@@ -31,8 +31,7 @@ void set_bogohome(const char *path) {
     char *t;
     struct stat st;
 
-    if (bogohome)
-	xfree(bogohome);
+    xfree(bogohome);
 
     bogohome = tildeexpand(path);
     if (stat(bogohome, &st) != 0 || !S_ISDIR(st.st_mode)) {
