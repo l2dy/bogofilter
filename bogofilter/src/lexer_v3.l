@@ -239,9 +239,10 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <HDISCARD>{TOKEN}				{ /* discard innards of html tags     */ }
 <LCOMMENT>{TOKEN}				{ /* discard innards of html comments */ }
 <HSCRIPT>{TOKEN}				{ if (tokenize_html_script)   return TOKEN; }
+<SCOMMENT>{TOKEN}				;			/* discard innards of html comments */ 
 
 <HTOKEN,HDISCARD>">"				{ BEGIN HTML; }		/* end of tag; return to normal html processing */
-<SCOMMENT>{TOKEN}				;			/* discard innards of html comments */ 
+<LCOMMENT>">"					{ BEGIN HTML; }		/* end of loose  comment; return to normal html processing */
 <SCOMMENT>"-->"					{ BEGIN HTML; }		/* end of strict comment; return to normal html processing */
 
 {IPADDR}					{ return IPADDR;}
