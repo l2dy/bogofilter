@@ -19,6 +19,14 @@ LC_ALL=
 unset LANG || :
 unset LC_COLLATE || :
 unset LC_ALL || :
+i=0
+INSERT=.
+while [ $i -lt 3 ] ; do
+    PRINTCORE=${srcdir}/$INSERT/printcore
+    if [ -x $PRINTCORE ] ; then break ; fi
+    i=`expr $i + 1`
+    INSERT=$INSERT/..
+done
 
 if [ -z "$RUN_FROM_MAKE" ] ; then
 # standalone, from shell directly
@@ -40,7 +48,7 @@ rm -rf $TMPDIR
 mkdir $TMPDIR
 
 if test "x$SUPPRESS_DELETE" = "x" ; then
-    trap "rm -r -f core ${TMPDIR}" 0
+    trap "$PRINTCORE ; rm -r -f core ${TMPDIR}" 0
 else
     echo "Results are in ${TMPDIR}.  Remove it after testing."
 fi

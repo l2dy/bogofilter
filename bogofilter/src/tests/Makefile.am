@@ -2,7 +2,7 @@
 
 SUBDIRS=. bogoutil bogofilter
 
-check_PROGRAMS=dehex spam_header_name dumbhead deqp deb64 escnp
+check_PROGRAMS=dehex spam_header_name dumbhead deqp deb64 escnp abortme
 dehex_SOURCES=dehex.c
 dumbhead_SOURCES=dumbhead.c
 deqp_SOURCES=deqp.c
@@ -17,7 +17,7 @@ LDADD = -lbogofilter
 TESTSCRIPTS=t.env \
 	    t.ignore_spam_header \
 	    t.integrity t.integrity2 t.integrity3 \
-	    t.lexer \
+	    t.lexer t.abort \
 	    t.lock1 t.lock2 \
 	    t.nullstatsprefix \
 	    t.score1 t.score2
@@ -26,7 +26,8 @@ TESTS=$(TESTSCRIPTS)
 
 TESTS_ENVIRONMENT=RUN_FROM_MAKE=1 AWK=$(AWK) srcdir=$(srcdir) $(SHELL) $(VERBOSE)
 
-EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel inputs outputs
+EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel inputs outputs \
+	   printcore t._abort
 
 dist-hook:
 	cd $(distdir) && for i in inputs outputs ; do find $$i -name CVS -type d -prune -exec rm -r '{}' ';' ; done

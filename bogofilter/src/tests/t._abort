@@ -1,0 +1,6 @@
+#! /bin/sh
+
+. ${srcdir:=.}/t.frame
+
+set +e
+(./abortme)
