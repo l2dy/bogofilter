@@ -11,7 +11,11 @@
 #include <stdlib.h>
 #include "xmalloc.h"
 
-#define mem_error(a) do { fprintf(stderr, a ": Out of memory\n"); abort(); } while(0)
+/*@noreturn@*/
+static void mem_error(const char *a) {
+    fprintf(stderr, "%s: Out of memory\n", a);
+    abort(); 
+}
 
 void *
 xmalloc(size_t size){
