@@ -3,3 +3,6 @@
 set -e
 TMPDIR=`mktemp -d ./checks.$$.XXXXXX`
 trap "rm -r ${TMPDIR}" 0
+BOGOFILTER_DIR=$TMPDIR
+export BOGOFILTER_DIR
+../bogofilter -n </dev/null
