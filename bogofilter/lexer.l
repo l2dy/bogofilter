@@ -18,6 +18,7 @@
 #include "charset.h"
 #include "error.h"
 #include "lexer.h"
+#include "fgetsl.h"
 #include "xmalloc.h"
 
 /*
@@ -69,7 +70,7 @@ static char save_text[256];
 %option align nounput noyywrap noreject 8bit
 
 BASE64		^([A-Za-z0-9/+]+={1,2}|[A-Za-z0-9/+]{32,})$
-UUENCODE	^M[^ ]{60}$
+UUENCODE	^M[^ ]{60}X?$
 UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
 IPADDR		{UINT8}\.{UINT8}\.{UINT8}\.{UINT8}
 MIME_BOUNDARY	^--[^[:blank:][:cntrl:]]+
@@ -252,29 +253,6 @@ filename=\"?					;
 
 %%
 
-/* returns -1 for EOF or max_size < 2, characters read otherwise */
-int lexer_fgets(char *buf, int max_size, FILE *s)
-{
-	int c;
-	char *cp = buf;
-
-	if ((max_size < 2) || feof(s)) return(-1);
-
-	while ((--max_size > 0) && ((c = getc(s)) != EOF)) {
-		*cp++ = c;
-		if (c == '\n')
-			break;
-	}
-
-	if (ferror(s)) {
-	    perror("stdin");
-	    exit(2);
-	}
-
-	*cp = '\0'; /* DO NOT ADD ++ HERE! */
-	return(cp - buf);
-}
-
 static int yyinput(char *buf, int max_size)
 /* input getter for the scanner */
 {
@@ -284,14 +262,14 @@ static int yyinput(char *buf, int max_size)
     if (hdrlen==0)
 	hdrlen=strlen(spam_header_name);
 
-    returned = lexer_fgets(buf, max_size, yyin);
+    returned = fgetsl(buf, max_size, yyin);
 
     while (returned != -1
 	    && !past_header
 	    && memcmp(buf,spam_header_name,hdrlen) == 0)
     {
 	do {
-	    returned = lexer_fgets(buf, max_size, yyin);
+	    returned = fgetsl(buf, max_size, yyin);
 	    if (returned != -1 && *buf == '\n')
 		break;
 	} while (returned != -1 && isspace((unsigned char)*buf));

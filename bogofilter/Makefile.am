@@ -51,6 +51,7 @@ libbogofilter_a_SOURCES= \
 	wordhash.h wordhash.c wordlists.h wordlists.c \
 	globals.h system.h \
 	version.c directories.c \
+	fgetsl.h fgetsl.c \
 	dcdflib/src/dcdflib.c dcdflib/src/ipmpar.c
 
 CLEANFILES=version.c directories.c
