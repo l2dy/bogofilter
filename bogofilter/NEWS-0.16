@@ -9,9 +9,11 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.16 !
 
-0.16.2.1 2004-01-17
+0.16.3	2004-01-17
 
 * Removed optional argument from "-u" flag.
+* Config file options can be put on the command line by using
+  "--option=value" syntax.
 
 0.16.2	2004-01-16
 
