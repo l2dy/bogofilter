@@ -139,11 +139,11 @@ my $msgformat = "mbox";
 if(-d $spfiles[0]) {
     $msgformat = "MH"; $scount = 0;
     foreach my $dir (@spfiles) {
-	$scount += `find $dir -type f -name '[0-9]*' 2>/dev/null | wc -l`;
+	$scount += `find $dir -xtype f -name '[0-9]*' 2>/dev/null | wc -l`;
     }
     $ncount = 0;
     foreach my $dir (@nsfiles) {
-	$ncount += `find $dir -type f -name '[0-9]*' 2>/dev/null | wc -l`;
+	$ncount += `find $dir -xtype f -name '[0-9]*' 2>/dev/null | wc -l`;
     }
 } else {
     my $cmd = join(" ", "cat", @spfiles, "| grep -c '^From ' |");
