@@ -3,10 +3,8 @@
 		bogofilter -- fast Bayesian spam filtering
 
 This package implements a fast Bayesian spam filter along the lines suggested 
-by Paul Graham in his article "A Plan For Spam".  It requires the Judy 
-libraries, available from SourceForge at:
-
-		http://sourceforge.net/projects/judy/	
+by Paul Graham in his article "A Plan For Spam".  The Judy library requirement has been
+dropped in favor of a built-in hash table.
 
 This version substantially improves on Paul's proposal by doing smarter
 lexical analysis.  In particular, hostames and IP addresses are retained

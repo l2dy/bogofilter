@@ -1,5 +1,8 @@
 # $Id$ 
 # $Log$
+# Revision 1.14  2002/09/29 03:37:56  gyepi
+# replace Judy with hash table (wordhash)
+#
 # Revision 1.13  2002/09/26 23:13:12  relson
 # Changed name of lexer_l.l to lexer.l for consistency with other filenames.
 #
@@ -74,7 +77,8 @@ man1_MANS = bogofilter.1
 
 # what to build that from
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
-		     datastore.h datastore_db.h datastore_db.c xmalloc.h xmalloc.c
+		     datastore.h datastore_db.h datastore_db.c xmalloc.h xmalloc.c \
+                     wordhash.h wordhash.c
 
 lexertest_SOURCES = lexer.l
 lexertest_CFLAGS = -DMAIN

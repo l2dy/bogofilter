@@ -1,5 +1,8 @@
 # $Id$
 # $Log$
+# Revision 1.7  2002/09/29 03:37:56  gyepi
+# replace Judy with hash table (wordhash)
+#
 # Revision 1.6  2002/09/17 11:35:08  m-a
 # Remove check for [v]fork(), bogofilter does not fork() at the moment.
 #
@@ -35,47 +38,6 @@ AC_EXEEXT
 AC_CHECK_LIB([m],  [cos])
 
 AH_TEMPLATE([HAVE_DB_H], [Have suitable db.h header])
-
-AC_ARG_WITH(judy,
-	[  AC_HELP_STRING([--with-judy=PATH],
-		[Specify path to Judy install directory. (default=/opt/Judy/usr)])
-	],
-	[
-		if test "x$withval" = "xno" ; then
-			withval = "/opt/Judy/usr"
-		fi
-		if test "x$withval" != "xno" ; then
-			if test -d "$withval/lib"; then
-				if test -n "${need_dash_r}"; then
-					LDFLAGS="-L${withval}/lib -R${withval}/lib ${LDFLAGS}"
-				else
-					LDFLAGS="-L${withval}/lib ${LDFLAGS}"
-				fi
-			else
-				if test -n "${need_dash_r}"; then
-					LDFLAGS="-L${withval} -R${withval} ${LDFLAGS}"
-				else
-					LDFLAGS="-L${withval} ${LDFLAGS}"
-				fi
-			fi
-			if test -d "$withval/include"; then
-				CPPFLAGS="-I${withval}/include ${CPPFLAGS}"
-			else
-				CPPFLAGS="-I${withval} ${CPPFLAGS}"
-			fi
-		fi
-		LIBS="$LIBS -lJudy"
-	],
-	[
-		AC_CHECK_LIB([Judy], [JudySLIns], LIBS="$LIBS -lJudy", 
-			AC_MSG_ERROR([Can not locate the Judy library in ${withval}. Use --with-judy=PATH to specify a valid Judy install location]) 
-		)
-	]
-)
-
-AC_MSG_CHECKING(Judy)
-AC_TRY_LINK_FUNC(JudySLIns,, AC_MSG_ERROR([Judy package is not working properly. Specify a different one using --with-judy=PATH]))
-AC_MSG_RESULT(Judy)
 
 AC_ARG_WITH(db,
         [  --with-db=PATH     Specify path to BerkelyDB install directory ],
