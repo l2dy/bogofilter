@@ -112,10 +112,10 @@ base changes so that they can be rolled back or restored after an
 application crash.
 
 The logs of the transactional data store, log.NNNNNNNNNN files of up to
-10 MB in size (in the default configuration), can clog up considerable
+10 MB in size (in the default configuration), can consume considerable
 amounts of disk space and many users wish to purge or compress these log
 files. These can safely be handled with BerkeleyDB's db_checkpoint and
-db_archive utilities, which you'll run in this order:
+db_archive utilities, which should be run in this order:
 
 - db_checkpoint migrates written-ahead data from the log files into the
   data base, and places a checkpoint which will speed up data base
