@@ -72,7 +72,7 @@ AUTHOR:
 #define	PREF_COUNT	4000	/* preferred message count         */
 #define	LARGE_COUNT	40000
 
-#define	MIN_THR_PCT	0.0015	/* minimum threshold percent */
+#define	MIN_THR_PCT	0.0014	/* minimum threshold percent */
 #define	MAX_THR_PCT	0.0050	/* maximum threshold percent */
 
 #define	HAM_CUTOFF	0.10
@@ -459,9 +459,10 @@ static double scale(uint cnt, uint lo, uint hi, double beg, double end)
     return ans;
 }
 
-/* compute scores and get fp target and spam cutoff value
+/* compute scores and set global variables:
 **
-**	sets global variables target and spam_cutoff
+**	 target
+**	 spam_cutoff
 **
 ** As count increases from 500 to 4000 ...
 **	1) initial target percent drops from 1% to 0.25% 
@@ -505,6 +506,9 @@ static void set_thresh(uint count, double *scores)
  	cutoff = SPAM_CUTOFF;
 	--ftarget;
     }
+
+    if (verbose >= PARMS)
+	print_ns_scores(ftarget-4, ftarget+4, 0);
 
     target = ftarget;
     spam_cutoff = cutoff;
