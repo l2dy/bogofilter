@@ -118,6 +118,24 @@ void dbh_print_names(void *vhandle, const char *msg)
 }
 
 
+static void check_db_version(void)
+{
+    int maj, min;
+    static int version_ok;
+
+    if (!version_ok) {
+	version_ok = 1;
+	(void)db_version(&maj, &min, NULL);
+	if (!(maj == DB_VERSION_MAJOR && min == DB_VERSION_MINOR)) {
+	    fprintf(stderr, "The DB versions do not match.\n"
+		    "This program was compiled for DB version %d.%d,\n"
+		    "but it is linked against DB version %d.%d.\nAborting.\n",
+		    DB_VERSION_MAJOR, DB_VERSION_MINOR, maj, min);
+	    exit(2);
+	}
+    }
+}
+
 /*
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
@@ -137,20 +155,8 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
      */
     size_t idx;
     uint32_t retryflags[] = { 0, DB_NOMMAP };
-    int maj, min;
-    static int version_ok;
     
-    if (!version_ok) {
-	version_ok = 1;
-	(void)db_version(&maj, &min, NULL);
-	if (!(maj == DB_VERSION_MAJOR && min == DB_VERSION_MINOR)) {
-	    fprintf(stderr, "The DB versions do not match.\n"
-		    "This program was compiled for DB version %d.%d,\n"
-		    "but it is linked against DB version %d.%d.\nAborting.\n",
-		    DB_VERSION_MAJOR, DB_VERSION_MINOR, maj, min);
-	    exit(2);
-	}
-    }
+    check_db_version();
 
     if (open_mode == DB_READ)
 	opt_flags = DB_RDONLY;
