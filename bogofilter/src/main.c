@@ -73,10 +73,10 @@ static void cleanup_exit(int exitcode, int killfiles) {
     exit(exitcode);
 }
 
-int classify(int argc, char **argv, FILE *out);
-void initialize(FILE *fp);
+static int classify(int argc, char **argv, FILE *out);
+static void initialize(FILE *fp);
 
-void initialize(FILE *fp)
+static void initialize(FILE *fp)
 {
     init_charset_table(charset_default, true);
     mime_reset();
@@ -85,7 +85,7 @@ void initialize(FILE *fp)
     lexer_v3_init(fp);
 }
 
-int classify(int argc, char **argv, FILE *out)
+static int classify(int argc, char **argv, FILE *out)
 {
     int  exitcode = 0;
     bool done = false;
