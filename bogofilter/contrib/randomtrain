@@ -7,6 +7,8 @@
 #  version:  0.5 (Greg Louis <glouis@dynamicro.on.ca>)
 
 pid=$$
+BOGOFILTER="../bogofilter"
+BOGOUTIL="../bogoutil"
 
 function usage() {
     iam=`basename $0`
@@ -42,6 +44,24 @@ let n=${#*}%2
 test $n -eq 0 || usage
 
 # params may be ok, here goes...
+
+cat <<EOF > cfg.$pid
+terse_format = %1.1c %d
+header_format = %1.1c
+#
+# For Robinson algorithm:
+#
+algorithm = robinson
+terse_format = %1.1c %d
+spamicity_formats = %0.6f %0.6f
+#
+# For Fisher algorithm:
+#
+algorithm = fisher
+ham_cutoff = 0.10f
+spamicity_tags = Y, N, U
+spamicity_formats = %6.2e %6.2e %0.6f
+EOF
 
 # get all the byte offsets in all the files, in one list
 while [ ${#*} -gt 1 ]; do
@@ -79,20 +99,25 @@ file=""
 # go through the list, extract the messages, eval with bogofilter
 # and train if bogofilter is wrong or uncertain
 {
+    cnt=0
     while read expect fnam offset length; do
+	let cnt=cnt+1
 	dd if=$fnam bs=1 skip=$offset count=$length 2>/dev/null >msg.$pid
-	bogofilter -d $bogodir <msg.$pid
-	got=$?	# 0=spam, 1=good, 2=unknown, 3=err
-	echo -n "bogo=$got, "
-	if [ $got -eq 0 ]; then got="s"; elif [ $got -eq 1 ]; then got="n"; fi
+	got=`$BOGOFILTER -l -v -d $bogodir -c cfg.$pid <msg.$pid`
+	printf "%d bogo=%s, " $cnt $got
+	if [ $got = "Y" ]; then got="s"; else got="n"; fi
 	echo -n "exp=$expect, got=$got"
 	if [ $got != $expect ]; then
 	    echo -n ", reg=$expect"
 	    # comment out the next line for dry-run testing
-	    bogofilter -d $bogodir -$expect <msg.$pid
+	    $BOGOFILTER -d $bogodir -c cfg.$pid -$expect <msg.$pid
 	fi
 	echo
     done
 } <shuf.$pid
+
 # next line can be commented out for debugging
-rm -f list.$pid shuf.$pid msg.$pid
+rm -f list.$pid shuf.$pid msg.$pid cfg.$pid
+
+# display message counts
+$BOGOUTIL -w $bogodir .MSG_COUNT
