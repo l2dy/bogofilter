@@ -82,7 +82,7 @@ done
 
 if test x$SUPPRESS_DELETE != x ; then rm -rf t.systest.d/cfg.?; fi
 
-if  [ "$verbose" -eq 1 ]; then
+if  [ "$verbose" = "1" ]; then
     diff -u -s outputs/$OUT tests/$OUT
 fi
 
