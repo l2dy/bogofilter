@@ -30,3 +30,10 @@ cvs-check:
 	cvs export -rHEAD -d $(PACKAGE)-$(VERSION)-export $(PACKAGE)
 	cd $(PACKAGE)-$(VERSION)-export && autoreconf -i -f -s \
 	&& ./configure && make distcheck
+
+# this target expects a .rsyncs file with lines of this format:
+# host:directory/
+# it will call rsync from its source directory to the destination for
+# each of them, running them in parallel
+rsync:	distdir .rsyncs
+	cat .rsyncs | while read a ; do case $$a in *:*/) rsync -av --delete $(PACKAGE)-$(VERSION)/ $$a/ & ;; esac ; done ; wait
