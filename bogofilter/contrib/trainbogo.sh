@@ -148,7 +148,7 @@ done
 [ ! -d "${statsdir}" ] && echo "Missing statsdir (-s option)" && exit
 
 # check for bogofilter
-bfbin=`which ${bf%% *}`
+bfbin=$(which ${bf%% *})
 [ $? -ne 0 ] && echo "Missing bogofilter, not in path? (${bf})" && exit
 [ ! -x "${bfbin}" ] && echo "Missing or bad bogofilter binary! (${bf})" && exit
 
@@ -172,7 +172,7 @@ fi
 if [ ! -f "${list}" -o -n "${dofilelist}" ]; then
     # MD5 all the spam and ham
 
-    [ -z "${rndseed}" ] && rndseed="$$.`date +%s`"
+    [ -z "${rndseed}" ] && rndseed="$$.$(date +%s)"
 
     normal "MD5'ing ham and spam corpus, rndseed used: ${rndseed}"
 
@@ -181,11 +181,11 @@ if [ ! -f "${list}" -o -n "${dofilelist}" ]; then
     for i in "${hamdir}"/* "${spamdir}"/*
       do
       [ ! -f "${i}" ] && continue
-      md5=`echo -n "${rndseed}${i}" | md5sum | sed "s/  -//"`
+      md5=$(echo -n "${rndseed}${i}" | md5sum | sed "s/  -//")
       echo "${md5}  ${i}" >> "${list}"
     done
 
-    [ `wc -l < "${list}"` -eq 0 ] && echo "No files to work on!!!" && exit
+    [ $(wc -l < "${list}") -eq 0 ] && echo "No files to work on!!!" && exit
 
     # This randomizes the file names by sorting on the md5 hash
     normal "Randomizing ham and spam"
@@ -209,7 +209,7 @@ if [ -n "${dotest}" -o -n "${dotrain}" ]; then
     (while read spamstatus fname
 	do
 	normaln  "${lastdot}"
-	bogotest=`${bf} -v < "${fname}"`
+	bogotest=$(${bf} -v < "${fname}")
 	ret=$?
 	if [ ${spamstatus} -eq ${ret} ]; then	# bogofilter detected this message correctly
 	    echo "${fname}" >> "${log}.${spamstatus}.success"
@@ -234,7 +234,7 @@ if [ -n "${dotest}" -o -n "${dotrain}" ]; then
 	${bf} ${bfopt} < "${fname}"
 
 	# Test again
-	bogotest=`${bf} -v < "${fname}"`
+	bogotest=$(${bf} -v < "${fname}")
 	ret=$?
 
 	# Did it train successfully?
@@ -256,17 +256,17 @@ echo
 
 if [ -z "${quiet}" ]; then
 
-    total_msg=`wc -l < "${list}"`
+    total_msg=$(wc -l < "${list}")
 
-    total_ham_msg=`ls "${hamdir}" | wc -l`
-    total_ham_success=`wc -l < "${log}.1.success"`
-    total_ham_fail=`wc -l < "${log}.1.fail"`
-    total_ham_train_fail=`wc -l < "${log}.1.train.fail"`
+    total_ham_msg=$(ls "${hamdir}" | wc -l)
+    total_ham_success=$(wc -l < "${log}.1.success")
+    total_ham_fail=$(wc -l < "${log}.1.fail")
+    total_ham_train_fail=$(wc -l < "${log}.1.train.fail")
 
-    total_spam_msg=`ls "${spamdir}" | wc -l`
-    total_spam_success=`wc -l < "${log}.0.success"`
-    total_spam_fail=`wc -l < "${log}.0.fail"`
-    total_spam_train_fail=`wc -l < "${log}.0.train.fail"`
+    total_spam_msg=$(ls "${spamdir}" | wc -l)
+    total_spam_success=$(wc -l < "${log}.0.success")
+    total_spam_fail=$(wc -l < "${log}.0.fail")
+    total_spam_train_fail=$(wc -l < "${log}.0.train.fail")
 
     echo "Total   messages: ${total_msg}"
     echo
