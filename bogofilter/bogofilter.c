@@ -1,23 +1,26 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.7  2002/09/15 19:22:51  relson
- * Refactor the main bogofilter() function into three smaller, more coherent pieces:
+ * Revision 1.8  2002/09/17 06:20:08  adrian_otto
+ * Removed type cast on qsort call to improve portability
  *
- * void *collect_words(int fd)
- * 	- returns a set of tokens in a Judy array
- *
- * bogostat_t *select_indicators(void  *PArray)
- * 	- processes the set of words
- * 	- returns an array of spamicity indicators (words & probabilities)
- *
- * double compute_spamicity(bogostat_t *stats)
- *    	- processes the array of spamicity indicators
- * 	- returns the spamicity
- *
- * rc_t bogofilter(int fd)
- * 	- calls the 3 component functions
- * 	- returns RC_SPAM or RC_NONSPAM
- *
+/* Revision 1.7  2002/09/15 19:22:51  relson
+/* Refactor the main bogofilter() function into three smaller, more coherent pieces:
+/*
+/* void *collect_words(int fd)
+/* 	- returns a set of tokens in a Judy array
+/*
+/* bogostat_t *select_indicators(void  *PArray)
+/* 	- processes the set of words
+/* 	- returns an array of spamicity indicators (words & probabilities)
+/*
+/* double compute_spamicity(bogostat_t *stats)
+/*    	- processes the array of spamicity indicators
+/* 	- returns the spamicity
+/*
+/* rc_t bogofilter(int fd)
+/* 	- calls the 3 component functions
+/* 	- returns RC_SPAM or RC_NONSPAM
+/*
 /* Revision 1.6  2002/09/15 19:07:13  relson
 /* Add an enumerated type for return codes of RC_SPAM and RC_NONSPAM, which  values of 0 and 1 as called for by procmail.
 /* Use the new codes and type for bogofilter() and when generating the X-Spam-Status message.
@@ -570,7 +573,7 @@ double compute_spamicity(bogostat_t *stats)
     if (verbose)
     {
 	// put the stats in ascending order by probability and alphabet
-	qsort(stats->extrema, KEEPERS, sizeof(discrim_t), (__compar_fn_t) compare_stats);
+	qsort(stats->extrema, KEEPERS, sizeof(discrim_t), compare_stats);
     }
 
     // Bayes' theorem.
