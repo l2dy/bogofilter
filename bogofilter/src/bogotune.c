@@ -871,7 +871,6 @@ static void help(void)
 		  "\t  -s file1 file2 ... - spam files\n"
 		  "\t  -n file1 file2 ... - non-spam files\n"
 		  "\t  -v      - increase level of verbose messages\n"
-		  "\t          - accept high scoring non-spam and low scoring spam\n"
 		  "\t  -q      - quiet (suppress warnings)\n"
 	);
     (void)fprintf(stderr,
