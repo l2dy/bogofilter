@@ -1,9 +1,27 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.6  2002/09/15 19:07:13  relson
- * Add an enumerated type for return codes of RC_SPAM and RC_NONSPAM, which  values of 0 and 1 as called for by procmail.
- * Use the new codes and type for bogofilter() and when generating the X-Spam-Status message.
+ * Revision 1.7  2002/09/15 19:22:51  relson
+ * Refactor the main bogofilter() function into three smaller, more coherent pieces:
  *
+ * void *collect_words(int fd)
+ * 	- returns a set of tokens in a Judy array
+ *
+ * bogostat_t *select_indicators(void  *PArray)
+ * 	- processes the set of words
+ * 	- returns an array of spamicity indicators (words & probabilities)
+ *
+ * double compute_spamicity(bogostat_t *stats)
+ *    	- processes the array of spamicity indicators
+ * 	- returns the spamicity
+ *
+ * rc_t bogofilter(int fd)
+ * 	- calls the 3 component functions
+ * 	- returns RC_SPAM or RC_NONSPAM
+ *
+/* Revision 1.6  2002/09/15 19:07:13  relson
+/* Add an enumerated type for return codes of RC_SPAM and RC_NONSPAM, which  values of 0 and 1 as called for by procmail.
+/* Use the new codes and type for bogofilter() and when generating the X-Spam-Status message.
+/*
 /* Revision 1.5  2002/09/15 18:29:04  relson
 /* bogofilter.c:
 /*
@@ -426,33 +444,18 @@ int compare_stats(discrim_t *d1, discrim_t *d2)
 	     ((d1->prob == d2->prob) && (strcmp(d1->key, d2->key) > 0)));
 }
 
-rc_t bogofilter(int fd)
-/* evaluate text for spamicity */
+void *collect_words(int fd)
+// tokenize input text and save words in a Judy array.
+// returns:  the Judy array
 {
+    int tok;
+
     void	**PPValue;			// associated with Index.
     void	*PArray = (Pvoid_t) NULL;	// JudySL array.
     JError_t	JError;				// Judy error structure
 
     void	**loc;
     char	tokenbuffer[BUFSIZ];
-
-    double prob, product, invproduct;
-    double hamness, spamness, slotdev, hitdev;    
-    int tok;
-#ifdef NON_EQUIPROBABLE
-    // There is an argument that we should by by number of *words* here.
-    double	msg_prob = (spam_list.msgcount / ham_list.msgcount);
-#endif // NON_EQUIPROBABLE
-
-    static bogostat_t stats;
-    double spamicity;
-    discrim_t *pp, *hit;
-
-    for (pp = stats.extrema; pp < stats.extrema+sizeof(stats.extrema)/sizeof(*stats.extrema); pp++)
-    {
-	pp->prob = 0.5f;
-	pp->key[0] = '\0';
-    }
 
     yyin = fdopen(fd, "r");
     while ((tok = get_token()) != 0)
@@ -463,15 +466,39 @@ rc_t bogofilter(int fd)
 	    break;
 	(*((PWord_t) PPValue))++;
     }
+    return PArray;
+}
 
-    tokenbuffer[0]='\0';
+bogostat_t *select_indicators(void  *PArray)
+// selects the best spam/nonspam indicators and
+// populates the stats structure.
+{
+    void	**loc;
+    char	tokenbuffer[BUFSIZ];
+
+    discrim_t *pp, *hit;
+    static bogostat_t stats;
+    
+#ifdef NON_EQUIPROBABLE
+    // There is an argument that we should by by number of *words* here.
+    double	msg_prob = (spam_list.msgcount / ham_list.msgcount);
+#endif // NON_EQUIPROBABLE
+
+    for (pp = stats.extrema; pp < stats.extrema+sizeof(stats.extrema)/sizeof(*stats.extrema); pp++)
+    {
+ 	pp->prob = 0.5f;
+ 	pp->key[0] = '\0';
+    }
+ 
+    yytext = tokenbuffer;
     for (loc  = JudySLFirst(PArray, tokenbuffer, 0);
 	 loc != (void *) NULL;
 	 loc  = JudySLNext(PArray, tokenbuffer, 0))
     {
+	double prob;
 	double dev;
+	double hamness, spamness, slotdev, hitdev;
 
-	yytext = tokenbuffer;
 	hamness = getcount(yytext, &ham_list);
 	spamness  = getcount(yytext, &spam_list);
 
@@ -528,17 +555,29 @@ rc_t bogofilter(int fd)
 	    strncpy(hit->key, yytext, MAXWORDLEN);
 	}
     }
+    return (&stats);
+}
+
+double compute_spamicity(bogostat_t *stats)
+// computes the spamicity of the words in the bogostat structure
+// returns:  the spamicity
+{
+    double product, invproduct;
+    double spamicity = 0.0;
+
+    discrim_t *pp;
 
     if (verbose)
-	qsort(&stats.extrema, KEEPERS, sizeof(discrim_t), (__compar_fn_t) compare_stats);
+    {
+	// put the stats in ascending order by probability and alphabet
+	qsort(stats->extrema, KEEPERS, sizeof(discrim_t), (__compar_fn_t) compare_stats);
+    }
 
     // Bayes' theorem.
     // For discussion, see <http://www.mathpages.com/home/kmath267.htm>.
     product = invproduct = 1.0f;
-    for (pp = stats.extrema; pp < stats.extrema+sizeof(stats.extrema)/sizeof(*stats.extrema); pp++)
-	if (pp->prob == 0)
-	    break;
-    	else
+    for (pp = stats->extrema; pp < stats->extrema+sizeof(stats->extrema)/sizeof(*stats->extrema); pp++)
+	if (pp->prob != 0)
 	{
 	    product *= pp->prob;
 	    invproduct *= (1 - pp->prob);
@@ -550,8 +589,29 @@ rc_t bogofilter(int fd)
     if (verbose)
 	printf("#  Spamicity of %f\n", spamicity);
 
-    return((spamicity > SPAM_CUTOFF) ? RC_SPAM : RC_NONSPAM);
+    return spamicity;
+}
+
+rc_t bogofilter(int fd)
+/* evaluate text for spamicity */
+{
+    rc_t	status;
+    double 	spamicity;
+    void	*PArray = (Pvoid_t) NULL;	// JudySL array.
+    bogostat_t	*stats;
+
+//  tokenize input text and save words in a Judy array.
+    PArray = collect_words(fd);
+    
+//  select the best spam/nonspam indicators.
+    stats = select_indicators(PArray);
+    
+//  computes the spamicity of the spam/nonspam indicators.
+    spamicity = compute_spamicity(stats);
+
+    status = (spamicity > SPAM_CUTOFF) ? RC_SPAM : RC_NONSPAM;
+
+    return status;
 }
 
 // Done
-
