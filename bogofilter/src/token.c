@@ -91,7 +91,7 @@ static void build_prefixed_token( word_t *token, uint32_t token_size,
     uint l = leng + p;
 
     if (l >= token_size)
-	l = token_size - p;
+	l = token_size - p - 1;
 
     token->leng = l;
 
