@@ -19,13 +19,13 @@ AUTHOR:
 
 #include <config.h>
 #include "common.h"
+#include "globals.h"
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #ifdef	HAVE_CHARSET
 #include "charset.h"
 #endif
-#include "directories.h"
 #include "find_home.h"
 #include "method.h"
 #ifdef	ENABLE_GRAHAM_METHOD
@@ -66,7 +66,6 @@ int Rtable = 0;		/* '-R' */
 static bool suppress_config_file = false;
 
 char directory[PATH_LEN + 100] = "";
-const char *system_config_file = SYSCONFDIR "/bogofilter.cf";
 const char *user_config_file   = "~/.bogofilter.cf";
 const char *spam_header_name = SPAM_HEADER_NAME;
 
@@ -407,9 +406,9 @@ static void help(void)
     (void)printf( "\n" );
 }
 
-static void version(void)
+static void print_version(void)
 {
-    (void)printf("\n%s version %s ", PACKAGE, VERSION);
+    (void)printf("\n%s version %s ", PACKAGE, version);
     (void)printf("Copyright (C) 2002 Eric S. Raymond\n\n");
     (void)printf("%s comes with ABSOLUTELY NO WARRANTY. ", PACKAGE);
     (void)printf("This is free software, and you\nare welcome to ");
@@ -480,7 +479,7 @@ int process_args(int argc, char **argv)
 	    break;
 
         case 'V':
-	    version();
+	    print_version();
 	    exit(0);
 	    break;
 
