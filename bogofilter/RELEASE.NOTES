@@ -1,6 +1,6 @@
 This file documents incompatible (that require further action upon
 update) and major (noteworthy but compatible) changes since bogofilter
-0.11, separated by line feeds.
+0.11, separated by form feeds.
 
 Caution: If upgrading from an old version and skipping several
 intervening versions of bogofilter, be smart and check all the
