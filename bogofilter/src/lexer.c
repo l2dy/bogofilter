@@ -58,12 +58,15 @@ bool is_from(word_t *w)
     return false;
 }
 
-static bool check_alphanum(byte *buf, size_t count)
+/* Check for lines wholly composed of printable characters as they can cause a scanner abort 
+   "input buffer overflow, can't enlarge buffer because scanner uses REJECT"
+*/
+static bool may_be_long_token(byte *buf, size_t count)
 {
     size_t i;
     for (i=0; i < count; i += 1) {
 	unsigned char c = (unsigned char)buf[i];
-	if (iscntrl(c) || isspace(c) || ispunct(c))
+	if ((iscntrl(c) || isspace(c) || ispunct(c)) && (c != '_'))
 	    return false;
     }
     return true;
@@ -254,9 +257,9 @@ int yyinput(byte *buf, size_t max_size)
 	done = true;
 	count += get_decoded_line(&buff);
 
-	while (count > (MAXTOKENLEN * 1.5)  && check_alphanum(buff.t.text, count)) {
+	while (count > (MAXTOKENLEN * 1.5) && may_be_long_token(buff.t.text, count)) {
 	    done = false;
-	    if (count < 2 * MAXTOKENLEN) 
+	    if (count < MAXTOKENLEN * 2) 
 		break;
 	    else {
 		size_t shift = count - MAXTOKENLEN;
