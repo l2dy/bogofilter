@@ -178,7 +178,7 @@ AM_CONDITIONAL(ENABLE_ROBINSON_FISHER, test x$USE_FISHER != xNO)
 # Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_STDBOOL
-AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h stdlib.h string.h sys/socket.h unistd.h sys/file.h])
+AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h stdlib.h string.h sys/socket.h unistd.h sys/file.h stddef.h])
 AC_CHECK_HEADERS([limits.h float.h],,[AC_CHECK_HEADERS(values.h)])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -197,8 +197,13 @@ dnl AC_FUNC_STAT
 # AC_FUNC_STAT wants to replace stat(2) if stat("", &st) succeeds.
 # we catch this.
 
+AC_FUNC_MEMCMP
+AC_FUNC_MMAP
+AC_FUNC_VPRINTF
+
 AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup)
 AC_CHECK_FUNCS(strerror flock lockf fcntl strchr strrchr memcpy)
+AC_CHECK_FUNCS(munmap pow sqrt strcasecmp strcspn strspn strstr)
 AC_REPLACE_FUNCS(strlcpy strlcat)
 
 if test "$sysconfdir" = "\${prefix}/etc" \
