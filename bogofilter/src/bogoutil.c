@@ -387,30 +387,20 @@ static int get_robx(const char *path)
 	printf("%f\n", rx);
     else {
 	dsv_t val;
-	void  *dsh;
-	char filepath[PATH_LEN];
-
 	word_t *word_robx = word_new((const byte *)ROBX_W, (uint) strlen(ROBX_W));
 
-	build_wordlist_path(filepath, sizeof(filepath), path);
+	open_wordlists(DS_WRITE);
 
-	run_type = REG_SPAM;
-
-	set_bogohome(filepath);
-
-	dsh = ds_open(CURDIR_S, filepath, DS_WRITE);
-	if (dsh == NULL)
-	    return EX_ERROR;
-
-	if (DST_OK == ds_txn_begin(dsh)) {
+	if (DST_OK == ds_txn_begin(word_lists->dsh)) {
 	    val.goodcount = 0;
 	    val.spamcount = (uint32_t) (rx * 1000000);
-	    ret = ds_write(dsh, word_robx, &val);
-	    if (DST_OK != ds_txn_commit(dsh))
+	    ret = ds_write(word_lists->dsh, word_robx, &val);
+	    if (DST_OK != ds_txn_commit(word_lists->dsh))
 		ret = 1;
 	}
-	ds_close(dsh);
-	ds_cleanup();
+
+	close_wordlists();
+	free_wordlists();
 
 	word_free(word_robx);
     }
