@@ -18,6 +18,7 @@ Buildroot:	%{_tmppath}/%{name}-%{version}-root
 Conflicts:	bogofilter-static
 
 AutoReq:	no
+
 %description
 Bogofilter is a Bayesian spam filter.  In its normal mode of
 operation, it takes an email message or other text on standard input,
@@ -33,6 +34,7 @@ Group:		Networking/Mail
 Conflicts:	bogofilter
 
 AutoReq:	no
+
 %description static
 Statically linked bogofilter, bogolexer, bogoutil, and bogotune
 
