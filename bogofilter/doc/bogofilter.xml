@@ -250,11 +250,13 @@ registered on the spamlist and a non-spam message on the goodlist.  If
 the classification is "unsure", the message will not be registered.
 Effectively this option runs <application>bogofilter</application>
 with the <option>-s</option> or <option>-n</option> flag, as
-appropriate.  (Caution is urged in the use of this capability, as any
+appropriate.  Caution is urged in the use of this capability, as any
 classification errors <application>bogofilter</application> may make
 will be preserved and will accumulate until manually corrected with
 the <option>-Sn</option> and <option>-Ns</option> option
-combinations.)</para>
+combinations.  Note this option cause the database to be opened for
+write access, which can entail massive slowdowns through
+lock contention and synchronous I/O operations.</para>
 
 <para>The <option>-H</option> option tells
 <application>bogofilter</application> to not tag tokens from the
