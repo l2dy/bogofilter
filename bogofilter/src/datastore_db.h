@@ -63,10 +63,12 @@ int db_delete(void *handle, const dbv_t *data);
 /** Set the value associated with a given word in a list. */
 int db_set_dbvalue(void *handle, const dbv_t *token, const dbv_t *val);
 
-/** Iterate over all elements in data base and call \p hook for each item.
- * \p userdata is passed through to the hook function unaltered.
- */
+/** Callback hook used by db_foreach, passes the original \p userdata
+ * down as well as \a token and \a data. If the function returns a
+ * nonzero value, the traversal is aborted. */
 typedef ex_t (*db_foreach_t)(dbv_t *token, dbv_t *data, void *userdata);
+/** Iterate over all elements in data base and call \p hook for each item.
+ * \p userdata is passed through to the hook function unaltered. */
 ex_t db_foreach(void *handle, db_foreach_t hook, void *userdata);
 
 /** Returns error string associated with \a code. */
