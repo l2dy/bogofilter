@@ -333,8 +333,8 @@ size_t decode_text(word_t *w)
 {
     char *beg = (char *) w->text;
     char *fin = beg + w->leng;
-    char *txt = beg;
-    size_t size = 0;
+    char *txt = strstr(beg, "=?");		/* skip past leading text */
+    size_t size = txt - beg;
 
     while (txt < fin) {
 	word_t n;
