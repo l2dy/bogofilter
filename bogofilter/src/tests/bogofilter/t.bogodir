@@ -22,7 +22,9 @@ if [ "$1" = "-v" ]; then
     verbose=1
 fi
 
-HOME="${TMPDIR}"
+HOME="${TMPDIR}/home"
+mkdir $HOME
+export HOME
 BOGOFILTER="$VAL ${relpath}/bogofilter"
 LOG="${TMPDIR}/bogodir.log"
 cat /dev/null > $LOG
