@@ -1,6 +1,6 @@
 #! /usr/bin/perl
 # bogotune - a bogofilter tuning tool
-# 20030621, version 0.2.4
+# version 0.2.5, started 20030623
 # Copyright (c) 2003 Gregory Louis; distributed wiithout warranty of
 # any kind under the GNU General Public License (GPL).
 
@@ -351,14 +351,28 @@ foreach $scantype ("coarse", "fine") {
 		### now get fn count
 		if($usebogofilter) {
 		    $cmd = join(" ", "cat", @spfiles, "|", $bogof, $cf, "-d",
-			$bogodir, "-Mttv -m", $mpar, "-o", $cutoff,
-			"| grep -c -v '^1' |");
+			$bogodir, "-Mttv -m", $mpar, "-o", $cutoff, ">",
+			$workfn);
+		    $err = system($cmd) >> 8;
+		    if($err > 2) {
+			print("Warning re processing spam messages: ",
+			    $errr, "\n");
+		    }
+		    open(SCORES, $workfn) or
+			yuk(8, "Couldn't open spam scores");
+		    $fn = 0;
+		    while(<SCORES>) {
+			chop; ($V1, $V2) = split(/\s+/);
+			if(($V2 == "" && $V1 <= $cutoff) ||
+			    ($V2 && $V1 != 1)) { ++$fn; }
+		    }
+		    close SCORES;
 		} else {
 		    $cmd = join(" ", "cat", @spfiles, "| apclass -fq -m",
 			$mpar, "-o", $cutoff, "| grep -c -v '^1' |");
+		    open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
+		    $fn = <COUNTS>; chop $fn; close COUNTS;
 		}
-		open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
-		$fn = <COUNTS>; chop $fn; close COUNTS;
 		@parm = ($rsi, $mdi, $rxi, $cutoff, $fp, $fn);
 		push @parms, [ @parm ];
 		if($verbose) {
@@ -528,7 +542,7 @@ if($cutoff < 0.999) {
     for $i (0 .. $#spscores) { if($spscores[$i] > $cutoff) { $n=$i; last; }}
     $fneg = sprintf("%0.2f", 100 * $n / $scount);
     $fp = sprintf("%0.2f", 100 * $target / $ncount);
-    print("Spam cutoff for ", $fp, " false positives is ", $cutoff,
+    print("Spam cutoff for ", $fp, "% false positives is ", $cutoff,
 	"; expect ", $fneg, "% false neg.\n");
 }
 $cutoff = sprintf("%0.3f", $spscores[POSIX::ceil($scount * 0.002)-1]);
