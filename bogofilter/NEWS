@@ -2,7 +2,10 @@
 
 				bogofilter news
 
-0.7.6	2002-10-25T23:05:00Z
+0.7.6	2002-10-27
+	* Added README.hp-ux for those using HP-UX.
+	* Added support for additional architectures - ia64, arm,
+	  powerpc, and s390.
 	* Bogofilter -p mode now preserves CR and NUL characters.
 	* Bogofilter -p mode now detects if the computer runs out of
 	  memory.
@@ -10,11 +13,12 @@
 	  information to syslog.
 	* Bogofilter supports a new algorithm to calculate the
 	  "spamicity", the "Robinson" algorithm. It is enabled with the
-	  new "-r" switch. The old behaviour is called the "Graham"
-	  algorithm and can be enforced with the new "-g" switch.
+	  new "-r" switch. The old behavior is called the "Graham"
+	  algorithm and can be enforced with the new "-g" switch.  The
+	  default behavior is to use the "Graham" algorithm.
 	* Bogofilter now has an "-R FILE" option (that implies -r) to print
 	  an R data frame to FILE.
-	* Bogofilter and bogoutil now have an -x CLASSES option to turn
+	* Bogofilter and bogoutil now have a "-x CLASSES" option to turn
 	  on debugging.
 	* Bogoupgrade.pl has been renamed to bogoupgrade.
 	* There is now a man page for bogoupgrade.
