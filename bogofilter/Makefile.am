@@ -40,7 +40,6 @@ libbogofilter_a_SOURCES= \
 	bogoconfig.h config.c \
 	find_home.h find_home.c find_home_user.c \
 	    find_home_tildeexpand.c \
-	charset.h charset.c \
 	collect.h collect.c \
 	datastore.h datastore_db.h datastore_db.c \
 	format.h format.c \
