@@ -113,9 +113,9 @@ rc_t bogofilter(int argc, char **argv)
 	    status = (*method->status)();
 	    if (run_type & RUN_UPDATE)		/* Note: don't register if RC_UNSURE */
 	    {
-		if (status == RC_SPAM)
+		if (status == RC_SPAM && spamicity <= 1.0 - thresh_update)
 		    register_words(REG_SPAM, w, msgcount);
-		if (status == RC_HAM)
+		if (status == RC_HAM && spamicity >= thresh_update)
 		    register_words(REG_GOOD, w, msgcount);
 	    }
 

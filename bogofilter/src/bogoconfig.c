@@ -122,6 +122,7 @@ const parm_desc sys_parms[] =
     { "min_dev",	  CP_DOUBLE,	{ (void *) &min_dev } },
     { "spam_cutoff",	  CP_DOUBLE,	{ (void *) &spam_cutoff } },
     { "thresh_stats",	  CP_DOUBLE,	{ (void *) &thresh_stats } },
+    { "thresh_update",	  CP_DOUBLE,	{ (void *) &thresh_update } },
 #ifdef	ENABLE_DEPRECATED_CODE
     { "thresh_index",	  CP_INTEGER,	{ (void *) NULL } },	/* Graham */
 #endif
@@ -303,6 +304,7 @@ static void help(void)
 		  "\t  -p      - passthrough.\n"
 		  "\t  -e      - in -p mode, exit with code 0 when the mail is not spam.\n"
 		  "\t  -u      - classify message as spam or non-spam and register accordingly.\n"
+		  "\t  -u v1   - set threshold for auto-update.\n"
 #ifdef	ENABLE_DEPRECATED_CODE
 		  "\t  -2      - set binary classification mode (yes/no).\n"
 		  "\t  -3      - set ternary classification mode (yes/no/unsure).\n"
@@ -427,9 +429,9 @@ static void print_version(void)
 #endif
 
 #ifndef	ENABLE_DEPRECATED_CODE
-#define	OPTIONS	":bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pqQRrsStTuUvVx:X:y:"
+#define	OPTIONS	":bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pqQRrsStTu::UvVx:X:y:"
 #else
-#define	OPTIONS	":23bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pP:qQRrsStTuUvWVx:X:y:" G R F
+#define	OPTIONS	":23bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pP:qQRrsStTu::UvWVx:X:y:" G R F
 #endif
 
 /** These functions process command line arguments.
@@ -570,8 +572,18 @@ void process_args_1(int argc, char **argv)
 	    break;
 
 	case 'u':
+	{
+	    char *tmp = optarg;
 	    run_type |= RUN_UPDATE;
+	    if (optarg == NULL)
+		thresh_update = 0.0;
+	    else {
+		bool ok = xatof(&thresh_update, optarg);
+		if (!ok)
+		    fprintf(stderr, "Cannot parse -%c option argument '%s'.\n", option, optarg);
+	    }
 	    break;
+	}
 
 	case 'U':
 	    unsure_stats = true;
@@ -657,7 +669,6 @@ void process_args_2(int argc, char **argv)
 		exit(EX_ERROR);
 	    break;
 	}
-
 
 	case 'H':
 #ifdef	ENABLE_DEPRECATED_CODE
@@ -750,7 +761,7 @@ void query_config(void)
 {
     fprintf(stdout, "%s version %s\n", progname, version);
     fprintf(stdout, "\n");
-    fprintf(stdout, "%-11s = %s\n", "algorithm", method->name);
+    fprintf(stdout, "%-11s = %s\n",            "algorithm", method->name);
     fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "robx", robx, robx);
     fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "robs", robs, robs);
     fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "min_dev", min_dev, min_dev);
@@ -766,9 +777,9 @@ void query_config(void)
 #endif
     fprintf(stdout, "%-17s = %s\n", "replace_nonascii_characters", YN(replace_nonascii_characters));
     fprintf(stdout, "\n");
-    fprintf(stdout, "%-17s = '%s'\n", "spam_header_name", spam_header_name);
-    fprintf(stdout, "%-17s = '%s'\n", "header_format", header_format);
-    fprintf(stdout, "%-17s = '%s'\n", "terse_format", terse_format);
+    fprintf(stdout, "%-17s = '%s'\n", "spam_header_name",  spam_header_name);
+    fprintf(stdout, "%-17s = '%s'\n", "header_format",     header_format);
+    fprintf(stdout, "%-17s = '%s'\n", "terse_format",      terse_format);
     fprintf(stdout, "%-17s = '%s'\n", "log_header_format", log_header_format);
     fprintf(stdout, "%-17s = '%s'\n", "log_update_format", log_update_format);
     display_tag_array("spamicity_tags   ", spamicity_tags);

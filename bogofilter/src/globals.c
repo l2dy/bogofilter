@@ -43,6 +43,7 @@ int	max_repeats;
 double	min_dev;
 double	spam_cutoff;
 double	thresh_stats;
+double	thresh_update;
 
 const char	*update_dir;
 /*@observer@*/

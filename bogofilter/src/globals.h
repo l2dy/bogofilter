@@ -46,6 +46,7 @@ extern	double	min_dev;
 extern	double	ham_cutoff;
 extern	double	spam_cutoff;
 extern	double	thresh_stats;
+extern	double	thresh_update;
 
 extern	int	abort_on_error;
 extern	bool	stats_in_header;
