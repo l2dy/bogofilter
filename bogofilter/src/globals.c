@@ -62,6 +62,9 @@ bool	tokenize_html_script = false;	/* -Ps - not yet in use */
 char	*directory;			/* '-d' */
 method_t *method = NULL;
 
+/* from html.c */
+bool strict_check = false;
+
 /* other */
 int	db_cachesize = 0;		/* in MB */
 enum	passmode passmode;		/* internal */

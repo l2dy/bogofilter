@@ -33,7 +33,6 @@ CONTRIBUTORS:
 #include "maint.h"
 #include "error.h"
 #include "find_home.h"
-#include "html.h"
 #include "format.h"
 #include "lexer.h"
 #include "maint.h"

@@ -69,7 +69,6 @@
 
 #include "buff.h"
 #include "charset.h"
-#include "html.h"		/* for strict_check */
 #include "lexer.h"
 #include "mime.h"		/* for mime_*() */
 #include "msgcounts.h"
@@ -216,10 +215,8 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
 						      BEGIN INITIAL;
 						      msg_header = true;
-						      if (test) fprintf(dbgout, "MIME_BOUNDARY -> BEGIN HTML\n");
 						      return BOUNDARY;
 						  } else {
-						      if (test) fprintf(dbgout, "MIME_BOUNDARY -> yyless()\n");
 						      yyless(2);
 						  }
 						}
@@ -309,7 +306,6 @@ char yy_get_state()
 void yy_set_state_initial()
 {
     BEGIN INITIAL;
-    if (test) fprintf(dbgout, "%s:%d BEGIN INITIAL\n", __FILE__, __LINE__);
 }
 
 /*

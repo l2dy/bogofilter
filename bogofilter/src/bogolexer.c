@@ -22,7 +22,6 @@ AUTHOR:
 #include "bool.h"
 #include "charset.h"
 #include "configfile.h"
-#include "html.h"		/* for strict_check */
 #include "lexer.h"
 #include "textblock.h"
 #include "token.h"
