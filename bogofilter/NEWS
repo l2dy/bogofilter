@@ -5,6 +5,13 @@
 NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+RELEASE.NOTES-0.93 has two important sections entitled:
+
+        MAJOR CHANGES IN BOGOFILTER 0.93 
+and     INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
+
+0.93.0	2004-10-??
+
 	2004-10-28
 
 	* Merged Transactional branch (for BerkeleyDB) back into the trunk.
@@ -12,6 +19,7 @@ is in the RELEASE.NOTES files.  Read them!!
 	2004-10-25
 
 	* Added GETTING.STARTED document.
+
 	* Changed default mode from two-state to three-state
 	  - with ham_cutoff=0.45 and spam_cutoff=0.99
             The ham_cutoff value is new and spam_cutoff is unchanged.

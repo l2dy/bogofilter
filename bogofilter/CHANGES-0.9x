@@ -3,6 +3,17 @@
 			       =================
 
 
+RELEASE.NOTES-0.93 has two important sections entitled:
+
+        MAJOR CHANGES IN BOGOFILTER 0.93 
+and     INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
+
+0.93.0	2004-10-??
+
+	2004-10-28
+
+	* Merged Transactional branch (for BerkeleyDB) back into the trunk.
+
 	2004-10-25
 
 	* Changed default mode from two-state to three-state
