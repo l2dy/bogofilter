@@ -160,12 +160,14 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	    break;
     }
 
-    switch(passmode) {
-	case PASS_MEM:
-	    textblock_free(textblocks);
-	    break;
-	case PASS_SEEK: default:
-	    break;
+    if (passthrough) {
+	switch(passmode) {
+	    case PASS_MEM:
+		textblock_free(textblocks);
+		break;
+	    case PASS_SEEK: default:
+		break;
+	}
     }
 
     close_wordlists(false);
