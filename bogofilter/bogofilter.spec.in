@@ -76,7 +76,7 @@ done
 %config(noreplace) %{_sysconfdir}/bogofilter.cf
 %doc AUTHORS CHANGES-0.10 CHANGES-0.11 COPYING INSTALL METHODS NEWS
 %doc README README.cvs RELEASE.NOTES TODO UPGRADE
-%doc doc/README.Robinson doc/integrating-with-qmail
+%doc doc/bogofilter-tuning.HOWTO doc/integrating-with-qmail
 %doc doc/programmer
 %doc .inst/contrib .inst/html .inst/xml
 
