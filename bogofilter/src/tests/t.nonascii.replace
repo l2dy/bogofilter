@@ -34,7 +34,7 @@ RESULT=`printf "%d.%d %s %s" $LEN1 $LEN2 $TOKDAT1 $TOKDAT2`
 
 WANT="7.2 6.20030303 10.20030304"
 
-if [ "$RESULT" != "$WANT" ] || [ $verbose > 0 ] ; then
+if [ "$RESULT" != "$WANT" ] || [ $verbose -gt 0 ] ; then
     echo want: \"$WANT\", have: \"$RESULT\"
 fi
 
