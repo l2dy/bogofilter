@@ -108,27 +108,33 @@ void iconvert(buff_t *src, buff_t *dst)
 	if (count == (size_t)(-1)) {
 
 	    int err = errno;
+	    
+	    if (DEBUG_ICONV(1)) {
+		const char *msg = NULL;
+		switch (err) {
+		case EILSEQ:		/* invalid multibyte sequence */
+		    msg = "EILSEQ";
+		    break;
+		case EINVAL:		/* incomplete multibyte sequence */
+		    msg = "EINVAL";
+		    break;
+		case E2BIG:		/* output buffer has no more room */
+		    msg = "E2BIG";
+		    break;
+		}
+		if (msg != NULL)
+		    fprintf(dbgout, "%s - t: %p, r: %d, l: %d, s: %d\n", msg, src->t.text, src->read, src->t.leng, src->size);
+	    }
+
 	    switch (err) {
-
 	    case EILSEQ:		/* invalid multibyte sequence */
-		inbytesleft -= 1;	/* copy 1 byte */
-		outbytesleft -= 1;
-		*outbuf++ = *inbuf++;
-		if (DEBUG_ICONV(1))
-		    fprintf(dbgout, "EILSEQ - t: %p, r: %d, l: %d, s: %d\n", src->t.text, src->read, src->t.leng, src->size);
-		break;
-
 	    case EINVAL:		/* incomplete multibyte sequence */
-		inbytesleft -= 1;	/* copy 1 byte */
+		inbytesleft -= 1;	/* copy 1 byte (or substitute a '?') */
 		outbytesleft -= 1;
 		*outbuf++ = *inbuf++;
-		if (DEBUG_ICONV(1))
-		    fprintf(dbgout, "EINVAL - t: %p, r: %d, l: %d, s: %d\n", src->t.text, src->read, src->t.leng, src->size);
 		break;
 
 	    case E2BIG:			/* output buffer has no more room */
-		if (DEBUG_ICONV(1))
-		    fprintf(dbgout, "E2BIG - t: %p, r: %d, l: %d, s: %d\n", src->t.text, src->read, src->t.leng, src->size);
 		break;
 
 	    default:
