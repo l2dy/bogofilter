@@ -8,8 +8,8 @@ my $commandlineoptions=($ARGV[0]=~/^-(?=[^f]*f?[^f]*$)(?=[^s]*s?[^s]*$)[fs]*v{0,
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.23
-  requires bogofilter 0.14.1 or later
+bogominitrain.pl version 1.24
+  requires bogofilter 0.14.5 or later
 
 Usage:
   bogominitrain.pl [-[f][v[v]][s]] <database-directory> <ham-mboxes>\\ 
@@ -149,9 +149,9 @@ do { # Start force loop
   print "Read $hamcount ham mails and $spamcount spam mails.\n";
   print "Added $hamadd ham mail",$hamadd!=1&&"s"," and $spamadd spam mail",$spamadd!=1&&"s"," to the database.\n";
   print `bogoutil -w $dir .MSG_COUNT`;
-  $fn=`cat $spam | $bogofilter -vtM | egrep -cv ^[YS]`;
+  $fn=`cat $spam | $bogofilter -TM | grep -cv ^S`;
   print "\nFalse negatives: $fn";
-  $fp=`cat $ham | $bogofilter -vtM| egrep -cv ^[NH]`;
+  $fp=`cat $ham | $bogofilter -TM | grep -cv ^H`;
   print "False positives: $fp\n";
 } until ($fn+$fp==0 || !$force);
 print "\n$runs run",$runs>1&&"s"," needed to close off.\n" if ($force);

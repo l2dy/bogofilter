@@ -77,9 +77,14 @@ const char *log_header_format = "%h: %c, spamicity=%p, version=%v";
 const char *log_update_format = "register-%r, %w words, %m messages";
 
 #define	RC_COUNT RC_UNSURE+1	/* 3 (for Spam/Ham/Unsure) */
+
 typedef const char *FIELD;
 typedef FIELD FIELDS[RC_COUNT];
-FIELDS spamicity_tags    = {  "Yes",   "No",   "Unsure" };
+
+FIELDS spamicity_tags_ynu = { "Yes",  "No",  "Unsure" };
+FIELDS spamicity_tags_shu = { "Spam", "Ham", "Unsure" };
+
+FIELD  *spamicity_tags    = spamicity_tags_ynu;
 FIELDS spamicity_formats = { "%0.6f", "%0.6f", "%0.6f"  };
 
 static bool set_spamicity_tags(const unsigned char *val);
@@ -124,8 +129,14 @@ enum flags {
 
 /* Function Definitions */
 
+void set_terse_mode_format(void)
+{
+    spamicity_tags = spamicity_tags_shu;
+    terse_format = "%1.1c %g";
+}
+
 /* any fields omitted will retain their original value */
-static bool set_spamicity_fields(FIELD *strings, const char *val)
+static bool set_spamicity_fields(FIELD *fields, const char *val)
 {
     size_t i;
     /* dup the value string and break it up */
@@ -134,7 +145,7 @@ static bool set_spamicity_fields(FIELD *strings, const char *val)
     {
 	char *tok = strtok(i ? NULL : tmp, " ,");
 	if (tok == NULL) break;
-	strings[i] = tok;
+	fields[i] = tok;
     }
     return true;
 }

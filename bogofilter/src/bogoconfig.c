@@ -404,6 +404,8 @@ static void help(void)
     (void)fprintf(stderr,
 		  "\tinfo options:\n"
 		  "\t  -q      - quiet - don't print warning messages.\n"
+		  "\t  -t      - set terse output mode.\n"
+		  "\t  -T      - set invariant terse output mode.\n"
 		  "\t  -v      - set debug verbosity level.\n"
 		  "\t  -y      - set date for token timestamps.\n"
 		  "\t  -D      - direct debug output to stdout.\n"
@@ -621,10 +623,6 @@ void process_args_1(int argc, char **argv)
 	    run_type = check_run_type(UNREG_SPAM, REG_SPAM | UNREG_GOOD);
 	    break;
 
-	case 'T':
-	    test += 1;
-	    break;
-
 	case 'u':
 	    run_type |= RUN_UPDATE;
 	    break;
@@ -674,6 +672,7 @@ void process_args_2(int argc, char **argv)
 {
     int option;
     ex_t exitcode;
+    bool inv_terse_mode = false;
 
     optind = opterr = 1;
     /* don't use #ifdef here: */
@@ -746,6 +745,11 @@ void process_args_2(int argc, char **argv)
 		terse_format = "%0.16f";
 	    break;
 
+	case 'T':			/* invariant terse mode */
+	    terse = true;
+	    inv_terse_mode = true;
+	    break;
+
         case 'V':
 	    print_version();
 	    exit(EX_OK);
@@ -762,6 +766,11 @@ void process_args_2(int argc, char **argv)
     if (bulk_mode == B_NORMAL && optind < argc) {
 	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
 	exit(EX_ERROR);
+    }
+
+    if (inv_terse_mode) {
+	verbose = max(1, verbose); 	/* force printing */
+	set_terse_mode_format();
     }
 
     return;
