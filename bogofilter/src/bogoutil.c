@@ -233,7 +233,7 @@ static int get_token(buff_t *buff, FILE *fp)
 
 static int display_words(const char *path, int argc, char **argv, bool show_probability)
 {
-    size_t count = 0;
+    uint count = 0;
 
     byte buf[BUFSIZE];
     buff_t *buff = buff_new(buf, 0, BUFSIZE);
@@ -343,8 +343,10 @@ static int get_robx(char *path)
 
     robx = compute_robinson_x(path);
 
-    if (!onlyprint) {
-	size_t count;
+    if (onlyprint)
+	printf("%f\n", robx);
+    else {
+	uint count;
 
 	dsv_t val;
 	void  *dsh;
