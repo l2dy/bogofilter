@@ -290,54 +290,71 @@ static void help(void)
     (void)fprintf(stderr,
 		  "%s version %s\n"
 		  "\n"
-		  "Usage: %s [options] < message\n"
-		  "\t-h\t- print this help message.\n"
-		  "\t-d path\t- specify directory for wordlists.\n"
+		  "Usage:  %s [options] < message\n",
+		  PACKAGE, version, PACKAGE
+    );
+    (void)fprintf(stderr,
+		  "\thelp options:\n"
+		  "\t  -h      - print this help message.\n"
+		  "\t  -V      - print version information and exit.\n"
+	);
+    (void)fprintf(stderr,
+		  "\tclassification options:\n"
+		  "\t  -p      - passthrough.\n"
+		  "\t  -e      - in -p mode, exit with code 0 when the mail is not spam.\n"
+		  "\t  -2      - set binary classification mode (yes/no).\n"
+		  "\t  -3      - set ternary classification mode (yes/no/unsure).\n"
+		  "\t  -u      - classify message as spam or non-spam and register accordingly.\n"
+		  "\t  -M      - set mailbox mode. Classify multiple messages in an mbox formatted file.\n"
+		  "\t  -b      - set streaming bulk mode. Classify multiple messages whose filenames are read from STDIN.\n"
+		  "\t  -B name1 name2 ... - set bulk mode. Classify multiple messages named as files on the command line.\n"
+		  "\t  -O file - save message to 'file' in passthrough mode.\n"
+		  "\t  -F      - force printing of spamicity numbers.\n"
+		  "\t  -R      - print an R data frame.\n"
+	);
+    (void)fprintf(stderr,
+		  "\tregistration options:\n"
+		  "\t  -s      - register message(s) as spam.\n"
+		  "\t  -n      - register message(s) as non-spam.\n"
+		  "\t  -S      - unregister message(s) from spam list.\n"
+		  "\t  -N      - unregister message(s) from non-spam list.\n"
+	);
+    (void)fprintf(stderr,
+		  "\tgeneral options:\n"
+		  "\t  -c file - read specified config file.\n"
+		  "\t  -C      - don't read standard config files.\n"
+		  "\t  -d path - specify directory for wordlists.\n"
+		  "\t  -l      - write messages to syslog.\n"
+		  "\t  -L tag  - specify the tag value for log messages.\n"
+		  "\t  -I file - read message from 'file' instead of stdin.\n"
+	);
+    (void)fprintf(stderr,
+		  "\talgorithm options:\n"
 #ifdef	GRAHAM_AND_ROBINSON
 #ifdef	ENABLE_GRAHAM_METHOD
-		  "\t-g\t- select Graham spam calculation method.\n"
+		  "\t  -g      - select Graham spam calculation method.\n"
 #endif
 #ifdef	ENABLE_ROBINSON_METHOD
-		  "\t-r\t- select Robinson spam calculation method.\n"
+		  "\t  -r      - select Robinson spam calculation method.\n"
 #endif
 #ifdef	ENABLE_ROBINSON_FISHER
-		  "\t-f\t- select Fisher spam calculation method (default).\n"
+		  "\t  -f      - select Fisher spam calculation method (default).\n"
 #endif
 #endif
-		  ,
-		  PACKAGE, version, PACKAGE);
+	);
     (void)fprintf(stderr,
-		  "\t-2\t- set binary classification mode (yes/no).\n"
-		  "\t-3\t- set ternary classification mode (yes/no/unsure).\n"
-		  "\t-p\t- passthrough.\n"
-		  "\t-I file\t- read message from 'file' instead of stdin.\n"
-		  "\t-O file\t- save message to 'file' in passthrough mode.\n"
-		  "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n"
-		  "\t-s\t- register message(s) as spam.\n"
-		  "\t-n\t- register message(s) as non-spam.\n"
-		  "\t-m val [,val]\t- set user defined min_dev and robs values.\n");
+		  "\tparameter options:\n"
+		  "\t  -m val [,val] - set user defined min_dev and robs values.\n"
+		  "\t  -o val [,val] - set user defined spam and non-spam cutoff values.\n"
+	);
     (void)fprintf(stderr,
-		  "\t-o val [,val]\t- set user defined spam and non-spam cutoff values.\n"
-		  "\t-u\t- classify message as spam or non-spam and register accordingly.\n"
-		  "\t-S\t- unregister message(s) from spam list.\n"
-		  "\t-N\t- unregister message(s) from non-spam list.\n"
-		  "\t-R\t- print an R data frame.\n");
+		  "\tinfo options:\n"
+		  "\t  -q      - quiet - don't print warning messages.\n"
+		  "\t  -v      - set debug verbosity level.\n"
+		  "\t  -x list - set debug flags.\n"
+		  "\t  -D      - direct debug output to stdout.\n"
+	);
     (void)fprintf(stderr,
-		  "\t-v\t- set debug verbosity level.\n"
-		  "\t-V\t- print version information and exit.\n"
-		  "\t-c file\t- read specified config file.\n"
-		  "\t-C\t- don't read standard config files.\n"
-		  "\t-q\t- quiet - don't print warning messages.\n"
-		  "\t-l\t- write messages to syslog.\n");
-    (void)fprintf(stderr,
-		  "\t-M- set mailbox mode. Classify multiple messages in an mbox formatted file.\n"
-		  "\t-b\t- set streaming bulk mode. Classify multiple messages whose filenames are read from STDIN.\n"
-		  "\t-B name1 name2 ...\t- set bulk mode. Classify multiple messages named as files on the command line.\n");
-    (void)fprintf(stderr,
-		  "\t-L tag\t- specify the tag value for log messages.\n"
-		  "\t-F\t- force printing of spamicity numbers.\n"
-		  "\t-x list\t- set debug flags.\n"
-		  "\t-D\t- direct debug output to stdout.\n"
 		  "\n"
 		  "bogofilter is a tool for classifying email as spam or non-spam.\n"
 		  "\n"
