@@ -53,6 +53,7 @@ libbogofilter_a_SOURCES= \
 	lexer.h lexer.c lexer_v3.l \
 	maint.h maint.c \
 	mime.h mime.c \
+	msgcounts.h msgcounts.c \
 	paths.h paths.c \
 	qp.h qp.c \
 	register.h register.c \
