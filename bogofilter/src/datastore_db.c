@@ -945,7 +945,7 @@ static int db_try_glock(short locktype, int lockcmd) {
 
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
-static dbe_t *db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
+static dbe_t *dbe_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
 {
     int ret;
     dbe_t *env = xcalloc(1, sizeof(dbe_t));
@@ -1090,7 +1090,7 @@ void *dbe_init(void) {
 #endif
 #endif
 
-    return db_xinit(db_max_locks, db_max_objects, flags);
+    return dbe_xinit(db_max_locks, db_max_objects, flags);
 }
 
 int dbe_recover(int catastrophic, int force) {
@@ -1110,7 +1110,7 @@ retry:
     if (DEBUG_DATABASE(0))
         fprintf(dbgout, "running %s data base recovery\n",
 	    catastrophic ? "catastrophic" : "regular");
-    env = db_xinit(1024, 1024, catastrophic ? DB_RECOVER_FATAL : DB_RECOVER);
+    env = dbe_xinit(1024, 1024, catastrophic ? DB_RECOVER_FATAL : DB_RECOVER);
     if (env == NULL) {
 	if(!catastrophic) {
 	    catastrophic = 1;
