@@ -257,6 +257,7 @@ static bool open_mailstore(const char *name)
 	    return false;
 	} else {
 	    mail_first = true;
+	    msg_count_file = false;
 	    reader_getline = get_reader_line(fpin);
 	    mailstore_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
 	    return true;

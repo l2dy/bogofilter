@@ -272,7 +272,11 @@ token_t get_token(void)
 	    header_line_markup = false;
 	    token_prefix = NULL;
 	    lexer = &msg_count_lexer;
-	    reader_more = msgcount_more;
+	    if (mbox_mode) {
+		/* Allows processing multiple messages, **
+		** but only a single file.              */
+		reader_more = msgcount_more;
+	    }
 	    continue;
 
 	case BOGO_LEX_LINE:
