@@ -3,6 +3,9 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#define	VER_017	/* for 0.17.x */
+#undef	VER_017	/* for 0.16.x */
+
 #include <float.h> /* has DBL_EPSILON */
 #define EPS	DBL_EPSILON	 /* equality cutoff */
 
@@ -57,9 +60,11 @@ extern	bool	degen_enabled;		/* -Pd,-PD - default: disabled */
 extern	bool	header_line_markup;	/* -Ph,-PH */
 
 #ifndef	ENABLE_DEPRECATED_CODE
+#ifndef	VER_017
 #define	ignore_case		false	/* -PI */
 #define	tokenize_html_tags 	true	/* -Pt */
 #define	tokenize_html_script 	false	/* -Ps - not yet in use */
+#endif
 #else
 extern	bool	ignore_case;		/* -Pu,-PU */
 extern	bool	tokenize_html_tags;	/* -Pt,-PT */
@@ -84,10 +89,12 @@ extern	u_int32_t	 msgs_good;
 extern	u_int32_t	 msgs_bad;
 
 /* from html.h */
-#ifdef	ENABLE_DEPRECATED_CODE
-extern	bool strict_check;
-#else
+#ifndef	ENABLE_DEPRECATED_CODE
+#ifndef	VER_017
 #define strict_check	false
+#endif
+#else
+extern	bool strict_check;
 #endif
 
 /* from robinson.h */
