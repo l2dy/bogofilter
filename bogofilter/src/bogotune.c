@@ -140,6 +140,7 @@ const char *progname = "bogotune";
 static char *ds_file;
 static char *ds_path;
 static ds_loc ds_flag = DS_NONE;
+static void *env = NULL;
 
 static bool    bogolex = false;		/* true if convert input to msg-count format */
 static bool    esf_flag = true;		/* test ESF factors if true */
@@ -630,7 +631,7 @@ static void load_wordlist(ds_foreach_t *hook, void *userdata)
 	fflush(stdout);
     }
 
-    ds_oper(ds_path, DS_READ, hook, userdata);
+    ds_oper(env, ds_path, DS_READ, hook, userdata);
 
     return;
 }
@@ -1699,7 +1700,6 @@ static rc_t bogotune(void)
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
     ex_t exitcode = EX_OK;
-    void *env = NULL;
 
     fBogotune = true;		/* for rob_compute_spamicity() */
 
