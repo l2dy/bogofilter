@@ -449,7 +449,7 @@ int process_args(int argc, char **argv)
 
     select_algorithm(NULL);	/* select default algorithm */
 
-    while ((option = getopt(argc, argv, "d:ehl::o:snSNvVpuc:CgrRx:fqt" G R F)) != EOF)
+    while ((option = getopt(argc, argv, "d:eFhl::o:snSNvVpuc:CgrRx:fqt" G R F)) != EOF)
     {
 	switch(option)
 	{
