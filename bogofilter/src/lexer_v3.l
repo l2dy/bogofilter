@@ -207,8 +207,10 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						}
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
 						      BEGIN INITIAL;
+						      if (test) fprintf(dbgout, "MIME_BOUNDARY -> BEGIN HTML\n");
 						      return BOUNDARY;
 						  } else {
+						      if (test) fprintf(dbgout, "MIME_BOUNDARY -> yyless()\n");
 						      yyless(2);
 						  }
 						}
@@ -279,13 +281,16 @@ static void reorder_html(void)
 
 char yy_get_state(void);
 
-char yy_get_state(void)
+char yy_get_state()
 {
     switch (YYSTATE) {
-    case INITIAL: return 'i';
-    case TEXT:    return 't';
-    case HTML:    return 'h';
-    default:      return 'o';
+    case INITIAL:  return 'i';
+    case TEXT:     return 't';
+    case HTML:
+    case HTOKEN:   return 'h';
+    case SCOMMENT: return 's';
+    case LCOMMENT: return 'l';
+    default:       return 'o';
     }
 }
 
