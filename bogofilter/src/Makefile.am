@@ -81,10 +81,10 @@ libbogofilter_a_SOURCES= \
 	dcdflib/src/dcdflib.c dcdflib/src/ipmpar.c \
 	xatox.h xatof.c xatoi.c
 
-if !ENABLE_TDB_DATASTORE
-libbogofilter_a_SOURCES += datastore_db.c
-else
+if ENABLE_TDB_DATASTORE
 libbogofilter_a_SOURCES += datastore_tdb.c
+else
+libbogofilter_a_SOURCES += datastore_db.c
 endif
 
 CLEANFILES=version.c directories.c
