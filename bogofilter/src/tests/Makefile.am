@@ -23,9 +23,8 @@ PARSING_TESTS = \
 	t.escaped.html t.escaped.url \
 	t.split t.parsing \
 	t.lexer t.lexer.mbx \
-	t.folded_rfc2047 \
-	t.msgaddr
-# t.message_id - commented out, outputs/message_id.ref not in CVS
+	t.folded_rfc2047
+#	t.message_addr t.message_id t.queue_id
 
 WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest t.upgrade.subnet.prefix t.multiple.wordlists
 

@@ -4,12 +4,12 @@
 
 CFG=${TMPDIR}/test.cf
 OUT=${TMPDIR}/test.out
-CORRECT=${SYSTEST}/outputs/msgaddr.ref
+CORRECT=${SYSTEST}/outputs/queue_id.ref
 
 cat <<EOF > $CFG
-# include ip address
+# include queue ID
 # suppress timestamps & version info in output
-header_format=%h: %c, ipaddr=%A
+header_format=%h: %c, queue_id=%Q
 EOF
 
 # build wordlists
