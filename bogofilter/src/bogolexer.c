@@ -62,7 +62,7 @@ int main(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
-    while ((option = getopt(argc, argv, ":hnpqvnx:I:k:D")) != -1)
+    while ((option = getopt(argc, argv, ":hnpqvnx:I:k:DT")) != -1)
 	switch (option)
 	{
 	case '?':
@@ -107,6 +107,10 @@ int main(int argc, char **argv)
 
 	case 'D':
 	    dbgout = stdout;
+	    break;
+
+	case 'T':
+	    test += 1;
 	    break;
 
 	default:
