@@ -23,7 +23,7 @@ AUTHOR:
 #include "datastore.h"
 #include "datastore_db.h"
 
-#define ERRSTR(str) "bogofilter (db) " str
+extern char *progname;
 
 #define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
 
@@ -73,10 +73,10 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode){
     handle = dbh_init(db_file, name);
 
     if ((ret = db_create (&(handle->dbp), NULL, 0)) != 0){
-	   fprintf (stderr, ERRSTR("db_create: %s\n"), db_strerror (ret));
+	   fprintf (stderr, "%s (db) db_create: %s\n", progname, db_strerror (ret));
     }
     else if ((ret = handle->dbp->open (handle->dbp, db_file, NULL, DB_BTREE, opt_flags, 0664)) != 0){
-           handle->dbp->err (handle->dbp, ret, ERRSTR("open: %s"), db_file);
+           handle->dbp->err (handle->dbp, ret, "%s (db) open: %s", progname, db_file);
     }
     else {
       return (void *)handle;
@@ -111,17 +111,16 @@ long db_getvalue(void *vhandle, char *word){
       value = *(long *)db_data.data;
 
       if (verbose > 2){
-        fprintf(stderr, "db_getvalue (%s): [%s] has value %ld\n",handle->name, word, value);
+        fprintf(stderr, "[%lu] db_getvalue (%s): [%s] has value %ld\n", (unsigned long)handle->pid, handle->name, word, value);
       }
 
       return(value);
-
     }
     else if (ret == DB_NOTFOUND){
-	return 0;
+      return 0;
     }
     else {
-	handle->dbp->err (handle->dbp, ret, ERRSTR("db_getvalue: %s"), word);
+	handle->dbp->err (handle->dbp, ret, "%s (db) db_getvalue: %s", progname, word);
 	exit(2);
     }
 }
@@ -155,7 +154,7 @@ void db_setvalue(void *vhandle, char * word, long value){
     }
     else 
     {
-	handle->dbp->err (handle->dbp, ret, ERRSTR("db_setvalue: %s"), word);
+	handle->dbp->err (handle->dbp, ret, "%s (db) db_setvalue: %s", progname, word);
 	exit(2);
     }
 }
@@ -231,7 +230,7 @@ static int db_lock(dbh_t *handle, int cmd, int type){
   struct flock lock;
 
   if ( (ret = handle->dbp->fd(handle->dbp, &fd)) != 0){
-    handle->dbp->err (handle->dbp, ret, ERRSTR("db_lock:"));
+    handle->dbp->err (handle->dbp, ret, "%s (db) db_lock:", progname);
     exit(2);
   }
 
