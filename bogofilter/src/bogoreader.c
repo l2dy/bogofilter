@@ -422,9 +422,11 @@ static int mailbox_getline(buff_t *buff)
 /* reads from an rmail batch, paying attention to ^#! rmail lines */
 static int brmail_getline(buff_t *buff)
 {
+    int count;
     size_t used = buff->t.leng;
     byte *buf = buff->t.text + used;
-    int count;
+    const char *separator = "#! rmail";
+    const int   seplen = 8;
     static word_t *saved = NULL;
     static unsigned long bytesleft;
 
@@ -445,12 +447,12 @@ static int brmail_getline(buff_t *buff)
     count = buff_fgetsl(buff, fpin);
     have_message = false;
 
-    if ((firstline || emptyline) &&
-	count >= 9 && memcmp("#! rmail ", buf, 9) == 0)
+    if (count >= seplen && memcmp(separator, buf, seplen) == 0)
     {
 	int i;
 	bytesleft = 0;
-	for (i = 9; i < count; i++) {
+	for (i = seplen; i < count; i++) {
+	    if (isspace(buf[i])) continue;
 	    if (!isdigit(buf[i])) break;
 	    bytesleft = bytesleft * 10 + (buf[i] - '0');
 	}
