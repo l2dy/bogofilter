@@ -305,8 +305,7 @@ static ex_t display_words(const char *path, int argc, char **argv, bool show_pro
 	if ( ! S_ISDIR(sb.st_mode)) {		/* words from file */
 	    dsh = ds_open(dbe, CURDIR_S, path, DS_READ); }
 	else {					/* words from path */
-	    char *filepath = build_wordlist_path(path);
-	    dsh = ds_open(dbe, CURDIR_S, filepath, DS_READ);
+	    dsh = ds_open(dbe, path, WORDLIST, DS_READ);
 	}
     }
 
