@@ -100,7 +100,8 @@ int yyinput(char *buf, int max_size)
 %option full align nounput noyywrap noreject 8bit
 
 BASE64		[A-Za-z0-9/+]
-IPADDR		[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+
+UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
+IPADDR		{UINT8}\.{UINT8}\.{UINT8}\.{UINT8}
 MIME_BOUNDARY	^--[^[:blank:]\n]*$
 
 %%
@@ -266,7 +267,7 @@ width	;
 ^{BASE64}+$					;
 ^\tid\ .*					;
 
-SMTP\ id\ .*					;
+E?SMTP\ id\ .*					;
 boundary=.*					;
 name=\"						;
 filename=\"					;
