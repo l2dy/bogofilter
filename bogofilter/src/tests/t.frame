@@ -106,7 +106,7 @@ export BOGOFILTER_DIR
 BOGOFILTER="$VAL ${relpath}/bogofilter"
 BOGOLEXER="$VAL ${relpath}/bogolexer"
 BOGOUTIL="$VAL ${relpath}/bogoutil"
-BOGOLEX_SH="$VAL ${relpath}/bogolex.sh"
+BOGOLEX_SH="$VAL ${srcdir}/../bogolex.sh"
 export BOGOFILTER
 export BOGOLEXER
 export BOGOUTIL
