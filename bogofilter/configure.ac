@@ -308,6 +308,7 @@ AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_TDB" = "xyes")
 # Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_STDBOOL
+AC_HEADER_DIRENT
 AC_HEADER_TIME
 AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h stdlib.h string.h sys/socket.h unistd.h sys/file.h stddef.h sys/time.h sys/select.h inttypes.h stdint.h])
 AC_CHECK_HEADERS([limits.h float.h],,[AC_CHECK_HEADERS(values.h)])
