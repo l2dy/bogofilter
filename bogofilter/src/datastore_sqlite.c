@@ -44,10 +44,6 @@ ex_t db_verify(bfdir *d, bffile *f) { (void)d; (void)f; return EX_OK; }
 	"   key   BLOB PRIMARY KEY, "\
 	"   value BLOB);"
 
-/** The command to begin a regular transaction. */
-#define BEGIN \
-	"BEGIN TRANSACTION;"
-
 /* real functions */
 /** Initialize database handle and return it. 
  * \returns non-NULL, as it exits with EX_ERROR in case of trouble. */
@@ -352,7 +348,7 @@ static int sqlfexec(sqlite3 *db, const char *cmd, ...)
 
 int db_txn_begin(void *vhandle) {
     dbh_t *dbh = vhandle;
-    return sqlexec(dbh->db, BEGIN);
+    return sqlexec(dbh->db, "BEGIN TRANSACTION;");
 }
 
 int db_txn_abort(void *vhandle) {
@@ -367,7 +363,7 @@ int db_txn_commit(void *vhandle) {
 
 /** Converts \a len unsigned characters starting at \a input into the
  * SQL X'b1a4' notation, returns malloc'd string that the caller must
- * xfree. */
+ * xofree. */
 static char *binenc(const void *input, size_t len) {
     const unsigned char *in = input;
     const char hexdig[] = "0123456789ABCDEF";
