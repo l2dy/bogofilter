@@ -1698,8 +1698,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     fBogotune = true;		/* for rob_compute_spamicity() */
 
     dbgout = stderr;
-    debug_mask=MASK_BIT('R');
-    debug_mask=0;
 
     progtype = build_progtype(progname, DB_TYPE);
 
