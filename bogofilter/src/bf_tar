@@ -28,8 +28,8 @@ if [ $# -ne 1 ] ; then
     echo >&2 "Usage: `basename $0` [options] bogodir > outfile.tar"
     echo >&2 "   or: `basename $0` [options] bogodir | gzip -c >outfile.tar.gz"
     echo >&2 'Options are:'
-    echo >&2 ' -r - remove log files after archiving'
-    echo >&2 ' -R - remove log files before archiving (unsafe!)'
+    echo >&2 ' -r - remove inactive log files after archiving'
+    echo >&2 ' -R - remove inactive log files before archiving (use with caution)'
     exit 1
 fi
 
