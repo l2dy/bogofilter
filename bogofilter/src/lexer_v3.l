@@ -343,7 +343,7 @@ void yy_set_state_initial(void)
 
 void lexer_set_debug(int v)
 {
-#ifdef	FLEX_DEBUG
+#ifndef	FLEX_DEBUG
     v;
 #else
     yy_flex_debug = v & 1;
