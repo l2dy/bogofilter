@@ -10,7 +10,7 @@ Here's what packages are needed (assuming all their dependencies are installed
 as well according to the respective packager's directions):
 
 Mandrake Linux 9.1:
-  HTML: OpenSP, HTML document type definitions installed manually
+  HTML: OpenSP or  openjade, HTML document type definitions installed manually
   XML:  docbook-dtd412-xml, libxml2, libxml2-utils
 
 SuSE Linux 8.2:
@@ -21,4 +21,10 @@ FreeBSD:
   HTML: jade or openjade, html
   XML:  xmlto
 
- vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:
+If you encounter a slew of errors, it may be necessary to create a
+catalog file.  The following line will create the needed file for a
+Mandrake 9.1 system:
+
+    echo 'CATALOG "/usr/share/sgml/html/catalog"' > catalog
+
+vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:
