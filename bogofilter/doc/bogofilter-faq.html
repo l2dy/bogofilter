@@ -1,13 +1,9 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-"http://www.w3.org/TR/html4/strict.dtd">
-
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
     <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
     <title>Bogofilter FAQ</title>
-
     <style type="text/css">
-    <!--
       h2 {
 	margin-top: 1em;
 	font-size: 125%;
@@ -38,28 +34,23 @@
 	margin-top: 1em;
 	margin-bottom: 1em;
       }
-    -->
     </style>
   </head>
 
   <body>
     <h1>Bogofilter FAQ</h1>
 
-    <p>Official Versions: In <a href=
-    "http://bogofilter.sourceforge.net/bogofilter-faq.html">
-English</a> or <a href=
-    "http://bogofilter.sourceforge.net/bogofilter-faq-fr.html">
-French</a>
-<br>
-
-     Maintainer: David Relson &lt;relson@osagesoftware.com&gt;</p>
+    <p>Official Versions: In
+    <a href="http://bogofilter.sourceforge.net/bogofilter-faq.html">English</a> or
+    <a href="http://bogofilter.sourceforge.net/bogofilter-faq-fr.html">French</a><br>
+    Maintainer: David Relson &lt;relson@osagesoftware.com&gt;</p>
 
     <p>This document is intended to answer frequently asked
     questions about bogofilter.</p>
 
     <ul>
       <li>
-        General Information 
+        General Information
 
         <ul>
           <li><a href="#what-is-bogofilter">What is
@@ -72,33 +63,27 @@ French</a>
       </li>
 
       <li>
-        Operational Questions 
+        Operational Questions
 
         <ul>
           <li><a href="#train_on_error">What are "training on error" and
-          "training to exhaustion"?
-	  </a></li>
+          "training to exhaustion"?</a></li>
 
-          <li><a href="#training">How do I start my bogofilter training?
-	  </a></li>
+          <li><a href="#training">How do I start my bogofilter training?</a></li>
 
-          <li><a href="#production">How can I keep the scoring accuracy high?
-	  </a></li>
+          <li><a href="#production">How can I keep the scoring accuracy high?</a></li>
 
-          <li><a href="#spamassassin">How can I use SpamAssassin to train Bogofilter?
-	  </a></li>
+          <li><a href="#spamassassin">How can I use SpamAssassin to train Bogofilter?</a></li>
 
-          <li><a href="#vvv">What does bogofilter's verbose output mean?
-	  </a></li>
+          <li><a href="#vvv">What does bogofilter's verbose output mean?</a></li>
 
-          <li><a href="#asian-spam">What can I do about asian spam?
-	  </a></li>
+          <li><a href="#asian-spam">What can I do about asian spam?</a></li>
 
         </ul>
       </li>
 
       <li>
-        Database Questions 
+        Database Questions
 
         <ul>
           <li><a href="#query-database">How do I manually query the
@@ -110,7 +95,7 @@ French</a>
       </li>
 
       <li>
-        Technical problems 
+        Technical problems
 
         <ul>
           <li><a href="#port-notes">How do I get Bogofilter working
@@ -142,13 +127,13 @@ French</a>
     <p>Bogofilter is a fast Bayesian spam filter along the lines
     suggested by Paul Graham in his article <a href=
     "http://www.paulgraham.com/spam.html">A Plan For Spam</a>.
-    Bogofilter uses <a href=
-    "http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">
-    Gary Robinson</a>'s geometric-mean algorithm with the Fisher's
+    Bogofilter uses
+    <a href="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">Gary
+    Robinson</a>'s geometric-mean algorithm with the Fisher's
     method modification to classify email as spam or non-spam.</p>
 
-    <p>The bogofilter <a href=
-    "http://bogofilter.sourceforge.net">home page</a> at
+    <p>The bogofilter
+    <a href="http://bogofilter.sourceforge.net">home page</a> at
     SourceForge is the central clearinghouse for bogofilter
     resources.</p>
 
@@ -163,10 +148,10 @@ French</a>
 
     <h2 id="bogo-what">Bogo-what?</h2>
 
-    <p>Bogofilter is some kind of a 
+    <p>Bogofilter is some kind of a
 <a href="http://www.catb.org/~esr/jargon/html/B/bogometer.html">bogometer</a> or
-<a href="http://www.catb.org/~esr/jargon/html/B/bogon-filter.html">bogon filter</a>, i.e., it tries to identify 
-<a href="http://www.catb.org/~esr/jargon/html/B/bogus.html">bogus</a> mail by measuring the 
+<a href="http://www.catb.org/~esr/jargon/html/B/bogon-filter.html">bogon filter</a>, i.e., it tries to identify
+<a href="http://www.catb.org/~esr/jargon/html/B/bogus.html">bogus</a> mail by measuring the
 <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">bogosity</a>.</p>
 
     <hr>
@@ -189,9 +174,7 @@ French</a>
 
         <td><a href=
         "mailto:bogofilter-announce-subscribe@aotto.com">[subscribe]</a>
-        <a href=
-        "http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.announce">
-        [archive]</a></td>
+        <a href="http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.announce">[archive]</a></td>
 
         <td>An announcement-only list where new versions are
         announced.</td>
@@ -200,11 +183,8 @@ French</a>
       <tr>
         <td>bogofilter@aotto.com</td>
 
-        <td><a href=
-        "mailto:bogofilter-subscribe@aotto.com">[subscribe]</a> <a
-        href=
-        "http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.general">
-        [archive]</a></td>
+        <td><a href="mailto:bogofilter-subscribe@aotto.com">[subscribe]</a>
+        <a href="http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.general">[archive]</a></td>
 
         <td>A discussion list where any conversation about
         bogofilter may take place.</td>
@@ -213,11 +193,8 @@ French</a>
       <tr>
         <td>bogofilter-dev@aotto.com</td>
 
-        <td><a href=
-        "mailto:bogofilter-dev-subscribe@aotto.com">[subscribe]</a>
-        <a href=
-        "http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.devel">
-        [archive]</a></td>
+        <td><a href="mailto:bogofilter-dev-subscribe@aotto.com">[subscribe]</a>
+        <a href="http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.devel">[archive]</a></td>
 
         <td>A list for sharing patches, development, and technical
         discussions.</td>
@@ -226,11 +203,8 @@ French</a>
       <tr>
         <td>bogofilter-cvs@lists.sourceforge.net</td>
 
-        <td><a href=
-        "http://lists.sourceforge.net/mailman/listinfo/bogofilter-cvs">
-        [subscribe]</a> <a href=
-        "http://sourceforge.net/mailarchive/forum.php?forum=bogofilter-cvs">
-        [archive]</a></td>
+        <td><a href="http://lists.sourceforge.net/mailman/listinfo/bogofilter-cvs">[subscribe]</a>
+        <a href="http://sourceforge.net/mailarchive/forum.php?forum=bogofilter-cvs">[archive]</a></td>
 
         <td>Mailing list for announcing code changes to the CVS
         archive.</td>
@@ -241,35 +215,33 @@ French</a>
 
     <h2 id="train_on_error">What are "training on error" and "training to exhaustion"?</h2>
 
-    <p> "Training on error" involves scanning a corpus of known spam
-    and nonspam messages; only those that are misclassified, or
+    <p>"Training on error" involves scanning a corpus of known spam
+    and non-spam messages; only those that are misclassified, or
     classed as unsure, get registered in the training database.  It's
     been found that sampling just messages prone to misclassification
     is an effective way to train; if you train bogofilter on the hard
-    messages, it learns to handle obvious spam and nonspam too.
-    (Learning is a bit faster if one begins with a period of full
-    training, up to perhaps 10,000 spam and 10,000 nonspam.)</p>
+    messages, it learns to handle obvious spam and non-spam too.</p>
 
-    <p> "Training to exhaustion" is repeating training on error, with
-    the same message corpus, until no errors remain.  This has worked
-    well in some tests, but may be risky.</p>
+    <p>"Training to exhaustion" is repeating training on error, with
+    the same message corpus, until no errors remain.</p>
 
-    <p>Registering messages different numbers of times changes the
+    <p>A basic assumption of bayes' theory is that the messages used
+    for training are a randomly chosen sample of the messages received.
+    This is violated when choosing messages by analyzing them first.
+    Though theoretically wrong, in practice "training on error" seems
+    to work.</p>
+
+    <p>Registering messages different numbers of times (as can happen
+    with training to exhaustion) changes the
     distribution of token scores in the training database so that it's
     different from the distribution in the input messages. This
     violates a basic assumption of Bayesian classification, and may
-    lead to unpredictable results.</p>
+    lead to unpredictable results. Though theoretically wrong, in
+    practice "training to exhaustion" seems to work.</p>
 
-    <p>Tokens that appear more or less equally in spam and nonspam may
-    wrongly score highly in one category or the other, if they happen
-    to occur in messages of one type that are registered many times.
-    Such effects should be transient, but may degrade accuracy while
-    they last.
-    </p>
-
-    Note: <code>bogominitrain.pl</code> has a <code>-f</code> option
+    <p>Note: <code>bogominitrain.pl</code> has a <code>-f</code> option
     to do "training to exhaustion".  If you choose to use it, you need
-    to be aware of its possible effects. </p>
+    to be aware of its possible effects.</p>
 
     <hr>
 
@@ -291,24 +263,26 @@ French</a>
     errors bogofilter will make in production. Let's assume your
     collection is two mbox files:  ham.mbx and spam.mbx.</p>
 
+    <p>If your database size needs to be small, for example due to
+    quota limitations), use methods 2 or 3.</p>
+
     <ul>
     <li><p>Method 1) Full training. Train bogofilter with all your messages. In
     our example:</p>
 
     <pre>
 	bogofilter -s &lt; spam.mbx
-	bogofilter -n &lt; ham.mbx
-    </pre></li>
+	bogofilter -n &lt; ham.mbx</pre></li>
     </ul>
 
-    Note: bogofilter's contrib directory includes two scripts that
+    <p>Note: bogofilter's contrib directory includes two scripts that
     both use a train-on-error technique. This technique scores each
     message and adds to the database only those messages that were
     scored incorrectly (messages scored as uncertain, ham scored as
     spam, or spam scored as ham). The goal is to build a database of
     those words <em>needed</em> to correctly classify messages. The
     resulting database is smaller than the one build using full
-    training.
+    training.</p>
 
     <ul>
     <li><p>Method 2) Use the script bogominitrain.pl (in the contrib
@@ -323,8 +297,8 @@ French</a>
     spam_cutoff=0.6 and an interval of 0.1 is wanted, our example
     is:</p>
 
-    <pre> 
-	bogominitrain.pl -fv ~/.bogofilter ham.mbx spam.mbx '-o 0.7,0.5' 
+    <pre>
+	bogominitrain.pl -fnv ~/.bogofilter ham.mbx spam.mbx '-o 0.7,0.5'
     </pre></li>
 
     <li><p>Method 3) Use the script randomtrain (in the contrib
@@ -333,16 +307,19 @@ French</a>
     message, with training as needed. In our example:</p>
 
     <pre>
-	randomtrain -s spam.mbx -n ham.mbx 
-    </pre></li>
+	randomtrain -s spam.mbx -n ham.mbx</pre>
+    
+    <p>As with method 4, it works better if you start with full
+    training using several thousand messages.  This will give a
+    database that is more comprehensive and significantly
+    bigger.</p></li>
 
-    <li><p>Method 4) If you have enough spams and nonspams in your
+    <li><p>Method 4) If you have enough spams and non-spams in your
     training collection, separate out some 10,000 spams and 10,000
-    nonspams into separate mbox files, and train as in method 1. Then
-    use bogofilter to classify the remaining spams and nonspams. Take
+    non-spams into separate mbox files, and train as in method 1. Then
+    use bogofilter to classify the remaining spams and non-spams. Take
     any messages that it classifies as unsure or classifies
-    incorrectly, and train with those. This method produces the best
-    possible overall discrimination. Here are two little scripts you
+    incorrectly, and train with those. Here are two little scripts you
     can use to classify the train-on-error messages:</p>
 
     <pre>
@@ -364,10 +341,17 @@ French</a>
 	# classify -- put all messages in mbox through class3
 	src=$1;
 	shift
-	formail -s class3 $* &lt;$src
+	formail -s class3 $* &lt;$src</pre>
 
-	$ classify mbox [bogofilter options]
-    </pre></li>
+    <p>In our example (after the initial full training):</p>
+
+    <pre>
+	classify spam.mbx [bogofilter options]
+        bogofilter -s &lt; corpus.good
+        rm -f corpus.*
+        classify ham.mbx [bogofilter options]
+        bogofilter -n &lt; corpus.bad
+        rm -f corpus.*</pre></li>
     </ul>
 
     <hr>
@@ -393,10 +377,16 @@ French</a>
     train with it as ham.  Use switch <code>-s</code> to train with a
     spam message.</p>
 
+    <p>Bogofilter has a <code>-u</code> switch that automagically
+    updates the wordlists after scoring each message.  As bogofilter
+    sometimes misclassifies a message, monitoring is necessary to
+    correct any mistakes. Corrections can be done using
+    <code>-Sn</code> to change a message's classification from spam to
+    non-spam and <code>-Ns</code> to change it from non-spam to spam.</p>
+
     <p>Correcting a misclassfied message may affect classification for
     other message.  The smaller your database is, the higher is the
-    likelihood that a training error will casue a misclassification.
-    </p>
+    likelihood that a training error will casue a misclassification.</p>
 
     <p>Using a method like #2 or #3 (above) can compensate for this
     effect.  Repeat the training with your complete training
@@ -404,21 +394,12 @@ French</a>
     training). This will add messages to the database which show that
     adverse effect on both sides until you have a new equilibrium.</p>
 
-    <p>Bogofilter has a <code>-u</code> switch that automagically
-    updates the wordlists after scoring each message. As bogofilter
-    sometimes misclassifies a message, this method has the drawback
-    that the training database is degraded with erroneous entries; you
-    then need to review and correct it at frequent
-    intervals. Correction can be done using <code>-S</code> to remove
-    spam messages from the database and by using <code>-N</code> to
-    remove ham messages.</p>
-
     <p>An alternative strategy, based on method 4 in the previous
     section, is the following: Periodically take blocks of messages
     and use the scripts in method 4 above to classify them. Then
     manually review the good, bad and unsure files, correct any
-    errors, and split the unsures into spam and nonspam.  Until you
-    have accumulated some 10,000 spam and 10,000 nonspam in your
+    errors, and split the unsures into spam and non-spam.  Until you
+    have accumulated some 10,000 spam and 10,000 non-spam in your
     training database, train with the good, the bad, and the separated
     errors and unsures; thereafter, train with only the separated and
     unsures, discarding the messages that bogofilter already
@@ -431,8 +412,7 @@ French</a>
     <pre>
 	bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
 	mv wordlist.db wordlist.db.prv
-	mv wordlist.db.new wordlist.db
-    </pre>
+	mv wordlist.db.new wordlist.db</pre>
 
     <p>or, for spamlist.db and goodlist.db (if using bogofilter with
     separate spam and ham wordlists).  This will compact the database
@@ -473,8 +453,7 @@ French</a>
 
   :0:
   * ^X-Bogosity:.No
-  non-spam
-</pre>
+  non-spam</pre>
 
     <hr>
 
@@ -487,16 +466,13 @@ French</a>
     <ul>
       <li>
         Using "-v" causes bogofilter to generate the "X-Bogosity:"
-        header line, i.e. 
+        header line, i.e.
 <pre>
-  X-Bogosity: No, tests=bogofilter, spamicity=0.500000
- 
-</pre>
-      </li>
+  X-Bogosity: No, tests=bogofilter, spamicity=0.500000</pre></li>
 
       <li>
         Using "-vv" causes bogofilter to generate a histogram, i.e.
-        
+
 <pre>
   X-Bogosity: No, tests=bogofilter, spamicity=0.500000
           int  cnt    prob   spamicity  histogram
@@ -504,14 +480,12 @@ French</a>
          0.10    2  0.179065  0.003425  ##
          0.20    2  0.276880  0.008870  ##
          0.30   18  0.363295  0.069245  ##################
-         0.40    0  0.000000  0.069245  
-         0.50    0  0.000000  0.069245  
+         0.40    0  0.000000  0.069245
+         0.50    0  0.000000  0.069245
          0.60   37  0.667823  0.257307  #####################################
          0.70    5  0.767436  0.278892  #####
          0.80   13  0.836789  0.334980  #############
-         0.90   32  0.984903  0.499835  ################################
- 
-</pre>
+         0.90   32  0.984903  0.499835  ################################</pre>
 
         <p>Each row shows an interval, the count of tokens with
         scores in that interval, the average spam probability for
@@ -526,7 +500,7 @@ French</a>
 
       <li>
         Using "-vvv" produces a list of <em>all</em> the tokens in
-        the messages with information on each one, i.e. 
+        the messages with information on each one, i.e.
 <pre>
   X-Bogosity: No, tests=bogofilter, spamicity=0.500000
                         n    pgood     pbad      fw     U
@@ -538,10 +512,8 @@ French</a>
   "million"             4  0.000000  0.190476  0.999854 +
   "copy"                5  0.000000  0.238095  0.999883 +
   N_P_Q_S_s_x_md      138  0.00e+00  0.00e+00  5.00e-01
-                           1.00e-03  4.15e-01  0.100
- 
-</pre>
-        The columns printed contain the following information: 
+                           1.00e-03  4.15e-01  0.100</pre>
+        The columns printed contain the following information:
 
         <dl>
           <dt>"&hellip;"</dt>
@@ -589,7 +561,7 @@ French</a>
 
       <li>
         Using "-R" produces the "-vvv" output described above plus
-        two additional columns: 
+        two additional columns:
 
         <dl>
           <dt>invfwlog</dt>
@@ -658,8 +630,7 @@ spam-unreadable
 :0:
 * ^Content-Type:.*multipart
 * B ?? $ ^Content-Type:.*^?.*charset="?($UNREADABLE)
-spam-unreadable
-</pre>
+spam-unreadable</pre>
 
         <p>With the above recipe, bogofilter will <em>never</em>
         see the message.</p>
@@ -700,20 +671,17 @@ spam-unreadable
     <p>If you think your word lists are hosed, you can see what
     BerkeleyDB thinks by running:</p>
 <pre>
-  db_verify wordlist.db
-</pre>
+  db_verify wordlist.db</pre>
 
     <p>If there is a problem, you may be able to recover some (or
     all) of the tokens and their counts with the following
     commands:</p>
 <pre>
-  bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
-</pre>
+  bogoutil -d wordlist.db | bogoutil -l wordlist.db.new</pre>
     <p>or with</p>
 <pre>
   db_dump -r wordlist.db &gt; wordlist.txt
-  db_load wordlist.new &lt; wordlist.txt
-</pre>
+  db_load wordlist.new &lt; wordlist.txt</pre>
 
     <p>If you've got two wordlists (spamlist.db and goodlist.db), run the above commands for each of them.</p>
 
@@ -730,8 +698,7 @@ spam-unreadable
 $ cd build_unix
 $ sh ../dist/configure
 $ make
-# make install
-</pre>
+# make install</pre>
 
     <p>Next, download a <a href=
     "http://sourceforge.net/project/showfiles.php?group_id=62265">portable
@@ -743,15 +710,13 @@ $ make
 <pre>
 $ ./configure --with-db=/usr/local/BerkeleyDB.4.1
 $ make
-# make install-strip
-</pre>
+# make install-strip</pre>
 
     <p>You will either want to put a symlink to libdb.so in
     /usr/lib, or use a modified LD_LIBRARY_PATH environment
     variable before you start bogofilter.</p>
 <pre>
-$ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
-</pre>
+$ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1</pre>
 
     <p>Note that some make versions shipped with Solaris break when
     you try to build bogofilter outside of its source directory.
@@ -765,17 +730,13 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
     portupgrade and cvsup software packages. To install these two
     fine pieces, type (you need to do this only once):</p>
 <pre>
-# pkg_add -r portupgrade cvsup
- 
-</pre>
+# pkg_add -r portupgrade cvsup</pre>
 
     <p>To install or upgrade bogofilter, just <a href=
     "http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html">
     upgrade your portstree using cvsup</a>, then type:</p>
 <pre>
-# portupgrade -N bogofilter
- 
-</pre>
+# portupgrade -N bogofilter</pre>
 
     <p class="subheading">On HP-UX</p>
 
@@ -813,7 +774,7 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
     <p>Likely the return codes are being reformatted by waitpid(2).
     In C use WEXITSTATUS(status) in sys/wait.h, or comparable macro,
     to get the correct value.  In Perl you can just use
-    'system("bogofilter $input") >> 8.  If you want more info, run
+    'system("bogofilter $input") &gt;&gt; 8.  If you want more info, run
     <code>"man waitpid"</code>.</p>
 
     <hr>
@@ -881,7 +842,7 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
 
     <hr>
 
-    <h2 id="#changed-tagging">Now that I've upgraded to 0.15 why is
+    <h2 id="changed-tagging">Now that I've upgraded to 0.15 why is
     bogofilter working less well?</h2>
 
     <p>Prior to version 0.15.4, bogofilter added special prefixes to
