@@ -28,6 +28,24 @@ algorithm=robinson
 #block_on_subnets=no
 
 
+#### CHARSET info
+#
+#	specify default charset
+
+charset_default=us-ascii
+#charset_default=iso-8859-1
+#charset_default=iso-8859-2
+#charset_default=iso-8859-3
+#charset_default=iso-8859-4
+
+#### REPLACE_NONASCII_CHARACTERS
+#
+#	replace non-7bit chars with '?'
+
+replace_nonascii_characters=N
+#replace_nonascii_characters=Y
+
+
 #### SPAM_HEADER_NAME
 #
 #	used in reporting spamicity and
