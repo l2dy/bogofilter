@@ -19,8 +19,12 @@ Friend,
 
 EOF
 
-$VAL ${relpath}/bogofilter -p -e -C < $TMPDIR/input > $TMPDIR/output
+# check seekable input
+$VAL ${relpath}/bogofilter -p -e -C < $TMPDIR/input > $TMPDIR/output1
+# check non-seekable input
+cat $TMPDIR/input | $VAL ${relpath}/bogofilter -p -e -C >$TMPDIR/output2
 
-count=`grep $shn $TMPDIR/output | wc -l`
+count=`grep $shn $TMPDIR/output1 | wc -l`
 test $count = "1"
-
+count=`grep $shn $TMPDIR/output2 | wc -l`
+test $count = "1"
