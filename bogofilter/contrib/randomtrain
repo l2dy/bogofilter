@@ -6,11 +6,9 @@
 #                 and train if the result is wrong or uncertain
 #  needs:    bash basename rm grep awk wc perl dd bogofilter
 #  usage:    see function usage() starting on line 10 of this file
-#  author:   (Greg Louis <glouis@dynamicro.on.ca>)
+#  version:  0.6 (Greg Louis <glouis@dynamicro.on.ca>)
 
 pid=$$
-BOGOFILTER="../bogofilter"
-BOGOUTIL="../bogoutil"
 
 function usage() {
     iam=`basename $0`
@@ -35,11 +33,11 @@ function usage() {
 bogodir="${HOME}/.bogofilter"
 test "x$1" = "x" && usage
 indic=${1:0-1:1}
-if [ "$1" != "s" -a "$1" != "n" ]; then
+if [ "$indic" != "s" -a "$indic" != "n" ]; then
     bogodir=$1
     shift
 fi
-
+echo $bogodir
 # check for an even number of params >= 4
 test ${#*} -ge 4 || usage
 let n=${#*}%2
@@ -47,79 +45,42 @@ test $n -eq 0 || usage
 
 # params may be ok, here goes...
 
-cat <<EOF > cfg.$pid
-terse_format = %1.1c %d
-header_format = %1.1c
-#
-# For Robinson algorithm:
-#
-algorithm = robinson
-terse_format = %1.1c %d
-spamicity_formats = %0.6f %0.6f
-#
-# For Fisher algorithm:
-#
-algorithm = fisher
-ham_cutoff = 0.10f
-spamicity_tags = Y, N, U
-spamicity_formats = %6.2e %6.2e %0.6f
-EOF
-
 # get all the byte offsets in all the files, in one list
+cmd=""
 while [ ${#*} -gt 1 ]; do
     indic=${1:0-1:1} ; shift
     test "$indic" != "s" -a "$indic" != "n" && usage
     file=$1 ; shift
     if [ ! -r $file ]; then echo "$file not found"; usage; fi
-    grep -a -b '^From ' $file | \
-	awk "BEGIN {FS=\":\"} {print \"$indic $file \"\$1}" >>list.$pid
-    wc -c $file | awk "{print \"$indic $file \"\$1}" >>list.$pid
+    cmd=" $cmd -c $indic $file"
 done
 
 # create a shuffled list, with lengths
-# read a line; if it's not a new file, write a line
-file=""
-{
-    while read indic fnam offset; do
-	if [ "x$fnam" = "x$file" ]; then
-	    let length=$offset-$oldoff
-	    echo "$indic $fnam $oldoff $length"
-	    oldoff=$offset
-	else
-	    file=$fnam
-	    oldoff=0
-	fi
-    done
-} <list.$pid | perl \
--e' srand ( time() ^ ($$ + ($$ << 15)) );' \
--e' foreach $key (<>) {' \
--e'     $shuf{$key} = rand;' \
--e' }' \
--e' foreach $key (sort { $shuf{$b} <=> $shuf{$a} } keys %shuf ) {' \
--e'     print $key;' \
--e' }' >shuf.$pid
+scramble '^From ' -l$cmd >scram.$pid
+
 # go through the list, extract the messages, eval with bogofilter
 # and train if bogofilter is wrong or uncertain
 {
-    cnt=0
+    nspam=0; ngood=0; rspam=0; rgood=0;
+    echo " spam  reg   good  reg"
     while read expect fnam offset length; do
-	let cnt=cnt+1
 	dd if=$fnam bs=1 skip=$offset count=$length 2>/dev/null >msg.$pid
-	got=`$BOGOFILTER -l -v -d $bogodir -c cfg.$pid <msg.$pid`
-	printf "%d bogo=%s, " $cnt $got
-	if [ $got = "Y" ]; then got="s"; else got="n"; fi
-	echo -n "exp=$expect, got=$got"
+	bogofilter -d $bogodir <msg.$pid
+	got=$?	# 0=spam, 1=good, 2=unknown, 3=err
+	if [ "$expect" = "s" ]; then let nspam=$nspam+1
+	else let ngood=$ngood+1; fi
+	if [ $got -eq 0 ]; then got="s"; elif [ $got -eq 1 ]; then got="n"; fi
 	if [ $got != $expect ]; then
-	    echo -n ", reg=$expect"
+	    if [ "$expect" = "s" ]; then let rspam=$rspam+1
+	    else let rgood=$rgood+1; fi
 	    # comment out the next line for dry-run testing
-	    $BOGOFILTER -d $bogodir -c cfg.$pid -$expect <msg.$pid
+	    bogofilter -d $bogodir -$expect <msg.$pid
 	fi
-	echo
+	n=`expr \( $nspam + $ngood \) % 10`
+	test $n -eq 0 && \
+	    printf "\r%5d%5d  %5d%5d " $nspam $rspam $ngood $rgood
     done
-} <shuf.$pid
-
+    printf "\r%5d%5d  %5d%5d\n" $nspam $rspam $ngood $rgood
+} <scram.$pid
 # next line can be commented out for debugging
-rm -f list.$pid shuf.$pid msg.$pid cfg.$pid
-
-# display message counts
-$BOGOUTIL -w $bogodir .MSG_COUNT
+rm scram.$pid msg.$pid
