@@ -141,27 +141,7 @@ if [ -z "$NODB" ]; then
     create_empty_wordlist
 fi
 
-BF_CHECKTOOL=${BF_CHECKTOOL-glibc}
-
-# make GNU libc nasty and abort on memory allocation issues:
-if test "x$BF_CHECKTOOL" = x"glibc" ; then
-    MALLOC_CHECK_=2
-    export MALLOC_CHECK_
-fi
-
-# use the Boehm-Demers-Weiser Garbage Collector in find-leak mode,
-# only supported on Linux:
-if test "x$BF_CHECKTOOL" = x"boehm-gc" ; then
-    for p in /usr/local/lib /usr/lib /lib ; do
-	if test -f $p/libgc.so ; then
-	    VAL="env LD_PRELOAD=$p/libgc.so GC_FIND_LEAK=1"
-	    export VAL
-	    break
-	fi
-    done
-fi
-
-# check valgrind:
+# check valgrind version
 case `(valgrind --version) 2>/dev/null` in
     valgrind-2.[123].*) VALGRIND="valgrind --tool=memcheck" ;;
     valgrind-*) VALGRIND="valgrind" ;;
@@ -172,14 +152,36 @@ if [ "x$VALGRIND" != x ] ; then
 fi
 export VALGRIND
 
-# use valgrind:
-if test "x$BF_CHECKTOOL" = x"valgrind" && test "x$VALGRIND" != x ; then
-    VAL="$VALGRIND"
-    export VAL
-fi
-
-# use Electric Fence:
-if test "x$BF_CHECKTOOL" = x"efence" ; then
+# parse BF_CHECKTOOL
+BF_CHECKTOOL=${BF_CHECKTOOL-glibc}
+case ${BF_CHECKTOOL} in
+glibc)
+    # make GNU libc nasty and abort on memory allocation issues:
+    MALLOC_CHECK_=2
+    export MALLOC_CHECK_
+    ;;
+boehm-gc)
+    # use the Boehm-Demers-Weiser Garbage Collector in find-leak mode,
+    # only supported on Linux:
+    for p in /usr/local/lib /usr/lib /lib ; do
+	if test -f $p/libgc.so ; then
+	    VAL="env LD_PRELOAD=$p/libgc.so GC_FIND_LEAK=1"
+	    export VAL
+	    break
+	fi
+    done
+    ;;
+valgrind)
+    # use valgrind
+    if test "x$VALGRIND" != x ; then
+	VAL="$VALGRIND"
+	export VAL
+    else
+	echo >&2 "WARNING: valgrind not found or unsupported version, ignored."
+    fi
+    ;;
+efence)
+    # use Electric Fence
     VAL="env LD_PRELOAD=libefence.so.0.0"
     EF_PROTECT_FREE=1
     EF_FILL=85
@@ -188,8 +190,16 @@ if test "x$BF_CHECKTOOL" = x"efence" ; then
     EF_ALIGNMENT=0
     export LD_PRELOAD EF_PROTECT_FREE EF_FILL EF_ALLOW_MALLOC_0 EF_PROTECT_BELOW
     export EF_ALIGNMENT VAL
-fi
+    ;;
+"")
+    ;;
+*)
+    echo >&2 "WARNING: unsupported BF_CHECKTOOL=\"${BF_CHECKTOOL}\" ignored."
+    echo >&2 "         supported BF_CHECKTOOL values: glibc, boehm-gc, valgrind, efence"
+    ;;
+esac
 
+# check diff options
 case `uname -s` in
     Linux)  case $verbose in 
 	    1) DIFF_BRIEF="--brief -s" ;;
@@ -198,6 +208,7 @@ case `uname -s` in
 	;;
 esac
 
+# ## HELPER FUNCTIONS ---------------------------------------------
 # split file on stdin into files 1, 2, 3, 4... at "From " lines.
 splitmbox() {
       $AWK 'BEGIN { f=0; } /^From / { close(f); f++; } { print $0 > f }'
