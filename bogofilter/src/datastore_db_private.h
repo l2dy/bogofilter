@@ -46,7 +46,7 @@ typedef void	dsm_v_pvuiui	(void *vhandle, u_int32_t numlocks, u_int32_t numobjs)
 typedef const char *dsm_pc_pc	(const char *db_file);
 typedef ex_t	dsm_x_pnvpc	(DB_ENV *dbe, const char *db_file);
 typedef dbe_t  *dsm_pbe_pc	(const char *directory);
-typedef DB_ENV *dsm_pnv_pc	(const char *db_file);
+typedef DB_ENV *dsm_pnv_pcpc	(const char *directory, const char *db_file);
 typedef DB_ENV *dsm_pnv_pbe	(dbe_t *env);
 
 typedef struct {
@@ -60,7 +60,7 @@ typedef struct {
     dsm_v_pbe	 *dsm_cleanup_lite;
     dsm_pnv_pbe	 *dsm_get_env_dbe;
     dsm_pc_pc	 *dsm_database_name;
-    dsm_pnv_pc	 *dsm_recover_open;
+    dsm_pnv_pcpc *dsm_recover_open;
     dsm_i_v	 *dsm_auto_commit_flags;
     dsm_i_i	 *dsm_get_rmw_flag;
     dsm_i_pvi	 *dsm_lock;

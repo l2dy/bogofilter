@@ -940,7 +940,7 @@ ex_t db_verify(const char *directory, const char *db_file)
 
     dsm_init(directory, db_file);
 
-    dbe = dsm->dsm_recover_open(db_file);
+    dbe = dsm->dsm_recover_open(directory, db_file);
     if (dbe == NULL) {
 	exit(EX_ERROR);
     }

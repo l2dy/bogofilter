@@ -40,7 +40,7 @@ static int  	   bft_commit		(void *vhandle);
 /* private -- used in datastore_db_*.c */
 static DB_ENV	  *bft_get_env_dbe	(dbe_t *env);
 static const char *bft_database_name	(const char *db_file);
-static DB_ENV	  *bft_recover_open	(const char *db_file);
+static DB_ENV	  *bft_recover_open	(const char *directory, const char *db_file);
 static int	   bft_auto_commit_flags(void);
 static int	   bft_get_rmw_flag	(int open_mode);
 static int	   bft_lock		(void *handle, int open_mode);
@@ -133,9 +133,11 @@ int bft_get_rmw_flag(int open_mode)
     return 0;
 }
 
-DB_ENV *bft_recover_open(const char *db_file)
+DB_ENV *bft_recover_open(const char *directory, const char *db_file)
 {
     int fd;
+
+    (void) directory;		/* quiet compiler warning */
 
     fd = open(db_file, O_RDWR);
     if (fd < 0) {

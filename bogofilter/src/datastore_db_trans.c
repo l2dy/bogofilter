@@ -60,7 +60,7 @@ static int  	   dbx_commit		(void *vhandle);
 /* private -- used in datastore_db_*.c */
 static DB_ENV	  *dbx_get_env_dbe	(dbe_t *env);
 static const char *dbx_database_name	(const char *db_file);
-static DB_ENV	  *dbx_recover_open	(const char *db_file);
+static DB_ENV	  *dbx_recover_open	(const char *directory, const char *db_file);
 static int	   dbx_auto_commit_flags(void);
 static int	   dbx_get_rmw_flag	(int open_mode);
 static int	   dbx_lock		(void *handle, int open_mode);
@@ -230,9 +230,10 @@ static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags)
     return dbe;
 }
 
-static DB_ENV *dbx_recover_open(const char *dir)
+static DB_ENV *dbx_recover_open(const char *directory, const char *db_file)
 {
-    return dbe_recover_open(dir, 0);
+    (void) db_file;		/* quiet compiler warning */
+    return dbe_recover_open(directory, 0);
 }
 
 static int dbx_begin(void *vhandle)
