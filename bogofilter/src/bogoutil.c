@@ -525,7 +525,7 @@ typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST,
     M_RECOVER, M_CRECOVER, M_PURGELOGS, M_VERIFY, M_REMOVEENV } cmd_t;
 static cmd_t flag = M_NONE;
 
-#define	OPTIONS	":a:c:C:d:Df:F:hH:I:k:l:m:np:P:r:R:s:u:vVw:x:X:y:"
+#define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:u:vVw:x:X:y:"
 
 static int process_arglist(int argc, char **argv)
 {
