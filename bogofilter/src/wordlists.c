@@ -184,13 +184,19 @@ void open_wordlists(dbmode_t mode)
 	    case W_SEPARATE:
 		list->dbh = db_open(list->filepath, cSeparate, aSeparate, mode);
 		break;
-	    default:
-		fprintf(stderr, "Unknown wordlist type.\n");
-		exit(2);
-		if (list->dbh == NULL)
+	    case W_UNKNOWN:
+		if (list->dbh == NULL) {
 		    list->dbh = db_open(list->filepath, cCombined, aCombined, mode);
-		if (list->dbh == NULL)
+		    if (list->dbh == NULL)
+			wordlists = W_COMBINED;
+		}
+		if (list->dbh == NULL) {
 		    list->dbh = db_open(list->filepath, cSeparate, aSeparate, mode);
+		    if (list->dbh == NULL)
+			wordlists = W_SEPARATE;
+		}
+		if (wordlists == W_UNKNOWN)
+		    wordlists = W_COMBINED;
 		break;
 	    }
 	    if (list->dbh == NULL) {
