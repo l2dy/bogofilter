@@ -144,9 +144,6 @@ AC_CHECK_LIB(tdb,
     xdb)
 # check if we need LIBDB at all (it is harmful on BSD since
 # they rename the library including soname)
-ac_cv_libdb_cppflags=
-ac_cv_libdb_libs=
-ac_cv_libdb_ltlibs=
   AC_LIB_LINKFLAGS([db])
   AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],LIBDB="")
   saveLIBS="$LIBS"
