@@ -55,10 +55,11 @@ void collect_words(wordhash_t *wh)
 
 	if (cls == BOGO_LEX_LINE)
 	{
-	    char *s = (char *)(yylval->text+1);/* skip leading quote mark */
+	    char *s = (char *)(yylval->text+1);	/* skip leading quote mark */
 	    char *f = memchr(s, '"', yylval->leng - 1);
 	    token->text = (unsigned char *) s;
 	    token->leng = f - s;
+	    Z(token->text[token->leng]);	/* replace terminal quote by NUL */
 	}
 
 	wp = wordhash_insert(wh, token, sizeof(wordprop_t), &wordprop_init);
