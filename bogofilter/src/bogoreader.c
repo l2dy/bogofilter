@@ -117,6 +117,7 @@ static reader_line_t *get_reader_line(FILE *fp) {
             fcn = s->fcn;
 	    seplen = s->len;
 	    separator = s->sep;
+	    break;
 	}
     }
     
@@ -194,7 +195,7 @@ static bool reader__next_mail(void)
     for (;;) {
 	/* check mailstore-specific method */
 	if (mailstore_next_mail) {
-	    if ((*mailstore_next_mail)()) /* more mails in the mailstore */
+	    if (mailstore_next_mail()) /* more mails in the mailstore */
 		return true;
 	    mailstore_next_mail = NULL;
 	}
@@ -606,6 +607,7 @@ void bogoreader_init(int _argc, char **_argv)
 	argc = _argc;
 	argv = _argv;
 	mailstore_next_store = b_args_next_mailstore;
+	mailstore_next_mail  = NULL;
 	break;
     default:
 	fprintf(stderr, "Unknown bulk_mode = %d\n", (int) bulk_mode);
