@@ -207,13 +207,14 @@ void token_init(void)
 
 size_t decode_text(word_t *w)
 {
+    size_t i;
     size_t size = w->leng;
     char *text = (char *) w->text;
     char *beg = strchr(text, '=');
     char *enc = strchr(beg+2,  '?');
     word_t n;
-    n.text = (unsigned char *)(enc + 3);
-    n.leng = size - (enc+3 - text + 2);
+    n.text = (byte *)(enc + 3);
+    n.leng = size -= enc + 3 - text + 2;;
     n.text[n.leng] = '\0';
 
     switch (tolower(enc[1])) {
@@ -221,6 +222,10 @@ size_t decode_text(word_t *w)
 	size = base64_decode(&n);
 	break;
     case 'q':
+	for (i=0; i < size; i += 1) {
+	    if (n.text[i] == '_')
+		n.text[i] = ' ';
+	}
 	size = qp_decode(&n);
 	break;
     }
