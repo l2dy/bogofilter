@@ -1,8 +1,10 @@
 # $Id$
-n
+
 				bogofilter news
 
 0.9.0
+	* New file README.Robinson describes the tunable parameters
+	  for the Robinson algorithm and what to do for best performance.
 	* Changed the default behavior to use the Robinson algorithm.
 	* Corrected incorrect sort order when printing statistics.
 	* Added support for Fisher's method of combining probabilities,
