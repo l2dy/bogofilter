@@ -1,7 +1,12 @@
 # $Id$
 # $Log$
-# Revision 1.1  2002/09/14 22:15:20  adrian_otto
-# Initial revision
+# Revision 1.2  2002/09/17 01:30:21  adrian_otto
+# Improved configure script for locking functions, and improved the error
+# messag when the configure script can't find a suitable BerkeleyDB version
+# installed.
+#
+# Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
+# 0.7.3 Base Source
 #
 AC_INIT(bogofilter.c)
 AM_INIT_AUTOMAKE(poke, 0.7.3)
@@ -16,8 +21,6 @@ AC_EXEEXT
 AC_CHECK_LIB([m],  [cos])
 
 AH_TEMPLATE([HAVE_DB_H], [Have suitable db.h header])
-AH_TEMPLATE([HAVE_FLOCK], [Have flock() function])
-AH_TEMPLATE([HAVE_LOCKF], [Have POSIX lockf() function])
 
 AC_ARG_WITH(judy,
 	[  AC_HELP_STRING([--with-judy=PATH],
@@ -87,7 +90,7 @@ AC_ARG_WITH(db,
 	],
 	[
 		AC_EGREP_HEADER(db_create, [db.h], AC_DEFINE(HAVE_DB_H),
-			AC_MSG_ERROR([Can not locate a suitable BerkeleyDB db.h header file. Use --with-db=PATH to specify the path to a v3+ install directory]) 
+			AC_MSG_ERROR([Can not locate a suitable BerkeleyDB db.h header file. Use --with-db=PATH to specify the path to a v3+ install directory. You can download BerkeleyDB 4.x from http://www.sleepycat.com]) 
 		)
 
 		AC_CHECK_LIB(db-4, db_create, LIBS="$LIBS -ldb-4", 
@@ -116,13 +119,11 @@ AC_TYPE_SIGNAL
 
 # Checks for library functions.
 AC_CHECK_HEADERS([sys/file.h])
-AC_EGREP_HEADER(lockf, [sys/file.h], AC_DEFINE(HAVE_LOCKF))
-AC_EGREP_HEADER(flock, [sys/file.h], AC_DEFINE(HAVE_FLOCK))
 AC_CHECK_HEADERS([syslog.h])
 AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_FUNC_STAT
 
-AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror)
+AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl)
 
 AC_OUTPUT(Makefile)
