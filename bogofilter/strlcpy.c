@@ -29,13 +29,9 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-#if defined(LIBC_SCCS) && !defined(lint)
-__RCSID("$NetBSD: strlcpy.c,v 1.5.8.2 2002/04/26 13:17:42 he Exp $");
-#endif /* LIBC_SCCS and not lint */
-
 #include <sys/types.h>
 #include <string.h>
+#include "system.h"
 
 /*
  * Copy src to string dst of size siz.  At most siz-1 characters
