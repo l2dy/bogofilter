@@ -232,11 +232,11 @@ static bool check_wordlist_version(dsh_t *dsh)
 	return false;
 }
 
-static int maintain_wordlist(void *database)
+static ex_t maintain_wordlist(void *database)
 {
     ta_t *transaction = ta_init();
     struct userdata_t userdata;
-    int ret;
+    ex_t ret;
     bool done = false;
 
     userdata.vhandle = database;
@@ -245,7 +245,7 @@ static int maintain_wordlist(void *database)
     if (DST_OK == ds_txn_begin(database)) {
 	ret = ds_foreach(database, maintain_hook, &userdata);
     } else
-	ret = -1;
+	ret = EX_ERROR;
 
     if (upgrade_wordlist_version) {
 	done = check_wordlist_version(database);
@@ -263,9 +263,12 @@ static int maintain_wordlist(void *database)
 	ds_set_wordlist_version(database, &val);
     }
 
-    ret |= ta_commit(transaction);
+    if (ta_commit(transaction) != TA_OK)
+	ret = EX_ERROR;
+
     if (DST_OK != ds_txn_commit(database))
-	ret = -1;
+	ret = EX_ERROR;
+
     return ret;
 }
 
@@ -279,9 +282,9 @@ void maintain_wordlists(void)
     }
 }
 
-int maintain_wordlist_file(const char *db_file)
+ex_t maintain_wordlist_file(const char *db_file)
 {
-    int rc = 0;
+    ex_t rc;
     dsh_t *dsh;
     void *dbe;
 
@@ -290,8 +293,8 @@ int maintain_wordlist_file(const char *db_file)
 
     if (dsh == NULL)
 	return EX_ERROR;
-    else
-	rc = maintain_wordlist(dsh);
+
+    rc = maintain_wordlist(dsh);
 
     ds_close(dsh);
     ds_cleanup(dbe);

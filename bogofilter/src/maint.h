@@ -21,7 +21,7 @@ extern	bool     upgrade_wordlist_version;
 
 /* Function Prototypes */
 void maintain_wordlists(void);
-int  maintain_wordlist_file(const char *db_file);
+ex_t maintain_wordlist_file(const char *db_file);
 
 bool discard_token(word_t *token, dsv_t *info);
 
