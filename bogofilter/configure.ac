@@ -1,5 +1,5 @@
 # $Id$
-AC_INIT(bogofilter, 0.14.2)
+AC_INIT(bogofilter, 0.14.2.cvs)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR([src])
 AC_CANONICAL_TARGET
@@ -199,6 +199,12 @@ AC_RUN_IFELSE(
 AC_MSG_RESULT(yes)
 fi
 
+# Disable TRIO.
+AC_ARG_WITH(trio,
+         [  --without-trio          disable TRIO support],
+       [with_trio=$withval],
+           [with_trio='yes'])
+
 # Allow the user to specify a header name to use to indicate whether a given
 # message is SPAM or not.
 AC_ARG_ENABLE(spam-header-name, 
@@ -344,7 +350,7 @@ AC_FUNC_MEMCMP
 AC_FUNC_MMAP
 AC_FUNC_VPRINTF
 
-AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl strchr strrchr memcpy munmap pow sqrt strcasecmp strcspn strspn strstr)
+AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl strchr strrchr memcpy munmap pow sqrt strcasecmp strcspn strspn strstr vsnprintf)
 AC_REPLACE_FUNCS(strlcpy strlcat)
 
 AC_CACHE_SAVE
