@@ -353,7 +353,6 @@ static void help(void)
 	);
     (void)fprintf(stderr, "%s",
 		  "\tinfo options:\n"
-		  "\t  -q      - quiet - don't print warning messages.\n"
 		  "\t  -t      - set terse output mode.\n"
 		  "\t  -T      - set invariant terse output mode.\n"
 		  "\t  -v      - set debug verbosity level.\n"
@@ -510,10 +509,6 @@ void process_args_1(int argc, char **argv)
 
 	case 'r':
 	    select_algorithm(AL_ROBINSON, true);
-	    break;
-
-	case 'q':
-	    quiet = true;
 	    break;
 
 	case 'Q':

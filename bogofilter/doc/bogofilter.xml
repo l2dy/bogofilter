@@ -457,8 +457,6 @@ the message's tokens.  Enabling this option increases
 
 <para>INFO OPTIONS</para>
 
-<para>The <option>-q</option> (quiet) suppresses warning messages.</para>
-
 <para>The <option>-v</option> option produces a report to standard
 output on <application>bogofilter</application>'s analysis af the
 input.  Each additional <option>v</option> will increase the verbosity of
@@ -704,7 +702,12 @@ bogofilter[6244]: register-s, 1273 words, 4 messages
 </refsect1>
 
 <refsect1 id='author'><title>AUTHOR</title>
-    <para>Eric S. Raymond <email>esr@thyrsus.com</email>.</para>
+    <para>Eric S. Raymond <email>esr@thyrsus.com</email>.<br>
+    David Relson <email>relson@osagesoftware.com</email>.<br>
+    Matthias Andree <email>matthias.andree@gmx.de</email>.<br>
+    Greg Louis <email>glouis@dynamicro.on.ca</email>.
+</para>
+
     <para>For updates, see <ulink url="http://bogofilter.sourceforge.net/">
 the bogofilter project page</ulink>.</para>
 </refsect1>
