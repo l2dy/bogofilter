@@ -35,6 +35,8 @@ WANT="1780.4029"
 # v0.17.4 - Discard the PGP signature
 #         - Special tagging for mime header parts
 WANT="1787.4046"
+# v0.93.1 - Fixed mime boundary problem
+WANT="1787.4052"
 
 if [ "$RESULT" != "$WANT" ] || [ $verbose -ne 0 ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT
