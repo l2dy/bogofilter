@@ -1,9 +1,17 @@
 /* $Id$ */
 
-/* (C) 2004 Matthias Andree. License: GNU GPL v2 */
+/** \file memstr.c
+ * find a C string in memory
+ * \author Matthias Andree
+ * \date 2004
+ * GNU General Public License v2
+ */
 
 #include "memstr.h"
 
+/** find the C string \a needle in the \a n bytes starting with \a hay,
+ * \return 0 if no match found, the pointer to the first byte otherwise.
+ */
 void *memstr(const void *hay, size_t n, const char *needle)
 {
     unsigned const char *haystack = hay;
