@@ -67,7 +67,7 @@
       </li>
 
       <li>
-        Questions opérationnelles 
+        Questions opérationnelles
 
         <ul>
 	  <li><a href="#train-on-error">Qu'est-ce que "l'entrainement sur erreur" et
@@ -80,6 +80,9 @@
           <li><a href="#spamassassin">Comment puis-je utiliser
           SpamAssassin pour entraîner Bogofilter?</a></li>
 
+      <li><a href="#mboxformats">Quels formats de fichier Bogofilter
+	  comprend-il?</a></li>
+      
           <li><a href="#vvv">Que signifie la sortie verbeuse de
           Bogofilter?</a></li>
 
@@ -477,7 +480,28 @@
 	* ^X-Bogosity:.No
 	non-spam</pre>
   
-<hr>
+    <hr>
+    <h2 id="mboxformats">Quels formats de fichier Bogofilter
+	comprend-il?</h2>
+
+    <P>Bogofilter comprend les formats mbox traditionnel, Maildir et MH.
+    Bogofilter ne soutient pas des sous-répertoires, vous devrez
+    explicitement les lister si vous avez des répertoires Maildir++ ou
+    MH - mentionnez seulement les noms absoluts des
+    sous-répertoires.</p>
+
+    <P>Pour des formats non soutenus, vous devrez transformer le fichier
+    en un format que Bogofilter comprend. Mbox est souvent commode parce
+    qu'il peut être enovyé directement à bogofilter.</P>
+
+    <P>La liste suivante pourrait vous aider:</P>
+    <DL>
+	<DT>format UW-IMAP/PINE mbx</DT>
+	<DD>convertir en mbox: <KBD>mailtool copy /full/path/to/mail.mbx
+	    '#driver.unix//full/path/to/mbox'</KBD></DD>
+    </DL>
+
+    <hr>
 
     <h2 id="vvv">Quelle est la signification de la sortie verbeuse
     de Bogofilter?</h2>
