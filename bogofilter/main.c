@@ -202,7 +202,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 #ifdef HAVE_SYSLOG_H
     if (logflag)
     {
-	openlog( "bogofilter", LOG_PID, LOG_DAEMON );
+	openlog("bogofilter", LOG_PID, LOG_MAIL);
 
 	switch (run_type)
 	{
