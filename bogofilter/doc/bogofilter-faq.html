@@ -311,23 +311,23 @@ French</a>
     <pre>
 	#! /bin/sh
 	#  class3 -- classify one message as bad, good or unsure
-	cat >msg.$$
-	/usr/bin/bogofilter $* <msg.$$
+	cat &gt;msg.$$
+	bogofilter $* &lt;msg.$$
 	res=$?
 	if [ $res = 0 ]; then
-	    cat msg.$$ >>corpus.bad
+	    cat msg.$$ &gt;&gt;corpus.bad
 	elif [ $res = 1 ]; then
-	    cat msg.$$ >>corpus.good
+	    cat msg.$$ &gt;&gt;corpus.good
 	elif [ $res = 2 ]; then
-	    cat msg.$$ >>corpus.unsure
+	    cat msg.$$ &gt;&gt;corpus.unsure
 	fi
-	/bin/rm msg.$$
+	rm msg.$$
 
 	#! /bin/sh
 	# classify -- put all messages in mbox through class3
 	src=$1;
 	shift
-	formail -s class3 $* <$src
+	formail -s class3 $* &lt;$src
     </pre></li>
     </ul>
 

@@ -299,17 +299,17 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
     <pre> 
 	#! /bin/sh
 	#  class3 -- classe un message en mauvais, bon ou incertain
-	cat >msg.$$
-	/usr/bin/bogofilter $* <msg.$$
+	cat &gt;msg.$$
+	bogofilter $* &lt;msg.$$
 	res=$?
 	if [ $res = 0 ]; then
-		cat msg.$$ >>corpus.bad
+	    cat msg.$$ &gt;&gt;corpus.bad
 	elif [ $res = 1 ]; then
-		cat msg.$$ >>corpus.good
+	    cat msg.$$ &gt;&gt;corpus.good
 	elif [ $res = 2 ]; then
-		cat msg.$$ >>corpus.unsure
+	    cat msg.$$ &gt;&gt;corpus.unsure
 	fi
-		/bin/rm msg.$$
+	rm msg.$$
 
 	#! /bin/sh
 	# classifie -- Place tous les messages dans un fichier mbox à l'aide de class3
