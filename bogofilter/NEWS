@@ -22,6 +22,12 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-03-23
+
+	* Fix --enable-iconv breaking with non-ASCII default charset.
+
+	* bogolexer now understands the --charset-default options.
+
 	2005-03-22
 
 	* Fix SQLite3 regression in 0.94.0 that broke consistency guarantees

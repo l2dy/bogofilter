@@ -151,12 +151,13 @@ static int get_decoded_line(buff_t *buff)
 #ifndef	ENABLE_ICONV
     temp = buff;
 #else
-    /* have the temp buff match the capacity of the parameter */
     if (temp == NULL)
 	temp = (buff_t *) calloc(sizeof(buff_t), 1);
-    if (temp->size < buff->size) {
+    /* UTF-8 uses up to six octets per character, make output buffer
+     * large enough */
+    if (temp->size < buff->size * 6) {
 	xfree(temp->t.text);
-	temp->size = buff->size;
+	temp->size = buff->size * 6;
 	temp->t.text = (byte *) xmalloc(temp->size + D);
     }
 
@@ -175,8 +176,14 @@ static int get_decoded_line(buff_t *buff)
 
 #ifdef	ENABLE_ICONV
     iconvert(temp, buff);
+    /*
+     * iconvert, treating multi-byte sequences, can shrink or enlarge
+     * the output compared to its input.  Correct count.
+     */
+    if (count > 0)
+	count = buff->t.leng;
 #endif
-  
+
     if (count == EOF) {
 	if ( !ferror(fpin))
 	    return YY_NULL;
@@ -322,11 +329,13 @@ int yyinput(byte *buf, size_t used, size_t size)
 #ifdef	CP866
     count = htmlUNICODE_decode(buf, count);
 #else
+#ifndef ENABLE_ICONV
     for (i = 0; i < count; i++ )
     {
 	byte ch = buf[i];
 	buf[i] = charset_table[ch];
     }
+#endif
 #endif
     return (count == EOF ? 0 : count);
 }
