@@ -66,6 +66,10 @@ extern	const char	*stats_prefix;
 extern	const char *const version;
 extern	const char *const system_config_file;
 
+/* for msgcounts.c */
+extern	long	 msgs_good;
+extern 	long	 msgs_bad;
+
 /* from html.h */
 extern	bool strict_check;
 
