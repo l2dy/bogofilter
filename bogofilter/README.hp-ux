@@ -2,12 +2,11 @@ Compiling Bogofilter on HP-UX
 =============================
 Bogofilter has been tested on HP-UX 11.00 and 11i.
 
-There are three prerequisites for compiling Bogofilter on HP-UX.
+There are two prerequisites for compiling Bogofilter on HP-UX.
 1. gcc
-2. flex
-3. Berkeley DB
+2. Berkeley DB
 
-gcc and flex (and other open-source software) are available from HP,
+gcc (and other open-source software) is available from HP,
 at http://h21007.www2.hp.com/dev/technologies/topic/1,2608,10602,00.html
 Also available from the HP-UX Porting and Archive Centre,
 at http://hpux.connect.org.uk/ (and mirrors around the world).
@@ -18,12 +17,17 @@ Also available from HP as part of the HP release of the Gnome Desktop,
 at http://www.hp.com/workstations/support/software/hpux/gnome/
 The Gnome Desktop and Gnome Developer bundles are required.
 
-After the prerequistes have been met, make certain that gcc and flex
-are available through your PATH environment variable.  Be sure to
+After the prerequistes have been met, make certain that gcc
+is available through your PATH environment variable.  Be sure to
 run the `configure' script with the `--with-db=/path/to/berkeley-db-dir'
 option so that `configure' can find your Berkeley DB installation.
-For example, users of the HP Gnome Desktop could use
+For example, users of the HP Gnome Desktop would use
 `configure --with-db=/opt/gnome'.
 
 Read the INSTALL file in this directory for more information and
 additional options for the `configure' script.
+
+Please note that `make check' fails on HP-UX due to portability
+issues in the testing framework.  This does not mean bogofilter
+is not operating properly.  This will be corrected in a future
+release.
