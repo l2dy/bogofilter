@@ -11,16 +11,22 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 ******************************************************************************/
 
+/* To avoid header file conflicts the order is:
+**	1. System header files
+**	2. Header files for external packages
+**	3. Bogofilter's header files
+*/
+
 #define DONT_TYPEDEF_SSIZE_T 1
 #include "common.h"
 
-#include <unistd.h>		/* for SEEK_SET for SunOS 4.1.x */
-#include <db.h>
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>		/* for SEEK_SET for SunOS 4.1.x */
 #include <sys/resource.h>
 
+#include <db.h>
 #ifdef NEEDTRIO
 #include "trio.h"
 #endif
@@ -98,11 +104,10 @@ static dbh_t *dbh_init(const char *path, const char *name)
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
 
-    handle->fd    = -1; /* for lock */
+    handle->fd   = -1; /* for lock */
 
     handle->path = xstrdup(path);
     handle->name = xmalloc(len);
-
     build_path(handle->name, len, path, name);
     
     handle->locked     = false;
