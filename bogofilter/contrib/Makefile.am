@@ -8,6 +8,7 @@ bogogrep_static_LDFLAGS=$(STATICLDFLAGS)
 endif
 
 EXTRA_DIST= \
+	README.contrib \
 	README.randomtrain \
 	bogo.R \
 	bogofilter-milter.pl \
