@@ -1,5 +1,12 @@
 /* $Id$ */
 
+/*****************************************************************************
+
+NAME:
+   lexer.h -- prototypes and definitions for lexer.c
+
+******************************************************************************/
+
 #ifndef	LEXER_H
 #define	LEXER_H
 
@@ -18,10 +25,7 @@ typedef enum {
     FROM,	/* mbox message delimiter */
     BOUNDARY,	/* MIME multipart boundary line */
     IPADDR,	/* ip address */
-    CHARSET,	/* charset="..." */
-    TRANSFER,	/* content-transfer-encoding: */
-    UUENCODE,	/* uuencoded line */
-    EMPTY	/* empty line */
+    CHARSET	/* charset="..." */
 } token_t;
 
 extern bool block_on_subnets;
