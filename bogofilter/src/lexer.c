@@ -155,8 +155,7 @@ static int get_decoded_line(buff_t *buff)
     if (temp == NULL)
 	temp = (buff_t *) calloc(sizeof(buff_t), 1);
     if (temp->size < buff->size) {
-	if (temp->t.text != NULL)
-	    xfree(temp->t.text);
+	xfree(temp->t.text);
 	temp->size = buff->size;
 	temp->t.text = (byte *) xmalloc(temp->size + D);
     }
