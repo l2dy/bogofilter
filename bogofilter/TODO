@@ -4,9 +4,6 @@
 
 **** Perhaps implement helper to resize the Berkeley DB environment.
 
-**** Implement DB_ENV->remove to help Berkeley DB upgrades, and document
-     them.
-
 **** Implement Concurrent Data store, quite similar to Transactional.
 
 **** Make sure that RFC-2047 decoder runs only once, not recursively.
@@ -43,9 +40,6 @@ message belongs to at above 0.9 confidence level.
 **** New Feature: Web based tool for wordlist management. Allow message
 registration and whitelist management. HTML Templatized for easy integration
 with existing web mail systems.
-
-**** Performance Enhancement: Investigate if mmap/msync might help
-performance. The db4 library does it already.
 
 **** New Feature: Add support for a user configurable list of headers that 
 should be used to ignore (single or multi-line) headers that appear in the 
