@@ -289,6 +289,9 @@ SIZING OPTIONS:
 
    This option takes precedence over Bogofilter's db_cachesize option!
 
+   Example: set_cachesize 0 60000000 6
+   will create six caches sized 12500000 bytes (12.5 MB, +25% applied)
+
  - set_lk_max_locks   12345
  - set_lk_max_objects 12346
    (valid in Berkeley DB 3.2 - 4.3)
