@@ -155,15 +155,18 @@ respectively.</para>
     bogofilter will exit with code 0 even if the mail is not spam. This
     simplifies using bogofilter from procmail or maildrop.</para>
 
-<para>The <option>-u</option> (update) option tells 
-<application>bogofilter</application>
-to update the appropriate wordfile automatically.  If the text
-presented on standard input is spam, the spam wordfile will be updated.  
-If the text is not spam, the good wordfile will be updated.
-Effectively this option runs <application>bogofilter</application> 
-with the '-s' or '-n' flag, as appropriate.
-</para>
-
+<para>The <option>-u</option> (update) option tells
+<application>bogofilter</application> to update the appropriate
+wordfile automatically.  If the text presented on standard input is
+spam, the spam wordfile will be updated.  If the text is not spam, the
+good wordfile will be updated. Effectively this option runs
+<application>bogofilter</application> with the <option>-s</option> or
+<option>-n</option> flag, as appropriate.  (Caution is urged in the use
+of this capability, as any classification errors
+<application>bogofilter</application> may make will be preserved and
+accumulated until corrected with the <option>-S</option> and
+<option>-N</option> options.)</para>
+  
 <para>The <option>-v</option> option produces a report to standard 
 output on <application>bogofilter</application>'s analysis af the
 input. Each additional <option>v</option> will increase the verbosity of
@@ -173,16 +176,21 @@ with spam.</para>
 
 <para>The <option>-g</option> option selects the original Graham form
 of the calculation method.  This is the default unless the
-<option>-r</option> option is specified.</para>
+<option>-r</option> option is specified, or unless
+<application>bogofilter</application> has been compiled with the
+<option>--disable-graham-method</option> option to the configure
+script.</para>
 
 <para>The <option>-r</option> option selects the Robinson modifications
 to the calculation method.  This is automatically enabled when the
-<option>-R</option> option is specified.</para>
+<option>-R</option> option is specified.  Neither this nor the
+<option>-g</option> option is available if bogofilter was configured
+with <option>--disable-graham-method</option> at compile time. </para>
 
 <para>The <option>-R</option> option tells
 <application>bogofilter</application> to output an R data frame in
-text form to stdout.  See the section on integration with R, below,
-for further detail.  Option <option>-R</option> implies option
+text form on the standard output.  See the section on integration with
+R, below, for further detail.  Option <option>-R</option> implies option
 <option>-r</option>.</para>
 
 <para>The <option>-V</option> option prints the version number and 
