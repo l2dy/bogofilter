@@ -5,9 +5,7 @@
 NOTE: More information on important changes for bogofilters updaters
 is in the RELEASE.NOTES files.  Read them!!
 
-0.17.4	2004-03-??
-
-	2004-03-20
+0.17.4	2004-03
 
 	* Ignore data portion of PGP signatures.
 	* Use "mime:" (rather than "head:") to tag mime part headers.

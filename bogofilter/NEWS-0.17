@@ -8,7 +8,7 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
 
-0.17.4	2004-03-??
+0.17.4	2004-03-20
 
 * Fix message reporting lack of config file.
 * Fix "Can't find '.MSG_COUNT'" problem in bogotune.
@@ -16,7 +16,7 @@ Note:
 * Ignore data portion of PGP signatures.
 * Use "mime:" (rather than "head:") to tag mime part headers.
 
-0.17.?	2004-03-??
+0.17.3	2004-03-17
 
 * Added code to use to Berkeley DB Concurrent Data Store, which uses a
   "DB_ENV" BerkeleyDB environment and the BerkeleyDB Lock Manager.
