@@ -19,8 +19,8 @@
 	 <arg>-C</arg>
 	 <arg>-d <replaceable>file.db</replaceable></arg>
 	 <arg>-D</arg>
-	 <arg choice="plain">-n <emphasis>okfile</emphasis> [<emphasis>okfile</emphasis>...]</arg>
-	 <arg choice="plain">-s <emphasis>spamfile</emphasis> [<emphasis>spamfile</emphasis>...]</arg>
+	 <arg choice="plain">-n <replaceable>okfile</replaceable> [<replaceable>okfile</replaceable>...]</arg>
+	 <arg choice="plain">-s <replaceable>spamfile</replaceable> [<replaceable>spamfile</replaceable>...]</arg>
       </cmdsynopsis>
 
     <cmdsynopsis>
