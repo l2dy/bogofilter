@@ -86,7 +86,7 @@ static dbh_t *dbh_init(const char *filename, const char *name) {
   return handle;
 }
 
-static void dbh_free(dbh_t *handle){
+static void dbh_free(/*@only@*/ dbh_t *handle){
     if (handle == NULL) return;
     xfree(handle->filename);
     xfree(handle->name);
@@ -184,7 +184,7 @@ open_err:
 */
 long db_getvalue(void *vhandle, const char *word){
   dbv_t val;
-  int  ret;
+  long ret;
   long value = 0;
   dbh_t *handle = vhandle;
 
@@ -220,7 +220,7 @@ void db_delete(void *vhandle, const char *word) {
     exit(2);
 }
 
-static long db_get_dbvalue(void *vhandle, const char *word, dbv_t *val){
+static long db_get_dbvalue(void *vhandle, const char *word, /*@out@*/ dbv_t *val){
   int  ret;
   DBT db_key;
   DBT db_data;
@@ -391,14 +391,13 @@ void db_flush(void *vhandle){
     }
 }
 
-
 /* implements locking. */
-static int db_lock(int fd, int cmd, int type){
+static int db_lock(int fd, int cmd, short int type){
     struct flock lock;
 
     lock.l_type = type;
     lock.l_start = 0;
-    lock.l_whence = SEEK_SET;
+    lock.l_whence = (short int)SEEK_SET;
     lock.l_len = 0;
     return (fcntl(fd, cmd, &lock));
 }
