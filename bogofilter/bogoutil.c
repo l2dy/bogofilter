@@ -10,6 +10,8 @@ AUTHOR:
    
 ******************************************************************************/
 
+#define	WH
+
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +21,10 @@ AUTHOR:
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
+
+#ifndef	WH
 #include <db.h>
+#endif
 
 #include <config.h>
 #include "common.h"
@@ -42,12 +47,16 @@ run_t run_type = RUN_NORMAL;
 
 const char *progname = PROGNAME;
 
+static int dump_count = 0;
+
 static int db_dump_hook(char *key,  uint32_t keylen, 
 			char *data, uint32_t datalen,
 			 /*@unused@*/ void *userdata)
 {
     dbv_t val = {0, 0};
     (void)userdata;
+
+    dump_count += 1;
 
     if (datalen != sizeof(uint32_t) && datalen != 2 * sizeof(uint32_t)) {
 	print_error(__FILE__, __LINE__, "Unknown data size - %d.\n", datalen);
@@ -168,7 +177,16 @@ static int db_oper(const char *path, dbmode_t open_mode, db_foreach_t funct,
 
 static int dump_file(char *db_file)
 {
-    return db_oper(db_file, DB_READ, db_dump_hook, NULL);
+    int rc;
+
+    dump_count = 0;
+
+    rc = db_oper(db_file, DB_READ, db_dump_hook, NULL);
+
+    if (verbose)
+	fprintf(dbgout, "%d tokens dumped\n", dump_count);
+
+    return rc;
 }
 
 #define BUFSIZE 512
@@ -180,6 +198,7 @@ static int load_file(char *db_file)
     byte *p;
     int rv = 0;
     size_t len;
+    int load_count = 0;
     unsigned long line = 0;
     unsigned long count, date;
     YYYYMMDD today_save = today;
@@ -247,12 +266,17 @@ static int load_file(char *db_file)
 	if (!keep_count(count) || !keep_date(date) || !keep_size(strlen((const char *)buf)))
 	    continue;
 
+	load_count += 1;
+
 	/* Slower, but allows multiple lists to be concatenated */
 	set_date(date);
 	count += db_getvalue(dbh, (char *)buf);
 	db_setvalue(dbh, (char *)buf, count);
     }
     db_close(dbh);
+
+    if (verbose)
+	fprintf(dbgout, "%d tokens loaded\n", load_count);
 
     return rv;
 }
