@@ -7,6 +7,15 @@ is in the RELEASE.NOTES files!
 
 $Id$
 
+	2003-09-12
+
+	* Revise parsing pattern for "encoded text" and regression
+          test for folded text.
+
+	2003-09-11
+
+	* Use GSL (the Gnu Scientific Library) when it's available.
+
 0.15.3	2003-09-10
 
 	2003-09-09

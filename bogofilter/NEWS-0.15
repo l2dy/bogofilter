@@ -2,6 +2,12 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.15.???
+
+* Revise parsing pattern for "encoded text" and regression
+  test for folded text.
+* Use GSL (the Gnu Scientific Library) when it's available.
+
 0.15.3	2003-09-10
 
 * Fix auto-update ('-u') bug that double registers ham and spam.
