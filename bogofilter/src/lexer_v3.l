@@ -232,7 +232,7 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); skip_to('='); return TOKEN; }
 
 <INITIAL>(file)?name=\"?			/* ignore */
-<INITIAL>(ESMTP|SMTP)+[ \t\n]+id\ {ID}		{ if (header_line_markup) { use_to(' '); return TOKEN; } }
+<INITIAL>(ESMTP|SMTP)+/[ \t\n]+id\ {ID}		{ if (header_line_markup) { return TOKEN; } }
 <INITIAL>[:blank:]*id\ {ID}			/* ignore */
 
 <INITIAL>\n[ \t]				{ lineno += 1; }
