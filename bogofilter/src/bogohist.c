@@ -27,6 +27,7 @@ AUTHOR:
 #include "msgcounts.h"
 #include "word.h"
 #include "wordlists.h"
+#include "xmalloc.h"
 
 static uint ham_only,  ham_hapax;
 static uint spam_only, spam_hapax;
