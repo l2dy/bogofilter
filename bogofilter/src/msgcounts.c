@@ -95,4 +95,5 @@ void set_msg_counts(char *s)
     msgs_bad = atoi(s);
     s = strchr(s, ' ') + 1;
     msgs_good = atoi(s);
+    header_line_markup = false;		/* not necessary with MSG_COUNT files */
 }
