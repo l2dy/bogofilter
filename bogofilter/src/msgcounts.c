@@ -11,11 +11,13 @@ AUTHOR:
 ******************************************************************************/
 
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <config.h>
 #include "common.h"
 
+#include "fgetsl.h"
 #include "msgcounts.h"
 #include "wordlists.h"
 
@@ -25,6 +27,34 @@ long msgs_good = 0L;
 long msgs_bad  = 0L;
 
 /* Function Definitions */
+
+yylex_t	msg_count_lex;
+char	msg_count_text[MSG_COUNT_MAX_LEN];
+size_t	msg_count_leng = MSG_COUNT_MAX_LEN;
+char	*msg_count_text_ptr = msg_count_text;
+
+const char *msg_count_header = "\".MSG_COUNT\"";
+
+token_t  msg_count_lex(void)
+{
+    char *tmp = fgets(msg_count_text, sizeof(msg_count_text), fpin);
+    if (tmp == NULL) {
+	msg_count_leng = 0;
+	return NONE;
+    }
+    else {
+	msg_count_leng = strlen(msg_count_text);
+
+	while (msg_count_leng > 0 && isspace(msg_count_text[msg_count_leng-1])) {
+	    msg_count_leng -= 1;
+	    msg_count_text[msg_count_leng] = '\0';
+	}
+	if ( memcmp(msg_count_text, msg_count_header, strlen(msg_count_header)) == 0 )
+	    return MSG_COUNT_LINE;
+	else
+	    return BOGO_LEX_LINE;
+    }
+}
 
 void init_msg_counts()
 {
@@ -51,4 +81,3 @@ void set_msg_counts(char *s)
     s = index(s, ' ') + 1;
     msgs_good = atoi(s);
 }
-
