@@ -198,6 +198,11 @@ token_t get_token(void)
 		save_class = IPADDR;
 		return (cls);
 	    }
+	    if (token_prefix != NULL) {
+		word_t *o = yylval;
+		yylval = word_concat(token_prefix, yylval);
+		word_free(o);
+	    }
 	    break;
 
 	case NONE:		/* nothing to do */
