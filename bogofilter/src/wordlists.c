@@ -109,9 +109,11 @@ void open_wordlists(dbmode_t mode)
 			    fprintf(stderr,
 				    "Can't open files '%s' and '%s' in directory '%s',\n",
 				    aSeparate[0], aSeparate[1], list->filepath);
-			fprintf(stderr,
-				"error #%d - %s.\n\n", err, strerror(err));
-			fprintf(stderr,
+			if (err != 0)
+			    fprintf(stderr,
+				    "error #%d - %s.\n", err, strerror(err));
+			fprintf(stderr, 
+				"\n"
 				"Remember to register some spam and ham messages before you\n"
 				"use bogofilter to evaluate mail for its probable spam status!\n");
 			exit(EX_ERROR);
