@@ -178,7 +178,10 @@ if test "x$BF_CHECKTOOL" = x"efence" ; then
 fi
 
 case `uname -s` in
-    Linux)  if test $verbose -eq 1 ; then DIFF_BRIEF="--brief -s" ; fi
+    Linux)  case $verbose in 
+	    1) DIFF_BRIEF="--brief -s" ;;
+	    2) DIFF_BRIEF="-u" ;;
+	esac
 	;;
 esac
 
