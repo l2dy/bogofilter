@@ -2,28 +2,29 @@
 n
 				bogofilter news
 
-0.8.90
+0.9.0
 	* Changed the default behavior to use the Robinson algorithm.
 	* Corrected incorrect sort order when printing statistics.
-	* Added two more regression tests designed to confirm that
-	  bogofilter's results are matching saved reference results.
-	* New file METHODS describes the Graham, Robinson, and Fisher
-	  methods that bogofilter supports for computing spamicity.
 	* Added support for Fisher's method of combining probabilities,
 	  as optimized for this purpose by Rob W. W. Hooft, to the
 	  "Robinson" algorithm.
+	* The new file METHODS describes the Graham, Robinson, and Fisher
+	  methods that bogofilter supports for computing spamicity.
 	* A new '-f' option tells bogofilter to use Fisher's method.
-	* Split the main module into a registration module and two
-	  algorithm modules - for the graham and robinson methods.
-	* Implemented an object oriented API for using computational
-	  methods.
-	* The testing framework now works on Solaris.
 	* A new '-c' option in bogofilter allows specification of the
 	  configuration file to read.
 	* A new '-C' option tells bogofilter not to read any config file.
 	* The syslog facility in '-l' mode has changed from "daemon" to "mail",
 	  so your logs may now be in /var/log/maillog or /var/log/mail rather
 	  than /var/log/messages. Check your /etc/syslog.conf.
+	* The testing framework now works on Solaris.
+
+	Internal Changes:
+	* Added two more regression tests designed to confirm that
+	  bogofilter's results are matching saved reference results.
+	* Implemented an object oriented API for using computational methods.
+	* Split the main module into a registration module and three algorithm
+	  modules - for the fisher, graham and robinson methods.
 
 0.8.0	2002-11-10
 
