@@ -13,17 +13,22 @@
 
 /* Function Definitions */
 
+word_t  *word_news(const char *cstring)
+{
+    return word_new((const byte *)cstring, strlen(cstring));
+}
+
 word_t *word_new(const byte *text, uint len)
 {
     /* to lessen malloc/free calls, allocate struct and data in one block */
     word_t *self = xmalloc(sizeof(word_t)+len+1);
     self->leng = len;
     self->text = (byte *)((char *)self+sizeof(word_t));
-    if (text) {
+    if (text != NULL) {
 	memcpy(self->text, text, len);
 	self->text[len] = '\0';			/* ensure nul termination */
     } else {
-	self->text[0] = '\0';			/* dito for text == NULL */
+	self->text[0] = '\0';			/* ditto for text == NULL */
     }
     return self;
 }

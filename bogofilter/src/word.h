@@ -26,7 +26,7 @@ extern word_t  *word_new(const byte *text, /**< may be NULL, to create a blank w
 	uint leng);
 
 /** create a new word_t from the NUL-terminated \a cstring */
-#define word_news(cstring) word_new((cstring), strlen((const char *)(cstring)));
+extern word_t  *word_news(const char *cstring);
 
 /** deallocate memory allocated for \a self */
 #define word_free(self) xfree((self))
