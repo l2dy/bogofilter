@@ -154,8 +154,6 @@ void open_wordlists(wordlist_t *list, dbmode_t mode)
     LIST_INIT(&envs);
 
     while (retry) {
-	ds_init();
-
 	if (run_type & (REG_SPAM | REG_GOOD | UNREG_SPAM | UNREG_GOOD))
 	    retry = open_wordlist(get_default_wordlist(list), mode);
 	else {
