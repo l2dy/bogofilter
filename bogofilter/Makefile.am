@@ -39,7 +39,9 @@ cvs-check:
 # host:directory/
 # it will call rsync from its source directory to the destination for
 # each of them, running them in parallel
-rsync:	distdir .rsyncs
+.PHONY: rsync rsynconly
+rsync:	distdir rsynconly
+rsynconly: .rsyncs
 	@( cat $(srcdir)/.rsyncs | sed -e 's}^}rsync -av -e ssh --delete $(PACKAGE)-$(VERSION)/ }; s/\($$\)/ \&/;' ; echo "wait" ) | $(SHELL) -x
 
 dist-hook:
