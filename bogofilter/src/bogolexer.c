@@ -54,7 +54,8 @@ const parm_desc format_parms[] =
 
 /* Function Prototypes */
 
-static int process_args(int argc, char **argv);
+static void process_args_1(int argc, char **argv);
+static void process_args_2(int argc, char **argv);
 static void initialize(FILE *fp);
 
 /* Function Definitions */
@@ -93,7 +94,7 @@ static void help(void)
 	    progname, version);
 }
 
-static int process_args(int argc, char **argv)
+static void process_args_1(int argc, char **argv)
 {
     int option;
 
@@ -114,8 +115,8 @@ static int process_args(int argc, char **argv)
 
 	case 'c':
 	    read_config_file(optarg, false, false, PR_COMMAND);
-	/*@fallthrough@*/
-	/* fall through to suppress reading config files */
+	    /*@fallthrough@*/
+	    /* fall through to suppress reading config files */
 
 	case 'C':
 	    suppress_config_file = true;
@@ -128,33 +129,6 @@ static int process_args(int argc, char **argv)
 	case 'h':
 	    help();
 	    exit(0);
-
-	case 'P':
-	{
-	    char *s;
-	    for (s = optarg; *s ; s += 1)
-	    {
-		switch (*s)
-		{
-		case 't': tokenize_html_tags ^= true;		/* -Pt */
-		    break;
-		case 's': tokenize_html_script ^= true;		/* -Ps - not yet in use */
-		    break;
-		case 'C': strict_check ^= true;			/* -PC */
-		    /*@fallthrough@*/
-		case 'c': tokenize_html_comments ^= true;	/* -Pc - not yet in use */
-		    break;
-		case 'h': tag_header_lines ^= true;		/* -Ph */
-		    break;
-		case 'f': fold_case ^= true;			/* -Pf */
-		    break;
-		default:
-		    fprintf(stderr, "Unknown parsing option -P%c.\n", *s);
-		    exit(2);
-		}
-	    }
-	    break;
-	}
 
 	case 'I':
 	    fpin = fopen( optarg, "r" );
@@ -187,18 +161,60 @@ static int process_args(int argc, char **argv)
 	case 'x':
 	    set_debug_mask( optarg );
 	    break;
-
-	default:
-	    abort();
-	    exit(2);
 	}
     }
+
     if (optind < argc) {
 	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n",
 		argv[optind]);
 	exit(2);
     }
-    return 0;
+}
+
+static void process_args_2(int argc, char **argv)
+{
+    int option;
+
+    optind = opterr = 1;
+    /* don't use #ifdef here: */
+#if HAVE_DECL_OPTRESET
+    optreset = 1;
+#endif
+
+    while ((option = getopt(argc, argv, ":c:CDhI:npP:qTvx:")) != -1)
+    {
+	switch (option)
+	{
+	case 'P':
+	{
+	    char *s;
+	    for (s = optarg; *s ; s += 1)
+	    {
+		switch (*s)
+		{
+		case 't': tokenize_html_tags ^= true;		/* -Pt */
+		    break;
+		case 's': tokenize_html_script ^= true;		/* -Ps - not yet in use */
+		    break;
+		case 'C': strict_check ^= true;			/* -PC */
+		    /*@fallthrough@*/
+		case 'c': tokenize_html_comments ^= true;	/* -Pc - not yet in use */
+		    break;
+		case 'h': tag_header_lines ^= true;		/* -Ph */
+		    break;
+		case 'f': fold_case ^= true;			/* -Pf */
+		    break;
+		default:
+		    fprintf(stderr, "Unknown parsing option -P%c.\n", *s);
+		    exit(2);
+		}
+	    }
+	    break;
+	}
+
+	}
+    }
+    return;
 }
 
 int main(int argc, char **argv)
@@ -206,8 +222,9 @@ int main(int argc, char **argv)
     token_t t;
     int count=0;
 
-    process_args(argc, argv);
+    process_args_1(argc, argv);
     process_config_files(false);
+    process_args_2(argc, argv);
 
     textblocks = textblock_init();
 
