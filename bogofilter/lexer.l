@@ -293,7 +293,7 @@ filename=\"					;
 {MIME_BOUNDARY}					;
 
 {IPADDR}					{return(TOKEN);}
-[^[:blank:]\n\r[:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,\n\r[]+[^[:blank:][:punct:]\n\r]   {return(TOKEN);} 
+[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,[:cntrl:][]+[^[:blank:][:punct:][:cntrl:]]   {return(TOKEN);} 
 .						;
 \n						;
 
