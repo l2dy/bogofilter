@@ -21,11 +21,11 @@ AUTHOR:
 #include <config.h>
 #include "common.h"
 
+#include "datastore.h"
+#include "datastore_db.h"
 #include "error.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
-#include "datastore.h"
-#include "datastore_db.h"
 
 #define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
 
