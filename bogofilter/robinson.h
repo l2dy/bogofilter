@@ -49,7 +49,7 @@ extern	rf_method_t rf_robinson_method;
 
 /* needed by fisher.c */
 extern	const	parm_desc rob_parm_table[];
-extern	void	rob_initialize_with_parameters(double _min_dev, double _spam_cutoff);
+extern	void    rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double _spam_cutoff);
 #endif
 
 #endif	/* HAVE_ROBINSON_H */

@@ -264,9 +264,9 @@ void rob_print_summary(void)
 		  rob_stats.p_pr, rob_stats.q_pr, rob_stats.s.spamicity, rob_stats.p_ln, rob_stats.q_ln);
 }
 
-void rob_initialize_with_parameters(double _min_dev, double _spam_cutoff)
+void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double _spam_cutoff)
 {
-    mth_initialize( &rob_stats, ROBINSON_MAX_REPEATS, _min_dev, _spam_cutoff, ROBINSON_GOOD_BIAS );
+    mth_initialize( stats, ROBINSON_MAX_REPEATS, _min_dev, _spam_cutoff, ROBINSON_GOOD_BIAS );
     scalefactor = compute_scale();
     if (fabs(robs) < EPS)
 	robs = ROBS;
@@ -274,7 +274,7 @@ void rob_initialize_with_parameters(double _min_dev, double _spam_cutoff)
 
 void rob_initialize_constants(void)
 {
-    rob_initialize_with_parameters(ROBINSON_MIN_DEV, ROBINSON_SPAM_CUTOFF);
+    rob_initialize_with_parameters(&rob_stats, ROBINSON_MIN_DEV, ROBINSON_SPAM_CUTOFF);
 }
 
 double rob_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/

@@ -105,7 +105,7 @@ void fis_print_summary(void)
 
 void fis_initialize_constants(void)
 {
-    rob_initialize_with_parameters(FISHER_MIN_DEV, FISHER_SPAM_CUTOFF);
+    rob_initialize_with_parameters(&fis_stats, FISHER_MIN_DEV, FISHER_SPAM_CUTOFF);
 }
 
 rc_t fis_status(void)
