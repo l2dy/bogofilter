@@ -21,12 +21,12 @@ typedef struct {
     parm_t	type;
     union
     {
+	void	*v;
 	bool	*b;
 	int	*i;
 	double	*d;
 	char	*c;
-	char	**s;
-	void	*v;
+	const char **s;
     } addr;
 } parm_desc;
 
