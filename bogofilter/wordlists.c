@@ -115,6 +115,7 @@ int init_list(wordlist_t* list, const char* name, const char* directory, const c
 	    list->next=NULL;
 	    break;
 	}
+	list_index=list_index->next;
     }
     return 0;
 }
