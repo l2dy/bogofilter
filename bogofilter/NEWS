@@ -4,6 +4,12 @@
 
 $Id$
 
+0.13.6	2003-06-04
+
+	* Fix check for "^From " lines to work properly during base64
+          decoding. 
+	* End html comment processing when a message header is found.
+
 0.13.5	2003-06-03
 
 	* Allow terminal exclamation points on tokens.

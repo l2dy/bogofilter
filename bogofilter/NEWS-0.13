@@ -2,8 +2,13 @@
 				BOGOFILTER NEWS
 			       =================
  
+0.13.6	2003-06-04
+ 
+* Fix check for "^From " lines to work properly during base64 decoding. 
+* End html comment processing when a message header is found.
+ 
 0.13.5	2003-06-03
-
+ 
 * Allow terminal exclamation points on tokens.
 * Diagnose invalid values of robx.
 * Fixed bogofilter's non-use of message counts in msg-count files.
@@ -62,7 +67,7 @@
 * contrib/randomtrain and contrib/scramble can now process
   both mbox and maildir formats.
 * Added perl script contrib/mime.get.rfc822 to extract
-  forwaded messages from with a message.
+  forwarded messages from with a message.
 * Added basic support for emacs RMAIL mailboxes.
 * Remove incomplete RMAIL/Babyl-5 support.
 * Registration code modified to count unique tokens for each
