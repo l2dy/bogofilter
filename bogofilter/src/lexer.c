@@ -145,7 +145,7 @@ static int get_decoded_line(buff_t *buff)
 	}
     }
 
-#if 0
+#ifdef EXCESSIVE_DEBUG
     /* debug */
     fprintf(dbgout, "%d: ", count);
     buff_puts(buff, 0, dbgout);

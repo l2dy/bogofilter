@@ -421,7 +421,7 @@ static void process_arglist(int argc, char **argv, priority_t precedence, int pa
 
 	name = (option_index == 0) ? argv[this_option_optind] : long_options[option_index].name;
 
-#if 0
+#ifdef EXCESSIVE_DEBUG
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
 	    fprintf(stderr, "config: option=%c (%d), optind=%d, opterr=%d, optarg=%s\n", 
 		    isprint((unsigned char)option) ? option : '_', option, 
