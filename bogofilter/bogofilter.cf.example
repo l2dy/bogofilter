@@ -48,6 +48,7 @@
 #### SPAM_SUBJECT_TAG
 #
 #	tag added to "Subject: " line for identifying spam
+#	default is to add nothing.
 
 ##spam_subject_tag=***SPAM***
 
@@ -74,8 +75,9 @@
 #	applications such as scoring.
 #	WARNING: If you set this too large, bogofilter will fail.
 
-##db_cachesize=16
 #db_cachesize=0
+##db_cachesize=16
+
 
 #### Format of SPAM_HEADER
 #
@@ -89,14 +91,17 @@
 #
 #	    e - spamicity as 'e' format
 #	    f - spamicity as 'f' format
-#	    d - if ham, difference from 0.0 (as 'f' format)
-#		if spam, difference from 1.0 (as 'f' format)
 #
 #	    l - logging tag (from '-l' option)
 #
-#	    o - spam_cutoff, ex. cutoff=%c
+#	    o - spam_cutoff, ex. cutoff=%o
 #
 #	    p - spamicity as a probability
+#	    d - if ham, difference of spamicity from 0.0
+#		if spam, difference of spamicity from 1.0
+#		if unsure, just the spamicity
+#
+#		For examples, see "Format of spamicity output" (below).
 #
 #	    r - runtype
 #	        w - word count
@@ -125,7 +130,7 @@
 
 ##### TERSE
 #
-#	if enabled, format the X-Bogosity use the 'terse_format' specificaton.
+#	if enabled, format the X-Bogosity using the 'terse_format' specificaton.
 
 #terse=no
 
@@ -195,7 +200,7 @@
 
 #### MINIMUM DEVIATION
 #
-#	if token spamicity closer to EVEN_ODDS (0.5f)
+#	if token spamicity closer to EVEN_ODDS (0.5)
 #	than MIN_DEV, don't use the word in the
 #	spamicity calculation
 #       defaults: 0.0 for graham and 0.1 for robinson and fisher
@@ -253,12 +258,12 @@
 ## spam_cutoff = 0.90	# for graham
 ## spam_cutoff = 0.54	# for robinson
 
-# fisher (with Yes/No output, i.e. '-2' option):
+# Fisher (with Yes/No output, i.e. '-2' option):
 #
 #ham_cutoff = 0.00
 #spam_cutoff = 0.95
 
-# fisher (with Yes/No/Unsure output, i.e. '-3' option):
+# Fisher (with Yes/No/Unsure output, i.e. '-3' option):
 #
 ## ham_cutoff = 0.10
 ## spam_cutoff = 0.95
@@ -272,10 +277,7 @@
 #spamicity_tags = Yes, No
 #spamicity_formats = %0.6f, %0.6f
 
-# for fisher (with 3-state output)
-#	using "Spam", "Ham", and "Unsure" as labels,
-#	format "%6.2e" for displaying Spam/Ham scores.
-#	and format "%0.6f" for Unsure scores.
+# for Fisher (with 3-state output)
 #
 ## spamicity_tags = Spam, Ham, Unsure
 ## spamicity_formats = %6.2e, %6.2e, %0.6f
