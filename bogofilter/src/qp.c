@@ -58,11 +58,11 @@ size_t qp_decode(word_t *word)
 	    s++;
 	    continue;
 	}
-	if (ch == '=' && s + 2 < e && (y = hex_to_bin(s[0])) >= 0 &&
-		    (x = hex_to_bin(s[1])) >= 0) {
+	if (ch == '=' && s + 2 <= e && 
+	    (y = hex_to_bin(s[0])) >= 0 && (x = hex_to_bin(s[1])) >= 0) {
 	    /* encoded character */
-		ch = y << 4 | x;
-		s += 2;
+	    ch = y << 4 | x;
+	    s += 2;
 	}
 	*d++ = ch;
     }
