@@ -73,10 +73,17 @@ void open_wordlists(dbmode_t mode)
 			if (err != 0)
 			    fprintf(stderr,
 				    "error #%d - %s.\n", err, strerror(err));
-			fprintf(stderr, 
-				"\n"
-				"Remember to register some spam and ham messages before you\n"
-				"use bogofilter to evaluate mail for its probable spam status!\n");
+			if (err == ENOENT)
+			    fprintf(stderr, 
+				    "\n"
+				    "Remember to register some spam and ham messages before you\n"
+				    "use bogofilter to evaluate mail for its probable spam status!\n");
+			if (err == EINVAL)
+			    fprintf(stderr,
+				    "\n"
+				    "Make sure that the BerkeleyDB version this program is linked against\n"
+				    "can handle the format of the data base file (after updates in particular)\n"
+				    "and that your NFS locking, if applicable, works.\n");
 			exit(EX_ERROR);
 		} /* switch */
 	    } else { /* ds_open */
