@@ -13,6 +13,8 @@ AUTHOR:
 #ifndef	WORD_H
 #define	WORD_H
 
+#include "common.h"
+
 #define	D	1	/* size adjustment */
 #define	Z(n)	n='\0'	/* mark end of string */
 
