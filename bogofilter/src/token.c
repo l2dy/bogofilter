@@ -70,6 +70,7 @@ token_t get_token(void)
 {
     token_t class = NONE;
     unsigned char *cp;
+    bool done = false;
 
     /* If saved IPADDR, truncate last octet */
     if ( block_on_subnets && save_class == IPADDR )
@@ -89,7 +90,7 @@ token_t get_token(void)
     if (yylval == NULL)
 	yylval = word_new(NULL, 0);
 
-    while (true) {
+    while (!done) {
 	class  = lexer_v3_lex();
 	yylval->leng = lexer_v3_leng;
 	yylval->text = (byte *)lexer_v3_text;
@@ -165,8 +166,8 @@ token_t get_token(void)
 	case NONE:		/* nothing to do */
 	    break;
 	case MSG_COUNT_LINE:
-	    break;
 	case BOGO_LEX_LINE:
+	    done = true;
 	    break;
 	case FROM:		/* nothing to do */
 	    break;
@@ -174,7 +175,7 @@ token_t get_token(void)
 
 	/* eat all long words */
 	if (yylval->leng <= MAXTOKENLEN)
-	    break;
+	    done = true;
     }
 
     /* Remove trailing blanks */
