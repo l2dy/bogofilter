@@ -142,7 +142,7 @@ static void add_hash(wordhash_t *dest, wordhash_t *src) {
 void register_messages(run_t _run_type)
 {
   wordhash_t *h, *words = wordhash_init();
-  long	wordcount, msgcount = 0;
+  long	wordcount, totalwords = 0, msgcount = 0;
   bool cont;
 
   initialize_constants();
@@ -152,8 +152,9 @@ void register_messages(run_t _run_type)
     add_hash(words, h);
     wordhash_free(h);
     msgcount++;
+    totalwords += wordcount;
   } while(cont);
 
-  register_words(_run_type, words, msgcount, wordcount);
+  register_words(_run_type, words, msgcount, totalwords);
   wordhash_free(words);
 }
