@@ -65,7 +65,6 @@ typedef struct {
 typedef struct {
     void     *data;		/* addr of buffer       */
     u_int32_t leng;		/* number of data bytes */
-    u_int32_t size;		/* capacity of buffer   */
 } dbv_t;
 
 /** Iterate over all elements in data base and call \p hook for each item.

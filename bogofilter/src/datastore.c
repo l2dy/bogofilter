@@ -175,10 +175,10 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
     struct_init(ex_data);
 
     ex_key.data = word->text;
-    ex_key.leng = ex_key.size = word->leng;
+    ex_key.leng = word->leng;
 
     ex_data.data = cv;
-    ex_data.leng = ex_data.size = sizeof(cv);
+    ex_data.leng = sizeof(cv);
 
     memset(val, 0, sizeof(*val));
 
@@ -230,10 +230,9 @@ int ds_write(void *vhandle, const word_t *word, dsv_t *val)
 
     ex_key.data = word->text;
     ex_key.leng = word->leng;
-    ex_key.size = word->leng;
 
     ex_data.data = cv;
-    ex_data.size = sizeof(cv);
+    ex_data.leng = sizeof(cv);
 
     if (timestamp_tokens && today != 0)
 	val->date = today;

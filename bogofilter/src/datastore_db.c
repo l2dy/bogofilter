@@ -386,19 +386,21 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
     db_key.size = token->leng;
 
     db_data.data = val->data;
-    db_data.size = val->size;		/* cur used */
-    db_data.ulen = val->size;		/* max size */
+    db_data.size = val->leng;		/* cur used */
+    db_data.ulen = val->leng;		/* max size */
     db_data.flags = DB_DBT_USERMEM;	/* saves the memcpy */
 
     ret = dbp->get(dbp, NULL, &db_key, &db_data, 0);
 
-    if (val->size < db_data.size) {
+#if	0
+    if (val->leng < db_data.size) {
 	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%.*s' ), size error %lu::%lu",
 		    CLAMP_INT_MAX(token->leng), (char *)token->data,
 		    (unsigned long)val->leng,
 		    (unsigned long)db_data.size);
 	exit(EX_ERROR);
     }
+#endif
 
     val->leng = db_data.size;		/* read count */
 
