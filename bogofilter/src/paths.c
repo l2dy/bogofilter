@@ -168,9 +168,7 @@ char *get_directory(priority_t which)
 
 char *get_file_from_path(const char *path)
 {
-    char *file;
-
-    file = strrchr(path, DIRSEP_C);
+    char *file = strrchr(path, DIRSEP_C);
     if (file == NULL)
 	file = xstrdup(path);
     else
@@ -181,11 +179,7 @@ char *get_file_from_path(const char *path)
 char *get_directory_from_path(const char *path)
 {
     char *dir = xstrdup(path);
-    char *last = NULL;
-    char *sep;
-
-    for (sep = strstr(dir, DIRSEP_S); sep != NULL ; sep = strstr(sep+1, DIRSEP_S))
-	last = sep;
+    char *last = strrchr(dir, DIRSEP_C);
     if (last == NULL) {
 	xfree(dir);
 	return NULL;
