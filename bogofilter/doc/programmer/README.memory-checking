@@ -1,0 +1,16 @@
+$Id$
+
+Bogofilter's test suite has support for several memory access/leak
+checking tools, namely Valgrind ("valgrind"), Electric Fence ("efence"),
+GNU libc ("glibc", default), Boehm-Demers-Weiser Garbage Collector
+("boehm-gc").
+
+To enable, these, just add BF_CHECKTOOL=tool to your make check command
+line, example:
+
+make check BF_TESTDIR=/tmp BF_CHECKTOOL=boehm-gc
+
+If a leak checker is enabled, t.leakfind is a simple smoke test, it
+should PASS. If no leak checker is enabled, t.leakfind will report SKIP.
+
+-- Matthias Andree, 2005-01-03
