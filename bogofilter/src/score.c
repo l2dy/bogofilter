@@ -81,7 +81,6 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 {
     int override=0;
     wordlist_t* list;
-    bool ignored = false;
 
     if (fBogotune) {
 	wordprop_t *wp = wordhash_search_memory(token);
@@ -118,8 +117,10 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 		abort();
 	}
 
-	if (ret == 0 && list->type == WL_IGNORE)	/* if found on ignore list */
-	    ignored = true;
+	if (ret == 0 && list->type == WL_IGNORE) {	/* if found on ignore list */
+	    cnts->good = cnts->bad = 0;
+	    break;
+	}
 
 	override=list->override;
 
@@ -132,17 +133,11 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 	    fputc('\n', dbgout);
 	}
 
-	/* ignore token + msg counts from ignore lists */
-	if (list->type != WL_IGNORE) {
-	    cnts->good += val.count[IX_GOOD];
-	    cnts->bad += val.count[IX_SPAM];
-	    cnts->msgs_good += list->msgcount[IX_GOOD];
-	    cnts->msgs_bad += list->msgcount[IX_SPAM];
-	}
+	cnts->good += val.count[IX_GOOD];
+	cnts->bad += val.count[IX_SPAM];
+	cnts->msgs_good += list->msgcount[IX_GOOD];
+	cnts->msgs_bad += list->msgcount[IX_SPAM];
     }
-
-    if (ignored)
-	cnts->good = cnts->bad = 0;
 
     if (DEBUG_ALGORITHM(1)) {
 	fprintf(dbgout, "%5u %5u ", cnts->good, cnts->bad);
