@@ -104,8 +104,6 @@ static word_t *yy_text(void)
     return &yyt;
 }
 
-#define exit(exitcode) bf_abort()
-
 %}
 
 %option warn
