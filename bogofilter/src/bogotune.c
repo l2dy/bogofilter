@@ -1122,6 +1122,16 @@ static bool check_msg_counts(void)
 	ok = false;
     }
 
+    if (ns_cnt < TEST_COUNT || sp_cnt < TEST_COUNT) {
+	if (!quiet)
+	    fprintf(stderr, 
+		    "The messages sets contain %u non-spam and %u spam.  Bogotune "
+		    "requires at least %d non-spam and %d spam messages to run.\n",
+		    ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
+	if (!force)
+	    exit(EX_ERROR);
+    }
+
     return ok;
 }
 
@@ -1174,15 +1184,8 @@ static rc_t bogotune(void)
     sp_cnt = count_messages(sp_msglists);
     cnt = ns_cnt + sp_cnt;
 
-    if (ns_cnt < TEST_COUNT || sp_cnt < TEST_COUNT) {
-	if (!quiet)
-	    fprintf(stderr, 
-		    "The messages sets contain %u non-spam and %u spam.  Bogotune "
-		    "requires at least %d non-spam and %d spam messages to run.\n",
-		    ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
-	if (!force)
-	    exit(EX_ERROR);
-    }
+    if (!check_msg_counts() && !force)
+	exit(EX_ERROR);
 
     fflush(stdout);
 
@@ -1243,9 +1246,6 @@ static rc_t bogotune(void)
     /* No longer needed */
     wordhash_free(ns_and_sp->train);
     ns_and_sp->train = NULL;
-
-    if (!check_msg_counts() && !force)
-	exit(EX_ERROR);
 
     for (scan=0; scan <= 1; scan += 1) {
 	bool f;
