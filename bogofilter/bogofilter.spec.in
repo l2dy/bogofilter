@@ -124,7 +124,7 @@ for file in bogofilter bogolexer bogoutil bogotune ; do
     fi
 done
 
-cat %{_defaultdocdir}/%{name}-%{version}/rpm.notes.BerkeleyDB
+cat %{_defaultdocdir}/%{name}_static-%{version}/rpm.notes.BerkeleyDB
 
 %postun static
 for file in bogofilter bogolexer bogoutil bogotune ; do
