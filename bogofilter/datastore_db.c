@@ -271,6 +271,7 @@ Releases acquired lock
 void db_lock_release(void *vhandle){
 
   dbh_t *handle = vhandle;
+
   if (handle->locked){
     if (verbose > 1)
       fprintf(stderr, "[%lu] Releasing lock on %s\n",(unsigned long)handle->pid, handle->filename);
@@ -337,7 +338,7 @@ static void db_lock_list(wordlist_t *list, int type){
   for(;;){
     for (tmp = list, i = 0, cmd = F_SETLKW; tmp != NULL; tmp = tmp->next, i++, cmd = F_SETLK){
 
-      dbh_t *handle = list->dbh;
+      dbh_t *handle = tmp->dbh;
       
       if (list->active == FALSE)
 	continue;
@@ -348,7 +349,8 @@ static void db_lock_list(wordlist_t *list, int type){
       if (db_lock(handle, cmd, type) == 0){
         if (verbose > 1)
           do_lock_msg("Got");
-
+        
+        handle->locked = TRUE;
       }
       else if (errno == EACCES || errno == EAGAIN || errno == EINTR){
         if (verbose)
