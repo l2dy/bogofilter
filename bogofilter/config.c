@@ -146,7 +146,7 @@ static const parm_desc *usr_parms = NULL;
 
 static bool select_algorithm(const unsigned char *s)
 {
-    enum algorithm_e al = tolower(*s);
+    enum algorithm_e al = s ? (unsigned) tolower(*s) : algorithm;
     bool ok = true;
     switch (al)
     {
@@ -313,6 +313,8 @@ static void read_config_file(const char *fname, bool tilde_expand)
 	size_t len;
 	unsigned char buff[MAXBUFFLEN];
 
+	memset(buff, '\0', sizeof(buff));		/* for debugging */
+
 	lineno += 1;
 	if (fgets((char *)buff, sizeof(buff), fp) == NULL)
 	    break;
@@ -445,6 +447,8 @@ int process_args(int argc, char **argv)
     int option;
     int exitcode;
 
+    select_algorithm(NULL);	/* select default algorithm */
+
     while ((option = getopt(argc, argv, "d:ehl::o:snSNvVpuc:CgrRx:fqt" G R F)) != EOF)
     {
 	switch(option)
@@ -505,6 +509,7 @@ int process_args(int argc, char **argv)
 #ifdef	GRAHAM_AND_ROBINSON
 	case 'g':
 	    algorithm = AL_GRAHAM;
+	    select_algorithm(NULL);
 	    break;
 #endif
 
@@ -516,6 +521,7 @@ int process_args(int argc, char **argv)
 	/* fall through to force Robinson calculations */
 	case 'r':
 	    algorithm = AL_ROBINSON;
+	    select_algorithm(NULL);
 #endif
 	    break;
 #endif
@@ -523,6 +529,7 @@ int process_args(int argc, char **argv)
 #ifdef ENABLE_ROBINSON_FISHER
 	case 'f':
 	    algorithm = AL_FISHER;
+	    select_algorithm(NULL);
 	    break;
 #endif
 
@@ -570,10 +577,6 @@ int process_args(int argc, char **argv)
 /* exported */
 void process_config_files(void)
 {
-    unsigned char buff[2] = { 0, 0 };
-    buff[0] = algorithm;
-    select_algorithm(buff);
-
     if (! suppress_config_file)
     {
 	read_config_file(system_config_file, false);
