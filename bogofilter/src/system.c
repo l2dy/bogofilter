@@ -37,7 +37,8 @@ bool bf_abspath(const char *path)
 #endif
 }
 
-void bf_sleep(long delay)
+/** sleep for a certain time */
+void bf_sleep(long delay /** microseconds to wait */)
 {
 #ifndef _OS2_
     struct timeval timeval;
@@ -46,7 +47,7 @@ void bf_sleep(long delay)
     select(0,NULL,NULL,NULL,&timeval);
 #else
 /*APIRET DosSleep(ULONG  msec )  */
-    DosSleep(1);
+    DosSleep((delay+500)/1000);
 #endif
 }
 
