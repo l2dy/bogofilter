@@ -76,7 +76,7 @@ wordhash_SOURCES = wordhash.main.c
 find_home_test_SOURCES = find_home.test.c
 
 # what to distribute
-extradistdirs = doc
+extradistdirs=
 EXTRA_DIST = bogofilter.cf.example \
 	     METHODS UPGRADE \
 	     bogofilter.spec bogofilter.spec.in \
