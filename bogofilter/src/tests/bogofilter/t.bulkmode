@@ -27,7 +27,7 @@ V="v"	# verbosity level
 BOGOFILTER="$VAL ${relpath}/bogofilter"
 BOGOLEXER="$VAL ${relpath}/bogolexer"
 BOGOUTIL="$VAL ${relpath}/bogoutil"
-BOGOLEX_SH="$VAL ${relpath}/bogolex.sh"
+BOGOLEX_SH="$VAL ${srcdir}/../../../tuning/bogolex.sh"
 SYSTEST="${srcdir}"
 
 export BOGOFILTER
@@ -53,7 +53,8 @@ run_single_test()
     ver="$3"
     OUT="${TMPDIR}/tests/msg.$fil.$mth.$ver"
     OPTS="-$mth -t -$ver $CFG"
-    map_rc $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt >${TMPDIR}/tests-$mth 
+    map_rc $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt \
+	sed s@.*inputs/@./inputs/@ \>${TMPDIR}/tests-$mth 
     sed s/,.version=.*// < ${TMPDIR}/tests-$mth > $OUT
 }
 
@@ -64,7 +65,8 @@ run_batch_test()
     ver="$3"
     OUT="${TMPDIR}/tests/msg.$fil.$mth.$ver"
     OPTS="-$mth -t -$ver $CFG"
-    map_rc $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt >${TMPDIR}/tests-$mth 
+    map_rc $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt \
+	sed s@.*inputs/@./inputs/@ \>${TMPDIR}/tests-$mth 
     sed s/,.version=.*// < ${TMPDIR}/tests-$mth > $OUT
 }
 
