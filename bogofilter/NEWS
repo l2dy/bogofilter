@@ -23,6 +23,11 @@ Briefly:
 
 0.93.2	2004-12-??
 
+	2004-12-02
+
+	* Accuracy fix: message counts of ignore lists (that can be present) will be
+	  ignored and no longer skew the spamicity.
+
 	2004-12-01
 
 	* Allow environment to be group writable, reported by Fletcher Mattox.

@@ -123,11 +123,22 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 
 	override=list->override;
 
-	cnts->good += val.count[IX_GOOD];
-	cnts->bad += val.count[IX_SPAM];
-	cnts->msgs_good += list->msgcount[IX_GOOD];
-	cnts->msgs_bad += list->msgcount[IX_SPAM];
+	if (DEBUG_ALGORITHM(2)) {
+	    fprintf(dbgout, "%6d %5u %5u %5u %5u list=%s,%c,%d ",
+		    ret, val.count[IX_GOOD], val.count[IX_SPAM],
+		    list->msgcount[IX_GOOD], list->msgcount[IX_SPAM],
+		    list->listname, list->type, list->override);
+	    word_puts(token, 0, dbgout);
+	    fputc('\n', dbgout);
+	}
 
+	/* ignore token + msg counts from ignore lists */
+	if (list->type != WL_IGNORE) {
+	    cnts->good += val.count[IX_GOOD];
+	    cnts->bad += val.count[IX_SPAM];
+	    cnts->msgs_good += list->msgcount[IX_GOOD];
+	    cnts->msgs_bad += list->msgcount[IX_SPAM];
+	}
     }
 
     if (ignored)
