@@ -425,7 +425,7 @@ wordhash_next (wordhash_t *wh)
 	    val = &wh->props[wh->index];
 	break;
     case WH_CNTS:
-	if (++wh->index < wh->size)
+	if (++wh->index < wh->count)
 	    val = &wh->cnts[wh->index];
 	break;
     }
