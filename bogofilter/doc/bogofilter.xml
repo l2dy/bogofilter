@@ -203,7 +203,7 @@ This simplifies using bogofilter from procmail or maildrop.
   
 <para>The <option>-t</option> (terse) option tells 
 <application>bogofilter</application> to print an abbreviated spamicity message containing 1 letter and the score.
-The letter will be "Y" to indicate spam and "N" to indicate non-spam.
+Spam is indicated with "Y", ham by "N", and unsure by "U".
 </para>
   
 <para>The <option>-u</option> option tells
