@@ -21,6 +21,7 @@ int fgetsl(char *buf, int max_size, /*@null@*/ FILE *in)
 int xfgetsl(char *buf, int max_size, FILE *in, bool no_nul_terminate)
 {
     int c = 0;
+    int rc;
     char *cp = buf;
     char *end = buf + max_size;				/* Physical end of buffer */
     char *fin = end - (no_nul_terminate ? 0 : 1);	/* Last available byte    */
@@ -51,8 +52,10 @@ int xfgetsl(char *buf, int max_size, FILE *in, bool no_nul_terminate)
 
     if (cp < end)
 	*cp = '\0'; /* DO NOT ADD ++ HERE! */
-    if (cp == buf && feof(in)) return EOF;
-    return(cp - buf);
+
+    rc = (cp != buf || !feof(in)) ? cp - buf : EOF;
+
+    return rc;
 }
 
 #ifdef MAIN
