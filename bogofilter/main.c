@@ -110,6 +110,11 @@ static int check_directory(const char* path) /*@globals errno,stderr@*/
     return 0;
 }
 
+static void cleanup_exit(int exitcode, int killfiles) {
+    if (killfiles && *outfname) unlink(*outfname);
+    exit(exitcode);
+}
+
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
     int   exitcode;
@@ -157,13 +162,13 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 		    for (textend=&textblocks; textend->block; textend=textend->next)
 		    {
 			if ((textend->len == 1
-			     && memcmp(textend->block, NL, 1) == 0)
-			    || (textend->len == 2
-				&& memcmp(textend->block, CRLF, 2) == 0))
+				    && memcmp(textend->block, NL, 1) == 0)
+				|| (textend->len == 2
+				    && memcmp(textend->block, CRLF, 2) == 0))
 			    break;
 
 			(void) fwrite(textend->block, 1, textend->len, out);
-			if (ferror(out)) exit(2);
+			if (ferror(out)) cleanup_exit(2, 1);
 		    }
 		}
 
@@ -200,11 +205,12 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 		    for (; textend->block != NULL; textend=textend->next)
 		    {
 			(void) fwrite(textend->block, 1, textend->len, out);
-			if (ferror(out)) exit(2);
+			if (ferror(out)) cleanup_exit(2, 1);
 		    }
 
-		    if (fflush(out) || ferror(out)) exit(2);
-		    if (out != stdout && fclose(out)) exit(2);
+		    if (fflush(out) || ferror(out) || (out != stdout && fclose(out))) {
+			cleanup_exit(2, 1);
+		    }
 		}
 
 		exitcode = (status == RC_SPAM) ? 0 : 1;
