@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /** \file xatoi.c
  * Implements xatoi, an easy to use atoi() replacement with error
  * checking.
@@ -10,7 +8,6 @@
 
 #include "xatox.h"
 
-#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -18,23 +15,14 @@
 
 int xatoi(int *i, const char *in) {
     char *end;
-    long val;
-
+    long d;
     errno = 0;
-    val = strtol(in, &end, 10);
+    d = strtol(in, &end, 10);
     if (in == end || errno == EINVAL || errno == ERANGE) return 0;
-    if (val > INT_MAX || val < INT_MIN) { errno = ERANGE; return 0; }
-
-    while (isspace(*end))
-	end += 1;
-
-    if (*end == '#' || *end == '\0' || end == in + strlen(in)) 
-    {
-	*i = val;
-	return 1;
-    }
-    else
-	return 0;
+    if (d > INT_MAX || d < INT_MIN) { errno = ERANGE; return 0; }
+    if (end < in + strlen(in)) return 0;
+    *i = d;
+    return 1;
 }
 
 #if MAIN
