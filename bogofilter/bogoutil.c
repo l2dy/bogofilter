@@ -139,8 +139,8 @@ static int robx_hook(char *key,  uint32_t keylen,
 
     /* print if token in both word lists */
     if ((verbose > 1 && goodness && spamness) || verbose > 2)
-	printf("cnt: %6d,  sum: %12.6f,  ratio: %f,  sp: %4d,  gd: %4d,"
-		"  p: %f,  t: %s\n", *rd->count, *rd->sum,
+	printf("cnt: %4d,  sum: %11.6f,  ratio: %9.6f,  sp: %3d,  gd: %3d,"
+		"  p: %9.6f,  t: %s\n", *rd->count, *rd->sum,
 		*rd->sum / *rd->count, spamness, goodness, prob, x);
 
     return 0;
