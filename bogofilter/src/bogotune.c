@@ -1175,9 +1175,9 @@ static void final_recommendations(bool skip)
     printf("---cut---\n");
     printf("db_cachesize=%u\n", db_cachesize);
 
-    printf("robx=%8.6f\n", robx);
-    printf("min_dev=%5.3f\n", min_dev);
     printf("robs=%6.4f\n", robs);
+    printf("min_dev=%5.3f\n", min_dev);
+    printf("robx=%8.6f\n", robx);
     printf("sp_esf=%8.6f\n", sp_esf);
     printf("ns_esf=%8.6f\n", ns_esf);
 
