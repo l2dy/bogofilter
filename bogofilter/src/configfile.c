@@ -64,7 +64,6 @@ const parm_desc *usr_parms = NULL;
 static bool process_config_parameter(const parm_desc *arg, const unsigned char *val)
 {
     bool ok = true;
-    while (isspace(*val) || *val == '=') val += 1;
     if (arg->addr.v == NULL)
 	return ok;
     switch (arg->type)
@@ -122,7 +121,7 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 	{
 	    ok = (*arg->addr.f)(val);
 	    if (DEBUG_CONFIG(0))
-		fprintf(dbgout, "%s -> '%c'\n", arg->name, *val);
+		fprintf(dbgout, "%s -> '%s'\n", arg->name, val);
 	    break;
 	}
 	default:
@@ -134,26 +133,20 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
     return ok;
 }
 
-static bool process_config_line( const unsigned char *line, const parm_desc *parms )
+static bool process_config_line(const unsigned char *line,
+       const unsigned char *val,
+       const parm_desc *parms )
 {
-    size_t len;
-    const unsigned char *val;
     const parm_desc *arg;
 
     if (parms == NULL)
 	return false;
 
-    for (val=line; *val != '\0'; val += 1) {
-	if (isspace(*val) || *val == '=') {
-	    break;
-	}
-    }
-    len = val - line;
     for ( arg = parms; arg->name != NULL; arg += 1 )
     {
 	if (DEBUG_CONFIG(1))
 	    fprintf(dbgout, "Testing:  %s\n", arg->name);
-	if (strncmp(arg->name, (const char *)line, len) == 0)
+	if (strcmp(arg->name, (const char *)line) == 0)
 	{
 	    bool ok = process_config_parameter(arg, val);
 	    if (DEBUG_CONFIG(1) && ok )
@@ -170,6 +163,7 @@ void read_config_file(const char *fname, bool fail_on_error, bool tilde_expand)
     int lineno = 0;
     FILE *fp;
     char *filename;
+    char *arg = NULL, *val = NULL;
 
     if (tilde_expand) {
 	filename = tildeexpand(fname);
@@ -192,6 +186,7 @@ void read_config_file(const char *fname, bool fail_on_error, bool tilde_expand)
 
     while (!feof(fp))
     {
+	const char delim[] = " \t=";
 	size_t len;
 	unsigned char buff[MAXBUFFLEN];
 
@@ -203,13 +198,23 @@ void read_config_file(const char *fname, bool fail_on_error, bool tilde_expand)
 	len = strlen((char *)buff);
 	if ( buff[0] == '#' || buff[0] == ';' || buff[0] == '\n' )
 	    continue;
-	while (iscntrl(buff[len-1]))
+	while (iscntrl(buff[len-1]) || isspace(buff[len-1]))
 	    buff[--len] = '\0';
 
-	if ( ! process_config_line( buff, usr_parms ) &&
-	     ! process_config_line( buff, sys_parms ) &&
-	     ! process_config_line( buff, format_parms ) &&
-	     fail_on_error)
+	arg = buff;
+	if (strcspn(arg, delim) < strlen(arg)) { /* if delimiter present */
+	    val = arg + strcspn(arg, delim);
+	    *val++ = '\0';
+	    val += strspn(val, delim);
+	} else {
+	    val = NULL;
+	}
+
+	if (!arg || !val ||
+	       (! process_config_line(arg, val, usr_parms ) &&
+		! process_config_line(arg, val, sys_parms ) &&
+		! process_config_line(arg, val, format_parms ) &&
+		fail_on_error))
 	{
 	    error = true;
 	    if (!quiet)
