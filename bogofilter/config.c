@@ -25,6 +25,7 @@ AUTHOR:
 #ifdef	HAVE_CHARSET
 #include "charset.h"
 #endif
+#include "directories.h"
 #include "find_home.h"
 #include "globals.h"
 #include "method.h"
@@ -66,7 +67,7 @@ int Rtable = 0;		/* '-R' */
 static bool suppress_config_file = false;
 
 char directory[PATH_LEN + 100] = "";
-const char *system_config_file = "/etc/bogofilter.cf";
+const char *system_config_file = SYSCONFDIR "/bogofilter.cf";
 const char *user_config_file   = "~/.bogofilter.cf";
 const char *spam_header_name = SPAM_HEADER_NAME;
 
