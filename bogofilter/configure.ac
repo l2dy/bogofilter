@@ -480,6 +480,23 @@ if test "$sysconfdir" = "\${prefix}/etc" \
     )
 fi
 
+dnl work around Linux ldconfig design bug
+dnl ldconfig will cache libraries in order found in library search
+dnl order rather than by minor version, so it will happily link against
+dnl /usr/lib/libgsl.so.0 (which is 0.4.0) when
+dnl /usr/local/lib/libgsl.so.0 (which is 0.5.0) is available
+dnl so try to find gsl-config in trusted system path first
+
+AC_MSG_NOTICE([-------------------------------------------------------------])
+AC_MSG_NOTICE([If you have multiple versions of GSL installed, this])
+AC_MSG_NOTICE([configure script will prefer the one in /lib or /usr/lib])
+AC_MSG_NOTICE([to work around a bug in Linux ldconfig.])
+AC_MSG_NOTICE([Deinstall the older GSL version if this behaviour annoys you.])
+AC_MSG_NOTICE([-------------------------------------------------------------])
+
+PATH_SAVED="$PATH"
+PATH=/bin:/usr/bin:$PATH
+
 need_my_gsl=1
 AM_PATH_GSL(1.4, AC_DEFINE(HAVE_GSL_14,,[Define if you have GNU Scientific Library 1.4 or newer])
 need_my_gsl=0)
@@ -488,6 +505,8 @@ need_my_gsl=0)
 if test "$need_my_gsl" = 1 ; then
   GSL_LIBS="libbf_gsl.a"
 fi
+
+PATH="$PATH_SAVED"
 
 AM_CONDITIONAL(NEED_GSL,test $need_my_gsl = 1)
 
