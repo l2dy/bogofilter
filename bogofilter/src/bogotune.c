@@ -870,6 +870,10 @@ static int process_arglist(int argc, char **argv)
 		    ds_file = *++argv;
 		    break;
 		case 'D':
+		    if (ds_file) {
+			fprintf(stderr, "Using both \"-d\" and \"-D\" options is not allowed.\n");
+			exit(EX_ERROR);
+		    }
 		    ds_file = NULL;
 		    break;
 		case 'E':
