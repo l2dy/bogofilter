@@ -18,15 +18,7 @@ NAME:
 
 #include "lexer.h"
 
-/* exports */
-bool logflag;		/* '-l' */
-bool quiet;		/* '-q' */
-int  passthrough;	/* '-p' */
-int  verbose;		/* '-v' */
-
 const char *progname = "bogolexer";
-
-const char *spam_header_name = SPAM_HEADER_NAME;
 
 static void usage(void)
 {
