@@ -3,7 +3,7 @@
 /*****************************************************************************
 
 NAME:
-   graham.c -- code for implementing Graham algorithm for computing spamicity.
+   robinson.c -- implements f(w) and S, or Fisher, algorithm for computing spamicity.
 
 ******************************************************************************/
 
@@ -25,6 +25,12 @@ NAME:
 #define ROBINSON_MIN_DEV	0.0f	/* if nonzero, use characteristic words */
 #define ROBINSON_SPAM_CUTOFF	0.54f	/* if it's spammier than this... */
 
+/* 11/17/02:
+**	   Greg Louis recommends:
+** #define ROBINSON_MIN_DEV	0.1f
+** #define ROBINSON_SPAM_CUTOFF	0.582f
+*/
+
 #define ROBINSON_MAX_REPEATS	1	/* cap on word frequency per message */
   
 #define ROBS			0.001f	/* Robinson's s */
@@ -39,7 +45,7 @@ static double	thresh_rtable = 0.0f;
 static double	robx = 0.0f;
 static double	robs = 0.0f;
 
-static const parm_desc rob_parm_table[] =
+const parm_desc rob_parm_table[] =	/* needed by fisher.c */
 {
     { "robx",		  CP_DOUBLE,	{ (void *) &robx } },
     { "robs",		  CP_DOUBLE,	{ (void *) &robs } },
@@ -47,14 +53,19 @@ static const parm_desc rob_parm_table[] =
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
 
-method_t robinson_method = {
-    "robinson",				/* const char		  *name;		*/
-    rob_parm_table,	 		/* m_parm_table		  *parm_table		*/
-    rob_initialize_constants, 		/* m_initialize_constants *initialize_constants	*/
-    rob_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
-    rob_print_bogostats, 		/* m_print_bogostats	  *print_stats		*/
-    rob_cleanup 			/* m_free		  *cleanup		*/
-} ;
+#ifdef	ENABLE_ROBINSON_METHOD
+rf_method_t rf_robinson_method = {
+    {
+	"robinson",			/* const char		  *name;		*/
+	rob_parm_table,	 		/* m_parm_table		  *parm_table		*/
+	rob_initialize_constants,	/* m_initialize_constants *initialize_constants	*/
+	rob_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
+	rob_print_bogostats, 		/* m_print_bogostats	  *print_stats		*/
+	rob_cleanup, 			/* m_free		  *cleanup		*/
+    },
+    rob_get_spamicity			/* rf_get_spamicity	  *get_spamicity	*/
+};
+#endif
 
 void rob_print_bogostats(FILE *fp, double spamicity)
 {
@@ -147,6 +158,7 @@ static double compute_probability(const char *token)
     return prob;
 }
 
+
 double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 /* selects the best spam/nonspam indicators and calculates Robinson's S */
 {
@@ -192,12 +204,9 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     /* S = (P - Q) / (P + Q)                        [combined indicator]
      */
     if (robn) {
-	double invn = (double)robn;
-	double invproduct = 1.0 - exp(invlogsum / invn);
-	double product = 1.0 - exp(logsum / invn);
+	double invproduct, product;
 
-        spamicity =
-            (1.0 + (invproduct - product) / (invproduct + product)) / 2.0;
+	spamicity = ((rf_method_t *) method)->get_spamicity( robn, invlogsum, logsum, &invproduct, &product );
 
 	if (Rtable || verbose)
 	    rstats_fini(robn, invlogsum, logsum, invproduct, product, spamicity);
@@ -207,17 +216,36 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     return (spamicity);
 }
 
-void rob_initialize_constants(void)
+double rob_get_spamicity(int robn, double invlogsum, double logsum, double *invproduct, double *product)
+{
+    double invn = (double)robn;
+    double _invproduct = 1.0 - exp(invlogsum / invn);
+    double _product = 1.0 - exp(logsum / invn);
+
+    double spamicity = (1.0 + (_invproduct - _product) / (_invproduct + _product)) / 2.0;
+
+    *product = _product;
+    *invproduct = _invproduct;
+
+    return spamicity;
+}
+
+void rob_initialize_with_parameters(double _min_dev, double _spam_cutoff)
 {
     max_repeats = ROBINSON_MAX_REPEATS;
     scalefactor = compute_scale();
     if (fabs(min_dev) < EPS)
-	min_dev = ROBINSON_MIN_DEV;
+	min_dev = _min_dev;
     if (fabs(robs) < EPS)
 	robs = ROBS;
     if (spam_cutoff < EPS)
-	spam_cutoff = ROBINSON_SPAM_CUTOFF;
+	spam_cutoff = _spam_cutoff;
     set_good_weight( ROBINSON_GOOD_BIAS );
+}
+
+void rob_initialize_constants(void)
+{
+    rob_initialize_with_parameters(ROBINSON_MIN_DEV, ROBINSON_SPAM_CUTOFF);
 }
 
 double rob_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/

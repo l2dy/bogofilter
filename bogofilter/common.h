@@ -23,6 +23,8 @@
 #define PATH_LEN 1024
 #endif
 
+#include "globals.h"
+
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
 #define min(x, y)	(((x) < (y)) ? (x) : (y))
 
@@ -38,6 +40,10 @@
 
 #if	defined(ENABLE_ROBINSON_METHOD) && defined(ENABLE_GRAHAM_METHOD)
 #define	GRAHAM_AND_ROBINSON
+#endif
+
+#ifndef	ENABLE_ROBINSON_FISHER
+#define	ENABLE_ROBINSON_FISHER
 #endif
 
 enum dbmode_e { DB_READ = 0, DB_WRITE = 1 };
