@@ -1,6 +1,6 @@
 # $Id$
 dnl vim: set noai tw=0:
-AC_INIT(bogofilter, 0.17.2.cvs)
+AC_INIT(bogofilter, 0.92.7.cvs+txn2.1)
 AC_PREREQ(2.54)
 AC_CONFIG_SRCDIR([src/bogofilter.c])
 AC_CANONICAL_TARGET
@@ -17,14 +17,29 @@ AC_PATH_PROGS(PERL, perl perl5, $PATH:/usr/local/bin:/usr/bin)
 AC_PATH_PROGS(NSGMLS,onsgmls nsgmls,nsgmls)
 AM_PROG_LEX
 
+dnl Check for "extern inline", using a modified version
+dnl of the test for AC_C_INLINE from acspecific.mt.
+dnl Run this before AC_C_INLINE to avoid skewing the results?
+dnl Imported from the GSL 1.4 documentation (section "Autoconf Macros")
+dnl and modified to define HAVE_EXTERN_INLINE.
+AC_CACHE_CHECK([for extern inline], ac_cv_c_extern_inline,
+	       [ac_cv_c_extern_inline=no
+		AC_TRY_COMPILE([extern $ac_cv_c_inline double foo(double x);
+				extern $ac_cv_c_inline double foo(double x) { return x+1.0; };
+				double foo (double x) { return x + 1.0; };],
+				[  foo(1.0)  ],
+				[ac_cv_c_extern_inline="yes"])
+		])
+
+if test "$ac_cv_c_extern_inline" != no ; then
+    AC_DEFINE(HAVE_EXTERN_INLINE,1,Define to 1 if your compiler supports extern inline storage class.)
+    AC_SUBST(HAVE_EXTERN_INLINE)
+fi
+
 dnl Check compiler capabilities
 AC_C_CONST
 AC_C_INLINE
 AC_C_VOLATILE
-if test "$ac_cv_c_inline" != no ; then
-    AC_DEFINE(HAVE_INLINE,1,[Define to 1 if your compiler supports inline])
-    AC_SUBST(HAVE_INLINE)
-fi
 
 dnl Check for extension
 AC_EXEEXT
@@ -88,10 +103,6 @@ dgux*)
     ;;
 esac
 
-AC_ARG_WITH(db,
-	    AC_HELP_STRING([--with-db=PATH], [obsolete, use --with-libdb-prefix instead]),
-    AC_MSG_ERROR([--with-db is obsolete. Use --with-libdb-prefix=$withval instead.]))
-
 dnl If we're using gcc, enable some warnings
 dnl missing: -Wunreachable-code
 if test "$GCC" = yes ; then
@@ -125,8 +136,8 @@ dnl See http://thread.gmane.org/gmane.mail.bogofilter.general/6352
       -Wmissing-format-attribute -Wnested-externs \
       -fno-common -Wchar-subscripts -Wcomment \
       -Wimplicit -Wsequence-point -Wreturn-type \
-      -Wno-system-headers -Wformat -Wformat=2
-      # -Wfloat-equal
+      -Wno-system-headers -Wformat
+      # -Wfloat-equal -Wformat=2
       # -Wmissing-noreturn -Wconversion -pedantic -Wredundant-decls
   do
        if $CC $i $ac_cv_prog_gcc_flags -c configure-dummy.c >/dev/null 2>&1 
@@ -141,12 +152,16 @@ AC_SUBST(CFLAGS)
 
 dnl Checks for libraries.
 AC_CHECK_LIB([m],  [cos])
+AC_SEARCH_LIBS([fdatasync],[rt],AC_DEFINE(HAVE_FDATASYNC,1,[Define to 1 if you have the 'fdatasync' function.]))
 
 AC_CHECK_DECLS([getopt,optreset],,,[[
 #include <unistd.h>
 /* Solaris */
 #include <stdlib.h>
 ]])
+
+dnl check for SYNC stuff
+AC_CHECK_DECLS([O_DSYNC, O_SYNC, O_FSYNC],,,[#include <fcntl.h>])
 
 dnl Coerce GLIBC 2.3 to GLIBC 2.2 compatibility.
 dnl May not be complete with future extensions, but appears to work
@@ -214,7 +229,7 @@ if test x$USE_MEMDEBUG = xYES ; then
 	AC_DEFINE(ENABLE_MEMDEBUG,1,
 	[Enable memory usage debugging])
 fi
-AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$MEM_DEBUG = xYES)
+AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$USE_MEMDEBUG = xYES)
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -310,25 +325,38 @@ case "x$WITH_DB_ENGINE" in
     xdb)
 	dnl check if we need LIBDB at all (it is harmful on BSD since
 	dnl they rename the library including soname)
+	dnl and try to guess if we need -lpthread or -lthread
 	AC_DEFINE_UNQUOTED(DB_TYPE, "db")
 	AC_DEFINE_UNQUOTED(DB_EXT, ".db")
 	AC_LIB_LINKFLAGS([db])
-	AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],LIBDB="")
+	AC_MSG_CHECKING(db and dependent libraries)
 	saveLIBS="$LIBS"
-	LIBS="$LIBS $LIBDB"
+	havelib=0
+	for dblibs in "" "$LIBDB" ; do
+	    for addlibs in "" -lpthread -lthread ; do
+		LIBDB="$dblibs $addlibs"
+		export LIBDB
+	        LIBS="$saveLIBS $LIBDB"
+		export LIBS
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],havelib=1 ; break 2)
+	    done
+	done
+	LIBS="$saveLIBS"
 	export LIBS
-	AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],,
-	AC_MSG_ERROR([[
+	if test $havelib = 0 ; then
+	    AC_MSG_RESULT(error)
+	    AC_MSG_ERROR([[
 ====================================================================
 Cannot link against libdb? Try 'rm config.cache', then re-configure.
 If the problem persists, report it to the bogofilter mailing list.
 Remember to include your config.log.
 ====================================================================
-	]]))
+	    ]])
+	fi
+	AC_MSG_RESULT($LIBDB)
 	LIBS="$saveLIBS"
 	export LIBS
 	AH_TEMPLATE([HAVE_DB_H], [Have suitable db.h header])
-	WITH_DB=
 	AC_SUBST(LIBDB)
 
 	dnl check if run-time link works
@@ -362,7 +390,7 @@ Did you adjust your library search path to include your libdb?])],)
 		   #include <db.h>
 		   ]], [[
 			int maj, min;
-			(void)db_version(&maj, &min, (void *)0);
+			(void)db_version(&maj, &min, 0);
 			(void)fprintf(stderr, "headers: %d.%d, library: %d.%d\n",
 				DB_VERSION_MAJOR, DB_VERSION_MINOR, maj, min);
 			if (maj != DB_VERSION_MAJOR) exit(1);
@@ -388,10 +416,12 @@ You can download BerkeleyDB 4.1.x from http://www.sleepycat.com/]]),
     ;;
 esac
 
-if test a$WITH_DB_ENGINE = a ; then
-    STATIC_DB="-ldb"
-else
-    STATIC_DB="-l$WITH_DB_ENGINE"
+if test "a$STATIC_DB" = a ; then
+    if test "a$WITH_DB_ENGINE" = a ; then
+	STATIC_DB="-ldb"
+    else
+	STATIC_DB="-l$WITH_DB_ENGINE"
+    fi
 fi
 
 AC_SUBST(STATIC_DB)
@@ -549,7 +579,7 @@ case "${target}" in
         ;;
     i?86-emx-os2 | i?86-*-os2*emx )
         # OS/2 with the EMX environment
-        have_dosish_system=yes
+        have_dosish_system=no
         ;;
     i?86-*-msdosdjgpp*)
         # DOS with the DJGPP environment

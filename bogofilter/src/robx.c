@@ -66,6 +66,7 @@ static int robx_hook(word_t *key, dsv_t *data,
     return 0;
 }
 
+/** returns negative for failure */
 static double compute_robx(dsh_t *dsh)
 {
     double rx;
@@ -74,12 +75,13 @@ static double compute_robx(dsh_t *dsh)
     bool ok;
     uint32_t good_cnt, spam_cnt;
     struct robhook_data rh;
+    int ret;
 
-    ok = ds_get_msgcounts(dsh, &val);
+    ok = ds_get_msgcounts(dsh, &val) == 0;
 
     if (!ok) {
 	fprintf(stderr, "Can't find message counts.\n");
-	exit(EX_ERROR);
+	return -1;
     }
 
     spam_cnt = val.spamcount;
@@ -90,7 +92,7 @@ static double compute_robx(dsh_t *dsh)
     rh.sum = 0.0;
     rh.count = 0;
 
-    ds_foreach(dsh, robx_hook, &rh);
+    ret = ds_foreach(dsh, robx_hook, &rh);
 
     rx = rh.sum/rh.count;
     if (verbose > 2)
@@ -99,19 +101,24 @@ static double compute_robx(dsh_t *dsh)
 	       (unsigned long)spam_cnt, (unsigned long)good_cnt,
 	       rh.scalefactor, rh.sum, (int)rh.count, rx);
 
-    return rx;
+    return ret ? -1 : rx;
 }
 
+/** returns negative for failure */
 double compute_robinson_x(char *path)
 {
     double rx;
 
-    setup_wordlists(path, PR_NONE);
-    open_wordlists(DB_READ);
+    set_wordlist_dir(path, PR_NONE);
+    open_wordlists(DS_READ);
 
-    rx = compute_robx(word_lists->dsh);
+    if (DST_OK == ds_txn_begin(word_lists->dsh)) {
+	rx = compute_robx(default_wordlist()->dsh);
+	if (DST_OK != ds_txn_commit(word_lists->dsh))
+	    rx = -1;
+    } else rx = -1;
 
-    close_wordlists(false);
+    close_wordlists();
     free_wordlists();
 
     return rx;

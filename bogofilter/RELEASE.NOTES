@@ -1,0 +1,572 @@
+		    ####### RELEASE.NOTES-0.17 #######
+
+			   Code Clean-Up - Phase 2
+			   -----------------------
+
+				 Update
+				========
+
+    Since bogofilter 0.17.3, the BerkeleyDB data store model (the default
+    data base) has been switched to the Berkeley DB Concurrent Data Store.
+    This changes some aspects of how concurrent bogofilter processes are
+    handles. Please see the file doc/README.db for details.
+
+    The text below applies to all versions since 0.17.0 inclusively, and is
+    still true for 0.17.3:
+
+				 Introduction
+				 ------------
+
+    Bogofilter was released over a year ago and has continually been
+    extended, corrected, enhanced, and refined.  Over this time it has
+    evolved from a simple Bayesian filter to a sophisticated filter that
+    understands email, decodes text parts of multi-part MIME messages,
+    processes html, etc.
+
+    During this evolution, old functions have remained in the code and
+    command-line options have been added to provide compatibility with
+    older versions.  Many of these functions and options have started
+    collecting dust - some are not commonly used and others are not
+    well-tested.
+
+    Bogofilter is suffering from creeping featuritis and optionitis.
+
+			  It is time to clean house!
+
+    In bogofilter 0.16.0 much of the cruft was bracketed with #ifdef
+    ENABLE_DEPRECATED_CODE and #endif statements.  The later 0.16.x
+    releases tagged additional code that had been overlooked in 0.16.0.
+
+    Now, with bogofilter 0.17.0, all the tagged code has been removed.
+    The documentation and sample config file have been updated to reflect
+    the deleted options and features.
+
+    The following list is supposed to be complete.  Let us know if we've
+    omitted anything.  We shall try to provide workarounds and migration
+    paths whenever possible.
+
+				 Feature List
+				 ------------
+
+    1) Scoring algorithms:
+
+	Bogofilter will support only the Robinson-Fisher algorithm,
+	commonly called the "Fisher algorithm".  The Graham algorithm and
+	Robinson geometric-mean algorithm, a.k.a. Robinson algorithm, have
+	been deprecated.
+
+    2) Wordlist support.
+
+       Bogofilter will now support only the combined wordlist, i.e.
+       wordlist.db, which contains both the ham and spam counts for each
+       token.  The older, separate wordlists (spamlist.db and goodlist.db)
+       are no longer supported.
+
+       The bogoupgrade program can still be used to merge the separate
+       databases for you.  Type "bogoupgrade -d /you/wordlist/directory/"
+       to do the job.
+
+       Ignore lists, i.e. ignorelist.db, are also being deprecated.  The
+       ignore list feature has never been thoroughly tested and is not
+       used (as far as we know).
+
+    3) BerkeleyDB support
+
+       Binary RPM packages are now being built with BerkeleyDB-4.1 (or
+       newer).
+
+       For convenience, use whatever BerkeleyDB version came with your
+       system.  We have tested BerkeleyDB 3.2 and newer, but our testing
+       focus is with the recent 4.X releases.  We developers are no longer
+       using BerkeleyDB-3.3, but will leave the code in bogofilter to
+       allow its continued use.
+
+    4) Command line switches:
+
+       Bogofilter will no longer support the switches listed in this
+       section.  If used, bogofilter will print an error message and exit.
+
+       Scoring related switches:
+
+	    -g - select Graham algorithm
+	    -r - select Robinson Geometric-Mean algorithm
+	    -f - select Robinson-Fisher algorithm
+	    -2 - set binary classification mode
+	    -3 - set ternary classification mode
+
+	    Note:  The Robinson-Fisher algorithm is bogofilter's one and
+	    only algorithm.  The classification mode switches are
+	    unnecessary.  Bogofilter will use binary mode if ham_cutoff is
+	    zero and will use ternary mode (Yes, No, Unsure) if ham_cutoff
+	    in non-zero and less than spam_cutoff.
+
+       Wordlist switches:
+
+	    -W   - use combined wordlist  for spam and ham tokens
+	    -WW  - use separate wordlists for spam and ham tokens
+
+	    Note:  Combined mode is now the only supported mode.
+
+       Backwards compatible token generation switches:
+
+	    -Pi and -PI - ignore_case
+	    -Pt and -PT - tokenize_html_tags
+	    -Pc and -PC - strict_check
+	    -Pd and -PD - degen_enabled
+	    -Pf and -PF - first_match
+
+	    Note: Since last May, the default values for these switches
+	    have been:
+
+		ignore_case         disabled
+		tokenize_html_tags  enabled
+		strict_check        disabled
+		degen_enabled       disabled
+		first_match         disabled
+
+	    There will be no change in the default values.
+
+    5) Configuration options:
+
+       The following configuration options (for the above switches) are
+       deprecated:
+
+	    algorithm
+
+	    wordlist
+	    wordlist_mode
+
+	    ignore_case
+	    tokenize_html_tags
+	    tokenize_html_script
+	    header_degen
+	    degen_enabled
+	    first_match
+
+       The following configuration options (which don't correspond to
+       switches) are deprecated:
+
+	    thresh_stats
+	    thresh_rtable
+
+	Note:  Bogofilter will print a warning message if it sees any of
+	these options, but will run fine anyhow.
+
+    6) Miscellany:
+
+       The user formatted SPAM_HEADER will no longer support format
+       specification "%a" (for algorithm) since bogofilter now has only
+       one algorithm.
+
+			       Operational Note
+			       ----------------
+
+    With the 0.16.0 release, a number of features have been deprecated.
+    The relevant code is bracketed by "#ifdef ENABLE_DEPRECATED_CODE" and
+    "#endif" statements.  The default build will not include the
+    deprecated features.  For those who still need these features,
+    configure option "--enable-deprecated-code" exists to allow them to be
+    turned on.
+
+				     Plan
+				     ----
+
+    Bogofilter 0.16.0 will be the "Code Clean-Up - Phase 1" release.  The
+    "deprecated" state will exist until 0.16.X is promoted to "stable"
+    status, or for a month, whichever is longer.
+
+    Bogofilter 0.17.0 will be the "Code Clean-Up - Phase 2" release.  All the
+    deprecated code will be removed.
+
+		    ####### RELEASE.NOTES-0.16 #######
+
+			   Code Clean-Up - Phase 1
+			   -----------------------
+
+				 Introduction
+				 ------------
+
+    Bogofilter was released over a year ago and has continually been
+    extended, corrected, enhanced, and refined.  Over this time it has
+    evolved from a simple Bayesian filter to a sophisticated filter that
+    understands email, decodes text parts of multi-part MIME messages,
+    processes html, etc.
+
+    During this evolution, old functions have remained in the code and
+    command-line options have been added to provide compatibility with
+    older versions.  Many of these functions and options have started
+    collecting dust - some are not commonly used and others are not
+    well-tested.
+
+    Bogofilter is suffering from creeping featuritis and optionitis.
+
+			  It is time to clean house!
+
+    The goal of the bogofilter 0.16 series is to clean out this excess
+    code and create a core of high quality code. This will necessarily cut
+    some ties with previous versions, and you may need to adjust your
+    wrapper scripts to make up for features we have dropped.
+
+    The following list is supposed to be complete.  Let us know if we've
+    omitted anything. We shall try to provide workarounds and migration
+    paths whenever possible.
+
+				 Feature List
+				 ------------
+
+    1) Scoring algorithms:
+
+	Bogofilter will support only the Robinson-Fisher algorithm,
+	commonly called the "Fisher algorithm".  The Graham algorithm and
+	Robinson geometric-mean algorithm, a.k.a. Robinson algorithm, have
+	been deprecated.
+
+    2) Wordlist support.
+
+       Bogofilter will now support only the combined wordlist, i.e.
+       wordlist.db, which contains both the ham and spam counts for each
+       token.  The older, separate wordlists (spamlist.db and goodlist.db)
+       are no longer supported.  
+
+       The bogoupgrade program can still be used to merge the separate
+       databases for you.  Type "bogoupgrade -d /you/wordlist/directory/"
+       to do the job.
+
+       Ignore lists, i.e. ignorelist.db, are also being deprecated.  The
+       ignore list feature has never been thoroughly tested and is not
+       used (as far as we know).
+
+    3) BerkeleyDB support
+
+       Binary RPM packages are now being built with BerkeleyDB-4.1 (or
+       newer).
+
+       For convenience, use whatever BerkeleyDB version came with your
+       system.  We have tested BerkeleyDB 3.2 and newer, but our testing
+       focus is with the recent 4.X releases.  We developers are no longer
+       using BerkeleyDB-3.3, but will leave the code in bogofilter to
+       allow its continued use.
+
+    4) Command line switches:
+
+       Bogofilter will no longer support the switches listed in this
+       section.  If used, bogofilter will print an error message and exit.
+
+       Scoring related switches:
+
+	    -g - select Graham algorithm
+	    -r - select Robinson Geometric-Mean algorithm
+	    -f - select Robinson-Fisher algorithm
+	    -2 - set binary classification mode
+	    -3 - set ternary classification mode
+
+	    Note:  The Robinson-Fisher algorithm is bogofilter's one and
+	    only algorithm.  The classification mode switches are
+	    unnecessary.  Bogofilter will use binary mode if ham_cutoff is
+	    zero and will use ternary mode (Yes, No, Unsure) if ham_cutoff
+	    in non-zero and less than spam_cutoff.
+
+       Wordlist switches:
+
+	    -W   - use combined wordlist  for spam and ham tokens
+	    -WW  - use separate wordlists for spam and ham tokens
+
+	    Note:  Combined mode is now the only supported mode.
+
+       Backwards compatible token generation switches:
+
+	    -Pi and -PI - ignore_case
+	    -Pt and -PT - tokenize_html_tags
+	    -Pc and -PC - strict_check
+	    -Pd and -PD - degen_enabled
+	    -Pf and -PF - first_match
+
+	    Note: Since last May, the default values for these switches
+	    have been:
+
+		ignore_case         disabled
+		tokenize_html_tags  enabled
+		strict_check        disabled
+		degen_enabled       disabled
+		first_match         disabled
+
+	    There will be no change in the default values.
+
+    5) Configuration options:
+
+       The following configuration options (for the above switches) are
+       deprecated:
+
+	    algorithm
+
+	    wordlist
+	    wordlist_mode
+
+	    ignore_case
+	    tokenize_html_tags
+	    tokenize_html_script
+	    header_degen
+	    degen_enabled
+	    first_match
+
+       The following configuration options (which don't correspond to
+       switches) are deprecated:
+
+	    thresh_stats
+	    thresh_rtable
+
+	Note:  Bogofilter will print a warning message if it sees any of
+	these options, but will run fine anyhow.
+
+    6) Miscellany:
+
+       The user formatted SPAM_HEADER will no longer support format
+       specification "%a" (for algorithm) since bogofilter now has only
+       one algorithm.
+
+			       Operational Note
+			       ----------------
+
+    With the 0.16.0 release, a number of features have been deprecated.
+    The relevant code is bracketed by "#ifdef ENABLE_DEPRECATED_CODE" and
+    "#endif" statements.  The default build will not include the
+    deprecated features.  For those who still need these features,
+    configure option "--enable-deprecated-code" exists to allow them to be
+    turned on.
+
+				     Plan
+				     ----
+
+    Bogofilter 0.16.0 will be the "Code Clean-Up - Phase 1" release.  The
+    "deprecated" state will exist until 0.16.X is promoted to "stable"
+    status, or for a month, whichever is longer.
+
+    Bogofilter 0.17.0 will be the "Code Clean-Up - Phase 2" release.  All the
+    deprecated code will be removed.
+
+		    ####### RELEASE.NOTES-0.15 #######
+
+    *** GOOD NEWS ... BAD NEWS ***
+
+    Since release 0.15.9, bogofilter no longer allows to disable algorithms,
+    which has never been supported well.
+
+    With release 0.15.4, all header line tokens are now tagged as:
+
+	Subject:      subj:
+	To:           to:
+	From:         from:
+	Return-Path:  rtrn:
+	Received:     rcvd:   ***new***
+	any other:    head:   ***new***
+
+    Since existing wordlists don't have "head:???" tokens, the new tokens
+    won't be found in the wordlist and bogofilter's accuracy will go down.
+    To correct this you can do one of the following things:
+
+    1 - Use the new "-H" (for header-degen) option when scoring messages.
+    This option tells bogofilter to check the wordlist twice for each
+    header token - once for "head:xyz" and a second time for "xyz".  The
+    ham and spam counts are added together to give a cumulative result.
+
+    Note that, with bogofilter 0.15.4 and later, during message
+    registration, "head:xyz" tokens are added to the wordlist (for the
+    header lines).  The "-H" option is only applied during scoring.
+
+    The "-H" option is meant for temporary usage to cover the period while
+    bogofilter goes from having no "head:xyz" tokens in the wordlist to
+    the time when there are enough such tokens to score messages
+    effectively.  After a few weeks, or perhaps months, of registering
+    messages with the new bogofilter, use of the "-H" option can end and
+    bogofilter will use the newly added "head:xyz" tokens.
+
+    2 - Retrain bogofilter with whatever ham and spam you have available.
+    This will create "header:xyz" tokens and allow the new, more effective
+    header tagging to be used to fullest advantage.
+
+    *** A MAJOR ENHANCEMENT ***
+
+    With release 0.15, bogofilter's code for processing multiple messages
+    has been rewritten.  In addition to understanding mbox format files,
+    bogofilter now understands maildirs and MH folders.
+
+		    ####### RELEASE.NOTES-0.14 #######
+
+    With release 0.14, bogofilter's use of BerkelyDB has changed.  First,
+    TrivialDB (tdb) can be used.  Second, instead of separate wordlists
+    for spam and ham tokens, bogofilter can now use a single combined,
+    wordlist that stores both all tokens.  However, this change broke the
+    early versions (up to and including 0.14.2) of bogofilter. You should
+    use at least bogofilter 0.14.3.
+    In the combined wordlist each token contains two counts - for spam and
+    ham.  The name of the new file is wordlist.db.
+
+    Bogofilter will check in $BOGOFILTER_DIR and use the wordlist(s) that
+    are there.  If wordlist.db is present, bogofilter will use the
+    combined mode.  If wordlist.db is not present, but both spamlist.db
+    and goodlist.db are present, bogofilter will use the separate wordlist
+    mode.  If no wordlists are present, bogofilter will create wordlist.db
+    and use it.
+
+    Command line switches '-W' and '-WW' can be used to tell bogofilter
+    the mode you want.  Also config file options "wordlist_mode=combined"
+    and "wordlist_mode=separate" can be used.
+
+    Upgrading from an old bogofilter environment with its two wordlists
+    (spamlist.db and goodlist.db) to the new 0.14.x environment with its
+    single, combined wordlist.db involves 3 main steps - dumping the
+    current spamlist.db and goodlist.db files, formatting that output, and
+    then loading the data into a new file wordlist.db.  Script bogoupgrade
+    is included with bogofilter and performs the task.  Use command
+    "bogoupgrade -d /path/to/your/wordlists" to do the upgrade.  After
+    running it, your BOGOFILTER_DIR will contain all 3 database files.
+    When started, bogofilter checks for wordlist.db and will use it.
+
+    Also, exit codes returned by bogofilter have been expanded.  They are:
+
+	Spam   = 0 -- unchanged
+	Ham    = 1 -- unchanged
+	Unsure = 2 -- *NEW*
+	Error  = 3 -- *CHANGED*
+
+    NOTE:  See the CHANGES-0.14 document for a list of all the changes.
+
+		    ####### RELEASE.NOTES-0.13 #######
+
+    NOTE: Please also see the CHANGES-0.13 document for a detailed summary.
+
+    With release 0.13, bogofilter's parsing has changed.  As background,
+    Paul Graham has done work to improve the results of his bayesian
+    filter and has published them in "Better Bayesian Filtering" at
+    http://www.paulgraham.com/better.html.  He found the following
+    definition of a token to be beneficial:
+
+       1. Case is preserved.
+
+       2. Exclamation points are constituent characters.
+
+       3. Periods and commas are constituents if they occur between two
+	  digits. This lets me get ip addresses and prices intact. 
+
+       4. A price range like $20-25 yields two tokens, $20 and $25.
+
+       5. Tokens that occur within the To, From, Subject, and Return-Path
+	  lines, or within urls, get marked accordingly.
+
+    Bogofilter has always done #3 and has tagged for Subject lines for a
+    while.  Its parser now does all of these things.  Several command line
+    switches and config file options have been added to allow enabling or
+    disabling them.  Here are the new switches and options: 
+
+       -Pi/-PI	ignore_case		default - disabled
+       -Ph/-PH	header_line_markup 	default - enabled
+       -Pt/-PT	tokenize_html_tags 	default - enabled
+
+    The options can be enabled using the lower case switch or disabled
+    using the upper case switch.
+
+    When header_line_markup_is enabled, tokens in To:, From:, Subject:,
+    and Return-Path: lines are prefixed by "to:", "from:", "subj:", and
+    "rtrn:" respectively.
+
+    When tokenize_html_tags_is enabled, tokens in A, IMG, and FONT tags
+    are scored while classifying the message.
+
+    NOTE:
+
+    To take full advantage of these changes, additional training of
+    bogofilter is necessary. 
+
+    Here's why:
+
+    With bogofilter's use of upper and lower case, the wordlists won't
+    match as many words as before.  For example, "From" and "from" both
+    used to match "from", but this is no longer the case.  As additional
+    training is done, words like these will be added to the wordlists and
+    bogofilter will have a larger number of distinct tokens to use when
+    classifying messages.  This will improve its classification accuracy. 
+
+    Similarly, the use of header_line_markup will tokenize "Subject: great
+    p0rn site" as "subj:great", "subj:p0rn", and "subj:site".  At first
+    these tokens won't be recognized, so bogofilter won't use them to
+    score the message.  After being trained, bogofilter will have these
+    additional tokens to aid in the classification process.
+
+		    ####### RELEASE.NOTES-0.12 #######
+
+    Bogofilter 0.12.0 includes a new file, bogofilter-tuning.HOWTO.
+    It's in the bogofilter/doc directory and replaces README.Robinson.
+
+    Directory bogofilter/tuning has been added and contains scripts for
+    running tuning experiments as described in the new HOWTO. See file
+    bogofilter/tuning/README for more information.
+
+    Bogofilter's man page and help message describe the many command line
+    switches.  They have been divided into groups (help, classification,
+    registration, general, algorithm, parameter, and info) in both
+    places.
+
+    Bogofilter 0.12.0 has three new command line switches for rapidly
+    scoring large numbers of messages.  These "bulk mode" switches are
+    especially useful for the tuning process.  The new switches are:
+
+    -M - allows scoring all the messages in a mbox formatted file.  If
+    used with "-v", an X-Bogosity line is printed as each message is
+    scored.  Using the "-t" (terse) option is recommended to reduce the
+    amount of output.
+
+    -B - allows scoring of multiple message files, with each file
+    containing a single message.  With this option, bogofilter expects the
+    file names to be at the end of the command line.  If used with "-v",
+    the file name is included in each printed line.  Using "-t" is
+    recommended.
+
+    -b - allows scoring of multiple message files, with each file
+    containing a single message.  With this option, bogofilter reads the
+    file names from stdin.  This option can be used with maildirs, as in
+    "ls Maildir/* | bogofilter -b ..."  If used with "-v", the file name
+    is included in each printed line.  Using "-t" is recommended.
+
+    New script bogolex.sh converts an email to a special file format that
+    contains the information needed by bogofilter to score the email.
+    Its use speeds up the message scoring done by the tuning scripts.  The
+    script is described in more detail in bogofilter/tuning/README.
+
+		    ####### RELEASE.NOTES-0.11 #######
+
+    Command line flags
+	
+	The meaning of command line flags '-S' and '-N' was changed in
+	version 0.11.0.  Previously '-S' meant to unregister a message
+	from the spam wordlist and register the message in the
+	non-spam wordlist and '-N' meant to unregister from non-spam
+	and register as spam.
+
+	Each of the flags now performs a single action.  
+	'-S' unregisters a message from the spam wordlist and 
+	'-N' unregisters a message from the non-spam wordlist.
+
+	To duplicate the old (compound) actions, it is necessary to
+	use two options - an unregister option ('-S' or '-N') and a
+	register option ('-s' or '-n').
+
+	To duplicate the effect of the old '-S' option, use '-N -s'.
+	To duplicate the effect of the old '-N' option, use '-S -n'.
+	The order of the options doesn't matter and they can be
+	concatenated, as in '-Sn' and '-sN'.
+
+   Config file processing
+
+	The code to process config files now checks numeric values
+	for validity.  It complains when it detects something
+	wrong.  In particular, double precision values are no longer
+	allowed to have a terminal 'f'.  For example
+	"spam_cutoff=0.95f" will generate a messages.
+
+    New parameter query option
+
+	Using options "-q -v" in a bogofilter command line will run
+	the query_config() function and will display bogofilter's
+	various parameter values.  This can be very useful in finding
+	the reason for an unexpected message classification.
+

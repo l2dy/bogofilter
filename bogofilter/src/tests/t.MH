@@ -1,7 +1,5 @@
 #! /bin/sh
 
-set -e
-
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
 #	 MH.YYYYMMDD.  This is useful when something is different.
@@ -15,8 +13,6 @@ set -e
 NODB=1 . ${srcdir=.}/t.frame
 
 OUT="${TMPDIR}/MH.out"
-
-OUTPUTS=${SYSTEST}/outputs
 CORRECT="${OUTPUTS}/MH.out"
 
 for f in good spam ; do
@@ -28,7 +24,7 @@ $BOGOFILTER -C -D -n $v -B $TMPDIR/good
 $BOGOFILTER -C -D -s $v -B $TMPDIR/spam
 wordlist=".MSG_COUNT Lotus Magazine Min Service connection more most set that unsubscribe"
 
-$BOGOUTIL -w $TMPDIR/wordlist.$DB_EXT $wordlist >$OUT || rm -f $OUT
+$BOGOUTIL -w $WORDLIST $wordlist >$OUT || rm -f $OUT
 
 if  [ $verbose -eq 0 ]; then
     cmp $CORRECT $OUT

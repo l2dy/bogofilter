@@ -109,6 +109,7 @@ cd %{buildroot}%{_datadir}/%{name}
 cp -p -r contrib contrib-static
 rm contrib/bogogrep_static
 rm contrib-static/bogogrep
+strip contrib-static/bogogrep_static
 )
 %endif
 
@@ -136,7 +137,7 @@ done
 
 %doc AUTHORS CHANGES* COPYING INSTALL METHODS
 %doc NEWS README* RELEASE.NOTES* TODO
-%doc doc/bogofilter-tuning.HOWTO
+%doc doc/bogofilter-tuning.HOWTO.html
 %doc doc/bogofilter-SA-2002-01
 %doc doc/integrating*
 %doc doc/programmer
@@ -165,7 +166,7 @@ done
 
 %doc AUTHORS CHANGES* COPYING INSTALL METHODS
 %doc NEWS README* RELEASE.NOTES* TODO
-%doc doc/bogofilter-tuning.HOWTO
+%doc doc/bogofilter-tuning.HOWTO.html
 %doc doc/bogofilter-SA-2002-01
 %doc doc/integrating*
 %doc doc/programmer

@@ -14,7 +14,7 @@ NAME:
 
 /* Path Definitions */
 
-#if !defined(__OS2__) && !defined(__riscos__)
+#if !defined(_OS2_) && !defined(__riscos__)
   #define BOGODIR ".bogofilter"
 #else
   #define BOGODIR "bogofilter"
@@ -33,6 +33,7 @@ char *create_path_from_env(const char *var,
 
 char *get_directory(priority_t which);
 
-bool check_directory(const char *path) /*@globals errno,stderr@*/;
+bool is_file(const char* path)		/*@globals errno,stderr@*/;
+bool check_directory(const char *path)	/*@globals errno,stderr@*/;
 
 #endif	/* PATHS_H */

@@ -1,7 +1,5 @@
 #! /bin/sh
 
-set -e
-
 # t.regtest
 #
 #	test the registration options, i.e. '-s', '-n', '-S', and '-N'
@@ -52,7 +50,7 @@ check_counts()
     fi
 }
 
-rm -f $BOGOFILTER_DIR/*.${DB_EXT}
+create_empty_wordlist
 
 # populate goodlist and spamlist
 
@@ -89,7 +87,7 @@ T=3	# test #3
 S=60	# expected tokens from spam message
 G=0	# expected tokens from good message
 
-rm -f $BOGOFILTER_DIR/*.${DB_EXT}
+create_empty_wordlist
 
 $BOGOFILTER $OPTS -s -I $INPUT/msg.regtest.s
 $BOGOFILTER $OPTS -n -I $INPUT/msg.regtest.n
@@ -103,7 +101,7 @@ T=4	# test #4
 S=0	# expected tokens from spam message
 G=60	# expected tokens from good message
 
-rm -f $BOGOFILTER_DIR/*.${DB_EXT}
+create_empty_wordlist
 
 $BOGOFILTER $OPTS -s -I $INPUT/msg.regtest.s
 $BOGOFILTER $OPTS -n -I $INPUT/msg.regtest.n
