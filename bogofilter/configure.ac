@@ -229,7 +229,6 @@ fi
 
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 AC_CONFIG_FILES([Makefile \
-		src.osage/Makefile src.osage/dcdflib/Makefile src.osage/dcdflib/src/Makefile \
 		tests/Makefile tests/bogoutil/Makefile tests/bogofilter/Makefile \
 		bogofilter.spec \
 		dcdflib/Makefile dcdflib/src/Makefile contrib/Makefile doc/Makefile])

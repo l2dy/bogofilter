@@ -52,7 +52,6 @@ libbogofilter_a_SOURCES= \
 	lexer.h lexer.c lexer_head.l lexer_text_plain.l lexer_text_html.l \
 	maint.h maint.c \
 	mime.h mime.c \
-	myexit.c \
 	paths.h paths.c \
 	qp.h qp.c \
 	register.h register.c \
