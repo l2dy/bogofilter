@@ -53,7 +53,7 @@ EXTRA_DIST = \
 
 if ENABLE_XMLTO
 dist-local:
-	@case $(MFLAGS) in *s*) : ;; *) echo >&2 "validating $(HTML_DOCS)" ;; esac
+	@case "$(MFLAGS)" in *s*) : ;; *) echo >&2 "validating $(HTML_DOCS)" ;; esac
 	@( set -e ; for i in $(HTML_DOCS) ; do $(NSGMLS) -s $(srcdir)/$$i \
 	    || { echo >&2 "ERROR: $$i does not validate." ; exit 1 ; } ; done )
 
