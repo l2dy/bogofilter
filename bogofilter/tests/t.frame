@@ -10,10 +10,7 @@
 
 set -e
 
-relpath=..
-if [ -n "$1" ] ; then
-    relpath=$1/..
-fi
+: ${relpath=..}
 
 if [ -z "$RUN_FROM_MAKE" ] ; then
    NAME=`echo $0 | sed s@./t.@@`

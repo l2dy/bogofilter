@@ -2,7 +2,7 @@
 
 #Test database maintenance using bogoutil's dump/load capabilities.
 
-. ${srcdir}/../t.frame "`pwd`/.."
+relpath="`pwd`/../.." . ${srcdir}/../t.frame
 
 verbose=0
 if [ "$1" = "-v" ]; then
