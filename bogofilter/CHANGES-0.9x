@@ -4,6 +4,10 @@
 
 	2004-07-07
 
+	* Formatting character changes:
+	  '%A' is now the message's IP address.
+	  '%I' is now the message's ID.
+
 	* bogofilter-faq.html - corrected editting error that deleted
 	  "asian spam" question and added answer to "multi-user"
 	  question.
