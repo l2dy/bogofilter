@@ -80,6 +80,14 @@
 ##db_cachesize=16
 
 
+##### TIMESTAMP
+#
+#	enables or disables token timestamps
+#
+
+#timestamp=Y
+
+
 ##### WORDLIST_MODE
 #
 #	combined - store spam and ham tokens in a single, combined
