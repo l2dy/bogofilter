@@ -28,10 +28,12 @@ libbf_gsl_a_SOURCES= \
 ../gsl/specfunc/erfc.c ../gsl/sys/coerce.c \
 ../gsl/sys/pow_int.c ../gsl/sys/minmax.c
 noinst_LIBRARIES += libbf_gsl.a
+libbf_gsl_a_CPPFLAGS= -I$(top_srcdir)
 endif
 
-AM_CPPFLAGS = -I$(top_srcdir)/gnugetopt -I$(top_srcdir)/trio -I$(srcdir) \
-	      -I$(top_srcdir) @GSL_CFLAGS@ -I-
+AM_CPPFLAGS = -I$(top_srcdir)/gnugetopt -I$(top_srcdir)/trio -I- -I. \
+	      -I$(srcdir) @GSL_CFLAGS@ -I$(top_srcdir)/gsl/specfunc -I$(top_srcdir)
+
 AM_CFLAGS = -DBOGOFILTER
 
 if ENABLE_MEMDEBUG
