@@ -97,7 +97,9 @@ static void comma_parse(char opt, const char *arg, double *parm1, double *parm2,
 /* externs for query_config() */
 
 extern double robx, robs;
+#ifdef	ENABLE_DEPRECATED_CODE
 extern wl_t wl_default;
+#endif
 
 /*---------------------------------------------------------------------------*/
 
@@ -127,12 +129,12 @@ const parm_desc sys_parms[] =
 
     { "min_dev",	  CP_DOUBLE,	{ (void *) &min_dev } },
     { "spam_cutoff",	  CP_DOUBLE,	{ (void *) &spam_cutoff } },
-    { "thresh_stats",	  CP_DOUBLE,	{ (void *) &thresh_stats } },
     { "thresh_update",	  CP_DOUBLE,	{ (void *) &thresh_update } },
 #ifdef	ENABLE_DEPRECATED_CODE
+    { "thresh_stats",	  CP_DOUBLE,	{ (void *) &thresh_stats } },
     { "thresh_index",	  CP_INTEGER,	{ (void *) NULL } },	/* Graham */
-#endif
     { "thresh_rtable",	  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
+#endif
     { "robx",		  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
     { "robs",		  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
     { "ham_cutoff",	  CP_FUNCTION,	{ (void *) NULL } },	/* Robinson-Fisher */
