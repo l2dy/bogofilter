@@ -257,22 +257,22 @@ extern int ds_lock(int fd, int cmd, short int type);
 extern const char *ds_version_str(void);
 
 /** Runs forced recovery on data base */
-extern int ds_recover(const char *directory, bool catastrophic);
+extern ex_t ds_recover(const char *directory, bool catastrophic);
 
 /** Remove environment in given directory, \return EX_OK or EX_ERROR */
-extern int ds_remove(const char *directory);
+extern ex_t ds_remove(const char *directory);
 
 /** Verify given database */
-extern int ds_verify(const char *directory, const char *file);
+extern ex_t ds_verify(const char *directory, const char *file);
 
 /** Return page size of given database, \return 0xffffffff for error, 0 for
  * variable sized pages or unpaged datastores. */
 extern u_int32_t ds_pagesize(const char *directory, const char *file);
 
 /** Remove inactive log files in given directory, \return EX_OK. */
-extern int ds_purgelogs(const char *directory);
+extern ex_t ds_purgelogs(const char *directory);
 
 /** Run checkpoint once */
-extern int ds_checkpoint(const char *directory);
+extern ex_t ds_checkpoint(const char *directory);
 
 #endif
