@@ -4,6 +4,41 @@
 
 $Id$
 
+0.14.0	2003-07-22
+
+	* Updated contrib/bogominitrain.pl prints more info and can save
+	  messages used in training.
+
+	* Miscellaneous documentation updates.
+
+	2003-07-21
+
+	* Decode encoded text in header lines.
+
+	2003-07-19
+
+	* Bogofilter and bogoutil detect whether one or two wordlists
+	  are in BOGOFILTER_DIR and use the appropriate wordlist mode
+	  (combined or separate).
+
+	* Bogofilter's -V output now includes algorithm and database
+          info.
+
+	2003-07-18
+
+	* Default wordlist mode is single, combined wordlist.
+	  File wordlist.db contains all spam and ham tokens.
+
+	2003-07-17
+
+	* Added tdb (trivial database) support.
+
+	2003-07-16
+
+	* Initial release of code allowing bogofilter to use a single,
+	  combined BerkeleyDB database for storing both ham and spam
+	  tokens.  The file is named wordlist.db.
+
 0.13.7.3 2003-07-16
 
 	* Added contrib/bogominitrain.pl
