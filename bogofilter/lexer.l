@@ -257,6 +257,11 @@ int lexer_fgets(char *buf, int max_size, FILE *s)
 			break;
 	}
 
+	if (ferror(s)) {
+	    perror("stdin");
+	    exit(2);
+	}
+
 	*cp = '\0'; /* DO NOT ADD ++ HERE! */
 	return(cp - buf);
 }
@@ -298,9 +303,11 @@ static int yyinput(char *buf, int max_size)
 	// Note that we store fixed-length blocks here, not lines.
 	// One very long physical line could break up into more
 	// than one of these.
-	textend->block = (char *)xmalloc(returned);
 	textend->len = returned;
-	memcpy(textend->block, buf, returned);
+	if (returned) {
+	    textend->block = (char *)xmalloc(returned);
+	    memcpy(textend->block, buf, returned);
+	}
 	textend->next = (struct textblock *)xmalloc(sizeof(struct textblock));
 	textend->next->block = NULL;
 	textend->next->len = 0;
