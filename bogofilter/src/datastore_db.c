@@ -13,10 +13,8 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 #include "system.h"
 #include <db.h>
-#include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 #include <db.h>
@@ -482,18 +480,20 @@ void db_flush(void *vhandle)
 
 int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 {
-    dbh_t *handle = vhandle;
-    int ret = 0;
-    DBC dbc;
-    DBC *dbcp = &dbc;
-    DBT key, data;
     size_t i;
-    word_t w_key, w_data;
-    memset (&key, 0, sizeof(key));
-    memset (&data, 0, sizeof(data));
+    int ret = 0;
+    dbh_t *handle = vhandle;
 
-    for (i = 0; i < handle->count; i += 1) {
+    for (i = 0; i < handle->count; i += 1)
+    {
+	DBC dbc;
+	DBC *dbcp = &dbc;
+	DBT key, data;
 	DB *dbp = handle->dbp[i];
+
+	word_t w_key, w_data;
+	memset (&key, 0, sizeof(key));
+	memset (&data, 0, sizeof(data));
 
 	ret = dbp->cursor(dbp, NULL, &dbcp, 0);
 	if (ret) {
@@ -501,7 +501,8 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 	    return -1;
 	}
 
-	while((ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) == 0) {
+	while ((ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) == 0)
+	{
 	    uint32_t cv[2];
 
 	    memcpy(&cv, data.data, data.size);
@@ -521,7 +522,8 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 	    if (hook(&w_key, &w_data, userdata))
 		break;
 	}
-	switch(ret) {
+
+	switch (ret) {
 	case DB_NOTFOUND:
 	    /* OK */
 	    ret = 0;
@@ -537,4 +539,3 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     }
     return ret;
 }
-
