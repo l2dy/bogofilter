@@ -285,15 +285,14 @@ int yyinput(byte *buf, size_t used, size_t size)
 	   break;
     }
 
-//extern mime_t *msg_state;
-  if(msg_state)
-  {  if(msg_state->mime_disposition)
-     {  if(msg_state->mime_type == MIME_APPLICATION ||  msg_state->mime_type == MIME_IMAGE)
-	 return (count == EOF ? 0 : count);   //not decode at all
-     }
+  if (msg_state &&
+      msg_state->mime_disposition &&
+      (msg_state->mime_type == MIME_APPLICATION ||  
+       msg_state->mime_type == MIME_IMAGE)) {
+      return (count == EOF ? 0 : count);   /* not decode at all */
   }
 
-//EK decoding things like &#1084 and charset_table;
+/* EK -  decoding things like &#1084 and charset_table */
 #ifdef	CP866
     count = htmlUNICODE_decode(buf, count);
 #else
