@@ -16,7 +16,6 @@
 #include "bogoreader.h"
 #include "charset.h"
 #include "error.h"
-#include "html.h"
 #include "lexer.h"
 #include "mime.h"
 #include "msgcounts.h"
@@ -125,7 +124,6 @@ static int yy_get_new_line(buff_t *buff)
     ** -- before mime decoding.  Without it, flex aborts:
     ** "fatal flex scanner internal error--end of buffer missed" */
     if (got_mime_boundary(&buff->t)) {
-	if (test) fprintf(dbgout, "lexer.c:  yy_get_new_line() -> yy_set_state_initial()\n");
 	yy_set_state_initial();
     }
 
@@ -299,17 +297,6 @@ int yyinput(byte *buf, size_t max_size)
 	    buff.t.leng = MAXTOKENLEN;
 	}
     }
-
-    /* do nothing if in header */
-
-#if	1
-    if ((count > 0)
-	&& ! msg_header
-	&& msg_state->mime_type == MIME_TEXT_HTML)
-    {
-	count = process_html_comments(&buff);
-    }
-#endif
 
     for (i = 0; i < count; i++ )
     {
