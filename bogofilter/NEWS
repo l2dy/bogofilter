@@ -2,6 +2,16 @@
 
 				bogofilter news
 
+0.7.4	Tue Sep 17 02:29:48 EDT 2002
+	* Added infrastructure to support multiple multiple worlists
+	* Fixed classification bug
+	* Fixed errors in documentation
+	* Improved portability of locking code
+	* Fixed 'last line occasionally emitted twice' bug
+	* Cleaned up underflow checking for word counts in bogofilter.c
+	* Code readability improvements
+	* Split main() function in bogofilter.c into smaller pieces
+	* Message processing performance improvements
 
 0.7.3	Thu Sep 12 13:28:37 PDT 2002
 	Adrian Otto:

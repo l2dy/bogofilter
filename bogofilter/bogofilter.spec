@@ -1,10 +1,13 @@
 # $Id$
 # $Log$
-# Revision 1.1  2002/09/14 22:15:20  adrian_otto
-# Initial revision
+# Revision 1.2  2002/09/17 06:39:49  adrian_otto
+# Updating for release. Added NEWS items.
+#
+# Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
+# 0.7.3 Base Source
 #
 Name: bogofilter
-Version: 0.7.3
+Version: 0.7.4
 Release: 1
 URL: http://bogofilter.sourceforge.net
 Source0: %{name}-%{version}.tar.gz
@@ -42,6 +45,10 @@ gzip $RPM_BUILD_ROOT/%{_mandir}/*/*.?
 %doc README COPYING
 
 %changelog
+* Tue Sep 17 02:29:48 EDT 2002
+- changed version to 0.7.4 after a number of bug fixes and feature additions
+  see NEWS file for more information.
+
 * Sat Sep 14 15:03:20 PDT 2002
 - changed version to 0.7.3 and added "./configure --prefix=/usr" line
 
