@@ -21,6 +21,7 @@ $Id$
 	2003-04-21
 	* Added '-M' to allow classification of multiple messages in
 	  mbox formatted files.
+	* New option '-Q' (query/display config) replaces '-qv'.
 	* Grouped options into logical groups for help message and
 	  man page.  Revised option descriptions.
 
@@ -39,4 +40,4 @@ $Id$
 	2003-04-16
 	* Miscellaneous refactoring in main.c
 
-0.11.2	2003-04-13 - new stable version
+0.11.2	2003-04-13 - stable version
