@@ -77,7 +77,7 @@ extern size_t	decode_text(word_t *w);
 
 typedef int   lexer_line_t(buff_t *buff);
 typedef bool  lexer_more_t(void);
-typedef char *lexer_file_t(void);
+typedef const char *lexer_file_t(void);
 
 extern lexer_line_t *lexer_getline;
 extern lexer_more_t *lexer_more;

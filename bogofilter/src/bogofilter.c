@@ -140,7 +140,7 @@ rc_t bogofilter(int argc, char **argv)
 	    }
 
 	    if (verbose || passthrough) {
-		char *filename = lexer_filename();
+		const char *filename = lexer_filename();
 		if (filename)
 		    fprintf(fpo, "%s ", filename); 
 	    }
