@@ -82,10 +82,14 @@ void msglist_print(mlhead_t *list)
     int count = 0;
     mlitem_t *item;
 
-    if (verbose <= 2 || list->count == 0)
+    if (verbose <= 2)
 	return;
 
     printf("%s:\n", list->name);
+
+    if (list->count == 0)
+	printf("  (empty)\n");
+
     for (item = list->head; item != NULL; item = item->next) {
 	wordhash_t *wh = item->wh;
 	printf("  %4d  %p  %4lu\n", count++, item, (unsigned long)wh->count);
