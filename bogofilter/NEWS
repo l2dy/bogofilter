@@ -11,7 +11,7 @@ $Id$
 	  have been resolved.
 	* Moved most documentation files to doc directory.
 	* Added sample procmail file, contrib/procmailrc.example
-	* Spamicity score now computed from multiple word list pairs, i.e. all
+	* Spamicity score now computable from multiple word list pairs, i.e. all
 	  spam and ham word lists in directories named on command line or in
 	  config file (via "wordlist=" lines).
 	* Added mime processing capability, with decoding of base64,
@@ -21,8 +21,8 @@ $Id$
 	* Added dates to wordlist tokens.  Option "datestamp_tokens=true|false"
 	  can be used to enable/disable them.
 	* Added wordlist maintenance capability to bogoutil.  Can discard
-	  tokens based on count, age, or length.  Can replace non-ASCII with
-	  question marks.
+	  tokens based on count, age, or length.  Can replace non-ASCII
+	  characters with question marks.
 	* Increase MAXTOKENLEN from 20 to 30, allowing more and longer tokens
 	  to be processed.
 	* Using new character set handling routines to provide charset specific
@@ -32,12 +32,12 @@ $Id$
 	* New error handling routine will output error messages to stderr and,
 	  if '-l' (logging) is enabled, to syslog.
 	* Work around ash-0.2 and bash-1 bugs, needed for make check.
-	* Reorder gcc __attribute__ lines for gcc-2.7 compatibility.
-	  (also available as patch for 0.9.1.2)
+	* Reorder gcc __attribute__ lines for gcc-2.7 compatibility.  (also
+	  available as patch for 0.9.1.2)
 	* Cater for malloc/calloc implementations that return NULL when 0 bytes
 	  of memory are requested, some AIX versions e. g., that would
-	  previously falsely claim an "out of memory" condition.
-	  (also available as patch for 0.9.1.2)
+	  previously falsely claim an "out of memory" condition.  (also
+	  available as patch for 0.9.1.2)
 	* New message formatting capability allows formats to be put in config
 	  file for X-Bogosity line and logging messages.  Message content can
 	  include status, spamicity, version, etc.
