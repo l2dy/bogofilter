@@ -1,5 +1,8 @@
 # $Id$ 
 # $Log$
+# Revision 1.13  2002/09/26 23:13:12  relson
+# Changed name of lexer_l.l to lexer.l for consistency with other filenames.
+#
 # Revision 1.12  2002/09/25 00:51:07  adrian_otto
 # Removed referenced to lock.c and lock.h, because they have been obviated.
 #
@@ -61,6 +64,8 @@
 # 1.6: minimum version
 AUTOMAKE_OPTIONS = foreign 1.6
 
+CFLAGS=-g -Wall
+
 # what to build
 bin_PROGRAMS = bogofilter bogoutil
 bin_SCRIPTS = bogoupgrade.pl
@@ -68,10 +73,10 @@ noinst_PROGRAMS = lexertest
 man1_MANS = bogofilter.1
 
 # what to build that from
-bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer_l.l lexer.h \
+bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c xmalloc.h xmalloc.c
 
-lexertest_SOURCES = lexer_l.l
+lexertest_SOURCES = lexer.l
 lexertest_CFLAGS = -DMAIN
 
 bogoutil_SOURCES = bogoutil.c datastore.h datastore_db.h datastore_db.c xmalloc.h xmalloc.c

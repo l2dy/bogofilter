@@ -12,7 +12,7 @@
 /configure
 /cscope.out
 /lexertest
-/lexer_l.c
+/lexer.c
 /Makefile
 /Makefile.in
 /stamp-h1
