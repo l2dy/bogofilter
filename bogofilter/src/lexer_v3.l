@@ -226,9 +226,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
 <HTML>"<!--"					{ BEGIN SCOMMENT; }
 <HTML>"<!"					{ BEGIN (strict_check ? HTOKEN : LCOMMENT ); }
-<HTML>"<a\ "					{ BEGIN HTOKEN; }
-<HTML>"<img\ "					{ BEGIN HTOKEN; }
-<HTML>"<font\ "					{ BEGIN HTOKEN; }
+<HTML>"<"(a|img|font)"\ "			{ BEGIN HTOKEN; }
 <HTML>"<"					{ /* unknown tag */ BEGIN HDISCARD; }
 
 <HTOKEN>{TOKEN}					{ if (tokenize_html_tags)     return TOKEN; }
