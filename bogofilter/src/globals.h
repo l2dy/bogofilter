@@ -53,8 +53,8 @@ extern	const char *const system_config_file;
 
 /* for msgcounts.c */
 #define	MSG_COUNT	".MSG_COUNT"
-extern	double		 msgs_good;
-extern	double		 msgs_bad;
+extern	uint		 msgs_good;
+extern	uint		 msgs_bad;
 
 /* for passthrough.c */
 extern size_t msg_register_size;

@@ -71,10 +71,10 @@ AUTHORS:
 #undef	HAM_CUTOFF	/* ignore value in score.h */
 #undef	SPAM_CUTOFF	/* ignore value in score.h */
 
-#define	TEST_COUNT	500	/* minimum allowable message count */
-#define	LIST_COUNT	2000	/* minimum msg count in tunelist   */
-#define	PREF_COUNT	4000	/* preferred message count         */
-#define	LARGE_COUNT	40000
+#define	TEST_COUNT	500u	/* minimum allowable message count */
+#define	LIST_COUNT	2000u	/* minimum msg count in tunelist   */
+#define	PREF_COUNT	4000u	/* preferred message count         */
+#define	LARGE_COUNT	40000u
 
 #define	HAM_CUTOFF	0.10
 #define MIN_HAM_CUTOFF	0.10	/* minimum final ham_cutoff */
@@ -662,7 +662,7 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 
 	collect_words(whc);
 
-	if (ds_path != NULL && (int)(msgs_good + msgs_bad) == 0)
+	if (ds_path != NULL && (msgs_good + msgs_bad) == 0)
 	    set_train_msg_counts(train, whc);
 
 	if (whc->count == 0 && !quiet) {
@@ -814,7 +814,7 @@ static void write_msgcount_file(wordhash_t *wh)
     hashnode_t *hn;
     wordhash_t *train = ns_and_sp->train;
 
-    print_msgcount_entry(".MSG_COUNT", (int) msgs_bad, (int) msgs_good);
+    print_msgcount_entry(".MSG_COUNT", msgs_bad, msgs_good);
 
     wordhash_sort(wh);
 
@@ -1355,19 +1355,19 @@ static bool check_msg_counts(void)
     if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
 	if (!quiet)
 	    fprintf(stderr,
-		    "The wordlist contains %d non-spam and %d spam messages.\n"
-		    "Bogotune must be run with at least %d of each.\n",
-		    (int) msgs_good, (int) msgs_bad, LIST_COUNT);
+		    "The wordlist contains %u non-spam and %u spam messages.\n"
+		    "Bogotune must be run with at least %u of each.\n",
+		    msgs_good, msgs_bad, LIST_COUNT);
 	ok = false;
     }
 
-    if (msgs_bad < msgs_good / 5 ||
-	msgs_bad > msgs_good * 5) {
+    if (msgs_bad * 5.0 < msgs_good ||
+	msgs_bad > msgs_good * 5.0) {
 	if (!quiet)
 	    fprintf(stderr,
 		    "The wordlist has a ratio of spam to non-spam of %0.1f to 1.0.\n"
 		    "Bogotune requires the ratio be in the range of 0.2 to 5.\n",
-		    msgs_bad / msgs_good);
+		    (double)msgs_bad / msgs_good);
 	ok = false;
     }
 
@@ -1375,7 +1375,7 @@ static bool check_msg_counts(void)
 	if (!quiet)
 	    fprintf(stderr,
 		    "The messages sets contain %u non-spam and %u spam.  Bogotune "
-		    "requires at least %d non-spam and %d spam messages to run.\n",
+		    "requires at least %u non-spam and %u spam messages to run.\n",
 		    ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
 	exit(EX_ERROR);
     }

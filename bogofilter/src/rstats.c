@@ -243,8 +243,8 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 
 	(void)fprintf(fpo, "\"%*s %6lu  %8.6f  %8.6f  %8.6f",
 		      len, " ", (unsigned long)(cur->good + cur->bad),
-		      cur->good / msgs_good,
-		      cur->bad  / msgs_bad,
+		      (double)cur->good / msgs_good,
+		      (double)cur->bad  / msgs_bad,
 		      fw);
 	if (Rtable)
 	    (void)fprintf(fpo, "%10.5f%10.5f",
