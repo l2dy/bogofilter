@@ -26,7 +26,6 @@ depcomp
 directories.c
 find_home.test
 install-sh
-lexer.c
 lexer_head.c
 lexer_text_html.c
 lexer_text_plain.c
