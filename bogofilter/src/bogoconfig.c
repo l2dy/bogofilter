@@ -352,9 +352,9 @@ static void help(void)
 		  "\tinfo options:\n"
 		  "\t  -q      - quiet - don't print warning messages.\n"
 		  "\t  -v      - set debug verbosity level.\n"
-		  "\t  -x list - set debug flags.\n"
-		  "\t  -D      - direct debug output to stdout.\n"
 		  "\t  -y      - set date for token timestamps.\n"
+		  "\t  -D      - direct debug output to stdout.\n"
+		  "\t  -x list - set flags to display debug information.\n"
 	);
     (void)fprintf(stderr,
 		  "\n"
