@@ -11,7 +11,7 @@ Theory:
  1. Mail users on non-unix platforms will benefit from bogofilter spam filtering
  2. bogofilter learns better since it has access to a larger corpus.
 
- There is also a mechanism for users to register new spam/nonspam messages, as well as correcting mis-classifications.
+ There is also a mechanism for users to register new spam/nonspam messages, as well as correcting misclassifications.
 
 Assumptions:
 
@@ -43,7 +43,7 @@ Filtering:
  
    Given a good initial corpus, it is better to have bogofilter update it's lists based
    on the message classification, since it is quite likely to get it right.
-   Mis-classifications will be corrected later.
+   Misclassifications will be corrected later.
 
 - Setup an /etc/tcpcontrol/qmail.rules entry to trigger the  filtering.
   Ideally, you want to filter incoming mail, but not outgoing.
@@ -70,7 +70,7 @@ Filtering:
 Registration and Correction:
 
 Setup an email alias, for users to register new spam or nonspam messages
-as well as to correct mis-classification.
+as well as to correct misclassification.
 
 - copy  contrib/dot-qmail-bogofilter-default to /var/qmail/alias/.qmail-bogofilter-default
 
@@ -104,19 +104,20 @@ as well as to correct mis-classification.
 
        # chown -R alias:alias /home/bogofilter
 
-- Educate your users to bounce or redirect, and NOT forward their messages to:
+- Educate your users to bounce their messages to:
 
   To register:
 	 spam, send to bogofilter-register-spam@example.com
   	 nonspam, send to bogofilter-register-nonspam@example.com
 
-  To correct mis-classified:
+  To correct misclassified:
 
 	 spam, send to bogofilter-spam@example.com
   	 nonspam, send to bogofilter-nonspam@example.com
 
-  This will be the most common operation.
-  
+  It is important that users bounce or redirect the messages rather than forward them
+  since forwarding loses important header information.
+ 
 - Done!
 
 TODO:
