@@ -27,13 +27,13 @@ Briefly:
 	  can be created and used to configure the Berkeley DB module.
 
 	* Bogofilter's config file now supports setting max lock and
-	  object counts for Berkeley DB using options 
-	      db_lk_max_locks=N 
+	  object counts for Berkeley DB using options
+	      db_lk_max_locks=N
 	      db_lk_max_objects=N
 
 	* Bogofilter and bogoutil now allow these options on the
           command line, as:
-	      --db_lk_max_locks=N 
+	      --db_lk_max_locks=N
 	      --db_lk_max_objects=N
 
 	* When running database recovery automatically, don't let go of the
@@ -56,15 +56,15 @@ Briefly:
 	  compiled against Berkeley DB. Minor change to the output format.
 
 	* Bogofilter's config file  now supports setting max lock and
-	  object counts for Berkeley DB using options 
-	  
-	      db_lk_max_locks=N 
+	  object counts for Berkeley DB using options
+	
+	      db_lk_max_locks=N
 	      db_lk_max_objects=N
 
 	* Bogofilter and bogoutil now allow these options on the
           command line, as:
 
-	      --db_lk_max_locks=N 
+	      --db_lk_max_locks=N
 	      --db_lk_max_objects=N
 
 	2004-11-09
@@ -261,7 +261,7 @@ Briefly:
 	  don't collide and no two processes try running recovery at the same
 	  time.
 
-	  
+	
 	2004-08-30
 	* Remove bogus 'P' in bogolexer's allowed option list.
 
@@ -498,7 +498,7 @@ Briefly:
 
 	2004-05-05
 
-	* Added code for Robinson's Effective Size Factor (ESF) 
+	* Added code for Robinson's Effective Size Factor (ESF)
 	  to score.c, bogotune.c, bogofilter.cf.example, etc.
 	* Added '-E' options to bogotune to suppress ESF scan.
 
@@ -656,7 +656,7 @@ Briefly:
 
 	2004-01-20
 
-	* Config options 'thresh_stats' and 'thresh_rtable' have been 
+	* Config options 'thresh_stats' and 'thresh_rtable' have been
 	  deprecated.
 
 	2004-01-19
@@ -833,7 +833,7 @@ Briefly:
 	* Fixed bug in header degeneration.
 	* Added degeneration options to config file.
 	* Added subject line tagging for Unsures.  (Contributed by
-          Burkhard Kaas). 
+          Burkhard Kaas).
 
 	2003-11-30
 
@@ -1006,7 +1006,7 @@ Briefly:
 0.15.5.1 2003-09-30
 
 	 * Added GSL-1.4 as requirement for binary rpm.
-	 * Fixed up t.separate reference test and cleaned up 
+	 * Fixed up t.separate reference test and cleaned up
 	   t.degen, t.split, and t.regtest.
 	 * Man page and French FAQ revised.
 
@@ -1200,7 +1200,7 @@ Briefly:
 
 	* Fix parser errors that can cause:
 	  1. Incorrect processing of html comments.
-	  2. "fatal flex scanner internal error--end of buffer missed", 
+	  2. "fatal flex scanner internal error--end of buffer missed",
 	     which kills bogofilter.
 	* Fix defective printing in 'bogofilter -Q' output.
 	* Compiles with TDB again.
@@ -1444,7 +1444,7 @@ Briefly:
 0.13.6	2003-06-04
 
 	* Fix check for "^From " lines to work properly during base64
-	  decoding. 
+	  decoding.
 	* End html comment processing when a message header is found.
 	* Improve README for the tuning scripts and simplify them.
 
@@ -1773,7 +1773,7 @@ Briefly:
 	* Increase MAXTOKENLEN from 20 to 30, allowing more and longer tokens
 	  to be processed.
 	* New options for setting of default charset and replacing of non-ASCII
-	  characters.	New character set handling routines to provide charset 
+	  characters.	New character set handling routines to provide charset
 	  specific token parsing.
 	* New error handling routine will output error messages to stderr and,
 	  if '-l' (logging) is enabled, to syslog.
@@ -1848,7 +1848,7 @@ Briefly:
 	  spam-header from a mail body.
 	* Fixed portability to some systems, notably, Solaris
 	  and HP-UX, added README. for some systems to describe build
-	  issues. 
+	  issues.
 	* Fixed "rpl_malloc" link failures.
 	* Fixed bogofilter 0.7.6 passthrough regression on some
 	  systems: The X-Bogofilter header would be added to the body
@@ -1909,23 +1909,23 @@ Briefly:
 
 0.7.5	Sun Oct 20 17:34:35 PDT 2002
 
-	* The header in bogofilter -p mode now defaults to X-Bogosity, but 
+	* The header in bogofilter -p mode now defaults to X-Bogosity, but
 	  can be changed by using "./configure --enable-spam-header=name" at
 	  compile time.
-	* The option names -h/-H are back to -n/-N like they were in version 
+	* The option names -h/-H are back to -n/-N like they were in version
 	  0.6, and -h now means "help".
-	* A utility has been added to help upgrade wordlists from older 
-	  versions of bogofilter to the current format. See the UPGRADE file 
+	* A utility has been added to help upgrade wordlists from older
+	  versions of bogofilter to the current format. See the UPGRADE file
 	  for more information.
-	* Support has been added for the environment variable BOGOFILTER_DIR 
+	* Support has been added for the environment variable BOGOFILTER_DIR
 	  to control where bogofilter looks for it's wordlists.
-	* Now bogofilter no longer depends on the Judy package. We now use a 
-	  high performance hashing algorithm for message evaluation. The Judy 
+	* Now bogofilter no longer depends on the Judy package. We now use a
+	  high performance hashing algorithm for message evaluation. The Judy
 	  package is no longer required to compile or run bogofilter.
-	* Support for the -e flag, which will cause bogofilter to exit with a 
+	* Support for the -e flag, which will cause bogofilter to exit with a
 	  value of 0 regardless of the spamicity of the message. This is useful
 	  when using -p mode.
-	* Support for -u flag. This allows message evaluation and training to 
+	* Support for -u flag. This allows message evaluation and training to
 	  happen in the same invocation of bogofilter.
 	* Extended TOKEN patterns to improve support for European languages.
 	* Improved wordlist locking to prevent data corruption.
@@ -1959,7 +1959,7 @@ Briefly:
 
 0.7.1: Tue Sep 10 00:59:00 PDT 2002
 
-	Adrian Otto: 
+	Adrian Otto:
 	* Skip existing X-Spam-Header
 	* Performance improvement for -p mode
 	Paul Tomblin:
