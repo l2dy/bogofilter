@@ -29,7 +29,7 @@ libbf_gsl_a_SOURCES= \
 ../gsl/specfunc/zeta.c ../gsl/specfunc/elementary.c \
 ../gsl/err/stream.c ../gsl/specfunc/expint.c \
 ../gsl/specfunc/erfc.c ../gsl/sys/coerce.c \
-../gsl/sys/pow_int.c
+../gsl/sys/pow_int.c ../gsl/sys/minmax.c
 noinst_LIBRARIES += libbf_gsl.a
 endif
 
