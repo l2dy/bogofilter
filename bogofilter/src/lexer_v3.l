@@ -143,9 +143,6 @@ TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}
 T12		[[:alpha:]][[:alnum:]]?
 TOKEN_12 	({TOKEN}|{T12})
 
-BASE64		[[:alnum:]/+=]+
-QP		[!->@-~]+
-
 /*  RFC2047.2
     encoded-word = "=?" charset "?" encoding "?" encoded-text "?="
     charset = token    ; see section 3
@@ -164,6 +161,9 @@ QP		[!->@-~]+
   reduces executable size by approx 290k.
   new: ENCODED_WORD =\?{CHARSET}\?[bq]\?[^?]*\?=
   old: ENCODED_WORD =\?{CHARSET}\?(b\?{BASE64}|q\?{QP})\?=
+
+  BASE64	[[:alnum:]/+=]+
+  QP		[!->@-~]+
 */
 
 ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^?]*\?=
@@ -175,10 +175,12 @@ NOTWHITESPACE	[^ \t\n]
 HTML_ENCODING		"&#"x?[[:xdigit:]]+";"
 URL_ENCODING		"%"[[:xdigit:]][[:xdigit:]]
 
+/*
 HTML_WI_COMMENTS	"<"[^>]*">"
 HTML_WO_COMMENTS	"<"[^!][^>]*">"|"<>"
+*/
 
-HTMLTOKEN		{HTML_WI_COMMENTS}
+HTMLTOKEN		"<"[^>]*">"
 
 /*
  * Generally, there are some html tags that cause an "eyebreak" and some
