@@ -60,7 +60,7 @@ static int db_dump_hook(word_t *key, word_t *data,
     dump_count += 1;
 
     if (data->leng != sizeof(uint32_t) && data->leng != 2 * sizeof(uint32_t)) {
-	print_error(__FILE__, __LINE__, "Unknown data size - %d.\n", data->leng);
+	print_error(__FILE__, __LINE__, "Unknown data size - %ld.\n", (long)data->leng);
 	return 0;
     }
 

@@ -95,5 +95,5 @@ void word_puts(const word_t *self, size_t width, FILE *fp)
     size_t l = (width == 0) ? self->leng : min(width, self->leng);
     (void)fwrite(self->text, 1, l, fp);
     if (l < width)
-	(void) fprintf(fp, "%*s", width - l," ");
+	(void) fprintf(fp, "%*s", (int)(width - l), " ");
 }

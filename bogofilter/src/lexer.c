@@ -46,8 +46,8 @@ static void check_alphanum(buff_t *buff);
 
 static void lexer_display_buffer(buff_t *buff)
 {
-    fprintf(dbgout, "*** %2d %c %d ", yylineno,
-	    msg_header ? 'h' : 'b', buff->t.leng - buff->read);
+    fprintf(dbgout, "*** %2d %c %ld ", yylineno,
+	    msg_header ? 'h' : 'b', (long)(buff->t.leng - buff->read));
     buff_puts(buff, 0, dbgout);
     if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
 	fputc('\n', dbgout);
@@ -295,7 +295,7 @@ int yyredo(word_t *text, char del)
     size_t tlen = strlen((const char *)t);
     assert(tlen == leng);
 
-    if (DEBUG_LEXER(2)) fprintf(dbgout, "yyredo:  %d \"%s\"\n", leng, text->text);
+    if (DEBUG_LEXER(2)) fprintf(dbgout, "yyredo:  %ld \"%s\"\n", (long)leng, text->text);
 
     /* if already processing saved text, concatenate new after old */
     if (yysave == NULL) {
