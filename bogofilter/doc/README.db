@@ -489,14 +489,6 @@ SAFE OPTIONS:
 
 UNSAFE OPTIONS - these may impair robustness/recoverability of the data base
 
- - set_flags DB_LOG_AUTOREMOVE
-   (valid in Berkeley DB 4.2 - 4.3, takes effect immediately)
-
-   this option lets Berkeley DB automatically remove log files as soon
-   as they are no longer needed. It will prevent "catastrophic"
-   recovery (because the log files are missing), but regular recovery
-   should still work.
-
  - set_flags DB_TXN_NOSYNC
    (valid in Berkeley DB 3.3 - 4.3, takes effect immediately)
 
