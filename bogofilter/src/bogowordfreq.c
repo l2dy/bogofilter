@@ -28,7 +28,9 @@
 const char *progname = "bogowordfreq.c";
 const char *spam_header_name = "X-Bogosity:"; /* unused */
 
+#if 0
 wordlist_t* word_lists=NULL;	/* define to satisfy link requirements of msgcount.c */
+#endif
 
 void initialize(void);
 
