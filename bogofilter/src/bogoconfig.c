@@ -658,20 +658,20 @@ void process_args_2(int argc, char **argv)
 	    {
 		switch (*s)
 		{
-		case 't': tokenize_html_tags ^= true;		/* -Ht */
+		case 't': tokenize_html_tags ^= true;		/* -Pt */
 		    break;
-		case 's': tokenize_html_script ^= true;		/* -Hs - not yet in use */
+		case 's': tokenize_html_script ^= true;		/* -Ps - not yet in use */
 		    break;
-		case 'C': strict_check ^= true;			/* -HC */
+		case 'C': strict_check ^= true;			/* -PC */
 		    /*@fallthrough@*/
-		case 'c': tokenize_html_comments ^= true;	/* -Hc - not yet in use */
+		case 'c': tokenize_html_comments ^= true;	/* -Pc - not yet in use */
 		    break;
-		case 'h': tag_header_lines ^= true;		/* -Hh */
+		case 'h': tag_header_lines ^= true;		/* -Ph */
 		    break;
-		case 'f': fold_case ^= true;			/* -Hf */
+		case 'f': fold_case ^= true;			/* -Pf */
 		    break;
 		default:
-		    fprintf(stderr, "Unknown parsing option -H%c.\n", *s);
+		    fprintf(stderr, "Unknown parsing option -P%c.\n", *s);
 		    exit(2);
 		}
 	    }
