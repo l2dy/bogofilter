@@ -4,7 +4,17 @@
 
 $Id$
 
+	2002-12-08
+	* Increase MAXTOKENLEN from 20 to 30, allowing more and longer
+	  tokens to be processed.
+
 	2002-12-07
+	* Using new charset handling routines to provide charset
+	  specific token parsing.
+	* Added new config file options for setting of default charset
+	  and replacing of nonascii characters.
+	* New error handling routine will output error messages to stderr
+	  and, if '-l' (logging) is enabled, to syslog.
 	* Work around ash-0.2 and bash-1 bugs, needed for make check.
 	* Reorder gcc __attribute__ lines for gcc-2.7 compatibility.
 	* Cater for malloc/calloc implementations that return NULL when 0 bytes
