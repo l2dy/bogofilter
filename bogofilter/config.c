@@ -374,18 +374,18 @@ static void version(void)
     (void)printf("details.\n\n");
 }
 
+#ifndef	GRAHAM_AND_ROBINSON
+#define	GR
+#else
+#define	GR "gr"
+#endif
+
 int process_args(int argc, char **argv)
 {
     int option;
     int exitcode;
 
-#ifndef	GRAHAM_AND_ROBINSON
-#define	OPTIONS "d:ehlsnSNvVpuc:CRx:fq"
-#else
-#define	OPTIONS "d:ehlsnSNvVpuc:CgrRx:fq"
-#endif
-
-    while ((option = getopt(argc, argv, OPTIONS)) != EOF)
+    while ((option = getopt(argc, argv, GR "d:ehlsnSNvVpuc:CgrRx:fq")) != EOF)
     {
 	switch(option)
 	{
@@ -445,15 +445,17 @@ int process_args(int argc, char **argv)
 	    algorithm = AL_GRAHAM;
 	    break;
 #endif
+#ifdef	ENABLE_ROBINSON_METHOD
 	case 'R':
 	    Rtable = 1;
-#ifdef	GRAHAM_AND_ROBINSON
+#ifdef	ENABLE_GRAHAM_METHOD
 	/*@fallthrough@*/
 	/* fall through to force Robinson calculations */
 	case 'r':
 	    algorithm = AL_ROBINSON;
 #endif
 	    break;
+#endif
 
 	case 'x':
 	    set_debug_mask( optarg );
