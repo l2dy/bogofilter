@@ -513,6 +513,7 @@ static int compute_robinson_x(char *path)
     open_wordlists(DB_READ);
 
     robx = compute_robx(word_lists->dbh);
+
     close_wordlists(false);
     free_wordlists();
 

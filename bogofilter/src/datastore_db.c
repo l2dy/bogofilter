@@ -169,7 +169,8 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 	    break;
 
 	for (i = 0; i < handle->count; i += 1) {
-	    DB *dbp = handle->dbp[i];
+	    DB *dbp;
+
 	    /* create DB handle */
 	    if ((ret = db_create (&dbp, NULL, 0)) != 0) {
 		print_error(__FILE__, __LINE__, "(db) create, err: %d, %s",
