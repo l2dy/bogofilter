@@ -2,7 +2,7 @@
 
 Name: @PACKAGE@
 Version: @VERSION@
-Release: 2
+Release: 1
 URL: http://bogofilter.sourceforge.net
 Source0: %{name}-%{version}.tar.gz
 License: GPL
@@ -81,14 +81,14 @@ done
 
 %post static
 for file in bogofilter bogolexer bogoutil ; do
-    if [ ! -f %{_bindir}/${file} ] ; then
-        ln -s %{_bindir}/${file%_static} %{_bindir}/${file} 
+    if [ $1 -lt 2 ] ; then
+        ln -s %{_bindir}/${file}_static %{_bindir}/${file} 
     fi
 done
 
 %postun static
 for file in bogofilter bogolexer bogoutil ; do
-    if [ -f %{_bindir}/${file} ] ; then
+    if [ $1 -eq 0 ] ; then
         rm -f %{_bindir}/${file}
         echo rm -f %{_bindir}/${file}
     fi
