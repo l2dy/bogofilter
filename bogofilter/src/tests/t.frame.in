@@ -14,9 +14,6 @@ set -e
 : ${relpath=..}
 : ${BF_TESTDIR=.}
 
-BOGOFILTER_DIR=$TMPDIR
-export BOGOFILTER_DIR
-
 BOGOFILTER="$VAL ${relpath}/@BOGOFILTER@"
 BOGOLEXER="$VAL ${relpath}/@BOGOLEXER@"
 BOGOTUNE="$VAL ${relpath}/@BOGOTUNE@"
@@ -98,6 +95,9 @@ else
 fi
 rm -rf $TMPDIR
 mkdir $TMPDIR
+
+BOGOFILTER_DIR=$TMPDIR
+export BOGOFILTER_DIR
 
 verbose=0
 if [ "$1" = "-v" ]; then
