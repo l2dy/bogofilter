@@ -296,7 +296,7 @@ static void check_lock(int unused) {
     (void)unused;
 
     if (0 != check_zombies()) {
-	const char *text = "bogofilter or related application has crashed or directory damaged, aborting.";
+	const char *text = "bogofilter or related application has crashed or directory damaged, aborting.\n";
 	write(STDERR_FILENO, text, strlen(text));
 	_exit(EX_ERROR);	/* use _exit, not exit, to avoid running the atexit handler that might deadlock */
     }
