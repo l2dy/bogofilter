@@ -1,5 +1,5 @@
 # $Id$
-AC_INIT(bogofilter, 0.12.3.cvs)
+AC_INIT(bogofilter, 0.13.0)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR([src])
 AC_CANONICAL_TARGET

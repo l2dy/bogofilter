@@ -28,6 +28,13 @@ disabling them.  Here are the new switches and options:
 The options can be enabled using the lower case switch or disabled
 using the upper case switch.
 
+When header_line_markup_is enabled, tokens in To:, From:, Subject:,
+and Return-Path: lines are prefixed by "to:", "from:", "subj:", and
+"rtrn:" respectively.
+
+When tokenize_html_tags_is enabled, tokens in A, IMG, and FONT tags
+are scored while classifying the message.
+
 NOTE:
 
 To take full advantage of these changes, additional training of
