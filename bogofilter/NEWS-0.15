@@ -9,11 +9,12 @@
   separate wordlists.
 * Fixed processing of rmail files.
 * Transaction code added for wordlist maintenance.
-* Timestamp code refactored and moved from maint.c to datastore.c
 * End-of-header code revised to ensure that passthrough ("-p")
   properly places the X-Bogosity line.
 * Fixed logging behavior when scoring mailboxes, maildirs, etc.
+* Timestamp code refactored and moved from maint.c to datastore.c
 * Added support for OS/2's file system.
+* Minor revisions of RISC-OS compatibility code.
 
 0.15.4	2003-09-20
 

@@ -4,6 +4,10 @@
 
 $Id$
 
+	2003-09-28
+
+	* Minor revisions of OS/2 and RISC-OS compatibility code.
+
 	2003-09-27
 
 	* Transaction code added for wordlist maintenance.
