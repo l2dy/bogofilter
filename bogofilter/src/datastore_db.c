@@ -11,7 +11,8 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 ******************************************************************************/
 
-#include "system.h"
+#include "common.h"
+
 #include <db.h>
 #include <string.h>
 #include <stdlib.h>
@@ -19,9 +20,6 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include <unistd.h>
 #include <db.h>
 #include <errno.h>
-
-#include <config.h>
-#include "common.h"
 
 #include "datastore.h"
 #include "error.h"
