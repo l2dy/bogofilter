@@ -94,9 +94,9 @@ typedef struct {
 
 /* Function Prototypes */
 
-void mime_disposition (word_t *text);
-void mime_encoding (word_t *text);
-void mime_type (word_t *text);
+static void mime_disposition (word_t *text);
+static void mime_encoding (word_t *text);
+static void mime_type (word_t *text);
 
 static const byte *skipws (const byte *t, const byte *e);
 static byte *getword (const byte *t, const byte *e);
@@ -430,7 +430,7 @@ mime_content(word_t *text)
     }
 }
 
-void
+static void
 mime_disposition (word_t *text)
 {
   size_t i;
@@ -472,7 +472,7 @@ mime_disposition (word_t *text)
 **
 *********/
 
-void
+static void
 mime_encoding (word_t *text)
 {
   size_t i;
@@ -502,7 +502,7 @@ mime_encoding (word_t *text)
   return;
 }
 
-void
+static void
 mime_type (word_t *text)
 {
   size_t l;
