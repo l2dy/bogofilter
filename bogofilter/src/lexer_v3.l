@@ -243,7 +243,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						  else
 						      BEGIN TEXT; 
 						  msg_header = false;
-						  return EMPTY;
+						  return EOH;
 						}
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
 						      BEGIN INITIAL;

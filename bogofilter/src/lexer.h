@@ -27,7 +27,7 @@ extern	bool	score_html_comments;
 typedef enum {
     NONE,
     TOKEN,	/* regular token */
-    EMPTY,	/* empty line */
+    EOH,	/* end-of-header (empty line) */
     BOUNDARY,	/* MIME multipart boundary line */
     IPADDR,	/* ip address */
     MSG_COUNT_LINE,

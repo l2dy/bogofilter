@@ -88,7 +88,7 @@ token_t get_token(void)
 
 	switch (class) {
 
-	case EMPTY:	/* empty line -- check for bogus end of header */
+	case EOH:	/* end of header - bogus if not empty */
 	    if (msg_state->mime_type == MIME_MESSAGE)
 		mime_add_child(msg_state);
 	    if (yylval->leng == 0)
