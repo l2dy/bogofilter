@@ -1,5 +1,8 @@
 # $Id$ 
 # $Log$
+# Revision 1.16  2002/10/04 00:31:30  m-a
+# Add convenience function xstrdup() which is a xmalloc() variant of strdup.
+#
 # Revision 1.15  2002/10/02 16:27:40  relson
 # Initial inclusion of multiple wordlist code into bogofilter.
 #
@@ -80,7 +83,7 @@ man1_MANS = bogofilter.1
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c \
                      wordhash.h wordhash.c wordlists.h wordlists.c \
-		     xmalloc.h xmalloc.c
+		     xmalloc.h xmalloc.c xstrdup.h xstrdup.c
 
 lexertest_SOURCES = lexer.l
 lexertest_CFLAGS = -DMAIN
