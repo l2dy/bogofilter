@@ -121,12 +121,13 @@ MSG_COUNT	^\"\.MSG_COUNT\"
 TOKENFRONT	[^[:blank:][:cntrl:][:digit:][:punct:]]
 TOKENMID	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*,[:cntrl:]\[\]]+
 BOGOLEX_TOKEN	[^[:blank:]<>;    &%  @ |/\\{}^\"  \*,[:cntrl:]\[\]]+
-TOKENBACK_OLD	[^[:blank:][:punct:][:cntrl:]]
 TOKENBACK	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*\._\-\+,\[\][:cntrl:]]
 
 TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}{1,70}
 
-ENCODED_TOKEN	{BOGOLEX_TOKEN}{0,60}=\?{ID}\?[bq]\?[^[:blank:]]+\?\=
+BASE64		[0-9a-zA-Z/+=]+
+QP		[^[:blank:]]+
+ENCODED_TOKEN	{BOGOLEX_TOKEN}*=\?{ID}\?(b\?{BASE64}|q\?{QP})\?\=
 
 DOLLARS		[0-9]+
 CENTS		[0-9]+
