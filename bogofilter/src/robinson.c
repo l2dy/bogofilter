@@ -89,17 +89,27 @@ static void wordprob_add(wordcnts_t *cnts, uint count, uint bad)
 	cnts->good += count;
 }
 
-static double wordprob_result(wordcnts_t *cnts)
+double calc_prob(uint good, uint bad)
 {
-    double g = (double) min(cnts->good, msgs_good);
-    double b = (double) min(cnts->bad,  msgs_bad);
-    double n = g + b;
+    uint g = min(good, msgs_good);
+    uint b = min(bad,  msgs_bad);
+    int n = g + b;
+    double fw;
 
-    double pw = (n < EPS) ? 0.0 : ((b / bad_cnt) / 
-				   (b / bad_cnt + g / good_cnt));
-    double fw = (robs * robx + n * pw) / (robs + n);
+    if (n == 0)
+	fw = robx;
+    else {
+	double pw = ((b / bad_cnt) / (b / bad_cnt + g / good_cnt));
+	fw = (robs * robx + n * pw) / (robs + n);
+    }
 
-    return (fw);
+    return fw;
+}
+
+static double wordprob_result(wordcnts_t *cnt)
+{
+    double fw = calc_prob(cnt->good, cnt->bad);
+    return fw;
 }
 
 static void lookup(const word_t *token, wordcnts_t *cnts)
