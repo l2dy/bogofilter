@@ -1,5 +1,6 @@
-/* register.c -- read input with collect and register to persistent db */
 /* $Id$ */
+
+/* register.c -- read input with collect and register to persistent db */
 
 #include <stdio.h>
 #include <stdlib.h>
