@@ -43,10 +43,7 @@ typedef struct {
 
 const char *db_version_str(void)
 {
-    static char v[80];
-    if (!v[0])
-	snprintf(v, sizeof(v), "QDBM (version %s, depot API)", dpversion);
-    return v;
+    return "QDBM";
 }
 
 static dbh_t *dbh_init(const char *path, size_t count, const char **names)
