@@ -143,7 +143,7 @@ if ENABLE_TDB_DATASTORE
 datastore_SOURCE = datastore_tdb.c
 else
 if ENABLE_QDBM_DATASTORE
-datastore_SOURCE = datastore_qdbm.c
+datastore_SOURCE = datastore_qdbm.c datastore_qdbm.h datastore_qdbm_cmpkey.c
 else
 datastore_SOURCE = datastore_db.c
 endif

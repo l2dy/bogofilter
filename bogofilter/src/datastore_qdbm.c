@@ -21,6 +21,7 @@ Stefan Bellon <sbellon@sbellon.de>       2003-2004
 
 #include "datastore.h"
 #include "datastore_db.h"
+#include "datastore_qdbm.h"
 #include "error.h"
 #include "paths.h"
 #include "xmalloc.h"
@@ -42,22 +43,6 @@ typedef struct {
 static bool init = false;
 
 /* Function definitions */
-
-static int cmpkey(const char *aptr, int asiz, const char *bptr, int bsiz)
-{
-    int aiter, biter;
-
-    for (aiter = 0, biter = 0; aiter < asiz && biter < bsiz; ++aiter, ++biter) {
-	if (aptr[aiter] != bptr[biter])
-	    return (aptr[aiter] < bptr[biter]) ? -1 : 1;
-    }
-
-    if (aiter == asiz && biter == bsiz)
-	return 0;
-
-    return (aiter == asiz) ? -1 : 1;
-}
-
 
 const char *db_version_str(void)
 {
