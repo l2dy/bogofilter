@@ -1,8 +1,13 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.2  2002/09/15 16:16:50  relson
- * Clean up underflow checking for word counts by using max() instead of if...then...
+ * Revision 1.3  2002/09/15 16:37:27  relson
+ * Implement Eric Seppanen's fix so that bogofilter() properly populates the stats.extrema array.
+ * A new word goes into the first empty slot of the array.  If there are no empty slots, it replaces
+ * the word with the spamicity index closest to 0.5.
  *
+/* Revision 1.2  2002/09/15 16:16:50  relson
+/* Clean up underflow checking for word counts by using max() instead of if...then...
+/*
 /* Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
 /* 0.7.3 Base Source
 /* */
@@ -468,7 +473,7 @@ int bogofilter(int fd)
 	// update the list of tokens with maximum deviation
 	dev = DEVIATION(prob);
         hit = NULL;
-        hitdev=0;
+        hitdev=1;
 	for (pp = stats.extrema; pp < stats.extrema+sizeof(stats.extrema)/sizeof(*stats.extrema); pp++)
         {
 	    // don't allow duplicate tokens in the stats.extrema
@@ -480,7 +485,7 @@ int bogofilter(int fd)
 	    else 
 	    {
                 slotdev=DEVIATION(pp->prob);
-                if (dev>slotdev && dev>hitdev)
+		if (dev>slotdev && hitdev>slotdev)
                 {
                     hit=pp;
 		    hitdev=slotdev;
