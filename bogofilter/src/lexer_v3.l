@@ -100,7 +100,7 @@ static word_t *yy_text(void)
 %}
 
 %option debug nodebug
-%option align caseless 8bit 
+%option align caseless 8bit
 %option never-interactive noreject
 %option noyywrap
 %option prefix="lexer_v3_"
@@ -123,7 +123,7 @@ BOGOLEX_TOKEN	[^[:blank:]<>;    &%  @ |/\\{}^\"  \*,[:cntrl:]\[\]]+
 TOKENBACK_OLD	[^[:blank:][:punct:][:cntrl:]]
 TOKENBACK	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*\._\-\+,\[\][:cntrl:]]
 
-TOKEN 		{TOKENFRONT}{TOKENMID}{TOKENBACK}{1,70}
+TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}{1,70}
 
 DOLLARS		[0-9]+
 CENTS		[0-9]+
@@ -142,12 +142,16 @@ HTML_WO_COMMENTS	"<"[^!][^\>]*">"|"<>"
 
 HTMLTOKEN		{HTML_WI_COMMENTS}
 
-/* Generally, there are some html tags that cause an "eyebreak" and some that do not.
-   For example, the "P" tag or the "BR" tag cause a break, and can be interpreted
-   in place, while, the B (bold) tag does not.  No close tags seem to cause a break.
-   Comments do not.  This is an attempt to make an exhaustive list of tags that cause
-   an "eyebreak". When the exit tag also causes a break, we include the /?.
-   I believe this to be a complete list of tags that can cause a formatting break. */
+/*
+ * Generally, there are some html tags that cause an "eyebreak" and some
+ * that do not. For example, the "P" tag or the "BR" tag cause a break,
+ * and can be interpreted in place, while, the B (bold) tag does not.
+ * No close tags seem to cause a break.
+ * Comments do not.  This is an attempt to make an exhaustive list of
+ * tags that cause an "eyebreak". When the exit tag also causes a break,
+ * we include the /?. I believe this to be a complete list of tags that
+ * can cause a formatting break.
+ */
 
 HBREAK		p|br|li|h[1-6]|hr|title|table|center|dd|dt|iframe|img|input|select|td|textarea|th|\/?(div|blockquote|pre|dir|dl|fieldset|legend|form|menu|ol|ul)
 
@@ -205,11 +209,10 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						}
 
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
-						      BEGIN(INITIAL); 
-						      return BOUNDARY; 
-						  }
-						  else { 
-						      return TOKEN;
+						      BEGIN(INITIAL);
+						      return BOUNDARY;
+						  } else {
+						      yyless(2);
 						  }
 						}
 
