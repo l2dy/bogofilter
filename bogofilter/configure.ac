@@ -53,6 +53,10 @@ if test "x$target_cpu" = "xs390" && test "x$GCC" = "xyes" ; then
     esac
 fi
 
+AC_ARG_WITH(db,
+	    AC_HELP_STRING([--with-db=PATH], [obsolete, use --with-libdb-prefix instead]),
+    AC_MSG_ERROR([--with-db is obsolete. Use --with-libdb-prefix=$withval instead.]))
+
 dnl If we're using gcc, enable some warnings
 dnl missing: -Wunreachable-code
 AC_CACHE_CHECK(for additional compiler options, ac_cv_prog_gcc_flags, [
@@ -346,10 +350,6 @@ AC_SUBST(STATIC_DB)
 AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xtdb")
 AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
 
-AC_ARG_WITH(db,
-	    AC_HELP_STRING([--with-db=PATH], [obsolete, use --with-libdb-prefix instead]),
-    AC_MSG_ERROR([--with-db is obsolete. Use --with-libdb-prefix=$withval instead.]))
-
 dnl Use TRIO to replace missing snprintf/vsnprintf.
 needtrio=0
 if test "x$ac_cv_func_snprintf" != "xyes" ; then
@@ -469,17 +469,27 @@ PATH=/bin:/usr/bin:$PATH
 export PATH
 
 need_my_gsl=1
-AM_PATH_GSL(1.4, AC_DEFINE(HAVE_GSL_14,,[Define if you have GNU Scientific Library 1.4 or newer])
-need_my_gsl=0)
-AM_PATH_GSL(1.0, AC_DEFINE(HAVE_GSL_10,,[Define if you have GNU Scientific Library 1.0 or newer])
-need_my_gsl=0)
+AC_ARG_WITH(included-gsl, AS_HELP_STRING([--with-included-gsl],[force use of shipped GSL rather than system GSL]),
+if test "x$WITHVAL" != "xyes" ; then need_my_gsl=2 ; fi)
+
 if test "$need_my_gsl" = 1 ; then
+  AM_PATH_GSL(1.4,
+	        AC_DEFINE(HAVE_GSL_14,,[Define if you have GNU Scientific Library 1.4 or newer])
+		need_my_gsl=0)
+  AM_PATH_GSL(1.0,
+		AC_DEFINE(HAVE_GSL_10,,[Define if you have GNU Scientific Library 1.0 or newer])
+		need_my_gsl=0)
+fi
+
+if test "$need_my_gsl" != 0 ; then
   GSL_LIBS="libbf_gsl.a"
+  AC_DEFINE(HAVE_GSL_14)
+  AC_DEFINE(HAVE_GSL_10)
 fi
 
 PATH="$PATH_SAVED"
 
-AM_CONDITIONAL(NEED_GSL,test $need_my_gsl = 1)
+AM_CONDITIONAL(NEED_GSL,test $need_my_gsl != 0)
 
 have_dosish_system=no
 case "${target}" in
