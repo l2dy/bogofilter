@@ -29,7 +29,7 @@ double calc_prob(uint good, uint bad)
 	*/
 	double pw = bad*msgs_good / (bad*msgs_good + good*msgs_bad);
 
-	/* robs is Robinson's s parameter, the "strenght of background info" */
+	/* robs is Robinson's s parameter, the "strength of background info" */
 	/* robx is Robinson's x parameter, the assumed probability that
 	 * a word we don't have enough info about will be spam */
 	/* n is the amount of mails that contain the word w */
