@@ -20,8 +20,8 @@ if [ "$1" = "-v" ]; then
     verbose=1
 fi
 
-[   -d ${TMPDIR} ] && rm -rf ${TMPDIR}
-[ ! -d ${TMPDIR} ] && mkdir  ${TMPDIR}
+if [   -d ${TMPDIR} ] ; then rm -rf ${TMPDIR} ; else : ; fi
+mkdir -p ${TMPDIR}
 
 # Graham config
 cat /dev/null > ${TMPDIR}/cfg.g
@@ -75,17 +75,17 @@ run_test()
     sed s/,.version=.*// < ${TMPDIR}/tests-$alg > $OUT
 }
 
-[   -d ${TMPDIR}/tests ] && rm -f ${TMPDIR}/tests/*
-[ ! -d ${TMPDIR}/tests ] && mkdir -p ${TMPDIR}/tests
+if [   -d ${TMPDIR}/tests ] ; then rm -f ${TMPDIR}/tests/* ; else : ; fi
+mkdir -p ${TMPDIR}/tests
 
 for mth in g r f t ; do
     alg="$mth"
-    [ "$alg" = "t" ] && alg=f
+    if [ "$alg" = "t" ] ; then alg=f ; else : ; fi
     BOGOFILTER_DIR="${TMPDIR}/words.$mth"
     CFG="-c ${TMPDIR}/cfg.$mth"
     export BOGOFILTER_DIR
-    [   -d $BOGOFILTER_DIR ] && rm -f $BOGOFILTER_DIR/*
-    [ ! -d $BOGOFILTER_DIR ] && mkdir $BOGOFILTER_DIR
+    if [   -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
+    mkdir -p $BOGOFILTER_DIR
     $BOGOFILTER -$alg $CFG -s < ${SYSTEST}/inputs/spam.mbx
     $BOGOFILTER -$alg $CFG -n < ${SYSTEST}/inputs/good.mbx
     #

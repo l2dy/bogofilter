@@ -14,8 +14,8 @@ if [ "$1" = "-v" ]; then
     verbose=1
 fi
 
-[   -d ${TMPDIR}/tests ] && rm -rf ${TMPDIR}/tests
-[ ! -d ${TMPDIR}/tests ] && mkdir -p ${TMPDIR}/tests
+if [   -d ${TMPDIR}/tests ] ; then rm -rf ${TMPDIR}/tests ; else : ; fi
+mkdir -p ${TMPDIR}/tests
 
 CONFIG="${TMPDIR}/test.cf"
 BOGOFILTER="../bogofilter -c ${CONFIG}"
