@@ -77,8 +77,6 @@ UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
 IPADDR		{UINT8}\.{UINT8}\.{UINT8}\.{UINT8}
 MIME_BOUNDARY	^--[^[:blank:][:cntrl:]]+
 
-CHARSET		charset=["]*[A-Za-z][A-Za-z0-9_-]*[A-Za-z0-9]["]*
-
 %%
 
 abbr	;
@@ -107,7 +105,7 @@ cellspacing	;
 center	;
 char	;
 charoff	;
-charset	;
+charset						{return(CHARSET);}
 circle	;
 cite	;
 colspan	;
@@ -249,7 +247,6 @@ name=\"?					;
 filename=\"?					;
 {MIME_BOUNDARY}(--)?$				{return (BOUNDARY);}
 
-{CHARSET}					{return(CHARSET);}
 {IPADDR}					{return(IPADDR);}
 [^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,[:cntrl:][]+[^[:blank:][:punct:][:cntrl:]]	{return(TOKEN);} 
 .						;
@@ -390,19 +387,11 @@ token_t get_token(void)
 
 	if (class == CHARSET)
 	{
-	    /* Got: 'charset="charset-name"'
-	       First call got_charset()
-	       then  return "charset" as a token
-	       next  call returns "charset-name"
+	    /* Charset name is next token.
+	       Get the name, call got_charset(), and return the name.
 	     */
-	    t = index( yytext, '=' ) + 1;
-	    while (isspace(*t) || *t == '"' )	/* find the beginning of the charset name */
-		t += 1;
-	    yyleng -= t - (unsigned char *) yytext;
-	    strcpy(yytext, t);
-	    while (yytext[yyleng-1] == '"')	/* ... and it's end */
-		yytext[--yyleng] = '\0';
-	    got_charset( yytext );
+	    get_token();
+	    got_charset(yytext);
 	}
 
 	/* eat all long words */
