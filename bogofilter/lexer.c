@@ -47,7 +47,7 @@ extern int get_decoded_line(byte *buf, size_t size);
 /* Function Definitions */
 static int lgetsl(byte *buf, size_t size)
 {
-    size_t count = fgetsl((char *)buf, size, fpin);
+    size_t count = xfgetsl((char *)buf, size, fpin, 1);
     yylineno += 1;
     if (DEBUG_LEXER(0)) {
 	fprintf(dbgout, "*** %2d %d %d ", yylineno, msg_header, count);
