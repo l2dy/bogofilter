@@ -74,7 +74,6 @@
 #include "msgcounts.h"
 #include "textblock.h"
 #include "token.h"
-#include "xatox.h"
 #include "xmalloc.h"
 
 #define YY_DECL token_t yylex(void)
@@ -93,7 +92,7 @@ static int lineno;
 
 static word_t *yy_text(void);
 static void html_char(void);
-static void reorder_html(void);
+static void html_reorder(void);
 
 static void skip_to(char chr);
 
@@ -271,7 +270,7 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 			return TOKEN;
 			}
 
-<HTML>({TOKEN}|{A2}|{A1})({HTMLTOKEN})+/{NOTWHITESPACE} 	{ reorder_html(); }
+<HTML>({TOKEN}|{A2}|{A1})({HTMLTOKEN})+/{NOTWHITESPACE} 	{ html_reorder(); }
 
 <HTML>"<!--"					{ BEGIN SCOMMENT; }
 <HTML>"<!"					{ BEGIN (strict_check ? HTOKEN : LCOMMENT ); }
@@ -312,7 +311,7 @@ static void skip_to(char chr)
     yyless(len);
 }
 
-static void reorder_html(void)
+static void html_reorder(void)
 {
     char *chr = memchr(yytext, '<', yyleng);	/* find start of html tag */
     size_t len = chr - yytext;
