@@ -13,8 +13,6 @@ AUTHOR:
 
 #include "common.h"
 
-
-
 #include "datastore.h"
 #include "robx.h"
 #include "wordlists.h"
@@ -108,7 +106,7 @@ static int count_hook(word_t *key, dsv_t *data,
 
 static double compute_robx(dsh_t *dsh)
 {
-    double robx;
+    double rx;
 
     dsv_t val;
     uint32_t good_cnt, spam_cnt;
@@ -135,27 +133,27 @@ static double compute_robx(dsh_t *dsh)
 	ds_foreach(dsh, robx_hook, &rh);
     }
 
-    robx = rh.sum/rh.count;
+    rx = rh.sum/rh.count;
     if (verbose > 2)
 	printf("%s: %lu, %lu, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
 	       MSG_COUNT,
 	       (unsigned long)spam_cnt, (unsigned long)good_cnt,
-	       rh.scalefactor, rh.sum, (int)rh.count, robx);
+	       rh.scalefactor, rh.sum, (int)rh.count, rx);
 
-    return robx;
+    return rx;
 }
 
 double compute_robinson_x(char *path)
 {
-    double robx;
+    double rx;
 
     setup_wordlists(path, PR_NONE);
     open_wordlists(DB_READ);
 
-    robx = compute_robx(word_lists->dsh);
+    rx = compute_robx(word_lists->dsh);
 
     close_wordlists(false);
     free_wordlists();
 
-    return robx;
+    return rx;
 }
