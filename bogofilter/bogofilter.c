@@ -1,10 +1,14 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.5  2002/09/15 18:29:04  relson
- * bogofilter.c:
+ * Revision 1.6  2002/09/15 19:07:13  relson
+ * Add an enumerated type for return codes of RC_SPAM and RC_NONSPAM, which  values of 0 and 1 as called for by procmail.
+ * Use the new codes and type for bogofilter() and when generating the X-Spam-Status message.
  *
- * Use a Judy array to provide a set of (unique) tokens to speed up the filling of the stat.extrema array.
- *
+/* Revision 1.5  2002/09/15 18:29:04  relson
+/* bogofilter.c:
+/*
+/* Use a Judy array to provide a set of (unique) tokens to speed up the filling of the stat.extrema array.
+/*
 /* Revision 1.4  2002/09/15 17:41:20  relson
 /* The printing of tokens used for computing the spamicity has been changed.  They are now printed in increasing order (by probability and alphabet).  The cumulative spamicity is also printed.
 /*
@@ -422,7 +426,7 @@ int compare_stats(discrim_t *d1, discrim_t *d2)
 	     ((d1->prob == d2->prob) && (strcmp(d1->key, d2->key) > 0)));
 }
 
-int bogofilter(int fd)
+rc_t bogofilter(int fd)
 /* evaluate text for spamicity */
 {
     void	**PPValue;			// associated with Index.
@@ -543,11 +547,10 @@ int bogofilter(int fd)
 		printf("#  %f  %f  %s\n", pp->prob, spamicity, pp->key);
 	}
 
-
     if (verbose)
 	printf("#  Spamicity of %f\n", spamicity);
 
-    return((spamicity > SPAM_CUTOFF) ? 0 : 1);
+    return((spamicity > SPAM_CUTOFF) ? RC_SPAM : RC_NONSPAM);
 }
 
 // Done

@@ -1,8 +1,12 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.2  2002/09/15 16:31:41  relson
- * Substitute STDIN_FILENO where numeric constant 0 is used as a file descriptor.
+ * Revision 1.3  2002/09/15 19:07:13  relson
+ * Add an enumerated type for return codes of RC_SPAM and RC_NONSPAM, which  values of 0 and 1 as called for by procmail.
+ * Use the new codes and type for bogofilter() and when generating the X-Spam-Status message.
  *
+/* Revision 1.2  2002/09/15 16:31:41  relson
+/* Substitute STDIN_FILENO where numeric constant 0 is used as a file descriptor.
+/*
 /* Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
 /* 0.7.3 Base Source
 /* */
@@ -161,7 +165,7 @@ int main(int argc, char **argv)
     }
     else
     {
-	int	status = bogofilter(STDIN_FILENO);
+	rc_t	status = bogofilter(STDIN_FILENO);
 
 	if (passthrough)
 	{
@@ -182,7 +186,7 @@ int main(int argc, char **argv)
 		else if (strncmp(textend->block, "Subject:", 8) == 0) {
 			/* Append the X-Spam-Status: header before subject */
 			printf("X-Spam-Status: %s, tests=bogofilter\n", 
-			status ? "No" : "Yes");
+			(status==RC_SPAM) ? "Yes" : "No");
 			(void) fputs(textend->block, stdout);
 		}
 		else if (strcmp(textend->block, "\n") == 0) {
