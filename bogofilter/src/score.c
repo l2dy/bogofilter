@@ -265,7 +265,6 @@ void score_initialize(void)
 {
     word_t *word_robx = word_new((const byte *)ROBX_W, strlen(ROBX_W));
 
-    max_repeats = 1;
     if (fabs(min_dev) < EPS)
 	min_dev = MIN_DEV;
     if (spam_cutoff < EPS)
