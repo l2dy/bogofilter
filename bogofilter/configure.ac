@@ -523,7 +523,7 @@ shared environments, you can use --disable-dbshared-test.])],)
 	LIBS="$saveLIBS"
     ;;
     *)
-	AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, tdb, qdbm.])
+	AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, tdb, qdbm, sqlite.])
     ;;
 esac
 
