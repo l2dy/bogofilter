@@ -22,13 +22,6 @@ these changes. You should consult them.
 
 ########################################################################
 
-INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
-=======================================
-
-Support for Berkeley DB 3.1 is removed as a side effect of automatically
-detecting transactional mode at run-time, BDB 3.1 lacks DB_JOINENV.
-
-
 NEW CAPABILITIES IN BOGOFILTER 0.94
 ===================================
 
@@ -55,6 +48,10 @@ If none of the above methods are used to enable/disable transactions,
 bogofilter and bogoutil will query Berkeley DB to see if a transaction
 environment already exists.  If so, transactions will be enabled.  If
 not, they will be disabled.
+
+Note: Support for Berkeley DB 3.1 has been removed as a side effect of
+automatically detecting transactional mode at run-time, since 3.1
+lacks DB_JOINENV.
 
 Compile-time selection:
 
