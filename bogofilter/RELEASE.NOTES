@@ -1,6 +1,7 @@
-This file documents incompatible (that require further action upon
-update) and major (noteworthy but compatible) changes since bogofilter
-0.11, separated by form feeds.
+This file documents changes in bogofilter since version 0.11.  In
+particular it describes (1) significant changes (noteworthy and
+compatible) and (2) incompatible changes (that require further action
+upon update).
 
 Caution: If upgrading from an old version and skipping several
 intervening versions of bogofilter, be smart and check all the
@@ -122,6 +123,7 @@ bogoQDBMupgrade wordlist.qdbm wordlist.tmp wordlist.qdbm.old
 If this command didn't print anything, everything has gone well and it
 has left your old data base in wordlist.qdbm.old.
 
+NOTE: bogoQDBMupgrade needs qdbm-1.8.18 or newer to build.
 
 Bogotune option parsing changes
 -------------------------------
