@@ -7,48 +7,6 @@ NAME:
 
 ******************************************************************************/
 
-/*
-** RCS file: /cvsroot/bogofilter/bogofilter/lexertest.c,v
-** Working file: lexertest.c
-** head: 1.5
-** branch:
-** locks: strict
-** access list:
-** symbolic names:
-** 	release-0_7_6: 1.4
-** 	bogofilter-beta-0_7_6_1: 1.4
-** 	bogofilter-0_7_6: 1.4.0.2
-** 	bogofilter-0_7_5: 1.3.0.2
-** keyword substitution: kv
-** total revisions: 5;	selected revisions: 5
-** description:
-** ----------------------------
-** revision 1.5
-** date: 2002/10/28 21:29:31;  author: relson;  state: Exp;  lines: +37 -16
-** Added a passthrough option "-p".  Useful for simply seeing the words
-** or for piping to bogoutil to get spam/good counts.
-** ----------------------------
-** revision 1.4
-** date: 2002/10/25 01:38:36;  author: m-a;  state: Exp;  lines: +8 -0
-** Add -h for help.
-** ----------------------------
-** revision 1.3
-** date: 2002/10/09 23:40:51;  author: m-a;  state: Exp;  lines: +14 -5
-** Implement a fast -q (quiet) mode to suppress the token output. Useful
-** for benchmarks.
-** ----------------------------
-** revision 1.2
-** date: 2002/10/08 03:29:57;  author: mmhoffman;  state: Exp;  lines: +1 -3
-** Fix interface to lexer bug; use yylval in place of yytext.
-** ----------------------------
-** revision 1.1
-** date: 2002/10/07 15:41:45;  author: m-a;  state: Exp;
-** Move lexertest main() function from lexer.l into a separate file.
-** This way, lexertest and bogofilter share the same lexer code, cutting down
-** compilation times and saving space.
-** =============================================================================
-*/
-
 /* imports */
 #include <stdio.h>
 #include <string.h>
