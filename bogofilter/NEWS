@@ -4,6 +4,10 @@
 
 $Id$
 
+0.13.6.1 2003-06-05
+
+	* Updated file tuning/README.
+
 0.13.6	2003-06-04
 
 	* Fix check for "^From " lines to work properly during base64
