@@ -167,6 +167,7 @@ directories.c: ../config.status
 .l.c:
 	flex -o$@ $<
 
-bogoupgrade: bogoupgrade.in
+bogoupgrade: bogoupgrade.in Makefile
+	rm -f $@
 	sed 's}[@]PERL@}$(PERL)}' <$(srcdir)/bogoupgrade.in >$@ || rm -f $@
-	chmod +x bogoupgrade
+	chmod a=rx bogoupgrade
