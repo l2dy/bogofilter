@@ -13,8 +13,16 @@ Note:
    only the lexer.
 
 AUTHOR:
-   David Relson <relson@osagesoftware.com>
+   David Relson <relson@osagesoftware.com>  2005
 
+******************************************************************************/
+
+/*****************************************************************************
+ **
+ **    EXPERIMENTAL    EXPERIMENTAL    EXPERIMENTAL    EXPERIMENTAL
+ **
+ ** This is test code -- mostly a proof of concept; not ready for prime time.
+ **
 ******************************************************************************/
 
 /* imports */
