@@ -14,7 +14,6 @@ URL:		http://bogofilter.sourceforge.net
 Source0:	%{name}-%{version}.tar.gz
 BuildRequires:	autoconf2.5
 BuildRequires:	gsl >= 1.1
-AutoReq:	no
 Buildroot:	%{_tmppath}/%{name}-%{version}-root
 Conflicts:	bogofilter-static
 
@@ -108,13 +107,22 @@ done
 %files
 %defattr(-,root,root)
 
+%doc AUTHORS CHANGES* COPYING INSTALL METHODS
+%doc NEWS README* RELEASE.NOTES* TODO UPGRADE
+%doc doc/bogofilter-tuning.HOWTO
+%doc doc/bogofilter-SA-2002-01
+%doc doc/integrating*
+%doc doc/programmer
+%doc .inst/html .inst/xml
+
+%{_sysconfdir}/bogofilter.cf.example
+%config(noreplace) %{_sysconfdir}/bogofilter.cf
+
 %{_bindir}/bogofilter
 %{_bindir}/bogolexer
 %{_bindir}/bogotune
 %{_bindir}/bogoutil
 %{_bindir}/bogoupgrade
-%{_sysconfdir}/bogofilter.cf.example
-%config(noreplace) %{_sysconfdir}/bogofilter.cf
 
 %{_mandir}/man1/bogofilter.1*
 %{_mandir}/man1/bogolexer.1*
@@ -122,17 +130,21 @@ done
 %{_mandir}/man1/bogoutil.1*
 %{_mandir}/man1/bogoupgrade.1*
 
-%doc AUTHORS CHANGES* COPYING INSTALL METHODS
-%doc NEWS README* RELEASE.NOTES* TODO UPGRADE
-%doc doc/bogofilter-tuning.HOWTO
-%doc doc/integrating*
-%doc doc/programmer
-%doc .inst/html .inst/xml
-
 %{_datadir}/%{name}/contrib/*
 
 %files static
 %defattr(-,root,root)
+
+%doc AUTHORS CHANGES* COPYING INSTALL METHODS
+%doc NEWS README* RELEASE.NOTES* TODO UPGRADE
+%doc doc/bogofilter-tuning.HOWTO
+%doc doc/bogofilter-SA-2002-01
+%doc doc/integrating*
+%doc doc/programmer
+%doc .inst/html .inst/xml
+
+%{_sysconfdir}/bogofilter.cf.example
+%config(noreplace) %{_sysconfdir}/bogofilter.cf
 
 %{_bindir}/bogofilter_static
 %{_bindir}/bogolexer_static
@@ -140,21 +152,11 @@ done
 %{_bindir}/bogoutil_static
 %{_bindir}/bogoupgrade
 
-%{_sysconfdir}/bogofilter.cf.example
-%config(noreplace) %{_sysconfdir}/bogofilter.cf
-
 %{_mandir}/man1/bogofilter.1*
 %{_mandir}/man1/bogolexer.1*
 %{_mandir}/man1/bogotune.1*
 %{_mandir}/man1/bogoutil.1*
 %{_mandir}/man1/bogoupgrade.1*
-
-%doc AUTHORS CHANGES* COPYING INSTALL METHODS
-%doc NEWS README* RELEASE.NOTES* TODO UPGRADE
-%doc doc/bogofilter-tuning.HOWTO
-%doc doc/integrating*
-%doc doc/programmer
-%doc .inst/html .inst/xml
 
 %{_datadir}/%{name}/contrib-static/*
 
