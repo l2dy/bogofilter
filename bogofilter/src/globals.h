@@ -64,16 +64,6 @@ extern char msg_register[256];
 extern bool maintain;
 extern bool onlyprint;
 
-/* from fisher.h */
-#define ROBS		0.0178	/* Robinson's s */
-#define ROBX		0.52	/* Robinson's x */
-
-#define ROBX_W		".ROBX"
-
-#define MIN_DEV		0.375
-#define HAM_CUTOFF	0.00	/* 0.00 for two-state, 0.45 for three-state */
-#define SPAM_CUTOFF	0.99
-
 /*		    old     new
 **  robs            0.010   0.0178
 **  robx            0.415   0.52
@@ -82,6 +72,15 @@ extern bool onlyprint;
 **  ham_cutoff      0.00    0.00    (bi-state)
 **  ham_cutoff      0.10    0.45    (tri-state)
 */
+
+#define ROBS		0.0178	/* Robinson's s */
+#define ROBX		0.52	/* Robinson's x */
+
+#define ROBX_W		".ROBX"
+
+#define MIN_DEV		0.375
+#define HAM_CUTOFF	0.00	/* 0.00 for two-state, 0.45 for three-state */
+#define SPAM_CUTOFF	0.99
 
 extern	double robs;
 extern	double robx;
@@ -97,6 +96,6 @@ enum passmode { PASS_MEM, PASS_SEEK };
 extern enum passmode passmode;
 
 extern	bool	msg_count_file;
-extern	bool	unsure_stats;		/* true if print stats for unsures */
+extern	bool	unsure_stats;	/* true if print stats for unsures */
 
 #endif
