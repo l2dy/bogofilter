@@ -4,6 +4,14 @@
 
 $Id$
 
+0.12.2	2003-04-30
+
+	* Corrected bulkmode problem processing messages without
+          "^From " lines.
+	* Corrected alignment of wordprop_t which caused bus error
+          on risc.
+	* Added directory to 'Error creating directory' message.
+
 0.12.1	2003-04-25
 
 	* Corrected bad BOGOFILTER_DIR value in t.bulkmode
