@@ -222,7 +222,6 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>^(To|CC|From|Return-Path|Subject|Received):	{ set_tag(yytext); }
 <INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); return TOKEN; }
 
-<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); return HEADKEY; }
 <INITIAL>^(Delivery-)?Date:.*			{ return HEADKEY; }
 <INITIAL>^(Resent-)?Message-ID:.*		{ return HEADKEY; }
 <INITIAL>^(In-Reply-To|References):.* 		{ return HEADKEY; }

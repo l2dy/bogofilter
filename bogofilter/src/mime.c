@@ -154,12 +154,6 @@ mime_free (mime_t * t)
     t->charset = NULL;
   }
 
-  if (t->version)
-  {
-    xfree (t->version);
-    t->version = NULL;
-  }
-
   t->parent = NULL;
 }
 
@@ -398,21 +392,6 @@ getparam (char *t, char *e, const byte *param)
 }
 #endif
 
-void
-mime_version (word_t *text)
-{
-  size_t l;
-  char *w;
-
-  l = strlen("MIME-Version:");
-  w = (char *)getword(text->text + l, text->text + text->leng);
-
-  if (!w) return;
-
-  xfree(msg_state->version);
-  msg_state->version = w;
-}
-
 void 
 mime_content(word_t *text)
 {
@@ -617,6 +596,28 @@ mime_decode (word_t *text)
   }
 
   return count;
+}
+
+bool
+mime_validate (word_t *text)
+{
+  bool ok = true;
+
+  /* early out for the uninteresting cases */
+  if (msg_state->mime_encoding !=  MIME_QP &&
+      msg_state->mime_encoding !=  MIME_BASE64)
+      return ok;
+
+  /* Do not validate "real" boundary lines */
+  if (mime_is_boundary(text) == true)
+      return ok;
+
+  if (msg_state->mime_encoding == MIME_BASE64) {
+      if (text->leng > 4)
+	  ok = base64_validate(text);
+  }
+
+  return ok;
 }
 
 enum mimetype get_content_type(void)
