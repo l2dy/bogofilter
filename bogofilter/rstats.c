@@ -19,11 +19,11 @@ AUTHOR:
 #include "bogofilter.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
+#include "globals.h"
 
 extern int verbose;
 extern int Rtable;
 extern double min_dev;
-extern char *stats_prefix;
 
 typedef struct rstats_s rstats_t;
 struct rstats_s {

@@ -24,6 +24,8 @@ AUTHOR:
 
 #include "bogoconfig.h"
 
+const char progname[] = "configtest";
+
 #ifndef	DEBUG_CONFIG
 #define DEBUG_CONFIG(level)	(verbose > level)
 #endif

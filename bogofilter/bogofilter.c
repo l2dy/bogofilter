@@ -38,6 +38,7 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #include "lexer.h"
 #include "rstats.h"
 #include "wordhash.h"
+#include "globals.h"
 
 #include <assert.h>
 
@@ -69,7 +70,6 @@ extern double robx;
 extern char msg_register[];
 extern int Rtable;
 static double scalefactor;
-extern char *stats_prefix;
 
 static void initialize_constants(void);
 
@@ -542,14 +542,14 @@ static double compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errn
 		case 1:
 		    break;
 		case 2:
+		    assert(stats_prefix != NULL);
 		    fprintf(fp, "%s%f  %s\n", stats_prefix, pp->prob, pp->key);
 		    break;
 		case 3:
+		    assert(stats_prefix != NULL);
 		    fprintf(fp, "%s%f  %f  %s\n", stats_prefix, pp->prob, spamicity, pp->key);
 		    break;
 		default:
-		    assert(pp != NULL);
-		    assert(pp->key != NULL);
 		    assert(stats_prefix != NULL);
 		    fprintf(fp, "%s%f  %f  %f  %8.5e  %s\n", stats_prefix, pp->prob, product, invproduct, spamicity, pp->key);
 		    break;

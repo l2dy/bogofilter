@@ -52,7 +52,7 @@ const char *user_config_file   = "~/.bogofilter.cf";
 const char *spam_header_name = SPAM_HEADER_NAME;
 
 bool	stats_in_header = TRUE;
-const char *stats_prefix;
+const char *stats_prefix = "\t";
 
 run_t run_type = RUN_NORMAL; 
 algorithm_t algorithm = AL_GRAHAM;
@@ -271,7 +271,8 @@ void read_config_file(const char *filename, bool home_dir)
     (void)fclose(fp); /* we're just reading, so fclose should succeed */
     xfree(tmp);
 
-    stats_prefix= stats_in_header ? "\t" : "#    ";
+    if (! stats_in_header)
+	stats_prefix="# ";
     if (DEBUG_CONFIG(0))
 	fprintf( stderr, "stats_prefix: '%s'\n", stats_prefix );
 
