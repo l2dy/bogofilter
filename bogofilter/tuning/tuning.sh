@@ -11,13 +11,14 @@
 
 # range of values for testing
 
-svals="1 3.2e-1 1e-1 3.2e-2 1e-2"
-mvals=`seq 0.025 0.025 0.47501`		# wide value range 
+svals="3.2e-1 1e-1 3.2e-2 1e-2"
+mvals=`seq 0.025 0.025 0.45001`		# wide value range 
 #mvals=`seq 0.420 0.020 0.46001` 	# high value range
 
 # approx 0.1%-0.3% of nonspam corpus size for selecting spam_cutoff value
 
-target=24
+target=12
+export target
 
 # file names
 
