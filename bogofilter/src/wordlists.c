@@ -197,6 +197,8 @@ void open_wordlists(dbmode_t mode)
 		set_wordlist_mode(list->filepath);
 	    switch (wl_mode) {
 	    case WL_M_COMBINED:
+		if (db_cachesize < 4)
+		    db_cachesize = 4;
 		list->dbh = db_open(list->filepath, cCombined, aCombined, mode);
 		break;
 	    case WL_M_SEPARATE:
