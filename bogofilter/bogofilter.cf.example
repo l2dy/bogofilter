@@ -2,8 +2,8 @@
 
 # $Id$
 
-# Default settings (as defined in the bogofilter source code) have a
-# single hash mark starting their line.
+# Default settings (as defined in the bogofilter source code) 
+# have a single hash mark at the beginning of the line.
 
 # Alternate values have two hash marks.
 
@@ -189,6 +189,11 @@
 ## with Yes/No/Unsure output:
 ## ham_cutoff = 0.45
 ## spam_cutoff= 0.99
+
+#### Effective Size Factor Values
+#
+#ns_esf = 1.000
+#sp_esf = 1.000
 
 #### Auto-update threshold
 #
