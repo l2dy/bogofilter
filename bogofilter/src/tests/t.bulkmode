@@ -8,8 +8,8 @@
 #	 ./outputs - known correct outputs
 #		     esp. bulkmode.out
 #
-#	 bulkmode.YYYYMMDD:
-#		tests   - directory containing individual output files
+#	 ./bulkmode.YYYYMMDD:
+#		directory containing individual output files
 
 NODB=1 . ${srcdir=.}/t.frame
 
