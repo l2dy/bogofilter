@@ -322,11 +322,9 @@ void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double 
     ** If we're registering tokens, we needn't get .MSG_COUNT
     */
 
-    if (run_type & (RUN_NORMAL | RUN_UPDATE)) {
-	compute_msg_counts();
-	if (fabs(robs) < EPS)
-	    robs = ROBS;
-    }
+    compute_msg_counts();
+    if (fabs(robs) < EPS)
+	robs = ROBS;
 
     if (fabs(robx) < EPS && word_list->dsh != NULL)
     {

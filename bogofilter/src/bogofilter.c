@@ -74,6 +74,9 @@ rc_t bogofilter()
 
     wordhash_sort(wordhash);
 
+    if (run_register && passthrough)
+	register_words(run_type, wordhash, msgcount);
+
     spamicity = method->compute_spamicity(wordhash, NULL);
 
     status = method->status();

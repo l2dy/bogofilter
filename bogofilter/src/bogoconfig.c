@@ -293,20 +293,10 @@ static int validate_args(void)
 		      outfname);
     }
     
-    if (run_register && (run_classify || passthrough || nonspam_exits_zero || (Rtable != 0)))
+    if (run_register && (run_classify || (Rtable != 0)))
     {
-	(void)fprintf(stderr, 
-		      "Error:  Invalid combination of options.\n"
-		      "\n"
-		      "    Options '-p, '-e', '-u', and '-R' are used when classifying messages.\n"
-		      "    Options '-s', '-n', '-S', and '-N' are used when registering words.\n"
-		      "    The two sets of options may not be used together.\n"
-		      "    \n"
-#ifdef	GRAHAM_AND_ROBINSON
-		      "    Options '-g', '-r', '-l', '-d', '-x', and '-v' may be used with either mode.\n"
-#else
-		      "    Options '-l', '-d', '-x', and '-v' may be used with either mode.\n"
-#endif
+	(void)fprintf(stderr,
+		      "Error:  Option '-u' may not be used with options '-s', '-n', '-S', or '-N'.\n"
 	    );
 	return EX_ERROR;
     }
