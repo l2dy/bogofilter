@@ -1,5 +1,7 @@
 #! /bin/sh
 
-. ${srcdir:=.}/t.frame
+NODB=1 . ${srcdir:=.}/t.frame
 
-if (${srcdir}/t._abort junk arguments here) ; then exit 1 ; fi
+if (${srcdir}/t._abort junk arguments here) ; then 
+    exit 1
+fi
