@@ -40,6 +40,7 @@ void mime_reset(void);
 void mime_add_child(mime_t *parent);
 void mime_boundary_set(word_t *text);
 bool got_mime_boundary(word_t *text);
+void mime_content(word_t *text);
 void mime_type(word_t *text);
 void mime_version(word_t *text);
 size_t mime_decode(word_t *buff);
