@@ -30,20 +30,8 @@
 
 #undef	HAVE_CHARSET
 
-#ifndef	DISABLE_GRAHAM_METHOD
-#define	ENABLE_GRAHAM_METHOD
-#endif
-
-#ifndef	DISABLE_ROBINSON_METHOD
-#define	ENABLE_ROBINSON_METHOD
-#endif
-
 #if	defined(ENABLE_ROBINSON_METHOD) && defined(ENABLE_GRAHAM_METHOD)
 #define	GRAHAM_AND_ROBINSON
-#endif
-
-#ifndef	ENABLE_ROBINSON_FISHER
-#define	ENABLE_ROBINSON_FISHER
 #endif
 
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
