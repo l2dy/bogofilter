@@ -118,7 +118,7 @@ static void convert_internal_to_external(dsh_t *dsh, dsv_t *in_data, dbv_t *ex_d
 	cv[i++] = !dsh->is_swapped ? in_data->count[dsh->index] : swap_32bit(in_data->count[dsh->index]);
     }
 
-    if (datestamp_tokens || in_data->date != 0)
+    if (timestamp_tokens || in_data->date != 0)
 	cv[i++] = !dsh->is_swapped ? in_data->date : swap_32bit(in_data->date);
 
     ex_data->leng = i * sizeof(cv[0]);
@@ -237,7 +237,7 @@ int ds_write(void *vhandle, const word_t *word, dsv_t *val)
     ex_data.data = cv;
     ex_data.size = sizeof(cv);
 
-    if (datestamp_tokens || today != 0)
+    if (timestamp_tokens || today != 0)
 	val->date = today;
 
     for (dsh->index = 0; dsh->index < dsh->count; dsh->index++) {
@@ -362,7 +362,7 @@ void ds_get_msgcounts(void *vhandle, dsv_t *val)
 void ds_set_msgcounts(void *vhandle, dsv_t *val)
 {
     dsh_t *dsh = vhandle;
-    if (val->date == 0 && datestamp_tokens)
+    if (val->date == 0 && timestamp_tokens)
 	val->date = today;
     ds_write(dsh, msg_count_tok, val);
     return;

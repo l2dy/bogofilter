@@ -28,7 +28,7 @@ uint32_t thresh_count = 0;
 YYYYMMDD thresh_date  = 0;
 size_t	 size_min = 0;
 size_t	 size_max = 0;
-bool     datestamp_tokens = true;
+bool     timestamp_tokens = true;
 
 /* Function Prototypes */
 

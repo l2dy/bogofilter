@@ -13,7 +13,7 @@
 extern	uint32_t thresh_count;
 extern	YYYYMMDD thresh_date;
 extern	size_t   size_min, size_max;
-extern	bool     datestamp_tokens;
+extern	bool     timestamp_tokens;
 extern	bool     replace_nonascii_characters;
 
 /* Function Prototypes */
