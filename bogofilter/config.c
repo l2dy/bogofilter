@@ -75,6 +75,8 @@ const	char *stats_prefix;
 run_t run_type = RUN_NORMAL; 
 method_t *method = NULL;
 
+const char *logtag = NULL;
+
 enum algorithm_e {
 #ifdef ENABLE_GRAHAM_METHOD
     AL_GRAHAM='g',
@@ -440,7 +442,7 @@ int process_args(int argc, char **argv)
     int option;
     int exitcode;
 
-    while ((option = getopt(argc, argv, "d:ehlsnSNvVpuc:CgrRx:fqt" G R F)) != EOF)
+    while ((option = getopt(argc, argv, "d:ehl::o:snSNvVpuc:CgrRx:fqt" G R F)) != EOF)
     {
 	switch(option)
 	{
@@ -493,6 +495,8 @@ int process_args(int argc, char **argv)
 
 	case 'l':
 	    logflag = 1;
+	    if (optarg)
+		logtag = optarg;
 	    break;
 
 #ifdef	GRAHAM_AND_ROBINSON
@@ -538,6 +542,10 @@ int process_args(int argc, char **argv)
 
 	case 'C':
 	    suppress_config_file = true;
+	    break;
+
+	case 'o':
+	    spam_cutoff = atof( optarg );
 	    break;
 
 	case 't':
