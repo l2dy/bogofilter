@@ -21,6 +21,7 @@ David Relson <relson@osagesoftware.com>  2003
 #include <errno.h>
 #include <limits.h>
 
+#include "datastore.h"
 #include "datastore_db.h"
 
 #include "error.h"
@@ -325,6 +326,26 @@ int ds_foreach(void *vhandle, ds_foreach_t *hook, void *userdata)
     ds_data.data = userdata;
 
     ret = db_foreach(dsh, ds_hook, &ds_data);
+
+    return ret;
+}
+
+/* Wrapper for ds_foreach that opens and closes file */
+
+int ds_oper(const char *path, dbmode_t open_mode, 
+	    ds_foreach_t *hook, void *userdata)
+{
+    int  ret = 0;
+    void *dsh = ds_open(CURDIR_S, 1, &path, open_mode);
+
+    if (dsh == NULL) {
+	fprintf(stderr, "Can't open file %s\n", path);
+	exit(EX_ERROR);
+    }
+
+    ret = ds_foreach(dsh, hook, userdata);
+    if (ret)
+	ds_close(dsh, false);
 
     return ret;
 }

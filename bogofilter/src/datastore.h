@@ -70,7 +70,11 @@ typedef struct {
  * \p userdata is passed through to the hook function unaltered.
  */
 typedef int ds_foreach_t(word_t *token, dsv_t *data, void *userdata);
-int ds_foreach(void *, ds_foreach_t *hook, void *userdata);
+extern int ds_foreach(void *, ds_foreach_t *hook, void *userdata);
+
+/* Wrapper for ds_foreach that opens and closes file */
+extern int ds_oper(const char *path, dbmode_t open_mode, 
+		   ds_foreach_t *hook, void *userdata);
 
 /** Initialize database, open and lock files, etc.
  * params: char * path to database file, char * name of database

@@ -162,24 +162,6 @@ static int count_hook(word_t *key, dsv_t *data,
     return 0;
 }
 
-static int ds_oper(const char *path, dbmode_t open_mode, 
-		   ds_foreach_t *hook, void *userdata)
-{
-    int  ret = 0;
-    void *dsh = ds_open(CURDIR_S, 1, &path, open_mode);
-
-    if (dsh == NULL) {
-	fprintf(stderr, "Can't open file %s\n", path);
-	exit(EX_ERROR);
-    }
-
-    ret = ds_foreach(dsh, hook, userdata);
-    if (ret)
-	ds_close(dsh, false);
-
-    return ret;
-}
-
 static int dump_file(char *ds_file)
 {
     int rc;
@@ -451,7 +433,7 @@ static double compute_robx(dsh_t *dsh)
 	ds_foreach(dsh, robx_hook, &rh);
     }
     else {
-	dsh->index = IX_GOOD;	    /* robx needs count good tokens */
+	dsh->index = IX_GOOD;	    /* robx needs count of good tokens */
 	ds_foreach(dsh, count_hook, &rh);
 
 	dsh->index = IX_SPAM;	    /* and scores for spam spam tokens */
