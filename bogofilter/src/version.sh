@@ -11,10 +11,12 @@
 #	current date from the files. To parse, we need Perl 5 and
 #	the HTTP::Date module.
 #
-#	If that files, either because HTTP::Date is missing, Perl is
+#	If that fails, either because HTTP::Date is missing, Perl is
 #	missing or we're building outside the CVS working directory,
 #	we'll fall back to use the current date (GMT time zone) with
 #	hour precision.
+#
+#	On FreeBSD, HTTP::Date is part of the p5-libwww port.
 
 VERSION=$(grep define.VERSION config.h | awk '{print $3}' | tr -d '"')
 
