@@ -238,6 +238,9 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						  clr_tag();
 						  return EOH;
 						}
+
+<INITIAL><<EOF>>				{ return NONE; }
+
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
 						      BEGIN INITIAL;
 						      msg_header = true;
@@ -278,6 +281,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
 .						/* ignore character */
 \n						{ lineno += 1; clr_tag(); }
+<<EOF>>						{ return NONE; }
 %%
 
 void lexer_v3_init(FILE *fp)
