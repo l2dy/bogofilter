@@ -77,6 +77,7 @@ void rob_print_stats(FILE *fp)
 	rob_stats.s.spamicity > thresh_stats ||
 	rob_stats.s.spamicity > thresh_rtable)
 	rstats_print(unsure);
+    rstats_cleanup();
 }
 
 static void wordprob_add(wordcnts_t *cnts, uint count, uint bad)
@@ -228,7 +229,7 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 
     if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() begins\n");
 
-    need_stats = (Rtable || verbose || passthrough);
+    need_stats = Rtable || verbose || passthrough;
     Rtable |= verbose > 3;
 
     if (need_stats)

@@ -67,7 +67,8 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count);
 
 void rstats_init(void)
 {
-    current = (rstats_t *) xcalloc( 1, sizeof(rstats_t));
+    if (current == NULL)
+	current = (rstats_t *) xcalloc( 1, sizeof(rstats_t));
     header.list = current;
     header.count = 0;
     header.robn  = 0;
