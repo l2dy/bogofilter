@@ -129,7 +129,6 @@ static char *ds_file;
 static char *ds_path;
 
 static bool    bogolex = false;		/* true if convert input to msg-count format */
-static bool    force   = false;		/* force adherence to minimum message counts */
 static bool    esf_flag = true;		/* test ESF factors if true */
 static char   *bogolex_file = NULL;
 static word_t *w_msg_count;
@@ -825,7 +824,6 @@ static void help(void)
 		  "\t  -D      - don't read a wordlist file.\n"
 		  "\t  -d path - specify directory for wordlists.\n"
 		  "\t  -E      - disable ESF (effective size factor) tuning.\n"
-		  "\t  -F      - force tuning with fewer than %d messages.\n"
 		  "\t  -M      - output input file in message count format.\n"
 		  "\t  -r num  - specify robx value\n",
 		  LIST_COUNT);
@@ -871,9 +869,6 @@ static int process_arglist(int argc, char **argv)
 		case 'E':
 		    esf_flag ^= true;
 		    break;
-		case 'F':
-		    force ^= true;
-		    break;
 		case 'I':
 		    argc -= 1;
 		    bogolex_file = *++argv;
@@ -917,15 +912,6 @@ static int process_arglist(int argc, char **argv)
 	}
 	else
 	    filelist_add( (run_type == REG_GOOD) ? ham_files : spam_files, arg);
-    }
-
-    if (force && !quiet) {
-	fprintf(stderr, "*** WARNING ***  The authors of bogotune strongly advise\n");
-	fprintf(stderr, "against the use of the -F option.  The option bypasses\n");
-	fprintf(stderr, "bogotune's protective checks and allows bogotune to run\n");
-	fprintf(stderr, "without enough messages to ensure valid results.  This will\n");
-	fprintf(stderr, "often result in bogotune suggesting wrong parameter values\n");
-	fprintf(stderr, "that, if used, may significantly degrade bogofilter's accuracy.\n");
     }
 
     if (!bogolex && 
@@ -1312,7 +1298,7 @@ static bool check_msg_counts(void)
 {
     bool ok = true;
 
-    if (!force && (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT)) {
+    if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT)) {
 	QPRINTF(stderr, 
 		"The wordlist contains %d non-spam and %d spam messages.\n"
 		"Bogotune must be run with at least %d of each.\n",
@@ -1334,11 +1320,10 @@ static bool check_msg_counts(void)
 		"The messages sets contain %u non-spam and %u spam.  Bogotune "
 		"requires at least %d non-spam and %d spam messages to run.\n",
 		ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
-	if (!force)
-	    exit(EX_ERROR);
+	exit(EX_ERROR);
     }
 
-    return !force ? ok : true;
+    return ok;
 }
 
 static rc_t bogotune(void)
