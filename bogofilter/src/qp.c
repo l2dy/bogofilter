@@ -61,7 +61,7 @@ uint qp_decode(word_t *word)
 	if (ch == '=' && s + 2 <= e && 
 	    (y = hex_to_bin(s[0])) >= 0 && (x = hex_to_bin(s[1])) >= 0) {
 	    /* encoded character */
-	    ch = y << 4 | x;
+	    ch = (byte) (y << 4 | x);
 	    s += 2;
 	}
 	*d++ = ch;
@@ -82,7 +82,7 @@ static void qp_init(void)
 	return;
     first = false;
 
-    for (i = '!'; i <= '~'; i += 1) {
+    for (i = (byte) '!'; i <= '~'; i += 1) {
 	qp_xlate[i] = (byte) i;
     }
 

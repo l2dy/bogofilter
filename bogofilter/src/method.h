@@ -14,12 +14,14 @@
 
 typedef struct bogostat_s bogostat_t;
 
+#if	0
 typedef	void	m_initialize(void);
 typedef	double	m_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/;
 typedef	void	m_print_stats(FILE *fp);
 typedef	void	m_cleanup(void);
 typedef	double	m_spamicity(void);
 typedef	rc_t	m_status(void);
+#endif
 
 /*
 ** This defines an object oriented API for accessing 
@@ -29,12 +31,21 @@ typedef	rc_t	m_status(void);
 typedef struct method_s {
     const char		*name;
     const parm_desc	*config_parms;
+#if	1
+    void	(*initialize)(void);
+    double	(*compute_spamicity)(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/;
+    double	(*spamicity)(void);
+    rc_t	(*status)(void);
+    void	(*print_stats)(FILE *fp);
+    void	(*cleanup)(void);
+#else
     m_initialize	*initialize;
     m_compute_spamicity	*compute_spamicity;
     m_spamicity		*spamicity;		/* numeric */
     m_status		*status;		/* string - Yes, No, ... */
     m_print_stats	*print_stats;
     m_cleanup		*cleanup;
+#endif
 } method_t;
 
 extern method_t *method;

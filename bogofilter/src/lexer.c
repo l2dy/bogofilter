@@ -150,7 +150,7 @@ static int skip_spam_header(buff_t *buff)
 
 static int get_decoded_line(buff_t *buff)
 {
-    size_t used = buff->t.leng;
+    uint used = buff->t.leng;
     byte *buf = buff->t.text + used;
     int count = yy_get_new_line(buff);
 
@@ -180,7 +180,7 @@ static int get_decoded_line(buff_t *buff)
 	/*change buffer size only if the decoding worked */
 	if (decoded_count != 0 && decoded_count < (uint) count) {
 	    buff->t.leng -= (uint) (count - decoded_count);
-	    count = decoded_count;
+	    count = (int) decoded_count;
 	    if (DEBUG_LEXER(1)) 
 		lexer_display_buffer(buff);
 	}
@@ -189,7 +189,7 @@ static int get_decoded_line(buff_t *buff)
     /* CRLF -> NL */
     if (count >= 2 && memcmp((char *) buf + count - 2, CRLF, 2) == 0) {
 	count --;
-	*(buf + count - 1) = '\n';
+	*(buf + count - 1) = (byte) '\n';
     }
 
     if (buff->t.leng < buff->size)	/* for easier debugging - removable */
@@ -242,7 +242,7 @@ int yyinput(byte *buf, size_t max_size)
 
     while ((cnt = get_decoded_line(&buff)) != 0) {
 	count += cnt;
-	if ((count <= (MAXTOKENLEN * 1.5)) || not_long_token(buff.t.text, count))
+	if ((count <= (MAXTOKENLEN * 3 / 2)) || not_long_token(buff.t.text, count))
 	    break;
 
 	if (count >= MAXTOKENLEN * 2) {
@@ -274,12 +274,12 @@ size_t text_decode(word_t *w)
 	char *typ = strchr(txt+2, '?');		/* Encoding type - 'B' or 'Q' */
 	char *tmp = typ + 3;
 	char *end = strstr(tmp, "?=");		/* last char of encoded word  */
-	size_t len = end - tmp;
+	uint len = end - tmp;
 	bool copy;
 
 	n.text = (byte *)tmp;			/* Start of encoded word */
 	n.leng = len;				/* Length of encoded word */
-	n.text[n.leng] = '\0';
+	n.text[n.leng] = (byte) '\0';
 
 	if (DEBUG_LEXER(2)) {
 	    fputs("***  ", dbgout);

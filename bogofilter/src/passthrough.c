@@ -194,7 +194,7 @@ void write_message(rc_t status)
 	char buff[256];
 	/* print spam-status at the end of the header
 	 * then mark the beginning of the message body */
-	fcn(buff, sizeof(buff));
+	(*fcn)(buff, sizeof(buff));
 	fputs (buff, fpo);
 	fputs ("\n", fpo);
     }

@@ -271,7 +271,7 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     ** S = (P - Q) / (P + Q)                        [combined indicator]
     */
 
-    spamicity = ((rf_method_t *) method)->get_spamicity( robn, P, Q );
+    spamicity = (*((rf_method_t *)method)->get_spamicity)( robn, P, Q );
 
     if (robn && need_stats)
 	rstats_fini(robn, P, Q, spamicity );
@@ -356,7 +356,7 @@ void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double 
 	    robx = ROBX;
 	else {
 	    /* If found, unscale; else use predefined value */
-	    long l_robx = val.count[IX_SPAM];
+	    uint l_robx = val.count[IX_SPAM];
 	    robx = l_robx ? (double)l_robx / 1000000 : ROBX;
 	}
     }

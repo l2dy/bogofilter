@@ -274,5 +274,5 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count)
     }
 
     /* print trailer */
-    ((rf_method_t *)method)->print_summary();
+    (*((rf_method_t *)method)->print_summary)();
 }

@@ -76,7 +76,7 @@ token_t get_token(void)
 	yylval = word_new(NULL, 0);
 
     while (!done) {
-	cls = lexer->yylex();
+	cls = (*lexer->yylex)();
 	yylval->leng = (uint) *lexer->yyleng;
 	yylval->text = (unsigned char *)(*lexer->yytext);
 

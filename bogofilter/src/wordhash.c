@@ -240,7 +240,7 @@ wordhash_foreach (wordhash_t *wh, wh_foreach_t *hook, void *userdata)
     hashnode_t *hn;
 
     for (hn = wordhash_first(wh); hn != NULL; hn = wordhash_next(wh)) {
-	hook(hn->key, hn->buf, userdata);
+	(*hook)(hn->key, hn->buf, userdata);
     }
 
     return;
