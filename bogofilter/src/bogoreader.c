@@ -139,45 +139,45 @@ static st_t ismaildir(const char *dir) {
 
 static void dummy_fini(void) { }
 
-static reader_more_t *object_next_mailstore;
-static reader_more_t *object_next_mail = NULL;
+static reader_more_t *mailstore_next_store;
+static reader_more_t *mailstore_next_mail = NULL;
 
 /* this is the 'nesting driver' for our input.
- * object := one out of { mail, mbox, maildir }
- * if we have a current object-specific handle, check that if we have
- * further input in the object first. if we don't, see if we have
- * further objects to process
+ * mailstore := one of { mail, mbox, maildir }
+ * if we have a current mailstore-specific handle, check that if we have
+ * further input in the mailstore first. if we don't, see if we have
+ * further mailstores to process
  */
 static bool reader__next_mail(void)
 {
     for (;;) {
-	/* check object-specific method */
-	if (object_next_mail) {
-	    if ((*object_next_mail)()) /* more mails in the object */
+	/* check mailstore-specific method */
+	if (mailstore_next_mail) {
+	    if ((*mailstore_next_mail)()) /* more mails in the mailstore */
 		return true;
-	    object_next_mail = NULL;
+	    mailstore_next_mail = NULL;
 	}
 
-	/* ok, that one has been exhausted, try the next object */
+	/* ok, that one has been exhausted, try the next mailstore */
 
-	/* object_next_mailstore opens the object */
-	if (!object_next_mailstore())
+	/* mailstore_next_store opens the mailstore */
+	if (!mailstore_next_store())
 	    return NULL;
 
-	/* ok, we have more objects, so check if the current object has
+	/* ok, we have more mailstores, so check if the current mailstore has
 	 * input - loop.
 	 */
     }
 }
 
-/* open object (Maildir, mbox file or file with a single mail) and set
+/* open mailstore (Maildir, mbox file or file with a single mail) and set
  * _getline and _next_mail pointers dependent on what the obj is.
  *
  * - automatically detects maildir
  * - does not automatically distinguish between mbox and mail
  *   and takes mbox_mode instead
  */
-static bool open_object(char *obj)
+static bool open_mailstore(char *obj)
 {
     filename = obj;
     if (fpin) {
@@ -197,7 +197,7 @@ static bool open_object(char *obj)
 	    emptyline = false;
 	    mail_first = true;
 	    reader_getline   = mbox_mode ? mailbox_getline   : simple_getline;
-	    object_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
+	    mailstore_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
 	    return true;
 	}
 	break; /* not reached */
@@ -206,19 +206,19 @@ static bool open_object(char *obj)
 	    /* MAILDIR */
 	    maildir_init(filename);
 	    reader_getline   = simple_getline;
-	    object_next_mail = maildir_next_mail;
+	    mailstore_next_mail = maildir_next_mail;
 	    return true;
 	} else {
 	    /* MH */
 	    mh_init(filename);
 	    reader_getline   = simple_getline;
-	    object_next_mail = mh_next_mail;
+	    mailstore_next_mail = mh_next_mail;
 	    return true;
 	}
 	break; /* notreached */
     case IS_ERR:
     default:
-	fprintf(stderr, "Can't identify type of object '%s'\n", filename);
+	fprintf(stderr, "Can't identify type of mailstore '%s'\n", filename);
     }
     return false;
 }
@@ -230,7 +230,7 @@ static bool stdin_next_mailstore(void)
 {
     bool val = mailstore_first;
     reader_getline = mbox_mode ? mailbox_getline : simple_getline;
-    object_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
+    mailstore_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
     mailstore_first = false;
     return val;
 }
@@ -248,7 +248,7 @@ static bool b_stdin_next_mailstore(void)
     if (len > 0 && filename[len-1] == '\n')
 	filename[len-1] = '\0';
 
-    return open_object(filename);
+    return open_mailstore(filename);
 }
 
 /* this reads file names from the command line and processes them
@@ -257,7 +257,7 @@ static bool b_args_next_mailstore(void)
 {
     if (!*argv) return false;
     filename = *(argv++);
-    return open_object(filename);
+    return open_mailstore(filename);
 }
 
 /*** _next_mail functions ***********************************************/
@@ -531,15 +531,15 @@ void bogoreader_init(int _argc, char **_argv)
     switch (bulk_mode) {
     case B_NORMAL:		/* read mail (mbox) from stdin */
 	yy_file = fpin;
-	object_next_mailstore = stdin_next_mailstore;
+	mailstore_next_store = stdin_next_mailstore;
 	break;
     case B_STDIN:		/* '-b' - streaming (stdin) mode */
-	object_next_mailstore = b_stdin_next_mailstore;
+	mailstore_next_store = b_stdin_next_mailstore;
 	break;
     case B_CMDLINE:		 /* '-B' - command line mode */
 	argc = _argc;
 	argv = _argv;
-	object_next_mailstore = b_args_next_mailstore;
+	mailstore_next_store = b_args_next_mailstore;
 	break;
     default:
 	fprintf(stderr, "Unknown bulk_mode = %d\n", (int) bulk_mode);
