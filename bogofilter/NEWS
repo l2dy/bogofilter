@@ -39,10 +39,23 @@ Briefly:
 	  differing endian, dump and re-load the databases on a machine with
 	  same endian as the machine that created them.
 
+	2005-02-18
+
+	* Added code to auto-detect when a transaction environment
+          exists and act accordingly (if none of the enable/disable
+          options are specified in the config file or on the command
+          line).
+
 	2005-02-10
 
 	* Fixed problem causing SIGSEGV when using options "-p" and
           "-s" with multiple wordlists.
+
+	2005-02-09
+
+	* Environment variables BF_FORCE_TRANSACTIONAL and
+	  BF_FORCE_NON_TRANSACTIONAL can be used to enable/disable
+	  transactions.
 
 	2005-02-06
 
