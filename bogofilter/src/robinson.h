@@ -13,6 +13,9 @@
 
 #define ROBX_W			 ".ROBX"
 
+extern	bool	first_match;
+extern	bool	degen_enabled;
+
 typedef	double	rf_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
 typedef	void	rf_print_summary(void);
  
@@ -51,5 +54,8 @@ extern	rf_method_t rf_robinson_method;
 /* needed by fisher.c */
 extern	const	parm_desc rob_parm_table[];
 extern	void    rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double _spam_cutoff);
+
+/* needed by degen.c */
+extern double lookup_and_score(const word_t *token, wordprop_t *wordstats);
 
 #endif	/* ROBINSON_H */

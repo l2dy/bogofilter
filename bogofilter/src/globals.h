@@ -50,6 +50,11 @@ extern	bool	ignore_case;		/* -Pu,-PU */
 extern	bool	header_line_markup;	/* -Ph,-PH */
 extern	bool	tokenize_html_tags;	/* -Pt,-PT */
 extern	bool	tokenize_html_script;
+extern	bool	first_match;		/* -Pf,-PF - default: disabled */
+extern	bool	degen_enabled;		/* -Pd,-PD - default: disabled */
+#if	0
+extern	bool	separate_counts;	/* -Ps,-PS - default: enabled  */
+#endif
 
 extern	int	db_cachesize;
 

@@ -18,6 +18,7 @@ NAME:
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #include "datastore.h"
+#include "degen.h"
 #include "msgcounts.h"
 #include "robinson.h"
 #include "rstats.h"
@@ -113,7 +114,7 @@ static double wordprob_result(wordprop_t* wordstats)
     return (fw);
 }
 
-static double compute_probability(const word_t *token, wordprop_t *wordstats)
+double lookup_and_score(const word_t *token, wordprop_t *wordstats)
 {
     int override=0;
     wordlist_t* list;
@@ -155,7 +156,29 @@ static double compute_probability(const word_t *token, wordprop_t *wordstats)
 	}
     }
 
-    wordstats->prob=wordprob_result(wordstats);
+    if (wordstats->bad != 0 || wordstats->good != 0)
+	wordstats->prob = wordprob_result(wordstats);
+    else
+	if (!degen_enabled)
+	    wordstats->prob = wordprob_result(wordstats);
+	else
+	{
+	    degen_enabled = false;	/* Disable further recursion */
+	    wordstats->prob = degen(token, wordstats);
+	    degen_enabled = true;	/* Enable further recursion */
+	}
+
+    return wordstats->prob;
+}
+
+static double compute_probability(const word_t *token, wordprop_t *wordstats)
+{
+    if (wordstats->bad != 0 || wordstats->good != 0)
+	/* A msg-count file already has the values needed */
+	wordstats->prob = wordprob_result(wordstats);
+    else
+	/* Otherwise lookup the word and get its score */
+	wordstats->prob = lookup_and_score(token, wordstats);
 
     if (need_stats)
 	rstats_add(token, wordstats);

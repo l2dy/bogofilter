@@ -344,6 +344,14 @@ static void help(void)
 		  "\t      H   - disables header line tagging.\n"
 		  "\t      t   - enables  parsing of html tags 'a', 'font', and 'img' (default).\n"
 		  "\t      T   - disables parsing of html tags 'a', 'font', and 'img'.\n"
+		  "\t      d   - enables  token degeneration.\n"
+		  "\t      D   - disables token degeneration (default).\n"
+		  "\t      f   - enables  first degeneration match (default).\n"
+		  "\t      F   - enables  extreme score selection.\n"
+#if	0
+		  "\t      s   - enables  separate case-sensitive tokens. (default)\n"
+		  "\t      s   - enables  combined counts for related tokens.\n"
+#endif
 	);
     (void)fprintf(stderr,
 		  "\t  -M      - set mailbox mode.  Classify multiple messages in an mbox formatted file.\n"
@@ -724,6 +732,11 @@ void process_args_2(int argc, char **argv)
 		case 'i': case 'I': ignore_case        = *s == 'i';	break;	/* -Pi and -PI */
 		case 'h': case 'H': header_line_markup = *s == 'h'; 	break;	/* -Ph and -PH */
 		case 't': case 'T': tokenize_html_tags = *s == 't'; 	break;	/* -Pt and -PT */
+		case 'f': case 'F': first_match        = *s == 'f';	break;	/* -Pf and -PF */
+		case 'd': case 'D': degen_enabled      = *s == 'd';	break;	/* -Pd and -PD */
+#if	0
+		case 's': case 'S': separate_counts    = *s == 's';	break;	/* -Ps and -PS */
+#endif
 		default:
 		    fprintf(stderr, "Unknown parsing option -P%c.\n", *s);
 		    exit(EX_ERROR);

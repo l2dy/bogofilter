@@ -51,6 +51,11 @@ const char	*stats_prefix;
 bool	ignore_case = false;		/* -PI */
 bool	header_line_markup = true;	/* -Ph */
 bool	tokenize_html_tags = true;	/* -Pt */
+bool	degen_enabled = false;		/* -Pd,-PD - default: disabled */
+bool	first_match = true;		/* -Pf,-PF - default: enabled */
+#if	0
+bool	separate_counts = true;		/* -Ps,-PS - default: enabled  */
+#endif
 bool	tokenize_html_script = false;	/* -Ps - not yet in use */
 
 /* dual definition options */
