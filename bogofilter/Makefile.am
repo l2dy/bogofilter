@@ -26,7 +26,8 @@ AM_CFLAGS = -DBOGOFILTER
 # what to build
 bin_PROGRAMS = bogofilter bogoutil bogolexer 
 bin_SCRIPTS = bogoupgrade
-check_PROGRAMS = debugtest configtest wordhash find_home.test bogowordfreq
+check_PROGRAMS = debugtest configtest wordhash find_home.test \
+		 bogowordfreq fgetsl.test
 sysconf_DATA = bogofilter.cf.example
 
 noinst_LIBRARIES = libbogofilter.a
@@ -77,6 +78,9 @@ debugtest_SOURCES = debug.main.c
 wordhash_SOURCES = wordhash.main.c
 
 find_home_test_SOURCES = find_home.test.c
+
+fgetsl_test_SOURCES = fgetsl.c
+fgetsl_test_CFLAGS= -DMAIN
 
 # what to distribute
 EXTRA_DIST = bogofilter.cf.example \
