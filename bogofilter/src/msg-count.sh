@@ -72,19 +72,28 @@ then
     exit
 fi
 
-if [ "$1" = "formail" ] ; then
-    shift
-    ( echo .MSG_COUNT ; $BOGOLEXER -p "$@" | sort -u ) | \
-	$BOGOUTIL -w $BOGOFILTER_DIR | \
-	awk 'NF == 3 { printf( "\"%s\" %s %s\n", $1, $2, $3 ) } '
-elif [ ! -d "$1" ] ; then
-    formail -es "$0" formail "$@"
-else
-    DIR="$1"
-    shift
-    for f in $DIR/* ; do
-	( echo .MSG_COUNT ; $BOGOLEXER -p "$@" < $f | sort -u ) | \
+case $1 in
+    convert)
+	shift
+	( echo .MSG_COUNT ; $BOGOLEXER -p "$@" | sort -u ) | \
 	    $BOGOUTIL -w $BOGOFILTER_DIR | \
 	    awk 'NF == 3 { printf( "\"%s\" %s %s\n", $1, $2, $3 ) } '
-    done
-fi
+	;;
+
+    -*)
+	formail -es "$0" convert "$@"
+	;;
+
+    *)
+	if [ ! -d "$1" ] ; then
+	    formail -es "$0" convert "$@"
+	else
+	    DIR="$1"
+	    shift
+	    for f in $DIR/* ; do
+		msg-count.sh convert "$@" < $f
+	    done
+	fi
+	;;
+esac
+
