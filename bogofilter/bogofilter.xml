@@ -19,7 +19,7 @@
   <arg choice='opt'>-n</arg>
   <arg choice='opt'>-S</arg>
   <arg choice='opt'>-N</arg>
-  <arg choice='opt'>-d</arg>
+  <arg choice='opt'>-d <replaceable>dir</replaceable></arg>
   <arg choice='opt'>-p</arg>
   <arg choice='opt'>-e</arg>
   <arg choice='opt'>-u</arg>
@@ -78,29 +78,30 @@ and non-enclosure parts.</para>
 returns 1 if the message is non-spam, 0 if it is spam.  The non-spam
 wordfile is created if absent.</para>
 
-<para>The <option>-h</option> prints the help message and exits.</para>
+<para>The <option>-h</option> option prints the help message and exits.</para>
 
-<para>The <option>-s</option> tells <application>bogofilter</application>
+<para>The <option>-s</option> option tells <application>bogofilter</application>
 to register the text presented on standard input as spam.  The spam
 wordfile is created if absent.</para>
 
-<para>The <option>-n</option> tells
+<para>The <option>-n</option> option tells
 <application>bogofilter</application> to register the text presented
 on standard input as non-spam.</para>
 
-<para>The <option>-S</option> tells
+<para>The <option>-S</option> option tells
 <application>bogofilter</application> to register the text presented
 on standard input as spam and to undo a prior registration of the
 same message as non-spam.</para>
 
-<para>The <option>-N</option> tells
+<para>The <option>-N</option> option tells
 <application>bogofilter</application> to register the text presented
 on standard input as non-spam and to undo a prior registration of the
 same message as spam.</para>
 
-<para>The <option>-d</option> allows you to set the directory under
-which wordlists will be found (normally
-<filename>$HOME/.bogofilter</filename>).</para>
+<para>The <option>-d</option>&nbsp;<replaceable>dir</replaceable> option
+    allows you to set the directory under which wordlists will be found
+    to <replaceable>dir</replaceable>. If omitted,
+    <filename>$HOME/.bogofilter</filename> is assumed.</para>
 
 <para>The <option>-p</option> (passthrough) option writes a copy of
 the input mail to the output with an X-Spam-Status header (in the
