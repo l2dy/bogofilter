@@ -40,12 +40,17 @@ typedef int	dsm_i_i		(int open_mode);
 typedef int	dsm_i_pnvi	(DB_ENV *dbe, int ret);
 typedef int	dsm_i_pvi	(void *handle, int open_mode);
 typedef int	dsm_i_v		(void);
+typedef ex_t	dsm_x_pd	(bfdir *db_dir);
+typedef void	dsm_v_pc	(const char *str);
 typedef void	dsm_v_pbe	(dbe_t *env);
 typedef void	dsm_v_pnv	(DB_ENV *dbe);
 typedef void	dsm_v_pvuiui	(void *vhandle, u_int32_t numlocks, u_int32_t numobjs);
 typedef const char *dsm_pc_pc	(const char *db_file);
+typedef ex_t	dsm_x_pdbb	(bfdir *dir, bool, bool);
 typedef ex_t	dsm_x_pnvpd	(DB_ENV *dbe, bfdir *directory);
 typedef dbe_t  *dsm_pbe_pd	(bfdir *directory);
+typedef ex_t	dsm_x_pdpf	(bfdir *directory, bffile *db_file);
+typedef u_int32_t dsm_u_pdpf	(bfdir *directory, bffile *db_file);
 typedef DB_ENV *dsm_pnv_pdpf	(bfdir *directory, bffile *db_file);
 typedef DB_ENV *dsm_pnv_pbe	(dbe_t *env);
 
@@ -67,6 +72,12 @@ typedef struct {
     dsm_x_pnvpd	 *dsm_common_close;
     dsm_i_pnvi	 *dsm_sync;
     dsm_v_pnv	 *dsm_log_flush;
+    dsm_u_pdpf	 *dsm_pagesize;
+    dsm_x_pd	 *dsm_checkpoint;
+    dsm_x_pd	 *dsm_purgelogs;
+    dsm_x_pd	 *dsm_remove;
+    dsm_x_pdbb	 *dsm_recover;
+    dsm_x_pdpf	 *dsm_verify;
 } dsm_t;
 
 /** implementation internal type to keep track of databases

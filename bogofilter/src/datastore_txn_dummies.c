@@ -37,29 +37,28 @@ bool	  db_txn_durable = true;	/* not DB_TXN_NOT_DURABLE */
 
 dsm_t dsm_transactional = {
     /* public -- used in datastore.c */
-#ifdef ENABLE_SQLITE_DATASTORE
-    &db_txn_begin,
-    &db_txn_abort,
-    &db_txn_commit,
-#else
-    NULL,
-    NULL,
-    NULL,
-#endif
-
+    NULL,	/* dsm_begin           */
+    NULL,	/* dsm_abort           */
+    NULL,	/* dsm_commit          */
     /* private -- used in datastore_db_*.c */
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL
+    NULL,	/* dsm_env_init         */
+    NULL,	/* dsm_cleanup          */
+    NULL,	/* dsm_cleanup_lite     */
+    NULL,	/* dsm_get_env_dbe      */
+    NULL,	/* dsm_database_name    */
+    NULL,	/* dsm_recover_open     */
+    NULL,	/* dsm_auto_commit_flags*/                    
+    NULL,	/* dsm_get_rmw_flag     */
+    NULL,	/* dsm_lock             */
+    NULL,	/* dsm_common_close     */
+    NULL,	/* dsm_sync             */
+    NULL,	/* dsm_log_flush        */
+    NULL,	/* dsm_checkpoint       */
+    NULL,	/* dsm_pagesize         */
+    NULL,	/* dsm_purgelogs        */
+    NULL,	/* dsm_recover          */
+    NULL,	/* dsm_remove           */
+    NULL	/* dsm_verify           */
 };
 
 #ifndef ENABLE_SQLITE_DATASTORE
@@ -136,4 +135,3 @@ probe_txn_t probe_txn(bfdir *directory, bffile *file)
     (void) file;
     return P_DISABLE;
 }
-
