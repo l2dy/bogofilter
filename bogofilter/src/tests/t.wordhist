@@ -52,7 +52,7 @@ $BOGOFILTER $OPTS -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER $OPTS -n < ${SYSTEST}/inputs/good.mbx
 
 $BOGOUTIL -H $BOGOFILTER_DIR >$OUT
-$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db >${TMPDIR}/wordlist.txt
+$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.$DB_EXT >${TMPDIR}/wordlist.txt
 
 if  [ $verbose -eq 0 ]; then
     cmp $REF $OUT
