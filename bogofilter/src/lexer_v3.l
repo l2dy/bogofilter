@@ -55,12 +55,10 @@
  *    For example. `foo' in the Subject line becomes `subj:foo'.
 */
 
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <config.h>
 #include "common.h"
+
+#include <ctype.h>
+#include <stdlib.h>
 
 #include "buff.h"
 #include "charset.h"

@@ -51,8 +51,6 @@ int xfgetsl(char *buf, int max_size, FILE *s, int no_nul_terminate)
 }
 
 #ifdef MAIN
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <xmalloc.h>
 
