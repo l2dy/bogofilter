@@ -5,6 +5,14 @@
 NOTE: More information on important changes for bogofilters updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+0.16.1	2004-??-??
+
+	* Updated bogotune man page.
+	* Fixed minor errors in bogotune.
+	* Corrected memory leaks affecting bogotune.
+	* Added additional ifdefs for deprecated code.
+	* Added database histogram to bogoutil (using '-H' flag).
+
 0.16.0	2004-01-01
 
 	* Added "#ifdef ENABLE_DEPRECATED_CODE" statements as
