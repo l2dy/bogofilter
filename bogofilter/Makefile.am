@@ -17,16 +17,11 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 		bogofilter.cf.example \
 		bogofilter.spec bogofilter.spec.in \
 		METHODS Doxyfile gnugetopt \
-		CHANGES-0.10 README.cvs \
-		CHANGES-0.11 RELEASE.NOTES-0.11 \
-		CHANGES-0.12 RELEASE.NOTES-0.12 \
-		CHANGES-0.13 RELEASE.NOTES-0.13 \
-		CHANGES-0.14 RELEASE.NOTES-0.14 \
-		CHANGES-0.15 RELEASE.NOTES-0.15 \
-		CHANGES-0.16 RELEASE.NOTES-0.16 \
-		CHANGES-0.17 RELEASE.NOTES-0.17
+		README.cvs \
+		RELEASE.NOTES \
+		CHANGES-0.9x RELEASE.NOTES-0.92
 
-.PHONY:	rpm cvs-check
+.PHONY:	check
 
 rpm:	dist
 	rpm -ta $(distdir).tar.gz
@@ -42,9 +37,9 @@ cvs-check:
 # it will call rsync from its source directory to the destination for
 # each of them, running them in parallel
 rsync:	distdir .rsyncs
-	@( cat $(srcdir)/.rsyncs | sed -e 's}^}rsync -av --delete $(PACKAGE)-$(VERSION)/ }; s/\($$\)/ \&/;' ; echo "wait" ) | $(SHELL) -x
+	@( cat $(srcdir)/.rsyncs | sed -e 's}^}rsync -av -e ssh --delete $(PACKAGE)-$(VERSION)/ }; s/\($$\)/ \&/;' ; echo "wait" ) | $(SHELL) -x
 
 dist-hook:
 	cd $(distdir) && find doc gnugetopt gsl -name CVS -type d -prune -exec rm -r '{}' ';'
 	cd $(distdir) && find doc gnugetopt gsl -name '.#*' -type f -exec rm '{}' ';'
-	rm -f $(distdir)/doc/.cvsignore
+	rm -f $(distdir)/doc/.cvsignore $(distdir)/ChangeLog

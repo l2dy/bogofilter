@@ -24,6 +24,8 @@ void bogoreader_name(const char *name);
 
 /* Lexer-Reader Interface */
 
+extern	bool is_eol(const char *buf, size_t len);
+
 typedef int   reader_line_t(buff_t *buff);
 typedef bool  reader_more_t(void);
 typedef const char *reader_file_t(void);

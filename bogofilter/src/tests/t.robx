@@ -1,7 +1,5 @@
 #! /bin/sh
 
-set -e
-
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
 #	 robx.YYYYMMDD.  This is useful when something is different.
@@ -28,8 +26,8 @@ EOF
 
 OPTS="-c ${CONFIG} -y 0"
 
-$BOGOFILTER $OPTS -r -s < ${SYSTEST}/inputs/spam.mbx
-$BOGOFILTER $OPTS -r -n < ${SYSTEST}/inputs/good.mbx
+$BOGOFILTER $OPTS -s < ${SYSTEST}/inputs/spam.mbx
+$BOGOFILTER $OPTS -n < ${SYSTEST}/inputs/good.mbx
 
 if [ ! -z "$RUN_FROM_MAKE" ] ; then
     $BOGOUTIL -D -R $TMPDIR
@@ -45,8 +43,7 @@ fi
 
 RESULT=`$BOGOUTIL -w $TMPDIR .ROBX | $AWK '/.ROBX/ { print $2; }'`
 
-# v0.16.0 - Don't create token from "Received:"
-WANT="364391"
+WANT="366405"
 
 if [ "$RESULT" != "$WANT" ] ; then
     echo want: $WANT, have: $RESULT

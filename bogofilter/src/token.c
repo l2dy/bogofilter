@@ -29,6 +29,9 @@ AUTHOR:
 /* Local Variables */
 
 word_t *yylval = NULL;
+word_t *msg_addr = NULL;	/* First IP Address in Received: statement */
+word_t *msg_id   = NULL;	/* Message ID */
+word_t *queue_id = NULL;	/* Message's first queue ID */
 
 static token_t save_class = NONE;
 static word_t *ipsave = NULL;
@@ -39,6 +42,7 @@ static word_t *w_rtrn = NULL;	/* Return-Path: */
 static word_t *w_subj = NULL;	/* Subject:     */
 static word_t *w_recv = NULL;	/* Received:    */
 static word_t *w_head = NULL;	/* Header:      */
+static word_t *w_mime = NULL;	/* Mime:        */
 
 /* Global Variables */
 
@@ -46,6 +50,8 @@ bool block_on_subnets = false;
 
 static word_t *token_prefix = NULL;
 static word_t *nonblank_line = NULL;
+
+#define WFREE(n)  word_free(n); n = NULL/* Global Variables */
 
 /* Function Prototypes */
 
@@ -168,10 +174,63 @@ token_t get_token(void)
 	    }
 	    break;
 
+	case MESSAGE_ID:
+	    /* special token;  saved for formatted output, but not returned to bogofilter */
+	{
+	    size_t skip = 0;
+	    while (!isspace(yylval->text[skip]))
+		skip += 1;
+	    while (isspace(yylval->text[skip]))
+		skip += 1;
+	    yylval->leng -= skip;
+	    memmove(yylval->text, yylval->text+skip, yylval->leng);
+	    Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
+	    word_free(msg_id);
+	    msg_id = word_dup(yylval);
+	}
+	continue;
+
+	case QUEUE_ID:
+	    /* special token;  saved for formatted output, but not returned to bogofilter */
+	    if (queue_id == NULL) {
+		size_t skip = 0;
+		while (isspace(yylval->text[skip]))
+		    skip += 1;
+		if (memcmp(yylval->text+skip, "id", 2) == 0)
+		    skip += 2;
+		while (isspace(yylval->text[skip]))
+		    skip += 1;
+		yylval->leng -= skip;
+		memmove(yylval->text, yylval->text+skip, yylval->leng);
+		Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
+		word_free(queue_id);
+		queue_id = word_dup(yylval);
+	    }
+	    continue;
+
+	case MESSAGE_ADDR:
+	{
+	    /* trim brackets */
+	    yylval->leng -= 2;
+	    memmove(yylval->text, yylval->text+1, yylval->leng);
+	    Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
+	    /* if top level, no address, not localhost, .... */
+	    if (token_prefix == w_recv &&
+		msg_state == msg_state->parent && 
+		msg_addr == NULL &&
+		strcmp((char *)yylval->text, "127.0.0.1") != 0) {
+		/* Not guaranteed to be the originating address of the message. */
+		word_free(msg_addr);
+		msg_addr = word_dup(yylval);
+	    }
+	}
+
+	/*@fallthrough@*/
+
 	case IPADDR:
 	    if (block_on_subnets)
 	    {
-		const byte *prefix = (const byte *)"url:";
+		const byte *prefix = (wordlist_version >= IP_PREFIX) ? (const byte *)"ip:" : (const byte *)"url:";
 		size_t plen = strlen((const char *)prefix);
 		int q1, q2, q3, q4;
 		/*
@@ -197,6 +256,11 @@ token_t get_token(void)
 		yylval = ipsave;
 		save_class = IPADDR;
 		return (cls);
+	    }
+	    if (token_prefix != NULL) {
+		word_t *o = yylval;
+		yylval = word_concat(token_prefix, yylval);
+		word_free(o);
 	    }
 	    break;
 
@@ -270,7 +334,12 @@ void token_init(void)
 	w_subj = word_new((const byte *) "subj:", 0);	/* Subject:     */
 	w_recv = word_new((const byte *) "rcvd:", 0);	/* Received:    */
 	w_head = word_new((const byte *) "head:", 0);	/* Header:      */
+	w_mime = word_new((const byte *) "mime:", 0);	/* Mime:        */
     }
+
+    WFREE(msg_addr);
+    WFREE(msg_id);
+    WFREE(queue_id);
 
     return;
 }
@@ -300,7 +369,10 @@ void set_tag(const char *text)
 	token_prefix = w_from;		/* From: */
 	break;
     case 'h':
-	token_prefix = w_head;		/* Header: */
+	if (msg_state == msg_state->parent)
+	    token_prefix = w_head;	/* Header: */
+	else
+	    token_prefix = w_mime;	/* Mime:   */
 	break;
     case 'r':
 	if (tolower(text[2]) == 't')
@@ -320,8 +392,6 @@ void set_tag(const char *text)
     return;
 }
 
-#define WFREE(n)  word_free(n); n = NULL
-
 /* Cleanup storage allocation */
 void token_cleanup()
 {
@@ -333,4 +403,8 @@ void token_cleanup()
     WFREE(w_subj);
     WFREE(w_recv);
     WFREE(w_head);
+    WFREE(w_mime);
+    WFREE(msg_addr);
+    WFREE(msg_id);
+    WFREE(queue_id);
 }

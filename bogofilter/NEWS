@@ -2,17 +2,352 @@
 				BOGOFILTER NEWS
 			       =================
 
-NOTE: More information on important changes for bogofilters updaters
+NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
-0.17.?	2004-03-??
+	2004-09-21
+	* bogofilter can now be used with Berkeley DB 3.0 or 3.1 although this
+	  is not recommended. You should prefer 4.2 or 4.1 instead.
+	* Documentation on the write cache issue (recoverability of data bases)
+	  has been revised.
+
+	2004-09-13
+	* Updates doc/README.db with a section on the log file size and
+	  pointers to db_checkpoint and db_archive.
+
+	2004-09-03 (txn 2.1)
+	* The on-line crash detector would consider its own process a zombie,
+	  so all processes that lasted 30 s or longer would abort themselves
+	  after that period.
+
+	  This was particularly prominent with BerkeleyDB 4.1 with
+	  x86/gcc-assembly mutexes as this combination appears rather slow when
+	  facing lock contention, causing t.lock3 failure. BDB 4.1 compiled to
+	  use POSIX mutexes (where working) appears to be a lot faster in this
+	  situation.
+
+	2004-09-01 (txn 2.0)
+	* Hook up crash detection code. Bogofilter is now able to detect
+	  when recovery is necessary and should detect stalled data bases
+	  within 30 seconds.
+	  NOTE: this means if one process crashes all other processes
+	  accessing the same data base will abort with an error code.
+
+	  Stalled data bases happen when one process or the system crashes and
+	  doesn't have a chance to clear its locks.
+
+	  This code uses ideas from Matthias Andree and Pavel Kankovsky.
+
+	2004-08-23 (txn 1.1)
+	* Add -f and -F options to bogoutil (mnemonic: fix) to run data base
+	  recovery.
+	* Reimplement our own locking so that recovery and data base access
+	  don't collide and no two processes try running recovery at the same
+	  time.
+
+0.92.6	2004-08-22
+
+	* Revise "-QQ" output so it can be used (unchanged) in a
+          config file.
+	* Remove obsolete "--with-db" option from configure.ac
+
+0.92.5	2004-08-20
+
+	2004-08-17
+
+	* Expanded discussion of long options in bogofilter's man page.
+	* Merged files RELEASE.NOTES-0.1? into cumulative
+	  RELEASE.NOTES file.
+	* Removed files CHANGES-0.1? as they duplicate info in NEWS.
+
+	2004-08-16
+
+	* Added "-QQ" option to bogofilter to display extended
+          parameter list.
+
+	2004-08-15
+
+	* Documentation update.  Sample configure commands now use
+	  option --with-libdb-prefix rather than obsolete --with-db.
+	* Added "--wordlist" to bogofilter's help output.
+	* Minor clean-ups for bogofilter's help output.
+
+	2004-08-10
+
+	* Improve documentation of '-B' and '-y' options.
+	* Validate dates used with '-y'.
+	* Diagnose missing wordlist specification.
+
+	2004-08-07
+
+	* Cross reference man pages to one another.
+	* OS/2 compatibility changes (contributed by Yuri Dario).
+	* Removed obsolete test output files - degen.out,
+          combined.out, and separate.out
+
+0.92.4	2004-07-29 - Stable Release
+
+	* Warn on invalid options, rather than exit.
+
+0.92.3	2004-07-27
+
+	2004-07-19
+
+	* Revise enums and regression tests for new format characters
+	  %A, %I, %Q.
+
+	* Strip bogogrep_static executable to reduce binary rpm size.
+
+	2004-07-18
+
+	* Remove initialize() function in bogoconfig.c and use
+	  lexer_init() in lexer.c, which provides same functionality.
+
+0.92.2	2004-07-11
+
+	* Bugfix:  '%I' is now really the Message-ID,
+	* Feature: '%Q' is now the queue ID
+
+	2004-07-10
+
+	* Use an explicit inputs/outputs directory list to avoid shipping test
+	  files in those directories.
+
+	2004-07-08
+
+	* Miscellaneous cleanups, removed 'degen' code remainders.
+
+	2004-07-07
+
+	* Formatting character changes:
+	  '%A' is now the message's IP address.
+	  '%I' is now the message's ID.
+
+	* bogofilter-faq.html - corrected editting error that deleted
+	  "asian spam" question and added answer to "multi-user"
+	  question.
+
+	* Fix self-test suite ("make check") when bogofilter is compiled
+	  with QDBM or TDB as the data base engine.
+
+	2004-07-02
+
+	* The self-test suite now properly detects valgrind when
+	  make check VERBOSE=-x is used.
+
+	2004-07-01
+
+	* Convert a C99/C++ //-style comment to a /* C-style comment */
+
+	* Fix valgrind self test that still had an obsolete '-f' option.
+
+0.92.1	2004-07-01
+
+	* Remove 'g', 'r', and 'f' from bogofilter's OPTIONS list as
+	  there's only one scoring algorithm.
+
+	* Removed obsolete occurrences of '-g' and '-f' from
+	  regression tests.
+
+	2004-06-30
+
+	* Revised README file.
+
+	2004-06-29
+
+	* French version of FAQ updated.
+	* Rewrote code for identifying message's originating IP address.
+	* Changed name of variable 'ipaddr' to 'msgaddr'.
+	* Added t.msgaddr to regression test.
+
+	2004-06-27
+
+	* Fixed db_init/db_cleanup problems encountered with multiple
+	wordlists and concurrent data stores.
+
+0.92.0	2004-06-26 - Stable Release
+
+	* Added ESF options to bogofilter's man page.
+	* Revised man pages' description of multi-parameter options.
+
+	2004-06-25
+
+	* Fixed problem recognizing empty line ending of header in
+          files with CRLFs and X-Bogosity line as last header line.
+
+	2004-06-24
+
+	* Added ESF options to bogofilter's help message.
+
+	2004-06-22
+
+	* t.lock3 regression modified for solaris shell compatibility.
+
+0.91.4	2004-06-20
+
+	2004-06-19
+
+	* Fix abort during db_open (ds_open wasn't first calling
+          ds_init).
+	* Added regression test t.lock3 for this fix.
+	* Revise datastore and database levels so that each level
+          calls its own init() and cleanup() routines.
+
+0.91.3	2004-06-15
+
+	2004-06-14
+
+	* Added format specification '%I' to allow logging of the IP
+	  address from which an email was received.
+
+	2004-06-13
+
+	* Avoid "Invalid buffer size, exiting." problems by discarding
+	  text from an excessively long html tag.
+
+0.91.2	2004-06-11
+
+	* Bogofilter's creation of new wordlists now includes
+          .WORDLIST_VERSION token.
+	* Fix erroneous double opening of wordlists specified on
+          command line.
+	* Corrected tests so that "make check" passes with qdbm and
+          tdb.
+
+	2004-06-10
+
+	* Fix included GSL compile for compilers that do not support
+	  "extern inline", such as Compaq C V6.3.
+	* FAQ updated with info on multiple wordlists and ignore
+          lists.
+	* FAQ updated with info on building as non-root user.
+
+0.91.1	2004-06-04
+
+	2004-06-04
+
+	* Fix problem with not expanding tildes.
+	* Add DS_LOAD flag to distinguish between database creation by
+	  bogofilter and bogoutil so .WORDLIST_VERSION is only added
+	  by bogofilter.
+	* Modify regression tests to use bogoutil to create empty
+	  wordlists (as needed).
+
+	2004-05-30
+
+	* Fixed registration.  When multiple wordlists are specified,
+          registration is to first regular wordlist.
+	* Added regresstion test for multiple wordlists.
+
+	2004-05-29
+
+	* Distinguish open modes of READ, WRITE, and CREATE so
+	* bogofilter will include .WORDLIST_VERSION in new database.
+
+	2004-05-28
+
+	* Modify contrib scripts so they're sh compatible.
+	* Fix problem with not expanding tildes.
+
+	2004-05-23
+
+	* Use named constants for wordlist 'type' attribute.
+
+	2004-05-22
+
+	* Fix problem when bogofilter's home is a symlink.
+
+0.91.0	2004-05-22
+
+	* Miscellaneous cleanups for multiple wordlist code.
+	* Cleanup variable names in database open() code.
+	* Increase width of 'count' column for -vvv output.
+
+	2004-05-17
+
+	* Add ignore list capability.
+	* Revive and revise multiple wordlist code.
+
+0.90.0	2004-05-09
+
+	* Revised bogotune's parameter ranges for coarse scan.
+
+	2004-05-08
+
+	* Changed list address in FAQ to bogofilter.org
+
+	2004-05-05
+
+	* Added code for Robinson's Effective Size Factor (ESF) 
+	  to score.c, bogotune.c, bogofilter.cf.example, etc.
+	* Added '-E' options to bogotune to suppress ESF scan.
+
+	2004-05-02
+
+	* Remove unreferenced enum wl_e.
+	* Add .WORDLIST_VERSION meta symbol.
+	* Change subnet prefix from url: to ip:
+	* Add -u switch to bogoutil to do wordlist upgrade.
+	* Add regression test t.upgrade.subnet.prefix
+
+	2004-04-22
+
+	* Fixed configure's --enable-memdebug option.
+
+	2004-04-12
+
+	* Updated TODO list and procmailrc.example
+
+	2004-04-02
+
+	* Lower output precision for regression tests, by using %f
+          rather than %e, to mask differences between GSL versions.
+
+0.17.5	2004-04-01
+	2004-04-08 - Promoted to Stable Release
+
+	2004-03-31
+
+	* Change default parameters to the results of Greg's 300k ham
+	  and 300k spam bogotune run:
+
+		     robs     robx    min_dev  spam_co
+	      old  0.010000 0.415000 0.100000 0.950000
+	      new  0.017800 0.520000 0.375000 0.990000
+
+	2004-03-22
+
+	* Fix check for PGP signatures.
+
+0.17.4	2004-03-20
+
+	* Ignore data portion of PGP signatures.
+	* Use "mime:" (rather than "head:") to tag mime part headers.
+
+	2004-03-19
+
+	* Fix "Can't find '.MSG_COUNT'" problem in bogotune.
+	* Fix defect that continues decoding base64/qp after invalid chars.
+
+	2004-03-18
+
+	* Fix message reporting lack of config file.
+
+0.17.3	2004-03-17
+
+	2004-03-15
+	
+	* Warn if user specified config file doesn't exist.
+
+	2004-03-09
+
+	* Fix tagging of IPAddrs in header lines.
 
 	2004-03-04
 
-	* Switched from Berkeley DB Data Store to Berkeley DB
-	  Concurrent Data Store, which uses a "DB_ENV" BerkeleyDB
-	  environment and the BerkeleyDB Lock Manager.  This is
-	  documented in file doc/README.db.
+	* Added code to use Berkeley DB Concurrent Data Store, which
+	  uses a "DB_ENV" BerkeleyDB environment and the BerkeleyDB
+	  Lock Manager.  This is documented in file doc/README.db.
 
 	2004-03-03
 

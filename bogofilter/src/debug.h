@@ -10,6 +10,11 @@ NAME:
 #ifndef _DEBUG_H
 #define _DEBUG_H
 
+/* define FILE type */
+#include <stdio.h>
+/* define other types */
+#include "bftypes.h"
+
 #define	DEBUG_NONE	0
 
 #define	MASK_BIT(uc)	( 1 << (uc - 'A'))

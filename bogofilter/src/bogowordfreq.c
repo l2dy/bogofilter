@@ -53,6 +53,11 @@ static void print_wordlist (wordhash_t *h)
 
 int main(int argc, char **argv)
 {
+#ifdef __EMX__
+    _response (&argc, &argv);	/* expand response files (@filename) */
+    _wildcard (&argc, &argv);	/* expand wildcards (*.*) */
+#endif
+
     max_repeats=1;		/* set default value */
 
     if (argc >= 2) {
