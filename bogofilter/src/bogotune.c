@@ -686,7 +686,7 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
     int good = mode == REG_GOOD;
     int bad  = 1 - good;
 
-    bool divvy = ds_file == NULL && user_robx < EPS;
+    bool divvy = ds_file == NULL && user_robx < EPS && !msg_count_file;
 
     wordhash_t *train = ns_and_sp->train;
     mlhead_t *msgs = ns_or_sp->msgs;
