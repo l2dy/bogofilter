@@ -644,7 +644,7 @@ static int load_hook(word_t *key, dsv_t *data, void *userdata)
     tokenprop->cnts.bad = data->spamcount;
     tokenprop->cnts.good = data->goodcount;
 
-    if (strcmp((char *)key->text, ".MSG_COUNT") == 0)
+    if (word_cmps(key, ".MSG_COUNT") == 0)
 	set_msg_counts(data->goodcount, data->spamcount);
 
     return 0;
