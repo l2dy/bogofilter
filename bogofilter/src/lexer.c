@@ -315,6 +315,12 @@ size_t decode_text(word_t *w)
     n.leng = size -= enc + 3 - text + 2;;
     n.text[n.leng] = '\0';
 
+    if (DEBUG_LEXER(2)) {
+	fputs("***  ", dbgout);
+	word_puts(&n, 0, dbgout);
+	fputs("\n", dbgout);
+    }
+
     switch (tolower(enc[1])) {
     case 'b':
 	size = base64_decode(&n);
