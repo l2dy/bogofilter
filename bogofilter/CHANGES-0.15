@@ -35,7 +35,7 @@ $Id$
 
 	2003-11-15
 
-	* "<DOCTYPE HTML PUBLIC...>" is now recognized as starting
+	* "<!DOCTYPE HTML PUBLIC...>" is now recognized as starting
           html text.
 
 	2003-11-14

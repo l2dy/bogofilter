@@ -22,7 +22,7 @@ about retraining and the '-H' flag...
 * Lexer.c no longer discards X-Bogosity lines in rfc822 attachments.
 * Removed repetition counts in lexer for TOKEN and MIME_BOUNDARY
   patterns to reduce executable size.
-* "<DOCTYPE HTML PUBLIC...>" is now recognized as starting html text.
+* "<!DOCTYPE HTML PUBLIC...>" is now recognized as starting html text.
 * Several minor lexer bugs fixed.
 * Updated bogominitrain.pl to v1.4.2
 * TDB passes all checks again.
