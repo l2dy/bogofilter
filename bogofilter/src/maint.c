@@ -173,7 +173,7 @@ static int maintain_hook(word_t *key, word_t *data,
     else {
 	if (replace_nonascii_characters)
 	{
-	    byte *tmp = xstrdup(key->text);
+	    byte *tmp = (byte *)xstrdup((char *)key->text);
 	    if (do_replace_nonascii_characters(tmp, key->leng))
 	    {
 		db_delete(userdata, key);
