@@ -1,0 +1,26 @@
+#! /bin/sh
+# (C) 2004 Matthias Andree, GNU GPLv2
+
+# This script updates the bogofilter web directory on sourceforge.
+
+# Theory: check out everything into a staging directory, web,
+# then rsync the relevant part into htdocs
+
+set -e
+umask 02
+
+cd /home/groups/b/bo/bogofilter/web
+
+cmdpfx="cvs -d :pserver:anonymous@cvs1:/cvsroot/bogofilter"
+
+# check out
+$cmdpfx update
+for i in bogofilter-faq.html bogofilter-faq-fr.html ; do
+  $cmdpfx checkout -p -Dtomorrow bogofilter/doc/$i >$i
+done
+$cmdpfx checkout -p -Dtomorrow bogofilter/NEWS >NEWS
+
+# remove cruft and internal files
+rsync -av --delete ./ htdocs/ --delete-excluded \
+    --exclude CVS
+    --exclude README_BEFORE_EDITING
