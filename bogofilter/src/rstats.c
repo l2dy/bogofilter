@@ -82,6 +82,7 @@ void rstats_cleanup(void)
     for (p = header.list; p != NULL; p = q)
     {
       q = p->next;
+      xfree(p->token);
       xfree(p);
     }
     current = NULL;
@@ -140,13 +141,6 @@ void rstats_print(void)
     else
 	if (verbose==2)
 	    rstats_print_histogram(robn, rstats_array, count);
-
-    for (r= 0; r<count; r+=1)
-    {
-	cur = rstats_array[r];
-	xfree(cur->token);
-	xfree(cur);
-    }
 
     xfree(rstats_array);
 }
