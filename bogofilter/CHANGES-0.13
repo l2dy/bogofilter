@@ -1,0 +1,46 @@
+			       =================
+				BOGOFILTER NEWS
+			       =================
+
+$Id$
+
+0.13.0	2003-05-20
+
+	* Added file RELEASE.NOTES-0.13.  Read it!!!
+
+	* contrib/randomtrain and contrib/scramble can now process
+	  both mbox and maildir formats.
+
+	2003-05-19
+	* Remove incomplete RMAIL/Babyl-5 support.
+	* Added perl script contrib/mime.get.rfc822 to extract
+	  forwaded messages from with a message.
+
+	2003-05-18
+	* Changed parsing defaults to:								
+
+	  -PI	ignore_case		(default is disabled)
+	  -Ph	header_line_markup 	(default is ensabled)
+	  -Pt	tokenize_html_tags 	(default is enabled)
+
+	2003-05-17
+	* Added basic support for emacs RMAIL mailboxes.
+
+	2003-05-16
+	* Parsing code now recognizes money amounts, includes
+	  exclamation points in tokens, and allows tokenizing of html
+	  tags FONT, A, and IMG.
+
+	2003-05-15
+	* New parsing options (command line and config filee) for
+	  ignore_case (-Pi/-PI), header_line_markup (-Ph/-PH), and
+	  tokenize_html_tags (-Pt/-PT).
+	* Registration code modified to count unique tokens for each
+	  message and display the total of the counts.
+
+	2003-05-14
+	* Added 'bogo-what?' to FAQ.
+
+0.12.3	2003-05-10
+
+	* Final 0.12 release
