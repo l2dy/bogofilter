@@ -4,6 +4,21 @@
 
 $Id$
 
+     
+	2003-10-23
+
+	* Initial release of faster, C language version of bogotune.
+
+	2003-10-21
+
+	* Configure modified to better detect BerkeleyDB libs.
+	* Makefile modified to build bogolexer and bogoutil with fewer
+	  shared libs.
+
+	2003-10-19
+
+	* Added decoding of percent escaped characters in URLs.
+
 	2003-10-16
 
 	* English and french versions of bogofilter-faq.html revised.

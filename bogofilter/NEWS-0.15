@@ -4,15 +4,17 @@
 
 Be sure to read RELEASE.NOTES-0.15 ...
 
-2003-10-16
+2003-10-23
 
-* Tuning script doc/bogotune rewritten as C program.
-* Fix build problem in doc directory.
+* Script tuning/bogotune rewritten as C program.
+* Added decoding of percent escaped characters in URLs.
 * Fix initialization problem that prevents reading more than
   one msg-count file.
 * Initialize wordhash storage.
-* Refactored source code so bogolexer will build without datastore
-  code.
+* Configure modified to better detect BerkeleyDB libs.
+* Makefile modified to build bogolexer and bogoutil with fewer
+  shared libs.
+* Fix build problem in doc directory.
 * English and french versions of bogofilter-faq.html revised.
 
 0.15.7	2003-10-13
