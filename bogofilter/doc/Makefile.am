@@ -17,6 +17,7 @@ EXTRA_DIST = bogofilter.1in bogoutil.1in bogoupgrade.1in \
 	     bogofilter.htmlin bogoutil.htmlin bogoupgrade.htmlin \
 		bogolexer.htmlin \
 	     bogofilter-faq.html \
+	     bogofilter-tuning.HOWTO \
 	     bogofilter.xml bogoutil.xml bogoupgrade.xml bogolexer.xml \
 	     bogofilter-SA-2002-01 \
 	     integrating-with-qmail \
