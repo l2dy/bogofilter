@@ -24,12 +24,36 @@
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-#define	MIN_SLEEP	500l		/* .5 milliseconds */
-#define	MAX_SLEEP	2000000l	/* 2 seconds */
+#define	MIN_SLEEP	0.5e+3		/* .5 milliseconds */
+#define	MAX_SLEEP	2.0e+6		/* 2 seconds */
 
 wordlist_t *good_list;
 wordlist_t *spam_list;
 /*@null@*/ wordlist_t* word_lists=NULL;
+
+/* Function Prototypes */
+
+static void rand_sleep(double min, double max);
+
+/* Function Definitions */
+
+static void rand_sleep(double min, double max)
+{
+    static bool need_init = true;
+    struct timeval timeval;
+    long delay;
+
+    if (need_init) {
+	need_init = false;
+	gettimeofday(&timeval, NULL);
+	srand(timeval.tv_usec);
+    }
+    delay = min + ((max-min)*rand()/(RAND_MAX+1.0));
+    printf("%d\n", delay);
+    timeval.tv_sec  = delay / 1000000;
+    timeval.tv_usec = delay % 1000000;
+    select(0,NULL,NULL,NULL,&timeval);
+}
 
 /* returns -1 for error, 0 for success */
 static int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* path,
@@ -122,15 +146,7 @@ void open_wordlists(dbmode_t mode)
 		    /* F_SETLK can't obtain lock */
 		    case EAGAIN:
 		    case EACCES:
-			{
-			    struct timeval to;
-			    long delay = MIN_SLEEP + (long)
-				((MAX_SLEEP-MIN_SLEEP)*rand()/(RAND_MAX+1.0));
-
-			    to.tv_sec  = delay / 1000000;
-			    to.tv_usec = delay % 1000000;
-			    select(0,NULL,NULL,NULL,&to);
-			}
+			rand_sleep(MIN_SLEEP, MAX_SLEEP);
 			retry = 1;
 			break;
 		    default:
