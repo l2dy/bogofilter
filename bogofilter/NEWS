@@ -5,6 +5,20 @@
 NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+0.92.3	2004-07-27
+
+	2004-07-19
+
+	* Revise enums and regression tests for new format characters
+	  %A, %I, %Q.
+
+	* Strip bogogrep_static executable to reduce binary rpm size.
+
+	2004-07-18
+
+	* Remove initialize() function in bogoconfig.c and use
+	  lexer_init() in lexer.c, which provides same functionality.
+
 0.92.2	2004-07-11
 
 	* Bugfix:  '%I' is now really the Message-ID,

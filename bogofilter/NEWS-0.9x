@@ -2,6 +2,16 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.92.3	2004-07-27
+
+* Revise enums and regression tests for new format characters
+  %A, %I, %Q.
+
+* Strip bogogrep_static executable to reduce binary rpm size.
+
+* Remove initialize() function in bogoconfig.c and use
+  lexer_init() in lexer.c, which provides same functionality.
+
 0.92.2	2004-07-11
 
 * Use an explicit inputs/outputs directory list to avoid shipping test
