@@ -107,9 +107,6 @@ enum e_verbosity {
 const char *progname = "bogotune";
 char *ds_file;
 
-uint memdebug = 0;
-uint max_messages_per_mailbox = 0;
-
 extern double robx, robs;
 
 word_t *w_msg_count;
@@ -119,10 +116,6 @@ tunelist_t *ns_and_sp;
 tunelist_t *ns_msglists, *sp_msglists;
 
 flhead_t *spam_files, *ham_files;
-
-#ifdef	ENABLE_MEMDEBUG
-extern uint32_t dbg_trap_index;
-#endif
 
 typedef struct {
     uint cnt;
@@ -685,18 +678,6 @@ static int process_args(int argc, char **argv)
 		case 'v':
 		    verbose += 1;
 		    break;
-#ifdef	ENABLE_MEMDEBUG
-		case 'm':
-		    memtrace += 1;
-		    break;
-		case 'M': 
-		    memdebug += 1;
-		    if ( argv[1][0] != '-') {
-			argc -= 1;
-			dbg_trap_index=atoi(*++argv);
-		    }
-		    break;
-#endif
 		default:
 		    help();
 		    exit(EX_ERROR);
@@ -1043,8 +1024,6 @@ static rc_t bogotune(void)
     ham_cutoff = 0.0;
     spam_cutoff = 0.1;
 
-    if (memdebug) { MEMDISPLAY; }
-
     /* Note: memory usage highest while reading messages */
     /* usage decreases as distribute() converts to count format */
 
@@ -1058,17 +1037,11 @@ static rc_t bogotune(void)
 	show_elapsed_time(beg, end, ns_cnt + sp_cnt, (double)cnt/(end-beg), "messages", "msg/sec");
     }
 
-    if (memdebug) { MEMDISPLAY; }
-
     distribute(REG_SPAM, sp_msglists);
     distribute(REG_GOOD, ns_msglists);
 
-    if (memdebug) { MEMDISPLAY; }
-
     create_countlists(ns_msglists);
     create_countlists(sp_msglists);
-
-    if (memdebug) { MEMDISPLAY; }
 
     if (verbose && time(NULL) - end > 2) {
 	end = time(NULL);
@@ -1140,8 +1113,6 @@ static rc_t bogotune(void)
 
     if (!check_msg_counts())
 	exit(EX_ERROR);
-
-    if (memdebug) { MEMDISPLAY; }
 
     for (scan=0; scan <= 1; scan += 1) {
 	bool f;
@@ -1285,8 +1256,6 @@ static rc_t bogotune(void)
     if (ns_cnt >= TEST_COUNT && sp_cnt >= TEST_COUNT)	/* HACK */
     final_recommendations();
 
-    if (memdebug) { MEMDISPLAY; }
-
     return status;
 }
 
@@ -1320,8 +1289,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     bogotune();
 
     bogotune_free();
-
-    MEMDISPLAY;
 
     exit(exitcode);
 }
