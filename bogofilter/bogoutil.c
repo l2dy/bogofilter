@@ -241,11 +241,15 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     const char *head_format = !show_probability ? "%-20s %6s %6s\n"   : "%-20s %6s  %6s  %6s  %6s\n";
     const char *data_format = !show_probability ? "%-20s %6ld %6ld\n" : "%-20s %6ld  %6ld  %f  %f\n";
 
-    build_path(filepath, sizeof(filepath), dir, GOODFILE);
+    if (build_path(filepath, sizeof(filepath), dir, GOODFILE) < 0)
+	return 2;
+
     if ((dbh_good = db_open_and_lock_file(filepath, GOODFILE, DB_READ)) == NULL)
 	return 2;
 
-    build_path(filepath, sizeof(filepath), dir, SPAMFILE);
+    if (build_path(filepath, sizeof(filepath), dir, SPAMFILE) < 0)
+	return 2;
+
     if ((dbh_spam = db_open_and_lock_file(filepath, SPAMFILE, DB_READ)) == NULL)
 	return 2;
 
