@@ -10,6 +10,8 @@ idea to retrain or else use the '-H' (header tag degeneration) option.
 
 0.15.10	2003-12-08
 
+	* Important string format fixes that address "prints garbage" and
+	  "crashes" problems.
 	* Formatting and portability fixes for DGUX.
 	* The test suite ("make check") now works without formail for
 	  t.bulkmode.

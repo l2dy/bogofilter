@@ -166,7 +166,8 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
       ret = dpout(dbp, token->data, token->leng);
 
       if (ret == 0) {
-	  print_error(__FILE__, __LINE__, "(qdbm) dpout('%s'), err: %s",
+	  print_error(__FILE__, __LINE__, "(qdbm) dpout('%.*s'), err: %s",
+		  CLAMP_INT_MAX(token->leng),
 		      (char *)token->data, dperrmsg(dpecode));
 	  exit(EX_ERROR);
       }
@@ -192,8 +193,10 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 
     if (val->size < (unsigned)dsiz) {
 	print_error(__FILE__, __LINE__,
-		    "(qdbm) db_get_dbvalue( '%s' ), size error %d: %d",
-		    (char *)token->data, val->size, dsiz);
+		    "(qdbm) db_get_dbvalue( '%.*s' ), size error %lu: %lu",
+		    CLAMP_INT_MAX(token->leng),
+		    (char *)token->data, (unsigned long)val->size,
+		    (unsigned long)dsiz);
 	exit(EX_ERROR);
     }
 

@@ -356,8 +356,10 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
 	ret = dbp->del(dbp, NULL, &db_key, 0);
 
 	if (ret != 0 && ret != DB_NOTFOUND) {
-	    print_error(__FILE__, __LINE__, "(db) db_delete('%s'), err: %d, %s", 
-			(const char *) db_key.data, ret, db_strerror(ret));
+	    print_error(__FILE__, __LINE__, "(db) db_delete('%.*s'), err: %d, %s", 
+		    CLAMP_INT_MAX(db_key.size),
+		    (const char *) db_key.data,
+    		    ret, db_strerror(ret));
 	    exit(EX_ERROR);
 	}
     }
@@ -391,8 +393,9 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
     ret = dbp->get(dbp, NULL, &db_key, &db_data, 0);
 
     if (val->size < db_data.size) {
-	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%s' ), size error %lu::%lu",
-		    (char *)token->data, (unsigned long)val->size,
+	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%.*s' ), size error %lu::%lu",
+		    CLAMP_INT_MAX(token->size), (char *)token->data,
+		    (unsigned long)val->size,
 		    (unsigned long)db_data.size);
 	exit(EX_ERROR);
     }
