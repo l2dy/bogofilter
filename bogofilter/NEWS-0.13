@@ -1,9 +1,17 @@
 			       =================
 				BOGOFILTER NEWS
 			       =================
+
+0.13.6.2 2003-06-05
+ 
+* Don't allow square brackets in tokens.  Do allow dollar signs in
+  tokens in msg-count files.
+* Bogolexer now discards first 'From' token to match scoring behavior
+  of bogofilter.
+ 
 0.13.6.1 2003-06-05
  
-* Updated file tuning/README.
+* Updated file tuning/README and script tuning/tuning.sh.
  
 0.13.6	2003-06-04
  
