@@ -102,7 +102,6 @@ enum e_verbosity {
 const char *progname = "bogotune";
 char *ds_file;
 
-uint test = 0;
 uint memdebug = 0;
 uint max_messages_per_mailbox = 0;
 
@@ -685,9 +684,6 @@ static int process_args(int argc, char **argv)
 		case 's':
 		    run_type = REG_SPAM;
 		    break;
-		case 't':
-		    test += 1;
-		    break;
 		case 'v':
 		    verbose += 1;
 		    break;
@@ -1213,14 +1209,6 @@ static rc_t bogotune(void)
 		    score_ns(ns_scores);	/* scores in ascending order */
 		    qsort(ns_scores, ns_cnt, sizeof(double), compare_double);
 		    
-		    if (test && rsi == 0 && mdi == 0 && rxi == 0) {
-			printf("robx        = %8.6f (%8.2e)\n", robx, robx);
-			printf("robs        = %8.6f (%8.2e)\n", robs, robs);
-			printf("min_dev     = %8.6f (%8.2e)\n", min_dev, min_dev);
-			for (fp = 1; fp <= target+2; fp += 1)
-			    printf("%2d %8.6f %c\n", fp, ns_scores[ns_cnt - fp], fp <= target ? '+' : '-');
-		    }
-
 		    /* Determine spam_cutoff and false_pos */
 		    for (fp = target; fp < ns_cnt; fp += 1) {
 			spam_cutoff = ns_scores[ns_cnt - fp];
