@@ -53,9 +53,12 @@ EXTRA_DIST = \
 
 if ENABLE_XMLTO
 dist-hook:
-	@case "$(MFLAGS)" in *s*) : ;; *) echo >&2 "validating $(HTML_DOCS)" ;; esac
-	@( set -e ; for i in $(HTML_DOCS) ; do $(NSGMLS) -s $(srcdir)/$$i \
-	    || { echo >&2 "ERROR: $$i does not validate." ; exit 1 ; } ; done )
+	@if [ ! -f catalog ] ; then \
+	echo ; echo "Warning: 'catalog' file not present; see 'README.validation'". ; echo ; else \
+	case "$(MFLAGS)" in *s*) : ;; *) echo >&2 "validating $(HTML_DOCS)" ;; esac ; \
+	( set -e ; for i in $(HTML_DOCS) ; do $(NSGMLS) -s $(srcdir)/$$i \
+	    || { echo >&2 "ERROR: $$i does not validate." ; exit 1 ; } ; done ) ; \
+	fi
 
 # Use Perl to fix up br0ken 0xa0 characters that the XML DocBook style
 # sheets emit instead of "\ " for roff or "&nbsp;" for HTML,
