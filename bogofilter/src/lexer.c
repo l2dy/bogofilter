@@ -50,8 +50,8 @@ lexer_t msg_count_lexer = {
 
 /* Function Prototypes */
 static int yy_get_new_line(buff_t *buff);
-static int skip_spam_header(buff_t *buff);
 static int get_decoded_line(buff_t *buff);
+static int skip_folded_line(buff_t *buff);
 
 /* Function Definitions */
  
@@ -95,11 +95,11 @@ static int yy_get_new_line(buff_t *buff)
 	yylineno += 1;
 
     if (count == EOF) {
-	if (ferror(fpin)) {
+	if ( !ferror(fpin)) 
+	    return YY_NULL;
+	else {
 	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
 	    exit(EX_ERROR);
-	} else {
-	    return YY_NULL;
 	}
     }
 
@@ -119,9 +119,8 @@ static int yy_get_new_line(buff_t *buff)
     /* skip spam_header ("X-Bogosity:") lines */
     while (msg_header
 	   && count != EOF
-	   && memcmp(buff->t.text,spam_header_name,hdrlen) == 0)
-    {
-	count = skip_spam_header(buff);
+	   && memcmp(buff->t.text,spam_header_name,hdrlen) == 0) {
+	count = skip_folded_line(buff);
     }
 
     /* Also, save the text on a linked list of lines.
@@ -135,20 +134,6 @@ static int yy_get_new_line(buff_t *buff)
     return count;
 }
 
-static int skip_spam_header(buff_t *buff)
-{
-    while (true) {
-	int count;
-	buff->t.leng = 0;		/* discard X-Bogosity line */
-	count = reader_getline(buff);
-	yylineno += 1;
-	if (count <= 1 || !isspace(buff->t.text[0])) 
-  	    return count;
-    }
-
-    return EOF;
-}
-  
 static int get_decoded_line(buff_t *buff)
 {
     uint used = buff->t.leng;
@@ -156,11 +141,11 @@ static int get_decoded_line(buff_t *buff)
     int count = yy_get_new_line(buff);
 
     if (count == EOF) {
-	if (ferror(fpin)) {
+	if ( !ferror(fpin)) 
+	    return YY_NULL;
+	else {
 	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
 	    exit(EX_ERROR);
-	} else {
-	    return YY_NULL;
 	}
     }
 
@@ -170,7 +155,7 @@ static int get_decoded_line(buff_t *buff)
 	fprintf(dbgout, "\n");
     }
 
-    if ( ! msg_header && msg_state->mime_type != MIME_TYPE_UNKNOWN)
+    if ( !msg_header && msg_state->mime_type != MIME_TYPE_UNKNOWN)
     {
 	word_t line;
 	uint decoded_count;
@@ -199,6 +184,20 @@ static int get_decoded_line(buff_t *buff)
     return count;
 }
 
+static int skip_folded_line(buff_t *buff)
+{
+    while (true) {
+	int count;
+	buff->t.leng = 0;
+	count = reader_getline(buff);
+	yylineno += 1;
+	if (count <= 1 || !isspace(buff->t.text[0])) 
+  	    return count;
+    }
+
+    return EOF;
+}
+  
 int buff_fill(buff_t *buff, size_t used, size_t need)
 {
     int cnt = 0;
@@ -221,7 +220,7 @@ void yyinit(void)
 {
     yylineno = 0;
 
-    if (!msg_count_file)
+    if ( !msg_count_file)
 	lexer = &v3_lexer;
 }
 
