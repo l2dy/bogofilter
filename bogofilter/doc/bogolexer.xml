@@ -37,8 +37,8 @@
        print just the tokens read from stdin, without any extra messages.
     </para>
     <para>
-	The <option>-q</option> option tells
-	<application>bogolexer</application> to print a token count,
+	The <option>-q</option> option tells <application>bogolexer</application>
+	to print a token count,
 	without printing the actual tokens.  </para>
     <para>The <option>-h</option> option prints the help message and exits.</para>
     <para>The <option>-n</option> option tells bogolexer to map
