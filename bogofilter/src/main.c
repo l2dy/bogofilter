@@ -49,6 +49,13 @@ size_t msg_register_size = sizeof(msg_register);
 
 const char *progname = "bogofilter";
 
+/* Function Prototypes */
+
+static void write_log_message(void);
+static void write_message(FILE *fp);
+
+/* Function Definitions */
+
 static void cleanup_exit(int exitcode, int killfiles) {
     if (killfiles && outfname[0] != '\0') unlink(outfname);
     exit(exitcode);
@@ -99,70 +106,12 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	    {
 		double spamicity;
 		rc_t   status = bogofilter(&spamicity);
-		textdata_t *text = textblocks->head;
 
-		if (passthrough)
-		{
-		    /* print headers */
-		    while (text->next)
-		    {
-			if ((text->size == 1 && memcmp(text->data, NL, 1) == 0) ||
-			    (text->size == 2 && memcmp(text->data, CRLF, 2) == 0))
-			    break;
-
-			(void) fwrite(text->data, 1, text->size, out);
-			if (ferror(out)) cleanup_exit(2, 1);
-			text=text->next;
-		    }
-		}
-
-		if (passthrough || verbose)
-		{
-		    typedef char *formatter(char *buff, size_t size);
-		    formatter *fcn = terse ? format_terse : format_header;
-		    char buff[256];
-		    /* print spam-status at the end of the header
-		     * then mark the beginning of the message body */
-		    fcn(buff, sizeof(buff));
-		    fputs (buff, out);
-		    fputs ("\n", out);
-		}
-
-		if (verbose || passthrough || Rtable)
-		{
-		    if (! stats_in_header)
-			(void)fputs("\n", stdout);
-		    verbose += passthrough;
-		    print_stats( stdout );
-		    verbose -= passthrough;
-		}
-
-		if (passthrough)
-		{
-		    /* If the message terminated early (without body or blank
-		     * line between header and body), enforce a blank line to
-		     * prevent anything past us from choking. */
-		    if (!text->data)
-			(void)fputs("\n", out);
-
-		    /* print body */
-		    while (text->next)
-		    {
-			(void) fwrite(text->data, 1, text->size, out);
-			if (ferror(out)) cleanup_exit(2, 1);
-			text=text->next;
-		    }
-
-		    if (fflush(out) || ferror(out) || (out != stdout && fclose(out))) {
-			cleanup_exit(2, 1);
-		    }
-		}
+		write_message(out);
 
 		exitcode = (status == RC_SPAM) ? 0 : 1;
 		if (nonspam_exits_zero && passthrough && exitcode == 1)
 		    exitcode = 0;
-
-		format_log_header(msg_bogofilter, sizeof(msg_bogofilter));
 	    }
 	    break;
 	default:
@@ -175,29 +124,96 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     close_wordlists(false);
     free_wordlists();
 
-#ifdef HAVE_SYSLOG_H
     if (logflag)
-    {
-	openlog("bogofilter", LOG_PID, LOG_MAIL);
-
-	switch (run_type)
-	{
-	case RUN_NORMAL:
-	    syslog(LOG_INFO, "%s\n", msg_bogofilter);
-	    break;
-	case RUN_UPDATE:
-	    syslog(LOG_INFO, "%s, %s\n", msg_bogofilter, msg_register);
-	    break;
-	default:
-	    syslog(LOG_INFO, "%s", msg_register);
-	    break;
-	}
-
-	closelog();
-    }
-#endif
+	write_log_message();
 
     exit(exitcode);
+}
+
+static void write_message(FILE *fp)
+{
+    textdata_t *text = textblocks->head;
+
+    if (passthrough)
+    {
+	/* print headers */
+	while (text->next)
+	{
+	    if ((text->size == 1 && memcmp(text->data, NL, 1) == 0) ||
+		(text->size == 2 && memcmp(text->data, CRLF, 2) == 0))
+		break;
+
+	    (void) fwrite(text->data, 1, text->size, fp);
+	    if (ferror(fp)) cleanup_exit(2, 1);
+	    text=text->next;
+	}
+    }
+
+    if (passthrough || verbose)
+    {
+	typedef char *formatter(char *buff, size_t size);
+	formatter *fcn = terse ? format_terse : format_header;
+	char buff[256];
+	/* print spam-status at the end of the header
+	 * then mark the beginning of the message body */
+	fcn(buff, sizeof(buff));
+	fputs (buff, fp);
+	fputs ("\n", fp);
+    }
+
+    if (verbose || passthrough || Rtable)
+    {
+	if (! stats_in_header)
+	    (void)fputs("\n", stdout);
+	verbose += passthrough;
+	print_stats( stdout );
+	verbose -= passthrough;
+    }
+
+    if (passthrough)
+    {
+	/* If the message terminated early (without body or blank
+	 * line between header and body), enforce a blank line to
+	 * prevent anything past us from choking. */
+	if (!text->data)
+	    (void)fputs("\n", fp);
+
+	/* print body */
+	while (text->next)
+	{
+	    (void) fwrite(text->data, 1, text->size, fp);
+	    if (ferror(fp)) cleanup_exit(2, 1);
+	    text=text->next;
+	}
+
+	if (fflush(fp) || ferror(fp) || (fp != stdout && fclose(fp))) {
+	    cleanup_exit(2, 1);
+	}
+    }
+}
+
+static void write_log_message(void)
+{
+#ifdef HAVE_SYSLOG_H
+    openlog("bogofilter", LOG_PID, LOG_MAIL);
+
+    format_log_header(msg_bogofilter, sizeof(msg_bogofilter));
+
+    switch (run_type)
+    {
+    case RUN_NORMAL:
+	syslog(LOG_INFO, "%s\n", msg_bogofilter);
+	break;
+    case RUN_UPDATE:
+	syslog(LOG_INFO, "%s, %s\n", msg_bogofilter, msg_register);
+	break;
+    default:
+	syslog(LOG_INFO, "%s", msg_register);
+	break;
+    }
+
+    closelog();
+#endif
 }
 
 /* End */
