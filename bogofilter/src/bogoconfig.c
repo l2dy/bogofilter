@@ -272,7 +272,7 @@ static int validate_args(void)
 		      outfname);
     }
     
-    if (run_register && (run_classify || (Rtable != 0)))
+    if (run_register && (run_classify || Rtable))
     {
 	(void)fprintf(stderr,
 		      "Error:  Option '-u' may not be used with options '-s', '-n', '-S', or '-N'.\n"
