@@ -511,18 +511,15 @@ esac
 
 # Note the \\\\ for backslashes.  Autoconf eats one layer, leaving \\
 
-/* Generated automatically by configure */
-/* These are here to be redefined by handcrafted src/config.h. */
-
 AC_DEFINE( CURDIR_S, ".", [Define current directory])
 AC_DEFINE( EXTSEP_S, ".", [Define extension separator])
 
 if test "$have_dosish_system" = no; then
-AC_DEFINE( DIRSEP_C, '/', [Define directory separator (as character)])
-AC_DEFINE( DIRSEP_S, "/", [Define directory separator (as string)])
+AC_DEFINE( DIRSEP_C, '/', [Define directory separator])
+AC_DEFINE( DIRSEP_S, "/", [Define directory separator])
 else
-AC_DEFINE( DIRSEP_C, '\\\\', [Define directory separator (as character)])
-AC_DEFINE( DIRSEP_S, "\\\\", [Define directory separator (as string)])
+AC_DEFINE( DIRSEP_C, '\\\\', [Define directory separator])
+AC_DEFINE( DIRSEP_S, "\\\\", [Define directory separator])
 fi
 
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
