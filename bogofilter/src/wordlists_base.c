@@ -13,40 +13,59 @@
 bool	config_setup = false;
 
 static wordlist_t *free_wordlist(wordlist_t *list);
-static bool	    dup_wordlist(wordlist_t *a, wordlist_t *b);
 
-/* Default wordlist mode is now wordlist.db -
-   a single wordlist containing ham and spam tokens */
-
+/** priority queue of wordlists, ordered by their "override" parameter */
 /*@null@*/ wordlist_t* word_lists=NULL;
 
-/* returns -1 for error, 0 for success */
+/** Check if wordlist nodes \a a and \a b have the same type, override,
+ * listname and filepath, \returns true if these parameters match in
+ * either list node. */
+static bool is_dup_wordlist(wordlist_t *a, wordlist_t *b)
+{
+    if (a->type != b->type)
+	return false;
+
+    if (a->override!= b->override)
+	return false;
+
+    if (strcmp(a->listname, b->listname) != 0)
+	return false;
+
+    if (strcmp(a->filepath, b->filepath) != 0)
+	return false;
+
+    return true;
+}
+
 void init_wordlist(const char* name, const char* path,
 		   int override, WL_TYPE type)
 {
     wordlist_t *n = (wordlist_t *)xcalloc(1, sizeof(*n));
     wordlist_t *list_ptr;
-    static int listcount;
 
-    n->dsh=NULL;
+    /* initialize list node */
+    n->dsh     =NULL;
     n->listname=xstrdup(name);
     n->filepath=xstrdup(path);
-    n->index   =++listcount;
     n->type    =type;
     n->next    =NULL;
     n->override=override;
 
+    /* rest of this code: enqueue in the right place */
+
+    /* initialize iterator */
     list_ptr=word_lists;
 
     if (list_ptr == NULL ||
 	list_ptr->override > override) {
+	/* prepend to list */
 	n->next=word_lists;
 	word_lists=n;
 	return;
     }
 
     while(1) {
-	if (dup_wordlist(n, list_ptr)) {
+	if (is_dup_wordlist(n, list_ptr)) {
 	    free_wordlist(n);
 	    return;
 	}
@@ -66,26 +85,6 @@ void init_wordlist(const char* name, const char* path,
 	list_ptr=list_ptr->next;
     }
 }
-
-static bool dup_wordlist(wordlist_t *a, wordlist_t *b)
-{
-    if (a->type != b->type)
-	return false;
-
-    if (a->override!= b->override)
-	return false;
-
-    if (strcmp(a->listname, b->listname) != 0)
-	return false;
-
-    if (strcmp(a->filepath, b->filepath) != 0)
-	return false;
-
-    return true;
-}
-
-
-/* Set default wordlist for registering messages, finding robx, etc */
 
 wordlist_t *default_wordlist(void)
 {
