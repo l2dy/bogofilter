@@ -497,10 +497,18 @@ void init_charset_table(const char *charset_name, bool use_default)
 /* like set_charset() but charset is in form blabla="CharsetName" */
 void got_charset(const char *charset)
 {
-    char *t = strchr(charset, '=') + 1;
-    bool q = *t == '"';
+    set_charset(strchr(charset, '=') + 1);
+}
+
+/* like got_charset() but charset is pure charset name */
+void set_charset(const char *charset)
+{
+    char *t = (char *) charset;
     char *s, *d;
+    bool q = *t == '"';
+
     t = xstrdup( t + q);
+
     for (s = d = t; *s != '\0'; s++)
     {
 	char c = tolower(*s);	/* map upper case to lower */
@@ -516,36 +524,11 @@ void got_charset(const char *charset)
     *d++ = '\0';
     if (DEBUG_CONFIG(0))
 	fprintf(dbgout, "got_charset( '%s' )\n", t);
-/*
-    init_charset_table( t, false ); // bf default
-*/
-    init_charset_table( t, true );
-    xfree(t);
-}
-
-/* like got_charset() but charset is pure charset name */
-void set_charset(const char *charset)
-{
-    char *t;
-    char *s, *d;
-    t = xstrdup( charset);
-    for (s = d = t; *s != '\0'; s++)
-    {
-       char c = tolower(*s);	/* map upper case to lower */
-       if (c == '_')		/* map underscore to dash */
-	c = '-';
-       if (c == '-' &&		/* map "iso-" to "iso"     */
-	   memcmp(t, "iso", 3) == 0)
-	   continue;
-       *d++ = c;
-    }
-    *d++ = '\0';
-    if (DEBUG_CONFIG(0))
-       fprintf(dbgout, "got_charset( '%s' )\n", t);
-/*
+#ifndef	CP866
     init_charset_table( t, false ); //bf default
-*/
+#else
     init_charset_table( t, true );
+#endif
     xfree(t);
 }
 
