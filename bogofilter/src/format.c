@@ -56,6 +56,8 @@ const char *spam_subject_tag = NULL;			/* used in passthrough mode */
 **
 **	    c - classification, e.g. Yes/No, Spam/Ham/Unsure, +/-/?
 **
+**	    D - date, fixed ISO-8601 format for Universal Time ("GMT")
+**
 **	    e - spamicity as 'e' format
 **	    f - spamicity as 'f' format
 **	    g - spamicity as 'g' format
@@ -170,6 +172,20 @@ static bool set_spamicity_formats(const unsigned char *val)
 {
     bool ok = set_spamicity_fields(spamicity_formats, (const char *)val);
     return ok;
+}
+
+static size_t format_date(char *dest, const char *destend)
+{
+    struct tm *tm;
+    time_t t;
+    size_t l;
+
+    time(&t);
+    tm = gmtime(&t);
+    l = strftime(dest, destend - dest - 1, "%Y-%m-%dT%H:%M:%SZ", tm);
+    if (l + 1 >= destend - dest) /* sanitize return */
+	l = 0;
+    return l;
 }
 
 static size_t format_float(char *dest, double src, 
@@ -336,6 +352,12 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 		buff += format_spamicity(buff, f, spamicity, end);
 		break;
 	    }
+	    case 'D':		/* D - date in ISO8601 format for GMT time zone */
+	    {
+		buff += format_date(buff, end);
+		break;
+	    }
+
 	    case 'p':		/* p - spamicity as a probability */
 	    {
 		const char *f = spamicity_formats[status];
