@@ -12,7 +12,9 @@
 #include <ctype.h>
 #include <string.h>
 #include "config.h"
+
 #include "lexer.h"
+#include "xmalloc.h"
 
 // Our lexical analysis is different from Paul Graham's rules: 
 //
