@@ -10,6 +10,9 @@ AUTHOR:
 
 ******************************************************************************/
 
+#ifndef HAVE_RSTATS_H
+#define HAVE_RSTATS_H
+
 void rstats_init(void);
 
 void rstats_add(const char *token,
@@ -23,3 +26,5 @@ void rstats_fini(size_t robn,
 		 double spamicity);
 
 void rstats_print(void);
+
+#endif	/* HAVE_RSTATS_H */
