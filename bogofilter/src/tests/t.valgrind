@@ -32,7 +32,7 @@ spamicity_tags = S,h,u
 spamicity_formats = %6.2e %6.2e %0.6f
 EOF
 
-#V="v"	# verbosity level
+#V="-v"	# verbosity level
 
 run_test()
 {
@@ -40,7 +40,7 @@ run_test()
     fil="$2"
     ver="$3"
     OUT="${TMPDIR}/tests/msg.$fil.$mth.$ver"
-    OPTS="-e -t -$ver $CFG"
+    OPTS="-e -t $ver $CFG"
     eval $VALGRIND $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt \
     >${TMPDIR}/tests-$alg
     if test -s $TMPDIR/vg.out ; then cat $TMPDIR/vg.out ; exit 2 ; fi
