@@ -21,6 +21,7 @@ LICENSE:
 #include <stdlib.h>
 
 #include "bogohome.h"
+#include "find_home.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
@@ -33,7 +34,7 @@ void set_bogohome(const char *path) {
     if (bogohome)
 	xfree(bogohome);
 
-    bogohome = xstrdup(path);
+    bogohome = tildeexpand(path, true);
     if (stat(bogohome, &st) != 0 || !S_ISDIR(st.st_mode)) {
 	if ((t = strrchr(bogohome, DIRSEP_C)))
 	    *t = '\0';
