@@ -2,6 +2,15 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.92.2	2004-07-10
+
+	* Use an explicit inputs/outputs directory list to avoid shipping test
+	  files in those directories.
+
+	2004-07-08
+
+	* Miscellaneous cleanups, removed 'degen' code remainders.
+
 	2004-07-07
 
 	* Formatting character changes:

@@ -5,6 +5,15 @@
 NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+0.92.2	2004-07-10
+
+	* Use an explicit inputs/outputs directory list to avoid shipping test
+	  files in those directories.
+
+	2004-07-08
+
+	* Miscellaneous cleanups, removed 'degen' code remainders.
+
 	2004-07-07
 
 	* Formatting character changes:
@@ -18,9 +27,16 @@ is in the RELEASE.NOTES files.  Read them!!
 	* Fix self-test suite ("make check") when bogofilter is compiled
 	  with QDBM or TDB as the data base engine.
 
+	2004-07-02
+
+	* The self-test suite now properly detects valgrind when
+	  make check VERBOSE=-x is used.
+
 	2004-07-01
 
-	* Remove obsolete '-f' from t.valgrind, too.
+	* Convert a C99/C++ //-style comment to a /* C-style comment */
+
+	* Fix valgrind self test that still had an obsolete '-f' option.
 
 0.92.1	2004-07-01
 

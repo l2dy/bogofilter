@@ -2,7 +2,12 @@
 				BOGOFILTER NEWS
 			       =================
 
-2004-07-??
+0.92.2	2004-07-10
+
+* Use an explicit inputs/outputs directory list to avoid shipping test
+  files in those directories.
+
+* Miscellaneous cleanups, removed 'degen' code remainders.
 
 * Formatting character changes:
   '%A' is now the message's IP address.
