@@ -66,11 +66,11 @@ AUTHOR:
 #define	MSG_COUNT	".MSG_COUNT"
 
 #define	TEST_COUNT	500	/* minimum allowable message count */
-#define	PREF_COUNT	4000	/* preferred message count */
-#define	LIST_COUNT	2000	/* minimum msg count in wordlist */
+#define	PREF_COUNT	4000	/* preferred message count         */
+#define	LIST_COUNT	2000	/* minimum msg count in wordlist   */
 
 #define	HAM_CUTOFF	0.10
-#define	MIN_CUTOFF	0.52	/* minimum for get_thresh() */
+#define	MIN_CUTOFF	0.55	/* minimum for get_thresh() */
 #define	MAX_CUTOFF	0.99	/* maximum for get_thresh() */
 #define	SPAM_CUTOFF	0.95
 #define FP_CUTOFF	0.999
@@ -94,7 +94,6 @@ enum e_verbosity {
 const char *progname = "bogotune";
 char *ds_file;
 
-uint target = 0;
 uint memdebug = 0;
 uint max_messages_per_mailbox = 0;
 
@@ -168,6 +167,23 @@ static data_t *seq_by_amt(double fst, double lst, double amt)
     return val;
 }
 
+static data_t *seq_canonical(double fst, double amt)
+{
+    uint i = 0;
+    data_t *val = xcalloc(1, sizeof(data_t));
+
+    val->cnt = 5;
+    val->data = xcalloc(val->cnt, sizeof(double));
+
+    val->data[i++] = fst;
+    val->data[i++] = fst - amt;
+    val->data[i++] = fst + amt;
+    val->data[i++] = fst - amt * 2;
+    val->data[i++] = fst + amt * 2;
+
+    return val;
+}
+
 static data_t *seq_by_pow(double fst, double lst, double amt)
 {
     uint i;
@@ -187,21 +203,14 @@ static void data_free(data_t *val)
     xfree(val->data); xfree(val);
 }
 
+/*
+canonical, -0.05, +0.05, -0.1, +0.1 and Cbogotune is doing -0.1, -0.05,
+canonical, +0.05, +0.1.  If, as I do, you always take the first of a
+*/
+
 static void init_coarse(double _rx)
 {
-#ifndef	DUP_PERL
-    rxval = seq_by_cnt(_rx - 0.1, _rx + 0.1, 5);
-#else
-    /* special order required by outlier check  */
-    double x0, x1;
-    x0 = _rx - 0.1;
-    x1 = _rx + 0.1;
-    rxval->data[0] = x0 + (x1 - x0) / 2;
-    rxval->data[1] = x0 + (x1 - x0) / 4;
-    rxval->data[2] = x0 + (x1 - x0) * 3 / 4;
-    rxval->data[3] = x0;
-    rxval->data[4] = x1;
-#endif
+    rxval = seq_canonical(_rx, 0.05);
     rsval = seq_by_pow(0.0, -2.0, -0.5);
     mdval = seq_by_cnt(0.05, 0.45, 9);
 }
@@ -223,19 +232,7 @@ static void init_fine(double _rs, double _md, double _rx)
     if (s1 > 0.465) s1 = 0.465;
 
     mdval = seq_by_amt(s0, s1, 0.015);
-
-    s0 = _rx - 2 * 0.02;
-    s1 = _rx + 2 * 0.02;
-#ifndef	DUP_PERL
-    rxval = seq_by_amt(s0, s1, 0.02);
-#else
-    /* special order required by outlier check  */
-    rxval->data[0] = _rx;
-    rxval->data[1] = _rx - 0.02;
-    rxval->data[2] = _rx + 0.02;
-    rxval->data[3] = _rx - 0.04;
-    rxval->data[4] = _rx + 0.04;
-#endif
+    rxval = seq_canonical(_rx, 0.02);
 }
 
 static void print_parms(const char *label, const char *format, data_t *data)
@@ -309,7 +306,7 @@ static void score_ns(double *results)
 static bool check_for_high_ns_scores(void)
 {
     double percent = 0.0025;
-    target = ceil(ns_cnt * percent);
+    uint target = ceil(ns_cnt * percent);
 
     score_ns(ns_scores);	/* scores in ascending order */
     qsort(ns_scores, ns_cnt, sizeof(double), compare_double);
@@ -364,7 +361,7 @@ static uint get_fn_count(uint count, double *results)
 static bool check_for_low_sp_scores(void)
 {
     double percent = 0.0025;
-    target = ceil(sp_cnt * percent);
+    uint target = ceil(sp_cnt * percent);
 
     score_sp(sp_scores);	/* scores in ascending order */
     qsort(sp_scores, sp_cnt, sizeof(double), compare_double);
@@ -941,7 +938,6 @@ static void final_recommendations(void)
 {
     uint m, s;
     bool printed = false;
-    const char *comment= "";
     uint minn[] = { 10000, 2000, 1000, 500, 1 };
 
     printf("Performing final scoring:\n");
@@ -955,6 +951,9 @@ static void final_recommendations(void)
     score_sp(sp_scores);		/* get scores */
     /* ... ascending */
     qsort(sp_scores, sp_cnt, sizeof(double), compare_double);
+
+    if (verbose >= PARMS)
+	printf("# ns_cnt %d, sp_cnt %d\n", ns_cnt, sp_cnt);
 
     printf("Recommendations:\n\n");
     printf("---cut---\n");
@@ -1001,16 +1000,12 @@ static void final_recommendations(void)
 	    }
 	}
 
-	printf("%sspam_cutoff=%5.3f\t# for %4.2f%% false positives; expect %4.2f%% false neg.\n",
-	       comment, cutoff,
-	       (mn != 1) ? 100.0 / mn : 100.0 * fp / ns_cnt,
-	       100.0 * fn / sp_cnt);
+	if (printed)  printf("#");
+	printf("spam_cutoff=%5.3f\t# for %4.2f%% false positives (%d); expect %4.2f%% false neg (%d).\n",
+	       cutoff,
+	       (mn != 1) ? 100.0 / mn : 100.0 * fp / ns_cnt, fp,
+	       100.0 * fn / sp_cnt, fn);
 
-	if (verbose >= PARMS)
-	    printf("# mn %5d, ns_cnt %5d, sp_cnt %5d, fp %3d, fn %3d\n",
-		   mn, ns_cnt, sp_cnt, fp, fn);
-
-	comment = "#";
 	printed = true;
     }
 
@@ -1018,7 +1013,7 @@ static void final_recommendations(void)
     ham_cutoff = sp_scores[s];
     if (ham_cutoff < 0.10) ham_cutoff = 0.10;
     if (ham_cutoff > 0.45) ham_cutoff = 0.45;
-    printf("ham_cutoff=%5.3f\n", ham_cutoff);
+    printf("ham_cutoff=%5.3f\t# %5.3f%%\n", ham_cutoff,sp_scores[s]);
     printf("---cut---\n");
     printf("\n");
     printf("Tuning completed.\n");
@@ -1085,6 +1080,7 @@ static rc_t bogotune(void)
 {
     int beg, end;
     uint cnt, scan;
+    uint target;
     rc_t status = RC_OK;
 
     bogotune_init();
@@ -1201,7 +1197,6 @@ static rc_t bogotune(void)
 
     if (memdebug) { MEMDISPLAY; }
 
-    if (ns_cnt >= TEST_COUNT && sp_cnt >= TEST_COUNT)	/* HACK */
     for (scan=0; scan <= 1; scan += 1) {
 	bool f;
 	uint i;
