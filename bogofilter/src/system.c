@@ -9,13 +9,15 @@ NAME:
 
 #include "common.h"
 
-//#include <errno.h>
-//#include <sys/stat.h>
-//#include <stdlib.h>
+#if 0
+#include <errno.h>
+#include <sys/stat.h>
+#include <stdlib.h>
 
-//#include "paths.h"
-//#include "xmalloc.h"
-//#include "xstrdup.h"
+#include "paths.h"
+#include "xmalloc.h"
+#include "xstrdup.h"
+#endif
 
 int bf_mkdir(const char *path, mode_t mode)
 {
