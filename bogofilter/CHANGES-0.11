@@ -6,6 +6,25 @@ $Id$
      
 0.11.X  2003-03-??
 
+	2003-02-27
+	* Separate message registration options from unregistration
+	  options.  '-s' and '-n' register messages and '-S' and '-N'
+	  unregister them.
+
+	2003-02-26
+	* Bogofilter's -p (passthrough) mode will no longer read the entire
+	  mail into memory if the standard input is a seekable regular file.
+
+	2003-02-25
+	* Lexer speed improvements for handling overly long tokens.
+
+	2003-02-21
+	* Separated option '-l's functions into '-l' and '-L'.
+
+	2003-02-16
+	* Changed the default algorithm to Robinson-Fisher.
+	* Bogofilter option '-qv' now displays the config options and exits.
+
 	2003-02-12
 	* Split bogofilter's command line and config file processing
 	  so bogolexer can use the config file.

@@ -6,9 +6,16 @@ $Id$
 
 0.11.X   2003-XX-YY
 
+	* The Robinson-Fisher algorithm is now the default algorithm.
+	* Database access efficiency changes.
+	* Internal cleanup of storage used in parsing messages and
+	  working with databases.
+	* Improvements in html comment handling code.
 	* Manual pages now contain the proper path to bogofilter.cf.
 	* Bogofilter's -p (passthrough) mode will no longer read the entire
 	  mail into memory if the standard input is a seekable regular file.
+	* Separate message registration options from unregistration
+	  options.
 
 0.10.3.2 2003-XX-XX
 
