@@ -26,9 +26,12 @@ struct dbhsqlite_t {
     char *name;	   /**< database file name */
     sqlite3 *db;   /**< pointer to SQLite3 handle */
     bool created;  /**< gets set by db_open if it created the database new */
+    bool swapped;  /**< if endian swapped on disk vs. current host */
 };
 /** Convenience shortcut to avoid typing "struct dbh_t" */
 typedef struct dbhsqlite_t dbh_t;
+
+static const char *ENDIAN32 = ".ENDIAN32";
 
 /* dummy functions */
 #define DUMMYVVP(name)  void name(void *dummy) { (void)dummy; }
@@ -43,7 +46,6 @@ DUMMYICP(dbe_remove)
 void *dbe_init(const char *d1, const char *d2) { (void)d1; (void)d2; return (void *)~0; }
 /** dummy function, Sqlite recovers automatically. */
 ex_t dbe_recover(const char *d1, bool d2, bool d3) { (void)d1; d2=d3; return EX_ERROR; }
-bool db_is_swapped(void *dummy) { (void)dummy; return false; }
 
 /** The layout of the bogofilter table, formatted as SQL statement. */
 #define LAYOUT \
@@ -173,7 +175,9 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
 		    val.data = xmalloc(val.leng);
 		    memcpy(key.data, sqlite3_column_blob(stmt, 0), key.leng);
 		    memcpy(val.data, sqlite3_column_blob(stmt, 1), val.leng);
-		    rc = hook(&key, &val, userdata);
+		    if (key.leng != strlen(ENDIAN32)
+			    || memcmp(key.data, ENDIAN32, key.leng) != 0)
+			rc = hook(&key, &val, userdata);
 		    free(val.data);
 		    free(key.data);
 		    if (rc) {
@@ -204,6 +208,7 @@ void *db_open(void *dummyenv, const char *dbpath,
 	const char *dbname, dbmode_t mode) {
     int rc;
     dbh_t *dbh;
+    dbv_t k, v;
     int count = 0;
 
     (void)dummyenv;
@@ -241,9 +246,54 @@ void *db_open(void *dummyenv, const char *dbpath,
 		if (sqlexec(dbh->db, "COMMIT;")) goto barf;
 		break;
 	    case DS_NOTFOUND:
-		if (sqlexec(dbh->db, LAYOUT)) goto barf;
-		if (sqlexec(dbh->db, "COMMIT;")) goto barf;
-		dbh->created = true;
+		{
+		    u_int32_t p[2] = { 0x01020304, 0x01020304 };
+		    int rc2;
+		    k.data = strdup(ENDIAN32);
+		    k.leng = strlen(k.data);
+		    v.data = p;
+		    v.leng = sizeof(p);
+		    if (sqlexec(dbh->db, LAYOUT)) goto barf;
+		    rc2 = db_set_dbvalue(dbh, &k, &v);
+		    free(k.data);
+		    if (rc2)
+			goto barf;
+		    if (sqlexec(dbh->db, "COMMIT;")) goto barf;
+		    dbh->created = true;
+		}
+		break;
+	    default:
+		goto barf;
+	}
+    }
+
+    /* check if byteswapped */
+    {
+	k.data = strdup(ENDIAN32);
+	k.leng = strlen(k.data);
+	u_int32_t t;
+	switch(db_get_dbvalue(dbh, &k, &v)) {
+	    case 0: /* found endian marker token, read it */
+		if (v.leng < 4)
+		    goto barf;
+		t = ((u_int32_t *)v.data)[0];
+		free(v.data);
+		switch (t) {
+		    case 0x01020304: /* same endian, "UNIX" */
+			dbh->swapped = false;
+			break;
+		    case 0x04030201: /* swapped, "XINU" */
+			dbh->swapped = true;
+			break;
+		    default: /* NUXI or IXUN or crap */
+			print_error(__FILE__, __LINE__,
+				"Unknown endianness on %s: %08x.\n",
+				dbh->name, ((u_int32_t *)v.data)[0]);
+			goto barf2;
+		}
+		break;
+	    case DS_NOTFOUND: /* no marker token, assume not swapped */
+		dbh->swapped = false;
 		break;
 	    default:
 		goto barf;
@@ -254,6 +304,7 @@ void *db_open(void *dummyenv, const char *dbpath,
 barf:
     print_error(__FILE__, __LINE__, "Error on database %s: %s\n",
 	    dbh->name, sqlite3_errmsg(dbh->db));
+barf2:
     sqlite3_close(dbh->db);
     free_dbh(dbh);
     return NULL;
@@ -379,4 +430,9 @@ const char *db_str_err(int e) {
 bool db_created(void *vhandle) {
     dbh_t *dbh = vhandle;
     return dbh->created;
+}
+
+bool db_is_swapped(void *vhandle) {
+    dbh_t *dbh = vhandle;
+    return dbh->swapped;
 }

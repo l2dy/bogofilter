@@ -21,6 +21,14 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-02-24
+
+	* Add swapped endian support for SQlite3 database, to support reading
+	  big endian (SPARC) generated databases on little endian machines
+	  (x86) and vice versa. To enable reading databases on machines with
+	  differing endian, dump and re-load the databases on a machine with
+	  same endian as the machine that created them.
+
 	2005-02-10
 
 	* Fixed problem causing SIGSEGV when using options "-p" and
