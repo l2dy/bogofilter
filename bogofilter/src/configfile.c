@@ -19,6 +19,8 @@ AUTHOR:
 #include <string.h>
 #include <errno.h>
 
+#include "getopt.h"
+
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #include "bool.h"
@@ -26,7 +28,6 @@ AUTHOR:
 #include "error.h"
 #include "find_home.h"
 #include "format.h"
-#include "getopt.h"
 #include "lexer.h"
 #include "maint.h"
 #include "wordlists.h"

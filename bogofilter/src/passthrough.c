@@ -14,6 +14,10 @@ NAME:
 #include <stdlib.h>
 #include <syslog.h>
 
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>		/* for unlink() */
+#endif
+
 #include "passthrough.h"
 #include "bogofilter.h"
 #include "fgetsl.h"

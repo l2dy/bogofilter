@@ -41,8 +41,6 @@ Note: bogolexer also uses configfile.c.
 #include <string.h>
 #include <errno.h>
 
-#include <unistd.h>
-
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #include "bogoreader.h"

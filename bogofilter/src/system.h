@@ -100,10 +100,6 @@ size_t strlcat(/*@out@*/ char *dst, const char *src, size_t size);
 # endif
 #endif
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
 #ifdef __DGUX__
 #undef EX_OK
 #endif

@@ -18,7 +18,6 @@ CONTRIBUTORS:
 
 #include <stdlib.h>
 #include <syslog.h>
-#include <unistd.h>
 
 #include "bogoconfig.h"
 #include "bogofilter.h"

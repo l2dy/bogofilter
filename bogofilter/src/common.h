@@ -146,10 +146,6 @@ typedef struct {
 extern void bf_abort(void);
 extern void bf_exit(void);
 
-/* getopt stuff */
-extern char *optarg;
-extern int optind, opterr, optopt;
-
 #define internal_error do { fprintf(stderr, "Internal error in %s:%lu\n", __FILE__, (unsigned long)__LINE__); abort(); } while(0)
 
 #endif
