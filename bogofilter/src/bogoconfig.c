@@ -618,7 +618,7 @@ void process_args_1(int argc, char **argv)
 	    break;
 
 	case 'y':		/* date as YYYYMMDD */
-	    today = string_to_date((char *)optarg);
+	    set_date( string_to_date((char *)optarg) );
 	    break;
 
 	case ':':
