@@ -15,9 +15,13 @@
 #include "collect.h"
 
 /* this is referenced by register.c, must not be static */
-void wordprop_init(void *vwordprop){
-	wordprop_t *wordprop = vwordprop;
-	wordprop->freq = 0;
+void wordprop_init(void *vwordprop)
+{
+    wordprop_t *wordprop = vwordprop;
+    wordprop->freq = 0;
+    wordprop->good = 0;
+    wordprop->bad  = 0;
+    wordprop->prob = 0;
 }
 
 static bool from_seen = false;

@@ -88,6 +88,14 @@ typedef enum bulk_e {
 
 #include "globals.h"
 
+/* Represents the secondary data for a word key */
+typedef struct {
+    int freq;
+    long good;
+    long bad;
+    double prob;
+} wordprop_t;
+
 extern int build_path(char* dest, size_t size, const char* dir, const char* file);
 
 #define internal_error do { fprintf(stderr, "Internal error in %s:%u\n", __FILE__, __LINE__); abort(); } while(0)

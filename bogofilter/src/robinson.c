@@ -88,17 +88,12 @@ void rob_print_stats(FILE *fp)
 	rstats_print();
 }
 
-typedef struct {
-    int good;
-    int bad;
-} wordprob_t;
-
-static void wordprob_init(/*@out@*/ wordprob_t* wordstats)
+static void wordprob_init(/*@out@*/ wordprop_t* wordstats)
 {
     wordstats->good = wordstats->bad = 0;
 }
 
-static void wordprob_add(wordprob_t* wordstats, int count, int bad)
+static void wordprob_add(wordprop_t* wordstats, int count, int bad)
 {
     if (bad)
 	wordstats->bad += count;
@@ -106,7 +101,7 @@ static void wordprob_add(wordprob_t* wordstats, int count, int bad)
 	wordstats->good += count;
 }
 
-static double wordprob_result(wordprob_t* wordstats)
+static double wordprob_result(wordprop_t* wordstats)
 {
     double g = min(wordstats->good, msgs_good);
     double b = min(wordstats->bad,  msgs_bad);
@@ -129,7 +124,7 @@ static double compute_probability(const word_t *token)
     long count;
     double prob;
 
-    wordprob_t wordstats;
+    wordprop_t wordstats;
 
     wordprob_init(&wordstats);
 

@@ -6,11 +6,6 @@
 
 #include "wordhash.h"
 
-/* Represents the secondary data for a word key */
-typedef struct {
-  int freq;
-} wordprop_t;
-
 extern void wordprop_init(void *vwordprop);
 
 extern bool collect_words(wordhash_t *wh);
