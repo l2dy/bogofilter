@@ -34,7 +34,7 @@ bogoutil_SOURCES = bogoutil.c \
 		   $(MYCOMMON)
 
 configtest_CFLAGS = -DMAIN
-configtest_SOURCES = config.c $(MYCOMMON)
+configtest_SOURCES = configtest.c config.c wordlists.c datastore_db.c $(MYCOMMON)
 
 # what to distribute
 EXTRA_DIST = $(man1_MANS) \
