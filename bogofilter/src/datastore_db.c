@@ -60,14 +60,10 @@ typedef struct {
 
 const char *db_version_str(void)
 {
-    if (verbose == 0)
-	return "BerkeleyDB";
-    else {
-	static char v[20];
-	snprintf(v, sizeof(v), "BerkeleyDB (%d.%d.%d)",
-		 DB_VERSION_MAJOR, DB_VERSION_MINOR, DB_VERSION_PATCH);
-	return v;
-    }
+    static char v[80];
+    snprintf(v, sizeof(v), "BerkeleyDB (%d.%d.%d)",
+	    DB_VERSION_MAJOR, DB_VERSION_MINOR, DB_VERSION_PATCH);
+    return v;
 }
 
 
