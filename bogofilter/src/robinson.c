@@ -41,6 +41,7 @@ double	robs = 0.0;			/* used in fisher.c and rstats.c */
 
 #define ROBX_S ".ROBX"
 
+static bool	need_stats = false;
 static rob_stats_t  rob_stats;
 
 const parm_desc rob_parm_table[] =	/* needed by fisher.c */
@@ -60,6 +61,9 @@ static void	rob_print_summary(void);
 #endif
 
 /* Static Variables */
+
+double bad_cnt;
+double good_cnt;
 
 #ifdef	ENABLE_ROBINSON_METHOD
 rf_method_t rf_robinson_method = {	/* needed by config.c */
@@ -101,9 +105,6 @@ static double wordprob_result(wordprop_t* wordstats)
     double g = min(wordstats->good, msgs_good);
     double b = min(wordstats->bad,  msgs_bad);
     double n = g + b;
-
-    long bad_cnt  = max(1, msgs_bad);
-    long good_cnt = max(1, msgs_good);
 
     double pw = (n < EPS) ? 0.0 : ((b / bad_cnt) / 
 				   (b / bad_cnt + g / good_cnt));
@@ -147,7 +148,7 @@ static double compute_probability(const word_t *token, wordprop_t *wordstats)
 
     wordstats->prob=wordprob_result(wordstats);
 
-    if (Rtable || verbose)
+    if (need_stats)
 	rstats_add(token, wordstats);
 
     return wordstats->prob;
@@ -167,11 +168,15 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 
     (void) fp; 	/* quench compiler warning */
 
+    bad_cnt  = max(1, msgs_bad);
+    good_cnt = max(1, msgs_good);
+
     if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() begins\n");
 
+    need_stats = Rtable || (verbose + passthrough) > 1;
     Rtable |= verbose > 3;
 
-    if (Rtable || verbose)
+    if (need_stats)
 	rstats_init();
 
     if (DEBUG_ROBINSON(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
@@ -223,7 +228,7 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 
     spamicity = ((rf_method_t *) method)->get_spamicity( robn, P, Q );
 
-    if (robn && (Rtable || verbose))
+    if (robn && need_stats)
 	rstats_fini(robn, P, Q, spamicity );
 
     if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() ends\n");
@@ -238,8 +243,8 @@ double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 	rob_stats.s.spamicity = robx;
     else
     {
-	double r = 1.0 / (double)max(1,robn);
-	double ln2  = 0.6931472;				/* ln(2) */
+	double r = 1.0 / robn;
+	static double ln2 = 0.6931472;				/* ln(2) */
 
 	rob_stats.robn = robn;
 
