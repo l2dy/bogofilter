@@ -57,7 +57,7 @@ struct textblock textblocks;
 char *yylval;
 static char alt_text[MAXTOKENLEN];
 static int past_header;
-static int yyinput(char *buf, int max_size);
+static int yyinput(unsigned char *buf, int max_size);
 
 %}
 
@@ -238,7 +238,7 @@ filename=\"?					;
 {MIME_BOUNDARY}(--)?$				{return (BOUNDARY);}
 
 {IPADDR}					{return(TOKEN);}
-[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,[:cntrl:][]+[^[:blank:][:punct:][:cntrl:]]	{return(TOKEN);} 
+[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,[:cntrl:][]+[^[:blank:][:punct:][:cntrl:]]	{return(TOKEN);}
 .						;
 ^\n						{past_header = 1; /* eat token */}
 \n						;
@@ -268,7 +268,7 @@ int lexer_fgets(char *buf, int max_size, FILE *s)
 	return(cp - buf);
 }
 
-static int yyinput(char *buf, int max_size)
+static int yyinput(unsigned char *buf, int max_size)
 /* input getter for the scanner */
 {
     int returned;
@@ -322,6 +322,16 @@ static int yyinput(char *buf, int max_size)
 	*(buf + returned - 1) = '\n';
     }
 
+    while (*buf != '\0') {
+	int ch = *buf;
+	if (ch == 0xA0) *buf = ' ';	/* convert no-break space to space */
+	if (ch == 0x92) *buf = '\'';	/* convert 0x92 to apostrophe      */
+	if (ch == 0x93) *buf = ' ';	/* convert 0x93 to space           */
+	if (ch == 0x94) *buf = ' ';	/* convert 0x94 to space           */
+	if (ch == 0xA9) *buf = ' ';	/* convert copyright sign to space */
+	buf += 1;
+    }
+			   
     return(returned == -1 ? YY_NULL : returned);
 }
 
