@@ -58,10 +58,10 @@ $BOGOUTIL $OPTS -l ${WORDLIST} < ${TMPDIR}/t.before.ref
 $BOGOUTIL $OPTS -d ${WORDLIST} > ${TMPDIR}/t.before.out
 
 $BOGOUTIL $OPTS -u ${WORDLIST} >  ${TMPDIR}/t.after.out
-$BOGOUTIL $OPTS -d ${WORDLIST} >> ${TMPDIR}/t.after.out
+$BOGOUTIL $OPTS -d ${WORDLIST} | sort >> ${TMPDIR}/t.after.out
 
 $BOGOUTIL $OPTS -u ${WORDLIST} >  ${TMPDIR}/t.already.out
-$BOGOUTIL $OPTS -d ${WORDLIST} >> ${TMPDIR}/t.already.out
+$BOGOUTIL $OPTS -d ${WORDLIST} | sort >> ${TMPDIR}/t.already.out
 
 for i in ${TMPDIR}/*.ref ; do
     j=`basename $i .ref`
