@@ -3,8 +3,6 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#undef	HAVE_CHARSET
-
 #include <float.h> /* has DBL_EPSILON */
 #define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
 
