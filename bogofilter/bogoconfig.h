@@ -1,5 +1,15 @@
 /* $Id$ */
 
+/*****************************************************************************
+
+NAME:
+   bogoconfig.h -- prototypes and definitions for config.c.
+
+AUTHOR:
+   David Relson <relson@osagesoftware.com>
+
+******************************************************************************/
+
 #ifndef BOGOCONFIG_H
 #define BOGOCONFIG_H
 
