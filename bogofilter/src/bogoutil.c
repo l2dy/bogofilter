@@ -432,7 +432,7 @@ static void print_version(void)
 		  "See\nthe COPYING file with the source distribution for "
 		  "details.\n"
 		  "\n", 
-		  progtype, version, ds_version_str(), PACKAGE);
+		  progname, version, ds_version_str(), PACKAGE);
 }
 
 static void usage(void)
@@ -441,45 +441,69 @@ static void usage(void)
 	    progname, DB_EXT);
 }
 
+static const char *help_text[] = {
+    "\n",
+    "  -h, --help                - print this help message.\n",
+    "  -V, --version             - print version information and exit.\n",
+
+    "  -d, --dump=file           - Dump data from file to stdout.\n",
+    "  -l, --load=file           - Load data from stdin into file.\n",
+    "  -u, --upgrade=file        - Upgrade wordlist version.\n",
+
+    "info options:\n",
+    "  -w dir                    - Display counts for words from stdin.\n",
+    "  -p dir                    - Display word counts and probabilities.\n",
+    "  -I file                   - Read this file instead of standard input.\n",
+
+    "  -H dir                    - Display histogram and statistics for the wordlist.\n",
+    "                            - Use with -v  to exclude hapaxes.\n",
+    "                            - Use with -vv to exclude pure spam/ham.\n",
+    "  -r dir                    - Compute Robinson's X for specified directory.\n",
+    "  -R dir                    - Compute Robinson's X and save it in the wordlist.\n",
+
+    "  -v, --verbosity           - set debug verbosity level.\n",
+    "  -D, --debug-to-stdout     - direct debug output to stdout.\n",
+    "  -x, --debug-flags=list    - set flags to display debug information.\n",
+
+    "database maintenance:\n",
+    "  -m                        - Enable maintenance works (expiring tokens).\n",
+    "  -a age                    - Exclude tokens with older ages.\n",
+    "  -c cnt                    - Exclude tokens with lower counts.\n",
+    "  -s l,h                    - Exclude tokens with lengths between 'l' and 'h' (low and high).\n",
+    "  -n                        - Replace non-ascii characters with '?'.\n",
+    "  -y date                   - Set default date (format YYYYMMDD).\n",
+
+    "environment maintenance:\n",
+    "  -k size                   - set BerkeleyDB cache size (MB).\n",
+    "  -f dir                    - Run recovery on data base in dir.\n",
+    "  -F dir                    - Run catastrophic recovery on data base in dir.\n",
+    "  -P dir                    - Remove inactive log files in dir.\n",
+    "  -C file                   - Check data file.\n",
+
+#ifdef	HAVE_DECL_DB_CREATE
+    "--db_lk_max_locks           - db_lk_max_locks\n",
+    "--db_lk_max_objects         - db_lk_max_objects\n",
+#ifdef	FUTURE_DB_OPTIONS
+    "--db_log_autoremove         - db_log_autoremove\n",
+    "--db_txn_durable            - db_txn_durable\n",
+#endif
+#endif
+    "--remove-environment        - remove-environment\n",
+
+    "\n",
+    NULL
+    };
+
 static void help(void)
 {
+    uint i;
     usage();
-    fprintf(stderr,
-	    "\n"
-	    "\t-h\tPrint this message.\n"
-	    "\t-f dir\tRun recovery on data base in dir.\n"
-	    "\t-F dir\tRun catastrophic recovery on data base in dir.\n"
-	    "\t-P dir\tRemove inactive log files in dir.\n"
-	    "\t-C file\tCheck data file.\n"
-	    "\t-d file\tDump data from file to stdout.\n"
-	    "\t-l file\tLoad data from stdin into file.\n"
-	    "\t-u file\tUpgrade wordlist version.\n"
-	    "\t-w dir\tDisplay counts for words from stdin.\n"
-	    "\t-p dir\tDisplay word counts and probabilities.\n"
-	    "\t-m\tEnable maintenance works (expiring tokens).\n");
-    fprintf(stderr,
-	    "\t-v\tOutput debug messages.\n"
-	    "\t-H dir\tDisplay histogram and statistics for the wordlist.\n"
-	    "\t"    "\tUse -v  to exclude hapaxes."
-	    "\t"    "\tUse -vv to exclude pure spam/ham.\n"
-	    "\t-r dir\tCompute Robinson's X for specified directory.\n"
-	    "\t-R dir\tCompute Robinson's X and save it in the wordlist.\n");
-    fprintf(stderr,
-	    "\t-k size\tset BerkeleyDB cache size (MB).\n"
-	    DB_EXT);
-    fprintf(stderr,
-	    "\t-a age\tExclude tokens with older ages.\n"
-	    "\t-c cnt\tExclude tokens with lower counts.\n"
-	    "\t-s l,h\tExclude tokens with lengths between 'l' and 'h' (low and high).\n"
-	    "\t-n\tReplace non-ascii characters with '?'.\n"
-	    "\t-y date\tSet default date (format YYYYMMDD).\n"
-	    "\t-x list\tSet debug flags.\n"
-	    "\t-D\tDirect debug output to stdout.\n"
-	    "\t-V\tPrint program version.\n"
-	    "\t-I file\tRead this file instead of standard input.\n"
-	    "\n"
-	    "%s (version %s) is part of the bogofilter package.\n",
-	    progname, version);
+    for (i=0; help_text[i] != NULL; i++)
+	(void)fprintf(stderr, "%s", help_text[i]);
+    (void)fprintf(stderr,
+		  "%s (version %s) is part of the bogofilter package.\n",
+                  progname, version
+	);
 }
 
 static const char *ds_file = NULL;
@@ -495,6 +519,8 @@ static int remenv = 0;	/** if set, run recovery and remove the environment */
 static char *remedir;	/** environment to remove */
 
 struct option long_options[] = {
+    { "help",				N, 0, 'h' },
+    { "version",			N, 0, 'V' },
 #ifdef	HAVE_DECL_DB_CREATE
     { "db_lk_max_locks",		R, 0, O_DB_MAX_LOCKS },
     { "db_lk_max_objects",		R, 0, O_DB_MAX_OBJECTS },
