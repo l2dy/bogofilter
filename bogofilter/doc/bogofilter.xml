@@ -597,7 +597,7 @@ macro index \ed "&lt;enter-command&gt;unset wait_key\n\
    <option>-p</option>, <option>-u</option>, and <option>-e</option> options.</para>
 </step>
 <step>
- <para>Set up a mechanism for users to register spam/nonspam messages,
+ <para>Set up a mechanism for users to register spam/non-spam messages,
  as well as to correct mis-classifications.
  The most generic solution is to set up alias email addresses to which
  users bounce messages.</para>
