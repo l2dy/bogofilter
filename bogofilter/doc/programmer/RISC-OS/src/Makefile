@@ -59,7 +59,6 @@ COMMON_OBJS = o.base64 \
 	o.find_home \
 	o.find_home_tildeexpand \
 	o.find_home_user \
-	o.fisher \
 	o.format \
 	o.globals \
 	o.graham \
@@ -68,15 +67,14 @@ COMMON_OBJS = o.base64 \
 	o.maint \
 	o.memcmp \
 	o.memdebug \
-	o.method \
 	o.mime \
 	o.msgcounts \
 	o.passthrough \
 	o.paths \
 	o.qp \
 	o.register \
-	o.robinson \
 	o.rstats \
+	o.score \
 	o.strlcat \
 	o.strlcpy \
 	o.swap_32bit \
@@ -103,7 +101,7 @@ COMMON_OBJS = o.base64 \
 	o.xstrlcpy
 
 BOGOFILTER_OBJS = o.main
-	
+
 BOGOLEXER_OBJS = o.bogolexer
 
 BOGOTUNE_OBJS = o.bogotune
