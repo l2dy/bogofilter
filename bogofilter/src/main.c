@@ -73,8 +73,9 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
     int   exitcode = 0;
     FILE  *out;
+    int   count;
 
-    process_args_and_config_file(argc, argv, true);
+    count = process_args_and_config_file(argc, argv, true);
 
     /* initialize */
     init_charset_table(charset_default, true);
@@ -127,13 +128,34 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     if (run_type & (RUN_NORMAL | RUN_UPDATE))
     {
 	double spamicity;
-	rc_t   status = bogofilter(&spamicity);
+	rc_t   status;
 
-	write_message(out, status);
-
-	exitcode = (status == RC_SPAM) ? 0 : 1;
-	if (nonspam_exits_zero && passthrough && exitcode == 1)
-	    exitcode = 0;
+	if (!bulk_mode) {
+	    status = bogofilter(&spamicity);
+	    write_message(out, status);
+	    exitcode = (status == RC_SPAM) ? 0 : 1;
+	    if (nonspam_exits_zero && passthrough && exitcode == 1)
+		exitcode = 0;
+	}
+	else {
+	    bool error = false;
+	    while (count < argc && !error) {
+		const char *filename = argv[count];
+		fclose(fpin);
+		fpin = fopen( filename, "r" );
+		if (fpin == NULL) {
+		    error = true;
+		    fprintf(stderr, "Can't read file '%s'\n", filename);
+		}
+		else {
+		    status = bogofilter(&spamicity);
+		    fprintf(out, "%s ", filename);
+		    write_message(out, status);
+		    count += 1;
+		}
+	    }
+	    exitcode = !error ? 0 : 1;
+	}
     }
     else {
 	register_messages(run_type);

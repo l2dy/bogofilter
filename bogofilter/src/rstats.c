@@ -68,6 +68,8 @@ void rstats_print_rtable_summary(void);
 void rstats_init(void)
 {
     header.list = (rstats_t *) xcalloc( 1, sizeof(rstats_t));
+    header.count = 0;
+    header.robn  = 0;
     current = header.list;
 }
 

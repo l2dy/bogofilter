@@ -99,7 +99,7 @@ static void display_tag_array(const char *label, const char **array);
 static bool config_algorithm(const unsigned char *s);
 static bool select_algorithm(const unsigned char ch, bool cmdline);
 
-static void process_args(int argc, char **argv, int pass);
+static int  process_args(int argc, char **argv, int pass);
 
 /* externs for query_config() */
 
@@ -157,11 +157,12 @@ const parm_desc sys_parms[] =
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
 
-void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
+int process_args_and_config_file(int argc, char **argv, bool warn_on_error)
 {
+    int files;
     process_args(argc, argv, 1);
     process_config_files(warn_on_error);
-    process_args(argc, argv, 2);
+    files = process_args(argc, argv, 2);
 
     if (!twostate && !threestate) {
 	twostate = ham_cutoff < EPS;
@@ -180,7 +181,7 @@ void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
     if (DEBUG_CONFIG(0))
 	fprintf(dbgout, "stats_prefix: '%s'\n", stats_prefix);
 
-    return;
+    return files;
 }
 
 static bool config_algorithm(const unsigned char *s)
@@ -360,7 +361,7 @@ static void print_version(void)
  ** there are leftover command line arguments.
  */
 
-void process_args(int argc, char **argv, int pass)
+int process_args(int argc, char **argv, int pass)
 {
     int option;
     int exitcode;
@@ -379,7 +380,7 @@ void process_args(int argc, char **argv, int pass)
 #if HAVE_DECL_OPTRESET
     optreset = 1;
 #endif
-    while ((option = getopt(argc, argv, ":23d:eFhlL:m:o:snSNvVpuc:CgrRfqtI:O:y:x:DT" G R F)) != -1)
+    while ((option = getopt(argc, argv, ":23d:eFhlL:m:o:snSNvVpuc:CgrRfqtI:O:y:x:BDT" G R F)) != -1)
     {
 #if 0
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
@@ -559,6 +560,10 @@ void process_args(int argc, char **argv, int pass)
 	    today = string_to_date((char *)optarg);
 	    break;
 
+	case 'B':
+	    bulk_mode = true;
+	    break;
+
 	case 'D':
 	    dbgout = stdout;
 	    break;
@@ -585,12 +590,12 @@ void process_args(int argc, char **argv, int pass)
     if (exitcode) 
 	exit (exitcode);
 
-    if (optind < argc) {
+    if (!bulk_mode && optind < argc) {
 	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
 	exit(2);
     }
 
-    return;
+    return optind;
 }
 
 #define YN(b) (b ? "yes" : "no")

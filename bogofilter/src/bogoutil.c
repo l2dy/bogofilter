@@ -234,6 +234,8 @@ static int load_file(char *db_file)
 	len = strlen((const char *)buf);
 
 	count = atoi((const char *)p);
+	if ((int) count < 0)
+	    count = 0;
 	p = spanword(p);
 
 	date = atoi((const char *)p);
@@ -353,7 +355,7 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     unsigned long good_count, good_msg_count = 0 ;
 
     const char *head_format = !show_probability ? "%-20s %6s %6s\n"   : "%-20s %6s  %6s  %6s  %6s\n";
-    const char *data_format = !show_probability ? "%-20s %6ld %6ld\n" : "%-20s %6ld  %6ld  %f  %f\n";
+    const char *data_format = !show_probability ? "%-20s %6lu %6lu\n" : "%-20s %6lu  %6lu  %f  %f\n";
 
     /* XXX FIXME: deadlock possible */
     if (build_path(filepath, sizeof(filepath), dir, GOODFILE) < 0)

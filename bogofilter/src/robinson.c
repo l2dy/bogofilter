@@ -160,6 +160,12 @@ static double compute_probability(const word_t *token)
 	    break;
 	count=db_getvalue(list->dbh, token);
 
+	/* Protect against negatives */
+	if (count < 0) {
+	    count = 0;
+	    db_setvalue(list->dbh, token, count);
+	}
+
 	if (count) {
 	    if (list->ignore)
 		return EVEN_ODDS;
