@@ -166,7 +166,9 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
 		if (verbose || passthrough || Rtable)
 		{
-		    // (void)fputs("\n", stdout);
+		    extern bool stats_in_header;
+		    if (! stats_in_header)
+			(void)fputs("\n", stdout);
 		    verbose += passthrough;
 		    print_bogostats( stdout, spamicity );
 		    verbose -= passthrough;
