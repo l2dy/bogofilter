@@ -6,6 +6,8 @@ SUBDIRS =  dcdflib . tests
 SYSCONFDIR = @sysconfdir@
 DISTCHECK_CONFIGURE_FLAGS= @DISTCHECK_CONFIGURE_FLAGS@
 
+PERL = @PERL@
+
 if ENABLE_GRAHAM_METHOD
 GRAHAM_SRC = graham.c graham.h
 endif
@@ -108,7 +110,7 @@ libbogofilter_a_SOURCES += datastore_db.c
 endif
 endif
 
-CLEANFILES=version.c directories.c
+CLEANFILES=version.c directories.c bogoupgrade
 
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c \
 		     method.c $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
@@ -134,7 +136,7 @@ fgetsl_test_CFLAGS= -DMAIN
 
 # what to distribute
 EXTRA_DIST = \
-	     bogoupgrade \
+	     bogoupgrade.in \
 	     version.sh \
 	     strlcat.3 strlcpy.3
 #
@@ -148,3 +150,6 @@ directories.c: ../config.status
 #
 .l.c:
 	flex -o$@ $<
+
+bogoupgrade: bogoupgrade.in
+	sed 's}[@]PERL@}$(PERL)}' <$(srcdir)/bogoupgrade.in >$@ || rm -f $@
