@@ -285,10 +285,6 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 	    /* query page size */
 #if DB_AT_LEAST(3,3)
 	    ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
-#else
-	    ret = dbp->stat(dbp, &dbstat, NULL, DB_CACHED_COUNTS);
-#endif
-      
 	    if (ret) {
 		dbp->err (dbp, ret, "%s (db) stat: %s", progname, handle->name);
 		db_close(handle, false);
@@ -296,6 +292,15 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 	    }
 	    pagesize = dbstat->bt_pagesize;
 	    free(dbstat);
+#else
+	    /* The old, pre-3.3 API will not fill in the page size with
+	     * DB_CACHED_COUNTS, and without DB_CACHED_COUNTS,
+	     * BerlekeyDB will read the whole data base, incurring a
+	     * severe performance penalty. We'll guess a page size.
+	     * As this is a safety margin for the file size, we'll
+	     * rather choose it too large than too small. */
+	    pagesize = 16384;
+#endif
 
 	    check_fsize_limit(handle->fd[i], pagesize);
 
