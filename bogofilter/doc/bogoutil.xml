@@ -108,9 +108,9 @@
 	    The <option>-p <replaceable>file_or_dir</replaceable></option> 
 	    option tells <application>bogoutil</application> to
 	    display the database information for one or more tokens.
-	    The display includes a probability column with is the
+	    The display includes a probability column with the
 	    token's spam score (computed using
-	    <application>bogofilter</application>'s default values.
+	    <application>bogofilter</application>'s default values).
 	    Option <option>-p</option> takes the same arguments as
 	    option <option>-w</option> .
 	</para>
