@@ -4,6 +4,11 @@
 
 $Id$
 
+0.15.5.2 2003-10-01
+
+	 * Rebuild of i586.rpm with GSL-1.4 dynamically linked.
+           Source rpms and bogofilter-static rpm not affected.
+
 0.15.5.1 2003-09-30
 
 	 * Added GSL-1.4 as requirement for binary rpm.
