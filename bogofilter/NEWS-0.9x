@@ -2,6 +2,23 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.91.1	2004-06-04
+
+* Use named constants for wordlist 'type' attribute to
+  distinguish open modes of READ, WRITE, and CREATE so
+  bogofilter will include .WORDLIST_VERSION in new database.
+* Add DS_LOAD flag so bogoutil won't add .WORDLIST_VERSION
+* Modify regression tests to use bogoutil to create empty
+  wordlists (as needed).
+
+* Fixed registration.  When multiple wordlists are specified,
+  registration is to first regular wordlist.
+* Added regresstion test for multiple wordlists.
+
+* Modify contrib scripts so they're sh compatible.
+* Fix problem when bogofilter's home is a symlink.
+* Fix problems with not expanding tildes.
+
 0.91.0	2004-05-22
 
 * Add ignore list capability.

@@ -2,6 +2,41 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.91.1	2004-06-04
+
+	2004-06-04
+
+	* Fix problem with not expanding tildes.
+	* Add DS_LOAD flag to distinguish between database creation by
+	  bogofilter and bogoutil so .WORDLIST_VERSION is only added
+	  by bogofilter.
+	* Modify regression tests to use bogoutil to create empty
+	  wordlists (as needed).
+
+	2004-05-30
+
+	* Fixed registration.  When multiple wordlists are specified,
+          registration is to first regular wordlist.
+	* Added regresstion test for multiple wordlists.
+
+	2004-05-29
+
+	* Distinguish open modes of READ, WRITE, and CREATE so
+	* bogofilter will include .WORDLIST_VERSION in new database.
+
+	2004-05-28
+
+	* Modify contrib scripts so they're sh compatible.
+	* Fix problem with not expanding tildes.
+
+	2004-05-23
+
+	* Use named constants for wordlist 'type' attribute.
+
+	2004-05-22
+
+	* Fix problem when bogofilter's home is a symlink.
+
 0.91.0	2004-05-22
 
 	* Miscellaneous cleanups for multiple wordlist code.
