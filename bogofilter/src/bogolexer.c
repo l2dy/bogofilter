@@ -42,14 +42,6 @@ static void usage(void)
     fprintf(stderr, "Usage: %s [ -p | -q | -n | -h ]\n", progname);
 }
 
-static void initialize(void)
-{
-    init_charset_table(charset_default, true);
-    mime_reset();
-    token_init();
-    lexer_v3_init(NULL);
-}
-
 static void help(void)
 {
     usage();
@@ -295,7 +287,7 @@ int main(int argc, char **argv)
     bogoreader_init(argc, argv);
 
     while ((*reader_more)()) {
-	initialize();
+	lexer_init();
 
 	while ((t = get_token()) != NONE)
 	{
