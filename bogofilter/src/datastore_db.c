@@ -207,9 +207,6 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
     return;
 }
 
-/* If header and library version do not match,
- * print an error message on stderr and exit with EX_ERROR. */
-
 /* Returns is_swapped flag */
 bool db_is_swapped(void *vhandle)
 {
