@@ -148,18 +148,6 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
     return;
 }
 
-inline static double compute_probability(const word_t *token, wordcnts_t *cnts)
-{
-    double prob;
-
-    if (!msg_count_file)
-	lookup(token, cnts);
-
-    prob = calc_prob(cnts->good, cnts->bad, cnts->msgs_good, cnts->msgs_bad);
-
-    return prob;
-}
-
 /** selects the best spam/non-spam indicators and calculates Robinson's S,
  * \return -1.0 for error, S otherwise */
 double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
@@ -195,15 +183,18 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 	    props = (wordprop_t *) node->buf;
 	    cnts  = &props->cnts;
 	    token = node->key;
-	}
-	else {
+	} else {
 	    cnts = (wordcnts_t *) node;
 	    token = NULL;
 	}
 
 	count += 1;
 
-	prob = compute_probability(token, cnts);
+	if (!msg_count_file)
+	    lookup(token, cnts);
+
+	prob = calc_prob(cnts->good, cnts->bad,
+		cnts->msgs_good, cnts->msgs_bad);
 
 	if (need_stats)
 	    rstats_add(token, prob, cnts);
