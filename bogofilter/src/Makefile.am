@@ -50,7 +50,7 @@ libbogofilter_a_SOURCES= \
 	find_home.h find_home.c find_home_user.c find_home_tildeexpand.c \
 	format.h format.c \
 	html.h html.c \
-	lexer.h lexer.c lexer_head.l lexer_text_plain.l lexer_text_html.l \
+	lexer.h lexer.c lexer_v3.l \
 	maint.h maint.c \
 	mime.h mime.c \
 	paths.h paths.c \
@@ -90,7 +90,7 @@ EXTRA_DIST = bogoupgrade \
 	     version.sh \
 	     strlcat.3 strlcpy.3
 #
-VERSION_FROM=../configure.ac main.c bogofilter.c bogoutil.c lexer.c lexer_head.l lexer_text_plain.l lexer_text_html.l
+VERSION_FROM=../configure.ac main.c bogofilter.c bogoutil.c lexer.c lexer_v3.l
 version.c:	version.sh $(VERSION_FROM)
 	$(srcdir)/version.sh $(srcdir) $(VERSION_FROM) >"$@" \
 	    || rm -f "$@"

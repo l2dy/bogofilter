@@ -36,20 +36,10 @@ extern int yylineno;
 extern int msg_header;
 extern bool is_from(word_t *w);
 
-/* in lexer_head.l */
-extern token_t	lexer_lex(void);
-extern int	lexer_leng;
-extern char   * lexer_text;
-
-/* in lexer_text_plain.l */
-extern token_t	text_plain_lex(void);
-extern int	text_plain_leng;
-extern char   * text_plain_text;
-
-/* in lexer_text_html.l */
-extern token_t	text_html_lex(void);
-extern int	text_html_leng;
-extern char   * text_html_text;
+/* in lexer_v3_head.l */
+extern token_t	lexer_v3_lex(void);
+extern int	lexer_v3_leng;
+extern char   * lexer_v3_text;
 
 /* in lexer.c */
 extern int yyinput(byte *buf, size_t size);
