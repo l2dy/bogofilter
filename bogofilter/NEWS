@@ -10,6 +10,10 @@ idea to retrain or else use the '-H' (header tag degeneration) option.
 
 0.15.11
 
+	2003-12-12
+
+	* Fixed CRLF problem in bogoreader.c
+
 	2003-12-11
 
 	* Updates to bogofilter man page and FAQ.
