@@ -1,4 +1,4 @@
-README for bogotune version 0.2.7
+README for bogotune version 0.3
 (How to tune bogofilter with minimum effort)
 
 This document describes a script called bogotune that will completely
@@ -30,7 +30,7 @@ Prerequisites:
 	but results will be much more reliable (though the run will
 	take longer) if you can use several thousand (or even one or
 	two myriad) of each.
-    3. You must be using bogofilter version 0.13.6.3 or later, with
+    3. You must be using bogofilter version 0.13.7.1 or later, with
 	the Robinson-Fisher algorithm.  Programs bogofilter, bogoutil
 	and bogolexer must all be in your execution path.  If it's
 	version 0.13.6.3 you're using, you need to apply the patch
@@ -83,7 +83,7 @@ msg-count files to use in the scans.  (I _think_ bogotune should work
 with maildir format as well, but this has not been tested; feedback
 would be much appreciated.)
 
-If bogotune aborts, there may be leftover files named Rxxx in the
+If bogotune aborts, there may be leftover files named btxxx in the
 directory from which bogotune ran; the xxx stands for some number of
 more or less random digits (actually the pid of the bogotune process).
 
@@ -91,20 +91,23 @@ Running bogotune generally takes quite a while.  You will usually see
 output that ends like this:
 
 Recommendations:
+
+---cut---
 db_cachesize=10
 robx=0.503238
 min_dev=0.040
 robs=0.0178
-spam_cutoff=0.81 for 0.01% false positives; expect 6.79% false neg.
-spam_cutoff=0.69 for 0.05% false positives; expect 3.07% false neg.
-spam_cutoff=0.611 for 0.1% false positives; expect 2.81% false neg.
-spam_cutoff=0.563 for 0.2% false positives; expect 1.84% false neg.
-non_spam=0.312
+spam_cutoff=0.81	# for 0.01% false positives; expect 6.79% false neg.
+#spam_cutoff=0.69	# for 0.05% false positives; expect 3.07% false neg.
+#spam_cutoff=0.611	# for 0.1% false positives; expect 2.81% false neg.
+#spam_cutoff=0.563	# for 0.2% false positives; expect 1.84% false neg.
+ham_cutoff=0.312
+---cut---
+
 Tuning complete.
 
 These can be pasted into your bogofilter.cf file (but choose only one
-spam_cutoff value, and only copy up to but not including the first
-space on the line).  Normally, up to four possible spam cutoffs are
+spam_cutoff value).  Normally, up to four possible spam cutoffs are
 suggested, as shown above, to give you an opportunity to judge of the
 tradeoff between false positives and false negatives.  If there are too
 few messages in your test files, some of the suggestions may be

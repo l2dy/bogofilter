@@ -3,7 +3,7 @@ Verifying training db /root/.bogofilter/wordlist.db...
 Verifying test files...
 Verification completed successfully.
 Test files are in mbox format, creating message-count files...
-Message-count files R0.978894.sp and R0.978894.ns created in /proj/Rwork.
+Message-count files bt9788.sp and bt9788.ns created.
 Recommended cache size is 10 Mbytes.
 Calculating false-positive target...
 False-positive target is 6
@@ -16,14 +16,18 @@ Performing fine scan:
 [..................................................................... ]
 Minimum found at s 0.0178, md 0.040, x 0.503
 Performing final scoring:
-        Nonspam...
-           Spam...
-Recommended cache: 10 Mbytes
-                x: 0.503238
-   min. deviation: 0.040
-                s: 0.0178
-Spam cutoff for 0.05% false positives is 0.59; expect 3.07% false neg.
-Spam cutoff for 0.1% false positives is 0.511; expect 2.81% false neg.
-Spam cutoff for 0.2% false positives is 0.463; expect 1.84% false neg.
-Recommended nonspam cutoff is 0.312
+Nonspam...
+Spam...
+Recommendations:
+
+db_cachesize=10
+robx=0.503238
+min_dev=0.040
+robs=0.0178
+spam_cutoff=0.81	# for 0.01% false positives; expect 7.32% false neg.
+spam_cutoff=0.69	# for 0.05% false positives; expect 3.07% false neg.
+spam_cutoff=0.511	# for 0.1% false positives; expect 2.81% false neg.
+spam_cutoff=0.463	# for 0.2% false positives; expect 1.84% false neg.
+ham_cutoff=0.312
+
 Tuning complete.
