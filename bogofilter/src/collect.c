@@ -4,6 +4,7 @@
 
 #include "common.h"
 
+#include <assert.h>
 #include <stdlib.h>
 
 #include "charset.h"
@@ -53,10 +54,11 @@ void collect_words(wordhash_t *wh)
 
 	if (cls == BOGO_LEX_LINE)
 	{
-	    char *s = (char *)(token->text+1);	/* skip leading quote mark */
-	    char *f = memchr(s, '"', token->leng - 1);
-	    token->text = (unsigned char *) s;
-	    token->leng = f - s;
+	    char *beg = (char *)token->text+1;	/* skip leading quote mark */
+	    char *end = strchr(beg, '"');
+	    assert(end);
+	    token->leng = end - beg;
+	    memmove(token->text, token->text + 1, token->leng + D);
 	    Z(token->text[token->leng]);	/* replace terminal quote by NUL */
 	}
 
