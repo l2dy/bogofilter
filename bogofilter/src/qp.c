@@ -86,13 +86,13 @@ static void qp_init(void)
 	qp_xlate[i] = (byte) i;
     }
 
-    qp_xlate['?'] = 0;
     qp_xlate[' '] = (byte) ' ';
     qp_xlate['_'] = (byte) ' ';
 
     return;
 }
 
+#if	0	/* unused */
 bool qp_validate(word_t *word)
 {
     uint i;
@@ -102,7 +102,7 @@ bool qp_validate(word_t *word)
     for (i = 0; i < word->leng; i += 1) {
 	byte b = word->text[i];
 	byte v = qp_xlate[b];
-	if (v == 0)
+	if (v == 0 && b != '\n')
 	    return false;
 	else
 	    word->text[i] = v;
@@ -110,3 +110,4 @@ bool qp_validate(word_t *word)
 
     return true;
 }
+#endif
