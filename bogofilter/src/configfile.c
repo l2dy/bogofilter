@@ -35,6 +35,7 @@ AUTHOR:
 #include "lexer.h"
 #include "maint.h"
 #include "wordlists.h"
+#include "xatox.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 #include "xstrlcpy.h"
@@ -78,20 +79,16 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 	    }
 	case CP_INTEGER:
 	    {
-		int sign = (*val == '-') ? -1 : 1;
-		if (*val == '-' || *val == '+')
-		    val += 1;
-		*arg->addr.i = atoi((const char *)val) * sign;
+		if (!xatoi(arg->addr.i, val))
+		    fprintf(stderr, "cannot parse integer value '%s'\n", val);
 		if (DEBUG_CONFIG(0))
 		    fprintf(dbgout, "%s -> %d\n", arg->name, *arg->addr.i);
 		break;
 	    }
 	case CP_DOUBLE:
 	    {
-		double sign = (*val == '-') ? -1.0f : 1.0f;
-		if (*val == '-' || *val == '+')
-		    val += 1;
-		*arg->addr.d = atof((const char *)val) * sign;
+		if (!xatof(arg->addr.d, (const char *)val))
+		    fprintf(stderr, "cannot parse double value '%s'\n", val);
 		if (DEBUG_CONFIG(0))
 		    fprintf(dbgout, "%s -> %f\n", arg->name, *arg->addr.d);
 		break;

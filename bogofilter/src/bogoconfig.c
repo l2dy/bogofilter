@@ -36,6 +36,7 @@ AUTHOR:
 #include "lexer.h"
 #include "maint.h"
 #include "wordlists.h"
+#include "xatox.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 #include "xstrlcpy.h"
@@ -471,15 +472,19 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case 'm':
-	    c_min_dev = atof( optarg );
+	    if (!xatof(&c_min_dev, optarg))
+		fprintf(stderr, "cannot parse argument '%s' to -m\n", optarg);
 	    break;
 
 	case 'o':
 	{
-	    char *del = strchr(optarg, ',');
-	    c_spam_cutoff = atof( optarg );
-	    if (del != NULL) {
-		c_ham_cutoff = atof( del+1 );
+	    char *del = strtok(optarg, ",");
+	    bool ok = true;
+	    ok = ok && xatof(&c_spam_cutoff, del);
+	    if ((del = strtok(NULL, ",")))
+		ok = ok && xatof(&c_ham_cutoff, del);
+	    if (!ok) {
+		fprintf(stderr, "Cannot parse argument of -o option.\n");
 	    }
 	    break;
 	}
