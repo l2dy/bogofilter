@@ -69,29 +69,40 @@ int db_set_dbvalue(void *handle, const dbv_t *token, const dbv_t *val);
 typedef ex_t (*db_foreach_t)(dbv_t *token, dbv_t *data, void *userdata);
 ex_t db_foreach(void *handle, db_foreach_t hook, void *userdata);
 
-/* Returns error associated with code */
-const char *db_str_err(int);
+/** Returns error string associated with \a code. */
+const char *db_str_err(int code);
 
-/* Returns version string */
+/** Returns version string (pointer to a static buffer). */
 const char *db_version_str(void);
 
-/* Transactional interfaces */
+/** Begin new transaction. */
 int db_txn_begin(void *vhandle);
+
+/** Abort a pending transaction. */
 int db_txn_abort(void *vhandle);
+
+/** Commit a pending transaction. */
 int db_txn_commit(void *vhandle);
 
+/** Recover the environment given in \a directory. */
 ex_t dbe_recover(const char *directory, bool catastrophic, bool force);
+
+/** Remove the environment given in \a directory. */
 ex_t dbe_remove(const char *directory);
+
+/** Mark inactive and remove older write-ahead log files. */
 ex_t dbe_purgelogs(const char *directory);
+
+/** Check if \a databasefile is a valid database. */
 ex_t db_verify(const char *databasefile);
 
-/** Returns is_swapped flag */
+/** Returns true if the database is byteswapped. */
 bool db_is_swapped(void *vhandle);
 
-/** Returns created flag */
+/** Returns true if the database has been created in this session. */
 bool db_created(void *vhandle);
 
-/** Returns parent environment */
+/** Returns parent environment handle. */
 void *db_get_env(void *vhandle);
 
 #endif

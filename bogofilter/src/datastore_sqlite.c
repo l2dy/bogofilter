@@ -3,8 +3,6 @@
  * \author Matthias Andree <matthias.andree@gmx.de>
  * \date 2004
  *
- * \bug does not expose the UPDATE command for fast modification
- *
  * This file handles a static table named "bogofilter" in a SQLite3
  * database. The table has two "BLOB"-typed columns, key and value.
  *
@@ -27,7 +25,7 @@ struct dbhsqlite_t {
     char *path;	   /**< directory to hold database */
     char *name;	   /**< database file name */
     sqlite3 *db;   /**< pointer to SQLite3 handle */
-    bool created;  /**< flag, gets set by db_open on creation of the database */
+    bool created;  /**< gets set by db_open if it created the database new */
 };
 /** Convenience shortcut to avoid typing "struct dbh_t" */
 typedef struct dbhsqlite_t dbh_t;
@@ -43,6 +41,7 @@ DUMMYICP(db_verify)
 DUMMYICP(dbe_purgelogs)
 DUMMYICP(dbe_remove)
 void *dbe_init(const char *dummy) { (void)dummy; return (void *)~0; }
+/** dummy function, Sqlite recovers automatically. */
 ex_t dbe_recover(const char *d1, bool d2, bool d3) { (void)d1; d2=d3; return EX_ERROR; }
 bool db_is_swapped(void *dummy) { (void)dummy; return false; }
 
@@ -52,6 +51,7 @@ bool db_is_swapped(void *dummy) { (void)dummy; return false; }
 	"   key   BLOB PRIMARY KEY, "\
 	"   value BLOB);"
 
+/** The command to begin a regular transaction. */
 #define BEGIN \
 	"BEGIN TRANSACTION;"
 
