@@ -41,8 +41,15 @@ check_counts()
     if  [ $verbose -ne 0 ]; then
 	echo "test #$T"
     fi
-    g=`$BOGOUTIL -d $BOGOFILTER_DIR/goodlist.db | grep -v " 0 " | tee $TMPDIR/good.$T.out | wc -l`
-    s=`$BOGOUTIL -d $BOGOFILTER_DIR/spamlist.db | grep -v " 0 " | tee $TMPDIR/spam.$T.out | wc -l`
+
+    if [ -f  $BOGOFILTER_DIR/goodlist.db ] ; then
+	g=`$BOGOUTIL -d $BOGOFILTER_DIR/goodlist.db | grep -v " 0 " | tee $TMPDIR/good.$T.out | wc -l`
+	s=`$BOGOUTIL -d $BOGOFILTER_DIR/spamlist.db | grep -v " 0 " | tee $TMPDIR/spam.$T.out | wc -l`
+    else
+	$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db > $TMPDIR/word.$T.out
+	g=`grep -v " 0$" < $TMPDIR/word.$T.out | tee $TMPDIR/good.$T.out | wc -l`
+	s=`grep -v " 0 " < $TMPDIR/word.$T.out | tee $TMPDIR/spam.$T.out | wc -l`
+    fi
     WANT=`printf "%d.%d" $S $G`
     HAVE=`printf "%d.%d" $s $g`
 

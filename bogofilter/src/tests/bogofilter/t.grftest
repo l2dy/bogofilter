@@ -90,8 +90,10 @@ for mth in g r f t ; do
     mkdir -p $BOGOFILTER_DIR
     $BOGOFILTER -$alg $CFG -s < ${SYSTEST}/inputs/spam.mbx
     $BOGOFILTER -$alg $CFG -n < ${SYSTEST}/inputs/good.mbx
-    $BOGOUTIL -d $BOGOFILTER_DIR/spamlist.db > $BOGOFILTER_DIR/spamlist.txt
-    $BOGOUTIL -d $BOGOFILTER_DIR/goodlist.db > $BOGOFILTER_DIR/goodlist.txt
+    for f in $BOGOFILTER_DIR/*.db ; do
+	n=`basename $f .db`
+	$BOGOUTIL -d $BOGOFILTER_DIR/$n.db > $BOGOFILTER_DIR/$n.txt
+    done
     [ $verbose -gt 0 ] && $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT
     #
     # run tests for msg.[1-8].txt

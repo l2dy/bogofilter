@@ -52,8 +52,10 @@ if [   -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
 mkdir -p $BOGOFILTER_DIR
 $BOGOFILTER -$mth $CFG -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER -$mth $CFG -n < ${SYSTEST}/inputs/good.mbx
-#$BOGOUTIL -d $BOGOFILTER_DIR/spamlist.db > $BOGOFILTER_DIR/spamlist.txt
-#$BOGOUTIL -d $BOGOFILTER_DIR/goodlist.db > $BOGOFILTER_DIR/goodlist.txt
+#for f in $BOGOFILTER_DIR/*.db ; do
+#    o=`echo $f | sed s@.db@.txt@`
+#    $BOGOUTIL -d $f > $o
+#done
 [ $verbose -gt 0 ] && $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT
 
 BOGOFILTER_DIR="${TMPDIR}"

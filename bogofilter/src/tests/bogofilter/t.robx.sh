@@ -44,9 +44,7 @@ $BOGOFILTER -r -n < ${SYSTEST}/inputs/good.mbx
 if [ ! -z "$RUN_FROM_MAKE" ] ; then
     $BOGOUTIL -R $TMPDIR
 else
-    for w in spamlist goodlist ; do
-	$BOGOUTIL -d $TMPDIR/$w.db > ${TMPDIR}/$w.txt
-    done
+    $BOGOUTIL -d $TMPDIR/wordlist.db > ${TMPDIR}/wordlist.txt
     $BOGOUTIL -vvv -R $TMPDIR > ${TMPDIR}/output.vvv
 fi
 
