@@ -19,6 +19,7 @@ NAME:
 #include <unixlib/local.h> /* __RISCOSIFY_NO_PROCESS */
 int __riscosify_control = __RISCOSIFY_NO_PROCESS;
 int __feature_imagefs_is_file = 1;
+const char *const system_config_file = "<Bogofilter$Dir>.bogofilter/cf";
 #endif
 
 bool bf_abspath(const char *path)

@@ -54,7 +54,6 @@ COMMON_OBJS = o.base64 \
 	o.datastore_qdbm \
 	o.debug \
 	o.degen \
-	o.directories \
 	o.error \
 	o.fgetsl \
 	o.find_home \
@@ -102,7 +101,7 @@ COMMON_OBJS = o.base64 \
 	o.xstrlcpy
 
 BOGOFILTER_OBJS = o.main
-	
+
 BOGOLEXER_OBJS = o.bogolexer
 
 BOGOUTIL_OBJS = o.bogoutil
