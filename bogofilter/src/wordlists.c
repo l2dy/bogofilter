@@ -172,8 +172,6 @@ static char *spanword(char *p)
 /* returns true for success, false for error */
 bool configure_wordlist(const char *val)
 {
-    bool ok;
-    int rc;
     char  ch;
     WL_TYPE type;
     char* listname;
@@ -207,11 +205,9 @@ bool configure_wordlist(const char *val)
     precedence=atoi(tmp);
     tmp = spanword(tmp);
     
-    rc = init_wordlist(listname, filename, precedence, type);
-    ok = rc == 0;
+    init_wordlist(listname, filename, precedence, type);
+    
+    config_setup = true;
 
-    if (ok)
-	config_setup = true;
-
-    return ok;
+    return true;
 }

@@ -29,8 +29,8 @@ struct wordlist_s
     int		override;
 };
 
-int init_wordlist(const char* name, const char* path,
-		  int override, WL_TYPE type);
+void init_wordlist(const char* name, const char* path,
+		   int override, WL_TYPE type);
 
 void free_wordlists(void);
 

@@ -18,8 +18,8 @@ bool	config_setup = false;
 /*@null@*/ wordlist_t* word_lists=NULL;
 
 /* returns -1 for error, 0 for success */
-int init_wordlist(const char* name, const char* path,
-		  int override, WL_TYPE type)
+void init_wordlist(const char* name, const char* path,
+		   int override, WL_TYPE type)
 {
     wordlist_t *n = (wordlist_t *)xcalloc(1, sizeof(*n));
     wordlist_t *list_ptr;
@@ -50,7 +50,8 @@ int init_wordlist(const char* name, const char* path,
 	}
 	list_ptr=list_ptr->next;
     }
-    return 0;
+
+    return;
 }
 
 /* Set default wordlist for registering messages, finding robx, etc */
