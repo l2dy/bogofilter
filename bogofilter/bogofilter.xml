@@ -151,20 +151,31 @@ intervene (with <option>-N</option> or <option>-S</option>) when
    :0HB
     * ? bogofilter
     {
-            :0HBc
+            :0c
             | bogofilter -s
 
-            :0
-            $MUTT/spam
+            :0:
+            spam-bogofilter
     }
 
-    :0EHBc
+    :0Ec
     | bogofilter -n
 </programlisting>
-<para> There have been numerous requests for a
-<application>bogofilter</application> option to do the above, but the
-current implemention would make this quite painful.  The procmail
-recipe is the best way for now.</para>
+
+<para> An alternate approach is to use the update ('-u') option.  When it is specified
+<application>bogofilter</application> will classify the text and update either the spam wordlist or the good wordlist, as appropriate.
+Here's a procmail recipe that does three things.  The '-u' option causes updating of the word lists;  the '-p' option adds a "X-Spam-Status: Yes/No" line to the message; and the "spam-bogofilter" action line puts all spam into file spam-bogofilter.
+</para>
+
+<programlisting class="procmail">
+   :0fw
+   | bogofilter -u -p
+
+   :0:
+   * ^X-Spam-Status: Yes
+   spam-bogofilter
+
+</programlisting>
 
 <para>The following <filename>.muttrc</filename> lines will create
 mutt macros for dispatching mail to
@@ -186,11 +197,11 @@ are missing.</para>
 <refsect1 id='files'><title>FILES</title>
 <variablelist>
 <varlistentry>
-<term><filename>~/.bogofilter/goodlist</filename></term>
+<term><filename>~/.bogofilter/goodlist.db</filename></term>
 <listitem><para>List of good tokens.</para></listitem>
 </varlistentry>
 <varlistentry>
-<term><filename>~/.bogofilter/spamlist</filename></term>
+<term><filename>~/.bogofilter/spamlist.db</filename></term>
 <listitem><para>List of spam tokens.</para></listitem>
 </varlistentry>
 </variablelist>
