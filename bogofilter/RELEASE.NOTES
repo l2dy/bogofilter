@@ -22,6 +22,48 @@ these changes. You should consult them.
 
 ########################################################################
 
+NEW CAPABILITIES IN BOGOFILTER 0.94
+===================================
+
+Bogofilter and bogoutil now support both build-time and run-time
+choosing whether to operate with (or without) transaction support.
+They can also auto-detect whether you've been using transactions or
+not.
+
+Run-time Selection:
+
+For bogofilter and bogoutil, transactions can be enabled or disabled
+in 3 ways -- by command line options, config file options, or
+environment variables.
+
+Command line option "--db-transaction=yes" enables transactions and
+"--db-transaction=no" disables them.
+
+Config file options "db_transactions=yes" and "db_transactions=no"
+have the same effect.
+
+Defining environment variable "BF_FORCE_TRANSACTIONAL" enables them
+and "BF_FORCE_NON_TRANSACTIONAL" disables them.
+
+Auto-detection:
+
+If none of the above methods are used to enable/disable transactions,
+bogofilter and bogoutil will query Berkeley DB to see if a transaction
+environment already exists.  If so, transactions will be enabled.  If
+not, they will be disabled.
+
+Compile-time selection:
+
+A default build includes the run-time and auto-detect capabilities.
+If you wish to minimize program size, ./configure can be used to
+create single mode versions of bogofilter and bogoutil, i.e. programs
+that only run transactionally or non-transactionallly.  Use
+"./configure --enable-transactions" to enable transactions and
+"./configure --disable-transactions" to disable them.  These programs
+will be _slightly_ smaller than the default build.
+
+########################################################################
+
 INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
 =======================================
 
