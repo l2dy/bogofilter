@@ -143,3 +143,5 @@ case `uname -s` in
     Linux)  DIFF_BRIEF="--brief -s" ;;
     *)      DIFF_BRIEF="" ;;
 esac
+
+if test $verbose -gt 0 ; then DIFF_BRIEF="" ; fi
