@@ -21,16 +21,17 @@ typedef struct {
 } word_t;
 
 /** create a new word_t from the \a leng bytes at address \a text */
-extern word_t  *word_new(const byte *text, uint leng);
+extern word_t  *word_new(const byte *text, /**< may be NULL, to create a blank word_t */
+	uint leng);
 
 /** create a new word_t from the NUL-terminated \a cstring */
-#define word_news(cstring) word_new(cstring, 0)
+#define word_news(cstring) word_new((cstring), strlen((const char *)(cstring)));
 
 /** deallocate memory allocated for \a self */
-extern void 	word_free(word_t *self);
+#define word_free(self) xfree((self))
 
 /** create a newly word_t to form a deep copy of \a self */
-extern word_t  *word_dup(const word_t *self);
+#define word_dup(self)  word_new((self)->text, (self)->leng)
 
 /** compare \a w1 and \a w2 with memcmp() */
 extern int 	word_cmp(const word_t *w1, const word_t *w2);
