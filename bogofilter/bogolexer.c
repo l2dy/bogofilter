@@ -63,29 +63,40 @@ int main(int argc, char **argv)
     dbgout = stderr;
 
     while ((option = getopt(argc, argv, ":hnpqvnx:I:k:")) != -1)
-	switch (option) {
+	switch (option)
+	{
+	case '?':
+	    help();
+	    exit(2);
+
 	case 'h':
 	    help();
 	    exit(0);
-	    break;
+
 	case 'q':
 	    quiet = true;
 	    break;
+
 	case 'p':
 	    passthrough = true;
 	    break;
+
 	case 'n':
 	    replace_nonascii_characters = true;
 	    break;
+
 	case 'v':
 	    verbose += 1;
 	    break;
+
 	case 'x':
 	    set_debug_mask( optarg );
 	    break;
+
 	case 'k':
 	    kill_html_comments = str_to_bool( optarg );
 	    break;
+
 	case 'I':
 	    fpin = fopen( optarg, "r" );
 	    if (fpin == NULL) {
@@ -93,6 +104,7 @@ int main(int argc, char **argv)
 		exit(2);
 	    }
 	    break;
+
 	default:
 	    usage();
 	    exit(0);

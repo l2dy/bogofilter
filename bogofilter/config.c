@@ -486,7 +486,7 @@ int process_args(int argc, char **argv)
 
     fpin = stdin;
 
-    while ((option = getopt(argc, argv, "23d:eFhl::o:snSNvVpuc:CgrRx:fqtI:O:y:k:" G R F)) != EOF)
+    while ((option = getopt(argc, argv, ":23d:eFhl::o:snSNvVpuc:CgrRx:fqtI:O:y:k:" G R F)) != EOF)
     {
 	switch(option)
 	{
@@ -530,17 +530,14 @@ int process_args(int argc, char **argv)
 	case '?':
 	    help();
 	    exit(2);
-	    break;
 
 	case 'h':
 	    help();
             exit(0);
-	    break;
 
         case 'V':
 	    print_version();
 	    exit(0);
-	    break;
 
 	case 'I':
 	    fpin = fopen( optarg, "r" );
