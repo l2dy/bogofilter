@@ -360,7 +360,7 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 
     char filepath1[PATH_LEN];
     char filepath2[PATH_LEN];
-    char *filepaths[] = { filepath1, filepath2 };
+    char *filepaths[2];
 
     byte buf[BUFSIZE];
     buff_t *buff = buff_new(buf, 0, BUFSIZE);
@@ -375,6 +375,9 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     void *dbh;
 
     set_wordlist_mode(dir);
+    filepaths[0] = filepath1;
+    filepaths[1] = filepath2;
+
     count = build_wordlist_paths(filepaths, dir);
 
     /* XXX FIXME: deadlock possible */
@@ -510,9 +513,14 @@ static int compute_robinson_x(char *path)
     if (!onlyprint) {
 	char filepath1[PATH_LEN];
 	char filepath2[PATH_LEN];
-	char *filepaths[] = { filepath1, filepath2 };
+	char *filepaths[2];
 
-	size_t count = build_wordlist_paths(filepaths, path);
+	size_t count;
+
+	filepaths[0] = filepath1;
+	filepaths[1] = filepath2;
+
+	count = build_wordlist_paths(filepaths, path);
 
 	if (count == 0)
 	{

@@ -162,7 +162,7 @@ static int maintain_hook(word_t *key, word_t *data,
 
     memcpy(&val, data->text, data->leng);
 
-    if (strncmp(key->text, ".MSG_COUNT", key->leng) == 0)
+    if (strncmp((char *)key->text, ".MSG_COUNT", key->leng) == 0)
 	return 0;
 
     if ((!keep_count(val.spamcount) && !keep_count(val.goodcount)) || 

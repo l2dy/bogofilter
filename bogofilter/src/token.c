@@ -212,7 +212,7 @@ size_t decode_text(word_t *w)
     char *beg = strchr(text, '=');
     char *enc = strchr(beg+2,  '?');
     word_t n;
-    n.text = (char *) enc + 3;
+    n.text = (unsigned char *)(enc + 3);
     n.leng = size - (enc+3 - text + 2);
     n.text[n.leng] = '\0';
 
