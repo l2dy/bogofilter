@@ -52,4 +52,6 @@ for FILE in "$SRC"/*.db ; do
     dd bs=$SIZE if="$FILE" of="$DST/"`basename "$FILE"`
 done
 
-db_recover -h "$DST" rm -f $F trap - 0
+db_recover -h "$DST"
+rm -f $F
+trap - 0
