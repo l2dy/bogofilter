@@ -232,7 +232,7 @@ const char *db_version_str(void)
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
 */
-void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
+void *db_open(const char *path, const char *name, dbmode_t open_mode)
 {
     int ret;
     int is_swapped;
@@ -272,7 +272,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	DB *dbp;
 	uint32_t retryflag = retryflags[idx], pagesize;
 
-	handle = dbh_init(db_file, name);
+	handle = dbh_init(path, name);
 
 	if (handle == NULL)
 	    break;
