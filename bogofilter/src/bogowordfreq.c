@@ -11,17 +11,19 @@
  * argument on the command line.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "common.h"
+
+#include <stdlib.h>
+#include <string.h>
 
 #include "collect.h"
 #include "wordhash.h"
+#include "wordlists.h"
 
 const char *progname = "bogowordfreq.c";
 const char *spam_header_name = "X-Bogosity:"; /* unused */
+
+wordlist_t* word_lists=NULL;	/* define to satisfy link requirements of msgcount.c */
 
 static void print_wordlist (wordhash_t *h)
 {
