@@ -3,7 +3,7 @@
 # foreign: don't insist on ChangeLog
 # 1.6: minimum version of automake/aclocal
 AUTOMAKE_OPTIONS = foreign 1.6
-SUBDIRS =  dcdflib . tests contrib
+SUBDIRS =  dcdflib . tests contrib doc
 SYSCONFDIR = @sysconfdir@
 DISTCHECK_CONFIGURE_FLAGS= @DISTCHECK_CONFIGURE_FLAGS@
 
@@ -79,16 +79,12 @@ find_home_test_SOURCES = find_home.test.c
 # what to distribute
 extradistdirs = doc
 EXTRA_DIST = $(man_MANS) \
-	     bogofilter.cf.example bogofilter-faq.html \
+	     bogofilter.cf.example \
 	     METHODS UPGRADE \
-	     bogofilter.xml bogoutil.xml bogoupgrade.xml bogolexer.xml \
 	     bogofilter.spec bogofilter.spec.in \
 	     bogoupgrade \
 	     version.sh \
-	     README.cvs README.freebsd README.hp-ux \
-	     README.dcdflib README.Robinson \
 	     $(extradistdirs) \
-	     bogofilter-SA-2002-01 \
 	     strlcat.3 strlcpy.3
 #
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.c lexer_head.l lexer_text_plain.l lexer_text_html.l
@@ -109,15 +105,6 @@ lexer_text_plain.c:	lexer_text_plain.l
 lexer_text_html.c:	lexer_text_html.l
 	flex -Ptext_html_ -o$@ $<
 #
-.xml.pdf:
-	xmlto pdf --extensions $<
-
-.xml.html:
-	xmlto html-nochunks $<
-
-.xml.1:
-	xmlto man $< || { rm -f $@ ; exit 1 ; }
-
 .PHONY: rpm cvs-check
 
 rpm:	    dist $(distdir).tar.gz
