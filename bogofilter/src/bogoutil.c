@@ -276,7 +276,7 @@ static int load_file(char *db_file)
 	if ( *p != '\0' ) {
 	    fprintf(stderr,
 		    "%s: Unexpected input [%s] on line %lu. "
-		    "Expecting whitespace before count\n",
+		    "Expecting whitespace before count.\n",
 		    PROGNAME, buf, line);
 	    rv = 1;
 	    break;
@@ -696,8 +696,9 @@ static int process_args(int argc, char **argv)
 		    size_min = mi;
 		    size_max = ma;
 		} else {
-		    fprintf(stderr, "syntax error in argument \"%s\" of -s.",
+		    fprintf(stderr, "syntax error in argument \"%s\" of -s\n.",
 			    optarg);
+		    exit(2);
 		}
 	    }
 	    break;
