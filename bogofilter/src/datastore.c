@@ -323,6 +323,7 @@ static word_t  *wordlist_version_tok;
 
 void ds_init()
 {
+    db_init();
     if (msg_count_tok == NULL) {
 	msg_count_tok = word_new((const byte *)MSG_COUNT, strlen(MSG_COUNT));
     }
@@ -334,6 +335,7 @@ void ds_init()
 /* Cleanup storage allocation */
 void ds_cleanup()
 {
+    db_cleanup();
     xfree(msg_count_tok);
     xfree(wordlist_version_tok);
     msg_count_tok = NULL;

@@ -47,8 +47,6 @@ typedef struct {
  * or transactional initialization/shutdown */
 
 static bool init = false;
-static int db_init(void) { init = true; return 0; }
-static void db_cleanup(void) { init = false; }
 
 /* Function definitions */
 
@@ -127,8 +125,6 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     handle = dbh_init(db_file, name);
 
     if (handle == NULL) return NULL;
-
-    db_init();
 
     dbp = handle->dbp = dpopen(handle->name, open_flags, DB_INITBNUM);
 
@@ -276,8 +272,6 @@ void db_close(void *vhandle, bool nosync)
     handle->dbp = NULL;
 
     dbh_free(handle);
-
-    db_cleanup();
 }
 
 
@@ -343,4 +337,15 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 
 const char *db_str_err(int e) {
     return dperrmsg(e);
+}
+
+int db_init(void)
+{
+    init = true; 
+    return 0;
+}
+
+void db_cleanup(void)
+{
+    init = false;
 }

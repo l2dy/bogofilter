@@ -70,9 +70,6 @@ typedef struct {
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
 
-static int db_init(void);
-static void db_cleanup(void);
-
 /* Function definitions */
 
 /** translate BerkeleyDB \a flags bitfield back to symbols */
@@ -284,10 +281,6 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
      */
     size_t idx;
     uint32_t retryflags[] = { 0, DB_NOMMAP };
-
-    db_init();
-
-    if (!init) abort();
 
     check_db_version();
 
@@ -574,8 +567,6 @@ void db_close(void *vhandle, bool nosync)
 	print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
 
     dbh_free(handle);
-
-    db_cleanup();
 }
 
 
@@ -671,7 +662,7 @@ const char *db_str_err(int e) {
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
 
-static int db_init(void) {
+int db_init(void) {
     char *t;
     int cdb_alldb = 1;
 
@@ -705,7 +696,7 @@ static int db_init(void) {
     return 0;
 }
 
-static void db_cleanup(void) {
+void db_cleanup(void) {
     if (!init)
 	return;
     if (dbe)

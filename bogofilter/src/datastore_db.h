@@ -81,6 +81,9 @@ bool db_is_swapped(void *vhandle);
 /* Returns created flag */
 bool db_created(void *vhandle);
 
+int db_init(void);
+void db_cleanup(void);
+
 /* This is not currently used ...
  * 
 #define db_write_lock(fd) db_lock(fd, F_SETLKW, F_WRLCK)
