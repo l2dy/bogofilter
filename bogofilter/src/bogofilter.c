@@ -133,7 +133,7 @@ rc_t bogofilter(int argc, char **argv)
 	}
 	wordhash_free(w);
 
-	rstats_cleanup();
+	(*method->cleanup)();
 	passthrough_cleanup();
     }
 

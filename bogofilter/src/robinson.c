@@ -29,7 +29,6 @@ extern int Rtable;
 
 double	thresh_rtable = 0.0;		/* used in fisher.c */
 
-static bool	need_stats = false;
 static rob_stats_t  rob_stats;
 
 const parm_desc rob_parm_table[] =	/* needed by fisher.c */
@@ -74,7 +73,6 @@ void rob_print_stats(FILE *fp)
 	rob_stats.s.spamicity > thresh_stats ||
 	rob_stats.s.spamicity > thresh_rtable)
 	rstats_print(unsure);
-    rstats_cleanup();
 }
 
 static void wordprob_add(wordcnts_t *cnts, uint count, uint bad)
@@ -185,9 +183,6 @@ static double compute_probability(const word_t *token, wordcnts_t *cnts)
 	/* Otherwise lookup the word and get its score */
 	prob = lookup_and_score(token, cnts);
 
-    if (need_stats)
-	rstats_add(token, prob, cnts);
-
     return prob;
 }
 
@@ -202,13 +197,14 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     double spamicity;
     size_t robn = 0;
     size_t count = 0;
+    bool need_stats;
 
     (void) fp; 	/* quench compiler warning */
 
     if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() begins\n");
 
-    need_stats = Rtable || verbose || passthrough;
     Rtable |= verbose > 3;
+    need_stats = Rtable || verbose || passthrough;
 
     if (need_stats)
 	rstats_init();
@@ -235,9 +231,12 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 	    token = NULL;
 	}
 
+	count += 1;
+
 	prob = compute_probability(token, cnts);
 
-	count += 1;
+	if (need_stats)
+	    rstats_add(token, prob, cnts);
 
 	/* Robinson's P and Q; accumulation step */
         /*
@@ -275,7 +274,7 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 
     spamicity = (*((rf_method_t *)method)->get_spamicity)( robn, P, Q );
 
-    if (robn && need_stats)
+    if (need_stats && robn != 0)
 	rstats_fini(robn, P, Q, spamicity );
 
     if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() ends\n");
@@ -376,7 +375,7 @@ void rob_initialize_constants(void)
 
 void rob_cleanup(void)
 {
-    /* Not yet implemented. */
+    rstats_cleanup();
 }
 
 /* Done */
