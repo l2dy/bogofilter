@@ -89,7 +89,7 @@ EXTRA_DIST = bogoupgrade \
 	     version.sh \
 	     strlcat.3 strlcpy.3
 #
-VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.c lexer_head.l lexer_text_plain.l lexer_text_html.l
+VERSION_FROM=../configure.ac main.c bogofilter.c bogoutil.c lexer.c lexer_head.l lexer_text_plain.l lexer_text_html.l
 version.c:	version.sh $(VERSION_FROM)
 	$(srcdir)/version.sh $(srcdir) $(VERSION_FROM) >"$@" \
 	    || rm -f "$@"
