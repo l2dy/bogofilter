@@ -1,4 +1,4 @@
-#!/bin/bash
+# no shebang line here, we want explicit $(SHELL) from make!
 
 #	version.sh
 #

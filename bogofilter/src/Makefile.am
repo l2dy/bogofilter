@@ -109,6 +109,8 @@ version_sources= \
 	xatox.h xatof.c xatoi.c \
 	datastore_db.h
 
+BUILT_SOURCES=	version.c
+
 libbogofilter_a_SOURCES = \
 	directories.c version.c \
 	$(version_sources)
@@ -174,7 +176,7 @@ version.c: version.sh ../configure.ac Makefile.am	\
 	$(bogoutil_SOURCES)				\
 	$(bogotune_SOURCES)
 
-	$(srcdir)/version.sh $(top_srcdir) >"$@.new" && mv "$@.new" "$@" \
+	$(SHELL) $(srcdir)/version.sh $(top_srcdir) >"$@.new" && mv "$@.new" "$@" \
 	    || rm -f "$@"
 #
 directories.c: ../config.status

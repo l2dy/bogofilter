@@ -20,6 +20,23 @@ AM_PROG_LEX
 # Check for extension
 AC_EXEEXT
 
+dnl check for b0rked Solaris (and other shells) and find one that works
+AC_MSG_CHECKING(for a working shell...)
+for i in /bin/sh /usr/xpg4/bin/sh /bin/ksh /bin/bash /usr/local/bin/bash ; do
+    $i -c 'echo $(echo ok)' >config.$$ 2>/dev/null
+    j=`cat config.$$`
+    rm -f config.$$
+    if test "x$j" = "xok" ; then
+	SHELL=$i
+	AC_SUBST(SHELL)
+	break
+    fi
+done
+AC_MSG_RESULT($SHELL)
+if test "x$SHELL" = "x" ; then
+    AC_MSG_ERROR(no sufficiently POSIX/SUS compliant shell found)
+fi
+
 dnl crutch for b0rked S/390 gcc:
 if test "x$target_cpu" = "xs390" && test "x$GCC" = "xyes" ; then
     case ${CFLAGS} in
