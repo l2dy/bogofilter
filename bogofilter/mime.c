@@ -224,7 +224,6 @@ mime_reset (void)
   msg_header = true;		/*FIXME: fold this into mime structure */
 }
 
-
 void
 mime_add_child (mime_t * parent)
 {
@@ -282,7 +281,7 @@ got_mime_boundary (const byte *boundary, int boundary_len)
 	 return; 
   
   if (DEBUG_MIME (1))
-    fprintf (dbgout, "*** got_mime_boundary. stackp: %d. boundary: %s\n",
+    fprintf (dbgout, "*** got_mime_boundary:  stackp: %d, boundary: '%s'\n",
 	     stackp, boundary);
 
   if (stackp > 0)
@@ -367,17 +366,31 @@ getparam (char *t, char *e, const byte *param)
 void
 mime_version (const byte *text, int leng)
 {
-  size_t l = strlen ("MIME-Version:");
-  char *w = getword (text + l, text + leng);
+  size_t l;
+  char *w;
+
+  if (!msg_header && !msg_state->mime_header)
+      return;
+
+  l = strlen ("MIME-Version:");
+  w = getword (text + l, text + leng);
+
   msg_state->version = w;
 }
 
 void
 mime_disposition (const byte *text, int leng)
 {
-  size_t l = strlen ("Content-Disposition:");
-  char *w = getword (text + l, text + leng);
+  size_t l;
+  char *w;
   struct disposition_s *dis;
+
+  if (!msg_header && !msg_state->mime_header)
+      return;
+
+  l = strlen ("Content-Disposition:");
+  w = getword (text + l, text + leng);
+
   msg_state->mime_disposition = MIME_DISPOSITION_UNKNOWN;
   for (dis = dispositions; dis < dispositions + COUNTOF (dispositions);
        dis += 1)
@@ -410,9 +423,16 @@ mime_disposition (const byte *text, int leng)
 void
 mime_encoding (const byte *text, int leng)
 {
-  size_t l = strlen ("Content-Transfer-Encoding:");
-  char *w = getword (text + l, text + leng);
+  size_t l;
+  char *w;
   struct encoding_s *enc;
+
+  if (!msg_header && !msg_state->mime_header)
+      return;
+
+  l = strlen ("Content-Transfer-Encoding:");
+  w = getword (text + l, text + leng);
+
   msg_state->mime_encoding = MIME_ENCODING_UNKNOWN;
   for (enc = encodings; enc < encodings + COUNTOF (encodings); enc += 1)
   {
@@ -431,9 +451,15 @@ mime_encoding (const byte *text, int leng)
 void
 mime_type (const byte *text, int leng)
 {
-  size_t l = strlen ("Content-Type:");
-  char *w = getword (text + l, text + leng);
+  size_t l;
+  char *w;
   struct type_s *typ;
+
+  if (!msg_header && !msg_state->mime_header)
+      return;
+
+  l = strlen ("Content-Type:");
+  w = getword (text + l, text + leng);
 
   if (!w)
     return;
@@ -499,41 +525,27 @@ mime_decode (byte *buff, size_t size)
 {
   size_t count = size;
   boundary_t b;
-   
-  if (DEBUG_MIME (3))
-    fprintf (dbgout, "*** mime_decode %d \"%-.*s\"\n", size, (int) size - 1,
-	     buff);
 
   if (msg_state->mime_header)	/* do nothing if in header */
     return count;
   
+  /* early out for the uninteresting cases */
+  if (msg_state->mime_encoding ==  MIME_7BIT ||
+      msg_state->mime_encoding ==  MIME_8BIT ||
+      msg_state->mime_encoding ==  MIME_BINARY ||
+      msg_state->mime_encoding ==  MIME_ENCODING_UNKNOWN)
+      return count;
+
+  if (DEBUG_MIME (3))
+    fprintf (dbgout, "*** mime_decode %d \"%-.*s\"\n", size, (int) size - 1,
+	     buff);
+
   /* Do not decode "real" boundary lines */
+  if (get_boundary_props(buff, size, &b) == true)
+      return count;
+
   switch (msg_state->mime_encoding)
   {
-  case MIME_QP:
-  case MIME_BASE64:
-  case MIME_UUENCODE:
-      if (get_boundary_props(buff, size, &b) == true)
-            return count;
-      break;
-  case MIME_ENCODING_UNKNOWN:
-  case MIME_7BIT:
-  case MIME_8BIT:
-  case MIME_BINARY:
-      break;
-  }
-  
-  switch (msg_state->mime_encoding)
-  {
-  case MIME_7BIT:
-    /* do nothing */
-    break;
-  case MIME_8BIT:
-    /* do nothing */
-    break;
-  case MIME_BINARY:
-    /* do nothing */
-    break;
   case MIME_QP:
     count = qp_decode(buff, size);
     break;
@@ -544,8 +556,12 @@ mime_decode (byte *buff, size_t size)
   case MIME_UUENCODE:
     count = uudecode(buff, size);
     break;
+  case MIME_7BIT:
+  case MIME_8BIT:
+  case MIME_BINARY:
   case MIME_ENCODING_UNKNOWN:
     break;
   }
+
   return count;
 }
