@@ -162,7 +162,7 @@ static void check_fsize_limit(int fd, uint32_t pagesize) {
 
     if (fstat(fd, &st)) return; /* ignore error */
     if (getrlimit(RLIMIT_FSIZE, &rl)) return; /* ignore error */
-    if (rl.rlim_cur != RLIM_INFINITY) {
+    if (rl.rlim_cur != (rlim_t)RLIM_INFINITY) {
 	/* WARNING: Be extremely careful that in these comparisons there
 	 * is no unsigned term, it will spoil everything as C will
 	 * coerce into unsigned types, which would then make "file size
