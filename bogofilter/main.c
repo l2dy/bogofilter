@@ -34,7 +34,7 @@ AUTHOR:
 run_t run_type = RUN_NORMAL; 
 
 int verbose, passthrough, nonspam_exits_zero;
-enum algorithm algorithm = AL_ORIGINAL;
+enum algorithm algorithm = AL_GRAHAM;
 
 char directory[PATH_LEN];
 
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
     set_dir_from_env(directory, "HOME", BOGODIR);
     set_dir_from_env(directory, "BOGOFILTER_DIR", NULL);
 
-    while ((ch = getopt(argc, argv, "d:ehlsnSNvVpuor")) != EOF)
+    while ((ch = getopt(argc, argv, "d:ehlsnSNvVpugr")) != EOF)
 	switch(ch)
 	{
 	case 'd':
@@ -203,8 +203,8 @@ int main(int argc, char **argv)
 	    logflag = 1;
 	    break;
 
-	case 'o':
-	    algorithm = AL_ORIGINAL;
+	case 'g':
+	    algorithm = AL_GRAHAM;
 	    break;
 
 	case 'r':

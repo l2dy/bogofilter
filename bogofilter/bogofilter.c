@@ -48,20 +48,21 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #define EVEN_ODDS	0.5f		// used for words we want to ignore
 #define DEVIATION(n)	fabs((n) - EVEN_ODDS)	// deviation from average
 
-#define ORIGINAL_MIN_DEV		0.4f		// look for characteristic words
+#define GRAHAM_MIN_DEV		0.4f		// look for characteristic words
 #define ROBINSON_MIN_DEV		0.0f		// if nonzero, use characteristic words
-#define MIN_DEV (algorithm == AL_ORIGINAL ? ORIGINAL_MIN_DEV : ROBINSON_MIN_DEV)
 
-#define ORIGINAL_SPAM_CUTOFF	0.90f	// if it's spammier than this...
+#define GRAHAM_SPAM_CUTOFF	0.90f	// if it's spammier than this...
 #define ROBINSON_SPAM_CUTOFF	0.52f	// if it's spammier than this...
-#define SPAM_CUTOFF (algorithm == AL_ORIGINAL ? ORIGINAL_SPAM_CUTOFF : ROBINSON_SPAM_CUTOFF)
 
-#define ORIGINAL_MAX_REPEATS	4	// cap on word frequency per message
+#define GRAHAM_MAX_REPEATS	4	// cap on word frequency per message
 #define ROBINSON_MAX_REPEATS	1	// cap on word frequency per message
-#define MAX_REPEATS (algorithm == AL_ORIGINAL ? ORIGINAL_MAX_REPEATS : ROBINSON_MAX_REPEATS)
 
 #define ROBS 0.001f                    // Robinson's s
 #define ROBX 0.415f                    // Robinson's x
+
+double min_dev;
+double spam_cutoff;
+double max_repeats;
 
 #define PLURAL(count) ((count == 1) ? "" : "s")
 
@@ -103,8 +104,8 @@ void *collect_words(int fd, int *msg_count, int *word_count)
       // in order to be able to cap frequencies.
       for(n = wordhash_first(h); n != NULL; n = wordhash_next(h)){
         w = n->buf;
-        if (w->msg_freq > MAX_REPEATS)
-          w->msg_freq = MAX_REPEATS;
+        if (w->msg_freq > max_repeats)
+          w->msg_freq = max_repeats;
   
         w->freq += w->msg_freq;
         w->msg_freq = 0;
@@ -347,7 +348,7 @@ double wordprob_result(wordprob_t* wordstats)
     double prob;
 
     switch(algorithm) {
-	case AL_ORIGINAL:
+	case AL_GRAHAM:
 	    prob = wordstats->bad/(wordstats->good + wordstats->bad);
 	    break;
 	case AL_ROBINSON:
@@ -402,7 +403,7 @@ double compute_probability( char *token )
     }
 
     switch(algorithm) {
-	case AL_ORIGINAL:
+	case AL_GRAHAM:
 	    if (totalcount < MINIMUM_FREQ) {
 		prob=UNKNOWN_WORD;
 	    } else {
@@ -506,7 +507,7 @@ double compute_robinson_spamicity(wordhash_t *wordhash)
         // Robinson's P and Q; accumulation step
         // P = 1 - ((1-p1)*(1-p2)*...*(1-pn))^(1/n)     [spamminess]
         // Q = 1 - (p1*p2*...*pn)^(1/n)                 [non-spamminess]
-        if (fabs(0.5 - prob) >= MIN_DEV) {
+        if (fabs(0.5 - prob) >= min_dev) {
             invproduct += log(1.0 - prob);
             product += log(prob);
             robn ++;
@@ -524,6 +525,26 @@ double compute_robinson_spamicity(wordhash_t *wordhash)
     } else spamicity = ROBX;
 
     return (spamicity);
+}
+
+void initialize_constants()
+{
+    switch(algorithm) {
+	case AL_GRAHAM:
+	    min_dev     = GRAHAM_MIN_DEV;
+	    spam_cutoff = GRAHAM_SPAM_CUTOFF;
+	    max_repeats = GRAHAM_MAX_REPEATS;
+	    break;
+
+	case AL_ROBINSON:
+	    min_dev     = ROBINSON_MIN_DEV;
+	    spam_cutoff = ROBINSON_SPAM_CUTOFF;
+	    max_repeats = ROBINSON_MAX_REPEATS;
+	    break;
+
+	default:
+	    abort();
+    }
 }
 
 rc_t bogofilter(int fd, double *xss)
@@ -546,7 +567,7 @@ rc_t bogofilter(int fd, double *xss)
     spam_list.msgcount = db_getcount(spam_list.dbh);
 
     switch(algorithm) {
-	case AL_ORIGINAL:
+	case AL_GRAHAM:
 	    // select the best spam/nonspam indicators.
 	    bogostats = select_indicators(wordhash);
 
@@ -564,7 +585,7 @@ rc_t bogofilter(int fd, double *xss)
 
     db_lock_release_list(word_lists);
 
-    status = (spamicity > SPAM_CUTOFF) ? RC_SPAM : RC_NONSPAM;
+    status = (spamicity > spam_cutoff) ? RC_SPAM : RC_NONSPAM;
 
     if (xss != NULL)
         *xss = spamicity;
