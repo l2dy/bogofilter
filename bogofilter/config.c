@@ -24,6 +24,7 @@ AUTHOR:
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #include "charset.h"
+#include "error.h"
 #include "find_home.h"
 #include "format.h"
 #include "lexer.h"
@@ -488,10 +489,6 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case '?':
-	    help();
-	    exit(2);
-	    break;
-
 	case 'h':
 	    help();
             exit(0);
@@ -573,9 +570,9 @@ int process_args(int argc, char **argv)
 	    break;
 
 	default:
-	    fprintf(stderr, "Internal error: unhandled option '%c' "
-		    "(%02X)\n", option, (unsigned int)option);
-	    exit(2); 
+	    PRINT_ERROR("Internal error: unhandled option '%c' "
+			"(%02X)\n", option, (unsigned int)option);
+	    exit(2);
 	}
     }
 
