@@ -96,7 +96,7 @@ do { # Start force loop
         open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
         print TEMP $mail;
         close (TEMP);
-        unless ($dbexists && `$bogofilter -vt <$temp`=~/^[NH]/) {
+        unless ($dbexists && (system("$bogofilter <$temp")/256==1)) {
           system("$bogofilter -n <$temp");
           $hamadd++;
           $dbexists=1;
@@ -124,7 +124,7 @@ do { # Start force loop
         open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
         print TEMP $mail;
         close (TEMP);
-        unless (`$bogofilter -vt <$temp`=~/^[YS]/) {
+        unless (system("$bogofilter <$temp")/256==0) {
           system("$bogofilter -s <$temp");
           $spamadd++;
           print "Training spam message $spamcount.\n" if ($verbose);
