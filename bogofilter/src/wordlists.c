@@ -33,14 +33,14 @@ void open_wordlists(dbmode_t mode)
     int retry;
 
     if (word_lists == NULL)
-	init_wordlist(&word_lists, "word", bogohome, true, false, 0, WL_REGULAR);
+	init_wordlist(&word_lists, "word", WORDLIST, true, false, 0, WL_REGULAR);
 
     do {
 	ds_init();
 
 	retry = 0;
 	for (list = word_lists; list != NULL; list = list->next) {
-	    list->dsh = ds_open(list->filepath, WORDLIST, mode);
+	    list->dsh = ds_open(bogohome, list->filepath, mode);
 	    if (list->dsh == NULL) {
 		int err = errno;
 		close_wordlists(true); /* unlock and close */
