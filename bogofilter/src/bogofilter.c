@@ -126,7 +126,7 @@ rc_t bogofilter(int argc, char **argv)
 		    fprintf(fpo, "%s ", filename); 
 	    }
 
-	    write_message(status);
+	    write_message(status);		/* passthrough */
 	    if (logflag && !register_opt) {
 		write_log_message(status);
 		msgcount = 0;
