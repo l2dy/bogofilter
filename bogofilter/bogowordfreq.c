@@ -21,9 +21,12 @@
 #include "system.h"
 #include "collect.h"
 
+const char *progname = "bogowordfreq.c";
 const char *spam_header_name = "X-Bogosity:"; /* unused */
-int passthrough = 0; /* unused */
-int max_repeats = 1;
+bool logflag;		/* unused */
+int passthrough = 0;	/* unused */
+bool quiet = 0;		/* unused */
+int verbose = 0;	/* unused */
 
 static void print_wordlist (wordhash_t *h)
 {

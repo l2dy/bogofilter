@@ -5,6 +5,7 @@
 AUTOMAKE_OPTIONS = foreign 1.6
 SUBDIRS =  dcdflib . tests
 SYSCONFDIR = @sysconfdir@
+DISTCHECK_CONFIGURE_FLAGS= @DISTCHECK_CONFIGURE_FLAGS@
 
 if ENABLE_GRAHAM_METHOD
 GRAHAM_SRC = graham.c graham.h
@@ -29,8 +30,7 @@ man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
 sysconf_DATA = bogofilter.cf.example
 
 noinst_LIBRARIES = libbogofilter.a
-LDADD = libbogofilter.a
-
+LDADD = libbogofilter.a @LIBOBJS@
 
 # what to build that from
 libbogofilter_a_SOURCES= \
@@ -46,12 +46,11 @@ libbogofilter_a_SOURCES= \
 	register.h register.c \
 	rstats.h rstats.c \
 	wordhash.h wordhash.c wordlists.h wordlists.c \
-	globals.h system.h version.h \
+	globals.h system.h \
+	version.c directories.c \
 	dcdflib/src/dcdflib.c dcdflib/src/ipmpar.c
 
-BUILT_SOURCES = version.h directories.h
-
-CLEANFILES= directories.h
+CLEANFILES=version.c directories.c
 
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c \
 		     $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
@@ -82,11 +81,19 @@ EXTRA_DIST = $(man_MANS) \
 	     version.sh \
 	     README.cvs README.freebsd README.hp-ux \
 	     README.dcdflib README.Robinson \
-	     $(extradistdirs)
+	     $(extradistdirs) \
+	     bogofilter-SA-2002-01 \
+	     strlcat.3 strlcpy.3
+
 #
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
-version.h:	version.sh $(VERSION_FROM)
-	$(srcdir)/version.sh $(srcdir) $(VERSION_FROM) >$@ || rm -f $@
+version.c:	version.sh $(VERSION_FROM)
+	$(srcdir)/version.sh $(srcdir) $(VERSION_FROM) >"$@" \
+	    || rm -f "$@"
+#
+directories.c: config.status
+	echo "const char *const system_config_file = \"$(SYSCONFDIR)/bogofilter.cf\";" >"$@" \
+	    || rm -f "$@"
 #
 .xml.pdf:
 	xmlto pdf --extensions $<
@@ -95,15 +102,12 @@ version.h:	version.sh $(VERSION_FROM)
 	xmlto html-nochunks $<
 
 .xml.1:
-	xmlto man $<
+	{ xmllint --noout --postvalid $< && xmlto man $< ; } || { rm -f $@ ; exit 1 ; }	
 
 .PHONY: rpm cvs-check
 
 rpm:	    dist $(distdir).tar.gz
 	rpm -ta $(distdir).tar.gz
-
-directories.h: Makefile
-	echo "#define SYSCONFDIR \"$(SYSCONFDIR)\"" >$@ || rm -f $@
 
 cvs-check:
 	rm -rf $(PACKAGE)-$(VERSION)-export

@@ -3,7 +3,7 @@
 =pod
 
 Name:
-upgrade.pl -- upgrade a bogofilter database to current version.
+bogoupgrade -- upgrade a bogofilter database to current version.
 
 Author:
 Gyepi Sam <gyepi@praxis-sw.com>

@@ -23,17 +23,28 @@ fi
 [   -d ${TMPDIR} ] && rm -rf ${TMPDIR}
 [ ! -d ${TMPDIR} ] && mkdir  ${TMPDIR}
 
+# Graham config
+cat /dev/null > ${TMPDIR}/cfg.g
+
+# Robinson config
 cat <<EOF > ${TMPDIR}/cfg.r
 robx=0.415
 min_dev=0.0
 EOF
 
+# Fisher config
 cat <<EOF > ${TMPDIR}/cfg.f
 robx=0.415
 min_dev=0.1
+ham_cutoff=0.0
 EOF
 
-cat /dev/null > ${TMPDIR}/cfg.g
+# Fisher tristate
+cat <<EOF > ${TMPDIR}/cfg.t
+robx=0.415
+min_dev=0.1
+ham_cutoff=0.1
+EOF
 
 BOGOUTIL="../bogoutil"
 BOGOFILTER="../bogofilter"
@@ -47,6 +58,7 @@ map_rc()
 	a=$?
 	[ $a -eq 0 ] && exit 0
 	[ $a -eq 1 ] && exit 0
+	echo exit $a
 	exit $a
     )
 }
@@ -54,25 +66,31 @@ map_rc()
 run_test()
 {
     id="$1"
-    out="$2"
+    fil="$2"
     ver="$3"
-    OUT="${TMPDIR}/tests/msg.$out.$alg.$ver"
+    OUT="${TMPDIR}/tests/msg.$fil.$mth.$ver"
     OPTS="-$alg -t -$ver $CFG"
+#echo $OPTS $OUT
     map_rc $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt >${TMPDIR}/tests-$alg 
     sed s/,.version=.*// < ${TMPDIR}/tests-$alg > $OUT
+#echo $BOGOFILTER $OPTS ${SYSTEST}/inputs/msg.$id.txt $OUT
 }
 
 [   -d ${TMPDIR}/tests ] && rm -f ${TMPDIR}/tests/*
 [ ! -d ${TMPDIR}/tests ] && mkdir -p ${TMPDIR}/tests
 
-for alg in r f g ; do
-    BOGOFILTER_DIR="${TMPDIR}/tests.$alg"
-    CFG="-c ${TMPDIR}/cfg.$alg"
+for mth in g r f t ; do
+    alg="$mth"
+    [ "$alg" = "t" ] && alg=f
+#   echo "***** a: $alg,  o: $mth *****"
+    BOGOFILTER_DIR="${TMPDIR}/words.$mth"
+    CFG="-c ${TMPDIR}/cfg.$mth"
     export BOGOFILTER_DIR
     [   -d $BOGOFILTER_DIR ] && rm -f $BOGOFILTER_DIR/*
     [ ! -d $BOGOFILTER_DIR ] && mkdir $BOGOFILTER_DIR
     $BOGOFILTER -$alg $CFG -s < ${SYSTEST}/inputs/spam.mbx
     $BOGOFILTER -$alg $CFG -n < ${SYSTEST}/inputs/good.mbx
+#   ../bogoutil -w $BOGOFILTER_DIR .MSG_COUNT
     #
     # run tests for msg.[1-8].txt
     #
@@ -87,18 +105,19 @@ done
 
 OUT="grftest.out"
 
-printf "%2s     %-10s   %-10s   %-10s\n" id graham robinson fisher > ${TMPDIR}/tests/$OUT
+printf "%2s     %-10s   %-10s   %-10s   %-10s\n" id graham robinson fisher tristate > ${TMPDIR}/tests/$OUT
 for out in ${TMPDIR}/tests/msg.?.r.v ; do
     id=`echo $out | sed s@${TMPDIR}/tests/msg.@@ | sed s@.r.v@@`
-    g=`cat ${TMPDIR}/tests/msg.$id.g.v | tr "NY" "hS"`
-    r=`cat ${TMPDIR}/tests/msg.$id.r.v | tr "NY" "hS"`
-    f=`cat ${TMPDIR}/tests/msg.$id.f.v | tr "NY" "hS"`
-    printf "%2s   %c %s   %c %s   %c %s\n" $id $g $r $f >> ${TMPDIR}/tests/$OUT
+    g=`cat ${TMPDIR}/tests/msg.$id.g.v | tr "NYU" "hSu"`
+    r=`cat ${TMPDIR}/tests/msg.$id.r.v | tr "NYU" "hSu"`
+    f=`cat ${TMPDIR}/tests/msg.$id.f.v | tr "NYU" "hSu"`
+    t=`cat ${TMPDIR}/tests/msg.$id.t.v | tr "NYU" "hSu"`
+    printf "%2s   %c %s   %c %s   %c %s   %c %s\n" $id $g $r $f $t >> ${TMPDIR}/tests/$OUT
 done
 
-OUTPUTS=$srcdir/t.systest.d/outputs
-if  [ $verbose -eq 1 ]; then
-    diff -u -s ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
+OUTPUTS=${SYSTEST}/outputs
+if  [ $verbose -eq 0 ]; then
+    cmp ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
+else
+    diff -u -s --brief ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
 fi
-
-cmp ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT

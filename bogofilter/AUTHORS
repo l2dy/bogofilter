@@ -9,3 +9,7 @@ Gyepi Sam	(database abstraction, berkelydb support, wordhash, bogoupgrade, bogou
 Allyn Fratkin	(bug fixes, bug database maintainer)
 Clint Adams	(bug fixes, portability, debian packaging)
 Greg Louis	(spamicity calculation methods)
+
+The strlcpy and strlcat functions are
+    (C) 1998 by Todd C. Miller <Todd.Miller@courtesan.com>
+    and were taken from the NetBSD CVS repository.

@@ -17,6 +17,7 @@
 
 #algorithm=graham
 algorithm=robinson
+#algorithm=fisher
 
 
 #### SPAM_HEADER_NAME
@@ -27,7 +28,7 @@ algorithm=robinson
 spam_header_name=X-Bogosity
 
 
-#### minimum deviation
+#### MINIMUM DEVIATION
 #
 #	if token spamicity closer to EVEN_ODDS (0.5f)
 #	than MIN_DEV, don't use the word in the 
@@ -46,7 +47,7 @@ robs=0.001
 robx=0.415
 
 
-##### stats_in_header
+##### STATS_IN_HEADER
 #
 #	non-zero (default):  put spamicity info in message header
 #	zero:  put spamicity info in message body
@@ -57,7 +58,36 @@ stats_in_header=Y
 #stats_in_header=N
 
 
-##### threshold values
+#### CUTOFF Values
+#
+#	for Graham and Robinson:
+#	    only spam_cutoff is needed.
+#
+#	for Fisher:
+#	    both ham_cutoff and spam_cutoff are allowed.
+#	    setting ham_cutoff to a non-zero value will
+#	    enable tristate results (Yes/No/Unsure).
+#
+# graham:
+#
+# spam_cutoff = 0.90
+
+# robinson:
+#
+# spam_cutoff = 0.54
+
+# fisher (with Yes/No output):
+#
+# ham_cutoff = 0.00
+# spam_cutoff = 0.95
+
+# fisher (with Yes/No/Unsure output):
+#
+# ham_cutoff = 0.10
+# spam_cutoff = 0.95
+
+
+##### THRESHOLD values
 #
 #	used to determine if/when spamicity 
 #	values are output by print_bogostats()
@@ -75,13 +105,13 @@ thresh_rtable = 0.0f
 #
 #	name/location of user config file
 
-user_config_file=.bogofilter.cf
+user_config_file=~/.bogofilter.cf
 
-#user_config_file=.bogofilterrc
-#user_config_file=.bogofilter/config
+#user_config_file=~/.bogofilterrc
+#user_config_file=~/.bogofilter/config
 
 
-#### wordlist: define a word list
+#### WORDLIST: define a word list
 #
 #	char type: 's','g','i' (denoting spam, good, or ignore)
 #	char *name: name of list, e.g. "good", "spam", "ignore"

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 #
 # unbase64
@@ -23,7 +23,6 @@ $qpapproaching = 0;
 $textattachment = 0;
 
 while (<>) {
-	s/\r$//;	# bogofilter can't deal with \r correctly
 	if (/^$/) {
 		$inqp = $qpapproaching;
 		$inbase64 = $base64approaching;

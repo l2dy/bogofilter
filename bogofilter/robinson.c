@@ -40,11 +40,11 @@ extern double min_dev;
 extern int Rtable;
 static double scalefactor;
 
-static double	thresh_rtable = 0.0f;
-static double	robx = 0.0f;
-static double	robs = 0.0f;
+double	thresh_rtable = 0.0f;
+double	robx = 0.0f;
+double	robs = 0.0f;
 
-static stats_t  stats;
+static rob_stats_t  stats;
 
 const parm_desc rob_parm_table[] =	/* needed by fisher.c */
 {
@@ -57,6 +57,7 @@ const parm_desc rob_parm_table[] =	/* needed by fisher.c */
 void	rob_initialize_constants(void);
 double	rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
 void	rob_print_summary(void);
+rc_t	rob_status(void);
 
 #ifdef	ENABLE_ROBINSON_METHOD
 rf_method_t rf_robinson_method = {
@@ -65,6 +66,7 @@ rf_method_t rf_robinson_method = {
 	rob_parm_table,	 		/* m_parm_table		  *parm_table		*/
 	rob_initialize_constants,	/* m_initialize_constants *initialize_constants	*/
 	rob_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
+	rob_status,			/* m_status		  *status		*/
 	rob_print_bogostats, 		/* m_print_bogostats	  *print_stats		*/
 	rob_cleanup, 			/* m_free		  *cleanup		*/
     },
@@ -227,6 +229,8 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     } else
 	spamicity = robx;
 
+    stats.spamicity = spamicity;
+
     return (spamicity);
 }
 
@@ -271,6 +275,12 @@ void rob_initialize_with_parameters(double _min_dev, double _spam_cutoff)
 void rob_initialize_constants(void)
 {
     rob_initialize_with_parameters(ROBINSON_MIN_DEV, ROBINSON_SPAM_CUTOFF);
+}
+
+rc_t rob_status(void)
+{
+    rc_t status = ( stats.spamicity >= spam_cutoff ) ? RC_SPAM : RC_HAM;
+    return status;
 }
 
 double rob_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/

@@ -20,19 +20,39 @@ NAME:
 #define	RF_DEBUG
 #undef	RF_DEBUG
 
-#define FISHER_SPAM_CUTOFF	0.952f
-#define FISHER_MIN_DEV		0.1f
+#define FISHER_HAM_CUTOFF	0.10f
+#define FISHER_SPAM_CUTOFF	0.95f
+#define FISHER_MIN_DEV		0.10f
 
 void	fis_initialize_constants(void);
 double	fis_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
 void	fis_print_summary(void);
+rc_t	fis_status(void);
+
+/* Static Variables */
+
+double ham_cutoff = 0.0;
+
+extern double robx;		/* in robinson.c */
+extern double robs;		/* in robinson.c */
+extern double thresh_rtable;	/* in robinson.c */
+
+const parm_desc fis_parm_table[] =
+{
+    { "robx",		  CP_DOUBLE,	{ (void *) &robx } },
+    { "robs",		  CP_DOUBLE,	{ (void *) &robs } },
+    { "thresh_rtable",	  CP_DOUBLE,	{ (void *) &thresh_rtable } },
+    { "ham_cutoff",	  CP_DOUBLE,	{ (void *) &ham_cutoff } },
+    { NULL,		  CP_NONE,	{ (void *) NULL } },
+};
 
 rf_method_t rf_fisher_method = {
     {
 	"fisher",			/* const char		  *name;		*/
-	rob_parm_table,	 		/* m_parm_table		  *parm_table		*/
+	fis_parm_table,	 		/* m_parm_table		  *parm_table		*/
 	fis_initialize_constants,	/* m_initialize_constants *initialize_constants	*/
 	rob_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
+	fis_status, 			/* m_status		  *status		*/
 	rob_print_bogostats, 		/* m_print_bogostats	  *print_stats		*/
 	rob_cleanup, 			/* m_free		  *cleanup		*/
     },
@@ -40,7 +60,7 @@ rf_method_t rf_fisher_method = {
     fis_print_summary			/* rf_print_summary	  *print_summary	*/
 };
 
-static stats_t stats;
+static rob_stats_t stats;
 
 double prbf(double x, double df)
 {
@@ -79,6 +99,18 @@ void fis_print_summary(void)
 void fis_initialize_constants(void)
 {
     rob_initialize_with_parameters(FISHER_MIN_DEV, FISHER_SPAM_CUTOFF);
+}
+
+rc_t fis_status(void)
+{
+    if ( stats.spamicity >= spam_cutoff ) 
+	return RC_SPAM;
+
+
+    if (ham_cutoff < EPS || (stats.spamicity - ham_cutoff < EPS))
+	return RC_HAM;
+
+    return RC_UNSURE;
 }
 
 /* Done */

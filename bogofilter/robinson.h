@@ -29,14 +29,14 @@ typedef struct rf_method_s {
 ** Define a struct so stats can be saved for printing.
 */
 
-typedef struct stats_s {
+typedef struct rob_stats_s {
     size_t robn;
     double p_ln;	/* Robinson P, as a log*/
     double q_ln;	/* Robinson Q, as a log*/
     double p_pr;	/* Robinson P */
     double q_pr;	/* Robinson Q */
     double spamicity;
-} stats_t;
+} rob_stats_t;
 
 extern	double	rob_bogofilter(wordhash_t *wordhash, FILE *fp); /*@globals errno@*/
 extern	double	rob_compute_spamicity(wordhash_t *wordhash, FILE *fp); /*@globals errno@*/

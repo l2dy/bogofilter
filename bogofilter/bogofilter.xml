@@ -80,8 +80,7 @@ calculations.  These modifications are described in Robinson's paper <ulink
 url="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">
 Spam Detection</ulink>.</para>
 
-<para><existing>Another seeming improvement...Spam
-Detection.</existing> Since then, Robinson and others have
+<para>Since then, Robinson and others have
 realized that the S calculation can be further optimized: if a vector of
 length k contains random, uniformly-distributed probabilities p, then
 -2 * sum(ln(p)) is distributed as chi-squared with 2n degrees of
@@ -122,6 +121,13 @@ same message as non-spam.</para>
 <application>bogofilter</application> to register the text presented
 on standard input as non-spam and to undo a prior registration of the
 same message as spam.</para>
+
+<para>The <option>-u</option> option tells
+<application>bogofilter</application> to register the message's text 
+after classifying it as spam or non-spam.  A spam message will be registered
+on the spamlist and a non-spam message on the goodlist.  If using the
+Robinson-Fisher method and the classification is "unsure", the message will
+not be registered.</para>
 
 <para>The <option>-d</option><replaceable> dir</replaceable> option
     allows you to set the directory under which wordlists will be found
@@ -185,12 +191,15 @@ the output, up to a maximum of 4.  With <option>-vv</option>, the report
 lists the tokens with highest deviation from a mean of 0.5 association
 with spam.</para>
 
+<para>The Robinson method is the default algorithm used for computing a
+message's spamicity score, unless <application>bogofilter</application> 
+has been compiled without it, by using the 
+<option>--disable-robinson-method</option> option to the configure
+script.  The method to be used can be specified on the command line or
+in the configuration file.</para>
+
 <para>The <option>-g</option> option selects the original Graham form
-of the calculation method.  This is the default unless the
-<option>-r</option> option is specified, or unless
-<application>bogofilter</application> has been compiled with the
-<option>--disable-graham-method</option> option to the configure
-script.</para>
+of the calculation method.</para>
 
 <para>The <option>-r</option> option selects the Robinson modifications
 to the calculation method.  This is automatically enabled when the
@@ -232,13 +241,35 @@ tells <application>bogofilter</application> to read the config file named.
 
 <refsect1 id='environment'><title>ENVIRONMENT</title>
     <para>
-	Bogofilter will initialize its data base directory to&nbsp;
+	Bogofilter will initialize its data base directory to 
 	<filename>$BOGOFILTER_DIR</filename> if <envar>BOGOFILTER_DIR</envar> is set.
 	If it is not set, bogofilter
 	will use <filename>$HOME/.bogofilter</filename> instead. If neither
 	 <envar>BOGOFILTER_DIR</envar> nor <envar>HOME</envar> is set, the <option>-d
 	    <replaceable>dir</replaceable></option> option must be present.
 </para></refsect1>
+
+<refsect1 id='configuration'><title>CONFIGURATION</title>
+<para>The <application>bogofilter</application> command line allows setting of many 
+options that determine how <application>bogofilter</application> operates.
+File <filename>/etc/bogofilter.cf</filename> can be used to set additional
+parameters that affect its operation.  File 
+<filename>/etc/bogofilter.cf.example</filename> has samples of all of the parameters.
+Status and logging messages can be customized for each site (see 
+<filename>/etc/bogofilter.cf.example</filename>).
+</para>
+</refsect1>
+
+<refsect1 id='returns'><title>RETURN VALUES</title>
+<para>0 for spam; 1 for non-spam; 2 for I/O or other errors.</para>
+<para>If both <option>-p</option> and <option>-e</option> are used, the
+    return values are: 0 for spam or non-spam; 2 for I/O or other
+    errors.</para>
+
+<para>Error 2 usually means that the wordlist files
+<application>bogofilter</application> wants to read at startup 
+are missing or the hard disk has filled up in <option>-p</option> mode.</para>
+</refsect1>
 
 <refsect1 id='integration'><title>INTEGRATION WITH OTHER TOOLS</title>
 
@@ -368,17 +399,6 @@ calculations.  Instructions for its use are included in the script in
 the form of comments.</para>
 </refsect1>
 
-<refsect1 id='returns'><title>RETURN VALUES</title>
-<para>0 for spam; 1 for non-spam; 2 for I/O or other errors.</para>
-<para>If both <option>-p</option> and <option>-e</option> are used, the
-    return values are: 0 for spam or non-spam; 2 for I/O or other
-    errors.</para>
-
-<para>Error 2 usually means that the wordlist files
-<application>bogofilter</application> wants to read at startup 
-are missing or the hard disk has filled up in <option>-p</option> mode.</para>
-</refsect1>
-
 <refsect1 id='files'><title>FILES</title>
 <variablelist>
 <varlistentry>
@@ -386,7 +406,7 @@ are missing or the hard disk has filled up in <option>-p</option> mode.</para>
 <listitem><para>System configuration file.</para></listitem>
 </varlistentry>
 <varlistentry>
-<term><filename>~/.bogofiltercf</filename></term>
+<term><filename>~/.bogofilter.cf</filename></term>
 <listitem><para>User configuration file.</para></listitem>
 </varlistentry>
 <varlistentry>

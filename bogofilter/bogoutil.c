@@ -27,7 +27,6 @@ AUTHOR:
 #include "datastore.h"
 #include "datastore_db.h"
 #include "robinson.h"			/* for ROBS and ROBX */
-#include "version.h"
 
 #define PROGNAME "bogoutil"
 
@@ -243,11 +242,15 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     const char *head_format = !show_probability ? "%-20s %6s %6s\n"   : "%-20s %6s  %6s  %6s  %6s\n";
     const char *data_format = !show_probability ? "%-20s %6ld %6ld\n" : "%-20s %6ld  %6ld  %f  %f\n";
 
-    build_path(filepath, PATH_LEN, dir, GOODFILE);
+    if (build_path(filepath, sizeof(filepath), dir, GOODFILE) < 0)
+	return 2;
+
     if ((dbh_good = db_open_and_lock_file(filepath, GOODFILE, DB_READ)) == NULL)
 	return 2;
 
-    build_path(filepath, PATH_LEN, dir, SPAMFILE);
+    if (build_path(filepath, sizeof(filepath), dir, SPAMFILE) < 0)
+	return 2;
+
     if ((dbh_spam = db_open_and_lock_file(filepath, SPAMFILE, DB_READ)) == NULL)
 	return 2;
 
@@ -424,16 +427,20 @@ static double compute_robx(dbh_t *dbh_spam, dbh_t *dbh_good)
 
 static int compute_robinson_x(char *path)
 {
+    int e;
+
     dbh_t *dbh_good;
     dbh_t *dbh_spam;
 
-    char db_good_file[PATH_LEN];
     char db_spam_file[PATH_LEN];
+    char db_good_file[PATH_LEN];
 
     double robx;
 
-    sprintf( db_spam_file, "%s/%s", path, "spamlist.db" );
-    sprintf( db_good_file, "%s/%s", path, "goodlist.db" );
+    e = build_path(db_spam_file, sizeof(db_spam_file), path, "spamlist.db");
+    if (e < 0) goto overflow;
+    e = build_path(db_good_file, sizeof(db_good_file), path, "goodlist.db");
+    if (e < 0) goto overflow;
 
     dbh_good = db_open(db_good_file, "good", DB_READ);
     dbh_spam = db_open(db_spam_file, "spam", DB_WRITE);
@@ -452,17 +459,22 @@ static int compute_robinson_x(char *path)
     db_close(dbh_good);
 
     return 0;
+
+overflow:
+    fprintf(stderr, "%s: string too long creating .db file name.\n", PROGNAME);
+    exit(2);
 }
 
-static void version(void)
+static void print_version(void)
 {
     fprintf(stderr,
-	    PROGNAME ": version: " VERSION "\n"
+	    "%s: version: %s\n"
 	    "Copyright (C) 2002 Gyepi Sam\n\n"
-	    PROGNAME " comes with ABSOLUTELY NO WARRANTY.\n"
+	    "%s comes with ABSOLUTELY NO WARRANTY.\n"
 	    "This is free software, and you are welcome to redistribute\n"
 	    "it under the General Public License.\n"
-	    "See the COPYING file with the source distribution for details.\n\n");
+	    "See the COPYING file with the source distribution for details.\n\n",
+	    PROGNAME, version, PROGNAME);
 }
 
 static void usage(void)
@@ -482,7 +494,7 @@ static void help(void)
 	    "\t-h\tPrint this message.\n"
 	    "\t-R\tCompute Robinson's X for specified directory.\n"
 	    "\t-V\tPrint program version.\n"
-	    PROGNAME " is part of the bogofilter package.\n");
+	    "%s is part of the bogofilter package.\n", PROGNAME);
 }
 
 #undef	ROBX
@@ -536,7 +548,7 @@ int main(int argc, char *argv[])
 	    exit(0);
 
 	case 'V':
-	    version();
+	    print_version();
 	    exit(0);
 
 	case 'x':
@@ -550,8 +562,9 @@ int main(int argc, char *argv[])
 
     if (count != 1)
     {
-      fprintf(stderr, PROGNAME ": Exactly one of the -d, -l, or -w flags must be present.\n");
-      exit(1);
+	fprintf(stderr, "%s: Exactly one of the -d, -l, or -w flags "
+		"must be present.\n", PROGNAME);
+	exit(1);
     }
 
     /* Extra or missing parameters */

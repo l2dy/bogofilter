@@ -9,6 +9,11 @@ set -e
 #		inputs  - test inputs
 #		outputs - known correct outputs
 
+verbose=0
+if [ "$1" = "-v" ]; then
+    verbose=1
+fi
+
 [   -d ${TMPDIR}/tests ] && rm -rf ${TMPDIR}/tests
 [ ! -d ${TMPDIR}/tests ] && mkdir -p ${TMPDIR}/tests
 
@@ -49,7 +54,7 @@ map_rc()
 #	3 r vvv		X-Bogosity: Yes, spamicity=0.540316
 
 for alg in r g ; do
-    BOGOFILTER_DIR="${TMPDIR}/tests.$alg"
+    BOGOFILTER_DIR="${TMPDIR}/words.$alg"
     rm -rf $BOGOFILTER_DIR
     mkdir $BOGOFILTER_DIR
     $BOGOFILTER -$alg -s < ${SYSTEST}/inputs/spam.mbx
@@ -84,8 +89,14 @@ done
 
 rm -f ${CONFIG}
 
+OUTPUTS=${SYSTEST}/outputs
 REFDIR=$srcdir/t.systest.d/outputs
+
 for i in $REFDIR/*v ; do
     j=`basename $i`
-    cmp $i ${TMPDIR}/tests/$j
+    if  [ $verbose -eq 0 ]; then
+	cmp $i ${TMPDIR}/tests/$j
+    else
+	diff -u -s --brief ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
+    fi
 done

@@ -33,13 +33,13 @@ const char *progname = "configtest";
 
 /* Dummy struct definitions to support config.c */
 method_t graham_method = {
-    NULL, NULL, NULL, NULL, NULL, NULL
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL
 } ;
 method_t rf_robinson_method = {
-    NULL, NULL, NULL, NULL, NULL, NULL
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL
 } ;
 method_t rf_fisher_method = {
-    NULL, NULL, NULL, NULL, NULL, NULL
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL
 } ;
 
 #ifdef COMPILE_DEAD_CODE

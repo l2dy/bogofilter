@@ -30,8 +30,8 @@ AUTHOR:
 #include "lexer.h"
 #include "bogofilter.h"
 #include "bogoconfig.h"
+#include "method.h"
 #include "register.h"
-#include "version.h"
 #include "wordlists.h"
 
 #define BOGODIR ".bogofilter"
@@ -45,30 +45,31 @@ char msg_register[1024];
 char msg_bogofilter[1024];
 
 const char *progname = "bogofilter";
-extern const char *system_config_file;
 
 /* if the given environment variable 'var' exists, copy it to 'dest' and
    tack on the optional 'subdir' value.
+   return value: 0 - success, no copy done
+   		 1 - success, copied
+		-1 - error (overflow)
  */
-static void set_dir_from_env(/*@reldef@*/ /*@unique@*/ char* dest,
+static int set_dir_from_env(/*@reldef@*/ /*@unique@*/ char* dest,
 	const char *var,
-	/*@null@*/ const char *subdir)
+	/*@null@*/ const char *subdir,
+	size_t path_size /* size of the full buffer */)
 {
     char *env;
-    size_t path_left=PATH_LEN-1;
 
     env = getenv(var);
-    if (env == NULL) return;
+    if (env == NULL) return 0;
 
-    strncpy(dest, env, path_left-1);  /* leave one char left for '/' */
-    path_left -= strlen(env);
+    if (strlcpy(dest, env, path_size) >= path_size) return -1;
     if ('/' != dest[strlen(dest)-1]) {
-	strcat(dest, "/");
-	path_left--;
+	if (strlcat(dest, "/", path_size) >= path_size) return -1;
     }
-    if (subdir && (path_left > 0)) {
-	strncat(dest, subdir, path_left);
+    if (subdir != NULL) {
+	if (strlcat(dest, subdir, path_size) >= path_size) return -1;
     }
+    return 1;
 }
 
 /* check that our directory exists and try to create it if it doesn't
@@ -92,18 +93,15 @@ static int check_directory(const char* path) /*@globals errno,stderr@*/
 	    if(mkdir(path, S_IRUSR|S_IWUSR|S_IXUSR)) {
 		perror("Error creating directory");
 		return -1;
-	    }
-	    else if (verbose > 0) {
+	    } else if (verbose > 0) {
 		(void)fprintf(stderr, "Created directory %s .\n", path);
 	    }
 	    return 0;
-	}
-	else {
+	} else {
 	    perror("Error accessing directory");
 	    return -1;
 	}
-    }
-    else {
+    } else {
 	if (! S_ISDIR(sb.st_mode)) {
 	    (void)fprintf(stderr, "Error: %s is not a directory.\n", path);
 	}
@@ -115,8 +113,11 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
     int   exitcode;
 
-    set_dir_from_env(directory, "HOME", BOGODIR);
-    set_dir_from_env(directory, "BOGOFILTER_DIR", NULL);
+    if ((set_dir_from_env(directory, "HOME", BOGODIR, sizeof(directory)) < 0)
+	|| (set_dir_from_env(directory, "BOGOFILTER_DIR", NULL, sizeof(directory)) < 0)) {
+	fprintf(stderr, "HOME or BOGOFILTER_DIR too long\n");
+	exit(2);
+    }
 
     exitcode = process_args(argc, argv);
     if (exitcode != 0)
@@ -136,6 +137,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	    {
 		double spamicity;
 		rc_t   status = bogofilter(&spamicity);
+		const char *yes_no_unsure = (status==RC_SPAM) ? "Yes" : ((status==RC_HAM) ? "No" : "Unsure");
 
 		if (passthrough)
 		{
@@ -157,16 +159,14 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 		{
 		    if ( terse )
 		    {
-			(void)printf("%c %f\n", (status==RC_SPAM) ? 'Y' : 'N', spamicity);
+			(void)printf("%1.1s %f\n", yes_no_unsure, spamicity);
 		    }
 		    else
 		    {
 			/* print spam-status at the end of the header
 			 * then mark the beginning of the message body */
 			(void)printf("%s: %s, tests=bogofilter, spamicity=%0.6f, version=%s\n", 
-				     spam_header_name, 
-				     (status==RC_SPAM) ? "Yes" : "No", 
-				     spamicity, VERSION);
+				     spam_header_name, yes_no_unsure, spamicity, version);
 		    }
 		}
 
@@ -197,13 +197,12 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 		    if (fflush(stdout) || ferror(stdout)) exit(2);
 		}
 
-		exitcode = status;
-		if (nonspam_exits_zero && passthrough && exitcode == 1)
+		exitcode = (status == RC_SPAM) ? 0 : 1;
+		if (nonspam_exits_zero && passthrough && exitcode != 0)
 		    exitcode = 0;
 
 		(void)sprintf(msg_bogofilter, "%s: %s, spamicity=%0.6f, version=%s",
-			spam_header_name, (status==RC_SPAM) ? "Yes" : "No",
-			spamicity, VERSION);
+			spam_header_name, yes_no_unsure, spamicity, version);
 	    }
 	    break;
 	default:

@@ -74,22 +74,22 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
 	++msgcount;
     } while(cont);
 
-    if (msgcount > 1) {
-	fprintf(stderr, "%s: must get only one message to calculate spamicity!\n", progname);
-	exit(2);
-    }
-
     spamicity = method->compute_spamicity(wordhash, NULL);
 
     db_lock_release_list(word_lists);
 
-    status = (spamicity > spam_cutoff) ? RC_SPAM : RC_NONSPAM;
+    status = method->status();
 
     if (xss != NULL)
         *xss = spamicity;
 
-    if (run_type == RUN_UPDATE)
-      register_words((status==RC_SPAM) ? REG_SPAM : REG_GOOD, wordhash, msgcount, wordcount);
+    if (run_type == RUN_UPDATE)		/* Note: don't register if RC_UNSURE */
+    {
+	if (status == RC_SPAM)
+	    register_words(REG_SPAM, wordhash, msgcount, wordcount);
+	if (status == RC_HAM)
+	    register_words(REG_GOOD, wordhash, msgcount, wordcount);
+    }
 
     wordhash_free(wordhash);
 

@@ -3,17 +3,7 @@
 /*****************************************************************************
 
 NAME:
-   robinson.c -- code for implementing robinson algorithm for computing spamicity.
-
-MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
-    Robinson's proposed modifications to the "spamicity" calculation and
-    uses his f(w) individual probability calculation.  See
-
-    http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html
-    
-    Robinson's method does not store "extrema."  Instead it accumulates
-    Robinson's P and Q using all words deemed "characteristic," i.e. having
-    a deviation (fabs (0.5f - prob)) >= MIN_DEV, currently set to 0.0.
+   graham.c -- code for implementing graham algorithm for computing spamicity.
 
 ******************************************************************************/
 
@@ -47,17 +37,22 @@ extern double min_dev;
 
 int	thresh_index = 0;
 
+stats_t stats;
+
 static const parm_desc gra_parm_table[] =
 {
     { "thresh_index",	  CP_INTEGER,	{ (void *) &thresh_index } },
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
 
+static	rc_t	gra_status(void);
+
 method_t graham_method = {
     "graham",				/* const char		  *name;		*/
     gra_parm_table,	 		/* m_parm_table		  *parm_table		*/
     gra_initialize_constants, 		/* m_initialize_constants *initialize_constants	*/
     gra_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
+    gra_status, 			/* m_status		  *status		*/
     gra_print_bogostats, 		/* m_print_bogostats	  *print_stats		*/
     gra_cleanup 			/* m_free		  *cleanup		*/
 } ;
@@ -102,8 +97,7 @@ static void init_bogostats(/*@out@*/ bogostat_t *bs)
 }
 
 static void populate_bogostats(/*@out@*/ bogostat_t *bs,
-	const char *text, double prob,
-	/*@unused@*/ int count)
+	const char *text, double prob)
 /* if  the new word,prob pair is a better indicator.
  * add them to the bogostats structure */
 {
@@ -149,8 +143,12 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
 		   DEVIATION(hit->prob), hit->prob, curkey);
 	}
 	hit->prob = prob;
-	strncpy(hit->key, text, MAXTOKENLEN);
-	hit->key[MAXTOKENLEN] = '\0';
+	if (strlcpy(hit->key, text, MAXTOKENLEN) >= MAXTOKENLEN) {
+	    /* The lexer should not have returned a token longer than
+	     * MAXTOKENLEN */
+	    internal_error;
+	    abort();
+	}
     }
     return;
 }
@@ -251,7 +249,7 @@ static bogostat_t *select_indicators(wordhash_t *wordhash)
 	double prob = compute_probability( token );
 
 	w_count += 1;
-	populate_bogostats( &bogostats, token, prob, 1 );
+	populate_bogostats( &bogostats, token, prob );
     }
 
     return (&bogostats);
@@ -304,6 +302,8 @@ double gra_compute_spamicity(bogostat_t *bs, FILE *fp) /*@globals errno@*/
 	}
     }
 
+    stats.spamicity = spamicity;
+
     return spamicity;
 }
 
@@ -315,6 +315,12 @@ void gra_initialize_constants(void)
     if (spam_cutoff < EPS)
 	spam_cutoff = GRAHAM_SPAM_CUTOFF;
     set_good_weight( GRAHAM_GOOD_BIAS );
+}
+
+rc_t gra_status(void)
+{
+    rc_t status = ( stats.spamicity >= spam_cutoff ) ? RC_SPAM : RC_HAM;
+    return status;
 }
 
 double gra_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/

@@ -78,24 +78,22 @@ static int init_list(/*@out@*/ wordlist_t* list, const char* name, const char* f
     return 0;
 }
 
-/* build an absolute path to a file given a directory and file name
+/* build an path to a file given a directory and file name,
+ * concatenating dir and file, adding a slash if necessary
+ *
+ * returns: -1 for overflow
+ *	     0 for success
  */
-void build_path(char* dest, int size, const char* dir, const char* file)
+int build_path(char* dest, size_t size, const char* dir, const char* file)
 {
-    int path_left=size-1;
-
-    *dest = '\0';
-    strncat(dest, dir, path_left);
-    path_left -= strlen(dir);
-    if (path_left <= 0) return;
+    if (strlcpy(dest, dir, size) >= size) return -1;
 
     if ('/' != dest[strlen(dest)-1]) {
-	strcat(dest, "/");
-	path_left--;
-	if (path_left <= 0) return;
+	if (strlcat(dest, "/", size) >= size) return -1; /* RATS: ignore */
     }
 
-    strncat(dest, file, path_left);
+    if (strlcat(dest, file, size) >= size) return -1;
+    return 0;
 }
 
 /* returns -1 for error, 0 for success */
@@ -104,10 +102,10 @@ int setup_lists(const char* dir, double good_weight, double bad_weight)
     int rc = 0;
     char filepath[PATH_LEN];
 
-    build_path(filepath, PATH_LEN, dir, GOODFILE);
+    if (build_path(filepath, sizeof(filepath), dir, GOODFILE) < 0) rc = -1;
     if (init_list(&good_list, "good", filepath, good_weight, false, 0, 0)) rc = -1;
 
-    build_path(filepath, PATH_LEN, dir, SPAMFILE);
+    if (build_path(filepath, sizeof(filepath), dir, SPAMFILE) < 0) rc = -1;
     if (init_list(&spam_list, "spam", filepath, bad_weight, true,  0, 0)) rc = -1;
 
     return rc;
