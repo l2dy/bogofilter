@@ -130,7 +130,8 @@ CHARSET		[0-9a-zA-Z-]+
 MTYPE		[ \t]*[0-9a-zA-Z/-]*
 TTYPE		[ \t]*[\.0-9a-zA-Z/-]*
 
-NUM_NUM		\ [0-9]+\ [0-9]+
+NUM		[0-9]+
+NUM_NUM		\ {NUM}\ {NUM}
 MSG_COUNT	^\".MSG_COUNT\"
 
 TOKENFRONT	[^[:blank:][:cntrl:][:digit:][:punct:]]
@@ -139,7 +140,9 @@ BOGOLEX_TOKEN	[^[:blank:]<>;    &%  @ |/\\{}^\" *,[:cntrl:]\[\]]+
 TOKENBACK	[^[:blank:]<>;=():&%$#@+|/\\{}^\"?*,[:cntrl:]\[\]._\+\-]
 
 TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}
-TOKEN_12 	({TOKEN}|{A2}|{A1})
+
+T12		[[:alpha:]][[:alnum:]]?
+TOKEN_12 	({TOKEN}|{T12})
 
 BASE64		[0-9a-zA-Z/+=]+
 QP		[!->@-~]+
@@ -167,12 +170,6 @@ QP		[!->@-~]+
 ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^\?]*\?\=
 ENCODED_TOKEN	({TOKENFRONT}{TOKENMID})?({ENCODED_WORD}[ \t\n]+)*{ENCODED_WORD}
 
-DOLLARS		[0-9]+
-CENTS		[0-9]+
-
-A1		[[:alpha:]]
-A2		[[:alpha:]][[:alnum:]]
-
 WHITESPACE	[ \t\n]
 NOTWHITESPACE	[^ \t\n]
 
@@ -197,10 +194,9 @@ HTMLTOKEN		{HTML_WI_COMMENTS}
 
 HBREAK		p|br|li|h[1-6]|hr|title|table|center|dd|dt|iframe|img|input|select|td|textarea|th|\/?(div|blockquote|pre|dir|dl|fieldset|legend|form|menu|ol|ul)
 
-PARSEHTML	"<"(a|font|img)([ \n\t][^>]*|"")">"
 BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
-VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
+VERP		{TOKEN}-{NUM}-{TOKEN}={TOKEN}@{TOKEN}
 
 %s TEXT HTML BOGO_LEX
 %s HTOKEN HDISCARD SCOMMENT LCOMMENT HSCRIPT
@@ -293,7 +289,7 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 <HTML>{TOKEN_12}?{HTML_ENCODING}		{ html_char(); }	/* process escaped chars, eg '&#101;' is 'a' */
 <HTOKEN>{TOKEN_12}?{URL_ENCODING}+		{ url_char(); }		/* process escaped chars, eg '%61'    is 'a' */
 
-\${DOLLARS}(\.{CENTS})?				{ return TOKEN;}
+\${NUM}(\.{NUM})?				{ return TOKEN;}	/* Dollars and cents */
 
 .						/* ignore character */
 \n						{ lineno += 1; clr_tag(); }
