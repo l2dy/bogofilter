@@ -73,7 +73,8 @@ extern int	yyinput(byte *buf, size_t size);
 
 extern int	buff_fill(buff_t *buff, size_t used, size_t need);
 
-extern size_t	decode_text(word_t *w);
+extern size_t	text_decode(word_t *w);
+extern size_t	html_decode(word_t *w);
 
 extern void	convert_eol(char *buf, char chr);
 

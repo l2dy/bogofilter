@@ -258,7 +258,7 @@ int yyinput(byte *buf, size_t max_size)
     return (count == EOF ? 0 : count);
 }
 
-size_t decode_text(word_t *w)
+size_t text_decode(word_t *w)
 {
     char *beg = (char *) w->text;
     char *fin = beg + w->leng;

@@ -213,7 +213,7 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 <BOGO_LEX>\n					{ lineno += 1; }
 
 <INITIAL>{ENCODED_TOKEN}			{ word_t *w = yy_text();
-						  size_t size = decode_text(w);
+						  size_t size = text_decode(w);
 						  while (size-- > 0)
 						    unput(w->text[size]);
 						}
