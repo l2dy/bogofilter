@@ -105,7 +105,7 @@ enum e_verbosity {
 };
 
 #define	MOD(n,m)	((n) - ((int)((n)/(m)))*(m))
-#define	ROUND(m,n)	((int)((m)*(n)+0.5))/((float)(n))
+#define	ROUND(m,n)	(float)(((int)((m)*(n)+0.5))/((float)(n)))
 
 #define	MIN(n)		((n)/60)
 #define SECONDS(n)	((n) - MIN(n)*60)
@@ -135,6 +135,7 @@ data_t *rsval;
 data_t *rxval;
 data_t *mdval;
 
+bool warn;
 uint target;
 uint ns_cnt, sp_cnt;
 
@@ -405,7 +406,7 @@ static bool check_for_low_sp_scores(void)
 static void scoring_error(void)
 {
     int i;
-
+    
     if (quiet)
 	return;
 
@@ -493,7 +494,7 @@ static void set_thresh(uint count, double *scores)
     ftarget = max(ROUND(((-0.4831 * lgc) + 12.8976) * lgc - 61.5264, 1), 1);
     cutoff  = ns_scores[ftarget-1];
 
-    percent = ROUND(ftarget/count,10000)/10000 + 0.0001;
+    percent = ROUND((float)ftarget/count, 10000.0) + 0.0001;
     if (verbose >= PARMS)
 	printf("m:  cutoff %8.6f, ftarget %d, percent %6.4f%%\n", cutoff, ftarget, percent * 100.0);
 
@@ -976,6 +977,16 @@ static void progress(uint cur, uint top)
      printf("]");
 }
 
+static void final_warning(void)
+{
+    printf(
+	"The small number and relative uniformity of the test messages imply\n"
+	"that the above recommended, though appropriate to the test set, may \n"
+	"not remain valid for long.  Bogotune should be run again with more\n"
+	"messages when that becomes possible.\n"
+	);
+}
+
 static void final_recommendations(void)
 {
     uint m, s;
@@ -1056,6 +1067,10 @@ static void final_recommendations(void)
     printf("ham_cutoff=%5.3f\t\n", ham_cutoff);
     printf("---cut---\n");
     printf("\n");
+
+    if (warn)
+	final_warning();
+
     printf("Tuning completed.\n");
 }
 
@@ -1192,10 +1207,13 @@ static rc_t bogotune(void)
     robx = DEFAULT_ROBX;
     min_dev = DEFAULT_MIN_DEV;
 
-    if (check_for_high_ns_scores() | check_for_low_sp_scores()) {
+    warn = check_for_high_ns_scores() | check_for_low_sp_scores();
+    if (warn) {
 	scoring_error();
-	if (!force)
+	if (!force) {
+	    fprintf(stderr, "Use '-F' option to force bogotune to continue.");
 	    exit(EX_ERROR);
+	}
     }
 
     /*
