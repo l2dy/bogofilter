@@ -49,6 +49,9 @@ typedef enum sh_e { IX_SPAM = 0, 	/* index for SPAM */
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
 #define min(x, y)	(((x) < (y)) ? (x) : (y))
 
+#define	NL	"\n"
+#define	CRLF	"\r\n"
+
 #if defined(PATH_MAX)
 #define PATH_LEN PATH_MAX
 #elif defined(MAXPATHLEN)

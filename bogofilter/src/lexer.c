@@ -33,9 +33,6 @@ lexer_t *lexer = NULL;
 
 /* Local Variables */
 
-#define	NL	"\n"
-#define	CRLF	"\r\n"
-
 extern char *spam_header_name;
 
 lexer_t v3_lexer = {
