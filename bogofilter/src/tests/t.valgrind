@@ -40,7 +40,7 @@ run_test()
     fil="$2"
     ver="$3"
     OUT="${TMPDIR}/tests/msg.$fil.$mth.$ver"
-    OPTS="-$alg -e -t -$ver $CFG"
+    OPTS="-e -t -$ver $CFG"
     eval $VALGRIND $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt \
     >${TMPDIR}/tests-$alg
     if test -s $TMPDIR/vg.out ; then cat $TMPDIR/vg.out ; exit 2 ; fi
@@ -49,6 +49,7 @@ run_test()
 if [   -d ${TMPDIR}/tests ] ; then rm -f ${TMPDIR}/tests/* ; else : ; fi
 mkdir -p ${TMPDIR}/tests
 
+set -x
 for mth in f t ; do
     alg="$mth"
     if [ "$alg" = "t" ] ; then alg=f ; else : ; fi
@@ -57,8 +58,8 @@ for mth in f t ; do
     export BOGOFILTER_DIR
     if [   -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
     mkdir -p $BOGOFILTER_DIR
-    $BOGOFILTER -$alg $CFG -s < ${SYSTEST}/inputs/spam.mbx
-    $BOGOFILTER -$alg $CFG -n < ${SYSTEST}/inputs/good.mbx
+    $BOGOFILTER $CFG -s < ${SYSTEST}/inputs/spam.mbx
+    $BOGOFILTER $CFG -n < ${SYSTEST}/inputs/good.mbx
 #   if [ $verbose -gt 0 ] ; then $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT ; fi
 
     for msg in ${SYSTEST}/inputs/msg.3.txt ; do
