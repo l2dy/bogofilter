@@ -18,11 +18,9 @@ AUTHOR:
 #include <config.h>
 #include "common.h"
 
-#include "base64.h"
 #include "charset.h"
 #include "error.h"
 #include "mime.h"
-#include "qp.h"
 #include "word.h"
 #include "token.h"
 #include "xmemrchr.h"
@@ -203,37 +201,6 @@ void token_init(void)
 	const char *s = "spc:invalid_end_of_header";
 	nonblank_line = word_new((const unsigned char *)s, strlen(s));
     }
-}
-
-size_t decode_text(word_t *w)
-{
-    size_t i;
-    size_t size = w->leng;
-    char *text = (char *) w->text;
-    char *beg = strchr(text, '=');
-    char *enc = strchr(beg+2,  '?');
-    word_t n;
-    n.text = (byte *)(enc + 3);
-    n.leng = size -= enc + 3 - text + 2;;
-    n.text[n.leng] = '\0';
-
-    switch (tolower(enc[1])) {
-    case 'b':
-	size = base64_decode(&n);
-	break;
-    case 'q':
-	for (i=0; i < size; i += 1) {
-	    if (n.text[i] == '_')
-		n.text[i] = ' ';
-	}
-	size = qp_decode(&n);
-	break;
-    }
-
-    memcpy(beg, n.text, size);
-    size += beg-text;
-    beg[size] = '\0';
-    return size;
 }
 
 void got_from(void)

@@ -66,4 +66,6 @@ extern int	yyinput(byte *buf, size_t size);
 
 extern int	buff_fill(buff_t *buff, size_t used, size_t need);
 
+extern size_t	decode_text(word_t *w);
+
 #endif	/* LEXER_H */
