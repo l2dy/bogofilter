@@ -23,6 +23,13 @@ Briefly:
 
 0.93.2	2004-11-??
 
+	2004-11-26
+
+	* bogofilter processes will refuse to open multiple wordlists in
+	  different database environments (directories) when the transactional
+	  Berkeley DB datastore is compiled (default). The non-transactional
+	  (--disable-transactions), QDBM and TDB datastores are unaffected.
+
 	2004-11-21
 
 	* bogotune now uses getopt() to process the argument list,
