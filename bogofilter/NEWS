@@ -7,6 +7,14 @@ is in the RELEASE.NOTES files.  Read them!!
 
 0.17.6	2004-04-0?
 
+	2004-04-22
+
+	* Fixed configure's --enable-memdebug option.
+
+	2004-04-12
+
+	* Updated TODO list and procmailrc.example
+
 	2004-04-02
 
 	* Lower output precision for regression tests, by using %f

@@ -214,7 +214,7 @@ if test x$USE_MEMDEBUG = xYES ; then
 	AC_DEFINE(ENABLE_MEMDEBUG,1,
 	[Enable memory usage debugging])
 fi
-AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$MEM_DEBUG = xYES)
+AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$USE_MEMDEBUG = xYES)
 
 dnl Checks for header files.
 AC_HEADER_STDC
