@@ -297,8 +297,11 @@ static bool b_stdin_next_mailstore(void)
  * according to their type */
 static bool b_args_next_mailstore(void)
 {
-    if (!*argv) return false;
-    filename = *(argv++);
+    if (argc <= 0)
+	return false;
+    filename = *argv;
+    argc -= 1;
+    argv += 1;
     return open_mailstore(filename);
 }
 
