@@ -54,10 +54,10 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	openlog("bogofilter", LOG_PID, LOG_MAIL);
 #endif
 
+    output_setup();
+
     /* open all wordlists */
     open_wordlists((run_type == RUN_NORMAL) ? DS_READ : DS_WRITE);
-
-    output_setup();
 
     status = bogofilter(argc, argv);
 
@@ -76,6 +76,8 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     close_wordlists(false);
     free_wordlists();
+
+    output_cleanup();
 
     /* cleanup storage */
     mime_cleanup();
