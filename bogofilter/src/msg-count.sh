@@ -12,7 +12,7 @@
 # which is given in the arguments.
 # WARNING: this does not escape any shell prompts or something
 pipesplitmbox() {
-      $AWK "BEGIN { cmd=\"$*\"; } /^From / { close(cmd); } { print | cmd; }"
+      ${AWK=awk} "BEGIN { cmd=\"$*\"; } /^From / { close(cmd); } { print | cmd; }"
 }
 
 
