@@ -297,7 +297,7 @@ static uint32_t get_psize(DB *dbp)
     ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
 #endif
     if (ret) {
-	print_error(__FILE__, __LINE__, "(db) DB->stat");
+	print_error(__FILE__, __LINE__, "DB->stat");
 	return 0xffffffff;
     }
     pagesize = dbstat->bt_pagesize;
@@ -352,7 +352,7 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 
 	/* create DB handle */
 	if ((ret = db_create (&dbp, dbe, 0)) != 0) {
-	    print_error(__FILE__, __LINE__, "(db) db_create, err: %d, %s",
+	    print_error(__FILE__, __LINE__, "db_create, err: %d, %s",
 			ret, db_strerror(ret));
 	    goto open_err;
 	}
@@ -390,7 +390,7 @@ retry_db_open:
 
 	    /* close again and bail out without further tries */
 	    if (DEBUG_DATABASE(0))
-		print_error(__FILE__, __LINE__, "(db) DB->open(%s) - actually %s, bogohome %s, err %d, %s",
+		print_error(__FILE__, __LINE__, "DB->open(%s) - actually %s, bogohome %s, err %d, %s",
 			    handle->name, t, bogohome, ret, db_strerror(ret));
 	    dbp->close(dbp, 0);
 	    goto open_err;
@@ -406,7 +406,7 @@ retry_db_open:
 	handle->is_swapped = is_swapped ? true : false;
 
 	if (ret != 0) {
-	    print_error(__FILE__, __LINE__, "(db) DB->get_byteswapped: %s",
+	    print_error(__FILE__, __LINE__, "DB->get_byteswapped: %s",
 		      db_strerror(ret));
 	    db_close(handle);
 	    return NULL;		/* handle already freed, ok to return */
@@ -417,7 +417,7 @@ retry_db_open:
 
 	ret = dbp->fd(dbp, &handle->fd);
 	if (ret != 0) {
-	    print_error(__FILE__, __LINE__, "(db) DB->fd: %s",
+	    print_error(__FILE__, __LINE__, "DB->fd: %s",
 		      db_strerror(ret));
 	    db_close(handle);
 	    return NULL;		/* handle already freed, ok to return */
@@ -585,7 +585,7 @@ int db_delete(void *vhandle, const dbv_t *token)
     ret = dbp->del(dbp, handle->txn, &db_key, 0);
 
     if (ret != 0 && ret != DB_NOTFOUND) {
-	print_error(__FILE__, __LINE__, "(db) DB->del('%.*s'), err: %d, %s",
+	print_error(__FILE__, __LINE__, "DB->del('%.*s'), err: %d, %s",
 		    CLAMP_INT_MAX(db_key.size),
 		    (const char *) db_key.data,
     		    ret, db_strerror(ret));
@@ -641,7 +641,7 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 	ret = DS_ABORT_RETRY;
 	break;
     default:
-	print_error(__FILE__, __LINE__, "(db) DB->get(TXN=%lu,  '%.*s' ), err: %d, %s",
+	print_error(__FILE__, __LINE__, "DB->get(TXN=%lu,  '%.*s' ), err: %d, %s",
 		    (unsigned long)handle->txn, CLAMP_INT_MAX(token->leng), (char *) token->data, ret, db_strerror(ret));
 	dbe_txn_abort(handle);
 	exit(EX_ERROR);
@@ -679,7 +679,7 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
     }
 
     if (ret != 0) {
-	print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%.*s' ), err: %d, %s",
+	print_error(__FILE__, __LINE__, "db_set_dbvalue( '%.*s' ), err: %d, %s",
 		    CLAMP_INT_MAX(token->leng), (char *)token->data, ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
@@ -776,7 +776,7 @@ void db_flush(void *vhandle)
 	fprintf(dbgout, "DB->sync(%p): %s\n", (void *)dbp, db_strerror(ret));
 
     if (ret)
-	print_error(__FILE__, __LINE__, "(db) db_sync: err: %d, %s", ret, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "db_sync: err: %d, %s", ret, db_strerror(ret));
 
     ret = BF_LOG_FLUSH(dbe, NULL);
     if (DEBUG_DATABASE(1))
@@ -1024,7 +1024,7 @@ static void dbe_cleanup_lite(void) {
 	ret = BF_TXN_CHECKPOINT(dbe, 64, 120, 0);
 	ret = db_flush_dirty(dbe, ret);
 	if (ret)
-	    print_error(__FILE__, __LINE__, "(db) DBE->txn_checkpoint returned %s", db_strerror(ret));
+	    print_error(__FILE__, __LINE__, "DBE->txn_checkpoint returned %s", db_strerror(ret));
 
 	ret = dbe->close(dbe, 0);
 	if (DEBUG_DATABASE(1) || ret)
