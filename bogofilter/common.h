@@ -9,6 +9,8 @@
 #include <sys/param.h>
 #endif
 
+#include "debug.h"
+
 #if defined(PATH_MAX)
 #define PATH_LEN PATH_MAX
 #elif defined(MAXPATHLEN)
