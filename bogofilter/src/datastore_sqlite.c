@@ -363,7 +363,7 @@ int db_txn_commit(void *vhandle) {
 
 /** Converts \a len unsigned characters starting at \a input into the
  * SQL X'b1a4' notation, returns malloc'd string that the caller must
- * xofree. */
+ * free. */
 static char *binenc(const void *input, size_t len) {
     const unsigned char *in = input;
     const char hexdig[] = "0123456789ABCDEF";
