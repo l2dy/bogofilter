@@ -47,6 +47,8 @@ int verbose, passthrough, force, nonspam_exits_zero;
 char directory[PATH_LEN+73];
 const char *user_config_file   = "~/.bogofilter.cf";
 const char *spam_header_name = SPAM_HEADER_NAME;
+
+bool	stats_in_header = TRUE;
 const char *stats_prefix;
 
 run_t run_type = RUN_NORMAL; 
@@ -87,6 +89,7 @@ static int dummy;
 
 static const ArgDefinition ArgDefList[] =
 {
+    { "stats_in_header",  CP_BOOLEAN,	{ (void *)&stats_in_header } },
     { "min_dev",	  CP_DOUBLE,	{ (void *)&min_dev } },
     { "robx",		  CP_DOUBLE,	{ (void *)&robx } },
     { "robs",		  CP_DOUBLE,	{ (void *)&robs } },

@@ -67,6 +67,7 @@ extern double robx;
 extern char msg_register[];
 extern int Rtable;
 static double scalefactor;
+extern char *stats_prefix;
 
 static void initialize_constants(void);
 
@@ -539,13 +540,13 @@ static double compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errn
 		case 1:
 		    break;
 		case 2:
-		    fprintf(fp, "\t%f  %s\n", pp->prob, pp->key);
+		    fprintf(fp, "%s%f  %s\n", stats_prefix, pp->prob, pp->key);
 		    break;
 		case 3:
-		    fprintf(fp, "\t%f  %f  %s\n", pp->prob, spamicity, pp->key);
+		    fprintf(fp, "%s%f  %f  %s\n", stats_prefix, pp->prob, spamicity, pp->key);
 		    break;
 		default:
-		    fprintf(fp, "\t%f  %f  %f  %8.5e  %s\n", pp->prob, product, invproduct, spamicity, pp->key);
+		    fprintf(fp, "%s%f  %f  %f  %8.5e  %s\n", stats_prefix, pp->prob, product, invproduct, spamicity, pp->key);
 		    break;
 	    }
 	}
