@@ -30,4 +30,6 @@ bool configure_wordlist(const char *val);
 void *open_wordlist(const char *name, const char *filepath);
 void close_lists(void);
 
+void set_good_weight(double weight);
+
 #endif	/* HAVE_WORDLISTS_H */
