@@ -156,10 +156,10 @@ else
 if ENABLE_SQLITE_DATASTORE
 datastore_SOURCE = datastore_sqlite.c
 else
-if ENABLE_OLD_BDB
-datastore_SOURCE = datastore_olddb.c datastore_dummies.c
-else
+if ENABLE_TRANSACTIONS
 datastore_SOURCE = datastore_db.c
+else
+datastore_SOURCE = datastore_olddb.c datastore_dummies.c
 endif
 endif
 endif
