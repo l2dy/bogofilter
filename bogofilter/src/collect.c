@@ -23,14 +23,14 @@ static void initialize(void)
 
 void wordprop_init(void *vwordprop)
 {
-    wordprop_t *wordprop = vwordprop;
-    memset(wordprop, 0, sizeof(*wordprop));
+    wordprop_t *wp = vwordprop;
+    memset(wp, 0, sizeof(*wp));
 }
 
 void wordcnts_init(void *vwordcnts)
 {
-    wordcnts_t *wordcnts = vwordcnts;
-    memset(wordcnts, 0, sizeof(*wordcnts));
+    wordcnts_t *wc = vwordcnts;
+    memset(wc, 0, sizeof(*wc));
 }
 
 /* this is used by robinson.c static */
@@ -51,7 +51,7 @@ void collect_words(wordhash_t *wh)
     initialize();
 
     for (;;){
-	wordprop_t *w;
+	wordprop_t *wp;
 	word_t *token;
 	token_t cls = get_token();
 
@@ -68,10 +68,10 @@ void collect_words(wordhash_t *wh)
 	    token->leng = f - s;
 	}
 
-	w = wordhash_insert(wh, token, sizeof(wordprop_t), &wordprop_init);
+	wp = wordhash_insert(wh, token, sizeof(wordprop_t), &wordprop_init);
 	if (wh->type != WH_CNTS &&
-	    w->freq < max_repeats) 
-	    w->freq += 1;
+	    wp->freq < max_repeats) 
+	    wp->freq += 1;
 
 	wh->count += 1;
 	if (DEBUG_WORDLIST(3)) { 
@@ -84,9 +84,9 @@ void collect_words(wordhash_t *wh)
 	{
 	    char *s = (char *)yylval->text;
 	    s += yylval->leng + 2;
-	    w->cnts.bad = atoi(s);
+	    wp->cnts.bad = atoi(s);
 	    s = strchr(s+1, ' ') + 1;
-	    w->cnts.good = atoi(s);
+	    wp->cnts.good = atoi(s);
 	}
     }
 
