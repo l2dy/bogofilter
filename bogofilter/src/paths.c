@@ -26,7 +26,7 @@ char *build_progtype(const char *name, const char *db_type)
     if (strcmp(db_type, "db") == 0)
 	type = xstrdup(name);
     else {
-	size_t len = strlen(name) + strlen(db_type) + 1;
+	size_t len = strlen(name) + strlen(db_type) + 2;
 	type = xmalloc(len);
 	sprintf(type, "%s-%s", name, db_type);
     }
