@@ -54,9 +54,11 @@ const parm_desc rob_parm_table[] =	/* needed by fisher.c */
 
 /* Function Prototypes */
 
+#ifdef	ENABLE_ROBINSON_METHOD
 static void	rob_initialize_constants(void);
 static double	rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
 static void	rob_print_summary(void);
+#endif
 
 /* Static Variables */
 
@@ -247,6 +249,7 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     return (spamicity);
 }
 
+#ifdef	ENABLE_ROBINSON_METHOD
 double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 {
     double r = 1.0 / (double)robn;
@@ -264,13 +267,16 @@ double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 
     return rob_stats.s.spamicity;
 }
+#endif
 
+#ifdef	ENABLE_ROBINSON_METHOD
 void rob_print_summary(void)
 {
     (void)fprintf(stdout, "%-*s %5d %9.5f %9.5f %9.6f %9.3f %9.3f %4.2f\n",
 		  MAXTOKENLEN+2, "P_Q_S_invs_logs_md", rob_stats.robn,
 		  rob_stats.p_pr, rob_stats.q_pr, rob_stats.s.spamicity, rob_stats.p_ln, rob_stats.q_ln, min_dev);
 }
+#endif
 
 void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double _spam_cutoff)
 {
@@ -289,10 +295,12 @@ void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double 
     }
 }
 
+#ifdef	ENABLE_ROBINSON_METHOD
 void rob_initialize_constants(void)
 {
     rob_initialize_with_parameters(&rob_stats, ROBINSON_MIN_DEV, ROBINSON_SPAM_CUTOFF);
 }
+#endif
 
 double rob_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 {
