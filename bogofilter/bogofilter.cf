@@ -1,8 +1,14 @@
 #### Sample bogofilter configuration file
 #
 #	bogofilter config files should be located in:
-#	    HOME as ~/.bogofilter.cf; and/or
-#	    /etc as /etc/bogofilter.cf
+#	    /etc as /etc/bogofilter.cf ; and/or
+#	    $HOME as .bogofilter.cf
+
+# Note: comment lines describe the configuration parameters
+#	and show other possible values for the parameter
+#
+#	non-comment lines show default values 
+#	as used in the bogofilter source code.
 
 
 #### SPAM_HEADER_NAME
@@ -10,40 +16,59 @@
 #	used in reporting spamicity and
 #	in removing already existing headers
 
-#spam_header_name=X-Bogosity
+spam_header_name=X-Bogosity
 
+
+#### minimum deviation
+#
+#	if token spamicity closer to EVEN_ODDS (0.5f)
+#	than MIN_DEV, don't use the word in the 
+#	spamicity calculation
+
+min_dev=0.0
+
+# min_dev=0.2
 
 ##### Robinson Constants
 #
 #	Specify floating point values for
 #	Robinson S and X coefficients
 
-# robs=0.01
-# robx=0.40
+robs=0.001
+robx=0.415
 
-##### spam_in_header
+
+##### stats_in_header
 #
 #	non-zero (default):  put spamicity info in message header
 #	zero:  put spamicity info in message body
 #	can use "bool" values of True, False, Yes, No, 1, or 0
 
-# spam_in_header=Y
-# spam_in_header=N
+stats_in_header=Y
+
+#stats_in_header=N
+
 
 ##### threshold values
 #
 #	used to determine if/when spamicity 
 #	values are output by print_bogostats()
 
+thresh_index = 0
+thresh_stats = 0.0f
+thresh_rtable = 0.0f
+
 # thresh_index = 12
-# thresh_stats = 0.2f
-# thresh_rtable=0.6f
+# thresh_stats =0.2f
+# thresh_rtable=0.4f
+
 
 #### USER_CONFIG_FILE
 #
 #	name/location of user config file
 
-#user_config_file=.bogofilter.cf
+user_config_file=.bogofilter.cf
+
 #user_config_file=.bogofilterrc
 #user_config_file=.bogofilter/config
 
@@ -57,5 +82,3 @@
 #	int override - skip lower valued lists
 
 #wordlist i,ignore,.ignorelist.db,1,0,0
-
-
