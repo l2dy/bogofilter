@@ -68,7 +68,7 @@ static dbh_t *handle_init(
     memset(handle, 0, sizeof(dbh_t));
 
     handle->path = xstrdup(path);
-    handle->name = build_path(handle->name, len, path, name);
+    handle->name = build_path(path, name);
 
     return handle;
 }
