@@ -12,15 +12,16 @@ set -e
 [   -d ${TMPDIR}/tests ] && rm -f ${TMPDIR}/tests/*
 [ ! -d ${TMPDIR}/tests ] && mkdir ${TMPDIR}/tests
 
-cat <<EOF > ${TMPDIR}/bogofilter.cf
+CONFIG="${TMPDIR}/test.cf"
+BOGOFILTER="../bogofilter -c ${CONFIG}"
+SYSTEST="${srcdir}/t.systest.d"
+
+cat <<EOF > ${CONFIG}
 robx=0.415
 min_dev=0.0
 spam_header_name=X-Bogosity
 stats_in_header=Y
 EOF
-
-BOGOFILTER="../bogofilter -c ${TMPDIR}/bogofilter.cf"
-SYSTEST="${srcdir}/t.systest.d"
 
 # Expected spamicity values (11/17/02 13:13):
 #
@@ -69,7 +70,7 @@ for alg in r g ; do
     rm -rf $BOGOFILTER_DIR
 done
 
-rm -f ${TMPDIR}/bogofilter.cf
+rm -f ${CONFIG}
 
 REFDIR=$srcdir/t.systest.d/outputs
 for i in $REFDIR/*v ; do
