@@ -138,6 +138,8 @@
 
         <ul>
           <li><a href="#which-muas">With which mail programs does bogofilter work?</a></li>
+          <li><a href="#with-mutt">How do I use bogofilter with mutt?</a></li>
+          <li><a href="#with-sc">How do I use bogofilter with Sylpheed Claws?</a></li>
           <li><a href="#with-mh-e">How do I use bogofilter with MH-E (the Emacs interface to the MH mail system)?</a></li>
         </ul>
       </li>
@@ -1306,6 +1308,109 @@
     pine, sylpheed-claws, thunderbird.  A google search will help you
     find more information on using bogofilter with the mail program
     you use.</p>
+
+    <hr>
+
+    <h2 id="with-mutt">How do I use bogofilter with mutt?</h2>
+
+    <p>Use a mail filter (procmail, maildrop, etc.) to filter mail
+    into different folders based on bogofilter's return code and set
+    mutt key bindings to train bogofilter on errors:</p>
+
+<pre>        macro index S "|bogofilter -s\ns=junkmail"  "Learn as spam and save to junk"
+        macro pager S "|bogofilter -s\ns=junkmail"  "Learn as spam and save to junk"
+        macro index H "|bogofilter -n\ns="          "Learn as ham and save"
+        macro pager H "|bogofilter -n\ns="          "Learn as ham and save"</pre>
+
+    <p>These will pipe the selected message through bogofilter,
+    training a false-ham as spam or vice versa, then offer to save the
+    message to a different folder.</p>
+
+    <hr>
+
+    <h2 id="with-sc">How do I use bogofilter with Sylpheed Claws?</h2>
+
+    <p> Add a filtering rule to run bogofilter on incoming messages
+    and an action to perform if it's spam </p>
+
+    <pre>    condition:
+    * test "bogofilter < %F"
+    action:
+    * move "#mh/YOUR_SPAM_BOX"</pre>
+
+    <p>Note: this assumes that bogofilter is in your
+    path!</p>
+
+    <p> Create two Claws actions - one for marking messages as spam
+    and one for marking messages as ham.  Use the "Mark As Spam"
+    action for messages incorrectly classified as ham and use the "Mark As Ham"
+    action for messages incorrectly classified as spam.</p>
+
+    <pre>    Mark as ham / spam:
+    * bogofilter -n -v -B "%f" (mark ham)
+    * bogofilter -s -v -B "%f" (mark spam)</pre>
+
+    <p>Another approach is to save incorrectly classified messages in
+    a folder (or folders) and run a script like:</p>
+
+<pre>        #!/bin/sh
+        CONFIGDIR=~/.bogofilter
+        SPAMDIRS="$CONFIGDIR/spamdirs"
+        MARKFILE="$CONFIGDIR/lastbogorun"
+        for D in `cat "$SPAMDIRS"`; do
+          find "$D" -type f -newer "$MARKFILE" -not -name ".sylpheed*"
+        done|bogofilter -bNsv
+        touch "$MARKFILE"</pre>
+
+    <p>This script can be used as an action and/or made into a toolbar
+    button.  It will register as spam the messages in ${SPAMDIRS} that
+    are newer than ${MARKFILE}.</p>
+
+    <p>Additional information is available at the Claws'
+    <a href="http://sylpheed-claws.sourceforge.net/phpwiki/index.php/FullTextSearch?s=bogofilter">wiki</a></p>
+
+    <hr>
+
+    <p>Another approach is to run bogofilter from procmail, maildrop,
+    etc and have Claws check the X-Bogosity header and filter messages
+    into Spam and Unsure folders, e.g.:</p>
+
+    <pre>    Condition:
+        header "X-Bogosity" matchcase "Spam"
+    Action:
+        move "#mh/Mailbox/Spam"
+    Condition:
+        header "X-Bogosity" matchcase "Unsure"
+    Action:
+        move "#mh/Mailbox/Unsure"</pre>
+
+    <p>Any messages in the Unsure folder should be used for training,
+    as should messages incorrectly classified as ham or spam.  The
+    actions below will handle these cases:</p>
+
+    <pre>    Register Spam:
+        bogofilter -s < "%f"
+
+    Register Ham:
+        bogofilter -n < "%f"
+
+    Unregister Spam:
+        bogofilter -S < "%f"
+
+    Unregister Ham:
+        bogofilter -N < "%f"</pre>
+
+    <p>To look inside the bogofilter scoring mechanism, the following
+    diagnostic are useful:</p>
+
+    <pre>    BogoTest -vv:
+        bogofilter -vv < "%f"
+
+    BogoTest -vvv:
+        bogofilter -vvv < "%f"</pre>
+
+    <p>Additional information on this approach is available <a
+    href="http://www.bogofilter.org/pipermail/bogofilter/2005-March/007815.html">here</a></p>
 
     <hr>
 

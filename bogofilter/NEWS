@@ -15,6 +15,13 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
+	2005-03-27
+
+	* Added FAQ info on using bogofilter with mutt and sylpheed claws.
+
+	* Fixed --db-print-pagesize so that the proper directory is
+	  used for database environment.
+
 	2005-03-25
 
 	* Add error checking to bogoutil's ROBX calculation.
