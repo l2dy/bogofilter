@@ -38,9 +38,9 @@ void word_free(word_t *self)
 
 word_t *word_dup(const word_t *word)
 {
-    word_t *self = xmalloc(sizeof(word_t));
+    word_t *self = xmalloc(sizeof(word_t)+word->leng+D);
     self->leng = word->leng;
-    self->text = xmalloc(word->leng+D);
+    self->text = (byte *)((char *)self+sizeof(word_t));
     if (word->text) {
 	memcpy(self->text, word->text, self->leng);
 	Z(self->text[self->leng]);		/* for easier debugging - removable */
