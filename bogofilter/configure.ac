@@ -142,7 +142,7 @@ AC_SUBST(CFLAGS)
 dnl Checks for libraries.
 AC_CHECK_LIB([m],  [cos])
 
-AC_CHECK_DECLS(optreset,,,[[
+AC_CHECK_DECLS([getopt,optreset],,,[[
 #include <unistd.h>
 /* Solaris */
 #include <stdlib.h>
