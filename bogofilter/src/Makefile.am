@@ -156,9 +156,9 @@ if ENABLE_SQLITE_DATASTORE
 datastore_SOURCE = datastore_sqlite.c
 else
 if ENABLE_OLD_BDB
-datastore_SOURCE = datastore_olddb.c datastore_dummies.c datastore_dbcommon.h
+datastore_SOURCE = datastore_olddb.c datastore_dummies.c
 else
-datastore_SOURCE = datastore_db.c datastore_dbcommon.h
+datastore_SOURCE = datastore_db.c
 endif
 endif
 endif
