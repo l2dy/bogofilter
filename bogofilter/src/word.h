@@ -29,9 +29,6 @@ extern void 	word_free(word_t *self);
 /** create a newly word_t to form a deep copy of \a self */
 extern word_t  *word_dup(const word_t *self);
 
-/** copy the content of \a src into \a dst. */
-extern word_t  *word_cpy(word_t *dst, const word_t *src);
-
 /** compare \a w1 and \a w2 with memcmp() */
 extern int 	word_cmp(const word_t *w1, const word_t *w2);
 

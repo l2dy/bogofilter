@@ -44,15 +44,6 @@ word_t *word_dup(const word_t *word)
     return self;
 }
 
-/** \bug if src doesn't fit into dst, overwrites heap data! */
-word_t *word_cpy(word_t *dst, const word_t *src)
-{
-    dst->leng = src->leng;
-    memcpy(dst->text, src->text, src->leng);
-    Z(dst->text[dst->leng]);			/* for easier debugging - removable */
-    return dst;
-}
-
 int word_cmp(const word_t *w1, const word_t *w2)
 {
     uint l = min(w1->leng, w2->leng);
