@@ -74,24 +74,6 @@ int dump_file(char *db_file)
     return rv;
 }
 
-int display_token(char *db_file, char *token)
-{
-    dbh_t *dbh;
-
-    int rv = 0;
-
-    if ((dbh = db_open(db_file, db_file, DB_READ)) == NULL) {
-	rv = 2;
-    }
-    else {
-      db_lock_reader(dbh);
-      printf( "%s %d\n", token, db_getvalue( dbh, token ) );
-      db_lock_release(dbh);
-    }
-
-    return rv;
-}
-
 #define BUFSIZE 512
 
 int load_file(char *db_file)
@@ -168,6 +150,50 @@ int load_file(char *db_file)
     return rv;
 }
 
+int display_words(char *db_file)
+{
+    dbh_t *dbh;
+    char buf[BUFSIZE];
+    char *p;
+    int rv = 0;
+    size_t len;
+
+    memset(buf, '\0', BUFSIZE);
+
+    if ((dbh = db_open(db_file, db_file, DB_READ)) == NULL) {
+	rv = 2;
+    }
+    else {
+      db_lock_reader(dbh);
+      for (;;) {
+	if (fgets(buf, BUFSIZE, stdin) == NULL) {
+	  if (ferror(stdin)) {
+	    perror(PROGNAME);
+	    rv = 2;
+	  }
+	  break;
+	}
+	len = strlen(buf);
+	p = &buf[len - 1];
+
+	if (*(p--) != '\n') {
+	    fprintf(stderr,
+		    PROGNAME
+		    ": Unexpected input [%s]. Does not end with newline\n",
+		    buf);
+	    rv = 1;
+	    break;
+	}
+	*(p + 1) = '\0';
+
+	printf( "%s %d\n", buf, db_getvalue( dbh, buf ) );
+      }
+      db_lock_release(dbh);
+    }
+
+    return rv;
+}
+
 void version(void)
 {
     fprintf(stderr,
@@ -181,7 +207,7 @@ void version(void)
 
 void usage(void)
 {
-    fprintf(stderr, "Usage: %s { -d | -l } [ -v ] file.db [ -w token ] | [ -h | -V ]\n", PROGNAME);
+    fprintf(stderr, "Usage: %s { -d | -l | -w } [ -v ] file.db | [ -h | -V ]\n", PROGNAME);
 }
 
 void help(void)
@@ -190,7 +216,7 @@ void help(void)
     fprintf(stderr,
 	    "\t-d\tDump data from file.db to stdout.\n"
 	    "\t-l\tLoad data from stdin into file.db.\n"
-	    "\t-w\tDisplay a token and its count.\n"
+	    "\t-w\tDisplay counts for words from stdin.\n"
 	    "\t-v\tOutput debug messages.\n"
 	    "\t-h\tPrint this message.\n"
 	    "\t-V\tPrint program version.\n"
@@ -202,7 +228,7 @@ int main(int argc, char *argv[])
     typedef enum { NONE, DUMP = 1, LOAD = 2, WORD = 3 } cmd_t;
 
     int  count = 0;
-    char *db_file, *token;
+    char *db_file;
     char ch;
     cmd_t flag = NONE;
 
@@ -222,7 +248,8 @@ int main(int argc, char *argv[])
 
 	case 'w':
 	    flag = WORD;
-	    token = (char *) optarg;
+	    count += 1;
+	    db_file = (char *) optarg;
 	    break;
 
 	case 'v':
@@ -245,7 +272,7 @@ int main(int argc, char *argv[])
 
     if ( count != 1 )
     {
-      fprintf(stderr, PROGNAME ": Exactly one of the -d or -l flags must be present.\n");
+      fprintf(stderr, PROGNAME ": Exactly one of the -d, -l, or -w flags must be present.\n");
       exit(1);
     }
 
@@ -262,6 +289,6 @@ int main(int argc, char *argv[])
     case LOAD:
 	 return load_file(db_file);
     case WORD:
-	 return display_token(db_file, token);
+	 return display_words(db_file);
     }
 }

@@ -15,6 +15,7 @@
       <group choice="req">
         <arg>-d</arg>
         <arg>-l</arg>
+        <arg>-w</arg>
       </group>
       <arg choice="opt">-v</arg>
       <arg choice="plain"><replaceable>file.db</replaceable></arg>
@@ -27,7 +28,7 @@
   <refsect1 id="description">
     <title>DESCRIPTION</title>
     <para><application>Bogoutil</application> is part of the bogofilter Bayesian spam filter package.</para>
-    <para>It is used to dump and load bogofilter's Berkeley DB databases to and from text files.</para>
+    <para>It is used to dump and load bogofilter's Berkeley DB databases to and from text files, and to display the values for specific words.</para>
   </refsect1>
   <refsect1 id="options">
     <title>OPTIONS</title>
@@ -42,6 +43,10 @@
     <para>
        The <option>-v</option> option produces verbose output on stderr.
        This option is primarily useful for debugging.
+    </para>
+    <para>
+       The <option>-w</option> option tells <application>bogoutil</application> to read the specified database file and display
+       display words and their associated count.  stdin provides the input list of words for this option.
     </para>
     <para>
       The <option>file.db</option> is the path to the database file that
