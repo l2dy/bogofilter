@@ -222,13 +222,16 @@ AC_MSG_CHECKING(if BerkeleyDB header and library versions match)
 AC_RUN_IFELSE(
   AC_LANG_PROGRAM([[
 		   #include <stdlib.h>
+		   #include <stdio.h>
 		   #include <db.h>
 		   ]], [[
 			int maj, min;
 			(void)db_version(&maj, &min, (void *)0);
+			(void)fprintf(stderr, "headers: %d.%d, library: %d.%d\n",
+				DB_VERSION_MAJOR, DB_VERSION_MINOR, maj, min);
 			if (maj != DB_VERSION_MAJOR) exit(1);
-			  if (min != DB_VERSION_MINOR) exit(1);
-			    exit(0);
+			if (min != DB_VERSION_MINOR) exit(1);
+			exit(0);
 		   ]]),,
 		   [AC_MSG_RESULT(no)
 		   AC_MSG_ERROR(db.h header file and db library version do not match.)],)
@@ -518,8 +521,6 @@ AC_DEFINE(DIRSEP_C, '\\\\')
 AC_DEFINE(DIRSEP_S, "\\\\")
 fi
 
-DISTCHECK_CONFIGURE_FLAGS="LDFLAGS=\"$LDFLAGS\" CPPFLAGS=\"$CPPFLAGS\" LIBS=\"$LIBS\" CFLAGS=\"$CFLAGS\""
-AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 AC_CONFIG_FILES([Makefile \
 		bogofilter.spec \
 		trio/Makefile \
