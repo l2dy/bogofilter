@@ -51,8 +51,8 @@ EXTRA_DIST = $(man1_MANS) \
 	     version.sh
 #
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
-version.h:	version.sh $(VERSION_FROM)
-	./version.sh $(VERSION_FROM) >$@
+$(srcdir)/version.h:	version.sh $(VERSION_FROM)
+	$(srcdir)/version.sh $(srcdir) $(VERSION_FROM) >$@ || rm -f $@
 #
 .xml.pdf:
 	xmlto pdf --extensions $<

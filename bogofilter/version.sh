@@ -17,10 +17,13 @@ VERSION=`grep define.VERSION config.h | awk '{print $3}' | tr -d '"'`
 
 echo $VERSION | egrep "[a-z][a-z][a-z]$" >/dev/null
 
+srcdir=$1
+shift
+
 if [ $? == 0 ]; then
    DATE="00000000"
    for file in $* ; do
-       HEAD=`head -1 $file | awk '{print $5}' | tr -d "/"`
+       HEAD=`head -1 $srcdir/$file | awk '{print $5}' | tr -d "/"`
        if [ $HEAD -gt $DATE  ] ; then
 	   DATE="$HEAD"
        fi
