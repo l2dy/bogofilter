@@ -145,7 +145,7 @@ static int arg_foreach(arg_foreach_t hook, int argc, char **argv)
 	    }
 	    initialize(fpin);
 	    if (verbose || passthrough)
-		fprintf(dbgout, "%s ", filename ); 
+		fprintf(fpo, "%s ", filename ); 
 	}
 
 	status = hook();
