@@ -153,15 +153,6 @@ bool is_eol(const char *buf, size_t len)
     return ans;
 }
  
-void convert_eol(char *buf, char chr)
-{
-    if (memcmp(buf-2, CRLF, 2) == 0)
-	memset(buf-2, chr,  2);
-    if (memcmp(buf-1, NL,   1) == 0)
-	memset(buf-1, chr,  1);
-    return;
-}
-
 static int get_decoded_line(buff_t *buff)
 {
     size_t used = buff->t.leng;
