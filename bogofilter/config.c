@@ -29,6 +29,7 @@ AUTHOR:
 #include "find_home.h"
 #include "format.h"
 #include "lexer.h"
+#include "maint.h"
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
@@ -488,9 +489,7 @@ int process_args(int argc, char **argv)
     int option;
     int exitcode;
 
-    time_t t = time(NULL);
-    struct tm *tm = localtime( &t );
-    today = tm->tm_yday + 1;
+    set_today();		/* compute current date for token age */
 
     select_algorithm(algorithm, false);	/* select default algorithm */
 
@@ -615,8 +614,8 @@ int process_args(int argc, char **argv)
 	    terse = true;
 	    break;
 
-	case 'y':		/* day of year (1..366) */
-	    today = atol((char *)optarg);
+	case 'y':		/* date as YYYYMMDD */
+	    today = string_to_date((char *)optarg);
 	    break;
 
 	default:
