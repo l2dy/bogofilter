@@ -1,9 +1,12 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.11  2002/09/19 03:20:32  relson
- * Move "msg_prob" assignment to proper function, i.e. from select_indicators() to compute_probability().
- * Move some local variables from the beginning of the function to the innermost block where they're needed.
+ * Revision 1.12  2002/09/22 21:26:28  relson
+ * Remove the definition and use of strlwr() since get_token() in lexer_l.l already converts the token to lower case.
  *
+/* Revision 1.11  2002/09/19 03:20:32  relson
+/* Move "msg_prob" assignment to proper function, i.e. from select_indicators() to compute_probability().
+/* Move some local variables from the beginning of the function to the innermost block where they're needed.
+/*
 /* Revision 1.10  2002/09/18 22:41:07  relson
 /* Separated probability calculation out of select_indicators() into new function compute_probability().
 /*
@@ -106,13 +109,6 @@ wordlist_t spam_list	= {"spam", NULL, 0, NULL};
 
 #define long2DBT(dbt,val) x2DBT(dbt,val,long)  
 #define int2DBT(dbt,val)  x2DBT(dbt,val,int)
-
-static void strlwr(char* s)
-{
-    char c;
-    while((c = *s) != 0)
-	*s++ = tolower(c);
-}
 
 long get_word_value(char *word, wordlist_t *list)
 {
@@ -368,7 +364,6 @@ void register_words(int fdin, wordlist_t *list, wordlist_t *other)
 	if (tok != FROM && tok != 0)
 	{
 	    // Ordinary word, stash in private per-message array.
-	    strlwr(yytext);
 	    if ((PPValue = JudySLIns(&PArray, yytext, &JError)) == PPJERR)
 		return;
 	    (*((PWord_t) PPValue))++;
@@ -465,7 +460,6 @@ void *collect_words(int fd)
     while ((tok = get_token()) != 0)
     {
 	// Ordinary word, stash in private per-message array.
-	strlwr(yytext);
 	if ((PPValue = JudySLIns(&PArray, yytext, &JError)) == PPJERR)
 	    break;
 	(*((PWord_t) PPValue))++;
