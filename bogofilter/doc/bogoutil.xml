@@ -22,25 +22,11 @@
         <arg choice="opt">-p</arg></arg>
       </group>
       <arg choice="plain"><replaceable>file.db</replaceable></arg>
-    </cmdsynopsis>
-
-    <para>where <option>option</option> is</para>
-    <cmdsynopsis>
-      <group choice="req">
-        <arg choice="plain">-v</arg>
-	<arg choice="plain">-n</arg>
-	<arg choice="plain">-a age</arg>
-	<arg choice="plain">-c count</arg>
-	<arg choice="plain">-s min,max</arg>
-	<arg choice="plain">-y date</arg>
-      </group>
-    </cmdsynopsis>
+   </cmdsynopsis>
 
     <cmdsynopsis>
       <command>bogoutil</command>
-      <group choice="req">
         <arg choice="plain">-R</arg>
-    </group>
     </cmdsynopsis>
 
     <cmdsynopsis>
@@ -49,6 +35,19 @@
         <arg choice="plain">-h</arg>
 	<arg choice="plain">-V</arg>
     </group>
+    </cmdsynopsis>
+
+  <para>where <option>options</option> is</para>
+    <cmdsynopsis>
+        <arg choice="opt">-v</arg>
+	<arg choice="opt">-n</arg>
+	<arg choice="opt">-D</arg>
+	<arg choice="opt">-a <replaceable>age</replaceable></arg>
+	<arg choice="opt">-c <replaceable>count</replaceable></arg>
+	<arg choice="opt">-s <replaceable>min,max</replaceable></arg>
+	<arg choice="opt">-y <replaceable>date</replaceable></arg>
+	<arg choice="opt">-I <replaceable>file</replaceable></arg>
+	<arg choice="opt">-x <replaceable>flags</replaceable></arg>
     </cmdsynopsis>
 
   </refsynopsisdiv>
@@ -69,7 +68,7 @@
        The <option>-l</option> option tells <application>bogoutil</application> 
        to load the data from <option>stdin</option> into the specified database file.
     </para>
-    <para>The <option>-m</option> option tell <application>bogoutil</application> 
+    <para>The <option>-m</option> option tells <application>bogoutil</application> 
     to perform maintenance functions on the specified database, i.e. discard tokens 
     that are older than desired, have counts that are too small, or sizes (lengths) 
     that are too long or too short.
@@ -92,10 +91,20 @@
     <para>
        The <option>-p</option> option adds a column of probabilities to the output of the <option>-w</option> option.
     </para>
+    <para>The <option>-R</option> option tells
+	<application>bogoutil</application> to recalculate the ROBX
+	value.</para>
+    <para>The <option>-I <replaceable>file</replaceable></option> option tells
+	    <application>bogoutil</application> to read its input from
+	    <replaceable>file</replaceable> rather than stdin.</para>
     <para>
        The <option>-v</option> option produces verbose output on <option>stderr</option>.
        This option is primarily useful for debugging.
     </para>
+    <para>The <option>-D</option> redirects debug output to stdout (it
+	usually goes to stderr).</para>
+    <para>The <option>-x <replaceable>flags</replaceable> sets debugging
+    flags.</option></para>
     <para>
       Option <option>-n</option> stands for "replace non-ascii characters".  
       It will replace characters with the high bit (0x80) by question marks.  

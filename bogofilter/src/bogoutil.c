@@ -544,6 +544,7 @@ static void help(void)
 	    "\t-d file\tDump data from file to stdout.\n"
 	    "\t-l file\tLoad data from stdin into file.\n"
 	    "\t-w\tDisplay counts for words from stdin.\n"
+	    "\t-m\tEnable maintenance works (expiring tokens).\n"
 	    "\t-p\tOutput word probabilities.\n"
 	    "\t-v\tOutput debug messages.\n"
 	    "\t-h\tPrint this message.\n"
@@ -556,6 +557,7 @@ static void help(void)
 	    "\t-x list\t- set debug flags.\n"
 	    "\t-D\t- direct debug output to stdout.\n"
 	    "\t-V\tPrint program version.\n"
+	    "\t-I file\tRead this file instead of standard input.\n"
 	    "%s is part of the bogofilter package.\n", PROGNAME);
 }
 
