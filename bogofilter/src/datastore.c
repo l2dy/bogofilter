@@ -275,23 +275,26 @@ int ds_delete(void *vhandle, const word_t *word)
 
 int ds_txn_begin(void *vhandle) {
     dsh_t *dsh = vhandle;
-    if (dsm && dsm->dsm_begin)
+    if (dsm)
 	return dsm->dsm_begin(dsh->dbh);
-    return 0;
+    else
+	return 0;
 }
 
 int ds_txn_abort(void *vhandle) {
     dsh_t *dsh = vhandle;
-    if (dsm && dsm->dsm_abort)
+    if (dsm)
 	return dsm->dsm_abort(dsh->dbh);
-    return 0;
+    else
+	return 0;
 }
 
 int ds_txn_commit(void *vhandle) {
     dsh_t *dsh = vhandle;
-    if (dsm && dsm->dsm_commit)
+    if (dsm)
 	return dsm->dsm_commit(dsh->dbh);
-    return 0;
+    else
+	return 0;
 }
 
 typedef struct {
