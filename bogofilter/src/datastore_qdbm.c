@@ -85,8 +85,8 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 
 bool db_is_swapped(void *vhandle)
 {
-    dbh_t *handle = vhandle;
-    return handle->is_swapped;
+    vhandle = NULL;	/* assignment to suppress compiler warning */
+    return false;
 }
 
 
