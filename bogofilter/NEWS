@@ -9,20 +9,34 @@ RELEASE.NOTES files!
 
 $Id$
 
-       2003-08-05
+0.14.3	2003-08-05
 
 	* Fixed critical locking bug introduced into bogofilter 0.13.7.4 with
 	  the combined-wordlist code: bogofilter would lock only the first
 	  opened data base file rather than all.
+	* Documentation updates.
 
-       2003-08-04
+	2003-08-04
 
 	* Merged trio 1.10 (http://ctrio.sourceforge.net/) to support
 	  compilation on ancient systems (Solaris 2.5) that do not have
 	  [v]snprintf functions.
 	  Trio is Copyright (C) 1998-2000 Bjorn Reese and Daniel Stenberg.
+	* %g formatting is now supported.
+	* Various documentation updates, including the FAQ.
 
-0.14.2 2003-08-02
+	2003-08-03
+	* Break up very long line into shorter lines for Solaris 2.5
+	  compatibility.
+	* Print data base version in print_version().
+
+	2003-08-02
+
+	* Postfix integration instructions have been upgraded.
+	* Debug output for wordlists and data bases was enhanced.
+	* Bogofilter is now flex-2.5.31 compatible.
+
+0.14.2	2003-08-02
 
 	* Replaced use of memcpy() by memmove() in an input routine. The
 	  overlapping copy migh cause data corruption on some systems.

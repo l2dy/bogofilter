@@ -4,6 +4,20 @@
 
 $Id$
 
+0.14.3	2003-08-05
+
+	* Fixed critical locking bug for separate wordlist mode that
+	  existed from bogofilter 0.13.7.4 to 0.14.2: bogofilter would
+	  lock only the first opened data base file.
+	* Use Bjorn Reese and Daniel Stenberg's Trio 1.10 to fix compilations
+	  on old systems that don't have snprintf or vsnprintf.
+	* Various documentation updates, including the FAQ.
+	* The test suite was adjusted for older grep variants that don't cope
+	  with long lines.
+	* Bogofilter is now flex-2.5.31 compatible.
+	* Print data base version in print_version().
+	* %g formatting is now supported.
+
 0.14.2	2003-08-02
 
 	* Replaced use of memcpy() by memmove() in an input routine. The
@@ -89,3 +103,5 @@ $Id$
 	* Initial release of code allowing bogofilter to use a single,
 	  combined BerkeleyDB database for storing both ham and spam
 	  tokens.  The file is named wordlist.db.
+
+ vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:
