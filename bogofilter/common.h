@@ -15,4 +15,7 @@ const bool TRUE = true;
 
 typedef enum dbmode_e { DB_READ = 0, DB_WRITE = 1 } dbmode_t;
 
+#define PATH_LEN 200
+void build_path(char* dest, int size, const char* dir, const char* file);
+
 #endif

@@ -12,7 +12,6 @@
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-#define BOGODIR		"/.bogofilter/"
 #define GOODFILE	"goodlist.db"
 #define SPAMFILE	"spamlist.db"
 
@@ -20,71 +19,26 @@ wordlist_t good_list;
 wordlist_t spam_list;
 wordlist_t* word_lists=NULL;
 
-// get_bogodir()
-//	given a list of environment variables,
-//	find the first match and build a directory name
-
-char *get_bogodir(char **dirnames)
-{
-    char *env = NULL, *dir, *var;
-    for (var=*dirnames; var != NULL; var=*++dirnames)
-    {
-	env = getenv(var);
-	if (env != NULL)
-	    break;
-    }
-
-    if (env == NULL)
-	dir = xstrdup(".");
-    else
-    {
-	dir = xmalloc( strlen(env) + strlen(BOGODIR) + 1 );
-	strcpy(dir, env );
-	if ( strstr(env, "bogofilter") == NULL )
-	    strcat(dir, BOGODIR);
-    }
-    return dir;
-}
-
-void *open_wordlist( const char *name, const char *directory, const char *filename, dbmode_t open_mode )
+void *open_wordlist( const char *name, const char *filepath, dbmode_t open_mode )
 {
     int	rc;
     void *dbh;			// database handle 
-    char *path;
-    struct stat sb;
-    size_t dirlen = strlen(directory);
-    size_t namlen = strlen(filename);
 
-    path = (char *)xmalloc( dirlen + namlen + 2 );
-    strcpy(path, directory);
-    if (path[dirlen-1] != '/')
-	strcat(path, "/");
-
-    rc = stat(path, &sb);
-    if (!((rc == 0 && S_ISDIR(sb.st_mode))
-	  || (errno==ENOENT && mkdir(path, S_IRUSR|S_IWUSR|S_IXUSR)==0)))
-    {
-	fprintf(stderr,"bogofilter: something is wrong with %s.\n", path);
-	exit(2);
-    }
-
-    strcat(path, filename);
-    if ( (dbh = db_open(path, name, open_mode)) == NULL){
+    if ( (dbh = db_open(filepath, name, open_mode)) == NULL){
       fprintf(stderr, "bogofilter: Cannot initialize database %s.\n", name);
       exit(2);
     }
 
-    free(path);
     return dbh;
 }
 
 /* returns -1 for error, 0 for success */
-int init_list(wordlist_t* list, const char* name, const char* directory, const char* filename, double weight, bool bad, int override, int ignore, dbmode_t open_mode)
+int init_list(wordlist_t* list, const char* name, const char* filepath, double weight, bool bad, int override, int ignore, dbmode_t open_mode)
 {
     wordlist_t* list_index;
     wordlist_t** last_list_ptr;
 
-    list->dbh=open_wordlist(name, directory, filename, open_mode);
+    list->dbh=open_wordlist(name, filepath, open_mode);
     if (list->dbh == NULL) return -1;
     list->name=xstrdup(name);
     list->msgcount=0;
@@ -121,11 +75,17 @@ int init_list(wordlist_t* list, const char* name, const char* directory, const c
 }
 
 /* returns -1 for error, 0 for success */
-int setup_lists(const char *directory, dbmode_t open_mode)
+int setup_lists(const char* directory, dbmode_t open_mode)
 {
     int rc = 0;
-    if (init_list(&good_list, "good", directory, GOODFILE, GOOD_BIAS, FALSE, 0, 0, open_mode)) rc = -1;
-    if (init_list(&spam_list, "spam", directory, SPAMFILE,         1, TRUE,  0, 0, open_mode)) rc = -1;
+    char filepath[PATH_LEN];
+
+    build_path(filepath, PATH_LEN, directory, GOODFILE);
+    if (init_list(&good_list, "good", filepath, GOOD_BIAS, FALSE, 0, 0, open_mode)) rc = -1;
+
+    build_path(filepath, PATH_LEN, directory, SPAMFILE);
+    if (init_list(&spam_list, "spam", filepath, 1, TRUE,  0, 0, open_mode)) rc = -1;
+
     return rc;
 }
 

@@ -15,6 +15,7 @@ AUTHOR:
 #include <stdlib.h>
 #include <signal.h>
 #include <sys/stat.h>
+#include <errno.h>
 #include <config.h>
 #ifdef HAVE_SYSLOG_H
 #include <sys/syslog.h>
@@ -24,22 +25,101 @@ AUTHOR:
 #include "datastore.h"
 #include "xstrdup.h"
 
+#define BOGODIR ".bogofilter"
+
 int verbose, passthrough, update, nonspam_exits_zero;
 
-char *dirnames[] = { "BOGOFILTER_DIR", "HOME", NULL };
+char directory[PATH_LEN];
+
+/* if the given environment variable 'var' exists, copy it to 'dest' and
+   tack on the optional 'subdir' value.
+ */
+void set_dir_from_env(char* dest, char *var, char* subdir)
+{
+    char *env;
+    int path_left=PATH_LEN-1;
+
+    env = getenv(var);
+    if (env == NULL) return;
+
+    strncpy(dest, env, path_left-1);  // leave one char left for '/'
+    path_left -= strlen(env);
+    if ('/' != dest[strlen(dest)-1]) {
+	strcat(dest, "/");
+	path_left--;
+    }
+    if (subdir && (path_left > 0)) {
+	strncat(dest, subdir, path_left);
+    }
+}
+
+/* build an absolute path to a file given a directory and file name
+ */
+void build_path(char* dest, int size, const char* dir, const char* file)
+{
+    int path_left=size-1;
+
+    strncpy(dest, dir, path_left);
+    path_left -= strlen(dir);
+    if (path_left <= 0) return;
+
+    if ('/' != dest[strlen(dest)-1]) {
+	strcat(dest, "/");
+	path_left--;
+	if (path_left <= 0) return;
+    }
+
+    strncat(dest, file, path_left);
+}
+
+/* check that our directory exists and try to create it if it doesn't
+   return -1 on failure, 0 otherwise.
+ */
+int check_directory(char* path)
+{
+    int rc;
+    struct stat sb;
+
+    rc = stat(path, &sb);
+    if (rc < 0) {
+	if (ENOENT==errno) {
+	    if(mkdir(path, S_IRUSR|S_IWUSR|S_IXUSR)) {
+		perror("Error creating directory");
+		return -1;
+	    }
+	    else if (verbose > 0) {
+		fprintf(stderr, "Created directory %s .\n", path);
+	    }
+	    return 0;
+	}
+	else {
+	    perror("Error accessing directory");
+	    return -1;
+	}
+    }
+    else {
+	if (! S_ISDIR(sb.st_mode)) {
+	    fprintf(stderr, "Error: %s is not a directory.\n", path);
+	}
+    }
+    return 0;
+}
 
 int main(int argc, char **argv)
 {
     int	  ch;
     reg_t register_type = REG_NONE; 
-    char  *directory = NULL;
     int   exitcode = 0;
+
+    strcpy(directory, BOGODIR);
+    set_dir_from_env(directory, "HOME", BOGODIR);
+    set_dir_from_env(directory, "BOGOFILTER_DIR", NULL);
 
     while ((ch = getopt(argc, argv, "d:ehsnSNvVpu")) != EOF)
 	switch(ch)
 	{
 	case 'd':
-	    directory = xstrdup(optarg);
+	    strncpy(directory, optarg, PATH_LEN);
 	    break;
 
 	case 'e':
@@ -106,11 +186,9 @@ int main(int argc, char **argv)
 	    break;
 	}
 
-    if ( directory == NULL )
-	directory = get_bogodir(dirnames);
+    if (check_directory(directory)) exit(2);
 
     setup_lists(directory, DB_WRITE);
-    xfree(directory);
 
     if (register_type == REG_NONE)
     {
