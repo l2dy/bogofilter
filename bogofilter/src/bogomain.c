@@ -86,14 +86,15 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     mime_cleanup();
     token_cleanup();
 
-    MEMDISPLAY;
-
 #ifdef	HAVE_SYSLOG_H
     if (logflag)
 	closelog();
 #endif
 
     xfree(progtype);
+
+    if (DEBUG_MEMORY(0))
+	MEMDISPLAY;
 
     return (exitcode);
 }

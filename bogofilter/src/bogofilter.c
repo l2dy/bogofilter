@@ -137,7 +137,7 @@ rc_t bogofilter(int argc, char **argv)
 	passthrough_cleanup();
 	rstats_cleanup();
 
-	if (DEBUG_MEMORY(1))
+	if (DEBUG_MEMORY(2))
 	    MEMDISPLAY;
 
 	if (fDie)
@@ -145,6 +145,9 @@ rc_t bogofilter(int argc, char **argv)
     }
 
     bogoreader_fini();
+
+    if (DEBUG_MEMORY(1))
+	MEMDISPLAY;
 
     if (register_aft && ((run_type & RUN_UPDATE) == 0)) {
 	wordhash_sort(words);
@@ -155,6 +158,9 @@ rc_t bogofilter(int argc, char **argv)
 	write_log_message(status);
 
     wordhash_free(words);
+
+    if (DEBUG_MEMORY(1))
+	MEMDISPLAY;
 
     return status;
 }
