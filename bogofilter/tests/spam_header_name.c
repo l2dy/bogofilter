@@ -23,10 +23,9 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "config.h"
 
 int main(void) {
     puts(SPAM_HEADER_NAME);
-    exit(0);
+    return 0;
 }
