@@ -176,16 +176,10 @@ void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
 
     /* directories from command line and config file are already handled */
 
-#ifndef __riscos__
     if (setup_wordlists(NULL, PR_ENV_BOGO) != 0)
 	exit(EX_ERROR);
-#endif
     if (setup_wordlists(NULL, PR_ENV_HOME) != 0)
 	exit(EX_ERROR);
-#ifdef __riscos__
-    if (setup_wordlists(NULL, PR_NONE) != 0)
-	exit(EX_ERROR);
-#endif
 
     stats_prefix= stats_in_header ? "  " : "# ";
 
@@ -322,6 +316,7 @@ static void help(void)
 		  "\t  -2      - set binary classification mode (yes/no).\n"
 		  "\t  -3      - set ternary classification mode (yes/no/unsure).\n");
     (void)fprintf(stderr,
+		  "\t  -H      - enables combined counts for tagged header tokens.\n"
 		  "\t  -P {opts} - set html processing flag(s).\n"
 		  "\t     where {opts} is one or more of:\n"
 		  "\t      c   - enables  strict comment checking.\n"
@@ -338,7 +333,7 @@ static void help(void)
 		  "\t      F   - enables  extreme score selection.\n"
 #if	0
 		  "\t      s   - enables  separate case-sensitive tokens. (default)\n"
-		  "\t      s   - enables  combined counts for related tokens.\n"
+		  "\t      S   - enables  combined counts for related tokens.\n"
 #endif
 	);
     (void)fprintf(stderr,

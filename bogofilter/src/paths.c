@@ -17,6 +17,27 @@ NAME:
 #include "xmalloc.h"
 #include "xstrdup.h"
 
+/* Local  Data */
+
+typedef struct {
+    priority_t p;	/* precedence */
+    const char *v;	/* env var    */
+    const char *s;	/* sub dir    */
+} pri_2_env_t;
+
+pri_2_env_t pri_2_env[] = {
+#ifndef __riscos__
+    { PR_ENV_BOGO, "BOGOFILTER_DIR", NULL },
+    { PR_ENV_BOGO, "BOGODIR",	     NULL },
+    { PR_ENV_HOME, "HOME",	     BOGODIR }
+#else
+    { PR_ENV_HOME, "Choices$Write",  NULL },
+    { PR_ENV_HOME, "Bogofilter$Dir", NULL },
+#endif
+};
+
+/* Function Definitions */
+
 char *build_progtype(const char *name, const char *db_type) 
 {
     char *type;
@@ -127,23 +148,16 @@ int check_directory(const char* path) /*@globals errno,stderr@*/
 
 char *get_directory(priority_t which)
 {
+    size_t i;
     char *dir = NULL;
 
-#ifndef __riscos__
-    if (which == PR_ENV_BOGO) {
-	dir = create_path_from_env("BOGOFILTER_DIR", NULL);
-	if (dir == NULL)
-	    dir = create_path_from_env("BOGODIR", NULL);
+    for (i = 0; i < COUNTOF(pri_2_env) ; i += 1) {
+	pri_2_env_t *p2e = &pri_2_env[i];
+	if (p2e->p == which) {
+	    dir = create_path_from_env(p2e->v, p2e->s);
+	    if (dir)
+		break;
+	}
     }
-    if (which == PR_ENV_HOME)
-	dir = create_path_from_env("HOME", BOGODIR);
-#else
-    if (which == PR_ENV_BOGO)
-	dir = create_path_from_env("Bogofilter$Dir", NULL);
-    if (which == PR_ENV_HOME)
-	dir = create_path_from_env("Choices$Write", BOGODIR);
-#endif
-
     return dir;
 }
-
