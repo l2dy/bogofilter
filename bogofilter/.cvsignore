@@ -1,3 +1,9 @@
+profile*
+*.out
+*.msg
+*.orig
+*.save
+snap.*.tgz
 .deps
 aclocal.m4
 autom4te.cache
@@ -12,7 +18,7 @@ config.status
 configure
 cscope.out
 lexertest
-lexer.c
+lexer_l.c
 Makefile
 Makefile.in
 stamp-h1
