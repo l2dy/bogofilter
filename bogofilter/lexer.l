@@ -15,11 +15,9 @@
 #include <config.h>
 #include "common.h"
 
+#include "error.h"
 #include "lexer.h"
 #include "xmalloc.h"
-
-#define	URL_TOKENS
-#undef	URL_TOKENS
 
 /*
  * Our lexical analysis is different from Paul Graham's rules: 
@@ -250,6 +248,8 @@ filename=\"?					;
 
 %%
 
+bool block_on_subnets = false;
+
 /* returns -1 for EOF or max_size < 2, characters read otherwise */
 int lexer_fgets(char *buf, int max_size, FILE *s)
 {
@@ -335,14 +335,11 @@ token_t get_token(void)
     token_t class;
     unsigned char *cp, *t;
 
-#ifdef	URL_TOKENS
     static token_t save_class = NONE;
     static char save_text[MAXTOKENLEN];
-#endif
 
-#ifdef	URL_TOKENS
     /* If saved IPADDR, truncate last octet */
-    if ( save_class == IPADDR )
+    if ( block_on_subnets && save_class == IPADDR )
     {
 	t = strrchr(save_text, '.');
 	if (t == NULL)
@@ -355,7 +352,6 @@ token_t get_token(void)
 	    return save_class;
 	}
     }
-#endif
 
     while ((class = yylex()) > 0) {
 	/* when we have a boundary line, eliminate the distinction between
@@ -368,8 +364,7 @@ token_t get_token(void)
 	    break;
 	}
 
-#ifdef	URL_TOKENS
-	if (class == IPADDR)
+	if ( block_on_subnets && save_class == IPADDR )
 	{
 	    const char *prefix="url:";
 	    size_t len = strlen(prefix);
@@ -380,7 +375,6 @@ token_t get_token(void)
 	    yyleng = strlcpy( yylval+len, yytext, avl);
 	    return (class);
 	}
-#endif
 
 	/* eat all long words */
 	if (yyleng <= MAXWORDLEN)
