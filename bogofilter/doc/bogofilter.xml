@@ -356,10 +356,6 @@ Enabling this option increases <application>bogofilter's</application> accuracy.
 Disabling this option increases <application>bogofilter's</application> accuracy.
 </para>
 
-<para>Options <option>-Ph</option> and <option>-PH</option> are for header line markup, i.e. whether to create special tags for header lines.
-When enable, tokens in "To:", "From:", "Return-Path:", and "Subject:" lines will be given special prefixes.
-This option increases <application>bogofilter's</application> accuracy.</para>
-
 <para>Options <option>-Pt</option> and  <option>-PT</option> are for tokenizing the innards of 3 html tags, i.e. 
 &gt;a&lt;, &gt;img&lt;, and &gt;font&lt;.
 Tokenizing these tags adds urls and font names to the message's tokens.
