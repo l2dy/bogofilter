@@ -146,12 +146,12 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
 			   "  %f  %f  ", i,
 			   DEVIATION(prob),  prob);
 	    /* print token (max width=20) */
-	    (void) word_puts(word, 20, fp);
+	    (void) word_puts(word, 20, dbgout);
 	    (void) fprintf(dbgout, "   %f  %f  ",
 			   DEVIATION(hit->prob), hit->prob);
 	    /* print token (max width=20) */
-	    (void) word_puts(key, min(20,key->leng), fp);
-	    (void) fputc('\n', fp);
+	    (void) word_puts(key, min(20,key->leng), dbgout);
+	    (void) fputc('\n', dbgout);
 	}
 	hit->prob = prob;
 	if (word->leng > MAXTOKENLEN) {
