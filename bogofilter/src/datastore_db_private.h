@@ -71,6 +71,8 @@ typedef struct {
 
 /** implementation internal type to keep track of databases
  * we have opened. */
+
+#ifndef	ENABLE_SQLITE_DATASTORE
 typedef struct {
     int		magic;
     bfdir	path;
@@ -90,6 +92,7 @@ typedef struct {
     /** OO database methods */
     dsm_t	*dsm;
 } dbh_t;
+#endif
 
 #define DBT_init(dbt)		(memset(&dbt, 0, sizeof(DBT)))
 
