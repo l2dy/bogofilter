@@ -109,7 +109,6 @@ struct option long_options[] = {
     { "register-ham",			N, 0, 'n' },
     { "passthrough",			N, 0, 'p' },
     { "register-spam",			N, 0, 's' },
-    { "terse",				N, 0, 't' },
     { "update-as-classed",		N, 0, 'u' },
     { "timestamp-date",			N, 0, 'y' },
     { "config-file",			R, 0, 'c' },
@@ -674,28 +673,36 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 }
 
 #define YN(b) (b ? "yes" : "no")
+#define NB(b) (b ? b : "")
 
 void query_config(void)
 {
-    fprintf(stdout, "%s version %s\n", progname, version);
+    fprintf(stdout, "# %s version %s\n", progname, version);
     fprintf(stdout, "\n");
-    fprintf(stdout, "%-11s = %s\n",            "algorithm", "fisher");
-    fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "robx", robx, robx);
-    fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "robs", robs, robs);
-    fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "min_dev", min_dev, min_dev);
-    fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "ham_cutoff", ham_cutoff, ham_cutoff);
-    fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "spam_cutoff", spam_cutoff, spam_cutoff);
+    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "robx", robx, robx);
+    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "robs", robs, robs);
+    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "min_dev", min_dev, min_dev);
+    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "ham_cutoff", ham_cutoff, ham_cutoff);
+    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "spam_cutoff", spam_cutoff, spam_cutoff);
     fprintf(stdout, "\n");
-    fprintf(stdout, "%-17s = %s\n", "block_on_subnets",		YN(block_on_subnets));
-    fprintf(stdout, "%-17s = %s\n", "replace_nonascii_characters", YN(replace_nonascii_characters));
+    fprintf(stdout, "%-17s = %s\n",    "block_on_subnets",    YN(block_on_subnets));
+    fprintf(stdout, "%-17s = %s\n",    "charset_default",     charset_default);
+    fprintf(stdout, "%-17s = %s\n",    "replace_nonascii_characters", YN(replace_nonascii_characters));
+    fprintf(stdout, "%-17s = %s\n",    "stats_in_header",     YN(stats_in_header));
+    fprintf(stdout, "%-17s = %0.6f\n", "thresh_update",       thresh_update);
+    fprintf(stdout, "%-17s = %s\n",    "timestamp",           YN(timestamp_tokens));
     fprintf(stdout, "\n");
-    fprintf(stdout, "%-17s = '%s'\n", "spam_header_name",  spam_header_name);
-    fprintf(stdout, "%-17s = '%s'\n", "header_format",     header_format);
-    fprintf(stdout, "%-17s = '%s'\n", "terse_format",      terse_format);
-    fprintf(stdout, "%-17s = '%s'\n", "log_header_format", log_header_format);
-    fprintf(stdout, "%-17s = '%s'\n", "log_update_format", log_update_format);
+    fprintf(stdout, "%-17s = %s\n", "terse",               YN(terse));
+    fprintf(stdout, "%-17s = %s\n", "spam_header_name",    spam_header_name);
+    fprintf(stdout, "%-17s = %s\n", "spam_subject_tag",    NB(spam_subject_tag));
+    fprintf(stdout, "%-17s = %s\n", "unsure_subject_tag",  NB(unsure_subject_tag));
+    fprintf(stdout, "%-17s = %s\n", "header_format",       header_format);
+    fprintf(stdout, "%-17s = %s\n", "terse_format",        terse_format);
+    fprintf(stdout, "%-17s = %s\n", "log_header_format",   log_header_format);
+    fprintf(stdout, "%-17s = %s\n", "log_update_format",   log_update_format);
     display_tag_array("spamicity_tags   ", spamicity_tags);
     display_tag_array("spamicity_formats", spamicity_formats);
+
     exit(EX_OK);
 }
 
@@ -703,10 +710,9 @@ static void display_tag_array(const char *label, FIELD *array)
 {
     int i;
     int count = (ham_cutoff < EPS) ? 2 : 3;
-    const char *s;
 
     fprintf(stdout, "%s =", label);
-    for (i = 0, s = ""; i < count; i += 1, s = ",")
-	fprintf(stdout, "%s '%s'", s, array[i]);
+    for (i = 0; i < count; i += 1)
+	fprintf(stdout, "%s ", array[i]);
     fprintf(stdout, "\n");
 }

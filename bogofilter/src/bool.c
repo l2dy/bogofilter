@@ -19,7 +19,12 @@ AUTHOR:
 
 bool str_to_bool(const char *str)
 {
-    char ch = toupper((unsigned char)*str);
+    char ch;
+
+    while (isspace((unsigned char)*str))
+	   str += 1;
+    ch = toupper((unsigned char)*str);
+
     switch (ch)
     {
     case 'Y':		/* Yes */
