@@ -39,8 +39,8 @@ spam-unreadable
 #### bogofilter passthrough-update ####
 
 :0fw
-| bogofilter -f -p -u -l -e -v
-# -f)isher, -p)assthrough -u)pdate, -l)og -e)xitcode 0 for spam and ham
+| bogofilter -p -u -l -e -v
+# -p)assthrough -u)pdate, -l)og -e)xitcode 0 for spam and ham
 # -v)erbose
 
 #### begin error catcher ####
