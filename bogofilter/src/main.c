@@ -31,16 +31,19 @@ CONTRIBUTORS:
 #include <syslog.h>
 #endif
 
-#include "lexer.h"
-#include "bogofilter.h"
 #include "bogoconfig.h"
+#include "bogofilter.h"
 #include "charset.h"
+#include "datastore.h"
 #include "fgetsl.h"
 #include "format.h"
+#include "lexer.h"
+#include "mime.h"
 #include "register.h"
 #include "textblock.h"
+#include "token.h"
 #include "wordlists.h"
-#include "mime.h"
+#include "xmalloc.h"
 
 #define	NL	"\n"
 #define	CRLF	"\r\n"
@@ -148,6 +151,12 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     if (logflag)
 	write_log_message();
+
+    /* cleanup storage */
+    db_cleanup();
+    mime_cleanup();
+    token_cleanup();
+    xfree(directory);
 
     exit(exitcode);
 }

@@ -42,6 +42,12 @@ void buff_free(buff_t *self)
     xfree(self);
 }
 
+void buff_free_text(buff_t *self)
+{
+    xfree(self->t.text);
+    xfree(self);
+}
+
 buff_t *buff_dup(const buff_t *self)
 {
     buff_t *new = xmalloc(sizeof(buff_t));
