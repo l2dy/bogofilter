@@ -127,7 +127,9 @@ function output_mbox_entries()
 	while read classID fnam offset; do
 	    if [ "$fnam" = "$file" ]; then
 		let length=$offset-$oldoff
-		echo "$classID $fnam $oldoff $length"
+		if [ $length -gt 0 ] ; then
+		    echo "$classID $fnam $oldoff $length"
+		fi
 		oldoff=$offset
 	    else
 		file=$fnam
