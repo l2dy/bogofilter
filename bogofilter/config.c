@@ -72,28 +72,22 @@ run_t run_type = RUN_NORMAL;
 
 const char *logtag = NULL;
 
-enum algorithm_e {
-#ifdef ENABLE_GRAHAM_METHOD
-    AL_GRAHAM='g',
-#endif
-#ifdef ENABLE_ROBINSON_METHOD
-    AL_ROBINSON='r',
-#endif
-#ifdef ENABLE_ROBINSON_FISHER
-    AL_FISHER='f'
-#endif
-};
-
 /* define default */
 #if defined (ENABLE_ROBINSON_METHOD)
 #define AL_DEFAULT AL_ROBINSON
-#elif defined (ENABLE_GRAHAM_METHOD)
-#define AL_DEFAULT AL_GRAHAM
 #elif defined (ENABLE_ROBINSON_FISHER)
 #define AL_DEFAULT AL_FISHER
+#elif defined (ENABLE_GRAHAM_METHOD)
+#define AL_DEFAULT AL_GRAHAM
 #else
 #error No algorithms compiled in. See configure --help.
 #endif
+
+enum algorithm_e {
+    AL_GRAHAM='g',
+    AL_ROBINSON='r',
+    AL_FISHER='f'
+};
 
 /* Local variables and declarations */
 
@@ -576,19 +570,19 @@ int process_args(int argc, char **argv)
 	    break;
 #endif
 
-#ifdef	ENABLE_GRAHAM_METHOD
+#if	defined(ENABLE_ROBINSON_METHOD) && (defined(ENABLE_GRAHAM_METHOD) || defined(ENABLE_ROBINSON_FISHER))
 	case 'r':
 	    select_algorithm(AL_ROBINSON, true);
 	    break;
 #endif
 
-#ifdef ENABLE_ROBINSON_FISHER
+#if	defined(ENABLE_ROBINSON_FISHER) && (defined(ENABLE_GRAHAM_METHOD) || defined(ENABLE_ROBINSON_METHOD))
 	case 'f':
 	    select_algorithm(AL_FISHER, true);
 	    break;
 #endif
 
-#ifdef	GRAHAM_OR_ROBINSON
+#ifdef	ROBINSON_OR_FISHER
 	case 'R':
 	    Rtable = 1;
 	    if (algorithm != AL_ROBINSON && algorithm != AL_FISHER)

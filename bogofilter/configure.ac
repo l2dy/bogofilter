@@ -149,9 +149,8 @@ AC_ARG_ENABLE(robinson-fisher,
 		[USE_FISHER=NO]
 	else
 		[USE_FISHER=YES]
-		[USE_ROBINSON=YES]
  		AC_DEFINE(ENABLE_ROBINSON_FISHER,1,
-		[Enable Fisher's method of combining Probabilities])
+		[Enable Fisher's method of combining probabilities])
 # trouble ???
 #		AC_CHECK_LIB([dcdf], [cdfchi], LIBS="$LIBS -ldcdf",
 #		    AC_MSG_ERROR([libdcdf (from package dcdflib.c) was not found.]))

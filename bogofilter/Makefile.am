@@ -11,12 +11,13 @@ if ENABLE_GRAHAM_METHOD
 GRAHAM_SRC = graham.c graham.h
 endif
 
+if ENABLE_ROBINSON_FISHER
+FISHER_SRC = fisher.c fisher.h
+ROBINSON_SRC = robinson.c robinson.h
+else
 if ENABLE_ROBINSON_METHOD
 ROBINSON_SRC = robinson.c robinson.h
 endif
-
-if ENABLE_ROBINSON_FISHER
-FISHER_SRC = fisher.c fisher.h
 endif
 
 AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc
@@ -51,6 +52,7 @@ libbogofilter_a_SOURCES= \
 	lexer.h lexer.c lexer_head.l lexer_text_plain.l lexer_text_html.l \
 	maint.h maint.c \
 	mime.h mime.c \
+	myexit.c \
 	paths.h paths.c \
 	qp.h qp.c \
 	register.h register.c \
