@@ -22,15 +22,15 @@ int fgetsl(buff_t *buff, FILE *s)
 
 int xfgetsl(buff_t *buff, FILE *s, int no_nul_terminate)
 {
-    int c = 0;
+    int c;
+    size_t read = buff->t.leng;
+    size_t size = buff->size - read;
+    size_t min_size = no_nul_terminate ? 1 : 2;
 
-    byte *buf = buff->t.text;
-    size_t size = buff->size;
+    byte *buf = buff->t.text + read;
+    byte *cp = buf;
 
-    byte *cp = buf + (buff->read = buff->t.leng);
-    int moreroom = no_nul_terminate ? 1 : 0;
-
-    if (size < (size_t) (2 - moreroom)) {
+    if (size < min_size) {
 	fprintf(stderr, "Invalid buffer size, exiting.\n");
 	abort();
 	exit(2);
@@ -39,9 +39,9 @@ int xfgetsl(buff_t *buff, FILE *s, int no_nul_terminate)
     if (feof(s))
 	return(EOF);
 
-    while (((--size > 0) || (no_nul_terminate && size == 0))
-	    && ((c = getc(s)) != EOF)) {
+    while (size > min_size && ((c = getc(s)) != EOF)) {
 	*cp++ = c;
+	size -= 1;
 	if (c == '\n')
 	    break;
     }
@@ -52,9 +52,9 @@ int xfgetsl(buff_t *buff, FILE *s, int no_nul_terminate)
     }
 
     if (!no_nul_terminate)
-	*cp = '\0'; /* DO NOT ADD ++ HERE! */
+	*cp = '\0'; 		/* DO NOT ADD ++ HERE! */
     buff->t.leng = cp - buf;
-    return (buff->t.leng - buff->read);
+    return buff->t.leng;
 }
 
 #ifdef MAIN
