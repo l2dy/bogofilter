@@ -15,7 +15,7 @@
 
 VERSION=`grep define.VERSION config.h | awk '{print $3}' | tr -d '"'`
 
-echo $VERSION | egrep "[a-z][a-z][a-z]$"
+echo $VERSION | egrep "[a-z][a-z][a-z]$" >/dev/null
 
 if [ $? == 0 ]; then
    DATE="00000000"
@@ -28,5 +28,5 @@ if [ $? == 0 ]; then
    VERSION="$VERSION.$DATE"
 fi
 
-echo "#undef  VERSION" > version.h
-echo "#define VERSION \"$VERSION\"" >> version.h
+echo "#undef  VERSION"
+echo "#define VERSION \"$VERSION\""
