@@ -10,4 +10,5 @@ Gyepi Sam	(database abstraction, berkeleydb support, wordhash,
 		 bogoupgrade, bogoutil, documentation, bug fixes, tdb support)
 Allyn Fratkin	(bug fixes, bug database maintainer)
 Clint Adams	(bug fixes, portability, debian packaging)
-Greg Louis	(spamicity calculation methods)
+Greg Louis	(spamicity calculation methods, tuning)
+Boris 'pi' Piwinger	(bogominitrain.pl)
