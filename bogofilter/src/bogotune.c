@@ -58,6 +58,7 @@ AUTHORS:
 #include "datastore.h"
 #include "msgcounts.h"
 #include "mime.h"
+#include "mxcat.h"
 #include "paths.h"
 #include "robx.h"
 #include "score.h"
@@ -136,7 +137,6 @@ typedef enum e_ds_loc {
 /* Global Variables */
 
 const char *progname = "bogotune";
-static char *ds_file;
 static char *ds_path;
 static ds_loc ds_flag = DS_NONE;
 static void *env = NULL;
@@ -926,7 +926,7 @@ static int process_arglist(int argc, char **argv)
 	    suppress_config_file = true;
 	    break;
 	case 'd':
-	    ds_file = optarg;
+	    ds_path = optarg;
 	    ds_flag = (ds_flag == DS_NONE) ? DS_DSK : DS_ERR;
 	    break;
 	case 'D':
@@ -1004,7 +1004,7 @@ static void check_wordlist_path(const char *path)
     struct stat sb;
 
     if (stat(path, &sb) != 0) {
-	fprintf(stderr, "Error accessing file or directory '%s'.\n", ds_path);
+	fprintf(stderr, "Error accessing file or directory '%s'.\n", path);
 	if (errno != 0)
 	    fprintf(stderr, "error #%d - %s.\n", errno, strerror(errno));
 	return;
@@ -1024,7 +1024,7 @@ static double get_robx(void)
     else if (ds_flag == DS_DSK)	{
 	printf("Calculating initial x value...\n");
 	verbose = -verbose;		/* disable bogofilter debug output */
-	rx = compute_robinson_x(ds_file);
+	rx = compute_robinson_x(ds_path);
 	verbose = -verbose;		/* enable bogofilter debug output */
     }
     else
@@ -1709,16 +1709,18 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     /* directories from command line and config file are already handled */
     if (ds_flag == DS_DSK) {
-	size_t len;
-	if (ds_file == NULL)
-	    ds_file = get_directory(PR_ENV_BOGO);
-	if (ds_file == NULL)
-	    ds_file = get_directory(PR_ENV_HOME);
-	set_bogohome(ds_file);
-	len = strlen(ds_file) + strlen(WORDLIST) + 2;
-	check_wordlist_path(ds_file);
+
+	if (ds_path == NULL)
+	    ds_path = get_directory(PR_ENV_BOGO);
+	if (ds_path == NULL)
+	    ds_path = get_directory(PR_ENV_HOME);
+
+	check_wordlist_path(ds_path);
+	set_bogohome(ds_path);
 	env = ds_init(bogohome);
-	init_wordlist("word", WORDLIST, 0, WL_REGULAR);
+
+	ds_path = mxcat(ds_path, DIRSEP_S, WORDLIST, NULL);
+	init_wordlist("word", ds_path, 0, WL_REGULAR);
     }
 
     bogotune();
