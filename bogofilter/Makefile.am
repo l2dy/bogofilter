@@ -1,6 +1,11 @@
 # $Id$ 
 # $Log$
+# Revision 1.11  2002/09/24 12:46:47  gyepi
+# added bogoupgrade.pl
+#
 # Revision 1.10  2002/09/24 04:34:19  gyepi
+#
+#
 #  Modified Files:
 #  	Makefile.am  -- add entries for datastore* + and other new files
 #         bogofilter.c bogofilter.h main.c -- fixup to use database abstraction
@@ -55,6 +60,7 @@ AUTOMAKE_OPTIONS = foreign 1.6
 
 # what to build
 bin_PROGRAMS = bogofilter bogoutil
+bin_SCRIPTS = bogoupgrade.pl
 noinst_PROGRAMS = lexertest
 man1_MANS = bogofilter.1
 
@@ -67,10 +73,12 @@ lexertest_CFLAGS = -DMAIN
 
 bogoutil_SOURCES = bogoutil.c datastore.h datastore_db.h datastore_db.c xmalloc.h xmalloc.c
 
+
 # what to distribute
 EXTRA_DIST = $(man1_MANS) \
 	     bogofilter.xml \
-	     bogofilter.spec bogofilter.spec.in
+	     bogofilter.spec bogofilter.spec.in \
+	     UPGRADE bogoupgrade.pl
 	     
 #
 .xml.1:
