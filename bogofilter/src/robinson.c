@@ -185,8 +185,9 @@ double lookup_and_score(const word_t *token, wordprop_t *wordstats)
 
 static double compute_probability(const word_t *token, wordprop_t *wordstats)
 {
-    if (wordstats->bad != 0 || wordstats->good != 0)
+    if (wordstats->bad != 0 || wordstats->good != 0 || token == NULL)
 	/* A msg-count file already has the values needed */
+	/* Note: token == NULL if msg-count file	  */
 	wordstats->prob = wordprob_result(wordstats);
     else
 	/* Otherwise lookup the word and get its score */
