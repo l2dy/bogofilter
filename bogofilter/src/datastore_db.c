@@ -50,7 +50,9 @@ Matthias Andree <matthias.andree@gmx.de> 2003 - 2004
 #include "datastore.h"
 #include "datastore_db.h"
 #include "datastore_dbcommon.h"
+#ifdef	DB_VERSION_MAJOR	/* if Berkeley DB */
 #include "datastore_db_private.h"
+#endif
 
 #include "bogohome.h"
 #include "error.h"
@@ -82,6 +84,16 @@ static const char *resolveopenflags(u_int32_t flags) {
     if (flags) strlcat(buf, b2, sizeof(buf));
     return buf;
 }
+
+typedef	enum {
+    P_ERROR = -1,	/* -1 for error */
+    P_DISABLE = 0,	/*  0 for no transactions */
+    P_ENABLE  = 1,	/*  1 for transactions */
+    P_DONT_KNOW		/*  2 for don't know */
+} probe_txn_t;
+
+static void dsm_init(const char *directory, const char *file);
+static probe_txn_t probe_txn(const char *directory, const char *file);
 
 /** wrapper for Berkeley DB's DB->open() method which has changed API and
  * semantics -- this should deal with 3.2, 3.3, 4.0, 4.1 and 4.2. */
@@ -179,17 +191,22 @@ int db_lock(int fd, int cmd, short int type)
     return (fcntl(fd, cmd, &lock));
 }
 
-static void dsm_init(int override /** 0 => traditional, 1 => TXN,
-				    other => use specified */)
+static void dsm_init(const char *directory, const char *file)
 {
-    switch(override) {
-	case 0:
-	    fTransaction = false;
-	    break;
-	case 1:
-	    fTransaction = true;
-	    break;
-    }
+    probe_txn_t txn;
+
+    if (DEBUG_DATABASE(2))
+	fprintf(dbgout, "probing \"%s\" and \"%s\" for environment...\n", directory, file);
+
+    txn = probe_txn(directory, file);
+
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "probing \"%s\" and \"%s\" result %d\n", directory, file, txn);
+
+    if (txn == P_DISABLE)
+	fTransaction = false;
+    if (txn == P_ENABLE)
+	fTransaction = true;
 
     /* overrides for test suite etc. */
 #ifdef DISABLE_TRANSACTIONS
@@ -246,22 +263,20 @@ static void handle_free(/*@only@*/ dbh_t *handle)
 /** probe if the directory contains an environment, and if so, if it has
  * transactions
  * \return
- *         - -1 for error
- *         -  0 for no transactions
- *         -  1 for transactions
- *         -  2 for don't know
  */
 static int probe_txn(const char *directory, const char *file)
 {
     DB_ENV *dbe;
     int r;
+#if DB_AT_LEAST(4,2)
     u_int32_t flags;
+#endif
 
     r = db_env_create(&dbe, 0);
     if (r) {
 	print_error(__FILE__, __LINE__, "cannot create environment handle: %s",
 		db_strerror(r));
-	return -1;
+	return P_ERROR;
     }
 
     r = dbe->open(dbe, directory, DB_JOINENV, DS_MODE);
@@ -277,21 +292,21 @@ static int probe_txn(const char *directory, const char *file)
 	w = stat(t, &st);
 	if (w == 0) {
 	    free(t);
-	    return 0;
+	    return P_DISABLE;
 	}
 	if (errno == ENOENT) {
 	    free(t);
-	    return 2;
+	    return P_DONT_KNOW;
 	}
 	print_error(__FILE__, __LINE__, "cannot stat %s: %s",
 		t, db_strerror(r));
 	free(t);
-	return -1;
+	return P_ERROR;
     }
     if (r != 0) {
 	print_error(__FILE__, __LINE__, "cannot join environment: %s",
 		db_strerror(r));
-	return -1;
+	return P_ERROR;
     }
 
     /* environment found, validate if it has transactions */
@@ -300,18 +315,18 @@ static int probe_txn(const char *directory, const char *file)
     if (r) {
 	print_error(__FILE__, __LINE__, "cannot query flags: %s",
 		db_strerror(r));
-	return -1;
+	return P_ERROR;
     }
 
     dbe->close(dbe, 0);
     if ((flags & DB_INIT_TXN) == 0) {
 	print_error(__FILE__, __LINE__, "environment found but does not support transactions.");
-	return -1;
+	return P_ERROR;
     }
 #else
     dbe->close(dbe, 0);
 #endif
-    return 1;
+    return P_ENABLE;
 }
 
 /** Initialize data base, configure some lock table sizes
@@ -323,7 +338,6 @@ void *dbe_init(const char *directory, const char *file)
 {
     char norm_dir[PATH_MAX+1]; /* check normalized directory names */
     char norm_home[PATH_MAX+1];/* see man realpath(3) for details */
-    int txn;
 
     dbe_t *env;
 
@@ -360,15 +374,7 @@ void *dbe_init(const char *directory, const char *file)
 
     assert(directory);
 
-    if (DEBUG_DATABASE(2))
-	fprintf(dbgout, "probing \"%s\" and \"%s\" for environment...\n", directory, file);
-
-    txn = probe_txn(directory, file);
-
-    if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "probing \"%s\" and \"%s\" result %d\n", directory, file, txn);
-
-    dsm_init(txn);
+    dsm_init(directory, file);
 
     env = dsm->dsm_env_init(directory);
 
