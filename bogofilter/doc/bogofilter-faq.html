@@ -97,6 +97,7 @@
 
         <ul>
           <li><a href="#build">How do I build bogofilter (as non-root user)?</a></li>
+          <li><a href="#smaller">How do I make the executables smaller</a></li>
           <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
           <li><a href="#return-codes">Why does bogofilter give return codes like 0 and
           256 when it's run from inside a program?</a></li>
@@ -784,14 +785,23 @@
     href="http://sourceforge.net/project/showfiles.php?group_id=62265">source
     code</a> and unpack it (<code>tar -xzf</code>). If you need to
     apply patches, do it now. Change to the source directory and run
-    <code>./configure --prefix=PATH</code> where PATH is the full
-    installation path where you want all the generated files
+    <code>./configure --prefix=PATH</code> where PATH is the
+    installation prefix for the generated files
     (binaries, man pages etc.).  Typically the path is
-    <code>/usr</code>.  Finally, run the usual build commands --
+    <code>/usr</code>.  Finally, run the usual build commands &8212;
     <code>make &amp;&amp; make check &amp;&amp; make install</code>.
     If you build a special version (with private patches, for example,
     a different lexer), make the changes after <code>make check</code>
     and before <code>make install </code>.
+
+    <hr>
+
+    <h2 id="build">How do I make the executables smaller</h2>
+
+    You can use <code>make install-strip</code> when space is tight.
+    Doing this will save space, but crashes can't be debugged unless
+    more information on reproducing the bug is provided to the
+    developers.
 
     <hr>
 
@@ -804,11 +814,7 @@
     HAVE_FCNTL 1" in your config.h file. Popular UNIX operating
     systems will all support this. If you are running an unusual, or
     an older version of an operating system, make sure it supports
-    fcntl().  After running <code>./configure</code>: check to see if
-    both "#define HAVE_FCNTL 1" and "#define HAVE_FLOCK 1" are set.
-    If so, comment out the HAVE_FLOCK line, i.e. (<code>/* #define
-    HAVE_FLOCK 1 */</code>), so that the locking system uses fcntl()
-    locking instead of flock() locking. If your system does not
+    fcntl().  If your system does not
     support fcntl(), then you will not be able to share word list
     files over NFS without the risk of data corruption.</p>
 
@@ -816,6 +822,12 @@
     running. Refer to your NFS documentation for more information
     about running "lockd" or "rpc.lockd". Most operating systems
     with NFS turn this on by default.</p>
+
+    <p>For shared directories (NFS directories used by multiple
+    machines, for instance, Sparc/Itanium/Alpha and x86), the
+    architecture-specific parts can be installed separately by giving
+    a different <code>--exec-prefix</code> (it will default to
+    <code>--prefix</code>)
 
     <hr>
 
