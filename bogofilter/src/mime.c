@@ -594,3 +594,8 @@ mime_decode (word_t *text)
 
   return count;
 }
+
+enum mimetype get_content_type(void)
+{
+    return msg_state->mime_type;
+}
