@@ -1,9 +1,10 @@
-X-Bogosity: Yes, tests=bogofilter, spamicity=1.000000
+X-Bogosity: Yes, tests=bogofilter, spamicity=0.999999
   0.010000  Build
   0.010000  How
   0.010000  Only
   0.010000  around
   0.010000  being
+  0.010000  current
   0.990000  $40
   0.990000  FFFFFF
   0.990000  FREE
@@ -12,5 +13,4 @@ X-Bogosity: Yes, tests=bogofilter, spamicity=1.000000
   0.990000  Secrets
   0.990000  Verdana
   0.990000  abuse
-  0.990000  car
   0.990000  copy
