@@ -1,15 +1,20 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.2  2002/09/15 15:52:24  relson
- * Makefile.in:
- * 	- fix .l.c rule so that lexer_l.c is correctly generated from lexer_l.l
- * 	- added lexer_l.c to target mostlyclean-compile
- * 	- removed lexer_l.c from  DIST_COMMON.  As it can can be generated, it no longer needs to be distributed.
- * 	- added target lexertest (from original bogofilter release)
+ * Revision 1.3  2002/09/16 18:58:14  m-a
+ * Fix 'last line occasionally emitted twice' bug, cleaning up our yyinput().
  *
- * lexer_l.l:
- * 	- defined global variable passthrough so that linking lexertest succeeds.
- *
+/* Revision 1.2  2002/09/15 15:52:24  relson
+/*
+/*
+/* Makefile.in:
+/* 	- fix .l.c rule so that lexer_l.c is correctly generated from lexer_l.l
+/* 	- added lexer_l.c to target mostlyclean-compile
+/* 	- removed lexer_l.c from  DIST_COMMON.  As it can can be generated, it no longer needs to be distributed.
+/* 	- added target lexertest (from original bogofilter release)
+/*
+/* lexer_l.l:
+/* 	- defined global variable passthrough so that linking lexertest succeeds.
+/*
 /* Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
 /* 0.7.3 Base Source
 /* */
@@ -60,10 +65,14 @@ int yyinput(buf, max_size)
 {
     char *returned;
 
-    if ((returned = fgets((char *)buf, max_size, yyin)) < 0)
-    {
-	fprintf(stderr, "input in flex scanner failed\n");
-	exit(2);
+    returned = fgets((char *)buf, max_size, yyin);
+    if (returned == NULL) {
+	if (ferror(yyin)) {
+	    fprintf(stderr, "input in flex scanner failed\n");
+	    exit(2);
+	} else {
+	    return 0;
+	}
     }
 
     if (passthrough)
@@ -78,10 +87,7 @@ int yyinput(buf, max_size)
 	textend = textend->next;
     }
 
-    if (returned == NULL)
-	return(0);
-    else
-	return(strlen(returned));
+    return(strlen(returned));
 }
 
 %}
