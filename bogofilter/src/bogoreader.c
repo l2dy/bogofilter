@@ -53,7 +53,6 @@ static ms_t mailstore_type;
 static bool mail_first = true;		/* for the _next_mail functions */
 static bool mailstore_first = true;	/* for the _next_mailstore functions */
 static bool firstline = true;		/* for mailbox /^From / match */
-static bool emptyline = false;		/* for mailbox /^From / match */
 
 static bool    have_message = false;
 
@@ -436,6 +435,7 @@ static int mailbox_getline(buff_t *buff)
     byte *buf = buff->t.text + used;
     int count;
     static word_t *saved = NULL;
+    static bool emptyline = false;		/* for mailbox /^From / match */
 
     if (saved != NULL) {
 	count = saved->leng;
@@ -523,8 +523,6 @@ static int rmail_getline(buff_t *buff)
 	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
     }
 
-    emptyline = is_eol((char *)buf, count);
-
     return count;
 }
 
@@ -567,8 +565,6 @@ static int ant_getline(buff_t *buff)
 	if (buff->t.leng < buff->size)		/* for easier debugging - removable */
 	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
     }
-
-    emptyline = is_eol((char *)buf, count);
 
     return count;
 }
