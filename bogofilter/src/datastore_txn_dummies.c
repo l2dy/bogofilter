@@ -14,7 +14,9 @@ David Relson	<relson@osagesoftware.com> 2005
 
 #include "common.h"
 
+#ifdef ENABLE_DB_DATASTORE
 #include <db.h>
+#endif
 
 #include "datastore.h"
 #include "datastore_db.h"
