@@ -1719,8 +1719,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	    ds_file = get_directory(PR_ENV_HOME);
 	set_bogohome(ds_file);
 	len = strlen(ds_file) + strlen(WORDLIST) + 2;
-	ds_path = xmalloc(len);
-	build_wordlist_path(ds_path, len, ds_file);
+	ds_path = build_wordlist_path(ds_file);
 	check_wordlist_path(ds_file);
 	env = ds_init(bogohome);
 	init_wordlist("word", ds_path, 0, WL_REGULAR);

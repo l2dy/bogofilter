@@ -123,7 +123,6 @@ static int db_lock(int fd, int cmd, short int type)
 static dbh_t *handle_init(const char *path, const char *name)
 {
     dbh_t *handle;
-    size_t len = strlen(path) + strlen(name) + 2;
 
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
@@ -131,8 +130,7 @@ static dbh_t *handle_init(const char *path, const char *name)
     handle->fd   = -1;			/* for lock */
 
     handle->path = xstrdup(path);
-    handle->name = xmalloc(len);
-    build_path(handle->name, len, path, name);
+    handle->name = build_path( path, name);
 
     handle->locked     = false;
     handle->is_swapped = false;

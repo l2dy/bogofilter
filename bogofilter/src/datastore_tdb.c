@@ -40,18 +40,16 @@ const char *db_version_str(void)
     return "TrivialDB";
 }
 
-static dbh_t *dbh_init(const char *path, const char *name)
+static dbh_t *dbh_init(const char *db_path, const char *db_name)
 {
     dbh_t *handle;
-    size_t len = strlen(path) + strlen(name) + 2;
 
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
 
     handle->path = xstrdup(path);
 
-    handle->name = xmalloc(len);
-    build_path(handle->name, len, path, name);
+    handle->name = build_path(handle->name, len, db_path, db_name);
 
     handle->locked  = false;
     handle->created = false;
@@ -91,7 +89,7 @@ bool db_created(void *vhandle)
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
 */
-void *db_open(void *dummy, const char *db_file, const char *name, dbmode_t open_mode)
+void *db_open(void *dummy, const char *path, const char *name, dbmode_t open_mode)
 {
     dbh_t *handle;
 
@@ -110,7 +108,7 @@ void *db_open(void *dummy, const char *db_file, const char *name, dbmode_t open_
     	tdb_flags = TDB_NOLOCK;
     }
 
-    handle = dbh_init(db_file, name);
+    handle = dbh_init(path, name);
 
     if (handle == NULL) return NULL;
 

@@ -63,14 +63,12 @@ static dbh_t *handle_init(
 	const char *name /** name of database file */)
 {
     dbh_t *handle;
-    size_t len = strlen(path) + strlen(name) + 2;
 
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));
 
     handle->path = xstrdup(path);
-    handle->name = xmalloc(len);
-    build_path(handle->name, len, path, name);
+    handle->name = build_path(handle->name, len, path, name);
 
     return handle;
 }

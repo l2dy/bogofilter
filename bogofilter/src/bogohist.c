@@ -137,15 +137,17 @@ ex_t histogram(const char *path)
 
     rhistogram_t hist;
 
-    char filepath[PATH_LEN];
-
-    build_wordlist_path(filepath, sizeof(filepath), path);
+    char *filepath;
 
     dbe = ds_init(bogohome);
     if (dbe == NULL)
 	return EX_ERROR;
 
+    filepath = build_wordlist_path(path);
+
     dsh = ds_open(dbe, CURDIR_S, filepath, DS_READ);
+    xfree(filepath);
+
     if (dsh == NULL)
 	return EX_ERROR;
 

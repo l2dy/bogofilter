@@ -130,8 +130,8 @@ static const char *resolveopenflags(u_int32_t flags) {
 
 /** wrapper for Berkeley DB's DB->open() method which has changed API and
  * semantics -- this should deal with 3.2, 3.3, 4.0, 4.1 and 4.2. */
-static int DB_OPEN(DB *db, const char *file,
-	const char *database, DBTYPE type, u_int32_t flags, int mode)
+static int DB_OPEN(DB *db, const char *db_path,
+	const char *db_file, DBTYPE type, u_int32_t flags, int mode)
 {
     int ret;
 
@@ -143,13 +143,13 @@ static int DB_OPEN(DB *db, const char *file,
 #if DB_AT_LEAST(4,1)
 	    0,	/* TXN handle - we use autocommit instead */
 #endif
-	    file, database, type, flags, mode);
+	    db_path, db_file, type, flags, mode);
 
     if (DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB_OPEN"))
 	fprintf(dbgout, "[pid %lu] DB->open(db=%p, file=%s, database=%s, "
 		"type=%x, flags=%#lx=%s, mode=%#o) -> %d %s\n",
-		(unsigned long)getpid(), (void *)db, file,
-		database ? database : "NIL", type, (unsigned long)flags,
+		(unsigned long)getpid(), (void *)db, db_path,
+		db_file ? db_file : "NIL", type, (unsigned long)flags,
 		resolveopenflags(flags), mode, ret, db_strerror(ret));
 
     return ret;
@@ -190,7 +190,6 @@ static int DB_SET_FLAGS(DB *db, u_int32_t flags)
 static dbh_t *handle_init(const char *path, const char *name)
 {
     dbh_t *handle;
-    size_t len = strlen(path) + strlen(name) + 2;
 
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
@@ -199,8 +198,8 @@ static dbh_t *handle_init(const char *path, const char *name)
     handle->fd   = -1;			/* for lock */
 
     handle->path = xstrdup(path);
-    handle->name = xmalloc(len);
-    build_path(handle->name, len, path, name);
+
+    handle->name = build_path(path, name);
 
     handle->is_swapped = false;
     handle->created    = false;

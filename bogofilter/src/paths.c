@@ -49,39 +49,32 @@ char *build_progtype(const char *name, const char *db_type)
     return type;
 }
 
-bool build_path(char* dest, size_t size, const char* path, const char* file)
+char *build_path(const char* path, const char* file)
 {
     size_t pathlen = strlen(path);
     size_t filelen = strlen(file);
-
-    if (pathlen >= size) return false;
-
+    size_t size = pathlen + filelen + strlen(DIRSEP_S) + 1;
+    char  *dest = xmalloc( size );
+    
     /* If absolute path ... */
     if (bf_abspath(file))
     {
-	if (filelen < size) {
-	    memcpy(dest, file, filelen+1);
-	    return true;
-	}
-	else
-	    return false;
+	memcpy(dest, file, filelen+1);
+	return dest;
     }
 
     memcpy(dest, path, pathlen+1);
 
     if (pathlen >= filelen && strcmp(path+(pathlen-filelen), file) == 0)
-	return true;
+	return dest;
 
     if (!is_file(path) && check_directory(path)) {
-	if (dest[strlen(dest)-1] != DIRSEP_C) {
-	    if (strlcat(dest, DIRSEP_S, size) >= size)
-		return false; /* RATS: ignore */
-	}
-	if (strlcat(dest, file, size) >= size)
-	    return false;
+	if (dest[strlen(dest)-1] != DIRSEP_C)
+	    strlcat(dest, DIRSEP_S, size);
+	strlcat(dest, file, size);
     }
 
-    return true;
+    return dest;
 }
 
 char *create_path_from_env(const char *var,
