@@ -10,7 +10,7 @@ Here's what packages are needed (assuming all their dependencies are installed
 as well according to the respective packager's directions):
 
 Mandrake Linux 9.1:
-  HTML: OpenSP
+  HTML: OpenSP, HTML document type definitions installed manually
   XML:  docbook-dtd412-xml, libxml2, libxml2-utils
 
 SuSE Linux 8.2:
