@@ -190,12 +190,15 @@ the output, up to a maximum of 4.  With <option>-vv</option>, the report
 lists the tokens with highest deviation from a mean of 0.5 association
 with spam.</para>
 
+<para>The Robinson method is the default algorithm used for computing a
+message's spamicity score, unless <application>bogofilter</application> 
+has been compiled without it, by using the 
+<option>--disable-robinson-method</option> option to the configure
+script.  The method to be used can be specified on the command line or
+in the configuration file.</para>
+
 <para>The <option>-g</option> option selects the original Graham form
-of the calculation method.  This is the default unless the
-<option>-r</option> option is specified, or unless
-<application>bogofilter</application> has been compiled with the
-<option>--disable-graham-method</option> option to the configure
-script.</para>
+of the calculation method.</para>
 
 <para>The <option>-r</option> option selects the Robinson modifications
 to the calculation method.  This is automatically enabled when the
