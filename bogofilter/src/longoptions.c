@@ -61,7 +61,6 @@ struct option long_options[] = {
     { "db-recover",                     R, 0, O_DB_RECOVER },
     { "db-recover-harder",              R, 0, O_DB_RECOVER_HARDER },
     { "db-remove-environment",		R, 0, O_DB_REMOVE_ENVIRONMENT },
-    { "db-transaction",			R, 0, O_DB_TRANSACTION },
     { "db-verify",                      R, 0, O_DB_VERIFY },
 #ifdef	HAVE_DECL_DB_CREATE
     { "db-lk-max-locks",		R, 0, O_DB_MAX_LOCKS },
