@@ -127,21 +127,22 @@ static void add_hash(wordhash_t *dest, wordhash_t *src) {
  */
 void register_messages(run_t _run_type)
 {
-  wordhash_t *h, *words = wordhash_init();
+  wordhash_t *words = wordhash_init();
   long	wordcount, totalwords = 0, msgcount = 0;
   bool cont;
 
   initialize_constants();
 
   do {
-    msgcount++;
-    if (DEBUG_REGISTER(1))
-	fprintf(dbgout, "Message #%ld\n", msgcount);
-    collect_words(&h, &wordcount, &cont);
-    wordhash_sort(h);
-    add_hash(words, h);
-    wordhash_free(h);
-    totalwords += wordcount;
+      wordhash_t *h = wordhash_init();
+      msgcount++;
+      if (DEBUG_REGISTER(1))
+	  fprintf(dbgout, "Message #%ld\n", msgcount);
+      collect_words(h, &wordcount, &cont);
+      wordhash_sort(h);
+      add_hash(words, h);
+      wordhash_free(h);
+      totalwords += wordcount;
   } while(cont);
 
   wordhash_sort(words);

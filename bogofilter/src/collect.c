@@ -40,13 +40,12 @@ void collect_reset(void)
  * *cont is set to true if the EOF token has not been read. cont must
  * not be NULL.
  */
-void collect_words(/*@out@*/ wordhash_t **wh,
+void collect_words(/*@out@*/ wordhash_t *wh,
        /*@out@*/ /*@null@*/ long *word_count, /*@out@*/ bool *cont)
 {
     long w_count = 0;
 
     wordprop_t *w;
-    wordhash_t *h = wordhash_init();
 
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### collect_words() begins\n");
 
@@ -54,7 +53,7 @@ void collect_words(/*@out@*/ wordhash_t **wh,
 	token_t token_type = get_token();
 
 	if (token_type != FROM && token_type != NONE){
-	    w = wordhash_insert(h, yylval, sizeof(wordprop_t), &wordprop_init);
+	    w = wordhash_insert(wh, yylval, sizeof(wordprop_t), &wordprop_init);
 	    if (w->freq < max_repeats) w->freq++;
 	    w_count++;
 	    if (DEBUG_WORDLIST(3)) { 
@@ -79,6 +78,4 @@ void collect_words(/*@out@*/ wordhash_t **wh,
 
     if (word_count)
 	*word_count = w_count;
-
-    *wh = h;
 }

@@ -36,14 +36,14 @@ static void print_wordlist (wordhash_t *h)
 }
 
 int main(int argc, char **argv) {
-    wordhash_t *h;
     long count;
     bool b;
 
     if (argc >= 2) max_repeats=atoi(argv[1]);
     
     do {
-	collect_words(&h, &count, &b);
+	wordhash_t *h = wordhash_init();
+	collect_words(h, &count, &b);
 	printf("%ld tokens:\n", count);
 	print_wordlist(h);
 	printf("\n");

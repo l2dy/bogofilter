@@ -51,7 +51,7 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
 {
     rc_t	status;
     double 	spamicity;
-    wordhash_t  *wordhash;
+    wordhash_t  *wordhash = wordhash_init();
     long	wordcount, msgcount = 0;
     bool	cont;
 
@@ -64,7 +64,7 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
 
     /* tokenize input text and save words in a wordhash. */
     do {
-	collect_words(&wordhash, &wordcount, &cont);
+	collect_words(wordhash, &wordcount, &cont);
 	++msgcount;
     } while(cont);
 
