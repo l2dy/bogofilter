@@ -15,10 +15,7 @@
 
 #define PLURAL(count) ((count == 1) ? "" : "s")
 
-int	max_repeats;
-
 extern char msg_register[];
-
 
 /*
  * tokenize text on stdin and register it to a specified list
