@@ -65,7 +65,7 @@ for msg in $files ; do
     done
 done
 
-[ ! -z $BF_SAVE ] && . ${srcdir}/../t.save
+[ ! -z $BF_SAVEDIR ] && . ${srcdir}/../t.save
 
 OUTPUTS=${SYSTEST}/outputs
 

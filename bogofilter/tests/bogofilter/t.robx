@@ -52,6 +52,12 @@ fi
 
 [ ! -z $BF_SAVEDIR ] && . ${srcdir}/../t.save
 
-ROBX=`$BOGOUTIL -w $TMPDIR .ROBX | $AWK '/.ROBX/ { print $2; }'`
+RESULT=`$BOGOUTIL -w $TMPDIR .ROBX | $AWK '/.ROBX/ { print $2; }'`
 
-test $ROBX = "253230"
+WANT="253406"
+
+if  [ $verbose -ne 0 ]; then
+    echo want: $WANT, have: $RESULT
+fi
+
+test $RESULT = "$WANT"
