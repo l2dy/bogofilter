@@ -27,8 +27,11 @@ AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc
 AM_CFLAGS = -DBOGOFILTER
 
 # what to build
-bin_PROGRAMS = bogofilter bogoutil bogolexer 
+bin_PROGRAMS = bogofilter bogoutil bogolexer
 bin_SCRIPTS = bogoupgrade
+if ENABLE_STATIC
+bin_PROGRAMS += bogofilter_static bogoutil_static bogolexer_static
+endif
 
 check_PROGRAMS = debugtest configtest wordhash find_home.test \
 		 bogowordfreq fgetsl.test
@@ -83,6 +86,14 @@ CLEANFILES=version.c directories.c
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c \
 		     method.c $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
 		     common.h method.h
+bogofilter_static_SOURCES = $(bogofilter_SOURCES)
+bogofilter_static_LDFLAGS = $(STATICLDFLAGS)
+
+bogolexer_static_SOURCES = bogolexer.c
+bogolexer_static_LDFLAGS = $(STATICLDFLAGS)
+
+bogoutil_static_SOURCES = bogoutil.c
+bogoutil_static_LDFLAGS = $(STATICLDFLAGS)
 
 debugtest_SOURCES = debug.main.c
 
@@ -94,12 +105,10 @@ fgetsl_test_SOURCES = fgetsl.c
 fgetsl_test_CFLAGS= -DMAIN
 
 # what to distribute
-EXTRA_DIST = Makefile-static.am Makefile-static.in \
+EXTRA_DIST = \
 	     bogoupgrade \
 	     version.sh \
 	     strlcat.3 strlcpy.3
-#
-DISTCLEANFILES = Makefile-static
 #
 VERSION_FROM=../configure.ac main.c bogofilter.c bogoutil.c lexer.c lexer_v3.l
 version.c:	version.sh $(VERSION_FROM)

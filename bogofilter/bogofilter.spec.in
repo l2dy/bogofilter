@@ -9,6 +9,7 @@ License: GPL
 Group: Applications/Internet
 Summary: fast anti-spam filtering by Bayesian statistical analysis
 Buildroot: %{_tmppath}/%{name}-%{version}-root
+Conflicts: bogofilter-static
 %define mydocdir %{_docdir}/%{name}
 
 %description
@@ -22,7 +23,8 @@ by sites that process a lot of mail.
 
 %package static
 Summary: Statically linked
-Group: bogous
+Group: Applications/Internet
+Conflicts: bogofilter
 %description static
 Statically linked bogofilter, bogolexer, and bogoutil
 
@@ -32,20 +34,18 @@ CFLAGS="$RPM_OPT_FLAGS" \
 ./configure \
   --prefix=%{_prefix} \
   --mandir=%{_mandir} \
-  --sysconfdir=%{_sysconfdir}
+  --sysconfdir=%{_sysconfdir} \
+  --enable-static
 
 %build
 make
 make DESTDIR=$RPM_BUILD_ROOT check
-cd src
-make -f Makefile-static DESTDIR=$RPM_BUILD_ROOT static install-binPROGRAMS
 
 %clean
-
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 
 %install
-
+[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install-strip
 
 cp $RPM_BUILD_ROOT%{_sysconfdir}/bogofilter.cf.example \
@@ -68,19 +68,23 @@ for d in contrib tuning ; do
   done
 done
 
+(
+cd $RPM_BUILD_ROOT%{_datadir}/%{name}
+cp -p -r contrib contrib-static
+rm contrib/bogogrep_static
+rm contrib-static/bogogrep
+)
+
 for README in randomtrain ; do
   ln -s ../contrib/README.$README doc/README.$README
 done
 
 %post static
-
 for file in bogofilter_static bogolexer_static bogoutil_static ; do
-  base=`basename $file _static`
-  ln -s %{_bindir}/$file %{_bindir}/$base
+  ln -s %{_bindir}/$file %{_bindir}/${file%_static}
 done
 
 %postun static
-
 for file in bogofilter bogolexer bogoutil ; do
   rm -f %{_bindir}/$file
 done
@@ -104,8 +108,8 @@ done
 %doc doc/programmer
 %doc .inst/html .inst/xml
 
-%dir %{_datadir}/%{name}/contrib/*
-%dir %{_datadir}/%{name}/tuning/*
+%{_datadir}/%{name}/contrib/*
+%{_datadir}/%{name}/tuning/*
 
 %files static
 
@@ -127,7 +131,7 @@ done
 %doc doc/programmer
 %doc .inst/html .inst/xml
 
-%dir %{_datadir}/%{name}/contrib/*
-%dir %{_datadir}/%{name}/tuning/*
+%{_datadir}/%{name}/contrib-static/*
+%{_datadir}/%{name}/tuning/*
 
 %changelog
