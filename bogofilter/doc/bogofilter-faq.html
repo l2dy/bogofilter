@@ -211,7 +211,6 @@ The sample procmail recipe below shows one way to do this:<p>
   * ? $SPAMASSASSIN -e
   #spam yields non-zero
   #non-spam yields zero
-  :0c
   | $BOGOFILTER -n -d $BOGOFILTER_DIR
   #else (E)
   :0Ec
