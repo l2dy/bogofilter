@@ -31,7 +31,6 @@
 int yylineno;
 bool msg_header = true;
 lexer_t *lexer = NULL;
-yy_getline_t *yy_getline = NULL;
 
 lexer_more_t *lexer_more;
 lexer_line_t *lexer_getline;
