@@ -13,7 +13,7 @@ set -e
 : ${relpath=..}
 
 if [ -z "$RUN_FROM_MAKE" ] ; then
-   NAME=`echo $0 | sed s@./t.@@`
+   NAME=`echo $0 | sed s@.*/t\.@@`
    DATE=`date +"%Y%m%d"`
    TMPDIR="$NAME.$DATE"
    rm -rf $TMPDIR
