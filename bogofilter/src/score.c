@@ -282,19 +282,21 @@ void score_initialize(void)
     if (fabs(robs) < EPS)
 	robs = ROBS;
 
-    if (fabs(robx) < EPS && list->dsh != NULL)
-    {
-	int ret;
-	dsv_t val;
-
-	/* Note: .ROBX is scaled by 1000000 in the wordlist */
-	ret = ds_read(list->dsh, word_robx, &val);
-	if (ret != 0)
-	    robx = ROBX;
-	else {
-	    /* If found, unscale; else use predefined value */
-	    uint l_robx = val.count[IX_SPAM];
-	    robx = l_robx ? (double)l_robx / 1000000 : ROBX;
+    if (fabs(robx) < EPS) {
+	/* Assign default value in case there's no wordlist
+	 * or no wordlist entry */
+	robx = ROBX;
+	if (list->dsh != NULL)
+	{
+	    int ret;
+	    dsv_t val;
+	    
+	    /* Note: .ROBX is scaled by 1000000 in the wordlist */
+	    ret = ds_read(list->dsh, word_robx, &val);
+	    if (ret == 0) {
+		uint l_robx = val.count[IX_SPAM];
+		robx = l_robx ? (double)l_robx / 1000000 : ROBX; /* unscale */
+	    }
 	}
     }
 
