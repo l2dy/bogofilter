@@ -36,7 +36,7 @@ static	bool	saved = false;
 
 /* Function Definitions */
 
-token_t  read_msg_count_line(void)
+token_t read_msg_count_line(void)
 {
     bool msg_sep;
 
@@ -73,16 +73,10 @@ bool msgcount_more(void)
     return val;
 }
 
-void init_msg_counts()
-{
-    msgs_good = 0L;
-    msgs_bad  = 0L;
-    msg_count_header_len= strlen(msg_count_header);
-}
-
 void set_msg_counts(char *s)
 {
     msgs_bad = atoi(s);
     s = strchr(s, ' ') + 1;
     msgs_good = atoi(s);
+    msg_count_header_len= strlen(msg_count_header);
 }
