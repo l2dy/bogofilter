@@ -16,7 +16,7 @@ set -e
 relpath="`pwd`/../.."
 NODB=1 . ${srcdir}/../t.frame
 
-: ${AWK=awk}
+OUT="lexer.mbx.out"
 
 verbose=0
 if [ "$1" = "-v" ]; then
@@ -31,8 +31,12 @@ done
 RESULT=`cat $TMPDIR/spam.2 | wc -l`.`cat $TMPDIR/good.2 | wc -l`
 RESULT=`echo $RESULT | sed s@\ @@g`
 
+WANT="1147.3074"
+
 if  [ $verbose -ne 0 ]; then
-    echo $RESULT
+    echo want: $WANT, have: $RESULT > $TMPDIR/$OUT
 fi
 
-test "$RESULT" = "1147.3074"
+[ ! -z $BF_SAVEDIR ] && . ${srcdir}/../t.save
+
+test "$RESULT" = "$WANT"

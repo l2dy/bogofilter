@@ -25,7 +25,7 @@ TESTS=$(TESTSCRIPTS)
 
 TESTS_ENVIRONMENT=RUN_FROM_MAKE=1 AWK=$(AWK) srcdir=$(srcdir) $(SHELL) $(VERBOSE)
 
-EXTRA_DIST=$(TESTSCRIPTS) t.frame t.skel inputs outputs
+EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel inputs outputs
 
 dist-hook:
 	cd $(distdir) && for i in inputs outputs ; do find $$i -name CVS -type d -prune -exec rm -r '{}' ';' ; done

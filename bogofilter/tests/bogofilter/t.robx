@@ -40,6 +40,17 @@ EOF
 
 $BOGOFILTER -r -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER -r -n < ${SYSTEST}/inputs/good.mbx
-$BOGOUTIL -R $TMPDIR
+
+if [ ! -z "$RUN_FROM_MAKE" ] ; then
+    $BOGOUTIL -R $TMPDIR
+else
+    for w in spamlist goodlist ; do
+	$BOGOUTIL -d $TMPDIR/$w.db > ${TMPDIR}/$w.txt
+    done
+    $BOGOUTIL -vvv -R $TMPDIR > ${TMPDIR}/output.vvv
+fi
+
+[ ! -z $BF_SAVEDIR ] && . ${srcdir}/../t.save
+
 ROBX=`$BOGOUTIL -w $TMPDIR .ROBX | $AWK '/.ROBX/ { print $2; }'`
 test $ROBX = "253445"
