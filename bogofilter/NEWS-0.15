@@ -9,17 +9,26 @@ about retraining and the '-H' flag...
 * Remove --disable-* options for algorithms. Has never been supported
   well and serves no useful purpose, the algorithm code is irrelevant
   compared to lexer or other stuff.
+* Fixed a memory leak in bogoutil.
 * Bogotune now checks for incorrectly classified messages in the test
   data and exits if so.
+* Bogotune's memory needs lessened.
 * Fixed timestamp config option.
+* Exclude apostrophes and backticks at the end of a token.
 * Lexer changes reduce size of bogofilter executable by approx 90%.
+* Lexer.c no longer discards X-Bogosity lines in rfc822 attachments.
 * Removed repetition counts in lexer for TOKEN and MIME_BOUNDARY
   patterns to reduce executable size.
+* "<DOCTYPE HTML PUBLIC...>" is now recognized as starting html text.
 * Several minor lexer bugs fixed.
+* Updated bogominitrain.pl to v1.4.2
+* TDB passes all checks again.
+* QDBM support fixed.
 * Minor documentation fixes.
 * Minor error message cleanups.
+* Refactored passthrough.c.
 
-0.15.8	2003-10-29
+0.15.8 2003-10-29
 
 * Modified handling of mime attachments to decode rfc822 and to
   ignore applications and images.
