@@ -64,10 +64,14 @@ AUTHOR:
 #include "xstrdup.h"
 
 #define	MSG_COUNT	".MSG_COUNT"
-#define	LIST_COUNT	2000
-#define	TEST_COUNT	500
+
+#define	TEST_COUNT	500	/* minimum allowable message count */
+#define	PREF_COUNT	4000	/* preferred message count */
+#define	LIST_COUNT	2000	/* minimum msg count in wordlist */
 
 #define	HAM_CUTOFF	0.10
+#define	MIN_CUTOFF	0.52	/* minimum for get_thresh() */
+#define	MAX_CUTOFF	0.99	/* maximum for get_thresh() */
 #define	SPAM_CUTOFF	0.95
 #define FP_CUTOFF	0.999
 
@@ -126,6 +130,8 @@ double user_robx = 0.0;		/* from '-r' option */
 
 static void bt_exit(void);
 static int ds_read_hook(word_t *key, dsv_t *data, void *userdata);
+static void show_elapsed_time(int beg, int end, uint cnt, double val, 
+			      const char *lbl1, const char *lbl2);
 
 /* Function Definitions */
 
@@ -311,7 +317,7 @@ static bool check_for_high_ns_scores(void)
     if (ns_scores[ns_cnt-target] < SPAM_CUTOFF)
 	return false;
     else {
-	fprintf(stderr, "Error - high scoring non-spam.\n");
+	fprintf(stderr, "Warning:  high scoring non-spam.\n");
 	return true;
     }
 }
@@ -366,7 +372,7 @@ static bool check_for_low_sp_scores(void)
     if (sp_scores[target] > HAM_CUTOFF)
 	return false;
     else {
-	fprintf(stderr, "Error - low scoring spam.\n");
+	fprintf(stderr, "Warning:  low scoring spam.\n");
 	return true;
     }
 }
@@ -375,55 +381,83 @@ static void scoring_error(void)
 {
     int i;
 
-    printf("high ham scores:\n");
+    printf("    high ham scores:\n");
     for (i = 0; i < 10 && ns_scores[ns_cnt-i-1] > SPAM_CUTOFF; i += 1) 
-	printf("  %2d %8.6f\n", i+1, ns_scores[ns_cnt-i-1]);
+	printf("      %2d %8.6f\n", i+1, ns_scores[ns_cnt-i-1]);
 
-    printf("low spam scores:\n");
+    printf("    low spam scores:\n");
     for (i = 0; i < 10 && sp_scores[i] < HAM_CUTOFF; i += 1) 
-	printf("  %2d %8.6f\n", i+1, sp_scores[i]);
+	printf("      %2d %8.6f\n", i+1, sp_scores[i]);
 }
 
-/* compute scores and get fp target and spam cutoff value */
+static double scale(uint cnt, uint lo, uint hi, double beg, double end)
+{
+    double ans;
+
+    if (cnt < lo)
+	return beg;
+    if (cnt > hi)
+	return end;
+
+    ans = beg + (end - beg) * (cnt - lo ) / (hi - lo);
+
+    return ans;
+}
+
+/* compute scores and get fp target and spam cutoff value
+**
+** As count increases from 500 to 4000 ...
+**	1) initial target percent drops from 1% to 0.25% 
+**	2) initial minimum target increases from 5 to 10
+*/
 
 static uint get_thresh(uint count, double *scores)
 {
-    uint ft = 0;
-    double percent;
+    uint   ftarget = 0;
+    uint   mtarget = scale(count, TEST_COUNT, PREF_COUNT, 3, 10);
+    double percent = scale(count, TEST_COUNT, PREF_COUNT, 0.01, 0.0025);
+    double cutoff;
     static bool show_first = false;
 
     score_ns(scores);			/* scores in ascending order */
     qsort(scores, count, sizeof(double), compare_double);
 
-    for (percent = 0.0025 ; percent > EPS; percent -= 0.0005) {
-	ft = ceil(count * percent);		/* compute fp count */
-	spam_cutoff = scores[count - ft];	/* get cutoff value */
-	if (spam_cutoff >= 0.5)
+    while (percent > 0.0001) {
+	ftarget = ceil(count * percent);	/* compute fp count */
+	if (ftarget <= mtarget)
 	    break;
+	cutoff = scores[count - ftarget];	/* get cutoff value */
+	if (cutoff >= MIN_CUTOFF)
+	    break;
+	percent -= 0.0001;
     }
+
+    if (verbose >= PARMS)
+	printf("mtarget %d, ftarget %d, percent %6.4f%%\n", mtarget, ftarget, percent * 100.0);
 
     if (show_first) {
 	uint f;
 	show_first = false;
-	for (f = 1; f <= ft; f += 1) 
+	for (f = 1; f <= ftarget; f += 1) 
 	    printf("%2d %5d %8.6f\n", f, count-f, scores[count-f]);
     }
 
-    if (!force && spam_cutoff < 0.5) {
+    if (!force && (cutoff < MIN_CUTOFF || cutoff > MAX_CUTOFF)) {
 	fprintf(stderr,
-		"Very few high-scoring non-spams in this data set.\n");
+		"%s high-scoring non-spams in this data set.\n",
+		(cutoff < MIN_CUTOFF) ? "Too few" : "Too many");
 	fprintf(stderr,
-		"At target %d, cutoff is %8.6f.\n", ft, spam_cutoff);
+		"At target %d, cutoff is %8.6f.\n", ftarget, cutoff);
 	exit(EX_ERROR);
     }
 
-    /* ensure cutoff is below 0.95 */
-    while (spam_cutoff >= 0.95 && ++ft < count)
-	spam_cutoff = scores[count-ft];
+    /* ensure cutoff is below SPAM_CUTOFF */
+    while (cutoff >= SPAM_CUTOFF && ++ftarget < count)
+	cutoff = scores[count-ftarget];
 
-    spam_cutoff = scores[count-(ft+1)] + 0.0005;
+    spam_cutoff = scores[count-(ftarget+1)] + 0.0005;
 
-    return ft;
+    return ftarget;
 }
 
 static uint read_mailbox(char *arg)
@@ -1063,7 +1097,7 @@ static rc_t bogotune(void)
     ham_cutoff = 0.0;
     spam_cutoff = 0.1;
 
-    if (memdebug) MEMDISPLAY;
+    if (memdebug) { MEMDISPLAY; }
 
     /* Note: memory usage highest while reading messages */
     /* usage decreases as distribute() converts to count format */
@@ -1072,25 +1106,28 @@ static rc_t bogotune(void)
     ns_cnt = filelist_read(REG_GOOD, ham_files);
     sp_cnt = filelist_read(REG_SPAM, spam_files);
 
-    if (memdebug) MEMDISPLAY;
+    if (verbose) {
+	end = time(NULL);
+	cnt = ns_cnt + sp_cnt;
+	show_elapsed_time(beg, end, ns_cnt + sp_cnt, (double)cnt/(end-beg), "messages", "msg/sec");
+    }
+
+    if (memdebug) { MEMDISPLAY; }
 
     distribute(REG_GOOD, ns_msglists);
     distribute(REG_SPAM, sp_msglists);
 
-    if (memdebug) MEMDISPLAY;
+    if (memdebug) { MEMDISPLAY; }
 
     create_countlists(ns_msglists);
     create_countlists(sp_msglists);
 
-    if (memdebug) MEMDISPLAY;
+    if (memdebug) { MEMDISPLAY; }
 
-    end = time(NULL);
-
-    if (verbose) {
-	int tm = end - beg;
+    if (verbose && time(NULL) - end > 2) {
+	end = time(NULL);
 	cnt = ns_cnt + sp_cnt;
-	printf("    %2dm:%02ds for %d messages.  avg: %5.1f msg/sec\n",
-	       MIN(tm), SECONDS(tm), cnt, (double)cnt/(tm));
+	show_elapsed_time(beg, end, ns_cnt + sp_cnt, (double)cnt/(end-beg), "messages", "msg/sec");
     }
 
     if (msgs_good == 0 && msgs_bad == 0) {
@@ -1162,7 +1199,7 @@ static rc_t bogotune(void)
     wordhash_free(ns_and_sp->train);
     ns_and_sp->train = NULL;
 
-    if (memdebug) MEMDISPLAY;
+    if (memdebug) { MEMDISPLAY; }
 
     if (ns_cnt >= TEST_COUNT && sp_cnt >= TEST_COUNT)	/* HACK */
     for (scan=0; scan <= 1; scan += 1) {
@@ -1257,15 +1294,10 @@ static rc_t bogotune(void)
 	    }
 	    fflush(stdout);
 	}
-	end = time(NULL);
-
-	if (!verbose)
-	    printf("\n");
 
 	if (verbose >= SUMMARY) {
-	    uint tm = end - beg;
-	    printf("    %2dm:%02ds for %d iterations.  avg: %5.3fs\n", 
-		   MIN(tm), SECONDS(tm), cnt, (double)(tm)/cnt);
+	    end = time(NULL);
+	    show_elapsed_time(beg, end, cnt, (double)(end-beg)/cnt, "iterations", "secs");
 	}
 
 	printf("\n");
@@ -1313,7 +1345,7 @@ static rc_t bogotune(void)
     if (ns_cnt >= TEST_COUNT && sp_cnt >= TEST_COUNT)	/* HACK */
     final_recommendations();
 
-    if (memdebug) MEMDISPLAY;
+    if (memdebug) { MEMDISPLAY; }
 
     return status;
 }
@@ -1357,6 +1389,14 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 static void bt_exit(void)
 {
     return;
+}
+
+static void show_elapsed_time(int beg, int end, uint cnt, double val, 
+			      const char *lbl1, const char *lbl2)
+{
+    int tm = end - beg;
+    printf("    %2dm:%02ds for %d %s.  avg: %5.1f %s\n",
+	   MIN(tm), SECONDS(tm), cnt, lbl1, val, lbl2);
 }
 
 /* End */
