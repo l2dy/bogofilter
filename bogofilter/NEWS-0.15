@@ -2,6 +2,18 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.15.3	2003-09-??
+
+* Fix auto-update ('-u') bug that double registers ham and spam.
+* Revised parsing to discard additional headers, i.e.
+  Resent-Message-ID, In-Reply-To, and References.
+* Fixed maintenance mode (broken during database API rewrite).
+* Added regression test for maintenance mode.
+* Re-organized test framework to put all scripts in src/tests,
+  all input files in src/tests/inputs, and reference outputs
+  in src/tests/outputs.
+* Correct QDBM optimization problems arising from API change.
+
 0.15.2	2003-09-07
 
 * Header line unfolding now handled by flex rules.

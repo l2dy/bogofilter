@@ -4,6 +4,24 @@
 
 $Id$
 
+	2003-09-09
+
+	* Fixed maintenance mode (broken during database API rewrite).
+	* Added regression test for maintenance mode.
+	* Re-organized test framework to put all scripts in src/tests,
+          all input files in src/tests/inputs, and reference outputs
+          in src/tests/outputs.
+
+	2003-09-08
+
+	* Revised parsing to discard additional headers, i.e.
+          Resent-Message-ID, In-Reply-To, and References.
+
+	2003-09-07
+	
+	* Fix auto-update ('-u') bug that double registers ham and spam.
+	* Correct QDBM optimization problems arising from API change.
+
 0.15.2	2003-09-07
 
 	2003-09-06
