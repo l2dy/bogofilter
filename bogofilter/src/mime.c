@@ -1,7 +1,6 @@
 /* $Id$ */
 
 /**
- *
  * \file mime.c
  * lexer MIME processing
  *
@@ -39,45 +38,48 @@ static mime_t msg_stack[MIME_STACK_MAX];
 mime_t *msg_state = msg_stack;
 mime_t *msg_top = msg_stack;
 
+/** MIME media types (or prefixes thereof) that we detect. */
 static struct type_s {
-    enum mimetype type;
-    const char *name;
-    size_t len;
+    enum mimetype type;	/**< internal representation of MIME type */
+    const char *name;	/**< prefix of MIME type to match */
+    size_t len;		/**< length of \a name */
 } mime_type_table[] = {
-    { MIME_TEXT_HTML, "text/html", 9,},
-    { MIME_TEXT_PLAIN, "text/plain", 10,},
-    { MIME_TEXT, "text", 4,},	/* NON-COMPLIANT; should be "text/" */
-    { MIME_APPLICATION, "application/", 12,},
-    { MIME_IMAGE, "image/", 6,},
-    { MIME_MESSAGE, "message/", 8,},
-    { MIME_MULTIPART, "multipart/", 10,},
+    { MIME_TEXT_HTML, "text/html", 9 },
+    { MIME_TEXT_PLAIN, "text/plain", 10 },
+    { MIME_TEXT, "text", 4 },	/* NON-COMPLIANT; should be "text/" */
+    { MIME_APPLICATION, "application/", 12 },
+    { MIME_IMAGE, "image/", 6 },
+    { MIME_MESSAGE, "message/", 8 },
+    { MIME_MULTIPART, "multipart/", 10 },
 };
 
+/** MIME encodings that we detect. */
 static struct encoding_s {
-    enum mimeencoding encoding;
-    const char *name;
+    enum mimeencoding encoding;	/**< internal representation of encoding */
+    const char *name;		/**< encoding name to match */
 } mime_encoding_table[] = {
-    { MIME_7BIT, "7BIT",},
-    { MIME_8BIT, "8BIT",},
-    { MIME_BINARY, "BINARY",},
-    { MIME_QP, "QUOTED-PRINTABLE",},
-    { MIME_BASE64, "BASE64",},
-    { MIME_UUENCODE, "X-UUENCODE",},
+    { MIME_7BIT, "7BIT" },
+    { MIME_8BIT, "8BIT" },
+    { MIME_BINARY, "BINARY" },
+    { MIME_QP, "QUOTED-PRINTABLE" },
+    { MIME_BASE64, "BASE64" },
+    { MIME_UUENCODE, "X-UUENCODE" },
 };
 
+/** MIME content dispositions that we detect. */
 static struct disposition_s {
-    enum mimedisposition disposition;
-    const char *name;
+    enum mimedisposition disposition;	/**< internal representation of disposition */
+    const char *name;			/**< disposition name to match */
 } mime_disposition_table[] = {
-    { MIME_INLINE, "inline",},
-    { MIME_ATTACHMENT, "attachment",},
+    { MIME_INLINE, "inline" },
+    { MIME_ATTACHMENT, "attachment" },
 };
 
-/* boundary properties */
+/** properties of a MIME boundary */
 typedef struct {
-    bool is_valid;
-    bool is_final;
-    int depth;
+    bool is_valid;	/**< valid boundary of an enclosing MIME container */
+    bool is_final;	/**< boundary is a closing one (two trailing dashes) */
+    int depth;		/**< stack level the boundary was found at */
 } boundary_t;
 
 /* Function Prototypes */
@@ -88,9 +90,6 @@ static void mime_type(word_t * text);
 
 static const byte *skipws(const byte * t, const byte * e);
 static byte *getword(const byte * t, const byte * e);
-#if	0
-static char *getparam(const byte * t, char *e, const byte * param);
-#endif
 
 static void mime_push(mime_t * parent);
 static void mime_pop(void);
@@ -110,6 +109,49 @@ const char *mime_type_name(enum mimetype type)
 }
 #endif
 
+static const char *str_mime_type(enum mimetype m) {
+    switch (m) {
+	case MIME_TYPE_UNKNOWN:
+	    return "unknown";
+	case MIME_MULTIPART:
+	    return "multipart/*";
+	case MIME_MESSAGE:
+	    return "message/*";
+	case MIME_TEXT:
+	    return "text/*";
+	case MIME_TEXT_PLAIN:
+	    return "text/plain";
+	case MIME_TEXT_HTML:
+	    return "text/html";
+	case MIME_APPLICATION:
+	    return "application/*";
+	case MIME_IMAGE:
+	    return "image/*";
+    }
+    return "INTERNAL_ERROR";
+}
+
+static const char *str_mime_enc(enum mimeencoding e) {
+    switch(e) {
+	case MIME_ENCODING_UNKNOWN:
+	    return "unknown";
+	case MIME_7BIT:
+	    return "7bit";
+	case MIME_8BIT:
+	    return "8bit";
+	case MIME_BINARY:
+	    return "binary";
+	case MIME_QP:
+	    return "quoted-printable";
+	case MIME_BASE64:
+	    return "base64";
+	case MIME_UUENCODE:
+	    return "x-uuencode";
+    }
+    return "INTERNAL_ERROR";
+}
+
+/** Dump the current MIME boundary stack. For debugging. */
 static void mime_stack_dump(void)
 {
     int i;
@@ -118,10 +160,10 @@ static void mime_stack_dump(void)
 	fprintf(dbgout, "**** empty\n");
     else
 	for (i = 0; i <= stackp; i++)
-	    fprintf(dbgout, "**** %3d type %d enc %d bnd %s chr %s\n",
+	    fprintf(dbgout, "**** %3d type %s enc %s bnd %s chr %s\n",
 		    i,
-		    msg_stack[i].mime_type,
-		    msg_stack[i].mime_encoding,
+		    str_mime_type(msg_stack[i].mime_type),
+		    str_mime_enc(msg_stack[i].mime_encoding),
 		    msg_stack[i].boundary ? msg_stack[i].boundary : "NIL",
 		    msg_stack[i].charset);
 }
@@ -154,7 +196,6 @@ static void mime_free(mime_t * t)
     t->parent = NULL;
 }
 
-/** Cleanup storage allocation */
 void mime_cleanup()
 {
     while (stackp > -1)
@@ -213,10 +254,15 @@ static void mime_pop(void)
 	mime_stack_dump();
 }
 
-static int is_mime_container(mime_t * m)
+/**
+ * check if the media type of the MIME entity \a m is a container type
+ * (message/anything or multipart/anything)
+ */
+static bool is_mime_container(mime_t * m)
 {
-    return (m && ((m->mime_type == MIME_MESSAGE)
-		  || (m->mime_type == MIME_MULTIPART)));
+    return (m
+	    && ((m->mime_type == MIME_MESSAGE)
+		|| (m->mime_type == MIME_MULTIPART)));
 }
 
 void mime_reset(void)
@@ -235,8 +281,13 @@ void mime_add_child(mime_t * parent)
     mime_push(parent);
 }
 
-static
-bool get_boundary_props(const word_t * boundary, boundary_t * b)
+/**
+ * Check if the line given in \a boundary is a boundary of one of the
+ * outer MIME containers and store the results in \a b.
+ * container we'd previously seen. \return a copy of b->is_valid
+ */
+static bool get_boundary_props(const word_t * boundary, /**< input line */
+	boundary_t * b /*@out@*/ /**< output properties, must be pre-allocated by caller */)
 {
     int i;
     const byte *buf = boundary->text;
@@ -244,8 +295,10 @@ bool get_boundary_props(const word_t * boundary, boundary_t * b)
 
     b->is_valid = false;
 
+    /* a boundary line must begin with two dashes */
     if (blen > 2 && buf[0] == '-' && buf[1] == '-') {
 
+	/* strip EOL characters */
 	while (blen > 2 &&
 	       (buf[blen - 1] == '\r' || buf[blen - 1] == '\n'))
 	    blen--;
@@ -262,10 +315,15 @@ bool get_boundary_props(const word_t * boundary, boundary_t * b)
 	    b->is_final = false;
 	}
 
+	/* search stack for matching boundary, in reverse order */
 	for (i = stackp; i > -1; i--) {
-	    if (is_mime_container(&msg_stack[i]) &&
-		msg_stack[i].boundary &&
-		(memcmp(msg_stack[i].boundary, buf, blen) == 0)) {
+	    if (is_mime_container(&msg_stack[i])
+		&& msg_stack[i].boundary
+#ifdef THIS_BUGFIX_TWISTS_TEST_SUITE
+		&& blen == msg_stack[i].boundary_len
+#endif
+		&& memcmp(msg_stack[i].boundary, buf, blen) == 0)
+	    {
 		b->depth = i;
 		b->is_valid = true;
 		break;
@@ -279,8 +337,7 @@ bool get_boundary_props(const word_t * boundary, boundary_t * b)
 bool mime_is_boundary(word_t * boundary)
 {
     boundary_t b;
-    get_boundary_props(boundary, &b);
-    return b.is_valid;
+    return get_boundary_props(boundary, &b);
 }
 
 bool got_mime_boundary(word_t * boundary)
@@ -299,7 +356,8 @@ bool got_mime_boundary(word_t * boundary)
 		stackp, boundary->text);
 
     if (stackp > 0) {
-	/* This handles explicit and implicit boundaries */
+	/* This handles explicit and implicit boundaries - pop stack
+	 * until we reach the boundary level on the stack */
 	while (stackp > 0 && stackp > b.depth)
 	    mime_pop();
 
@@ -309,12 +367,14 @@ bool got_mime_boundary(word_t * boundary)
     }
 
     parent = is_mime_container(msg_state) ? msg_state : msg_state->parent;
-    mime_push(parent);
+    mime_push(parent); /* push for the next part */
     return true;
 }
 
-/* skips whitespace, returns NULL when ran into end of string */
-static const byte *skipws(const byte * t, const byte * e)
+/** Skip leading whitespace from t. \return pointer to first non-whitespace character, or NULL if the string is all whitespace or empty */
+static const byte *skipws(
+	const byte * t, /**< string to find non-whitespace in */
+	const byte * e  /**< pointer to the byte after the last byte in \a t */)
 {
     while (t < e && isspace(*t))
 	t++;
@@ -323,21 +383,14 @@ static const byte *skipws(const byte * t, const byte * e)
     return NULL;
 }
 
-/* skips [ws]";"[ws] */
-#if	0
-char *skipsemi(const byte * t, const byte * e)
-{
-    if (!(t = skipws(t, e)))
-	return NULL;
-    if (*t == ';')
-	t++;
-    return skipws(t, e);
-}
-#endif
-
-/* get next MIME word, NULL when none found.
- * caller must free returned string with xfree() */
-static byte *getword(const byte * t, const byte * e)
+/**
+ * get next MIME word, \return malloc'd NUL-terminated string containing
+ * a copy of the word, or NULL when none found. It is the caller's
+ * responsibility to xfree() the returned string!
+ */
+static byte *getword(
+	const byte * t, /**< string to extract word from */
+	const byte * e  /**< pointer to byte after last byte in \a t */)
 {
     int quote = 0;
     int l;
@@ -361,15 +414,6 @@ static byte *getword(const byte * t, const byte * e)
     n[l] = (byte) '\0';
     return n;
 }
-
-#if	0
-char *getparam(char *t, char *e, const byte * param)
-{
-/*    char *w, *u; */
-
-    return NULL;		/* NOT YET IMPLEMENTED */
-}
-#endif
 
 void mime_content(word_t * text)
 {
@@ -497,6 +541,7 @@ static void mime_type(word_t * text)
     return;
 }
 
+/* to be removed. Used only by bogus hacks in collect.c::collect_words */
 void mime_type2(word_t * text)
 {
     byte *w = text->text;
@@ -571,7 +616,7 @@ uint mime_decode(word_t * text)
 {
     uint count = text->leng;
 
-    /* early out for the uninteresting cases */
+    /* early out for the identity codings */
     if (msg_state->mime_encoding == MIME_7BIT ||
 	msg_state->mime_encoding == MIME_8BIT ||
 	msg_state->mime_encoding == MIME_BINARY ||
