@@ -1,5 +1,4 @@
 /* $Id$ */
-
 /*****************************************************************************
 
 NAME:
@@ -44,6 +43,8 @@ run_t run_type = RUN_NORMAL;
 const char *progname = PROGNAME;
 
 static int dump_count = 0;
+
+bool onlyprint = false;
 
 /* Function Prototypes */
 
@@ -499,6 +500,7 @@ static double compute_robx(void *dbh_spam, void *dbh_good)
 	printf(".MSG_COUNT: %lu, %lu, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
 	       (unsigned long)msg_spam, (unsigned long)msg_good, rh.scalefactor,
 	       sum, (int)tok_cnt, robx);
+    else if (onlyprint) printf("%f\n", robx);
     return robx;
 }
 
@@ -539,9 +541,11 @@ static int compute_robinson_x(char *path)
     free(wl[0].filename);
     free(wl[1].filename);
 
-    dbh_spam = db_open(db_spam_file, "spam", DB_WRITE);
-    db_setvalue(dbh_spam, word_robx, (uint32_t) (robx * 1000000));
-    db_close(dbh_spam, false);
+    if (!onlyprint) {
+	dbh_spam = db_open(db_spam_file, "spam", DB_WRITE);
+	db_setvalue(dbh_spam, word_robx, (uint32_t) (robx * 1000000));
+	db_close(dbh_spam, false);
+    }
 
     word_free(word_robx);
 
@@ -562,7 +566,7 @@ static void print_version(void)
 
 static void usage(void)
 {
-    fprintf(stderr, "Usage: %s { -d | -l | -w | -p } file.db | -R directory | [ -v | -h | -V ]\n", PROGNAME);
+    fprintf(stderr, "Usage: %s { -d | -l | -w | -p } file.db | { -r | -R } directory | [ -v | -h | -V ]\n", PROGNAME);
 }
 
 static void help(void)
@@ -577,7 +581,8 @@ static void help(void)
 	    "\t-m\tEnable maintenance works (expiring tokens).\n"
 	    "\t-v\tOutput debug messages.\n"
 	    "\t-h\tPrint this message.\n"
-	    "\t-R\tCompute Robinson's X for specified directory.\n");
+	    "\t-r\tCompute Robinson's X for specified directory.\n"
+	    "\t-R\tCompute Robinson's X and save it in the spam list.\n");
     fprintf(stderr,
 	    "\t-a age\tExclude tokens with older ages.\n"
 	    "\t-c count\tExclude tokens with lower counts.\n"
@@ -608,7 +613,7 @@ static int process_args(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
-    while ((option = getopt(argc, argv, ":d:l:m:w:R:p:hvVa:c:s:ny:I:x:D")) != -1)
+    while ((option = getopt(argc, argv, ":d:l:m:w:R:r:p:hvVa:c:s:ny:I:x:D")) != -1)
 	switch (option) {
 	case 'd':
 	    flag = DUMP;
@@ -638,6 +643,8 @@ static int process_args(int argc, char **argv)
 	    db_file = (char *) optarg;
 	    break;
 
+	case 'r':
+	    onlyprint = true;
 	case 'R':
 	    flag = ROBX;
 	    count += 1;
