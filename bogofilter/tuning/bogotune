@@ -280,13 +280,6 @@ $robx = 0.6 if $robx > 0.6; $robx = 0.4 if $robx < 0.4;
 my $x0 = $robx - 0.1; my $x1 = $robx + 0.1;
 printf("Initial x value is %0.6f\n", $robx);
 
-### 6.  Coarsely scan s, md and x
-# The coarse s scan will range from 1 to 0.01 in half decades, and the
-# coarse md scan will range from 0.05 to 0.45 in steps of 0.05.  The
-# coarse x scan will use steps of 0.05. The trough must be surrounded on
-# six sides by values below the 33% quantile (unless bounded on one or
-# more sides).
-
 sub progress {
     my ($cur, $top) = @_;
     my $i; my $ndots = POSIX::ceil(70 * $cur / $top);
@@ -308,12 +301,40 @@ sub gfn {
 
 sub my_log10 { my $n = shift; return log($n) / log(10); }
 
-my @rsval = (10 ** 0, 10 ** -0.5, 10 ** -1, 10 ** -1.5, 10 ** -2);
-@mdval = (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45);
-my $n = ($x1 - $x0);
-@rxval = ($x0 + $n/2, $x0 + $n/4, $x0 + $n*0.75, $x0, $x1);
 my ($robs, $md);
 foreach my $scantype ("coarse", "fine") {
+    if($scantype eq "coarse") {
+	### 7.  Coarsely scan s, md and x
+	# The coarse s scan will range from 1 to 0.01 in half decades, and the
+	# coarse md scan will range from 0.05 to 0.45 in steps of 0.05.  The
+	# coarse x scan will use steps of 0.05. The trough must be surrounded on
+	# six sides by values below the 33% quantile (unless bounded on one or
+	# more sides).
+	@rsval = (10 ** 0, 10 ** -0.5, 10 ** -1, 10 ** -1.5, 10 ** -2);
+	@mdval = (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45);
+	my $n = ($x1 - $x0);
+	@rxval = ($x0 + $n/2, $x0 + $n/4, $x0 + $n*0.75, $x0, $x1);
+	# count: 5 * 9 * 5 -> 225
+    }
+    else {
+	### 8.  Finely scan the peak region
+	# The fine s scan will range over the estimated s +/- half a decade in
+	# steps of a quarter decade, and the fine md scan will range over the
+	# estimated md +/- 0.075 in steps of 0.015.  The fine x scan will range
+	# over the estimated x +/- 0.04 in steps of 0.02.  Scans of s and md
+	# are bounded by the limits of the coarse scan.  Again, the trough must
+	# be surrounded on six sides by values below the 33% quantile.  If no
+	# such trough exists, a warning is given.
+	@rsval = @mdval = ();
+	my $s0 = my_log10($robs) - 0.5; $s0 = -2 if $s0 < -2;
+	my $s1 = my_log10($robs) + 0.5; $s1 = 0 if $s1 > 0;
+	for(my $i=$s1; $i>=$s0; $i-=0.25) { push @rsval, 10 ** $i; }
+	$s0 = $md - 0.075; $s0 = 0.02 if $s0 < 0.02;
+	$s1 = $md + 0.075; $s1 = 0.465 if $s1 > 0.465;
+	for(my $i=$s0; $i<=$s1; $i+=0.015) { push @mdval, $i; }
+	@rxval = ($robx, $robx-0.02, $robx+0.02, $robx-0.04, $robx+0.04);
+	# count: 3 * 10 * 5 -> 90
+    }
     my ($rsi, $mdi, $rxi, $cutoff, $fn);
     print("Performing ", $scantype, " scan:\n");
     my $ord = 0; my $np = scalar @rsval * scalar @mdval * scalar @rxval;
@@ -439,26 +460,6 @@ foreach my $scantype ("coarse", "fine") {
     $robs = $rsval[$rsi]; $md = $mdval[$mdi]; $robx = $rxval[$rxi];
     printf("Minimum found at s %0.4f, md %0.3f, x %0.3f %s\n",
 	$robs, $md, $robx, "                           ");
-
-    ### 7.  Finely scan the peak region
-    # The fine s scan will range over the estimated s +/- half a decade in
-    # steps of a quarter decade, and the fine md scan will range over the
-    # estimated md +/- 0.075 in steps of 0.015.  The fine x scan will range
-    # over the estimated x +/- 0.04 in steps of 0.02.  Scans of s and md
-    # are bounded by the limits of the coarse scan.  Again, the troubh must
-    # be surrounded on six sides by values below the 33% quantile.  If no
-    # such trough exists, a warning is given.
-
-    if($scantype == "coarse") {
-	@rsval = @mdval = ();
-	my $s0 = my_log10($robs) - 0.5; $s0 = -2 if $s0 < -2;
-	my $s1 = my_log10($robs) + 0.5; $s1 = 0 if $s1 > 0;
-	for(my $i=$s1; $i>=$s0; $i-=0.25) { push @rsval, 10 ** $i; }
-	$s0 = $md - 0.075; $s0 = 0.02 if $s0 < 0.02;
-	$s1 = $md + 0.075; $s1 = 0.465 if $s1 > 0.465;
-	for(my $i=$s0; $i<=$s1; $i+=0.015) { push @mdval, $i; }
-	@rxval = ($robx, $robx-0.02, $robx+0.02, $robx-0.04, $robx+0.04);
-    }
 }
 
 ### 8.  Suggest possible spam and nonspam cutoff values
