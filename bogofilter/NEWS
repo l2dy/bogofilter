@@ -12,6 +12,7 @@ is in the RELEASE.NOTES files.  Read them!!
 	* Tag Cc: lines as To: lines.e
 	* Allow setting threshold for auto-updating, using the "-u
 	  value" flag or the "thresh_update=value" option.
+	* Minor FAQ updates.
 
 	2004-01-12
 
