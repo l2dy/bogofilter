@@ -122,7 +122,7 @@ static const ArgDefinition ArgDefList[] =
     { "wordlist",	  CP_WORDLIST,	{ (void *)&dummy } },
 };
 
-static const int ArgDefListSize = (int)sizeof(ArgDefList)/sizeof(ArgDefList[0]);
+static const size_t ArgDefListSize = sizeof(ArgDefList)/sizeof(ArgDefList[0]);
 
 static bool process_config_parameter(const ArgDefinition * arg, const char *val)
 {
@@ -222,7 +222,7 @@ static bool process_config_parameter(const ArgDefinition * arg, const char *val)
 
 static bool process_config_line( const char *line )
 {
-    int i;
+    size_t i;
     size_t len;
     const char *val;
 
