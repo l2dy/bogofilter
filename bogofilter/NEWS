@@ -4,6 +4,15 @@
 
 $Id$
 
+0.14.1	2003-07-23
+
+	* Fix problem with encoded text.
+	* Fix handling of absolute paths.
+	* Fix defect in base64 decoding that can cause segfaults.
+	* Bogoutil now complains before exiting when it can't open a
+          file.
+	* Updated bogominitrain.pl to work with combined wordlists.
+
 0.14.0	2003-07-22
 
 	* Updated contrib/bogominitrain.pl prints more info and can save

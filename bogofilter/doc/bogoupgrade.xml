@@ -14,6 +14,7 @@
 
 <cmdsynopsis>
   <command>bogoupgrade</command>
+  <arg choice='plain'>-d <replaceable>directory</replaceable></arg>
   <arg choice='plain'>-i <replaceable>input file</replaceable></arg>
   <arg choice='plain'>-o <replaceable>output file</replaceable></arg>
   <arg choice='opt'>-b <replaceable>path to bogoutil</replaceable></arg>
@@ -70,7 +71,13 @@ options to bogoupgrade.</para>
 
 <para>The <option>-h</option> option prints the help message and exits.</para>
 
-<para>The <option>-i</option> specifys the input file to be converted. It
+<para>The <option>-d</option> specifies the directory with the wordlists for
+converting.  This option is used when converting from multiple, separate 
+wordlists (spamlist.db and goodlist.db - containing spam and ham tokens, 
+respectively) to a combined wordlist (wordlist.db) which contains both spam 
+and ham tokens.</para>
+
+<para>The <option>-i</option> specifies the input file to be converted. It
 should be a text file containing message counts, and possibly data. If there is
 no data in the text file, there should be a  Berkeley DB file in the same
 directory as the text file which contains the data.</para>
