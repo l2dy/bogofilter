@@ -1309,7 +1309,7 @@ static bool check_msgcount_parms(void)
     bool ok = true;
 
     if (ds_file == NULL) {
-	fprintf(stderr, "A wordlist directory must be specified for converting message to the message count format.\n");
+	fprintf(stderr, "A wordlist directory must be specified for converting messages to the message count format.\n");
 	ok = false;
     }
 
