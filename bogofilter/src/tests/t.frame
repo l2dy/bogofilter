@@ -16,7 +16,7 @@ set -e
 if [ -z "$RUN_FROM_MAKE" ] ; then
 # standalone, from shell directly
 # THIS IS PRONE TO RACES
-   NAME=`basename $0 | sed s@^t\.@@`
+   NAME=`basename $0 | sed -e 's/^t\.//'`
    DATE=`date +"%Y%m%d"`
    TMPDIR="${BF_TESTDIR}/$NAME.$DATE"
    SUPPRESS_DELETE="NO"
