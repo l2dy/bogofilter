@@ -20,7 +20,7 @@ echo $VERSION | egrep "[a-z][a-z][a-z]$" >/dev/null
 srcdir=$1
 shift
 
-if [ $? == 0 ]; then
+if [ $? = 0 ]; then
    DATE="00000000"
    for file in $* ; do
        HEAD=`head -1 $srcdir/$file | awk '{print $5}' | tr -d "/"`
