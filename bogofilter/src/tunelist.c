@@ -139,7 +139,7 @@ void wordlist_free(wordlist_t *list)
 	return;
 
     wordhash_free(list->train);		/* training */
-//    msglist_free(list->msgs);
+    msglist_free(list->msgs);
     msglist_free(list->u.r.r0);		/* run sets */
     msglist_free(list->u.r.r1);
     msglist_free(list->u.r.r2);
