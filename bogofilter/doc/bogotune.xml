@@ -19,8 +19,11 @@
 	 <arg>-C</arg>
 	 <arg>-d <replaceable>file.db</replaceable></arg>
 	 <arg>-D</arg>
+	 <arg>-r <replaceable>value</replaceable></arg>
+	 <arg>-T <replaceable>value</replaceable></arg>
 	 <arg choice="plain">-n <replaceable>okfile</replaceable> [<replaceable>okfile</replaceable>...]</arg>
 	 <arg choice="plain">-s <replaceable>spamfile</replaceable> [<replaceable>spamfile</replaceable>...]</arg>
+	 <arg>-M</arg>
       </cmdsynopsis>
 
     <cmdsynopsis>
@@ -91,6 +94,24 @@
     <para>The <option>-s</option> option tells
     <application>bogotune</application> that the following arguments
     are files (or folders) containing spam.</para>
+
+    <para>The <option>-r <replaceable>value</replaceable></option>
+    option tells <application>bogotune</application> to use the
+    following parameter as the robx value.</para>
+
+    <para>The <option>-T <replaceable>value</replaceable></option>
+    option tells <application>bogotune</application> to use the
+    following parameter as fp target value.</para>
+
+    <para>The <option>-M</option> option tells
+    <application>bogotune</application> to convert the input files to
+    message count format.  This format provides a sorted list of each
+    message's unique tokens, along with their ham and spam counts.
+    Sorting hides the sense of the messages quite effectively, thus
+    protecting privacy.  This format allows
+    <application>bogotune</application> and
+    <application>bogofilter</application> to quickly score
+    messageswithout having the original token database.  </para>
 
 </refsect1>
 
