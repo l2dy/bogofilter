@@ -458,6 +458,7 @@ static const char *help_text[] = {
     "\n",
     "  -h, --help                - print this help message.\n",
     "  -V, --version             - print version information and exit.\n",
+    "  -C, --no-config-file      - don't read standard config files.\n",
 
     "  -d, --dump=file           - dump data from file to stdout.\n",
     "  -l, --load=file           - load data from stdin into file.\n",
@@ -525,7 +526,7 @@ typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST,
     M_RECOVER, M_CRECOVER, M_PURGELOGS, M_VERIFY, M_REMOVEENV } cmd_t;
 static cmd_t flag = M_NONE;
 
-#define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:u:vVw:x:X:y:"
+#define	OPTIONS	":a:c:Cd:DhH:I:k:l:m:np:r:R:s:u:vVw:x:X:y:"
 
 static int process_arglist(int argc, char **argv)
 {
@@ -584,6 +585,10 @@ static int process_arg(int option, const char *name, const char *val)
 	flag = M_DUMP;
 	count += 1;
 	ds_file = val;
+	break;
+
+    case 'C':
+	suppress_config_file = true;
 	break;
 
     case 'k':

@@ -29,6 +29,12 @@ Briefly:
 	* Berkeley DB Transactional recovery now uses the actual db_lk_max_*
 	  values rather than hardcoded 1024.  Reported by Karl O. Pinc.
 
+	* Added -C option to allow bogoutil to not read the config file.
+
+	2005-01-03
+
+	* Added '--default-charset=name' option to configure script.
+
 	2005-01-02
 
 	* Initial support for Russian character sets (thanks to Evgeny
