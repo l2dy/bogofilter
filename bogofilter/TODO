@@ -10,11 +10,6 @@
 
 **** Make sure that RFC-2047 decoder runs only once, not recursively.
 
-**** Implement RFC-2046 section 5.2.2 (message/partial reassembly rules,
-     Take most headers from enclosing message except Content-*, Subject,
-     Message-ID, Encrypted, MIME-Version, which are taken from the
-     enclosed message).
-
 **** Reimplement seeking passthrough mode that got dropped on 2003-08-23
      with the switch to bogoreader.*
      http://article.gmane.org/gmane.mail.bogofilter.general/9035 and

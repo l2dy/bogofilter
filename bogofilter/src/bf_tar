@@ -17,7 +17,6 @@ while [ "$1" ] ; do
     case "$1" in
 	-r) REMOVEAFT=1 ;;
 	-R) REMOVEBEF=1 ;;
-	--) shift ; break ;;
 	-*) echo >&2 "`basename $0`: unknown option $1" ; exit 1 ;;
 	*) break;
     esac
@@ -37,20 +36,18 @@ BOGOHOME="$1"
 
 if [ ! -d $BOGOHOME ] ; then
     echo "$BOGOHOME" must be a directory, not a file
-    exit 1
+    exit
 fi
 
 nukelogs() {
     bogoutil --db-prune="$BOGOHOME"
 }
 
+# run db_checkpoint to reduce number of logs
+db_checkpoint -1 -h "$BOGOHOME"
+
 # remove if requested
-if [ $REMOVEBEF -eq 1 ] ; then
-    nukelogs
-else
-    # run db_checkpoint to reduce number of logs
-    db_checkpoint -1 -h "$BOGOHOME"
-fi
+if [ $REMOVEBEF -eq 1 ] ; then nukelogs ; fi
 
 # database first, if it's newer than the log, it's not recoverable!
 # pax options: -w: write archive, -v: verbosely, -x ustar: choose tar
