@@ -45,9 +45,6 @@ run_test()
     if test -s $TMPDIR/vg.out ; then cat $TMPDIR/vg.out ; exit 2 ; fi
 }
 
-if [   -d ${TMPDIR}/tests ] ; then rm -f ${TMPDIR}/tests/* ; else : ; fi
-mkdir -p ${TMPDIR}/tests
-
 for mth in f t ; do
     BOGOFILTER_DIR="${TMPDIR}/words.$mth"
     CFG="-c ${TMPDIR}/cfg.$mth -y 0"
