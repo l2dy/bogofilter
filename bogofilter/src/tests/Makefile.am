@@ -33,6 +33,7 @@ SCORING_TESTS =  t.score1 t.score2 t.systest t.grftest t.bogoutil-hist
 BULKMODE_TESTS = t.bulkmode t.MH t.maildir
 
 INTEGRITY_TESTS = t.lock1 t.valgrind
+# INTEGRITY_TESTS += t.lock2
 
 TESTSCRIPTS = ${ENVIRON_TESTS} ${PARSING_TESTS} ${WORDLIST_TESTS} ${SCORING_TESTS} ${BULKMODE_TESTS} ${INTEGRITY_TESTS}
 
@@ -41,7 +42,7 @@ TESTS=$(TESTSCRIPTS)
 TESTS_ENVIRONMENT=RUN_FROM_MAKE=1 AWK=$(AWK) srcdir=$(srcdir) $(SHELL) $(VERBOSE)
 
 EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel inputs outputs \
-	printcore t._abort \
+	printcore t._abort unsort.pl \
 	run.sh
 
 dist-hook:
