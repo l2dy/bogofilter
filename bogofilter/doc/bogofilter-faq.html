@@ -87,14 +87,15 @@
 
         <ul>
           <li><a href="#query-database">How do I manually query the database?</a></li>
-          <li><a href="#page-notfound">Why am I getting DB_PAGE_NOTFOUND messages?</a></li>
           <li><a href="#rescue">How can I tell if my wordlists are corrupted?</a></li>
           <li><a href="#update">How do I upgrade from separate word
           databases to the new combined wordlist format?</a></li>
           <li><a href="#multiple">Can I use multiple wordlists?</a></li>
           <li><a href="#ignore">Can I tell bogofilter to ignore certain tokens?</a></li>
 	  <li><a href="#locksize">Why does bogofilter die after printing
+	      "Lock table is out of available locks"? or
 	      "Lock table is out of available object entries"?</a></li>
+          <li><a href="#page-notfound">Why am I getting DB_PAGE_NOTFOUND messages?</a></li>
         </ul>
       </li>
 
@@ -812,31 +813,6 @@
 
     <hr>
 
-    <h2 id="page-notfound">Why am I getting DB_PAGE_NOTFOUND messages?</h2>
-
-    <p>You have a problem with your BerkeleyDB database.  There are
-    two likely causes: either you've hit a max size limit or the
-    database is corrupt.</p>
-
-    <p>Some mail transfer agents, such as Postfix, impose file size
-    limits. When bogofilter's database reaches that limit, write
-    problems will occur.
-
-    <p>To show the database size use:</p>
-    <pre>	ls -lh $BOGOFILTER_DIR/wordlist.db</pre>
-
-    <p>To show the postfix setting:</p>
-    <pre>	postconf | grep mailbox_size_limit</pre>
-
-    <p>To set the limit to 73MB (or whatever size is right for you):</p>
-    <pre>	postconf -e mailbox_size_limit=73000000</pre>
-
-    <p>If you think your database may be corrupt, read
-    <a href="#rescue">How can I tell if my wordlists are corrupted?</a>
-    FAQ entry.</p>
-
-    <hr>
-
     <h2 id="rescue">How can I tell if my wordlists are corrupted?</h2>
 
     <p>If you think your wordlists are hosed, you can see what
@@ -957,14 +933,46 @@
     <pre>  echo ignore.me | bogoutil -l ~/ignorelist.db</pre>
 
     <h2 id="locksize">Why does bogofilter die after printing
-	"Lock table is out of available object entries"?</h2>
+	"Lock table is out of available locks"? or
+	"Lock table is out of available object entries"</h2>
 
     <p>The transactional and concurrent modes of BerkeleyDB require a
     lock table that corresponds to the data base in size. See the
     <samp>README.db</samp> file for a detailed explanation and a
     remedy.</p>
 
+    <p>The size of the lock table can be set in bogofilter.cf or in
+    DB_CONFIG.  Bogofilter.cf uses the db_lk_max_locks and
+    db_lk_max_objects directives, while DB_CONFIG uses the
+    set_lk_max_objects and set_lk_max_locks directives.</p>
+
     <hr>
+
+    <h2 id="page-notfound">Why am I getting DB_PAGE_NOTFOUND messages?</h2>
+
+    <p>You have a problem with your BerkeleyDB database.  There are
+    two likely causes: either you've hit a max size limit or the
+    database is corrupt.</p>
+
+    <p>Some mail transfer agents, such as Postfix, impose file size
+    limits. When bogofilter's database reaches that limit, write
+    problems will occur.
+
+    <p>To show the database size use:</p>
+    <pre>	ls -lh $BOGOFILTER_DIR/wordlist.db</pre>
+
+    <p>To show the postfix setting:</p>
+    <pre>	postconf | grep mailbox_size_limit</pre>
+
+    <p>To set the limit to 73MB (or whatever size is right for you):</p>
+    <pre>	postconf -e mailbox_size_limit=73000000</pre>
+
+    <p>If you think your database may be corrupt, read
+    <a href="#rescue">How can I tell if my wordlists are corrupted?</a>
+    FAQ entry.</p>
+
+    <hr>
+
     <h2 id="multi-user">Can bogofilter be used in a multi-user environment?</h2>
 
     <p>Yes, it can.  There are multiple, distinct strategies for doing
