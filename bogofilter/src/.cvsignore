@@ -30,6 +30,7 @@ install-sh
 lexer_head.c
 lexer_text_html.c
 lexer_text_plain.c
+lexer_v3.c
 missing
 mkinstalldirs
 stamp-h.in
