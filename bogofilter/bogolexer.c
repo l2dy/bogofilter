@@ -48,7 +48,7 @@ static void help(void)
 	    "\t-k y/n\t- kill html comments (yes or no).\n"
 	    "\t-n\t- map non-ascii characters to '?'.\n"
 	    "\t-v\t- set debug verbosity level.\n"
-	    "\t-x LIST\t- set debug flags.\n"
+	    "\t-x list\t- set debug flags.\n"
 	    "\t-I file\t- read message from file instead of stdin.\n"
 	    "%s is part of the bogofilter package.\n", progname);
 }
