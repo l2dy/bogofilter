@@ -11,7 +11,7 @@ AUTHORS:
 
 ******************************************************************************/
 
-#include <assert.h>
+#include <stdlib.h>
 
 #include "config.h"
 #include "common.h"
@@ -19,6 +19,8 @@ AUTHORS:
 #include "buff.h"
 #include "fgetsl.h"
 #include "xmalloc.h"
+
+#define BOGO_ASSERT(expr, msg) if (!(expr)) { fprintf(stderr, "%s: %s:%d %s\n", progname, __FILE__, __LINE__, msg); abort(); }
 
 /* Function Definitions */
 buff_t *buff_init(buff_t *self, byte *buff, size_t used, size_t size)
@@ -80,9 +82,10 @@ void buff_shift(buff_t *self, byte *start, size_t length)
     /* Implemented for deleting html comments.		      */
     byte *buff_end = self->t.text+self->t.leng;
     byte *move_end = start + length;
-    if ( ! ((self->t.text <= start) && (move_end <= buff_end)) ) {
-	assert("Invalid buff_shift() parameters.");
-    }
+
+    BOGO_ASSERT((self->t.text <= start) && (move_end <= buff_end),
+	   "Invalid buff_shift() parameters.");
+
     memmove(start, start+length, buff_end - move_end);
     self->t.leng -= length;
     Z(self->t.text[self->t.leng]);		/* for easier debugging - removable */
