@@ -27,7 +27,7 @@ else
   $cmdpfx checkout -p -Dtomorrow bogofilter/NEWS >NEWS
 
   # copy without cruft and internal files
-  rsync -av --delete ./ htdocs/ --delete-excluded \
+  rsync -av --delete ./ ../htdocs/ --delete-excluded \
       --exclude CVS \
       --exclude README_BEFORE_EDITING \
       # do not remove this comment - it is for the preceding backslash
