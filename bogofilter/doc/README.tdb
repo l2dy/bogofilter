@@ -1,0 +1,34 @@
+To build and run bogofilter using the Trivial Database (tdb), you'll
+need to do the following:
+
+1. Have tdb and gdbm installed.
+
+   tdb needs gdbm, so if neither is installed, you'll need to:
+
+   a. Download gdbm from ftp://ftp.gnu.org/pub/gnu/gdbm.  The current
+      version is gdbm-1.8.3.tar.gz (16 Oct 2002).  Build with the
+      usual commands: "./configure && make && make install"
+
+   b. Download tdb from http://sourceforge.net/projects/tdb.  The
+      current version is tdb-1.0.6 (10 Dec 2001).  After unpacking the
+      tarball, build with the usual commands: "./configure && make &&
+      make install"
+
+2. From the bogofilter directory, run:
+
+   "./configure --with-tdb && make && make check && make install"
+
+3. To verify configuration, run:
+
+   bogofilter -V
+
+   Output should resemble:
+
+   bogofilter-tdb version 0.14.0
+      Algorithms: Fisher Graham Robinson
+      Database: TrivialDB
+
+4. When running bogofilter, the database files will have a tdb
+   extension.  For combined list bogofilter, the database is
+   wordlist.tdb.  For separate list bogofilter, the databases are
+   spamlist.tdb and goodlist.tdb.
