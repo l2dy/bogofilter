@@ -110,8 +110,10 @@ same message as spam.</para>
 
 <para>The <option>-d</option><replaceable> dir</replaceable> option
     allows you to set the directory under which wordlists will be found
-    to <replaceable>dir</replaceable>. If omitted,
-    <filename>$HOME/.bogofilter</filename> is assumed.</para>
+    to <replaceable>dir</replaceable>. If omitted, the default directory
+    will be <filename>$BOGOFILTER_DIR</filename> if
+    <envar>BOGOFILTER_DIR</envar> is set and
+    <filename>$HOME/.bogofilter</filename> otherwise.</para>
 
 <para>The <option>-l</option> (log) option writes an informational line
 to the system log each time <application>bogofilter</application> is run.
@@ -187,6 +189,17 @@ called <application>bogo.R</application> that does just that.  (In
 order not to clutter the data frame with extraneous or duplicate
 information, one should not combine the -R and -v options.)</para>
 </refsect1>
+
+<refsect1 id='environment'><title>ENVIRONMENT</title>
+    <para>
+	Bogofilter will initialize its data base directory to
+	<filename>$BOGOFILTER_DIR</filename> if <envar>BOGOFILTER_DIR</envar> is set.
+	If it is unset, bogofilter
+	will use <filename>$HOME/.bogofilter</filename> instead. If both
+	<envar>BOGOFILTER_DIR</envar> and
+	<envar>HOME</envar> variables are unset, the <option>-d
+	    <replaceable>dir</replaceable></option> becomes mandatory.
+</para></refsect1>
 
 <refsect1 id='integration'><title>INTEGRATION WITH OTHER TOOLS</title>
 <para>The following procmail rule will take mail on stdin and direct
