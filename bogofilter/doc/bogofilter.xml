@@ -702,11 +702,12 @@ bogofilter[6244]: register-s, 1273 words, 4 messages
 </refsect1>
 
 <refsect1 id='author'><title>AUTHOR</title>
-    <para>Eric S. Raymond <email>esr@thyrsus.com</email>.<br>
-    David Relson <email>relson@osagesoftware.com</email>.<br>
-    Matthias Andree <email>matthias.andree@gmx.de</email>.<br>
-    Greg Louis <email>glouis@dynamicro.on.ca</email>.
-</para>
+    <literallayout>
+Eric S. Raymond <email>esr@thyrsus.com</email>.
+David Relson <email>relson@osagesoftware.com</email>.
+Matthias Andree <email>matthias.andree@gmx.de</email>.
+Greg Louis <email>glouis@dynamicro.on.ca</email>.
+</literallayout>
 
     <para>For updates, see <ulink url="http://bogofilter.sourceforge.net/">
 the bogofilter project page</ulink>.</para>
