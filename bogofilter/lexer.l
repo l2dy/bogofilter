@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.5  2002/10/04 11:09:26  relson
+ * Made the TOKEN recognition pattern a bit more thorough in excluding carriage returns.
+ *
  * Revision 1.4  2002/10/03 17:57:06  relson
  * Changed interface to lexer.l as a first step towards adding the advanced
  * tokenizing features of spambayes into bogofilter.
@@ -326,8 +329,7 @@ filename=\"					;
 {MIME_BOUNDARY}					;
 
 {IPADDR}					{return(TOKEN);}
-[^[:blank:]\n[:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,\n[]+[^[:blank:][:punct:]\n\r]	{return(TOKEN);}
-
+[^[:blank:]\n\r[:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,\n\r[]+[^[:blank:][:punct:]\n\r]   {return(TOKEN);} 
 .						;
 \n						;
 
