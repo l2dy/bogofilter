@@ -24,6 +24,7 @@ AUTHORS:
 
 #include "bogofilter.h"
 #include "bogohist.h"
+#include "bogohome.h"
 #include "buff.h"
 #include "datastore.h"
 #include "error.h"
@@ -31,7 +32,6 @@ AUTHORS:
 #include "paths.h"
 #include "prob.h"
 #include "robx.h"
-#include "set_bogohome.h"
 #include "swap.h"
 #include "wordlists.h"
 #include "xmalloc.h"

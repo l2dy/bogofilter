@@ -1,17 +1,33 @@
+/* $Id$ */
+
+/*****************************************************************************
+
+NAME:
+   bogohome.c -- support for bogofilter's home directory.
+
+AUTHOR:
+   Matthias Andree <m-a@gmx.de>
+
+******************************************************************************/
+
 #include "config.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <stdlib.h>
 
-#include "globals.h"
-#include "set_bogohome.h"
+#include "bogohome.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
+
+char *bogohome=NULL;
 
 void set_bogohome(const char *ds_file) {
     char *t;
     struct stat st;
+
+    if (bogohome)
+	xfree(bogohome);
 
     bogohome = xstrdup(ds_file);
     if (lstat(bogohome, &st) != 0 || !S_ISDIR(st.st_mode))
@@ -24,3 +40,8 @@ void set_bogohome(const char *ds_file) {
 }
 
 
+void free_bogohome(void)
+{
+    xfree(bogohome);
+    bogohome = NULL;
+}

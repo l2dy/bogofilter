@@ -2,6 +2,7 @@
 
 #include "common.h"
 
+#include "bogohome.h"
 #include "paths.h"
 #include "wordlists.h"
 #include "wordlists_base.h"
@@ -13,7 +14,6 @@
 
 wordlist_t *word_list;
 /*@null@*/ wordlist_t* word_lists=NULL;
-char *bogohome=NULL;
 
 /* returns -1 for error, 0 for success */
 int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* path,
@@ -113,8 +113,7 @@ int setup_wordlists(const char* d, priority_t precedence)
     if (init_wordlist(&word_list, "word", dir, true, false, 0, false) != 0)
 	rc = -1;
 
-    xfree(bogohome);
-    bogohome = dir;
+    set_bogohome(dir);
 
     return rc;
 }
@@ -141,7 +140,6 @@ void free_wordlists(void)
 
     word_lists = NULL;
 
-    xfree(bogohome);
-    bogohome = NULL;
+    free_bogohome();
 }
 

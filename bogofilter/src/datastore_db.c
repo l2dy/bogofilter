@@ -33,6 +33,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 #include "datastore.h"
 #include "datastore_db.h"
+#include "bogohome.h"
 #include "error.h"
 #include "maint.h"
 #include "paths.h"		/* for build_path */

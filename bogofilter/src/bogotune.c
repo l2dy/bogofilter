@@ -51,6 +51,7 @@ AUTHORS:
 #include "bogotune.h"
 
 #include "bogoconfig.h"
+#include "bogohome.h"
 #include "bogoreader.h"
 #include "collect.h"
 #include "datastore.h"
@@ -60,7 +61,6 @@ AUTHORS:
 #include "robx.h"
 #include "rstats.h"
 #include "score.h"
-#include "set_bogohome.h"
 #include "token.h"
 #include "tunelist.h"
 #include "wordhash.h"
