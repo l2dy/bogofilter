@@ -12,6 +12,7 @@
 #include "bogohome.h"
 #include "datastore.h"
 #include "msgcounts.h"
+#include "mxcat.h"
 #include "paths.h"
 #include "rand_sleep.h"
 #include "wordlists.h"
@@ -39,17 +40,6 @@
  * for destruction: - when closed an environment, NULL it in word_lists
  * past the current one that match our address
  */
-
-/** returns malloc()ed copy of the directory name of \a path,
- * or bogohome if no directory is part of \a path.
- */
-static char *bf_dirname(const char *path) {
-    char *x = xstrdup(path), *t;
-    t = strrchr(x, DIRSEP_C);
-    if (t) *t = '\0';
-    else xfree(x), x = xstrdup(bogohome);
-    return x;
-}
 
 static LIST_HEAD(envlist, envnode) envs;
 struct envlist envlisthead;
@@ -80,19 +70,17 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 {
     bool retry = false;
     void *dbe;
-    char *x;
 
     if (list->type == WL_IGNORE) 	/* open ignore list in read-only mode */
 	mode = DS_READ;
 
     /* FIXME: create or reuse environment from filepath */
 
-    x = bf_dirname(list->filepath);
-    dbe = list_searchinsert(x, list->filepath);
-    xfree(x);
+    dbe = list_searchinsert(list->dirname, list->filepath);
+
     if (dbe == NULL)
 	exit(EX_ERROR);
-    list->dsh = ds_open(dbe, bogohome, list->filepath, mode); /* FIXME */
+    list->dsh = ds_open(dbe, list->dirname, list->filename, mode); /* FIXME */
     if (list->dsh == NULL) {
 	int err = errno;
 	close_wordlists(word_lists, false); /* unlock and close */
@@ -111,7 +99,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 		return false;
 	    fprintf(stderr,
 		    "Can't open file '%s' in directory '%s'.\n",
-		    list->filepath, bogohome);
+		    list->filename, list->dirname);
 	    if (err != 0)
 		fprintf(stderr,
 			"error #%d - %s.\n", err, strerror(err));
@@ -153,6 +141,24 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
     return retry;
 }
 
+static void check_wordlist_path(wordlist_t *list)
+{
+    if (list->dirname == NULL) {
+	list->dirname = xstrdup(bogohome);
+	list->filepath = mxcat(list->dirname, DIRSEP_S, list->filename, NULL);
+    }
+}
+
+/* set bogohome using first wordlist's directory
+*/
+void set_wordlist_directory(void)
+{
+    if (word_lists != NULL) {
+	check_wordlist_path(word_lists);
+	set_bogohome(word_lists->dirname);
+    }
+}
+
 void open_wordlists(wordlist_t *list, dbmode_t mode)
 {
     bool retry = true;
@@ -166,22 +172,9 @@ void open_wordlists(wordlist_t *list, dbmode_t mode)
 	wordlist_t *l;
 	retry = false;
 	for (l = list; l ; l = l->next) {
+	    check_wordlist_path(l);
 	    retry |= open_wordlist(l, l->type == WL_IGNORE ? DS_READ : mode);
 	}
-    }
-}
-
-/* set_wordlist_directory()
-**	set bogohome using first wordlist's directory
-**	if none, don't change bogohome
-*/
-
-void set_wordlist_directory(void)
-{
-    if (word_lists != NULL) {
-	char *path = get_directory_from_path(word_lists->filepath);
-	if (path != NULL)
-	    set_bogohome(path);
     }
 }
 
