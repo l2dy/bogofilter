@@ -137,7 +137,7 @@ void open_wordlists(dbmode_t mode)
     do {
 	retry = 0;
 	for (list = word_lists; list != NULL; list = list->next) {
-	    list->dbh = db_open(list->filepath, list->filename, mode, directory);
+	    list->dbh = db_open(list->filepath, list->filename, mode);
 	    if (list->dbh == NULL) {
 		int err = errno;
 		close_wordlists(true); /* unlock and close */

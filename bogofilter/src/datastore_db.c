@@ -105,8 +105,7 @@ static void dbh_free(/*@only@*/ dbh_t *handle){
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
 */
-void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
-	const char *dir)
+void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 {
     int ret;
     dbh_t *handle = NULL;
@@ -123,9 +122,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
     uint32_t *retryflag_i;
     int maj, min;
     static int version_ok;
-
-    assert(dir && *dir);
-
+    
     if (!version_ok) {
 	version_ok = 1;
 	(void)db_version(&maj, &min, NULL);

@@ -158,7 +158,7 @@ static int db_oper(const char *path, dbmode_t open_mode, db_foreach_t funct,
 	void *userdata) {
     void *dbh;
 
-    if ((dbh = db_open(path, path, open_mode, directory)) == NULL) {
+    if ((dbh = db_open(path, path, open_mode)) == NULL) {
 	exit(2);
     } else {
 	int r = db_foreach(dbh, funct, userdata);
@@ -207,7 +207,7 @@ static int load_file(char *db_file)
     unsigned long count, date;
     YYYYMMDD today_save = today;
 
-    if ((dbh = db_open(db_file, db_file, DB_WRITE, directory)) == NULL)
+    if ((dbh = db_open(db_file, db_file, DB_WRITE)) == NULL)
 	return 2;
 
     memset(buf, '\0', BUFSIZE);
@@ -308,7 +308,7 @@ static int words_from_list(const char *db_file, int argc, char **argv)
     void *dbh;
     int rv = 0;
 
-    dbh = db_open(db_file, db_file, DB_READ, directory);
+    dbh = db_open(db_file, db_file, DB_READ);
     if ( dbh == NULL )
 	return 2;
 
@@ -359,13 +359,13 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     if (build_path(filepath, sizeof(filepath), dir, GOODFILE) < 0)
 	return 2;
 
-    if ((dbh_good = db_open(filepath, GOODFILE, DB_READ, directory)) == NULL)
+    if ((dbh_good = db_open(filepath, GOODFILE, DB_READ)) == NULL)
 	return 2;
 
     if (build_path(filepath, sizeof(filepath), dir, SPAMFILE) < 0)
 	return 2;
 
-    if ((dbh_spam = db_open(filepath, SPAMFILE, DB_READ, directory)) == NULL)
+    if ((dbh_spam = db_open(filepath, SPAMFILE, DB_READ)) == NULL)
 	return 2;
 
     if (show_probability)
@@ -512,7 +512,7 @@ static int compute_robinson_x(char *path)
     free(wl[0].filename);
     free(wl[1].filename);
 
-    dbh_spam = db_open(db_spam_file, "spam", DB_WRITE, directory);
+    dbh_spam = db_open(db_spam_file, "spam", DB_WRITE);
     db_setvalue(dbh_spam, word_robx, (uint32_t) (robx * 1000000));
     db_close(dbh_spam, false);
 

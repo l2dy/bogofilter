@@ -32,7 +32,7 @@ typedef struct {
  */
 /*@only@*/ /*@null@*/
 void *db_open(const char *path /** path to database file */, const char *name /** name of data base */,
-	dbmode_t mode /** open mode, DB_READ or DB_WRITE */, const char *dir /** directory, currently unused */);
+	dbmode_t mode /** open mode, DB_READ or DB_WRITE */);
 
 /** Close file and clean up. */
 void  db_close(/*@only@*/ void *, bool nosync  /** Normally false, if true, do not synchronize data. This should not be used in regular operation but only to ease the disk I/O load when the lock operation failed. */);
