@@ -31,8 +31,8 @@ for f in good spam ; do
     cat ${srcdir}/inputs/$f.mbx | formail -s $0 save $TMPDIR $f 
 done
 
-$BOGOFILTER -C -D -n -B $TMPDIR/good $v
-$BOGOFILTER -C -D -s -B $TMPDIR/spam $v
+$BOGOFILTER -C -D -n $v -B $TMPDIR/good
+$BOGOFILTER -C -D -s $v -B $TMPDIR/spam
 
 $BOGOFILTER -C -D -T -B $TMPDIR/good $TMPDIR/spam | sort | sed s@$TMPDIR/@@ | egrep -v " (H 0|S 1)$" > $OUT
 
