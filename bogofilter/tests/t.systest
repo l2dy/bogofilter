@@ -16,6 +16,7 @@ cat <<EOF > ${TMPDIR}/bogofilter.cf
 robx=0.415
 min_dev=0.0
 spam_header_name=X-Bogosity
+stats_in_header=Y
 EOF
 
 BOGOFILTER="../bogofilter -c ${TMPDIR}/bogofilter.cf"
