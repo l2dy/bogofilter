@@ -37,27 +37,25 @@ void buff_free(buff_t *self)
     xfree(self);
 }
 
-buff_t *buff_dup(const buff_t *word)
+buff_t *buff_dup(const buff_t *self)
 {
-    buff_t *self = xmalloc(sizeof(buff_t));
-    self->size = word->size;
-    self->t.text = word->t.text;
-    return self;
+    buff_t *new = xmalloc(sizeof(buff_t));
+    new->size = self->size;
+    new->t.text = self->t.text;
+    return new;
 }
 
-int buff_fgetsl(buff_t *b, FILE *in)
+int buff_fgetsl(buff_t *self, FILE *in)
 {
-    int s = xfgetsl(b->t.text, b->size, in, 1);
-    if (s >= 0) {
-	b->t.leng = s;
-    }
-    b->read = 0;
+    int s = xfgetsl(self->t.text+self->read, self->size, in, 1);
+    if (s >= 0)
+	self->t.leng += s;
     return s;
 }
 
-void buff_puts(const buff_t *buff, size_t width, FILE *fp)
+void buff_puts(const buff_t *self, size_t width, FILE *fp)
 {
-    word_t word = { buff->t.leng-buff->read, buff->t.text+buff->read };
+    word_t word = { self->t.leng-self->read, self->t.text+self->read };
     word_puts(&word, width, fp);
 }
 
