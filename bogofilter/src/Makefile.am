@@ -99,11 +99,5 @@ directories.c: ../config.status
 	echo "const char *const system_config_file = \"$(SYSCONFDIR)/bogofilter.cf\";" >"$@" \
 	    || rm -f "$@"
 #
-lexer_head.c:	lexer_head.l
-	flex -Plexer_ -o$@ $<
-
-lexer_text_plain.c:	lexer_text_plain.l
-	flex -Ptext_plain_ -o$@ $<
-
-lexer_text_html.c:	lexer_text_html.l
-	flex -Ptext_html_ -o$@ $<
+.l.c:
+	flex -o$@ $<

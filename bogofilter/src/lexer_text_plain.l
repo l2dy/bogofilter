@@ -25,6 +25,7 @@ static word_t yy_text;
 %}
 
 %option align nounput noyywrap noreject 8bit caseless
+%option prefix="text_plain_"
 
 MIME_BOUNDARY	[0-9a-zA-Z\'()+_,-./:=?]*
 

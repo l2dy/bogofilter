@@ -68,6 +68,7 @@ static word_t *yy_text(void)
 %}
 
 %option align nounput noyywrap noreject 8bit caseless
+%option prefix="lexer_"
 
 UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
 IPADDR		{UINT8}\.{UINT8}\.{UINT8}\.{UINT8}
