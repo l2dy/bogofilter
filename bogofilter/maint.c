@@ -10,13 +10,15 @@ AUTHOR:
 
 ******************************************************************************/
 
-#include <time.h>
+#include <config.h>
+#include "system.h"
+/* has time.h */
+
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <db.h>
 
-#include <config.h>
 #include "common.h"
 
 #include "datastore.h"
