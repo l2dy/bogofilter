@@ -37,7 +37,7 @@ bogofilter is working properly.
 * Merged files RELEASE.NOTES-0.1? into cumulative RELEASE.NOTES file.
 * Removed files CHANGES-0.1? as they duplicate info in NEWS.
 
-0.92.4	2004-07-29
+0.92.4	2004-07-29 - Stable Release
 
 * Warn on invalid options, rather than exit.
 

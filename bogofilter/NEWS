@@ -45,7 +45,7 @@ is in the RELEASE.NOTES files.  Read them!!
 	* Removed obsolete test output files - degen.out,
           combined.out, and separate.out
 
-0.92.4	2004-07-29
+0.92.4	2004-07-29 - Stable Release
 
 	* Warn on invalid options, rather than exit.
 
