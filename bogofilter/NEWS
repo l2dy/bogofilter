@@ -5,18 +5,31 @@
 NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
-0.92.1	2004-06-??
+0.92.1	2004-07-01
+
+	* Remove 'g', 'r', and 'f' from bogofilter's OPTIONS list as
+	  there's only one scoring algorithm.
+
+	* Removed obsolete occurrences of '-g' and '-f' from
+	  regression tests.
+
+	2004-06-30
+
+	* Revised README file.
 
 	2004-06-29
 
 	* French version of FAQ updated.
+	* Rewrote code for identifying message's originating IP address.
+	* Changed name of variable 'ipaddr' to 'msgaddr'.
+	* Added t.msgaddr to regression test.
 
 	2004-06-27
 
 	* Fixed db_init/db_cleanup problems encountered with multiple
 	wordlists and concurrent data stores.
 
-0.92.0	2004-06-26
+0.92.0	2004-06-26 - New Stable Release
 
 	* Added ESF options to bogofilter's man page.
 	* Revised man pages' description of multi-parameter options.

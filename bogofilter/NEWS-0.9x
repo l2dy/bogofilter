@@ -2,12 +2,25 @@
 				BOGOFILTER NEWS
 			       =================
 
-0.92.1	2004-06-??
+0.92.1	2004-07-01
+
+* Remove 'g', 'r', and 'f' from bogofilter's OPTIONS list as
+  there's only one scoring algorithm.
+
+* Removed obsolete occurrences of '-g' and '-f' from
+  regression tests.
+
+* Revised README file.
+
+* French version of FAQ updated.
+* Rewrote code for identifying message's originating IP address.
+* Changed name of variable 'ipaddr' to 'msgaddr'.
+* Added t.msgaddr to regression test.
 
 * Fixed db_init/db_cleanup problems encountered with multiple
   wordlists and concurrent data stores.
 
-0.92.0	2004-06-26
+0.92.0	2004-06-26 - Stable Release
 
 * Fixed problem recognizing empty line ending of header in
   files with CRLFs and X-Bogosity line as last header line.
