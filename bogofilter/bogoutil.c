@@ -449,7 +449,7 @@ void version(void)
 
 void usage(void)
 {
-    fprintf(stderr, "Usage: %s { -d | -l | -w } [ -v ] file.db | -R directory | [ -h | -V ]\n", PROGNAME);
+    fprintf(stderr, "Usage: %s { -d | -l | -w } file.db | -R directory | [ -p | -v | -h | -V ]\n", PROGNAME);
 }
 
 void help(void)
@@ -459,6 +459,7 @@ void help(void)
 	    "\t-d\tDump data from file.db to stdout.\n"
 	    "\t-l\tLoad data from stdin into file.db.\n"
 	    "\t-w\tDisplay counts for words from stdin.\n"
+	    "\t-p\tOutput word probabilities.\n"
 	    "\t-v\tOutput debug messages.\n"
 	    "\t-h\tPrint this message.\n"
 	    "\t-R\tCompute Robinson's X for specified directory.\n"
@@ -512,7 +513,6 @@ int main(int argc, char *argv[])
 
 	case 'h':
 	    help();
-	    usage();
 	    exit(0);
 
 	case 'V':
