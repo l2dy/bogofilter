@@ -25,6 +25,7 @@
   <arg choice='opt'>-e</arg>
   <arg choice='opt'>-g</arg>
   <arg choice='opt'>-r</arg>
+  <arg choice='opt'>-f</arg>
   <arg choice='opt'>-R</arg>
   <arg choice='opt'>-u</arg>
   <arg choice='opt'>-v</arg>
@@ -33,7 +34,7 @@
   <arg choice='opt'>-c <replaceable>filename</replaceable></arg>
   <arg choice='opt'>-C</arg>
   <arg choice='opt'>-q</arg>
-  <arg choice='opt'>-f</arg>
+  <arg choice='opt'>-F</arg>
 </cmdsynopsis>
 
 </refsynopsisdiv>
@@ -78,6 +79,17 @@ Robinson's suggested modifications (S and f(w) but not g(w)) to the
 calculations.  These modifications are described in Robinson's paper <ulink
 url="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">
 Spam Detection</ulink>.</para>
+
+<para><existing>Another seeming improvement...Spam
+Detection.</existing> Since then, Robinson and others have
+realized that the S calculation can be further optimized: if a vector of
+length k contains random, uniformly-distributed probabilities p, then
+-2 * sum(ln(p)) is distributed as chi-squared with 2n degrees of
+freedom.  This is believed to be the most sensitive test of the
+hypothesis that the vector of probabilities is, in fact, uniformly
+distributed.  Bogofilter now offers the option of applying this test
+(known as Fisher's method) to yield P(spam) and P(not spam), and using
+the difference as the "spamicity" score.</para>
 
 <para>The input may be one message or many.  Messages are broken up
 on From_ lines.  The algorithm is relatively insensitive to message
@@ -182,9 +194,17 @@ script.</para>
 
 <para>The <option>-r</option> option selects the Robinson modifications
 to the calculation method.  This is automatically enabled when the
-<option>-R</option> option is specified.  Neither this nor the
-<option>-g</option> option is available if bogofilter was configured
-with <option>--disable-graham-method</option> at compile time.</para>
+<option>-R</option> option is specified.</para>
+
+<para>The <option>-f</option> option selects the Robinson-Fisher
+modifications to the calculation method.</para>
+
+<para>The configure script has options
+<option>--disable-graham-method</option>,
+<option>--disable-robinson-method</option>, and
+<option>--disable-fisher-method</option> so that
+<application>bogofilter</application> can be built to support a subset
+of the available methods.</para>
 
 <para>The <option>-R</option> option tells
 <application>bogofilter</application> to output an R data frame in
@@ -207,7 +227,7 @@ tells <application>bogofilter</application> to read the config file named.
 
 <para>The <option>-q</option> (quiet) suppresses warning messages.</para>
 
-<para>The <option>-f</option> (force) ignores threshold values when printing spamicity statistics.</para>
+<para>The <option>-F</option> (force) ignores threshold values when printing spamicity statistics.</para>
 </refsect1>
 
 <refsect1 id='environment'><title>ENVIRONMENT</title>
