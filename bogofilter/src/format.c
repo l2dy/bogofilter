@@ -357,7 +357,7 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 		buff += format_string(buff, spam_header_name, 0, prec, flags, end);
 		break;
 	    case 'I':		/* I - received IP address */
-		buff += format_string(buff, ipaddr->text, 0, prec, flags, end);
+		buff += format_string(buff, ipaddr ? (const char *)ipaddr->text : "UNKNOWN", 0, prec, flags, end);
 		break;
 	    case 'l':		/* l - logging tag */
 		buff += format_string(buff, logtag, 0, prec, flags, end);
