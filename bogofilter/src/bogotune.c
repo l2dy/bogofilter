@@ -116,6 +116,7 @@ char *ds_path;
 
 extern double robx, robs;
 
+bool	bogolex = false;	/* true if convert input to msg-count format */
 word_t *w_msg_count;
 wordhash_t *t_ns, *t_sp;
 
@@ -156,6 +157,7 @@ static int  load_hook(word_t *key, dsv_t *data, void *userdata);
 static void load_wordlist(ds_foreach_t *hook, void *userdata);
 static void show_elapsed_time(int beg, int end, uint cnt, double val, 
 			      const char *lbl1, const char *lbl2);
+static void write_msgcount_file(wordhash_t *wh);
 
 /* Function Definitions */
 
@@ -570,11 +572,16 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 
 	if (whc->count != 0) {
 	    count += 1;
-	    if (!msg_count_file)
-		whp = convert_wordhash_to_propslist(whc, train);
-	    else
-		whp = convert_propslist_to_countlist(whc);
-	    msglist_add(msgs, whp);
+	    if (bogolex) {
+		write_msgcount_file(whc);
+	    }
+	    else {
+		if (!msg_count_file)
+		    whp = convert_wordhash_to_propslist(whc, train);
+		else
+		    whp = convert_propslist_to_countlist(whc);
+		msglist_add(msgs, whp);
+	    }
 	}
 
 	if (whc != whp)
@@ -696,6 +703,36 @@ static void create_countlists(tunelist_t *ns_or_sp)
     return;
 }
 
+/* write_msgcount_file()
+**
+**	Create a message count file from the original messages
+*/
+
+static void print_msgcount_entry(const char *token, uint bad, uint good)
+{
+    printf( "\"%s\" %d %d\n", token, bad, good);
+}
+
+static void write_msgcount_file(wordhash_t *wh)
+{
+    hashnode_t *n;
+    wordhash_t *train = ns_and_sp->train;
+
+    print_msgcount_entry(".MSG_COUNT", msgs_bad, msgs_good);
+
+    wordhash_sort(wh);
+
+    for (n = wordhash_first(wh); n != NULL; n = wordhash_next(wh)) {
+	word_t *key = n->key;
+	if (key != NULL && strcmp(key->text, ".MSG_COUNT") != 0) {
+	    wordprop_t *p = wordhash_insert(train, key, sizeof(wordprop_t), NULL);
+	    print_msgcount_entry(key->text, p->cnts.bad, p->cnts.good);
+	}
+    }
+
+    return;
+}
+
 static void usage(void)
 {
     (void)fprintf(stderr, 
@@ -712,6 +749,7 @@ static void help(void)
 		  "\t  -c file - read specified config file.\n"
 		  "\t  -D      - don't read a wordlist file.\n"
 		  "\t  -d path - specify directory for wordlists.\n"
+		  "\t  -M      - output input file in message count format.\n"
 		  "\t  -r      - specify robx value\n"
 		  "\t  -s file1 file2 ... - spam files\n"
 		  "\t  -n file1 file2 ... - non-spam files\n" 
@@ -756,6 +794,9 @@ static int process_args(int argc, char **argv)
 				*/
 		    force = true;
 		    break;
+		case 'M':
+		    bogolex = true;
+		    break;
 		case 'n':
 		    run_type = REG_GOOD;
 		    break;
@@ -787,7 +828,8 @@ static int process_args(int argc, char **argv)
 	    filelist_add( (run_type == REG_GOOD) ? ham_files : spam_files, arg);
     }
 
-    if (spam_files->count == 0 || ham_files->count == 0) {
+    if (!bogolex && 
+	(spam_files->count == 0 || ham_files->count == 0)) {
 	fprintf(stderr, 
 		"Bogotune needs both non-spam and spam messages sets for its testing.\n");
 	exit(EX_ERROR);
@@ -837,6 +879,11 @@ static int load_hook(word_t *key, dsv_t *data, void *userdata)
     tokenprop->cnts.bad = data->spamcount;
     tokenprop->cnts.good = data->goodcount;
 
+    if (strcmp(key->text, ".MSG_COUNT") == 0) {
+	msgs_bad  = data->spamcount;
+	msgs_good = data->goodcount;
+    }
+	
     return 0;
 }
 
@@ -1116,6 +1163,24 @@ static void bogotune_free(void)
     return;
 }
 
+static bool check_msgcount_parms(void)
+{
+    bool ok = true;
+
+    if (ds_file == NULL) {
+	fprintf(stderr, "A wordlist directory must be specified for converting message to the message count format.\n");
+	ok = false;
+    }
+
+    if (ham_files->count != 0 && spam_files->count != 0) {
+	fprintf(stderr, "Message count files may be created from spam or non-spam inputs but not both.\n");
+	fprintf(stderr, "Run bogotune once for the spam and again for the non-spam.\n");
+	ok = false;
+    }
+
+    return ok;
+}
+
 static bool check_msg_counts(void)
 {
     bool ok = true;
@@ -1161,6 +1226,13 @@ static rc_t bogotune(void)
 
     bogotune_init();
 
+    if (bogolex) {
+	if (check_msgcount_parms())
+	    load_wordlist(load_hook, ns_and_sp->train);
+	else
+	    exit(EX_ERROR);
+    }
+
     beg = time(NULL);
 
     ham_cutoff = 0.0;
@@ -1178,6 +1250,9 @@ static rc_t bogotune(void)
     if (verbose >= TIME) {
 	show_elapsed_time(beg, end, ns_cnt + sp_cnt, (double)cnt/(end-beg), "messages", "msg/sec");
     }
+
+    if (bogolex)
+	return status;
 
     distribute(REG_SPAM, sp_msglists);
     distribute(REG_GOOD, ns_msglists);
