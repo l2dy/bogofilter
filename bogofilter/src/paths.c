@@ -166,6 +166,8 @@ char *get_directory(priority_t which)
     return dir;
 }
 
+/** returns malloc()ed copy of the file name part of \a path.
+ */
 char *get_file_from_path(const char *path)
 {
     char *file = strrchr(path, DIRSEP_C);
@@ -176,6 +178,8 @@ char *get_file_from_path(const char *path)
     return file;
 }
 
+/** returns malloc()ed copy of the directory name of \a path.
+ */
 char *get_directory_from_path(const char *path)
 {
     char *dir = xstrdup(path);

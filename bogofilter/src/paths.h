@@ -43,6 +43,9 @@ char *create_path_from_env(const char *var,
 
 char *get_directory(priority_t which);
 
+/** \return malloc'd copy of just the file name of \a path */
+char *get_file_from_path(const char *path);
+
 /** \return malloc'd copy of just the directory name of \a path */
 char *get_directory_from_path(const char *path);
 
