@@ -65,8 +65,7 @@ static uint32_t token_prefix_len;
 #define NONBLANK "spc:invalid_end_of_header"
 static word_t *nonblank_line = NULL;
 
-#define WCLEAR(n)	n.leng = 0
-#define WFREE(n)	word_free(n); n = NULL
+#define WFREE(n)	do { word_free((n)); (n) = NULL; } while(0)
 
 /* Function Prototypes */
 
