@@ -25,7 +25,7 @@ AUTHOR:
 
 #include "error.h"
 
-void print_error( const char *file, int line, const char *format, ... )
+void print_error( const char *file, unsigned long line, const char *format, ... )
 {
     pid_t pid = getpid();
     char message[256];
@@ -37,5 +37,5 @@ void print_error( const char *file, int line, const char *format, ... )
 
     fprintf( stderr, "%s: %s\n", progname, message );
     if (logflag)
-	syslog( LOG_INFO, "[%u] %s:%d:  %s", pid, file, line, message );
+	syslog( LOG_INFO, "[%u] %s:%lu:  %s", pid, file, line, message );
 }
