@@ -841,7 +841,9 @@ static void final_recommendations(void)
 	}
 
 	printf("%sspam_cutoff=%5.3f\t# for %4.2f%% false positives; expect %4.2f%% false neg.\n",
-	       comment, cutoff, (mn != 1) ? 100.0 / mn : 100.0 * fp / ns_cnt, 100.0 * fn / sp_cnt);
+	       comment, cutoff, 
+	       (mn != 1) ? 100.0 / mn : 100.0 * fp / ns_cnt, 
+	       100.0 * fn / sp_cnt);
 
 	if (verbose >= PARMS)
 	    printf("# mn %5d, ns_cnt %5d, sp_cnt %5d, fp %3d, fn %3d\n",
@@ -894,9 +896,8 @@ static void bogotune_free(void)
 
 static rc_t bogotune(void)
 {
-    uint scan;
     int beg, end;
-    uint cnt;
+    uint cnt, scan;
     rc_t status = RC_OK;
 
     wordprop_t *props;
@@ -1080,7 +1081,7 @@ static rc_t bogotune(void)
 		    if (verbose >= SUMMARY) {
 			if (verbose > SUMMARY)
 			    printf( "%3d  %d %d %d  ", cnt, rsi, mdi, rxi);
-			printf( "%6.4f %5.3f %5.3f %8.6f %d %d\n", robs, min_dev, robx, spam_cutoff, fp, fn);
+			printf( "%6.4f %5.3f %5.3f %8.6f %3d %3d\n", robs, min_dev, robx, spam_cutoff, fp, fn);
 			fflush(stdout);
 		    }
 		    else {
