@@ -18,7 +18,7 @@ AUTHOR:
 
 #include "error.h"
 
-#if NEEDTRIO
+#ifdef NEEDTRIO
 #include <trio.h>
 #endif
 

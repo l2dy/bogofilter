@@ -19,6 +19,7 @@ AUTHOR:
 #include <string.h>
 #include <errno.h>
 
+#include "bogoconfig.h"
 #include "bogofilter.h"
 #include "bool.h"
 #include "maint.h"

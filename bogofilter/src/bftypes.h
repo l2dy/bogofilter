@@ -124,7 +124,7 @@ typedef uint8_t u_int8_t;
 
 typedef uint32_t YYYYMMDD;	/* date as YYYYMMDD */
 
-#if HAVE_SIZE_T
+#ifdef HAVE_SIZE_T
 #if SIZEOF_INT > SIZEOF_SIZE_T
 #error "int is wider than size_t. The current code is not designed to work on such systems and needs review."
 #endif

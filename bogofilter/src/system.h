@@ -58,11 +58,11 @@ NAME:
 # endif
 #endif
 
-#if !HAVE_STRLCPY
+#ifndef HAVE_STRLCPY
 size_t strlcpy(/*@out@*/ char *dst, const char *src, size_t size);
 #endif
 
-#if !HAVE_STRLCAT
+#ifndef HAVE_STRLCAT
 size_t strlcat(/*@out@*/ char *dst, const char *src, size_t size);
 #endif
 

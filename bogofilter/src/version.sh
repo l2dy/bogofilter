@@ -47,4 +47,5 @@ if [ ! -z "$SUFFIX" ]; then
     VERSION="$VERSION.$DATE"
 fi
 
+echo "#include \"globals.h\""
 echo "const char * const version = \"$VERSION\";"

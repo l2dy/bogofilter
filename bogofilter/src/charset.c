@@ -325,7 +325,7 @@ typedef struct charset_def {
 #define	T	true
 #define	F	false
 
-charset_def_t charsets[] = {
+static charset_def_t charsets[] = {
     { "default",	&map_default,	   T },
     { "us-ascii",	&map_us_ascii,	   T },
 #if	1

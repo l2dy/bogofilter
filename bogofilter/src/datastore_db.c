@@ -19,7 +19,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include <errno.h>
 #include <sys/resource.h>
 
-#if NEEDTRIO
+#ifdef NEEDTRIO
 #include <trio.h>
 #endif
 
