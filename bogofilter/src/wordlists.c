@@ -216,10 +216,10 @@ bool close_wordlists(wordlist_t *list, bool commit /** if unset, abort */)
     return err;
 }
 
-bool build_wordlist_path(char *filepath, size_t size, const char *path)
+void build_wordlist_path(char *filepath, size_t size, const char *path)
 {
-    bool ok = build_path(filepath, size, path, WORDLIST);
-    return ok;
+    build_path(filepath, size, path, WORDLIST);
+    return;
 }
 
 #ifdef COMPILE_DEAD_CODE
