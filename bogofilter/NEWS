@@ -21,7 +21,12 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
-0.93.2	2004-11-??
+0.93.2	2004-12-??
+
+	2004-12-01
+
+	* Accuracy fix: no longer pretend that we had seen an empty message
+	  registered when there was no registration. Use ROBX for spamicity.
 
 	2004-11-29
 
