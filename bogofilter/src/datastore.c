@@ -432,7 +432,7 @@ const char *ds_version_str(void)
     return db_version_str();
 }
 
-int ds_recover(int catastrophic)
+int ds_recover(const char *directory, int catastrophic)
 {
-    return dbe_recover(catastrophic, 1);
+    return dbe_recover(directory, catastrophic, 1);
 }

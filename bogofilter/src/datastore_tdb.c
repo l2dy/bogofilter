@@ -373,7 +373,8 @@ void dbe_cleanup(void *d)
 int dbe_txn_begin(void *d) { (void)d; return 0; }
 int dbe_txn_abort(void *d) { (void)d; return 0; }
 int dbe_txn_commit(void *d) { (void)d; return 0; }
-int dbe_recover(int a, int b) {
+int dbe_recover(const char *d, int a, int b) {
+    (void)d;
     (void)a;
     (void)b;
 

@@ -238,7 +238,7 @@ extern int ds_lock(int fd, int cmd, short int type);
 /** Returns version string. */
 extern const char *ds_version_str(void);
 
-/** Runs recovery on data base */
-extern int ds_recover(int);
+/** Runs forced recovery on data base */
+extern int ds_recover(const char *directory, int catastrophic);
 
 #endif

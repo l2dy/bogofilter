@@ -368,8 +368,9 @@ int dbe_txn_commit(void *d)
     return 0;
 }
 
-int dbe_recover(int a, int b)
+int dbe_recover(const char *d, int a, int b)
 {
+    UNUSED(d);
     UNUSED(a);
     UNUSED(b);
 

@@ -80,7 +80,7 @@ int dbe_txn_begin(void *vhandle);
 int dbe_txn_abort(void *vhandle);
 int dbe_txn_commit(void *vhandle);
 
-int dbe_recover(int catastrophic, int force);
+int dbe_recover(const char *directory, int catastrophic, int force);
 
 /* Returns is_swapped flag */
 bool db_is_swapped(void *vhandle);
