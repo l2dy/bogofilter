@@ -51,10 +51,12 @@ map_rc()
 
 #standard test (bogodir.log=3225)
 OPTS=" -x d -vv -D"
+
 #a bit more info (bogodir.log=5071)
-OPTS=" -x dcw -vvv -D"
+#OPTS=" -x dcw -vvv -D"
+
 #everything (bogodir.log=5416)
-OPTS=" -x cdfghlmrstw -vvvv -D"
+#OPTS=" -x cdfghlmrstw -vvvv -D"
 
 # just $HOME should display /home/userid
 unset BOGOFILTER_DIR
