@@ -69,6 +69,8 @@ CONTRIBUTORS:
 char outfname[PATH_LEN] = "";
 
 run_t run_type = RUN_UNKNOWN;
+bool  run_classify = false;
+bool  run_register = false;
 
 const char *logtag = NULL;
 
@@ -256,11 +258,10 @@ static bool select_algorithm(const unsigned char ch, bool cmdline)
 
 static int validate_args(void)
 {
-    bool registration, classification;
 
 /*  flags '-s', '-n', '-S', or '-N', are mutually exclusive of flags '-p', '-u', '-e', and '-R'. */
-    classification = (run_type & (RUN_NORMAL | RUN_UPDATE)) || passthrough || nonspam_exits_zero || (Rtable != 0);
-    registration   = (run_type & (REG_SPAM | REG_GOOD | UNREG_SPAM | UNREG_GOOD)) != 0;
+    run_classify = (run_type & (RUN_NORMAL | RUN_UPDATE)) != 0;
+    run_register = (run_type & (REG_SPAM | REG_GOOD | UNREG_SPAM | UNREG_GOOD)) != 0;
 
     if (*outfname && !passthrough)
     {
@@ -269,7 +270,7 @@ static int validate_args(void)
 		      outfname);
     }
     
-    if (registration && classification)
+    if (run_register && (run_classify || passthrough || nonspam_exits_zero || (Rtable != 0)))
     {
 	(void)fprintf(stderr, 
 		      "Error:  Invalid combination of options.\n"

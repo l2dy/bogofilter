@@ -151,7 +151,7 @@ static int arg_foreach(arg_foreach_t hook, int argc, char **argv)
 	exitcode = !error ? 0 : 1;
 
 	if (bulk_mode == B_NORMAL) {
-	    if ((run_type & (REG_SPAM | REG_GOOD | UNREG_SPAM | UNREG_GOOD)) != 0)
+	    if (run_register)
 		done = true;
 	    else {
 		if (status != RC_MORE) {
@@ -181,11 +181,10 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     initialize(NULL);
 
-    if (run_type & (RUN_NORMAL | RUN_UPDATE)) {
+    if (run_classify)
 	exitcode = arg_foreach(classify, argc, argv);
-    } else {
+    else
 	exitcode = arg_foreach(register_messages, argc, argv);
-    }
 
     close_wordlists(false);
     free_wordlists();

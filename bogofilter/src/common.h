@@ -64,6 +64,8 @@ typedef enum run_e {
     UNREG_GOOD = BIT(5)
 } run_t;
 extern run_t run_type;
+extern bool  run_classify;
+extern bool  run_register;
 
 typedef struct {
     double mant;
