@@ -31,6 +31,7 @@ AUTHOR:
 #include "lexer.h"
 #include "bogofilter.h"
 #include "bogoconfig.h"
+#include "register.h"
 
 #define BOGODIR ".bogofilter"
 

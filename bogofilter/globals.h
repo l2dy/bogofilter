@@ -3,6 +3,8 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#undef	HAVE_CHARSET
+
 #include <float.h> /* has DBL_EPSILON */
 #define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
 
@@ -16,6 +18,7 @@ extern int verbose;		/* '-v' */
 extern bool stats_in_header;
 
 extern int thresh_index;
+extern int max_repeats;
 extern double thresh_stats;
 extern double thresh_rtable;
 
