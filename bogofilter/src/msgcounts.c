@@ -28,6 +28,7 @@ size_t	msg_count_leng = MSG_COUNT_MAX_LEN;
 char   *msg_count_text = msg_count_chars;
 
 const char *msg_count_header = "\".MSG_COUNT\"";
+size_t	    msg_count_header_len = 0;
 
 long	msgs_good = 0L;
 long	msgs_bad  = 0L;
@@ -44,11 +45,10 @@ token_t  msg_count_lex(void)
     else {
 	msg_count_leng = strlen(msg_count_text);
 
-	while (msg_count_leng > 0 && isspace(msg_count_text[msg_count_leng-1])) {
-	    msg_count_leng -= 1;
-	    msg_count_text[msg_count_leng] = '\0';
-	}
-	if ( memcmp(msg_count_text, msg_count_header, strlen(msg_count_header)) == 0 )
+	if (msg_count_header_len == 0)
+	    msg_count_header_len= strlen(msg_count_header);
+
+	if ( memcmp(msg_count_text, msg_count_header, msg_count_header_len) == 0 )
 	    return MSG_COUNT_LINE;
 	else
 	    return BOGO_LEX_LINE;
