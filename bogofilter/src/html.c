@@ -10,10 +10,10 @@ AUTHOR:
 
 ******************************************************************************/
 
+#include "common.h"
+
 #include <ctype.h>
 #include <stdlib.h>
-
-#include "common.h"
 
 #include "html.h"
 #include "lexer.h"
