@@ -26,8 +26,6 @@ AUTHOR:
 #include "token.h"
 #include "xmemrchr.h"
 
-typedef enum { R_INIT, R_SAVE, R_DONE } R_STATE;
-
 /* Local Variables */
 
 word_t *yylval = NULL;
@@ -35,7 +33,6 @@ word_t *ipaddr = NULL;		/* First IP Address in Received: statement */
 
 static token_t save_class = NONE;
 static word_t *ipsave = NULL;
-static R_STATE r_state;
 
 static word_t *w_to   = NULL;	/* To:          */
 static word_t *w_from = NULL;	/* From:        */
@@ -51,6 +48,8 @@ bool block_on_subnets = false;
 
 static word_t *token_prefix = NULL;
 static word_t *nonblank_line = NULL;
+
+#define WFREE(n)  word_free(n); n = NULL/* Global Variables */
 
 /* Function Prototypes */
 
@@ -173,15 +172,21 @@ token_t get_token(void)
 	    }
 	    break;
 
-	case IPADDR:
-	    if ((token_prefix == w_recv) &&
-		(r_state == R_INIT || r_state == R_SAVE) &&
-		(strcmp(yylval->text, "127.0.0.1") != 0)) {
+	case MSGADDR:
+	    /* trim brackets */
+	    yylval->leng -= 2;
+	    memcpy(yylval->text, yylval->text+1, yylval->leng);
+	    Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
+	    /* if top level, no address, not localhost, .... */
+	    if (token_prefix == w_recv &&
+		msg_state == msg_state->parent && 
+		ipaddr == NULL &&
+		strcmp(yylval->text, "127.0.0.1") != 0) {
 		/* Not guaranteed to be the originating address of the message. */
-		r_state = R_SAVE;
 		word_free(ipaddr);
 		ipaddr = word_dup(yylval);
 	    }
+	case IPADDR:
 	    if (block_on_subnets)
 	    {
 		const byte *prefix = (wordlist_version >= IP_PREFIX) ? (const byte *)"ip:" : (const byte *)"url:";
@@ -272,8 +277,7 @@ token_t get_token(void)
 void token_init(void)
 {
     yyinit();
-
-    r_state = R_INIT;
+    WFREE(ipaddr);
 
     if (!msg_count_file)
 	mime_reset();
@@ -329,11 +333,8 @@ void set_tag(const char *text)
     case 'r':
 	if (tolower(text[2]) == 't')
 	    token_prefix = w_rtrn;	/* Return-Path: */
-	else {
+	else
 	    token_prefix = w_recv;	/* Received: */
-	    if (r_state == R_SAVE)
-		r_state = R_DONE;
-	}
 	break;
     case 's':
 	token_prefix = w_subj;		/* Subject: */
@@ -346,8 +347,6 @@ void set_tag(const char *text)
     }
     return;
 }
-
-#define WFREE(n)  word_free(n); n = NULL
 
 /* Cleanup storage allocation */
 void token_cleanup()

@@ -27,6 +27,7 @@ typedef enum {
     EOH,	/* end-of-header (empty line) */
     BOUNDARY,	/* MIME multipart boundary line */
     IPADDR,	/* IP address */
+    MSGADDR,	/* Message's IP address */
     VERP,	/* Variable Envelope Return Path */
     MSG_COUNT_LINE,
     BOGO_LEX_LINE

@@ -288,6 +288,9 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 "<"\!DOCTYPE\ HTML\ PUBLIC\ .*">" 		{ BEGIN HTML; }
 
 {IPADDR}					{ return IPADDR;}
+"\["({IPADDR})"\]"				{ return MSGADDR;}
+
+
 {TOKEN}						{ return TOKEN;}
 
 <HTML>{TOKEN_12}?{HTML_ENCODING}		{ html_char(); }	/* process escaped chars, eg '&#101;' is 'a' */
