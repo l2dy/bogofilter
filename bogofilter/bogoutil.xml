@@ -10,20 +10,24 @@
     <refpurpose>Dumps and load bogofilter database files</refpurpose>
   </refnamediv>
   <refsynopsisdiv id="synopsis">
+
     <cmdsynopsis>
       <command>bogoutil</command>
       <group choice="req">
-        <arg>-d</arg>
-        <arg>-l</arg>
-        <arg>-w</arg>
+        <arg choice="plain">-d</arg>
+	<arg choice="plain">-l</arg>
+        <arg choice="plain">-w
+        <arg choice="opt">-p</arg></arg>
       </group>
+      <arg choice="opt">-v</arg>
       <arg choice="plain"><replaceable>file.db</replaceable></arg>
-      <group choice="opt">
-        <arg>-p</arg>
-        <arg>-v</arg>
-        <arg>-h</arg>
-        <arg>-V</arg>
-      </group>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>bogoutil</command>
+      <group choice="req">
+        <arg choice="plain">-h</arg>
+	<arg choice="plain">-V</arg>
+    </group>
     </cmdsynopsis>
   </refsynopsisdiv>
   <refsect1 id="description">
