@@ -95,8 +95,11 @@ int db_txn_commit(void *vhandle);
 /** Recover the environment given in \a directory. */
 ex_t dbe_recover(bfdir *directory, bool catastrophic, bool force);
 
-/** Remove the environment given in \a directory. */
+/** Remove the environment from \a directory. */
 ex_t dbe_remove(bfdir *directory);
+
+/** Checkpoint environment in \a directory. */
+ex_t dbe_checkpoint(bfdir *directory);
 
 /** Mark inactive and remove older write-ahead log files. */
 ex_t dbe_purgelogs(bfdir *directory);

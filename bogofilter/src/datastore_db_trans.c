@@ -693,6 +693,9 @@ static ex_t dbe_env_purgelogs(DB_ENV *dbe)
     }
 
     if (list != NULL) {
+	if (DEBUG_DATABASE(0))
+	    fprintf(dbgout, "removing inactive logfiles\n");
+
 	for (i = list; *i != NULL; i++) {
 	    if (DEBUG_DATABASE(1))
 		fprintf(dbgout, " removing logfile %s\n", *i);
@@ -708,13 +711,9 @@ static ex_t dbe_env_purgelogs(DB_ENV *dbe)
     return EX_OK;
 }
 
-ex_t dbe_purgelogs(bfdir *directory)
-{
+/** checkpoint the open environment \a dbe once and unconditionally */
+static ex_t dbe_env_checkpoint(DB_ENV *dbe) {
     int e;
-    DB_ENV *dbe = dbe_recover_open(directory, 0);
-
-    if (!dbe)
-	exit(EX_ERROR);
 
     if (DEBUG_DATABASE(0))
 	fprintf(dbgout, "checkpoint database\n");
@@ -728,12 +727,38 @@ ex_t dbe_purgelogs(bfdir *directory)
 	exit(EX_ERROR);
     }
 
-    if (DEBUG_DATABASE(0))
-	fprintf(dbgout, "removing inactive logfiles\n");
+    return EX_OK;
+}
 
-    dbe_env_purgelogs(dbe);
+static ex_t dbe_simpleop(bfdir *directory, ex_t func(DB_ENV *env))
+{
+    ex_t e;
 
-    return dbx_common_close(dbe, directory);
+    DB_ENV *dbe = dbe_recover_open(directory, 0);
+    if (!dbe)
+	exit(EX_ERROR);
+
+    e = func(dbe);
+    dbx_common_close(dbe, directory);
+    return e;
+}
+
+ex_t dbe_checkpoint(bfdir *directory)
+{
+    return dbe_simpleop(directory, dbe_env_checkpoint);
+}
+
+static ex_t i_purgelogs(DB_ENV *dbe)
+{
+    int e;
+    if ((e = dbe_env_checkpoint(dbe)))
+	return e;
+    return dbe_env_purgelogs(dbe);
+}
+
+ex_t dbe_purgelogs(bfdir *directory)
+{
+    return dbe_simpleop(directory, i_purgelogs);
 }
 
 ex_t dbe_remove(bfdir *directory)
@@ -772,6 +797,7 @@ const char **dsm_help_bogoutil(void)
 	"      --db-transaction=BOOL   - enable or disable transactions\n",
 	"                                (only effective at creation time)\n",
 	"      --db-verify=file        - verify data file.\n",
+	"      --db-checkpoint=dir     - flush buffer cache and checkpoint database\n",
 	"      --db-prune=dir          - remove inactive log files in dir.\n",
 	"      --db-recover=dir        - run recovery on database in dir.\n",
 	"      --db-recover-harder=dir - run catastrophic recovery on database.\n",
@@ -835,6 +861,12 @@ void dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_f
 
     case O_DB_RECOVER_HARDER:
 	*flag = M_CRECOVER;
+	*count += 1;
+	*ds_file = val;
+	break;
+
+    case O_DB_CHECKPOINT:
+	*flag = M_CHECKPOINT;
 	*count += 1;
 	*ds_file = val;
 	break;
