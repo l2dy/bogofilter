@@ -308,8 +308,8 @@ static int words_from_list(const char *db_file, int argc, char **argv)
 
     if ( argc == 0)
     {
-	char buf[BUFSIZE];
-	buff_t *buff = buff_new((byte *)buf, 0, BUFSIZE);
+	byte buf[BUFSIZE];
+	buff_t *buff = buff_new(buf, 0, BUFSIZE);
 	while (get_token(buff, stdin) == 0) {
 	    word_t *token = &buff->t;
 	    uint32_t count = db_getvalue(dbh, token);
@@ -321,8 +321,8 @@ static int words_from_list(const char *db_file, int argc, char **argv)
     else
     {
 	while (argc-- > 0) {
-	    char *word = *argv++;
-	    word_t *token = word_new((byte *)word, strlen(word));
+	    const byte *word = (const byte *) *argv++;
+	    word_t *token = word_new(word, strlen(word));
 	    uint32_t count = db_getvalue(dbh, token);
 	    word_puts(token, 0, stdout);
 	    printf(" %lu\n", (unsigned long) count);
@@ -340,9 +340,9 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     void *dbh_good;
     void *dbh_spam;
     char filepath[PATH_LEN];
-    char buf[BUFSIZE];
-    buff_t *buff = buff_new((byte *)buf, 0, BUFSIZE);
-    char *word = buf;
+    byte buf[BUFSIZE];
+    buff_t *buff = buff_new(buf, 0, BUFSIZE);
+    const byte *word = buf;
     unsigned long spam_count, spam_msg_count = 0 ;
     unsigned long good_count, good_msg_count = 0 ;
 
@@ -381,10 +381,10 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 		break;
 	    token = &buff->t;
 	} else {
-	    word = *argv++;
+	    word = (const byte *) *argv++;
 	    if (--argc == 0)
 		argc = -1;
-	    token = word_new((byte *)word, strlen(word));
+	    token = word_new(word, strlen(word));
 	}
 
 	spam_count = db_getvalue(dbh_spam, token);
