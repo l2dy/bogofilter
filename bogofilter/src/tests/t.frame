@@ -32,7 +32,7 @@ _POSIX2_VERSION=199209
 export _POSIX2_VERSION
 
 # Obtain data base file suffix
-DB_NAME=`$BOGOFILTER -V 2>&1 | sed -n '2p;'`
+DB_NAME=`$BOGOFILTER -C -V 2>&1 | sed -n '2p;'`
 case $DB_NAME in
     *BerkeleyDB*)   DB_EXT=db ;;
     *QDBM*)	    DB_EXT=qdbm ;;
