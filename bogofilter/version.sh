@@ -9,9 +9,9 @@
 #	the 4 digit date is the newer of the two $Id: dates
 #	in main.c and bogofilter.c
 #
-#	#define BOGOFILTER_VERSION "0.7.5"
+#	const char *const version = "0.9.1"
 # or:
-#	#define BOGOFILTER_VERSION "0.7.5.cvs.1012"
+#	const char *const version = "0.9.1.cvs.1130"
 
 VERSION=`grep define.VERSION config.h | awk '{print $3}' | tr -d '"'`
 
@@ -31,5 +31,4 @@ if [ ! -z "$SUFFIX" ]; then
    VERSION="$VERSION.$DATE"
 fi
 
-echo "#undef  VERSION"
-echo "#define VERSION \"$VERSION\""
+echo "const char * const version = \"$VERSION\";"
