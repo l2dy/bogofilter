@@ -47,11 +47,8 @@ void compute_msg_counts()
 
 void set_msg_counts(char *s)
 {
-    while (isspace((unsigned char) *s))
-	   s += 1;
     msgs_bad = atoi(s);
-    while (isdigit((unsigned char) *s))
-	   s += 1;
+    s = index(s, ' ') + 1;
     msgs_good = atoi(s);
 }
 

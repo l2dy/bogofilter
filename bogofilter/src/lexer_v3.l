@@ -157,13 +157,17 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 %%
 
 ^From\ 						{ if (msg_header && is_from(yy_text())) { 
-						      BEGIN(INITIAL); return FROM;
+						      BEGIN(INITIAL); 
+						      return FROM;
 						  } else { 
 						      return TOKEN;
 						  }
 						}
 
-<INITIAL,BOGO_LEX>{MSG_COUNT}{NUM_NUM}		{ if (lineno == 0) { BEGIN(BOGO_LEX); } 
+<INITIAL,BOGO_LEX>{MSG_COUNT}{NUM_NUM}		{ if (lineno == 0) { 
+						      BEGIN(BOGO_LEX); 
+						      set_msg_counts(index(yytext, ' ') + 1); 
+						  }
 						  return MSG_COUNT_LINE;
 						}
 <BOGO_LEX>^\"{BOGOLEX_TOKEN}\"{NUM_NUM}		{ return BOGO_LEX_LINE; }
