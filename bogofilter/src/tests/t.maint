@@ -20,11 +20,11 @@ count 2 -> 938
 count 3 -> 603
 EOF
 
-echo initial: `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db | wc -l` > $OUT
+echo initial: `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.$DB_EXT | wc -l` > $OUT
 
 for cnt in 0 1 2 3 ; do
-    $BOGOUTIL -c $cnt -m $BOGOFILTER_DIR/wordlist.db
-    echo "count $cnt ->" `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db | wc -l` >> $OUT
+    $BOGOUTIL -c $cnt -m $BOGOFILTER_DIR/wordlist.$DB_EXT
+    echo "count $cnt ->" `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.$DB_EXT | wc -l` >> $OUT
 done
 
 if  [ $verbose -eq 0 ]; then
