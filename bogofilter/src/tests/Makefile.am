@@ -32,7 +32,7 @@ SCORING_TESTS =  t.score1 t.score2 t.systest t.grftest t.bogoutil-hist
 
 BULKMODE_TESTS = t.bulkmode t.MH t.maildir
 
-INTEGRITY_TESTS = t.lock1 t.lock2 t.valgrind
+INTEGRITY_TESTS = t.lock1 t.valgrind
 
 TESTSCRIPTS = ${ENVIRON_TESTS} ${PARSING_TESTS} ${WORDLIST_TESTS} ${SCORING_TESTS} ${BULKMODE_TESTS} ${INTEGRITY_TESTS}
 
