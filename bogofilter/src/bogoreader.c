@@ -193,14 +193,14 @@ static bool open_object(char *obj)
 	    fprintf(stderr, "Can't open file '%s': %s\n", filename,
 		    strerror(errno));
 	    return false;
-	}
-	else {
+	} else {
 	    emptyline = false;
 	    mail_first = true;
 	    reader_getline   = mbox_mode ? mailbox_getline   : simple_getline;
 	    object_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
 	    return true;
 	}
+	break; /* not reached */
     case IS_DIR:
 	if (ismaildir(filename) == IS_DIR) {
 	    /* MAILDIR */
@@ -208,16 +208,16 @@ static bool open_object(char *obj)
 	    reader_getline   = simple_getline;
 	    object_next_mail = maildir_next_mail;
 	    return true;
-	} 
-	else {
+	} else {
 	    /* MH */
 	    mh_init(filename);
 	    reader_getline   = simple_getline;
 	    object_next_mail = mh_next_mail;
 	    return true;
-	} 
-	/* fallthrough to error */
+	}
+	break; /* notreached */
     case IS_ERR:
+    default:
 	fprintf(stderr, "Can't identify type of object '%s'\n", filename);
     }
     return false;
@@ -291,69 +291,72 @@ static bool mailbox_next_mail(void)
 static bool maildir_next_mail(void)
 {
     struct dirent *dirent;
+    struct stat st;
 
-trynext: /* ugly but simple */
-    if (reader_dir == NULL) {
-	/* open next directory */
-	char *x;
-	size_t siz;
+    while(true) {
+	if (reader_dir == NULL) {
+	    /* open next directory */
+	    char *x;
+	    size_t siz;
 
-	if (*maildir_sub == NULL)
-	    return false; /* IMPORTANT for termination */
-	siz = strlen(dirname) + 4 + 1;
-	x = xmalloc(siz);
-	strlcpy(x, dirname, siz);
-	strlcat(x, *(maildir_sub++), siz);
-	reader_dir = opendir(x);
-	if (!reader_dir) {
-	    fprintf(stderr, "cannot open directory '%s': %s", x,
-		    strerror(errno));
+	    if (*maildir_sub == NULL)
+		return false; /* IMPORTANT for termination */
+	    siz = strlen(dirname) + 4 + 1;
+	    x = xmalloc(siz);
+	    strlcpy(x, dirname, siz);
+	    strlcat(x, *(maildir_sub++), siz);
+	    reader_dir = opendir(x);
+	    if (!reader_dir) {
+		fprintf(stderr, "cannot open directory '%s': %s", x,
+			strerror(errno));
+	    }
+	    free(x);
 	}
-	free(x);
-    }
 
-    while ((dirent = readdir(reader_dir)) != NULL) {
-	/* skip dot files */
-	if (dirent->d_name[0] == '.')
+	while ((dirent = readdir(reader_dir)) != NULL) {
+	    /* skip dot files */
+	    if (dirent->d_name[0] != '.')
+		break;
+	}
+
+	if (dirent == NULL) {
+	    if (reader_dir)
+		closedir(reader_dir);
+	    reader_dir = NULL;
+	    continue;
+	}
+
+	filename = namebuff;
+	snprintf(namebuff, sizeof(namebuff), "%s%s/%s", dirname, *(maildir_sub-1),
+		dirent->d_name);
+
+	if (fpin)
+	    fclose(fpin);
+	fpin = fopen( filename, "r" );
+	if (fpin == NULL) {
+	    fprintf(stderr, "Warning: can't open file '%s': %s\n", filename,
+		    strerror(errno));
+	    /* don't barf, the file may have been changed by another MUA,
+	     * or a directory that just doesn't belong there, just skip it */
+	    continue;
+	}
+
+	/* skip non-regular files */
+	if (0 == fstat(fileno(fpin), &st) && !S_ISREG(st.st_mode))
 	    continue;
 
-	/* there's no need to skip directories here, we can do that
-	 * later */
-	break;
+	if (DEBUG_READER(0))
+	    fprintf(dbgout, "%s:%d - reading %s (%p)\n", __FILE__, __LINE__, filename, fpin);
+
+	return true;
     }
-
-    if (dirent == NULL) {
-	if (reader_dir)
-	    closedir(reader_dir);
-	reader_dir = NULL;
-	goto trynext;
-    }
-
-    filename = namebuff;
-    snprintf(namebuff, sizeof(namebuff), "%s%s/%s", dirname, *(maildir_sub-1),
-	    dirent->d_name);
-
-    if (fpin)
-	fclose(fpin);
-    fpin = fopen( filename, "r" );
-    if (fpin == NULL) {
-	fprintf(stderr, "Warning: can't open file '%s': %s\n", filename,
-		strerror(errno));
-	/* don't barf, the file may have been changed by another MUA,
-	 * or a directory that just doesn't belong there, just skip it */
-	goto trynext;
-    }
-
-    if (DEBUG_READER(0))
-	fprintf(dbgout, "%s:%d - reading %s (%p)\n", __FILE__, __LINE__, filename, fpin);
-
-    return true;
 }
 
 /* iterates over files in a MH directory */
 static bool mh_next_mail(void)
 {
     struct dirent *dirent;
+    struct stat st;
 
     while (true) {
 	if (reader_dir == NULL) {
@@ -367,7 +370,7 @@ static bool mh_next_mail(void)
 	while ((dirent = readdir(reader_dir)) != NULL) {
 	    /* skip private files */
 	    if (dirent->d_name[0] != '.' &&
-		dirent->d_type == DT_REG)
+		dirent->d_name[0] != ',')
 		break;
 	}
 
@@ -391,6 +394,10 @@ static bool mh_next_mail(void)
 	     * or a directory that just doesn't belong there, just skip it */
 	    continue;
 	}
+
+	/* skip non-regular files */
+	if (0 == fstat(fileno(fpin), &st) && !S_ISREG(st.st_mode))
+	    continue;
 
 	if (DEBUG_READER(0))
 	    fprintf(dbgout, "%s:%d - reading %s (%p)\n", __FILE__, __LINE__, filename, fpin);
