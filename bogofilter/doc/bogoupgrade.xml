@@ -79,6 +79,11 @@ fire off bogofilter.</para></listitem>
 <prompt>$</prompt> <userinput>bogoupgrade -i ~/.bogofilter.safe/spamlist.count -o ~/.bogofilter/spamlist.db</userinput>
 </screen></listitem>
 
+<listitem><para>Current versions of <application>bogofilter</application> use a combined wordlist that holds both spam and non-spam tokens.  It is named wordlist.db.  If you're updating from a version older than 0.14.0 that has separate wordlists (named goodlist.db and spamlist.db), use:</para>
+<screen>
+<prompt>$</prompt> <userinput>bogoupgrade -d ~/.bogofilter.safe</userinput>
+</screen></listitem>
+
 <listitem><para>Done. Restart any stopped daemons, cron tasks,
 etc.</para></listitem>
 </orderedlist>
