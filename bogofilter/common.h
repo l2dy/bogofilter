@@ -45,7 +45,16 @@ const bool TRUE = true;
 #endif
 
 typedef enum algorithm_e { AL_GRAHAM='g', AL_ROBINSON='r' } algorithm_t;
-extern algorithm_t algorithm;
+#ifdef	GRAHAM_AND_ROBINSON
+  extern algorithm_t algorithm;
+#else
+  #ifdef	ENABLE_GRAHAM_METHOD
+    #define	algorithm	GRAHAM
+  #endif
+  #ifdef	ENABLE_ROBINSON_METHOD
+    #define	algorithm	ROBINSON
+  #endif
+#endif
 
 typedef enum dbmode_e { DB_READ = 0, DB_WRITE = 1 } dbmode_t;
 
