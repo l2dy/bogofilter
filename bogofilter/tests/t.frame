@@ -41,8 +41,22 @@ if [ "$1" != "-no-db" ]; then
     export BOGOFILTER_DIR
 
 # make GNU libc nasty and abort on memory allocation issues:
-#   MALLOC_CHECK_=2
-#   export MALLOC_CHECK_
+if true ; then
+    MALLOC_CHECK_=2
+    export MALLOC_CHECK_
+fi
+
+# use Electric Fence:
+if false ; then
+    LD_PRELOAD=libefence.so.0.0
+    EF_PROTECT_FREE=1
+    EF_FILL=85
+    EF_ALLOW_MALLOC_0=1
+    EF_PROTECT_BELOW=0
+    EF_ALIGNMENT=0
+    export LD_PRELOAD EF_PROTECT_FREE EF_FILL EF_ALLOW_MALLOC_0 EF_PROTECT_BELOW
+    export EF_ALIGNMENT
+fi
 
     ${relpath}/bogofilter -n -C </dev/null
 fi
