@@ -72,10 +72,10 @@ run_t run_type = RUN_NORMAL;
 const char *logtag = NULL;
 
 /* define default */
-#if defined (ENABLE_ROBINSON_METHOD)
-#define AL_DEFAULT AL_ROBINSON
-#elif defined (ENABLE_ROBINSON_FISHER)
+#if defined (ENABLE_ROBINSON_FISHER)
 #define AL_DEFAULT AL_FISHER
+#elif defined (ENABLE_ROBINSON_METHOD)
+#define AL_DEFAULT AL_ROBINSON
 #elif defined (ENABLE_GRAHAM_METHOD)
 #define AL_DEFAULT AL_GRAHAM
 #else
@@ -230,10 +230,10 @@ static void help(void)
 		  "\t-g\t- select Graham spam calculation method.\n"
 #endif
 #ifdef	ENABLE_ROBINSON_METHOD
-		  "\t-r\t- select Robinson spam calculation method (default).\n"
+		  "\t-r\t- select Robinson spam calculation method.\n"
 #endif
 #ifdef	ENABLE_ROBINSON_FISHER
-		  "\t-f\t- select Fisher spam calculation method.\n"
+		  "\t-f\t- select Fisher spam calculation method (default).\n"
 #endif
 #endif
 		  "\t-2\t- set binary classification mode (yes/no).\n"

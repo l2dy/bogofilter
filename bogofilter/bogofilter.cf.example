@@ -170,8 +170,8 @@ thresh_rtable = 0.0f
 #	specify scoring algorithm
 
 #algorithm=graham
-algorithm=robinson
-#algorithm=fisher
+#algorithm=robinson
+algorithm=fisher
 
 
 ##### Robinson Constants
