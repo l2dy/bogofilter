@@ -212,7 +212,6 @@ if($msgformat ne "msgcount") {
 # Calculate the cache size that should be used.
 
 my $dbsize = (stat( "$dbname/wordlist.db" ))[7];
-printf "%s\n", $dbsize/(1024*1024*3);
 if($twolist) {
     my $spamsize = (stat( "$bogodir/spamlist.db" ))[7];
     $dbsize = $spamsize if $spamsize > $dbsize;
