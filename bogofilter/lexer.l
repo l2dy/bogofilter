@@ -16,32 +16,34 @@
 #include "lexer.h"
 #include "xmalloc.h"
 
-// Our lexical analysis is different from Paul Graham's rules: 
-//
-// We throw away headers that are readily identifiable as dates.
-// We throw away text lines that look like BASE64 encoding.
-// We throw away all digit strings that don't look like IP address parts.
-// We thow away lines beginning with <tab>id<space> -- mailer UDs.
-// We throw away various bits of MIME cruft (things that look like
-// declarations and boundaries for multipart declarations).
-// We throw away *all* tokens of length 1 or 2.
-//
-// These are optimizations to keep the token lists from bloating.
-// The big win is recognizing machine-generated unique IDs that
-// we'll never see again and shouldn't 
-//
-// We don't treat dot between two alphanumerics as a separator,
-// because we want to keep domain names and IP addresses together as 
-// recognizable units. 
-//
-// Having done the above, there isn't much need to recognize URLs.  
-// If a URL is a spam indicator, very likely any other URL from the
-// same site is as well, so the hostname part should be an adequate
-// statistical trigger.  
-//
-// The list of HTML keywords and attributes to be ignored is from the 4.0 DTD.
+/*
+ * Our lexical analysis is different from Paul Graham's rules: 
+ *
+ * We throw away headers that are readily identifiable as dates.
+ * We throw away text lines that look like BASE64 encoding.
+ * We throw away all digit strings that don't look like IP address parts.
+ * We thow away lines beginning with <tab>id<space> -- mailer UDs.
+ * We throw away various bits of MIME cruft (things that look like
+ * declarations and boundaries for multipart declarations).
+ * We throw away *all* tokens of length 1 or 2.
+ *
+ * These are optimizations to keep the token lists from bloating.
+ * The big win is recognizing machine-generated unique IDs that
+ * we'll never see again and shouldn't 
+ *
+ * We don't treat dot between two alphanumerics as a separator,
+ * because we want to keep domain names and IP addresses together as 
+ * recognizable units. 
+ *
+ * Having done the above, there isn't much need to recognize URLs.  
+ * If a URL is a spam indicator, very likely any other URL from the
+ * same site is as well, so the hostname part should be an adequate
+ * statistical trigger.  
+ *
+ * The list of HTML keywords and attributes to be ignored is from the 4.0 DTD.
+ */
 
-// ignore words longer than this
+/* ignore words longer than this */
 #define MAXWORDLEN 20
 
 extern int passthrough;
@@ -267,7 +269,7 @@ int lexer_fgets(char *buf, int max_size, FILE *s)
 }
 
 static int yyinput(char *buf, int max_size)
-// input getter for the scanner
+/* input getter for the scanner */
 {
     int returned;
 
@@ -299,10 +301,10 @@ static int yyinput(char *buf, int max_size)
 
     if (passthrough)
     {
-	// Also, save the text on a linked list of lines.
-	// Note that we store fixed-length blocks here, not lines.
-	// One very long physical line could break up into more
-	// than one of these.
+	/* Also, save the text on a linked list of lines.
+	 * Note that we store fixed-length blocks here, not lines.
+	 * One very long physical line could break up into more
+	 * than one of these. */
 	textend->len = returned;
 	if (returned) {
 	    textend->block = (char *)xmalloc(returned);
@@ -353,7 +355,9 @@ token_t get_token(void)
     return(class);
 }
 
-// The following sets edit modes for GNU EMACS
-// Local Variables:
-// mode:fundamental
-// End:
+/*
+ * The following sets edit modes for GNU EMACS
+ * Local Variables:
+ * mode:c
+ * End:
+ */

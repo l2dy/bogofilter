@@ -353,7 +353,7 @@ double compute_robx( dbh_t *dbh_spam, dbh_t *dbh_good )
     for (;;) {
 	ret = dbcp_good->c_get(dbcp_good, &key, &data, DB_NEXT);
 	if (ret == 0) {
-	    word_cnt += 1;		// count words in good list
+	    word_cnt += 1;		/* count words in good list */
 	}
 	else if (ret == DB_NOTFOUND) {
 	    break;
@@ -380,7 +380,7 @@ double compute_robx( dbh_t *dbh_spam, dbh_t *dbh_good )
 	    char         *token = key.data;
 	    token[key.size] = '\0';
 
-	    // ignore system meta-data
+	    /* ignore system meta-data */
 	    if ( *token == '.')
 		continue;
 
@@ -390,12 +390,12 @@ double compute_robx( dbh_t *dbh_spam, dbh_t *dbh_good )
 	    prob = spamness / (goodness*scalefactor + spamness);
 	    sum += prob;
 
-	    // tokens in good list were already counted
-	    // now add in tokens only in spam list
+	    /* tokens in good list were already counted */
+	    /* now add in tokens only in spam list */
 	    if (goodness == 0)
 		word_cnt += 1;
 
-	    // print if token in both word lists
+	    /* print if token in both word lists */
 	    if (verbose > 1 && (goodness && spamness))
 		printf("cnt: %6d,  sum: %12.6f,  ratio: %f,  sp: %4lu,  gd: %4ld,  p: %f,  t: %s\n", word_cnt, sum, sum/word_cnt, spamness, goodness, prob, token);
 	}

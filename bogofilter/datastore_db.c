@@ -400,7 +400,7 @@ static void db_lock_list(wordlist_t *list, int type){
     /* Some locks failed. Release all acquired locks */
     db_lock_release_list(list);
 
-    //sleep for short, random time between 1 microsecond and 1 second
+    /*sleep for short, random time between 1 microsecond and 1 second */
     usleep( 1 + (unsigned long) (1000.0*rand()/(RAND_MAX+1.0)));
   }
 }

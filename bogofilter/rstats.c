@@ -135,10 +135,10 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
     rhistogram_t hist[INTERVALS];
     int maxcnt=0;
 
-    double invlogsum = 0.0;	// Robinson's P
-    double logsum = 0.0;	// Robinson's Q
+    double invlogsum = 0.0;	/* Robinson's P */
+    double logsum = 0.0;	/* Robinson's Q */
 
-    // Compute histogram
+    /* Compute histogram */
     for (i=r=0; i<INTERVALS; i+=1)
     {
 	rhistogram_t *h = &hist[i];
@@ -176,7 +176,7 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
 
     (void)fprintf(stdout, "%5s %4s %7s   %9s  %s\n", "int", "cnt", "prob", "spamicity", "histogram" );
 
-    // Print histogram
+    /* Print histogram */
     for (i=0; i<INTERVALS; i+=1)
     {
 	double beg = 1.0*i/INTERVALS;
@@ -184,13 +184,13 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
 	int cnt = h->count;
 	double prob = cnt ? h->prob/cnt : 0.0;
 
-	// print interval, count, probability, and spamicity
+	/* print interval, count, probability, and spamicity */
 	(void)fprintf(stdout, "%5.2f %4d  %f  %f  ", beg, cnt, prob, h->spamicity );
 
-	// scale histogram to 50 characters
+	/* scale histogram to 50 characters */
 	if (maxcnt>50) cnt = (cnt * 50 + maxcnt - 1) / maxcnt;
 
-	// display histogram
+	/* display histogram */
 	for (r=0; r<cnt; r+=1)
 	    (void)fputc( '#', stdout);
 	(void)fputc( '\n', stdout);
@@ -201,11 +201,11 @@ void rstats_print_rtable(int robn, rstats_t **rstats_array)
 {
     int r;
 
-    // print header
+    /* print header */
     (void)fprintf(stdout, "     %-20s%10s%10s%10s%10s%10s\n",
 		  "Token","pgood","pbad","fw","invfwlog","fwlog");
 
-    // Print 1 line per token
+    /* Print 1 line per token */
     for (r= 0; r<robn; r+=1)
     {
 	rstats_t *cur = rstats_array[r];
@@ -216,7 +216,7 @@ void rstats_print_rtable(int robn, rstats_t **rstats_array)
 		      log(1.0 - prob), log(prob));
     }
 
-    // print trailer
+    /* print trailer */
     (void)fprintf(stdout, "%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
 		  robn, "P_Q_S_invsum_logsum", header.invproduct, header.product, header.spamicity,
 		  header.invlogsum, header.logsum);
