@@ -20,7 +20,6 @@ AUTHOR:
 #include "charset.h"
 #include "error.h"
 #include "mime.h"
-#include "msgcounts.h"
 #include "word.h"
 #include "token.h"
 #include "xmemrchr.h"

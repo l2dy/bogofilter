@@ -23,7 +23,6 @@ AUTHOR:
 
 /* Globals */
 
-bool	msg_count_file = false;
 char	msg_count_chars[MSG_COUNT_MAX_LEN];
 size_t	msg_count_leng = MSG_COUNT_MAX_LEN;
 char   *msg_count_text = msg_count_chars;

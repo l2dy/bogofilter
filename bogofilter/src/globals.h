@@ -64,4 +64,6 @@ extern	const char *const system_config_file;
 enum passmode { PASS_MEM, PASS_SEEK };
 extern enum passmode passmode;
 
+extern	bool	msg_count_file;
+
 #endif
