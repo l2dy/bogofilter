@@ -9,8 +9,8 @@
 #                their locations and classes, or a stream of
 #                entries in random order, with classifiers if given
 #  needs:    bash basename rm grep awk wc perl dd
-#  usage:    see function usage() starting on line 10 of this file
-#  version:  0.11 (Greg Louis <glouis@dynamicro.on.ca>)
+#  usage:    see function usage() starting on line 14 of this file
+#  version:  0.12 (Greg Louis <glouis@dynamicro.on.ca>)
 
 pid=$$
 
@@ -99,17 +99,16 @@ if [ $stream = 0 ]; then
 	    fi
 	done
     } <shuf.$pid
-    exit 0
+else
+    # go through the list, extract the messages, mark the classes
+    {
+	while read classID fnam offset length; do
+	    if [ "$classID" != "." ]; then
+	        echo "%%-CLASS-$classID-%%"
+	    fi
+	    dd if=$fnam bs=1 skip=$offset count=$length 2>/dev/null
+	done
+    } <shuf.$pid
 fi
-
-# go through the list, extract the messages, mark the classes
-{
-    while read classID fnam offset length; do
-	if [ "$classID" != "." ]; then
-	    echo "%%-CLASS-$classID-%%"
-	fi
-	dd if=$fnam bs=1 skip=$offset count=$length 2>/dev/null
-    done
-} <shuf.$pid
 # next line can be commented out for debugging
 rm list.$pid shuf.$pid
