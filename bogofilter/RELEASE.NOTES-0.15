@@ -1,0 +1,13 @@
+With release 0.15, bogofilter's code for processing multiple messages
+has been rewritten.  Previously bogofilter could process multiple
+messages in a mailbox or in a list of message files supplied via stdin
+or on the command line.  Bogofilter now understands Maildir and MH
+directories.  This processing is done in a new module, bogoreader.c,
+which also separates a mbox into individual messages.  The net result
+is to simplify the lexer module, lexer_v3.l, and remove multiple
+special checks for message separator lines, i.e. "^From " lines.  Code
+for setting message header/body state has also been moved into the
+lexer module.  That change and removal of the "never-interactive"
+attribute makes the parser code work properly with both flex v2.5.4
+and 2.5.31. 
+
