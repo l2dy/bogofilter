@@ -70,12 +70,15 @@ my $temp; srand; do {$temp="/tmp/".rand();} until (!-e $temp);
 
 die ("$dir is not a directory or not accessible.\n") unless (-d $dir && -r $dir && -w $dir && -x $dir);
 print "\nStarting with this database:\n";
-my $dbexists=(-s "$dir/goodlist.db" || -s "$dir/wordlist.db");
-if ($dbexists) {print `bogoutil -w $dir .MSG_COUNT`,"\n";} else {print "  (empty)\n\n";}
+if (-s "$dir/goodlist.db" || -s "$dir/wordlist.db") {
+    print `bogoutil -w $dir .MSG_COUNT`,"\n";
+} else {
+    print "  (empty)\n\n"; 
+    `$bogofilter -n < /dev/null` ;
+}
 
 my $ham_total=`cat $ham|grep -c "^From "`;
 my $spam_total=`cat $spam|grep -c "^From "`;
-my $ham_spam_ratio=$ham_total/$spam_total;
 
 my ($fp,$fn);
 my $runs=0;
@@ -89,7 +92,7 @@ do { # Start force loop
   do {
 
     # Read one mail from ham box and test, train as needed
-    unless (eof(HAM) || $hamcount>$spamcount*$ham_spam_ratio+2) {
+    unless (eof(HAM) || $hamcount/$ham_total > $spamcount/$spam_total) {
       my $mail=$lasthamline;
       $lasthamline="";
       while (defined(my $line=<HAM>)) {
@@ -101,10 +104,9 @@ do { # Start force loop
         open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
         print TEMP $mail;
         close (TEMP);
-        unless ($dbexists && system("$bogofilter <$temp")/256==1) {
+        unless (system("$bogofilter <$temp")/256==1) {
           system("$bogofilter -n <$temp");
           $hamadd++;
-          $dbexists=1;
           print "Training ham message $hamcount.\n" if ($verbose);
           if ($safe) {
             open (TEMP, ">>$safeham") || die "Cannot write to $safeham: $!";
@@ -117,7 +119,7 @@ do { # Start force loop
     }
 
     # Read one mail from spam box and test, train as needed
-    unless (eof(SPAM) || $spamcount*$ham_spam_ratio>$hamcount+2) {
+    unless (eof(SPAM) || $spamcount/$spam_total > $hamcount/$ham_total) {
       my $mail=$lastspamline;
       $lastspamline="";
       while (!eof(SPAM) && defined(my $line=<SPAM>)) {
