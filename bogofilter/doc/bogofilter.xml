@@ -94,7 +94,7 @@
   <para><option>parameter options</option> are:</para>
     <cmdsynopsis>
     <arg choice='opt'>-m <replaceable><optional>value</optional>
-      <optional>,value</optional></replaceable></arg>
+      <optional>,value</optional><optional>,value</optional></replaceable></arg>
     <arg choice='opt'>-o <replaceable><optional>value</optional>
       <optional>,value</optional></replaceable></arg>
     </cmdsynopsis>
@@ -364,14 +364,16 @@ Enabling this option increases <application>bogofilter's</application> accuracy.
 <para>PARAMETER OPTIONS</para>
 
 <para>The <option>-m 
-	<replaceable><optional>value</optional><optional>,value</optional></replaceable></option>
+	<replaceable><optional>value</optional><optional>,value</optional><optional>,value</optional></replaceable></option>
       option allows setting the min_dev value and, optionally, the
-      robs value.  If one value is supplied, then min_dev is
+      robs and robx values.  If one value is supplied, then min_dev is
       set.  If a comma followed by one value is supplied, then robs
-      is set.  With two values, both min_dev and robs are set.  Note the
+      is set.  With two values, both min_dev and robs are set; with
+      three, mindev, robs and robx are set; and other combinations of
+      values and commas behave as one would expect.  Note the
       syntax is misleading, at least one of the values MUST be present,
-      and the comma determines whether it is to set the spam or the ham
-      cutoff.  Note: spaces are not allowed after the comma.
+      and the commas determine what value(s) will be set.  Note: spaces
+      are not allowed after the comma.
 </para>
 
 <para>The <option>-o
