@@ -3,7 +3,12 @@
 			       =================
 
 $Id$
-
+     
+	2003-01-12
+	* Merged mime processing code into main cvs branch.
+	* Moved most documentation files to doc directory.
+	* Renamed regression t.systest.d to bogofilter.
+	
 	2002-12-31
 	* Added sample procmail file, contrib/procmailrc.example
 	
