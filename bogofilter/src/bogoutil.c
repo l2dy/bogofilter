@@ -81,6 +81,7 @@ int ds_dump_hook(word_t *key, dsv_t *data,
 	printf(" %lu", (unsigned long)data->date);
     putchar('\n');
 
+    fflush(stdout); /* solicit ferror flag if output is shorter than buffer */
     return ferror(stdout) ? 1 : 0;
 }
 
