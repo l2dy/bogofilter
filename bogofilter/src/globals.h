@@ -77,7 +77,7 @@ extern	bool	separate_counts;	/* -Ps,-PS - default: enabled  */
 #endif
 #endif
 
-extern	uint	db_cachesize;
+extern	unsigned int	db_cachesize;
 
 extern	const char	*update_dir;
 extern	const char	*progname;
