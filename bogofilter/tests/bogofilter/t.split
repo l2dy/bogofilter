@@ -16,8 +16,8 @@ set -e
 relpath="`pwd`/../.."
 NODB=1 . ${srcdir}/../t.frame
 
-BOGOLEXER="../../bogolexer"
-BOGOFILTER="../../bogofilter"
+BOGOLEXER="$VAL ../../bogolexer"
+BOGOFILTER="$VAL ../../bogofilter"
 SYSTEST="${srcdir}"
 BOGOFILTER_DIR="${TMPDIR}/tests"
 export BOGOFILTER_DIR
