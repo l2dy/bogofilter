@@ -221,7 +221,7 @@ mime_reset (void)
     mime_pop ();
 
   mime_push (NULL);
-  msg_header = 1;		/*FIXME: fold this into mime structure */
+  msg_header = true;		/*FIXME: fold this into mime structure */
 }
 
 
