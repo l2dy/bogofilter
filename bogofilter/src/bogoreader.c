@@ -430,8 +430,6 @@ static int mailbox_getline(buff_t *buff)
     }
 #endif
 
-    buf = buff->t.text + used;
-
     /* XXX FIXME: do we need to unescape the >From, >>From, >>>From, ... lines
      * by discarding the first ">"? */
 
@@ -458,28 +456,10 @@ static int mailbox_getline(buff_t *buff)
     return count;
 }
 
-/* reads a whole file as a mail, no ^From detection */
+/* reads a file as a single mail ( no ^From detection ). */
 static int simple_getline(buff_t *buff)
 {
-    size_t used = buff->t.leng;
-    byte *buf = buff->t.text + used;
-    int count;
-
-#ifndef	DUP_REF_RSLTS
-    count = buff_fgetsl(buff, fpin);
-    have_message = false;
-#else
-    if (!line_save) {
-	count = buff_fgetsl(buff, fpin);
-    }
-    else {
-	count = buff_add(buff, line_save);
-	word_free(line_save);
-	line_save = NULL;
-    }
-#endif
-
-    buf = buff->t.text + used;
+    int count = buff_fgetsl(buff, fpin);
 
     if (buff->t.leng < buff->size)	/* for easier debugging - removable */
 	Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
