@@ -7,6 +7,8 @@ $Id$
 0.11.X   2003-XX-YY
 
 	* Manual pages now contain the proper path to bogofilter.cf.
+	* Bogofilter's -p (passthrough) mode will no longer read the entire
+	  mail into memory if the standard input is a seekable regular file.
 
 0.10.3.2 2003-XX-XX
 
