@@ -68,8 +68,9 @@ AUTHOR:
 #define	MSG_COUNT	".MSG_COUNT"
 
 #define	TEST_COUNT	500	/* minimum allowable message count */
-#define	PREF_COUNT	4000	/* preferred message count         */
 #define	LIST_COUNT	2000	/* minimum msg count in tunelist   */
+#define	PREF_COUNT	4000	/* preferred message count         */
+#define	LARGE_COUNT	40000
 
 #define	HAM_CUTOFF	0.10
 #define	MIN_CUTOFF	0.55	/* minimum for get_thresh() */
@@ -91,10 +92,11 @@ AUTHOR:
 #define	MD_DLT_F	0.015
 
 enum e_verbosity {
-    SUMMARY	   = 1,	/* summarize main loop iterations */
-    PARMS	   = 2,	/* print parameter sets (rs, md, rx) */
-    SCORE_SUMMARY  = 4,	/* verbosity level for printing scores */
-    SCORE_DETAIL	/* verbosity level for printing scores */
+    SUMMARY	   = 1,	/* summarize main loop iterations	*/
+    TIME	   = 2, /* include timing info           	*/
+    PARMS	   = 3,	/* print parameter sets (rs, md, rx)	*/
+    SCORE_SUMMARY  = 5,	/* verbosity level for printing scores	*/
+    SCORE_DETAIL	/* verbosity level for printing scores	*/
 };
 
 #define	MOD(n,m)	((n) - ((int)((n)/(m)))*(m))
@@ -127,11 +129,13 @@ data_t *rxval;
 data_t *mdval;
 uint ns_cnt, sp_cnt;
 
+double check_percent;		/* initial check for excessively high/low scores */
+double thresh_percent;		/* for selecting cutoff during parameter scans */
 double *ns_scores;
 double *sp_scores;
 double user_robx = 0.0;		/* from '-r' option */
 
-#undef	TEST
+#define	TEST
 
 #ifdef	TEST
 uint test = 0;
@@ -163,7 +167,7 @@ static data_t *seq_by_amt(double fst, double lst, double amt)
     val->cnt = get_cnt(fst, lst, amt);
     val->data = xcalloc(val->cnt, sizeof(double));
 
-    for (i=0; i < val->cnt; i += 1)
+    for (i = 0; i < val->cnt; i += 1)
 	val->data[i] = fst + i * amt;
 
     return val;
@@ -194,7 +198,7 @@ static data_t *seq_by_pow(double fst, double lst, double amt)
     val->cnt = get_cnt(fst, lst, amt);
     val->data = xcalloc(val->cnt, sizeof(double));
 
-    for (i=0; i < val->cnt; i += 1)
+    for (i = 0; i < val->cnt; i += 1)
 	val->data[i] = pow(10, fst + i * amt);
 
     return val;
@@ -237,7 +241,7 @@ static void print_parms(const char *label, const char *format, data_t *data)
     uint i;
     printf("  %s: %2d ", label, data->cnt);
     for (i = 0; i < data->cnt; i += 1) {
-	printf("%s", (i==0) ? " (" : ", ");
+	printf("%s", (i == 0) ? " (" : ", ");
 	printf(format, data->data[i]); /* RATS: ignore */
     }
     printf(")\n"); fflush(stdout);
@@ -296,17 +300,19 @@ static void score_ns(double *results)
     if (verbose >= SCORE_DETAIL)
 	printf("ns:\n");
 
-    for (i=0; i < COUNTOF(ns_msglists->u.sets); i += 1) {
+    verbose = -verbose;		/* disable bogofilter debug output */
+    for (i = 0; i < COUNTOF(ns_msglists->u.sets); i += 1) {
 	mlhead_t *list = ns_msglists->u.sets[i];
 	mlitem_t *item;
 	for (item = list->head; item != NULL; item = item->next) {
 	    wordhash_t *wh = item->wh;
 	    double score = (*method->compute_spamicity)(wh, NULL);
 	    results[count++] = score;
-	    if (verbose >= SCORE_DETAIL)
+	    if (-verbose >= SCORE_DETAIL)
 		printf("%6d %0.16f\n", count-1, score);
 	}
     }
+    verbose = -verbose;		/* enable bogofilter debug output */
 
     qsort(results, count, sizeof(double), compare_descending);
 
@@ -315,8 +321,7 @@ static void score_ns(double *results)
 
 static bool check_for_high_ns_scores(void)
 {
-    double percent = 0.0025;
-    uint target = ceil(ns_cnt * percent);
+    uint target = ceil(ns_cnt * check_percent);
 
     score_ns(ns_scores);	/* scores in descending order */
 
@@ -338,17 +343,19 @@ static void score_sp(double *results)
     if (verbose >= SCORE_DETAIL)
 	printf("sp:\n");
 
-    for (i=0; i < COUNTOF(sp_msglists->u.sets); i += 1) {
+    verbose = -verbose;		/* disable bogofilter debug output */
+    for (i = 0; i < COUNTOF(sp_msglists->u.sets); i += 1) {
 	mlhead_t *list = sp_msglists->u.sets[i];
 	mlitem_t *item;
 	for (item = list->head; item != NULL; item = item->next) {
 	    wordhash_t *wh = item->wh;
 	    double score = (*method->compute_spamicity)(wh, NULL);
 	    results[count++] = score;
-	    if (verbose >= SCORE_DETAIL)
+	    if (-verbose >= SCORE_DETAIL)
 		printf("%6d %0.16f\n", count-1, score);
 	}
     }
+    verbose = -verbose;		/* enable bogofilter debug output */
 
     qsort(results, count, sizeof(double), compare_ascending);
 
@@ -360,7 +367,7 @@ static uint get_fn_count(uint count, double *results)
     uint i;
     uint fn = 0;
 
-    for (i=0; i < count; i += 1) {
+    for (i = 0; i < count; i += 1) {
 	double score = results[i];
 	if (score < spam_cutoff)
 	    fn += 1;
@@ -371,8 +378,7 @@ static uint get_fn_count(uint count, double *results)
 
 static bool check_for_low_sp_scores(void)
 {
-    double percent = 0.0025;
-    uint target = ceil(sp_cnt * percent);
+    uint target = ceil(sp_cnt * check_percent);
 
     score_sp(sp_scores);			/* get scores */
 
@@ -412,19 +418,22 @@ static char flag(uint idx, uint cnt, uint dlt)
 #ifdef	TEST
 static void print_ns_scores(uint beg, uint cnt, uint dlt)
 {
-    uint i;
+    uint i, m = min(cnt + dlt, ns_cnt);
+
     printf("ns:\n");
-    for (i=beg; i < cnt + dlt; i += 1)
+    for (i = beg; i < m; i += 1)
 	printf("    %3d %0.16f %c\n", i+1, ns_scores[i], flag(i, cnt, dlt));
 }
 #endif
 
 #ifdef	TEST
 static void print_sp_scores(uint beg, uint cnt, uint dlt)
+
 {
-    uint i;
+    uint i, m = min(cnt + dlt, sp_cnt);
+
     printf("sp:\n");
-    for (i=beg; i < cnt + dlt; i += 1)
+    for (i = beg; i < m; i += 1)
 	printf("    %3d %0.16f %c\n", i+1, sp_scores[i], flag(i, cnt, dlt));
 }
 #endif
@@ -459,9 +468,7 @@ static uint get_thresh(uint count, double *scores)
     score_ns(scores);				/* get scores */
 
     cutoff = 0.0;
-    for (percent = scale(count, TEST_COUNT, PREF_COUNT, 0.0050, 0.0025);
-	 percent > 0.0001;
-	 percent -= 0.0001) {
+    for (percent = thresh_percent; percent > 0.0001; percent -= 0.0001) {
 	ftarget = ceil(count * percent);	/* compute fp count */
 	if (ftarget <= mtarget)
 	    break;
@@ -634,7 +641,7 @@ static void create_countlists(tunelist_t *ns_or_sp)
 {
     uint i;
     uint c = COUNTOF(ns_or_sp->u.sets);
-    for (i=0; i<c; i += 1) {
+    for (i = 0; i<c; i += 1) {
 	mlhead_t *list = ns_or_sp->u.sets[i];
 	mlitem_t *item;
 
@@ -795,7 +802,9 @@ static double get_robx(void)
 
     printf("Calculating initial x value...\n");
 
+    verbose = -verbose;		/* disable bogofilter debug output */
     rx = compute_robinson_x(ds_file);
+    verbose = -verbose;		/* enable bogofilter debug output */
 
     if (rx > 0.6) rx = 0.6;
     if (rx < 0.4) rx = 0.4;
@@ -821,15 +830,14 @@ static void top_ten(result_t *sorted)
 
     if (verbose)
 	printf("    ");
-    printf("   rs     md    rx    co      %%fp     %%fn    fp  fn\n" );
+    printf("   rs     md    rx    co    fp  fn   %%fp     %%fn\n" );
 
-    for (i=0; i < 10; i += 1) {
+    for (i = 0; i < 10; i += 1) {
 	result_t *r = &sorted[i];
-	if (verbose)
-	    printf("%3d  ", r->idx);
-	printf( "%6.4f %5.3f %5.3f %6.4f  %6.4f  %6.4f  %3d %3d\n",
-		r->rs, r->md, r->rx, r->co, 
-		r->fp*100.0/ns_cnt, r->fn*100.0/sp_cnt, r->fp, r->fn);
+	printf("%3d  %6.4f %5.3f %5.3f %6.4f %3d %3d  %6.4f  %6.4f\n",
+	       r->idx,
+	       r->rs, r->md, r->rx, r->co, 
+	       r->fp, r->fn, r->fp*100.0/ns_cnt, r->fn*100.0/sp_cnt);
     }
 
     printf("\n");
@@ -909,9 +917,9 @@ static void progress(uint cur, uint top)
     if (ndots < 1)
 	ndots = 1;
      printf("\r%3d [", cur);
-     for (i=0; i < ndots; i += 1)
+     for (i = 0; i < ndots; i += 1)
 	 printf(".");
-     for (i=ndots; i < 70; i += 1)
+     for (i = ndots; i < 70; i += 1)
 	 printf(" ");
      printf("]");
 }
@@ -1076,10 +1084,10 @@ static rc_t bogotune(void)
     /* read all messages, merge training sets, look up scoring sets */
     ns_cnt = filelist_read(REG_GOOD, ham_files);
     sp_cnt = filelist_read(REG_SPAM, spam_files);
+    cnt = ns_cnt + sp_cnt;
 
     end = time(NULL);
-    if (verbose) {
-	cnt = ns_cnt + sp_cnt;
+    if (verbose >= TIME) {
 	show_elapsed_time(beg, end, ns_cnt + sp_cnt, (double)cnt/(end-beg), "messages", "msg/sec");
     }
 
@@ -1089,9 +1097,8 @@ static rc_t bogotune(void)
     create_countlists(ns_msglists);
     create_countlists(sp_msglists);
 
-    if (verbose && time(NULL) - end > 2) {
+    if (verbose >= TIME && time(NULL) - end > 2) {
 	end = time(NULL);
-	cnt = ns_cnt + sp_cnt;
 	show_elapsed_time(beg, end, ns_cnt + sp_cnt, (double)cnt/(end-beg), "messages", "msg/sec");
     }
 
@@ -1103,6 +1110,7 @@ static rc_t bogotune(void)
 
     ns_cnt = count_messages(ns_msglists);
     sp_cnt = count_messages(sp_msglists);
+    cnt = ns_cnt + sp_cnt;
 
     if (!force && (ns_cnt < TEST_COUNT || sp_cnt < TEST_COUNT)) {
 	fprintf(stderr, 
@@ -1113,6 +1121,12 @@ static rc_t bogotune(void)
     }
 
     fflush(stdout);
+
+    check_percent = 0.0025;	/* for checking high scoring non-spam 
+				** and low scoring spam */
+
+    /* for selecting cutoff during parameter scans */
+    thresh_percent = scale(cnt, TEST_COUNT, PREF_COUNT,  0.0050, 0.0020);
 
     ns_scores = xcalloc(ns_cnt, sizeof(double));
     sp_scores = xcalloc(sp_cnt, sizeof(double));
@@ -1153,6 +1167,13 @@ static rc_t bogotune(void)
     target = get_thresh(ns_cnt, ns_scores);
     spam_cutoff = ns_scores[target-1];
     printf("False-positive target is %d (cutoff %8.6f)\n", target, spam_cutoff);
+
+#ifdef	TEST
+    if (test) {
+	printf("m: %8.6f, s: %8.6f, x: %0.16f\n", min_dev, robs, robx);
+	print_ns_scores(target-2, target+2, 0);
+    }
+#endif
 
     /* No longer needed */
     wordhash_free(ns_and_sp->train);
@@ -1219,10 +1240,12 @@ static rc_t bogotune(void)
 		    r->rsi = rsi; r->rs = robs;
 		    r->rxi = rxi; r->rx = robx;
 		    r->mdi = mdi; r->md = min_dev;
-
-		    if (verbose > SUMMARY)
-			printf( "%3d  %d %d %d  ", cnt, rsi, mdi, rxi);
+		    
 		    if (verbose >= SUMMARY) {
+			if (verbose >= SUMMARY+1)
+			    printf( "%3d  ", cnt);
+			if (verbose >= SUMMARY+2)
+			    printf( "%d %d %d  ", rsi, mdi, rxi);
 			printf( "%6.4f %5.3f %5.3f", robs, min_dev, robx);
 			fflush(stdout);
 		    }
@@ -1254,12 +1277,20 @@ static rc_t bogotune(void)
 			printf(" %8.6f %2d %3d\n", spam_cutoff, fp, fn);
 			fflush(stdout);
 		    }
+
+#ifdef	TEST
+		    if (test && spam_cutoff < 0.501) {
+			printf("co: %0.16f\n", spam_cutoff);
+			print_ns_scores(0, fp, 2);
+			print_sp_scores(fn-10, fn, 10);
+		    }
+#endif
 		}
 	    }
 	    fflush(stdout);
 	}
 
-	if (verbose >= SUMMARY) {
+	if (verbose >= TIME) {
 	    end = time(NULL);
 	    show_elapsed_time(beg, end, cnt, (double)(end-beg)/cnt, "iterations", "secs");
 	}
@@ -1290,6 +1321,11 @@ static rc_t bogotune(void)
 		best->fn, best->fn*100.0/sp_cnt);
 	printf("\n");
 
+	/* save results before freeing list */
+	robs = rsval->data[best->rsi];
+	robx = rxval->data[best->rxi];
+	min_dev = mdval->data[best->mdi];
+
 	data_free(rsval);
 	data_free(rxval);
 	data_free(mdval);
@@ -1305,10 +1341,6 @@ static rc_t bogotune(void)
     ** then, traverse the non-spam list until the 0.2% point; report cutoffs
     ** that give 0.05%, 0.1% and 0.2% fp.
     */
-
-    robs = rsval->data[best->rsi];
-    robx = rxval->data[best->rxi];
-    min_dev = mdval->data[best->mdi];
 
     final_recommendations();
 
