@@ -176,8 +176,8 @@ static int load_file(char *db_file)
     byte *p;
     int rv = 0;
     size_t len;
-    long line = 0;
-    long count, date;
+    unsigned long line = 0;
+    unsigned long count, date;
     YYYYMMDD today_save = today;
 
     if ((dbh = db_open(db_file, db_file, DB_WRITE, directory)) == NULL)
