@@ -70,7 +70,7 @@ int passthrough;	/* '-p' */
 int verbose;		/* '-v' */
 int Rtable = 0;		/* '-R' */
 
-char directory[PATH_LEN] = "";
+char *directory = NULL;
 char outfname[PATH_LEN] = "";
 
 const char *user_config_file   = "~/.bogofilter.cf";
@@ -134,6 +134,7 @@ static const parm_desc sys_parms[] =
     { "user_config_file", CP_STRING,	{ &user_config_file } },
 
     { "algorithm",  	  CP_FUNCTION,	{ (void *) &config_algorithm } },
+    { "bogofilter_dir",	  CP_STRING,	{ &directory } },
     { "wordlist",	  CP_FUNCTION,	{ (void *) &configure_wordlist } },
 
     { "min_dev",	  CP_DOUBLE,	{ (void *) &min_dev } },
@@ -500,7 +501,7 @@ int process_args(int argc, char **argv)
 	switch(option)
 	{
 	case 'd':
-	    xstrlcpy(directory, optarg, sizeof(directory));
+	    directory = xstrdup(optarg);
 	    break;
 
 	case 'e':

@@ -28,6 +28,14 @@ algorithm=robinson
 #block_on_subnets=no
 
 
+#### BOGOFILTER_DIR
+#
+#	set directory for wordlists
+
+#bogofilter_dir=/var/lib/bogofilter
+#bogofilter_dir=~/.bogofilter
+
+
 #### CHARSET info
 #
 #	specify default charset

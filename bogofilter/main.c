@@ -30,9 +30,10 @@ AUTHOR:
 #include "lexer.h"
 #include "bogofilter.h"
 #include "bogoconfig.h"
+#include "format.h"
 #include "register.h"
 #include "wordlists.h"
-#include "format.h"
+#include "xmalloc.h"
 
 #define BOGODIR ".bogofilter"
 
@@ -47,30 +48,32 @@ size_t msg_register_size = sizeof(msg_register);
 
 const char *progname = "bogofilter";
 
-/* if the given environment variable 'var' exists, copy it to 'dest' and
+/* if the given environment variable 'var' exists, create a path from it and
    tack on the optional 'subdir' value.
-   return value: 0 - success, no copy done
-                 1 - success, copied
-		-1 - error (overflow)
+   return value: buffer address if successful
+                 NULL if failure
  */
-static int set_dir_from_env(/*@reldef@*/ /*@unique@*/ char* dest,
-	const char *var,
-	/*@null@*/ const char *subdir,
-	size_t path_size /* size of the full buffer */)
+static char *create_path_from_env(const char *var,
+		       /*@null@*/ const char *subdir)
 {
-    char *env;
+    char *buff, *env;
+    size_t path_size, env_size;
 
     env = getenv(var);
-    if (env == NULL) return 0;
+    if (env == NULL) return NULL;
 
-    if (strlcpy(dest, env, path_size) >= path_size) return -1;
-    if ('/' != dest[strlen(dest)-1]) {
-	if (strlcat(dest, "/", path_size) >= path_size) return -1;
+    env_size = strlen(env);
+    path_size = env_size + (subdir ? strlen(subdir) : 0) + 2;
+    buff = xmalloc(path_size);
+
+    strcpy(buff, env);
+    if ('/' != buff[env_size-1]) {
+	strcat(buff, "/");
     }
     if (subdir != NULL) {
-	if (strlcat(dest, subdir, path_size) >= path_size) return -1;
+	strcat(buff, subdir);
     }
-    return 1;
+    return buff;
 }
 
 /* check that our directory exists and try to create it if it doesn't
@@ -120,8 +123,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     int   exitcode;
     FILE  *out;
 
-    if ((set_dir_from_env(directory, "HOME", BOGODIR, sizeof(directory)) < 0)
-	|| (set_dir_from_env(directory, "BOGOFILTER_DIR", NULL, sizeof(directory)) < 0)) {
+    if (((directory = create_path_from_env("HOME", BOGODIR)) == NULL) ||
+	((directory = create_path_from_env("BOGOFILTER_DIR", NULL)) == NULL)) {
 	fprintf(stderr, "HOME or BOGOFILTER_DIR too long\n");
 	exit(2);
     }
