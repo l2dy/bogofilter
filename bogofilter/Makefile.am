@@ -3,18 +3,12 @@
 # foreign: don't insist on ChangeLog
 # 1.6: minimum version of automake/aclocal
 AUTOMAKE_OPTIONS = foreign 1.6
-SUBDIRS =  src . doc contrib
+SUBDIRS = src . doc contrib
 SYSCONFDIR = @sysconfdir@
 DISTCHECK_CONFIGURE_FLAGS= @DISTCHECK_CONFIGURE_FLAGS@
 
-#AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc
-#AM_CFLAGS = -DBOGOFILTER
-
 # what to build
 sysconf_DATA = bogofilter.cf.example
-
-#noinst_LIBRARIES = libbogofilter.a
-#LDADD = libbogofilter.a @LIBOBJS@
 
 # what to build that from
 
@@ -28,7 +22,7 @@ EXTRA_DIST = autogen.sh \
 #
 .PHONY: rpm cvs-check
 
-rpm:	    dist
+rpm:	dist
 	rpm -ta $(distdir).tar.gz
 
 cvs-check:
