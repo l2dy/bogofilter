@@ -24,6 +24,8 @@ AUTHOR:
 typedef struct robhook_data {
     double   sum;
     uint32_t count;
+    uint32_t spam_cnt;
+    uint32_t good_cnt;
     dsh_t    *dsh;
     double   scalefactor;
 } rhd_t;
@@ -61,9 +63,9 @@ static int robx_hook(word_t *key, dsv_t *data,
     if (*key->text == '.') {
 	size_t len = strlen(".MSG_COUNT");
 	if (key->leng == len && memcmp(key->text, ".MSG_COUNT", len) == 0) {
-	    uint spam_cnt = data->spamcount;
-	    uint good_cnt = data->goodcount;
-	    rh->scalefactor = (double)spam_cnt/(double)good_cnt;
+	    rh->spam_cnt = data->spamcount;
+	    rh->good_cnt = data->goodcount;
+	    rh->scalefactor = (double)rh->spam_cnt/(double)rh->good_cnt;
 	}
 	return 0;
     }
@@ -81,7 +83,6 @@ double compute_robinson_x(const char *path)
     double rx;
     dsh_t *dsh;
 
-    uint good_cnt, spam_cnt;
     struct robhook_data rh;
 
     set_wordlist_dir(path, PR_NONE);
@@ -97,7 +98,7 @@ double compute_robinson_x(const char *path)
     rx = rh.sum/rh.count;
     if (verbose > 2)
 	printf("%s: %u, %u, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
-	       MSG_COUNT, spam_cnt, good_cnt,
+	       MSG_COUNT, rh.spam_cnt, rh.good_cnt,
 	       rh.scalefactor, rh.sum, (int)rh.count, rx);
 
     close_wordlists(word_lists, true);
