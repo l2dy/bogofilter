@@ -28,9 +28,6 @@ CONTRIBUTORS:
 #include "token.h"
 #include "wordlists.h"
 #include "xmalloc.h"
-#ifdef	ENABLE_MEMDEBUG
-#include "memdebug.h"
-#endif
 
 const char *progname = "bogofilter";
 
