@@ -7,7 +7,8 @@
 enum {
     TOKEN = 1,	// regular token
     FROM,	// mbox message delimiter
-    BOUNDARY	// MIME multipart boundary line
+    BOUNDARY,	// MIME multipart boundary line
+    EMPTY	// empty line
 };
 
 extern FILE	*yyin;
