@@ -42,7 +42,7 @@ const parm_desc sys_parms[] =
     { "block_on_subnets",		CP_BOOLEAN,	{ (void *) &block_on_subnets } },
     { "charset_default",		CP_STRING,	{ &charset_default } },
     { "replace_nonascii_characters",	CP_BOOLEAN,	{ (void *) &replace_nonascii_characters } },
-    { "tag_header_lines",		CP_BOOLEAN,	{ (void *) &tag_header_lines } },
+    { "header_line_markup",		CP_BOOLEAN,	{ (void *) &header_line_markup } },
     { "strict_check",			CP_BOOLEAN,	{ (void *) &strict_check } },
     { NULL,				CP_NONE,	{ (void *) NULL } },
 };
@@ -85,8 +85,8 @@ static void help(void)
 	    "\t     where {opts} is one or more of:\n"
 	    "\t      c   - enables  strict comment checking.\n"
 	    "\t      C   - disables strict comment checking (default).\n"
-	    "\t      f   - enables  case folding."
-	    "\t      F   - disables case folding (default)."
+	    "\t      u   - enables  uppercase tokens."
+	    "\t      U   - disables uppercase tokens (default)."
 	    "\t      h   - enables  header line tagging (default)."
 	    "\t      H   - disables header line tagging."
 	    "\t      t   - enables  parsing of html tags 'a', 'font', and 'img' (default).\n"
@@ -205,10 +205,10 @@ static void process_args_2(int argc, char **argv)
 	    {
 		switch (*s)
 		{
-		case 'c': case 'C': strict_check       = *s == 'C';	break;	/* -Pc and -PC */
-		case 'f': case 'F': fold_case          = *s == 'F';	break;	/* -Pf and -PF */
-		case 'h': case 'H': tag_header_lines   = *s == 'H'; 	break;	/* -Ph and -PH */
-		case 't': case 'T': tokenize_html_tags = *s == 'T'; 	break;	/* -Pt and -PT */
+		case 'c': case 'C': strict_check       = *s == 'c';	break;	/* -Pc and -PC */
+		case 'u': case 'U': upper_case         = *s == 'u';	break;	/* -Pu and -PU */
+		case 'h': case 'H': header_line_markup = *s == 'h'; 	break;	/* -Ph and -PH */
+		case 't': case 'T': tokenize_html_tags = *s == 't'; 	break;	/* -Pt and -PT */
 		default:
 		    fprintf(stderr, "Unknown parsing option -P%c.\n", *s);
 		    exit(2);

@@ -154,10 +154,10 @@ const parm_desc sys_parms[] =
     { "charset_default",  	     CP_STRING,  { &charset_default } },
     { "datestamp_tokens",	     CP_BOOLEAN, { (void *) &datestamp_tokens } },
     { "replace_nonascii_characters", CP_BOOLEAN, { (void *) &replace_nonascii_characters } },
-    { "tag_header_lines", 	     CP_BOOLEAN, { (void *) &tag_header_lines } },
+    { "header_line_markup", 	     CP_BOOLEAN, { (void *) &header_line_markup } },
     { "strict_check", 	  	     CP_BOOLEAN, { (void *) &strict_check } },
 
-    { "fold_case", 	  	     CP_BOOLEAN, { (void *) &fold_case } },
+    { "upper_case", 	  	     CP_BOOLEAN, { (void *) &upper_case } },
     { "tokenize_html_tags",	     CP_BOOLEAN, { (void *) &tokenize_html_tags } },
     { "tokenize_html_script",	     CP_BOOLEAN, { (void *) &tokenize_html_script } },	/* Not yet in use */
 
@@ -313,10 +313,11 @@ static void help(void)
 		  "\t  -3      - set ternary classification mode (yes/no/unsure).\n");
     (void)fprintf(stderr,
 		  "\t  -P {opts} - set html processing flag(s).\n"
+		  "\t     where {opts} is one or more of:\n"
 		  "\t      c   - enables  strict comment checking.\n"
 		  "\t      C   - disables strict comment checking (default).\n"
-		  "\t      f   - enables  case folding."
-		  "\t      F   - disables case folding (default)."
+		  "\t      u   - enables  uppercase tokens."
+		  "\t      U   - disables uppercase tokens (default)."
 		  "\t      h   - enables  header line tagging (default)."
 		  "\t      H   - disables header line tagging."
 		  "\t      t   - enables  parsing of html tags 'a', 'font', and 'img' (default).\n"
@@ -658,10 +659,10 @@ void process_args_2(int argc, char **argv)
 	    {
 		switch (*s)
 		{
-		case 'c': case 'C': strict_check       = *s == 'C';	break;	/* -Pc and -PC */
-		case 'f': case 'F': fold_case          = *s == 'F';	break;	/* -Pf and -PF */
-		case 'h': case 'H': tag_header_lines   = *s == 'H'; 	break;	/* -Ph and -PH */
-		case 't': case 'T': tokenize_html_tags = *s == 'T'; 	break;	/* -Pt and -PT */
+		case 'c': case 'C': strict_check       = *s == 'c';	break;	/* -Pc and -PC */
+		case 'u': case 'U': upper_case         = *s == 'u';	break;	/* -Pu and -PU */
+		case 'h': case 'H': header_line_markup   = *s == 'h'; 	break;	/* -Ph and -PH */
+		case 't': case 'T': tokenize_html_tags = *s == 't'; 	break;	/* -Pt and -PT */
 		default:
 		    fprintf(stderr, "Unknown parsing option -P%c.\n", *s);
 		    exit(2);
@@ -710,11 +711,11 @@ void query_config(void)
     fprintf(stdout, "\n");
     fprintf(stdout, "%-17s = %s\n", "block_on_subnets", YN(block_on_subnets));
     fprintf(stdout, "%-17s = %s\n", "strict_check",	YN(strict_check));
-    fprintf(stdout, "%-17s = %s\n", "tag_header_lines", YN(tag_header_lines));
-    fprintf(stdout, "%-17s = %s\n", "fold_case",	YN(fold_case));
+    fprintf(stdout, "%-17s = %s\n", "header_line_markup", YN(header_line_markup));
+    fprintf(stdout, "%-17s = %s\n", "upper_case",	YN(upper_case));
     fprintf(stdout, "%-17s = %s\n", "block_on_subnets", YN(block_on_subnets));
     fprintf(stdout, "%-17s = %s\n", "strict_check",	YN(strict_check));
-    fprintf(stdout, "%-17s = %s\n", "tag_header_lines", YN(tag_header_lines));
+    fprintf(stdout, "%-17s = %s\n", "header_line_markup", YN(header_line_markup));
     fprintf(stdout, "%-17s = %s\n", "tokenize_html_tags",     YN(tokenize_html_tags));
     fprintf(stdout, "%-17s = %s\n", "replace_nonascii_characters", YN(replace_nonascii_characters));
     fprintf(stdout, "\n");

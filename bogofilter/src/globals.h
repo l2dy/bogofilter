@@ -45,10 +45,10 @@ extern	int	abort_on_error;
 extern	bool	stats_in_header;
 
 /* for lexer_v3.l */
-extern	bool	fold_case;		/* -Pf */
-extern	bool	tag_header_lines;	/* -Ph */
-extern	bool	tokenize_html_tags;	/* -Pt */
-extern	bool	tokenize_html_script;	/* -Ps */
+extern	bool	upper_case;		/* -Pu,-PU */
+extern	bool	header_line_markup;	/* -Ph,-PH */
+extern	bool	tokenize_html_tags;	/* -Pt,-PT */
+extern	bool	tokenize_html_script;
 
 extern	int	db_cachesize;
 

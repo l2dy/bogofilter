@@ -77,7 +77,7 @@ spamicity_tags = S,h,u
 spamicity_formats = %6.2e %6.2e %0.6f
 strict_check=no
 block_on_subnets=yes
-tag_header_lines=yes
+header_line_markup=yes
 replace_nonascii_characters=yes
 EOF
 

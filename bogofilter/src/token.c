@@ -169,8 +169,9 @@ token_t get_token(void)
     }
 
     /* Need separate loop so lexer can see "From", "Date", etc */
-    for (cp = yylval->text; cp < yylval->text+yylval->leng; cp += 1)
-	*cp = casefold_table[*cp];
+    if (!upper_case)
+	for (cp = yylval->text; cp < yylval->text+yylval->leng; cp += 1)
+	    *cp = casefold_table[*cp];
 
     return(class);
 }
@@ -211,7 +212,7 @@ const char *prefixes = "|to:|from:|rtrn:|subj:";
 
 void set_tag(const char *tag)
 {
-    if (tag_header_lines) {
+    if (header_line_markup) {
 	const char *tmp;
 	size_t len = strlen(tag);
 	

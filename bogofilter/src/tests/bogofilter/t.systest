@@ -36,7 +36,7 @@ ham_cutoff=0.10
 spam_cutoff=0.95
 spam_header_name=X-Bogosity
 stats_in_header=Y
-tag_header_lines=no
+header_line_markup=no
 EOF
 
 map_rc()
