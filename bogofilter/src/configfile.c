@@ -185,7 +185,7 @@ bool process_config_option(char *arg, bool warn_on_error, priority_t precedence)
 {
     const char delim[] = " \t=";
     char *val = NULL;
-    bool error = false;
+    bool ok = true;
 
     if (strcspn(arg, delim) < strlen(arg)) { /* if delimiter present */
 	val = arg + strcspn(arg, delim);
@@ -198,18 +198,18 @@ bool process_config_option(char *arg, bool warn_on_error, priority_t precedence)
 	 ! process_config_line(arg, val, sys_parms, precedence ) &&
 	 ! process_config_line(arg, val, format_parms, precedence )))
     {
-	error = true;
+	ok = false;
  	if (warn_on_error)
 	    fprintf(stderr, "Error - bad parameter '%s'\n", arg);
     }
 
-    return error;
+    return ok;
 }
 
 bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, priority_t precedence)
 /* returns true if ok, false if error */
 {
-    bool error = false;
+    bool ok = true;
     int lineno = 0;
     FILE *fp;
     char *filename;
@@ -249,18 +249,18 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
 	    fprintf(dbgout, "Testing:  %s\n", buff);
 
 	if (!process_config_option(buff, warn_on_error, precedence))
-	    error = true;
+	    ok = false;
     }
 
     if (ferror(fp)) {
 	fprintf(stderr, "Error reading file \"%s\"\n.", filename);
-	error = true;
+	    ok = false;
     }
 
     (void)fclose(fp); /* we're just reading, so fclose should succeed */
     xfree(filename);
 
-    return (error);
+    return ok;
 }
 
 /* exported */
