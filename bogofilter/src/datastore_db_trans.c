@@ -803,6 +803,8 @@ const char **dsm_help_bogoutil(void)
 {
     static const char *help_text[] = {
 	"environment maintenance:\n",
+	"      --db-transaction=BOOL   - enable or disable transactions\n",
+	"                                (only effective at creation time)\n",
 	"      --db-verify=file        - verify data file.\n",
 	"      --db-prune=dir          - remove inactive log files in dir.\n",
 	"      --db-recover=dir        - run recovery on database in dir.\n",
