@@ -56,6 +56,34 @@ stats_in_header=Y
 
 #stats_in_header=N
 
+#### cutoff values
+#
+#	for Graham and Robinson:
+#	    only spam_cutoff is needed.
+#
+#	for Fisher:
+#	    both ham_cutoff and spam_cutoff are allowed.
+#	    setting ham_cutoff to a non-zero value will
+#	    enable tristate results (Yes/No/Unsure).
+#
+# graham:
+#
+# spam_cutoff = 0.90
+
+# robinson:
+#
+# spam_cutoff = 0.54
+
+# fisher (with Yes/No output):
+#
+# ham_cutoff = 0.00
+# spam_cutoff = 0.95
+
+# fisher (with Yes/No/Unsure output):
+#
+# ham_cutoff = 0.10
+# spam_cutoff = 0.95
+
 
 ##### threshold values
 #
@@ -90,3 +118,31 @@ user_config_file=.bogofilter.cf
 #	int override - skip lower valued lists
 
 #wordlist i,ignore,.ignorelist.db,1,0,0
+
+### New Message Formatting Options - 12/01/2002
+#
+#	see file format.c for more info
+#
+#	below are options showing name and current value
+#
+# header_format = %h: %c, tests=bogofilter, spamicity=%p, version=%v
+# terse_format = %1.1c %f
+# log_header_format = %h: %c, spamicity=%p, version=%v
+# log_update_format = register-%r, %w words, %m messages
+
+# for robinson or fisher (with binary state)
+#	using "Yes" and "No" as labels.
+#
+# ham_cutoff = 0.0
+# spamicity_tags = Yes, No
+# spamicity_formats = %0.6f, %0.6f
+
+
+# for fisher (with 3-way state)
+#	using "Spam", "Ham", and "Unsure" as labels,
+#	format "%6.2e" for displaying Spam/Ham scores.
+#	and format "%0.6f" for Unsure scores.
+#
+# ham_cutoff = 0.10
+# spamicity_tags = Spam, Ham, Unsure 
+# spamicity_formats = %6.2e, %6.2e, %0.6f 
