@@ -28,8 +28,9 @@ configtest
 configure
 cscope.out
 debugtest
+find_home.test
 lexer.c
+stamp-h.in
 stamp-h1
 version.h
-find_home.test
 wordhash
