@@ -6,7 +6,7 @@
 #include <stddef.h>
 
 #ifdef	BF_MALLOC
-/* special defines for xmalloc., xcalloc.c, etc */
+/* special defines for xmalloc.c, xcalloc.c, etc */
 #ifndef	ENABLE_MEMDEBUG
   #define bf_malloc  malloc
   #define bf_calloc  calloc
