@@ -483,21 +483,28 @@ int process_args(int argc, char **argv)
     return exitcode;
 }
 
+#define YN(b) (b ? "yes" : "no")
+
 void query_config(void)
 {
-    fprintf(dbgout, "algorithm = %s\n", method->name);
+    fprintf(dbgout, "%-11s = %s\n", "algorithm", method->name);
 
-    fprintf(dbgout, "robx = %0.6f (%8.2e)\n", robx, robx);
-    fprintf(dbgout, "robs = %0.6f (%8.2e)\n", robs, robs);
-    fprintf(dbgout, "min_dev = %0.6f (%8.2e)\n", min_dev, min_dev);
-    fprintf(dbgout, "ham_cutoff = %0.6f (%8.2e)\n", ham_cutoff, ham_cutoff);
-    fprintf(dbgout, "spam_cutoff = %0.6f (%8.2e)\n", spam_cutoff, spam_cutoff);
-    fprintf(dbgout, "spam_header_name = '%s'\n", spam_header_name);
-    fprintf(dbgout, "header_format = '%s'\n", header_format);
-    fprintf(dbgout, "terse_format = '%s'\n", terse_format);
-    fprintf(dbgout, "log_header_format = '%s'\n", log_header_format);
-    fprintf(dbgout, "log_update_format = '%s'\n", log_update_format);
-    display_tag_array("spamicity_tags", &spamicity_tags);
+    fprintf(dbgout, "%-11s = %0.6f (%8.2e)\n", "robx", robx, robx);
+    fprintf(dbgout, "%-11s = %0.6f (%8.2e)\n", "robs", robs, robs);
+    fprintf(dbgout, "%-11s = %0.6f (%8.2e)\n", "min_dev", min_dev, min_dev);
+    fprintf(dbgout, "%-11s = %0.6f (%8.2e)\n", "ham_cutoff", ham_cutoff, ham_cutoff);
+    fprintf(dbgout, "%-11s = %0.6f (%8.2e)\n", "spam_cutoff", spam_cutoff, spam_cutoff);
+    fprintf(dbgout, "\n");
+    fprintf(dbgout, "%-10s = %s\n", "block_on_subnets", YN(block_on_subnets));
+    fprintf(dbgout, "%-10s = %s\n", "tag_header_lines", YN(tag_header_lines));
+    fprintf(dbgout, "%-10s = %s\n", "replace_nonascii_characters", YN(replace_nonascii_characters));
+    fprintf(dbgout, "\n");
+    fprintf(dbgout, "%-17s = '%s'\n", "spam_header_name", spam_header_name);
+    fprintf(dbgout, "%-17s = '%s'\n", "header_format", header_format);
+    fprintf(dbgout, "%-17s = '%s'\n", "terse_format", terse_format);
+    fprintf(dbgout, "%-17s = '%s'\n", "log_header_format", log_header_format);
+    fprintf(dbgout, "%-17s = '%s'\n", "log_update_format", log_update_format);
+    display_tag_array("spamicity_tags   ", &spamicity_tags);
     display_tag_array("spamicity_formats", &spamicity_formats);
     exit(2);
 }
