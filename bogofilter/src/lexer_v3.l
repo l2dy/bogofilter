@@ -232,7 +232,7 @@ VERP		{TOKEN}-{NUM}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); skip_to('='); return TOKEN; }
 
 <INITIAL>(file)?name=\"?			/* ignore */
-<INITIAL>[:blank:]*id\ {ID}			/* ignore */
+<INITIAL>\n?[[:blank:]]id\ {ID}			/* ignore */
 
 <INITIAL>\n[ \t]				{ lineno += 1; }
 <INITIAL>\n\n					{ enum mimetype type = get_content_type();
