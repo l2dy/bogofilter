@@ -512,11 +512,9 @@ void got_charset(const char *charset)
 /* like got_charset() but charset is pure charset name */
 void set_charset(const char *charset)
 {
-    char *t;
-    char *s, *d;
     bool q = (charset[0] == '"');
-
-    t = xstrdup(charset + q);
+    char *s, *d;
+    char *t = xstrdup(charset + q);
 
     for (s = d = t; *s != '\0'; s++)
     {
