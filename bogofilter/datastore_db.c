@@ -260,10 +260,18 @@ void db_lock_reader(void *vhandle){
   if (DEBUG_DATABASE(1))
     fprintf(stderr, "[%lu] Acquiring read lock  on %s\n", (unsigned long) handle->pid, handle->filename);
 
+  errno = 0;
+  
   if (db_lock(handle, F_SETLKW, F_RDLCK) != 0){
+    if (errno == EAGAIN){
+  	if (DEBUG_DATABASE(2))
+    	  fprintf(stderr, "[%lu] Faked lock %s.\n", (unsigned long) handle->pid, handle->filename);
+    }
+    else {
     fprintf(stderr, "[%lu] Error acquiring read lock on %s\n", (unsigned long) handle->pid, handle->filename);
     SYSLOG_ERROR( "Error acquiring read lock on %s\n", handle->filename);
     exit(2);
+    }
   }
 
   if (DEBUG_DATABASE(1))
@@ -374,10 +382,16 @@ static void db_lock_list(wordlist_t *list, int type){
       if (DEBUG_DATABASE(1))
 	do_lock_msg("Trying");
       
-      if (db_lock(handle, cmd, type) == 0){
+       if (db_lock(handle, cmd, type) == 0){
         if (DEBUG_DATABASE(1))
           do_lock_msg("Got");
         
+        handle->locked = TRUE;
+       }
+       else if (type == F_RDLCK && errno == EAGAIN){
+        if (verbose)
+          do_lock_msg("Faked acquired");
+	
         handle->locked = TRUE;
       }
       else if (errno == EACCES || errno == EAGAIN || errno == EINTR){
