@@ -187,7 +187,7 @@ EXTRA_libbogofilter_a_SOURCES = datastore_db.c datastore_db_trad.c \
 				datastore_db_trans.c \
 				datastore_opthelp_dummies.c \
 				datastore_txn_dummies.c \
-				datastore_qdbm.h datastore_qdbm.c \
+				datastore_qdbm.c \
 				datastore_tdb.c \
 				datastore_sqlite.c
 
