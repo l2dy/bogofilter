@@ -67,8 +67,8 @@ extern	const char *const version;
 extern	const char *const system_config_file;
 
 /* for msgcounts.c */
-extern	long	 msgs_good;
-extern 	long	 msgs_bad;
+extern	uint		 msgs_good;
+extern	uint		 msgs_bad;
 
 /* from html.h */
 extern	bool strict_check;

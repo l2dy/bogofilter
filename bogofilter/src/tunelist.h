@@ -21,7 +21,7 @@ typedef struct wordprops_s wordprops_t;
 
 struct msglist_s {		/* message list header */
     char *name;
-    uint count;
+    uint     count;
     mlitem_t *head;
     mlitem_t *tail;
 };
@@ -33,7 +33,7 @@ struct mlitem_s {		/* message list item */
 };
 
 struct wordprops_s {
-    uint count;
+    uint	count;
     wordprop_t *wp;
 };
 
@@ -50,7 +50,7 @@ typedef struct flhead_s flhead_t;
 
 struct flhead_s {		/* file list header */
     char *name;
-    uint count;
+    uint      count;
     flitem_t *head;
     flitem_t *tail;
 };
@@ -70,7 +70,7 @@ typedef struct wordlist_s wordlist_t;
 
 struct wordlist_s {
     const char *name;
-    uint      count;
+    uint	count;
     wordhash_t *train;	/* training */
     union {
 	mlhead_t *sets[3];

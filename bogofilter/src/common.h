@@ -141,9 +141,9 @@ typedef enum wl_e { WL_M_UNKNOWN ='U',
 /* Represents the secondary data for a word key */
 typedef struct {
     int freq;
-    long good;
-    long bad;
-    double prob;
+    uint	good;
+    uint	bad;
+    double 	prob;
 } wordprop_t;
 
 extern void bf_abort(void);

@@ -29,8 +29,8 @@ char   *msg_count_text = msg_count_buff;
 const char *msg_count_header = "\"" MSG_COUNT "\"";
 size_t	    msg_count_header_len = 0;
 
-long	msgs_good = 0L;
-long	msgs_bad  = 0L;
+uint	msgs_good = 0L;
+uint	msgs_bad  = 0L;
 
 static	bool	saved = false;
 
