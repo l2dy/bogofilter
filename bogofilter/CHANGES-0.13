@@ -4,6 +4,10 @@
 
 $Id$
 
+	2003-05-24
+
+	* Tweaked long line check used to prevent scanner buffer overflow.
+
 0.13.2.1 2003-05-24
 
 	 * In bulkmode, output filenames to stdout.
@@ -30,6 +34,8 @@ $Id$
 	  superseding ignore_case option.
 
 	* Portability fix for efence usage in t.frame.
+
+	* Added static-build to solve glibc version problem.
 
 0.13.1	2003-05-23
 
