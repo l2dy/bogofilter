@@ -62,7 +62,13 @@ static void map_iso_8859_15(void);
 
 static void map_unicode(void);
 
-static void map_windows_1251(void);
+#ifndef        CP866
+static void map_windows_1251_to_koi8r(void);
+#else
+static void map_windows_1251_to_cp866(void);
+static void map_koi8_r_to_cp866(void);
+static void map_iso_8859_5_to_cp866(void);
+#endif
 static void map_windows_1252(void);
 static void map_windows_1256(void);
 
@@ -272,7 +278,7 @@ static void map_unicode(void)
     /* Not yet implemented */
 }
 
-static void map_windows_1251(void)
+static void map_windows_1251_to_koi8r(void)
 {
 #ifdef	CP866
     /* Map:  windows-1251 -> KOI8-R (Cyrillic) */
@@ -346,7 +352,8 @@ KOI8-R
 	142, '▌',  158, '∙',  174, '╝',  190, '╬',  206, 'н',  222, 'ч',  238, 'Н',  254, 'Ч',
 	143, '▐',  159, 'Ў',  175, '╞',  191, 255,  207, 'о',  223, 'ъ',  239, 'О',  255, 'Ъ'
     };
-/*; символ 191 = (с)/255 в дос */
+
+    /* символ 191 = (с)/255 в дос */
     map_xlate_characters( koi8_r_to_cp866, COUNTOF( koi8_r_to_cp866) );
 }
 #endif
@@ -354,7 +361,6 @@ KOI8-R
 #ifdef	CP866
 static void map_iso_8859_5_to_cp866(void)
 {
-
     static byte iso_8859_5_to_cp866[] = {
     160, 255, 176, 'А',  192, 'Р',  208, 'а',  224, 'р',
     161, 'Ё', 177, 'Б',  193, 'С',  209, 'б',  225, 'с',  241, 'ё',
@@ -372,13 +378,13 @@ static void map_iso_8859_5_to_cp866(void)
     173, '─', 189, 'Н',  205, 'Э',  221, 'н',  237, 'э',
     174, 'Ў', 190, 'О',  206, 'Ю',  222, 'о',  238, 'ю',  254, 'ў',
               191, 'П',  207, 'Я',  223, 'п',  239, 'я'
-   };
+    };
 
+    /* символ 160 = (с)/255 в дос */
     map_xlate_characters( iso_8859_5_to_cp866, COUNTOF(iso_8859_5_to_cp866) );
 }
 #endif
 
-/* символ 160 = (с)/255 в дос */
 #ifdef	CP866
 static void map_cp866(void)
 {
@@ -425,7 +431,7 @@ static charset_def_t charsets[] = {
     { "default",	&map_default,	   T },
     { "us-ascii",	&map_us_ascii,	   T },
 #ifdef	CP866
-    { "cp866",		&map_windows_1251_to_cp866, T },/* selected by 'charset_default=cp866' in bogofilter.cf */
+    { "cp866",		&map_windows_1251_to_cp866, F },/* selected by 'charset_default=cp866' in bogofilter.cf */
 #endif
     { "iso8859-1",	&map_iso_8859_1,   T },		/* ISOIEC 8859-1:1998 Latin Alphabet No. 1	*/
     /* tests/t.systest.d/inputs/spam.mbx is iso-8859-1 and contains 8-bit characters - " УYour AccountФ " */
@@ -446,7 +452,7 @@ static charset_def_t charsets[] = {
     { "iso8859-14",	&map_iso_8859_14,  F },		/* ISOIEC 8859-14:1998 Latin Alphabet No. 8 (Celtic)	*/
     { "iso8859-15",	&map_iso_8859_15,  F },		/* ISOIEC 8859-15:1999 Latin Alphabet No. 9		*/
 #ifndef	CP866
-    { "windows-1251",	&map_windows_1251, T },
+    { "windows-1251",	&map_windows_1251_to_koi8r, F },
 #else
     { "cp866",		&map_cp866, F },
     { "koi8-r",		&map_koi8_r_to_cp866, F },
@@ -526,16 +532,17 @@ void set_charset(const char *charset)
     }
     *d++ = '\0';
     if (DEBUG_CONFIG(0))
-	fprintf(dbgout, "got_charset( '%s' )\n", t);
-#ifndef	CP866
-    init_charset_table( t, false ); //bf default
+       fprintf(dbgout, "got_charset( '%s' )\n", t);
+#ifndef        CP866
+    init_charset_table( t, false ); // bf default
 #else
     init_charset_table( t, true );
 #endif
     xfree(t);
 }
 
-int  htmlUNICODE_decode(byte *buf, int len)
+#ifdef	CP866
+int  decode_and_htmlUNICODE_to_cp866(byte *buf, int len)
 {
     int i,j, j1, l, is=0;
     char  *pbuf, str[40];
@@ -614,3 +621,4 @@ int  htmlUNICODE_decode(byte *buf, int len)
     pbuf[l1] = 0;
     return l1;
 }
+#endif
