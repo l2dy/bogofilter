@@ -97,6 +97,7 @@ static void html_reorder(void);
 static void url_char(void);
 
 static void skip_to(char chr);
+static void yy_unput(const byte *txt, uint len);
 
 char yy_get_state(void);
 void yy_set_state_initial(void);
@@ -214,9 +215,7 @@ VERP		{TOKEN}-{NUM}-{TOKEN}={TOKEN}@{TOKEN}
 <BOGO_LEX>\n					{ lineno += 1; }
 
 <INITIAL>{ENCODED_TOKEN}			{ word_t *w = yy_text();
-						  size_t size = text_decode(w);
-						  while (size-- > 0)
-						    unput(w->text[size]);
+						  yy_unput(w->text, text_decode(w));
 						}
 
 <INITIAL>^(To|From|Return-Path|Subject):	{ set_tag(yytext); }
@@ -288,7 +287,7 @@ VERP		{TOKEN}-{NUM}-{TOKEN}={TOKEN}@{TOKEN}
 {TOKEN}						{ return TOKEN;}
 
 <HTML>{TOKEN_12}?{HTML_ENCODING}		{ html_char(); }	/* process escaped chars, eg '&#101;' is 'a' */
-<HTOKEN>{TOKEN_12}?{URL_ENCODING}+		{ url_char(); }		/* process escaped chars, eg '%61'    is 'a' */
+<HTML>{TOKEN_12}?{URL_ENCODING}+		{ url_char(); }		/* process escaped chars, eg '%61'    is 'a' */
 
 \${NUM}(\.{NUM})?				{ return TOKEN;}	/* Dollars and cents */
 
@@ -315,15 +314,13 @@ static void html_reorder(void)
 {
     char *chr = memchr(yytext, '<', yyleng);	/* find start of html tag */
     size_t len = chr - yytext;
-    char *tmp;
     char *yycopy = xmalloc(yyleng + 1); 	/* +1 for NUL byte below */
 
     memcpy(yycopy, yytext+len, yyleng-len);	/* copy tag to start of buffer */
     memcpy(yycopy+yyleng-len, yytext, len);	/* copy leading text to end of buffer */
     yycopy[yyleng] = '\0';			/* for debugging */
 
-    for(tmp = yycopy+yyleng-1 ; tmp >= yycopy; tmp--) 
-	yyunput(*tmp, yytext);
+    yy_unput(yycopy, yyleng);
     xfree(yycopy);
 }
 
@@ -365,8 +362,7 @@ static void html_char(void)
     }
 
     if (yycopy != NULL) {
-	while (yyleng-- > 0)
-	    yyunput(yycopy[yyleng], yytext);
+	yy_unput(yycopy, yyleng);
 	xfree(yycopy);
     }
 }
@@ -387,6 +383,12 @@ static void url_char(void)
     while (dst > yytext) {
 	yyunput(*--dst, yytext);
     }
+}
+
+static void yy_unput(const byte *txt, uint len)
+{
+    while (len-- > 0)
+	unput(txt[len]);
 }
 
 char yy_get_state()
