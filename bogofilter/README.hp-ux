@@ -6,15 +6,14 @@ There are two prerequisites for compiling Bogofilter on HP-UX.
 1. gcc
 2. Berkeley DB
 
-gcc (and other open-source software) is available from HP,
-at http://h21007.www2.hp.com/dev/technologies/topic/1,2608,10602,00.html
+gcc (and other open-source software) is available from HP, at
+http://h21007.www2.hp.com/dev/technologies/topic/1,2608,10602,00.html .
 Also available from the HP-UX Porting and Archive Centre,
 at http://hpux.connect.org.uk/ (and mirrors around the world).
 
-Berkeley DB may be obtained from Sleepycat Software,
-at http://www.sleepycat.com/
-Also available from HP as part of the HP release of the Gnome Desktop,
-at http://www.hp.com/workstations/support/software/hpux/gnome/
+Berkeley DB may be obtained from Sleepycat Software, at
+http://www.sleepycat.com/ .  Also available from HP as part of the HP
+release of the Gnome Desktop, at http://www.software.hp.com/products/GNOME/ .
 The Gnome Desktop and Gnome Developer bundles are required.
 
 After the prerequistes have been met, make certain that gcc
