@@ -76,8 +76,8 @@ AUTHOR:
 #define	MAX_THR_PCT	0.0050	/* maximum threshold percent */
 
 #define	HAM_CUTOFF	0.10
-#define	MIN_CUTOFF	0.55	/* minimum cutoff for get_thresh() */
-#define	MAX_CUTOFF	0.99	/* maximum cutoff for get_thresh() */
+#define	MIN_CUTOFF	0.55	/* minimum cutoff for set_thresh() */
+#define	MAX_CUTOFF	0.99	/* maximum cutoff for set_thresh() */
 #define	SPAM_CUTOFF	0.95
 #define FP_CUTOFF	0.999
 
@@ -466,7 +466,7 @@ static double scale(uint cnt, uint lo, uint hi, double beg, double end)
 **	2) initial minimum target increases from 5 to 10
 */
 
-static void get_thresh(uint count, double *scores)
+static void set_thresh(uint count, double *scores)
 {
     uint   ftarget = 0;
     uint   mtarget = scale(count, TEST_COUNT, PREF_COUNT, 3, 10);
@@ -1178,7 +1178,8 @@ static rc_t bogotune(void)
     
     min_dev = 0.02;
 
-    get_thresh(ns_cnt, ns_scores);
+    /* set target and spam_cutoff */
+    set_thresh(ns_cnt, ns_scores);
     printf("False-positive target is %d (cutoff %8.6f)\n", target, spam_cutoff);
 
 #ifdef	TEST
