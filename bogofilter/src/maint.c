@@ -10,21 +10,19 @@ AUTHOR:
 
 ******************************************************************************/
 
-#include <config.h>
-#include "system.h"		/* has time.h */
-
+#include <assert.h>
+#include <db.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <db.h>
 
-#include <assert.h>
-
+#include <config.h>
 #include "common.h"
-#include "xmalloc.h"
 
 #include "datastore.h"
+#include "error.h"
 #include "maint.h"
+#include "xmalloc.h"
 
 YYYYMMDD today;			/* date as YYYYMMDD */
 uint32_t thresh_count = 0;
