@@ -141,7 +141,7 @@ do { # Start force loop
           unless (system("$bogofilter <$temp") >>8==0) {
             system("$bogofilter -s <$temp");
             $spamadd++;
-            $trainedspam{$hamcount}++;
+            $trainedspam{$spamcount}++;
             print "Training spam message $spamcount",
                   $trainedspam{$spamcount}>1&&" ($trainedspam{$spamcount})",
                   ".\n" if ($verbose);
