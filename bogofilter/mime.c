@@ -234,8 +234,9 @@ static
 bool get_boundary_props(const byte *boundary, int boundary_len, boundary_t *b)
 {
   int i;
-  
-  b->is_valid = false;
+  bool is_valid = false;
+
+  if (b) b->is_valid = is_valid;
 
   if (boundary_len > 2 && *(boundary) == '-' && *(boundary + 1) == '-'){
 
@@ -249,11 +250,11 @@ bool get_boundary_props(const byte *boundary, int boundary_len, boundary_t *b)
       
     /* skip and note ending --, if any */
     if (*(boundary + boundary_len - 1) == '-' && *(boundary + boundary_len - 2) == '-'){
-      b->is_final = true;
+      if (b) b->is_final = true;
       boundary_len -= 2;
     }
     else {
-      b->is_final = false;
+      if (b) b->is_final = false;
     }
   
     for (i = stackp; i > -1; i--){
@@ -261,14 +262,21 @@ bool get_boundary_props(const byte *boundary, int boundary_len, boundary_t *b)
       if (is_mime_container (&msg_stack[i]) &&
           msg_stack[i].boundary &&
           (memcmp (msg_stack[i].boundary, boundary, boundary_len) == 0)){
-        b->depth = i;
-        b->is_valid = true;
+        if (b){
+	   b->depth = i;
+           b->is_valid = true;
+	}
         break;
       }
     }
   }
   
-  return b->is_valid;
+  return is_valid;
+}
+
+bool
+mime_is_boundary(const byte *boundary, int len){
+  return get_boundary_props(boundary, len, NULL);
 }
 
 void
@@ -524,7 +532,6 @@ size_t
 mime_decode (byte *buff, size_t size)
 {
   size_t count = size;
-  boundary_t b;
 
   if (msg_state->mime_header)	/* do nothing if in header */
     return count;
@@ -541,9 +548,9 @@ mime_decode (byte *buff, size_t size)
 	     buff);
 
   /* Do not decode "real" boundary lines */
-  if (get_boundary_props(buff, size, &b) == true)
+  if (mime_is_boundary(buff, size) == true)
       return count;
-
+ 
   switch (msg_state->mime_encoding)
   {
   case MIME_QP:
