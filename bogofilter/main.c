@@ -29,6 +29,7 @@ AUTHOR:
 #include "common.h"
 #include "lexer.h"
 #include "bogofilter.h"
+#include "bogoconfig.h"
 
 #define BOGODIR ".bogofilter"
 
@@ -44,8 +45,8 @@ char msg_register[1024];
 char msg_bogofilter[1024];
 
 const char *progname = "bogofilter";
-const char *system_config_file = "/etc/bogofilter.cf";
-const char *user_config_file   = "~/.bogofilter.cf";
+char *system_config_file = "/etc/bogofilter.cf";
+char *user_config_file   = ".bogofilter.cf";
 
 char *spam_header_name = SPAM_HEADER_NAME;
 
@@ -54,8 +55,6 @@ run_t run_type = RUN_NORMAL;
 int thresh_index = 0;
 double thresh_stats = 0.0f;
 double thresh_rtable = 0.0f;
-
-extern	void read_config_file(const char *filename);
 
 /* if the given environment variable 'var' exists, copy it to 'dest' and
    tack on the optional 'subdir' value.
@@ -121,7 +120,7 @@ static int check_directory(const char* path) /*@globals errno,stderr@*/
     return 0;
 }
 
-int validate_args(/*@unused@*/ int argc, /*@unused@*/ char **argv)
+static int validate_args(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 {
     bool registration, classification;
 
@@ -146,7 +145,7 @@ int validate_args(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 
 static int quell_config_read = 0;
 
-int process_args(int argc, char **argv)
+static int process_args(int argc, char **argv)
 {
     int option;
     int exitcode;
@@ -280,8 +279,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	exit(2);
 
     if (!quell_config_read) {
-	read_config_file( system_config_file );
-	read_config_file( user_config_file );
+	read_config_file(system_config_file, 0);
+	read_config_file(user_config_file, 1);
     }
 
     switch(run_type) {
