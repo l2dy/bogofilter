@@ -12,7 +12,7 @@ AM_CPPFLAGS = -I$(srcdir)/..
 AM_LDFLAGS = -L..
 LDADD = -lbogofilter
 
-ENVIRON_TESTS =  t.env t.bogodir 
+ENVIRON_TESTS = t.abort t.env t.bogodir
 
 PARSING_TESTS = \
 	t.ignore_spam_header \
@@ -29,7 +29,7 @@ SCORING_TESTS =  t.score1 t.score2 t.systest t.grftest
 
 BULKMODE_TESTS = t.bulkmode t.MH t.maildir
 
-INTEGRITY_TESTS = t.abort t.lock1 t.lock2 t.valgrind
+INTEGRITY_TESTS = t.lock1 t.lock2 t.valgrind
 
 TESTSCRIPTS = ${ENVIRON_TESTS} ${PARSING_TESTS} ${WORDLIST_TESTS} ${SCORING_TESTS} ${BULKMODE_TESTS} ${INTEGRITY_TESTS} 
 
