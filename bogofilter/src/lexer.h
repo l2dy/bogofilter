@@ -17,10 +17,6 @@ extern FILE *yyin;
 
 extern	bool	block_on_subnets;
 
-extern	bool	kill_html_comments;
-extern	int	count_html_comments;
-extern	bool	score_html_comments;
-
 #define YY_NULL 0
 
 /* lexer interface */
