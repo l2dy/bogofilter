@@ -26,6 +26,7 @@ AUTHOR:
 #define PROGNAME "bogoutil"
 
 int verbose = 0;
+int logflag = 0;
 
 run_t run_type = RUN_NORMAL;
 

@@ -18,16 +18,27 @@ AUTHOR:
 #include <db.h>
 #include <errno.h>
 
+#include "config.h"
+#ifdef	HAVE_SYSLOG_H
+#include <syslog.h>
+#endif
+
 #include "xmalloc.h"
 #include "xstrdup.h"
 #include "datastore.h"
 #include "datastore_db.h"
 #include "globals.h"
 
-
 #define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
 
 extern int errno;
+extern int logflag;
+
+#ifndef	HAVE_SYSLOG_H
+#define SYSLOG_ERROR(format, filename)
+#else
+#define SYSLOG_ERROR(format, filename)      if (logflag) syslog( LOG_ERR, format, filename)
+#endif
 
 static void db_enforce_locking(dbh_t *handle, const char *func_name){
   if (handle->locked == FALSE){
@@ -116,14 +127,14 @@ long db_getvalue(void *vhandle, char *word){
       value = *(long *)db_data.data;
 
       if (DEBUG_DATABASE(2)) {
-        fprintf(stderr, "[%lu] db_getvalue (%s): [%s] has value %ld\n", (unsigned long)handle->pid, handle->name, word, value);
+        fprintf(stderr, "[%lu] db_getvalue (%s): [%s] has value %ld\n", (unsigned long) handle->pid, handle->name, word, value);
       }
 
       return(value);
     }
     else if (ret == DB_NOTFOUND){
       if (DEBUG_DATABASE(2)) {
-        fprintf(stderr, "[%lu] db_getvalue (%s): DB_NOTFOUND\n", (unsigned long)handle->pid, handle->name, word);
+        fprintf(stderr, "[%lu] db_getvalue (%s): DB_NOTFOUND\n", (unsigned long) handle->pid, handle->name, word);
       }
       return 0;
     }
@@ -251,15 +262,16 @@ void db_lock_reader(void *vhandle){
   dbh_t *handle = vhandle;
 
   if (DEBUG_DATABASE(1))
-    fprintf(stderr, "[%lu] Acquiring read lock  on %s\n",(unsigned long)handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Acquiring read lock  on %s\n", (unsigned long) handle->pid, handle->filename);
 
   if (db_lock(handle, F_SETLKW, F_RDLCK) != 0){
-    fprintf(stderr, "[%lu] Error acquiring read lock on %s\n",(unsigned long)handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Error acquiring read lock on %s\n", (unsigned long) handle->pid, handle->filename);
+    SYSLOG_ERROR( "Error acquiring read lock on %s\n", handle->filename);
     exit(2);
   }
 
   if (DEBUG_DATABASE(1))
-    fprintf(stderr, "[%lu] Got read lock  on %s\n",(unsigned long)handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Got read lock  on %s\n", (unsigned long) handle->pid, handle->filename);
 
   handle->locked = TRUE;
 }
@@ -271,15 +283,16 @@ void db_lock_writer(void *vhandle){
   dbh_t *handle = vhandle;
 
   if (DEBUG_DATABASE(1))
-    fprintf(stderr, "[%lu] Acquiring write lock on %s\n",(unsigned long)handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Acquiring write lock on %s\n", (unsigned long) handle->pid, handle->filename);
 
   if (db_lock(handle, F_SETLKW, F_WRLCK) != 0){
-    fprintf(stderr, "[%lu] Error acquiring write lock on %s\n",(unsigned long)handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Error acquiring write lock on %s\n", (unsigned long) handle->pid, handle->filename);
+    SYSLOG_ERROR( "Error acquiring write lock on %s\n", handle->filename);
     exit(2);
   }
 
   if (DEBUG_DATABASE(1))
-    fprintf(stderr, "[%lu] Got write lock on %s\n",(unsigned long)handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Got write lock on %s\n", (unsigned long) handle->pid, handle->filename);
 
   handle->locked = TRUE;
 }
@@ -292,15 +305,16 @@ void db_lock_release(void *vhandle){
 
   if (handle->locked == TRUE){
     if (DEBUG_DATABASE(1))
-      fprintf(stderr, "[%lu] Releasing lock on %s\n",(unsigned long)handle->pid, handle->filename);
+      fprintf(stderr, "[%lu] Releasing lock on %s\n", (unsigned long) handle->pid, handle->filename);
 
     if (db_lock(handle, F_SETLK, F_UNLCK) != 0){
-      fprintf(stderr, "[%lu] Error releasing on %s\n", (unsigned long)handle->pid, handle->filename);
+      fprintf(stderr, "[%lu] Error releasing on %s\n", (unsigned long) handle->pid, handle->filename);
+      SYSLOG_ERROR( "Error releasing on %s\n", handle->filename);
       exit(2);
     }
   }
   else if (DEBUG_DATABASE(1)) {
-    fprintf(stderr, "[%lu] Attempt to release open lock on %s\n",(unsigned long)handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Attempt to release open lock on %s\n", (unsigned long) handle->pid, handle->filename);
   }
 
   handle->locked = FALSE;
