@@ -29,8 +29,6 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
   u_int32_t wordcount = h->count;	/* use number of unique tokens */
 
-  dsv_t val;
-
   wordlist_t *list;
   sh_t incr = IX_UNDF, decr = IX_UNDF;
 
@@ -61,6 +59,7 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
   for (node = wordhash_first(h); node != NULL; node = wordhash_next(h))
   {
+      dsv_t val;
       wordprop = node->buf;
       ds_read(word_list->dsh, node->key, &val);
       if (incr != IX_UNDF) {
@@ -76,6 +75,8 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
   for (list = word_lists; list != NULL; list = list->next)
   {
+      dsv_t val;
+
 /*
       if (!list->active)
 	  continue;
