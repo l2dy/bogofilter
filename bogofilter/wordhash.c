@@ -1,7 +1,11 @@
 /*
 $Id$
 $Log$
+Revision 1.3  2002/10/04 02:48:29  m-a
+Fix types.
+
 Revision 1.2  2002/10/04 02:06:55  gyepi
+
 1. Use multiple buffer lists in wordhash to avoid alignment problems
 on more restrictive architectures.
 2. Add initializer arg to wordhash_insert.
@@ -148,7 +152,7 @@ void *
 wordhash_insert (wordhash_t * h, char *s, size_t n, void (*initializer)(void *))
 {
   hashnode_t *p;
-  int index = hash (s);
+  unsigned int index = hash (s);
 
   for (p = h->bin[index]; p != NULL; p = p->next)
     if (strcmp (s, p->key) == 0)

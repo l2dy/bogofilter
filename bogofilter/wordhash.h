@@ -18,7 +18,7 @@ typedef struct wh_alloc_node {
 
 typedef struct wh_alloc_str {
   char * buf;
-  int avail;
+  size_t avail;
   int used;
   struct wh_alloc_str *next;
 } wh_alloc_str;
