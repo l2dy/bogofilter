@@ -36,7 +36,7 @@ struct rstats_s {
 
 typedef struct rhistogram_s rhistogram_t;
 struct rhistogram_s {
-    int count;
+    size_t count;
     double prob;
     double spamicity;
 };
@@ -45,7 +45,7 @@ struct rhistogram_s {
 typedef struct header_s header_t;
 struct header_s {
     rstats_t *list;
-    int    robn;
+    size_t    robn;
     double invlogsum;
     double logsum;
     double invproduct;
@@ -53,12 +53,12 @@ struct header_s {
     double spamicity;
 };
 
-static int	 count;
+static size_t	 count;
 static header_t  header;
 static rstats_t *current = NULL;
 
-void rstats_print_histogram(int robn, rstats_t **rstats_array);
-void rstats_print_rtable(int robn, rstats_t **rstats_array);
+void rstats_print_histogram(size_t robn, rstats_t **rstats_array);
+void rstats_print_rtable(size_t robn, rstats_t **rstats_array);
 
 void rstats_init(void)
 {
@@ -91,7 +91,7 @@ static int compare_rstats_t(const void *const ir1, const void *const ir2)
 
 #define	INTERVALS	10
 
-void rstats_fini(int robn, double invlogsum, double logsum, double invproduct, double product, double spamicity)
+void rstats_fini(size_t robn, double invlogsum, double logsum, double invproduct, double product, double spamicity)
 {
     header.robn       = robn;
     header.invproduct = invproduct;
@@ -103,8 +103,8 @@ void rstats_fini(int robn, double invlogsum, double logsum, double invproduct, d
 
 void rstats_print(void)
 {
-    int r;
-    int robn = header.robn;
+    size_t r;
+    size_t robn = header.robn;
     rstats_t *cur;
     rstats_t **rstats_array = (rstats_t **) xcalloc( robn, sizeof(rstats_t *));
 
@@ -129,11 +129,11 @@ void rstats_print(void)
     xfree(rstats_array);
 }
 
-void rstats_print_histogram(int robn, rstats_t **rstats_array)
+void rstats_print_histogram(size_t robn, rstats_t **rstats_array)
 {
-    int i, r;
+    size_t i, r;
     rhistogram_t hist[INTERVALS];
-    int maxcnt=0;
+    size_t maxcnt=0;
 
     double invlogsum = 0.0;	/* Robinson's P */
     double logsum = 0.0;	/* Robinson's Q */
@@ -143,7 +143,7 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
     {
 	rhistogram_t *h = &hist[i];
 	double fin = 1.0*(i+1)/INTERVALS;
-	int cnt = 0;
+	size_t cnt = 0;
 	h->prob = 0.0;
 	h->spamicity=0.0;
 	while ( r<robn)
@@ -181,7 +181,7 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
     {
 	double beg = 1.0*i/INTERVALS;
 	rhistogram_t *h = &hist[i];
-	int cnt = h->count;
+	size_t cnt = h->count;
 	double prob = cnt ? h->prob/cnt : 0.0;
 
 	/* print interval, count, probability, and spamicity */
@@ -197,9 +197,9 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
     }
 }
 
-void rstats_print_rtable(int robn, rstats_t **rstats_array)
+void rstats_print_rtable(size_t robn, rstats_t **rstats_array)
 {
-    int r;
+    size_t r;
 
     /* print header */
     (void)fprintf(stdout, "     %-20s%10s%10s%10s%10s%10s\n",

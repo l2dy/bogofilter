@@ -17,7 +17,7 @@ void rstats_add(const char *token,
 		double bad,
 		double prob);
 
-void rstats_fini(int robn, 
+void rstats_fini(size_t robn, 
 		 double invlogsum, 
 		 double logsum, 
 		 double invproduct, 
