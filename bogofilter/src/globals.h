@@ -45,7 +45,7 @@ extern	bool	header_line_markup;	/* -Ph,-PH */
 
 extern	const char	*update_dir;
 extern	const char	*progname;
-extern	const char	*progtype;
+extern	      char	*progtype;
 /*@observer@*/
 extern	const char	*stats_prefix;
 extern	const char *const version;

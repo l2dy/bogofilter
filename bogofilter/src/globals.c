@@ -62,7 +62,7 @@ FILE	*fpo;
 uint	db_cachesize = DB_CACHESIZE;	/* in MB */
 enum	passmode passmode;		/* internal */
 bool	msg_count_file = false;
-const char *progtype = NULL;
+char	*progtype = NULL;
 bool	unsure_stats = false;		/* true if print stats for unsures */
 
 run_t run_type = RUN_UNKNOWN;
