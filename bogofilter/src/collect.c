@@ -63,7 +63,7 @@ void collect_words(wordhash_t *wh)
 	if (cls == BOGO_LEX_LINE)
 	{
 	    char *s = (char *)(yylval->text+1);
-	    char *f = strchr(s, '"');
+	    char *f = strchr(s, ' ') - 1;
 	    token->text = (unsigned char *) s;
 	    token->leng = f - s;
 	}
