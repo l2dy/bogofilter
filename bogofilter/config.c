@@ -158,12 +158,6 @@ static bool select_method(enum algorithm_e al)
     return ok;
 }
 
-bool isFisher(void)
-{
-    bool ans = algorithm == AL_FISHER;
-    return ans;
-}
-
 static bool process_config_parameter(const parm_desc *arg, const char *val)
 {
     bool ok = true;
@@ -370,8 +364,15 @@ static void help(void)
     (void)printf( "\t-h\t- print this help message.\n" );
     (void)printf( "\t-d path\t- specify directory for wordlists.\n" );
 #ifdef	GRAHAM_AND_ROBINSON
+#ifdef	ENABLE_GRAHAM_METHOD
     (void)printf( "\t-g\t- select Graham spam calulation method (default).\n" );
+#endif
+#ifdef	ENABLE_ROBINSON_METHOD
     (void)printf( "\t-r\t- select Robinson spam calulation method.\n" );
+#endif
+#ifdef	ENABLE_ROBINSON_FISHER
+    (void)printf( "\t-f\t- select Fisher spam calulation method.\n" );
+#endif
 #endif
     (void)printf( "\t-p\t- passthrough.\n" );
     (void)printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
@@ -387,7 +388,7 @@ static void help(void)
     (void)printf( "\t-c filename\t- read config file 'filename'.\n" );
     (void)printf( "\t-C\t- don't read standard config files.\n" );
     (void)printf( "\t-q\t- quiet - don't print warning messages.\n" );
-    (void)printf( "\t-f\t- force printing of spamicity numbers.\n" );
+    (void)printf( "\t-F\t- force printing of spamicity numbers.\n" );
     (void)printf( "\n" );
     (void)printf( "bogofilter is a tool for classifying email as spam or non-spam.\n" );
     (void)printf( "\n" );
@@ -508,6 +509,7 @@ int process_args(int argc, char **argv)
 	    algorithm = AL_FISHER;
 	    break;
 #endif
+
 	case 'x':
 	    set_debug_mask( optarg );
 	    break;
