@@ -2,7 +2,7 @@
 
 Name: @PACKAGE@
 Version: @VERSION@
-Release: 1
+Release: 2
 URL: http://bogofilter.sourceforge.net
 Source0: %{name}-%{version}.tar.gz
 License: GPL
@@ -80,27 +80,34 @@ for README in randomtrain ; do
 done
 
 %post static
-for file in bogofilter_static bogolexer_static bogoutil_static ; do
-  ln -s %{_bindir}/$file %{_bindir}/${file%_static}
+for file in bogofilter bogolexer bogoutil ; do
+    if [ ! -f %{_bindir}/${file} ] ; then
+        ln -s %{_bindir}/${file%_static} %{_bindir}/${file} 
+    fi
 done
 
 %postun static
 for file in bogofilter bogolexer bogoutil ; do
-  rm -f %{_bindir}/$file
+    if [ -f %{_bindir}/${file} ] ; then
+        rm -f %{_bindir}/${file}
+        echo rm -f %{_bindir}/${file}
+    fi
 done
 
 %files
 %defattr(-,root,root)
-%{_mandir}/man1/bogofilter.1*
-%{_mandir}/man1/bogolexer.1*
-%{_mandir}/man1/bogoutil.1*
-%{_mandir}/man1/bogoupgrade.1*
+
 %{_bindir}/bogofilter
 %{_bindir}/bogolexer
 %{_bindir}/bogoutil
 %{_bindir}/bogoupgrade
 %{_sysconfdir}/bogofilter.cf.example
 %config(noreplace) %{_sysconfdir}/bogofilter.cf
+
+%{_mandir}/man1/bogofilter.1*
+%{_mandir}/man1/bogolexer.1*
+%{_mandir}/man1/bogoutil.1*
+%{_mandir}/man1/bogoupgrade.1*
 
 %doc AUTHORS CHANGES-* COPYING INSTALL METHODS NEWS
 %doc README README.cvs RELEASE.NOTES-* TODO UPGRADE
@@ -112,18 +119,20 @@ done
 %{_datadir}/%{name}/tuning/*
 
 %files static
+%defattr(-,root,root)
 
 %{_bindir}/bogofilter_static
 %{_bindir}/bogolexer_static
 %{_bindir}/bogoutil_static
+%{_bindir}/bogoupgrade
 
-%defattr(-,root,root)
+%{_sysconfdir}/bogofilter.cf.example
+%config(noreplace) %{_sysconfdir}/bogofilter.cf
+
 %{_mandir}/man1/bogofilter.1*
 %{_mandir}/man1/bogolexer.1*
 %{_mandir}/man1/bogoutil.1*
 %{_mandir}/man1/bogoupgrade.1*
-%{_sysconfdir}/bogofilter.cf.example
-%config(noreplace) %{_sysconfdir}/bogofilter.cf
 
 %doc AUTHORS CHANGES-* COPYING INSTALL METHODS NEWS
 %doc README README.cvs RELEASE.NOTES-* TODO UPGRADE
