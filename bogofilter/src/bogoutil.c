@@ -301,7 +301,10 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     {
 	dsv_t val;
 	word_t *token;
-	double gra_prob = 0.0, rob_prob = 0.0;
+#ifdef	ENABLE_DEPRECATED_CODE
+	double gra_prob = 0.0;
+#endif
+	double rob_prob = 0.0;
 	
 	if (argc == 0)
 	{
@@ -321,13 +324,18 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 
 	if (show_probability)
 	{
+#ifdef	ENABLE_DEPRECATED_CODE
 	    double spamness = (double) spam_count / (double) spam_msg_count;
 	    double goodness = (double) good_count / (double) good_msg_count;
 
 	    gra_prob = (spam_count + good_count <= MINIMUM_FREQ)
 		? UNKNOWN_WORD
 		: spamness / (spamness+goodness);
-	    rob_prob = calc_prob(goodness, spamness);
+#endif
+	    msgs_good = good_msg_count;
+	    msgs_bad  = spam_msg_count;
+
+	    rob_prob = calc_prob(good_count, spam_count);
 	}
 
 #ifndef	ENABLE_DEPRECATED_CODE
