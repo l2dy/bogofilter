@@ -12,6 +12,7 @@
 /bogofilter-*.tar.gz
 /bogofilter.spec
 /bogoutil
+/bogoutil.1
 /config.h
 /config.in
 /config.log
