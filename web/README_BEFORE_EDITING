@@ -12,13 +12,7 @@ To edit,
 3. commit the changes
 
 4. log into the sourceforge net shell,
-   type: cd /home/groups/b/bo/bogofilter/htdocs && ./updateweb
+   type: cd /home/groups/b/bo/bogofilter/htdocs/web && ./updateweb
 
-Note there is a hidden .htaccess file!
-
-As to the "Permanent" Redirection: I (Matthias) have tried various way to
-either send an Expires: or Cache-Control: public header, to use "Temporary
-redirections" and allow for cacheable results, but all methods I am aware of
-(mod_cern_meta, mod_expires) have failed. So we use Permanent, which is
-cachable.
-
+NOTE: you must also to #4 above if the FAQ or NEWS files have been
+updated - we no longer use viewcvs to obtain these, it's all too slow.
