@@ -43,7 +43,7 @@
 * Added file RELEASE.NOTES-0.13.  Read it!!!
 * Changed parsing defaults to:
   -PI	ignore_case		(default is disabled)
-  -Ph	header_line_markup	(default is ensabled)
+  -Ph	header_line_markup	(default is enabled)
   -Pt	tokenize_html_tags	(default is enabled)
 * contrib/randomtrain and contrib/scramble can now process
   both mbox and maildir formats.
