@@ -134,7 +134,7 @@ int maintain_wordlist_file(const char *db_file)
 
     dbh = db_open(".", 1, &db_file, DB_WRITE);
     if (dbh == NULL)
-	return 2;
+	return EX_ERROR;
 
     rc = maintain_wordlist(dbh);
 
