@@ -206,8 +206,6 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     int is_swapped;
     char *t;
 
-    if (!init) abort();
-
     dbh_t *handle = NULL;
     uint32_t opt_flags = 0;
     /*
@@ -220,6 +218,8 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
      */
     size_t idx;
     uint32_t retryflags[] = { 0, DB_NOMMAP };
+
+    if (!init) abort();
 
     check_db_version();
 
