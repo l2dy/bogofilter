@@ -113,9 +113,9 @@ sub help {
   Options:
     -i	<input file>.
       
-        Text file containing message counts, and possibly data.
-        If there is no data in the text file, there should be a  Berkeley DB file
-        in the same directory as the text file which contains the data. 
+        Text file containing message counts, and possibly data. If there is no
+        data in the text file, there should be a  Berkeley DB file in the same
+        directory as the text file which contains the data. 
             
    -o	<output file>
               
