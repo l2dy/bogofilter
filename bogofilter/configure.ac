@@ -96,6 +96,12 @@ You can download BerkeleyDB 4.0.x from http://www.sleepycat.com/]]),
 [[#include <db.h>]]
 )
 
+AC_CHECK_DECLS(optreset,,,[[
+#include <unistd.h>
+/* Solaris */
+#include <stdlib.h>
+]])
+
 AC_CHECK_DB([db db-4.1 db-4 db4 db-3.3 db-3.2 db-3.1 db-3 db3],,
 	    AC_MSG_ERROR([[Can not locate a suitable Berkeley DB library.  Use --with-db=PATH to specify the path to a v3+ install directory]]))
 
