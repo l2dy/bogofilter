@@ -4,6 +4,9 @@
 #define XMALLOC_H_GUARD
 #include <stdlib.h>
 
+/*@noreturn@*/
+void xmem_error(const char *);
+
 /*@only@*/ /*@out@*/ /*@notnull@*/
 void *xmalloc(size_t size);
 
