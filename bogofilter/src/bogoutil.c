@@ -583,8 +583,8 @@ static void help(void)
 	    "\t-R\tCompute Robinson's X and save it in the spam list.\n");
     fprintf(stderr,
 	    "\t-k size\tset BerkeleyDB cache size (MB).\n"
-	    "\t  -W\tUse combined wordlist.db for spam and ham tokens.\n"
-	    "\t  -WW\tUse separate wordlists for spam and ham tokens.\n");
+	    "\t-W\tUse combined wordlist.db for spam and ham tokens.\n"
+	    "\t-WW\tUse separate wordlists for spam and ham tokens.\n");
     fprintf(stderr,
 	    "\t-a age\tExclude tokens with older ages.\n"
 	    "\t-c count\tExclude tokens with lower counts.\n"
@@ -607,7 +607,7 @@ char *db_file = NULL;
 bool  prob = false;
 cmd_t flag = NONE;
 
-#define	OPTIONS	":a:c:d:DhI:l:m:np:r:R:s:vVw:Wx:y:"
+#define	OPTIONS	":a:c:d:DhI:kl:m:np:r:R:s:vVw:Wx:y:"
 
 static int process_args(int argc, char **argv)
 {
