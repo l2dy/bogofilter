@@ -101,6 +101,9 @@ then
       *) addopts="$addopts -Wpointer-arith -ggdb" ;;
   esac
   for i in $addopts \
+dnl the -ieee options are for Alpha and VAX, Clint Adams' recommendation
+dnl See http://thread.gmane.org/gmane.mail.bogofilter.general/6352
+      -mieee -ieee_with_no_inexact \
       -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wshadow \
       -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings \
       -Waggregate-return -Wmissing-declarations \
