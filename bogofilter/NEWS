@@ -21,7 +21,12 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
-0.93.4	2005-01-XX
+0.93.4	2005-01-09
+
+	2005-01-08
+
+	* Misc fixing of compiler warning messages.
+	* Minor refactoring of charset code.
 
 	2005-01-05
 
