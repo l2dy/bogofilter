@@ -90,7 +90,9 @@ token_t get_token(void)
 	case EMPTY:	/* empty line -- check for bogus end of header */
 	    got_emptyline(); 
 	    msg_header = false;
-	    if (yylval->leng != 1)
+	    if (yylval->leng == 1)
+		continue;
+	    else	/* "spc:invalid_end_of_header" */
 		yylval = word_dup(nonblank_line);
 	    break;
 
