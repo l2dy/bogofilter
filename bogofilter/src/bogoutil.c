@@ -119,8 +119,8 @@ static int load_wordlist(const char *ds_file)
     for (;;) {
 	dsv_t data;
 	word_t *token;
-	if (fgets((char *)buf, BUFSIZE, stdin) == NULL) {
-	    if (ferror(stdin)) {
+	if (fgets((char *)buf, BUFSIZE, fpin) == NULL) {
+	    if (ferror(fpin)) {
 		perror(progname);
 		rv = 2;
 	    }
