@@ -17,8 +17,8 @@ Matthias Andree <matthias.andree@gmx.de> 2003 - 2004
 **	3. Bogofilter's header files
 */
 
-/* This code has been tested with BerkeleyDB 3.0, 3.1 3.2, 3.3, 4.0,
- * 4.1 and 4.2.  -- Matthias Andree, 2004-10-04 */
+/* This code has been tested with BerkeleyDB 3.1 3.2, 3.3, 4.0,
+ * 4.1 and 4.2.  -- Matthias Andree, 2004-11-29 */
 
 /* TODO:
  * - implement proper retry when our transaction is aborted after a
@@ -485,7 +485,7 @@ retry_db_open:
 #define BF_TXN_COMMIT(t, f) ((t)->commit((t), (f)))
 #define BF_TXN_CHECKPOINT(e, k, m, f) ((e)->txn_checkpoint((e), (k), (m), (f)))
 #else
-/* BerkeleyDB 3.0, 3.1, 3.2, 3.3 */
+/* BerkeleyDB 3.1, 3.2, 3.3 */
 #define BF_LOG_FLUSH(e, i) (log_flush((e), (i)))
 #define BF_MEMP_SYNC(e, l) (memp_sync((e), (l)))
 #define BF_MEMP_TRICKLE(e, p, n) (memp_trickle((e), (p), (n)))
@@ -493,13 +493,7 @@ retry_db_open:
 #define BF_TXN_ID(t) (txn_id(t))
 #define BF_TXN_ABORT(t) (txn_abort((t)))
 #define BF_TXN_COMMIT(t, f) (txn_commit((t), (f)))
-#if DB_AT_LEAST(3,1)
-/* BerkeleyDB 3.1, 3.2, 3.3 */
 #define BF_TXN_CHECKPOINT(e, k, m, f) (txn_checkpoint((e), (k), (m), (f)))
-#else
-/* BerkeleyDB 3.0 */
-#define BF_TXN_CHECKPOINT(e, k, m, f) (txn_checkpoint((e), (k), (m)))
-#endif
 #endif
 
 /** begin transaction. Returns 0 for success. */
@@ -1027,9 +1021,6 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 	fprintf(dbgout, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT)\n");
 
     ret = env->dbe->open(env->dbe, directory,
-#if DB_AT_MOST(3,0)
-	    NULL,
-#endif
 	    dbenv_defflags | DB_CREATE | flags, /* mode */ 0644);
     if (ret != 0) {
 	env->dbe->close(env->dbe, 0);

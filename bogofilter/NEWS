@@ -25,6 +25,14 @@ Briefly:
 
 	2004-11-28
 
+	* Support for Berkeley DB 3.0 was explicitly removed again, so that no
+	  stable bogofilter version since 0.17.5 will have had support for this
+	  version. This eliminates the need for on-disk database format
+	  upgrades and keeps things simple.
+	  As the unadvertised breaking of BDB 3.0 didn't raise a single
+	  complaint and 3.1 has been around since July 2000, this should be
+	  safe.
+
 	* Support long options in bogoutil.
 
 	* Add --remove-environment DIR long option to bogoutil, to remove the

@@ -181,6 +181,10 @@ static void check_db_version(void)
     int maj, min;
     static int version_ok;
 
+#if DB_AT_MOST(3,0)
+#error "Berkeley DB 3.0 is not supported"
+#endif
+
     if (!version_ok) {
 	version_ok = 1;
 	(void)db_version(&maj, &min, NULL);
