@@ -25,6 +25,7 @@ AUTHOR:
 #include "charset.h"
 #endif
 #include "common.h"
+#include "directories.h"
 #include "find_home.h"
 #include "globals.h"
 #include "method.h"
