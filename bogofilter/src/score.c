@@ -77,6 +77,9 @@ void msg_print_stats(FILE *fp)
 	rstats_print(unsure);
 }
 
+/** search token in all lists according to precedence, summing up the
+ * counts (all lists at same precedence are used); if found, set cnts
+ * accordingly. */
 static void lookup(const word_t *token, wordcnts_t *cnts)
 {
     int override=0;
