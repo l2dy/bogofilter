@@ -131,6 +131,10 @@ const parm_desc sys_parms[] =
     { "header_line_markup", 	     CP_BOOLEAN, { (void *) &header_line_markup } },
     { "strict_check", 	  	     CP_BOOLEAN, { (void *) &strict_check } },
 
+    { "header_degen",		     CP_BOOLEAN, { (void *) &header_degen } }, 
+    { "degen_enabled",		     CP_BOOLEAN, { (void *) &degen_enabled } }, 
+    { "first_match",		     CP_BOOLEAN, { (void *) &first_match } }, 
+
     { "ignore_case", 	  	     CP_BOOLEAN, { (void *) &ignore_case } },
     { "tokenize_html_tags",	     CP_BOOLEAN, { (void *) &tokenize_html_tags } },
     { "tokenize_html_script",	     CP_BOOLEAN, { (void *) &tokenize_html_script } },	/* Not yet in use */

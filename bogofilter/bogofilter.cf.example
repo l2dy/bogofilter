@@ -81,6 +81,18 @@
 ##db_cachesize=16
 
 
+#### Degeneration options
+#
+#	header_degen - if tagged header token isn't found, 
+#		       check for the untagged token
+#	degen_enabled - if no match, try simplifying token
+#	first_match - use first match or most extreme
+
+#header_degen=N
+#degen_enabled=N
+#first_match=N
+
+
 ##### TIMESTAMP
 #
 #	enables or disables token timestamps
