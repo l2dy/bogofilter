@@ -1,5 +1,7 @@
-/*
-$Id$
+/* $Id$ */
+
+/*****************************************************************************
+
 NAME:
 datastore.c -- contains database independent components of data storage.
 
@@ -7,7 +9,7 @@ AUTHORS:
 Gyepi Sam <gyepi@praxis-sw.com>   2002 - 2003
 Matthias Andree <matthias.andree@gmx.de> 2003
 
-*/
+******************************************************************************/
 
 #include "datastore.h"
 #include "xmalloc.h"

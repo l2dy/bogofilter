@@ -1,16 +1,21 @@
-/**
- * \file datastore.h
- * API for bogofilter datastore.  The idea here is to make bogofilter
- * independent of the database system used to store words. The interface
- * specified by this file determines the entire interaction between
- * bogofilter and the database. Writing a new database backend merely
- * requires the implementation of the interface.
- *
- * \author Gyepi Sam  <gyepi@praxis-sw.com>
- * \author Matthias Andree <matthias.andree@gmx.de>
- * \date 2002-2003
- * $Id$
- */
+/* $Id$ */
+
+/*****************************************************************************
+
+NAME:
+datastore.h - API for bogofilter datastore.  
+
+   The idea here is to make bogofilter independent of the database
+   system used to store words.  The interface specified by this file
+   determines the entire interaction between bogofilter and the
+   database.  Writing a new database backend merely requires the
+   implementation of the interface.
+
+AUTHORS:
+Gyepi Sam <gyepi@praxis-sw.com>   2002 - 2003
+Matthias Andree <matthias.andree@gmx.de> 2003
+
+******************************************************************************/
 
 #ifndef DATASTORE_H
 #define DATASTORE_H
