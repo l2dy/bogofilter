@@ -218,9 +218,14 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
   /* This has to match just as much or more than the below rules, so as to be the 
      controlling rule. */
-<HTML>{TOKEN}/{HTMLTOKEN}*{BREAKHTML}+{HTMLTOKEN}*.?	{ return TOKEN; }
+<HTML>{TOKEN}{HTMLTOKEN}*{BREAKHTML}+{HTMLTOKEN}*.?	|
 
-<HTML>{TOKEN}/({HTMLTOKEN})+{WHITESPACE}		{ return TOKEN; }
+<HTML>{TOKEN}({HTMLTOKEN})+{WHITESPACE}		{ 
+    			char *chr = memchr(yytext, '<', yyleng);	/* find start of html tag */
+			size_t len = chr - yytext;
+			yyless(len);
+			return TOKEN;
+			}
 
 <HTML>{TOKEN}({HTMLTOKEN})+/{NOTWHITESPACE} 	{
 						    reorder_html();
@@ -240,12 +245,11 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <HTML>"<"					{ /* unknown tag */ BEGIN HDISCARD; }
 
 <HTOKEN>{TOKEN}					{ if (tokenize_html_tags)     return TOKEN; }
-<HDISCARD>{TOKEN}				{ /* discard innards of html tags     */ }
-<SCOMMENT,LCOMMENT>{TOKEN}			{ /* discard innards of html comments */ }
+<HDISCARD,LCOMMENT>[^>]*>			{ BEGIN HTML; /* discard innards of html tags */ }
 <HSCRIPT>{TOKEN}				{ if (tokenize_html_script)   return TOKEN; }
 
 <HTOKEN,HDISCARD>">"				{ BEGIN HTML; }	/* end of tag; return to normal html processing */
-<LCOMMENT>">"					{ BEGIN HTML; }	/* end of loose comment; return to normal html processing */
+<SCOMMENT>{TOKEN}				{ /* discard innards of html comments */ }
 <SCOMMENT>"-->"					{ BEGIN HTML; }	/* end of strict comment; return to normal html processing */
 
 {IPADDR}					{ return IPADDR;}
