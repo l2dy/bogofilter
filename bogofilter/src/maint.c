@@ -134,15 +134,14 @@ void maintain_wordlists(void)
 int maintain_wordlist_file(const char *db_file)
 {
     int rc;
-    void *dbh;
+    dsh_t *dsh = ds_open(".", 1, &db_file, DB_WRITE);
 
-    dbh = ds_open(".", 1, &db_file, DB_WRITE);
-    if (dbh == NULL)
+    if (dsh == NULL)
 	return EX_ERROR;
 
-    rc = maintain_wordlist(dbh);
+    rc = maintain_wordlist(dsh);
 
-    ds_close(dbh, false);
+    ds_close(dsh, false);
 
     return rc;
 }
