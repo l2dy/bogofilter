@@ -20,6 +20,14 @@ algorithm=robinson
 #algorithm=fisher
 
 
+#### BLOCK ON SUBNETS
+#
+#	convert IPADDRs into a special token, url:1.2.3.4,
+#	and also return url:1.2.3, url:1.2, and url:1
+
+#block_on_subnets=no
+
+
 #### SPAM_HEADER_NAME
 #
 #	used in reporting spamicity and
@@ -28,7 +36,7 @@ algorithm=robinson
 spam_header_name=X-Bogosity
 
 
-#### minimum deviation
+#### MINIMUM DEVIATION
 #
 #	if token spamicity closer to EVEN_ODDS (0.5f)
 #	than MIN_DEV, don't use the word in the 
@@ -47,7 +55,7 @@ robs=0.001
 robx=0.415
 
 
-##### stats_in_header
+##### STATS_IN_HEADER
 #
 #	non-zero (default):  put spamicity info in message header
 #	zero:  put spamicity info in message body
@@ -57,7 +65,7 @@ stats_in_header=Y
 
 #stats_in_header=N
 
-#### cutoff values
+#### CUTOFF Values
 #
 #	for Graham and Robinson:
 #	    only spam_cutoff is needed.
@@ -86,7 +94,7 @@ stats_in_header=Y
 # spam_cutoff = 0.95
 
 
-##### threshold values
+##### THRESHOLD Values
 #
 #	used to determine if/when spamicity 
 #	values are output by print_bogostats()
@@ -110,7 +118,7 @@ user_config_file=~/.bogofilter.cf
 #user_config_file=~/.bogofilter/config
 
 
-#### wordlist: define a word list
+#### WORDLIST: define a word list
 #
 #	char type: 's','g','i' (denoting spam, good, or ignore)
 #	char *name: name of list, e.g. "good", "spam", "ignore"
