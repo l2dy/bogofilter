@@ -50,13 +50,13 @@ ta_t *ta_init(void)
 }
 
 /* write back contents of scheduler queue to database (internal function) */
-static int ta_flush(ta_t *ta, bool write)
+static int ta_flush(ta_t *ta, bool wr)
 {
     int ret = TA_OK;
     ta_iter_t *tmp, *iter = ta->head;
     
     while (iter) {
-        if (write) {
+        if (wr) {
             switch (iter->kind) {
             case TA_DELETE:
                 ret |= ds_delete(iter->vhandle, iter->word);
