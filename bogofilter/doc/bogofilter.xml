@@ -37,6 +37,7 @@
     <arg choice='opt'>-p</arg>
     <arg choice='opt'>-e</arg>
     <arg choice='opt'>-t</arg>
+    <arg choice='opt'>-T</arg>
     <arg choice='opt'>-u</arg>
     <arg choice='opt'>-2</arg>
     <arg choice='opt'>-3</arg>
@@ -202,10 +203,16 @@ was an error (even if the mail is not spam or classified as unsure).
 This simplifies using bogofilter from procmail or maildrop.
 </para>
   
-<para>The <option>-t</option> (terse) option tells 
-<application>bogofilter</application> to print an abbreviated spamicity message containing 1 letter and the score.
-Spam is indicated with "Y", ham by "N", and unsure by "U".
-</para>
+<para>The <option>-t</option> (terse) option tells
+<application>bogofilter</application> to print an abbreviated
+spamicity message containing 1 letter and the score.  Spam is
+indicated with "Y", ham by "N", and unsure by "U".  Note: the
+formatting can be customized using the config file.</para>
+  
+<para>The <option>-T</option> provides an invariant terse mode for
+scripts to use.  <application>bogofilter</application> will print an
+abbreviated spamicity message containing 1 letter and the score.  Spam
+is indicated with "S", ham by "H", and unsure by "U".  </para>
   
 <para>The <option>-u</option> option tells
 <application>bogofilter</application> to register the message's text 
