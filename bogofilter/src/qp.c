@@ -18,6 +18,9 @@ AUTHOR:
 
 static byte qp_xlate[256];
 
+static void qp_init(void);
+static bool qp_validate(word_t *word);
+
 static int hex_to_bin(byte c) {
     switch(c) {
 	case '0': return 0;
@@ -48,6 +51,11 @@ uint qp_decode(word_t *word)
     byte *s = word->text;	/* src */
     byte *d = word->text;	/* dst */
     byte *e = s + size;		/* end */
+
+    qp_init();
+
+    if (!qp_validate(word))
+	return size;
 
     while (s < e)
     {
@@ -93,11 +101,9 @@ static void qp_init(void)
     return;
 }
 
-bool qp_validate(word_t *word)
+static bool qp_validate(word_t *word)
 {
     uint i;
-
-    qp_init();
 
     for (i = 0; i < word->leng; i += 1) {
 	byte b = word->text[i];

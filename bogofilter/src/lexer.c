@@ -286,15 +286,11 @@ size_t text_decode(word_t *w)
 
 	switch (tolower(typ[1])) {		/* ... encoding type */
 	case 'b':
-	    if (base64_validate(&n))
-		len = base64_decode(&n);	/* decode base64 */
+	    len = base64_decode(&n);		/* decode base64 */
 	    break;
 	case 'q':
-	{
-	    if (qp_validate(&n))
-		len = qp_decode(&n);		/* decode quoted-printable */
+	    len = qp_decode(&n);		/* decode quoted-printable */
 	    break;
-	}
 	}
 
 	n.leng = len;

@@ -16,31 +16,18 @@ AUTHOR:
 
 /* Local Variables */
 
+/* rfc2047 - BASE64    [0-9a-zA-Z/+=]+
+*/
+
 static byte base64_charset[] = {
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" };
 static byte base64_xlate[256];
 static const byte base64_invalid = 0x7F;
 
+static void base64_init(void);
+static bool base64_validate(word_t *word);
+
 /* Function Definitions  */
-
-static void base64_init(void)
-{
-    size_t i;
-    static bool first = true;
-
-    if (!first)
-	return;
-    first = false;
-
-    for (i = 0; i < sizeof(base64_charset); i += 1) {
-	byte c = base64_charset[i];
-	base64_xlate[c] = (byte) i;
-    }
-
-    base64_xlate['='] = base64_invalid;
-
-    return;
-}
 
 uint base64_decode(word_t *word)
 {
@@ -50,6 +37,9 @@ uint base64_decode(word_t *word)
     byte *d = word->text;		/* dst */
 
     base64_init();
+
+    if (!base64_validate(word))
+	return size;
 
     while (size)
     {
@@ -87,19 +77,33 @@ uint base64_decode(word_t *word)
     return count;
 }
 
-/* rfc2047 - BASE64    [0-9a-zA-Z/+=]+
-*/
+static void base64_init(void)
+{
+    size_t i;
+    static bool first = true;
 
-bool base64_validate(word_t *word)
+    if (!first)
+	return;
+    first = false;
+
+    for (i = 0; i < sizeof(base64_charset); i += 1) {
+	byte c = base64_charset[i];
+	base64_xlate[c] = (byte) i;
+    }
+
+    base64_xlate['='] = base64_invalid;
+
+    return;
+}
+
+static bool base64_validate(word_t *word)
 {
     uint i;
-
-    base64_init();
 
     for (i = 0; i < word->leng; i += 1) {
 	byte b = word->text[i];
 	byte v = base64_xlate[b];
-	if (b != 'A' && v == 0)
+	if (b != 'A' && v == 0 && b != '\n')
 	    return false;
     }
 
