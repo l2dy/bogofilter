@@ -126,7 +126,7 @@ static char *ds_file;
 static char *ds_path;
 
 static bool    bogolex = false;		/* true if convert input to msg-count format */
-static bool    force   = true;		/* force adherence to minimum message counts */
+static bool    force   = false;		/* force adherence to minimum message counts */
 static char   *bogolex_file = NULL;
 static word_t *w_msg_count;
 
@@ -424,11 +424,12 @@ static bool check_for_low_sp_scores(void)
     if (sp_scores[t-1] > HAM_CUTOFF)
 	return false;
     else {
-	if (!quiet)
+	if (!quiet) {
 	    fprintf(stderr,
 	        "Warning: test messages include many low scoring spam.\n");
 	    fprintf(stderr,
 	        "         You may wish to reclassify them and rerun.\n");
+	}
 	return true;
     }
 }
@@ -1237,7 +1238,25 @@ static bool check_msgcount_parms(void)
 {
     bool ok = true;
 
-    if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
+    if (ds_file == NULL) {
+	fprintf(stderr, "A wordlist directory must be specified for converting message to the message count format.\n");
+	ok = false;
+    }
+
+    if (ham_files->count != 0 && spam_files->count != 0) {
+	fprintf(stderr, "Message count files may be created from spam or non-spam inputs but not both.\n");
+	fprintf(stderr, "Run bogotune once for the spam and again for the non-spam.\n");
+	ok = false;
+    }
+
+    return ok;
+}
+
+static bool check_msg_counts(void)
+{
+    bool ok = true;
+
+    if (!force && (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT)) {
 	QPRINTF(stderr, 
 		"The wordlist contains %d non-spam and %d spam messages.\n"
 		"Bogotune must be run with at least %d of each.\n",
@@ -1264,39 +1283,6 @@ static bool check_msgcount_parms(void)
     }
 
     return !force ? ok : true;
-}
-
-static bool check_msg_counts(void)
-{
-    bool ok = true;
-
-    if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
-	fprintf(stderr, 
-		"The wordlist contains %d non-spam and %d spam messages.\n"
-		"Bogotune must be run with at least %d of each.\n",
-		(int) msgs_good, (int) msgs_bad, LIST_COUNT);
-	ok = false;
-    }
-
-    if (msgs_bad < msgs_good / 5 ||
-	msgs_bad > msgs_good * 5) {
-	fprintf(stderr,
-		"The wordlist has a ratio of spam to non-spam of %0.1f to 1.0.\n"
-		"Bogotune requires the ratio be in the range of 0.2 to 5.\n",
-		msgs_bad / msgs_good);
-	ok = false;
-    }
-
-    if (ns_cnt < TEST_COUNT || sp_cnt < TEST_COUNT) {
-	if (!quiet)
-	    fprintf(stderr, 
-		    "The messages sets contain %u non-spam and %u spam.  Bogotune "
-		    "requires at least %d non-spam and %d spam messages to run.\n",
-		    ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
-	    exit(EX_ERROR);
-    }
-
-    return ok;
 }
 
 static rc_t bogotune(void)
