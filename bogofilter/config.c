@@ -568,8 +568,8 @@ int process_args(int argc, char **argv)
 	    break;
 
 	default:
-	    fprintf(stderr, "Internal error: unhandled option '%c'
-		    (%02X)\n", option, (unsigned int)option);
+	    fprintf(stderr, "Internal error: unhandled option '%c' "
+		    "(%02X)\n", option, (unsigned int)option);
 	    exit(2); 
 	}
     }
