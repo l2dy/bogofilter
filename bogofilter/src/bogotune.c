@@ -60,7 +60,6 @@ AUTHORS:
 #include "mime.h"
 #include "paths.h"
 #include "robx.h"
-#include "rstats.h"
 #include "score.h"
 #include "token.h"
 #include "tunelist.h"
