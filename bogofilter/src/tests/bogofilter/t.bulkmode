@@ -82,7 +82,7 @@ $BOGOFILTER -$mth $CFG -n < ${SYSTEST}/inputs/good.mbx
 #$BOGOUTIL -d $BOGOFILTER_DIR/goodlist.db > $BOGOFILTER_DIR/goodlist.txt
 [ $verbose -gt 0 ] && $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT
 
-export BOGOFILTER_DIR="/var/lib/bogofilter"
+export BOGOFILTER_DIR="${TMPDIR}"
 
 CFG="${TMPDIR}/test.cf"
 OPT="-t -v"
