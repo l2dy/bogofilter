@@ -10,9 +10,6 @@
 #undef	AGE_IS_YYYYMMDD
 #define	AGE_IS_YYYYMMDD
 
-typedef uint32_t YYYYMMDD;	/* date as YYYYMMDD */
-extern YYYYMMDD today;		/* date as YYYYMMDD */
-
 extern	uint32_t thresh_count;
 extern	YYYYMMDD thresh_date;
 extern	size_t   size_min, size_max;

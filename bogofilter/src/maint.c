@@ -24,7 +24,6 @@ AUTHOR:
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-YYYYMMDD today;			/* date as YYYYMMDD */
 uint32_t thresh_count = 0;
 YYYYMMDD thresh_date  = 0;
 size_t	 size_min = 0;
@@ -32,39 +31,10 @@ size_t	 size_max = 0;
 bool     datestamp_tokens = true;
 
 /* Function Prototypes */
-static YYYYMMDD time_to_date(long days);
 
 static int maintain_wordlist(void *vhandle);
 
 /* Function Definitions */
-
-static
-YYYYMMDD time_to_date(long days)
-{
-    time_t t = time(NULL) - days * 86400;
-    struct tm *tm = localtime( &t );
-    YYYYMMDD date = ((((tm->tm_year + (YYYYMMDD)1900) * 100 + tm->tm_mon + 1) * 100) + tm->tm_mday);
-    return date;
-}
-
-void set_date(YYYYMMDD date)
-{
-    today = date;
-}
-
-void set_today(void)
-{
-    today = time_to_date(0);
-}
-
-YYYYMMDD string_to_date(const char *s)
-{
-    YYYYMMDD date = atol(s);
-    if (date < 20020801 && date != 0) {
-	date = time_to_date(date);
-    }
-    return date;
-}
 
 /* Keep high counts */
 bool keep_count(uint32_t count)

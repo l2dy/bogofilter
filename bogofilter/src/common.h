@@ -27,6 +27,8 @@ NAME:
 #include "debug.h"
 #include "system.h"	/* defines bool, uint32_t */
 
+typedef uint32_t YYYYMMDD;	/* date as YYYYMMDD */
+
 /* for easier debugging - can be disabled */
 #if	0
 #define	D		/* size adjustment */

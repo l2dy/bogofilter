@@ -26,6 +26,8 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 #include "word.h"
 
+extern YYYYMMDD today;		/* date as YYYYMMDD */
+
 #define MSG_COUNT ".MSG_COUNT"
 
 /* typedef:  Datastore handle type

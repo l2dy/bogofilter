@@ -31,12 +31,42 @@ David Relson <relson@osagesoftware.com>  2003
 
 #define struct_init(s) memset(&s, 0, sizeof(s))
 
+YYYYMMDD today;			/* date as YYYYMMDD */
+
 /* Function prototypes */
 
 void ds_init(void);
 void ds_cleanup(void);
 
 /* Function definitions */
+
+static
+YYYYMMDD time_to_date(long days)
+{
+    time_t t = time(NULL) - days * 86400;
+    struct tm *tm = localtime( &t );
+    YYYYMMDD date = ((((tm->tm_year + (YYYYMMDD)1900) * 100 + tm->tm_mon + 1) * 100) + tm->tm_mday);
+    return date;
+}
+
+YYYYMMDD string_to_date(const char *s)
+{
+    YYYYMMDD date = atol(s);
+    if (date < 20020801 && date != 0) {
+	date = time_to_date(date);
+    }
+    return date;
+}
+
+void set_date(YYYYMMDD date)
+{
+    today = date;
+}
+
+void set_today(void)
+{
+    today = time_to_date(0);
+}
 
 static void convert_external_to_internal(dsh_t *dsh, dbv_t *ex_data, dsv_t *in_data)
 {
