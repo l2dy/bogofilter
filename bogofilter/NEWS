@@ -23,6 +23,9 @@ Briefly:
 
 	2005-02-26
 
+	* Remove bogus signal handler, remove SIGKILL handling; ignore SIGINT,
+	  SIGTERM and SIGPIPE.
+
 	* Fix non-transactional mode for Berkeley DB 4.0 and older.
 
 	2005-02-25

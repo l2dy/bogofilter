@@ -13,39 +13,31 @@ AUTHOR:
 #include "common.h"
 
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "sighandler.h"
 #include "wordlists.h"
 
 /* Function Definitions */
 
-static void signal_handler(int sig)
-{
-    close_wordlists(word_lists, true);
-    exit(sig);
+static void mysignal(int sig, void (*hdl)(int)) {
+    struct sigaction sa;
+
+    sa.sa_handler = hdl;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+    if (sigaction(sig, &sa, NULL)) {
+	fprintf(stderr, "Cannot set signal %d handler to %p: %s\n",
+		sig, hdl, strerror(errno));
+	exit(EX_ERROR);
+    }
 }
 
 void signal_setup(void)
 {
-    sigset_t mask;
-
-    sigemptyset(&mask);
-
-#ifdef	SIGINT
-    signal(SIGINT,  signal_handler);	/*  2 */
-    sigaddset(&mask, SIGINT);
-#endif
-
-#ifdef	SIGKILL
-    signal(SIGKILL, signal_handler);	/*  9 */
-    sigaddset(&mask, SIGKILL);
-#endif
-
-#ifdef	SIGTERM
-    signal(SIGTERM, signal_handler);	/* 15 */
-    sigaddset(&mask, SIGTERM);
-#endif
-
-    sigprocmask(SIG_UNBLOCK, &mask, 0);
+    mysignal(SIGINT,  SIG_IGN);
+    mysignal(SIGPIPE, SIG_IGN);
+    mysignal(SIGTERM, SIG_IGN);
 }
