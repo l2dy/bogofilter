@@ -326,7 +326,7 @@ static int words_from_list(const char *db_file, int argc, char **argv)
     {
 	while (argc-- > 0) {
 	    const byte *word = (const byte *) *argv++;
-	    word_t *token = word_new(word, strlen(word));
+	    word_t *token = word_new(word, strlen((const char *)word));
 	    uint32_t count = db_getvalue(dbh, token);
 	    word_puts(token, 0, stdout);
 	    printf(" %lu\n", (unsigned long) count);
@@ -388,7 +388,7 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 	    word = (const byte *) *argv++;
 	    if (--argc == 0)
 		argc = -1;
-	    token = word_new(word, strlen(word));
+	    token = word_new(word, strlen((const char *)word));
 	}
 
 	spam_count = db_getvalue(dbh_spam, token);
