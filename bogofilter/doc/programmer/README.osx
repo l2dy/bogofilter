@@ -16,13 +16,14 @@ installed as well.)
 You must pass the 'configure' script information on where to find the
 Berkeley DB headers and libraries, like this (for Fink):
 
-./configure CPPFLAGS=-I/sw/include/db4 LDFLAGS=-L/sw/lib LIBS=-ldb-4.2
+  ./configure CPPFLAGS=-I/sw/include/db4 LDFLAGS=-L/sw/lib LIBS=-ldb-4.2
+
 (the --with-libdb-prefix option does not work because it does not
-support different prefix for libraries and headers)
+support different prefixes for libraries and headers)
 
 On the HP Gnome Desktop, try:
 
-./configure --with-libdb-prefix=/opt/gnome
+  ./configure --with-libdb-prefix=/opt/gnome
 
 Bogofilter can be built with either gcc or xlc.  The configure script
 checks gcc first, then for xlc, then for cc, and uses the first that is
