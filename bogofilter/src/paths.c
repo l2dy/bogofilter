@@ -59,16 +59,26 @@ char *build_progtype(const char *name, const char *db_type)
  */
 bool build_path(char* dest, size_t size, const char* dir, const char* file)
 {
+    size_t dirlen = strlen(dir);
+    size_t filelen = strlen(file);
+
+    if (dirlen >= size) return false;
+
     /* If absolute path ... */
     if (bf_abspath(file))
     {
-	if (strlcpy(dest, file, size) >= size) 
-	    return false;
-	else
+	if (filelen < size) {
+	    memcpy(dest, file, filelen);
 	    return true;
+	}
+	else
+	    return false;
     }
 
-    if (strlcpy(dest, dir, size) >= size) return -1;
+    memcpy(dest, dir, dirlen+1);
+
+    if (dirlen >= filelen && strcmp(dir+(dirlen-filelen), file) == 0)
+	return true;
 
     if (check_directory(dir)) {
 	if (dest[strlen(dest)-1] != DIRSEP_C) {
