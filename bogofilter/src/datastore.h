@@ -97,7 +97,8 @@ extern ex_t ds_oper(void *dbenv,	/**< parent environment */
 		    const char *path,	/**< path to database file */
 		    dbmode_t open_mode,	/**< open mode, DS_READ or DS_WRITE */
 		    ds_foreach_t *hook,	/**< function for actual operations */
-		    void *userdata	/**< user data for \a hook */);
+		    void *userdata,	/**< user data for \a hook */
+		    bool msg_count_first/**< .MSG_COUNT first */);
 
 /** Initialize database, open and lock files, etc.
  * params: char * path to database file, char * name of database

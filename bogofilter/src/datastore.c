@@ -325,7 +325,8 @@ ex_t ds_foreach(void *vhandle, ds_foreach_t *hook, void *userdata)
 /* Wrapper for ds_foreach that opens and closes file */
 
 ex_t ds_oper(void *env, const char *path, dbmode_t open_mode, 
-	     ds_foreach_t *hook, void *userdata)
+	     ds_foreach_t *hook, void *userdata,
+	     bool msg_count_first)
 {
     ex_t ret = EX_OK;
     void *dsh;
