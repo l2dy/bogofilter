@@ -104,8 +104,6 @@ the difference as the "spamicity" score.</para>
 <para>The input may be one message or many.  Messages are broken up
 on From_ lines.  The algorithm is relatively insensitive to message
 miscounts.</para>
-
-<para>For speed, MIME and other attachments are not decoded.</para>
 </refsect1>
 
 <refsect1 id='options'><title>OPTIONS</title>
