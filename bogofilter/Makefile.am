@@ -18,6 +18,8 @@ if ENABLE_ROBINSON_FISHER
 FISHER_SRC = fisher.c fisher.h
 AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc
 LDADD = dcdflib/src/libdcdf.a
+else
+LDADD =
 endif
 
 # what to build
@@ -27,12 +29,20 @@ check_PROGRAMS = debugtest configtest wordhash find_home.test
 man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
 sysconf_DATA = bogofilter.cf.example
 
-# what to build that from
-MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h debug.h \
-	debug.c find_home.h find_home.c find_home_user.c \
-	find_home_tildeexpand.c bogoconfig.h system.h
+noinst_LIBRARIES = libbogofilter.a
+LDADD += libbogofilter.a
 
-BUILT_SOURCES = version.h 
+# what to build that from
+libbogofilter_a_SOURCES=xmalloc.h xcalloc.c xmem_error.c xrealloc.c \
+	xmalloc.c xstrdup.h xstrdup.c globals.h debug.h \
+	debug.c find_home.h find_home.c find_home_user.c \
+	find_home_tildeexpand.c
+
+MYCOMMON=  bogoconfig.h system.h version.h
+
+BUILT_SOURCES = version.h directories.h
+
+CLEANFILES= directories.h
 
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c \
@@ -40,7 +50,7 @@ bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
 		     rstats.h rstats.c \
                      wordhash.h wordhash.c wordlists.h wordlists.c \
-		     $(MYCOMMON) common.h method.h version.h
+		     $(MYCOMMON) common.h method.h
 
 bogolexer_SOURCES = bogolexer.c lexer.l lexer.h $(MYCOMMON)
 
@@ -88,6 +98,9 @@ version.h:	version.sh $(VERSION_FROM)
 
 rpm:	    dist $(distdir).tar.gz
 	rpm -ta $(distdir).tar.gz
+
+directories.h: Makefile
+	echo "#define SYSCONFDIR \"$(SYSCONFDIR)\"" >$@ || rm -f $@
 
 cvs-check:
 	rm -rf $(PACKAGE)-$(VERSION)-export
