@@ -47,7 +47,7 @@ size_t base64_decode(word_t *word)
     while (size)
     {
 	unsigned long v = 0;
-	int i;
+	size_t i;
 	unsigned int shorten = 0;
 	while (size && (*s == '\r' || *s == '\n')) {
 	    size--;
@@ -59,8 +59,6 @@ size_t base64_decode(word_t *word)
 	    byte t = base64_xlate[c];
 	    if (t == base64_invalid) {
 		shorten = 4 - i;
-		if (shorten > count)
-		    return count;
 		i = 4;
 		v >>= (shorten * 2);
 		if (shorten == 2) s++;
@@ -69,12 +67,12 @@ size_t base64_decode(word_t *word)
 	    v = v << 6 | t;
 	}
 	size -= i;
-	for (i = 2 - shorten; i >= 0; i -= 1) {
+	for (i = 3 - shorten; i > 0; i -= 1) {
 	    byte c = v & 0xFF;
-	    d[i] = c;
+	    d[i-1] = c;
 	    v = v >> 8;
 	}
-	d += 3;
+	d += 3 - shorten;
 	count += 3 - shorten;
     }
     *d = '\0';
