@@ -161,7 +161,7 @@ distributed.  Bogofilter now offers the option of applying this test
 the difference as the "spamicity" score.</para>
 
 <para>The input may be one message or many.  Messages are broken up
-on "From " lines.  The algorithm is relatively insensitive to message
+on "From&nbsp;" lines.  The algorithm is relatively insensitive to message
 miscounts.</para>
 </refsect1>
 
@@ -631,9 +631,9 @@ bogofilter[6244]: register-s, 1273 words, 4 messages
 
 <refsect1 id='bugs'><title>BUGS</title>
 <para><application>bogofilter</application> counts messages on input 
-by looking for "From " lines.  As a special case, a single message
-without "From " line is counted correctly.  Multiple messages without 
-intervening "From " lines will be counted as one message.</para>
+by looking for "From&nbsp;" lines.  As a special case, a single message
+without "From&nbsp;" line is counted correctly.  Multiple messages without 
+intervening "From&nbsp;" lines will be counted as one message.</para>
 
 <para>Bogofilter does not canonicalize the transport encoding or
     character set, sacrificing precision.  We used to believe that spam
