@@ -13,6 +13,17 @@ set -e
 : ${relpath=..}
 : ${BF_TESTDIR=.}
 
+# Cater for Solaris "compatibility"
+case $PATH in
+*/usr/xpg4/bin:*) ;;
+*)
+    if test -d /usr/xpg4/bin ; then
+	PATH=/usr/xpg4/bin:$PATH
+	export PATH
+    fi
+    ;;
+esac
+
 LANG=
 LC_COLLATE=
 LC_ALL=
