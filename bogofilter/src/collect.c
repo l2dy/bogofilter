@@ -18,10 +18,7 @@
 void wordprop_init(void *vwordprop)
 {
     wordprop_t *wordprop = vwordprop;
-    wordprop->freq = 0;
-    wordprop->good = 0;
-    wordprop->bad  = 0;
-    wordprop->prob = 0;
+    memset(wordprop, 0, sizeof(*wordprop));
 }
 
 static bool from_seen = false;
@@ -59,7 +56,8 @@ token_t collect_words(wordhash_t *wh)
 	    {
 		char *s = (char *)(yylval->text+1);
 		char *f = strchr(s, '"');
-		token = word_new((unsigned char *)s, f-s);
+		token->text = (unsigned char *) s;
+		token->leng = f - s;
 	    }
 
 	    w = wordhash_insert(wh, token, sizeof(wordprop_t), &wordprop_init);
@@ -73,15 +71,13 @@ token_t collect_words(wordhash_t *wh)
 
 	    if (token_type == BOGO_LEX_LINE)
 	    {
-		char *s = (char *)yylval->text+1;
-
-		s = strchr(s, '"');
-		w->bad = atoi(s+2);
-		s = strchr(s+2, ' ');
-		w->good = atoi(s+1);
-
-		word_free(token);
+		char *s = (char *)yylval->text;
+		s += yylval->leng + 2;
+		w->bad = atoi(s);
+		s = strchr(s+1, ' ') + 1;
+		w->good = atoi(s);
 	    }
+
 	    continue;
 	}
 

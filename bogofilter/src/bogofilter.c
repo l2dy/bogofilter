@@ -43,7 +43,8 @@ void initialize_constants()
 
 void print_stats(FILE *fp)
 {
-    method->print_stats(fp);
+    if (Rtable || verbose>=2)
+	method->print_stats(fp);
 }
 
 rc_t bogofilter()
