@@ -38,7 +38,7 @@
     <arg choice='opt'>-e</arg>
     <arg choice='opt'>-t</arg>
     <arg choice='opt'>-T</arg>
-    <arg choice='opt'>-u <replaceable><optional>value</optional></replaceable></arg>
+    <arg choice='opt'>-u</arg>
     <arg choice='opt'>-2</arg>
     <arg choice='opt'>-3</arg>
     <arg choice='opt'>-H</arg>
@@ -253,12 +253,6 @@ use of this capability, as any classification errors
 <application>bogofilter</application> may make will be preserved and
 accumulated until corrected with the <option>-Sn</option> and
 <option>-Ns</option> option combinations.)</para>
-
-<para>The <option>-u <replaceable>value</replaceable></option> option
-tells <application>bogofilter</application> to skip registering
-obvious ham and spam.  If auto-updating and the message's score is
-less than "value" or greater than "1-value", don't register the
-message. </para>
 
 <para>The <option>-2</option> option tells
 <application>bogofilter</application> to binary classify the message as either

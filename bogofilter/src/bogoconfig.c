@@ -304,7 +304,6 @@ static void help(void)
 		  "\t  -p      - passthrough.\n"
 		  "\t  -e      - in -p mode, exit with code 0 when the mail is not spam.\n"
 		  "\t  -u      - classify message as spam or non-spam and register accordingly.\n"
-		  "\t  -u v1   - set threshold for auto-update.\n"
 #ifdef	ENABLE_DEPRECATED_CODE
 		  "\t  -2      - set binary classification mode (yes/no).\n"
 		  "\t  -3      - set ternary classification mode (yes/no/unsure).\n"
