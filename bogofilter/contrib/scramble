@@ -17,7 +17,7 @@ pid=$$
 mbox=1		# mbox mode
 mdir=2		# maildir mode
 
-usage() {
+function usage() {
     iam=$(basename $0)
     echo "Usage: $iam separator [-l] [-c classID] filename/directory [...]"
     echo "       Files contain entries, each of which begins with"
@@ -42,7 +42,7 @@ usage() {
     exit 1
 }
 
-doit()
+function doit()
 {
 # the first param is the separator
     test "x$1" = "x" && usage
@@ -78,7 +78,7 @@ doit()
   rm list.$pid shuf.$pid
 }
 
-create_mbox_entries()
+function create_mbox_entries()
 {
 # get all the byte offsets in all the files, in one list
     while [ ${#*} -gt 0 ]; do
@@ -100,7 +100,7 @@ create_mbox_entries()
     done
 }
 
-create_maildir_entries()
+function create_maildir_entries()
 {
 # get all the byte offsets in all the files, in one list
     while [ ${#*} -gt 0 ]; do
@@ -120,7 +120,7 @@ create_maildir_entries()
     done
 }
 
-output_mbox_entries()
+function output_mbox_entries()
 {
     file=""
     {
@@ -139,12 +139,12 @@ output_mbox_entries()
     } < list.$pid
 }
 
-output_maildir_entries()
+function output_maildir_entries()
 {
     cat list.$pid
 }
 
-output()
+function output()
 {
     if [ "$mode" = "$mbox" ] ; then	# mbox
 	output_mbox_entries
@@ -153,4 +153,4 @@ output()
     fi
 }
 
-doit "$@"
+doit $*
