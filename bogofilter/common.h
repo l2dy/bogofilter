@@ -48,6 +48,10 @@
 enum dbmode_e { DB_READ = 0, DB_WRITE = 1 };
 typedef enum dbmode_e dbmode_t;
 
+/* Defined in datastore_db.c */
+typedef long YEARDAY;		/* day of year (1..366) */
+extern YEARDAY today;		/* day of year (1..366) */
+
 typedef enum run_e {
     RUN_NORMAL='r',
     RUN_UPDATE='u',
