@@ -58,36 +58,36 @@ static int robx_hook(word_t *key, dsv_t *data,
     struct robhook_data *rh = userdata;
 
     /* ignore system meta-data */
-    if (*key->text == '.')
+    if (*key->text == '.') {
+	size_t len = strlen(".MSG_COUNT");
+	if (key->leng == len && memcmp(key->text, ".MSG_COUNT", len) == 0) {
+	    uint spam_cnt = data->spamcount;
+	    uint good_cnt = data->goodcount;
+	    rh->scalefactor = (double)spam_cnt/(double)good_cnt;
+	}
 	return 0;
+    }
 
     robx_accum(rh, key, data);
     
     return 0;
 }
 
-/** returns negative for failure */
-static double compute_robx(dsh_t *dsh)
+/** returns negative for failure.
+ * used by bogoutil and bogotune */
+double compute_robinson_x(const char *path)
 {
+    int ret;
     double rx;
+    dsh_t *dsh;
 
-    dsv_t val;
-    bool ok;
     uint good_cnt, spam_cnt;
     struct robhook_data rh;
-    int ret;
 
-    ok = ds_get_msgcounts(dsh, &val) == 0;
+    set_wordlist_dir(path, PR_NONE);
+    open_wordlists(word_lists, DS_READ);
+    dsh = get_default_wordlist(word_lists)->dsh;
 
-    if (!ok) {
-	fprintf(stderr, "Can't find message counts.\n");
-	return -1;
-    }
-
-    spam_cnt = val.spamcount;
-    good_cnt = val.goodcount;
-
-    rh.scalefactor = (double)spam_cnt/(double)good_cnt;
     rh.dsh = dsh;
     rh.sum = 0.0;
     rh.count = 0;
@@ -100,23 +100,7 @@ static double compute_robx(dsh_t *dsh)
 	       MSG_COUNT, spam_cnt, good_cnt,
 	       rh.scalefactor, rh.sum, (int)rh.count, rx);
 
-    return ret ? -1 : rx;
-}
-
-/** returns negative for failure.
- * used by bogoutil and bogotune */
-double compute_robinson_x(const char *path)
-{
-    double rx;
-    dsh_t *ds;
-
-    set_wordlist_dir(path, PR_NONE);
-    open_wordlists(word_lists, DS_READ);
-    ds = get_default_wordlist(word_lists)->dsh;
-
-    rx = compute_robx(ds);
-
     close_wordlists(word_lists, true);
 
-    return rx;
+    return ret ? -1 : rx;
 }
