@@ -288,7 +288,7 @@ static void help(void)
 		  "\t  -u      - classify message as spam or non-spam and register accordingly.\n"
 		  "\t  -2      - set binary classification mode (yes/no).\n"
 		  "\t  -3      - set ternary classification mode (yes/no/unsure).\n");
-    (void)fprintf(stderr,
+    (void)fprintf(stderr, "%s",
 		  "\t  -H      - enables combined counts for tagged header tokens.\n"
 		  "\t  -P {opts} - set html processing flag(s).\n"
 		  "\t     where {opts} is one or more of:\n"
@@ -304,19 +304,19 @@ static void help(void)
 		  "\t      D   - disables token degeneration (default).\n"
 		  "\t      f   - enables  first degeneration match (default).\n"
 		  "\t      F   - enables  extreme score selection.\n"
-#if	0
+		  /*
 		  "\t      s   - enables  separate case-sensitive tokens. (default)\n"
 		  "\t      S   - enables  combined counts for related tokens.\n"
-#endif
-	);
-    (void)fprintf(stderr,
+		  */
+		 );
+    (void)fprintf(stderr, "%s",
 		  "\t  -M      - set mailbox mode.  Classify multiple messages in an mbox formatted file.\n"
 		  "\t  -b      - set streaming bulk mode. Process multiple messages whose filenames are read from STDIN.\n"
 		  "\t  -B name1 name2 ... - set bulk mode. Process multiple messages named as files on the command line.\n"
 		  "\t  -F      - force printing of spamicity numbers.\n"
 		  "\t  -R      - print an R data frame.\n"
 	);
-    (void)fprintf(stderr,
+    (void)fprintf(stderr, "%s",
 		  "\tregistration options:\n"
 		  "\t  -s      - register message(s) as spam.\n"
 		  "\t  -n      - register message(s) as non-spam.\n"
@@ -336,18 +336,18 @@ static void help(void)
 		  "\t  -I file - read message from 'file' instead of stdin.\n"
 		  "\t  -O file - save message to 'file' in passthrough mode.\n",
 		  DB_EXT);
-    (void)fprintf(stderr,
+    (void)fprintf(stderr, "%s",
 		  "\talgorithm options:\n"
 		  "\t  -g      - select Graham spam calculation method.\n"
 		  "\t  -r      - select Robinson spam calculation method.\n"
 		  "\t  -f      - select Fisher spam calculation method (default).\n"
 	);
-    (void)fprintf(stderr,
+    (void)fprintf(stderr, "%s",
 		  "\tparameter options:\n"
 		  "\t  -m v1[,v2[,v3]] - set user defined min_dev, robs, and robx values.\n"
 		  "\t  -o v1[,v2] - set user defined spam and non-spam cutoff values.\n"
 	);
-    (void)fprintf(stderr,
+    (void)fprintf(stderr, "%s",
 		  "\tinfo options:\n"
 		  "\t  -q      - quiet - don't print warning messages.\n"
 		  "\t  -t      - set terse output mode.\n"
@@ -357,7 +357,7 @@ static void help(void)
 		  "\t  -D      - direct debug output to stdout.\n"
 		  "\t  -x list - set flags to display debug information.\n"
 	);
-    (void)fprintf(stderr,
+    (void)fprintf(stderr, "%s",
 		  "\n"
 		  "bogofilter is a tool for classifying email as spam or non-spam.\n"
 		  "\n"
@@ -369,12 +369,6 @@ static void print_version(void)
 {
     (void)fprintf(stderr,
 		  "%s version %s\n"
-
-		  "    Algorithms:"
-		  " Fisher"
-		  " Graham"
-		  " Robinson"
-		  "\n"
 		  "    Database: %s, %s\n",
 		  progtype, version, ds_version_str(),
 		  (wl_default == WL_M_SEPARATE) ? "separate" : "combined");

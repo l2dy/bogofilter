@@ -106,7 +106,7 @@ static reader_line_t *get_reader_line(FILE *fp) {
     uint i;
     int c;
     reader_line_t *fcn = mailbox_getline;
-    
+
     c = fgetc(fp);
     ungetc(c, fp);
 

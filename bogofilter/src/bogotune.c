@@ -200,7 +200,7 @@ static void print_parms(const char *label, const char *format, data_t *data)
     printf("  %s: %2d ", label, data->cnt);
     for (i = 0; i < data->cnt; i += 1) {
 	printf("%s", (i==0) ? " (" : ", ");
-	printf(format, data->data[i]);
+	printf(format, data->data[i]); /* RATS: ignore */
     }
     printf(")\n"); fflush(stdout);
 }
@@ -564,10 +564,11 @@ static void load_wordlist(char *file)
     }
 
     if (S_ISDIR(sb.st_mode)) {
-	size_t path_len = strlen(path);
-	char del = path[path_len-1];
-	path = xmalloc(path_len + strlen(WORDLIST) + 2);
-	sprintf(path, "%s%s%s", file, (del == DIRSEP_C) ? "" : DIRSEP_S, WORDLIST);
+	size_t len = strlen(path) + strlen(WORDLIST) + 2;
+	char del = -1[strchr(path, 0)];
+	path = xmalloc(len);
+	snprintf(path, len, "%s%s%s", file,
+		(del == DIRSEP_C) ? "" : DIRSEP_S, WORDLIST);
     }
 	 
     if (verbose) {

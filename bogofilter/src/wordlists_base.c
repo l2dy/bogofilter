@@ -105,14 +105,14 @@ int setup_wordlists(const char* d, priority_t precedence)
     saved_precedence = precedence;
 
     if (check_directory(dir)) {
+#ifndef __riscos__
+	const char var[] = "using the BOGOFILTER_DIR or HOME environment variables.";
+#else
+	const char var[] = "ensuring that <Bogofilter$Dir> is set correctly.";
+#endif
 	(void)fprintf(stderr, "%s: cannot find bogofilter directory.\n"
 		      "You must specify a directory on the command line, in the config file,\n"
-#ifndef __riscos__
-		      "or by using the BOGOFILTER_DIR or HOME environment variables.\n"
-#else
-                      "or by ensuring that <Bogofilter$Dir> is set correctly.\n"
-#endif
-		      "Program aborting.\n", progname);
+		      "or by %s\nProgram aborting.\n", progname, var);
 	rc = -1;
     }
 

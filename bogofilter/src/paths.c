@@ -46,7 +46,7 @@ char *build_progtype(const char *name, const char *db_type)
     else {
 	size_t len = strlen(name) + strlen(db_type) + 2;
 	type = xmalloc(len);
-	sprintf(type, "%s-%s", name, db_type);
+	snprintf(type, len, "%s-%s", name, db_type);
     }
     return type;
 }
@@ -97,12 +97,14 @@ char *create_path_from_env(const char *var,
     path_size = env_size + (subdir ? strlen(subdir) : 0) + 2;
     buff = xmalloc(path_size);
 
-    strcpy(buff, env);
+    strlcpy(buff, env, path_size);
     if (subdir != NULL) {
 	if (buff[env_size-1] != DIRSEP_C)
-	    strcat(buff, DIRSEP_S);
-	strcat(buff, subdir);
+	    strlcat(buff, DIRSEP_S, path_size);
+	strlcat(buff, subdir, path_size);
     }
+    if (strlcat(buff, "", path_size) >= path_size)
+	abort(); /* buffer overrun, this cannot happen - buff is xmalloc()d */
     return buff;
 }
 
