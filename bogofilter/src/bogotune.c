@@ -147,7 +147,8 @@ uint ns_cnt, sp_cnt;
 double check_percent;		/* initial check for excessively high/low scores */
 double *ns_scores;
 double *sp_scores;
-double user_robx = 0.0;		/* from '-r' option */
+double user_robx = 0.0;		/* from option '-r value' */
+uint   coerced_target = 0;	/* user supplied with '-T value' */
 
 #undef	TEST
 
@@ -778,7 +779,8 @@ static void help(void)
 		  "\t  -D      - don't read a wordlist file.\n"
 		  "\t  -d path - specify directory for wordlists.\n"
 		  "\t  -M      - output input file in message count format.\n"
-		  "\t  -r      - specify robx value\n"
+		  "\t  -r num  - specify robx value\n"
+		  "\t  -T num  - specify fp target value\n"
 		  "\t  -s file1 file2 ... - spam files\n"
 		  "\t  -n file1 file2 ... - non-spam files\n" 
 		  "\t  -v      - increase level of verbose messages\n"
@@ -844,6 +846,10 @@ static int process_args(int argc, char **argv)
 		    test += 1;
 		    break;
 #endif
+		case 'T':
+		    argc -= 1;
+		    coerced_target = atoi(*++argv);
+		    break;
 		case 'V':
 		    print_version();
 		    exit(EX_OK);
@@ -1349,7 +1355,15 @@ static rc_t bogotune(void)
     min_dev = 0.02;
 
     /* set target and spam_cutoff */
-    set_thresh(ns_cnt, ns_scores);
+
+    if (coerced_target == 0)
+	set_thresh(ns_cnt, ns_scores);
+    else {
+	/* if coerced target ... */
+	target = coerced_target;
+	spam_cutoff = ns_scores[target-1];
+    }
+
     skip = ROUND(spam_cutoff,100000) <= SCAN_CUTOFF;
     printf("False-positive target is %d (cutoff %8.6f)\n", target, spam_cutoff);
 
@@ -1449,6 +1463,8 @@ static rc_t bogotune(void)
 		    for (fp = target; fp < ns_cnt; fp += 1) {
 			spam_cutoff = ns_scores[fp-1];
 			if (spam_cutoff < 0.999999)
+			    break;
+			if (coerced_target != 0)
 			    break;
 		    }
 		    if (ns_cnt < fp)
@@ -1571,6 +1587,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     bogotune();
 
     bogotune_free();
+
+    MEMDISPLAY;
 
     exit(exitcode);
 }
