@@ -4,6 +4,29 @@
 
 $Id$
 
+0.13.0	2003-05-20
+
+	* Added file RELEASE.NOTES-0.13.  Read it!!!
+
+	* Changed parsing defaults to:								
+
+	  -PI	ignore_case		(default is disabled)
+	  -Ph	header_line_markup 	(default is ensabled)
+	  -Pt	tokenize_html_tags 	(default is enabled)
+	
+	* contrib/randomtrain and contrib/scramble can now process
+	  both mbox and maildir formats.
+	* Added perl script contrib/mime.get.rfc822 to extract
+	  forwaded messages from with a message.
+	
+	* Added basic support for emacs RMAIL mailboxes.
+	* Remove incomplete RMAIL/Babyl-5 support.
+
+	* Registration code modified to count unique tokens for each
+	  message and display the total of the counts.
+
+	* Added 'bogo-what?' to FAQ.
+
 0.12.3	2003-05-10
 
 	* Modified bulk mode code to allow registering maildirs.

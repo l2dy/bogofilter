@@ -15,9 +15,9 @@ sysconf_DATA = bogofilter.cf.example
 # what to distribute
 EXTRA_DIST = autogen.sh \
 	     bogofilter.cf.example \
-	     CHANGES-0.10 CHANGES-0.11 CHANGES-0.12 \
+	     CHANGES-0.10 CHANGES-0.11 CHANGES-0.12 CHANGES-0.13\
 	     METHODS UPGRADE Doxyfile \
-	     README.cvs RELEASE.NOTES-0.11  RELEASE.NOTES-0.12 \
+	     README.cvs RELEASE.NOTES-0.11 RELEASE.NOTES-0.12  RELEASE.NOTES-0.13 \
 	     bogofilter.spec bogofilter.spec.in
 
 .PHONY: rpm cvs-check
