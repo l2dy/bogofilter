@@ -135,6 +135,8 @@ void bogoreader_init(int _argc, char **_argv)
 
 void bogoreader_fini(void)
 {
+    if (fpin && fpin != stdin)
+	fclose(fpin);
     fini();
 }
 
@@ -265,8 +267,6 @@ static void maildir_fini(void)
 {
     if (maildir_dir)
 	closedir(maildir_dir);
-    if (fpin)
-	fclose(fpin);
     maildir_dir = NULL;
     return;
 }
