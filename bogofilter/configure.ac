@@ -1,5 +1,5 @@
 # $Id$
-AC_INIT(bogofilter, 0.10.0.cvs)
+AC_INIT(bogofilter, 0.10.0.tst)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR([bogofilter.c])
 AM_INIT_AUTOMAKE
@@ -144,14 +144,14 @@ fi
 
 AC_ARG_ENABLE(robinson-fisher,
 	AC_HELP_STRING([--disable-robinson-fisher],
-	[Disable Fisher's method of combining P]),
+	[Disable Fisher's method of combining probabilities]),
 	if test "$enableval" = no; then
 		[USE_FISHER=NO]
 	else
 		[USE_FISHER=YES]
 		[USE_ROBINSON=YES]
  		AC_DEFINE(ENABLE_ROBINSON_FISHER,1,
-		[Enable Fisher's method of combining P])
+		[Enable Fisher's method of combining Probabilities])
 # trouble ???
 #		AC_CHECK_LIB([dcdf], [cdfchi], LIBS="$LIBS -ldcdf",
 #		    AC_MSG_ERROR([libdcdf (from package dcdflib.c) was not found.]))
@@ -230,6 +230,7 @@ fi
 
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 AC_CONFIG_FILES([Makefile \
+		src.osage/Makefile src.osage/dcdflib/Makefile src.osage/dcdflib/src/Makefile \
 		tests/Makefile tests/bogoutil/Makefile tests/bogofilter/Makefile \
 		bogofilter.spec \
 		dcdflib/Makefile dcdflib/src/Makefile contrib/Makefile doc/Makefile])
