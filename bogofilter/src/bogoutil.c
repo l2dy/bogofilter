@@ -96,7 +96,7 @@ static ex_t dump_wordlist(const char *ds_file)
     token_count = 0;
 
     dbe = ds_init(bogohome);
-    rc = ds_oper(dbe, ds_file, DS_READ, ds_dump_hook, NULL, false);
+    rc = ds_oper(dbe, ds_file, DS_READ, ds_dump_hook, NULL);
     ds_cleanup(dbe);
 
     if (rc != EX_OK)

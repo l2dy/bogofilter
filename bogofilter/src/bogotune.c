@@ -630,7 +630,7 @@ static void load_wordlist(ds_foreach_t *hook, void *userdata)
 	fflush(stdout);
     }
 
-    ds_oper(env, ds_path, DS_READ, hook, userdata, false);
+    ds_oper(env, ds_path, DS_READ, hook, userdata);
 
     return;
 }
