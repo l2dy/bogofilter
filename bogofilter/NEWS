@@ -3,6 +3,10 @@
 				bogofilter news
 
 0.8.1
+	* Split the main module into a registration module and two
+	  algorithm modules - for the graham and robinson methods.
+	* Implemented an object oriented API for using computational
+	  methods.
 	* The testing framework now works on Solaris.
 	* A new '-c' option in bogofilter allows specification of the
 	  configuration file to read.
