@@ -90,8 +90,7 @@ map_rc $BOGOFILTER -y 0 -d $BOGOFILTER_DIR -C -D -t -PdF -vvv -x s < ${TMPDIR}/m
 OUTPUTS=${SYSTEST}/outputs
 
 if  [ $verbose -eq 0 ]; then
-    cmp $(OUTPUTS)/degen.out $OUT
+    cmp ${OUTPUTS}/degen.out $OUT
 else
-    diff $(OUTPUTS)/degen.out $OUT
+    diff ${OUTPUTS}/degen.out $OUT
 fi
-
