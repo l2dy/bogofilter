@@ -43,7 +43,9 @@ CONTRIBUTORS:
 
 /* includes for scoring algorithms */
 #include "method.h"
+#ifdef	ENABLE_DEPRECATED_CODE
 #include "graham.h"
+#endif
 #include "robinson.h"
 #include "fisher.h"
 
