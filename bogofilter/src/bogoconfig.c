@@ -102,14 +102,14 @@ struct option long_options[] = {
     { "version",			N, 0, 'V' },
     { "classify-stdin",			N, 0, 'b' },
     { "bogofilter_dir",			R, 0, 'd' },
-    { "ham",				N, 0, 'e' },
+    { "nonspam-exits-zero",		N, 0, 'e' },
     { "help",				N, 0, 'h' },
     { "db_cachesize",			N, 0, 'k' },
     { "use-syslog",			N, 0, 'l' },
     { "register-ham",			N, 0, 'n' },
     { "passthrough",			N, 0, 'p' },
     { "register-spam",			N, 0, 's' },
-    { "update-as-classed",		N, 0, 'u' },
+    { "update-as-classified",		N, 0, 'u' },
     { "timestamp-date",			N, 0, 'y' },
     { "config-file",			R, 0, 'c' },
     { "no-config-file",			N, 0, 'C' },
@@ -538,11 +538,11 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'Q':
-	query = true;
+	query = 1;
 	break;
 
     case 'R':
-	Rtable = 1;
+	Rtable = true;
 	break;
 
     case 's':
