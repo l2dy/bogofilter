@@ -118,8 +118,8 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
      * message #1520, Message-ID: <20030206172016.GS1214@sgh.waw.pl>
      * Date: Thu, 6 Feb 2003 18:20:16 +0100
      */
-    uint32_t retryflags[] = { 0, DB_NOMMAP, 0xffffffff };
-    uint32_t *retryflag_i;
+    size_t idx;
+    uint32_t retryflags[] = { 0, DB_NOMMAP };
     int maj, min;
     static int version_ok;
     
@@ -143,7 +143,8 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	 * applications try to create a DB at the same time. */
 	opt_flags = 0;
 
-    for(retryflag_i = &retryflags[0] ; *retryflag_i != 0xfffffffful; retryflag_i++) {
+    for (idx = 0; idx < COUNTOF(retryflags); idx += 1) {
+	uint32_t retryflag = retryflags[idx];
 	handle = dbh_init(db_file, name);
 	handle->open_mode = open_mode;
 	/* create DB handle */
@@ -154,15 +155,15 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	}
 
 	if (db_cachesize != 0 &&
-		(ret = handle->dbp->set_cachesize(handle->dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
+	    (ret = handle->dbp->set_cachesize(handle->dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
 	    print_error(__FILE__, __LINE__, "(db) setcache( %s ), err: %d, %s",
 		    db_file, ret, db_strerror(ret));
 	    goto open_err; 
 	}
 
 	/* open data base */
-	if ((ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags | *retryflag_i, 0664)) != 0 &&
-		(ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags |  DB_CREATE | DB_EXCL | *retryflag_i, 0664)) != 0) {
+	if ((ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0 &&
+	    (ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags |  DB_CREATE | DB_EXCL | retryflag, 0664)) != 0) {
 	    print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s",
 		    db_file, ret, db_strerror(ret));
 	    goto open_err;
