@@ -118,14 +118,20 @@ static int load_wordlist(const char *ds_file)
     unsigned long line = 0;
     unsigned long count[IX_SIZE], date;
     YYYYMMDD today_save = today;
-
-    dsh = ds_open(CURDIR_S, ds_file, DS_WRITE | DS_LOAD);
-    if (dsh == NULL)
+    void *dbe = ds_init();
+    if (dbe == NULL)
 	return EX_ERROR;
+
+    dsh = ds_open(dbe, CURDIR_S, ds_file, DS_WRITE | DS_LOAD);
+    if (dsh == NULL) {
+	ds_cleanup(dbe);
+	return EX_ERROR;
+    }
 
     memset(buf, '\0', BUFSIZE);
 
-    ds_txn_begin(dsh);
+    if (ds_txn_begin(dbe))
+	exit(EX_ERROR);
 
     for (;;) {
 	dsv_t data;
@@ -205,9 +211,9 @@ static int load_wordlist(const char *ds_file)
 
     if (rv) {
 	fprintf(stderr, "read or write error, aborting.\n");
-	ds_txn_abort(dsh);
+	ds_txn_abort(dbe);
     } else {
-	switch (ds_txn_commit(dsh)) {
+	switch (ds_txn_commit(dbe)) {
 	    case DST_FAILURE:
 	    case DST_TEMPFAIL:
 		fprintf(stderr, "commit failed\n");
@@ -219,7 +225,7 @@ static int load_wordlist(const char *ds_file)
 
     ds_close(dsh);
 
-    ds_cleanup();
+    ds_cleanup(dbe);
 
     if (verbose)
 	fprintf(dbgout, "%d tokens loaded\n", load_count);
@@ -266,6 +272,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     const char *data_format = !show_probability ? "%-30s %6lu %6lu\n" : "%-30s %6lu  %6lu  %f\n";
 
     void *dsh = NULL; /* initialize to silence bogus gcc warning */
+    void *dbe;
 
     struct stat sb;
     int rv = 0;
@@ -278,17 +285,18 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
         return EX_ERROR;
     }
 
+    dbe = ds_init();
+
     if ( stat(path, &sb) == 0 ) {
 	/* XXX FIXME: deadlock possible */
 	if ( ! S_ISDIR(sb.st_mode)) {		/* words from file */
-	    dsh = ds_open(CURDIR_S, path, DS_READ);
-	}
+	    dsh = ds_open(dbe, CURDIR_S, path, DS_READ); }
 	else {					/* words from path */
 	    char filepath[PATH_LEN];
 
 	    build_wordlist_path(filepath, sizeof(filepath), path);
 
-	    dsh = ds_open(CURDIR_S, filepath, DS_READ);
+	    dsh = ds_open(dbe, CURDIR_S, filepath, DS_READ);
 	}
     }
 
@@ -296,11 +304,13 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	fprintf(stderr, "Error accessing file or directory '%s'.\n", path);
 	if (errno != 0)
 	    fprintf(stderr, "error #%d - %s.\n", errno, strerror(errno));
+	ds_cleanup(dbe);
 	return EX_ERROR;
     }
 
-    if (DST_OK != ds_txn_begin(dsh)) {
+    if (DST_OK != ds_txn_begin(dbe)) {
 	ds_close(dsh);
+	ds_cleanup(dbe);
 	fprintf(stderr, "Cannot begin transaction.\n");
 	return EX_ERROR;
     }
@@ -363,12 +373,12 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     }
 
 finish:
-    if (DST_OK != rv ? ds_txn_abort(dsh) : ds_txn_commit(dsh)) {
+    if (DST_OK != rv ? ds_txn_abort(dbe) : ds_txn_commit(dbe)) {
 	fprintf(stderr, "Cannot %s transaction.\n", rv ? "abort" : "commit");
 	rv = EX_ERROR;
     }
     ds_close(dsh);
-    ds_cleanup();
+    ds_cleanup(dbe);
 
     buff_free(buff);
 
@@ -393,15 +403,11 @@ static int get_robx(const char *path)
 
 	open_wordlists(word_lists, DS_WRITE);
 
-	if (DST_OK == ds_txn_begin(word_lists->dsh)) {
-	    val.goodcount = 0;
-	    val.spamcount = (uint32_t) (rx * 1000000);
-	    ret = ds_write(word_lists->dsh, word_robx, &val);
-	    if (DST_OK != ds_txn_commit(word_lists->dsh))
-		ret = 1;
-	}
+	val.goodcount = 0;
+	val.spamcount = (uint32_t) (rx * 1000000);
+	ret = ds_write(word_lists->dsh, word_robx, &val);
 
-	close_wordlists(word_lists);
+	close_wordlists(word_lists, 1);
 	free_wordlists(word_lists);
 	word_lists = NULL;
 
@@ -758,7 +764,7 @@ int main(int argc, char *argv[])
 	exit(EX_ERROR);
     }
 
-    atexit(bf_exit);
+    // atexit(bf_exit);
 
     set_bogohome(ds_file);
 
@@ -767,8 +773,6 @@ int main(int argc, char *argv[])
     } else if (flag == M_CRECOVER) {
 	return ds_recover(1);
     }
-
-    ds_init();
 
     switch(flag) {
 	case M_DUMP:
@@ -798,8 +802,6 @@ int main(int argc, char *argv[])
 	    abort();
 	    break;
     }
-
-    ds_cleanup();
 
     return rc;
 }

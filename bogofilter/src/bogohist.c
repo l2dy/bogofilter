@@ -129,7 +129,7 @@ int histogram(const char *path)
 {
     int rc;
     uint count;
-    void *dsh;
+    void *dsh, *dbe;
     dsv_t val;
 
     rhistogram_t hist;
@@ -138,14 +138,17 @@ int histogram(const char *path)
 
     build_wordlist_path(filepath, sizeof(filepath), path);
 
-    ds_init();
+    dbe = ds_init();
+    if (dbe == NULL)
+	return EX_ERROR;
 
-    dsh = ds_open(CURDIR_S, filepath, DS_READ);
+    dsh = ds_open(dbe, CURDIR_S, filepath, DS_READ);
     if (dsh == NULL)
 	return EX_ERROR;
 
-    if (DST_OK != ds_txn_begin(dsh)) {
+    if (DST_OK != ds_txn_begin(dbe)) {
 	ds_close(dsh);
+	ds_cleanup(dbe);
 	fprintf(stderr, "cannot begin transaction!\n");
 	return EX_ERROR;
     }
@@ -157,14 +160,15 @@ int histogram(const char *path)
     memset(&hist, 0, sizeof(hist));
     rc = ds_foreach(dsh, ds_histogram_hook, &hist);
 
-    if (DST_OK != ds_txn_commit(dsh)) {
+    if (DST_OK != ds_txn_commit(dbe)) {
 	ds_close(dsh);
+	ds_cleanup(dbe);
 	fprintf(stderr, "cannot commit transaction!\n");
 	return EX_ERROR;
     }
 
     ds_close(dsh);
-    ds_cleanup();
+    ds_cleanup(dbe);
 
     count = print_histogram(&hist);
 

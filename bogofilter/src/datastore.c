@@ -118,12 +118,12 @@ void dsh_free(void *vhandle)
     return;
 }
 
-void *ds_open(const char *path, const char *name, dbmode_t open_mode)
+void *ds_open(void *dbe, const char *path, const char *name, dbmode_t open_mode)
 {
     dsh_t *dsh;
     void *v;
 
-    v = db_open(path, name, open_mode);
+    v = db_open(dbe, path, name, open_mode); /* FIXME */
 
     if (!v)
 	return NULL;
@@ -131,16 +131,8 @@ void *ds_open(const char *path, const char *name, dbmode_t open_mode)
     dsh = dsh_init(v);
 
     if (db_created(v) && ! (open_mode & DS_LOAD)) {
-	if (DST_OK == ds_txn_begin(dsh)) {
-	    ds_set_wordlist_version(dsh, NULL);
-	    if (DST_OK == ds_txn_commit(dsh))
-		return dsh;
-	}
-	db_close(v);
-	dsh_free(dsh);
-	dsh = NULL;
+	ds_set_wordlist_version(dsh, NULL);
     }
-
     return dsh;
 }
 
@@ -271,18 +263,15 @@ int ds_delete(void *vhandle, const word_t *word)
 }
 
 int ds_txn_begin(void *vhandle) {
-    dsh_t *h = vhandle;
-    return dbe_txn_begin(h->dbh);
+    return dbe_txn_begin(vhandle);
 }
 
 int ds_txn_abort(void *vhandle) {
-    dsh_t *h = vhandle;
-    return dbe_txn_abort(h->dbh);
+    return dbe_txn_abort(vhandle);
 }
 
 int ds_txn_commit(void *vhandle) {
-    dsh_t *h = vhandle;
-    return dbe_txn_commit(h->dbh);
+    return dbe_txn_commit(vhandle);
 }
 
 typedef struct {
@@ -332,24 +321,26 @@ int ds_oper(const char *path, dbmode_t open_mode,
 	    ds_foreach_t *hook, void *userdata)
 {
     int  ret = 0;
-    void *dsh;
+    void *dsh, *dbe;
 
-    dsh = ds_open(CURDIR_S, path, open_mode);
+    dbe = ds_init();
+    dsh = ds_open(dbe, CURDIR_S, path, open_mode);
 
     if (dsh == NULL) {
 	fprintf(stderr, "Can't open file '%s'\n", path);
 	exit(EX_ERROR);
     }
 
-    if (DST_OK == ds_txn_begin(dsh)) {
+    if (DST_OK == ds_txn_begin(dbe)) {
 	ret = ds_foreach(dsh, hook, userdata);
-	if (ret) { ds_txn_abort(dsh); }
+	if (ret) { ds_txn_abort(dbe); }
 	else
-	    if (ds_txn_commit(dsh) != DST_OK)
+	    if (ds_txn_commit(dbe) != DST_OK)
 		ret = -1;
     }
 
     ds_close(dsh);
+    ds_cleanup(dbe);
 
     return ret;
 }
@@ -357,21 +348,22 @@ int ds_oper(const char *path, dbmode_t open_mode,
 static word_t  *msg_count_tok;
 static word_t  *wordlist_version_tok;
 
-void ds_init()
+void *ds_init(void)
 {
-    dbe_init();
+    void *dbe = dbe_init();
     if (msg_count_tok == NULL) {
 	msg_count_tok = word_new((const byte *)MSG_COUNT, strlen(MSG_COUNT));
     }
     if (wordlist_version_tok == NULL) {
 	wordlist_version_tok = word_new((const byte *)WORDLIST_VERSION, strlen(WORDLIST_VERSION));
     }
+    return dbe;
 }
 
 /* Cleanup storage allocation */
-void ds_cleanup()
+void ds_cleanup(void *dbe)
 {
-    dbe_cleanup();
+    dbe_cleanup(dbe);
     xfree(msg_count_tok);
     xfree(wordlist_version_tok);
     msg_count_tok = NULL;
@@ -398,6 +390,12 @@ int  ds_set_msgcounts(void *vhandle, dsv_t *val)
     val->date = today;
 
     return ds_write(dsh, msg_count_tok, val);
+}
+
+void *ds_get_dbenv(void *vhandle)
+{
+    dsh_t *dsh = vhandle;
+    return db_get_env(dsh->dbh);
 }
 
 /*

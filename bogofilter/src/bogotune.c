@@ -181,16 +181,6 @@ static uint   ncnt, nsum;		/* neighbor count and sum - for gfn() averaging */
 uint test = 0;
 #endif
 
-/* Function Prototypes */
-
-static void bt_exit(void);
-static void check_wordlist_path(void);
-static int  load_hook(word_t *key, dsv_t *data, void *userdata);
-static void load_wordlist(ds_foreach_t *hook, void *userdata);
-static void show_elapsed_time(int beg, int end, uint cnt, double val,
-			      const char *lbl1, const char *lbl2);
-static void write_msgcount_file(wordhash_t *wh);
-
 /* Function Definitions */
 
 static void bt_trap(void) {}
@@ -632,6 +622,33 @@ static int update_count(void)
     return message_count;
 }
 
+static void load_wordlist(ds_foreach_t *hook, void *userdata)
+{
+    if (verbose) {
+	printf("Reading %s\n", ds_path);
+	fflush(stdout);
+    }
+
+    ds_oper(ds_path, DS_READ, hook, userdata);
+
+    return;
+}
+
+static int load_hook(word_t *key, dsv_t *data, void *userdata)
+/* returns 0 if ok, 1 if not ok */
+{
+    wordhash_t *train = userdata;
+
+    wordprop_t *tokenprop = wordhash_insert(train, key, sizeof(wordprop_t), &wordprop_init);
+    tokenprop->cnts.bad = data->spamcount;
+    tokenprop->cnts.good = data->goodcount;
+
+    if (strcmp((char *)key->text, ".MSG_COUNT") == 0)
+	set_msg_counts(data->goodcount, data->spamcount);
+
+    return 0;
+}
+
 static void set_train_msg_counts(wordhash_t *train, wordhash_t *wh)
 {
     wordprop_t *count;
@@ -642,6 +659,44 @@ static void set_train_msg_counts(wordhash_t *train, wordhash_t *wh)
 	fprintf(stderr, "Can't find '.MSG_COUNT'.\n");
 	exit(EX_ERROR);
     }
+}
+
+/* write_msgcount_file()
+**
+**	Create a message count file from the original messages
+*/
+
+static void print_msgcount_entry(const char *token, uint bad, uint good)
+{
+    printf( "\"%s\" %u %u\n", token, bad, good);
+}
+
+static void write_msgcount_file(wordhash_t *wh)
+{
+    hashnode_t *hn;
+    wordhash_t *train = ns_and_sp->train;
+
+    print_msgcount_entry(".MSG_COUNT", msgs_bad, msgs_good);
+
+    wordhash_sort(wh);
+
+    for (hn = wordhash_first(wh); hn != NULL; hn = wordhash_next(wh)) {
+	word_t *token = hn->key;
+	wordprop_t *wp = (wordprop_t *) hn->buf;
+	wordcnts_t *cnts = &wp->cnts;
+
+	if (cnts->good == 0 && cnts->bad == 0) {
+	    wp = wordhash_search(train, token, 0);
+	    if (wp) {
+		cnts->good = wp->cnts.good;
+		cnts->bad  = wp->cnts.bad;
+	    }
+	}
+
+	print_msgcount_entry((char *)token->text, cnts->bad, cnts->good);
+    }
+
+    return;
 }
 
 static uint read_mailbox(char *arg, mlhead_t *msgs)
@@ -794,44 +849,6 @@ static void create_countlists(tunelist_t *ns_or_sp)
 		item->wh = whn;
 	    }
 	}
-    }
-
-    return;
-}
-
-/* write_msgcount_file()
-**
-**	Create a message count file from the original messages
-*/
-
-static void print_msgcount_entry(const char *token, uint bad, uint good)
-{
-    printf( "\"%s\" %u %u\n", token, bad, good);
-}
-
-static void write_msgcount_file(wordhash_t *wh)
-{
-    hashnode_t *hn;
-    wordhash_t *train = ns_and_sp->train;
-
-    print_msgcount_entry(".MSG_COUNT", msgs_bad, msgs_good);
-
-    wordhash_sort(wh);
-
-    for (hn = wordhash_first(wh); hn != NULL; hn = wordhash_next(wh)) {
-	word_t *token = hn->key;
-	wordprop_t *wp = (wordprop_t *) hn->buf;
-	wordcnts_t *cnts = &wp->cnts;
-
-	if (cnts->good == 0 && cnts->bad == 0) {
-	    wp = wordhash_search(train, token, 0);
-	    if (wp) {
-		cnts->good = wp->cnts.good;
-		cnts->bad  = wp->cnts.bad;
-	    }
-	}
-
-	print_msgcount_entry((char *)token->text, cnts->bad, cnts->good);
     }
 
     return;
@@ -997,33 +1014,6 @@ static void check_wordlist_path(void)
     db_cachesize = ceil(sb.st_size / (3 * 1024 * 1024));
 
     return;
-}
-
-static void load_wordlist(ds_foreach_t *hook, void *userdata)
-{
-    if (verbose) {
-	printf("Reading %s\n", ds_path);
-	fflush(stdout);
-    }
-
-    ds_oper(ds_path, DS_READ, hook, userdata);
-
-    return;
-}
-
-static int load_hook(word_t *key, dsv_t *data, void *userdata)
-/* returns 0 if ok, 1 if not ok */
-{
-    wordhash_t *train = userdata;
-
-    wordprop_t *tokenprop = wordhash_insert(train, key, sizeof(wordprop_t), &wordprop_init);
-    tokenprop->cnts.bad = data->spamcount;
-    tokenprop->cnts.good = data->goodcount;
-
-    if (strcmp((char *)key->text, ".MSG_COUNT") == 0)
-	set_msg_counts(data->goodcount, data->spamcount);
-
-    return 0;
 }
 
 static double get_robx(void)
@@ -1383,6 +1373,14 @@ static bool check_msg_counts(void)
     return ok;
 }
 
+static void show_elapsed_time(int beg, int end, uint cnt, double val,
+			      const char *lbl1, const char *lbl2)
+{
+    int tm = end - beg;
+    printf("    %dm:%02ds for %u %s.  avg: %.1f %s\n",
+	   MIN(tm), SECONDS(tm), cnt, lbl1, val, lbl2);
+}
+
 static rc_t bogotune(void)
 {
     bool skip;
@@ -1698,8 +1696,7 @@ static rc_t bogotune(void)
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
     ex_t exitcode = EX_OK;
-
-    atexit(bt_exit);
+    void *env = NULL;
 
     fBogotune = true;		/* for rob_compute_spamicity() */
 
@@ -1723,7 +1720,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	    ds_file = get_directory(PR_ENV_HOME);
 	set_bogohome(ds_file);
 	check_wordlist_path();
-	ds_init();
+	env = ds_init();
     }
 
     bogotune();
@@ -1731,22 +1728,9 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     bogotune_free();
 
     if (ds_flag == DS_DSK)
-	ds_cleanup();
+	ds_cleanup(env);
 
     exit(exitcode);
-}
-
-static void bt_exit(void)
-{
-    return;
-}
-
-static void show_elapsed_time(int beg, int end, uint cnt, double val,
-			      const char *lbl1, const char *lbl2)
-{
-    int tm = end - beg;
-    printf("    %dm:%02ds for %u %s.  avg: %.1f %s\n",
-	   MIN(tm), SECONDS(tm), cnt, lbl1, val, lbl2);
 }
 
 /* End */

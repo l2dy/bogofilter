@@ -101,22 +101,7 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 	if (override > list->override)	/* if already found */
 	    break;
 
-retry:
-	if (ds_txn_begin(list->dsh) != DST_OK) {
-	    fprintf(stderr, "Problem starting transaction!\n");
-	    exit(EX_ERROR);
-	}
-
 	ret = ds_read(list->dsh, token, &val);
-	if (ret == DS_ABORT_RETRY) {
-	    rand_sleep(4*1000,1000*1000);
-	    goto retry;
-	}
-
-	if (ds_txn_commit(list->dsh) == DST_TEMPFAIL) {
-	    rand_sleep(4*1000,1000*1000);
-	    goto retry;
-	}
 
 	/* check if we have the token */
 	switch (ret) {
@@ -302,28 +287,14 @@ void score_initialize(void)
 	    int ret;
 	    dsv_t val;
 
-retry:
 	    /* Note: .ROBX is scaled by 1000000 in the wordlist */
-	    if (DST_OK != ds_txn_begin(list->dsh))
-		ret = -1;
+	    ret = ds_read(list->dsh, word_robx, &val);
+	    if (ret != 0)
+		robx = ROBX;
 	    else {
-		ret = ds_read(list->dsh, word_robx, &val);
-		if (ret == DS_ABORT_RETRY) {
-		    rand_sleep(4*1000,1000*1000);
-		    goto retry;
-		}
-		if (ret != 0)
-		    robx = ROBX;
-		else {
-		    /* If found, unscale; else use predefined value */
-		    uint l_robx = val.count[IX_SPAM];
-		    robx = l_robx ? (double)l_robx / 1000000 : ROBX;
-		}
-		if (DST_OK != ds_txn_commit(list->dsh)) {
-		    ret = -1;
-		    fprintf(stderr, "transaction commit failed.\n");
-		    exit(EX_ERROR);
-		}
+		/* If found, unscale; else use predefined value */
+		uint l_robx = val.count[IX_SPAM];
+		robx = l_robx ? (double)l_robx / 1000000 : ROBX;
 	    }
 	}
     }

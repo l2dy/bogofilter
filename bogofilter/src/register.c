@@ -71,11 +71,6 @@ retry:
 	exit(EX_ERROR);
     }
 
-    if (ds_txn_begin(list->dsh)) {
-	fprintf(stderr, "ds_txn_begin error.\n");
-	exit(EX_ERROR);
-    }
-
     for (node = wordhash_first(h); node != NULL; node = wordhash_next(h))
     {
 	wordprop = node->buf;
@@ -147,25 +142,6 @@ retry:
 	default:
 	    fprintf(stderr, "cannot set message count values\n");
 	    exit(EX_ERROR);
-    }
-
-    switch(ds_txn_commit(list->dsh)) {
-	case DST_OK:
-	    break;
-	case DST_TEMPFAIL:
-	    if (--retrycount) {
-		fprintf(stderr, "commit was aborted, retrying...\n");
-		rand_sleep(4 * 1000, 1000 * 1000);
-		goto retry;
-	    }
-	    fprintf(stderr, "giving up on this transaction.\n");
-	    exit(EX_ERROR);
-	case DST_FAILURE:
-	    fprintf(stderr, "commit failed.\n");
-	    exit(EX_ERROR);
-	default:
-	    fprintf(stderr, "unknown return.\n");
-	    abort();
     }
 
     if (DEBUG_REGISTER(1))

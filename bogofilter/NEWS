@@ -23,6 +23,16 @@ Briefly:
 
 0.93.2	2004-11-??
 
+	2004-11-20
+
+	* Make scoring one huge transaction, rather than one individual
+	  transaction per token. This fixes consistency and should improve
+	  score speed.
+
+	  WARNING: this seems to have broken bogotune, which, BTW, doesn't
+	  return errors to the test suite (t.bulkmode, with message-count
+	  files), it reports a bogus "PASS" in spite of database PANICs.
+
 	2004-11-19
 
 	* Restored the old traditional Berkeley DB datastore that cannot be

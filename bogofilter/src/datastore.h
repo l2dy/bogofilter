@@ -102,9 +102,10 @@ extern int ds_oper(const char *path, dbmode_t open_mode,
  * passed as the first parameter in all subsequent database function calls. 
  */
 /*@only@*/ /*@null@*/
-extern void *ds_open(const char *path	/** path to database file */, 
-		     const char *name	/** name(s) of data base(s) */,
-		     dbmode_t mode	/** open mode, DS_READ or DS_WRITE */);
+extern void *ds_open(void *dbev,	/**< parent environment */
+		     const char *path,	/**< path to database file */
+		     const char *name,	/**< name(s) of data base(s) */
+		     dbmode_t mode	/**< open mode, DS_READ or DS_WRITE */);
 
 /** Close file and clean up. */
 extern void  ds_close(/*@only@*/ void *vhandle);
@@ -113,11 +114,11 @@ extern void  ds_close(/*@only@*/ void *vhandle);
 extern void ds_flush(void *vhandle);
 
 /** Global initialization of datastore layer. */
-extern void ds_init(void);
+extern void *ds_init(void);
 
 /** Cleanup storage allocation of datastore layer. After calling this,
  * datastore access is no longer permitted. */
-extern void ds_cleanup(void);
+extern void ds_cleanup(void *);
 
 /** Initialize datastore handle. */
 dsh_t *dsh_init(
@@ -154,6 +155,9 @@ extern int ds_get_msgcounts(void *vhandle, dsv_t *val);
 
 /** Set the database message count. */
 extern int ds_set_msgcounts(void *vhandle, dsv_t *val);
+
+/** Get the parent environment. */
+extern void *ds_get_dbenv(void *vhandle);
 
 /* transactional code */
 /** Start a transaction for the data store identified by vhandle.

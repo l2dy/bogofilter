@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "bogofilter.h"
 #include "bogohome.h"
@@ -17,6 +18,8 @@
 #include "xmalloc.h"
 #include "xstrdup.h"
 
+#include "bsdqueue.h"
+
 #define	MIN_SLEEP	0.5e+3		/* 0.5 milliseconds */
 #define	MAX_SLEEP	2.0e+6		/* 2.0 seconds */
 
@@ -26,17 +29,68 @@
 
 /* Function Definitions */
 
+#define MAX_ENVS    10
+
+/* Idea: - build dirname
+ *	 - search list of known environments if we have that dirname,
+ *	   if so, return it
+ *	 - create and insert new environment
+ *
+ * for destruction: - when closed an environment, NULL it in word_lists
+ * past the current one that match our address
+ */
+
+static char *bf_dirname(const char *path) {
+    char *x = xstrdup(path), *t;
+    t = strrchr(x, DIRSEP_C);
+    if (t) *t = '\0';
+    else xfree(x), x = xstrdup(CURDIR_S);
+    return x;
+}
+
+static LIST_HEAD(envlist, envnode) envs;
+struct envlist envlisthead;
+struct envnode {
+    LIST_ENTRY(envnode) entries;
+    void *dbe;
+    char directory[0];
+};
+
+static void *list_searchinsert(const char *directory) {
+    struct envnode *i, *n;
+
+    assert(directory);
+
+    for (i = envlisthead.lh_first ; i ; i = i->entries.le_next) {
+	if (strcmp(directory, &i->directory[0]) == 0)
+	    return i->dbe;
+    }
+
+    n = xmalloc(sizeof(struct envnode) + strlen(directory) + 1);
+    n->dbe = ds_init(); /* FIXME: directory here */
+    ds_txn_begin(n->dbe);
+    strcpy(&n->directory[0], directory);
+    LIST_INSERT_HEAD(&envlisthead, n, entries);
+    return n->dbe;
+}
+
 static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 {
     bool retry = false;
+    void *dbe;
 
     if (list->type == WL_IGNORE) 	/* open ignore list in read-only mode */
 	mode = DS_READ;
 
-    list->dsh = ds_open(bogohome, list->filepath, mode);
+    /* FIXME: create or reuse environment from filepath */
+
+    dbe = list_searchinsert(bf_dirname(list->filepath));
+    if (!dbe)
+	exit(EX_ERROR);
+    list->dsh = ds_open(dbe, bogohome, list->filepath, mode); /* FIXME */
     if (list->dsh == NULL) {
 	int err = errno;
-	close_wordlists(word_lists); /* unlock and close */
+	close_wordlists(word_lists, 0); /* unlock and close */
 	switch(err) {
 	    /* F_SETLK can't obtain lock */
 	case EAGAIN:
@@ -71,31 +125,21 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 	} /* switch */
     } else { /* ds_open */
 	dsv_t val;
-retry:
-	if (DST_OK == ds_txn_begin(list->dsh)) {
-	    switch (ds_get_msgcounts(list->dsh, &val)) {
-		case 0:
-		case 1:
-		    list->msgcount[IX_GOOD] = val.goodcount;
-		    list->msgcount[IX_SPAM] = val.spamcount;
-		    if (wordlist_version == 0 &&
+
+	switch (ds_get_msgcounts(list->dsh, &val)) {
+	    case 0:
+	    case 1:
+		list->msgcount[IX_GOOD] = val.goodcount;
+		list->msgcount[IX_SPAM] = val.spamcount;
+		if (wordlist_version == 0 &&
 			ds_get_wordlist_version(list->dsh, &val) == 0)
-			wordlist_version = val.count[0];
-		    if (DST_OK == ds_txn_commit(list->dsh))
-			return retry;
-		    break;
-		case DS_ABORT_RETRY:
-		    fprintf(stderr, "Transaction reading message count/wordlist version failed, retrying.\n");
-		    rand_sleep(4000,3000*1000);
-		    goto retry;
-		    break;
-		default:
-		    break;
-	    }
+		    wordlist_version = val.count[0];
+		break;
+	    case DS_ABORT_RETRY:
+		retry = true;
+		break;
 	}
-	fprintf(stderr, "Transaction reading message count/wordlist version failed.\n");
-	exit(EX_ERROR);
-    } /* ds_open */
+    }
 
     return retry;
 }
@@ -106,6 +150,8 @@ void open_wordlists(wordlist_t *list, dbmode_t mode)
 
     /* set bogohome using first wordlist's directory */
     set_wordlist_directory();
+
+    LIST_INIT(&envs);
 
     while (retry) {
 	ds_init();
@@ -137,15 +183,36 @@ void set_wordlist_directory(void)
 }
 
 /** close all open word lists */
-void close_wordlists(wordlist_t *list)
+int close_wordlists(wordlist_t *list, int commit /** if unset, abort */)
+    /* FIXME: we really need to look at the list's environments */
 {
+    int err = 0;
+    struct envnode *i;
+    for (i = envlisthead.lh_first; i; i = i->entries.le_next) {
+	if (i->dbe) {
+	    if (commit) {
+		if (ds_txn_commit(i->dbe)) {
+		    err = 1;
+		}
+	    } else {
+		ds_txn_abort(i->dbe);
+	    }
+	}
+    }
+
     for (; list ; list = list->next) {
 	if (list->dsh) {
 	    ds_close(list->dsh);
 	    list->dsh = NULL;
 	}
     }
-    ds_cleanup();
+
+    while ((i = envlisthead.lh_first)) {
+	ds_cleanup(i->dbe);
+	LIST_REMOVE(i, entries);
+	free(i);
+    }
+    return err;
 }
 
 bool build_wordlist_path(char *filepath, size_t size, const char *path)

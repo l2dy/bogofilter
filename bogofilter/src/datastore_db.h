@@ -34,9 +34,10 @@ extern	bool	  db_txn_durable;	/* not DB_TXN_NOT_DURABLE */
  * passed as the first parameter in all subsequent database function calls. 
  */
 /*@only@*/ /*@null@*/
-void *db_open(const char *path	/** path to database file */, 
-	      const char *name	/** name(s) of data base(s) */,
-	      dbmode_t mode	/** open mode, DS_READ or DS_WRITE */);
+void *db_open(void *env,	/**< database environment to open DB in */
+	      const char *path,	/**< path to database file */
+	      const char *name,	/**< name(s) of data base(s) */
+	      dbmode_t mode	/**< open mode, DS_READ or DS_WRITE */);
 
 /** Close file and clean up. */
 void  db_close(/*@only@*/ void *vhandle);
@@ -44,12 +45,12 @@ void  db_close(/*@only@*/ void *vhandle);
 /** Flush pending writes to disk */
 void db_flush(void *handle);
 
-/** Do global initializations. \return 0 for success, non-zero for
+/** Do global initializations. \return pointer to environment for success, NULL for
  * error. */
-int dbe_init(void);
+void *dbe_init(void);
 
 /** Cleanup storage allocation */
-void dbe_cleanup(void);
+void dbe_cleanup(void *);
 
 /** Retrieve the value associated with a given word in a list. 
  * \return zero if the word does not exist in the database. Implementation
@@ -86,5 +87,8 @@ bool db_is_swapped(void *vhandle);
 
 /* Returns created flag */
 bool db_created(void *vhandle);
+
+/* Returns parent environment */
+void *db_get_env(void *);
 
 #endif

@@ -105,12 +105,14 @@ bool db_created(void *vhandle)
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
 */
-void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
+void *db_open(void * dummy, const char *db_file, const char *name, dbmode_t open_mode)
 {
     dbh_t *handle;
 
     int open_flags;
     VILLA *dbp;
+
+    UNUSED(dummy);
 
     if (open_mode & DS_WRITE)
 	open_flags = VL_OWRITER;
@@ -330,14 +332,16 @@ const char *db_str_err(int e)
     return dperrmsg(e);
 }
 
-int dbe_init(void)
+void * dbe_init(void)
 {
-    init = true; 
-    return 0;
+    init = true;
+    return (void *)~0;
 }
 
-void dbe_cleanup(void)
+void dbe_cleanup(void *d)
 {
+    UNUSED(d);
+
     init = false;
 }
 
@@ -373,4 +377,9 @@ int dbe_recover(int a, int b)
     "you must delete your data base and rebuild it, or restore an older version\n"
     "that you know is good from your backups.\n");
     exit(EX_ERROR);
+}
+
+void *db_get_env(void *d) {
+    UNUSED(d);
+    return 0;
 }

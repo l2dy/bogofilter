@@ -77,6 +77,7 @@ version_sources= \
 	bogomain.h bogomain.c \
 	bogoreader.h bogoreader.c \
 	bool.h bool.c \
+	bsdqueue.h \
 	buff.h buff.c \
 	charset.h charset.c \
 	collect.h collect.c \

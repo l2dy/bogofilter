@@ -270,7 +270,7 @@ const char *db_version_str(void)
 /** Initialize database. Expects open environment.
  * \return pointer to database handle on success, NULL otherwise.
  */
-void *db_open(const char *path, const char *name, dbmode_t open_mode)
+void *db_open(void *dummy, const char *path, const char *name, dbmode_t open_mode)
 {
     int ret;
     int is_swapped;
@@ -294,6 +294,7 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
     size_t idx;
     uint32_t retryflags[] = { 0, DB_NOMMAP };
 
+    (void)dummy;
     check_db_version();
 
     /* retry when locking failed */
@@ -677,12 +678,13 @@ const char *db_str_err(int e) {
     return db_strerror(e);
 }
 
-int dbe_init(void) {
+void *dbe_init(void) {
     init = true;
-    return 0;
+    return (void *)~0;
 }
 
-void dbe_cleanup(void) {
+void dbe_cleanup(void *d) {
+    (void)d;
     init = false;
 }
 
@@ -702,3 +704,7 @@ int dbe_recover(int a, int b) {
     exit(EX_ERROR);
 }
 
+void *db_get_env(void *d) {
+    (void)d;
+    return 0;
+}

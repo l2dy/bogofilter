@@ -32,8 +32,6 @@ bool	 upgrade_wordlist_version = false;
 
 /* Function Prototypes */
 
-static int maintain_wordlist(void *vhandle);
-
 /* Function Definitions */
 
 /* Keep high counts */
@@ -144,44 +142,6 @@ bool do_replace_nonascii_characters(register byte *str, register size_t len)
     return change;
 }
 
-void maintain_wordlists(void)
-{
-    wordlist_t *list;
-
-    for (list = word_lists; list != NULL; list = list->next) {
-	maintain_wordlist(list->dsh);
-	list = list->next;
-    }
-}
-
-static bool check_wordlist_version(dsh_t *dsh)
-{
-    dsv_t val;
-    ds_get_wordlist_version(dsh, &val);
-    if (val.count[0] >= CURRENT_VERSION)
-	return true;
-    else
-	return false;
-}
-
-int maintain_wordlist_file(const char *db_file)
-{
-    int rc = 0;
-    dsh_t *dsh;
-
-    dsh = ds_open(CURDIR_S, db_file, DS_WRITE);
-
-    if (dsh == NULL)
-	return EX_ERROR;
-    else
-	rc = maintain_wordlist(dsh);
-
-    ds_close(dsh);
-    ds_cleanup();
-
-    return rc;
-}
-
 struct userdata_t {
     void *vhandle;
     ta_t *transaction;
@@ -259,23 +219,34 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
     return EX_OK;
 }
 
-static int maintain_wordlist(void *vhandle)
+static bool check_wordlist_version(dsh_t *dsh)
+{
+    dsv_t val;
+    ds_get_wordlist_version(dsh, &val);
+    if (val.count[0] >= CURRENT_VERSION)
+	return true;
+    else
+	return false;
+}
+
+static int maintain_wordlist(void *database)
 {
     ta_t *transaction = ta_init();
     struct userdata_t userdata;
     int ret;
     bool done = false;
+    void *environment = ds_get_dbenv(database);
 
-    userdata.vhandle = vhandle;
+    userdata.vhandle = database;
     userdata.transaction = transaction;
 
-    if (DST_OK == ds_txn_begin(vhandle)) {
-	ret = ds_foreach(vhandle, maintain_hook, &userdata);
+    if (DST_OK == ds_txn_begin(environment)) {
+	ret = ds_foreach(database, maintain_hook, &userdata);
     } else
 	ret = -1;
 
     if (upgrade_wordlist_version) {
-	done = check_wordlist_version(vhandle);
+	done = check_wordlist_version(database);
 	if (!done)
 	    fprintf(dbgout, "Upgrading wordlist.\n");
 	else
@@ -287,11 +258,41 @@ static int maintain_wordlist(void *vhandle)
 	dsv_t val;
 	val.count[0] = CURRENT_VERSION;
 	val.count[1] = 0;
-	ds_set_wordlist_version(vhandle, &val);
+	ds_set_wordlist_version(database, &val);
     }
 
     ret |= ta_commit(transaction);
-    if (DST_OK != ds_txn_commit(vhandle))
+    if (DST_OK != ds_txn_commit(environment))
 	ret = -1;
     return ret;
+}
+
+void maintain_wordlists(void)
+{
+    wordlist_t *list;
+
+    for (list = word_lists; list != NULL; list = list->next) {
+	maintain_wordlist(list->dsh);
+	list = list->next;
+    }
+}
+
+int maintain_wordlist_file(const char *db_file)
+{
+    int rc = 0;
+    dsh_t *dsh;
+    void *dbe;
+
+    dbe = ds_init();
+    dsh = ds_open(dbe, CURDIR_S, db_file, DS_WRITE);
+
+    if (dsh == NULL)
+	return EX_ERROR;
+    else
+	rc = maintain_wordlist(dsh);
+
+    ds_close(dsh);
+    ds_cleanup(dbe);
+
+    return rc;
 }
