@@ -14,14 +14,19 @@
 #include <limits.h>
 
 int xatoi(int *i, const char *in) {
+    long val;
     char *end;
-    long d;
     errno = 0;
-    d = strtol(in, &end, 10);
-    if (in == end || errno == EINVAL || errno == ERANGE) return 0;
-    if (d > INT_MAX || d < INT_MIN) { errno = ERANGE; return 0; }
-    if (end < in + strlen(in)) return 0;
-    *i = d;
+    val = strtol(in, &end, 10);
+    if (end == in /* input string empty or does not start with sign/digit */
+	    || end < in + strlen(in) /* junk at end of in */
+	    || errno == EINVAL /* "base not supported" (shouldn't happen) */
+	    || errno == ERANGE /* underflow or overflow */) return 0;
+    if (val > INT_MAX || val < INT_MIN) { /* out of range for 'int' type */
+	errno = ERANGE;
+	return 0;
+    }
+    *i = val;
     return 1;
 }
 
@@ -33,7 +38,8 @@ int main(int argc, char **argv) {
     for (i = 1; i < argc; i++) {
 	int d;
 	int s = xatoi(&d, argv[i]);
-	printf("%s -> errno=%d status=%d int=%d\n", argv[i], errno, s, d);
+	printf("%s -> errno=%d_(%s) status=%d int=%d\n", argv[i], errno,
+		strerror(errno), s, d);
     }
     exit(0);
 }

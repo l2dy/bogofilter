@@ -12,11 +12,15 @@
 #include <errno.h>
 
 int xatof(double *d, const char *in) {
+    double val;
     char *end;
     errno = 0;
-    *d = strtod(in, &end);
-    if (in == end || errno == EINVAL || errno == ERANGE) return 0;
-    if (end < in + strlen(in)) return 0;
+    val = strtod(in, &end);
+    if (end == in /* input string empty or does not start with sign/digit */
+	    || end < in + strlen(in) /* junk at end of in */
+	    || errno == EINVAL /* SUSv3: "no conversion could be performed" */
+	    || errno == ERANGE /* overflow, SUSv3 CX underflow */) return 0;
+    *d = val;
     return 1;
 }
 
@@ -28,7 +32,8 @@ int main(int argc, char **argv) {
     for (i = 1; i < argc; i++) {
 	double d;
 	int s = xatof(&d, argv[i]);
-	printf("%s -> errno=%d status=%d double=%g\n", argv[i], errno, s, d);
+	printf("%s -> errno=%d_(%s) status=%d double=%g\n", argv[i], errno,
+		strerror(errno), s, d);
     }
     exit(0);
 }
