@@ -217,10 +217,7 @@ static void read_config_file(const char *filename, bool home_dir)
     {
 	const char *home = find_home(1);
 	if (home == NULL)
-	{
-	    fprintf(stderr, "Can't find home directory.\n");
-	    exit(2);
-	}
+	    return;
 	if (memcmp(filename, "~/", 2) == 0 )
 	    filename += 2;
 	tmp = xmalloc(strlen(home) + strlen(filename) + 2);
