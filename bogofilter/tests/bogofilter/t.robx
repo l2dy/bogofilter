@@ -58,6 +58,8 @@ WANT="252685"
 
 if  [ $verbose -ne 0 ]; then
     echo want: $WANT, have: $RESULT
+#   $BOGOFILTER -x ml -vvv -r -s < ${SYSTEST}/inputs/spam.mbx > ${TMPDIR}/spam.txt
+#   $BOGOFILTER -x ml -vvv -r -n < ${SYSTEST}/inputs/good.mbx > ${TMPDIR}/good.txt
 fi
 
 test $RESULT = "$WANT"
