@@ -549,6 +549,8 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
     int good = mode == REG_GOOD;
     int bad  = 1 - good;
 
+    bool divvy = ds_file == NULL && user_robx < EPS;
+
     wordhash_t *train = ns_and_sp->train;
     mlhead_t *msgs = ns_or_sp->msgs;
     mlitem_t *item;
@@ -572,9 +574,7 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
 	wordhash_t *wh = item->wh;
 
 	/* training set */
-	if (ds_file == NULL && 
-	    user_robx < EPS &&
-	    train_count / ratio < score_count + 1) {
+	if (divvy && train_count / ratio < score_count + 1) {
 	    wordhash_set_counts(wh, good, bad);
 	    wordhash_add(train, wh, &wordprop_init);
 	    train_count += 1;
@@ -584,7 +584,7 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
 	}
 	/* scoring set  */
 	else {
-	    uint bin = MOD(score_count,3);
+	    uint bin = divvy ? MOD(score_count,3) : 0;
 	    msglist_add(ns_or_sp->u.sets[bin], wh);
 	    score_count += 1;
 	}
