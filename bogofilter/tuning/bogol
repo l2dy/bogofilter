@@ -35,5 +35,5 @@ fi
 db=~/.bogofilter
 if [ "x$1" != "x" ]; then db=$1; shift; fi
 ( echo .MSG_COUNT; bogolexer -p $* | sort -u ) | \
-    bogoutil -w $db | \
+    bogoutil $CACHE_SIZE -w $db | \
     awk 'NF == 3 {printf("\"%s\" %s %s\n", $1, $2, $3)}'
