@@ -4,6 +4,19 @@
 
 $Id$
 
+	2003-12-01
+
+	* Added subject line tagging for Unsures.  (Contributed by
+          Burkhard Kaas). 
+
+	2003-11-30
+
+	* Multiple fixes, revisions, and changes to bogotune.
+
+	2003-11-27
+
+	* Fix defect in robx calculation (for bogoutil and bogotune).
+
 	2003-11-24
 
 	* The test suite ("make check") now works without procmail for t.MH

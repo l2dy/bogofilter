@@ -7,6 +7,8 @@ about retraining and the '-H' flag...
 
 0.15.10
 
+* Added subject line tagging for Unsures.
+* Multiple fixes, revisions, and changes to bogotune.
 * The test suite no longer depends on procmail for t.MH and t.maildir.
 * Moved robx calculation code to new file for sharing by bogoutil and
   bogotune.
