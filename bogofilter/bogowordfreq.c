@@ -27,6 +27,7 @@ bool logflag;		/* unused */
 int passthrough = 0;	/* unused */
 bool quiet = 0;		/* unused */
 int verbose = 0;	/* unused */
+bool replace_nonascii_characters = 0;	/* unused */
 
 static void print_wordlist (wordhash_t *h)
 {
