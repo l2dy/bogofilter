@@ -87,17 +87,14 @@ void rstats_cleanup(void)
     }
 }
 
-void rstats_add( const word_t *token,
-		 double good,
-		 double bad,
-		 double prob)
+void rstats_add(const word_t *token, wordprop_t *props)
 {
     header.count += 1;
     current->next  = NULL;
     current->token = word_dup(token);
-    current->good  = good;
-    current->bad   = bad;
-    current->prob  = prob;
+    current->good  = props->good;
+    current->bad   = props->bad;
+    current->prob  = props->prob;
     current->next = (rstats_t *)xcalloc(1, sizeof(rstats_t));
     current = current->next;
 }

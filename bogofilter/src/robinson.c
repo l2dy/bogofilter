@@ -117,17 +117,21 @@ static double wordprob_result(wordprop_t* wordstats)
     return (fw);
 }
 
-static double compute_probability(const word_t *token)
+static double compute_probability(const word_t *token, wordprop_t *props)
 {
-    wordlist_t* list;
     int override=0;
     long count;
-    double prob;
-
-    wordprop_t wordstats;
+    wordlist_t* list;
+    wordprop_t  wordstats;
 
     wordprob_init(&wordstats);
 
+    if (props->bad != 0 || props->good != 0)
+    {
+	wordstats.bad = props->bad;
+	wordstats.good = props->good;
+    }
+    else
     for (list=word_lists; list != NULL ; list=list->next)
     {
 	if (override > list->override)
@@ -154,11 +158,14 @@ static double compute_probability(const word_t *token)
 	}
     }
 
-    prob=wordprob_result(&wordstats);
-    if (Rtable || verbose)
-	rstats_add(token, wordstats.good, wordstats.bad, prob);
+    props->good = wordstats.good;
+    props->bad  = wordstats.bad;
+    props->prob=wordprob_result(&wordstats);
 
-    return prob;
+    if (Rtable || verbose)
+	rstats_add(token, props);
+
+    return props->prob;
 }
 
 double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
@@ -190,7 +197,8 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     for(node = wordhash_first(wordhash); node != NULL; node = wordhash_next(wordhash))
     {
 	word_t *token = node->key;
-	double prob = compute_probability( token );
+	wordprop_t *props = (wordprop_t *) node->buf;
+	double prob = compute_probability(token, props);
 
 	count += 1;
 
