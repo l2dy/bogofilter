@@ -8,5 +8,5 @@
 shn=`./spam_header_name`
 ( echo "$shn: blah1" ; echo ; echo "$shn: blah2" ) >$TMPDIR/input
 tail -2 $TMPDIR/input >$TMPDIR/want
-../bogofilter -p -e -q <$TMPDIR/input | sed -n '/^$/,$ p' >$TMPDIR/out
+../bogofilter -p -e -C <$TMPDIR/input | sed -n '/^$/,$ p' >$TMPDIR/out
 cmp $TMPDIR/out $TMPDIR/want
