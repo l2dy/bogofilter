@@ -1,8 +1,8 @@
 ./inputs/msg.1.txt u 0.500000
 ./inputs/msg.2.txt u 0.500000
 ./inputs/msg.3.txt u 0.500000
-./inputs/msg.4.txt u 0.506094
-./inputs/msg.5.txt u 0.501016
-./inputs/msg.6.txt u 0.500412
-./inputs/msg.7.txt S 6.81e-03
-./inputs/msg.8.txt S 3.69e-13
+./inputs/msg.4.txt u 0.602261
+./inputs/msg.5.txt u 0.775392
+./inputs/msg.6.txt u 0.603169
+./inputs/msg.7.txt S 5.37e-06
+./inputs/msg.8.txt S 0.00e+00
