@@ -77,9 +77,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     mime_cleanup();
     token_cleanup();
 
-#ifdef	ENABLE_MEMDEBUG
-    memdisplay();
-#endif
+    MEMDISPLAY;
 
     if (logflag)
 	closelog();
