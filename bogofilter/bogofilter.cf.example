@@ -195,7 +195,8 @@
 
 ##### HEADER_LINE_MARKUP
 #
-#	if enabled, add a "subj:" prefix to tokens in the Subject: line
+#	if enabled, prefix tokens in header lines, i.e.
+#	use "to:", "from:", "rtrn:", "subj:", "recv:", or "head:"
 
 #header_line_markup=yes
 
