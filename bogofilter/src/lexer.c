@@ -293,8 +293,8 @@ size_t text_decode(word_t *w)
     byte *const beg = w->text;		/* base pointer, fixed */
     byte *const fin = beg + w->leng;	/* end+1 position */
 
-    byte *txt = (byte *) memstr(w->text, w->leng, "=?"); /* input position */
-    uint size = (uint) (txt - beg); /* output offset */
+    byte *txt = (byte *) memstr(w->text, w->leng, "=?");	/* input position */
+    uint size = (uint) (txt - beg);				/* output offset */
 
     if (txt == NULL)
 	return w->leng;
@@ -305,8 +305,8 @@ size_t text_decode(word_t *w)
 	uint len;
 	bool adjacent;
 
-	typ = (byte *) memchr((char *)txt+2, '?', fin-(txt+2));/* Encoding type - 'B' or 'Q' */
-	tmp = typ + 3;	/* start of encoded word */
+	typ = (byte *) memchr((char *)txt+2, '?', fin-(txt+2));	/* Encoding type - 'B' or 'Q' */
+	tmp = typ + 3;						/* start of encoded word */
 	end = (byte *) memstr((char *)tmp, fin-tmp, "?=");	/* last byte of encoded word  */
 	len = end - tmp;
 
@@ -326,7 +326,7 @@ size_t text_decode(word_t *w)
 	    break;
 	case 'q':
 	    if (qp_validate(&n, RFC2047))
-		len = qp_decode(&n, RFC2047);		/* decode quoted-printable */
+		len = qp_decode(&n, RFC2047);	/* decode quoted-printable */
 	    break;
 	}
 
@@ -340,8 +340,8 @@ size_t text_decode(word_t *w)
 
 	/* move decoded word to where the encoded used to be */
 	memmove(beg+size, n.text, len+1);
-	size += len; /* bump output pointer */
-	txt = end + 2; /* skip ?= trailer */
+	size += len;	/* bump output pointer */
+	txt = end + 2;	/* skip ?= trailer */
 	if (txt >= fin)
 	    break;
 

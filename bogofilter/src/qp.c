@@ -96,13 +96,13 @@ static void qp_init(void)
 	qp_xlate2045[i] = qp_xlate2047[i] = (byte) i;
     }
 
-    qp_xlate2045['\t'] = '\t'; /* HTAB */
-    qp_xlate2045[' ']  = ' '; /* SP */
-    qp_xlate2045['=']  = 0; /* illegal */
+    qp_xlate2045['\t'] = '\t';	/* HTAB */
+    qp_xlate2045[' ']  = ' ';	/* SP */
+    qp_xlate2045['=']  = 0;	/* illegal */
 
-    qp_xlate2047['_']  = ' '; /* SP */
-    qp_xlate2047['=']  = 0; /* illegal */
-    qp_xlate2047['?']  = 0; /* illegal */
+    qp_xlate2047['_']  = ' ';	/* SP */
+    qp_xlate2047['=']  = 0;	/* illegal */
+    qp_xlate2047['?']  = 0;	/* illegal */
 
     return;
 }
