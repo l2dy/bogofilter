@@ -104,77 +104,11 @@ if test $ac_cv_header_stdbool_h = yes; then
 fi
 ])# AC_HEADER_STDBOOL
 
-dnl This is the end of the part extracted from autoconf.
-dnl The next part was added by Clint Adams and modified by
-dnl Matthias Andree.
 
-dnl arguments:
-dnl 1- space delimited list of libraries to check for db_create
-dnl 2- optional LDFLAGS to apply when checking for library, such as -static
-dnl 3- action-if-found
-dnl 4- action-if-not-found
-dnl 5- optional set of libraries to use (pass -lpthread here
-dnl    in case DB is compiled with POSIX mutexes)
-AC_DEFUN([AC_CHECK_DB],[
-  AS_VAR_PUSHDEF([ac_tr_db], [ac_cv_db_libdb])dnl
-  bogo_saved_LIBS="$LIBS"
-  bogo_saved_LDFLAGS="$LDFLAGS"
-  AC_CACHE_CHECK([for library providing db_create], ac_tr_db, [
-    for lib in '' $1 ; do
-     for i in '' $5 ; do
-      for ld in '' $2 ; do
-	if test "x$lib" != "x" ; then
-	  bogo_libadd="-l$lib $i"
-	else
-	  bogo_libadd="$i"
-	fi
-	LDFLAGS="$bogo_saved_LDFLAGS $ld"
-	LIBS="$LIBS $bogo_libadd"
-	AC_RUN_IFELSE(
-	    AC_LANG_PROGRAM([[
-		   #include <stdlib.h>
-		   #include <db.h>
-		   ]], [[
-			int maj, min;
-			(void)db_version(&maj, &min, (void *)0);
-			if (maj != DB_VERSION_MAJOR) exit(1);
-			  if (min != DB_VERSION_MINOR) exit(1);
-			    exit(0);
-		   ]]),
-	    [AS_VAR_SET(ac_tr_db, $bogo_libadd)],
-	    [AS_VAR_SET(ac_tr_db, no)],
-	    AC_LINK_IFELSE([AC_LANG_PROGRAM([
-		#include <db.h>],[
-		int foo=db_create((void *)0, (void *) 0, 0 );
-	    ])],
-	    [AS_VAR_SET(ac_tr_db, $bogo_libadd)],
-	    [AS_VAR_SET(ac_tr_db, no)]))
-
-	AS_IF([test x"AS_VAR_GET(ac_tr_db)" != xno],
-	    [$3
-	    db="$bogo_libadd"],
-	    [LIBS="$bogo_saved_LIBS"
-	    db=no])
-	LDFLAGS="$bogo_saved_LDFLAGS"
-	test "x$db" = "xno" && break
-      done
-      test "x$db" != "xno" && break
-     done
-     test "x$db" != "xno" && break
-    done
-    ])
-if test "x$db" = "xno"; then
-$4
-else
-    LIBS="$bogo_saved_LIBS $ac_tr_db"
-fi
-AS_VAR_POPDEF([ac_tr_db])dnl
-])# AC_CHECK_DB
 
 # Configure path for the GNU Scientific Library
 # Christopher R. Gabriel <cgabriel@linux.it>, April 2000
-
-
+# Modified by Matthias Andree, 2003
 AC_DEFUN(AM_PATH_GSL,
 [
 AC_ARG_WITH(gsl-prefix,[  --with-gsl-prefix=PFX   Prefix where GSL is installed (optional)],

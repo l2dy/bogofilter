@@ -8,6 +8,9 @@ to bogofilter's mode of operation will be documented in it.  In some
 releases major changes may require updating files or scripts used for
 running bogofilter.
 
+REMEMBER to read the doc/programmer/README.* file for your operating
+systems in case of trouble.
+
 NOTE: If you are about to build from code checked out via CVS, then
 please read the README.cvs file first before you proceed with this file!
 

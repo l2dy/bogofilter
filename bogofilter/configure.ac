@@ -1,4 +1,5 @@
 # $Id$
+dnl vim: set noai tw=0:
 AC_INIT(bogofilter, 0.15.7.cvs)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR([src])
@@ -120,8 +121,11 @@ case "x$WITH_DB_ENGINE" in
     ;;
 esac
 
+AC_LIB_RPATH
+
 case "x$WITH_DB_ENGINE" in
     xtdb)
+AC_LIB_LINKFLAGS([tdb])
 AC_CHECK_LIB(tdb,
              tdb_open,,
              [AC_MSG_ERROR(Cannot link to tdb library.
@@ -129,67 +133,44 @@ AC_CHECK_LIB(tdb,
                            LDFLAGS='-L/path/to/tdb/lib' CPPFLAGS='-I/path/to/tdb/include'
                            )],
 )
+  LIBDB="$LIBTDB"
 ;;
   xqdbm) 
+  AC_LIB_LINKFLAGS([qdbm])
   AC_CHECK_LIB(qdbm, dbm_open,,[
     AC_MSG_ERROR(Cannot link to qdbm library.)])
+  LIBDB="$LIBQDBM"
 ;;
     xdb)
+# check if we need LIBDB at all (it is harmful on BSD since
+# they rename the library including soname)
+  AC_LIB_LINKFLAGS([db])
+  AC_LINK_IFELSE([AC_LANG_CALL([], [db_version])],LIBDB="")
+  saveLIBS="$LIBS"
+  LIBS="$LIBS $LIBDB"
+  export LIBS
+  AC_LINK_IFELSE([AC_LANG_CALL([], [db_version])],,
+    AC_MSG_ERROR([Cannot link against libdb? Report to the bogofilter mailing list. Include config.log.]))
+  LIBS="$saveLIBS"
+  export LIBS
 AH_TEMPLATE([HAVE_DB_H], [Have suitable db.h header])
-need_dash_r=
-case $target_os in
-    solaris*) need_dash_r=yes ;;
-esac
 WITH_DB=
+AC_SUBST(LIBDB)
 
-dnl old test, going to be phased out
 AC_ARG_WITH(db,
-	    AC_HELP_STRING([--with-db=PATH], [Specify path to BerkeleyDB install directory]),
-	    [
-	     if test "x$withval" != "xno" ; then
-		 WITH_DB=$withval
-		 if test -d "$withval/lib"; then
-		     if test -n "${need_dash_r}"; then
-			 LDFLAGS="-R${withval}/lib ${LDFLAGS}"
-		     fi
-		     LDFLAGS="-L${withval}/lib ${LDFLAGS}"
-		 else
-		     if test -n "${need_dash_r}"; then
-			 LDFLAGS="-R${withval} ${LDFLAGS}"
-		     fi
-		     LDFLAGS="-L${withval} ${LDFLAGS}"
-		 fi
-		 if test -f "$withval/include/db.h"; then
-		     CPPFLAGS="-I${withval}/include ${CPPFLAGS}"
-		 else
-		     if test -f "$withval/db.h";then
-			 CPPFLAGS="-I${withval} ${CPPFLAGS}"
-		     else
-			 AC_MSG_ERROR(Not a BerkeleyDB path. Use LDFLAGS and CPPFLAGS to specify the path.)
-			 fi
-		     fi
-		 fi
-		 ]
-)
-
-if test "x$WITH_DB" != "x" ; then
-    DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --with-db=$WITH_DB"
-fi
+	    AC_HELP_STRING([--with-db=PATH], [obsolete, use --with-libdb-prefix instead]),
+    AC_MSG_ERROR([--with-db is obsolete. Use --with-libdb-prefix=$withval]))
 
 AC_CHECK_DECLS(db_create,,
 	       AC_MSG_ERROR([[Can not locate a suitable BerkeleyDB db.h header file.
-Use --with-db=PATH to specify the path to a v3+ install directory.
-You can download BerkeleyDB 4.0.x from http://www.sleepycat.com/]]),
+Use --with-libdb-prefix=PATH to specify the path to a v3+ install directory.
+You can download BerkeleyDB 4.1.x from http://www.sleepycat.com/]]),
 [[#include <db.h>]]
 )
 
-
-AC_CHECK_DB([db db-4.1 db41 db-4.0 db4 db-3.3 db-3.2 db-3.1 db3],${STATICLDFLAGS},,
-	    AC_MSG_ERROR([[Can not locate a suitable Berkeley DB library.  Use --with-db=PATH to specify the path to a v3+ install directory]]),-lpthread -lthread)
-export LIBS
-
 dnl check if run-time link works
-dnl XXX FIXME: try -rpath and -R with the library path component.
+saveLIBS="$LIBS"
+LIBS="$LIBS $LIBDB"
 AC_MSG_CHECKING(if a program can be linked against BerkeleyDB and run)
 AC_RUN_IFELSE(
   AC_LANG_PROGRAM([[
@@ -222,6 +203,7 @@ AC_RUN_IFELSE(
 AC_MSG_RESULT(yes)
 ;;
 esac
+LIBS="$saveLIBS"
 
 # Allow the user to specify a header name to use to indicate whether a given
 # message is SPAM or not.
@@ -501,6 +483,7 @@ AC_MSG_NOTICE([-------------------------------------------------------------])
 
 PATH_SAVED="$PATH"
 PATH=/bin:/usr/bin:$PATH
+export PATH
 
 need_my_gsl=1
 AM_PATH_GSL(1.4, AC_DEFINE(HAVE_GSL_14,,[Define if you have GNU Scientific Library 1.4 or newer])
@@ -546,6 +529,7 @@ AC_DEFINE(DIRSEP_C, '\\\\')
 AC_DEFINE(DIRSEP_S, "\\\\")
 fi
 
+DISTCHECK_CONFIGURE_FLAGS="LDFLAGS=\"$LDFLAGS\" CPPFLAGS=\"$CPPFLAGS\" LIBS=\"$LIBS\" CFLAGS=\"$CFLAGS\""
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 AC_CONFIG_FILES([Makefile \
 		bogofilter.spec \

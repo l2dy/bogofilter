@@ -10,7 +10,7 @@ sysconf_DATA = bogofilter.cf.example
 # what to build that from
 
 # what to distribute
-EXTRA_DIST = autogen.sh gsl \
+EXTRA_DIST = autogen.sh gsl config.rpath \
 	     bogofilter.cf.example \
 	     bogofilter.spec bogofilter.spec.in \
 	     METHODS UPGRADE Doxyfile \
