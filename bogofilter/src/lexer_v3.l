@@ -166,14 +166,14 @@ TOKEN_12 	({TOKEN}|{T12})
   QP		[!->@-~]+
 */
 
-ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^?]*\?=
-ENCODED_TOKEN	({TOKENFRONT}{TOKENMID})?({ENCODED_WORD}[ \t\n]+)*{ENCODED_WORD}
-
 WHITESPACE	[ \t\n]
 NOTWHITESPACE	[^ \t\n]
 
 HTML_ENCODING		"&#"x?[[:xdigit:]]+";"
 URL_ENCODING		"%"[[:xdigit:]][[:xdigit:]]
+
+ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^?]*\?=
+ENCODED_TOKEN	({TOKENFRONT}{TOKENMID})?({ENCODED_WORD}{WHITESPACE}+)*{ENCODED_WORD}
 
 /*
 HTML_WI_COMMENTS	"<"[^>]*">"
@@ -195,7 +195,7 @@ HTMLTOKEN		"<"[^>]*">"
 
 HBREAK		p|br|li|h[1-6]|hr|title|table|center|dd|dt|iframe|img|input|select|td|textarea|th|\/?(div|blockquote|pre|dir|dl|fieldset|legend|form|menu|ol|ul)
 
-BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
+BREAKHTML	"<"({HBREAK}({WHITESPACE}[^>]*|""))">"
 
 VERP		{TOKEN}-{NUM}-{TOKEN}={TOKEN}@{TOKEN}
 
