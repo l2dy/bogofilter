@@ -41,10 +41,15 @@ AUTHOR:
 
 /* Global variables */
 
-int logflag;
-int Rtable = 0;
 
-int quiet, verbose, passthrough, force, nonspam_exits_zero;
+int nonspam_exits_zero;	/* '-e' */
+int force;		/* '-f' */
+int logflag;		/* '-l' */
+int quiet;		/* '-q' */
+int passthrough;	/* '-p' */
+int verbose;		/* '-v' */
+int Rtable = 0;		/* '-R' */
+
 static bool suppress_config_file = FALSE;
 
 char directory[PATH_LEN + 100] = "";
@@ -300,15 +305,18 @@ static void help(void)
 {
     (void)printf( "\n" );
     (void)printf( "Usage: bogofilter [options] < message\n" );
-    (void)printf( "\t-h\t- print this help message and exit.\n" );
+    (void)printf( "\t-h\t- print this help message.\n" );
     (void)printf( "\t-d path\t- specify directory for wordlists.\n" );
+    (void)printf( "\t-g\t- select Graham spam calulation method (default).\n" );
+    (void)printf( "\t-r\t- select Robinson spam calulation method.\n" );
     (void)printf( "\t-p\t- passthrough.\n" );
     (void)printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
     (void)printf( "\t-s\t- register message as spam.\n" );
     (void)printf( "\t-n\t- register message as non-spam.\n" );
     (void)printf( "\t-S\t- move message's words from non-spam list to spam list.\n" );
     (void)printf( "\t-N\t- move message's words from spam list to spam non-list.\n" );
-    (void)printf( "\t-v\t- set verbosity level.\n" );
+    (void)printf( "\t-R\t- print an R data frame.\n" );
+    (void)printf( "\t-v\t- set debug verbosity level.\n" );
     (void)printf( "\t-x LIST\t- set debug flags.\n" );
     (void)printf( "\t-V\t- print version information and exit.\n" );
     (void)printf( "\t-c filename\t- read config file 'filename'.\n" );
@@ -339,7 +347,7 @@ int process_args(int argc, char **argv)
     int option;
     int exitcode;
 
-    while ((option = getopt(argc, argv, "d:ehlsnSNvVpugc:CRrx:fq")) != EOF)
+    while ((option = getopt(argc, argv, "d:ehlsnSNvVpuc:CgrRx:fq")) != EOF)
     {
 	switch(option)
 	{
@@ -371,6 +379,7 @@ int process_args(int argc, char **argv)
 	    verbose++;
 	    break;
 
+	case '?':
 	case 'h':
 	    help();
             exit(0);
@@ -426,6 +435,9 @@ int process_args(int argc, char **argv)
 	case 'C':
 	    suppress_config_file = TRUE;
 	    break;
+	default:
+	    fprintf( stderr, "Unknown option '%c' ( %02X )\n", option, option );
+	    exit(2);
 	}
     }
 
