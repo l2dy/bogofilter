@@ -15,7 +15,7 @@ CFLAGS ?= -g -Os -Wall
 
 # what to build that from
 MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h debug.h \
-    debug.c find_home.h find_home.c
+    debug.c find_home.h find_home.c bogoconfig.h
 
 BUILT_SOURCES = version.h
 
