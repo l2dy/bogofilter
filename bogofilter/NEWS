@@ -4,6 +4,14 @@
 
 $Id$
 
+0.11.1.3
+
+	2003-03-10
+	* Expanded regression tests.
+	* Cleaned up fprintf() arguments.
+	* Cleaned up message and mime header checks.
+	* Additional improvements to maintenance code.
+
 0.11.1.2
 
 	2003-03-06
