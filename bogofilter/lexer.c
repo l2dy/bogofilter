@@ -53,7 +53,8 @@ static int lgetsl(byte *buf, size_t size)
 	fprintf(dbgout, "*** %2d %c,%c %d ", yylineno,
 		HORB(msg_header), HORB(msg_state->mime_header), count);
 	fwrite(buf, 1, count, dbgout);
-	fputc('\n', dbgout);
+	if (buf[count-1] != '\n')
+	    fputc('\n', dbgout);
     }
 
     /* Special check for message separator.
