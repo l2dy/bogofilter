@@ -261,7 +261,7 @@ AC_FUNC_MMAP
 AC_FUNC_VPRINTF
 
 AC_CHECK_FUNCS(strchr strrchr memcpy memmove snprintf vsnprintf getopt_long)
-AC_REPLACE_FUNCS(strlcpy strlcat)
+AC_REPLACE_FUNCS(strlcpy strlcat strerror strtoul)
 
 AC_LIB_RPATH
 
