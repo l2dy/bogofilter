@@ -6,7 +6,7 @@ Summary:
 
 1. What is Bogofilter?
 2. Documentation
-3. Building Bogofilter.
+3. Building Bogofilter
 4. How to contribute
 5. How to request features
 6. Installing Bogofilter from source tarball or CVS
@@ -80,7 +80,7 @@ warning: format not a string literal, argument types not checked
 
 
 
-3. How to contribute
+4. How to contribute
 --------------------
 
 The best way to contribute to bogofilter is through the bogofilter
