@@ -151,7 +151,7 @@ round...
 From smythe@example.com  Fri Nov  1 06:32:06 2002
 Return-Path: <smythe@example.com>
 Delivered-To: smythe@example.com
-Received: from oak.example.com (oak.example.com [192.168.1.10])
+Received: from oak.example.com (oak.example.com [219.168.1.10])
 	by example.com (Postfix) with ESMTP id 9156627F82
 	for <smythe@example.com>; Fri,  1 Nov 2002 06:32:05 -0500 (EST)
 Received: by oak.example.com (Postfix, from userid 1000)
@@ -2574,7 +2574,7 @@ Will-Retry-Until: Wed,  6 Nov 2002 07:59:10 -0500 (EST)
 Content-Description: Undelivered Message Headers
 Content-Type: text/rfc822-headers
 
-Received: from maple.example.com (maple.example.com [192.168.1.20])
+Received: from maple.example.com (maple.example.com [219.168.1.20])
 	by example.com (Postfix) with ESMTP
 	id 6CD7D27F82; Fri,  1 Nov 2002 07:59:10 -0500 (EST)
 Message-Id: <4.3.2.7.2.20021101074812.00d554a0@mail.example.com>
@@ -3175,7 +3175,7 @@ Regards..................
 From smythe@example.com  Fri Nov  1 16:00:05 2002
 Return-Path: <smythe@example.com>
 Delivered-To: admin@example.com
-Received: from oak.example.com (oak.example.com [192.168.1.10])
+Received: from oak.example.com (oak.example.com [219.168.1.10])
 	by example.com (Postfix) with ESMTP id DB718280E1
 	for <admin@example.com>; Fri,  1 Nov 2002 16:00:03 -0500 (EST)
 Received: by oak.example.com (Postfix, from userid 1000)
