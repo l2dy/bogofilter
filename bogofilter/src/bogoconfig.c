@@ -10,6 +10,9 @@ NAME:
 AUTHOR:
    David Relson <relson@osagesoftware.com>
 
+CONTRIBUTORS:
+   David Saez	-O option, helps embedding into Exim.
+
 ******************************************************************************/
 
 #include <ctype.h>

@@ -8,6 +8,10 @@ NAME:
 AUTHOR:
    Eric S. Raymond <esr@thyrsus.com>
 
+CONTRIBUTORS:
+   Integrate patch by Zeph Hull and Clint Adams to present spamicity in
+   X-Spam-Status header in -p (passthrough) mode.
+
 ******************************************************************************/
 
 #include <stdio.h>
