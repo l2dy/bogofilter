@@ -15,13 +15,14 @@ NAME:
 /* calls exit(2) on read error or when max_size < 2 */
 int fgetsl(char *buf, int max_size, FILE *s)
 {
-    int c;
+    int c = 0;
     char *cp = buf;
 
     if (max_size < 2) {
 	fprintf(stderr, "Invalid buffer size, exiting.\n");
 	exit(2);
     }
+
     if (feof(s))
 	return(EOF);
 
@@ -31,7 +32,7 @@ int fgetsl(char *buf, int max_size, FILE *s)
 	    break;
     }
 
-    if (ferror(s)) {
+    if (c == EOF && ferror(s)) {
 	perror("stdin");
 	exit(2);
     }
