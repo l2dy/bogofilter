@@ -2,6 +2,9 @@
 				BOGOFILTER NEWS
 			       =================
 
+* GNU GSL 1.4 has replaced DCDFLIB.
+* VERPs (Variable Envelope Return Paths) now have their sequence
+  numbers replaced by a '#' for scoring.
 * Fixed processing of rmail files.
 * Fixed logging behavior when scoring mailboxes, maildirs, etc.
 * Added support for OS/2's file system.

@@ -9,18 +9,23 @@ is in the RELEASE.NOTES files!
 
 $Id$
 
+	2003-09-26
+
+	* VERPs (Variable Envelope Return Paths) now have their
+          sequence numbers replaced by a '#' for scoring.
+
 	2003-09-25
 
-	* DCDFLIB has been replaced by GNU GSL 1.4. If GSL 1.4 or newer is
+	* GNU GSL 1.4 has replaced DCDFLIB . If GSL 1.4 or newer is
 	  installed in your system, bogofilter will use that (which will
-	  usually be a shared library); if GSL is missing or a prior versions,
-	  bogofilter will statically link against GSL 1.4 excerpts from the
-	  gsl/ directory.
+	  usually be a shared library); if GSL is missing or a prior
+	  versions, bogofilter will statically link against GSL 1.4
+	  excerpts from the gsl/ directory.
 
 	  While we believe we have been allowed to include DCDFLIB with
-	  bogofilter, some people had expressed concerns. GSL is subject to the
-	  GNU General Public License v2, so we are DEFINITELY allowed to
-	  include it.
+	  bogofilter, some people had expressed concerns. GSL is subject
+	  to the GNU General Public License v2, so we are DEFINITELY
+	  allowed to include it.
 
 	2003-09-22
 
