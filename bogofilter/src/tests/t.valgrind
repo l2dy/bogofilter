@@ -49,7 +49,6 @@ run_test()
 if [   -d ${TMPDIR}/tests ] ; then rm -f ${TMPDIR}/tests/* ; else : ; fi
 mkdir -p ${TMPDIR}/tests
 
-set -x
 for mth in f t ; do
     alg="$mth"
     if [ "$alg" = "t" ] ; then alg=f ; else : ; fi
