@@ -17,9 +17,6 @@ endif
 if ENABLE_ROBINSON_FISHER
 FISHER_SRC = fisher.c fisher.h
 AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc
-LDADD = dcdflib/src/libdcdf.a
-else
-LDADD =
 endif
 
 # what to build
@@ -30,41 +27,42 @@ man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
 sysconf_DATA = bogofilter.cf.example
 
 noinst_LIBRARIES = libbogofilter.a
-LDADD += libbogofilter.a
+LDADD = dcdflib/src/libdcdf.a libbogofilter.a
+
 
 # what to build that from
 libbogofilter_a_SOURCES= \
 	xmalloc.h xcalloc.c xmem_error.c xrealloc.c \
 	    xmalloc.c xstrdup.h xstrdup.c \
 	debug.h debug.c \
+	bogoconfig.h config.c \
 	find_home.h find_home.c find_home_user.c \
 	    find_home_tildeexpand.c \
 	collect.h collect.c \
 	datastore.h datastore_db.h datastore_db.c \
 	lexer.h lexer.l \
 	register.h register.c \
+	rstats.h rstats.c \
 	wordhash.h wordhash.c wordlists.h wordlists.c \
-	bogoconfig.h globals.h system.h version.h
+	globals.h system.h version.h
 
 BUILT_SOURCES = version.h directories.h
 
 CLEANFILES= directories.h
 
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c \
-		     config.c \
 		     $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
-		     rstats.h rstats.c \
 		     common.h method.h
 
 bogowordfreq_SOURCES = bogowordfreq.c
 
 bogolexer_SOURCES = bogolexer.c
 
-debugtest_SOURCES = debug.c debug.h debug.main.c
+debugtest_SOURCES = debug.main.c
 
 bogoutil_SOURCES = bogoutil.c
 
-configtest_SOURCES = configtest.c config.c
+configtest_SOURCES = configtest.c
 
 wordhash_SOURCES = wordhash.main.c
 
