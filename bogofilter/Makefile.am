@@ -9,7 +9,7 @@ SUBDIRS = . tests
 bin_PROGRAMS = bogofilter bogoutil
 bin_SCRIPTS = bogoupgrade
 check_PROGRAMS = lexertest debugtest
-man1_MANS = bogofilter.1 bogoutil.1
+man1_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1
 
 CFLAGS = -g
 
