@@ -5,6 +5,13 @@
 NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+	2004-06-19
+
+	* Fix abort during db_open (ds_open wasn't first calling
+          ds_init).
+	* Revise datastore and database levels so that each level
+          calls its own init() and cleanup() routines.
+
 0.91.3	2004-06-15
 
 	2004-06-14
