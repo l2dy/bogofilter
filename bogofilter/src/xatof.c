@@ -32,8 +32,10 @@ int main(int argc, char **argv) {
     for (i = 1; i < argc; i++) {
 	double d;
 	int s = xatof(&d, argv[i]);
-	printf("%s -> errno=%d_(%s) status=%d double=%g\n", argv[i], errno,
-		strerror(errno), s, d);
+	printf("%s -> errno=%d_(%s) status=%d", argv[i], errno,
+		strerror(errno), s);
+	if (s) printf(" double=%g", d);
+	printf("\n");
     }
     exit(0);
 }
