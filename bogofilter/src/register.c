@@ -109,8 +109,8 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
       ds_flush(list->dsh);
 
       if (DEBUG_REGISTER(1))
-	  (void)fprintf(dbgout, "bogofilter: list %s - %ul spam, %ul good\n",
-			list->listname, list->msgcount[IX_SPAM], list->msgcount[IX_GOOD]);
+	  (void)fprintf(dbgout, "bogofilter: list %s (%s) - %ul spam, %ul good\n",
+			list->listname, list->filepath, list->msgcount[IX_SPAM], list->msgcount[IX_GOOD]);
   }
 
   set_msg_counts(g, b);
