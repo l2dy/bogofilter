@@ -94,13 +94,13 @@
 #
 #	    l - logging tag (from '-l' option)
 #
-##	    o - spam_cutoff, ex. cutoff=%c
+#	    o - spam_cutoff, ex. cutoff=%c
 #
 #	    r - runtype
 #	        w - word count
 #	        m - message count
 #
-##	    v - version, ex. "version=%v"
+#	    v - version, ex. "version=%v"
 #
 #    customizable messages:
 #
