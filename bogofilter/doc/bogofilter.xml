@@ -36,6 +36,7 @@
 <cmdsynopsis>
     <arg choice='opt'>-p</arg>
     <arg choice='opt'>-e</arg>
+    <arg choice='opt'>-t</arg>
     <arg choice='opt'>-u</arg>
     <arg choice='opt'>-2</arg>
     <arg choice='opt'>-3</arg>
@@ -188,7 +189,11 @@ mail in memory.</para>
 <para>The <option>-e</option> (embed) option tells 
 <application>bogofilter</application> to exit with code 0 even if the mail is not spam.  
 This simplifies using bogofilter from procmail or maildrop.
-This option is only effective when <option>-p</option> is used.
+</para>
+  
+<para>The <option>-t</option> (terse) option tells 
+<application>bogofilter</application> to print an abbreviatd spamicit message containing 1 letter and the score.
+The letter will be "Y" to indicate spam and "N" to indicate non-spam.
 </para>
   
 <para>The <option>-u</option> option tells
@@ -248,6 +253,12 @@ wordfile is created if absent.</para>
 <para>The <option>-n</option> option tells
 <application>bogofilter</application> to register the text presented
 on standard input as non-spam.</para>
+
+<para><application>Bogofilter</application> doesn't detect if a message registered twice.  
+If you do this by accident, the token counts will off by 1 from what you really want 
+and the corresponding spam scores will be slightly off.
+Given a large number of tokens and messages in the wordlists, this doesn't matter.
+The problem _can_ be corrected by using the <option>-S</option> option or the <option>-N</option> option.
 
 <para>The <option>-S</option> option tells
 <application>bogofilter</application> to undo a prior registration of the
