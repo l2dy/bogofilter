@@ -4,14 +4,13 @@
 
 $Id$
 
-0.11.1.5
+	2003-04-01
+	* Changed default value of 'strict_check' to No.
 
-	2003-03-28
-	* Bogofilter now frees all memory that it allocates.
-	* FAQ reorganized and info added on asian spam, the 
-	  format of verbose output, and how to use SpamAssassin to
-	  train bogofilter.
-	* Fixed processing of '-o' option.
+	2003-03-30
+	* Added config file option 'strict_check' for processing
+	  html comments.  Enabled means to use "<!--" and "-->" to
+	  delimit comments.  Disabled uses "<!" and ">".
 
 0.11.1.5
 
