@@ -221,7 +221,7 @@ AC_HEADER_STDC
 AC_HEADER_STDBOOL
 AC_HEADER_DIRENT
 AC_HEADER_TIME
-AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h stdlib.h string.h strings.h sys/socket.h unistd.h sys/file.h stddef.h sys/time.h sys/select.h inttypes.h stdarg.h stdint.h])
+AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h string.h strings.h unistd.h sys/time.h sys/select.h inttypes.h stdarg.h stdint.h])
 AC_CHECK_HEADERS([limits.h float.h],,[AC_CHECK_HEADERS(values.h)])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -250,7 +250,7 @@ AC_FUNC_MEMCMP
 AC_FUNC_MMAP
 AC_FUNC_VPRINTF
 
-AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl strchr strrchr memcpy memmove munmap pow sqrt strcasecmp strcspn strspn strstr snprintf vsnprintf getopt_long)
+AC_CHECK_FUNCS(strchr strrchr memcpy memmove snprintf vsnprintf getopt_long)
 AC_REPLACE_FUNCS(strlcpy strlcat)
 
 AC_LIB_RPATH
