@@ -176,13 +176,14 @@ int main(int argc, char **argv)
     }
 
     init_charset_table("default", true);
-    mime_reset();
+    got_from();	/* initialize */
 
     while ((t = get_token()) > 0)
     {
 	count += 1;
-	if ( passthrough )
+	if (passthrough) {
 	    fprintf(stdout, "%s\n", yylval->text);
+	}
 	else if (!quiet)
 	    printf("get_token: %d '%s`\n", t, yylval->text);
     }
