@@ -81,6 +81,9 @@ static void help(void)
 	    "\t-v\t- set verbosity level.\n"
 	    "\t-c file\t- read specified config file.\n"
 	    "\t-C\t- don't read standard config files.\n"
+#ifndef	ENABLE_DEPRECATED_CODE
+	    "\t-H\t- disables header line tagging.\n"
+#endif   
 	    "\t-I file\t- read message from file instead of stdin.\n"
 	    "\t-x list\t- set debug flags.\n"
 	    "\t-D\t- direct debug output to stdout.\n");
@@ -119,7 +122,7 @@ static void print_version(void)
 }
 
 #ifndef	ENABLE_DEPRECATED_CODE
-#define	OPTIONS	":c:CDhI:npP:qvVx:X:m"
+#define	OPTIONS	":c:CDhHI:npP:qvVx:X:m"
 #else
 #define	OPTIONS	":c:CDhHI:npP:qvVx:X:m"
 #endif
@@ -169,9 +172,9 @@ static void process_args_1(int argc, char **argv)
 	    help();
 	    exit(EX_OK);
 
-#ifdef	ENABLE_DEPRECATED_CODE
+#ifndef	ENABLE_DEPRECATED_CODE
 	case 'H':
-	    header_degen = true;
+	    header_line_markup = false;
 	    break;
 #endif
 

@@ -349,6 +349,9 @@ static void help(void)
 		  "\t  -c file - read specified config file.\n"
 		  "\t  -C      - don't read standard config files.\n"
 		  "\t  -d path - specify directory for wordlists.\n"
+#ifndef	ENABLE_DEPRECATED_CODE
+		  "\t  -H      - disables header line tagging.\n"
+#endif   
 		  "\t  -k size - set BerkeleyDB cache size (MB).\n"
 #ifdef	ENABLE_DEPRECATED_CODE
 		  "\t  -W      - use combined wordlist for spam and ham tokens.\n"
@@ -660,7 +663,7 @@ void process_args_2(int argc, char **argv)
 #ifdef	ENABLE_DEPRECATED_CODE
 	    header_degen = true;
 #else
-	    header_line_markup = true;
+	    header_line_markup = false;
 #endif
 	    break;
 
