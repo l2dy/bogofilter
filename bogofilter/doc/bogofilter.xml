@@ -301,11 +301,11 @@ passthrough mode.  Note that this only works when -p is explicitly given.</para>
 <refsect1 id='configuration'><title>CONFIGURATION</title>
 <para>The <application>bogofilter</application> command line allows setting of many 
 options that determine how <application>bogofilter</application> operates.
-File <filename>@SYSCONFDIR@/bogofilter.cf</filename> can be used to set additional
+File <filename>@sysconfdir@/bogofilter.cf</filename> can be used to set additional
 parameters that affect its operation.  File 
-<filename>@SYSCONFDIR@/bogofilter.cf.example</filename> has samples of all of the parameters.
+<filename>@sysconfdir@/bogofilter.cf.example</filename> has samples of all of the parameters.
 Status and logging messages can be customized for each site (see 
-<filename>@SYSCONFDIR@/bogofilter.cf.example</filename>).
+<filename>@sysconfdir@/bogofilter.cf.example</filename>).
 </para>
 </refsect1>
 
@@ -457,7 +457,7 @@ comments.</para>
 <refsect1 id='files'><title>FILES</title>
 <variablelist>
 <varlistentry>
-<term><filename>@SYSCONFDIR@/bogofilter.cf</filename></term>
+<term><filename>@sysconfdir@/bogofilter.cf</filename></term>
 <listitem><para>System configuration file.</para></listitem>
 </varlistentry>
 <varlistentry>
