@@ -27,6 +27,7 @@ void open_wordlists(dbmode_t);
 void close_wordlists(void);
 
 void set_list_active_status(bool status);
+void set_wordlist_directory(void);
 
 void compute_msg_counts(void);
 

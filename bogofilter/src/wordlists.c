@@ -120,6 +120,20 @@ void open_wordlists(dbmode_t mode)
     }
 }
 
+/* set_wordlist_directory()
+**	set bogohome using first wordlist's directory
+**	if none, don't change bogohome
+*/
+
+void set_wordlist_directory(void)
+{
+    if (word_lists != NULL) {
+	char *path = get_directory_from_path(word_lists->filepath);
+	if (path != NULL)
+	    set_bogohome(path);
+    }
+}
+
 /** close all open word lists */
 void close_wordlists(void)
 {

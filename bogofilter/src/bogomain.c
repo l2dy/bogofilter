@@ -56,8 +56,12 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     output_setup();
 
-    /* open all wordlists */
+    /* set bogohome using first wordlist's directory */
+    set_wordlist_directory();
+
     ds_init();
+
+    /* open all wordlists */
     open_wordlists((run_type == RUN_NORMAL) ? DS_READ : DS_WRITE);
 
     status = bogofilter(argc, argv);

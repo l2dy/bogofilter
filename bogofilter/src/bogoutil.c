@@ -807,5 +807,6 @@ int main(int argc, char *argv[])
     }
 
     ds_cleanup();
+
     return rc;
 }

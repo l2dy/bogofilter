@@ -189,3 +189,22 @@ char *get_directory(priority_t which)
     }
     return dir;
 }
+
+char *get_directory_from_path(const char *path)
+{
+    char *dir = xstrdup(path);
+    char *last = NULL;
+    char *sep;
+
+    for (sep = strstr(dir, DIRSEP_S); sep != NULL ; sep = strstr(sep+1, DIRSEP_S))
+	last = sep;
+    if (last == NULL) {
+	xfree(dir);
+	return NULL;
+    }
+    else {
+	*last = '\0';
+	return dir;
+    }
+}
+

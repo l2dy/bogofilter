@@ -32,6 +32,7 @@ char *create_path_from_env(const char *var,
 			   /*@null@*/ const char *subdir);
 
 char *get_directory(priority_t which);
+char *get_directory_from_path(const char *path);
 
 bool is_file(const char* path)		/*@globals errno,stderr@*/;
 bool check_directory(const char *path)	/*@globals errno,stderr@*/;
