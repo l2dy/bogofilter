@@ -227,7 +227,7 @@ token_t get_token(void)
     }
 
     if (!msg_count_file) {
-	/* Remove trailing blanks */
+	
 	/* From "From ", for example */
 	while (yylval->leng > 1 && yylval->text[yylval->leng-1] == ' ') {
 	    yylval->leng -= 1;
