@@ -106,6 +106,9 @@ smalloc (wordhash_t * h, size_t n)
   wh_alloc_str *x = h->strings;
   char *t;
 
+  /* Force alignment on architecture's natural boundary.*/
+  n += ( n % __alignof__ ( char * ));
+   
   if (x == NULL || x->avail < n)
     {
       x = xmalloc (sizeof (wh_alloc_str));
