@@ -255,7 +255,7 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
 	if (DEBUG_CONFIG(1))
 	    fprintf(dbgout, "Testing:  %s\n", buff);
 
-	if (!process_config_option(buff, precedence, warn_on_error))
+	if (!process_config_option(buff, warn_on_error, precedence))
 	    error = true;
     }
 
