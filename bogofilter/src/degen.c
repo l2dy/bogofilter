@@ -76,8 +76,8 @@ REFERENCE:
 
 #ifndef	DEBUG
 #include "degen.h"
+#include "score.h"
 #include "xmalloc.h"
-#include "robinson.h"
 #else
 #define	xmalloc	malloc
 #define	xfree	free

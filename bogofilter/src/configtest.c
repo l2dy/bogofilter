@@ -16,8 +16,8 @@ AUTHOR:
 #include <stdlib.h>
 #include <string.h>
 
-#include "fisher.h"
-#include "method.h"
+#include "configfile.h"
+#include "score.h"
 #include "wordlists.h"
 
 const char *progname = "configtest";
@@ -28,10 +28,17 @@ double ham_cutoff;
 #define DEBUG_CONFIG(level)	(verbose > level)
 #endif
 
-/* Dummy struct definitions to support config.c */
-rf_method_t rf_fisher_method = {
-    {NULL, NULL, NULL, NULL, NULL, NULL, NULL}, NULL, NULL
-} ;
+/* Definitions to support config.c */
+
+double msg_spamicity(void)
+{
+    return 0.0;
+}
+
+rc_t msg_status(void)
+{
+    return RC_HAM;
+}
 
 #ifdef COMPILE_DEAD_CODE
 static bool x_configure_wordlist(const char *val)

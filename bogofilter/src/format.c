@@ -22,10 +22,10 @@ Most of the ideas in here are stolen from Mutt's snprintf implementation.
 
 #include "system.h"
 
-#include "format.h"
 #include "bogoconfig.h"
 #include "bogofilter.h"
-#include "method.h"
+#include "format.h"
+#include "score.h"
 #include "xstrdup.h"
 
 /* Function Prototypes */
@@ -253,8 +253,8 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
     int prec = 0;
     int flags = 0;
 
-    rc_t status = (*method->status)();
-    double spamicity = (*method->spamicity)();
+    rc_t status = msg_status();
+    double spamicity = msg_spamicity();
 
     memset(buff, '\0', size);		/* for debugging */
     memset(temp, '\0', sizeof(temp));	/* for debugging */

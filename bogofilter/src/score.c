@@ -3,7 +3,7 @@
 /*****************************************************************************
 
 NAME:
-   robinson.c -- implements f(w) and S, or Fisher, algorithm for computing spamicity.
+   fisher.c -- implements Fisher variant on Robinson algorithm.
 
 ******************************************************************************/
 
@@ -19,16 +19,61 @@ NAME:
 #include "datastore.h"
 #include "msgcounts.h"
 #include "prob.h"
-#include "robinson.h"
 #include "rstats.h"
+#include "score.h"
 #include "wordhash.h"
 #include "wordlists.h"
 
+#if defined(HAVE_GSL_10) && !defined(HAVE_GSL_14)
+/* HAVE_GSL_14 implies HAVE_GSL_10
+ * if we have neither, we'll use our included GSL 1.4, which knows CDFs
+ * if we have both, we have GSL 1.4, which knows CDFs
+ *
+ * in other cases, we need to integrate the PDF to get the CDF
+ */
+#define GSL_INTEGRATE_PDF
+#include "gsl/gsl_randist.h"
+#include "gsl/gsl_integration.h"
+#include "gsl/gsl_errno.h"
+#else
+#include "gsl/gsl_cdf.h"
+#endif
+
+/* Function Prototypes */
+
+	 void	print_summary(void);
+static	double	get_spamicity(size_t robn, FLOAT P, FLOAT Q);
+
+/* Global Variables */
+
+double ham_cutoff = HAM_CUTOFF;
+
+/* Static Variables */
+
+static score_t  score;
+
 /* Function Definitions */
 
-void rob_print_stats(FILE *fp)
+double msg_spamicity(void)
 {
-    bool unsure = unsure_stats && ((*method->status)() == RC_UNSURE) && verbose;
+    return score.spamicity;
+}
+
+rc_t msg_status(void)
+{
+    if (score.spamicity >= spam_cutoff)
+	return RC_SPAM;
+
+    if ((ham_cutoff < EPS) ||
+	(score.spamicity <= ham_cutoff))
+	return RC_HAM;
+
+    return RC_UNSURE;
+}
+
+void msg_print_stats(FILE *fp)
+{
+    bool unsure = unsure_stats && (msg_status() == RC_UNSURE) && verbose;
 
     (void)fp;
 
@@ -89,7 +134,7 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 	    wordprob_add(cnts, val.count[i], list->bad[i]);
 	}
 
-	if (DEBUG_ROBINSON(1)) {
+	if (DEBUG_ALGORITHM(1)) {
 	    fprintf(dbgout, "%2d %2d \n", (int) cnts->good, (int) cnts->bad);
 	    word_puts(token, 0, dbgout);
 	    fputc('\n', dbgout);
@@ -99,7 +144,7 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
     return;
 }
 
-double lookup_and_score(const word_t *token, wordcnts_t *cnts)
+double msg_lookup_and_score(const word_t *token, wordcnts_t *cnts)
 {
     double prob;
 
@@ -120,12 +165,12 @@ static double compute_probability(const word_t *token, wordcnts_t *cnts)
 	prob = wordprob_result(cnts);
     else
 	/* Otherwise lookup the word and get its score */
-	prob = lookup_and_score(token, cnts);
+	prob = msg_lookup_and_score(token, cnts);
 
     return prob;
 }
 
-double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
+double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 /* selects the best spam/non-spam indicators and calculates Robinson's S */
 {
     hashnode_t *node;
@@ -140,7 +185,7 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 
     (void) fp; 	/* quench compiler warning */
 
-    if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() begins\n");
+    if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "### msg_compute_spamicity() begins\n");
 
     Rtable |= verbose > 3;
     need_stats = Rtable || verbose || passthrough;
@@ -148,8 +193,8 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     if (need_stats)
 	rstats_init();
 
-    if (DEBUG_ROBINSON(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
-				   min_dev, robs, robx);
+    if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
+				    min_dev, robs, robx);
 
     wordhash_sort(wh);
 
@@ -199,7 +244,7 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
             robn ++;
         }
 
-	if (DEBUG_ROBINSON(3)) {
+	if (DEBUG_ALGORITHM(3)) {
 	    (void)fprintf(dbgout, "%3lu %3lu %f ",
 			  (unsigned long)robn, (unsigned long)count, prob);
 	    (void)word_puts(token, 0, dbgout);
@@ -211,21 +256,26 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     ** S = (P - Q) / (P + Q)                        [combined indicator]
     */
 
-    spamicity = (*((rf_method_t *)method)->get_spamicity)( robn, P, Q );
+    spamicity = get_spamicity(robn, P, Q);
 
     if (need_stats && robn != 0)
 	rstats_fini(robn, P, Q, spamicity );
 
-    if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() ends\n");
+    if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "### msg_compute_spamicity() ends\n");
 
     return (spamicity);
 }
 
-void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double _spam_cutoff)
+void score_initialize(void)
 {
     word_t *word_robx = word_new((const byte *)ROBX_W, strlen(ROBX_W));
 
-    mth_initialize( stats, ROBINSON_MAX_REPEATS, _min_dev, _spam_cutoff, ROBINSON_GOOD_BIAS );
+    max_repeats = 1;
+    if (fabs(min_dev) < EPS)
+	min_dev = MIN_DEV;
+    if (spam_cutoff < EPS)
+	spam_cutoff = SPAM_CUTOFF;
+    set_good_weight( GOOD_BIAS );
 
     /*
     ** If we're classifying messages, we need to compute the scalefactor 
@@ -263,9 +313,108 @@ void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double 
     return;
 }
 
-void rob_cleanup(void)
+void score_cleanup(void)
 {
     rstats_cleanup();
+}
+
+#ifdef GSL_INTEGRATE_PDF
+static double chisq(double x, void *p) {
+     return(gsl_ran_chisq_pdf(x, *(double *)p));
+}
+
+inline static double prbf(double x, double df) {
+    gsl_function chi;
+    int status;
+    double p, abserr;
+    const int intervals = 15;
+    const double eps = 1000 * DBL_EPSILON;
+
+    gsl_integration_workspace *w;
+    chi.function = chisq;
+    chi.params = &df;
+    gsl_set_error_handler_off();
+    w = gsl_integration_workspace_alloc(intervals);
+    if (!w) {
+	fprintf(stderr, "Out of memory! %s:%d\n", __FILE__, __LINE__);
+	abort();
+    }
+    status = gsl_integration_qag(&chi, 0, x, eps, eps,
+	    intervals, GSL_INTEG_GAUSS15, w, &p, &abserr);
+    if (status && status != GSL_EMAXITER) {
+	fprintf(stderr, "Integration error: %s\n", gsl_strerror(status));
+	abort();
+    }
+    gsl_integration_workspace_free(w);
+    p = max(0.0, 1.0 - p);
+    return(min(1.0, p));
+}
+#else
+inline static double prbf(double x, double df)
+{
+    double r = gsl_cdf_chisq_Q(x, df);
+    return (r < DBL_EPSILON) ? 0.0 : r;
+}
+#endif
+
+double calc_prob(uint good, uint bad)
+{
+    uint g = min(good, msgs_good);
+    uint b = min(bad,  msgs_bad);
+    int n = g + b;
+    double fw;
+
+    if (n == 0)
+	fw = robx;
+    else {
+	double bad_cnt  = (double) max(1, msgs_bad);
+	double good_cnt = (double) max(1, msgs_good);
+	double pw = ((b / bad_cnt) / (b / bad_cnt + g / good_cnt));
+	fw = (robs * robx + n * pw) / (robs + n);
+    }
+
+    return fw;
+}
+
+double get_spamicity(size_t robn, FLOAT P, FLOAT Q)
+{
+    if (robn == 0)
+    {
+	score.spamicity = robx;
+    }
+    else
+    {
+	double df = 2.0 * robn;
+	double ln2 = log(2.0);					/* ln(2) */
+
+	score.robn = robn;
+
+	/* convert to natural logs */
+	score.p_ln = log(P.mant) + P.exp * ln2;		/* invlogsum */
+	score.q_ln = log(Q.mant) + Q.exp * ln2;		/* logsum    */
+
+	score.p_pr = prbf(-2.0 * score.p_ln, df);	/* compute P */
+	score.q_pr = prbf(-2.0 * score.q_ln, df);	/* compute Q */
+
+	score.spamicity = (1.0 + score.q_pr - score.p_pr) / 2.0;
+    }
+
+    return score.spamicity;
+}
+
+void msg_print_summary(void)
+{
+    if (!Rtable) {
+	(void)fprintf(stdout, "%-*s %5lu %9.2e %9.2e %9.2e\n",
+		      MAXTOKENLEN+2, "N_P_Q_S_s_x_md", (unsigned long)score.robn, 
+		      score.p_pr, score.q_pr, score.spamicity);
+	(void)fprintf(stdout, "%-*s %9.2e %9.2e %6.3f\n",
+		      MAXTOKENLEN+2+6, " ", robs, robx, min_dev);
+    }
+    else
+	(void)fprintf(stdout, "%-*s %5lu %9.2e %9.2e %9.2e %9.2e %9.2e %5.3f\n",
+		      MAXTOKENLEN+2, "N_P_Q_S_s_x_md", (unsigned long)score.robn, 
+		      score.p_pr, score.q_pr, score.spamicity, robs, robx, min_dev);
 }
 
 /* Done */

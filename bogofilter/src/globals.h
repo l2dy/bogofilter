@@ -64,7 +64,7 @@ extern char msg_register[256];
 extern bool maintain;
 extern bool onlyprint;
 
-/* from robinson.h */
+/* from fisher.h */
 #define ROBS		0.010	/* Robinson's s */
 #define ROBX		0.415	/* Robinson's x */
 

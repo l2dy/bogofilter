@@ -49,21 +49,26 @@ AUTHORS:
 #include <sys/stat.h>
 
 #include "bogotune.h"
+
+#include "bogoconfig.h"
 #include "bogoreader.h"
 #include "collect.h"
 #include "datastore.h"
-#include "fisher.h"
 #include "msgcounts.h"
 #include "mime.h"
 #include "paths.h"
 #include "robx.h"
 #include "rstats.h"
+#include "score.h"
 #include "token.h"
 #include "tunelist.h"
 #include "wordhash.h"
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
+
+#undef	HAM_CUTOFF	/* ignore value in score.h */
+#undef	SPAM_CUTOFF	/* ignore value in score.h */
 
 #define	MSG_COUNT	".MSG_COUNT"
 
@@ -85,8 +90,8 @@ AUTHORS:
 				** and low scoring spam */
 
 /* bogotune's default parameters */
-#define	DEFAULT_ROBS	0.01
-#define	DEFAULT_ROBX	0.415
+#define	DEFAULT_ROBS	ROBS	/* 0.010 */
+#define	DEFAULT_ROBX	ROBX	/* 0.415 */
 #define	DEFAULT_MIN_DEV	0.02
 
 /* coarse scan parms */
@@ -321,7 +326,7 @@ static void score_ns(double *results)
 	mlitem_t *item;
 	for (item = list->head; item != NULL; item = item->next) {
 	    wordhash_t *wh = item->wh;
-	    double score = (*method->compute_spamicity)(wh, NULL);
+	    double score = msg_compute_spamicity(wh, NULL);
 	    results[count++] = score;
 	    if (-verbose >= SCORE_DETAIL)
 		printf("%6u %0.16f\n", count-1, score);
@@ -368,7 +373,7 @@ static void score_sp(double *results)
 	mlitem_t *item;
 	for (item = list->head; item != NULL; item = item->next) {
 	    wordhash_t *wh = item->wh;
-	    double score = (*method->compute_spamicity)(wh, NULL);
+	    double score = msg_compute_spamicity(wh, NULL);
 	    results[count++] = score;
 	    if (-verbose >= SCORE_DETAIL)
 		printf("%6u %0.16f\n", count-1, score);
@@ -1332,8 +1337,6 @@ static rc_t bogotune(void)
 
     ns_scores = xcalloc(ns_cnt, sizeof(double));
     sp_scores = xcalloc(sp_cnt, sizeof(double));
-
-    method = (method_t *) &rf_fisher_method;
 
     robs = DEFAULT_ROBS;
     robx = DEFAULT_ROBX;

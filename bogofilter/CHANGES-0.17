@@ -8,7 +8,14 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
  
-0.17.2	2004-02-??
+0.17.2	2004-02-22
+
+	* Algorithm code cleanup -- created file score.[ch] from
+          files method.[ch], robinson.[ch], and fisher.[ch]
+
+	2004-02-21
+	
+	* Changed path in example config files to /var/spool/bogofilter.
 
 	2004-02-20
 	

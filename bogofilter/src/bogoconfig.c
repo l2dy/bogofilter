@@ -55,17 +55,13 @@ Note: bogolexer also uses configfile.c.
 #include "lexer.h"
 #include "maint.h"
 #include "paths.h"
+#include "score.h"
 #include "wordlists.h"
 #include "wordlists_base.h"
 #include "xatox.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 #include "xstrlcpy.h"
-
-/* includes for scoring algorithms */
-#include "method.h"
-#include "robinson.h"
-#include "fisher.h"
 
 #ifndef	DEBUG_CONFIG
 #define DEBUG_CONFIG(level)	(verbose > level)
@@ -196,8 +192,6 @@ void process_parameters(int argc, char **argv, bool warn_on_error)
     fpin = stdin;
     dbgout = stderr;
     set_today();		/* compute current date for token age */
-
-    method = (method_t *) &rf_fisher_method;
 
     process_arglist(argc, argv, PR_COMMAND, PASS_1_CLI);
     process_config_files(warn_on_error);
@@ -683,7 +677,7 @@ void query_config(void)
 {
     fprintf(stdout, "%s version %s\n", progname, version);
     fprintf(stdout, "\n");
-    fprintf(stdout, "%-11s = %s\n",            "algorithm", method->name);
+    fprintf(stdout, "%-11s = %s\n",            "algorithm", "fisher");
     fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "robx", robx, robx);
     fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "robs", robs, robs);
     fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "min_dev", min_dev, min_dev);

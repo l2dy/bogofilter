@@ -8,16 +8,20 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
 
-0.17.2	2004-02-??
+0.17.2	2004-02-22
 
-* Corrected typos in doc/bogofilter.xml (the man page) 
-  and in contrib/mailfilter.example
+* Relax filename vs. path restrictions in bogoutil.
 * Added experimental code for BerkeleyDB environments code
   for improved locking and caching.
+* Algorithm code cleanup -- created file score.[ch] from
+  files method.[ch], robinson.[ch], and fisher.[ch]
+
 * Documented bogoutil's histogram ('-H') option.
 * Revised documentation of '-d', '-p', and '-w' options
   for bogoutil.
-* Relax filename vs. path restrictions in bogoutil.
+* Corrected typos in doc/bogofilter.xml (the man page) 
+  and in contrib/mailfilter.example
+* Changed path in example config files to /var/spool/bogofilter.
 
 0.17.1	2004-02-09
 

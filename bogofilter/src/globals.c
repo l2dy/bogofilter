@@ -12,7 +12,7 @@ AUTHOR:
 
 #include "system.h"
 #include "globals.h"
-#include "method.h"
+#include "score.h"
 
 /* exports */
 
@@ -46,9 +46,6 @@ const char	*stats_prefix;
 
 /* for lexer_v3.l */
 bool	header_line_markup = true;	/* -H */
-
-/* dual definition options */
-method_t *method = NULL;
 
 /* for  bogotune */
 bool fBogotune = false;

@@ -6,9 +6,6 @@ SYSCONFDIR = @sysconfdir@
 
 PERL = @PERL@
 
-FISHER_SRC = fisher.c fisher.h
-ROBINSON_SRC = robinson.c robinson.h
-
 if ENABLE_MEMDEBUG
 MEMDEBUG_SRC = memdebug.c memdebug.h
 endif
@@ -99,6 +96,7 @@ version_sources= \
 	register.h register.c \
 	robx.h robx.c \
 	rstats.h rstats.c \
+	score.h score.c \
 	swap.h swap_32bit.c system.c \
 	textblock.h textblock.c \
 	token.h token.c \
@@ -154,8 +152,7 @@ EXTRA_libbogofilter_a_SOURCES = datastore_db.c datastore_qdbm.c datastore_tdb.c
 CLEANFILES=version.c directories.c bogoupgrade
 
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c \
-		     method.c $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
-		     common.h method.h
+		     common.h
 bogofilter_static_SOURCES = $(bogofilter_SOURCES)
 bogofilter_static_LDFLAGS = $(STATICLDFLAGS)
 bogofilter_static_LDADD = $(LDADD) $(STATIC_DB) $(GSL_LIBS)
@@ -170,14 +167,12 @@ bogoutil_static_LDADD = $(LDADD) $(STATIC_DB)
 
 bogotune_SOURCES = bogotune.c bogotune.h \
 		   tunelist.c tunelist.h \
-		   method.c $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
-		   common.h method.h
+		   common.h
 bogotune_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
 
 bogotune_static_SOURCES = bogotune.c bogotune.h \
 		   tunelist.c tunelist.h \
-		   method.c $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
-		   common.h method.h
+		   common.h
 bogotune_static_LDFLAGS = $(STATICLDFLAGS)
 bogotune_static_LDADD= $(LDADD) $(STATIC_DB) $(GSL_LIBS)
 

@@ -30,14 +30,14 @@ THEORY:
 #include <string.h>
 #include <stdlib.h>
 
-#include "bogoconfig.h"
 #include "bogofilter.h"
+#include "bogoconfig.h"
 #include "bogoreader.h"
 #include "collect.h"
-#include "method.h"
 #include "passthrough.h"
 #include "register.h"
 #include "rstats.h"
+#include "score.h"
 #include "wordlists.h"
 
 /*
@@ -64,7 +64,7 @@ THEORY:
 
 void print_stats(FILE *fp)
 {
-    (*method->print_stats)(fp);
+    msg_print_stats(fp);
 }
 
 rc_t bogofilter(int argc, char **argv)
@@ -81,7 +81,7 @@ rc_t bogofilter(int argc, char **argv)
 
     atexit(bf_exit);
 
-    (*method->initialize)();	/* initialize constants */
+    score_initialize();	/* initialize constants */
 
     if (query || classify_msg || write_msg) {
 	set_list_active_status(true);
@@ -112,8 +112,8 @@ rc_t bogofilter(int argc, char **argv)
 	    wordhash_add(words, w, &wordprop_init);
 
 	if (classify_msg || write_msg) {
-	    spamicity = (*method->compute_spamicity)(w, NULL);
-	    status = (*method->status)();
+	    spamicity = msg_compute_spamicity(w, NULL);
+	    status = msg_status();
 	    if (run_type & RUN_UPDATE)		/* Note: don't register if RC_UNSURE */
 	    {
 		if (status == RC_SPAM && spamicity <= 1.0 - thresh_update)
@@ -136,7 +136,7 @@ rc_t bogofilter(int argc, char **argv)
 	}
 	wordhash_free(w);
 
-	(*method->cleanup)();
+	score_cleanup();
 	passthrough_cleanup();
     }
 

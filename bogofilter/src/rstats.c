@@ -20,8 +20,8 @@ AUTHOR:
 #include "bogofilter.h"
 #include "msgcounts.h"
 #include "prob.h"
-#include "robinson.h"
 #include "rstats.h"
+#include "score.h"
 #include "xmalloc.h"
 
 typedef struct rstats_s rstats_t;
@@ -263,5 +263,5 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
     }
 
     /* print trailer */
-    (*((rf_method_t *)method)->print_summary)();
+    msg_print_summary();
 }
