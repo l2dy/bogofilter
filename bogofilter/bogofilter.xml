@@ -21,6 +21,7 @@
   <arg choice='opt'>-p</arg>
   <arg choice='opt'>-d</arg>
   <arg choice='opt'>-v</arg>
+  <arg choice='opt'>-l</arg>
   <arg choice='opt'>-V</arg>
 </cmdsynopsis>
 
