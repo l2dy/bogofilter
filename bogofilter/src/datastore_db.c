@@ -253,7 +253,7 @@ uint32_t db_getvalue(void *vhandle, const word_t *word){
       fprintf(dbgout, "] has value %lu\n",
 	      (unsigned long)value);
     }
-    if ((int)value < 0)
+    if ((int32_t)value < (int32_t)0)
 	value = 0;
     return value;
   } else {
@@ -439,7 +439,8 @@ uint32_t db_get_msgcount(void *vhandle){
 
     if (DEBUG_DATABASE(2)) {
 	dbh_t *handle = vhandle;
-	fprintf(dbgout, "db_get_msgcount( %s ) -> %d\n", handle->name, msg_count);
+	fprintf(dbgout, "db_get_msgcount( %s ) -> %lu\n", handle->name,
+		(unsigned long)msg_count);
     }
 
     return msg_count;
@@ -453,7 +454,8 @@ void db_set_msgcount(void *vhandle, uint32_t count){
 
     if (DEBUG_DATABASE(2)) {
 	dbh_t *handle = vhandle;
-	fprintf(dbgout, "db_set_msgcount( %s ) -> %d\n", handle->name, count);
+	fprintf(dbgout, "db_set_msgcount( %s ) -> %lu\n", handle->name,
+		(unsigned long)count);
     }
 }
 
