@@ -55,7 +55,7 @@ void open_wordlists(dbmode_t mode)
 			    return;
 			fprintf(stderr,
 				"Can't open file '%s' in directory '%s'.\n",
-				WORDLIST, list->filepath);
+				list->filepath, bogohome);
 			if (err != 0)
 			    fprintf(stderr,
 				    "error #%d - %s.\n", err, strerror(err));
