@@ -90,10 +90,10 @@ enum algorithm_e {
 };
 
 /* define default */
-#ifdef ENABLE_GRAHAM_METHOD
-#define AL_DEFAULT AL_GRAHAM
-#else
+#ifdef ENABLE_ROBINSON_METHOD
 #define AL_DEFAULT AL_ROBINSON
+#else
+#define AL_DEFAULT AL_GRAHAM
 #endif
 
 static enum algorithm_e algorithm = AL_DEFAULT;
@@ -156,6 +156,12 @@ static bool select_method(enum algorithm_e al)
     }
     usr_parms = method->config_parms;
     return ok;
+}
+
+bool isFisher(void)
+{
+    bool ans = algorithm == AL_FISHER;
+    return ans;
 }
 
 static bool process_config_parameter(const parm_desc *arg, const char *val)
