@@ -93,4 +93,13 @@ typedef struct {
 
 #define DBT_init(dbt)		(memset(&dbt, 0, sizeof(DBT)))
 
+typedef	enum {
+    P_ERROR = -1,	/* -1 for error */
+    P_DISABLE = 0,	/*  0 for no transactions */
+    P_ENABLE  = 1,	/*  1 for transactions */
+    P_DONT_KNOW		/*  2 for don't know */
+} probe_txn_t;
+
+probe_txn_t probe_txn(const char *directory, const char *file);
+
 #endif

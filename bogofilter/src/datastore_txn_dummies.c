@@ -100,3 +100,14 @@ ex_t dbe_remove(const char *directory)
     (void) directory;
     return EX_OK;
 }
+
+/** probe if the directory contains an environment, and if so,
+ * if it has transactions
+ */
+probe_txn_t probe_txn(const char *directory, const char *file)
+{
+    (void) directory;
+    (void) file;
+    return P_DISABLE;
+}
+

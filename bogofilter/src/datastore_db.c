@@ -85,15 +85,7 @@ static const char *resolveopenflags(u_int32_t flags) {
     return buf;
 }
 
-typedef	enum {
-    P_ERROR = -1,	/* -1 for error */
-    P_DISABLE = 0,	/*  0 for no transactions */
-    P_ENABLE  = 1,	/*  1 for transactions */
-    P_DONT_KNOW		/*  2 for don't know */
-} probe_txn_t;
-
 static void dsm_init(const char *directory, const char *file);
-static probe_txn_t probe_txn(const char *directory, const char *file);
 
 /** wrapper for Berkeley DB's DB->open() method which has changed API and
  * semantics -- this should deal with 3.2, 3.3, 4.0, 4.1 and 4.2. */
@@ -260,95 +252,6 @@ static void handle_free(/*@only@*/ dbh_t *handle)
 	xfree(handle);
     }
     return;
-}
-
-/** probe if the directory contains an environment, and if so,
- * if it has transactions
- */
-static probe_txn_t probe_txn(const char *directory, const char *file)
-{
-    DB_ENV *dbe;
-    int r;
-#if DB_AT_LEAST(4,2)
-    u_int32_t flags;
-#endif
-
-    r = db_env_create(&dbe, 0);
-    if (r) {
-	print_error(__FILE__, __LINE__, "cannot create environment handle: %s",
-		db_strerror(r));
-	return P_ERROR;
-    }
-
-    r = dbe->open(dbe, directory, DB_JOINENV, DS_MODE);
-    if (r == ENOENT) {
-	struct stat st;
-	int w;
-	char *t = build_path(directory, file);
-	struct dirent *de;
-	DIR *d;
-
-	/* no environment found by JOINENV */
-	dbe->close(dbe, 0);
-
-	/* retry globbing for log.* files - needed for instance after
-	 * bogoutil --db-remove DIR */
-	d = opendir(directory);
-	if (!d) {
-	    print_error(__FILE__, __LINE__, "cannot open directory %s: %s",
-		    t, strerror(r));
-	    return P_ERROR;
-	}
-	while ((de = readdir(d))) {
-	    if (strlen(de->d_name) == 14
-		    && strncmp(de->d_name, "log.", 4) == 0
-		    && strspn(de->d_name + 4, "0123456789") == 10)
-	    {
-		closedir(d);
-		return P_ENABLE;
-	    }
-	}
-	closedir(d);
-
-	w = stat(t, &st);
-	if (w == 0) {
-	    free(t);
-	    return P_DISABLE;
-	}
-	if (errno == ENOENT) {
-	    free(t);
-	    return P_DONT_KNOW;
-	}
-	print_error(__FILE__, __LINE__, "cannot stat %s: %s",
-		t, db_strerror(r));
-	free(t);
-	return P_ERROR;
-    }
-    if (r != 0) {
-	print_error(__FILE__, __LINE__, "cannot join environment: %s",
-		db_strerror(r));
-	return P_ERROR;
-    }
-
-    /* environment found, validate if it has transactions */
-#if DB_AT_LEAST(4,2)
-    r = dbe->get_open_flags(dbe, &flags);
-    if (r) {
-	print_error(__FILE__, __LINE__, "cannot query flags: %s",
-		db_strerror(r));
-	return P_ERROR;
-    }
-
-    dbe->close(dbe, 0);
-    if ((flags & DB_INIT_TXN) == 0) {
-	print_error(__FILE__, __LINE__,
-		"environment found but does not support transactions.");
-	return P_ERROR;
-    }
-#else
-    dbe->close(dbe, 0);
-#endif
-    return P_ENABLE;
 }
 
 /** Initialize data base, configure some lock table sizes

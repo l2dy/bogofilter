@@ -33,6 +33,7 @@ David Relson	<relson@osagesoftware.com> 2005
 #include "db_lock.h"
 #include "longoptions.h"
 #include "mxcat.h"
+#include "paths.h"		/* for build_path */
 #include "rand_sleep.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
@@ -895,4 +896,93 @@ void dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_f
 #endif
 #endif
 }
+}
+
+/** probe if the directory contains an environment, and if so,
+ * if it has transactions
+ */
+probe_txn_t probe_txn(const char *directory, const char *file)
+{
+    DB_ENV *dbe;
+    int r;
+#if DB_AT_LEAST(4,2)
+    u_int32_t flags;
+#endif
+
+    r = db_env_create(&dbe, 0);
+    if (r) {
+	print_error(__FILE__, __LINE__, "cannot create environment handle: %s",
+		db_strerror(r));
+	return P_ERROR;
+    }
+
+    r = dbe->open(dbe, directory, DB_JOINENV, DS_MODE);
+    if (r == ENOENT) {
+	struct stat st;
+	int w;
+	char *t = build_path(directory, file);
+	struct dirent *de;
+	DIR *d;
+
+	/* no environment found by JOINENV */
+	dbe->close(dbe, 0);
+
+	/* retry globbing for log.* files - needed for instance after
+	 * bogoutil --db-remove DIR */
+	d = opendir(directory);
+	if (!d) {
+	    print_error(__FILE__, __LINE__, "cannot open directory %s: %s",
+		    t, strerror(r));
+	    return P_ERROR;
+	}
+	while ((de = readdir(d))) {
+	    if (strlen(de->d_name) == 14
+		    && strncmp(de->d_name, "log.", 4) == 0
+		    && strspn(de->d_name + 4, "0123456789") == 10)
+	    {
+		closedir(d);
+		return P_ENABLE;
+	    }
+	}
+	closedir(d);
+
+	w = stat(t, &st);
+	if (w == 0) {
+	    free(t);
+	    return P_DISABLE;
+	}
+	if (errno == ENOENT) {
+	    free(t);
+	    return P_DONT_KNOW;
+	}
+	print_error(__FILE__, __LINE__, "cannot stat %s: %s",
+		t, db_strerror(r));
+	free(t);
+	return P_ERROR;
+    }
+    if (r != 0) {
+	print_error(__FILE__, __LINE__, "cannot join environment: %s",
+		db_strerror(r));
+	return P_ERROR;
+    }
+
+    /* environment found, validate if it has transactions */
+#if DB_AT_LEAST(4,2)
+    r = dbe->get_open_flags(dbe, &flags);
+    if (r) {
+	print_error(__FILE__, __LINE__, "cannot query flags: %s",
+		db_strerror(r));
+	return P_ERROR;
+    }
+
+    dbe->close(dbe, 0);
+    if ((flags & DB_INIT_TXN) == 0) {
+	print_error(__FILE__, __LINE__,
+		"environment found but does not support transactions.");
+	return P_ERROR;
+    }
+#else
+    dbe->close(dbe, 0);
+#endif
+    return P_ENABLE;
 }
