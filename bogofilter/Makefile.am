@@ -38,6 +38,7 @@ libbogofilter_a_SOURCES= \
 	directories.c version.c \
 	base64.h base64.c \
 	bogoconfig.h config.c \
+	bool.h bool.c \
 	charset.h charset.c \
 	collect.h collect.c \
 	datastore.h datastore_db.c \

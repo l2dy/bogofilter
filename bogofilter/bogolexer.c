@@ -8,6 +8,7 @@ NAME:
 ******************************************************************************/
 
 /* imports */
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,6 +17,7 @@ NAME:
 #include <config.h>
 #include "common.h"
 
+#include "bool.h"
 #include "charset.h"
 #include "lexer.h"
 #include "textblock.h"
@@ -25,8 +27,11 @@ NAME:
 const char *progname = "bogolexer";
 
 /* prevent larger inclusions */
-const char *spam_header_name = SPAM_HEADER_NAME;
+
 run_t run_type = RUN_NORMAL;
+const char *spam_header_name = SPAM_HEADER_NAME;
+
+/* Function definitions */
 
 static void usage(void)
 {
@@ -39,8 +44,12 @@ static void help(void)
     fprintf(stderr,
 	    "\t-p\tprint the tokens from stdin.\n"
 	    "\t-q\tquiet mode, no tokens are printed.\n"
-	    "\t-n\tmap non-ascii characters to '?'.\n"
 	    "\t-h\thelp, this output.\n"
+	    "\t-k y/n\t- kill html comments (yes or no).\n"
+	    "\t-n\t- map non-ascii characters to '?'.\n"
+	    "\t-v\t- set debug verbosity level.\n"
+	    "\t-x LIST\t- set debug flags.\n"
+	    "\t-I file\t- read message from file instead of stdin.\n"
 	    "%s is part of the bogofilter package.\n", progname);
 }
 
@@ -53,7 +62,7 @@ int main(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
-    while ((option = getopt(argc, argv, ":hnpqvnx:I:")) != -1)
+    while ((option = getopt(argc, argv, ":hnpqvnx:I:k:")) != -1)
 	switch (option) {
 	case 'h':
 	    help();
@@ -73,6 +82,9 @@ int main(int argc, char **argv)
 	    break;
 	case 'x':
 	    set_debug_mask( optarg );
+	    break;
+	case 'k':
+	    kill_html_comments = str_to_bool( optarg );
 	    break;
 	case 'I':
 	    fpin = fopen( optarg, "r" );
