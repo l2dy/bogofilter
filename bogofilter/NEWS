@@ -10,7 +10,11 @@ $Id$
 	2003-09-06
 
 	* Header line unfolding now handled by flex rules.
-	* Initial release of RISC-OS support, including qdbm and tdb.
+	* Initial release of RISC-OS support, for qdbm and tdb.
+	* QDBM is now supported.
+	* The data base configuration has changed. --with-tdb is gone,
+	  use --with-database=db, --with-database=tdb or
+	  --with-database=qdbm instead.
 
 	2003-09-05
 
