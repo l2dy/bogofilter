@@ -102,13 +102,47 @@ static int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const ch
     return 0;
 }
 
-/* returns -1 for error, 0 for success */
-int setup_wordlists(const char* dir)
+/* setup_wordlists()
+   returns: -1 for error, 0 for success
+   **
+   ** precedence: (high to low)
+   **
+   **	command line
+   **	$BOGOFILTER_DIR
+   **	user config file
+   **	site config file
+   **	$HOME
+   */
+
+int setup_wordlists(const char* dir, priority_t precedence)
 {
     int rc = 0;
     char filepath[PATH_LEN];
     double good_weight = 1.0;
     double bad_weight  = 1.0;
+    static priority_t saved_precedence = PR_NONE;
+
+    if (precedence < saved_precedence)
+	return rc;
+
+    if (dir == NULL) {
+	dir = get_directory(precedence);
+	if (dir == NULL)
+	    return rc;
+    }
+
+    if (saved_precedence < precedence && word_lists != NULL) {
+	wordlist_t *list, *next;
+	for (list = word_lists; list != NULL; list = next) {
+	    xfree(list->filename);
+	    xfree(list->filepath);
+	    next = list->next;
+	    xfree(list);
+	}
+	word_lists = NULL;
+    }
+
+    saved_precedence = precedence;
 
     if (check_directory(dir)) {
 	(void)fprintf(stderr, "%s: cannot find bogofilter directory.\n"

@@ -99,11 +99,20 @@ int check_directory(const char* path) /*@globals errno,stderr@*/
     return 0;
 }
 
-char *get_directory(void) {
-	char *dir = create_path_from_env("BOGOFILTER_DIR", NULL);
+char *get_directory(priority_t which)
+{
+    char *dir = NULL;
+
+    if (which == PR_ENV_BOGO) {
+	dir = create_path_from_env("BOGOFILTER_DIR", NULL);
 	if (dir == NULL)
 	    dir = create_path_from_env("BOGODIR", NULL);
-	if (dir == NULL)
-	    dir = create_path_from_env("HOME", BOGODIR);
-	return dir;
+    }
+
+    if (which == PR_ENV_HOME) {
+	dir = create_path_from_env("HOME", BOGODIR);
+    }
+
+    return dir;
 }
+

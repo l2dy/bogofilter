@@ -26,7 +26,7 @@ struct wordlist_s
 /*@null@*/ extern wordlist_t *word_lists;
 extern wordlist_t *good_list, *spam_list;
 
-int setup_wordlists(const char* dir);
+int setup_wordlists(const char* dir, priority_t precedence);
 bool configure_wordlist(const char *val);
 
 void open_wordlists(dbmode_t);

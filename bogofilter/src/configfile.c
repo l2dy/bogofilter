@@ -24,7 +24,6 @@ AUTHOR:
 #include "common.h"
 #include "globals.h"
 
-#include "bogoconfig.h"
 #include "bogofilter.h"
 #include "bool.h"
 #include "maint.h"
@@ -73,7 +72,7 @@ static char *remove_comment(char *line)
     return line;
 }
 
-static bool process_config_parameter(const parm_desc *arg, char *val)
+static bool process_config_parameter(const parm_desc *arg, char *val, priority_t precedence)
 /* returns true if ok, false if error */
 {
     bool ok = true;
@@ -128,7 +127,7 @@ static bool process_config_parameter(const parm_desc *arg, char *val)
 		*arg->addr.s = dir;
 		if (DEBUG_CONFIG(2))
 		    fprintf(dbgout, "%s -> '%s'\n", arg->name, dir);
-		if (setup_wordlists(dir) != 0)
+		if (setup_wordlists(dir, precedence) != 0)
 		    exit(2);
 		break;
 	    }
@@ -150,7 +149,8 @@ static bool process_config_parameter(const parm_desc *arg, char *val)
 
 static bool process_config_line(char *line,
 				char *val,
-				const parm_desc *parms )
+				const parm_desc *parms, 
+				priority_t precedence )
 /* returns true if parm is processed, false if not */
 {
     const parm_desc *arg;
@@ -164,7 +164,7 @@ static bool process_config_line(char *line,
 	    fprintf(dbgout, "Testing:  %s\n", arg->name);
 	if (strcmp(arg->name, line) == 0)
 	{
-	    bool ok = process_config_parameter(arg, val);
+	    bool ok = process_config_parameter(arg, val, precedence);
 	    if (ok && DEBUG_CONFIG(1))
 		fprintf(dbgout, "%s\n", "   Found it!");
 	    return ok;
@@ -173,7 +173,7 @@ static bool process_config_line(char *line,
     return false;
 }
 
-bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error)
+bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, priority_t precedence)
 /* returns true if ok, false if error */
 {
     bool error = false;
@@ -231,9 +231,9 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error)
 	}
 
 	if (val == NULL ||
-	       (! process_config_line(arg, val, usr_parms ) &&
-		! process_config_line(arg, val, sys_parms ) &&
-		! process_config_line(arg, val, format_parms )))
+	       (! process_config_line(arg, val, usr_parms, precedence ) &&
+		! process_config_line(arg, val, sys_parms, precedence ) &&
+		! process_config_line(arg, val, format_parms, precedence )))
 	{
 	    error = true;
 	    if (warn_on_error)
@@ -258,9 +258,9 @@ bool process_config_files(bool warn_on_error)
     bool ok = true;
 
     if (!suppress_config_file) {
-	if (!read_config_file(system_config_file, false, warn_on_error))
+	if (!read_config_file(system_config_file, false, warn_on_error, PR_CFG_SITE))
 	    ok = false;
-	if (!read_config_file(user_config_file, true, warn_on_error))
+	if (!read_config_file(user_config_file, true, warn_on_error, PR_CFG_USER))
 	    ok = false;
     }
 

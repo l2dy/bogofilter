@@ -702,8 +702,11 @@ static int process_args(int argc, char **argv)
 int main(int argc, char *argv[])
 {
     set_today();		/* compute current date for token age */
-
-    directory = get_directory();
+    
+    /* Get directory name from environment */
+    directory = get_directory(PR_ENV_BOGO);
+    if (directory == NULL)
+	directory = get_directory(PR_ENV_HOME);
 
     process_args(argc, argv);
 

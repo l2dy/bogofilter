@@ -167,14 +167,11 @@ void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
     }
 
     /* directories from command line and config file are already handled */
-    if (directory == NULL)
-    {
-	directory = get_directory();
 
-	if (directory != NULL)
-	    if (setup_wordlists(directory) != 0)
-		exit(2);
-    }
+    if (setup_wordlists(NULL, PR_ENV_BOGO) != 0)
+	exit(2);
+    if (setup_wordlists(NULL, PR_ENV_HOME) != 0)
+	exit(2);
 
     stats_prefix= stats_in_header ? "\t" : "#   ";
 
@@ -395,7 +392,7 @@ void process_args(int argc, char **argv, int pass)
 	case 'd':
 	    xfree(directory);
 	    directory = xstrdup(optarg);
-	    if (pass == 2 && setup_wordlists(directory) != 0)
+	    if (pass == 2 && setup_wordlists(directory, PR_COMMAND) != 0)
 		exit(2);
 	    break;
 
@@ -512,7 +509,7 @@ void process_args(int argc, char **argv, int pass)
 	    ** options can be overridden on pass #2
 	    */
 	    if (pass == 1 )			
-		read_config_file(optarg, false, !quiet);
+		read_config_file(optarg, false, !quiet, PR_CFG_USER);
 
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */

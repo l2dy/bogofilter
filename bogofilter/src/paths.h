@@ -15,7 +15,7 @@ int build_path(char* dest, size_t size, const char* dir, const char* file);
 char *create_path_from_env(const char *var,
 			   /*@null@*/ const char *subdir);
 
-char *get_directory(void);
+char *get_directory(priority_t which);
 
 int check_directory(const char *path) /*@globals errno,stderr@*/;
 

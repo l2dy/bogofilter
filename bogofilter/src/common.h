@@ -72,6 +72,16 @@ typedef struct {
     int    exp;
 } FLOAT;
 
+typedef enum priority_e {
+    PR_NONE,		/* 0 */
+    PR_ENV_HOME,	/* 1 */
+    PR_CFG_SITE,	/* 2 */
+    PR_CFG_USER,	/* 3 */
+    PR_CFG_UPDATE,	/* 4 */
+    PR_ENV_BOGO,	/* 5 */
+    PR_COMMAND		/* 6 */
+} priority_t;
+
 extern int build_path(char* dest, size_t size, const char* dir, const char* file);
 
 #define internal_error do { fprintf(stderr, "Internal error in %s:%u\n", __FILE__, __LINE__); abort(); } while(0)
