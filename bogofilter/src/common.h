@@ -131,6 +131,8 @@ typedef enum bulk_e {
 typedef struct {
     u_int32_t	good;
     u_int32_t	bad;
+    u_int32_t	msgs_good;
+    u_int32_t	msgs_bad;
 } wordcnts_t;
 
 typedef struct {
