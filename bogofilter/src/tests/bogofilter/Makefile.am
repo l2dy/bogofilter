@@ -1,6 +1,6 @@
 # $Id$
 
-TESTSCRIPTS = t.lexer.mbx t.regtest t.robx t.valgrind t.split t.systest t.grftest
+TESTSCRIPTS = t.bogodir t.lexer.mbx t.regtest t.robx t.valgrind t.split t.systest t.grftest
 
 TESTS=$(TESTSCRIPTS)
 
