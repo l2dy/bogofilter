@@ -67,7 +67,7 @@ AUTHOR:
 
 #define	TEST_COUNT	500	/* minimum allowable message count */
 #define	PREF_COUNT	4000	/* preferred message count         */
-#define	LIST_COUNT	2000	/* minimum msg count in wordlist   */
+#define	LIST_COUNT	2000	/* minimum msg count in tunelist   */
 
 #define	HAM_CUTOFF	0.10
 #define	MIN_CUTOFF	0.55	/* minimum for get_thresh() */
@@ -109,8 +109,8 @@ extern double robx, robs;
 word_t *w_msg_count;
 wordhash_t *t_ns, *t_sp;
 
-wordlist_t *ns_and_sp;
-wordlist_t *ns_msglists, *sp_msglists;
+tunelist_t *ns_and_sp;
+tunelist_t *ns_msglists, *sp_msglists;
 
 flhead_t *spam_files, *ham_files;
 
@@ -531,7 +531,7 @@ static uint filelist_read(int mode, flhead_t *list)
 **	In between 2500 and 4000, do a proportional distribution.
 */
 
-static void distribute(int mode, wordlist_t *ns_or_sp)
+static void distribute(int mode, tunelist_t *ns_or_sp)
 {
     int good = mode == REG_GOOD;
     int bad  = 1 - good;
@@ -581,7 +581,7 @@ static void distribute(int mode, wordlist_t *ns_or_sp)
     return;
 }
 
-static void create_countlists(wordlist_t *ns_or_sp)
+static void create_countlists(tunelist_t *ns_or_sp)
 {
     uint i;
     uint c = COUNTOF(ns_or_sp->u.sets);
@@ -1030,9 +1030,9 @@ static void bogotune_init(void)
 {
     const char *msg_count = MSG_COUNT;
     w_msg_count = word_new((const byte *)msg_count, strlen(msg_count));
-    ns_and_sp = wordlist_new("tr");		/* training wordlist */
-    ns_msglists = wordlist_new("ns");		/* non-spam scoring wordlist */
-    sp_msglists = wordlist_new("sp");		/* spam scoring wordlist */
+    ns_and_sp   = tunelist_new("tr");		/* training lists */
+    ns_msglists = tunelist_new("ns");		/* non-spam scoring lists */
+    sp_msglists = tunelist_new("sp");		/* spam     scoring lists */
 
     return;
 }
@@ -1045,9 +1045,9 @@ static void bogotune_free(void)
     filelist_free(ham_files);
     filelist_free(spam_files);
 
-    wordlist_free(ns_msglists);
-    wordlist_free(sp_msglists);
-    wordlist_free(ns_and_sp);
+    tunelist_free(ns_msglists);
+    tunelist_free(sp_msglists);
+    tunelist_free(ns_and_sp);
 
     word_free(w_msg_count);
 
@@ -1138,9 +1138,9 @@ static rc_t bogotune(void)
     }
 
     if (verbose > 3) {
-	wordlist_print(ns_and_sp);
-	wordlist_print(ns_msglists);
-	wordlist_print(sp_msglists);
+	tunelist_print(ns_and_sp);
+	tunelist_print(ns_msglists);
+	tunelist_print(sp_msglists);
     }
 
     ns_cnt = count_messages(ns_msglists);

@@ -4,7 +4,7 @@
 
 NAME:
    tunelist.h -- definitions and prototypes of list structures for bogotune.
-		 includes msglist_t, filelist_t, and wordlist_t.
+		 includes msglist_t, filelist_t, and tunelist_t.
 
 ******************************************************************************/
 
@@ -63,11 +63,11 @@ extern	flhead_t *filelist_new(const char *name);
 extern	void filelist_add(flhead_t *list, char *name);
 extern	void filelist_free(flhead_t *list);
 
-/***** wordlist *****/
+/***** tunelist *****/
 
-typedef struct wordlist_s wordlist_t;
+typedef struct tunelist_s tunelist_t;
 
-struct wordlist_s {
+struct tunelist_s {
     const char *name;
     uint	count;
     wordhash_t *train;	/* training */
@@ -82,8 +82,8 @@ struct wordlist_s {
     } u;
 };
 
-uint count_messages(wordlist_t *list);
-wordlist_t *wordlist_new(const char *label);
-void wordlist_print(wordlist_t *list);
-void wordlist_free(wordlist_t *list);
+uint count_messages(tunelist_t *list);
+tunelist_t *tunelist_new(const char *label);
+void tunelist_print(tunelist_t *list);
+void tunelist_free(tunelist_t *list);
 #endif

@@ -4,7 +4,7 @@
 
 NAME:
    tunelist.c -- definitions and prototypes of list structures for bogotune.
-		 includes msglist_t, filelist_t, and wordlist_t.
+		 includes msglist_t, filelist_t, and tunelist_t.
 
 ******************************************************************************/
 
@@ -109,9 +109,9 @@ void msglist_free(mlhead_t *list)
     return;
 }
 
-wordlist_t *wordlist_new(const char *label)
+tunelist_t *tunelist_new(const char *label)
 {
-    wordlist_t *list = xcalloc( 1, sizeof(wordlist_t));
+    tunelist_t *list = xcalloc( 1, sizeof(tunelist_t));
 
     list->name = label;
     list->train = wordhash_new();
@@ -123,7 +123,7 @@ wordlist_t *wordlist_new(const char *label)
     return list;
 }
 
-void wordlist_print(wordlist_t *list)
+void tunelist_print(tunelist_t *list)
 {
     printf("%s (%u):\n", list->name, list->count);
 
@@ -134,7 +134,7 @@ void wordlist_print(wordlist_t *list)
     return;
 }
 
-void wordlist_free(wordlist_t *list)
+void tunelist_free(tunelist_t *list)
 {
     if (list == NULL)
 	return;
@@ -151,7 +151,7 @@ void wordlist_free(wordlist_t *list)
 
 /* Count all messages */
 
-uint count_messages(wordlist_t *list)
+uint count_messages(tunelist_t *list)
 {
     uint i;
     uint count = 0;
