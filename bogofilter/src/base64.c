@@ -3,7 +3,7 @@
 /*****************************************************************************
 
 NAME:
-   base64.c -- decode quoted printable text
+   base64.c -- decode base64 text
 
 AUTHOR:
    David Relson <relson@osagesoftware.com>
