@@ -73,7 +73,7 @@ static int dump_file(char *db_file)
 		ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT);
 		if (ret == 0) {
 		    dbv_t *val = (dbv_t *)data.data;
-		    if (!check_count(val->count) || !check_date(val->date) || !check_size(key.size))
+		    if (!keep_count(val->count) || !keep_date(val->date) || !keep_size(key.size))
 			continue;
 		    if (replace_nonascii_characters)
 			do_replace_nonascii_characters((byte *)key.data);
@@ -174,7 +174,7 @@ static int load_file(char *db_file)
 	if (replace_nonascii_characters)
 	    do_replace_nonascii_characters(buf);
 
-	if (!check_count(count) || !check_date(date) || !check_size(strlen(buf)))
+	if (!keep_count(count) || !keep_date(date) || !keep_size(strlen(buf)))
 	    continue;
 
 	/* Slower, but allows multiple lists to be concatenated */

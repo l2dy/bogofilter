@@ -53,7 +53,7 @@ YYYYMMDD string_to_date(char *s)
 }
 
 /* Keep high counts */
-bool check_count(int count)
+bool keep_count(int count)
 {
     if (thresh_count == 0)
 	return true;
@@ -64,7 +64,7 @@ bool check_count(int count)
 }
 
 /* Keep recent dates */
-bool check_date(int date)
+bool keep_date(int date)
 {
     if (thresh_date == 0 || date == 0 || date == today)
 	return true;
@@ -75,7 +75,7 @@ bool check_date(int date)
 }
 
 /* Keep sizes within bounds */
-bool check_size(size_t size)
+bool keep_size(size_t size)
 {
     if (size_min == 0 || size_max == 0)
 	return true;

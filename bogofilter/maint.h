@@ -19,9 +19,9 @@ extern	size_t   size_min, size_max;
 extern	bool     replace_nonascii_characters;
 
 /* Function Prototypes */
-bool check_date(int dat);
-bool check_count(int cnt);
-bool check_size(size_t siz);
+bool keep_date(int dat);
+bool keep_count(int cnt);
+bool keep_size(size_t siz);
 void do_replace_nonascii_characters(byte *str);
 
 void set_today(void);
