@@ -219,6 +219,9 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error)
 	while (iscntrl((unsigned char)buff[len-1]) || isspace((unsigned char)buff[len-1]))
 	    buff[--len] = '\0';
 
+	if (DEBUG_CONFIG(1))
+	    fprintf(dbgout, "Testing:  %s\n", buff);
+
 	arg = buff;
 	if (strcspn(arg, delim) < strlen(arg)) { /* if delimiter present */
 	    val = arg + strcspn(arg, delim);
