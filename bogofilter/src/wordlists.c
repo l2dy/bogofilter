@@ -309,7 +309,7 @@ bool configure_wordlist(const char *val)
     char* path;
     double weight = 0.0;
     bool bad = false;
-    bool override = false;
+    int  override = 0;
     bool ignore = false;
 
     char *tmp = xstrdup(val);
