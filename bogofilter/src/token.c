@@ -278,8 +278,8 @@ token_t get_token(word_t **token)
 	case IPADDR:
 	    if (block_on_subnets)
 	    {
-		const byte *ptext = (wordlist_version >= IP_PREFIX) ? (const byte *)"ip:" : (const byte *)"url:";
-		word_t *prefix = word_news((const char *)ptext);
+		const char *ptext = (wordlist_version >= IP_PREFIX) ? "ip:" : "url:";
+		word_t *prefix = word_news(ptext);
 		int q1, q2, q3, q4;
 		/*
 		 * Trick collected by ESR in real time during John
