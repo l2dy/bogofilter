@@ -46,6 +46,7 @@
     <arg choice='opt'>-R</arg>
     <arg choice='opt'>general options</arg>
     <arg choice='opt'>parameter options</arg>
+    <arg choice='opt'>config file options</arg>
     </cmdsynopsis>
 
   <para><option>registration options</option> are:</para>
@@ -88,10 +89,9 @@
     </cmdsynopsis>
 
   <para><option>config file options</option> are:</para>
-   <cmdsynopsis>
-   <arg choice='opt'>--<replaceable>option=value</replaceable></arg>
-   </cmdsynopsis>
-
+    <cmdsynopsis>
+    <arg choice='opt'>--<replaceable>option=value</replaceable></arg>
+    </cmdsynopsis>
 </refsynopsisdiv>
 
 <refsect1 id='description'><title>DESCRIPTION</title>
@@ -229,14 +229,14 @@ score and displays it to 16 significant digits.</para>
 <application>bogofilter</application> to register the message's text
 after classifying it as spam or non-spam.  A spam message will be
 registered on the spamlist and a non-spam message on the goodlist.  If
-using the Robinson-Fisher method and the classification is "unsure",
-the message will not be registered.  Effectively this option runs
-<application>bogofilter</application> with the <option>-s</option> or
-<option>-n</option> flag, as appropriate.  (Caution is urged in the
-use of this capability, as any classification errors
-<application>bogofilter</application> may make will be preserved and
-accumulated until corrected with the <option>-Sn</option> and
-<option>-Ns</option> option combinations.)</para>
+the classification is "unsure", the message will not be registered.
+Effectively this option runs <application>bogofilter</application>
+with the <option>-s</option> or <option>-n</option> flag, as
+appropriate.  (Caution is urged in the use of this capability, as any
+classification errors <application>bogofilter</application> may make
+will be preserved and will accumulate until manually corrected with
+the <option>-Sn</option> and <option>-Ns</option> option
+combinations.)</para>
 
 <para>The <option>-u <replaceable>value</replaceable></option> option
 tells <application>bogofilter</application> to skip registering
@@ -398,7 +398,7 @@ timestamping.</para>
 
 <para>The <option>-x <replaceable>flags</replaceable></option> option
 allows setting of debug flags for printing debug information.  See
-header file debug.h for the list of usable flags.</para> 
+header file debug.h for the list of usable flags.</para>
 
 <para>CONFIG FILE OPTIONS</para>
 
