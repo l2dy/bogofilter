@@ -1,0 +1,17 @@
+.deps
+aclocal.m4
+autom4te.cache
+bogofilter
+bogofilter-*.tar.gz
+bogofilter.spec
+config.h
+config.in
+config.log
+config.status
+configure
+cscope.out
+lexertest
+lexer_l.c
+Makefile
+Makefile.in
+stamp-h1
