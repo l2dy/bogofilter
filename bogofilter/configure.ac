@@ -144,13 +144,22 @@ AC_CHECK_LIB(tdb,
     xdb)
 # check if we need LIBDB at all (it is harmful on BSD since
 # they rename the library including soname)
+ac_cv_libdb_cppflags=
+ac_cv_libdb_libs=
+ac_cv_libdb_ltlibs=
   AC_LIB_LINKFLAGS([db])
   AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],LIBDB="")
   saveLIBS="$LIBS"
   LIBS="$LIBS $LIBDB"
   export LIBS
   AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],,
-    AC_MSG_ERROR([Cannot link against libdb? Report to the bogofilter mailing list. Include config.log.]))
+    AC_MSG_ERROR([[
+====================================================================
+Cannot link against libdb? Try 'rm config.cache', then re-configure.
+If the problem persists, report it to the bogofilter mailing list.
+Remember to include your config.log.
+====================================================================
+]]))
   LIBS="$saveLIBS"
   export LIBS
 AH_TEMPLATE([HAVE_DB_H], [Have suitable db.h header])
