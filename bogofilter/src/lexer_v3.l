@@ -242,13 +242,15 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>[:blank:]*id\ {ID}			/* ignore */
 
 <INITIAL>\n[ \t]				{ lineno += 1; }
-<INITIAL>\n\n					{ have_body=true;
-						  if (get_content_type() == MIME_TEXT_HTML)
-						      BEGIN HTML;
-						  else
-						      BEGIN TEXT; 
+<INITIAL>\n\n					{ enum mimetype type = get_content_type();
+						  have_body = true;
 						  msg_header = false;
 						  clr_tag();
+						  switch (type) { 
+						  case MIME_TEXT_HTML:	BEGIN HTML; break;
+						  case MIME_MESSAGE:	yy_set_state_initial(); break;
+						  default:		BEGIN TEXT; 
+						  }
 						  return EOH;
 						}
 

@@ -281,6 +281,12 @@ void set_tag(const char *text)
     if (!header_line_markup)
 	return;
 
+    if (msg_state != msg_state->parent &&
+	msg_state->parent->mime_type == MIME_MESSAGE) {	
+	clr_tag();			/* don't tag if inside message/rfc822 */
+	return;
+    }
+
     switch (tolower(*text)) {
     case 't':
 	token_prefix = w_to;		/* To: */
