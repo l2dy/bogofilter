@@ -14,7 +14,7 @@ PROGNAME="bogofilter"
 
 (automake --version) < /dev/null > /dev/null 2>&1 || {
   echo
-  echo "**Error**: You must have \`autoconf' installed to compile $PROGNAME."
+  echo "**Error**: You must have \`automake' installed to compile $PROGNAME."
   echo "Download the appropriate package for your distribution,"
   echo "or get the source tarball at ftp://ftp.gnu.org/pub/gnu/"
   DIE=1
