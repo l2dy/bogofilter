@@ -168,11 +168,13 @@ static int arg_foreach(arg_foreach_t hook, int argc, char **argv)
     return exitcode;
 }
 
-static bool is_blank_line(const char *line)
+/* check for non-empty blank line */
+static bool is_blank_line(const char *line, size_t len)
 {
-    while (*line) {
+    while (len > 0) {
 	if (! isspace(*line) && *line != '\b' )
 	    return false;
+	len -= 1;
 	line++;
     }
     return true;
@@ -330,9 +332,8 @@ static void write_message(FILE *fp, rc_t status)
 	    /* detect end of headers */
 	    if ((rd == 1 && memcmp(out, NL, 1) == 0) ||
 		(rd == 2 && memcmp(out, CRLF, 2) == 0) ||
-		is_blank_line(out)) {
+		is_blank_line(out, rd))		/* check for non-empty blank line */
 		break;
-	    }
 
 	    /* rewrite "Subject: " line */
 	    if (status == RC_SPAM &&
