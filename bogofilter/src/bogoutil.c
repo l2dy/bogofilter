@@ -477,7 +477,7 @@ static const char *help_text[] = {
     "      --db_verify=file        - verify data file.\n",
     "      --db_prune=dir          - remove inactive log files in dir.\n",
     "      --db_recover=dir        - run recovery on database in dir.\n",
-    "      --db_recover-harder=dir - run catastrophic recovery on database in dir.\n",
+    "      --db_recover-harder=dir - run catastrophic recovery on database.\n",
     "      --db_remove-environment - remove environment.\n",
 
 #ifdef	HAVE_DECL_DB_CREATE
@@ -532,6 +532,7 @@ struct option long_options[] = {
     { "db-prune",                       R, 0, O_DB_PRUNE },
     { "db-recover",                     R, 0, O_DB_RECOVER },
     { "db-recover-harder",              R, 0, O_DB_RECOVER_HARDER },
+    { "db-remove-environment",		R, &remenv, O_DB_REMOVE_ENVIRONMENT },
     { "db-verify",                      R, 0, O_DB_VERIFY },
 #ifdef	HAVE_DECL_DB_CREATE
     { "db_lk_max_locks",		R, 0, O_DB_MAX_LOCKS },
@@ -541,8 +542,6 @@ struct option long_options[] = {
     { "db_txn_durable",			R, 0, O_DB_TXN_DURABLE },
 #endif
 #endif
-    /* no short option for safety */
-    { "db-remove-environment",		R, &remenv, O_DB_REMOVE_ENVIRONMENT },
 
     /* The following options are present to allow config files
     ** to be read without complaints (and mostly ignored)
