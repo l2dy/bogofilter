@@ -6,7 +6,11 @@ SYSCONFDIR = @sysconfdir@
 # what to build
 sysconf_DATA=	bogofilter.cf.example
 
-# what to build that from
+# ChangeLog, cvs2cl lives at http://www.red-bean.com/cvs2cl
+.PHONY:		changelog.txt
+changelog.txt:
+		test -f $@ || : >$@ || { rm -f $@ ; exit 1; }
+		cvs2cl.pl --fsf --accum --utc --file $@
 
 # what to distribute
 EXTRA_DIST=	autogen.sh gsl config.rpath \
