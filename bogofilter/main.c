@@ -25,6 +25,7 @@ AUTHOR:
 
 #include "version.h"
 #include "common.h"
+#include "lexer.h"
 #include "bogofilter.h"
 
 #define BOGODIR ".bogofilter"
