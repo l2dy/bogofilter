@@ -731,32 +731,39 @@ void db_close(void *vhandle)
     int ret;
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
-    uint32_t f = DB_NOSYNC, t; /* safe as long as we're logging TXNs */
+    uint32_t f = DB_NOSYNC; /* safe as long as we're logging TXNs */
     DB_ENV *dbe = handle->dbenv->dbe;
     assert(handle->magic == MAGIC_DBH);
 
 #if DB_AT_LEAST(4,2)
-    /* get_flags and DB_TXN_NOT_DURABLE are new in 4.2 */
-    ret = dbp->get_flags(dbp, &t);
-    if (ret) {
-	print_error(__FILE__, __LINE__, "DB->get_flags returned error: %s",
-		db_strerror(ret));
-	f = 0;
-    } else {
-	if (t & DB_TXN_NOT_DURABLE)
-	    f &= ~DB_NOSYNC;
+    {
+	/* get_flags and DB_TXN_NOT_DURABLE are new in 4.2 */
+	uint32_t t;
+	ret = dbp->get_flags(dbp, &t);
+	if (ret) {
+	    print_error(__FILE__, __LINE__, "DB->get_flags returned error: %s",
+		    db_strerror(ret));
+	    f = 0;
+	} else {
+	    if (t & DB_TXN_NOT_DURABLE)
+		f &= ~DB_NOSYNC;
+	}
     }
 #endif
 
 #if DB_AT_LEAST(4,3)
-    ret = dbe->get_flags(dbe, &t);
-    if (ret) {
-	print_error(__FILE__, __LINE__, "DB_ENV->get_flags returned error: %s",
-		db_strerror(ret));
-	f = 0;
-    } else {
-	if (t & DB_LOG_INMEMORY)
-	    f &= ~DB_NOSYNC;
+    /* DB_LOG_INMEMORY is new in 4,3 */
+    {
+	uint32_t t;
+	ret = dbe->get_flags(dbe, &t);
+	if (ret) {
+	    print_error(__FILE__, __LINE__, "DB_ENV->get_flags returned error: %s",
+		    db_strerror(ret));
+	    f = 0;
+	} else {
+	    if (t & DB_LOG_INMEMORY)
+		f &= ~DB_NOSYNC;
+	}
     }
 #endif
 
@@ -1010,6 +1017,9 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
     }
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB_ENV->set_lk_max_objects(%p, %lu)\n", (void *)env->dbe, (unsigned long)numlocks);
+#else
+    /* suppress compiler warning for unused variable */
+    (void)numobjs;
 #endif
 
     /* configure automatic deadlock detector */
