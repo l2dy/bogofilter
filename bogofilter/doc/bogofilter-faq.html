@@ -71,7 +71,7 @@
         Operational Questions
 
         <ul>
-          <li><a href="#train_on_error">What are "training on error" and
+          <li><a href="#trainonerror">What are "training on error" and
           "training to exhaustion"?</a></li>
 
           <li><a href="#training">How do I start my bogofilter training?</a></li>
@@ -224,7 +224,7 @@
 
     <hr>
 
-    <h2 id="train_on_error">What are "training on error" and "training to exhaustion"?</h2>
+    <h2 id="trainonerror">What are "training on error" and "training to exhaustion"?</h2>
 
     <p>"Training on error" involves scanning a corpus of known spam
     and non-spam messages; only those that are misclassified, or
@@ -311,8 +311,7 @@
     spam_cutoff=0.6 you might want to score all ham in your
     collection below 0.3 and all spam above 0.8. Our example is:</p>
 
-    <pre>	bogominitrain.pl -fnv ~/.bogofilter ham.mbx spam.mbx '-o 0.8,0.3'</pre></li>and an interval of 0.1 is wanted, our example
-    is:</p>
+    <pre>	bogominitrain.pl -fnv ~/.bogofilter ham.mbx spam.mbx '-o 0.8,0.3'</pre></li>
 
     <li><p>Method 3) Use the script randomtrain (in the contrib
     directory). The script generates a list of all the messages in the
@@ -880,21 +879,19 @@
 
     <p>Bogoutil lets you dump a wordlist and load the tokens into a new wordlist.  With the added use of awk and grep, counts can be zeroed and tokens with zero counts for both spam and non-spam can be deleted.</p>
 
-    <p>The following commands will delete the tokens from spam messages:
+    <p>The following commands will delete the tokens from spam messages:</p>
 
 <pre>    bogoutil -d wordlist.db | \
     awk '{print $1 " " $2 " 0"}' | grep -v " 0 0" | \
     bogoutil -l wordlist.new.db
 </pre>
-</p>
 
-    <p>The following commands will delete the tokens from non-spam messages:
+    <p>The following commands will delete the tokens from non-spam messages:</p>
 
 <pre>    bogoutil -d wordlist.db | \
     awk '{print $1 " 0 " $3}' | grep -v " 0 0" | \
     bogoutil -l wordlist.new.db
 </pre>
-</p>
 
     <hr>
 

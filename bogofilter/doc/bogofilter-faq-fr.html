@@ -70,7 +70,7 @@
         Questions opérationnelles 
 
         <ul>
-	  <li><a href="#train_on_error">Qu'est-ce que "l'entrainement sur erreur" et
+	  <li><a href="#trainonerror">Qu'est-ce que "l'entrainement sur erreur" et
 	  "l'entrainement sur épuisement"?</a></li>
 	 
           <li><a href="#training">Comment débuter l'apprentissage de Bogofilter?</a></li>
@@ -327,14 +327,14 @@
     méthodes 1 et 4 produit une base de données plus grande que ne le
     ferait un entrainement avec les méthodes 2 ou 3. Si votre base de données
     doit être de petite taille (par exemple à cause de quotas), utilisez les
-    m&eacutes;thodes 2 ou 3.</p>
+    m&eacute;thodes 2 ou 3.</p>
     <p>L'entrainement avec la méthode 1 est le plus rapide. L'entrainement sur erreur
     (tel que décrit dans les méthodes 2,3 et 4) est efficace, mais
     l'apprentissage est plut&ocirc;t lent.</p>
 
     <hr>
  
-    <h2 id="train_on_error">Qu'est-ce que "l'entrainement sur erreur" et "l'entrainement sur épuisement"?</h2>
+    <h2 id="trainonerror">Qu'est-ce que "l'entrainement sur erreur" et "l'entrainement sur épuisement"?</h2>
 
     <p>"L'entrainement sur erreur" implique l'analyse d'un corpus de messages dont le statut de spam ou ham
     est connu. Seuls ceux qui sont mal classés, ou dont le classement est incertain, seront intégrés dans
@@ -890,23 +890,23 @@ pour chacun d'eux.
       être mis à zéros et les tokens dont les comptes seraient à
       zéro pour les spams et les hams pourraient être détruits.</p>
    
-      <p>Les commandes suivantes vont détruire les tokens des messages spams :
+      <p>Les commandes suivantes vont détruire les tokens des messages
+      spams:</p>
 
       <pre>    bogoutil -d wordlist.db | \
        awk '{print $1 " " $2 " 0"}' | grep -v " 0 0" | \
        bogoutil -l wordlist.new.db
       </pre>
-      </p>
    
-       <p>Les commandes suivantes vont détruire les tokens provenant des messages hams.
+       <p>Les commandes suivantes vont détruire les tokens provenant des
+       messages hams.</p>
    <pre>    bogoutil -d wordlist.db | \
        awk '{print $1 " 0 " $3}' | grep -v " 0 0" | \
        bogoutil -l wordlist.new.db
    </pre>
-   </p>
    
 
     <!--
     $Id$
     -->
-  </ul></body></html>
+  </body></html>
