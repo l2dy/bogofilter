@@ -60,6 +60,7 @@ AUTHOR:
 #include "token.h"
 #include "tunelist.h"
 #include "wordhash.h"
+#include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
@@ -135,7 +136,8 @@ double user_robx = 0.0;		/* from '-r' option */
 /* Function Prototypes */
 
 static void bt_exit(void);
-static int load_hook(word_t *key, dsv_t *data, void *userdata);
+static int  load_hook(word_t *key, dsv_t *data, void *userdata);
+static void load_wordlist(ds_foreach_t *hook, void *userdata);
 static void show_elapsed_time(int beg, int end, uint cnt, double val, 
 			      const char *lbl1, const char *lbl2);
 
@@ -464,20 +466,34 @@ static uint read_mailbox(char *arg)
     bogoreader_init(1, &arg);
     while ((*reader_more)()) {
 	wordhash_t *whc, *whp = NULL;
+	wordprop_t *msg_count;
 
-	if (user_robx < EPS)
+	if (user_robx < EPS && !msg_count_file)
 	    whc = wordhash_new();
 	else
 	    whc = wordhash_init(WH_CNTS, 0);
 
 	collect_words(whc);
+	
+	if (msgs_good == 0 && msgs_bad == 0) {
+	    msg_count = wordhash_insert(whc, w_msg_count, sizeof(wordprop_t), NULL);
+	    if (msg_count->cnts.good == 0 ||msg_count->cnts.bad == 0)
+		load_wordlist(load_hook, ns_and_sp->train);
+	    if (msgs_good == 0 && msgs_bad == 0)
+		fprintf(stderr,
+			"Can't find .MSG_COUNT.\n");
+	    exit(EX_ERROR);
+	}
 
 	if (whc->wordcount == 0)
 	    bt_trap();
 
 	if (whc->wordcount != 0) {
 	    count += 1;
-	    whp = convert_wordhash_to_propslist(whc, train);
+	    if (!msg_count_file)
+		whp = convert_wordhash_to_propslist(whc, train);
+	    else
+		whp = convert_propslist_to_countlist(whc);
 	    msglist_add(msgs, whp);
 	}
 
@@ -715,31 +731,31 @@ static int process_args(int argc, char **argv)
     return count;
 }
 
-static void load_wordlist(char *file)
+static void load_wordlist(ds_foreach_t *hook, void *userdata)
 {
     struct stat sb;
-    size_t len = strlen(file) + strlen(WORDLIST) + 2;
+    size_t len = strlen(ds_file) + strlen(WORDLIST) + 2;
     char *path = xmalloc(len);
 
-    if (stat(file, &sb) != 0) {
+    if (stat(ds_file, &sb) != 0) {
 	fprintf(stderr, "Error accessing file or directory '%s'.\n", ds_file);
 	if (errno != 0)
 	    fprintf(stderr, "error #%d - %s.\n", errno, strerror(errno));
 	return;
     }
 
-    build_path(path, len, file, WORDLIST);
+    build_path(path, len, ds_file, WORDLIST);
 
     if (verbose) {
 	printf("Reading %s\n", path);
 	fflush(stdout);
     }
 
-    ds_oper(path, DB_READ, load_hook, ns_and_sp->train);
+    ds_oper(path, DB_READ, hook, userdata);
+//  ds_oper(path, DB_READ, load_hook, ns_and_sp->train); XXXXXXXXXX
     db_cachesize = ceil(sb.st_size / 3.0 / 1024.0 / 1024.0);
 
-    if (path != ds_file)
-	xfree(path);
+    xfree(path);
 
     return;
 }
@@ -762,68 +778,70 @@ typedef struct robhook_data {
     double   scalefactor;
 } rh_t;
 
-static void robx_accum(word_t *key,
-		       void   *data,
-		       void   *userdata)
+static int robx_accum(word_t *key,
+		      dsv_t  *data,
+		      void   *userdata)
 {
     rh_t *rh = userdata;
-    wordprop_t *wp = data;
-    uint goodness = wp->cnts.good;
-    uint spamness = wp->cnts.bad;
-    double prob = spamness / (goodness * rh->scalefactor + spamness);
+    dsv_t *wp = data;
+    double goodness = wp->goodcount;
+    double spamness = wp->spamcount;
     bool doit = goodness + spamness >= 10;
 
-    /* ignore system meta-data */
-    if (*key->text == '.')
-	return;
-
+    /* check for system meta-data */
+    if (*key->text == '.') {
+	if (strcmp(key->text, MSG_COUNT) == 0) {
+	    msgs_good = goodness;
+	    msgs_bad  = spamness;
+	    rh->scalefactor = spamness/goodness;
+	}
+    }
+    else
     if (doit) {
+	double prob = spamness / (goodness * rh->scalefactor + spamness);
 	rh->sum += prob;
 	rh->count += 1;
     }
 
-    return;
+    return 0;
 }
 
-static double robx_compute(wordhash_t *wh)
+static double robx_compute(void)
 {
     double rx;
-    wordprop_t *p = wordhash_search(wh, w_msg_count, 0);
-    uint msg_good = p->cnts.good;
-    uint msg_spam = p->cnts.bad;
+    dsv_t val;
 
-    rh_t rh;
-    rh.scalefactor = (double)msg_spam/(double)msg_good;
+    struct robhook_data rh;
+
+    if (user_robx > 0.0)
+	return user_robx;
+
+    printf("Calculating initial x value...\n");
+
+    setup_wordlists(ds_file, PR_NONE);
+    open_wordlists(DB_READ);
+
+    ds_get_msgcounts(word_lists->dsh, &val);
+    msgs_good = val.goodcount;
+    msgs_bad  = val.spamcount;
+
+    rh.scalefactor = (double)msgs_bad/(double)msgs_good;
     rh.sum = 0.0;
     rh.count = 0;
 
-    wordhash_foreach(wh, robx_accum, &rh);
+    load_wordlist(robx_accum, &rh);
 
-    if (rh.count == 0)
-	rx = ROBX;
-    else
-	rx = rh.sum/rh.count;
+    close_wordlists(false);
+    free_wordlists();
 
-    if (verbose > 1) {
-	printf("%s: %lu spam, %lu ham\n",
-	       MSG_COUNT, (unsigned long)msg_spam, (unsigned long)msg_good);
-/*
-	printf("scale: %f, sum: %f, cnt: %6d\n",
-	       rh.scalefactor, rh.sum, (int)rh.count);
-*/
-    }
+    rx = (rh.count == 0) ? ROBX : rh.sum/rh.count;
+
+    if (rx > 0.6) rx = 0.6;
+    if (rx < 0.4) rx = 0.4;
+
+    printf("Initial x value is %8.6f\n", rx);
 
     return rx;
-}
-
-static double robx_init(void)
-{
-    double x;
-    printf("Calculating initial x value...\n");
-    x = robx_compute(ns_and_sp->train);
-    if (x > 0.6) x = 0.6;
-    if (x < 0.4) x = 0.4;
-    return x;
 }
 
 static result_t *results_sort(uint r_count, result_t *results)
@@ -1057,18 +1075,16 @@ static void bogotune_free(void)
     return;
 }
 
-static void get_msg_counts(void)
+static bool check_msg_counts(void)
 {
-    wordprop_t *props = wordhash_insert(ns_and_sp->train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
-    msgs_good = props->cnts.good;
-    msgs_bad  = props->cnts.bad;
+    bool ok = true;
 
     if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
 	fprintf(stderr, 
 		"The wordlist contains %u non-spam and %u spam messages.\n"
 		"Bogotune must be run with at least %d of each.\n",
 		msgs_good, msgs_bad, LIST_COUNT);
-	exit(EX_ERROR);
+	ok = false;
     }
 
     if (msgs_bad < msgs_good / 5 ||
@@ -1077,10 +1093,10 @@ static void get_msg_counts(void)
 		"The wordlist has a ratio of spam to non-spam of %0.1f to 1.0.\n"
 		"Bogotune requires the ratio be in the range of 0.2 to 5.\n",
 		msgs_bad * 1.0 / msgs_good);
-	exit(EX_ERROR);
+	ok = false;
     }
 
-    return;
+    return ok;
 }
 
 static rc_t bogotune(void)
@@ -1093,9 +1109,6 @@ static rc_t bogotune(void)
     bogotune_init();
 
     beg = time(NULL);
-
-    if (ds_file)
-	load_wordlist(ds_file);
 
     ham_cutoff = 0.0;
     spam_cutoff = 0.1;
@@ -1131,10 +1144,6 @@ static rc_t bogotune(void)
 	end = time(NULL);
 	cnt = ns_cnt + sp_cnt;
 	show_elapsed_time(beg, end, ns_cnt + sp_cnt, (double)cnt/(end-beg), "messages", "msg/sec");
-    }
-
-    if (msgs_good == 0 && msgs_bad == 0) {
-	get_msg_counts();
     }
 
     if (verbose > 3) {
@@ -1189,16 +1198,18 @@ static rc_t bogotune(void)
     ** Bound the calculated value within [0.4, 0.6] and set the range to be
     ** investigated to [x-0.1, x+0.1].
     */
-    if (user_robx > 0.0)
-	robx = user_robx;
-    else
-	robx = robx_init();
 
-    printf("Initial x value is %8.6f\n", robx);
+    if (user_robx > EPS)
+	robx = user_robx;
+    else if (ds_file != NULL)
+	robx = robx_compute();
 
     /* No longer needed */
     wordhash_free(ns_and_sp->train);
     ns_and_sp->train = NULL;
+
+    if (!check_msg_counts())
+	exit(EX_ERROR);
 
     if (memdebug) { MEMDISPLAY; }
 
