@@ -124,7 +124,8 @@ void *ds_open(const char *path, const char *name, dbmode_t open_mode)
 
     if (v == NULL && open_mode != DS_READ) {
 	v = db_open(path, name, DS_CREATE);
-	if (v && open_mode != DS_WRITE)
+	
+	if (v && (open_mode & DS_WRITE) && ! (open_mode & DS_LOAD))
 	    ds_set_wordlist_version(v, NULL);
     }
 

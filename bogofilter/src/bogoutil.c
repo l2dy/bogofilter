@@ -115,7 +115,7 @@ static int load_wordlist(const char *ds_file)
 
     ds_init();
 
-    dsh = ds_open(CURDIR_S, ds_file, DS_WRITE);
+    dsh = ds_open(CURDIR_S, ds_file, DS_WRITE | DS_LOAD);
     if (dsh == NULL)
 	return EX_ERROR;
 
