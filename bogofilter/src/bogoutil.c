@@ -837,7 +837,7 @@ int main(int argc, char *argv[])
 	    {
 		u_int32_t s;
 		ds_minit(bogohome, ds_file);
-		s = ds_pagesize(CURDIR_S, ds_file);
+		s = ds_pagesize(bogohome, ds_file);
 		if (s == 0xffffffff)
 		    fprintf(stderr, "%s: error getting page size.\n", ds_file);
 		else if (s == 0)
