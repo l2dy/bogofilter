@@ -120,12 +120,15 @@ void dsh_free(void *vhandle)
 void *ds_open(const char *path, const char *name, dbmode_t open_mode)
 {
     dsh_t *dsh;
-    void *v = db_open(path, name, open_mode);
+    void *v;
+
+    ds_init();
+
+    v = db_open(path, name, open_mode);
 
     if (!v)
 	return NULL;
 
-    ds_init();
     dsh = dsh_init(v);
 
     if (db_created(v) && ! (open_mode & DS_LOAD))
