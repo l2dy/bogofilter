@@ -34,6 +34,9 @@ static char dirname[PATH_LEN+1];
 
 static FILE *yy_file;
 
+typedef enum ms_e {MS_FILE, MS_MAILDIR, MS_MH } ms_t;
+
+static ms_t mailstore_type;
 static bool mail_first = true;  /* for the _next_mail functions */
 static bool mailstore_first = true; /* for the _next_mailstore functions */
 static bool emptyline = false; /* for mailbox /^From / match */
@@ -60,15 +63,11 @@ static reader_more_t b_args_next_mailstore;
 
 /* these functions check if there is more mail in a mailbox/maildir/...
  * to process, trivial mail_next_mail for uniformity */
+static reader_more_t dir_next_mail;
 static reader_more_t mail_next_mail;
 static reader_more_t mailbox_next_mail;
-static reader_more_t maildir_next_mail;
 /* maildir is the mailbox format specified in
  * http://cr.yp.to/proto/maildir.html */
-
-/* this function checks if there is more mail in a MH directory...
- * to process, trivial mail_next_mail for uniformity */
-static reader_more_t mh_next_mail;
 
 static reader_line_t simple_getline;	/* ignores /^From / */
 static reader_line_t mailbox_getline;	/* minds   /^From / */
@@ -204,15 +203,17 @@ static bool open_mailstore(char *obj)
     case IS_DIR:
 	if (ismaildir(filename) == IS_DIR) {
 	    /* MAILDIR */
+	    mailstore_type = MS_MAILDIR;
 	    maildir_init(filename);
 	    reader_getline   = simple_getline;
-	    mailstore_next_mail = maildir_next_mail;
+	    mailstore_next_mail = dir_next_mail;
 	    return true;
 	} else {
 	    /* MH */
+	    mailstore_type = MS_MH;
 	    mh_init(filename);
 	    reader_getline   = simple_getline;
-	    mailstore_next_mail = mh_next_mail;
+	    mailstore_next_mail = dir_next_mail;
 	    return true;
 	}
 	break; /* notreached */
@@ -287,90 +288,43 @@ static bool mailbox_next_mail(void)
     return val;
 }
 
-/* iterates over files in a maildir */
-static bool maildir_next_mail(void)
+/* iterates over files in a directory */
+static bool dir_next_mail(void)
 {
     struct dirent *dirent;
     struct stat st;
 
     while(true) {
 	if (reader_dir == NULL) {
+	    char *x = dirname;
 	    /* open next directory */
-	    char *x;
-	    size_t siz;
-
-	    if (*maildir_sub == NULL)
-		return false; /* IMPORTANT for termination */
-	    siz = strlen(dirname) + 4 + 1;
-	    x = xmalloc(siz);
-	    strlcpy(x, dirname, siz);
-	    strlcat(x, *(maildir_sub++), siz);
+	    if (mailstore_type == MS_MAILDIR) {
+		size_t siz;
+		
+		if (*maildir_sub == NULL)
+		    return false; /* IMPORTANT for termination */
+		siz = strlen(dirname) + 4 + 1;
+		x = xmalloc(siz);
+		strlcpy(x, dirname, siz);
+		strlcat(x, *(maildir_sub++), siz);
+	    }
 	    reader_dir = opendir(x);
 	    if (!reader_dir) {
 		fprintf(stderr, "cannot open directory '%s': %s", x,
 			strerror(errno));
 	    }
-	    free(x);
-	}
-
-	while ((dirent = readdir(reader_dir)) != NULL) {
-	    /* skip dot files */
-	    if (dirent->d_name[0] != '.')
-		break;
-	}
-
-	if (dirent == NULL) {
-	    if (reader_dir)
-		closedir(reader_dir);
-	    reader_dir = NULL;
-	    continue;
-	}
-
-	filename = namebuff;
-	snprintf(namebuff, sizeof(namebuff), "%s%s/%s", dirname, *(maildir_sub-1),
-		dirent->d_name);
-
-	if (fpin)
-	    fclose(fpin);
-	fpin = fopen( filename, "r" );
-	if (fpin == NULL) {
-	    fprintf(stderr, "Warning: can't open file '%s': %s\n", filename,
-		    strerror(errno));
-	    /* don't barf, the file may have been changed by another MUA,
-	     * or a directory that just doesn't belong there, just skip it */
-	    continue;
-	}
-
-	/* skip non-regular files */
-	if (0 == fstat(fileno(fpin), &st) && !S_ISREG(st.st_mode))
-	    continue;
-
-	if (DEBUG_READER(0))
-	    fprintf(dbgout, "%s:%d - reading %s (%p)\n", __FILE__, __LINE__, filename, fpin);
-
-	return true;
-    }
-}
-
-/* iterates over files in a MH directory */
-static bool mh_next_mail(void)
-{
-    struct dirent *dirent;
-    struct stat st;
-
-    while (true) {
-	if (reader_dir == NULL) {
-	    reader_dir = opendir(dirname);
-	    if (!reader_dir) {
-		fprintf(stderr, "cannot open directory '%s': %s", dirname,
-			strerror(errno));
-	    }
+	    if (x != dirname)
+		free(x);
 	}
 
 	while ((dirent = readdir(reader_dir)) != NULL) {
 	    /* skip private files */
-	    if (dirent->d_name[0] != '.' &&
-		dirent->d_name[0] != ',')
+	    if ((mailstore_type == MS_MAILDIR &&
+		 dirent->d_name[0] != '.')
+		||
+		(mailstore_type == MS_MH &&
+		 dirent->d_name[0] != '.' &&
+		 dirent->d_name[0] != ','))
 		break;
 	}
 
@@ -378,11 +332,16 @@ static bool mh_next_mail(void)
 	    if (reader_dir)
 		closedir(reader_dir);
 	    reader_dir = NULL;
-	    return false;
+	    if (mailstore_type == MS_MAILDIR)
+		continue;
+	    if (mailstore_type == MS_MH)
+		return false;
 	}
 
 	filename = namebuff;
-	snprintf(namebuff, sizeof(namebuff), "%s/%s", dirname, dirent->d_name);
+	snprintf(namebuff, sizeof(namebuff), "%s%s/%s", dirname, 
+		 (mailstore_type == MS_MH) ? "" : *(maildir_sub-1),
+		 dirent->d_name);
 
 	if (fpin)
 	    fclose(fpin);
