@@ -128,6 +128,9 @@
           <li><a href="#changed-exitcodes">Pourquoi, depuis que j'ai
           installé la 0.14, mes scripts ne fonctionnent-ils
           plus?</a></li>
+
+          <li><a href="#changed-tagging">Pourquoi, depuis que j'ai
+          installé la 0.15, Bogofilter fonctionne-t-il moins bien?</a></li>
         </ul>
       </li>
     </ul>
@@ -855,7 +858,6 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
     <em>doivent</em> être changés.</p>
 
     <hr>
-<hr>
  	 
       <h2 id="changed-exitcodes">Pourquoi, depuis que j'ai installé la
       0.14, mes scripts ne fonctionnent-ils plus?</h2>
@@ -865,6 +867,29 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
       unsure). Avant la 0.14, les codes de retour étaient 0 pour spam, 1 pour
       ham, et 2 pour les erreurs. Désormais c'est 0 pour spam, 1 pour ham, 2
       pour unsure et 3 pour toute erreur.</p>
+
+     <h2 id="changed-tagging">Pourquoi, depuis que j'ai installé la
+     0.15, Bogofilter fonctionne-t-il moins bien?</h2>
+     <p>Avant la version 0.15.4, Bogofilter ajoutait des préfixes dédiés au marquage
+     des en-têtes "Subject:", "From:", "To:" et "Return-Path". Depuis la version
+     0.15.4, les lignes "Received:" sont aussi traitées spécifiquement et toutes les
+     autres lignes d'en-têtes ont un préfixe "head:". Comme Bogofilter n'a pas
+     rencontré précédemment de tels préfixes, les tokens ainsi constitués
+     ne peuvent plus contribuer,
+     temporairement, à l'évaluation ham ou spam. Cette perte d'information va dégrader les
+     performances de Bogofilter.</p>
+     <p>Il existe deux moyens de gérer ce problème. Le premier consiste à réentrainer
+     Bogofilter avec tous vos anciens ham et spam. Cela créera les nouvelles entrées
+     avec les entrées "head:" nécessaires, et tout sera correct.
+     </p>
+
+     <p>Le second moyen est d'utiliser la nouvelle option header-degen ("-H"). Quand il
+     classe un message, header-degen indique à Bogofilter de regarder à la fois
+     "head:token" et "token" dans la base. Les deux scores ham et spam sont combinés
+     pour donner un résultat cumulatif de l'évaluation. Enregistrer de tels messages créera
+     les entrées "head:token" dans la base. Après un mois environ d'utilisation du "-H",
+     la base devrait contenir suffisamment d'entrées avec le préfixe "head:" et l'utilisation
+     du "-H" ne sera plus nécessaire</p>
 
     <!--
     $Id$
