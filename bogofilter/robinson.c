@@ -167,7 +167,7 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     double invlogsum = 0.0;	/* Robinson's P */
     double logsum = 0.0;	/* Robinson's Q */
     double spamicity;
-    int robn = 0;
+    size_t robn = 0;
 
     Rtable |= verbose > 3;
 
@@ -216,7 +216,7 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     return (spamicity);
 }
 
-double rob_get_spamicity(int robn, double invlogsum, double logsum, double *invproduct, double *product)
+double rob_get_spamicity(size_t robn, double invlogsum, double logsum, double *invproduct, double *product)
 {
     double invn = (double)robn;
     double _invproduct = 1.0 - exp(invlogsum / invn);

@@ -60,7 +60,7 @@ double prbf(double x, double df)
     return(status==0 ? q : 1.0);
 }
 
-double fis_get_spamicity(int robn, double invlogsum, double logsum, double *invproduct, double *product)
+double fis_get_spamicity(size_t robn, double invlogsum, double logsum, double *invproduct, double *product)
 {
     double df = 2.0 * robn;
     double _invproduct = prbf(-2.0 * invlogsum, df);
