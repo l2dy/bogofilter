@@ -8,6 +8,8 @@
 # if run from command line, use testname and date for TMPDIR,
 # and suppress directory deletion.
 
+set -e
+
 exec </dev/null
 
 : ${srcdir=.}
