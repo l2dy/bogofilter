@@ -130,7 +130,7 @@ The information logged depends on how <application>bogofilter</application> is r
 </programlisting>
 
 <para>The <option>-p</option> (passthrough) option writes a copy of
-the input mail to the output with an X-Spam-Status header (in the
+the input mail to the output with an X-Bogosity header (in the
 style of SpamAssassin) inserted.  The header will begin with "Yes" or
 "No" according as the mail is judged to be spam or non-spam
 respectively.</para>
