@@ -2,13 +2,9 @@
 				BOGOFILTER NEWS
 			       =================
 
-Note: 
+0.90.0	2004-05-09
 
-  Release 0.17.0 is the "Code Clean-up Release - Phase 2".
-
-  Be sure to read RELEASE.NOTES-0.17 !
- 
-0.18.0	2004-05-??
+	* Revised bogotune's parameter ranges for coarse scan.
 
 	2004-05-08
 

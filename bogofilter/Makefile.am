@@ -25,7 +25,7 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 		CHANGES-0.15 RELEASE.NOTES-0.15 \
 		CHANGES-0.16 RELEASE.NOTES-0.16 \
 		CHANGES-0.17 RELEASE.NOTES-0.17 \
-		CHANGES-0.18
+		CHANGES-0.90
 
 .PHONY:	rpm cvs-check
 
