@@ -15,6 +15,7 @@
 #include <config.h>
 #include "common.h"
 
+#include "charset.h"
 #include "error.h"
 #include "lexer.h"
 #include "xmalloc.h"
@@ -62,6 +63,9 @@ struct textblock textblocks;
 char *yylval;
 static int past_header;
 static int yyinput(char *buf, int max_size);
+
+static token_t save_class = NONE;
+static char save_text[256];
 
 %}
 
@@ -277,7 +281,7 @@ int lexer_fgets(char *buf, int max_size, FILE *s)
 static int yyinput(char *buf, int max_size)
 /* input getter for the scanner */
 {
-    int returned;
+    int i, returned;
 
     static size_t hdrlen = 0;
     if (hdrlen==0)
@@ -298,7 +302,7 @@ static int yyinput(char *buf, int max_size)
 
     if (returned == -1) {
 	if (ferror(yyin)) {
-	    fprintf(stderr, "input in flex scanner failed\n");
+	    PRINT_ERROR("input in flex scanner failed\n");
 	    exit(2);
 	} else {
 	    return YY_NULL;
@@ -328,6 +332,12 @@ static int yyinput(char *buf, int max_size)
 	*(buf + returned - 1) = '\n';
     }
 
+    for (i=0; i <= returned; i += 1)
+    {	
+	unsigned char ch = buf[i];
+	buf[i] = charset_table[ch];
+    }
+
     return(returned == -1 ? YY_NULL : returned);
 }
 
@@ -335,9 +345,6 @@ token_t get_token(void)
 {
     token_t class;
     unsigned char *cp, *t;
-
-    static token_t save_class = NONE;
-    static char save_text[MAXTOKENLEN];
 
     /* If saved IPADDR, truncate last octet */
     if ( block_on_subnets && save_class == IPADDR )
@@ -382,9 +389,10 @@ token_t get_token(void)
 	    break;
     }
 
+    /* Need separate loop so lexer can see "From", "Date", etc */
     for (cp = yytext; *cp; cp++)
-	*cp = tolower((unsigned char)*cp);
-
+	*cp = casefold_table[*cp];
+    
     yylval = yytext;
     return(class);
 }
