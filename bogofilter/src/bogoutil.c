@@ -529,7 +529,7 @@ static void print_version(void)
 
 static void usage(void)
 {
-    fprintf(stderr, "Usage: %s { -d | -l | -w } file.db | -R directory | [ -p | -v | -h | -V ]\n", PROGNAME);
+    fprintf(stderr, "Usage: %s { -d | -l | -w | -p } file.db | -R directory | [ -v | -h | -V ]\n", PROGNAME);
 }
 
 static void help(void)
@@ -539,9 +539,9 @@ static void help(void)
 	    "\n"
 	    "\t-d file\tDump data from file to stdout.\n"
 	    "\t-l file\tLoad data from stdin into file.\n"
-	    "\t-w\tDisplay counts for words from stdin.\n"
+	    "\t-w directory\tDisplay counts for words from stdin.\n"
+	    "\t-p directory\tDisplay word counts and probabilities.\n"
 	    "\t-m\tEnable maintenance works (expiring tokens).\n"
-	    "\t-p\tOutput word probabilities.\n"
 	    "\t-v\tOutput debug messages.\n"
 	    "\t-h\tPrint this message.\n"
 	    "\t-R\tCompute Robinson's X for specified directory.\n");
@@ -551,8 +551,8 @@ static void help(void)
 	    "\t-s min,max\tExclude tokens with lengths between min and max.\n"
 	    "\t-n\tReplace non-ascii characters with '?'.\n"
 	    "\t-y today\tSet default day-of-year (1..366).\n"
-	    "\t-x list\t- set debug flags.\n"
-	    "\t-D\t- direct debug output to stdout.\n"
+	    "\t-x list\tSet debug flags.\n"
+	    "\t-D\tDirect debug output to stdout.\n"
 	    "\t-V\tPrint program version.\n"
 	    "\t-I file\tRead this file instead of standard input.\n"
 	    "\n"
@@ -575,7 +575,7 @@ static int process_args(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
-    while ((option = getopt(argc, argv, ":d:l:m:w:R:phvVa:c:s:ny:I:x:D")) != -1)
+    while ((option = getopt(argc, argv, ":d:l:m:w:R:p:hvVa:c:s:ny:I:x:D")) != -1)
 	switch (option) {
 	case 'd':
 	    flag = DUMP;
@@ -595,6 +595,10 @@ static int process_args(int argc, char **argv)
 	    db_file = (char *) optarg;
 	    break;
 
+	case 'p':
+	    prob = true;
+	    /*@fallthrough@*/
+
 	case 'w':
 	    flag = WORD;
 	    count += 1;
@@ -605,10 +609,6 @@ static int process_args(int argc, char **argv)
 	    flag = ROBX;
 	    count += 1;
 	    db_file = (char *) optarg;
-	    break;
-
-	case 'p':
-	    prob = true;
 	    break;
 
 	case 'v':
