@@ -214,9 +214,9 @@ bogostat_t;
 
 #define SIZEOF(array)	((size_t)(sizeof(array)/sizeof(array[0])))
 
-static bogostat_t stats;
+static bogostat_t bogostats;
 
-int compare_stats(const void *id1, const void *id2)
+int compare_extrema(const void *id1, const void *id2)
 { 
     const discrim_t *d1 = id1;
     const discrim_t *d2 = id2;
@@ -224,21 +224,21 @@ int compare_stats(const void *id1, const void *id2)
 	     ((d1->prob == d2->prob) && (strcmp(d1->key, d2->key) > 0)));
 }
 
-void init_stats(bogostat_t *stats)
+void init_bogostats(bogostat_t *bogostats)
 {
     int idx;
 
-    for (idx = 0; idx < SIZEOF(stats->extrema); idx++)
+    for (idx = 0; idx < SIZEOF(bogostats->extrema); idx++)
     {
-	discrim_t *pp = &stats->extrema[idx];
+	discrim_t *pp = &bogostats->extrema[idx];
 	pp->prob = EVEN_ODDS;
 	pp->key[0] = '\0';
     }
 }
 
-void populate_stats( bogostat_t *stats, char *text, double prob, int count )
+void populate_bogostats( bogostat_t *bogostats, char *text, double prob, int count )
 // if  the new word,prob pair is a better indicator.
-// add them to the stats structure, 
+// add them to the bogostats structure, 
 {
     size_t idx;
     double dev;
@@ -250,9 +250,9 @@ void populate_stats( bogostat_t *stats, char *text, double prob, int count )
     hit = NULL;
     hitdev=1;
 
-    for (idx = 0; idx < SIZEOF(stats->extrema); idx++)
+    for (idx = 0; idx < SIZEOF(bogostats->extrema); idx++)
     {
-	pp = &stats->extrema[idx];
+	pp = &bogostats->extrema[idx];
 	if (pp->key[0] == '\0' )
 	{
 	    hit = pp;
@@ -276,12 +276,12 @@ void populate_stats( bogostat_t *stats, char *text, double prob, int count )
     }
 }
 
-void print_stats( bogostat_t *stats )
+void print_bogostats( bogostat_t *bogostats )
 {
     size_t idx;
-    for (idx = 0; idx < SIZEOF(stats->extrema); idx++)
+    for (idx = 0; idx < SIZEOF(bogostats->extrema); idx++)
     {
-	discrim_t *pp = &stats->extrema[idx];
+	discrim_t *pp = &bogostats->extrema[idx];
 	fprintf(stderr, "#  %2ld  %f  %s\n", (long)idx, pp->prob, pp->key);
     }
 }
@@ -291,22 +291,22 @@ typedef struct {
     double bad;
 } wordprob_t;
 
-void wordprob_init(wordprob_t* stats)
+void wordprob_init(wordprob_t* wordstats)
 {
-    stats->good=stats->bad=0;
+    wordstats->good=wordstats->bad=0;
 }
 
-void wordprob_add(wordprob_t* stats, double newprob, int bad)
+void wordprob_add(wordprob_t* wordstats, double newprob, int bad)
 {
     if (bad)
-	stats->bad+=newprob;
+	wordstats->bad+=newprob;
     else
-	stats->good+=newprob;
+	wordstats->good+=newprob;
 }
 
-double wordprob_result(wordprob_t* stats)
+double wordprob_result(wordprob_t* wordstats)
 {
-    double prob = stats->bad/(stats->good + stats->bad);
+    double prob = wordstats->bad/(wordstats->good + wordstats->bad);
     return (prob);
 }
 
@@ -318,9 +318,9 @@ double compute_probability( char *token )
     int totalcount=0;
     double prob;
 
-    wordprob_t stats;
+    wordprob_t wordstats;
 
-    wordprob_init(&stats);
+    wordprob_init(&wordstats);
 
     for (list=word_lists; list != NULL ; list=list->next)
     {
@@ -346,13 +346,13 @@ double compute_probability( char *token )
 	    if (verbose >= 4)
 		fprintf(stderr, "word '%s' has spamicity %f.\n", token, prob);
 
-	    wordprob_add(&stats, prob, list->bad);
+	    wordprob_add(&wordstats, prob, list->bad);
 	}
     }
     if (totalcount < MINIMUM_FREQ)
 	prob=UNKNOWN_WORD;
     else {
-	prob=wordprob_result(&stats);
+	prob=wordprob_result(&wordstats);
 	prob = min(MAX_PROB, prob);
 	prob = max(MIN_PROB, prob);
     }
@@ -361,24 +361,24 @@ double compute_probability( char *token )
 
 bogostat_t *select_indicators(wordhash_t *wordhash)
 // selects the best spam/nonspam indicators and
-// populates the stats structure.
+// populates the bogostats structure.
 {
     hashnode_t *node;
 
-    init_stats(&stats);
+    init_bogostats(&bogostats);
 
     for(node = wordhash_first(wordhash); node != NULL; node = wordhash_next(wordhash))
     {
 	char *token = node->key;
 	double prob = compute_probability( token );
 
-	populate_stats( &stats, token, prob, 1 );
+	populate_bogostats( &bogostats, token, prob, 1 );
     }
 
-    return (&stats);
+    return (&bogostats);
 }
 
-double compute_spamicity(bogostat_t *stats)
+double compute_spamicity(bogostat_t *bogostats)
 // computes the spamicity of the words in the bogostat structure
 // returns:  the spamicity
 {
@@ -389,14 +389,14 @@ double compute_spamicity(bogostat_t *stats)
 
     if (verbose)
     {
-	// put the stats in ascending order by probability and alphabet
-	qsort(stats->extrema, SIZEOF(stats->extrema), sizeof(discrim_t), compare_stats);
+	// put the bogostats in ascending order by probability and alphabet
+	qsort(bogostats->extrema, SIZEOF(bogostats->extrema), sizeof(discrim_t), compare_extrema);
     }
 
     // Bayes' theorem.
     // For discussion, see <http://www.mathpages.com/home/kmath267.htm>.
     product = invproduct = 1.0f;
-    for (pp = stats->extrema; pp < stats->extrema+SIZEOF(stats->extrema); pp++)
+    for (pp = bogostats->extrema; pp < bogostats->extrema+SIZEOF(bogostats->extrema); pp++)
 	if (pp->prob != 0)
 	{
 	    product *= pp->prob;
@@ -415,7 +415,7 @@ rc_t bogofilter(int fd, double *xss)
     rc_t	status;
     double 	spamicity;
     wordhash_t  *wordhash;
-    bogostat_t	*stats;
+    bogostat_t	*bogostats;
     int		wordcount, msgcount;
 
 //  tokenize input text and save words in a wordhash.
@@ -429,12 +429,12 @@ rc_t bogofilter(int fd, double *xss)
     spam_list.msgcount = db_getcount(spam_list.dbh);
 
 //  select the best spam/nonspam indicators.
-    stats = select_indicators(wordhash);
+    bogostats = select_indicators(wordhash);
 
     db_lock_release_list(word_lists);
 
 //  computes the spamicity of the spam/nonspam indicators.
-    spamicity = compute_spamicity(stats);
+    spamicity = compute_spamicity(bogostats);
 
     status = (spamicity > SPAM_CUTOFF) ? RC_SPAM : RC_NONSPAM;
 
