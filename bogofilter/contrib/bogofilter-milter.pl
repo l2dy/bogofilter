@@ -24,8 +24,8 @@
 # Before using this script, search for CONFIGURABLE SETTINGS and
 # configure them appropriately for your site.
 #
-# Inserts "X-Bogosity: Yes, tests=bogofilter" into messages that
-# appear to be spam (or "No" into ones that don't).  If the message is
+# Inserts "X-Bogosity: Spam, tests=bogofilter" into messages that
+# appear to be spam (or "Ham" into ones that don't).  If the message is
 # rejected, you usually won't see the "Yes", but see below about
 # training mode.
 #
