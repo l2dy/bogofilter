@@ -88,11 +88,6 @@ void rob_print_stats(FILE *fp)
 	rstats_print();
 }
 
-static void wordprob_init(/*@out@*/ wordprop_t* wordstats)
-{
-    wordstats->good = wordstats->bad = 0;
-}
-
 static void wordprob_add(wordprop_t* wordstats, int count, int bad)
 {
     if (bad)
@@ -117,21 +112,13 @@ static double wordprob_result(wordprop_t* wordstats)
     return (fw);
 }
 
-static double compute_probability(const word_t *token, wordprop_t *props)
+static double compute_probability(const word_t *token, wordprop_t *wordstats)
 {
     int override=0;
     long count;
     wordlist_t* list;
-    wordprop_t  wordstats;
 
-    wordprob_init(&wordstats);
-
-    if (props->bad != 0 || props->good != 0)
-    {
-	wordstats.bad = props->bad;
-	wordstats.good = props->good;
-    }
-    else
+    if (wordstats->bad == 0 && wordstats->good == 0)
     for (list=word_lists; list != NULL ; list=list->next)
     {
 	if (override > list->override)
@@ -149,23 +136,21 @@ static double compute_probability(const word_t *token, wordprop_t *props)
 		return EVEN_ODDS;
 	    override=list->override;
 
-	    wordprob_add(&wordstats, count, list->bad);
+	    wordprob_add(wordstats, count, list->bad);
 	    if (DEBUG_WORDLIST(1)) {
-		fprintf(dbgout, "%2d %2d \n", (int) wordstats.good, (int) wordstats.bad);
+		fprintf(dbgout, "%2d %2d \n", (int) wordstats->good, (int) wordstats->bad);
 		word_puts(token, 0, dbgout);
 		fputc('\n', dbgout);
 	    }
 	}
     }
 
-    props->good = wordstats.good;
-    props->bad  = wordstats.bad;
-    props->prob=wordprob_result(&wordstats);
+    wordstats->prob=wordprob_result(wordstats);
 
     if (Rtable || verbose)
-	rstats_add(token, props);
+	rstats_add(token, wordstats);
 
-    return props->prob;
+    return wordstats->prob;
 }
 
 double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
