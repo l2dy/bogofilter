@@ -59,6 +59,10 @@ char *resolve_home_directory(const char *filename)
 {
     char *tmp;
     const char *home = find_home(1);
+
+    if (filename[0] == '/') /* absolute */
+	return xstrdup(filename);
+
     if (home == NULL)
     {
 	fprintf(stderr, "Can't find home directory.\n");
