@@ -27,7 +27,7 @@ Summary: Statically linked
 Group: Applications/Internet
 Conflicts: bogofilter
 %description static
-Statically linked bogofilter, bogolexer, and bogoutil
+Statically linked bogofilter, bogolexer, bogoutil, and bogotune
 
 %prep
 %setup
@@ -83,14 +83,14 @@ for README in randomtrain ; do
 done
 
 %post static
-for file in bogofilter bogolexer bogoutil ; do
+for file in bogofilter bogolexer bogoutil bogotune ; do
     if [ $1 -lt 2 ] ; then
         ln -s %{_bindir}/${file}_static %{_bindir}/${file} 
     fi
 done
 
 %postun static
-for file in bogofilter bogolexer bogoutil ; do
+for file in bogofilter bogolexer bogoutil bogotune ; do
     if [ $1 -eq 0 ] ; then
         rm -f %{_bindir}/${file}
         echo rm -f %{_bindir}/${file}
@@ -103,6 +103,7 @@ done
 %{_bindir}/bogofilter
 %{_bindir}/bogolexer
 %{_bindir}/bogoutil
+%{_bindir}/bogotune
 %{_bindir}/bogoupgrade
 %{_sysconfdir}/bogofilter.cf.example
 %config(noreplace) %{_sysconfdir}/bogofilter.cf
@@ -111,7 +112,6 @@ done
 %{_mandir}/man1/bogolexer.1*
 %{_mandir}/man1/bogoutil.1*
 %{_mandir}/man1/bogoupgrade.1*
-%{_mandir}/man1/bogol.1*
 %{_mandir}/man1/bogotune.1*
 
 %doc AUTHORS CHANGES-* COPYING INSTALL METHODS NEWS
@@ -132,6 +132,7 @@ done
 %{_bindir}/bogofilter_static
 %{_bindir}/bogolexer_static
 %{_bindir}/bogoutil_static
+%{_bindir}/bogotune_static
 %{_bindir}/bogoupgrade
 
 %{_sysconfdir}/bogofilter.cf.example
@@ -141,7 +142,6 @@ done
 %{_mandir}/man1/bogolexer.1*
 %{_mandir}/man1/bogoutil.1*
 %{_mandir}/man1/bogoupgrade.1*
-%{_mandir}/man1/bogol.1*
 %{_mandir}/man1/bogotune.1*
 
 %doc AUTHORS CHANGES-* COPYING INSTALL METHODS NEWS
