@@ -42,7 +42,7 @@ typedef struct wordhash_s {
   /*@null@*/  /*@dependent@*/ size_t count;		/* size of array */
   /*@null@*/  /*@dependent@*/ size_t wordcount;		/* count of words */
   /*@null@*/  /*@dependent@*/ hashnode_t **order;	/* array of nodes */
-
+  /*@null@*/  /*@dependent@*/ hashnode_t  *props;	/* array of nodes */
 } wordhash_t;
 
 /*@only@*/ wordhash_t *wordhash_init(void);
@@ -51,6 +51,10 @@ void wordhash_free(/*@only@*/ wordhash_t *);
 size_t wordhash_count(wordhash_t * h);
 void wordhash_sort(wordhash_t * h);
 void wordhash_add(wordhash_t *dst, wordhash_t *src, void (*initializer)(void *));
+void wordhash_print(const char *lbl, wordhash_t *wh);
+void wordhash_set_counts(wordhash_t *wh, int good, int bad);
+
+void * wordhash_search (wordhash_t *wh, word_t *t, unsigned int hash);
 
 /* Given h, s, n, search for key s.
  * If found, return pointer to associated buffer.
@@ -62,5 +66,9 @@ void wordhash_add(wordhash_t *dst, wordhash_t *src, void (*initializer)(void *))
 
 /* returns next entry or NULL if at end */
 /*@null@*/ /*@exposed@*/ hashnode_t *wordhash_next(wordhash_t *);
+
+typedef void wh_foreach_t(word_t *token, void *data, void *userdata);
+void wordhash_foreach(wordhash_t *wh, wh_foreach_t *hook, void *userdata);
+void wordhash_convert_to_proplist(wordhash_t *wh, wordhash_t *db);
 
 #endif
