@@ -37,15 +37,15 @@ wait
 
 [ -n "$BF_SAVEDIR" ] && . ${srcdir}/t.save
 
-# check exit codes -- fed up with shell junk,  use awk
+# check exit codes
 ok=0
-${AWK=awk} <$TMPDIR/res \
-'{ 
+$AWK <$TMPDIR/res \
+'{
     if ($0 ~ /^[0|1]$/) {
-	ok=1; 
-     } else { 
-	fail=1; 
-    } 
+	ok=1;
+     } else {
+	fail=1;
+    }
  }
 
  END {

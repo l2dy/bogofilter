@@ -75,9 +75,9 @@ for alg in f r g ; do
     # run tests for msg.1.txt, msg.2.txt, and msg.3.txt
     #
     for tst in 1.1.v 2.2a.vv 2.2a.vvv 3.3.vvv ; do
-	in=`echo $tst | tr "." " " | awk '{print $1}'`
-	out=`echo $tst | tr "." " " | awk '{print $2}'`
-	ver=`echo $tst | tr "." " " | awk '{print $3}'`
+	in=`echo $tst | tr "." " " | $AWK '{print $1}'`
+	out=`echo $tst | tr "." " " | $AWK '{print $2}'`
+	ver=`echo $tst | tr "." " " | $AWK '{print $3}'`
 	map_rc $BOGOFILTER $OPTS -$alg -$ver 2>/dev/null \
 	< ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg || :
 	sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
@@ -88,9 +88,9 @@ for alg in f r g ; do
     #
     $BOGOFILTER $OPTS -$alg -s < ${SYSTEST}/inputs/msg.3.txt
     for tst in 2.2b.vv 2.2b.vvv ; do
-	in=`echo $tst | tr "." " " | awk '{print $1}'`
-	out=`echo $tst | tr "." " " | awk '{print $2}'`
-	ver=`echo $tst | tr "." " " | awk '{print $3}'`
+	in=`echo $tst | tr "." " " | $AWK '{print $1}'`
+	out=`echo $tst | tr "." " " | $AWK '{print $2}'`
+	ver=`echo $tst | tr "." " " | $AWK '{print $3}'`
 	map_rc $BOGOFILTER $OPTS -$alg -$ver 2>/dev/null \
 	< ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg
 	sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver

@@ -19,14 +19,14 @@ EXP="21 48"
 $BOGOFILTER -W -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER -W -n < ${SYSTEST}/inputs/good.mbx
 
-COM=`$BOGOUTIL   -W -w $BOGOFILTER_DIR .MSG_COUNT | tail -1 | awk '{printf "%s %s", $2, $3}'`
+COM=`$BOGOUTIL   -W -w $BOGOFILTER_DIR .MSG_COUNT | tail -1 | $AWK '{printf "%s %s", $2, $3}'`
 
 # separate wordlists
 
 $BOGOFILTER -WW -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER -WW -n < ${SYSTEST}/inputs/good.mbx
 
-SEP=`$BOGOUTIL   -W -w $BOGOFILTER_DIR .MSG_COUNT | tail -1 | awk '{printf "%s %s", $2, $3}'`
+SEP=`$BOGOUTIL   -W -w $BOGOFILTER_DIR .MSG_COUNT | tail -1 | $AWK '{printf "%s %s", $2, $3}'`
 
 if [ "$COM" != "$EXP" ] ; then
     echo com: $COM, exp: $EXP

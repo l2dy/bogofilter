@@ -40,6 +40,8 @@ GREP=/bin/grep
 test -x $GREP || GREP=/usr/bin/grep
 test -x $GREP || { echo >&2 'Cannot find grep!' ; exit 1 ; }
 export GREP
+: ${AWK=awk}
+export AWK
 
 LANG=
 LC_COLLATE=

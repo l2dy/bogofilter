@@ -24,11 +24,11 @@ $BOGOUTIL -d ${WORDLIST} > ${TMPDIR}/output.1
 $BOGOUTIL -n -m ${WORDLIST}
 $BOGOUTIL -d ${WORDLIST} > ${TMPDIR}/output.2
 
-LEN1=`wc -l ${TMPDIR}/output.1 | awk '{print $1}'`
-LEN2=`wc -l ${TMPDIR}/output.2 | awk '{print $1}'`
+LEN1=`wc -l ${TMPDIR}/output.1 | $AWK '{print $1}'`
+LEN2=`wc -l ${TMPDIR}/output.2 | $AWK '{print $1}'`
 
-TOKDAT1=`head -1 ${TMPDIR}/output.2 | awk '{print $2 "." $4 }'`
-TOKDAT2=`tail -1 ${TMPDIR}/output.2 | awk '{print $2 "." $4 }'`
+TOKDAT1=`head -1 ${TMPDIR}/output.2 | $AWK '{print $2 "." $4 }'`
+TOKDAT2=`tail -1 ${TMPDIR}/output.2 | $AWK '{print $2 "." $4 }'`
 
 RESULT=`printf "%d.%d.%s.%s" $LEN1 $LEN2 $TOKDAT1 $TOKDAT2`
 
