@@ -2,6 +2,10 @@
 				BOGOFILTER NEWS
 			       =================
  
+2003-07-17
+ 
+* Added tdb (trivial database) support.
+ 
 2003-07-16
  
 * Initial release of code allowing bogofilter to use a single
