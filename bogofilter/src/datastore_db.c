@@ -179,8 +179,18 @@ int db_lock(int fd, int cmd, short int type)
     return (fcntl(fd, cmd, &lock));
 }
 
-static void dsm_init(void)
+static void dsm_init(int override /** 0 => traditional, 1 => TXN,
+				    other => use specified */)
 {
+    switch(override) {
+	case 0:
+	    fTransaction = false;
+	    break;
+	case 1:
+	    fTransaction = true;
+	    break;
+    }
+
     /* overrides for test suite etc. */
 #ifdef DISABLE_TRANSACTIONS
     if (getenv("BF_FORCE_NON_TRANSACTIONAL"))
@@ -233,15 +243,77 @@ static void handle_free(/*@only@*/ dbh_t *handle)
     return;
 }
 
-/* initialize data base, configure some lock table sizes
+/** probe if the directory contains an environment, and if so, if it has
+ * transactions
+ * \return
+ *         - -1 for error
+ *         -  0 for no transactions
+ *         -  1 for transactions
+ *         -  2 for don't know
+ */
+static int probe_txn(const char *directory, const char *file)
+{
+    DB_ENV *dbe;
+    int r;
+    u_int32_t flags;
+
+    r = db_env_create(&dbe, 0);
+    if (r) {
+	print_error(__FILE__, __LINE__, "cannot create environment handle: %s",
+		db_strerror(r));
+	return -1;
+    }
+
+    r = dbe->open(dbe, directory, DB_JOINENV, DS_MODE);
+    if (r == ENOENT) {
+	struct stat st;
+	int w;
+	char *t = build_path(directory, file);
+
+	/* no environment found */
+	dbe->close(dbe, 0);
+
+	w = stat(t, &st);
+	if (w == 0)
+	    return 0;
+	if (errno == ENOENT)
+	    return 2;
+	print_error(__FILE__, __LINE__, "cannot stat %s" DIRSEP_S "%s: %s",
+		directory, file, db_strerror(r));
+	return -1;
+    }
+    if (r != 0) {
+	print_error(__FILE__, __LINE__, "cannot join environment: %s",
+		db_strerror(r));
+	return -1;
+    }
+
+    /* environment found */
+    r = dbe->get_open_flags(dbe, &flags);
+    if (r) {
+	print_error(__FILE__, __LINE__, "cannot query flags: %s",
+		db_strerror(r));
+	return -1;
+    }
+
+    dbe->close(dbe, 0);
+    if ((flags & DB_INIT_TXN) == 0) {
+	print_error(__FILE__, __LINE__, "environment found but does not support transactions.");
+	return -1;
+    }
+    return 1;
+}
+
+/** Initialize data base, configure some lock table sizes
  * (which can be overridden in the DB_CONFIG file)
  * and lock the file to tell other parts we're initialized and
- * do not want recovery to stomp over us
+ * do not want recovery to stomp over us.
  */
-void *dbe_init(const char *directory)
+void *dbe_init(const char *directory, const char *file)
 {
     char norm_dir[PATH_MAX+1]; /* check normalized directory names */
     char norm_home[PATH_MAX+1];/* see man realpath(3) for details */
+    int txn;
 
     dbe_t *env;
 
@@ -278,7 +350,15 @@ void *dbe_init(const char *directory)
 
     assert(directory);
 
-    dsm_init();
+    if (DEBUG_DATABASE(2))
+	fprintf(dbgout, "probing \"%s\" and \"%s\" for environment...\n", directory, file);
+
+    txn = probe_txn(directory, file);
+
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "probing \"%s\" and \"%s\" result %d\n", directory, file, txn);
+
+    dsm_init(txn);
 
     env = dsm->dsm_env_init(directory);
 
@@ -732,7 +812,7 @@ static uint32_t db_get_flags(DB *dbp, uint32_t test)
 {
     int ret;
     uint32_t flags;
-    uint32_t mask = ~1;
+    uint32_t mask = DB_NOSYNC;
 
     ret = dbp->get_flags(dbp, &flags);
     if (ret) {
@@ -769,7 +849,7 @@ void db_close(void *vhandle)
 
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB->close(%s, %s)\n",
-		handle->name, flag & DB_NOSYNC ? "nosync" : "sync");
+		handle->name, flag & DB_NOSYNC ? "DB_NOSYNC" : "0");
 
     if (handle->txn) {
 	print_error(__FILE__, __LINE__, "db_close called with transaction still open, program fault!");
