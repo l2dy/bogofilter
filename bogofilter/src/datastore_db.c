@@ -261,20 +261,18 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	}
 
 	/* open data base */
-	t = handle->name;
-	if (dbe && bogohome && 
-	    strncmp(t, bogohome, strlen(bogohome)) == 0) {
-	    /* strip prefix, BerkeleyDB will add it */
-	    t += strlen(bogohome);
-	    while (*t == DIRSEP_C) t++;
-	}
+	if (dbe && (t = strrchr(handle->name, DIRSEP_C)))
+	    t++;
+	else
+	    t = handle->name;
+
 	if ((ret = DB_OPEN(dbp, t, NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0
 	    && ( ret != ENOENT || opt_flags == DB_RDONLY ||
 		(ret = DB_OPEN(dbp, t, NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0))
 	{
 	    /* close again and bail out without further tries */
-	    print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s",
-		    handle->name, ret, db_strerror(ret));
+	    print_error(__FILE__, __LINE__, "(db) open(%s) - actually %s bogohome: %s -, err: %d, %s",
+		    handle->name, t, bogohome, ret, db_strerror(ret));
 	    dbp->close(dbp, 0);
 	    goto open_err;
 	}
@@ -582,6 +580,9 @@ const char *db_str_err(int e) {
  * or transactional initialization/shutdown */
 static bool init = false;
 int db_init(void) {
+    if (!bogohome)
+	abort();
+
     if (bogohome && getenv("BF_EXPERIMENTAL_DBENV")) {
 	int ret = db_env_create(&dbe, 0);
 	if (ret != 0) {
