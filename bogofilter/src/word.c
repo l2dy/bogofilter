@@ -51,7 +51,7 @@ word_t *word_dup(const word_t *word)
 word_t *word_cpy(word_t *dst, const word_t *src)
 {
     dst->leng = src->leng;
-    memcpy(dst->text, src->text, src->leng+D);
+    memcpy(dst->text, src->text, src->leng);
     Z(dst->text[dst->leng]);			/* for easier debugging - removable */
     return dst;
 }
