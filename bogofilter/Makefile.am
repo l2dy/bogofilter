@@ -40,3 +40,6 @@ EXTRA_DIST = $(man1_MANS) \
 .PHONY: rpm
 rpm:	    dist $(distdir).tar.gz
 	rpm -ta $(distdir).tar.gz
+
+TESTS=t.score1 t.score2 t.lock1 t.skel
+XFAIL_TESTS=t.skel
