@@ -302,7 +302,7 @@ static void read_config_file(const char *fname, bool tilde_expand)
 	exit(2);
 }
 
-static int validate_args(/*@unused@*/ int argc, /*@unused@*/ char **argv)
+static int validate_args(void)
 {
     bool registration, classification;
 
@@ -483,7 +483,7 @@ int process_args(int argc, char **argv)
 	}
     }
 
-    exitcode = validate_args(argc, argv);
+    exitcode = validate_args();
 
     return exitcode;
 }
