@@ -13,11 +13,8 @@
  * Our lexical analysis is different from Paul Graham's rules: 
  *
  * We throw away headers that are readily identifiable as dates.
- * We throw away text lines that look like BASE64 encoding.
  * We throw away all digit strings that don't look like IP address parts.
  * We thow away lines beginning with <tab>id<space> -- mailer UDs.
- * We throw away various bits of MIME cruft (things that look like
- * declarations and boundaries for multipart declarations).
  * We throw away *all* tokens of length 1 or 2.
  *
  * These are optimizations to keep the token lists from bloating.
@@ -32,8 +29,6 @@
  * If a URL is a spam indicator, very likely any other URL from the
  * same site is as well, so the hostname part should be an adequate
  * statistical trigger.  
- *
- * The list of HTML keywords and attributes to be ignored is from the 4.0 DTD.
  *
  * LEXED_TOKENS, which are found in "msg-count" files need a special pattern
  * because they can be:
@@ -167,7 +162,11 @@ TOKEN 		{TOKENFRONT}{TOKENMID_NJS_DR}{TOKENBACK}
 
 <HTML>"<!--"					{ BEGIN SCOMMENT; }
 <HTML>"<!"					{ if (!strict_check) {
-						  BEGIN LCOMMENT; } else { BEGIN HTOKEN; }}
+						    BEGIN LCOMMENT;
+						  } else { 
+						    BEGIN HTOKEN;
+						  }
+						}
 
 <LCOMMENT>">"					{ BEGIN HTML; }	/* end of loose comment; return to normal html processing */
 <SCOMMENT>"-->"					{ BEGIN HTML; }	/* end of strict comment; return to normal html processing */
@@ -180,12 +179,10 @@ TOKEN 		{TOKENFRONT}{TOKENMID_NJS_DR}{TOKENBACK}
 
 {IPADDR}					{ return IPADDR;}
 {TOKEN}						{ return TOKEN;}
-
-.						;
+.						/* ignore character */ ;
 \n						{ got_newline(); 
 						  lineno += 1;
 						}
-
 %%
 
 void lexer_v3_init(FILE *fp)
