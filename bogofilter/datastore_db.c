@@ -21,22 +21,13 @@ AUTHOR:
 #include <config.h>
 #include "common.h"
 
-#ifdef	HAVE_SYSLOG_H
-#include <syslog.h>
-#endif
-
+#include "error.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 #include "datastore.h"
 #include "datastore_db.h"
 
 #define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
-
-#ifdef	HAVE_SYSLOG_H
-#define SYSLOG_ERROR(format, filename)      if (logflag) syslog( LOG_ERR, format, filename)
-#else
-#define SYSLOG_ERROR(format, filename)
-#endif
 
 #if DB_VERSION_MAJOR <= 3 || DB_VERSION_MINOR == 0
 #define	DB_OPEN(db, file, database, dbtype, flags, mode) db->open(db, file, database, dbtype, flags, mode)
@@ -46,8 +37,8 @@ AUTHOR:
 
 static void db_enforce_locking(dbh_t *handle, const char *func_name){
   if (handle->locked == false){
-    fprintf(stderr, "%s (%s): Attempt to access unlocked handle.\n", func_name, handle->name);
-    exit(2);
+      PRINT_ERROR("%s (%s): Attempt to access unlocked handle.", func_name, handle->name );
+      exit(2);
   }
 }
 
@@ -94,11 +85,11 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode){
 
     handle = dbh_init(db_file, name);
     if ((ret = db_create (&(handle->dbp), NULL, 0)) != 0){
-	   fprintf (stderr, "%s (db) db_create: %s\n", progname, db_strerror (ret));
+	PRINT_ERROR("(db) create, err: %d, %s", ret, db_strerror(ret));
     }
     else if ((ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags, 0664)) != 0)
     {
-	handle->dbp->err (handle->dbp, ret, "%s (db) open: %s", progname, db_file);
+	PRINT_ERROR("(db) open( %s ), err: %d, %s", db_file, ret, db_strerror(ret));
     }
     else {
       /* see if the database byte order differs from that of the cpu's */
@@ -165,7 +156,7 @@ long db_getvalue(void *vhandle, const char *word){
       return 0;
     }
     else {
-	handle->dbp->err (handle->dbp, ret, "%s (db) db_getvalue: %s", progname, word);
+	PRINT_ERROR("(db) db_getvalue( '%s' ), err: %d, %s", word, ret, db_strerror(ret));
 	exit(2);
     }
 }
@@ -205,7 +196,7 @@ void db_setvalue(void *vhandle, const char * word, long value){
     }
     else 
     {
-	handle->dbp->err (handle->dbp, ret, "%s (db) db_setvalue: %s", progname, word);
+	PRINT_ERROR("(db) db_setvalue( '%s' ), err: %d, %s", word, ret, db_strerror(ret));
 	exit(2);
     }
 }
@@ -268,7 +259,7 @@ static int db_lock(dbh_t *handle, int cmd, int type){
   struct flock lock;
 
   if ( (ret = handle->dbp->fd(handle->dbp, &fd)) != 0){
-    handle->dbp->err (handle->dbp, ret, "%s (db) db_lock:", progname);
+    PRINT_ERROR("(db) db_lock: %d, err: %d, %s", cmd, ret, db_strerror(ret));
     exit(2);
   }
 
@@ -296,9 +287,8 @@ void db_lock_reader(void *vhandle){
     	  fprintf(stderr, "[%lu] Faked read lock on %s.\n", (unsigned long) handle->pid, handle->filename);
     }
     else {
-    fprintf(stderr, "[%lu] Error acquiring read lock on %s\n", (unsigned long) handle->pid, handle->filename);
-    SYSLOG_ERROR( "Error acquiring read lock on %s\n", handle->filename);
-    exit(2);
+	PRINT_ERROR( "Error acquiring read lock on %s\n", handle->filename);
+	exit(2);
     }
   }
 
@@ -318,9 +308,8 @@ void db_lock_writer(void *vhandle){
     fprintf(stderr, "[%lu] Acquiring write lock on %s\n", (unsigned long) handle->pid, handle->filename);
 
   if (db_lock(handle, F_SETLKW, F_WRLCK) != 0){
-    fprintf(stderr, "[%lu] Error acquiring write lock on %s\n", (unsigned long) handle->pid, handle->filename);
-    SYSLOG_ERROR( "Error acquiring write lock on %s\n", handle->filename);
-    exit(2);
+      PRINT_ERROR( "Error acquiring write lock on %s\n", handle->filename);
+      exit(2);
   }
 
   if (DEBUG_DATABASE(1))
@@ -340,9 +329,8 @@ void db_lock_release(void *vhandle){
       fprintf(stderr, "[%lu] Releasing lock on %s\n", (unsigned long) handle->pid, handle->filename);
 
     if (db_lock(handle, F_SETLK, F_UNLCK) != 0){
-      fprintf(stderr, "[%lu] Error releasing on %s\n", (unsigned long) handle->pid, handle->filename);
-      SYSLOG_ERROR( "Error releasing on %s\n", handle->filename);
-      exit(2);
+	PRINT_ERROR( "Error releasing on %s\n", handle->filename);
+	exit(2);
     }
   }
   else if (DEBUG_DATABASE(1)) {
@@ -366,11 +354,10 @@ void db_lock_release_list(wordlist_t *list){
 
 static void lock_msg(const dbh_t *handle, int idx, const char *msg, int cmd, int type)
 {
-
   const char *block_type[] = { "nonblocking", "blocking" };
   const char *lock_type[]  = { "write", "read" };
                                                      
-  fprintf(stderr, "[%lu] [%d] %s %s %s lock on %s\n", 
+  PRINT_ERROR("[%lu] [%d] %s %s %s lock on %s", 
 	          (unsigned long)handle->pid,
                   idx,
 		  msg,
