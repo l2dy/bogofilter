@@ -68,6 +68,7 @@ static int yyinput(char *buf, int max_size);
 %option align nounput noyywrap noreject 8bit
 
 BASE64		^([A-Za-z0-9/+]+={1,2}|[A-Za-z0-9/+]{32,})$
+UUENCODE	^M[^ ]{60}$
 UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
 IPADDR		{UINT8}\.{UINT8}\.{UINT8}\.{UINT8}
 MIME_BOUNDARY	^--[^[:blank:][:cntrl:]]+
@@ -233,6 +234,7 @@ width	;
 ^Date:.*|Delivery-Date:.*			;
 ^Message-ID:.*					;
 {BASE64}					;
+{UUENCODE}					;
 ^\tid\ .*					;
 
 E?SMTP\ id\ .*					;
