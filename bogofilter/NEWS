@@ -5,7 +5,7 @@
 NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
-RELEASE.NOTES-0.93 has two important sections entitled:
+RELEASE.NOTES has two important sections entitled:
 
         INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
 and     MAJOR CHANGES IN BOGOFILTER 0.93
@@ -22,6 +22,17 @@ Briefly:
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
 0.93.1	2004-11-??
+
+	2004-11-09
+
+	* Unify and clean up the horrible RELEASE.NOTES-*, CHANGES* and NEWS-*
+	  mess with lots of duplicated info.
+	  There shall only be one RELEASE.NOTES file and one NEWS file.
+	  RELEASE.NOTES shall contain important information for updates.
+	  NEWS shall contain noteworthy code changes in technical detail.
+
+	  This also removes the confusion that RELEASE.NOTES didn't contain
+	  information relevant for 0.93.X.
 
 	2004-11-08
 
