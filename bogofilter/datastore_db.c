@@ -122,6 +122,9 @@ long db_getvalue(void *vhandle, char *word){
       return(value);
     }
     else if (ret == DB_NOTFOUND){
+      if (DEBUG_DATABASE(2)) {
+        fprintf(stderr, "[%lu] db_getvalue (%s): DB_NOTFOUND\n", (unsigned long)handle->pid, handle->name, word);
+      }
       return 0;
     }
     else {
@@ -169,7 +172,6 @@ void db_setvalue(void *vhandle, char * word, long value){
   Increment count associated with WORD, by VALUE.
  */
 void db_increment(void *vhandle, char *word, long value){
-
   value += db_getvalue(vhandle, word);
 
   if (value < 0)
@@ -184,16 +186,12 @@ void db_increment(void *vhandle, char *word, long value){
   if WORD exists in the database.
 */
 void db_decrement(void *vhandle, char *word, long value){
-  long n;
+  value = db_getvalue(vhandle, word) - value;
 
-  n = db_getvalue(vhandle, word);
+  if (value < 0)
+    value = 0;
 
-  if (n > value)
-    n -= value;
-  else
-    n = 0;
-
-  db_setvalue(vhandle, word, n);
+  db_setvalue(vhandle, word, value);
 }
 
 /*
@@ -250,7 +248,6 @@ static int db_lock(dbh_t *handle, int cmd, int type){
 Acquires blocking read lock on database.
 */
 void db_lock_reader(void *vhandle){
-
   dbh_t *handle = vhandle;
 
   if (DEBUG_DATABASE(1))
@@ -291,7 +288,6 @@ void db_lock_writer(void *vhandle){
 Releases acquired lock
 */
 void db_lock_release(void *vhandle){
-
   dbh_t *handle = vhandle;
 
   if (handle->locked == TRUE){
