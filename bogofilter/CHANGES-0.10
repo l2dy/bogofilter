@@ -4,6 +4,11 @@
 
 $Id$
      
+0.10.2	2003-02-03
+
+	* Support option '-?'
+	* Fix handling of consecutive html comments.
+
 0.10.1.5 2003-02-01
 
 	* Locking: use random sleep interval in case of lock conflict.
