@@ -29,13 +29,14 @@ AUTHOR:
 
 #include "charset.h"
 #include "lexer.h"
+#include "maint.h"		/* for replace_nonascii_characters */
 #include "xmalloc.h"
 #include "xstrdup.h"
 
 #define	SP	' '
 
 const char *charset_default = "us-ascii";
-bool replace_nonascii_characters = false;
+/* bool replace_nonascii_characters = false; */
 
 unsigned char charset_table[256];
 unsigned char casefold_table[256];
@@ -264,6 +265,7 @@ static void map_us_ascii(void)
 
     map_xlate_characters( xlate_us, COUNTOF(xlate_us) );
 }
+
 static void map_unicode(void)
 {
     /* Not yet implemented */
