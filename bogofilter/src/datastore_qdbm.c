@@ -28,9 +28,14 @@ Stefan Bellon <sbellon@sbellon.de>       2003
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-#define DB_INITBNUM  1913
-#define DB_ALIGNSIZE   16
-#define DB_MAXLOAD   1.25
+/* initial bucket array element count (for new data base) */
+static const int DB_INITBNUM = 1913;
+/* align to size for quick overwrites.
+ * XXX FIXME: make this 12 to conserve space? */
+static const int DB_ALIGNSIZE = 16;
+/* reorganize data base if record/bucket ratio grows above this 
+ * hence "FILL" for "bucket fill ratio". */
+static const double DB_MAXFILL = 0.8;
 
 typedef struct {
     char *path;
@@ -185,7 +190,7 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
     if (data == NULL)
 	return DS_NOTFOUND;
 
-    if (val->size < dsiz) {
+    if (val->size < (unsigned)dsiz) {
 	print_error(__FILE__, __LINE__, "(qdbm) db_get_dbvalue( '%s' ), size error %d: %d",
 		    (char *)token->data, val->size, dsiz);
 	exit(EX_ERROR);
@@ -236,10 +241,10 @@ void db_close(void *vhandle, bool nosync)
     for (i = 0; i < handle->count; i += 1) {
 	DEPOT *dbp = handle->dbp[i];
 
-	/* re-organize DB when fill ratio > DB_MAXLOAD */
+	/* re-organize DB when fill ratio > DB_MAXFILL */
 	bnum = dpbnum(dbp);
 	rnum = dprnum(dbp);
-	if (bnum > 0 && rnum > 0 && ((double)rnum / (double)bnum > DB_MAXLOAD))
+	if (bnum > 0 && rnum > 0 && ((double)rnum / bnum > DB_MAXFILL))
 	{
 	    if (!dpoptimize(dbp, -1))
 		print_error(__FILE__, __LINE__, "(qdbm) dpoptimize for %s failed: %s",
