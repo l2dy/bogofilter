@@ -1,31 +1,34 @@
 /* $Id$ */
 /* $Log$
+ * Revision 1.8  2002/09/23 11:27:25  m-a
+ * Drop unused `inheaders' variable, unnest comments.
+ *
  * Revision 1.7  2002/09/23 10:08:49  m-a
  * Integrate patch by Zeph Hull and Clint Adams to present spamicity in
  * X-Spam-Status header in bogofilter -p mode.
  *
-/* Revision 1.6  2002/09/20 15:27:27  m-a
-/* Optimize bogofilter -p: use tighter loop, print our X-Spam-Status: header after
-/* all other headers, and ensure that there is always an empty line after the
-/* headers. We have much less checks in the loops, so it should be somewhat
-/* faster now.
-/*
-/* Revision 1.5  2002/09/17 07:19:04  adrian_otto
-/* Added -V mode for printing out version information.
-/*
-/* Revision 1.4  2002/09/16 20:44:13  m-a
-/* Do not increment passthrough on -p, but set it to 1.
-/*
-/* Revision 1.3  2002/09/15 19:07:13  relson
-/* Add an enumerated type for return codes of RC_SPAM and RC_NONSPAM, which  values of 0 and 1 as called for by procmail.
-/* Use the new codes and type for bogofilter() and when generating the X-Spam-Status message.
-/*
-/* Revision 1.2  2002/09/15 16:31:41  relson
-/* Substitute STDIN_FILENO where numeric constant 0 is used as a file descriptor.
-/*
-/* Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
-/* 0.7.3 Base Source
-/* */
+ * Revision 1.6  2002/09/20 15:27:27  m-a
+ * Optimize bogofilter -p: use tighter loop, print our X-Spam-Status: header after
+ * all other headers, and ensure that there is always an empty line after the
+ * headers. We have much less checks in the loops, so it should be somewhat
+ * faster now.
+ *
+ * Revision 1.5  2002/09/17 07:19:04  adrian_otto
+ * Added -V mode for printing out version information.
+ *
+ * Revision 1.4  2002/09/16 20:44:13  m-a
+ * Do not increment passthrough on -p, but set it to 1.
+ *
+ * Revision 1.3  2002/09/15 19:07:13  relson
+ * Add an enumerated type for return codes of RC_SPAM and RC_NONSPAM, which  values of 0 and 1 as called for by procmail.
+ * Use the new codes and type for bogofilter() and when generating the X-Spam-Status message.
+ *
+ * Revision 1.2  2002/09/15 16:31:41  relson
+ * Substitute STDIN_FILENO where numeric constant 0 is used as a file descriptor.
+ *
+ * Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
+ * 0.7.3 Base Source
+ * */
 /*****************************************************************************
 
 NAME:
@@ -197,8 +200,6 @@ int main(int argc, char **argv)
 
 	if (passthrough)
 	{
-	    int	inheaders = 1;
-
 	    /* print headers */
 	    for (textend=&textblocks; textend->block; textend=textend->next)
 	    {
