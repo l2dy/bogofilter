@@ -20,9 +20,9 @@ NAME:
 #define	RF_DEBUG
 #undef	RF_DEBUG
 
-#define FISHER_HAM_CUTOFF	0.05f
-#define FISHER_SPAM_CUTOFF	0.952f
-#define FISHER_MIN_DEV		0.1f
+#define FISHER_HAM_CUTOFF	0.10f
+#define FISHER_SPAM_CUTOFF	0.96f
+#define FISHER_MIN_DEV		0.10f
 
 /* Function Prototypes */
 
@@ -35,7 +35,7 @@ static rc_t	fis_status(void);
 
 /* Static Variables */
 
-double ham_cutoff = 0.0f;
+double ham_cutoff = FISHER_HAM_CUTOFF;
 
 rf_method_t rf_fisher_method = {	/* used by config.c */
     {
@@ -92,8 +92,6 @@ void fis_print_summary(void)
 
 void fis_initialize_constants(void)
 {
-    if ( ham_cutoff < EPS )
-	ham_cutoff = FISHER_HAM_CUTOFF;
     rob_initialize_with_parameters(FISHER_MIN_DEV, FISHER_SPAM_CUTOFF);
 }
 
