@@ -211,10 +211,11 @@ void rstats_print_rtable(size_t robn, rstats_t **rstats_array)
     {
 	rstats_t *cur = rstats_array[r];
 	double prob = cur->prob;
+	char flag = (fabs(prob-EVEN_ODDS) < min_dev) ? '-' : '+';
 
-	(void)fprintf(stdout, "%3d  %-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f\n",
+	(void)fprintf(stdout, "%3d  %-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f %c\n",
 		      r+1, cur->token, cur->good, cur->bad, prob, 
-		      log(1.0 - prob), log(prob));
+		      log(1.0 - prob), log(prob), flag);
     }
 
     /* print trailer */
