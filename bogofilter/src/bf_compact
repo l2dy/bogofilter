@@ -6,6 +6,8 @@
 #    replaces original directory with new one
 #    renames original directory with '.old' extension
 
+# $Id$
+
 set -e # die on errors
 
 if [ -z "$1" ] ; then
