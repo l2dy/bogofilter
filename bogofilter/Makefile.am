@@ -9,7 +9,7 @@ SUBDIRS = . tests
 bin_PROGRAMS = bogofilter bogoutil bogolexer
 bin_SCRIPTS = bogoupgrade
 check_PROGRAMS = debugtest configtest wordhash find_home.test
-man1_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
+man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
 
 # what to build that from
 MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h debug.h \
@@ -39,7 +39,7 @@ wordhash_SOURCES = wordhash.c wordhash.h wordhash.main.c $(MYCOMMON)
 find_home_test_SOURCES = find_home.test.c $(MYCOMMON)
 
 # what to distribute
-EXTRA_DIST = $(man1_MANS) \
+EXTRA_DIST = $(man_MANS) \
 	     bogofilter.cf bogofilter-faq.html \
 	     README.hp-ux UPGRADE \
 	     bogofilter.xml bogoutil.xml bogoupgrade.xml bogolexer.xml \
