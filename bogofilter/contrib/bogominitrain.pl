@@ -1,3 +1,6 @@
+I think this is it. Test runs nicely.
+
+pi
 #!/usr/bin/perl
 # Script to train bogofilter from mboxes
 # by Boris 'pi' Piwinger <3.14@piology.org>
@@ -25,7 +28,7 @@ Usage:
   It may be a good idea to run this script command several times.  Use
   the '-f' option to run the script until no scoring errors occur.
 
-  To increase the size of your wordlists, which will help bogofilter's
+  To increase the size of your wordlists and to improve bogofilter's
   scoring accuracy, use bogofilter's -o option to set ham_cutoff and
   spam_cutoff to create an "unsure" interval around your normal
   spam_cutoff.  The script will train so that the messages will avoid
@@ -78,7 +81,6 @@ do { # Start force loop
   open (SPAM, "cat $spam|") || die("Cannot open spam: $!\n");
 
   # Loop through all the mails
-  # bogofilter return codes: 0 for spam; 1 for non-spam
   my ($lasthamline,$lastspamline,$hamcount,$spamcount,$hamadd,$spamadd) = ("","",0,0,0,0);
   do {
 
@@ -95,7 +97,7 @@ do { # Start force loop
         open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
         print TEMP $mail;
         close (TEMP);
-        unless ($dbexists && system("$bogofilter <$temp")/256==1) {
+        unless ($dbexists && `$bogofilter -vt <$temp`=~/^[NH]/) {
           system("$bogofilter -n <$temp");
           $hamadd++;
           $dbexists=1;
@@ -123,7 +125,7 @@ do { # Start force loop
         open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
         print TEMP $mail;
         close (TEMP);
-        unless (system("$bogofilter <$temp")/256==0) {
+        unless (`$bogofilter -vt <$temp`=~/^[YS]/) {
           system("$bogofilter -s <$temp");
           $spamadd++;
           print "Training spam message $spamcount.\n" if ($verbose);
@@ -145,9 +147,9 @@ do { # Start force loop
   print "Read $hamcount ham mails and $spamcount spam mails.\n";
   print "Added $hamadd ham mails and $spamadd spam mails to the database.\n";
   print `bogoutil -w $dir .MSG_COUNT`;
-  $fn=`cat $spam | $bogofilter -vM | grep -c Ham`;
+  $fn=`cat $spam | $bogofilter -vtM | egrep -cv ^[YS]`;
   print "\nFalse negatives: $fn";
-  $fp=`cat $ham | $bogofilter -vM | grep -c Spam`;
+  $fp=`cat $ham | $bogofilter -vtM| egrep -cv ^[NH]`;
   print "False positives: $fp\n";
 } until ($fn+$fp==0 || !$force);
-print "\n$runs run(s) needed to close off.\n" if ($force);
+print "\n$runs run",($runs==1)?"":"s"," needed to close off.\n" if ($force);
