@@ -3,7 +3,7 @@
 . ${srcdir=.}/t.frame
 
 OUT=${TMPDIR}/test.out
-REF=${SYSTEST}/outputs/multiple.wordlists.ref
+CORRECT=${SYSTEST}/outputs/multiple.wordlists.ref
 
 CF_DEFAULT=default.cf
 CF_IGN_REG=ign_reg.cf
@@ -144,8 +144,8 @@ done
 # compare test output to reference output
 
 if  [ $verbose -eq 0 ]; then
-    diff $REF $OUT
-    cmp $REF $OUT
+    diff $CORRECT $OUT
+    cmp $CORRECT $OUT
 else
-    diff $DIFF_BRIEF $REF $OUT
+    diff $DIFF_BRIEF $CORRECT $OUT
 fi
