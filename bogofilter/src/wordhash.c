@@ -101,7 +101,7 @@ wordhash_init (wh_t t, uint c)
 wordhash_t *
 wordhash_new (void)
 {
-    wh_t t = !msg_count_file ? WH_NORMAL : WH_CNTS;
+    wh_t t = (!fBogotune || !msg_count_file) ? WH_NORMAL : WH_CNTS;
     return wordhash_init(t, 0);
 }
 
