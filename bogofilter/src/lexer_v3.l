@@ -174,7 +174,7 @@ WHITESPACE	[ \t\n]
 
 NOTWHITESPACE	[^ \t\n]
 
-HTML_ENTITY		"&#"x?[[:digit:]]+";"
+HTML_ENTITY		"&#"x?[[:xdigit:]]+";"
 
 HTML_WI_COMMENTS	"<"[^\>]*">"
 
@@ -332,7 +332,7 @@ static int xtoi(char *in)
     int val = 0;
     while (isxdigit(*in)) {
 	char c = *in++;
-	val <<= 16;
+	val <<= 4;
 	val += isdigit(c) ? (c - '0') : (tolower(c) - 'a' + 10);
     }
     return val;
@@ -358,10 +358,13 @@ static void html_char(void)
 	yyunput(val, yytext);
 	yyleng = len;			/* adjust len to pre-char count */
     }
+    else {
+	if (yycopy)
+	    yycopy[yyleng-1] = ' ';	/* prevents parsing loop */
+    }
 
     if (yycopy != NULL) {
-	yyunput(' ', yytext);		/* prevents parsing loop */
-	while (--yyleng > 0)
+	while (yyleng-- > 0)
 	    yyunput(yycopy[yyleng], yytext);
 	xfree(yycopy);
     }
