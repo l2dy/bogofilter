@@ -15,7 +15,7 @@ AC_PROG_AWK
 AC_PROG_CC(gcc xlc cc)
 AC_PROG_RANLIB
 AC_PATH_PROGS(PERL, perl perl5, $PATH:/usr/local/bin:/usr/bin)
-AC_PATH_PROG(NSGMLS,nsgmls,:)
+AC_PATH_PROG(NSGMLS,nsgmls,false)
 AM_PROG_LEX
 
 dnl Check for extension

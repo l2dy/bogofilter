@@ -52,8 +52,9 @@ EXTRA_DIST = \
 	|| { rm -f $@ ; exit 1 ; }
 
 if ENABLE_XMLTO
-check-local:
-	@( set -e ; for i in $(HTML_DOCS) ; do $(NSGMLS) -s $$i \
+dist-local:
+	@case $(MFLAGS) in *s*) : ;; *) echo >&2 "validating $(HTML_DOCS)" ;; esac
+	@( set -e ; for i in $(HTML_DOCS) ; do $(NSGMLS) -s $(srcdir)/$$i \
 	    || { echo >&2 "ERROR: $$i does not validate." ; exit 1 ; } ; done )
 
 # Use Perl to fix up br0ken 0xa0 characters that the XML DocBook style
