@@ -44,6 +44,7 @@ Note: bogolexer also uses configfile.c.
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
+#include "bogohome.h"
 #include "bogoreader.h"
 #include "bool.h"
 #include "charset.h"
@@ -273,7 +274,8 @@ static const char *help_text[] = {
     "help options:\n",
     "  -h,                       - print this help message.\n",
     "  -V, --version             - print version information and exit.\n",
-    "  -Q, --query               - query (display) bogofilter configuration.\n",
+    "  -Q, --query               - query (display) base bogofilter configuration.\n",
+    "  -QQ                       - display extended configuration info.\n",
     "classification options:\n",
     "  -p, --passthrough         - passthrough.\n",
     "  -e, --ham-true            - in -p mode, exit with code 0 when the mail is not spam.\n",
@@ -538,7 +540,8 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'Q':
-	query = 1;
+	if (pass == PASS_1_CLI)
+	    query += 1;
 	break;
 
     case 'R':
@@ -692,38 +695,84 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     }
 }
 
+#define	Q1	if (query >= 1)
+#define	Q2	if (query >= 2)
+
 #define YN(b) (b ? "yes" : "no")
 #define NB(b) (b ? b : "")
 
 void query_config(void)
 {
-    fprintf(stdout, "# %s version %s\n", progname, version);
-    fprintf(stdout, "\n");
-    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "robx", robx, robx);
-    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "robs", robs, robs);
-    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "min_dev", min_dev, min_dev);
-    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "ham_cutoff", ham_cutoff, ham_cutoff);
-    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "spam_cutoff", spam_cutoff, spam_cutoff);
-    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "ns_esf", ns_esf, ns_esf);
-    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "sp_esf", sp_esf, sp_esf);
-    fprintf(stdout, "\n");
-    fprintf(stdout, "%-17s = %s\n",    "block_on_subnets",    YN(block_on_subnets));
-    fprintf(stdout, "%-17s = %s\n",    "charset_default",     charset_default);
-    fprintf(stdout, "%-17s = %s\n",    "replace_nonascii_characters", YN(replace_nonascii_characters));
-    fprintf(stdout, "%-17s = %s\n",    "stats_in_header",     YN(stats_in_header));
-    fprintf(stdout, "%-17s = %0.6f\n", "thresh_update",       thresh_update);
-    fprintf(stdout, "%-17s = %s\n",    "timestamp",           YN(timestamp_tokens));
-    fprintf(stdout, "\n");
-    fprintf(stdout, "%-17s = %s\n", "terse",               YN(terse));
-    fprintf(stdout, "%-17s = %s\n", "spam_header_name",    spam_header_name);
-    fprintf(stdout, "%-17s = %s\n", "spam_subject_tag",    NB(spam_subject_tag));
-    fprintf(stdout, "%-17s = %s\n", "unsure_subject_tag",  NB(unsure_subject_tag));
-    fprintf(stdout, "%-17s = %s\n", "header_format",       header_format);
-    fprintf(stdout, "%-17s = %s\n", "terse_format",        terse_format);
-    fprintf(stdout, "%-17s = %s\n", "log_header_format",   log_header_format);
-    fprintf(stdout, "%-17s = %s\n", "log_update_format",   log_update_format);
+    Q1 fprintf(stdout, "# %s version %s\n", progname, version);
+    Q1 fprintf(stdout, "\n");
+    Q1 fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "robx", robx, robx);
+    Q1 fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "robs", robs, robs);
+    Q1 fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "min_dev", min_dev, min_dev);
+    Q1 fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "ham_cutoff", ham_cutoff, ham_cutoff);
+    Q1 fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "spam_cutoff", spam_cutoff, spam_cutoff);
+    Q1 fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "ns_esf", ns_esf, ns_esf);
+    Q1 fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "sp_esf", sp_esf, sp_esf);
+    Q1 fprintf(stdout, "\n");
+    Q1 fprintf(stdout, "%-17s = %s\n",    "block_on_subnets",    YN(block_on_subnets));
+    Q1 fprintf(stdout, "%-17s = %s\n",    "charset_default",     charset_default);
+    Q1 fprintf(stdout, "%-17s = %s\n",    "replace_nonascii_characters", YN(replace_nonascii_characters));
+    Q1 fprintf(stdout, "%-17s = %s\n",    "stats_in_header",     YN(stats_in_header));
+    Q1 fprintf(stdout, "%-17s = %0.6f\n", "thresh_update",       thresh_update);
+    Q1 fprintf(stdout, "%-17s = %s\n",    "timestamp",           YN(timestamp_tokens));
+    Q2 fprintf(stdout, "%-17s = %d\n", 	  "timestamp-date", 	 today);
+    Q1 fprintf(stdout, "\n");
+    Q1 fprintf(stdout, "%-17s = %s\n", "terse",               YN(terse));
+    Q1 fprintf(stdout, "%-17s = %s\n", "spam_header_name",    spam_header_name);
+    Q1 fprintf(stdout, "%-17s = %s\n", "spam_subject_tag",    NB(spam_subject_tag));
+    Q1 fprintf(stdout, "%-17s = %s\n", "unsure_subject_tag",  NB(unsure_subject_tag));
+    Q1 fprintf(stdout, "%-17s = %s\n", "header_format",       header_format);
+    Q1 fprintf(stdout, "%-17s = %s\n", "terse_format",        terse_format);
+    Q1 fprintf(stdout, "%-17s = %s\n", "log_header_format",   log_header_format);
+    Q1 fprintf(stdout, "%-17s = %s\n", "log_update_format",   log_update_format);
     display_tag_array("spamicity_tags   ", spamicity_tags);
     display_tag_array("spamicity_formats", spamicity_formats);
+
+    Q2 fprintf(stdout, "\n");
+
+    Q2 fprintf(stdout, "%-17s = %s\n", "no-config-file", YN(suppress_config_file));
+    Q2 fprintf(stdout, "%-17s = %s\n", "config-file", config_file_name);
+    Q2 fprintf(stdout, "%-17s = %s\n", "user_config_file", user_config_file);
+    Q2 fprintf(stdout, "\n");
+
+    Q2 fprintf(stdout, "%-17s = %s\n", "bogofilter_dir", bogohome);
+    Q2 fprintf(stdout, "wordlist(s)\n"); display_wordlists();
+    Q2 fprintf(stdout, "\n");
+
+    Q2 fprintf(stdout, "%-17s = %s\n", "classify-files", YN(bulk_mode == B_CMDLINE));
+    Q2 fprintf(stdout, "%-17s = %s\n", "classify-mbox", YN(mbox_mode));
+    Q2 fprintf(stdout, "%-17s = %s\n", "classify-stdin", YN(bulk_mode == B_STDIN));
+    Q2 fprintf(stdout, "\n");
+
+    Q2 fprintf(stdout, "%-17s = %s\n", "unregister-nonspam", YN(run_type == UNREG_GOOD));
+    Q2 fprintf(stdout, "%-17s = %s\n", "unregister-spam", YN(run_type == UNREG_SPAM));
+    Q2 fprintf(stdout, "%-17s = %s\n", "register-ham", YN(run_type == REG_GOOD));
+    Q2 fprintf(stdout, "%-17s = %s\n", "register-spam", YN(run_type == REG_SPAM));
+    Q2 fprintf(stdout, "%-17s = %s\n", "update-as-classified", YN(run_type & RUN_UPDATE));
+    Q2 fprintf(stdout, "\n");
+
+    Q2 fprintf(stdout, "%-17s = %s\n", "syslog-tag", logtag);
+    Q2 fprintf(stdout, "%-17s = %s\n", "use-syslog", YN(logflag));
+    Q2 fprintf(stdout, "\n");
+
+    Q2 fprintf(stdout, "%-17s = %s\n", "dataframe", YN(Rtable));
+    Q2 fprintf(stdout, "%-17s = %s\n", "fixed-terse-format", YN(inv_terse_mode));
+    Q2 fprintf(stdout, "%-17s = %s\n", "report-unsure", YN(unsure_stats));
+    Q2 fprintf(stdout, "\n");
+
+    Q2 fprintf(stdout, "%-17s = %d\n", "db_cachesize", db_cachesize);
+    Q2 fprintf(stdout, "%-17s = %s\n", "debug-to-stdout", YN(dbgout == stdout));
+    Q2 fprintf(stdout, "%-17s = %s\n", "no-header-tags", YN(header_line_markup));
+    Q2 fprintf(stdout, "%-17s = %s\n", "nonspam-exits-zero", YN(nonspam_exits_zero));
+    Q2 fprintf(stdout, "%-17s = %s\n", "passthrough", YN(passthrough));
+/*  Q2 fprintf(stdout, "%-17s = %s\n", "debug-flags", xxx); */
+/*  Q2 fprintf(stdout, "%-17s = %s\n", "input-file", xxx);	 */
+/*  Q2 fprintf(stdout, "%-17s = %s\n", "output-file", xxx); */
+    Q2 fprintf(stdout, "%-17s = %d\n", "verbosity", verbose);
 
     exit(EX_OK);
 }
