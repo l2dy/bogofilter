@@ -39,7 +39,7 @@ typedef enum {
 	CP_INTEGER,
 	CP_DOUBLE,
 	CP_STRING,
-	CP_WORDLIST,
+	CP_WORDLIST
 } ArgType;
 
 typedef struct {

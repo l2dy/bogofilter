@@ -47,8 +47,8 @@ int main( int argc, char **argv)
 	if (strcmp(arg, "-v") == 0)
 	    verbose = 1;
     }
-    read_config_file("/etc/bogofilter.cf", 0);
-    read_config_file(".bogofilter.cf", 1);
+    read_config_file("/etc/bogofilter.cf", FALSE);
+    read_config_file(".bogofilter.cf", TRUE);
     /* read_config_file("./bogofilter.cf", 0); */
     return 0;
 }

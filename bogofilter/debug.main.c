@@ -32,7 +32,7 @@ static mask_char_to_symbol_t char_to_symbol[] =
 
 int main(int argc, char **argv)
 {
-    int i;
+    size_t i;
     for (i=0; i<sizeof(char_to_symbol)/sizeof(char_to_symbol[0]); i += 1)
     {
 	mask_char_to_symbol_t *ptr = char_to_symbol + i;

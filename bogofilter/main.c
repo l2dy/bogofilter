@@ -279,8 +279,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	exit(2);
 
     if (!quell_config_read) {
-	read_config_file(system_config_file, 0);
-	read_config_file(user_config_file, 1);
+	read_config_file(system_config_file, FALSE);
+	read_config_file(user_config_file, TRUE);
     }
 
     switch(run_type) {
