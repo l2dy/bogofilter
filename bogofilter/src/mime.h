@@ -41,7 +41,6 @@ void mime_boundary_set(word_t *text);
 bool got_mime_boundary(word_t *text);
 void mime_content(word_t *text);
 uint mime_decode(word_t *buff);
-bool mime_validate(word_t *buff);
 bool mime_is_boundary(word_t *boundary);
 enum mimetype get_content_type(void);
 
