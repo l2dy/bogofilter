@@ -85,7 +85,7 @@ EXTRA_DIST = $(man_MANS) \
 	     METHODS UPGRADE \
 	     bogofilter.xml bogoutil.xml bogoupgrade.xml bogolexer.xml \
 	     bogofilter.spec bogofilter.spec.in \
-	     bogoupgrade bogo.R \
+	     bogoupgrade \
 	     version.sh \
 	     README.cvs README.freebsd README.hp-ux \
 	     README.dcdflib README.Robinson \

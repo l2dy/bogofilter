@@ -403,10 +403,7 @@ mentioned.</para>
 <para>The R data frame can be saved to a file and later read
 into an R session (see <ulink url="http://cran.r-project.org">the R
 project website</ulink> for information about the mathematics package
-R).  Provided with the distribution is a simple R script (file bogo.R)
-that can be used to verify <application>bogofilter</application>'s
-calculations.  Instructions for its use are included in the script in
-the form of comments.</para>
+R).</para>
 </refsect1>
 
 <refsect1 id='files'><title>FILES</title>
