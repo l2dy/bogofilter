@@ -1,4 +1,4 @@
-X-Bogosity: No, tests=bogofilter, spamicity=0.543875
+X-Bogosity: No, tests=bogofilter, spamicity=0.543817
                                      n    pgood     pbad      fw     U
 "which"                             10  0.208333  0.000000  0.000415 +
 "working"                            6  0.125000  0.000000  0.000691 +
@@ -162,6 +162,7 @@ X-Bogosity: No, tests=bogofilter, spamicity=0.543875
 "may"                               13  0.187500  0.181818  0.492248 +
 "Delivered-To"                      70  1.000000  1.000000  0.499988 +
 "EST"                               70  1.000000  1.000000  0.499988 +
+"From"                              70  1.000000  1.000000  0.499988 +
 "Nov"                               70  1.000000  1.000000  0.499988 +
 "Postfix"                           70  1.000000  1.000000  0.499988 +
 "Received"                          70  1.000000  1.000000  0.499988 +
@@ -184,7 +185,6 @@ X-Bogosity: No, tests=bogofilter, spamicity=0.543875
 "Reply-To"                          46  0.625000  0.727273  0.537788 +
 "http"                              63  0.854167  1.000000  0.539306 +
 "text"                              63  0.854167  1.000000  0.539306 +
-"From"                              14  0.187500  0.227273  0.547850 +
 "bit"                               41  0.541667  0.681818  0.557241 +
 "Service"                            8  0.104167  0.136364  0.566739 +
 "Content-Transfer-Encoding"         40  0.520833  0.681818  0.566891 +
@@ -311,5 +311,5 @@ X-Bogosity: No, tests=bogofilter, spamicity=0.543875
 "Here"                               7  0.000000  0.318182  0.999165 +
 "Verdana"                            9  0.000000  0.409091  0.999351 +
 "FREE"                              11  0.000000  0.500000  0.999469 +
-P_Q_S_invs_logs_md                 311  0.791038  0.663409  0.543875
+P_Q_S_invs_logs_md                 311  0.790970  0.663508  0.543817
                                         1.00e-02  4.15e-01  0.000

@@ -13,10 +13,10 @@ $BOGOFILTER -C -n < ${SYSTEST}/inputs/good.mbx >> $TMPDIR/tmp
 CORRECT="$TMPDIR/result"
 
 cat >> $CORRECT <<EOF
-initial: 5063
-count 0 -> 5063
-count 1 -> 1753
-count 2 -> 878
+initial: 5086
+count 0 -> 5086
+count 1 -> 1756
+count 2 -> 879
 count 3 -> 571
 EOF
 
@@ -28,7 +28,8 @@ for cnt in 0 1 2 3 ; do
 done
 
 if  [ $verbose -eq 0 ]; then
-    cmp $CORRECT $OUT
+    cmp $CORRECT $OUT \
+    ||  diff $DIFF_BRIEF $CORRECT $OUT
 else
     diff $DIFF_BRIEF $CORRECT $OUT
 fi

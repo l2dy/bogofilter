@@ -13,4 +13,4 @@ X-Bogosity: No, tests=bogofilter, spamicity=0.010000
   0.990000  0.000000  Shipping
   0.990000  0.000001  ZYPb9G
   0.990000  0.000102  abuse
-  0.990000  0.010000  instructions
+  0.990000  0.010000  bounce.azogle.com
