@@ -24,7 +24,7 @@ AUTHOR:
 #include "token.h"
 #include "xmemrchr.h"
 
-/* Local Static Variables */
+/* Local Variables */
 
 word_t *yylval = NULL;
 
@@ -227,4 +227,12 @@ void set_tag(const char *tag)
 	word_free(token_prefix_next);
 	token_prefix_next = word_new((const byte *)tag, strlen(tag));
     }
+}
+
+/* Cleanup storage allocation */
+void token_cleanup()
+{
+    if (yylval)
+	word_free(yylval);
+    yylval = NULL;
 }

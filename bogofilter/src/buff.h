@@ -26,6 +26,7 @@ typedef struct {
 extern buff_t  *buff_new(byte *buff, size_t used, size_t size);
 extern buff_t  *buff_init(buff_t *self, byte *buff, size_t used, size_t size);
 extern void 	buff_free(buff_t *self);
+extern void	buff_free_text(buff_t *self);
 extern buff_t  *buff_dup(const buff_t *self);
 extern int 	buff_cmp(const buff_t *t1, const buff_t *t2);
 extern int	buff_fgetsl(buff_t *self, FILE *);

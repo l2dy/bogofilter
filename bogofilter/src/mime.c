@@ -157,6 +157,12 @@ mime_free (mime_t * t)
 
 }
 
+/** Cleanup storage allocation */
+void mime_cleanup()
+{
+    mime_free(msg_state);
+}
+
 static void
 mime_push (mime_t * parent)
 {
@@ -398,6 +404,8 @@ mime_version (word_t *text)
 
   if (!w) return;
 
+  if (msg_state->version)
+      xfree(msg_state->version);
   msg_state->version = w;
 }
 
@@ -540,6 +548,8 @@ mime_boundary_set (word_t *text)
   }
 
   boundary = getword(boundary + strlen("boundary="), boundary + blen);
+  if (msg_state->boundary)
+      xfree(msg_state->boundary);
   msg_state->boundary = (char *)boundary;
   msg_state->boundary_len = strlen((char *)boundary);
 

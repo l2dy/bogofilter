@@ -56,4 +56,6 @@ size_t mime_decode(word_t *buff);
 bool mime_is_boundary(word_t *boundary);
 enum mimetype get_content_type(void);
 
+extern void mime_cleanup(void);
+
 #endif	/* HAVE_MIME_H */

@@ -220,6 +220,13 @@ open_err:
     return NULL;
 }
 
+/* Cleanup storage allocation */
+void db_cleanup()
+{
+    xfree(msg_count_tok);
+    msg_count_tok = NULL;
+}
+
 /*
     Retrieve numeric value associated with word.
     Returns: value if the the word is found in database,

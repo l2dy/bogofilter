@@ -111,7 +111,7 @@ static int yy_use_redo_text(buff_t *buff)
     buf[count++] = '\n';
     buf[count] = '\0';
     buff->t.leng += count;
-    buff_free(yysave);
+    buff_free_text(yysave);
     yysave = NULL;
     return count;
 }
@@ -307,8 +307,7 @@ int yyredo(word_t *text, char del)
 	memcpy(tmp->t.text, yysave->t.text, yu);
 	memcpy(tmp->t.text+yu, t, tlen);
 	Z(tmp->t.text[tmp->t.leng]);	/* for easier debugging - removable */
-	xfree(yysave->t.text);
-	buff_free(yysave);
+	buff_free_text(yysave);
     }
 
     yysave = tmp;

@@ -21,6 +21,8 @@ extern void got_newline(void);
 extern void got_emptyline(void);
 extern void set_tag(const char *tag);
 
+extern void token_cleanup(void);
+
 /* used by lexer_text_html.l */
 extern void html_tag(int level);
 extern void html_comment(int level);

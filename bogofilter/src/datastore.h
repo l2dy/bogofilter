@@ -40,6 +40,9 @@ void  db_close(/*@only@*/ void *, bool nosync  /** Normally false, if true, do n
 /** Flush pending writes to disk */
 void db_flush(void *);
 
+/** Cleanup storage allocation */
+void db_cleanup(void);
+
 /** Increments count for given word.  Note: negative results are set to
  * zero.
  */

@@ -114,9 +114,10 @@ static int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const ch
    **	$HOME
    */
 
-int setup_wordlists(const char* dir, priority_t precedence)
+int setup_wordlists(const char* d, priority_t precedence)
 {
     int rc = 0;
+    char *dir;
     char filepath[PATH_LEN];
     double good_weight = 1.0;
     double bad_weight  = 1.0;
@@ -125,7 +126,10 @@ int setup_wordlists(const char* dir, priority_t precedence)
     if (precedence < saved_precedence)
 	return rc;
 
-    if (dir == NULL) {
+    if (d) {
+	dir = xstrdup(d);
+    }
+    else {
 	dir = get_directory(precedence);
 	if (dir == NULL)
 	    return rc;
@@ -159,6 +163,8 @@ int setup_wordlists(const char* dir, priority_t precedence)
     if ((build_path(filepath, sizeof(filepath), dir, SPAMFILE) < 0) ||
 	init_wordlist(&spam_list, "spam", filepath, bad_weight, true, 0, false) != 0)
 	rc = -1;
+
+    xfree(dir);
 
     return rc;
 }
@@ -208,12 +214,14 @@ void close_wordlists(bool nosync /** Normally false, if true, do not synchronize
 
 void free_wordlists(void)
 {
-    wordlist_t *list;
+    wordlist_t *list, *next;
 
-    for ( list = word_lists; list != NULL; list = list->next )
+    for ( list = word_lists; list != NULL; list = next )
     {
 	if (list->filename) xfree(list->filename);
 	if (list->filepath) xfree(list->filepath);
+	next = list->next;
+	xfree(list);
     }
 }
 

@@ -44,6 +44,9 @@ THEORY:
 #define offsetof(type, member) ( (int) & ((type*)0) -> member )
 #endif
 
+void wordhash_free_1 (wordhash_t * h);
+void wordhash_free_2 (wordhash_t * h);
+
 wordhash_t *
 wordhash_init (void)
 {
@@ -73,28 +76,39 @@ wordhash_init (void)
 void
 wordhash_free (wordhash_t * h)
 {
-  wh_alloc_node *np, *nq;
-  wh_alloc_str *sp, *sq;
+    hashnode_t *p, *q;
+    wh_alloc_str *sp, *sq;
+    wh_alloc_node *np, *nq;
 
-  if (h == NULL)
-    return;
+    if (h == NULL)
+	return;
 
-  for (np = h->nodes; np; np = nq)
+    for (p = h->iter_head; p != NULL ; p = q)
+    {
+	q = p->iter_next;
+	word_free( p->key );
+    }
+
+    for (np = h->nodes; np; np = nq)
     {
       nq = np->next;
       xfree (np->buf);
       xfree (np);
     }
 
-  for (sp = h->strings; sp; sp = sq)
+    for (sp = h->strings; sp; sp = sq)
     {
-      sq = sp->next;
-      xfree (sp->buf);
-      xfree (sp);
+	sq = sp->next;
+	xfree (sp->buf);
+	xfree (sp);
     }
 
-  xfree (h->bin);
-  xfree (h);
+    if( h->order != NULL ) {
+	xfree( h->order );
+    }
+
+    xfree (h->bin);
+    xfree (h);
 }
 
 static hashnode_t *
