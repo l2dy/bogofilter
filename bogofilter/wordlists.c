@@ -191,7 +191,7 @@ bool configure_wordlist(const char *val)
     type=tmp;
     tmp += strcspn(tmp, ", \t");
     *tmp++ = '\0';
-    while (isspace(*tmp)) tmp += 1;
+    while (isspace((unsigned char)*tmp)) tmp += 1;
 
     switch (type[0])
     {
@@ -212,22 +212,22 @@ bool configure_wordlist(const char *val)
     name=tmp;
     tmp += strcspn(tmp, ", \t");
     *tmp++ = '\0';
-    while (isspace(*tmp)) tmp += 1;
+    while (isspace((unsigned char)*tmp)) tmp += 1;
 
     path=tmp;
     tmp += strcspn(tmp, ", \t");
     *tmp++ = '\0';
-    while (isspace(*tmp)) tmp += 1;
+    while (isspace((unsigned char)*tmp)) tmp += 1;
 
     weight=atof(tmp);
     tmp += strcspn(tmp, ", \t");
     *tmp++ = '\0';
-    while (isspace(*tmp)) tmp += 1;
+    while (isspace((unsigned char)*tmp)) tmp += 1;
 
     override=atoi(tmp);
     tmp += strcspn(tmp, ", \t");
     *tmp++ = '\0';
-    while (isspace(*tmp)) tmp += 1;
+    while (isspace((unsigned char)*tmp)) tmp += 1;
 
     rc = init_list(list, name, path, weight, bad, override, ignore);
     ok = rc == 0;

@@ -118,8 +118,8 @@ double	thresh_stats = 0.0f;
 static const parm_desc sys_parms[] =
 {
     { "stats_in_header",  CP_BOOLEAN,	{ (void *) &stats_in_header } },
-    { "spam_header_name", CP_STRING,	{ (void *) &spam_header_name } },
-    { "user_config_file", CP_STRING,	{ (void *) &user_config_file } },
+    { "spam_header_name", CP_STRING,	{ &spam_header_name } },
+    { "user_config_file", CP_STRING,	{ &user_config_file } },
     { "wordlist",	  CP_WORDLIST,	{ (void *) NULL } },	/* Processed by configure_wordlist() */
     
     { "algorithm",  	  CP_ALGORITHM,	{ (void *) NULL } },	/* Processed by select_method() */
@@ -171,14 +171,14 @@ static bool select_method(enum algorithm_e al)
 static bool process_config_parameter(const parm_desc *arg, const char *val)
 {
     bool ok = true;
-    while (isspace(*val) || *val == '=') val += 1;
-    if ( arg->addr.v == NULL )
+    while (isspace((unsigned char)*val) || *val == '=') val += 1;
+    if (arg->addr.v == NULL)
 	return ok;
     switch (arg->type)
     {
 	case CP_BOOLEAN:
 	    {
-		char ch = toupper(*val);
+		char ch = toupper((unsigned char)*val);
 		switch (ch)
 		{
 		case 'Y':		/* Yes */
@@ -233,7 +233,7 @@ static bool process_config_parameter(const parm_desc *arg, const char *val)
 	    }
 	case CP_ALGORITHM:
 	{
-	    ok = select_method( tolower(*val) );
+	    ok = select_method(tolower((unsigned char)*val));
 	    if (DEBUG_CONFIG(0))
 		fprintf( stderr, "%s -> '%c'\n", arg->name, *val );
 	    break;
@@ -320,7 +320,7 @@ static void read_config_file(const char *fname, bool tilde_expand)
 	len = strlen(buff);
 	if ( buff[0] == '#' || buff[0] == ';' || buff[0] == '\n' )
 	    continue;
-	while (iscntrl(buff[len-1]))
+	while (iscntrl((unsigned char)buff[len-1]))
 	    buff[--len] = '\0';
 
 	if ( ! process_config_line( buff, usr_parms ) &&

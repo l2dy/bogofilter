@@ -136,10 +136,10 @@ static int load_file(char *db_file)
 	    break;
 	}
 
-	while (isdigit(*p))
+	while (isdigit((unsigned char)*p))
 	    p--;
 
-	if (!isspace(*p)) {
+	if (!isspace((unsigned char)*p)) {
 	    fprintf(stderr,
 		    PROGNAME
 		    ": Unexpected input [%s] on line %ld. Expecting whitespace before count\n",
@@ -150,7 +150,7 @@ static int load_file(char *db_file)
 
 	count = atol(p + 1);
 
-	while (isspace(*p))
+	while (isspace((unsigned char)*p))
 	    p--;
 
 	*(p + 1) = '\0';
