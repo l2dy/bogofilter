@@ -46,30 +46,6 @@ map_rc()
     )
 }
 
-run_single_test()
-{
-    id="$1"
-    fil="$2"
-    ver="$3"
-    OUT="${TMPDIR}/tests/msg.$fil.$mth.$ver"
-    OPTS="-$mth -t -$ver $CFG"
-    map_rc $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt \
-	sed s@.*inputs/@./inputs/@ \>${TMPDIR}/tests-$mth 
-    sed s/,.version=.*// < ${TMPDIR}/tests-$mth > $OUT
-}
-
-run_batch_test()
-{
-    id="$1"
-    fil="$2"
-    ver="$3"
-    OUT="${TMPDIR}/tests/msg.$fil.$mth.$ver"
-    OPTS="-$mth -t -$ver $CFG"
-    map_rc $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt \
-	sed s@.*inputs/@./inputs/@ >${TMPDIR}/tests-$mth 
-    sed s/,.version=.*// < ${TMPDIR}/tests-$mth > $OUT
-}
-
 mth="f"
 BOGOFILTER_DIR="${TMPDIR}"
 CFG="-c ${TMPDIR}/cfg.$mth -y 0"
