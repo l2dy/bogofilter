@@ -31,6 +31,9 @@ EXTRA_DIST = $(man1_MANS) \
 	     UPGRADE bogoupgrade.pl
 	     
 #
+.xml.pdf:
+	xmlto pdf --extensions $<
+
 .xml.1:
 	xmlto man $<
 
