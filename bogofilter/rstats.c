@@ -176,7 +176,7 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
 	maxcnt = max(maxcnt, cnt);
     }
 
-    fprintf(Rfp, "# %5s %4s %7s   %9s  %s\n", "int", "cnt", "prob", "spamicity", "histogram" );
+    fprintf(Rfp, "\t%5s %4s %7s   %9s  %s\n", "int", "cnt", "prob", "spamicity", "histogram" );
 
     // Print histogram
     for (i=0; i<INTERVALS; i+=1)
@@ -187,10 +187,7 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
 	double prob = cnt ? h->prob/cnt : 0.0;
 
 	// print interval, count, probability, and spamicity
-	fprintf(Rfp, "# %5.2f %4d  %f  %f  ", beg, cnt, prob, h->spamicity );
-
-	// print interval, count, probability, and spamicity, as well as internal calculations
-//	fprintf(Rfp, "# %5.2f %4d  %f  %f  %f  %f  %f  %f  ", beg, cnt, prob, invlogsum, logsum, invproduct, product, spamicity );
+	fprintf(Rfp, "\t%5.2f %4d  %f  %f  ", beg, cnt, prob, h->spamicity );
 
 	// scale histogram to 50 characters
 	if (maxcnt>50) cnt = (cnt * 50 + maxcnt - 1) / maxcnt;
@@ -208,8 +205,8 @@ void rstats_print_rtable(int robn, rstats_t **rstats_array)
     int r;
 
     // print header
-    fprintf(Rfp, "#%26s%10s%10s%10s%10s%10s\n",
-	    "Token         ","pgood","pbad","fw","invfwlog","fwlog");
+    fprintf(Rfp, "\t     %-20s%10s%10s%10s%10s%10s\n",
+	    "Token","pgood","pbad","fw","invfwlog","fwlog");
 
     // Print 1 line per token
     for (r= 0; r<robn; r+=1)
@@ -217,13 +214,13 @@ void rstats_print_rtable(int robn, rstats_t **rstats_array)
 	rstats_t *cur = rstats_array[r];
 	double prob = cur->prob;
 
-	fprintf(Rfp, "# %3d  %-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f\n",
+	fprintf(Rfp, "\t%3d  %-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f\n",
 		r, cur->token, cur->good, cur->bad, prob, 
 		log(1.0 - prob), log(prob)); 
     }
 
     // print trailer
-    fprintf(Rfp, "# %3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
+    fprintf(Rfp, "\t%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
 	    robn, "P_Q_S_invsum_logsum", header.invproduct, header.product, header.spamicity,
 	    header.invlogsum, header.logsum);
 }

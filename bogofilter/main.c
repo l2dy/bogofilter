@@ -286,7 +286,7 @@ int main(int argc, char **argv)
 
 		if (verbose || passthrough || Rtable)
 		{
-		    (void)fputs("\n", stdout);
+		    // (void)fputs("\n", stdout);
 		    verbose += passthrough;
 		    print_bogostats( stdout, spamicity );
 		    verbose -= passthrough;

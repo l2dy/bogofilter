@@ -527,15 +527,18 @@ double compute_spamicity(bogostat_t *bogostats, FILE *fp)
 	{
 	    switch (verbose)
 	    {
-	    case 1:
-		fprintf(fp, "#  %f  %s\n", pp->prob, pp->key);
-		break;
-	    case 2:
-		fprintf(fp, "#  %f  %f  %s\n", pp->prob, spamicity, pp->key);
-		break;
-	    default:
-		fprintf(fp, "#  %f  %f  %f  %8.5e  %s\n", pp->prob, product, invproduct, spamicity, pp->key);
-		break;
+		case 0:
+		case 1:
+		    break;
+		case 2:
+		    fprintf(fp, "\t%f  %s\n", pp->prob, pp->key);
+		    break;
+		case 3:
+		    fprintf(fp, "\t%f  %f  %s\n", pp->prob, spamicity, pp->key);
+		    break;
+		default:
+		    fprintf(fp, "\t%f  %f  %f  %8.5e  %s\n", pp->prob, product, invproduct, spamicity, pp->key);
+		    break;
 	    }
 	}
     }
