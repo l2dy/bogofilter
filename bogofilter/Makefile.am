@@ -36,4 +36,4 @@ cvs-check:
 # it will call rsync from its source directory to the destination for
 # each of them, running them in parallel
 rsync:	distdir .rsyncs
-	cat .rsyncs | while read a ; do case $$a in *:*/) rsync -av --delete $(PACKAGE)-$(VERSION)/ $$a/ & ;; esac ; done ; wait
+	@( cat .rsyncs | sed -e 's}^}rsync -av --delete $(PACKAGE)-$(VERSION)/ }; s/\($$\)/ \&/;' ; echo "wait" ) | $(SHELL) -x
