@@ -6,6 +6,7 @@
  
 * Fix check for "^From " lines to work properly during base64 decoding. 
 * End html comment processing when a message header is found.
+* Improve README for the tuning scripts and simplify them.
  
 0.13.5	2003-06-03
  
