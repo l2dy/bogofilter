@@ -30,7 +30,7 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
   hashnode_t *node;
   wordprop_t *wordprop;
 
-  int wordcount = h->wordcount;
+  int wordcount = h->count;	/* use number of unique tokens */
 
   wordlist_t *list;
   wordlist_t *incr_list = NULL;
@@ -111,12 +111,16 @@ static void add_hash(wordhash_t *dest, wordhash_t *src) {
     wordprop_t *d;
     hashnode_t *s;
 
+    int count = dest->count + src->count;	/* use dest count as total */
+
     dest->wordcount += src->wordcount;
 
     for (s = wordhash_first(src); s; s = wordhash_next(src)) {
 	d = wordhash_insert(dest, s->key, sizeof(wordprop_t), &wordprop_init);
 	d -> freq += ((wordprop_t *)(s -> buf)) ->freq;
     }
+
+    dest->count = count;
 }
 
 /* read messages from stdin and register according to _run_type.
