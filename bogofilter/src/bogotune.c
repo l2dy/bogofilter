@@ -1263,12 +1263,15 @@ static rc_t bogotune(void)
     wordhash_free(ns_and_sp->train);
     ns_and_sp->train = NULL;
 
-    for (scan=0; scan <= 1 && !skip; scan += 1) {
+    for (scan=0; scan <= 1 && (force || !skip); scan += 1) {
 	bool f;
 	uint i;
 	uint r_count;
 	uint rsi, rxi, mdi;
 	result_t *results, *r, *sorted;
+
+	if (skip && scan == 0)
+	    continue;
 
 	printf("Performing %s scan:\n", scan==0 ? "coarse" : "fine");
 
