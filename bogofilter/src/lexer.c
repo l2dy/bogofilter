@@ -257,6 +257,8 @@ int yyinput(byte *buf, size_t used, size_t size)
 
     while ((cnt = get_decoded_line(&buff)) != 0) {
 
+       count += cnt;
+
        /* Note: some malformed messages can cause xfgetsl() to report
        ** "Invalid buffer size, exiting."  ** and then abort.  This
        ** can happen when the parser is in html mode and there's a
@@ -265,22 +267,19 @@ int yyinput(byte *buf, size_t used, size_t size)
        ** The "fix" is to check for a nearly full lexer buffer and
        ** discard most of it.
        */
-       bool nearly_full = used > 1000 && used > size * 10;
 
-       count += cnt;
+       /* if not nearly full */
+       if (used < 1000 || used < size * 10)
+	   break;
 
-       if ((count <= (MAXTOKENLEN * 3 / 2)) || ! long_token(buff.t.text, (uint) count))
-	   if (!nearly_full)
-	       break;
-
-       if (count >= MAXTOKENLEN * 2) {
-	   size_t shift = count - MAXTOKENLEN;
-	   memmove(buff.t.text, buff.t.text + shift, MAXTOKENLEN+D);
-	   count = MAXTOKENLEN;
-	   buff.t.leng = MAXTOKENLEN;
+       if (count >= MAXTOKENLEN * 2 && 
+	   long_token(buff.t.text, (uint) count)) {
+	   uint start = buff.t.leng - count;
+	   uint length = count - MAXTOKENLEN;
+	   buff_shift(&buff, start, length);
+	   count = buff.t.leng;
        }
-
-       if (nearly_full)
+       else
 	   break;
     }
 
