@@ -51,6 +51,8 @@ WANT="1784.4031"
 WANT="1784.4029"
 # v0.15.9 - Exclude apostrophe and backtick as last chars
 WANT="1781.4024"
+# v0.15.9 - Stop discarding X-Bogosity lines in lexer.c
+WANT="1787.4024"
 
 if [ "$RESULT" != "$WANT" ] || [ $verbose -ne 0 ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT

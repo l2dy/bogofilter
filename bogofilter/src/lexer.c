@@ -34,8 +34,6 @@ lexer_t *lexer = NULL;
 
 /* Local Variables */
 
-extern char *spam_header_name;
-
 lexer_t v3_lexer = {
     lexer_v3_lex,
     &lexer_v3_text,
@@ -50,7 +48,6 @@ lexer_t msg_count_lexer = {
 
 /* Function Prototypes */
 static int yy_get_new_line(buff_t *buff);
-static int skip_spam_header(buff_t *buff);
 static int get_decoded_line(buff_t *buff);
 
 /* Function Definitions */
@@ -87,10 +84,6 @@ static int yy_get_new_line(buff_t *buff)
     int count = (*reader_getline)(buff);
     const byte *buf = buff->t.text;
 
-    static size_t hdrlen = 0;
-    if (hdrlen==0)
-	hdrlen=strlen(spam_header_name);
-
     if (count > 0)
 	yylineno += 1;
 
@@ -116,14 +109,6 @@ static int yy_get_new_line(buff_t *buff)
     if (count >= 0 && DEBUG_LEXER(0))
 	lexer_display_buffer(buff);
     
-    /* skip spam_header ("X-Bogosity:") lines */
-    while (msg_header
-	   && count != EOF
-	   && memcmp(buff->t.text,spam_header_name,hdrlen) == 0)
-    {
-	count = skip_spam_header(buff);
-    }
-
     /* Also, save the text on a linked list of lines.
      * Note that we store fixed-length blocks here, not lines.
      * One very long physical line could break up into more
@@ -133,19 +118,6 @@ static int yy_get_new_line(buff_t *buff)
 	textblock_add(buff->t.text+buff->read, (size_t) count);
 
     return count;
-}
-
-static int skip_spam_header(buff_t *buff)
-{
-    while (true) {
-	int count;
-	buff->t.leng = 0;		/* discard X-Bogosity line */
-	count = (*reader_getline)(buff);
-	if (count <= 1 || !isspace(buff->t.text[0])) 
-	    return count;
-    }
-
-    return EOF;
 }
 
 static int get_decoded_line(buff_t *buff)
