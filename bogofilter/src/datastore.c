@@ -165,7 +165,7 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 
 	    if (DEBUG_DATABASE(3)) {
 		fprintf(dbgout, "ds_read: [%*s] -- %lu,%lu\n",
-			(int)max(word->leng, INT_MAX), word->text,
+			(int)min(word->leng, INT_MAX), word->text,
 			(unsigned long)val->spamcount,
 			(unsigned long)val->goodcount);
 	    }
@@ -174,14 +174,14 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 	case DS_NOTFOUND:
 	    if (DEBUG_DATABASE(3)) {
 		fprintf(dbgout, "ds_read: [%*s] not found\n", 
-			(int)max(word->leng, INT_MAX), (char *) word->text);
+			(int)min(word->leng, INT_MAX), (char *) word->text);
 	    }
 	    break;
 	    
 	default:
 	    fprintf(dbgout, "ret=%d, DS_NOTFOUND=%d\n", ret, DS_NOTFOUND);
 	    print_error(__FILE__, __LINE__, "ds_read( '%*s' ), err: %d, %s", 
-			(int)max(word->leng, INT_MAX), (char *) word->text, ret, db_str_err(ret));
+			(int)min(word->leng, INT_MAX), (char *) word->text, ret, db_str_err(ret));
 	    exit(EX_ERROR);
 	}
     }
@@ -232,10 +232,11 @@ int ds_write(void *vhandle, const word_t *word, dsv_t *val)
 	    break;
 
 	if (DEBUG_DATABASE(3)) {
-	    fprintf(dbgout, "ds_write: [%*s] -- %lu,%lu\n",
-		    (int)max(word->leng, INT_MAX), word->text,
+	    fprintf(dbgout, "ds_write: [%*s] -- %lu,%lu,%lu\n",
+		    (int)min(word->leng, INT_MAX), word->text,
 		    (unsigned long)val->spamcount,
-		    (unsigned long)val->goodcount);
+		    (unsigned long)val->goodcount,
+		    (unsigned long)val->date);
 	}
     }
 
