@@ -17,9 +17,10 @@ Currently, bogofilter offers a choice of three classification methods:
 the original as proposed by Paul Graham and implemented in bogofilter
 by Eric S. Raymond; a variation proposed by Gary Robinson and
 implemented in bogofilter by Greg Louis; and a further variation, also
-proposed by Gary Robinson, which uses Fisher's method of combining
-probabilities; for bogofilter, your author has implemented this one
-too.
+proposed by Gary Robinson, which uses Fisher's method (Fisher, R. A.,
+1950: Statistical Methods for Research Workers, pp. 99ff.  London:
+Oliver and Boyd) of combining probabilities; for bogofilter, your
+author has implemented this one too.
 
 Both of Gary Robinson's proposed classification methods work better
 than the original.  For optimal results, they (and the original)
@@ -82,7 +83,7 @@ to install the calculated value so bogofilter will use it from then on.
 The value of x that bogoutil calculates is just the average of
   p(w) = badcount / (goodcount + badcount)
 for every word in your training set that appears at least 10 times in
-one or both wordlists (ie badcount + goodcount >= 10).
+one or both wordlists (i.e. badcount + goodcount >= 10).
 
 In the last two paragraphs I've I oversimplified, for the sake of
 explaining the basic concept clearly: in real life, you have to scale
@@ -250,7 +251,7 @@ Once the lists are both over 5,000 and fairly similar in message count,
 you can train only on errors and unsures.  By this time there should be
 very few errors (spams classed as nonspam or vice versa), but there
 will still be a proportion of unsure spam and unsure nonspam messages. 
-Training on these will keep bogofilter working well, asyou're telling
+Training on these will keep bogofilter working well, as you're telling
 it what it needs to learn, and not so much of what it already knows. 
 If one list grows faster than the other, extra (correctly classified)
 messages may be added from time to time to equalize them again; try to
