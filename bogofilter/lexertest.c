@@ -2,18 +2,27 @@
 
 /* imports */
 #include <stdio.h>
+#include <string.h>
 #include "lexer.h"
 
 /* exports */
 int passthrough;
 
-int main(void)
+int main(int argc, char **argv)
 {
-    int	t;
+    int	t, quiet = 0;
 
-    while ((t = get_token()) > 0)
-    {
-	(void) printf("get_token: %d '%s'\n", t, yylval);
+    if (argc >= 2 && argv[1] && 0 == strcmp(argv[1], "-q")) quiet=1;
+
+    if (quiet) {
+	puts("quiet mode.");
+	while ((t = get_token()) > 0) { }
+    } else {
+	puts("normal mode.");
+	while ((t = get_token()) > 0)
+	{
+	    (void) printf("get_token: %d '%s'\n", t, yylval);
+	}
     }
     return 0;
 }
