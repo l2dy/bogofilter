@@ -88,7 +88,7 @@ EOF
 # test scoring of individual files
 
 NAME="bulk-single"
-( for f in $pattern ; do echo $f `$BOGOFILTER -c $CFG $OPT -I $f` ; done ) | \
+( for f in $pattern ; do echo $f `$BOGOFILTER -e -c $CFG $OPT -I $f` ; done ) | \
     sed s@.*inputs/@./inputs/@ >${TMPDIR}/$NAME.out
 
 # test scoring of files listed on stdin
