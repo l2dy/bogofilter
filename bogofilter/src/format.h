@@ -17,9 +17,10 @@ extern const char *spam_subject_tag;
 ** extern const char *log_header_format;
 */
 
-/* needed by config.c */
+/* needed by bogoconfig.c */
 
 extern const parm_desc format_parms[];
+extern void set_terse_mode_format(void);
 
 /* Function Prototypes */
 
@@ -27,5 +28,4 @@ extern char *format_header(char *buff, size_t size);
 extern char *format_terse(char *buff, size_t size);
 extern char *format_log_header(char *buff, size_t size);
 extern char *format_log_update(char *buff, size_t size, const char *reg, const char *unreg, int wordcount, int msgcount);
-
 #endif
