@@ -64,7 +64,7 @@ static uint32_t token_prefix_len;
 #define NONBLANK "spc:invalid_end_of_header"
 static word_t nonblank_line = { sizeof(NONBLANK)-1, NONBLANK};
 
-#define WFREE(n)  n.leng = 0
+#define WCLEAR(n)  n.leng = 0
 
 /* Function Prototypes */
 
@@ -374,9 +374,7 @@ void token_init(void)
     if (!msg_count_file)
 	mime_reset();
 
-    WFREE(msg_addr);
-    WFREE(msg_id);
-    WFREE(queue_id);
+    token_cleanup();
 
     return;
 }
@@ -451,7 +449,7 @@ void set_msg_id(byte *text, uint leng)
 /* Cleanup storage allocation */
 void token_cleanup()
 {
-    WFREE(msg_addr);
-    WFREE(msg_id);
-    WFREE(queue_id);
+    WCLEAR(msg_addr);
+    WCLEAR(msg_id);
+    WCLEAR(queue_id);
 }
