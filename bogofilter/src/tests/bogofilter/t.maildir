@@ -41,6 +41,8 @@ if [ "$1" = "-v" ]; then
     v="-v"
 fi
 
+( formail </dev/null >/dev/null 2>/dev/null ) || exit 77
+
 for f in good spam ; do
     cat ${srcdir}/inputs/$f.mbx | formail -s $0 save $TMPDIR $f 
 done
