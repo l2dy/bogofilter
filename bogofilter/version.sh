@@ -15,7 +15,7 @@
 
 VERSION=`grep define.VERSION config.h | awk '{print $3}' | tr -d '"'`
 
-echo $VERSION | grep cvs 
+echo $VERSION | egrep "[a-z][a-z][a-z]$"
 
 if [ $? == 0 ]; then
    DATE="00000000"
