@@ -39,7 +39,7 @@ uint32_t dbg_size_trap = 0;	/* 100000 */
 
 #define	MB 1000000
 #define	GB 1000*MB
-uint32_t dbg_too_much  = 0;	/* GB */
+uint32_t dbg_too_much  = 0; 	/* GB */
 
 uint32_t dbg_size_delt = 0;	/* MB */
 uint32_t dbg_delt_save = 0;
@@ -56,7 +56,20 @@ uint32_t max_malloc = 0;
 uint32_t tot_malloc = 0;
 
 void md_trap(const char *why);
+void md_too_much(void);
+
 void md_trap(const char *why) { (void)why; }
+
+void md_too_much()
+{
+    static bool first = true;
+    if (first) {
+	first = false;
+	fprintf(stderr, "max_malloc = %12lu, tot_malloc = %12lu\n", 
+		(ulong) max_malloc, (ulong) tot_malloc);
+	md_trap("dbg_too_much");
+    }
+}
 
 typedef struct memheader {
     uint32_t	size;
@@ -103,10 +116,8 @@ md_malloc(size_t size)
     if (dbg_size_trap != 0 && size > dbg_size_trap)
 	md_trap("dbg_size_trap");
 
-    if (dbg_too_much != 0 && max_malloc > dbg_too_much) {
-	fprintf(stderr, "max_malloc = %12lu, tot_malloc = %12lu\n", (ulong) max_malloc, (ulong) tot_malloc);
-	exit(EX_ERROR);
-    }
+    if (dbg_too_much != 0 && max_malloc > dbg_too_much)
+	md_too_much();
 
     ptr = malloc(size);
 
@@ -196,11 +207,8 @@ void
     size += sizeof(mh_t) + sizeof(md_tag);		/* Include size storage */
     ++cnt_calloc;
 
-    if (dbg_too_much != 0 && max_malloc > dbg_too_much) {
-	fprintf(stderr, "max_malloc = %12lu, tot_malloc = %12lu\n", 
-		(ulong) max_malloc, (ulong) tot_malloc);
-	exit(EX_ERROR);
-    }
+    if (dbg_too_much != 0 && max_malloc > dbg_too_much) 
+	md_too_much();
 
     ptr = calloc(nmemb, size);
 
@@ -233,13 +241,11 @@ void
     cur_malloc += size - oldsize;
     max_malloc = max(max_malloc, cur_malloc);
     tot_malloc += size - oldsize;
+
     ++cnt_realloc;
 
-    if (dbg_too_much != 0 && max_malloc > dbg_too_much) {
-	fprintf(stderr, "max_malloc = %12lu, tot_malloc = %12lu\n", 
-		(ulong) max_malloc, (ulong) tot_malloc);
-	exit(EX_ERROR);
-    }
+    if (dbg_too_much != 0 && max_malloc > dbg_too_much)
+	md_too_much();
 
     if (memtrace & M_FREE)
 	mh_disp( "r", mh );
