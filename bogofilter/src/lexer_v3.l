@@ -162,7 +162,7 @@ TOKEN_12 	({TOKEN}|{T12})
   new: ENCODED_WORD =\?{CHARSET}\?[bq]\?[^?]*\?=
   old: ENCODED_WORD =\?{CHARSET}\?(b\?{BASE64}|q\?{QP})\?=
 
-  BASE64	[[:alnum:]/+=]+
+  BASE64	[0-9a-zA-Z/+=]+
   QP		[!->@-~]+
 */
 
