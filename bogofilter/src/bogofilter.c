@@ -137,6 +137,9 @@ rc_t bogofilter(int argc, char **argv)
 	passthrough_cleanup();
 	rstats_cleanup();
 
+	if (DEBUG_MEMORY(1))
+	    MEMDISPLAY;
+
 	if (fDie)
 	    exit(EX_ERROR);
     }

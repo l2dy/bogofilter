@@ -73,6 +73,10 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	exitcode = EX_OK;
 
     close_wordlists(word_lists, true);
+
+    if (DEBUG_MEMORY(1))
+	MEMDISPLAY;
+
     free_wordlists(word_lists);
     word_lists = NULL;
 
