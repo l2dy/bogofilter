@@ -420,30 +420,24 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 static int display_words(const char *path, int argc, char **argv, bool prob)
 {
     struct stat sb;
-    int rc;
 
     /* protect against broken stat(2) that succeeds for empty names */
-    if (*path)
-	rc = stat(path, &sb);
-    else
-	rc = -1, errno = ENOENT;
-
-    if (rc >= 0) 
-    {
-	if ( S_ISDIR(sb.st_mode))
-	    words_from_path(path, argc, argv, prob);
-	else
-    	    words_from_list(path, argc, argv);
-    } else {
-	if (errno==ENOENT) {
-	    fprintf(stderr, "No such directory.\n");
-	    return 0;
-	}
-	else {
-	    perror("Error accessing directory");
-	    return -1;
-	}
+    if (path == NULL || *path == '\0') {
+        fprintf(stderr, "Expecting non-empty directory or file name.\n");
+        return -1;
     }
+
+    if ( stat(path, &sb) != 0 ) {
+	fprintf(stderr, "Error accessing file or directory [%s].  %s\n",
+		path, strerror(errno));
+	return -1;
+    }
+
+    if ( S_ISDIR(sb.st_mode))
+	words_from_path(path, argc, argv, prob);
+    else
+	words_from_list(path, argc, argv);
+    
     return 0;
 }
 
