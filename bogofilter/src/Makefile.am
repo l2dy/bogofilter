@@ -69,7 +69,7 @@ endif
 
 LDADD = libbogofilter.a @LIBOBJS@
 bogofilter_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
-bogoutil_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
+bogoutil_LDADD = $(LDADD) $(LIBDB)
 configtest_LDADD = $(LDADD) $(LIBDB)
 
 # what to build that from
