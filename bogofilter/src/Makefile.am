@@ -52,7 +52,7 @@ check_PROGRAMS = debugtest configtest wordhash find_home.test \
 
 TESTS=
 
-LDADD = libbogofilter.a @LIBOBJS@
+LDADD = libbogofilter.a
 bogofilter_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
 bogoutil_LDADD = $(LDADD) $(LIBDB)
 configtest_LDADD = $(LDADD) $(LIBDB)
@@ -131,6 +131,10 @@ noinst_LIBRARIES	+= libgnugetopt.a
 LDADD			+= libgnugetopt.a
 libgnugetopt_a_SOURCES	 = ../gnugetopt/getopt1.c ../gnugetopt/getopt.c
 endif
+
+# this must be last so any library we may have added has access to the
+# AC_REPLACE objects, for instance, trio may need strtoul:
+LDADD += @LIBOBJS@
 
 if ENABLE_TDB_DATASTORE
 datastore_SOURCE = datastore_tdb.c
