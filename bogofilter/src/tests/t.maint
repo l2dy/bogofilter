@@ -8,15 +8,15 @@ NODB=1 . ${srcdir=.}/t.frame
 OUT="$TMPDIR/maint.out"
 
 rm -f $TMPDIR/wordlist.db
-$BOGOFILTER -D -v -l -s < ${SYSTEST}/inputs/spam.mbx >> $TMPDIR/tmp
-$BOGOFILTER -D -v -l -n < ${SYSTEST}/inputs/good.mbx >> $TMPDIR/tmp
+$BOGOFILTER -D -C -v -l -s < ${SYSTEST}/inputs/spam.mbx >> $TMPDIR/tmp
+$BOGOFILTER -D -C -v -l -n < ${SYSTEST}/inputs/good.mbx >> $TMPDIR/tmp
 
 cat >>$TMPDIR/result <<EOF
-initial:   5212
-count 0 -> 5212
-count 1 -> 1801
-count 2 ->  908
-count 3 ->  588
+initial:   5063
+count 0 -> 5063
+count 1 -> 1753
+count 2 ->  878
+count 3 ->  571
 EOF
 
 echo -n initial:  >> $OUT
@@ -27,6 +27,12 @@ for cnt in 0 1 2 3 ; do
     echo -n count $cnt "-> " >> $OUT
     printf "%4d\n" `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db | wc -l` >> $OUT
 done
+
+if  [ $verbose -gt 1 ]; then
+    echo files:  ${TMPDIR}/result $OUT
+    cat ${TMPDIR}/result
+    cat $OUT
+fi
 
 if  [ $verbose -eq 0 ]; then
     cmp ${TMPDIR}/result $OUT
