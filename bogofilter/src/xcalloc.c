@@ -20,11 +20,11 @@
 
 void
 *xcalloc(size_t nmemb, size_t size){
-   void *prt;
-   prt = calloc(nmemb, size);
-   if (prt == NULL && (nmemb == 0 || size == 0))
-       prt = calloc(1, 1);
-   if (prt == NULL)
+   void *ptr;
+   ptr = calloc(nmemb, size);
+   if (ptr == NULL && (nmemb == 0 || size == 0))
+       ptr = calloc(1, 1);
+   if (ptr == NULL)
        xmem_error("xcalloc");
    return ptr;
 }
