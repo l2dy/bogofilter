@@ -34,19 +34,22 @@
 char *tildeexpand(const char *name) {
     char *tmp;
     const char *home;
-    size_t l;
+    size_t l, tl;
 
     if (name[0] != '~')
 	return xstrdup(name);
 
+    /* figure length of user name */
     l = strspn(&name[1], 
 	    "abcdefghijklmnopqrstuvwxyz"
 	    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	    "0123456789._-"); /* Portable Filename Character Set */
-    if (l) {
+    if (l > 0) {
 	/* got a parameter to the tilde */
 	tmp = xmalloc(l + 1);
-	strncpy(tmp, &name[1], l);
+	strlcpy(tmp, &name[1], l+1);
+	/* robustness: we only want the first l characters, so truncate
+	 * here just in case */
 	tmp[l] = '\0';
 
 	home = find_home_user(tmp);
@@ -64,9 +67,10 @@ char *tildeexpand(const char *name) {
     }
 
     xfree(tmp);
-    tmp = xmalloc(strlen(name) - l + strlen(home));
-    strcpy(tmp, home);
-    /* no need to insert a slash here, name[l] should contain one */
-    strcat(tmp, name + l + 1);
+    tl = strlen(name) + strlen(home) - l + 1;
+    tmp = xmalloc(tl);
+    (void)strlcpy(tmp, home, tl);
+    /* no need to insert a slash here, name[l] contains one */
+    if (strlcat(tmp, name + l + 1, tl) >= tl) internal_error;
     return tmp;
 }
