@@ -82,15 +82,6 @@ void collect_words(wordhash_t *wh)
 	}
     }
 
-    while (true) {
-	word_t *token = get_hint();
-	wordprop_t *w;
-	if (token == NULL)
-	    break;
-	w = wordhash_insert(wh, token, sizeof(wordprop_t), &wordprop_init);
-	w->freq += 1;
-    }
-
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### collect_words() ends\n");
 
     return;
