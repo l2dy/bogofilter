@@ -394,6 +394,7 @@ static void help(void)
     (void)printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
     (void)printf( "\t-s\t- register message as spam.\n" );
     (void)printf( "\t-n\t- register message as non-spam.\n" );
+    (void)printf( "\t-o cutoff\t- set user defined spamicity cutoff.\n" );
     (void)printf( "\t-u\t- classify message as spam or non-spam and register appropriately.\n" );
     (void)printf( "\t-S\t- move message's words from non-spam list to spam list.\n" );
     (void)printf( "\t-N\t- move message's words from spam list to spam non-list.\n" );
