@@ -21,8 +21,10 @@
 	 <arg>-D</arg>
 	 <arg>-r <replaceable>value</replaceable></arg>
 	 <arg>-T <replaceable>value</replaceable></arg>
-	 <arg choice="plain">-n <replaceable>okfile</replaceable> [<replaceable>okfile</replaceable>...]</arg>
-	 <arg choice="plain">-s <replaceable>spamfile</replaceable> [<replaceable>spamfile</replaceable>...]</arg>
+	 <arg choice="plain">-n <replaceable>okfile</replaceable> [-n
+	     <replaceable>okfile</replaceable> [...]]</arg>
+	 <arg choice="plain">-s <replaceable>spamfile</replaceable> [-s
+	     <replaceable>spamfile</replaceable> [...]]</arg>
 	 <arg>-M</arg>
       </cmdsynopsis>
 
@@ -89,11 +91,13 @@
 
     <para>The <option>-n</option> option tells
     <application>bogotune</application> that the following arguments
-    are files (or folders) containing non-spam.</para>
+    are files (or folders) containing non-spam. It can be repeated as
+    often as necessary.</para>
 
     <para>The <option>-s</option> option tells
     <application>bogotune</application> that the following arguments
-    are files (or folders) containing spam.</para>
+    are files (or folders) containing spam. It can be repeated as often
+    as necessary.</para>
 
     <para>The <option>-r <replaceable>value</replaceable></option>
     option tells <application>bogotune</application> to use the

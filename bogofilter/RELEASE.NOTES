@@ -123,6 +123,16 @@ If this command didn't print anything, everything has gone well and it
 has left your old data base in wordlist.qdbm.old.
 
 
+Bogotune option parsing changes
+-------------------------------
+
+In bogotune 0.93.2 and newer, you must repeat the -n or -s option as
+prefix for the mailbox.
+
+Example: bogotune -n good1 good2 -s bad1 bad2 ...
+will be: bogotune -n good1 -n good2 -s bad1 -s bad2
+
+
 MAJOR CHANGES IN BOGOFILTER 0.93
 ================================
 
