@@ -18,8 +18,8 @@ AUTHORS:
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-
-#undef	HAVE_DECL_GETOPT	/* for configure/getopt incompatibility */
+#include <unistd.h>
+ 
 #include "getopt.h"
 
 #include "bogofilter.h"
