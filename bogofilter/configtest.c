@@ -16,9 +16,10 @@ AUTHOR:
 #include <string.h>
 
 #include "config.h"
+
 #include "common.h"
-#include "debug.h"
 #include "globals.h"
+#include "method.h"
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
@@ -30,6 +31,14 @@ const char *progname = "configtest";
 #ifndef	DEBUG_CONFIG
 #define DEBUG_CONFIG(level)	(verbose > level)
 #endif
+
+/* Dummy struct definitions to support config.c */
+method_t graham_method = {
+    NULL, NULL, NULL, NULL
+} ;
+method_t robinson_method = {
+    NULL, NULL, NULL, NULL
+} ;
 
 #ifdef COMPILE_DEAD_CODE
 static bool x_configure_wordlist(const char *val)
@@ -51,6 +60,11 @@ static int x_init_list(wordlist_t* list, const char* name, const char* filepath,
     return 0;
 }
 #endif
+
+void init_charset_table(const char *charset_name, bool use_default)
+{
+    return;
+}
 
 int main( int argc, char **argv)
 {

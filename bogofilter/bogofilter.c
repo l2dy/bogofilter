@@ -27,8 +27,6 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 
 ******************************************************************************/
 
-#include <math.h>
-#include <float.h> /* has DBL_EPSILON */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -38,65 +36,18 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #include "common.h"
 #include "globals.h"
 #include "bogofilter.h"
-#include "graham.h"
-#include "robinson.h"
+#include "method.h"
 #include "datastore.h"
 #include "register.h"
-#include "rstats.h"
-#include "wordhash.h"
-#include "wordlists.h"
 
-#include <assert.h>
-
-#define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
-
-#ifdef	ENABLE_GRAHAM_METHOD
-/* constants for the Graham formula */
-#define MINIMUM_FREQ	5		/* minimum freq */
-
-#define MAX_PROB	0.99f		/* max probability value used */
-#define MIN_PROB	0.01f		/* min probability value used */
-#define DEVIATION(n)	fabs((n) - EVEN_ODDS)	/* deviation from average */
-#endif
-
-#define GRAHAM_MIN_DEV		0.4f	/* look for characteristic words */
-#define ROBINSON_MIN_DEV	0.0f	/* if nonzero, use characteristic words */
-
-#define GRAHAM_SPAM_CUTOFF	0.90f	/* if it's spammier than this... */
-#define ROBINSON_SPAM_CUTOFF	0.54f	/* if it's spammier than this... */
-
-void print_bogostats(FILE *fp, double spamicity)
+void initialize_constants()
 {
-#ifdef	ENABLE_GRAHAM_METHOD
-    if (algorithm == AL_GRAHAM)
-    {
-	gra_print_bogostats(fp, spamicity);
-    }
-#endif
-
-#ifdef	ENABLE_ROBINSON_METHOD
-    if (algorithm == AL_ROBINSON)
-    {
-	rob_print_bogostats(fp, spamicity);
-    }
-#endif
+    method->initialize();
 }
 
-void initialize_constants(void)
+void print_stats(FILE *fp, double spamicity)
 {
-#ifdef	ENABLE_GRAHAM_METHOD
-    if (algorithm == AL_GRAHAM)
-    {
-	gra_initialize_constants();
-    }
-#endif
-
-#ifdef	ENABLE_ROBINSON_METHOD
-    if (algorithm == AL_ROBINSON)
-    {
-	rob_initialize_constants();
-    }
-#endif
+    method->print_stats(fp, spamicity);
 }
 
 rc_t bogofilter(double *xss) /*@globals errno@*/
@@ -114,26 +65,12 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
     good_list.msgcount = db_getcount(good_list.dbh);
     spam_list.msgcount = db_getcount(spam_list.dbh);
 
-    initialize_constants();
+    method->initialize();
 
     /* tokenize input text and save words in a wordhash. */
     wordhash = collect_words(&msgcount, &wordcount);
 
-#ifdef	ENABLE_GRAHAM_METHOD
-    if (algorithm == AL_GRAHAM)
-    {
-	/* computes the spamicity of the spam/nonspam indicators. */
-	spamicity = gra_bogofilter(wordhash, NULL);
-    }
-#endif
-
-#ifdef	ENABLE_ROBINSON_METHOD
-    if (algorithm == AL_ROBINSON)
-    {
-	/* computes the spamicity of the spam/nonspam indicators. */
-	spamicity = rob_bogofilter(wordhash, NULL);
-    }
-#endif
+    spamicity = method->compute_spamicity(wordhash, NULL);
 
     db_lock_release_list(word_lists);
 

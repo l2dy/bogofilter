@@ -21,12 +21,13 @@ AUTHOR:
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
-#ifdef	HAVE_CHARSET_H
+#ifdef	HAVE_CHARSET
 #include "charset.h"
 #endif
 #include "common.h"
 #include "find_home.h"
 #include "globals.h"
+#include "method.h"
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
@@ -60,18 +61,37 @@ const char *user_config_file   = "~/.bogofilter.cf";
 const char *spam_header_name = SPAM_HEADER_NAME;
 
 bool	stats_in_header = TRUE;
-const char *stats_prefix;
+const	char *stats_prefix;
 
 run_t run_type = RUN_NORMAL; 
-algorithm_t algorithm = AL_DEFAULT;
+method_t *method = NULL;
 
+enum algorithm_e {
+#ifdef ENABLE_GRAHAM_METHOD
+    AL_GRAHAM='g',
+#endif
+#ifdef ENABLE_ROBINSON_METHOD
+    AL_ROBINSON='r'
+#endif
+};
+
+/* define default */
+#ifdef ENABLE_GRAHAM_METHOD
+#define AL_DEFAULT AL_GRAHAM
+#else
+#define AL_DEFAULT AL_ROBINSON
+#endif
+
+static enum algorithm_e algorithm = AL_DEFAULT;
+
+double	spam_cutoff;
 double	min_dev = 0.0f;
 double	robx = 0.0f;
 double	robs = 0.0f;
 
-int thresh_index = 0;
-double thresh_stats = 0.0f;
-double thresh_rtable = 0.0f;
+int	thresh_index = 0;
+double	thresh_stats = 0.0f;
+double	thresh_rtable = 0.0f;
 
 /*---------------------------------------------------------------------------*/
 
@@ -98,7 +118,7 @@ typedef struct {
 	char	*c;
 	char	**s;
 #ifdef	GRAHAM_AND_ROBINSON
-	algorithm_t	*a;
+	enum algorithm_e *a;
 #endif
     } addr;
 } ArgDefinition;
@@ -114,6 +134,7 @@ static const ArgDefinition ArgDefList[] =
     { "min_dev",	  CP_DOUBLE,	{ (void *)&min_dev } },
     { "robx",		  CP_DOUBLE,	{ (void *)&robx } },
     { "robs",		  CP_DOUBLE,	{ (void *)&robs } },
+    { "spam_cutoff",	  CP_DOUBLE,	{ (void *)&spam_cutoff } },
     { "thresh_index",	  CP_INTEGER,	{ (void *)&thresh_index } },
     { "thresh_rtable",	  CP_DOUBLE,	{ (void *)&thresh_rtable } },
     { "thresh_stats",	  CP_DOUBLE,	{ (void *)&thresh_stats } },
@@ -260,7 +281,7 @@ static void read_config_file(const char *fname, bool tilde_expand)
 
     if (fp == NULL) {
 	if (DEBUG_CONFIG(0)) {
-	    fprintf(stderr, "Debug: cannot open %s: %s", filename, strerror(errno));
+	    fprintf(stderr, "Debug: cannot open %s: %s\n", filename, strerror(errno));
 	}
 	xfree(filename);
 	return;
@@ -504,7 +525,23 @@ void process_config_files(void)
     if (DEBUG_CONFIG(0))
 	fprintf( stderr, "stats_prefix: '%s'\n", stats_prefix );
 
-#ifdef	HAVE_CHARSET_H
+#ifdef	ENABLE_GRAHAM_METHOD
+    if ( algorithm == AL_GRAHAM )
+    {
+	extern method_t graham_method;
+	method = &graham_method;
+    }
+#endif
+
+#ifdef	ENABLE_ROBINSON_METHOD
+    if ( algorithm == AL_ROBINSON )
+    {
+	extern method_t robinson_method;
+	method = &robinson_method;
+    }
+#endif
+
+#ifdef	HAVE_CHARSET
     init_charset_table("us-ascii", TRUE);
 #endif
 }

@@ -1,7 +1,7 @@
 /* $Id$ */
 
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <ctype.h>
 #include <errno.h>
 #include <unistd.h>
@@ -116,6 +116,16 @@ void close_lists(void)
     {
 	db_close(list->dbh);
 	if (list->name) free(list->name);
+    }
+}
+
+void set_good_weight(double weight)
+{
+    wordlist_t* list;
+    for ( list = word_lists; list != NULL; list = list->next )
+    {
+	if ( ! list->bad )
+	    list->weight = weight;
     }
 }
 

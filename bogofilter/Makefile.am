@@ -24,7 +24,7 @@ bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     graham.c graham.h robinson.c robinson.h \
 		     rstats.h rstats.c \
                      wordhash.h wordhash.c wordlists.h wordlists.c \
-		     $(MYCOMMON) common.h version.h
+		     $(MYCOMMON) common.h method.h version.h
 
 bogolexer_SOURCES = bogolexer.c lexer.l lexer.h $(MYCOMMON)
 

@@ -32,6 +32,8 @@ const bool FALSE = false;
 const bool TRUE = true;
 #endif
 
+#undef	HAVE_CHARSET
+
 #ifndef	DISABLE_GRAHAM_METHOD
 #define	ENABLE_GRAHAM_METHOD
 #endif
@@ -42,23 +44,6 @@ const bool TRUE = true;
 
 #if	defined(ENABLE_ROBINSON_METHOD) && defined(ENABLE_GRAHAM_METHOD)
 #define	GRAHAM_AND_ROBINSON
-#endif
-
-typedef enum algorithm_e {
-#ifdef ENABLE_GRAHAM_METHOD
-    AL_GRAHAM='g',
-#endif
-#ifdef ENABLE_ROBINSON_METHOD
-    AL_ROBINSON='r'
-#endif
-} algorithm_t;
-extern algorithm_t algorithm;
-
-/* define default */
-#ifdef ENABLE_GRAHAM_METHOD
-#define AL_DEFAULT AL_GRAHAM
-#else
-#define AL_DEFAULT AL_ROBINSON
 #endif
 
 enum dbmode_e { DB_READ = 0, DB_WRITE = 1 };

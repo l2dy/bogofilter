@@ -3,17 +3,7 @@
 /*****************************************************************************
 
 NAME:
-   bogofilter.c -- detect spam and bogons presented on standard input.
-
-AUTHOR:
-   Eric S. Raymond <esr@thyrsus.com>
-
-THEORY:
-   This is Paul Graham's variant of Bayes filtering described at 
-
-	http://www.paulgraham.com/spam.html
-
-I do the lexical analysis slightly differently, however.
+   robinson.c -- code for implementing robinson algorithm for computing spamicity.
 
 MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
     Robinson's proposed modifications to the "spamicity" calculation and
@@ -28,33 +18,34 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 ******************************************************************************/
 
 #include <math.h>
-#include <float.h> /* has DBL_EPSILON */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 #include "config.h"
-#include "common.h"
+
 #include "bogofilter.h"
-#include "graham.h"
+#include "common.h"
 #include "datastore.h"
-#include "lexer.h"
-#include "wordhash.h"
 #include "globals.h"
+#include "graham.h"
+#include "lexer.h"
+#include "method.h"
+#include "wordhash.h"
 
-#include <assert.h>
+method_t graham_method = {
+    gra_initialize_constants, 		/* alg_initialize_constants *initialize_constants; */
+    gra_bogofilter,	 		/* alg_compute_spamicity *compute_spamicity; */
+    gra_print_bogostats, 		/* alg_print_bogostats *print_stats; */
+    gra_cleanup 			/* alg_free *cleanup; */
+} ;
 
-#define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
-
-#ifdef	ENABLE_GRAHAM_METHOD
 /* constants for the Graham formula */
 #define KEEPERS		15		/* how many extrema to keep */
 #define MINIMUM_FREQ	5		/* minimum freq */
 
 #define MAX_PROB	0.99f		/* max probability value used */
 #define MIN_PROB	0.01f		/* min probability value used */
-#define DEVIATION(n)	fabs((n) - EVEN_ODDS)	/* deviation from average */
-#endif
 
 #define GRAHAM_MIN_DEV		0.4f	/* look for characteristic words */
 #define GRAHAM_SPAM_CUTOFF	0.90f	/* if it's spammier than this... */
@@ -62,14 +53,12 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 
 extern double min_dev;
 
-#ifdef	ENABLE_GRAHAM_METHOD
 typedef struct 
 {
     /*@unique@*/ 
     char        key[MAXTOKENLEN+1];
     double      prob; /* WARNING: DBL_EPSILON IN USE, DON'T CHANGE */
-}
-discrim_t;
+} discrim_t;
 
 struct bogostat_s
 {
@@ -78,7 +67,6 @@ struct bogostat_s
 
 #define SIZEOF(array)	((size_t)(sizeof(array)/sizeof(array[0])))
 
-//typedef struct bogostat_s bogostat_t;
 static bogostat_t bogostats;
 
 static int compare_extrema(const void *id1, const void *id2)
@@ -154,27 +142,13 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bogostats,
 	hit->key[MAXTOKENLEN] = '\0';
     }
 }
-#endif
 
 void gra_print_bogostats(FILE *fp, double spamicity)
 {
-#ifdef	ENABLE_GRAHAM_METHOD
-    if (algorithm == AL_GRAHAM)
-    {
-	int idx = (thresh_index >= 0) ? thresh_index : KEEPERS+thresh_index;
-	discrim_t *pp = &bogostats.extrema[idx];
-	if (force || pp->prob >= thresh_stats)
-	    (void)gra_compute_spamicity( &bogostats, fp );
-    }
-#endif
-
-#ifdef	ENABLE_ROBINSON_METHOD_XXX
-    if (algorithm == AL_ROBINSON)
-    {
-	if (force || spamicity > thresh_stats || spamicity > thresh_rtable)
-	    rstats_print();
-    }
-#endif
+    int idx = (thresh_index >= 0) ? thresh_index : KEEPERS+thresh_index;
+    discrim_t *pp = &bogostats.extrema[idx];
+    if (force || pp->prob >= thresh_stats)
+	(void)gra_compute_spamicity( &bogostats, fp );
 }
 
 typedef struct {
@@ -200,19 +174,7 @@ static double wordprob_result(wordprob_t* wordstats)
     double prob = 0.0;
     double count = wordstats->good + wordstats->bad;
 
-#ifdef	ENABLE_GRAHAM_METHOD
-    if (algorithm == AL_GRAHAM)
-    {
-	prob = wordstats->bad/count;
-    }
-#endif
-
-#ifdef	ENABLE_ROBINSON_METHOD_XXX
-    if (algorithm == AL_ROBINSON)
-    {
-	prob = ((ROBS * ROBX + wordstats->bad) / (ROBS + count));
-    }
-#endif
+    prob = wordstats->bad/count;
 
     return (prob);
 }
@@ -223,9 +185,7 @@ static double compute_probability(const char *token)
     int override=0;
     long count;
     double prob;
-#ifdef	ENABLE_GRAHAM_METHOD
     int totalcount=0;
-#endif
 
     wordprob_t wordstats;
 
@@ -240,60 +200,29 @@ static double compute_probability(const char *token)
 	if (count) {
 	    if (list->ignore)
 		return EVEN_ODDS;
-#ifdef	ENABLE_GRAHAM_METHOD
 	    totalcount+=count*list->weight;
-#endif
 	    override=list->override;
 	    prob = (double)count;
 
-#ifdef	ENABLE_GRAHAM_METHOD
-	    if (algorithm == AL_GRAHAM)
-	    {
- 	        prob /= list->msgcount;
- 	        prob *= list->weight;
-		prob = min(1.0, prob);
-	    }
-#endif
-
-#ifdef	ENABLE_ROBINSON_METHOD_XXX
-	    if (algorithm == AL_ROBINSON)
-	    {
- 	        if (!list->bad)
-		    prob *= scalefactor;
-	    }
-#endif
-
+	    prob /= list->msgcount;
+	    prob *= list->weight;
+	    prob = min(1.0, prob);
+	    
 	    wordprob_add(&wordstats, prob, list->bad);
 	}
     }
 
-#ifdef	ENABLE_GRAHAM_METHOD
-    if (algorithm == AL_GRAHAM)
-    {
-	if (totalcount < MINIMUM_FREQ) {
-	    prob=UNKNOWN_WORD;
-	} else {
-	    prob=wordprob_result(&wordstats);
-	    prob = min(MAX_PROB, prob);
-	    prob = max(MIN_PROB, prob);
-	}
-    }
-#endif
-
-#ifdef	ENABLE_ROBINSON_METHOD_XXX
-    if (algorithm == AL_ROBINSON)
-    {
+    if (totalcount < MINIMUM_FREQ) {
+	prob=UNKNOWN_WORD;
+    } else {
 	prob=wordprob_result(&wordstats);
-	if ((Rtable || verbose) &&
-	    (fabs(EVEN_ODDS - prob) >= min_dev))
-	    rstats_add(token, wordstats.good, wordstats.bad, prob);
+	prob = min(MAX_PROB, prob);
+	prob = max(MIN_PROB, prob);
     }
-#endif
 
     return prob;
 }
 
-#ifdef	ENABLE_GRAHAM_METHOD
 static bogostat_t *select_indicators(wordhash_t *wordhash)
 /* selects the best spam/nonspam indicators and
  * populates the bogostats structure.
@@ -315,10 +244,8 @@ static bogostat_t *select_indicators(wordhash_t *wordhash)
 
     return (&bogostats);
 }
-#endif
 
-#ifdef	ENABLE_GRAHAM_METHOD
-double	gra_compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errno@*/
+double gra_compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errno@*/
 /* computes the spamicity of the words in the bogostat structure
  * returns:  the spamicity */
 {
@@ -353,15 +280,12 @@ double	gra_compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errno@*
 		case 1:
 		    break;
 		case 2:
-		    assert(stats_prefix != NULL);
 		    fprintf(fp, "%s%f  %s\n", stats_prefix, pp->prob, pp->key);
 		    break;
 		case 3:
-		    assert(stats_prefix != NULL);
 		    fprintf(fp, "%s%f  %f  %s\n", stats_prefix, pp->prob, spamicity, pp->key);
 		    break;
 		default:
-		    assert(stats_prefix != NULL);
 		    fprintf(fp, "%s%f  %f  %f  %8.5e  %s\n", stats_prefix, pp->prob, product, invproduct, spamicity, pp->key);
 		    break;
 	    }
@@ -370,36 +294,18 @@ double	gra_compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errno@*
 
     return spamicity;
 }
-#endif
-
 
 void gra_initialize_constants(void)
 {
-#ifdef	ENABLE_GRAHAM_METHOD
-    if (algorithm == AL_GRAHAM)
-    {
+    max_repeats = GRAHAM_MAX_REPEATS;
+    if (fabs(min_dev) < EPS)
+	min_dev = GRAHAM_MIN_DEV;
+    if (spam_cutoff < EPS)
 	spam_cutoff = GRAHAM_SPAM_CUTOFF;
-	max_repeats = GRAHAM_MAX_REPEATS;
-	if (fabs(min_dev) < EPS)
-	    min_dev     = GRAHAM_MIN_DEV;
-    }
-#endif
-
-#ifdef	ENABLE_ROBINSON_METHOD_XXX
-    if (algorithm == AL_ROBINSON)
-    {
-	spam_cutoff = ROBINSON_SPAM_CUTOFF;
-	max_repeats = ROBINSON_MAX_REPEATS;
-	scalefactor = compute_scale();
-	if (fabs(min_dev) < EPS)
-	    min_dev     = ROBINSON_MIN_DEV;
-	if (fabs(robs) < EPS)
-	    robs = ROBS;
-    }
-#endif
+    set_good_weight( GRAHAM_GOOD_BIAS );
 }
 
-double	gra_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
+double gra_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 {
     double spamicity;
     bogostat_t	*bogostats;
@@ -411,3 +317,9 @@ double	gra_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 
     return spamicity;
 }
+
+void gra_cleanup(void)
+{
+}
+
+/* Done */

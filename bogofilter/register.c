@@ -1,8 +1,6 @@
 /* $Id$ */
 
-/*#include <math.h>*/
 #include <stdio.h>
-/*#include <string.h>*/
 #include <stdlib.h>
 
 #include "config.h"
@@ -15,6 +13,8 @@
 #include "globals.h"
 
 #define PLURAL(count) ((count == 1) ? "" : "s")
+
+int	max_repeats;
 
 extern char msg_register[];
 
@@ -77,7 +77,7 @@ void *collect_words(/*@out@*/ int *message_count,
  
   if (word_count)
     *word_count = w_count;
- 
+
   if (message_count)
     *message_count = msg_count;
  

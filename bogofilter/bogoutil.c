@@ -24,6 +24,7 @@ AUTHOR:
 #include "bogofilter.h"
 #include "datastore.h"
 #include "datastore_db.h"
+#include "robinson.h"			/* for ROBS and ROBX */
 
 #define PROGNAME "bogoutil"
 

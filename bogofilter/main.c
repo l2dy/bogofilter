@@ -124,7 +124,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     if (check_directory(directory))
 	exit(2);
 
-    if (setup_lists(directory, GOOD_BIAS, 1.0))
+    if (setup_lists(directory, 1.0, 1.0))
 	exit(2);
 
     process_config_files();
@@ -167,7 +167,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 		    if (! stats_in_header)
 			(void)fputs("\n", stdout);
 		    verbose += passthrough;
-		    print_bogostats( stdout, spamicity );
+		    print_stats( stdout, spamicity );
 		    verbose -= passthrough;
 		}
 
