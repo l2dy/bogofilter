@@ -131,11 +131,11 @@ TOKEN 		{TOKENFRONT}{TOKENMID_NJS_DR}{TOKENBACK}
 <BOGO_LEX>^\"{BOGOLEX_TOKEN}\"{NUM_NUM}		{ return BOGO_LEX_LINE; }
 <BOGO_LEX>\n					{ lineno += 1; }
 
-<INITIAL>charset=\"?{ID}\"?			{ got_charset(yytext); yyredo(yy_text(), '='); }
+<INITIAL>charset=\"?{ID}\"?			{ got_charset(yytext); yyless(strlen("charset")); return TOKEN; }
 <INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); yyless(strlen("MIME-Version:")); return(TOKEN); }
 <INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); yyless(strlen("Content-Transfer-Encoding:")); return(TOKEN); }
-<INITIAL>^Content-Type:{MTYPE};?		{ mime_type(yy_text()); yyredo(yy_text(), ':'); }
-<INITIAL>^Content-Disposition:{MTYPE}		{ mime_disposition(yy_text()); yyredo(yy_text(), ':'); }
+<INITIAL>^Content-Type:{MTYPE};?		{ mime_type(yy_text()); yyless(strlen("Content-Type:")); return TOKEN; }
+<INITIAL>^Content-Disposition:{MTYPE}		{ mime_disposition(yy_text()); yyless(strlen("Content-Disposition:")); return TOKEN; }
 <INITIAL>^Subject:.* 				{ set_tag("subj:");  yyredo(yy_text(), ':'); }
 <INITIAL>^Date:.*|Delivery-Date:.*		;
 <INITIAL>^Message-ID:.*				;
