@@ -29,12 +29,12 @@ words
 wordlist
 wordlist
 ******  IhT  ******
-From
-bounce
+head:From
+head:bounce
 to:junk
-Content-Type
-text
-html
+head:Content-Type
+head:text
+head:html
 DONE
 Done
 done
@@ -69,12 +69,12 @@ arial
 color
 red
 ******  Iht  ******
-From
-bounce
+head:From
+head:bounce
 to:junk
-Content-Type
-text
-html
+head:Content-Type
+head:text
+head:html
 DONE
 Done
 done
@@ -119,12 +119,12 @@ arial
 color
 red
 ******  ihT  ******
-from
-bounce
+head:from
+head:bounce
 to:junk
-content-type
-text
-html
+head:content-type
+head:text
+head:html
 done
 done
 done
@@ -134,12 +134,12 @@ words
 wordlist
 wordlist
 ******  iht  ******
-from
-bounce
+head:from
+head:bounce
 to:junk
-content-type
-text
-html
+head:content-type
+head:text
+head:html
 done
 done
 done

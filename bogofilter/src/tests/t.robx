@@ -57,7 +57,7 @@ WANT="356086"
 # v0.15.1 - lexer_v3.l changes to exclude message ids
 WANT="368615"
 # v0.15.4 - no longer discarding message separators
-WANT="368893"
+WANT="363576"
 
 if [ "$RESULT" != "$WANT" ] ; then
     echo want: $WANT, have: $RESULT

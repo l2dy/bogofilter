@@ -13,11 +13,11 @@ $BOGOFILTER -C -n < ${SYSTEST}/inputs/good.mbx >> $TMPDIR/tmp
 CORRECT="$TMPDIR/result"
 
 cat >> $CORRECT <<EOF
-initial: 5086
-count 0 -> 5086
-count 1 -> 1756
-count 2 -> 879
-count 3 -> 571
+initial: 5303
+count 0 -> 5303
+count 1 -> 1842
+count 2 -> 938
+count 3 -> 603
 EOF
 
 echo initial: `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db | wc -l` > $OUT

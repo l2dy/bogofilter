@@ -42,8 +42,9 @@ WANT="1710.3914"
 WANT="1708.3909"
 # v0.15.3 - discarding other likely singletons
 WANT="1708.3864"
-# v0.15.4 - no longer discarding message separators
-WANT="1718.3877"
+# v0.15.4 - tagging all header tokens
+#         - no longer discarding message separators
+WANT="1784.4039"
 
 if [ "$RESULT" != "$WANT" -o $verbose -ne 0 ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT

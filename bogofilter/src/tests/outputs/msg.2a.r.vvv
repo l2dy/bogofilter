@@ -1,4 +1,4 @@
-X-Bogosity: No, tests=bogofilter, spamicity=0.531266
+X-Bogosity: No, tests=bogofilter, spamicity=0.531123
                                      n    pgood     pbad      fw     U
 "which"                             10  0.208333  0.000000  0.000415 +
 "working"                            6  0.125000  0.000000  0.000691 +
@@ -201,7 +201,6 @@ X-Bogosity: No, tests=bogofilter, spamicity=0.531266
 "you"                               40  0.479167  0.809524  0.628122 +
 "get"                               21  0.250000  0.428571  0.631476 +
 "your"                              42  0.500000  0.857143  0.631527 +
-"MIME-Version"                      30  0.354167  0.619048  0.636012 +
 "multi-part"                        22  0.250000  0.476190  0.655628 +
 "was"                               26  0.291667  0.571429  0.661974 +
 "address"                           15  0.166667  0.333333  0.666499 +
@@ -311,5 +310,5 @@ X-Bogosity: No, tests=bogofilter, spamicity=0.531266
 "Here"                               7  0.000000  0.333333  0.999165 +
 "Verdana"                            9  0.000000  0.428571  0.999351 +
 "FREE"                              10  0.000000  0.476190  0.999416 +
-P_Q_S_invs_logs_md                 311  0.785454  0.693003  0.531266
+P_Q_S_invs_logs_md                 310  0.785820  0.693723  0.531123
                                         1.00e-02  4.15e-01  0.000
