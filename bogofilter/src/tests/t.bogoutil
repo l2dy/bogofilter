@@ -1,0 +1,65 @@
+#! /bin/sh
+
+. ${srcdir:=.}/t.frame
+
+# test common bogoutil functions
+
+# initialize
+rm ${TMPDIR}/wordlist.$DB_EXT # reset TXN detection
+if [ $DB_TXN = true ] ; then addarg=--db-transaction=yes ; else addarg= ; fi
+echo bacon on toast | $BOGOFILTER -C -d ${TMPDIR} -n $addarg
+echo foul eggs      | $BOGOFILTER -C -d ${TMPDIR} -s $addarg
+
+$BOGOUTIL -v -V 2>/dev/null
+$BOGOUTIL -h 2>/dev/null
+
+# check if bogoutil can count ;-)
+echo >${TMPDIR}/ref "6 tokens dumped"
+$BOGOUTIL -C -v -d ${TMPDIR}/wordlist.$DB_EXT 2>&1 >/dev/null \
+| cmp -s - ${TMPDIR}/ref
+
+# ROBX calculation cannot work, insufficient data
+if $BOGOUTIL -C -r ${TMPDIR}/ ; then false ; fi
+
+# load more data as ROBX fodder
+$BOGOFILTER -xd -C -n -d ${TMPDIR}/ -M -B ${srcdir}/inputs/good.mbx
+$BOGOFILTER -xd -C -s -d ${TMPDIR}/ -M -B ${srcdir}/inputs/spam.mbx
+
+# printing robx must not store the token
+$BOGOUTIL -C -r ${TMPDIR}/ | egrep '^ ?0?.[0-9]+$' >/dev/null
+if $BOGOUTIL -C -w ${TMPDIR}/ .ROBX | egrep '^[[:alnum:]]' ; then
+    false
+fi
+
+# storing robx must store the token, quite obviously :-)
+# also use -p so we test both -p and -w
+$BOGOUTIL -C -R ${TMPDIR}/
+$BOGOUTIL -C -p ${TMPDIR}/ .ROBX | egrep '^\.ROBX' >/dev/null
+
+# check if it can dump tokens from stdin
+echo "head:toast" | $BOGOUTIL -C -p ${TMPDIR}/ \
+| egrep '^head:toast' >/dev/null
+
+if [ $DB_TYPE = db ] || [ $DB_TYPE = sqlite ] ; then
+    ps=`$BOGOUTIL -C --db-print-pagesize ${TMPDIR}/wordlist.$DB_EXT`
+    test -n "$ps"
+    test "$ps" != UNKNOWN
+fi
+
+if [ $DB_TYPE = db ] ; then
+    $BOGOUTIL -C --db-verify ${TMPDIR}/wordlist.$DB_EXT
+
+    if [ $DB_TXN = true ] ; then
+	$BOGOUTIL --db-recover ${TMPDIR}/
+	$BOGOUTIL --db-checkpoint ${TMPDIR}/
+	if ls "${TMPDIR}/log."* >/dev/null 2>&1 ; then
+	    $BOGOUTIL --db-prune ${TMPDIR}/
+	fi
+	if ls "${TMPDIR}/__db."* >/dev/null 2>&1 ; then
+	    $BOGOUTIL --db-remove-environment ${TMPDIR}/
+	    if ls "${TMPDIR}/__db."* >/dev/null 2>&1 ; then
+		false
+	    fi
+	fi
+    fi
+fi

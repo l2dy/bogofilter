@@ -11,7 +11,9 @@ BUILT_SOURCES = t.config
 CLEANFILES= $(BUILT_SOURCES)
 
 t.config: Makefile
-	echo >$@ 'EXE_EXT="@EXE_EXT@"' || rm -f $@
+	( echo  >$@ 'EXE_EXT="@EXE_EXT@"' ; \
+	  echo >>$@ 'DB_EXT="@DB_EXT@"' ; \
+	  echo >>$@ 'DB_TYPE="@DB_TYPE@"' ) || rm -f $@
 
 ENVIRON_TESTS = t.abort t.env t.ctype t.bogodir t.leakfind t.u_fpe
 

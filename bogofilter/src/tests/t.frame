@@ -16,8 +16,11 @@ exec </dev/null
 : ${relpath=..}
 : ${BF_TESTDIR=.}
 
-# suck in $EXE_EXT
+# suck in EXE_EXT and DB_TYPE, export the latter.
 . ./t.config
+export DB_TYPE
+DB_EXT=${DB_EXT#.}
+export DB_EXT
 
 BOGOFILTER="$VAL ${relpath}/bogofilter$EXE_EXT"
 BOGOLEXER="$VAL ${relpath}/bogolexer$EXE_EXT"
@@ -35,16 +38,21 @@ export _POSIX2_VERSION
 # Obtain data base file suffix
 DB_NAME=`$BOGOFILTER -C -V 2>&1 | sed -n '2p;'`
 case $DB_NAME in
-    *BerkeleyDB*)    DB_EXT=db ;;
-    *"Berkeley DB"*) DB_EXT=db ;;
-    *QDBM*)	     DB_EXT=qdbm ;;
-    *SQLite*)	     DB_EXT=db ;;
-    *TrivialDB*)     DB_EXT=tdb ;;
+    *BerkeleyDB*|*"Berkeley DB"*)
+	case $DB_NAME in
+	    *" TRANSACTIONAL"*|*" AUTO-XA"*) DB_TXN=true ;;
+	    *)                               DB_TXN=false ;;
+	esac ;;
+    *QDBM*)	     DB_TXN=false ;;
+    *SQLite*)	     DB_TXN=true  ;;
+    *TrivialDB*)     DB_TXN=false ;;
     *)		    echo >&2 "Unknown data base type in bogofilter -V: $DB_NAME"
 		    exit 1 ;;
 esac
-
-export DB_EXT
+export DB_EXT DB_TXN
+if [ "x$BF_TESTVERBOSE" != x ] ; then
+    echo "detected database type \"$DB_TYPE\", extension: \"$DB_EXT\", transactions: $DB_TXN"
+fi
 
 # Cater for Solaris "compatibility"
 case $PATH in

@@ -372,16 +372,16 @@ AC_ARG_WITH(database,
 case "x$WITH_DB_ENGINE" in
     xsqlite)
 	AC_DEFINE(ENABLE_SQLITE_DATASTORE,1, [Enable sqlite datastore])
-	AC_DEFINE_UNQUOTED(DB_TYPE, "sqlite", [database type])
-	AC_DEFINE_UNQUOTED(DB_EXT, ".db", [database file extension])
+	DB_TYPE=sqlite
+	DB_EXT=.db
 	AC_CHECK_HEADERS([sqlite3.h],,AC_MSG_ERROR(Cannot find sqlite3.h header file))
 	AC_LIB_LINKFLAGS([sqlite3])
 	LIBDB="$LIBSQLITE3"
 	;;
     xtdb)
 	AC_DEFINE(ENABLE_TDB_DATASTORE,1, [Enable tdb datastore])
-	AC_DEFINE_UNQUOTED(DB_TYPE, "tdb", [database type])
-	AC_DEFINE_UNQUOTED(DB_EXT, ".tdb", [database file extension])
+	DB_TYPE=tdb
+	DB_EXT=.tdb
 	AC_LIB_LINKFLAGS([tdb])
 	LIBDB="$LIBTDB"
 	saveLIBS="$LIBS"
@@ -396,8 +396,8 @@ case "x$WITH_DB_ENGINE" in
     ;;
     xqdbm)
 	AC_DEFINE(ENABLE_QDBM_DATASTORE,1, [Enable qdbm datastore])
-	AC_DEFINE_UNQUOTED(DB_TYPE, "qdbm")
-	AC_DEFINE_UNQUOTED(DB_EXT, ".qdbm")
+	DB_TYPE=qdbm
+	DB_EXT=.qdbm
 	AC_LIB_LINKFLAGS([qdbm])
 	LIBDB="$LIBQDBM"
 	saveLIBS="$LIBS"
@@ -414,8 +414,8 @@ case "x$WITH_DB_ENGINE" in
 	dnl check if we need LIBDB at all (it is harmful on BSD since
 	dnl they rename the library including soname)
 	dnl and try to guess if we need -lpthread or -lthread
-	AC_DEFINE_UNQUOTED(DB_TYPE, "db")
-	AC_DEFINE_UNQUOTED(DB_EXT, ".db")
+	DB_TYPE=db
+	DB_EXT=.db
 	AC_LIB_LINKFLAGS([db])
 	AC_MSG_CHECKING(db and dependent libraries)
 	saveLIBS="$LIBS"
@@ -555,6 +555,10 @@ if test "a$STATIC_DB" = a ; then
     fi
 fi
 
+AC_DEFINE_UNQUOTED(DB_EXT, "$DB_EXT", [database file extension])
+AC_DEFINE_UNQUOTED(DB_TYPE, "$DB_TYPE", [database type])
+AC_SUBST(DB_EXT)
+AC_SUBST(DB_TYPE)
 AC_SUBST(STATIC_DB)
 
 AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xtdb")
