@@ -102,7 +102,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode){
       /* see if the database byte order differs from that of the cpu's */
       int had_err = 0;
 
-#if DB_VERSION_MAJOR == 3 && DB_VERSION_MINOR >= 3
+#if DB_VERSION_MAJOR > 3 || (DB_VERSION_MAJOR == 3 && DB_VERSION_MINOR >= 3)
       if ( (ret = handle->dbp->get_byteswapped (handle->dbp, &(handle->is_swapped))) != 0){
 	handle->dbp->err (handle->dbp, ret, "%s (db) get_byteswapped: %s", progname, db_file);
         had_err = 1;
