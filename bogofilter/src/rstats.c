@@ -69,17 +69,17 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count);
 
 void rstats_init(void)
 {
-    header.list = (rstats_t *) xcalloc( 1, sizeof(rstats_t));
+    current = (rstats_t *) xcalloc( 1, sizeof(rstats_t));
+    header.list = current;
     header.count = 0;
     header.robn  = 0;
-    current = header.list;
 }
 
 void rstats_cleanup(void)
 {
     rstats_t *p, *q;
 
-    for (p = current; p != NULL; p = q)
+    for (p = header.list; p != NULL; p = q)
     {
       q = p->next;
       xfree(p);
