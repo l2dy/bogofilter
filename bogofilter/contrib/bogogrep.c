@@ -17,8 +17,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#if defined(__DGUX__) || !defined(MAP_FAILED)
-#define MAP_FAILED (-1)
+#ifndef MAP_FAILED
+#define MAP_FAILED	((void *) -1)
 #endif
 
 #if !defined(__GNUC__)
