@@ -180,6 +180,10 @@ typedef uint8_t u_int8_t;
 # endif
 #endif
 
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 /* system.c - function prototypes */
 
 extern bool bf_abspath(const char *path);
