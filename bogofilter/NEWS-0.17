@@ -14,6 +14,7 @@ Note:
 * Fix "Can't find '.MSG_COUNT'" problem in bogotune.
 * Fix defect that continues decoding base64/qp after invalid chars.
 * Ignore data portion of PGP signatures.
+* Use "mime:" (rather than "head:") to tag mime part headers.
 
 0.17.?	2004-03-??
 

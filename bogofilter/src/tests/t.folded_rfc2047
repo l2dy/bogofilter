@@ -26,7 +26,8 @@ _EOF
 cat >${TMPDIR}/reference <<_EOF
 subj:okay
 subj:another
-subj:merge_worked
+subj:merge
+subj:worked
 head:Reply-To
 head:join
 head:Reply-To

@@ -13,6 +13,7 @@ Note:
 	2004-03-20
 
 	* Ignore data portion of PGP signatures.
+	* Use "mime:" (rather than "head:") to tag mime part headers.
 
 	2004-03-19
 
