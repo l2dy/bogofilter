@@ -392,6 +392,7 @@ AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
 
 dnl Use TRIO to replace missing snprintf/vsnprintf.
 needtrio=0
+dnl if test "$FORCE_TRIO" = "yes" ; then needtrio=1 ; ac_cv_func_vsnprintf=no ; ac_cv_func_snprintf=no ; fi
 if test "x$ac_cv_func_snprintf" != "xyes" ; then
     AC_DEFINE(snprintf, trio_snprintf, [Define to trio_snprintf if your system lacks snprintf])
     needtrio=1
@@ -434,7 +435,6 @@ if test $ac_cv_ieee_option != none; then
 fi
 dnl END TRIO
 
-    LIBS="$LIBS -ltrio -lm"
     AC_DEFINE(NEEDTRIO, 1, [Define to 1 if trio is to be included.])
 fi
 AM_CONDITIONAL(NEEDTRIO, test "$needtrio" = "1")

@@ -52,6 +52,11 @@ check_PROGRAMS = debugtest configtest wordhash find_home.test \
 
 TESTS=
 
+LDADD = libbogofilter.a @LIBOBJS@
+bogofilter_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
+bogoutil_LDADD = $(LDADD) $(LIBDB)
+configtest_LDADD = $(LDADD) $(LIBDB)
+
 if NEEDTRIO
 noinst_LIBRARIES += libtrio.a
 libtrio_a_SOURCES= ../trio/triostr.c ../trio/trio.c ../trio/trionan.c \
@@ -60,12 +65,8 @@ libtrio_a_SOURCES= ../trio/triostr.c ../trio/trio.c ../trio/trionan.c \
 check_PROGRAMS += regression
 TESTS+=./regression
 regression_SOURCES= ../trio/regression.c
+LDADD += libtrio.a
 endif
-
-LDADD = libbogofilter.a @LIBOBJS@
-bogofilter_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
-bogoutil_LDADD = $(LDADD) $(LIBDB)
-configtest_LDADD = $(LDADD) $(LIBDB)
 
 # what to build that from
 version_sources= \
