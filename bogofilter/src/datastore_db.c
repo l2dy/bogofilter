@@ -1311,6 +1311,11 @@ ex_t db_verify(const char *dbfile) {
     DB *db;
     int e;
 
+    if (!is_file(dbfile)) {
+	print_error(__FILE__, __LINE__, "\"%s\" is not a file.", dbfile);
+	return EX_ERROR;
+    }
+
     tmp = strrchr(dir, DIRSEP_C);
     if (!tmp)
 	free(dir), dir = xstrdup(CURDIR_S);
