@@ -41,7 +41,7 @@ void set_bogohome(const char *ds_file) {
 	    *bogohome = '\0';
     }
     if (!*bogohome) {
-	free(bogohome);
+	xfree(bogohome);
 	bogohome = xstrdup(CURDIR_S);
     }
 }
