@@ -78,7 +78,6 @@
   </ul>
 
   <hr>
-
   <h2 id="what-is-bogofilter">What is bogofilter?</h2>
 
   <p>Bogofilter is a fast Bayesian spam filter along the lines suggested by Paul Graham in his article <a href="http://www.paulgraham.com/spam.html">A Plan For Spam</a>. Bogofilter uses <a href="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">Gary Robinson</a>'s geometric-mean algorithm with the Fisher's method modification to classify email as spam or non-spam.</p>
@@ -90,7 +89,6 @@
   <p>The <a href="http://bogofilter.sourceforge.net/NEWS">NEWS file</a> describes bogofilter's version history.</p>
 
   <hr>
-
   <h2 id="lists">Mailing Lists</h2>
 
   <p>There are currently four mailing lists for bogofilter:</p>
@@ -124,7 +122,6 @@
   </table>
 
   <hr>
-
   <h2 id="vvv">What does bogofilter's verbose output mean?</h2>
 
   <p>Bogofilter can instructed to display information on the scoring of a message by running it with flags "-v", "-vv", "-vvv", or "-R".</p>
@@ -229,7 +226,6 @@ The sample procmail recipe below shows one way to do this:<p>
   </pre>
 
   <hr>
-
   <h2 id="asian-spam">What can I do about asian spam?</h2>
 
   <p>Many people get unsolicited email using asian language charsets.  Since they don't know the languages and don't know people there, they assume it's spam.</p>
@@ -261,7 +257,6 @@ spam-unreadable
   </ul>
 
   <hr>
-
   <h2 id="query-database">How do I manually query the database</h2>
 
   <p>To find the spam and ham counts for a token (word) use bogoutil's '-w' option. For example, "bogoutil -w $BOGOFILTER_DIR example.com" gives the good and bad counts for "example.com".</p>
@@ -273,7 +268,6 @@ spam-unreadable
   <p>To tell how many tokens are in your wordlists pipe the output of bogoutil's dump command to command "wc", i.e. use "bogoutil -d $BOGOFILTER_DIR/spamlist.db | wc -l " to display the count for the spamlist and use "bogoutil -d $BOGOFILTER_DIR/goodlist.db | wc -l" to display the count for the goodlist.</p>
 
   <hr>
-
   <h2 id="rescue">How can I tell if my wordlists are corrupted?</h2>
 
   <p>If you think your wordlists are hosed, you can see what BerkeleyDB thinks by running:</p>
@@ -294,7 +288,6 @@ db_load spamlist.new &lt; spamlist.txt
 </pre>
 
   <hr>
-
   <h2 id="port-notes">How do I get bogofilter working on Solaris, BSD, etc?</h2>
 
   <p>If you don't already have a v3.0+ version of <a
@@ -352,7 +345,6 @@ source directory (as suggested above) or use GNU make (gmake).</p>
   <p>See the file doc/programmer/README.hp-ux in the source distribution.</p>
 
   <hr>
-
   <h2 id="nfs">Can I share wordlists over NFS?</h2>
 
   <p>Yes, provided you use the correct file locking to avoid data corruption. When you compile bogofilter, you will need to verify that the configure script has set "#define HAVE_FCNTL 1" in your config.h file. Popular UNIX operating systems will all support this. If you are running an unusual, or an older version of an operating system, make sure it supports fcntl(). If "#define HAVE_FCNTL 1" is set, then comment out "#define HAVE_FLOCK 1" so that the locking system uses fcntl() locking instead of the default of flock() locking. If your system does not support fcntl, then you will not be able to share wordlist files over NFS without the risk of data corruption.</p>
@@ -360,13 +352,11 @@ source directory (as suggested above) or use GNU make (gmake).</p>
   <p>Next, make sure you have NFS set up properly, with "lockd" running. Refer to your NFS documentation for more information about running "lockd" or "rpc.lockd". Most operating systems with NFS turn this on by default.</p>
 
   <hr>
-
   <h2 id="return-codes">Why does bogofilter give return codes like 0 and 256 when it's run from inside a program?</h2>
 
   <p>Likely the return codes are being reformatted by waitpid(2). Use WEXITSTATUS(status) in sys/wait.h, or comparable macro, to get the correct value.</p>
 
   <hr>
-
   <h2 id="changed-options">Now that I've upgraded to 0.11 why are my scripts broken?</h2>
 
   <p>With version 0.11 bogofilter's options for registering mail as ham or spam have been changed. They now allow registering (or unregistering) messages in the ham and spam wordlists. Prior to this, there was no way to unregister a message from a wordlist (without registering it in the other wordlist).</p>
@@ -387,7 +377,6 @@ source directory (as suggested above) or use GNU make (gmake).</p>
   <p>MUA scripts typically use '-s' and '-n' and don't need to change. Other scripts which use '-S' and '-N' for fixing registration errors <em>do</em> need to be changed.</p>
 
   <hr>
-
 <!--
 $Id$
 -->
