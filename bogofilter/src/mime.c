@@ -548,9 +548,9 @@ mime_boundary_set (word_t *text)
 
   if (DEBUG_MIME (1)) {
       int len = blen;
-      if(blen > INT_MAX) len = INT_MAX;
-    fprintf (dbgout, "*** --> mime_boundary_set: %d '%-.*s'\n", stackp,
-	     len, boundary);
+      if (blen > INT_MAX) len = INT_MAX;
+      fprintf (dbgout, "*** --> mime_boundary_set: %d '%-.*s'\n", stackp,
+	       len, boundary);
   }
 
   boundary = getword(boundary + strlen("boundary="), boundary + blen);
@@ -560,8 +560,8 @@ mime_boundary_set (word_t *text)
   msg_state->boundary_len = strlen((char *)boundary);
 
   if (DEBUG_MIME (1))
-    fprintf (dbgout, "*** <-- mime_boundary_set: %d '%s'\n", stackp,
-	     boundary);
+      fprintf (dbgout, "*** <-- mime_boundary_set: %d '%s'\n", stackp,
+	       boundary);
 
   return;
 }
