@@ -2,6 +2,16 @@
 				BOGOFILTER NEWS
 			       =================
  
+0.13.5	2003-06-03
+
+* Allow terminal exclamation points on tokens.
+* Diagnose invalid values of robx.
+* Fixed bogofilter's non-use of message counts in msg-count files.
+* Updated contrib/mime.get.rfc822
+* Modified rstats_print_histogram() so it doesn't print 'nan's.
+* Modified t.frame to find version of grep on Solaris so t.bulkmode
+   can run successfully.
+ 
 0.13.4.1 2003-05-31
  
 * Modified t.parsing test so it works with OSX's default file system.
