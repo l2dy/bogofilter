@@ -104,8 +104,10 @@ enum e_verbosity {
     SCORE_DETAIL	/* verbosity level for printing scores	*/
 };
 
+extern double round(double x);
+
 #define	MOD(n,m)	((n) - ((int)((n)/(m)))*(m))
-#define	ROUND(m,n)	(float)(((int)((m)*(n)+0.5))/((float)(n)))
+#define	ROUND(m,n)	round((m)*(n))/(n)
 
 #define	MIN(n)		((n)/60)
 #define SECONDS(n)	((n) - MIN(n)*60)
@@ -481,7 +483,7 @@ static double scale(uint cnt, uint lo, uint hi, double beg, double end)
 static void set_thresh(uint count, double *scores)
 {
     uint   ftarget = 0;
-    double cutoff, percent, lgc;
+    double cutoff, lgc;
 
     score_ns(scores);				/* get scores */
 
@@ -491,19 +493,15 @@ static void set_thresh(uint count, double *scores)
 **	target values:  (   22,    18,    8,   1)
 */
     lgc = log(count);
-    ftarget = max(ROUND(((-0.4831 * lgc) + 12.8976) * lgc - 61.5264, 1), 1);
-    cutoff  = ns_scores[ftarget-1];
 
-    percent = ROUND((float)ftarget/count, 10000.0) + 0.0001;
-    if (verbose >= PARMS)
-	printf("m:  cutoff %8.6f, ftarget %d, percent %6.4f%%\n", cutoff, ftarget, percent * 100.0);
-
-    while (percent > 0.0001 && ftarget > 1 && cutoff < MIN_CUTOFF) {
-	percent = percent - 0.0001;
-	ftarget  = max(ceil(count*percent), 1);
-	cutoff  = ns_scores[ftarget-1];
+    ftarget = max(ROUND(((-0.4831 * lgc) + 12.8976) * lgc - 61.5264, 1.0), 1);
+    while (1) {
+	cutoff = ns_scores[ftarget-1];
 	if (verbose >= PARMS)
-	    printf("m:  cutoff %8.6f, ftarget %d, percent %6.4f%%\n", cutoff, ftarget, percent * 100.0);
+	    printf("m:  cutoff %8.6f, ftarget %d\n", cutoff, ftarget);
+	if (ftarget == 1 || cutoff >= MIN_CUTOFF)
+	    break;
+	ftarget -= 1;
     }
 
     /* ensure cutoff is below SPAM_CUTOFF */
@@ -511,12 +509,12 @@ static void set_thresh(uint count, double *scores)
  	while (cutoff > SPAM_CUTOFF && ++ftarget < count) {
  	    cutoff = scores[ftarget-1];
 	    if (verbose >= PARMS)
-		printf("s:  cutoff %8.6f, ftarget %d, percent %6.4f%%\n", cutoff, ftarget, percent * 100.0);
+		printf("s:  cutoff %8.6f, ftarget %d%%\n", cutoff, ftarget);
 	}
  	cutoff = SPAM_CUTOFF;
 	--ftarget;
 	if (verbose >= PARMS)
-	    printf("s:  cutoff %8.6f, ftarget %d, percent %6.4f%%\n", cutoff, ftarget, percent * 100.0);
+	    printf("s:  cutoff %8.6f, ftarget %d%%\n", cutoff, ftarget);
     }
 
     if (cutoff < MIN_CUTOFF || cutoff > MAX_CUTOFF) {
@@ -1170,7 +1168,7 @@ static rc_t bogotune(void)
 	show_elapsed_time(beg, end, ns_cnt + sp_cnt, (double)cnt/(end-beg), "messages", "msg/sec");
     }
 
-    if (verbose > 3) {
+    if (verbose > PARMS+1) {
 	tunelist_print(ns_and_sp);
 	tunelist_print(ns_msglists);
 	tunelist_print(sp_msglists);
