@@ -71,7 +71,7 @@ static void lexer_display_buffer(buff_t *buff)
 	    (long)(buff->t.leng - buff->read));
     buff_puts(buff, 0, dbgout);
     if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
-       fputc('\n', dbgout);
+	fputc('\n', dbgout);
 }
 
 /*
@@ -83,9 +83,9 @@ static bool long_token(byte *buf, uint count)
 {
     uint i;
     for (i=0; i < count; i += 1) {
-       byte c = buf[i];
-       if ((iscntrl(c) || isspace(c) || ispunct(c)) && (c != '_'))
-	   return false;
+	byte c = buf[i];
+	if ((iscntrl(c) || isspace(c) || ispunct(c)) && (c != '_'))
+	    return false;
     }
     return true;
 }
@@ -222,12 +222,12 @@ int buff_fill(buff_t *buff, size_t used, size_t need)
 
     /* check bytes needed vs. bytes in buff */
     while (size - leng > 2 && need > leng - used) {
-       /* too few, read more */
-       int add = get_decoded_line(buff);
-       if (add == EOF) return EOF;
-       if (add == 0) break ;
-       cnt += add;
-       leng += add;
+	/* too few, read more */
+	int add = get_decoded_line(buff);
+	if (add == EOF) return EOF;
+	if (add == 0) break ;
+	cnt += add;
+	leng += add;
     }
     return cnt;
 }
@@ -237,7 +237,7 @@ void yyinit(void)
     yylineno = 0;
 
     if ( !msg_count_file)
-       lexer = &v3_lexer;
+	lexer = &v3_lexer;
 }
 
 int yyinput(byte *buf, size_t used, size_t size)
@@ -258,38 +258,38 @@ int yyinput(byte *buf, size_t used, size_t size)
 
     while ((cnt = get_decoded_line(&buff)) != 0) {
 
-       count += cnt;
+	count += cnt;
 
-       /* Note: some malformed messages can cause xfgetsl() to report
-       ** "Invalid buffer size, exiting."  ** and then abort.  This
-       ** can happen when the parser is in html mode and there's a
-       ** leading '<' but no closing '>'.
-       **
-       ** The "fix" is to check for a nearly full lexer buffer and
-       ** discard most of it.
-       */
+	/* Note: some malformed messages can cause xfgetsl() to report
+	** "Invalid buffer size, exiting."  ** and then abort.  This
+	** can happen when the parser is in html mode and there's a
+	** leading '<' but no closing '>'.
+	**
+	** The "fix" is to check for a nearly full lexer buffer and
+	** discard most of it.
+	*/
 
-       /* if not nearly full */
-       if (used < 1000 || used < size * 10)
-	   break;
+	/* if not nearly full */
+	if (used < 1000 || used < size * 10)
+	    break;
 
-       if (count >= MAXTOKENLEN * 2 && 
-	   long_token(buff.t.text, (uint) count)) {
-	   uint start = buff.t.leng - count;
-	   uint length = count - MAXTOKENLEN;
-	   buff_shift(&buff, start, length);
-	   count = buff.t.leng;
-       }
-       else
-	   break;
+	if (count >= MAXTOKENLEN * 2 && 
+	    long_token(buff.t.text, (uint) count)) {
+	    uint start = buff.t.leng - count;
+	    uint length = count - MAXTOKENLEN;
+	    buff_shift(&buff, start, length);
+	    count = buff.t.leng;
+	}
+	else
+	    break;
     }
 
-  if (msg_state &&
-      msg_state->mime_disposition &&
-      (msg_state->mime_type == MIME_APPLICATION ||  
-       msg_state->mime_type == MIME_IMAGE)) {
-      return (count == EOF ? 0 : count);   /* not decode at all */
-  }
+    if (msg_state &&
+	msg_state->mime_disposition &&
+	(msg_state->mime_type == MIME_APPLICATION ||  
+	 msg_state->mime_type == MIME_IMAGE)) {
+	return (count == EOF ? 0 : count);   /* not decode at all */
+    }
 
 /* EK -  decoding things like &#1084 and charset_table */
 #ifdef	CP866
