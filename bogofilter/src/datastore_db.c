@@ -319,8 +319,7 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
 
 int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 {
-    int ret;
-    bool found = false;
+    int ret = 0;
     DBT db_key;
     DBT db_data;
 
@@ -352,9 +351,9 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 
     switch (ret) {
     case 0:
-	found = true;
 	break;
     case DB_NOTFOUND:
+	ret = DS_NOTFOUND;
 	if (DEBUG_DATABASE(3)) {
 	    fprintf(dbgout, "db_get_dbvalue: [%*s] not found\n", 
 		    token->leng, (char *) token->data);
@@ -366,7 +365,7 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 	exit(EX_ERROR);
     }
 
-    return found ? 0 : DS_NOTFOUND;
+    return ret;
 }
 
 
