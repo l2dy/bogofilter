@@ -679,6 +679,9 @@ static ex_t dbx_common_close(DB_ENV *dbe, const char *directory)
     if (db_log_autoremove)
 	dbe_env_purgelogs(dbe);
 
+    if (DEBUG_DATABASE(0))
+	fprintf(dbgout, "closing environment\n");
+
     e = dbe->close(dbe, 0);
     if (e != 0) {
 	print_error(__FILE__, __LINE__, "Error closing environment \"%s\": %s",
@@ -743,9 +746,6 @@ ex_t dbe_purgelogs(const char *directory)
 	fprintf(dbgout, "removing inactive logfiles\n");
 
     dbe_env_purgelogs(dbe);
-
-    if (DEBUG_DATABASE(0))
-	fprintf(dbgout, "closing environment\n");
 
     return dbx_common_close(dbe, directory);
 }
