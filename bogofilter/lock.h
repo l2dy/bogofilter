@@ -1,8 +1,12 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.1  2002/09/14 22:15:20  adrian_otto
- * Initial revision
- * */
+ * Revision 1.2  2002/09/17 06:23:46  adrian_otto
+ * Changed HAVE_FCNTL_H to HAVE_FCNTL and added safeguard chacks to make sure
+ * the lock contants LOCK_EX and LOCK_SH get defined.
+ *
+/* Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
+/* 0.7.3 Base Source
+/* */
 /*****************************************************************************
 
 NAME:
@@ -45,8 +49,12 @@ DESCRIPTION:
 /****************************************************************************/
 /* Constants                                                                */
 /****************************************************************************/
-//#define LOCK_SH 1       /* Shared lock.  */
-//#define LOCK_EX 2       /* Exclusive lock.  */
+#ifndef LOCK_SH		/* Usually comes from <sys/file.h> */
+#define LOCK_SH 1       /* Shared lock.  */
+#endif
+#ifndef LOCK_EX
+#define LOCK_EX 2       /* Exclusive lock.  */
+#endif
 
 /****************************************************************************/
 /* Function Prototypes                                                      */

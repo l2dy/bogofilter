@@ -1,8 +1,12 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.1  2002/09/14 22:15:20  adrian_otto
- * Initial revision
- * */
+ * Revision 1.2  2002/09/17 06:23:46  adrian_otto
+ * Changed HAVE_FCNTL_H to HAVE_FCNTL and added safeguard chacks to make sure
+ * the lock contants LOCK_EX and LOCK_SH get defined.
+ *
+/* Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
+/* 0.7.3 Base Source
+/* */
 /****************************************************************************/
 /*                                                                          */
 /* NAME:                                                                    */
@@ -48,14 +52,14 @@ int lock_file (FILE *f, int lock_arg) {
 int lock_fileno (int f, int lock_arg) {
 
 #ifndef HAVE_LOCKF
-#ifdef HAVE_FCNTL_H
+#ifdef HAVE_FCNTL
 	/* persist a struct initialized the first time this function runs */
 	static struct flock lock_info = { F_RDLCK, SEEK_SET, 0, 0 };
 
 	if(lock_arg == LOCK_EX) {           /* Excludive lock requested */
 		lock_info.l_type = F_RWLCK; /* Use write lock instead */
 	}
-#endif /* HAVE_FCNTL_H */
+#endif /* HAVE_FCNTL */
 #endif /* HAVE_LOCKF */
 
 #ifdef HAVE_SIGNAL_H
@@ -107,7 +111,7 @@ int lock_fileno (int f, int lock_arg) {
 		#endif /* HAVE_SYSLOG_H */
 	} 
 
-#elif HAVE_FCNTL_H
+#elif HAVE_FCNTL
 
 	/* fcntl locking */
 	#ifdef HAVE_SYSLOG_H
@@ -156,10 +160,10 @@ int unlock_file (FILE *f) {
 int unlock_fileno (int f) {
 
 #ifndef HAVE_LOCKF
-#ifdef HAVE_FCNTL_H
+#ifdef HAVE_FCNTL
 	/* persist a struct initialized the first time this function runs */
 	static struct flock lock_info = { F_UNLCK, SEEK_SET, 0, 0 };
-#endif /* HAVE_FCNTL_H */
+#endif /* HAVE_FCNTL */
 #endif /* HAVE_LOCKF */
 
 #ifdef HAVE_FLOCK
@@ -178,7 +182,7 @@ int unlock_fileno (int f) {
 	syslog(LOG_DEBUG, "released POSIX lock");
 	#endif /* HAVE_SYSLOG_H */
 
-#elif HAVE_FCNTL_H
+#elif HAVE_FCNTL
 
 	/* fcntl locking */
 	fcntl(f, F_SETLKW, &lock_info); /* release fcntl lock */
