@@ -46,13 +46,13 @@ static word_t ipsave = { 0, ipsave_text};
 byte yylval_text[MAXTOKENLEN + MAX_PREFIX_LEN + D];
 static word_t yylval = { 0, yylval_text };
 
-static word_t w_to   = { sizeof("to:")-1,   "to:"};	/* To:          */
-static word_t w_from = { sizeof("from:")-1, "from:"};	/* From:        */
-static word_t w_rtrn = { sizeof("rtrn:")-1, "rtrn:"};	/* Return-Path: */
-static word_t w_subj = { sizeof("subj:")-1, "subj:"};	/* Subject:     */
-static word_t w_recv = { sizeof("rcvd:")-1, "rcvd:"};	/* Received:    */
-static word_t w_head = { sizeof("head:")-1, "head:"};	/* Header:      */
-static word_t w_mime = { sizeof("mime:")-1, "mime:"};	/* Mime:        */
+static word_t *w_to   = NULL;	/* To:          */
+static word_t *w_from = NULL;	/* From:        */
+static word_t *w_rtrn = NULL;	/* Return-Path: */
+static word_t *w_subj = NULL;	/* Subject:     */
+static word_t *w_recv = NULL;	/* Received:    */
+static word_t *w_head = NULL;	/* Header:      */
+static word_t *w_mime = NULL;	/* Mime:        */
 
 /* Global Variables */
 
@@ -62,11 +62,14 @@ static word_t *token_prefix = NULL;
 static uint32_t token_prefix_len;
 
 #define NONBLANK "spc:invalid_end_of_header"
-static word_t nonblank_line = { sizeof(NONBLANK)-1, NONBLANK};
+static word_t *nonblank_line = NULL;
 
 #define WCLEAR(n)  n.leng = 0
+#define WFREE(n)  word_free(n); n = NULL
 
 /* Function Prototypes */
+
+void token_clear(void);
 
 /* Function Definitions */
 
@@ -145,7 +148,7 @@ token_t get_token(word_t **token)
 	    if (leng == 2)
 		continue;
 	    else {	/* "spc:invalid_end_of_header" */
-		token_set( &yylval, nonblank_line.text, nonblank_line.leng);
+		token_copy( &yylval, nonblank_line);
 		done = true;
 	    }
 	    break;
@@ -263,7 +266,7 @@ token_t get_token(word_t **token)
 	    leng -= 2;
 	    token_set( &yylval, text, leng);
 	    /* if top level, no address, not localhost, .... */
-	    if (token_prefix == &w_recv &&
+	    if (token_prefix == w_recv &&
 		msg_state == msg_state->parent && 
 		msg_addr.leng == 0 &&
 		strcmp((char *)text, "127.0.0.1") != 0) {
@@ -373,7 +376,17 @@ void token_init(void)
     if (!msg_count_file)
 	mime_reset();
 
-    token_cleanup();
+    token_clear();
+
+    w_to   = word_new( "to:",   strlen("to:"));		/* To:          */
+    w_from = word_new( "from:", strlen("from:"));	/* From:        */
+    w_rtrn = word_new( "rtrn:", strlen("rtrn:"));	/* Return-Path: */
+    w_subj = word_new( "subj:", strlen("subj:"));	/* Subject:     */
+    w_recv = word_new( "rcvd:", strlen("rcvd:"));	/* Received:    */
+    w_head = word_new( "head:", strlen("head:"));	/* Header:      */
+    w_mime = word_new( "mime:", strlen("mime:"));	/* Mime:        */
+
+    nonblank_line = word_new(NONBLANK, strlen(NONBLANK));
 
     return;
 }
@@ -399,25 +412,25 @@ void set_tag(const char *text)
     switch (tolower(*text)) {
     case 'c':				/* CC: */
     case 't':
-	token_prefix = &w_to;		/* To: */
+	token_prefix = w_to;		/* To: */
 	break;
     case 'f':
-	token_prefix = &w_from;		/* From: */
+	token_prefix = w_from;		/* From: */
 	break;
     case 'h':
 	if (msg_state == msg_state->parent)
-	    token_prefix = &w_head;	/* Header: */
+	    token_prefix = w_head;	/* Header: */
 	else
-	    token_prefix = &w_mime;	/* Mime:   */
+	    token_prefix = w_mime;	/* Mime:   */
 	break;
     case 'r':
 	if (tolower(text[2]) == 't')
-	    token_prefix = &w_rtrn;	/* Return-Path: */
+	    token_prefix = w_rtrn;	/* Return-Path: */
 	else
-	    token_prefix = &w_recv;	/* Received: */
+	    token_prefix = w_recv;	/* Received: */
 	break;
     case 's':
-	token_prefix = &w_subj;		/* Subject: */
+	token_prefix = w_subj;		/* Subject: */
 	break;
     default:
 	fprintf(stderr, "%s:%d  invalid tag - '%s'\n",
@@ -448,7 +461,20 @@ void set_msg_id(byte *text, uint leng)
 /* Cleanup storage allocation */
 void token_cleanup()
 {
-    WCLEAR(msg_addr);
-    WCLEAR(msg_id);
-    WCLEAR(queue_id);
+    WFREE(w_to);
+    WFREE(w_from);
+    WFREE(w_rtrn);
+    WFREE(w_subj);
+    WFREE(w_recv);
+    WFREE(w_head);
+    WFREE(w_mime);
+
+    token_clear();
+}
+
+void token_clear()
+{
+    msg_addr.leng = 0;
+    msg_id.leng   = 0;
+    queue_id.leng = 0;
 }
