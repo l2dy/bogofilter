@@ -85,7 +85,7 @@ Use --with-db=PATH to specify the path to a v3+ install directory.
 You can download BerkeleyDB 4.0.x from http://www.sleepycat.com])
 )
 
-AC_CHECK_DB([db-4 db4 db-3.1 db-3 db3 db-2 db2 db],,
+AC_CHECK_DB([db db-4.1 db-4 db4 db-3.1 db-3 db3 db-2 db2],,
 		    AC_MSG_ERROR([Can not locate a suitable Berkeley DB
 				  library.  Use --with-db=PATH to specify
 				  the path to a v3+ install directory]))
@@ -183,6 +183,7 @@ AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 AC_TYPE_SIGNAL
+AC_CACHE_SAVE
 AC_FUNC_SELECT_ARGTYPES
 AC_CHECK_TYPES([uint32_t, u_int32_t])
 AC_CHECK_SIZEOF(unsigned short)
