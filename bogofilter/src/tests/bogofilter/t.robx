@@ -60,6 +60,8 @@ WANT="244544"
 WANT="244724"
 #min spamness/hamness of 10
 WANT="356086"
+# v0.13.0 - new parsing rules - case sensitive, header_line_markup, tokenize_html_tags
+WANT="370952"
 
 if [ "$RESULT" != "$WANT" ] ; then
     echo want: $WANT, have: $RESULT

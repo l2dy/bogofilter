@@ -59,8 +59,8 @@ rm -f $BOGOFILTER_DIR/*.db
 # populate goodlist and spamlist
 
 T=1	# test #1
-S=26	# expected tokens from spam message
-G=32	# expected tokens from good message
+S=28	# expected tokens from spam message
+G=34	# expected tokens from good message
 
 $BOGOFILTER $opts -C -y 0 -s -I $INPUT/msg.regtest.s
 $BOGOFILTER $opts -C -y 0 -n -I $INPUT/msg.regtest.n
@@ -70,7 +70,7 @@ check_counts
 # move msg.regtest.n from goodlist to spamlist in two separate steps
 
 T=2.1	# test #2.1
-S=26	# expected tokens from spam message
+S=28	# expected tokens from spam message
 G=0	# expected tokens from good message
 
 $BOGOFILTER $opts -C -y 0 -N -I $INPUT/msg.regtest.n
@@ -78,7 +78,7 @@ $BOGOFILTER $opts -C -y 0 -N -I $INPUT/msg.regtest.n
 check_counts
 
 T=2.2	# test #2.2
-S=45	# expected tokens from spam message
+S=54	# expected tokens from spam message
 G=0	# expected tokens from good message
 
 $BOGOFILTER $opts -C -y 0 -s -I $INPUT/msg.regtest.n
@@ -88,7 +88,7 @@ check_counts
 # move msg.regtest.n from goodlist to spamlist in one big step
 
 T=3	# test #3
-S=45	# expected tokens from spam message
+S=54	# expected tokens from spam message
 G=0	# expected tokens from good message
 
 rm -f $BOGOFILTER_DIR/*.db
@@ -103,7 +103,7 @@ check_counts
 
 T=4	# test #4
 S=0	# expected tokens from spam message
-G=45	# expected tokens from good message
+G=54	# expected tokens from good message
 
 rm -f $BOGOFILTER_DIR/*.db
 

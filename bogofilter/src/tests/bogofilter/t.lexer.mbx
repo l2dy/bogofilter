@@ -44,6 +44,9 @@ WANT="1103.3073"
 # v0.12.4 - parsing adds '!' and money amounts
 WANT="1126.3080"
 
+# v0.13.0 - new parsing rules - case sensitive, header_line_markup, tokenize_html_tags
+WANT="1690.3918"
+
 if [ "$RESULT" != "$WANT" ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT
 fi
