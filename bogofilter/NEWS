@@ -2,7 +2,7 @@
 
 				bogofilter news
 
-0.9.0
+0.9.0.2 2002-11-24
 
 	* New file README.Robinson describes the tunable parameters
 	  for the Robinson algorithm and what to do for best performance.
@@ -25,7 +25,9 @@
 	* The testing framework now works on Solaris.
 
 	Internal Changes:
-	* Added two more regression tests designed to confirm that
+	* Fixed several portability problems uncovered by the new
+	  regression tests.
+	* Added three more regression tests designed to confirm that
 	  bogofilter's results are matching saved reference results.
 	* Implemented an object oriented API for using computational methods.
 	* Split the main module into a registration module and three algorithm
