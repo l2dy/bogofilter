@@ -48,7 +48,7 @@ typedef token_t yylex_t(void);
 typedef struct lexer_s {
     yylex_t  *yylex;
     char    **yytext;
-    size_t   *yyleng;
+    int      *yyleng; /* DO NOT EVEN CONSIDER MAKING THIS SIZE_T! */
 } lexer_t;
 
 extern lexer_t *lexer;

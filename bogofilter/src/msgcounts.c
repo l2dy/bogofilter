@@ -23,7 +23,7 @@ AUTHOR:
 /* Globals */
 
 char	msg_count_buff[MSG_COUNT_MAX_LEN];
-size_t	msg_count_leng = MSG_COUNT_MAX_LEN;
+int	msg_count_leng = MSG_COUNT_MAX_LEN; /* DO NOT MAKE THIS SIZE_T! */
 char   *msg_count_text = msg_count_buff;
 
 const char *msg_count_header = "\"" MSG_COUNT "\"";
