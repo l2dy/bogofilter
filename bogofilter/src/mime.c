@@ -213,6 +213,7 @@ mime_pop (void)
 
     mime_free (msg_state);
     stackp--;
+
     msg_state = stackp == -1 ? NULL : &msg_stack[stackp];
     
     if (msg_state && parent && parent->child_count > 0)
@@ -260,8 +261,9 @@ bool get_boundary_props(const word_t *boundary, boundary_t *b)
 
   if (blen > 2 && buf[0] == '-' && buf[1] == '-') {
 
-    while (buf[blen - 1] == '\r' ||
-           buf[blen - 1] == '\n')
+    while (blen > 2 &&
+	   (buf[blen - 1] == '\r' ||
+	    buf[blen - 1] == '\n'))
   	  blen--;
 
     /* skip initial -- */
@@ -269,7 +271,8 @@ bool get_boundary_props(const word_t *boundary, boundary_t *b)
     blen -= 2;
 
     /* skip and note ending --, if any */
-    if (buf[blen-1] == '-' &&
+    if (blen > 2 &&
+	buf[blen-1] == '-' &&
 	buf[blen-2] == '-') {
       b->is_final = true;
       blen -= 2;
