@@ -128,7 +128,7 @@ MIME_BOUNDARY	{BCHARS}*{BCHARSNOSPC}
 
 ID		<?[[:alnum:]-]*>?
 CHARSET		[[:alnum:]-]+
-VERPID		[[:alnum:]#-]+
+VERPID		[[:alnum:]#-]+[[:digit:]]+[[:alnum:]#-]+
 MTYPE		[[:blank:]]*[[:alnum:]/-]*
 
 NUM		[[:digit:]]+
