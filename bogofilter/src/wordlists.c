@@ -11,6 +11,7 @@
 #include "datastore.h"
 #include "find_home.h"
 #include "paths.h"
+#include "rand_sleep.h"
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
@@ -22,26 +23,7 @@
 #define	RAND_MAX	2147483647	/* May not work on SysV   */
 #endif
 
-/* Function Prototypes */
-
-static void rand_sleep(double min, double max);
-
 /* Function Definitions */
-
-static void rand_sleep(double min, double max)
-{
-    static bool need_init = true;
-    long delay;
-
-    if (need_init) {
-	struct timeval timeval;
-	need_init = false;
-	gettimeofday(&timeval, NULL);
-	srand((uint)timeval.tv_usec); /* RATS: ignore - this is safe enough */
-    }
-    delay = (int)(min + ((max-min)*rand()/(RAND_MAX+1.0)));
-    bf_sleep(delay);
-}
 
 void open_wordlists(dbmode_t mode)
 {

@@ -93,6 +93,7 @@ version_sources= \
 	paths.h paths.c \
 	prob.h prob.c \
 	qp.h qp.c \
+	rand_sleep.h rand_sleep.c \
 	register.h register.c \
 	robx.h robx.c \
 	rstats.h rstats.c \
