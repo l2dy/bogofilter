@@ -65,6 +65,12 @@ char *fgetsnonull(char *buf, int max_size, FILE *s)
 		if (c == '\n')
 			break;
 	}
+
+	/* \r\n -> \n */
+	if (cp - 2 >= buf && 0 == strcmp(cp - 2, "\r\n")) {
+		cp -= 2;
+		*cp++ = '\n';
+	}
 	*cp++ = '\0';
 	return(buf);
 }
@@ -118,10 +124,10 @@ int yyinput(char *buf, int max_size)
 
 %option align nounput noyywrap noreject 8bit
 
-BASE64		[A-Za-z0-9/+]
+BASE64		^([A-Za-z0-9/+]+=|[A-Za-z0-9/+]{32,})$
 UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
 IPADDR		{UINT8}\.{UINT8}\.{UINT8}\.{UINT8}
-MIME_BOUNDARY	^--[^[:blank:]\n]*$
+MIME_BOUNDARY	^--[^[:blank:][:cntrl:]]+
 
 %%
 
@@ -280,17 +286,17 @@ width	;
 \<\!--	;
 -->	;
 
-^From\ 					{return(FROM);}
+^From\ 						{return(FROM);}
 ^Date:.*|Delivery-Date:.*			;
 ^Message-ID:.*					;
-^{BASE64}+\r?$					;
+{BASE64}					;
 ^\tid\ .*					;
 
 E?SMTP\ id\ .*					;
 boundary=.*					;
-name=\"						;
-filename=\"					;
-{MIME_BOUNDARY}					;
+name=\"?					;
+filename=\"?					;
+{MIME_BOUNDARY}(--)?$			{return (BOUNDARY);}
 
 {IPADDR}					{return(TOKEN);}
 [^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,[:cntrl:][]+[^[:blank:][:punct:][:cntrl:]]   {return(TOKEN);} 
@@ -302,13 +308,22 @@ filename=\"					;
 int get_token(void)
 {
     int class;
-    char *cp;
+    char *cp, *t;
 
     alt_text[0] = 0;
 
     while ((class = yylex()) > 0)
 	if (yyleng <= MAXWORDLEN)
 	    break;
+
+    /* when we have a boundary line, eliminate the distinction between
+     * start and end boundary, chopping of the distinct trailing -- of
+     * the end boundary. */
+    if (class == BOUNDARY && yyleng >= 4
+	    && (t = strstr(yytext+yyleng-2, "--")))
+    {
+	strcpy(t, "");
+    }
 
     for (cp = yytext; *cp; cp++)
 	*cp = tolower(*cp);

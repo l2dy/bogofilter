@@ -6,6 +6,7 @@
 // lexer interface
 #define TOKEN	1	// Ordinary token
 #define FROM	2	// Mail message delimiter
+#define BOUNDARY 3	// MIME boundary
 
 extern FILE	*yyin;
 
