@@ -31,7 +31,7 @@ pri_2_env_t pri_2_env[] = {
     { PR_ENV_BOGO, "BOGODIR",	     NULL },
     { PR_ENV_HOME, "HOME",	     BOGODIR }
 #else
-    { PR_ENV_HOME, "Choices$Write",  NULL },
+    { PR_ENV_HOME, "Choices$Write",  BOGODIR },
     { PR_ENV_HOME, "Bogofilter$Dir", NULL },
 #endif
 };
