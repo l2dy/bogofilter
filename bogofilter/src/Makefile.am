@@ -164,14 +164,6 @@ directories.c: ../config.status
 	echo "const char *const system_config_file = \"$(SYSCONFDIR)/bogofilter.cf\";" >"$@" \
 	    || rm -f "$@"
 #
-.c.o:
-	@echo "Compiling "$<" ..."; \
-	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
-	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<; \
-	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
-	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-	fi
-#
 .l.c:
 	flex -o$@ $<
 
