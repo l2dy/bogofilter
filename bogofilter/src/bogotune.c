@@ -113,6 +113,7 @@ enum e_verbosity {
 
 const char *progname = "bogotune";
 char *ds_file;
+char *ds_path;
 
 extern double robx, robs;
 
@@ -151,6 +152,7 @@ uint test = 0;
 /* Function Prototypes */
 
 static void bt_exit(void);
+static void check_wordlist_path(void);
 static int  load_hook(word_t *key, dsv_t *data, void *userdata);
 static void load_wordlist(ds_foreach_t *hook, void *userdata);
 static void show_elapsed_time(int beg, int end, uint cnt, double val, 
@@ -783,33 +785,34 @@ static int process_args(int argc, char **argv)
     return count;
 }
 
-static void load_wordlist(ds_foreach_t *hook, void *userdata)
+static void check_wordlist_path(void)
 {
     struct stat sb;
     size_t len = strlen(ds_file) + strlen(WORDLIST) + 2;
-    char *path = xmalloc(len);
+    ds_path = xmalloc(len);
 
-    build_path(path, len, ds_file, WORDLIST);
+    build_path(ds_path, len, ds_file, WORDLIST);
 
-    if (stat(path, &sb) != 0) {
-	fprintf(stderr, "Error accessing file or directory '%s'.\n", path);
+    if (stat(ds_path, &sb) != 0) {
+	fprintf(stderr, "Error accessing file or directory '%s'.\n", ds_path);
 	if (errno != 0)
 	    fprintf(stderr, "error #%d - %s.\n", errno, strerror(errno));
 	return;
     }
 
     db_cachesize = ceil(sb.st_size / 3.0 / 1024.0 / 1024.0);
-    if (verbose>2)
-	printf("st_size: %d, cache: %d\n", (int) sb.st_size, db_cachesize);
 
+    return;
+}
+
+static void load_wordlist(ds_foreach_t *hook, void *userdata)
+{
     if (verbose) {
-	printf("Reading %s\n", path);
+	printf("Reading %s\n", ds_path);
 	fflush(stdout);
     }
 
-    ds_oper(path, DB_READ, hook, userdata);
-
-    xfree(path);
+    ds_oper(ds_path, DB_READ, hook, userdata);
 
     return;
 }
@@ -1068,6 +1071,8 @@ static void bogotune_free(void)
     token_cleanup();
     mime_cleanup();
 
+    xfree(ds_path);
+
     return;
 }
 
@@ -1144,12 +1149,14 @@ static rc_t bogotune(void)
     sp_cnt = count_messages(sp_msglists);
     cnt = ns_cnt + sp_cnt;
 
-    if (!force && (ns_cnt < TEST_COUNT || sp_cnt < TEST_COUNT)) {
-	fprintf(stderr, 
-		"The messages sets contain %u non-spam and %u spam.  Bogotune "
-		"requires at least %d non-spam and %d spam messages to run.\n",
-		ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
-	exit(EX_ERROR);
+    if (ns_cnt < TEST_COUNT || sp_cnt < TEST_COUNT) {
+	if (!quiet)
+	    fprintf(stderr, 
+		    "The messages sets contain %u non-spam and %u spam.  Bogotune "
+		    "requires at least %d non-spam and %d spam messages to run.\n",
+		    ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
+	if (!force)
+	    exit(EX_ERROR);
     }
 
     fflush(stdout);
@@ -1212,7 +1219,7 @@ static rc_t bogotune(void)
     wordhash_free(ns_and_sp->train);
     ns_and_sp->train = NULL;
 
-    if (!check_msg_counts())
+    if (!check_msg_counts() && !force)
 	exit(EX_ERROR);
 
     for (scan=0; scan <= 1; scan += 1) {
@@ -1395,17 +1402,20 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     progtype = build_progtype(progname, DB_TYPE);
 
+    ham_files  = filelist_new("ham");
+    spam_files = filelist_new("spam");
+
     /* directories from command line and config file are already handled */
 
     ds_file = get_directory(PR_ENV_BOGO);
     if (ds_file == NULL)
 	ds_file = get_directory(PR_ENV_HOME);
 
-    ham_files  = filelist_new("ham");
-    spam_files = filelist_new("spam");
-
     /* process args and read mailboxes */
     process_args(argc, argv);
+
+    if (ds_file)
+	check_wordlist_path();
 
     bogotune();
 
