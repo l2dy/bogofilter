@@ -112,6 +112,7 @@ for i in $OUTPUTS/*v ; do
     if  [ $verbose -eq 0 ]; then
 	cmp $i ${TMPDIR}/tests/$j
     else
-	diff $DIFF_BRIEF ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
+	set +e
+	diff $DIFF_BRIEF $i ${TMPDIR}/tests/$j
     fi
 done
