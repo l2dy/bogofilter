@@ -1,3 +1,8 @@
+INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
+=======================================
+
+I1. Defaults changed
+
 Bogofilter's defaults have been changed.  It now operates in tri-state
 mode and will classify messages as Spam, Ham, or Unsure.
 
@@ -9,3 +14,33 @@ you _need_ to change your checks.  Use "X-Bogosity: Spam" and
 as "Unsure" messages are messages that bogofilter has too little
 information to classify (with certainty) as spam or ham.
 
+
+MAJOR CHANGES IN BOGOFILTER 0.93
+================================
+
+M1. Berkeley DB switched to Transactional Data Store
+
+Bogofilter will now use the Berkeley DB Transactional Data Store when
+compiled with Berkeley DB as the data base engine (the default).
+
+This means that bogofilter programs now exhibit the A C I D traits,
+changes are atomic (all-or-nothing), the data base is always consistent,
+changes are always isolated from each other and all changes that are
+acknowledged are durable.
+
+Bogofilter can stand multiple writers at the same time, mixed freely
+with simultaneous readers, and the data base will not get corrupt in
+application or system crashes, except when the disk drive gets damaged.
+
+Note that this requires that the operating system and disk drive
+maintain proper write order on the disk, and that both be honest about
+synchronous I/O completion.
+
+Note also that this causes bogofilter to write additional "log" files to
+its .bogofilter (or other home) directory that need to be archived or
+deleted periodically.
+
+For detailed instructions, be sure to check doc/README.db and check the
+BerkeleyDB documentation.
+
+END of RELEASE.NOTES-0.93
