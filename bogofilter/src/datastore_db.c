@@ -21,6 +21,10 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include <db.h>
 #include <errno.h>
 
+#if NEEDTRIO
+#include <trio.h>
+#endif
+
 #include "datastore.h"
 #include "error.h"
 #include "maint.h"

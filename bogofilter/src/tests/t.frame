@@ -88,7 +88,7 @@ if [ -z "$NODB" ]; then
 fi
 
 # make GNU libc nasty and abort on memory allocation issues:
-if false ; then
+if true ; then
     MALLOC_CHECK_=2
     export MALLOC_CHECK_
 fi

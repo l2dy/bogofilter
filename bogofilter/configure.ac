@@ -69,6 +69,38 @@ AC_CHECK_DECLS(optreset,,,[[
 #include <stdlib.h>
 ]])
 
+dnl BEGIN TRIO
+dnl Alpha floating-point compiler option.
+dnl
+
+AC_MSG_CHECKING(for IEEE compilation options)
+AC_CACHE_VAL(ac_cv_ieee_option, [
+AC_TRY_COMPILE(,[
+#if !(defined(__alpha) && (defined(__DECC) || defined(__DECCXX) || (defined(__osf__) && defined(__LANGUAGE_C__))) && (defined(VMS) || defined(__VMS)))
+# error "Option needed"
+#endif
+],ac_cv_ieee_option="/IEEE_MODE=UNDERFLOW_TO_ZERO/FLOAT=IEEE",
+AC_TRY_COMPILE(,[
+#if !(defined(__alpha) && (defined(__DECC) || defined(__DECCXX) || (defined(__osf__) && defined(__LANGUAGE_C__))) && !(defined(VMS) || defined(__VMS)) && !defined(_CFE))
+# error "Option needed"
+#endif
+],ac_cv_ieee_option="-ieee",
+AC_TRY_COMPILE(,[
+#if !(defined(__alpha) && (defined(__GNUC__) && (defined(__osf__) || defined(__linux__))))
+# error "Option needed"
+#endif
+],ac_cv_ieee_option="-mieee",
+ac_cv_ieee_option="none"
+)
+)
+)
+])
+AC_MSG_RESULT($ac_cv_ieee_option)
+if test $ac_cv_ieee_option != none; then
+  CFLAGS="${CFLAGS} ${ac_cv_ieee_option}"
+fi
+dnl END TRIO
+
 AC_ARG_ENABLE(static,
       AC_HELP_STRING([--enable-static], [Build static versions as well.]))
 if test a$enable_static = ayes ; then
@@ -198,12 +230,6 @@ AC_RUN_IFELSE(
 		   AC_MSG_ERROR(db.h header file and db library version do not match.)],)
 AC_MSG_RESULT(yes)
 fi
-
-# Disable TRIO.
-AC_ARG_WITH(trio,
-         [  --without-trio          disable TRIO support],
-       [with_trio=$withval],
-           [with_trio='yes'])
 
 # Allow the user to specify a header name to use to indicate whether a given
 # message is SPAM or not.
@@ -350,8 +376,25 @@ AC_FUNC_MEMCMP
 AC_FUNC_MMAP
 AC_FUNC_VPRINTF
 
-AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl strchr strrchr memcpy munmap pow sqrt strcasecmp strcspn strspn strstr vsnprintf)
+AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl strchr strrchr memcpy munmap pow sqrt strcasecmp strcspn strspn strstr snprintf vsnprintf)
 AC_REPLACE_FUNCS(strlcpy strlcat)
+
+dnl Use TRIO to replace missing snprintf/vsnprintf.
+needtrio=0
+if test "x$ac_cv_func_snprintf" != "xyes" ; then
+    AC_DEFINE(snprintf, trio_snprintf, [Define to trio_snprintf if your system lacks snprintf])
+    needtrio=1
+fi
+if test "x$ac_cv_func_vsnprintf" != "xyes" ; then
+    AC_DEFINE(vsnprintf, trio_vsnprintf, [Define to trio_vsnprintf if your system lacks vsnprintf])
+    needtrio=1
+fi
+if test $needtrio -gt 0
+then
+    LIBS="$LIBS -ltrio -lm"
+    AC_DEFINE(NEEDTRIO, 1, [Define to 1 if trio is to be included.])
+fi
+AM_CONDITIONAL(NEEDTRIO, test "$needtrio" = "1")
 
 AC_CACHE_SAVE
 
@@ -372,6 +415,7 @@ fi
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 AC_CONFIG_FILES([Makefile \
 		bogofilter.spec \
+		trio/Makefile \
 		contrib/Makefile doc/Makefile \
 		src/Makefile src/dcdflib/Makefile src/dcdflib/src/Makefile \
 		src/tests/Makefile src/tests/bogoutil/Makefile src/tests/bogofilter/Makefile \

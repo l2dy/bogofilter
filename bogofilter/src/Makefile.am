@@ -23,7 +23,8 @@ if ENABLE_MEMDEBUG
 MEMDEBUG_SRC = memdebug.c memdebug.h
 endif
 
-AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc
+
+AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc -I$(top_srcdir)/trio
 AM_CFLAGS = -DBOGOFILTER
 
 # what to build
@@ -37,6 +38,18 @@ check_PROGRAMS = debugtest configtest wordhash find_home.test \
 		 bogowordfreq fgetsl.test
 
 noinst_LIBRARIES = libbogofilter.a
+TESTS=
+
+if NEEDTRIO
+noinst_LIBRARIES += libtrio.a
+libtrio_a_SOURCES= ../trio/triostr.c ../trio/trio.c ../trio/trionan.c \
+		   ../trio/trio.h ../trio/triop.h ../trio/triodef.h \
+		   ../trio/trionan.h ../trio/triostr.h
+check_PROGRAMS += regression
+TESTS+=./regression
+regression_SOURCES= ../trio/regression.c
+endif
+
 LDADD = libbogofilter.a @LIBOBJS@
 
 # what to build that from

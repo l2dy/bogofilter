@@ -21,6 +21,10 @@ AUTHOR:
 
 #include "error.h"
 
+#if NEEDTRIO
+#include <trio.h>
+#endif
+
 void print_error( const char *file, unsigned long line, const char *format, ... )
 {
     pid_t pid = getpid();

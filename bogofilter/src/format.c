@@ -18,6 +18,10 @@ Most of the ideas in here are stolen from Mutt's snprintf implementation.
 #include <config.h>
 #include "common.h"
 
+#if NEEDTRIO
+#include <trio.h>
+#endif
+
 #include "system.h"
 
 #include "format.h"
