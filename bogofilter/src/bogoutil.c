@@ -439,7 +439,7 @@ static void usage(void)
 {
     fprintf(stderr, "Usage: %s [ -h | -v | -V ]\n",
 	    progname);
-    fprintf(stderr, "   or: %s { -d | -l | -w | -p | --db-verify } file%s\n",
+    fprintf(stderr, "   or: %s { -d | -l | -m | -w | -p | --db-verify } file%s\n",
 	    progname, DB_EXT);
     fprintf(stderr, "   or: %s { -r | -R | --db-prune --db-recover --db-recover-harder --db-remove-environment } directory\n",
 	    progname);
@@ -469,7 +469,7 @@ static const char *help_text[] = {
     "  -x, --debug-flags=list    - set flags to display debug information.\n",
 
     "database maintenance:\n",
-    "  -m                        - enable maintenance works (expiring tokens).\n",
+    "  -m file                   - enable maintenance works (expiring tokens).\n",
     "  -n                        - replace non-ascii characters with '?'.\n",
     "  -a age                    - exclude tokens with older ages.\n",
     "  -c cnt                    - exclude tokens with lower counts.\n",
