@@ -82,9 +82,6 @@
 #define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, max_size)
 #define YY_EXIT_FAILURE EX_ERROR
 
-#include <setjmp.h>
-extern jmp_buf lexer_abort_jmp_buf;
-
 #undef	stderr
 #define	stderr	dbgout		/* for debug & -D options */
 
@@ -107,16 +104,7 @@ static word_t *yy_text(void)
     return &yyt;
 }
 
-#define YY_FATAL_ERROR(msg) lexer_fatal_error(msg)
-
-static void lexer_fatal_error(const char *msg)
-{
-    void *fe = yy_fatal_error;	/* suppress compiler warning */
-    (void) fe;			/* suppress compiler warning */
-
-    (void) fprintf( stderr, "%s\n", msg );
-    longjmp( lexer_abort_jmp_buf, EX_ERROR ) ;
-}
+#define exit(exitcode) bf_abort()
 
 %}
 

@@ -65,9 +65,6 @@ method_t *method = NULL;
 /* from html.c */
 bool strict_check = false;
 
-/* Define longjmp environment for use by YY_FATAL_ERROR in lexer_v3.l */
-jmp_buf lexer_abort_jmp_buf;
-
 /* other */
 int	db_cachesize = 0;		/* in MB */
 enum	passmode passmode;		/* internal */
