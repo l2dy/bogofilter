@@ -2,6 +2,11 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.15.5	2003-09-29
+
+* Added '-H' (header-degen) option to aid transition to new
+  parsing.  See RELEASE.NOTES-0.15 for more info.
+
 * GNU GSL 1.4 has replaced DCDFLIB.
 * VERPs (Variable Envelope Return Paths) now have their sequence
   numbers replaced by a '#' for scoring.
