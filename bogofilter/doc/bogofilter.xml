@@ -122,14 +122,16 @@ wordfile is created if absent.</para>
 on standard input as non-spam.</para>
 
 <para>The <option>-S</option> option tells
-<application>bogofilter</application> to register the text presented
-on standard input as spam and to undo a prior registration of the
-same message as non-spam.</para>
+<application>bogofilter</application> undoes a prior registration of the
+same message as spam.   If a message was incorrectly entered in the spam 
+wordfile by '-s' or '-u', use '-Sn' to remove it from the spam wordfile
+enter it in the non-spam wordfile.</para>
 
 <para>The <option>-N</option> option tells
-<application>bogofilter</application> to register the text presented
-on standard input as non-spam and to undo a prior registration of the
-same message as spam.</para>
+<application>bogofilter</application> undoes a prior registration of the
+same message as non-spam.   If a message was incorrectly entered in the non-spam 
+wordfile by '-n' or '-u', use '-Ns to remove it from the non-spam wordfile
+enter it in the spam wordfile.</para>
 
 <para>The <option>-u</option> option tells
 <application>bogofilter</application> to register the message's text 
@@ -221,8 +223,8 @@ good wordfile will be updated. Effectively this option runs
 <option>-n</option> flag, as appropriate.  (Caution is urged in the use
 of this capability, as any classification errors
 <application>bogofilter</application> may make will be preserved and
-accumulated until corrected with the <option>-S</option> and
-<option>-N</option> options.)</para>
+accumulated until corrected with the <option>-Sn</option> and
+<option>-Ns</option> option combinationss.)</para>
   
 <para>The <option>-v</option> option produces a report to standard 
 output on <application>bogofilter</application>'s analysis af the
@@ -350,7 +352,7 @@ message will be treated as non-spam.</para>
 words in messages rated as spam to the spam wordlist, and (c) adds the
 words in messages rated as non-spam to the non-spam wordlist.  With
 this in place, it will normally only be necessary for the user to
-intervene (with <option>-N</option> or <option>-S</option>) when
+intervene (with <option>-Ns</option> or <option>-Sn</option>) when
 <application>bogofilter</application> miscategorizes something.</para>
 <programlisting>
   <lineannotation>
