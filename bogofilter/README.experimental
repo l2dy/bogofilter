@@ -92,3 +92,8 @@ c. USER HELP REQUIRED: Benchmark results, comparisons of traditional
 
 d. TODO: Make sure that the token updates and the .MSG_COUNT are bundled and
    the whole bundle is written atomically.
+
+e. TODO: Make sure that all code paths that use data bases
+   I.  initialize the data base environment properly
+   II. are covered by the test suite. (gcov coverage tests can
+       be helpful here).
