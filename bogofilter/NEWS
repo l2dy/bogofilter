@@ -4,6 +4,14 @@
 
 $Id$
 
+0.11.1.8
+
+	2003-04-07
+
+	* Include 'strict_check' in '-qv' output.
+	* Correct outdated acinclude.m4, as it causes the configure
+	  script to be invalid.
+
 0.11.1.7
 
 	2003-04-07
