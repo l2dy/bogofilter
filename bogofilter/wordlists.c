@@ -45,7 +45,9 @@ static int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const ch
     new->filename=xstrdup(name);
     new->filepath=xstrdup(path);
     new->index = ++listcount;
+#if 0
     new->msgcount=0;
+#endif
     new->override=override;
     new->active=false;
     new->weight=weight;
@@ -107,31 +109,38 @@ int setup_wordlists(const char* dir)
 void open_wordlists(dbmode_t mode)
 {
     wordlist_t *list;
+    int retry;
 
-retry:
-    for (list = word_lists; list != NULL; list = list->next)
-    {
-	list->dbh = db_open(list->filepath, list->filename, mode, directory);
-	if (list->dbh == NULL) {
-	    int err = errno;
-	    close_wordlists(); /* unlock and close */
-	    switch(err) {
-		/* F_SETLK can't obtain lock */
-		case EAGAIN:
-		case EACCES:
-		    {
-			struct timeval to;
-			to.tv_sec = 0;
-			to.tv_usec = MIN_SLEEP + (long) ((MAX_SLEEP-MIN_SLEEP)*rand()/(RAND_MAX+1.0));
-			select(0,NULL,NULL,NULL,&to);
-		    }
-		    goto retry;
-		default:
-		    fprintf(stderr, "Can't open %s (%s), errno %d, %s\n", list->filename, list->filepath, err, strerror(err));
-		    exit(2);
-	    } /* switch */
-	} /* db_open */
-    } /* for */
+    do {
+	retry = 0;
+	for (list = word_lists; list != NULL; list = list->next) {
+	    list->dbh = db_open(list->filepath, list->filename, mode, directory);
+	    if (list->dbh == NULL) {
+		int err = errno;
+		close_wordlists(); /* unlock and close */
+		switch(err) {
+		    /* F_SETLK can't obtain lock */
+		    case EAGAIN:
+		    case EACCES:
+			{
+			    struct timeval to;
+			    to.tv_sec = 0;
+			    to.tv_usec = MIN_SLEEP +
+				(long) ((MAX_SLEEP-MIN_SLEEP)*rand()/(RAND_MAX+1.0));
+			    select(0,NULL,NULL,NULL,&to);
+			}
+			retry = 1;
+			break;
+		    default:
+			fprintf(stderr, "Can't open %s (%s), errno %d, %s\n",
+				list->filename, list->filepath, err, strerror(err));
+			exit(2);
+		} /* switch */
+	    } else { /* db_open */
+		list->msgcount = db_get_msgcount(list->dbh);
+	    } /* db_open */
+	} /* for */
+    } while(retry);
 }
 
 void close_wordlists(void)

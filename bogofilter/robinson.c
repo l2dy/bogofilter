@@ -126,7 +126,6 @@ static double compute_scale(void)
 
     for(list=word_lists; list != NULL; list=list->next)
     {
-	list->msgcount = db_get_msgcount(list->dbh);
 	if (list->bad)
 	    msgs_bad += list->msgcount;
 	else

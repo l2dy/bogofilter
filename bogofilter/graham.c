@@ -313,14 +313,7 @@ double gra_compute_spamicity(bogostat_t *bs, FILE *fp) /*@globals errno@*/
 
 void gra_initialize_constants(void)
 {
-    wordlist_t *list;
-
     mth_initialize( &gra_stats, GRAHAM_MAX_REPEATS, GRAHAM_MIN_DEV, GRAHAM_SPAM_CUTOFF, GRAHAM_GOOD_BIAS );
-
-    for(list=word_lists; list != NULL; list=list->next)
-    {
-	list->msgcount = db_get_msgcount(list->dbh);
-    }
 }
 
 double gra_spamicity(void)
