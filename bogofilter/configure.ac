@@ -17,7 +17,7 @@ AC_PROG_RANLIB
 AC_PATH_PROGS(PERL, perl perl5, $PATH:/usr/local/bin:/usr/bin)
 AM_PROG_LEX
 
-# Check for extension
+dnl Check for extension
 AC_EXEEXT
 
 dnl check for b0rked Solaris (and other shells) and find one that works
@@ -126,122 +126,8 @@ export STATICLDFLAGS
 AC_SUBST(STATICLDFLAGS)
 AM_CONDITIONAL(ENABLE_STATIC, test x$enable_static = xyes)
 
-WITH_DB_ENGINE=db
-AC_ARG_WITH(database,
-	    AC_HELP_STRING([--with-database=ENGINE],
-	    [Choose database engine {db|tdb|qdbm} [[ENGINE=db]]]),
-	    [ WITH_DB_ENGINE=$withval ]
-)
-case "x$WITH_DB_ENGINE" in
-    xdb|xtdb|xqdbm) : ;;
-    *) AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, tdb, qdbm.])
-    ;;
-esac
-
-AC_LIB_RPATH
-
-case "x$WITH_DB_ENGINE" in
-    xtdb)
-AC_LIB_LINKFLAGS([tdb])
-AC_CHECK_LIB(tdb,
-             tdb_open,,
-             [AC_MSG_ERROR(Cannot link to tdb library.
-                           Try setting the environment variables:
-                           LDFLAGS='-L/path/to/tdb/lib' CPPFLAGS='-I/path/to/tdb/include'
-                           )],
-)
-  LIBDB="$LIBTDB"
-;;
-  xqdbm)
-  AC_LIB_LINKFLAGS([qdbm])
-  LIBDB="$LIBQDBM"
-  save_LIBS="$LIBS"
-  LIBS="$LIBS $LIBDB"
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([
-#include <stdlib.h>
-#include <depot.h>
-], [
-DEPOT *d = dpopen("", 0, 0);
-]
-)],,AC_MSG_ERROR(Cannot link to qdbm library.))
-  LIBS="$save_LIBS"
-
-;;
-    xdb)
-# check if we need LIBDB at all (it is harmful on BSD since
-# they rename the library including soname)
-  AC_LIB_LINKFLAGS([db])
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],LIBDB="")
-  saveLIBS="$LIBS"
-  LIBS="$LIBS $LIBDB"
-  export LIBS
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],,
-    AC_MSG_ERROR([[
-====================================================================
-Cannot link against libdb? Try 'rm config.cache', then re-configure.
-If the problem persists, report it to the bogofilter mailing list.
-Remember to include your config.log.
-====================================================================
-]]))
-  LIBS="$saveLIBS"
-  export LIBS
-AH_TEMPLATE([HAVE_DB_H], [Have suitable db.h header])
-WITH_DB=
-AC_SUBST(LIBDB)
-
-AC_ARG_WITH(db,
-	    AC_HELP_STRING([--with-db=PATH], [obsolete, use --with-libdb-prefix instead]),
-    AC_MSG_ERROR([--with-db is obsolete. Use --with-libdb-prefix=$withval]))
-
-AC_CHECK_DECLS(db_create,,
-	       AC_MSG_ERROR([[Can not locate a suitable BerkeleyDB db.h header file.
-Use --with-libdb-prefix=PATH to specify the path to a v3+ install directory.
-You can download BerkeleyDB 4.1.x from http://www.sleepycat.com/]]),
-[[#include <db.h>]]
-)
-
-dnl check if run-time link works
-saveLIBS="$LIBS"
-LIBS="$LIBS $LIBDB"
-AC_MSG_CHECKING(if a program can be linked against BerkeleyDB and run)
-AC_RUN_IFELSE(
-  AC_LANG_PROGRAM([[
-		   #include <stdlib.h>
-		   #include <db.h>
-		   ]], [[
-			    exit(0);
-		   ]]),,
-		   [AC_MSG_RESULT(no)
-AC_MSG_ERROR([Cannot run a program linked against libdb.
-Did you adjust your library search path to include your libdb?])],)
-AC_MSG_RESULT(yes)
-
-dnl check if header and library of DB library match
-dnl ignore if cross compiling
-AC_MSG_CHECKING(if BerkeleyDB header and library versions match)
-AC_RUN_IFELSE(
-  AC_LANG_PROGRAM([[
-		   #include <stdlib.h>
-		   #include <stdio.h>
-		   #include <db.h>
-		   ]], [[
-			int maj, min;
-			(void)db_version(&maj, &min, (void *)0);
-			(void)fprintf(stderr, "headers: %d.%d, library: %d.%d\n",
-				DB_VERSION_MAJOR, DB_VERSION_MINOR, maj, min);
-			if (maj != DB_VERSION_MAJOR) exit(1);
-			if (min != DB_VERSION_MINOR) exit(1);
-			exit(0);
-		   ]]),,
-		   [AC_MSG_RESULT(no)
-		   AC_MSG_ERROR(db.h header file and db library version do not match.)],)
-AC_MSG_RESULT(yes)
-;;
-esac
-LIBS="$saveLIBS"
-
-# Allow the user to specify a header name to use to indicate whether a given
-# message is SPAM or not.
+dnl Allow the user to specify a header name to use to indicate whether a given
+dnl message is SPAM or not.
 AC_ARG_ENABLE(spam-header-name, 
 	AC_HELP_STRING([--enable-spam-header-name=name], 
 	[Use specified header name instead of X-Bogosity]), 
@@ -253,7 +139,7 @@ AC_ARG_ENABLE(spam-header-name,
 	[Use specified header name instead of X-Bogosity])
 )
 
-# Allow the user to enable memory usage debugging methods
+dnl Allow the user to enable memory usage debugging methods
 
 AC_ARG_ENABLE(memdebug,
 	AC_HELP_STRING([--enable-memdebug],
@@ -271,27 +157,6 @@ if test x$USE_MEMDEBUG = xYES ; then
 	[Enable memory usage debugging])
 fi
 AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$MEM_DEBUG != xNO)
-
-dnl Data base engine dependent stuff
-case "x$WITH_DB_ENGINE" in
-    xtdb)
-    AC_DEFINE(ENABLE_TDB_DATASTORE,1, [Enable tdb datastore])
-    AC_DEFINE_UNQUOTED(DB_TYPE, "tdb", [database type])
-    AC_DEFINE_UNQUOTED(DB_EXT, ".tdb", [database file extension])
-    ;;
-    xqdbm)
-    AC_DEFINE(ENABLE_QDBM_DATASTORE,1, [Enable qdbm datastore])
-    AC_DEFINE_UNQUOTED(DB_TYPE, "qdbm")
-    AC_DEFINE_UNQUOTED(DB_EXT, ".qdbm")
-    ;;
-    xdb)
-    AC_DEFINE_UNQUOTED(DB_TYPE, "db")
-    AC_DEFINE_UNQUOTED(DB_EXT, ".db")
-    ;;
-esac
-
-AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xtdb")
-AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
 
 dnl Deprecated code dependent stuff
 AC_ARG_ENABLE(deprecated-code,
@@ -312,7 +177,7 @@ if test x$USE_DEPRECATED_CODE = xYES ; then
 fi
 AM_CONDITIONAL(ENABLE_DEPRECATED_CODE, test x$USE_DEPRECATED_CODE != xNO)
 
-# Checks for header files.
+dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_STDBOOL
 AC_HEADER_DIRENT
@@ -326,8 +191,7 @@ if test "$ac_cv_c_inline" != no ; then
     AC_SUBST(HAVE_INLINE)
 fi
 
-
-# Checks for typedefs, structures, and compiler characteristics.
+dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
@@ -335,6 +199,7 @@ AC_TYPE_UID_T
 AC_TYPE_SIGNAL
 AC_FUNC_SELECT_ARGTYPES
 AC_CHECK_TYPES([uint, ulong, uint32_t, u_int32_t, int32_t, int16_t, u_int16_t, uint16_t, u_int8_t])
+AC_CHECK_TYPE(u_long, unsigned long)
 AC_CACHE_SAVE
 AC_CHECK_SIZEOF(short)
 AC_CHECK_SIZEOF(int)
@@ -343,21 +208,136 @@ dnl The next one isn't really needed, but useful for post-mortem analysis of
 dnl automated package build logs such as bento.freebsd.org or buildd.debian.org:
 AC_CHECK_SIZEOF(size_t)
 
-# Checks for library functions.
-dnl AC_FUNC_MALLOC
-# AC_FUNC_MALLOC wants rpl_malloc in malloc.c, to protect against
-# malloc(0) == NULL. xmalloc handles this by retrying with size 1.
-
-dnl AC_FUNC_STAT
-# AC_FUNC_STAT wants to replace stat(2) if stat("", &st) succeeds.
-# we catch this.
-
 AC_FUNC_MEMCMP
 AC_FUNC_MMAP
 AC_FUNC_VPRINTF
 
 AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl strchr strrchr memcpy munmap pow sqrt strcasecmp strcspn strspn strstr snprintf vsnprintf)
 AC_REPLACE_FUNCS(strlcpy strlcat)
+
+WITH_DB_ENGINE=db
+AC_ARG_WITH(database,
+	    AC_HELP_STRING([--with-database=ENGINE],
+	    [Choose database engine {db|tdb|qdbm} [[ENGINE=db]]]),
+	    [ WITH_DB_ENGINE=$withval ]
+)
+case "x$WITH_DB_ENGINE" in
+    xdb|xtdb|xqdbm) : ;;
+    *) AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, tdb, qdbm.])
+    ;;
+esac
+
+AC_LIB_RPATH
+
+case "x$WITH_DB_ENGINE" in
+    xtdb)
+	AC_DEFINE(ENABLE_TDB_DATASTORE,1, [Enable tdb datastore])
+	AC_DEFINE_UNQUOTED(DB_TYPE, "tdb", [database type])
+	AC_DEFINE_UNQUOTED(DB_EXT, ".tdb", [database file extension])
+	AC_LIB_LINKFLAGS([tdb])
+	LIBDB="$LIBTDB"
+	save_LIBS="$LIBS"
+	LIBS="$LIBS $LIBDB"
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([
+#include <sys/types.h>
+#include <tdb.h>
+	], [
+	    TDB_CONTEXT *t = tdb_open("", 0, 0, 0, 0);
+	])],,AC_MSG_ERROR(Cannot link to tdb library.))
+	LIBS="$save_LIBS"
+    ;;
+    xqdbm)
+	AC_DEFINE(ENABLE_QDBM_DATASTORE,1, [Enable qdbm datastore])
+	AC_DEFINE_UNQUOTED(DB_TYPE, "qdbm")
+	AC_DEFINE_UNQUOTED(DB_EXT, ".qdbm")
+	AC_LIB_LINKFLAGS([qdbm])
+	LIBDB="$LIBQDBM"
+	save_LIBS="$LIBS"
+	LIBS="$LIBS $LIBDB"
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([
+#include <stdlib.h>
+#include <depot.h>
+	], [
+	    DEPOT *d = dpopen("", 0, 0);
+	])],,AC_MSG_ERROR(Cannot link to qdbm library.))
+	LIBS="$save_LIBS"
+    ;;
+    xdb)
+	dnl check if we need LIBDB at all (it is harmful on BSD since
+	dnl they rename the library including soname)
+	AC_DEFINE_UNQUOTED(DB_TYPE, "db")
+	AC_DEFINE_UNQUOTED(DB_EXT, ".db")
+	AC_LIB_LINKFLAGS([db])
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],LIBDB="")
+	saveLIBS="$LIBS"
+	LIBS="$LIBS $LIBDB"
+	export LIBS
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],,
+	AC_MSG_ERROR([[
+====================================================================
+Cannot link against libdb? Try 'rm config.cache', then re-configure.
+If the problem persists, report it to the bogofilter mailing list.
+Remember to include your config.log.
+====================================================================
+	]]))
+	LIBS="$saveLIBS"
+	export LIBS
+	AH_TEMPLATE([HAVE_DB_H], [Have suitable db.h header])
+	WITH_DB=
+	AC_SUBST(LIBDB)
+
+	dnl check if run-time link works
+	saveLIBS="$LIBS"
+	LIBS="$LIBS $LIBDB"
+	AC_MSG_CHECKING(if a program can be linked against BerkeleyDB and run)
+	AC_RUN_IFELSE(
+	AC_LANG_PROGRAM([[
+		   #include <stdlib.h>
+		   #include <db.h>
+		   ]], [[
+			    exit(0);
+		   ]]),,
+		   [AC_MSG_RESULT(no)
+	AC_MSG_ERROR([Cannot run a program linked against libdb.
+Did you adjust your library search path to include your libdb?])],)
+	AC_MSG_RESULT(yes)
+
+	dnl check if header and library of DB library match
+	dnl ignore if cross compiling
+	AC_MSG_CHECKING(if BerkeleyDB header and library versions match)
+	AC_RUN_IFELSE(
+	AC_LANG_PROGRAM([[
+		   #include <stdlib.h>
+		   #include <stdio.h>
+		   #include <db.h>
+		   ]], [[
+			int maj, min;
+			(void)db_version(&maj, &min, (void *)0);
+			(void)fprintf(stderr, "headers: %d.%d, library: %d.%d\n",
+				DB_VERSION_MAJOR, DB_VERSION_MINOR, maj, min);
+			if (maj != DB_VERSION_MAJOR) exit(1);
+			if (min != DB_VERSION_MINOR) exit(1);
+			exit(0);
+		   ]]),,
+		   [AC_MSG_RESULT(no)
+		   AC_MSG_ERROR(db.h header file and db library version do not match.)],)
+	AC_MSG_RESULT(yes)
+	AC_CHECK_DECLS(db_create,,
+	       AC_MSG_ERROR([[Can not locate a suitable BerkeleyDB db.h header file.
+Use --with-libdb-prefix=PATH to specify the path to a v3+ install directory.
+You can download BerkeleyDB 4.1.x from http://www.sleepycat.com/]]),
+	[[#include <db.h>]]
+	)
+    ;;
+esac
+LIBS="$saveLIBS"
+
+AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xtdb")
+AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
+
+AC_ARG_WITH(db,
+	    AC_HELP_STRING([--with-db=PATH], [obsolete, use --with-libdb-prefix instead]),
+    AC_MSG_ERROR([--with-db is obsolete. Use --with-libdb-prefix=$withval instead.]))
 
 dnl Use TRIO to replace missing snprintf/vsnprintf.
 needtrio=0
