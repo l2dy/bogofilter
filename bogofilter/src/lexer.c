@@ -24,7 +24,6 @@
 #include "token.h"
 #include "word.h"
 #include "xmalloc.h"
-#include "xstrdup.h"
 
 /* Local Variables */
 
@@ -42,8 +41,10 @@ static int yy_use_redo_text(buff_t *buff);
 static int yy_get_new_line(buff_t *buff);
 static int skip_spam_header(buff_t *buff);
 static int get_decoded_line(buff_t *buff);
+static void check_alphanum(buff_t *buff);
 
 /* Function Definitions */
+
 static void lexer_display_buffer(buff_t *buff)
 {
     fprintf(dbgout, "*** %2d %c,%c %d ", yylineno,
@@ -51,6 +52,27 @@ static void lexer_display_buffer(buff_t *buff)
     buff_puts(buff, 0, dbgout);
     if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
 	fputc('\n', dbgout);
+}
+
+static void check_alphanum(buff_t *buff)
+{
+    size_t e = 0;
+    size_t i;
+    size_t l = buff->t.leng;
+    byte *txt = buff->t.text;
+
+    if (l < MAXTOKENLEN)
+	return;
+    for (i = 0; i < buff->t.leng; i += 1) {
+	if (isalnum((char) txt[i]))
+	    e = i;
+	else
+	    break;
+    }
+    if (e > MAXTOKENLEN) {
+	memcpy(txt, txt+e, l-e);
+	buff->t.leng -= e;
+    }
 }
 
 bool is_from(word_t *w)
@@ -71,7 +93,6 @@ static int lgetsl(buff_t *buff)
     */
 
     if (is_from(&buff->t)) {
-	if (DEBUG_LEXER(1)) fprintf(dbgout, "%s:%d  %s\n", __FILE__, __LINE__, buff->t.text);
 	got_from();
     }
 
@@ -196,11 +217,11 @@ static int get_decoded_line(buff_t *buff)
 	&& !msg_header && !msg_state->mime_header
 	&& msg_state->mime_type != MIME_TYPE_UNKNOWN) {
 	int decoded_count = mime_decode(&buff->t);
-	if (DEBUG_LEXER(1)) fprintf(dbgout, "%s:%d  %s\n", __FILE__, __LINE__, buff->t.text);
 	/*change buffer size only if the decoding worked */
 	if (decoded_count != 0 && decoded_count < count) {
 	    buff->t.leng = count = decoded_count;
-	    memcpy(buf, buff->t.text, count);
+	    check_alphanum(buff);
+	    memcpy(buf, buff->t.text, buff->t.leng);
 	    if (DEBUG_LEXER(1)) 
 		lexer_display_buffer(buff);
 	}
