@@ -81,20 +81,33 @@ static rob_stats_t fis_stats;
 /* Function Definitions */
 
 #ifdef GSL_INTEGRATE_PDF
-/* Code by Greg Louis */
-inline static double chisq(double x, void *p) {
+static double chisq(double x, void *p) {
      return(gsl_ran_chisq_pdf(x, *(double *)p));
 }
 
 inline static double prbf(double x, double df) {
-    gsl_function chi; int status;
-    double p, abserr; size_t neval;
+    gsl_function chi;
+    int status;
+    double p, abserr;
+    const int intervals = 15;
+    const double eps = 1000 * DBL_EPSILON;
+
+    gsl_integration_workspace *w;
     chi.function = chisq;
     chi.params = &df;
     gsl_set_error_handler_off();
-    status = gsl_integration_qng(&chi, 0.00001, x, 0.0001, 0.01, &p,
-	    &abserr, &neval);
-    /* if we didn't converge we might be outside [0,1] */
+    w = gsl_integration_workspace_alloc(intervals);
+    if (!w) {
+	fprintf(stderr, "Out of memory! %s:%d\n", __FILE__, __LINE__);
+	abort();
+    }
+    status = gsl_integration_qag(&chi, 0, x, eps, eps,
+	    intervals, GSL_INTEG_GAUSS15, w, &p, &abserr);
+    if (status && status != GSL_EMAXITER) {
+	fprintf(stderr, "Integration error: %s\n", gsl_strerror(status));
+	abort();
+    }
+    gsl_integration_workspace_free(w);
     p = max(0.0, 1.0 - p);
     return(min(1.0, p));
 }
