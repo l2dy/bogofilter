@@ -50,12 +50,18 @@ gzip -f -9 $RPM_BUILD_ROOT/%{_mandir}/*/*.[1-9]
 %{_sysconfdir}/bogofilter.cf.example
 %config(noreplace) %{_sysconfdir}/bogofilter.cf
 %doc AUTHORS COPYING METHODS NEWS README TODO UPGRADE
-%doc doc/README.Robinson
-%doc doc/programmer/README.dcdflib doc/programmer/README.freebsd doc/programmer/README.hp-ux
+%doc doc/README.Robinson doc/bogofilter-faq.html
+%doc doc/programmer
+
+# to doc/xml
 %doc doc/bogoutil.xml doc/bogoupgrade.xml doc/bogofilter.xml doc/bogolexer.xml
+
+# to doc/html
 %doc doc/bogofilter.html doc/bogoutil.html doc/bogoupgrade.html doc/bogolexer.html
-%doc contrib/README.unbase64 contrib/bogofilter-qfe
-%doc contrib/dot-qmail-bogofilter-default
-%doc contrib/unbase64
+
+# to doc/contrib
+%doc contrib/bogopass
+%doc contrib/bogofilter-qfe contrib/dot-qmail-bogofilter-default
+%doc contrib/randomtrain contrib/shuffle contrib/bilbogrep
 
 %changelog
