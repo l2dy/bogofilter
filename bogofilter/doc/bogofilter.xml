@@ -422,7 +422,7 @@ lists the tokens with highest deviation from a mean of 0.5 association
 with spam.</para>
 
 <para>
-Option <option>-y date</option> is specifies the date to give to tokens that don't have dates.
+Option <option>-y date</option> specifies the date to give to tokens that don't have dates.
 </para>
 
 <para>The <option>-D</option> option redirects debug output to stdout.</para>
