@@ -32,10 +32,8 @@ head:Reply-To
 head:join
 head:Reply-To
 head:join
-rcvd:Received
 rcvd:john
 rcvd:doe
-rcvd:Received
 rcvd:john_q_public
 head:X-Subject
 head:Zurückbehaltungsrecht

@@ -219,7 +219,7 @@ VERP		{TOKEN}-{NUM}-{TOKEN}={TOKEN}@{TOKEN}
 						}
 
 <INITIAL>^(To|From|Return-Path|Subject):	{ set_tag(yytext); }
-<INITIAL>^Received:				{ set_tag(yytext); return TOKEN; }
+<INITIAL>^Received:				{ set_tag(yytext); }
 <INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); return TOKEN; }
 
 <INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); return HEADKEY; }
