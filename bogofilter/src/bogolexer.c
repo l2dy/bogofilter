@@ -20,6 +20,7 @@ NAME:
 #include "bool.h"
 #include "charset.h"
 #include "configfile.h"
+#include "html.h"		/* for strict_check */
 #include "lexer.h"
 #include "textblock.h"
 #include "token.h"
@@ -42,6 +43,7 @@ const parm_desc sys_parms[] =
     { "charset_default",		CP_STRING,	{ &charset_default } },
     { "replace_nonascii_characters",	CP_BOOLEAN,	{ (void *) &replace_nonascii_characters } },
     { "tag_header_lines",		CP_BOOLEAN,	{ (void *) &tag_header_lines } },
+    { "strict_check",			CP_BOOLEAN,	{ (void *) &strict_check } },
     { NULL,				CP_NONE,	{ (void *) NULL } },
 };
 
