@@ -4,16 +4,10 @@ through unbase64, then sends it to bogofilter with the "-v" option.
 The X-Bogosity header output by bogofilter is added to the original
 message by formail, and the updated message is output to stdout.
 
-Make sure that base64 and bogofilter are installed in /usr/local/bin or
-/usr/bin, because this script is NOT going to look at your $PATH for security
-reasons.  If your bogofilter and/or unbase64 are installed elsewhere,
-you will need to add these directories to the PATH definition on bogopass.
-
 Any options given to bogopass will be passed on to bogofilter along
-with "-v". For instance, call "bogopass -r" to use the Robinson
+with "-v". For instance, call "bogopass -g" to use the Graham
 algorithm.  Do not pass -p to bogopass, as this is implied.
 
-This script requires formail (part of the procmail suite) to be
-installed in /usr/local/bin or /usr/bin.
+This script requires formail (part of the procmail suite).
 
 Bogopass was written by Suzanne Skinner.

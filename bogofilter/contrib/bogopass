@@ -26,16 +26,11 @@
 # The X-Bogosity header output by bogofilter is added to the original
 # message by formail, and the updated message is output to stdout.
 #
-# Make sure that base64 is installed in /usr/local/bin or /usr/bin,
-# because this script is NOT going to look at your $PATH for security
-# reasons.
-#
 # Any options given to bogopass will be passed on to bogofilter along
-# with "-v". For instance, call "bogopass -r" to use the Robinson
+# with "-v". For instance, call "bogopass -g" to use the Graham
 # algorithm.
 #
-# This script requires formail (part of the procmail suite) to be
-# installed in /usr/local/bin or /usr/bin.
+# This script requires formail (part of the procmail suite).
 
 require 5.004;
 use strict;
@@ -46,7 +41,6 @@ sub my_die($ );
 sub parsewait($ );
 
 my $PROG = 'bogopass';
-$ENV{PATH} = '/bin:/usr/bin:/usr/local/bin';
 
 sub werr($ ) {
     my ($f) = shift;
@@ -66,22 +60,21 @@ my $r;
 ($r = (system "unbase64 <\"$fn\" >>\"$n2\"")) == 0 or
     my_die("Error executing unbase64: " . parsewait($r));
 
-unlink0 ($fh,$fn) or
-    my_die "cannot unlink temporary file $fn: $!";
-close $fh or my_die("Error closing temporary file $fn: $!");
-
 my $options = join ' ', @ARGV;
-my $bogo_header = `bogofilter -v $options`;
-my_die "unbase64 or bogofilter failed" unless defined $bogo_header;
+my $bogo_header = `bogofilter -v $options <"$n2"`;
+my_die "bogofilter failed" unless defined $bogo_header;
 chomp $bogo_header;
 $bogo_header =~ /^X-Bogosity:/ or
     my_die "bogofilter returned invalid output (\"$bogo_header\")";
-
-system("formail -I \"$bogo_header\" < \"$n2\"") == 0 or
-    my_die "formail failed (" . parsewait($?) . ")";
 unlink0 ($h2,$n2) or
     my_die "cannot unlink temporary file $n2: $!";
 close $h2 or my_die("Error closing temporary file $n2: $!");
+
+system("formail -I \"$bogo_header\" < \"$fn\"") == 0 or
+    my_die "formail failed (" . parsewait($?) . ")";
+unlink0 ($fh,$fn) or
+    my_die "cannot unlink temporary file $fn: $!";
+close $fh or my_die("Error closing temporary file $fn: $!");
 exit 0;
 
 ### End Main ###
