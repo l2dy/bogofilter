@@ -79,8 +79,9 @@ install_sh = @install_sh@
 
 # $Id$ 
 # $Log$
-# Revision 1.7  2002/09/17 01:51:53  adrian_otto
-# Prepared this snapshot for 0.7.4 release
+# Revision 1.8  2002/09/17 02:16:37  adrian_otto
+# Re-aranged the makefile so that the autoconfigured Makefile gets a correct
+# rule for cleaning lexertest.
 #
 # Revision 1.5  2002/09/17 01:47:51  adrian_otto
 # Fixed the Makefile configuration so that it knows how to build the man
@@ -102,8 +103,10 @@ install_sh = @install_sh@
 # Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
 # 0.7.3 Base Source
 #
-bin_PROGRAMS = bogofilter
+bin_PROGRAMS = bogofilter lexertest
 bogofilter_SOURCES = bogofilter.c bogofilter.h lock.c lock.h main.c lexer_l.c
+lexertest_SOURCES = 
+lexertest_LDADD = lexertest.o
 man1_MANS = bogofilter.1
 EXTRA_DIST = $(man1_MANS)
 subdir = .
@@ -111,7 +114,7 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
-bin_PROGRAMS = bogofilter$(EXEEXT)
+bin_PROGRAMS = bogofilter$(EXEEXT) lexertest$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
 am_bogofilter_OBJECTS = bogofilter.$(OBJEXT) lock.$(OBJEXT) \
@@ -120,6 +123,10 @@ bogofilter_OBJECTS = $(am_bogofilter_OBJECTS)
 bogofilter_LDADD = $(LDADD)
 bogofilter_DEPENDENCIES =
 bogofilter_LDFLAGS =
+am_lexertest_OBJECTS =
+lexertest_OBJECTS = $(am_lexertest_OBJECTS)
+lexertest_DEPENDENCIES = lexertest.o
+lexertest_LDFLAGS =
 
 DEFS = @DEFS@
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I.
@@ -135,14 +142,14 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 CFLAGS = @CFLAGS@
-DIST_SOURCES = $(bogofilter_SOURCES)
+DIST_SOURCES = $(bogofilter_SOURCES) $(lexertest_SOURCES)
 
 NROFF = nroff
 MANS = $(man1_MANS)
 DIST_COMMON = README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
 	Makefile.in NEWS TODO aclocal.m4 config.in configure \
 	configure.in depcomp install-sh missing mkinstalldirs
-SOURCES = $(bogofilter_SOURCES)
+SOURCES = $(bogofilter_SOURCES) $(lexertest_SOURCES)
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -208,6 +215,9 @@ clean-binPROGRAMS:
 bogofilter$(EXEEXT): $(bogofilter_OBJECTS) $(bogofilter_DEPENDENCIES) 
 	@rm -f bogofilter$(EXEEXT)
 	$(LINK) $(bogofilter_LDFLAGS) $(bogofilter_OBJECTS) $(bogofilter_LDADD) $(LIBS)
+lexertest$(EXEEXT): $(lexertest_OBJECTS) $(lexertest_DEPENDENCIES) 
+	@rm -f lexertest$(EXEEXT)
+	$(LINK) $(lexertest_LDFLAGS) $(lexertest_OBJECTS) $(lexertest_LDADD) $(LIBS)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -478,11 +488,11 @@ uninstall-man: uninstall-man1
 	uninstall-man uninstall-man1
 
 #
-lexer_l.c: lexer_l.l
-	flex lexer_l.l
+#lexer_l.c: lexer_l.l
+#	flex lexer_l.l
 #
-lexertest: lexer_l.c
-	$(CC) -DMAIN -o lexertest lexer_l.c
+lexertest.o: lexer_l.c
+	$(COMPILE) -DMAIN -o lexertest.o -c lexer_l.c
 #
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core lexer_l.c

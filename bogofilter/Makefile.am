@@ -1,5 +1,9 @@
 # $Id$ 
 # $Log$
+# Revision 1.6  2002/09/17 02:16:37  adrian_otto
+# Re-aranged the makefile so that the autoconfigured Makefile gets a correct
+# rule for cleaning lexertest.
+#
 # Revision 1.5  2002/09/17 01:47:51  adrian_otto
 # Fixed the Makefile configuration so that it knows how to build the man
 # page properly. Updated the man page to reflect the Sourceforge web site,
@@ -20,16 +24,18 @@
 # Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
 # 0.7.3 Base Source
 #
-bin_PROGRAMS = bogofilter
+bin_PROGRAMS = bogofilter lexertest
 bogofilter_SOURCES = bogofilter.c bogofilter.h lock.c lock.h main.c lexer_l.c
+lexertest_SOURCES =
+lexertest_LDADD = lexertest.o
 man1_MANS = bogofilter.1
 EXTRA_DIST = $(man1_MANS)
 #
-lexer_l.c: lexer_l.l
-	flex lexer_l.l
+#lexer_l.c: lexer_l.l
+#	flex lexer_l.l
 #
-lexertest: lexer_l.c
-	$(CC) -DMAIN -o lexertest lexer_l.c
+lexertest.o: lexer_l.c
+	$(COMPILE) -DMAIN -o lexertest.o -c lexer_l.c
 #
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core lexer_l.c
