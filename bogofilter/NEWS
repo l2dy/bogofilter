@@ -23,7 +23,7 @@
 	* Support for -u flag. This allows messsage evaluation and training to 
 	  happen in the same invocation of bogofilter.
 	* Extended TOKEN patterns to impeove support for european languages.
-	* Improved worlist locking to prevent data corruption.
+	* Improved wordlist locking to prevent data corruption.
 	* Added procmail recipies for example usage in the man page.
 
 0.7.4	Tue Sep 17 02:29:48 EDT 2002
