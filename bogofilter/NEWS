@@ -25,10 +25,16 @@ Briefly:
 
 	2004-11-10
 
-	* Support for BerkeleyDB 4.3 was added.
+	* Support for BerkeleyDB 4.3 was added. We'll avoid DB_NOSYNC on
+	  DB->close() when DB_LOG_INMEMORY is configured for now.
 
 	* Update manual pages/example outputs and filter recipe examples from
 	  "X-Bogosity: yes" to "X-Bogosity: Spam". Fixes Debian bug #280557.
+	
+	* Bugfix for BerkeleyDB 4.2 support: check the data base flags, not the
+	  environment flags, for DB_TXN_NOT_DURABLE, when determining whether
+	  DB_NOSYNC is safe on DB->close(). May fix some kinds of database
+	  corruption encountered with DB_TXN_NOT_DURABLE.
 
 	2004-11-09
 

@@ -702,17 +702,30 @@ void db_close(void *vhandle)
     int ret;
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
-    uint32_t f = DB_NOSYNC; /* safe as long as we're logging TXNs*/
+    uint32_t f = DB_NOSYNC, t; /* safe as long as we're logging TXNs */
 
 #if DB_AT_LEAST(4,2)
     /* get_flags and DB_TXN_NOT_DURABLE are new in 4.2 */
-    ret = dbe->get_flags(dbe, &f);
+    ret = dbp->get_flags(dbp, &t);
     if (ret) {
-	print_error(__FILE__, __LINE__, "get_flags returned error: %s",
+	print_error(__FILE__, __LINE__, "DB->get_flags returned error: %s",
 		db_strerror(ret));
 	f = 0;
     } else {
-	f = (f & DB_TXN_NOT_DURABLE) ? 0 : DB_NOSYNC;
+	if (t & DB_TXN_NOT_DURABLE)
+	    f &= ~DB_NOSYNC;
+    }
+#endif
+
+#if DB_AT_LEAST(4,3)
+    ret = dbe->get_flags(dbe, &t);
+    if (ret) {
+	print_error(__FILE__, __LINE__, "DB_ENV->get_flags returned error: %s",
+		db_strerror(ret));
+	f = 0;
+    } else {
+	if (t & DB_LOG_INMEMORY)
+	    f &= ~DB_NOSYNC;
     }
 #endif
 
@@ -727,7 +740,8 @@ void db_close(void *vhandle)
     ret = dbp->close(dbp, f);
     ret = db_flush_dirty(dbe, ret);
     if (ret)
-	print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "DB->close error: %s",
+		db_strerror(ret));
 
     handle->dbp = NULL;
     dbh_free(handle);
