@@ -26,14 +26,6 @@ AUTHOR:
 #define	COMMENT_END	"-->"
 #define	COMMENT_END_LEN 3		/* strlen(COMMENT_END) */
 
-/* Global Variables */
-
-int	html_comment_count = 0;
-
-bool	kill_html_comments  = true;	/* config file option:  "kill_html_comments"  */
-int	count_html_comments = 5;	/* config file option:  "count_html_comments" */
-bool	score_html_comments = false;	/* config file option:  "score_html_comments" */
-
 /* Function Declarations */
 
 static int kill_html_comment(buff_t *buff, size_t comment_start);
@@ -121,8 +113,6 @@ static int kill_html_comment(buff_t *buff, size_t comment_offset)
 		tmp += 1;
 	    else {
 		comment = tmp;
-		if (level == 0 && score_html_comments)
-		    html_comment_count = min(count_html_comments, html_comment_count + 1);
 		level += 1;
 		tmp += COMMENT_START_LEN;
 	    }
@@ -140,11 +130,8 @@ static int kill_html_comment(buff_t *buff, size_t comment_offset)
 		size_t len = short_check ? 1 : COMMENT_END_LEN;
 		tmp += len;
 		/* eat comment */
-		if (kill_html_comments) {
-		    size_t shift = tmp - comment;
-		    buff_shift(buff, comment, shift);
-		    tmp = comment;
-		}
+		buff_shift(buff, comment, tmp - comment);
+		tmp = comment;
 		level -= 1;
 		/* If not followed by a comment, there is no need to keep reading */
 		if (level == 0 && isalnum(*tmp))
@@ -163,8 +150,7 @@ static int kill_html_comment(buff_t *buff, size_t comment_offset)
 	*/
 
 	/* When killing html comments, there's no need to keep it in memory */
-	if (kill_html_comments && 
-	    comment != NULL && 
+	if (comment != NULL && 
 	    buf_end - buf_used < COMMENT_END_LEN) 
 	{
 	    /* Leave enough to recognize the end of comment string. */

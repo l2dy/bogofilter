@@ -22,16 +22,6 @@ SYSTEST="${srcdir}"
 BOGOFILTER_DIR="${TMPDIR}/tests"
 export BOGOFILTER_DIR
 
-# kill_html_comments=yes
-cat <<EOF > ${TMPDIR}/cfg.y
-kill_html_comments=yes
-EOF
-
-# kill_html_comments=no
-cat <<EOF > ${TMPDIR}/cfg.n
-kill_html_comments=no
-EOF
-
 verbose=0
 if [ "$1" = "-v" ]; then
     verbose=1
@@ -57,12 +47,10 @@ OUT="split.out"
 files=`ls ${srcdir}/inputs/split.d/msg*`
 for msg in $files ; do
     nam=`basename $msg`
-    for cfg in n y ; do
-	out="$TMPDIR/$nam"
-	map_rc $BOGOLEXER -C -p -k $cfg -I $msg > $out.l$cfg
-	map_rc $BOGOFILTER -vvv -f -c ${TMPDIR}/cfg.$cfg -I $msg > $out.f$cfg
-	printf "%-20s %s\n" $nam.$cfg `head -1 $out.f$cfg | sed s@spamicity=@@ | tr -d "," | awk '{print $4}'` >> ${TMPDIR}/$OUT
-    done
+    out="$TMPDIR/$nam"
+    map_rc $BOGOLEXER -C -p -I $msg > $out.l
+    map_rc $BOGOFILTER -vvv -f -C -I $msg > $out.f
+    printf "%-20s %s\n" $nam `head -1 $out.f | sed s@spamicity=@@ | tr -d "," | awk '{print $4}'` >> ${TMPDIR}/$OUT
 done
 
 [ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save

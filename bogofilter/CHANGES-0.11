@@ -6,10 +6,20 @@ $Id$
      
 0.11.X  2003-03-??
 
+	2003-03-02
+	* Discarding of html comments is the standard action.  Removed
+	  options to control that action.
+
+	2003-03-01
+	* Command line arguments take precedence over config file
+	  options.
+	* Improved value validity checking for arguments.
+
 	2003-02-27
 	* Separate message registration options from unregistration
 	  options.  '-s' and '-n' register messages and '-S' and '-N'
-	  unregister them.
+	  unregister them.  '-S' and '-n' may be used together, as can
+	  '-N' and '-s'.
 
 	2003-02-26
 	* Bogofilter's -p (passthrough) mode will no longer read the entire

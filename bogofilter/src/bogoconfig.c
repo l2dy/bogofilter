@@ -147,9 +147,6 @@ const parm_desc sys_parms[] =
     { "charset_default",  CP_STRING,	{ &charset_default } },
     { "datestamp_tokens",		CP_BOOLEAN, { (void *) &datestamp_tokens } },
     { "replace_nonascii_characters",	CP_BOOLEAN, { (void *) &replace_nonascii_characters } },
-    { "kill_html_comments", 		CP_BOOLEAN, { (void *) &kill_html_comments } },
-    { "count_html_comments",  		CP_INTEGER, { (void *) &count_html_comments } },
-    { "score_html_comments",  		CP_BOOLEAN, { (void *) &score_html_comments } },
     { "db_cachesize",	  CP_INTEGER,	{ (void *) &db_cachesize } },
     { "tag_header_lines", CP_BOOLEAN,	{ (void *) &tag_header_lines } },
     { NULL,		  CP_NONE,	{ (void *) NULL } },
@@ -289,7 +286,6 @@ static void help(void)
 		  "\t-N\t- unregister message(s) from non-spam list.\n"
 		  "\t-R\t- print an R data frame.\n"
 		  "\t-v\t- set debug verbosity level.\n"
-		  "\t-k y/n\t- kill html comments (yes or no).\n"
 		  "\t-V\t- print version information and exit.\n"
 		  "\t-c file\t- read specified config file.\n"
 		  "\t-C\t- don't read standard config files.\n"
@@ -366,7 +362,7 @@ void process_args(int argc, char **argv, int pass)
     select_algorithm(algorithm, false);	/* select default algorithm */
 
     optind = 0;
-    while ((option = getopt(argc, argv, ":23d:eFhlL:m:o:snSNvVpuc:CgrRfqtI:O:y:k:x:DT" G R F)) != EOF)
+    while ((option = getopt(argc, argv, ":23d:eFhlL:m:o:snSNvVpuc:CgrRfqtI:O:y:x:DT" G R F)) != EOF)
     {
 #if 0
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
@@ -450,10 +446,6 @@ void process_args(int argc, char **argv, int pass)
 
 	case 'u':
 	    run_type = RUN_UPDATE;
-	    break;
-
-	case 'k':
-	    kill_html_comments = str_to_bool( optarg );
 	    break;
 
 	case 'L':

@@ -272,8 +272,7 @@ int yyinput(byte *buf, size_t max_size)
 	&& ! (msg_header || msg_state->mime_header)
 	&& msg_state->mime_type == MIME_TEXT_HTML)
     {
-	if (kill_html_comments || score_html_comments )
-	    count = process_html_comments(buff);
+	count = process_html_comments(buff);
     }
 
     for (i = 0; i < count; i++ )

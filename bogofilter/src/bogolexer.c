@@ -39,9 +39,6 @@ const parm_desc sys_parms[] =
     { "block_on_subnets",		CP_BOOLEAN,	{ (void *) &block_on_subnets } },
     { "charset_default",		CP_STRING,	{ &charset_default } },
     { "replace_nonascii_characters",	CP_BOOLEAN,	{ (void *) &replace_nonascii_characters } },
-    { "kill_html_comments",		CP_BOOLEAN,	{ (void *) &kill_html_comments } },
-    { "count_html_comments",		CP_INTEGER,	{ (void *) &count_html_comments } },
-    { "score_html_comments",		CP_BOOLEAN,	{ (void *) &score_html_comments } },
     { "tag_header_lines",		CP_BOOLEAN,	{ (void *) &tag_header_lines } },
     { NULL,				CP_NONE,	{ (void *) NULL } },
 };
@@ -87,7 +84,7 @@ static int process_args(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
-    while ((option = getopt(argc, argv, ":hnpqvnI:k:c:Cx:DT")) != -1)
+    while ((option = getopt(argc, argv, ":hnpqvnI:c:Cx:DT")) != -1)
     {
 	switch (option)
 	{
@@ -117,10 +114,6 @@ static int process_args(int argc, char **argv)
 
 	case 'x':
 	    set_debug_mask( optarg );
-	    break;
-
-	case 'k':
-	    kill_html_comments = str_to_bool( optarg );
 	    break;
 
 	case 'c':
