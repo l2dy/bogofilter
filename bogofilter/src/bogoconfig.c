@@ -604,6 +604,8 @@ void process_args(int argc, char **argv, int pass)
 
 void query_config(void)
 {
+    fprintf(stdout, "%s version %s\n", progname, version);
+    fprintf(stdout, "\n");
     fprintf(stdout, "%-11s = %s\n", "algorithm", method->name);
     fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "robx", robx, robx);
     fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "robs", robs, robs);
