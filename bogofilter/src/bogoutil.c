@@ -221,7 +221,8 @@ static ex_t load_wordlist(const char *ds_file)
 	data.spamcount = spamcount;
 	data.date = date;
 
-	if (is_count(buf) && !(maintain && discard_token(token, &data))) {
+	if (is_count((const char *)buf)
+		&& !(maintain && discard_token(token, &data))) {
 	    load_count += 1;
 	    /* Slower, but allows multiple lists to be concatenated */
 	    set_date(date);
