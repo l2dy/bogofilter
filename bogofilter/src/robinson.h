@@ -9,6 +9,10 @@
 #define ROBS			0.010	/* Robinson's s */
 #define ROBX			0.415	/* Robinson's x */
 
+#define ROBINSON_MIN_DEV	0.0	/* if nonzero, use characteristic words */
+#define ROBINSON_SPAM_CUTOFF	0.54	/* if it's spammier than this... */
+#define ROBINSON_MAX_REPEATS	1	/* cap on word frequency per message */
+  
 #define ROBINSON_GOOD_BIAS	1.0	/* don't give good words more weight */
 
 #define ROBX_W			 ".ROBX"

@@ -24,10 +24,6 @@ NAME:
 #include "wordhash.h"
 #include "wordlists.h"
 
-#define ROBINSON_MIN_DEV	0.0	/* if nonzero, use characteristic words */
-#define ROBINSON_SPAM_CUTOFF	0.54	/* if it's spammier than this... */
-#define ROBINSON_MAX_REPEATS	1	/* cap on word frequency per message */
-  
 extern int Rtable;
 
 double	thresh_rtable = 0.0;		/* used in fisher.c */
