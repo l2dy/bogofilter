@@ -630,30 +630,6 @@ static int process_arg(int option, const char *name, const char *val, int option
 	fprintf(stderr, "Unknown option '%s'.\n", name);
 	break;
 
-    case 'C':
-	flag = M_VERIFY;
-	count += 1;
-	ds_file = val;
-	break;
-
-    case 'f':
-	flag = M_RECOVER;
-	count += 1;
-	ds_file = val;
-	break;
-
-    case 'F':
-	flag = M_CRECOVER;
-	count += 1;
-	ds_file = val;
-	break;
-
-    case 'P':
-	flag = M_PURGELOGS;
-	count += 1;
-	ds_file = val;
-	break;
-
     case 'd':
 	flag = M_DUMP;
 	count += 1;
@@ -785,6 +761,30 @@ static int process_arg(int option, const char *name, const char *val, int option
 
     case 'D':
 	dbgout = stdout;
+	break;
+
+    case O_DB_VERIFY:
+	flag = M_VERIFY;
+	count += 1;
+	ds_file = val;
+	break;
+
+    case O_DB_RECOVER:
+	flag = M_RECOVER;
+	count += 1;
+	ds_file = val;
+	break;
+
+    case O_DB_RECOVER_HARDER:
+	flag = M_CRECOVER;
+	count += 1;
+	ds_file = val;
+	break;
+
+    case O_DB_PRUNE:
+	flag = M_PURGELOGS;
+	count += 1;
+	ds_file = val;
 	break;
 
 #ifdef	HAVE_DECL_DB_CREATE
