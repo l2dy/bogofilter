@@ -29,4 +29,3 @@ if  [ $verbose -eq 0 ]; then
 else
     diff $DIFF_BRIEF ${OUTPUTS}/$OUT ${TMPDIR}/$OUT
 fi
-
