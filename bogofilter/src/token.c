@@ -33,6 +33,11 @@ word_t *yylval = NULL;
 static token_t save_class = NONE;
 static word_t *ipsave = NULL;
 
+static word_t *w_to   = NULL;	/* To: */
+static word_t *w_from = NULL;	/* From: */
+static word_t *w_rtrn = NULL;	/* Return-Path: */
+static word_t *w_subj = NULL;	/* Subject: */
+
 /* Global Variables */
 
 bool block_on_subnets = false;
@@ -198,31 +203,44 @@ void token_init(void)
     mime_reset(); 
     if (nonblank_line == NULL) {
 	const char *s = "spc:invalid_end_of_header";
-	nonblank_line = word_new((const unsigned char *)s, strlen(s));
+	nonblank_line = word_new((const byte *)s, strlen(s));
     }
+
+    if (w_to == NULL) {
+	w_to   = word_new((const byte *) "to:",   0);	/* To: */
+	w_from = word_new((const byte *) "from:", 0);	/* From: */
+	w_rtrn = word_new((const byte *) "rtrn:", 0);	/* Return-Path: */
+	w_subj = word_new((const byte *) "subj:", 0);	/* Subject: */
+    }
+
+    return;
 }
 
 void got_newline()
 {
-    word_free(token_prefix);
     token_prefix = NULL;
 }
 
-const char *prefixes = "to:|from:|rtrn:|subj:";
-
-void set_tag(const char *tag)
+void set_tag(word_t *text)
 {
-    size_t len = strlen(tag);
-    const char *tmp = prefixes;
-
-    while (tmp != NULL) {
-	if (memcmp(tmp, tag, len) == 0) {
-	    word_free(token_prefix);
-	    token_prefix = word_new((const byte *)tag, strlen(tag));
-	    return;
-	}
-	tmp = strchr(tmp, '|');
-	if (tmp) tmp++;
+    switch (tolower(*text->text)) {
+    case 't':			/* To: */
+	token_prefix = w_to;
+	break;
+    case 'f':			/* From: */
+	token_prefix = w_from;
+	break;
+    case 'r':			/* Return-Path: */
+	token_prefix = w_rtrn;
+	break;
+    case 's':			/* Subject: */
+	token_prefix = w_subj;
+	break;
+    default:
+	fprintf(stderr, "%s:%d  invalid tag - '%s'\n", 
+		__FILE__, __LINE__, 
+		(char *)text->text);
+	exit(EX_ERROR);
     }
     return;
 }

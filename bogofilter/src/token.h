@@ -18,7 +18,7 @@ extern token_t get_token(void);
 
 extern void got_from(void);
 extern void got_newline(void);
-extern void set_tag(const char *tag);
+extern void set_tag(word_t *text);
 
 extern void token_init(void);
 extern void token_cleanup(void);

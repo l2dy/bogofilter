@@ -205,16 +205,16 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						    unput(w->text[size]);
 						}
 
-<INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext);	 	skip_to('='); return TOKEN; }
+<INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); 		skip_to('='); return TOKEN; }
 <INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); 	skip_to(':'); return TOKEN; }
 <INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); 	skip_to(':'); return TOKEN; }
 <INITIAL>^Content-Type:{TTYPE};?		{ mime_type(yy_text()); 	skip_to(':'); return TOKEN; }
 <INITIAL>^Content-Disposition:{MTYPE}		{ mime_disposition(yy_text()); 	skip_to(':'); return TOKEN; }
-<INITIAL>^To/:.*				{ if (header_line_markup) set_tag("to:"); }
-<INITIAL>^From/:.*				{ if (header_line_markup) set_tag("from:"); else return TOKEN; }
-<INITIAL>^Return-Path/:.*			{ if (header_line_markup) set_tag("rtrn:"); else return TOKEN; }
-<INITIAL>^Subject/:.*				{ if (header_line_markup) set_tag("subj:"); else return TOKEN; }
-<INITIAL>^Date:.*|Delivery-Date:.*		;
+<INITIAL>^To/:.*				{ if (header_line_markup) set_tag(yy_text()); }
+<INITIAL>^From/:.*				{ if (header_line_markup) set_tag(yy_text()); }
+<INITIAL>^Return-Path/:.*			{ if (header_line_markup) set_tag(yy_text()); }
+<INITIAL>^Subject/:.*				{ if (header_line_markup) set_tag(yy_text()); }
+<INITIAL>^(Delivery-)?Date:.*			;
 <INITIAL>^Message-ID:.*				;
 <INITIAL>(ESMTP|SMTP)?[ \t]+id\ {ID}		;
 <INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
@@ -292,7 +292,7 @@ static void skip_to(char chr)
     size_t len = strchr(yytext, chr) - yytext;
     yyless(len);
 }
- 
+
 static void reorder_html(void)
 {
     char *chr = memchr(yytext, '<', yyleng);	/* find start of html tag */

@@ -20,12 +20,13 @@ AUTHOR:
 word_t *word_new(const byte *text, size_t leng)
 {
     /* to lessen malloc/free calls, allocate struct and data in one block */
-    word_t *self = xmalloc(sizeof(word_t)+leng+D);
-    self->leng = leng;
+    size_t len   = (leng || !text) ? leng : strlen((const char *) text);
+    word_t *self = xmalloc(sizeof(word_t)+len+D);
+    self->leng = len;
     self->text = (byte *)((char *)self+sizeof(word_t));
     if (text) {
-	memcpy(self->text, text, leng);
-	Z(self->text[self->leng]);		/* for easier debugging - removable */
+	memcpy(self->text, text, len);
+	Z(self->text[len]);			/* for easier debugging - removable */
     }
     return self;
 }
