@@ -47,7 +47,6 @@ This version was built with tdb support.
 This version was built with Berkeley DB support.
 %endif
 
-%prep
 %package static
 Summary:	Statically linked
 Group:		Networking/Mail
@@ -56,6 +55,7 @@ Conflicts:	bogofilter
 %description static
 Statically linked bogofilter, bogolexer, bogoutil, and bogotune
 
+%prep
 %setup -q
 CFLAGS="$RPM_OPT_FLAGS" \
 ./configure \
