@@ -6,7 +6,7 @@ $Id$
 
 0.13.7	2003-06-20
 
-	* Replaced tuning/tuning.sh with tuning/bogotune.
+	* Replaced tuning/tuning.sh with tuning/bogotune (and related files).
 
 0.13.6.3 2003-06-18
 
