@@ -2,18 +2,15 @@
 dnl vim: set noai tw=0:
 AC_INIT(bogofilter, 0.16.3.cvs)
 AC_PREREQ(2.54)
-AC_CONFIG_SRCDIR([src])
+AC_CONFIG_SRCDIR([src/bogofilter.c])
 AC_CANONICAL_TARGET
 
-dnl foreign: don't insist on ChangeLog
-dnl 1.7: minimum version of automake/aclocal
-dnl dist-bzip2: make dist emits bogofilter-$VERSION.tar.bz2
 AM_INIT_AUTOMAKE([foreign 1.7 dist-bzip2])
 
 AM_CONFIG_HEADER(src/config.h:config.in)
 AC_PROG_AWK
 AC_PROG_CC(gcc xlc cc)
-AC_GNU_SOURCE
+dnl AC_GNU_SOURCE
 AC_CHECK_TOOL(AR, ar)
 AC_PROG_RANLIB
 AC_PATH_PROGS(PERL, perl perl5, $PATH:/usr/local/bin:/usr/bin)
@@ -230,6 +227,7 @@ AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h stdlib.h string.h strings.h sys/s
 AC_CHECK_HEADERS([limits.h float.h],,[AC_CHECK_HEADERS(values.h)])
 
 AC_C_INLINE
+AC_C_VOLATILE
 if test "$ac_cv_c_inline" != no ; then
     AC_DEFINE(HAVE_INLINE,1,[Define to 1 if your compiler supports inline])
     AC_SUBST(HAVE_INLINE)
