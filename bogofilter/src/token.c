@@ -83,7 +83,9 @@ static inline void token_copy( word_t *dst, word_t *src )
     token_set(dst, src->text, src->leng);
 }
 
-static void build_prefixed_token( word_t *token, word_t *prefix, byte *text, uint32_t leng )
+static void build_prefixed_token( word_t *token, uint32_t token_size,
+				  word_t *prefix, 
+				  byte *text, uint32_t leng )
 {
     if (token_prefix != NULL) {
 	token->leng = leng +prefix->leng;
@@ -177,7 +179,7 @@ token_t get_token(word_t **token)
 		leng = (uint) (ot - st);
 	    }
 	    text[leng] = '\0';		/* ensure nul termination */
-	    build_prefixed_token( &yylval, token_prefix, text, leng );
+	    build_prefixed_token(&yylval, sizeof(yylval_text), token_prefix, text, leng);
 	}
 	break;
 
@@ -199,7 +201,7 @@ token_t get_token(word_t **token)
 	case TOKEN:	/* ignore anything when not reading text MIME types */
 	    if (leng > MAXTOKENLEN)
 		continue;
-	    build_prefixed_token( &yylval, token_prefix, text, leng );
+	    build_prefixed_token(&yylval, sizeof(yylval_text), token_prefix, text, leng);
 	    if (token_prefix == NULL) {
 		switch (msg_state->mime_type) {
 		case MIME_TEXT:
@@ -299,7 +301,7 @@ token_t get_token(word_t **token)
 			    q1 & 0xff, q2 & 0xff, q3 & 0xff, q4 & 0xff);
 		leng = strlen((const char *)text);
 
-		build_prefixed_token( &ipsave, prefix, text, leng );
+		build_prefixed_token(&ipsave, sizeof(ipsave_text), prefix, text, leng);
 		token_copy( &yylval, &ipsave );
 		word_free(prefix);
 
@@ -307,7 +309,7 @@ token_t get_token(word_t **token)
 		*token = &yylval;
 		return (cls);
 	    }
-	    build_prefixed_token( &yylval, token_prefix, text, leng );
+	    build_prefixed_token(&yylval, sizeof(yylval_text), token_prefix, text, leng);
 	    break;
 
 	case NONE:		/* nothing to do */
