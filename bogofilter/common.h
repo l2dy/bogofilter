@@ -2,7 +2,6 @@
 
 #ifndef COMMON_H_GUARD
 #define COMMON_H_GUARD
-#include "config.h"
 
 #if defined(HAVE_LIMITS_H)
 #include <limits.h>

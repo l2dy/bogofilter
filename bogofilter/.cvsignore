@@ -3,15 +3,16 @@ aclocal.m4
 autom4te.cache
 bogofilter
 bogofilter.1
+bogofilter.html
+bogofilter.pdf
 bogofilter-*.tar.gz
 bogofilter.spec
 bogoutil
 bogoutil.1
-bogofilter.html
-bogofilter.pdf
 config.h
 config.in
 config.log
+config.cache
 config.status
 configure
 cscope.out
@@ -20,4 +21,4 @@ lexer.c
 Makefile
 Makefile.in
 stamp-h1
-config.cache
+version.h

@@ -22,6 +22,7 @@ AUTHOR:
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
 #endif
+#include "version.h"
 #include "common.h"
 #include "bogofilter.h"
 #include "xmalloc.h"
