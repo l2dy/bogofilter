@@ -5,9 +5,9 @@
 NAME:
    bogotune.c -- determine optimal parameters for bogofilter
 
-AUTHOR:
+AUTHORS:
+   Greg Louis - perl version
    David Relson - C version
-   Greg Lous - perl version
 
 ******************************************************************************/
 
