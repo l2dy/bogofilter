@@ -117,7 +117,7 @@ typedef enum e_ds_loc {
     DS_NONE	   = 0,	/* datastore locn not specified */
     DS_ERR	   = 1,	/* error in datastore locn spec */
     DS_DSK	   = 2,	/* datastore on disk */
-    DS_RAM	   = 4,	/* datastore in ram  */
+    DS_RAM	   = 4 	/* datastore in ram  */
 } ds_loc;
 
 #define	MOD(n,m)	((n) - (floor((n)/(m)))*(m))
