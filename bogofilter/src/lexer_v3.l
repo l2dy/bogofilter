@@ -3,7 +3,7 @@
 %{
 /*
  * NAME
- *   lexer_header.l -- bogofilter's lexical analyzer for message headers
+ *   lexer_v3.l -- bogofilter's lexical analyzer for message headers
  *
  *   01/01/2003 - split out of lexer.l
  *
@@ -121,29 +121,27 @@ static word_t *yy_text(void)
 
 UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
 IPADDR		{UINT8}\.{UINT8}\.{UINT8}\.{UINT8}
-BCHARSNOSPC	[0-9a-zA-Z'()+_,-./:=?#]
-BCHARS		[0-9a-zA-Z'()+_,-./:=?# ]
+BCHARSNOSPC	[[:alnum:]'()+_,-./:=?#]
+BCHARS		[[:alnum:]'()+_,-./:=?# ]
 MIME_BOUNDARY	{BCHARS}*{BCHARSNOSPC}
 
-ID		<?[0-9a-zA-Z-]*>?
-CHARSET		[0-9a-zA-Z-]+
-MTYPE		[ \t]*[0-9a-zA-Z/-]*
-TTYPE		[ \t]*[\.0-9a-zA-Z/-]*
+ID		<?[[:alnum:]-]*>?
+CHARSET		[[:alnum:]-]+
+MTYPE		[ \t]*[[:alnum:]/-]*
 
-NUM_NUM		\ [0-9]+\ [0-9]+
+NUM		[[:digit:]]+
+NUM_NUM		\ {NUM}\ {NUM}
 MSG_COUNT	^\".MSG_COUNT\"
 
 TOKENFRONT	[^[:blank:][:cntrl:][:digit:][:punct:]]
-
 TOKENMID	[^[:blank:]<>;=():&%$#@+|/\\{}^\"?*,[:cntrl:]\[\]]+
 BOGOLEX_TOKEN	[^[:blank:]<>;    &%  @ |/\\{}^\" *,[:cntrl:]\[\]]+
 TOKENBACK	[^[:blank:]<>;=():&%$#@+|/\\{}^\"?*,[:cntrl:]\[\]._\+\-]
 
 TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}
-TOKEN_12 	({TOKEN}|{A2}|{A1})
 
-BASE64		[0-9a-zA-Z/+=]+
-QP		[!->@-~]+
+T12		[[:alpha:]][[:alnum:]]?
+TOKEN_12 	({TOKEN}|{T12})
 
 /*  RFC2047.2
     encoded-word = "=?" charset "?" encoding "?" encoded-text "?="
@@ -159,34 +157,30 @@ QP		[!->@-~]+
 */
 
 /* 09/01/03
-  Using "^[\?]" in the pattern and validating the charset in 'C'
+  Using "[^?]" in the pattern and validating the charset in 'C'
   reduces executable size by approx 290k.
-  new: ENCODED_WORD =\?{CHARSET}\?[bq]\?[^\?]*\?\=
-  old: ENCODED_WORD =\?{CHARSET}\?(b\?{BASE64}|q\?{QP})\?\=
+  new: ENCODED_WORD =\?{CHARSET}\?[bq]\?[^?]*\?=
+  old: ENCODED_WORD =\?{CHARSET}\?(b\?{BASE64}|q\?{QP})\?=
+
+  BASE64	[0-9a-zA-Z/+=]+
+  QP		[!->@-~]+
 */
 
-ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^\?]*\?\=
+ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^?]*\?=
 ENCODED_TOKEN	({TOKENFRONT}{TOKENMID})?({ENCODED_WORD}[ \t\n]+)*{ENCODED_WORD}
 
-DOLLARS		[0-9]+
-CENTS		[0-9]+
-
-A1		[[:alpha:]]+
-A2		[[:alpha:]][[:alnum:]]+
-ALPHA		[[:alpha:]][[:alnum:]]+
-
 WHITESPACE	[ \t\n]
-
 NOTWHITESPACE	[^ \t\n]
 
 HTML_ENCODING		"&#"x?[[:xdigit:]]+";"
-URL_ENCODING		"\%"[[:xdigit:]][[:xdigit:]]
+URL_ENCODING		"%"[[:xdigit:]][[:xdigit:]]
 
-HTML_WI_COMMENTS	"<"[^\>]*">"
+/*
+HTML_WI_COMMENTS	"<"[^>]*">"
+HTML_WO_COMMENTS	"<"[^!][^>]*">"|"<>"
+*/
 
-HTML_WO_COMMENTS	"<"[^!][^\>]*">"|"<>"
-
-HTMLTOKEN		{HTML_WI_COMMENTS}
+HTMLTOKEN		"<"[^>]*">"
 
 /*
  * Generally, there are some html tags that cause an "eyebreak" and some
@@ -201,10 +195,9 @@ HTMLTOKEN		{HTML_WI_COMMENTS}
 
 HBREAK		p|br|li|h[1-6]|hr|title|table|center|dd|dt|iframe|img|input|select|td|textarea|th|\/?(div|blockquote|pre|dir|dl|fieldset|legend|form|menu|ol|ul)
 
-PARSEHTML	"<"(a|font|img)([ \n\t][^>]*|"")">"
 BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
-VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
+VERP		{TOKEN}-{NUM}-{TOKEN}={TOKEN}@{TOKEN}
 
 %s TEXT HTML BOGO_LEX
 %s HTOKEN HDISCARD SCOMMENT LCOMMENT HSCRIPT
@@ -239,7 +232,6 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); skip_to('='); return TOKEN; }
 
 <INITIAL>(file)?name=\"?			/* ignore */
-<INITIAL>(ESMTP|SMTP)+/[ \t\n]+id\ {ID}		{ if (header_line_markup) { return TOKEN; } }
 <INITIAL>[:blank:]*id\ {ID}			/* ignore */
 
 <INITIAL>\n[ \t]				{ lineno += 1; }
@@ -297,7 +289,7 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 <HTML>{TOKEN_12}?{HTML_ENCODING}		{ html_char(); }	/* process escaped chars, eg '&#101;' is 'a' */
 <HTOKEN>{TOKEN_12}?{URL_ENCODING}+		{ url_char(); }		/* process escaped chars, eg '%61'    is 'a' */
 
-\${DOLLARS}(\.{CENTS})?				{ return TOKEN;}
+\${NUM}(\.{NUM})?				{ return TOKEN;}	/* Dollars and cents */
 
 .						/* ignore character */
 \n						{ lineno += 1; clr_tag(); }

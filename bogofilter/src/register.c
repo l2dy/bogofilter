@@ -81,7 +81,7 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
       ds_write(word_list->dsh, node->key, &val);
   }
 
-  for (list = word_lists; list != NULL; list = list->next)
+  list = word_lists;
   {
 /*
       if (!list->active)

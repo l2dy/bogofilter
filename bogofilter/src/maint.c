@@ -91,14 +91,8 @@ bool do_replace_nonascii_characters(register byte *str, register size_t len)
 
 void maintain_wordlists(void)
 {
-    wordlist_t *list;
-
     set_list_active_status(true);
-
-    for (list = word_lists; list != NULL; list = list->next) {
-	maintain_wordlist(list->dsh);
-	list = list->next;
-    }
+    maintain_wordlist(word_lists->dsh);
 }
 
 int maintain_wordlist_file(const char *db_file)

@@ -89,7 +89,6 @@ static void comma_parse(char opt, const char *arg, double *parm1, double *parm2,
 /* externs for query_config() */
 
 extern double robx, robs;
-extern wl_t wl_default;
 
 /*---------------------------------------------------------------------------*/
 
@@ -136,7 +135,6 @@ const parm_desc sys_parms[] =
     { "tokenize_html_script",	     CP_BOOLEAN, { (void *) &tokenize_html_script } },	/* Not yet in use */
 
     { "db_cachesize",	  	     CP_INTEGER, { (void *) &db_cachesize } },
-    { "wordlist_mode",	  	     CP_WORDLIST,{ (void *) &wl_mode } },
     { "terse",	 	  	     CP_BOOLEAN, { (void *) &terse } },
 
     { NULL,		  	     CP_NONE,	 { (void *) NULL } },
@@ -369,9 +367,8 @@ static void print_version(void)
 {
     (void)fprintf(stderr,
 		  "%s version %s\n"
-		  "    Database: %s, %s\n",
-		  progtype, version, ds_version_str(),
-		  (wl_default == WL_M_SEPARATE) ? "separate" : "combined");
+		  "    Database: %s\n",
+		  progtype, version, ds_version_str());
 
     (void)fprintf(stderr,
 		  "Copyright (C) 2002 Eric S. Raymond\n\n"
@@ -384,11 +381,7 @@ static void print_version(void)
 		  PACKAGE);
 }
 
-#define	G "g"
-#define	R "r"
-#define	F "f"
-
-#define	OPTIONS	":23bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pP:qQRrsStTuvWVx:X:y:" G R F
+#define	OPTIONS	":23bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pP:qQRrsStTuvVx:X:y:"
 
 /** These functions process command line arguments.
  **
@@ -537,10 +530,6 @@ void process_args_1(int argc, char **argv)
 
 	case 'v':
 	    verbose++;
-	    break;
-
-	case 'W':
-	    incr_wordlist_mode();
 	    break;
 
 	case 'x':

@@ -23,7 +23,6 @@ typedef enum {
 	CP_CHAR,
 	CP_STRING,
 	CP_DIRECTORY,
-	CP_WORDLIST,
 	CP_FUNCTION
 } parm_t;
 
