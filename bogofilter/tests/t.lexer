@@ -4,13 +4,10 @@
 
 set -e
 
-pwd
-find . -name "t.lexer*" | xargs ls -l
-
 unset LANG
 unset LC_ALL
 unset LC_COLLATE
 
-cat inputs/t.lexer.inp | ../bogolexer -p | sort -u > ${TMPDIR}/t.lexer.out
+cat ${srcdir}/inputs/t.lexer.inp | ../bogolexer -p | sort -u > ${TMPDIR}/t.lexer.out
 
-cmp outputs/t.lexer.out ${TMPDIR}/t.lexer.out
+cmp ${srcdir}/outputs/t.lexer.out ${TMPDIR}/t.lexer.out
