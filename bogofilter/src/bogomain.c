@@ -74,7 +74,7 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     if (nonspam_exits_zero && exitcode != EX_ERROR)
 	exitcode = EX_OK;
 
-    close_wordlists(word_lists, 1);
+    close_wordlists(word_lists, true);
     free_wordlists(word_lists);
     word_lists = NULL;
 

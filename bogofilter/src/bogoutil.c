@@ -407,7 +407,7 @@ static int get_robx(const char *path)
 	val.spamcount = (uint32_t) (rx * 1000000);
 	ret = ds_write(word_lists->dsh, word_robx, &val);
 
-	close_wordlists(word_lists, 1);
+	close_wordlists(word_lists, true);
 	free_wordlists(word_lists);
 	word_lists = NULL;
 

@@ -16,7 +16,7 @@ AUTHOR:
 void bf_exit(void)
 {
     /* Ensure wordlists are closed */
-    close_wordlists(word_lists, 0);
+    close_wordlists(word_lists, false);
 
     return;
 }

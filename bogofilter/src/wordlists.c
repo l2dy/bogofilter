@@ -90,7 +90,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
     list->dsh = ds_open(dbe, bogohome, list->filepath, mode); /* FIXME */
     if (list->dsh == NULL) {
 	int err = errno;
-	close_wordlists(word_lists, 0); /* unlock and close */
+	close_wordlists(word_lists, false); /* unlock and close */
 	switch(err) {
 	    /* F_SETLK can't obtain lock */
 	case EAGAIN:
@@ -183,16 +183,17 @@ void set_wordlist_directory(void)
 }
 
 /** close all open word lists */
-int close_wordlists(wordlist_t *list, int commit /** if unset, abort */)
+bool close_wordlists(wordlist_t *list, bool commit /** if unset, abort */)
     /* FIXME: we really need to look at the list's environments */
 {
-    int err = 0;
+    bool err = false;
     struct envnode *i;
+
     for (i = envlisthead.lh_first; i; i = i->entries.le_next) {
 	if (i->dbe) {
 	    if (commit) {
 		if (ds_txn_commit(i->dbe)) {
-		    err = 1;
+		    err = true;
 		}
 	    } else {
 		ds_txn_abort(i->dbe);

@@ -116,7 +116,7 @@ double compute_robinson_x(const char *path)
 
     rx = compute_robx(ds);
 
-    close_wordlists(word_lists, 1);
+    close_wordlists(word_lists, true);
 
     return rx;
 }
