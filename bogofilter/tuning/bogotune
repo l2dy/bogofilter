@@ -94,6 +94,7 @@ if(!$bogodir) {
 	$bogodir = $ENV{"HOME"} . "/.bogofilter";
     }
 }
+opendir(DH, $bogodir) || die( "$bogodir is not a directory" ); closedir(DH);
 my $dbname = $bogodir . "/wordlist.db";
 my $twolist = 0;
 if(! -r $dbname) {
