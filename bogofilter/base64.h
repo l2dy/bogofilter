@@ -10,7 +10,8 @@ NAME:
 #ifndef	HAVE_BASE64_H
 #define	HAVE_BASE64_H
 
-void base64_init(void);
+#include "common.h"
+
 int base64_decode(byte *buff, size_t size);
 
 #endif	/* HAVE_BASE64_H */

@@ -1,0 +1,21 @@
+#! /bin/sh
+
+. ${srcdir:=.}/t.frame
+
+filelist=`find $srcdir -maxdepth 1 -type f -print`
+
+grind() {
+    a=0
+    cat $filelist | ../bogofilter -n -d $TMPDIR -xd -vvv 2>>$TMPDIR/log || a=$?
+    echo >>$TMPDIR/res $a
+}
+
+# this test tortures the locking
+for i in 1 2 3 4 5 6 7 8 9 10 ; do
+    grind &
+done
+wait
+# check exit codes
+test "x`sed '/[01]/ d'  $BOGOFILTER_DIR/res`" == "x"
+# check data base consistency
+db_verify $TMPDIR/goodlist.db

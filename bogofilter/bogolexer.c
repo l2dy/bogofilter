@@ -20,13 +20,7 @@ NAME:
 #include "lexer.h"
 #include "textblock.h"
 #include "token.h"
-
-/* exports */
-bool logflag;				/* '-l' */
-bool quiet;				/* '-q' */
-int  passthrough;			/* '-p' */
-int  verbose;				/* '-v' */
-bool replace_nonascii_characters;	/* '-n' */
+#include "mime.h"
 
 const char *progname = "bogolexer";
 
@@ -56,7 +50,10 @@ int main(int argc, char **argv)
     int option;
     int count=0;
 
-    while ((option = getopt(argc, argv, ":hnpqvx")) != -1)
+    fpin = stdin;
+    dbgout = stderr;
+
+    while ((option = getopt(argc, argv, ":hnpqvnx:I:")) != -1)
 	switch (option) {
 	case 'h':
 	    help();
@@ -77,6 +74,13 @@ int main(int argc, char **argv)
 	case 'x':
 	    set_debug_mask( optarg );
 	    break;
+	case 'I':
+	    fpin = fopen( optarg, "r" );
+	    if (fpin == NULL) {
+		fprintf(stderr, "Can't read file '%s'\n", optarg);
+		exit(2);
+	    }
+	    break;
 	default:
 	    usage();
 	    exit(0);
@@ -93,6 +97,7 @@ int main(int argc, char **argv)
     }
 
     init_charset_table("default", true);
+    mime_reset();
 
     while ((t = get_token()) > 0)
     {

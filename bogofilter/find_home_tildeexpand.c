@@ -61,12 +61,12 @@ char *tildeexpand(const char *name) {
 	tmp = NULL;
     }
 
+    xfree(tmp);
+
     if (home == NULL) {
-	xfree(tmp);
 	return xstrdup(name);
     }
 
-    xfree(tmp);
     tl = strlen(name) + strlen(home) - l + 1;
     tmp = xmalloc(tl);
     (void)strlcpy(tmp, home, tl);

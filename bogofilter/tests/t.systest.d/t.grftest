@@ -1,7 +1,5 @@
 #!/bin/sh
 
-. ${srcdir:=.}/t.frame
-
 set -e
 
 # Note:  This test DOES leave its output files on the hard drive.
@@ -14,6 +12,10 @@ set -e
 #		grftest.out - comparison of directories:
 #			      outputs - known correct outputs
 #			      tests   - outputs of the individual tests
+
+: ${srcdir=.}
+relpath="`pwd`/../.."
+. ${srcdir}/../t.frame -no-db
 
 verbose=0
 if [ "$1" = "-v" ]; then
@@ -46,9 +48,11 @@ spamicity_tags = S,h,u
 spamicity_formats = %6.2e %6.2e %0.6f
 EOF
 
-BOGOFILTER="../bogofilter"
-BOGOUTIL="../bogoutil"
-SYSTEST="${srcdir}/t.systest.d"
+V="v"	# verbosity level
+
+BOGOFILTER="$VAL ${relpath}/bogofilter"
+BOGOUTIL="$VAL ${relpath}/bogoutil"
+SYSTEST="${srcdir}"
 
 map_rc()
 {
@@ -80,19 +84,21 @@ for mth in g r f t ; do
     alg="$mth"
     if [ "$alg" = "t" ] ; then alg=f ; else : ; fi
     BOGOFILTER_DIR="${TMPDIR}/words.$mth"
-    CFG="-c ${TMPDIR}/cfg.$mth"
+    CFG="-c ${TMPDIR}/cfg.$mth -y 0"
     export BOGOFILTER_DIR
     if [   -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
     mkdir -p $BOGOFILTER_DIR
     $BOGOFILTER -$alg $CFG -s < ${SYSTEST}/inputs/spam.mbx
     $BOGOFILTER -$alg $CFG -n < ${SYSTEST}/inputs/good.mbx
+    $BOGOUTIL -d $BOGOFILTER_DIR/spamlist.db > $BOGOFILTER_DIR/spamlist.txt
+    $BOGOUTIL -d $BOGOFILTER_DIR/goodlist.db > $BOGOFILTER_DIR/goodlist.txt
     [ $verbose -gt 0 ] && $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT
     #
     # run tests for msg.[1-8].txt
     #
     for msg in ${SYSTEST}/inputs/msg.?.txt ; do
 	tst=`echo $msg | sed s@${SYSTEST}/inputs/msg.@@ | sed s@.txt@@`
-	args="$tst $tst v"
+	args="$tst $tst $V"
 	run_test $args
     done
 
@@ -102,12 +108,12 @@ done
 OUT="grftest.out"
 
 printf "%2s     %-10s   %-10s   %-10s   %-10s\n" id graham robinson fisher tristate > ${TMPDIR}/tests/$OUT
-for out in ${TMPDIR}/tests/msg.?.r.v ; do
-    id=`echo $out | sed s@${TMPDIR}/tests/msg.@@ | sed s@.r.v@@`
-    g=`cat ${TMPDIR}/tests/msg.$id.g.v | tr "NY" "hS"`
-    r=`cat ${TMPDIR}/tests/msg.$id.r.v | tr "NY" "hS"`
-    f=`cat ${TMPDIR}/tests/msg.$id.f.v | tr "NY" "hS"`
-    t=`cat ${TMPDIR}/tests/msg.$id.t.v`
+for out in ${TMPDIR}/tests/msg.?.r.$V ; do
+    id=`echo $out | sed s@${TMPDIR}/tests/msg.@@ | sed s@.r.$V@@`
+    g=`head -1 ${TMPDIR}/tests/msg.$id.g.$V | tr "NY" "hS"`
+    r=`head -1 ${TMPDIR}/tests/msg.$id.r.$V | tr "NY" "hS"`
+    f=`head -1 ${TMPDIR}/tests/msg.$id.f.$V | tr "NY" "hS"`
+    t=`head -1 ${TMPDIR}/tests/msg.$id.t.$V`
     printf "%2s   %c %s   %c %s   %c %s   %c %s\n" $id $g $r $f $t >> ${TMPDIR}/tests/$OUT
 done
 

@@ -14,6 +14,9 @@
 #include "debug.h"
 #include "system.h" /* defines bool */
 
+/* length of *yylval will not exceed this... */
+#define MAXTOKENLEN	30
+
 #define GOODFILE	"goodlist.db"
 #define SPAMFILE	"spamlist.db"
 #define IGNOREFILE	"ignorelist.db"

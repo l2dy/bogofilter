@@ -14,6 +14,6 @@ shn2="$shn: blah2"
 
 ( echo $hdr ; echo $shn1 ; echo ; echo $shn2 ) >$TMPDIR/input
 tail -2 $TMPDIR/input >$TMPDIR/want
-../bogofilter -p -e -C < $TMPDIR/input | sed -n '/^$/,$ p' > $TMPDIR/out
+$VAL ../bogofilter -p -e -C < $TMPDIR/input | sed -n '/^$/,$ p' > $TMPDIR/out
 
 cmp $TMPDIR/out $TMPDIR/want

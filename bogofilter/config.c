@@ -61,16 +61,10 @@ AUTHOR:
 
 /* Global variables */
 
-int nonspam_exits_zero;	/* '-e' */
-bool force;		/* '-F' */
-bool logflag;		/* '-l' */
-bool quiet;		/* '-q' */
-bool terse;		/* '-t' */
-int passthrough;	/* '-p' */
-int verbose;		/* '-v' */
 int Rtable = 0;		/* '-R' */
 
 char *directory = NULL;
+char *update_dir = NULL;
 char outfname[PATH_LEN] = "";
 
 const char *user_config_file   = "~/.bogofilter.cf";
@@ -96,16 +90,15 @@ enum algorithm_e {
 };
 
 /* define default */
-#ifdef ENABLE_ROBINSON_METHOD
+#if defined (ENABLE_ROBINSON_METHOD)
 #define AL_DEFAULT AL_ROBINSON
-#else
+#elif defined (ENABLE_GRAHAM_METHOD)
 #define AL_DEFAULT AL_GRAHAM
+#elif defined (ENABLE_ROBINSON_FISHER)
+#define AL_DEFAULT AL_FISHER
+#else
+#error No algorithms compiled in. See configure --help.
 #endif
-
-double	spam_cutoff = 0.0;			/* set during method initialization */
-double	min_dev = 0.0f;
-
-double	thresh_stats = 0.0f;
 
 /* Local variables and declarations */
 
@@ -136,6 +129,7 @@ static const parm_desc sys_parms[] =
     { "algorithm",  	  CP_FUNCTION,	{ (void *) &config_algorithm } },
     { "bogofilter_dir",	  CP_DIRECTORY,	{ &directory } },
     { "wordlist",	  CP_FUNCTION,	{ (void *) &configure_wordlist } },
+    { "update_dir",	  CP_STRING,	{ &update_dir } },
 
     { "min_dev",	  CP_DOUBLE,	{ (void *) &min_dev } },
     { "spam_cutoff",	  CP_DOUBLE,	{ (void *) &spam_cutoff } },
@@ -226,7 +220,7 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 		    break;
 		}
 		if (DEBUG_CONFIG(0))
-		    fprintf(stderr, "%s -> %s\n", arg->name,
+		    fprintf(dbgout, "%s -> %s\n", arg->name,
 			    *arg->addr.b ? "Yes" : "No");
 		break;
 	    }
@@ -237,7 +231,7 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 		    val += 1;
 		*arg->addr.i = atoi((const char *)val) * sign;
 		if (DEBUG_CONFIG(0))
-		    fprintf( stderr, "%s -> %d\n", arg->name, *arg->addr.i );
+		    fprintf(dbgout, "%s -> %d\n", arg->name, *arg->addr.i);
 		break;
 	    }
 	case CP_DOUBLE:
@@ -247,32 +241,31 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 		    val += 1;
 		*arg->addr.d = atof((const char *)val) * sign;
 		if (DEBUG_CONFIG(0))
-		    fprintf( stderr, "%s -> %f\n", arg->name, *arg->addr.d );
+		    fprintf(dbgout, "%s -> %f\n", arg->name, *arg->addr.d);
 		break;
 	    }
 	case CP_CHAR:
 	    {
 		*arg->addr.c = *(const char *)val;
 		if (DEBUG_CONFIG(0))
-		    fprintf( stderr, "%s -> '%c'\n", arg->name, *arg->addr.c );
+		    fprintf(dbgout, "%s -> '%c'\n", arg->name, *arg->addr.c);
 		break;
 	    }
 	case CP_STRING:
 	    {
 		*arg->addr.s = xstrdup((const char *)val);
 		if (DEBUG_CONFIG(0))
-		    fprintf( stderr, "%s -> '%s'\n", arg->name, *arg->addr.s );
+		    fprintf(dbgout, "%s -> '%s'\n", arg->name, *arg->addr.s);
 		break;
 	    }
 	case CP_DIRECTORY:
 	    {
 		char *dir = *arg->addr.s;
-		if (dir)
-		    xfree(dir);
-		*arg->addr.s = dir = xstrdup(val);
+		xfree(dir);
+		*arg->addr.s = dir = xstrdup((const char *)val);
 		if (DEBUG_CONFIG(0))
-		    fprintf( stderr, "%s -> '%s'\n", arg->name, dir );
-		if (setup_lists(dir) != 0)
+		    fprintf(dbgout, "%s -> '%s'\n", arg->name, dir);
+		if (setup_wordlists(dir) != 0)
 		    exit(2);
 		break;
 	    }
@@ -280,7 +273,7 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 	{
 	    ok = (*arg->addr.f)(val);
 	    if (DEBUG_CONFIG(0))
-		fprintf( stderr, "%s -> '%c'\n", arg->name, *val );
+		fprintf(dbgout, "%s -> '%c'\n", arg->name, *val);
 	    break;
 	}
 	default:
@@ -310,12 +303,12 @@ static bool process_config_line( const unsigned char *line, const parm_desc *par
     for ( arg = parms; arg->name != NULL; arg += 1 )
     {
 	if (DEBUG_CONFIG(1))
-	    fprintf( stderr, "Testing:  %s\n", arg->name);
+	    fprintf(dbgout, "Testing:  %s\n", arg->name);
 	if (strncmp(arg->name, (const char *)line, len) == 0)
 	{
 	    bool ok = process_config_parameter(arg, val);
 	    if (DEBUG_CONFIG(1) && ok )
-		fprintf( stderr, "%s\n", "   Found it!");
+		fprintf(dbgout, "%s\n", "   Found it!");
 	    return ok;
 	}
     }
@@ -339,14 +332,14 @@ static void read_config_file(const char *fname, bool tilde_expand)
 
     if (fp == NULL) {
 	if (DEBUG_CONFIG(0)) {
-	    fprintf(stderr, "Debug: cannot open %s: %s\n", filename, strerror(errno));
+	    fprintf(dbgout, "Debug: cannot open %s: %s\n", filename, strerror(errno));
 	}
 	xfree(filename);
 	return;
     }
 
     if (DEBUG_CONFIG(0))
-	fprintf(stderr, "Reading %s\n", filename);
+	fprintf(dbgout, "Reading %s\n", filename);
 
     while (!feof(fp))
     {
@@ -441,6 +434,7 @@ static void help(void)
 #endif
 #endif
 		  "\t-p\t- passthrough.\n"
+		  "\t-I filename\t- read message from filename instead of stdin.\n"
 		  "\t-O filename\t- save message to filename in passthrough mode.\n"
 		  "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n"
 		  "\t-s\t- register message as spam.\n"
@@ -508,20 +502,21 @@ int process_args(int argc, char **argv)
 
     select_algorithm(algorithm, false);	/* select default algorithm */
 
-    while ((option = getopt(argc, argv, "d:eFhl::o:snSNvVpuc:CgrRx:fqtO:y:" G R F)) != EOF)
+    fpin = stdin;
+
+    while ((option = getopt(argc, argv, "d:eFhl::o:snSNvVpuc:CgrRx:fqtI:O:y:" G R F)) != EOF)
     {
 	switch(option)
 	{
 	case 'd':
-	    if (directory)
-		xfree(directory);
+	    xfree(directory);
 	    directory = xstrdup(optarg);
-	    if (setup_lists(directory) != 0)
+	    if (setup_wordlists(directory) != 0)
 		exit(2);
 	    break;
 
 	case 'e':
-	    nonspam_exits_zero = 1;
+	    nonspam_exits_zero = true;
 	    break;
 
 	case 's':
@@ -559,12 +554,20 @@ int process_args(int argc, char **argv)
 	    exit(0);
 	    break;
 
+	case 'I':
+	    fpin = fopen( optarg, "r" );
+	    if (fpin == NULL) {
+		fprintf(stderr, "Can't read file '%s'\n", optarg);
+		exit(2);
+	    }
+	    break;
+
         case 'O':
 	    xstrlcpy(outfname, optarg, sizeof(outfname));
 	    break;
 
 	case 'p':
-	    passthrough = 1;
+	    passthrough = true;
 	    break;
 
 	case 'u':
@@ -572,7 +575,7 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case 'l':
-	    logflag = 1;
+	    logflag = true;
 	    if (optarg)
 		logtag = optarg;
 	    break;
@@ -609,11 +612,11 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case 'q':
-	    quiet = 1;
+	    quiet = true;
 	    break;
 
 	case 'F':
-	    force = 1;
+	    force = true;
 	    break;
 
 	case 'c':
@@ -661,7 +664,7 @@ void process_config_files(void)
     stats_prefix= stats_in_header ? "\t" : "#   ";
 
     if (DEBUG_CONFIG(0))
-	fprintf( stderr, "stats_prefix: '%s'\n", stats_prefix );
+	fprintf(dbgout, "stats_prefix: '%s'\n", stats_prefix);
 
     init_charset_table(charset_default, true);
 

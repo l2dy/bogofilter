@@ -18,7 +18,6 @@ NAME:
 #include "bogofilter.h"
 #include "datastore.h"
 #include "graham.h"
-#include "lexer.h"
 #include "wordhash.h"
 
 /* constants for the Graham formula */
@@ -90,8 +89,8 @@ static int compare_extrema(const void *id1, const void *id2)
     const discrim_t *d1 = id1;
     const discrim_t *d2 = id2;
 
-    if (d1->prob > d2->prob) return 1;
-    if (d1->prob < d2->prob) return -1;
+    if (d1->prob - d2->prob > EPS) return 1;
+    if (d2->prob - d1->prob > EPS) return -1;
 
     return strcmp(d1->key, d2->key);
 }
@@ -191,10 +190,8 @@ static void wordprob_add(wordprob_t* wordstats, double newprob, int bad)
 
 static double wordprob_result(wordprob_t* wordstats)
 {
-    double prob = 0.0;
     double count = wordstats->good + wordstats->bad;
-
-    prob = wordstats->bad/count;
+    double prob = wordstats->bad/count;
 
     return (prob);
 }

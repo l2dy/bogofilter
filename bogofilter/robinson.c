@@ -38,9 +38,12 @@ NAME:
 extern int Rtable;
 static double scalefactor;
 
-double	thresh_rtable = 0.0f;		/* used in fis_parms in fisher.c */
-double	robx = 0.0f;			/* used in fis_parms in fisher.c */
-double	robs = 0.0f;			/* used in fis_parms in fisher.c */
+long msgs_good = 0L;			/* used in rstats.c */
+long msgs_bad  = 0L;			/* used in rstats.c */
+
+double	thresh_rtable = 0.0f;		/* used in fisher.c */
+double	robx = 0.0f;			/* used in fisher.c and rstats.c */
+double	robs = 0.0f;			/* used in fisher.c and rstats.c */
 
 static rob_stats_t  rob_stats;
 
@@ -96,41 +99,43 @@ static void wordprob_init(/*@out@*/ wordprob_t* wordstats)
     wordstats->good = wordstats->bad = 0.0;
 }
 
-static void wordprob_add(wordprob_t* wordstats, double newprob, int bad)
+static void wordprob_add(wordprob_t* wordstats, int count, int bad)
 {
     if (bad)
-	wordstats->bad+=newprob;
+	wordstats->bad += (double) count;
     else
-	wordstats->good+=newprob;
+	wordstats->good += (double) count;
 }
 
 static double wordprob_result(wordprob_t* wordstats)
 {
-    double prob = 0.0;
-    double count = wordstats->good + wordstats->bad;
+    double n, fw, pw;
 
-    prob = ((ROBS * ROBX + wordstats->bad) / (ROBS + count));
+    n = wordstats->good + wordstats->bad;
+    pw = (n < EPS) ? 0.0 : ((wordstats->bad / msgs_bad) / 
+			    (wordstats->bad / msgs_bad + wordstats->good / msgs_good));
+    fw = (robs * robx + n * pw) / (robs + n);
 
-    return (prob);
+    return (fw);
 }
 
 static double compute_scale(void)
 {
     wordlist_t* list;
-    long goodmsgs=0L, badmsgs=0L;
-    
+
     for(list=word_lists; list != NULL; list=list->next)
     {
+	list->msgcount = db_getcount(list->dbh);
 	if (list->bad)
-	    badmsgs += list->msgcount;
+	    msgs_bad += list->msgcount;
 	else
-	    goodmsgs += list->msgcount;
+	    msgs_good += list->msgcount;
     }
 
-    if (goodmsgs == 0L)
+    if (msgs_good == 0L)
 	return(1.0f);
     else
-	return ((double)badmsgs / (double)goodmsgs);
+	return ((double)msgs_bad / (double)msgs_good);
 }
 
 static double compute_probability(const char *token)
@@ -154,12 +159,8 @@ static double compute_probability(const char *token)
 	    if (list->ignore)
 		return EVEN_ODDS;
 	    override=list->override;
-	    prob = (double)count;
 
-	    if (!list->bad)
-		prob *= scalefactor;
-
-	    wordprob_add(&wordstats, prob, list->bad);
+	    wordprob_add(&wordstats, count, list->bad);
 	}
     }
 
@@ -174,6 +175,7 @@ static double compute_probability(const char *token)
 double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 /* selects the best spam/nonspam indicators and calculates Robinson's S */
 {
+    int count = 0;
     hashnode_t *node;
 
     FLOAT P = {1.0, 0};		/* Robinson's P */
@@ -182,12 +184,14 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     double spamicity;
     size_t robn = 0;
 
+    if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### rob_compute_spamicity() begins\n");
+
     Rtable |= verbose > 3;
 
     if (fabs(robx) < EPS)
     {
 	/* Note: .ROBX is scaled by 1000000 in the wordlist */
-	long l_robx = db_getvalue(spam_list.dbh, ".ROBX");
+	long l_robx = db_getvalue(spam_list->dbh, ".ROBX");
 
 	/* If found, unscale; else use predefined value */
 	robx = l_robx ? (double)l_robx / 1000000 : ROBX;
@@ -195,6 +199,9 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 
     if (Rtable || verbose)
 	rstats_init();
+
+    if (DEBUG_WORDLIST(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
+				   min_dev, robs, robx);
 
     for(node = wordhash_first(wordhash); node != NULL; node = wordhash_next(wordhash))
     {
@@ -206,7 +213,7 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 	 * P = 1 - ((1-p1)*(1-p2)*...*(1-pn))^(1/n)     [spamminess]
          * Q = 1 - (p1*p2*...*pn)^(1/n)                 [non-spamminess]
 	 */
-        if (fabs(EVEN_ODDS - prob) >= min_dev) {
+        if (fabs(EVEN_ODDS - prob) - min_dev >= EPS) {
 	    P.mant *= 1-prob;
 	    if (P.mant < 1.0e-200) {
 		P.mant *= 1.0e200;
@@ -220,6 +227,7 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 	    }
             robn ++;
         }
+	if (DEBUG_WORDLIST(3)) fprintf(dbgout, "%3d %3d %f %s\n", robn, count, prob, token);
     }
 
     /* Robinson's P, Q and S
@@ -230,6 +238,8 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 
     if (robn && (Rtable || verbose))
 	rstats_fini(robn, P, Q, spamicity );
+
+    if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### rob_compute_spamicity() ends\n");
 
     return (spamicity);
 }
@@ -254,17 +264,26 @@ double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 
 void rob_print_summary(void)
 {
-    (void)fprintf(stdout, "%-20s %9.5f %9.5f %9.6f %9.3f %9.3f %4.2f\n",
-		  "P_Q_S_invs_logs_md", 
+    (void)fprintf(stdout, "%-*s %5d %9.5f %9.5f %9.6f %9.3f %9.3f %4.2f\n",
+		  MAXTOKENLEN+2, "\"P_Q_S_invs_logs_md\"", rob_stats.robn,
 		  rob_stats.p_pr, rob_stats.q_pr, rob_stats.s.spamicity, rob_stats.p_ln, rob_stats.q_ln, min_dev);
 }
 
 void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double _spam_cutoff)
 {
     mth_initialize( stats, ROBINSON_MAX_REPEATS, _min_dev, _spam_cutoff, ROBINSON_GOOD_BIAS );
-    scalefactor = compute_scale();
-    if (fabs(robs) < EPS)
-	robs = ROBS;
+
+    /*
+    ** If we're classifying messages, we need to compute the scalefactor 
+    ** (from the .MSG_COUNT values)
+    ** If we're registering tokens, we needn't get .MSG_COUNT
+    */
+
+    if (run_type == RUN_NORMAL || run_type == RUN_UPDATE) {
+	scalefactor = compute_scale();
+	if (fabs(robs) < EPS)
+	    robs = ROBS;
+    }
 }
 
 void rob_initialize_constants(void)

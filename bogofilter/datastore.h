@@ -39,7 +39,6 @@ Increments count for given word.
 Note: negative results are set to zero, 
 */
 void db_increment(void *, const char *, long);
-void db_increment_with_date(void *, const char *, long, long);
 
 
 /*

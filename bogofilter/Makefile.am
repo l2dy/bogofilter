@@ -23,7 +23,7 @@ AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc
 AM_CFLAGS = -DBOGOFILTER
 
 # what to build
-bin_PROGRAMS = bogofilter bogoutil bogolexer
+bin_PROGRAMS = bogofilter bogoutil bogolexer 
 bin_SCRIPTS = bogoupgrade
 check_PROGRAMS = debugtest configtest wordhash find_home.test bogowordfreq
 man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
@@ -34,30 +34,34 @@ LDADD = libbogofilter.a @LIBOBJS@
 
 # what to build that from
 libbogofilter_a_SOURCES= \
-	xmalloc.h xcalloc.c xmem_error.c xrealloc.c \
-	    xmalloc.c xstrdup.h xstrdup.c \
-	xstrlcat.h xstrlcat.c \
-	xstrlcpy.h xstrlcpy.c \
-	debug.h debug.c \
+	common.h system.h \
+	globals.h globals.c \
+	directories.c version.c \
+	base64.h base64.c \
 	bogoconfig.h config.c \
-	find_home.h find_home.c find_home_user.c \
-	    find_home_tildeexpand.c \
 	charset.h charset.c \
 	collect.h collect.c \
 	datastore.h datastore_db.h datastore_db.c \
+	debug.h debug.c \
 	error.h error.c \
+	fgetsl.h fgetsl.c \
+	find_home.h find_home.c find_home_user.c find_home_tildeexpand.c \
 	format.h format.c \
-	lexer.h lexer.l \
+	lexer.h lexer.c lexer_head.l lexer_text_plain.l lexer_text_html.l \
 	maint.h maint.c \
+	mime.h mime.c \
 	paths.h paths.c \
+	qp.h qp.c \
 	register.h register.c \
 	rstats.h rstats.c \
+	swap.h swap_32bit.c\
 	textblock.h textblock.c \
 	token.h token.c \
+	uudecode.h uudecode.c \
 	wordhash.h wordhash.c wordlists.h wordlists.c \
-	globals.h system.h \
-	version.c directories.c \
-	fgetsl.h fgetsl.c \
+	xmalloc.h xcalloc.c xmalloc.c xmem_error.c xrealloc.c xstrdup.h xstrdup.c \
+	xstrlcat.h xstrlcat.c \
+	xstrlcpy.h xstrlcpy.c \
 	dcdflib/src/dcdflib.c dcdflib/src/ipmpar.c
 
 CLEANFILES=version.c directories.c
@@ -66,15 +70,7 @@ bogofilter_SOURCES = bogofilter.c bogofilter.h main.c \
 		     method.c $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
 		     common.h method.h
 
-bogowordfreq_SOURCES = bogowordfreq.c
-
-bogolexer_SOURCES = bogolexer.c
-
 debugtest_SOURCES = debug.main.c
-
-bogoutil_SOURCES = bogoutil.c
-
-configtest_SOURCES = configtest.c
 
 wordhash_SOURCES = wordhash.main.c
 
@@ -95,7 +91,7 @@ EXTRA_DIST = $(man_MANS) \
 	     bogofilter-SA-2002-01 \
 	     strlcat.3 strlcpy.3
 #
-VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
+VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.c lexer_head.l lexer_text_plain.l lexer_text_html.l
 version.c:	version.sh $(VERSION_FROM)
 	$(srcdir)/version.sh $(srcdir) $(VERSION_FROM) >"$@" \
 	    || rm -f "$@"
@@ -104,6 +100,15 @@ directories.c: config.status
 	echo "const char *const system_config_file = \"$(SYSCONFDIR)/bogofilter.cf\";" >"$@" \
 	    || rm -f "$@"
 #
+lexer_head.c:	lexer_head.l
+	flex -Plexer_ -o$@ $<
+
+lexer_text_plain.c:	lexer_text_plain.l
+	flex -Ptext_plain_ -o$@ $<
+
+lexer_text_html.c:	lexer_text_html.l
+	flex -Ptext_html_ -o$@ $<
+#
 .xml.pdf:
 	xmlto pdf --extensions $<
 
@@ -111,7 +116,7 @@ directories.c: config.status
 	xmlto html-nochunks $<
 
 .xml.1:
-	{ xmllint --noout --postvalid $< && xmlto man $< ; } || { rm -f $@ ; exit 1 ; }
+	xmlto man $< || { rm -f $@ ; exit 1 ; }
 
 .PHONY: rpm cvs-check
 

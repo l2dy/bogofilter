@@ -1146,7 +1146,7 @@ static double s[4] = {
     1.80124575948747e+01
 };
 static int K1 = 1;
-static double erfc1,ax,bot,e,t,top,w;
+static double answer,ax,bot,e,t,top,w;
 /*
      ..
      .. Executable Statements ..
@@ -1159,9 +1159,9 @@ static double erfc1,ax,bot,e,t,top,w;
     t = *x**x;
     top = (((a[0]*t+a[1])*t+a[2])*t+a[3])*t+a[4]+1.0e0;
     bot = ((b[0]*t+b[1])*t+b[2])*t+1.0e0;
-    erfc1 = 0.5e0+(0.5e0-*x*(top/bot));
-    if(*ind != 0) erfc1 = exp(t)*erfc1;
-    return erfc1;
+    answer = 0.5e0+(0.5e0-*x*(top/bot));
+    if(*ind != 0) answer = exp(t)*answer;
+    return answer;
 S10:
 /*
                   0.5 .LT. ABS(X) .LE. 4
@@ -1171,7 +1171,7 @@ S10:
       7];
     bot = ((((((q[0]*ax+q[1])*ax+q[2])*ax+q[3])*ax+q[4])*ax+q[5])*ax+q[6])*ax+q[
       7];
-    erfc1 = top/bot;
+    answer = top/bot;
     goto S40;
 S20:
 /*
@@ -1185,35 +1185,35 @@ S30:
     t = pow(1.0e0/ *x,2.0);
     top = (((r[0]*t+r[1])*t+r[2])*t+r[3])*t+r[4];
     bot = (((s[0]*t+s[1])*t+s[2])*t+s[3])*t+1.0e0;
-    erfc1 = (c-t*top/bot)/ax;
+    answer = (c-t*top/bot)/ax;
 S40:
 /*
                       FINAL ASSEMBLY
 */
     if(*ind == 0) goto S50;
-    if(*x < 0.0e0) erfc1 = 2.0e0*exp(*x**x)-erfc1;
-    return erfc1;
+    if(*x < 0.0e0) answer = 2.0e0*exp(*x**x)-answer;
+    return answer;
 S50:
     w = *x**x;
     t = w;
     e = w-t;
-    erfc1 = (0.5e0+(0.5e0-e))*exp(-t)*erfc1;
-    if(*x < 0.0e0) erfc1 = 2.0e0-erfc1;
-    return erfc1;
+    answer = (0.5e0+(0.5e0-e))*exp(-t)*answer;
+    if(*x < 0.0e0) answer = 2.0e0-answer;
+    return answer;
 S60:
 /*
              LIMIT VALUE FOR LARGE NEGATIVE X
 */
-    erfc1 = 2.0e0;
-    if(*ind != 0) erfc1 = 2.0e0*exp(*x**x);
-    return erfc1;
+    answer = 2.0e0;
+    if(*ind != 0) answer = 2.0e0*exp(*x**x);
+    return answer;
 S70:
 /*
              LIMIT VALUE FOR LARGE POSITIVE X
                        WHEN IND = 0
 */
-    erfc1 = 0.0e0;
-    return erfc1;
+    answer = 0.0e0;
+    return answer;
 }
 
 double exparg(int *l)
@@ -1352,13 +1352,13 @@ static double q[7] = {
 };
 static int K2 = 3;
 static int K3 = 0;
-static double Xgamm,bot,g,lnx,s,t,top,w,x,z;
+static double answer,bot,g,lnx,s,t,top,w,x,z;
 static int i,j,m,n,T1;
 /*
      ..
      .. Executable Statements ..
 */
-    Xgamm = 0.0e0;
+    answer = 0.0e0;
     x = *a;
     if(fabs(*a) >= 15.0e0) goto S110;
 /*
@@ -1398,16 +1398,16 @@ S40:
 S60:
     x += (0.5e0+0.5e0);
     t = x*t;
-    if(EQ(t, 0.0e0)) return Xgamm;
+    if(EQ(t, 0.0e0)) return answer;
 S70:
 /*
      THE FOLLOWING CODE CHECKS IF 1/T CAN OVERFLOW. THIS
      CODE MAY BE OMITTED IF DESIRED.
 */
     if(fabs(t) >= 1.e-30) goto S80;
-    if(fabs(t)*spmpar(&K2) <= 1.0001e0) return Xgamm;
-    Xgamm = 1.0e0/t;
-    return Xgamm;
+    if(fabs(t)*spmpar(&K2) <= 1.0001e0) return answer;
+    answer = 1.0e0/t;
+    return answer;
 S80:
 /*
      COMPUTE GAMMA(1 + X) FOR  0 .LE. X .LT. 1
@@ -1418,23 +1418,23 @@ S80:
         top = p[i]+x*top;
         bot = q[i]+x*bot;
     }
-    Xgamm = top/bot;
+    answer = top/bot;
 /*
      TERMINATION
 */
     if(*a < 1.0e0) goto S100;
-    Xgamm *= t;
-    return Xgamm;
+    answer *= t;
+    return answer;
 S100:
-    Xgamm /= t;
-    return Xgamm;
+    answer /= t;
+    return answer;
 S110:
 /*
 -----------------------------------------------------------------------
             EVALUATION OF GAMMA(A) FOR ABS(A) .GE. 15
 -----------------------------------------------------------------------
 */
-    if(fabs(*a) >= 1.e3) return Xgamm;
+    if(fabs(*a) >= 1.e3) return answer;
     if(*a > 0.0e0) goto S120;
     x = -*a;
     n = (long)(x);
@@ -1442,7 +1442,7 @@ S110:
     if(t > 0.9e0) t = 1.0e0-t;
     s = sin(pi*t)/pi;
     if(fifmod(n,2) == 0) s = -s;
-    if(EQ(s, 0.0e0)) return Xgamm;
+    if(EQ(s, 0.0e0)) return answer;
 S120:
 /*
      COMPUTE THE MODIFIED ASYMPTOTIC SUM
@@ -1461,10 +1461,10 @@ S120:
     g = d+g+(z-0.5e0)*(lnx-1.e0);
     w = g;
     t = g-w;
-    if(w > 0.99999e0*exparg(&K3)) return Xgamm;
-    Xgamm = exp(w)*(1.0e0+t);
-    if(*a < 0.0e0) Xgamm = 1.0e0/(Xgamm*s)/x;
-    return Xgamm;
+    if(w > 0.99999e0*exparg(&K3)) return answer;
+    answer = exp(w)*(1.0e0+t);
+    if(*a < 0.0e0) answer = 1.0e0/(answer*s)/x;
+    return answer;
 }
 
 void gratio(double *a,double *x,double *ans,double *qans,int *ind)
@@ -1898,22 +1898,22 @@ static double q1 = -.499999999085958e+00;
 static double q2 = .107141568980644e+00;
 static double q3 = -.119041179760821e-01;
 static double q4 = .595130811860248e-03;
-static double rexp,w;
+static double answer,w;
 /*
      ..
      .. Executable Statements ..
 */
     if(fabs(*x) > 0.15e0) goto S10;
-    rexp = *x*(((p2**x+p1)**x+1.0e0)/((((q4**x+q3)**x+q2)**x+q1)**x+1.0e0));
-    return rexp;
+    answer = *x*(((p2**x+p1)**x+1.0e0)/((((q4**x+q3)**x+q2)**x+q1)**x+1.0e0));
+    return answer;
 S10:
     w = exp(*x);
     if(*x > 0.0e0) goto S20;
-    rexp = w-0.5e0-0.5e0;
-    return rexp;
+    answer = w-0.5e0-0.5e0;
+    return answer;
 S20:
-    rexp = w*(0.5e0+(0.5e0-1.0e0/w));
-    return rexp;
+    answer = w*(0.5e0+(0.5e0-1.0e0/w));
+    return answer;
 }
 
 double rlog(double *x)
@@ -2099,7 +2099,7 @@ long fifmod(long a,long b)
 FTNSTOP:
 Prints msg to standard error and then exits
 ************************************************************************/
-void ftnstop(char* msg)
+void ftnstop(const char* msg)
 /* msg - error message */
 {
   if (msg != NULL) fprintf(stderr,"%s\n",msg);

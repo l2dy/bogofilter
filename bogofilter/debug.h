@@ -14,10 +14,11 @@
 #define BIT_LEXER	( 1 << ('L' - 'A'))
 #define BIT_MIME	( 1 << ('M' - 'A'))
 #define BIT_SPAMICITY	( 1 << ('S' - 'A'))
-#define BIT_TEST	( 1 << ('T' - 'A'))
+#define BIT_TEXT	( 1 << ('T' - 'A'))
 #define BIT_WORDLIST	( 1 << ('W' - 'A'))
 #endif
 
+extern FILE *dbgout;
 extern int debug_mask;
 
 #ifdef	NODEBUG
@@ -28,7 +29,7 @@ extern int debug_mask;
 #define DEBUG_LEXER(level)	0
 #define DEBUG_MIME(level)	0
 #define DEBUG_SPAMICITY(level)	0
-#define DEBUG_TEST(level)	0
+#define DEBUG_TEXT(level)	0
 #define DEBUG_WORDLIST(level)	0
 #else
 #define	DEBUG_GENERAL(level)	((debug_mask & BIT_GENERAL)   && (verbose > level))
@@ -38,7 +39,7 @@ extern int debug_mask;
 #define DEBUG_LEXER(level)	((debug_mask & BIT_LEXER)     && (verbose > level))
 #define DEBUG_MIME(level)	((debug_mask & BIT_MIME)      && (verbose > level))
 #define DEBUG_SPAMICITY(level)	((debug_mask & BIT_SPAMICITY) && (verbose > level))
-#define DEBUG_TEST(level)	((debug_mask & BIT_TEST)      && (verbose > level))
+#define DEBUG_TEXT(level)	((debug_mask & BIT_TEXT)      && (verbose > level))
 #define DEBUG_WORDLIST(level)	((debug_mask & BIT_WORDLIST)  && (verbose > level))
 #endif
 

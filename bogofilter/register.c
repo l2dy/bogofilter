@@ -34,6 +34,12 @@ void register_words(run_t _run_type, wordhash_t *h,
   wordlist_t *incr_list = NULL;
   wordlist_t *decr_list = NULL;
 
+  /* If update directory explicity supplied, setup the wordlists. */
+  if (update_dir) {
+      if (setup_wordlists(update_dir) != 0)
+	  exit(2);
+  }
+
   switch(_run_type)
   {
     case REG_SPAM:		ch = 's' ;  break;
@@ -49,26 +55,26 @@ void register_words(run_t _run_type, wordhash_t *h,
     (void)fprintf(stderr, "# %d word%s, %d message%s\n", 
 		  wordcount, PLURAL(wordcount), msgcount, PLURAL(msgcount));
 
-  good_list.active = spam_list.active = false;
+  set_list_active_status(false);
 
   switch(_run_type)
   {
     case REG_GOOD:
-      incr_list = &good_list;
+      incr_list = good_list;
       break;
 
     case REG_SPAM:
-      incr_list = &spam_list;
+      incr_list = spam_list;
       break;
 
     case  REG_GOOD_TO_SPAM:
-      decr_list = &good_list;
-      incr_list = &spam_list;
+      decr_list = good_list;
+      incr_list = spam_list;
       break;
 
     case REG_SPAM_TO_GOOD:
-      incr_list = &good_list;
-      decr_list = &spam_list;
+      incr_list = good_list;
+      decr_list = spam_list;
       break;
 
     default:
@@ -108,7 +114,7 @@ void register_words(run_t _run_type, wordhash_t *h,
       db_flush(list->dbh);
       if (verbose>1)
 	(void)fprintf(stderr, "bogofilter: %ld messages on the %s list\n",
-		      list->msgcount, list->name);
+		      list->msgcount, list->filename);
     }
   }
 

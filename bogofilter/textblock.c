@@ -23,15 +23,15 @@ size_t cur_mem, max_mem, tot_mem;
 
 textblock_t *textblock_init(void)
 {
-    textblock_t *t = (textblock_t *) xmalloc(sizeof(*t));
+    textblock_t *t = (textblock_t *) xcalloc(1, sizeof(*t));
     size_t mem = sizeof(*t)+sizeof(textdata_t);
-    t->head = (textdata_t *) xmalloc(sizeof(textdata_t));
+    t->head = (textdata_t *) xcalloc(1, sizeof(textdata_t));
     t->tail = t->head;
     cur_mem += mem;
     tot_mem += mem;
     max_mem = max(max_mem, cur_mem);
-    if (DEBUG_TEXT(2)) fprintf(stderr, "%s:%d  %p %p %3d alloc, cur: %d, max: %d, tot: %d\n", 
-				 __FILE__,__LINE__, t, t->head, mem, cur_mem, max_mem, tot_mem );
+    if (DEBUG_TEXT(2)) fprintf(dbgout, "%s:%d  %p %p %3d alloc, cur: %d, max: %d, tot: %d\n", 
+			       __FILE__,__LINE__, t, t->head, mem, cur_mem, max_mem, tot_mem );
     return t;
 }
 
@@ -50,10 +50,9 @@ void textblock_add(textblock_t *t, const char *text, size_t size)
     cur_mem += mem;
     tot_mem += mem;
     max_mem = max(max_mem, cur_mem);
-    if (DEBUG_TEXT(2)) fprintf(stderr, "%s:%d  %p %p %3d add, cur: %d, max: %d, tot: %d\n", 
-				 __FILE__,__LINE__, cur, cur->data, cur->size, cur_mem, max_mem, tot_mem );
-    cur = cur->next = (textdata_t *) xmalloc(sizeof(textdata_t));
-    memset(cur, 0, sizeof(*cur));
+    if (DEBUG_TEXT(2)) fprintf(dbgout, "%s:%d  %p %p %3d add, cur: %d, max: %d, tot: %d\n", 
+			       __FILE__,__LINE__, cur, cur->data, cur->size, cur_mem, max_mem, tot_mem );
+    cur = cur->next = (textdata_t *) xcalloc(1, sizeof(textdata_t));
     t->tail = cur;
 }
 
@@ -64,8 +63,8 @@ void textblock_free(textblock_t *t)
     for (cur = t->head; (nxt = cur->next) != NULL; cur = nxt) {
 	mem = cur->size + sizeof(*cur);
 	cur_mem -= mem;
-	if (DEBUG_TEXT(2)) fprintf(stderr, "%s:%d  %p %p %3d free, cur: %d, max: %d, tot: %d\n", 
-				     __FILE__,__LINE__, cur, cur->data, cur->size, cur_mem, max_mem, tot_mem );
+	if (DEBUG_TEXT(2)) fprintf(dbgout, "%s:%d  %p %p %3d free, cur: %d, max: %d, tot: %d\n", 
+				   __FILE__,__LINE__, cur, cur->data, cur->size, cur_mem, max_mem, tot_mem );
 	xfree((void*)cur->data);
 	xfree((void*)cur);
     }
@@ -73,10 +72,9 @@ void textblock_free(textblock_t *t)
     mem = sizeof(*t->head);
     cur_mem -= mem;
 
-    if (DEBUG_TEXT(2)) fprintf(stderr, "%s:%d  %p %p free, cur: %d, max: %d, tot: %d\n", 
-				 __FILE__,__LINE__, t, t->head, cur_mem, max_mem, tot_mem );
-    xfree(t->head);
+    if (DEBUG_TEXT(2)) fprintf(dbgout, "%s:%d  %p %p free, cur: %d, max: %d, tot: %d\n", 
+			       __FILE__,__LINE__, t, t->head, cur_mem, max_mem, tot_mem );
     xfree(t);
     cur_mem -= sizeof(t->head) + sizeof(t);
-    if (DEBUG_TEXT(1)) fprintf(stderr, "cur: %d, max: %d, tot: %d\n", cur_mem, max_mem, tot_mem );
+    if (DEBUG_TEXT(1)) fprintf(dbgout, "cur: %d, max: %d, tot: %d\n", cur_mem, max_mem, tot_mem );
 }
