@@ -79,8 +79,6 @@ rc_t bogofilter(int argc, char **argv)
 
     wordhash_t *words = register_aft ? wordhash_new() : NULL;
 
-    // atexit(bf_exit);
-
     if (query)
 	query_config();
 

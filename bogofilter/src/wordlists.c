@@ -56,7 +56,7 @@ struct envlist envlisthead;
 struct envnode {
     LIST_ENTRY(envnode) entries;
     void *dbe;
-    char directory[0];
+    char directory[1];
 };
 
 static void *list_searchinsert(const char *directory) {

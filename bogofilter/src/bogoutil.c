@@ -801,8 +801,6 @@ int main(int argc, char *argv[])
 	exit(EX_ERROR);
     }
 
-    // atexit(bf_exit);
-
     set_bogohome(ds_file);
 
     if (flag == M_RECOVER) {
