@@ -151,12 +151,12 @@ int histogram(const char *path)
     count = print_histogram(&hist);
 
     if (verbose > 0) {
-	printf("hapaxes:  ham %7d, spam %7d\n", ham_hapax, spam_hapax);
-	printf("   pure:  ham %7d, spam %7d\n", ham_only,  spam_only);
+	printf("hapaxes:  ham %7u, spam %7u\n", ham_hapax, spam_hapax);
+	printf("   pure:  ham %7u, spam %7u\n", ham_only,  spam_only);
     }
     else {
-	printf("hapaxes:  ham %7d (%5.2f%%), spam %7d (%5.2f%%)\n", ham_hapax, PCT(ham_hapax), spam_hapax, PCT(spam_hapax));
-	printf("   pure:  ham %7d (%5.2f%%), spam %7d (%5.2f%%)\n", ham_only,  PCT(ham_only),  spam_only,  PCT(spam_only));
+	printf("hapaxes:  ham %7u (%5.2f%%), spam %7u (%5.2f%%)\n", ham_hapax, PCT(ham_hapax), spam_hapax, PCT(spam_hapax));
+	printf("   pure:  ham %7u (%5.2f%%), spam %7u (%5.2f%%)\n", ham_only,  PCT(ham_only),  spam_only,  PCT(spam_only));
     }
 
     return rc;
