@@ -16,6 +16,7 @@ t.config: Makefile
 ENVIRON_TESTS = t.abort t.env t.ctype t.bogodir t.leakfind t.u_fpe
 
 PARSING_TESTS = \
+	t.longoptions \
 	t.ignore_spam_header \
 	t.nullstatsprefix \
 	t.integrity t.integrity2 t.integrity3 \
