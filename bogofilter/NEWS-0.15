@@ -8,7 +8,8 @@ about retraining and the '-H' flag...
 0.15.10
 
 * The test suite no longer depends on procmail for t.MH and t.maildir.
-* C89 compliance bugfixes for non-GCC compilers
+* Moved robx calculation code to new file for sharing by bogoutil and
+  bogotune.
 
 0.15.9	2003-11-23
 
