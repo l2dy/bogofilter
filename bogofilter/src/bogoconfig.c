@@ -678,11 +678,11 @@ void process_args_2(int argc, char **argv)
 	    if (setup_wordlists(dir, PR_COMMAND) != 0)
 		exit(EX_ERROR);
 	    break;
+	}
 
 	case 'H':
 	    header_degen = true;
 	    break;
-	}
 
 	case 'k':
 	    db_cachesize=atoi(optarg);
