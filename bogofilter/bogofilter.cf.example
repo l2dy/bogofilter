@@ -191,9 +191,9 @@ spam_cutoff = 0.54	# for robinson
 #
 # for two-state output:
 #	using "Yes" and "No" as labels.
-#
-# spamicity_tags = Yes, No
-# spamicity_formats = %0.6f, %0.6f
+
+spamicity_tags = Yes, No
+spamicity_formats = %0.6f, %0.6f
 
 # for fisher (with 3-state output)
 #	using "Spam", "Ham", and "Unsure" as labels,
