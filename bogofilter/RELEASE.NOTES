@@ -138,8 +138,6 @@ MAJOR CHANGES IN BOGOFILTER 0.93
 
 Bogofilter 0.93.1 and newer add support for Berkeley DB 4.3.
 
-Bogofilter 0.93.0 and newer add support for Berkeley DB 3.1.
-
 ########################################################################
 
 INCOMPATIBLE CHANGES IN BOGOFILTER 0.92
@@ -158,6 +156,9 @@ INCOMPATIBLE CHANGES IN BOGOFILTER 0.17
 Support for --enable-deprecated-code (see the 0.16 release notes)
 has been removed. If you've run 0.16.X without that switch, nothing
 changes for you.
+
+Support for Berkeley DB 3.0 was removed in bogofilter 0.17.3
+as a side effect of adding Concurrent Database support.
 
 ########################################################################
 
