@@ -23,7 +23,7 @@ int main(void) {
     w = word_new(NULL, size);
     if (fread(w->text, 1, w->leng, stdin) != w->leng) die();
     size = qp_decode(w);
-    if (fwrite(w->text, 1, w->leng, stdin) != w->leng) die();
+    if (fwrite(w->text, 1, size, stdout) != size) die();
     word_free(w);
     if (fflush(stdout)) die();
     if (fclose(stdout)) die();
