@@ -19,7 +19,6 @@ NAME:
 #endif
 
 #include "passthrough.h"
-#include "configfile.h"
 #include "bogofilter.h"
 #include "fgetsl.h"
 #include "lexer.h"
@@ -35,6 +34,13 @@ size_t msg_register_size = sizeof(msg_register);
 
 /* Function Definitions */
 
+static bool is_eol(const char *buf, size_t len)
+{
+    bool ans = ((len == 1 && memcmp(buf, NL, 1) == 0) ||
+		(len == 2 && memcmp(buf, CRLF, 2) == 0));
+    return ans;
+}
+ 
 static void cleanup_exit(ex_t exitcode, int killfiles) {
     if (killfiles && outfname[0] != '\0') unlink(outfname);
     exit(exitcode);

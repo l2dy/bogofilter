@@ -146,13 +146,6 @@ static int skip_spam_header(buff_t *buff)
     return EOF;
 }
 
-bool is_eol(const char *buf, size_t len)
-{
-    bool ans = ((len == 1 && memcmp(buf, NL, 1) == 0) ||
-		(len == 2 && memcmp(buf, CRLF, 2) == 0));
-    return ans;
-}
- 
 static int get_decoded_line(buff_t *buff)
 {
     size_t used = buff->t.leng;

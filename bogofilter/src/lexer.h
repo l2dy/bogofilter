@@ -71,7 +71,6 @@ extern int	buff_fill(buff_t *buff, size_t used, size_t need);
 
 extern size_t	decode_text(word_t *w);
 
-extern bool	is_eol(const char *buf, size_t cnt);
 extern void	convert_eol(char *buf, char chr);
 
 #endif	/* LEXER_H */
