@@ -937,7 +937,7 @@ static int process_arglist(int argc, char **argv)
     if (!bogolex &&
 	(spam_files->count == 0 || ham_files->count == 0)) {
 	fprintf(stderr,
-		"Bogotune needs both non-spam and spam messages sets for its testing.\n");
+		"Bogotune needs both non-spam and spam message sets for its parameter testing.\n");
 	exit(EX_ERROR);
     }
 
