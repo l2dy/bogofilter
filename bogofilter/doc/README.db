@@ -276,6 +276,24 @@ effective.
 Here is a list of interesting settings, put one at a line, omitting the
 leading spaces and hyphen:
 
+SIZING OPTIONS:
+
+ - set_lk_max_locks   12345
+ - set_lk_max_objects 12346
+   (valid in Berkeley DB 3.2 - 4.3)
+
+   see sections 3.2 and 4.2 of this document for how to set the numbers.
+   Choosing these figures too high wastes disk space,
+   choosing them too low may cause bogofilter applications to abort.
+
+ - set_lg_max         1048576
+   (valid in Berkeley DB 3.1 - 4.3)
+
+   this option configures the maximum log file size, in bytes, before
+   Berkeley DB starts a new log file. The default is 10 MB. Reducing
+   this can save disk space if combined with the (unsafe)
+   DB_LOG_AUTOREMOVE flag.
+
 SAFE OPTIONS:
 
  - set_flags DB_DIRECT_DB

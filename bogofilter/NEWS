@@ -23,6 +23,11 @@ Briefly:
 
 0.93.1	2004-11-??
 
+	2004-11-11
+
+	* The README.doc file now has information on the DB_CONFIG file that
+	  can be created and used to configure the Berkeley DB module.
+
 	2004-11-10
 
 	* Support for BerkeleyDB 4.3 was added. We'll avoid DB_NOSYNC on
