@@ -50,7 +50,7 @@ progress).
 Bogofilter should transparently upgrade the existing data base to the
 new transactional data base.  Note though that upgrading will not add
 checksums (see the previous section) to existing data bases, so it is
-recommended that, if you are using BerkeleyDB versions 4.1 or newer,
+recommended that, if you are using Berkeley DB versions 4.1 or newer,
 that you dump and reload the data base to add checksums.
 
 The dump/load cycle is necessary only the first time you upgrade from a
@@ -97,13 +97,13 @@ data loss).
 2.4 Choosing a file system
 
 If your computer saves the data on its own disk drive (a "local file
-system"), BerkeleyDB should work fine. Such file systems are ext2, ext3,
+system"), Berkeley DB should work fine. Such file systems are ext2, ext3,
 ffs, jfs, hfs, hfs+, reiserfs, ufs, xfs.
 
 Berkeley DB does not work reliably with a networked file system. AFS,
 CIFS, Coda, NFS, SMBFS fall into this category.
 
-Strictly speaking, with BerkeleyDB 4.0 and older versions, the data base
+Strictly speaking, with Berkeley DB 4.0 and older versions, the data base
 block size must be written atomically. The bogofilter maintainers are
 not currently aware of a file system that meets this requirement and is
 production quality at the same time.
@@ -132,7 +132,7 @@ application crash.
 The logs of the transactional data store, log.NNNNNNNNNN files of up to
 10 MB in size (in the default configuration), can consume considerable
 amounts of disk space and many users wish to purge or compress these log
-files. These can safely be handled with BerkeleyDB's db_checkpoint and
+files. These can safely be handled with Berkeley DB's db_checkpoint and
 db_archive utilities, which should be run in this order:
 
 - db_checkpoint migrates written-ahead data from the log files into the
@@ -143,7 +143,7 @@ db_archive utilities, which should be run in this order:
   that you can compress or remove them.
 
 Before choosing to remove log files, be sure to read the db_archive
-documentation that ships with BerkeleyDB, because removing logs has an
+documentation that ships with Berkeley DB, because removing logs has an
 impact on recoverability and can render your data base unrecoverable.
 
 The db_archive documentation also contains suggestions for several
@@ -265,6 +265,116 @@ f. run bogoutil -f ~/.bogofilter
 
 Bogofilter will re-create the lock tables automatically
 the next time it is run.
+
+4.3 INTERESTING CONFIGURATION PARAMETERS FOR DB_CONFIG
+
+A "DB_CONFIG" file that is in your bogofilter home directory, usually
+~/.bogofilter, can be used to configure the data base behavior. Some
+options take effect immediately, some need bogoutil -f to become
+effective.
+
+Here is a list of interesting settings, put one at a line, omitting the
+leading spaces and hyphen:
+
+SAFE OPTIONS:
+
+ - set_flags DB_DIRECT_DB
+   (valid in Berkeley DB 4.1 - 4.3, takes effect immediately)
+
+   this option turns off system buffering of *database* files, to avoid
+   double caching of data.
+
+ - set_flags DB_DIRECT_LOG
+   (valid in Berkeley DB 4.1 - 4.3, takes effect immediately)
+
+   this option turns off system buffering of *log* files, to avoid
+   double caching of data.
+
+ - set_flags DB_DSYNC_LOG
+   (valid in Berkeley DB 4.3, takes effect immediately)
+
+   this option can increase performance on some systems (and decrease on
+   other systems), by using the O_DSYNC POSIX flag rather than a
+   separate function to flush the logs.
+
+ - set_flags DB_NOMMAP
+   (valid in Berkeley DB 3.2 - 4.3, takes effect immediately)
+
+   this option can reduce memory consumption at run time, particularly
+   with large databases, at some cost of performance
+
+ - set_flags DB_REGION_INIT
+   (valid in Berkeley DB 3.2 - 4.3, takes effect immediately)
+
+   this option causes all shared memory regions to be "page faulted"
+   into core memory at application start and written at data base
+   creation. This can improve performance under load, and it allows
+   bogofilter or bogoutil to allocate disk space in advance, to avoid
+   some out-of-space conditions later on.
+
+UNSAFE OPTIONS - these may impair robustness/recoverability of the data base
+
+ - set_flags DB_LOG_AUTOREMOVE
+   (valid in Berkeley DB 4.2 - 4.3, takes effect immediately)
+
+   this option lets Berkeley DB automatically remove log files as soon
+   as they are no longer needed. It will prevent "catastrophic"
+   recovery (because the log files are missing), but regular recovery
+   should still work.
+
+ - set_flags DB_TXN_NOSYNC
+   (valid in Berkeley DB 3.3 - 4.3, takes effect immediately)
+
+   if set, the log is not written or synchronously flushed at commit
+   time. In case of an application or system crash, the last few
+   registrations can be lost.
+
+ - set_flags DB_TXN_WRITE_NOSYNC
+   (valid in Berkeley DB 4.1 - 4.3, takes effect immediately)
+
+   if set, the log is written, but not synchronously flushed at commit
+   time. In case of a system crash, the last few registrations can be
+   lost.
+
+DANGEROUS OPTIONS - these can improve performance, but should be avoided
+
+ - set_flags DB_TXN_NOT_DURABLE
+   (valid in Berkeley DB 4.2, takes effect at next application start,
+    replaced by DB_LOG_INMEMORY for version 4.3)
+
+   this option prevents writing into log files. In case of application
+   or system crashes, the data base can become corrupt, and large
+   registrations can exhaust the log buffer space and then fail.
+
+ - set_flags DB_LOG_INMEMORY
+   (valid in Berkeley DB 4.3, takes effect at next application start)
+
+   this option prevents the writing of any log files to disk. In case of
+   application or system crashes, the data base can become corrupt, and
+   large registrations can exhaust the log buffer space and then fail.
+
+   After a crash, verify the data base (see below) and if it is corrupt,
+   restore from backup or rebuild from scratch.
+
+4.4 VERIFYING DATABASES TO CHECK FOR CORRUPTION
+
+To check if the database is intact, stop all applications accessing the
+database and make sure no new applications are started.
+
+Then, type db_verify ~/.bogofilter/wordlist.db. It should print
+nothing. If it prints errors, try running recovery manually:
+
+bogoutil -f ~/.bogofilter
+
+Then verify again. If it still prints errors, you must restore your
+database from a backup, rebuild from scratch, or you can attempt to
+salvage it with
+
+db_dump -r ~/.bogofilter/wordlist.db >~/.bogofilter/wordlist.txn
+rm ~/.bogofilter/{__db.*,log.*,wordlist.db}
+db_load ~/.bogofilter/wordlist.db <~/.bogofilter/wordlist.txn
+
+NOTE that there is no guarantee that the salvage procedure will work.
 
 A. Switching the disk drive's write cache off and on -------------------
 
