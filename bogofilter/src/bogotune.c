@@ -927,6 +927,15 @@ static int process_arglist(int argc, char **argv)
 	    filelist_add( (run_type == REG_GOOD) ? ham_files : spam_files, arg);
     }
 
+    if (force && !quiet) {
+	fprintf(stderr, "*** WARNING ***  The authors of bogotune strongly advise\n");
+	fprintf(stderr, "against the use of the -F option.  The option bypasses\n");
+	fprintf(stderr, "bogotune's protective checks and allows bogotune to run\n");
+	fprintf(stderr, "without enough messages to ensure valid results.  This will\n");
+	fprintf(stderr, "often result in bogotune suggesting wrong parameter values\n");
+	fprintf(stderr, "that, if used, may significantly degrade bogofilter's accuracy.\n");
+    }
+
     if (!bogolex && 
 	(spam_files->count == 0 || ham_files->count == 0)) {
 	fprintf(stderr, 
