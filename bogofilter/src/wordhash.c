@@ -391,7 +391,13 @@ wordhash_convert_to_proplist(wordhash_t *wh, wordhash_t *db)
 
     count = 0;
     for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh)) {
-	wordprop_t *wp = wordhash_insert(db, node->key, sizeof(wordprop_t), NULL);
+	wordprop_t *wp;
+	if (!msg_count_file)
+	    wp = wordhash_insert(db, node->key, sizeof(wordprop_t), NULL);
+	else {
+	    wp = xcalloc(1, sizeof(wordprop_t));
+	    memcpy(wp, node->buf, sizeof(wordprop_t));
+	}
 	props[count].buf = wp;
 	order[count] = &props[count];
 	count += 1;

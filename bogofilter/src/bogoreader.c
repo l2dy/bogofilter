@@ -78,7 +78,7 @@ static reader_file_t get_filename;
 
 static void bogoreader_close(void);
 
-typedef enum { MBOX, RMAIL, ANT } mbox_t;
+typedef enum { MBOX, MC, RMAIL, ANT } mbox_t;
 
 typedef struct {
     const char	*sep;
@@ -88,9 +88,10 @@ typedef struct {
 } sep_2_box_t;
 
 sep_2_box_t sep_2_box[] = {
-    { "From ",       5, MBOX,  mailbox_getline },
-    { "#! rmail",    8, RMAIL, rmail_getline },
-    { "MAIL FROM:", 10, ANT,   ant_getline }		/* RISC-OS only */
+    { "From ",      	 5, MBOX,  mailbox_getline },
+    { "\".MSG_COUNT\"", 12, MC,    mailbox_getline },	/* msg-count */
+    { "#! rmail",   	 8, RMAIL, rmail_getline   },
+    { "MAIL FROM:", 	10, ANT,   ant_getline     }	/* RISC-OS only */
 };
 
 ssize_t     seplen = 0;
