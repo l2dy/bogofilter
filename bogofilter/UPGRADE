@@ -1,7 +1,17 @@
 What:
 
-There are now multiple file formats for various versions of bogofilter:
-This document explains how to upgrade any earlier type to current versions.
+This document explains how to upgrade bogofilter's wordlist files 
+from any earlier version to the current version.
+
+There are two possible upgrades paths:
+
+1. Delete current wordlist files and regenerate them from your email corpus.
+   This is the recommended upgrade for the upcoming versions (0.75-beta, and 0.75)
+   since the definition of a 'word' has now changed. Regeneration will pick up more
+   words and also create the wordlist files with the correct format.
+
+2. If you choose not to regenerate your wordlists, you MUST upgrade the formats
+   of the existing wordlist files.
 
 Assumptions:
 
@@ -12,7 +22,7 @@ How:
 
 1. Stop all instances of bogofilter. The upgrade tools do not lock files or guard
    against multiple processes accessing the same files. If you have cron jobs or daemons
-   that fetch and process mail and could fire off bogofilter. Stop them.
+   that fetch and process mail and could fire off bogofilter, stop them.
 
 2. Backup your data. Let's assume that you said:
    
@@ -22,12 +32,12 @@ How:
 
 3. If your bogofilter version is less than 0.7, say
    
-    $ /usr/bin/bogoupgrade.pl -b /usr/bin/bogoutil -i ~/.bogofilter.safe/goodlist -o  ~/.bogofilter/hamlist.db
+    $ /usr/bin/bogoupgrade.pl -b /usr/bin/bogoutil -i ~/.bogofilter.safe/goodlist -o  ~/.bogofilter/goodlist.db
     $ /usr/bin/bogoupgrade.pl -b /usr/bin/bogoutil -i ~/.bogofilter.safe/badlist  -o  ~/.bogofilter/spamlist.db
 
    If your bogofilter version is 0.7 or greater, say
 
-    $ /usr/bin/bogoupgrade.pl -b /usr/bin/bogoutil -i ~/.bogofilter.safe/hamlist.count -o  ~/.bogofilter/hamlist.db
+    $ /usr/bin/bogoupgrade.pl -b /usr/bin/bogoutil -i ~/.bogofilter.safe/hamlist.count -o  ~/.bogofilter/goodlist.db
     $ /usr/bin/bogoupgrade.pl -b /usr/bin/bogoutil -i ~/.bogofilter.safe/spamlist.count  -o  ~/.bogofilter/spamlist.db
 
 4. Done. Restart any stopped daemons, cron tasks, etc.
