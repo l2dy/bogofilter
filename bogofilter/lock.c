@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.5  2002/09/24 19:49:01  m-a
+ * Work around compiler warning.
+ *
  * Revision 1.4  2002/09/23 11:38:11  m-a
  * Fix missing right paranthesis.
  *
@@ -208,7 +211,7 @@ int unlock_fileno (int f) {
 /* Signal handler used when locks time out. It logs a message to syslog.    */
 /****************************************************************************/
 void alarm_signal_handler(int signum) {
-
+	(void)signum; /* work around compiler warning */
 	#ifdef HAVE_SYSLOG_H
 	syslog(LOG_WARNING, "Waited %i seconds for a file lock, continuing without a lock", LOCK_TIMEOUT);
 	#endif /* HAVE_SYSLOG_H */
