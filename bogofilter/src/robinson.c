@@ -51,9 +51,6 @@ static void	rob_print_summary(void);
 
 /* Static Variables */
 
-double bad_cnt;
-double good_cnt;
-
 rf_method_t rf_robinson_method = {	/* needed by config.c */
     {
 	"robinson",			/* const char		  *name;		*/
@@ -99,6 +96,8 @@ double calc_prob(uint good, uint bad)
     if (n == 0)
 	fw = robx;
     else {
+	double bad_cnt  = (double) max(1, msgs_bad);
+	double good_cnt = (double) max(1, msgs_good);
 	double pw = ((b / bad_cnt) / (b / bad_cnt + g / good_cnt));
 	fw = (robs * robx + n * pw) / (robs + n);
     }
@@ -215,9 +214,6 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     size_t count = 0;
 
     (void) fp; 	/* quench compiler warning */
-
-    bad_cnt  = (double) max(1, msgs_bad);
-    good_cnt = (double) max(1, msgs_good);
 
     if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() begins\n");
 
