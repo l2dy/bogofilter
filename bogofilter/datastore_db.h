@@ -1,6 +1,8 @@
 #ifndef DATASTORE_DB3_H_GUARD
 #define DATASTORE_DB3_H_GUARD
 
+#include "common.h"
+
 #define MSG_COUNT_TOK ".MSG_COUNT"
 
 typedef struct {
@@ -8,6 +10,8 @@ typedef struct {
   char *name;
   DB *dbp;
   pid_t pid;
+  bool locked;
+
 } dbh_t;
 
 extern int verbose;
