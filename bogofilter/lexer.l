@@ -51,57 +51,51 @@ struct textblock textblocks, *textend = &textblocks;
 char *yylval;
 static char alt_text[MAXTOKENLEN];
 
-char *fgetsnonull(char *buf, int max_size, FILE *s)
+/* returns -1 for EOF or max_size < 2, characters read otherwise */
+int myfgets(char *buf, int max_size, FILE *s)
 {
 	int c;
 	char *cp = buf;
 
-	if ((max_size <= 0) || feof(s)) return(NULL);
+	if ((max_size < 2) || feof(s)) return(-1);
 
 	while ((--max_size > 0) && ((c = getc(s)) != EOF)) {
-		if (c == '\0')
-			c = ' ';	/* NULL becomes space */
 		*cp++ = c;
 		if (c == '\n')
 			break;
 	}
 
-	/* \r\n -> \n */
-	if (cp - 2 >= buf && 0 == strcmp(cp - 2, "\r\n")) {
-		cp -= 2;
-		*cp++ = '\n';
-	}
-	*cp++ = '\0';
-	return(buf);
+	*cp = '\0'; /* DO NOT ADD ++ HERE! */
+	return(cp - buf);
 }
 
 
 int yyinput(char *buf, int max_size)
 // input getter for the scanner
 {
-    char *returned;
+    int returned;
 
     static int hdrlen = 0;
     if (hdrlen==0)
 	hdrlen=strlen(SPAM_HEADER_NAME);
 
-    returned = fgetsnonull(buf, max_size, yyin);
+    returned = myfgets(buf, max_size, yyin);
 
-    while (returned != NULL && memcmp(buf,SPAM_HEADER_NAME,hdrlen) == 0)
+    while (returned != -1 && memcmp(buf,SPAM_HEADER_NAME,hdrlen) == 0)
     {
 	do {
-	    returned = fgetsnonull(buf, max_size, yyin);
-	    if (returned != NULL && *buf == '\n')
+	    returned = myfgets(buf, max_size, yyin);
+	    if (returned != -1 && *buf == '\n')
 		break;
-	} while (returned != NULL && isspace(*buf));
+	} while (returned != -1 && isspace(*buf));
     }
 
-    if (returned == NULL) {
+    if (returned == -1) {
 	if (ferror(yyin)) {
 	    fprintf(stderr, "input in flex scanner failed\n");
 	    exit(2);
 	} else {
-	    return 0;
+	    return YY_NULL;
 	}
     }
 
@@ -111,13 +105,22 @@ int yyinput(char *buf, int max_size)
 	// Note that we store fixed-length blocks here, not lines.
 	// One very long physical line could break up into more
 	// than one of these.
-	textend->block = strdup(buf);
-	textend->next = (struct textblock *)malloc(sizeof(struct textblock));
+	textend->block = (char *)xmalloc(returned);
+	textend->len = returned;
+	memcpy(textend->block, buf, returned);
+	textend->next = (struct textblock *)xmalloc(sizeof(struct textblock));
 	textend->next->block = (char *)NULL;
+	textend->next->len = 0;
 	textend = textend->next;
     }
 
-    return(strlen(returned));
+    /* \r\n -> \n */
+    if (returned >= 2 && 0 == strcmp(buf + returned - 2, "\r\n")) {
+	returned --;
+	*(buf + returned - 1) = '\n';
+    }
+
+    return(returned == -1 ? YY_NULL : returned);
 }
 
 %}
@@ -299,7 +302,7 @@ filename=\"?					;
 {MIME_BOUNDARY}(--)?$			{return (BOUNDARY);}
 
 {IPADDR}					{return(TOKEN);}
-[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,[:cntrl:][]+[^[:blank:][:punct:][:cntrl:]]   {return(TOKEN);} 
+[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,[:cntrl:][]+[^[:blank:][:punct:][:cntrl:]]	{return(TOKEN);} 
 .						;
 \n						;
 

@@ -21,7 +21,7 @@ bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
                      wordhash.h wordhash.c wordlists.h wordlists.c \
 		     $(MYCOMMON) common.h version.h
 
-lexertest_SOURCES = lexertest.c lexer.l lexer.h
+lexertest_SOURCES = lexertest.c lexer.l lexer.h $(MYCOMMON)
 
 debugtest_SOURCES = debug.c debug.h debug.main.c
 

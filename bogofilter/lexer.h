@@ -16,6 +16,7 @@ struct textblock
 {
     char		*block;
     struct textblock	*next;
+    int			len;
 };
 
 extern struct textblock textblocks, *textend;

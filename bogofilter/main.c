@@ -236,7 +236,7 @@ int main(int argc, char **argv)
 		    for (textend=&textblocks; textend->block; textend=textend->next)
 		    {
 			if (strcmp(textend->block, "\n") == 0) break;
-			(void) fputs(textend->block, stdout);
+			(void) fwrite(textend->block, 1, textend->len, stdout);
 			if (ferror(stdout)) exit(2);
 		    }
 		}
@@ -269,7 +269,7 @@ int main(int argc, char **argv)
 		    /* print body */
 		    for (; textend->block; textend=textend->next)
 		    {
-			(void) fputs(textend->block, stdout);
+			(void) fwrite(textend->block, 1, textend->len, stdout);
 			if (ferror(stdout)) exit(2);
 		    }
 
