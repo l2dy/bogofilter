@@ -9,7 +9,7 @@
 #		     esp. grftest.out
 #
 #	 grftest.YYYYMMDD:
-#		tests   - directory containing individual output files
+#		directory containing individual output files
 
 NODB=1 . ${srcdir=.}/t.frame
 

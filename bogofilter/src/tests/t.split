@@ -8,7 +8,7 @@
 #	 ./outputs - known correct outputs
 #
 #	 split.YYYYMMDD:
-#		tests   - directory containing individual output files
+#		directory containing individual output files
 
 NODB=1 . ${srcdir=.}/t.frame
 
