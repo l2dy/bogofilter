@@ -23,7 +23,9 @@ AUTHOR:
 #include "buff.h"
 #include "datastore.h"
 #include "error.h"
+#ifdef	ENABLE_DEPRECATED_CODE
 #include "graham.h"			/* for UNKNOWN_WORD */
+#endif
 #include "maint.h"
 #include "paths.h"
 #include "prob.h"
@@ -233,9 +235,6 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     buff_t *buff = buff_new(buf, 0, BUFSIZE);
     const byte *word = buf;
 
-    unsigned long spam_count, spam_msg_count = 0 ;
-    unsigned long good_count, good_msg_count = 0 ;
-
 #ifndef	ENABLE_DEPRECATED_CODE
     const char *head_format = !show_probability ? "%-30s %6s\n"   : "%-30s %6s  %6s  %6s\n";
     const char *data_format = !show_probability ? "%-30s %6lu\n" : "%-30s %6lu  %6lu  %f\n";
@@ -287,12 +286,14 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     {
 	dsv_t val;
 	ds_get_msgcounts(dsh, &val);
-	spam_msg_count = val.spamcount;
-	good_msg_count = val.goodcount;
+	msgs_good = val.goodcount;
+	msgs_bad  = val.spamcount;
+	robs = ROBS;
+	robx = ROBX;
     }
 
 #ifndef	ENABLE_DEPRECATED_CODE
-    printf(head_format, "", "spam", "good", "Fisher");
+    printf(head_format, "", "spam", "good", "  Fisher");
 #else
     printf(head_format, "", "spam", "good", "Gra prob", "Rob/Fis");
 #endif
@@ -301,6 +302,10 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     {
 	dsv_t val;
 	word_t *token;
+
+	unsigned long spam_count;
+	unsigned long good_count;
+
 #ifdef	ENABLE_DEPRECATED_CODE
 	double gra_prob = 0.0;
 #endif
@@ -322,7 +327,9 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	spam_count = val.spamcount;
 	good_count = val.goodcount;
 
-	if (show_probability)
+	if (!show_probability)
+	    printf(data_format, token->text, spam_count, good_count);
+	else
 	{
 #ifdef	ENABLE_DEPRECATED_CODE
 	    double spamness = (double) spam_count / (double) spam_msg_count;
@@ -332,17 +339,14 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 		? UNKNOWN_WORD
 		: spamness / (spamness+goodness);
 #endif
-	    msgs_good = good_msg_count;
-	    msgs_bad  = spam_msg_count;
-
 	    rob_prob = calc_prob(good_count, spam_count);
-	}
 
 #ifndef	ENABLE_DEPRECATED_CODE
-	printf(data_format, token->text, spam_count, good_count, rob_prob);
+	    printf(data_format, token->text, spam_count, good_count, rob_prob);
 #else
-	printf(data_format, token->text, spam_count, good_count, gra_prob, rob_prob);
+	    printf(data_format, token->text, spam_count, good_count, gra_prob, rob_prob);
 #endif
+	}
 
 	if (token != &buff->t)
 	    word_free(token);
