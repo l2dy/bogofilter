@@ -227,30 +227,22 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 			return TOKEN;
 			}
 
-<HTML>{TOKEN}({HTMLTOKEN})+/{NOTWHITESPACE} 	{
-						    reorder_html();
-						}
-
-<HTML>{A2}({HTMLTOKEN})+/{NOTWHITESPACE}	{
-						    reorder_html();
-						}
-
-<HTML>{A1}({HTMLTOKEN})+/{NOTWHITESPACE} 	{
-						    reorder_html();
-						}
+<HTML>{TOKEN}({HTMLTOKEN})+/{NOTWHITESPACE} 	{ reorder_html(); }
+<HTML>{A2}({HTMLTOKEN})+/{NOTWHITESPACE}	{ reorder_html(); }
+<HTML>{A1}({HTMLTOKEN})+/{NOTWHITESPACE} 	{ reorder_html(); }
 
 <HTML>"<!--"					{ BEGIN SCOMMENT; }
 <HTML>"<!"					{ BEGIN (strict_check ? HTOKEN : LCOMMENT ); }
 <HTML>"<"(a|img|font){WHITESPACE}		{ BEGIN HTOKEN; }
-<HTML>"<"					{ /* unknown tag */ BEGIN HDISCARD; }
+<HTML>"<"					{ BEGIN HDISCARD; }	/* unknown tag */
 
 <HTOKEN>{TOKEN}					{ if (tokenize_html_tags)     return TOKEN; }
-<HDISCARD,LCOMMENT>[^>]*>			{ BEGIN HTML; /* discard innards of html tags */ }
+<HDISCARD,LCOMMENT>[^>]*>			{ BEGIN HTML; }		/* discard innards of html tags */
 <HSCRIPT>{TOKEN}				{ if (tokenize_html_script)   return TOKEN; }
 
-<HTOKEN,HDISCARD>">"				{ BEGIN HTML; }	/* end of tag; return to normal html processing */
-<SCOMMENT>{TOKEN}				{ /* discard innards of html comments */ }
-<SCOMMENT>"-->"					{ BEGIN HTML; }	/* end of strict comment; return to normal html processing */
+<HTOKEN,HDISCARD>">"				{ BEGIN HTML; }		/* end of tag; return to normal html processing */
+<SCOMMENT>{TOKEN}				;			/* discard innards of html comments */ 
+<SCOMMENT>"-->"					{ BEGIN HTML; }		/* end of strict comment; return to normal html processing */
 
 {IPADDR}					{ return IPADDR;}
 {TOKEN}						{ return TOKEN;}
@@ -258,7 +250,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 ${DOLLARS}					{ return TOKEN;}
 ${DOLLARS}\.{CENTS}				{ return TOKEN;}
 
-.						/* ignore character */ ;
+.						;			/* ignore character */
 \n						{ got_newline(); 
 						  lineno += 1;
 						}
