@@ -6,19 +6,19 @@ AUTOMAKE_OPTIONS = foreign 1.5
 SUBDIRS =  dcdflib . tests doc contrib
 SYSCONFDIR = @sysconfdir@
 
-#if ENABLE_GRAHAM_METHOD
+if ENABLE_GRAHAM_METHOD
 GRAHAM_FILES = graham.c graham.h
-#endif
+endif
 
-#if ENABLE_ROBINSON_METHOD
+if ENABLE_ROBINSON_METHOD
 ROBINSON_FILES = robinson.c robinson.h
-#endif
+endif
 
-#if ENABLE_ROBINSON_FISHER
+if ENABLE_ROBINSON_FISHER
 FISHER_FILES = fisher.c fisher.h
 AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc
 LDADD = dcdflib/src/libdcdf.a
-#endif
+endif
 
 # what to build
 bin_PROGRAMS = bogofilter bogoutil bogolexer

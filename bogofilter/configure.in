@@ -101,38 +101,67 @@ AC_ARG_ENABLE(spam-header-name,
 )
 
 # Allow the user to disable Graham methods
+
 AC_ARG_ENABLE(graham-method,
 	AC_HELP_STRING([--disable-graham-method],
 	[Disable Graham calculation method]),
 	if test "$enableval" = no; then
-		AC_DEFINE(DISABLE_GRAHAM_METHOD,1,
-		[Disable Graham calculation method])
+		[USE_GRAHAM=NO]
+	else
+		[USE_GRAHAM=YES]
 	fi
 )
 
+if test x$USE_GRAHAM != xNO ; then
+	AC_DEFINE(ENABLE_GRAHAM_METHOD,1,
+	[Enable Graham calculation method])
+fi
+
+AM_CONDITIONAL(ENABLE_GRAHAM_METHOD, test x$USE_GRAHAM != xNO)
+
 # Allow the user to disable Robinson methods
+
 AC_ARG_ENABLE(robinson-method,
 	AC_HELP_STRING([--disable-robinson-method],
 	[Disable Robinson calculation method]),
 	if test "$enableval" = no; then
-		AC_DEFINE(DISABLE_ROBINSON_METHOD,1,
-		[Disable Robinson calculation method])
-		ROBDIS=yes
+		[USE_ROBINSON=NO]
+	else
+		[USE_ROBINSON=YES]
 	fi
 )
 
-if test "$ROBDIS" != yes; then
-	AC_ARG_ENABLE(robinson-fisher,
-		AC_HELP_STRING([--enable-robinson-fisher],
-		[Enable Fisher's method of combining P]),
-		if test "$enableval" = yes; then
-			AC_DEFINE(ENABLE_ROBINSON_FISHER,1,
-			[Enable Fisher's method of combining P])
-		fi
-	)
+if test x$USE_ROBINSON != xNO ; then
+	AC_DEFINE(ENABLE_ROBINSON_METHOD,1,
+	[Enable Robinson calculation method])
 fi
 
-  
+AM_CONDITIONAL(ENABLE_ROBINSON_METHOD, test x$USE_ROBINSON != xNO)
+
+# Allow the user to disable Robinson-Fisher methods
+
+AC_ARG_ENABLE(robinson-fisher,
+	AC_HELP_STRING([--disable-robinson-fisher],
+	[Disable Fisher's method of combining P]),
+	if test "$enableval" = no; then
+		[USE_FISHER=NO]
+	else
+		[USE_FISHER=YES]
+ 		AC_DEFINE(ENABLE_ROBINSON_FISHER,1,
+		[Enable Fisher's method of combining P])
+# trouble ???
+#		AC_CHECK_LIB([dcdf], [cdfchi], LIBS="$LIBS -ldcdf",
+#		    AC_MSG_ERROR([libdcdf (from package dcdflib.c) was not found.]))
+	fi
+)
+
+if test x$USE_FISHER != xNO ; then
+	AC_DEFINE(ENABLE_ROBINSON_FISHER,1,
+	[Enable Fisher's method of combining P])
+fi
+
+AM_CONDITIONAL(ENABLE_ROBINSON_FISHER, test x$USE_FISHER = xYES)
+
 # Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_STDBOOL
