@@ -11,6 +11,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 ******************************************************************************/
 
+#define DONT_TYPEDEF_SSIZE_T 1
 #include "common.h"
 
 #include <db.h>
