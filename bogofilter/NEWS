@@ -21,6 +21,9 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+0.93.3.1 2004-12-26
+
+	 * Fixed errors in bogoutil's usage and help messages.
 
 0.93.3	2004-12-24
 
