@@ -1,0 +1,33 @@
+			       =================
+				BOGOFILTER NEWS
+			       =================
+
+$Id$
+     
+0.11.X  2003-03-??
+
+	2003-02-12
+	* Split bogofilter's command line and config file processing
+	  so bogolexer can use the config file.
+	* Added config file option 'set_header_tags' so Subject line
+	  tokens will be treated specially.
+	* Added script parmtest.sh to facilitate testing of bogofilter's
+	  config file options.
+
+	2003-02-09
+	* Manual pages now contain the proper path to bogofilter.cf.
+	* Added options '-D' and '-T' to support testing.
+	* Improvements in html comment handling code.
+
+	2003-02-07
+	* Internal cleanup of storage used in parsing messages and
+	  working with databases
+
+	2003-02-05
+	* Sort word collections for more efficient database access.
+
+	2003-02-04
+	* Added support for setting BerkeleyDB cache size.
+
+	2003-02-03
+	* Corrected defect in killing of html comments.

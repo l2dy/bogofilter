@@ -21,7 +21,7 @@ sysconf_DATA = bogofilter.cf.example
 # what to distribute
 EXTRA_DIST = autogen.sh \
 	     bogofilter.cf.example \
-	     CHANGES-0.10 \
+	     CHANGES-0.10 CHANGES-0.11 \
 	     METHODS UPGRADE \
 	     README.cvs \
 	     bogofilter.spec bogofilter.spec.in
