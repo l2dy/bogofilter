@@ -20,8 +20,6 @@ AUTHOR:
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-extern FILE *Rfp;
-
 extern int verbose;
 extern int Rtable;
 extern double min_dev;
@@ -114,9 +112,6 @@ void rstats_print(void)
 
     qsort(rstats_array, robn, sizeof(rstats_t *), compare_rstats_t);
 
-    if (Rfp == NULL)
-	Rfp = stdout;
-
     if (Rtable || verbose>=3)
 	rstats_print_rtable(robn, rstats_array);
     else
@@ -177,7 +172,7 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
 	maxcnt = max(maxcnt, cnt);
     }
 
-    fprintf(Rfp, "\t%5s %4s %7s   %9s  %s\n", "int", "cnt", "prob", "spamicity", "histogram" );
+    fprintf(stdout, "\t%5s %4s %7s   %9s  %s\n", "int", "cnt", "prob", "spamicity", "histogram" );
 
     // Print histogram
     for (i=0; i<INTERVALS; i+=1)
@@ -188,17 +183,16 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
 	double prob = cnt ? h->prob/cnt : 0.0;
 
 	// print interval, count, probability, and spamicity
-	(void)fprintf(Rfp, "\t%5.2f %4d  %f  %f  ", beg, cnt, prob, h->spamicity );
+	(void)fprintf(stdout, "\t%5.2f %4d  %f  %f  ", beg, cnt, prob, h->spamicity );
 
 	// scale histogram to 50 characters
 	if (maxcnt>50) cnt = (cnt * 50 + maxcnt - 1) / maxcnt;
 
 	// display histogram
 	for (r=0; r<cnt; r+=1)
-	    (void)fputc( '#', Rfp);
-	(void)fputc( '\n', Rfp);
+	    (void)fputc( '#', stdout);
+	(void)fputc( '\n', stdout);
     }
-
 }
 
 void rstats_print_rtable(int robn, rstats_t **rstats_array)
@@ -206,7 +200,7 @@ void rstats_print_rtable(int robn, rstats_t **rstats_array)
     int r;
 
     // print header
-    fprintf(Rfp, "\t     %-20s%10s%10s%10s%10s%10s\n",
+    fprintf(stdout, "\t     %-20s%10s%10s%10s%10s%10s\n",
 	    "Token","pgood","pbad","fw","invfwlog","fwlog");
 
     // Print 1 line per token
@@ -215,13 +209,13 @@ void rstats_print_rtable(int robn, rstats_t **rstats_array)
 	rstats_t *cur = rstats_array[r];
 	double prob = cur->prob;
 
-	fprintf(Rfp, "\t%3d  %-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f\n",
+	fprintf(stdout, "\t%3d  %-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f\n",
 		r, cur->token, cur->good, cur->bad, prob, 
 		log(1.0 - prob), log(prob)); 
     }
 
     // print trailer
-    fprintf(Rfp, "\t%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
+    fprintf(stdout, "\t%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
 	    robn, "P_Q_S_invsum_logsum", header.invproduct, header.product, header.spamicity,
 	    header.invlogsum, header.logsum);
 }

@@ -35,7 +35,6 @@ AUTHOR:
 
 int verbose, passthrough, nonspam_exits_zero;
 int Rtable = 0;
-/*@null@*/ /*@dependent@*/ FILE *Rfp;
 algorithm_t algorithm = AL_GRAHAM;
 
 char directory[PATH_LEN] = "";
@@ -141,7 +140,7 @@ static int process_args(int argc, char **argv)
     int option;
     int exitcode;
 
-    while ((option = getopt(argc, argv, "d:ehlsnSNvVpugqR:rx:")) != EOF)
+    while ((option = getopt(argc, argv, "d:ehlsnSNvVpugqRrx:")) != EOF)
     {
 	switch(option)
 	{
@@ -226,14 +225,7 @@ static int process_args(int argc, char **argv)
 	    break;
 
 	case 'R':
-	{
 	    Rtable = 1;
-	    Rfp = fopen(optarg, "w");
-	    if(Rfp == NULL) {
-		(void)fprintf(stderr, "Error: can't write %s\n", optarg);
-		Rtable = 0;
-	    }
-	}
 	/*@fallthrough@*/
 	/* fall through to force Robinson calculations */
 	case 'r':
@@ -347,9 +339,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	    register_messages(STDIN_FILENO, run_type);
 	    break;
     }
-    
-    if(Rtable && Rfp != NULL && fclose(Rfp) != 0)
-	(void)fprintf(stderr, "Error: couldn't close Rtable file\n");
 
     close_lists();
 
