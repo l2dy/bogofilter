@@ -1,4 +1,6 @@
-########### BOGOFILTER Configuration File ###########################
+########### Sample BOGOFILTER Configuration File ###########################
+
+# $Id$
 
 # Non-comment lines of bogofilter.cf.example show default settings as
 # used in the bogofilter source code.
@@ -198,20 +200,18 @@ robx=0.415
 #	    setting ham_cutoff to a non-zero value will
 #	    enable tristate results (Yes/No/Unsure).
 
-# for graham:
-#spam_cutoff = 0.90
-# for robinson:
-#spam_cutoff = 0.54
+# spam_cutoff = 0.90	# for graham
+# spam_cutoff = 0.54	# for robinson
 
 # fisher (with Yes/No output, i.e. '-2' option):
 #
-# ham_cutoff = 0.00
-# spam_cutoff = 0.95
+ham_cutoff = 0.00
+spam_cutoff = 0.95
 
 # fisher (with Yes/No/Unsure output, i.e. '-3' option):
 #
-ham_cutoff = 0.10
-spam_cutoff = 0.95
+# ham_cutoff = 0.10
+# spam_cutoff = 0.95
 
 
 #### Format of spamicity output
@@ -219,13 +219,13 @@ spam_cutoff = 0.95
 # for two-state output:
 #	using "Yes" and "No" as labels.
 
-# spamicity_tags = Yes, No
-# spamicity_formats = %0.6f, %0.6f
+spamicity_tags = Yes, No
+spamicity_formats = %0.6f, %0.6f
 
 # for fisher (with 3-state output)
 #	using "Spam", "Ham", and "Unsure" as labels,
 #	format "%6.2e" for displaying Spam/Ham scores.
 #	and format "%0.6f" for Unsure scores.
 #
-spamicity_tags = Spam, Ham, Unsure
-spamicity_formats = %6.2e, %6.2e, %0.6f
+# spamicity_tags = Spam, Ham, Unsure
+# spamicity_formats = %6.2e, %6.2e, %0.6f
