@@ -710,14 +710,14 @@ static void load_wordlist(ds_foreach_t *hook, void *userdata)
     size_t len = strlen(ds_file) + strlen(WORDLIST) + 2;
     char *path = xmalloc(len);
 
-    if (stat(ds_file, &sb) != 0) {
-	fprintf(stderr, "Error accessing file or directory '%s'.\n", ds_file);
+    build_path(path, len, ds_file, WORDLIST);
+
+    if (stat(path, &sb) != 0) {
+	fprintf(stderr, "Error accessing file or directory '%s'.\n", path);
 	if (errno != 0)
 	    fprintf(stderr, "error #%d - %s.\n", errno, strerror(errno));
 	return;
     }
-
-    build_path(path, len, ds_file, WORDLIST);
 
     if (verbose) {
 	printf("Reading %s\n", path);
