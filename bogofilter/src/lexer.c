@@ -266,21 +266,13 @@ size_t decode_text(word_t *w)
 
     while (txt < fin) {
 	word_t n;
-	char *typ;			/* Encoding type - 'B' or 'Q' */
-	char *end;			/* last char of encoded word  */
-	size_t len;
+	char *typ = strchr(txt+2, '?');		/* Encoding type - 'B' or 'Q' */
+	char *tmp = typ + 3;
+	char *end = strstr(tmp, "?=");		/* last char of encoded word  */
+	size_t len = end - tmp;
+	bool copy;
 
-	if (txt == NULL)
-	    break;
-	typ = strchr(txt+2, '?');
-	if (typ == NULL)
-	    break;
-	end = strstr(typ+2, "?=");
-	if (end == NULL)
-	    break;
-	len = end - (typ+2);
-
-	n.text = (byte *)(typ + 2);		/* Start of encoded word */
+	n.text = (byte *)tmp;			/* Start of encoded word */
 	n.leng = len;				/* Length of encoded word */
 	n.text[n.leng] = '\0';
 
@@ -290,7 +282,7 @@ size_t decode_text(word_t *w)
 	    fputs("\n", dbgout);
 	}
 
-	switch (tolower(typ[0])) {		/* ... encoding type */
+	switch (tolower(typ[1])) {		/* ... encoding type */
 	case 'b':
 	    if (base64_validate(&n))
 		len = base64_decode(&n);	/* decode base64 */
@@ -315,21 +307,25 @@ size_t decode_text(word_t *w)
 	memmove(beg+size, n.text, len+1);
 	size += len;
 	txt = end + 2;
-	if (txt < fin) {
-	    bool allspaces = true;
-	    char *nxt = strstr(txt, "=?");
-	    char *tmp = txt;
-	    while (allspaces && tmp < nxt) {
+	if (txt >= fin)
+	    break;
+	end = strstr(txt, "=?");
+	copy = end != NULL;
+
+	if (copy) {
+	    tmp = txt;
+	    while (copy && tmp < end) {
 		if (isspace((unsigned char)*tmp))
 		    tmp += 1;
 		else
-		    allspaces = false;
+		    copy = false;
 	    }
-	    if (allspaces)
-		txt = nxt;
-	    else while (txt < nxt)
-		beg[size++] = *txt++;
 	}
+
+	if (copy)
+	    txt = end;
+	else while (txt < end)
+	    beg[size++] = *txt++;
     }
 
     return size;
