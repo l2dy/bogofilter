@@ -876,10 +876,10 @@ static int process_arglist(int argc, char **argv)
 		case 'd':
 		    argc -= 1;
 		    ds_file = *++argv;
-		    ds_flag = (ds_flag = DS_NONE) ? DS_DSK : DS_ERR;
+		    ds_flag = (ds_flag == DS_NONE) ? DS_DSK : DS_ERR;
 		    break;
 		case 'D':
-		    ds_flag = (ds_flag = DS_NONE) ? DS_RAM : DS_ERR;
+		    ds_flag = (ds_flag == DS_NONE) ? DS_RAM : DS_ERR;
 		    break;
 		case 'E':
 		    esf_flag ^= true;
