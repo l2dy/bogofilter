@@ -140,11 +140,6 @@ retry:
 	override=list->override;
 
 	for (i=0; i<COUNTOF(val.count); i++) {
-	    /* Protect against negatives */
-	    if ((int) val.count[i] < 0) {
-		val.count[i] = 0;
-		ds_write(list->dsh, token, &val);
-	    }
 	    wordprob_add(cnts, val.count[i], i);
 	}
 
