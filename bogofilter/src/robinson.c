@@ -170,8 +170,8 @@ double lookup_and_score(const word_t *token, wordcnts_t *cnts)
     if (cnts->bad == 0 && cnts->good == 0)
 	lookup(token, cnts);
 
-    if (header_degen && cnts->bad == 0 && cnts->good == 0 && (colon = strchr(token->text, ':')) != NULL) {
-	word_t *tword = word_new(colon+1, strlen(colon+1));
+    if (header_degen && cnts->bad == 0 && cnts->good == 0 && (colon = strchr((const char *)(token->text), ':')) != NULL) {
+	word_t *tword = word_new((unsigned const char *)(colon+1), strlen(colon+1));
 	wordcnts_t tcnts;
 	wordcnts_init(&tcnts);
 	lookup_and_score(tword, &tcnts);

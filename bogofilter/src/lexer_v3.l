@@ -320,7 +320,7 @@ static void html_reorder(void)
     memcpy(yycopy+yyleng-len, yytext, len);	/* copy leading text to end of buffer */
     yycopy[yyleng] = '\0';			/* for debugging */
 
-    yy_unput(yycopy, yyleng);
+    yy_unput((unsigned char *)yycopy, yyleng);
     xfree(yycopy);
 }
 
@@ -362,7 +362,7 @@ static void html_char(void)
     }
 
     if (yycopy != NULL) {
-	yy_unput(yycopy, yyleng);
+	yy_unput((unsigned char *)yycopy, yyleng);
 	xfree(yycopy);
     }
 }
