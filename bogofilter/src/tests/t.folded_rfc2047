@@ -26,10 +26,6 @@ subj:okay
 subj:another
 subj:merge
 subj:worked
-torso
-header
-iso-8859-1
-iso-8859-1
 Reply-To
 join
 Reply-To
@@ -39,7 +35,11 @@ john
 doe
 Reply-To
 john_q_public
-_EOF
+iso-8859-1
+iso-8859-1
+torso
+header
+g_EOF
 
 ../bogolexer -p -C <${TMPDIR}/input >${TMPDIR}/output
 cmp ${TMPDIR}/reference ${TMPDIR}/output \
