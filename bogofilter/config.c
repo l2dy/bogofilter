@@ -221,12 +221,13 @@ static void read_config_file(const char *filename, bool home_dir)
     char *tmp = NULL;
     FILE *fp;
 
-    if (!home_dir || filename[0] == '/')
-	tmp = NULL;
-    else
+    if (home_dir && filename[0] != '/')
     {
 	tmp = resolve_home_directory(filename);
-	filename = tmp;
+	if (!tmp) {
+	    fprintf(stderr, "Cannot find home directory.\n");
+	    exit(2);
+	}
     }
 
     fp = fopen(filename, "r");
@@ -286,7 +287,7 @@ static int validate_args(/*@unused@*/ int argc, /*@unused@*/ char **argv)
     classification = (run_type == RUN_NORMAL) ||(run_type == RUN_UPDATE) || passthrough || nonspam_exits_zero || (Rtable != 0);
     registration   = (run_type == REG_SPAM) || (run_type == REG_GOOD) || (run_type == REG_GOOD_TO_SPAM) || (run_type == REG_SPAM_TO_GOOD);
 
-    if ( registration && classification)
+    if (registration && classification)
     {
 	(void)fprintf(stderr, "Error:  Invalid combination of options.\n");
 	(void)fprintf(stderr, "\n");
@@ -444,8 +445,7 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case 'c':
-	    system_config_file = optarg;
-	    read_config_file(system_config_file, FALSE);
+	    read_config_file(optarg, FALSE);
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
 
@@ -453,7 +453,8 @@ int process_args(int argc, char **argv)
 	    suppress_config_file = TRUE;
 	    break;
 	default:
-	    fprintf( stderr, "Unknown option '%c' ( %02X )\n", option, option );
+	    fprintf( stderr, "Unknown option '%c' (%02X)\n", option,
+		    (unsigned int)option);
 	    exit(2);
 	}
     }
