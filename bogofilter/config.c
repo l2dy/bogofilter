@@ -102,6 +102,8 @@ double	min_dev = 0.0f;
 
 double	thresh_stats = 0.0f;
 
+static bool select_algorithm(const char *s);
+
 /*---------------------------------------------------------------------------*/
 
 /* Notes:
@@ -120,9 +122,8 @@ static const parm_desc sys_parms[] =
     { "spam_header_name", CP_STRING,	{ &spam_header_name } },
     { "user_config_file", CP_STRING,	{ &user_config_file } },
 
-    { "algorithm",  	  CP_ALGORITHM,	{ (void *) "algorithm" } },	/* Processed by select_method() */
-    { "wordlist",	  CP_WORDLIST,	{ (void *) "wordlist" } },	/* Processed by configure_wordlist() */
-    /* Above, string addresses are used to circumvent the NULL check in process_config_parameter() */
+    { "algorithm",  	  CP_FUNCTION,	{ (void *) &select_algorithm } },
+    { "wordlist",	  CP_FUNCTION,	{ (void *) &configure_wordlist } },
 
     { "min_dev",	  CP_DOUBLE,	{ (void *) &min_dev } },
     { "spam_cutoff",	  CP_DOUBLE,	{ (void *) &spam_cutoff } },
@@ -140,8 +141,9 @@ static const parm_desc sys_parms[] =
 
 static const parm_desc *usr_parms = NULL;
 
-static bool select_method(enum algorithm_e al)
+static bool select_algorithm(const char *s)
 {
+    enum algorithm_e al = tolower((unsigned char)*s);
     bool ok = true;
     switch (al)
     {
@@ -231,19 +233,13 @@ static bool process_config_parameter(const parm_desc *arg, const char *val)
 		    fprintf( stderr, "%s -> '%s'\n", arg->name, *arg->addr.s );
 		break;
 	    }
-	case CP_ALGORITHM:
+	case CP_FUNCTION:
 	{
-	    ok = select_method(tolower((unsigned char)*val));
+	    ok = (*arg->addr.f)(val);
 	    if (DEBUG_CONFIG(0))
 		fprintf( stderr, "%s -> '%c'\n", arg->name, *val );
 	    break;
 	}
-	case CP_WORDLIST:
-	    {
-		if (!configure_wordlist(val))
-		    ok = false;
-		break;
-	    }
 	default:
 	    {
 		ok = false;
@@ -564,7 +560,9 @@ int process_args(int argc, char **argv)
 /* exported */
 void process_config_files(void)
 {
-    select_method(algorithm);
+    char buff[2];
+    sprintf(buff, "%c", algorithm);
+    select_algorithm(buff);
 
     if (! suppress_config_file)
     {
