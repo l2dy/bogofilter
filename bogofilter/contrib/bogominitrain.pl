@@ -8,7 +8,7 @@ my $commandlineoptions=($ARGV[0]=~/^-(?=[^f]*f?[^f]*$)(?=[^s]*s?[^s]*$)[fs]*v{0,
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.22
+bogominitrain.pl version 1.23
   requires bogofilter 0.14.1 or later
 
 Usage:
@@ -100,7 +100,7 @@ do { # Start force loop
         open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
         print TEMP $mail;
         close (TEMP);
-        unless (system("$bogofilter <$temp")%256==1) {
+        unless (system("$bogofilter <$temp") >>8==1) {
           system("$bogofilter -n <$temp");
           $hamadd++;
           print "Training ham message $hamcount.\n" if ($verbose);
@@ -127,7 +127,7 @@ do { # Start force loop
         open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
         print TEMP $mail;
         close (TEMP);
-        unless (system("$bogofilter <$temp")%256==0) {
+        unless (system("$bogofilter <$temp") >>8==0) {
           system("$bogofilter -s <$temp");
           $spamadd++;
           print "Training spam message $spamcount.\n" if ($verbose);
