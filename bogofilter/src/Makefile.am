@@ -1,5 +1,4 @@
-# vim:tw=0
-# $Id$
+# vim:tw=0 $Id$
 
 SUBDIRS = . tests
 SYSCONFDIR = @sysconfdir@
@@ -151,8 +150,8 @@ bogofilter_static_LDADD = $(LDADD) $(STATIC_DB) $(GSL_LIBS)
 bogolexer_static_SOURCES = bogolexer.c
 bogolexer_static_LDFLAGS = $(STATICLDFLAGS)
 
-bogoutil_SOURCES = bogoutil.c bogohist.c
-bogoutil_static_SOURCES = bogoutil.c bogohist.c
+bogoutil_SOURCES = bogoutil.c bogohist.c bogohist.h
+bogoutil_static_SOURCES = bogoutil.c bogohist.c bogohist.h
 bogoutil_static_LDFLAGS = $(STATICLDFLAGS)
 bogoutil_static_LDADD = $(LDADD) $(STATIC_DB)
 
