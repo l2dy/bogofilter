@@ -39,13 +39,13 @@ typedef struct dbhsqlite_t dbh_t;
 static const char *ENDIAN32 = ".ENDIAN32";
 
 void db_flush(void *unused) { (void)unused; }
-ex_t db_verify(bfdir *d, bffile *f) { (void)d; (void)f; return EX_OK; }
 
 extern dsm_t *dsm;			/* in datastore.c */
 
 static int sql_txn_begin(void *vhandle);
 static int sql_txn_abort(void *vhandle);
 static int sql_txn_commit(void *vhandle);
+static u_int32_t sql_pagesize(bfdir *db_dir, bffile *db_file);
 
 /** The layout of the bogofilter table, formatted as SQL statement. */
 #define LAYOUT \
@@ -60,19 +60,29 @@ dsm_t dsm_sqlite = {
     &sql_txn_commit,
 
     /* private -- used in datastore_db_*.c */
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL
+    NULL,	/* dsm_env_init         */
+    NULL,	/* dsm_cleanup          */
+    NULL,	/* dsm_cleanup_lite     */
+    NULL,	/* dsm_get_env_dbe      */
+    NULL,	/* dsm_database_name    */
+    NULL,	/* dsm_recover_open     */
+    NULL,	/* dsm_auto_commit_flags*/                    
+    NULL,	/* dsm_get_rmw_flag     */
+    NULL,	/* dsm_lock             */
+    NULL,	/* dsm_common_close     */
+    NULL,	/* dsm_sync             */
+    NULL,	/* dsm_log_flush        */
+    NULL,	/* dsm_recover          */
+    NULL,	/* dsm_remove           */
+    NULL,	/* dsm_checkpoint       */
+    NULL,	/* dsm_purgelogs        */
+    NULL,	/* dsm_verify           */
+    &sql_pagesize /* dsm_pagesize       */
 };
+
+/** The command to begin a regular transaction. */
+#define BEGIN \
+	"BEGIN TRANSACTION;"
 
 /* real functions */
 /** Initialize database handle and return it. 
@@ -380,7 +390,7 @@ static int sqlfexec(sqlite3 *db, const char *cmd, ...)
 
 static int sql_txn_begin(void *vhandle) {
     dbh_t *dbh = vhandle;
-    return sqlexec(dbh->db, "BEGIN TRANSACTION;");
+    return sqlexec(dbh->db,  BEGIN );
 }
 
 static int sql_txn_abort(void *vhandle) {
@@ -479,7 +489,7 @@ static int pagesize_cb(void *ptr, int argc, char **argv, char **dummy) {
     return errno;
 }
 
-u_int32_t db_pagesize(bfdir *db_dir, bffile *db_file)
+static u_int32_t sql_pagesize(bfdir *db_dir, bffile *db_file)
 {
     dbh_t *dbh;
     int rc;
