@@ -1,6 +1,9 @@
 /* $Id$ */
 /* 
  * $Log$
+ * Revision 1.9  2002/09/27 01:17:38  gyepi
+ * removed unused bogodump declaration
+ *
  * Revision 1.8  2002/09/26 23:04:41  relson
  * documentation:
  *     changed to refer to "good" and "spam" tokens and lists.
@@ -67,7 +70,6 @@ wordlist_t;
 
 extern void register_words(int fd, wordlist_t *list, wordlist_t *other);
 extern rc_t bogofilter(int fd, double *xss);
-extern int bogodump(char *file);
 
 extern wordlist_t good_list, spam_list;
 extern int verbose;
