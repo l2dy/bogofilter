@@ -29,7 +29,9 @@ bool replace_nonascii_characters;	/* '-n' */
 
 const char *progname = "bogolexer";
 
+/* prevent larger inclusions */
 const char *spam_header_name = SPAM_HEADER_NAME;
+run_t run_type = RUN_NORMAL;
 
 static void usage(void)
 {
