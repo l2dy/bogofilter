@@ -111,7 +111,7 @@ static int check_directory(const char* path) /*@globals errno,stderr@*/
 }
 
 static void cleanup_exit(int exitcode, int killfiles) {
-    if (killfiles && *outfname) unlink(*outfname);
+    if (killfiles && outfname[0] != '\0') unlink(outfname);
     exit(exitcode);
 }
 
