@@ -412,6 +412,8 @@ static void help(void)
 		  "\t-f\t- select Fisher spam calculation method.\n"
 #endif
 #endif
+		  "\t-2\t- set binary classification mode (yes/no).\n"
+		  "\t-3\t- set ternary classification mode (yes/no/unsure).\n"
 		  "\t-p\t- passthrough.\n"
 		  "\t-I file\t- read message from 'file' instead of stdin.\n"
 		  "\t-O file\t- save message to 'file' in passthrough mode.\n"
@@ -484,10 +486,16 @@ int process_args(int argc, char **argv)
 
     fpin = stdin;
 
-    while ((option = getopt(argc, argv, "d:eFhl::o:snSNvVpuc:CgrRx:fqtI:O:y:k:" G R F)) != EOF)
+    while ((option = getopt(argc, argv, "23d:eFhl::o:snSNvVpuc:CgrRx:fqtI:O:y:k:" G R F)) != EOF)
     {
 	switch(option)
 	{
+	case '2':
+	case '3':
+	    twostate = option == '2';
+	    threestate = option == '3';
+	    break;
+
 	case 'd':
 	    xfree(directory);
 	    directory = xstrdup(optarg);

@@ -14,6 +14,8 @@
 #endif
 
 /* command line options */
+extern	bool	twostate;		/* '-2' */
+extern	bool	threestate;		/* '-3' */
 extern	bool	nonspam_exits_zero;	/* '-e' */
 extern	bool	fisher;			/* '-f' */
 extern	bool	force;			/* '-F' */
@@ -32,9 +34,11 @@ extern	char	outfname[PATH_LEN];	/* '-O' */
 /* config file options */
 extern	int	max_repeats;
 extern	double	min_dev;
+extern	double	ham_cutoff;
 extern	double	spam_cutoff;
 extern	double	thresh_stats;
 
+extern	int	abort_on_error;
 extern	bool	stats_in_header;
 
 extern	const char	*update_dir;

@@ -17,6 +17,8 @@ AUTHOR:
 /* exports */
 
 /* command line options */
+bool	twostate;			/* '-2' */
+bool	threestate;			/* '-3' */
 bool	nonspam_exits_zero;		/* '-e' */
 bool	force;				/* '-F' */
 bool	fisher;				/* '-f' */
@@ -29,8 +31,6 @@ int	verbose;			/* '-v' */
 
 FILE	*fpin = NULL;			/* '-I' */
 int	Rtable = 0;			/* '-R' */
-
-extern	char	outfname[PATH_LEN];	/* '-O' */
 
 /* config file options */
 int	max_repeats;

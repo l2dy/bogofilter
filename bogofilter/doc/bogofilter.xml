@@ -27,6 +27,8 @@
   <arg choice='opt'>-g</arg>
   <arg choice='opt'>-r</arg>
   <arg choice='opt'>-f</arg>
+  <arg choice='opt'>-2</arg>
+  <arg choice='opt'>-3</arg>
   <arg choice='opt'>-R</arg>
   <arg choice='opt'>-u</arg>
   <arg choice='opt'>-v</arg>
@@ -136,6 +138,16 @@ on the spamlist and a non-spam message on the goodlist.  If using the
 Robinson-Fisher method and the classification is "unsure", the message will
 not be registered.</para>
 
+<para>The <option>-2</option> option tells
+<application>bogofilter</application> to binary classify the message as either
+ham or spam, and never as unsure.  When this option is used with <option>-u</option>,
+a wordlist is always updated.</para>
+
+<para>The <option>-3</option> option tells
+<application>bogofilter</application> to use three-state classification for the message,
+i.e. classify the message as ham, spam, or unsure.  This option is effective only if
+ham_cutoff is non-zereo.</para>
+
 <para>The <option>-d</option><replaceable> dir</replaceable> option
     allows you to set the directory under which wordlists will be found
     to <replaceable>dir</replaceable>. If omitted, the default directory
@@ -222,7 +234,7 @@ modifications to the calculation method.</para>
 <para>The configure script has options
 <option>--disable-graham-method</option>,
 <option>--disable-robinson-method</option>, and
-<option>--disable-fisher-method</option> so that
+<option>--disable-robinson-fisher</option> so that
 <application>bogofilter</application> can be built to support a subset
 of the available methods.</para>
 

@@ -119,7 +119,9 @@ rc_t fis_status(void)
     if ( fis_stats.s.spamicity >= spam_cutoff ) 
 	return RC_SPAM;
 
-    if (ham_cutoff < EPS || (fis_stats.s.spamicity - ham_cutoff < EPS))
+    if (twostate ||
+	(ham_cutoff < EPS) ||
+	(fis_stats.s.spamicity - ham_cutoff < EPS))
 	return RC_HAM;
 
     return RC_UNSURE;
