@@ -45,7 +45,7 @@ AUTHOR:
 #define	MOD(n,m)	((n) - ((int)((n)/(m)))*(m))
 
 #define	MIN(n)		((n)/60)
-#define SEC(n)		((n) - MIN(n)*60)
+#define SECONDS(n)		((n) - MIN(n)*60)
 
 #define	ROUND(f)	floor(f+0.5)
 
@@ -898,7 +898,7 @@ static rc_t bogotune(void)
     if (verbose) {
 	uint tm = end - beg;
 	cnt = ns_cnt + sp_cnt;
-	printf("    %2dm:%02ds for %d messages.  avg = %5.1f msg/sec\n", MIN(tm), SEC(tm), cnt, (double)cnt/(tm));
+	printf("    %2dm:%02ds for %d messages.  avg = %5.1f msg/sec\n", MIN(tm), SECONDS(tm), cnt, (double)cnt/(tm));
     }
 
     if (msgs_good == 0 && msgs_bad == 0) {
@@ -1072,7 +1072,7 @@ static rc_t bogotune(void)
 
 	if (verbose >= SUMMARY) {
 	    uint tm = end - beg;
-	    printf("    %2dm:%02ds for %d iterations.  avg = %5.3fs\n", MIN(tm), SEC(tm), cnt, (double)(tm)/cnt);
+	    printf("    %2dm:%02ds for %d iterations.  avg = %5.3fs\n", MIN(tm), SECONDS(tm), cnt, (double)(tm)/cnt);
 	}
 
 	printf("\n");
