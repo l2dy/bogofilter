@@ -77,10 +77,8 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
-void dbh_print_names(dsh_t *dsh, const char *msg)
+static void dbh_print_names(dbh_t *dbh, const char *msg)
 {
-    dbh_t *handle = dsh->dbh;
-
     if (handle->count == 1)
 	fprintf(dbgout, "%s (%s)", msg, handle->name[0]);
     else
@@ -124,7 +122,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 	  goto open_err;
 
       if (DEBUG_DATABASE(1)) {
-	  dbh_print_names(dsh, "(db) tdb_open( ");
+	  dbh_print_names(dsh->dbh, "(db) tdb_open( ");
 	  fprintf(dbgout, ", %d )\n", open_mode);
       }
       

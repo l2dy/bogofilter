@@ -76,9 +76,6 @@ unsigned long db_handle_pid(dsh_t *dsh);
 /* Get the database filename */
 char *db_handle_filename(dsh_t *dsh);
 
-/* Prints wordlist name(s) */
-void dbh_print_names(dsh_t *dsh, const char *msg);
-
 /* Returns error associated with code */
 const char *db_str_err(int);
 

@@ -127,10 +127,8 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
-void dbh_print_names(dsh_t *vhandle, const char *msg)
+static void dbh_print_names(dbh_t *handle, const char *msg)
 {
-    dbh_t *handle = vhandle->dbh;
-
     if (handle->count == 1)
 	fprintf(dbgout, "%s (%s)", msg, handle->name[0]);
     else
@@ -411,7 +409,7 @@ void db_close(void *vhandle, bool nosync)
     uint32_t f = nosync ? DB_NOSYNC : 0;
 
     if (DEBUG_DATABASE(1)) {
-	dbh_print_names(vhandle, "db_close");
+	dbh_print_names(handle, "db_close");
 	fprintf(dbgout, " %s\n", nosync ? "nosync" : "sync");
     }
 

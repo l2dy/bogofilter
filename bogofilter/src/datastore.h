@@ -268,9 +268,6 @@ int ds_lock(int fd, int cmd, short int type)
     return db_lock(int fd, int cmd, short int type)
 }
 
-/* Prints wordlist name(s) */
-void dbh_print_names(void *vhandlevhandle, const char *msg);
-
 /* Returns version string */
 extern __inline 
 const char *ds_version_str(void)
