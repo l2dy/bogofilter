@@ -1,4 +1,6 @@
+# $Id$
 Eric S. Raymond (Initial Version)
+Gyepi Sam (Support for BerkelyDB format wordlist files)
 Adrian Otto (Portability code, file locking)
 David Relson (Bug Fixes)
 Paul Tomblin (Bug Fixes)
