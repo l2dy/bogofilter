@@ -34,8 +34,9 @@ static char dirname[PATH_LEN+1];
 
 static FILE *yy_file;
 
-static bool first = true;
-static bool emptyline = false;
+static bool first = true;  /* for the _more functions */
+static bool nfirst = true; /* for the _next functions */
+static bool emptyline = false; /* for mailbox /^From / match */
 
 #ifdef	DUP_REF_RSLTS
 static word_t *line_save = NULL;
@@ -45,18 +46,24 @@ static bool    have_message = false;
 
 /* Function Prototypes */
 
-static lexer_more_t normal_more;
-static lexer_more_t cmdline_more;
-static lexer_more_t stdin_more;
+/* these functions check if there are more file names in bulk modes,
+ * read-mail/mbox-from-stdin for uniformity */
+static lexer_more_t stdin_next;
+static lexer_more_t b_stdin_next;
+static lexer_more_t b_args_next;
+
+/* these functions check if there is more mail in a mailbox/maildir/...
+ * to process, trivial mail_more for uniformity */
+static lexer_more_t mail_more;
+static lexer_more_t mailbox_more;
 static lexer_more_t maildir_more;
-
-static lexer_line_t mailbox_getline;
-static lexer_file_t mailbox_filename;
-
 /* maildir is the mailbox format specified in
  * http://cr.yp.to/proto/maildir.html */
-static lexer_line_t maildir_getline;
-static lexer_file_t maildir_filename;
+
+static lexer_line_t mailbox_getline; /* minds   /^From / */
+static lexer_line_t maildir_getline; /* ignores /^From / */
+
+static lexer_file_t get_filename;
 
 static void maildir_init(const char *name);
 static void maildir_fini(void);
@@ -106,89 +113,92 @@ static int ismaildir(const char *dir) {
 
 static void dummy_fini(void) { }
 
-void bogoreader_init(int _argc, char **_argv)
-{
-    first = true;
-    lexer_getline = mailbox_getline;
-    fini = dummy_fini;
+static lexer_more_t *object_next;
+static lexer_more_t *object_more = NULL; /* for universal_more */
 
-    switch (bulk_mode) {
-    case B_NORMAL:
-	yy_file = fpin;
-	lexer_more = normal_more;
-	break;
-    case B_STDIN:		/* '-b' - streaming (stdin) mode */
-	lexer_more = stdin_more;
-	break;
-    case B_CMDLINE:		 /* '-B' - command line mode */
-	argc = _argc;
-	argv = _argv;
-	lexer_more = cmdline_more;
-	break;
-    default:
-	fprintf(stderr, "Unknown bulk_mode = %d\n", (int) bulk_mode);
-	abort();
-	break;
+/* this is the 'nesting driver' for our input.
+ * object := one out of { mail, mbox, maildir }
+ * if we have a current object-specific handle, check that if we have
+ * further input in the object first. if we don't, see if we have
+ * further objects to process
+ */
+static bool lexer__more(void)
+{
+    for (;;) {
+	/* check object-specific method */
+	if (object_more) {
+	    if ((*object_more)()) /* more mails in the object */
+		return true;
+	    object_more = NULL;
+	}
+
+	/* ok, that one has been exhausted, try the next object */
+
+	/* object_next opens the object */
+	if (!object_next())
+	    return NULL;
+
+	/* ok, we have more objects, so check if the current object has
+	 * input - loop.
+	 */
     }
-    lexer_filename = mailbox_filename;
 }
 
-void bogoreader_fini(void)
+/* open object (Maildir, mbox file or file with a single mail) and set
+ * _getline and _more pointers dependent on what the obj is.
+ *
+ * - automatically detects maildir
+ * - does not automatically distinguish between mbox and mail
+ *   and takes mbox_mode instead
+ */
+static bool open_object(char *obj)
 {
-    if (fpin && fpin != stdin)
+    filename = obj;
+    if (fpin) {
 	fclose(fpin);
-    fini();
-}
-
-static bool normal_more(void)
-{
-    bool mailbox = (mbox_mode ||			/* '-M' */
-		    ((run_type & (REG_SPAM |		/* '-s' */
-				  UNREG_SPAM |		/* '-S' */
-				  REG_GOOD |		/* '-n' */
-				  UNREG_GOOD)) != 0));	/* '-N' */
-#ifndef	DUP_REF_RSLTS
-    bool val = first || (mailbox && have_message);
-#else
-    bool val = first || (mailbox && line_save != NULL);
-#endif
-    first = false;
-    return val;
-}
-
-static bool cmdline_more(void)
-{
-    bool val = *argv != NULL;
-
-    if (val) {
-	filename = *argv++;
-	if (fpin)
-	    fclose(fpin);
-	if (isdir(filename) == 0) {
-	    if (DEBUG_READER(0))
-		fprintf(dbgout, "%s:%d - assuming %s is a file\n", __FILE__, __LINE__, filename);
-	    fpin = fopen( filename, "r" );
-	    if (fpin == NULL) {
-		fprintf(stderr, "Can't open file '%s': %s\n", filename,
-			strerror(errno));
-		return false;
-	    }
-	    emptyline = false;
-	} else if (ismaildir(filename) == 1) {
-	    if (DEBUG_READER(0))
-		fprintf(dbgout, "%s:%d - assuming %s is a maildir\n", __FILE__, __LINE__, filename);
-	    maildir_init(filename);
-	    lexer_more = maildir_more;
-	    lexer_more();
-	} else {
-	    fprintf(stderr, "Can't identify type of object '%s'\n", filename);
+	fpin = NULL;
+    }
+    if (ismaildir(filename) == 1) {
+	/* MAILDIR */
+	lexer_getline = maildir_getline;
+	object_more = maildir_more;
+	maildir_init(filename);
+	return true;
+    } else if (isdir(filename) == 1) {
+	fprintf(stderr, "Can't identify type of object '%s'\n", filename);
+	return false;
+    } else {
+	if (DEBUG_READER(0))
+	    fprintf(dbgout, "%s:%d - assuming %s is a %s\n", __FILE__, __LINE__, filename, mbox_mode ? "mbox" : "mail");
+	fpin = fopen( filename, "r" );
+	if (fpin == NULL) {
+	    fprintf(stderr, "Can't open file '%s': %s\n", filename,
+		    strerror(errno));
 	    return false;
 	}
+	emptyline = false;
+	lexer_getline = mbox_mode ? mailbox_getline : maildir_getline;
+	object_more = mbox_mode ? mailbox_more : mail_more;
+	first = true;
+	return true;
     }
+}
+
+/*** _next functions ***********************************************/
+
+/* this initializes for reading a single mail or a mbox from stdin */
+static bool stdin_next(void)
+{
+    bool val = nfirst;
+    lexer_getline = mbox_mode ? mailbox_getline : maildir_getline;
+    object_more = mbox_mode ? mailbox_more : mail_more;
+    nfirst = false;
     return val;
 }
 
-static bool stdin_more(void)
+/* this reads file names from stdin and processes them according to
+ * their type */
+static bool b_stdin_next(void)
 {
     int len;
     filename = namebuff;
@@ -199,92 +209,46 @@ static bool stdin_more(void)
     if (len > 0 && filename[len-1] == '\n')
 	filename[len-1] = '\0';
 
-    if (fpin)
-	fclose(fpin);
-    fpin = fopen( filename, "r" );
-    if (fpin == NULL) {
-	fprintf(stderr, "Can't open file '%s': %s\n", filename,
-		strerror(errno));
-	return false;
+    return open_object(filename);
+}
+
+/* this reads file names from the command line and processes them
+ * according to their type */
+static bool b_args_next(void)
+{
+    if (!*argv) return false;
+    filename = *(argv++);
+    return open_object(filename);
+}
+
+/*** _more functions ***********************************************/
+
+/* trivial function, returns true on first run,
+ * returns false on all subsequent runs */
+static bool mail_more(void)
+{
+    if (first) {
+	first = false;
+	return true;
     }
-
-    emptyline = false;
-
-    return true;
+    return false;
 }
 
-char *mailbox_filename(void)
+/* always returns true on the first run
+ * subsequent runs return true when a From line was encountered */
+static bool mailbox_more(void)
 {
-    return filename;
-}
-
-static int mailbox_getline(buff_t *buff)
-{
-    size_t used = buff->t.leng;
-    byte *buf = buff->t.text + used;
-    int count;
-
 #ifndef	DUP_REF_RSLTS
-    count = buff_fgetsl(buff, fpin);
-    have_message = false;
+    bool val = have_message;
 #else
-    if (!line_save) {
-	count = buff_fgetsl(buff, fpin);
-    }
-    else {
-	count = buff_add(buff, line_save);
-	word_free(line_save);
-	line_save = NULL;
-	emptyline = false;
-    }
+    bool val = line_save != NULL;
 #endif
-
-    buf = buff->t.text + used;
-
-    if (emptyline
-	&& count >= 5
-	&& memcmp("From ", buf, 5) == 0)
-    {
-#ifndef	DUP_REF_RSLTS
-	have_message = true;
-#else
-	line_save = word_new(NULL, count);
-	memcpy(line_save->text, buf, count);
-#endif
-	count = EOF;
-    }
-    else {
-	if (buff->t.leng < buff->size)		/* for easier debugging - removable */
-	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
-    }
-
-    emptyline = (count == 1 && *buf == '\n');
-
-    return count;
+    val = val || first;
+    first = false;
+    return val;
 }
 
-static void maildir_fini(void)
-{
-    if (maildir_dir)
-	closedir(maildir_dir);
-    maildir_dir = NULL;
-    return;
-}
-
-static void maildir_init(const char *name)
-{
-    lexer_more = maildir_more;
-    lexer_filename = maildir_filename;
-    lexer_getline  = maildir_getline;
-    maildir_sub = maildir_subs;
-    maildir_dir = NULL;
-    fini = maildir_fini;
-
-    strlcpy(dirname, name, sizeof(dirname));
-
-    return;
-}
-
+/* iterates over files in a maildir */
 static bool maildir_more(void)
 {
     struct dirent *dirent;
@@ -320,7 +284,8 @@ trynext: /* ugly but simple */
     }
 
     if (dirent == NULL) {
-	closedir(maildir_dir);
+	if (maildir_dir)
+	    closedir(maildir_dir);
 	maildir_dir = NULL;
 	goto trynext;
     }
@@ -346,6 +311,56 @@ trynext: /* ugly but simple */
     return true;
 }
 
+/*** _getline functions ***********************************************/
+
+/* reads from a mailbox, paying attention to ^From lines */
+static int mailbox_getline(buff_t *buff)
+{
+    size_t used = buff->t.leng;
+    byte *buf = buff->t.text + used;
+    int count;
+
+#ifndef	DUP_REF_RSLTS
+    count = buff_fgetsl(buff, fpin);
+    have_message = false;
+#else
+    if (!line_save) {
+	count = buff_fgetsl(buff, fpin);
+    }
+    else {
+	count = buff_add(buff, line_save);
+	word_free(line_save);
+	line_save = NULL;
+	emptyline = false;
+    }
+#endif
+
+    buf = buff->t.text + used;
+    /* XXX FIXME: do we need to unescape the >From, >>From, >>>From, ... lines
+     * by discarding the first ">"? */
+
+    if (emptyline
+	&& count >= 5
+	&& memcmp("From ", buf, 5) == 0)
+    {
+#ifndef	DUP_REF_RSLTS
+	have_message = true;
+#else
+	line_save = word_new(NULL, count);
+	memcpy(line_save->text, buf, count);
+#endif
+	count = EOF;
+    } else {
+	if (buff->t.leng < buff->size)		/* for easier debugging - removable */
+	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
+    }
+
+    emptyline = (count == 1 && *buf == '\n');
+
+    return count;
+}
+
+/* reads a whole file as a mail, no ^From detection */
 static int maildir_getline(buff_t *buff)
 {
     size_t used = buff->t.leng;
@@ -374,7 +389,74 @@ static int maildir_getline(buff_t *buff)
     return count;
 }
 
-char *maildir_filename(void)
+/* maildir specific functions */
+
+static void maildir_fini(void)
+{
+    if (maildir_dir)
+	closedir(maildir_dir);
+    maildir_dir = NULL;
+    return;
+}
+
+/* initialize iterators for Maildir subdirectories, 
+ * cur and new. */
+static void maildir_init(const char *name)
+{
+    maildir_sub = maildir_subs;
+    maildir_dir = NULL;
+    fini = maildir_fini;
+
+    strlcpy(dirname, name, sizeof(dirname));
+
+    return;
+}
+
+
+/* returns current file name */
+static const char *get_filename(void)
 {
     return filename;
 }
+
+
+/* global reader initialization, exported */
+void bogoreader_init(int _argc, char **_argv)
+{
+    nfirst = first = true;
+    lexer_getline = mailbox_getline;
+    lexer_more = lexer__more;
+    fini = dummy_fini;
+    if (run_type & (REG_SPAM|REG_GOOD|UNREG_SPAM|UNREG_GOOD))
+	mbox_mode = true;
+
+    switch (bulk_mode) {
+    case B_NORMAL:		/* read mail (mbox) from stdin */
+	yy_file = fpin;
+	object_next = stdin_next;
+	break;
+    case B_STDIN:		/* '-b' - streaming (stdin) mode */
+	object_next = b_stdin_next;
+	break;
+    case B_CMDLINE:		 /* '-B' - command line mode */
+	argc = _argc;
+	argv = _argv;
+	object_next = b_args_next;
+	break;
+    default:
+	fprintf(stderr, "Unknown bulk_mode = %d\n", (int) bulk_mode);
+	abort();
+	break;
+    }
+    lexer_filename = get_filename;
+}
+
+/* global cleanup, exported */
+void bogoreader_fini(void)
+{
+    if (fpin && fpin != stdin)
+	fclose(fpin);
+    fini();
+}
+
+
