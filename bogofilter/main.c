@@ -1,7 +1,11 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.16  2002/10/02 16:27:40  relson
+ * Initial inclusion of multiple wordlist code into bogofilter.
+ *
  * Revision 1.15  2002/09/29 03:40:54  gyepi
+ *
  * Modified: bogofilter.c bogofilter.h main.c
  * 1. replace Judy with hash table (wordhash)
  * 2. ensure that databases are always locked in the same order.
@@ -196,6 +200,8 @@ int main(int argc, char **argv)
 	exit(2);
     }
 
+    setup_lists();
+
     strcpy(goodfile, directory);
     strcat(goodfile, GOODFILE);
     good_list.file = goodfile;
@@ -214,7 +220,7 @@ int main(int argc, char **argv)
       db_close(good_list.dbh);
       exit(2);
     }
-   
+    
     if (register_type == REG_NONE)
     {
 	double spamicity;

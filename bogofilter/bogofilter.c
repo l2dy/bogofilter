@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.23  2002/10/02 16:27:40  relson
+ * Initial inclusion of multiple wordlist code into bogofilter.
+ *
  * Revision 1.22  2002/10/02 16:12:53  relson
  * Added SIZEOF(array) macro for readability of for loops iterating over arrays, particularly the extrema array.
  *
@@ -137,6 +140,7 @@ I do the lexical analysis slightly differently, however.
 #include <stdlib.h>
 #include <db.h>
 #include <wordhash.h>
+#include <wordlists.h>
 #include "bogofilter.h"
 #include "datastore.h"
 
@@ -149,14 +153,13 @@ I do the lexical analysis slightly differently, however.
 #define SPAM_CUTOFF	0.9f		// if it's spammier than this...
 #define MAX_REPEATS	4		// cap on word frequency per message
 
-#define DEVIATION(n)	fabs((n) - 0.5f)	// deviation from average
+#define MAX_PROB	0.99f		// max probability value used
+#define MIN_PROB	0.01f		// min probability value used
+#define EVEN_ODDS	0.5f		// used for words we want to ignore
+#define DEVIATION(n)	fabs((n) - EVEN_ODDS)		// deviation from average
 
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
 #define min(x, y)	(((x) < (y)) ? (x) : (y))
-
-wordlist_t good_list	= {"good", NULL, 0, NULL};
-wordlist_t spam_list	= {"spam", NULL, 0, NULL};
-
 
 void *collect_words(int fd, int *msg_count, int *word_count)
 // tokenize input text and save words in wordhash_t hash table
@@ -174,7 +177,7 @@ void *collect_words(int fd, int *msg_count, int *word_count)
     tok = get_token();
   
     if (tok != FROM && tok != 0){
-      w = wordhash_insert(h, yytext, sizeof(wordprop_t));             
+      w = wordhash_insert(h, yytext, sizeof(wordprop_t));
       w->msg_freq++;
       w_count++;
     }
@@ -312,51 +315,124 @@ int compare_stats(const void *id1, const void *id2)
 	     ((d1->prob == d2->prob) && (strcmp(d1->key, d2->key) > 0)));
 }
 
+void populate_stats( bogostat_t *stats, char *text, double prob, int count )
+// if  the new word,prob pair is a better indicator.
+// add them to the stats structure, 
+{
+    int idx;
+    double dev;
+    double slotdev, hitdev;
+    discrim_t *pp, *hit;
+
+    // update the list of tokens with maximum deviation
+    dev = DEVIATION(prob);
+    hit = NULL;
+    hitdev=1;
+
+    for (idx = 0; idx < SIZEOF(stats->extrema); idx++)
+    {
+	pp = &stats->extrema[idx];
+	if (pp->key[0] == '\0' )
+	{
+	    hit = pp;
+	    break;
+	}
+	else
+	{
+	    slotdev=DEVIATION(pp->prob);
+
+	    if (dev>slotdev && hitdev>slotdev)
+	    {
+		hit=pp;
+		hitdev=slotdev;
+	    }
+	}
+    }
+    if (hit) 
+    { 
+	hit->prob = prob;
+	strncpy(hit->key, text, MAXWORDLEN);
+    }
+}
+
+void print_stats( bogostat_t *stats )
+{
+    int idx;
+    for (idx = 0; idx < SIZEOF(stats->extrema); idx++)
+    {
+	discrim_t *pp = &stats->extrema[idx];
+	printf("#  %2d  %f  %s\n", idx, pp->prob, pp->key);
+    }
+}
+
+typedef struct {
+    double good;
+    double bad;
+} wordprob_t;
+
+void wordprob_init(wordprob_t* stats)
+{
+    stats->good=stats->bad=0;
+}
+
+void wordprob_add(wordprob_t* stats, double newprob, int bad)
+{
+    if (bad)
+	stats->bad+=newprob;
+    else
+	stats->good+=newprob;
+}
+
+double wordprob_result(wordprob_t* stats)
+{
+    double prob = stats->bad/(stats->good + stats->bad);
+    return (prob);
+}
 
 double compute_probability( char *token )
 {
-    double prob, goodness, spamness;
-    
-    goodness = db_getvalue(good_list.dbh, token);
-    spamness = db_getvalue(spam_list.dbh, token);
+    wordlist_t* list;
+    int override=0;
+    int count;
+    int totalcount=0;
+    wordprob_t stats;
+    double prob;
 
-#ifdef NON_EQUIPROBABLE
-    // There is an argument that we should by by number of *words* here.
-    double	msg_prob = (spam_list.msgcount / good_list.msgcount);
-#endif // NON_EQUIPROBABLE
+    wordprob_init(&stats);
 
-    // Paul Graham's original formula:
-    // 
-    // (let ((g (* 2 (or (gethash word good) 0))) 
-    //      (b (or (gethash word spam) 0)))
-    //  (unless (< (+ g b) 5) 
-    //   (max .01 (min .99 
-    //  	    (double (/ 
-    // 		    (min 1 (/ b nspam)) 
-    // 		    (+ (min 1 (/ g ngood)) (min 1 (/ b nspam)))))))))
-    // This assumes that spam and non-spam are equiprobable.
-    goodness *= GOOD_BIAS;
-    if (goodness + spamness < MINIMUM_FREQ)
-#ifdef NON_EQUIPROBABLE
-	// In the absence of evidence, the probability that a new word
-	// will be spam is the historical ratio of spam words to
-	// nonspam words.
-	prob = msg_prob;
-#else
-	prob = UNKNOWN_WORD;
-#endif // NON_EQUIPROBABLE
-    else
+    for (list=first_list; list ; list=list->next)
     {
-	register double pb = min(1, (spamness / spam_list.msgcount));
-	register double pg = min(1, (goodness / good_list.msgcount));
+	if (verbose >= 2)
+	    printf("checking list %s for word '%s'.\n", list->name, token);
+	if (override > list->override) break;
+	count=db_getvalue(list->dbh, token);
+	if (count) {
+	    if (list->ignore)
+		return EVEN_ODDS;
+	    if (verbose >= 3)
+		printf("word '%s' found on list %s with count %d.\n", token, list->name, count);
+	    totalcount+=count*list->weight;
+	    override=list->override;
+	    prob = count;
+	    prob /= list->msgcount;
+	    prob *= list->weight;
+	    if (verbose >= 4)
+		printf("word '%s' has uncorrected spamicity %f.\n", token, prob);
 
-#ifdef NON_EQUIPROBABLE
-	prob = (pb * msg_prob) / ((pg * (1 - msg_prob)) + (pb * msg_prob));
-#else
-	prob = pb / (pg + pb);
-#endif // NON_EQUIPROBABLE
-	prob = min(prob, 0.99);
-	prob = max(prob, 0.01);
+	    prob = min(1.0, prob);
+
+	    if (verbose >= 4)
+		printf("word '%s' has spamicity %f.\n", token, prob);
+
+	    wordprob_add(&stats, prob, list->bad);
+	}
+    }
+    if (totalcount < MINIMUM_FREQ)
+	prob=UNKNOWN_WORD;
+    else {
+	prob=wordprob_result(&stats);
+	prob = min(MAX_PROB, prob);
+	prob = max(MIN_PROB, prob);
     }
     return prob;
 }
@@ -414,7 +490,7 @@ double compute_spamicity(bogostat_t *stats)
     if (verbose)
     {
 	// put the stats in ascending order by probability and alphabet
-	qsort(stats->extrema, KEEPERS, sizeof(discrim_t), compare_stats);
+	qsort(stats->extrema, SIZEOF(stats->extrema), sizeof(discrim_t), compare_stats);
     }
 
     // Bayes' theorem.
@@ -444,6 +520,7 @@ rc_t bogofilter(int fd, double *xss)
     wordhash_t  *wordhash;
     bogostat_t	*stats;
 
+//  tokenize input text and save words in a wordhash.
     wordhash = collect_words(fd, NULL, NULL);
 
     db_lock_reader(good_list.dbh);
