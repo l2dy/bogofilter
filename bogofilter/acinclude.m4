@@ -118,9 +118,13 @@ AC_DEFUN([AC_CHECK_DB],[
   AS_VAR_PUSHDEF([ac_tr_db], [ac_cv_db_libdb])dnl
   bogo_saved_LIBS="$LIBS"
   AC_CACHE_CHECK([for library providing db_create], ac_tr_db, [
-    for lib in $1 ; do
+    for lib in '' $1 ; do
       for i in '' $4 ; do
-	bogo_libadd="-l$lib $i"
+	if test "x$lib" != "x" ; then
+	  bogo_libadd="-l$lib $i"
+	else
+	  bogo_libadd="$i"
+	fi
 	LIBS="$LIBS $bogo_libadd"
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([
 #include <db.h>],[
