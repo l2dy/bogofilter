@@ -121,6 +121,11 @@
 
           <li><a href="#changed-tagging">Now that I've upgraded to
           0.15 why is bogofilter working less well?</a></li>
+
+          <li><a href="#remove-spam-or-nonspam">Having a combined
+          wordlist, how can I delete all the spam (or non-spam)
+          tokens?</a></li>
+
         </ul>
       </li>
     </ul>
@@ -867,6 +872,29 @@
     wordlist.  After a month or so of using '-H', the wordlist should
     contain plenty of the new "head:" entries and using '-H' should no
     longer be necessary.</p>
+
+    <hr>
+
+    <h2 id="remove-spam-or-nonspam">Having a combined wordlist, how can I
+    delete all the spam (or non-spam) tokens?</h2>
+
+    <p>Bogoutil lets you dump a wordlist and load the tokens into a new wordlist.  With the added use of awk and grep, counts can be zeroed and tokens with zero counts for both spam and non-spam can be deleted.</p>
+
+    <p>The following commands will delete the tokens from spam messages:
+
+<pre>    bogoutil -d wordlist.db | \
+    awk '{print $1 " " $2 " 0"}' | grep -v " 0 0" | \
+    bogoutil -l wordlist.new.db
+</pre>
+</p>
+
+    <p>The following commands will delete the tokens from non-spam messages:
+
+<pre>    bogoutil -d wordlist.db | \
+    awk '{print $1 " 0 " $3}' | grep -v " 0 0" | \
+    bogoutil -l wordlist.new.db
+</pre>
+</p>
 
     <hr>
 
