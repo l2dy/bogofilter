@@ -2,7 +2,7 @@
 
 SUBDIRS=. bogoutil
 
-TESTSCRIPTS=t.score1 t.score2 t.lock1 t.skel
+TESTSCRIPTS=t.score1 t.score2 t.integrity t.lock1 t.skel
 TESTS=$(TESTSCRIPTS)
 XFAIL_TESTS=t.skel
 

@@ -1,0 +1,10 @@
+#! /bin/sh
+
+. ${srcdir}/t.frame
+# test description here
+#
+# test below
+# remember to use ${srcdir}
+printf "test\0te\rst\r\n" >input
+../bogofilter -e -p <input >output
+head -1 output | cmp - input
