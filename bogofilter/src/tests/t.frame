@@ -149,6 +149,18 @@ if test "x$BF_CHECKTOOL" = x"glibc" ; then
     export MALLOC_CHECK_
 fi
 
+# use the Boehm-Demers-Weiser Garbage Collector in find-leak mode,
+# only supported on Linux:
+if test "x$BF_CHECKTOOL" = x"boehm-gc" ; then
+    for p in /usr/local/lib /usr/lib /lib ; do
+	if test -f $p/libgc.so ; then
+	    VAL="env LD_PRELOAD=$p/libgc.so GC_FIND_LEAK=1"
+	    export VAL
+	    break
+	fi
+    done
+fi
+
 # check valgrind:
 case `(valgrind --version) 2>/dev/null` in
     valgrind-2.[123].*) VALGRIND="valgrind --tool=memcheck" ;;
