@@ -11,6 +11,8 @@ set -e
 
 yday="-y 0"
 
+( setopt SH_WORD_SPLIT 2>/dev/null ) && setopt SH_WORD_SPLIT
+
 while : ; do
     tdir=${BF_TESTDIR=.}/checks.$$.`date +"%Y%m%dT%H%M%S"`
     mkdir $tdir && break
