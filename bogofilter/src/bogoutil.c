@@ -54,7 +54,7 @@ bool  onlyprint = false;
 
 /* Function Prototypes */
 
-static int process_arg(int option, const char *name, const char *arg);
+static int process_arg(int option, const char *name, const char *arg, priority_t);
 
 /* Function Definitions */
 
@@ -558,7 +558,7 @@ static int process_arglist(int argc, char **argv)
  	    break;
 
 	name = (option_index == 0) ? argv[this_option_optind] : long_options[option_index].name;
-	count += process_arg(option, name, optarg);
+	count += process_arg(option, name, optarg, PASS_1_CLI);
     }
 
     if (count != 1)
@@ -576,7 +576,7 @@ static int process_arglist(int argc, char **argv)
     return count;
 }
 
-static int process_arg(int option, const char *name, const char *val)
+static int process_arg(int option, const char *name, const char *val, priority_t precedence)
 {
     int count = 0;
 
@@ -590,6 +590,11 @@ static int process_arg(int option, const char *name, const char *val)
 	count += 1;
 	ds_file = val;
 	break;
+
+    case O_CONFIG_FILE:
+	read_config_file(val, false, false, precedence);
+	/*@fallthrough@*/
+	/* fall through to suppress reading config files */
 
     case 'C':
 	suppress_config_file = true;
@@ -772,7 +777,6 @@ static int process_arg(int option, const char *name, const char *val)
     /* ignore options that don't apply to bogoutil */
     case O_BLOCK_ON_SUBNETS:
     case O_CHARSET_DEFAULT:
-    case O_CONFIG_FILE:
     case O_NS_ESF:
     case O_SP_ESF:
     case O_HAM_CUTOFF:
