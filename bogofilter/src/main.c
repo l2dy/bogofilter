@@ -115,15 +115,28 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
      */
 
     passmode = PASS_MEM;
-    if (fseek(stdin, 0, SEEK_END) == 0) {
-	passmode = PASS_SEEK;
-	(void)rewind(stdin);
-    } else {
-	if (errno != ESPIPE && errno != ENOTTY) {
-	    fprintf(stderr, "cannot determine if input is seekable: %s", strerror(errno));
-	    exit(2);
+    if (passthrough) {
+	if (fseek(stdin, 0, SEEK_END) == 0) {
+	    passmode = PASS_SEEK;
+	    (void)rewind(stdin);
+	} else {
+	    if (errno != ESPIPE && errno != ENOTTY) {
+		fprintf(stderr, "cannot determine if input is seekable: %s",
+			strerror(errno));
+		exit(2);
+	    }
+	    textblocks = textblock_init();
 	}
-	textblocks = textblock_init();
+
+	if (DEBUG_GENERAL(2)) {
+	    const char *m;
+	    switch (passmode) {
+		case PASS_MEM:  m = "cache in memory"; break;
+		case PASS_SEEK: m = "rewind and reread file"; break;
+		default:        m = "unknown"; break;
+	    }
+	    fprintf(dbgout, "passthrough mode: %s\n", m);
+	}
     }
 
     mime_reset();
