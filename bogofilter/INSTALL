@@ -54,7 +54,7 @@ may remove or edit it.
 'configure.ac' if you want to change it or regenerate 'configure' using
 a newer version of 'autoconf'.
 
-The simplest way to compile this package is:
+The simplest way to build this package is:
 
   1. 'cd' to the directory containing the package's source code and type
      './configure' to configure the package for your system.  If you're
@@ -246,4 +246,14 @@ operates.
 
 'configure' also accepts some other, not widely useful, options.  Run
 'configure --help' for more details.
+
+make command
+============
+
+GNU make is recommended for building bogofilter because we know it
+works.  We cannot support less capable make commands.  If your non-GNU
+make command can successfully build bogofilter, that's great.  If you
+encounter problems, the right thing to do is install GNU make.  If
+your non-GNU make can't build bogofilter, we're sorry but you're on
+your own.
 

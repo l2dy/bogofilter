@@ -133,6 +133,9 @@
           <li><a href="#port-notes">How do I get Bogofilter working
           on Solaris, BSD, etc.?</a></li>
 
+          <li><a href="#make-notes">Can I use the make command on my
+          operating system?</a></li>
+
         </ul>
       </li>
     </ul>
@@ -899,6 +902,22 @@
     <p>See the file
     <a href="http://cvs.sourceforge.net/viewcvs.py/*checkout*/bogofilter/bogofilter/doc/programmer/README.hp-ux?rev=HEAD&amp;content-type=text/plain">doc/programmer/README.hp-ux</a>
     in the source distribution.</p>
+
+    <hr>
+
+    <h2 id="make-notes">Can I use the make command on my
+          operating system?</h2>
+
+    <para>Bogofilter has been successfully built on many operating
+    systems using GNU make and the native make commands.  However,
+    bogofilter's Makefile doesn't work with some make commands.</para>
+
+    <para>GNU make is recommended for building bogofilter because we
+    know it works.  We cannot support less capable make commands.  If
+    your non-GNU make command can successfully build bogofilter,
+    that's great.  If you encounter problems, the right thing to do is
+    install GNU make.  If your non-GNU make can't build bogofilter,
+    we're sorry but you're on your own.</para>
 
     <hr>
 
