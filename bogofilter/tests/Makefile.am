@@ -13,8 +13,6 @@ AM_CPPFLAGS = -I$(srcdir)/..
 AM_LDFLAGS = -L..
 LDADD = -lbogofilter
 
-t.integrity: dehex dumbhead
-
 TESTSCRIPTS=t.env \
 	    t.ignore_spam_header \
 	    t.integrity t.integrity2 \
