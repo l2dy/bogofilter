@@ -4,6 +4,17 @@
 
 $Id$
 
+0.14.xx	2003-07-xx
+
+	2003-07-25
+
+	* Revised lexer pattern to better recognize encoded tokens.
+
+	2003-07-24
+
+	* Implemented named exitcodes, with Unsure having its own
+	  value (2) and 3 for error.
+
 0.14.0.1 2003-07-23
 
 	* Fix problem with encoded text.

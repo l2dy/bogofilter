@@ -4,13 +4,24 @@
 
 $Id$
 
+0.14.xx	2003-07-xx
+
+	2003-07-25
+
+	* Revised lexer pattern to better recognize encoded tokens.
+
+	2003-07-24
+
+	* Implemented named exitcodes, with Unsure having its own
+	  value (2) and 3 for error.
+
 0.14.0.1 2003-07-23
 
 	* Fix problem with encoded text.
 	* Fix handling of absolute paths.
 	* Fix defect in base64 decoding that can cause segfaults.
 	* Bogoutil now complains before exiting when it can't open a
-          file.
+	  file.
 	* Updated bogominitrain.pl to work with combined wordlists.
 
 0.14.0	2003-07-22
@@ -31,7 +42,7 @@ $Id$
 	  (combined or separate).
 
 	* Bogofilter's -V output now includes algorithm and database
-          info.
+	  info.
 
 	2003-07-18
 
@@ -76,14 +87,14 @@ $Id$
 
 	* Update bogotune to version 0.3
 	* Added '-k size' option to bogofilter and bogoutil for
-          setting BerkeleyDB's cache size.
+	  setting BerkeleyDB's cache size.
 
 	2003-06-25
 
 	* For bogotune change processing of '-t' switch from pass 1 to
-          pass 2 so that it supercedes the config file.
+	  pass 2 so that it supercedes the config file.
 	* Man pages now use '\ ' when a non-breaking space is needed,
-          instead of 0xA0.
+	  instead of 0xA0.
 
 	2003-06-24
 
@@ -96,7 +107,7 @@ $Id$
 0.13.6.3 2003-06-18
 
 	* Minor code rewrites to speed up processing messages, mboxes,
-	  and msg-count files.  In particular, tuning/tuning.sh runs
+	  and msg-count files.	In particular, tuning/tuning.sh runs
 	  are approx 47% faster than before.
 	* Fixed several errors in tuning/tuning.sh and reformatted
 	  "Top 10 Results" output.
@@ -106,9 +117,9 @@ $Id$
 0.13.6.2 2003-06-05
 
 	* Don't allow square brackets in tokens.  Do allow dollar
-          signs in tokens in msg-count files.
+	  signs in tokens in msg-count files.
 	* Bogolexer now discards first 'From' token to match scoring
-          behavior of bogofilter.
+	  behavior of bogofilter.
 
 0.13.6.1 2003-06-05
 
@@ -117,7 +128,7 @@ $Id$
 0.13.6	2003-06-04
 
 	* Fix check for "^From " lines to work properly during base64
-          decoding. 
+	  decoding. 
 	* End html comment processing when a message header is found.
 	* Improve README for the tuning scripts and simplify them.
 
@@ -142,7 +153,7 @@ $Id$
 
 	* Changed default value of ROBS from 0.001 to 0.01
 	* Fixed options '-M' (mailbox mode) and '-p' (passthrough
-          mode) so they work properly together.
+	  mode) so they work properly together.
 	* Minor cleanups in bogofilter.cf.example
 	* Added db-3.2 and db-3.1 to list for AC_CHECK_DB in configure.ac
 
@@ -195,8 +206,8 @@ $Id$
 	* Changed parsing defaults to:
 
 	  -PI	ignore_case		(default is disabled)
-	  -Ph	header_line_markup 	(default is enabled)
-	  -Pt	tokenize_html_tags 	(default is enabled)
+	  -Ph	header_line_markup	(default is enabled)
+	  -Pt	tokenize_html_tags	(default is enabled)
 	
 	* Recognize a line of whitespace as ending the message header.
 
@@ -232,9 +243,9 @@ $Id$
 0.12.2	2003-04-30
 
 	* Corrected bulkmode problem processing messages without
-          "^From " lines.
+	  "^From " lines.
 	* Corrected alignment of wordprop_t which caused bus error
-          on risc.
+	  on risc.
 	* Added directory to 'Error creating directory' message.
 
 0.12.1	2003-04-25
@@ -273,12 +284,12 @@ $Id$
 	2003-04-16
 	* Miscellaneous refactoring in main.c
 
-0.11.2  - stable version
+0.11.2	- stable version
 
 	2003-04-13
 
 	* Added 'terse' option to bogofilter.cf for selecting format of
-          X-Bogosity line.
+	  X-Bogosity line.
 
 	2003-04-11
 
@@ -294,7 +305,7 @@ $Id$
 	2003-04-09
 
 	* Added protections against negative token counts to
-          bogoutil.c and database_db.c
+	  bogoutil.c and database_db.c
 	* Additional portability changes made to the regression tests.
 	* Enhanced '-m' option allows specifying robs value.
 
@@ -378,7 +389,7 @@ $Id$
 	 * Using standard html comment delimiters when discarding comments.
 	 * Fixed charset initialization flaw.
 
-0.11.0   2003-03-03
+0.11.0	 2003-03-03
 
 	* The Robinson-Fisher algorithm is now the default algorithm.
 	* The configuration file parser is stricter and more correct.
@@ -389,8 +400,8 @@ $Id$
 	* Bogofilter's -p (passthrough) mode will no longer read the entire
 	  mail into memory if the standard input is a seekable regular file.
 	* Bogofilter's '-l' option was changed and no longer allows an
-          argument.  Use the new '-L yourtag' option to provide a tag
-          for log messages.
+	  argument.  Use the new '-L yourtag' option to provide a tag
+	  for log messages.
 	* Database access efficiency changes.
 	* Improvements in html comment handling code.
 	* Internal cleanup of storage used in parsing messages and
@@ -402,14 +413,14 @@ $Id$
 	* Updated bogofilter and bogoutil man pages.
 	* Give command line options preference over config file options.
 
-0.10.3  2003-02-14
+0.10.3	2003-02-14
 
 	* Database access efficiency changes.
 	* Database properly closed at end of maintenance pass.
 	* Improvements in html comment handling code.
 	* Support option '-?'
 
-0.10.2   2003-02-01
+0.10.2	 2003-02-01
 
 	* Stable release of 0.10.1.5
 
@@ -421,13 +432,13 @@ $Id$
 0.10.1	 2003-01-22
 
 	* A variety of robustness and portability changes, code and
-          file cleanups and documentation updates.
+	  file cleanups and documentation updates.
 	* Multiple fixes for mime and html processing.
 	* Additional support and fixes for the various spam scoring
 	  algorithms.
 	** See file CHANGES-0.10 for details of the above items.
 
-0.10.0  2003-01-19
+0.10.0	2003-01-19
 
 	* Added mime processing capability, with decoding of base64,
 	  quoted-printable and uuencoded sections.  Ignores attachments when
@@ -446,7 +457,7 @@ $Id$
 	* Increase MAXTOKENLEN from 20 to 30, allowing more and longer tokens
 	  to be processed.
 	* New options for setting of default charset and replacing of non-ASCII
-	   characters.  New character set handling routines to provide charset 
+	   characters.	New character set handling routines to provide charset 
 	   specific token parsing.
 	* New error handling routine will output error messages to stderr and,
 	  if '-l' (logging) is enabled, to syslog.
@@ -480,7 +491,7 @@ $Id$
 0.9.1	2002-11-30
 
 	* New script contrib/bogopass allows processing of base64
-	  attachments.  This is a temporary solution until base64
+	  attachments.	This is a temporary solution until base64
 	  code can be built into bogofilter.
 	* New file README.Robinson describes the tunable parameters
 	  for the Robinson algorithm and what to do for best performance.
@@ -539,7 +550,7 @@ $Id$
 	  parsing a file to examine the tokens.
 	* Bogolexer has a new '-p' (passthrough) for printing tokens and
 	  bogoutil has a new '-p' (probability) for printing the
-	  probabilities of one or more tokens.  They can be connected
+	  probabilities of one or more tokens.	They can be connected
 	  via pipe to display the probabilities of all words in a message.
 	* DB 4.1 support has been fixed.
 	* Documentation updates.
@@ -645,7 +656,7 @@ $Id$
 	* Name changes: goodlist -> hamlist, badlist-> spamlist.
 	  This is a step towards supporting more categories.
 	* Autodaemon is gone.  Instead, the new implementation uses
-	  DBM.  Optimization with mmap will be in a future release.
+	  DBM.	Optimization with mmap will be in a future release.
 	* Speed-tuning of the bogofilter function.
 	* We're back to not ignoring HTML comments.
 
@@ -692,7 +703,7 @@ $Id$
 0.2: Tue Aug 20 06:49:42 EDT 2002
 
 	* Added mutt-1.4 interface patch
-	* Note:  Location of the base directory has changed.
+	* Note:	 Location of the base directory has changed.
 
 0.1: Mon 19 Aug 2002 03:07:31
 

@@ -2,8 +2,13 @@
 				BOGOFILTER NEWS
 			       =================
  
+2003-07-24
+ 
+* Implemented named exitcodes, with Unsure having its own value (2)
+  and 3 for error.
+ 
 0.14.0.1 2003-07-23
-
+ 
 * Fix problem with encoded text.
 * Fix handling of absolute paths.
 * Fix defect in base64 decoding that can cause segfaults.
@@ -22,12 +27,12 @@
   BOGOFILTER_DIR and use the appropriate wordlist mode (combined or 
   separate).
 * Added tdb (trivial database) support.
-
+ 
 * Decode encoded text in header lines.
-
+ 
 * Updated contrib/bogominitrain.pl prints more info and can save
   messages used in training.
-
+ 
 * Bogofilter's -V output now includes algorithm and database info.
 * Miscellaneous documentation updates.
 
