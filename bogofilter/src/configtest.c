@@ -22,8 +22,6 @@ AUTHOR:
 
 const char *progname = "configtest";
 
-double ham_cutoff;
-
 #ifndef	DEBUG_CONFIG
 #define DEBUG_CONFIG(level)	(verbose > level)
 #endif
