@@ -15,7 +15,7 @@ LDADD = -lbogofilter
 BUILT_SOURCES = t.config
 CLEANFILES= $(BUILT_SOURCES)
 
-t.config:
+t.config: Makefile
 	echo >$@ 'EXE_EXT="@EXE_EXT@"' || rm -f $@
 
 ENVIRON_TESTS = t.abort t.env t.bogodir
