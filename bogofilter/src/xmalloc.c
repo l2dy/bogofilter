@@ -11,7 +11,6 @@
 
 #include "config.h"
 
-#define	 BF_MALLOC
 #include "xmalloc.h"
 
 void *
@@ -30,4 +29,3 @@ xfree(void *ptr){
     if (ptr)
 	bf_free(ptr);
 }
-

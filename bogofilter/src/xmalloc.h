@@ -6,7 +6,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#ifdef	BF_MALLOC
 /* special defines for xmalloc.c, xcalloc.c, etc */
 #ifndef	ENABLE_MEMDEBUG
   #define bf_malloc  malloc
@@ -15,7 +14,6 @@
   #define bf_free    free
 #else
   #include "memdebug.h"
-#endif
 #endif
 
 /*@noreturn@*/

@@ -11,7 +11,6 @@
 
 #include "config.h"
 
-#define	 BF_MALLOC
 #include "xmalloc.h"
 
 void
