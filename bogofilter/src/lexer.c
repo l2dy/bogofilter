@@ -75,23 +75,23 @@ bool is_from(const byte *text, size_t leng)
 /* Check for lines wholly composed of printable characters as they can cause a scanner abort 
    "input buffer overflow, can't enlarge buffer because scanner uses REJECT"
 */
-static bool may_be_long_token(byte *buf, size_t count)
+static bool not_long_token(byte *buf, size_t count)
 {
     size_t i;
     for (i=0; i < count; i += 1) {
 	unsigned char c = (unsigned char)buf[i];
 	if ((iscntrl(c) || isspace(c) || ispunct(c)) && (c != '_'))
-	    return false;
+	    return true;
     }
-    return true;
+    return false;
 }
 
 static int lgetsl(buff_t *buff)
 {
-    int count = 0;
+    int count = buff_fgetsl(buff, fpin);
 
-    count += buff_fgetsl(buff, fpin);
-    yylineno += 1;
+    if (count > 0)
+	yylineno += 1;
 
     /* Special check for message separator.
        If found, handle it immediately.
@@ -148,11 +148,9 @@ static int skip_spam_header(buff_t *buff)
 
 static int get_decoded_line(buff_t *buff)
 {
-    int count;
     size_t used = buff->t.leng;
     byte *buf = buff->t.text + used;
-
-    count = yy_get_new_line(buff);
+    int count = yy_get_new_line(buff);
 
 /* unfolding:
 ** 	causes "^\tid" to be treated as continuation of previous line
@@ -259,8 +257,6 @@ int yyinput(byte *buf, size_t max_size)
     int i, count = 0;
     buff_t buff;
 
-    bool done = false;
-
     buff_init(&buff, buf, 0, max_size);
 
     /* After reading a line of text, check if it has special characters.
@@ -270,20 +266,20 @@ int yyinput(byte *buf, size_t max_size)
      * the flex lexer.
      */
 
-    while (!done) {
-	done = true;
-	count += get_decoded_line(&buff);
+    while (1) {
+	int cnt = get_decoded_line(&buff);
+	if (cnt == 0)
+	    break;
 
-	while (count > (MAXTOKENLEN * 1.5) && may_be_long_token(buff.t.text, count)) {
-	    done = false;
-	    if (count < MAXTOKENLEN * 2) 
-		break;
-	    else {
-		size_t shift = count - MAXTOKENLEN;
-		memcpy(buff.t.text, buff.t.text + shift, MAXTOKENLEN+D);
-		count = MAXTOKENLEN;
-		buff.t.leng = MAXTOKENLEN;
-	    }	
+	count += cnt;
+	if ((count <= (MAXTOKENLEN * 1.5)) || not_long_token(buff.t.text, count))
+	    break;
+
+	if (count >= MAXTOKENLEN * 2) {
+	    size_t shift = count - MAXTOKENLEN;
+	    memcpy(buff.t.text, buff.t.text + shift, MAXTOKENLEN+D);
+	    count = MAXTOKENLEN;
+	    buff.t.leng = MAXTOKENLEN;
 	}
     }
 
