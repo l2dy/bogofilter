@@ -247,7 +247,7 @@ tells <application>bogofilter</application> to read the config file named.
 
 <refsect1 id='environment'><title>ENVIRONMENT</title>
     <para>
-	Bogofilter will initialize its data base directory to&nbsp;
+	Bogofilter will initialize its data base directory to 
 	<filename>$BOGOFILTER_DIR</filename> if <envar>BOGOFILTER_DIR</envar> is set.
 	If it is not set, bogofilter
 	will use <filename>$HOME/.bogofilter</filename> instead. If neither
