@@ -18,11 +18,13 @@ Stefan Bellon <sbellon@sbellon.de>       2003
 #include "transaction.h"
 #include "xmalloc.h"
 
+/* list all kinds of operations that can be present in the scheduler queue */
 typedef enum ta_kind {
     TA_DELETE,
     TA_WRITE
 } ta_kind_t;
 
+/* scheduler queue item */
 typedef struct ta_iter {
     ta_kind_t kind;
     void *vhandle;
@@ -32,11 +34,13 @@ typedef struct ta_iter {
     struct ta_iter *prev;
 } ta_iter_t;
 
+/* scheduler queue anchor */
 struct ta_type {
     ta_iter_t *head;
     ta_iter_t *last;
 };
 
+/* open a transaction and return pointer to transaction anchor */
 ta_t *ta_init(void)
 {
     ta_t *ta = xmalloc(sizeof(*ta));
@@ -45,6 +49,7 @@ ta_t *ta_init(void)
     return ta;
 }
 
+/* write back contents of scheduler queue to database (internal function) */
 static int ta_flush(ta_t *ta, bool write)
 {
     int ret = TA_OK;
@@ -57,7 +62,7 @@ static int ta_flush(ta_t *ta, bool write)
                 ret |= ds_delete(iter->vhandle, iter->word);
                 break;
             case TA_WRITE:
-		set_date(iter->dsvval->date);
+		set_date(iter->dsvval->date); /* wrong date otherwise! */
                 ret |= ds_write(iter->vhandle, iter->word, iter->dsvval);
                 break;
             }
@@ -75,6 +80,7 @@ static int ta_flush(ta_t *ta, bool write)
     return ret;
 }
 
+/* write back contents of scheduler queue to database and end transaction */
 int ta_commit(ta_t *ta)
 {
     if (ta == NULL)
@@ -82,6 +88,7 @@ int ta_commit(ta_t *ta)
     return ta_flush(ta, true);
 }
 
+/* discard contents of scheduler queue and end transaction */
 int ta_rollback(ta_t *ta)
 {
     if (ta == NULL)
@@ -90,6 +97,7 @@ int ta_rollback(ta_t *ta)
     return ta_flush(ta, false);
 }
 
+/* add operation to scheduler queue (internal function) */
 static void ta_add(ta_t *ta, ta_kind_t ta_kind, void *vhandle,
                    const word_t *word, dsv_t *dsvval)
 {
@@ -121,6 +129,7 @@ static void ta_add(ta_t *ta, ta_kind_t ta_kind, void *vhandle,
     ta->last = item;
 }
 
+/* add delete operation to scheduler queue */
 int ta_delete(ta_t *ta, void *vhandle, const word_t *word)
 {
     if (ta == NULL)
@@ -131,6 +140,7 @@ int ta_delete(ta_t *ta, void *vhandle, const word_t *word)
     return TA_OK;
 }
 
+/* add write operation to scheduler queue */
 int ta_write(ta_t *ta, void *vhandle, const word_t *word, dsv_t *val)
 {
     if (ta == NULL)
@@ -141,6 +151,7 @@ int ta_write(ta_t *ta, void *vhandle, const word_t *word, dsv_t *val)
     return TA_OK;
 }
 
+/* read from database, first looking whether transaction updated record */
 int ta_read(ta_t *ta, void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 {
     ta_iter_t *iter;
