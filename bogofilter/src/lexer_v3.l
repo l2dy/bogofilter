@@ -280,7 +280,7 @@ static void reorder_html(void)
     yycopy[yyleng] = '\0';			/* for debugging */
 
     for(tmp = yycopy+yyleng-1 ; tmp >= yycopy; tmp--) 
-	unput(*tmp);
+	yyunput(*tmp, yytext);
     xfree(yycopy);
 }
 
