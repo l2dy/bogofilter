@@ -504,6 +504,13 @@ void *db_open(void *vhandle,
 	handle->open_mode = open_mode;
 	db_file = dsm->dsm_database_name(handle->name.filename);
 
+#ifdef	ENABLE_MEMDEBUG	
+	if (!fTransaction)
+	    dbp->set_alloc(dbp, md_malloc, md_realloc, md_free);
+	else
+	    dbe->set_alloc(dbe, md_malloc, md_realloc, md_free);
+#endif
+
 retry_db_open:
 	handle->created = false;
 
