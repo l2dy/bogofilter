@@ -83,6 +83,7 @@ version_sources= \
 	collect.h collect.c \
 	configfile.h configfile.c \
 	datastore.h datastore.c \
+	datastore_dbcommon.h \
 	db_lock.h db_lock.c \
 	debug.h debug.c \
 	error.h error.c \
