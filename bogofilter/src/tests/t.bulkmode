@@ -28,14 +28,10 @@ map_rc()
     )
 }
 
-mth="f"
-
-CFG="-c ${TMPDIR}/cfg.$mth -y 0"
-
 if [   -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
 mkdir -p $BOGOFILTER_DIR
-$BOGOFILTER -$mth $CFG -s < ${SYSTEST}/inputs/spam.mbx
-$BOGOFILTER -$mth $CFG -n < ${SYSTEST}/inputs/good.mbx
+$BOGOFILTER -C -s < ${SYSTEST}/inputs/spam.mbx
+$BOGOFILTER -C -n < ${SYSTEST}/inputs/good.mbx
 #for f in $BOGOFILTER_DIR/*.${DB_EXT} ; do
 #    o=`echo $f | sed s@.${DB_EXT}@.txt@`
 #    $BOGOUTIL -d $f > $o

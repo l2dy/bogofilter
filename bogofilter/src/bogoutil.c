@@ -73,7 +73,7 @@ static int ds_dump_hook(word_t *key, dsv_t *data,
     return ferror(stdout) ? 1 : 0;
 }
 
-static int dump_file(char *ds_file)
+static int dump_wordlist(char *ds_file)
 {
     int rc;
 
@@ -82,8 +82,11 @@ static int dump_file(char *ds_file)
     set_bogohome(ds_file);
     rc = ds_oper(ds_file, DB_READ, ds_dump_hook, NULL);
 
-    if (verbose)
-	fprintf(dbgout, "%d tokens dumped\n", token_count);
+    if (rc)
+	fprintf(stderr, "error dumping tokens!\n");
+    else
+	if (verbose)
+	    fprintf(dbgout, "%d tokens dumped\n", token_count);
 
     return rc;
 }
@@ -99,7 +102,7 @@ static byte *spanword(byte *t)
     return t;
 }
 
-static int load_file(const char *ds_file)
+static int load_wordlist(const char *ds_file)
 {
     void *dsh;
     byte buf[BUFSIZE];
@@ -120,6 +123,8 @@ static int load_file(const char *ds_file)
 	return EX_ERROR;
 
     memset(buf, '\0', BUFSIZE);
+
+    ds_txn_begin(dsh);
 
     for (;;) {
 	dsv_t data;
@@ -189,6 +194,15 @@ static int load_file(const char *ds_file)
 	    ds_write(dsh, token, &data);
 	}
 	word_free(token);
+    }
+
+    switch (ds_txn_commit(dsh)) {
+	case DST_FAILURE:
+	case DST_TEMPFAIL:
+	    fprintf(stderr, "commit failed\n");
+	    exit(EXIT_FAILURE);
+	case DST_OK:
+	    break;
     }
 
     ds_close(dsh, false);
@@ -282,6 +296,11 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     }
 
     printf(head_format, "", "spam", "good", "  Fisher");
+    if (DST_OK != ds_txn_begin(dsh)) {
+	ds_close(dsh, false);
+	fprintf(stderr, "Cannot begin transaction.\n");
+	return EX_ERROR;
+    }
 
     while (argc >= 0)
     {
@@ -320,6 +339,11 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	    word_free(token);
     }
 
+    if (DST_OK != ds_txn_commit(dsh)) {
+	ds_close(dsh, false);
+	fprintf(stderr, "Cannot commit transaction.\n");
+	return EX_ERROR;
+    }
     ds_close(dsh, false);
     ds_cleanup();
 
@@ -331,6 +355,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 static int get_robx(char *path)
 {
     double rx;
+    int ret = 0;
 
     rx = compute_robinson_x(path);
 
@@ -353,16 +378,20 @@ static int get_robx(char *path)
 	if (dsh == NULL)
 	    return EX_ERROR;
 
-	val.goodcount = 0;
-	val.spamcount = (uint32_t) (rx * 1000000);
-	ds_write(dsh, word_robx, &val);
+	if (DST_OK == ds_txn_begin(dsh)) {
+	    val.goodcount = 0;
+	    val.spamcount = (uint32_t) (rx * 1000000);
+	    ret = ds_write(dsh, word_robx, &val);
+	    if (DST_OK != ds_txn_commit(dsh))
+		ret = 1;
+	}
 	ds_close(dsh, false);
 	ds_cleanup();
 
 	word_free(word_robx);
     }
 
-    return EX_OK;
+    return ret ? EX_ERROR : EX_OK;
 }
 
 static void print_version(void)
@@ -394,9 +423,11 @@ static void help(void)
 	    "\t-h\tPrint this message.\n"
 	    "\t-d file\tDump data from file to stdout.\n"
 	    "\t-l file\tLoad data from stdin into file.\n"
+	    "\t-u file\tUpgrade wordlist version.\n"
 	    "\t-w dir\tDisplay counts for words from stdin.\n"
 	    "\t-p dir\tDisplay word counts and probabilities.\n"
-	    "\t-m\tEnable maintenance works (expiring tokens).\n"
+	    "\t-m\tEnable maintenance works (expiring tokens).\n");
+    fprintf(stderr,
 	    "\t-v\tOutput debug messages.\n"
 	    "\t-H dir\tDisplay histogram and statistics for the wordlist.\n"
 	    "\t"    "\tUse -v  to exclude hapaxes."
@@ -427,7 +458,7 @@ static bool  prob = false;
 typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST } cmd_t;
 static cmd_t flag = M_NONE;
 
-#define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:vVw:x:X:y:"
+#define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:u:vVw:x:X:y:"
 
 static int process_arglist(int argc, char **argv)
 {
@@ -475,6 +506,13 @@ static int process_arglist(int argc, char **argv)
 	    onlyprint = true;
 	case 'R':
 	    flag = M_ROBX;
+	    count += 1;
+	    ds_file = (char *) optarg;
+	    break;
+
+	case 'u':
+	    upgrade_wordlist_version = true;
+	    flag = M_MAINTAIN;
 	    count += 1;
 	    ds_file = (char *) optarg;
 	    break;
@@ -599,9 +637,9 @@ int main(int argc, char *argv[])
 
     switch(flag) {
 	case M_DUMP:
-	    return dump_file(ds_file);
+	    return dump_wordlist(ds_file);
 	case M_LOAD:
-	    return load_file(ds_file);
+	    return load_wordlist(ds_file);
 	case M_MAINTAIN:
 	    maintain = true;
 	    set_bogohome(ds_file);

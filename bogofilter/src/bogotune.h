@@ -17,10 +17,16 @@ typedef struct result_s {
     uint rsi;
     uint mdi;
     uint rxi;
+    uint spi;
+    uint nsi;
+
     double rs;
     double md;
     double rx;
     double co;
+    double sp_exp;
+    double ns_exp;
+
     uint fp;
     uint fn;
 } result_t;

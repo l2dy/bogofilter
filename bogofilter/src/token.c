@@ -39,6 +39,7 @@ static word_t *w_rtrn = NULL;	/* Return-Path: */
 static word_t *w_subj = NULL;	/* Subject:     */
 static word_t *w_recv = NULL;	/* Received:    */
 static word_t *w_head = NULL;	/* Header:      */
+static word_t *w_mime = NULL;	/* Mime:        */
 
 /* Global Variables */
 
@@ -171,7 +172,7 @@ token_t get_token(void)
 	case IPADDR:
 	    if (block_on_subnets)
 	    {
-		const byte *prefix = (const byte *)"url:";
+		const byte *prefix = (wordlist_version >= IP_PREFIX) ? (const byte *)"ip:" : (const byte *)"url:";
 		size_t plen = strlen((const char *)prefix);
 		int q1, q2, q3, q4;
 		/*
@@ -197,6 +198,11 @@ token_t get_token(void)
 		yylval = ipsave;
 		save_class = IPADDR;
 		return (cls);
+	    }
+	    if (token_prefix != NULL) {
+		word_t *o = yylval;
+		yylval = word_concat(token_prefix, yylval);
+		word_free(o);
 	    }
 	    break;
 
@@ -270,6 +276,7 @@ void token_init(void)
 	w_subj = word_new((const byte *) "subj:", 0);	/* Subject:     */
 	w_recv = word_new((const byte *) "rcvd:", 0);	/* Received:    */
 	w_head = word_new((const byte *) "head:", 0);	/* Header:      */
+	w_mime = word_new((const byte *) "mime:", 0);	/* Mime:        */
     }
 
     return;
@@ -300,7 +307,10 @@ void set_tag(const char *text)
 	token_prefix = w_from;		/* From: */
 	break;
     case 'h':
-	token_prefix = w_head;		/* Header: */
+	if (msg_state == msg_state->parent)
+	    token_prefix = w_head;	/* Header: */
+	else
+	    token_prefix = w_mime;	/* Mime:   */
 	break;
     case 'r':
 	if (tolower(text[2]) == 't')
@@ -333,4 +343,5 @@ void token_cleanup()
     WFREE(w_subj);
     WFREE(w_recv);
     WFREE(w_head);
+    WFREE(w_mime);
 }
