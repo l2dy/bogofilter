@@ -23,6 +23,7 @@ AUTHOR:
 #include "error.h"
 #include "maint.h"
 #include "xmalloc.h"
+#include "xstrdup.h"
 
 YYYYMMDD today;			/* date as YYYYMMDD */
 uint32_t thresh_count = 0;
@@ -98,12 +99,18 @@ bool keep_size(size_t size)
     }
 }
 
-void do_replace_nonascii_characters(register byte *str, register size_t len) {
+bool do_replace_nonascii_characters(register byte *str, register size_t len)
+{
+    bool change = false;
     assert(str != NULL);
     while(len--) {
-	if (*str & 0x80) *str = '?';
+	if (*str & 0x80) {
+	    *str = '?';
+	    change = true;
+	}
 	str++;
     }
+    return change;
 }
 
 void maintain_wordlists(void)
@@ -137,8 +144,7 @@ int maintain_wordlist_file(const char *db_file)
 static int maintain_hook(word_t *key, word_t *data,
 			 void *userdata /*@unused@*/)
 {
-    static word_t *x = NULL;
-    static uint32_t x_size = MAXTOKENLEN+1;
+    word_t w;
     dbv_t val;
 
     if (data->leng > sizeof(val)) {
@@ -146,28 +152,34 @@ static int maintain_hook(word_t *key, word_t *data,
 	exit(2);
     }
 
+    w.leng = key->leng;
+    w.text = key->text;
+
     memcpy(&val, data->text, data->leng);
 
-    if (replace_nonascii_characters)
-	do_replace_nonascii_characters(key->text, key->leng);
-
     if (!keep_count(val.count) || !keep_date(val.date) || !keep_size(key->leng)) {
-	if (x == NULL || key->leng + 1 > x_size) {
-	    word_free(x);
-	    x_size = max(x_size, key->leng + 1);
-	    x = word_new(NULL, x_size);
-	}
-
-	x->leng = key->leng;
-	memcpy(x->text, key->text, key->leng);
-	x->text[key->leng] = '\0';
-
-	db_delete(userdata, x);
 
 	if (DEBUG_DATABASE(0)) {
 	    fputs("deleting ", dbgout);
-	    word_puts(x, 0, dbgout);
+	    word_puts(&w, 0, dbgout);
 	    fputc('\n', dbgout);
+	}
+    }
+    else {
+	if (replace_nonascii_characters)
+	{
+	    byte *tmp = xstrdup(key->text);
+	    unsigned long count = val.count;
+	    if (do_replace_nonascii_characters(tmp, key->leng))
+	    {
+		db_delete(userdata, key);
+		w.text = tmp;
+		w.leng = key->leng;
+		count += db_getvalue(userdata, &w);
+		set_date(val.date);
+		db_setvalue(userdata, &w, count);
+	    }
+	    xfree(tmp);
 	}
     }
     return 0;
