@@ -109,7 +109,8 @@
 	    Option <option>-n</option> stands for "replace non-ascii characters".  
 	    It will replace characters with the high bit (0x80) by question marks.  
 	    This can be useful if a word list has lots of unreadable tokens, for example from asian spam.
-	    The "bad" characters will be converted to question marks and matching tokens will be combined.
+	    The "bad" characters will be converted to question marks and matching tokens will be combined
+	    when used with '-m' or '-l', but not with '-d'.
 	</para>
 	<para>
 	    Option <option>-a age</option> indicates an acceptable token age, with older ones being discarded.  
