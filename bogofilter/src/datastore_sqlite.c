@@ -238,7 +238,7 @@ void *db_open(void *dummyenv, const char *dbpath,
 		{
 		    u_int32_t p[2] = { 0x01020304, 0x01020304 };
 		    int rc2;
-		    k.data = strdup(ENDIAN32);
+		    k.data = xstrdup(ENDIAN32);
 		    k.leng = strlen(k.data);
 		    v.data = p;
 		    v.leng = sizeof(p);
@@ -337,7 +337,7 @@ static int sqlfexec(sqlite3 *db, const char *cmd, ...)
     buf = sqlite3_vmprintf(cmd, ap);
     va_end(ap);
     rc = sqlexec(db, buf);
-    xfree(buf);
+    free(buf);
     return rc;
 }
 
