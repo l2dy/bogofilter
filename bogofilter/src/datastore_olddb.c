@@ -85,8 +85,8 @@ static const char *resolveopenflags(u_int32_t flags) {
 
 /** wrapper for Berkeley DB's DB->open() method which has changed API and
  * semantics -- this should deal with 3.2, 3.3, 4.0, 4.1 and 4.2. */
-static int DB_OPEN(DB *db, const char *file,
-	const char *database, DBTYPE type, u_int32_t flags, int mode)
+static int DB_OPEN(DB *db, const char *db_path,
+	const char *db_file, DBTYPE type, u_int32_t flags, int mode)
 {
     int ret;
 
@@ -94,13 +94,13 @@ static int DB_OPEN(DB *db, const char *file,
 #if DB_AT_LEAST(4,1)
     	    0,	/* TXN handle - we use autocommit instead */
 #endif
-	    file, database, type, flags, mode);
+	    db_path, db_file, type, flags, mode);
 
     if (DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB_OPEN"))
 	fprintf(dbgout, "[pid %lu] DB->open(db=%p, file=%s, database=%s, "
 		"type=%x, flags=%#lx=%s, mode=%#o) -> %d %s\n",
-		(unsigned long)getpid(), (void *)db, file,
-		database ? database : "NIL", type, (unsigned long)flags,
+		(unsigned long)getpid(), (void *)db, db_path,
+		db_file ? db_file : "NIL", type, (unsigned long)flags,
 		resolveopenflags(flags), mode, ret, db_strerror(ret));
 
     return ret;
@@ -120,7 +120,7 @@ static int db_lock(int fd, int cmd, short int type)
 
 
 /** "constructor" - allocate our handle and initialize its contents */
-static dbh_t *handle_init(const char *path, const char *name)
+static dbh_t *handle_init(const char *db_path, const char *db_name)
 {
     dbh_t *handle;
 
@@ -129,8 +129,8 @@ static dbh_t *handle_init(const char *path, const char *name)
 
     handle->fd   = -1;			/* for lock */
 
-    handle->path = xstrdup(path);
-    handle->name = build_path( path, name);
+    handle->path = xstrdup(db_path);
+    handle->name = build_path( db_path, db_name);
 
     handle->locked     = false;
     handle->is_swapped = false;
@@ -175,14 +175,14 @@ bool db_created(void *vhandle)
 static void check_db_version(void)
 {
     int maj, min;
-    static int version_ok;
+    static bool version_ok = false;
 
 #if DB_AT_MOST(3,0)
 #error "Berkeley DB 3.0 is not supported"
 #endif
 
     if (!version_ok) {
-	version_ok = 1;
+	version_ok = true;
 	(void)db_version(&maj, &min, NULL);
 	if (DEBUG_DATABASE(1))
 	    fprintf(dbgout, "db_version: Header version %d.%d, library version %d.%d\n",
@@ -676,40 +676,40 @@ const char *db_str_err(int e) {
     return db_strerror(e);
 }
 
-ex_t db_verify(const char *file) {
-    DB *dbp;
+ex_t db_verify(const char *db_file) {
+    DB *db;
     int e;
-    int fd = open(file, O_RDWR);
+    int fd = open(db_file, O_RDWR);
 
     if (fd < 0) {
-	print_error(__FILE__, __LINE__, "db_verify: cannot open %s: %s", file,
+	print_error(__FILE__, __LINE__, "db_verify: cannot open %s: %s", db_file,
 	       strerror(errno));
 	exit(EX_ERROR);
     }
 
     if (db_lock(fd, F_SETLKW, (short int)F_WRLCK)) {
 	print_error(__FILE__, __LINE__,
-		"db_verify: cannot lock %s for exclusive use: %s", file,
+		"db_verify: cannot lock %s for exclusive use: %s", db_file,
 		strerror(errno));
 	close(fd);
 	exit(EX_ERROR);
     }
 
-    if ((e = db_create (&dbp, NULL, 0)) != 0) {
+    if ((e = db_create (&db, NULL, 0)) != 0) {
 	print_error(__FILE__, __LINE__, "db_create, err: %s",
 		db_strerror(e));
 	close(fd);
 	exit(EX_ERROR);
     }
 
-    e = dbp->verify(dbp, file, NULL, NULL, 0);
+    e = db->verify(db, db_file, NULL, NULL, 0);
     if (e) {
 	print_error(__FILE__, __LINE__, "database %s does not verify: %s",
-		file, db_strerror(e));
+		db_file, db_strerror(e));
 	exit(EX_ERROR);
     } else {
 	if (verbose)
-	    printf("%s OK.\n", file);
+	    printf("%s OK.\n", db_file);
     }
     close(fd);
     return EX_OK;

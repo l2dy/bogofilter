@@ -1341,19 +1341,19 @@ ex_t dbe_purgelogs(const char *directory) {
     return dbe_common_close(env, directory);
 }
 
-ex_t db_verify(const char *dbfile) {
+ex_t db_verify(const char *db_file) {
     char *dir;
     char *tmp;
     DB_ENV *env;
     DB *db;
     int e;
 
-    if (!is_file(dbfile)) {
-	print_error(__FILE__, __LINE__, "\"%s\" is not a file.", dbfile);
+    if (!is_file(db_file)) {
+	print_error(__FILE__, __LINE__, "\"%s\" is not a file.", db_file);
 	return EX_ERROR;
     }
 
-    dir = xstrdup(dbfile);
+    dir = xstrdup(db_file);
     tmp = strrchr(dir, DIRSEP_C);
     if (!tmp)
 	free(dir), dir = xstrdup(CURDIR_S);
@@ -1370,17 +1370,17 @@ ex_t db_verify(const char *dbfile) {
 	free(dir);
 	exit(EX_ERROR);
     }
-    e = db->verify(db, dbfile, NULL, NULL, 0);
+    e = db->verify(db, db_file, NULL, NULL, 0);
     if (e) {
 	print_error(__FILE__, __LINE__, "database %s does not verify: %s",
-		dbfile, db_strerror(e));
+		db_file, db_strerror(e));
 	free(dir);
 	exit(EX_ERROR);
     }
     e = dbe_common_close(env, dir);
     free(dir);
     if (e == 0 && verbose)
-	printf("%s OK.\n", dbfile);
+	printf("%s OK.\n", db_file);
     return e;
 }
 
