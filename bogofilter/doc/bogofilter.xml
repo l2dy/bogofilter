@@ -41,6 +41,7 @@
     <arg choice='opt'>-u</arg>
     <arg choice='opt'>-2</arg>
     <arg choice='opt'>-3</arg>
+    <arg choice='opt'>-H</arg>
     <arg choice='opt'>-M</arg>
     <arg choice='opt'>-b</arg>
     <arg choice='opt'>-B <replaceable>filename ...</replaceable></arg>
@@ -236,6 +237,20 @@ a wordlist is always updated.</para>
 <application>bogofilter</application> to use tristate classification for the message,
 i.e. classify the message as ham, spam, or unsure.  This option is effective only if
 ham_cutoff is non-zero.</para>
+
+<para>The <option>-H</option> option tells
+<application>bogofilter</application> to combine scores for "head:"
+tokens.  Since version 0.15.4 bogofilter has been adding special tags
+to ALL header tokens.  Prior to 0.15.4, only tokens in "To:", "From:",
+"Return-Path:", and "Subject:" lines were given special prefixes.  Now
+the rest of the header tokens are given a "head:" prefix.  When using
+an old wordlist, this results in many tokens not being recognized.  To
+compensate for this, using the <option>-H</option> option causes
+<application>bogofilter</application> to retrieve the counts for the
+prefixed token and for the non-prefixed token and then combine the
+counts.  This option is useful if you're using an old wordlist.  If
+you retrained <application>bogofilter</application> bogofilter using
+0.15.4 there is no need to use this option.</para>
 
 <para>The <option>-M</option> option tells
 <application>bogofilter</application> to process its input as a mbox formatted file.  If the
