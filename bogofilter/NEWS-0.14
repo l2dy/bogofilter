@@ -1,9 +1,11 @@
 			       =================
 				BOGOFILTER NEWS
 			       =================
+ 
+2003-08-24
 
 * Implemented a new, more robust, mail reading module that knows how to
-  read a Maildir.
+  split a mbox into messages and read Maildirs.
 * 64-bit printf files for %*s string formatting.
 * Compiles with TDB again.
 
