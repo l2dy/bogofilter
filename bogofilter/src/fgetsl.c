@@ -18,7 +18,7 @@ int fgetsl(char *buf, int max_size, /*@null@*/ FILE *in)
     return xfgetsl(buf, max_size, in, 0);
 }
 
-int xfgetsl(char *buf, int max_size, FILE *in, int no_nul_terminate)
+int xfgetsl(char *buf, int max_size, FILE *in, bool no_nul_terminate)
 {
     int c = 0;
     char *cp = buf;

@@ -104,7 +104,7 @@ static int read_seek(char **out, void *in) {
     b += i;
     cap -= i;
 
-    s = xfgetsl(b, cap, inf, 1);
+    s = xfgetsl(b, cap, inf, true);
     if (s == EOF) {
        if (i) s = i;
     } else {
