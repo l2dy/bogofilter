@@ -204,6 +204,13 @@ token_t get_token(void)
 	    break;
     }
 
+    /* Remove trailing blanks */
+    /* From "From ", for example */
+    while (yyleng > 1 && yytext[yyleng-1] == ' ') {
+	yyleng -= 1;
+	yytext[yyleng] = '\0';
+    }
+
     /* Need separate loop so lexer can see "From", "Date", etc */
     for (cp = (unsigned char *)yytext; *cp; cp++)
 	*cp = casefold_table[(unsigned char)*cp];
