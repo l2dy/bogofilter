@@ -4126,12 +4126,12 @@ List-Subscribe: <mailto:sympa@linux-mandrake.com?subject=subscribe%20expert>
 List-Unsubscribe: <mailto:sympa@linux-mandrake.com?subject=unsubscribe%20expert>
 List-Post: <mailto:expert@linux-mandrake.com>
 List-Owner: <mailto:expert-request@linux-mandrake.com>
-Content-type: multipart/mixed; boundary="----------=_1036209537-28558-591"
+Content-type: multipart/mixed; boundary="----------=_1036209537 28558 591"
 Sender: expert-owner@linux-mandrake.com
 
 This is a multi-part message in MIME format...
 
-------------=_1036209537-28558-591
+------------=_1036209537 28558 591
 Content-Type: text/plain; charset="us-ascii"
 
 Try joe, which I believe is still released with Mandrake.  It's comparable
@@ -4188,7 +4188,7 @@ At 09:09 AM 11/1/2002 -0500, you wrote:
 >
 
 
-------------=_1036209537-28558-591
+------------=_1036209537 28558 591
 Content-Type: text/plain; name="message.footer"
 Content-Disposition: inline; filename="message.footer"
 Content-Transfer-Encoding: 8bit
@@ -4196,7 +4196,7 @@ Content-Transfer-Encoding: 8bit
 Want to buy your Pack or Services from MandrakeSoft? 
 Go to http://www.mandrakestore.com
 
-------------=_1036209537-28558-591--
+------------=_1036209537 28558 591--
 
 From mdlug-return-6207-smythe=example.com@mdlug.org  Fri Nov  1 23:39:26 2002
 Return-Path: <mdlug-return-6207-smythe=example.com@mdlug.org>
@@ -4274,25 +4274,3 @@ Mail::Audit is a tool that any spam-combatant should be aware of.
 poisoned coffee, n.:
 	Grounds for divorce.
 
-From root Tue Jul 15 15:57:14 2003
-Subject: simple test with spaced boundary (conforming to RFC-2046)
-MIME-Version: 1.0
-Content-type: multipart/mixed; boundary="simple boundary"
-
-This is the preamble.  It is to be ignored, though it
-is a handy place for composition agents to include an
-explanatory note to non-MIME conformant readers.
-
---simple boundary
-
-This is implicitly typed plain US-ASCII text.
-It does NOT end with a linebreak.
---simple boundary
-Content-type: text/plain; charset=us-ascii
-
-This is explicitly typed plain US-ASCII text.
-It DOES end with a linebreak.
-
---simple boundary--
-
-This is the epilogue.  It is also to be ignored.
