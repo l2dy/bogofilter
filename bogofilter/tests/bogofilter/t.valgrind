@@ -13,8 +13,8 @@ NODB=1 . ${srcdir}/../t.frame
 
 exec 3>$TMPDIR/vg.out
 VALGRIND="valgrind -q --num-callers=20 --logfile-fd=3"
-( $VALGRIND true 2>/dev/null) || exit 77
-( $VALGRIND false 2>/dev/null) && exit 77
+( $VALGRIND true ) 2>/dev/null || exit 77
+( $VALGRIND false ) 2>/dev/null && exit 77
 
 verbose=0
 if [ "$1" = "-v" ]; then
