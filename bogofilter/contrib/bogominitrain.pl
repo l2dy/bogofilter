@@ -8,11 +8,11 @@ my $commandlineoptions=($ARGV[0]=~/^-(?=[^f]*f?[^f]*$)(?=[^n]*n?[^n]*$)(?=[^s]*s
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.32
+bogominitrain.pl version 1.33
   requires bogofilter 0.14.5 or later
 
 Usage:
-  bogominitrain.pl [-[f][v[v]][s]] <database-directory> <ham-mboxes>\\ 
+  bogominitrain.pl [-[f][v[v]][s]] <database-directory> <ham-mboxes>\\
     <spam-mboxes> [bogofilter-options]
 
   database-directory is the directory containing your database files.
@@ -110,15 +110,15 @@ do { # Start force loop
             system("$bogofilter -n <$temp");
             $hamadd++;
             $trainedham{$hamcount}++;
-            print "Training  ham message $hamcount",
+            print "$sh -- Training ham message $hamcount",
                   $trainedham{$hamcount}>1&&" ($trainedham{$hamcount})",
-                  ": $sh\n" if ($verbose);
+                  ".\n" if ($verbose);
             if ($safe) {
               open (TEMP, ">>$safeham.$runs") || die "Cannot write to $safeham.$runs: $!";
               print TEMP $mail;
               close (TEMP);
             }
-          } else {print "Not training  ham message $hamcount: $sh\n" if ($vverbose);}
+          } else {print "$sh -- Not training ham message $hamcount.\n" if ($vverbose);}
           unlink ($temp);
         }
       }
@@ -142,15 +142,15 @@ do { # Start force loop
             system("$bogofilter -s <$temp");
             $spamadd++;
             $trainedspam{$spamcount}++;
-            print "Training spam message $spamcount",
+            print "$sh -- Training spam message $spamcount",
                   $trainedspam{$spamcount}>1&&" ($trainedspam{$spamcount})",
-                  ": $sh\n" if ($verbose);
+                  ".\n" if ($verbose);
             if ($safe) {
               open (TEMP, ">>$safespam.$runs") || die "Cannot write to $safespam.$runs: $!";
               print TEMP $mail;
               close (TEMP);
             }
-          } else {print "Not training spam message $spamcount: $sh\n" if ($vverbose);}
+          } else {print "$sh -- Not training spam message $spamcount.\n" if ($vverbose);}
           unlink ($temp);
         }
       }
