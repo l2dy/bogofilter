@@ -19,6 +19,7 @@
 #endif
 
 /*@noreturn@*/
+/** print out of memory error and exit program */
 void xmem_error(const char *)
 #ifdef __GNUC__
  __attribute__((noreturn))
@@ -26,6 +27,7 @@ void xmem_error(const char *)
    ;
 
 /*@noreturn@*/
+/** print string too long error and exit program */
 void xmem_toolong(const char *)
 #ifdef __GNUC__
  __attribute__((noreturn))
@@ -33,13 +35,22 @@ void xmem_toolong(const char *)
    ;
 
 /*@only@*/ /*@out@*/ /*@notnull@*/
+/** allocate \a size bytes of memory, exit program on allocation failure
+ */
 void *xmalloc(size_t size);
 
+/** free memory area at \a ptr if ptr is non-NULL, do nothing if \a ptr
+ * is NULL */
 void xfree(/*@only@*/ /*@null@*/ void *ptr);
 
+/** allocate and clear \a nmemb blocks of \a size bytes of memory, exit
+ * program on allocation failure */
 /*@only@*/ /*@out@*/ /*@notnull@*/
 void *xcalloc(size_t nmemb, size_t size);
 
+/** reallocate \a size bytes of memory and initialize it with the
+ * first bytes of the shorter area (old in \a ptr vs. newly allocated),
+ * exit program on allocation failure */
 /*@only@*/ /*@out@*/ /*@notnull@*/
 void *xrealloc(/*@only@*/ void *ptr, size_t size);
 
