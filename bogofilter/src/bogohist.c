@@ -24,7 +24,6 @@ AUTHOR:
 #include "word.h"
 #include "wordlists.h"
 
-uint msgs_good, msgs_bad;
 uint ham_only,  ham_hapax;
 uint spam_only, spam_hapax;
 
