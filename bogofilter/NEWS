@@ -3,10 +3,23 @@
 			       =================
 
 NOTE: More information on important changes for bogofilters updaters
-is in the RELEASE.NOTES files.  Read it!!
+is in the RELEASE.NOTES files.  Read them!!
 
-If updating from a bogofilter version older than 0.15.4, it's a good
-idea to retrain or else use the '-H' (header tag degeneration) option.
+0.16.0	2004-01-01
+
+	* Added "#ifdef ENABLE_DEPRECATED_CODE" statements as
+          appropriate.
+	* Corrected configure.ac defect for "--enable-memdebug".
+	* Corrected lexer defect that created unnecessary
+          "rcvd:Received" tokens.
+	* Fixed header file problem that causes sigsegv with qdbm.
+	* Expanded VERP pattern to reduce hapax count.
+
+0.15.13	2003-12-31 - Stable Release
+
+	If updating from a bogofilter version older than 0.15.4, it's
+	a good idea to retrain or else use the '-H' (header tag
+	degeneration) option.
 
 0.15.13	2003-12-26
 
@@ -667,7 +680,7 @@ idea to retrain or else use the '-H' (header tag degeneration) option.
 	  spam_subject_tag.
 	  (Thanks to Pavel Kankovsky for these patches.)
 
-0.13.7.2 2003-07-02
+0.13.7.2 2003-07-02 - Stable Release
 
 	* Fixed loop in yyinput() caused by unexpected EOF.
 
