@@ -4,7 +4,7 @@ Topic:		vulnerability in bogofilter/bogolexer
 
 Announcement:	bogofilter-SA-2004-01
 Writer:		Matthias Andree
-Version:	1.00
+Version:	1.01
 CVE id:		CAN-2004-1007
 Announced:	2004-10-30
 Category:	vulnerability
