@@ -1,10 +1,15 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.3  2002/09/15 16:37:27  relson
- * Implement Eric Seppanen's fix so that bogofilter() properly populates the stats.extrema array.
- * A new word goes into the first empty slot of the array.  If there are no empty slots, it replaces
- * the word with the spamicity index closest to 0.5.
+ * Revision 1.4  2002/09/15 17:41:20  relson
+ * The printing of tokens used for computing the spamicity has been changed.  They are now printed in increasing order (by probability and alphabet).  The cumulative spamicity is also printed.
  *
+ * The spamicity element of the bogostat_t struct has become a local variable in bogofilter() as it didn't need to be in the struct.
+ *
+/* Revision 1.3  2002/09/15 16:37:27  relson
+/* Implement Eric Seppanen's fix so that bogofilter() properly populates the stats.extrema array.
+/* A new word goes into the first empty slot of the array.  If there are no empty slots, it replaces
+/* the word with the spamicity index closest to 0.5.
+/*
 /* Revision 1.2  2002/09/15 16:16:50  relson
 /* Clean up underflow checking for word counts by using max() instead of if...then...
 /*
@@ -402,10 +407,15 @@ discrim_t;
 
 typedef struct
 {
-    double spamicity;
     discrim_t extrema[KEEPERS];
 }
 bogostat_t;
+
+int compare_stats(discrim_t *d1, discrim_t *d2)
+{ 
+    return ( (d1->prob > d2->prob) ||
+	     ((d1->prob == d2->prob) && (strcmp(d1->key, d2->key) > 0)));
+}
 
 int bogofilter(int fd)
 /* evaluate text for spamicity */
@@ -419,6 +429,7 @@ int bogofilter(int fd)
 #endif // NON_EQUIPROBABLE
 
     static bogostat_t stats;
+    double spamicity;
     discrim_t *pp, *hit;
 
     for (pp = stats.extrema; pp < stats.extrema+sizeof(stats.extrema)/sizeof(*stats.extrema); pp++)
@@ -500,11 +511,7 @@ int bogofilter(int fd)
     }
 
     if (verbose)
-    {
-	for (pp = stats.extrema; pp < stats.extrema + KEEPERS; pp++)
-	    if (pp->key)
-		printf("%s -> %f\n", pp->key, pp->prob);
-    }
+	qsort(&stats.extrema, KEEPERS, sizeof(discrim_t), (__compar_fn_t) compare_stats);
 
     // Bayes' theorem.
     // For discussion, see <http://www.mathpages.com/home/kmath267.htm>.
@@ -516,13 +523,16 @@ int bogofilter(int fd)
 	{
 	    product *= pp->prob;
 	    invproduct *= (1 - pp->prob);
+	    spamicity = product / (product + invproduct);
+	    if (verbose)
+		printf("#  %f  %f  %s\n", pp->prob, spamicity, pp->key);
 	}
-    stats.spamicity = product / (product + invproduct);
+
 
     if (verbose)
-	printf("Spamicity of %f\n", stats.spamicity);
+	printf("#  Spamicity of %f\n", spamicity);
 
-    return((stats.spamicity > SPAM_CUTOFF) ? 0 : 1);
+    return((spamicity > SPAM_CUTOFF) ? 0 : 1);
 }
 
 // Done
