@@ -9,6 +9,8 @@
 
 0.8.0	2002-10-30 XXX FIXME XXX (fix the date)
 
+	* Fixed passthrough mode in bogofilter: it no longer strips the
+	  spam-header from a mail body.
 	* Fixed portability to some systems, notably, Solaris
 	  and HP-UX, added README. for some systems to describe build
 	  issues. 
