@@ -246,7 +246,6 @@ int buff_fill(buff_t *buff, size_t used, size_t need)
 void yyinit(void)
 {
     yylineno = 0;
-    msg_header = true;
 
     if (!msg_count_file)
 	lexer = &v3_lexer;

@@ -38,6 +38,10 @@ bool block_on_subnets = false;
 static word_t *token_prefix = NULL;
 static word_t *nonblank_line = NULL;
 
+/* Function Prototypes */
+
+void got_emptyline(void);
+
 /* Function Definitions */
 
 token_t get_token(void)
@@ -79,7 +83,13 @@ token_t get_token(void)
 
 	switch (class) {
 
+	case FROM:	/* change state to header processing */
+	    msg_header = true;
+	    break;
+
 	case EMPTY:	/* empty line -- check for bogus end of header */
+	    got_emptyline(); 
+	    msg_header = false;
 	    if (yylval->leng == 1) 
 		continue;
 	    else
@@ -152,8 +162,6 @@ token_t get_token(void)
 	case BOGO_LEX_LINE:
 	    done = true;
 	    break;
-	case FROM:		/* nothing to do */
-	    break;
 	}
 
 	if (DEBUG_TEXT(1)) { 
@@ -218,8 +226,6 @@ void got_emptyline(void)
     if (msg_state->mime_type != MIME_MESSAGE && !msg_header)
 	return;
 
-    msg_header = false;
-     
     if (msg_state->mime_type == MIME_MESSAGE)
 	mime_add_child(msg_state);
 

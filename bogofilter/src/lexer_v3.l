@@ -165,7 +165,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
 %%
 
-^From\ 						{ if (msg_header && is_from((const unsigned char *)yytext, yyleng)) { 
+^From\ 						{ if (is_from((const unsigned char *)yytext, yyleng)) { 
 						      BEGIN(INITIAL); 
 						      return FROM;
 						  } else { 
@@ -205,8 +205,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
 <INITIAL>name=\"?				;
 <INITIAL>filename=\"?				;
-<INITIAL>^[ \b\t]*\n				{ got_emptyline(); 
-						  lineno += 1;
+<INITIAL>^[ \b\t]*\n				{ lineno += 1;
 						  if (get_content_type() == MIME_TEXT_HTML)
 						      BEGIN(HTML);
 						  else

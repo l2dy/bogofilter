@@ -18,7 +18,6 @@ extern token_t get_token(void);
 
 extern void got_from(void);
 extern void got_newline(void);
-extern void got_emptyline(void);
 extern void set_tag(const char *tag);
 
 extern void token_init(void);
