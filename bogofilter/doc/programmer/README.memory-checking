@@ -2,11 +2,11 @@ $Id$
 
 Bogofilter's test suite has support for several memory access/leak
 checking tools, namely Valgrind ("valgrind"), Electric Fence ("efence"),
-GNU libc ("glibc", default), Boehm-Demers-Weiser Garbage Collector
-("boehm-gc").
+GNU libc ("glibc", default), and the Boehm-Demers-Weiser Conservative
+Garbage Collector ("boehm-gc").
 
-To enable, these, just add BF_CHECKTOOL=tool to your make check command
-line, example:
+To enable one of these, just add BF_CHECKTOOL=tool to your make check
+command line, example:
 
 make check BF_TESTDIR=/tmp BF_CHECKTOOL=boehm-gc
 
