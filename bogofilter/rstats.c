@@ -17,6 +17,7 @@ AUTHOR:
 
 #include "common.h"
 #include "bogofilter.h"
+#include "xmalloc.h"
 #include "xstrdup.h"
 
 extern FILE *Rfp;
