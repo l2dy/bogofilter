@@ -93,7 +93,8 @@ message
 EOF
 
 # suppress timestamps & version info in output
-OPTS="-y 0"
+BUOPTS="-y 0"
+BFOPTS='--header_format=%h: %c, tests=bogofilter, spamicity=%p'
 PAT="s/[,]\? version.*//"
 
 # build wordlists
@@ -106,7 +107,7 @@ $BOGOUTIL $OPTS -l ${TMPDIR}/system.db   < ${TMPDIR}/system.txt
 
 for DB in ${TMPDIR}/*.db ; do
     printf "%-12s" `basename $DB`: >> $OUT
-    $BOGOFILTER -C -D -H -e --wordlist=r,wordlist,`basename $DB`,1 -m0.1 -v -I ${TMPDIR}/message | sed "$PAT" >> $OUT
+    $BOGOFILTER "$BFOPTS" -C -D -H -e --wordlist=r,wordlist,`basename $DB`,1 -m0.1 -v -I ${TMPDIR}/message | sed "$PAT" >> $OUT
 done
 echo >> $OUT
 
@@ -114,7 +115,7 @@ echo >> $OUT
 
 for CFG in ${TMPDIR}/*.cf ; do
     echo Using `basename $CFG`: >> $OUT
-    $BOGOFILTER -D -H -e -c $CFG -m0.1 -vvv -I ${TMPDIR}/message | sed "$PAT" >> $OUT
+    $BOGOFILTER "$BFOPTS" -D -H -e -c $CFG -m0.1 -vvv -I ${TMPDIR}/message | sed "$PAT" >> $OUT
     echo >> $OUT
 done
 
@@ -123,13 +124,13 @@ done
 # Add message to user.db (first regular wordlist in CF_IGN_USR_SYS)
 
 echo >> $OUT
-echo common message ignore | $BOGOFILTER -D -H -n -c ${TMPDIR}/$CF_IGN_USR_SYS -y 0
+echo common message ignore | $BOGOFILTER "$BFOPTS" -D -H -n -c ${TMPDIR}/$CF_IGN_USR_SYS -y 0
 
 (echo "#### 2: score message using each wordlist ####"; echo) >> $OUT
 
 for DB in ${TMPDIR}/*.db ; do
     printf "%-12s" `basename $DB`: >> $OUT
-    $BOGOFILTER -C -D -H -e --wordlist=r,wordlist,`basename $DB`,1 -m0.1 -v -I ${TMPDIR}/message | sed "$PAT" >> $OUT
+    $BOGOFILTER "$BFOPTS" -C -D -H -e --wordlist=r,wordlist,`basename $DB`,1 -m0.1 -v -I ${TMPDIR}/message | sed "$PAT" >> $OUT
 done
 echo >> $OUT
 
@@ -137,7 +138,7 @@ echo >> $OUT
 
 for CFG in ${TMPDIR}/*.cf ; do
     echo Using `basename $CFG`: >> $OUT
-    $BOGOFILTER -D -H -e -c $CFG -m0.1 -vvv -I ${TMPDIR}/message | sed "$PAT" >> $OUT
+    $BOGOFILTER "$BFOPTS" -D -H -e -c $CFG -m0.1 -vvv -I ${TMPDIR}/message | sed "$PAT" >> $OUT
     echo >> $OUT
 done
 
