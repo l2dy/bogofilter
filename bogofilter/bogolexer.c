@@ -34,7 +34,7 @@ static void help(void)
 	    "\t-p\tprint the tokens from stdin.\n"
 	    "\t-q\tquiet mode, no tokens are printed.\n"
 	    "\t-h\thelp, this output.\n"
-	    PROGNAME " is part of the bogofilter package.\n");
+	    "%s is part of the bogofilter package.\n", PROGNAME);
 }
 
 int main(int argc, char **argv)
