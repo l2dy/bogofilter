@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<refentry id="bogoutil.1">
+  <refmeta>
+    <refentrytitle>bogoutil</refentrytitle>
+    <manvolnum>1</manvolnum>
+  </refmeta>
+  <refnamediv id="name">
+    <refname>bogoutil</refname>
+    <refpurpose>Dumps and load bogofilter database files</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv id="synopsis">
+    <cmdsynopsis>
+      <command>bogoutil</command>
+      <group choice="req">
+        <arg>-d</arg>
+        <arg>-l</arg>
+      </group>
+      <arg choice="opt">-v</arg>
+      <arg choice="plain"><replaceable>file.db</replaceable></arg>
+      <group choice="opt">
+        <arg>-h</arg>
+        <arg>-V</arg>
+      </group>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1 id="description">
+    <title>DESCRIPTION</title>
+    <para><application>Bogoutil</application> is part of the bogofilter Bayesian spam filter package.</para>
+    <para>It is used to dump and load bogofilter's Berkeley DB databases to and from text files.</para>
+  </refsect1>
+  <refsect1 id="options">
+    <title>OPTIONS</title>
+    <para>
+       The <option>-d</option> option tells <application>bogoutil</application> to
+       print the contents of the specified database file to stdout.
+    </para>
+    <para>
+       The <option>-l</option> option tells <application>bogoutil</application> to load the data on stdin into the
+       specified database file.
+    </para>
+    <para>
+       The <option>-v</option> option produces verbose output on stderr.
+       This option is primarily useful for debugging.
+    </para>
+    <para>
+      The <option>file.db</option> is the path to the database file that
+      <application>bogoutil</application> reads or writes.
+    </para>   
+    <para>The <option>-h</option> option prints the help message and exits.</para>
+    <para>The <option>-V</option> option prints the version number and exits.</para>
+  </refsect1>
+
+  <refsect1 id="dataformat">
+    <title>DATA FORMAT</title>
+    <para>
+      <application>bogoutil</application> reads and writes text files where each nonblank
+        line consists of a word, any amount of horizontal whitespace, and a numeric word count.
+      Blank lines are skipped.
+    </para>
+  </refsect1>
+  
+ <refsect1 id="returns">
+    <title>RETURN VALUES</title>
+    <para>
+	0 for successful operation.
+	1 for most errors.
+	2 for I/O or other errors.
+	Error 2 usually means that something is seriously wrong with the database files. 
+    </para>
+  </refsect1>
+  <refsect1 id="author">
+    <title>AUTHOR</title>
+    <para>Gyepi Sam <email>gyepi@praxis-sw.com</email>.</para>
+    <para>
+       For updates, see <ulink url="http://bogofilter.sourceforge.net/">
+       the bogofilter project page</ulink>.
+    </para>
+  </refsect1>
+</refentry>
