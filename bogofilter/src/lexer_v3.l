@@ -251,15 +251,15 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>{VERP} 				{ skip_to('='); return VERP; }
 
 ^-----BEGIN\ PGP\ SIGNED\ MESSAGE-----$		{ have_pgp = true;     
-						  yy_unput(yytext, yyleng); }
+						  yy_unput((byte *)yytext, yyleng); }
 ^-----BEGIN\ PGP\ SIGNATURE-----$		{ if (have_pgp)
 						      BEGIN PGP_HEAD;
-						  yy_unput(yytext, yyleng);
+						  yy_unput((byte *)yytext, yyleng);
 						}
 <PGP_HEAD>^\n					{ BEGIN PGP_BODY; }
 <PGP_BODY>{TOKEN}				{ /* ignore */ }
 ^-----END\ PGP\ SIGNATURE-----$ 		{ BEGIN TEXT;
-						  yy_unput(yytext, yyleng);
+						  yy_unput((byte *)yytext, yyleng);
 						}
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
 						      yy_set_state_initial();
