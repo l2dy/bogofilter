@@ -27,11 +27,12 @@ typedef struct {
  * \return opaque pointer to database handle, which must be saved and
  * passed as the first parameter in all subsequent database function calls. 
  */
+/*@only@*/ /*@null@*/
 void *db_open(const char *path /** path to database file */, const char *name /** name of data base */,
 	dbmode_t mode /** open mode, DB_READ or DB_WRITE */, const char *dir /** directory, currently unused */);
 
 /** Close files and clean up. */
-void  db_close(void *);
+void  db_close(/*@only@*/ void *);
 
 /** Flush pending writes to disk */
 void db_flush(void *);
