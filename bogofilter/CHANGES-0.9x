@@ -10,6 +10,19 @@ and     INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
 
 0.93.0	2004-10-??
 
+	2004-10-30
+
+	* Converted QDBM from hash files (DEPOT API) to B+ trees
+          (Villa API) for better speed.  (Stefan Bellon).
+
+	2004-10-29
+
+	* Attempting recovery with TDB or QDBM data bases results in an error,
+	  so the user does not think it succeeded.
+
+	* Document that recovery only works for Berkeley DB, but not TDB or
+	  QDBM.
+
 	2004-10-28
 
 	* Merged Transactional branch (for BerkeleyDB) back into the trunk.

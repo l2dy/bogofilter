@@ -51,4 +51,21 @@ BerkeleyDB documentation.
 These benefits are not available when bogofilter is compiled to use the
 TDB or QDBM data bases.
 
+QDBM database format changed to B+ trees
+----------------------------------------
+
+The QDBM database format has been changed from hash tables to B+
+trees, i.e. from the DEPOT API to the Villa API.  This results in
+significantly better performance, i.e. faster speed.  Unfortunately,
+the two modes are incompatible, so upgrading to 0.9.3 requires several
+special steps, i.e. dumping and renaming your wordlist before
+installing 0.93 and building a new wordlist afterwards.
+
+Use these commands:
+
+1:  bogoutil -d /your/path/wordlist.db > wordlist.txt
+2:  mv /your/path/wordlist.db /your/path/wordlist.db.old
+3:  install new bogofilter
+4:  bogoutil -l /your/path/wordlist.db < wordlist.txt
+
                   --- END of RELEASE.NOTES-0.93 ---
