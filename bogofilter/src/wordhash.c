@@ -241,7 +241,7 @@ static void display_node(hashnode_t *n, const char *str)
 {
     wordprop_t *p = (wordprop_t *)n->buf;
     if (verbose > 2)
-	printf( "%20.20s %5d %5d%s", n->key->text, (int)p->cnts.bad, (int)p->cnts.good, str);
+	printf( "%20.20s %5u %5u%s", n->key->text, p->cnts.bad, p->cnts.good, str);
 }
 
 /* this function accumulates the word frequencies from the src hash to

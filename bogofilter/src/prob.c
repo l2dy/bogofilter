@@ -44,8 +44,3 @@ double calc_prob_pure(uint good, uint bad,
 
     return fw;
 }
-
-double calc_prob(uint good, uint bad)
-{
-    return calc_prob_pure(good, bad, msgs_good, msgs_bad, robs, robx);
-}

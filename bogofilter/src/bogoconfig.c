@@ -209,6 +209,11 @@ void process_parameters(int argc, char **argv, bool warn_on_error)
 	exit(EX_ERROR);
     }
 
+    if (!config_setup) {
+	/* set up default wordlist */
+	init_wordlist("word", WORDLIST, 0, WL_REGULAR);
+    }
+
     stats_prefix= stats_in_header ? "  " : "# ";
 
     return;
@@ -761,7 +766,7 @@ void query_config(void)
     Q2 fprintf(stdout, "\n");
 
     Q2 fprintf(stdout, "%-18s = %s\n", "bogofilter_dir", bogohome);
-    Q2 display_wordlists("%-18s   ");
+    Q2 display_wordlists(word_lists, "%-18s   ");
     Q2 fprintf(stdout, "\n");
 
     Q2 fprintf(stdout, "%-18s = %d\n", "db_cachesize",        	db_cachesize);

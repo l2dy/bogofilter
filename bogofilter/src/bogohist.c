@@ -28,6 +28,8 @@ AUTHOR:
 static uint ham_only,  ham_hapax;
 static uint spam_only, spam_hapax;
 
+static uint mgood, mbad;
+
 #define	INTERVALS	20
 #define PCT(n)		100.0 * n / count
 
@@ -46,7 +48,7 @@ static int ds_histogram_hook(/*@unused@*/ word_t *key, dsv_t *data,
 {
     rhistogram_t *hist = userdata;
 
-    double fw = calc_prob(data->goodcount, data->spamcount);
+    double fw = calc_prob_pure(data->goodcount, data->spamcount, mgood, mbad, robs, robx);
     uint idx = min(fw * INTERVALS, INTERVALS-1);
 
     (void)key;
@@ -149,7 +151,8 @@ int histogram(const char *path)
     }
 
     ds_get_msgcounts(dsh, &val);
-    set_msg_counts(val.goodcount, val.spamcount);
+    mgood = val.goodcount;
+    mbad = val.spamcount;
 
     memset(&hist, 0, sizeof(hist));
     rc = ds_foreach(dsh, ds_histogram_hook, &hist);

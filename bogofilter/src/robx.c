@@ -73,7 +73,7 @@ static double compute_robx(dsh_t *dsh)
 
     dsv_t val;
     bool ok;
-    uint32_t good_cnt, spam_cnt;
+    uint good_cnt, spam_cnt;
     struct robhook_data rh;
     int ret;
 
@@ -96,31 +96,31 @@ static double compute_robx(dsh_t *dsh)
 
     rx = rh.sum/rh.count;
     if (verbose > 2)
-	printf("%s: %lu, %lu, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
-	       MSG_COUNT,
-	       (unsigned long)spam_cnt, (unsigned long)good_cnt,
+	printf("%s: %u, %u, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
+	       MSG_COUNT, spam_cnt, good_cnt,
 	       rh.scalefactor, rh.sum, (int)rh.count, rx);
 
     return ret ? -1 : rx;
 }
 
-/** returns negative for failure */
-/** used by bogoutil and bogotune */
-
+/** returns negative for failure.
+ * used by bogoutil and bogotune */
 double compute_robinson_x(const char *path)
 {
     double rx;
+    dsh_t *ds;
 
     set_wordlist_dir(path, PR_NONE);
-    open_wordlists(DS_READ);
+    open_wordlists(word_lists, DS_READ);
+    ds = get_default_wordlist(word_lists)->dsh;
 
-    if (DST_OK == ds_txn_begin(word_lists->dsh)) {
-	rx = compute_robx(default_wordlist()->dsh);
-	if (DST_OK != ds_txn_commit(word_lists->dsh))
+    if (DST_OK == ds_txn_begin(ds)) {
+	rx = compute_robx(ds);
+	if (DST_OK != ds_txn_commit(ds))
 	    rx = -1;
     } else rx = -1;
 
-    close_wordlists();
+    close_wordlists(word_lists);
 
     return rx;
 }

@@ -23,12 +23,10 @@ void set_wordlist_mode(const char *filepath);
 bool build_wordlist_path(char *filepath, size_t size, const char *path);
 bool configure_wordlist(const char *val);
 
-void open_wordlists(dbmode_t);
-void close_wordlists(void);
+void open_wordlists(wordlist_t *, dbmode_t);
+void close_wordlists(wordlist_t *);
 
 void set_list_active_status(bool status);
 void set_wordlist_directory(void);
-
-void compute_msg_counts(void);
 
 #endif	/* WORDLISTS_H */

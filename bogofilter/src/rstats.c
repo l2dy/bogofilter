@@ -30,6 +30,8 @@ struct rstats_s {
     word_t *token;
     u_int32_t	good;
     u_int32_t	bad;
+    u_int32_t	msgs_good;
+    u_int32_t	msgs_bad;
     double prob;
 };
 
@@ -65,8 +67,6 @@ void rstats_init(void)
     if (current == NULL)
 	current = (rstats_t *) xcalloc( 1, sizeof(rstats_t));
     header.list = current;
-    header.count = 0;
-    header.robn  = 0;
 }
 
 void rstats_cleanup(void)
@@ -94,6 +94,8 @@ void rstats_add(const word_t *token, double prob, wordcnts_t *cnts)
     current->prob  = prob;
     current->good  = cnts->good;
     current->bad   = cnts->bad;
+    current->msgs_good = max(1, cnts->msgs_good);
+    current->msgs_bad = max(1, cnts->msgs_bad);
     current->next = (rstats_t *)xcalloc(1, sizeof(rstats_t));
     current = current->next;
 }
@@ -235,7 +237,8 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
     {
 	rstats_t *cur = rstats_array[r];
 	int len = max(0, MAXTOKENLEN-(int)cur->token->leng);
-	double fw = calc_prob(cur->good, cur->bad);
+	double fw = calc_prob_pure(cur->good, cur->bad,
+		cur->msgs_good, cur->msgs_bad, robs, robx);
 	char flag = (fabs(fw-EVEN_ODDS) - min_dev >= EPS) ? '+' : '-';
 
 	(void)fputc( '"', fpo);
@@ -243,8 +246,8 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 
 	(void)fprintf(fpo, "\"%*s %6lu  %8.6f  %8.6f  %8.6f",
 		      len, " ", (unsigned long)(cur->good + cur->bad),
-		      (double)cur->good / msgs_good,
-		      (double)cur->bad  / msgs_bad,
+		      (double)cur->good / cur->msgs_good,
+		      (double)cur->bad  / cur->msgs_bad,
 		      fw);
 	if (Rtable)
 	    (void)fprintf(fpo, "%10.5f%10.5f",

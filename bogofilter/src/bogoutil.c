@@ -270,6 +270,8 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     struct stat sb;
     int rv = 0;
 
+    dsv_t msgcnts;
+
     /* protect against broken stat(2) that succeeds for empty names */
     if (path == NULL || *path == '\0') {
         fprintf(stderr, "Expecting non-empty directory or file name.\n");
@@ -297,22 +299,20 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	return EX_ERROR;
     }
 
-    if (show_probability)
-    {
-	dsv_t val;
-	ds_get_msgcounts(dsh, &val);
-	set_msg_counts(val.goodcount, val.spamcount);
-	robs = ROBS;
-	robx = ROBX;
-    }
-
-    printf(head_format, "", "spam", "good", "  Fisher");
     if (DST_OK != ds_txn_begin(dsh)) {
 	ds_close(dsh);
 	fprintf(stderr, "Cannot begin transaction.\n");
 	return EX_ERROR;
     }
 
+    if (show_probability)
+    {
+	ds_get_msgcounts(dsh, &msgcnts);
+	robs = ROBS;
+	robx = ROBX;
+    }
+
+    printf(head_format, "", "spam", "good", "  Fisher");
     while (argc >= 0)
     {
 	dsv_t val;
@@ -345,7 +345,8 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 		    printf(data_format, token->text, spam_count, good_count);
 		else
 		{
-		    rob_prob = calc_prob(good_count, spam_count);
+		    rob_prob = calc_prob_pure(good_count, spam_count, msgcnts.goodcount, msgcnts.spamcount,
+			    robs, robx);
 		    printf(data_format, token->text, spam_count, good_count, rob_prob);
 		}
 		break;
@@ -379,6 +380,7 @@ static int get_robx(const char *path)
     double rx;
     int ret = 0;
 
+    init_wordlist("word", WORDLIST, 0, WL_REGULAR);
     rx = compute_robinson_x(path);
     if (rx < 0)
 	return EX_ERROR;
@@ -389,7 +391,7 @@ static int get_robx(const char *path)
 	dsv_t val;
 	word_t *word_robx = word_new((const byte *)ROBX_W, (uint) strlen(ROBX_W));
 
-	open_wordlists(DS_WRITE);
+	open_wordlists(word_lists, DS_WRITE);
 
 	if (DST_OK == ds_txn_begin(word_lists->dsh)) {
 	    val.goodcount = 0;
@@ -399,8 +401,9 @@ static int get_robx(const char *path)
 		ret = 1;
 	}
 
-	close_wordlists();
-	free_wordlists();
+	close_wordlists(word_lists);
+	free_wordlists(word_lists);
+	word_lists = NULL;
 
 	word_free(word_robx);
     }

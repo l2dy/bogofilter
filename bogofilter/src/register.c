@@ -35,7 +35,8 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
     u_int32_t wordcount = h->count;	/* use number of unique tokens */
 
-    wordlist_t *list = default_wordlist();	/* use default wordlist */
+    /* registrations always go to the default wordlist */
+    wordlist_t *list = get_default_wordlist(word_lists);
 
     sh_t incr = IX_UNDF, decr = IX_UNDF;
 
@@ -147,7 +148,6 @@ retry:
 	    fprintf(stderr, "cannot set message count values\n");
 	    exit(EX_ERROR);
     }
-    set_msg_counts(val.goodcount, val.spamcount);
 
     switch(ds_txn_commit(list->dsh)) {
 	case DST_OK:
@@ -167,10 +167,6 @@ retry:
 	    fprintf(stderr, "unknown return.\n");
 	    abort();
     }
-
-#if 0
-    ds_flush(list->dsh);
-#endif
 
     if (DEBUG_REGISTER(1))
 	(void)fprintf(dbgout, "bogofilter: list %s (%s) - %ul spam, %ul good\n",

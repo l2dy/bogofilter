@@ -12,8 +12,6 @@
 
 bool	config_setup = false;
 
-static wordlist_t *free_wordlist(wordlist_t *list);
-
 /** priority queue of wordlists, ordered by their "override" parameter */
 /*@null@*/ wordlist_t* word_lists=NULL;
 
@@ -37,6 +35,18 @@ static bool is_dup_wordlist(wordlist_t *a, wordlist_t *b)
     return true;
 }
 
+/** Free a wordlist node and return the pointer to the next node */
+static wordlist_t *free_wordlistnode(wordlist_t *node)
+{
+    wordlist_t *next = node->next;
+
+    xfree(node->listname);
+    xfree(node->filepath);
+    xfree(node);
+
+    return next;
+}
+
 void init_wordlist(const char* name, const char* path,
 		   int override, WL_TYPE type)
 {
@@ -44,16 +54,12 @@ void init_wordlist(const char* name, const char* path,
     wordlist_t *list_ptr;
 
     /* initialize list node */
-    n->dsh     =NULL;
     n->listname=xstrdup(name);
     n->filepath=xstrdup(path);
     n->type    =type;
-    n->next    =NULL;
     n->override=override;
 
-    /* rest of this code: enqueue in the right place */
-
-    /* initialize iterator */
+    /* now enqueue according to "override" (priority) */
     list_ptr=word_lists;
 
     if (list_ptr == NULL ||
@@ -64,39 +70,39 @@ void init_wordlist(const char* name, const char* path,
 	return;
     }
 
-    while(1) {
+    for ( ; ; list_ptr=list_ptr->next) {
+	/* drop duplicates */
 	if (is_dup_wordlist(n, list_ptr)) {
-	    free_wordlist(n);
+	    free_wordlistnode(n);
 	    return;
 	}
 
-        if (list_ptr->next == NULL) {
-	    /* end of list */
+	/* append to list */
+	if (list_ptr->next == NULL) {
 	    list_ptr->next=n;
 	    return;
 	}
 
+	/* insert into middle of list */
 	if (list_ptr->next->override > override) {
 	    n->next=list_ptr->next;
 	    list_ptr->next=n;
 	    return;
-        }
-
-	list_ptr=list_ptr->next;
+	}
     }
 }
 
-wordlist_t *default_wordlist(void)
+wordlist_t *get_default_wordlist(wordlist_t *list)
 {
-    wordlist_t *list;
-    for ( list = word_lists; list != NULL; list = list->next )
+    for (;; list = list->next)
     {
- 	if (list->type != WL_IGNORE)
- 	    return list;
+	if (list->type != WL_IGNORE)
+	    return list;
     }
+
+    /* not found -> abort */
     fprintf(stderr, "Can't find default wordlist.\n");
     exit(EX_ERROR);
-    return NULL;
 }
 
 /* setup_wordlists()
@@ -149,39 +155,22 @@ int set_wordlist_dir(const char* d, priority_t precedence)
     return rc;
 }
 
-static wordlist_t *free_wordlist(wordlist_t *list)
+void free_wordlists(wordlist_t *list)
 {
-    wordlist_t *next = list->next;
-
-    xfree(list->listname);
-    xfree(list->filepath);
-    xfree(list);
-
-    return next;
-}
-
-void free_wordlists(void)
-{
-    wordlist_t *list = word_lists;
-
-    while ( list != NULL )
+    while (list)
     {
-	list = free_wordlist(list);
+	list = free_wordlistnode(list);
     }
-
-    word_lists = NULL;
 
     free_bogohome();
 }
 
-void display_wordlists(const char *fmt)
+void display_wordlists(wordlist_t *list, const char *fmt)
 {
-    wordlist_t *list;
-
-    for ( list = word_lists; list != NULL ; list = list->next )
+    for (; list; list = list->next)
     {
-	fprintf(stdout, fmt, "wordlist");
-	fprintf(stdout, "%s,%s,%s,%d\n",
+	printf(fmt, "wordlist");
+	printf("%s,%s,%s,%d\n",
 		(list->type == WL_REGULAR) ? "r" : "i",
 		list->listname,
 		list->filepath,

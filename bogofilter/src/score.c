@@ -77,20 +77,6 @@ void msg_print_stats(FILE *fp)
 	rstats_print(unsure);
 }
 
-static void wordprob_add(wordcnts_t *cnts, uint count, uint idx)
-{
-    if (idx == IX_SPAM)
-	cnts->bad += count;
-    else
-	cnts->good += count;
-}
-
-static double wordprob_result(wordcnts_t *cnt)
-{
-    double fw = calc_prob(cnt->good, cnt->bad);
-    return fw;
-}
-
 static void lookup(const word_t *token, wordcnts_t *cnts)
 {
     int override=0;
@@ -105,9 +91,10 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 	return;
     }
 
+    cnts->msgs_bad = cnts->msgs_good = 0;
+
     for (list=word_lists; list != NULL; list=list->next)
     {
-	size_t i;
 	dsv_t val;
 	int ret;
 
@@ -131,22 +118,32 @@ retry:
 	    goto retry;
 	}
 
-	if (ret)
-	    /* XXX FIXME: must add message count here when the global is
-	     * eliminated */
-	    continue;			/* not found */
+	/* check if we have the token */
+	switch (ret) {
+	    case 0:
+		/* token found, pass */
+		break;
+	    case 1:
+		/* token not found, clear counts */
+		val.count[IX_GOOD] = 0;
+		val.count[IX_SPAM] = 0;
+		break;
+	    default:
+		abort();
+	}
 
-	if (list->type == WL_IGNORE)	/* if on ignore list */
+	if (ret == 0 && list->type == WL_IGNORE)	/* if found on ignore list */
 	    break;
 
 	override=list->override;
 
-	for (i=0; i<COUNTOF(val.count); i++) {
-	    wordprob_add(cnts, val.count[i], i);
-	}
+	cnts->good += val.count[IX_GOOD];
+	cnts->bad += val.count[IX_SPAM];
+	cnts->msgs_good += list->msgcount[IX_GOOD];
+	cnts->msgs_bad += list->msgcount[IX_SPAM];
 
 	if (DEBUG_ALGORITHM(1)) {
-	    fprintf(dbgout, "%2d %2d \n", (int) cnts->good, (int) cnts->bad);
+	    fprintf(dbgout, "%5u %5u ", cnts->good, cnts->bad, cnts->msgs_good, cnts->msgs_bad);
 	    word_puts(token, 0, dbgout);
 	    fputc('\n', dbgout);
 	}
@@ -157,14 +154,11 @@ retry:
 
 static double msg_lookup_and_score(const word_t *token, wordcnts_t *cnts)
 {
-    double prob;
-
     if (cnts->bad == 0 && cnts->good == 0)
 	lookup(token, cnts);
 
-    prob = wordprob_result(cnts);
-
-    return prob;
+    return calc_prob_pure(cnts->good, cnts->bad,
+	    cnts->msgs_good, cnts->msgs_bad, robs, robx);
 }
 
 static double compute_probability(const word_t *token, wordcnts_t *cnts)
@@ -173,7 +167,7 @@ static double compute_probability(const word_t *token, wordcnts_t *cnts)
 
     if (cnts->bad != 0 || cnts->good != 0 || msg_count_file)
 	/* A msg-count file already has the values needed */
-	prob = wordprob_result(cnts);
+	prob = calc_prob_pure(cnts->good, cnts->bad, cnts->msgs_good, cnts->msgs_bad, robs, robx);
     else
 	/* Otherwise lookup the word and get its score */
 	prob = msg_lookup_and_score(token, cnts);
@@ -282,7 +276,7 @@ void score_initialize(void)
 {
     word_t *word_robx = word_new((const byte *)ROBX_W, strlen(ROBX_W));
 
-    wordlist_t *list = default_wordlist();
+    wordlist_t *list = get_default_wordlist(word_lists);
 
     if (fabs(min_dev) < EPS)
 	min_dev = MIN_DEV;
@@ -295,7 +289,6 @@ void score_initialize(void)
     ** If we're registering tokens, we needn't get .MSG_COUNT
     */
 
-    compute_msg_counts();
     if (fabs(robs) < EPS)
 	robs = ROBS;
 

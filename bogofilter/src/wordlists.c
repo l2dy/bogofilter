@@ -36,7 +36,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
     list->dsh = ds_open(bogohome, list->filepath, mode);
     if (list->dsh == NULL) {
 	int err = errno;
-	close_wordlists(); /* unlock and close */
+	close_wordlists(word_lists); /* unlock and close */
 	switch(err) {
 	    /* F_SETLK can't obtain lock */
 	case EAGAIN:
@@ -100,7 +100,7 @@ retry:
     return retry;
 }
 
-void open_wordlists(dbmode_t mode)
+void open_wordlists(wordlist_t *list, dbmode_t mode)
 {
     bool retry = true;
 
@@ -109,17 +109,14 @@ void open_wordlists(dbmode_t mode)
 
     ds_init();
 
-    if (word_lists == NULL)
-	init_wordlist("word", WORDLIST, 0, WL_REGULAR);
-
     while (retry) {
 	if (run_type & (REG_SPAM | REG_GOOD | UNREG_SPAM | UNREG_GOOD))
-	    retry = open_wordlist(default_wordlist(), mode);
+	    retry = open_wordlist(get_default_wordlist(list), mode);
 	else {
-	    wordlist_t *list;
+	    wordlist_t *i;
 	    retry = false;
-	    for (list = word_lists; list != NULL; list = list->next) {
-		retry |= open_wordlist(list, list->type != WL_IGNORE ? mode : DS_READ);
+	    for (i = list; i ; i = i->next) {
+		retry |= open_wordlist(i, i->type == WL_IGNORE ? DS_READ : mode);
 	    }  /* for */
 	}
     }
@@ -140,14 +137,13 @@ void set_wordlist_directory(void)
 }
 
 /** close all open word lists */
-void close_wordlists(void)
+void close_wordlists(wordlist_t *list)
 {
-    wordlist_t *list;
-
-    for ( list = word_lists; list != NULL; list = list->next )
-    {
-	if (list->dsh) ds_close(list->dsh);
-	list->dsh = NULL;
+    for (; list ; list = list->next) {
+	if (list->dsh) {
+	    ds_close(list->dsh);
+	    list->dsh = NULL;
+	}
     }
     ds_cleanup();
 }
@@ -189,22 +185,6 @@ static void sanitycheck_lists(void)
 	fprintf(dbgout, "%d lists look OK.\n", listcount);
 }
 #endif
-
-/** Sum up the msgcount for each of the word lists, store the
- * count of bad messages in \a mb and the count of good messages in the
- * data bases in \a mg. */
-void compute_msg_counts(void)
-{
-    u_int32_t s = 0, g = 0;
-    wordlist_t* list;
-
-    for(list=word_lists; list != NULL; list=list->next)
-    {
-	s += list->msgcount[IX_SPAM];
-	g += list->msgcount[IX_GOOD];
-    }
-    set_msg_counts(g, s);
-}
 
 static char *spanword(char *p)
 {

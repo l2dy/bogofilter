@@ -9,6 +9,7 @@
 typedef void *dsh_t;
 #endif
 
+/** true when at least one wordlist has been configured */
 extern	bool	config_setup;
 
 typedef enum e_WL_TYPE {
@@ -18,7 +19,7 @@ typedef enum e_WL_TYPE {
 
 /** type of a wordlist node */
 typedef struct wordlist_s wordlist_t;
-/** structure of a wordlist node */
+/** structure of a wordlist node - singly linked priority queue */
 struct wordlist_s
 {
     /*@null@*/ wordlist_t *next;/**< link to next queue node */
@@ -35,12 +36,17 @@ struct wordlist_s
 void init_wordlist(const char* name, const char* path,
 		   int override, WL_TYPE type);
 
-void display_wordlists(const char *fmt);
+/** Print wordlists to stdout, prefixing it by \a fmt which is
+ * considered a printf format string and provided one constant argument,
+ * "wordlist" (literally).
+ */
+void display_wordlists(wordlist_t *list, const char *fmt);
 
-void free_wordlists(void);
+/** Free resources of all nodes in the list */
+void free_wordlists(wordlist_t *list);
 
 /** Get default wordlist for registering messages, finding robx, etc */
-wordlist_t * default_wordlist(void);
+wordlist_t *get_default_wordlist(wordlist_t *list);
 
 int  set_wordlist_dir(const char* dir, priority_t precedence);
 

@@ -78,6 +78,8 @@ void collect_words(wordhash_t *wh)
 	    wp->cnts.bad = atoi(s);
 	    s = strchr(s+1, ' ') + 1;
 	    wp->cnts.good = atoi(s);
+	    wp->cnts.msgs_good = msgs_good;
+	    wp->cnts.msgs_bad = msgs_bad;
 	}
     }
 

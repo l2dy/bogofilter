@@ -57,7 +57,7 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     output_setup();
 
     /* open all wordlists */
-    open_wordlists((run_type == RUN_NORMAL) ? DS_READ : DS_WRITE);
+    open_wordlists(word_lists, (run_type == RUN_NORMAL) ? DS_READ : DS_WRITE);
 
     status = bogofilter(argc, argv);
 
@@ -74,8 +74,9 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     if (nonspam_exits_zero && exitcode != EX_ERROR)
 	exitcode = EX_OK;
 
-    close_wordlists();
-    free_wordlists();
+    close_wordlists(word_lists);
+    free_wordlists(word_lists);
+    word_lists = NULL;
 
     output_cleanup();
 
