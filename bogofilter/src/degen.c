@@ -120,20 +120,20 @@ double get_score(const word_t *token, wordprop_t *wordstats)
 
 double lookup(const word_t *token, wordprop_t *wordstats, double old)
 {
-    double new = get_score(token, wordstats);
+    double n = get_score(token, wordstats);
 #if	0
-    double ans = (fabs(new-EVEN_ODDS) > fabs(old-EVEN_ODDS)) ? new : old;
+    double ans = (fabs(n-EVEN_ODDS) > fabs(old-EVEN_ODDS)) ? n : old;
 #else
     double ans;
-    if (fabs(new-EVEN_ODDS) > fabs(old-EVEN_ODDS)) 
-	ans = new;
+    if (fabs(n-EVEN_ODDS) > fabs(old-EVEN_ODDS)) 
+	ans = n;
     else
 	ans = old;
 #endif
     if (DEBUG_SPAMICITY(2)) {
 	fputs("***  ", dbgout);
 	word_puts(token, 0, dbgout);
-	fprintf(dbgout, " - o: %f, n: %f, a: %f\n", old, new, ans );
+	fprintf(dbgout, " - o: %f, n: %f, a: %f\n", old, n, ans );
     }
 
     return ans;

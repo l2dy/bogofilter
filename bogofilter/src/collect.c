@@ -33,14 +33,14 @@ void collect_words(wordhash_t *wh)
     for (;;){
 	wordprop_t *w;
 	word_t *token;
-	token_t class = get_token();
+	token_t cls = get_token();
 
-	if (class == NONE)
+	if (cls == NONE)
 	    break;
 
 	token = yylval;
 
-	if (class == BOGO_LEX_LINE)
+	if (cls == BOGO_LEX_LINE)
 	{
 	    char *s = (char *)(yylval->text+1);
 	    char *f = strchr(s, '"');
@@ -57,7 +57,7 @@ void collect_words(wordhash_t *wh)
 	    fputc('\n', dbgout);
 	}
 
-	if (class == BOGO_LEX_LINE)
+	if (cls == BOGO_LEX_LINE)
 	{
 	    char *s = (char *)yylval->text;
 	    s += yylval->leng + 2;

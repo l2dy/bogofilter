@@ -62,27 +62,27 @@ static int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const ch
 			 double gweight, bool gbad, 
 			 int override, bool ignore)
 {
-    wordlist_t *new = (wordlist_t *)xcalloc(1, sizeof(*new));
+    wordlist_t *n = (wordlist_t *)xcalloc(1, sizeof(*n));
     wordlist_t *list_ptr;
     static int listcount;
 
-    *list = new;
+    *list = n;
 
-    new->dsh=NULL;
-    new->filename=xstrdup(name);
-    new->filepath=xstrdup(path);
-    new->index = ++listcount;
-    new->override=override;
-    new->active=false;
-    new->weight[IX_SPAM]=sweight;
-    new->weight[IX_GOOD]=gweight;
-    new->bad[IX_SPAM]=sbad;
-    new->bad[IX_GOOD]=gbad;
-    new->ignore=ignore;
+    n->dsh=NULL;
+    n->filename=xstrdup(name);
+    n->filepath=xstrdup(path);
+    n->index = ++listcount;
+    n->override=override;
+    n->active=false;
+    n->weight[IX_SPAM]=sweight;
+    n->weight[IX_GOOD]=gweight;
+    n->bad[IX_SPAM]=sbad;
+    n->bad[IX_GOOD]=gbad;
+    n->ignore=ignore;
 
     if (! word_lists) {
-	word_lists=new;
-	new->next=NULL;
+	word_lists=n;
+	n->next=NULL;
 	return 0;
     }
     list_ptr=word_lists;
@@ -90,14 +90,14 @@ static int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const ch
     /* put lists with high override numbers at the front. */
     while(1) {
 	if (list_ptr->override < override) {
-	    word_lists=new;
-	    new->next=list_ptr;
+	    word_lists=n;
+	    n->next=list_ptr;
 	    break;
         }
         if (! list_ptr->next) {
 	    /* end of list */
-	    list_ptr->next=new;
-	    new->next=NULL;
+	    list_ptr->next=n;
+	    n->next=NULL;
 	    break;
 	}
 	list_ptr=list_ptr->next;

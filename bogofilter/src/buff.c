@@ -51,10 +51,10 @@ void buff_free_text(buff_t *self)
 
 buff_t *buff_dup(const buff_t *self)
 {
-    buff_t *new = xmalloc(sizeof(buff_t));
-    new->size = self->size;
-    new->t.text = self->t.text;
-    return new;
+    buff_t *n = xmalloc(sizeof(buff_t));
+    n->size = self->size;
+    n->t.text = self->t.text;
+    return n;
 }
 
 int buff_fgetsl(buff_t *self, FILE *in)

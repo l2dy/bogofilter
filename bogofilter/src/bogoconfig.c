@@ -219,13 +219,13 @@ void comma_parse(char opt, const char *arg, double *parm1, double *parm2, double
     xfree(parse);
 }
 
-static run_t check_run_type(run_t new, run_t conflict)
+static run_t check_run_type(run_t add_type, run_t conflict)
 {
     if (run_type & conflict) {
 	(void)fprintf(stderr, "Error:  Invalid combination of options.\n");
 	exit(EX_ERROR);
     }
-    return (run_type | new );
+    return (run_type | add_type);
 }
 
 static bool config_algorithm(const unsigned char *s)
@@ -235,7 +235,7 @@ static bool config_algorithm(const unsigned char *s)
 
 static bool select_algorithm(const unsigned char ch, bool cmdline)
 {
-    enum algorithm_e al = ch;
+    enum algorithm_e al = (enum algorithm_e)ch;
 
     /* if algorithm specified on command line, ignore value from config file */
     if (cmd_algorithm && !cmdline)

@@ -51,7 +51,7 @@ static word_t *nonblank_line = NULL;
 
 token_t get_token(void)
 {
-    token_t class = NONE;
+    token_t cls = NONE;
     unsigned char *cp;
     bool done = false;
 
@@ -74,7 +74,7 @@ token_t get_token(void)
 	yylval = word_new(NULL, 0);
 
     while (!done) {
-	class = lexer->yylex();
+	cls = lexer->yylex();
 	yylval->leng = *lexer->yyleng;
 	yylval->text = (unsigned char *)(*lexer->yytext);
 
@@ -83,10 +83,10 @@ token_t get_token(void)
 	    fputc('\n', dbgout);
 	}
 	    
-	if (class == NONE)
+	if (cls == NONE)
 	    break;
 
-	switch (class) {
+	switch (cls) {
 
 	case EOH:	/* end of header - bogus if not empty */
 	    if (msg_state->mime_type == MIME_MESSAGE)
@@ -148,7 +148,7 @@ token_t get_token(void)
 		word_free(yylval);
 		yylval = ipsave;
 		save_class = IPADDR;
-		return (class);
+		return (cls);
 	    }
 	    break;
 	case NONE:		/* nothing to do */
@@ -194,7 +194,7 @@ token_t get_token(void)
 	    *cp = casefold_table[*cp];
     }
 
-    return(class);
+    return(cls);
 }
 
 void token_init(void)

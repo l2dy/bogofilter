@@ -154,7 +154,7 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 
     memset(val, 0, sizeof(*val));
 
-    for (dsh->index = 0; dsh->index < dsh->count; dsh->index += 1) {
+    for (dsh->index = 0; dsh->index < dsh->count; (int)dsh->index += 1) {
 	int ret = db_get_dbvalue(dsh, &ex_key, &ex_data);
 
 	switch (ret) {
@@ -210,7 +210,7 @@ int ds_write(void *vhandle, const word_t *word, dsv_t *val)
     if (datestamp_tokens || today != 0)
 	val->date = today;
 
-    for (dsh->index = 0; dsh->index < dsh->count; dsh->index += 1) {
+    for (dsh->index = 0; dsh->index < dsh->count; (int)dsh->index += 1) {
 
 	/* With two wordlists, it's necessary to check index and
 	** run_type to avoid writing all tokens to both lists. */
