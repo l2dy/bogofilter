@@ -9,12 +9,14 @@ SUBDIRS = . tests
 bin_PROGRAMS = bogofilter bogoutil
 bin_SCRIPTS = bogoupgrade
 check_PROGRAMS = lexertest debugtest
-man1_MANS = bogofilter.1 bogoutil.1
+man1_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1
 
 CFLAGS = -g
 
 # what to build that from
 MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h debug.h debug.c
+
+BUILT_SOURCES = version.h
 
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c \
@@ -33,7 +35,7 @@ bogoutil_SOURCES = bogoutil.c \
 EXTRA_DIST = $(man1_MANS) \
 	     bogofilter.xml bogoutil.xml bogoupgrade.xml \
 	     bogofilter.spec bogofilter.spec.in \
-	     UPGRADE bogoupgrade bogo.R \
+	     README.hp-ux UPGRADE bogoupgrade bogo.R \
 	     doc/integrating-with-qmail contrib/bogofilter-qfe \
 	     version.sh
 #

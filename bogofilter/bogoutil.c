@@ -358,13 +358,13 @@ int main(int argc, char *argv[])
 {
     typedef enum { NONE, DUMP = 1, LOAD = 2, WORD = 3, ROBX = 4 } cmd_t;
 
-    int  count = 0;
+    int count = 0;
+    int option;
     char *db_file = NULL;
-    char ch;
     cmd_t flag = NONE;
 
-    while ((ch = getopt(argc, argv, "d:l:w:R:hvVx:")) != -1)
-	switch (ch) {
+    while ((option = getopt(argc, argv, "d:l:w:R:hvVx:")) != -1)
+	switch (option) {
 	case 'd':
 	    flag = DUMP;
 	    count += 1;

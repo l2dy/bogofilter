@@ -9,7 +9,8 @@
 
 set -e
 
-for num in `seq 1 4`;do
+# Note FreeBSD has no "seq" command.
+for num in 1 2 3 4 ;do
 echo "Running test $num"
   env num=${num} ${SHELL:=/bin/sh} ${srcdir}/run.sh
 done

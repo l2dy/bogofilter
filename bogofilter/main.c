@@ -43,6 +43,8 @@ const char *progname = "bogofilter";
 
 run_t run_type = RUN_NORMAL; 
 
+static char  *Rfn = NULL;
+
 /* if the given environment variable 'var' exists, copy it to 'dest' and
    tack on the optional 'subdir' value.
  */
@@ -98,20 +100,39 @@ static int check_directory(const char* path)
     return 0;
 }
 
-int main(int argc, char **argv)
+int validate_args(int argc, char **argv)
 {
-    int	  ch;
-    int	  optind_save;
-    int   exitcode = 0;
-    char  *Rfn = NULL;
+    bool registration, classification;
 
-    set_dir_from_env(directory, "HOME", BOGODIR);
-    set_dir_from_env(directory, "BOGOFILTER_DIR", NULL);
+//  flags '-s', '-n', '-S', or '-N', are mutually exclusive of flags '-p', '-u', '-e', and '-R'.
+    classification = (run_type == RUN_NORMAL) ||(run_type == RUN_UPDATE) || passthrough || nonspam_exits_zero || (Rtable != 0);
+    registration   = (run_type == REG_SPAM) || (run_type == REG_GOOD) || (run_type == REG_GOOD_TO_SPAM) || (run_type == REG_SPAM_TO_GOOD);
+
+    if ( registration && classification)
+    {
+	fprintf(stderr, "Error:  Invalid combination of options.\n");
+	fprintf(stderr, "\n");
+	fprintf(stderr, "    Options '-s', '-n', '-S', and '-N' are used when registering words.\n");
+	fprintf(stderr, "    Options '-p', '-u', '-e', and '-R' are used when classifying messages.\n");
+	fprintf(stderr, "    The two sets of options may not be used together.\n");
+	fprintf(stderr, "    \n");
+//	fprintf(stderr, "    Options '-g', '-r', '-l', '-d', '-x', and '-v' may be used with either mode.\n");
+	return 2;
+    }
+
+    return 0;
+}
+
+int process_args(int argc, char **argv)
+{
+    int option;
+    int exitcode;
+    int optind_save;
 
     optind_save=1;
-    while ((ch = getopt(argc, argv, "d:ehlsnSNvVpugR::rx:")) != EOF)
+    while ((option = getopt(argc, argv, "d:ehlsnSNvVpugR::rx:")) != EOF)
     {
-	switch(ch)
+	switch(option)
 	{
 	case 'd':
 	    strncpy(directory, optarg, PATH_LEN);
@@ -212,6 +233,22 @@ int main(int argc, char **argv)
 	}
 	optind_save = optind+1;
     }
+
+    exitcode = validate_args(argc, argv);
+
+    return exitcode;
+}
+
+int main(int argc, char **argv)
+{
+    int   exitcode;
+
+    set_dir_from_env(directory, "HOME", BOGODIR);
+    set_dir_from_env(directory, "BOGOFILTER_DIR", NULL);
+
+    exitcode = process_args(argc, argv);
+    if (exitcode != 0)
+	exit(exitcode);
 
     if (!directory[0]) {
 	fprintf(stderr, "%s: cannot find bogofilter directory.\n"

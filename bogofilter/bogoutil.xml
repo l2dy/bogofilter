@@ -17,9 +17,9 @@
         <arg>-l</arg>
         <arg>-w</arg>
       </group>
-      <arg choice="opt">-v</arg>
       <arg choice="plain"><replaceable>file.db</replaceable></arg>
       <group choice="opt">
+        <arg>-v</arg>
         <arg>-h</arg>
         <arg>-V</arg>
       </group>
@@ -41,10 +41,6 @@
        specified database file.
     </para>
     <para>
-       The <option>-v</option> option produces verbose output on stderr.
-       This option is primarily useful for debugging.
-    </para>
-    <para>
        The <option>-w</option> option tells <application>bogoutil</application> to read the specified database file and display
        display words and their associated count.  stdin provides the input list of words for this option.
     </para>
@@ -52,6 +48,10 @@
       The <option>file.db</option> is the path to the database file that
       <application>bogoutil</application> reads or writes.
     </para>   
+    <para>
+       The <option>-v</option> option produces verbose output on stderr.
+       This option is primarily useful for debugging.
+    </para>
     <para>The <option>-h</option> option prints the help message and exits.</para>
     <para>The <option>-V</option> option prints the version number and exits.</para>
   </refsect1>

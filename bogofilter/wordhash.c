@@ -107,7 +107,7 @@ smalloc (wordhash_t * h, size_t n)
   char *t;
 
   /* Force alignment on architecture's natural boundary.*/
-  n += ( n % __alignof__ ( char * ));
+  n += __alignof__ ( char * ) - ( n % __alignof__ ( char * ));
    
   if (x == NULL || x->avail < n)
     {

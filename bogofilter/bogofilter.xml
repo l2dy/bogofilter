@@ -25,7 +25,7 @@
   <arg choice='opt'>-e</arg>
   <arg choice='opt'>-g</arg>
   <arg choice='opt'>-r</arg>
-  <arg choice='opt'>-R[<replaceable>filename</replaceable>]</arg>
+  <arg choice='opt'>-R <replaceable><optional>filename</optional></replaceable></arg>
   <arg choice='opt'>-u</arg>
   <arg choice='opt'>-v</arg>
   <arg choice='opt'>-V</arg>
@@ -174,7 +174,7 @@ of the calculation method.  This is the default unless the
 to the calculation method.  This is automatically enabled when the
 <option>-R</option> option is specified.</para>
 
-<para>The <option>-R</option><replaceable>filename</replaceable> option tells
+<para>The <option>-R</option><optional><replaceable>filename</replaceable></optional> option tells
 <application>bogofilter</application> to produce an R data frame in
 text form to the filename specified (or stdout, if none).  See the 
 section on integration with R, below, for further detail.  Option 
@@ -182,14 +182,6 @@ section on integration with R, below, for further detail.  Option
 
 <para>The <option>-V</option> option prints the version number and 
 exits.</para>
-
-<para>The <option>-g</option> option causes 
-<application>bogofilter</application> to use the Graham algorithm for 
-calculating spamicity.</para>
-
-<para>The <option>-r</option> option causes 
-<application>bogofilter</application> to use the Robinson algorithm for 
-calculating spamicity.</para>
 
 <para>The <option>-x</option> option allows setting of debug classes for 
 printing debug messages.</para>
