@@ -92,10 +92,7 @@ wordhash_free (wordhash_t *wh)
 	xfree (sp);
     }
 
-    if (wh->order != NULL) {
-	xfree (wh->order);
-    }
-
+    xfree (wh->order);
     xfree (wh->bin);
     xfree (wh);
 }
