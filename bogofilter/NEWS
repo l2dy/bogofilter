@@ -21,6 +21,11 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-01-17
+
+	* bogotune's '-M' option for converting a message to msg-count
+          format now requires a filename option.
+
 	2005-01-15
 
 	* Fixed segfault caused by using non-existant option 'F'

@@ -25,7 +25,7 @@
 	     <replaceable>okfile</replaceable> [...]]</arg>
 	 <arg choice="plain">-s <replaceable>spamfile</replaceable> [-s
 	     <replaceable>spamfile</replaceable> [...]]</arg>
-	 <arg>-M</arg>
+	 <arg>-M <replaceable>file</replaceable> </arg>
       </cmdsynopsis>
 
     <cmdsynopsis>
@@ -107,13 +107,13 @@
     option tells <application>bogotune</application> to use the
     following parameter as fp target value.</para>
 
-    <para>The <option>-M</option> option tells
-    <application>bogotune</application> to convert the input files to
-    message count format.  This format provides a sorted list of each
-    message's unique tokens, along with their ham and spam counts.
-    Sorting hides the sense of the messages quite effectively, thus
-    protecting privacy.  The message-count format allows
-    <application>bogotune</application> and
+    <para>The <option>-M <replaceable>file</replaceable></option>
+    option tells <application>bogotune</application> to convert the
+    file to message count format.  This format provides a sorted list
+    of each message's unique tokens, along with their ham and spam
+    counts.  Sorting hides the sense of the messages quite
+    effectively, thus protecting privacy.  The message-count format
+    allows <application>bogotune</application> and
     <application>bogofilter</application> to score messages quickly
     without needing the original token database.  </para>
 

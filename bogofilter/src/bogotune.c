@@ -882,7 +882,7 @@ static void help(void)
 		  "\t  -D      - don't read a wordlist file.\n"
 		  "\t  -d path - specify directory for wordlists.\n"
 		  "\t  -E      - disable ESF (effective size factor) tuning.\n"
-		  "\t  -M      - rewrite input file in message count format.\n"
+		  "\t  -M file - rewrite input file in message count format.\n"
 		  "\t  -r num  - specify robx value\n");
     (void)fprintf(stderr,
 		  "\t  -T num  - specify fp target value\n"
@@ -908,7 +908,7 @@ static int process_arglist(int argc, char **argv)
     _wildcard (&argc, &argv);	/* expand wildcards (*.*) */
 #endif
 
-#define	OPTIONS	":c:Cd:DEI:Mn:qr:s:tT:vVx:"
+#define	OPTIONS	":c:Cd:DEM:n:qr:s:tT:vVx:"
 
     while (1)
     {
@@ -935,11 +935,9 @@ static int process_arglist(int argc, char **argv)
 	case 'E':
 	    esf_flag ^= true;
 	    break;
-	case 'I':
-	    bogolex_file = optarg;
-	    break;
 	case 'M':
 	    bogolex = true;
+	    bogolex_file = optarg;
 	    break;
 	case 'n':
 	    run_type = REG_GOOD;
@@ -1408,7 +1406,7 @@ static rc_t bogotune(void)
     /* Note: memory usage highest while reading messages */
     /* usage decreases as distribute() converts to count format */
 
-    if (bogolex && bogolex_file != NULL) {
+    if (bogolex_file != NULL) {
 	robx = ROBX;			/* needed for degen */
 	read_mailbox(bogolex_file, NULL);
 	return status;
@@ -1423,9 +1421,6 @@ static rc_t bogotune(void)
     if (verbose >= TIME) {
 	show_elapsed_time(beg, end, ns_cnt + sp_cnt, (double)cnt/(end-beg), "messages", "msg/sec");
     }
-
-    if (bogolex)
-	return status;
 
     distribute(REG_GOOD, ns_msglists);
     distribute(REG_SPAM, sp_msglists);
