@@ -13,6 +13,7 @@ COMPACT=0
 while test "$1" ; do
     case "$1" in
 	-c) COMPACT=1 ;;
+	--) shift ; break ;;
 	-*) echo "unknown option $1" >&2 ; exit 1 ;;
 	*) break;
     esac
@@ -52,6 +53,6 @@ for FILE in "$SRC"/*.db ; do
     dd bs=$SIZE if="$FILE" of="$DST/"`basename "$FILE"`
 done
 
-db_recover -h "$DST"
+bogoutil --db-recover="$DST"
 rm -f $TMP
 trap - 0
