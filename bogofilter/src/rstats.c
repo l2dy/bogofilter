@@ -60,8 +60,8 @@ static rstats_t *current = NULL;
 
 /* Function Prototypes */
 
-void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count);
-void rstats_print_rtable(rstats_t **rstats_array, size_t count);
+static void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count);
+static void rstats_print_rtable(rstats_t **rstats_array, size_t count);
 
 /* Function Definitions */
 
@@ -146,7 +146,7 @@ void rstats_print(void)
     xfree(rstats_array);
 }
 
-void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
+static void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
 {
     size_t i, r;
     size_t maxcnt=0;
@@ -223,7 +223,7 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
     }
 }
 
-void rstats_print_rtable(rstats_t **rstats_array, size_t count)
+static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 {
     size_t r;
     long bad_cnt  = max(1, msgs_bad);
