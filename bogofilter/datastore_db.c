@@ -494,7 +494,7 @@ static void db_lock_list(wordlist_t *list, int type){
     db_lock_release_list(list);
 
     /*sleep for short, random time between 1 microsecond and 1 second */
-    usleep( 1 + (unsigned long) (1000.0*rand()/(RAND_MAX+1.0)));
+    usleep( 1 + (unsigned long) (999999.0*rand()/(RAND_MAX+1.0)));
   }
 }
 
