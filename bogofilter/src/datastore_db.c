@@ -48,7 +48,7 @@ static DB_ENV *dbe; /* libdb environment, if in use, NULL otherwise */
 
 static const DBTYPE dbtype = DB_BTREE;
 
-static bool init;
+static bool init = false;
 
 typedef struct {
     char	*path;
@@ -634,7 +634,7 @@ const char *db_str_err(int e) {
 
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
-static bool init = false;
+
 int db_init(void) {
     char *t;
     int cdb_alldb = 1;
