@@ -11,10 +11,14 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include "config.h"
+
+#include <config.h>
+#include "common.h"
 
 #include "lexer.h"
 #include "xmalloc.h"
+
+#undef	URL_TOKENS
 
 /*
  * Our lexical analysis is different from Paul Graham's rules: 
@@ -46,7 +50,6 @@
 /* ignore words longer than this */
 #define MAXWORDLEN 20
 
-extern int passthrough;
 extern char *spam_header_name;
 
 struct textblock textblocks;
@@ -57,7 +60,6 @@ struct textblock textblocks;
 #define YY_DECL token_t yylex(void)
 
 char *yylval;
-static char alt_text[MAXTOKENLEN];
 static int past_header;
 static int yyinput(char *buf, int max_size);
 
@@ -239,8 +241,8 @@ name=\"?					;
 filename=\"?					;
 {MIME_BOUNDARY}(--)?$				{return (BOUNDARY);}
 
-{IPADDR}					{return(TOKEN);}
-[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,[:cntrl:][]+[^[:blank:][:punct:][:cntrl:]]	{return(TOKEN);}
+{IPADDR}					{return(IPADDR);}
+[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,[:cntrl:][]+[^[:blank:][:punct:][:cntrl:]]	{return(TOKEN);} 
 .						;
 ^\n						{past_header = 1; /* eat token */}
 \n						;
@@ -330,9 +332,28 @@ static int yyinput(char *buf, int max_size)
 token_t get_token(void)
 {
     token_t class;
-    char *cp, *t;
+    unsigned char *cp, *t;
 
-    alt_text[0] = 0;
+#ifdef	URL_TOKENS
+    static token_t alt_tok = NONE;
+    static char alt_text[MAXTOKENLEN];
+#endif
+
+#ifdef	URL_TOKENS
+    /* If saved IPADDR, truncate last octet */
+    if ( alt_tok == IPADDR )
+    {
+	char *dot = strrchr(alt_text, '.');
+	if (dot == NULL)
+	    alt_tok = NONE;
+	else
+	{
+	    *dot = '\0';	
+	    yylval = alt_text;
+	    return IPADDR;
+	}
+    }
+#endif
 
     while ((class = yylex()) > 0) {
 	/* when we have a boundary line, eliminate the distinction between
@@ -345,6 +366,20 @@ token_t get_token(void)
 	    break;
 	}
 
+#ifdef	URL_TOKENS
+	if (class == IPADDR)
+	{
+	    const char *prefix="url:";
+	    size_t len = strlen(prefix);
+	    size_t avl = sizeof(alt_text);
+	    avl -= strlcpy( alt_text, "url:", avl);
+	    strlcpy( alt_text+len, yytext, avl);
+	    yylval = alt_text;
+	    alt_tok = IPADDR;
+	    return class;
+	}
+#endif
+
 	/* eat all long words */
 	if (yyleng <= MAXWORDLEN)
 	    break;
@@ -353,7 +388,7 @@ token_t get_token(void)
     for (cp = yytext; *cp; cp++)
 	*cp = tolower((unsigned char)*cp);
 
-    yylval = (alt_text[0] ? alt_text : yytext);
+    yylval = yytext;
     return(class);
 }
 
