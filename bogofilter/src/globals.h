@@ -81,6 +81,6 @@ enum passmode { PASS_MEM, PASS_SEEK };
 extern enum passmode passmode;
 
 extern	bool	msg_count_file;
-extern	bool	no_stats;		/* true if suppress rstats */
+extern	bool	unsure_stats;		/* true if print stats for unsures */
 
 #endif

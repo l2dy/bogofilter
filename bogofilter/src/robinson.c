@@ -70,12 +70,12 @@ rf_method_t rf_robinson_method = {	/* needed by config.c */
 
 void rob_print_stats(FILE *fp)
 {
-    bool unsure = (*method->status)() == RC_UNSURE;
+    bool unsure = unsure_stats && ((*method->status)() == RC_UNSURE) && verbose;
 
     fp = NULL; 	/* quench compiler warning */
-    if (Rtable || verbose >= 2 ||
-	rob_stats.s.spamicity > thresh_stats || 
-	rob_stats.s.spamicity > thresh_rtable )
+    if (Rtable || unsure || verbose >= 2 ||
+	rob_stats.s.spamicity > thresh_stats ||
+	rob_stats.s.spamicity > thresh_rtable)
 	rstats_print(unsure);
 }
 
@@ -228,7 +228,7 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 
     if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() begins\n");
 
-    need_stats = !no_stats && (Rtable || (verbose + passthrough) > 1);
+    need_stats = (Rtable || verbose || passthrough);
     Rtable |= verbose > 3;
 
     if (need_stats)

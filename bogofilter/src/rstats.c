@@ -139,7 +139,7 @@ void rstats_print(bool unsure)
 
     if (Rtable || verbose>=3)
 	rstats_print_rtable(rstats_array, count);
-    else if (verbose==2 || (unsure && verbose == 1))
+    else if (verbose==2 || (unsure && verbose))
 	rstats_print_histogram(robn, rstats_array, count);
 
     xfree(rstats_array);

@@ -72,6 +72,6 @@ uint	db_cachesize = 0;		/* in MB */
 enum	passmode passmode;		/* internal */
 bool	msg_count_file = false;
 const char *progtype = NULL;
-bool	no_stats  = false;		/* true if suppress rstats */
+bool	unsure_stats = false;		/* true if print stats for unsures */
 
 run_t run_type = RUN_UNKNOWN;

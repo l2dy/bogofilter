@@ -354,6 +354,7 @@ static void help(void)
 		  "\tinfo options:\n"
 		  "\t  -t      - set terse output mode.\n"
 		  "\t  -T      - set invariant terse output mode.\n"
+		  "\t  -U      - print statistics if spamicity is 'unsure'.\n"
 		  "\t  -v      - set debug verbosity level.\n"
 		  "\t  -y      - set date for token timestamps.\n"
 		  "\t  -D      - direct debug output to stdout.\n"
@@ -527,6 +528,10 @@ void process_args_1(int argc, char **argv)
 
 	case 'u':
 	    run_type |= RUN_UPDATE;
+	    break;
+
+	case 'U':
+	    unsure_stats = true;
 	    break;
 
 	case 'v':
