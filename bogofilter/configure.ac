@@ -195,7 +195,7 @@ if test x$USE_MEMDEBUG = xYES ; then
 	AC_DEFINE(ENABLE_MEMDEBUG,1,
 	[Enable memory usage debugging])
 fi
-AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$MEM_DEBUG != xNO)
+AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$MEM_DEBUG = xYES)
 
 dnl Deprecated code dependent stuff
 AC_ARG_ENABLE(deprecated-code,
