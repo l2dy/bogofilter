@@ -1,13 +1,40 @@
-With release 0.15, bogofilter's code for processing multiple messages
-has been rewritten.  Previously bogofilter could process multiple
-messages in a mailbox or in a list of message files supplied via stdin
-or on the command line.  Bogofilter now understands Maildir and MH
-directories.  This processing is done in a new module, bogoreader.c,
-which also separates a mbox into individual messages.  The net result
-is to simplify the lexer module, lexer_v3.l, and remove multiple
-special checks for message separator lines, i.e. "^From " lines.  Code
-for setting message header/body state has also been moved into the
-lexer module.  That change and removal of the "never-interactive"
-attribute makes the parser code work properly with both flex v2.5.4
-and 2.5.31. 
+*** GOOD NEWS ... BAD NEWS ***
 
+With release 0.15.4, all header line tokens are now tagged as:
+
+    Subject:      subj:
+    To:           to:
+    From:         from:
+    Return-Path:  rtrn:
+    Received:     rcvd:   ***new***
+    any other:    head:   ***new***
+
+Since existing wordlists don't have "head:???" tokens, the new tokens
+won't be found in the wordlist and bogofilter's accuracy will go down.
+To correct this you can do one of the following things:
+
+1 - Use the new "-H" (for header-degen) option when scoring messages.
+This option tells bogofilter to check the wordlist twice for each
+header token - once for "head:xyz" and a second time for "xyz".  The
+ham and spam counts are added together to give a cumulative result.
+
+Note that, with bogofilter 0.15.4 and later, during message
+registration, "head:xyz" tokens are added to the wordlist (for the
+header lines).  The "-H" option is only applied during scoring.
+
+The "-H" option is meant for temporary usage to cover the period while
+bogofilter goes from having no "head:xyz" tokens in the wordlist to
+the time when there are enough such tokens to score messages
+effectively.  After a few weeks, or perhaps months, of registering
+messages with the new bogofilter, use of the "-H" option can end and
+bogofilter will use the newly added "head:xyz" tokens.
+
+2 - Retrain bogofilter with whatever ham and spam you have available.
+This will create "header:xyz" tokens and allow the new, more effective
+header tagging to be used to fullest advantage.
+
+*** A MAJOR ENHANCEMENT ***
+
+With release 0.15, bogofilter's code for processing multiple messages
+has been rewritten.  In addition to understanding mbox format files,
+bogofilter now understands MH and Mailder folder formats.
