@@ -217,7 +217,7 @@ static int get_decoded_line(buff_t *buff)
     byte *buf = buff->t.text + used;
     int count = yy_get_new_line(buff);
 
-    if (msg_header) {
+    if (msg_header && count > 1 && !isspace(*buf)) {
 	int add = get_unfolded_line(buff);
 	if (add != EOF)
 	    count += add;
