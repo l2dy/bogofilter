@@ -19,6 +19,7 @@ AUTHOR:
 
 extern void bogoreader_init(int argc, char **argv);
 extern void bogoreader_fini(void);
+void bogoreader_name(const char *name);
 
 /* Lexer-Reader Interface */
 

@@ -26,6 +26,7 @@ CONTRIBUTORS:
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
+#include "bogoreader.h"
 #include "bool.h"
 #include "charset.h"
 #include "configfile.h"
@@ -540,11 +541,7 @@ void process_args_1(int argc, char **argv)
             exit(EX_OK);
 
 	case 'I':
-	    fpin = fopen( optarg, "r" );
-	    if (fpin == NULL) {
-		fprintf(stderr, "Can't read file '%s'\n", optarg);
-		exit(EX_ERROR);
-	    }
+	    bogoreader_name(optarg);
 	    break;
 
 	case 'L':

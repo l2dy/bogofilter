@@ -31,7 +31,7 @@ AUTHORS: (C) Copyright 2003 by
 static void (*fini)(void);
 static int  argc;
 static char **argv;
-static char *filename;
+static const char *filename;
 static char namebuff[PATH_LEN+1];
 static char dirname[PATH_LEN+1];
 
@@ -132,7 +132,6 @@ static st_t ismaildir(const char *dir) {
     return IS_DIR;
 }
 
-
 static void dummy_fini(void) { }
 
 static reader_more_t *mailstore_next_store;
@@ -173,7 +172,7 @@ static bool reader__next_mail(void)
  * - does not automatically distinguish between mbox and mail
  *   and takes mbox_mode instead
  */
-static bool open_mailstore(char *name)
+static bool open_mailstore(const char *name)
 {
     filename = name;
     if (fpin) {
@@ -192,7 +191,7 @@ static bool open_mailstore(char *name)
 	    return false;
 	} else {
 	    mail_first = true;
-	    reader_getline   = mbox_mode ? mailbox_getline   : simple_getline;
+	    reader_getline      = mbox_mode ? mailbox_getline   : simple_getline;
 	    mailstore_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
 	    return true;
 	}
@@ -202,14 +201,14 @@ static bool open_mailstore(char *name)
 	    /* MAILDIR */
 	    mailstore_type = MS_MAILDIR;
 	    dir_init(filename);
-	    reader_getline   = simple_getline;
+	    reader_getline      = simple_getline;
 	    mailstore_next_mail = dir_next_mail;
 	    return true;
 	} else {
 	    /* MH */
 	    mailstore_type = MS_MH;
 	    dir_init(filename);
-	    reader_getline   = simple_getline;
+	    reader_getline      = simple_getline;
 	    mailstore_next_mail = dir_next_mail;
 	    return true;
 	}
@@ -243,8 +242,8 @@ static bool b_stdin_next_mailstore(void)
     if ((len = fgetsl(namebuff, sizeof(namebuff), stdin)) <= 0)
 	return false;
 
-    if (len > 0 && filename[len-1] == '\n')
-	filename[len-1] = '\0';
+    if (len > 0 && namebuff[len-1] == '\n')
+	namebuff[len-1] = '\0';
 
     return open_mailstore(filename);
 }
@@ -406,7 +405,7 @@ static int simple_getline(buff_t *buff)
 }
 
 /* initialize for MH directory and
- * Maildir subdirectories ( cur and new). */
+ * Maildir subdirectories (cur and new). */
 static void dir_init(const char *name)
 {
     reader_dir = NULL;
@@ -440,7 +439,6 @@ static const char *get_filename(void)
 void bogoreader_init(int _argc, char **_argv)
 {
     mailstore_first = mail_first = true;
-    reader_getline = mailbox_getline;
     reader_more = reader__next_mail;
     fini = dummy_fini;
     if (run_type & (REG_SPAM|REG_GOOD|UNREG_SPAM|UNREG_GOOD))
@@ -467,6 +465,29 @@ void bogoreader_init(int _argc, char **_argv)
     reader_filename = get_filename;
 }
 
+/* For bogoconfig to distinguish '-I file' from '-I dir' */
+/* global reader initialization, exported */
+void bogoreader_name(const char *name)
+{
+    bool ok;
+    switch (isdir(name)) {
+    case IS_FILE:
+	fpin = fopen( name, "r" );
+	ok = fpin != NULL;
+	break;
+    case IS_DIR:
+	ok = open_mailstore(name);
+	break;
+    default:
+	ok = false;
+	break;
+    }
+    if (!ok) {
+	fprintf(stderr, "Can't read '%s'\n", optarg);
+	exit(EX_ERROR);
+    }
+}
+
 /* global cleanup, exported */
 void bogoreader_fini(void)
 {
@@ -474,5 +495,3 @@ void bogoreader_fini(void)
 	fclose(fpin);
     fini();
 }
-
-
