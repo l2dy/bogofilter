@@ -30,7 +30,8 @@ DO REFER to the bogofilter 0.93 section below for incompatible changes.
 
 Bogofilter 0.94.0 and 0.94.1 SQLite3 support is broken and was repaired
 in 0.94.2; aborting a larger registration could break databases
-consistency (permanent database corruption).
+consistency (permanent database corruption). SQLite3 must be at least
+version 3.2.0.
 
 
 NEW CAPABILITIES IN BOGOFILTER 0.94
