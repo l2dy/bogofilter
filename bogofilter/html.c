@@ -55,7 +55,7 @@ int kill_html_comment(byte *buf_start, byte *buf_used, byte *buf_end)
 	size_t need = (c == '<') ? COMMENT_START_LEN : 1;
 	if (need > (size_t) (buf_used - tmp)) {
 	    int new = buff_fill(need, tmp, buf_used - tmp, buf_end - tmp);
-	    if (new == EOF)
+	    if (new == 0 || new == EOF)
 		break;
 	    buf_used += new;
 	    continue;

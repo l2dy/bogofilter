@@ -177,6 +177,7 @@ int buff_fill(size_t need, byte *buf, size_t used, size_t size)
 	/* too few, read more */
 	int add = get_decoded_line(buf+used, size-used);
 	if (add == EOF) return EOF;
+	if (add == 0) break ;
 	cnt += add;
 	used += add;
     }
