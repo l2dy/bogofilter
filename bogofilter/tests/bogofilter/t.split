@@ -4,12 +4,12 @@ set -e
 
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
-#	 robx.YYYYMMDD.  This is useful when something is different.
+#	 split.YYYYMMDD.  This is useful when something is different.
 #
 #	 ./inputs  - test inputs
 #	 ./outputs - known correct outputs
 #
-#	 robx.YYYYMMDD:
+#	 split.YYYYMMDD:
 #		tests   - directory containing individual output files
 
 : ${srcdir=.}
