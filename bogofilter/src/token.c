@@ -203,6 +203,7 @@ token_t get_token(void)
 	case MSG_COUNT_LINE:
 	    msg_count_file = true;
 	    header_line_markup = false;
+	    token_prefix = NULL;
 	    lexer = &msg_count_lexer;
 	    reader_more = msgcount_more;
 	    continue;
