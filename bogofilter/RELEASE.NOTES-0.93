@@ -22,16 +22,13 @@ QDBM database format changed to B+ trees
 The QDBM database format has been changed from hash tables to B+
 trees, i.e. from the Depot API to the Villa API.  This results in
 significantly better performance, i.e. faster speed.  Unfortunately,
-the two modes are incompatible, so upgrading to 0.93 requires several
-special steps, i.e. dumping and renaming your wordlist before
-installing 0.93 and building a new wordlist afterwards.
+the two modes are incompatible, so upgrading to 0.93 requires running
+a special command to convert the database once:
 
-Use these commands:
+bogoQDBMupgrade wordlist.qdbm wordlist.tmp wordlist.qdbm.old
 
-1:  bogoutil -d /your/path/wordlist.qdbm > wordlist.txt
-2:  mv /your/path/wordlist.qdbm /your/path/wordlist.qdbm.old
-3:  install new bogofilter
-4:  bogoutil -l /your/path/wordlist.qdbm < wordlist.txt
+If this command didn't print anything, everything has gone well and it
+has left your old data base in wordlist.qdbm.old.
 
 
                    MAJOR CHANGES IN BOGOFILTER 0.93
