@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.25  2002/10/02 17:19:42  relson
+ * Removed unneeded #include statements.
+ *
  * Revision 1.24  2002/10/02 17:09:04  gyepi
  * switch to general database locking protocol
  *
@@ -137,19 +140,14 @@ I do the lexical analysis slightly differently, however.
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-#include <ctype.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include <db.h>
-#include <wordhash.h>
-#include <wordlists.h>
-#include "bogofilter.h"
-#include "datastore.h"
 
+#include <bogofilter.h>
+#include <datastore.h>
+#include <wordhash.h>
 
 // constants for the Graham formula 
-#define GOOD_BIAS	2		// give good words more weight
 #define KEEPERS		15		// how many extrema to keep
 #define MINIMUM_FREQ	5		// minimum freq
 #define UNKNOWN_WORD	0.4f		// odds that unknown word is spammish
