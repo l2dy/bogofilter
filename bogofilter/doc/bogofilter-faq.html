@@ -96,6 +96,7 @@
         Technical problems
 
         <ul>
+          <li><a href="#build">How do I build bogofilter (as non-root user)?</a></li>
           <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
           <li><a href="#return-codes">Why does bogofilter give return codes like 0 and
           256 when it's run from inside a program?</a></li>
@@ -773,6 +774,27 @@
 
     <hr>
 
+    <h2 id="build">How do I build bogofilter (as non-root user)?</h2>
+
+    <p>To install bogofilter to a non-standard path (as non-root user
+    you don't have the permission to the normal paths) or if you need
+    to apply patches, build bogofilter as any other program:</p>
+
+    <p>Get the <a
+    href="http://sourceforge.net/project/showfiles.php?group_id=62265">source
+    code</a> and unpack it (<code>tar -xzf</code>). If you need to
+    apply patches, do it now. Change to the source directory and run
+    <code>./configure --prefix=PATH</code> where PATH is the full
+    installation path where you want all the generated files
+    (binaries, man pages etc.).  Typically the path is
+    <code>/usr</code>.  Finally, run the usual build commands --
+    <code>make &amp;&amp; make check &amp;&amp; make install</code>.
+    If you build a special version (with private patches, for example,
+    a different lexer), make the changes after <code>make check</code>
+    and before <code>make install </code>.
+
+    <hr>
+
     <h2 id="nfs">Can I share word lists over NFS?</h2>
 
     <p>If all you're just reading from them, there are no problems.
@@ -782,10 +804,11 @@
     HAVE_FCNTL 1" in your config.h file. Popular UNIX operating
     systems will all support this. If you are running an unusual, or
     an older version of an operating system, make sure it supports
-    fcntl().  If "#define HAVE_FCNTL 1" is set, which indicates
-    fcntl() is supported on your system, then comment out "#define
-    HAVE_FLOCK 1" so that the locking system uses fcntl() locking
-    instead of the default of flock() locking. If your system does not
+    fcntl().  After running <code>./configure</code>: check to see if
+    both "#define HAVE_FCNTL 1" and "#define HAVE_FLOCK 1" are set.
+    If so, comment out the HAVE_FLOCK line, i.e. (<code>/* #define
+    HAVE_FLOCK 1 */</code>), so that the locking system uses fcntl()
+    locking instead of flock() locking. If your system does not
     support fcntl(), then you will not be able to share word list
     files over NFS without the risk of data corruption.</p>
 
@@ -859,7 +882,7 @@
 
     <p>If you don't already have a v3.0+ version of
     <a href="http://www.sleepycat.com">BerkeleyDB</a>, then
-    <a href="http://www.sleepycat.com/download/db/index.shtml">download it (take
+    <a href="http://www.sleepycat.com/download/db/">download it (take
 	one of the 4.2.X versions)</a>,
     unpack it, and do these commands in the db directory:</p>
     <pre>	$ cd build_unix
@@ -900,6 +923,17 @@
     <a href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html">upgrade your portstree using cvsup</a>,
     then type:</p>
     <pre>	# portupgrade -N bogofilter</pre>
+
+    <p><em>Note: This assumes you are root.</em> If not,
+    <a href="#build">build</a> as usual for yourself.
+    Depending on your system you may have to set some environment
+    variables for the <code>./configure</code> command. Example:</p>
+
+    <pre>	# env CPPFLAGS=-I/usr/local/include/db3 LIBS=-ldb3 LDFLAGS=-L/usr/local/lib ./configure</pre>
+
+    <p>The actual paths you use here depend on your system and
+    the database versions you have installed. Check and replace
+    accordingly.</p>
 
     <h3>On HP-UX</h3>
 
