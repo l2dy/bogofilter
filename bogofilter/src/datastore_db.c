@@ -194,10 +194,9 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 
 	    if ((ret = DB_OPEN(dbp, handle->name[i], NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0 &&
 		(ret = DB_OPEN(dbp, handle->name[i], NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0) {
-/*
-  print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s",
-  handle->name[i], ret, db_strerror(ret));
-*/
+		if (DEBUG_DATABASE(1))
+		    print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s",
+				handle->name[i], ret, db_strerror(ret));
 		goto open_err;
 	    }
 	    
