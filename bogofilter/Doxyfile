@@ -55,7 +55,7 @@ WARN_LOGFILE           =
 # configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT                  = 
-FILE_PATTERNS          = *.[chl]
+FILE_PATTERNS          = *.[ch]
 RECURSIVE              = NO
 EXCLUDE                = 
 EXCLUDE_SYMLINKS       = NO
