@@ -176,6 +176,7 @@ static const char *resolvesetflags(u_int32_t flags) {
 static int DB_SET_FLAGS(DB *db, u_int32_t flags)
 {
     int ret = db->set_flags(db, flags);
+
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "[pid %lu] DB->set_flags(db=%p, flags=%#lx=%s) -> %d %s\n",
 		(unsigned long)getpid(), (void *)db, (unsigned long)flags,
@@ -223,7 +224,9 @@ static void handle_free(/*@only@*/ dbh_t *handle)
 bool db_is_swapped(void *vhandle)
 {
     dbh_t *handle = vhandle;
+
     assert(handle->magic == MAGIC_DBH);
+
     return handle->is_swapped;
 }
 
@@ -232,7 +235,9 @@ bool db_is_swapped(void *vhandle)
 bool db_created(void *vhandle)
 {
     dbh_t *handle = vhandle;
+
     assert(handle->magic == MAGIC_DBH);
+
     return handle->created;
 }
 
@@ -247,9 +252,11 @@ static void check_db_version(void)
     if (!version_ok) {
 	version_ok = true;
 	(void)db_version(&maj, &min, NULL);
+
 	if (DEBUG_DATABASE(1))
 	    fprintf(dbgout, "db_version: Header version %d.%d, library version %d.%d\n",
 		    DB_VERSION_MAJOR, DB_VERSION_MINOR, maj, min);
+
 	if (!(maj == DB_VERSION_MAJOR && min == DB_VERSION_MINOR)) {
 	    fprintf(stderr, "The DB versions do not match.\n"
 		    "This program was compiled for DB version %d.%d,\n"
@@ -311,8 +318,10 @@ static uint32_t get_psize(DB *dbp)
 	return 0xffffffff;
     }
     pagesize = dbstat->bt_pagesize;
+
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB->stat success, pagesize: %lu\n", (unsigned long)pagesize);
+
     free(dbstat);
     return pagesize;
 }
@@ -383,8 +392,10 @@ void *db_open(void *vhandle, const char *path,
 
 retry_db_open:
 	handle->created = false;
-	if ((ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags, 0664)) != 0
-	    && ( ret != ENOENT || opt_flags == DB_RDONLY ||
+
+	ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags, 0664);
+
+	if (ret != 0 && ( ret != ENOENT || opt_flags == DB_RDONLY ||
 		((handle->created = true),
 #if DB_EQUAL(4,1)
 		 (ret = DB_SET_FLAGS(dbp, DB_CHKSUM_SHA1)) != 0 ||
@@ -406,6 +417,7 @@ retry_db_open:
 	    if (DEBUG_DATABASE(0))
 		print_error(__FILE__, __LINE__, "DB->open(%s) - actually %s, directory %s, err %s",
 			    handle->name, t, env->directory, db_strerror(ret));
+
 	    dbp->close(dbp, 0);
 	    goto open_err;
 	}
@@ -474,10 +486,13 @@ int db_txn_begin(void *vhandle)
 
     dbh_t *dbh = vhandle;
     dbe_t *env;
+
     assert(dbh);
     assert(dbh->magic == MAGIC_DBH);
     assert(dbh->txn == 0);
+
     env = dbh->dbenv;
+
     assert(env);
     assert(env->dbe);
 
@@ -488,6 +503,7 @@ int db_txn_begin(void *vhandle)
 	return ret;
     }
     dbh->txn = t;
+
     if (DEBUG_DATABASE(2))
 	fprintf(dbgout, "DB_ENV->txn_begin(%p), tid: %lx\n",
 		(void *)env->dbe, (unsigned long)BF_TXN_ID(t));
@@ -500,9 +516,12 @@ int db_txn_abort(void *vhandle)
     int ret;
     dbh_t *dbh = vhandle;
     DB_TXN *t;
+
     assert(dbh);
     assert(dbh->magic == MAGIC_DBH);
+
     t = dbh->txn;
+
     assert(t);
 
     ret = BF_TXN_ABORT(t);
@@ -513,6 +532,7 @@ int db_txn_abort(void *vhandle)
 	if (DEBUG_DATABASE(2))
 	    fprintf(dbgout, "DB_TXN->abort(%lx)\n",
 		    (unsigned long)BF_TXN_ID(t));
+
     dbh->txn = NULL;
 
     switch (ret) {
@@ -531,9 +551,12 @@ int db_txn_commit(void *vhandle)
     dbh_t *dbh = vhandle;
     DB_TXN *t;
     u_int32_t id;
+
     assert(dbh);
     assert(dbh->magic == MAGIC_DBH);
+
     t = dbh->txn;
+
     assert(t);
 
     id = BF_TXN_ID(t);
@@ -545,6 +568,7 @@ int db_txn_commit(void *vhandle)
 	if (DEBUG_DATABASE(2))
 	    fprintf(dbgout, "DB_TXN->commit(%lx, 0)\n",
 		    (unsigned long)id);
+
     dbh->txn = NULL;
 
     switch (ret) {
@@ -601,6 +625,7 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
+
     assert(handle);
     assert(handle->magic == MAGIC_DBH);
     assert(handle->txn);
@@ -656,6 +681,7 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *val)
 
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
+
     assert(handle->magic == MAGIC_DBH);
     assert(handle->txn);
 
@@ -708,8 +734,9 @@ void db_close(void *vhandle)
     int ret;
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
-    uint32_t f = DB_NOSYNC; /* safe as long as we're logging TXNs */
+    uint32_t f = DB_NOSYNC;	/* safe as long as we're logging TXNs */
     DB_ENV *dbe = handle->dbenv->dbe;
+
     assert(handle->magic == MAGIC_DBH);
 
 #if DB_AT_LEAST(4,2)
@@ -771,6 +798,7 @@ void db_flush(void *vhandle)
     int ret;
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
+
     assert(handle->magic == MAGIC_DBH);
 
     if (DEBUG_DATABASE(1))
@@ -984,6 +1012,7 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 		(unsigned long)numlocks, db_strerror(ret));
 	exit(EX_ERROR);
     }
+
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB_ENV->set_lk_max_locks(%p, %lu)\n", (void *)env->dbe, (unsigned long)numlocks);
 
@@ -1006,6 +1035,7 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT), err: %s", db_strerror(ret));
 	exit(EX_ERROR);
     }
+
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT)\n");
 
@@ -1016,6 +1046,7 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 		(unsigned long)logsize, db_strerror(ret));
 	exit(EX_ERROR);
     }
+
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB_ENV->set_lg_max(%lu)\n", (unsigned long)logsize);
 
@@ -1186,7 +1217,9 @@ rec_fail:
 
 void dbe_cleanup(void *vhandle) {
     dbe_t *env = vhandle;
+
     assert(env->magic == MAGIC_DBE);
+
     dbe_cleanup_lite(env);
     clear_lock();
     if (lockfd >= 0)
@@ -1195,7 +1228,9 @@ void dbe_cleanup(void *vhandle) {
 
 void *db_get_env(void *vhandle) {
     dbh_t *handle = vhandle;
+
     assert(handle->magic == MAGIC_DBH);
+
     return handle->dbenv;
 }
 
@@ -1210,9 +1245,11 @@ static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags) {
 
     /* run recovery */
     bf_dbenv_create(&env);
+
     if (DEBUG_DATABASE(0))
         fprintf(dbgout, "running regular data base recovery%s\n",
 	       flags & DB_PRIVATE ? " and removing environment" : "");
+
     /* quirk: DB_RECOVER requires DB_CREATE and cannot work with DB_JOINENV */
 
     /*
