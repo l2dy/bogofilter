@@ -177,13 +177,18 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
     ex_key.data = word->text;
     ex_key.leng = word->leng;
 
-    ex_data.data = cv;
-    ex_data.leng = sizeof(cv);
-
     memset(val, 0, sizeof(*val));
 
     for (dsh->index = 0; dsh->index < dsh->count; dsh->index++) {
-	int ret = db_get_dbvalue(dsh, &ex_key, &ex_data);
+	int ret;
+
+	/* init ex_data inside loop since first db_get_value()
+	** call can change it and cause the second call to fail.
+	*/
+	ex_data.data = cv;
+	ex_data.leng = sizeof(cv);
+
+	ret = db_get_dbvalue(dsh, &ex_key, &ex_data);
 
 	switch (ret) {
 	case 0:
