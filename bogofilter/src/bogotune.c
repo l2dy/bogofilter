@@ -1043,9 +1043,11 @@ static void top_ten(result_t *sorted, uint n)
       for (i = j = 0; i < 10 && j < n;) {
  	result_t *r = &sorted[j++];
  	if (!f && r->fp != target) continue;
+	sp_esf = ESF_SEL(sp_esf, pow(0.75, r->sp_exp));
+	ns_esf = ESF_SEL(ns_esf, pow(0.75, r->ns_exp));
+
 	printf("%5u %6.4f %5.3f %5.3f %8.6f %8.6f %6.4f  %3u %3u  %6.4f %6.4f\n",
-	       r->idx, r->rs, r->md, r->rx,
-	       pow(0.75, r->sp_exp), pow(0.75, r->ns_exp), r->co,
+	       r->idx, r->rs, r->md, r->rx, sp_esf, ns_esf, r->co,
 	       r->fp, r->fn, r->fp*100.0/ns_cnt, r->fn*100.0/sp_cnt);
 	++i;
       }
@@ -1631,6 +1633,7 @@ static rc_t bogotune(void)
 	robs = rsval->data[best->rsi];
 	robx = rxval->data[best->rxi];
 	min_dev = mdval->data[best->mdi];
+
 	spex = spexp->data[best->spi]; sp_esf = ESF_SEL(sp_esf, pow(0.75, spex));
 	nsex = nsexp->data[best->nsi]; ns_esf = ESF_SEL(ns_esf, pow(0.75, nsex));
 
