@@ -1,6 +1,11 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.5  2002/10/04 11:58:46  relson
+ * Removed obsolete "file" field from wordlist_t.
+ * Cleaned up list name, directory, and filename code in open_wordlist().
+ * Changed parameters to "const char *" for open_wordlist(), dbh_init(), and db_open().
+ *
  * Revision 1.4  2002/10/04 04:01:51  relson
  * Added cvs keywords Id and Log to the files' headers.
  *
@@ -28,7 +33,7 @@ params: char * path to database file, char * name of database
 returns: opaque pointer to database handle, which must be saved and
          passed as the first parameter in all subsequent database function calls. 
 */
-void *db_open(char *, char *);
+void *db_open(const char *, const char *);
 
 
 /* Close files and clean up. */
@@ -62,6 +67,7 @@ long db_getvalue(void *, char *);
 
 /* Set the value associated with a given word in a list */
 void db_setvalue(void *, char *, long);
+
 
 /* Get the database message count */
 long db_getcount(void*);

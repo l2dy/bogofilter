@@ -1,6 +1,11 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.9  2002/10/04 11:58:46  relson
+ * Removed obsolete "file" field from wordlist_t.
+ * Cleaned up list name, directory, and filename code in open_wordlist().
+ * Changed parameters to "const char *" for open_wordlist(), dbh_init(), and db_open().
+ *
  * Revision 1.8  2002/10/04 04:01:51  relson
  * Added cvs keywords Id and Log to the files' headers.
  *
@@ -35,7 +40,7 @@ AUTHOR:
 
 extern int errno;
 
-static dbh_t *dbh_init(char *filename, char *name){
+static dbh_t *dbh_init(const char *filename, const char *name){
   dbh_t *handle;
 
   handle = xmalloc(sizeof(dbh_t));
@@ -59,7 +64,7 @@ static void dbh_free(dbh_t *handle){
   Initialize database.
   Returns: pointer database handle on success, NULL otherwise.
 */
-void *db_open(char *db_file, char *name){
+void *db_open(const char *db_file, const char *name){
     int ret;
     dbh_t *handle;
 

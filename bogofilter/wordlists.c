@@ -1,6 +1,11 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.6  2002/10/04 11:58:46  relson
+ * Removed obsolete "file" field from wordlist_t.
+ * Cleaned up list name, directory, and filename code in open_wordlist().
+ * Changed parameters to "const char *" for open_wordlist(), dbh_init(), and db_open().
+ *
  * Revision 1.5  2002/10/04 04:34:11  relson
  * Changed "char *" parameters of setup_lists() and init_lists() to "const char *".
  *
@@ -37,7 +42,7 @@ wordlist_t good_list;
 wordlist_t spam_list;
 wordlist_t* word_lists=NULL;
 
-void *open_wordlist( wordlist_t *list, const char *directory, const char *filename )
+void *open_wordlist( const char *name, const char *directory, const char *filename )
 {
     int	rc;
     void *dbh;			// database handle 
@@ -47,7 +52,6 @@ void *open_wordlist( wordlist_t *list, const char *directory, const char *filena
     size_t namlen = strlen(filename);
 
     path = (char *)xmalloc( dirlen + namlen + 2 );
-    list->file = path;
     strcpy(path, directory);
     if (path[dirlen-1] != '/')
 	strcat(path, "/");
@@ -61,8 +65,8 @@ void *open_wordlist( wordlist_t *list, const char *directory, const char *filena
     }
 
     strcat(path, filename);
-    if ( (dbh = db_open(path, list->name)) == NULL){
-      fprintf(stderr, "bogofilter: Cannot initialize database %s.\n", list->name);
+    if ( (dbh = db_open(path, name)) == NULL){
+      fprintf(stderr, "bogofilter: Cannot initialize database %s.\n", name);
       exit(2);
     }
 
@@ -76,13 +80,10 @@ int init_list(wordlist_t* list, const char* name, const char* directory, const c
     wordlist_t* list_index;
     wordlist_t** last_list_ptr;
 
-    list->name=xstrdup(name);
-    /* warning: open_wordlist requires list->name initialized, do not
-     * reorder */
-    list->dbh=open_wordlist(list, directory, filename);
+    list->dbh=open_wordlist(name, directory, filename);
     if (list->dbh == NULL) return -1;
+    list->name=xstrdup(name);
     list->msgcount=0;
-    list->file=NULL;
     list->override=override;
     list->active=FALSE;
     list->weight=weight;
@@ -130,7 +131,6 @@ void close_lists(void)
     {
 	db_close(list->dbh);
 	if (list->name) free(list->name);
-	if (list->file) free(list->file);
     }
 }
 

@@ -1,6 +1,11 @@
 /* $Id$ */
 /* 
  * $Log$
+ * Revision 1.7  2002/10/04 11:58:46  relson
+ * Removed obsolete "file" field from wordlist_t.
+ * Cleaned up list name, directory, and filename code in open_wordlist().
+ * Changed parameters to "const char *" for open_wordlist(), dbh_init(), and db_open().
+ *
  * Revision 1.6  2002/10/04 04:34:11  relson
  * Changed "char *" parameters of setup_lists() and init_lists() to "const char *".
  *
@@ -34,8 +39,7 @@ struct wordlist_s
     wordlist_t *next;
     char *name;			// resource name (for debug/verbose messages)
     void *dbh;			// database handle 
-    long msgcount;	// count of messages in wordlist.
-    char *file;			// associated  file
+    long msgcount;		// count of messages in wordlist.
     double weight;
     bool active;
     bool bad;
@@ -48,6 +52,6 @@ extern wordlist_t good_list, spam_list;
 
 int setup_lists(const char *directory);
 void close_lists(void);
-void *open_wordlist( wordlist_t *list, const char *directory, const char *filename );
+void *open_wordlist( const char *name, const char *directory, const char *filename );
 
 #endif	/* HAVE_WORDLISTS_H */
