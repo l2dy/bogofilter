@@ -62,7 +62,7 @@ extern void yy_set_state_initial(void);
 
 /* in lexer.c */
 extern void	yyinit(void);
-extern int	yyinput(byte *buf, size_t size);
+extern int	yyinput(byte *buf, size_t used, size_t size);
 
 extern int	buff_fill(buff_t *buff, size_t used, size_t need);
 

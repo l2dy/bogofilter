@@ -79,7 +79,7 @@
 #define YY_DECL token_t yylex(void)
     YY_DECL;			/* declare function */
 
-#define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, max_size)
+#define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, result, max_size)
 #define YY_EXIT_FAILURE EX_ERROR
 
 #undef	stderr

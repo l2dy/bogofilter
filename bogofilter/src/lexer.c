@@ -222,14 +222,14 @@ void yyinit(void)
 	lexer = &v3_lexer;
 }
 
-int yyinput(byte *buf, size_t max_size)
+int yyinput(byte *buf, size_t used, size_t size)
 /* input getter for the scanner */
 {
     int i, cnt;
     int count = 0;
     buff_t buff;
 
-    buff_init(&buff, buf, 0, (uint) max_size);
+    buff_init(&buff, buf, 0, (uint) size);
 
     /* After reading a line of text, check if it has special characters.
      * If not, trim some, but leave enough to match a max length token.
@@ -239,9 +239,22 @@ int yyinput(byte *buf, size_t max_size)
      */
 
     while ((cnt = get_decoded_line(&buff)) != 0) {
+
+	/* Note: some malformed messages can cause xfgetsl() to report
+	** "Invalid buffer size, exiting."  ** and then abort.  This
+	** can happen when the parser is in html mode and there's a
+	** leading '<' but no closing '>'.
+	**
+	** The "fix" is to check for a nearly full lexer buffer and
+	** discard most of it.
+	*/
+	bool nearly_full = used > 1000 && used > size * 10;
+
 	count += cnt;
+
 	if ((count <= (MAXTOKENLEN * 3 / 2)) || not_long_token(buff.t.text, (uint) count))
-	    break;
+	    if (!nearly_full)
+		break;
 
 	if (count >= MAXTOKENLEN * 2) {
 	    size_t shift = count - MAXTOKENLEN;
@@ -249,6 +262,9 @@ int yyinput(byte *buf, size_t max_size)
 	    count = MAXTOKENLEN;
 	    buff.t.leng = MAXTOKENLEN;
 	}
+
+	if (nearly_full)
+	    break;
     }
 
     for (i = 0; i < count; i++ )
