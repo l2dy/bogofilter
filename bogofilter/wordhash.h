@@ -27,7 +27,7 @@ typedef struct wh_alloc_str {
 
 typedef /*@null@*/ hashnode_t *hashnode_pt;
 
-typedef struct {
+typedef struct wordhash_s {
   hashnode_pt *bin;
   /*@null@*/ /*@owned@*/ wh_alloc_node *nodes; /*list of node buffers */
   /*@null@*/  wh_alloc_str  *strings; /* list of string buffers */
