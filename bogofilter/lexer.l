@@ -101,6 +101,7 @@ cellspacing	;
 center	;
 char	;
 charoff	;
+charset	;
 circle	;
 cite	;
 colspan	;
