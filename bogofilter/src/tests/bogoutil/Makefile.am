@@ -1,6 +1,6 @@
 # $Id$
 
-TESTSCRIPTS = driver.sh t.dump.load
+TESTSCRIPTS = driver.sh t.dump.load t.nonascii.replace
 TESTS=$(TESTSCRIPTS)
 
 TESTS_ENVIRONMENT = RUN_FROM_MAKE=1 srcdir=$(srcdir) $(SHELL) $(VERBOSE)

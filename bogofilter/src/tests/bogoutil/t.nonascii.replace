@@ -1,0 +1,47 @@
+#! /bin/sh
+
+: ${srcdir=.}
+relpath="`pwd`/../.."
+. ${srcdir}/../t.frame
+
+BOGOUTIL="$VAL ../../bogoutil"
+
+# create a test wordlist with tokens containing non-ascii characters,
+# replace the non-ascii characters to question marks,
+# check the number of tokens in the wordlist
+#
+# test below
+# remember to use ${srcdir}
+echo  	41 A4 BA B5 B5 20 31 0A \
+	41 C1 BA B8 B5 20 32 0A \
+	41 BA C1 B8 B5 20 33 0A \
+  	42 A4 BA B8 B5 B5 20 31 0A \
+	42 C1 BA B8 B5 B5 20 32 0A \
+	42 BA C1 B8 B5 B5 20 33 0A \
+	42 C1 BA B5 B8 B5 20 34 0A \
+| ../dehex >${TMPDIR}/input
+
+WORDLIST="${TMPDIR}/spamlist.db"
+
+rm -f ${WORDLIST}
+
+$BOGOUTIL -l ${WORDLIST} < ${TMPDIR}/input
+$BOGOUTIL -d ${WORDLIST} > ${TMPDIR}/output.1
+$BOGOUTIL -n -m ${WORDLIST}
+$BOGOUTIL -d ${WORDLIST} > ${TMPDIR}/output.2
+
+LEN1=`wc -l ${TMPDIR}/output.1 | awk '{print $1}'`
+LEN2=`wc -l ${TMPDIR}/output.2 | awk '{print $1}'`
+
+TOK1=`head -1 ${TMPDIR}/output.2 | awk '{print $2 }'`
+TOK2=`tail -1 ${TMPDIR}/output.2 | awk '{print $2 }'`
+
+RESULT=`printf "%d.%d.%d.%d" $LEN1 $LEN2 $TOK1 $TOK2`
+
+WANT="7.2.6.10"
+
+if [ "$RESULT" != "$WANT" ] ; then
+    echo want: $WANT, have: $RESULT
+fi
+
+test $RESULT = "$WANT"
