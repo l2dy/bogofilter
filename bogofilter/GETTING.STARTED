@@ -30,9 +30,9 @@ Summary:
     Releases are made available on SourceForge.net.
 
     If you're a newbie, installing from a binary package is quickest
-    and easiest.  If you're running an rpm based distro like Mandrake,
-    Suse, or Fedora Core, install bogofilter from an rpm.  Similarly
-    if you're running Debian, install from a deb package.
+    and easiest.  If you're running an rpm based distro like Mandrake
+    or Suse, install bogofilter from an rpm.  Similarly if you're
+    running Debian, install from a deb package.
 
     Source formats include tarballs (in .tar.gz and .tar.bz2 forms)
     and rpms (bogofilter-VER.src.rpm).  Once downloaded and untarred,
