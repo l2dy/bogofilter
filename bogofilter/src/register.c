@@ -31,7 +31,9 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
     u_int32_t g = 0, b = 0;
     u_int32_t wordcount = h->count;	/* use number of unique tokens */
 
-    wordlist_t *list;
+    dsv_t val;
+    wordlist_t *list = word_list;	/* use default wordlist for registration */
+
     sh_t incr = IX_UNDF, decr = IX_UNDF;
 
     /* If update directory explicity supplied, setup the wordlists. */
@@ -61,9 +63,9 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
     for (node = wordhash_first(h); node != NULL; node = wordhash_next(h))
     {
-	dsv_t val;
+
 	wordprop = node->buf;
-	ds_read(word_list->dsh, node->key, &val);
+	ds_read(list->dsh, node->key, &val);
 	if (incr != IX_UNDF) {
 	    u_int32_t *counts = val.count;
 	    counts[incr] += wordprop->freq;
@@ -72,17 +74,8 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 	    u_int32_t *counts = val.count;
 	    counts[decr] = ((long)counts[decr] < wordprop->freq) ? 0 : counts[decr] - wordprop->freq;
 	}
-	ds_write(word_list->dsh, node->key, &val);
+	ds_write(list->dsh, node->key, &val);
     }
-
-    for (list = word_lists; list != NULL; list = list->next)
-    {
-	dsv_t val;
-
-	/*
-	   if (!list->active)
-	   continue;
-	   */
 
 	ds_get_msgcounts(list->dsh, &val);
 	list->msgcount[IX_SPAM] = val.spamcount;
@@ -111,7 +104,6 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 	if (DEBUG_REGISTER(1))
 	    (void)fprintf(dbgout, "bogofilter: list %s (%s) - %ul spam, %ul good\n",
 			  list->listname, list->filepath, list->msgcount[IX_SPAM], list->msgcount[IX_GOOD]);
-    }
 
     set_msg_counts(g, b);
 
