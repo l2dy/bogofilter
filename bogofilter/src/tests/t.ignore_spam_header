@@ -27,7 +27,12 @@ $VAL ${relpath}/bogofilter -p -e -C < $TMPDIR/input > $TMPDIR/output1
 # check non-seekable input
 cat $TMPDIR/input | $VAL ${relpath}/bogofilter -p -e -C >$TMPDIR/output2
 
-count=`grep $shn $TMPDIR/output1 | wc -l`
-test $count = "1"
-count=`grep $shn $TMPDIR/output2 | wc -l`
-test $count = "1"
+count1=`grep $shn $TMPDIR/output1 | wc -l`
+count2=`grep $shn $TMPDIR/output2 | wc -l`
+
+if [ $count1 = "1" -a $count2 = "1" ] ; then
+    exit 0
+else
+    echo count1: $count1, count2: $count2
+    exit 1
+fi
