@@ -1,9 +1,13 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.3  2002/09/18 22:30:22  relson
- * Created lexer.h with the definitions needed by lexer_l.l from bogofilter.h.
- * This removes the compile-time dependency between the two files.
+ * Revision 1.4  2002/09/23 10:08:49  m-a
+ * Integrate patch by Zeph Hull and Clint Adams to present spamicity in
+ * X-Spam-Status header in bogofilter -p mode.
  *
+/* Revision 1.3  2002/09/18 22:30:22  relson
+/* Created lexer.h with the definitions needed by lexer_l.l from bogofilter.h.
+/* This removes the compile-time dependency between the two files.
+/*
 /* Revision 1.2  2002/09/15 19:07:12  relson
 /* Add an enumerated type for return codes of RC_SPAM and RC_NONSPAM, which  values of 0 and 1 as called for by procmail.
 /* Use the new codes and type for bogofilter() and when generating the X-Spam-Status message.
@@ -32,7 +36,7 @@ extern void write_list(wordlist_t *ham_list);
 extern void register_words(int fd, wordlist_t *list, wordlist_t *other);
 extern int get_token(void);
 extern void lexer_stream_mode(void);
-extern rc_t bogofilter(int fd);
+extern rc_t bogofilter(int fd, double *xss);
 extern int bogodump(char *file);
 
 extern wordlist_t ham_list, spam_list;

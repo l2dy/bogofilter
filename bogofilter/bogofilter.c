@@ -1,8 +1,12 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.12  2002/09/22 21:26:28  relson
- * Remove the definition and use of strlwr() since get_token() in lexer_l.l already converts the token to lower case.
+ * Revision 1.13  2002/09/23 10:08:49  m-a
+ * Integrate patch by Zeph Hull and Clint Adams to present spamicity in
+ * X-Spam-Status header in bogofilter -p mode.
  *
+/* Revision 1.12  2002/09/22 21:26:28  relson
+/* Remove the definition and use of strlwr() since get_token() in lexer_l.l already converts the token to lower case.
+/*
 /* Revision 1.11  2002/09/19 03:20:32  relson
 /* Move "msg_prob" assignment to proper function, i.e. from select_indicators() to compute_probability().
 /* Move some local variables from the beginning of the function to the innermost block where they're needed.
@@ -595,7 +599,7 @@ double compute_spamicity(bogostat_t *stats)
     return spamicity;
 }
 
-rc_t bogofilter(int fd)
+rc_t bogofilter(int fd, double *xss)
 /* evaluate text for spamicity */
 {
     rc_t	status;
@@ -613,6 +617,9 @@ rc_t bogofilter(int fd)
     spamicity = compute_spamicity(stats);
 
     status = (spamicity > SPAM_CUTOFF) ? RC_SPAM : RC_NONSPAM;
+
+    if (xss != NULL)
+        *xss = spamicity;
 
     return status;
 }

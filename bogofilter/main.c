@@ -1,11 +1,15 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.6  2002/09/20 15:27:27  m-a
- * Optimize bogofilter -p: use tighter loop, print our X-Spam-Status: header after
- * all other headers, and ensure that there is always an empty line after the
- * headers. We have much less checks in the loops, so it should be somewhat
- * faster now.
+ * Revision 1.7  2002/09/23 10:08:49  m-a
+ * Integrate patch by Zeph Hull and Clint Adams to present spamicity in
+ * X-Spam-Status header in bogofilter -p mode.
  *
+/* Revision 1.6  2002/09/20 15:27:27  m-a
+/* Optimize bogofilter -p: use tighter loop, print our X-Spam-Status: header after
+/* all other headers, and ensure that there is always an empty line after the
+/* headers. We have much less checks in the loops, so it should be somewhat
+/* faster now.
+/*
 /* Revision 1.5  2002/09/17 07:19:04  adrian_otto
 /* Added -V mode for printing out version information.
 /*
@@ -188,7 +192,8 @@ int main(int argc, char **argv)
     }
     else
     {
-	rc_t	status = bogofilter(STDIN_FILENO);
+	double spamicity;
+	rc_t	status = bogofilter(STDIN_FILENO, &spamicity);
 
 	if (passthrough)
 	{
@@ -203,8 +208,8 @@ int main(int argc, char **argv)
 
 	    /* print spam-status at the end of the header
 	     * then mark the beginning of the message body */
-	    printf("X-Spam-Status: %s, tests=bogofilter\n", 
-		    (status==RC_SPAM) ? "Yes" : "No");
+	    printf("X-Spam-Status: %s, tests=bogofilter, spamicity=%0.6f\n", 
+		    (status==RC_SPAM) ? "Yes" : "No", spamicity);
 	    /* If the message terminated early (without body or blank
 	     * line between header and body), enforce a blank line to
 	     * prevent anything past us from choking. */
