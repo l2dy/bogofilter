@@ -85,8 +85,8 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
     if (fBogotune) {
 	wordprop_t *wp = wordhash_search_memory(token);
 	if (wp) {
-	    cnts->good = wp->cnts.good;
-	    cnts->bad  = wp->cnts.bad;
+	    cnts->good = max(1, wp->cnts.good);
+	    cnts->bad  = max(1, wp->cnts.bad );
 	}
 	return;
     }
@@ -133,6 +133,9 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 	    fputc('\n', dbgout);
 	}
     }
+
+    cnts->msgs_good = max(1, cnts->msgs_good);
+    cnts->msgs_bad  = max(1, cnts->msgs_bad);
 
     return;
 }
