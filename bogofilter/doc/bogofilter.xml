@@ -143,26 +143,30 @@ robx is the probabilty that the token is spammish.</para>
 token towards robx.</para>
 
 <para>min_dev: a minimum distance from .5 for tokens to use in the
-calculation.  Tokens closer to 0.5 than this value are not used.</para>
+calculation.  Only tokens farther away from 0.5 than this value are
+used.</para>
 
 <para>spam_cutoff: messages with scores bigger than this will be
 marked as spam.</para>
 
 <para>ham_cutoff: If zero, all messages with values below spam_cutoff
-are marked as ham.  If bigger than zero, values below ham_cutoff are
-marked as ham, messages with values between ham_cutoff and spam_cutoff
-are marked as unsure.</para>
+are marked as ham.  If bigger than zero, values less than or equal to
+ham_cutoff are marked as ham.  Messages with values between ham_cutoff
+and spam_cutoff are marked as unsure.  If ham_cutoff equals
+spam_cutoff, messages with this score are marked as spam.</para>
 
 <para>While this method sounds crude compared to the more usual
 pattern-matching approach, it turns out to be extremely effective.
 Paul Graham's paper <ulink url="http://www.paulgraham.com/spam.html">
 A Plan For Spam</ulink> is recommended reading.</para>
 
-<para>This program substantially improves on Paul's proposal by doing smarter
-lexical analysis.  In particular, hostnames and IP addresses are retained
-as recognition features rather than broken up.  Various kinds of MTA
-cruft such as dates and message-IDs are ignored so as not to bloat
-the wordlists.  Lex's Swiss-army-knife nature rises again.</para>
+<para>This program substantially improves on Paul's proposal by doing
+smarter lexical analysis.  <application>Bogofilter</application> does
+proper MIME decoding and a reasonable HTML parsing.  Special kinds of
+tokens like hostnames and IP addresses are retained as recognition
+features rather than broken up.  Various kinds of MTA cruft such as
+dates and message-IDs are ignored so as not to bloat the wordlists.
+Tokens found in various header fields are marked appropriately.</para>
 
 <para>Another seeming improvement is that this program offers Gary
 Robinson's suggested modifications to the calculations.  These modifications
@@ -211,6 +215,10 @@ formatting can be customized using the config file.</para>
 scripts to use.  <application>bogofilter</application> will print an
 abbreviated spamicity message containing 1 letter and the score.  Spam
 is indicated with "S", ham by "H", and unsure by "U".</para>
+
+<para>The <option>-TT</option> provides an invariant terse mode for
+scripts to use.  <application>Bogofilter</application> prints only the
+score and displays it to 16 significant digits.</para>
 
 <para>The <option>-u</option> option tells
 <application>bogofilter</application> to register the message's text
