@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.13  2002/09/25 18:17:09  relson
+ * Added '-h' option to print help message and exit.
+ *
  * Revision 1.12  2002/09/25 18:15:19  relson
  * Renamed '-h' and '-H' options to '-n' and '-N' in main.c.
  * Modified documentation to show the new names.
@@ -103,7 +106,7 @@ int main(int argc, char **argv)
     }
     strcat(directory, BOGODIR);
 
-    while ((ch = getopt(argc, argv, "d:snSNvVp")) != EOF)
+    while ((ch = getopt(argc, argv, "d:hsnSNvVp")) != EOF)
 	switch(ch)
 	{
 	case 'd':
@@ -131,6 +134,26 @@ int main(int argc, char **argv)
 	case 'v':
 	    verbose++;
 	    break;
+
+	case 'h':
+	    printf( "\n" );
+	    printf( "Usage: bogofilter [options] < message\n" );
+	    printf( "\t-h\t- print this help message.\n" );
+	    printf( "\t-d path\t- specify directory for wordlists.\n" );
+	    printf( "\t-p\t- passthrough.\n" );
+	    printf( "\t-s\t- register message as spam.\n" );
+	    printf( "\t-n\t- register message as non-spam.\n" );
+	    printf( "\t-S\t- move message's words from non-spam list to spam list.\n" );
+	    printf( "\t-N\t- move message's words from spam list to spam non-list.\n" );
+	    printf( "\t-v\t- set debug verbosity level.\n" );
+	    printf( "\t-V\t- print version info.\n" );
+	    printf( "\n" );
+	    printf( "bogofilter is a tool for classifying email as spam or non-spam.\n" );
+	    printf( "\n" );
+	    printf( "For updates and additional information, see\n" );
+	    printf( "URL: http://bogofilter.sourceforge.net\n" );
+	    printf( "\n" );
+	    exit(0);
 
         case 'V':
             printf("\n%s version %s ", PACKAGE, VERSION);
