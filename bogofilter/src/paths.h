@@ -26,7 +26,7 @@ NAME:
 
 /* Function Prototypes */
 
-int build_path(char* dest, size_t size, const char* dir, const char* file);
+bool build_path(char* dest, size_t size, const char* dir, const char* file);
 
 char *build_progtype(const char *name, const char *db_type);
 

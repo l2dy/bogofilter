@@ -114,10 +114,7 @@ void close_wordlists(bool nosync /** Normally false, if true, do not synchronize
 
 bool build_wordlist_path(char *filepath, size_t size, const char *path)
 {
-    bool ok;
-
-    ok = build_path(filepath, size, path, WORDLIST) == 0;
-
+    bool ok = build_path(filepath, size, path, WORDLIST);
     return ok;
 }
 

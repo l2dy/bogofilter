@@ -54,18 +54,18 @@ char *build_progtype(const char *name, const char *db_type)
 /* build an path to a file given a directory and file name,
  * concatenating dir and file, adding a slash if necessary
  *
- * returns: -1 for overflow
- *	     0 for success
+ * returns: true for success
+ *	    false for error (esp. overflow)
  */
-int build_path(char* dest, size_t size, const char* dir, const char* file)
+bool build_path(char* dest, size_t size, const char* dir, const char* file)
 {
     /* If absolute path ... */
     if (bf_abspath(file))
     {
 	if (strlcpy(dest, file, size) >= size) 
-	    return -1;
+	    return false;
 	else
-	    return 0;
+	    return true;
     }
 
     if (strlcpy(dest, dir, size) >= size) return -1;
@@ -73,13 +73,13 @@ int build_path(char* dest, size_t size, const char* dir, const char* file)
     if (check_directory(dir)) {
 	if (dest[strlen(dest)-1] != DIRSEP_C) {
 	    if (strlcat(dest, DIRSEP_S, size) >= size)
-		return -1; /* RATS: ignore */
+		return false; /* RATS: ignore */
 	}
 	if (strlcat(dest, file, size) >= size)
-	    return -1;
+	    return false;
     }
 
-    return 0;
+    return true;
 }
 
 /* if the given environment variable 'var' exists, create a path from it and
