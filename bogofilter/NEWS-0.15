@@ -2,29 +2,25 @@
 				BOGOFILTER NEWS
 			       =================
 
-2003-08-29
-
-* Fix defective printing in 'bogofilter -Q' output.
-
-2003-08-28
-
-* Revise mime processing to cure "fatal flex scanner internal
-  error--end of buffer missed".
-* Restore parsing rule for ending a "loose" html comment.
-
-2003-08-26
-
-* Change mime boundary line to operate on raw input,
-  i.e. before decoding it.
-* Add charset map for windows-1251 to KOI8-R (Cyrillic).
-
-2003-08-24
+0.15.0	2003-08-29
 
 * Implemented a new, more robust, mail reading module that knows how to
   split a mbox into messages and read Maildirs.
-* 64-bit printf files for %*s string formatting.
-* Compiles with TDB again.
 * Implement support for MH directory (such as used by Sylpheed).
+
+* Change mime boundary line to operate on raw input,
+  i.e. before decoding it.
+* Revise mime processing to cure "fatal flex scanner internal
+  error--end of buffer missed".
+* Restore parsing rule for ending a "loose" html comment.
+* Add charset map for windows-1251 to KOI8-R (Cyrillic).
+
+* 64-bit printf files for %*s string formatting.
+
+0.14.5.3 2003-08-29
+
+* Compiles with TDB again.
+* Fix defective printing in 'bogofilter -Q' output.
 
 0.14.5.2 2003-08-20
 
