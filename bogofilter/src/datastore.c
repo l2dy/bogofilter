@@ -369,9 +369,9 @@ ex_t ds_oper(void *env, const char *path, dbmode_t open_mode,
 static word_t  *msg_count_tok;
 static word_t  *wordlist_version_tok;
 
-void *ds_init(const char *directory)
+void *ds_init(const char *directory, const char *db_file)
 {
-    void *dbe = dbe_init(directory);
+    void *dbe = dbe_init(directory, db_file);
     if (msg_count_tok == NULL) {
 	msg_count_tok = word_new((const byte *)MSG_COUNT, strlen(MSG_COUNT));
     }

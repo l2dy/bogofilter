@@ -95,7 +95,7 @@ static ex_t dump_wordlist(const char *ds_file)
 
     token_count = 0;
 
-    dbe = ds_init(bogohome);
+    dbe = ds_init(bogohome, ds_file);
     rc = ds_oper(dbe, ds_file, DS_READ, ds_dump_hook, NULL);
     ds_cleanup(dbe);
 
@@ -149,7 +149,7 @@ static ex_t load_wordlist(const char *ds_file)
     unsigned long line = 0;
     unsigned long count[IX_SIZE], date;
     YYYYMMDD today_save = today;
-    void *dbe = ds_init(bogohome);
+    void *dbe = ds_init(bogohome, ds_file);
 
     dsh = ds_open(dbe, CURDIR_S, ds_file, DS_WRITE | DS_LOAD);
 
@@ -316,7 +316,7 @@ static ex_t display_words(const char *path, int argc, char **argv, bool show_pro
         return EX_ERROR;
     }
 
-    dbe = ds_init(bogohome);
+    dbe = ds_init(bogohome, path);
 
     if ( stat(path, &sb) == 0 ) {
 	/* XXX FIXME: deadlock possible */

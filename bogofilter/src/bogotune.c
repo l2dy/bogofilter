@@ -1704,7 +1704,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
 	check_wordlist_path(ds_path);
 	set_bogohome(ds_path);
-	env = ds_init(bogohome);
+	env = ds_init(bogohome, WORDLIST);
 
 	ds_path = mxcat(ds_path, DIRSEP_S, WORDLIST, NULL);
 	init_wordlist("word", ds_path, 0, WL_REGULAR);

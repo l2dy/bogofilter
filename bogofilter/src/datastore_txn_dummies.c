@@ -54,8 +54,9 @@ dsm_t dsm_transactional = {
 };
 
 #if	!defined(DISABLE_TRANSACTIONS) && !defined(ENABLE_TRANSACTIONS)
-void *dbe_init(const char *unused) {
+void *dbe_init(const char *unused, const char *unused2) {
     (void)unused;
+    (void)unused2;
     return (void *)~0;
 }
 #endif

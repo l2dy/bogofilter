@@ -288,7 +288,7 @@ ex_t maintain_wordlist_file(const char *db_file)
     dsh_t *dsh;
     void *dbe;
 
-    dbe = ds_init(bogohome);
+    dbe = ds_init(bogohome, db_file);
     dsh = ds_open(dbe, CURDIR_S, db_file, DS_WRITE);
 
     if (dsh == NULL)

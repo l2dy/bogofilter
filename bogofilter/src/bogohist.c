@@ -139,7 +139,7 @@ ex_t histogram(const char *path)
 
     rhistogram_t hist;
 
-    dbe = ds_init(bogohome);
+    dbe = ds_init(bogohome, path);
     if (dbe == NULL)
 	return EX_ERROR;
 

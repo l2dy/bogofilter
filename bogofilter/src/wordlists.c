@@ -59,7 +59,7 @@ struct envnode {
     char directory[1];
 };
 
-static void *list_searchinsert(const char *directory) {
+static void *list_searchinsert(const char *directory, const char *file) {
     struct envnode *i, *n;
 
     assert(directory);
@@ -70,7 +70,7 @@ static void *list_searchinsert(const char *directory) {
     }
 
     n = xmalloc(sizeof(struct envnode) + strlen(directory) + 1);
-    n->dbe = ds_init(directory);
+    n->dbe = ds_init(directory, file);
     strcpy(&n->directory[0], directory);
     LIST_INSERT_HEAD(&envlisthead, n, entries);
     return n->dbe;
@@ -88,7 +88,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
     /* FIXME: create or reuse environment from filepath */
 
     x = bf_dirname(list->filepath);
-    dbe = list_searchinsert(x);
+    dbe = list_searchinsert(x, list->filepath);
     free(x);
     if (dbe == NULL)
 	exit(EX_ERROR);
