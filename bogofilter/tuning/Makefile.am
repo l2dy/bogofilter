@@ -6,4 +6,5 @@ EXTRA_DIST= \
 	README.bogotune	 \
 	bogotune \
 	bogol \
+	bogolex.sh \
 	sample.output/tune.nochange sample.output/tune.normal sample.output/tune.verbose
