@@ -90,12 +90,8 @@ double fis_get_spamicity(size_t robn, FLOAT P, FLOAT Q )
     {
 	double df = 2.0 * robn;
 	double ln2 = 0.6931472;					/* ln(2) */
-	int e;
 
 	fis_stats.robn = robn;
-
-	P.mant = frexp(P.mant, &e); P.exp += e;
-	Q.mant = frexp(Q.mant, &e); Q.exp += e;
 
 	/* convert to natural logs */
 	fis_stats.p_ln = log(P.mant) + P.exp * ln2;		/* invlogsum */
