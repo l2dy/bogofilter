@@ -1,6 +1,12 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.4  2002/10/03 17:57:06  relson
+ * Changed interface to lexer.l as a first step towards adding the advanced
+ * tokenizing features of spambayes into bogofilter.
+ *
+ * Thanks to Mark Hoffman for this work.
+ *
  * Revision 1.3  2002/10/02 19:04:55  relson
  * Don't allow carriage returns, '\r', in tokens.
  *
@@ -90,11 +96,17 @@
 //
 // The list of HTML keywords and attributes to be ignored is from the 4.0 DTD.
 
+// ignore words longer than this
+#define MAXWORDLEN 20
+
 extern int passthrough;
 
 struct textblock textblocks, *textend = &textblocks;
 
 #define YY_INPUT(buf,result,max_size) result = yyinput(buf, max_size)
+
+char *yylval;
+static char alt_text[MAXTOKENLEN];
 
 int yyinput(char *buf, int max_size)
 // input getter for the scanner
@@ -326,12 +338,16 @@ int get_token(void)
     int class;
     char *cp;
 
+    alt_text[0] = 0;
+
     while ((class = yylex()) > 0)
 	if (yyleng <= MAXWORDLEN)
 	    break;
 
     for (cp = yytext; *cp; cp++)
 	*cp = tolower(*cp);
+
+    yylval = (alt_text[0] ? alt_text : yytext);
     return(class);
 }
 

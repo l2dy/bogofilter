@@ -1,6 +1,12 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.26  2002/10/03 17:57:06  relson
+ * Changed interface to lexer.l as a first step towards adding the advanced
+ * tokenizing features of spambayes into bogofilter.
+ *
+ * Thanks to Mark Hoffman for this work.
+ *
  * Revision 1.25  2002/10/02 17:19:42  relson
  * Removed unneeded #include statements.
  *
@@ -178,7 +184,7 @@ void *collect_words(int fd, int *msg_count, int *word_count)
     tok = get_token();
   
     if (tok != FROM && tok != 0){
-      w = wordhash_insert(h, yytext, sizeof(wordprop_t));
+      w = wordhash_insert(h, yylval, sizeof(wordprop_t));
       w->msg_freq++;
       w_count++;
     }
@@ -302,7 +308,7 @@ void register_words(int fdin, reg_t register_type)
 
 typedef struct 
 {
-    char        key[MAXWORDLEN+1];
+    char        key[MAXTOKENLEN+1];
     double      prob;
 }
 discrim_t;
@@ -359,7 +365,7 @@ void populate_stats( bogostat_t *stats, char *text, double prob, int count )
     if (hit) 
     { 
 	hit->prob = prob;
-	strncpy(hit->key, text, MAXWORDLEN);
+	strncpy(hit->key, text, MAXTOKENLEN);
     }
 }
 
@@ -480,7 +486,7 @@ bogostat_t *select_indicators(wordhash_t *wordhash)
         if (hit) 
 	{ 
 	    hit->prob = prob;
-	    strncpy(hit->key, node->key, MAXWORDLEN);
+	    strncpy(hit->key, node->key, MAXTOKENLEN);
 	}
     }
     return (&stats);
