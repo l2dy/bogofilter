@@ -23,12 +23,14 @@ extern	bool	score_html_comments;
 
 /* lexer interface */
 typedef enum {
-    NONE = 0,
-    TOKEN,	/* regular token */
+    NONE,
     FROM,	/* mbox message delimiter */
-    BOUNDARY,	/* MIME multipart boundary line */
+    TOKEN,	/* regular token */
     EMPTY,	/* empty line */
-    IPADDR	/* ip address */
+    BOUNDARY,	/* MIME multipart boundary line */
+    IPADDR,	/* ip address */
+    MSG_COUNT_LINE,
+    BOGO_LEX_LINE
 } token_t;
 
 /* in lexer.c */

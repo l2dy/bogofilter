@@ -47,6 +47,7 @@
 #include "charset.h"
 #include "lexer.h"
 #include "mime.h"		/* for mime_*() */
+#include "msgcounts.h"
 #include "textblock.h"
 #include "token.h"
 
@@ -57,6 +58,7 @@
 
 static word_t yyt;
 static word_t *yy_text(void);
+static int lineno;
 
 static word_t *yy_text(void)
 {
@@ -78,6 +80,7 @@ MIME_BOUNDARY	[0-9a-zA-Z\'()+_,-./:=?#]{1,70}
 ID		[0-9a-zA-Z-]*
 MTYPE		[ \t]*[0-9a-zA-Z/-]*
 
+NUM		[0-9]+
 TOKEN_ESR	[A-Za-z$][A-Za-z0-9$\'.-]+[A-Za-z0-9$]
 
 TOKENMID_CA_075	[^][:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:][]+
@@ -85,15 +88,19 @@ TOKENMID_NJS	[^\][:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[]+
 TOKENMID_NJS_DR	[^[:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[\]]+
 
 TOKENFRONT	[^[:blank:][:cntrl:][:digit:][:punct:]]
-TOKENMID	[^][:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:][]+
+TOKENMID	[^[:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[\]]+
 TOKENBACK	[^[:blank:][:punct:][:cntrl:]]
 
 TOKEN 		{TOKENFRONT}{TOKENMID_NJS_DR}{TOKENBACK}
 
+MSG_COUNT	^\"\.MSG_COUNT\"\ {NUM}\ {NUM}$
+BOGOLEX_MID	[^[:blank:]<>;=()&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[\]]+
+BOGOLEX_TOKEN	{TOKENFRONT}{BOGOLEX_MID}{TOKENBACK}
+
 T2		{TOKENFRONT}<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[]+
 T1		{TOKENFRONT}
 
-%s TEXT HTML
+%s TEXT HTML BOGO_LEX
 
 %%
 
@@ -103,6 +110,12 @@ T1		{TOKENFRONT}
 						      return TOKEN;
 						  }
 						}
+
+<INITIAL,BOGO_LEX>{MSG_COUNT}			{ if (lineno==0) { BEGIN(BOGO_LEX); } 
+						  return MSG_COUNT_LINE;
+						}
+<BOGO_LEX>^\"{BOGOLEX_TOKEN}\"\ {NUM}\ {NUM}	{ return BOGO_LEX_LINE; }
+<BOGO_LEX>\n					{ lineno += 1; }
 
 <INITIAL>charset=\"?{ID}\"?			{ got_charset(yytext); yyredo(yy_text(), '='); }
 <INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); yyless(strlen("MIME-Version:")); return(TOKEN); }
@@ -137,6 +150,7 @@ T1		{TOKENFRONT}
 
 .						;
 ^\n						{ got_emptyline(); 
+						  lineno += 1;
 						  switch (get_content_type()) 
 						  {
 						    case MIME_TEXT_PLAIN: BEGIN(TEXT); break;
@@ -146,6 +160,7 @@ T1		{TOKENFRONT}
 						  return(EMPTY);
 						}
 \n						{ got_newline(); 
+						  lineno += 1;
 						}
 
 %%

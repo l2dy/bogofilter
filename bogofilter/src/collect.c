@@ -48,14 +48,41 @@ bool collect_words(wordhash_t *wh)
     for (;;){
 	token_t token_type = get_token();
 
-	if (token_type != FROM && token_type != NONE){
-	    w = wordhash_insert(wh, yylval, sizeof(wordprop_t), &wordprop_init);
+	/* treat .MSG_COUNT as FROM */
+	if (token_type == MSG_COUNT_LINE)
+	    token_type = FROM;
+
+	if (token_type != FROM && 
+	    token_type != NONE)
+	{
+	    word_t *token = yylval;
+
+	    if (token_type == BOGO_LEX_LINE)
+	    {
+		char *s = yylval->text+1;
+		char *f = strchr(s, '"');
+		token = word_new(s, f-s);
+	    }
+
+	    w = wordhash_insert(wh, token, sizeof(wordprop_t), &wordprop_init);
 	    if (w->freq < max_repeats) w->freq++;
 	    wh->wordcount += 1;
 	    if (DEBUG_WORDLIST(3)) { 
 		fprintf(dbgout, "%3d ", (int) wh->wordcount);
-		word_puts(yylval, 0, dbgout);
+		word_puts(token, 0, dbgout);
 		fputc('\n', dbgout);
+	    }
+
+	    if (token_type == BOGO_LEX_LINE)
+	    {
+		char *s = yylval->text+1;
+
+		s = strchr(s, '"');
+		w->bad = atoi(s+2);
+		s = strchr(s+2, ' ');
+		w->good = atoi(s+1);
+
+		word_free(token);
 	    }
 	    continue;
 	}

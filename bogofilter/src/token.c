@@ -164,6 +164,10 @@ token_t get_token(void)
 	    break;
 	case NONE:		/* nothing to do */
 	    break;
+	case MSG_COUNT_LINE:
+	    break;
+	case BOGO_LEX_LINE:
+	    break;
 	case FROM:		/* nothing to do */
 	    break;
 	}
