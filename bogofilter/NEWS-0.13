@@ -2,6 +2,10 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.13.7	2003-06-20
+
+* Replaced tuning/tuning.sh with tuning/bogotune.
+
 0.13.6.3 2003-06-18
  
 * Minor code rewrites to speed up processing messages, mboxes,
