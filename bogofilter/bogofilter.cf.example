@@ -97,9 +97,8 @@
 #	    o - spam_cutoff, ex. cutoff=%o
 #
 #	    p - spamicity as a probability
-#	    d - if ham, difference of spamicity from 0.0
+#	    d - if ham or unsure, the spamicity
 #		if spam, difference of spamicity from 1.0
-#		if unsure, just the spamicity
 #
 #		For examples, see "Format of spamicity output" (below).
 #
@@ -278,6 +277,11 @@
 #spamicity_formats = %0.6f, %0.6f
 
 # for Fisher (with 3-state output)
-#
+
+#spamicity_tags = Yes, No, Unsure
+#spamicity_formats = %0.6f, %0.6f, %0.6f
+
+## for 3-state output (with alternative labels and formats):
+
 ## spamicity_tags = Spam, Ham, Unsure
 ## spamicity_formats = %6.2e, %6.2e, %0.6f
