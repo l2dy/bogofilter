@@ -296,20 +296,19 @@ static void help(void)
     (void)fprintf(stderr,
 		  "\thelp options:\n"
 		  "\t  -h      - print this help message.\n"
-		  "\t  -Q      - query (display) bogofilter configuration.\n"
 		  "\t  -V      - print version information and exit.\n"
+		  "\t  -Q      - query (display) bogofilter configuration.\n"
 	);
     (void)fprintf(stderr,
 		  "\tclassification options:\n"
 		  "\t  -p      - passthrough.\n"
 		  "\t  -e      - in -p mode, exit with code 0 when the mail is not spam.\n"
+		  "\t  -u      - classify message as spam or non-spam and register accordingly.\n"
 		  "\t  -2      - set binary classification mode (yes/no).\n"
 		  "\t  -3      - set ternary classification mode (yes/no/unsure).\n"
-		  "\t  -u      - classify message as spam or non-spam and register accordingly.\n"
 		  "\t  -M      - set mailbox mode. Classify multiple messages in an mbox formatted file.\n"
 		  "\t  -b      - set streaming bulk mode. Classify multiple messages whose filenames are read from STDIN.\n"
 		  "\t  -B name1 name2 ... - set bulk mode. Classify multiple messages named as files on the command line.\n"
-		  "\t  -O file - save message to 'file' in passthrough mode.\n"
 		  "\t  -F      - force printing of spamicity numbers.\n"
 		  "\t  -R      - print an R data frame.\n"
 	);
@@ -328,6 +327,7 @@ static void help(void)
 		  "\t  -l      - write messages to syslog.\n"
 		  "\t  -L tag  - specify the tag value for log messages.\n"
 		  "\t  -I file - read message from 'file' instead of stdin.\n"
+		  "\t  -O file - save message to 'file' in passthrough mode.\n"
 	);
     (void)fprintf(stderr,
 		  "\talgorithm options:\n"
@@ -354,6 +354,7 @@ static void help(void)
 		  "\t  -v      - set debug verbosity level.\n"
 		  "\t  -x list - set debug flags.\n"
 		  "\t  -D      - direct debug output to stdout.\n"
+		  "\t  -y      - set date for token timestamps.\n"
 	);
     (void)fprintf(stderr,
 		  "\n"
