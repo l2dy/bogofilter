@@ -111,7 +111,7 @@ static void print_version(void)
 		  progname, version, PACKAGE);
 }
 
-#define	OPTIONS	":c:CDhHI:npP:qvVx:X"
+#define	OPTIONS	":c:CDhHI:npP:qvVx:X:"
 
 /** These functions process command line arguments.
  **
