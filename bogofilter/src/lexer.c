@@ -17,6 +17,7 @@
 #include "bogoreader.h"
 #include "charset.h"
 #include "error.h"
+#include "iconvert.h"
 #include "lexer.h"
 #include "memstr.h"
 #include "mime.h"
@@ -139,9 +140,29 @@ static int yy_get_new_line(buff_t *buff)
 
 static int get_decoded_line(buff_t *buff)
 {
+    int count;
+    static buff_t *temp = NULL;
+
     uint used = buff->t.leng;
     byte *buf = buff->t.text + used;
-    int count = yy_get_new_line(buff);
+
+#ifndef	ENABLE_ICONV
+    temp = buff;
+#else
+    /* have the temp buff match the capacity of the parameter */
+    if (temp == NULL)
+	temp = (buff_t *) calloc(sizeof(buff_t), 1);
+    if (temp->size < buff->size) {
+	if (temp->t.text != NULL)
+	    xfree(temp->t.text);
+	temp->size = buff->size;
+	temp->t.text = (byte *) xmalloc(temp->size + D);
+    }
+
+    temp->t.leng = temp->read = 0;
+#endif
+
+    count = yy_get_new_line(temp);
 
     /* Save the text on a linked list of lines.
      * Note that we store fixed-length blocks here, not lines.
@@ -151,6 +172,10 @@ static int get_decoded_line(buff_t *buff)
     if (passthrough && passmode == PASS_MEM && count > 0)
 	textblock_add(temp->t.text+temp->read, (size_t) count);
 
+#ifdef	ENABLE_ICONV
+    iconvert(temp, buff);
+#endif
+  
     if (count == EOF) {
 	if ( !ferror(fpin))
 	    return YY_NULL;

@@ -308,9 +308,11 @@ token_t get_token(void)
 	    yylval->text[yylval->leng] = (byte) '\0';
 	}
 
-	/* replace nonascii characters by '?'s */
-	for (cp = yylval->text; cp < yylval->text+yylval->leng; cp += 1)
-	    *cp = casefold_table[*cp];
+	if (replace_nonascii_characters) {
+	    /* replace nonascii characters by '?'s */
+	    for (cp = yylval->text; cp < yylval->text+yylval->leng; cp += 1)
+		*cp = casefold_table[*cp];
+	}
     }
 
     return(cls);

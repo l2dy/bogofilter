@@ -66,6 +66,12 @@ regression_SOURCES= ../trio/regression.c
 LDADD += libtrio.a
 endif
 
+if !ENABLE_ICONV
+CHARSET_SOURCES = charset.h charset.c chUnicodeTo866.h
+else
+CHARSET_SOURCES = charset.h charset_iconv.c iconvert.h iconvert.c
+endif
+
 # what to build that from
 version_sources= \
 	common.h system.h bftypes.h \
@@ -78,7 +84,7 @@ version_sources= \
 	bool.h bool.c \
 	bsdqueue.h \
 	buff.h buff.c \
-	charset.h charset.c chUnicodeTo866.h \
+	$(CHARSET_SOURCES) \
 	collect.h collect.c \
 	configfile.h configfile.c \
 	datastore.h datastore.c \

@@ -312,6 +312,27 @@ AC_REPLACE_FUNCS(strlcpy strlcat strerror strtoul)
 
 AC_LIB_RPATH
 
+dnl Allow the user to enable/disable use of iconv for converting character sets files.
+
+AC_ARG_ENABLE(iconv,
+	AC_HELP_STRING([--enable-iconv],
+	[Enable iconv for converting character sets]),
+	if test "$enableval" = no; then
+		[USE_ICONV=NO]
+	else
+		[USE_ICONV=YES]
+	fi
+)
+
+dnl Enable building with iconv for converting character sets files.
+if test x$USE_ICONV = xYES ; then
+	AC_DEFINE(ENABLE_ICONV,1,
+	[Enable iconv for converting character sets])
+fi
+AM_CONDITIONAL(ENABLE_ICONV, test x$USE_ICONV = xYES)
+
+dnl Allow the user to enable/disable use of database transactions
+
 AC_ARG_ENABLE(transactions,
 	      AS_HELP_STRING([--enable-transactions], [Enable transactions in Berkeley DB (yes)]))
 

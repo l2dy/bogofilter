@@ -19,13 +19,14 @@ NAME:
 
 #define	MASK_BIT(uc)	( 1 << (uc - 'A'))
 
-#define BIT_NAMES	"abcdghlmrstw"
+#define BIT_NAMES	"abcdghilmrstw"
 #define BIT_ALGORITHM	MASK_BIT('A')
 #define BIT_READER	MASK_BIT('B')
 #define BIT_CONFIG	MASK_BIT('C')
 #define BIT_DATABASE	MASK_BIT('D')
 #define BIT_GENERAL	MASK_BIT('G')
 #define BIT_HTML	MASK_BIT('H')
+#define BIT_ICONV	MASK_BIT('I')
 #define BIT_LEXER	MASK_BIT('L')
 #define BIT_MIME	MASK_BIT('M')
 #define BIT_REGISTER	MASK_BIT('R')
@@ -42,6 +43,7 @@ extern u_int32_t  debug_mask;
 #define DEBUG_DATABASE(level)	0
 #define DEBUG_ALGORITHM(level)	0
 #define DEBUG_HTML(level)	0
+#define DEBUG_ICONV(level)	0
 #define DEBUG_LEXER(level)	0
 #define DEBUG_MIME(level)	0
 #define DEBUG_READER(level)	0
@@ -55,6 +57,7 @@ extern u_int32_t  debug_mask;
 #define DEBUG_DATABASE(level)	((debug_mask & BIT_DATABASE)  && (verbose > level))
 #define DEBUG_ALGORITHM(level)	((debug_mask & BIT_ALGORITHM) && (verbose > level))
 #define DEBUG_HTML(level)	((debug_mask & BIT_HTML)      && (verbose > level))
+#define DEBUG_ICONV(level)	((debug_mask & BIT_ICONV)     && (verbose > level))
 #define DEBUG_LEXER(level)	((debug_mask & BIT_LEXER)     && (verbose > level))
 #define DEBUG_MIME(level)	((debug_mask & BIT_MIME)      && (verbose > level))
 #define DEBUG_READER(level)	((debug_mask & BIT_READER)    && (verbose > level))
