@@ -160,7 +160,7 @@ If you need a log file upgrade, the upgrade procedure is:
 (NOTE: DO NOT UPGRADE BERKELEY DB OR BOGOFILTER UNTIL STEP 4!)
 
 1. shut down your mail system,
-2. run bogoutil --db-remove-environment ~/.bogofilter (for each user)
+2. run 'bogoutil --db-remove-environment ~/.bogofilter' (for each user)
    (this implies running forced recovery first)
 3. archive the database for catastrophic recovery (take a backup)
 4. install the new Berkeley DB version, recompile bogofilter (unless
@@ -179,7 +179,7 @@ The logs of the transactional data store, log.NNNNNNNNNN files of up to
 1 MB in size (in the default configuration), can consume considerable
 amounts of disk space and many users wish to purge or compress these log
 files. For the simple removal of log files that are no longer active,
-you can run bogoutil --db-prune ~/.bogofilter. It will checkpoint the
+you can run 'bogoutil --db-prune ~/.bogofilter'. It will checkpoint the
 database (to make some more log files inactive) and then remove the
 inactive log files.
 
@@ -222,11 +222,11 @@ Fix:     Resize the lock tables. Just run "bf_resize ~/.bogofilter" and
 	 file and run recovery to perform the reize. It'll resize the
 	 lock and object tables to twice of what is currently in use.
 
-You may need to adjust these figures before larger updates or to
-conserve disk space. You will need up to one lock per data base page and
-a bit of headroom for future training -- see section 4.2 below to
-determine the size of the data base and data base page. After changing
-these set_lk_max* lines in DB_CONFIG, run bogoutil --db-recover ~/.bogofilter
+You may need to adjust these figures before larger updates or to conserve
+disk space. You will need up to one lock per data base page and a bit
+of headroom for future training -- see section 4.2 below to determine
+the size of the data base and data base page. After changing these
+set_lk_max* lines in DB_CONFIG, run 'bogoutil --db-recover ~/.bogofilter'
 to make the change effective.
 
 4. Other Information of Interest ---------------------------------------
@@ -259,10 +259,10 @@ concurrent processes alongside a registration process.
 
 Exception: after reading the Berkeley DB documentation for the
 db_archive utility and using that utility, you may be able to remove
-the INACTIVE log.NNNNNNNNNN files, or use bogoutil --db-prune. This may
-be necessary to reclaim disk space, but you must strictly adhere to
-the Berkeley DB documentation lest you risk your data base become
-unrecoverable in case of trouble.
+the INACTIVE log.NNNNNNNNNN files, or use 'bogoutil --db-prune ...'.
+This may be necessary to reclaim disk space, but you must strictly
+adhere to the Berkeley DB documentation lest you risk your data base
+become unrecoverable in case of trouble.
 
 WARNING: If you need to copy data base files,
 	 DO NOT USE cp, BUT DO USE dd instead and give it a block size
@@ -312,7 +312,7 @@ but may require you to to resize the lock region more often.
 e. Use this rounded-up figure for both of the the two DB_CONFIG file
    lines mentioned in section 3.1
 
-f. run bogoutil --db-recover ~/.bogofilter
+f. run 'bogoutil --db-recover ~/.bogofilter'
 
 Bogofilter will re-create the lock tables automatically
 the next time it is run.
@@ -321,7 +321,7 @@ the next time it is run.
 
 A "DB_CONFIG" file that is in your bogofilter home directory, usually
 ~/.bogofilter, can be used to configure the data base behavior. Some
-options take effect immediately, some need bogoutil --db-recover to
+options take effect immediately, some need 'bogoutil --db-recover' to
 become effective.
 
 Here is a list of interesting settings, put one at a line, omitting the
