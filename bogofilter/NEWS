@@ -4,6 +4,8 @@
 
 $Id$
 
+0.11.1.9
+
 	2003-04-10
 
 	* Reformat histogram output (from "-vv") to fit in 80 columns.
@@ -18,7 +20,6 @@ $Id$
 0.11.1.8
 
 	2003-04-07
-
 	* Include 'strict_check' in '-qv' output.
 	* Correct outdated acinclude.m4, as it causes the configure
 	  script to be invalid.
@@ -28,12 +29,10 @@ $Id$
 0.11.1.7
 
 	2003-04-07
-
 	* Change bogoutil's '-p' option to require a database.
 	* Fix OS X segfault caused by using DB handle after closing database.
 
 	2003-04-05
-
 	* Improve bogoutil's reporting of a bad directory or filename.
 	* Simplify configure check for BerkeleyDB.
 	* Extend configure's compiler checks for AIX.
