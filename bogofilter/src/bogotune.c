@@ -655,14 +655,12 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
     int score_count = 0;
     int train_count = 0;
 
-    double ratio = (ds_file != NULL || user_robx < EPS)
-	? 0.0
-	: scale(msgs->count,  
-		LIST_COUNT + TEST_COUNT,	/* small count */
-		LIST_COUNT + LIST_COUNT,	/* large count */
-		LIST_COUNT / TEST_COUNT,	/* small ratio */
-		LIST_COUNT / LIST_COUNT);	/* large ratio */
-    
+    double ratio = scale(msgs->count,  
+			 LIST_COUNT + TEST_COUNT,	/* small count */
+			 LIST_COUNT + LIST_COUNT,	/* large count */
+			 LIST_COUNT / TEST_COUNT,	/* small ratio */
+			 LIST_COUNT / LIST_COUNT);	/* large ratio */
+
     /* Update .MSG_COUNT */
     msg_count = wordhash_insert(train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
 
