@@ -42,8 +42,10 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
     /* If update directory explicity supplied, setup the wordlists. */
     if (update_dir) {
-	if (set_wordlist_dir(update_dir, PR_CFG_UPDATE) != 0)
+	if (set_wordlist_dir(update_dir, PR_CFG_UPDATE) != 0) {
+	    fprintf(stderr, "Can't find HOME or BOGOFILTER_DIR in environment.\n");
 	    exit(EX_ERROR);
+	}
     }
 
     if (_run_type & REG_SPAM)	{ r = "s"; incr = IX_SPAM; }

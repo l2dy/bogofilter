@@ -79,7 +79,11 @@ double compute_robinson_x(const char *path)
 
     struct robhook_data rh;
 
-    set_wordlist_dir(path, PR_NONE);
+    if (set_wordlist_dir(path, PR_NONE)) {
+	fprintf(stderr, "Can't find HOME or BOGOFILTER_DIR in environment.\n");
+	exit(EX_ERROR);
+    }
+
     open_wordlists(word_lists, DS_READ);
     wordlist = get_default_wordlist(word_lists);
 
