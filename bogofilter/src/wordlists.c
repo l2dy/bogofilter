@@ -6,13 +6,9 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
-#ifdef HAVE_SYS_SELECT_H
-#include <sys/select.h>
-#endif
 
 #include "bogofilter.h"
 #include "datastore.h"
-#include "error.h"
 #include "find_home.h"
 #include "paths.h"
 #include "wordlists.h"
@@ -22,8 +18,8 @@
 #define	MIN_SLEEP	0.5e+3		/* 0.5 milliseconds */
 #define	MAX_SLEEP	2.0e+6		/* 2.0 seconds */
 
-#ifndef	RAND_MAX
-#define	RAND_MAX	2147483647	/* May not work on SysV */
+#ifndef	RAND_MAX			/* SunOS 4.1.X needs this */
+#define	RAND_MAX	2147483647	/* May not work on SysV   */
 #endif
 
 /* Function Prototypes */
