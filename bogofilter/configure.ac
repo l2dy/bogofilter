@@ -334,7 +334,7 @@ case "x$WITH_DB_ENGINE" in
 		export LIBDB
 	        LIBS="$saveLIBS $LIBDB"
 		export LIBS
-		AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],havelib=1 ; break)
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],havelib=1 ; break 2)
 	    done
 	done
 	LIBS="$saveLIBS"
