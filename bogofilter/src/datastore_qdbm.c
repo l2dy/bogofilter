@@ -83,12 +83,6 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
-static void dbh_print_name(dbh_t *handle, const char *msg)
-{
-    fprintf(dbgout, "%s (%s)", msg, handle->name);
-}
-
-
 /*
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
@@ -124,11 +118,9 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	}
     }
 
-    if (DEBUG_DATABASE(1)) {
-	dbh_print_name(dsh->dbh, "(qdbm) dpopen( ");
-	fprintf(dbgout, ", %d )\n", open_mode);
-    }
-      
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "(qdbm) dpopen( %s, %d )\n", handle->name, open_mode);
+
     return dsh;
 
  open_err:
@@ -239,10 +231,8 @@ void db_close(void *vhandle, bool nosync)
 
     if (handle == NULL) return;
 
-    if (DEBUG_DATABASE(1)) {
-	dbh_print_name(vhandle, "(qdbm) db_close");
-	fprintf(dbgout, " %s\n", nosync ? "nosync" : "sync");
-    }
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "(qdbm) dpclose( %s, %d )\n", handle->name, nosync ? "nosync" : "sync");
 
     dbp = handle->dbp;
 
@@ -251,6 +241,7 @@ void db_close(void *vhandle, bool nosync)
     if (!dpclose(dbp))
 	print_error(__FILE__, __LINE__, "(qdbm) dpclose for %s failed: %s",
 		    handle->name, dperrmsg(dpecode));
+
     handle->dbp = NULL;
 
     dbh_free(handle);

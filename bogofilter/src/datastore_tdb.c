@@ -70,12 +70,6 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
-static void dbh_print_name(dbh_t *handle, const char *msg)
-{
-    fprintf(dbgout, "%s (%s)", msg, handle->name);
-}
-
-
 /*
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
@@ -108,10 +102,8 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     if (dbp == NULL)
 	goto open_err;
 
-    if (DEBUG_DATABASE(1)) {
-	dbh_print_name(dsh->dbh, "(db) tdb_open( ");
-	fprintf(dbgout, ", %d )\n", open_mode);
-    }
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "(db) tdb_open( %s ), %d )\n", handle->name, open_mode);
       
     if (open_mode == DB_WRITE) {
 	if (tdb_lockall(dbp) == 0) {
@@ -223,10 +215,8 @@ void db_close(void *vhandle, bool nosync)
 
     if (handle == NULL) return;
 
-    if (DEBUG_DATABASE(1)) {
-	dbh_print_name(vhandle, "db_close");
-	fprintf(dbgout, " %s\n", nosync ? "nosync" : "sync");
-    }
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "db_close (%s) %s\n", handle->name, nosync ? "nosync" : "sync");
 
     if (handle->locked) {
 	tdb_unlockall(handle->dbp);

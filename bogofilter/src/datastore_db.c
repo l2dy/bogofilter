@@ -121,12 +121,6 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
-static void dbh_print_name(dbh_t *handle, const char *msg)
-{
-    fprintf(dbgout, "%s (%s)", msg, handle->name);
-}
-
-
 static void check_db_version(void)
 {
     int maj, min;
@@ -240,8 +234,9 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 
 	/* open data base */
 
-	if ((ret = DB_OPEN(dbp, handle->name, NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0 && (ret != ENOENT ||
-													(ret = DB_OPEN(dbp, handle->name, NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0)) {
+	if (((ret = DB_OPEN(dbp, handle->name, NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0) &&
+	    ((ret != ENOENT) ||
+	     (ret = DB_OPEN(dbp, handle->name, NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0)) {
 	    if (DEBUG_DATABASE(1))
 		print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s",
 			    handle->name, ret, db_strerror(ret));
@@ -458,10 +453,9 @@ void db_close(void *vhandle, bool nosync)
     DB *dbp = handle->dbp;
     uint32_t f = nosync ? DB_NOSYNC : 0;
 
-    if (DEBUG_DATABASE(1)) {
-	dbh_print_name(handle, "db_close");
-	fprintf(dbgout, " %s\n", nosync ? "nosync" : "sync");
-    }
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "db_close (%s) %s\n",
+		handle->name, nosync ? "nosync" : "sync");
 
 #if 0
     if (handle->fd >= 0) {
