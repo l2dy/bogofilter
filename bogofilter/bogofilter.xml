@@ -80,8 +80,7 @@ calculations.  These modifications are described in Robinson's paper <ulink
 url="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">
 Spam Detection</ulink>.</para>
 
-<para><existing>Another seeming improvement...Spam
-Detection.</existing> Since then, Robinson and others have
+<para>Since then, Robinson and others have
 realized that the S calculation can be further optimized: if a vector of
 length k contains random, uniformly-distributed probabilities p, then
 -2 * sum(ln(p)) is distributed as chi-squared with 2n degrees of
