@@ -5,6 +5,7 @@ extern int verbose;
 extern int passthrough;
 extern int nonspam_exits_zero;
 extern int logflag;
+extern bool stats_in_header;
 
 extern int thresh_index;
 extern double thresh_stats;

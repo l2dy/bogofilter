@@ -47,6 +47,8 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #define KEEPERS		15		/* how many extrema to keep */
 #define MINIMUM_FREQ	5		/* minimum freq */
 
+#define EPS		100.0 * DBL_EPSILON /* equality cutoff */
+
 #define MAX_PROB	0.99f		/* max probability value used */
 #define MIN_PROB	0.01f		/* min probability value used */
 #define DEVIATION(n)	fabs((n) - EVEN_ODDS)	/* deviation from average */
@@ -267,7 +269,7 @@ static int compare_extrema(const void *id1, const void *id2)
     const discrim_t *d1 = id1;
     const discrim_t *d2 = id2;
     return ((d1->prob > d2->prob) ||
-	     ((fabs(d1->prob - d2->prob) < DBL_EPSILON) && (strcmp(d1->key, d2->key) > 0)));
+	     ((fabs(d1->prob - d2->prob) < EPS) && (strcmp(d1->key, d2->key) > 0)));
 }
 
 static void init_bogostats(/*@out@*/ bogostat_t *bogostats)
@@ -524,7 +526,7 @@ static double compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errn
     product = invproduct = 1.0f;
     for (pp = bogostats->extrema; pp < bogostats->extrema+SIZEOF(bogostats->extrema); pp++)
     {
-	if (fabs(pp->prob) < DBL_EPSILON)
+	if (fabs(pp->prob) < EPS)
 	    continue;
 
 	product *= pp->prob;
@@ -567,7 +569,7 @@ static double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@
     double spamicity;
     int robn = 0;
 
-    if (fabs(robx) < DBL_EPSILON)
+    if (fabs(robx) < EPS)
     {
 	/* Note: .ROBX is scaled by 1000000 in the wordlist */
 	long l_robx = db_getvalue(spam_list.dbh, ".ROBX");
@@ -621,7 +623,7 @@ static void initialize_constants(void)
 	case AL_GRAHAM:
 	    spam_cutoff = GRAHAM_SPAM_CUTOFF;
 	    max_repeats = GRAHAM_MAX_REPEATS;
-	    if (fabs(min_dev) < DBL_EPSILON)
+	    if (fabs(min_dev) < EPS)
 		min_dev     = GRAHAM_MIN_DEV;
 	    break;
 
@@ -629,9 +631,9 @@ static void initialize_constants(void)
 	    spam_cutoff = ROBINSON_SPAM_CUTOFF;
 	    max_repeats = ROBINSON_MAX_REPEATS;
 	    scalefactor = compute_scale();
-	    if (fabs(min_dev) < DBL_EPSILON)
+	    if (fabs(min_dev) < EPS)
 		min_dev     = ROBINSON_MIN_DEV;
-	    if (fabs(robs) < DBL_EPSILON)
+	    if (fabs(robs) < EPS)
 		robs = ROBS;
 	    break;
 
