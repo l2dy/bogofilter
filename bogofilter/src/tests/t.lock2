@@ -2,6 +2,7 @@
 
 . ${srcdir:=.}/t.frame
 
+rm -f $TMPDIR/*
 filelist="${srcdir}/inputs/????.mbx ${srcdir}/inputs/msg.?.txt"
 cat $filelist >$TMPDIR/inp
 
@@ -14,26 +15,32 @@ replace_nonascii_characters=Y
 EOF
 
 grind() {
-    a=0
-    $BOGOFILTER -n -d $TMPDIR -c $CONFIG <$TMPDIR/inp 2>> $TMPDIR/log || a=$?
+    $BOGOFILTER -n -d $TMPDIR -c $CONFIG <$TMPDIR/inp 2>> $TMPDIR/log && a=0 || a=$?
     echo >>$TMPDIR/res $a
 }
 
 explode() {
-    (
-    grind &
-    grind &
-    grind &
-    grind
-    wait
-    )
+(   a=
+    trap "kill 0" 1 2 3 15
+    for i in 1 2 3 4 ; do
+	grind &
+        a="$a $!"
+    done
+    wait $a
+)
 }
 
 # this test tortures the locking
+
+trap "" 2
+wtpid=
 for i in 1 2 3 4 ; do
     explode &
+    wtpid="$wtpid $!"
 done
-wait
+trap "kill 0" 2
+wait $wtpid
+trap - 2
 
 [ -n "$BF_SAVEDIR" ] && . ${srcdir}/t.save
 
