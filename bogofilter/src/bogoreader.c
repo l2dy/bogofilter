@@ -19,12 +19,11 @@ AUTHORS: (C) Copyright 2003 by
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "buff.h"
+#include "bogoreader.h"
 #include "error.h"
 #include "fgetsl.h"
 #include "lexer.h"
-#include "bogoreader.h"
-#include "system.h"
+#include "paths.h"
 #include "token.h"
 #include "xmalloc.h"
 
