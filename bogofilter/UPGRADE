@@ -1,0 +1,71 @@
+What:
+
+There are now multiple file formats for various versions of bogofilter:
+This document explains how to upgrade any earlier type to current versions.
+
+Assumptions:
+
+Recent version of bogofilter package is installed and the programs
+/usr/bin/bogoutil and /usr/bin/bogoupgrade.pl exist. Adjust paths to suit your taste and system.
+
+How:
+
+1. Stop all instances of bogofilter. The upgrade tools do not lock files or guard
+   against multiple processes accessing the same files. If you have cron jobs or daemons
+   that fetch and process mail and could fire off bogofilter. Stop them.
+
+2. Backup your data. Let's assume that you said:
+   
+    $  mv ~/.bogofilter ~/.bogofilter.safe
+    $  mkdir ~/.bogofilter
+
+
+3. If your bogofilter version is less than 0.7, say
+   
+    $ /usr/bin/bogoupgrade.pl -b /usr/bin/bogoutil -i ~/.bogofilter.safe/goodlist -o  ~/.bogofilter/hamlist.db
+    $ /usr/bin/bogoupgrade.pl -b /usr/bin/bogoutil -i ~/.bogofilter.safe/badlist  -o  ~/.bogofilter/spamlist.db
+
+   If your bogofilter version is 0.7 or greater, say
+
+    $ /usr/bin/bogoupgrade.pl -b /usr/bin/bogoutil -i ~/.bogofilter.safe/hamlist.count -o  ~/.bogofilter/hamlist.db
+    $ /usr/bin/bogoupgrade.pl -b /usr/bin/bogoutil -i ~/.bogofilter.safe/spamlist.count  -o  ~/.bogofilter/spamlist.db
+
+4. Done. Restart any stopped daemons, cron tasks, etc.
+
+Why:
+
+Versions 0.1? to 0.6 uses a text file for message counts
+and data.
+
+The first line contains a signature and a message count.
+Subsequent lines contain space separated word/count pairs, each followed by a newline.
+
+Here are the first few lines of a sample file:
+
+# bogofilter wordlist (format version A): 798
+word 5
+otherword 4
+yetanotherword 4
+
+Versions 0.7 to 0.7.4 uses two files for each list:
+A text file for the message counts, and a Berkeley DB
+file for the word/count values.
+
+Here is a sample signature message count file:
+
+# bogofilter email-count (format version B): 1077
+
+
+Versions 0.7.5+ use a single Berkeley DB file to hold both word and message counts.
+A record with the special key, '.MSG_COUNT' is used for the message count.
+The text file unused.
+
+Note: That some people may have applied a patch to version 0.70 which
+has a similar effect, but uses a key value of '.count' for the message count.
+This type will also be correctly upgraded.
+
+Who:
+
+Gyepi Sam <gyepi@praxis-sw.com>
+
+Any problems should first be addressed to the bogofilter lists, to which I am subscribed.
