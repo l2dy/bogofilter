@@ -12,7 +12,7 @@ To edit,
 3. commit the changes
 
 4. log into the sourceforge net shell,
-   type: cd /home/groups/b/bo/bogofilter/htdocs && cvs update
+   type: cd /home/groups/b/bo/bogofilter/htdocs && ./updateweb
 
 Note there is a hidden .htaccess file!
 
