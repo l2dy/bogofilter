@@ -535,13 +535,13 @@ static void help(void)
 	    "\n"
 	    "\t-d file\tDump data from file to stdout.\n"
 	    "\t-l file\tLoad data from stdin into file.\n"
-	    "\t-w directory\tDisplay counts for words from stdin.\n"
-	    "\t-p directory\tDisplay word counts and probabilities.\n"
+	    "\t-w dir\tDisplay counts for words from stdin.\n"
+	    "\t-p dir\tDisplay word counts and probabilities.\n"
 	    "\t-m\tEnable maintenance works (expiring tokens).\n"
 	    "\t-h\tPrint this message.\n"
 	    "\t-v\tOutput debug messages.\n"
-	    "\t-r\tCompute Robinson's X for specified directory.\n"
-	    "\t-R\tCompute Robinson's X and save it in the spam list.\n");
+	    "\t-r dir\tCompute Robinson's X for specified directory.\n"
+	    "\t-R dir\tCompute Robinson's X and save it in the spam list.\n");
     fprintf(stderr,
 	    "\t-k size\tset BerkeleyDB cache size (MB).\n"
 	    "\t-W\tUse combined wordlist%s for spam and ham tokens.\n"
@@ -549,10 +549,10 @@ static void help(void)
 	    DB_EXT);
     fprintf(stderr,
 	    "\t-a age\tExclude tokens with older ages.\n"
-	    "\t-c count\tExclude tokens with lower counts.\n"
-	    "\t-s min,max\tExclude tokens with lengths between min and max.\n"
+	    "\t-c cnt\tExclude tokens with lower counts.\n"
+	    "\t-s l,h\tExclude tokens with lengths between 'l' and 'h' (low and high).\n"
 	    "\t-n\tReplace non-ascii characters with '?'.\n"
-	    "\t-y today\tSet default day-of-year (1..366).\n"
+	    "\t-y day\tSet default day-of-year (1..366).\n"
 	    "\t-x list\tSet debug flags.\n"
 	    "\t-D\tDirect debug output to stdout.\n"
 	    "\t-V\tPrint program version.\n"
