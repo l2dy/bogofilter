@@ -3,7 +3,7 @@
 %{
 /*
  * NAME
- *   lexer_header.l -- bogofilter's lexical analyzer for message headers
+ *   lexer_v3.l -- bogofilter's lexical analyzer for message headers
  *
  *   01/01/2003 - split out of lexer.l
  *
@@ -161,7 +161,7 @@ QP		[!->@-~]+
 */
 
 /* 09/01/03
-  Using "^[\?]" in the pattern and validating the charset in 'C'
+  Using "[^\?]" in the pattern and validating the charset in 'C'
   reduces executable size by approx 290k.
   new: ENCODED_WORD =\?{CHARSET}\?[bq]\?[^\?]*\?\=
   old: ENCODED_WORD =\?{CHARSET}\?(b\?{BASE64}|q\?{QP})\?\=
