@@ -1,14 +1,10 @@
 /* $Id$ */
 
-/*****************************************************************************
-
-NAME:
-   base64.c -- decode base64 text
-
-AUTHOR:
-   David Relson <relson@osagesoftware.com>
-
-******************************************************************************/
+/** \file base64.c
+ * decode base64 encoded text
+ * \author David Relson <relson@osagesoftware.com>
+ * \author Matthias Andree <matthias.andree@gmx.de>
+ */
 
 #include "common.h"
 
@@ -25,7 +21,6 @@ static const byte base64_invalid = 0x7F;
 
 /* Function Definitions  */
 
-/** decode base64 in situ */
 uint base64_decode(word_t *word)
 {
     uint count = 0;
