@@ -1,3 +1,9 @@
+*.c.*
+*.osage
+*.tgz
+diff*
+test*
+update*
 .deps
 aclocal.m4
 autom4te.cache
