@@ -15,6 +15,7 @@
 
 /* $Id$ */
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <unistd.h>
@@ -22,6 +23,9 @@
 #include <sys/types.h>
 
 #include "find_home.h"
+#include "string.h"
+#include "xmalloc.h"
+#include "xstrdup.h"
 
 /* This function will try to figure out the home directory of the user.
  * 
@@ -49,4 +53,21 @@ const char *find_home(int read_env) {
 	return pw -> pw_dir;
     }
     return NULL;
+}
+
+char *resolve_home_directory(const char *filename)
+{
+    char *tmp;
+    const char *home = find_home(1);
+    if (home == NULL)
+    {
+	fprintf(stderr, "Can't find home directory.\n");
+	exit(2);
+    }
+    tmp = xmalloc(strlen(home) + strlen(filename) + 2);
+    strcpy(tmp, home);
+    if (tmp[strlen(tmp)-1] != '/')
+	strcat(tmp, "/");
+    strcat(tmp, filename);
+    return tmp;
 }

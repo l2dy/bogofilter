@@ -214,18 +214,11 @@ static void read_config_file(const char *filename, bool home_dir)
     char *tmp = NULL;
     FILE *fp;
 
-    if (home_dir && filename[0] != '/')
+    if (!home_dir || filename[0] == '/')
+	tmp = NULL;
+    else
     {
-	const char *home = find_home(1);
-	if (home == NULL)
-	    return;
-	if (memcmp(filename, "~/", 2) == 0 )
-	    filename += 2;
-	tmp = xmalloc(strlen(home) + strlen(filename) + 2);
-	strcpy(tmp, home);
-	if (tmp[strlen(tmp)-1] != '/')
-	    strcat(tmp, "/");
-	strcat(tmp, filename);
+	tmp = resolve_home_directory(filename);
 	filename = tmp;
     }
 
