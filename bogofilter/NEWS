@@ -4,6 +4,10 @@
 
 $Id$
 
+0.11.0.1 2003-03-04
+
+	 * Fixed charset initialization flaw.
+
 0.11.0   2003-03-03
 
 	* The Robinson-Fisher algorithm is now the default algorithm.
