@@ -16,6 +16,9 @@ unset LC_ALL
 LC_COLLATE=
 unset LC_COLLATE
 
+# Skip tests if Perl isn't installed
+( perl -e 'exit 0' 2>/dev/null ) || exit 77
+
 # Note FreeBSD has no "seq" command.
 for num in 1 2 3 4 ;do
 echo "Running test $num"
