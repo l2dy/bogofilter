@@ -123,7 +123,7 @@ static int count_hook(word_t *key, word_t *data,
 	(*rd->count) += 1;
     }
 
-    /* print if token in both word lists */
+    /* print if -vv and token in both word lists, or -vvv */
     if ((verbose > 1 && goodness && spamness) || verbose > 2) {
 	printf("cnt: %4lu,  sum: %11.6f,  ratio: %9.6f,"
 	       "  sp: %3lu,  gd: %3lu,  p: %9.6f,  t: ", 
@@ -173,8 +173,7 @@ static int robx_hook(word_t *key, word_t *data,
 	    (*rd->sum) += prob;
 	    (*rd->count) += 1;
 	}
-	/* print if token in both word lists */
-	if ((verbose > 1 && goodness && spamness) || verbose > 2) {
+	if (verbose > 2) {
 	    printf("cnt: %4lu,  sum: %11.6f,  ratio: %9.6f,"
 		   "  sp: %3lu,  gd: %3lu,  p: %9.6f,  t: ", 
 		   (unsigned long)*rd->count, *rd->sum, *rd->sum / *rd->count,
