@@ -10,8 +10,9 @@
 # see http://www.bgl.nu/bogofilter/smindev3.html#appA for more information
 #
 
-#                                                              /**/
-# For use in R, parms.tbl from runex is expected in bogolog/smindev.tbl
+# This script expects to run from a directory /proj/Rwork (change the
+# setwd call in the first noncomment line to use a different base).
+# File parms.tbl from smindev.sh is expected in bogolog/smindev.tbl
 # by default; otherwise run ./smindev.R filename
 
 graphics.off(); setwd("/proj/Rwork")
