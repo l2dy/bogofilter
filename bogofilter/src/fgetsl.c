@@ -11,7 +11,7 @@
 #include "common.h"
 #include "fgetsl.h"
 
-/* calls exit(2) on read error or when max_size < 2 */
+/* calls exit(EX_ERROR) on read error or when max_size < 2 */
 int fgetsl(char *buf, int max_size, FILE *s)
 {
     return xfgetsl(buf, max_size, s, 0);
@@ -27,7 +27,7 @@ int xfgetsl(char *buf, int max_size, FILE *s, int no_nul_terminate)
     if (cp >= fin) {
 	fprintf(stderr, "Invalid buffer size, exiting.\n");
 	abort();
-	exit(2);
+	exit(EX_ERROR);
     }
 
     if (feof(s))
@@ -41,7 +41,7 @@ int xfgetsl(char *buf, int max_size, FILE *s, int no_nul_terminate)
 
     if (c == EOF && ferror(s)) {
 	perror("stdin");
-	exit(2);
+	exit(EX_ERROR);
     }
 
     if (cp < end)
@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 
     if (argc != 3) {
 	fprintf(stderr, "%s <size> <non_nul_terminate>\n", argv[0]);
-	exit(2);
+	exit(EX_ERROR);
     }
 
     non_nul_terminate = atoi(argv[2]);
@@ -80,6 +80,6 @@ int main(int argc, char **argv) {
 	putchar('\n');
     }
     xfree(buf);
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 #endif

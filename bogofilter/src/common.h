@@ -64,6 +64,18 @@ typedef enum dbmode_e dbmode_t;
 
 #define BIT(n)	(1 << n)
 
+typedef enum rc_e { RC_SPAM	= 0,
+		    RC_HAM	= 1,
+		    RC_UNSURE	= 2,
+		    RC_OK,
+		    RC_MORE	}  rc_t;
+
+typedef enum ex_e { EX_SPAM	= RC_SPAM,
+		    EX_HAM	= RC_HAM,
+		    EX_UNSURE	= RC_UNSURE,
+		    EX_OK	= 0,
+		    EX_ERROR	= 3 } ex_t;
+
 typedef enum run_e {
     RUN_UNKNOWN= 0,
     RUN_NORMAL = BIT(0),

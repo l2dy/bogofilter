@@ -214,7 +214,7 @@ static void die (const char *msg, ...)
     va_start (ap, msg);
     vfprintf (stderr, msg, ap);
     va_end (ap);
-    exit (2);
+    exit(EX_ERROR);
 }
 
 static

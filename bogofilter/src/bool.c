@@ -33,7 +33,7 @@ bool str_to_bool(const char *str)
 	return (false);
     default:
 	fprintf(stderr, "Invalid boolean value - %s\n", str);
-	exit(2);
+	exit(EX_ERROR);
     }
     return (0);
 }

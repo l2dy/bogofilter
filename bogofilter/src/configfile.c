@@ -128,7 +128,7 @@ static bool process_config_parameter(const parm_desc *arg, char *val, priority_t
 		if (DEBUG_CONFIG(2))
 		    fprintf(dbgout, "%s -> '%s'\n", arg->name, dir);
 		if (setup_wordlists(dir, precedence) != 0)
-		    exit(2);
+		    exit(EX_ERROR);
 		break;
 	    }
 	case CP_FUNCTION:
@@ -146,7 +146,7 @@ static bool process_config_parameter(const parm_desc *arg, char *val, priority_t
 	    case 's': wl_mode = WL_M_SEPARATE; break;
 	    default:
 		fprintf(stderr, "Unknown wordlist type - '%s'.\n", val);
-		exit(2);
+		exit(EX_ERROR);
 	    }
 	    if (DEBUG_CONFIG(2))
 		fprintf(dbgout, "%s -> '%s'\n", arg->name, val);

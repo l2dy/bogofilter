@@ -34,7 +34,7 @@ void set_debug_mask(const char *mask)
 	else
 	{
 	    (void)fprintf(stderr, "set_debug_mask:  unknown mask specification '%c'\n", ch);
-	    exit(2);
+	    exit(EX_ERROR);
 	}
     }
 }

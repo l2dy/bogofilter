@@ -113,7 +113,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 
       if (dbp == NULL) {
           print_error(__FILE__, __LINE__, "(db) tdb_open( %s ) failed with error %s", handle->name[i], strerror(errno));
-          exit(2);
+          exit(EX_ERROR);
       }
       else {
           if (DEBUG_DATABASE(1)) {
@@ -128,7 +128,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
             else {
                 print_error(__FILE__, __LINE__, "(db) tdb_lockall on file (%s) failed with error %s.",
                             handle->name[i], tdb_errorstr(dbp));
-                exit(2);
+                exit(EX_ERROR);
             }
           }
       }
@@ -154,7 +154,7 @@ void db_delete(void *vhandle, const word_t *word)
       if (ret != 0) {
           print_error(__FILE__, __LINE__, "(db) tdb_delete('%s'), err: %d, %s",
                       word->text, ret, tdb_errorstr(dbp));
-          exit(2);
+          exit(EX_ERROR);
       }
     }
 
@@ -185,7 +185,7 @@ int db_get_dbvalue(void *vhandle, const word_t *word,	/*@out@*/ dbv_t *val)
           if (sizeof(cv) < db_val.dsize) {
             print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%s' ), size error %d::%d",
                   word->text, sizeof(cv), db_val.dsize);
-            exit(2);
+            exit(EX_ERROR);
           }
 
           found = true;
@@ -261,7 +261,7 @@ void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val)
       else {
           print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%s' ), err: %d, %s",
           word->text, ret, tdb_errorstr(dbp));
-          exit(2);
+          exit(EX_ERROR);
       }
     }
 }
@@ -346,7 +346,7 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
         if (ret == -1) {
             print_error(__FILE__, __LINE__, "(db) db_foreach err: %d, %s",
             ret, tdb_errorstr(dbp));
-            exit(2);
+            exit(EX_ERROR);
         }
         else {
             /* tdb_traverse returns a count of records. We just want success or failure */

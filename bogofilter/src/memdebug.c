@@ -81,7 +81,7 @@ md_malloc(size_t size)
 
     if (dbg_too_much != 0 && max_malloc > dbg_too_much) {
 	fprintf(stderr, "max_malloc = %12lu, tot_malloc = %12lu\n", (ulong) max_malloc, (ulong) tot_malloc);
-	exit(2);
+	exit(EX_ERROR);
     }
 
     x = malloc(size);
@@ -149,7 +149,7 @@ void
     if (dbg_too_much != 0 && max_malloc > dbg_too_much) {
 	fprintf(stderr, "max_malloc = %12lu, tot_malloc = %12lu\n", 
 		(ulong) max_malloc, (ulong) tot_malloc);
-	exit(2);
+	exit(EX_ERROR);
     }
 
     x = calloc(nmemb, size);
@@ -186,7 +186,7 @@ void
     if (dbg_too_much != 0 && max_malloc > dbg_too_much) {
 	fprintf(stderr, "max_malloc = %12lu, tot_malloc = %12lu\n", 
 		(ulong) max_malloc, (ulong) tot_malloc);
-	exit(2);
+	exit(EX_ERROR);
     }
 
     x = realloc(ptr, size);

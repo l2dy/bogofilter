@@ -180,7 +180,7 @@ mime_push (mime_t * parent)
       else
       {
 	fprintf (stderr, "**mime_push: expecting non-null parent\n");
-	exit (2);
+	exit(EX_ERROR);
       }
     }
     else

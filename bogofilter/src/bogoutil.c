@@ -159,7 +159,7 @@ static int db_oper(const char *path, dbmode_t open_mode, db_foreach_t funct,
 
     if (dbh == NULL) {
 	fprintf(stderr, "Can't open file %s\n", path);
-	exit(2);
+	exit(EX_ERROR);
     } else {
 	int r = db_foreach(dbh, funct, userdata);
 	if (r) {
@@ -526,7 +526,7 @@ static int compute_robinson_x(char *path)
 	if (count == 0)
 	{
 	    fprintf(stderr, "%s: string too long creating .db file name.\n", PROGNAME);
-	    exit(2);
+	    exit(EX_ERROR);
 	}
 
 	dbh = db_open(".", count, (const char **) filepaths, DB_WRITE);
@@ -668,19 +668,19 @@ static int process_args(int argc, char **argv)
 
 	case ':':
 	    fprintf(stderr, "Option -%c requires an argument.\n", optopt);
-	    exit(2);
+	    exit(EX_ERROR);
 
 	case '?':
 	    fprintf(stderr, "Unknown option -%c.\n", optopt);
-	    exit(2);
+	    exit(EX_ERROR);
 
 	case 'h':
 	    help();
-	    exit(0);
+	    exit(EX_OK);
 
 	case 'V':
 	    print_version();
-	    exit(0);
+	    exit(EX_OK);
 
 	case 'W':
 	    incr_wordlist_mode();
@@ -708,7 +708,7 @@ static int process_args(int argc, char **argv)
 		} else {
 		    fprintf(stderr, "syntax error in argument \"%s\" of -s\n.",
 			    optarg);
-		    exit(2);
+		    exit(EX_ERROR);
 		}
 	    }
 	    break;
@@ -725,7 +725,7 @@ static int process_args(int argc, char **argv)
 	    fpin = fopen( optarg, "r" );
 	    if (fpin == NULL) {
 		fprintf(stderr, "Can't read file '%s'\n", optarg);
-		exit(2);
+		exit(EX_ERROR);
 	    }
 	    break;
 
@@ -735,19 +735,19 @@ static int process_args(int argc, char **argv)
 
 	default:
 	    abort();
-	    exit(1);
+	    exit(EX_ERROR);
 	}
 
     if (count != 1)
     {
       fprintf(stderr, "%s: Exactly one of the -d, -l, -R or -w flags "
 	      "must be present.\n", PROGNAME);
-      exit(1);
+      exit(EX_ERROR);
     }
 
     if (optind < argc && flag != WORD) {
 	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
-	exit(1);
+	exit(EX_ERROR);
     }
 
     return count;
@@ -769,7 +769,7 @@ int main(int argc, char *argv[])
     /* Extra or missing parameters */
     if (flag != WORD && argc != optind) {
 	usage();
-	exit(1);
+	exit(EX_ERROR);
     }
 
     switch(flag) {

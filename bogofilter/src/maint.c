@@ -154,7 +154,7 @@ static int maintain_hook(word_t *key, word_t *data,
 
     if (data->leng > sizeof(val)) {
 	print_error(__FILE__, __LINE__, "Invalid database value.\n");
-	exit(2);
+	exit(EX_ERROR);
     }
 
     w.leng = key->leng;

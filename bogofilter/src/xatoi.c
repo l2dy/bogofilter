@@ -41,6 +41,6 @@ int main(int argc, char **argv) {
 	printf("%s -> errno=%d_(%s) status=%d int=%d\n", argv[i], errno,
 		strerror(errno), s, d);
     }
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 #endif

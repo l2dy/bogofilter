@@ -182,7 +182,7 @@ static int get_decoded_line(buff_t *buff)
     if (count == -1) {
 	if (ferror(fpin)) {
 	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
-	    exit(2);
+	    exit(EX_ERROR);
 	} else {
 	    return YY_NULL;
 	}

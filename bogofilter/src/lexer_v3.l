@@ -76,6 +76,7 @@
     YY_DECL;			/* declare function */
 
 #define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, max_size)
+#define YY_EXIT_FAILURE EX_ERROR
 
 #undef	stderr
 #define	stderr	dbgout		/* for debug & -D options */

@@ -14,7 +14,7 @@ AUTHOR:
 #include <stdlib.h>
 #include <string.h>
 
-#include "debug.h"
+#include "common.h"
 
 typedef struct mask_char_to_symbol_s {
     const char *str;
@@ -40,7 +40,7 @@ int main(void)
 	if ( (debug_mask & ptr->bit) != ptr->bit )
 	{
 	    fprintf(stderr, "debug_mask for '%s' is wrong.\n", ptr->str);
-	    exit(2);
+	    exit(EX_ERROR);
 	}
     }
     printf("All O.K.\n");

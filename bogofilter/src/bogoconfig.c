@@ -185,9 +185,9 @@ void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
     /* directories from command line and config file are already handled */
 
     if (setup_wordlists(NULL, PR_ENV_BOGO) != 0)
-	exit(2);
+	exit(EX_ERROR);
     if (setup_wordlists(NULL, PR_ENV_HOME) != 0)
-	exit(2);
+	exit(EX_ERROR);
 
     stats_prefix= stats_in_header ? "  " : "# ";
 
@@ -231,7 +231,7 @@ static run_t check_run_type(run_t new, run_t conflict)
 {
     if (run_type & conflict) {
 	(void)fprintf(stderr, "Error:  Invalid combination of options.\n");
-	exit(2);
+	exit(EX_ERROR);
     }
     return (run_type | new );
 }
@@ -474,7 +474,7 @@ static void print_version(void)
 void process_args_1(int argc, char **argv)
 {
     int option;
-    int exitcode;
+    ex_t exitcode;
 
     test = 0;
     verbose = 0;
@@ -546,13 +546,13 @@ void process_args_1(int argc, char **argv)
 
 	case 'h':
 	    help();
-            exit(0);
+            exit(EX_OK);
 
 	case 'I':
 	    fpin = fopen( optarg, "r" );
 	    if (fpin == NULL) {
 		fprintf(stderr, "Can't read file '%s'\n", optarg);
-		exit(2);
+		exit(EX_ERROR);
 	    }
 	    break;
 
@@ -629,7 +629,7 @@ void process_args_1(int argc, char **argv)
 
         case 'V':
 	    print_version();
-	    exit(0);
+	    exit(EX_OK);
 
 	case 'W':
 	    incr_wordlist_mode();
@@ -645,11 +645,11 @@ void process_args_1(int argc, char **argv)
 
 	case ':':
 	    fprintf(stderr, "Option -%c requires an argument.\n", optopt);
-	    exit(2);
+	    exit(EX_ERROR);
 
 	case '?':
 	    fprintf(stderr, "Unknown option -%c.\n", optopt);
-	    exit(2);
+	    exit(EX_ERROR);
 	}
     }
 
@@ -658,11 +658,11 @@ void process_args_1(int argc, char **argv)
 
     exitcode = validate_args();
     if (exitcode) 
-	exit (exitcode);
+	exit(exitcode);
 
     if (bulk_mode == B_NORMAL && optind < argc) {
 	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
-	exit(2);
+	exit(EX_ERROR);
     }
 
     return;
@@ -671,7 +671,7 @@ void process_args_1(int argc, char **argv)
 void process_args_2(int argc, char **argv)
 {
     int option;
-    int exitcode;
+    ex_t exitcode;
 
     optind = opterr = 1;
     /* don't use #ifdef here: */
@@ -694,7 +694,7 @@ void process_args_2(int argc, char **argv)
 	    xfree(directory);
 	    directory = xstrdup(optarg);
 	    if (setup_wordlists(directory, PR_COMMAND) != 0)
-		exit(2);
+		exit(EX_ERROR);
 	    break;
 
 	case 'k':
@@ -726,7 +726,7 @@ void process_args_2(int argc, char **argv)
 		case 't': case 'T': tokenize_html_tags = *s == 't'; 	break;	/* -Pt and -PT */
 		default:
 		    fprintf(stderr, "Unknown parsing option -P%c.\n", *s);
-		    exit(2);
+		    exit(EX_ERROR);
 		}
 	    }
 	    break;
@@ -746,11 +746,11 @@ void process_args_2(int argc, char **argv)
 
     exitcode = validate_args();
     if (exitcode) 
-	exit (exitcode);
+	exit(exitcode);
 
     if (bulk_mode == B_NORMAL && optind < argc) {
 	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
-	exit(2);
+	exit(EX_ERROR);
     }
 
     return;
@@ -783,7 +783,7 @@ void query_config(void)
     fprintf(stdout, "%-17s = '%s'\n", "log_update_format", log_update_format);
     display_tag_array("spamicity_tags   ", &spamicity_tags);
     display_tag_array("spamicity_formats", &spamicity_formats);
-    exit(0);
+    exit(EX_OK);
 }
 
 static void display_tag_array(const char *label, const char **array)

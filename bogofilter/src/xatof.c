@@ -39,6 +39,6 @@ int main(int argc, char **argv) {
 	if (s) printf(" double=%g", d);
 	printf("\n");
     }
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 #endif

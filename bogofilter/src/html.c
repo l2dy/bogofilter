@@ -61,7 +61,7 @@ int process_html_comments(buff_t *buff)
     if (buff->t.leng != (size_t)(buf_used - buf_start)) {
 	fprintf(dbgout, "incorrect count:  %ld != %ld\n",
 		(long)buff->t.leng, (long)(buf_used - buf_start));
-	exit(2);
+	exit(EX_ERROR);
     }
 
     return buf_used - buf_start;

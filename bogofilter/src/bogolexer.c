@@ -137,11 +137,11 @@ static void process_args_1(int argc, char **argv)
 	{
 	case ':':
 	    fprintf(stderr, "Option -%c requires an argument.\n", optopt);
-	    exit(2);
+	    exit(EX_ERROR);
 
 	case '?':
 	    fprintf(stderr, "Unknown option -%c.\n", optopt);
-	    exit(2);
+	    exit(EX_ERROR);
 
 	case 'c':
 	    read_config_file(optarg, false, false, PR_COMMAND);
@@ -158,13 +158,13 @@ static void process_args_1(int argc, char **argv)
 
 	case 'h':
 	    help();
-	    exit(0);
+	    exit(EX_OK);
 
 	case 'I':
 	    fpin = fopen( optarg, "r" );
 	    if (fpin == NULL) {
 		fprintf(stderr, "Can't read file '%s'\n", optarg);
-		exit(2);
+		exit(EX_ERROR);
 	    }
 	    break;
 
@@ -190,7 +190,7 @@ static void process_args_1(int argc, char **argv)
 
         case 'V':
 	    print_version();
-	    exit(0);
+	    exit(EX_OK);
 
 	case 'x':
 	    set_debug_mask( optarg );
@@ -201,7 +201,7 @@ static void process_args_1(int argc, char **argv)
     if (optind < argc) {
 	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n",
 		argv[optind]);
-	exit(2);
+	exit(EX_ERROR);
     }
 }
 
@@ -232,7 +232,7 @@ static void process_args_2(int argc, char **argv)
 		case 't': case 'T': tokenize_html_tags = *s == 't'; 	break;	/* -Pt and -PT */
 		default:
 		    fprintf(stderr, "Unknown parsing option -P%c.\n", *s);
-		    exit(2);
+		    exit(EX_ERROR);
 		}
 	    }
 	    break;

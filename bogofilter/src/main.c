@@ -74,7 +74,7 @@ static void write_message(FILE *fp, rc_t status);
 
 /* Function Definitions */
 
-static void cleanup_exit(int exitcode, int killfiles) {
+static void cleanup_exit(ex_t exitcode, int killfiles) {
     if (killfiles && outfname[0] != '\0') unlink(outfname);
     exit(exitcode);
 }
@@ -93,9 +93,9 @@ static void initialize(FILE *fp)
 
 typedef rc_t (*arg_foreach_t)(void);
 
-static int arg_foreach(arg_foreach_t hook, int argc, char **argv)
+static ex_t arg_foreach(arg_foreach_t hook, int argc, char **argv)
 {
-    int  exitcode = 0;
+    ex_t  exitcode = EX_OK;
     bool error = false;
     bool done = false;
     int  i = 0;
@@ -149,16 +149,16 @@ static int arg_foreach(arg_foreach_t hook, int argc, char **argv)
 
 	status = hook();
 
-	exitcode = !error ? 0 : 1;
+	exitcode = !error ? RC_SPAM : RC_HAM;
 
 	if (bulk_mode == B_NORMAL) {
 	    if (run_register)
 		done = true;
 	    else {
 		if (status != RC_MORE) {
-		    exitcode = (status == RC_SPAM) ? 0 : 1;
-		    if (nonspam_exits_zero && exitcode == 1)
-			exitcode = 0;
+		    exitcode = status;	/* SPAM=0, HAM=1, UNSURE=2 */
+		    if (nonspam_exits_zero && exitcode != EX_ERROR)
+			exitcode = EX_OK;
 		    done = true;
 		}
 	    }
@@ -181,7 +181,7 @@ static bool is_blank_line(const char *line, size_t len)
 
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
-    int   exitcode;
+    ex_t exitcode;
 
     progtype = build_progtype(progname, DB_TYPE);
 
@@ -436,7 +436,7 @@ static FILE *output_setup(void)
 	{
 	    fprintf(stderr,"Cannot open %s: %s\n",
 		    outfname, strerror(errno));
-	    exit(2);
+	    exit(EX_ERROR);
 	}
     } else {
 	fp = stdout;
@@ -463,7 +463,7 @@ static void passthrough_setup()
 	    if (errno != ESPIPE && errno != ENOTTY) {
 		fprintf(stderr, "cannot determine if input is seekable: %s\n",
 			strerror(errno));
-		exit(2);
+		exit(EX_ERROR);
 	    }
 	}
     }

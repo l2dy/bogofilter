@@ -38,7 +38,7 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
   /* If update directory explicity supplied, setup the wordlists. */
   if (update_dir) {
       if (setup_wordlists(update_dir, PR_CFG_UPDATE) != 0)
-	  exit(2);
+	  exit(EX_ERROR);
   }
 
   if (_run_type & REG_SPAM)	{ r = "s"; incr = SPAM; }

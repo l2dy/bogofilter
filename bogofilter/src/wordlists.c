@@ -180,7 +180,7 @@ void incr_wordlist_mode(void)
     case WL_M_COMBINED: wl_mode = WL_M_SEPARATE; break;
     case WL_M_SEPARATE: 
 	fprintf(stderr, "Invalid -W option.\n");
-	exit(2);
+	exit(EX_ERROR);
     }
     return;
 }
@@ -206,7 +206,7 @@ void open_wordlists(dbmode_t mode)
 		break;
 	    case WL_M_UNKNOWN:
 		fprintf(stderr, "Invalid wordlist mode.\n");
-		exit(2);
+		exit(EX_ERROR);
 	    }
 	    if (list->dbh == NULL) {
 		int err = errno;
@@ -223,7 +223,7 @@ void open_wordlists(dbmode_t mode)
 			    return;
 			fprintf(stderr, "Can't open %s (%s), errno %d, %s\n",
 				list->filename, list->filepath, err, strerror(err));
-			exit(2);
+			exit(EX_ERROR);
 		} /* switch */
 	    } else { /* db_open */
 		dbv_t val;
@@ -277,7 +277,7 @@ size_t build_wordlist_paths(char **filepaths, const char *path)
 	break;
     case WL_M_UNKNOWN:
 	fprintf(stderr, "Invalid wordlist mode.\n");
-	exit(2);
+	exit(EX_ERROR);
     }
     return count;
 }
@@ -350,18 +350,18 @@ static void sanitycheck_lists(void)
 	if (!list) break;
 	if (! list->name) {
 	    fprintf(stderr, "A list has no name.\n");
-	    exit(2);
+	    exit(EX_ERROR);
 	}
 	if (list->msgcount==0) {
 	    fprintf(stderr, "list %s has zero message count.\n", list->name);
-	    exit(2);
+	    exit(EX_ERROR);
 	}
 	listcount++;
 	list=list->next;
     }
     if (0==listcount) {
 	fprintf(stderr, "No wordlists available!\n");
-	exit(2);
+	exit(EX_ERROR);
     }
     if (DEBUG_WORDLIST(1))
 	fprintf(dbgout, "%d lists look OK.\n", listcount);

@@ -65,7 +65,7 @@ static void db_enforce_locking(dbh_t *handle, const char *func_name)
 {
     if (handle->locked == false) {
 	print_error(__FILE__, __LINE__, "%s (%s): Attempt to access unlocked handle.", func_name, handle->name[0]);
-	exit(2);
+	exit(EX_ERROR);
     }
 }
 
@@ -131,7 +131,7 @@ static void check_db_version(void)
 		    "This program was compiled for DB version %d.%d,\n"
 		    "but it is linked against DB version %d.%d.\nAborting.\n",
 		    DB_VERSION_MAJOR, DB_VERSION_MINOR, maj, min);
-	    exit(2);
+	    exit(EX_ERROR);
 	}
     }
 }
@@ -278,7 +278,7 @@ void db_delete(void *vhandle, const word_t *word)
 
 	if (ret != 0 && ret != DB_NOTFOUND) {
 	    print_error(__FILE__, __LINE__, "(db) db_delete('%s'), err: %d, %s", word->text, ret, db_strerror(ret));
-	    exit(2);
+	    exit(EX_ERROR);
 	}
     }
 
@@ -353,7 +353,7 @@ int db_get_dbvalue(void *vhandle, const word_t *word, /*@out@*/ dbv_t *val)
 	    break;
 	default:
 	    print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%s' ), err: %d, %s", word->text, ret, db_strerror(ret));
-	    exit(2);
+	    exit(EX_ERROR);
 	}
     }
 
@@ -428,7 +428,7 @@ void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val)
 	}
 	else {
 	    print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%s' ), err: %d, %s", word->text, ret, db_strerror(ret));
-	    exit(2);
+	    exit(EX_ERROR);
 	}
     }
 }
