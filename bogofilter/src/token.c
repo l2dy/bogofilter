@@ -306,11 +306,6 @@ void set_tag(const char *text)
     return;
 }
 
-void add_hint(const char *h)
-{
-    (const void *) h;
-}
-
 #define WFREE(n)  word_free(n); n = NULL
 
 /* Cleanup storage allocation */
