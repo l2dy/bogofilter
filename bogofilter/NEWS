@@ -8,6 +8,35 @@ is in the RELEASE.NOTES files.  Read it!!
 If updating from a bogofilter version older than 0.15.4, it's a good
 idea to retrain or else use the '-H' (header tag degeneration) option.
 
+0.15.13.2 (unreleased)
+
+	* Pass -mieee to GCC on machines that know this option (Alpha, SH).
+	  Prevents SIGFPE and program termination with coredumps in some
+	  conditions. Reported by Paul Ackersville, fix suggested by Clint
+	  Adams.
+
+	* Fix defined minimum autoconf/automake versions to match actual
+	  requirements: autoconf 2.54, automake 1.7.
+
+	* Change AS_HELP_STRING to AC_HELP_STRING for compatibility with older
+	  autoconf than version 2.58.
+
+	* Fix two compiler warnings in BerkeleyDB data store code. It is
+	  unknown whether one has real-world impact when opening data bases,
+	  fixing nonetheless. The other is cosmetic in any case.
+
+0.15.13.1 2004-01-07
+
+	* Fix setvbuf portability, some systems do not support
+	  0-sized buffers, use BUFSIZ instead. (Reported by Stefan Bellon.)
+
+	* Use included GSL in RPMs, drop BuildRequires from .spec file.
+
+	* Drop blank line from src/Makefile* that confuses some non-GNU "make"
+	  tools.
+
+Bogofilter stable branch 0.15.13 forked.
+
 0.15.13	2003-12-26
 
 	* Fix problem with separate wordlists that causes

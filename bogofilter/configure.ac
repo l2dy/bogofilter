@@ -1,14 +1,14 @@
 # $Id$
 dnl vim: set noai tw=0:
-AC_INIT(bogofilter, 0.15.13)
-AC_PREREQ(2.53)
+AC_INIT(bogofilter, 0.15.13.2)
+AC_PREREQ(2.54)
 AC_CONFIG_SRCDIR([src])
 AC_CANONICAL_TARGET
 
 dnl foreign: don't insist on ChangeLog
 dnl 1.6: minimum version of automake/aclocal
 dnl dist-bzip2: make dist emits bogofilter-$VERSION.tar.bz2
-AM_INIT_AUTOMAKE([foreign 1.6 dist-bzip2])
+AM_INIT_AUTOMAKE([foreign 1.7 dist-bzip2])
 
 AM_CONFIG_HEADER(src/config.h:config.in)
 AC_PROG_AWK
@@ -101,6 +101,9 @@ then
       *) addopts="$addopts -Wpointer-arith -ggdb" ;;
   esac
   for i in $addopts \
+dnl the -ieee option is for Alpha, Clint Adams' recommendation
+dnl See http://thread.gmane.org/gmane.mail.bogofilter.general/6352
+      -mieee \
       -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wshadow \
       -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings \
       -Waggregate-return -Wmissing-declarations \
@@ -501,7 +504,7 @@ PATH=/bin:/usr/bin:$PATH
 export PATH
 
 need_my_gsl=1
-AC_ARG_WITH(included-gsl, AS_HELP_STRING([--with-included-gsl],[force use of shipped GSL rather than system GSL]),
+AC_ARG_WITH(included-gsl, AC_HELP_STRING([--with-included-gsl],[force use of shipped GSL rather than system GSL]),
 if test "x$WITHVAL" != "xyes" ; then need_my_gsl=2 ; fi)
 
 if test "$need_my_gsl" = 1 ; then

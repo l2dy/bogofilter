@@ -1,12 +1,7 @@
 # $Id$
 
-check_PROGRAMS=dehex spam_header_name dumbhead deqp deb64 escnp abortme
-dehex_SOURCES=dehex.c
-dumbhead_SOURCES=dumbhead.c
-deqp_SOURCES=deqp.c
-deb64_SOURCES=deb64.c
-escnp_SOURCES=escnp.c
-spam_header_name_SOURCES=spam_header_name.c
+check_PROGRAMS=dehex spam_header_name dumbhead deqp deb64 escnp abortme \
+	       u_fpe
 
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_LDFLAGS = -L..
@@ -18,7 +13,7 @@ CLEANFILES= $(BUILT_SOURCES)
 t.config: Makefile
 	echo >$@ 'EXE_EXT="@EXE_EXT@"' || rm -f $@
 
-ENVIRON_TESTS = t.abort t.env t.bogodir
+ENVIRON_TESTS = t.abort t.env t.bogodir t.u_fpe
 
 PARSING_TESTS = \
 	t.ignore_spam_header \

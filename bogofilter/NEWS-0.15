@@ -5,6 +5,22 @@
 Be sure to read RELEASE.NOTES-0.15, with attention to the section
 about retraining and the '-H' flag...
 
+0.15.13.2 (unreleased)
+
+* fix Alpha machine SIGFPE termination by passing -mieee.
+  Only GCC is currently supported on Alpha.
+* make autoconf/automake requirements in configure.ac match the facts
+* make configure.ac more compatible with autoconf versions 2.54..2.57
+* fix compiler warning (potentially uninitialized data) in datastore_db.c
+
+0.15.13.1 2004-01-07
+
+* build binary RPM statically linked against GSL
+* fix setvbuf portability problem
+* remove blank line from Makefile.am to improve "make" tool compatibility.
+
+stable branch forked
+
 0.15.13 2003-12-26
 
 * Fixed memory leak affecting bogotune.

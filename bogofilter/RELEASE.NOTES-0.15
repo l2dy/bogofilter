@@ -1,5 +1,9 @@
 *** GOOD NEWS ... BAD NEWS ***
 
+Builds for Alpha machines are only supported with GCC at the moment.
+If you know how we can detect a non-GCC alpha compiler and tell it to
+use IEEE NaN/Infinity states, let us know.
+
 Since release 0.15.9, bogofilter no longer allows to disable algorithms,
 which has never been supported well.
 

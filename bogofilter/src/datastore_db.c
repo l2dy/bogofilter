@@ -193,7 +193,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
     int ret;
     int is_swapped;
 
-    dbh_t *handle;
+    dbh_t *handle = NULL;
     uint32_t opt_flags = 0;
     /*
      * If locking fails with EAGAIN, then try without MMAP, fcntl()
@@ -205,7 +205,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
      */
     size_t idx;
     uint32_t retryflags[] = { 0, DB_NOMMAP };
-   
+
     check_db_version();
 
     if (open_mode == DB_READ)
@@ -219,7 +219,9 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
     for (idx = 0; idx < COUNTOF(retryflags); idx += 1) {
 	size_t i;
 	uint32_t retryflag = retryflags[idx], pagesize;
+#if DB_AT_LEAST(3,3)
 	DB_BTREE_STAT *dbstat = NULL;
+#endif
 
 	handle = dbh_init(db_file, count, names);
 
@@ -242,7 +244,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 		(ret = dbp->set_cachesize(dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
 		print_error(__FILE__, __LINE__, "(db) setcache( %s ), err: %d, %s",
 			    handle->name[0], ret, db_strerror(ret));
-		goto open_err; 
+		goto open_err;
 	    }
 
 	    /* open data base */
@@ -254,7 +256,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 				handle->name[i], ret, db_strerror(ret));
 		goto open_err;
 	    }
-	    
+	
 	    if (DEBUG_DATABASE(1))
 		fprintf(dbgout, "db_open( %s, %d ) -> %d\n", handle->name[i], open_mode, ret);
 
@@ -363,7 +365,7 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
 	ret = dbp->del(dbp, NULL, &db_key, 0);
 
 	if (ret != 0 && ret != DB_NOTFOUND) {
-	    print_error(__FILE__, __LINE__, "(db) db_delete('%.*s'), err: %d, %s", 
+	    print_error(__FILE__, __LINE__, "(db) db_delete('%.*s'), err: %d, %s",
 		    CLAMP_INT_MAX(db_key.size),
 		    (const char *) db_key.data,
     		    ret, db_strerror(ret));
@@ -417,12 +419,12 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
     case DB_NOTFOUND:
 	ret = DS_NOTFOUND;
 	if (DEBUG_DATABASE(3)) {
-	    fprintf(dbgout, "db_get_dbvalue: [%.*s] not found\n", 
+	    fprintf(dbgout, "db_get_dbvalue: [%.*s] not found\n",
 		    CLAMP_INT_MAX(token->leng), (char *) token->data);
 	}
 	break;
     default:
-	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%.*s' ), err: %d, %s", 
+	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%.*s' ), err: %d, %s",
 		    CLAMP_INT_MAX(token->leng), (char *) token->data, ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
@@ -455,7 +457,7 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
     ret = dbp->put(dbp, NULL, &db_key, &db_data, 0);
 
     if (ret != 0) {
-	print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%.*s' ), err: %d, %s", 
+	print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%.*s' ), err: %d, %s",
 		    CLAMP_INT_MAX(token->leng), (char *)token->data, ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
@@ -536,7 +538,7 @@ int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 	return -1;
     }
 
-    for (ret =  dbcp->c_get(dbcp, &key, &data, DB_FIRST); 
+    for (ret =  dbcp->c_get(dbcp, &key, &data, DB_FIRST);
 	 ret == 0;
 	 ret =  dbcp->c_get(dbcp, &key, &data, DB_NEXT))
     {
