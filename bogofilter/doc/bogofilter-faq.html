@@ -703,8 +703,9 @@
     two likely causes: either you've hit a max size limit or the
     database is corrupt.</p>
 
-    <p>Mail delivery agents, like postfix, have a file size limit.
-    When bogofilter's database reaches that limit problems occur.
+    <p>Some mail transfer agents, such as Postfix, impose file size
+    limits. When bogofilter's database reaches that limit, write
+    problems will occur.
 
     <p>To show the database size use:</p>
     <pre>	ls -lh $BOGOFILTER_DIR/wordlist.db</pre>
