@@ -176,21 +176,22 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
 		logsum += log(prob);
 	    }
 
-	    if (robn == 0)
-	    {
-		h->spamicity = robx;
-	    }
-	    else
-	    {
-		double invn, invproduct, product;
-		assert(robn > 0);
-		invn = (double)robn;
-		invproduct = 1.0 - exp(invlogsum / invn);
-		product = 1.0 - exp(logsum / invn);
-		h->spamicity =
-		    (1.0 + (invproduct - product) / (invproduct + product)) / 2.0;
-	    }
 	    r += 1;
+	}
+
+	if (robn == 0)
+	{
+	    h->spamicity = robx;
+	}
+	else
+	{
+	    double invn, invproduct, product;
+	    assert(robn > 0);
+	    invn = (double)robn;
+	    invproduct = 1.0 - exp(invlogsum / invn);
+	    product = 1.0 - exp(logsum / invn);
+	    h->spamicity =
+		(1.0 + (invproduct - product) / (invproduct + product)) / 2.0;
 	}
 	h->count=cnt;
 	maxcnt = max(maxcnt, cnt);
