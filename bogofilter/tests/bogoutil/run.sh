@@ -49,4 +49,4 @@ perl ${srcdir}/../../bogoupgrade $yday -b ../../bogoutil \
     -i $tdir/$inputfile -o $tdir/$outputdb \
 && ../../bogoutil $yday -d $tdir/$outputdb \
 |LC_COLLATE=C sort\
-|diff -u - ${srcdir}/output-${num}.txt
+|diff - ${srcdir}/output-${num}.txt
