@@ -279,7 +279,7 @@ leading spaces and hyphen:
 SIZING OPTIONS:
 
  - set_cachesize      G B C
-   (valid in Berkeley DB 3.1 - 4.3)
+   (valid in Berkeley DB 3.1 - 4.3, requires recovery to change)
 
    sets the cache size to G gigabytes plus B bytes which are spread out
    in C equally sized caches (all figures are natural numbers). You
@@ -294,14 +294,14 @@ SIZING OPTIONS:
 
  - set_lk_max_locks   12345
  - set_lk_max_objects 12346
-   (valid in Berkeley DB 3.2 - 4.3)
+   (valid in Berkeley DB 3.2 - 4.3, requires recovery to change)
 
    see sections 3.2 and 4.2 of this document for how to set the numbers.
    Choosing these figures too high wastes disk space,
    choosing them too low may cause bogofilter applications to abort.
 
  - set_lg_max         1048576
-   (valid in Berkeley DB 3.1 - 4.3)
+   (valid in Berkeley DB 3.1 - 4.3, takes effect immediately)
 
    this option configures the maximum log file size, in bytes, before
    Berkeley DB starts a new log file. The default is 10 MB. Reducing
@@ -314,13 +314,13 @@ SAFE OPTIONS:
    (valid in Berkeley DB 4.1 - 4.3, takes effect immediately)
 
    this option turns off system buffering of *database* files, to avoid
-   double caching of data.
+   double caching of data. NOT SUPPORTED ON ALL PLATFORMS!
 
  - set_flags DB_DIRECT_LOG
    (valid in Berkeley DB 4.1 - 4.3, takes effect immediately)
 
    this option turns off system buffering of *log* files, to avoid
-   double caching of data.
+   double caching of data. NOT SUPPORTED ON ALL PLATFORMS!
 
  - set_flags DB_DSYNC_LOG
    (valid in Berkeley DB 4.3, takes effect immediately)
