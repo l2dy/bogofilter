@@ -1,3 +1,4 @@
+# vim:tw=0
 # $Id$
 
 # foreign: don't insist on ChangeLog
@@ -184,7 +185,9 @@ directories.c: ../config.status
 	    || rm -f "$@"
 #
 .l.c:
-	flex -o$@ $<
+	flex -o$@.new $< && \
+	sed 's/yy_rule_linenum\[yy_act\]/(long int)yy_rule_linenum[yy_act]/; s/accepting rule at line %d/accepting rule at line %ld/' <$@.new >$@ && rm -f $@.new || \
+	rm -f $@ $@.new
 
 bogoupgrade: bogoupgrade.in Makefile
 	rm -f $@
