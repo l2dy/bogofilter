@@ -21,7 +21,7 @@ AUTHOR:
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
-#ifdef NOT_YET
+#ifdef	HAVE_CHARSET_H
 #include "charset.h"
 #endif
 #include "common.h"
@@ -502,7 +502,7 @@ void process_config_files(void)
     if (DEBUG_CONFIG(0))
 	fprintf( stderr, "stats_prefix: '%s'\n", stats_prefix );
 
-#ifdef NOT_YET
+#ifdef	HAVE_CHARSET_H
     init_charset_table("us-ascii", TRUE);
 #endif
 }
