@@ -11,6 +11,8 @@ $Id$
 	* Include 'strict_check' in '-qv' output.
 	* Correct outdated acinclude.m4, as it causes the configure
 	  script to be invalid.
+	* Revised UPGRADE document.
+	* Added contrib/bogotrain.sh
 
 0.11.1.7
 
