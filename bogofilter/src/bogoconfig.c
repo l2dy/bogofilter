@@ -428,7 +428,6 @@ void process_args(int argc, char **argv, int pass)
 {
     int option;
     int exitcode;
-    int errflag = 0;
 
     test = 0;
     verbose = 0;
@@ -665,9 +664,6 @@ void process_args(int argc, char **argv, int pass)
 	    exit(2);
 	}
     }
-
-    if (errflag)
-	exit(2);
 
     if (run_type == RUN_UNKNOWN)
 	run_type = RUN_NORMAL;
