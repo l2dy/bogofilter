@@ -3,8 +3,22 @@
 			       =================
 
 $Id$
-
      
+	2003-10-28
+
+	* Print "X-Bogosity" line when "-t" is used alone.
+	* Modified handling of mime attachments to decode rfc822 and
+	  to discard applications and images.
+
+	2003-10-27
+
+	* Change bogoupgrade back to using 2 arg open for perl-5.6
+          compatibility.
+
+	2003-10-26
+
+	* Added man page for bogotune.
+
 	2003-10-23
 
 	* Initial release of faster, C language version of bogotune.
