@@ -75,6 +75,7 @@ double prbf(double x, double df)
     int status;
     double bound;
 
+    /* pass in x, df; want p and q; return q */
     cdfchi(&which, &p, &q, &x, &df, &status, &bound);
 
     return(status==0 ? q : 1.0);
@@ -89,7 +90,7 @@ double fis_get_spamicity(size_t robn, FLOAT P, FLOAT Q )
     else
     {
 	double df = 2.0 * robn;
-	double ln2 = 0.6931472;					/* ln(2) */
+	double ln2 = log(2.0);					/* ln(2) */
 
 	fis_stats.robn = robn;
 
