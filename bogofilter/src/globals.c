@@ -50,7 +50,7 @@ bool	header_line_markup = true;	/* -H */
 #ifndef	ENABLE_TRANSACTIONS
 bool fTransaction = false;
 #else
-bool fTransaction = true;
+bool fTransaction = false;
 #endif
 
 /* for  bogotune */

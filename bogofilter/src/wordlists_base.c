@@ -134,7 +134,7 @@ int set_wordlist_dir(const char* d, priority_t precedence)
     if (precedence < saved_precedence)
 	return rc;
 
-    dir = (d != NULL) ? tildeexpand(d, true) : get_directory(precedence);
+    dir = (d != NULL) ? tildeexpand(d) : get_directory(precedence);
     if (dir == NULL)
 	return -1;
 

@@ -34,7 +34,7 @@ void set_bogohome(const char *path) {
     if (bogohome)
 	xfree(bogohome);
 
-    bogohome = tildeexpand(path, true);
+    bogohome = tildeexpand(path);
     if (stat(bogohome, &st) != 0 || !S_ISDIR(st.st_mode)) {
 	if ((t = strrchr(bogohome, DIRSEP_C)))
 	    *t = '\0';

@@ -37,13 +37,13 @@ static bool tilde_expand =  false;
  * count of characters in the POSIX portable file name character set.
  */
 /*@only@*/
-char *tildeexpand(const char *name, bool _expand) 
+char *tildeexpand(const char *name) 
 {
     char *tmp;
     const char *home;
     size_t l, tl;
 
-    if (!tilde_expand || !_expand)
+    if (!tilde_expand)
 	return xstrdup(name);
 
     if (name[0] != '~')

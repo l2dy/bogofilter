@@ -30,6 +30,6 @@ find_home_user(const char *username) /*@globals errno@*/;
 
 /*@only@*/
 char *
-tildeexpand(const char *filename, bool expand) /*@globals errno@*/;
+tildeexpand(const char *filename) /*@globals errno@*/;
 
 #endif

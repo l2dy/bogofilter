@@ -146,7 +146,11 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
 
     if (config_file_name != NULL)
 	xfree(config_file_name);
-    config_file_name = tildeexpand(fname, tilde_expand);
+
+    if (!tilde_expand)
+	config_file_name = xstrdup(fname);
+    else
+	config_file_name = tildeexpand(fname);
 
     fp = fopen(config_file_name, "r");
 
