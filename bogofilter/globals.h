@@ -3,11 +3,13 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-extern int verbose;
-extern int force;
-extern int passthrough;
-extern int nonspam_exits_zero;
-extern int logflag;
+extern int nonspam_exits_zero;	/* '-e' */
+extern int force;		/* '-f' */
+extern int logflag;		/* '-l' */
+extern int quiet;		/* '-q' */
+extern int passthrough;		/* '-p' */
+extern int verbose;		/* '-v' */
+
 extern bool stats_in_header;
 
 extern int thresh_index;
