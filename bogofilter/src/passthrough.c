@@ -142,14 +142,14 @@ static bool write_header(rc_t status, readfunc_t rf, void *rfarg)
     int bogolen = strlen(spam_header_name);
     const char *subjstr = "Subject:";
     int subjlen = strlen(subjstr);
-    
+
     /* print headers */
     while ((rd = rf(&out, rfarg)) > 0)
     {
 	if (eol == NULL) {
 	    if (memcmp(out+rd-1, NL, 1) == 0)
 		eol = NL;
-	    if (memcmp(out+rd-2, CRLF, 2) == 0)
+	    if (rd >=2 && memcmp(out+rd-2, CRLF, 2) == 0)
 		eol = CRLF;
 	}
 
