@@ -82,16 +82,22 @@ double prbf(double x, double df)
 
 double fis_get_spamicity(size_t robn, FLOAT P, FLOAT Q )
 {
-    double df = 2.0 * robn;
-    double ln10 = 2.302585093;		 	/* log(10) - 2.3025850929940459  */
+    if (robn == 0)
+    {
+	fis_stats.s.spamicity = robx;
+    }
+    else
+    {
+	double df = 2.0 * robn;
+	double ln10 = 2.302585093;			 	/* log(10) - 2.3025850929940459  */
+	fis_stats.robn = robn;
+	fis_stats.p_ln = log(P.mant) + P.exp * ln10;		/* convert to natural logs */
+	fis_stats.q_ln = log(Q.mant) + Q.exp * ln10;		/* convert to natural logs */
+	fis_stats.p_pr = prbf(-2.0 * fis_stats.p_ln, df);	/* compute P */
+	fis_stats.q_pr = prbf(-2.0 * fis_stats.q_ln, df);	/* compute Q */
 
-    fis_stats.robn = robn;
-    fis_stats.p_ln = log(P.mant) + P.exp * ln10;	/* convert to natural logs */
-    fis_stats.q_ln = log(Q.mant) + Q.exp * ln10;	/* convert to natural logs */
-    fis_stats.p_pr = prbf(-2.0 * fis_stats.p_ln, df);	/* compute P */
-    fis_stats.q_pr = prbf(-2.0 * fis_stats.q_ln, df);	/* compute Q */
-
-    fis_stats.s.spamicity = (1.0 + fis_stats.q_pr - fis_stats.p_pr) / 2.0;
+	fis_stats.s.spamicity = (1.0 + fis_stats.q_pr - fis_stats.p_pr) / 2.0;
+    }
 
     return fis_stats.s.spamicity;
 }
