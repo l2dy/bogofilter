@@ -2,13 +2,11 @@
 
 . ${srcdir:=.}/t.frame
 
-# test description here
+# t.passthrough-hb
 #
-# test below
-# remember to use ${srcdir}
-# check seekable input
-$VAL ${relpath}/bogofilter -e -p -C <${srcdir}/inputs/headerbody.txt \
->${TMPDIR}/output
+#	test for correct detection of line separating header and body
+
+$BOGOFILTER -e -p -C <${srcdir}/inputs/headerbody.txt >${TMPDIR}/output
 $AWK '/^X-Bogosity:/ { bl=NR } \
       /^Summary:/    { sl=NR } \
       END            { if (sl > bl) { exit 1; } }' \
