@@ -3,6 +3,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include "config.h"
+
 #if defined(HAVE_LIMITS_H)
 #include <limits.h>
 #elif defined(HAVE_SYS_PARAM_H)
@@ -17,11 +19,10 @@
 /* length of token will not exceed this... */
 #define MAXTOKENLEN	30
 
-#define WORDLIST	"wordlist.db"
-#define GOODFILE	"goodlist.db"
-#define SPAMFILE	"spamlist.db"
-
-#define IGNOREFILE	"ignorelist.db"
+#define WORDLIST	"wordlist" DB_EXT
+#define GOODFILE	"goodlist" DB_EXT
+#define SPAMFILE	"spamlist" DB_EXT
+#define IGNOREFILE	"ignorelist" DB_EXT
 
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
 #define min(x, y)	(((x) < (y)) ? (x) : (y))
