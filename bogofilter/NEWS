@@ -2,14 +2,32 @@
 
 				bogofilter news
 
-0.7.5
-	* The header in bogofilter -p mode now defaults to X-Bogosity:,
-	  but can be changed by using --enable-spam-header-name during
-	  configuration.
-	* The option names -h/-H are back to -n/-N as of 0.6, and -h now
-	  means "help".
+0.7.5	Sun Oct 20 17:34:35 PDT 2002
+
+	* The header in bogofilter -p mode now defaults to X-Bogosity, but 
+	  can be changed by using "./configure --enable-spam-header=name" at
+	  compile time.
+	* The option names -h/-H are back to -n/-N like they were in version 
+	  0.6, and -h now means "help".
+	* A utility has been added to help upgrade worlists from older 
+	  versions of bogofilter to the current format. See the UPGRADE file 
+	  for more information.
+	* Support has been added for the environment variable BOGOFILTER_DIR 
+	  to control where bogofilter looks for it's wordlists.
+	* Now bogofilter no longer depends on the Judy package. We now use a 
+	  high performance hashing algorithm for message evaluation. The Judy 
+	  package is no longer required to compile or run bogofilter.
+	* Support for the -e flag, which will cause bogofilter to exit with a 
+	  value of 0 regardless of the spamicity of the message. This is useful
+	  when using -p mode.
+	* Support for -u flag. This allows messsage evaluation and training to 
+	  happen in the same invocation of bogofilter.
+	* Extended TOKEN patterns to impeove support for european languages.
+	* Improved worlist locking to prevent data corruption.
+	* Added procmail recipies for example usage in the man page.
 
 0.7.4	Tue Sep 17 02:29:48 EDT 2002
+
 	* Added infrastructure to support multiple multiple worlists
 	* Fixed classification bug
 	* Fixed errors in documentation
@@ -21,6 +39,7 @@
 	* Message processing performance improvements
 
 0.7.3	Thu Sep 12 13:28:37 PDT 2002
+
 	Adrian Otto:
 	* Added portable file locking support for files and databases
 	David Relson
@@ -29,10 +48,12 @@
 	* Bug fix for trailing slash in -d option
 
 0.7.2: Wed Sep 11 15:28:00 PDT 2002
+
 	Adrian Otto:
 	* Introduced GNU configure for portability code
 
 0.7.1: Tue Sep 10 00:59:00 PDT 2002
+
 	Adrian Otto: 
 	* Skip existing X-Spam-Header
 	* Performance improvement for -p mode
@@ -40,6 +61,7 @@
 	* Bug fix in getopt argument
 		
 0.7: Sat Sep  7 14:18:33 EDT 2002
+
 	Eric S. Raymond:
 	* Check your scripts!  Option names have changed.
 	* Name changes: goodlist -> hamlist, badlist-> spamlist.
@@ -50,6 +72,7 @@
 	* We're back to not ignoring HTML comments.
 
 0.6: Fri Aug 30 00:25:49 EDT 2002
+
 	* Fixed a fluky bug in the socket-transmission logic
 	* Fixed an edge case where a single message with a From line
 	  was getting counted twice.
@@ -58,6 +81,7 @@
 	* Documented -d option.
 
 0.5: Thu Aug 29 13:38:12 EDT 2002
+
 	* Passthrough option can be used to add an X-Spam-Status header.
 	* There is now a per-message word frequency cap, so spammers can't do
 	  an equivalent of Google fodder.
@@ -71,6 +95,7 @@
 	* Minor bugfix by Eric Seppanen.
 
 0.4: Sat Aug 24 09:07:45 EDT 2002
+
 	* regenerated bogofilter mutt patch.
 	* wordlist files are now automatically created in -s and -n modes.
 	* Reversed the exit values, following a suggestion by Michal Elkins
@@ -80,14 +105,17 @@
 	* Added the long-sought procmail recipe.
 
 0.3: Fri 23 Aug 03:30:49 EDT 2002
+
 	* Specfile/Makefile improvements from Graham Reed.
 	* Caseblindness fix from Eric Seppanen.
 	* Deallocation fix from Mike Mayfield.
 	* Wordlist file format changed.
 
 0.2: Tue Aug 20 06:49:42 EDT 2002
+
 	* Added mutt-1.4 interface patch
 	* Note:  Location of the base directory has changed.
 
 0.1: Mon 19 Aug 2002 03:07:31
+
 	* Initial release.
