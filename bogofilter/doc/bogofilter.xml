@@ -132,7 +132,7 @@ which maintain counts of the numbers of times it has occurred in
 non-spam and spam mails.  These numbers are used to compute the
 probability that a mail in which the token occurs is spam.  After
 probabilities for all input tokens have been computed, a fixed number
-of the probabilities that deviate furtherest from average are combined
+of the probabilities that deviate furthest from average are combined
 using Bayes's theorem on conditional probabilities.  If the computed
 probability that the input is spam exceeds a cutoff determined at 
 compile time (currently 0.95, for the Robinson-Fisher algorithm),
