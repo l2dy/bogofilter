@@ -26,6 +26,7 @@ AUTHOR:
 #include "maint.h"
 #include "paths.h"
 #include "robinson.h"			/* for ROBS and ROBX */
+#include "robx.h"
 #include "swap.h"
 #include "wordlists.h"
 #include "xmalloc.h"
@@ -78,89 +79,6 @@ int ds_dump_hook(word_t *key, dsv_t *data,
 
     fflush(stdout); /* solicit ferror flag if output is shorter than buffer */
     return ferror(stdout) ? 1 : 0;
-}
-
-typedef struct robhook_data {
-    double   sum;
-    uint32_t count;
-    dsh_t    *dsh;
-    double   scalefactor;
-} rhd_t;
-
-static void robx_accum(rhd_t *rh, 
-		       word_t *key,
-		       dsv_t *data)
-{
-    uint32_t goodness = data->goodcount;
-    uint32_t spamness = data->spamcount;
-    double prob = spamness / (goodness * rh->scalefactor + spamness);
-    bool doit = goodness + spamness >= 10;
-
-    if (doit) {
-	rh->sum += prob;
-	rh->count += 1;
-    }
-
-    /* print if -vv and token in both word lists, or -vvv */
-    if ((verbose > 1 && doit) || verbose > 2) {
-	fprintf(dbgout, "cnt: %4lu,  sum: %11.6f,  ratio: %9.6f,"
-		"  sp: %3lu,  gd: %3lu,  p: %9.6f,  t: %*s\n", 
-		(unsigned long)rh->count, rh->sum, rh->sum / rh->count,
-		(unsigned long)spamness, (unsigned long)goodness, prob,
-		(int)min(INT_MAX,key->leng), key->text);
-    }
-}
-
-static int robx_hook(word_t *key, dsv_t *data, 
-		     void *userdata)
-{
-    struct robhook_data *rh = userdata;
-    dsh_t *dsh = rh->dsh;
-    sh_t i = dsh->index;
-
-    bool doit;
-
-    /* ignore system meta-data */
-    if (*key->text == '.')
-	return 0;
-
-    if (dsh->count == 1) {
-	doit = true;
-    } else {
-	/* tokens in good list were already counted */
-	/* now add in tokens only in spam list */
-	ds_read(dsh, key, data);
-	doit = data->goodcount == 0;
-    }
-
-    if (doit)
-	robx_accum(rh, key, data);
-
-    dsh->index = i;
-
-    return 0;
-}
-
-static int count_hook(word_t *key, dsv_t *data, 
-		      void *userdata)
-{
-    struct robhook_data *rh = userdata;
-    dsh_t *dsh = rh->dsh;
-    sh_t i = dsh->index;
-
-    /* ignore system meta-data */
-    if (*key->text == '.')
-	return 0;
-
-    ds_read(dsh, key, data);
-
-    /* skip tokens with goodness == 0 */
-    if (data->goodcount != 0)
-	robx_accum(rh, key, data);
-
-    dsh->index = i;
-
-    return 0;
 }
 
 static int dump_file(char *ds_file)
@@ -419,58 +337,11 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     return 0;
 }
 
-static double compute_robx(dsh_t *dsh)
+static int get_robx(char *path)
 {
     double robx;
 
-    dsv_t val;
-    uint32_t good_cnt, spam_cnt;
-    struct robhook_data rh;
-
-    ds_get_msgcounts(dsh, &val);
-    spam_cnt = val.spamcount;
-    good_cnt = val.goodcount;
-
-    rh.scalefactor = (double)spam_cnt/(double)good_cnt;
-    rh.dsh = dsh;
-    rh.sum = 0.0;
-    rh.count = 0;
-
-    if (dsh->count == 1) {
-	dsh->index = 0;
-	ds_foreach(dsh, robx_hook, &rh);
-    }
-    else {
-	dsh->index = IX_GOOD;	    /* robx needs count of good tokens */
-	ds_foreach(dsh, count_hook, &rh);
-
-	dsh->index = IX_SPAM;	    /* and scores for spam spam tokens */
-	ds_foreach(dsh, robx_hook, &rh);
-    }
-
-    robx = rh.sum/rh.count;
-    if (verbose)
-	printf("%s: %lu, %lu, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
-	       MSG_COUNT,
-	       (unsigned long)spam_cnt, (unsigned long)good_cnt,
-	       rh.scalefactor, rh.sum, (int)rh.count, robx);
-    else if (onlyprint) printf("%f\n", robx);
-
-    return robx;
-}
-
-static int compute_robinson_x(char *path)
-{
-    double robx;
-    word_t *word_robx = word_new((const byte *)ROBX_W, (uint) strlen(ROBX_W));
-
-    setup_wordlists(path, PR_NONE);
-    open_wordlists(DB_READ);
-
-    robx = compute_robx(word_lists->dsh);
-
-    close_wordlists(false);
-    free_wordlists();
+    robx = compute_robinson_x(path);
 
     if (!onlyprint) {
 	size_t count;
@@ -481,6 +352,8 @@ static int compute_robinson_x(char *path)
 	char filepath1[PATH_LEN];
 	char filepath2[PATH_LEN];
 	char *filepaths[IX_SIZE];
+
+	word_t *word_robx = word_new((const byte *)ROBX_W, (uint) strlen(ROBX_W));
 
 	filepaths[IX_SPAM] = filepath1;
 	filepaths[IX_GOOD] = filepath2;
@@ -503,9 +376,9 @@ static int compute_robinson_x(char *path)
 	val.spamcount = (uint32_t) (robx * 1000000);
 	ds_write(dsh, word_robx, &val);
 	ds_close(dsh, false);
-    }
 
-    word_free(word_robx);
+	word_free(word_robx);
+    }
 
     return EX_OK;
 }
@@ -748,7 +621,7 @@ int main(int argc, char *argv[])
 	    argv += optind;
 	    return display_words(ds_file, argc, argv, prob);
 	case M_ROBX:
-	    return compute_robinson_x(ds_file);
+	    return get_robx(ds_file);
 	case M_NONE:
 	default:
 	    /* should have been handled above */

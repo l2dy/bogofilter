@@ -56,6 +56,7 @@ AUTHOR:
 #include "msgcounts.h"
 #include "mime.h"
 #include "paths.h"
+#include "robx.h"
 #include "rstats.h"
 #include "token.h"
 #include "tunelist.h"
@@ -752,7 +753,6 @@ static void load_wordlist(ds_foreach_t *hook, void *userdata)
     }
 
     ds_oper(path, DB_READ, hook, userdata);
-/*  ds_oper(path, DB_READ, load_hook, ns_and_sp->train); XXXXXXXXXX */
     db_cachesize = ceil(sb.st_size / 3.0 / 1024.0 / 1024.0);
 
     xfree(path);
@@ -772,69 +772,15 @@ static int load_hook(word_t *key, dsv_t *data, void *userdata)
     return 0;
 }
 
-typedef struct robhook_data {
-    double   sum;
-    int      count;
-    double   scalefactor;
-} rh_t;
-
-static int robx_accum(word_t *key,
-		      dsv_t  *data,
-		      void   *userdata)
-{
-    rh_t *rh = userdata;
-    dsv_t *wp = data;
-    double goodness = wp->goodcount;
-    double spamness = wp->spamcount;
-    bool doit = goodness + spamness >= 10;
-
-    /* check for system meta-data */
-    if (*key->text == '.') {
-	if (strcmp((const char *)key->text, MSG_COUNT) == 0) {
-	    msgs_good = goodness;
-	    msgs_bad  = spamness;
-	    rh->scalefactor = spamness/goodness;
-	}
-    }
-    else
-    if (doit) {
-	double prob = spamness / (goodness * rh->scalefactor + spamness);
-	rh->sum += prob;
-	rh->count += 1;
-    }
-
-    return 0;
-}
-
-static double robx_compute(void)
+static double get_robx(void)
 {
     double rx;
-    dsv_t val;
-
-    struct robhook_data rh;
-
     if (user_robx > 0.0)
 	return user_robx;
 
     printf("Calculating initial x value...\n");
 
-    setup_wordlists(ds_file, PR_NONE);
-    open_wordlists(DB_READ);
-
-    ds_get_msgcounts(word_lists->dsh, &val);
-    msgs_good = val.goodcount;
-    msgs_bad  = val.spamcount;
-
-    rh.scalefactor = (double)msgs_bad/(double)msgs_good;
-    rh.sum = 0.0;
-    rh.count = 0;
-
-    load_wordlist(robx_accum, &rh);
-
-    close_wordlists(false);
-    free_wordlists();
-
-    rx = (rh.count == 0) ? ROBX : rh.sum/rh.count;
+    rx = compute_robinson_x(ds_file);
 
     if (rx > 0.6) rx = 0.6;
     if (rx < 0.4) rx = 0.4;
@@ -1202,7 +1148,7 @@ static rc_t bogotune(void)
     if (user_robx > EPS)
 	robx = user_robx;
     else if (ds_file != NULL)
-	robx = robx_compute();
+	robx = get_robx();
 
     /* No longer needed */
     wordhash_free(ns_and_sp->train);

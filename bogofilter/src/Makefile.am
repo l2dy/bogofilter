@@ -89,6 +89,7 @@ version_sources= \
 	paths.h paths.c \
 	qp.h qp.c \
 	register.h register.c \
+	robx.h robx.c \
 	rstats.h rstats.c \
 	swap.h swap_32bit.c system.c \
 	textblock.h textblock.c \
