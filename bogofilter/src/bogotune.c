@@ -653,7 +653,6 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
     wordhash_t *train = ns_and_sp->train;
     mlhead_t *msgs = ns_or_sp->msgs;
     mlitem_t *item;
-    wordprop_t *msg_count;
 
     int score_count = 0;
     int train_count = 0;
@@ -664,14 +663,16 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
 			 LIST_COUNT / TEST_COUNT,	/* small ratio */
 			 LIST_COUNT / LIST_COUNT);	/* large ratio */
 
-    /* Update .MSG_COUNT */
-    msg_count = wordhash_insert(train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
-
     for (item = msgs->head; item != NULL; item = item->next) {
 	wordhash_t *wh = item->wh;
 
 	/* training set */
 	if (divvy && train_count / ratio < score_count + 1) {
+	    static wordprop_t *msg_count = NULL;
+	    if (msg_count == NULL)
+		/* Update .MSG_COUNT */
+		msg_count = wordhash_insert(train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
+
 	    wordhash_set_counts(wh, good, bad);
 	    wordhash_add(train, wh, &wordprop_init);
 	    train_count += 1;
@@ -1297,7 +1298,7 @@ static rc_t bogotune(void)
 
     create_countlists(ns_msglists);
     create_countlists(sp_msglists);
-    
+
     if (verbose >= TIME && time(NULL) - end > 2) {
 	end = time(NULL);
 	show_elapsed_time(beg, end, ns_cnt + sp_cnt, (double)cnt/(end-beg), "messages", "msg/sec");
@@ -1587,8 +1588,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     bogotune();
 
     bogotune_free();
-
-    MEMDISPLAY;
 
     exit(exitcode);
 }
