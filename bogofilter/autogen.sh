@@ -7,7 +7,7 @@
 DIE=0
 
 PROGNAME="bogofilter"
-(autoconf --version) < /dev/null > /dev/null 2>&1 || {
+(autoconf --version) < /dev/null | head -1 > autogen.log 2>&1 || {
   echo
   echo "**Error**: You must have \`autoconf' installed to compile $PROGNAME."
   echo "Download the appropriate package for your distribution,"
@@ -15,9 +15,17 @@ PROGNAME="bogofilter"
   DIE=1
 }
 
-(automake --version) < /dev/null > /dev/null 2>&1 || {
+(automake --version) < /dev/null | head -1 >> autogen.log 2>&1 || {
   echo
   echo "**Error**: You must have \`automake' installed to compile $PROGNAME."
+  echo "Download the appropriate package for your distribution,"
+  echo "or get the source tarball at ftp://ftp.gnu.org/pub/gnu/"
+  DIE=1
+}
+
+(flex --version) < /dev/null | head -1 >> autogen.log 2>&1 || {
+  echo
+  echo "**Error**: You must have \`flex.xxx' installed to compile $PROGNAME."
   echo "Download the appropriate package for your distribution,"
   echo "or get the source tarball at ftp://ftp.gnu.org/pub/gnu/"
   DIE=1
