@@ -26,6 +26,25 @@ if test "$ac_cv_c_inline" != no ; then
     AC_SUBST(HAVE_INLINE)
 fi
 
+dnl Check for "extern inline", using a modified version
+dnl of the test for AC_C_INLINE from acspecific.mt.
+dnl
+dnl Imported from the GSL 1.4 documentation (section "Autoconf Macros")
+dnl and modified to define HAVE_EXTERN_INLINE.
+AC_CACHE_CHECK([for extern inline], ac_cv_c_extern_inline,
+	       [ac_cv_c_extern_inline=no
+		AC_TRY_COMPILE([extern $ac_cv_c_inline double foo(double x);
+				extern $ac_cv_c_inline double foo(double x) { return x+1.0; };
+				double foo (double x) { return x + 1.0; };],
+				[  foo(1.0)  ],
+				[ac_cv_c_extern_inline="yes"])
+		])
+
+if test "$ac_cv_c_extern_inline" != no ; then
+    AC_DEFINE(HAVE_EXTERN_INLINE,1,Define to 1 if your compiler supports extern inline storage class.)
+    AC_SUBST(HAVE_EXTERN_INLINE)
+fi
+
 dnl Check for extension
 AC_EXEEXT
 
