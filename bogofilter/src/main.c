@@ -41,7 +41,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     progtype = build_progtype(progname, DB_TYPE);
 
-    process_args_and_config_file(argc, argv, true);
+    process_parameters(argc, argv, true);
     argc -= optind;
     argv += optind;
 

@@ -13,6 +13,24 @@ AUTHOR:
 CONTRIBUTORS:
    David Saez	-O option, helps embedding into Exim.
 
+******************************************************************************
+
+The call tree is (roughly):
+
+bogoconfig.c	  process_parameters
+bogoconfig.c	    process_arglist(PASS_1_CLI)
+bogoconfig.c	      process_arg(PASS_1_CLI)
+configfile.c	    process_config_files
+configfile.c	      read_config_file
+configfile.c	        process_config_option
+configfile.c	          process_config_option_as_arg
+bogoconfig.c	            process_arg(PASS_2_CFG)
+bogoconfig.c	    process_arglist(PASS_2_CLI)
+bogoconfig.c	      process_arg(PASS_3_CLI)
+
+Note: bogolexer also uses configfile.c.
+      bogolexer.c calls process_config_files(), which calls back to it.
+
 ******************************************************************************/
 
 #include "common.h"
@@ -71,7 +89,7 @@ static int inv_terse_mode = 0;
 
 static void display_tag_array(const char *label, FIELD *array);
 
-static void process_args(int argc, char **argv, priority_t precedence, int pass);
+static void process_arglist(int argc, char **argv, priority_t precedence, int pass);
 static bool get_parsed_value(char **arg, double *parm);
 static void comma_parse(char opt, const char *arg, double *parm1, double *parm2, double *parm3);
 
@@ -172,7 +190,7 @@ static void set_bogofilter_dir(const char *name, const char *arg, int precedence
     return;
 }
 
-void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
+void process_parameters(int argc, char **argv, bool warn_on_error)
 {
     bogotest = 0;
     verbose = 0;
@@ -184,9 +202,9 @@ void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
     method = (method_t *) &rf_fisher_method;
     usr_parms = method->config_parms;
 
-    process_args(argc, argv, PR_COMMAND, PASS_1_CLI);
+    process_arglist(argc, argv, PR_COMMAND, PASS_1_CLI);
     process_config_files(warn_on_error);
-    process_args(argc, argv, PR_COMMAND, PASS_3_CLI);
+    process_arglist(argc, argv, PR_COMMAND, PASS_3_CLI);
 
     /* directories from command line and config file are already handled */
 
@@ -243,7 +261,8 @@ static run_t check_run_type(run_t add_type, run_t conflict)
 
 static int validate_args(void)
 {
-/*  flags '-s', '-n', '-S', or '-N', are mutually exclusive of flags '-p', '-u', '-e', and '-R'. */
+/*  flags '-s', '-n', '-S', and '-N' are mutually exclusive with
+    flags '-p', '-u', '-e', and '-R'. */
     run_classify = (run_type & (RUN_NORMAL | RUN_UPDATE)) != 0;
     run_register = (run_type & (REG_SPAM | REG_GOOD | UNREG_SPAM | UNREG_GOOD)) != 0;
 
@@ -435,7 +454,7 @@ static void print_version(void)
  ** there are leftover command line arguments.
  */
 
-static void process_args(int argc, char **argv, priority_t precedence, int pass)
+static void process_arglist(int argc, char **argv, priority_t precedence, int pass)
 {
     int option;
     ex_t exitcode;

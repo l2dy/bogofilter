@@ -152,7 +152,7 @@ static char *get_string(const char *name, const char *arg)
  ** there are leftover command line arguments.
  */
 
-static void process_args(int argc, char **argv)
+static void process_arglist(int argc, char **argv)
 {
     int option;
 
@@ -172,7 +172,7 @@ static void process_args(int argc, char **argv)
 	    break;
 
 	name = (option_index == 0) ? argv[this_option_optind] : long_options[option_index].name;
-	process_arg(option, name, optarg, PR_COMMAND, PASS_1, CMD_LINE);
+	process_arg(option, name, optarg, PR_COMMAND, PASS_1_CLI);
     }
 
     if (optind < argc) {
@@ -182,9 +182,9 @@ static void process_args(int argc, char **argv)
     }
 }
 
-void process_arg(int option, const char *name, const char *val, priority_t precedence, arg_pass_t pass, arg_source_t src)
+void process_arg(int option, const char *name, const char *val, priority_t precedence, arg_pass_t pass)
 {
-    pass = PASS_1;	/* suppress compiler warning */
+    pass = 0;		/* suppress compiler warning */
 
     switch (option)
     {
@@ -266,7 +266,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	**  ok    - if from config file
 	**  error - if on command line
 	*/
-	if (src == CMD_LINE) {
+	if (pass == PASS_2_CFG) {
 	    fprintf(stderr, "Invalid option '%s'.\n", name);
 	    exit(EX_ERROR);
 	}
@@ -281,7 +281,7 @@ int main(int argc, char **argv)
 
     mbox_mode = true;		/* to allow multiple messages */
 
-    process_args(argc, argv);
+    process_arglist(argc, argv);
     process_config_files(false);
 
     textblock_init();

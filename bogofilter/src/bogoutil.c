@@ -12,10 +12,10 @@ AUTHOR:
 
 #include "common.h"
 
-#include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
 #include <errno.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -412,7 +412,7 @@ static cmd_t flag = M_NONE;
 
 #define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:vVw:x:X:y:"
 
-static int process_args(int argc, char **argv)
+static int process_arglist(int argc, char **argv)
 {
     int option;
     int count = 0;
@@ -570,7 +570,7 @@ int main(int argc, char *argv[])
 
     set_today();			/* compute current date for token age */
 
-    (void)process_args(argc, argv);
+    process_arglist(argc, argv);
 
     /* Extra or missing parameters */
     if (flag != M_WORD && argc != optind) {

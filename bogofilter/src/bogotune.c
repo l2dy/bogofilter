@@ -796,7 +796,7 @@ static void help(void)
 		  progname, version);
 }
 
-static int process_args(int argc, char **argv)
+static int process_arglist(int argc, char **argv)
 {
     int  count = 1;
 
@@ -1586,7 +1586,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	ds_file = get_directory(PR_ENV_HOME);
 
     /* process args and read mailboxes */
-    process_args(argc, argv);
+    process_arglist(argc, argv);
 
     if (ds_file)
 	check_wordlist_path();
