@@ -80,14 +80,13 @@ static bogostat_t bogostats;
 
 static int compare_extrema(const void *id1, const void *id2)
 {
-    double d;
     const discrim_t *d1 = id1;
     const discrim_t *d2 = id2;
-    d = d2->prob - d1->prob;
-    if (fabs(d) < EPS) return strcmp(d1->key, d2->key);
+
     if (d1->prob > d2->prob) return 1;
     if (d1->prob < d2->prob) return -1;
-    return 0;
+
+    return strcmp(d1->key, d2->key);
 }
 
 static void init_bogostats(/*@out@*/ bogostat_t *bs)
