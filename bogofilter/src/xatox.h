@@ -21,7 +21,7 @@
  *   details; if errno == 0, then the string contained junk at the end.
  * - 1 - success
  */
-int xatoi(int *i /** the result is stored here */ /*@out@*/,
+int xatoi(/*@out@*/ int *i /** the result is stored here */,
 	  const char *in /** input string */);
 
 /** strtod variant with simplified error checking. The function tries to parse
@@ -34,7 +34,7 @@ int xatoi(int *i /** the result is stored here */ /*@out@*/,
  *   details; if errno == 0, then the string contained junk at the end.
  * - 1 - success
  */
-int xatof(double *d /** the result is stored here */ /*@out@*/, 
+int xatof(/*@out@*/ double *d /** the result is stored here */,
 	  const	char *in /** input string */);
 
 #endif
