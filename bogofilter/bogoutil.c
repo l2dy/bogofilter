@@ -21,10 +21,11 @@ AUTHOR:
 #include "datastore.h"
 #include "datastore_db.h"
 
-#undef  PROGNAME
 #define PROGNAME "bogoutil"
 
 int verbose = 0;
+
+run_t run_type = RUN_NORMAL;
 
 const char *progname = PROGNAME;
 
@@ -226,14 +227,14 @@ void help(void)
 
 int main(int argc, char *argv[])
 {
-    typedef enum { NONE, DUMP = 1, LOAD = 2, WORD = 3 } cmd_t;
+    typedef enum { NONE, DUMP = 1, LOAD = 2, WORD = 3, ROBX = 4 } cmd_t;
 
     int  count = 0;
     char *db_file = NULL;
     char ch;
     cmd_t flag = NONE;
 
-    while ((ch = getopt(argc, argv, "d:l:w:vhV")) != -1)
+    while ((ch =getopt(argc, argv, "d:l:w:hvVx")) != -1)
 	switch (ch) {
 	case 'd':
 	    flag = DUMP;
@@ -253,14 +254,18 @@ int main(int argc, char *argv[])
 	    db_file = (char *) optarg;
 	    break;
 
-	case 'v':
-	    verbose++;
-	    break;
-
 	case 'h':
 	    help();
 	    usage();
 	    exit(0);
+
+	case 'x':
+	    set_debug_mask( argv[optind] );
+	    break;
+
+	case 'v':
+	    verbose++;
+	    break;
 
 	case 'V':
 	    version();

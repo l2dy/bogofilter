@@ -146,7 +146,7 @@ void sanitycheck_lists()
 	fprintf(stderr, "No wordlists available!\n");
 	exit(2);
     }
-    if (verbose >= 2)
+    if (DEBUG_WORDLIST(1))
 	fprintf(stderr, "%d lists look OK.\n", listcount);
 }
 

@@ -112,7 +112,7 @@ int main(int argc, char **argv)
     set_dir_from_env(directory, "HOME", BOGODIR);
     set_dir_from_env(directory, "BOGOFILTER_DIR", NULL);
 
-    while ((ch = getopt(argc, argv, "d:ehlsnSNvVpugrR")) != EOF)
+    while ((ch = getopt(argc, argv, "d:ehlsnSNvVxpugrR")) != EOF)
 	switch(ch)
 	{
 	case 'd':
@@ -194,6 +194,10 @@ int main(int argc, char **argv)
 	    algorithm = AL_ROBINSON;
 	    break;
 
+	case 'x':
+	    set_debug_mask( argv[optind] );
+	    break;
+	    
 	case 'R':
 	    Rtable = 1;
 	    break;

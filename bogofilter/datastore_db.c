@@ -110,7 +110,7 @@ long db_getvalue(void *vhandle, char *word){
     if ((ret = handle->dbp->get(handle->dbp, NULL, &db_key, &db_data, 0)) == 0){
       value = *(long *)db_data.data;
 
-      if (verbose > 2){
+      if (DEBUG_DATABASE(2)) {
         fprintf(stderr, "[%lu] db_getvalue (%s): [%s] has value %ld\n", (unsigned long)handle->pid, handle->name, word, value);
       }
 
@@ -148,7 +148,7 @@ void db_setvalue(void *vhandle, char * word, long value){
     data.size = sizeof(long);
 
     if ((ret = handle->dbp->put(handle->dbp, NULL, &key, &data, 0)) == 0){
-      if (verbose > 2){
+      if (DEBUG_DATABASE(2)) {
 	fprintf(stderr, "db_setvalue (%s): [%s] has value %ld\n", handle->name, word, value);
       }
     }
@@ -238,7 +238,7 @@ static int db_lock(dbh_t *handle, int cmd, int type){
   lock.l_start = 0;
   lock.l_whence = SEEK_END;
   lock.l_len = 0;
-  return (fcntl(fd, cmd, &lock));  
+  return (fcntl(fd, cmd, &lock));
 }
 
 /*
@@ -248,7 +248,7 @@ void db_lock_reader(void *vhandle){
 
   dbh_t *handle = vhandle;
 
-  if (verbose > 1)
+  if (DEBUG_DATABASE(1))
     fprintf(stderr, "[%lu] Acquiring read lock  on %s\n",(unsigned long)handle->pid, handle->filename);
 
   if (db_lock(handle, F_SETLKW, F_RDLCK) != 0){
@@ -256,7 +256,7 @@ void db_lock_reader(void *vhandle){
     exit(2);
   }
 
-  if (verbose > 1)
+  if (DEBUG_DATABASE(1))
     fprintf(stderr, "[%lu] Got read lock  on %s\n",(unsigned long)handle->pid, handle->filename);
 
   handle->locked = TRUE;
@@ -268,7 +268,7 @@ Acquires blocking write lock on database.
 void db_lock_writer(void *vhandle){
   dbh_t *handle = vhandle;
 
-  if (verbose > 1)
+  if (DEBUG_DATABASE(1))
     fprintf(stderr, "[%lu] Acquiring write lock on %s\n",(unsigned long)handle->pid, handle->filename);
 
   if (db_lock(handle, F_SETLKW, F_WRLCK) != 0){
@@ -276,7 +276,7 @@ void db_lock_writer(void *vhandle){
     exit(2);
   }
 
-  if (verbose > 1)
+  if (DEBUG_DATABASE(1))
     fprintf(stderr, "[%lu] Got write lock on %s\n",(unsigned long)handle->pid, handle->filename);
 
   handle->locked = TRUE;
@@ -290,7 +290,7 @@ void db_lock_release(void *vhandle){
   dbh_t *handle = vhandle;
 
   if (handle->locked == TRUE){
-    if (verbose > 1)
+    if (DEBUG_DATABASE(1))
       fprintf(stderr, "[%lu] Releasing lock on %s\n",(unsigned long)handle->pid, handle->filename);
 
     if (db_lock(handle, F_SETLK, F_UNLCK) != 0){
@@ -298,7 +298,7 @@ void db_lock_release(void *vhandle){
       exit(2);
     }
   }
-  else if (verbose > 1){
+  else if (DEBUG_DATABASE(1)) {
     fprintf(stderr, "[%lu] Attempt to release open lock on %s\n",(unsigned long)handle->pid, handle->filename);
   }
 
@@ -360,11 +360,11 @@ static void db_lock_list(wordlist_t *list, int type){
       if (tmp->active == FALSE)
 	continue;
 
-      if (verbose > 1)
+      if (DEBUG_DATABASE(1))
 	do_lock_msg("Trying");
       
       if (db_lock(handle, cmd, type) == 0){
-        if (verbose > 1)
+        if (DEBUG_DATABASE(1))
           do_lock_msg("Got");
         
         handle->locked = TRUE;

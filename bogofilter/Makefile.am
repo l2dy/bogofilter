@@ -11,9 +11,10 @@ bin_SCRIPTS = bogoupgrade
 check_PROGRAMS = lexertest
 man1_MANS = bogofilter.1 bogoutil.1
 
-CFLAGS=-g
+CFLAGS = -g
+
 # what to build that from
-MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h
+MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h debug.h debug.c
 
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c \
@@ -22,8 +23,10 @@ bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 
 lexertest_SOURCES = lexertest.c lexer.l lexer.h
 
+debugtest_SOURCES = debug.c debug.h
+
 bogoutil_SOURCES = bogoutil.c \
-		   datastore.h datastore_db.h datastore_db.c \
+		   datastore.h datastore_db.h datastore_db.c wordlists.h wordlists.c \
 		   $(MYCOMMON)
 
 # what to distribute
@@ -37,6 +40,9 @@ EXTRA_DIST = $(man1_MANS) \
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
 version.h:	version.sh $(VERSION_FROM)
 	version.sh $(VERSION_FROM) >$@
+#
+debugtest: debug.c
+	$(CC) -DMAIN $(CFLAGS) -o debugtest debug.c
 #
 .xml.pdf:
 	xmlto pdf --extensions $<
