@@ -22,12 +22,10 @@
 void
 *xrealloc(void *ptr, size_t size){
    void *x;
-   if (size != 0)
-       x = realloc(ptr, size);
-   else {
-       xfree(ptr);
-       x = xcalloc(1, size);
-   }
-   if (x == NULL) xmem_error("xrealloc");
+   x = realloc(ptr, size);
+   if (x == NULL && size == 0)
+       x = calloc(1, 1);
+   if (x == NULL)
+       xmem_error("xrealloc");
    return x;
 }
