@@ -57,9 +57,8 @@ static void cleanup_exit(int exitcode, int killfiles) {
 
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
-    int   exitcode, ok = 0;
+    int   exitcode;
     FILE  *out;
-    char *t;
 
     exitcode = process_args(argc, argv);
     if (exitcode != 0)
@@ -96,12 +95,12 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	    {
 		double spamicity;
 		rc_t   status = bogofilter(&spamicity);
-		textdata_t *text;
+		textdata_t *text = textblocks->head;
 
 		if (passthrough)
 		{
 		    /* print headers */
-		    for (text=textblocks->head; text->next; text=text->next)
+		    while (text->next)
 		    {
 			if ((text->size == 1 && memcmp(text->data, NL, 1) == 0) ||
 			    (text->size == 2 && memcmp(text->data, CRLF, 2) == 0))
@@ -109,6 +108,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
 			(void) fwrite(text->data, 1, text->size, out);
 			if (ferror(out)) cleanup_exit(2, 1);
+			text=text->next;
 		    }
 		}
 
@@ -142,10 +142,11 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 			(void)fputs("\n", out);
 
 		    /* print body */
-		    for (; text->next != NULL; text=text->next)
+		    while (text->next)
 		    {
 			(void) fwrite(text->data, 1, text->size, out);
 			if (ferror(out)) cleanup_exit(2, 1);
+			text=text->next;
 		    }
 
 		    if (fflush(out) || ferror(out) || (out != stdout && fclose(out))) {
