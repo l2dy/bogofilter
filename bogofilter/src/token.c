@@ -233,9 +233,8 @@ void got_from(void)
     reset_html_level();
 }
 
-void got_newline()
+void got_emptyline()
 {
-
     if (msg_state->mime_type != MIME_MESSAGE && !msg_state->mime_header)
 	return;
 

@@ -16,7 +16,7 @@
 
 #include "lexer.h"
 #include "mime.h"		/* for mime_*() */
-#include "token.h"		/* for got_newline() */
+#include "token.h"
 
 #define YY_DECL token_t yylex(void)
 #define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, max_size)
@@ -41,7 +41,7 @@ TOKEN		[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\
 {IPADDR}					{ return(IPADDR);}
 {TOKEN}						{ return(TOKEN); }
 .						;
-^\n						{ got_newline(); return(EMPTY);}
+^\n						{ got_emptyline(); return(EMPTY);}
 \n						;
 
 %%
