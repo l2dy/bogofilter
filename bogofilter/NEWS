@@ -7,7 +7,7 @@
 	* A new '-q' option in bogofilter prevents reading configuration
 	  files.
 
-0.8.0	2002-10-30 XXX FIXME XXX (fix the date)
+0.8.0	2002-11-10
 
 	* The lexer code now detects read errors (and exits with code 2
 	  if it finds one.)
