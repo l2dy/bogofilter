@@ -40,9 +40,12 @@ done
 a=$(( $a * 2 ))
 
 touch "$DIR"/DB_CONFIG
-egrep -v '^set_lk_max_(locks|objects)' "$DIR"/DB_CONFIG >"$DIR"/DB_CONFIG.new || true
+(
+  set +e
+  egrep -v '^set_lk_max_(locks|objects)' "$DIR"/DB_CONFIG >"$DIR"/DB_CONFIG.new
+)
+if [ $? -ge 2 ] ; then exit 1 ; fi
 echo >>"$DIR"/DB_CONFIG.new set_lk_max_locks $a
 echo >>"$DIR"/DB_CONFIG.new set_lk_max_objects $a
 mv "$DIR"/DB_CONFIG.new "$DIR"/DB_CONFIG
-yes
 bogoutil --db-recover="$DIR"
