@@ -186,15 +186,12 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     double spamicity;
     size_t robn = 0;
     size_t count = 0;
-    bool need_stats;
+    bool need_stats = Rtable || verbose || passthrough;
     int err = 0;
 
     (void) fp; 	/* quench compiler warning */
 
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "### msg_compute_spamicity() begins\n");
-
-    Rtable |= verbose > 3;
-    need_stats = Rtable || verbose || passthrough;
 
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
 				    min_dev, robs, robx);
