@@ -49,7 +49,6 @@ extern	bool	fold_case;		/* -Pf */
 extern	bool	tag_header_lines;	/* -Ph */
 extern	bool	tokenize_html_tags;	/* -Pt */
 extern	bool	tokenize_html_script;	/* -Ps */
-extern	bool	tokenize_html_comments;	/* -Pc */
 
 extern	int	db_cachesize;
 
