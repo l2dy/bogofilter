@@ -4,8 +4,7 @@
  
 0.14.1.1 2003-08-01
 
-* Removed case sensitivity for adding spam_subject_tag to message
-  header.
+* Fixed check for adding spam_subject_tag to Subject: line.
 * Correct problem with t.degen regression test.
  
 0.14.1	2003-07-31
