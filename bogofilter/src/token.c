@@ -173,10 +173,10 @@ token_t get_token(void)
 	    break;
 
 	case MSGADDR:
+	{
 	    /* trim brackets */
 	    yylval->leng -= 2;
-	    memmove(yylval->text, yylval->text+1, yylval->leng);
-	    Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
+	    memmove(yylval->text, yylval->text+1, yylval->leng+D);
 	    /* if top level, no address, not localhost, .... */
 	    if (token_prefix == w_recv &&
 		msg_state == msg_state->parent && 
@@ -186,6 +186,10 @@ token_t get_token(void)
 		word_free(msg_addr);
 		msg_addr = word_dup(yylval);
 	    }
+	}
+
+	/*@fallthrough@*/
+
 	case IPADDR:
 	    if (block_on_subnets)
 	    {
