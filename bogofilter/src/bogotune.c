@@ -1021,12 +1021,14 @@ static double get_robx(void)
 
     if (user_robx > 0.0)
 	rx = user_robx;
-    else {
+    else if (ds_flag == DS_DSK)	{
 	printf("Calculating initial x value...\n");
 	verbose = -verbose;		/* disable bogofilter debug output */
 	rx = compute_robinson_x(ds_file);
 	verbose = -verbose;		/* enable bogofilter debug output */
     }
+    else
+	rx = ROBX;
 
     if (rx > RX_MAX) rx = RX_MAX;
     if (rx < RX_MIN) rx = RX_MIN;
@@ -1471,10 +1473,7 @@ static rc_t bogotune(void)
     ** investigated to [x-0.1, x+0.1].
     */
 
-    if (user_robx > EPS)
-	robx = user_robx;
-    else if (ds_flag == DS_DSK)
-	robx = get_robx();
+    robx = get_robx();
 
     /*
     ** 6.  Calculate fp target
