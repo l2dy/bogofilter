@@ -50,8 +50,8 @@ uint32_t cur_malloc = 0;
 uint32_t max_malloc = 0;
 uint32_t tot_malloc = 0;
 
-void debugtrap(const char *why);
-void debugtrap(const char *why) { (void)why; }
+void md_trap(const char *why);
+void md_trap(const char *why) { (void)why; }
 
 typedef struct memheader {
     size_t	size;
@@ -84,7 +84,7 @@ md_malloc(size_t size)
     size += sizeof(mh_t);		/* Include size storage */
 
     if (dbg_size_trap != 0 && size > dbg_size_trap)
-	debugtrap("dbg_size_trap");
+	md_trap("dbg_size_trap");
 
     if (dbg_too_much != 0 && max_malloc > dbg_too_much) {
 	fprintf(stderr, "max_malloc = %12lu, tot_malloc = %12lu\n", (ulong) max_malloc, (ulong) tot_malloc);
@@ -101,7 +101,7 @@ md_malloc(size_t size)
     if (memtrace & M_MALLOC)
 	mh_disp( "a", mh );
     if (dbg_index != 0 && mh->indx == dbg_index)
-	debugtrap("dbg_index");
+	md_trap("dbg_index");
 
     x = (void *) (mh+1);
 
@@ -123,12 +123,12 @@ md_free(void *ptr)
 	mh_disp( "f", mh );
 
     if (mh->tag != md_tag)
-	debugtrap("md_tag");
+	md_trap("md_tag");
     if (dbg_index != 0 && mh->indx == dbg_index)
-	debugtrap("dbg_index");
+	md_trap("dbg_index");
     if (mh->size > cur_malloc || 
 	(dbg_size_trap != 0 && mh->size > dbg_size_trap))
-	debugtrap("dbg_size_trap");
+	md_trap("dbg_size_trap");
     cur_malloc -= mh->size;
 
     mh->tag = -1;
@@ -187,7 +187,7 @@ void
     if (memtrace & M_MALLOC)
 	mh_disp( "c", mh );
     if (dbg_index != 0 && mh->indx == dbg_index)
-	debugtrap("dbg_index");
+	md_trap("dbg_index");
 
     x = (void *) (mh+1);
 
