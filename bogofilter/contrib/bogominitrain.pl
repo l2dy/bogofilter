@@ -3,28 +3,37 @@
 # by Boris 'pi' Piwinger <3.14@piology.org>
 
 # Not correct number of parameters
-unless (scalar(@ARGV)==3 || (scalar(@ARGV)==4 && $ARGV[0] =~ /^-(?=[vf]{1,3}$)(?:f?v{0,2}|v+f)$/)) {
-  print <<END unless (scalar(@ARGV)==3 || (scalar(@ARGV)==4 && $ARGV[0] eq "-v"));
+my $commandlineoptions=($ARGV[0]=~/^-(?=[^v]*v{0,2}[^v]*$)(?=[^f]*f?[^f]*$)(?=[^s]*s?[^s]*$)[vfs]+$/);
+unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
+  print <<END;
 
 Usage:
-  bogominitrain.pl [-[f][v[v]]] <database-directory> <ham-mboxes> <spam-mboxes>
+  bogominitrain.pl [-[f][v[v]][s]] <database-directory> <ham-mboxes>\\ 
+    <spam-mboxes> [bogofilter-options]
 
-  Uses a "train on error" process to build minimal wordlists that can correctly 
-  score all messages.
+  database-directory is the directory containing your database files.
+  They will be created as needed.  ham-mboxes and spam-mboxes are the
+  mboxes containing the mails; the will be shell-expanded.
+  bogofilter-options are given to bogofilter literally.
+
+  Uses a "train on error" process to build minimal wordlists that can
+  correctly score all messages.
 
   Run "formail -es" on your mailboxes before you start to ensure their
   correctness.
 
-  It may be a good idea to run this script command several times (until no
-  scoring errors occur).  Use the '-f' option to do this.
+  It may be a good idea to run this script command several times.
+  Use the '-f' option to run the script until no scoring errors occur.
 
 Example:
-  bogominitrain.pl .bogofilter 'ham*' 'spam*'
+  bogominitrain.pl -fv .bogofilter 'ham*' 'spam*' '-c train.cf'
 
 Options:
   -v   This switch produces info on messages used for training.
-  -vv  In addition messages not used for training are listed.
-  -f   Runs the program until no error remains.
+  -vv  also lists messages not used for training.
+  -f   Runs the program until no errors remain.
+  -s   Saves the messages used for training to files
+       bogominitrain.ham and bogominitrain.spam
   Note: If you need to use more than one option, you must combine them.
 
 Warning:
@@ -37,20 +46,25 @@ END
 }
 
 # Check input and open
-my $force=1 if (scalar(@ARGV)==4 && $ARGV[0]=~s/f//);
-my $verbose=1 if (scalar(@ARGV)==4 && $ARGV[0]=~s/^-v/-/);
-my $vverbose=1 if (scalar(@ARGV)==4 && $ARGV[0] eq "-v");
-shift (@ARGV) if (scalar(@ARGV)==4);
-my ($dir,$ham,$spam) = @ARGV;
+my $force=1 if ($commandlineoptions && $ARGV[0]=~s/f//);
+my ($safe,$safeham,$safespam)=(1,"bogominitrain.ham","bogominitrain.spam")
+   if ($commandlineoptions && $ARGV[0]=~s/s//);
+my $verbose=1 if ($commandlineoptions && $ARGV[0]=~s/^-v/-/);
+my $vverbose=1 if ($commandlineoptions && $ARGV[0] eq "-v");
+shift (@ARGV) if ($commandlineoptions);
+my ($dir,$ham,$spam,$options) = @ARGV;
+my $bogofilter="bogofilter $options -d $dir";
 my $temp; srand; do {$temp="/tmp/".rand();} until (!-e $temp);
 
 die ("$dir is not a directory or not accessible.\n") unless (-d $dir && -r $dir && -w $dir && -x $dir);
 print "\nStarting with this database:\n";
 my $dbexists=(-s "$dir/goodlist.db");
-if ($dbexists) {print `bogoutil -w $dir .MSG_COUNT`;} else {print "  (empty)\n";}
+if ($dbexists) {print `bogoutil -w $dir .MSG_COUNT`;} else {print "  (empty)\n\n";}
 
 my ($fp,$fn);
+my $runs=0;
 do { # Start force loop
+  $runs++;
   open (HAM, "cat $ham|")   || die("Cannot open ham: $!\n");
   open (SPAM, "cat $spam|") || die("Cannot open spam: $!\n");
 
@@ -64,21 +78,26 @@ do { # Start force loop
       my $mail=$lasthamline;
       $lasthamline="";
       while (defined(my $line=<HAM>)) {
-	if ($line=~/^From /) {$lasthamline=$line; last;}
-	$mail.=$line;
+        if ($line=~/^From /) {$lasthamline=$line; last;}
+        $mail.=$line;
       }
       if ($mail) {
-	$hamcount++;
-	open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
-	print TEMP $mail;
-	close (TEMP);
-	unless ($dbexists && system("bogofilter -d $dir <$temp")/256==1) {
-	  system("bogofilter -d $dir -n <$temp");
-	  $hamadd++;
-	  $dbexists=1;
-	  print "Training ham message $hamcount.\n" if ($verbose);
-	} else {print "Not training ham message $hamcount..\n" if ($vverbose);}
-	unlink ($temp);
+        $hamcount++;
+        open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
+        print TEMP $mail;
+        close (TEMP);
+        unless ($dbexists && system("$bogofilter <$temp")/256==1) {
+          system("$bogofilter -n <$temp");
+          $hamadd++;
+          $dbexists=1;
+          print "Training ham message $hamcount.\n" if ($verbose);
+          if ($safe) {
+            open (TEMP, ">>$safeham") || die "Cannot write to $safeham: $!";
+            print TEMP $mail;
+            close (TEMP);
+          }
+        } else {print "Not training ham message $hamcount..\n" if ($vverbose);}
+        unlink ($temp);
       }
     }
 
@@ -87,20 +106,25 @@ do { # Start force loop
       my $mail=$lastspamline;
       $lastspamline="";
       while (!eof(SPAM) && defined(my $line=<SPAM>)) {
-	if ($line=~/^From /) {$lastspamline=$line; last;}
-	$mail.=$line;
+        if ($line=~/^From /) {$lastspamline=$line; last;}
+        $mail.=$line;
       }
       if ($mail) {
-	$spamcount++;
-	open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
-	print TEMP $mail;
-	close (TEMP);
-	unless (system("bogofilter -d $dir <$temp")/256==0) {
-	  system("bogofilter -d $dir -s <$temp");
-	  $spamadd++;
-	  print "Training spam message $spamcount.\n" if ($verbose);
-	} else {print "Not training spam message $spamcount.\n" if ($vverbose);}
-	unlink ($temp);
+        $spamcount++;
+        open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
+        print TEMP $mail;
+        close (TEMP);
+        unless (system("$bogofilter <$temp")/256==0) {
+          system("$bogofilter -s <$temp");
+          $spamadd++;
+          print "Training spam message $spamcount.\n" if ($verbose);
+          if ($safe) {
+            open (TEMP, ">>$safespam") || die "Cannot write to $safespam: $!";
+            print TEMP $mail;
+            close (TEMP);
+          }
+        } else {print "Not training spam message $spamcount.\n" if ($vverbose);}
+        unlink ($temp);
       }
     }
 
@@ -112,8 +136,9 @@ do { # Start force loop
   print "Read $hamcount ham mails and $spamcount spam mails.\n";
   print "Added $hamadd ham mails and $spamadd spam mails to the database.\n";
   print `bogoutil -w $dir .MSG_COUNT`;
-  $fn=`cat $spam | bogofilter -d $dir -vM | grep -c Ham`;
+  $fn=`cat $spam | $bogofilter -vM | grep -c Ham`;
   print "\nFalse negatives: $fn";
-  $fp=`cat $ham | bogofilter -d $dir -vM | grep -c Spam`;
+  $fp=`cat $ham | $bogofilter -vM | grep -c Spam`;
   print "False positives: $fp\n";
-} until ($fn+$fp==0 || !$force)
+} until ($fn+$fp==0 || !$force);
+print "\n$runs runs needed to close off.\n" if ($force);
