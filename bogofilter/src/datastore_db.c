@@ -1056,8 +1056,27 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %s", db_strerror(ret));
 	switch (ret) {
 	    case DB_RUNRECOVERY:
-		fprintf(stderr, "To recover, run: bogoutil -v --db-recover \"%s\"\n",
-			directory);
+		if (flags & DB_RECOVER) {
+		    fprintf(stderr,
+			    "\n"
+			    "### Standard recovery failed. ###\n"
+			    "\n"
+			    "Please check section 3.3 in bogofilter's README.db file\n"
+			    "for help.\n");
+		    /* ask that the user runs catastrophic recovery */
+		} else if (flags & DB_RECOVER_FATAL) {
+		    fprintf(stderr,
+			    "\n"
+			    "### Catastrophic recovery failed. ###\n"
+			    "\n"
+			    "Please check the README.db file that came with bogofilter for hints,\n"
+			    "section 3.3, or remove all __db.*, log.* and *.db files in \"%s\"\n"
+			    "and start from scratch.\n", directory);
+		    /* catastrophic recovery failed */
+		} else {
+		    fprintf(stderr, "To recover, run: bogoutil -v --db-recover \"%s\"\n",
+			    directory);
+		}
 		break;
 	    case EINVAL:
 		fprintf(stderr, "\n"
