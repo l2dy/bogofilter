@@ -66,7 +66,7 @@ int word_cmp(const word_t *w1, const word_t *w2)
     return 0;
 }
 
-int word_cmps(const word_t *w, char *s)
+int word_cmps(const word_t *w, const char *s)
 {
     word_t w2;
     w2.leng = strlen(s);
