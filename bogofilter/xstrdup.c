@@ -13,6 +13,6 @@
 
 char *xstrdup(const char *s) {
     char *t = xmalloc(strlen(s) + 1);
-    strcpy(t, s);
+    strcpy(t, s); /* RATS: ignore */
     return t;
 }

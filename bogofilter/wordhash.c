@@ -174,7 +174,7 @@ wordhash_insert (wordhash_t * h, char *s, size_t n, void (*initializer)(void *))
 	  initializer(p->buf);
 		  
   p->key = smalloc (h, strlen (s) + 1);
-  strcpy (p->key, s);
+  strcpy (p->key, s); /* RATS: ignore */
   p->next = h->bin[idx];
   h->bin[idx] = p;
 

@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
     if (argc >= 2 && argv[1][0] == '-')
 	lines = atoi(&argv[1][1]);
 
-    while(lines && (c = getchar()) != EOF) {
+    while(lines && (c = getchar()) != EOF) { /* RATS: ignore */
 	if (putchar(c) == EOF) die("stdout");
 	if (c == '\n') lines--;
     }
