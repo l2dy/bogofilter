@@ -30,12 +30,16 @@ AUTHOR:
 #include "token.h"
 #include "xmemrchr.h"
 
+typedef enum { R_INIT, R_SAVE, R_DONE } R_STATE;
+
 /* Local Variables */
 
 word_t *yylval = NULL;
+word_t *ipaddr = NULL;		/* First IP Address in Received: statement */
 
 static token_t save_class = NONE;
 static word_t *ipsave = NULL;
+static R_STATE r_state;
 
 static word_t *w_to   = NULL;	/* To:          */
 static word_t *w_from = NULL;	/* From:        */
@@ -174,6 +178,13 @@ token_t get_token(void)
 	    break;
 
 	case IPADDR:
+	    if ((token_prefix == w_recv) &&
+		(r_state == R_INIT || r_state == R_SAVE) &&
+		(strcmp(yylval->text, "127.0.0.1") != 0)) {
+		r_state = R_SAVE;
+		word_free(ipaddr);
+		ipaddr = word_dup(yylval);
+	    }
 	    if (block_on_subnets)
 	    {
 		const byte *prefix = (wordlist_version >= IP_PREFIX) ? (const byte *)"ip:" : (const byte *)"url:";
@@ -265,6 +276,8 @@ void token_init(void)
 {
     yyinit();
 
+    r_state = R_INIT;
+
     if (!msg_count_file)
 	mime_reset();
 
@@ -319,8 +332,11 @@ void set_tag(const char *text)
     case 'r':
 	if (tolower(text[2]) == 't')
 	    token_prefix = w_rtrn;	/* Return-Path: */
-	else
+	else {
 	    token_prefix = w_recv;	/* Received: */
+	    if (r_state == R_SAVE)
+		r_state = R_DONE;
+	}
 	break;
     case 's':
 	token_prefix = w_subj;		/* Subject: */
@@ -348,4 +364,5 @@ void token_cleanup()
     WFREE(w_recv);
     WFREE(w_head);
     WFREE(w_mime);
+    WFREE(ipaddr);
 }
