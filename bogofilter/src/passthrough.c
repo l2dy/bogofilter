@@ -216,23 +216,18 @@ void write_message(rc_t status)
     }
 }
 
-void write_log_message(void)
+void write_log_message(rc_t status)
 {
 #ifdef HAVE_SYSLOG_H
     format_log_header(msg_bogofilter, sizeof(msg_bogofilter));
 
-    switch (run_type)
-    {
-    case RUN_NORMAL:
+    if (run_type == RUN_NORMAL ||
+	(run_type == RUN_UPDATE && status == RC_UNSURE))
 	syslog(LOG_INFO, "%s\n", msg_bogofilter);
-	break;
-    case RUN_UPDATE:
+    else if (run_type == RUN_UPDATE)
 	syslog(LOG_INFO, "%s, %s\n", msg_bogofilter, msg_register);
-	break;
-    default:
+    else
 	syslog(LOG_INFO, "%s", msg_register);
-	break;
-    }
 
     closelog();
 #endif

@@ -72,9 +72,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     close_wordlists(false);
     free_wordlists();
 
-    if (logflag)
-	write_log_message();
-
     /* cleanup storage */
     ds_cleanup();
     mime_cleanup();
