@@ -219,6 +219,8 @@ void read_config_file(const char *filename, bool home_dir)
 	    fprintf(stderr, "Can't find home directory.\n");
 	    exit(2);
 	}
+	if (memcmp(filename, "~/", 2) == 0 )
+	    filename += 2;
 	tmp = xmalloc(strlen(home) + strlen(filename) + 2);
 	strcpy(tmp, home);
 	if (tmp[strlen(tmp)-1] != '/')
