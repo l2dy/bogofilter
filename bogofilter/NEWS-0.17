@@ -8,6 +8,10 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
 
+0.17.1	2004-02-??
+
+* Fix '-d' and '--bogofilter_dir=directory' options.
+
 0.17.0	2004-02-01
 
 * Removed DEPRECATED CODE.

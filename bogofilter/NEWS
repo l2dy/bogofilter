@@ -5,6 +5,10 @@
 NOTE: More information on important changes for bogofilters updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+0.17.1	2004-02-??
+
+	* Fix '-d' and '--bogofilter_dir=directory' options.
+
 0.17.0	2004-02-01
 
 	* Documentation cleanups.
