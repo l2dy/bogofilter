@@ -4,7 +4,9 @@
 
 0.8.1
 	* The testing framework now works on Solaris.
-	* A new '-q' option in bogofilter prevents reading configuration files.
+	* A new '-c' option in bogofilter allows specification of the
+	  configuration file to read.
+	* A new '-C' option tells bogofilter not to read any config file.
 	* The syslog facility in '-l' mode has changed from "daemon" to "mail",
 	  so your logs may now be in /var/log/maillog or /var/log/mail rather
 	  than /var/log/messages. Check your /etc/syslog.conf.
