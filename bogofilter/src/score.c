@@ -140,7 +140,7 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
     }
 
     if (DEBUG_ALGORITHM(1)) {
-	fprintf(dbgout, "%5u %5u ", (uint)cnts->good, (uint)cnts->bad);
+	fprintf(dbgout, "%5u %5u ", (uint)cnts->bad, (uint)cnts->good);
 	word_puts(token, 0, dbgout);
 	fputc('\n', dbgout);
     }
