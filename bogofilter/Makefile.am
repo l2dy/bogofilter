@@ -3,7 +3,7 @@
 # foreign: don't insist on ChangeLog
 # 1.6: minimum version of automake/aclocal
 AUTOMAKE_OPTIONS = foreign 1.6
-SUBDIRS =  dcdflib . tests
+SUBDIRS =  dcdflib . tests contrib
 SYSCONFDIR = @sysconfdir@
 DISTCHECK_CONFIGURE_FLAGS= @DISTCHECK_CONFIGURE_FLAGS@
 
@@ -75,7 +75,7 @@ wordhash_SOURCES = wordhash.main.c
 find_home_test_SOURCES = find_home.test.c
 
 # what to distribute
-extradistdirs = doc contrib
+extradistdirs = doc
 EXTRA_DIST = $(man_MANS) \
 	     bogofilter.cf.example bogofilter-faq.html \
 	     METHODS UPGRADE \
