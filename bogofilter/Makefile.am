@@ -2,7 +2,6 @@
 
 SUBDIRS = trio src . doc contrib
 SYSCONFDIR = @sysconfdir@
-DISTCHECK_CONFIGURE_FLAGS= @DISTCHECK_CONFIGURE_FLAGS@
 
 # what to build
 sysconf_DATA = bogofilter.cf.example

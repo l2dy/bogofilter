@@ -1,11 +1,8 @@
 # vim:tw=0
 # $Id$
 
-# foreign: don't insist on ChangeLog
-# 1.6: minimum version of automake/aclocal
 SUBDIRS = . tests
 SYSCONFDIR = @sysconfdir@
-DISTCHECK_CONFIGURE_FLAGS= @DISTCHECK_CONFIGURE_FLAGS@
 
 PERL = @PERL@
 
