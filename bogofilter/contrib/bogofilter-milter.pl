@@ -38,6 +38,12 @@
 # performing operations on individual users' files (if you find a
 # security problem, please let me know!)
 #
+# For additional information about libmilter and integrating this or
+# any other libmilter filter into your sendmail installation, see the
+# file README.libmilter that ships with sendmail and/or the section
+# entitled "ADDING NEW MAIL FILTERS" in the README file that ships
+# with the M4 sendmail CF templates.
+#
 # You may need to restart this script to get it to notice changes in
 # mail aliases.
 
