@@ -185,7 +185,7 @@ sub help {
             
    -o	<output file>
               
-        Output Berkeley DB file.
+        Output database file. The file extension depends whatever database was built into bogofilter.
 
    -b   <path to bogoutil program>
 
