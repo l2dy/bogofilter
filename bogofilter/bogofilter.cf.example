@@ -75,12 +75,6 @@ stats_in_header=Y
 #db_cachesize=16
 db_cachesize=0
 
-##### HEADER_LINE_MARKUP
-#
-#	if enabled, add a "subj:" prefix to tokens in the Subject: line
-
-header_line_markup=no
-
 #### Format of SPAM_HEADER
 #
 #	formatting characters:
@@ -160,6 +154,20 @@ charset_default=us-ascii
 #	replace non-7bit chars with '?'
 
 replace_nonascii_characters=N
+
+
+##### HEADER_LINE_MARKUP
+#
+#	if enabled, add a "subj:" prefix to tokens in the Subject: line
+
+header_line_markup=no
+
+
+##### IGNORE_CASE
+#
+#	if enabled, all letters are converted to lower case
+
+ignore_case=no
 
 
 #### TOKENIZE_HTML_TAGS
