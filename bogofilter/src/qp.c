@@ -66,7 +66,8 @@ uint qp_decode(word_t *word)
 	}
 	*d++ = ch;
     }
-    *d = (byte) '\0';
+    /* do not stuff NUL byte here:
+     * if there was one, it has been copied! */
     return d - word->text;
 }
 
@@ -92,7 +93,7 @@ static void qp_init(void)
     return;
 }
 
-bool qp_validate(word_t *word)
+bool qp_validate(const word_t *word)
 {
     uint i;
 
