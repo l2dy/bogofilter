@@ -148,7 +148,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 	}
     }
 
-//    xfree(dbe);
+    /* xfree(dbe); */
 
     return retry;
 }
