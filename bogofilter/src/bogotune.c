@@ -976,7 +976,7 @@ static void top_ten(result_t *sorted)
     printf("   rs     md    rx    co     fp  fn      pcts\n");
     for (i = 0; i < 10; i += 1) {
 	result_t *r = &sorted[i];
-	printf("%ud  %6.4f %5.3f %5.3f %6.4f  %3u %3u  %6.4f %5.3f\n",
+	printf("%3u  %6.4f %5.3f %5.3f %6.4f  %3u %3u  %6.4f %5.3f\n",
 	       r->idx,
 	       r->rs, r->md, r->rx, r->co, 
 	       r->fp, r->fn, r->fp*100.0/ns_cnt, r->fn*100.0/sp_cnt);
