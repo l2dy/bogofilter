@@ -247,8 +247,8 @@ void free_wordlists(void)
 
     for ( list = word_lists; list != NULL; list = next )
     {
-	if (list->filename) xfree(list->filename);
-	if (list->filepath) xfree(list->filepath);
+	xfree(list->filename);
+	xfree(list->filepath);
 	next = list->next;
 	xfree(list);
     }

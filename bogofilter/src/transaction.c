@@ -67,10 +67,8 @@ static int ta_flush(ta_t *ta, bool write)
                 break;
             }
         }
-        if (iter->word)
-            word_free(iter->word);
-        if (iter->dsvval)
-            xfree(iter->dsvval);
+	word_free(iter->word);
+	xfree(iter->dsvval);
         tmp = iter;
         iter = iter->next;
         xfree(tmp);
