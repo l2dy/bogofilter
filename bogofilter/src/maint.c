@@ -135,6 +135,8 @@ int maintain_wordlist_file(const char *db_file)
 
     rc = maintain_wordlist(dbh);
 
+    db_close(dbh, false);
+
     return rc;
 }
 
