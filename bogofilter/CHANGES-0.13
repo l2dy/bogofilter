@@ -24,7 +24,7 @@ $Id$
 	  spam_subject_tag.
 	  (Thanks to Pavel Kankovsky for these patches.)
 
-0.13.7.2 2003-07-02
+0.13.7.2 2003-07-02 - Stable Release
 
 	* Fixed loop in yyinput() caused by unexpected EOF.
 
@@ -59,14 +59,14 @@ $Id$
 	* Minor changes to bogoutil to support bogotune script.
 	* Added newlines to correct usage messages.
 
-0.13.6.2 2003-06-05
+0.13.6.2 2003-06-05 - Stable Release
 
 	* Don't allow square brackets in tokens.  Do allow dollar
           signs in tokens in msg-count files.
 	* Bogolexer now discards first 'From' token to match scoring
           behavior of bogofilter.
 
-0.13.6.1 2003-06-05
+0.13.6.1 2003-06-05 - Stable Release
 
 	* Updated file tuning/README and script tuning/tuning.sh.
 
