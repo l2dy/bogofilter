@@ -68,9 +68,8 @@ static void lexer_display_buffer(buff_t *buff)
 
 bool is_from(const byte *text, size_t leng)
 {
-    if (leng >= 5 && memcmp(text, "From ", 5) == 0)
-	return true;
-    return false;
+    bool val = (leng >= 5) && (memcmp(text, "From ", 5) == 0);
+    return val;
 }
 
 /* Check for lines wholly composed of printable characters as they can cause a scanner abort 
