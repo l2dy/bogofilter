@@ -9,6 +9,13 @@ is in the RELEASE.NOTES files!
 
 $Id$
 
+0.15.5.1 2003-09-30
+
+	 * Added GSL-1.4 as requirement for binary rpm.
+	 * Fixed up t.separate reference test and cleaned up 
+	   t.degen, t.split, and t.regtest.
+	 * Man page and French FAQ revised.
+
 0.15.5	2003-09-29
 
 	* Added '-H' (header-degen) option to aid transition to new
