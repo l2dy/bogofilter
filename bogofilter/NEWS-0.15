@@ -9,11 +9,17 @@ about retraining and the '-H' flag...
 
 * Fixed CRLF problem in bogoreader.c
 * Exclude ~ (tilde) at the end of tokens.
-* Updates to bogofilter man page and FAQ.
 * Updates to configure scripts and makefiles to support DGUX.
+* bogotune-faq.html - new file
+* bogofilter - man page and FAQ updated
+* bogoupgrade - revised help message and man page
 * Improved configuration of BerkeleyDB and GSL.
 * Removed unused '-F' (force) option from bogofilter.
 * Removed unused '-q' (quiet) option from bogofilter.
+* Bugfix for SIGFPE (division by zero) crash on start-up on systems
+  with BerkeleyDB 3.2 or older.
+* bogotune now understands degeneration options and can use
+  them when creating message-count files.
 
 0.15.10	2003-12-08
 
