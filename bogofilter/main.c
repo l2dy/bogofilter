@@ -203,58 +203,62 @@ int main(int argc, char **argv)
 
     setup_lists(directory);
 
-    if (run_type == RUN_NORMAL || run_type == RUN_UPDATE)
-    {
-	double spamicity;
-	rc_t   status = bogofilter(STDIN_FILENO, &spamicity);
-
-	if (passthrough)
-	{
-	    /* print headers */
-	    for (textend=&textblocks; textend->block; textend=textend->next)
+    switch(run_type) {
+	case RUN_NORMAL:
+	case RUN_UPDATE:
 	    {
-		if (strcmp(textend->block, "\n") == 0) break;
-		(void) fputs(textend->block, stdout);
-		if (ferror(stdout)) exit(2);
-	    }
-	}
+		double spamicity;
+		rc_t   status = bogofilter(STDIN_FILENO, &spamicity);
 
-	if (passthrough || verbose)
-	{
-	    /* print spam-status at the end of the header
-	     * then mark the beginning of the message body */
-	    printf("%s: %s, tests=bogofilter, spamicity=%0.6f, version=%s\n", 
-		   SPAM_HEADER_NAME, 
-		   (status==RC_SPAM) ? "Yes" : "No", 
-		   spamicity, VERSION);
-	}
+		if (passthrough)
+		{
+		    /* print headers */
+		    for (textend=&textblocks; textend->block; textend=textend->next)
+		    {
+			if (strcmp(textend->block, "\n") == 0) break;
+			(void) fputs(textend->block, stdout);
+			if (ferror(stdout)) exit(2);
+		    }
+		}
 
-	if (passthrough)
-	{
-	    /* If the message terminated early (without body or blank
-	     * line between header and body), enforce a blank line to
-	     * prevent anything past us from choking. */
-	    if (!textend->block)
-		(void)fputs("\n", stdout);
+		if (passthrough || verbose)
+		{
+		    /* print spam-status at the end of the header
+		     * then mark the beginning of the message body */
+		    printf("%s: %s, tests=bogofilter, spamicity=%0.6f, version=%s\n", 
+			    SPAM_HEADER_NAME, 
+			    (status==RC_SPAM) ? "Yes" : "No", 
+			    spamicity, VERSION);
+		}
 
-	    /* print body */
-	    for (; textend->block; textend=textend->next)
-	    {
-		(void) fputs(textend->block, stdout);
-		if (ferror(stdout)) exit(2);
-	    }
+		if (passthrough)
+		{
+		    /* If the message terminated early (without body or blank
+		     * line between header and body), enforce a blank line to
+		     * prevent anything past us from choking. */
+		    if (!textend->block)
+			(void)fputs("\n", stdout);
 
-	    if (fflush(stdout) || ferror(stdout)) exit(2);
-	}
+		    /* print body */
+		    for (; textend->block; textend=textend->next)
+		    {
+			(void) fputs(textend->block, stdout);
+			if (ferror(stdout)) exit(2);
+		    }
 
-	exitcode = status;
-	if (nonspam_exits_zero && passthrough && exitcode == 1)
-	    exitcode = 0;
+		    if (fflush(stdout) || ferror(stdout)) exit(2);
+		}
 
-	sprintf(msg_bogofilter, "%s: %s, spamicity=%0.6f",
-		SPAM_HEADER_NAME, (status==RC_SPAM) ? "Yes" : "No", spamicity);
-    } else {
-	register_messages(STDIN_FILENO, run_type);
+		exitcode = status;
+		if (nonspam_exits_zero && passthrough && exitcode == 1)
+		    exitcode = 0;
+
+		sprintf(msg_bogofilter, "%s: %s, spamicity=%0.6f",
+			SPAM_HEADER_NAME, (status==RC_SPAM) ? "Yes" : "No", spamicity);
+	    }; break;
+	default:
+	    register_messages(STDIN_FILENO, run_type);
+	    break;
     }
 
     close_lists();
