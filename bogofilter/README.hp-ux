@@ -26,12 +26,7 @@ Desktop would use `configure --with-db=/opt/gnome'.
 Read the INSTALL file in this directory for more information and
 additional options for the `configure' script.
 
-Please note that `make check' fails on HP-UX due to portability
-issues in the testing framework.  This does not mean bogofilter
-is not operating properly.  This will be corrected in a future
-release.
-
-Also note that HP's lex is insufficient for generating lexer.c from
+Please note that HP's lex is insufficient for generating lexer.c from
 lexer.l so a pre-generated lexer.c is included in the distribution.
 If you wish to make any changes or improvements to lexer.l
 this would require access to flex, an open-source version of lex.
