@@ -1,6 +1,6 @@
 X-Bogosity: Yes, tests=bogofilter, spamicity=1.000000
-	0.010000  build
 	0.010000  call
+	0.010000  effort
 	0.010000  having
 	0.990000  abuse
 	0.990000  bordercolor
