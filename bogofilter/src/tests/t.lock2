@@ -1,13 +1,23 @@
 #! /bin/sh
 
+# this test tortures the locking of the data base
+
 . ${srcdir:=.}/t.frame
+
+unsort=${srcdir}/unsort.pl
+( perl -e 'exit 0;' ) 2>/dev/null || {
+echo >&2 "Note: the t.lock2 test may run faster when Perl is installed."
+unsort="cat -"
+}
 
 rm -f $TMPDIR/*
 filelist="${srcdir}/inputs/????.mbx ${srcdir}/inputs/msg.?.txt"
-cat $filelist >$TMPDIR/inp
+filelist="`ls -1 $filelist`"
+
+BFOPTS="-k2 -M -n -d $TMPDIR -C"
 
 grind() {
-    $BOGOFILTER -n -d $TMPDIR -C <$TMPDIR/inp 2>> $TMPDIR/log && a=0 || a=$?
+    $BOGOFILTER $BFOPTS -B `echo $filelist | $unsort` 2>> $TMPDIR/log && a=0 || a=$?
     echo >>$TMPDIR/res $a
 }
 
@@ -22,8 +32,10 @@ explode() {
 )
 }
 
-# this test tortures the locking
+# create data base first
+$BOGOFILTER $BFOPTS </dev/null
 
+# now grind it
 trap "" 2
 wtpid=
 for i in 1 2 3 4 ; do
