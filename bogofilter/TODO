@@ -52,3 +52,13 @@ performance. Don't the db3 libraries probably already implement these?
 should be used to ignore (single or multi-line) headers that appear in the 
 list. The list should be used to ignore headers both during the message 
 registration and evaluation procedures.
+
+11) Make the GNU configure script smarter so that at compilte time a 
+--with-nfs-locks argument will cause the HAVE_FLOCK and HAVE_LOCKF to 
+undef'ed and make HAVE_FCNTL defined if the system supports it. Cause
+the configure script to fail if this option is used on a system that does 
+not have fcntl support.
+
+12) Record the message count as a value in the db file. Use a magic key that 
+can't collide with any words (by using uppercase letters or nonprintable 
+characters). This will obviate the need for .count files.
