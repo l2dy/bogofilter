@@ -89,6 +89,10 @@ choke me because we do not know how to define uint32_t
 #endif
 #endif /* HAVE_UINT32_T */
 
+#ifndef HAVE_ULONG
+typedef unsigned long ulong;
+#endif
+
 /* splint crutch */
 #ifdef __LCLINT__
 typedef uint32_t u_int32_t;

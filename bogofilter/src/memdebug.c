@@ -31,10 +31,6 @@
 bool memdebug=true;	/* false */
 int  memtrace=  0	/* M_MALLOC+M_FREE */ ;
 
-#ifndef HAVE_ULONG
-typedef unsigned long ulong;
-#endif
-
 uint32_t cnt_malloc = 0;
 uint32_t cnt_free   = 0;
 uint32_t cnt_realloc= 0;
