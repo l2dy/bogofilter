@@ -1,8 +1,11 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.8  2002/09/17 06:20:08  adrian_otto
- * Removed type cast on qsort call to improve portability
+ * Revision 1.9  2002/09/18 22:09:07  relson
+ * Remove unused local variables from collect_words().
  *
+/* Revision 1.8  2002/09/17 06:20:08  adrian_otto
+/* Removed type cast on qsort call to improve portability
+/*
 /* Revision 1.7  2002/09/15 19:22:51  relson
 /* Refactor the main bogofilter() function into three smaller, more coherent pieces:
 /*
@@ -456,9 +459,6 @@ void *collect_words(int fd)
     void	**PPValue;			// associated with Index.
     void	*PArray = (Pvoid_t) NULL;	// JudySL array.
     JError_t	JError;				// Judy error structure
-
-    void	**loc;
-    char	tokenbuffer[BUFSIZ];
 
     yyin = fdopen(fd, "r");
     while ((tok = get_token()) != 0)
