@@ -21,6 +21,13 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+0.93.5	2005-01-22
+
+	2005-01-21
+
+	* Revised t.systest to remove vestiges of different scoring
+          algorithms. 
+
 	2005-01-17
 
 	* bogotune's '-M' option for converting a message to msg-count
