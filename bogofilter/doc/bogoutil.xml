@@ -101,7 +101,7 @@
 	    <application>bogoutil</application> to recalculate the ROBX
 	    value and print it as a six-digit fraction.
 	</para>
-	<para>The <option>-R</option> option does the same as <option>-R</option>, but prints more
+	<para>The <option>-R</option> option does the same as <option>-r</option>, but prints more
 	    information and saves the result in the training database.
 	</para>
 	<para>The <option>-I <replaceable>file</replaceable></option> option tells
