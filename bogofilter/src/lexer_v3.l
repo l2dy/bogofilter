@@ -91,8 +91,8 @@ TOKEN 		{TOKENFRONT}{TOKENMID_NJS_DR}{TOKENBACK}
 
 T2		{TOKENFRONT}<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[]+
 T1		{TOKENFRONT}
- 
-%s TEXT HTML MIXED 
+
+%s TEXT HTML
 
 %%
 
@@ -133,7 +133,6 @@ T1		{TOKENFRONT}
 <HTML>-->					{ html_comment(-1); }
 <HTML>\<					{ html_tag(1); }
 <HTML>\>					{ html_tag(0); }
-
 
 .						;
 ^\n						{ got_emptyline(); 
