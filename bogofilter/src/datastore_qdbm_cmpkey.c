@@ -5,8 +5,8 @@
 int cmpkey(const char *aptrin, int asiz, const char *bptrin, int bsiz)
 {
     int aiter, biter;
-    const unsigned char *aptr = aptrin;
-    const unsigned char *bptr = bptrin;
+    const unsigned char *aptr = (const unsigned char *)aptrin;
+    const unsigned char *bptr = (const unsigned char *)bptrin;
 
     for (aiter = 0, biter = 0; aiter < asiz && biter < bsiz; ++aiter, ++biter) {
 	if (aptr[aiter] != bptr[biter])
