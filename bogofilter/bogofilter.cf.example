@@ -15,8 +15,8 @@
 #
 #	specify spamicity algorithm
 
-algorithm=graham
-#algorithm=robinson
+#algorithm=graham
+algorithm=robinson
 
 
 #### SPAM_HEADER_NAME
