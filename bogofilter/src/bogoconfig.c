@@ -184,9 +184,9 @@ void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
     method = (method_t *) &rf_fisher_method;
     usr_parms = method->config_parms;
 
-    process_args(argc, argv, PR_COMMAND, PASS_1);
+    process_args(argc, argv, PR_COMMAND, PASS_1_CLI);
     process_config_files(warn_on_error);
-    process_args(argc, argv, PR_COMMAND, PASS_2);
+    process_args(argc, argv, PR_COMMAND, PASS_3_CLI);
 
     /* directories from command line and config file are already handled */
 
@@ -440,7 +440,7 @@ static void process_args(int argc, char **argv, priority_t precedence, int pass)
     int option;
     ex_t exitcode;
 
-    if (pass != PASS_1) {
+    if (pass != PASS_1_CLI) {
 	optind = opterr = 1;
 	/* don't use #ifdef here: */
 #if HAVE_DECL_OPTRESET
@@ -470,15 +470,15 @@ static void process_args(int argc, char **argv, priority_t precedence, int pass)
 	}
 #endif
 
-	process_arg(option, name, optarg, precedence, pass, CMD_LINE);
+	process_arg(option, name, optarg, precedence, pass);
     }
 
-    if (pass == PASS_1) {
+    if (pass == PASS_1_CLI) {
 	if (run_type == RUN_UNKNOWN)
 	    run_type = RUN_NORMAL;
     }
 
-    if (pass == PASS_2) {
+    if (pass == PASS_3_CLI) {
 	exitcode = validate_args();
 	if (exitcode) 
 	    exit(exitcode);
@@ -497,7 +497,7 @@ static void process_args(int argc, char **argv, priority_t precedence, int pass)
     return;
 }
 
-void process_arg(int option, const char *name, const char *val, priority_t precedence, arg_pass_t pass, arg_source_t src)
+void process_arg(int option, const char *name, const char *val, priority_t precedence, arg_pass_t pass)
 {
     switch (option)
     {
@@ -511,14 +511,14 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'c':
-	if (pass == PASS_1)
+	if (pass == PASS_1_CLI)
 	    read_config_file(val, false, !quiet, PR_CFG_USER);
 
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
 
     case 'C':
-	if (pass == PASS_1)
+	if (pass == PASS_1_CLI)
 	    suppress_config_file = true;
 	break;
 
@@ -539,7 +539,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	exit(EX_OK);
 
     case 'I':
-	if (pass == PASS_1)
+	if (pass == PASS_1_CLI)
 	    bogoreader_name(val);
 	break;
 
@@ -564,7 +564,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'O':
-	if (pass == PASS_1)
+	if (pass == PASS_1_CLI)
 	    xstrlcpy(outfname, val, sizeof(outfname));
 	break;
 
@@ -597,7 +597,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'v':
-	if (pass == PASS_1)
+	if (pass == PASS_1_CLI)
 	    verbose++;
 	break;
 
@@ -622,7 +622,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	exit(EX_ERROR);
 
     case '-':
-	if (pass == PASS_2)
+	if (pass == PASS_3_CLI)
 	    process_config_option(val, true, precedence);
 	break;
 
@@ -631,7 +631,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'd':
-	if (pass != PASS_1) {
+	if (pass != PASS_1_CLI) {
 	    if (setup_wordlists(val, precedence) != 0)
 		exit(EX_ERROR);
 	}
@@ -646,7 +646,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'm':
-	if (pass != PASS_1) {
+	if (pass != PASS_1_CLI) {
 	    comma_parse(option, val, &min_dev, &robs, &robx);
 	    if (DEBUG_CONFIG(1))
 		printf("md %6.4f, rs %6.4f, rx %6.4f\n", min_dev, robs, robx);
@@ -654,22 +654,22 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case O_MIN_DEV:
-	if (pass != PASS_1)
+	if (pass != PASS_1_CLI)
 	    get_double(name, val, &min_dev);
 	break;
 
     case O_ROBS:
-	if (pass != PASS_1)
+	if (pass != PASS_1_CLI)
 	    get_double(name, val, &robs);
 	break;
 
     case O_ROBX:
-	if (pass != PASS_1)
+	if (pass != PASS_1_CLI)
 	    get_double(name, val, &robx);
 	break;
 
     case 'o':
-	if (pass != PASS_1) {
+	if (pass != PASS_1_CLI) {
 	    comma_parse(option, val, &spam_cutoff, &ham_cutoff, NULL);
 	    if (DEBUG_CONFIG(1))
 		printf("sc %6.4f, hc %6.4f\n", spam_cutoff, ham_cutoff);
@@ -677,12 +677,12 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case O_SPAM_CUTOFF:
-	if (pass != PASS_1)
+	if (pass != PASS_1_CLI)
 	    get_double(name, val, &spam_cutoff);
 	break;
 
     case O_HAM_CUTOFF:
-	if (pass != PASS_1)
+	if (pass != PASS_1_CLI)
 	    get_double(name, val, &ham_cutoff);
 	break;
 
@@ -692,7 +692,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 
     case 'T':			/* invariant terse mode */
 	terse = true;
-	if (pass == PASS_1)
+	if (pass == PASS_1_CLI)
 	    inv_terse_mode += 1;
 	break;
 

@@ -43,15 +43,10 @@ typedef struct {
 } parm_desc;
 
 typedef enum arg_pass_e {
-    PASS_1 = 1,		/* argc,argv pass - first  pass */
-    PASS_2 = 2,		/* argc,argv pass - second pass */
-    PASS_F = 4		/* config file options ...      */
+    PASS_1_CLI = 1,		/* 1 - first command line pass  */
+    PASS_2_CFG = 2,		/* 2 - config file options ...  */
+    PASS_3_CLI = 3		/* 3 - second command line pass */
 } arg_pass_t;
-
-typedef enum arg_source_e {
-    CFG_FILE,
-    CMD_LINE
-} arg_source_t;
 
 enum field_e {
     N,		/* no_argument		(or 0) if the option does not take an argument, */
