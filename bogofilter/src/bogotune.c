@@ -376,7 +376,7 @@ static void score_ns(double *results)
 	    wordhash_t *wh = item->wh;
 	    double score = msg_compute_spamicity(wh, NULL);
 	    results[count++] = score;
-	    if ( -verbose =  SCORE_DETAIL ||
+	    if ( -verbose == SCORE_DETAIL ||
 		(-verbose >= SCORE_DETAIL && EPS < score && score < 1 - EPS))
 		printf("%6u %0.16f\n", count-1, score);
 	}
@@ -426,7 +426,7 @@ static void score_sp(double *results)
 	    wordhash_t *wh = item->wh;
 	    double score = msg_compute_spamicity(wh, NULL);
 	    results[count++] = score;
-	    if ( -verbose =  SCORE_DETAIL ||
+	    if ( -verbose == SCORE_DETAIL ||
 		(-verbose >= SCORE_DETAIL && EPS < score && score < 1 - EPS))
 		printf("%6u %0.16f\n", count-1, score);
 	}
