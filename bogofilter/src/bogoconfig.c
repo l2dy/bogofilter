@@ -100,6 +100,7 @@ static bool config_algorithm(const unsigned char *s);
 static bool select_algorithm(const unsigned char ch, bool cmdline);
 
 static void process_args(int argc, char **argv, int pass);
+static void comma_parse(char opt, const char *arg, double *parm1, double *parm2);
 
 /* externs for query_config() */
 
@@ -181,6 +182,26 @@ void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
 	fprintf(dbgout, "stats_prefix: '%s'\n", stats_prefix);
 
     return;
+}
+
+void comma_parse(char opt, const char *arg, double *parm1, double *parm2)
+{
+    char *parse = xstrdup(arg);
+    char *p1, *p2;
+    bool ok = true;
+    if (parse[0] == ',') {
+	p1 = NULL;
+	p2 = &parse[1];
+    } else {
+	p1 = strtok(parse, ",");
+	p2 = strtok(NULL, "");
+    }
+    if (p1) ok = ok && xatof(parm1, p1);
+    if (p2) ok = ok && xatof(parm2, p2);
+    if (!ok) {
+	fprintf(stderr, "Cannot parse -%c option argument '%s'.\n", opt, arg);
+    }
+    xfree(parse);
 }
 
 static bool config_algorithm(const unsigned char *s)
@@ -290,7 +311,7 @@ static void help(void)
 		  "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n"
 		  "\t-s\t- register message(s) as spam.\n"
 		  "\t-n\t- register message(s) as non-spam.\n"
-		  "\t-m val\t- set user defined min_dev value.\n");
+		  "\t-m val [,val]\t- set user defined min_dev and robs values.\n");
     (void)fprintf(stderr,
 		  "\t-o val [,val]\t- set user defined spam and non-spam cutoff values.\n"
 		  "\t-u\t- classify message as spam or non-spam and register accordingly.\n"
@@ -526,30 +547,12 @@ void process_args(int argc, char **argv, int pass)
 	    break;
 
 	case 'm':
-	    if (!xatof(&min_dev, optarg))
-		fprintf(stderr, "Cannot parse -%c option argument '%s'.\n", option, optarg);
+	    comma_parse(option, optarg, &min_dev, &robs);
 	    break;
 
 	case 'o':
-	{
-	    char *parse = xstrdup(optarg);
-	    char *sc, *hc;
-	    bool ok = true;
-	    if (parse[0] == ',') {
-		sc = NULL;
-		hc = &parse[1];
-	    } else {
-		sc = strtok(parse, ",");
-		hc = strtok(NULL, "");
-	    }
-	    if (sc) ok = ok && xatof(&spam_cutoff, sc);
-	    if (hc) ok = ok && xatof(&ham_cutoff, hc);
-	    if (!ok) {
-		fprintf(stderr, "Cannot parse -%c option argument '%s'.\n", option, optarg);
-	    }
-	    xfree(parse);
+	    comma_parse(option, optarg, &spam_cutoff, &ham_cutoff);
 	    break;
-	}
 
 	case 't':
 	    terse = true;
