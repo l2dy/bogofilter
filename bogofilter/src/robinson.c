@@ -19,6 +19,7 @@ NAME:
 #include "datastore.h"
 #include "degen.h"
 #include "msgcounts.h"
+#include "prob.h"
 #include "robinson.h"
 #include "rstats.h"
 #include "wordhash.h"
@@ -84,25 +85,6 @@ static void wordprob_add(wordcnts_t *cnts, uint count, uint bad)
 	cnts->bad += count;
     else
 	cnts->good += count;
-}
-
-double calc_prob(uint good, uint bad)
-{
-    uint g = min(good, msgs_good);
-    uint b = min(bad,  msgs_bad);
-    int n = g + b;
-    double fw;
-
-    if (n == 0)
-	fw = robx;
-    else {
-	double bad_cnt  = (double) max(1, msgs_bad);
-	double good_cnt = (double) max(1, msgs_good);
-	double pw = ((b / bad_cnt) / (b / bad_cnt + g / good_cnt));
-	fw = (robs * robx + n * pw) / (robs + n);
-    }
-
-    return fw;
 }
 
 static double wordprob_result(wordcnts_t *cnt)

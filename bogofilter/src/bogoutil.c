@@ -25,7 +25,7 @@ AUTHOR:
 #include "graham.h"			/* for UNKNOWN_WORD */
 #include "maint.h"
 #include "paths.h"
-#include "robinson.h"			/* for ROBS and ROBX */
+#include "prob.h"
 #include "robx.h"
 #include "swap.h"
 #include "wordlists.h"
@@ -314,7 +314,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	    gra_prob = (spam_count + good_count <= MINIMUM_FREQ)
 		? UNKNOWN_WORD
 		: spamness / (spamness+goodness);
-	    rob_prob = ((ROBS * ROBX + spamness) / (ROBS + spamness+goodness));
+	    rob_prob = calc_prob(goodness, spamness);
 	}
 
 	printf(data_format, token->text, spam_count, good_count, gra_prob, rob_prob);

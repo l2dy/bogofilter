@@ -19,6 +19,7 @@ AUTHOR:
 
 #include "bogofilter.h"
 #include "msgcounts.h"
+#include "prob.h"
 #include "robinson.h"
 #include "rstats.h"
 #include "xmalloc.h"

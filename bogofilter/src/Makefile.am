@@ -91,6 +91,7 @@ version_sources= \
 	msgcounts.h msgcounts.c \
 	passthrough.h passthrough.c \
 	paths.h paths.c \
+	prob.h prob.c \
 	qp.h qp.c \
 	register.h register.c \
 	robx.h robx.c \
