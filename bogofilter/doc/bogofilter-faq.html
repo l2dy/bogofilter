@@ -1,6 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
   <title>Bogofilter FAQ</title>
 <style type="text/css">
   body {
@@ -179,7 +180,7 @@ The columns printed contain the following information:
     <dt>fw<dd>Robinson's weighted index, which combines pgood and pbad to give a value that will be close to zero if a message containing this token is likely to be non-spam and close to one if it's likely to be spam
     <dt>U<dd>'<b>+</b>' if this token contributes to the final bogosity value, '<b>-</b>' otherwise.  A token is excluded when its score is closer to 0.5 than min_dev.
   </dl>
-<p>The final lines show:
+<p>The final lines show:</p>
   <ul>
     <li>The cumulative results of the columns</li>
     <li>The values of Robinson's <b>s</b> and <b>x</b> parameters and of <b>min_dev</b></li>
@@ -190,8 +191,10 @@ The columns printed contain the following information:
     <dt>invfwlog<dd>logarithm of fw
     <dt>fwlog<dd>logarithm of (1-fw)
   </dl>
+<p>
 The "-R" output is formatted for use with the R language for statistical computing.  More information is available at <a href="http://www.r-project.org/">
 The R Project for Statistical Computing</a>.
+</p>
 </li>
 </ul>
 
@@ -202,19 +205,16 @@ The easiest way is to create a script for your MDA that runs SpamAssassin, tests
 The sample procmail recipe below shows one way to do this:<p>
  
   <pre>
-  BOGOFILTER    = "/usr/bin/bogofilter"
-  BOGOFILTER_DIR = "/var/lib/bogofilter"
-  BOGOFILTER_DIR = "."
+  BOGOFILTER     = "/usr/bin/bogofilter"
+  BOGOFILTER_DIR = "training"
   SPAMASSASSIN  = "/usr/bin/spamassassin"
 
   :0
   * ? $SPAMASSASSIN -e
   #spam yields non-zero
   #non-spam yields zero
-  {
-	  :0c
-	  | $BOGOFILTER -n -d $BOGOFILTER_DIR
-  }
+  :0c
+  | $BOGOFILTER -n -d $BOGOFILTER_DIR
   #else (E)
   :0Ec
   | $BOGOFILTER -s -d $BOGOFILTER_DIR
@@ -235,14 +235,19 @@ The sample procmail recipe below shows one way to do this:<p>
 
   <h2 id="asian_spam">What can I do about asian spam?</h2>
 
-  <p>The good news is that bogofilter does detect them quite successfully. The bad news is that this can be expensive. You have basically two choices:</p>
+  <p>Many people get unsolicited email using asian language charsets.  Since they don't know the languages and don't know people there, they assume it's spam.</p>
+<p>The good news is that bogofilter does detect them quite successfully. The bad news is that this can be expensive. You have basically two choices:</p>
 
   <ul>
     <li>
-      <p>If you are sure you will not receive any legitimate messages in those languages, you might as well kill them right away. This will keep the database smaller. You can do this with an MDA script.</p>
+      <p>You can simply let bogofilter handle it. Just train bogofilter with the asian language messages identified as spam. Bogofilter will parse the messages as best it can and will add tokens to the spam wordlist. The wordlist will contain many tokens which don't make sense to you (since the charset cannot be displayed), but bogofilter can work with them and successfully identify asian spam.</p>
+      <p>A second method is to use the "replace_nonascii_characters" config file option. This will replace high-bit characters, i.e. those between 0x80 and 0xFF, with question marks, '?'. This keeps the database much smaller. Unfortunately this conflicts with european language which have many accented vowels and consonant in the high-bit range.</p>
+    </li>
+    <li>
+      <p>If you are sure you will not receive any legitimate messages in those languages, you can kill them right away. This will keep the database smaller. You can do this with an MDA script.</p>
       <p>Here's a procmail recipe that will sideline messages written with asian charsets:</p>
 <pre>
-## Silently drop all completely unreadable mail
+## Silently drop all asian language mail
 UNREADABLE="big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987|windows-1251|windows-1256"
 :0:
 * 1^0 ^\/Subject:.*=\?(.*$UNREADABLE)\?
@@ -250,11 +255,6 @@ UNREADABLE="big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987|windows-12
 spam-unreadable
 </pre>
       <p>With the above recipe, bogofilter will <em>never</em> see the message.</p>
-    </li>
-    <li>
-      <p>Or, you can simply let bogofilter do its job.</p>
-      <p>Just train bogofilter with the asian language messages identified as spam. Bogofilter will parse the messages as best it can and will add tokens to the spam wordlist. The wordlist will contain many tokens which don't make sense to you (since the charset cannot been displayed), but bogofilter can work with them and successfully identify asian spam.</p>
-      <p>A second method is to use the "replace_nonascii_characters" config file option. This will replace high-bit characters, i.e. those between 0x80 and 0xFF, with question marks, '?'. This keeps the database much smaller. Unfortunately this conflicts with european language which have many accented vowels and consonant in the high-bit range.</p>
     </li>
   </ul>
 
