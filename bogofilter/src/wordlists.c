@@ -177,8 +177,8 @@ void free_wordlists(void) {
 
     for ( list = word_lists; list != NULL; list = list->next )
     {
-	if (list->filename) free(list->filename);
-	if (list->filepath) free(list->filepath);
+	if (list->filename) xfree(list->filename);
+	if (list->filepath) xfree(list->filepath);
     }
 }
 
@@ -319,7 +319,7 @@ bool configure_wordlist(const char *val)
     rc = init_wordlist(&list, name, path, weight, bad, override, ignore);
     ok = rc == 0;
 
-    free(path);
+    xfree(path);
 
     return ok;
 }
