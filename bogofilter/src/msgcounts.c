@@ -10,12 +10,10 @@ AUTHOR:
 
 ******************************************************************************/
 
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <config.h>
 #include "common.h"
+
+#include <ctype.h>
+#include <stdlib.h>
 
 #include "fgetsl.h"
 #include "msgcounts.h"

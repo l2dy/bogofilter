@@ -9,18 +9,15 @@ AUTHOR:
    
 ******************************************************************************/
 
+#include "common.h"
+
 #include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
-
-#include <config.h>
-#include "common.h"
 
 #include "bogofilter.h"
 #include "buff.h"

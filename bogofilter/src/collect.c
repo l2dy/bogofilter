@@ -2,11 +2,9 @@
 
 /* collect.c -- tokenize input and cap word frequencies, return a wordhash */
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <config.h>
 #include "common.h"
+
+#include <stdlib.h>
 
 #include "bogofilter.h"
 #include "wordhash.h"

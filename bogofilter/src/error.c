@@ -10,12 +10,10 @@ AUTHOR:
 
 ******************************************************************************/
 
-#include <stdio.h>
+#include "common.h"
+
 #include <stdarg.h>
 #include <unistd.h>
-
-#include <config.h>
-#include "common.h"
 
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>

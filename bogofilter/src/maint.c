@@ -10,13 +10,11 @@ AUTHOR:
 
 ******************************************************************************/
 
+#include "common.h"
+
 #include <assert.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <unistd.h>
-
-#include <config.h>
-#include "common.h"
 
 #include "datastore.h"
 #include "error.h"

@@ -68,19 +68,17 @@ REFERENCE:
 ** size.
 **/
 
+#include "common.h"
+
 #include <ctype.h>
 #include <math.h>
 #include <stdlib.h>
 
 #ifndef	DEBUG
-#include <config.h>
-#include "common.h"
-
 #include "degen.h"
 #include "xmalloc.h"
 #include "robinson.h"
 #else
-#include <stdio.h>
 #define	xmalloc	malloc
 #define	xfree	free
 #endif

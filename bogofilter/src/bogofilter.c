@@ -22,12 +22,10 @@ THEORY:
 
 ******************************************************************************/
 
-#include <stdio.h>
+#include "common.h"
+
 #include <string.h>
 #include <stdlib.h>
-
-#include <config.h>
-#include "common.h"
 
 #include "bogoconfig.h"
 #include "bogofilter.h"

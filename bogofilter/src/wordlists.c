@@ -1,18 +1,15 @@
 /* $Id$ */
 
-#include <stdio.h>
+#include "common.h"
+
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include "system.h"
 #ifdef HAVE_SYS_SELECT_H
 #include <sys/select.h>
 #endif
-
-#include <config.h>
-#include "common.h"
 
 #include "bogofilter.h"
 #include "datastore.h"

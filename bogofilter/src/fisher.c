@@ -7,11 +7,9 @@ NAME:
 
 ******************************************************************************/
 
-#include <math.h>
-#include <stdio.h>
-
-#include <config.h>
 #include "common.h"
+
+#include <math.h>
 
 #include <dcdflib.h>
 

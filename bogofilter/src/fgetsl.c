@@ -5,10 +5,10 @@
  * \date 2002,2003
  */
 
-#include <stdio.h>
+#include "common.h"
+
 #include <stdlib.h>
 
-#include "common.h"
 #include "fgetsl.h"
 
 /* calls exit(EX_ERROR) on read error or when max_size < 2 */

@@ -2,11 +2,9 @@
 
 /* register.c -- read input with collect and register to persistent db */
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <config.h>
 #include "common.h"
+
+#include <stdlib.h>
 
 #include "bogofilter.h"
 #include "datastore.h"

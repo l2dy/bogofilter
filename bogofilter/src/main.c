@@ -15,9 +15,7 @@ CONTRIBUTORS:
 ******************************************************************************/
 
 #include <ctype.h>
-#include <stdio.h>
 #include <string.h>
-#include <limits.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
