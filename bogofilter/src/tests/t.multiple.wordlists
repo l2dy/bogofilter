@@ -18,23 +18,23 @@ EOF
 # ignore list, single wordlist
 cat <<EOF > ${TMPDIR}/$CF_IGN_REG
 bogofilter_dir=${TMPDIR}
-wordlist i,ign,ignore.db,1
-wordlist r,wrd,wordlist.db,2
+wordlist i,ign,ignore.${DB_EXT},1
+wordlist r,wrd,wordlist.${DB_EXT},2
 EOF
 
 # ignore list, user & system wordlists
 cat <<EOF > ${TMPDIR}/$CF_IGN_USR_SYS
 bogofilter_dir=${TMPDIR}
-wordlist r,sys,system.db,6
-wordlist i,ign,ignore.db,4
-wordlist r,usr,user.db,5
+wordlist r,sys,system.${DB_EXT},6
+wordlist i,ign,ignore.${DB_EXT},4
+wordlist r,usr,user.${DB_EXT},5
 EOF
 
 # merged user & system wordlists
 cat <<EOF > ${TMPDIR}/$CF_MRG_USR_SYS
 bogofilter_dir=${TMPDIR}
-wordlist r,usr,user.db,7
-wordlist r,sys,system.db,7
+wordlist r,usr,user.${DB_EXT},7
+wordlist r,sys,system.${DB_EXT},7
 EOF
 
 # files for building databases
@@ -97,17 +97,17 @@ BFOPTS="-D -H -e -m0.1 -y 0"
 BFHEAD='--header_format=%h: %c, tests=bogofilter, spamicity=%p'
 
 # build wordlists
-$BOGOUTIL -l ${TMPDIR}/ignore.db   < ${TMPDIR}/ignore.txt
-$BOGOUTIL -l ${TMPDIR}/wordlist.db < ${TMPDIR}/wordlist.txt
-$BOGOUTIL -l ${TMPDIR}/user.db     < ${TMPDIR}/user.txt
-$BOGOUTIL -l ${TMPDIR}/system.db   < ${TMPDIR}/system.txt
+$BOGOUTIL -l ${TMPDIR}/ignore.${DB_EXT}   < ${TMPDIR}/ignore.txt
+$BOGOUTIL -l ${TMPDIR}/wordlist.${DB_EXT} < ${TMPDIR}/wordlist.txt
+$BOGOUTIL -l ${TMPDIR}/user.${DB_EXT}     < ${TMPDIR}/user.txt
+$BOGOUTIL -l ${TMPDIR}/system.${DB_EXT}   < ${TMPDIR}/system.txt
 
 (echo "#### 1: score message using each wordlist ####"; echo) >> $OUT
 
-for DB in ${TMPDIR}/*.db ; do
-    N=`basename $DB`
+for DB in ${TMPDIR}/*.${DB_EXT} ; do
+    N=`basename $DB .${DB_EXT}`
     printf "%-12s" $N: >> $OUT
-    $BOGOFILTER $BFOPTS "$BFHEAD" -v -C --wordlist=r,wordlist,$N,1 -I ${TMPDIR}/message >> $OUT
+    $BOGOFILTER $BFOPTS "$BFHEAD" -v -C --wordlist=r,wordlist,$N.${DB_EXT},1 -I ${TMPDIR}/message >> $OUT
 done
 echo >> $OUT
 
@@ -120,19 +120,19 @@ for CFG in ${TMPDIR}/*.cf ; do
     echo >> $OUT
 done
 
-(echo "#### Update user.db using $CF_IGN_USR_SYS ####"; echo) >> $OUT
+(echo "#### Update user using $CF_IGN_USR_SYS ####"; echo) >> $OUT
 
-# Add message to user.db (first regular wordlist in CF_IGN_USR_SYS)
+# Add message to user.${DB_EXT} (first regular wordlist in CF_IGN_USR_SYS)
 
 echo >> $OUT
 echo common message ignore | $BOGOFILTER $BFOPTS "$BFHEAD" -n -c ${TMPDIR}/$CF_IGN_USR_SYS
 
 (echo "#### 2: score message using each wordlist ####"; echo) >> $OUT
 
-for DB in ${TMPDIR}/*.db ; do
-    N=`basename $DB`
+for DB in ${TMPDIR}/*.${DB_EXT} ; do
+    N=`basename $DB .${DB_EXT}`
     printf "%-12s" $N: >> $OUT
-    $BOGOFILTER $BFOPTS "$BFHEAD" -v -C --wordlist=r,wordlist,$N,1 -I ${TMPDIR}/message >> $OUT
+    $BOGOFILTER $BFOPTS "$BFHEAD" -v -C --wordlist=r,wordlist,$N.${DB_EXT},1 -I ${TMPDIR}/message >> $OUT
 done
 echo >> $OUT
 

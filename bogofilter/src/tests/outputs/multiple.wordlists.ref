@@ -1,9 +1,9 @@
 #### 1: score message using each wordlist ####
 
-ignore.db:  X-Bogosity: No, tests=bogofilter, spamicity=0.520000
-system.db:  X-Bogosity: No, tests=bogofilter, spamicity=0.213025
-user.db:    X-Bogosity: No, tests=bogofilter, spamicity=0.227378
-wordlist.db:X-Bogosity: No, tests=bogofilter, spamicity=0.246265
+ignore:     X-Bogosity: No, tests=bogofilter, spamicity=0.520000
+system:     X-Bogosity: No, tests=bogofilter, spamicity=0.213025
+user:       X-Bogosity: No, tests=bogofilter, spamicity=0.227378
+wordlist:   X-Bogosity: No, tests=bogofilter, spamicity=0.246265
 
 #### 1: score message using each config file ####
 
@@ -67,15 +67,15 @@ X-Bogosity: No, tests=bogofilter, spamicity=0.267356
 N_P_Q_S_s_x_md                        6  0.760046  0.294759  0.267356
                                          0.017800  0.520000  0.100000
 
-#### Update user.db using ign_usr_sys.cf ####
+#### Update user using ign_usr_sys.cf ####
 
 
 #### 2: score message using each wordlist ####
 
-ignore.db:  X-Bogosity: No, tests=bogofilter, spamicity=0.520000
-system.db:  X-Bogosity: No, tests=bogofilter, spamicity=0.213025
-user.db:    X-Bogosity: No, tests=bogofilter, spamicity=0.150631
-wordlist.db:X-Bogosity: No, tests=bogofilter, spamicity=0.246265
+ignore:     X-Bogosity: No, tests=bogofilter, spamicity=0.520000
+system:     X-Bogosity: No, tests=bogofilter, spamicity=0.213025
+user:       X-Bogosity: No, tests=bogofilter, spamicity=0.150631
+wordlist:   X-Bogosity: No, tests=bogofilter, spamicity=0.246265
 
 #### 2: score message using each config file ####
 
