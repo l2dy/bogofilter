@@ -231,7 +231,7 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 	char flag = (fabs(fw-EVEN_ODDS) - min_dev >= EPS) ? '+' : '-';
 
 	(void)fputc( '"', stdout);
-	(void)fwrite(token->text, 1, token->leng, stdout);
+	(void)word_puts(token, 0, stdout);
 	(void)fprintf(stdout, "\"%*s %5d  %8.6f  %8.6f  %8.6f%10.5f%10.5f %c\n",
 		      len, " ",
 		      (int)n, g / msgs_good, b / msgs_bad, 

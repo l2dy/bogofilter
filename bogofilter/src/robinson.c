@@ -166,7 +166,7 @@ static double compute_probability(const word_t *token)
 	    wordprob_add(&wordstats, count, list->bad);
 	    if (DEBUG_WORDLIST(1)) {
 		fprintf(dbgout, "%2d %2d \n", (int) wordstats.good, (int) wordstats.bad);
-		fwrite(token->text, 1, token->leng, dbgout);
+		word_puts(token, 0, dbgout);
 		fputc('\n', dbgout);
 	    }
 	}
@@ -233,10 +233,10 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
         }
 
 	if (DEBUG_WORDLIST(3)) {
-	    fprintf(dbgout, "%3lu %3lu %f ",
-		(unsigned long)robn, (unsigned long)count, prob);
-	    word_puts(token, 0, dbgout);
-	    fputc('\n', dbgout);
+	    (void)fprintf(dbgout, "%3lu %3lu %f ",
+			  (unsigned long)robn, (unsigned long)count, prob);
+	    (void)word_puts(token, 0, dbgout);
+	    (void)fputc('\n', dbgout);
 	}
     }
 
