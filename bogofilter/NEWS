@@ -8,9 +8,7 @@ is in the RELEASE.NOTES files.  Read it!!
 If updating from a bogofilter version older than 0.15.4, it's a good
 idea to retrain or else use the '-H' (header tag degeneration) option.
 
-0.15.12
-
-	2003-12-24
+0.15.12	2003-12-24
 
 	* Distinguish between pipe and stdin as input sources.
           (contributed by Henning Makholm)

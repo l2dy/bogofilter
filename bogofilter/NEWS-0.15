@@ -5,7 +5,7 @@
 Be sure to read RELEASE.NOTES-0.15, with attention to the section
 about retraining and the '-H' flag...
 
-0.15.12
+0.15.12	2003-12-24
 
 * Fix decoding of escaped urls.
 * Fix sigsegv in bogotune when '-D' option is used.
