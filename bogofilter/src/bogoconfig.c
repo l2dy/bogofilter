@@ -261,6 +261,7 @@ static int validate_args(void)
 static void help(void)
 {
     (void)fprintf(stderr,
+		  "%s version %s\n"
 		  "\n"
 		  "Usage: %s [options] < message\n"
 		  "\t-h\t- print this help message.\n"
@@ -285,7 +286,7 @@ static void help(void)
 		  "\t-s\t- register message(s) as spam.\n"
 		  "\t-n\t- register message(s) as non-spam.\n"
 		  "\t-m val\t- set user defined min_dev value.\n"
-		  "\t-o val [,val]\t- set user defined spam and ham cutoff values.\n"
+		  "\t-o val [,val]\t- set user defined spam and non-spam cutoff values.\n"
 		  "\t-u\t- classify message as spam or non-spam and register accordingly.\n"
 		  "\t-S\t- unregister message(s) from spam list.\n"
 		  "\t-N\t- unregister message(s) from non-spam list.\n"
@@ -295,8 +296,8 @@ static void help(void)
 		  "\t-c file\t- read specified config file.\n"
 		  "\t-C\t- don't read standard config files.\n"
 		  "\t-q\t- quiet - don't print warning messages.\n"
-		  "\t-l\t- log - log a line to syslog.\n"
-		  "\t-L tag\t- Log tag - configure the string the custom %%l prints.\n"
+		  "\t-l\t- write messages to syslog.\n"
+		  "\t-L tag\t- specify the tag value for log messages.\n"
 		  "\t-F\t- force printing of spamicity numbers.\n"
 		  "\t-x list\t- set debug flags.\n"
 		  "\t-D\t- direct debug output to stdout.\n"
@@ -304,9 +305,8 @@ static void help(void)
 		  "bogofilter is a tool for classifying email as spam or non-spam.\n"
 		  "\n"
 		  "For updates and additional information, see\n"
-		  "URL: http://bogofilter.sourceforge.net\n"
-		  "\n", 
-		  PACKAGE );
+		  "URL: http://bogofilter.sourceforge.net\n", 
+		  PACKAGE, version, PACKAGE);
 }
 
 static void print_version(void)

@@ -25,7 +25,9 @@ NAME:
 #include "token.h"
 #include "mime.h"
 
-const char *progname = "bogolexer";
+#define PROGNAME "bogolexer"
+
+const char *progname = PROGNAME;
 
 /* prevent larger inclusions */
 
@@ -63,6 +65,7 @@ static void help(void)
 {
     usage();
     fprintf(stderr,
+	    "\n"
 	    "\t-p\t- print the tokens from stdin.\n"
 	    "\t-q\t- quiet mode, no tokens are printed.\n"
 	    "\t-h\t- help, this output.\n"
@@ -73,7 +76,9 @@ static void help(void)
 	    "\t-I file\t- read message from file instead of stdin.\n"
 	    "\t-x list\t- set debug flags.\n"
 	    "\t-D\t- direct debug output to stdout.\n"
-	    "%s is part of the bogofilter package.\n", progname);
+	    "\n"
+	    "%s (version %s) is part of the bogofilter package.\n", 
+	    progname, version);
 }
 
 static int process_args(int argc, char **argv)

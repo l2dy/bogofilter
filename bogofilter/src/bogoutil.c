@@ -542,6 +542,7 @@ static void help(void)
 {
     usage();
     fprintf(stderr,
+	    "\n"
 	    "\t-d file\tDump data from file to stdout.\n"
 	    "\t-l file\tLoad data from stdin into file.\n"
 	    "\t-w\tDisplay counts for words from stdin.\n"
@@ -559,7 +560,9 @@ static void help(void)
 	    "\t-D\t- direct debug output to stdout.\n"
 	    "\t-V\tPrint program version.\n"
 	    "\t-I file\tRead this file instead of standard input.\n"
-	    "%s is part of the bogofilter package.\n", PROGNAME);
+	    "\n"
+	    "%s (version %s) is part of the bogofilter package.\n",
+	    PROGNAME, version);
 }
 
 #undef	ROBX
