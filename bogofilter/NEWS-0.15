@@ -5,6 +5,15 @@
 Be sure to read RELEASE.NOTES-0.15, with attention to the section
 about retraining and the '-H' flag...
 
+0.15.11
+
+* Exclude ~ (tilde) at the end of tokens.
+* Removed unused '-F' (force) option from bogofilter.
+* Removed unused '-q' (quiet) option from bogofilter.
+* Updates to bogofilter man page and FAQ.
+* Updates to configure scripts and makefiles to support DGUX.
+* Improved configuration of BerkeleyDB and GSL.
+
 0.15.10	2003-12-08
 
 * Multiple fixes, revisions, and changes to bogotune.

@@ -8,6 +8,23 @@ is in the RELEASE.NOTES files.  Read it!!
 If updating from a bogofilter version older than 0.15.4, it's a good
 idea to retrain or else use the '-H' (header tag degeneration) option.
 
+0.15.11
+
+	2003-12-11
+
+	* Updates to bogofilter man page and FAQ.
+	* Updates to configure scripts and makefiles to support DGUX.
+	* Improved configuration of BerkeleyDB and GSL.
+
+	2003-12-10
+
+	* Removed unused '-F' (force) option from bogofilter.
+	* Exclude ~ (tilde) at the end of tokens.
+
+	2003-12-09
+
+	* Removed unused '-q' (quiet) option from bogofilter.
+
 0.15.10	2003-12-08
 
 	* Important string format fixes that address "prints garbage" and

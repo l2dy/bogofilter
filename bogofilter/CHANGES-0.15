@@ -4,6 +4,23 @@
 
 $Id$
 
+0.15.11
+
+	2003-12-11
+
+	* Updates to bogofilter man page and FAQ.
+	* Updates to configure scripts and makefiles to support DGUX.
+	* Improved configuration of BerkeleyDB and GSL.
+
+	2003-12-10
+
+	* Removed unused '-F' (force) option from bogofilter.
+	* Exclude ~ (tilde) at the end of tokens.
+
+	2003-12-09
+
+	* Removed unused '-q' (quiet) option from bogofilter.
+
 0.15.10	2003-12-08
 
 	* Formatting and portability fixes for DGUX.
