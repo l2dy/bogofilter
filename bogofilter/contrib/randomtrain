@@ -40,7 +40,7 @@ function train() {
     while read expect fnam offset length; do
 	let cnt=cnt+1
 	dd if=$fnam bs=1 skip=$offset count=$length 2>/dev/null >msg.$pid
-	result=`bogofilter -t -v -d $bogodir -c cfg.$pid <msg.$pid | tr "SHU" "shu"`
+	result=`bogofilter -t -v -d $bogodir $cfg <msg.$pid | tr "SHU" "shu"`
 	got=`echo $result | awk '{print $1}' | tr "YNU" "snu"`
 	if [ "$expect" = "s" ]; then let nspam=$nspam+1
 	else let ngood=$ngood+1; fi
