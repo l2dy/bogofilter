@@ -694,8 +694,17 @@ void query_config(void)
     fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "spam_cutoff", spam_cutoff, spam_cutoff);
     fprintf(stdout, "\n");
     fprintf(stdout, "%-17s = %s\n", "block_on_subnets", YN(block_on_subnets));
-    fprintf(stdout, "%-17s = %s\n", "strict_check", 	YN(strict_check));
+    fprintf(stdout, "%-17s = %s\n", "strict_check",	YN(strict_check));
     fprintf(stdout, "%-17s = %s\n", "tag_header_lines", YN(tag_header_lines));
+    fprintf(stdout, "%-17s = %s\n", "fold_case",	YN(fold_case));
+    fprintf(stdout, "%-17s = %s\n", "block_on_subnets", YN(block_on_subnets));
+    fprintf(stdout, "%-17s = %s\n", "strict_check",	YN(strict_check));
+    fprintf(stdout, "%-17s = %s\n", "tag_header_lines", YN(tag_header_lines));
+    fprintf(stdout, "%-17s = %s\n", "tokenize_html_tags",     YN(tokenize_html_tags));
+/*  ... not yet implemented ... 
+    fprintf(stdout, "%-17s = %s\n", "tokenize_html_comments", YN(tokenize_html_comments));
+    fprintf(stdout, "%-17s = %s\n", "tokenize_html_script",   YN(tokenize_html_script));
+*/
     fprintf(stdout, "%-17s = %s\n", "replace_nonascii_characters", YN(replace_nonascii_characters));
     fprintf(stdout, "\n");
     fprintf(stdout, "%-17s = '%s'\n", "spam_header_name", spam_header_name);
