@@ -400,7 +400,7 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 	good_msg_count = val.goodcount;
     }
 
-    printf(head_format, "", "spam", "good", "Gra prob", "Rob prob");
+    printf(head_format, "", "spam", "good", "Gra prob", "Rob/Fis");
 
     while (argc >= 0)
     {
