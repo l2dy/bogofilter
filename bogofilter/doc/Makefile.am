@@ -26,8 +26,8 @@ EXTRA_DIST = \
 	     integrating-with-qmail \
 	     programmer/README.freebsd programmer/README.hp-ux \
 	     programmer/README.RISC-OS \
-	     programmer/RISC-OS/src/Makefile programmer/RISC-OS/src/h/config \
-	     programmer/RISC-OS/gsl/Makefile programmer/RISC-OS/gsl/h/config \
+	     programmer/RISC-OS/src/Makefile \
+	     programmer/RISC-OS/gsl/Makefile \
 	     README.tdb
 
 #	     bogofilter.cf.example 
