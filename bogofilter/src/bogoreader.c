@@ -128,7 +128,7 @@ static reader_line_t *get_reader_line(FILE *fp) {
     reader_line_t *fcn = mailbox_getline;
 
     if (fp == NULL)
-	return simple_getline ; /* which will return EOF immediately */
+	return NULL;
 
     c = fgetc(fp);
     ungetc(c, fp);
