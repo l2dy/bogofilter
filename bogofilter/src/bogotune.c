@@ -930,11 +930,11 @@ static void top_ten(result_t *sorted)
 
     if (verbose)
 	printf("    ");
-    printf("   rs     md    rx    co     fp  fn    fpc      fnc\n" );
+    printf("   rs     md    rx    co     fp  fn    fpc    fnc\n" );
 
     for (i = 0; i < 10; i += 1) {
 	result_t *r = &sorted[i];
-	printf("%3d  %6.4f %5.3f %5.3f %6.4f  %3d %3d  %0.4g %0.4g\n",
+	printf("%3d  %6.4f %5.3f %5.3f %6.4f  %3d %3d  %6.4f %5.3f\n",
 	       r->idx,
 	       r->rs, r->md, r->rx, r->co, 
 	       r->fp, r->fn, r->fp*100.0/ns_cnt, r->fn*100.0/sp_cnt);
@@ -1028,8 +1028,8 @@ static void final_warning(void)
 {
     printf(
 	"The small number and relative uniformity of the test messages imply\n"
-	"that the above recommended, though appropriate to the test set, may \n"
-	"not remain valid for long.  Bogotune should be run again with more\n"
+	"that the recommended values (above), though appropriate to the test set,\n"
+	"may not remain valid for long.  Bogotune should be run again with more\n"
 	"messages when that becomes possible.\n"
 	);
 }
@@ -1307,7 +1307,7 @@ static rc_t bogotune(void)
     if (warn) {
 	scoring_error();
 	if (!force) {
-	    fprintf(stderr, "Use '-F' option to force bogotune to continue.");
+	    fprintf(stderr, "Use '-F' option to force bogotune to continue.\n");
 	    exit(EX_ERROR);
 	}
     }
