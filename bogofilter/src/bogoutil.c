@@ -562,21 +562,13 @@ static void print_version(void)
 {
     (void)fprintf(stderr,
 		  "%s version %s\n"
-
-		  "    Database:"
-#ifdef	ENABLE_TDB_DATASTORE
-		  " TrivialDB"
-#else
-		  " BerkeleyDB"
-#endif
-		  "\n"
-
+		  "    Database: %s\n"
 		  "Copyright (C) 2002 Gyepi Sam\n\n"
 		  "%s comes with ABSOLUTELY NO WARRANTY.\n"
 		  "This is free software, and you are welcome to redistribute\n"
 		  "it under the General Public License.\n"
 		  "See the COPYING file with the source distribution for details.\n\n",
-		  progtype, version, PROGNAME);
+		  progtype, version, ds_version_str(), PROGNAME);
 }
 
 static void usage(void)
