@@ -11,6 +11,7 @@ AUTHOR:
 ******************************************************************************/
 
 #include <math.h>
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -188,6 +189,7 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
 	    else
 	    {
 		double invn, invproduct, product;
+		assert(robn > 0);
 		invn = (double)robn;
 		invproduct = 1.0 - exp(invlogsum / invn);
 		product = 1.0 - exp(logsum / invn);
@@ -229,12 +231,15 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count)
     long bad_cnt  = max(1, msgs_bad);
     long good_cnt = max(1, msgs_good);
 
+    assert(bad_cnt > 0);
+    assert(good_cnt > 0);
+
     /* print header */
     if (!Rtable)
 	(void)fprintf(stdout, "%*s%6s    %-6s    %-6s    %-6s %s\n",
 		      MAXTOKENLEN+2,"","n", "pgood", "pbad", "fw", "U");
     else
-	(void)fprintf(stdout, "%*s%6s    %-6s    %-6s    %-6s    %-6s    %-6s %s\n",
+	(void)fprintf(stdout, "%*s%6s    %-6s    %-6s    %-6s  %-6s    %-6s %s\n",
 		      MAXTOKENLEN+2,"","n", "pgood", "pbad", "fw","invfwlog", "fwlog", "U");
 
     /* Print 1 line per token */
@@ -253,6 +258,8 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 			(b / bad_cnt + g / good_cnt)));
 	double fw = (robs * robx + c * pw) / (robs + c);
 	char flag = (fabs(fw-EVEN_ODDS) - min_dev >= EPS) ? '+' : '-';
+
+	assert(b >= 0 && g >= 0);
 
 	(void)fputc( '"', stdout);
 	(void)word_puts(token, 0, stdout);
