@@ -183,7 +183,7 @@ int get_decoded_line(byte *buf, size_t max_size)
     }
 
     /* \r\n -> \n */
-    if (count >= 2 && 0 == strcmp((const char *)(buf + count - 2), "\r\n")) {
+    if (count >= 2 && 0 == memcmp((const char *)(buf + count - 2), "\r\n", 2)) {
 	count --;
 	*(buf + count - 1) = '\n';
     }
