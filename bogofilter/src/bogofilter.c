@@ -81,6 +81,8 @@ rc_t bogofilter(int argc, char **argv)
 
     atexit(bf_exit);
 
+    set_default_wordlist();
+
     score_initialize();	/* initialize constants */
 
     if (query)

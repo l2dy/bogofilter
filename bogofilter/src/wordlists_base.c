@@ -59,6 +59,13 @@ int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* pat
     return 0;
 }
 
+/* Set default wordlist for registering messages, finding robx, etc */
+
+void set_default_wordlist(void)
+{
+    if (word_lists)
+	word_list = word_lists;
+}
 
 /* setup_wordlists()
    returns: -1 for error, 0 for success

@@ -29,6 +29,7 @@ int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* pat
 		  bool sbad, bool gbad, int override);
 
 void free_wordlists(void);
+void set_default_wordlist(void);
 int  setup_wordlists(const char* dir, priority_t precedence);
 
 #endif	/* WORDLISTS_CORE_H */
