@@ -52,6 +52,7 @@ libbogofilter_a_SOURCES= \
 	paths.h paths.c \
 	register.h register.c \
 	rstats.h rstats.c \
+	textblock.h textblock.c \
 	token.h token.c \
 	wordhash.h wordhash.c wordlists.h wordlists.c \
 	globals.h system.h \
