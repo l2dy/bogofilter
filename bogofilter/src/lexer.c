@@ -149,7 +149,7 @@ static int skip_spam_header(buff_t *buff)
 	int count;
 	buff->t.leng = 0;		/* discard X-Bogosity line */
 	count = lgetsl(buff);
-	if (count <= 0 || !isspace(buff->t.text[0])) 
+	if (count <= 1 || !isspace(buff->t.text[0])) 
 	    return count;
     }
 
