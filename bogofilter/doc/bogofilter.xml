@@ -40,9 +40,6 @@
   <arg choice='opt'>-F</arg>
   <arg choice='opt'>-I <replaceable>filename</replaceable></arg>
   <arg choice='opt'>-O <replaceable>filename</replaceable></arg>
-  <arg choice='opt'>-a <replaceable>age</replaceable></arg>
-  <arg choice='opt'>-c <replaceable>count</replaceable></arg>
-  <arg choice='opt'>-s <replaceable>min,max</replaceable></arg>
   <arg choice='opt'>-y <replaceable>date</replaceable></arg>
 </cmdsynopsis>
 
@@ -269,19 +266,6 @@ rather than from <option>stdin</option>
 tells <application>bogofilter</application> where to write its output in
 passthrough mode.  Note that this only works when -p is explicitly given.</para>
 
-<para>
-  Option <option>-a age</option> indicates an acceptable token age, with older ones being discarded.  
-  The age can be a date (in form YYYYMMMDD) or a day count, i.e. discard tokens older than 
-  <option>age</option> days.
-</para>
-<para>
-  Option <option>-c min</option> indicates that tokens with counts less than <option>min</option> 
-  are to be discarded.
-</para>
-<para>
-  Option <option>-s min,max</option> is used to discard tokens based on their size, i.e. length.  
-  All tokens shorter than <option>min</option> or longer than <option>max</option> will be discarded.
-</para>
 <para>
   Option <option>-y date</option> is specifies the date to give to tokens that don't have dates.
 </para>

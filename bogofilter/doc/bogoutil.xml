@@ -108,7 +108,7 @@
       <option>age</option> days.
     </para>
     <para>
-      Option <option>-c min</option> indicates that tokens with counts less than <option>min</option> 
+      Option <option>-c value</option> indicates that tokens with counts less than or equal to <option>value</option> 
       are to be discarded.
     </para>
     <para>
