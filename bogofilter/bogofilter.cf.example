@@ -213,8 +213,8 @@
 #### CUTOFF Values
 #
 #	both ham_cutoff and spam_cutoff are allowed.
-#	setting ham_cutoff to a zero value will
-#	enable two-state results (Yes/No).
+#	setting ham_cutoff to a non-zero value will
+#	enable tri-state results (Spam/Ham/Unsure).
 #
 #ham_cutoff = 0.45
 #spam_cutoff= 0.99
