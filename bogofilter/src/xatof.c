@@ -1,5 +1,8 @@
+/* $Id$ */
+
 /** \file xatof.c
- * Implements xatof, an easy to use strtod() wrapper.
+ * Implements xatof, an easy to use strtod() replacement with error
+ * checking.
  *
  * \author Matthias Andree
  * \date 2003
@@ -7,17 +10,29 @@
 
 #include "xatox.h"
 
+#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
 
 int xatof(double *d, const char *in) {
     char *end;
+    double val;
+
     errno = 0;
-    *d = strtod(in, &end);
+    val = strtod(in, &end);
     if (in == end || errno == EINVAL || errno == ERANGE) return 0;
-    if (end < in + strlen(in)) return 0;
-    return 1;
+
+    while (isspace(*end))
+	end += 1;
+
+    if (*end == '#' || *end == '\0' || end == in + strlen(in)) 
+    {
+	*d = val;
+	return 1;
+    }
+    else
+	return 0;
 }
 
 #if MAIN
