@@ -72,6 +72,15 @@ extern	u_int32_t	 msgs_bad;
 /* from html.h */
 extern	bool strict_check;
 
+/* from robinson.h */
+#define ROBS			0.010	/* Robinson's s */
+#define ROBX			0.415	/* Robinson's x */
+
+#define ROBX_W			 ".ROBX"
+
+extern	double robs;
+extern	double robx;
+
 /* for  bogotune */
 extern	bool fBogotune;
 

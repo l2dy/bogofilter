@@ -67,6 +67,10 @@ bool strict_check = false;
 /* for  bogotune */
 bool fBogotune = false;
 
+/* for  robinson.c, bogoutil.c, and bogohist.c */
+double	robx = 0.0;			/* used in fisher.c and rstats.c */
+double	robs = 0.0;			/* used in fisher.c and rstats.c */
+
 /* other */
 uint	db_cachesize = 0;		/* in MB */
 enum	passmode passmode;		/* internal */

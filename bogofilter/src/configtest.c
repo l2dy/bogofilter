@@ -21,7 +21,6 @@ AUTHOR:
 
 const char *progname = "configtest";
 
-double robs, robx;
 double ham_cutoff;
 
 #ifndef	DEBUG_CONFIG

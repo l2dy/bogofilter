@@ -339,12 +339,12 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 
 static int get_robx(char *path)
 {
-    double robx;
+    double rx;
 
-    robx = compute_robinson_x(path);
+    rx = compute_robinson_x(path);
 
     if (onlyprint)
-	printf("%f\n", robx);
+	printf("%f\n", rx);
     else {
 	uint count;
 
@@ -375,7 +375,7 @@ static int get_robx(char *path)
 	    return EX_ERROR;
 
 	val.goodcount = 0;
-	val.spamcount = (uint32_t) (robx * 1000000);
+	val.spamcount = (uint32_t) (rx * 1000000);
 	ds_write(dsh, word_robx, &val);
 	ds_close(dsh, false);
 

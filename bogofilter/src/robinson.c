@@ -27,8 +27,6 @@ NAME:
 extern int Rtable;
 
 double	thresh_rtable = 0.0;		/* used in fisher.c */
-double	robx = 0.0;			/* used in fisher.c and rstats.c */
-double	robs = 0.0;			/* used in fisher.c and rstats.c */
 
 #define ROBX_S ".ROBX"
 
