@@ -48,3 +48,6 @@ const char	*stats_prefix;
 /* dual definition options */
 char	*directory;		/* '-d' */
 method_t *method = NULL;
+
+/* other */
+enum	passmode passmode;		/* internal */

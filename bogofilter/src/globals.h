@@ -56,4 +56,7 @@ extern	const char	*stats_prefix;
 extern	const char *const version;
 extern	const char *const system_config_file;
 
+enum passmode { PASS_MEM, PASS_SEEK };
+extern enum passmode passmode;
+
 #endif
