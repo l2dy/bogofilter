@@ -66,7 +66,7 @@ run_batch_test()
     OUT="${TMPDIR}/tests/msg.$fil.$mth.$ver"
     OPTS="-$mth -t -$ver $CFG"
     map_rc $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt \
-	sed s@.*inputs/@./inputs/@ \>${TMPDIR}/tests-$mth 
+	sed s@.*inputs/@./inputs/@ >${TMPDIR}/tests-$mth 
     sed s/,.version=.*// < ${TMPDIR}/tests-$mth > $OUT
 }
 
@@ -108,13 +108,16 @@ EOF
 # run tests for msg.[1-8].txt
 #
 NAME="bulk-single"
-( for f in $pattern ; do echo $f `$BOGOFILTER -c $CFG $OPT -I $f` ; done ) > ${TMPDIR}/$NAME.out
+( for f in $pattern ; do echo $f `$BOGOFILTER -c $CFG $OPT -I $f` ; done ) | \
+    sed s@.*inputs/@./inputs/@ >${TMPDIR}/$NAME.out
 
 NAME="bulk-stdin"
-ls $pattern | $BOGOFILTER -c $CFG $OPT -b > ${TMPDIR}/$NAME.out
+ls $pattern | $BOGOFILTER -c $CFG $OPT -b | \
+    sed s@.*inputs/@./inputs/@ >${TMPDIR}/$NAME.out
 
 NAME="bulk-linend"
-$BOGOFILTER -c $CFG $OPT -B `ls $pattern` > ${TMPDIR}/$NAME.out
+$BOGOFILTER -c $CFG $OPT -B `ls $pattern` | \
+    sed s@.*inputs/@./inputs/@ >${TMPDIR}/$NAME.out> ${TMPDIR}/$NAME.out
 
 NAME="bogolex-single"
 for f in $pattern ; do 
