@@ -236,8 +236,13 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     unsigned long spam_count, spam_msg_count = 0 ;
     unsigned long good_count, good_msg_count = 0 ;
 
+#ifndef	ENABLE_DEPRECATED_CODE
+    const char *head_format = !show_probability ? "%-30s %6s\n"   : "%-30s %6s  %6s  %6s\n";
+    const char *data_format = !show_probability ? "%-30s %6lu\n" : "%-30s %6lu  %6lu  %f\n";
+#else
     const char *head_format = !show_probability ? "%-30s %6s %6s\n"   : "%-30s %6s  %6s  %6s  %6s\n";
     const char *data_format = !show_probability ? "%-30s %6lu %6lu\n" : "%-30s %6lu  %6lu  %f  %f\n";
+#endif
 
     void *dsh = NULL; /* initialize to silence bogus gcc warning */
 
@@ -286,7 +291,11 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	good_msg_count = val.goodcount;
     }
 
+#ifndef	ENABLE_DEPRECATED_CODE
+    printf(head_format, "", "spam", "good", "Fisher");
+#else
     printf(head_format, "", "spam", "good", "Gra prob", "Rob/Fis");
+#endif
 
     while (argc >= 0)
     {
@@ -321,7 +330,11 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	    rob_prob = calc_prob(goodness, spamness);
 	}
 
+#ifndef	ENABLE_DEPRECATED_CODE
+	printf(data_format, token->text, spam_count, good_count, rob_prob);
+#else
 	printf(data_format, token->text, spam_count, good_count, gra_prob, rob_prob);
+#endif
 
 	if (token != &buff->t)
 	    word_free(token);
