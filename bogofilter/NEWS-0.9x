@@ -2,9 +2,9 @@
 				BOGOFILTER NEWS
 			       =================
 
-0.92.4	2004-07-??
+0.92.4	2004-07-29
 
-* Warn on invalid options, rather than exit
+* Warn on invalid options, rather than exit.
 
 0.92.3	2004-07-27
 

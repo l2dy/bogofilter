@@ -5,11 +5,9 @@
 NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
-0.92.4	2004-07-??
+0.92.4	2004-07-29
 
-	2004-07-29
-
-	* Warn on invalid options, rather than exit
+	* Warn on invalid options, rather than exit.
 
 0.92.3	2004-07-27
 
