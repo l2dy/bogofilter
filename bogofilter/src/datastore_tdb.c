@@ -25,7 +25,6 @@ Gyepi Sam <gyepi@praxis-sw.com>   2003
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-
 typedef struct {
     char *filename;
     size_t count;
@@ -57,6 +56,7 @@ static dbh_t *dbh_init(const char *path, size_t count, const char **names)
     return handle;
 }
 
+
 static void dbh_free(/*@only@*/ dbh_t *handle)
 {
     if (handle != NULL) {
@@ -76,9 +76,9 @@ void dbh_print_names(void *vhandle, const char *msg)
     dbh_t *handle = vhandle;
 
     if (handle->count == 1)
-        	fprintf(dbgout, "%s (%s)", msg, handle->name[0]);
+	fprintf(dbgout, "%s (%s)", msg, handle->name[0]);
     else
-        	fprintf(dbgout, "%s (%s,%s)", msg, handle->name[0], handle->name[1]);
+	fprintf(dbgout, "%s (%s,%s)", msg, handle->name[0], handle->name[1]);
 }
 
 
@@ -274,12 +274,12 @@ void db_close(void *vhandle, bool nosync)
     int ret;
     size_t i;
 
+    if (handle == NULL) return;
+
     if (DEBUG_DATABASE(1)) {
       dbh_print_names(vhandle, "db_close");
       fprintf(dbgout, " %s\n", nosync ? "nosync" : "sync");
     }
-
-    if (handle == NULL) return;
 
     if (handle->locked) {
         for (i = 0; i < handle->count; i += 1) {
@@ -356,4 +356,3 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 
     return ret;
 }
-
