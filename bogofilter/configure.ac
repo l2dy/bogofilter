@@ -102,16 +102,8 @@ AC_DEFINE(__NO_CTYPE,1,[Define __NO_CTYPE to 1 to avoid GLIBC_2.3-specific ctype
 AC_ARG_ENABLE(static,
       AC_HELP_STRING([--enable-static], [Build static versions as well.]))
 
-if test a$enable_static != ayes ; then
-    BOGOFILTER="bogofilter"
-    BOGOLEXER="bogolexer"
-    BOGOTUNE="bogotune"
-    BOGOUTIL="bogoutil"
-else
-    BOGOFILTER="bogofilter_static"
-    BOGOLEXER="bogolexer_static"
-    BOGOTUNE="bogotune_static"
-    BOGOUTIL="bogoutil_static"
+if test a$enable_static = ayes ; then
+    EXE_EXT="_static"
     AC_MSG_CHECKING([option to link statically])
     LDEFLAGS="$LDFLAGS"
     found=0
@@ -136,10 +128,7 @@ fi
 export STATICLDFLAGS
 AC_SUBST(STATICLDFLAGS)
 AM_CONDITIONAL(ENABLE_STATIC, test x$enable_static = xyes)
-AC_SUBST(BOGOFILTER)
-AC_SUBST(BOGOLEXER)
-AC_SUBST(BOGOTUNE)
-AC_SUBST(BOGOUTIL)
+AC_SUBST(EXE_EXT)
 
 dnl Allow the user to specify a header name to use to indicate whether a given
 dnl message is SPAM or not.
@@ -346,12 +335,12 @@ You can download BerkeleyDB 4.1.x from http://www.sleepycat.com/]]),
 esac
 
 if test a$WITH_DB_ENGINE = a ; then
-    STATICDBFLAGS="-ldb"
+    STATIC_DB="-ldb"
 else
-    STATICDBFLAGS="-l$WITH_DB_ENGINE"
+    STATIC_DB="-l$WITH_DB_ENGINE"
 fi
 
-AC_SUBST(STATICDBFLAGS)
+AC_SUBST(STATIC_DB)
 
 AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xtdb")
 AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")

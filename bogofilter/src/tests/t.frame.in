@@ -14,11 +14,11 @@ set -e
 : ${relpath=..}
 : ${BF_TESTDIR=.}
 
-BOGOFILTER="$VAL ${relpath}/@BOGOFILTER@"
-BOGOLEXER="$VAL ${relpath}/@BOGOLEXER@"
-BOGOTUNE="$VAL ${relpath}/@BOGOTUNE@"
-BOGOUTIL="$VAL ${relpath}/@BOGOUTIL@"
-BOGOLEX_SH="$VAL ${srcdir}/../msg-count.sh"
+BOGOFILTER="$VAL ${relpath}/bogofilter@EXE_EXT@"
+BOGOLEXER="$VAL ${relpath}/bogolexer@EXE_EXT@"
+BOGOTUNE="$VAL ${relpath}/bogotune@EXE_EXT@"
+BOGOUTIL="$VAL ${relpath}/bogoutil@EXE_EXT@"
+BOGOLEX_SH="$VAL ${relpath}/msg-count.sh"
 export BOGOFILTER
 export BOGOLEXER
 export BOGOUTIL

@@ -135,14 +135,14 @@ bogofilter_SOURCES = bogofilter.c bogofilter.h main.c \
 		     common.h method.h
 bogofilter_static_SOURCES = $(bogofilter_SOURCES)
 bogofilter_static_LDFLAGS = $(STATICLDFLAGS)
-bogofilter_static_LDADD = $(LDADD) $(STATICDBFLAGS) $(GSL_LIBS)
+bogofilter_static_LDADD = $(LDADD) $(STATIC_DB) $(GSL_LIBS)
 
 bogolexer_static_SOURCES = bogolexer.c
 bogolexer_static_LDFLAGS = $(STATICLDFLAGS)
 
 bogoutil_static_SOURCES = bogoutil.c
 bogoutil_static_LDFLAGS = $(STATICLDFLAGS)
-bogoutil_static_LDADD = $(LDADD) $(STATICDBFLAGS)
+bogoutil_static_LDADD = $(LDADD) $(STATIC_DB)
 
 bogotune_SOURCES = bogotune.c bogotune.h \
 		   tunelist.c tunelist.h \
@@ -155,7 +155,7 @@ bogotune_static_SOURCES = bogotune.c bogotune.h \
 		   method.c $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
 		   common.h method.h
 bogotune_static_LDFLAGS = $(STATICLDFLAGS)
-bogotune_static_LDADD= $(LDADD) $(STATICDBFLAGS) $(GSL_LIBS)
+bogotune_static_LDADD= $(LDADD) $(STATIC_DB) $(GSL_LIBS)
 
 debugtest_SOURCES = debug.main.c
 
