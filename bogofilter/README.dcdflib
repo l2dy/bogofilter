@@ -1,0 +1,17 @@
+The cdfchi function comes from dcdflib.c-1.1, a free library of
+routines for cumulative distribution functions.  The library is
+distributed by the M. D. Anderson Cancer Center's Department of
+Biomathematics and Biostatistics.  Source is available from
+  http://odin.mdacc.tmc.edu/anonftp
+
+The dcdflib cdfchi function is both faster and more accurate than the
+prbf approximation used in early testing.
+
+To install dcdflib, download dcdflib.c-1.1.tar.gz from the above URL,
+unpack it, go into the source directory, and edit ipmpar.c to uncomment
+the machine-specific parameters for your machine type.  Then
+  gcc -c -O2 ipmpar.c
+  gcc -c -O2 dcdflib.c
+  ar cru libdcdf.a dcdflib.o ipmpar.o
+  install libdcdf.a /usr/lib
+  cp ../doc/dcdflib.h /usr/include
