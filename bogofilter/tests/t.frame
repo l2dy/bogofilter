@@ -36,9 +36,12 @@ else
     echo "Results are in ${TMPDIR}.  Remove it after testing."
 fi
 
+BOGOFILTER_DIR=$TMPDIR
+export BOGOFILTER_DIR
+
 if [ "$1" != "-no-db" ]; then
-    BOGOFILTER_DIR=$TMPDIR
-    export BOGOFILTER_DIR
+    ${relpath}/bogofilter -n -C </dev/null
+fi
 
 # make GNU libc nasty and abort on memory allocation issues:
 if true ; then
@@ -56,7 +59,4 @@ if false ; then
     EF_ALIGNMENT=0
     export LD_PRELOAD EF_PROTECT_FREE EF_FILL EF_ALLOW_MALLOC_0 EF_PROTECT_BELOW
     export EF_ALIGNMENT
-fi
-
-    ${relpath}/bogofilter -n -C </dev/null
 fi
