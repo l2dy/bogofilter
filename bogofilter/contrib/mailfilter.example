@@ -41,7 +41,8 @@ cc "unsure-bogofilter"
 # teach bogofilter about it (avoiding to register spamassassin markup)
 # and store it to spam-spamassassin
 xfilter "/usr/bin/spamc"
-if (/^X-Spam-Status: YES) {
+if (/^X-Spam-Status: YES/)
+{
     cc "|/usr/bin/spamassassin -d -L|bogofilter -s"
     to "spam-spamassassin"
 }
