@@ -81,7 +81,7 @@ else {
     if ($sig =~ m/^\# bogofilter wordlist \(format version A\):\s(\d+)$/){ 
 	convert_format_A();
     }
-    elsif ($sig =~ m/^\# bogofilter wordlist \(format version A\):\s(\d+)$/){ 
+    elsif ($sig =~ m/^\# bogofilter email-count \(format version B\):\s(\d+)/){
 	convert_format_B();
     }
     else {
