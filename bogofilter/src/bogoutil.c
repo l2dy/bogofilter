@@ -550,7 +550,8 @@ static void help(void)
 	    "\t-p\tOutput word probabilities.\n"
 	    "\t-v\tOutput debug messages.\n"
 	    "\t-h\tPrint this message.\n"
-	    "\t-R\tCompute Robinson's X for specified directory.\n"
+	    "\t-R\tCompute Robinson's X for specified directory.\n");
+    fprintf(stderr,
 	    "\t-a age\tExclude tokens with older ages.\n"
 	    "\t-c count\tExclude tokens with lower counts.\n"
 	    "\t-s min,max\tExclude tokens with lengths between min and max.\n"
