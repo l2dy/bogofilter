@@ -5,7 +5,17 @@
 Be sure to read RELEASE.NOTES-0.15, with attention to the section
 about retraining and the '-H' flag...
 
-0.15.11
+0.15.12
+
+* Fix decoding of escaped urls.
+* Fix sigsegv in bogotune when '-D' option is used.
+* Fix compilation problems with datastore_tdb.c and datastore_qdbm.c
+* Force line buffered output when not in passthrough mode.
+* Minor fixes for parsing msg-count files.
+* Clarify list of supported mail formats in FAQ.
+* Enhance memdebug capabilities.
+
+0.15.11	2003-12-17
 
 * Fixed CRLF problem in bogoreader.c
 * Exclude ~ (tilde) at the end of tokens.

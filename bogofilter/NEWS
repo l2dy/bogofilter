@@ -8,6 +8,24 @@ is in the RELEASE.NOTES files.  Read it!!
 If updating from a bogofilter version older than 0.15.4, it's a good
 idea to retrain or else use the '-H' (header tag degeneration) option.
 
+0.15.12
+
+	2003-12-23
+
+	* Minor fixes for parsing msg-count files.
+	* Fix sigsegv in bogotune when '-D' option is used.
+	* Clarify list of supported mail formats in FAQ.
+	* If not in passthrough mode, force output to be line buffered.
+	* Enhance memdebug capabilities.
+
+	2003-12-21
+
+	* Fix decoding of escaped urls.
+
+	2003-12-18
+
+	* Fix compilation problems with datastore_tdb.c and datastore_qdbm.c
+
 0.15.11	2003-12-17
 
 	* Additional portability fixes for DGUX in configure.ac and bogogrep.c
