@@ -48,11 +48,12 @@ const char	*update_dir;
 const char	*stats_prefix;
 
 /* for lexer_v3.l */
+bool	header_degen = false;		/* -H 	   - default: disabled */
 bool	ignore_case = false;		/* -PI */
 bool	header_line_markup = true;	/* -Ph */
 bool	tokenize_html_tags = true;	/* -Pt */
 bool	degen_enabled = false;		/* -Pd,-PD - default: disabled */
-bool	first_match = true;		/* -Pf,-PF - default: enabled */
+bool	first_match = true;		/* -Pf,-PF - default: enabled  */
 #if	0
 bool	separate_counts = true;		/* -Ps,-PS - default: enabled  */
 #endif

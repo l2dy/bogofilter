@@ -19,6 +19,13 @@ void wordprop_init(void *vwordprop)
     memset(wordprop, 0, sizeof(*wordprop));
 }
 
+/* this is used by robinson.c static */
+void wordprop_incr(wordprop_t *w1, wordprop_t *w2)
+{
+    w1->good += w2->good;
+    w1->bad += w2->bad;
+}
+
 /* Tokenize input text and save words in the wordhash_t hash table.
  *
  * Returns:  true if the EOF token has not been read.

@@ -111,7 +111,7 @@ static void print_version(void)
 		  progname, version, PACKAGE);
 }
 
-#define	OPTIONS	":c:CDhI:npP:qvVx:X"
+#define	OPTIONS	":c:CDhHI:npP:qvVx:X"
 
 /** These functions process command line arguments.
  **
@@ -157,6 +157,10 @@ static void process_args_1(int argc, char **argv)
 	case 'h':
 	    help();
 	    exit(EX_OK);
+
+	case 'H':
+	    header_degen = true;
+	    break;
 
 	case 'I':
 	    bogoreader_name(optarg);

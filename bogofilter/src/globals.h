@@ -45,6 +45,7 @@ extern	int	abort_on_error;
 extern	bool	stats_in_header;
 
 /* for lexer_v3.l */
+extern	bool	header_degen;		/* -H 	   - default: disabled */
 extern	bool	ignore_case;		/* -Pu,-PU */
 extern	bool	header_line_markup;	/* -Ph,-PH */
 extern	bool	tokenize_html_tags;	/* -Pt,-PT */

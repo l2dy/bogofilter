@@ -454,7 +454,7 @@ static void print_version(void)
 #define	F "f"
 #endif
 
-#define	OPTIONS	":23bBc:Cd:DefFghI:k:lL:m:MnNo:O:pP:qQRrsStTuvWVx:Xy:" G R F
+#define	OPTIONS	":23bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pP:qQRrsStTuvWVx:Xy:" G R F
 
 /** These functions process command line arguments.
  **
@@ -682,6 +682,10 @@ void process_args_2(int argc, char **argv)
 	    char *dir = optarg;
 	    if (setup_wordlists(dir, PR_COMMAND) != 0)
 		exit(EX_ERROR);
+	    break;
+
+	case 'H':
+	    header_degen = true;
 	    break;
 	}
 

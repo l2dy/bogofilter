@@ -15,6 +15,7 @@ NAME:
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
+#include "collect.h"
 #include "datastore.h"
 #include "degen.h"
 #include "msgcounts.h"
@@ -113,7 +114,7 @@ static double wordprob_result(wordprop_t* wordstats)
     return (fw);
 }
 
-static double lookup(const word_t *token, wordprop_t *wordstats)
+static void lookup(const word_t *token, wordprop_t *wordstats)
 {
     int override=0;
     wordlist_t* list;
@@ -124,7 +125,7 @@ static double lookup(const word_t *token, wordprop_t *wordstats)
 	dsv_t val;
 
 	if (list->ignore)
-	    return EVEN_ODDS;
+	    return;
 
 	if (override > list->override)
 	    break;
@@ -150,7 +151,7 @@ static double lookup(const word_t *token, wordprop_t *wordstats)
 	    }
 	}
     }
-    return wordstats->prob;
+    return;
 }
 
 double lookup_and_score(const word_t *token, wordprop_t *wordstats)
@@ -158,19 +159,30 @@ double lookup_and_score(const word_t *token, wordprop_t *wordstats)
     double prob;
 
     if (wordstats->bad == 0 && wordstats->good == 0)
-	prob = lookup(token, wordstats);
+	lookup(token, wordstats);
 
-    if (wordstats->bad != 0 || wordstats->good != 0)
+    if (header_degen && token->leng >= 5 && memcmp(token->text, "head:", 5) == 0) {
+	word_t *tword = word_new(token->text+5, token->leng-5);
+	wordprop_t tprop;
+	wordprop_init(&tprop);
+	lookup(tword, &tprop);
+	wordprop_incr(wordstats, &tprop);
 	prob = wordprob_result(wordstats);
+	word_free(tword);
+    }
     else
-	if (!degen_enabled)
-	    prob = wordprob_result(wordstats);
-	else
-	{
-	    degen_enabled = false;	/* Disable further recursion */
-	    prob = degen(token, wordstats);
-	    degen_enabled = true;	/* Enable further recursion */
-	}
+    if (wordstats->bad != 0 || wordstats->good != 0) {
+	prob = wordprob_result(wordstats);
+    }
+    else
+    if (degen_enabled)
+    {
+	degen_enabled = false;	/* Disable further recursion */
+	prob = degen(token, wordstats);
+	degen_enabled = true;	/* Enable further recursion */
+    }
+    else
+	prob = wordprob_result(wordstats);
 
     return prob;
 }
