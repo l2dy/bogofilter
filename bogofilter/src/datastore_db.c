@@ -58,6 +58,7 @@ typedef struct {
 #define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
 
 #define DB_AT_LEAST(maj, min) ((DB_VERSION_MAJOR > (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR >= (min))))
+#define DB_AT_MOST(maj, min) ((DB_VERSION_MAJOR < (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR <= (min))))
 
 #if DB_AT_LEAST(4,1)
 #define	DB_OPEN(db, file, database, dbtype, flags, mode) db->open(db, NULL /*txnid*/, file, database, dbtype, flags, mode)
@@ -475,7 +476,13 @@ void db_close(void *vhandle, bool nosync)
 	fprintf(dbgout, "db_close (%s) %s\n",
 		handle->name, nosync ? "nosync" : "sync");
 
-    if ((ret = dbp->close(dbp, f)))
+    ret = dbp->close(dbp, f);
+#if DB_AT_LEAST(3,2) && DB_AT_MOST(4,0)
+    /* ignore dirty pages in buffer pool */
+    if (ret == DB_INCOMPLETE)
+	ret = 0;
+#endif
+    if (ret)
 	print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
 
     dbh_free(handle);
@@ -491,7 +498,13 @@ void db_flush(dsh_t *dsh)
     dbh_t *handle = dsh->dbh;
     DB *dbp = handle->dbp;
 
-    if ((ret = dbp->sync(dbp, 0)))
+    ret = dbp->sync(dbp, 0);
+#if DB_AT_LEAST(3,2) && DB_AT_MOST(4,0)
+    /* ignore dirty pages in buffer pool */
+    if (ret == DB_INCOMPLETE)
+	ret = 0;
+#endif
+    if (ret)
 	print_error(__FILE__, __LINE__, "(db) db_sync: err: %d, %s", ret, db_strerror(ret));
 }
 
