@@ -225,7 +225,7 @@ print("Recommended cache size is ", $cachesize, " Mbytes.\n");
 ### 4.  Calculate fp target
 # The fp target will be derived thus: score nonspams with s and md as
 # shipped, and determine the count that will result from a spam cutoff
-# of 0.95; if that is < 3, try 0.85 etc.
+# of 0.95; if that is < 0.25%, try 0.9375 etc.
 
 print("Calculating false-positive target...\n");
 
@@ -245,9 +245,9 @@ while(<SCORES>) {
     push @nsscores, $V2;
     if($V2 > $thresh) { ++$target; }
 }
-close SCORES;
-while($target < 3) {
-    $thresh -= 0.1;
+close SCORES; --$target;
+while($target < POSIX::ceil(scalar @nsscores * 0.0025)) {
+    $thresh -= 0.0125;
     if ($thresh < 0.5) {
 	print("Very few high-scoring nonspams in this data set.\n",
 	    "Retain the current settings:\n");
@@ -265,7 +265,7 @@ while($target < 3) {
 	if($n > $thresh) { ++$target; }
     }
 }
-print("False-positive target is ", $target, "\n");
+print("False-positive target is ", $target, " (cutoff ", $thresh, ")\n");
 
 ### 5.  Calculate x
 # Calculate x with bogoutil's -r option (a new addition).
@@ -301,7 +301,7 @@ sub col5 { $$a[5] <=> $$b[5]; }
 sub gfn {
     my ($si, $mi, $xi) = @_; my $pi;
     $pi = $si * ($#mdval+1) * ($#rxval+1) + $mi * ($#rxval+1) + $xi;
-    return($unsorted[$pi][5]);
+    return($parms[$pi][5]);
 }
 
 sub log10 { my $n = shift; return log($n) / log(10); }
@@ -336,7 +336,7 @@ foreach $scantype ("coarse", "fine") {
 		@scores = ();
 		while(<SCORES>) {
 		    chop; ($V1, $V2) = split(/\s+/);
-		    if($V2 == "") { push @scores, 1-$V1; }
+		    if($V2 eq "") { push @scores, 1-$V1; }
 		    elsif($V1 == 1) { push @scores, $V2; }
 		}
 		close SCORES;
@@ -363,8 +363,8 @@ foreach $scantype ("coarse", "fine") {
 		    $fn = 0;
 		    while(<SCORES>) {
 			chop; ($V1, $V2) = split(/\s+/);
-			if(($V2 == "" && $V1 <= $cutoff) ||
-			    ($V2 && $V1 != 1)) { ++$fn; }
+			if($V2 eq "") { ++$fn if $V1 < $cutoff; }
+			else { ++$fn if $V1 != 1; }
 		    }
 		    close SCORES;
 		} else {
@@ -396,20 +396,20 @@ foreach $scantype ("coarse", "fine") {
 	@unsorted = @parms;
 	print("Warning: fp target was not met, using original results\n");
     }
-    @parms = sort col5 @unsorted;
+    @sorted = sort col5 @unsorted;
     if($verbose) {
 	print("Top ten parameter sets from this scan:\n");
 	foreach $i (0 .. 10) {
-	    ($rsi, $mdi, $rxi, $cutoff, $fp, $fn) = @{$parms[$i]};
+	    ($rsi, $mdi, $rxi, $cutoff, $fp, $fn) = @{$sorted[$i]};
 	    printf("%6.4f %5.3f %5.3f %5.3f %2.0f %3.0f\n",
 		$rsval[$rsi], $mdval[$mdi], $rxval[$rxi], $cutoff, $fp, $fn);
 	}
     }
-    $med = $parms[int(scalar @parms / 2)][5];
+    $med = $sorted[int(scalar @sorted / 2)][5];
     if($verbose) { print("Median fn count was ", $med, "\n"); }
     $n = $o = 0;
-    foreach $i (0 .. $#parms) {
-	$rsi = $parms[$i][0]; $mdi = $parms[$i][1]; $rxi = $parms[$i][2];
+    foreach $i (0 .. $#sorted) {
+	$rsi = $sorted[$i][0]; $mdi = $sorted[$i][1]; $rxi = $sorted[$i][2];
 	if(    ($rsi == 0       || gfn($rsi-1, $mdi, $rxi) < $med)
 	    && ($rsi == $#rsval || gfn($rsi+1, $mdi, $rxi) < $med)
 	    && ($mdi == 0       || gfn($rsi, $mdi-1, $rxi) < $med)
@@ -418,14 +418,14 @@ foreach $scantype ("coarse", "fine") {
 	    && ($rxi == $#rxval || gfn($rsi, $mdi, $rxi+1) < $med)) {
 	    $n = 1; last;
 	}
-	$o = $i;
+	$o = $i+1;
     }
     if($o > 0) {
 	 print($o, " outlier", $o > 1 ? "s" : "", " encountered.",
 	"                                                   \n");
     }
     if($n == 0) {
-	$rsi = $parms[0][0]; $mdi = $parms[0][1]; $rxi = $parms[0][2];
+	$rsi = $sorted[0][0]; $mdi = $sorted[0][1]; $rxi = $sorted[0][2];
 	print("No smooth minimum encountered, using lowest fn count",
 	    " (an outlier).         \n");
     }
@@ -546,6 +546,6 @@ if($cutoff < 0.999) {
 	"; expect ", $fneg, "% false neg.\n");
 }
 $cutoff = sprintf("%0.3f", $spscores[POSIX::ceil($scount * 0.002)-1]);
-$cutoff = 0.2 if $cutoff < 0.2;
+$cutoff = 0.1 if $cutoff < 0.1;
 print("Recommended nonspam cutoff is ", $cutoff, "\n");
 yuk(0, "Tuning completed.");
