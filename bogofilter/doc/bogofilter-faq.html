@@ -168,12 +168,12 @@
   </pre>
 The columns printed contain the following information:
   <dl>
-    <dt>&quot;&hellip;&quot;<dd>the token in question
-    <dt>n<dd>number of times this token was encountered in training
-    <dt>pgood<dd>likelihood that a message containing this token is non-spam
-    <dt>pbad<dd>likelihood that a message containing this token is spam
-    <dt>fw<dd>Robinson's weighted index, which combines pgood and pbad to give a value that will be close to zero if a message containing this token is likely to be non-spam and close to one if it's likely to be spam
-    <dt>U<dd>'<b>+</b>' if this token contributes to the final bogosity value, '<b>-</b>' otherwise.  A token is excluded when its score is closer to 0.5 than min_dev.
+    <dt>&quot;&hellip;&quot;</dt><dd>the token in question</dd>
+    <dt>n</dt><dd>number of times this token was encountered in training</dd>
+    <dt>pgood</dt><dd>proportion of good messages that contained this token</dd>e
+    <dt>pbad</dt><dd>proportion of spam messages that contained this token</dd>
+    <dt>fw</dt><dd>Robinson's weighted index, which combines pgood and pbad to give a value that will be close to zero if a message containing this token is likely to be non-spam and close to one if it's likely to be spam</dd>
+    <dt>U</dt><dd>'<b>+</b>' if this token contributes to the final bogosity value, '<b>-</b>' otherwise.  A token is excluded when its score is closer to 0.5 than min_dev.</dd>
   </dl>
 <p>The final lines show:</p>
   <ul>
