@@ -5,7 +5,9 @@
 #	performs lexical analysis and database lookup
 #	and converts an email to the msg-count format
 #
-if [ "x$1" = "x-?" ] || [ "x$1" = "x-h" ]; then
+# $Id$ 
+
+if [ "$1" = "-?" ] || [ "$1" = "-h" ]; then
     cat <<EOT
 NAME
   msg-count.sh - lexical analysis and database lookup for an email message
