@@ -196,12 +196,17 @@ token_t get_token(void)
 		return (cls);
 	    }
 	    break;
+
 	case NONE:		/* nothing to do */
 	    break;
+
 	case MSG_COUNT_LINE:
 	    msg_count_file = true;
+	    header_line_markup = false;
 	    lexer = &msg_count_lexer;
 	    reader_more = msgcount_more;
+	    continue;
+
 	case BOGO_LEX_LINE:
 	    done = true;
 	    break;
