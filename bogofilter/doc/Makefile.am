@@ -31,6 +31,7 @@ EXTRA_DIST = \
 	     bogofilter-SA-2002-01 bogofilter-SA-2004-01 \
 	     integrating-with-postfix \
 	     integrating-with-qmail \
+	     programmer/OS2/configure.os2 \
 	     programmer/README.freebsd programmer/README.hp-ux \
 	     programmer/README.RISC-OS \
 	     programmer/RISC-OS/src/Makefile \
