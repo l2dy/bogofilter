@@ -465,7 +465,7 @@ static void help(void)
 {
     usage();
     (void)fprintf(stderr,
-		  "\t  -h    - print this help message.\n"
+		  "\t  -h      - print this help message.\n"
 		  "\t  -C      - don't read standard config files.\n"
 		  "\t  -c file - read specified config file.\n"
 		  "\t  -D      - don't read a wordlist file.\n"
@@ -531,6 +531,12 @@ static int process_args(int argc, char **argv)
 	}
 	else
 	    filelist_add( (run_type == REG_GOOD) ? ham_files : spam_files, arg);
+    }
+
+    if (spam_files->count == 0 || ham_files->count == 0) {
+	fprintf(stderr, 
+		"Bogotune needs both non-spam and spam messages sets for its testing.\n");
+	exit(EX_ERROR);
     }
 
     return count;
