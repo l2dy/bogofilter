@@ -230,7 +230,7 @@ static int words_from_list(const char *db_file, int argc, char **argv)
     return rv;
 }
 
-static int words_from_path(const char *directory, int argc, char **argv, bool show_probability)
+static int words_from_path(const char *dir, int argc, char **argv, bool show_probability)
 {
     dbh_t *dbh_good;
     dbh_t *dbh_spam;
@@ -243,11 +243,11 @@ static int words_from_path(const char *directory, int argc, char **argv, bool sh
     const char *head_format = !show_probability ? "%-20s %6s %6s\n"   : "%-20s %6s  %6s  %6s  %6s\n";
     const char *data_format = !show_probability ? "%-20s %6ld %6ld\n" : "%-20s %6ld  %6ld  %f  %f\n";
 
-    build_path(filepath, PATH_LEN, directory, GOODFILE);
+    build_path(filepath, PATH_LEN, dir, GOODFILE);
     if ((dbh_good = db_open_and_lock_file(filepath, GOODFILE, DB_READ)) == NULL)
 	return 2;
 
-    build_path(filepath, PATH_LEN, directory, SPAMFILE);
+    build_path(filepath, PATH_LEN, dir, SPAMFILE);
     if ((dbh_spam = db_open_and_lock_file(filepath, SPAMFILE, DB_READ)) == NULL)
 	return 2;
 
