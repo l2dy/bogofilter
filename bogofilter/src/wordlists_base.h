@@ -31,6 +31,7 @@ struct wordlist_s
 
 void init_wordlist(const char* name, const char* path,
 		   int override, WL_TYPE type);
+void display_wordlists(void);
 
 void free_wordlists(void);
 
