@@ -18,6 +18,16 @@ is in the RELEASE.NOTES files.  Read them!!
 	  t.bogodir failure seen, for instance, on Solaris, particularly with
 	  -D and redirected output.
 
+	2004-10-19
+
+	* bogofilter will now properly exit with code 3 when encountering write
+	  errors in pass-through mode. It would use the wrong code, 2, since
+	  the introduction of the "unsure" exit code.
+
+	* Properly flush existing data before changing I/O buffer size. Fixes
+	  t.bogodir failure seen, for instance, on Solaris, particularly with
+	  -D and redirected output.
+
 	2004-10-15
 
 	* Limit bogotune's scanning to rx values between 0.4 and 0.6.
