@@ -249,15 +249,18 @@ French</a>
 
     <p> "Training to exhaustion" is repeating training on error, with
     the same message corpus, until no errors remain.  This has worked
-    well in some tests, but may be risky: First, registering messages
-    different numbers of times makes the distribution of token scores
-    in the training database differ from the distribution in the input
-    messages; this violates a basic assumption of Bayesian
-    classification, and may lead to unpredictable results.  Second,
-    tokens that appear more or less equally in spam and nonspam may
+    well in some tests, but may be risky.</p>
+
+    <p>Registering messages different numbers of times changes the
+    distribution of token scores in the training database so that it's
+    different from the distribution in the input messages. This
+    violates a basic assumption of Bayesian classification, and may
+    lead to unpredictable results.</p>
+
+    <p>Tokens that appear more or less equally in spam and nonspam may
     wrongly score highly in one category or the other, if they happen
-    to occur in messages of one type that are registered many times;
-    such effects should be transient, but may degrade accuracy while
+    to occur in messages of one type that are registered many times.
+    Such effects should be transient, but may degrade accuracy while
     they last.
     </p>
 
@@ -402,18 +405,23 @@ French</a>
     updates the wordlists after scoring each message. As bogofilter
     sometimes misclassifies a message, this method has the drawback
     that the training database is degraded with erroneous entries; you
-    then need to review and correct it at frequent intervals. An
-    alternative strategy, based on method 4 in the previous section,
-    is the following: Periodically take blocks of messages and use the
-    scripts in method 4 above to classify them. Then manually review
-    the good, bad and unsure files, correct any errors, and split the
-    unsures into spam and nonspam.  Until you have accumulated some
-    10,000 spam and 10,000 nonspam in your training database, train
-    with the good, the bad, and the separated errors and unsures;
-    thereafter, train with only the separated and unsures, discarding
-    the messages that bogofilter already classifies correctly.  This
-    method is likely to give a near-optimal discrimination power with
-    the minimum number of messages processed.</p>
+    then need to review and correct it at frequent
+    intervals. Correction can be done using <code>-S</code> to remove
+    spam messages from the database and by using <code>-N</code> to
+    remove ham messages.</p>
+
+    <p>An alternative strategy, based on method 4 in the previous
+    section, is the following: Periodically take blocks of messages
+    and use the scripts in method 4 above to classify them. Then
+    manually review the good, bad and unsure files, correct any
+    errors, and split the unsures into spam and nonspam.  Until you
+    have accumulated some 10,000 spam and 10,000 nonspam in your
+    training database, train with the good, the bad, and the separated
+    errors and unsures; thereafter, train with only the separated and
+    unsures, discarding the messages that bogofilter already
+    classifies correctly.  This method is likely to give a
+    near-optimal discrimination power with the minimum number of
+    messages processed.</p>
 
     <p>Note that you should periodically run:</p>
 
@@ -802,7 +810,8 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
     <p>Likely the return codes are being reformatted by waitpid(2).
     In C use WEXITSTATUS(status) in sys/wait.h, or comparable macro,
     to get the correct value.  In Perl you can just use
-    'system("bogofilter $input")%256'.</p>
+    'system("bogofilter $input") >> 8.  If you want more info, run
+    <code>"man waitpid"</code>.</p>
 
     <hr>
 
