@@ -102,10 +102,8 @@ enum e_verbosity {
     SCORE_DETAIL	/* verbosity level for printing scores	*/
 };
 
-extern double round(double x);
-
-#define	MOD(n,m)	((n) - ((int)((n)/(m)))*(m))
-#define	ROUND(m,n)	round((m)*(n))/(n)
+#define	MOD(n,m)	((n) - (floor((n)/(m)))*(m))
+#define	ROUND(m,n)	floor((m)*(n)+.5)/(n)
 
 #define	MIN(n)		((n)/60)
 #define SECONDS(n)	((n) - MIN(n)*60)
