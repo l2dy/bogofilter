@@ -13,7 +13,7 @@
 
 #### ALGORITHM
 #
-#	specify spamitity algorithm
+#	specify spamicity algorithm
 
 algorithm=graham
 #algorithm=robinson
