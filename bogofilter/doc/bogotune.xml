@@ -140,4 +140,9 @@
        the bogofilter project page</ulink>.
     </para>
   </refsect1>
+
+<refsect1 id="also">
+    <title>SEE ALSO </title>
+    <para>bogofilter(1), bogolexer(1), bogoupgrade(1), bogoutil(1)</para>
+</refsect1>
 </refentry>

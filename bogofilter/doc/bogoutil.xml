@@ -184,9 +184,15 @@
     <para>Gyepi Sam <email>gyepi@praxis-sw.com</email>.</para>
     <para>Matthias Andree <email>matthias.andree@gmx.de</email>.</para>
     <para>David Relson <email>relson@osagesoftware.com</email>.</para>
+
   <para>
       For updates, see <ulink url="http://bogofilter.sourceforge.net/">
 	  the bogofilter project page</ulink>.
   </para>
   </refsect1>
+
+<refsect1 id="also">
+    <title>SEE ALSO </title>
+    <para>bogofilter(1), bogolexer(1), bogotune(1), bogoupgrade(1)</para>
+</refsect1>
 </refentry>

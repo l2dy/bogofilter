@@ -652,4 +652,9 @@ Greg Louis <email>glouis@dynamicro.on.ca</email>.
     <para>For updates, see the <ulink url="http://bogofilter.sourceforge.net/">
     bogofilter project page</ulink>.</para>
 </refsect1>
+
+<refsect1 id="also">
+    <title>SEE ALSO </title>
+    <para>bogolexer(1), bogotune(1), bogoupgrade(1), bogoutil(1)</para>
+</refsect1>
 </refentry>
