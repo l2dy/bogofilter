@@ -30,7 +30,8 @@
   <arg choice='opt'>-v</arg>
   <arg choice='opt'>-V</arg>
   <arg choice='opt'>-x <replaceable>flags</replaceable></arg>
-  <arg choice='opt'>-q</arg>
+  <arg choice='opt'>-c <replaceable>filename</replaceable></arg>
+  <arg choice='opt'>-C</arg>
 </cmdsynopsis>
 
 </refsynopsisdiv>
@@ -154,8 +155,8 @@ respectively.</para>
 
 <para>The <option>-u</option> (update) option tells 
 <application>bogofilter</application>
-to update the appropriate wordfile automatically.  
-If the text presented on standard input is spam, the spam wordfile will be updated.  
+to update the appropriate wordfile automatically.  If the text
+presented on standard input is spam, the spam wordfile will be updated.  
 If the text is not spam, the good wordfile will be updated.
 Effectively this option runs <application>bogofilter</application> 
 with the '-s' or '-n' flag, as appropriate.
@@ -176,11 +177,11 @@ of the calculation method.  This is the default unless the
 to the calculation method.  This is automatically enabled when the
 <option>-R</option> option is specified.</para>
 
-<para>The <option>-R</option><optional><replaceable>filename</replaceable></optional> option tells
-<application>bogofilter</application> to produce an R data frame in
-text form to the filename specified (or stdout, if none).  See the 
-section on integration with R, below, for further detail.  Option 
-<option>-R</option> implies option <option>-r</option>.</para>
+<para>The <option>-R</option> option tells
+<application>bogofilter</application> to output an R data frame in
+text form to stdout.  See the section on integration with R, below,
+for further detail.  Option <option>-R</option> implies option
+<option>-r</option>.</para>
 
 <para>The <option>-V</option> option prints the version number and 
 exits.</para>
@@ -188,7 +189,11 @@ exits.</para>
 <para>The <option>-x</option> option allows setting of debug classes for 
 printing debug messages.</para>
 
-<para>The <option>-q</option> option prevents bogofilter from reading
+<para>The <option>-c</option><replaceable>filename</replaceable> option
+tells <application>bogofilter</application> to read the config file named.
+</para>
+
+<para>The <option>-C</option> option prevents bogofilter from reading
     configuration files.</para>
 </refsect1>
 
