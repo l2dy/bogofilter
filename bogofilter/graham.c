@@ -73,7 +73,7 @@ static bogostat_t bogostats;
 
 static	void	gra_initialize_constants(void);
 static	double	gra_bogofilter(wordhash_t *wordhash, FILE *fp); /*@globals errno@*/
-static	double	gra_compute_spamicity(bogostat_t *bogostats, FILE *fp); /*@globals errno@*/
+static	double	gra_compute_spamicity(bogostat_t *bs, FILE *fp); /*@globals errno@*/
 static	void	gra_print_bogostats(FILE *fp, double spamicity);
 static	double	gra_spamicity(void);
 static	rc_t	gra_status(void);
