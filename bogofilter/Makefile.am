@@ -3,7 +3,7 @@
 # foreign: don't insist on ChangeLog
 # 1.6: minimum version
 AUTOMAKE_OPTIONS = foreign 1.6
-SUBDIRS = . tests
+SUBDIRS = . tests doc contrib
 
 # what to build
 bin_PROGRAMS = bogofilter bogoutil bogolexer
@@ -45,7 +45,6 @@ EXTRA_DIST = $(man_MANS) \
 	     bogofilter.xml bogoutil.xml bogoupgrade.xml bogolexer.xml \
 	     bogofilter.spec bogofilter.spec.in \
 	     bogoupgrade bogo.R \
-	     doc/integrating-with-qmail contrib/bogofilter-qfe \
 	     version.sh
 #
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
@@ -61,6 +60,13 @@ $(srcdir)/version.h:	version.sh $(VERSION_FROM)
 .xml.1:
 	xmlto man $<
 
-.PHONY: rpm
+.PHONY: rpm cvs-check
+
 rpm:	    dist $(distdir).tar.gz
 	rpm -ta $(distdir).tar.gz
+
+cvs-check:
+	rm -rf $(PACKAGE)-$(VERSION)-export
+	cvs export -rHEAD -d $(PACKAGE)-$(VERSION)-export $(PACKAGE)
+	cd $(PACKAGE)-$(VERSION)-export && autoreconf -i -f -s \
+	&& ./configure && make distcheck
