@@ -71,9 +71,8 @@ done
 
 rm -f ${TMPDIR}/bogofilter.cf
 
-pfx=$srcdir/t.systest.d/outputs
-for i in $pfx/*v ; do
-    # SunOS /bin/sh does not like ${i##$pfx/}
-    j=`echo $i | sed "s'^$pfx/''"`
+REFDIR=$srcdir/t.systest.d/outputs
+for i in $REFDIR/*v ; do
+    j=`basename $i`
     cmp $i ${TMPDIR}/tests/$j
 done
