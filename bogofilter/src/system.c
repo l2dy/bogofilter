@@ -24,10 +24,15 @@ const char *const system_config_file = "<Bogofilter$Dir>.bogofilter/cf";
 
 bool bf_abspath(const char *path)
 {
-#ifndef __riscos__
-    return (*path == DIRSEP_C);
+#if	!defined(__OS2__) && !defined(__riscos__)
+    return (bool) (*path == DIRSEP_C);
 #else
-    return (strchr(path, ':') || strchr(path, '$'));
+  #ifdef	__OS2__
+    return (bool) strchr(path, ':');
+  #endif
+  #ifdef	__riscos__
+    return (bool) (strchr(path, ':') || strchr(path, '$'));
+  #endif
 #endif
 }
 
