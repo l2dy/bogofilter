@@ -7,8 +7,14 @@ bogofilter.html
 bogofilter.pdf
 bogofilter-*.tar.gz
 bogofilter.spec
+bogolexer
+bogolexer.1
+bogolexer.html
+bogolexer.pdf
 bogoutil
 bogoutil.1
+bogoutil.html
+bogoutil.pdf
 config.h
 config.in
 config.log
@@ -16,7 +22,6 @@ config.cache
 config.status
 configure
 cscope.out
-lexertest
 lexer.c
 Makefile
 Makefile.in

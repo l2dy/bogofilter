@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<refentry id="bogolexer.1">
+  <refmeta>
+    <refentrytitle>bogolexer</refentrytitle>
+    <manvolnum>1</manvolnum>
+  </refmeta>
+  <refnamediv id="name">
+    <refname>bogolexer</refname>
+    <refpurpose>Utility program for separating email messages into tokens</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv id="synopsis">
+    <cmdsynopsis>
+      <command>bogofilter</command>
+        <arg choice='opt'>-p</arg>
+        <arg choice='opt'>-q</arg>
+        <arg choice='opt'>-h</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1 id="description">
+    <title>DESCRIPTION</title>
+    <para><application>Bogolexer</application> is part of the bogofilter Bayesian spam filter package.</para>
+    <para>It is used to separate messages into tokens and to test new versions of the lexer.l code.</para>
+  </refsect1>
+  <refsect1 id="options">
+    <title>OPTIONS</title>
+    <para>
+       The <option>-p</option> option tells <application>bogolexer</application> to
+       print just the tokens read from stdin, withouth any extra messages.
+    </para>
+    <para>
+       The <option>-q</option> option tells <application>bogolexer</application> to print a token count, withouth printing the actual tokens.
+    </para>
+    <para>The <option>-h</option> option prints the help message and exits.</para>
+  </refsect1>
+
+  <refsect1 id="author">
+    <title>AUTHOR</title>
+    <para>The bogofilter developer team.</para>
+    <para>
+       For updates, see <ulink url="http://bogofilter.sourceforge.net/">
+       the bogofilter project page</ulink>.
+    </para>
+  </refsect1>
+</refentry>

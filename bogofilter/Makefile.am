@@ -35,7 +35,7 @@ bogoutil_SOURCES = bogoutil.c \
 # what to distribute
 EXTRA_DIST = $(man1_MANS) \
 	     bogofilter-faq.html README.hp-ux UPGRADE \
-	     bogofilter.xml bogoutil.xml bogoupgrade.xml \
+	     bogofilter.xml bogoutil.xml bogoupgrade.xml bogolexer.xml \
 	     bogofilter.spec bogofilter.spec.in \
 	     bogoupgrade bogo.R \
 	     doc/integrating-with-qmail contrib/bogofilter-qfe \
