@@ -29,7 +29,8 @@
 
 /* Global Variables */
 
-int yylineno;
+extern int yylineno;
+
 bool msg_header = true;
 bool have_body  = false;
 lexer_t *lexer = NULL;

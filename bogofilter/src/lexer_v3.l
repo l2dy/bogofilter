@@ -87,6 +87,18 @@
 
 static int lineno;
 
+#define	FLEX_VER(MAJ, MIN, SUB) ( MAJ * 1000 + MIN * 100 + SUB)
+
+#ifndef	YY_FLEX_SUBMINOR_VERSION
+#define	FLEX_VERSION_BF FLEX_VER(YY_FLEX_MAJOR_VERSION, YY_FLEX_MINOR_VERSION, 0)
+#else
+#define	FLEX_VERSION_BF FLEX_VER(YY_FLEX_MAJOR_VERSION, YY_FLEX_MINOR_VERSION, YY_FLEX_SUBMINOR_VERSION)
+#endif
+
+#if	FLEX_VERSION_BF != 2531
+int yylineno;
+#endif
+
 /* Function Prototypes */
 
 static word_t *yy_text(void);
@@ -409,7 +421,7 @@ static void url_char(void)
 static void yy_unput(const byte *txt, uint len)
 {
     while (len-- > 0)
-	unput(txt[len]);
+	yyunput(txt[len], yytext);
 }
 
 char yy_get_state()
