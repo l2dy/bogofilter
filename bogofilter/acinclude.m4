@@ -297,12 +297,7 @@ int main (void)
      ifelse([$2], , :, [$2])     
   else
      AC_MSG_RESULT(no)
-     if test "$GSL_CONFIG" = "no" ; then
-       echo "*** The gsl-config script installed by GSL could not be found"
-       echo "*** If GSL was installed in PREFIX, make sure PREFIX/bin is in"
-       echo "*** your path, or set the GSL_CONFIG environment variable to the"
-       echo "*** full path to gsl-config."
-     else
+     if test "$GSL_CONFIG" != "no" ; then
        if test -f conf.gsltest ; then
         :
        else
@@ -337,5 +332,3 @@ int main (void)
   AC_SUBST(GSL_LIBS)
   rm -f conf.gsltest
 ])
-
-
