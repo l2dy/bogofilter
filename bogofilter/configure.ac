@@ -309,7 +309,7 @@ AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 AC_CONFIG_FILES([Makefile \
 		bogofilter.spec \
 		contrib/Makefile doc/Makefile \
-		src/Makefile src/dcdflib/Makefile src/dcdflib/src/Makefile \
+		src/Makefile src/Makefile-static src/dcdflib/Makefile src/dcdflib/src/Makefile \
 		src/tests/Makefile src/tests/bogoutil/Makefile src/tests/bogofilter/Makefile \
 		tuning/Makefile \
 		])

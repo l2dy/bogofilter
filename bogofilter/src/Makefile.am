@@ -29,6 +29,7 @@ AM_CFLAGS = -DBOGOFILTER
 # what to build
 bin_PROGRAMS = bogofilter bogoutil bogolexer 
 bin_SCRIPTS = bogoupgrade
+
 check_PROGRAMS = debugtest configtest wordhash find_home.test \
 		 bogowordfreq fgetsl.test
 
@@ -93,7 +94,8 @@ fgetsl_test_SOURCES = fgetsl.c
 fgetsl_test_CFLAGS= -DMAIN
 
 # what to distribute
-EXTRA_DIST = bogoupgrade \
+EXTRA_DIST = Makefile-static.am \
+	     bogoupgrade \
 	     version.sh \
 	     strlcat.3 strlcpy.3
 #
