@@ -263,8 +263,9 @@ int yyinput(byte *buf, size_t max_size)
 /* input getter for the scanner */
 {
     int i, count;
-    buff_t *buff = buff_new(buf, 0, max_size);
-    count = get_decoded_line(buff);
+    buff_t buff;
+    buff_init(&buff, buf, 0, max_size);
+    count = get_decoded_line(&buff);
 
     /* do nothing if in header */
 
@@ -272,7 +273,7 @@ int yyinput(byte *buf, size_t max_size)
 	&& ! msg_header
 	&& msg_state->mime_type == MIME_TEXT_HTML)
     {
-	count = process_html_comments(buff);
+	count = process_html_comments(&buff);
     }
 
     for (i = 0; i < count; i++ )
@@ -280,8 +281,6 @@ int yyinput(byte *buf, size_t max_size)
 	byte ch = buf[i];
 	buf[i] = charset_table[ch];
     }
-    
-    buff_free(buff);
 
     return (count == -1 ? 0 : count);
 }
