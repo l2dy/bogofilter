@@ -123,6 +123,13 @@ same message as non-spam.</para>
 on standard input as non-spam and to undo a prior registration of the
 same message as spam.</para>
 
+<para>The <option>-u</option> option tells
+<application>bogofilter</application> to register the message's text 
+after classifying it as spam or non-spam.  A spam message will be registered
+on the spamlist and a non-spam message on the goodlist.  If using the
+Robinson-Fisher method and the classification is "unsure", the message will
+not be registered.</para>
+
 <para>The <option>-d</option><replaceable> dir</replaceable> option
     allows you to set the directory under which wordlists will be found
     to <replaceable>dir</replaceable>. If omitted, the default directory

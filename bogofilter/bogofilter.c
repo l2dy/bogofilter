@@ -88,8 +88,13 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
     if (xss != NULL)
         *xss = spamicity;
 
-    if (run_type == RUN_UPDATE)
-      register_words((status==RC_SPAM) ? REG_SPAM : REG_GOOD, wordhash, msgcount, wordcount);
+    if (run_type == RUN_UPDATE)		/* Note: don't register if RC_UNSURE */
+    {
+	if (status == RC_SPAM)
+	    register_words(REG_SPAM, wordhash, msgcount, wordcount);
+	if (status == RC_HAM)
+	    register_words(REG_GOOD, wordhash, msgcount, wordcount);
+    }
 
     wordhash_free(wordhash);
 
