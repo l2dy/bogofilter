@@ -565,6 +565,15 @@ static double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@
     double spamicity;
     int robn = 0;
 
+    if (robx == 0.0f)		/* if not yet set ... */
+    {
+	/* Note: .ROBX is scaled by 1000000 in the wordlist */
+	long l_robx = db_getvalue(spam_list.dbh, ".ROBX");
+
+	/* If found, unscale; else use predefined value */
+	robx = l_robx ? (double)l_robx / 1000000 : ROBX;
+    }
+
     if (Rtable || verbose)
 	rstats_init();
 
@@ -622,15 +631,6 @@ static void initialize_constants(void)
 		min_dev     = ROBINSON_MIN_DEV;
 	    if ( robs == 0.0f )			/* if not yet set ... */
 		robs = ROBS;
-	    if ( robx == 0.0f )			/* if not yet set ... */
-	    {
-		/* Note: .ROBX is scaled by 1000000 in the wordlist */
-		long l_robx = db_getvalue(spam_list.dbh, ".ROBX");
-
-		/* If found, unscale; else use predefined value */
-		robx = l_robx ? (double)l_robx / 1000000 : ROBX;
-	    }
-
 	    break;
 
 	default:
