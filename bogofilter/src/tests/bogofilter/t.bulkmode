@@ -1,0 +1,150 @@
+#!/bin/sh
+
+set -e
+
+# Note:  When run via "make check", test output files are automatically deleted.
+#	 When run from the command line, outputs files are left in directory
+#	 bulkmode.YYYYMMDD.  This is useful when something is different.
+#
+#	 ./inputs  - test inputs
+#	 ./outputs - known correct outputs
+#		     esp. bulkmode.out
+#
+#	 bulkmode.YYYYMMDD:
+#		tests   - directory containing individual output files
+
+: ${srcdir=.}
+relpath="`pwd`/../.."
+NODB=1 . ${srcdir}/../t.frame
+
+verbose=0
+if [ "$1" = "-v" ]; then
+    verbose=1
+fi
+
+V="v"	# verbosity level
+
+BOGOFILTER="$VAL ${relpath}/bogofilter"
+BOGOUTIL="$VAL ${relpath}/bogoutil"
+BOGOLEX_SH="$VAL ${relpath}/bogolex.sh"
+SYSTEST="${srcdir}"
+
+map_rc()
+{
+    (
+	set +e
+	eval "$@"
+	a=$?
+	[ $a -eq 0 ] && exit 0
+	[ $a -eq 1 ] && exit 0
+	exit $a
+    )
+}
+
+run_single_test()
+{
+    id="$1"
+    fil="$2"
+    ver="$3"
+    OUT="${TMPDIR}/tests/msg.$fil.$mth.$ver"
+    OPTS="-$mth -t -$ver $CFG"
+    map_rc $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt >${TMPDIR}/tests-$mth 
+    sed s/,.version=.*// < ${TMPDIR}/tests-$mth > $OUT
+}
+
+run_batch_test()
+{
+    id="$1"
+    fil="$2"
+    ver="$3"
+    OUT="${TMPDIR}/tests/msg.$fil.$mth.$ver"
+    OPTS="-$mth -t -$ver $CFG"
+    map_rc $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt >${TMPDIR}/tests-$mth 
+    sed s/,.version=.*// < ${TMPDIR}/tests-$mth > $OUT
+}
+
+mth="f"
+BOGOFILTER_DIR="${TMPDIR}"
+CFG="-c ${TMPDIR}/cfg.$mth -y 0"
+export BOGOFILTER_DIR
+if [   -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
+mkdir -p $BOGOFILTER_DIR
+$BOGOFILTER -$mth $CFG -s < ${SYSTEST}/inputs/spam.mbx
+$BOGOFILTER -$mth $CFG -n < ${SYSTEST}/inputs/good.mbx
+#$BOGOUTIL -d $BOGOFILTER_DIR/spamlist.db > $BOGOFILTER_DIR/spamlist.txt
+#$BOGOUTIL -d $BOGOFILTER_DIR/goodlist.db > $BOGOFILTER_DIR/goodlist.txt
+[ $verbose -gt 0 ] && $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT
+
+export BOGOFILTER_DIR="/var/lib/bogofilter"
+export db="$BOGOFILTER_DIR"
+
+CFG="${TMPDIR}/test.cf"
+OPT="-t -v"
+pattern="inputs/msg.?.txt"
+
+# Fisher tristate
+
+cat <<EOF > $CFG
+robx=0.415
+min_dev=0.1
+ham_cutoff=0.1
+spam_cutoff=0.95
+terse_format = %1.1c %d
+spamicity_tags = S,h,u
+spamicity_formats = %6.2e %6.2e %0.6f
+strict_check=no
+block_on_subnets=yes
+tag_header_lines=yes
+replace_nonascii_characters=yes
+EOF
+
+#
+# run tests for msg.[1-8].txt
+#
+NAME="bulk-single"
+( for f in $pattern ; do echo $f `$BOGOFILTER -c $CFG $OPT -I $f` ; done ) > ${TMPDIR}/$NAME.out
+
+NAME="bulk-stdin"
+ls $pattern | $BOGOFILTER -c $CFG $OPT -b > ${TMPDIR}/$NAME.out
+
+NAME="bulk-linend"
+$BOGOFILTER -c $CFG $OPT -B `ls $pattern` > ${TMPDIR}/$NAME.out
+
+NAME="bogolex-single"
+for f in $pattern ; do 
+    map_rc "$BOGOLEX_SH -c $CFG < $f | $BOGOFILTER -c $CFG $OPT >> ${TMPDIR}/$NAME.out"
+done
+
+NAME="bogolex-batch"
+cat /dev/null > ${TMPDIR}/test.bl
+for f in $pattern ; do 
+    map_rc $BOGOLEX_SH -c $CFG < $f >> ${TMPDIR}/test.bl
+done
+
+map_rc $BOGOFILTER -c $CFG $OPT < ${TMPDIR}/test.bl > ${TMPDIR}/$NAME.out
+
+[ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
+
+OUTPUTS=${SYSTEST}/outputs
+
+CORRECT="${OUTPUTS}/bulkmode.out"
+
+for OUT in ${TMPDIR}/bulk-*.out ; do
+    if  [ $verbose -eq 0 ]; then
+	cmp $CORRECT $OUT
+    else
+	[ `uname -s` = "Linux" ] && OPTS="-u -s --brief"
+	diff $OPTS $CORRECT $OUT
+    fi
+done
+
+CORRECT="${OUTPUTS}/bogolex.out"
+
+for OUT in ${TMPDIR}/bogolex-*.out ; do
+    if  [ $verbose -eq 0 ]; then
+	cmp $CORRECT $OUT
+    else
+	[ `uname -s` = "Linux" ] && OPTS="-u -s --brief"
+	diff $OPTS $CORRECT $OUT
+    fi
+done
