@@ -1,0 +1,6 @@
+Please note this important bug in bogofilter -p mode:
+
+bogofilter will currently strip text that matches its spam header
+(X-Bogosity by default) ANYWHERE, not just in the header.
+
+It's a known bug with no known workaround, scheduled to be fixed after 0.8.0.

@@ -24,7 +24,7 @@ void set_debug_mask( char *mask )
     char *maskbits = MASKNAMES;
     for (ch = *mask; ch != '\0'; ch = *++mask)
     {
-	char *pos = index(maskbits, ch);
+	char *pos = strchr(maskbits, ch);
 	if (pos != NULL)
 	    debug_mask |= ( 1 << (pos-maskbits) );
 	else

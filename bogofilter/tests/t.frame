@@ -1,7 +1,8 @@
 # testing framework for /bin/sh
 
+set +e
+TMPDIR=`mktemp -d ./checks.$$.XXXXXX` || exit 77
 set -e
-TMPDIR=`mktemp -d ./checks.$$.XXXXXX`
 trap "rm -r ${TMPDIR}" 0
 BOGOFILTER_DIR=$TMPDIR
 export BOGOFILTER_DIR
