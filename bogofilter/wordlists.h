@@ -24,8 +24,8 @@ struct wordlist_s
 extern wordlist_t *word_lists;
 extern wordlist_t good_list, spam_list;
 
-int setup_lists(const char* directory, dbmode_t);
-void *open_wordlist( const char *name, const char *filepath, dbmode_t );
+int setup_lists(const char* directory);
+void *open_wordlist( const char *name, const char *filepath);
 void close_lists(void);
 
 #endif	/* HAVE_WORDLISTS_H */

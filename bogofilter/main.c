@@ -201,7 +201,7 @@ int main(int argc, char **argv)
 
     if (check_directory(directory)) exit(2);
 
-    setup_lists(directory, DB_WRITE);
+    setup_lists(directory);
 
     if (run_type == RUN_NORMAL || run_type == RUN_UPDATE)
     {
