@@ -51,6 +51,10 @@ const char *stats_prefix;
 
 run_t run_type = RUN_NORMAL; 
 
+double	min_dev = 0.0f;
+double	robx = 0.0f;
+double	robs = 0.0f;
+
 int thresh_index = 0;
 double thresh_stats = 0.0f;
 double thresh_rtable = 0.0f;
@@ -79,6 +83,9 @@ static int dummy;
 
 static const ArgDefinition ArgDefList[] =
 {
+    { "min_dev",	  CP_DOUBLE,	{ (void *)&min_dev } },
+    { "robx",		  CP_DOUBLE,	{ (void *)&robx } },
+    { "robs",		  CP_DOUBLE,	{ (void *)&robs } },
     { "thresh_index",	  CP_INTEGER,	{ (void *)&thresh_index } },
     { "thresh_rtable",	  CP_DOUBLE,	{ (void *)&thresh_rtable } },
     { "thresh_stats",	  CP_DOUBLE,	{ (void *)&thresh_stats } },

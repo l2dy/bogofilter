@@ -56,9 +56,11 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #define GRAHAM_MAX_REPEATS	4	/* cap on word frequency per message */
 #define ROBINSON_MAX_REPEATS	1	/* cap on word frequency per message */
 
-double min_dev;
+int max_repeats;
 double spam_cutoff;
-int    max_repeats;
+extern double min_dev;
+extern double robs;
+extern double robx;
 
 #define PLURAL(count) ((count == 1) ? "" : "s")
 
@@ -563,12 +565,6 @@ static double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@
     double spamicity;
     int robn = 0;
 
-    /* Note: .ROBX is scaled by 1000000 in the wordlist */
-    long l_robx = db_getvalue(spam_list.dbh, ".ROBX");
-
-    /* If found, unscale; else use predefined value */
-    double robx = l_robx ? (double)l_robx / 1000000 : ROBX;
-
     if (Rtable || verbose)
 	rstats_init();
 
@@ -612,16 +608,29 @@ static void initialize_constants(void)
 {
     switch(algorithm) {
 	case AL_GRAHAM:
-	    min_dev     = GRAHAM_MIN_DEV;
 	    spam_cutoff = GRAHAM_SPAM_CUTOFF;
 	    max_repeats = GRAHAM_MAX_REPEATS;
+	    if ( min_dev == 0.0f )		/* if not yet set ... */
+		min_dev     = GRAHAM_MIN_DEV;
 	    break;
 
 	case AL_ROBINSON:
-	    min_dev     = ROBINSON_MIN_DEV;
 	    spam_cutoff = ROBINSON_SPAM_CUTOFF;
 	    max_repeats = ROBINSON_MAX_REPEATS;
 	    scalefactor = compute_scale();
+	    if ( min_dev == 0.0f )		/* if not yet set ... */
+		min_dev     = ROBINSON_MIN_DEV;
+	    if ( robs == 0.0f )			/* if not yet set ... */
+		robs = ROBS;
+	    if ( robx == 0.0f )			/* if not yet set ... */
+	    {
+		/* Note: .ROBX is scaled by 1000000 in the wordlist */
+		long l_robx = db_getvalue(spam_list.dbh, ".ROBX");
+
+		/* If found, unscale; else use predefined value */
+		robx = l_robx ? (double)l_robx / 1000000 : ROBX;
+	    }
+
 	    break;
 
 	default:
