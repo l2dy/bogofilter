@@ -14,6 +14,10 @@ AUTHOR:
 
 #include "qp.h"
 
+/* Local Variables */
+
+static byte qp_xlate[256];
+
 static int hex_to_bin(byte c) {
     switch(c) {
 	case '0': return 0;
@@ -35,6 +39,8 @@ static int hex_to_bin(byte c) {
 	default: return -1;
     }
 }
+
+/* Function Definitions  */
 
 size_t qp_decode(word_t *word)
 {
@@ -62,4 +68,45 @@ size_t qp_decode(word_t *word)
     }
     *d = '\0';
     return d - word->text;
+}
+
+/* rfc2047 - QP    [!->@-~]+
+*/
+
+static void qp_init(void)
+{
+    size_t i;
+    static bool first = true;
+
+    if (!first)
+	return;
+    first = false;
+
+    for (i = '!'; i <= '~'; i += 1) {
+	qp_xlate[i] = (byte) i;
+    }
+
+    qp_xlate['?'] = 0;
+    qp_xlate[' '] = ' ';
+    qp_xlate['_'] = ' ';
+
+    return;
+}
+
+bool qp_validate(word_t *word)
+{
+    size_t i;
+
+    qp_init();
+
+    for (i = 0; i < word->leng; i += 1) {
+	byte b = word->text[i];
+	byte v = qp_xlate[b];
+	if (v == 0)
+	    return false;
+	else
+	    word->text[i] = v;
+    }
+
+    return true;
 }

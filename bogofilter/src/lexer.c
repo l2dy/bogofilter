@@ -354,16 +354,13 @@ size_t decode_text(word_t *w)
 
 	switch (tolower(typ[0])) {		/* ... encoding type */
 	case 'b':
-	    len = base64_decode(&n);		/* decode base64 */
+	    if (base64_validate(&n))
+		len = base64_decode(&n);	/* decode base64 */
 	    break;
 	case 'q':
 	{
-	    size_t i;
-	    for (i = 0; i < len; i += 1) {
-		if (n.text[i] == '_')
-		    n.text[i] = ' ';
-	    }
-	    len = qp_decode(&n);		/* decode quoted-printable */
+	    if (qp_validate(&n))
+		len = qp_decode(&n);		/* decode quoted-printable */
 	    break;
 	}
 	}

@@ -150,7 +150,14 @@ QP		[!->@-~]+
 		   ; headers", section 5)
 */
 
-ENCODED_WORD	=\?{CHARSET}\?(b\?{BASE64}|q\?{QP})\?\=
+/* 09/01/03
+  Using "^[\?]" in the pattern and validating the charset in 'C'
+  reduces executable size by approx 290k.
+  new: ENCODED_WORD =\?{CHARSET}\?[bq]\?[^\?]*\?\=
+  old: ENCODED_WORD =\?{CHARSET}\?(b\?{BASE64}|q\?{QP})\?\=
+*/
+
+ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^\?]*\?\=
 ENCODED_TOKEN	{BOGOLEX_TOKEN}?({ENCODED_WORD}[ \t]+)*{ENCODED_WORD}
 
 DOLLARS		[0-9]+

@@ -14,34 +14,42 @@ AUTHOR:
 
 #include "base64.h"
 
+/* Local Variables */
+
 static byte base64_charset[] = {
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" };
 static byte base64_xlate[256];
 static const byte base64_invalid = 0x7F;
 
+/* Function Definitions  */
+
 static void base64_init(void)
 {
     size_t i;
+    static bool first = true;
+
+    if (!first)
+	return;
+    first = false;
+
     for (i = 0; i < sizeof(base64_charset); i += 1) {
 	byte c = base64_charset[i];
 	base64_xlate[c] = (byte) i;
     }
+
     base64_xlate['='] = base64_invalid;
+
     return;
 }
 
 size_t base64_decode(word_t *word)
 {
-    static int table_set_up = 0;
     size_t count = 0;
     size_t size = word->leng;
     byte *s = word->text;		/* src */
     byte *d = word->text;		/* dst */
 
-    if (!table_set_up) {
-	table_set_up ++;
-	base64_init();
-    }
+    base64_init();
 
     while (size)
     {
@@ -52,7 +60,8 @@ size_t base64_decode(word_t *word)
 	    size--;
 	    s++;
 	}
-	if (size < 4) break;
+	if (size < 4)
+	    break;
 	for (i = 0; i < 4 && (size_t)i < size; i += 1) {
 	    byte c = *s++;
 	    byte t = base64_xlate[c];
@@ -76,4 +85,23 @@ size_t base64_decode(word_t *word)
     }
     *d = '\0';
     return count;
+}
+
+/* rfc2047 - BASE64    [0-9a-zA-Z/+=]+
+*/
+
+bool base64_validate(word_t *word)
+{
+    size_t i;
+
+    base64_init();
+
+    for (i = 0; i < word->leng; i += 1) {
+	byte b = word->text[i];
+	byte v = base64_xlate[b];
+	if (b != 'A' && v == 0)
+	    return false;
+    }
+
+    return true;
 }
