@@ -12,6 +12,14 @@ int main(int argc, char **argv)
 {
     int	t, quiet = 0;
 
+    if (argc >= 2 && argv[1] && 0 == strcmp(argv[1], "-h")) {
+	puts("Usage: lexertest [options]");
+	puts("Options are:");
+	puts("  -h    help, this output.");
+	puts("  -q    quiet mode, no tokens are printed.");
+	exit(0);
+    }
+
     if (argc >= 2 && argv[1] && 0 == strcmp(argv[1], "-q")) quiet=1;
 
     if (quiet) {
