@@ -16,9 +16,13 @@ extern YYYYMMDD today;		/* date as YYYYMMDD */
 extern	int      thresh_count;
 extern	YYYYMMDD thresh_date;
 extern	size_t   size_min, size_max;
+extern	bool     datestamp_tokens;
 extern	bool     replace_nonascii_characters;
 
 /* Function Prototypes */
+void maintain_wordlists(void);
+int  maintain_wordlist_file(const char *db_file);
+
 bool keep_date(int dat);
 bool keep_count(int cnt);
 bool keep_size(size_t siz);
