@@ -264,7 +264,7 @@ width	;
 ^From\ 					{return(FROM);}
 ^Date:.*|Delivery-Date:.*			;
 ^Message-ID:.*					;
-^{BASE64}+$					;
+^{BASE64}+\r?$					;
 ^\tid\ .*					;
 
 E?SMTP\ id\ .*					;
