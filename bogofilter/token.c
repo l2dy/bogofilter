@@ -140,9 +140,10 @@ token_t get_token(void)
 	    continue;
 
 	case BOUNDARY:	/* don't return boundary tokens to the user */
-	    change_lexer_state(LEXER_HEAD);
-	    if (yyleng >= 4)
+	    if ( mime_is_boundary(yytext, yyleng)){
+    	    	change_lexer_state(LEXER_HEAD);
 		continue;
+	    }
 
 	case TOKEN:	/* ignore anything when not reading text MIME types */
 	      if (html_tag_level > 0 || html_comment_level > 0)

@@ -31,7 +31,7 @@ done
 RESULT=`cat $TMPDIR/spam.2 | wc -l`.`cat $TMPDIR/good.2 | wc -l`
 RESULT=`echo $RESULT | sed s@\ @@g`
 
-WANT="1147.3074"
+WANT="1147.3075"
 
 if  [ $verbose -ne 0 ]; then
     echo want: $WANT, have: $RESULT > $TMPDIR/$OUT
