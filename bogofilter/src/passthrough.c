@@ -43,15 +43,20 @@ static void cleanup_exit(ex_t exitcode, int killfiles) {
     exit(exitcode);
 }
 
+#define	ISSPACE(ch)	(isspace(ch) || (ch == '\b'))
+
 /* check for non-empty blank line */
 static bool is_blank_line(const char *line, size_t len)
 {
-    while (len > 0) {
-	if (*line != '\b' && (have_body || !isspace((unsigned char)*line)))
+    if (have_body)
+	return len == 0;
+
+    while (len-- > 0) {
+	byte ch = *line++;
+	if (!ISSPACE(ch))
 	    return false;
-	len -= 1;
-	line++;
     }
+
     return true;
 }
 
