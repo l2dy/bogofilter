@@ -36,7 +36,6 @@ int	Rtable = 0;			/* '-R' */
 bool	terse;				/* '-t' */
 int	test = 0;			/* '-T' */
 int	verbose;			/* '-v' */
-wl_t	wl_mode = WL_M_UNKNOWN;		/* '-W' */
 
 /* config file options */
 int	max_repeats;

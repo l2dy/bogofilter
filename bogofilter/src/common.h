@@ -98,8 +98,6 @@ typedef enum bulk_e {
     B_STDIN
 } bulk_t;
 
-#define	WL_M_DEFAULT   WL_M_COMBINED
-
 typedef enum wl_e { WL_M_UNKNOWN ='U',
 		    WL_M_SEPARATE='S',
 		    WL_M_COMBINED='C' } wl_t;

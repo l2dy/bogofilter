@@ -24,6 +24,11 @@
 #include "xmalloc.h"
 #include "xstrdup.h"
 
+/* Default wordlist mode is single wordlist (named wordlist.db) 
+   which contains both ham and spam tokens */
+wl_t	wl_default = WL_M_COMBINED;	
+wl_t	wl_mode    = WL_M_UNKNOWN;	/* '-W' flag */
+
 #define	MIN_SLEEP	0.5e+3		/* .5 milliseconds */
 #define	MAX_SLEEP	2.0e+6		/* 2 seconds */
 
@@ -185,18 +190,21 @@ void set_wordlist_mode(void **dbhp, const char *filepath, dbmode_t dbmode)
 {
     if (wl_mode == WL_M_UNKNOWN) {
 	void *dbh = NULL;
-	wl_mode = WL_M_DEFAULT;
 
 	if (dbh == NULL) {
 	    dbh = db_open(filepath, cCombined, aCombined, dbmode);
 	    if (dbh == NULL)
 		wl_mode = WL_M_COMBINED;
 	}
+
 	if (dbh == NULL) {
 	    dbh = db_open(filepath, cSeparate, aSeparate, dbmode);
 	    if (dbh == NULL)
 		wl_mode = WL_M_SEPARATE;
 	}
+
+	if (dbh == NULL)
+	    wl_mode = wl_default;
 
 	if (dbhp != NULL)
 	    *dbhp = dbh;
