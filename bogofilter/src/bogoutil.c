@@ -31,6 +31,7 @@ AUTHORS:
 #include "paths.h"
 #include "prob.h"
 #include "robx.h"
+#include "set_bogohome.h"
 #include "swap.h"
 #include "wordlists.h"
 #include "xmalloc.h"
@@ -77,6 +78,7 @@ static int dump_file(char *ds_file)
 
     token_count = 0;
 
+    set_bogohome(ds_file);
     rc = ds_oper(ds_file, DB_READ, ds_dump_hook, NULL);
 
     if (verbose)
@@ -107,6 +109,8 @@ static int load_file(const char *ds_file)
     unsigned long line = 0;
     unsigned long count[IX_SIZE], date;
     YYYYMMDD today_save = today;
+
+    set_bogohome(ds_file);
 
     ds_init();
 
@@ -338,11 +342,12 @@ static int get_robx(char *path)
 	char filepath[PATH_LEN];
 
 	word_t *word_robx = word_new((const byte *)ROBX_W, (uint) strlen(ROBX_W));
-	    
+
 	build_wordlist_path(filepath, sizeof(filepath), path);
-	
+
 	run_type = REG_SPAM;
 
+	set_bogohome(filepath);
 	ds_init();
 	dsh = ds_open(CURDIR_S, filepath, DB_WRITE);
 	if (dsh == NULL)
@@ -599,14 +604,18 @@ int main(int argc, char *argv[])
 	    return load_file(ds_file);
 	case M_MAINTAIN:
 	    maintain = true;
+	    set_bogohome(ds_file);
 	    return maintain_wordlist_file(ds_file);
 	case M_WORD:
 	    argc -= optind;
 	    argv += optind;
+	    set_bogohome(ds_file);
 	    return display_words(ds_file, argc, argv, prob);
 	case M_HIST:
+	    set_bogohome(ds_file);
 	    return histogram(ds_file);
 	case M_ROBX:
+	    set_bogohome(ds_file);
 	    return get_robx(ds_file);
 	case M_NONE:
 	default:

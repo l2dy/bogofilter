@@ -60,6 +60,7 @@ AUTHORS:
 #include "robx.h"
 #include "rstats.h"
 #include "score.h"
+#include "set_bogohome.h"
 #include "token.h"
 #include "tunelist.h"
 #include "wordhash.h"
@@ -899,7 +900,7 @@ static void check_wordlist_path(void)
 	return;
     }
 
-    db_cachesize = ceil(sb.st_size / 3.0 / 1024.0 / 1024.0);
+    db_cachesize = ceil(sb.st_size / (3 * 1024 * 1024));
 
     return;
 }
@@ -1593,6 +1594,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     /* process args and read mailboxes */
     process_arglist(argc, argv);
 
+    set_bogohome(ds_file);
     if (ds_file)
 	check_wordlist_path();
 
