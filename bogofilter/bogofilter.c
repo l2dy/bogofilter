@@ -1,6 +1,13 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.28  2002/10/04 02:06:55  gyepi
+ * 1. Use multiple buffer lists in wordhash to avoid alignment problems
+ * on more restrictive architectures.
+ * 2. Add initializer arg to wordhash_insert.
+ *
+ * Thanks to Clint Adams for helping debug both of these.
+ *
  * Revision 1.27  2002/10/04 00:39:57  m-a
  * First set of type fixes.
  *
@@ -152,9 +159,10 @@ I do the lexical analysis slightly differently, however.
 #include <fcntl.h>
 #include <stdlib.h>
 
-#include <bogofilter.h>
-#include <datastore.h>
-#include <wordhash.h>
+#include "bogofilter.h"
+#include "datastore.h"
+#include "wordhash.h"
+#include "common.h"
 
 // constants for the Graham formula 
 #define KEEPERS		15		// how many extrema to keep
@@ -168,8 +176,12 @@ I do the lexical analysis slightly differently, however.
 #define EVEN_ODDS	0.5f		// used for words we want to ignore
 #define DEVIATION(n)	fabs((n) - EVEN_ODDS)		// deviation from average
 
-#define max(x, y)	(((x) > (y)) ? (x) : (y))
-#define min(x, y)	(((x) < (y)) ? (x) : (y))
+static void wordprop_init(void *vwordprop){
+	wordprop_t *wordprop = vwordprop;
+
+	wordprop->freq = 0;
+	wordprop->msg_freq = 0;
+}
 
 void *collect_words(int fd, int *msg_count, int *word_count)
 // tokenize input text and save words in wordhash_t hash table
@@ -187,7 +199,7 @@ void *collect_words(int fd, int *msg_count, int *word_count)
     tok = get_token();
   
     if (tok != FROM && tok != 0){
-      w = wordhash_insert(h, yylval, sizeof(wordprop_t));
+      w = wordhash_insert(h, yylval, sizeof(wordprop_t), &wordprop_init);
       w->msg_freq++;
       w_count++;
     }
@@ -233,54 +245,52 @@ void register_words(int fdin, reg_t register_type)
   wordprop_t *wordprop;
   wordhash_t *h;
 
-  wordlist_t *lists[2];
+  wordlist_t *list;
   wordlist_t *incr_list = NULL;
   wordlist_t *decr_list = NULL;
-  void *dbh[2];
-
-  int i;
-  int nlists = 0;
 
   h = collect_words(fdin, &msgcount, &wordcount);
 
   if (verbose)
     fprintf(stderr, "# %d words\n", wordcount);
-  
-  /* If the operation requires both databases, they must be locked in order */
+
+  good_list.active = spam_list.active = FALSE;
+
   switch(register_type)
     {
     case REG_GOOD:
-      incr_list = lists[nlists++] = &good_list;
+      incr_list = &good_list;
       break;
 
     case REG_SPAM:
-      incr_list = lists[nlists++] = &spam_list;
+      incr_list = &spam_list;
       break;
 
     case  REG_GOOD_TO_SPAM:
-      decr_list = lists[nlists++] = &good_list;
-      incr_list = lists[nlists++] = &spam_list;
+      decr_list = &good_list;
+      incr_list = &spam_list;
       break;
 
     case REG_SPAM_TO_GOOD:
-      incr_list = lists[nlists++] = &good_list;
-      decr_list = lists[nlists++] = &spam_list;
+      incr_list = &good_list;
+      decr_list = &spam_list;
       break;
      
     default:
       fprintf(stderr, "Error: Invalid register_type\n");
       exit(2);      
     }
+  
+  incr_list->active = TRUE;
+  if (decr_list)
+    decr_list->active = TRUE;
 
-      
-  for (i = 0; i < nlists; i++){
-    dbh[i] = (void *)lists[i]->dbh;
-  }
+  db_lock_writer_list(word_lists);
 
-  db_lock_writer_list(dbh, nlists);
-
-  for (i = 0; i < nlists; i++){
-    lists[i]->msgcount = db_getcount(lists[i]->dbh);
+  for (list = word_lists; list != NULL; list = list->next){
+    if (list->active == TRUE) {
+      list->msgcount = db_getcount(list->dbh);
+    }
   }
  
   incr_list->msgcount += msgcount;
@@ -298,14 +308,17 @@ void register_words(int fdin, reg_t register_type)
     if (decr_list) db_increment(decr_list->dbh, node->key, -wordprop->freq);
   }
 
-  for (i = 0; i < nlists; i++){
-    db_setcount(lists[i]->dbh, lists[i]->msgcount);
-    db_flush(lists[i]->dbh);
-    if (verbose)
-      fprintf(stderr, "bogofilter: %ld messages on the %s list\n", lists[i]->msgcount, lists[i]->name);
+  for (list = word_lists; list != NULL; list = list->next){
+    if (list->active) {
+      db_setcount(list->dbh, list->msgcount);
+      db_flush(list->dbh);
+      if (verbose)
+	fprintf(stderr, "bogofilter: %lu messages on the %s list\n", list->msgcount, list->name);
+    }
   }
 
-  db_lock_release_list(dbh, nlists);
+  db_lock_release_list(word_lists);
+
   wordhash_free(h);
 }
 
@@ -417,7 +430,7 @@ double compute_probability( char *token )
 
     wordprob_init(&stats);
 
-    for (list=first_list; list ; list=list->next)
+    for (list=word_lists; list != NULL ; list=list->next)
     {
 	if (verbose >= 2)
 	    printf("checking list %s for word '%s'.\n", list->name, token);
@@ -536,16 +549,13 @@ rc_t bogofilter(int fd, double *xss)
     double 	spamicity;
     wordhash_t  *wordhash;
     bogostat_t	*stats;
-    void *dbh[2];
 
 //  tokenize input text and save words in a wordhash.
     wordhash = collect_words(fd, NULL, NULL);
 
-    //FIXME: This needs to be done as part of the application initialization
-    dbh[0] = (void *)good_list.dbh;
-    dbh[1] = (void *)spam_list.dbh;
+    good_list.active = spam_list.active = TRUE;
 
-    db_lock_reader_list(dbh, 2);
+    db_lock_reader_list(word_lists);
 
     good_list.msgcount = db_getcount(good_list.dbh);
     spam_list.msgcount = db_getcount(spam_list.dbh);
@@ -553,7 +563,7 @@ rc_t bogofilter(int fd, double *xss)
 //  select the best spam/nonspam indicators.
     stats = select_indicators(wordhash);
 
-    db_lock_release_list(dbh, 2);
+    db_lock_release_list(word_lists);
 
 //  computes the spamicity of the spam/nonspam indicators.
     spamicity = compute_spamicity(stats);

@@ -9,36 +9,38 @@ typedef struct hashnode_t {
   struct hashnode_t *iter_next;          /* Next item added to hash. For fast traversal */
 } hashnode_t;
 
-/* Managed heap for memory  allocation */
-typedef struct halloc_t {
-  char *buf;
+typedef struct wh_alloc_node {
+  hashnode_t *buf;
   int avail;
   int used;
-  struct halloc_t *next;
-} halloc_t;
+  struct wh_alloc_node *next;
+} wh_alloc_node;
 
-
-/* hash table, with bookkeeping */
+typedef struct wh_alloc_str {
+  char * buf;
+  int avail;
+  int used;
+  struct wh_alloc_str *next;
+} wh_alloc_str;
+ 
 typedef struct {
-  hashnode_t **bin;     /* hash table */
-  halloc_t *halloc_buf; /*list of node buffers */
+  hashnode_t **bin;
+  wh_alloc_node *nodes; /*list of node buffers */
+  wh_alloc_str  *strings; /* list of string buffers */
 
-  hashnode_t *iter_ptr;    /* For traversal */
+  hashnode_t *iter_ptr;
   hashnode_t *iter_head;
   hashnode_t *iter_tail;
-  
+
 } wordhash_t;
 
-/* initialize a wordhash */
 wordhash_t *wordhash_init(void);
 
-/* deallocate resources */
 void wordhash_free(wordhash_t *);
 
-/* Given hash table h, key s, and int  n, search for key s.
-* If found, return pointer to associated buffer,
-  else, insert key and return pointer to allocated buffer of size n */
-void *wordhash_insert(wordhash_t *, char *, size_t);
+/* Given h, s, n, search for key s. If found, return pointer to associated buffer.
+   Else, insert key and return pointer to allocated buffer of size n */
+void *wordhash_insert(wordhash_t *, char *, size_t, void (*)(void *));
 
 /* Starts an iteration over the hash entries */
 hashnode_t *wordhash_first(wordhash_t *);
