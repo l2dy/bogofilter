@@ -14,6 +14,9 @@ Note:
   and in contrib/mailfilter.example
 * Added experimental code for BerkeleyDB environments code
   for improved locking and caching.
+* Documented bogoutil's histogram ('-H') option.
+* Revised documentation of '-d', '-p', and '-w' options
+  for bogoutil.
 
 0.17.1	2004-02-09
 

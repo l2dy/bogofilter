@@ -15,11 +15,12 @@
 	    <command>bogoutil</command>
 	    <arg choice="opt">options</arg>
 	    <group choice="req">
-		<arg choice="plain">-d</arg>
+		<arg choice="plain">-d <replaceable>file_or_dir</replaceable></arg>
+		<arg choice="plain">-H</arg>
 		<arg choice="plain">-l</arg>
 		<arg choice="plain">-m</arg>
-		<arg choice="plain">-w</arg>
-		<arg choice="plain">-p</arg>
+		<arg choice="plain">-w <replaceable>file_or_dir</replaceable></arg>
+		<arg choice="plain">-p <replaceable>file_or_dir</replaceable></arg>
 	    </group>
 	    <arg choice="plain"><replaceable>file.db</replaceable></arg>
 	</cmdsynopsis>
@@ -65,8 +66,20 @@
     <refsect1 id="options">
 	<title>OPTIONS</title>
 	<para>
-	    The <option>-d</option> option tells <application>bogoutil</application> to
-	    print the contents of the specified database file to <option>stdout</option>.
+	    The <option>-d <replaceable>file_or_dir</replaceable></option>
+	    option tells <application>bogoutil</application> to print
+	    the contents of the specified database file to
+	    <option>stdout</option>.
+	</para>
+	<para>
+	    The <option>-H <replaceable>file_or_dir</replaceable></option>
+	    option tells <application>bogoutil</application> to print
+	    a histogram of the specified database file to
+	    <option>stdout</option>.  The output is similar to
+	    <application>bogofilter -vv</application>. Finally,
+	    hapaxes (tokens which were only seen once) and pure tokens
+	    (tokens which were encountered only in ham or only in
+	    spam) are counted.
 	</para>
 	<para>
 	    The <option>-l</option> option tells <application>bogoutil</application> 
@@ -77,25 +90,29 @@
 	    that are older than desired, have counts that are too small, or sizes (lengths) 
 	    that are too long or too short.
 	</para>
-
 	<para>
-	    The <option>-w</option> option tells <application>bogoutil</application> 
-	    to display the value of one or more tokens in one or more databases.
-	    <option>-w</option> takes an argument, which is either the name of a wordlist
-	    or the name of a directory containing spamlist.db and goodlist.db.
-	    Tokens can be listed on the command line or piped to <application>bogoutil</application>.
-	    When there are extra arguments on the command line, <application>bogoutil</application> 
-	    will use them as the tokens to lookup.  If there are no extra arguments, 
-	    <application>bogoutil</application> will read tokens from <option>stdin</option>.  When 
-	    <option>file.db</option> is the path to a database file, the tokens will be looked up in
-	    the database and the value for each token will be displayed.  When <option>file.db</option>
-	    is a directory name, each token will be looked up in both spamlist.db and goodlist.db and 
-	    the values will be displayed.
+	    The <option>-w <replaceable>file_or_dir</replaceable></option> 
+	    option tells <application>bogoutil</application> to
+	    display token information from the database.  The option
+	    takes an argument, which is either the name of the
+	    wordlist (usually wordlist.db) or the name of the directory
+	    containing it.  Tokens can be listed on the command line
+	    or piped to <application>bogoutil</application>.  When
+	    there are extra arguments on the command line,
+	    <application>bogoutil</application> will use them as the
+	    tokens to lookup.  If there are no extra arguments,
+	    <application>bogoutil</application> will read tokens from
+	    <option>stdin</option>.
 	</para>
 	<para>
-	    The <option>-p</option> option tells <application>bogoutil</application> 
-	    to display the value of one or more tokens in one or more databases and add a column of probabilities to the output.  
-	    Option <option>-p</option> takes the same arguments as option  <option>-w</option> .
+	    The <option>-p <replaceable>file_or_dir</replaceable></option> 
+	    option tells <application>bogoutil</application> to
+	    display the database information for one or more tokens.
+	    The display includes a probability column with is the
+	    token's spam score (computed using
+	    <application>bogofilter</application>'s default values.
+	    Option <option>-p</option> takes the same arguments as
+	    option <option>-w</option> .
 	</para>
 	<para>The <option>-r</option> option tells
 	    <application>bogoutil</application> to recalculate the ROBX

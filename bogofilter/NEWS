@@ -10,7 +10,10 @@ is in the RELEASE.NOTES files.  Read them!!
 	2004-02-20
 	
 	* Corrected typos in doc/bogofilter.xml (the man page)
-	* and in contrib/mailfilter.example
+	  and in contrib/mailfilter.example
+	* Documented bogoutil's histogram ('-H') option.
+	* Revised documentation of '-d', '-p', and '-w' options
+	  for bogoutil.
 
 	2004-02-19
 	
