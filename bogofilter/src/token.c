@@ -33,10 +33,12 @@ word_t *yylval = NULL;
 static token_t save_class = NONE;
 static word_t *ipsave = NULL;
 
-static word_t *w_to   = NULL;	/* To: */
-static word_t *w_from = NULL;	/* From: */
+static word_t *w_to   = NULL;	/* To:          */
+static word_t *w_from = NULL;	/* From:        */
 static word_t *w_rtrn = NULL;	/* Return-Path: */
-static word_t *w_subj = NULL;	/* Subject: */
+static word_t *w_subj = NULL;	/* Subject:     */
+static word_t *w_recv = NULL;	/* Received:    */
+static word_t *w_head = NULL;	/* Header:      */
 
 /* Global Variables */
 
@@ -83,7 +85,7 @@ token_t get_token(void)
 	    fputc('\n', dbgout);
 	}
 	    
-	if (cls == NONE)
+	if (cls == NONE) /* End of message */
 	    break;
 
 	switch (cls) {
@@ -101,11 +103,13 @@ token_t get_token(void)
 	    continue;
 
 	case HEADKEY:
-	{
-	    const char *delim = memchr((const void *)yylval->text, ':', yylval->leng);
-	    yylval->leng = delim - (const char *)yylval->text;
-	    Z(yylval->text[yylval->leng]);
-	}
+	    if (!header_line_markup)
+		continue;
+	    else {
+		const char *delim = strchr((const char *)yylval->text, ':');
+		yylval->leng = delim - (const char *)yylval->text;
+		Z(yylval->text[yylval->leng]);
+	    }
 
 	/*@fallthrough@*/
 
@@ -216,10 +220,12 @@ void token_init(void)
     }
 
     if (w_to == NULL) {
-	w_to   = word_new((const byte *) "to:",   0);	/* To: */
-	w_from = word_new((const byte *) "from:", 0);	/* From: */
+	w_to   = word_new((const byte *) "to:",   0);	/* To:          */
+	w_from = word_new((const byte *) "from:", 0);	/* From:        */
 	w_rtrn = word_new((const byte *) "rtrn:", 0);	/* Return-Path: */
-	w_subj = word_new((const byte *) "subj:", 0);	/* Subject: */
+	w_subj = word_new((const byte *) "subj:", 0);	/* Subject:     */
+	w_recv = word_new((const byte *) "rcvd:", 0);	/* Received:    */
+	w_head = word_new((const byte *) "head:", 0);	/* Header:      */
     }
 
     return;
@@ -232,25 +238,37 @@ void clr_tag(void)
 
 void set_tag(const char *text)
 {
+    if (!header_line_markup)
+	return;
+
     switch (tolower(*text)) {
-    case 't':			/* To: */
-	token_prefix = w_to;
+    case 't':
+	token_prefix = w_to;		/* To: */
 	break;
-    case 'f':			/* From: */
-	token_prefix = w_from;
+    case 'f':
+	token_prefix = w_from;		/* From: */
 	break;
-    case 'r':			/* Return-Path: */
-	token_prefix = w_rtrn;
+    case 'h':
+	token_prefix = w_head;		/* Header: */
 	break;
-    case 's':			/* Subject: */
-	token_prefix = w_subj;
+    case 'r':			
+	token_prefix = w_rtrn;		/* Return-Path: */
+	break;
+    case 's':
+	token_prefix = w_subj;		/* Subject: */
 	break;
     default:
 	fprintf(stderr, "%s:%d  invalid tag - '%s'\n", 
-		__FILE__, __LINE__, text);
+		__FILE__, __LINE__, 
+		text);
 	exit(EX_ERROR);
     }
     return;
+}
+
+void add_hint(const char *h)
+{
+    (const void *) h;
 }
 
 /* Cleanup storage allocation */

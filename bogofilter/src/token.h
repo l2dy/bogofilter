@@ -19,6 +19,7 @@ extern token_t get_token(void);
 extern void got_from(void);
 extern void clr_tag(void);
 extern void set_tag(const char *text);
+extern void add_hint(const char *text);
 
 extern void token_init(void);
 extern void token_cleanup(void);

@@ -213,7 +213,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						    unput(w->text[size]);
 						}
 
-<INITIAL>^(To|From|Return-Path|Subject):	{ if (header_line_markup) set_tag(yytext); }
+<INITIAL>^(To|From|Return-Path|Subject):	{ set_tag(yytext); }
 <INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); return TOKEN; }
 <INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); skip_to(':'); return TOKEN; }
 
