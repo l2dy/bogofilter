@@ -21,7 +21,6 @@ by sites that process a lot of mail.
 
 %prep
 %setup
-BUILD_ROOT=~/tmp
 CFLAGS="$RPM_OPT_FLAGS" \
 ./configure \
   --prefix=%{_prefix} \
@@ -50,8 +49,8 @@ gzip -f -9 $RPM_BUILD_ROOT/%{_mandir}/*/*.[1-9]
 %{_bindir}/bogoupgrade
 %{_sysconfdir}/bogofilter.cf.example
 %config(noreplace) %{_sysconfdir}/bogofilter.cf
-%doc AUTHORS COPYING NEWS README TODO UPGRADE
-%doc README.freebsd README.hp-ux
+%doc AUTHORS COPYING METHODS NEWS README TODO UPGRADE
+%doc README.freebsd README.hp-ux README.dcdflib
 %doc bogoutil.xml bogoupgrade.xml bogofilter.xml bogolexer.xml
 %doc doc/integrating-with-qmail bogo.R
 %doc contrib/README.unbase64 contrib/bogofilter-qfe
