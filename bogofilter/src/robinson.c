@@ -300,7 +300,7 @@ void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double 
 	    robs = ROBS;
     }
 
-    if (fabs(robx) < EPS)
+    if (fabs(robx) < EPS && spam_list->dbh)
     {
 	/* Note: .ROBX is scaled by 1000000 in the wordlist */
 	long l_robx = db_getvalue(spam_list->dbh, word_robx);

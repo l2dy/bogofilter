@@ -188,6 +188,8 @@ void open_wordlists(dbmode_t mode)
 			retry = 1;
 			break;
 		    default:
+			if (query)	/* If "-Q", failure is OK */
+			    return;
 			fprintf(stderr, "Can't open %s (%s), errno %d, %s\n",
 				list->filename, list->filepath, err, strerror(err));
 			exit(2);
