@@ -4,8 +4,21 @@
 
 $Id$
 
+	2003-05-23
+	* The static-build system has been revised. It is not very portable,
+	  but it works on recent Linux distros. This feature is mainly used for
+	  packaging RPMs. The revision now uses ./configure --enable-static
+	  to compile bogofilter_static at al in addition to dynamically linked
+	  executables.
+
+	* Some effort has been put in the autoconfiguration of the BerkeleyDB
+	  library, as long as no cross-compilation for a different system is
+	  done. This code should now reliably detect the right library to link
+	  against for BerkeleyDB 4.1, 4.0 and 3.3 and possibly some older 3.x
+	  versions, and it takes --enable-static into account.
+
 0.13.1	2003-05-23
-	
+
 	* Modified "make rpm" to also build statically linked binaries.
 	  They're packaged in bogofilter-static-x.y.z-1.i586.rpm
 
@@ -14,11 +27,11 @@ $Id$
 
 	2003-05-21
 
-	* tests/t.frame portability fix for BSD compatibility.
+	* tests/t.frame portability fix for non-Linux compatibility.
 
 0.13.0	2003-05-21
 
-	* Added file RELEASE.NOTES-0.13.  Read it!!!
+	* Added file RELEASE.NOTES-0.13.  Read it!
 
 	* Bogofilter now recognizes a line composed of whitespace
 	  characters as the end of the message header and creates
@@ -60,3 +73,4 @@ $Id$
 0.12.3	2003-05-10
 
 	* Final 0.12 release
+ vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:

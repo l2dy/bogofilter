@@ -4,21 +4,24 @@
 
 $Id$
 
+	2003-05-23
+	* Autoconfiguration of BerkeleyDB library has been improved.
+
 0.13.1	2003-05-23
-	
+
 	* Modified "make rpm" to also build statically linked binaries.
 	  They're packaged in bogofilter-static-x.y.z-1.i586.rpm
 
 	* Fixed bogofilter.spec.in to include files CHANGES-0.13 and
 	  RELEASE.NOTES-0.13 which had been left out.
 
-	* tests/t.frame portability fix for BSD compatibility.
+	* tests/t.frame portability fix for non-Linux compatibility.
 
 0.13.0	2003-05-21
 
-	* Added file RELEASE.NOTES-0.13.  Read it!!!
+	* Added file RELEASE.NOTES-0.13.  Read it!
 
-	* Changed parsing defaults to:								
+	* Changed parsing defaults to:
 
 	  -PI	ignore_case		(default is disabled)
 	  -Ph	header_line_markup 	(default is ensabled)
