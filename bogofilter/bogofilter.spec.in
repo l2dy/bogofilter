@@ -65,10 +65,10 @@ done
 
 %files
 %defattr(-,root,root)
-%{_mandir}/man1/bogofilter.1.*
-%{_mandir}/man1/bogolexer.1.*
-%{_mandir}/man1/bogoutil.1.*
-%{_mandir}/man1/bogoupgrade.1.*
+%{_mandir}/man1/bogofilter.1*
+%{_mandir}/man1/bogolexer.1*
+%{_mandir}/man1/bogoutil.1*
+%{_mandir}/man1/bogoupgrade.1*
 %{_bindir}/bogofilter
 %{_bindir}/bogolexer
 %{_bindir}/bogoutil
