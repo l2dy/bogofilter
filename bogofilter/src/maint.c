@@ -106,7 +106,7 @@ static void replace_token(const word_t *old_token, const word_t *new_token, dsv_
 bool discard_token(word_t *token, dsv_t *in_val)
 {
     bool discard;
- 
+
     if (token->text[0] == '.') {	/* keep .MSG_COUNT and .ROBX */
 	if (strcmp((const char *)token->text, MSG_COUNT) == 0)
 	    return false;
@@ -118,12 +118,12 @@ bool discard_token(word_t *token, dsv_t *in_val)
 
     if (discard) {
 	if (thresh_count != 0 &&
-	    (keep_count(in_val->spamcount) || keep_count(in_val->goodcount)))
+		(keep_count(in_val->spamcount) || keep_count(in_val->goodcount)))
 	    discard = false;
 	if (thresh_date != 0 && keep_date(in_val->date))
 	    discard = false;
 	if ((size_min != 0 || size_max != 0) &&
-	    keep_size(token->leng))
+		keep_size(token->leng))
 	    discard = false;
     }
 
@@ -201,7 +201,7 @@ struct userdata_t {
 };
 
 static int maintain_hook(word_t *w_key, dsv_t *in_val,
-			 void *userdata)
+	void *userdata)
 {
     size_t len;
     word_t token;
@@ -213,7 +213,7 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 
     len = strlen(MSG_COUNT);
     if (len == token.leng && 
-	strncmp((char *)token.text, MSG_COUNT, token.leng) == 0)
+	    strncmp((char *)token.text, MSG_COUNT, token.leng) == 0)
 	return EX_OK;
 
     if (discard_token(&token, in_val)) {
@@ -239,33 +239,33 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
     {
 	switch (wordlist_version)
 	{
-	case IP_PREFIX:
-	{
-	    /* up-to-date - nothing to do */
-	    break;
-	}
-	case 0:
-	{
-	    /* update to "ip:" prefix level */
+	    case IP_PREFIX:
+		{
+		    /* up-to-date - nothing to do */
+		    break;
+		}
+	    case 0:
+		{
+		    /* update to "ip:" prefix level */
 
-	    const char  *url_hdr = "url:";
-	    size_t       url_len = strlen(url_hdr);
-	    const char  *ip_hdr  = "ip:";
-	    size_t       ip_len  = strlen(ip_hdr);
+		    const char  *url_hdr = "url:";
+		    size_t       url_len = strlen(url_hdr);
+		    const char  *ip_hdr  = "ip:";
+		    size_t       ip_len  = strlen(ip_hdr);
 
-	    if (token.leng > url_len && memcmp(token.text, url_hdr, url_len) == 0)
-	    {
-		word_t new_token;
-		new_token.leng = token.leng + ip_len -  url_len;
-		new_token.text = (byte *)xmalloc(new_token.leng + 1);
-		memcpy(new_token.text, ip_hdr, ip_len);
-		memcpy(new_token.text+ip_len, token.text+url_len, token.leng - url_len);
-		new_token.text[new_token.leng] = '\0';
-		replace_token(&token, &new_token, in_val, transaction, vhandle);
-		xfree(new_token.text);
-	    }
-	    break;
-	}
+		    if (token.leng > url_len && memcmp(token.text, url_hdr, url_len) == 0)
+		    {
+			word_t new_token;
+			new_token.leng = token.leng + ip_len -  url_len;
+			new_token.text = (byte *)xmalloc(new_token.leng + 1);
+			memcpy(new_token.text, ip_hdr, ip_len);
+			memcpy(new_token.text+ip_len, token.text+url_len, token.leng - url_len);
+			new_token.text[new_token.leng] = '\0';
+			replace_token(&token, &new_token, in_val, transaction, vhandle);
+			xfree(new_token.text);
+		    }
+		    break;
+		}
 	}
     }
 
@@ -277,10 +277,10 @@ int maintain_wordlist(void *vhandle)
     ta_t *transaction = ta_init();
     struct userdata_t userdata;
     int ret;
-    
+
     userdata.vhandle = vhandle;
     userdata.transaction = transaction;
-    
+
     ret = ds_foreach(vhandle, maintain_hook, &userdata);
 
     return ret | ta_commit(transaction);
