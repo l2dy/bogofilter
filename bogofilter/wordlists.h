@@ -5,6 +5,8 @@
 #ifndef	WORDLISTS_H
 #define	WORDLISTS_H
 
+#include "system.h"
+
 typedef struct wordlist_s wordlist_t;
 struct wordlist_s
 {
