@@ -25,8 +25,6 @@ Briefly:
 
 	2005-01-05
 
-	* Add --config-file option to bogoutil.
-
 	* Fix --enable-transactions logic, was inverted since 2004-12-26
 	  (affected release: 0.93.3.1 only, 0.93.3 was fine). Note that
 	  giving neither --enable-transactions nor --disable-transactions woudl
@@ -37,10 +35,11 @@ Briefly:
 	* bogoutil now reads the configuration files to know the user's
 	  db_lk_max_* values.  Reported by Karl O. Pinc.
 
+	* Added '--config-file=name' to bogoutil to name a config file and
+	  '-C' option to suppress reading a config file.
+
 	* Berkeley DB Transactional recovery now uses the actual db_lk_max_*
 	  values rather than hardcoded 1024.  Reported by Karl O. Pinc.
-
-	* Added -C option to allow bogoutil to not read the config file.
 
 	2005-01-03
 
