@@ -73,7 +73,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     if (directory == NULL)
 	directory = create_path_from_env("HOME", BOGODIR);
 
-    if (setup_lists(directory))
+    if (setup_lists(directory) != 0)
 	exit(2);
 
     if (*outfname && passthrough) {

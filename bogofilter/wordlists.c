@@ -93,7 +93,7 @@ int setup_lists(const char* dir)
 		      "You must specify a directory on the command line, in the config file,\n"
 		      "or by using the BOGOFILTER_DIR or HOME environment variables.\n"
 		      "Program aborting.\n", progname);
-	exit(2);
+	rc = -1;
     }
 
     if ((build_path(filepath, sizeof(filepath), dir, GOODFILE) < 0) ||
