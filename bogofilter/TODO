@@ -5,7 +5,9 @@
 1) New Feature: Token aging. Support for struct data in the wordlists is
 already present.
 
-2) Unknown Category: Two deletes for kmail? (please explain?)
+2) Two deletes for kmail?  This wouldn't be a patch for bogofilter
+itself, but a change to give kmail delete-as-spam and delete-as-
+nonspam buttons.  Similarly for other MUAs.
 
 3) New Feature: Make it a milter?
 
