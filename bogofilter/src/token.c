@@ -65,7 +65,7 @@ token_t get_token(void)
 	    save_class = NONE;
 	else
 	{
-	    *t = (byte) '\0';	
+	    *t = (byte) '\0';
 	    ipsave->leng = (uint) (t - ipsave->text);
 	    yylval = ipsave;
 	    return save_class;
@@ -80,11 +80,11 @@ token_t get_token(void)
 	yylval->leng = (uint) *lexer->yyleng;
 	yylval->text = (unsigned char *)(*lexer->yytext);
 
-	if (DEBUG_TEXT(2)) { 
+	if (DEBUG_TEXT(2)) {
 	    word_puts(yylval, 0, dbgout);
 	    fputc('\n', dbgout);
 	}
-	    
+
 	if (cls == NONE) /* End of message */
 	    break;
 
@@ -177,17 +177,17 @@ token_t get_token(void)
 		 * Trick collected by ESR in real time during John
 		 * Graham-Cummings's talk at Paul Graham's spam conference
 		 * in January 2003...  Some spammers know that people are
-		 * doing recognition on spamhaus IP addresses.  They use 
-		 * the fact that HTML clients normally interpret IP addresses 
-		 * by doing a simple accumulate-and-shift algorithm; they 
+		 * doing recognition on spamhaus IP addresses.  They use
+		 * the fact that HTML clients normally interpret IP addresses
+		 * by doing a simple accumulate-and-shift algorithm; they
 		 * add large random multiples of 256 to the quads to
-		 * mask their origin.  Nuke the high bits to unmask the 
+		 * mask their origin.  Nuke the high bits to unmask the
 		 * address.
 		 */
 		if (sscanf((const char *)yylval->text, "%d.%d.%d.%d", &q1, &q2, &q3, &q4) == 4)
 		    /* safe because result string guaranteed to be shorter */
-		    sprintf((char *)yylval->text, "%d.%d.%d.%d", 
-			    q1 & 0xff, q2 & 0xff, q3 & 0xff, q4 & 0xff);		    
+		    sprintf((char *)yylval->text, "%d.%d.%d.%d",
+			    q1 & 0xff, q2 & 0xff, q3 & 0xff, q4 & 0xff);
 		yylval->leng = strlen((const char *)yylval->text);
 		ipsave = word_new(NULL, plen + yylval->leng);
 		memcpy(ipsave->text, prefix, plen);
@@ -215,11 +215,11 @@ token_t get_token(void)
 	    break;
 	}
 
-	if (DEBUG_TEXT(1)) { 
+	if (DEBUG_TEXT(1)) {
 	    word_puts(yylval, 0, dbgout);
 	    fputc('\n', dbgout);
 	}
-	    
+
 	/* eat all long words */
 	if (yylval->leng <= MAXTOKENLEN)
 	    done = true;
@@ -253,7 +253,7 @@ token_t get_token(void)
 void token_init(void)
 {
     yyinit();
-    mime_reset(); 
+    mime_reset();
     if (nonblank_line == NULL) {
 	const char *s = "spc:invalid_end_of_header";
 	nonblank_line = word_new((const byte *)s, strlen(s));
@@ -282,7 +282,7 @@ void set_tag(const char *text)
 	return;
 
     if (msg_state != msg_state->parent &&
-	msg_state->parent->mime_type == MIME_MESSAGE) {	
+	msg_state->parent->mime_type == MIME_MESSAGE) {
 	clr_tag();			/* don't tag if inside message/rfc822 */
 	return;
     }
@@ -297,7 +297,7 @@ void set_tag(const char *text)
     case 'h':
 	token_prefix = w_head;		/* Header: */
 	break;
-    case 'r':			
+    case 'r':
 	if (tolower(text[2]) == 't')
 	    token_prefix = w_rtrn;	/* Return-Path: */
 	else
@@ -307,8 +307,8 @@ void set_tag(const char *text)
 	token_prefix = w_subj;		/* Subject: */
 	break;
     default:
-	fprintf(stderr, "%s:%d  invalid tag - '%s'\n", 
-		__FILE__, __LINE__, 
+	fprintf(stderr, "%s:%d  invalid tag - '%s'\n",
+		__FILE__, __LINE__,
 		text);
 	exit(EX_ERROR);
     }
