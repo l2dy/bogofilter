@@ -25,14 +25,12 @@ AUTHOR:
 #include "version.h"
 #include "common.h"
 #include "bogofilter.h"
-#include "xmalloc.h"
-#include "datastore.h"
-#include "xstrdup.h"
 
 #define BOGODIR ".bogofilter"
 
 int verbose, passthrough, nonspam_exits_zero;
 int Rtable = 0;
+FILE *Rfp;
 enum algorithm algorithm = AL_GRAHAM;
 
 char directory[PATH_LEN] = "";
@@ -104,11 +102,12 @@ int main(int argc, char **argv)
 {
     int	  ch;
     int   exitcode = 0;
+    char  *Rfn = NULL;
 
     set_dir_from_env(directory, "HOME", BOGODIR);
     set_dir_from_env(directory, "BOGOFILTER_DIR", NULL);
 
-    while ((ch = getopt(argc, argv, "d:ehlsnSNvVxpugrR")) != EOF)
+    while ((ch = getopt(argc, argv, "d:ehlsnSNvVxpugR::r")) != EOF)
 	switch(ch)
 	{
 	case 'd':
@@ -186,16 +185,23 @@ int main(int argc, char **argv)
 	    algorithm = AL_GRAHAM;
 	    break;
 
+	case 'R':
+	    Rtable = 1;
+	    if(optarg) {
+	        Rfn = strdup(optarg-1);
+	        if(!(Rfp = fopen(Rfn, "w"))) {
+	            fprintf(stderr, "Error: can't write %s\n", Rfn);
+	            Rtable = 0;
+	        }
+	    } else Rfp = stdout;
+	    // fall through to force Robinson calculations
+
 	case 'r':
 	    algorithm = AL_ROBINSON;
 	    break;
 
 	case 'x':
 	    set_debug_mask( argv[optind] );
-	    break;
-	    
-	case 'R':
-	    Rtable = 1;
 	    break;
 	}
 
@@ -274,6 +280,9 @@ int main(int argc, char **argv)
 	    register_messages(STDIN_FILENO, run_type);
 	    break;
     }
+    
+    if(Rtable && Rfp != stdout && fclose(Rfp) != 0)
+	fprintf(stderr, "Error: couldn't close %s\n", Rfn);
 
     close_lists();
 

@@ -68,6 +68,7 @@ int    max_repeats;
 
 extern char msg_register[];
 extern int Rtable;
+extern FILE *Rfp;
 static double scalefactor;
 
 void initialize_constants();
@@ -449,8 +450,9 @@ double compute_probability( char *token )
 	    prob=wordprob_result(&wordstats);
 	    if (Rtable)
 	    {
-		printf("%4d %-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f\n", Rtable, token,
-		       wordstats.good, wordstats.bad, prob, log(1.0 - prob), log(prob));
+		fprintf(Rfp, "%4d %-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f\n",
+		    Rtable, token, wordstats.good, wordstats.bad, prob,
+		    log(1.0 - prob), log(prob));
 		Rtable++;
 	    }
 	    break;
@@ -540,7 +542,7 @@ double compute_robinson_spamicity(wordhash_t *wordhash)
     int robn = 0;
 
     if(Rtable)
-     	printf("%25s%10s%10s%10s%10s%10s\n",
+     	fprintf(Rfp, "%25s%10s%10s%10s%10s%10s\n",
 		"Token         ","pgood","pbad","fw","invfwlog","fwlog");
 
     for(node = wordhash_first(wordhash); node != NULL; node = wordhash_next(wordhash))
@@ -569,9 +571,9 @@ double compute_robinson_spamicity(wordhash_t *wordhash)
             (1.0 + (invproduct - product) / (invproduct + product)) / 2.0;
 
 	if (Rtable)
-	    printf("%4d %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n", Rtable,
-		   "P_Q_S_invsum_logsum", invproduct, product, spamicity,
-		   invlogsum, logsum);
+	    fprintf(Rfp, "%4d %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
+	        Rtable, "P_Q_S_invsum_logsum", invproduct, product, spamicity,
+		invlogsum, logsum);
     } else
 	spamicity = ROBX;
 
