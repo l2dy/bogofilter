@@ -1211,14 +1211,21 @@ int dbe_remove(const char *directory) {
     /* run recovery */
     bf_dbenv_create(&env);
     if (DEBUG_DATABASE(0))
-        fprintf(dbgout, "running regular data base recovery\n");
-    /* quirk: DB_RECOVER doesn't appear to work without DB_CREATE */
-    e = env->open(env, directory, dbenv_defflags | DB_CREATE | DB_RECOVER, 0644);
+        fprintf(dbgout, "running regular data base recovery and removing environment\n");
+    /* quirk: DB_RECOVER requires DB_CREATE and cannot work with DB_JOINENV */
+
+    /*
+     * Hint from Keith Bostic, SleepyCat support, 2004-11-29,
+     * we can use the DB_PRIVATE flag, that rebuilds the database
+     * environment in heap memory, so we don't need to remove it.
+     */
+
+    e = env->open(env, directory, dbenv_defflags | DB_PRIVATE | DB_CREATE | DB_RECOVER, 0644);
     if (e == DB_RUNRECOVERY) {
 	/* that didn't work, try harder */
 	if (DEBUG_DATABASE(0))
 	    fprintf(dbgout, "running catastrophic data base recovery\n");
-	e = env->open(env, directory, dbenv_defflags | DB_CREATE | DB_RECOVER_FATAL, 0644);
+	e = env->open(env, directory, dbenv_defflags | DB_PRIVATE | DB_CREATE | DB_RECOVER_FATAL, 0644);
     }
     if (e) {
 	print_error(__FILE__, __LINE__, "Cannot recover environment \"%s\": %s",
@@ -1226,17 +1233,6 @@ int dbe_remove(const char *directory) {
 	exit(EX_ERROR);
     }
     (void)env->close(env, 0); /* FIXME: is ignoring errors right? */
-
-    /* remove - requires new handle, hence close/create */
-    bf_dbenv_create(&env);
-    if (DEBUG_DATABASE(0))
-        fprintf(dbgout, "removing database environment\n");
-    e = env->remove(env, directory, 0);
-    if (e) {
-	print_error(__FILE__, __LINE__, "Cannot remove environment \"%s\": %s",
-		directory, db_strerror(e));
-	exit(EX_ERROR);
-    }
 
     /* no env->close() here, env->remove() does that for us */
 
