@@ -234,6 +234,9 @@ AC_CHECK_TYPES([uint32_t, u_int32_t])
 AC_CHECK_SIZEOF(unsigned short)
 AC_CHECK_SIZEOF(unsigned int)
 AC_CHECK_SIZEOF(unsigned long)
+dnl The next one isn't really needed, but useful for post-mortem analysis of
+dnl automated package build logs such as bento.freebsd.org or buildd.debian.org:
+AC_CHECK_SIZEOF(size_t)
 
 # Checks for library functions.
 dnl AC_FUNC_MALLOC
