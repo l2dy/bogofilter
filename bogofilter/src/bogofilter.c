@@ -84,7 +84,7 @@ rc_t bogofilter(int argc, char **argv)
     bool register_opt = run_type & (REG_SPAM | UNREG_SPAM | REG_GOOD | UNREG_GOOD);
     bool register_bef = register_opt && passthrough;
     bool register_aft = (register_opt && !passthrough) || (run_type & RUN_UPDATE);
-    bool write_msg    = passthrough || Rtable || (verbose > 2);
+    bool write_msg    = passthrough || Rtable;
     bool classify_msg = write_msg || (run_type & (RUN_NORMAL | RUN_UPDATE));
 
     wordhash_t *words = register_aft ? wordhash_init() : NULL;
