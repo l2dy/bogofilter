@@ -4,12 +4,18 @@
 
 $Id$
 
+	2003-07-21
+
+	* Decode encoded text in header lines.
+
 	2003-07-19
 
-	* Bogofilter and bogoutil detect whether there is one or two wordlists in
-	  BOGOFILTER_DIR and use combined or separate wordlist mode (as appropriate).
+	* Bogofilter and bogoutil detect whether one or two wordlists
+	  are in BOGOFILTER_DIR and use the appropriate wordlist mode
+	  (combined or separate).
 
-	* Bogofilter's -V output now includes algorithm and database info.
+	* Bogofilter's -V output now includes algorithm and database
+          info.
 
 	2003-07-18
 
