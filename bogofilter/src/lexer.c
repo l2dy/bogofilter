@@ -39,7 +39,6 @@ extern char *spam_header_name;
 static int yy_get_new_line(buff_t *buff);
 static int skip_spam_header(buff_t *buff);
 static int get_decoded_line(buff_t *buff);
-static void check_alphanum(buff_t *buff);
 
 /* Function Definitions */
 
@@ -50,27 +49,6 @@ static void lexer_display_buffer(buff_t *buff)
     buff_puts(buff, 0, dbgout);
     if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
 	fputc('\n', dbgout);
-}
-
-static void check_alphanum(buff_t *buff)
-{
-    size_t e = 0;
-    size_t i;
-    size_t l = buff->t.leng;
-    byte *txt = buff->t.text;
-
-    if (l < MAXTOKENLEN)
-	return;
-    for (i = 0; i < buff->t.leng; i += 1) {
-	if (isalnum((unsigned char) txt[i]))
-	    e = i;
-	else
-	    break;
-    }
-    if (e > MAXTOKENLEN) {
-	memcpy(txt, txt+e, l-e);
-	buff->t.leng -= e;
-    }
 }
 
 bool is_from(word_t *w)
@@ -199,7 +177,6 @@ static int get_decoded_line(buff_t *buff)
 	if (decoded_count != 0 && decoded_count < count) {
 	    buff->t.leng -= count - decoded_count;
 	    count = decoded_count;
-	    check_alphanum(buff);
 	    if (DEBUG_LEXER(1)) 
 		lexer_display_buffer(buff);
 	}
