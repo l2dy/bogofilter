@@ -70,7 +70,7 @@ fi
 
 function getco () {
     opts="-m$1 -o$2"
-    shift ; shift ; shift
+    shift ; shift
     res=`cat $* | bogofilter -t -c $CFG $opts -v 2>&1 | \
     perl -e ' $target = $ENV{"target"}; while (<>) { ' \
 	 -e ' ($i, $d) = split; push @diffs, $d unless $i != 1; }' \
@@ -83,7 +83,7 @@ function getco () {
 function wrapper () {
     v="-v"
     opts="-m$1 -o$2"
-    shift ; shift ; shift
+    shift ; shift
     res=`cat $1 | bogofilter -t -c $CFG $opts -v | grep -c $v '^1'`
 }
 
@@ -93,16 +93,16 @@ function doit () {
     date=`date "+%m/%d %H:%M:%S"`
     echo -n $date "  "
     printf "%-7s %5.3f fpos..." $rs $md
-    getco $md 0.10 $rs r0.ns.mc r1.ns.mc r2.ns.mc
+    getco $md,$rs 0.10 r0.ns.mc r1.ns.mc r2.ns.mc
     fpos=${res##* }; co=${res%% *}; let fpos=$fpos/3
     printf "%d at cutoff %8.6f, run0..." $fpos $co
-    run=0; wrapper $md $co $rs r0.sp.mc; fneg1=$res
+    run=0; wrapper $md,$rs $co r0.sp.mc; fneg1=$res
     echo "$rs $md $co $run $fpos $fneg1" >> $PARM_TBL
     printf "%3d  run1..." $fneg1
-    run=1; wrapper $md $co $rs r1.sp.mc; fneg2=$res
+    run=1; wrapper $md,$rs $co r1.sp.mc; fneg2=$res
     echo "$rs $md $co $run $fpos $fneg2" >> $PARM_TBL
     printf "%3d  run2..." $fneg2
-    run=2; wrapper $md $co $rs r2.sp.mc; fneg3=$res
+    run=2; wrapper $md,$rs $co r2.sp.mc; fneg3=$res
     echo "$rs $md $co $run $fpos $fneg3" >> $PARM_TBL
     printf "%3d"  $fneg3
     let fneg="$fneg1+$fneg2+$fneg3"
