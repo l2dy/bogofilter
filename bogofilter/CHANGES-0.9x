@@ -26,7 +26,7 @@
 	* Fixed db_init/db_cleanup problems encountered with multiple
 	wordlists and concurrent data stores.
 
-0.92.0	2004-06-26 - New Stable Release
+0.92.0 2004-06-26 - Stable Release
 
 	* Added ESF options to bogofilter's man page.
 	* Revised man pages' description of multi-parameter options.
@@ -164,4 +164,4 @@
 	* Lower output precision for regression tests, by using %f
 	  rather than %e, to mask differences between GSL versions.
 
-0.17.5	2004-04-01 - previous stable release
+0.17.5	2004-04-01 - Stable Release
