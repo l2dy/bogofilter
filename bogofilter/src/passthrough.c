@@ -301,7 +301,7 @@ void output_setup(void)
     }
 
     if (!passthrough) {
-	mysetvbuf(fpo, NULL, _IOLBF, 0);
+	mysetvbuf(fpo, NULL, _IOLBF, BUFSIZ);
     }
 }
 
