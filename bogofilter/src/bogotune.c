@@ -375,6 +375,7 @@ static bool check_for_high_ns_scores(void)
 
     score_ns(ns_scores);	/* scores in descending order */
 
+    /* want at least 1 high scoring spam for FP determination */
     if (ns_scores[t-1] < SPAM_CUTOFF)
 	return false;
 
@@ -437,6 +438,7 @@ static bool check_for_low_sp_scores(void)
 
     score_sp(sp_scores);			/* get scores */
 
+    /* want at least 1 low scoring ham for FN determination */
     if (sp_scores[t-1] > HAM_CUTOFF)
 	return false;
 
