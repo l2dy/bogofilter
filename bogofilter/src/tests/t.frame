@@ -66,12 +66,6 @@ if true ; then
     export MALLOC_CHECK_
 fi
 
-# use valgrind:
-if false ; then
-    VAL='valgrind -q --num-callers=16'
-    export VAL
-fi
-
 # use Electric Fence:
 if false ; then
     LD_PRELOAD=libefence.so.0.0

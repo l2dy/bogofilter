@@ -279,9 +279,6 @@ static void help(void)
 		  "\t-f\t- select Fisher spam calculation method (default).\n"
 #endif
 #endif
-		  ,
-		  PACKAGE, version, PACKAGE);
-    (void)fprintf(stderr,
 		  "\t-2\t- set binary classification mode (yes/no).\n"
 		  "\t-3\t- set ternary classification mode (yes/no/unsure).\n"
 		  "\t-p\t- passthrough.\n"
@@ -290,21 +287,18 @@ static void help(void)
 		  "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n"
 		  "\t-s\t- register message(s) as spam.\n"
 		  "\t-n\t- register message(s) as non-spam.\n"
-		  "\t-m val\t- set user defined min_dev value.\n");
-    (void)fprintf(stderr,
+		  "\t-m val\t- set user defined min_dev value.\n"
 		  "\t-o val [,val]\t- set user defined spam and non-spam cutoff values.\n"
 		  "\t-u\t- classify message as spam or non-spam and register accordingly.\n"
 		  "\t-S\t- unregister message(s) from spam list.\n"
 		  "\t-N\t- unregister message(s) from non-spam list.\n"
-		  "\t-R\t- print an R data frame.\n");
-    (void)fprintf(stderr,
+		  "\t-R\t- print an R data frame.\n"
 		  "\t-v\t- set debug verbosity level.\n"
 		  "\t-V\t- print version information and exit.\n"
 		  "\t-c file\t- read specified config file.\n"
 		  "\t-C\t- don't read standard config files.\n"
 		  "\t-q\t- quiet - don't print warning messages.\n"
-		  "\t-l\t- write messages to syslog.\n");
-    (void)fprintf(stderr,
+		  "\t-l\t- write messages to syslog.\n"
 		  "\t-L tag\t- specify the tag value for log messages.\n"
 		  "\t-F\t- force printing of spamicity numbers.\n"
 		  "\t-x list\t- set debug flags.\n"
@@ -313,7 +307,8 @@ static void help(void)
 		  "bogofilter is a tool for classifying email as spam or non-spam.\n"
 		  "\n"
 		  "For updates and additional information, see\n"
-		  "URL: http://bogofilter.sourceforge.net\n");
+		  "URL: http://bogofilter.sourceforge.net\n", 
+		  PACKAGE, version, PACKAGE);
 }
 
 static void print_version(void)

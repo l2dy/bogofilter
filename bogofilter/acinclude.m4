@@ -105,48 +105,29 @@ fi
 ])# AC_HEADER_STDBOOL
 
 dnl This is the end of the part extracted from autoconf.
-dnl The next part was added by Clint Adams and modified by
-dnl Matthias Andree.
+dnl The next part was added by Clint Adams.
 
-dnl arguments:
-dnl 1- space delimited list of libraries to check for db_create
-dnl 2- action-if-found
-dnl 3- action-if-not-found
-dnl 4- optional set of libraries to use (pass -lpthread here
-dnl    in case DB is compiled with POSIX mutexes)
 AC_DEFUN([AC_CHECK_DB],[
-  AS_VAR_PUSHDEF([ac_tr_db], [ac_cv_db_libdb])dnl
-  bogo_saved_LIBS="$LIBS"
-  AC_CACHE_CHECK([for library providing db_create], ac_tr_db, [
-    for lib in '' $1 ; do
-      for i in '' $4 ; do
-	if test "x$lib" != "x" ; then
-	  bogo_libadd="-l$lib $i"
-	else
-	  bogo_libadd="$i"
-	fi
-	LIBS="$LIBS $bogo_libadd"
-	AC_LINK_IFELSE([AC_LANG_PROGRAM([
-#include <db.h>],[
-int foo=db_create((void *)0, (void *) 0, 0 );
-])],
-	    [AS_VAR_SET(ac_tr_db, $bogo_libadd)],
-	    [AS_VAR_SET(ac_tr_db, no)])
-	AS_IF([test x"AS_VAR_GET(ac_tr_db)" != xno],
-	    [$2
-	    db="$bogo_libadd"],
-	    [LIBS="$bogo_saved_LIBS"
-	    db=no])
-	test "x$db" != "xno" && break
-      done
-      test "x$db" != "xno" && break
-    done
-    ])
-if test "x$db" = "xno"; then
+for lib in $1
+do
+   AS_VAR_PUSHDEF([ac_tr_db], [ac_cv_db_lib_${lib}])dnl
+   bogo_saved_LIBS="$LIBS"
+   LIBS="$LIBS -l$lib"
+   AC_CACHE_CHECK([for db_create in -l${lib}], ac_tr_db,
+      [AC_TRY_LINK([#include <db.h>], [int foo=db_create((void *)0, (void *) 0, 0 )],
+                   [AS_VAR_SET(ac_tr_db, yes)],
+                   [AS_VAR_SET(ac_tr_db, no)])
+      ])
+   AS_IF([test AS_VAR_GET(ac_tr_db) = yes],
+         [$2
+          db=yes],
+         [LIBS="$bogo_saved_LIBS"
+          db=no])
+   AS_VAR_POPDEF([ac_tr_db])dnl
+test "$db" = "yes" && break
+done
+if test "$db" = "no"; then
 $3
-else
-    LIBS="$bogo_saved_LIBS $ac_tr_db"
 fi
-AS_VAR_POPDEF([ac_tr_db])dnl
 ])# AC_CHECK_DB
 
