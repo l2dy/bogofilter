@@ -125,7 +125,10 @@ done
 
 # get 10 best results (lowest false negative count)
 (echo "" ; \
-echo "Top 10 results" ; \
-grep fpos < $RESULTS | sed "s@\.\.\.@.. @g" | sort -g --key=15 | head -10 ) | tee -a $RESULTS
+echo "Top 10 results:" ; \
+echo " robs   min_dev spam_cutoff  run0 run1 run2 total" ; \
+grep fpos < $RESULTS | grep -v cutoff.0.415000 | sed "s@\.\.\.@.. @g" | \
+awk '{printf "%6.4f %7s %12s  %4d %4d %4d %5d\n", $3, $4, $9, $11, $13, $15, $16 }' | \
+tr -d "," | sort -g --key=7 | head -10 ) | tee -a $RESULTS
 
 date "+%m/%d %H:%M:%S"
