@@ -81,10 +81,12 @@ static int init_list(/*@out@*/ wordlist_t* list, const char* name, const char* f
 }
 
 /* returns -1 for error, 0 for success */
-int setup_lists(const char* dir, double good_weight, double bad_weight)
+int setup_lists(const char* dir)
 {
     int rc = 0;
     char filepath[PATH_LEN];
+    double good_weight = 1.0;
+    double bad_weight  = 1.0;
 
     if (check_directory(dir)) {
 	(void)fprintf(stderr, "%s: cannot find bogofilter directory.\n"
