@@ -122,13 +122,13 @@ wordfile is created if absent.</para>
 on standard input as non-spam.</para>
 
 <para>The <option>-S</option> option tells
-<application>bogofilter</application> undoes a prior registration of the
+<application>bogofilter</application> to undo a prior registration of the
 same message as spam.   If a message was incorrectly entered in the spam 
 wordfile by '-n' or '-u' and you want to remove it from the spam wordfile
 and enter it in the non-spam wordfile, use options '-Sn'.</para>
 
 <para>The <option>-N</option> option tells
-<application>bogofilter</application> undoes a prior registration of the
+<application>bogofilter</application> to undo a prior registration of the
 same message as non-spam.   If a message was incorrectly entered in the non-spam 
 wordfile by '-n' or '-u' and you want to remove it from the non-spam wordfile and
 enter it in the spam wordfile, then use '-Ns'.</para>
@@ -244,8 +244,8 @@ R, below, for further detail.</para>
 <para>The <option>-V</option> option prints the version number and 
 exits.</para>
 
-<para>The <option>-x</option> option allows setting of debug classes for 
-printing debug messages.</para>
+<para>The <option>-x <replaceable>flags</replaceable></option> option 
+allows setting of debug flags for printing debug messages.</para>
 
 <para>The <option>-c</option><replaceable>filename</replaceable> option
 tells <application>bogofilter</application> to read the config file named.

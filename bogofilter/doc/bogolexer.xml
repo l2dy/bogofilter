@@ -44,10 +44,10 @@
 	non-ascii characters to the question point '?'.</para>
     <para>The <option>-v</option> option increases the verbosity level.</para>
 
-<para>The <option>-x</option> option allows setting of debug classes for 
-printing debug messages.</para>
+<para>The <option>-x <replaceable>flags</replaceable></option> option 
+allows setting of debug flags for printing debug messages.</para>
 
-  <para>The <option>-c</option><replaceable>filename</replaceable> option
+<para>The <option>-c</option><replaceable>filename</replaceable> option
 tells <application>bogofilter</application> to read the config file named.
 </para>
 
