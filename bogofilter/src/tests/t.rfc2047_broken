@@ -10,6 +10,11 @@
 # improper processing of the mime parts.
 # Test case 2 supplied by Evgeny Kotsuba.
 
+# NOTE #####
+# Test case 2 is currently disabled because we don't want to
+# provide the same output for broken encoded words as for conformant
+# ones, so we can tell broken mailers from intact.
+
 ##### Test #1 - improper folding #####
 cat >${TMPDIR}/input.1 <<_EOF
 Subject: [Broken] =?ISO-8859-1?Q?Re=3A_=5BBroken=5D_=3D=3FISO-8859-1=3FQ=3F=3D5B?=
@@ -21,6 +26,8 @@ Hello.
 _EOF
 
 $BOGOLEXER -p -C <${TMPDIR}/input.1 >${TMPDIR}/output.1
+
+exit $?
 
 ##### Test #2a - improperly terminated encoded word #####
 
