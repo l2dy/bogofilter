@@ -270,9 +270,15 @@ static void print_parms(const char *label, const char *format, data_t *data)
 
 static void print_all_parms(void)
 {
-    print_parms("rsval", "%6.4f", rsval);
-    print_parms("rxval", "%5.3f", rxval);
-    print_parms("mdval", "%5.3f", mdval);
+    if (verbose >= PARMS) {
+	print_parms("rsval", "%6.4f", rsval);
+	print_parms("rxval", "%5.3f", rxval);
+	print_parms("mdval", "%5.3f", mdval);
+    }
+    else if (verbose >= TIME)
+	printf("cnt: %d ( rs: %d, rx: %d, md: %d )\n",
+	       rsval->cnt * rxval->cnt * mdval->cnt,
+	       rsval->cnt, rxval->cnt, mdval->cnt);
 }
 
 static int compare_ascending(const void *const ir1, const void *const ir2)
@@ -1439,8 +1445,7 @@ static rc_t bogotune(void)
 	    break;
 	}
 
-	if (verbose >= PARMS)
-	    print_all_parms();
+	print_all_parms();
 
 	r_count = rsval->cnt * mdval->cnt * rxval->cnt;
 	results = (result_t *) xcalloc(rsval->cnt * mdval->cnt * rxval->cnt, sizeof(result_t));
