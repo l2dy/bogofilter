@@ -463,7 +463,7 @@ need_my_gsl=0)
 AM_PATH_GSL(1.0, AC_DEFINE(HAVE_GSL_10,,[Define if you have GNU Scientific Library 1.0 or newer])
 need_my_gsl=0)
 if test "$need_my_gsl" = 1 ; then
-  GSL_LIBS="libbf_gsl.a"
+  GSL_LIBS="libbf_gsl.a -lm"
 fi
 
 PATH="$PATH_SAVED"
