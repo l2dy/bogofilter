@@ -1,5 +1,7 @@
 # testing framework for /bin/sh
 
+#SUPPRESS_DELETE=NO
+
 set -e
 
 while : ; do
