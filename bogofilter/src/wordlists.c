@@ -24,9 +24,9 @@
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-/* Default wordlist mode is single wordlist (named wordlist.db) 
-   which contains both ham and spam tokens */
-wl_t	wl_default = WL_M_COMBINED;	
+/* Default wordlist mode is now wordlist.db -
+   a single wordlist containing ham and spam tokens */
+wl_t	wl_default = WL_M_COMBINED;
 wl_t	wl_mode    = WL_M_UNKNOWN;	/* '-W' flag */
 
 #define	MIN_SLEEP	0.5e+3		/* .5 milliseconds */
@@ -189,26 +189,23 @@ void incr_wordlist_mode(void)
 void set_wordlist_mode(void **dbhp, const char *filepath, dbmode_t dbmode)
 {
     if (wl_mode == WL_M_UNKNOWN) {
-	void *dbh = NULL;
+	void *dbh;
 
-	if (dbh == NULL) {
-	    dbh = db_open(filepath, cCombined, aCombined, dbmode);
-	    if (dbh == NULL)
-		wl_mode = WL_M_COMBINED;
-	}
+	wl_mode = wl_default;
+
+	dbh = db_open(filepath, cCombined, aCombined, dbmode);
+	if (dbh != NULL)
+	    wl_mode = WL_M_COMBINED;
 
 	if (dbh == NULL) {
 	    dbh = db_open(filepath, cSeparate, aSeparate, dbmode);
-	    if (dbh == NULL)
+	    if (dbh != NULL)
 		wl_mode = WL_M_SEPARATE;
 	}
 
-	if (dbh == NULL)
-	    wl_mode = wl_default;
-
-	if (dbhp != NULL)
+	if (dbhp != NULL)	/* If non-null, handle is wanted */
 	    *dbhp = dbh;
-	else
+	else			/* else not wanted - close file */
 	    if (dbh != NULL)
 		db_close(dbh, true);
     }
