@@ -2,11 +2,13 @@
 
 # $Id$
 
-# Non-comment lines of bogofilter.cf.example show default settings as
-# used in the bogofilter source code.
+# Default settings (as defined in the bogofilter source code) have a
+# single hash mark starting their line.
 
-# NOTE that comments MUST have their hash mark in the leftmost
-# column of a line! Blank lines are allowed.
+# Alternate values have two hash marks.
+
+# Comments MUST have their hash mark in the leftmost column of a line!
+# Blank lines are allowed.  
 
 ########### General Settings ########################################
 
@@ -14,14 +16,14 @@
 #
 #	directory for wordlists
 
-bogofilter_dir=~/.bogofilter
-#bogofilter_dir=/var/lib/bogofilter
+#bogofilter_dir=~/.bogofilter
+##bogofilter_dir=/var/lib/bogofilter
 
 #	name/location of user config file
 
-user_config_file=~/.bogofilter.cf
-#user_config_file=~/.bogofilterrc
-#user_config_file=~/.bogofilter/config
+#user_config_file=~/.bogofilter.cf
+##user_config_file=~/.bogofilterrc
+##user_config_file=~/.bogofilter/config
 
 
 #### WORDLIST: define additional word lists
@@ -32,7 +34,7 @@ user_config_file=~/.bogofilter.cf
 #	double weight - probability BIAS for list
 #	int override - skip lower valued lists
 
-#wordlist i,ignore,.ignorelist.db,1,0,0
+##wordlist i,ignore,.ignorelist.db,1,0,0
 
 
 #### SPAM_HEADER_NAME
@@ -40,14 +42,14 @@ user_config_file=~/.bogofilter.cf
 #	used in reporting spamicity and
 #	in removing already existing headers
 
-spam_header_name=X-Bogosity
+#spam_header_name=X-Bogosity
 
 
 #### SPAM_SUBJECT_TAG
 #
 #	tag added to "Subject: " line for identifying spam
 
-#spam_subject_tag=***SPAM***
+##spam_subject_tag=***SPAM***
 
 
 ##### STATS_IN_HEADER
@@ -56,7 +58,7 @@ spam_header_name=X-Bogosity
 #	zero:  put spamicity info in message body
 #	can use "bool" values of True, False, Yes, No, 1, or 0
 
-stats_in_header=Y
+#stats_in_header=Y
 
 
 ##### DB_CACHESIZE
@@ -72,8 +74,8 @@ stats_in_header=Y
 #	applications such as scoring.
 #	WARNING: If you set this too large, bogofilter will fail.
 
-#db_cachesize=16
-db_cachesize=0
+##db_cachesize=16
+#db_cachesize=0
 
 #### Format of SPAM_HEADER
 #
@@ -92,13 +94,13 @@ db_cachesize=0
 #
 #	    l - logging tag (from '-l' option)
 #
-#	    o - spam_cutoff, ex. cutoff=%c
+##	    o - spam_cutoff, ex. cutoff=%c
 #
 #	    r - runtype
 #	        w - word count
 #	        m - message count
 #
-#	    v - version, ex. "version=%v"
+##	    v - version, ex. "version=%v"
 #
 #    customizable messages:
 #
@@ -113,17 +115,17 @@ db_cachesize=0
 #
 #    below are the current values of the options:
 #
-# header_format = %h: %c, tests=bogofilter, spamicity=%p, version=%v
-# terse_format = %1.1c %f
-# log_header_format = %h: %c, spamicity=%p, version=%v
-# log_update_format = register-%r, %w words, %m messages
+## header_format = %h: %c, tests=bogofilter, spamicity=%p, version=%v
+## terse_format = %1.1c %f
+## log_header_format = %h: %c, spamicity=%p, version=%v
+## log_update_format = register-%r, %w words, %m messages
 
 
 ##### TERSE
 #
 #	if enabled, format the X-Bogosity use the 'terse_format' specificaton.
 
-terse=no
+#terse=no
 
 ########### Tokenizer Settings ######################################
 
@@ -132,7 +134,7 @@ terse=no
 #	if enabled, html comments are delimited by "<!-->" and "-->".
 #	if disabled, html comments are delimited by "<!>" and ">".
 
-strict_check=no
+#strict_check=no
 
 
 #### BLOCK ON SUBNETS
@@ -141,47 +143,50 @@ strict_check=no
 #	and also return url:1.2.3, url:1.2, and url:1
 #       to allow identifying spammers by ip address / subnets.
 
-block_on_subnets=no
+#block_on_subnets=no
 
 
 #### CHARSET handling
 #
 #	specify default charset
 
-charset_default=us-ascii
-#charset_default=iso-8859-1
+#charset_default=us-ascii
+##charset_default=iso-8859-1
 
+
+##### REPLACE_NONASCII_CHARACTERS
+#
 #	replace non-7bit chars with '?'
 
-replace_nonascii_characters=N
+#replace_nonascii_characters=N
 
 
 ##### HEADER_LINE_MARKUP
 #
 #	if enabled, add a "subj:" prefix to tokens in the Subject: line
 
-header_line_markup=no
+#header_line_markup=yes
 
 
 ##### IGNORE_CASE
 #
 #	if enabled, all letters are converted to lower case
 
-ignore_case=no
+#ignore_case=no
 
 
 #### TOKENIZE_HTML_TAGS
 #
 #	when enabled, the innards of html tags are tokenized
 
-tokenize_html_tags=no
+#tokenize_html_tags=yes
 
 
 #### TOKENIZE_HTML_SCRIPT --- 	*** NOT YET WORKING ***
 #
 #	when enabled, the innards of html script blocks are tokenized
 
-tokenize_html_script=no
+#tokenize_html_script=no
 
 
 ########### Classification Constants General Settings ###############
@@ -193,7 +198,7 @@ tokenize_html_script=no
 #	spamicity calculation
 #       defaults: 0.0 for graham and 0.1 for robinson and fisher
 
-# min_dev=0.0
+## min_dev=0.0
 
 
 ##### THRESHOLD Values
@@ -201,13 +206,13 @@ tokenize_html_script=no
 #	used to determine if/when spamicity
 #	values are output by print_bogostats()
 
-thresh_index = 0
-thresh_stats = 0.0
-thresh_rtable = 0.0
+#thresh_index = 0
+#thresh_stats = 0.0
+#thresh_rtable = 0.0
 
-# thresh_index = 12
-# thresh_stats =0.2
-# thresh_rtable=0.4
+## thresh_index = 12
+## thresh_stats =0.2
+## thresh_rtable=0.4
 
 
 
@@ -217,9 +222,9 @@ thresh_rtable = 0.0
 #
 #	specify scoring algorithm
 
-#algorithm=graham
-#algorithm=robinson
-algorithm=fisher
+##algorithm=graham
+##algorithm=robinson
+#algorithm=fisher
 
 
 ##### Robinson Constants
@@ -229,8 +234,8 @@ algorithm=fisher
 #       Also applies to Fisher.
 #	Does not apply to Graham.
 
-robs=0.001
-robx=0.415
+#robs=0.001
+#robx=0.415
 
 
 #### CUTOFF Values
@@ -243,18 +248,18 @@ robx=0.415
 #	    setting ham_cutoff to a non-zero value will
 #	    enable tristate results (Yes/No/Unsure).
 
-# spam_cutoff = 0.90	# for graham
-# spam_cutoff = 0.54	# for robinson
+## spam_cutoff = 0.90	# for graham
+## spam_cutoff = 0.54	# for robinson
 
 # fisher (with Yes/No output, i.e. '-2' option):
 #
-ham_cutoff = 0.00
-spam_cutoff = 0.95
+#ham_cutoff = 0.00
+#spam_cutoff = 0.95
 
 # fisher (with Yes/No/Unsure output, i.e. '-3' option):
 #
-# ham_cutoff = 0.10
-# spam_cutoff = 0.95
+## ham_cutoff = 0.10
+## spam_cutoff = 0.95
 
 
 #### Format of spamicity output
@@ -262,13 +267,13 @@ spam_cutoff = 0.95
 # for two-state output:
 #	using "Yes" and "No" as labels.
 
-spamicity_tags = Yes, No
-spamicity_formats = %0.6f, %0.6f
+#spamicity_tags = Yes, No
+#spamicity_formats = %0.6f, %0.6f
 
 # for fisher (with 3-state output)
 #	using "Spam", "Ham", and "Unsure" as labels,
 #	format "%6.2e" for displaying Spam/Ham scores.
 #	and format "%0.6f" for Unsure scores.
 #
-# spamicity_tags = Spam, Ham, Unsure
-# spamicity_formats = %6.2e, %6.2e, %0.6f
+## spamicity_tags = Spam, Ham, Unsure
+## spamicity_formats = %6.2e, %6.2e, %0.6f
