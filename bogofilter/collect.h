@@ -16,6 +16,8 @@ extern void wordprop_init(void *vwordprop);
 extern void collect_words(/*@out@*/ wordhash_t **wh,
        /*@out@*/ /*@null@*/ long *word_count, /*@out@*/ bool *cont);
 
-extern void collect_reset(void);
+#if	0	/* 01/26/2003 - not used */
+void collect_reset(void);
+#endif
 
 #endif

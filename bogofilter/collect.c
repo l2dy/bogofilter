@@ -22,10 +22,12 @@ void wordprop_init(void *vwordprop){
 
 static bool from_seen = false;
 
+#if	0	/* 01/26/2003 - not used */
 void collect_reset(void)
 {
     from_seen = false;
 }
+#endif
 
 /* Tokenize input text and save words in the allocated wordhash_t hash table.
  * The caller must free the returned wordhash.
@@ -64,8 +66,8 @@ void collect_words(/*@out@*/ wordhash_t **wh,
 	    continue;
 	}
 
-	/* Want to process EOF, *then* drop out */
-	*cont = (token_type != NONE);
+	/* Process more input if FROM, but not if EOF */
+	*cont = token_type != NONE;
 	break;
     }
 
