@@ -205,6 +205,8 @@ static int get_unfolded_line(buff_t *buff)
 		convert_eol(text, ' ');
 	    }
 	}
+	if (buff->size - count < 1000)
+	    break;
     }
     return count;
 }
