@@ -162,6 +162,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'c':
+    case O_CONFIG_FILE:
 	read_config_file(val, false, false, precedence);
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */

@@ -24,6 +24,7 @@ enum field_e {
 typedef enum longopts_e {
     O_BLOCK_ON_SUBNETS = 1000,
     O_CHARSET_DEFAULT,
+    O_CONFIG_FILE,
     O_DB_MAX_OBJECTS,
     O_DB_MAX_LOCKS,
     O_DB_PRUNE,

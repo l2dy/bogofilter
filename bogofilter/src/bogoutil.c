@@ -768,6 +768,7 @@ static int process_arg(int option, const char *name, const char *val)
     /* ignore options that don't apply to bogoutil */
     case O_BLOCK_ON_SUBNETS:
     case O_CHARSET_DEFAULT:
+    case O_CONFIG_FILE:
     case O_NS_ESF:
     case O_SP_ESF:
     case O_HAM_CUTOFF:

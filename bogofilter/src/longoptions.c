@@ -45,7 +45,7 @@ struct option long_options[] = {
     { "register-spam",			N, 0, 's' },
     { "update-as-scored",		N, 0, 'u' },
     { "timestamp-date",			N, 0, 'y' },
-    { "config-file",			R, 0, 'c' },
+    { "config-file",			R, 0, O_CONFIG_FILE },
     { "no-config-file",			N, 0, 'C' },
     { "debug-flags",			R, 0, 'x' },
     { "debug-to-stdout",		N, 0, 'D' },
