@@ -608,7 +608,7 @@ static void top_ten(result_t *sorted)
 
     if (verbose)
 	printf("    ");
-    printf("    rs    md    rx    co    %%fp    %%fn");
+    printf("   rs     md    rx    co      %%fp     %%fn");
     if (verbose>1)
 	printf("    fp  fn");
     printf( "\n" );
@@ -643,9 +643,8 @@ static int gfn(result_t *results, uint rsi, uint mdi, uint rxi)
     return fn;
 }
 
-static bool count_outliers(uint r_count, result_t *sorted, result_t *unsorted)
+static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsorted)
 {
-    bool ok = true;
     bool f = false;
     uint i, o = 0;
     uint fn;
@@ -693,11 +692,7 @@ static bool count_outliers(uint r_count, result_t *sorted, result_t *unsorted)
 	printf("No smooth minimum encountered, using lowest fn count (an outlier).         \n");
     }
 
-    robs = rsval->data[rsi];
-    robx = rxval->data[rxi];
-    min_dev = mdval->data[mdi];
-
-    return ok;
+    return r;
 }
 
 static void progress(uint cur, uint top)
@@ -783,7 +778,7 @@ static void final_recommendations(void)
     ham_cutoff = sp_scores[s];
     if (ham_cutoff < 0.1) ham_cutoff = 0.1;
     if (ham_cutoff > 0.4) ham_cutoff = 0.4;
-    printf("ham_cutoff=%8.6f\n", ham_cutoff);
+    printf("ham_cutoff=%5.3f\n", ham_cutoff);
     printf("---cut---\n");
     printf("\n");
     printf("Tuning completed.\n");
@@ -896,7 +891,7 @@ static rc_t bogotune(void)
 
     robx = ROUND(robx*1000.0)/1000.0;
 
-    printf("Initial x value is %8.6f\n", robx);
+    printf("Initial x value is %5.3f\n", robx);
 
     for (scan=0; scan <= 1; scan += 1) {
 	bool f;
@@ -1014,9 +1009,16 @@ static rc_t bogotune(void)
 
 	sorted = results_sort(r_count, results);
 	top_ten(sorted);
-	count_outliers(r_count, sorted, results);
+
+	r = count_outliers(r_count, sorted, results);
+	robs = rsval->data[r->rsi];
+	robx = rxval->data[r->rxi];
+	min_dev = mdval->data[r->mdi];
 
 	printf("Minimum found at s %6.4f, md %5.3f, x %5.3f\n", robs, min_dev, robx);
+	printf( "        fp %d (%6.4f%%), fn %d (%6.4f%%)\n",
+		r->fp, r->fp*100.0/ns_cnt, 
+		r->fn, r->fn*100.0/sp_cnt);
 	printf("\n");
 
 	data_free(rsval);
