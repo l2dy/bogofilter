@@ -7,6 +7,8 @@ is in the RELEASE.NOTES files!
 
 $Id$
 
+0.15.3	2003-09-10
+
 	2003-09-09
 
 	* Fixed maintenance mode (broken during database API rewrite).
