@@ -74,6 +74,7 @@
 #include "msgcounts.h"
 #include "textblock.h"
 #include "token.h"
+#include "xatox.h"
 #include "xmalloc.h"
 
 #define YY_DECL token_t yylex(void)
@@ -91,6 +92,7 @@ static int lineno;
 /* Function Prototypes */
 
 static word_t *yy_text(void);
+static void html_char(void);
 static void reorder_html(void);
 
 static void skip_to(char chr);
@@ -173,7 +175,7 @@ WHITESPACE	[ \t\n]
 
 NOTWHITESPACE	[^ \t\n]
 
-HTML_ENTITY		"&#"[[:digit:]]+";"
+HTML_ENTITY		"&#"x?[[:digit:]]+";"
 
 HTML_WI_COMMENTS	"<"[^\>]*">"
 
@@ -287,9 +289,7 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 {IPADDR}					{ return IPADDR;}
 {TOKEN}						{ return TOKEN;}
 
-<HTML>{HTML_ENTITY}				{ if (BOGOTEST('T')) 	/* token mode ??? */
-						     return TOKEN;
-						}
+<HTML>({TOKEN}|{A2}|{A1})?{HTML_ENTITY}		{ html_char(); }	/* process escaped chars, eg '&#61;' is 'A' */
 
 \${DOLLARS}(\.{CENTS})?				{ return TOKEN;}
 
@@ -326,6 +326,46 @@ static void reorder_html(void)
     for(tmp = yycopy+yyleng-1 ; tmp >= yycopy; tmp--) 
 	yyunput(*tmp, yytext);
     xfree(yycopy);
+}
+
+static int xtoi(char *in)
+{
+    int val = 0;
+    while (isxdigit(*in)) {
+	char c = *in++;
+	val <<= 16;
+	val += isdigit(c) ? (c - '0') : (tolower(c) - 'a' + 10);
+    }
+    return val;
+}
+
+static void html_char(void)
+{
+    char *txt = strstr(yytext, "&#");	/* find decodable char */
+    size_t len = txt - yytext;
+    int  val;
+    byte *yycopy = NULL;
+
+    if (len != 0) {
+	yycopy = xmalloc(yyleng + 1);	/* +1 for NUL byte below */
+	memcpy(yycopy, yytext, yyleng);	/* copy tag to start of buffer */
+	yycopy[yyleng] = '\0';		/* for debugging */
+    }
+
+    txt += 2;
+    val = isdigit((byte) *txt) ? atoi(txt) : xtoi(txt+1);
+
+    if ((val < 256) && isalnum(val)) {	/* use it if alphanumeric */
+	yyunput(val, yytext);
+	yyleng = len;			/* adjust len to pre-char count */
+    }
+
+    if (yycopy != NULL) {
+	yyunput(' ', yytext);		/* prevents parsing loop */
+	while (--yyleng > 0)
+	    yyunput(yycopy[yyleng], yytext);
+	xfree(yycopy);
+    }
 }
 
 char yy_get_state(void);

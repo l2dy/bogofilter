@@ -180,12 +180,6 @@ static int get_decoded_line(buff_t *buff)
 	    if (DEBUG_LEXER(1)) 
 		lexer_display_buffer(buff);
 	}
-
-	if (msg_state->mime_type == MIME_TEXT_HTML) {
-	    line.leng = count;
-	    line.text[line.leng] = '\0';
-	    count = html_decode(&line);
-	}
     }
 
     /* CRLF -> NL */
@@ -311,12 +305,6 @@ size_t text_decode(word_t *w)
 	    fputs("\n", dbgout);
 	}
 
-	if (msg_state->mime_type == MIME_TEXT_HTML) {
-	    len = html_decode(&n);
-	    n.leng = len;
-	    n.text[n.leng] = '\0';
-	}
-
 	memmove(beg+size, n.text, len+1);
 	size += len;
 	txt = end + 2;
@@ -340,52 +328,6 @@ size_t text_decode(word_t *w)
 	else while (txt < end)
 	    beg[size++] = *txt++;
     }
-
-    return size;
-}
-
-size_t html_decode(word_t *w)
-{
-    char *beg = (char *) w->text;
-    size_t size = w->leng;
-    char *fin = beg + size;
-    char *txt = strstr(beg, "&#");	/* find decodable char */
-    char *out = txt;
-
-    if (! BOGOTEST('C'))		/* char mode ??? */
-	return size;
-
-    if (txt == NULL)
-	return size;
-
-    while (txt != NULL && txt + 2 < fin) {
-	char c;
-	size_t len;
-	int v = 0;
-	char *nxt = txt + 2;
-
-	for (c = *nxt++; isdigit(c); c = *nxt++) {
-	    v = v * 10 + c - '0';
-	}
-	if (c != ';')
-	    break;
-	if (v < 256 && isalnum(v))
-	    *out++ = v;			/* use it if alphanumeric */
-	else {
-	    *out++ = *txt++;		/* else skip it */
-	    nxt = txt;
-	}
-	txt = strstr(nxt, "&#");	/* find decodable char */
-	if (txt != NULL)
-	    len = txt - nxt;
-	else
-	    len = fin - nxt;
-	memmove(out, nxt, len);
-	out += len;
-    }
-
-    size = out - beg;
-    Z(beg[size]);			/* for easier debugging - removable */
 
     return size;
 }
