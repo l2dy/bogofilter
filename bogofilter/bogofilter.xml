@@ -14,6 +14,7 @@
 
 <cmdsynopsis>
   <command>bogofilter</command>
+  <arg choice='opt'>-h</arg>
   <arg choice='opt'>-s</arg>
   <arg choice='opt'>-n</arg>
   <arg choice='opt'>-S</arg>
@@ -75,6 +76,8 @@ and non-enclosure parts.</para>
 <para>Without command-line options, <application>bogofilter</application>
 returns 1 if the message is non-spam, 0 if it is spam.  The non-spam
 wordfile is created if absent.</para>
+
+<para>The <option>-h</option> prints the help message and exits.</para>
 
 <para>The <option>-s</option> tells <application>bogofilter</application>
 to register the text presented on standard input as spam.  The spam
