@@ -29,7 +29,6 @@ struct textblock
 };
 
 extern bool block_on_subnets;
-extern struct textblock textblocks, *textend;
 
 extern token_t yylex(void);
 

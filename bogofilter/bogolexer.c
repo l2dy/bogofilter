@@ -18,6 +18,7 @@ NAME:
 
 #include "charset.h"
 #include "lexer.h"
+#include "textblock.h"
 #include "token.h"
 
 /* exports */
@@ -78,6 +79,8 @@ int main(int argc, char **argv)
 	    exit(0);
 	}
 
+    textblocks = textblock_init();
+
     if (!passthrough)
     {
 	if (quiet)
@@ -99,6 +102,8 @@ int main(int argc, char **argv)
 
     if ( !passthrough )
 	printf( "%d tokens read.\n", count );
+
+    textblock_free(textblocks);
 
     return 0;
 }

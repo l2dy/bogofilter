@@ -19,6 +19,7 @@
 #include "error.h"
 #include "lexer.h"
 #include "fgetsl.h"
+#include "textblock.h"
 #include "xmalloc.h"
 
 /*
@@ -49,9 +50,6 @@
  */
 
 extern char *spam_header_name;
-
-struct textblock textblocks;
-/*@dependent@*/ struct textblock *textend = &textblocks;
 
 #define YY_INPUT(buf,result,max_size) result = yyinput(buf, max_size)
 
@@ -286,15 +284,7 @@ static int yyinput(char *buf, int max_size)
 	 * Note that we store fixed-length blocks here, not lines.
 	 * One very long physical line could break up into more
 	 * than one of these. */
-	textend->len = returned;
-	if (returned) {
-	    textend->block = (char *)xmalloc(returned);
-	    memcpy(textend->block, buf, returned);
-	}
-	textend->next = (struct textblock *)xmalloc(sizeof(struct textblock));
-	textend->next->block = NULL;
-	textend->next->len = 0;
-	textend = textend->next;
+	textblock_add(textblocks, buf, returned);
     }
 
     /* \r\n -> \n */

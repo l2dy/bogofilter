@@ -33,6 +33,7 @@ AUTHOR:
 #include "format.h"
 #include "paths.h"
 #include "register.h"
+#include "textblock.h"
 #include "wordlists.h"
 #include "xmalloc.h"
 
@@ -92,6 +93,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     } else {
 	out = stdout;
     }
+    
+    textblocks = textblock_init();
 
     switch(run_type) {
 	case RUN_NORMAL:
@@ -99,19 +102,18 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	    {
 		double spamicity;
 		rc_t   status = bogofilter(&spamicity);
+		textdata_t *text;
 
 		if (passthrough)
 		{
 		    /* print headers */
-		    for (textend=&textblocks; textend->block; textend=textend->next)
+		    for (text=textblocks->head; text->next; text=text->next)
 		    {
-			if ((textend->len == 1
-				    && memcmp(textend->block, NL, 1) == 0)
-				|| (textend->len == 2
-				    && memcmp(textend->block, CRLF, 2) == 0))
+			if ((text->size == 1 && memcmp(text->data, NL, 1) == 0) ||
+			    (text->size == 2 && memcmp(text->data, CRLF, 2) == 0))
 			    break;
 
-			(void) fwrite(textend->block, 1, textend->len, out);
+			(void) fwrite(text->data, 1, text->size, out);
 			if (ferror(out)) cleanup_exit(2, 1);
 		    }
 		}
@@ -142,13 +144,13 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 		    /* If the message terminated early (without body or blank
 		     * line between header and body), enforce a blank line to
 		     * prevent anything past us from choking. */
-		    if (!textend->block)
+		    if (!text->data)
 			(void)fputs("\n", out);
 
 		    /* print body */
-		    for (; textend->block != NULL; textend=textend->next)
+		    for (; text->next != NULL; text=text->next)
 		    {
-			(void) fwrite(textend->block, 1, textend->len, out);
+			(void) fwrite(text->data, 1, text->size, out);
 			if (ferror(out)) cleanup_exit(2, 1);
 		    }
 
@@ -168,6 +170,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	    register_messages(run_type);
 	    break;
     }
+
+    textblock_free(textblocks);
 
     close_lists();
 
