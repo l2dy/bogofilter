@@ -73,9 +73,11 @@ void open_wordlists(dbmode_t mode)
 		} /* switch */
 	    } else { /* ds_open */
 		dsv_t val;
+		ds_txn_begin(list->dsh);
 		ds_get_msgcounts(list->dsh, &val);
 		list->msgcount[IX_GOOD] = val.goodcount;
 		list->msgcount[IX_SPAM] = val.spamcount;
+		ds_txn_commit(list->dsh);
 	    } /* ds_open */
 	} /* for */
     } while(retry);

@@ -31,8 +31,6 @@ bool     timestamp_tokens = true;
 
 /* Function Prototypes */
 
-static int maintain_wordlist(void *vhandle);
-
 /* Function Definitions */
 
 /* Keep high counts */
@@ -111,35 +109,6 @@ bool do_replace_nonascii_characters(register byte *str, register size_t len)
     return change;
 }
 
-void maintain_wordlists(void)
-{
-    wordlist_t *list;
-
-    for (list = word_lists; list != NULL; list = list->next) {
-	maintain_wordlist(list->dsh);
-	list = list->next;
-    }
-}
-
-int maintain_wordlist_file(const char *db_file)
-{
-    int rc;
-    dsh_t *dsh;
-
-    ds_init();
-    dsh = ds_open(CURDIR_S, db_file, DB_WRITE);
-
-    if (dsh == NULL)
-	return EX_ERROR;
-
-    rc = maintain_wordlist(dsh);
-
-    ds_close(dsh, false);
-    ds_cleanup();
-
-    return rc;
-}
-
 struct userdata_t {
     void *vhandle;
     ta_t *transaction;
@@ -199,7 +168,7 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
     return EX_OK;
 }
 
-int maintain_wordlist(void *vhandle)
+static int maintain_wordlist(void *vhandle)
 {
     ta_t *transaction = ta_init();
     struct userdata_t userdata;
@@ -208,7 +177,44 @@ int maintain_wordlist(void *vhandle)
     userdata.vhandle = vhandle;
     userdata.transaction = transaction;
     
-    ret = ds_foreach(vhandle, maintain_hook, &userdata);
+    if (DST_OK == ds_txn_begin(vhandle)) {
+	ret = ds_foreach(vhandle, maintain_hook, &userdata);
+    } else
+	ret = -1;
 
-    return ret | ta_commit(transaction);
+    ret |= ta_commit(transaction);
+    if (DST_OK != ds_txn_commit(vhandle))
+	ret = -1;
+    return ret;
+}
+
+#if 0
+static void maintain_wordlists(void)
+{
+    wordlist_t *list;
+
+    for (list = word_lists; list != NULL; list = list->next) {
+	maintain_wordlist(list->dsh);
+	list = list->next;
+    }
+}
+#endif
+
+int maintain_wordlist_file(const char *db_file)
+{
+    int rc;
+    dsh_t *dsh;
+
+    ds_init();
+    dsh = ds_open(CURDIR_S, db_file, DB_WRITE);
+
+    if (dsh == NULL)
+	return EX_ERROR;
+
+    rc = maintain_wordlist(dsh);
+
+    ds_close(dsh, false);
+    ds_cleanup();
+
+    return rc;
 }

@@ -59,6 +59,11 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
   run_type |= _run_type;
 
+retry:
+  if (ds_txn_begin(word_list->dsh)) {
+      fprintf(stderr, "ds_txn_begin error.\n");
+      abort();
+  }
   for (node = wordhash_first(h); node != NULL; node = wordhash_next(h))
   {
       dsv_t val;
@@ -78,11 +83,6 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
   for (list = word_lists; list != NULL; list = list->next)
   {
       dsv_t val;
-
-/*
-      if (!list->active)
-	  continue;
-*/
 
       ds_get_msgcounts(list->dsh, &val);
       list->msgcount[IX_SPAM] = val.spamcount;
@@ -105,6 +105,19 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
       g += val.goodcount;
       b += val.spamcount;
+
+      switch(ds_txn_commit(list->dsh)) {
+	  case DST_OK:
+	      break;
+	  case DST_TEMPFAIL:
+	      goto retry;
+	  case DST_FAILURE:
+	      fprintf(stderr, "commit failed.\n");
+	      abort();
+	  default:
+	      fprintf(stderr, "unknown return.\n");
+	      abort();
+      }
 
       ds_flush(list->dsh);
 

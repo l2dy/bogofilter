@@ -243,6 +243,10 @@ int ds_delete(void *vhandle, const word_t *word)
     return ret;		/* 0 if ok */
 }
 
+int ds_txn_begin(void *vhandle) { return db_txn_begin(vhandle); }
+int ds_txn_abort(void *vhandle) { return db_txn_abort(vhandle); }
+int ds_txn_commit(void *vhandle) { return db_txn_commit(vhandle); }
+
 typedef struct {
     ds_foreach_t *hook;
     dsh_t	 *dsh;
@@ -300,7 +304,13 @@ int ds_oper(const char *path, dbmode_t open_mode,
 	exit(EX_ERROR);
     }
 
-    ret = ds_foreach(dsh, hook, userdata);
+    if (DST_OK == ds_txn_begin(dsh)) {
+	ret = ds_foreach(dsh, hook, userdata);
+	if (ret) { ds_txn_abort(dsh); }
+	else
+	    if (ds_txn_commit(dsh) != DST_OK)
+		ret = -1;
+    }
 
     ds_close(dsh, false);
     ds_cleanup();
