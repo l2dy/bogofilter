@@ -41,7 +41,7 @@ if [ "${opt}" = "X" ]; then
 
  #but some don't
  if [ "${recipient}X" = "X" ]; then
-	$recipient = $SENDER
+	recipient=$SENDER
 	echo "bogofilter-qfe: defaulting error response to $SENDER"
  fi
 
