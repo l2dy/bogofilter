@@ -16,10 +16,10 @@ $Id$
 
 	2003-09-25
 
-	* GNU GSL 1.4 has replaced DCDFLIB . If GSL 1.4 or newer is
+	* GNU GSL 1.4 has replaced DCDFLIB. If GSL 1.4 or newer is
 	  installed in your system, bogofilter will use that (which will
 	  usually be a shared library); if GSL is missing or a prior
-	  versions, bogofilter will statically link against GSL 1.4
+	  version, bogofilter will statically link against GSL 1.4
 	  excerpts from the gsl/ directory.
 
 	  While we believe we have been allowed to include DCDFLIB with
