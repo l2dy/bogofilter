@@ -12,11 +12,11 @@ $BOGOFILTER -D -v -l -s < ${SYSTEST}/inputs/spam.mbx >> $TMPDIR/tmp
 $BOGOFILTER -D -v -l -n < ${SYSTEST}/inputs/good.mbx >> $TMPDIR/tmp
 
 cat >>$TMPDIR/result <<EOF
-initial:   5256
-count 0 -> 5256
-count 1 -> 1813
-count 2 ->  916
-count 3 ->  595
+initial:   5212
+count 0 -> 5212
+count 1 -> 1801
+count 2 ->  908
+count 3 ->  588
 EOF
 
 echo -n initial:  >> $OUT
