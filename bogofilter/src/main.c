@@ -297,11 +297,13 @@ static void write_message(FILE *fp, rc_t status)
     void *rfarg = 0;	/* assignment to quench warning */
     char *out;
     textdata_t *text;
+    int seen_subj = 0;
 
     if (passthrough) {
 	int hadlf = 1;
 	int bogolen = strlen(spam_header_name);
-	int subjlen = strlen("Subject:");
+	const char *subjstr = "Subject:";
+	int subjlen = strlen(subjstr);
 	/* initialize */
 	switch (passmode) {
 	    case PASS_MEM:
@@ -338,11 +340,12 @@ static void write_message(FILE *fp, rc_t status)
 	    if (status == RC_SPAM &&
 		rd >= subjlen && 
 		spam_subject_tag != NULL &&
-		memcmp(out, "Subject:", subjlen) == 0) {
-		(void) fprintf(fp, "Subject: %s", spam_subject_tag);
+		strncasecmp(out, subjstr, subjlen)) {
+		(void) fprintf(fp, "%.*s %s", subjlen, out, spam_subject_tag);
 		if (out[subjlen] != ' ')
 		    fputc(' ', fp);
 		(void) fwrite(out + subjlen, 1, rd - subjlen, fp);
+		seen_subj = 1;
 		continue;
 	    }
 
@@ -370,6 +373,11 @@ static void write_message(FILE *fp, rc_t status)
 	verbose += passthrough;
 	print_stats( stdout );
 	verbose -= passthrough;
+    }
+
+    if (passthrough && !seen_subj &&
+	status == RC_SPAM && spam_subject_tag != NULL) {
+	(void) fprintf(fp, "Subject: %s\n", spam_subject_tag);
     }
 
     if (passthrough) {
