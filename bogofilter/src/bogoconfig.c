@@ -600,11 +600,11 @@ void query_config(void)
 static void display_tag_array(const char *label, const char **array)
 {
     size_t i;
-    size_t size = twostate ? 2 : 3;
+    size_t count = twostate ? 2 : 3;
     const char *s;
 
     fprintf(stdout, "%s =", label);
-    for (i = 0, s = ""; i < size; i += 1, s = ",")
+    for (i = 0, s = ""; i < count; i += 1, s = ",")
 	fprintf(stdout, "%s '%s'", s, array[i]);
     fprintf(stdout, "\n");
 }
