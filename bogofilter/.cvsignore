@@ -22,3 +22,5 @@ Makefile
 Makefile.in
 stamp-h1
 version.h
+bogoupgrade.1
+debugtest
