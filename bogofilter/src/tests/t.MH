@@ -1,0 +1,49 @@
+#! /bin/sh
+
+set -e
+
+# Note:  When run via "make check", test output files are automatically deleted.
+#	 When run from the command line, outputs files are left in directory
+#	 MH.YYYYMMDD.  This is useful when something is different.
+#
+#	 ./inputs/spam.mbx & ./inputs/good.mbx  - test inputs
+#	 ./outputs - known correct outputs
+#
+#	 MH.YYYYMMDD:
+#		tests   - directory containing individual output files
+
+if [ "$1" = "save" ]; then
+    [ -d $2/$3 ] || mkdir $2/$3
+    cat > $2/$3/$FILENO
+    exit
+fi
+
+NODB=1 . ${srcdir=.}/t.frame
+
+OUT="${TMPDIR}/MH.out"
+
+OUTPUTS=${SYSTEST}/outputs
+CORRECT="${OUTPUTS}/MH.out"
+
+verbose=0
+if [ "$1" = "-v" ]; then
+    verbose=1
+    v="-v"
+fi
+
+( formail </dev/null >/dev/null 2>/dev/null ) || exit 77
+
+for f in good spam ; do
+    cat ${srcdir}/inputs/$f.mbx | formail -s $0 save $TMPDIR $f 
+done
+
+$BOGOFILTER -C -D -n -B $TMPDIR/good $v
+$BOGOFILTER -C -D -s -B $TMPDIR/spam $v
+
+$BOGOFILTER -C -D -T -B $TMPDIR/good $TMPDIR/spam | sed s@$TMPDIR/@@ | egrep -v " (H 0|S 1)$" > $OUT
+
+if  [ $verbose -eq 0 ]; then
+    cmp $CORRECT $OUT
+else
+    diff $DIFF_BRIEF $CORRECT $OUT
+fi

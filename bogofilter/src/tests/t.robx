@@ -1,0 +1,71 @@
+#! /bin/sh
+
+set -e
+
+# Note:  When run via "make check", test output files are automatically deleted.
+#	 When run from the command line, outputs files are left in directory
+#	 robx.YYYYMMDD.  This is useful when something is different.
+#
+#	 ./inputs  - test inputs
+#	 ./outputs - known correct outputs
+#
+#	 robx.YYYYMMDD:
+#		tests   - directory containing individual output files
+
+NODB=1 . ${srcdir=.}/t.frame
+
+: ${AWK=awk}
+
+[ -d ${TMPDIR}/tests ] && rm -rf ${TMPDIR}/tests
+mkdir -p ${TMPDIR}/tests
+
+CONFIG="${TMPDIR}/test.cf"
+
+cat <<EOF > ${CONFIG}
+robx=0.415
+min_dev=0.0
+spam_header_name=X-Bogosity
+stats_in_header=Y
+EOF
+
+OPTS=" -c ${CONFIG} -y 0"
+
+$BOGOFILTER $OPTS -r -s < ${SYSTEST}/inputs/spam.mbx
+$BOGOFILTER $OPTS -r -n < ${SYSTEST}/inputs/good.mbx
+
+if [ ! -z "$RUN_FROM_MAKE" ] ; then
+    $BOGOUTIL -D -R $TMPDIR
+else
+    for f in $BOGOFILTER_DIR/*.${DB_EXT} ; do
+	n=`basename $f .${DB_EXT}`
+	$BOGOUTIL -d $BOGOFILTER_DIR/$n.${DB_EXT} > ${TMPDIR}/$n.txt
+    done
+    $BOGOUTIL -vvv -D -R $TMPDIR > ${TMPDIR}/output.vvv
+fi
+
+[ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
+
+RESULT=`$BOGOUTIL -w $TMPDIR .ROBX | $AWK '/.ROBX/ { print $2; }'`
+
+#strict checking
+WANT="244544"
+#loose checking
+WANT="244724"
+#min spamness/hamness of 10
+WANT="356086"
+# v0.13.0 - new parsing rules - case sensitive, header_line_markup, tokenize_html_tags
+WANT="370952"
+# v0.13.5 - new parsing rules - allow terminal exclamation points
+WANT="367743"
+# v0.13.6.2 - lexer_v3.l changes to exclude brackets
+WANT="367104"
+# v0.15.1 - lexer_v3.l changes to exclude message ids
+WANT="368615"
+
+if [ "$RESULT" != "$WANT" ] ; then
+    echo want: $WANT, have: $RESULT
+#   $BOGOFILTER $OPTS -x ml -vvv -r -s < ${SYSTEST}/inputs/spam.mbx > ${TMPDIR}/spam.txt
+#   $BOGOFILTER $OPTS -x ml -vvv -r -n < ${SYSTEST}/inputs/good.mbx > ${TMPDIR}/good.txt
+fi
+
+test "$RESULT" = "$WANT"

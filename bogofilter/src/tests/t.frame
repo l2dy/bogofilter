@@ -10,6 +10,7 @@
 
 set -e
 
+: ${srcdir=.}
 : ${relpath=..}
 : ${BF_TESTDIR=.}
 
@@ -55,6 +56,8 @@ while [ $i -lt 3 ] ; do
     INSERT=$INSERT/..
 done
 
+SYSTEST="${srcdir}"
+
 if [ -z "$RUN_FROM_MAKE" ] ; then
 # standalone, from shell directly
 # THIS IS PRONE TO RACES
@@ -74,8 +77,15 @@ fi
 rm -rf $TMPDIR
 mkdir $TMPDIR
 
+verbose=0
 if [ "$1" = "-v" ]; then
+    verbose=1
     ${relpath}/bogofilter -V 2> ${TMPDIR}/version.out
+fi
+
+if [ "$1" = "-vv" ]; then
+    v="-x l -vv -D"
+    verbose=2
 fi
 
 if test "x$SUPPRESS_DELETE" = "x" ; then
@@ -86,6 +96,14 @@ fi
 
 BOGOFILTER_DIR=$TMPDIR
 export BOGOFILTER_DIR
+
+BOGOFILTER="$VAL ${relpath}/bogofilter"
+BOGOLEXER="$VAL ${relpath}/bogolexer"
+BOGOUTIL="$VAL ${relpath}/bogoutil"
+BOGOLEX_SH="$VAL ${srcdir}/../../tuning/bogolex.sh"
+export BOGOFILTER
+export BOGOLEXER
+export BOGOUTIL
 
 if [ -z "$NODB" ]; then
     ${relpath}/bogofilter -n -C </dev/null

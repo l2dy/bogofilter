@@ -1,0 +1,35 @@
+#!/bin/sh
+
+#Test database maintenance using bogoutil's dump/load capabilities.
+#    The building of wordlist.db also tests bogofilter's lexer
+
+NODB=1 . ${srcdir=.}/t.frame
+
+OUT="$TMPDIR/maint.out"
+
+rm -f $TMPDIR/wordlist.db
+$BOGOFILTER -D -v -l -s < ${SYSTEST}/inputs/spam.mbx >> $TMPDIR/tmp
+$BOGOFILTER -D -v -l -n < ${SYSTEST}/inputs/good.mbx >> $TMPDIR/tmp
+
+cat >>$TMPDIR/result <<EOF
+initial count is   5256
+Maintenance: count - 0 ->    5256
+Maintenance: count - 1 ->    1813
+Maintenance: count - 2 ->     916
+Maintenance: count - 3 ->     595
+EOF
+
+echo -n initial count is  >> $OUT
+$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db | wc -l >> $OUT
+
+for cnt in 0 1 2 3 ; do
+    $BOGOUTIL -c $cnt -m $BOGOFILTER_DIR/wordlist.db
+    echo -n Maintenance:  count - $cnt "-> " >> $OUT
+    $BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db | wc -l >> $OUT
+done
+
+if  [ $verbose -eq 0 ]; then
+    cmp ${TMPDIR}/result $OUT
+else
+    diff $DIFF_BRIEF ${TMPDIR}/result $OUT
+fi
