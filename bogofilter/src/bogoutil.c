@@ -446,49 +446,48 @@ static const char *help_text[] = {
     "  -h, --help                - print this help message.\n",
     "  -V, --version             - print version information and exit.\n",
 
-    "  -d, --dump=file           - Dump data from file to stdout.\n",
-    "  -l, --load=file           - Load data from stdin into file.\n",
-    "  -u, --upgrade=file        - Upgrade wordlist version.\n",
+    "  -d, --dump=file           - dump data from file to stdout.\n",
+    "  -l, --load=file           - load data from stdin into file.\n",
+    "  -u, --upgrade=file        - upgrade wordlist version.\n",
 
     "info options:\n",
-    "  -w dir                    - Display counts for words from stdin.\n",
-    "  -p dir                    - Display word counts and probabilities.\n",
-    "  -I file                   - Read this file instead of standard input.\n",
-
-    "  -H dir                    - Display histogram and statistics for the wordlist.\n",
-    "                            - Use with -v  to exclude hapaxes.\n",
-    "                            - Use with -vv to exclude pure spam/ham.\n",
-    "  -r dir                    - Compute Robinson's X for specified directory.\n",
-    "  -R dir                    - Compute Robinson's X and save it in the wordlist.\n",
+    "  -w dir                    - display counts for words from stdin.\n",
+    "  -p dir                    - display word counts and probabilities.\n",
+    "  -I, --input-file=file     - read 'file' instead of standard input.\n",
+    "  -H dir                    - display histogram and statistics for the wordlist.\n",
+    "                            - use with -v  to exclude hapaxes.\n",
+    "                            - use with -vv to exclude pure spam/ham.\n",
+    "  -r dir                    - compute Robinson's X for specified directory.\n",
+    "  -R dir                    - compute Robinson's X and save it in the wordlist.\n",
 
     "  -v, --verbosity           - set debug verbosity level.\n",
     "  -D, --debug-to-stdout     - direct debug output to stdout.\n",
     "  -x, --debug-flags=list    - set flags to display debug information.\n",
 
     "database maintenance:\n",
-    "  -m                        - Enable maintenance works (expiring tokens).\n",
-    "  -a age                    - Exclude tokens with older ages.\n",
-    "  -c cnt                    - Exclude tokens with lower counts.\n",
-    "  -s l,h                    - Exclude tokens with lengths between 'l' and 'h' (low and high).\n",
-    "  -n                        - Replace non-ascii characters with '?'.\n",
-    "  -y date                   - Set default date (format YYYYMMDD).\n",
+    "  -m                        - enable maintenance works (expiring tokens).\n",
+    "  -n                        - replace non-ascii characters with '?'.\n",
+    "  -a age                    - exclude tokens with older ages.\n",
+    "  -c cnt                    - exclude tokens with lower counts.\n",
+    "  -s l,h                    - exclude tokens with lengths between 'l' and 'h' (low and high).\n",
+    "  -y, --timestamp-date=date - set default date (format YYYYMMDD).\n",
 
     "environment maintenance:\n",
-    "  -k size                   - set BerkeleyDB cache size (MB).\n",
-    "  -f dir                    - Run recovery on data base in dir.\n",
-    "  -F dir                    - Run catastrophic recovery on data base in dir.\n",
-    "  -P dir                    - Remove inactive log files in dir.\n",
-    "  -C file                   - Check data file.\n",
+    "  -k, --db_cachesize=size   - set Berkeley DB cache size (MB).\n",
+    "  -C, --check=file          - check data file.\n",
+    "  -P, --prune=dir           - remove inactive log files in dir.\n",
+    "  -f, --recover=dir         - run recovery on data base in dir.\n",
+    "  -F, --crecover=dir        - run catastrophic recovery on data base in dir.\n",
+    "      --remove-environment  - remove environment.\n",
 
 #ifdef	HAVE_DECL_DB_CREATE
-    "--db_lk_max_locks           - db_lk_max_locks\n",
-    "--db_lk_max_objects         - db_lk_max_objects\n",
+    "      --db_lk_max_locks     - set max lock count.\n",
+    "      --db_lk_max_objects   - set max object count.\n",
 #ifdef	FUTURE_DB_OPTIONS
-    "--db_log_autoremove         - db_log_autoremove\n",
-    "--db_txn_durable            - db_txn_durable\n",
+    "      --db_log_autoremove   - set autoremoving of logs.\n",
+    "      --db_txn_durable      - set durable mode.\n",
 #endif
 #endif
-    "--remove-environment        - remove-environment\n",
 
     "\n",
     NULL
@@ -521,6 +520,19 @@ static char *remedir;	/** environment to remove */
 struct option long_options[] = {
     { "help",				N, 0, 'h' },
     { "version",			N, 0, 'V' },
+    { "debug-flags",			R, 0, 'x' },
+    { "debug-to-stdout",		N, 0, 'D' },
+    { "verbosity",			N, 0, 'v' },
+    { "input-file",			N, 0, 'I' },
+
+    { "recover",                        N, 0, 'f' },
+    { "crecover",                       N, 0, 'F' },
+    { "prune",                          N, 0, 'P' },
+    { "check",                          N, 0, 'C' },
+
+    { "db_cachesize",			N, 0, 'k' },
+    { "replace_nonascii_characters",	R, 0, 'n' },
+    { "timestamp-date",			N, 0, 'y' },
 #ifdef	HAVE_DECL_DB_CREATE
     { "db_lk_max_locks",		R, 0, O_DB_MAX_LOCKS },
     { "db_lk_max_objects",		R, 0, O_DB_MAX_OBJECTS },
@@ -529,18 +541,15 @@ struct option long_options[] = {
     { "db_txn_durable",			R, 0, O_DB_TXN_DURABLE },
 #endif
 #endif
-    { "debug-flags",			R, 0, 'x' },
-    { "debug-to-stdout",		N, 0, 'D' },
-    { "verbosity",			N, 0, 'v' },
     /* no short option for safety */
     { "remove-environment",		R, &remenv, O_REMOVE_ENVIRONMENT },
+
     /* The following options are present to allow config files
     ** to be read without complaints (and mostly ignored)
     */
     { "config-file",			N, 0, O_IGNORE },
     { "no-config-file",			N, 0, O_IGNORE },
     { "no-header-tags",			N, 0, O_IGNORE },
-    { "input-file",			N, 0, O_IGNORE },
     { "output-file",			N, 0, O_IGNORE },
     { "query",				N, 0, O_IGNORE },
     { "block_on_subnets",		R, 0, O_IGNORE },
@@ -551,7 +560,6 @@ struct option long_options[] = {
     { "log_header_format",		R, 0, O_IGNORE },
     { "log_update_format",		R, 0, O_IGNORE },
     { "min_dev",			R, 0, O_IGNORE },
-    { "replace_nonascii_characters",	R, 0, O_IGNORE },
     { "robs",				R, 0, O_IGNORE },
     { "robx",				R, 0, O_IGNORE },
     { "spam_cutoff",			R, 0, O_IGNORE },
