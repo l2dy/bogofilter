@@ -3,7 +3,13 @@
 			       =================
 
 $Id$
-     
+
+	2003-11-24
+
+	* The test suite ("make check") now works without procmail for t.MH and
+	  t.maildir.
+	* C89 compliance bugfixes for non-GCC compilers (// is invalid in C89).
+
 0.15.9	2003-11-23
 
 	* Minor revisions to the FAQ.
@@ -18,6 +24,7 @@ $Id$
 	* Fixed a memory leak in bogoutil.  Thanks to Dan Deward for
           reporting the problem.
 	* Refactored passthrough.c.
+	* Test suite bugfixes for TDB/QDBM.
 
 	2003-11-19
 
@@ -32,6 +39,10 @@ $Id$
 
 	* Exclude apostrophes and backticks at the end of a token.
 	* Updated bogominitrain.pl to v1.4.2
+	* BerkeleyDB support warns if data base size approaches file size
+	  resource limit, to avoid DB corruption when bogofilter is spawned
+	  from Postfix-controlled systems (Postfix by default limits file
+	  size to 51,200,000 bytes).
 
 	2003-11-15
 

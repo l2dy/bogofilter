@@ -5,6 +5,11 @@
 Be sure to read RELEASE.NOTES-0.15, with attention to the section
 about retraining and the '-H' flag...
 
+0.15.10
+
+* The test suite no longer depends on procmail for t.MH and t.maildir.
+* C89 compliance bugfixes for non-GCC compilers
+
 0.15.9	2003-11-23
 
 * Configure now finds a POSIX compliant shell for running version.sh
@@ -30,6 +35,8 @@ about retraining and the '-H' flag...
 * Minor documentation fixes.
 * Minor error message cleanups.
 * Refactored passthrough.c.
+* Test suite bugfixes for TDB/QDBM.
+* BerkeleyDB support warns if data base size approaces file size resource limit.
 
 0.15.8 2003-10-29
 
@@ -178,3 +185,5 @@ about retraining and the '-H' flag...
 * Add charset map for windows-1251 to KOI8-R (Cyrillic).
 
 * 64-bit printf files for %*s string formatting.
+
+ vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:
