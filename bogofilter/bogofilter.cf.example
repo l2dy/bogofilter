@@ -7,7 +7,8 @@
 
 # Alternate values have two hash marks.
 
-# Comments MUST have their hash mark in the leftmost column of a line!
+# Comment lines MUST have their hash mark in the leftmost column.
+# Comments can be added at the end of any line (after whitespace and a '#').
 # Blank lines are allowed.  
 
 ########### General Settings ########################################
