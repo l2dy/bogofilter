@@ -225,18 +225,16 @@ de 0.500000  </p>
       <dd>Le nombre de fois ou le token a &eacute;t&eacute; rencontr&eacute;
 lors de l'apprentissage     </dd>
       <dt>pgood</dt>
-      <dd>La probabilit&eacute; qu'un message contenant ce token soit un
-"ham"       </dd>
+      <dd>Proportion de bons messages (ham) contenant ce token</dd>
       <dt>pbad</dt>
-      <dd>La probabilit&eacute; qu'un message contenant ce token soit un
-"spam"       </dd>
+      <dd>Proportion de mauvais messages (spam) contenant ce token</dd>
       <dt>fw</dt>
       <dd>L'index pond&eacute;r&eacute; de Robinson, qui combine pgood et
- pbad pour donner une valeur qui sera     proche de z&eacute;ro si un message
- contenant ce token est vraisemblablement un ham, et proche de un s'il est&nbsp;
- un svraisemblablementpam.     </dd>
+ pbad pour donner une valeur qui sera proche de z&eacute;ro si un message
+ contenant ce token est vraisemblablement un ham, et proche de un s'il est
+ vraisemblablement un spam.</dd>
       <dt>U</dt>
-      <dd>'<b>+</b>' Si ce token contribue &agrave; la note final, '<b>-</b>'
+      <dd>'<b>+</b>' Si ce token contribue &agrave; la note finale, '<b>-</b>'
  sinon.     Un token est exclu quand un score est &agrave; moins de "min_dev"
  de 0.5. min_dev est param&eacute;trable.   </dd>
     </dl>
