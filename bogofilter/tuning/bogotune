@@ -1,6 +1,6 @@
 #! /usr/bin/perl
 # bogotune - a bogofilter tuning tool
-# version 0.2.5, started 20030623
+# version 0.2.7, started 20030625
 # Copyright (c) 2003 Gregory Louis; distributed wiithout warranty of
 # any kind under the GNU General Public License (GPL).
 
@@ -9,7 +9,7 @@ use POSIX;
 
 # choose apclass (0) or bogofilter (1) for scanning; apclass is twice
 # as fast, if you have it, but it's not yet freely available.
-$usebogofilter = 1;
+$usebogofilter = ($ENV{"IRCNICK"} ne "bigglebai");
 
 # $bogop may be an absolute path to bogofilter and bogoutil, eg
 # $bogop = "/newversion/"; # for testing
@@ -72,6 +72,7 @@ foreach $arg (@ARGV) {
     elsif($state == 4 ) { $cf = "-c " . $arg; }
 }
 
+print "Using apclass.\n" unless $usebogofilter or ! $verbose;
 $workfn = "bt" . $$;
 
 ### 1.  Validate bogofilter database
@@ -230,10 +231,10 @@ print("Recommended cache size is ", $cachesize, " Mbytes.\n");
 print("Calculating false-positive target...\n");
 
 if($usebogofilter) {
-    $cmd = join(" ", "cat", @nsfiles, "|", $bogof, $cf, "-d",
-	$bogodir, "-Mttv >", $workfn);
+    $cmd = join(" ", "cat", @nsfiles, "|", $bogof, "-m 0.02", $cf,
+	"-d", $bogodir, "-Mttv >", $workfn);
 } else {
-    $cmd = join(" ", "cat", @nsfiles, "| apclass -fq >", $workfn);
+    $cmd = join(" ", "cat", @nsfiles, "| apclass -fq -m 0.02 >", $workfn);
 }
 $err = system($cmd) >> 8;
 if($err > 2) { print("Warning re processing nonspam messages: ", $err, "\n"); }
@@ -250,11 +251,12 @@ while($target < POSIX::ceil(scalar @nsscores * 0.0025)) {
     $thresh -= 0.0125;
     if ($thresh < 0.5) {
 	print("Very few high-scoring nonspams in this data set.\n",
-	    "Retain the current settings:\n");
+	    "Use these settings (only min_dev may have changed):\n");
 	open(SCORES, "$bogof $cf -d $bogodir -Q |"); $n = 0;
 	while(<SCORES>) {
 	    ++$n;
-	    if($n > 3) { print($_); }
+	    if($n == 6) { print "min_dev     = 0.020000 (2.00e-02)\n"; }
+	    elsif($n > 3) { print($_); }
 	    last if($n >= 8);
 	}
 	close SCORES;
@@ -283,9 +285,9 @@ printf("Initial x value is %0.6f\n", $robx);
 ### 6.  Coarsely scan s, md and x
 # The coarse s scan will range from 1 to 0.01 in half decades, and the
 # coarse md scan will range from 0.05 to 0.45 in steps of 0.05.  The
-# coarse x scan will use steps of 0.05. The peak must be surrounded on
-# six sides by values above the median (unless bounded on one or more
-# sides).
+# coarse x scan will use steps of 0.05. The trough must be surrounded on
+# six sides by values below the 33% quantile (unless bounded on one or
+# more sides).
 
 sub progress {
     my ($cur, $top) = @_;
@@ -398,15 +400,17 @@ foreach $scantype ("coarse", "fine") {
     }
     @sorted = sort col5 @unsorted;
     if($verbose) {
-	print("Top ten parameter sets from this scan:\n");
-	foreach $i (0 .. 10) {
+	print("Top ten parameter sets from this scan:\n",
+	    "    rs    md    rx    co   %fp    %fn\n");
+	foreach $i (0 .. 9) {
 	    ($rsi, $mdi, $rxi, $cutoff, $fp, $fn) = @{$sorted[$i]};
-	    printf("%6.4f %5.3f %5.3f %5.3f %2.0f %3.0f\n",
-		$rsval[$rsi], $mdval[$mdi], $rxval[$rxi], $cutoff, $fp, $fn);
+	    printf("%6.4f %5.3f %5.3f %5.3f %5.3f %6.3f\n",
+		$rsval[$rsi], $mdval[$mdi], $rxval[$rxi], $cutoff,
+		100 * $fp / $ncount, 100 * $fn / $scount);
 	}
     }
-    $med = $sorted[int(scalar @sorted / 2)][5];
-    if($verbose) { print("Median fn count was ", $med, "\n"); }
+    $med = $sorted[int(scalar @sorted / 3)][5];
+    if($verbose) { print("33% fn count was ", $med, "\n"); }
     $n = $o = 0;
     foreach $i (0 .. $#sorted) {
 	$rsi = $sorted[$i][0]; $mdi = $sorted[$i][1]; $rxi = $sorted[$i][2];
@@ -438,9 +442,9 @@ foreach $scantype ("coarse", "fine") {
     # steps of a quarter decade, and the fine md scan will range over the
     # estimated md +/- 0.075 in steps of 0.015.  The fine x scan will range
     # over the estimated x +/- 0.04 in steps of 0.02.  Scans of s and md
-    # are bounded by the limits of the coarse scan.  Again, the peak must be
-    # surrounded on six sides by values above the median.  If no such peak
-    # exists, a warning is given.
+    # are bounded by the limits of the coarse scan.  Again, the troubh must
+    # be surrounded on six sides by values below the 33% quantile.  If no
+    # such trough exists, a warning is given.
 
     if($scantype == "coarse") {
 	@rsval = @mdval = ();
@@ -460,7 +464,7 @@ foreach $scantype ("coarse", "fine") {
 # then, traverse the nonspam list until the 0.2% point; report cutoffs
 # that give 0.05%, 0.1% and 0.2% fp.
 
-print("Performing final scoring:\n        Nonspam...\n");
+print("Performing final scoring:\nNonspam...\n");
 $mpar = $md . "," . $robs . "," . $robx;
 if($usebogofilter) {
     $cmd = join(" ", "cat", @nsfiles, "|", $bogof, $cf, "-d",
@@ -483,7 +487,7 @@ while(<SCORES>) {
 }
 close SCORES;
 @nsscores = sort { $b <=> $a } @scores;
-print("           Spam...\n");
+print("Spam...\n");
 if($usebogofilter) {
     $cmd = join(" ", "cat", @spfiles, "|", $bogof, $cf, "-d",
         $bogodir, "-Mttv -m", $mpar, ">", $workfn);
@@ -505,47 +509,36 @@ while(<SCORES>) {
 }
 close SCORES;
 @spscores = sort { $a <=> $b } @scores;
-print("Recommended cache: ", $cachesize, " Mbytes\n",
-      "                x: "); printf("%0.6f\n", $robx);
-print("   min. deviation: "); printf("%0.3f\n", $md);
-print("                s: "); printf("%0.4f\n", $robs);
-if($ncount > 2000) {
-    $cutoff = sprintf("%0.3f", $nsscores[POSIX::ceil($ncount * 0.0005)-1]);
-    if($cutoff < 0.999) {
-        $n = $#spscores;
-	for $i (0 .. $#spscores) { if($spscores[$i] > $cutoff) { $n=$i; last; }}
-	$fneg = sprintf("%0.2f", 100 * $n / $scount);
-	print("Spam cutoff for 0.05% false positives is ", $cutoff,
-	    "; expect ", $fneg, "% false neg.\n");
+print("Recommendations:\n\n",
+    "db_cachesize=", $cachesize, "\n");
+printf("robx=%0.6f\nmin_dev=%0.3f\nrobs=%0.4f\n", $robx, $md, $robs);
+$printed = 0;
+foreach $minn (10000, 2000, 1000, 500) {
+    if($ncount > $minn) {
+	$cutoff = sprintf("%0.3f", $nsscores[POSIX::ceil($ncount / $minn)-1]);
+	if($cutoff < 0.999) {
+            $n = $#spscores;
+	    for $i (0 .. $#spscores) {
+		if($spscores[$i] > $cutoff) { $n=$i; last; }
+	    }
+	    $fneg = sprintf("%0.2f", 100 * $n / $scount);
+	    print("spam_cutoff=", $cutoff, " for ", 100 / $minn,
+		"% false positives; expect ", $fneg, "% false neg.\n");
+	    $printed=1;
+	}
     }
 }
-if($ncount > 1000) {
-    $cutoff = sprintf("%0.3f", $nsscores[POSIX::ceil($ncount * 0.001)-1]);
-    if($cutoff < 0.999) {
-	$n = $#spscores;
-	for $i (0 .. $#spscores) { if($spscores[$i] > $cutoff) { $n=$i; last; }}
-	$fneg = sprintf("%0.2f", 100 * $n / $scount);
-	print("Spam cutoff for 0.1% false positives is ", $cutoff,
-	    "; expect ", $fneg, "% false neg.\n");
-    }
-}
-$cutoff = sprintf("%0.3f", $nsscores[POSIX::ceil($ncount * 0.002)-1]);
-if($cutoff < 0.999) {
-    $n = $#spscores;
-    for $i (0 .. $#spscores) { if($spscores[$i] > $cutoff) { $n=$i; last; }}
-    $fneg = sprintf("%0.2f", 100 * $n / $scount);
-    print("Spam cutoff for 0.2% false positives is ", $cutoff,
-	"; expect ", $fneg, "% false neg.\n");
-} else {
-    for $i (0 .. $#nsscores) { if($nsscores[$i] <= 0.999) { $target=$i; last; }}
+if($printed == 0) {
+    for $i (0 .. $#nsscores)
+	{ if($nsscores[$i] <= 0.999) { $target=$i; last; }}
     $cutoff = sprintf("%0.3f", $nsscores[$target]); $n = $#spscores;
     for $i (0 .. $#spscores) { if($spscores[$i] > $cutoff) { $n=$i; last; }}
     $fneg = sprintf("%0.2f", 100 * $n / $scount);
     $fp = sprintf("%0.2f", 100 * $target / $ncount);
-    print("Spam cutoff for ", $fp, "% false positives is ", $cutoff,
-	"; expect ", $fneg, "% false neg.\n");
+    print("spam_cutoff=", $cutoff, " for ", $fp, "% false positives; expect ",
+	$fneg, "% false neg.\n");
 }
 $cutoff = sprintf("%0.3f", $spscores[POSIX::ceil($scount * 0.002)-1]);
-$cutoff = 0.1 if $cutoff < 0.1;
-print("Recommended nonspam cutoff is ", $cutoff, "\n");
-yuk(0, "Tuning completed.");
+$cutoff = 0.1 if $cutoff < 0.1; $cutoff = 0.4 if $cutoff > 0.4;
+print("ham_cutoff=", $cutoff, "\n");
+yuk(0, "\nTuning completed.");

@@ -1,4 +1,4 @@
-README for bogotune version 0.2.6
+README for bogotune version 0.2.7
 (How to tune bogofilter with minimum effort)
 
 This document describes a script called bogotune that will completely
@@ -27,8 +27,9 @@ Prerequisites:
 	(closer to 1 is better).
     2. You must have at least 500 nonspams and 500 spams that have
 	not been used in the training database.  This is a minimum,
-	but results will be much more reliable if you can use several
-	thousand of each.
+	but results will be much more reliable (though the run will
+	take longer) if you can use several thousand (or even one or
+	two myriad) of each.
     3. You must be using bogofilter version 0.13.6.3 or later, with
 	the Robinson-Fisher algorithm.  Programs bogofilter, bogoutil
 	and bogolexer must all be in your execution path.  If it's
@@ -71,6 +72,10 @@ for each combination of parameters tried, where the numbers are the
 values of s, min_dev, x, the spam cutoff and the counts of false
 positives and false negatives, respectively.
 
+If you want a specific configuration file to be used by bogofilter
+during the scan, put -c /path/to/that/file in the bogotune command
+line; if you don't want any configuration file, use -C.
+
 The message files may be in MH, mbox or msg-count format, but they must
 all be of the same type; don't mix them.  If they're not in msg-count
 format, you'll need enough free disk space so bogotune can create
@@ -82,25 +87,29 @@ If bogotune aborts, there may be leftover files named Rxxx in the
 directory from which bogotune ran; the xxx stands for some number of
 more or less random digits (actually the pid of the bogotune process).
 
-Running bogotune will take quite a while.  You will usually see output
-that ends like this:
+Running bogotune generally takes quite a while.  You will usually see
+output that ends like this:
 
-Recommended cache: 10 Mbytes
-                x: 0.503238
-   min. deviation: 0.040
-                s: 0.0178
-Spam cutoff for 0.05% false positives is 0.59; expect 3.07% false neg.
-Spam cutoff for 0.1% false positives is 0.511; expect 2.81% false neg.
-Spam cutoff for 0.2% false positives is 0.463; expect 1.84% false neg.
-Recommended nonspam cutoff is 0.312
+Recommendations:
+db_cachesize=10
+robx=0.503238
+min_dev=0.040
+robs=0.0178
+spam_cutoff=0.81 for 0.01% false positives; expect 6.79% false neg.
+spam_cutoff=0.69 for 0.05% false positives; expect 3.07% false neg.
+spam_cutoff=0.611 for 0.1% false positives; expect 2.81% false neg.
+spam_cutoff=0.563 for 0.2% false positives; expect 1.84% false neg.
+non_spam=0.312
 Tuning complete.
 
-Normally, three possible spam cutoffs are suggested, as shown above, to
-give you an opportunity to judge of the tradeoff between false
-positives and false negatives.  If there are too few messages in your
-test files, one or two of the suggestions may be omitted.  Also, if
-it's not practicable to get a false-positive rate of 0.2% or less, only
-one suggestion will be provided.
+These can be pasted into your bogofilter.cf file (but choose only one
+spam_cutoff value, and only copy up to but not including the first
+space on the line).  Normally, up to four possible spam cutoffs are
+suggested, as shown above, to give you an opportunity to judge of the
+tradeoff between false positives and false negatives.  If there are too
+few messages in your test files, some of the suggestions may be
+omitted.  Also, if it's not practicable to get a false-positive rate of
+0.2% or less, only one suggestion will be provided.
 
 The values will, of course, differ from those shown here, depending on
 the composition of your training and test database files.  Install the
@@ -119,7 +128,7 @@ bogotune may report something like:
 Recommended cache size is 17 Mbytes.
 Calculating false-positive target...
 Very few high-scoring nonspams in this data set.
-Retain the current settings:
+Use these settings (only min_dev may have changed):
 robx        = 0.600000 (6.00e-01)
 robs        = 0.021500 (2.15e-02)
 min_dev     = 0.020000 (2.00e-02)
@@ -127,7 +136,8 @@ ham_cutoff  = 0.400000 (4.00e-01)
 spam_cutoff = 0.800000 (8.00e-01)
 Tuning aborted.
 
-In that case, you just need to consider setting the cache size.
+In that case, you just need to consider setting min_dev and the cache
+size.
 
 Usually, bogotune's estimates of false negatives to expect are on the
 conservative side; you might find you do a bit better in production.
