@@ -67,7 +67,7 @@
     <arg choice='opt'>-c <replaceable>filename</replaceable></arg>
     <arg choice='opt'>-C</arg>
     <arg choice='opt'>-d <replaceable>dir</replaceable></arg>
-    <arg choice='opt'>-k <replaceable>size</replaceable></arg>
+    <arg choice='opt'>-k <replaceable>cachesize</replaceable></arg>
     <arg choice='opt'>-l</arg>
     <arg choice='opt'>-L <replaceable>tag</replaceable></arg>
     <arg choice='opt'>-I <replaceable>filename</replaceable></arg>
@@ -324,12 +324,13 @@ configuration files.</para>
 allows you to set the directory for the database.  See the ENVIRONMENT
 section for other directory setting options.</para>
 
-<para>The <option>-k <replaceable>size</replaceable></option> option
-sets the cache size for the BerkeleyDB subsystem.  Properly sizing the
-cache improves <application>bogofilter</application>'s performance.
-The recommended size is one third of the size of the database file.
-You can run the <application>bogotune</application> script (in the
-tuning directory) to determine the recommended size.</para>
+<para>The <option>-k <replaceable>cachesize</replaceable></option> option
+sets the cache size for the BerkeleyDB subsystem, in units of 1 MByte (1,048,576
+bytes).  Properly sizing the cache improves
+<application>bogofilter</application>'s performance.  The recommended
+size is one third of the size of the database file.  You can run the
+<application>bogotune</application> script (in the tuning directory) to
+determine the recommended size.</para>
 
 <para>The <option>-l</option> option writes an informational line to
 the system log each time <application>bogofilter</application> is run.
