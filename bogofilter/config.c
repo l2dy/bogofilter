@@ -445,7 +445,7 @@ int process_args(int argc, char **argv)
 	switch(option)
 	{
 	case 'd':
-	    strncpy(directory, optarg, PATH_LEN);
+	    strlcpy(directory, optarg, PATH_LEN);
 	    break;
 
 	case 'e':
@@ -559,8 +559,8 @@ int process_args(int argc, char **argv)
 /* exported */
 void process_config_files(void)
 {
-    char buff[2];
-    sprintf(buff, "%c", algorithm);
+    char buff[2] = { 0, 0 };
+    buff[0] = algorithm;
     select_algorithm(buff);
 
     if (! suppress_config_file)
