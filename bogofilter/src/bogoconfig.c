@@ -409,15 +409,37 @@ static void help(void)
 static void print_version(void)
 {
     (void)fprintf(stderr,
-		  "%s version %s\n"
+		  "%s version %s\n",
+		  progtype, version);
+
+    (void)fprintf(stderr, "    Algorithms:");
+#ifdef	ENABLE_ROBINSON_FISHER
+    (void)fprintf(stderr, " Fisher");
+#endif
+#ifdef	ENABLE_GRAHAM_METHOD
+    (void)fprintf(stderr, " Graham");
+#endif
+#ifdef	ENABLE_ROBINSON_METHOD
+    (void)fprintf(stderr, " Robinson");
+#endif
+    (void)fprintf(stderr, "\n");
+
+    (void)fprintf(stderr, "    Database:");
+#ifdef	ENABLE_TDB
+    (void)fprintf(stderr, " TrivialDB");
+#else
+    (void)fprintf(stderr, " BerkeleyDB");
+#endif
+    (void)fprintf(stderr, "\n");
+
+    (void)fprintf(stderr,
 		  "Copyright (C) 2002 Eric S. Raymond\n\n"
 		  "%s comes with ABSOLUTELY NO WARRANTY. "
 		  "This is free software, and you\nare welcome to "
 		  "redistribute it under the General Public License. "
 		  "See the\nCOPYING file with the source distribution for "
 		  "details.\n"
-		  "\n", 
-		  progtype, version, PACKAGE);
+		  "\n", PACKAGE);
 }
 
 #ifndef	ENABLE_GRAHAM_METHOD

@@ -295,7 +295,7 @@ fi
 AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$MEM_DEBUG != xNO)
 
 if test "x$WITH_TDB" = "xyes" ; then
-    #AC_DEFINE(ENABLE_TDB_DATASTORE,1, [Enable tdb datastore])
+    AC_DEFINE(ENABLE_TDB_DATASTORE,1, [Enable tdb datastore])
     AC_DEFINE_UNQUOTED(DB_TYPE, "tdb", [tdb database type])
     AC_DEFINE_UNQUOTED(DB_EXT, ".tdb", [tdb database file extension])
 else
