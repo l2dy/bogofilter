@@ -476,9 +476,10 @@ if test "$sysconfdir" = "\${prefix}/etc" \
 fi
 
 need_my_gsl=1
-AM_PATH_GSL(1.1, AC_DEFINE(HAVE_GSL_11,,[Define if you have GNU Scientific Library 1.1 or newer])
+AM_PATH_GSL(1.4, AC_DEFINE(HAVE_GSL_14,,[Define if you have GNU Scientific Library 1.4 or newer])
 need_my_gsl=0)
-AM_PATH_GSL(1.4, AC_DEFINE(HAVE_GSL_14,,[Define if you have GNU Scientific Library 1.4 or newer]))
+AM_PATH_GSL(1.0, AC_DEFINE(HAVE_GSL_10,,[Define if you have GNU Scientific Library 1.0 or newer])
+need_my_gsl=0)
 if test "$need_my_gsl" = 1 ; then
   GSL_LIBS="libbf_gsl.a"
 fi

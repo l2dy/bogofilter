@@ -10,8 +10,8 @@ NAME:
 #include "config.h"
 #include "common.h"
 
-#if defined(HAVE_GSL_11) && !defined(HAVE_GSL_14)
-/* HAVE_GSL_14 implies HAVE_GSL_11
+#if defined(HAVE_GSL_10) && !defined(HAVE_GSL_14)
+/* HAVE_GSL_14 implies HAVE_GSL_10
  * if we have neither, we'll use our included GSL 1.4, which knows CDFs
  * if we have both, we have GSL 1.4, which knows CDFs
  *
