@@ -54,7 +54,7 @@ libbogofilter_a_SOURCES= \
 CLEANFILES=version.c directories.c
 
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c \
-		     $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
+		     method.c $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
 		     common.h method.h
 
 bogowordfreq_SOURCES = bogowordfreq.c
