@@ -15,25 +15,50 @@ NAME:
 /* exports */
 int passthrough;
 
-void help(void);
+#define PROGNAME "bogolexer"
+
+void usage(void)
+{
+    fprintf(stderr, "Usage: %s [ -p | -q | -h ]\n", PROGNAME);
+}
+
+void help(void)
+{
+    usage();
+    fprintf(stderr,
+	    "\t-p\tprint the tokens from stdin.\n"
+	    "\t-q\tquiet mode, no tokens are printed.\n"
+	    "\t-h\thelp, this output.\n"
+	    PROGNAME " is part of the bogofilter package.\n");
+}
 
 int main(int argc, char **argv)
 {
     char *arg;
     int	t;
+    int option;
     int count=0;
     int quiet = 0;
-    int passthru = 0;
+    int passthrough = 0;
 
-    while ((arg = *++argv))
-    {
-	if (strcmp(arg, "-h") == 0)
+    while ((option = getopt(argc, argv, ":hpq")) != -1)
+	switch (option) {
+	case 'h':
 	    help();
-	quiet += strcmp(arg, "-q") == 0;
-	passthru += strcmp(arg, "-p") == 0;
-    }
+	    exit(0);
+	    break;
+	case 'q':
+	    quiet = 1;
+	    break;
+	case 'p':
+	    passthrough = 1;
+	    break;
+	default:
+	    usage();
+	    exit(0);
+	}
 
-    if (!passthru)
+    if (!passthrough)
 	if (quiet)
 	    puts( "quiet mode.");
 	else
@@ -42,24 +67,14 @@ int main(int argc, char **argv)
     while ((t = get_token()) > 0)
     {
 	count += 1;
-	if ( passthru )
+	if ( passthrough )
 	    (void) printf("%s\n", yylval);
 	else if (!quiet)
 	    (void) printf("get_token: %d '%s'\n", t, yylval);
     }
 
-    if ( !passthru )
+    if ( !passthrough )
 	printf( "%d tokens read.\n", count );
 
     return 0;
-}
-
-void help(void)
-{
-    puts("Usage: lexertest [options]");
-    puts("Options are:");
-    puts("  -h    help, this output.");
-    puts("  -q    quiet mode, no tokens are printed.");
-    puts("  -p    print the tokens.");
-    exit(0);
 }
