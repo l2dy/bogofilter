@@ -52,6 +52,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003 - 2004
 
 #include "datastore.h"
 #include "datastore_db.h"
+#include "datastore_dbcommon.h"
 #include "bogohome.h"
 #include "error.h"
 #include "maint.h"
@@ -107,10 +108,6 @@ typedef struct {
 } dbh_t;
 
 #define DBT_init(dbt)		(memset(&dbt, 0, sizeof(DBT)))
-
-#define DB_AT_LEAST(maj, min)	((DB_VERSION_MAJOR > (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR >= (min))))
-#define DB_AT_MOST(maj, min)	((DB_VERSION_MAJOR < (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR <= (min))))
-#define DB_EQUAL(maj, min)	((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR == (min)))
 
 /* Function definitions */
 
@@ -308,11 +305,7 @@ static uint32_t get_psize(DB *dbp)
     uint32_t ret, pagesize;
     DB_BTREE_STAT *dbstat = NULL;
 
-#if DB_AT_LEAST(4,3)
-    ret = dbp->stat(dbp, NULL, &dbstat, DB_FAST_STAT);
-#else
-    ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
-#endif
+    ret = BF_DB_STAT(dbp, NULL, &dbstat, DB_FAST_STAT);
     if (ret) {
 	print_error(__FILE__, __LINE__, "DB->stat");
 	return 0xffffffff;
@@ -472,30 +465,6 @@ retry_db_open:
 	errno = EINVAL;
     return NULL;
 }
-
-/* wrapper for the API that changed in 4.0, to
- * collect the junk in a location separate from the implementation */
-#if DB_AT_LEAST(4,0)
-/* BerkeleyDB 4.0, 4.1, 4.2 */
-#define BF_LOG_FLUSH(e, i) ((e)->log_flush((e), (i)))
-#define BF_MEMP_SYNC(e, l) ((e)->memp_sync((e), (l)))
-#define BF_MEMP_TRICKLE(e, p, n) ((e)->memp_trickle((e), (p), (n)))
-#define BF_TXN_BEGIN(e, f, g, h) ((e)->txn_begin((e), (f), (g), (h)))
-#define BF_TXN_ID(t) ((t)->id(t))
-#define BF_TXN_ABORT(t) ((t)->abort((t)))
-#define BF_TXN_COMMIT(t, f) ((t)->commit((t), (f)))
-#define BF_TXN_CHECKPOINT(e, k, m, f) ((e)->txn_checkpoint((e), (k), (m), (f)))
-#else
-/* BerkeleyDB 3.1, 3.2, 3.3 */
-#define BF_LOG_FLUSH(e, i) (log_flush((e), (i)))
-#define BF_MEMP_SYNC(e, l) (memp_sync((e), (l)))
-#define BF_MEMP_TRICKLE(e, p, n) (memp_trickle((e), (p), (n)))
-#define BF_TXN_BEGIN(e, f, g, h) (txn_begin((e), (f), (g), (h)))
-#define BF_TXN_ID(t) (txn_id(t))
-#define BF_TXN_ABORT(t) (txn_abort((t)))
-#define BF_TXN_COMMIT(t, f) (txn_commit((t), (f)))
-#define BF_TXN_CHECKPOINT(e, k, m, f) (txn_checkpoint((e), (k), (m), (f)))
-#endif
 
 /** begin transaction. Returns 0 for success. */
 int dbe_txn_begin(void *vhandle)
@@ -1304,7 +1273,7 @@ int dbe_purgelogs(const char *directory) {
 	fprintf(dbgout, "removing inactive logfiles\n");
 
     /* figure redundant log files and nuke them */
-    e = env->log_archive(env, &list, DB_ARCH_ABS);
+    e = BF_LOG_ARCHIVE(env, &list, DB_ARCH_ABS);
     if (e) {
 	print_error(__FILE__, __LINE__,
 		"DB_ENV->log_archive failed: %s",

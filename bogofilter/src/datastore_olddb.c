@@ -34,6 +34,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 #include "datastore.h"
 #include "datastore_db.h"
+#include "datastore_dbcommon.h"
 #include "bogohome.h"
 #include "error.h"
 #include "maint.h"
@@ -62,9 +63,6 @@ typedef struct {
 } dbh_t;
 
 #define DBT_init(dbt) (memset(&dbt, 0, sizeof(DBT)))
-
-#define DB_AT_LEAST(maj, min) ((DB_VERSION_MAJOR > (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR >= (min))))
-#define DB_AT_MOST(maj, min) ((DB_VERSION_MAJOR < (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR <= (min))))
 
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
@@ -246,11 +244,7 @@ static uint32_t get_psize(DB *dbp)
     uint32_t ret, pagesize;
     DB_BTREE_STAT *dbstat = NULL;
 
-#if DB_AT_LEAST(4,3)
-    ret = dbp->stat(dbp, NULL, &dbstat, DB_FAST_STAT);
-#else
-    ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
-#endif
+    ret = BF_DB_STAT(dbp, NULL, &dbstat, DB_FAST_STAT);
     if (ret) {
 	print_error(__FILE__, __LINE__, "DB->stat");
 	return 0xffffffff;

@@ -153,9 +153,9 @@ bogoQDBMupgrade_SOURCES = bogoQDBMupgrade.c datastore_qdbm_cmpkey.c
 bogoQDBMupgrade_LDADD = $(LDADD) $(LIBDB)
 else
 if ENABLE_OLD_BDB
-datastore_SOURCE = datastore_olddb.c datastore_dummies.c
+datastore_SOURCE = datastore_olddb.c datastore_dummies.c datastore_dbcommon.h
 else
-datastore_SOURCE = datastore_db.c
+datastore_SOURCE = datastore_db.c datastore_dbcommon.h
 endif
 endif
 endif
