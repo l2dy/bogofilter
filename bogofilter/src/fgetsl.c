@@ -8,11 +8,12 @@
 #include "common.h"
 
 #include <stdlib.h>
+#include <errno.h>
 
 #include "fgetsl.h"
 
 /* calls exit(EX_ERROR) on read error or when max_size < 2 */
-int fgetsl(char *buf, int max_size, FILE *in)
+int fgetsl(char *buf, int max_size, /*@null@*/ FILE *in)
 {
     return xfgetsl(buf, max_size, in, 0);
 }
@@ -29,7 +30,12 @@ int xfgetsl(char *buf, int max_size, FILE *in, int no_nul_terminate)
 	abort();
     }
 
-    if (in == NULL || feof(in))
+    if (in == NULL) {
+	errno = EBADF;
+	return(EOF);
+    }
+
+    if (feof(in))
 	return(EOF);
 
     while ((cp < fin) && ((c = getc(in)) != EOF)) {
