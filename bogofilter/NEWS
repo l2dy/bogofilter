@@ -54,12 +54,6 @@ Briefly:
 	* Fixed problem causing SIGSEGV when using options "-p" and
           "-s" with multiple wordlists.
 
-	2005-02-09
-
-	* Environment variables BF_FORCE_TRANSACTIONAL and
-	  BF_FORCE_NON_TRANSACTIONAL can be used to enable/disable
-	  transactions.
-
 	2005-02-06
 
 	* Code to enable/disable Berkeley DB transactions now uses an
