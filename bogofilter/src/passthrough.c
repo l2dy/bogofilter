@@ -20,6 +20,7 @@ NAME:
 #include "format.h"
 #include "textblock.h"
 #include "xmalloc.h"
+#include "mysetvbuf.h"
 
 #include "lexer.h" /* need have_body */
 
@@ -296,7 +297,10 @@ void output_setup(void)
     } else {
 	fpo = stdout;
     }
-    return;
+
+    if (!passthrough) {
+	mysetvbuf(fpo, NULL, _IOLBF, 0);
+    }
 }
 
 void passthrough_setup()
