@@ -6,7 +6,11 @@ NAME:
    bogohome.c -- support for bogofilter's home directory.
 
 AUTHOR:
-   Matthias Andree <m-a@gmx.de>
+   (C) Copyright 2004
+   Matthias Andree <matthias.andree@gmx.de>
+
+LICENSE:
+   GNU General Public License V2
 
 ******************************************************************************/
 
