@@ -2,6 +2,12 @@
 				BOGOFILTER NEWS
 			       =================
 
+	2004-08-07
+
+	* OS/2 compatibility changes (contributed by Yuri Danio).
+	* Removed obsolete test output files - degen.out,
+          combined.out, and separate.out
+
 0.92.4	2004-07-29
 
 	* Warn on invalid options, rather than exit.

@@ -2,6 +2,17 @@
 				BOGOFILTER NEWS
 			       =================
 
+Caution: When upgrading from an old version of bogofilter, to ensure
+it's working properly, it's worth running a few manual command line
+tests.  Using options, config files, and wordlists from your procmail
+or maildrop scripts is suggested.
+
+2004-08-07
+
+* OS/2 compatibility changes (contributed by Yuri Danio).
+* Removed obsolete test output files - combined.out, separate.out, and
+  degen.out
+
 0.92.4	2004-07-29
 
 * Warn on invalid options, rather than exit.
