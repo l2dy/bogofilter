@@ -232,7 +232,7 @@ void db_close(void *vhandle, bool nosync)
     if (handle == NULL) return;
 
     if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "(qdbm) dpclose( %s, %d )\n", handle->name, nosync ? "nosync" : "sync");
+	fprintf(dbgout, "(qdbm) dpclose(%s, %s)\n", handle->name, nosync ? "nosync" : "sync");
 
     dbp = handle->dbp;
 
