@@ -54,7 +54,7 @@ bool  onlyprint = false;
 
 /* Function Prototypes */
 
-static int process_arg(int option, const char *name, const char *arg, priority_t);
+static int process_arg(int option, const char *name, const char *arg);
 
 /* Function Definitions */
 
@@ -558,7 +558,7 @@ static int process_arglist(int argc, char **argv)
  	    break;
 
 	name = (option_index == 0) ? argv[this_option_optind] : long_options[option_index].name;
-	count += process_arg(option, name, optarg, PASS_1_CLI);
+	count += process_arg(option, name, optarg);
     }
 
     if (count != 1)
@@ -576,7 +576,7 @@ static int process_arglist(int argc, char **argv)
     return count;
 }
 
-static int process_arg(int option, const char *name, const char *val, priority_t precedence)
+static int process_arg(int option, const char *name, const char *val)
 {
     int count = 0;
 
@@ -592,7 +592,7 @@ static int process_arg(int option, const char *name, const char *val, priority_t
 	break;
 
     case O_CONFIG_FILE:
-	read_config_file(val, false, false, precedence);
+	read_config_file(val, false, false, PR_COMMAND);
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
 

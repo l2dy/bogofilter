@@ -19,7 +19,7 @@ void *memstr(const void *hay, size_t n, const char *needle)
 
     while (n >= l) {
 	if (0 == memcmp(haystack, needle, l))
-	    return (void *)haystack;
+	    return (void *)(const void *)haystack;
 	haystack++;
 	n--;
     }

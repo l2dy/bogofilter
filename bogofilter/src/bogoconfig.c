@@ -724,7 +724,7 @@ rc_t query_config(void)
 #endif
 #endif
 
-    return EX_OK;
+    return RC_OK;
 }
 
 static void display_tag_array(const char *label, FIELD *array)
