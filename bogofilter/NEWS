@@ -16,6 +16,11 @@ $Id$
 	  mail into memory if the standard input is a seekable regular file.
 	* Separate message registration options from unregistration
 	  options.
+	* The configuration file parser is stricter and more correct; it does
+	  no longer tolerate end-of-line comments and a trailing "f" after
+	  numeric constants though. So change (for instance)
+	  "spam_cutoff = 0.54f  # for robinson" into "spam_cutoff = 0.54"
+	  in your bogofilter.cf files.
 
 0.10.3.2 2003-XX-XX
 
