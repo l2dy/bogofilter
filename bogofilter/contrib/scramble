@@ -75,7 +75,7 @@ function doit()
     cat shuf.$pid
 
 # next line can be commented out for debugging
-#    rm list.$pid shuf.$pid
+  rm list.$pid shuf.$pid
 }
 
 function create_mbox_entries()
