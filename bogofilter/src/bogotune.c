@@ -876,7 +876,7 @@ static void top_ten(result_t *sorted)
 
     if (verbose)
 	printf("    ");
-    printf("   rs     md    rx    co    fp  fn   fpc      fnc\n" );
+    printf("   rs     md    rx    co     fp  fn    fpc      fnc\n" );
 
     for (i = 0; i < 10; i += 1) {
 	result_t *r = &sorted[i];
@@ -1054,7 +1054,7 @@ static void final_recommendations(bool skip)
 	fnp = 100.0 * fn / sp_cnt;
 
 	if (printed)  printf("#");
-	printf("spam_cutoff=%5.3f\t# for %4.2f%% false pos (%d); expect %4.2f%% false neg (%d).\n",
+	printf("spam_cutoff=%5.3f\t# for %4.2f%% fpos (%d); expect %4.2f%% fneg (%d).\n",
 	       cutoff, fpp, fp, fnp, fn);
 
 	printed = true;
@@ -1071,6 +1071,9 @@ static void final_recommendations(bool skip)
 
     printf("ham_cutoff=%5.3f\t\n", ham_cutoff);
     printf("---cut---\n");
+    printf("\n");
+    
+    printf("note:  fpos means 'false positive' and fneg means 'false negative'.\n");
     printf("\n");
 
     if (warn)
@@ -1301,6 +1304,15 @@ static rc_t bogotune(void)
 
 	r_count = rsval->cnt * mdval->cnt * rxval->cnt;
 	results = (result_t *) xcalloc(rsval->cnt * mdval->cnt * rxval->cnt, sizeof(result_t));
+
+	if (verbose >= SUMMARY) {
+	    if (verbose >= SUMMARY+1)
+		printf("%3s ", "cnt");
+	    if (verbose >= SUMMARY+2)
+		printf(" %s %s %s  ", "s", "m", "x");
+	    printf(" %4s %5s   %4s %7s %3s %3s\n", 
+		   "rs", "md", "rx", "cutoff", "fp", "fn");
+	}
 
 	cnt = 0;
 	beg = time(NULL);
