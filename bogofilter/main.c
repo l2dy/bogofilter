@@ -125,14 +125,14 @@ int validate_args(int argc, char **argv)
 
 int process_args(int argc, char **argv)
 {
-    int	  ch;
-    int   exitcode;
-    int	  optind_save;
+    int option;
+    int exitcode;
+    int optind_save;
 
     optind_save=1;
-    while ((ch = getopt(argc, argv, "d:ehlsnSNvVpugR::rx:")) != EOF)
+    while ((option = getopt(argc, argv, "d:ehlsnSNvVpugR::rx:")) != EOF)
     {
-	switch(ch)
+	switch(option)
 	{
 	case 'd':
 	    strncpy(directory, optarg, PATH_LEN);
