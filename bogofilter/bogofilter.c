@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.15  2002/09/23 11:35:51  m-a
+ * Fix GCC 3.2 warnings.
+ *
  * Revision 1.14  2002/09/23 11:31:53  m-a
  * Unnest comments, and move $ line down by one to prevent CVS from adding nested comments again.
  *
@@ -105,8 +108,8 @@ I do the lexical analysis slightly differently, however.
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
 #define min(x, y)	(((x) < (y)) ? (x) : (y))
 
-wordlist_t ham_list	= {"ham", NULL, 0, NULL};
-wordlist_t spam_list	= {"spam", NULL, 0, NULL};
+wordlist_t ham_list	= {"ham", NULL, 0, NULL, NULL};
+wordlist_t spam_list	= {"spam", NULL, 0, NULL, NULL};
 
 #define	PLURAL(count) ((count == 1) ? "" : "s")
 
@@ -448,8 +451,10 @@ typedef struct
 }
 bogostat_t;
 
-int compare_stats(discrim_t *d1, discrim_t *d2)
+int compare_stats(const void *id1, const void *id2)
 { 
+    const discrim_t *d1 = id1;
+    const discrim_t *d2 = id2;
     return ( (d1->prob > d2->prob) ||
 	     ((d1->prob == d2->prob) && (strcmp(d1->key, d2->key) > 0)));
 }
