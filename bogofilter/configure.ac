@@ -152,11 +152,20 @@ AC_CHECK_LIB(tdb,
 )
   LIBDB="$LIBTDB"
 ;;
-  xqdbm) 
+  xqdbm)
   AC_LIB_LINKFLAGS([qdbm])
-  AC_CHECK_LIB(qdbm, dbm_open,,[
-    AC_MSG_ERROR(Cannot link to qdbm library.)])
   LIBDB="$LIBQDBM"
+  save_LIBS="$LIBS"
+  LIBS="$LIBS $LIBDB"
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([
+#include <stdlib.h>
+#include <depot.h>
+], [
+DEPOT *d = dpopen("", 0, 0);
+]
+)],,AC_MSG_ERROR(Cannot link to qdbm library.))
+  LIBS="$save_LIBS"
+
 ;;
     xdb)
 # check if we need LIBDB at all (it is harmful on BSD since
