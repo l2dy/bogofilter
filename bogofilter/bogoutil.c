@@ -140,8 +140,8 @@ static int load_file(char *db_file)
 
 	if (!isspace((unsigned char)*p)) {
 	    fprintf(stderr,
-		    "%s: Unexpected input [%s] on line %ld.
-		    Expecting whitespace before count\n",
+		    "%s: Unexpected input [%s] on line %ld. "
+		    "Expecting whitespace before count\n",
 		    PROGNAME, buf, line);
 	    rv = 1;
 	    break;
