@@ -514,11 +514,11 @@ static const char *help_text[] = {
     "      --db-remove-environment - remove environment.\n",
 
 #ifdef	HAVE_DECL_DB_CREATE
-    "      --db_lk_max_locks       - set max lock count.\n",
-    "      --db_lk_max_objects     - set max object count.\n",
+    "      --db-lk-max-locks       - set max lock count.\n",
+    "      --db-lk-max-objects     - set max object count.\n",
 #ifdef	FUTURE_DB_OPTIONS
-    "      --db_log_autoremove     - set autoremoving of logs.\n",
-    "      --db_txn_durable        - set durable mode.\n",
+    "      --db-log-autoremove     - set autoremoving of logs.\n",
+    "      --db-txn-durable        - set durable mode.\n",
 #endif
 #endif
 

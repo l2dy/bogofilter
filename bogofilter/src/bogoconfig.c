@@ -240,18 +240,18 @@ static const char *help_text[] = {
     "general options:\n",
     "  -c, --config-file=file    - read specified config file.\n",
     "  -C, --no-config-file      - don't read standard config files.\n",
-    "  -d, --bogofilter_dir=path - specify directory for wordlists.\n",
+    "  -d, --bogofilter-dir=path - specify directory for wordlists.\n",
     "  -H, --no-header-tags      - disables header line tagging.\n",
-    "  -k, --db_cachesize=size   - set Berkeley DB cache size (MB).\n",
+    "  -k, --db-cachesize=size   - set Berkeley DB cache size (MB).\n",
     "  -l, --use-syslog          - write messages to syslog.\n",
     "  -L, --syslog-tag=tag      - specify the tag value for log messages.\n",
     "  -I, --input-file=file     - read message from 'file' instead of stdin.\n",
     "  -O, --output-file=file    - save message to 'file' in passthrough mode.\n",
     "parameter options:\n",
     "  -mv1[,v2[,v3]]            - set user defined min_dev, robs, and robx values.\n",
-    "      --min_dev=v1, --robs=v2, --robx=v3\n",
+    "      --min-dev=v1, --robs=v2, --robx=v3\n",
     "  -ov1[,v2]                 - set user defined spam and non-spam cutoff values.\n",
-    "      --spam_cutoff=v1, --ham_cutoff=v2\n",
+    "      --spam-cutoff=v1, --ham-cutoff=v2\n",
     "info options:\n",
     "  -t, --terse               - set terse output mode.\n",
     "  -T, --fixed-terse-format  - set invariant terse output mode.\n",
@@ -263,32 +263,32 @@ static const char *help_text[] = {
     "config file options:\n",
     "  --option=value - can be used to set the value of a config file option.\n",
     "                   see bogofilter.cf.example for more info.\n",
-    "  --block_on_subnets                return class addr tokens\n",
-    "  --bogofilter_dir                  directory for wordlists\n",
-    "  --charset_default                 default character set\n",
-    "  --db_cachesize                    Berkeley db cache in Mb\n",
-    "  --ham_cutoff                      nonspam if score below this\n",
-    "  --header_format                   spam header format\n",
-    "  --log_header_format               header written to log\n",
-    "  --log_update_format               logged on update\n",
-    "  --min_dev                         ignore if score near\n",
-    "  --ns_esf                          effective size factor for ham\n",
-    "  --replace_nonascii_characters     substitute '?' if bit8 is 1\n",
+    "  --block-on-subnets                return class addr tokens\n",
+    "  --bogofilter-dir                  directory for wordlists\n",
+    "  --charset-default                 default character set\n",
+    "  --db-cachesize                    Berkeley db cache in Mb\n",
+    "  --ham-cutoff                      nonspam if score below this\n",
+    "  --header-format                   spam header format\n",
+    "  --log-header-format               header written to log\n",
+    "  --log-update-format               logged on update\n",
+    "  --min-dev                         ignore if score near\n",
+    "  --ns-esf                          effective size factor for ham\n",
+    "  --replace-nonascii-characters     substitute '?' if bit8 is 1\n",
     "  --robs                            Robinson's s parameter\n",
     "  --robx                            Robinson's x parameter\n",
-    "  --sp_esf                          effective size factor for spam\n",
-    "  --spam_cutoff                     spam if score above this\n",
-    "  --spam_header_name                passthrough adds/replaces\n",
-    "  --spam_subject_tag                passthrough prepends Subject\n",
-    "  --spamicity_formats               spamicity output format\n",
-    "  --spamicity_tags                  spamicity tag format\n",
-    "  --stats_in_header                 use header not body\n",
+    "  --sp-esf                          effective size factor for spam\n",
+    "  --spam-cutoff                     spam if score above this\n",
+    "  --spam-header-name                passthrough adds/replaces\n",
+    "  --spam-subject-tag                passthrough prepends Subject\n",
+    "  --spamicity-formats               spamicity output format\n",
+    "  --spamicity-tags                  spamicity tag format\n",
+    "  --stats-in-header                 use header not body\n",
     "  --terse                           report in short form\n",
-    "  --terse_format                    short form\n",
-    "  --thresh_update                   no update if near 0 or 1\n",
+    "  --terse-format                    short form\n",
+    "  --thresh-update                   no update if near 0 or 1\n",
     "  --timestamp                       apply token timestamps\n",
-    "  --unsure_subject_tag              like spam_subject_tag\n",
-    "  --user_config_file                configuration file\n",
+    "  --unsure-subject-tag              like spam-subject-tag\n",
+    "  --user-config-file                configuration file\n",
     "  --wordlist                        specify wordlist parameters\n",
     "\n",
     "bogofilter is a tool for classifying email as spam or non-spam.\n",
@@ -682,45 +682,45 @@ rc_t query_config(void)
     Q1 fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "ns_esf", ns_esf, ns_esf);
     Q1 fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "sp_esf", sp_esf, sp_esf);
     Q1 fprintf(stdout, "\n");
-    Q1 fprintf(stdout, "%-17s = %s\n",    "block_on_subnets",    YN(block_on_subnets));
-    Q1 fprintf(stdout, "%-17s = %s\n",    "charset_default",     charset_default);
-    Q1 fprintf(stdout, "%-17s = %s\n",    "replace_nonascii_characters", YN(replace_nonascii_characters));
+    Q1 fprintf(stdout, "%-17s = %s\n",    "block-on-subnets",    YN(block_on_subnets));
+    Q1 fprintf(stdout, "%-17s = %s\n",    "charset-default",     charset_default);
+    Q1 fprintf(stdout, "%-17s = %s\n",    "replace-nonascii-characters", YN(replace_nonascii_characters));
     Q2 fprintf(stdout, "%-17s = %s\n",    "no-header-tags",      YN(header_line_markup));
-    Q1 fprintf(stdout, "%-17s = %s\n",    "stats_in_header",     YN(stats_in_header));
+    Q1 fprintf(stdout, "%-17s = %s\n",    "stats-in-header",     YN(stats_in_header));
     Q2 fprintf(stdout, "%-17s = %s\n",    "report-unsure",       YN(unsure_stats));
-    Q1 fprintf(stdout, "%-17s = %0.6f\n", "thresh_update",       thresh_update);
+    Q1 fprintf(stdout, "%-17s = %0.6f\n", "thresh-update",       thresh_update);
     Q1 fprintf(stdout, "%-17s = %s\n",    "timestamp",           YN(timestamp_tokens));
     Q2 fprintf(stdout, "%-17s = %d\n",    "timestamp-date",      today);
     Q1 fprintf(stdout, "\n");
-    Q1 fprintf(stdout, "%-17s = %s\n", "spam_header_name",    spam_header_name);
-    Q1 fprintf(stdout, "%-17s = %s\n", "spam_subject_tag",    NB(spam_subject_tag));
-    Q1 fprintf(stdout, "%-17s = %s\n", "unsure_subject_tag",  NB(unsure_subject_tag));
+    Q1 fprintf(stdout, "%-17s = %s\n", "spam-header-name",    spam_header_name);
+    Q1 fprintf(stdout, "%-17s = %s\n", "spam-subject-tag",    NB(spam_subject_tag));
+    Q1 fprintf(stdout, "%-17s = %s\n", "unsure-subject-tag",  NB(unsure_subject_tag));
     Q2 fprintf(stdout, "%-18s = %s\n", "syslog-tag",          NB(logtag));
-    Q1 fprintf(stdout, "%-17s = %s\n", "header_format",       header_format);
-    Q1 fprintf(stdout, "%-17s = %s\n", "terse_format",        terse_format);
-    Q1 fprintf(stdout, "%-17s = %s\n", "log_header_format",   log_header_format);
-    Q1 fprintf(stdout, "%-17s = %s\n", "log_update_format",   log_update_format);
-    Q1 display_tag_array("spamicity_tags   ", spamicity_tags);
-    Q1 display_tag_array("spamicity_formats", spamicity_formats);
+    Q1 fprintf(stdout, "%-17s = %s\n", "header-format",       header_format);
+    Q1 fprintf(stdout, "%-17s = %s\n", "terse-format",        terse_format);
+    Q1 fprintf(stdout, "%-17s = %s\n", "log-header-format",   log_header_format);
+    Q1 fprintf(stdout, "%-17s = %s\n", "log-update-format",   log_update_format);
+    Q1 display_tag_array("spamicity-tags   ", spamicity_tags);
+    Q1 display_tag_array("spamicity-formats", spamicity_formats);
 
     Q2 fprintf(stdout, "\n");
 
     Q2 fprintf(stdout, "%-18s = %s\n", "no-config-file",   YN(suppress_config_file));
     Q2 fprintf(stdout, "%-18s = %s\n", "config-file",      NB(config_file_name));
-    Q2 fprintf(stdout, "%-18s = %s\n", "user_config_file", NB(user_config_file));
+    Q2 fprintf(stdout, "%-18s = %s\n", "user-config-file", NB(user_config_file));
     Q2 fprintf(stdout, "\n");
 
-    Q2 fprintf(stdout, "%-18s = %s\n", "bogofilter_dir", bogohome);
+    Q2 fprintf(stdout, "%-18s = %s\n", "bogofilter-dir", bogohome);
     Q2 display_wordlists(word_lists, "%-18s   ");
     Q2 fprintf(stdout, "\n");
 
-    Q2 fprintf(stdout, "%-18s = %d\n", "db_cachesize",        	db_cachesize);
+    Q2 fprintf(stdout, "%-18s = %d\n", "db-cachesize",        	db_cachesize);
 #ifdef	HAVE_DECL_DB_CREATE
-    Q2 fprintf(stdout, "%-18s = %d\n", "db_lk_max_locks",   	db_max_locks);
-    Q2 fprintf(stdout, "%-18s = %d\n", "db_lk_max_objects", 	db_max_objects);
+    Q2 fprintf(stdout, "%-18s = %d\n", "db-lk-max-locks",   	db_max_locks);
+    Q2 fprintf(stdout, "%-18s = %d\n", "db-lk-max-objects", 	db_max_objects);
 #ifdef	FUTURE_DB_OPTIONS
-    Q2 fprintf(stdout, "%-18s = %s\n", "db_log_autoremove",     YN(db_log_autoremove));
-    Q2 fprintf(stdout, "%-18s = %s\n", "db_log_txn_durable",	YN(db_txn_durable));
+    Q2 fprintf(stdout, "%-18s = %s\n", "db-log-autoremove",     YN(db_log_autoremove));
+    Q2 fprintf(stdout, "%-18s = %s\n", "db-log-txn-durable",	YN(db_txn_durable));
 #endif
 #endif
 
