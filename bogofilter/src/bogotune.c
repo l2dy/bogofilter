@@ -1382,8 +1382,8 @@ static rc_t bogotune(void)
     if (bogolex)
 	return status;
 
-    distribute(REG_SPAM, sp_msglists);
     distribute(REG_GOOD, ns_msglists);
+    distribute(REG_SPAM, sp_msglists);
 
     create_countlists(ns_msglists);
     create_countlists(sp_msglists);
