@@ -14,6 +14,7 @@ AUTHOR:
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <time.h>
 #include <unistd.h>
 #include <db.h>
 #include <errno.h>
@@ -34,6 +35,17 @@ AUTHOR:
 #else
 #define	DB_OPEN(db, file, database, dbtype, flags, mode) db->open(db, NULL /*txnid*/, file, database, dbtype, flags, mode)
 #endif
+
+/* Global Variables */
+
+YEARDAY today;		/* day of year (1..366) */
+
+/* Function prototypes */
+
+static long db_get_dbvalue(void *vhandle, const char *word, dbv_t *val);
+static void db_set_dbvalue(void *vhandle, const char *word, dbv_t *val);
+
+/* Function definitions */
 
 static void db_enforce_locking(dbh_t *handle, const char *func_name){
   if (handle->locked == false){
@@ -69,6 +81,7 @@ static void dbh_free(dbh_t *handle){
         xfree(handle);
 }
 
+
 /*
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
@@ -81,7 +94,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode){
     if (open_mode == DB_READ)
       opt_flags = DB_RDONLY;
     else
-      opt_flags =  DB_CREATE; /*Read-write mode implied. Allow database to be created if necesary */
+      opt_flags = DB_CREATE; /*Read-write mode implied. Allow database to be created if necesary */
 
     handle = dbh_init(db_file, name);
     if ((ret = db_create (&(handle->dbp), NULL, 0)) != 0){
@@ -105,7 +118,6 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode){
 #endif
       if (!had_err)
         return (void *)handle;
-
     }
 
     dbh_free(handle);
@@ -118,47 +130,75 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode){
     Notes: Will call exit if an error occurs.
 */
 long db_getvalue(void *vhandle, const char *word){
-    DBT db_key;
-    DBT db_data;
-    long value;
-    int  ret;
-    char *t;
+  dbv_t val;
+  int  ret;
+  long value = 0;
+  dbh_t *handle = vhandle;
 
-    dbh_t *handle = vhandle;
+  ret = db_get_dbvalue(vhandle, word, &val);
+
+  if (ret == 0) {
+    value = val.count;
+      
+    if (DEBUG_DATABASE(2)) {
+      fprintf(stderr, "[%lu] db_getvalue (%s): [%s] has value %ld\n",
+	      (unsigned long) handle->pid, handle->name, word, value);
+    }
+    return(value);
+  }
+  else
+    return 0;
+}
+
+
+long db_get_dbvalue(void *vhandle, const char *word, dbv_t *val){
+  int  ret;
+  DBT db_key;
+  DBT db_data;
+  char *t;
+  long cv[2];
+
+  dbh_t *handle = vhandle;
 	
-    db_enforce_locking(handle, "db_getvalue");
+  db_enforce_locking(handle, "db_getvalue");
     
-    DBT_init(db_key);
-    DBT_init(db_data);
+  DBT_init(db_key);
+  DBT_init(db_data);
 
-    db_key.data = t = xstrdup(word);
-    db_key.size = strlen(word);
+  db_key.data = t = xstrdup(word);
+  db_key.size = strlen(word);
 
-    ret = handle->dbp->get(handle->dbp, NULL, &db_key, &db_data, 0);
-    xfree(t);
-    if (ret == 0) {      
-      value = *(long *)db_data.data;
-      
-      if (handle->is_swapped)
-        value = swap_long(value);
-      
-      if (DEBUG_DATABASE(2)) {
-        fprintf(stderr, "[%lu] db_getvalue (%s): [%s] has value %ld\n",
-		(unsigned long) handle->pid, handle->name, word, value);
-      }
+  db_data.data = &cv;
+  db_data.size = sizeof(cv);
+  db_data.ulen = sizeof(cv);
 
-      return(value);
+  ret = handle->dbp->get(handle->dbp, NULL, &db_key, &db_data, 0);
+  xfree(t);
+  switch (ret) {
+  case 0:
+    memcpy(cv, db_data.data, db_data.ulen);	/* save array from wordlist */
+    if (!handle->is_swapped){			/* convert from struct to array */
+      val->count = cv[0];
+      val->yday  = cv[1];
+    } else {
+      val->count = swap_long(cv[0]);
+      val->yday  = swap_long(cv[1]);
     }
-    else if (ret == DB_NOTFOUND){
-      if (DEBUG_DATABASE(2)) {
-        fprintf(stderr, "[%lu] db_getvalue (%s): [%s] not found\n", (unsigned long) handle->pid, handle->name, word);
-      }
-      return 0;
+    if (handle->is_swapped){
+      val->count = swap_long(val->count);
+      if (db_data.ulen > sizeof(long))
+	val->yday  = swap_long(val->yday);
     }
-    else {
-	PRINT_ERROR("(db) db_getvalue( '%s' ), err: %d, %s", word, ret, db_strerror(ret));
-	exit(2);
+    return ret;
+  case DB_NOTFOUND:
+    if (DEBUG_DATABASE(2)) {
+      fprintf(stderr, "[%lu] db_getvalue (%s): [%s] not found\n", (unsigned long) handle->pid, handle->name, word);
     }
+    return ret;
+  default:
+    PRINT_ERROR("(db) db_getvalue( '%s' ), err: %d, %s", word, ret, db_strerror(ret));
+    exit(2);
+  }
 }
 
 
@@ -167,38 +207,59 @@ Store VALUE in database, using WORD as database key
 Notes: Calls exit if an error occurs.
 */
 void db_setvalue(void *vhandle, const char * word, long value){
-    int ret;
-    DBT key;
-    DBT data;
-    dbh_t *handle = vhandle;
-    char *t;
-   
-    db_enforce_locking(handle, "db_setvalue");
+  dbv_t val;
+  val.count = value;
+  val.yday  = today;		/* day is 1..366 */
+  db_set_dbvalue(vhandle, word, &val);
+}
 
-    DBT_init(key);
-    DBT_init(data);
+void db_setvalue_and_date(void *vhandle, const char * word, long value, long yday){
+  dbv_t val;
+  val.count = value;
+  val.yday  = yday;		/* day is 1..366 */
+  db_set_dbvalue(vhandle, word, &val);
+}
 
-    key.data = t = xstrdup(word);
-    key.size = strlen(word);
-    
-    if (handle->is_swapped)
-      value = swap_long(value);
 
-    data.data = &value;
-    data.size = sizeof(long);
+void db_set_dbvalue(void *vhandle, const char * word, dbv_t *val){
+  int ret;
+  DBT db_key;
+  DBT db_data;
+  long cv[2];
+  dbh_t *handle = vhandle;
+  char *t;
 
-    ret = handle->dbp->put(handle->dbp, NULL, &key, &data, 0);
-    xfree(t);
-    if (ret == 0){
-      if (DEBUG_DATABASE(2)) {
-	fprintf(stderr, "db_setvalue (%s): [%s] has value %ld\n", handle->name, word, value);
-      }
+  db_enforce_locking(handle, "db_set_dbvalue");
+
+  DBT_init(db_key);
+  DBT_init(db_data);
+
+  db_key.data = t = xstrdup(word);
+  db_key.size = strlen(word);
+
+  if (!handle->is_swapped){		/* convert from struct to array */
+    cv[0] = val->count;
+    cv[1] = val->yday;
+  } else {
+    val->count = swap_long(cv[0]);
+    val->yday  = swap_long(cv[1]);
+  }
+
+  db_data.data = &cv;		/* and save array in wordlist */
+  db_data.size = sizeof(cv);
+  db_data.ulen = sizeof(cv);
+
+  ret = handle->dbp->put(handle->dbp, NULL, &db_key, &db_data, 0);
+  xfree(t);
+  if (ret == 0){
+    if (DEBUG_DATABASE(2)) {
+      fprintf(stderr, "db_set_dbvalue (%s): [%s] has value %ld\n", handle->name, word, val->count);
     }
-    else 
-    {
-	PRINT_ERROR("(db) db_setvalue( '%s' ), err: %d, %s", word, ret, db_strerror(ret));
-	exit(2);
-    }
+  }
+  else {
+    PRINT_ERROR("(db) db_set_dbvalue( '%s' ), err: %d, %s", word, ret, db_strerror(ret));
+    exit(2);
+  }
 }
 
 
@@ -208,6 +269,12 @@ void db_setvalue(void *vhandle, const char * word, long value){
 void db_increment(void *vhandle, const char *word, long value){
   value = db_getvalue(vhandle, word) + value;
   db_setvalue(vhandle, word, value < 0 ? 0 : value);
+}
+
+
+void db_increment_with_date(void *vhandle, const char *word, long value, long yday){
+  value = db_getvalue(vhandle, word) + value;
+  db_setvalue_and_date(vhandle, word, value < 0 ? 0 : value, yday);
 }
 
 
@@ -356,7 +423,7 @@ static void lock_msg(const dbh_t *handle, int idx, const char *msg, int cmd, int
 {
   const char *block_type[] = { "nonblocking", "blocking" };
   const char *lock_type[]  = { "write", "read" };
-                                                     
+
   PRINT_ERROR("[%lu] [%d] %s %s %s lock on %s", 
 	          (unsigned long)handle->pid,
                   idx,

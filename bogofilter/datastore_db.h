@@ -14,4 +14,11 @@ typedef struct {
   int  is_swapped;
 } dbh_t;
 
+typedef struct {
+    long count;
+    long yday;
+} dbv_t;
+
+void db_setvalue_and_date(void *vhandle, const char * word, long value, long yday);
+
 #endif	/* DATASTORE_H */
