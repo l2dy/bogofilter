@@ -276,7 +276,9 @@ wordhash_insert (wordhash_t *wh, word_t *t, size_t n, void (*initializer)(void *
     hn->buf = smalloc (wh, n);
     if (initializer)
 	initializer(hn->buf);
-		  
+    else
+	memset(hn->buf, '\0', n);
+
     hn->key = word_dup(t);
 
     hn->next = wh->bin[idx];
@@ -389,7 +391,7 @@ wordhash_convert_to_proplist(wordhash_t *wh, wordhash_t *db)
 
     count = 0;
     for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh)) {
-	wordprop_t *wp = wordhash_insert(db, node->key, 0, NULL);
+	wordprop_t *wp = wordhash_insert(db, node->key, sizeof(wordprop_t), NULL);
 	props[count].buf = wp;
 	order[count] = &props[count];
 	count += 1;
