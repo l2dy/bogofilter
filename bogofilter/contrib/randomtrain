@@ -1,0 +1,98 @@
+#! /bin/bash
+#
+#  randomtrain -- bogofilter messages from files in random order
+#                 and train if the result is wrong or uncertain
+#  needs:    bash basename rm grep awk wc perl dd bogofilter
+#  usage:    see function usage() starting on line 10 of this file
+#  version:  0.5 (Greg Louis <glouis@dynamicro.on.ca>)
+
+pid=$$
+
+function usage() {
+    iam=`basename $0`
+    echo "Usage: $iam [bogodir] [-]n|s filename [-]n|s filename [...]"
+    echo "       Messages contained in the files are fed to bogofilter"
+    echo "       in random order.  If bogofilter is wrong or uncertain"
+    echo "       about whether a message is spam, that message is used"
+    echo "       for training, with bogofilter's -s or -n option."
+    echo "Parameters:"
+    echo "       bogodir is where bogofilter's .db files are kept"
+    echo "       (bogodir defaults to $HOME/.bogofilter)."
+    echo "       n (or -n) indicates that the next file contains only"
+    echo "       nonspams, and s (or -s) means it contains only spams."
+    echo "       No one file may contain both spams and nonspams."
+    echo "       Filenames may not contain blanks."
+    echo "NB:    At least one spam and one nonspam file are needed!"
+    rm -f list.$pid
+    exit 1
+}
+
+# if the first param isn't s or n, treat it as a directory
+bogodir="${HOME}/.bogofilter"
+test "x$1" = "x" && usage
+indic=${1:0-1:1}
+if [ "$1" != "s" -a "$1" != "n" ]; then
+    bogodir=$1
+    shift
+fi
+
+# check for an even number of params >= 4
+test ${#*} -ge 4 || usage
+let n=${#*}%2
+test $n -eq 0 || usage
+
+# params may be ok, here goes...
+
+# get all the byte offsets in all the files, in one list
+while [ ${#*} -gt 1 ]; do
+    indic=${1:0-1:1} ; shift
+    test "$indic" != "s" -a "$indic" != "n" && usage
+    file=$1 ; shift
+    if [ ! -r $file ]; then echo "$file not found"; usage; fi
+    grep -b '^From ' $file | \
+	awk "BEGIN {FS=\":\"} {print \"$indic $file \"\$1}" >>list.$pid
+    wc -c $file | awk "{print \"$indic $file \"\$1}" >>list.$pid
+done
+
+# create a shuffled list, with lengths
+# read a line; if it's not a new file, write a line
+file=""
+{
+    while read indic fnam offset; do
+	if [ "x$fnam" = "x$file" ]; then
+	    let length=$offset-$oldoff
+	    echo "$indic $fnam $oldoff $length"
+	    oldoff=$offset
+	else
+	    file=$fnam
+	    oldoff=0
+	fi
+    done
+} <list.$pid | perl \
+-e' srand ( time() ^ ($$ + ($$ << 15)) );' \
+-e' foreach $key (<>) {' \
+-e'     $shuf{$key} = rand;' \
+-e' }' \
+-e' foreach $key (sort { $shuf{$b} <=> $shuf{$a} } keys %shuf ) {' \
+-e'     print $key;' \
+-e' }' >shuf.$pid
+# go through the list, extract the messages, eval with bogofilter
+# and train if bogofilter is wrong or uncertain
+{
+    while read expect fnam offset length; do
+	dd if=$fnam bs=1 skip=$offset count=$length 2>/dev/null >msg.$pid
+	bogofilter -d $bogodir <msg.$pid
+	got=$?	# 0=spam, 1=good, 2=unknown, 3=err
+	echo -n "bogo=$got, "
+	if [ $got -eq 0 ]; then got="s"; elif [ $got -eq 1 ]; then got="n"; fi
+	echo -n "exp=$expect, got=$got"
+	if [ $got != $expect ]; then
+	    echo -n ", reg=$expect"
+	    # comment out the next line for dry-run testing
+	    bogofilter -d $bogodir -$expect <msg.$pid
+	fi
+	echo
+    done
+} <shuf.$pid
+# next line can be commented out for debugging
+rm -f list.$pid shuf.$pid msg.$pid
