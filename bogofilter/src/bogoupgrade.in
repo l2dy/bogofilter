@@ -34,6 +34,10 @@ David Relson <relson@osagesoftware.com>
 require 5.006_000;
 use strict;
 
+sub convert_double_to_single();
+sub convert_format_A();
+sub convert_format_B();
+
 my $VERSION = '0.4.1';
 
 my ($in, $out, $help, $dir, $yday, $msg_count_token);
@@ -107,7 +111,7 @@ sub convert_format_B() {
   $in_db =~ s/count$/$db_ext/;
 
   unless (-f $in_db){
-    warn("Cannot find database file [$in_db] corresponding to input file [$in]\n");
+    warn("Cannot find database file [$in_db]\n  corresponding to input file [$in]\n");
     exit;
   }
 
@@ -120,7 +124,7 @@ sub convert_format_B() {
 
   while(<F>){
     if (m/^\.count\s+(\d+)$/){
-      warn("Found a message count of [$1] in db. Throwing away text file count of [$msg_count]\n");
+      warn("Found a message count of [$1] in db.\nThrowing away text file count of [$msg_count]\n");
       $msg_count = $1;
       next;
     }
@@ -147,8 +151,9 @@ sub cvt2to1_get($$) {
     @cmd = ($bogoutil, '-d', $filename);
     open I, "-|", @cmd or die "cannot run \"@cmd\": $!";
     while (<I>) {
-	chomp; split;
-	push @tmp, sprintf($format, $_[0], $_[1], $_[2]);
+	chomp;
+	my @a = split;
+	push @tmp, sprintf($format, $a[0], $a[1], $a[2]);
     }
     close I or die "error running \"@cmd\": $!";
     return @tmp;
@@ -174,40 +179,39 @@ sub convert_double_to_single() {
 exit(0);
 
 sub usage {
-  warn "usage: $0 [ -d <bogofilter directory> ] [ -i <input text file> -o <output db file> [ -b <path to bogoutil>] ] [ -h ]\n";
+  warn "usage: $0 [ -d <bogofilter directory> ]\n  [ -i <input text file> -o <output db file> [ -b <path to bogoutil>] ]\n  [ -h ]\n";
 }
 
 sub help {
   print <<EOF;
-  $0 -- upgrades bogofilter database to current version.
-  Options:
-    -d	<directory>.
+$0 -- upgrades bogofilter database to current version.
+Options:
+  -d <directory>
 
-	Name of directory containing database files.  Old files will be read
-	and new files will be written.
+    Name of directory containing database files.  Old files will be read and new
+    files will be written.
 
-    -i	<input file>.
+  -i <input file>
 
-	Text file containing message count, and possibly wordlist data
-	records.  If the file only contains a message count but no word
-	list records, there must be a database file, in the same
-	directory as the text file, which contains the word list data.
+    Text file containing message count, and possibly wordlist data records.  If
+    the file only contains a message count but no word list records, there must
+    be a database file, in the same directory as the text file, which contains
+    the word list data.
 
-   -o	<output file>
+ -o <output file>
 
-	Output database file.  Use the appropriate file extension for your
-	version of bogofilter, i.e. '.db' for Berkeley DB or '.tdb' for
-	Trivial DB.
+    Output database file.  Use the appropriate file extension for your version
+    of bogofilter, i.e. '.db' for Berkeley DB or '.tdb' for Trivial DB.
 
-   -b	<path to bogoutil program>
+ -b <path to bogoutil program>
 
-	Defaults to 'bogoutil', in the hopes that your shell will find it.
+    Defaults to 'bogoutil', in the hopes that your shell will find it.
 
-   -h	help
+ -h     help
 
-	You are reading it.
+    You are reading it.
 EOF
 	exit(0);
 }
 
-# vim: set filetype=perl:
+# vim: set filetype=perl ai:
