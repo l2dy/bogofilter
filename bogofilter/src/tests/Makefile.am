@@ -81,24 +81,12 @@ EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel \
 	outputs/maildir.out \
 	outputs/message_addr.ref \
 	outputs/message_id.ref \
-	outputs/msg.1.f.v \
-	outputs/msg.1.g.v \
-	outputs/msg.1.r.v \
-	outputs/msg.2a.f.vv \
-	outputs/msg.2a.f.vvv \
-	outputs/msg.2a.g.vv \
-	outputs/msg.2a.g.vvv \
-	outputs/msg.2a.r.vv \
-	outputs/msg.2a.r.vvv \
-	outputs/msg.2b.f.vv \
-	outputs/msg.2b.f.vvv \
-	outputs/msg.2b.g.vv \
-	outputs/msg.2b.g.vvv \
-	outputs/msg.2b.r.vv \
-	outputs/msg.2b.r.vvv \
-	outputs/msg.3.f.vvv \
-	outputs/msg.3.g.vvv \
-	outputs/msg.3.r.vvv \
+	outputs/msg.1.v \
+	outputs/msg.2a.vv \
+	outputs/msg.2a.vvv \
+	outputs/msg.2b.vv \
+	outputs/msg.2b.vvv \
+	outputs/msg.3.vvv \
 	outputs/multiple.wordlists.ref   \
 	outputs/parsing.out \
 	outputs/queue_id.ref \
