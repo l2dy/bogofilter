@@ -37,9 +37,15 @@ bool	  db_txn_durable = true;	/* not DB_TXN_NOT_DURABLE */
 
 dsm_t dsm_transactional = {
     /* public -- used in datastore.c */
+#ifdef ENABLE_SQLITE_DATASTORE
     &db_txn_begin,
     &db_txn_abort,
     &db_txn_commit,
+#else
+    NULL,
+    NULL,
+    NULL,
+#endif
 
     /* private -- used in datastore_db_*.c */
     NULL,
