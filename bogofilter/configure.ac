@@ -395,7 +395,7 @@ fi
 AM_CONDITIONAL(NEEDTRIO, test "$needtrio" = "1")
 
 dnl check if XMLTO is somewhere
-AC_CHECK_PROG(ac_cv_enable_xmlto, xxmlto, yes, no)
+AC_CHECK_PROG(ac_cv_enable_xmlto, xmlto, yes, no)
 AC_MSG_CHECKING([whether xmlto is available])
 AC_MSG_RESULT($ac_cv_enable_xmlto)
 
