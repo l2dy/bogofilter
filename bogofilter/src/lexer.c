@@ -189,7 +189,10 @@ static int skip_folded_line(buff_t *buff)
 	buff->t.leng = 0;
 	count = reader_getline(buff);
 	yylineno += 1;
-	if (count <= 1 || !isspace(buff->t.text[0])) 
+	if (!isspace(buff->t.text[0])) 
+	    return count;
+	/* Check for empty line which terminates message header */
+	if (is_eol(buff->t.text, count))
 	    return count;
     }
 
