@@ -35,6 +35,9 @@ AUTHOR:
 #ifdef	ENABLE_ROBINSON_METHOD
 #include "robinson.h"
 #endif
+#ifdef	ENABLE_ROBINSON_FISHER
+#include "fisher.h"
+#endif
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
@@ -79,7 +82,10 @@ enum algorithm_e {
     AL_GRAHAM='g',
 #endif
 #ifdef ENABLE_ROBINSON_METHOD
-    AL_ROBINSON='r'
+    AL_ROBINSON='r',
+#endif
+#ifdef ENABLE_ROBINSON_FISHER
+    AL_FISHER='f',
 #endif
 };
 
@@ -131,12 +137,17 @@ static bool select_method(enum algorithm_e al)
     {
 #ifdef ENABLE_GRAHAM_METHOD
     case AL_GRAHAM:
-	method = &graham_method;
+	method = (method_t *) &graham_method;
 	break;
 #endif
 #ifdef ENABLE_ROBINSON_METHOD
     case AL_ROBINSON:
-	method = &robinson_method;
+	method = (method_t *) &rf_robinson_method;
+	break;
+#endif
+#ifdef ENABLE_ROBINSON_FISHER
+    case AL_FISHER:
+	method = (method_t *) &rf_fisher_method;
 	break;
 #endif
     default:
@@ -389,10 +400,22 @@ static void version(void)
     (void)printf("details.\n\n");
 }
 
-#ifndef	GRAHAM_AND_ROBINSON
-#define	GR
+#ifndef	ENABLE_GRAHAM_METHOD
+#define	G ""
 #else
-#define	GR "gr"
+#define	G "g"
+#endif
+
+#ifndef	ENABLE_ROBINSON_METHOD
+#define	R ""
+#else
+#define	R "r"
+#endif
+
+#ifndef	ENABLE_ROBINSON_FISHER
+#define	F ""
+#else
+#define	F "f"
 #endif
 
 int process_args(int argc, char **argv)
@@ -400,7 +423,7 @@ int process_args(int argc, char **argv)
     int option;
     int exitcode;
 
-    while ((option = getopt(argc, argv, GR "d:ehlsnSNvVpuc:CgrRx:fq")) != EOF)
+    while ((option = getopt(argc, argv, "d:ehlsnSNvVpuc:CgrRx:fqt" G R F)) != EOF)
     {
 	switch(option)
 	{
@@ -460,6 +483,7 @@ int process_args(int argc, char **argv)
 	    algorithm = AL_GRAHAM;
 	    break;
 #endif
+
 #ifdef	ENABLE_ROBINSON_METHOD
 	case 'R':
 	    Rtable = 1;
@@ -472,6 +496,11 @@ int process_args(int argc, char **argv)
 	    break;
 #endif
 
+#ifdef ENABLE_ROBINSON_FISHER
+	case 'f':
+	    algorithm = AL_FISHER;
+	    break;
+#endif
 	case 'x':
 	    set_debug_mask( optarg );
 	    break;
@@ -480,9 +509,10 @@ int process_args(int argc, char **argv)
 	    quiet = 1;
 	    break;
 
-	case 'f':
+	case 'F':
 	    force = 1;
 	    break;
+
 
 	case 'c':
 	    read_config_file(optarg, false);
@@ -491,6 +521,10 @@ int process_args(int argc, char **argv)
 
 	case 'C':
 	    suppress_config_file = true;
+	    break;
+
+	case 't':
+	    terse = true;
 	    break;
 
 	default:
