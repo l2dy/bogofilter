@@ -1,5 +1,5 @@
 dnl -*- Autoconf -*-
-dnl This code was taken from autoconf 2.57.
+dnl The AC_HEADER_STDBOOL code was taken from autoconf 2.57.
 dnl
 dnl It was modified to only define the AC_HEADER_STDBOOL test,
 dnl which is not present in autoconf 2.54 and older, because
@@ -103,6 +103,9 @@ if test $ac_cv_header_stdbool_h = yes; then
   AC_DEFINE(HAVE_STDBOOL_H, 1, [Define to 1 if stdbool.h conforms to C99.])
 fi
 ])# AC_HEADER_STDBOOL
+
+dnl This is the end of the part extracted from autoconf.
+dnl The next part was added by Clint Adams.
 
 AC_DEFUN([AC_CHECK_DB],[
 for lib in $1
