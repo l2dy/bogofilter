@@ -146,6 +146,22 @@ static int skip_spam_header(buff_t *buff)
     return EOF;
 }
 
+bool is_eol(const char *buf, size_t len)
+{
+    bool ans = ((len == 1 && memcmp(buf, NL, 1) == 0) ||
+		(len == 2 && memcmp(buf, CRLF, 2) == 0));
+    return ans;
+}
+ 
+void convert_eol(char *buf, char chr)
+{
+    if (memcmp(buf-2, CRLF, 2) == 0)
+	memset(buf-2, chr,  2);
+    if (memcmp(buf-1, NL,   1) == 0)
+	memset(buf-1, chr,  1);
+    return;
+}
+
 static int get_unfolded_line(buff_t *buff)
 {
     int count = 0;
@@ -164,8 +180,7 @@ static int get_unfolded_line(buff_t *buff)
 	    if (add == EOF) break;
 	    cnt = strspn(text, " \t");
 
-	    if ((add - cnt == 1 && memcmp(text + cnt, NL, 1) == 0) ||
-		(add - cnt == 2 && memcmp(text + cnt, CRLF, 2) == 0)) {
+	    if (is_eol(text + cnt, add - cnt)) {
 		/* reject empty line */
 		buff->read -= add;
 		buff->t.leng -= add;
@@ -187,10 +202,7 @@ static int get_unfolded_line(buff_t *buff)
 		count += add;
 
 		/* Convert multiple lines to single line */
-		if (memcmp(text-2, CRLF, 2) == 0)
-		    memset(text-2, ' ',  2);
-		if (memcmp(text-1, NL,   1) == 0)
-		    memset(text-1, ' ',  1);
+		convert_eol(text, ' ');
 	    }
 	}
     }

@@ -41,11 +41,6 @@ CONTRIBUTORS:
 #include "memdebug.h"
 #endif
 
-#define	NL	"\n"
-#define	CRLF	"\r\n"
-
-extern int Rtable;
-
 FILE  *fpo;
 
 char msg_register[256];
@@ -223,8 +218,7 @@ void write_message(rc_t status)
 	    }
 
 	    /* detect end of headers */
-	    if ((rd == 1 && memcmp(out, NL, 1) == 0) ||
-		(rd == 2 && memcmp(out, CRLF, 2) == 0) ||
+	    if (is_eol(out, rd) ||
 		is_blank_line(out, rd))		/* check for non-empty blank line */
 		break;
 
