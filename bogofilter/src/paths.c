@@ -119,9 +119,8 @@ bool check_directory(const char* path) /*@globals errno,stderr@*/
     int rc;
     struct stat sb;
 
-    if (path == NULL || *path == '\0') {
+    if (path == NULL || *path == '\0')
 	return false;
-    }
 
     rc = stat(path, &sb);
     if (rc < 0) {
