@@ -26,7 +26,8 @@ EXTRA_DIST = bogofilter.1in bogoutil.1in bogoupgrade.1in \
 #	     strlcat.3 strlcpy.3
 
 .1in.1 .htmlin.html:
-	sed -e "s|[@]SYSCONFDIR@|$(sysconfdir)|g" $< >$@ \
+	sed -e "s|[@]sysconfdir@|$(sysconfdir)|g" \
+	    -e "s|[@]bindir@|$(bindir)|g" $< >$@ \
 	|| { rm -f $@ ; exit 1 ; }
 
 .xml.htmlin:

@@ -46,16 +46,16 @@ fire off bogofilter.</para></listitem>
 </screen></listitem>
 <listitem><para>If your bogofilter version is less than 0.7, say:</para>
 <screen>
-<prompt>$</prompt> <userinput>/usr/bin/bogoupgrade -b /usr/bin/bogoutil \
+<prompt>$</prompt> <userinput>@bindir@/bogoupgrade -b @bindir@/bogoutil \
 -i ~/.bogofilter.safe/goodlist -o ~/.bogofilter/goodlist.db</userinput>
-<prompt>$</prompt> <userinput>/usr/bin/bogoupgrade -b /usr/bin/bogoutil \
+<prompt>$</prompt> <userinput>@bindir@/bogoupgrade -b @bindir@/bogoutil \
 -i ~/.bogofilter.safe/badlist -o ~/.bogofilter/spamlist.db</userinput>
 </screen>
 <para>If your bogofilter version is 0.7 or greater, say:</para>
 <screen>
-<prompt>$</prompt> <userinput>/usr/bin/bogoupgrade -b /usr/bin/bogoutil \
+<prompt>$</prompt> <userinput>@bindir@/bogoupgrade -b @bindir@/bogoutil \
 -i ~/.bogofilter.safe/hamlist.count -o ~/.bogofilter/goodlist.db</userinput>
-<prompt>$</prompt> <userinput>/usr/bin/bogoupgrade -b /usr/bin/bogoutil \
+<prompt>$</prompt> <userinput>@bindir@/bogoupgrade -b @bindir@/bogoutil \
 -i ~/.bogofilter.safe/spamlist.count -o ~/.bogofilter/spamlist.db</userinput>
 </screen></listitem>
 
