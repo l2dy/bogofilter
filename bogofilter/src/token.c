@@ -279,7 +279,7 @@ token_t get_token(word_t **token)
 	    if (block_on_subnets)
 	    {
 		const byte *ptext = (wordlist_version >= IP_PREFIX) ? (const byte *)"ip:" : (const byte *)"url:";
-		word_t *prefix = word_news(ptext);
+		word_t *prefix = word_news((const char *)ptext);
 		int q1, q2, q3, q4;
 		/*
 		 * Trick collected by ESR in real time during John

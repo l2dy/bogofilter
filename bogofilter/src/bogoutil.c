@@ -373,7 +373,7 @@ static ex_t display_words(const char *path, int argc, char **argv, bool show_pro
 	    word = (const byte *) *argv++;
 	    if (--argc == 0)
 		argc = -1;
-	    token = word_news(word);
+	    token = word_news((const char *)word);
 	}
 
 	rc = ds_read(dsh, token, &val);
@@ -429,7 +429,7 @@ static ex_t get_robx(const char *path)
 	printf("%f\n", rx);
     else {
 	dsv_t val;
-	word_t *word_robx = word_news((const byte *)ROBX_W);
+	word_t *word_robx = word_news(ROBX_W);
 
 	open_wordlists(word_lists, DS_WRITE);
 

@@ -265,7 +265,7 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 
 void score_initialize(void)
 {
-    word_t *word_robx = word_news((const byte *)ROBX_W);
+    word_t *word_robx = word_news(ROBX_W);
 
     wordlist_t *list = get_default_wordlist(word_lists);
 
