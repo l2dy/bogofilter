@@ -13,8 +13,11 @@ AUTHOR:
 #ifndef BOGOCONFIG_H
 #define BOGOCONFIG_H
 
-#include "config.h"
 #include "system.h"
+
+#include <getopt.h>
+
+#include "configfile.h"
 
 /* Global variables */
 
@@ -24,5 +27,8 @@ extern const char *user_config_file;
 
 extern void query_config(void) __attribute__ ((noreturn));
 extern void process_args_and_config_file(int argc, char **argv, bool warn_on_error);
+
+extern struct option long_options[];
+extern void process_arg(int option, const char *name, const char *arg, priority_t precedence, arg_pass_t pass, arg_source_t src);
 
 #endif
