@@ -185,7 +185,7 @@ int display_words(char *db_file)
 	}
 	*(p + 1) = '\0';
 
-	printf( "%s %d\n", buf, db_getvalue( dbh, buf ) );
+	printf("%s %ld\n", buf, db_getvalue(dbh, buf));
       }
       db_lock_release(dbh);
     }
@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
     typedef enum { NONE, DUMP = 1, LOAD = 2, WORD = 3 } cmd_t;
 
     int  count = 0;
-    char *db_file;
+    char *db_file = NULL;
     char ch;
     cmd_t flag = NONE;
 
@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
 	    exit(1);
 	}
 
-    if ( count != 1 )
+    if (count != 1)
     {
       fprintf(stderr, PROGNAME ": Exactly one of the -d, -l, or -w flags must be present.\n");
       exit(1);
@@ -281,13 +281,16 @@ int main(int argc, char *argv[])
 	exit(1);
     }
 
-    switch(flag)
-    {
-    case DUMP:
-	 return dump_file(db_file);
-    case LOAD:
-	 return load_file(db_file);
-    case WORD:
-	 return display_words(db_file);
+    switch(flag) {
+	case DUMP:
+	    return dump_file(db_file);
+	case LOAD:
+	    return load_file(db_file);
+	case WORD:
+	    return display_words(db_file);
+	case NONE:
+	default:
+	    /* should have been handled above */
+	    abort();
     }
 }
