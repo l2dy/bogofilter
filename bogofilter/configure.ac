@@ -107,7 +107,8 @@ then
       -Wmissing-format-attribute -Wnested-externs \
       -fno-common -Wchar-subscripts -Wcomment \
       -Wimplicit -Wsequence-point -Wreturn-type \
-      -Wfloat-equal -Wno-system-headers
+      -Wno-system-headers
+      # -Wfloat-equal
       # -Wmissing-noreturn -Wconversion -pedantic -Wredundant-decls
   do
        if $CC $i $ac_cv_prog_gcc_flags -c configure-dummy.c >/dev/null 2>&1 
