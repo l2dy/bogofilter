@@ -54,6 +54,6 @@ am='{-1.6.3,-1.6,-1.5,}'
 ac='{-2.54,-2.53,-2.52,}'
 eval try    -- aclocal$am
 eval try    -- autoheader$ac
-eval try -a -- automake$am
+eval try -af -- automake$am
 eval try    -- autoconf$ac
 ./configure "$@"
