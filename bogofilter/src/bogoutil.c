@@ -437,7 +437,7 @@ static void print_version(void)
 
 static void usage(void)
 {
-    fprintf(stderr, "Usage: %s { -d | -l | -w | -p } file%s | { -r | -R } directory | [ -v | -h | -V ]\n", 
+    fprintf(stderr, "Usage: %s { -d | -l | -w | -p } file%s | { -r | -R | -f | -F | -P } directory | [ -v | -h | -V ]\n", 
 	    progname, DB_EXT);
 }
 
@@ -449,6 +449,7 @@ static void help(void)
 	    "\t-h\tPrint this message.\n"
 	    "\t-f dir\tRun recovery on data base in dir.\n"
 	    "\t-F dir\tRun catastrophic recovery on data base in dir.\n"
+	    "\t-P dir\tRemove inactive log files in dir.\n"
 	    "\t-d file\tDump data from file to stdout.\n"
 	    "\t-l file\tLoad data from stdin into file.\n"
 	    "\t-u file\tUpgrade wordlist version.\n"
@@ -484,10 +485,10 @@ static const char *ds_file = NULL;
 static bool  prob = false;
 
 typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST,
-    M_RECOVER, M_CRECOVER } cmd_t;
+    M_RECOVER, M_CRECOVER, M_PURGELOGS } cmd_t;
 static cmd_t flag = M_NONE;
 
-#define	OPTIONS	":a:c:d:Df:F:hH:I:k:l:m:np:r:R:s:u:vVw:x:X:y:"
+#define	OPTIONS	":a:c:d:Df:F:hH:I:k:l:m:np:P:r:R:s:u:vVw:x:X:y:"
 
 static int remenv = 0;	/** if set, run recovery and remove the environment */
 static char *remedir;	/** environment to remove */
@@ -572,11 +573,11 @@ static int process_arglist(int argc, char **argv)
 
     if (count != 1)
     {
-	fprintf(stderr, "%s: Exactly one of the -d, -f, -F, -l, -R or -w flags "
+	fprintf(stderr, "%s: Exactly one of the -d, -f, -F, -P, -l, -R or -w flags "
 		"must be present.\n", progname);
 	exit(EX_ERROR);
     }
- 
+
     if (optind < argc && flag != M_WORD) {
 	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
 	exit(EX_ERROR);
@@ -602,6 +603,12 @@ static int process_arg(int option, const char *name, const char *val, int option
 
     case 'F':
 	flag = M_CRECOVER;
+	count += 1;
+	ds_file = val;
+	break;
+
+    case 'P':
+	flag = M_PURGELOGS;
 	count += 1;
 	ds_file = val;
 	break;
@@ -803,13 +810,16 @@ int main(int argc, char *argv[])
 
     set_bogohome(ds_file);
 
-    if (flag == M_RECOVER) {
-	return ds_recover(ds_file, false);
-    } else if (flag == M_CRECOVER) {
-	return ds_recover(ds_file, true);
-    }
-
     switch(flag) {
+	case M_RECOVER:
+	    rc = ds_recover(ds_file, false);
+	    break;
+	case M_CRECOVER:
+	    rc = ds_recover(ds_file, true);
+	    break;
+	case M_PURGELOGS:
+	    rc = ds_purgelogs(ds_file);
+	    break;
 	case M_DUMP:
 	    rc = dump_wordlist(ds_file);
 	    break;

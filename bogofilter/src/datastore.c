@@ -440,3 +440,7 @@ int ds_recover(const char *directory, bool catastrophic)
 int ds_remove(const char *directory) {
     return dbe_remove(directory);
 }
+
+int ds_purgelogs(const char *directory) {
+    return dbe_purgelogs(directory);
+}

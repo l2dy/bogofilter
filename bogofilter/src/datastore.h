@@ -244,4 +244,7 @@ extern int ds_recover(const char *directory, bool catastrophic);
 /** Remove environment in given directory, \return EX_OK or EX_ERROR */
 extern int ds_remove(const char *directory);
 
+/** Remove inactive log files in given directory, \return EX_OK. */
+extern int ds_purgelogs(const char *directory);
+
 #endif

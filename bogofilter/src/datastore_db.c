@@ -1226,7 +1226,8 @@ static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags) {
     /* run recovery */
     bf_dbenv_create(&env);
     if (DEBUG_DATABASE(0))
-        fprintf(dbgout, "running regular data base recovery and removing environment\n");
+        fprintf(dbgout, "running regular data base recovery%s\n",
+	       flags & DB_PRIVATE ? " and removing environment" : "");
     /* quirk: DB_RECOVER requires DB_CREATE and cannot work with DB_JOINENV */
 
     /*
@@ -1251,6 +1252,65 @@ static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags) {
     }
 
     return env;
+}
+
+int dbe_purgelogs(const char *directory) {
+    int e;
+    DB_ENV *env = dbe_recover_open(directory, 0);
+    char **i, **list;
+
+    if (!env)
+	exit(EX_ERROR);
+
+    if (DEBUG_DATABASE(0))
+	fprintf(dbgout, "checkpoint database\n");
+
+    /* checkpoint the transactional system */
+    e = BF_TXN_CHECKPOINT(env, 0, 0, 0);
+    e = db_flush_dirty(env, e);
+    if (e) {
+	print_error(__FILE__, __LINE__, "DB_ENV->txn_checkpoint failed: %s",
+		db_strerror(e));
+	exit(EX_ERROR);
+    }
+
+    if (DEBUG_DATABASE(0))
+	fprintf(dbgout, "removing inactive logfiles\n");
+
+    /* figure redundant log files and nuke them */
+    e = env->log_archive(env, &list, DB_ARCH_ABS);
+    if (e && e != DB_NOTFOUND) {
+	print_error(__FILE__, __LINE__,
+		"DB_ENV->log_archive failed: %s",
+		db_strerror(e));
+	exit(EX_ERROR);
+    }
+
+    if (list != NULL && e != DB_NOTFOUND) {
+	for (i = list; *i != NULL; i++) {
+	    if (DEBUG_DATABASE(1))
+		fprintf(dbgout, " removing logfile %s\n", *i);
+	    if (unlink(*i)) {
+		print_error(__FILE__, __LINE__,
+			"cannot unlink \"%s\": %s", *i, strerror(errno));
+		/* proceed anyways */
+	    }
+	}
+	free(list);
+    }
+
+    if (DEBUG_DATABASE(0))
+	fprintf(dbgout, "closing environment\n");
+
+    e = env->close(env, 0);
+    if (e != 0) {
+	print_error(__FILE__, __LINE__, "Error closing environment \"%s\": %s",
+		directory, db_strerror(e));
+	exit(EX_ERROR);
+    }
+
+    db_try_glock(directory, F_UNLCK, F_SETLKW); /* release lock */
+    return EX_OK;
 }
 
 int dbe_remove(const char *directory) {

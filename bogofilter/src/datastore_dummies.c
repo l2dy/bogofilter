@@ -41,3 +41,8 @@ int dbe_remove(const char *d) {
     (void)d;
     return 0;
 }
+
+int dbe_purgelogs(const char *d) {
+    (void)d;
+    return 0;
+}

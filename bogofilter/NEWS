@@ -24,6 +24,13 @@ Briefly:
 
 0.93.3	2004-12-XX
 
+	2004-12-13
+
+	* bogoutil -P directory  now checkpoints the database and removes
+	  inactive log files. Note you must save the database and remaining log
+	  files, in that order, if you want to be able to recover from
+	  corrupted files.
+
 	2004-12-10
 
 	* Limit mime overflow error messages to 1 per email.

@@ -30,6 +30,7 @@
 	    <group choice="req">
 		<arg choice="plain">-f</arg>
 		<arg choice="plain">-F</arg>
+		<arg choice="plain">-P</arg>
 		<arg choice="plain">-r</arg>
 		<arg choice="plain">-R</arg>
 		<arg choice="plain">--remove-environment</arg>
@@ -136,6 +137,16 @@
 	    This is only supported when compiled with Berkeley DB
 	    support with transactions enabled. Trying recovery with QDBM or TDB support will
 	    result in an error.</para>
+	<para>The <option>-p <replaceable>dir</replaceable></option>
+	    option causes bogoutil to checkpoint the database
+	    environment and remove inactive log files.</para>
+	<para>The <option>-r <replaceable>dir</replaceable></option> option tells
+	    <application>bogoutil</application> to recalculate the ROBX
+	    value and print it as a six-digit fraction.
+	</para>
+	<para>The <option>-R <replaceable>dir</replaceable></option> option does the same as <option>-r</option>, but prints more
+	    information and saves the result in the training database.
+	</para>
 	<para>The <option>--remove-environment
 		<replaceable>directory</replaceable></option> option has
 	    no short option equivalent. It runs recovery in the given
@@ -143,13 +154,6 @@
 	    this <emphasis>before</emphasis> upgrading to a new Berkeley
 	    DB version if the new version to be installed requires a log
 	    file format update.</para>
-	<para>The <option>-r</option> option tells
-	    <application>bogoutil</application> to recalculate the ROBX
-	    value and print it as a six-digit fraction.
-	</para>
-	<para>The <option>-R</option> option does the same as <option>-r</option>, but prints more
-	    information and saves the result in the training database.
-	</para>
 	<para>The <option>-I <replaceable>file</replaceable></option> option tells
 	    <application>bogoutil</application> to read its input from
 	    <replaceable>file</replaceable> rather than stdin.
