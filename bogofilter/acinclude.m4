@@ -128,7 +128,7 @@ AC_DEFUN([AC_CHECK_DB],[
 	else
 	  bogo_libadd="$i"
 	fi
-	LDFLAGS="$LDFLAGS $ld"
+	LDFLAGS="$bogo_saved_LDFLAGS $ld"
 	LIBS="$LIBS $bogo_libadd"
 	AC_RUN_IFELSE(
 	    AC_LANG_PROGRAM([[
@@ -154,8 +154,8 @@ AC_DEFUN([AC_CHECK_DB],[
 	    [$3
 	    db="$bogo_libadd"],
 	    [LIBS="$bogo_saved_LIBS"
-	     LDFLAGS="$bogo_saved_LDFLAGS"
 	    db=no])
+	LDFLAGS="$bogo_saved_LDFLAGS"
 	test "x$db" = "xno" && break
       done
       test "x$db" != "xno" && break
