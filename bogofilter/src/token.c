@@ -67,7 +67,7 @@ token_t get_token(void)
     while (!done) {
 	class = lexer->yylex();
 	yylval->leng = *lexer->yyleng;
-	yylval->text = *lexer->yytext;
+	yylval->text = (unsigned char *)(*lexer->yytext);
 
 	if (DEBUG_TEXT(2)) { 
 	    word_puts(yylval, 0, dbgout);

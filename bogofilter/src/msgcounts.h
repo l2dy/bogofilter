@@ -20,7 +20,7 @@ AUTHOR:
 #define	MSG_COUNT_MAX_LEN 100
 extern	yylex_t	 msg_count_lex;
 extern	char	*msg_count_text;
-extern	size_t	 msg_count_leng;
+extern	int	 msg_count_leng;
 
 extern	long	 msgs_good;
 extern 	long	 msgs_bad;

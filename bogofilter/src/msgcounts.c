@@ -24,7 +24,7 @@ AUTHOR:
 /* Globals */
 
 char	msg_count_chars[MSG_COUNT_MAX_LEN];
-size_t	msg_count_leng = MSG_COUNT_MAX_LEN;
+int	msg_count_leng = MSG_COUNT_MAX_LEN;
 char   *msg_count_text = msg_count_chars;
 
 const char *msg_count_header = "\".MSG_COUNT\"";
@@ -77,6 +77,6 @@ void compute_msg_counts()
 void set_msg_counts(char *s)
 {
     msgs_bad = atoi(s);
-    s = index(s, ' ') + 1;
+    s = strchr(s, ' ') + 1;
     msgs_good = atoi(s);
 }

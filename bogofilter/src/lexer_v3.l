@@ -157,7 +157,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
 %%
 
-^From\ 						{ if (msg_header && is_from(yytext, yyleng)) { 
+^From\ 						{ if (msg_header && is_from((const unsigned char *)yytext, yyleng)) { 
 						      BEGIN(INITIAL); 
 						      return FROM;
 						  } else { 
@@ -167,7 +167,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
 <INITIAL,BOGO_LEX>{MSG_COUNT}{NUM_NUM}		{ if (lineno == 0) { 
 						      BEGIN(BOGO_LEX); 
-						      set_msg_counts(index(yytext, ' ') + 1); 
+						      set_msg_counts(strchr(yytext, ' ') + 1); 
 						  }
 						  return MSG_COUNT_LINE;
 						}
