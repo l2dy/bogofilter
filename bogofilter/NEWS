@@ -191,6 +191,7 @@ Briefly:
 	2004-10-28
 
 	* Merged Transactional branch (for BerkeleyDB) back into the trunk.
+	  Further changes below.
 
 	2004-10-25
 
@@ -201,6 +202,58 @@ Briefly:
             The ham_cutoff value is new and spam_cutoff is unchanged.
 	  - changed the "Yes/No" tags used in the "X-Bogosity:" line
 	    to "Spam/Ham/Unsure"
+
+	NOTE: the next entries appear to be out of order, the pertinent changes
+	have been developed on a side branch of bogofilter and have been merged
+	for bogofilter 0.93.0.
+
+	2004-09-21
+
+	* bogofilter can now be used with Berkeley DB 3.0 or 3.1 although this
+	  is not recommended. You should prefer 4.2 or 4.1 instead.
+	  UPDATE: support for 3.0 was later removed on 2004-11-29
+
+	* Documentation on the write cache issue (recoverability of data bases)
+	  has been revised.
+
+	2004-09-13
+
+	* Updates doc/README.db with a section on the log file size and
+	  pointers to db_checkpoint and db_archive.
+
+	2004-09-03 (txn 2.1)
+
+	* The on-line crash detector would consider its own process a zombie,
+	  so all processes that lasted 30 s or longer would abort themselves
+	  after that period.
+
+	  This was particularly prominent with BerkeleyDB 4.1 with
+	  x86/gcc-assembly mutexes as this combination appears rather slow when
+	  facing lock contention, causing t.lock3 failure. BDB 4.1 compiled to
+	  use POSIX mutexes (where working) appears to be a lot faster in this
+	  situation.
+
+	2004-09-01 (txn 2.0)
+
+	* Hook up crash detection code. Bogofilter is now able to detect
+	  when recovery is necessary and should detect stalled data bases
+	  within 30 seconds.
+	  NOTE: this means if one process crashes all other processes
+	  accessing the same data base will abort with an error code.
+
+	  Stalled data bases happen when one process or the system crashes and
+	  doesn't have a chance to clear its locks.
+
+	  This code uses ideas from Matthias Andree and Pavel Kankovsky.
+
+	2004-08-23 (txn 1.1)
+
+	* Add -f and -F options to bogoutil (mnemonic: fix) to run data base
+	  recovery.
+
+	* Reimplement our own locking so that recovery and data base access
+	  don't collide and no two processes try running recovery at the same
+	  time.
 
 0.92.8	2004-10-19
 	2004-10-25 - Promoted to Stable Release
@@ -263,16 +316,6 @@ Briefly:
 
 	* Fixed help messages for bogofilter's "-m" and "-o" options.
 
-	2004-09-21
-	* bogofilter can now be used with Berkeley DB 3.0 or 3.1 although this
-	  is not recommended. You should prefer 4.2 or 4.1 instead.
-	* Documentation on the write cache issue (recoverability of data bases)
-	  has been revised.
-
-	2004-09-13
-	* Updates doc/README.db with a section on the log file size and
-	  pointers to db_checkpoint and db_archive.
-
 	2004-09-10
 
 	* bogofilter-tuning.HOWTO revised and converted to html.
@@ -282,38 +325,8 @@ Briefly:
 	* Ensure that robx computation uses a regular wordlist (rather
           than an ignore list) to avoid a seg fault in bogotune.
 
-	2004-09-03 (txn 2.1)
-	* The on-line crash detector would consider its own process a zombie,
-	  so all processes that lasted 30 s or longer would abort themselves
-	  after that period.
-
-	  This was particularly prominent with BerkeleyDB 4.1 with
-	  x86/gcc-assembly mutexes as this combination appears rather slow when
-	  facing lock contention, causing t.lock3 failure. BDB 4.1 compiled to
-	  use POSIX mutexes (where working) appears to be a lot faster in this
-	  situation.
-
-	2004-09-01 (txn 2.0)
-	* Hook up crash detection code. Bogofilter is now able to detect
-	  when recovery is necessary and should detect stalled data bases
-	  within 30 seconds.
-	  NOTE: this means if one process crashes all other processes
-	  accessing the same data base will abort with an error code.
-
-	  Stalled data bases happen when one process or the system crashes and
-	  doesn't have a chance to clear its locks.
-
-	  This code uses ideas from Matthias Andree and Pavel Kankovsky.
-
-	2004-08-23 (txn 1.1)
-	* Add -f and -F options to bogoutil (mnemonic: fix) to run data base
-	  recovery.
-	* Reimplement our own locking so that recovery and data base access
-	  don't collide and no two processes try running recovery at the same
-	  time.
-
-	
 	2004-08-30
+
 	* Remove bogus 'P' in bogolexer's allowed option list.
 
 0.92.6	2004-08-22
