@@ -611,6 +611,10 @@ void process_args_1(int argc, char **argv)
 	    verbose++;
 	    break;
 
+        case 'V':
+	    print_version();
+	    exit(EX_OK);
+
 #ifdef	ENABLE_DEPRECATED_CODE
 	case 'W':
 	    incr_wordlist_mode();
@@ -750,10 +754,6 @@ void process_args_2(int argc, char **argv)
 	    terse = true;
 	    inv_terse_mode += 1;
 	    break;
-
-        case 'V':
-	    print_version();
-	    exit(EX_OK);
 	}
     }
 
