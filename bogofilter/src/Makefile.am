@@ -84,7 +84,7 @@ libbogofilter_a_SOURCES= \
 	qp.h qp.c \
 	register.h register.c \
 	rstats.h rstats.c \
-	swap.h swap_32bit.c\
+	swap.h swap_32bit.c system.c \
 	textblock.h textblock.c \
 	token.h token.c \
 	uudecode.h uudecode.c \
