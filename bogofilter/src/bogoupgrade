@@ -66,6 +66,8 @@ for (my $i = 0; $i < @ARGV; $i++){
   }
 }
 
+my $db_ext = $ENV{DB_EXT} ||  'db';
+
 if ( $dir ) {
     convert_double_to_single();
 }
@@ -105,7 +107,8 @@ sub convert_format_A() {
 sub convert_format_B() {
   my $msg_count = $1;
   my $in_db = $in;
-  $in_db =~ s/count$/db/;
+
+  $in_db =~ s/count$/$db_ext/;
 
   unless (-f $in_db){
     warn("Cannot find database file [$in_db] corresponding to input file [$in]\n");
@@ -139,15 +142,15 @@ sub convert_format_B() {
 }
 
 sub convert_double_to_single() {  
-    $word = "$dir/wordlist.db";
+    $word = "$dir/wordlist.$db_ext";
     open(F, $word) and die "$word already exists.\n";
     close(F);
 
-    $spam = "$dir/spamlist.db";
+    $spam = "$dir/spamlist.$db_ext";
     open(F, $spam) or die "Cannot open file [$spam].\n";
     close(F);
 
-    $good = "$dir/goodlist.db";
+    $good = "$dir/goodlist.$db_ext";
     open(F, $good) or die "Cannot open file [$good].\n";
     close(F);
 
