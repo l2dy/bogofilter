@@ -75,7 +75,7 @@ static void lexer_display_buffer(buff_t *buff)
 	fputc('\n', dbgout);
 }
 
-/*
+/**
  * Check for lines wholly composed of printable characters as they can
  * cause a scanner abort "input buffer overflow, can't enlarge buffer
  * because scanner uses REJECT"
