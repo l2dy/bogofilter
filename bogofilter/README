@@ -11,21 +11,49 @@ as recognition features rather than broken up. Various kinds of MTA
 cruft such as dates and message-IDs are discarded so as not to bloat
 the word lists.
 
-Note that the default location for the configuration files is
-/etc on Linux and /usr/local/etc on all other systems, unless you
-override with --sysconfdir=/etc
+
+*** DOCUMENTATION ***
+
+When installed there are man pages for bogofilter, bogoutil,
+bogolexer, and bogoupgrade.  Additional documentation is in
+/usr/src/bogofilter-1.2.3/doc or comparable directory (depending on
+your operating system).
+
+If you've installed the source code, the  doc directory and its
+subdirectories contain most of bogofilter's documentation.  In it are
+a variety of README files, the xml originals for the man pages , and
+other documents.  Additionally, many of the directories in the
+bogofilter hierarchy have their own README files.
 
 If you use mutt, see the bogofilter(1) manual page for helpful macros
 you can add to your .muttrc.
 
-Note that you can safely ignore any of these compile time warnings:
+
+*** BUILDING BOGOFILTER ***
+
+You can safely ignore any of these compile time warnings:
 
 warning: unused parameter ...
 warning: format not a string literal, argument types not checked
 
+
+*** CONFIGURATION ***
+
+The default location for the configuration files is /etc on Linux and
+/usr/local/etc on all other systems, unless you override with
+--sysconfdir=/etc.  A sample config file, bogofilter.cf.example is
+included with the distribution.
+
+
+*** NEWEST SOFTWARE ***
+
 For the most recent version of this software, see: 
 
 	http://sourceforge.net/projects/bogofilter/
+
+The latest stable version can be downloaded.  The development source
+is in a CVS repository on SourceForge and can also be downloaded.
+
 
 							Eric S. Raymond
 							August 2002
