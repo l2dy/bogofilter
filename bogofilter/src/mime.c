@@ -395,10 +395,8 @@ void mime_content(word_t * text)
 static void mime_disposition(word_t * text)
 {
     size_t i;
-    const size_t l = sizeof("Content-Disposition:");
-    char *w;
-
-    w = (char *) getword(text->text + l, text->text + text->leng);
+    const size_t l = sizeof("Content-Disposition:") - 1;
+    byte *w = getword(text->text + l, text->text + text->leng);
 
     if (!w)
 	return;
@@ -435,11 +433,8 @@ static void mime_disposition(word_t * text)
 static void mime_encoding(word_t * text)
 {
     size_t i;
-const size_t l =  sizeof("Content-Transfer-Encoding:") - 1;
-    char *w;
-
-//    l = strlen("Content-Transfer-Encoding:");
-    w = (char *) getword(text->text + l, text->text + text->leng);
+    const size_t l =  sizeof("Content-Transfer-Encoding:") - 1;
+    byte *w = getword(text->text + l, text->text + text->leng);
 
     if (!w)
 	return;
@@ -463,11 +458,9 @@ const size_t l =  sizeof("Content-Transfer-Encoding:") - 1;
 
 static void mime_type(word_t * text)
 {
-    const size_t l = sizeof("Content-Type:");
-    char *w;
     struct type_s *typ;
-
-    w = (char *) getword(text->text + l, text->text + text->leng);
+    const size_t l = sizeof("Content-Type:") - 1;
+    byte *w = getword(text->text + l, text->text + text->leng);
 
     if (!w)
 	return;
@@ -511,7 +504,7 @@ static void mime_type(word_t * text)
 
 void mime_type2(word_t * text)
 {
-    char *w = text->text;
+    byte *w = text->text;
     struct type_s *typ;
 
     if (!w)
