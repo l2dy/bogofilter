@@ -4,6 +4,17 @@
 
 $Id$
 
+0.13.6.3 2003-06-18
+
+	* Minor code rewrites to speed up processing messages, mboxes,
+	  and msg-count files.  In particular, tuning/tuning.sh runs
+	  are approx 47% faster than before.
+	* Fixed several errors in tuning/tuning.sh and reformatted
+	  "Top 10 Results" output.
+	* Minor changes to bogoutil to support bogotune script.
+	* Added newlines to correct usage messages.
+
+
 0.13.6.2 2003-06-05
 
 	* Don't allow square brackets in tokens.  Do allow dollar
