@@ -107,6 +107,7 @@ static word_t *yy_text(void)
 %}
 
 %option debug nodebug
+%option warn
 %option align caseless 8bit
 %option noreject
 %option noyywrap
@@ -150,7 +151,7 @@ QP		[!->@-~]+
 */
 
 ENCODED_WORD	=\?{CHARSET}\?(b\?{BASE64}|q\?{QP})\?\=
-ENCODED_TOKEN	{BOGOLEX_TOKEN}?({ENCODED_WORD}[ \t])*{ENCODED_WORD}
+ENCODED_TOKEN	{BOGOLEX_TOKEN}?({ENCODED_WORD}[ \t]+)*{ENCODED_WORD}
 
 DOLLARS		[0-9]+
 CENTS		[0-9]+
@@ -208,7 +209,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); 		skip_to('='); return TOKEN; }
 <INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); 	skip_to(':'); return TOKEN; }
 <INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); return TOKEN; }
-<INITIAL>^(To|From|Return-Path|Subject)/:.*	{ if (header_line_markup) set_tag(yy_text()); }
+<INITIAL>^(To|From|Return-Path|Subject)/:.	{ if (header_line_markup) set_tag(yy_text()); }
 <INITIAL>^(Delivery-)?Date:.*			;
 <INITIAL>^Message-ID:.*				;
 <INITIAL>(ESMTP|SMTP)?[ \t]+id\ {ID}		;
@@ -259,7 +260,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 {IPADDR}					{ return IPADDR;}
 {TOKEN}						{ return TOKEN;}
 
-${DOLLARS}(\.{CENTS})				{ return TOKEN;}
+\${DOLLARS}(\.{CENTS})?				{ return TOKEN;}
 
 .						;			/* ignore character */
 \n						{ got_newline(); 
