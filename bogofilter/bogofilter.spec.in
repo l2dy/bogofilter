@@ -9,6 +9,7 @@ License: GPL
 Group: Applications/Internet
 Summary: fast anti-spam filtering by Bayesian statistical analysis
 Buildroot: %{_tmppath}/%{name}-%{version}-root
+%define mydocdir %{_docdir}/%{name}
 
 %description
 Bogofilter is a Bayesian spam filter.  In its normal mode of
@@ -36,6 +37,17 @@ make DESTDIR=${RPM_BUILD_ROOT} install-strip
 cp $RPM_BUILD_ROOT%{_sysconfdir}/bogofilter.cf.example \
    $RPM_BUILD_ROOT%{_sysconfdir}/bogofilter.cf
 gzip -f -9 $RPM_BUILD_ROOT/%{_mandir}/*/*.[1-9]
+for a in xml html contrib ; do
+mkdir -p .inst/$a
+done
+for i in doc/*.xml ; do
+install -m644 $i .inst/xml
+done
+for i in doc/*.html ; do
+install -m644 $i .inst/html
+done
+find contrib -maxdepth 1 '(' -name "Makefile*" -prune ')' -or '(' -exec \
+    install -m644 '{}' .inst/contrib ';' ')'
 
 %files
 %defattr(-,root,root)
@@ -52,16 +64,6 @@ gzip -f -9 $RPM_BUILD_ROOT/%{_mandir}/*/*.[1-9]
 %doc AUTHORS COPYING METHODS NEWS README TODO UPGRADE
 %doc doc/README.Robinson doc/bogofilter-faq.html
 %doc doc/programmer
-
-# to doc/xml
-%doc doc/bogoutil.xml doc/bogoupgrade.xml doc/bogofilter.xml doc/bogolexer.xml
-
-# to doc/html
-%doc doc/bogofilter.html doc/bogoutil.html doc/bogoupgrade.html doc/bogolexer.html
-
-# to doc/contrib
-%doc contrib/bogopass
-%doc contrib/bogofilter-qfe contrib/dot-qmail-bogofilter-default
-%doc contrib/randomtrain contrib/shuffle contrib/bilbogrep
+%doc .inst/contrib .inst/html .inst/xml
 
 %changelog
