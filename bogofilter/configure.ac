@@ -511,15 +511,15 @@ esac
 
 # Note the \\\\ for backslashes.  Autoconf eats one layer, leaving \\
 
-AC_DEFINE( CURDIR_S, ".", [Define current directory])
-AC_DEFINE( EXTSEP_S, ".", [Define extension separator])
+AC_DEFINE(CURDIR_S, ".", [Define name of current directory (C string)])
+AC_DEFINE(EXTSEP_S, ".", [Define file extension separator (C string)])
 
 if test "$have_dosish_system" = no; then
-AC_DEFINE( DIRSEP_C, '/', [Define directory separator])
-AC_DEFINE( DIRSEP_S, "/", [Define directory separator])
+AC_DEFINE(DIRSEP_C, '/', [Define directory separator (C character)])
+AC_DEFINE(DIRSEP_S, "/", [Define directory separator (C string)])
 else
-AC_DEFINE( DIRSEP_C, '\\\\', [Define directory separator])
-AC_DEFINE( DIRSEP_S, "\\\\", [Define directory separator])
+AC_DEFINE(DIRSEP_C, '\\\\')
+AC_DEFINE(DIRSEP_S, "\\\\")
 fi
 
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
