@@ -11,6 +11,9 @@
 
 #include "debug.h"
 
+#define GOODFILE	"goodlist.db"
+#define SPAMFILE	"spamlist.db"
+
 #if defined(PATH_MAX)
 #define PATH_LEN PATH_MAX
 #elif defined(MAXPATHLEN)

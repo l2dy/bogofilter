@@ -13,9 +13,6 @@
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-#define GOODFILE	"goodlist.db"
-#define SPAMFILE	"spamlist.db"
-
 wordlist_t good_list;
 wordlist_t spam_list;
 wordlist_t* word_lists=NULL;
