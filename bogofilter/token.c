@@ -19,7 +19,7 @@ AUTHOR:
 
 #include "charset.h"
 #include "error.h"
-#include "lexer.h"
+#include "token.h"
 
 /* ignore words longer than this */
 #define MAXWORDLEN 30
