@@ -5,7 +5,11 @@
 #include <stdlib.h>
 
 /*@noreturn@*/
-void xmem_error(const char *);
+void xmem_error(const char *)
+#ifdef __GNUC__
+ __attribute__((noreturn))
+#endif
+   ;
 
 /*@only@*/ /*@out@*/ /*@notnull@*/
 void *xmalloc(size_t size);

@@ -19,10 +19,14 @@
 #include <stdlib.h>
 
 /*@noreturn@*/
+static void die(const char *tag)
 #ifdef __GNUC__
-__attribute__ ((noreturn))
+  __attribute__((noreturn))
 #endif
-static void die(const char *tag) {
+;
+
+static void die(const char *tag)
+{
     perror(tag);
     exit(EXIT_FAILURE);
 }
