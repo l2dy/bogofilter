@@ -18,7 +18,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void die(const char *tag) {
+/*@noreturn@*/
+static void die(const char *tag) {
     perror(tag);
     exit(EXIT_FAILURE);
 }
