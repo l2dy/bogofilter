@@ -905,16 +905,17 @@
 
     <h2 id="smaller">How do I make the executables smaller?</h2>
 
-    <p>You can use <code>make install-strip</code> when space is tight.
-    Doing this will save space, but crashes can't be debugged unless
-    more information on reproducing the bug is provided to the
+    <p>When space is tight, you can use <code>make
+    install-strip</code> instead of <code>make install</code>.  Doing
+    this will save space, but crashes can't be debugged unless more
+    information on reproducing the bug is provided to the
     developers.</p>
 
     <hr>
 
     <h2 id="nfs">Can I share word lists over NFS?</h2>
 
-    <p>If all you're just reading from them, there are no problems.
+    <p>If you're just reading from them, there are no problems.
     When you're updating them, you need to use the correct file
     locking to avoid data corruption. When you compile bogofilter, you
     will need to verify that the configure script has set "#define
