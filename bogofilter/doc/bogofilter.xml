@@ -106,7 +106,6 @@
 
   <para><option>info options</option> are:</para>
     <cmdsynopsis>
-    <arg choice='opt'>-q</arg>
     <arg choice='opt'>-v</arg>
     <arg choice='opt'>-y <replaceable>date</replaceable></arg>
     <arg choice='opt'>-D</arg>
@@ -471,8 +470,8 @@ timestamping.</para>
 <para>The <option>-D</option> option redirects debug output to stdout.</para>
 
 <para>The <option>-x <replaceable>flags</replaceable></option> option
-allows setting of debug flags for printing debug information.</para>
-</refsect1>
+allows setting of debug flags for printing debug information.  See
+header file debug.h for the list of usable flags.</para> </refsect1>
 
 <refsect1 id='environment'><title>ENVIRONMENT</title>
 <para>Bogofilter uses a database directory, which can be set in the
@@ -709,7 +708,7 @@ Matthias Andree <email>matthias.andree@gmx.de</email>.
 Greg Louis <email>glouis@dynamicro.on.ca</email>.
 </literallayout>
 
-    <para>For updates, see <ulink url="http://bogofilter.sourceforge.net/">
-the bogofilter project page</ulink>.</para>
+    <para>For updates, see the <ulink url="http://bogofilter.sourceforge.net/">
+ bogofilter project page</ulink>.</para>
 </refsect1>
 </refentry>
