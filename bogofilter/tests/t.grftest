@@ -102,7 +102,7 @@ done
 
 OUT="grftest.out"
 
-printf "%2s     %-10s   %-10s   %-10s\n" id graham robinson fisher > ${TMPDIR}/tests/$OUT
+printf "%2s     %-10s   %-10s   %-10s   %-10s\n" id graham robinson fisher tristate > ${TMPDIR}/tests/$OUT
 for out in ${TMPDIR}/tests/msg.?.r.v ; do
     id=`echo $out | sed s@${TMPDIR}/tests/msg.@@ | sed s@.r.v@@`
     g=`cat ${TMPDIR}/tests/msg.$id.g.v | tr "NY" "hS"`
