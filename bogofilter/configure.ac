@@ -67,18 +67,20 @@ then
   echo "void dummy(void);" >configure-dummy.c
   echo "void dummy(void) {}" >>configure-dummy.c
   addopts=
+  # note: GCC 2.X print just the version number, like "2.95.3"
+  #       GCC 3.X print something like "gcc (GCC) 3.3.1 (SuSE Linux)"
   case `$CC --version` in
-      *2.7*) ;;
-      *) addopts="$addopts -Wpointer-arith" ;;
+      2.*) ;;
+      *) addopts="$addopts -Wpointer-arith -ggdb" ;;
   esac
-  for i in -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wshadow \
+  for i in $addopts \
+      -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wshadow \
       -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings \
       -Waggregate-return -Wmissing-declarations \
       -Wmissing-format-attribute -Wnested-externs \
-      -ggdb -fno-common -Wchar-subscripts -Wcomment \
+      -fno-common -Wchar-subscripts -Wcomment \
       -Wimplicit -Wsequence-point -Wreturn-type \
-      -Wfloat-equal $addopts \
-      -Wno-system-headers
+      -Wfloat-equal -Wno-system-headers
       # -Wmissing-noreturn -Wconversion -pedantic -Wredundant-decls
   do
        if $CC $i $ac_cv_prog_gcc_flags -c configure-dummy.c >/dev/null 2>&1 
