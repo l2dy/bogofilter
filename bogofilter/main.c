@@ -1,8 +1,11 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.4  2002/09/16 20:44:13  m-a
- * Do not increment passthrough on -p, but set it to 1.
+ * Revision 1.5  2002/09/17 07:19:04  adrian_otto
+ * Added -V mode for printing out version information.
  *
+/* Revision 1.4  2002/09/16 20:44:13  m-a
+/* Do not increment passthrough on -p, but set it to 1.
+/*
 /* Revision 1.3  2002/09/15 19:07:13  relson
 /* Add an enumerated type for return codes of RC_SPAM and RC_NONSPAM, which  values of 0 and 1 as called for by procmail.
 /* Use the new codes and type for bogofilter() and when generating the X-Spam-Status message.
@@ -31,10 +34,11 @@ AUTHOR:
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "bogofilter.h"
+#include <config.h>
 #ifdef HAVE_SYSLOG_H
 #include <sys/syslog.h>
 #endif
+#include "bogofilter.h"
 
 #define BOGODIR		"/.bogofilter/"
 #define HAMFILE		"hamlist.db"
@@ -61,7 +65,7 @@ int main(int argc, char **argv)
     }
     strcat(directory, BOGODIR);
 
-    while ((ch = getopt(argc, argv, "d:shSHvpl")) != EOF)
+    while ((ch = getopt(argc, argv, "d:shSHvVpl")) != EOF)
 	switch(ch)
 	{
 	case 'd':
@@ -89,6 +93,16 @@ int main(int argc, char **argv)
 	case 'v':
 	    verbose++;
 	    break;
+
+        case 'V':
+            printf("\n%s version %s ", PACKAGE, VERSION);
+            printf("Copyright (C) 2002 Eric S. Raymond\n\n");
+            printf("%s comes with ABSOLUTELY NO WARRANTY. ", PACKAGE);
+            printf("This is free software, and you\nare welcome to ");
+            printf("redistribute it under the General Public License. ");
+            printf("See the\nCOPYING file with the source distribution for ");
+            printf("details.\n\n");
+            exit(0);
 
 	case 'p':
 	    passthrough = 1;

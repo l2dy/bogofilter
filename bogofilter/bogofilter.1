@@ -23,7 +23,7 @@ bogofilter \- fast Bayesian spam filter
 .SH "SYNOPSIS"
 
 .nf
-\fBbogofilter\fR [-s] [-h] [-S] [-H] [-p] [-d] [-v]
+\fBbogofilter\fR [-s] [-h] [-S] [-H] [-p] [-d] [-v] [-V]
 .fi
 
 .SH "DESCRIPTION"
@@ -76,6 +76,9 @@ The \fB-p\fR (passthrough) option writes a copy of the input mail to the output 
 
 .PP
 The \fB-v\fR option produces a report to standard output on bogofilter's analysis af the input. The report lists the tokens with highest deviation from a mean of 0.5 association with spam.
+
+.PP
+The \fB-V\fR option prints the version number and exits.
 
 .SH "INTEGRATION WITH OTHER TOOLS"
 

@@ -21,6 +21,7 @@
   <arg choice='opt'>-p</arg>
   <arg choice='opt'>-d</arg>
   <arg choice='opt'>-v</arg>
+  <arg choice='opt'>-V</arg>
 </cmdsynopsis>
 
 </refsynopsisdiv>
@@ -110,6 +111,9 @@ respectively.</para>
 output on <application>bogofilter</application>'s analysis af the
 input. The report lists the tokens with highest deviation from a mean
 of 0.5 association with spam.</para>
+
+<para>The <option>-V</option> option prints the version number and 
+exits.</para>
 </refsect1>
 
 <refsect1 id='integration'><title>INTEGRATION WITH OTHER TOOLS</title>
