@@ -180,11 +180,15 @@ static size_t format_string(char *dest, const char *src, size_t min, size_t prec
     size_t len = strlen(src);
     if (flags & F_PREC && prec < len)
 	len = prec;
-    if (dest + len < destend) {
-	strlcpy(dest, src, len+1);
+    if (dest + len + 1 < destend) {
+	/* warning: this is abuse of strlcpy. we can do this because we
+	 * checked.
+	 */
+	strlcpy(dest, src, len + 1);
     } else {
 	fprintf(stderr, "header format is too long.\n");
-	exit (2);
+	/* abort to obtain a stack backtrace */
+	abort();
     }
     return len;
 }
