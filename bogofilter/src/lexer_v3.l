@@ -232,8 +232,6 @@ VERP		{TOKEN}-{NUM}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); skip_to('='); return TOKEN; }
 
 <INITIAL>(file)?name=\"?			/* ignore */
-<INITIAL>E?SMTP					{ if (header_line_markup) { return TOKEN; } }
-
 <INITIAL>[:blank:]*id\ {ID}			/* ignore */
 
 <INITIAL>\n[ \t]				{ lineno += 1; }
