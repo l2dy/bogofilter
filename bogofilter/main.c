@@ -1,7 +1,13 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.12  2002/09/25 18:15:19  relson
+ * Renamed '-h' and '-H' options to '-n' and '-N' in main.c.
+ * Modified documentation to show the new names.
+ *
  * Revision 1.11  2002/09/24 04:34:19  gyepi
+ *
+ *
  *  Modified Files:
  *  	Makefile.am  -- add entries for datastore* + and other new files
  *         bogofilter.c bogofilter.h main.c -- fixup to use database abstraction
@@ -97,20 +103,20 @@ int main(int argc, char **argv)
     }
     strcat(directory, BOGODIR);
 
-    while ((ch = getopt(argc, argv, "d:shSHvVp")) != EOF)
+    while ((ch = getopt(argc, argv, "d:snSNvVp")) != EOF)
 	switch(ch)
 	{
 	case 'd':
 	    strcpy(directory, optarg);
-	   if (directory[strlen(directory)-1] != '/')
-               strcat(directory, "/" );
+	    if (directory[strlen(directory)-1] != '/')
+		strcat(directory, "/" );
 	    break;
 
 	case 's':
 	    register_spam = 1;
 	    break;
 
-	case 'h':
+	case 'n':
 	    register_ham = 1;
 	    break;
 
@@ -118,7 +124,7 @@ int main(int argc, char **argv)
 	    ham_to_spam = 1;
 	    break;
 
-	case 'H':
+	case 'N':
 	    spam_to_ham = 1;
 	    break;
 

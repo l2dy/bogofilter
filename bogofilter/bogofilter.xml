@@ -15,9 +15,9 @@
 <cmdsynopsis>
   <command>bogofilter</command>
   <arg choice='opt'>-s</arg>
-  <arg choice='opt'>-h</arg>
+  <arg choice='opt'>-n</arg>
   <arg choice='opt'>-S</arg>
-  <arg choice='opt'>-H</arg>
+  <arg choice='opt'>-N</arg>
   <arg choice='opt'>-p</arg>
   <arg choice='opt'>-d</arg>
   <arg choice='opt'>-v</arg>
@@ -80,7 +80,7 @@ wordfile is created if absent.</para>
 to register the text presented on standard input as spam.  The spam
 wordfile is created if absent.</para>
 
-<para>The <option>-h</option> tells
+<para>The <option>-n</option> tells
 <application>bogofilter</application> to register the text presented
 on standard input as non-spam.</para>
 
@@ -89,7 +89,7 @@ on standard input as non-spam.</para>
 on standard input as spam and to undo a prior registration of the
 same message as non-spam.</para>
 
-<para>The <option>-H</option> tells
+<para>The <option>-N</option> tells
 <application>bogofilter</application> to register the text presented
 on standard input as non-spam and to undo a prior registration of the
 same message as spam.</para>
@@ -99,7 +99,7 @@ which wordlists will be found (normally
 <filename>$HOME/.bogofilter</filename>).</para>
 
 <para>The <option>-l</option> lists wordlists. Used with
-<option>-h</option>, it lists the ham list; used with
+<option>-n</option>, it lists the ham list; used with
 <option>-s</option>, it lists the spam list.</para>
 
 <para>The <option>-p</option> (passthrough) option writes a copy of
@@ -135,7 +135,7 @@ message will be treated as non-spam.</para>
 words in messages rated as spam to the spam wordlist, and (c) adds the
 words in messages rated as non-spam to the non-spam wordlist.  With
 this in place, it will normally only be necessary for the user to
-intervene (with <option>-H</option> or <option>-S</option>) when
+intervene (with <option>-N</option> or <option>-S</option>) when
 <application>bogofilter</application> miscategorizes something.</para>
 <programlisting class="procmail">
    :0HB
@@ -149,7 +149,7 @@ intervene (with <option>-H</option> or <option>-S</option>) when
     }
 
     :0EHBc
-    | bogofilter -h
+    | bogofilter -n
 </programlisting>
 <para> There have been numerous requests for a
 <application>bogofilter</application> option to do the above, but the
@@ -160,7 +160,7 @@ recipe is the best way for now.</para>
 mutt macros for dispatching mail to
 <application>bogofilter</application>.</para>
 <programlisting>
-macro index d "&lt;enter-command&gt;unset wait_key\n&lt;pipe-entry&gt;bogofilter -h\n&lt;enter-command&gt;set wait_key\n&lt;delete-message&gt;" "delete message as non-spam"
+macro index d "&lt;enter-command&gt;unset wait_key\n&lt;pipe-entry&gt;bogofilter -n\n&lt;enter-command&gt;set wait_key\n&lt;delete-message&gt;" "delete message as non-spam"
 macro index \ed "&lt;enter-command&gt;unset wait_key\n&lt;pipe-entry&gt;bogofilter -s\n&lt;enter-command&gt;set wait_key\n&lt;delete-message&gt;" "delete message as spam"
 </programlisting>
 </refsect1>
