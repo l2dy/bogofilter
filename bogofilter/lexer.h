@@ -14,6 +14,8 @@ typedef enum {
     BOUNDARY,	/* MIME multipart boundary line */
     IPADDR,	/* ip address */
     CHARSET,	/* charset="..." */
+    TRANSFER,	/* content-transfer-encoding: */
+    UUENCODE,	/* uuencoded line */
     EMPTY	/* empty line */
 } token_t;
 
