@@ -71,7 +71,6 @@ static void *list_searchinsert(const char *directory) {
 
     n = xmalloc(sizeof(struct envnode) + strlen(directory) + 1);
     n->dbe = ds_init(directory);
-    ds_txn_begin(n->dbe);
     strcpy(&n->directory[0], directory);
     LIST_INSERT_HEAD(&envlisthead, n, entries);
     return n->dbe;
@@ -129,6 +128,8 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
     } else { /* ds_open */
 	dsv_t val;
 
+	if (ds_txn_begin(list->dsh))
+	    exit(EX_ERROR); /* XXX FIXME: do we want to retry here? */
 	switch (ds_get_msgcounts(list->dsh, &val)) {
 	    case 0:
 	    case 1:
@@ -190,23 +191,18 @@ bool close_wordlists(wordlist_t *list, bool commit /** if unset, abort */)
     bool err = false;
     struct envnode *i;
 
-    for (i = envlisthead.lh_first; i; i = i->entries.le_next) {
-	if (i->dbe) {
-	    if (commit) {
-		if (ds_txn_commit(i->dbe)) {
-		    err = true;
-		}
-	    } else {
-		ds_txn_abort(i->dbe);
-	    }
-	}
-    }
-
-    for (; list ; list = list->next) {
+    while (list) {
 	if (list->dsh) {
+	    if (commit) {
+		if (ds_txn_commit(list->dsh))
+		    err = true;
+	    } else {
+		(void)ds_txn_abort(list->dsh);
+	    }
 	    ds_close(list->dsh);
 	    list->dsh = NULL;
 	}
+	list = list->next;
     }
 
     while ((i = envlisthead.lh_first)) {

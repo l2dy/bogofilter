@@ -26,6 +26,10 @@ Briefly:
 
 	2004-12-20
 
+	* Internal cleanup: Move transaction handling back into database space,
+	  and let the database backend driver map this into the environment if
+	  necessary.
+
 	* Portability fix for BerkeleyDB versions 3.1 and 3.2:
 	  log_archive expects a fourth argument.
 

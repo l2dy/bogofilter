@@ -131,7 +131,11 @@ void *ds_open(void *dbe, const char *path, const char *name, dbmode_t open_mode)
     dsh = dsh_init(v);
 
     if (db_created(v) && ! (open_mode & DS_LOAD)) {
+	if (DST_OK != ds_txn_begin(dsh))
+	    exit(EX_ERROR);
 	ds_set_wordlist_version(dsh, NULL);
+	if (ds_txn_commit(dsh))
+	    exit(EX_ERROR);
     }
     return dsh;
 }
@@ -263,15 +267,18 @@ int ds_delete(void *vhandle, const word_t *word)
 }
 
 int ds_txn_begin(void *vhandle) {
-    return dbe_txn_begin(vhandle);
+    dsh_t *dsh = vhandle;
+    return db_txn_begin(dsh->dbh);
 }
 
 int ds_txn_abort(void *vhandle) {
-    return dbe_txn_abort(vhandle);
+    dsh_t *dsh = vhandle;
+    return db_txn_abort(dsh->dbh);
 }
 
 int ds_txn_commit(void *vhandle) {
-    return dbe_txn_commit(vhandle);
+    dsh_t *dsh = vhandle;
+    return db_txn_commit(dsh->dbh);
 }
 
 typedef struct {
@@ -330,11 +337,11 @@ int ds_oper(void *env, const char *path, dbmode_t open_mode,
 	exit(EX_ERROR);
     }
 
-    if (DST_OK == ds_txn_begin(env)) {
+    if (DST_OK == ds_txn_begin(dsh)) {
 	ret = ds_foreach(dsh, hook, userdata);
-	if (ret) { ds_txn_abort(env); }
+	if (ret) { ds_txn_abort(dsh); }
 	else
-	    if (ds_txn_commit(env) != DST_OK)
+	    if (ds_txn_commit(dsh) != DST_OK)
 		ret = -1;
     }
 

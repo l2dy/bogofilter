@@ -89,7 +89,6 @@ static const DBTYPE dbtype = DB_BTREE;
 typedef struct {
     int		magic;
     DB_ENV	*dbe;		/* stores the environment handle */
-    DB_TXN	*txn;		/* stores the transaction handle */
     char	*directory;	/* stores the home directory for this environment */
 } dbe_t;
 
@@ -105,6 +104,7 @@ typedef struct {
     bool	is_swapped;	/* set if CPU and data base endianness differ */
     bool	created;	/* if newly created; for datastore.c (to add .WORDLIST_VERSION) */
     dbe_t	*dbenv;		/* "parent" environment */
+    DB_TXN	*txn;		/* transaction in progress or NULL */
 } dbh_t;
 
 #define DBT_init(dbt)		(memset(&dbt, 0, sizeof(DBT)))
@@ -467,16 +467,18 @@ retry_db_open:
 }
 
 /** begin transaction. Returns 0 for success. */
-int dbe_txn_begin(void *vhandle)
+int db_txn_begin(void *vhandle)
 {
     DB_TXN *t;
     int ret;
 
-    dbe_t *env = vhandle;
+    dbh_t *dbh = vhandle;
+    assert(dbh);
+    assert(dbh->magic == MAGIC_DBH);
+    assert(dbh->txn == 0);
+    dbe_t *env = dbh->dbenv;
     assert(env);
-    assert(env->magic == MAGIC_DBE);
     assert(env->dbe);
-    assert(env->txn == 0);
 
     ret = BF_TXN_BEGIN(env->dbe, NULL, &t, 0);
     if (ret) {
@@ -484,7 +486,7 @@ int dbe_txn_begin(void *vhandle)
 		(void *)env->dbe, db_strerror(ret));
 	return ret;
     }
-    env->txn = t;
+    dbh->txn = t;
     if (DEBUG_DATABASE(2))
 	fprintf(dbgout, "DB_ENV->txn_begin(%p), tid: %lx\n",
 		(void *)env->dbe, (unsigned long)BF_TXN_ID(t));
@@ -492,12 +494,13 @@ int dbe_txn_begin(void *vhandle)
     return 0;
 }
 
-int dbe_txn_abort(void *vhandle)
+int db_txn_abort(void *vhandle)
 {
     int ret;
-    dbe_t *env = vhandle;
-    DB_TXN *t = env->txn;
-    assert(env->magic == MAGIC_DBE);
+    dbh_t *dbh = vhandle;
+    assert(dbh);
+    assert(dbh->magic == MAGIC_DBH);
+    DB_TXN *t = dbh->txn;
     assert(t);
 
     ret = BF_TXN_ABORT(t);
@@ -508,7 +511,7 @@ int dbe_txn_abort(void *vhandle)
 	if (DEBUG_DATABASE(2))
 	    fprintf(dbgout, "DB_TXN->abort(%lx)\n",
 		    (unsigned long)BF_TXN_ID(t));
-    env->txn = NULL;
+    dbh->txn = NULL;
 
     switch (ret) {
 	case 0:
@@ -520,13 +523,14 @@ int dbe_txn_abort(void *vhandle)
     }
 }
 
-int dbe_txn_commit(void *vhandle)
+int db_txn_commit(void *vhandle)
 {
     int ret;
-    dbe_t *env = vhandle;
-    DB_TXN *t = env->txn;
+    dbh_t *dbh = vhandle;
+    assert(dbh);
+    assert(dbh->magic == MAGIC_DBH);
+    DB_TXN *t = dbh->txn;
     u_int32_t id;
-    assert(env->magic == MAGIC_DBE);
     assert(t);
 
     id = BF_TXN_ID(t);
@@ -538,13 +542,13 @@ int dbe_txn_commit(void *vhandle)
 	if (DEBUG_DATABASE(2))
 	    fprintf(dbgout, "DB_TXN->commit(%lx, 0)\n",
 		    (unsigned long)id);
-    env->txn = NULL;
+    dbh->txn = NULL;
 
     switch (ret) {
 	case 0:
 	    /* push out buffer pages so that >=15% are clean - we
 	     * can ignore errors here, as the log has all the data */
-	    BF_MEMP_TRICKLE(env->dbe, 15, NULL);
+	    BF_MEMP_TRICKLE(dbh->dbenv->dbe, 15, NULL);
 
 	    return DST_OK;
 	case DB_LOCK_DEADLOCK:
@@ -564,12 +568,12 @@ int db_delete(void *vhandle, const dbv_t *token)
     DBT_init(db_key);
 
     assert(handle->magic == MAGIC_DBH);
-    assert(handle->dbenv->txn);
+    assert(handle->txn);
 
     db_key.data = token->data;
     db_key.size = token->leng;
 
-    ret = dbp->del(dbp, handle->dbenv->txn, &db_key, 0);
+    ret = dbp->del(dbp, handle->txn, &db_key, 0);
 
     if (ret != 0 && ret != DB_NOTFOUND) {
 	print_error(__FILE__, __LINE__, "DB->del('%.*s'), err: %s",
@@ -596,7 +600,7 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
     DB *dbp = handle->dbp;
     assert(handle);
     assert(handle->magic == MAGIC_DBH);
-    assert(handle->dbenv->txn);
+    assert(handle->txn);
 
     DBT_init(db_key);
     DBT_init(db_data);
@@ -610,7 +614,7 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
     db_data.flags = DB_DBT_USERMEM;	/* saves the memcpy */
 
     /* DB_RMW can avoid deadlocks */
-    ret = dbp->get(dbp, handle->dbenv->txn, &db_key, &db_data, handle->open_mode == DS_READ ? 0 : DB_RMW);
+    ret = dbp->get(dbp, handle->txn, &db_key, &db_data, handle->open_mode == DS_READ ? 0 : DB_RMW);
 
     if (DEBUG_DATABASE(3))
 	fprintf(dbgout, "DB->get(%.*s): %s\n",
@@ -625,14 +629,14 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 	ret = DS_NOTFOUND;
 	break;
     case DB_LOCK_DEADLOCK:
-	dbe_txn_abort(handle->dbenv);
+	db_txn_abort(handle);
 	ret = DS_ABORT_RETRY;
 	break;
     default:
 	print_error(__FILE__, __LINE__, "(db) DB->get(TXN=%lu,  '%.*s' ), err: %s",
-		    (unsigned long)handle->dbenv->txn, CLAMP_INT_MAX(token->leng),
+		    (unsigned long)handle->txn, CLAMP_INT_MAX(token->leng),
 		    (char *) token->data, db_strerror(ret));
-	dbe_txn_abort(handle->dbenv);
+	db_txn_abort(handle);
 	exit(EX_ERROR);
     }
 
@@ -650,7 +654,7 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
     assert(handle->magic == MAGIC_DBH);
-    assert(handle->dbenv->txn);
+    assert(handle->txn);
 
     DBT_init(db_key);
     DBT_init(db_data);
@@ -661,10 +665,10 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
     db_data.data = val->data;
     db_data.size = val->leng;		/* write count */
 
-    ret = dbp->put(dbp, handle->dbenv->txn, &db_key, &db_data, 0);
+    ret = dbp->put(dbp, handle->txn, &db_key, &db_data, 0);
 
     if (ret == DB_LOCK_DEADLOCK) {
-	dbe_txn_abort(handle->dbenv);
+	db_txn_abort(handle);
 	return DS_ABORT_RETRY;
     }
 
@@ -741,7 +745,7 @@ void db_close(void *vhandle)
 	fprintf(dbgout, "DB->close(%s, %s)\n",
 		handle->name, f & DB_NOSYNC ? "nosync" : "sync");
 
-    if (handle->dbenv->txn) {
+    if (handle->txn) {
 	print_error(__FILE__, __LINE__, "db_close called with transaction still open, program fault!");
     }
 
@@ -799,12 +803,12 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 
     assert(handle->magic == MAGIC_DBH);
     assert(handle->dbenv->dbe);
-    assert(handle->dbenv->txn);
+    assert(handle->txn);
 
     memset(&key, 0, sizeof(key));
     memset(&data, 0, sizeof(data));
 
-    ret = dbp->cursor(dbp, handle->dbenv->txn, &dbcp, 0);
+    ret = dbp->cursor(dbp, handle->txn, &dbcp, 0);
     if (ret) {
 	print_error(__FILE__, __LINE__, "(cursor): %s", handle->path);
 	return -1;
@@ -1046,10 +1050,6 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 
 /* close the environment, but do not release locks */
 static void dbe_cleanup_lite(dbe_t *env) {
-    if (env->txn) {
-	print_error(__FILE__, __LINE__, "dbe_cleanup called with open transaction, aborting transaction.");
-	dbe_txn_abort(env);
-    }
     if (env->dbe) {
 	int ret;
 

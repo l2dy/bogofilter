@@ -149,7 +149,7 @@ int histogram(const char *path)
     if (dsh == NULL)
 	return EX_ERROR;
 
-    if (DST_OK != ds_txn_begin(dbe)) {
+    if (DST_OK != ds_txn_begin(dsh)) {
 	ds_close(dsh);
 	ds_cleanup(dbe);
 	fprintf(stderr, "cannot begin transaction!\n");
@@ -163,7 +163,7 @@ int histogram(const char *path)
     memset(&hist, 0, sizeof(hist));
     rc = ds_foreach(dsh, ds_histogram_hook, &hist);
 
-    if (DST_OK != ds_txn_commit(dbe)) {
+    if (DST_OK != ds_txn_commit(dsh)) {
 	ds_close(dsh);
 	ds_cleanup(dbe);
 	fprintf(stderr, "cannot commit transaction!\n");

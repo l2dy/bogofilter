@@ -76,9 +76,9 @@ const char *db_str_err(int);
 const char *db_version_str(void);
 
 /* Transactional interfaces */
-int dbe_txn_begin(void *vhandle);
-int dbe_txn_abort(void *vhandle);
-int dbe_txn_commit(void *vhandle);
+int db_txn_begin(void *vhandle);
+int db_txn_abort(void *vhandle);
+int db_txn_commit(void *vhandle);
 
 int dbe_recover(const char *directory, bool catastrophic, bool force);
 int dbe_remove(const char *directory);

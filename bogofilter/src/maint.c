@@ -238,12 +238,11 @@ static int maintain_wordlist(void *database)
     struct userdata_t userdata;
     int ret;
     bool done = false;
-    void *environment = ds_get_dbenv(database);
 
     userdata.vhandle = database;
     userdata.transaction = transaction;
 
-    if (DST_OK == ds_txn_begin(environment)) {
+    if (DST_OK == ds_txn_begin(database)) {
 	ret = ds_foreach(database, maintain_hook, &userdata);
     } else
 	ret = -1;
@@ -265,7 +264,7 @@ static int maintain_wordlist(void *database)
     }
 
     ret |= ta_commit(transaction);
-    if (DST_OK != ds_txn_commit(environment))
+    if (DST_OK != ds_txn_commit(database))
 	ret = -1;
     return ret;
 }

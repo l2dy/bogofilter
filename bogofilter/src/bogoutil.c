@@ -133,7 +133,7 @@ static int load_wordlist(const char *ds_file)
 
     memset(buf, '\0', BUFSIZE);
 
-    if (DST_OK != ds_txn_begin(dbe))
+    if (DST_OK != ds_txn_begin(dsh))
 	exit(EX_ERROR);
 
     for (;;) {
@@ -214,9 +214,9 @@ static int load_wordlist(const char *ds_file)
 
     if (rv) {
 	fprintf(stderr, "read or write error, aborting.\n");
-	ds_txn_abort(dbe);
+	ds_txn_abort(dsh);
     } else {
-	switch (ds_txn_commit(dbe)) {
+	switch (ds_txn_commit(dsh)) {
 	    case DST_FAILURE:
 	    case DST_TEMPFAIL:
 		fprintf(stderr, "commit failed\n");
@@ -311,7 +311,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	return EX_ERROR;
     }
 
-    if (DST_OK != ds_txn_begin(dbe)) {
+    if (DST_OK != ds_txn_begin(dsh)) {
 	ds_close(dsh);
 	ds_cleanup(dbe);
 	fprintf(stderr, "Cannot begin transaction.\n");
@@ -376,7 +376,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     }
 
 finish:
-    if (DST_OK != rv ? ds_txn_abort(dbe) : ds_txn_commit(dbe)) {
+    if (DST_OK != rv ? ds_txn_abort(dsh) : ds_txn_commit(dsh)) {
 	fprintf(stderr, "Cannot %s transaction.\n", rv ? "abort" : "commit");
 	rv = EX_ERROR;
     }

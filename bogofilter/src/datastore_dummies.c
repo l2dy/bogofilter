@@ -16,9 +16,9 @@ void dbe_cleanup(void *vhandle) {
     (void)vhandle;
 }
 
-int dbe_txn_begin(void *vhandle) { (void)vhandle; return 0; }
-int dbe_txn_abort(void *vhandle) { (void)vhandle; return 0; }
-int dbe_txn_commit(void *vhandle) { (void)vhandle; return 0; }
+int db_txn_begin(void *vhandle) { (void)vhandle; return 0; }
+int db_txn_abort(void *vhandle) { (void)vhandle; return 0; }
+int db_txn_commit(void *vhandle) { (void)vhandle; return 0; }
 int dbe_recover(const char *d, bool a, bool b) {
     (void)d;
     (void)a;
