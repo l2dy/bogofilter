@@ -218,7 +218,7 @@ void open_wordlists(dbmode_t mode)
 		    default:
 			if (query)	/* If "-Q", failure is OK */
 			    return;
-			fprintf(stderr, "Can't open %s (%s), errno %d, %s\n",
+			fprintf(stderr, "Can't open %s db directory (%s), errno %d, %s\n",
 				list->filename, list->filepath, err, strerror(err));
 			exit(EX_ERROR);
 		} /* switch */
