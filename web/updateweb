@@ -31,6 +31,7 @@ else
       --exclude CVS \
       --exclude README_BEFORE_EDITING \
       --exclude .nfs* \
+      --exclude updateweb \
       # do not remove this comment - it is for the preceding backslash
 
 fi
