@@ -111,7 +111,7 @@ T1		{TOKENFRONT}
 						  }
 						}
 
-<INITIAL,BOGO_LEX>{MSG_COUNT}			{ if (lineno==0) { BEGIN(BOGO_LEX); } 
+<INITIAL,BOGO_LEX>{MSG_COUNT}			{ if (lineno == 0) { BEGIN(BOGO_LEX); } 
 						  return MSG_COUNT_LINE;
 						}
 <BOGO_LEX>^\"{BOGOLEX_TOKEN}\"\ {NUM}\ {NUM}	{ return BOGO_LEX_LINE; }
@@ -167,6 +167,7 @@ T1		{TOKENFRONT}
 
 void lexer_v3_init(FILE *fp)
 {
+    lineno = 0;
     BEGIN(INITIAL);
     yyrestart(fp);
 }
