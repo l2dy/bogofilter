@@ -1,7 +1,7 @@
 # $Id$
 
 check_PROGRAMS=dehex spam_header_name dumbhead deqp deb64 escnp abortme \
-	       u_fpe wantcore
+	       u_fpe wantcore leakmem
 
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_LDFLAGS = -L..
@@ -13,7 +13,7 @@ CLEANFILES= $(BUILT_SOURCES)
 t.config: Makefile
 	echo >$@ 'EXE_EXT="@EXE_EXT@"' || rm -f $@
 
-ENVIRON_TESTS = t.abort t.env t.bogodir t.u_fpe
+ENVIRON_TESTS = t.abort t.env t.bogodir t.leakfind t.u_fpe
 
 PARSING_TESTS = \
 	t.ignore_spam_header \
