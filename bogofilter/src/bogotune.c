@@ -463,7 +463,7 @@ static uint read_mailbox(char *arg)
     mbox_mode = true;
     bogoreader_init(1, &arg);
     while ((*reader_more)()) {
-	wordhash_t *whc, *whp;
+	wordhash_t *whc, *whp = NULL;
 
 	if (user_robx < EPS)
 	    whc = wordhash_new();
@@ -481,7 +481,7 @@ static uint read_mailbox(char *arg)
 	    msglist_add(msgs, whp);
 	}
 
-	if (whc != whp || whc->wordcount == 0)
+	if (whc != whp)
 	    wordhash_free(whc);
 
 	if (verbose && (count % 100) == 0) {
