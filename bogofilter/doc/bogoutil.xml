@@ -158,8 +158,8 @@
 	<para>
 	    0 for successful operation.
 	    1 for most errors.
-	    2 for I/O or other errors.
-	    Error 2 usually means that something is seriously wrong with the database files. 
+	    3 for I/O or other errors.
+	    Error 3 usually means that something is seriously wrong with the database files. 
 	</para>
     </refsect1>
     <refsect1 id="author">

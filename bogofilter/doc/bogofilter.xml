@@ -456,12 +456,12 @@ Status and logging messages can be customized for each site (see
 </refsect1>
 
 <refsect1 id='returns'><title>RETURN VALUES</title>
-<para>0 for spam; 1 for non-spam; 2 for I/O or other errors.</para>
+<para>0 for spam; 1 for non-spam; 2 for unsure ; 3 for I/O or other errors.</para>
 <para>If both <option>-p</option> and <option>-e</option> are used, the
-    return values are: 0 for spam or non-spam; 2 for I/O or other
+    return values are: 0 for spam or non-spam; 3 for I/O or other
     errors.</para>
 
-<para>Error 2 usually means that the wordlist file(s)
+<para>Error 3 usually means that the wordlist file(s)
 <application>bogofilter</application> wants to read at startup 
 are missing or the hard disk has filled up in <option>-p</option> mode.</para>
 </refsect1>
