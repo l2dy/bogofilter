@@ -12,7 +12,7 @@ my $commandlineoptions=($ARGV[0]=~/^-(?=[^f]*f?[^f]*$)(?=[^n]*n?[^n]*$)(?=[^s]*s
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.4
+bogominitrain.pl version 1.40
   requires bogofilter 0.14.5 or later
 
 Usage:
