@@ -18,15 +18,16 @@ need to do the following:
    Download tdb from http://sourceforge.net/projects/tdb.  The current
    version is tdb-1.0.6 (10 Dec 2001).  After unpacking the tarball,
    build with the usual commands: "./configure && make && make
-   install".  
+   install".
 
    Note that file tdbspeed.h depends on gdbm.h.  If you don't have
-   gdbm installed, apply patch tdbspeed-gdbm.patch before building
-   tdb.
+   gdbm installed, apply patch tdbspeed-gdbm.patch (given below) before
+   building tdb. Just piping this whole README.tdb file into patch
+   should be fine.
 
 ** From the bogofilter directory, run:
 
-   "./configure --with-tdb && make && make check && make install"
+   "./configure --with-database=tdb && make all check && make install"
 
    To build an rpm, run:
 
