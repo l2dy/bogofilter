@@ -380,23 +380,23 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
   BOGOFILTER_DIR = "training"
   SPAMASSASSIN  = "/usr/bin/spamassassin"
 
- :0
-  *? $SPAMASSASSIN -e
+  :0 HBc
+  * ? $SPAMASSASSIN -e
   #spam yields non-zero
   #non-spam yields zero
   | $BOGOFILTER -n -d $BOGOFILTER_DIR
   #else (E)
- :0Ec
+  :0Ec
   | $BOGOFILTER -s -d $BOGOFILTER_DIR
 
- :0fw
+  :0fw
   | $BOGOFILTER -p -e
 
- :0:
+  :0:
   * ^X-Bogosity:.Yes
   spam
 
- :0:
+  :0:
   * ^X-Bogosity:.No
   non-spam
 </pre>
