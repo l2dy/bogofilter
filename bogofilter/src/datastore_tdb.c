@@ -95,16 +95,17 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 {
     dbh_t *handle;
 
-    int tdb_flags = 0;
+    int tdb_flags;
     int open_flags;
     TDB_CONTEXT *dbp;
 
     if (open_mode & DS_WRITE) {
-	open_flags = O_RDWR | O_CREAT;
+	open_flags = O_RDWR;
+	tdb_flags = 0;
     }
     else {
-    	tdb_flags = TDB_NOLOCK;
     	open_flags = O_RDONLY;
+    	tdb_flags = TDB_NOLOCK;
     }
 
     handle = dbh_init(db_file, name);
@@ -112,6 +113,12 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     if (handle == NULL) return NULL;
 
     dbp = handle->dbp = tdb_open(handle->name, 0, tdb_flags, open_flags, 0664);
+
+    if ((dbp == NULL) && (open_mode & DS_WRITE)) {
+	dbp = handle->dbp = tdb_open(handle->name, 0, tdb_flags, open_flags | O_CREAT, 0664);
+	if (dbp != NULL)
+	    handle->created = true;
+    }
 
     if (dbp == NULL)
 	goto open_err;

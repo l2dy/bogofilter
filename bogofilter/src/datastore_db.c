@@ -269,7 +269,7 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
     char *t;
 
     dbh_t *handle = NULL;
-    uint32_t opt_flags = 0;
+    uint32_t open_flags = 0;
     /*
      * If locking fails with EAGAIN, then try without MMAP, fcntl()
      * locking may be forbidden on mmapped files, or mmap may not be
@@ -286,9 +286,9 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
     check_db_version();
 
     if (open_mode & DS_READ )
-	opt_flags = DB_RDONLY;
+	open_flags = DB_RDONLY;
     if (open_mode & DS_CREATE )
-	opt_flags = DB_CREATE | DB_EXCL;
+	open_flags = DB_CREATE | DB_EXCL;
 
     /* retry when locking failed */
     for (idx = 0; idx < COUNTOF(retryflags); idx += 1)
@@ -327,12 +327,12 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 
 retry_db_open:
 
-	ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | retryflag, 0664);
+	ret = DB_OPEN(dbp, t, NULL, dbtype, open_flags | retryflag, 0664);
 
 	if (ret != 0) {
-	    err = (ret != ENOENT) || (opt_flags & DB_RDONLY);
+	    err = (ret != ENOENT) || (open_flags & DB_RDONLY);
 	    if (!err) {
-		ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664);
+		ret = DB_OPEN(dbp, t, NULL, dbtype, open_flags | DB_CREATE | DB_EXCL | retryflag, 0664);
 		if (ret != 0)
 		    err = true;
 		else
@@ -341,7 +341,7 @@ retry_db_open:
 	}
 
 	if (ret != 0) {
-	    if (ret == ENOENT && opt_flags != DB_RDONLY)
+	    if (ret == ENOENT && open_flags != DB_RDONLY)
 		return NULL;
 	    else
 		err = true;
@@ -349,7 +349,7 @@ retry_db_open:
 
 	if (err)
 	{
-	    if (opt_flags != DB_RDONLY && ret == EEXIST && --retries) {
+	    if (open_flags != DB_RDONLY && ret == EEXIST && --retries) {
 		/* sleep for 4 to 100 ms - this is just to give up the CPU
 		 * to another process and let it create the data base
 		 * file in peace */
