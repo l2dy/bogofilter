@@ -244,13 +244,24 @@ static void print_all_parms(void)
     print_parms("mdval", "%5.3f", mdval);
 }
 
-static int compare_double(const void *const ir1, const void *const ir2)
+static int compare_ascending(const void *const ir1, const void *const ir2)
 {
     const double d1 = *(const double *)ir1;
     const double d2 = *(const double *)ir2;
 
     if (d1 - d2 > 0.0) return  1;
     if (d2 - d1 > 0.0) return -1;
+
+    return 0;
+}
+
+static int compare_descending(const void *const ir1, const void *const ir2)
+{
+    const double d1 = *(const double *)ir1;
+    const double d2 = *(const double *)ir2;
+
+    if (d1 - d2 > 0.0) return -1;
+    if (d2 - d1 > 0.0) return +1;
 
     return 0;
 }
@@ -291,7 +302,7 @@ static void score_ns(double *results)
 	}
     }
 
-    qsort(results, count, sizeof(double), compare_double);
+    qsort(results, count, sizeof(double), compare_descending);
 
     return;
 }
@@ -301,9 +312,9 @@ static bool check_for_high_ns_scores(void)
     double percent = 0.0025;
     uint target = ceil(ns_cnt * percent);
 
-    score_ns(ns_scores);	/* scores in ascending order */
+    score_ns(ns_scores);	/* scores in descending order */
 
-    if (ns_scores[ns_cnt-target] < SPAM_CUTOFF)
+    if (ns_scores[target-1] < SPAM_CUTOFF)
 	return false;
     else {
 	fprintf(stderr, "Warning:  high scoring non-spam.\n");
@@ -333,7 +344,7 @@ static void score_sp(double *results)
 	}
     }
 
-    qsort(results, count, sizeof(double), compare_double);
+    qsort(results, count, sizeof(double), compare_ascending);
 
     return;
 }
@@ -359,7 +370,7 @@ static bool check_for_low_sp_scores(void)
 
     score_sp(sp_scores);			/* get scores */
 
-    if (sp_scores[target] > HAM_CUTOFF)
+    if (sp_scores[target-1] > HAM_CUTOFF)
 	return false;
     else {
 	fprintf(stderr, "Warning:  low scoring spam.\n");
@@ -372,8 +383,8 @@ static void scoring_error(void)
     int i;
 
     printf("    high ham scores:\n");
-    for (i = 1; i <= 10 && ns_scores[ns_cnt-i] > SPAM_CUTOFF; i += 1) 
-	printf("      %2d %8.6f\n", i, ns_scores[ns_cnt-i]);
+    for (i = 0; i < 10 && ns_scores[i] > SPAM_CUTOFF; i += 1) 
+	printf("      %2d %8.6f\n", i+1, ns_scores[i]);
 
     printf("    low spam scores:\n");
     for (i = 0; i < 10 && sp_scores[i] < HAM_CUTOFF; i += 1) 
@@ -416,7 +427,7 @@ static uint get_thresh(uint count, double *scores)
 	ftarget = ceil(count * percent);	/* compute fp count */
 	if (ftarget <= mtarget)
 	    break;
-	cutoff = scores[count - ftarget];	/* get cutoff value */
+	cutoff = scores[ftarget-1];		/* get cutoff value */
 	if (cutoff >= MIN_CUTOFF)
 	    break;
     }
@@ -435,9 +446,9 @@ static uint get_thresh(uint count, double *scores)
 
     /* ensure cutoff is below SPAM_CUTOFF */
     while (cutoff >= SPAM_CUTOFF && ++ftarget < count)
-	cutoff = scores[count-ftarget];
+	cutoff = scores[ftarget-1];
 
-    spam_cutoff = scores[count-(ftarget+1)] + 0.0005;
+    spam_cutoff = scores[ftarget+1] + 0.0005;
 
     return ftarget;
 }
@@ -873,10 +884,10 @@ static void final_recommendations(void)
     printf("Performing final scoring:\n");
 
     printf("Non-Spam...\n");
-    score_ns(ns_scores);		/* get scores */
+    score_ns(ns_scores);		/* get scores (in descending order) */
 
     printf("Spam...\n");
-    score_sp(sp_scores);		/* get scores */
+    score_sp(sp_scores);		/* get scores (in ascending order) */
 
     if (verbose >= PARMS)
 	printf("# ns_cnt %d, sp_cnt %d\n", ns_cnt, sp_cnt);
@@ -900,7 +911,7 @@ static void final_recommendations(void)
 
 	if (mn > 1 ) {
 	    uint t = (ns_cnt + mn - 1) / mn;
-	    cutoff = ns_scores[ns_cnt-t];
+	    cutoff = ns_scores[t-1];
 	    if (cutoff > FP_CUTOFF)
 		continue;
 	    fpp = 100.0 / mn;
@@ -910,7 +921,7 @@ static void final_recommendations(void)
 	    cutoff = SPAM_CUTOFF;
 	    if (printed)
 		break;
-	    for (i = 0; i < ns_cnt && ns_scores[i] < cutoff; i += 1)
+	    for (i = 0; i < ns_cnt && ns_scores[i-1] < cutoff; i += 1)
 		fp = i;
 	    if (fp == 0) {
 		fprintf(stderr, 
@@ -918,7 +929,7 @@ static void final_recommendations(void)
 		exit(EX_ERROR);
 	    }
 	    fp -= 1;
-	    cutoff = ns_scores[fp];
+	    cutoff = ns_scores[fp-1];
 	    fpp = 100.0 * (ns_cnt - fp) / ns_cnt;
 	}
 
@@ -1175,11 +1186,11 @@ static rc_t bogotune(void)
 		    }
 
 		    spam_cutoff = 0.01;
-		    score_ns(ns_scores);	/* scores in ascending order */
+		    score_ns(ns_scores);	/* scores in descending order */
 		    
 		    /* Determine spam_cutoff and false_pos */
 		    for (fp = target; fp < ns_cnt; fp += 1) {
-			spam_cutoff = ns_scores[ns_cnt - fp];
+			spam_cutoff = ns_scores[fp-1];
 			if (spam_cutoff < 0.999999)
 			    break;
 		    }
@@ -1187,7 +1198,7 @@ static rc_t bogotune(void)
 			fprintf(stderr,
 				"Too few false positives to determine a valid cutoff\n");
 
-		    score_sp(sp_scores);
+		    score_sp(sp_scores);	/* scores in ascending order */
 		    fn = get_fn_count(sp_cnt, sp_scores);
 
 		    /* save results */
