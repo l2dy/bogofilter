@@ -46,17 +46,15 @@ void collect_words(wordhash_t *wh)
     for (;;){
 	wordprop_t *wp;
 	word_t *token;
-	token_t cls = get_token();
+	token_t cls = get_token( &token );
 
 	if (cls == NONE)
 	    break;
 
-	token = yylval;
-
 	if (cls == BOGO_LEX_LINE)
 	{
-	    char *s = (char *)(yylval->text+1);	/* skip leading quote mark */
-	    char *f = memchr(s, '"', yylval->leng - 1);
+	    char *s = (char *)(token->text+1);	/* skip leading quote mark */
+	    char *f = memchr(s, '"', token->leng - 1);
 	    token->text = (unsigned char *) s;
 	    token->leng = f - s;
 	    Z(token->text[token->leng]);	/* replace terminal quote by NUL */
@@ -121,8 +119,8 @@ void collect_words(wordhash_t *wh)
 
 	if (cls == BOGO_LEX_LINE)
 	{
-	    char *s = (char *)yylval->text;
-	    s += yylval->leng + 2;
+	    char *s = (char *)token->text;
+	    s += token->leng + 2;
 	    wp->cnts.bad = atoi(s);
 	    s = strchr(s+1, ' ') + 1;
 	    wp->cnts.good = atoi(s);

@@ -308,16 +308,17 @@ int main(int argc, char **argv)
     bogoreader_init(argc, argv);
 
     while ((*reader_more)()) {
+	word_t *token;
 	lexer_init();
 
-	while ((t = get_token()) != NONE)
+	while ((t = get_token( &token )) != NONE)
 	{
 	    count += 1;
 	    if (passthrough) {
-		fprintf(fpo, "%s\n", yylval->text);
+		fprintf(fpo, "%s\n", token->text);
 	    }
 	    else if (!quiet)
-		fprintf(fpo, "get_token: %d \"%s\"\n", (int)t, yylval->text);
+		fprintf(fpo, "get_token: %d \"%s\"\n", (int)t, token->text);
 	}
     }
 

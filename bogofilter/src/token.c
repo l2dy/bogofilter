@@ -28,13 +28,13 @@ AUTHOR:
 
 /* Local Variables */
 
-word_t *yylval = NULL;
 word_t *msg_addr = NULL;	/* First IP Address in Received: statement */
 word_t *msg_id   = NULL;	/* Message ID */
 word_t *queue_id = NULL;	/* Message's first queue ID */
 
 static token_t save_class = NONE;
 static word_t *ipsave = NULL;
+static word_t *yylval = NULL;
 
 static word_t *w_to   = NULL;	/* To:          */
 static word_t *w_from = NULL;	/* From:        */
@@ -57,7 +57,7 @@ static word_t *nonblank_line = NULL;
 
 /* Function Definitions */
 
-token_t get_token(void)
+token_t get_token(word_t **token)
 {
     token_t cls = NONE;
     unsigned char *cp;
@@ -257,6 +257,7 @@ token_t get_token(void)
 		word_free(yylval);
 		yylval = ipsave;
 		save_class = IPADDR;
+		*token = yylval;
 		return (cls);
 	    }
 	    if (token_prefix != NULL) {
@@ -316,6 +317,8 @@ token_t get_token(void)
 		*cp = casefold_table[*cp];
 	}
     }
+
+    *token = yylval;
 
     return(cls);
 }
