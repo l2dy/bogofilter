@@ -2,7 +2,7 @@
 
 #	version.sh
 #
-#	create version.h to define BOGOFILTER_VERSION
+#	create version.c to define BOGOFILTER_VERSION
 #
 #	if VERSION in config.h does not contain 'cvs', use its value.
 #	if it does contain 'cvs', append a date to it.
@@ -16,14 +16,14 @@
 #	we'll fall back to use the current date (GMT time zone) with
 #	hour precision.
 
-set -e
-
 VERSION=`grep define.VERSION config.h | awk '{print $3}' | tr -d '"'`
 
 SUFFIX=`echo $VERSION | egrep "\.cvs$"`
 
 srcdir=$1
 shift
+
+set -e
 
 if [ ! -z "$SUFFIX" ]; then
     FILES=`find $srcdir -name CVS -type d | while read a ; do find "$a" -name Entries -type f ; done`
