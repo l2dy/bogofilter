@@ -88,7 +88,7 @@ if false ; then
 fi
 
 # use Electric Fence:
-if true ; then
+if false ; then
     VAL="env LD_PRELOAD=libefence.so.0.0"
     EF_PROTECT_FREE=1
     EF_FILL=85
