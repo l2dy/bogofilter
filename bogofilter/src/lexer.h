@@ -49,7 +49,6 @@ typedef struct lexer_s {
 } lexer_t;
 
 extern lexer_t *lexer;
-
 extern lexer_t	msg_count_lexer;
 
 /* in lexer_v3.l */
