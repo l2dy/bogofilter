@@ -14,9 +14,7 @@ AUTHOR:
 #define	PROB_H
 
 /** calculate the probability that a token is bad */
-extern double calc_prob_pure(uint good, uint bad,
-	uint goodmsgs, uint badmsgs,
-	double s, double x);
+extern double calc_prob(uint good, uint bad, uint goodmsgs, uint badmsgs);
 
 #endif	/* PROB_H */
 

@@ -364,8 +364,7 @@ static ex_t display_words(const char *path, int argc, char **argv, bool show_pro
 		    printf(data_format, token->text, spam_count, good_count);
 		else
 		{
-		    rob_prob = calc_prob_pure(good_count, spam_count, msgcnts.goodcount, msgcnts.spamcount,
-			    robs, robx);
+		    rob_prob = calc_prob(good_count, spam_count, msgcnts.goodcount, msgcnts.spamcount);
 		    printf(data_format, token->text, spam_count, good_count, rob_prob);
 		}
 		break;

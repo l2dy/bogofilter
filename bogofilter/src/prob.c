@@ -14,9 +14,7 @@ AUTHORS:
 #include "globals.h"
 #include "prob.h"
 
-double calc_prob_pure(uint good, uint bad,
-	uint goodmsgs, uint badmsgs,
-	double s, double x)
+double calc_prob(uint good, uint bad, uint goodmsgs, uint badmsgs)
 {
     int n = good + bad;
     double fw, pw;
@@ -48,7 +46,7 @@ double calc_prob_pure(uint good, uint bad,
 	pw =   bad * (double)goodmsgs
 	    / (bad * (double)goodmsgs + good * (double)badmsgs);
 
-	fw = (s * x + n * pw) / (s + n);
+	fw = (robs * robx + n * pw) / (robs + n);
     }
 
     return fw;

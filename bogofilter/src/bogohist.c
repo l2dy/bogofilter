@@ -53,7 +53,7 @@ static int ds_histogram_hook(/*@unused@*/ word_t *key, dsv_t *data,
 {
     rhistogram_t *hist = userdata;
 
-    double fw = calc_prob_pure(data->goodcount, data->spamcount, mgood, mbad, robs, robx);
+    double fw = calc_prob(data->goodcount, data->spamcount, mgood, mbad);
     uint idx = min(fw * INTERVALS, INTERVALS-1);
 
     (void)key;

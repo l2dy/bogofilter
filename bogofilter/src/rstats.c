@@ -240,8 +240,7 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
     {
 	rstats_t *cur = rstats_array[r];
 	int len = max(0, MAXTOKENLEN-(int)cur->token->leng);
-	double fw = calc_prob_pure(cur->good, cur->bad,
-		cur->msgs_good, cur->msgs_bad, robs, robx);
+	double fw = calc_prob(cur->good, cur->bad, cur->msgs_good, cur->msgs_bad);
 	char flag = (fabs(fw-EVEN_ODDS) - min_dev >= EPS) ? '+' : '-';
 
 	(void)fputc( '"', fpo);

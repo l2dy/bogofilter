@@ -155,8 +155,7 @@ inline static double compute_probability(const word_t *token, wordcnts_t *cnts)
     if (!msg_count_file)
 	lookup(token, cnts);
 
-    prob = calc_prob_pure(cnts->good, cnts->bad,
-			  cnts->msgs_good, cnts->msgs_bad, robs, robx);
+    prob = calc_prob(cnts->good, cnts->bad, cnts->msgs_good, cnts->msgs_bad);
 
     return prob;
 }
