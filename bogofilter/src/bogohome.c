@@ -26,14 +26,14 @@ LICENSE:
 
 char *bogohome=NULL;
 
-void set_bogohome(const char *ds_file) {
+void set_bogohome(const char *path) {
     char *t;
     struct stat st;
 
     if (bogohome)
 	xfree(bogohome);
 
-    bogohome = xstrdup(ds_file);
+    bogohome = xstrdup(path);
     if (lstat(bogohome, &st) != 0 || !S_ISDIR(st.st_mode)) {
 	if ((t = strrchr(bogohome, DIRSEP_C)))
 	    *t = '\0';
