@@ -71,7 +71,7 @@ static bool not_long_token(byte *buf, uint count)
 {
     uint i;
     for (i=0; i < count; i += 1) {
-	unsigned char c = (unsigned char)buf[i];
+	byte c = buf[i];
 	if ((iscntrl(c) || isspace(c) || ispunct(c)) && (c != '_'))
 	    return true;
     }
@@ -171,7 +171,7 @@ static int get_decoded_line(buff_t *buff)
     }
 
     /* CRLF -> NL */
-    if (count >= 2 && memcmp((char *) buf + count - 2, CRLF, 2) == 0) {
+    if (count >= 2 && memcmp(buf + count - 2, CRLF, 2) == 0) {
 	count --;
 	*(buf + count - 1) = (byte) '\n';
     }
@@ -278,20 +278,20 @@ int yyinput(byte *buf, size_t used, size_t size)
 
 size_t text_decode(word_t *w)
 {
-    char *beg = (char *) w->text;
-    char *fin = beg + w->leng;
-    char *txt = strstr(beg, "=?");		/* skip past leading text */
+    byte *beg = w->text;
+    byte *fin = beg + w->leng;
+    byte *txt = (byte *) strstr(beg, "=?");	/* skip past leading text */
     uint size = (uint) (txt - beg);
 
     while (txt < fin) {
 	word_t n;
-	char *typ = strchr(txt+2, '?');		/* Encoding type - 'B' or 'Q' */
-	char *tmp = typ + 3;
-	char *end = strstr(tmp, "?=");		/* last char of encoded word  */
+	byte *typ = (byte *) strchr(txt+2, '?');/* Encoding type - 'B' or 'Q' */
+	byte *tmp = typ + 3;
+	byte *end = (byte *) strstr(tmp, "?=");	/* last byte of encoded word  */
 	uint len = end - tmp;
 	bool copy;
 
-	n.text = (byte *)tmp;			/* Start of encoded word */
+	n.text = tmp;				/* Start of encoded word */
 	n.leng = len;				/* Length of encoded word */
 	n.text[n.leng] = (byte) '\0';
 
@@ -326,13 +326,13 @@ size_t text_decode(word_t *w)
 	txt = end + 2;
 	if (txt >= fin)
 	    break;
-	end = strstr(txt, "=?");
+	end = (byte *) strstr(txt, "=?");
 	copy = end != NULL;
 
 	if (copy) {
 	    tmp = txt;
 	    while (copy && tmp < end) {
-		if (isspace((unsigned char)*tmp))
+		if (isspace(*tmp))
 		    tmp += 1;
 		else
 		    copy = false;
