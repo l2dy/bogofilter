@@ -30,22 +30,28 @@ bool	kill_html_comments  = true;	/* config file option:  "kill_html_comments"  *
 int	count_html_comments = 5;	/* config file option:  "count_html_comments" */
 bool	score_html_comments = false;	/* config file option:  "score_html_comments" */
 
+/* Function Declarations */
+
+static int kill_html_comment(byte *buf_start, byte *buf_used, byte *buf_end);
+
 /* Function Definitions */
 
-int process_html_comments(byte *buf, size_t used, size_t size)
+int process_html_comments(byte *buf /** buffer */,
+	size_t used /** count of characters in buffer */,
+	size_t size /** total buffer size */)
 {
     byte *tmp;
     byte *buf_used = buf + used;
     byte *buf_end  = buf + size;
 
-    for (tmp = buf; (tmp = index(tmp, '<')) != NULL; tmp += 1) {
+    for (tmp = buf; tmp < buf_used && (tmp = memchr(tmp, '<', buf_used - tmp)) != NULL; tmp += 1) {
 	int count = kill_html_comment(tmp, buf_used, buf_end);
 	buf_used = tmp + count;
     }
     return buf_used - buf;
 }
 
-int kill_html_comment(byte *buf_start, byte *buf_used, byte *buf_end)
+static int kill_html_comment(byte *buf_start, byte *buf_used, byte *buf_end)
 {
     int level = 0;
     byte *tmp = buf_start;
@@ -77,7 +83,7 @@ int kill_html_comment(byte *buf_start, byte *buf_used, byte *buf_end)
 		/* eat comment */
 		size_t cnt = buf_used - tmp;
 		if (kill_html_comments) {
-		    memcpy(buf_start, tmp+1, cnt + 1);
+		    memmove(buf_start, tmp+1, cnt + 1);
 		    buf_used -= tmp + 1 - buf_start;
 		}
 		tmp = buf_start;

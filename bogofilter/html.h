@@ -27,6 +27,8 @@ extern	bool	score_html_comments;
 /* Function Prototypes */
 
 extern int process_html_comments(byte *buf, size_t used, size_t size);
+#if 0
 extern int kill_html_comment(byte *comment_start, byte *buf_used, byte *buf_end);
+#endif
 
 #endif
