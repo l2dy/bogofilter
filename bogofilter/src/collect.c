@@ -7,19 +7,14 @@
 #include <stdlib.h>
 
 #include "charset.h"
+#ifdef NOT_YET
+#include "hints.h"
+#endif
 #include "mime.h"
 #include "wordhash.h"
 #include "token.h"
 
 #include "collect.h"
-
-static void initialize(void)
-{
-    mime_reset();
-    token_init();
-    lexer_v3_init(NULL);
-    init_charset_table(charset_default, true);
-}
 
 void wordprop_init(void *vwordprop)
 {
@@ -47,7 +42,7 @@ void collect_words(wordhash_t *wh)
 {
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### collect_words() begins\n");
 
-    initialize();
+    lexer_init();
 
     for (;;){
 	wordprop_t *wp;

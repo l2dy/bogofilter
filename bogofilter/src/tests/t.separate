@@ -1,7 +1,5 @@
 #! /bin/sh
 
-set -e
-
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
 #	 separate.YYYYMMDD.  This is useful when something is different.
@@ -65,8 +63,6 @@ fi
 if [ "$SEP$COM" != "$EXP$EXP" ] ; then
     exit 1
 fi
-
-OUTPUTS=${SYSTEST}/outputs
 
 for i in $TMPDIR/[cs]*.out ; do
     j=`basename $i`

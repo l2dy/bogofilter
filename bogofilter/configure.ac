@@ -1,6 +1,6 @@
 # $Id$
 dnl vim: set noai tw=0:
-AC_INIT(bogofilter, 0.17.2.cvs)
+AC_INIT(bogofilter, 0.92.2+txn.cvs)
 AC_PREREQ(2.54)
 AC_CONFIG_SRCDIR([src/bogofilter.c])
 AC_CANONICAL_TARGET
@@ -17,14 +17,29 @@ AC_PATH_PROGS(PERL, perl perl5, $PATH:/usr/local/bin:/usr/bin)
 AC_PATH_PROGS(NSGMLS,onsgmls nsgmls,nsgmls)
 AM_PROG_LEX
 
+dnl Check for "extern inline", using a modified version
+dnl of the test for AC_C_INLINE from acspecific.mt.
+dnl Run this before AC_C_INLINE to avoid skewing the results?
+dnl Imported from the GSL 1.4 documentation (section "Autoconf Macros")
+dnl and modified to define HAVE_EXTERN_INLINE.
+AC_CACHE_CHECK([for extern inline], ac_cv_c_extern_inline,
+	       [ac_cv_c_extern_inline=no
+		AC_TRY_COMPILE([extern $ac_cv_c_inline double foo(double x);
+				extern $ac_cv_c_inline double foo(double x) { return x+1.0; };
+				double foo (double x) { return x + 1.0; };],
+				[  foo(1.0)  ],
+				[ac_cv_c_extern_inline="yes"])
+		])
+
+if test "$ac_cv_c_extern_inline" != no ; then
+    AC_DEFINE(HAVE_EXTERN_INLINE,1,Define to 1 if your compiler supports extern inline storage class.)
+    AC_SUBST(HAVE_EXTERN_INLINE)
+fi
+
 dnl Check compiler capabilities
 AC_C_CONST
 AC_C_INLINE
 AC_C_VOLATILE
-if test "$ac_cv_c_inline" != no ; then
-    AC_DEFINE(HAVE_INLINE,1,[Define to 1 if your compiler supports inline])
-    AC_SUBST(HAVE_INLINE)
-fi
 
 dnl Check for extension
 AC_EXEEXT
@@ -125,8 +140,8 @@ dnl See http://thread.gmane.org/gmane.mail.bogofilter.general/6352
       -Wmissing-format-attribute -Wnested-externs \
       -fno-common -Wchar-subscripts -Wcomment \
       -Wimplicit -Wsequence-point -Wreturn-type \
-      -Wno-system-headers -Wformat -Wformat=2
-      # -Wfloat-equal
+      -Wno-system-headers -Wformat
+      # -Wfloat-equal -Wformat=2
       # -Wmissing-noreturn -Wconversion -pedantic -Wredundant-decls
   do
        if $CC $i $ac_cv_prog_gcc_flags -c configure-dummy.c >/dev/null 2>&1 
@@ -214,7 +229,7 @@ if test x$USE_MEMDEBUG = xYES ; then
 	AC_DEFINE(ENABLE_MEMDEBUG,1,
 	[Enable memory usage debugging])
 fi
-AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$MEM_DEBUG = xYES)
+AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$USE_MEMDEBUG = xYES)
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -362,7 +377,7 @@ Did you adjust your library search path to include your libdb?])],)
 		   #include <db.h>
 		   ]], [[
 			int maj, min;
-			(void)db_version(&maj, &min, (void *)0);
+			(void)db_version(&maj, &min, 0);
 			(void)fprintf(stderr, "headers: %d.%d, library: %d.%d\n",
 				DB_VERSION_MAJOR, DB_VERSION_MINOR, maj, min);
 			if (maj != DB_VERSION_MAJOR) exit(1);
@@ -388,10 +403,12 @@ You can download BerkeleyDB 4.1.x from http://www.sleepycat.com/]]),
     ;;
 esac
 
-if test a$WITH_DB_ENGINE = a ; then
-    STATIC_DB="-ldb"
-else
-    STATIC_DB="-l$WITH_DB_ENGINE"
+if test "a$STATIC_DB" = a ; then
+    if test "a$WITH_DB_ENGINE" = a ; then
+	STATIC_DB="-ldb"
+    else
+	STATIC_DB="-l$WITH_DB_ENGINE"
+    fi
 fi
 
 AC_SUBST(STATIC_DB)

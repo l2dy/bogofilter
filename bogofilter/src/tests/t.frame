@@ -9,6 +9,7 @@
 # and suppress directory deletion.
 
 set -e
+
 exec </dev/null
 
 : ${srcdir=.}
@@ -32,7 +33,7 @@ _POSIX2_VERSION=199209
 export _POSIX2_VERSION
 
 # Obtain data base file suffix
-DB_NAME=`$BOGOFILTER -V 2>&1 | sed -n '2p;'`
+DB_NAME=`$BOGOFILTER -C -V 2>&1 | sed -n '2p;'`
 case $DB_NAME in
     *BerkeleyDB*)   DB_EXT=db ;;
     *QDBM*)	    DB_EXT=qdbm ;;
@@ -80,6 +81,7 @@ while [ $i -lt 3 ] ; do
 done
 
 SYSTEST="${srcdir}"
+OUTPUTS=${SYSTEST}/outputs
 
 if [ -z "$RUN_FROM_MAKE" ] ; then
 # standalone, from shell directly
@@ -103,6 +105,8 @@ mkdir $TMPDIR
 BOGOFILTER_DIR=$TMPDIR
 export BOGOFILTER_DIR
 
+WORDLIST="${TMPDIR}/wordlist.${DB_EXT}"
+
 verbose=0
 if [ "$1" = "-v" ]; then
     verbose=1
@@ -124,8 +128,14 @@ else
     echo "Results are in ${TMPDIR}.  Remove it after testing."
 fi
 
+create_empty_wordlist()
+{
+    rm -f $BOGOFILTER_DIR/*.${DB_EXT}
+    $BOGOUTIL -l $BOGOFILTER_DIR/wordlist.${DB_EXT} < /dev/null
+}
+
 if [ -z "$NODB" ]; then
-    $BOGOFILTER -n -C </dev/null
+    create_empty_wordlist
 fi
 
 BF_CHECKTOOL=${BF_CHECKTOOL-glibc}
@@ -136,9 +146,20 @@ if test "x$BF_CHECKTOOL" = x"glibc" ; then
     export MALLOC_CHECK_
 fi
 
+# check valgrind:
+case `(valgrind --version) 2>/dev/null` in
+    valgrind-2.1.*) VALGRIND="valgrind --tool=memcheck" ;;
+    valgrind-*) VALGRIND="valgrind" ;;
+    *) VALGRIND= ;;
+esac
+if [ "x$VALGRIND" != x ] ; then
+    VALGRIND="$VALGRIND -q --num-callers=20"
+fi
+export VALGRIND
+
 # use valgrind:
-if test "x$BF_CHECKTOOL" = x"valgrind" && (valgrind -q true) 2>/dev/null ; then
-    VAL='valgrind -q --num-callers=16'
+if test "x$BF_CHECKTOOL" = x"valgrind" && test "x$VALGRIND" != x ; then
+    VAL="$VALGRIND"
     export VAL
 fi
 

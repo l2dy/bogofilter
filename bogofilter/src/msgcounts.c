@@ -12,13 +12,9 @@ AUTHOR:
 
 #include "common.h"
 
-#include <ctype.h>
 #include <stdlib.h>
 
-#include "datastore.h"
-#include "fgetsl.h"
 #include "msgcounts.h"
-#include "wordlists.h"
 
 /* Globals */
 
@@ -74,8 +70,8 @@ bool msgcount_more(void)
 
 void set_msg_counts(u_int32_t good, u_int32_t spam)
 {
-    msgs_bad  = spam;
-    msgs_good = good;
+    msgs_bad  = max(1,spam);
+    msgs_good = max(1,good);
 }
 
 void set_msg_counts_from_str(char *str)

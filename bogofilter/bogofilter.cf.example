@@ -2,8 +2,8 @@
 
 # $Id$
 
-# Default settings (as defined in the bogofilter source code) have a
-# single hash mark starting their line.
+# Default settings (as defined in the bogofilter source code) 
+# have a single hash mark at the beginning of the line.
 
 # Alternate values have two hash marks.
 
@@ -25,6 +25,17 @@
 #user_config_file=~/.bogofilter.cf
 ##user_config_file=~/.bogofilterrc
 ##user_config_file=~/.bogofilter/config
+
+#### WORDLIST: define additional word lists
+#
+#	char type: 'r' (regular) or 'i' (ignore)
+#	char *name: name of list, e.g. "system", "user", "ignore"
+#	char *path: absolute path to file or
+#	            file name (relative to bogofilter_dir)
+#	int  order - once found, skip higher numbered lists
+#
+##wordlist i,ignore,~/ignorelist.db,1
+##wordlist r,wordlist,~/wordlist.db,2
 
 #### SPAM_HEADER_NAME
 #
@@ -85,6 +96,9 @@
 #
 #	formatting characters:
 #
+#	    A - IP addr (last IPAddr in first Received: statement having one)
+#		Not guaranteed to be the originating address of the message.
+#
 #	    h - spam_header_name, e.g. "X-Bogosity"
 #
 #	    c - classification, e.g. Yes/No, Spam/Ham/Unsure, +/-/?
@@ -94,6 +108,9 @@
 #	    e - spamicity as 'e' format
 #	    f - spamicity as 'f' format
 #	    g - spamicity as 'g' format
+#
+#	    I - Message ID
+#	    Q - Queue ID (from first id tag found in Received: headers)
 #
 #	    l - logging tag (from '-l' option)
 #
@@ -125,6 +142,7 @@
 #terse_format = %1.1c %f
 #log_header_format = %h: %c, spamicity=%p, version=%v
 #log_update_format = register-%r, %w words, %m messages
+##log_header_format = %h: %c, spamicity=%p, ipaddr=%A, msgID=%I, version=%v
 
 #### TERSE
 #
@@ -167,16 +185,15 @@
 #	than MIN_DEV, don't use the word in the
 #	spamicity calculation
 #
-## min_dev=0.1
-
+#min_dev=0.375
 
 #### Robinson Constants
 #
 #	floating point values for
 #	Robinson S and X coefficients.
 #
-#robs=0.010
-#robx=0.415
+#robs=0.0178
+#robx=0.52
 
 #### CUTOFF Values
 #
@@ -184,16 +201,22 @@
 #	setting ham_cutoff to a non-zero value will
 #	enable tristate results (Yes/No/Unsure).
 #
-#ham_cutoff = 0.00
-#spam_cutoff = 0.95
+#ham_cutoff  = 0.00
+#spam_cutoff = 0.99
 #
 ## with Yes/No/Unsure output:
-## ham_cutoff = 0.10
-## spam_cutoff = 0.95
+## ham_cutoff = 0.45
+## spam_cutoff= 0.99
+
+#### Effective Size Factor Values
+#
+#ns_esf = 1.000
+#sp_esf = 1.000
 
 #### Auto-update threshold
 #
-#	When using '-u' (auto-update), update wordlist if
-#	value less than score and score less than 1-value.
+#	Skip autoupdating if the spamicity is within this value
+#	of 0.000000 (surely ham) or 1.000000 (surely spam).
 #
 ## thresh_update=0.01
+
