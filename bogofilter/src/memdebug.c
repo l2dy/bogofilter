@@ -20,8 +20,6 @@
 *	- Program exit when current allocation is "too much".
 */
 
-#define	NO_MEMDEBUG_MACROS
-
 #include "common.h"
 
 #include <stdlib.h>
@@ -93,11 +91,12 @@ void mh_disp(const char *s, mh_t *p)
     if (dbg_index_max != 0 && p->indx > dbg_index_max)
 	return;
 
-    if (dbg_size_min <- p->size && p->size <- dbg_size_max)
-	fprintf(dbgout, "::%s  %lu\n", s, (ulong) p->size);
-//	fprintf(dbgout, "::%3d  %08lX  %s  %lu\n", p->indx, (ulong) (p+1), s, (ulong) p->size);
-
+    if (p->size < dbg_size_min || dbg_size_max < p->size )
 	return;
+
+    fprintf(dbgout, "::%3d  %08lX  %s  %lu\n", p->indx, (ulong) (p+1), s, (ulong) p->size);
+
+    return;
 }
 
 void *
@@ -200,6 +199,7 @@ void memdisplay(const char *file, int lineno)
     else
 	fprintf(dbgout, "%s         active: %lu, average: %lu\n", pfx, 
 		(ulong) cnt_alloc - cnt_free, (ulong) cur_malloc/(cnt_alloc - cnt_free));
+    fflush(dbgout);
 }
 
 void
