@@ -25,6 +25,8 @@ Briefly:
 
 	2005-01-05
 
+	* Add --config-file option to bogoutil.
+
 	* Fix --enable-transactions logic, was inverted since 2004-12-26
 	  (affected release: 0.93.3.1 only, 0.93.3 was fine). Note that
 	  giving neither --enable-transactions nor --disable-transactions woudl
