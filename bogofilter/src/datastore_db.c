@@ -333,8 +333,9 @@ retry_db_open:
 	    }
 
 	    /* close again and bail out without further tries */
-	    print_error(__FILE__, __LINE__, "(db) DB->open(%s) - actually %s bogohome: %s -, err: %d, %s",
-		    handle->name, t, bogohome, ret, db_strerror(ret));
+	    if (DEBUG_DATABASE(0))
+		print_error(__FILE__, __LINE__, "(db) DB->open(%s) - actually %s, bogohome %s, err %d, %s",
+			    handle->name, t, bogohome, ret, db_strerror(ret));
 	    dbp->close(dbp, 0);
 	    goto open_err;
 	}
