@@ -154,12 +154,6 @@ mime_free (mime_t * t)
     t->charset = NULL;
   }
 
-  if (t->version)
-  {
-    xfree (t->version);
-    t->version = NULL;
-  }
-
   t->parent = NULL;
 }
 
@@ -398,21 +392,6 @@ getparam (char *t, char *e, const byte *param)
 }
 #endif
 
-void
-mime_version (word_t *text)
-{
-  size_t l;
-  char *w;
-
-  l = strlen("MIME-Version:");
-  w = (char *)getword(text->text + l, text->text + text->leng);
-
-  if (!w) return;
-
-  xfree(msg_state->version);
-  msg_state->version = w;
-}
-
 void 
 mime_content(word_t *text)
 {
@@ -600,7 +579,7 @@ mime_decode (word_t *text)
   switch (msg_state->mime_encoding)
   {
   case MIME_QP:
-    count = qp_decode(text);
+    count = qp_decode(text, RFC2045);
     break;
   case MIME_BASE64:
       if (count > 4)

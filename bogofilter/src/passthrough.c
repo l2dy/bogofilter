@@ -9,6 +9,7 @@ NAME:
 
 #include "common.h"
 
+#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -20,6 +21,7 @@ NAME:
 
 #include "passthrough.h"
 #include "bogofilter.h"
+#include "bogoreader.h"		/* for is_eol() */
 #include "fgetsl.h"
 #include "format.h"
 #include "textblock.h"
@@ -36,18 +38,12 @@ size_t msg_register_size = sizeof(msg_register);
 
 /* Function Definitions */
 
-static bool is_eol(const char *buf, size_t len)
-{
-    if ((len == 1 && memcmp(buf, NL, 1) == 0) ||
-	(len == 2 && memcmp(buf, CRLF, 2) == 0))
-	return true;
-    else
-	return false;
-}
-
 static void cleanup_exit(ex_t exitcode, int killfiles)
     __attribute__ ((noreturn));
 static void cleanup_exit(ex_t exitcode, int killfiles) {
+    if (fpo) {
+	output_cleanup();
+    }
     if (killfiles && outfname[0] != '\0') unlink(outfname);
     exit(exitcode);
 }
@@ -104,7 +100,7 @@ static int read_seek(char **out, void *in) {
     b += i;
     cap -= i;
 
-    s = xfgetsl(b, cap, inf, 1);
+    s = xfgetsl(b, cap, inf, true);
     if (s == EOF) {
        if (i) s = i;
     } else {
@@ -121,8 +117,6 @@ static int read_seek(char **out, void *in) {
 	for (i = 0; i < c ; i++) {
 	    carry[i] = (unsigned char)buf[s+i];
 	}
-    } else {
-        fflush(fpo);
     }
 
     *out = buf;
@@ -189,7 +183,7 @@ static bool write_header(rc_t status, readfunc_t rf, void *rfarg)
 
 	hadlf = (out[rd-1] == '\n');
 	(void) fwrite(out, 1, rd, fpo);
-	if (ferror(fpo)) cleanup_exit(2, 1);
+	if (ferror(fpo)) cleanup_exit(EX_ERROR, 1);
     }
 
     if (eol == NULL)	/* special treatment of empty input */
@@ -217,14 +211,13 @@ static void write_body(readfunc_t rf, void *rfarg)
     {
 	(void) fwrite(out, 1, rd, fpo);
 	hadlf = (out[rd-1] == '\n');
-	if (ferror(fpo)) cleanup_exit(2, 1);
+	if (ferror(fpo)) cleanup_exit(EX_ERROR, 1);
     }
 
     if (!hadlf) (void) fputs(eol, fpo);
 
-    if (fflush(fpo) || ferror(fpo) || (fpo != stdout && fclose(fpo))) {
-	cleanup_exit(2, 1);
-    }
+    if (fflush(fpo) || ferror(fpo))
+	cleanup_exit(EX_ERROR, 1);
 }
 
 static void build_spam_header(void)
@@ -317,25 +310,54 @@ void write_log_message(rc_t status)
 #endif
 }
 
+/* we need to take care not to fclose() a shared file descriptor, if,
+ * for instance we've fdopen()ed STDOUT_FILENO, becase we'd prevent
+ * other streams accessing the same file descriptor from flushing their
+ * caches. Prominent symptom: t.bogodir failure.
+ */
+static bool fpo_mayclose;	/* if output_cleanup can close the file */
+
 void output_setup(void)
 {
+    assert(fpo == NULL);
+
     if (*outfname && passthrough) {
-	if ((fpo = fopen(outfname,"wt"))==NULL)
-	{
-	    fprintf(stderr,"Cannot open %s: %s\n",
-		    outfname, strerror(errno));
-	    exit(EX_ERROR);
-	}
+	fpo = fopen(outfname,"wt");
+	fpo_mayclose = true;
     } else {
-	fpo = stdout;
+	fpo = fdopen(STDOUT_FILENO, "wt");
+	fpo_mayclose = false;
     }
 
+    if (!fpo) {
+	if (*outfname)
+	    fprintf(stderr, "Cannot open %s: %s\n",
+		    outfname, strerror(errno));
+	else
+	    fprintf(stderr, "Cannot fdopen STDOUT: %s\n", strerror(errno));
+
+	exit(EX_ERROR);
+    }
+
+    /* if we're not in passthrough mode, set line buffered mode just in
+     * case some program that calls uses waits for our output in -T mode */
     if (!passthrough) {
 	mysetvbuf(fpo, NULL, _IOLBF, BUFSIZ);
     }
 }
 
-void passthrough_setup()
+void output_cleanup(void) {
+    int rc;
+
+    rc = fflush(fpo);
+    if (fpo_mayclose)
+	rc |= fclose(fpo);
+    fpo = NULL;
+    if (rc)
+	cleanup_exit(EX_ERROR, 1);
+}
+
+void passthrough_setup(void)
 {
     /* check if the input is seekable, if it is, we don't need to buffer
      * things in memory => configure passmode accordingly
@@ -356,16 +378,16 @@ void passthrough_setup()
 	case PASS_SEEK: m = "rewind and reread file"; break;
 	default:        m = "unknown"; break;
 	}
-	fprintf(fpo, "passthrough mode: %s\n", m);
+	fprintf(dbgout, "passthrough mode: %s\n", m);
     }
 }
 
-int passthrough_keepopen()
+int passthrough_keepopen(void)
 {
     return passthrough && passmode == PASS_SEEK ;
 }
 
-void passthrough_cleanup()
+void passthrough_cleanup(void)
 {
     if (!passthrough)
 	return;

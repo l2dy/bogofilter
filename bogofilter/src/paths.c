@@ -57,12 +57,12 @@ char *build_progtype(const char *name, const char *db_type)
  * returns: true for success
  *	    false for error (esp. overflow)
  */
-bool build_path(char* dest, size_t size, const char* dir, const char* file)
+bool build_path(char* dest, size_t size, const char* path, const char* file)
 {
-    size_t dirlen = strlen(dir);
+    size_t pathlen = strlen(path);
     size_t filelen = strlen(file);
 
-    if (dirlen >= size) return false;
+    if (pathlen >= size) return false;
 
     /* If absolute path ... */
     if (bf_abspath(file))
@@ -75,12 +75,12 @@ bool build_path(char* dest, size_t size, const char* dir, const char* file)
 	    return false;
     }
 
-    memcpy(dest, dir, dirlen+1);
+    memcpy(dest, path, pathlen+1);
 
-    if (dirlen >= filelen && strcmp(dir+(dirlen-filelen), file) == 0)
+    if (pathlen >= filelen && strcmp(path+(pathlen-filelen), file) == 0)
 	return true;
 
-    if (check_directory(dir)) {
+    if (!is_file(path) && check_directory(path)) {
 	if (dest[strlen(dest)-1] != DIRSEP_C) {
 	    if (strlcat(dest, DIRSEP_S, size) >= size)
 		return false; /* RATS: ignore */
@@ -154,6 +154,24 @@ bool check_directory(const char* path) /*@globals errno,stderr@*/
 	}
     }
     return true;
+}
+
+/* check whether the path is a file or a directory.
+ */
+bool is_file(const char* path) /*@globals errno,stderr@*/
+{
+    int rc;
+    struct stat sb;
+
+    if (path == NULL || *path == '\0')
+	return false;
+
+    rc = stat(path, &sb);
+
+    if (rc == 0 && !S_ISDIR(sb.st_mode))
+	return true;
+    else
+	return false;
 }
 
 char *get_directory(priority_t which)

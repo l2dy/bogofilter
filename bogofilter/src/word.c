@@ -58,22 +58,12 @@ word_t *word_cpy(word_t *dst, const word_t *src)
 
 int word_cmp(const word_t *w1, const word_t *w2)
 {
-#if	1
-    return strcmp((const char *)w1->text, (const char *)w2->text);
-#else
-    uint s1 = w1->leng;
-    uint s2 = w2->leng;
-    uint l  = min(s1, s2);
-    uint i;
-
-    for (i = 0; i < l ; i += 1) {
-	int d = w1->text[i] -  w2->text[i];
-	if (d != 0)
-	    return d;
-    }
-
-    return s1 - s2;
-#endif
+    uint l = min(w1->leng, w2->leng);
+    int r = memcmp((const char *)w1->text, (const char *)w2->text, l);
+    if (r) return r;
+    if (w1->leng > w2->leng) return 1;
+    if (w1->leng < w2->leng) return -1;
+    return 0;
 }
 
 word_t *word_concat(const word_t *w1, const word_t *w2)

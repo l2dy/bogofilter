@@ -60,7 +60,7 @@ buff_t *buff_dup(const buff_t *self)
 int buff_fgetsl(buff_t *self, FILE *in)
 {
     uint readpos = self->t.leng;
-    int readcnt = xfgetsl((char *)self->t.text+readpos, self->size-readpos, in, 1);
+    int readcnt = xfgetsl((char *)self->t.text+readpos, self->size-readpos, in, true);
     self->read = readpos;
     if (readcnt >= 0)
 	self->t.leng += readcnt;
@@ -70,7 +70,7 @@ int buff_fgetsl(buff_t *self, FILE *in)
 int buff_fgetsln(buff_t *self, FILE *in, uint maxlen)
 {
     uint readpos = self->t.leng;
-    int readcnt = xfgetsl((char *)self->t.text+readpos, min(self->size - readpos, maxlen), in, 1);
+    int readcnt = xfgetsl((char *)self->t.text+readpos, min(self->size - readpos, maxlen), in, true);
     /* WARNING: do not add NUL termination, the size must be exact! */
     self->read = readpos;
     if (readcnt >= 0)

@@ -29,9 +29,9 @@
 #include "memdebug.h"
 #include "xmalloc.h"
 
-int  memtrace= 0 * (M_MALLOC+M_FREE);
+int  memtrace= 1 * (M_MALLOC+M_FREE);
 
-uint32_t dbg_trap_index= 0;
+uint32_t dbg_trap_index= 36;
 uint32_t dbg_size      = 0;
 uint32_t dbg_index_min = 0;	/* 1 */
 uint32_t dbg_index_max = 0;	/* 1000 */
@@ -99,6 +99,9 @@ md_malloc(size_t size)
     void *ptr;
     mt_t *mt;
     mh_t *mh = NULL;
+
+    if (!verbose)
+	memtrace = 0;
 
     ++cnt_malloc;
     cur_malloc += size;

@@ -130,7 +130,7 @@ int gsl_sf_exp_mult_err_e10_e(const double x, const double dx, const double y, c
 __END_DECLS
 
 
-#if HAVE_INLINE
+#if HAVE_EXTERN_INLINE
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_errno.h>
 
@@ -158,7 +158,7 @@ int gsl_sf_exp_e(const double x, gsl_sf_result * result)
 
 __END_DECLS
 
-#endif /* HAVE_INLINE */
+#endif /* HAVE_EXTERN_INLINE */
 
 
 #endif /* __GSL_SF_EXP_H__ */

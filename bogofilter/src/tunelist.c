@@ -34,7 +34,8 @@ void filelist_add(flhead_t *list, char *name)
     list->count += 1;
     if (verbose > 1000)
 	printf("%s:  h %p (%u)  t %p  w %p\n",
-	       list->name, list->head, list->count, list->tail, name);
+	       list->name,
+	       (void *)list->head, list->count, (void *)list->tail, name);
     return;
 }
 
@@ -72,8 +73,8 @@ void msglist_add(mlhead_t *list, wordhash_t *wh)
     item->wh = wh;
     if (verbose > 1000)
 	printf("%s:  h %p (%u)  t %p  w %p %4lu\n", 
-	       list->name, list->head, list->count, list->tail, wh,
-	       (unsigned long)wh->count);
+	       list->name, (void *)list->head, list->count,
+	       (void *)list->tail, (void *)wh, (unsigned long)wh->count);
     return;
 }
 
@@ -92,7 +93,8 @@ void msglist_print(mlhead_t *list)
 
     for (item = list->head; item != NULL; item = item->next) {
 	wordhash_t *wh = item->wh;
-	printf("  %4d  %p  %4lu\n", count++, item, (unsigned long)wh->count);
+	printf("  %4d  %p  %4lu\n", count++, (void *)item,
+		(unsigned long)wh->count);
     }
 
     return;

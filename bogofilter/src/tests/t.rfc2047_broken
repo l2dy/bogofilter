@@ -1,0 +1,22 @@
+#! /bin/sh
+
+. ${srcdir:=.}/t.frame
+
+# This test checks if improperly folded encoded words are decoded
+# without crash. Test input supplied by Clint Adams, Debian.
+
+cat >${TMPDIR}/input <<_EOF
+Subject: [Broken] =?ISO-8859-1?Q?Re=3A_=5BBroken=5D_=3D=3FISO-8859-1=3FQ=3F=3D5B?=
+ =?ISO-8859-1?Q?Broken=3D5DBlah=3D20Foo=3DE4=3D20Bar=3D20Blah
+ _?= =?ISO-8859-1?Q?Foo=3D3D28=3D5F=3F=3D_Bar=5F=5F=3F=3D_t=E4Blah?=
+ =?ISO-8859-1?Q?Foo=E4t=29?=
+
+Hello.
+_EOF
+
+#cat >${TMPDIR}/reference <<_EOF
+#_EOF
+
+$BOGOLEXER -p -C <${TMPDIR}/input >/dev/null # >${TMPDIR}/output
+#cmp ${TMPDIR}/reference ${TMPDIR}/output \
+#|| diff ${TMPDIR}/reference ${TMPDIR}/output

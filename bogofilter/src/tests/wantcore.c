@@ -28,17 +28,21 @@ static void barf(const char *e)
 }
 
 int main(int argc, char **argv) {
+#ifndef __EMX__
     struct rlimit rl;
+#endif
 
     if (argc <= 1) {
 	fprintf(stderr, "Usage: %s program [args]\n", argv[0]);
 	exit(EXIT_FAILURE);
     }
+#ifndef __EMX__
     if (getrlimit(RLIMIT_CORE, &rl))
 	barf("getrlimit");
     rl.rlim_cur = rl.rlim_max;
     if (setrlimit(RLIMIT_CORE, &rl))
 	barf("setrlimit");
+#endif
     execv(argv[1], argv+1);
     fprintf(stderr, "execv: ");
     barf(argv[1]);

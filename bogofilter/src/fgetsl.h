@@ -36,7 +36,7 @@ extern int fgetsl(/*@out@*/ char *buf /** output buffer */,
 extern int xfgetsl(/*@out@*/ char *buf /** output buffer */,
 	int siz /** capacity of buffer */,
 	/*@null@*/ FILE *stream /** input stream */,
-	int no_NUL_terminate /** \li if 0, the maximum amount of bytes read is size-1 and the buffer is NUL terminated.
-				 \li if non-0, the maximum amount of bytes read is size and the buffer WILL NOT BE NUL terminated. */);
+	bool no_NUL_terminate /** \li if false, the maximum amount of bytes read is size-1 and the buffer is NUL terminated.
+				  \li if true, the maximum amount of bytes read is size and the buffer WILL NOT BE NUL terminated. */);
 
 #endif
