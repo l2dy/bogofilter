@@ -105,6 +105,8 @@ mkdir $TMPDIR
 BOGOFILTER_DIR=$TMPDIR
 export BOGOFILTER_DIR
 
+WORDLIST="${TMPDIR}/wordlist.${DB_EXT}"
+
 verbose=0
 if [ "$1" = "-v" ]; then
     verbose=1
@@ -126,8 +128,14 @@ else
     echo "Results are in ${TMPDIR}.  Remove it after testing."
 fi
 
+create_empty_wordlist()
+{
+    rm -f $BOGOFILTER_DIR/*.${DB_EXT}
+    $BOGOUTIL -l $BOGOFILTER_DIR/wordlist.${DB_EXT} < /dev/null
+}
+
 if [ -z "$NODB" ]; then
-    $BOGOFILTER -n -C -y 0 </dev/null
+    create_empty_wordlist
 fi
 
 BF_CHECKTOOL=${BF_CHECKTOOL-glibc}

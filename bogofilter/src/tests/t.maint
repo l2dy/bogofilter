@@ -7,6 +7,7 @@ NODB=1 . ${srcdir=.}/t.frame
 
 OUT="$TMPDIR/maint.out"
 
+create_empty_wordlist
 $BOGOFILTER -C -y 0 -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER -C -y 0 -n < ${SYSTEST}/inputs/good.mbx
 
@@ -20,13 +21,13 @@ count 2 -> 949
 count 3 -> 610
 EOF
 
-echo initial: `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.$DB_EXT | wc -l` > $OUT
+echo initial: `$BOGOUTIL -d $WORDLIST | wc -l` > $OUT
 
 for cnt in 0 1 2 3 ; do
-    $BOGOUTIL -c $cnt -m $BOGOFILTER_DIR/wordlist.$DB_EXT
-    echo "count $cnt ->" `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.$DB_EXT | wc -l` >> $OUT
+    $BOGOUTIL -c $cnt -m $WORDLIST
+    echo "count $cnt ->" `$BOGOUTIL -d $WORDLIST | wc -l` >> $OUT
     if  [ $verbose -ne 0 ]; then
-	$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.$DB_EXT > $OUT.$cnt
+	$BOGOUTIL -d $WORDLIST > $OUT.$cnt
     fi
 done
 

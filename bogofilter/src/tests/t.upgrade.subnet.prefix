@@ -50,7 +50,7 @@ test 0 1
 this 0 1
 EOF
 
-WORDLIST="${TMPDIR}/wordlist.${DB_EXT}"
+create_empty_wordlist
 
 OPTS="-D -y 0"
 
