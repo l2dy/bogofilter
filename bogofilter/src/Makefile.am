@@ -34,6 +34,10 @@ endif
 AM_CPPFLAGS = -I$(top_srcdir)/trio -I$(top_srcdir) @GSL_CFLAGS@
 AM_CFLAGS = -DBOGOFILTER
 
+if ENABLE_MEMDEBUG
+AM_CFLAGS += -DENABLE_MEMDEBUG
+endif
+
 # what to build
 bin_PROGRAMS = bogofilter bogoutil bogolexer bogotune
 bin_SCRIPTS = bogoupgrade
