@@ -327,7 +327,7 @@ static void print_version(void)
 		  progtype, version, ds_version_str(), PACKAGE);
 }
 
-#define	OPTIONS	":-:bBc:Cd:DeFhHI:k:lL:m:MnNo:O:pqQRsStTuUvVx:X:y:"
+#define	OPTIONS	":-:bBc:Cd:DehHI:k:lL:m:MnNo:O:pqQRsStTuUvVx:X:y:"
 
 /** These functions process command line arguments.
  **
