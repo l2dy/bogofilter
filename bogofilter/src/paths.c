@@ -17,8 +17,6 @@ NAME:
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-#define BOGODIR ".bogofilter"
-
 char *build_progtype(const char *name, const char *db_type) 
 {
     char *type;
@@ -41,7 +39,7 @@ char *build_progtype(const char *name, const char *db_type)
 int build_path(char* dest, size_t size, const char* dir, const char* file)
 {
     /* If absolute path ... */
-    if (*file == '/') {
+    if (*file == SLASH) {
 	if (strlcpy(dest, file, size) >= size) 
 	    return -1;
 	else
@@ -50,8 +48,8 @@ int build_path(char* dest, size_t size, const char* dir, const char* file)
 
     if (strlcpy(dest, dir, size) >= size) return -1;
 
-    if ('/' != dest[strlen(dest)-1]) {
-	if (strlcat(dest, "/", size) >= size) return -1; /* RATS: ignore */
+    if (dest[strlen(dest)-1] != SLASH) {
+	if (strlcat(dest, SLASH_STR, size) >= size) return -1; /* RATS: ignore */
     }
 
     if (strlcat(dest, file, size) >= size) return -1;
@@ -78,8 +76,8 @@ char *create_path_from_env(const char *var,
     buff = xmalloc(path_size);
 
     strcpy(buff, env);
-    if ('/' != buff[env_size-1]) {
-	strcat(buff, "/");
+    if (buff[env_size-1] != SLASH) {
+	strcat(buff, SLASH_STR);
     }
     if (subdir != NULL) {
 	strcat(buff, subdir);
@@ -102,7 +100,7 @@ int check_directory(const char* path) /*@globals errno,stderr@*/
     rc = stat(path, &sb);
     if (rc < 0) {
 	if (ENOENT==errno) {
-	    if(mkdir(path, S_IRUSR|S_IWUSR|S_IXUSR)) {
+	    if (bf_mkdir(path, S_IRUSR|S_IWUSR|S_IXUSR)) {
 		fprintf(stderr, "Error creating directory \"%s\": %s\n",
 			path, strerror(errno));
 		return -1;

@@ -100,7 +100,7 @@ static void save_dirname(const char *name)
     size_t l = strlen(name);
     l = min(l, sizeof(dirname)-2);
     memcpy(dirname, name, l);
-    if (dirname[l-1] == '/')
+    if (dirname[l-1] == SLASH)
 	l -= 1;
     dirname[l] = '\0';
 }
