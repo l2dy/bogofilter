@@ -444,12 +444,12 @@
       <li>
         En utilisant "-v", Bogofilter génère la ligne d'entête
         "X-Bogosity:", par exemple
-	<pre>  X-Bogosity: No, tests=bogofilter, spamicity=0.500000</pre></li>
+	<pre>  X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000</pre></li>
 
       <li>
         En utilisant "-vv" Bogofilter génère un histogramme, par
         exemple 
-<pre>  X-Bogosity: No, tests=bogofilter, spamicity=0.500000
+<pre>  X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
           int  cnt    prob   spamicity  histogram
          0.00   29  0.000209  0.000052  #############################
          0.10    2  0.179065  0.003425  ##
@@ -479,7 +479,7 @@
         En utilisant "-vvv" on produit la liste de <em>tous</em>
         les tokens dans le message, avec de l'information pour
         chacun d'un. Par exemple: 
-<pre>  X-Bogosity: No, tests=bogofilter, spamicity=0.500000
+<pre>  X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
                         n    pgood     pbad      fw     U
   "which"              10  0.208333  0.000000  0.000041 +
   "own"                 7  0.145833  0.000000  0.000059 +
@@ -544,13 +544,14 @@
 	#
 	#	both ham_cutoff and spam_cutoff are allowed.
 	#	setting ham_cutoff to a non-zero value will
-	#	enable tristate results (Yes/No/Unsure).
+	#	enable tri-state results (Spam/Ham/Unsure).
 	#
-	#ham_cutoff  = 0.00
+	#ham_cutoff  = 0.45
 	#spam_cutoff = 0.99
 	#
-	## with Yes/No/Unsure output:
-	## ham_cutoff = 0.45
+	#	for two-state classification:
+	#
+	## ham_cutoff = 0.00
 	## spam_cutoff= 0.99</pre>
 
     <p>Pour activer la classification Yes/No/Unsure, enlevez les dièses devant les
@@ -559,7 +560,7 @@
     <p>Alternativement, si vous préférez utiliser les labels Spam/Ham/Unsure
     au lieu de Yes/No/Unsure, enlevez les dièses devant la ligne :
 
-    </p><pre>	## spamicity_tags = Spam, Ham, Unsure</pre>
+    <pre>	## spamicity_tags = Yes, No, Unsure</pre>
 
     <p>Une fois que cela est fait, vous pourrez inclure les règles de filtrage
     suivantes pour votre outil de messagerie:</p>

@@ -599,23 +599,24 @@
 	#
 	#	both ham_cutoff and spam_cutoff are allowed.
 	#	setting ham_cutoff to a non-zero value will
-	#	enable tristate results (Yes/No/Unsure).
+	#	enable tri-state results (Spam/Ham/Unsure).
 	#
-	#ham_cutoff  = 0.00
+	#ham_cutoff  = 0.45
 	#spam_cutoff = 0.99
 	#
-	## with Yes/No/Unsure output:
-	## ham_cutoff = 0.45
+	#	for two-state classification:
+	#
+	## ham_cutoff = 0.00
 	## spam_cutoff= 0.99</pre>
 
     <p>To turn on Yes/No/Unsure classification, remove the #'s from the last
     two lines.</p>
 
-    <p>Alternatively, if you'd rather use labels Spam/Ham/Unsure
-    instead of Yes/No/Unsure, remove the #'s from the following
+    <p>Alternatively, if you'd rather use labels Yes/No/Unsure
+    instead of Spam/Ham/Unsure, remove the #'s from the following
     bogofilter.cf line:
 
-    <pre>	## spamicity_tags = Spam, Ham, Unsure</pre>
+    <pre>	## spamicity_tags = Yes, No, Unsure</pre>
 
     <p>Once that's done, you may want to set the filtering rules for your mail
     program to include rules like:</p>
@@ -724,11 +725,11 @@
 	| $BOGOFILTER -p -e
 
 	:0:
-	* ^X-Bogosity:.Yes
+	* ^X-Bogosity:.Spam
 	spam
 
 	:0:
-	* ^X-Bogosity:.No
+	* ^X-Bogosity:.Ham
 	non-spam</pre>
 
     <hr>

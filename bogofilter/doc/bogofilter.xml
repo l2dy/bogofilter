@@ -487,15 +487,15 @@ intervene (with <option>-Ns</option> or <option>-Sn</option>) when
 <application>bogofilter</application> miscategorizes something.</para>
 <programlisting>
 <lineannotation>
-# filter mail through bogofilter, tagging it as spam and
-# updating the wordlist
+# filter mail through bogofilter, tagging it as Ham, Spam, or Unsure,
+# and updating the wordlist
 </lineannotation>
 :0fw
 | bogofilter -u -e -p
 
 <lineannotation>
-# if bogofilter failed, return the mail to the queue, the MTA will
-# retry to deliver it later
+# if bogofilter failed, return the mail to the queue;
+# the MTA will retry to deliver it later
 # 75 is the value for EX_TEMPFAIL in /usr/include/sysexits.h
 </lineannotation>
 :0e
@@ -507,6 +507,19 @@ intervene (with <option>-Ns</option> or <option>-Sn</option>) when
 :0:
 * ^X-Bogosity: Spam, tests=bogofilter
 spam-bogofilter
+<lineannotation>
+# file the mail to <filename>unsure-bogofilter</filename> 
+# if it's neither ham nor spam.
+</lineannotation>
+:0:
+* ^X-Bogosity: Unsure, tests=bogofilter
+unsure-bogofilter
+
+# With this recipe, you can train bogofilter starting with an empty
+# wordlist.  Be sure to check your unsure-folder regularly, take the
+# messages out of it, classify them as ham (or spam), and use them to
+# train bogofilter.
+
 </programlisting>
 
 <para>The following procmail rule will take mail on stdin and save

@@ -26,6 +26,10 @@ Briefly:
 	* Fixed an array overrun in bogotune that caused problems when
           using msg-count files.
 
+	* Include saving of Unsures in procmail example in man page.
+
+	* Change Yes/No/Unsure to Spam/Ham/Unsure in FAQ.
+
 	2005-01-09
 	
 	* bf_util scripts now use name 'BOGOHOME' for their directory
