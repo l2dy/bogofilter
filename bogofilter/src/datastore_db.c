@@ -109,7 +109,7 @@ static dbh_t *dbh_init(const char *path, const char *name)
     handle->path = xstrdup(path);
     handle->name = xmalloc(len);
     build_path(handle->name, len, path, name);
-    
+
     handle->locked     = false;
     handle->is_swapped = false;
 
@@ -305,7 +305,6 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 		    (short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
 	{
 	    int e = errno;
-	    handle->fd = -1;
 	    db_close(handle, true);
 	    handle = NULL;	/* db_close freed it, we don't want to use it anymore */
 	    errno = e;
@@ -387,16 +386,6 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 
     ret = dbp->get(dbp, NULL, &db_key, &db_data, 0);
 
-#if	0
-    if (val->leng < db_data.size) {
-	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%.*s' ), size error %lu::%lu",
-		    CLAMP_INT_MAX(token->leng), (char *)token->data,
-		    (unsigned long)val->leng,
-		    (unsigned long)db_data.size);
-	exit(EX_ERROR);
-    }
-#endif
-
     val->leng = db_data.size;		/* read count */
 
     switch (ret) {
@@ -463,13 +452,6 @@ void db_close(void *vhandle, bool nosync)
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "db_close (%s) %s\n",
 		handle->name, nosync ? "nosync" : "sync");
-
-#if 0
-    if (handle->fd >= 0) {
-	ds_lock(handle->fd, F_UNLCK,
-		(short int)(handle->open_mode == DB_READ ? F_RDLCK : F_WRLCK));
-    }
-#endif
 
     if ((ret = dbp->close(dbp, f)))
 	print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
