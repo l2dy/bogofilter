@@ -57,13 +57,15 @@ Without command-line options, bogofilter returns 1 if the message is non-spam, 0
 The \fB-s\fR tells bogofilter to register the text presented on standard input as spam. The spam wordfile is created if absent.
 
 .PP
-The \fB-n\fR tells bogofilter to register the text presented on standard input as non-spam.
+The \fB-h\fR tells bogofilter to register the text presented on standard
+input as ham (non-spam).
 
 .PP
 The \fB-S\fR tells bogofilter to register the text presented on standard input as spam and to undo a prior registration of the same message as non-spam.
 
 .PP
-The \fB-N\fR tells bogofilter to register the text presented on standard input as non-spam and to undo a prior registration of the same message as spam.
+The \fB-H\fR tells bogofilter to register the text presented on standard
+input as ham (non-spam) and to undo a prior registration of the same message as spam.
 
 .PP
 The \fB-d\fR allows you to set the directory under which wordlists will be found (normally \fI$HOME/.bogofilter\fR).
@@ -152,5 +154,9 @@ bogofilter counts messages on input by looking for From_ lines. As a special cas
 .SH "AUTHOR"
 
 .PP
-Eric S. Raymond <esr@thyrsus.com>. For updates, see the bogofilter project page: \fIhttp://www.tuxedo.org/~esr/bogofilter/\fR.
-
+Eric S. Raymond <esr@thyrsus.com>. For updates, see the bogofilter
+project pages:
+.PP
+http://www.tuxedo.org/~esr/bogofilter/
+.PP
+http://sourceforge.net/projects/bogofilter/
