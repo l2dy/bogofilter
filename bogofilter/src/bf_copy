@@ -30,7 +30,7 @@ SRC="$1"
 DST="$2"
 
 # flush mempools
-db_checkpoint -1h "$SRC" || :
+bogoutil --db-checkpoint "$SRC" || :
 
 mkdir "$DST"
 
