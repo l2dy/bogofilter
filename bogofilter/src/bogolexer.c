@@ -156,6 +156,10 @@ static void process_args_1(int argc, char **argv)
 	    exit(EX_ERROR);
 
 	case 'c':
+	    if (optarg == NULL) {
+		fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+		exit(EX_ERROR);
+	    }
 	    read_config_file(optarg, false, false, PR_COMMAND);
 	    /*@fallthrough@*/
 	    /* fall through to suppress reading config files */

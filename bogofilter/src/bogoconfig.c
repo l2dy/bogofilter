@@ -504,6 +504,10 @@ void process_args_1(int argc, char **argv)
 	    break;
 
 	case 'c':
+	    if (optarg == NULL) {
+		fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+		exit(EX_ERROR);
+	    }
 	    read_config_file(optarg, false, !quiet, PR_CFG_USER);
 
 	/*@fallthrough@*/
