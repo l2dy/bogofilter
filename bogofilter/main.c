@@ -35,7 +35,7 @@ int verbose, passthrough, nonspam_exits_zero;
 int Rtable = 0;
 enum algorithm algorithm = AL_GRAHAM;
 
-char directory[PATH_LEN];
+char directory[PATH_LEN] = "";
 
 int  logflag;
 char msg_register[80];
@@ -48,7 +48,7 @@ run_t run_type = RUN_NORMAL;
 /* if the given environment variable 'var' exists, copy it to 'dest' and
    tack on the optional 'subdir' value.
  */
-void set_dir_from_env(char* dest, char *var, char* subdir)
+static void set_dir_from_env(char* dest, const char *var, const char* subdir)
 {
     char *env;
     int path_left=PATH_LEN-1;
@@ -70,7 +70,7 @@ void set_dir_from_env(char* dest, char *var, char* subdir)
 /* check that our directory exists and try to create it if it doesn't
    return -1 on failure, 0 otherwise.
  */
-int check_directory(char* path)
+static int check_directory(const char* path)
 {
     int rc;
     struct stat sb;
@@ -109,7 +109,6 @@ int main(int argc, char **argv)
     openlog ( "bogofilter", LOG_PID, LOG_DAEMON );
 #endif
 
-    strcpy(directory, BOGODIR);
     set_dir_from_env(directory, "HOME", BOGODIR);
     set_dir_from_env(directory, "BOGOFILTER_DIR", NULL);
 
@@ -200,6 +199,12 @@ int main(int argc, char **argv)
 	    break;
 	}
 
+    if (!directory[0]) {
+	fprintf(stderr, "%s: cannot find bogofilter directory.\n"
+		"You must set the BOGOFILTER_DIR or HOME environment variables\n"
+		"or use the -d DIR option. The program aborts.\n", progname);
+	exit(2);
+    }
     if (check_directory(directory)) exit(2);
 
     setup_lists(directory);
