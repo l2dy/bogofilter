@@ -382,10 +382,10 @@ void *ds_init(const char *directory, const char *filename)
     dbe = dbe_init(&dir, &file);
 
     if (msg_count_tok == NULL) {
-	msg_count_tok = word_news((const byte *)MSG_COUNT);
+	msg_count_tok = word_news(MSG_COUNT);
     }
     if (wordlist_version_tok == NULL) {
-	wordlist_version_tok = word_news((const byte *)WORDLIST_VERSION);
+	wordlist_version_tok = word_news(WORDLIST_VERSION);
     }
     return dbe;
 }
