@@ -17,6 +17,11 @@ need to do the following:
 2. From the bogofilter directory, run:
 
    "./configure --with-tdb && make && make check && make install"
+  
+   To build an rpm, run:
+
+   "make with_tdb=1 rpm"
+
 
 3. To verify configuration, run:
 
