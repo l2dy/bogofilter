@@ -399,26 +399,34 @@ wordhash_convert_to_countlist(wordhash_t *whi, wordhash_t *db)
     hashnode_t *node;
     wordhash_t *who = wordhash_new();
 
+    xfree(who->bin);		/* discard extra storage */
+    who->bin = NULL;
+
     who->cnts = (wordcnts_t *) xcalloc(whi->count, sizeof(wordcnts_t));
 
     for(node = wordhash_first(whi); node != NULL; node = wordhash_next(whi)) {
 	wordprop_t *wp;
 	wordcnts_t *cnts = &who->cnts[who->count];
+
+	who->count += 1;
+
 	if (!msg_count_file)
 	    wp = wordhash_insert(db, node->key, sizeof(wordprop_t), NULL);
 	else
 	    wp = (wordprop_t *) node->buf;
-	cnts->good = wp->cnts.good;
-	cnts->bad  = wp->cnts.bad ;
-	who->count += 1;
-/*
-	word_free(node->key);
-	node->key = NULL;
-*/
-    }
 
-    xfree(who->bin);		/* discard extra storage */
-    who->bin = NULL;
+	if (whi->cnts == NULL) {
+	    cnts->good = wp->cnts.good;
+	    cnts->bad  = wp->cnts.bad ;
+	    word_free(node->key);
+	    node->key = NULL;
+	}
+	else {
+	    wordcnts_t *old = (wordcnts_t *) node;
+	    cnts->good = old->good;
+	    cnts->bad  = old->bad ;
+	}
+    }
 
     return who;
 }

@@ -393,10 +393,13 @@ static uint read_mailbox(char *arg)
     mbox_mode = true;
     bogoreader_init(1, &arg);
     while ((*reader_more)()) {
-	wordhash_t *wh = wordhash_new();
+	wordhash_t *whi, *whs;
 
-	collect_words(wh);
-	msglist_add(ns_or_sp->msgs, wh);
+	whi = wordhash_new();
+	collect_words(whi);
+
+	whs = wordhash_convert_to_countlist(whi, train);
+	msglist_add(ns_or_sp->msgs, whs);
 
 	if (verbose && (count % 100) == 0) {
 	    if ((count % 1000) != 0)
@@ -412,8 +415,7 @@ static uint read_mailbox(char *arg)
 	    count > max_messages_per_mailbox)
 	    break;
 
-	xfree(wh->bin);		/* discard excess storage */
-	wh->bin = NULL;
+	wordhash_free(whi);
     }
 
     ns_and_sp->count += count;
@@ -975,7 +977,8 @@ static rc_t bogotune(void)
     if (verbose) {
 	int tm = end - beg;
 	cnt = ns_cnt + sp_cnt;
-	printf("    %2dm:%02ds for %d messages.  avg - %5.1f msg/sec\n", MIN(tm), SECONDS(tm), cnt, (double)cnt/(tm));
+	printf("    %2dm:%02ds for %d messages.  avg - %5.1f msg/sec\n",
+	       MIN(tm), SECONDS(tm), cnt, (double)cnt/(tm));
     }
 
     if (msgs_good == 0 && msgs_bad == 0) {
@@ -1159,7 +1162,8 @@ static rc_t bogotune(void)
 
 	if (verbose >= SUMMARY) {
 	    uint tm = end - beg;
-	    printf("    %2dm:%02ds for %d iterations.  avg - %5.3fs\n", MIN(tm), SECONDS(tm), cnt, (double)(tm)/cnt);
+	    printf("    %2dm:%02ds for %d iterations.  avg - %5.3fs\n", 
+		   MIN(tm), SECONDS(tm), cnt, (double)(tm)/cnt);
 	}
 
 	printf("\n");
