@@ -225,7 +225,7 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case 'x':
-	    set_debug_mask( argv[optind] );
+	    set_debug_mask( optarg );
 	    break;
 	}
     }
