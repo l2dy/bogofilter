@@ -221,7 +221,7 @@ AC_HEADER_STDC
 AC_HEADER_STDBOOL
 AC_HEADER_DIRENT
 AC_HEADER_TIME
-AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h stdlib.h string.h strings.h sys/socket.h unistd.h sys/file.h stddef.h sys/time.h sys/select.h inttypes.h stdint.h])
+AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h stdlib.h string.h strings.h sys/socket.h unistd.h sys/file.h stddef.h sys/time.h sys/select.h inttypes.h stdarg.h stdint.h])
 AC_CHECK_HEADERS([limits.h float.h],,[AC_CHECK_HEADERS(values.h)])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
