@@ -334,9 +334,18 @@ size_t decode_text(word_t *w)
 	break;
     }
 
-    memcpy(beg, n.text, size);
+    n.leng = size;
+    n.text[n.leng] = '\0';
+
+    if (DEBUG_LEXER(3)) {
+	fputs("***  ", dbgout);
+	word_puts(&n, 0, dbgout);
+	fputs("\n", dbgout);
+    }
+
+    memcpy(beg, n.text, size+1);
     size += beg-text;
-    beg[size] = '\0';
+
     return size;
 }
 
