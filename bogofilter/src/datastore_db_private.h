@@ -63,6 +63,11 @@ typedef struct {
     dsm_v_pnv	 *dsm_log_flush;
 } dsm_t;
 
+#ifndef	DB_VERSION_MAJOR	/* if not Berkeley DB */
+typedef	void DB;
+typedef	void DB_TXN;
+#endif
+
 /** implementation internal type to keep track of databases
  * we have opened. */
 typedef struct {
@@ -71,12 +76,16 @@ typedef struct {
     char	*name;
     int		fd;		/* file descriptor of data base file */
     dbmode_t	open_mode;	/* datastore open mode, DS_READ/DS_WRITE */
+#ifdef	DB_VERSION_MAJOR	/* if Berkeley DB */
     DB		*dbp;		/* data base handle */
+#endif
     bool	locked;
     bool	is_swapped;	/* set if CPU and data base endianness differ */
     bool	created;	/* if newly created; for datastore.c (to add .WORDLIST_VERSION) */
     dbe_t	*dbenv;		/* "parent" environment */
+#ifdef	DB_VERSION_MAJOR	/* if Berkeley DB */
     DB_TXN	*txn;		/* transaction in progress or NULL */
+#endif
     /** OO database methods */
     dsm_t	*dsm;
 } dbh_t;
