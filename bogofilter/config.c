@@ -25,7 +25,6 @@ AUTHOR:
 #ifdef	HAVE_CHARSET
 #include "charset.h"
 #endif
-#include "directories.h"
 #include "find_home.h"
 #include "globals.h"
 #include "method.h"
