@@ -10,4 +10,9 @@ if [ ! -z "$BF_SAVEDIR" ] ; then
     fi
     mkdir $NAME.$DATE
     ( cd $TMPDIR ; tar cf - *) | ( cd $NAME.$DATE ; tar xf - )
+    while {
+	fname=$NAME.`date +"%Y%m%d-%H%M%S"`.tar.gz
+	test -f $fname
+    } ; do sleep 1 ; done
+    tar czf $fname $TMPDIR
 fi
