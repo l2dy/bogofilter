@@ -5,6 +5,23 @@
 NOTE: More information on important changes for bogofilters updaters
 is in the RELEASE.NOTES files.  Read it!!
 
+	2003-10-16
+
+	* English and french versions of bogofilter-faq.html revised.
+	* Tuning script doc/bogotune rewritten as C program.
+
+	2003-10-15
+
+	* Fix build problem in doc directory.
+	* Refactored source code so bogolexer will build without
+          datastore code.
+
+	2003-10-14
+
+	* Fix initialization problem that prevents reading more than
+          one msg-count file.
+	* Initialize wordhash storage.
+
 0.15.7	2003-10-13
 
 	* Include all tokens in bogoutil dump output (unless in

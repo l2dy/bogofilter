@@ -4,6 +4,17 @@
 
 Be sure to read RELEASE.NOTES-0.15 ...
 
+2003-10-16
+
+* Tuning script doc/bogotune rewritten as C program.
+* Fix build problem in doc directory.
+* Fix initialization problem that prevents reading more than
+  one msg-count file.
+* Initialize wordhash storage.
+* Refactored source code so bogolexer will build without datastore
+  code.
+* English and french versions of bogofilter-faq.html revised.
+
 0.15.7	2003-10-13
 
 * Added decoding of escaped characters in html.
