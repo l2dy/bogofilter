@@ -594,7 +594,17 @@ int main(int argc, char *argv[])
 	    break;
 
 	case 's':
-	    sscanf((char *)optarg, "%d,%d", &size_min, &size_max);
+	    {
+		unsigned long mi, ma;
+
+		if (2 == sscanf((const char *)optarg, "%lu,%lu", &mi, &ma)) {
+		    size_min = mi;
+		    size_max = ma;
+		} else {
+		    fprintf(stderr, "syntax error in argument \"%s\" of -s.",
+			    optarg);
+		}
+	    }
 	    break;
 
 	case 'n':

@@ -90,7 +90,7 @@ int main(int argc, char **argv) {
 		int l = strcspn((const char *)i, "\n");
 
 		if (l > base - i + st.st_size) l = base - i + st.st_size;
-		printf("%d:", i - base);
+		printf("%ld:", (long)(i - base));
 		fwrite(i, 1, strcspn((const char *)i, "\n"), stdout);
 		if (EOF == puts("")) {
 		    perror("stdout");

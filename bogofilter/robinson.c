@@ -232,7 +232,8 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 	    }
             robn ++;
         }
-	if (DEBUG_WORDLIST(3)) fprintf(dbgout, "%3d %3d %f %s\n", robn, count, prob, token);
+	if (DEBUG_WORDLIST(3)) fprintf(dbgout, "%3lu %3lu %f %s\n",
+		(unsigned long)robn, (unsigned long)count, prob, token);
     }
 
     /* Robinson's P, Q and S
@@ -277,8 +278,8 @@ double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 #ifdef	ENABLE_ROBINSON_METHOD
 void rob_print_summary(void)
 {
-    (void)fprintf(stdout, "%-*s %5d %9.5f %9.5f %9.6f %9.3f %9.3f %4.2f\n",
-		  MAXTOKENLEN+2, "P_Q_S_invs_logs_md", rob_stats.robn,
+    (void)fprintf(stdout, "%-*s %5lu %9.5f %9.5f %9.6f %9.3f %9.3f %4.2f\n",
+		  MAXTOKENLEN+2, "P_Q_S_invs_logs_md", (unsigned long)rob_stats.robn,
 		  rob_stats.p_pr, rob_stats.q_pr, rob_stats.s.spamicity, rob_stats.p_ln, rob_stats.q_ln, min_dev);
 }
 #endif

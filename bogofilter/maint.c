@@ -98,7 +98,7 @@ bool keep_size(size_t size)
 	return true;
     else {
 	bool ok = (size_min <= size) && (size <= size_max);
-	if (DEBUG_DATABASE(1)) fprintf(dbgout, "keep_size:  %d <= %d <= %d -> %c\n", size_min, size, size_max, ok ? 't' : 'f' );
+	if (DEBUG_DATABASE(1)) fprintf(dbgout, "keep_size:  %lu <= %lu <= %lu -> %c\n", (unsigned long)size_min, (unsigned long)size, (unsigned long)size_max, ok ? 't' : 'f' );
 	return ok;
     }
 }

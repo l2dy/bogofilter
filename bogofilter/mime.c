@@ -563,8 +563,7 @@ mime_decode (byte *buff, size_t size)
       return count;
 
   if (DEBUG_MIME (3))
-    fprintf (dbgout, "*** mime_decode %d \"%-.*s\"\n", size, (int) size - 1,
-	     buff);
+    fprintf (dbgout, "*** mime_decode %lu \"%-.*s\"\n", (unsigned long)size, size > INT_MAX ? INT_MAX : (int)(size - 1), buff);
 
   /* Do not decode "real" boundary lines */
   if (mime_is_boundary(buff, size) == true)

@@ -193,7 +193,7 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
 	double prob = cnt ? h->prob/cnt : 0.0;
 
 	/* print interval, count, probability, and spamicity */
-	(void)fprintf(stdout, "%s%5.2f %4d  %f  %f  ", stats_prefix, beg, cnt, prob, h->spamicity );
+	(void)fprintf(stdout, "%s%5.2f %4lu  %f  %f  ", stats_prefix, beg, (unsigned long)cnt, prob, h->spamicity );
 
 	/* scale histogram to 50 characters */
 	if (maxcnt>50) cnt = (cnt * 50 + maxcnt - 1) / maxcnt;
