@@ -242,10 +242,10 @@ bool db_created(void *vhandle)
 static void check_db_version(void)
 {
     int maj, min;
-    static int version_ok;
+    static bool version_ok = false;
 
     if (!version_ok) {
-	version_ok = 1;
+	version_ok = true;
 	(void)db_version(&maj, &min, NULL);
 	if (DEBUG_DATABASE(1))
 	    fprintf(dbgout, "db_version: Header version %d.%d, library version %d.%d\n",
@@ -1168,7 +1168,7 @@ retry:
     env = dbe_xinit(directory, 1024, 1024, catastrophic ? DB_RECOVER_FATAL : DB_RECOVER);
     if (env == NULL) {
 	if(!catastrophic) {
-	    catastrophic = 1;
+	    catastrophic = true;
 	    goto retry;
 	}
 	goto rec_fail;
