@@ -38,6 +38,7 @@ typedef struct {
     char *path;
     char *name;
     bool locked;
+    bool created;
     DEPOT *dbp;
 } dbh_t;
 
@@ -67,6 +68,7 @@ static dbh_t *dbh_init(const char *path, const char *name)
     build_path(handle->name, len, path, name);
 
     handle->locked = false;
+    handle->created = false;
 
     return handle;
 }
@@ -83,10 +85,19 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
+/* Returns is_swapped flag */
 bool db_is_swapped(void *vhandle)
 {
-    vhandle = NULL;	/* assignment to suppress compiler warning */
+    (void) vhandle;		/* suppress compiler warning */
     return false;
+}
+
+
+/* Returns created flag */
+bool db_created(void *vhandle)
+{
+    dbh_t *handle = vhandle;
+    return handle->created;
 }
 
 
@@ -101,8 +112,8 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     int flags;
     DEPOT *dbp;
 
-    if (open_mode == DS_WRITE)
-	flags = DP_OWRITER | DP_OCREAT;
+    if (open_mode & DS_WRITE)
+	flags = DP_OWRITER;		/*  | DP_OCREAT */
     else
 	flags = DP_OREADER;
 
@@ -111,6 +122,14 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     if (handle == NULL) return NULL;
 
     dbp = handle->dbp = dpopen(handle->name, flags, DB_INITBNUM);
+
+    if (dbp == NULL) {
+	if (flags & DP_OWRITER) {
+	    dbp = handle->dbp = dpopen(handle->name, flags | DP_OCREAT, DB_INITBNUM);
+	    if (dbp != NULL)
+		handle->created = true;
+	}
+    }
 
     if (dbp == NULL)
 	goto open_err;
