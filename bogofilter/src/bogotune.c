@@ -38,14 +38,17 @@ AUTHOR:
 #define	LIST_COUNT	2000
 #define	TEST_COUNT	500
 
-#define	SUMMARY	1	/* summarize main loop iterations */
-#define	PARMS	2	/* print parameter sets (rs, md, rx) */
-#define	SCORES	6	/* verbosity level for printing scores */
+enum e_verbosity {
+    SUMMARY	   = 1,	/* summarize main loop iterations */
+    PARMS	   = 2,	/* print parameter sets (rs, md, rx) */
+    SCORE_SUMMARY  = 4,	/* verbosity level for printing scores */
+    SCORE_DETAIL	/* verbosity level for printing scores */
+};
 
 #define	MOD(n,m)	((n) - ((int)((n)/(m)))*(m))
 
 #define	MIN(n)		((n)/60)
-#define SECONDS(n)		((n) - MIN(n)*60)
+#define SECONDS(n)	((n) - MIN(n)*60)
 
 #define	ROUND(f)	floor(f+0.5)
 
@@ -241,7 +244,7 @@ static void score_ns(double *results)
     uint i;
     uint count = 0;
 
-    if (verbose >= SCORES)
+    if (verbose >= SCORE_DETAIL)
 	printf("ns:\n");
 
     for (i=0; i < COUNTOF(ns_msglists->u.sets); i += 1) {
@@ -251,6 +254,8 @@ static void score_ns(double *results)
 	    wordhash_t *wh = item->wh;
 	    double score = (*method->compute_spamicity)(wh, NULL);
 	    results[count++] = score;
+	    if (verbose >= SCORE_DETAIL)
+		printf("%6d %0.16f\n", count-1, score);
 	}
     }
 
@@ -264,6 +269,9 @@ static void score_sp(double *results)
     uint i;
     uint count = 0;
 
+    if (verbose >= SCORE_DETAIL)
+	printf("sp:\n");
+
     for (i=0; i < COUNTOF(sp_msglists->u.sets); i += 1) {
 	mlhead_t *list = sp_msglists->u.sets[i];
 	mlitem_t *item;
@@ -271,6 +279,8 @@ static void score_sp(double *results)
 	    wordhash_t *wh = item->wh;
 	    double score = (*method->compute_spamicity)(wh, NULL);
 	    results[count++] = score;
+	    if (verbose >= SCORE_DETAIL)
+		printf("%6d %0.16f\n", count-1, score);
 	}
     }
 
@@ -828,6 +838,10 @@ static void final_recommendations(void)
 
 	printf("%sspam_cutoff=%5.3f\t# for %4.2f%% false positives; expect %4.2f%% false neg.\n",
 	       comment, cutoff, (mn != 1) ? 100.0 / mn : 100.0 * fp / ns_cnt, 100.0 * fn / sp_cnt);
+
+	if (verbose >= PARMS)
+	    printf("# mn %5d, ns_cnt %5d, sp_cnt %5d, fp %3d, fn %3d\n",
+		   mn, ns_cnt, sp_cnt, fp, fn);
 
 	comment = "#";
 	printed = true;
