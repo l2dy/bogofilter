@@ -21,10 +21,15 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-01-12
+	
+	* Fixed an array overrun in bogotune that caused problems when
+          using msg-count files.
+
 	2005-01-09
 	
 	* bf_util scripts now use name 'BOGOHOME' for their directory
-          parameter and check that it really is a directory. 
+          parameter and check that it really is a directory.
 
 0.93.4	2005-01-09
 
