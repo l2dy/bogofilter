@@ -98,6 +98,8 @@ rc_t bogofilter(int argc, char **argv)
 
     wordhash_t *words = register_aft ? wordhash_init() : NULL;
 
+    atexit(bf_exit);
+
     method->initialize();	/* initialize constants */
 
     if (query || classify_msg || write_msg) {

@@ -140,6 +140,7 @@ typedef struct {
 } wordprop_t;
 
 extern void bf_abort(void);
+extern void bf_exit(void);
 
 #define internal_error do { fprintf(stderr, "Internal error in %s:%u\n", __FILE__, __LINE__); abort(); } while(0)
 

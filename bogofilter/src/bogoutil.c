@@ -778,6 +778,8 @@ int main(int argc, char *argv[])
 	exit(EX_ERROR);
     }
 
+    atexit(bf_exit);
+
     switch(flag) {
 	case DUMP:
 	    return dump_file(ds_file);
