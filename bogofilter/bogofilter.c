@@ -53,7 +53,7 @@ void *collect_words(int fd, int *msg_count, int *word_count)
 {
   int tok = 0;
   int w_count = 0;
-  int mm_count = 0;
+  int m_count = 0;
  
   wordprop_t *w;
   hashnode_t *n;
@@ -69,8 +69,8 @@ void *collect_words(int fd, int *msg_count, int *word_count)
     }
     else {
       // End of message. Update message counts.
-      if (tok == FROM || (tok == 0 && mm_count == 0))
-        mm_count++;
+      if (tok == FROM || (tok == 0 && m_count == 0))
+        m_count++;
   
       // Incremenent word frequencies, capping each message's contribution at MAX_REPEATS
       // in order to be able to cap frequencies.
@@ -93,7 +93,7 @@ void *collect_words(int fd, int *msg_count, int *word_count)
     *word_count = w_count;
  
   if (msg_count)
-    *msg_count = mm_count;
+    *msg_count = m_count;
  
   return(h);
 }
