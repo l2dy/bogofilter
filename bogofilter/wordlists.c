@@ -24,8 +24,8 @@
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-#define	MIN_SLEEP	1000		/* 1 millisecond */
-#define	MAX_SLEEP	1000000l	/* 1 second */
+#define	MIN_SLEEP	500l		/* .5 milliseconds */
+#define	MAX_SLEEP	2000000l	/* 2 seconds */
 
 wordlist_t *good_list;
 wordlist_t *spam_list;
@@ -117,16 +117,18 @@ void open_wordlists(dbmode_t mode)
 	    list->dbh = db_open(list->filepath, list->filename, mode, directory);
 	    if (list->dbh == NULL) {
 		int err = errno;
-		close_wordlists(); /* unlock and close */
+		close_wordlists(true); /* unlock and close */
 		switch(err) {
 		    /* F_SETLK can't obtain lock */
 		    case EAGAIN:
 		    case EACCES:
 			{
 			    struct timeval to;
-			    to.tv_sec = 0;
-			    to.tv_usec = MIN_SLEEP +
-				(long) ((MAX_SLEEP-MIN_SLEEP)*rand()/(RAND_MAX+1.0));
+			    long delay = MIN_SLEEP + (long)
+				((MAX_SLEEP-MIN_SLEEP)*rand()/(RAND_MAX+1.0));
+
+			    to.tv_sec  = delay / 1000000;
+			    to.tv_usec = delay % 1000000;
 			    select(0,NULL,NULL,NULL,&to);
 			}
 			retry = 1;
@@ -143,13 +145,14 @@ void open_wordlists(dbmode_t mode)
     } while(retry);
 }
 
-void close_wordlists(void)
+/** close all open word lists */
+void close_wordlists(bool nosync /** Normally false, if true, do not synchronize data. This should not be used in regular operation but only to ease the disk I/O load when the lock operation failed. */)
 {
     wordlist_t *list;
 
     for ( list = word_lists; list != NULL; list = list->next )
     {
-	if (list->dbh) db_close(list->dbh);
+	if (list->dbh) db_close(list->dbh, nosync);
 	list->dbh = NULL;
     }
 }

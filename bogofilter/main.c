@@ -174,7 +174,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     textblock_free(textblocks);
 
-    close_wordlists();
+    close_wordlists(false);
     free_wordlists();
 
 #ifdef HAVE_SYSLOG_H

@@ -168,7 +168,7 @@ static int db_oper(const char *path, dbmode_t open_mode, db_foreach_t funct,
     } else {
 	int r = db_foreach(dbh, funct, userdata);
 	if (r) {
-	    db_close(dbh);
+	    db_close(dbh, false);
 	    return r;
 	}
     }
@@ -273,7 +273,7 @@ static int load_file(char *db_file)
 	count += db_getvalue(dbh, (char *)buf);
 	db_setvalue(dbh, (char *)buf, count);
     }
-    db_close(dbh);
+    db_close(dbh, false);
 
     if (verbose)
 	fprintf(dbgout, "%d tokens loaded\n", load_count);
@@ -334,7 +334,7 @@ static int words_from_list(const char *db_file, int argc, char **argv)
 	}
     }
 
-    db_close(dbh);
+    db_close(dbh, false);
 
     return rv;
 }
@@ -402,8 +402,8 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 	printf(data_format, token, spam_count, good_count, gra_prob, rob_prob);
     }
 
-    db_close(dbh_good);
-    db_close(dbh_spam);
+    db_close(dbh_good, false);
+    db_close(dbh_spam, false);
 
     return 0;
 }
@@ -498,13 +498,13 @@ static int compute_robinson_x(char *path)
     open_wordlists(DB_READ);
 
     robx = compute_robx(wl[1].dbh, wl[0].dbh);
-    close_wordlists();
+    close_wordlists(false);
     free(wl[0].filename);
     free(wl[1].filename);
 
     dbh_spam = db_open(db_spam_file, "spam", DB_WRITE, directory);
     db_setvalue(dbh_spam, ".ROBX", (uint32_t) (robx * 1000000));
-    db_close(dbh_spam);
+    db_close(dbh_spam, false);
 
     return 0;
 }

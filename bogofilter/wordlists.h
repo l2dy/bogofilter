@@ -28,7 +28,7 @@ int setup_wordlists(const char* dir);
 bool configure_wordlist(const char *val);
 
 void open_wordlists(dbmode_t);
-void close_wordlists(void);
+void close_wordlists(bool);
 void free_wordlists(void);
 
 void set_good_weight(double weight);

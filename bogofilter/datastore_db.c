@@ -148,7 +148,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
     if (ret != 0) {
 	handle->dbp->err (handle->dbp, ret, "%s (db) get_byteswapped: %s",
 		progname, db_file);
-	db_close(handle);
+	db_close(handle, false);
 	goto open_err;
     }
 
@@ -156,7 +156,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
     if (ret < 0) {
 	handle->dbp->err (handle->dbp, ret, "%s (db) fd: %s",
 		progname, db_file);
-	db_close(handle);
+	db_close(handle, false);
 	goto open_err;
     }
 
@@ -165,7 +165,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
     {
 	int e = errno;
 	handle->fd = -1;
-	db_close(handle);
+	db_close(handle, true);
 	errno = e;
 	/* do not goto open_err here, db_close frees the handle! */
 	return NULL;
@@ -364,21 +364,25 @@ void db_set_msgcount(void *vhandle, uint32_t count){
 
 
 /* Close files and clean up. */
-void db_close(void *vhandle){
+void db_close(void *vhandle, bool nosync){
   dbh_t *handle = vhandle;
   int ret;
+  uint32_t f = nosync ? DB_NOSYNC : 0;
+
+  if (DEBUG_DATABASE(1)) {
+      fprintf(dbgout, "db_close(%s, %s, %s)\n", handle->name, handle->filename,
+	      nosync ? "true" : "false");
+  }
 
   if (handle == NULL) return;
+#if 0
   if (handle->fd >= 0) {
       db_lock(handle->fd, F_UNLCK,
 	      (short int)(handle->open_mode == DB_READ ? F_RDLCK : F_WRLCK));
   }
-  if ((ret = handle->dbp->close(handle->dbp, 0))) {
+#endif
+  if ((ret = handle->dbp->close(handle->dbp, f))) {
     print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
-  }
-
-  if (DEBUG_DATABASE(1)) {
-      fprintf(dbgout, "db_close( %s, %s )\n", handle->name, handle->filename);
   }
 
 /*  db_lock_release(handle); */
