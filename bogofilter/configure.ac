@@ -3,7 +3,12 @@ AC_INIT(bogofilter, 0.15.7.cvs)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR([src])
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE
+
+dnl foreign: don't insist on ChangeLog
+dnl 1.6: minimum version of automake/aclocal
+dnl dist-bzip2: make dist emits bogofilter-$VERSION.tar.bz2
+AM_INIT_AUTOMAKE([foreign 1.6 dist-bzip2])
+
 AM_CONFIG_HEADER(src/config.h:config.in)
 AC_PROG_AWK
 AC_PROG_CC(gcc xlc cc)
