@@ -37,11 +37,12 @@ libbogofilter_a_SOURCES= \
 	globals.h globals.c \
 	directories.c version.c \
 	base64.h base64.c \
-	bogoconfig.h config.c \
+	bogoconfig.h bogoconfig.c \
 	bool.h bool.c \
 	buff.h buff.c \
 	charset.h charset.c \
 	collect.h collect.c \
+	configfile.h configfile.c \
 	datastore.h datastore_db.c \
 	debug.h debug.c \
 	error.h error.c \

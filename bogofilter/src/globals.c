@@ -20,6 +20,7 @@ AUTHOR:
 bool	twostate;			/* '-2' */
 bool	threestate;			/* '-3' */
 bool	nonspam_exits_zero;		/* '-e' */
+bool	suppress_config_file;		/* '-C' */
 bool	force;				/* '-F' */
 bool	fisher;				/* '-f' */
 bool	logflag;			/* '-l' */

@@ -3,7 +3,7 @@
 #ifndef FORMAT_H
 #define FORMAT_H
 
-#include "bogoconfig.h"
+#include "configfile.h"
 
 /* Global variables */
 

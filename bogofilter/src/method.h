@@ -8,8 +8,8 @@
 #ifndef	METHOD_H
 #define	METHOD_H
 
-#include "bogoconfig.h"
 #include "bogofilter.h"
+#include "configfile.h"
 #include "wordhash.h"
 
 typedef struct bogostat_s bogostat_t;

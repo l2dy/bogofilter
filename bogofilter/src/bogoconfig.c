@@ -3,7 +3,9 @@
 /*****************************************************************************
 
 NAME:
-   config.c -- process config file parameters
+   bogoconfig.c -- process config file parameters
+
+   2003-02-12 - split out from config.c	
 
 AUTHOR:
    David Relson <relson@osagesoftware.com>
@@ -26,6 +28,7 @@ AUTHOR:
 #include "bogofilter.h"
 #include "bool.h"
 #include "charset.h"
+#include "configfile.h"
 #include "maint.h"
 #include "error.h"
 #include "find_home.h"
@@ -64,10 +67,6 @@ AUTHOR:
 
 char outfname[PATH_LEN] = "";
 
-const char *user_config_file   = "~/.bogofilter.cf";
-
-bool	stats_in_header = true;
-
 run_t run_type = RUN_NORMAL; 
 
 const char *logtag = NULL;
@@ -91,12 +90,8 @@ enum algorithm_e {
 
 /* Local variables and declarations */
 
-static bool suppress_config_file = false;
 static enum algorithm_e algorithm = AL_DEFAULT;
 static bool cmd_algorithm = false;		/* true if specified on command line */
-
-static bool select_algorithm(const unsigned char ch, bool cmdline);
-static bool config_algorithm(const unsigned char *s);
 
 /*---------------------------------------------------------------------------*/
 
@@ -110,7 +105,7 @@ static bool config_algorithm(const unsigned char *s);
 **		so config.c won't generate an error message.
 */
 
-static const parm_desc sys_parms[] =
+const parm_desc sys_parms[] =
 {
     { "stats_in_header",  CP_BOOLEAN,	{ (void *) &stats_in_header } },
     { "user_config_file", CP_STRING,	{ &user_config_file } },
@@ -146,14 +141,12 @@ static const parm_desc sys_parms[] =
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
 
-static const parm_desc *usr_parms = NULL;
-
-static bool config_algorithm(const unsigned char *s)
+bool config_algorithm(const unsigned char *s)
 {
     return select_algorithm(tolower(*s), false);
 }
 
-static bool select_algorithm(const unsigned char ch, bool cmdline)
+bool select_algorithm(const unsigned char ch, bool cmdline)
 {
     enum algorithm_e al = ch;
 
@@ -187,177 +180,6 @@ static bool select_algorithm(const unsigned char ch, bool cmdline)
     }
     usr_parms = method->config_parms;
     return true;
-}
-
-static bool process_config_parameter(const parm_desc *arg, const unsigned char *val)
-{
-    bool ok = true;
-    while (isspace(*val) || *val == '=') val += 1;
-    if (arg->addr.v == NULL)
-	return ok;
-    switch (arg->type)
-    {
-	case CP_BOOLEAN:
-	    {
-		*arg->addr.b = str_to_bool((const char *)val);
-		if (DEBUG_CONFIG(0))
-		    fprintf(dbgout, "%s -> %s\n", arg->name,
-			    *arg->addr.b ? "Yes" : "No");
-		break;
-	    }
-	case CP_INTEGER:
-	    {
-		int sign = (*val == '-') ? -1 : 1;
-		if (*val == '-' || *val == '+')
-		    val += 1;
-		*arg->addr.i = atoi((const char *)val) * sign;
-		if (DEBUG_CONFIG(0))
-		    fprintf(dbgout, "%s -> %d\n", arg->name, *arg->addr.i);
-		break;
-	    }
-	case CP_DOUBLE:
-	    {
-		double sign = (*val == '-') ? -1.0f : 1.0f;
-		if (*val == '-' || *val == '+')
-		    val += 1;
-		*arg->addr.d = atof((const char *)val) * sign;
-		if (DEBUG_CONFIG(0))
-		    fprintf(dbgout, "%s -> %f\n", arg->name, *arg->addr.d);
-		break;
-	    }
-	case CP_CHAR:
-	    {
-		*arg->addr.c = *(const char *)val;
-		if (DEBUG_CONFIG(0))
-		    fprintf(dbgout, "%s -> '%c'\n", arg->name, *arg->addr.c);
-		break;
-	    }
-	case CP_STRING:
-	    {
-		*arg->addr.s = xstrdup((const char *)val);
-		if (DEBUG_CONFIG(0))
-		    fprintf(dbgout, "%s -> '%s'\n", arg->name, *arg->addr.s);
-		break;
-	    }
-	case CP_DIRECTORY:
-	    {
-		char *dir = *arg->addr.s;
-		xfree(dir);
-		*arg->addr.s = dir = tildeexpand((const char *)val);
-		if (DEBUG_CONFIG(0))
-		    fprintf(dbgout, "%s -> '%s'\n", arg->name, dir);
-		if (setup_wordlists(dir) != 0)
-		    exit(2);
-		break;
-	    }
-	case CP_FUNCTION:
-	{
-	    ok = (*arg->addr.f)(val);
-	    if (DEBUG_CONFIG(0))
-		fprintf(dbgout, "%s -> '%c'\n", arg->name, *val);
-	    break;
-	}
-	default:
-	    {
-		ok = false;
-		break;
-	    }
-    }
-    return ok;
-}
-
-static bool process_config_line( const unsigned char *line, const parm_desc *parms )
-{
-    size_t len;
-    const unsigned char *val;
-    const parm_desc *arg;
-
-    if (parms == NULL)
-	return false;
-
-    for (val=line; *val != '\0'; val += 1) {
-	if (isspace(*val) || *val == '=') {
-	    break;
-	}
-    }
-    len = val - line;
-    for ( arg = parms; arg->name != NULL; arg += 1 )
-    {
-	if (DEBUG_CONFIG(1))
-	    fprintf(dbgout, "Testing:  %s\n", arg->name);
-	if (strncmp(arg->name, (const char *)line, len) == 0)
-	{
-	    bool ok = process_config_parameter(arg, val);
-	    if (DEBUG_CONFIG(1) && ok )
-		fprintf(dbgout, "%s\n", "   Found it!");
-	    return ok;
-	}
-    }
-    return false;
-}
-
-static void read_config_file(const char *fname, bool tilde_expand)
-{
-    bool error = false;
-    int lineno = 0;
-    FILE *fp;
-    char *filename;
-
-    if (tilde_expand) {
-	filename = tildeexpand(fname);
-    } else {
-	filename = xstrdup(fname);
-    }
-
-    fp = fopen(filename, "r");
-
-    if (fp == NULL) {
-	if (DEBUG_CONFIG(0)) {
-	    fprintf(dbgout, "Debug: cannot open %s: %s\n", filename, strerror(errno));
-	}
-	xfree(filename);
-	return;
-    }
-
-    if (DEBUG_CONFIG(0))
-	fprintf(dbgout, "Reading %s\n", filename);
-
-    while (!feof(fp))
-    {
-	size_t len;
-	unsigned char buff[MAXBUFFLEN];
-
-	memset(buff, '\0', sizeof(buff));		/* for debugging */
-
-	lineno += 1;
-	if (fgets((char *)buff, sizeof(buff), fp) == NULL)
-	    break;
-	len = strlen((char *)buff);
-	if ( buff[0] == '#' || buff[0] == ';' || buff[0] == '\n' )
-	    continue;
-	while (iscntrl(buff[len-1]))
-	    buff[--len] = '\0';
-
-	if ( ! process_config_line( buff, usr_parms ) &&
-	     ! process_config_line( buff, sys_parms ) &&
-	     ! process_config_line( buff, format_parms ))
-	{
-	    error = true;
-	    if (!quiet)
-		fprintf( stderr, "%s:%d:  Error - unknown parameter in '%s'\n", filename, lineno, buff );
-	}
-    }
-
-    if (ferror(fp)) {
-	fprintf(stderr, "Read error while reading file \"%s\".", filename);
-	error = true;
-    }
-
-    (void)fclose(fp); /* we're just reading, so fclose should succeed */
-    xfree(filename);
-
-    if (error)
-	exit(2);
 }
 
 static int validate_args(void)
@@ -651,23 +473,4 @@ int process_args(int argc, char **argv)
     exitcode = validate_args();
 
     return exitcode;
-}
-
-/* exported */
-void process_config_files(void)
-{
-    if (! suppress_config_file)
-    {
-	read_config_file(system_config_file, false);
-	read_config_file(user_config_file, true);
-    }
-
-    stats_prefix= stats_in_header ? "\t" : "#   ";
-
-    if (DEBUG_CONFIG(0))
-	fprintf(dbgout, "stats_prefix: '%s'\n", stats_prefix);
-
-    init_charset_table(charset_default, true);
-
-    return;
 }

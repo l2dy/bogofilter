@@ -16,6 +16,7 @@
 /* command line options */
 extern	bool	twostate;		/* '-2' */
 extern	bool	threestate;		/* '-3' */
+extern	bool	suppress_config_file;	/* '-C' */
 extern	bool	nonspam_exits_zero;	/* '-e' */
 extern	bool	fisher;			/* '-f' */
 extern	bool	force;			/* '-F' */
