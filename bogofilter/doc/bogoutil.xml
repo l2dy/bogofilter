@@ -58,6 +58,7 @@
 	    <command>bogoutil</command>
 	    <arg choice="opt">-v</arg>
 	    <arg choice="opt">-n</arg>
+	    <arg choice="opt">-C</arg>
 	    <arg choice="opt">-D</arg>
 	    <arg choice="opt">-a <replaceable>age</replaceable></arg>
 	    <arg choice="opt">-c <replaceable>count</replaceable></arg>
@@ -143,6 +144,8 @@
 	    The <option>-v</option> option produces verbose output on <option>stderr</option>.
 	    This option is primarily useful for debugging.
 	</para>
+	<para>The <option>-C</option> inhibits reading configuration
+	    files and lets bogoutil go with the defaults.</para>
 	<para>The <option>-D</option> redirects debug output to stdout (it
 	    usually goes to stderr).</para>
 	<para>The <option>-x <replaceable>flags</replaceable></option>
