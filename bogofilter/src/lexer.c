@@ -36,9 +36,9 @@ lexer_t *lexer = NULL;
 /* Local Variables */
 
 static lexer_t v3_lexer = {
-    lexer_v3_lex,
-    &lexer_v3_text,
-    &lexer_v3_leng
+    yylex,
+    &yytext,
+    &yyleng
 };
 
 lexer_t msg_count_lexer = {
@@ -91,8 +91,9 @@ static int yy_get_new_line(buff_t *buff)
 	yylineno += 1;
 
     if (count == EOF) {
-	if ( !ferror(fpin)) 
+	if (fpin == NULL || !ferror(fpin)) {
 	    return YY_NULL;
+	}
 	else {
 	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
 	    exit(EX_ERROR);
@@ -156,9 +157,9 @@ static int get_decoded_line(buff_t *buff)
     {
 	word_t line;
 	uint decoded_count;
-
         line.leng = (uint) (buff->t.leng - used);
 	line.text = buff->t.text + used;
+
 	decoded_count = mime_decode(&line);
 	/*change buffer size only if the decoding worked */
 	if (decoded_count != 0 && decoded_count < (uint) count) {
@@ -189,7 +190,7 @@ static int skip_folded_line(buff_t *buff)
 	count = reader_getline(buff);
 	yylineno += 1;
 	if (count <= 1 || !isspace(buff->t.text[0])) 
-  	    return count;
+	    return count;
     }
 
 /*    return EOF; */
@@ -290,11 +291,9 @@ size_t text_decode(word_t *w)
 		len = base64_decode(&n);	/* decode base64 */
 	    break;
 	case 'q':
-	{
 	    if (qp_validate(&n))
 		len = qp_decode(&n);		/* decode quoted-printable */
 	    break;
-	}
 	}
 
 	n.leng = len;

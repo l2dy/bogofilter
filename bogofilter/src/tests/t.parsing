@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
 #	 parsing.YYYYMMDD.  This is useful when something is different.
@@ -32,11 +30,12 @@ if  [ $verbose -ne 0 ]; then
     wc -l ${TMPDIR}/parsing.sor
 fi
 
-OUT="${srcdir}/outputs/parsing.out"
+OUT="${OUTPUTS}/parsing.out"
+
 if  [ $verbose -eq 0 ]; then
-    cmp $OUT ${TMPDIR}/`basename $OUT`
+    cmp $OUT ${TMPDIR}/parsing.out
 else
-    diff $DIFF_BRIEF $OUT ${TMPDIR}/`basename $OUT`
+    diff $DIFF_BRIEF $OUT ${TMPDIR}/parsing.out
 fi
 
 map_rc()

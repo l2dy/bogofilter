@@ -2,10 +2,6 @@
 
 			bogofilter TODO list
 
-**** 0.14: revise $(SHELL) macros, BSD make apparently uses the user's
-login shell, for example /usr/local/bin/zsh, which can cause arbitrary
-test failures. Make sure we have a Bourne/Korn-style shell.
-
 **** New Feature: Token aging. Support for struct data in the wordlists is
 already present.
 
@@ -34,10 +30,6 @@ http://razor.sourceforge.net/
 there's a general notion of tagged categories (spam being one) with
 cluster analysis being applied to categorize which categories a
 message belongs to at above 0.9 confidence level.
-
-**** Design Enhancement: Cascade lexers. Have one to analyze the
-structure and a selection of lexers to analyze the tokens.
-Use a functional approach to nest these lexers?
 
 **** New Feature: Web based tool for wordlist management. Allow message
 registration and whitelist management. HTML Templatized for easy integration

@@ -249,7 +249,7 @@ static bool open_mailstore(const char *name)
     switch (isdir(filename)) {
     case IS_FILE:
 	if (DEBUG_READER(0))
-	    fprintf(dbgout, "%s:%d - assuming %s is a %s\n", __FILE__, __LINE__, filename, mbox_mode ? "mbox" : "mail");
+	    fprintf(dbgout, "%s:%d - assuming %s is a %s\n", __FILE__, __LINE__, filename, mbox_mode ? "mbox" : "message");
 	fpin = fopen( filename, "r" );
 	if (fpin == NULL) {
 	    fprintf(stderr, "Can't open file '%s': %s\n", filename,
@@ -261,8 +261,6 @@ static bool open_mailstore(const char *name)
 	    mailstore_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
 	    return true;
 	}
-	/*NOTREACHED*/
-	break;
     case IS_DIR:
 	if (ismaildir(filename) == IS_DIR) {
 	    /* MAILDIR */
@@ -279,8 +277,6 @@ static bool open_mailstore(const char *name)
 	    mailstore_next_mail = dir_next_mail;
 	    return true;
 	}
-	/*NOTREACHED*/
-	break;
     case IS_ERR:
 	fprintf(stderr, "Can't stat mailstore '%s': %s\n",
 		filename, strerror(errno));
@@ -425,7 +421,8 @@ static bool dir_next_mail(void)
 	    continue;
 
 	if (DEBUG_READER(0))
-	    fprintf(dbgout, "%s:%d - reading %s (%p)\n", __FILE__, __LINE__, filename, fpin);
+	    fprintf(dbgout, "%s:%d - reading %s (%p)\n", __FILE__, __LINE__,
+		    filename, (void *)fpin);
 
 	return true;
     }

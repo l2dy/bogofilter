@@ -25,7 +25,7 @@ PARSING_TESTS = \
 	t.lexer t.lexer.mbx \
 	t.folded_rfc2047
 
-WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest
+WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest t.upgrade.subnet.prefix t.multiple.wordlists
 
 SCORING_TESTS =  t.score1 t.score2 t.systest t.grftest t.bogoutil-hist
 

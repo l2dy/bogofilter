@@ -122,6 +122,8 @@ struct option long_options[] = {
     { "verbosity",			N, 0, 'v' },
     { "block_on_subnets",		R, 0, O_BLOCK_ON_SUBNETS },
     { "charset_default",		R, 0, O_CHARSET_DEFAULT },
+    { "ns_esf",				R, 0, O_NS_ESF },
+    { "sp_esf",				R, 0, O_SP_ESF },
     { "ham_cutoff",			R, 0, O_HAM_CUTOFF },
     { "header_format",			R, 0, O_HEADER_FORMAT },
     { "log_header_format",		R, 0, O_LOG_HEADER_FORMAT },
@@ -142,6 +144,7 @@ struct option long_options[] = {
     { "timestamp",			R, 0, O_TIMESTAMP },
     { "unsure_subject_tag",		R, 0, O_UNSURE_SUBJECT_TAG },
     { "user_config_file",		R, 0, O_USER_CONFIG_FILE },
+    { "wordlist",			R, 0, O_WORDLIST },
     { NULL,				0, 0, 0 }
 };
 
@@ -172,24 +175,12 @@ static char *get_string(const char *name, const char *arg)
     return s;
 }
 
-static void set_bogofilter_dir(const char *name, const char *arg, int precedence)
-{
-    char *dir = tildeexpand(arg, true);
-    if (DEBUG_CONFIG(2))
-	fprintf(dbgout, "%s -> '%s'\n", name, dir);
-    if (setup_wordlists(dir, precedence) != 0)
-	exit(EX_ERROR);
-    xfree(dir);
-    return;
-}
-
 void process_parameters(int argc, char **argv, bool warn_on_error)
 {
     bogotest = 0;
     verbose = 0;
     run_type = RUN_UNKNOWN;
     fpin = stdin;
-    dbgout = stderr;
     set_today();		/* compute current date for token age */
 
     process_arglist(argc, argv, PR_COMMAND, PASS_1_CLI);
@@ -198,16 +189,13 @@ void process_parameters(int argc, char **argv, bool warn_on_error)
 
     /* directories from command line and config file are already handled */
 
-    if (setup_wordlists(NULL, PR_ENV_BOGO) != 0 &&
-	setup_wordlists(NULL, PR_ENV_HOME) != 0) {
+    if (set_wordlist_dir(NULL, PR_ENV_BOGO) != 0 &&
+	set_wordlist_dir(NULL, PR_ENV_HOME) != 0) {
 	fprintf(stderr, "Can't find HOME or BOGOFILTER_DIR in environment.\n");
 	exit(EX_ERROR);
     }
 
     stats_prefix= stats_in_header ? "  " : "# ";
-
-    if (DEBUG_CONFIG(0))
-	fprintf(dbgout, "stats_prefix: '%s'\n", stats_prefix);
 
     return;
 }
@@ -470,8 +458,12 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'c':
-	if (pass == PASS_1_CLI)
-	    read_config_file(val, false, !quiet, PR_CFG_USER);
+	if (pass == PASS_1_CLI) {
+	    if (!read_config_file(val, false, !quiet, PR_CFG_USER)) {
+		fprintf(stderr, "Cannot open %s: %s\n", val, strerror(errno));
+		exit(EX_ERROR);
+	    }
+	}
 
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
@@ -587,7 +579,17 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 
     case 'd':
 	if (pass != PASS_1_CLI)
-	    set_bogofilter_dir(WORDLIST, val, precedence);
+	    set_wordlist_dir(val, precedence);
+	break;
+
+    case O_NS_ESF:
+	if (pass != PASS_1_CLI)
+	    get_double(name, val, &ns_esf);
+	break;
+
+    case O_SP_ESF:
+	if (pass != PASS_1_CLI)
+	    get_double(name, val, &sp_esf);
 	break;
 
     case 'H':
@@ -669,6 +671,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case O_THRESH_UPDATE:		get_double(name, val, &thresh_update);			break;
     case O_TIMESTAMP:			timestamp_tokens = get_bool(name, val);			break;
     case O_UNSURE_SUBJECT_TAG:		unsure_subject_tag = get_string(name, val);		break;
+    case O_WORDLIST:			configure_wordlist(val);				break;
     }
 }
 
@@ -684,6 +687,8 @@ void query_config(void)
     fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "min_dev", min_dev, min_dev);
     fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "ham_cutoff", ham_cutoff, ham_cutoff);
     fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "spam_cutoff", spam_cutoff, spam_cutoff);
+    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "ns_esf", ns_esf, ns_esf);
+    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "sp_esf", sp_esf, sp_esf);
     fprintf(stdout, "\n");
     fprintf(stdout, "%-17s = %s\n",    "block_on_subnets",    YN(block_on_subnets));
     fprintf(stdout, "%-17s = %s\n",    "charset_default",     charset_default);
@@ -713,6 +718,6 @@ static void display_tag_array(const char *label, FIELD *array)
 
     fprintf(stdout, "%s =", label);
     for (i = 0; i < count; i += 1)
-	fprintf(stdout, "%s ", array[i]);
+	fprintf(stdout, "%s %s", (i == 0) ? "" : ",", array[i]);
     fprintf(stdout, "\n");
 }

@@ -40,6 +40,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     rc_t status;
     ex_t exitcode = EX_OK;
 
+    dbgout = stderr;
+
     progtype = build_progtype(progname, DB_TYPE);
 
     process_parameters(argc, argv, true);
@@ -50,7 +52,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	openlog("bogofilter", LOG_PID, LOG_MAIL);
 
     /* open all wordlists */
-    open_wordlists((run_type == RUN_NORMAL) ? DB_READ : DB_WRITE);
+    open_wordlists((run_type == RUN_NORMAL) ? DS_READ : DS_WRITE);
 
     output_setup();
 
