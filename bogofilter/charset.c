@@ -149,8 +149,11 @@ static void map_default(void)
 	}
     }
 
-    while ((ch = *blank++) != '\0')			/* Characters to treat as blanks */
-	charset_table[ch] = SP;
+    /* Characters to treat as delimiters.  The ideal would be to treat them as blanks, but
+       that breaks ignoring uuencode, so treat them as '!' (another char not allowed in tokens)
+    */
+    while ((ch = *blank++) != '\0')
+	charset_table[ch] = '!';
 
     while ((ch = *alone++) != '\0')			/* Characters to leave alone */
 	charset_table[ch] = ch;
