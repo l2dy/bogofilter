@@ -10,6 +10,7 @@
 #endif
 
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "debug.h"
 #include "system.h" /* defines bool */

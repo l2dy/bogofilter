@@ -64,8 +64,9 @@ long db_get_msgcount(void*);
 /** set the database message count */
 void db_set_msgcount(void*, long);
 
-typedef int (*db_foreach_t)(char *key, long key_size,
-	char *value, long key_value, void *userdata);
+typedef int (*db_foreach_t)(char *key,   uint32_t key_size,
+			    char *value, uint32_t key_value, 
+			    void *userdata);
 /** Iterate over all elements in data base and call \p hook for each item.
  * \p userdata is passed through to the hook function unaltered.
  */

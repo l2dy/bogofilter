@@ -42,14 +42,15 @@ run_t run_type = RUN_NORMAL;
 
 const char *progname = PROGNAME;
 
-static int db_dump_hook(char *key, long keylen, char *data, long
-	datalen, void *userdata /*@unused@*/)
+static int db_dump_hook(char *key,  uint32_t keylen, 
+			char *data, uint32_t datalen,
+			void *userdata /*@unused@*/)
 {
     dbv_t val = {0, 0};
     (void)userdata;
 
-    if (datalen != sizeof(long) && datalen != 2 * sizeof(long)) {
-	print_error(__FILE__, __LINE__, "Unknown data size - %ld.\n", datalen);
+    if (datalen != sizeof(uint32_t) && datalen != 2 * sizeof(uint32_t)) {
+	print_error(__FILE__, __LINE__, "Unknown data size - %d.\n", datalen);
 	return 0;
     }
 
@@ -69,8 +70,9 @@ static int db_dump_hook(char *key, long keylen, char *data, long
     return !!ferror(stdout);
 }
 
-static int count_hook(char *key, long keylen, char *data, long
-	datalen, void *userdata)
+static int count_hook(char *key,  uint32_t keylen, 
+		      char *data, uint32_t datalen,
+		      void *userdata)
 {
     long *counter = userdata;
 
@@ -89,20 +91,21 @@ static int count_hook(char *key, long keylen, char *data, long
 
 struct robhook_data {
     double *sum;
-    long *count;
+    uint32_t *count;
     void *dbh_good;
     double scalefactor;
 };
 
-static int robx_hook(char *key, long keylen, char *data, long
-	datalen, void *userdata)
+static int robx_hook(char *key,  uint32_t keylen, 
+		     char *data, uint32_t datalen, 
+		     void *userdata)
 {
     struct robhook_data *rd = userdata;
 
-    long goodness;
-    unsigned long spamness;
-    double        prob;
-    static int x_size = 40;
+    uint32_t goodness;
+    uint32_t spamness;
+    double   prob;
+    static size_t x_size = 40;
     static char *x;
 
     /* ignore system meta-data */
@@ -110,7 +113,7 @@ static int robx_hook(char *key, long keylen, char *data, long
 	return 0;
 
     /* ignore short read */
-    if (datalen < 4)
+    if (datalen < sizeof(uint32_t))
 	return 0;
 
     if (keylen + 1 > x_size) {
@@ -123,7 +126,7 @@ static int robx_hook(char *key, long keylen, char *data, long
     memcpy(x, key, keylen);
     x[keylen] = '\0';
 
-    memcpy(&spamness, data, 4);
+    memcpy(&spamness, data, sizeof(uint32_t));
     goodness = db_getvalue(rd->dbh_good, x);
 
     prob = spamness / (goodness * rd->scalefactor + spamness);
@@ -136,7 +139,7 @@ static int robx_hook(char *key, long keylen, char *data, long
 
     /* print if token in both word lists */
     if ((verbose > 1 && goodness && spamness) || verbose > 2)
-	printf("cnt: %6ld,  sum: %12.6f,  ratio: %f,  sp: %4lu,  gd: %4ld,"
+	printf("cnt: %6d,  sum: %12.6f,  ratio: %f,  sp: %4d,  gd: %4d,"
 		"  p: %f,  t: %s\n", *rd->count, *rd->sum,
 		*rd->sum / *rd->count, spamness, goodness, prob, x);
 
@@ -315,8 +318,8 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     char filepath[PATH_LEN];
     char buf[BUFSIZE];
     char *token = buf;
-    long int spam_count, spam_msg_count = 0 ;
-    long int good_count, good_msg_count = 0 ;
+    unsigned long spam_count, spam_msg_count = 0 ;
+    unsigned long good_count, good_msg_count = 0 ;
 
     const char *head_format = !show_probability ? "%-20s %6s %6s\n"   : "%-20s %6s  %6s  %6s  %6s\n";
     const char *data_format = !show_probability ? "%-20s %6ld %6ld\n" : "%-20s %6ld  %6ld  %f  %f\n";
@@ -409,11 +412,11 @@ static int display_words(const char *path, int argc, char **argv, bool prob)
 
 static double compute_robx(void *dbh_spam, void *dbh_good)
 {
-    long    word_cnt = 0;
+    uint32_t word_cnt = 0;
     double sum = 0.0;
     double robx;
 
-    long int msg_good, msg_spam;
+    unsigned long msg_good, msg_spam;
     struct robhook_data rh;
 
     msg_good = db_getvalue( dbh_good, ".MSG_COUNT" );
@@ -428,7 +431,7 @@ static double compute_robx(void *dbh_spam, void *dbh_good)
 
     robx = sum/word_cnt;
     if (verbose)
-	printf( ".MSG_COUNT: %ld, %ld, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
+	printf( ".MSG_COUNT: %lu, %lu, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
 		msg_spam, msg_good, rh.scalefactor, sum, (int)word_cnt, robx);
 
     return robx;

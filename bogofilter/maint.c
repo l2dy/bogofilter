@@ -137,10 +137,11 @@ int maintain_wordlist_file(const char *db_file)
     return rc;
 }
 
-static int maintain_hook(char *key, long keylen, char *data, long
-	datalen, void *userdata /*@unused@*/)
+static int maintain_hook(char *key,  uint32_t keylen, 
+			 char *data, uint32_t datalen, 
+			 void *userdata /*@unused@*/)
 {
-    static int x_size = 40;
+    static uint32_t x_size = 40;
     static char *x;
     dbv_t val;
     memcpy(&val, data, datalen);

@@ -102,7 +102,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
 {
     int ret;
     dbh_t *handle;
-    u_int32_t opt_flags = 0;
+    uint32_t opt_flags = 0;
 
     assert(dir && *dir);
 
@@ -402,8 +402,10 @@ static int db_lock(int fd, int cmd, short int type){
     return (fcntl(fd, cmd, &lock));
 }
 
-int db_foreach(void *vhandle, int (*hook)(char *key, long key_size,
-	    char *value, long key_value, void *userdata), void *userdata) {
+int db_foreach(void *vhandle, 
+	       int (*hook)(char *key,   uint32_t key_size,
+			   char *value, uint32_t key_value, 
+			   void *userdata), void *userdata) {
     dbh_t *handle = vhandle;
     int ret;
     DBC dbc;
