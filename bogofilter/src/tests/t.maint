@@ -13,10 +13,10 @@ $BOGOFILTER -C -y 0 -n < ${SYSTEST}/inputs/good.mbx
 CORRECT="$TMPDIR/result"
 
 cat >> $CORRECT <<EOF
-initial: 5283
-count 0 -> 5283
-count 1 -> 1841
-count 2 -> 937
+initial: 5287
+count 0 -> 5287
+count 1 -> 1843
+count 2 -> 939
 count 3 -> 602
 EOF
 

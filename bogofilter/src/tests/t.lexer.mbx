@@ -32,6 +32,8 @@ RESULT=`echo $RESULT | sed s@\ @@g`
 WANT="1786.4025"
 # v0.16.1 - Trim X-Bogosity from message header
 WANT="1780.4025"
+# v0.16.2 - Tag Cc: lines as To: lines.
+WANT="1780.4029"
 
 if [ "$RESULT" != "$WANT" ] || [ $verbose -ne 0 ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT
