@@ -4,22 +4,26 @@
 #define FORMAT_H
 
 #include "bogoconfig.h"
-#include "bogofilter.h"
 
 /* Global variables */
 
 extern const char *spam_header_name;
-extern const char *header_format;
-extern const char *terse_format;
-extern const char *update_log_format;
-extern const char *check_log_format;
+/*
+** extern const char *header_format;
+** extern const char *terse_format;
+** extern const char *update_log_format;
+** extern const char *log_header_format;
+*/
 
 /* needed by config.c */
 
 extern const parm_desc format_parms[];
 
-/* Prototypes */
+/* Function Prototypes */
 
-extern char *format(const char *frm, double spamicity, rc_t status);
+extern char *format_header(char *buff, size_t size);
+extern char *format_terse(char *buff, size_t size);
+extern char *format_log_header(char *buff, size_t size);
+extern char *format_log_update(char *buff, size_t size, char ch, int wordcount, int msgcount);
 
 #endif
