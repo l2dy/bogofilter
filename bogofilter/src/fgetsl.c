@@ -21,9 +21,10 @@ int xfgetsl(char *buf, int max_size, FILE *s, int no_nul_terminate)
 {
     int c = 0;
     char *cp = buf;
-    int moreroom = no_nul_terminate ? 1 : 0;
+    char *end = buf + max_size;				/* Physical end of buffer */
+    char *fin = end - (no_nul_terminate ? 0 : 1);	/* Last available byte    */
 
-    if (max_size < 2 - moreroom) {
+    if (cp >= fin) {
 	fprintf(stderr, "Invalid buffer size, exiting.\n");
 	abort();
 	exit(2);
@@ -32,8 +33,7 @@ int xfgetsl(char *buf, int max_size, FILE *s, int no_nul_terminate)
     if (feof(s))
 	return(EOF);
 
-    while (((--max_size > 0) || (no_nul_terminate && max_size == 0))
-	    && ((c = getc(s)) != EOF)) {
+    while ((cp < fin) && ((c = getc(s)) != EOF)) {
 	*cp++ = c;
 	if (c == '\n')
 	    break;
@@ -44,7 +44,7 @@ int xfgetsl(char *buf, int max_size, FILE *s, int no_nul_terminate)
 	exit(2);
     }
 
-    if (!no_nul_terminate)
+    if (cp < end)
 	*cp = '\0'; /* DO NOT ADD ++ HERE! */
     if (cp == buf && feof(s)) return EOF;
     return(cp - buf);
