@@ -270,10 +270,13 @@ void *db_open(void *dummyenv, const char *dbpath,
     /* check if byteswapped */
     {
 	u_int32_t t;
-	k.data = strdup(ENDIAN32);
+	int ee;
+	k.data = xstrdup(ENDIAN32);
 	k.leng = strlen(k.data);
 
-	switch(db_get_dbvalue(dbh, &k, &v)) {
+	ee = db_get_dbvalue(dbh, &k, &v);
+	free(k.data);
+	switch(ee) {
 	    case 0: /* found endian marker token, read it */
 		if (v.leng < 4)
 		    goto barf;
