@@ -84,7 +84,7 @@ export BOGOFILTER_DIR="/var/lib/bogofilter"
 
 CFG="${TMPDIR}/test.cf"
 OPT="-t -v"
-pattern="inputs/msg.?.txt"
+pattern="${SYSTEST}/inputs/msg.?.txt"
 
 # Fisher tristate
 
