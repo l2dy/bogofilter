@@ -247,11 +247,18 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 	(void)fputc( '"', fpo);
 	(void)word_puts(cur->token, 0, fpo);
 
-	(void)fprintf(fpo, "\"%*s %6lu  %8.6f  %8.6f  %8.6f",
-		      len, " ", (unsigned long)(cur->good + cur->bad),
-		      (double)cur->good / cur->msgs_good,
-		      (double)cur->bad  / cur->msgs_bad,
-		      fw);
+	if (cur->msgs_good == 0 && cur->msgs_bad == 0)
+	    (void)fprintf(fpo, "\"%*s %6lu  %8s  %8s  %8.6f",
+			  len, " ", (unsigned long)(cur->good + cur->bad),
+			  "--------", "--------",
+			  fw);
+	else
+	    (void)fprintf(fpo, "\"%*s %6lu  %8.6f  %8.6f  %8.6f",
+			  len, " ", (unsigned long)(cur->good + cur->bad),
+			  (double)cur->good / cur->msgs_good,
+			  (double)cur->bad  / cur->msgs_bad,
+			  fw);
+
 	if (Rtable)
 	    (void)fprintf(fpo, "%10.5f%10.5f",
 			  log(1.0 - fw), log(fw));
