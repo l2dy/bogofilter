@@ -1,8 +1,12 @@
 #! /usr/bin/perl
+#
 # bogotune - a bogofilter tuning tool
-# version 0.4.1, started 20030626
+#
+# Initial Release: 20030626
+# $Id$ 
+#
 # Copyright (c) 2003 Gregory Louis, David Relson
-# distributed wiithout warranty of any kind under the
+# Distributed wiithout warranty of any kind under the
 # GNU General Public License (GPL).
 
 use strict;
@@ -293,12 +297,20 @@ sub col5 { $$a[5] <=> $$b[5]; }
 my(@mdval,@rsval,@rxval,@parms);
 
 sub gfn {
-    my ($si, $mi, $xi) = @_; my $pi;
-    $pi = $si * ($#mdval+1) * ($#rxval+1) + $mi * ($#rxval+1) + $xi;
+    my ($si, $mi, $xi) = @_;
+    my $pi = ($si * ($#mdval+1) + $mi) * ($#rxval+1) + $xi;
     return($parms[$pi][5]);
 }
 
 sub my_log10 { my $n = shift; return log($n) / log(10); }
+
+sub array_print {
+    my $label = shift @_;
+    my $format = shift @_;
+    my @array = @_;
+    $format = join( ", ", ($format) x (@array+1));
+    printf "  %s: %d ( $format )\n", $label, $#array+1, @array;
+}
 
 my ($robs, $md);
 foreach my $scantype ("coarse", "fine") {
@@ -339,9 +351,9 @@ foreach my $scantype ("coarse", "fine") {
     my $ord = 0; my $np = scalar @rsval * scalar @mdval * scalar @rxval;
     @parms = ();
     if($verbose > 1) {
-	printf "  rsval: %d (%s)\n", $#rsval+1, join(', ', @rsval);
-	printf "  mdval: %d (%s)\n", $#mdval+1, join(', ', @mdval);
-	printf "  rxval: %d (%s)\n", $#rxval+1, join(', ', @rxval);
+	array_print("rsval", "%6.4f", @rsval);
+	array_print("rxval", "%5.3f", @rxval);
+	array_print("mdval", "%4.2f", @mdval);
     }
     foreach $rsi (0 .. $#rsval) {
 	foreach $mdi (0 .. $#mdval) {
