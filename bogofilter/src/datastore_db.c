@@ -109,7 +109,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
 	const char *dir)
 {
     int ret;
-    dbh_t *handle;
+    dbh_t *handle = NULL;
     uint32_t opt_flags = 0;
     /*
      * If locking fails with EAGAIN, then try without MMAP, fcntl()
@@ -121,8 +121,22 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
      */
     uint32_t retryflags[] = { 0, DB_NOMMAP, 0xffffffff };
     uint32_t *retryflag_i;
+    int maj, min;
+    static int version_ok;
 
     assert(dir && *dir);
+
+    if (!version_ok) {
+	version_ok = 1;
+	(void)db_version(&maj, &min, NULL);
+	if (!(maj == DB_VERSION_MAJOR && min == DB_VERSION_MINOR)) {
+	    fprintf(stderr, "The DB versions do not match.\n"
+		    "This program was compiled for DB version %d.%d,\n"
+		    "but it is linked against DB version %d.%d.\nAborting.\n",
+		    DB_VERSION_MAJOR, DB_VERSION_MINOR, maj, min);
+	    exit(2);
+	}
+    }
 
     if (open_mode == DB_READ)
 	opt_flags = DB_RDONLY;
