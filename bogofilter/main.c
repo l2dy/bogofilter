@@ -30,6 +30,7 @@ AUTHOR:
 #include "lexer.h"
 #include "bogofilter.h"
 #include "bogoconfig.h"
+#include "method.h"
 #include "register.h"
 #include "wordlists.h"
 #include "format.h"
