@@ -18,23 +18,23 @@ EOF
 # ignore list, single wordlist
 cat <<EOF > ${TMPDIR}/$CF_IGN_REG
 bogofilter_dir=${TMPDIR}
-wordlist i,ignore,ignore.db,1
-wordlist r,wordlist,wordlist.db,2
+wordlist i,ign,ignore.db,1
+wordlist r,wrd,wordlist.db,2
 EOF
 
 # ignore list, user & system wordlists
 cat <<EOF > ${TMPDIR}/$CF_IGN_USR_SYS
 bogofilter_dir=${TMPDIR}
-wordlist i,ignore,ignore.db,4
-wordlist r,wordlist,user.db,5
-wordlist r,wordlist,system.db,6
+wordlist i,ign,ignore.db,4
+wordlist r,usr,user.db,5
+wordlist r,sys,system.db,6
 EOF
 
 # merged user & system wordlists
 cat <<EOF > ${TMPDIR}/$CF_MRG_USR_SYS
 bogofilter_dir=${TMPDIR}
-wordlist r,wordlist,user.db,7
-wordlist r,wordlist,system.db,7
+wordlist r,usr,user.db,7
+wordlist r,sys,system.db,7
 EOF
 
 # files for building databases
