@@ -26,7 +26,7 @@ spam_header_name=X-Bogosity
 stats_in_header=Y
 EOF
 
-OPTS=" -c ${CONFIG} -y 0"
+OPTS="-c ${CONFIG} -y 0"
 
 $BOGOFILTER $OPTS -r -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER $OPTS -r -n < ${SYSTEST}/inputs/good.mbx

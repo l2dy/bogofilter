@@ -26,8 +26,8 @@ map_rc()
     )
 }
 
-$BOGOFILTER -f -s -C < ${srcdir}/inputs/spam.mbx
-$BOGOFILTER -f -n -C < ${srcdir}/inputs/good.mbx
+$BOGOFILTER -C -s < ${srcdir}/inputs/spam.mbx
+$BOGOFILTER -C -n < ${srcdir}/inputs/good.mbx
 
 OUT="split.out"
 
@@ -36,7 +36,7 @@ for msg in $files ; do
     nam=`basename $msg`
     out="$TMPDIR/$nam"
     map_rc $BOGOLEXER -C -p $v -I $msg > $out.l
-    map_rc $BOGOFILTER -vvv -f -C -I $msg > $out.f
+    map_rc $BOGOFILTER -C -vvv -I $msg > $out.f
     printf "%-24s %s\n" $nam `head -1 $out.f | sed s@spamicity=@@ \
     | tr -d "," | $AWK '{print $4}'` >> ${TMPDIR}/$OUT
 done
