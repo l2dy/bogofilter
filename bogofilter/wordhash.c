@@ -110,18 +110,18 @@ nmalloc (wordhash_t * h)
   return (x->buf + x->used++);
 }
 
+/* determine architecture's alignment boundary */
+struct dummy { char *c; int  i; };
+#define ALIGNMENT offsetof(struct dummy, i)
+
 static char *
 smalloc (wordhash_t * h, size_t n)
 {
   wh_alloc_str *x = h->strings;
   char *t;
 
-  /* determine architecture's alignment boundary */
-  struct dummy { char *c; int  i; };
-  size_t alignment= offsetof(struct dummy, i);
-
   /* Force alignment on architecture's natural boundary.*/
-  n += alignment - ( n % alignment);
+  n += ALIGNMENT - ( n % ALIGNMENT);
    
   if (x == NULL || x->avail < n)
     {
