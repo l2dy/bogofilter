@@ -2,6 +2,8 @@
 
 #Test database maintenance using bogoutil's dump/load capabilities.
 
+: ${srcdir=.}
+
 relpath="`pwd`/../.." . ${srcdir}/../t.frame
 
 verbose=0
