@@ -176,13 +176,6 @@ tokenize_html_tags=no
 tokenize_html_script=no
 
 
-#### TOKENIZE_HTML_COMMENTS --- *** NOT YET WORKING ***
-#
-#	when enabled, the innards of html comments are tokenized
-
-tokenize_html_comments=no
-
-
 ########### Classification Constants General Settings ###############
 
 #### MINIMUM DEVIATION
