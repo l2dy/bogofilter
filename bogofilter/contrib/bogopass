@@ -81,7 +81,7 @@ system("formail -I \"$bogo_header\" < \"$n2\"") == 0 or
     my_die "formail failed (" . parsewait($?) . ")";
 unlink0 ($h2,$n2) or
     my_die "cannot unlink temporary file $n2: $!";
-close $h2 or my_die("Error closing temporary file $fn: $!");
+close $h2 or my_die("Error closing temporary file $n2: $!");
 exit 0;
 
 ### End Main ###
