@@ -42,6 +42,7 @@ DUMMYVVP(db_flush)
 DUMMYVPVP(db_get_env)
 DUMMYICP(dbe_purgelogs)
 DUMMYICP(dbe_remove)
+DUMMYICP(dbe_checkpoint)
 void *dbe_init(bfdir *d, bffile *f) { (void)d; (void)f; return (void *)~0; }
 ex_t db_verify(bfdir *d, bffile *f) { (void)d; (void)f; return EX_OK; }
 

@@ -89,6 +89,12 @@ void *db_get_env(void *vhandle) {
 }
 #endif
 
+ex_t dbe_checkpoint(bfdir *directory)
+{
+    (void) directory;
+    return EX_OK;
+}
+
 ex_t dbe_purgelogs(bfdir *directory)
 {
     (void) directory;
