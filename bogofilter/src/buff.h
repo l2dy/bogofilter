@@ -15,9 +15,6 @@ AUTHOR:
 
 #include "word.h"
 
-#define	D	1	/* size adjustment */
-#define	Z(n)	n='\0'	/* mark end of string */
-
 typedef struct {
     word_t t;
     size_t pos;		/* read/write position  */
