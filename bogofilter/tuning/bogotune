@@ -171,14 +171,26 @@ if($scount < 500 || $ncount < 500) { yuk(4,
     $scount, " and ", $ncount, " were found."); }
 print("Verification completed successfully.\n");
 
-### 3.  Convert input files to message-count format.
+### 3.  Calculate cache size
+# Calculate the cache size that should be used.
+
+my $dbsize = (stat( "$dbname" ))[7];
+if($twolist) {
+    my $spamsize = (stat( "$bogodir/spamlist.db" ))[7];
+    $dbsize = $spamsize if $spamsize > $dbsize;
+}
+my $cachesize = POSIX::ceil($dbsize / (1024*1024*3));
+print("Recommended cache size is ", $cachesize, " Mbytes.\n");
+
+### 4.  Convert input files to message-count format.
 if($msgformat ne "msgcount") {
     print("Creating message-count files...\n");
     my $spwork = $workfn . ".sp"; my $nswork = $workfn . ".ns";
+    my $opts=qq( CACHE_SIZE="-k $cachesize" );
     if($msgformat eq "mbox") {
-	my $cmd = "cat $splist | formail -es bogol $bogodir $cf > $spwork";
+	my $cmd = "$opts cat $splist | formail -es bogol $bogodir $cf > $spwork";
 	system($cmd) == 0 or yuk(7, "Problem processing spam files");
-	$cmd = "cat $nslist | formail -es bogol $bogodir $cf > $nswork";
+	$cmd = "$opts cat $nslist | formail -es bogol $bogodir $cf > $nswork";
 	system($cmd) == 0 or yuk(7, "Problem processing nonspam files");
     } else {
 	unlink($spwork);
@@ -187,7 +199,7 @@ if($msgformat ne "msgcount") {
 		yuk(7, "Problem processing spam files");
 	    foreach my $msg (<FL>) {
 		chomp($msg);
-		my $cmd = "cat $msg | bogol $bogodir $cf >>$spwork";
+		my $cmd = "$opts cat $msg | bogol $bogodir $cf >>$spwork";
 		system($cmd) == 0 or
 		    yuk(7, "Problem writing spam msg-count file");
 	    }
@@ -198,7 +210,7 @@ if($msgformat ne "msgcount") {
 		yuk(7, "Problem processing nonspam files");
 	    foreach my $msg (<FL>) {
 		chomp($msg);
-		my $cmd = "cat $msg | bogol $bogodir $cf >>$nswork";
+		my $cmd = "$opts cat $msg | bogol $bogodir $cf >>$nswork";
 		system($cmd) == 0 or
 		    yuk(7, "Problem writing nonspam msg-count file");
 	    }
@@ -207,17 +219,6 @@ if($msgformat ne "msgcount") {
     @spfiles = $spwork; @nsfiles = $nswork;
     print("Message-count files ", $workfn, ".{sp,ns} created\n");
 }
-
-### 4.  Calculate cache size
-# Calculate the cache size that should be used.
-
-my $dbsize = (stat( "$dbname" ))[7];
-if($twolist) {
-    my $spamsize = (stat( "$bogodir/spamlist.db" ))[7];
-    $dbsize = $spamsize if $spamsize > $dbsize;
-}
-my $cachesize = POSIX::ceil($dbsize / (1024*1024*3));
-print("Recommended cache size is ", $cachesize, " Mbytes.\n");
 
 ### 5.  Calculate fp target
 # The fp target will be derived thus: score nonspams with s and md as
@@ -373,13 +374,13 @@ foreach my $scantype ("coarse", "fine") {
 		}
 		### now get fn count
 		if($usebogofilter) {
-		    $cmd = "cat $splist | "
-			. " $bogof $cf -d $bogodir -MTv -m $mpar -o $cutoff"
-			. "| grep -c -v '^S' |";
+		    $cmd = "cat $splist"
+			. " | $bogof $cf -d $bogodir -MTv -m $mpar -o $cutoff"
+			. " | grep -c -v '^S' |";
 		} else {
-		    $cmd = "cat $splist | "
-			. " apclass -fq -m $mpar -o $cutoff"
-			. "| grep -c -v '^1' |";
+		    $cmd = "cat $splist"
+			. " | apclass -fq -m $mpar -o $cutoff "
+			. " | grep -c -v '^1' |";
 		}
 		open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
 		$fn = <COUNTS>; chop $fn; close COUNTS;
