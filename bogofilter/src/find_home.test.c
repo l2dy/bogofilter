@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "common.h"
 #include "find_home.h"
 
 enum mode { current = 42, by_user, tilde };
