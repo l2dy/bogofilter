@@ -40,12 +40,13 @@ References:	Debian Bug #275373
 
 1. Background
 
-Bogofilter is a software package to determine if a mail is spam or not.
-It uses a data base to store words and must be trained which mails are
-spam or non-spam, it looks at the probabilities of individual words.
+Bogofilter is a software package to classify a mail as spam or
+non-spam.  It uses a data base to store words and must be trained
+which mail are spam and non-spam. It uses the probabilities of
+individual words for classifying the message.
 
 Bogofilter understands enough of MIME to decode headers and only
-consider text parts of mails.
+consider text parts of mail.
 
 2. Problem description
 
