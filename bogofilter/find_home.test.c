@@ -21,29 +21,51 @@
 
 #include "find_home.h"
 
+enum mode { current = 42, by_user, tilde };
+
+/* run:
+ * without arguments or with 0 argument to get home by user id
+ * with tilde argument to try tilde expansion
+ * with non-0 argument to try $HOME, then try user id
+ */
 int main(int argc, char **argv)
 {
     const char *h;
+    char *tofree = NULL;
     int read_env = 0;
-    int by_user = 0;
+    enum mode mode = current;
 
     if (argc >= 2) {
-	if (!isdigit((unsigned char)argv[1][0])) 
-	    by_user = 1;
+	if (!isdigit((unsigned char)argv[1][0]))
+	    if (argv[1][0] == '~')
+		mode = tilde;
+	    else
+		mode = by_user;
 	else
 	    read_env = atoi(argv[1]);
     }
 
-    if (by_user)
-	h = find_home_user(argv[1]);
-    else
-	h = find_home(read_env);
+    switch (mode) {
+	case by_user:
+	    h = find_home_user(argv[1]);
+	    break;
+	case tilde:
+	    h = tofree = tildeexpand(argv[1]);
+	    break;
+	case current:
+	    h = find_home(read_env);
+	    break;
+	default:
+	    abort();
+    }
 
     if (h != NULL) {
 	(void)puts(h);
-	exit(EXIT_SUCCESS);
     } else {
-	perror(NULL);
-	exit(EXIT_FAILURE);
+	perror(argv[0]);
     }
+    if (tofree)
+	free(tofree);
+
+    exit(h ? EXIT_SUCCESS : EXIT_FAILURE);
 }
