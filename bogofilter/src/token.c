@@ -194,7 +194,7 @@ void token_init(void)
     mime_reset(); 
     if (nonblank_line == NULL) {
 	const char *s = "spc:invalid_end_of_header";
-	nonblank_line = word_new(s, strlen(s));
+	nonblank_line = word_new((const unsigned char *)s, strlen(s));
     }
 }
 
@@ -230,13 +230,15 @@ void set_tag(const char *tag)
 	const char *tmp;
 	size_t len = strlen(tag);
 	
-	for (tmp = prefixes; tmp != NULL;
-	     (tmp = strchr(tmp, '|')) && (tmp += 1)) {
+	tmp = prefixes;
+	while (tmp != NULL) {
 	    if (memcmp(tmp, tag, len) == 0) {
 		word_free(token_prefix);
 		token_prefix = word_new((const byte *)tag, strlen(tag));
 		return;
 	    }
+	    tmp = strchr(tmp, '|');
+	    if (tmp) tmp++;
 	}
     }
     return;
