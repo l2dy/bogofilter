@@ -52,7 +52,7 @@
  *
  * 5. Tokens that occur within the To, From, Subject, and Return-Path
  *    lines, or within urls, get marked accordingly.
- *    For example. `foo' in the Subject line becomes `subj:foo'.
+ *    For example. "foo" in the Subject line becomes "subj:foo".
 */
 
 /* DR 08/29/2003:

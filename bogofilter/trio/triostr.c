@@ -1,6 +1,6 @@
 /*************************************************************************
  *
- * $Id: triostr.c,v 1.19 2003/03/01 15:34:02 breese Exp $
+ * $Id: triostr.c,v 1.1 2003/08/04 23:30:47 m-a Exp $
  *
  * Copyright (C) 2001 Bjorn Reese and Daniel Stenberg.
  *
@@ -8,7 +8,7 @@
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE AUTHORS AND
  * CONTRIBUTORS ACCEPT NO RESPONSIBILITY IN ANY CONCEIVABLE MANNER.
@@ -97,7 +97,7 @@ struct _trio_string_t
  */
 
 #if !defined(TRIO_MINIMAL)
-static TRIO_CONST char rcsid[] = "@(#)$Id: triostr.c,v 1.19 2003/03/01 15:34:02 breese Exp $";
+static TRIO_CONST char rcsid[] = "@(#)$Id: triostr.c,v 1.1 2003/08/04 23:30:47 m-a Exp $";
 #endif
 
 /*************************************************************************

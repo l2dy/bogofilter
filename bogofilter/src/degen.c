@@ -33,7 +33,7 @@ REFERENCE:
 
 /* *** From:  "Better Bayesian Filtering" ***
 **
-** Here are the alternatives [7] considered if the filter sees ``FREE!!!''
+** Here are the alternatives [7] considered if the filter sees "FREE!!!"
 ** in the Subject line and doesn't have a probability for it.
 **
 ** Subject*FREE!!! Subject*Free!!! Subject*free!!!
