@@ -552,6 +552,8 @@ static void help(void)
 	    "\t-s min,max\tExclude tokens with lengths between min and max.\n"
 	    "\t-n\tReplace non-ascii characters with '?'.\n"
 	    "\t-y today\tSet default day-of-year (1..366).\n"
+	    "\t-x list\t- set debug flags.\n"
+	    "\t-D\t- direct debug output to stdout.\n"
 	    "\t-V\tPrint program version.\n"
 	    "%s is part of the bogofilter package.\n", PROGNAME);
 }
@@ -571,7 +573,7 @@ static int process_args(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
-    while ((option = getopt(argc, argv, ":d:l:m:w:R:phvVx:a:c:s:ny:I:D")) != -1)
+    while ((option = getopt(argc, argv, ":d:l:m:w:R:phvVa:c:s:ny:I:x:D")) != -1)
 	switch (option) {
 	case 'd':
 	    flag = DUMP;

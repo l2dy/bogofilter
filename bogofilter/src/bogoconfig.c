@@ -249,7 +249,6 @@ static void help(void)
 		  "\t-S\t- move message's words from non-spam list to spam list.\n"
 		  "\t-N\t- move message's words from spam list to spam non-list.\n"
 		  "\t-R\t- print an R data frame.\n"
-		  "\t-x list\t- set debug flags.\n"
 		  "\t-v\t- set debug verbosity level.\n"
 		  "\t-k y/n\t- kill html comments (yes or no).\n"
 		  "\t-V\t- print version information and exit.\n"
@@ -257,6 +256,8 @@ static void help(void)
 		  "\t-C\t- don't read standard config files.\n"
 		  "\t-q\t- quiet - don't print warning messages.\n"
 		  "\t-F\t- force printing of spamicity numbers.\n"
+		  "\t-x list\t- set debug flags.\n"
+		  "\t-D\t- direct debug output to stdout.\n"
 		  "\n"
 		  "bogofilter is a tool for classifying email as spam or non-spam.\n"
 		  "\n"
@@ -312,7 +313,7 @@ int process_args(int argc, char **argv)
 
     fpin = stdin;
 
-    while ((option = getopt(argc, argv, ":23d:eFhl::o:snSNvVpuc:CgrRx:fqtI:O:y:k:DT" G R F)) != EOF)
+    while ((option = getopt(argc, argv, ":23d:eFhl::o:snSNvVpuc:CgrRfqtI:O:y:k:x:DT" G R F)) != EOF)
     {
 	switch(option)
 	{

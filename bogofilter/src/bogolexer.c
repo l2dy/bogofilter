@@ -75,6 +75,8 @@ static void help(void)
 	    "\t-c file\t- read specified config file.\n"
 	    "\t-C\t- don't read standard config files.\n"
 	    "\t-I file\t- read message from file instead of stdin.\n"
+	    "\t-x list\t- set debug flags.\n"
+	    "\t-D\t- direct debug output to stdout.\n"
 	    "%s is part of the bogofilter package.\n", progname);
 }
 
@@ -85,7 +87,7 @@ static int process_args(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
-    while ((option = getopt(argc, argv, ":hnpqvnx:I:k:c:CDT")) != -1)
+    while ((option = getopt(argc, argv, ":hnpqvnI:k:c:Cx:DT")) != -1)
     {
 	switch (option)
 	{
