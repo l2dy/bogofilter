@@ -215,13 +215,19 @@ void open_wordlists(dbmode_t mode)
 		    default:
 			if (query)	/* If "-Q", failure is OK */
 			    return;
+			if (wl_mode != WL_M_SEPARATE)
+			    fprintf(stderr,
+				    "Can't open file '%s' in directory '%s',\n",
+				    aCombined[0], list->filepath);
+			else
+			    fprintf(stderr,
+				    "Can't open files '%s' and '%s' in directory '%s',\n",
+				    aSeparate[0], aSeparate[1], list->filepath);
 			fprintf(stderr,
-				"Can't open %s list from db directory \"%s\",\n"
-				"errno #%d %s.\n\n"
-				""
-				"Remember to register some spam and ham mails before you can use bogofilter\n"
-				"to evaluate mail for its probable spam status!\n",
-				list->filename, list->filepath, err, strerror(err));
+				"error #%d - %s.\n\n", err, strerror(err));
+			fprintf(stderr,
+				"Remember to register some spam and ham messages before you\n"
+				"use bogofilter to evaluate mail for its probable spam status!\n");
 			exit(EX_ERROR);
 		} /* switch */
 	    } else { /* ds_open */
