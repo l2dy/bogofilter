@@ -21,6 +21,8 @@ extern void got_newline(void);
 extern void got_emptyline(void);
 extern void set_tag(const char *tag);
 
+extern size_t decode_text(word_t *w);
+
 extern void token_init(void);
 extern void token_cleanup(void);
 

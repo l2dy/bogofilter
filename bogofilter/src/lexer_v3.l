@@ -125,6 +125,9 @@ TOKENBACK	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*\._\-\+,\[\][:cntrl:]]
 
 TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}{1,70}
 
+B64_OR_QP	[0-9a-zA-Z\-\+\/\=]+
+ENCODED_TOKEN	{TOKENFRONT}{TOKENMID}{0,60}=\?{ID}\?[bq]\?{B64_OR_QP}\?\=
+
 DOLLARS		[0-9]+
 CENTS		[0-9]+
 
@@ -179,6 +182,12 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						}
 <BOGO_LEX>^\"{BOGOLEX_TOKEN}\"{NUM_NUM}		{ return BOGO_LEX_LINE; }
 <BOGO_LEX>\n					{ lineno += 1; }
+
+<INITIAL>{ENCODED_TOKEN}			{ word_t *w = yy_text();
+						  size_t size = decode_text(w);
+						  while (size-- > 0)
+						    unput(w->text[size]);
+						}
 
 <INITIAL>charset=\"?{ID}\"?			{ got_charset(yytext); yyless(strlen("charset")); return TOKEN; }
 <INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); yyless(strlen("MIME-Version:")); return(TOKEN); }
