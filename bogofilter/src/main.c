@@ -14,15 +14,14 @@ CONTRIBUTORS:
 
 ******************************************************************************/
 
+#include "common.h"
+
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
 #include <errno.h>
-
-#include <config.h>
-#include "common.h"
 
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>

@@ -7,7 +7,6 @@ NAME:
 
 ******************************************************************************/
 
-#include <config.h>
 #include "common.h"
 
 #include "textblock.h"

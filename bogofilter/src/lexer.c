@@ -7,12 +7,11 @@
  *   01/01/2003 - split out of lexer.l
 */
 
+#include "common.h"
+
 #include <assert.h>
 #include <ctype.h>
 #include <stdlib.h>
-
-#include <config.h>
-#include "common.h"
 
 #include "base64.h"
 #include "charset.h"

@@ -15,11 +15,10 @@
 
 /* $Id$ */
 
+#include "common.h"
+
 #include <string.h>
 #include <stdlib.h>
-
-#include <config.h>
-#include "common.h"
 
 #include "find_home.h"
 #include "xmalloc.h"

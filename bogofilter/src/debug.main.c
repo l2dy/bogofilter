@@ -10,11 +10,10 @@ AUTHOR:
 
 ******************************************************************************/
 
-#include <stdio.h>
+#include "common.h"
+
 #include <stdlib.h>
 #include <string.h>
-
-#include "common.h"
 
 typedef struct mask_char_to_symbol_s {
     const char *str;

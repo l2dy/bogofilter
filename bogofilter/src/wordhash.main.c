@@ -1,8 +1,7 @@
 /* $Id$ */
 
-#include <stdio.h>
-
 #include "common.h"
+
 #include "wordhash.h"
 
 typedef struct

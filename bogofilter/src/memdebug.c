@@ -20,10 +20,10 @@
 *	- Program exit when current allocation is "too much".
 */
 
-#include <stdio.h>
+#include "common.h"
+
 #include <stdlib.h>
 
-#include "common.h"
 #define	NO_MEMDEBUG_MACROS
 #include "memdebug.h"
 #include "xmalloc.h"

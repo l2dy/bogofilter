@@ -12,11 +12,10 @@ AUTHOR:
 
 ******************************************************************************/
 
+#include "common.h"
+
 #include <ctype.h>
 #include <stdlib.h>
-
-#include <config.h>
-#include "common.h"
 
 #include "charset.h"
 #include "error.h"

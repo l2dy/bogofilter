@@ -9,14 +9,12 @@ Most of the ideas in here are stolen from Mutt's snprintf implementation.
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <ctype.h>
-
-#include <config.h>
 #include "common.h"
+
+#include <ctype.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
 
 #if NEEDTRIO
 #include <trio.h>

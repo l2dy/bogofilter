@@ -10,9 +10,8 @@ AUTHOR:
 
 ******************************************************************************/
 
-#include "config.h"
-
 #include "common.h"
+
 #include "word.h"
 #include "xmalloc.h"
 

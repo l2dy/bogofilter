@@ -11,10 +11,9 @@ AUTHORS:
 
 ******************************************************************************/
 
-#include <stdlib.h>
-
-#include "config.h"
 #include "common.h"
+
+#include <stdlib.h>
 
 #include "buff.h"
 #include "fgetsl.h"
