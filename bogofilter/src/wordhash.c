@@ -387,37 +387,38 @@ wordhash_sort (wordhash_t *wh)
     wh->order = order;
 }
 
-void
-wordhash_convert_to_countlist(wordhash_t *wh, wordhash_t *db)
+/* 
+** wordhash_convert_to_countlist() allocates a new wordhash_t struct
+** to improve program locality and lessen need for swapping when
+** processing lots of messages.
+*/
+
+wordhash_t *
+wordhash_convert_to_countlist(wordhash_t *whi, wordhash_t *db)
 {
-    size_t count;
     hashnode_t *node;
-    wordcnts_t *cnts;
+    wordhash_t *who = wordhash_new();
 
-    if (wh->count == 0 || wh->cnts != NULL)
-	return;
+    who->cnts = (wordcnts_t *) xcalloc(whi->count, sizeof(wordcnts_t));
 
-    cnts = (wordcnts_t *) xcalloc(wh->count, sizeof(wordcnts_t));
-
-    count = 0;
-    for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh)) {
+    for(node = wordhash_first(whi); node != NULL; node = wordhash_next(whi)) {
 	wordprop_t *wp;
+	wordcnts_t *cnts = &who->cnts[who->count];
 	if (!msg_count_file)
 	    wp = wordhash_insert(db, node->key, sizeof(wordprop_t), NULL);
 	else
 	    wp = (wordprop_t *) node->buf;
-	cnts[count].good = wp->cnts.good;
-	cnts[count].bad  = wp->cnts.bad ;
-	count += 1;
+	cnts->good = wp->cnts.good;
+	cnts->bad  = wp->cnts.bad ;
+	who->count += 1;
+/*
 	word_free(node->key);
 	node->key = NULL;
+*/
     }
 
-    wh->cnts = cnts;
-    wordhash_free_alloc_nodes (wh);
-    wordhash_free_strings (wh);
-    xfree(wh->bin);
-    wh->bin = NULL;
+    xfree(who->bin);		/* discard extra storage */
+    who->bin = NULL;
 
-    return;
+    return who;
 }

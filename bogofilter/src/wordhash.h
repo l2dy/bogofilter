@@ -69,6 +69,6 @@ void * wordhash_search (wordhash_t *wh, word_t *t, unsigned int hash);
 
 typedef void wh_foreach_t(word_t *token, void *data, void *userdata);
 void wordhash_foreach(wordhash_t *wh, wh_foreach_t *hook, void *userdata);
-void wordhash_convert_to_countlist(wordhash_t *wh, wordhash_t *db);
+wordhash_t *wordhash_convert_to_countlist(wordhash_t *wh, wordhash_t *db);
 
 #endif

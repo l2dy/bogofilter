@@ -396,8 +396,6 @@ static uint read_mailbox(char *arg)
 	wordhash_t *wh = wordhash_new();
 
 	collect_words(wh);
-
-	wordhash_convert_to_countlist(wh, train);
 	msglist_add(ns_or_sp->msgs, wh);
 
 	if (verbose && (count % 100) == 0) {
@@ -413,7 +411,11 @@ static uint read_mailbox(char *arg)
 	if (max_messages_per_mailbox != 0 &&
 	    count > max_messages_per_mailbox)
 	    break;
+
+	xfree(wh->bin);		/* discard excess storage */
+	wh->bin = NULL;
     }
+
     ns_and_sp->count += count;
     bogoreader_fini();
 
@@ -495,10 +497,11 @@ static void distribute(int mode)
 	}
 	/* scoring set  */
 	else {
-	    wordhash_convert_to_countlist(wh, train);
+	    wh = wordhash_convert_to_countlist(wh, train);
 	    msglist_add(ns_or_sp->u.sets[MOD(score_count,3)], wh);
 	    score_count += 1;
 	}
+	wordhash_free(item->wh);
 	item->wh = NULL;
     }
 
