@@ -91,7 +91,9 @@ void mh_disp(const char *s, mh_t *p)
     if (dbg_index_max != 0 && p->indx > dbg_index_max)
 	return;
 
-    if (p->size < dbg_size_min || dbg_size_max < p->size )
+    if (dbg_size_min != 0 && p->size < dbg_size_min)
+	return;
+    if (dbg_size_max != 0 && p->size > dbg_size_max)
 	return;
 
     fprintf(dbgout, "::%3d  %08lX  %s  %lu\n", p->indx, (ulong) (p+1), s, (ulong) p->size);
