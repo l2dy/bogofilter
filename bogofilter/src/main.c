@@ -56,7 +56,7 @@ const char *progname = "bogofilter";
 /* Function Prototypes */
 
 static void write_log_message(void);
-static void write_message(FILE *fp);
+static void write_message(FILE *fp, rc_t status);
 
 /* Function Definitions */
 
@@ -123,7 +123,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	double spamicity;
 	rc_t   status = bogofilter(&spamicity);
 
-	write_message(out);
+	write_message(out, status);
 
 	exitcode = (status == RC_SPAM) ? 0 : 1;
 	if (nonspam_exits_zero && passthrough && exitcode == 1)
@@ -203,7 +203,7 @@ static int read_seek(char **out, void *in) {
 
 typedef int (*readfunc_t)(char **, void *);
 
-static void write_message(FILE *fp)
+static void write_message(FILE *fp, rc_t status)
 {
     ssize_t rd = 0;	/* assignment to quench warning */
     readfunc_t rf = 0;	/* assignment to quench warning */
@@ -245,7 +245,8 @@ static void write_message(FILE *fp)
 		continue;
 
 	    /* rewrite "Subject: " line */
-	    if (rd >= subjlen && 
+	    if (status == RC_SPAM &&
+		rd >= subjlen && 
 		spam_subject_tag != NULL &&
 		memcmp(out, "Subject:", subjlen) == 0) {
 		(void) fprintf(fp, "Subject: %s", spam_subject_tag);
