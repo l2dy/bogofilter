@@ -16,7 +16,7 @@
 #define DATASTORE_H
 
 #include "wordlists.h"
-#include <inttypes.h>
+#include "system.h"
 
 typedef struct {
     uint32_t count;
