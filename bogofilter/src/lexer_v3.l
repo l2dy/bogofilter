@@ -243,7 +243,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						  return EOH;
 						}
 
-<INITIAL>\n					{ if (header_line_markup) set_tag("Header"); lineno += 1; }
+<INITIAL>\n					{ set_tag("Header"); lineno += 1; }
 <INITIAL><<EOF>>				{ add_hint("no_body:"); return NONE; }
 
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
@@ -344,11 +344,8 @@ char yy_get_state()
 void yy_set_state_initial(void)
 {
     BEGIN INITIAL;
-    if (header_line_markup)
-	set_tag("Header");
-
     msg_header = true;
-
+    set_tag("Header");
     if (DEBUG_LEXER(1))
 	fprintf(dbgout, "BEGIN INITIAL\n");
 }
