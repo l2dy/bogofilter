@@ -1035,12 +1035,25 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
     if (ret != 0) {
 	env->dbe->close(env->dbe, 0);
 	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %s", db_strerror(ret));
-	if (ret == DB_RUNRECOVERY) {
-	    fprintf(stderr, "To recover, run: bogoutil -v -f \"%s\"\n",
-		    directory);
+	switch (ret) {
+	    case DB_RUNRECOVERY:
+		fprintf(stderr, "To recover, run: bogoutil -v -f \"%s\"\n",
+			directory);
+		break;
+	    case EINVAL:
+		fprintf(stderr, "\n"
+			"If you have just got a message that only private environments are supported,\n"
+			"your Berkeley DB %d.%d was not configured properly.\n"
+			"Bogofilter requires shared environments to support Berkeley DB transactions.\n",
+			DB_VERSION_MAJOR, DB_VERSION_MINOR);
+		fprintf(stderr,
+			"Reconfigure and recompile Berkeley DB with the right mutex interface,\n"
+			"see the docs/ref/build_unix/conf.html file that comes with your db source code.\n"
+			"If you installed Berkeley DB from a binary package, complain to the packager.\n"
+			"This is a known bug on Fedora Core that they won't fix, Red Hat Bugzilla #91933.\n");
+		break;
 	}
-	/* FIXME: return NULL instead so we can retry catastrophic
-	 * recovery perhaps? */
+
 	exit(EX_ERROR);
     }
 
