@@ -39,7 +39,7 @@ endif
 
 # what to build
 bin_PROGRAMS = bogofilter bogoutil bogolexer bogotune
-bin_SCRIPTS = bogoupgrade
+bin_SCRIPTS = bogoupgrade bf_copy bf_compact
 if ENABLE_STATIC
 bin_PROGRAMS += bogofilter_static bogoutil_static bogolexer_static bogotune_static
 endif
