@@ -52,13 +52,13 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #define ROBINSON_MIN_DEV	0.0f	// if nonzero, use characteristic words
 
 #define GRAHAM_SPAM_CUTOFF	0.90f	// if it's spammier than this...
-#define ROBINSON_SPAM_CUTOFF	0.52f	// if it's spammier than this...
+#define ROBINSON_SPAM_CUTOFF	0.54f	// if it's spammier than this...
 
 #define GRAHAM_MAX_REPEATS	4	// cap on word frequency per message
 #define ROBINSON_MAX_REPEATS	1	// cap on word frequency per message
 
 #define ROBS			0.001f	// Robinson's s
-#define ROBX			0.415f	// Robinson's x
+#define ROBX			0.200f	// Robinson's x
 
 double min_dev;
 double spam_cutoff;
@@ -541,6 +541,12 @@ double compute_robinson_spamicity(wordhash_t *wordhash)
     double spamicity;
     int robn = 0;
 
+    // Note: .ROBX is scaled by 1000000 in the wordlist
+    double robx = db_getvalue(spam_list.dbh, ".ROBX" );
+
+    // If found, unscale; else use predefined value
+    robx = robx ? robx / 1000000 : ROBX;
+
     if(Rtable)
      	fprintf(Rfp, "%25s%10s%10s%10s%10s%10s\n",
 		"Token         ","pgood","pbad","fw","invfwlog","fwlog");
@@ -575,7 +581,7 @@ double compute_robinson_spamicity(wordhash_t *wordhash)
 	        Rtable, "P_Q_S_invsum_logsum", invproduct, product, spamicity,
 		invlogsum, logsum);
     } else
-	spamicity = ROBX;
+	spamicity = robx;
 
     return (spamicity);
 }
