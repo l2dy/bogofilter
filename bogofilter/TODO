@@ -49,17 +49,7 @@ should be used to ignore (single or multi-line) headers that appear in the
 list. The list should be used to ignore headers both during the message 
 registration and evaluation procedures.
 
-11) Make the GNU configure script smarter so that at compilte time a 
---with-nfs-locks argument will cause the HAVE_FLOCK and HAVE_LOCKF to 
-undef'ed and make HAVE_FCNTL defined if the system supports it. Cause
-the configure script to fail if this option is used on a system that does 
-not have fcntl support.
-
-12) Create a wordlist import/export tool that runs as a separate CLI
-program. It should be able to dump wordlists into 'makemap' compatible text
-files, and be able to convert those files back to wordlist files.
-
-13) Provide support for the BerkeleyDB v1 API. If the configure script can't
+11) Provide support for the BerkeleyDB v1 API. If the configure script can't
 find a version 2+ version of the BerkeleyDB package, it should #define
 a variable that allows alternate database procedures to be compiled in.
 
