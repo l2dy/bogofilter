@@ -37,11 +37,6 @@ typedef struct {
     VILLA *dbp;
 } dbh_t;
 
-/* dummy infrastructure, to be expanded by environment
- * or transactional initialization/shutdown */
-
-static bool init = false;
-
 /* Function definitions */
 
 const char *db_version_str(void)
@@ -330,58 +325,4 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 const char *db_str_err(int e)
 {
     return dperrmsg(e);
-}
-
-void * dbe_init(const char *dummy)
-{
-    UNUSED(dummy);
-    init = true;
-    return (void *)~0;
-}
-
-void dbe_cleanup(void *d)
-{
-    UNUSED(d);
-
-    init = false;
-}
-
-/** begin transaction. Returns 0 for success. */
-int dbe_txn_begin(void *d)
-{
-    UNUSED(d);
-
-    return 0;
-}
-
-int dbe_txn_abort(void *d)
-{
-    UNUSED(d);
-
-    return 0;
-}
-
-int dbe_txn_commit(void *d)
-{
-    UNUSED(d);
-
-    return 0;
-}
-
-int dbe_recover(const char *d, int a, int b)
-{
-    UNUSED(d);
-    UNUSED(a);
-    UNUSED(b);
-
-    fprintf(stderr, "ERROR: bogofilter can not recover QDBM data bases.\n"
-    "If you experience hangs, strange behavior, inaccurate output,\n"
-    "you must delete your data base and rebuild it, or restore an older version\n"
-    "that you know is good from your backups.\n");
-    exit(EX_ERROR);
-}
-
-void *db_get_env(void *d) {
-    UNUSED(d);
-    return 0;
 }

@@ -46,8 +46,6 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 static const DBTYPE dbtype = DB_BTREE;
 
-static bool init = false;
-
 /* dummy variables */
 u_int32_t db_max_objects, db_max_locks;
 
@@ -676,37 +674,4 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 
 const char *db_str_err(int e) {
     return db_strerror(e);
-}
-
-void *dbe_init(const char *unused) {
-    (void)unused;
-    init = true;
-    return (void *)~0;
-}
-
-void dbe_cleanup(void *vhandle) {
-    (void)vhandle;
-    init = false;
-}
-
-int dbe_txn_begin(void *vhandle) { (void)vhandle; return 0; }
-int dbe_txn_abort(void *vhandle) { (void)vhandle; return 0; }
-int dbe_txn_commit(void *vhandle) { (void)vhandle; return 0; }
-int dbe_recover(const char *d, int a, int b) {
-    (void)d;
-    (void)a;
-    (void)b;
-
-    fprintf(stderr,
-	    "ERROR: bogofilter can not recover Berkeley DB "
-		"databases without transactions.\n"
-	    "If you experience hangs, strange behavior, inaccurate output,\n"
-	    "you must delete your data base and rebuild it, or restore an older version\n"
-	    "that you know is good from your backups.\n");
-    exit(EX_ERROR);
-}
-
-void *db_get_env(void *vhandle) {
-    (void)vhandle;
-    return 0;
 }

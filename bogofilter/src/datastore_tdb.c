@@ -33,11 +33,6 @@ typedef struct {
     TDB_CONTEXT *dbp;
 } dbh_t;
 
-/* dummy infrastructure, to be expanded by environment
- * or transactional initialization/shutdown */
-
-static bool init = false;
-
 /* Function definitions */
 
 const char *db_version_str(void)
@@ -353,39 +348,4 @@ const char *db_str_err(int j)
 		if (e == emap[i].ecode)
 			return emap[i].estring;
 	return "Invalid error code";
-}
-
-void *dbe_init(const char *dummy)
-{
-    (void)dummy;
-    init = true;
-    return (void *)~0;
-}
-
-void dbe_cleanup(void *d)
-{
-    (void)d;
-    init = false;
-}
-
-/* dummy infrastructure, to be expanded by environment
- * or transactional initialization/shutdown */
-int dbe_txn_begin(void *d) { (void)d; return 0; }
-int dbe_txn_abort(void *d) { (void)d; return 0; }
-int dbe_txn_commit(void *d) { (void)d; return 0; }
-int dbe_recover(const char *d, int a, int b) {
-    (void)d;
-    (void)a;
-    (void)b;
-
-    fprintf(stderr, "ERROR: bogofilter can not recover TDB data bases.\n"
-    "If you experience hangs, strange behavior, inaccurate output,\n"
-    "you must delete your data base and rebuild it, or restore an older version\n"
-    "that you know is good from your backups.\n");
-    exit(EX_ERROR);
-}
-
-void *db_get_env(void *d) {
-    (void)d;
-    return 0;
 }

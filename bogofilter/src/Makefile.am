@@ -142,17 +142,18 @@ endif
 LDADD += @LIBOBJS@
 
 if ENABLE_TDB_DATASTORE
-datastore_SOURCE = datastore_tdb.c
+datastore_SOURCE = datastore_tdb.c datastore_dummies.c
 else
 if ENABLE_QDBM_DATASTORE
-datastore_SOURCE = datastore_qdbm.c datastore_qdbm.h datastore_qdbm_cmpkey.c
+datastore_SOURCE = datastore_qdbm.c datastore_qdbm.h datastore_qdbm_cmpkey.c \
+		   datastore_dummies.c
 
 bin_PROGRAMS += bogoQDBMupgrade
 bogoQDBMupgrade_SOURCES = bogoQDBMupgrade.c datastore_qdbm_cmpkey.c
 bogoQDBMupgrade_LDADD = $(LDADD) $(LIBDB)
 else
 if ENABLE_OLD_BDB
-datastore_SOURCE = datastore_olddb.c
+datastore_SOURCE = datastore_olddb.c datastore_dummies.c
 else
 datastore_SOURCE = datastore_db.c
 endif
