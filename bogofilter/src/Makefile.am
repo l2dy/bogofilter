@@ -81,7 +81,6 @@ version_sources= \
 	configfile.h configfile.c \
 	datastore.h datastore.c db_handle_props.h \
 	debug.h debug.c \
-	$(DEGEN) \
 	error.h error.c \
 	fgetsl.h fgetsl.c \
 	find_home.h find_home.c find_home_user.c find_home_tildeexpand.c \

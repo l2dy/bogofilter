@@ -9,9 +9,6 @@
 #define MAX_REPEATS	1	/* cap on word frequency per message */
 #define GOOD_BIAS	1.0	/* don't give good words more weight */
 
-extern	bool	first_match;
-extern	bool	degen_enabled;
-
 /*
 ** Define a struct so stats can be saved for printing.
 */
@@ -36,7 +33,4 @@ extern	void	msg_print_summary(void);
 
 extern	 void	print_summary(void);
 
-/* needed by degen.c */
-extern	double	msg_lookup_and_score(const word_t *token, wordcnts_t *cnts);
-
-#endif	/* FISHER_H */
+#endif

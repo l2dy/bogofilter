@@ -139,7 +139,7 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
     return;
 }
 
-double msg_lookup_and_score(const word_t *token, wordcnts_t *cnts)
+static double msg_lookup_and_score(const word_t *token, wordcnts_t *cnts)
 {
     double prob;
 
