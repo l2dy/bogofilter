@@ -29,6 +29,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include "error.h"
 #include "maint.h"
 #include "swap.h"
+#include "word.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
@@ -437,6 +438,7 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata) {
     DBC dbc;
     DBC *dbcp = &dbc;
     DBT key, data;
+    word_t w_key, w_data;
     memset (&key, 0, sizeof(key));
     memset (&data, 0, sizeof(data));
 
@@ -456,8 +458,14 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata) {
 		cv[i] = swap_32bit(cv[i]);
 	}
 
+	/* switch to "word_t *" variables */
+	w_key.text = key.data;
+	w_key.leng = key.size;
+	w_data.text = data.data;
+	w_data.leng = data.size;
+
 	/* call user function */
-	if (hook(key.data, key.size, data.data, data.size, userdata))
+	if (hook(&w_key, &w_data, userdata))
 	    break;
     }
     switch(ret) {

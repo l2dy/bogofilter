@@ -138,34 +138,33 @@ int maintain_wordlist_file(const char *db_file)
     return rc;
 }
 
-static int maintain_hook(char *key,  uint32_t keylen, 
-			 char *data, uint32_t datalen, 
+static int maintain_hook(word_t *key, word_t *data,
 			 void *userdata /*@unused@*/)
 {
     static word_t *x = NULL;
     static uint32_t x_size = MAXTOKENLEN+1;
     dbv_t val;
-    memcpy(&val, data, datalen);
+    memcpy(&val, data->text, data->leng);
 
-    (void)datalen;
+    (void)data->leng;
     if (replace_nonascii_characters)
-	do_replace_nonascii_characters((byte *)key,keylen);
+	do_replace_nonascii_characters(key->text, key->leng);
 
-    if (!keep_count(val.count) || !keep_date(val.date) || !keep_size(keylen)) {
-	if (x == NULL || keylen + 1 > x_size) {
+    if (!keep_count(val.count) || !keep_date(val.date) || !keep_size(key->leng)) {
+	if (x == NULL || key->leng + 1 > x_size) {
 	    word_free(x);
-	    x_size = max(x_size, keylen + 1);
+	    x_size = max(x_size, key->leng + 1);
 	    x = word_new(NULL, x_size);
 	}
 
-	memcpy(x->text, key, keylen);
-	x->text[keylen] = '\0';
+	memcpy(x->text, key, key->leng);
+	x->text[key->leng] = '\0';
 
 	db_delete(userdata, x);
 
 	if (DEBUG_DATABASE(0)) {
 	    fputs("deleting ", dbgout);
-	    fwrite(x->text, 1, x->leng, dbgout);
+	    word_puts(x, dbgout);
 	    fputc('\n', dbgout);
 	}
     }
