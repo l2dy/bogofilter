@@ -121,11 +121,12 @@ int get_decoded_line(byte *buf, size_t max_size)
 	count = yy_get_new_line(buf, max_size);
     else
 	count = yy_use_redo_text(buf, max_size);
-	
+
 /* unfolding:
 ** 	causes "^\tid" to be treated as continuation of previous line
 ** 	hence doesn't match lexer pattern which specifies beginning of line
 */
+#if 0
     while (0 && msg_header) {
 	int c = fgetc(fpin);
 	if (c == EOF)
@@ -145,6 +146,7 @@ int get_decoded_line(byte *buf, size_t max_size)
 	    break;
 	}
     }
+#endif
 
     if (count == -1) {
 	if (ferror(fpin)) {
