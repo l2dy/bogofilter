@@ -182,8 +182,8 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						}
 
 <INITIAL>charset=\"?{ID}\"?			{ got_charset(yytext); yyless(strlen("charset")); return TOKEN; }
-<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); yyless(strlen("MIME-Version:")); return(TOKEN); }
-<INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); yyless(strlen("Content-Transfer-Encoding:")); return(TOKEN); }
+<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); yyless(strlen("MIME-Version:")); return TOKEN; }
+<INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); yyless(strlen("Content-Transfer-Encoding:")); return TOKEN; }
 <INITIAL>^Content-Type:{TTYPE};?		{ mime_type(yy_text()); yyless(strlen("Content-Type:")); return TOKEN; }
 <INITIAL>^Content-Disposition:{MTYPE}		{ mime_disposition(yy_text()); yyless(strlen("Content-Disposition:")); return TOKEN; }
 <INITIAL>^To/:.*				{ if (header_line_markup) set_tag("to:"); }
@@ -203,7 +203,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						      BEGIN HTML;
 						  else
 						      BEGIN TEXT; 
-						  return(EMPTY);
+						  return EMPTY;
 						}
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
 						      BEGIN INITIAL;
