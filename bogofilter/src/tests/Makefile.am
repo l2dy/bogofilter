@@ -70,8 +70,6 @@ EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel \
 	outputs/MH.out \
 	outputs/bogolex.out \
 	outputs/bulkmode.out \
-	outputs/combined.out \
-	outputs/degen.out \
 	outputs/dump.load-1.out \
 	outputs/dump.load-2.out \
 	outputs/dump.load-3.out \
@@ -104,5 +102,4 @@ EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel \
 	outputs/multiple.wordlists.ref   \
 	outputs/parsing.out \
 	outputs/queue_id.ref \
-	outputs/separate.out \
 	outputs/split.out
