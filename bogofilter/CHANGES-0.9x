@@ -2,9 +2,12 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.92.5	2004-08-??
+
 	2004-08-07
 
-	* OS/2 compatibility changes (contributed by Yuri Danio).
+	* Cross reference man pages to one another.
+	* OS/2 compatibility changes (contributed by Yuri Dario).
 	* Removed obsolete test output files - degen.out,
           combined.out, and separate.out
 
