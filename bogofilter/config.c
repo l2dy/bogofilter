@@ -96,7 +96,7 @@ enum algorithm_e {
 #define AL_DEFAULT AL_GRAHAM
 #endif
 
-double	spam_cutoff = 0.0;	/* set during method initialization */
+double	spam_cutoff = 0.0;			/* set during method initialization */
 double	min_dev = 0.0f;
 
 double	thresh_stats = 0.0f;
@@ -105,8 +105,10 @@ double	thresh_stats = 0.0f;
 
 static bool suppress_config_file = false;
 static enum algorithm_e algorithm = AL_DEFAULT;
+static bool cmd_algorithm = false;		/* true if specified on command line */
 
-static bool select_algorithm(const unsigned char *s);
+static bool select_algorithm(const unsigned char ch, bool cmdline);
+static void config_algorithm(const unsigned char *s);
 
 /*---------------------------------------------------------------------------*/
 
@@ -125,7 +127,7 @@ static const parm_desc sys_parms[] =
     { "stats_in_header",  CP_BOOLEAN,	{ (void *) &stats_in_header } },
     { "user_config_file", CP_STRING,	{ &user_config_file } },
 
-    { "algorithm",  	  CP_FUNCTION,	{ (void *) &select_algorithm } },
+    { "algorithm",  	  CP_FUNCTION,	{ (void *) &config_algorithm } },
     { "wordlist",	  CP_FUNCTION,	{ (void *) &configure_wordlist } },
 
     { "min_dev",	  CP_DOUBLE,	{ (void *) &min_dev } },
@@ -150,10 +152,22 @@ static const parm_desc sys_parms[] =
 
 static const parm_desc *usr_parms = NULL;
 
-static bool select_algorithm(const unsigned char *s)
+static void config_algorithm(const unsigned char *s)
 {
-    enum algorithm_e al = s ? (unsigned) tolower(*s) : algorithm;
-    bool ok = true;
+    select_algorithm(tolower(*s), false);
+}
+
+static bool select_algorithm(const unsigned char ch, bool cmdline)
+{
+    enum algorithm_e al = ch;
+
+    /* if algorithm specified on command line, ignore value from config file */
+    if (cmd_algorithm && !cmdline)
+	return true;
+
+    algorithm = al;
+    cmd_algorithm |= cmdline;
+
     switch (al)
     {
 #ifdef ENABLE_GRAHAM_METHOD
@@ -172,11 +186,11 @@ static bool select_algorithm(const unsigned char *s)
 	break;
 #endif
     default:
-	ok = false;
-	break;
+	PRINT_ERROR("Algorithm '%c' not supported.\n", al);
+	return false;
     }
     usr_parms = method->config_parms;
-    return ok;
+    return true;
 }
 
 static bool process_config_parameter(const parm_desc *arg, const unsigned char *val)
@@ -454,7 +468,7 @@ int process_args(int argc, char **argv)
     int option;
     int exitcode;
 
-    select_algorithm(NULL);	/* select default algorithm */
+    select_algorithm(algorithm, false);	/* select default algorithm */
 
     while ((option = getopt(argc, argv, "d:eFhl::o:snSNvVpuc:CgrRx:fqt" G R F)) != EOF)
     {
@@ -519,8 +533,7 @@ int process_args(int argc, char **argv)
 
 #ifdef	GRAHAM_AND_ROBINSON
 	case 'g':
-	    algorithm = AL_GRAHAM;
-	    select_algorithm(NULL);
+	    select_algorithm(AL_GRAHAM, true);
 	    break;
 #endif
 
@@ -531,16 +544,14 @@ int process_args(int argc, char **argv)
 	/*@fallthrough@*/
 	/* fall through to force Robinson calculations */
 	case 'r':
-	    algorithm = AL_ROBINSON;
-	    select_algorithm(NULL);
+	    select_algorithm(AL_ROBINSON, true);
 #endif
 	    break;
 #endif
 
 #ifdef ENABLE_ROBINSON_FISHER
 	case 'f':
-	    algorithm = AL_FISHER;
-	    select_algorithm(NULL);
+	    select_algorithm(AL_FISHER, true);
 	    break;
 #endif
 
