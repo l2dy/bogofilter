@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -32,7 +33,7 @@ void *open_wordlist( const char *name, const char *filepath )
 }
 
 /* returns -1 for error, 0 for success */
-int init_list(wordlist_t* list, const char* name, const char* filepath, double weight, bool bad, int override, int ignore)
+int init_list(wordlist_t* list, const char* name, const char* filepath, double weight, bool bad, int override, bool ignore)
 {
     wordlist_t* list_index;
     wordlist_t** last_list_ptr;
@@ -145,6 +146,82 @@ void sanitycheck_lists()
     }
     if (DEBUG_WORDLIST(1))
 	fprintf(stderr, "%d lists look OK.\n", listcount);
+}
+
+// type - 'g', 's', or 'i'
+// name - 'good', 'spam', etc
+// path - 'goodlist.db'
+// weight - 1,2,...
+// override - 1,2,...
+
+bool configure_wordlist(const char *val)
+{
+    bool ok;
+    int rc;
+    wordlist_t* list = xcalloc(1, sizeof(wordlist_t));
+    char* type;
+    char* name;
+    char* path;
+    double weight = 0.0f;
+    bool bad = FALSE;
+    int override = 0;
+    bool ignore = FALSE;
+
+    char *tmp = xstrdup(val);
+	
+    type=tmp;
+    tmp += strcspn(tmp, ", \t");
+    *tmp++ = '\0';
+    while (isspace(*tmp)) tmp += 1;
+
+    switch (type[0])
+    {
+    case 'g':		// good
+    {
+	break;
+    }
+    case 's':
+    case 'b':		// spam
+    {
+	bad = TRUE;
+	break;
+    }
+    case 'i':		// ignore
+    {
+	ignore = TRUE;
+	break;
+    }
+    default:
+    {
+	fprintf( stderr, "Unknown list type - '%c'\n", type[0]);
+	break;
+    }
+    }
+
+    name=tmp;
+    tmp += strcspn(tmp, ", \t");
+    *tmp++ = '\0';
+    while (isspace(*tmp)) tmp += 1;
+
+    path=tmp;
+    tmp += strcspn(tmp, ", \t");
+    *tmp++ = '\0';
+    while (isspace(*tmp)) tmp += 1;
+
+    weight=atof(tmp);
+    tmp += strcspn(tmp, ", \t");
+    *tmp++ = '\0';
+    while (isspace(*tmp)) tmp += 1;
+
+    override=atof(tmp);
+    tmp += strcspn(tmp, ", \t");
+    *tmp++ = '\0';
+    while (isspace(*tmp)) tmp += 1;
+
+    rc = init_list(list, name, path, weight, bad, override, ignore);
+    ok = rc == 0;
+
+    return ok;
 }
 
 // Done

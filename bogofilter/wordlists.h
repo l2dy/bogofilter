@@ -17,14 +17,16 @@ struct wordlist_s
     double weight;
     bool active;
     bool bad;
-    int override;
-    int ignore;
+    int  override;
+    bool ignore;
 };
 
 extern wordlist_t *word_lists;
 extern wordlist_t good_list, spam_list;
 
 int setup_lists(const char* directory);
+bool configure_wordlist(const char *val);
+
 void *open_wordlist( const char *name, const char *filepath);
 void close_lists(void);
 
