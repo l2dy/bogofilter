@@ -252,7 +252,10 @@ void set_tag(const char *text)
 	token_prefix = w_head;		/* Header: */
 	break;
     case 'r':			
-	token_prefix = w_rtrn;		/* Return-Path: */
+	if (tolower(text[2]) == 't')
+	    token_prefix = w_rtrn;	/* Return-Path: */
+	else
+	    token_prefix = w_recv;	/* Received: */
 	break;
     case 's':
 	token_prefix = w_subj;		/* Subject: */

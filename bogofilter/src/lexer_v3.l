@@ -94,6 +94,7 @@ static word_t *yy_text(void);
 static void reorder_html(void);
 
 static void skip_to(char chr);
+static void use_to(char chr);
 
 void yy_set_state_initial(void);
 
@@ -216,11 +217,12 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						}
 
 <INITIAL>^(To|From|Return-Path|Subject):	{ set_tag(yytext); }
+<INITIAL>^Received:				{ set_tag(yytext); return TOKEN; }
 <INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); return TOKEN; }
-<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); skip_to(':'); return TOKEN; }
 
-<INITIAL>^(Delivery-)?Date:.*			/* ignore */
-<INITIAL>^(Resent-)?Message-ID:.*		/* ignore */
+<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); return HEADKEY; }
+<INITIAL>^(Delivery-)?Date:.*			{ return HEADKEY; }
+<INITIAL>^(Resent-)?Message-ID:.*		{ return HEADKEY; }
 
 <INITIAL>^(In-Reply-To|References):.* 		{ return HEADKEY; }
 
@@ -228,7 +230,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); skip_to('='); return TOKEN; }
 
 <INITIAL>(file)?name=\"?			/* ignore */
-<INITIAL>(ESMTP|SMTP)+[ \t\n]+id\ {ID}		/* ignore */
+<INITIAL>(ESMTP|SMTP)+[ \t\n]+id\ {ID}		{ if (header_line_markup) { use_to(' '); return TOKEN; } }
 <INITIAL>[:blank:]*id\ {ID}			/* ignore */
 
 <INITIAL>\n[ \t]				{ lineno += 1; }
@@ -241,11 +243,13 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						  return EOH;
 						}
 
-<INITIAL><<EOF>>				{ return NONE; }
+<INITIAL>\n					{ if (header_line_markup) set_tag("Header"); lineno += 1; }
+<INITIAL><<EOF>>				{ add_hint("no_body:"); return NONE; }
 
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
 						      BEGIN INITIAL;
 						      msg_header = true;
+						      yy_set_state_initial();
 						      return BOUNDARY;
 						  } else {
 						      yyless(2);
@@ -299,6 +303,15 @@ static void skip_to(char chr)
     yyless(len);
 }
 
+static void use_to(char chr)
+{
+    char *del = memchr(yytext, chr, yyleng);
+    if (del) {
+	*del = 0;
+	yyleng = (del - yytext);
+    }
+}
+
 static void reorder_html(void)
 {
     char *chr = memchr(yytext, '<', yyleng);	/* find start of html tag */
@@ -316,7 +329,6 @@ static void reorder_html(void)
 }
 
 char yy_get_state(void);
-void yy_set_state_initial(void);
 
 char yy_get_state()
 {
@@ -334,6 +346,8 @@ char yy_get_state()
 void yy_set_state_initial(void)
 {
     BEGIN INITIAL;
+    if (header_line_markup)
+	set_tag("Header");
 
     msg_header = true;
 
