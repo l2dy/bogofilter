@@ -25,6 +25,7 @@ AUTHOR:
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #include "charset.h"
+#include "maint.h"
 #include "error.h"
 #include "find_home.h"
 #include "format.h"
@@ -151,6 +152,7 @@ static const parm_desc sys_parms[] =
 #endif
     { "block_on_subnets", CP_BOOLEAN,	{ (void *) &block_on_subnets } },
     { "charset_default",  CP_STRING,	{ &charset_default } },
+    { "datestamp_tokens",		CP_BOOLEAN, { (void *) &datestamp_tokens } },
     { "replace_nonascii_characters",	CP_BOOLEAN, { (void *) &replace_nonascii_characters } },
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };

@@ -243,8 +243,10 @@ void db_set_dbvalue(void *vhandle, const char * word, dbv_t *val){
   }
 
   db_data.data = &cv;			/* and save array in wordlist */
-  db_data.size = sizeof(cv);
-  db_data.ulen = sizeof(cv);
+  if (!datestamp_tokens || val->date == 0)
+      db_data.size = db_data.ulen = sizeof(cv[0]);
+  else
+      db_data.size = db_data.ulen = sizeof(cv);
 
   ret = handle->dbp->put(handle->dbp, NULL, &db_key, &db_data, 0);
   xfree(t);
