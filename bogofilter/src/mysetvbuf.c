@@ -9,7 +9,9 @@
 #include "config.h"
 #include <stdio.h>
 
-int mysetvbuf(FILE *stream, char *buf, int mode , size_t size)
+#include "mysetvbuf.h"
+
+int mysetvbuf(FILE *stream, char *buf, int mode, size_t size)
 {
 #ifdef SETVBUF_REVERSED
 	return setvbuf(stream, mode, buf, size);
