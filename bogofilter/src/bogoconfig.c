@@ -610,10 +610,12 @@ void process_args_1(int argc, char **argv)
 	    exit(0);
 
 	case 'W':
+	    wordlists++;
 	    switch (wordlists) {
-	    case W_UNKNOWN:  wordlists = W_COMBINED; break;
-	    case W_COMBINED: wordlists = W_SEPARATE; break;
-	    case W_SEPARATE: 
+	    case W_COMBINED:
+	    case W_SEPARATE:
+		break;
+	    default:
 		fprintf(stderr, "Invalid -W option.\n");
 		exit(2);
 	    }

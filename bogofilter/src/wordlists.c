@@ -184,7 +184,7 @@ void open_wordlists(dbmode_t mode)
 	    case W_SEPARATE:
 		list->dbh = db_open(list->filepath, cSeparate, aSeparate, mode);
 		break;
-	    case W_UNKNOWN:
+	    default: /* W_UNKNOWN */
 		if (list->dbh == NULL) {
 		    list->dbh = db_open(list->filepath, cCombined, aCombined, mode);
 		    if (list->dbh == NULL)
@@ -195,8 +195,6 @@ void open_wordlists(dbmode_t mode)
 		    if (list->dbh == NULL)
 			wordlists = W_SEPARATE;
 		}
-		if (wordlists == W_UNKNOWN)
-		    wordlists = W_COMBINED;
 		break;
 	    }
 	    if (list->dbh == NULL) {

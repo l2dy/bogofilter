@@ -100,9 +100,8 @@ typedef enum bulk_e {
 
 #define	W_DEFAULT   W_COMBINED
 
-typedef enum wl_e { W_UNKNOWN=0,
-		    W_SEPARATE=1,
-		    W_COMBINED=2 } wl_t;
+typedef enum wl_e { W_COMBINED=0,
+		    W_SEPARATE=1 } wl_t;
 
 #include "globals.h"
 

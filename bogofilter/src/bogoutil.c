@@ -537,7 +537,7 @@ static int compute_robinson_x(char *path)
 	    ok = (build_path(filepath1, sizeof(filepath1), path, SPAMFILE) == 0 &&
 		  build_path(filepath2, sizeof(filepath2), path, GOODFILE) == 0 );
 	    break;
-	case W_UNKNOWN:
+	default:
 	    fprintf(stderr, "Invalid wordlist mode.\n");
 	    exit(2);
 	}
@@ -693,10 +693,12 @@ static int process_args(int argc, char **argv)
 	    exit(0);
 
 	case 'W':
+	    wordlists++;
 	    switch (wordlists) {
-	    case W_UNKNOWN:  wordlists = W_COMBINED; break;
-	    case W_COMBINED: wordlists = W_SEPARATE; break;
-	    case W_SEPARATE: 
+	    case W_COMBINED:
+	    case W_SEPARATE:
+		break;
+	    default:
 		fprintf(stderr, "Invalid -W option.\n");
 		exit(2);
 	    }
