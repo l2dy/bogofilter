@@ -26,4 +26,8 @@ find_home(int read_env) /*@globals errno@*/;
 const char *
 find_home_user(const char *username) /*@globals errno@*/;
 
+/*@null@*/ /*@observer@*/
+char *
+resolve_home_directory(const char *filename) /*@globals errno@*/;
+
 #endif
