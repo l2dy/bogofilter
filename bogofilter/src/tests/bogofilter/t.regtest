@@ -47,9 +47,9 @@ function check_counts()
     HAVE=`printf "%d.%d" $s $g`
 
     if  [ $verbose -ne 0 ]; then
-	echo HAVE: $HAVE, WANT: $WANT
+	echo want: $WANT, have: $HAVE
     fi
-    if [ ! "$HAVE" = "$WANT" ] ; then
+    if [ ! "$WANT" = "$HAVE" ] ; then
 	exit 1
     fi
 }
