@@ -48,7 +48,6 @@ extern void	lexer_v3_init(FILE *fp);
 /* in lexer.c */
 extern void	yyinit(void);
 extern int	yyinput(byte *buf, size_t size);
-extern int	yyredo(word_t *text, char del);
 
 extern int	buff_fill(buff_t *buff, size_t used, size_t need);
 

@@ -31,14 +31,11 @@ bool msg_header = true;
 
 /* Local Variables */
 
-static buff_t *yysave = NULL;
-
 extern char *spam_header_name;
 
 #define YY_NULL 0
 
 /* Function Prototypes */
-static int yy_use_redo_text(buff_t *buff);
 static int yy_get_new_line(buff_t *buff);
 static int skip_spam_header(buff_t *buff);
 static int get_decoded_line(buff_t *buff);
@@ -99,25 +96,6 @@ static int lgetsl(buff_t *buff)
     return count;
 }
 
-static int yy_use_redo_text(buff_t *buff)
-{
-    size_t used  = buff->t.leng;
-    size_t size  = buff->size;
-    size_t avail = size - used;
-    byte  *buf = buff->t.text+used;
-    size_t count = min(yysave->size, avail-2);
-
-    if (avail < 2) abort();
-
-    memcpy(buf, yysave->t.text, count );
-    buf[count++] = '\n';
-    buf[count] = '\0';
-    buff->t.leng += count;
-    buff_free_text(yysave);
-    yysave = NULL;
-    return count;
-}
-
 static int yy_get_new_line(buff_t *buff)
 {
     int count = lgetsl(buff);
@@ -164,10 +142,7 @@ static int get_decoded_line(buff_t *buff)
     size_t used = buff->t.leng;
     byte *buf = buff->t.text + used;
 
-    if (yysave == NULL)
-	count = yy_get_new_line(buff);
-    else
-	count = yy_use_redo_text(buff);
+    count = yy_get_new_line(buff);
 
 /* unfolding:
 ** 	causes "^\tid" to be treated as continuation of previous line
@@ -290,39 +265,6 @@ int yyinput(byte *buf, size_t max_size)
     }
 
     return (count == -1 ? 0 : count);
-}
-
-int yyredo(word_t *text, char del)
-{
-    const byte *t = text->text;
-    size_t leng = text->leng;
-    buff_t *tmp;
-    byte *d;
-    size_t tlen = strlen((const char *)t);
-    assert(tlen == leng);
-
-    if (DEBUG_LEXER(2)) fprintf(dbgout, "yyredo:  %ld \"%s\"\n", (long)leng, text->text);
-
-    /* if already processing saved text, concatenate new after old */
-    if (yysave == NULL) {
-	tmp = buff_new(xmalloc(tlen+D), tlen, tlen+D);
-	memcpy(tmp->t.text, t, tlen);
-	Z(tmp->t.text[tmp->t.leng]);	/* for easier debugging - removable */
-    } else {
-	size_t yu = yysave->t.leng;
-	size_t nlen = yu + tlen;
-	tmp = buff_new(xmalloc(nlen+D), nlen, nlen+D);
-	memcpy(tmp->t.text, yysave->t.text, yu);
-	memcpy(tmp->t.text+yu, t, tlen);
-	Z(tmp->t.text[tmp->t.leng]);	/* for easier debugging - removable */
-	buff_free_text(yysave);
-    }
-
-    yysave = tmp;
-    if ((d = memchr(yysave->t.text, del, yysave->size)) != NULL)
-	*d = ' ';
-
-    return 1;
 }
 
 /*
