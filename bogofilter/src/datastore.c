@@ -477,6 +477,12 @@ int ds_remove(const char *directory) {
     return dbe_remove(&dir);
 }
 
+int ds_checkpoint(const char *directory) {
+    bfdir dir;
+    dir.dirname = directory;
+    return dbe_checkpoint(&dir);
+}
+
 int ds_purgelogs(const char *directory) {
     bfdir dir;
     dir.dirname = directory;

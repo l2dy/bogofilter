@@ -268,4 +268,7 @@ extern int ds_verify(const char *directory, const char *file);
 /** Remove inactive log files in given directory, \return EX_OK. */
 extern int ds_purgelogs(const char *directory);
 
+/** Run checkpoint once */
+extern int ds_checkpoint(const char *directory);
+
 #endif
