@@ -1,14 +1,10 @@
 /* $Id$ */
 
-/*****************************************************************************
-
-NAME:
-   bogoreader.h -- prototypes and definitions for bogoreader.c.
-
-AUTHOR:
-   David Relson <relson@osagesoftware.com>
-
-******************************************************************************/
+/** \file bogoreader.h
+ * prototypes and definitions for bogoreader.c
+ *
+ * \author David Relson <relson@osagesoftware.com>
+ */
 
 #ifndef BOGOREADER_H
 #define BOGOREADER_H
@@ -24,6 +20,8 @@ void bogoreader_name(const char *name);
 
 /* Lexer-Reader Interface */
 
+/** check if the string of \a len bytes starting at \a buf
+ * ends with LF or CRLF */
 extern	bool is_eol(const char *buf, size_t len);
 
 typedef int   reader_line_t(buff_t *buff);

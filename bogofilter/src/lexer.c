@@ -1,11 +1,11 @@
 /* $Id$ */
 
-/*
- * NAME
- *   lexer.c -- bogofilter's lexical analyzer (control routines)
+/**
+ * \file lexer.c
+ * bogofilter's lexical analyzer (control routines)
  *
- *   01/01/2003 - split out of lexer.l
-*/
+ * \date 2003-01-01 split out of lexer.l
+ */
 
 #include "common.h"
 
@@ -74,9 +74,12 @@ static void lexer_display_buffer(buff_t *buff)
        fputc('\n', dbgout);
 }
 
-/* Check for lines wholly composed of printable characters as they can cause a scanner abort
-   "input buffer overflow, can't enlarge buffer because scanner uses REJECT"
-*/
+/*
+ * Check for lines wholly composed of printable characters as they can
+ * cause a scanner abort
+ * "input buffer overflow, can't enlarge buffer because scanner uses
+ * REJECT"
+ */
 static bool not_long_token(byte *buf, uint count)
 {
     uint i;

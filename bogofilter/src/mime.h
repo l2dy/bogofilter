@@ -1,11 +1,8 @@
 /* $Id$ */
 
-/*****************************************************************************
-
-NAME:
-   mime.h -- prototypes and definitions for mime.c
-
-******************************************************************************/
+/** \file mime.h
+ * prototypes and definitions for mime.c
+ */
 
 #ifndef	HAVE_MIME_H
 #define	HAVE_MIME_H
