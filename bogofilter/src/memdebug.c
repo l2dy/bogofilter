@@ -20,6 +20,8 @@
 *	- Program exit when current allocation is "too much".
 */
 
+#define	NO_MEMDEBUG_MACROS
+
 #include "common.h"
 
 #include <stdlib.h>
