@@ -23,17 +23,30 @@ fi
 [   -d ${TMPDIR} ] && rm -rf ${TMPDIR}
 [ ! -d ${TMPDIR} ] && mkdir  ${TMPDIR}
 
+# Graham config
+cat /dev/null > ${TMPDIR}/cfg.g
+
+# Robinson config
 cat <<EOF > ${TMPDIR}/cfg.r
 robx=0.415
 min_dev=0.0
 EOF
 
+# Fisher config
 cat <<EOF > ${TMPDIR}/cfg.f
 robx=0.415
 min_dev=0.1
+ham_cutoff=0.0
 EOF
 
-cat /dev/null > ${TMPDIR}/cfg.g
+# Fisher tristate
+cat <<EOF > ${TMPDIR}/cfg.t
+robx=0.415
+min_dev=0.1
+terse_format = %1.1c %d
+spamicity_tags = S,h,u
+spamicity_formats = %6.2e %6.2e %0.6f
+EOF
 
 BOGOUTIL="../bogoutil"
 BOGOFILTER="../bogofilter"
@@ -54,9 +67,9 @@ map_rc()
 run_test()
 {
     id="$1"
-    out="$2"
+    fil="$2"
     ver="$3"
-    OUT="${TMPDIR}/tests/msg.$out.$alg.$ver"
+    OUT="${TMPDIR}/tests/msg.$fil.$mth.$ver"
     OPTS="-$alg -t -$ver $CFG"
     map_rc $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt >${TMPDIR}/tests-$alg 
     sed s/,.version=.*// < ${TMPDIR}/tests-$alg > $OUT
@@ -65,9 +78,11 @@ run_test()
 [   -d ${TMPDIR}/tests ] && rm -f ${TMPDIR}/tests/*
 [ ! -d ${TMPDIR}/tests ] && mkdir -p ${TMPDIR}/tests
 
-for alg in r f g ; do
-    BOGOFILTER_DIR="${TMPDIR}/words.$alg"
-    CFG="-c ${TMPDIR}/cfg.$alg"
+for mth in g r f t ; do
+    alg="$mth"
+    [ "$alg" = "t" ] && alg=f
+    BOGOFILTER_DIR="${TMPDIR}/words.$mth"
+    CFG="-c ${TMPDIR}/cfg.$mth"
     export BOGOFILTER_DIR
     [   -d $BOGOFILTER_DIR ] && rm -f $BOGOFILTER_DIR/*
     [ ! -d $BOGOFILTER_DIR ] && mkdir $BOGOFILTER_DIR
@@ -93,7 +108,8 @@ for out in ${TMPDIR}/tests/msg.?.r.v ; do
     g=`cat ${TMPDIR}/tests/msg.$id.g.v | tr "NY" "hS"`
     r=`cat ${TMPDIR}/tests/msg.$id.r.v | tr "NY" "hS"`
     f=`cat ${TMPDIR}/tests/msg.$id.f.v | tr "NY" "hS"`
-    printf "%2s   %c %s   %c %s   %c %s\n" $id $g $r $f >> ${TMPDIR}/tests/$OUT
+    t=`cat ${TMPDIR}/tests/msg.$id.t.v`
+    printf "%2s   %c %s   %c %s   %c %s   %c %s\n" $id $g $r $f $t >> ${TMPDIR}/tests/$OUT
 done
 
 OUTPUTS=$srcdir/t.systest.d/outputs
