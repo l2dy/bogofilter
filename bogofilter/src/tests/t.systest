@@ -12,9 +12,6 @@
 
 NODB=1 . ${srcdir=.}/t.frame
 
-[ -d ${TMPDIR}/tests ] && rm -rf ${TMPDIR}/tests
-mkdir -p ${TMPDIR}/tests
-
 CONFIG="${TMPDIR}/test.cf"
 
 OPTS="-c ${CONFIG} -y 0"
@@ -56,10 +53,8 @@ map_rc()
 
 alg="f"
 
-BOGOFILTER_DIR="${TMPDIR}/words.$alg"
+BOGOFILTER_DIR="${TMPDIR}"
 export BOGOFILTER_DIR
-rm -rf $BOGOFILTER_DIR
-mkdir $BOGOFILTER_DIR
 $BOGOFILTER $OPTS -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER $OPTS -n < ${SYSTEST}/inputs/good.mbx
 for f in $BOGOFILTER_DIR/*.${DB_EXT} ; do
@@ -78,7 +73,7 @@ for tst in 1.1.v 2.2a.vv 2.2a.vvv 3.3.vvv ; do
     ver=`echo $tst | tr "." " " | $AWK '{print $3}'`
     map_rc $BOGOFILTER $OPTS -$ver 2>/dev/null \
     < ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg || :
-    sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
+    sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/msg.$out.$alg.$ver
 done
 #
 # classify msg.2.txt a second time and rerun tests
@@ -91,7 +86,7 @@ for tst in 2.2b.vv 2.2b.vvv ; do
     ver=`echo $tst | tr "." " " | $AWK '{print $3}'`
     map_rc $BOGOFILTER $OPTS -$ver 2>/dev/null \
     < ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg
-    sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
+    sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/msg.$out.$alg.$ver
 done
 if  [ $verbose -eq 0 ]; then
     rm -f ${TMPDIR}/tests-$alg
@@ -105,9 +100,9 @@ if [ "$BF_SAVEDIR" ] ; then . ${srcdir}/t.save ; fi
 for i in $OUTPUTS/*f.v* ; do
     j=`basename $i`
     if  [ $verbose -eq 0 ]; then
-	cmp $i ${TMPDIR}/tests/$j
+	cmp $i ${TMPDIR}/$j
     else
 	set +e
-	diff $DIFF_BRIEF $i ${TMPDIR}/tests/$j
+	diff $DIFF_BRIEF $i ${TMPDIR}/$j
     fi
 done
