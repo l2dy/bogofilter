@@ -40,7 +40,7 @@ extern wordlist_t *word_list;
 extern wordlist_t *word_lists;
 
 void incr_wordlist_mode(void);
-void set_wordlist_mode(void **dbh, const char *filepath, dbmode_t dbmode);
+void set_wordlist_mode(const char *filepath);
 size_t build_wordlist_paths(char **filepaths, const char *path);
 
 int  setup_wordlists(const char* dir, priority_t precedence);

@@ -186,33 +186,6 @@ void incr_wordlist_mode(void)
     return;
 }
 
-void set_wordlist_mode(void **dbhp, const char *filepath, dbmode_t dbmode)
-{
-    if (wl_mode == WL_M_UNKNOWN) {
-	void *dbh;
-
-	wl_mode = wl_default;
-
-	dbh = db_open(filepath, cCombined, aCombined, dbmode);
-	if (dbh != NULL)
-	    wl_mode = WL_M_COMBINED;
-
-	if (dbh == NULL) {
-	    dbh = db_open(filepath, cSeparate, aSeparate, dbmode);
-	    if (dbh != NULL)
-		wl_mode = WL_M_SEPARATE;
-	}
-
-	if (dbhp != NULL)	/* If non-null, handle is wanted */
-	    *dbhp = dbh;
-	else			/* else not wanted - close file */
-	    if (dbh != NULL)
-		db_close(dbh, true);
-    }
-
-    return;
-}
-
 void open_wordlists(dbmode_t mode)
 {
     wordlist_t *list;
@@ -221,6 +194,8 @@ void open_wordlists(dbmode_t mode)
     do {
 	retry = 0;
 	for (list = word_lists; list != NULL; list = list->next) {
+	    if (wl_mode == WL_M_UNKNOWN)
+		set_wordlist_mode(list->filepath);
 	    switch (wl_mode) {
 	    case WL_M_COMBINED:
 		list->dbh = db_open(list->filepath, cCombined, aCombined, mode);
@@ -229,8 +204,8 @@ void open_wordlists(dbmode_t mode)
 		list->dbh = db_open(list->filepath, cSeparate, aSeparate, mode);
 		break;
 	    case WL_M_UNKNOWN:
-		set_wordlist_mode(&list->dbh, list->filepath, mode);
-		break;
+		fprintf(stderr, "Invalid wordlist mode.\n");
+		exit(2);
 	    }
 	    if (list->dbh == NULL) {
 		int err = errno;
@@ -296,14 +271,44 @@ size_t build_wordlist_paths(char **filepaths, const char *path)
 	break;
     case WL_M_SEPARATE:
 	count = 2;
-	ok = (build_path(filepaths[0], sizeof(FILEPATH), path, WORDLIST) == 0 &&
-	      build_path(filepaths[1], sizeof(FILEPATH), path, WORDLIST) == 0);
+	ok = (build_path(filepaths[0], sizeof(FILEPATH), path, SPAMFILE) == 0 &&
+	      build_path(filepaths[1], sizeof(FILEPATH), path, GOODFILE) == 0);
 	break;
     case WL_M_UNKNOWN:
 	fprintf(stderr, "Invalid wordlist mode.\n");
 	exit(2);
     }
     return count;
+}
+
+static bool check_wordlist_paths(const char *path, size_t count, const char **names)
+{
+    size_t i;
+    for (i = 0; i < count ; i += 1) {
+	char filepath[PATH_LEN];
+	struct stat statbuf;
+	const char *name = names[i];
+	build_path(filepath, sizeof(filepath), path, name);
+	memset(&statbuf, 0, sizeof(statbuf));
+	if (stat(filepath, &statbuf) != 0)
+	    return false;
+    }
+    return true;
+}
+
+void set_wordlist_mode(const char *filepath)
+{
+    if (wl_mode != WL_M_UNKNOWN)
+	return;
+
+    wl_mode = wl_default;
+    if (check_wordlist_paths(filepath, cCombined, aCombined))
+	wl_mode = WL_M_COMBINED;
+    else
+    if (check_wordlist_paths(filepath, cSeparate, aSeparate))
+	wl_mode = WL_M_SEPARATE;
+
+    return;
 }
 
 void set_good_weight(double weight)

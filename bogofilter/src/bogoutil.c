@@ -374,7 +374,7 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 
     void *dbh;
 
-    set_wordlist_mode(NULL, dir, DB_READ);
+    set_wordlist_mode(dir);
     count = build_wordlist_paths(filepaths, dir);
 
     /* XXX FIXME: deadlock possible */
