@@ -155,7 +155,7 @@ rc_t bogofilter(int argc, char **argv)
 
     bogoreader_fini();
 
-    if (register_aft) {
+    if (register_aft && ((run_type & RUN_UPDATE) == 0)) {
 	wordhash_sort(words);
 	register_words(run_type, words, msgcount);
     }
