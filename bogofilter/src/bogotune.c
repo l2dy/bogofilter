@@ -430,9 +430,9 @@ static uint filelist_read(int mode, flhead_t *list)
     uint count = 0;
     flitem_t *item;
     run_type = mode;
-    lexer = NULL;
-    msg_count_file = false;
     for (item = list->head; item != NULL; item = item->next) {
+	lexer = NULL;
+	msg_count_file = false;
 	count += read_mailbox(item->name);
     }
     return count;
