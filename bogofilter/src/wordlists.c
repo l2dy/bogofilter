@@ -30,6 +30,9 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 {
     bool retry = false;
 
+    if (list->type == WL_IGNORE) 	/* open ignore list in read-only mode */
+	mode = DS_READ;
+
     list->dsh = ds_open(bogohome, list->filepath, mode);
     if (list->dsh == NULL) {
 	int err = errno;
