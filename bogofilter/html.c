@@ -26,7 +26,7 @@ AUTHOR:
 
 int	html_comment_count = 0;
 
-bool	kill_html_comments  = false;	/* config file option:  "kill_html_comments"  */
+bool	kill_html_comments  = true;	/* config file option:  "kill_html_comments"  */
 int	count_html_comments = 5;	/* config file option:  "count_html_comments" */
 bool	score_html_comments = false;	/* config file option:  "score_html_comments" */
 
