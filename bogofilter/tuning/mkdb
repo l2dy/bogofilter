@@ -1,0 +1,51 @@
+#! /bin/bash
+
+# mkdb
+#
+#    make wordlist databases
+#
+#    presently set up for mbox files ;  needs minor changes for Maildirs
+#    by changing 'cat' command to 'zcat' can be used with compresed mboxes
+#
+
+spam_files="spam.mbx"
+good_files="good.mbx"
+
+cnt=`ls t.ns t.sp r[0-2].ns r[0-2].sp 2>&1 | wc -l | tr -d " "`
+if [ "$cnt" != "8" ] ; then
+    echo `date +%m%d.%H%M` " distributing spam... "
+    FILENO=0 cat $spam_files | formail -s sh -x ./distrib sp
+    echo done
+    
+    echo `date +%m%d.%H%M` " distributing nonspam... "
+    FILENO=0 $good_files | formail -s sh -x ./distrib ns
+    echo done
+fi
+
+cnt=`ls $BOGOFILTER_DIR/goodlist.db $BOGOFILTER_DIR/spamlist.db 2>&1 | wc -l | tr -d " "`
+if [ "$cnt" != "2" ] ; then
+    echo `date +%m%d.%H%M` " Building the wordlists... "
+    $BOGOFILTER -v -s -c $CFG < t.sp
+    $BOGOFILTER -v -n -c $CFG < t.ns
+    
+    $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT
+    echo ""
+fi
+
+#    Converting r*.(ns|sp) to 'msg-count' files costs time here
+#    but speeds up the processing in smindev.sh
+
+cnt=`ls r[0-2].ns.mc r[0-2].sp.mc 2>&1 | wc -l | tr -d " "`
+if [ "$cnt" != "6" ] ; then
+    echo `date +%m%d.%H%M` " Building the 'msg-count' files..."
+    for f in r[0-2].?? ; do
+	cat $f | formail -s ./bogolex.sh -c $CFG >> $f.mc
+    done
+fi
+
+echo `date +%m%d.%H%M` " Sizes:"
+for f in t.?? r?.?? r?.??.mc ; do
+    printf "%-10s %5d\n" $f `egrep -c "(^From |\".MSG_COUNT\")" $f`
+done
+
+echo "All done."

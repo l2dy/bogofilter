@@ -1,0 +1,15 @@
+#! /bin/sh
+
+#  distrib
+#
+#    deal messages from an mbox into files
+#
+#  usage: FILENO=0 cat mbox1 mbox2 | formail -s ./distrib extension
+
+# put names of files to be produced into this array
+FILE=(t.$1 r0.$1 t.$1 r1.$1 t.$1 r2.$1)
+
+# no user serviceable parts beyond this point
+let idx=$FILENO%${#FILE[*]}
+out=${FILE[$idx]}
+cat >>$out
