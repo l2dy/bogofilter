@@ -72,7 +72,7 @@ static reader_more_t mailbox_next_mail;
 static reader_line_t simple_getline;	/* ignores /^From / */
 static reader_line_t mailbox_getline;	/* minds   /^From / */
 static reader_line_t rmail_getline;	/* minds   /^#! rmail/ */
-<static reader_line_t ant_getline;	/* minds   /^MAIL TO:/ */
+static reader_line_t ant_getline;	/* minds   /^MAIL TO:/ */
 
 static reader_file_t get_filename;
 
