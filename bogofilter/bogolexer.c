@@ -13,18 +13,24 @@ NAME:
 #include <string.h>
 #include <unistd.h>
 
-#include "config.h"
+#include <config.h>
+#include "common.h"
+
 #include "lexer.h"
 
 /* exports */
-int passthrough;
+bool logflag;		/* '-l' */
+bool quiet;		/* '-q' */
+int  passthrough;	/* '-p' */
+int  verbose;		/* '-v' */
 
-#define PROGNAME "bogolexer"
+const char *progname = "bogolexer";
+
 const char *spam_header_name = SPAM_HEADER_NAME;
 
 static void usage(void)
 {
-    fprintf(stderr, "Usage: %s [ -p | -q | -h ]\n", PROGNAME);
+    fprintf(stderr, "Usage: %s [ -p | -q | -h ]\n", progname);
 }
 
 static void help(void)
@@ -34,7 +40,7 @@ static void help(void)
 	    "\t-p\tprint the tokens from stdin.\n"
 	    "\t-q\tquiet mode, no tokens are printed.\n"
 	    "\t-h\thelp, this output.\n"
-	    "%s is part of the bogofilter package.\n", PROGNAME);
+	    "%s is part of the bogofilter package.\n", progname);
 }
 
 int main(int argc, char **argv)
@@ -42,7 +48,6 @@ int main(int argc, char **argv)
     token_t t;
     int option;
     int count=0;
-    int quiet = 0;
 
     while ((option = getopt(argc, argv, ":hpq")) != -1)
 	switch (option) {
