@@ -41,3 +41,11 @@ to remove older tokens you may want to run this command:
     sqlite3 ~/.bogofilter/wordlist.db 'VACUUM;'
 
 to remove unused pages from the database file and reduce the file size.
+
+A. Miscellaneous ------------------------------------------------------
+
+A.1 Why BLOB?
+
+bogofilter has traditionally managed its own data structure inside key
+and value, BLOB allows the verbatim retrieval of such data without
+stumbling across embedded NUL characters.
