@@ -621,7 +621,7 @@ int db_init(void) {
     if (!bogohome)
 	abort();
 
-    if (bogohome && !getenv("BF_TRADITIONAL_DB")) {
+    if (bogohome && getenv("BOGOFILTER_CONCURRENT_DATA_STORE")) {
 	int ret = db_env_create(&dbe, 0);
 	if (ret != 0) {
 	    print_error(__FILE__, __LINE__, "db_env_create, err: %d, %s", ret, db_strerror(ret));

@@ -20,6 +20,8 @@ This bogofilter version now contains code to use BerkeleyDB environments
 for locking and caching data base access instead of the proven
 fcntl()/F_SETLK locks bogofilter used to use.
 
+The new code must be enabled by setting an environment variable.
+
 The ultimate goal is to migrate to the Berkeley DB Transactional Data
 Store, in order to improve data base robustness.
 
@@ -37,23 +39,30 @@ readers and one writer at the same time.
 
 2. Use, restrictions, caveats ------------------------------------------
 
-The new code is enabled by default. If, for some reason, it does not
-work for you, stop all bogofilter processes and try to recover the
-environment with the db_recover utility. Give it your data base
-directory as argument to the -h option, for instance:
+The new code is enabled iff you define the environment variable
+BOGOFILTER_CONCURRENT_DATA_STORE, irrespective of its content.
+
+If, for some reason, it does not work for you, stop all bogofilter
+processes and try to recover the environment with the db_recover
+utility. Give it your data base directory as argument to the -h option,
+for instance:
 
     db_recover -h ~/.bogofilter
 
 If that does not cure your problems, please report to the mailing list
 1. what you did, 2. what you got, 3. what you expected instead of #2.
 
-For a transition phase, the old code is still around and can be used by
-setting an environment variable:
+As an example, you could use this as a boilerplate to start using the
+new code:
 
-env BF_TRADITIONAL_DB=1 bogofilter [options]
+env BOGOFILTER_CONCURRENT_DATA_STORE=1 bogofilter [options]
 
 where [options] is a placeholder for the options you regularly run
 bogofilter with, it can be empty.
+
+Note that this env BOGOFILTER... is necessary for all bogofilter related
+commands that access the data base, for instance, bogoutil and bogotune
+in particular.
 
 BerkeleyDB keeps some additional statistics about locking, caching and
 their efficiency. These can be obtained by running the db_stat utility
