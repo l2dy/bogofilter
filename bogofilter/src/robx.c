@@ -109,7 +109,7 @@ double compute_robinson_x(char *path)
     set_wordlist_dir(path, PR_NONE);
     open_wordlists(DS_READ);
 
-    rx = compute_robx(word_lists->dsh);
+    rx = compute_robx(default_wordlist()->dsh);
 
     close_wordlists(false);
     free_wordlists();

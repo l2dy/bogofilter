@@ -3,6 +3,11 @@
 			       =================
 
 
+	2004-09-05
+
+	* Ensure that robx computation used a regular wordlist (rather
+          than an ignore list) to avoid a seg fault in bogotune.
+	  
 0.92.6	2004-08-22
 
 	* Revise "-QQ" output so it can be used (unchanged) in a
