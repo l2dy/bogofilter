@@ -6,7 +6,9 @@
 #                 and train if the result is wrong or uncertain
 #  needs:    bash basename rm grep awk wc perl dd bogofilter
 #  usage:    see function usage() of this file
-#  version:  0.6 (Greg Louis <glouis@dynamicro.on.ca>)
+#
+#  original author: 	Greg Louis <glouis@dynamicro.on.ca>
+#  modified by: 	David Relson <relson@osagesoftware.com>
 
 function usage() {
     name=`basename $0`
