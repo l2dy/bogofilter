@@ -67,8 +67,16 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     FILE  *out;
 
     exitcode = process_args(argc, argv);
-    if (exitcode != 0)
-	exit(exitcode);
+    if (exitcode < 0)
+	exit(-exitcode);
+    argc -= exitcode;
+    argv += exitcode;
+    exitcode = 0;
+
+    if (argc) {
+	fprintf(stderr, "Extra arguments given. Aborting.\n");
+	exit(2);
+    }
 
     process_config_files(false);
 

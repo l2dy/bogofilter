@@ -20,7 +20,8 @@
   <arg choice='opt'>-S</arg>
   <arg choice='opt'>-N</arg>
   <arg choice='opt'>-d <replaceable>dir</replaceable></arg>
-  <arg choice='opt'>-l <replaceable>tag</replaceable></arg>
+  <arg choice='opt'>-l</arg>
+  <arg choice='opt'>-L <replaceable>tag</replaceable></arg>
   <arg choice='opt'>-m <replaceable>value</replaceable></arg>
   <arg choice='opt'>-o <replaceable>value
       <optional>,value</optional></replaceable></arg>
@@ -154,11 +155,16 @@ ham_cutoff is non-zereo.</para>
     <envar>BOGOFILTER_DIR</envar> is set and
     <filename>$HOME/.bogofilter</filename> otherwise.</para>
 
-<para>The <option>-l <replaceable>tag</replaceable></option> (log) option writes an informational line
-    to the system log each time <application>bogofilter</application> is run.
-    The information logged depends on how <application>bogofilter</application>
-    is run.  The option allows an optional tag which can be included in the information being logged.
-</para>
+<para>The <option>-l</option> option writes an informational line
+    to the system log each time <application>bogofilter</application>
+    is run. The information logged depends on how
+    <application>bogofilter</application> is run.</para>
+
+<para>The <option>-L <replaceable>tag</replaceable></option> option
+    configures a tag which can be included in the information being
+    logged by the <option>-l</option> option, but it requires a custom
+    format that includes the %l string for now. This option implies
+    <option>-l</option>.</para>
 
 <para>The <option>-m <replaceable>value</replaceable></option> option allows setting min_dev.
 </para>

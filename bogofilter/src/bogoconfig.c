@@ -263,6 +263,8 @@ static void help(void)
 		  "\t-c file\t- read specified config file.\n"
 		  "\t-C\t- don't read standard config files.\n"
 		  "\t-q\t- quiet - don't print warning messages.\n"
+		  "\t-l\t- log - log a line to syslog.\n"
+		  "\t-L tag\t- Log tag - configure the string the custom %%l prints.\n"
 		  "\t-F\t- force printing of spamicity numbers.\n"
 		  "\t-x list\t- set debug flags.\n"
 		  "\t-D\t- direct debug output to stdout.\n"
@@ -308,6 +310,12 @@ static void print_version(void)
 #define	F "f"
 #endif
 
+/** This function processes command line arguments.
+ * \returns
+ * - a negative number in case of incompatible arguments, it's
+ *   the negative of the desired exit code
+ * - zero or a positive number in case of success, the number is
+ *   the amount of arguments parsed (optind). */
 int process_args(int argc, char **argv)
 {
     int option;
@@ -321,8 +329,13 @@ int process_args(int argc, char **argv)
 
     fpin = stdin;
 
-    while ((option = getopt(argc, argv, ":23d:eFhl::m:o:snSNvVpuc:CgrRfqtI:O:y:k:x:DT" G R F)) != EOF)
+    while ((option = getopt(argc, argv, ":23d:eFhlL:m:o:snSNvVpuc:CgrRfqtI:O:y:k:x:DT" G R F)) != EOF)
     {
+#if 0
+	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
+	    fprintf(stderr, "config: option=%c (%d), optind=%d, opterr=%d, optarg=%s\n", isprint((unsigned char)option) ? option : '_', option, optind, opterr, optarg ? optarg : "(null)");
+	}
+#endif
 	switch(option)
 	{
 	case '2':
@@ -362,6 +375,10 @@ int process_args(int argc, char **argv)
 	    verbose++;
 	    break;
 
+	case ':':
+	    fprintf(stderr, "One of the options lacked the mandatory argument.\n");
+	    exit(2);
+
 	case '?':
 	    help();
 	    exit(2);
@@ -398,10 +415,11 @@ int process_args(int argc, char **argv)
 	    kill_html_comments = str_to_bool( optarg );
 	    break;
 
+	case 'L':
+	    logtag = optarg;
+	    /*@fallthrough@*/
 	case 'l':
 	    logflag = true;
-	    if (optarg)
-		logtag = optarg;
 	    break;
 
 #ifdef	GRAHAM_AND_ROBINSON
@@ -484,14 +502,14 @@ int process_args(int argc, char **argv)
 
 	default:
 	    print_error(__FILE__, __LINE__, "Internal error: unhandled option '%c' "
-			"(%02X)\n", option, (unsigned int)option);
+			"(%02X)\n", isprint((unsigned char)option) ? option : '_', (unsigned int)option);
 	    exit(2);
 	}
     }
 
     exitcode = validate_args();
-
-    return exitcode;
+    if (exitcode) return -exitcode;
+    else return optind;
 }
 
 #define YN(b) (b ? "yes" : "no")
