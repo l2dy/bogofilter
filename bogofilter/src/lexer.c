@@ -126,6 +126,8 @@ static int yy_get_new_line(buff_t *buff)
     /* skip spam_header ("X-Bogosity:") lines */
     while (msg_header
 	   && count != EOF
+	   /* don't skip if inside message/rfc822 */
+	   && msg_state == msg_state->parent
 	   && memcmp(buff->t.text,spam_header_name,hdrlen) == 0) {
 	count = skip_folded_line(buff);
     }
