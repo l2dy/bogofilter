@@ -13,7 +13,7 @@ NAME:
 #include "lexer.h"
 
 extern word_t *yylval;
-extern word_t *ipaddr;		/* First IP Address in Received: statement */
+extern word_t *msg_addr;	/* First IP Address in Received: statement */
 
 extern token_t get_token(void);
 
