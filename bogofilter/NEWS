@@ -8,7 +8,14 @@ is in the RELEASE.NOTES files!
 
 $Id$
 
-0.15.0	2003-08-29
+	2003-08-30
+
+	* Clean-up message header processing:
+	  - Don't tokenize message separator lines.
+	  - Merge whitespace separated encoded words.
+	  - Unfold header lines.
+
+0.15.0	2003-08-30
 
 	* Fix defective printing in 'bogofilter -Q' output.
 
@@ -44,6 +51,10 @@ $Id$
 	  bulk mode, splitting mailboxes into messages, reading
 	  messages in maildirs, etc.
 
+0.14.5.4 2003-08-30
+
+* _Really_ fix defective printing in 'bogofilter -Q' output.
+
 0.14.5.3 2003-08-29
 
 	* Fix parser errors that can cause:
@@ -53,7 +64,7 @@ $Id$
 	* Fix defective printing in 'bogofilter -Q' output.
 	* Compiles with TDB again.
 
-0.14.5.2 2003-08-20
+0.14.5.2 2003-08-20 - Stable Release
 
 	* bogominitrain.pl - removed email 'cruft' and revised format
 	  of verbose output.

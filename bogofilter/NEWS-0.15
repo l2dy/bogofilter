@@ -2,7 +2,14 @@
 				BOGOFILTER NEWS
 			       =================
 
-0.15.0	2003-08-29
+2003-08-30
+
+* Clean-up message header processing:
+  - Don't tokenize message separator lines.
+  - Merge whitespace separated encoded words.
+  - Unfold header lines.
+
+0.15.0	2003-08-30
 
 * Implemented a new, more robust, mail reading module that knows how to
   split a mbox into messages and read Maildirs.
@@ -16,6 +23,10 @@
 * Add charset map for windows-1251 to KOI8-R (Cyrillic).
 
 * 64-bit printf files for %*s string formatting.
+
+0.14.5.4 2003-08-30
+
+* _Really_ fix defective printing in 'bogofilter -Q' output.
 
 0.14.5.3 2003-08-29
 

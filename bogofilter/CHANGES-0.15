@@ -5,7 +5,14 @@
 
 $Id$
 
-0.15.0	2003-08-29
+	2003-08-30
+
+	* Clean-up message header processing:
+	  - Don't tokenize message separator lines.
+	  - Merge whitespace separated encoded words.
+	  - Unfold header lines.
+
+0.15.0	2003-08-30
 
 	* Fix defective printing in 'bogofilter -Q' output.
 
