@@ -573,7 +573,6 @@ void process_args_1(int argc, char **argv)
 
 	case 'u':
 	{
-	    char *tmp = optarg;
 	    run_type |= RUN_UPDATE;
 	    if (optarg == NULL)
 		thresh_update = 0.0;
