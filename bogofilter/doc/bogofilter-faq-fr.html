@@ -84,14 +84,15 @@
 	  
           <li><a href="#production">Comment conserver une bonne d'acuité?</a></li>
 	  
-          <li><a href="#asian-spam">Comment traiter les spams
-          asiatiques?</a></li>
+          <li><a href="#spamassassin">Comment puis-je utiliser
+          SpamAssassin pour entraîner Bogofilter?</a></li>
 
           <li><a href="#vvv">Que signifie la sortie verbeuse de
           Bogofilter?</a></li>
 
-          <li><a href="#spamassassin">Comment puis-je utiliser
-          SpamAssassin pour entraîner Bogofilter?</a></li>
+          <li><a href="#asian-spam">Comment traiter les spams
+          asiatiques?</a></li>
+
         </ul>
       </li>
 
@@ -234,6 +235,119 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
     </table>
     <hr>
 
+    <h2 id="training">Comment débuter l'apprentissage de Bogofilter?</h2>
+    <p>Pour classifier les messages comme ham ou spam, Bogofilter
+    a besoin d'apprendre votre courrier. Pour commencer, le mieux est d'avoir
+    un corpus (aussi large que possible) de messages dont vous êtes sûr de
+    l'état de ham ou de spam. (Des erreurs à ce stade occasionneront des problèmes plus tard,
+    aussi, soyez attentifs). Attention, n'utilisez que votre email. L'utilisation d'autres
+    corpus (tel qu'un corpus trouvé sur Internet), peut entraîner
+    Bogofilter à tirer de mauvaises conclusions, après tout, votre but est de lui
+    faire comprendre <em>votre</em> courrier.</p>
+    
+    <p>Une fois que vous avez vos corpus de spam et de ham, vous avez trois
+    choix possibles. Dans tous les cas, cela fonctionnera mieux si votre base
+    d'apprentissage (les corpus ci-dessus) est conséquente. Plus un corpus est
+    petit, plus grand sera le nombre d'erreurs que fera Bogofilter en production. Supposons
+    que vos corpus se trouvent dans deux fichiers mbox: ham.mbx et spam.mbx.</p>
+
+    <ul>
+    <li><p>Méthode 1) Entraînez Bogofilter avec tous vos messages. Dans notre
+    example :</p>
+    <pre>
+    bogofilter -s &lt; spam.mbx
+    bogofilter -n &lt; ham.mbx
+    </pre></li>
+    <li><p>Méthode 2) Utilisez le script randomtrain (dans le répertoire contrib).
+    Il applique une technique d'apprentissage sur erreur, en clair : n'ajouter à la
+    base de données que les messages que Bogofilter ne peut évaluer correctement.
+    Le script génère une liste de l'ensemble des messages dans les mailbox, mélange la liste, puis
+    évalue chaque message. Tout message que Bogofilter évalue incorrectement, par exemple un ham
+    en spam ou inversement, est alors utilisé pour agrandir la liste des mots.
+    Ceci produit une base de données beaucoup plus petite que la méthode précédente,
+    tout en conservant une bonne acuité en production. Dans notre exemple:</p>
+    <pre> 
+    randomtrain -s spam.mbx -n ham.mbx 
+    </pre></li>
+    <li><p>Méthode 3) Utilisez le script  bogominitrain.pl (dans le répertoire contrib).
+    Il applique, lui aussi une technique d'apprentissage sur erreur, mais les messages
+    sont évalués dans le même ordre que vos fichiers mailbox. Vous devriez utiliser
+    l'option -f qui va demander au script de répéter le travail, jusqu'à ce que tous
+    les messages soient classifiés correctement.
+    Si nécessaire, vous pouvez ajuster le niveau de certitude. Les tests
+    ont montré que cela générait la base de données la plus petite de toutes les
+    méthodes citées. Malgré cela, comme le script s'assure que la base de données
+    connaît "tout" votre corpus d'entrainement avec la précision de votre choix, cela
+    fonctionne très bien.
+    Dans notre exemple (avec spam_cutoff=0.6 dans votre fichier de configuration):</p>
+    <pre>
+    bogominitrain.pl -fv ~/.bogofilter ham.mbx spam.mbx '-o 0.7,0.5'
+    </pre></li>
+    </ul>
+    <hr>
+    <h2 id="production">Comment puis-je conserver une bonne acuité ?</h2>
+    <p>Bogofilter fera des erreurs de temps en temps. C'est pourquoi un
+    apprentissage régulier est important. Il existe principalement deux méthodes pour le faire.
+    Premièrement, vous pouvez l'entrainer avec chaque nouveau message (en utilisant l'option
+    -u). Deuxièmement, vous pouvez ne l'entraîner que sur des erreurs.</p>
+    
+    <p>De plus, vous pouvez reconstruire votre base à certains moments,
+    par exemple quand une nouvelle fonctionnalité importante est ajoutée à Bogofilter,
+    il peut être fort utile de mettre à jour régulièrement votre corpus d'apprentissage.</p>
+    
+    <p>Bogofilter fait toujours de son mieux avec les informations
+    disponibles. Cependant, il fera des erreurs, tel que classer des ham en spam
+    (faux positifs) ou spam en ham (faux négatifs). Vous avez besoin de corriger ces erreurs.
+    Si vous entrainez Bogofilter avec chaque message entrant, vous devrez annuler
+    cette mauvaise classification puis la refaire correctement. La combinaison d'option "-Sn"
+    reclassera un faux-positif et "-Ns" fera de même pour un faux-négatif.
+    
+    <p> Corriger un message incorrectement classé peut affecter la classification d'autres
+    messages. Plus votre base de données sera petite, plus grande sera la probabilité qu'une
+    erreur d'apprentissage créee des classifications incorrectes.
+    
+    <p>L'utilisation de la méthode 2 ou 3 (ci-dessus) peut compenser cet effet.
+    Repéter l'entrainement avec le corpus complet (y compris les messages de corrections ajoutés
+    depuis le précédent apprentissage). Ceci ajoutera des messages dans la base de données afin
+    que d'atteindre un nouvel équilibre, annulant les effets éventuellement de "surcompensation".
+    <hr>
+
+    <h2 id="spamassassin">Comment puis-je utiliser SpamAssassin
+    pour l'apprentissage de Bogofilter?</h2>
+
+    <p>Si vous avez un SpamAssassin actif (ou si vous voulez en
+    créer un), vous pouvez utiliser ses codes de retour pour
+    l'apprentissage de Bogofilter. Le moyen le plus simple est de
+    créer un script pour votre MDA qui fait tourner SpamAssassin,
+    tester l'état du code de retour spam/ham, et lancer Bogofilter
+    pour valider le message. Le script procmail ci-dessous est un
+    moyen de le faire:</p>
+<pre>
+  BOGOFILTER     = "/usr/bin/bogofilter"
+  BOGOFILTER_DIR = "training"
+  SPAMASSASSIN  = "/usr/bin/spamassassin"
+
+  :0 HBc
+  * ? $SPAMASSASSIN -e
+  #spam yields non-zero
+  #non-spam yields zero
+  | $BOGOFILTER -n -d $BOGOFILTER_DIR
+  #else (E)
+  :0Ec
+  | $BOGOFILTER -s -d $BOGOFILTER_DIR
+
+  :0fw
+  | $BOGOFILTER -p -e
+
+  :0:
+  * ^X-Bogosity:.Yes
+  spam
+
+  :0:
+  * ^X-Bogosity:.No
+  non-spam
+</pre>
+<hr>
     <h2 id="vvv">Quelle est la signification de la sortie verbeuse
     de Bogofilter?</h2>
 
@@ -369,119 +483,6 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
       </li>
     </ul>
     <hr>
-    <h2 id="spamassassin">Comment puis-je utiliser SpamAssassin
-    pour l'apprentissage de Bogofilter?</h2>
-
-    <p>Si vous avez un SpamAssassin actif (ou si vous voulez en
-    créer un), vous pouvez utiliser ses codes de retour pour
-    l'apprentissage de Bogofilter. Le moyen le plus simple est de
-    créer un script pour votre MDA qui fait tourner SpamAssassin,
-    tester l'état du code de retour spam/ham, et lancer Bogofilter
-    pour valider le message. Le script procmail ci-dessous est un
-    moyen de le faire:</p>
-<pre>
-  BOGOFILTER     = "/usr/bin/bogofilter"
-  BOGOFILTER_DIR = "training"
-  SPAMASSASSIN  = "/usr/bin/spamassassin"
-
-  :0 HBc
-  * ? $SPAMASSASSIN -e
-  #spam yields non-zero
-  #non-spam yields zero
-  | $BOGOFILTER -n -d $BOGOFILTER_DIR
-  #else (E)
-  :0Ec
-  | $BOGOFILTER -s -d $BOGOFILTER_DIR
-
-  :0fw
-  | $BOGOFILTER -p -e
-
-  :0:
-  * ^X-Bogosity:.Yes
-  spam
-
-  :0:
-  * ^X-Bogosity:.No
-  non-spam
-</pre>
-<hr>
-    <h2 id="training">Comment débuter l'apprentissage de Bogofilter?</h2>
-    <p>Pour classifier les messages comme ham ou spam, Bogofilter
-    a besoin d'apprendre votre courrier. Pour commencer, le mieux est d'avoir
-    un corpus (aussi large que possible) de messages dont vous êtes sûr de
-    l'état de ham ou de spam. (Des erreurs à ce stade occasionneront des problèmes plus tard,
-    aussi, soyez attentifs). Attention, n'utilisez que votre email. L'utilisation d'autres
-    corpus (tel qu'un corpus trouvé sur Internet), peut entraîner
-    Bogofilter à tirer de mauvaises conclusions, après tout, votre but est de lui
-    faire comprendre <em>votre</em> courrier.</p>
-    
-    <p>Une fois que vous avez vos corpus de spam et de ham, vous avez trois
-    choix possibles. Dans tous les cas, cela fonctionnera mieux si votre base
-    d'apprentissage (les corpus ci-dessus) est conséquente. Plus un corpus est
-    petit, plus grand sera le nombre d'erreurs que fera Bogofilter en production. Supposons
-    que vos corpus se trouvent dans deux fichiers mbox: ham.mbx et spam.mbx.</p>
-
-    <ul>
-    <li><p>Méthode 1) Entraînez Bogofilter avec tous vos messages. Dans notre
-    example :</p>
-    <pre>
-    bogofilter -s &lt; spam.mbx
-    bogofilter -n &lt; ham.mbx
-    </pre></li>
-    <li><p>Méthode 2) Utilisez le script randomtrain (dans le répertoire contrib).
-    Il applique une technique d'apprentissage sur erreur, en clair : n'ajouter à la
-    base de données que les messages que Bogofilter ne peut évaluer correctement.
-    Le script génère une liste de l'ensemble des messages dans les mailbox, mélange la liste, puis
-    évalue chaque message. Tout message que Bogofilter évalue incorrectement, par exemple un ham
-    en spam ou inversement, est alors utilisé pour agrandir la liste des mots.
-    Ceci produit une base de données beaucoup plus petite que la méthode précédente,
-    tout en conservant une bonne acuité en production. Dans notre exemple:</p>
-    <pre> 
-    randomtrain -s spam.mbx -n ham.mbx 
-    </pre></li>
-    <li><p>Méthode 3) Utilisez le script  bogominitrain.pl (dans le répertoire contrib).
-    Il applique, lui aussi une technique d'apprentissage sur erreur, mais les messages
-    sont évalués dans le même ordre que vos fichiers mailbox. Vous devriez utiliser
-    l'option -f qui va demander au script de répéter le travail, jusqu'à ce que tous
-    les messages soient classifiés correctement.
-    Si nécessaire, vous pouvez ajuster le niveau de certitude. Les tests
-    ont montré que cela générait la base de données la plus petite de toutes les
-    méthodes citées. Malgré cela, comme le script s'assure que la base de données
-    connaît "tout" votre corpus d'entrainement avec la précision de votre choix, cela
-    fonctionne très bien.
-    Dans notre exemple (avec spam_cutoff=0.6 dans votre fichier de configuration):</p>
-    <pre>
-    bogominitrain.pl -fv ~/.bogofilter ham.mbx spam.mbx '-o 0.7,0.5'
-    </pre></li>
-    </ul>
-    <hr>
-    <h2 id="production">Comment puis-je conserver une bonne acuité ?</h2>
-    <p>Bogofilter fera des erreurs de temps en temps. C'est pourquoi un
-    apprentissage régulier est important. Il existe principalement deux méthodes pour le faire.
-    Premièrement, vous pouvez l'entrainer avec chaque nouveau message (en utilisant l'option
-    -u). Deuxièmement, vous pouvez ne l'entraîner que sur des erreurs.</p>
-    
-    <p>De plus, vous pouvez reconstruire votre base à certains moments,
-    par exemple quand une nouvelle fonctionnalité importante est ajoutée à Bogofilter,
-    il peut être fort utile de mettre à jour régulièrement votre corpus d'apprentissage.</p>
-    
-    <p>Bogofilter fait toujours de son mieux avec les informations
-    disponibles. Cependant, il fera des erreurs, tel que classer des ham en spam
-    (faux positifs) ou spam en ham (faux négatifs). Vous avez besoin de corriger ces erreurs.
-    Si vous entrainez Bogofilter avec chaque message entrant, vous devrez annuler
-    cette mauvaise classification puis la refaire correctement. La combinaison d'option "-Sn"
-    reclassera un faux-positif et "-Ns" fera de même pour un faux-négatif.
-    
-    <p> Corriger un message incorrectement classé peut affecter la classification d'autres
-    messages. Plus votre base de données sera petite, plus grande sera la probabilité qu'une
-    erreur d'apprentissage créee des classifications incorrectes.
-    
-    <p>L'utilisation de la méthode 2 ou 3 (ci-dessus) peut compenser cet effet.
-    Repéter l'entrainement avec le corpus complet (y compris les messages de corrections ajoutés
-    depuis le précédent apprentissage). Ceci ajoutera des messages dans la base de données afin
-    que d'atteindre un nouvel équilibre, annulant les effets éventuellement de "surcompensation".
-    <hr>
-
     <h2 id="asian-spam">Comment traiter les spams asiatiques?</h2>
 
     <p>Beaucoup de personnes reçoivent du mail non sollicité
