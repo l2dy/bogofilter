@@ -73,11 +73,16 @@ AUTHOR:
 #define	LARGE_COUNT	40000
 
 #define	HAM_CUTOFF	0.10
-#define	MIN_CUTOFF	0.55	/* minimum cutoff for set_thresh() */
-#define	MAX_CUTOFF	0.99	/* maximum cutoff for set_thresh() */
+#define	MIN_CUTOFF	0.55	/* minimum cutoff  for set_thresh() */
+#define	WARN_MIN	0.50	/* warning minimum for set_thresh() */
+#define	WARN_MAX	0.99	/* warning maximum for set_thresh() */
+#define	MAX_CUTOFF	0.99	/* maximum cutoff  for set_thresh() */
 #define	SPAM_CUTOFF	0.975
 #define FP_CUTOFF	0.999
 #define	SCAN_CUTOFF	0.500	/* skip scans if cutoff is less or equal */
+
+#define	CHECK_PCT	0.01	/* for checking high scoring non-spam 
+				** and low scoring spam */
 
 /* bogotune's default parameters */
 #define	DEFAULT_ROBS	0.01
@@ -135,8 +140,6 @@ data_t *rsval;
 data_t *rxval;
 data_t *mdval;
 
-bool warn;
-bool force;
 uint target;
 uint ns_cnt, sp_cnt;
 
@@ -341,7 +344,10 @@ static bool check_for_high_ns_scores(void)
 	return false;
     else {
 	if (!quiet)
-	    fprintf(stderr, "Warning:  high scoring non-spam.\n");
+	    fprintf(stderr,
+	        "Warning: test messages include many high scoring nonspam.\n");
+	    fprintf(stderr,
+	        "         You may wish to reclassify them and rerun.\n");
 	return true;
     }
 }
@@ -399,7 +405,10 @@ static bool check_for_low_sp_scores(void)
 	return false;
     else {
 	if (!quiet)
-	    fprintf(stderr, "Warning:  low scoring spam.\n");
+	    fprintf(stderr,
+	        "Warning: test messages include many low scoring spam.\n");
+	    fprintf(stderr,
+	        "         You may wish to reclassify them and rerun.\n");
 	return true;
     }
 }
@@ -516,16 +525,14 @@ static void set_thresh(uint count, double *scores)
 	    printf("s:  cutoff %8.6f, ftarget %d%%\n", cutoff, ftarget);
     }
 
-    if (cutoff < MIN_CUTOFF || cutoff > MAX_CUTOFF) {
+    if (cutoff < WARN_MIN || cutoff > WARN_MAX) {
 	if (!quiet) {
 	    fprintf(stderr,
 		    "%s high-scoring non-spams in this data set.\n",
-		    (cutoff < MIN_CUTOFF) ? "Too few" : "Too many");
+		    (cutoff < WARN_MIN) ? "Too few" : "Too many");
 	    fprintf(stderr,
 		    "At target %d, cutoff is %8.6f.\n", ftarget, cutoff);
 	}
-	if (!force)
-	    exit(EX_ERROR);
     }
 
     if (verbose >= PARMS)
@@ -756,7 +763,6 @@ static void help(void)
 		  "\t  -s file1 file2 ... - spam files\n"
 		  "\t  -n file1 file2 ... - non-spam files\n" 
 		  "\t  -v      - increase level of verbose messages\n"
-		  "\t  -F      - accept initial spam_cutoff < 0.5 and\n"
 		  "\t          - accept high scoring non-spam and low scoring spam\n"
 		  "\t  -q      - quiet (suppress warnings)\n"
 	);
@@ -790,11 +796,6 @@ static int process_args(int argc, char **argv)
 		    break;
 		case 'D':
 		    ds_file = NULL;
-		    break;
-		case 'F':	/* accept initial spam_cutoff < 0.5 and
-				** accept high scoring non-spam and low scoring spam
-				*/
-		    force = true;
 		    break;
 		case 'I':
 		    argc -= 1;
@@ -1130,7 +1131,7 @@ static void final_recommendations(bool skip)
     printf("note:  fpos means 'false positive' and fneg means 'false negative'.\n");
     printf("\n");
 
-    if (warn)
+    if (skip)
 	final_warning();
 
     printf("Tuning completed.\n");
@@ -1214,7 +1215,6 @@ static bool check_msg_counts(void)
 		    "The messages sets contain %u non-spam and %u spam.  Bogotune "
 		    "requires at least %d non-spam and %d spam messages to run.\n",
 		    ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
-	if (!force)
 	    exit(EX_ERROR);
     }
 
@@ -1286,12 +1286,12 @@ static rc_t bogotune(void)
     sp_cnt = count_messages(sp_msglists);
     cnt = ns_cnt + sp_cnt;
 
-    if (!check_msg_counts() && !force)
+    if (!check_msg_counts())
 	exit(EX_ERROR);
 
     fflush(stdout);
 
-    check_percent = 0.0025;	/* for checking high scoring non-spam 
+    check_percent = CHECK_PCT;	/* for checking high scoring non-spam 
 				** and low scoring spam */
 
     ns_scores = xcalloc(ns_cnt, sizeof(double));
@@ -1303,14 +1303,8 @@ static rc_t bogotune(void)
     robx = DEFAULT_ROBX;
     min_dev = DEFAULT_MIN_DEV;
 
-    warn = check_for_high_ns_scores() | check_for_low_sp_scores();
-    if (warn) {
+    if(check_for_high_ns_scores() | check_for_low_sp_scores())
 	scoring_error();
-	if (!force) {
-	    fprintf(stderr, "Use '-F' option to force bogotune to continue.\n");
-	    exit(EX_ERROR);
-	}
-    }
 
     /*
     ** 5.  Calculate x
@@ -1350,15 +1344,12 @@ static rc_t bogotune(void)
     wordhash_free(ns_and_sp->train);
     ns_and_sp->train = NULL;
 
-    for (scan=0; scan <= 1 && (force || !skip); scan += 1) {
+    for (scan=0; scan <= 1 && !skip; scan ++) {
 	bool f;
 	uint i;
 	uint r_count;
 	uint rsi, rxi, mdi;
 	result_t *results, *r, *sorted;
-
-	if (skip && scan == 0)
-	    continue;
 
 	printf("Performing %s scan:\n", scan==0 ? "coarse" : "fine");
 
