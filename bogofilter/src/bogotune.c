@@ -1009,8 +1009,6 @@ static void top_ten(result_t *sorted, uint n)
 
     printf("Top ten parameter sets from this scan:\n");
 
-    if (verbose)
-	printf("    ");
     printf("        rs     md    rx    spesf    nsesf    co     fp  fn   fppc   fnpc\n");
     for(f = false; !f; f = true) {
       for (i = j = 0; i < 10 && j < n;) {
