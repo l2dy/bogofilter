@@ -606,12 +606,13 @@ void db_flush(void *vhandle)
 }
 
 
-int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
+ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 {
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
 
-    int ret = 0, eflag = 0;
+    ex_t ret = 0;
+    bool eflag = false;
 
     DBC dbc;
     DBC *dbcp = &dbc;
@@ -661,23 +662,23 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 	break;
     default:
 	print_error(__FILE__, __LINE__, "(c_get): %s", db_strerror(ret));
-	eflag = 1;
+	eflag = true;
 	break;
     }
 
     if ((ret = dbcp->c_close(dbcp))) {
 	print_error(__FILE__, __LINE__, "(c_close): %s", db_strerror(ret));
-	eflag = -1;
+	eflag = true;
     }
 
-    return eflag ? -1 : ret;		/* 0 if ok */
+    return eflag ? EX_ERROR : ret;
 }
 
 const char *db_str_err(int e) {
     return db_strerror(e);
 }
 
-int db_verify(const char *file) {
+ex_t db_verify(const char *file) {
     DB *dbp;
     int e;
     int fd = open(file, O_RDWR);

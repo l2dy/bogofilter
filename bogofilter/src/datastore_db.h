@@ -66,8 +66,8 @@ int db_set_dbvalue(void *handle, const dbv_t *token, const dbv_t *val);
 /** Iterate over all elements in data base and call \p hook for each item.
  * \p userdata is passed through to the hook function unaltered.
  */
-typedef int (*db_foreach_t)(dbv_t *token, dbv_t *data, void *userdata);
-int db_foreach(void *handle, db_foreach_t hook, void *userdata);
+typedef ex_t (*db_foreach_t)(dbv_t *token, dbv_t *data, void *userdata);
+ex_t db_foreach(void *handle, db_foreach_t hook, void *userdata);
 
 /* Returns error associated with code */
 const char *db_str_err(int);
@@ -80,10 +80,10 @@ int db_txn_begin(void *vhandle);
 int db_txn_abort(void *vhandle);
 int db_txn_commit(void *vhandle);
 
-int dbe_recover(const char *directory, bool catastrophic, bool force);
-int dbe_remove(const char *directory);
-int dbe_purgelogs(const char *directory);
-int db_verify(const char *databasefile);
+ex_t dbe_recover(const char *directory, bool catastrophic, bool force);
+ex_t dbe_remove(const char *directory);
+ex_t dbe_purgelogs(const char *directory);
+ex_t db_verify(const char *databasefile);
 
 /** Returns is_swapped flag */
 bool db_is_swapped(void *vhandle);

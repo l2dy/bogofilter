@@ -128,9 +128,9 @@ static int print_histogram(rhistogram_t *hist)
     return count;
 }
 
-int histogram(const char *path)
+ex_t histogram(const char *path)
 {
-    int rc;
+    ex_t rc;
     uint count;
     void *dsh, *dbe;
     dsv_t val;

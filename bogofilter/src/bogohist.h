@@ -13,7 +13,7 @@ AUTHOR:
 #ifndef	HISTOGRAM_H
 #define	HISTOGRAM_H
 
-extern int histogram(const char *path);
+extern ex_t histogram(const char *path);
 
 #endif	/* HISTOGRAM_H */
 

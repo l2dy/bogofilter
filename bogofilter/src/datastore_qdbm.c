@@ -274,7 +274,7 @@ void db_flush(void *vhandle)
 }
 
 
-int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
+ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 {
     int ret = 0;
 
@@ -318,7 +318,7 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 	exit(EX_ERROR);
     }
 
-    return 0;
+    return EX_OK;
 }
 
 const char *db_str_err(int e)
@@ -326,7 +326,7 @@ const char *db_str_err(int e)
     return dperrmsg(e);
 }
 
-int db_verify(const char *f) {
+ex_t db_verify(const char *f) {
     (void)f;
     return EX_OK;
 }

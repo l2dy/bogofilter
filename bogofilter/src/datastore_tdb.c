@@ -294,7 +294,7 @@ static int tdb_traversor(/*@unused@*/ __attribute__ ((unused)) TDB_CONTEXT * tdb
 }
 
 
-int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
+ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 {
     int ret;
     dbh_t *handle = vhandle;
@@ -312,7 +312,7 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 	exit(EX_ERROR);
     }
 
-    return 0;
+    return EX_OK;
 }
 
 /*
@@ -350,7 +350,7 @@ const char *db_str_err(int j)
 	return "Invalid error code";
 }
 
-int db_verify(const char *f) {
+ex_t db_verify(const char *f) {
     (void)f;
     return EX_OK;
 }

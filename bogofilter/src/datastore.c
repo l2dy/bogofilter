@@ -287,11 +287,11 @@ typedef struct {
     void         *data;
 } ds_userdata_t;
 
-static int ds_hook(dbv_t *ex_key,
-		   dbv_t *ex_data,
-		   void *userdata)
+static ex_t ds_hook(dbv_t *ex_key,
+		    dbv_t *ex_data,
+		    void *userdata)
 {
-    int ret;
+    ex_t ret;
     word_t w_key;
     dsv_t in_data;
     ds_userdata_t *ds_data = userdata;
@@ -305,13 +305,13 @@ static int ds_hook(dbv_t *ex_key,
 
     ret = (*ds_data->hook)(&w_key, &in_data, ds_data->data);
 
-    return ret;		/* 0 if ok */
+    return ret;		/* EX_OK if ok */
 }
 
-int ds_foreach(void *vhandle, ds_foreach_t *hook, void *userdata)
+ex_t ds_foreach(void *vhandle, ds_foreach_t *hook, void *userdata)
 {
     dsh_t *dsh = vhandle;
-    int ret;
+    ex_t ret;
     ds_userdata_t ds_data;
     ds_data.hook = hook;
     ds_data.dsh  = dsh;
@@ -324,10 +324,10 @@ int ds_foreach(void *vhandle, ds_foreach_t *hook, void *userdata)
 
 /* Wrapper for ds_foreach that opens and closes file */
 
-int ds_oper(void *env, const char *path, dbmode_t open_mode, 
-	    ds_foreach_t *hook, void *userdata)
+ex_t ds_oper(void *env, const char *path, dbmode_t open_mode, 
+	     ds_foreach_t *hook, void *userdata)
 {
-    int  ret = 0;
+    ex_t ret = EX_OK;
     void *dsh;
 
     dsh = ds_open(env, CURDIR_S, path, open_mode);
@@ -342,7 +342,7 @@ int ds_oper(void *env, const char *path, dbmode_t open_mode,
 	if (ret) { ds_txn_abort(dsh); }
 	else
 	    if (ds_txn_commit(dsh) != DST_OK)
-		ret = -1;
+		ret = EX_ERROR;
     }
 
     ds_close(dsh);

@@ -33,9 +33,9 @@ struct dbhsqlite_t {
 typedef struct dbhsqlite_t dbh_t;
 
 /* dummy functions */
-#define DUMMYVVP(name) void name(void *dummy) { (void)dummy; }
+#define DUMMYVVP(name)  void name(void *dummy) { (void)dummy; }
 #define DUMMYVPVP(name) void *name(void *dummy) { (void)dummy; return NULL; }
-#define DUMMYICP(name) int name(const char *dummy) { (void)dummy; return 0; }
+#define DUMMYICP(name)  ex_t name(const char *dummy) { (void)dummy; return EX_OK; }
 DUMMYVVP(dbe_cleanup)
 DUMMYVVP(db_flush)
 DUMMYVPVP(db_get_env)
@@ -43,7 +43,7 @@ DUMMYICP(db_verify)
 DUMMYICP(dbe_purgelogs)
 DUMMYICP(dbe_remove)
 void *dbe_init(const char *dummy) { (void)dummy; return (void *)~0; }
-int dbe_recover(const char *d1, bool d2, bool d3) { (void)d1; d2=d3; return 0; }
+ex_t dbe_recover(const char *d1, bool d2, bool d3) { (void)d1; d2=d3; return EX_ERROR; }
 bool db_is_swapped(void *dummy) { (void)dummy; return false; }
 
 /** The layout of the bogofilter table, formatted as SQL statement. */

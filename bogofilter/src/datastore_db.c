@@ -791,12 +791,13 @@ void db_flush(void *vhandle)
 		db_strerror(ret));
 }
 
-int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
+ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 {
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
 
-    int ret = 0, eflag = 0;
+    ex_t ret = EX_OK;
+    bool eflag = false;
 
     DBC dbc;
     DBC *dbcp = &dbc;
@@ -814,7 +815,7 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     ret = dbp->cursor(dbp, handle->txn, &dbcp, 0);
     if (ret) {
 	print_error(__FILE__, __LINE__, "(cursor): %s", handle->path);
-	return -1;
+	return EX_ERROR;
     }
 
     for (ret =  dbcp->c_get(dbcp, &key, &data, DB_FIRST);
@@ -847,20 +848,20 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     case 0:
     case DB_NOTFOUND:
 	/* OK */
-	ret = 0;
+	ret = EX_OK;
 	break;
     default:
 	print_error(__FILE__, __LINE__, "(c_get): %s", db_strerror(ret));
-	eflag = 1;
+	eflag = true;
 	break;
     }
 
     if ((ret = dbcp->c_close(dbcp))) {
 	print_error(__FILE__, __LINE__, "(c_close): %s", db_strerror(ret));
-	eflag = -1;
+	eflag = true;
     }
 
-    return eflag ? -1 : ret;		/* 0 if ok */
+    return eflag ? EX_ERROR : ret;
 }
 
 const char *db_str_err(int e) {
@@ -1148,7 +1149,7 @@ void *dbe_init(const char *directory) {
     return dbe_xinit(directory, db_max_locks, db_max_objects, flags);
 }
 
-int dbe_recover(const char *directory, bool catastrophic, bool force) {
+ex_t dbe_recover(const char *directory, bool catastrophic, bool force) {
     dbe_t *env;
 
     /* set exclusive/write lock for recovery */
@@ -1159,7 +1160,7 @@ int dbe_recover(const char *directory, bool catastrophic, bool force) {
     /* ok, when we have the lock, a concurrent process may have
      * proceeded with recovery */
     if (!(force || needs_recovery()))
-	return 0;
+	return EX_OK;
 
 retry:
     if (DEBUG_DATABASE(0))
@@ -1177,7 +1178,7 @@ retry:
     clear_lockfile();
     dbe_cleanup_lite(env);
 
-    return 0;
+    return EX_OK;
 
 rec_fail:
     exit(EX_ERROR);
@@ -1238,7 +1239,7 @@ static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags) {
     return env;
 }
 
-static int dbe_common_close(DB_ENV *env, const char *directory) {
+static ex_t dbe_common_close(DB_ENV *env, const char *directory) {
     int e;
 
     e = env->close(env, 0);
@@ -1252,7 +1253,7 @@ static int dbe_common_close(DB_ENV *env, const char *directory) {
     return EX_OK;
 }
 
-int dbe_purgelogs(const char *directory) {
+ex_t dbe_purgelogs(const char *directory) {
     int e;
     DB_ENV *env = dbe_recover_open(directory, 0);
     char **i, **list;
@@ -1303,7 +1304,7 @@ int dbe_purgelogs(const char *directory) {
     return dbe_common_close(env, directory);
 }
 
-int db_verify(const char *dbfile) {
+ex_t db_verify(const char *dbfile) {
     char *dir = xstrdup(dbfile);
     char *tmp;
     DB_ENV *env;
@@ -1337,7 +1338,7 @@ int db_verify(const char *dbfile) {
     return e;
 }
 
-int dbe_remove(const char *directory) {
+ex_t dbe_remove(const char *directory) {
     DB_ENV *env = dbe_recover_open(directory, DB_PRIVATE);
 
     if (!env)

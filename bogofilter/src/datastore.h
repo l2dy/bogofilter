@@ -87,17 +87,17 @@ typedef int ds_foreach_t(
 /** Iterate over all records in data base and call \p hook for each item.
  * \p userdata is passed through to the hook function unaltered.
  */
-extern int ds_foreach(void *vhandle /** data store handle */,
-	ds_foreach_t *hook /** callback function */,
-	void *userdata /** opaque data that is passed to the callback function
-			 unaltered */);
+extern ex_t ds_foreach(void *vhandle	  /** data store handle */,
+		       ds_foreach_t *hook /** callback function */,
+		       void *userdata	  /** opaque data that is passed to the callback function
+					      unaltered */);
 
 /** Wrapper for ds_foreach that opens and closes file */
-extern int ds_oper(void *dbenv,		/**< parent environment */
-	           const char *path,	/**< path to database file */
-		   dbmode_t open_mode,	/**< open mode, DS_READ or DS_WRITE */
-		   ds_foreach_t *hook,	/**< function for actual operations */
-		   void *userdata	/**< user data for \a hook */);
+extern ex_t ds_oper(void *dbenv,	/**< parent environment */
+		    const char *path,	/**< path to database file */
+		    dbmode_t open_mode,	/**< open mode, DS_READ or DS_WRITE */
+		    ds_foreach_t *hook,	/**< function for actual operations */
+		    void *userdata	/**< user data for \a hook */);
 
 /** Initialize database, open and lock files, etc.
  * params: char * path to database file, char * name of database

@@ -79,9 +79,9 @@ static int ds_dump_hook(word_t *key, dsv_t *data,
     return ferror(stdout) ? 1 : 0;
 }
 
-static int dump_wordlist(const char *ds_file)
+static ex_t dump_wordlist(const char *ds_file)
 {
-    int rc;
+    ex_t rc;
     void *dbe;
 
     token_count = 0;
@@ -90,7 +90,7 @@ static int dump_wordlist(const char *ds_file)
     rc = ds_oper(dbe, ds_file, DS_READ, ds_dump_hook, NULL);
     ds_cleanup(dbe);
 
-    if (rc)
+    if (rc != EX_OK)
 	fprintf(stderr, "error dumping tokens!\n");
     else
 	if (verbose)
@@ -110,7 +110,7 @@ static byte *spanword(byte *t)
     return t;
 }
 
-static int load_wordlist(const char *ds_file)
+static ex_t load_wordlist(const char *ds_file)
 {
     void *dsh;
     byte buf[BUFSIZE];
@@ -265,7 +265,7 @@ static int get_token(buff_t *buff, FILE *fp)
     return rv;
 }
 
-static int display_words(const char *path, int argc, char **argv, bool show_probability)
+static ex_t display_words(const char *path, int argc, char **argv, bool show_probability)
 {
     byte buf[BUFSIZE];
     buff_t *buff = buff_new(buf, 0, BUFSIZE);
@@ -832,7 +832,7 @@ static int process_arg(int option, const char *name, const char *val, int option
 
 int main(int argc, char *argv[])
 {
-    int rc;
+    ex_t rc;
     progtype = build_progtype(progname, DB_TYPE);
 
     set_today();			/* compute current date for token age */
