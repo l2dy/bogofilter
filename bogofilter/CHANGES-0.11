@@ -4,6 +4,17 @@
 
 $Id$
      
+	2003-04-10
+
+	* Reformat histogram output (from "-vv") to fit in 80 columns.
+
+	2003-04-09
+
+	* Added protections against negative token counts to
+          bogoutil.c and database_db.c
+	* Additional portability changes made to the regression tests.
+	* Enhanced '-m' option allows specifying robs value.
+
 0.11.1.8
 
 	2003-04-07
