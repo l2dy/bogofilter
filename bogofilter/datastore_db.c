@@ -71,12 +71,17 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode){
       opt_flags =  DB_CREATE; /*Read-write mode implied. Allow database to be created if necesary */
 
     handle = dbh_init(db_file, name);
-
     if ((ret = db_create (&(handle->dbp), NULL, 0)) != 0){
 	   fprintf (stderr, "%s (db) db_create: %s\n", progname, db_strerror (ret));
     }
-    else if ((ret = handle->dbp->open (handle->dbp, db_file, NULL, DB_BTREE, opt_flags, 0664)) != 0){
-           handle->dbp->err (handle->dbp, ret, "%s (db) open: %s", progname, db_file);
+    else if
+#if DB_VERSION_MAJOR == 4 && DB_VERSION_MINOR > 0
+    ((ret = handle->dbp->open(handle->dbp, NULL, db_file, NULL, DB_BTREE, opt_flags | DB_AUTO_COMMIT, 0664)) != 0)
+#else
+    ((ret = handle->dbp->open (handle->dbp, db_file, NULL, DB_BTREE, opt_flags, 0664)) != 0)
+#endif	    
+    {
+	handle->dbp->err (handle->dbp, ret, "%s (db) open: %s", progname, db_file);
     }
     else {
       return (void *)handle;
