@@ -16,6 +16,7 @@ AUTHOR:
 #include <stdlib.h>
 #include <string.h>
 
+#include "fisher.h"
 #include "method.h"
 #include "wordlists.h"
 
@@ -28,13 +29,7 @@ double ham_cutoff;
 #endif
 
 /* Dummy struct definitions to support config.c */
-method_t graham_method = {
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
-} ;
-method_t rf_robinson_method = {
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
-} ;
-method_t rf_fisher_method = {
+rf_method_t rf_fisher_method = {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 } ;
 
