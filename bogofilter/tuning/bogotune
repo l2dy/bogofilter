@@ -232,7 +232,7 @@ if($usebogofilter) {
 } else {
     $prog = "apclass -fq";
 }
-my $cmd = "cat $nslist | $prog, -m 0.02 > $workfn";
+my $cmd = "cat $nslist | $prog -m 0.02 > $workfn";
 $err = system($cmd) >> 8;
 if($err > 2) { print("Warning re processing nonspam messages: ", $err, "\n"); }
 open(SCORES, $workfn) or yuk(8, "Couldn't open nonspam scores");
