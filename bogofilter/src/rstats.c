@@ -171,7 +171,7 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
 	while (r < count)
 	{
 	    double prob = rstats_array[r]->prob;
-	    if (prob - fin >= EPS)
+	    if (prob >= fin)
 		break;
 
 	    if (fabs(EVEN_ODDS - prob) - min_dev >= EPS)
