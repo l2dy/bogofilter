@@ -10,6 +10,6 @@ NAME:
 #ifndef	HAVE_ROBX_H
 #define	HAVE_ROBX_H
 
-double compute_robinson_x(char *path);
+double compute_robinson_x(const char *path);
 
 #endif	/* HAVE_ROBX_H */

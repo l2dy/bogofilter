@@ -105,7 +105,7 @@ static double compute_robx(dsh_t *dsh)
 }
 
 /** returns negative for failure */
-double compute_robinson_x(char *path)
+double compute_robinson_x(const char *path)
 {
     double rx;
 

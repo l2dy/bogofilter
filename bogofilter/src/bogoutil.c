@@ -49,7 +49,7 @@ bool  onlyprint = false;
 
 /* Function Prototypes */
 
-static int process_arg(int option, char *name, const char *arg);
+static int process_arg(int option, const char *name, const char *arg);
 
 /* Function Definitions */
 
@@ -79,7 +79,7 @@ static int ds_dump_hook(word_t *key, dsv_t *data,
     return ferror(stdout) ? 1 : 0;
 }
 
-static int dump_wordlist(char *ds_file)
+static int dump_wordlist(const char *ds_file)
 {
     int rc;
 
@@ -374,7 +374,7 @@ finish:
     return rv;
 }
 
-static int get_robx(char *path)
+static int get_robx(const char *path)
 {
     double rx;
     int ret = 0;
@@ -478,7 +478,7 @@ static void help(void)
 	    progname, version);
 }
 
-static char *ds_file = NULL;
+static const char *ds_file = NULL;
 static bool  prob = false;
 
 typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST,
@@ -496,6 +496,7 @@ struct option long_options[] = {
     { "db_txn_durable",			R, 0, O_DB_TXN_DURABLE },
 #endif
 #endif
+#ifdef	VERSION_0932
     { "debug-flags",			R, 0, 'x' },
     { "debug-to-stdout",		N, 0, 'D' },
     { "verbosity",			N, 0, 'v' },
@@ -531,6 +532,7 @@ struct option long_options[] = {
     { "timestamp",			R, 0, O_IGNORE },
     { "unsure_subject_tag",		R, 0, O_IGNORE },
     { "user_config_file",		R, 0, O_IGNORE },
+#endif
     { NULL,				0, 0, 0 }
 };
 
@@ -551,7 +553,7 @@ static int process_arglist(int argc, char **argv)
     {
 	int option_index = 0;
 	int this_option_optind = optind ? optind : 1;
-	char *name;
+	const char *name;
 
 	option = getopt_long(argc, argv, OPTIONS,
 			     long_options, &option_index);
@@ -578,7 +580,7 @@ static int process_arglist(int argc, char **argv)
     return count;
 }
 
-static int process_arg(int option, char *name, const char *val)
+static int process_arg(int option, const char *name, const char *val)
 {
     int count = 0;
 
@@ -590,35 +592,35 @@ static int process_arg(int option, char *name, const char *val)
     case 'f':
 	flag = M_RECOVER;
 	count += 1;
-	ds_file = (char *) optarg;
+	ds_file = val;
 	break;
 
     case 'F':
 	flag = M_CRECOVER;
 	count += 1;
-	ds_file = (char *) optarg;
+	ds_file = val;
 	break;
 
     case 'd':
 	flag = M_DUMP;
 	count += 1;
-	ds_file = (char *) optarg;
+	ds_file = val;
 	break;
 
     case 'k':
-	db_cachesize=(uint) atoi(optarg);
+	db_cachesize=(uint) atoi(val);
 	break;
 
     case 'l':
 	flag = M_LOAD;
 	count += 1;
-	ds_file = (char *) optarg;
+	ds_file = val;
 	break;
 
     case 'm':
 	flag = M_MAINTAIN;
 	count += 1;
-	ds_file = (char *) optarg;
+	ds_file = val;
 	break;
 
     case 'p':
@@ -628,7 +630,7 @@ static int process_arg(int option, char *name, const char *val)
     case 'w':
 	flag = M_WORD;
 	count += 1;
-	ds_file = (char *) optarg;
+	ds_file = val;
 	break;
 
     case 'r':
@@ -636,14 +638,14 @@ static int process_arg(int option, char *name, const char *val)
     case 'R':
 	flag = M_ROBX;
 	count += 1;
-	ds_file = (char *) optarg;
+	ds_file = val;
 	break;
 
     case 'u':
 	upgrade_wordlist_version = true;
 	flag = M_MAINTAIN;
 	count += 1;
-	ds_file = (char *) optarg;
+	ds_file = val;
 	break;
 
     case 'v':
@@ -661,7 +663,7 @@ static int process_arg(int option, char *name, const char *val)
     case 'H':
 	flag = M_HIST;
 	count += 1;
-	ds_file = (char *) optarg;
+	ds_file = val;
 	break;
 
     case 'V':
@@ -669,21 +671,21 @@ static int process_arg(int option, char *name, const char *val)
 	exit(EX_OK);
 
     case 'x':
-	set_debug_mask( (char *) optarg );
+	set_debug_mask(val);
 	break;
 
     case 'X':
-	set_bogotest( optarg );
+	set_bogotest(val);
 	break;
 
     case 'a':
 	maintain = true;
-	thresh_date = string_to_date(optarg);
+	thresh_date = string_to_date(val);
 	break;
 
     case 'c':
 	maintain = true;
-	thresh_count = (uint) atoi((char *)optarg);
+	thresh_count = (uint) atoi(val);
 	break;
 
     case 's':
@@ -692,12 +694,12 @@ static int process_arg(int option, char *name, const char *val)
 
 	maintain = true;
 	    
-	if (2 == sscanf((const char *)optarg, "%lu,%lu", &mi, &ma)) {
+	if (2 == sscanf(val, "%lu,%lu", &mi, &ma)) {
 	    size_min = mi;
 	    size_max = ma;
 	} else {
 	    fprintf(stderr, "syntax error in argument \"%s\" of -s\n.",
-		    optarg);
+		    val);
 	    exit(EX_ERROR);
 	}
     }
@@ -710,7 +712,7 @@ static int process_arg(int option, char *name, const char *val)
 
     case 'y':		/* date as YYYYMMDD */
     {
-	YYYYMMDD date = string_to_date(optarg);
+	YYYYMMDD date = string_to_date(val);
 	maintain = true;
 	if (date != 0 && date < 19990000) {
 	    fprintf(stderr, "Date format for '-y' option is YYYYMMDD\n");
@@ -721,9 +723,9 @@ static int process_arg(int option, char *name, const char *val)
     }
 
     case 'I':
-	fpin = fopen( optarg, "r" );
+	fpin = fopen( val, "r" );
 	if (fpin == NULL) {
-	    fprintf(stderr, "Can't read file '%s'\n", optarg);
+	    fprintf(stderr, "Can't read file '%s'\n", val);
 	    exit(EX_ERROR);
 	}
 	break;
@@ -736,8 +738,8 @@ static int process_arg(int option, char *name, const char *val)
     case O_DB_MAX_OBJECTS:	db_max_objects = atoi(val);		  break;
     case O_DB_MAX_LOCKS:	db_max_locks   = atoi(val);		  break;
 #ifdef	FUTURE_DB_OPTIONS
-    case O_DB_LOG_AUTOREMOVE:	db_log_autoremove  = get_bool(name, val); break;
-    case O_DB_TXN_DURABLE:	db_txn_durable = get_bool(name, val);	  break;
+    case O_DB_LOG_AUTOREMOVE:	db_log_autoremove = get_bool(name, val);  break;
+    case O_DB_TXN_DURABLE:	db_txn_durable    = get_bool(name, val);  break;
 #endif
 #endif
 
