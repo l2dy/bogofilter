@@ -40,7 +40,7 @@ for msg in $files ; do
     | tr -d "," | $AWK '{print $4}'` >> ${TMPDIR}/$OUT
 done
 
-[ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
+if [ "$BF_SAVEDIR" ] ; then . ${srcdir}/t.save ; fi
 
 test $verbose -eq 0 && cmp ${OUTPUTS}/$OUT ${TMPDIR}/$OUT \
 || diff $DIFF_BRIEF ${OUTPUTS}/$OUT ${TMPDIR}/$OUT

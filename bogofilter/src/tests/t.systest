@@ -100,7 +100,7 @@ alg="f"
 
 rm -f ${CONFIG}
 
-[ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
+if [ "$BF_SAVEDIR" ] ; then . ${srcdir}/t.save ; fi
 
 for i in $OUTPUTS/*f.v* ; do
     j=`basename $i`

@@ -122,7 +122,7 @@ done
 
 map_rc $BOGOFILTER -M < ${TMPDIR}/test.bl > ${TMPDIR}/$NAME.out
 
-[ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
+if [ "$BF_SAVEDIR" ] ; then . ${srcdir}/t.save ; fi
 
 CORRECT="${OUTPUTS}/bulkmode.out"
 

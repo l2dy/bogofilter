@@ -92,7 +92,7 @@ for out in ${TMPDIR}/tests/msg.?.t.$V ; do
     printf "%2s   %c %s   %c %s\n" $id $f $t >> ${TMPDIR}/tests/$OUT
 done
 
-[ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
+if [ "$BF_SAVEDIR" ] ; then . ${srcdir}/t.save ; fi
 
 
 if  [ $verbose -eq 0 ]; then

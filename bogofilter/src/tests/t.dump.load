@@ -70,7 +70,7 @@ $BOGOUTIL -a 20021010 -d $DATA | $SORT > ${TMPDIR}/dump.load-6.txt
 #confirm token merging
 ( diff ${TMPDIR}/dump.load-5.txt ${TMPDIR}/dump.load-6.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.5.6.txt >> $OUT
 
-[ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
+if [ "$BF_SAVEDIR" ] ; then . ${srcdir}/t.save ; fi
 
 for i in ${SYSTEST}/outputs/dump.load-?.out ; do
     j=${TMPDIR}/`basename $i .out`.txt
