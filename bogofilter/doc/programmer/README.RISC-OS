@@ -12,26 +12,21 @@ There are two prerequisites for compiling Bogofilter on RISC OS:
    - TDB
    - SDBM
    - QDBM
-   A RISC OS port of each of them is available from
-   http://www.sbellon.de/sw-ports.html
+   There are RISC OS ports for all of them are at
+    http://www.sbellon.de/sw-ports.html
 
-
-Place the top-level Bogofilter directory alongside the top-level database
+Place the top-level bogofilter directory alongside the top-level database
 directory.
 
 Rename the source files of bogofilter from foobar/c to c.foobar (you can use
 utilities like unixify (http://www.mk-net.demon.co.uk/software/risc_os/) in
 order to ease up this task.
 
-Copy the RISC OS Makefile into bogofilter.src and config file into
-bogofilter.src.h.
+Copy RISC OS files Makefile and config.h into bogofilter/src.
 
-Edit the first few lines of the Makefile to suit your needs.
+Edit the beginning of the Makefile to suit your needs.
 
+RISC OS binaries of bogofilter are available at http://www.sbellon.de/sw-ports.html.
 
-I will provide RISC OS binaries on my homepage
-(at http://www.sbellon.de/sw-ports.html) as well.
-
-
-Have fun,
-Stefan.
+Stefan Bellon
+<sbellon@sbellon.de>
