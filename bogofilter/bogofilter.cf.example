@@ -47,6 +47,22 @@ spam_header_name=X-Bogosity
 stats_in_header=Y
 
 
+##### DB_CACHESIZE
+#
+#	non-zero: set this as DB cache size (in Mbytes)
+#	zero:	  use DB default cache size (.25 Mbyte in 4.0.14)
+#
+#	note that Berkeley DB increases any buffer size below 500 MB
+#	by 25%!
+#	This helps most when doing massive changes to the data base that
+#	involve a lot of overwrites, such as registering mail boxes,
+#	whereas it is mostly a waste of memory for read-only
+#	applications such as scoring.
+#	WARNING: If you set this too large, bogofilter will fail.
+
+#db_cachesize=16
+db_cachesize=0
+
 #### Format of SPAM_HEADER
 #
 #	formatting characters:
