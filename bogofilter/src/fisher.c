@@ -20,9 +20,9 @@ NAME:
 #define	RF_DEBUG
 #undef	RF_DEBUG
 
-#define FISHER_HAM_CUTOFF	0.10f
-#define FISHER_SPAM_CUTOFF	0.95f
-#define FISHER_MIN_DEV		0.10f
+#define FISHER_HAM_CUTOFF	0.00	/* 0.00 for two-state, 0.10 for three-state */
+#define FISHER_SPAM_CUTOFF	0.95
+#define FISHER_MIN_DEV		0.10
 
 /* Function Prototypes */
 
