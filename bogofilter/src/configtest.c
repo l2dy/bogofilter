@@ -41,11 +41,6 @@ rc_t msg_status(void)
 }
 
 #ifdef COMPILE_DEAD_CODE
-static bool x_configure_wordlist(const char *val)
-{
-    return false;
-}
-
 static int x_init_list(wordlist_t* list, const char* name, const char* filepath, double weight, bool bad, int override, bool ignore)
 {
     if (DEBUG_CONFIG(0)) {

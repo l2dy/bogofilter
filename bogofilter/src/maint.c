@@ -115,8 +115,6 @@ void maintain_wordlists(void)
 {
     wordlist_t *list;
 
-    set_list_active_status(true);
-
     for (list = word_lists; list != NULL; list = list->next) {
 	maintain_wordlist(list->dsh);
 	list = list->next;

@@ -274,7 +274,6 @@ void score_initialize(void)
 	min_dev = MIN_DEV;
     if (spam_cutoff < EPS)
 	spam_cutoff = SPAM_CUTOFF;
-    set_good_weight( GOOD_BIAS );
 
     /*
     ** If we're classifying messages, we need to compute the scalefactor 

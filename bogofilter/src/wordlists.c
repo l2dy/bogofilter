@@ -118,30 +118,6 @@ bool build_wordlist_path(char *filepath, size_t size, const char *path)
     return ok;
 }
 
-void set_good_weight(double weight)
-{
-    wordlist_t *list;
-
-    for ( list = word_lists; list != NULL; list = list->next )
-    {
-	list->weight[IX_GOOD] = weight;
-    }
-
-    return;
-}
-
-void set_list_active_status(bool status)
-{
-    wordlist_t *list;
-
-    for ( list = word_lists; list != NULL; list = list->next )
-    {
-	list->active = status;
-    }
-
-    return;
-}
-
 #ifdef COMPILE_DEAD_CODE
 /* some sanity checking of lists is needed because we may
    allow users to specify lists eventually and there are
@@ -173,94 +149,6 @@ static void sanitycheck_lists(void)
 	fprintf(dbgout, "%d lists look OK.\n", listcount);
 }
 #endif
-
-static char *spanword(char *p)
-{
-    p += strcspn(p, ", \t");		/* skip to end of word */
-    *p++ = '\0';
-    while (isspace((unsigned char)*p)) 	/* skip trailing whitespace */
-	p += 1;
-    return p;
-}
-
-/* type - 'g', 's', or 'i'
- * name - 'good', 'spam', etc
- * path - 'goodlist.db'
- * weight - 1,2,...
- * override - 1,2,...
- */
-
-/* returns true for success, false for error */
-bool configure_wordlist(const char *val)
-{
-    bool ok;
-    int rc;
-    wordlist_t* list = xcalloc(1, sizeof(wordlist_t));
-    char* type;
-    char* name;
-    char* path;
-    double sweight, gweight;
-    bool bad = false;
-    int  override;
-    bool ignore = false;
-
-    char *tmp = xstrdup(val);
-
-    type=tmp;			/* save wordlist type (good/spam) */
-    tmp = spanword(tmp);
-
-    switch (type[0])
-    {
-	case 'g':		/* good */
-	    break;
-	case 's':
-	case 'b':		/* spam */
-	    bad = true;
-	    break;
-	default:
-	    fprintf( stderr, "Unknown list type - '%c'\n", type[0]);
-	    break;
-    }
-
-    name=tmp;			/* name of wordlist */
-    tmp = spanword(tmp);
-
-    path=tildeexpand(tmp, true);/* path to wordlist */
-    tmp = spanword(tmp);
-
-    sweight=atof(tmp);
-    tmp = spanword(tmp);
-
-    gweight=atof(tmp);
-    tmp = spanword(tmp);
-
-    override=atoi(tmp);
-    tmp = spanword(tmp);
-
-    if (isdigit((unsigned char)*tmp))
-	ignore=atoi(tmp);
-    else {
-	ignore = false;		/* default is "don't ignore" */
-	switch (tolower((unsigned char)*tmp)) {
-	case 'n':		/* no */
-	case 'f':		/* false */
-	    ignore = false;
-	    break;
-	case 'y':		/* yes */
-	case 't':		/* true */
-	    ignore = true;
-	    break;
-	}
-    }
-    tmp = spanword(tmp);
-
-    rc = init_wordlist(&list, name, path, sweight, bad, gweight, false, override, ignore);
-    ok = rc == 0;
-
-    xfree(path);
-
-    return ok;
-}
 
 void compute_msg_counts(void)
 {

@@ -17,8 +17,7 @@ char *bogohome=NULL;
 
 /* returns -1 for error, 0 for success */
 int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* path,
-			 double sweight, bool sbad, 
-			 double gweight, bool gbad, 
+			 bool sbad, bool gbad, 
 			 int override, bool ignore)
 {
     wordlist_t *n = (wordlist_t *)xcalloc(1, sizeof(*n));
@@ -32,9 +31,6 @@ int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* pat
     n->filepath=xstrdup(path);
     n->index = ++listcount;
     n->override=override;
-    n->active=false;
-    n->weight[IX_SPAM]=sweight;
-    n->weight[IX_GOOD]=gweight;
     n->bad[IX_SPAM]=sbad;
     n->bad[IX_GOOD]=gbad;
     n->ignore=ignore;
@@ -82,8 +78,6 @@ int setup_wordlists(const char* d, priority_t precedence)
 {
     int rc = 0;
     char *dir;
-    double good_weight = 1.0;
-    double bad_weight  = 1.0;
     static priority_t saved_precedence = PR_NONE;
 
     if (DEBUG_WORDLIST(2))
@@ -116,7 +110,7 @@ int setup_wordlists(const char* d, priority_t precedence)
 	rc = -1;
     }
 
-    if (init_wordlist(&word_list, "word", dir, bad_weight, true, good_weight, false, 0, false) != 0)
+    if (init_wordlist(&word_list, "word", dir, true, false, 0, false) != 0)
 	rc = -1;
 
     xfree(bogohome);

@@ -59,10 +59,6 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
   run_type |= _run_type;
 
-/*
-  set_list_active_status(false);
-*/
-
   for (node = wordhash_first(h); node != NULL; node = wordhash_next(h))
   {
       wordprop = node->buf;

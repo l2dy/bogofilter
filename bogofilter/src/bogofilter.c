@@ -83,12 +83,8 @@ rc_t bogofilter(int argc, char **argv)
 
     score_initialize();	/* initialize constants */
 
-    if (query || classify_msg || write_msg) {
-	set_list_active_status(true);
-
-	if (query)
-	    query_config();
-    }
+    if (query)
+	query_config();
 
     bogoreader_init(argc, argv);
 

@@ -18,8 +18,6 @@ struct wordlist_s
     /*@owned@*/ char *filepath;	/* resource path (for debug/verbose messages) */
     /*@owned@*/ dsh_t *dsh;	/* datastore handle */
     u_int32_t	msgcount[IX_SIZE];	/* count of messages in wordlist. */
-    double	weight[IX_SIZE];
-    bool	active;
     bool	bad[IX_SIZE];
     int		override;
     bool	ignore;
@@ -29,8 +27,7 @@ struct wordlist_s
 extern wordlist_t *word_list;
 
 int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* path,
-		  double sweight, bool sbad, 
-		  double gweight, bool gbad, 
+		  bool sbad, bool gbad, 
 		  int override, bool ignore);
 
 void free_wordlists(void);
