@@ -21,10 +21,10 @@ I do the lexical analysis slightly differently, however.
 #include <fcntl.h>
 #include <stdlib.h>
 
+#include "common.h"
 #include "bogofilter.h"
 #include "datastore.h"
 #include "wordhash.h"
-#include "common.h"
 
 // constants for the Graham formula 
 #define KEEPERS		15		// how many extrema to keep
@@ -99,7 +99,7 @@ void *collect_words(int fd, int *msg_count, int *word_count)
 }
 
 
-void register_words(reg_t register_type, wordhash_t *h, int msgcount, int wordcount)
+void register_words(run_t run_type, wordhash_t *h, int msgcount, int wordcount)
 // tokenize text on stdin and register it to  a specified list
 // and possibly out of another list
 {
@@ -111,7 +111,7 @@ void register_words(reg_t register_type, wordhash_t *h, int msgcount, int wordco
   wordlist_t *incr_list = NULL;
   wordlist_t *decr_list = NULL;
 
-  switch(register_type)
+  switch(run_type)
   {
   case REG_SPAM:		ch = 's' ; break;
   case REG_GOOD:		ch = 'n' ; break;
@@ -126,7 +126,7 @@ void register_words(reg_t register_type, wordhash_t *h, int msgcount, int wordco
 
   good_list.active = spam_list.active = FALSE;
 
-  switch(register_type)
+  switch(run_type)
     {
     case REG_GOOD:
       incr_list = &good_list;
@@ -147,7 +147,7 @@ void register_words(reg_t register_type, wordhash_t *h, int msgcount, int wordco
       break;
      
     default:
-      fprintf(stderr, "Error: Invalid register_type\n");
+      fprintf(stderr, "Error: Invalid run_type\n");
       exit(2);      
     }
 
@@ -190,12 +190,12 @@ void register_words(reg_t register_type, wordhash_t *h, int msgcount, int wordco
   db_lock_release_list(word_lists);
 }
 
-void register_messages(int fdin, reg_t register_type)
+void register_messages(int fdin, run_t run_type)
 {
   wordhash_t *h;
   int	wordcount, msgcount;
   h = collect_words(fdin, &msgcount, &wordcount);
-  register_words(register_type, h, msgcount, wordcount);
+  register_words(run_type, h, msgcount, wordcount);
   wordhash_free(h);
 }
 
@@ -441,7 +441,7 @@ rc_t bogofilter(int fd, double *xss)
     if (xss != NULL)
         *xss = spamicity;
     
-    if (update)
+    if (run_type == RUN_UPDATE)
       register_words((status==RC_SPAM) ? REG_SPAM : REG_GOOD, wordhash, msgcount, wordcount);
 
     wordhash_free(wordhash);

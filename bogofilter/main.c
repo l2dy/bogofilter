@@ -28,7 +28,8 @@ AUTHOR:
 
 #define BOGODIR ".bogofilter"
 
-int verbose, passthrough, update, nonspam_exits_zero;
+int verbose, passthrough, nonspam_exits_zero;
+run_t run_type = RUN_NORMAL; 
 
 char directory[PATH_LEN];
 
@@ -113,7 +114,6 @@ int check_directory(char* path)
 int main(int argc, char **argv)
 {
     int	  ch;
-    reg_t register_type = REG_NONE; 
     int   exitcode = 0;
 
 #ifdef HAVE_SYSLOG_H
@@ -136,19 +136,19 @@ int main(int argc, char **argv)
 	    break;
 
 	case 's':
-	    register_type = REG_SPAM;
+	    run_type = REG_SPAM;
 	    break;
 
 	case 'n':
-	    register_type = REG_GOOD;
+	    run_type = REG_GOOD;
 	    break;
 
 	case 'S':
-	    register_type = REG_GOOD_TO_SPAM;
+	    run_type = REG_GOOD_TO_SPAM;
 	    break;
 
 	case 'N':
-	    register_type = REG_SPAM_TO_GOOD;
+	    run_type = REG_SPAM_TO_GOOD;
 	    break;
 
 	case 'v':
@@ -191,8 +191,7 @@ int main(int argc, char **argv)
 	    break;
 
 	case 'u':
-	    update = 1;
-	    register_type = REG_UPDT;
+	    run_type = RUN_UPDATE;
 	    break;
 
 	case 'l':
@@ -204,10 +203,10 @@ int main(int argc, char **argv)
 
     setup_lists(directory, DB_WRITE);
 
-    if (register_type == REG_NONE || register_type == REG_UPDT)
+    if (run_type == RUN_NORMAL || run_type == RUN_UPDATE)
     {
 	double spamicity;
-	rc_t	status = bogofilter(STDIN_FILENO, &spamicity);
+	rc_t   status = bogofilter(STDIN_FILENO, &spamicity);
 
 	if (passthrough)
 	{
@@ -255,7 +254,7 @@ int main(int argc, char **argv)
 	sprintf(msg_bogofilter, "%s: %s, spamicity=%0.6f",
 		SPAM_HEADER_NAME, (status==RC_SPAM) ? "Yes" : "No", spamicity);
     } else {
-	register_messages(STDIN_FILENO, register_type);
+	register_messages(STDIN_FILENO, run_type);
     }
 
     close_lists();
@@ -263,12 +262,12 @@ int main(int argc, char **argv)
 #ifdef HAVE_SYSLOG_H
     if (logflag)
     {
-	switch (register_type)
+	switch (run_type)
 	{
-	case REG_NONE:
+	case RUN_NORMAL:
 	    syslog(LOG_INFO, "%s\n", msg_bogofilter);
 	    break;
-	case REG_UPDT:
+	case RUN_UPDATE:
 	    syslog(LOG_INFO, "%s, %s\n", msg_bogofilter, msg_register);
 	    break;
 	default:
