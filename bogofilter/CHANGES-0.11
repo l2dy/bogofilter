@@ -4,7 +4,7 @@
 
 $Id$
      
-0.11.0.1  2003-03-04
+0.11.1  2003-03-04
 
 	2003-03-04
 	* Fixed print checks in rob_print_rstats().

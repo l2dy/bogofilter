@@ -4,8 +4,9 @@
 
 $Id$
 
-0.11.0.1 2003-03-04
+0.11.1 2003-03-04
 
+	 * Using standard html comment delimiters when discarding comments.
 	 * Fixed charset initialization flaw.
 
 0.11.0   2003-03-03
