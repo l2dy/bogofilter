@@ -78,4 +78,9 @@ void wordhash_foreach(wordhash_t *wh, wh_foreach_t *hook, void *userdata);
 wordhash_t *convert_propslist_to_countlist(wordhash_t *wh);
 wordhash_t *convert_wordhash_to_propslist(wordhash_t *wh, wordhash_t *db);
 
+/* for bogotune */
+
+void wordhash_degen(wordhash_t *wh, wordhash_t *db);
+void *wordhash_search_memory (const word_t *t);
+
 #endif

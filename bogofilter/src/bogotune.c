@@ -52,6 +52,7 @@ AUTHOR:
 #include "bogoreader.h"
 #include "collect.h"
 #include "datastore.h"
+#include "degen.h"
 #include "fisher.h"
 #include "msgcounts.h"
 #include "mime.h"
@@ -557,24 +558,22 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
     mbox_mode = true;
     bogoreader_init(1, &arg);
     while ((*reader_more)()) {
-	wordhash_t *whc, *whp = NULL;
-	wordprop_t *msg_count;
-
-	whc = wordhash_new();
+	wordhash_t *whp = NULL;
+	wordhash_t *whc = wordhash_new();
 
 	collect_words(whc);
 	
 	if (msgs_good == 0 && msgs_bad == 0) {
-	    msg_count = wordhash_insert(whc, w_msg_count, sizeof(wordprop_t), NULL);
+	    wordprop_t *msg_count = wordhash_insert(whc, w_msg_count, sizeof(wordprop_t), NULL);
 	    if (msg_count->cnts.good == 0 || msg_count->cnts.bad == 0)
-		load_wordlist(load_hook, ns_and_sp->train);
+		load_wordlist(load_hook, train);
 	    if (msgs_good == 0 && msgs_bad == 0) {
-		fprintf(stderr, "Can't find .MSG_COUNT.\n");
+		fprintf(stderr, "Can't find '.MSG_COUNT'.\n");
 		exit(EX_ERROR);
 	    }
 	}
 
-	if (whc->count == 0) {
+	if (whc->count == 0 && !quiet) {
 	    printf("msg #%d, count is %d\n", count, whc->count);
 	    bt_trap();
 	}
@@ -724,19 +723,30 @@ static void print_msgcount_entry(const char *token, uint bad, uint good)
 
 static void write_msgcount_file(wordhash_t *wh)
 {
-    hashnode_t *n;
+    hashnode_t *hn;
     wordhash_t *train = ns_and_sp->train;
 
     print_msgcount_entry(".MSG_COUNT", msgs_bad, msgs_good);
 
     wordhash_sort(wh);
 
-    for (n = wordhash_first(wh); n != NULL; n = wordhash_next(wh)) {
-	word_t *key = n->key;
-	if (key != NULL && strcmp((char *)key->text, ".MSG_COUNT") != 0) {
-	    wordprop_t *p = wordhash_insert(train, key, sizeof(wordprop_t), NULL);
-	    print_msgcount_entry((char *)key->text, p->cnts.bad, p->cnts.good);
+    if (degen_enabled || header_degen)
+	wordhash_degen(wh, train);
+
+    for (hn = wordhash_first(wh); hn != NULL; hn = wordhash_next(wh)) {
+	word_t *token = hn->key;
+	wordprop_t *wp = (wordprop_t *) hn->buf;
+	wordcnts_t *cnts = &wp->cnts;
+
+	if (cnts->good == 0 && cnts->bad == 0) {
+	    wp = wordhash_search(train, token, 0);
+	    if (wp) {
+		cnts->good = wp->cnts.good;
+		cnts->bad  = wp->cnts.bad;
+	    }
 	}
+
+	print_msgcount_entry((char *)token->text, cnts->bad, cnts->good);
     }
 
     return;
@@ -841,6 +851,9 @@ static int process_args(int argc, char **argv)
 		"Bogotune needs both non-spam and spam messages sets for its testing.\n");
 	exit(EX_ERROR);
     }
+
+    if (!suppress_config_file)
+	process_config_files(false);
 
     return count;
 }
@@ -1248,6 +1261,7 @@ static rc_t bogotune(void)
     /* usage decreases as distribute() converts to count format */
 
     if (bogolex && bogolex_file != NULL) {
+	robx = ROBX;			/* needed for degen */
 	read_mailbox(bogolex_file, NULL);
 	return status;
     }
@@ -1564,7 +1578,7 @@ static void show_elapsed_time(int beg, int end, uint cnt, double val,
 			      const char *lbl1, const char *lbl2)
 {
     int tm = end - beg;
-    printf("    %2dm:%02ds for %d %s.  avg: %5.1f %s\n",
+    printf("    %dm:%02ds for %d %s.  avg: %.1f %s\n",
 	   MIN(tm), SECONDS(tm), cnt, lbl1, val, lbl2);
 }
 

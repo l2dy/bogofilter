@@ -32,7 +32,20 @@ const char *spam_header_name = "X-Bogosity:"; /* unused */
 wordlist_t* word_lists=NULL;	/* define to satisfy link requirements of msgcount.c */
 #endif
 
+/* dummy function to satisfy reference in wordhash_degen() */
+void degen(word_t *token, wordcnts_t *cnts);
+void degen(word_t *token, wordcnts_t *cnts)
+{
+    token = NULL;	/* quiet compiler */
+    cnts  = NULL;	/* quiet compiler */
+    return;
+}
+
+/* function prototypes */
+
 void initialize(void);
+
+/* function definitions */
 
 static void print_wordlist (wordhash_t *h)
 {

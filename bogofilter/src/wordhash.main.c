@@ -10,6 +10,17 @@ typedef struct
 }
 wh_elt_t;
 
+/* dummy function to satisfy reference in wordhash_degen() */
+void degen(word_t *token, wordcnts_t *cnts);
+void degen(word_t *token, wordcnts_t *cnts)
+{
+    token = NULL;	/* quiet compiler */
+    cnts  = NULL;	/* quiet compiler */
+    return;
+}
+
+/* function definitions */
+
 static void word_init(void *vw){
      wh_elt_t *w = vw;
      w->count = 0;   

@@ -116,6 +116,15 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
     int override=0;
     wordlist_t* list;
 
+    if (fBogotune) {
+	wordprop_t *wp = wordhash_search_memory(token);
+	if (wp) {
+	    cnts->good = wp->cnts.good;
+	    cnts->bad  = wp->cnts.bad;
+	}
+	return;
+    }
+
     for (list=word_lists; list != NULL; list=list->next)
     {
 	size_t i;

@@ -29,6 +29,7 @@ THEORY:
 #include <string.h>
 #include <stddef.h>	/* for offsetof */
 
+#include "degen.h"
 #include "wordhash.h"
 #include "xmalloc.h"
 
@@ -51,8 +52,17 @@ THEORY:
 #define offsetof(type, member) ((size_t) &((type*)0)->member )
 #endif
 
+/* global variables */
+
+/* for  bogotune */
+wordhash_t *memory_db;
+
+/* function prototypes */
+
 void wh_trap(void);
 void wh_trap(void) {}
+
+/* function definitions */
 
 /* 06/14/03
 ** profiling shows wordhash_new() is significant portion 
@@ -280,6 +290,15 @@ wordhash_foreach (wordhash_t *wh, wh_foreach_t *hook, void *userdata)
     }
 
     return;
+}
+
+void *
+wordhash_search_memory (const word_t *t)
+{
+    void *ans = NULL;
+    if (memory_db)
+	ans = wordhash_search(memory_db, t, 0);
+    return ans;
 }
 
 void *
@@ -549,3 +568,33 @@ convert_wordhash_to_propslist(wordhash_t *whi, wordhash_t *db)
 	return who;
     }
 } 
+
+void wordhash_degen(wordhash_t *wh, wordhash_t *db)
+{
+    if (degen_enabled) {
+	hashnode_t *node;
+
+	memory_db = db;
+	degen_enabled = false;	/* Disable further recursion */
+
+	for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
+	{
+	    wordprop_t *props = (wordprop_t *) node->buf;
+	    wordcnts_t *cnts  = &props->cnts;
+	    if (cnts->good == 0 && cnts->bad == 0) {
+		word_t *token = node->key;
+		props = wordhash_search_memory(token);
+		if (props) {
+		    cnts->good = props->cnts.good;
+		    cnts->bad  = props->cnts.bad;
+		}
+		if (cnts->good == 0 && cnts->bad == 0)
+		    degen(token, cnts);
+	    }
+	}
+	memory_db = NULL;
+	degen_enabled = true;	/* Enable further recursion */
+    }
+
+    return;
+}
