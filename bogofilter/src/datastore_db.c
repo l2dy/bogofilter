@@ -988,13 +988,15 @@ int db_init(void) {
     const u_int32_t numlocks = 16384;
     const u_int32_t numobjs = 16384;
 
-    if (needs_recovery(bogohome)) {
+    if (init_dbl(bogohome))
+
+    if (needs_recovery()) {
 	db_recover(0, 0);
     }
 
     db_try_glock(F_RDLCK, F_SETLKW);
 
-    if (set_lock(bogohome)) {
+    if (set_lock()) {
 	exit(EX_ERROR);
     }
 
@@ -1004,11 +1006,11 @@ int db_init(void) {
 int db_recover(int catastrophic, int force) {
     int ret;
 
-    while((force || needs_recovery(bogohome))
+    while((force || needs_recovery())
 	    && (db_try_glock(F_WRLCK, F_SETLKW) <= 0))
 	rand_sleep(10000,1000000);
 
-    if (!(force || needs_recovery(bogohome)))
+    if (!(force || needs_recovery()))
 	return 0;
 
 retry:
@@ -1024,7 +1026,7 @@ retry:
 	goto rec_fail;
     }
 
-    clear_lockfile(bogohome);
+    clear_lockfile();
     ds_cleanup();
 
     return 0;
