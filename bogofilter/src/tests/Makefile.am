@@ -13,11 +13,6 @@ CLEANFILES= $(BUILT_SOURCES)
 t.config: Makefile
 	echo >$@ 'EXE_EXT="@EXE_EXT@"' || rm -f $@
 
-if ENABLE_DEPRECATED_CODE
-DEGEN_TEST=t.degen
-SEPARATE_WORDLIST=t.separate
-endif
-
 ENVIRON_TESTS = t.abort t.env t.bogodir t.u_fpe
 
 PARSING_TESTS = \
