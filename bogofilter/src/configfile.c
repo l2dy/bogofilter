@@ -27,7 +27,6 @@ AUTHOR:
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #include "bool.h"
-#include "charset.h"
 #include "maint.h"
 #include "error.h"
 #include "find_home.h"
