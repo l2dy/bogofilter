@@ -364,6 +364,7 @@ static void help(void)
 		  "\t  -C      - don't read standard config files.\n"
 		  "\t  -d path - specify directory for wordlists.\n"
 		  "\t  -k size - set BerkeleyDB cache size (MB).\n"
+		  "\t  -W      - use combined wordlist.db for spam and ham tokens.\n"
 		  "\t  -l      - write messages to syslog.\n"
 		  "\t  -L tag  - specify the tag value for log messages.\n"
 		  "\t  -I file - read message from 'file' instead of stdin.\n"
@@ -436,7 +437,7 @@ static void print_version(void)
 #define	F "f"
 #endif
 
-#define	OPTIONS	":23bBc:Cd:DefFghI:k:lL:m:MnNo:O:pP:qQRrsStTuvVx:y:" G R F
+#define	OPTIONS	":23bBc:Cd:DefFghI:k:lL:m:MnNo:O:pP:qQRrsStTuvWVx:y:" G R F
 
 /** These functions process command line arguments.
  **
@@ -606,6 +607,10 @@ void process_args_1(int argc, char **argv)
         case 'V':
 	    print_version();
 	    exit(0);
+
+	case 'W':
+	    wordlists ^= W_COMBINED ^ W_SEPARATE;
+	    break;
 
 	case 'x':
 	    set_debug_mask( optarg );

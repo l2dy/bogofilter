@@ -611,7 +611,7 @@ char *db_file = NULL;
 bool  prob = false;
 cmd_t flag = NONE;
 
-#define	OPTIONS	":a:c:d:DhI:l:m:np:r:R:s:vVw:x:y:"
+#define	OPTIONS	":a:c:d:DhI:l:m:np:r:R:s:vVw:Wx:y:"
 
 static int process_args(int argc, char **argv)
 {
@@ -682,6 +682,10 @@ static int process_args(int argc, char **argv)
 	case 'V':
 	    print_version();
 	    exit(0);
+
+	case 'W':
+	    wordlists ^= W_COMBINED ^ W_SEPARATE;
+	    break;
 
 	case 'x':
 	    set_debug_mask( (char *) optarg );
