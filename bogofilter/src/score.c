@@ -143,7 +143,7 @@ retry:
 	cnts->msgs_bad += list->msgcount[IX_SPAM];
 
 	if (DEBUG_ALGORITHM(1)) {
-	    fprintf(dbgout, "%5u %5u ", cnts->good, cnts->bad, cnts->msgs_good, cnts->msgs_bad);
+	    fprintf(dbgout, "%5u %5u ", cnts->good, cnts->bad);
 	    word_puts(token, 0, dbgout);
 	    fputc('\n', dbgout);
 	}
