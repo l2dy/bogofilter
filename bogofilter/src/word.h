@@ -13,6 +13,8 @@ AUTHOR:
 #ifndef	WORD_H
 #define	WORD_H
 
+#include "bftypes.h"
+
 typedef struct {
     uint	leng;
     byte		*text;

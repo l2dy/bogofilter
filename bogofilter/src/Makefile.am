@@ -71,7 +71,7 @@ configtest_LDADD = $(LDADD) $(LIBDB)
 
 # what to build that from
 version_sources= \
-	common.h system.h \
+	common.h system.h bftypes.h \
 	globals.h globals.c \
 	base64.h base64.c \
 	bf_exit.c \
