@@ -1,0 +1,21 @@
+0.11.0
+
+	The meaning of command line flags '-S' and '-N' was changed in
+	version 0.11.0.  Previously '-S' meant to unregister a message
+	from the spam wordlist and register the message in the
+	non-spam wordlist and '-N' meant to unregister from non-spam
+	and register as spam.
+
+	Each of the flags now performs a single action.  
+	'-S' unregisters a message from the spam wordlist and 
+	'-N' unregisters a message from the non-spam wordlist.
+
+	To duplicate the old (compound) actions, it is necessary to
+	use two options - an unregister option ('-S' or '-N') and a
+	register option ('-s' or '-n').
+
+	To duplicate the effect of the old '-S' option, use '-S -n'.  
+	To duplicate the effect of the old '-N' option, use '-N -s'.  
+	The order of the options doesn't matter and they can be
+	concatenated, as in '-Sn' and '-sN'.
+
