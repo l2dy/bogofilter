@@ -44,17 +44,6 @@ void buff_free(buff_t *self)
     xfree(self);
 }
 
-int buff_fgetsl(buff_t *self, FILE *in)
-{
-    uint readpos = self->t.leng;
-    int readcnt = xfgetsl((char *)self->t.text + readpos, self->size - readpos,
-	    in, true);
-    self->read = readpos;
-    if (readcnt >= 0) /* don't decrease on error */
-	self->t.leng += readcnt;
-    return readcnt;
-}
-
 int buff_fgetsln(buff_t *self, FILE *in, uint maxlen)
 {
     uint readpos = self->t.leng;

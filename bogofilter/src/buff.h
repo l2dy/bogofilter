@@ -38,7 +38,7 @@ extern void 	buff_free(buff_t *self);
  * room if necessary */
 extern int	buff_add(buff_t *self, word_t *in);
 
-extern int	buff_fgetsl(buff_t *self, FILE *);
+#define buff_fgetsl(self, in) buff_fgetsln(self, in, UINT_MAX)
 extern int	buff_fgetsln(buff_t *self, FILE *, uint);
 extern void 	buff_puts(const buff_t *self, uint width, FILE *fp);
 
