@@ -20,8 +20,7 @@ count 2 -> 878
 count 3 -> 571
 EOF
 
-echo -n "initial: "
-$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db | wc -l > $OUT
+echo initial: `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db | wc -l` > $OUT
 
 for cnt in 0 1 2 3 ; do
     $BOGOUTIL -c $cnt -m $BOGOFILTER_DIR/wordlist.db
