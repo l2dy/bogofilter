@@ -3,11 +3,11 @@
 			       =================
 
 $Id$
-     
+
 0.12.0	2003-04-23
 
-	* Added tuning subdirectory with scripts to support parameter
-	  testing as described in bogofilter-tuning.HOWTO 
+	* Added 'tuning' directory with scripts for tuning bogofilter.
+	  (cf. bogofilter-tuning.HOWTO)
 
 	2003-04-21
 	* Added '-M' to allow classification of multiple messages in
