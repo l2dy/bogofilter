@@ -72,7 +72,7 @@ static const char *resolveopenflags(u_int32_t flags) {
     char b2[80];
     strlcpy(buf, "", sizeof(buf));
     if (flags & DB_CREATE) flags &= ~DB_CREATE, strlcat(buf, "DB_CREATE ", sizeof(buf));
-    if (flags & DB_EXCL) flags &= ~DB_EXCL, strlcat(buf, "DB_EXCL ", sizeof(buf));
+    if (flags & DB_EXCL)   flags &= ~DB_EXCL,   strlcat(buf, "DB_EXCL ",   sizeof(buf));
     if (flags & DB_NOMMAP) flags &= ~DB_NOMMAP, strlcat(buf, "DB_NOMMAP ", sizeof(buf));
     if (flags & DB_RDONLY) flags &= ~DB_RDONLY, strlcat(buf, "DB_RDONLY ", sizeof(buf));
 #if DB_AT_LEAST(4,1)
