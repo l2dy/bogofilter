@@ -86,16 +86,17 @@
         Database Questions
 
         <ul>
+          <li><a href="#compact-database">How can I compact my database?</a></li>
           <li><a href="#query-database">How do I manually query the database?</a></li>
           <li><a href="#rescue">How can I tell if my wordlists are corrupted?</a></li>
-          <li><a href="#update">How do I upgrade from separate word
-          databases to the new combined wordlist format?</a></li>
           <li><a href="#multiple">Can I use multiple wordlists?</a></li>
           <li><a href="#ignore">Can I tell bogofilter to ignore certain tokens?</a></li>
-	  <li><a href="#locksize">Why does bogofilter die after printing
-	      "Lock table is out of available locks"? or
+	  <li><a href="#locksize">Why does bogofilter die after printing<br>
+	      "Lock table is out of available locks" or<br>
 	      "Lock table is out of available object entries"?</a></li>
           <li><a href="#page-notfound">Why am I getting DB_PAGE_NOTFOUND messages?</a></li>
+          <li><a href="#update">How do I upgrade from separate word
+          databases to the new combined wordlist format?</a></li>
         </ul>
       </li>
 
@@ -433,13 +434,6 @@
     errors and unsures; thereafter, train with only the separated and
     unsures, discarding the messages that bogofilter already
     classifies correctly.</p>
-
-    <p>To compact the database so it occupies the minimum of disk
-    space, you should periodically run:</p>
-
-    <pre>	bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
-	mv wordlist.db wordlist.db.prv
-	mv wordlist.db.new wordlist.db</pre>
 
     <hr>
 
@@ -790,6 +784,37 @@
 
     <hr>
 
+    <h2 id="compact-database">How can I compact my database?</h2>
+
+    <p>You can periodically compact the database so it occupies a
+    minimum of disk space.  Assuming your wordlist is in directory
+    ~/.bogofilter, for bogofilter 0.93.0 (or newer) use:</p>
+
+    <pre>	bf_compact ~/.bogofilter wordlist.db</pre>
+
+    <p>For bogofilter older than 0.93.0, use:</p>
+
+    <pre>	cd ~/.bogofilter
+	bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
+	mv wordlist.db wordlist.db.prv
+	mv wordlist.db.new wordlist.db</pre>
+
+    <p>The script is needed to duplicate your database environment (in
+    order to support BerkeleyDB transaction processing).  Your
+    original directory will be renamed to ~/.bogofilter.old and
+    ~/.bogofilter will contain the new database environment.</p>
+
+    <p>Since older versions of bogofilter don't use Berkeley DB
+    transactions, the database is just a single file (wordlist.db) and
+    it isn't necessary to use the script.  The commands shown above
+    create a new compact database and rename the original file to
+    wordlist.db.prv</p>
+
+    <p>Note: it's O.K. to use the script with old versions of
+    bogofilter.</p>
+
+    <hr>
+
     <h2 id="query-database">How do I manually query the database?</h2>
 
     <p>To find the spam and ham counts for a token (word) use
@@ -829,15 +854,6 @@
     <p>You can also use a text file instead of a pipe, as in:</p>
     <pre>	bogoutil -d wordlist.db &gt; wordlist.txt
 	bogoutil -l wordlist.db.new &lt; wordlist.txt</pre>
-
-    <hr>
-
-    <h2 id="update">How do I upgrade from separate word
-    databases to the new combined wordlist format?</h2>
-
-    <p>Run script bogoupgrade.  For more info, run "bogoupgrade -h" to
-    see its help message or run "man bogoupgrade" and read its man
-    page.</p>
 
     <hr>
 
@@ -970,6 +986,15 @@
     <p>If you think your database may be corrupt, read
     <a href="#rescue">How can I tell if my wordlists are corrupted?</a>
     FAQ entry.</p>
+
+    <hr>
+
+    <h2 id="update">How do I upgrade from separate word databases to
+    the new combined wordlist format?</h2>
+
+    <p>Run script bogoupgrade.  For more info, run "bogoupgrade -h" to
+    see its help message or run "man bogoupgrade" and read its man
+    page.</p>
 
     <hr>
 
