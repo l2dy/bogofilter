@@ -20,7 +20,7 @@ extern const char *spam_subject_tag;
 /* needed by bogoconfig.c */
 
 extern const parm_desc format_parms[];
-extern void set_terse_mode_format(void);
+extern void set_terse_mode_format(int mode);
 
 /* Function Prototypes */
 

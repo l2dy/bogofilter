@@ -230,7 +230,7 @@ print("Calculating false-positive target...\n");
 
 if($usebogofilter) {
     $cmd = join(" ", "cat", @nsfiles, "|", $bogof, "-m 0.02", $cf,
-	"-d", $bogodir, "-Mttv >", $workfn);
+	"-d", $bogodir, "-MTTv >", $workfn);
 } else {
     $cmd = join(" ", "cat", @nsfiles, "| apclass -fq -m 0.02 >", $workfn);
 }
@@ -326,7 +326,7 @@ foreach my $scantype ("coarse", "fine") {
 		### first get cutoff
 		if($usebogofilter) {
 		    $cmd = join(" ", "cat", @nsfiles, "|", $bogof, $cf, "-d",
-			$bogodir, "-Mttv -m", $mpar, "-o 0.01 >", $workfn);
+			$bogodir, "-MTTv -m", $mpar, "-o 0.01 >", $workfn);
 		} else {
 		    $cmd = join(" ", "cat", @nsfiles, "| apclass -fq -m",
 			$mpar, "-o 0.01 >", $workfn);
@@ -356,7 +356,7 @@ foreach my $scantype ("coarse", "fine") {
 		### now get fn count
 		if($usebogofilter) {
 		    my $cmd = join(" ", "cat", @spfiles, "|", $bogof, $cf,
-			"-d", $bogodir, "-Mttv -m", $mpar, "-o", $cutoff,
+			"-d", $bogodir, "-MTTv -m", $mpar, "-o", $cutoff,
 			">", $workfn);
 		    $err = system($cmd) >> 8;
 		    if($err > 2) {
@@ -471,7 +471,7 @@ print("Performing final scoring:\nNonspam...\n");
 my $mpar = $md . "," . $robs . "," . $robx;
 if($usebogofilter) {
     $cmd = join(" ", "cat", @nsfiles, "|", $bogof, $cf, "-d",
-	$bogodir, "-Mttv -m", $mpar, ">", $workfn);
+	$bogodir, "-MTTv -m", $mpar, ">", $workfn);
 } else {
     $cmd = join(" ", "cat", @nsfiles, "| apclass -fq -m",
 	$mpar, ">", $workfn);
@@ -493,7 +493,7 @@ close SCORES;
 print("Spam...\n");
 if($usebogofilter) {
     $cmd = join(" ", "cat", @spfiles, "|", $bogof, $cf, "-d",
-        $bogodir, "-Mttv -m", $mpar, ">", $workfn);
+        $bogodir, "-MTTv -m", $mpar, ">", $workfn);
 } else {
     $cmd = join(" ", "cat", @spfiles, "| apclass -fq -m",  
         $mpar, ">", $workfn);

@@ -129,10 +129,20 @@ enum flags {
 
 /* Function Definitions */
 
-void set_terse_mode_format(void)
+void set_terse_mode_format(int mode)
 {
-    spamicity_tags = spamicity_tags_shu;
-    terse_format = "%1.1c %g";
+    switch (mode) {
+    case 1:
+	spamicity_tags = spamicity_tags_shu;
+	terse_format = "%1.1c %-8.6g";
+	break;
+    case 2:
+	terse_format = "%0.16f";
+	break;
+    default:
+	fprintf(stderr, "Invalid '-T' usage\n");
+	exit(EX_ERROR);
+    }
 }
 
 /* any fields omitted will retain their original value */

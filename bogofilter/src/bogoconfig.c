@@ -662,7 +662,7 @@ void process_args_2(int argc, char **argv)
 {
     int option;
     ex_t exitcode;
-    bool inv_terse_mode = false;
+    int inv_terse_mode = 0;
 
     optind = opterr = 1;
     /* don't use #ifdef here: */
@@ -729,15 +729,12 @@ void process_args_2(int argc, char **argv)
 	}
 
 	case 't':
-	    if (!terse)
-		terse = true;
-	    else
-		terse_format = "%0.16f";
+	    terse = true;
 	    break;
 
 	case 'T':			/* invariant terse mode */
 	    terse = true;
-	    inv_terse_mode = true;
+	    inv_terse_mode += 1;
 	    break;
 
         case 'V':
@@ -760,7 +757,7 @@ void process_args_2(int argc, char **argv)
 
     if (inv_terse_mode) {
 	verbose = max(1, verbose); 	/* force printing */
-	set_terse_mode_format();
+	set_terse_mode_format(inv_terse_mode);
     }
 
     return;
