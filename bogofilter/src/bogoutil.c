@@ -397,7 +397,8 @@ static void help(void)
 	    "\t-u file\tUpgrade wordlist version.\n"
 	    "\t-w dir\tDisplay counts for words from stdin.\n"
 	    "\t-p dir\tDisplay word counts and probabilities.\n"
-	    "\t-m\tEnable maintenance works (expiring tokens).\n"
+	    "\t-m\tEnable maintenance works (expiring tokens).\n");
+    fprintf(stderr,
 	    "\t-v\tOutput debug messages.\n"
 	    "\t-H dir\tDisplay histogram and statistics for the wordlist.\n"
 	    "\t"    "\tUse -v  to exclude hapaxes."
