@@ -230,9 +230,9 @@ void clr_tag(void)
     token_prefix = NULL;
 }
 
-void set_tag(word_t *text)
+void set_tag(const char *text)
 {
-    switch (tolower(*text->text)) {
+    switch (tolower(*text)) {
     case 't':			/* To: */
 	token_prefix = w_to;
 	break;
@@ -247,8 +247,7 @@ void set_tag(word_t *text)
 	break;
     default:
 	fprintf(stderr, "%s:%d  invalid tag - '%s'\n", 
-		__FILE__, __LINE__, 
-		(char *)text->text);
+		__FILE__, __LINE__, text);
 	exit(EX_ERROR);
     }
     return;
