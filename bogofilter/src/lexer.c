@@ -18,6 +18,7 @@
 #include "charset.h"
 #include "error.h"
 #include "lexer.h"
+#include "memstr.h"
 #include "mime.h"
 #include "msgcounts.h"
 #include "qp.h"
@@ -289,22 +290,28 @@ int yyinput(byte *buf, size_t used, size_t size)
 
 size_t text_decode(word_t *w)
 {
-    byte *beg = w->text;
-    byte *fin = beg + w->leng;
-    byte *txt = (byte *) strstr((char *)beg, "=?");	/* skip past leading text */
-    uint size = (uint) (txt - beg);
+    byte *const beg = w->text;		/* base pointer, fixed */
+    byte *const fin = beg + w->leng;	/* end+1 position */
+
+    byte *txt = (byte *) memstr(w->text, w->leng, "=?"); /* input position */
+    uint size = (uint) (txt - beg); /* output offset */
+
+    if (txt == NULL)
+	return w->leng;
 
     while (txt < fin) {
 	word_t n;
-	byte *typ = (byte *) strchr((char *)txt+2, '?');/* Encoding type - 'B' or 'Q' */
-	byte *tmp = typ + 3;
-	byte *end = (byte *) strstr((char *)tmp, "?=");	/* last byte of encoded word  */
-	uint len = end - tmp;
-	bool copy;
+	byte *typ, *tmp, *end;
+	uint len;
+	bool adjacent;
+
+	typ = (byte *) memchr((char *)txt+2, '?', fin-(txt+2));/* Encoding type - 'B' or 'Q' */
+	tmp = typ + 3;	/* start of encoded word */
+	end = (byte *) memstr((char *)tmp, fin-tmp, "?=");	/* last byte of encoded word  */
+	len = end - tmp;
 
 	n.text = tmp;				/* Start of encoded word */
 	n.leng = len;				/* Length of encoded word */
-	n.text[n.leng] = (byte) '\0';
 
 	if (DEBUG_LEXER(2)) {
 	    fputs("***  ", dbgout);
@@ -324,7 +331,6 @@ size_t text_decode(word_t *w)
 	}
 
 	n.leng = len;
-	n.text[n.leng] = '\0';
 
 	if (DEBUG_LEXER(3)) {
 	    fputs("***  ", dbgout);
@@ -332,28 +338,38 @@ size_t text_decode(word_t *w)
 	    fputs("\n", dbgout);
 	}
 
+	/* move decoded word to where the encoded used to be */
 	memmove(beg+size, n.text, len+1);
-	size += len;
-	txt = end + 2;
+	size += len; /* bump output pointer */
+	txt = end + 2; /* skip ?= trailer */
 	if (txt >= fin)
 	    break;
-	end = (byte *) strstr((char *)txt, "=?");
-	copy = end != NULL;
 
-	if (copy) {
+	/* check for next encoded word */
+	end = (byte *) memstr((char *)txt, fin-txt, "=?");
+	adjacent = end != NULL;
+
+	/* clear adjacent flag if non-whitespace character found between
+	 * adjacent encoded words */
+	if (adjacent) {
 	    tmp = txt;
-	    while (copy && tmp < end) {
+	    while (adjacent && tmp < end) {
 		if (isspace(*tmp))
 		    tmp += 1;
 		else
-		    copy = false;
+		    adjacent = false;
 	    }
 	}
 
-	if (copy)
+	/* we have a next encoded word and we've had only whitespace
+	 * between the current and the next */
+	if (adjacent)
+	    /* just skip whitespace */
 	    txt = end;
-	else while (txt < end)
-	    beg[size++] = *txt++;
+	else
+	    /* copy everything that was between the encoded words */
+	    while (txt < end)
+		beg[size++] = *txt++;
     }
 
     return size;
