@@ -120,6 +120,7 @@ int main(int argc, char **argv)
 	    {
 		if (strcmp(textend->block, "\n") == 0) break;
 		(void) fputs(textend->block, stdout);
+		if (ferror(stdout)) exit(2);
 	    }
 	}
 
@@ -143,13 +144,14 @@ int main(int argc, char **argv)
 	    for (; textend->block; textend=textend->next)
 	    {
 		(void) fputs(textend->block, stdout);
+		if (ferror(stdout)) exit(2);
 	    }
+
+	    if (fflush(stdout) || ferror(stdout)) exit(2);
 	}
 
 	exitcode = status;
-    }
-    else
-    {
+    } else {
 	register_messages(STDIN_FILENO, register_type);
     }
 
