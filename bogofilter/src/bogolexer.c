@@ -187,6 +187,18 @@ static void process_args_1(int argc, char **argv)
 	    passthrough = true;
 	    break;
 
+#ifndef	ENABLE_DEPRECATED_CODE
+	case 'P':
+	{
+	    while (*optarg != '\0')
+	    {
+		if (*optarg == 'h' || *optarg == 'H')
+		    header_line_markup = *optarg == 'h';
+		optarg += 1;
+	    }
+	}
+#endif
+
 	case 'q':
 	    quiet = true;
 	    break;
