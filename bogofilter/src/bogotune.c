@@ -849,6 +849,18 @@ static rc_t bogotune(void)
 	props = wordhash_insert(ns_and_sp->train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
 	msgs_good = props->good;
 	msgs_bad  = props->bad;
+	if (msgs_good < 1000 || msgs_bad < 1000)
+	    fprintf(stderr, 
+		    "The wordlist contains %ld ham and %ld spam messages.  It is recommended\n"
+		    "that bogotune be run with at least 1,000 of each.  A wordlist this small\n"
+		    "may produce poor results.\n",
+		    msgs_good, msgs_bad);
+	if (msgs_bad < msgs_good / 5 ||
+	    msgs_bad > msgs_good * 5)
+	    fprintf(stderr,
+		    "The wordlist has a ratio of spam to ham of %0.1f to 1.0.  It\n"
+		    "is recommended that the ratio be in the range of 0.2 to 5.\n",
+		    msgs_bad * 1.0 / msgs_good);
     }
 
     if (verbose > 3) {
@@ -859,6 +871,16 @@ static rc_t bogotune(void)
 
     ns_cnt = count_messages(ns_msglists);
     sp_cnt = count_messages(sp_msglists);
+
+    if (ns_cnt < 1000 || sp_cnt < 1000 ||
+	(ds_file == NULL && (ns_cnt < 2000 || sp_cnt < 2000))) {
+	fprintf(stderr, 
+		"The messages sets contain %ld ham and %ld spam.  It is recommended that\n"
+		"bogotune be run with at least %d,000 of each.  Messages sets this small\n"
+		"may produce poor results.\n",
+		msgs_good, msgs_bad, (ds_file != NULL) ? 1 : 2);
+    }
+
     ns_scores = xcalloc(ns_cnt, sizeof(double));
     sp_scores = xcalloc(sp_cnt, sizeof(double));
 
