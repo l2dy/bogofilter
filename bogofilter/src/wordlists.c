@@ -85,7 +85,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
     /* FIXME: create or reuse environment from filepath */
 
     dbe = list_searchinsert(bf_dirname(list->filepath));
-    if (!dbe)
+    if (dbe == NULL)
 	exit(EX_ERROR);
     list->dsh = ds_open(dbe, bogohome, list->filepath, mode); /* FIXME */
     if (list->dsh == NULL) {
@@ -231,8 +231,8 @@ static void sanitycheck_lists(void)
     int listcount=0;
 
     while(1) {
-	if (!list) break;
-	if (! list->name) {
+	if (list == NULL) break;
+	if (list->name == NULL) {
 	    fprintf(stderr, "A list has no name.\n");
 	    exit(EX_ERROR);
 	}

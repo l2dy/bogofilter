@@ -41,7 +41,7 @@ void set_bogohome(const char *path) {
 	else
 	    *bogohome = '\0';
     }
-    if (!*bogohome) {
+    if (*bogohome == '\0') {
 	xfree(bogohome);
 	bogohome = xstrdup(CURDIR_S);
     }
