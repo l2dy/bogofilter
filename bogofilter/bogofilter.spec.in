@@ -41,6 +41,6 @@ gzip -f -9 $RPM_BUILD_ROOT/%{_mandir}/*/*.[1-9]
 %{_bindir}/bogofilter
 %{_bindir}/bogoutil
 %{_bindir}/bogoupgrade.pl
-%doc AUTHORS COPYING NEWS README TODO UPGRADE bogofilter.xml
+%doc AUTHORS COPYING NEWS README TODO UPGRADE bogofilter.xml doc/* contrib/*
 
 %changelog

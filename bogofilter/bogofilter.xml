@@ -99,7 +99,7 @@ same message as non-spam.</para>
 on standard input as non-spam and to undo a prior registration of the
 same message as spam.</para>
 
-<para>The <option>-d</option>&nbsp;<replaceable>dir</replaceable> option
+<para>The <option>-d</option><replaceable> dir</replaceable> option
     allows you to set the directory under which wordlists will be found
     to <replaceable>dir</replaceable>. If omitted,
     <filename>$HOME/.bogofilter</filename> is assumed.</para>
@@ -224,6 +224,37 @@ mutt macros for dispatching mail to
 macro index d "&lt;enter-command&gt;unset wait_key\n&lt;pipe-entry&gt;bogofilter -n\n&lt;enter-command&gt;set wait_key\n&lt;delete-message&gt;" "delete message as non-spam"
 macro index \ed "&lt;enter-command&gt;unset wait_key\n&lt;pipe-entry&gt;bogofilter -s\n&lt;enter-command&gt;set wait_key\n&lt;delete-message&gt;" "delete message as spam"
 </programlisting>
+
+<para>Integration with Mail Transport Agent (MTA)</para>
+<procedure>
+<step>
+ <para><application>bogofilter</application> can also be integrated into an MTA 
+  to filter all incoming mail. While the specific implementation is MTA dependent, the
+  general steps are as follows</para>
+</step>
+
+<step>
+ <para>Install <application>bogofilter</application> on the mail server</para>
+</step>
+<step>
+ <para>Prime the bogofilter databases with a spam and non-spam corpus.
+ Since <application>bogofilter</application> will be serving a larger community,
+ it is important to prime it with a representative set of messages.</para>
+</step>
+<step>
+ <para>Setup the MTA to invoke bogofilter on each message.
+   While this is an MTA specific step, you'll probably need to use the 
+   <option>-p</option>, <option>-u</option>, and <option>-e</option> options.</para>
+</step>
+<step>
+ <para>Setup a mechanism for users to register spam/nonspam messages, as well as to correct mis-classifications.
+ The most generic solution is to setup up alias email addresses to which users bounce messages.</para>
+</step>
+<step>
+<para>See the <filename>doc</filename> and <filename>contrib</filename> directories for more information</para>
+</step>
+</procedure>
+
 </refsect1>
 
 <refsect1 id='returns'><title>RETURN VALUES</title>
