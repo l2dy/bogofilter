@@ -156,6 +156,10 @@ const parm_desc sys_parms[] =
     { "tag_header_lines", 	     CP_BOOLEAN, { (void *) &tag_header_lines } },
     { "strict_check", 	  	     CP_BOOLEAN, { (void *) &strict_check } },
 
+    { "tokenize_html_tags",	     CP_BOOLEAN, { (void *) &tokenize_html_tags } },
+    { "tokenize_html_script",	     CP_BOOLEAN, { (void *) &tokenize_html_script } },	/* Not yet in use */
+    { "tokenize_html_comments",	     CP_BOOLEAN, { (void *) &tokenize_html_comments } },/* Not yet in use */
+
     { "db_cachesize",	  	     CP_INTEGER, { (void *) &db_cachesize } },
     { "terse",	 	  	     CP_BOOLEAN, { (void *) &terse } },
 
@@ -307,6 +311,16 @@ static void help(void)
 		  "\t  -2      - set binary classification mode (yes/no).\n"
 		  "\t  -3      - set ternary classification mode (yes/no/unsure).\n");
     (void)fprintf(stderr,
+		  "\t  -H {opts} - set html processing flag(s).\n"
+		  "\t     where {opts} is one or more of:\n"
+		  "\t      C   - enable strict comment checking (default is loose checking).\n"
+		  "\t      t   - return tokens from inside html tags.\n"
+/*
+		  "\t      c   - return tokens from inside html comments.\n"
+		  "\t      s   - return tokens from inside html script blocks.\n"
+*/
+	);
+    (void)fprintf(stderr,
 		  "\t  -M      - set mailbox mode. Classify multiple messages in an mbox formatted file.\n"
 		  "\t  -b      - set streaming bulk mode. Classify multiple messages whose filenames are read from STDIN.\n"
 		  "\t  -B name1 name2 ... - set bulk mode. Classify multiple messages named as files on the command line.\n"
@@ -428,7 +442,7 @@ void process_args(int argc, char **argv, int pass)
 #if HAVE_DECL_OPTRESET
     optreset = 1;
 #endif
-    while ((option = getopt(argc, argv, ":23bBc:Cd:DefFghI:lL:m:MnNo:O:pqQRrsStTuvVx:y:" G R F)) != -1)
+    while ((option = getopt(argc, argv, ":23bBc:Cd:DefFghH:I:lL:m:MnNo:O:pqQRrsStTuvVx:y:" G R F)) != -1)
     {
 #if 0
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
@@ -502,6 +516,26 @@ void process_args(int argc, char **argv, int pass)
 	case 'h':
 	    help();
             exit(0);
+
+	case 'H':
+	{
+	    char *s;
+	    for (s = optarg; *s ; s += 1)
+	    {
+		switch (*s)
+		{
+		case 't': tokenize_html_tags ^= true;
+		    break;
+		case 's': tokenize_html_script ^= true;		/* Not yet in use */
+		    break;
+		case 'C': strict_check ^= true;
+		    /*@fallthrough@*/
+		case 'c': tokenize_html_comments ^= true;	/* Not yet in use */
+		    break;
+		}
+	    }
+	    break;
+	}
 
 	case 'I':
 	    if (pass == 2) {

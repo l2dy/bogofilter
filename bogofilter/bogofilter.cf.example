@@ -6,7 +6,7 @@
 # used in the bogofilter source code.
 
 # NOTE that comments MUST have their hash mark in the leftmost
-# column of a line! Blank lines are allowed though.
+# column of a line! Blank lines are allowed.
 
 ########### General Settings ########################################
 
@@ -161,6 +161,26 @@ charset_default=us-ascii
 
 replace_nonascii_characters=N
 
+
+#### TOKENIZE_HTML_TAGS
+#
+#	when enabled, the innards of html tags are tokenized
+
+tokenize_html_tags=no
+
+
+#### TOKENIZE_HTML_SCRIPT --- 	*** NOT YET WORKING ***
+#
+#	when enabled, the innards of html script blocks are tokenized
+
+tokenize_html_script=no
+
+
+#### TOKENIZE_HTML_COMMENTS --- *** NOT YET WORKING ***
+#
+#	when enabled, the innards of html comments are tokenized
+
+tokenize_html_comments=no
 
 
 ########### Classification Constants General Settings ###############

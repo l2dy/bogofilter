@@ -78,7 +78,16 @@ static void help(void)
 	    "\t-C\t- don't read standard config files.\n"
 	    "\t-I file\t- read message from file instead of stdin.\n"
 	    "\t-x list\t- set debug flags.\n"
-	    "\t-D\t- direct debug output to stdout.\n"
+	    "\t-D\t- direct debug output to stdout.\n");
+    fprintf(stderr,
+	    "\t  -H {opts} - set html processing flag(s).\n"
+	    "\t     where {opts} is one or more of:\n"
+	    "\t      C   - enable strict comment checking (default is loose checking).\n"
+	    "\t      t   - return tokens from inside html tags.\n"
+/*
+	    "\t      c   - return tokens from inside html comments.\n"
+	    "\t      s   - return tokens from inside html script blocks.\n"
+*/
 	    "\n"
 	    "%s (version %s) is part of the bogofilter package.\n", 
 	    progname, version);
@@ -91,7 +100,7 @@ static int process_args(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
-    while ((option = getopt(argc, argv, ":c:CDhI:npqTvx:")) != -1)
+    while ((option = getopt(argc, argv, ":c:CDhH:I:npqTvx:")) != -1)
     {
 	switch (option)
 	{
@@ -119,6 +128,26 @@ static int process_args(int argc, char **argv)
 	case 'h':
 	    help();
 	    exit(0);
+
+	case 'H':
+	{
+	    char *s;
+	    for (s = optarg; *s ; s += 1)
+	    {
+		switch (*s)
+		{
+		case 't': tokenize_html_tags ^= true;
+		    break;
+		case 's': tokenize_html_script ^= true;		/* Not yet in use */
+		    break;
+		case 'C': strict_check ^= true;
+		    /*@fallthrough@*/
+		case 'c': tokenize_html_comments ^= true;	/* Not yet in use */
+		    break;
+		}
+	    }
+	    break;
+	}
 
 	case 'I':
 	    fpin = fopen( optarg, "r" );

@@ -48,6 +48,11 @@ const char	*update_dir;
 /*@observer@*/
 const char	*stats_prefix;
 
+/* for lexer_v3.l */
+bool	tokenize_html_tags = false;
+bool	tokenize_html_script = false;	/* Not yet in use */
+bool	tokenize_html_comments = false;	/* Not yet in use */
+
 /* dual definition options */
 char	*directory;			/* '-d' */
 method_t *method = NULL;
