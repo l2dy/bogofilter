@@ -134,7 +134,6 @@ NUM_NUM		\ [0-9]+\ [0-9]+
 MSG_COUNT	^\".MSG_COUNT\"
 
 TOKENFRONT	[^[:blank:][:cntrl:][:digit:][:punct:]]
-
 TOKENMID	[^[:blank:]<>;=():&%$#@+|/\\{}^\"?*,[:cntrl:]\[\]]+
 BOGOLEX_TOKEN	[^[:blank:]<>;    &%  @ |/\\{}^\" *,[:cntrl:]\[\]]+
 TOKENBACK	[^[:blank:]<>;=():&%$#@+|/\\{}^\"?*,[:cntrl:]\[\]._\+\-]
@@ -171,19 +170,16 @@ ENCODED_TOKEN	({TOKENFRONT}{TOKENMID})?({ENCODED_WORD}[ \t\n]+)*{ENCODED_WORD}
 DOLLARS		[0-9]+
 CENTS		[0-9]+
 
-A1		[[:alpha:]]+
-A2		[[:alpha:]][[:alnum:]]+
-ALPHA		[[:alpha:]][[:alnum:]]+
+A1		[[:alpha:]]
+A2		[[:alpha:]][[:alnum:]]
 
 WHITESPACE	[ \t\n]
-
 NOTWHITESPACE	[^ \t\n]
 
 HTML_ENCODING		"&#"x?[[:xdigit:]]+";"
 URL_ENCODING		"\%"[[:xdigit:]][[:xdigit:]]
 
 HTML_WI_COMMENTS	"<"[^\>]*">"
-
 HTML_WO_COMMENTS	"<"[^!][^\>]*">"|"<>"
 
 HTMLTOKEN		{HTML_WI_COMMENTS}
