@@ -57,6 +57,20 @@ AC_MSG_CHECKING(BerkeleyDB)
 AC_TRY_LINK_FUNC(db_create,, AC_MSG_ERROR([BerkeleyDB v3+ package is not working properly. Specify a different one using --with-db=PATH]))
 AC_MSG_RESULT(BerkeleyDB)
 
+# Allow the user to specify a header name to use to indicate whether a given
+# message is SPAM or not.
+AC_ARG_ENABLE(spam-header-name, 
+	AC_HELP_STRING([--enable-spam-header-name=name], 
+	[Use specified header name instead of X-Bogosity]), 
+	AC_DEFINE_UNQUOTED(SPAM_HEADER_NAME, 
+	["$enableval"], 
+	[Use specified header name instead of X-Bogosity]),
+	AC_DEFINE_UNQUOTED(SPAM_HEADER_NAME, 
+	["X-Bogosity"], 
+	[Use specified header name instead of X-Bogosity])
+)
+
+
 # Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT

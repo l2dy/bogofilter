@@ -128,8 +128,10 @@ int main(int argc, char **argv)
 	{
 	    /* print spam-status at the end of the header
 	     * then mark the beginning of the message body */
-	    printf("X-Spam-Status: %s, tests=bogofilter, spamicity=%0.6f\n", 
-		    (status==RC_SPAM) ? "Yes" : "No", spamicity);
+	    printf("%s: %s, tests=bogofilter, spamicity=%0.6f\n", 
+		   SPAM_HEADER_NAME, 
+		   (status==RC_SPAM) ? "Yes" : "No", 
+		   spamicity);
 	}
 
 	if (passthrough)
