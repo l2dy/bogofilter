@@ -22,6 +22,7 @@
         <arg choice='opt'>-C</arg>
         <arg choice='opt'>-D</arg>
 	<arg choice='opt'>-I <replaceable>file</replaceable></arg>
+	<arg choice='opt'>-V</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
   <refsect1 id="description">
@@ -60,7 +61,8 @@ tells <application>bogofilter</application> to read the config file named.
 tells <application>bogofilter</application> to read its input from the specified file, 
 rather than from <emphasis>stdin</emphasis>.</para>
 
-
+<para>The <option>-V</option> option prints the version number and 
+exits.</para>
 
 </refsect1>
 
