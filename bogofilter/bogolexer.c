@@ -9,7 +9,10 @@ NAME:
 
 /* imports */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <getopt.h>
+
 #include "lexer.h"
 
 /* exports */
@@ -34,7 +37,6 @@ void help(void)
 
 int main(int argc, char **argv)
 {
-    char *arg;
     int	t;
     int option;
     int count=0;
@@ -59,10 +61,12 @@ int main(int argc, char **argv)
 	}
 
     if (!passthrough)
+    {
 	if (quiet)
 	    puts( "quiet mode.");
 	else
 	    puts("normal mode.");
+    }
 
     while ((t = get_token()) > 0)
     {
