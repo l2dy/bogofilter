@@ -65,17 +65,16 @@ fi
 
 if [ "$1" = "formail" ] ; then
     shift
-    ( echo .MSG_COUNT ; $BOGOLEXER -p $* | sort -u ) | \
+    ( echo .MSG_COUNT ; $BOGOLEXER -p "$@" | sort -u ) | \
 	$BOGOUTIL -w $BOGOFILTER_DIR | \
 	awk 'NF == 3 { printf( "\"%s\" %s %s\n", $1, $2, $3 ) } '
 elif [ ! -d "$1" ] ; then
-    shift
-    formail -es msg-count.sh formail $*
+    formail -es "$0" formail "$@"
 else
     DIR="$1"
     shift
     for f in $DIR/* ; do
-	( echo .MSG_COUNT ; $BOGOLEXER -p $* < $f | sort -u ) | \
+	( echo .MSG_COUNT ; $BOGOLEXER -p "$@" < $f | sort -u ) | \
 	    $BOGOUTIL -w $BOGOFILTER_DIR | \
 	    awk 'NF == 3 { printf( "\"%s\" %s %s\n", $1, $2, $3 ) } '
     done
