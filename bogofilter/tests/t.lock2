@@ -2,7 +2,7 @@
 
 . ${srcdir:=.}/t.frame
 
-filelist=`ls bogofilter/inputs/*x*`
+filelist=`ls ${srcdir}/bogofilter/inputs/*x*`
 cat $filelist >$TMPDIR/inp
 
 CONFIG=$TMPDIR/test.cf
