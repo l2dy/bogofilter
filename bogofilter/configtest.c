@@ -31,6 +31,7 @@ const char *progname = "configtest";
 #define DEBUG_CONFIG(level)	(verbose > level)
 #endif
 
+#ifdef COMPILE_DEAD_CODE
 static bool x_configure_wordlist(const char *val)
 {
     return FALSE;
@@ -49,6 +50,7 @@ static int x_init_list(wordlist_t* list, const char* name, const char* filepath,
     }
     return 0;
 }
+#endif
 
 int main( int argc, char **argv)
 {

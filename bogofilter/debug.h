@@ -28,6 +28,6 @@ extern bit_t debug_mask;
 #define DEBUG_CONFIG(level)	((debug_mask & BIT_CONFIG)    && (verbose > level))
 #endif
 
-void set_debug_mask( char *mask );
+void set_debug_mask(const char *mask);
 
 #endif

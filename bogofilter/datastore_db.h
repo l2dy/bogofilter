@@ -16,6 +16,4 @@ typedef struct {
 
 } dbh_t;
 
-extern int verbose;
-
 #endif

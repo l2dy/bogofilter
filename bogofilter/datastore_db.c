@@ -31,8 +31,6 @@ AUTHOR:
 
 #define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
 
-extern int logflag;
-
 #ifndef	HAVE_SYSLOG_H
 #define SYSLOG_ERROR(format, filename)
 #else
@@ -330,15 +328,15 @@ void db_lock_release_list(wordlist_t *list){
   }
 }
 
-static void lock_msg(dbh_t *handle, int index, char *msg, int cmd, int type)
+static void lock_msg(const dbh_t *handle, int idx, const char *msg, int cmd, int type)
 {
 
-  char *block_type[] = { "nonblocking", "blocking" };
-  char *lock_type[]  = { "write", "read" };
+  const char *block_type[] = { "nonblocking", "blocking" };
+  const char *lock_type[]  = { "write", "read" };
                                                      
   fprintf(stderr, "[%lu] [%d] %s %s %s lock on %s\n", 
 	          (unsigned long)handle->pid,
-                  index,
+                  idx,
 		  msg,
 		  block_type[cmd == F_SETLKW],
 		  lock_type[type == F_RDLCK],

@@ -19,6 +19,9 @@
 #include <stdlib.h>
 
 /*@noreturn@*/
+#ifdef __GNUC__
+__attribute__ ((noreturn))
+#endif
 static void die(const char *tag) {
     perror(tag);
     exit(EXIT_FAILURE);

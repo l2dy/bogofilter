@@ -17,11 +17,11 @@ AUTHOR:
 #include "debug.h"
 
 typedef struct mask_char_to_symbol_s {
-    char  *str;
+    const char *str;
     bit_t bit;
 }  mask_char_to_symbol_t;
 
-static mask_char_to_symbol_t char_to_symbol[] =
+static mask_char_to_symbol_t const char_to_symbol[] =
 {
     { "g",	BIT_GENERAL },
     { "s",	BIT_SPAMICITY },
@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     size_t i;
     for (i=0; i<sizeof(char_to_symbol)/sizeof(char_to_symbol[0]); i += 1)
     {
-	mask_char_to_symbol_t *ptr = char_to_symbol + i;
+	const mask_char_to_symbol_t *ptr = char_to_symbol + i;
 	set_debug_mask( ptr->str );
 	if ( (debug_mask & ptr->bit) != ptr->bit )
 	{

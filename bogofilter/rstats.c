@@ -20,8 +20,8 @@ AUTHOR:
 #include "xmalloc.h"
 #include "xstrdup.h"
 #include "globals.h"
+#include "rstats.h"
 
-extern int verbose;
 extern int Rtable;
 extern double min_dev;
 
@@ -81,12 +81,12 @@ void rstats_add( const char *token,
     current = current->next;
 }
 
-int compare_rstats_t(const void *ir1, const void *ir2)
-{ 
-    const rstats_t *r1 = *(rstats_t **)ir1;
-    const rstats_t *r2 = *(rstats_t **)ir2;
-    return ( (r1->prob > r2->prob) ||
-	     ((r1->prob == r2->prob) && (strcmp(r1->token, r2->token) > 0)));
+static int compare_rstats_t(const void *const ir1, const void *const ir2)
+{
+    const rstats_t *r1 = *(rstats_t *const *)ir1;
+    const rstats_t *r2 = *(rstats_t *const *)ir2;
+    return (r1->prob > r2->prob) ||
+	     ((fabs(r1->prob - r2->prob) < EPS) && (strcmp(r1->token, r2->token) > 0));
 }
 
 #define	INTERVALS	10

@@ -9,6 +9,7 @@
 
 #include <string.h>
 #include "xmalloc.h"
+#include "xstrdup.h"
 
 char *xstrdup(const char *s) {
     char *t = xmalloc(strlen(s) + 1);

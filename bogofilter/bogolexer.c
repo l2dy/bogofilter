@@ -20,14 +20,14 @@ NAME:
 int passthrough;
 
 #define PROGNAME "bogolexer"
-char *spam_header_name = SPAM_HEADER_NAME;
+const char *spam_header_name = SPAM_HEADER_NAME;
 
-void usage(void)
+static void usage(void)
 {
     fprintf(stderr, "Usage: %s [ -p | -q | -h ]\n", PROGNAME);
 }
 
-void help(void)
+static void help(void)
 {
     usage();
     fprintf(stderr,
@@ -43,7 +43,6 @@ int main(int argc, char **argv)
     int option;
     int count=0;
     int quiet = 0;
-    int passthrough = 0;
 
     while ((option = getopt(argc, argv, ":hpq")) != -1)
 	switch (option) {

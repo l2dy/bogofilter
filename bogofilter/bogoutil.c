@@ -36,7 +36,7 @@ run_t run_type = RUN_NORMAL;
 
 const char *progname = PROGNAME;
 
-int dump_file(char *db_file)
+static int dump_file(char *db_file)
 {
     dbh_t *dbh;
 
@@ -85,7 +85,7 @@ int dump_file(char *db_file)
 
 #define BUFSIZE 512
 
-int load_file(char *db_file)
+static int load_file(char *db_file)
 {
 
     dbh_t *dbh;
@@ -159,7 +159,7 @@ int load_file(char *db_file)
     return rv;
 }
 
-dbh_t *db_open_and_lock_file( const char *db_file, const char *name, dbmode_t mode)
+static dbh_t *db_open_and_lock_file( const char *db_file, const char *name, dbmode_t mode)
 {
     dbh_t *dbh = db_open(db_file, db_file, DB_READ);
     if (dbh != NULL)
@@ -236,8 +236,8 @@ static int words_from_path(const char *directory, int argc, char **argv, bool sh
     long int spam_count, spam_msg_count = 0 ;
     long int good_count, good_msg_count = 0 ;
 
-    char *head_format = !show_probability ? "%-20s %6s %6s\n"   : "%-20s %6s  %6s  %6s  %6s\n";
-    char *data_format = !show_probability ? "%-20s %6ld %6ld\n" : "%-20s %6ld  %6ld  %f  %f\n";
+    const char *head_format = !show_probability ? "%-20s %6s %6s\n"   : "%-20s %6s  %6s  %6s  %6s\n";
+    const char *data_format = !show_probability ? "%-20s %6ld %6ld\n" : "%-20s %6ld  %6ld  %f  %f\n";
 
     build_path(filepath, PATH_LEN, directory, GOODFILE);
     if ((dbh_good = db_open_and_lock_file(filepath, GOODFILE, DB_READ)) == NULL)
@@ -290,7 +290,7 @@ static int words_from_path(const char *directory, int argc, char **argv, bool sh
     return 0;
 }
 
-int display_words(const char *path, int argc, char **argv, bool prob)
+static int display_words(const char *path, int argc, char **argv, bool prob)
 {
     struct stat sb;
     int rc;
@@ -322,7 +322,7 @@ int display_words(const char *path, int argc, char **argv, bool prob)
     return 0;
 }
 
-double compute_robx( dbh_t *dbh_spam, dbh_t *dbh_good )
+static double compute_robx(dbh_t *dbh_spam, dbh_t *dbh_good)
 {
     DBT    key, data;
     int    ret = 0;
@@ -418,7 +418,7 @@ double compute_robx( dbh_t *dbh_spam, dbh_t *dbh_good )
     return robx;
 }
 
-int compute_robinson_x(char *path)
+static int compute_robinson_x(char *path)
 {
     dbh_t *dbh_good;
     dbh_t *dbh_spam;
@@ -450,7 +450,7 @@ int compute_robinson_x(char *path)
     return 0;
 }
 
-void version(void)
+static void version(void)
 {
     fprintf(stderr,
 	    PROGNAME ": version: " VERSION "\n"
@@ -461,12 +461,12 @@ void version(void)
 	    "See the COPYING file with the source distribution for details.\n\n");
 }
 
-void usage(void)
+static void usage(void)
 {
     fprintf(stderr, "Usage: %s { -d | -l | -w } file.db | -R directory | [ -p | -v | -h | -V ]\n", PROGNAME);
 }
 
-void help(void)
+static void help(void)
 {
     usage();
     fprintf(stderr,

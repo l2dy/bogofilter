@@ -160,9 +160,9 @@ void *
 wordhash_insert (wordhash_t * h, char *s, size_t n, void (*initializer)(void *))
 {
   hashnode_t *p;
-  unsigned int index = hash (s);
+  unsigned int idx = hash (s);
 
-  for (p = h->bin[index]; p != NULL; p = p->next)
+  for (p = h->bin[idx]; p != NULL; p = p->next)
     if (strcmp (s, p->key) == 0)
       {
 	return p->buf;
@@ -175,8 +175,8 @@ wordhash_insert (wordhash_t * h, char *s, size_t n, void (*initializer)(void *))
 		  
   p->key = smalloc (h, strlen (s) + 1);
   strcpy (p->key, s);
-  p->next = h->bin[index];
-  h->bin[index] = p;
+  p->next = h->bin[idx];
+  h->bin[idx] = p;
 
   if (h->iter_head == NULL){
     h->iter_head = p;

@@ -3,6 +3,9 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#include <float.h> /* has DBL_EPSILON */
+#define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
+
 extern int nonspam_exits_zero;	/* '-e' */
 extern int force;		/* '-f' */
 extern int logflag;		/* '-l' */

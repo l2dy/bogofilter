@@ -14,7 +14,11 @@
 #include "xmalloc.h"
 
 /*@noreturn@*/
-static void mem_error(const char *a) {
+#ifdef __GNUC__
+__attribute__ ((noreturn))
+#endif
+static void mem_error(const char *a)
+{
     (void)fprintf(stderr, "%s: Out of memory\n", a);
     abort();
 }

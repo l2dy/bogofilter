@@ -18,10 +18,10 @@ AUTHOR:
 
 bit_t debug_mask = DEBUG_NONE;
 
-void set_debug_mask( char *mask )
+void set_debug_mask(const char *mask)
 {
     char ch;
-    char *maskbits = MASKNAMES;
+    const char *maskbits = MASKNAMES;
     for (ch = *mask; ch != '\0'; ch = *++mask)
     {
 	/*@-shiftnegative@*/

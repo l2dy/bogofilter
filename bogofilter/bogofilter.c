@@ -28,7 +28,6 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 ******************************************************************************/
 
 #include <math.h>
-#include <float.h> /* has DBL_EPSILON */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -43,8 +42,6 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #include "globals.h"
 
 #include <assert.h>
-
-#define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
 
 #ifndef DISABLE_GRAHAM_METHOD
 /* constants for the Graham formula */
