@@ -20,6 +20,7 @@ AUTHOR:
 #ifdef HAVE_SYSLOG_H
 #include <sys/syslog.h>
 #endif
+#include "common.h"
 #include "bogofilter.h"
 #include "xmalloc.h"
 #include "datastore.h"
