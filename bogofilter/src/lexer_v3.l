@@ -199,15 +199,12 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <INITIAL>filename=\"?				;
 <INITIAL>^[ \b\t]*\n				{ got_emptyline(); 
 						  lineno += 1;
-						  switch (get_content_type()) 
-						  {
-						    case MIME_TEXT_PLAIN: BEGIN(TEXT); break;
-						    case MIME_TEXT_HTML:  BEGIN(HTML); break;
-						    default:		  BEGIN(TEXT); break;
-						  }
+						  if (get_content_type() == MIME_TEXT_HTML)
+						      BEGIN(HTML);
+						  else
+						      BEGIN(TEXT); 
 						  return(EMPTY);
 						}
-
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
 						      BEGIN(INITIAL);
 						      return BOUNDARY;
