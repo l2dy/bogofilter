@@ -561,7 +561,7 @@ static int ant_getline(buff_t *buff)
         if ((count == 2 || count == 3) && 
 	    (buf[0] == '.') && 
 	    (buf[1] == '\r' || buf[1] == '\n'))
-            dot_found = true;		/* dot found.  look for separator */
+            dot_found = true;			/* dot found.  look for separator */
 	if (buff->t.leng < buff->size)		/* for easier debugging - removable */
 	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
     }
