@@ -26,6 +26,7 @@ Stefan Bellon <sbellon@sbellon.de> 2003
 #include "datastore_db.h"
 #include "maint.h"
 #include "error.h"
+#include "paths.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
@@ -254,7 +255,7 @@ int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
     datum key, data;
     dbv_t dbv_key, dbv_data;
 
-    int ret;
+    int ret = 0;
 
     key = dbm_firstkey(dbp);
     while (key.dptr) {
