@@ -30,47 +30,38 @@ CFLAGS="$RPM_OPT_FLAGS" \
 
 %build
 make
-make check
+make DESTDIR=$RPM_BUILD_ROOT check
+
+%clean
+
+[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 
 %install
 
-[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
-make DESTDIR=${RPM_BUILD_ROOT} install-strip
+make DESTDIR=$RPM_BUILD_ROOT install-strip
+
 cp $RPM_BUILD_ROOT%{_sysconfdir}/bogofilter.cf.example \
    $RPM_BUILD_ROOT%{_sysconfdir}/bogofilter.cf
 
-for d in xml html contrib tuning ; do
-  mkdir -p .inst/$d
+for n in xml html ; do
+  install -d .inst/$n
+  install -m644 doc/*.$n .inst/$n
 done
 
-for f in doc/*.xml ; do
-  install -m644 $f .inst/xml
-done
-
-for f in doc/*.html ; do
-  install -m644 $f .inst/html
-done
-
-files=`find contrib -maxdepth 1 -type f | grep -v Makefile`
-for f in $files ; do
-  case $f in
-    *.c|*.o|*.obj) continue ;;
-    *.sh|*.pl|*/randomtrain|*/scramble)
-      install -m755 $f .inst/contrib ;;
-    *)
-      install -m644 $f .inst/contrib ;;
-  esac
-done
-
-files=`find tuning -maxdepth 1 -type f | grep -v Makefile`
-for f in $files ; do
-  case $f in
-    *.c|*.o|*.obj) continue ;;
-    */README)
-      install -m644 $f .inst/tuning ;;
-    *)
-      install -m755 $f .inst/tuning ;;
-  esac
+for d in contrib tuning ; do
+  install -d $RPM_BUILD_ROOT%{_datadir}/%{name}/$d
+  files=`find $d -maxdepth 1 -type f | grep -v Makefile`
+  for f in $files ; do
+    case $f in
+      *.c|*.o|*.obj) continue ;;
+      *.sh|*.pl|*/randomtrain|*/scramble|*/distrib|*R|*/mkdb)
+        cp -p $f $RPM_BUILD_ROOT%{_datadir}/%{name}/$d ;;
+#	install -m755 $f $RPM_BUILD_ROOT%{_datadir}/%{name}/$d ;;
+      *)
+        cp -p $f $RPM_BUILD_ROOT%{_datadir}/%{name}/$d ;;
+#	install -m644 $f $RPM_BUILD_ROOT%{_datadir}/%{name}/$d ;;
+    esac
+  done
 done
 
 for README in randomtrain ; do
@@ -95,6 +86,8 @@ done
 %doc doc/bogofilter-tuning.HOWTO doc/integrating-with-qmail
 %doc doc/programmer
 %doc .inst/html .inst/xml
-%doc .inst/contrib .inst/tuning
+
+%dir %{_datadir}/%{name}/contrib/*
+%dir %{_datadir}/%{name}/tuning/*
 
 %changelog
