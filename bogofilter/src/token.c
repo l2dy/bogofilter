@@ -181,7 +181,7 @@ token_t get_token(void)
 	    if (token_prefix == w_recv &&
 		msg_state == msg_state->parent && 
 		msg_addr == NULL &&
-		strcmp(yylval->text, "127.0.0.1") != 0) {
+		strcmp((char *)yylval->text, "127.0.0.1") != 0) {
 		/* Not guaranteed to be the originating address of the message. */
 		word_free(msg_addr);
 		msg_addr = word_dup(yylval);

@@ -192,7 +192,7 @@ static int skip_folded_line(buff_t *buff)
 	if (!isspace(buff->t.text[0])) 
 	    return count;
 	/* Check for empty line which terminates message header */
-	if (is_eol(buff->t.text, count))
+	if (is_eol((char *)buff->t.text, count))
 	    return count;
     }
 
@@ -283,14 +283,14 @@ size_t text_decode(word_t *w)
 {
     byte *beg = w->text;
     byte *fin = beg + w->leng;
-    byte *txt = (byte *) strstr(beg, "=?");	/* skip past leading text */
+    byte *txt = (byte *) strstr((char *)beg, "=?");	/* skip past leading text */
     uint size = (uint) (txt - beg);
 
     while (txt < fin) {
 	word_t n;
-	byte *typ = (byte *) strchr(txt+2, '?');/* Encoding type - 'B' or 'Q' */
+	byte *typ = (byte *) strchr((char *)txt+2, '?');/* Encoding type - 'B' or 'Q' */
 	byte *tmp = typ + 3;
-	byte *end = (byte *) strstr(tmp, "?=");	/* last byte of encoded word  */
+	byte *end = (byte *) strstr((char *)tmp, "?=");	/* last byte of encoded word  */
 	uint len = end - tmp;
 	bool copy;
 
@@ -329,7 +329,7 @@ size_t text_decode(word_t *w)
 	txt = end + 2;
 	if (txt >= fin)
 	    break;
-	end = (byte *) strstr(txt, "=?");
+	end = (byte *) strstr((char *)txt, "=?");
 	copy = end != NULL;
 
 	if (copy) {
