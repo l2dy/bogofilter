@@ -350,6 +350,8 @@ void token_init(void)
 void clr_tag(void)
 {
     token_prefix = NULL;
+    if (DEBUG_LEXER(2))
+	fprintf(dbgout,"--- clr_tag()\n");
 }
 
 void set_tag(const char *text)
@@ -391,6 +393,12 @@ void set_tag(const char *text)
 		__FILE__, __LINE__,
 		text);
 	exit(EX_ERROR);
+    }
+    if (DEBUG_LEXER(2)) {
+	fprintf(dbgout,"--- set_tag(%s) -> prefix=", text);
+	if (token_prefix)
+	    word_puts(token_prefix, 0, dbgout);
+	fputc('\n', dbgout);
     }
     return;
 }
