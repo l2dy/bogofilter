@@ -4,6 +4,10 @@
 
 $Id$
      
+0.10.1.1 2003-01-22
+
+	* Fixed two problems in parsing html.
+
 0.10.1	2003-01-22
 
 	* Bogofilter now kills html comments.  The '-k' switch can
