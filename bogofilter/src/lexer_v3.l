@@ -173,8 +173,8 @@ TOKEN 		{TOKENFRONT}{TOKENMID_NJS_DR}{TOKENBACK}
 <HTML>"<"					{ BEGIN HTOKEN; }
 <HTOKEN>">"					{ BEGIN HTML; }	/* end of tag; return to normal html processing */
 
-<HTOKEN>{TOKEN}					{ if (tokenize_html_tags)     return TOKEN; }
-<SCOMMENT,LCOMMENT>{TOKEN}			{ if (tokenize_html_comments) return TOKEN; }
+<HTOKEN>{TOKEN}					{ /* discard innards of html tokens */ }
+<SCOMMENT,LCOMMENT>{TOKEN}			{ /* discard innards of html tokens */ }
 <HSCRIPT>{TOKEN}				{ if (tokenize_html_script)   return TOKEN; }
 
 {IPADDR}					{ return IPADDR;}
