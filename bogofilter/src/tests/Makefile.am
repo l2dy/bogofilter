@@ -25,7 +25,7 @@ PARSING_TESTS = \
 	t.nullstatsprefix \
 	t.integrity t.integrity2 t.integrity3 \
 	t.passthrough-hb \
-	t.escaped.html \
+	t.escaped.html t.escaped.url \
 	t.split t.parsing \
 	t.lexer t.lexer.mbx \
 	t.folded_rfc2047 \
