@@ -15,9 +15,6 @@ Gyepi Sam <gyepi@praxis-sw.com>   2003
 #include <tdb.h>
 #include <stdlib.h>
 
-/* Map BDB name to TDB equivalents for datastore.c */
-#define        DB_NOTFOUND     TDB_ERR_NOEXIST
-
 #include <unistd.h>
 #include <errno.h>
 
