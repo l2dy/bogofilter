@@ -162,66 +162,11 @@ void convert_eol(char *buf, char chr)
     return;
 }
 
-static int get_unfolded_line(buff_t *buff)
-{
-    int count = 0;
-    while (1) {
-	int c = fgetc(fpin);
-	if (c == EOF)
-	    break;
-	ungetc(c,fpin);
-	if ((c != ' ') && (c != '\t')) 
-	    break;
-	else {
-	    /* whitespace -- possible continuation line */
-	    int add = reader_getline(buff);
-	    char *text = (char *) buff->t.text + buff->read;
-	    int cnt;
-	    if (add == EOF) break;
-	    cnt = strspn(text, " \t");
-
-	    if (is_eol(text + cnt, add - cnt)) {
-		/* reject empty line */
-		buff->read -= add;
-		buff->t.leng -= add;
-		while (add > 0) {
-		    ungetc( text[add], fpin );
-		    add -= 1;
-		}
-		break;
-	    }
-	    else {
-		if (count > 0)
-		    yylineno += 1;
-		if (count >= 0 && DEBUG_LEXER(0))
-		    lexer_display_buffer(buff);
-    
-		/* accept non-empty line */
-		if (passthrough && passmode == PASS_MEM && buff->t.leng > 0)
-		    textblock_add((const unsigned char *)text, add);
-		count += add;
-
-		/* Convert multiple lines to single line */
-		convert_eol(text, ' ');
-	    }
-	}
-	if (buff->size - count < 1000)
-	    break;
-    }
-    return count;
-}
-
 static int get_decoded_line(buff_t *buff)
 {
     size_t used = buff->t.leng;
     byte *buf = buff->t.text + used;
     int count = yy_get_new_line(buff);
-
-    if (msg_header && count > 1 && !isspace(*buf)) {
-	int add = get_unfolded_line(buff);
-	if (add != EOF)
-	    count += add;
-    }
 
     if (count == EOF) {
 	if (ferror(fpin)) {

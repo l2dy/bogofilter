@@ -17,7 +17,7 @@ extern word_t *yylval;
 extern token_t get_token(void);
 
 extern void got_from(void);
-extern void got_newline(void);
+extern void clr_tag(void);
 extern void set_tag(word_t *text);
 
 extern void token_init(void);

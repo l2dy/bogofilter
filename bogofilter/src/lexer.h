@@ -50,8 +50,7 @@ typedef struct lexer_s {
 
 extern lexer_t *lexer;
 
-extern lexer_t v3_lexer;
-extern lexer_t msg_count_lexer;
+extern lexer_t	msg_count_lexer;
 
 /* in lexer_v3.l */
 extern token_t	lexer_v3_lex(void);

@@ -172,7 +172,7 @@ QP		[!->@-~]+
 */
 
 ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^\?]*\?\=
-ENCODED_TOKEN	{BOGOLEX_TOKEN}?({ENCODED_WORD}[ \t]+)*{ENCODED_WORD}
+ENCODED_TOKEN	{BOGOLEX_TOKEN}?({ENCODED_WORD}[ \t\n]+)*{ENCODED_WORD}
 
 DOLLARS		[0-9]+
 CENTS		[0-9]+
@@ -230,19 +230,32 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); 		skip_to('='); return TOKEN; }
 <INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); 	skip_to(':'); return TOKEN; }
 <INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); return TOKEN; }
-<INITIAL>^(To|From|Return-Path|Subject)/:.	{ if (header_line_markup) set_tag(yy_text()); }
-<INITIAL>^(Delivery-)?Date:.*			;
-<INITIAL>^Message-ID:.*				;
-<INITIAL>(ESMTP|SMTP)?[ \t]+id\ {ID}		;
+<INITIAL>^To:					{ if (header_line_markup) set_tag(yy_text()); }
+<INITIAL>^From:					{ if (header_line_markup) set_tag(yy_text()); }
+<INITIAL>^Return-Path:				{ if (header_line_markup) set_tag(yy_text()); }
+<INITIAL>^Subject:				{ if (header_line_markup) set_tag(yy_text()); }
+<INITIAL>^(Delivery-)?Date:.*			{ }
+<INITIAL>^Message-ID:.*				{ }
+<INITIAL>(ESMTP|SMTP)+[ \t\n]+id\ {ID}		;
+<INITIAL>[:blank:]*id\ {ID}			;
 <INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
 <INITIAL>name=\"?				;
 <INITIAL>filename=\"?				;
-<INITIAL>^[ \b\t]*$				{ lineno += 1;
-						  if (get_content_type() == MIME_TEXT_HTML)
+<INITIAL>\n[ \t]				{ lineno += 1; }
+<INITIAL>\n\n					{ if (get_content_type() == MIME_TEXT_HTML)
 						      BEGIN HTML;
 						  else
 						      BEGIN TEXT; 
 						  msg_header = false;
+						  clr_tag();
+						  /* return EOH; */
+						}
+<INITIAL>^\n					{ if (get_content_type() == MIME_TEXT_HTML)
+						      BEGIN HTML;
+						  else
+						      BEGIN TEXT; 
+						  msg_header = false;
+						  clr_tag();
 						  return EOH;
 						}
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
@@ -284,9 +297,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 \${DOLLARS}(\.{CENTS})?				{ return TOKEN;}
 
 .						;			/* ignore character */
-\n						{ got_newline(); 
-						  lineno += 1;
-						}
+\n						{ lineno += 1; clr_tag(); }
 %%
 
 void lexer_v3_init(FILE *fp)

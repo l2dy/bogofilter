@@ -91,7 +91,7 @@ token_t get_token(void)
 	case EOH:	/* end of header - bogus if not empty */
 	    if (msg_state->mime_type == MIME_MESSAGE)
 		mime_add_child(msg_state);
-	    if (yylval->leng == 0)
+	    if (yylval->leng == 2)
 		continue;
 	    else	/* "spc:invalid_end_of_header" */
 		yylval = word_dup(nonblank_line);
@@ -216,7 +216,7 @@ void token_init(void)
     return;
 }
 
-void got_newline()
+void clr_tag(void)
 {
     token_prefix = NULL;
 }
