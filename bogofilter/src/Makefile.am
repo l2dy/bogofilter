@@ -1,4 +1,5 @@
-# vim:tw=0 $Id$
+# vim:tw=0
+# $Id$
 
 SUBDIRS = . tests
 SYSCONFDIR = @sysconfdir@
