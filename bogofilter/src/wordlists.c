@@ -40,11 +40,14 @@
  * past the current one that match our address
  */
 
+/** returns malloc()ed copy of the directory name of \a path,
+ * or bogohome if no directory is part of \a path.
+ */
 static char *bf_dirname(const char *path) {
     char *x = xstrdup(path), *t;
     t = strrchr(x, DIRSEP_C);
     if (t) *t = '\0';
-    else xfree(x), x = xstrdup(CURDIR_S);
+    else xfree(x), x = xstrdup(bogohome);
     return x;
 }
 
@@ -67,7 +70,7 @@ static void *list_searchinsert(const char *directory) {
     }
 
     n = xmalloc(sizeof(struct envnode) + strlen(directory) + 1);
-    n->dbe = ds_init(); /* FIXME: directory here */
+    n->dbe = ds_init(directory);
     ds_txn_begin(n->dbe);
     strcpy(&n->directory[0], directory);
     LIST_INSERT_HEAD(&envlisthead, n, entries);
