@@ -265,7 +265,7 @@ static void handle_free(/*@only@*/ dbh_t *handle)
 /** probe if the directory contains an environment, and if so,
  * if it has transactions
  */
-static int probe_txn(const char *directory, const char *file)
+static probe_txn_t probe_txn(const char *directory, const char *file)
 {
     DB_ENV *dbe;
     int r;
