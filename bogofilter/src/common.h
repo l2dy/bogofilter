@@ -47,7 +47,7 @@
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
 #define min(x, y)	(((x) < (y)) ? (x) : (y))
 
-#define COUNTOF(array)	(sizeof(array)/sizeof(array[0]))
+#define COUNTOF(array)	(size_t)(sizeof(array)/sizeof(array[0]))
 
 typedef unsigned char byte;
 
