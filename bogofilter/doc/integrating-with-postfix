@@ -93,7 +93,7 @@ Filtering:
   added to the headers.
   A bogofilter classified spam messages will have the entry:
 
-	X-Bogosity: Yes ...
+	X-Bogosity: Spam ...
 
   Note that the actual header name is configurable at compile time and
   may have been changed.
