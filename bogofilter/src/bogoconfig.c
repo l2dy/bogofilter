@@ -594,7 +594,7 @@ void process_args_1(int argc, char **argv)
 	    if (!terse)
 		terse = true;
 	    else
-		terse_format = "%1.1c %8.2d";
+		terse_format = "%0.16f";
 	    break;
 
 	case 'T':
