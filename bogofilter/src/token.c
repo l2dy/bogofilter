@@ -27,7 +27,8 @@ AUTHOR:
 #include "token.h"
 #include "xmemrchr.h"
 
-#define	MAX_PREFIX_LEN 5
+#define	MAX_PREFIX_LEN 	  5		/* maximim length of prefix     */
+#define	MSG_COUNT_PADDING 2 * 10	/* space for 2 10-digit numbers */
 
 /* Local Variables */
 
@@ -43,7 +44,7 @@ word_t	queue_id = { 0, queue_id_text};	/* Message's first queue ID */
 static token_t save_class = NONE;
 static word_t ipsave = { 0, ipsave_text};
 
-byte yylval_text[MAXTOKENLEN + MAX_PREFIX_LEN + D];
+byte yylval_text[MAXTOKENLEN + MAX_PREFIX_LEN + MSG_COUNT_PADDING + D];
 static word_t yylval = { 0, yylval_text };
 
 static word_t *w_to   = NULL;	/* To:          */
@@ -64,8 +65,8 @@ static uint32_t token_prefix_len;
 #define NONBLANK "spc:invalid_end_of_header"
 static word_t *nonblank_line = NULL;
 
-#define WCLEAR(n)  n.leng = 0
-#define WFREE(n)  word_free(n); n = NULL
+#define WCLEAR(n)	n.leng = 0
+#define WFREE(n)	word_free(n); n = NULL
 
 /* Function Prototypes */
 
@@ -281,8 +282,7 @@ token_t get_token(word_t **token)
 	    if (block_on_subnets)
 	    {
 		const byte *ptext = (wordlist_version >= IP_PREFIX) ? (const byte *)"ip:" : (const byte *)"url:";
-		size_t plen = strlen((const char *)ptext);
-		word_t prefix = { plen, ptext };
+		word_t *prefix = word_new(ptext, 0);
 		int q1, q2, q3, q4;
 		/*
 		 * Trick collected by ESR in real time during John
@@ -302,8 +302,9 @@ token_t get_token(word_t **token)
 			    q1 & 0xff, q2 & 0xff, q3 & 0xff, q4 & 0xff);
 		leng = strlen((const char *)text);
 
-		build_prefixed_token( &ipsave, &prefix, text, leng );
+		build_prefixed_token( &ipsave, prefix, text, leng );
 		token_copy( &yylval, &ipsave );
+		word_free(prefix);
 
 		save_class = IPADDR;
 		*token = &yylval;
@@ -378,15 +379,17 @@ void token_init(void)
 
     token_clear();
 
-    w_to   = word_new( "to:",   strlen("to:"));		/* To:          */
-    w_from = word_new( "from:", strlen("from:"));	/* From:        */
-    w_rtrn = word_new( "rtrn:", strlen("rtrn:"));	/* Return-Path: */
-    w_subj = word_new( "subj:", strlen("subj:"));	/* Subject:     */
-    w_recv = word_new( "rcvd:", strlen("rcvd:"));	/* Received:    */
-    w_head = word_new( "head:", strlen("head:"));	/* Header:      */
-    w_mime = word_new( "mime:", strlen("mime:"));	/* Mime:        */
-
-    nonblank_line = word_new(NONBLANK, strlen(NONBLANK));
+    if (w_to == NULL) {
+	/* word_new() used to avoid compiler complaints */
+	w_to   = word_new( "to:",   0);	/* To:          */
+	w_from = word_new( "from:", 0);	/* From:        */
+	w_rtrn = word_new( "rtrn:", 0);	/* Return-Path: */
+	w_subj = word_new( "subj:", 0);	/* Subject:     */
+	w_recv = word_new( "rcvd:", 0);	/* Received:    */
+	w_head = word_new( "head:", 0);	/* Header:      */
+	w_mime = word_new( "mime:", 0);	/* Mime:        */
+	nonblank_line = word_new(NONBLANK, 0);
+    }
 
     return;
 }
