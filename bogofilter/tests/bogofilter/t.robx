@@ -1,0 +1,40 @@
+#! /bin/sh
+
+set -e
+
+#        In directory t.systest.d are:
+#
+#		inputs  - test inputs
+#		outputs - known correct outputs
+
+: ${srcdir=.}
+relpath="`pwd`/../.."
+. ${srcdir}/../t.frame -no-db
+
+: ${AWK=awk}
+
+verbose=0
+if [ "$1" = "-v" ]; then
+    verbose=1
+fi
+
+[ -d ${TMPDIR}/tests ] && rm -rf ${TMPDIR}/tests
+mkdir -p ${TMPDIR}/tests
+
+CONFIG="${TMPDIR}/test.cf"
+BOGOFILTER="$VAL ${relpath}/bogofilter -c ${CONFIG} -y 0"
+BOGOUTIL="$VAL ${relpath}/bogoutil"
+SYSTEST="${srcdir}"
+
+cat <<EOF > ${CONFIG}
+robx=0.415
+min_dev=0.0
+spam_header_name=X-Bogosity
+stats_in_header=Y
+EOF
+
+$BOGOFILTER -r -s < ${SYSTEST}/inputs/spam.mbx
+$BOGOFILTER -r -n < ${SYSTEST}/inputs/good.mbx
+$BOGOUTIL -R $TMPDIR
+ROBX=`echo '.ROBX' | $BOGOUTIL -w $TMPDIR | $AWK '/.ROBX/ { print $2; }'`
+test $ROBX = "253445"

@@ -1,9 +1,9 @@
 # $Id$
 
-TESTSCRIPTS = t.systest t.grftest
+TESTSCRIPTS = t.systest t.grftest t.robx
 TESTS=$(TESTSCRIPTS)
 
-TESTS_ENVIRONMENT = RUN_FROM_MAKE=1 srcdir=$(srcdir) $(SHELL) $(VERBOSE)
+TESTS_ENVIRONMENT = RUN_FROM_MAKE=1 AWK=$(AWK) srcdir=$(srcdir) $(SHELL) $(VERBOSE)
 
 EXTRA_DIST=$(TESTSCRIPTS) inputs outputs
 
