@@ -15,6 +15,9 @@ about retraining and the '-H' flag...
 * Clarify list of supported mail formats in FAQ.
 * Enhance memdebug capabilities.
 
+* Distinguish between pipe and stdin as input sources.
+  (contributed by Henning Makholm)
+
 0.15.11	2003-12-17
 
 * Fixed CRLF problem in bogoreader.c

@@ -6,6 +6,11 @@ $Id$
 
 0.15.12
 
+	2003-12-24
+
+	* Distinguish between pipe and stdin as input sources.
+          (contributed by Henning Makholm)
+
 	2003-12-23
 
 	* Minor fixes for parsing msg-count files.
