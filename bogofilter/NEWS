@@ -2,6 +2,37 @@
 
 				bogofilter news
 
+0.7.6	2002-10-25T23:05:00Z
+	* Bogofilter -p mode now preserves CR and NUL characters.
+	* Bogofilter -p mode now detects if the computer runs out of
+	  memory.
+	* Bogofilter supports a new "-l" switch to write run-time log
+	  information to syslog.
+	* Bogofilter supports a new algorithm to calculate the
+	  "spamicity", the "Robinson" algorithm. It is enabled with the
+	  new "-r" switch. The old behaviour is called the "Graham"
+	  algorithm and can be enforced with the new "-g" switch.
+	* Bogofilter now has an "-R FILE" option (that implies -r) to print
+	  an R data frame to FILE.
+	* Bogofilter and bogoutil now have an -x CLASSES option to turn
+	  on debugging.
+	* Bogoupgrade.pl has been renamed to bogoupgrade.
+	* There is now a man page for bogoupgrade.
+	* BASE64 treatment has been fixed. It ignored whole lines if
+	  they consisted of a single token. Now a token is only
+	  considered base64 and ignored if it's >= 32 characters or ends
+	  in one or two padding "=" signs.
+	* MIME boundary lines are now emitted as tokens. Some of them
+	  are typical of certain spam software, so they might turn out
+	  to be useful.
+	* All control characters are now considered token delimiters.
+	* Bogofilter now aborts if it cannot figure where to look for its
+	  data base directory.
+	* The software no longer crashes on machines that do not allow
+	  for unaligned memory access (m68k; many RISC, e. g. SPARC).
+	* DB 4.1 is now supported.
+	* Documentation updates.
+
 0.7.5	Sun Oct 20 17:34:35 PDT 2002
 
 	* The header in bogofilter -p mode now defaults to X-Bogosity, but 
