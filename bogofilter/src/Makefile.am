@@ -71,7 +71,6 @@ version_sources= \
 	common.h system.h bftypes.h \
 	globals.h globals.c \
 	base64.h base64.c \
-	bf_exit.c \
 	bogoconfig.h bogoconfig.c \
 	bogohome.h bogohome.c \
 	bogomain.h bogomain.c \
