@@ -2,7 +2,7 @@
 
 %define	name	@PACKAGE@
 %define	version	@VERSION@
-%define	release	1
+%define	release	2
 
 Summary:	Fast anti-spam filtering by Bayesian statistical analysis
 Name:		%{name}
@@ -12,12 +12,12 @@ License:	GPL
 Group:		Networking/Mail
 URL:		http://bogofilter.sourceforge.net
 Source0:	%{name}-%{version}.tar.gz
-BuildRequires:	autoconf2.5
+
 BuildRequires:	gsl >= 1.1
+%define _requires_exceptions perl
+
 Buildroot:	%{_tmppath}/%{name}-%{version}-root
 Conflicts:	bogofilter-static
-
-AutoReq:	no
 
 %description
 Bogofilter is a Bayesian spam filter.  In its normal mode of
@@ -32,8 +32,6 @@ by sites that process a lot of mail.
 Summary:	Statically linked
 Group:		Networking/Mail
 Conflicts:	bogofilter
-
-AutoReq:	no
 
 %description static
 Statically linked bogofilter, bogolexer, bogoutil, and bogotune
