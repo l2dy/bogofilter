@@ -52,7 +52,7 @@ EOF
 
 create_empty_wordlist
 
-OPTS="-D -y 0"
+OPTS="-C -D -y 0"
 
 $BOGOUTIL $OPTS -l ${WORDLIST} < ${TMPDIR}/t.before.ref
 $BOGOUTIL $OPTS -d ${WORDLIST} | sort > ${TMPDIR}/t.before.out
