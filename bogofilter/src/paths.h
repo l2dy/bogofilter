@@ -22,9 +22,9 @@
 
 /* Function Prototypes */
 
-/** Build a path to a file given a directory and file name,
- * concatenating dir and file, adding a slash if necessary.
- * \return
+/** Build a path to a file given a directory and file name in malloc()d
+ * memory (caller freed), concatenating dir and file, adding a slash if
+ * necessary.  \return
  * - true for success
  * - false for error (esp. overflow)
  */
