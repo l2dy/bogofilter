@@ -40,9 +40,9 @@ extern double min_dev;
 extern int Rtable;
 static double scalefactor;
 
-static double	thresh_rtable = 0.0f;
-static double	robx = 0.0f;
-static double	robs = 0.0f;
+double	thresh_rtable = 0.0f;		/* used in fis_parms in fisher.c */
+double	robx = 0.0f;			/* used in fis_parms in fisher.c */
+double	robs = 0.0f;			/* used in fis_parms in fisher.c */
 
 static stats_t  stats;
 

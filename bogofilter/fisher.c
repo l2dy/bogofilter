@@ -21,7 +21,7 @@ NAME:
 #undef	RF_DEBUG
 
 #define FISHER_HAM_CUTOFF	0.10f
-#define FISHER_SPAM_CUTOFF	0.96f
+#define FISHER_SPAM_CUTOFF	0.95f
 #define FISHER_MIN_DEV		0.10f
 
 /* Function Prototypes */
@@ -37,10 +37,23 @@ static rc_t	fis_status(void);
 
 double ham_cutoff = FISHER_HAM_CUTOFF;
 
+extern double robx;		/* in robinson.c */
+extern double robs;		/* in robinson.c */
+extern double thresh_rtable;	/* in robinson.c */
+
+const parm_desc fis_parm_table[] =
+{
+    { "robx",		  CP_DOUBLE,	{ (void *) &robx } },
+    { "robs",		  CP_DOUBLE,	{ (void *) &robs } },
+    { "thresh_rtable",	  CP_DOUBLE,	{ (void *) &thresh_rtable } },
+    { "ham_cutoff",	  CP_DOUBLE,	{ (void *) &ham_cutoff } },
+    { NULL,		  CP_NONE,	{ (void *) NULL } },
+};
+
 rf_method_t rf_fisher_method = {	/* used by config.c */
     {
 	"fisher",			/* const char		  *name;		*/
-	rob_parm_table,	 		/* m_parm_table		  *parm_table		*/
+	fis_parm_table,	 		/* m_parm_table		  *parm_table		*/
 	fis_initialize_constants,	/* m_initialize_constants *initialize_constants	*/
 	rob_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
 	fis_spamicity,			/* m_spamicity		  *spamicity		*/
@@ -105,10 +118,10 @@ rc_t fis_status(void)
     if ( stats.spamicity >= spam_cutoff ) 
 	return RC_SPAM;
 
-    if (ham_cutoff > EPS && stats.spamicity > ham_cutoff)
-	return RC_UNSURE;
+    if (ham_cutoff < EPS || (stats.spamicity - ham_cutoff < EPS))
+	return RC_HAM;
 
-    return RC_HAM;
+    return RC_UNSURE;
 }
 
 /* Done */
