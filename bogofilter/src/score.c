@@ -126,8 +126,8 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 
 	if (DEBUG_ALGORITHM(2)) {
 	    fprintf(dbgout, "%6d %5u %5u %5u %5u list=%s,%c,%d ",
-		    ret, val.count[IX_GOOD], val.count[IX_SPAM],
-		    list->msgcount[IX_GOOD], list->msgcount[IX_SPAM],
+		    ret, (uint)val.count[IX_GOOD], (uint)val.count[IX_SPAM],
+		    (uint)list->msgcount[IX_GOOD], (uint)list->msgcount[IX_SPAM],
 		    list->listname, list->type, list->override);
 	    word_puts(token, 0, dbgout);
 	    fputc('\n', dbgout);
@@ -140,7 +140,7 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
     }
 
     if (DEBUG_ALGORITHM(1)) {
-	fprintf(dbgout, "%5u %5u ", cnts->good, cnts->bad);
+	fprintf(dbgout, "%5u %5u ", (uint)cnts->good, (uint)cnts->bad);
 	word_puts(token, 0, dbgout);
 	fputc('\n', dbgout);
     }
@@ -175,8 +175,9 @@ static double compute_probability(const word_t *token, wordcnts_t *cnts)
     return prob;
 }
 
+/** selects the best spam/non-spam indicators and calculates Robinson's S,
+ * \return -1.0 for error, S otherwise */
 double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
-/* selects the best spam/non-spam indicators and calculates Robinson's S */
 {
     hashnode_t *node;
 
@@ -263,7 +264,7 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "### msg_compute_spamicity() ends\n");
 
-    return err ? -1 : spamicity;
+    return err ? -1.0 : spamicity;
 }
 
 void score_initialize(void)
