@@ -59,7 +59,7 @@ done
 
 for d in contrib ; do
   install -d $RPM_BUILD_ROOT%{_datadir}/%{name}/$d
-  files=`find $d -maxdepth 1 -type f`
+  files=$(find $d -maxdepth 1 -type f)
   for f in $files ; do
     case $f in
       *.c|*.o|*.obj|*/Makefile*) continue ;;
