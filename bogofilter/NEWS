@@ -10,6 +10,9 @@ $Id$
 	* Portability: Switch data base handling to use uint32_t 32-bit
 	  integer, to let bogofilter use the same data widths on all
 	  architectures and platforms.
+	* Cleanup: The bogopass and unbase64 programs have been dropped from
+	  the contrib/ directory. Their functionality is now provided for by
+	  the bogofilter core code.
 
 0.10.1.3 2003-01-29
 

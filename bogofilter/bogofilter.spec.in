@@ -52,10 +52,13 @@ done
 
 files=`find contrib -maxdepth 1 -type f | grep -v Makefile`
 for i in $files ; do
+  case $i in
+    *.o|*.obj) continue ;;
+  esac
   install -m644 $i .inst/contrib
 done
 
-for README in bogopass randomtrain unbase64 ; do
+for README in randomtrain ; do
   ln -s ../contrib/README.$README doc/README.$README
 done
 
@@ -72,7 +75,7 @@ done
 %{_sysconfdir}/bogofilter.cf.example
 %config(noreplace) %{_sysconfdir}/bogofilter.cf
 %doc AUTHORS COPYING METHODS NEWS README TODO UPGRADE
-%doc doc/README.Robinson doc/bogofilter-faq.html
+%doc doc/README.Robinson
 %doc doc/programmer
 %doc .inst/contrib .inst/html .inst/xml
 

@@ -1,3 +1,7 @@
+This security announcement is kept for historic reasons. The software
+that was found to be vulnerable no longer ships with bogofilter.
+-----------------------------------------------------------------------
+
 bogofilter-SA-2002:01.bogopass
 
 Topic:		vulnerability in bogopass
