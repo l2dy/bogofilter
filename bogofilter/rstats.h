@@ -10,18 +10,18 @@ AUTHOR:
 
 ******************************************************************************/
 
-void rtable_init(void);
+void rstats_init(void);
 
-void rtable_add(char *token,
+void rstats_add(char *token,
 		double good,
 		double bad,
 		double prob);
 
-void rtable_fini(int robn, 
+void rstats_fini(int robn, 
 		 double invlogsum, 
 		 double logsum, 
 		 double invproduct, 
 		 double product, 
 		 double spamicity);
 
-void rtable_print(void);
+void rstats_print(void);
