@@ -134,7 +134,7 @@ long db_getvalue(void *vhandle, char *word){
     }
     else if (ret == DB_NOTFOUND){
       if (DEBUG_DATABASE(2)) {
-        fprintf(stderr, "[%lu] db_getvalue (%s): DB_NOTFOUND\n", (unsigned long) handle->pid, handle->name, word);
+        fprintf(stderr, "[%lu] db_getvalue (%s): [%s] not found\n", (unsigned long) handle->pid, handle->name, word);
       }
       return 0;
     }
