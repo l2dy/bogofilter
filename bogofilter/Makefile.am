@@ -8,7 +8,7 @@ AUTOMAKE_OPTIONS = foreign 1.6
 bin_PROGRAMS = bogofilter bogoutil
 bin_SCRIPTS = bogoupgrade.pl
 check_PROGRAMS = lexertest
-man1_MANS = bogofilter.1
+man1_MANS = bogofilter.1 bogoutil.1
 
 # what to build that from
 MYLIB= xmalloc.h xmalloc.c xstrdup.h xstrdup.c
@@ -26,7 +26,7 @@ bogoutil_SOURCES = bogoutil.c \
 
 # what to distribute
 EXTRA_DIST = $(man1_MANS) \
-	     bogofilter.xml \
+	     bogofilter.xml bogoutil.xml \
 	     bogofilter.spec bogofilter.spec.in \
 	     UPGRADE bogoupgrade.pl
 	     
