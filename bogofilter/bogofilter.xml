@@ -208,8 +208,7 @@ in the configuration file.</para>
 of the calculation method.</para>
 
 <para>The <option>-r</option> option selects the Robinson modifications
-to the calculation method.  This is automatically enabled when the
-<option>-R</option> option is specified.</para>
+to the calculation method.</para>
 
 <para>The <option>-f</option> option selects the Robinson-Fisher
 modifications to the calculation method.</para>
@@ -224,8 +223,7 @@ of the available methods.</para>
 <para>The <option>-R</option> option tells
 <application>bogofilter</application> to output an R data frame in
 text form on the standard output.  See the section on integration with
-R, below, for further detail.  Option <option>-R</option> implies option
-<option>-r</option>.</para>
+R, below, for further detail.</para>
 
 <para>The <option>-V</option> option prints the version number and 
 exits.</para>
