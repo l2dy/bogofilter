@@ -283,6 +283,7 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     }
 
     printf(head_format, "", "spam", "good", "Gra prob", "Rob prob");
+
     while (argc >= 0)
     {
 	double gra_prob = 0.0f, rob_prob = 0.0f;
@@ -527,7 +528,7 @@ static void help(void)
 
 int main(int argc, char *argv[])
 {
-    typedef enum { NONE, DUMP = 1, LOAD = 2, WORD = 3, ROBX = 4 } cmd_t;
+    typedef enum { NONE, DUMP, LOAD, WORD, MAINTAIN, ROBX } cmd_t;
 
     int count = 0;
     int option;
@@ -537,7 +538,7 @@ int main(int argc, char *argv[])
 
     set_today();		/* compute current date for token age */
 
-    while ((option = getopt(argc, argv, "d:l:w:R:phvVx:a:c:s:ny:")) != -1)
+    while ((option = getopt(argc, argv, "d:l:m:w:R:phvVx:a:c:s:ny:")) != -1)
 	switch (option) {
 	case 'd':
 	    flag = DUMP;
@@ -547,6 +548,12 @@ int main(int argc, char *argv[])
 
 	case 'l':
 	    flag = LOAD;
+	    count += 1;
+	    db_file = (char *) optarg;
+	    break;
+
+	case 'm':
+	    flag = MAINTAIN;
 	    count += 1;
 	    db_file = (char *) optarg;
 	    break;
@@ -627,6 +634,8 @@ int main(int argc, char *argv[])
 	    return dump_file(db_file);
 	case LOAD:
 	    return load_file(db_file);
+	case MAINTAIN:
+	    return maintain_wordlist_file(db_file);
 	case WORD:
 	    argc -= optind;
 	    argv += optind;
