@@ -16,6 +16,8 @@ AUTHOR:
 #include <string.h>
 #include <ctype.h>
 #include <db.h>
+#include <errno.h>
+#include <sys/stat.h>
 
 #include "version.h"
 #include "datastore.h"
@@ -152,48 +154,133 @@ int load_file(char *db_file)
     return rv;
 }
 
-int display_words(char *db_file)
+dbh_t *db_open_and_lock_file( const char *db_file, const char *name, dbmode_t mode)
 {
-    dbh_t *dbh;
-    char buf[BUFSIZE];
+    dbh_t *dbh = db_open(db_file, db_file, DB_READ);
+    if (dbh != NULL)
+	db_lock_reader(dbh);
+    return dbh;
+}
+
+int get_token(char *buf, size_t bufsize, FILE *fp)
+{
     char *p;
     int rv = 0;
     size_t len;
 
-    memset(buf, '\0', BUFSIZE);
-
-    if ((dbh = db_open(db_file, db_file, DB_READ)) == NULL) {
-	rv = 2;
-    }
-    else {
-      db_lock_reader(dbh);
-      for (;;) {
-	if (fgets(buf, BUFSIZE, stdin) == NULL) {
-	  if (ferror(stdin)) {
+    if (fgets(buf, bufsize, fp) == NULL) {
+	if (ferror(fp)) {
 	    perror(PROGNAME);
 	    rv = 2;
-	  }
-	  break;
 	}
+	else
+	    rv = 1;
+    }
+    else {
 	len = strlen(buf);
 	p = &buf[len - 1];
-
+	
 	if (*(p--) != '\n') {
 	    fprintf(stderr,
 		    PROGNAME
 		    ": Unexpected input [%s]. Does not end with newline\n",
 		    buf);
 	    rv = 1;
-	    break;
 	}
 	*(p + 1) = '\0';
+    }
+    return rv;
+}
 
-	printf("%s %ld\n", buf, db_getvalue(dbh, buf));
-      }
-      db_lock_release(dbh);
+int words_from_list(char *db_file, int argc, char **argv)
+{
+    dbh_t *dbh;
+    int rv = 0;
+
+    dbh = db_open_and_lock_file(db_file, db_file, DB_READ);
+    if ( dbh == NULL )
+	return 2;
+
+    if ( argc == 0)
+    {
+	char buf[BUFSIZE];
+	while (get_token(buf, BUFSIZE, stdin) == 0) {
+	    printf("%s %ld\n", buf, db_getvalue(dbh, buf));
+	}
+    }
+    else
+    {
+	while (argc-- > 0) {
+	    char *token = *++argv;
+	    printf("%s %ld\n", token, db_getvalue(dbh, token));
+	}
     }
 
+    db_close(dbh);
+
     return rv;
+}
+
+int words_from_path(char *directory, int argc, char **argv)
+{
+    dbh_t *dbh_good;
+    dbh_t *dbh_spam;
+    char filepath[PATH_LEN];
+
+    build_path(filepath, PATH_LEN, directory, GOODFILE);
+    if ((dbh_good = db_open_and_lock_file(filepath, GOODFILE, DB_READ)) == NULL)
+	return 2;
+
+    build_path(filepath, PATH_LEN, directory, SPAMFILE);
+    if ((dbh_spam = db_open_and_lock_file(filepath, SPAMFILE, DB_READ)) == NULL)
+	return 2;
+
+    printf("%-20s %6s %6s\n", "", "spam", "good");
+    if ( argc == 0)
+    {
+	char buf[BUFSIZE];
+	while (get_token(buf, BUFSIZE, stdin) == 0) {
+	    printf("%-20s %6ld %6ld\n", buf, db_getvalue(dbh_spam, buf), db_getvalue(dbh_good, buf));
+	}
+    }
+    else
+    {
+	while (argc-- > 0) {
+	    char *token = *argv++;
+	    printf("%-20s %6ld %6ld\n", token, db_getvalue(dbh_spam, token), db_getvalue(dbh_good, token));
+	}
+    }
+
+    db_close(dbh_good);
+    db_close(dbh_spam);
+
+    return 0;
+}
+
+int display_words(char *path, int argc, char **argv)
+{
+    struct stat sb;
+    int rc = stat(path, &sb);
+
+    if (rc >= 0) 
+    {
+	if ( S_ISDIR(sb.st_mode))
+	    words_from_path(path, argc, argv);
+	else
+    	    words_from_list(path, argc, argv);
+    }
+    else
+    {
+	if (errno==ENOENT) {
+	    fprintf(stderr, "No such directory.\n");
+	    return 0;
+	}
+	else {
+	    perror("Error accessing directory");
+	    return -1;
+	}
+    }
+    return 0;
 }
 
 double compute_robx( dbh_t *dbh_spam, dbh_t *dbh_good )
@@ -418,7 +505,7 @@ int main(int argc, char *argv[])
     }
 
     /* Extra or missing parameters */
-    if (argc != optind) {
+    if (flag != WORD && argc != optind) {
 	usage();
 	exit(1);
     }
@@ -429,7 +516,9 @@ int main(int argc, char *argv[])
 	case LOAD:
 	    return load_file(db_file);
 	case WORD:
-	    return display_words(db_file);
+	    argc -= optind;
+	    argv += optind;
+	    return display_words(db_file, argc, argv);
 	case ROBX:
 	    return compute_robinson_x(db_file);
 	case NONE:
