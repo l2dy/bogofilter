@@ -4,13 +4,14 @@
 #define MAINT_H
 
 #include <time.h>
+#include <inttypes.h>
 
 #define	AGE_IS_YDAY
 #undef	AGE_IS_YDAY
 #undef	AGE_IS_YYYYMMDD
 #define	AGE_IS_YYYYMMDD
 
-typedef long YYYYMMDD;		/* date as YYYYMMDD */
+typedef uint32_t YYYYMMDD;	/* date as YYYYMMDD */
 extern YYYYMMDD today;		/* date as YYYYMMDD */
 
 extern	int      thresh_count;
