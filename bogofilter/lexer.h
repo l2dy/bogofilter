@@ -6,6 +6,11 @@
 /* length of *yylval will not exceed this... */
 #define MAXTOKENLEN	30
 
+extern FILE *yyin;
+extern int yyleng;
+extern char *yytext;
+extern char *yylval;
+
 /* lexer interface */
 typedef enum {
     NONE = 0,
@@ -18,8 +23,6 @@ typedef enum {
     UUENCODE,	/* uuencoded line */
     EMPTY	/* empty line */
 } token_t;
-
-extern char *yylval;
 
 extern bool block_on_subnets;
 

@@ -21,12 +21,6 @@ AUTHOR:
 #include "error.h"
 #include "token.h"
 
-/* ignore words longer than this */
-#define MAXWORDLEN 30
-
-extern int yyleng;
-extern char *yytext;
-
 bool block_on_subnets = false;
 
 static token_t save_class = NONE;
