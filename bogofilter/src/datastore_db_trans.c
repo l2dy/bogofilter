@@ -929,6 +929,7 @@ probe_txn_t probe_txn(bfdir *directory, bffile *file)
 	int w;
 	char *t = build_path(directory->dirname, file->filename);
 	struct dirent *de;
+	probe_txn_t rc;
 	DIR *d;
 
 	/* no environment found by JOINENV, but clean up handle */
@@ -938,36 +939,40 @@ probe_txn_t probe_txn(bfdir *directory, bffile *file)
 	 * after bogoutil --db-remove DIR or when DB_JOINENV is
 	 * unsupported */
 	d = opendir(directory->dirname);
-	if (!d) {
+	if (d == NULL) {
 	    print_error(__FILE__, __LINE__, "cannot open directory %s: %s",
 		    t, strerror(r));
-	    return P_ERROR;
+	    rc = P_ERROR;
 	}
-	while ((de = readdir(d))) {
-	    if (strlen(de->d_name) == 14
+	else {
+	    while ((de = readdir(d))) {
+		if (strlen(de->d_name) == 14
 		    && strncmp(de->d_name, "log.", 4) == 0
 		    && strspn(de->d_name + 4, "0123456789") == 10)
-	    {
-		closedir(d);
-		return P_ENABLE;
+		{
+		    closedir(d);
+		    rc = P_ENABLE;
+		}
+	    }
+	    closedir(d);
+	    
+	    w = stat(t, &st);
+	    if (w == 0) {
+		rc = P_DISABLE;
+	    }
+	    else if (errno == ENOENT) {
+		rc = P_DONT_KNOW;
+	    }
+	    else {
+		rc = P_ERROR;
+		print_error(__FILE__, __LINE__, "cannot stat %s: %s",
+			    t, db_strerror(r));
 	    }
 	}
-	closedir(d);
-
-	w = stat(t, &st);
-	if (w == 0) {
-	    xfree(t);
-	    return P_DISABLE;
-	}
-	if (errno == ENOENT) {
-	    xfree(t);
-	    return P_DONT_KNOW;
-	}
-	print_error(__FILE__, __LINE__, "cannot stat %s: %s",
-		t, db_strerror(r));
 	xfree(t);
-	return P_ERROR;
+	return rc;
     }
+
     if (r != 0) {
 	print_error(__FILE__, __LINE__, "cannot join environment: %s",
 		db_strerror(r));
