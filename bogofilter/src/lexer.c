@@ -84,15 +84,15 @@ static int lgetsl(buff_t *buff)
     int count = buff_fgetsl(buff, fpin);
     yylineno += 1;
 
-    if (count >= 0 && DEBUG_LEXER(0))
-	lexer_display_buffer(buff);
-
     /* Special check for message separator.
        If found, handle it immediately.
     */
 
     if (is_from(&buff->t))
 	got_from();
+
+    if (count >= 0 && DEBUG_LEXER(0))
+	lexer_display_buffer(buff);
 
     return count;
 }
