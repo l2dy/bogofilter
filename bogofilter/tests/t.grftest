@@ -57,7 +57,7 @@ run_test()
     out="$2"
     ver="$3"
     OUT="${TMPDIR}/tests/msg.$out.$alg.$ver"
-    OPTS="-$alg -t -$ver -c ${TMPDIR}/cfg.$alg"
+    OPTS="-$alg -t -$ver $CFG"
     map_rc $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt >${TMPDIR}/tests-$alg 
     sed s/,.version=.*// < ${TMPDIR}/tests-$alg > $OUT
 }
@@ -67,11 +67,12 @@ run_test()
 
 for alg in r f g ; do
     BOGOFILTER_DIR="${TMPDIR}/tests.$alg"
+    CFG="-c ${TMPDIR}/cfg.$alg"
     export BOGOFILTER_DIR
     [   -d $BOGOFILTER_DIR ] && rm -f $BOGOFILTER_DIR/*
     [ ! -d $BOGOFILTER_DIR ] && mkdir $BOGOFILTER_DIR
-    $BOGOFILTER -$alg -s < ${SYSTEST}/inputs/spam.mbx
-    $BOGOFILTER -$alg -n < ${SYSTEST}/inputs/good.mbx
+    $BOGOFILTER -$alg $CFG -s < ${SYSTEST}/inputs/spam.mbx
+    $BOGOFILTER -$alg $CFG -n < ${SYSTEST}/inputs/good.mbx
     #
     # run tests for msg.[1-8].txt
     #
