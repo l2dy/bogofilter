@@ -169,17 +169,10 @@
 #
 ## min_dev=0.1
 
-#### THRESHOLD Values
-#
-#	When using '-u' (auto-update), update wordlist if
-#	value less than score and score less than 1-value.
-
-## thresh_update=0.01
-
 
 ########### Algorithm Settings ######################################
 
-#### ALGORITHM
+#### Robinson Constants
 #
 #	floating point values for
 #	Robinson S and X coefficients.
@@ -200,3 +193,9 @@
 ## ham_cutoff = 0.10
 ## spam_cutoff = 0.95
 
+#### Auto-update threshold
+#
+#	When using '-u' (auto-update), update wordlist if
+#	value less than score and score less than 1-value.
+#
+## thresh_update=0.01
