@@ -525,7 +525,7 @@ static int process_arglist(int argc, char **argv)
 
 	case 'a':
 	    maintain = true;
-	    thresh_date = string_to_date((char *)optarg);
+	    thresh_date = string_to_date(optarg);
 	    break;
 
 	case 'c':
@@ -557,7 +557,7 @@ static int process_arglist(int argc, char **argv)
 
 	case 'y':		/* date as YYYYMMDD */
 	{
-	    YYYYMMDD date = string_to_date((char *)optarg);
+	    YYYYMMDD date = string_to_date(optarg);
 	    maintain = true;
 	    if (date != 0 && date < 19990000) {
 		fprintf(stderr, "Date format for '-y' option is YYYYMMDD\n");
