@@ -19,9 +19,7 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
-0.93.0	2004-11-?? "Broken compatibility" release
-
-	2004-11-06
+0.93.0	2004-11-06 "Broken compatibility" release
 
 	* Fix bogotune's '-D' option.
 

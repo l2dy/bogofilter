@@ -10,7 +10,7 @@ line tests.  Use options, config files, and wordlists from your
 production environment.  This will help ensure that the new version of
 bogofilter is working properly.
 
-0.93.0	2004-11-?? "Broken compatibility" release
+0.93.0	2004-11-06 "Broken compatibility" release
 
 RELEASE.NOTES-0.93 has two important sections entitled:
 
