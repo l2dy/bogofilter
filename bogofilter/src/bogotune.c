@@ -388,7 +388,7 @@ static void scoring_error(void)
 
 static uint get_thresh(uint count, double *scores)
 {
-    uint ft;
+    uint ft = 0;
     double percent;
     static bool show_first = false;
 
