@@ -148,7 +148,7 @@ fi
 
 # check valgrind:
 case `(valgrind --version) 2>/dev/null` in
-    valgrind-2.1.*) VALGRIND="valgrind --tool=memcheck" ;;
+    valgrind-2.[12].*) VALGRIND="valgrind --tool=memcheck" ;;
     valgrind-*) VALGRIND="valgrind" ;;
     *) VALGRIND= ;;
 esac
