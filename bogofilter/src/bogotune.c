@@ -132,6 +132,8 @@ typedef struct {
 data_t *rsval;
 data_t *rxval;
 data_t *mdval;
+
+uint target;
 uint ns_cnt, sp_cnt;
 
 double check_percent;		/* initial check for excessively high/low scores */
@@ -326,11 +328,11 @@ static void score_ns(double *results)
 
 static bool check_for_high_ns_scores(void)
 {
-    uint target = ceil(ns_cnt * check_percent);
+    uint t = ceil(ns_cnt * check_percent);
 
     score_ns(ns_scores);	/* scores in descending order */
 
-    if (ns_scores[target-1] < SPAM_CUTOFF)
+    if (ns_scores[t-1] < SPAM_CUTOFF)
 	return false;
     else {
 	fprintf(stderr, "Warning:  high scoring non-spam.\n");
@@ -383,11 +385,11 @@ static uint get_fn_count(uint count, double *results)
 
 static bool check_for_low_sp_scores(void)
 {
-    uint target = ceil(sp_cnt * check_percent);
+    uint t = ceil(sp_cnt * check_percent);
 
     score_sp(sp_scores);			/* get scores */
 
-    if (sp_scores[target-1] > HAM_CUTOFF)
+    if (sp_scores[t-1] > HAM_CUTOFF)
 	return false;
     else {
 	fprintf(stderr, "Warning:  low scoring spam.\n");
@@ -1082,7 +1084,6 @@ static rc_t bogotune(void)
 
     int beg, end;
     uint cnt, scan;
-    uint target;
     rc_t status = RC_OK;
 
     bogotune_init();
