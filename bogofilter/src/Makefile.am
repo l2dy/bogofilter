@@ -113,11 +113,14 @@ version_sources= \
 	datastore_db.h \
 	mysetvbuf.c mysetvbuf.h
 
-BUILT_SOURCES=	version.c
+BUILT_SOURCES=	version.c directories.c
 
 libbogofilter_a_SOURCES = \
-	directories.c version.c \
+	version.c \
 	$(version_sources)
+
+nodist_libbogofilter_a_SOURCES = \
+	directories.c
 
 if ENABLE_TDB_DATASTORE
 datastore_SOURCE = datastore_tdb.c
@@ -189,8 +192,9 @@ version.c: version.sh ../configure.ac Makefile.am	\
 	    || { rm -f "$@" ; false ; }
 #
 directories.c: ../config.status
-	echo "const char *const system_config_file = \"$(SYSCONFDIR)/bogofilter.cf\";" >"$@" \
-	    || rm -f "$@"
+	( echo "#include \"globals.h\"" && \
+	echo "const char *const system_config_file = \"$(SYSCONFDIR)/bogofilter.cf\";" ) >"$@" \
+	    || { rm -f "$@" ; false ; }
 #
 .l.c:
 	flex -o$@.new $< && \
