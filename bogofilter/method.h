@@ -10,24 +10,22 @@
 typedef struct bogostat_s bogostat_t;
 
 typedef	void	m_initialize(void);
-#if	1
 typedef	double	m_compute_spamicity(wordhash_t *wordhash, FILE *fp); /*@globals errno@*/
-#else
-typedef	double	m_bogofilter(wordhash_t *wordhash, FILE *fp); /*@globals errno@*/
-typedef	double	m_compute_spamicity(bogostat_t *bogostats, FILE *fp); /*@globals errno@*/
-#endif
 typedef	void	m_print_bogostats(FILE *fp, double spamicity);
 typedef	void	m_cleanup(void);
 
-typedef struct method_s {
+/*
+** This defines an object oriented API for accessing 
+** the methods needed by an object for spamicity computing.
+*/
 
+typedef struct method_s {
     const char		*name;
     const parm_desc	*config_parms;
     m_initialize	*initialize;
     m_compute_spamicity	*compute_spamicity;
     m_print_bogostats	*print_stats;
     m_cleanup		*cleanup;
-
 } method_t;
 
 extern method_t *method;
