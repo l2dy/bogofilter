@@ -2,6 +2,10 @@
 
 			bogofilter TODO list
 
+**** 0.14: revise $(SHELL) macros, BSD make apparently uses the user's
+login shell, for example /usr/local/bin/zsh, which can cause arbitrary
+test failures. Make sure we have a Bourne/Korn-style shell.
+
 **** New Feature: Token aging. Support for struct data in the wordlists is
 already present.
 
@@ -33,6 +37,7 @@ message belongs to at above 0.9 confidence level.
 
 **** Design Enhancement: Cascade lexers. Have one to analyze the
 structure and a selection of lexers to analyze the tokens.
+Use a functional approach to nest these lexers?
 
 **** Design Enhancement: Improve evaluation accuracy by treating words common
 in both wordlists as neutral by excluding them from the probability
@@ -50,8 +55,3 @@ performance. The db4 library does it already.
 should be used to ignore (single or multi-line) headers that appear in the 
 list. The list should be used to ignore headers both during the message 
 registration and evaluation procedures.
-
-**** Provide support for the BerkeleyDB v1 API. If the configure script can't
-find a version 2+ version of the BerkeleyDB package, it should #define
-a variable that allows alternate database procedures to be compiled in.
-
