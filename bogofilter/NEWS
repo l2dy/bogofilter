@@ -4,7 +4,7 @@
 
 $Id$
 
-0.14.1	2003-07-23
+0.14.0.1 2003-07-23
 
 	* Fix problem with encoded text.
 	* Fix handling of absolute paths.
