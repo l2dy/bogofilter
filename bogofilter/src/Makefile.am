@@ -73,10 +73,9 @@ bogoutil_LDADD = $(LDADD) $(LIBDB)
 configtest_LDADD = $(LDADD) $(LIBDB)
 
 # what to build that from
-libbogofilter_a_SOURCES= \
+version_sources= \
 	common.h system.h \
 	globals.h globals.c \
-	directories.c version.c \
 	base64.h base64.c \
 	bf_exit.c \
 	bogoconfig.h bogoconfig.c \
@@ -118,6 +117,10 @@ libbogofilter_a_SOURCES= \
 	$(MEMDEBUG_SRC) \
 	xatox.h xatof.c xatoi.c \
 	datastore_db.h
+
+libbogofilter_a_SOURCES = \
+	directories.c version.c \
+	$(version_sources)
 
 if ENABLE_TDB_DATASTORE
 libbogofilter_a_SOURCES += datastore_tdb.c
@@ -173,7 +176,13 @@ EXTRA_DIST = \
 	     version.sh \
 	     strlcat.3 strlcpy.3
 #
-version.c:	version.sh ../configure.ac Makefile.am
+version.c: version.sh ../configure.ac Makefile.am	\
+	$(version_sources)				\
+	$(bogofilter_SOURCES)				\
+	$(bogolexer_SOURCES)				\
+	$(bogoutil_SOURCES)				\
+	$(bogotune_SOURCES)
+
 	$(srcdir)/version.sh $(top_srcdir) >"$@.new" && mv "$@.new" "$@" \
 	    || rm -f "$@"
 #
