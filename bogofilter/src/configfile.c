@@ -267,6 +267,7 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
 bool process_config_files(bool warn_on_error)
 {
     bool ok = true;
+    const char *env = getenv("BOGOTEST");
 
     if (!suppress_config_file) {
 	if (!read_config_file(system_config_file, false, warn_on_error, PR_CFG_SITE))
@@ -274,6 +275,11 @@ bool process_config_files(bool warn_on_error)
 	if (!read_config_file(user_config_file, true, warn_on_error, PR_CFG_USER))
 	    ok = false;
     }
+
+    if (env)
+	bogotest = atoi(env);
+
+    lexer_set_debug(bogotest);	/* 1 - INITEST, 2 - lexer states */
 
     return ok;
 }

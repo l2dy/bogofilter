@@ -31,7 +31,7 @@ extern	bool	quiet;			/* '-q' */
 extern	bool	query;			/* '-Q' */
 extern	int	Rtable;			/* '-R' */
 extern	bool	terse;			/* '-t' */
-extern	int	test;			/* '-T' */
+extern	int	bogotest;		/* '-X', env("BOGOTEST") */
 extern	int	verbose;		/* '-v' */
 extern	wl_t	wl_mode;		/* '-W' */
 

@@ -30,7 +30,6 @@ CONTRIBUTORS:
 #include "bool.h"
 #include "charset.h"
 #include "datastore.h"
-#include "maint.h"
 #include "error.h"
 #include "find_home.h"
 #include "format.h"
@@ -463,7 +462,7 @@ void process_args_1(int argc, char **argv)
     int option;
     ex_t exitcode;
 
-    test = 0;
+    bogotest = 0;
     verbose = 0;
     run_type = RUN_UNKNOWN;
     fpin = stdin;
@@ -614,6 +613,9 @@ void process_args_1(int argc, char **argv)
 	    set_debug_mask( optarg );
 	    break;
 
+        case 'X':
+	    bogotest = 1;
+
 	case 'y':		/* date as YYYYMMDD */
 	    today = string_to_date((char *)optarg);
 	    break;
@@ -725,9 +727,6 @@ void process_args_2(int argc, char **argv)
         case 'V':
 	    print_version();
 	    exit(EX_OK);
-
-        case 'X':
-	    test = 1;
 	}
     }
 

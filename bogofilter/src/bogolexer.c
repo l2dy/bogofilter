@@ -174,10 +174,6 @@ static void process_args_1(int argc, char **argv)
 	    quiet = true;
 	    break;
 
-	case 'X':
-	    test += 1;
-	    break;
-
 	case 'v':
 	    verbose += 1;
 	    break;
@@ -188,6 +184,10 @@ static void process_args_1(int argc, char **argv)
 
 	case 'x':
 	    set_debug_mask( optarg );
+	    break;
+
+	case 'X':
+	    bogotest += 1;
 	    break;
 	}
     }

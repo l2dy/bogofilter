@@ -34,7 +34,7 @@ bool	quiet;				/* '-q' */
 bool	query;				/* '-Q' */
 int	Rtable = 0;			/* '-R' */
 bool	terse;				/* '-t' */
-int	test = 0;			/* '-T' */
+int	bogotest = 0;			/* '-X', env("BOGOTEST") */
 int	verbose;			/* '-v' */
 
 /* config file options */

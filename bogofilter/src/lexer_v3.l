@@ -95,6 +95,8 @@ static void reorder_html(void);
 
 static void skip_to(char chr);
 
+void yy_set_state_initial(void);
+
 /* Function Definitions */
 
 static word_t *yy_text(void)
@@ -107,7 +109,7 @@ static word_t *yy_text(void)
 %}
 
 %option warn
-%option debug nodebug
+%option nodebug debug
 %option align caseless 8bit
 %option never-interactive
 %option noreject noyywrap
@@ -287,8 +289,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 void lexer_v3_init(FILE *fp)
 {
     lineno = 0;
-    BEGIN INITIAL;
-    msg_header = true;
+    yy_set_state_initial();
     yyrestart(fp);
 }
 
@@ -330,12 +331,25 @@ char yy_get_state()
     }
 }
 
-void yy_set_state_initial()
+void yy_set_state_initial(void)
 {
     BEGIN INITIAL;
-    if (DEBUG_LEXER(1)) fprintf(dbgout, "%s:%d %s\n", __FILE__, __LINE__, "BEGIN INITIAL");
+
+    msg_header = true;
+
+    if (DEBUG_LEXER(1))
+	fprintf(dbgout, "BEGIN INITIAL\n" );
 }
 
+void lexer_set_debug(int v)
+{
+#ifdef	FLEX_DEBUG
+    v;
+#else
+    yy_flex_debug = v & 1;
+#endif
+}
+ 
 /*
  * The following sets edit modes for GNU EMACS
  * Local Variables:
