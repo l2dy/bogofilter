@@ -154,12 +154,13 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 double lookup_and_score(const word_t *token, wordcnts_t *cnts)
 {
     double prob;
+    const char *colon;
 
     if (cnts->bad == 0 && cnts->good == 0)
 	lookup(token, cnts);
 
-    if (header_degen && token->leng >= 5 && memcmp(token->text, "head:", 5) == 0) {
-	word_t *tword = word_new(token->text+5, token->leng-5);
+    if (header_degen && cnts->bad == 0 && cnts->good == 0 && (colon = strchr(token->text, ':')) != NULL) {
+	word_t *tword = word_new(colon+1, strlen(colon+1));
 	wordcnts_t tcnts;
 	wordcnts_init(&tcnts);
 	lookup_and_score(tword, &tcnts);
