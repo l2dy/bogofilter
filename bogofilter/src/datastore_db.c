@@ -854,7 +854,7 @@ void db_close(void *vhandle)
 
 #ifdef	DB_LOG_INMEMORY
     /* DB_LOG_INMEMORY is new in 4.3 */
-    flag &= db_get_flags(dbp, DB_LOG_INMEMORY)
+    flag &= db_get_flags(dbp, DB_LOG_INMEMORY);
 #endif
 
     if (DEBUG_DATABASE(1))
