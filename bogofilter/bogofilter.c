@@ -201,12 +201,26 @@ bogostat_t;
 
 #define SIZEOF(array)	((size_t)(sizeof(array)/sizeof(array[0])))
 
+static bogostat_t stats;
+
 int compare_stats(const void *id1, const void *id2)
 { 
     const discrim_t *d1 = id1;
     const discrim_t *d2 = id2;
     return ( (d1->prob > d2->prob) ||
 	     ((d1->prob == d2->prob) && (strcmp(d1->key, d2->key) > 0)));
+}
+
+void init_stats(bogostat_t *stats)
+{
+    int idx;
+
+    for (idx = 0; idx < SIZEOF(stats->extrema); idx++)
+    {
+	discrim_t *pp = &stats->extrema[idx];
+	pp->prob = EVEN_ODDS;
+	pp->key[0] = '\0';
+    }
 }
 
 void populate_stats( bogostat_t *stats, char *text, double prob, int count )
@@ -289,8 +303,9 @@ double compute_probability( char *token )
     int override=0;
     long count;
     int totalcount=0;
-    wordprob_t stats;
     double prob;
+
+    wordprob_t stats;
 
     wordprob_init(&stats);
 
@@ -336,39 +351,17 @@ bogostat_t *select_indicators(wordhash_t *wordhash)
 // populates the stats structure.
 {
     hashnode_t *node;
-    discrim_t *pp;
-    static bogostat_t stats;
-    
-    for (pp = stats.extrema; pp < stats.extrema+SIZEOF(stats.extrema); pp++)
-    {
- 	pp->prob = 0.5f;
- 	pp->key[0] = '\0';
-    }
-    
+
+    init_stats(&stats);
+
     for(node = wordhash_first(wordhash); node != NULL; node = wordhash_next(wordhash))
-      {
-	double prob = compute_probability( node->key );
-	double dev = DEVIATION(prob);
-	discrim_t *hit = NULL;
-	double	hitdev=1;
+    {
+	char *token = node->key;
+	double prob = compute_probability( token );
 
-	// update the list of tokens with maximum deviation
-	for (pp = stats.extrema; pp < stats.extrema+SIZEOF(stats.extrema); pp++)
-        {
-	    double slotdev=DEVIATION(pp->prob);
-
-	    if (dev>slotdev && hitdev>slotdev)
-	    {
-		hit=pp;
-		hitdev=slotdev;
-            }
-        }
-        if (hit) 
-	{ 
-	    hit->prob = prob;
-	    strncpy(hit->key, node->key, MAXTOKENLEN);
-	}
+	populate_stats( &stats, token, prob, 1 );
     }
+
     return (&stats);
 }
 
