@@ -486,7 +486,7 @@ int process_args(int argc, char **argv)
 
     fpin = stdin;
 
-    while ((option = getopt(argc, argv, ":23d:eFhl::o:snSNvVpuc:CgrRx:fqtI:O:y:k:" G R F)) != EOF)
+    while ((option = getopt(argc, argv, ":23d:eFhl::o:snSNvVpuc:CgrRx:fqtI:O:y:k:T" G R F)) != EOF)
     {
 	switch(option)
 	{
@@ -627,6 +627,10 @@ int process_args(int argc, char **argv)
 
 	case 'y':		/* date as YYYYMMDD */
 	    today = string_to_date((char *)optarg);
+	    break;
+
+	case 'T':
+	    test += 1;
 	    break;
 
 	default:

@@ -27,6 +27,7 @@ extern	int	verbose;		/* '-v' */
 extern	FILE	*fpin;			/* '-I' */
 
 extern	int	Rtable;			/* '-R' */
+extern	int	test;			/* '-T' */
 
 extern	char	*directory;		/* '-d' */
 extern	char	outfname[PATH_LEN];	/* '-O' */

@@ -31,6 +31,7 @@ int	verbose;			/* '-v' */
 
 FILE	*fpin = NULL;			/* '-I' */
 int	Rtable = 0;			/* '-R' */
+int	test = 0;			/* '-T' */
 
 /* config file options */
 int	max_repeats;
