@@ -9,9 +9,10 @@
 echo 0a 74 65 73 74 00 74 65 0d 73 74 0d 0a \
 | ./dehex >${TMPDIR}/input
 ./escnp <${TMPDIR}/input >${TMPDIR}/reference
+shn="`./spam_header_name`:"
 # check seekable input
 $VAL ${relpath}/bogofilter -e -p -C <${TMPDIR}/input | ./escnp >${TMPDIR}/output
-grep -v ^X-Bogosity: <${TMPDIR}/output | cmp - ${TMPDIR}/reference
+grep -v "$shn" ${TMPDIR}/output | cmp - ${TMPDIR}/reference
 # check non-seekable input
 cat ${TMPDIR}/input | $VAL ${relpath}/bogofilter -e -p -C | ./escnp >${TMPDIR}/output
-grep -v ^X-Bogosity: <${TMPDIR}/output | cmp - ${TMPDIR}/reference
+grep -v "$shn" ${TMPDIR}/output | cmp - ${TMPDIR}/reference
