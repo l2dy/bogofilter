@@ -32,7 +32,6 @@ extern	int	verbose;		/* '-v' */
 extern	bool	replace_nonascii_characters;	/* '-n' */
 
 /* config file options */
-extern	int	max_repeats;
 extern	double	min_dev;
 extern	double	ham_cutoff;
 extern	double	spam_cutoff;

@@ -34,7 +34,6 @@ int	bogotest;			/* '-X', env("BOGOTEST") */
 int	verbose;			/* '-v' */
 
 /* config file options */
-int	max_repeats=1;			/* set default value */
 double	min_dev;
 double	ham_cutoff = HAM_CUTOFF;
 double	spam_cutoff;

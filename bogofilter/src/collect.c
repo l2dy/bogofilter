@@ -63,9 +63,8 @@ void collect_words(wordhash_t *wh)
 	}
 
 	wp = wordhash_insert(wh, token, sizeof(wordprop_t), &wordprop_init);
-	if (wh->type != WH_CNTS &&
-	    wp->freq < max_repeats)
-	    wp->freq += 1;
+	if (wh->type != WH_CNTS)
+	    wp->freq = 1;
 
 /******* EK **********/
 
