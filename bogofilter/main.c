@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.10  2002/09/23 11:34:30  relson
+ * Modify passthrough code so that X-Spam-Status line will also print in verbose mode.
+ *
  * Revision 1.9  2002/09/23 11:31:53  m-a
  * Unnest comments, and move $ line down by one to prevent CVS from adding nested comments again.
  *
@@ -210,11 +213,18 @@ int main(int argc, char **argv)
 		if (strcmp(textend->block, "\n") == 0) break;
 		(void) fputs(textend->block, stdout);
 	    }
+	}
 
+	if (passthrough || verbose)
+	{
 	    /* print spam-status at the end of the header
 	     * then mark the beginning of the message body */
 	    printf("X-Spam-Status: %s, tests=bogofilter, spamicity=%0.6f\n", 
 		    (status==RC_SPAM) ? "Yes" : "No", spamicity);
+	}
+
+	if (passthrough)
+	{
 	    /* If the message terminated early (without body or blank
 	     * line between header and body), enforce a blank line to
 	     * prevent anything past us from choking. */
