@@ -4,6 +4,26 @@
 
 $Id$
 
+	2003-05-08
+	* Fixed memory leak in rstats.c
+	* Added basic memory accounting and debug capability.
+
+	2003-05-07
+	* Bogofilter's '-e' switch can now be used without '-p'.
+	* Modified bulk mode code to allow registering maildirs.
+
+	2003-05-05
+	* Fixed defect in handling of folded spam header lines.
+	* Added bogofilter-faq-fr.html, a French translation of the FAQ.
+
+	2003-05-04
+	* Converted from separate wordlists (spamlist.db, goodlist.db)
+	  to combined wordlist (wordlist.db).
+
+	2003-05-02
+	* Added options to return tokens from inside html tags.
+	  Switch '-Ht' and option "tokenize_html_tags" turn it on.
+
 0.12.2	2003-04-30
 
 	* Corrected bulkmode problem processing messages without
