@@ -75,9 +75,9 @@ bool discard_token(word_t *token, dsv_t *in_val)
     bool discard;
  
     if (token->text[0] == '.') {	/* keep .MSG_COUNT and .ROBX */
-	if (strcmp(token->text, MSG_COUNT) == 0)
+	if (strcmp((const char *)token->text, MSG_COUNT) == 0)
 	    return false;
-	if (strcmp(token->text, ROBX_W) == 0)
+	if (strcmp((const char *)token->text, ROBX_W) == 0)
 	    return false;
     }
 
