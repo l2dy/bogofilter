@@ -18,6 +18,7 @@ NAME:
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #include "datastore.h"
+#include "msgcounts.h"
 #include "robinson.h"
 #include "rstats.h"
 #include "wordhash.h"
@@ -33,10 +34,6 @@ NAME:
 #define ROBINSON_MAX_REPEATS	1	/* cap on word frequency per message */
   
 extern int Rtable;
-static double scalefactor;
-
-long msgs_good = 0L;			/* used in rstats.c */
-long msgs_bad  = 0L;			/* used in rstats.c */
 
 double	thresh_rtable = 0.0;		/* used in fisher.c */
 double	robx = 0.0;			/* used in fisher.c and rstats.c */
@@ -123,24 +120,6 @@ static double wordprob_result(wordprob_t* wordstats)
     double fw = (robs * robx + n * pw) / (robs + n);
 
     return (fw);
-}
-
-static double compute_scale(void)
-{
-    wordlist_t* list;
-
-    for(list=word_lists; list != NULL; list=list->next)
-    {
-	if (list->bad)
-	    msgs_bad += list->msgcount;
-	else
-	    msgs_good += list->msgcount;
-    }
-
-    if (msgs_good == 0L)
-	return(1.0);
-    else
-	return ((double)msgs_bad / (double)msgs_good);
 }
 
 static double compute_probability(const word_t *token)
@@ -323,7 +302,7 @@ void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double 
     */
 
     if (run_type & (RUN_NORMAL | RUN_UPDATE)) {
-	scalefactor = compute_scale();
+	compute_msg_counts();
 	if (fabs(robs) < EPS)
 	    robs = ROBS;
     }
