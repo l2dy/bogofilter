@@ -23,98 +23,98 @@
  */
 void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 {
-  const char *r="",*u="";
-  hashnode_t *node;
-  wordprop_t *wordprop;
-  run_t save_run_type = run_type;
+    const char *r="",*u="";
+    hashnode_t *node;
+    wordprop_t *wordprop;
+    run_t save_run_type = run_type;
 
-  u_int32_t g = 0, b = 0;
-  u_int32_t wordcount = h->count;	/* use number of unique tokens */
+    u_int32_t g = 0, b = 0;
+    u_int32_t wordcount = h->count;	/* use number of unique tokens */
 
-  wordlist_t *list;
-  sh_t incr = IX_UNDF, decr = IX_UNDF;
+    wordlist_t *list;
+    sh_t incr = IX_UNDF, decr = IX_UNDF;
 
-  /* If update directory explicity supplied, setup the wordlists. */
-  if (update_dir) {
-      if (set_wordlist_dir(update_dir, PR_CFG_UPDATE) != 0)
-	  exit(EX_ERROR);
-  }
+    /* If update directory explicity supplied, setup the wordlists. */
+    if (update_dir) {
+	if (set_wordlist_dir(update_dir, PR_CFG_UPDATE) != 0)
+	    exit(EX_ERROR);
+    }
 
-  if (_run_type & REG_SPAM)	{ r = "s"; incr = IX_SPAM; }
-  if (_run_type & REG_GOOD)	{ r = "n"; incr = IX_GOOD; }
-  if (_run_type & UNREG_SPAM)	{ u = "S"; decr = IX_SPAM; }
-  if (_run_type & UNREG_GOOD)	{ u = "N"; decr = IX_GOOD; }
+    if (_run_type & REG_SPAM)	{ r = "s"; incr = IX_SPAM; }
+    if (_run_type & REG_GOOD)	{ r = "n"; incr = IX_GOOD; }
+    if (_run_type & UNREG_SPAM)	{ u = "S"; decr = IX_SPAM; }
+    if (_run_type & UNREG_GOOD)	{ u = "N"; decr = IX_GOOD; }
 
-  if (wordcount == 0)
-      msgcount = 0;
+    if (wordcount == 0)
+	msgcount = 0;
 
-  format_log_update(msg_register, msg_register_size, u, r, wordcount, msgcount);
+    format_log_update(msg_register, msg_register_size, u, r, wordcount, msgcount);
 
-  if (verbose)
-    (void)fprintf(dbgout, "# %u word%s, %u message%s\n", 
-		  wordcount, PLURAL(wordcount), msgcount, PLURAL(msgcount));
+    if (verbose)
+	(void)fprintf(dbgout, "# %u word%s, %u message%s\n", 
+		      wordcount, PLURAL(wordcount), msgcount, PLURAL(msgcount));
 
-  /* When using auto-update with separate wordlists , 
-     datastore.c needs to know which to update */
+    /* When using auto-update with separate wordlists , 
+       datastore.c needs to know which to update */
 
-  run_type |= _run_type;
+    run_type |= _run_type;
 
-  for (node = wordhash_first(h); node != NULL; node = wordhash_next(h))
-  {
-      dsv_t val;
-      wordprop = node->buf;
-      ds_read(word_list->dsh, node->key, &val);
-      if (incr != IX_UNDF) {
-	  u_int32_t *counts = val.count;
-	  counts[incr] += wordprop->freq;
-      }
-      if (decr != IX_UNDF) {
-	  u_int32_t *counts = val.count;
-	  counts[decr] = ((long)counts[decr] < wordprop->freq) ? 0 : counts[decr] - wordprop->freq;
-      }
-      ds_write(word_list->dsh, node->key, &val);
-  }
+    for (node = wordhash_first(h); node != NULL; node = wordhash_next(h))
+    {
+	dsv_t val;
+	wordprop = node->buf;
+	ds_read(word_list->dsh, node->key, &val);
+	if (incr != IX_UNDF) {
+	    u_int32_t *counts = val.count;
+	    counts[incr] += wordprop->freq;
+	}
+	if (decr != IX_UNDF) {
+	    u_int32_t *counts = val.count;
+	    counts[decr] = ((long)counts[decr] < wordprop->freq) ? 0 : counts[decr] - wordprop->freq;
+	}
+	ds_write(word_list->dsh, node->key, &val);
+    }
 
-  for (list = word_lists; list != NULL; list = list->next)
-  {
-      dsv_t val;
+    for (list = word_lists; list != NULL; list = list->next)
+    {
+	dsv_t val;
 
-/*
-      if (!list->active)
-	  continue;
-*/
+	/*
+	   if (!list->active)
+	   continue;
+	   */
 
-      ds_get_msgcounts(list->dsh, &val);
-      list->msgcount[IX_SPAM] = val.spamcount;
-      list->msgcount[IX_GOOD] = val.goodcount;
+	ds_get_msgcounts(list->dsh, &val);
+	list->msgcount[IX_SPAM] = val.spamcount;
+	list->msgcount[IX_GOOD] = val.goodcount;
 
-      if (incr != IX_UNDF)
-	  list->msgcount[incr] += msgcount;
-      
-      if (decr != IX_UNDF) {
-	  if (list->msgcount[decr] > msgcount)
-	      list->msgcount[decr] -= msgcount;
-	  else
-	      list->msgcount[decr] = 0;
-      }
+	if (incr != IX_UNDF)
+	    list->msgcount[incr] += msgcount;
 
-      val.spamcount = list->msgcount[IX_SPAM];
-      val.goodcount = list->msgcount[IX_GOOD];
+	if (decr != IX_UNDF) {
+	    if (list->msgcount[decr] > msgcount)
+		list->msgcount[decr] -= msgcount;
+	    else
+		list->msgcount[decr] = 0;
+	}
 
-      ds_set_msgcounts(list->dsh, &val);
+	val.spamcount = list->msgcount[IX_SPAM];
+	val.goodcount = list->msgcount[IX_GOOD];
 
-      g += val.goodcount;
-      b += val.spamcount;
+	ds_set_msgcounts(list->dsh, &val);
 
-      ds_flush(list->dsh);
+	g += val.goodcount;
+	b += val.spamcount;
 
-      if (DEBUG_REGISTER(1))
-	  (void)fprintf(dbgout, "bogofilter: list %s (%s) - %ul spam, %ul good\n",
-			list->listname, list->filepath, list->msgcount[IX_SPAM], list->msgcount[IX_GOOD]);
-  }
+	ds_flush(list->dsh);
 
-  set_msg_counts(g, b);
+	if (DEBUG_REGISTER(1))
+	    (void)fprintf(dbgout, "bogofilter: list %s (%s) - %ul spam, %ul good\n",
+			  list->listname, list->filepath, list->msgcount[IX_SPAM], list->msgcount[IX_GOOD]);
+    }
 
-  run_type = save_run_type;
+    set_msg_counts(g, b);
+
+    run_type = save_run_type;
 }
 
