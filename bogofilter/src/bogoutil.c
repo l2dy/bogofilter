@@ -122,6 +122,22 @@ static byte *spanword(byte *t)
     return t;
 }
 
+/** determines if the token is a regular token or a special non-count
+ * token (.ROBX, .WORDLIST_VERSION), returns true if the token is a
+ * count token */
+static bool is_count(const char *in)
+{
+    static const char *const msgc = MSG_COUNT;
+
+    /* anything that doesn't start with a . is a count */
+    if (in[0] != '.')
+	return true;
+    /* .MSG_COUNT is also a count */
+    if (strcmp(in, msgc) == 0)
+	return true;
+    return false;
+}
+
 static ex_t load_wordlist(const char *ds_file)
 {
     void *dsh;
@@ -207,7 +223,7 @@ static ex_t load_wordlist(const char *ds_file)
 	data.spamcount = spamcount;
 	data.date = date;
 
-	if (! (maintain && discard_token(token, &data))) {
+	if (is_count(buf) && !(maintain && discard_token(token, &data))) {
 	    load_count += 1;
 	    /* Slower, but allows multiple lists to be concatenated */
 	    set_date(date);
