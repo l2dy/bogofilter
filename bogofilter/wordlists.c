@@ -20,7 +20,7 @@ wordlist_t* word_lists=NULL;
 
 void *open_wordlist( const char *name, const char *filepath )
 {
-    void *dbh;			// database handle 
+    void *dbh;			/* database handle  */
 
     dbmode_t open_mode = (run_type==RUN_NORMAL) ? DB_READ : DB_WRITE;
 
@@ -57,7 +57,7 @@ int init_list(wordlist_t* list, const char* name, const char* filepath,
     list_index=word_lists;
     last_list_ptr=&word_lists;
 
-    // put lists with high override numbers at the front.
+    /* put lists with high override numbers at the front. */
     while(1) {
 	if (list_index->override < override) {
 	    *last_list_ptr=list;
@@ -65,7 +65,7 @@ int init_list(wordlist_t* list, const char* name, const char* filepath,
 	    break;
         }
         if (! list_index->next) {
-	    // end of list
+	    /* end of list */
 	    list_index->next=list;
 	    list->next=NULL;
 	    break;
@@ -149,12 +149,14 @@ void sanitycheck_lists()
 	fprintf(stderr, "%d lists look OK.\n", listcount);
 }
 
-// type - 'g', 's', or 'i'
-// name - 'good', 'spam', etc
-// path - 'goodlist.db'
-// weight - 1,2,...
-// override - 1,2,...
+/* type - 'g', 's', or 'i'
+ * name - 'good', 'spam', etc
+ * path - 'goodlist.db'
+ * weight - 1,2,...
+ * override - 1,2,...
+ */
 
+/* returns true for success, false for error */
 bool configure_wordlist(const char *val)
 {
     bool ok;
@@ -177,26 +179,18 @@ bool configure_wordlist(const char *val)
 
     switch (type[0])
     {
-    case 'g':		// good
-    {
-	break;
-    }
-    case 's':
-    case 'b':		// spam
-    {
-	bad = TRUE;
-	break;
-    }
-    case 'i':		// ignore
-    {
-	ignore = TRUE;
-	break;
-    }
-    default:
-    {
-	fprintf( stderr, "Unknown list type - '%c'\n", type[0]);
-	break;
-    }
+	case 'g':		/* good */
+	    break;
+	case 's':
+	case 'b':		/* spam */
+	    bad = TRUE;
+	    break;
+	case 'i':		/* ignore */
+	    ignore = TRUE;
+	    break;
+	default:
+	    fprintf( stderr, "Unknown list type - '%c'\n", type[0]);
+	    break;
     }
 
     name=tmp;
@@ -224,5 +218,3 @@ bool configure_wordlist(const char *val)
 
     return ok;
 }
-
-// Done
