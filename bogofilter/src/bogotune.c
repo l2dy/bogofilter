@@ -999,15 +999,11 @@ static int process_arglist(int argc, char **argv)
     return count;
 }
 
-static void check_wordlist_path(void)
+static void check_wordlist_path(const char *path)
 {
     struct stat sb;
-    size_t len = strlen(ds_file) + strlen(WORDLIST) + 2;
-    ds_path = xmalloc(len);
 
-    build_wordlist_path(ds_path, len, ds_file);
-
-    if (stat(ds_path, &sb) != 0) {
+    if (stat(path, &sb) != 0) {
 	fprintf(stderr, "Error accessing file or directory '%s'.\n", ds_path);
 	if (errno != 0)
 	    fprintf(stderr, "error #%d - %s.\n", errno, strerror(errno));
@@ -1716,12 +1712,16 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     /* directories from command line and config file are already handled */
     if (ds_flag == DS_DSK) {
+	size_t len;
 	if (ds_file == NULL)
 	    ds_file = get_directory(PR_ENV_BOGO);
 	if (ds_file == NULL)
 	    ds_file = get_directory(PR_ENV_HOME);
 	set_bogohome(ds_file);
-	check_wordlist_path();
+	len = strlen(ds_file) + strlen(WORDLIST) + 2;
+	ds_path = xmalloc(len);
+	build_wordlist_path(ds_path, len, ds_file);
+	check_wordlist_path(ds_file);
 	env = ds_init(bogohome);
     }
 
