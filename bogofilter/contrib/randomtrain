@@ -13,7 +13,7 @@
 BOGOFILTER="bogofilter"
 
 function usage() {
-    name=`basename $0`
+    name=$(basename $0)
     echo "Usage: $name [-d bogodir] [-p pid] [-c cfg] [-]n|s filename [-]n|s filename [...]"
     echo "       Messages contained in the files are fed to bogofilter"
     echo "       in random order.  If bogofilter is wrong or uncertain"
@@ -42,7 +42,7 @@ function train_mbox() {
     while read expect fnam offset length; do
 	let cnt=cnt+1
 	dd if=$fnam bs=1 skip=$offset count=$length 2>/dev/null >msg.$pid
-	result=`$BOGOFILTER -t -v -d $bogodir $cfg -I msg.$pid`
+	result=$($BOGOFILTER -t -v -d $bogodir $cfg -I msg.$pid)
 	got=$?	# 0=spam, 1=ham, 2=unsure, 3=err
 	if [ "$expect" = "s" ]; 
 	then let nspam=$nspam+1
@@ -56,7 +56,7 @@ function train_mbox() {
 	    $BOGOFILTER -$expect $cfg -d $bogodir -I msg.$pid
 	fi
 #	echo $expect $got $result, $nspam $rspam, $ngood $rgood
-	n=`expr \( $nspam + $ngood \) % 10`
+	n=$(expr \( $nspam + $ngood \) % 10)
 	test $n -eq 0 && \
 	    printf "\r%5d%5d  %5d%5d " $nspam $rspam $ngood $rgood
     done
@@ -70,7 +70,7 @@ function train_maildir() {
     echo " spam  reg   good  reg"
     while read expect fnam; do
 	let cnt=cnt+1
-	result=`$BOGOFILTER -t -v -d $bogodir $cfg -I $fnam`
+	result=$($BOGOFILTER -t -v -d $bogodir $cfg -I $fnam)
 	got=$?	# 0=spam, 1=ham, 2=unsure, 3=err
 	if [ "$expect" = "s" ]; 
 	then let nspam=$nspam+1
@@ -84,7 +84,7 @@ function train_maildir() {
 	    $BOGOFILTER -$expect $cfg -d $bogodir -I $fnam
 	fi
 #	echo $expect $got $result, $nspam $rspam, $ngood $rgood
-	n=`expr \( $nspam + $ngood \) % 10`
+	n=$(expr \( $nspam + $ngood \) % 10)
 	test $n -eq 0 && \
 	    printf "\r%5d%5d  %5d%5d " $nspam $rspam $ngood $rgood
     done

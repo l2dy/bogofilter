@@ -73,15 +73,15 @@ shift (@ARGV) if ($commandlineoptions);
 my ($dir,$ham,$spam,$options) = @ARGV;
 $bogofilter.=" $options -d $dir";
 die ("$dir is not a directory or not accessible.\n") unless (-d $dir && -r $dir && -w $dir && -x $dir);
-`$bogofilter -n < /dev/null` unless (-s "$dir/goodlist.db" || -s "$dir/wordlist.db");
-my $ham_total=`cat $ham|grep -c "^From "`;
-my $spam_total=`cat $spam|grep -c "^From "`;
+qx($bogofilter -n < /dev/null) unless (-s "$dir/goodlist.db" || -s "$dir/wordlist.db");
+my $ham_total=qx(cat $ham|grep -c "^From ");
+my $spam_total=qx(cat $spam|grep -c "^From ");
 my ($fp,$fn,$hamadd,$spamadd,%trainedham,%trainedspam);
 my $runs=0;
 my @status=("S","H","U","E");
 
 print "\nStarting with this database:\n";
-print `$bogoutil -w $dir .MSG_COUNT`,"\n";
+print qx($bogoutil -w $dir .MSG_COUNT),"\n";
 
 do { # Start force loop
   $runs++;
@@ -168,11 +168,11 @@ do { # Start force loop
   print "\nEnd of run #$runs:\n";
   print "Read $hamcount ham mail",$hamcount!=1&&"s"," and $spamcount spam mail",$spamcount!=1&&"s",".\n";
   print "Added $hamadd ham mail",$hamadd!=1&&"s"," and $spamadd spam mail",$spamadd!=1&&"s"," to the database.\n";
-  print `$bogoutil -w $dir .MSG_COUNT`;
+  print qx($bogoutil -w $dir .MSG_COUNT);
   unless ($runs>1 && $hamadd+$spamadd==0) {
-    $fn=$spamcount>0 && `cat $spam | $bogofilter -TM | grep -cv ^S` || "0\n";
+    $fn=$spamcount>0 && qx(cat $spam | $bogofilter -TM | grep -cv ^S) || "0\n";
     print "\nFalse negatives: $fn";
-    $fp=$hamcount>0 && `cat $ham | $bogofilter -TM | grep -cv ^H` || "0\n";
+    $fp=$hamcount>0 && qx(cat $ham | $bogofilter -TM | grep -cv ^H) || "0\n";
     print "False positives: $fp\n";
   }
 } until ($fn+$fp==0 || $hamadd+$spamadd==0 || !$force);

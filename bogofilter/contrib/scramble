@@ -18,7 +18,7 @@ mbox=1		# mbox mode
 mdir=2		# maildir mode
 
 function usage() {
-    iam=`basename $0`
+    iam=$(basename $0)
     echo "Usage: $iam separator [-l] [-c classID] filename/directory [...]"
     echo "       Files contain entries, each of which begins with"
     echo "       text matching the separator.  Entries are listed or"

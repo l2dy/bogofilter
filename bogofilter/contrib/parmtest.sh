@@ -43,12 +43,12 @@ BOGOFILTER_DIR="$TEST_DIR"
 export BOGOFILTER_DIR
 
 #specify files for creating the test wordlists
-SPAM_TRAIN=`ls spam_train*mbx`
-GOOD_TRAIN=`ls good_train*mbx`
+SPAM_TRAIN=$(ls spam_train*mbx)
+GOOD_TRAIN=$(ls good_train*mbx)
 
 #specify files for testing
-SPAM_TEST=`ls spam_test*mbx`
-GOOD_TEST=`ls good_test*mbx`
+SPAM_TEST=$(ls spam_test*mbx)
+GOOD_TEST=$(ls good_test*mbx)
 
 #specify names of tests to run
 TESTS="default tag_header_lines"
@@ -118,14 +118,14 @@ EOF
 	list="$SPAM_TEST $GOOD_TEST"
 
 	for mbox in $list ; do
-	    b=`basename $mbox`
+	    b=$(basename $mbox)
 	    f="$test.$b.out"
 	    cat /dev/null > $f
 	    FILENO=0000 formail -s $0 $cfg $f < $mbox
-	    s=`grep "^S" $f | wc -l`
-	    h=`grep "^H" $f | wc -l`
-	    u=`grep "^U" $f | wc -l`
-	    printf "%-20s %4d %4d %4d\n" `basename $f` $s $h $u
+	    s=$(grep "^S" $f | wc -l)
+	    h=$(grep "^H" $f | wc -l)
+	    u=$(grep "^U" $f | wc -l)
+	    printf "%-20s %4d %4d %4d\n" $(basename $f) $s $h $u
 	done
 
 	echo ""
@@ -134,7 +134,7 @@ else
     cfg="$1"
     out="$2"
     cat > $$.tmp
-    result=`$BOGOFILTER -t -v -c $cfg < $$.tmp | head -1`
-    echo $result  $FILENO  `grep ^Subject: $$.tmp | head -1` >> $out
+    result=$($BOGOFILTER -t -v -c $cfg < $$.tmp | head -1)
+    echo $result  $FILENO  $(grep ^Subject: $$.tmp | head -1) >> $out
     rm -f $$.tmp
 fi
