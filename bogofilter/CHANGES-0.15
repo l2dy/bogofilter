@@ -4,7 +4,7 @@
 
 $Id$
      
-	2003-10-28
+0.15.8	2003-10-29
 
 	* Print "X-Bogosity" line when "-t" is used alone.
 	* Modified handling of mime attachments to decode rfc822 and
@@ -25,7 +25,7 @@ $Id$
 
 	2003-10-21
 
-	* Configure modified to better detect BerkeleyDB libs.
+	* Configure script modified to better detect BerkeleyDB libs.
 	* Makefile modified to build bogolexer and bogoutil with fewer
 	  shared libs.
 

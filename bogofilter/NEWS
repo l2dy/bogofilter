@@ -5,6 +5,38 @@
 NOTE: More information on important changes for bogofilters updaters
 is in the RELEASE.NOTES files.  Read it!!
 
+If updating from a bogofilter version older than 0.15.4, it's a good
+idea to retrain or else use the '-H' (header tag degeneration) option.
+
+0.15.8	2003-10-29
+
+	* Print "X-Bogosity" line when "-t" is used alone.
+	* Modified handling of mime attachments to decode rfc822 and
+	  to discard applications and images.
+
+	2003-10-27
+
+	* Change bogoupgrade back to using 2 arg open for perl-5.6
+          compatibility.
+
+	2003-10-26
+
+	* Added man page for bogotune.
+
+	2003-10-23
+
+	* Initial release of faster, C language version of bogotune.
+
+	2003-10-21
+
+	* Configure script modified to better detect BerkeleyDB libs.
+	* Makefile modified to build bogolexer and bogoutil with fewer
+	  shared libs.
+
+	2003-10-19
+
+	* Added decoding of percent escaped characters in URLs.
+
 	2003-10-16
 
 	* English and french versions of bogofilter-faq.html revised.

@@ -2,16 +2,23 @@
 				BOGOFILTER NEWS
 			       =================
 
-Be sure to read RELEASE.NOTES-0.15 ...
+Be sure to read RELEASE.NOTES-0.15, with attention to the section
+about retraining and the '-H' flag...
 
-2003-10-23
+0.15.8	2003-10-29
 
-* Script tuning/bogotune rewritten as C program.
+* Modified handling of mime attachments to decode rfc822 and to
+  discard applications and images.
 * Added decoding of percent escaped characters in URLs.
+* Script tuning/bogotune rewritten as C program.
+* Added man page for bogotune.
+* Print "X-Bogosity" line when "-t" is used alone.
+* Change bogoupgrade back to using 2 arg open for perl-5.6
+  compatibility.
+* Initialize wordhash storage.
 * Fix initialization problem that prevents reading more than
   one msg-count file.
-* Initialize wordhash storage.
-* Configure modified to better detect BerkeleyDB libs.
+* Configure script modified to better detect BerkeleyDB libs.
 * Makefile modified to build bogolexer and bogoutil with fewer
   shared libs.
 * Fix build problem in doc directory.
