@@ -2,6 +2,14 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.91.3	2004-06-??
+	
+* Added format specification '%I' to allow logging of the IP
+  address from which an email was received.
+
+* Avoid "Invalid buffer size, exiting." problems by discarding
+  text from an excessively long html tag.
+
 0.91.2	2004-06-11
 
 * FAQ updated with info on multiple wordlists and ignore

@@ -5,6 +5,18 @@
 NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+0.91.3	2004-06-??
+
+	2004-06-14
+
+	* Added format specification '%I' to allow logging of the IP
+	  address from which an email was received.
+
+	2004-06-13
+
+	* Avoid "Invalid buffer size, exiting." problems by discarding
+	  text from an excessively long html tag.
+
 0.91.2	2004-06-11
 
 	* Bogofilter's creation of new wordlists now includes
