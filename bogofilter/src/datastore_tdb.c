@@ -218,8 +218,8 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
     ret = tdb_store(dbp, db_key, db_data, TDB_REPLACE);
 
     if (ret != 0) {
-	print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%*s' ), err: %d, %s",
-		    token->size, (char *)token->data, ret, tdb_errorstr(dbp));
+	print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%.*s' ), err: %d, %s",
+		    CLAMP_INT_MAX(token->size), (char *)token->data, ret, tdb_errorstr(dbp));
 	exit(EX_ERROR);
     }
 

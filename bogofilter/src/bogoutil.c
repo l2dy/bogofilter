@@ -69,8 +69,8 @@ int ds_dump_hook(word_t *key, dsv_t *data,
     if (replace_nonascii_characters)
 	do_replace_nonascii_characters(key->text, key->leng);
 
-    printf( "%*s %lu %lu", 
-	    (int)min(INT_MAX, key->leng), key->text,
+    printf( "%.*s %lu %lu",
+	    CLAMP_INT_MAX(key->leng), key->text,
 	    (unsigned long)data->spamcount,
 	    (unsigned long)data->goodcount);
     if (data->date)

@@ -45,10 +45,10 @@ static void robx_accum(rhd_t *rh,
     /* print if -vvv and token in both word lists, or -vvvv */
     if ((verbose > 2 && doit) || verbose > 3) {
 	fprintf(dbgout, "cnt: %4lu,  sum: %11.6f,  ratio: %9.6f,"
-		"  sp: %3lu,  gd: %3lu,  p: %9.6f,  t: %*s\n", 
+		"  sp: %3lu,  gd: %3lu,  p: %9.6f,  t: %.*s\n", 
 		(unsigned long)rh->count, rh->sum, rh->sum / rh->count,
 		(unsigned long)spamness, (unsigned long)goodness, prob,
-		(int)min(INT_MAX,key->leng), key->text);
+		CLAMP_INT_MAX(key->leng), key->text);
     }
 }
 

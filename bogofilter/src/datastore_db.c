@@ -391,8 +391,9 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
     ret = dbp->get(dbp, NULL, &db_key, &db_data, 0);
 
     if (val->size < db_data.size) {
-	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%s' ), size error %d::%d",
-		    (char *)token->data, val->size, db_data.size);
+	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%s' ), size error %lu::%lu",
+		    (char *)token->data, (unsigned long)val->size,
+		    (unsigned long)db_data.size);
 	exit(EX_ERROR);
     }
 
@@ -404,13 +405,13 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
     case DB_NOTFOUND:
 	ret = DS_NOTFOUND;
 	if (DEBUG_DATABASE(3)) {
-	    fprintf(dbgout, "db_get_dbvalue: [%*s] not found\n", 
-		    token->leng, (char *) token->data);
+	    fprintf(dbgout, "db_get_dbvalue: [%.*s] not found\n", 
+		    CLAMP_INT_MAX(token->leng), (char *) token->data);
 	}
 	break;
     default:
-	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%*s' ), err: %d, %s", 
-		    token->leng, (char *) token->data, ret, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%.*s' ), err: %d, %s", 
+		    CLAMP_INT_MAX(token->leng), (char *) token->data, ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
 
@@ -442,8 +443,8 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
     ret = dbp->put(dbp, NULL, &db_key, &db_data, 0);
 
     if (ret != 0) {
-	print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%*s' ), err: %d, %s", 
-		    token->size, (char *)token->data, ret, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%.*s' ), err: %d, %s", 
+		    CLAMP_INT_MAX(token->size), (char *)token->data, ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
 
