@@ -7,6 +7,22 @@ is in the RELEASE.NOTES files.  Read them!!
 
 0.92.5	2004-08-??
 
+	2004-08-17
+
+	* Expanded discussion of long options in bogofilter's man page.
+
+	2004-08-16
+
+	* Added "-QQ" option to bogofilter to display extended
+          parameter list.
+
+	2004-08-15
+
+	* Documentation update.  Sample configure commands now use
+	  option --with-libdb-prefix rather than obsolete --with-db.
+	* Added "--wordlist" to bogofilter's help output.
+	* Minor clean-ups for bogofilter's help output.
+
 	2004-08-10
 
 	* Improve documentation of '-B' and '-y' options.
