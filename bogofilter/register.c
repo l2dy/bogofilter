@@ -149,10 +149,12 @@ void register_messages(run_t _run_type)
   initialize_constants();
 
   do {
+    msgcount++;
+    if (DEBUG_REGISTER(1))
+	fprintf(dbgout, "Message #%ld\n", msgcount);
     collect_words(&h, &wordcount, &cont);
     add_hash(words, h);
     wordhash_free(h);
-    msgcount++;
     totalwords += wordcount;
   } while(cont);
 
