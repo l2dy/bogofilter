@@ -8,7 +8,7 @@ while : ; do
   sleep 1
 done
 
-trap "rm -r -f ${TMPDIR} core" 0
+trap "if test x$SUPPRESS_DELETE = x ; then rm -r -f core ${TMPDIR} ; else echo remove ${TMPDIR} and possibly core yourself ; fi" 0
 BOGOFILTER_DIR=$TMPDIR
 export BOGOFILTER_DIR
 ../bogofilter -n </dev/null
