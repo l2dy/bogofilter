@@ -133,7 +133,7 @@ static int load_wordlist(const char *ds_file)
 
     memset(buf, '\0', BUFSIZE);
 
-    if (ds_txn_begin(dbe))
+    if (DST_OK != ds_txn_begin(dbe))
 	exit(EX_ERROR);
 
     for (;;) {
