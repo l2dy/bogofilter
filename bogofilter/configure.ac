@@ -243,7 +243,7 @@ AM_CONDITIONAL(ENABLE_ROBINSON_FISHER, test x$USE_FISHER != xNO)
 
 # Enable building with memory usage debugging files.
 
-if test x$USE_MEMDEBUG == xYES ; then
+if test x$USE_MEMDEBUG = xYES ; then
 	AC_DEFINE(ENABLE_MEMDEBUG,1,
 	[Enable memory usage debugging])
 fi
