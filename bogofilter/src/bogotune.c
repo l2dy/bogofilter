@@ -1708,11 +1708,11 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	if (ds_path == NULL)
 	    ds_path = get_directory(PR_ENV_HOME);
 
-//	check_wordlist_path(ds_path);
+/*	check_wordlist_path(ds_path); */
 	set_bogohome(ds_path);
 
-//	bfp = bfpath_create(ds_file);
-//	fprintf(dbgout, "bf_create( %s )\n", ds_path);
+/*	bfp = bfpath_create(ds_file);
+    	fprintf(dbgout, "bf_create( %s )\n", ds_path); */
 	bfp = bfpath_create(ds_path);
 
 	if (!bfpath_check_mode(bfp, BFP_MUST_EXIST)) {
