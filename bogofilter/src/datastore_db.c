@@ -667,8 +667,6 @@ int db_init(void) {
     char *t;
     int cdb_alldb = 1;
 
-    assert(bogohome);
-
     if (bogohome && getenv("BOGOFILTER_CONCURRENT_DATA_STORE")) {
 	int ret = db_env_create(&dbe, 0);
 	if (ret != 0) {
