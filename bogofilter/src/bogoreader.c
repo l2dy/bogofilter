@@ -162,7 +162,7 @@ static bool reader__next_mail(void)
 
 	/* mailstore_next_store opens the mailstore */
 	if (!mailstore_next_store())
-	    return NULL;
+	    return false;
 
 	/* ok, we have more mailstores, so check if the current mailstore has
 	 * input - loop.
