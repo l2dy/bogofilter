@@ -14,26 +14,23 @@ set -e
 : ${BF_TESTDIR=.}
 
 if [ -z "$RUN_FROM_MAKE" ] ; then
+# standalone, from shell directly
+# THIS IS PRONE TO RACES
    NAME=`basename $0 | sed s@^t\.@@`
    DATE=`date +"%Y%m%d"`
    TMPDIR="${BF_TESTDIR}/$NAME.$DATE"
-   rm -rf $TMPDIR
-   mkdir  $TMPDIR
    SUPPRESS_DELETE="NO"
 else
-#   SUPPRESS_DELETE=NO
+# automated, from make
     while : ; do
 	TMPDIR=${BF_TESTDIR}/checks.$$.`date +"%Y%m%dT%H%M%S"`
 	if test x$SUPPRESS_DELETE = xNO ; then TMPDIR=${BF_TESTDIR}/outputs.`date +"%m%d"` ; fi
-	if [ ! -d $TMPDIR ] ; then
-	    mkdir $TMPDIR
-	else
-	    rm -rf $TMPDIR/*
-	fi
-        [ -d $TMPDIR ] && break
+        mkdir $TMPDIR && break || :
 	sleep 1
     done
 fi
+rm -rf $TMPDIR
+mkdir $TMPDIR
 
 if test "x$SUPPRESS_DELETE" = "x" ; then
     trap "rm -r -f core ${TMPDIR}" 0
