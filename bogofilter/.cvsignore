@@ -19,6 +19,7 @@ bogoutil
 bogoutil.1
 bogoutil.html
 bogoutil.pdf
+bogowordfreq
 config.cache
 config.h
 config.in
@@ -28,11 +29,10 @@ configtest
 configure
 cscope.out
 debugtest
+directories.c
 find_home.test
 lexer.c
 stamp-h.in
 stamp-h1
-version.h
+version.c
 wordhash
-directories.h
-bogowordfreq
