@@ -196,6 +196,134 @@ int display_words(char *db_file)
     return rv;
 }
 
+double compute_robx( dbh_t *dbh_spam, dbh_t *dbh_good )
+{
+    DBT    key, data;
+    int    ret = 0;
+    int    word_cnt = 0;
+    double sum = 0.0;
+    double robx;
+
+    DBC  dbc_spam;
+    DBC *dbcp_spam = &dbc_spam;
+    DBC  dbc_good;
+    DBC *dbcp_good = &dbc_good;
+
+    double scalefactor;
+    int msg_good, msg_spam;
+
+    msg_good = db_getvalue( dbh_good, ".MSG_COUNT" );
+    msg_spam = db_getvalue( dbh_spam, ".MSG_COUNT" );
+    scalefactor = (double) msg_spam / (double) msg_good;
+
+    memset(&key, 0, sizeof(DBT));
+    memset(&data, 0, sizeof(DBT));
+
+    if ((ret = dbh_good->dbp->cursor(dbh_good->dbp, NULL, &dbcp_good, 0) != 0)) {
+	dbh_good->dbp->err(dbh_good->dbp, ret, PROGNAME " (cursor): %s", "dbh_good->file");
+	return 2;
+    }
+
+    for (;;) {
+	ret = dbcp_good->c_get(dbcp_good, &key, &data, DB_NEXT);
+	if (ret == 0) {
+	    word_cnt += 1;		// count words in good list
+	}
+	else if (ret == DB_NOTFOUND) {
+	    break;
+	}
+	else {
+	    dbh_good->dbp->err(dbh_spam->dbp, ret, PROGNAME " (c_get)");
+	    ret = 2;
+	    break;
+	}
+    }
+    dbcp_good->c_close(dbcp_good);
+
+    if ((ret = dbh_spam->dbp->cursor(dbh_spam->dbp, NULL, &dbcp_spam, 0) != 0)) {
+	dbh_spam->dbp->err(dbh_spam->dbp, ret, PROGNAME " (cursor): %s", "dbh_spam->file");
+	return 2;
+    }
+
+    for (;;) {
+	ret = dbcp_spam->c_get(dbcp_spam, &key, &data, DB_NEXT);
+	if (ret == 0) {
+	    unsigned long goodness;
+	    unsigned long spamness;
+	    double        prob;
+	    char         *token = key.data;
+	    token[key.size] = '\0';
+
+	    // ignore system meta-data
+	    if ( *token == '.')
+		continue;
+
+	    spamness = *(unsigned long *) data.data;
+	    goodness = db_getvalue(dbh_good, token);
+
+	    prob = spamness / (goodness*scalefactor + spamness);
+	    sum += prob;
+
+	    // tokens in good list were already counted
+	    // now add in tokens only in spam list
+	    if (goodness == 0)
+		word_cnt += 1;
+
+	    // print if token in both word lists
+	    if (verbose > 1 && (goodness && spamness))
+		printf("cnt: %6d,  sum: %12.6f,  ratio: %f,  sp: %4lu,  gd: %4lu,  p: %f,  t: %s\n", word_cnt, sum, sum/word_cnt, spamness, goodness, prob, token);
+	}
+	else if (ret == DB_NOTFOUND) {
+	    break;
+	}
+	else {
+	    dbh_spam->dbp->err(dbh_spam->dbp, ret, PROGNAME " (c_get)");
+	    ret = 2;
+	    break;
+	}
+    }
+    dbcp_spam->c_close(dbcp_spam);
+
+    robx = sum/word_cnt;
+    if (verbose)
+	printf( ".MSG_COUNT: %d, %d, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
+		msg_spam, msg_good, scalefactor, sum, (int)word_cnt, robx);
+
+    return robx;
+}
+
+int compute_robinson_x(char *path)
+{
+    dbh_t *dbh_good;
+    dbh_t *dbh_spam;
+
+    char db_good_file[PATH_LEN];
+    char db_spam_file[PATH_LEN];
+
+    double robx;
+
+    sprintf( db_spam_file, "%s/%s", path, "spamlist.db" );
+    sprintf( db_good_file, "%s/%s", path, "goodlist.db" );
+
+    dbh_good = db_open(db_good_file, "good", DB_READ);
+    dbh_spam = db_open(db_spam_file, "spam", DB_WRITE);
+
+    db_lock_reader(dbh_good);
+    db_lock_writer(dbh_spam);
+
+    robx = compute_robx( dbh_spam, dbh_good );
+
+    db_setvalue( dbh_spam, ".ROBX", (int) (robx * 1000000) );
+
+    db_lock_release(dbh_spam);
+    db_close(dbh_spam);
+
+    db_lock_release(dbh_good);
+    db_close(dbh_good);
+
+    return 0;
+}
+
 void version(void)
 {
     fprintf(stderr,
@@ -209,7 +337,7 @@ void version(void)
 
 void usage(void)
 {
-    fprintf(stderr, "Usage: %s { -d | -l | -w } [ -v ] file.db | [ -h | -V ]\n", PROGNAME);
+    fprintf(stderr, "Usage: %s { -d | -l | -w } [ -v ] file.db | -R directory | [ -h | -V ]\n", PROGNAME);
 }
 
 void help(void)
@@ -221,6 +349,7 @@ void help(void)
 	    "\t-w\tDisplay counts for words from stdin.\n"
 	    "\t-v\tOutput debug messages.\n"
 	    "\t-h\tPrint this message.\n"
+	    "\t-R\tCompute Robinson's X for specified directory.\n"
 	    "\t-V\tPrint program version.\n"
 	    PROGNAME " is part of the bogofilter package.\n");
 }
@@ -234,7 +363,7 @@ int main(int argc, char *argv[])
     char ch;
     cmd_t flag = NONE;
 
-    while ((ch =getopt(argc, argv, "d:l:w:hvVx:")) != -1)
+    while ((ch = getopt(argc, argv, "d:l:w:R:hvVx:")) != -1)
 	switch (ch) {
 	case 'd':
 	    flag = DUMP;
@@ -254,22 +383,28 @@ int main(int argc, char *argv[])
 	    db_file = (char *) optarg;
 	    break;
 
-	case 'h':
-	    help();
-	    usage();
-	    exit(0);
-
-	case 'x':
-	    set_debug_mask( argv[optind] );
+	case 'R':
+	    flag = ROBX;
+	    count += 1;
+	    db_file = (char *) optarg;
 	    break;
 
 	case 'v':
 	    verbose++;
 	    break;
 
+	case 'h':
+	    help();
+	    usage();
+	    exit(0);
+
 	case 'V':
 	    version();
 	    exit(0);
+
+	case 'x':
+	    set_debug_mask( (char *) optarg );
+	    break;
 
 	default:
 	    usage();
@@ -295,6 +430,8 @@ int main(int argc, char *argv[])
 	    return load_file(db_file);
 	case WORD:
 	    return display_words(db_file);
+	case ROBX:
+	    return compute_robinson_x(db_file);
 	case NONE:
 	default:
 	    /* should have been handled above */
