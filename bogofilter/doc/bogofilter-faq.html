@@ -19,11 +19,16 @@ bogofilter.
   <li><a href="#history">Bogofilter History</a></li>
   <li><a href="#lists">Bogofilter Mailing Lists</a></li>
   <li><a href="#home_page">Bogofilter Home Page</a></li>
+  <li><a href="#token_counts">How do I find the spam and ham counts for a token?</a></li>
+  <li><a href="#message_count">How do I tell how many messages are in my wordlists?</a></li>
+  <li><a href="#wordlist_size">How do I tell how many tokens are in my wordlists?</a></li>
   <li><a href="#port_notes">How do I get Bogofilter working on Solaris, BSD, etc.?</a></li>
   <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
+  <li><a href="#return_codes">Why does bogofilter give return codes like 0 and 256 when it's run from inside a program?</a></li>
   <li>How can I use SpamAssasin to train Bogofilter? (coming soon)</li>
 </ul>
 </p>
+
 <hr>
 <a name="what_is_bogofilter"></a>
 <p><b>What is bogofilter?</b></p>
@@ -85,6 +90,27 @@ There are currently four mailing lists for bogofilter
 The <a href="http://bogofilter.sourceforge.net">bogofilter home page</a> at
 sourceforge is the central clearinghouse for bogofilter resources.
 </p>
+
+<hr>
+<a name="token_counts"></a>
+<p><b>How do I find the spam and ham counts for a token?</b></p>
+<p>
+ Use bogoutil's '-w' option to display info about a token (word).  For example, "bogoutil -d $BOGOFILTER_DIR example.com" gives the good and bad counts for "example.com".
+ </p>
+
+<hr>
+<a name="message_count"></a>
+<p><b>How do I tell how many messages are in my wordlists?</b></p>
+<p>
+ Use bogoutil's '-w' option to display the value of special token .MSG_COUNT, i.e. run command "bogoutil -w $BOGOFILTER_DIR .MSG_COUNT" to see the counts for the spam and ham wordlists.
+ </p>
+
+<hr>
+<a name="wordlist_size"></a>
+<p><b>How do I tell how many tokens are in my wordlists?</b></p>
+<p>
+ Pipe the output of bogoutil's dump command to command "wc", i.e. use "bogoutil -d $BOGOFILTER_DIR/spamlist.db | wc -l " to display the count for the spamlist and use "bogoutil -d $BOGOFILTER_DIR/goodlist.db | wc -l " to display the count for the goodlist.
+ </p>
 
 <hr>
 <a name="port_notes"></a>
@@ -169,6 +195,13 @@ Next, make sure you have NFS set up properly, with "lockd" running. Refer
 to your NFS documentation for more information about running "lockd" or
 "rpc.lockd". Most operating systems with NFS turn this on by default.
 </p>
+
+<hr>
+<a name="return_codes"></a>
+<p><b>Why does bogofilter give return codes like 0 and 256 when it's run from inside a program?</b></p>
+<p>
+ Likely the return codes are being reformatted by waitpid(2).  Use WEXITSTATUS(status) in sys/wait.h, or comparable macro, to get the correct value.
+ </p>
 
 <hr>
 $Id$
