@@ -25,6 +25,10 @@ extern FIELD *spamicity_formats;
 extern const parm_desc format_parms[];
 extern void set_terse_mode_format(int mode);
 
+extern bool set_spamicity_tags(const char *val);
+extern bool set_spamicity_formats(const char *val);
+extern bool set_spamicity_fields(FIELD *strings, const char *val);
+
 /* Function Prototypes */
 
 extern char *format_header(char *buff, size_t size);

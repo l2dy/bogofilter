@@ -36,7 +36,7 @@ static int maintain_wordlist(void *vhandle);
 /* Function Definitions */
 
 /* Keep high counts */
-bool keep_count(uint32_t count)
+static bool keep_count(uint32_t count)
 {
     bool ok = count > thresh_count;
     if (count > 0 && DEBUG_DATABASE(1))
@@ -47,32 +47,47 @@ bool keep_count(uint32_t count)
 }
 
 /* Keep recent dates */
-bool keep_date(YYYYMMDD date)
+static bool keep_date(YYYYMMDD date)
 {
-    if (thresh_date == 0 || date == 0 || date == today)
-	return true;
-    else {
-	bool ok = thresh_date < date;
-	if (DEBUG_DATABASE(1))
-	    fprintf(dbgout, "keep_date: %ld < %ld -> %c\n",
-		    (long)thresh_date, (long)date, ok ? 't' : 'f' );
-	return ok;
-    }
+    bool ok = thresh_date < date;
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "keep_date: %ld < %ld -> %c\n",
+		(long)thresh_date, (long)date, ok ? 't' : 'f' );
+    return ok;
 }
 
 /* Keep sizes within bounds */
-bool keep_size(size_t size)
+static bool keep_size(size_t size)
 {
-    if (size_min == 0 || size_max == 0)
-	return true;
-    else {
-	bool ok = (size_min <= size) && (size <= size_max);
-	if (DEBUG_DATABASE(1))
-	    fprintf(dbgout, "keep_size:  %lu <= %lu <= %lu -> %c\n", 
-		    (unsigned long)size_min, (unsigned long)size, (unsigned long)size_max, 
-		    ok ? 't' : 'f' );
-	return ok;
+    bool ok = (size_min <= size) && (size <= size_max);
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "keep_size:  %lu <= %lu <= %lu -> %c\n", 
+		(unsigned long)size_min, (unsigned long)size, (unsigned long)size_max, 
+		ok ? 't' : 'f' );
+    return ok;
+}
+
+/* Keep token if at least one user given constraint should be kept */
+/* Discard if all user given constraints are satisfied */
+
+bool discard_token(word_t *token, dsv_t *in_val)
+{
+    bool discard;
+ 
+    discard = (thresh_count != 0) || (thresh_date != 0) || (size_min != 0) || (size_max != 0);
+
+    if (discard) {
+	if (thresh_count != 0 &&
+	    (keep_count(in_val->spamcount) || keep_count(in_val->goodcount)))
+	    discard = false;
+	if (thresh_date != 0 && keep_date(in_val->date))
+	    discard = false;
+	if ((size_min != 0 || size_max != 0) &&
+	    keep_size(token->leng))
+	    discard = false;
     }
+
+    return discard;
 }
 
 bool do_replace_nonascii_characters(register byte *str, register size_t len)
@@ -137,8 +152,7 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 	strncmp((char *)token.text, MSG_COUNT, token.leng) == 0)
 	return EX_OK;
 
-    if ((!keep_count(in_val->spamcount) && !keep_count(in_val->goodcount)) || 
-	!keep_date(in_val->date) || !keep_size(token.leng)) {
+    if (discard_token(&token, in_val)) {
 	int ret = ta_delete(transaction, vhandle, &token);
 	if (DEBUG_DATABASE(0))
 	    fprintf(dbgout, "deleting '%.*s'\n", (int)min(INT_MAX, token.leng), (char *)token.text);

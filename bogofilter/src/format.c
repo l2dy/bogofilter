@@ -85,9 +85,9 @@ static FIELD spamicity_format_d[RC_COUNT] = { "%0.6f", "%0.6f", "%0.6f" };
 FIELD  *spamicity_tags    = spamicity_tags_ynu;
 FIELD  *spamicity_formats = spamicity_format_d;
 
-static bool set_spamicity_tags(const unsigned char *val);
-static bool set_spamicity_formats(const unsigned char *val);
-static bool set_spamicity_fields(FIELD *strings, const char *val);
+bool set_spamicity_tags(const char *val);
+bool set_spamicity_formats(const char *val);
+bool set_spamicity_fields(FIELD *strings, const char *val);
 
 /* Descriptors for config file */
  
@@ -145,7 +145,7 @@ void set_terse_mode_format(int mode)
 }
 
 /* any fields omitted will retain their original value */
-static bool set_spamicity_fields(FIELD *fields, const char *val)
+bool set_spamicity_fields(FIELD *fields, const char *val)
 {
     size_t i;
     /* dup the value string and break it up */
@@ -159,15 +159,15 @@ static bool set_spamicity_fields(FIELD *fields, const char *val)
     return true;
 }
 
-static bool set_spamicity_tags(const unsigned char *val)
+bool set_spamicity_tags(const char *val)
 {
-    bool ok = set_spamicity_fields(spamicity_tags, (const char *)val);
+    bool ok = set_spamicity_fields(spamicity_tags, val);
     return ok;
 }
 
-static bool set_spamicity_formats(const unsigned char *val)
+bool set_spamicity_formats(const char *val)
 {
-    bool ok = set_spamicity_fields(spamicity_formats, (const char *)val);
+    bool ok = set_spamicity_fields(spamicity_formats, val);
     return ok;
 }
 

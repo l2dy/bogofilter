@@ -5,6 +5,8 @@
 
 #include <time.h>
 
+#include "datastore.h"
+
 #define	AGE_IS_YDAY
 #undef	AGE_IS_YDAY
 #undef	AGE_IS_YYYYMMDD
@@ -20,9 +22,8 @@ extern	bool     replace_nonascii_characters;
 void maintain_wordlists(void);
 int  maintain_wordlist_file(const char *db_file);
 
-bool keep_date(YYYYMMDD dat);
-bool keep_count(uint32_t cnt);
-bool keep_size(size_t siz);
+bool discard_token(word_t *token, dsv_t *info);
+
 bool do_replace_nonascii_characters(byte *, size_t);
 
 void set_today(void);

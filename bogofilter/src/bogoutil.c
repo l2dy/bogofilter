@@ -52,10 +52,7 @@ static int ds_dump_hook(word_t *key, dsv_t *data,
 
     token_count += 1;
 
-    if (maintain &&
-	((!keep_count(data->goodcount) && !keep_count(data->spamcount)) ||
-	 !keep_date(data->date) ||
-	 !keep_size(key->leng)))
+    if (maintain && discard_token(key, data))
 	return 0;
 
     if (replace_nonascii_characters)
@@ -168,24 +165,24 @@ static int load_file(const char *ds_file)
 
 	if (replace_nonascii_characters)
 	    do_replace_nonascii_characters(buf, len);
-	if (maintain &&
-	    ((!keep_count(goodcount) && !keep_count(spamcount)) ||
-	     !keep_date(date) || 
-	     !keep_size(strlen((const char *)buf))))
-	    continue;
+ 
+ 	token = word_new(buf, len);
+	data.goodcount = goodcount;
+	data.spamcount = spamcount;
+	data.date = date;
 
-	load_count += 1;
-
-	/* Slower, but allows multiple lists to be concatenated */
-	set_date(date);
-
-	token = word_new(buf, len);
-	ds_read(dsh, token, &data);
-	data.spamcount += spamcount;
-	data.goodcount += goodcount;
-	ds_write(dsh, token, &data);
+	if (! (maintain && discard_token(token, &data))) {
+	    load_count += 1;
+	    /* Slower, but allows multiple lists to be concatenated */
+	    set_date(date);
+	    ds_read(dsh, token, &data);
+	    data.spamcount += spamcount;
+	    data.goodcount += goodcount;
+	    ds_write(dsh, token, &data);
+	}
 	word_free(token);
     }
+
     ds_close(dsh, false);
 
     if (verbose)
@@ -231,8 +228,8 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     buff_t *buff = buff_new(buf, 0, BUFSIZE);
     const byte *word = buf;
 
-    const char *head_format = !show_probability ? "%-30s %6s %6s\n"   : "%-30s %6s  %6s  %6s  %6s\n";
-    const char *data_format = !show_probability ? "%-30s %6lu %6lu\n" : "%-30s %6lu  %6lu  %f  %f\n";
+    const char *head_format = !show_probability ? "%-30s %6s %6s\n"   : "%-30s %6s  %6s  %6s\n";
+    const char *data_format = !show_probability ? "%-30s %6lu %6lu\n" : "%-30s %6lu  %6lu  %f\n";
 
     void *dsh = NULL; /* initialize to silence bogus gcc warning */
 
@@ -279,7 +276,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	robx = ROBX;
     }
 
-    printf(head_format, "", "spam", "good", "Gra prob", "Rob/Fis");
+    printf(head_format, "", "spam", "good", "  Fisher");
 
     while (argc >= 0)
     {
@@ -288,7 +285,6 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 
 	unsigned long spam_count;
 	unsigned long good_count;
-
 	double rob_prob = 0.0;
 	
 	if (argc == 0)
@@ -385,8 +381,8 @@ static void print_version(void)
 		  "redistribute it under the General Public License.  "
 		  "See\nthe COPYING file with the source distribution for "
 		  "details.\n"
-		  "\n",
-		  progname, version, ds_version_str(), PACKAGE);
+		  "\n", 
+		  progtype, version, ds_version_str(), PACKAGE);
 }
 
 static void usage(void)

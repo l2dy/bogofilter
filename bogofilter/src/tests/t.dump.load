@@ -35,7 +35,12 @@ $BOGOUTIL -a 20020815 -d $DATA | $SORT > ${TMPDIR}/dump.load-3.txt
 ( diff ${TMPDIR}/dump.load-2.txt ${TMPDIR}/dump.load-3.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.2.3.txt >> $OUT
 
 #dump wordlist, excluding oldest, shortest, and longest entries
-$BOGOUTIL -a 20020815 -s4,30 -d $DATA | $SORT > ${TMPDIR}/dump.load-4.txt
+#     and'ing of command line qualifiers forced changing next line to two lines
+#BOGOUTIL -a 20020815 -s4,30 -d $DATA | $SORT > ${TMPDIR}/dump.load-4.txt
+$BOGOUTIL -a 20020815 -d $DATA | $SORT > ${TMPDIR}/dump.load-4.txt
+rm -f $DATA
+$BOGOUTIL -l $DATA < ${TMPDIR}/dump.load-4.txt
+$BOGOUTIL -s4,30      -d $DATA | $SORT > ${TMPDIR}/dump.load-4.txt
 
 #confirm exclusion of oldest, shortest(<, and longest entries
 ( diff ${TMPDIR}/dump.load-3.txt ${TMPDIR}/dump.load-4.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.3.4.txt >> $OUT
