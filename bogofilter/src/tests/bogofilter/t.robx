@@ -74,4 +74,4 @@ if [ "$RESULT" != "$WANT" ] ; then
 #   $BOGOFILTER -x ml -vvv -r -n < ${SYSTEST}/inputs/good.mbx > ${TMPDIR}/good.txt
 fi
 
-test $RESULT = "$WANT"
+test "$RESULT" = "$WANT"
