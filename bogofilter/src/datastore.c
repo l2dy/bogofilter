@@ -290,7 +290,10 @@ int ds_oper(const char *path, dbmode_t open_mode,
 	    ds_foreach_t *hook, void *userdata)
 {
     int  ret = 0;
-    void *dsh = ds_open(CURDIR_S, path, open_mode);
+    void *dsh;
+
+    ds_init();
+    dsh = ds_open(CURDIR_S, path, open_mode);
 
     if (dsh == NULL) {
 	fprintf(stderr, "Can't open file '%s'\n", path);
@@ -300,6 +303,7 @@ int ds_oper(const char *path, dbmode_t open_mode,
     ret = ds_foreach(dsh, hook, userdata);
 
     ds_close(dsh, false);
+    ds_cleanup();
 
     return ret;
 }

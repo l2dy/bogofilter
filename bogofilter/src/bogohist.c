@@ -145,10 +145,10 @@ int histogram(const char *path)
     msgs_good = val.goodcount;
 
     ds_close(dsh, false);
+    ds_cleanup();
 
     memset(&hist, 0, sizeof(hist));
     rc = ds_oper(filepath, DB_READ, ds_histogram_hook, &hist);
-    ds_cleanup();
 
     count = print_histogram(&hist);
 

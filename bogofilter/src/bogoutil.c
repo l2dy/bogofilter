@@ -77,9 +77,7 @@ static int dump_file(char *ds_file)
 
     token_count = 0;
 
-    ds_init();
     rc = ds_oper(ds_file, DB_READ, ds_dump_hook, NULL);
-    ds_cleanup();
 
     if (verbose)
 	fprintf(dbgout, "%d tokens dumped\n", token_count);
