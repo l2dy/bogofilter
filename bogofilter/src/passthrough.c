@@ -119,20 +119,104 @@ static int read_seek(char **out, void *in) {
 
 typedef int (*readfunc_t)(char **, void *);
 
-void write_message(rc_t status)
+static bool write_header(rc_t status, readfunc_t rf, char *out, void *rfarg)
 {
     ssize_t rd;
+
+    bool hadlf = true;
+    bool seen_subj = false;
+
+    int bogolen = strlen(spam_header_name);
+    const char *subjstr = "Subject:";
+    int subjlen = strlen(subjstr);
+
+    /* print headers */
+    while ((rd = rf(&out, rfarg)) > 0)
+    {
+	/* skip over spam_header ("X-Bogosity:") lines */
+	while (rd >= bogolen && 
+	       memcmp(out, spam_header_name, bogolen) == 0) {
+	    while (((rd = rf(&out, rfarg)) > 0) && 
+		   (out[0] == ' ' || out[0] == '\t') )
+		/* empty loop */ ;
+	}
+
+	/* detect end of headers */
+	if (is_eol(out, rd) ||
+	    is_hb_delim(out, rd, have_body))
+	    /* check for non-empty blank line */
+	break;
+
+	/* rewrite "Subject: " line */
+	if (status == RC_SPAM &&
+	    rd >= subjlen && 
+	    spam_subject_tag != NULL &&
+	    strncasecmp(out, subjstr, subjlen) == 0) {
+	    (void) fprintf(fpo, "%.*s %s", subjlen, out, spam_subject_tag);
+	    if (out[subjlen] != ' ')
+		fputc(' ', fpo);
+	    (void) fwrite(out + subjlen, 1, rd - subjlen, fpo);
+	    seen_subj = true;
+	    continue;
+	}
+
+	hadlf = (out[rd-1] == '\n');
+	(void) fwrite(out, 1, rd, fpo);
+	if (ferror(fpo)) cleanup_exit(2, 1);
+    }
+
+    if (!hadlf)
+	fputc('\n', fpo);
+
+    return seen_subj;
+}
+
+static void write_body(readfunc_t rf, char *out, void *rfarg)
+{
+    ssize_t rd;
+
+    int hadlf = 1;
+    /* If the message terminated early (without body or blank
+     * line between header and body), enforce a blank line to
+     * prevent anything past us from choking. */
+    (void)fputc('\n', fpo);
+
+    /* print body */
+    while ((rd = rf(&out, rfarg)) > 0)
+    {
+	(void) fwrite(out, 1, rd, fpo);
+	hadlf = (out[rd-1] == '\n');
+	if (ferror(fpo)) cleanup_exit(2, 1);
+    }
+
+    if (!hadlf) fputc('\n', fpo);
+
+    if (fflush(fpo) || ferror(fpo) || (fpo != stdout && fclose(fpo))) {
+	cleanup_exit(2, 1);
+    }
+}
+
+static void write_spam_header(void)
+{
+    typedef char *formatter(char *buff, size_t size);
+    formatter *fcn = terse ? format_terse : format_header;
+    char buff[256];
+    /* print spam-status at the end of the header
+     * then mark the beginning of the message body */
+    (*fcn)(buff, sizeof(buff));
+    fputs (buff, fpo);
+    fputs ("\n", fpo);
+}
+
+void write_message(rc_t status)
+{
     readfunc_t rf = NULL;	/* assignment to quench warning */
     void *rfarg = 0;		/* assignment to quench warning */
     char *out;
     textdata_t *text;
-    int seen_subj = 0;
+    bool seen_subj = false;
 
     if (passthrough) {
-	int hadlf = 1;
-	int bogolen = strlen(spam_header_name);
-	const char *subjstr = "Subject:";
-	int subjlen = strlen(subjstr);
 	/* initialize */
 	switch (passmode) {
 	    case PASS_MEM:
@@ -149,53 +233,11 @@ void write_message(rc_t status)
 		abort();
 	}
 
-	/* print headers */
-	while ((rd = rf(&out, rfarg)) > 0)
-	{
-	    /* skip over spam_header ("X-Bogosity:") lines */
-	    while (rd >= bogolen && memcmp(out, spam_header_name, bogolen) == 0) {
-		while (((rd = rf(&out, rfarg)) > 0) && 
-		       (out[0] == ' ' || out[0] == '\t') )
-		    /* empty loop */ ;
-	    }
-
-	    /* detect end of headers */
-	    if (is_eol(out, rd) ||
-		is_hb_delim(out, rd, have_body))
-		/* check for non-empty blank line */
-		break;
-
-	    /* rewrite "Subject: " line */
-	    if (status == RC_SPAM &&
-		rd >= subjlen && 
-		spam_subject_tag != NULL &&
-		strncasecmp(out, subjstr, subjlen) == 0) {
-		(void) fprintf(fpo, "%.*s %s", subjlen, out, spam_subject_tag);
-		if (out[subjlen] != ' ')
-		    fputc(' ', fpo);
-		(void) fwrite(out + subjlen, 1, rd - subjlen, fpo);
-		seen_subj = 1;
-		continue;
-	    }
-
-	    hadlf = (out[rd-1] == '\n');
-	    (void) fwrite(out, 1, rd, fpo);
-	    if (ferror(fpo)) cleanup_exit(2, 1);
-	}
-
-	if (!hadlf)
-	    fputc('\n', fpo);
+	seen_subj = write_header(status, rf, out, rfarg);
     }
 
     if (passthrough || verbose || terse) {
-	typedef char *formatter(char *buff, size_t size);
-	formatter *fcn = terse ? format_terse : format_header;
-	char buff[256];
-	/* print spam-status at the end of the header
-	 * then mark the beginning of the message body */
-	(*fcn)(buff, sizeof(buff));
-	fputs (buff, fpo);
-	fputs ("\n", fpo);
+	write_spam_header();
     }
 
     if (verbose || passthrough || Rtable) {
@@ -209,27 +251,8 @@ void write_message(rc_t status)
 	(void) fprintf(fpo, "Subject: %s\n", spam_subject_tag);
     }
 
-    if (passthrough) {
-	int hadlf = 1;
-	/* If the message terminated early (without body or blank
-	 * line between header and body), enforce a blank line to
-	 * prevent anything past us from choking. */
-	(void)fputc('\n', fpo);
-
-	/* print body */
-	while ((rd = rf(&out, rfarg)) > 0)
-	{
-	    (void) fwrite(out, 1, rd, fpo);
-	    hadlf = (out[rd-1] == '\n');
-	    if (ferror(fpo)) cleanup_exit(2, 1);
-	}
-
-	if (!hadlf) fputc('\n', fpo);
-
-	if (fflush(fpo) || ferror(fpo) || (fpo != stdout && fclose(fpo))) {
-	    cleanup_exit(2, 1);
-	}
-    }
+    if (passthrough) 
+	write_body(rf, out, rfarg);
 }
 
 void write_log_message(rc_t status)
