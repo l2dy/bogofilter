@@ -635,7 +635,7 @@ void bogoreader_name(const char *name)
 	break;
     }
     if (!ok) {
-	fprintf(stderr, "Can't read '%s'\n", optarg);
+	fprintf(stderr, "Can't read '%s'\n", name);
 	exit(EX_ERROR);
     }
 }
