@@ -14,8 +14,7 @@
 	use two options - an unregister option ('-S' or '-N') and a
 	register option ('-s' or '-n').
 
-	To duplicate the effect of the old '-S' option, use '-S -n'.  
-	To duplicate the effect of the old '-N' option, use '-N -s'.  
+	To duplicate the effect of the old '-S' option, use '-N -s'.
+	To duplicate the effect of the old '-N' option, use '-S -n'.
 	The order of the options doesn't matter and they can be
 	concatenated, as in '-Sn' and '-sN'.
-
