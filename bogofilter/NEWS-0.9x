@@ -2,6 +2,10 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.92.4	2004-07-??
+
+* Warn on invalid options, rather than exit
+
 0.92.3	2004-07-27
 
 * Revise enums and regression tests for new format characters

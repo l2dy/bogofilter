@@ -184,7 +184,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 
     case '?':
 	fprintf(stderr, "Unknown option '%s'.\n", name);
-	exit(EX_ERROR);
+	break;
 
     case 'c':
 	read_config_file(val, false, false, precedence);

@@ -448,6 +448,11 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 {
     switch (option)
     {
+    case '?':
+	if (pass == PASS_1_CLI)
+	    fprintf(stderr, "Unknown option '%s'.\n", name);
+	break;
+
     case 'b':
 	bulk_mode = B_STDIN;
 	fpin = NULL;	/* Ensure that input file isn't stdin */
@@ -566,10 +571,6 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 
     case ':':
 	fprintf(stderr, "Option -%c requires an argument.\n", optopt);
-	exit(EX_ERROR);
-
-    case '?':
-	fprintf(stderr, "Unknown option '%s'.\n", name);
 	exit(EX_ERROR);
 
     case '-':
