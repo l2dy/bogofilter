@@ -177,6 +177,30 @@ static void check_fsize_limit(int fd, uint32_t pagesize) {
     }
 }
 
+/* The old, pre-3.3 API will not fill in the page size with
+ * DB_CACHED_COUNTS, and without DB_CACHED_COUNTS, BerlekeyDB will read
+ * the whole data base, incurring a severe performance penalty. We'll
+ * guess a page size.  As this is a safety margin for the file size,
+ * we'll let the code below guess some size. */
+#if DB_AT_LEAST(3,3)
+/* return page size, of 0xffffffff for trouble */
+static uint32_t get_psize(DB *dbp)
+{
+    uint32_t ret, pagesize;
+    DB_BTREE_STAT *dbstat = NULL;
+
+    ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
+    if (ret) {
+	dbp->err (dbp, ret, "%s (db) stat", progname);
+	return 0xffffffff;
+    }
+    pagesize = dbstat->bt_pagesize;
+    free(dbstat);
+    return pagesize;
+}
+#else
+#define get_psize(discard) 0
+#endif
 
 /*
   Initialize database.
@@ -214,9 +238,6 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     {
 	DB *dbp;
 	uint32_t retryflag = retryflags[idx], pagesize;
-#if DB_AT_LEAST(3,3)
-	DB_BTREE_STAT *dbstat = NULL;
-#endif
 
 	handle = dbh_init(db_file, name);
 
@@ -278,27 +299,16 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	}
 
 	/* query page size */
-#if DB_AT_LEAST(3,3)
-	ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
-	if (ret) {
-	    dbp->err (dbp, ret, "%s (db) stat: %s", progname, handle->name);
-	    db_close(handle, false);
-	    return NULL;
+	pagesize = get_psize(dbp);
+	if (pagesize == 0xffffffff) {
+	    dbp->close(dbp, 0);
+	    goto open_err;
 	}
-	pagesize = dbstat->bt_pagesize;
-#ifndef	ENABLE_MEMDEBUG
-	free(dbstat);
-#endif
-#else
-	/* The old, pre-3.3 API will not fill in the page size with
-	 * DB_CACHED_COUNTS, and without DB_CACHED_COUNTS,
-	 * BerlekeyDB will read the whole data base, incurring a
-	 * severe performance penalty. We'll guess a page size.
-	 * As this is a safety margin for the file size, we'll
-	 * rather choose it too large than too small. */
-	pagesize = 16384;
-#endif
 
+	if (!pagesize)
+	    pagesize = 16384;
+
+	/* check file size limit */
 	check_fsize_limit(handle->fd, pagesize);
 
 	if (db_lock(handle->fd, F_SETLK,
