@@ -14,41 +14,81 @@
 
 <cmdsynopsis>
   <command>bogofilter</command>
-  <arg choice='opt'>-h</arg>
-  <arg choice='opt'>-s</arg>
-  <arg choice='opt'>-n</arg>
-  <arg choice='opt'>-S</arg>
-  <arg choice='opt'>-N</arg>
-  <arg choice='opt'>-d <replaceable>dir</replaceable></arg>
-  <arg choice='opt'>-l</arg>
-  <arg choice='opt'>-L <replaceable>tag</replaceable></arg>
-  <arg choice='opt'>-m <replaceable>><optional>value</optional>
-      <optional>,value</optional></replaceable></arg>
-  <arg choice='opt'>-o <replaceable><optional>value</optional>
-      <optional>,value</optional></replaceable></arg>
-  <arg choice='opt'>-p</arg>
-  <arg choice='opt'>-e</arg>
-  <arg choice='opt'>-g</arg>
-  <arg choice='opt'>-r</arg>
-  <arg choice='opt'>-f</arg>
-  <arg choice='opt'>-2</arg>
-  <arg choice='opt'>-3</arg>
-  <arg choice='opt'>-R</arg>
-  <arg choice='opt'>-u</arg>
-  <arg choice='opt'>-v</arg>
-  <arg choice='opt'>-V</arg>
-  <arg choice='opt'>-D</arg>
-  <arg choice='opt'>-x <replaceable>flags</replaceable></arg>
-  <arg choice='opt'>-c <replaceable>filename</replaceable></arg>
-  <arg choice='opt'>-C</arg>
-  <arg choice='opt'>-q</arg>
-  <arg choice='opt'>-F</arg>
-  <arg choice='opt'>-I <replaceable>filename</replaceable></arg>
-  <arg choice='opt'>-O <replaceable>filename</replaceable></arg>
-  <arg choice='opt'>-y <replaceable>date</replaceable></arg>
+  <group>
+    <arg choice='plain'>help options</arg>
+    <arg choice='plain'>classification options</arg>
+    <arg choice='plain'>registration options</arg>
+  </group>
+  <arg choice='opt'>algorithm options</arg>
+  <arg choice='opt'>general options</arg>
 </cmdsynopsis>
 
+  <para>where</para>
+  <para><option>help options</option> are:</para>
+    <arg choice='opt'>-h</arg>
+    <arg choice='opt'>-V</arg>
+    <arg choice='opt'>-Q</arg>
+
+  <para><option>classification options</option> are:</para>
+
+    <arg choice='opt'>-p</arg>
+    <arg choice='opt'>-e</arg>
+    <arg choice='opt'>-u</arg>
+    <arg choice='opt'>-2</arg>
+    <arg choice='opt'>-3</arg>
+    <arg choice='opt'>-M</arg>
+    <arg choice='opt'>-b</arg>
+    <arg choice='opt'>-B <replaceable>filename ...</replaceable></arg>
+    <arg choice='opt'>-F</arg>
+    <arg choice='opt'>-R</arg>
+    <arg choice='opt'>algorithm options</arg>
+    <arg choice='opt'>general options</arg>
+    <arg choice='opt'>parameter options</arg>
+
+  <para><option>registration options</option> are:</para>
+    <group>
+      <arg choice='plain'>-s</arg>
+      <arg choice='plain'>-n</arg>
+    </group>
+    <group>
+      <arg choice='plain'>-S</arg>
+      <arg choice='plain'>-N</arg>
+    </group>
+    <arg choice='opt'>algorithm options</arg>
+    <arg choice='opt'>general options</arg>
+
+  <para><option>general options</option> are:</para>
+    <arg choice='opt'>-c <replaceable>filename</replaceable></arg>
+    <arg choice='opt'>-C</arg>
+    <arg choice='opt'>-d <replaceable>dir</replaceable></arg>
+    <arg choice='opt'>-l</arg>
+    <arg choice='opt'>-L <replaceable>tag</replaceable></arg>
+    <arg choice='opt'>-I <replaceable>filename</replaceable></arg>
+    <arg choice='opt'>-O <replaceable>filename</replaceable></arg>
+
+  <para><option>algorithm options</option> are:</para>
+    <group>
+      <arg choice='plain'>-g</arg>
+      <arg choice='plain'>-r</arg>
+      <arg choice='plain'>-f</arg>
+    </group>
+
+  <para><option>parameter options</option> are:</para>
+    <arg choice='opt'>-m <replaceable><optional>value</optional>
+      <optional>,value</optional></replaceable></arg>
+    <arg choice='opt'>-o <replaceable><optional>value</optional>
+      <optional>,value</optional></replaceable></arg>
+
+  <para><option>info options</option> are:</para>
+    <arg choice='opt'>-q</arg>
+    <arg choice='opt'>-v</arg>
+    <arg choice='opt'>-x <replaceable>flags</replaceable></arg>
+    <arg choice='opt'>-D</arg>
+    <arg choice='opt'>-y <replaceable>date</replaceable></arg>
+
 </refsynopsisdiv>
+
+<para></para>
 
 <refsect1 id='description'><title>DESCRIPTION</title>
 <para><application>Bogofilter</application> is a Bayesian spam filter.
