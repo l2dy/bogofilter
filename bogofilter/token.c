@@ -37,7 +37,8 @@ static void got_encoding(const char *encoding);
 token_t get_token(void)
 {
     token_t class;
-    unsigned char *cp, *t;
+    unsigned char *cp;
+    char *t;
 
     /* If saved IPADDR, truncate last octet */
     if ( block_on_subnets && save_class == IPADDR )
@@ -128,8 +129,8 @@ token_t get_token(void)
     }
 
     /* Need separate loop so lexer can see "From", "Date", etc */
-    for (cp = yytext; *cp; cp++)
-	*cp = casefold_table[*cp];
+    for (cp = (unsigned char *)yytext; *cp; cp++)
+	*cp = casefold_table[(unsigned char)*cp];
 
     yylval = yytext;
     return(class);

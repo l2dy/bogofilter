@@ -30,6 +30,6 @@ void do_replace_nonascii_characters(byte *str);
 
 void set_today(void);
 time_t long_to_date(long l);
-time_t string_to_date(char *s);
+YYYYMMDD string_to_date(const char *s);
 
 #endif	/* MAINT_H */

@@ -28,8 +28,8 @@ Most of the ideas in here are stolen from Mutt's snprintf implementation.
 #include "xstrdup.h"
 
 /* Function Prototypes */
-static size_t format_float( char *dest, double val,      size_t min, size_t prec, int flags, const char *destend);
-static size_t format_string(char *dest, const char *val, size_t min, size_t prec, int flags, const char *destend);
+static size_t format_float( char *dest, double val,      int min, int prec, int flags, const char *destend);
+static size_t format_string(char *dest, const char *val, int min, int prec, int flags, const char *destend);
 static size_t format_spamicity(char *dest, const char *fmt, double spamicity, const char *destend);
 static void die (const char *msg, ...);
 static char *convert_format_to_string(char *buff, size_t size, const char *format);
@@ -78,8 +78,8 @@ typedef FIELD FIELDS[RC_COUNT];
 FIELDS spamicity_tags    = {  "Yes",   "No",   "Unsure" };
 FIELDS spamicity_formats = { "%0.6f", "%0.6f", "%0.6f"  };
 
-static bool set_spamicity_tags(const char *val);
-static bool set_spamicity_formats(const char *val);
+static bool set_spamicity_tags(const unsigned char *val);
+static bool set_spamicity_formats(const unsigned char *val);
 static bool set_spamicity_fields(FIELD *strings, const char *val);
 
 /* Descriptors for config file */
@@ -91,8 +91,8 @@ const parm_desc format_parms[] =
     { "terse_format",	   CP_STRING,	{ &terse_format } },
     { "log_header_format", CP_STRING,	{ &log_header_format } },
     { "log_update_format", CP_STRING,	{ &log_update_format } },
-    { "spamicity_tags",    CP_FUNCTION,	{ set_spamicity_tags } },
-    { "spamicity_formats", CP_FUNCTION,	{ set_spamicity_formats } },
+    { "spamicity_tags",    CP_FUNCTION,	{ (void *)&set_spamicity_tags } },
+    { "spamicity_formats", CP_FUNCTION,	{ (void *)&set_spamicity_formats } },
 
     { NULL,                CP_NONE,	{ (void *) NULL } },
 };
@@ -140,23 +140,25 @@ static bool set_spamicity_fields(FIELD *strings, const char *val)
     return true;
 }
 
-static bool set_spamicity_tags(const char *val)
+static bool set_spamicity_tags(const unsigned char *val)
 {
-    bool ok = set_spamicity_fields( spamicity_tags, val );
+    bool ok = set_spamicity_fields(spamicity_tags, (const char *)val);
     return ok;
 }
 
-static bool set_spamicity_formats(const char *val)
+static bool set_spamicity_formats(const unsigned char *val)
 {
-    bool ok = set_spamicity_fields( spamicity_formats, val );
+    bool ok = set_spamicity_fields(spamicity_formats, (const char *)val);
     return ok;
 }
 
-static size_t format_float(char *dest, double src, size_t min, size_t prec, int flags, const char *destend)
+static size_t format_float(char *dest, double src, 
+	int min, int prec, int flags, const char *destend)
 {
     char buf[20];
     double s;
-    size_t p;
+    int p;
+
     if (flags & F_DELTA)
 	s = 1.0 - src;
     else
@@ -175,9 +177,17 @@ static size_t format_float(char *dest, double src, size_t min, size_t prec, int 
     return format_string (dest, buf, 0, 0, 0, destend);
 }
 
-static size_t format_string(char *dest, const char *src, size_t min, size_t prec, int flags, const char *destend)
+static size_t format_string(char *dest, const char *src, int min, int prec, int flags, const char *destend)
 {
-    size_t len = strlen(src);
+    size_t s_len = strlen(src);
+    int len;
+    if (s_len > INT_MAX) {
+	fprintf(stderr, "cannot handle string length (%lu) above %d, aborting\n", (unsigned long)s_len, INT_MAX);
+	internal_error;
+    }
+    len = s_len;
+    (void)min; /* kill compiler warning */
+
     if (flags & F_PREC && prec < len)
 	len = prec;
     if (dest + len + 1 < destend) {
@@ -256,7 +266,7 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 	    }
 	    break;
 	case S_MIN:
-	    if (isdigit (*format))
+	    if (isdigit ((unsigned char)*format))
 		min = min * 10 + (*format++ - '0');
 	    else
 		state = S_DOT;
@@ -270,7 +280,7 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 	    }
 	    break;
 	case S_PREC:
-	    if (isdigit (*format)) {
+	    if (isdigit ((unsigned char)*format)) {
 		prec = prec * 10 + (*format++ - '0');
 		flags |= F_PREC;
 	    } else {

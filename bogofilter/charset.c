@@ -211,47 +211,46 @@ static void map_iso_8859_14(void)	/* ISOIEC 8859-14:1998 Latin Alphabet No. 8 (C
 static void map_iso_8859_15(void)	/* ISOIEC 8859-15:1999 Latin Alphabet No. 9 */
 {
     static unsigned char xlate_15[] = {
-	'\xA0', ' ',		/* A0  160      160 NO-BREAK SPACE */
-	'\xA1', '!',		/* A1  161  ¡   161 INVERTED EXCLAMATION MARK */
-	'\xA2', '$',		/* A2  162  ¢   162 CENT SIGN */
-	'\xA3', '$',		/* A3  163  £   163 POUND SIGN */
-	'\xA4', '$',		/* A4  164 EUR 8364 EURO SIGN */
-	'\xA5', '$',		/* A5  165  ¥   165 YEN SIGN */
-
-	'\xA7', ' ',		/* A7  167  §   167 SECTION SIGN */
-	'\xA9', ' ',		/* A9  169  ©   169 COPYRIGHT SIGN */
-	'\xAA', ' ',		/* AA  170  ª   170 FEMININE ORDINAL INDICATOR */
-	'\xAB', '\"',		/* AB  171  «   171 LEFT-POINTING DOUBLE ANGLE QUOTATION MARK */
-	'\xAC', ' ',		/* AC  172  ¬   172 NOT SIGN */
-	'\xAD', ' ',		/* AD  173      173 SOFT HYPHEN */
-	'\xAE', ' ',		/* AE  174  ®   174 REGISTERED SIGN */
-	'\xAF', ' ',		/* AF  175  ¯   175 MACRON */
-	'\xB0', ' ',		/* B0  176  °   176 DEGREE SIGN */
-	'\xB1', ' ',		/* B1  177  ±   177 PLUS-MINUS SIGN */
-	'\xB2', ' ',		/* B2  178  ²   178 SUPERSCRIPT TWO */
-	'\xB3', ' ',		/* B3  179  ³   179 SUPERSCRIPT THREE */
-	'\xB5', ' ',		/* B5  181  µ   181 MICRO SIGN */
-	'\xB6', ' ',		/* B6  182  ¶   182 PILCROW SIGN */
-	'\xB7', ' ',		/* B7  183  ·   183 MIDDLE DOT */
-	'\xB9', ' ',		/* B9  185  ¹   185 SUPERSCRIPT ONE */
-	'\xBA', ' ',		/* BA  186  º   186 MASCULINE ORDINAL INDICATOR */
-	'\xBB', '\"',		/* BB  187  »   187 RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK */
-	'\xBC', ' ',		/* BC  188 OE   338 LATIN CAPITAL LIGATURE OE */
-	'\xBD', ' ',		/* BD  189 oe   339 LATIN SMALL LIGATURE OE */
-	'\xBF', '?',		/* BF  191  ¿   191 INVERTED QUESTION MARK */
-	'\xD7', '*',		/* D7  215  ×   215 MULTIPLICATION SIGN */
-	'\xF7', '/',		/* F7  247  ÷   247 DIVISION SIGN */
+	0xA0, ' ',		/* A0  160      160 NO-BREAK SPACE */
+	0xA1, '!',		/* A1  161  ¡   161 INVERTED EXCLAMATION MARK */
+	0xA2, '$',		/* A2  162  ¢   162 CENT SIGN */
+	0xA3, '$',		/* A3  163  £   163 POUND SIGN */
+	0xA4, '$',		/* A4  164 EUR 8364 EURO SIGN */
+	0xA5, '$',		/* A5  165  ¥   165 YEN SIGN */
+	0xA7, ' ',		/* A7  167  §   167 SECTION SIGN */
+	0xA9, ' ',		/* A9  169  ©   169 COPYRIGHT SIGN */
+	0xAA, ' ',		/* AA  170  ª   170 FEMININE ORDINAL INDICATOR */
+	0xAB, '\"',		/* AB  171  «   171 LEFT-POINTING DOUBLE ANGLE QUOTATION MARK */
+	0xAC, ' ',		/* AC  172  ¬   172 NOT SIGN */
+	0xAD, ' ',		/* AD  173      173 SOFT HYPHEN */
+	0xAE, ' ',		/* AE  174  ®   174 REGISTERED SIGN */
+	0xAF, ' ',		/* AF  175  ¯   175 MACRON */
+	0xB0, ' ',		/* B0  176  °   176 DEGREE SIGN */
+	0xB1, ' ',		/* B1  177  ±   177 PLUS-MINUS SIGN */
+	0xB2, ' ',		/* B2  178  ²   178 SUPERSCRIPT TWO */
+	0xB3, ' ',		/* B3  179  ³   179 SUPERSCRIPT THREE */
+	0xB5, ' ',		/* B5  181  µ   181 MICRO SIGN */
+	0xB6, ' ',		/* B6  182  ¶   182 PILCROW SIGN */
+	0xB7, ' ',		/* B7  183  ·   183 MIDDLE DOT */
+	0xB9, ' ',		/* B9  185  ¹   185 SUPERSCRIPT ONE */
+	0xBA, ' ',		/* BA  186  º   186 MASCULINE ORDINAL INDICATOR */
+	0xBB, '\"',		/* BB  187  »   187 RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK */
+	0xBC, ' ',		/* BC  188 OE   338 LATIN CAPITAL LIGATURE OE */
+	0xBD, ' ',		/* BD  189 oe   339 LATIN SMALL LIGATURE OE */
+	0xBF, '?',		/* BF  191  ¿   191 INVERTED QUESTION MARK */
+	0xD7, '*',		/* D7  215  ×   215 MULTIPLICATION SIGN */
+	0xF7, '/',		/* F7  247  ÷   247 DIVISION SIGN */
     };
     map_xlate_characters( xlate_15, COUNTOF(xlate_15) );
     /* Not yet implemented */
 }
 
 static unsigned char xlate_us[] = {
-    '\xA0', ' ',	/* no-break space      to space        */
-    '\x92', '\'',	/* windows apostrophe  to single quote */
-    '\x93', '"',	/* windows left  quote to double quote */
-    '\x94', '"',	/* windows right quote to double quote */
-    '\xA9', ' '		/* copyright sign      to space        */
+    0xA0, ' ',	/* no-break space      to space        */
+    0x92, '\'',	/* windows apostrophe  to single quote */
+    0x93, '"',	/* windows left  quote to double quote */
+    0x94, '"',	/* windows right quote to double quote */
+    0xA9, ' '		/* copyright sign      to space        */
 };
 
 /* For us-ascii, 

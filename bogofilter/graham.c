@@ -67,7 +67,7 @@ static bogostat_t bogostats;
 static	void	gra_initialize_constants(void);
 static	double	gra_bogofilter(wordhash_t *wordhash, FILE *fp); /*@globals errno@*/
 static	double	gra_compute_spamicity(bogostat_t *bs, FILE *fp); /*@globals errno@*/
-static	void	gra_print_bogostats(FILE *fp, double spamicity);
+static	void	gra_print_bogostats(FILE *fp);
 static	double	gra_spamicity(void);
 static	rc_t	gra_status(void);
 static	void	gra_cleanup(void);
@@ -163,7 +163,7 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
     return;
 }
 
-void gra_print_bogostats(FILE *fp, double spamicity)
+void gra_print_bogostats(FILE *fp)
 {
     int idx = (thresh_index >= 0) ? thresh_index : KEEPERS+thresh_index;
     discrim_t *pp = &bogostats.extrema[idx];

@@ -51,9 +51,9 @@ void set_today(void)
     today = time_to_date(0);
 }
 
-YYYYMMDD string_to_date(char *s)
+YYYYMMDD string_to_date(const char *s)
 {
-    YYYYMMDD date = atol((unsigned char *)s);
+    YYYYMMDD date = atol(s);
     if (date < 20020801 && date != 0) {
 	date = time_to_date(date);
     }
