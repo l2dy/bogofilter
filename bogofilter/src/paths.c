@@ -81,14 +81,16 @@ int check_directory(const char* path) /*@globals errno,stderr@*/
     if (rc < 0) {
 	if (ENOENT==errno) {
 	    if(mkdir(path, S_IRUSR|S_IWUSR|S_IXUSR)) {
-		perror("Error creating directory");
+		fprintf(stderr, "Error creating directory \"%s\": %s\n",
+			path, strerror(errno));
 		return -1;
 	    } else if (verbose > 0) {
 		(void)fprintf(dbgout, "Created directory %s .\n", path);
 	    }
 	    return 0;
 	} else {
-	    perror("Error accessing directory");
+	    fprintf(stderr, "Error accessing directory \"%s\": %s\n",
+		    path, strerror(errno));
 	    return -1;
 	}
     } else {
