@@ -86,11 +86,11 @@
 #
 # for two-state output the third entry is not needed and not used
 #
-#spamicity_tags = Yes, No, Unsure
+#spamicity_tags = Spam, Ham, Unsure
 #spamicity_formats = %0.6f, %0.6f, %0.6f
 #
-## spamicity_tags = Spam, Ham, Unsure
-## spamicity_formats = %6.2e, %6.2e, %0.6f
+##spamicity_tags = Yes, No, Unsure
+##spamicity_formats = %0.6f, %0.6f, %0.6f
 
 #### Format of SPAM_HEADER
 #
@@ -156,7 +156,7 @@
 #
 #	convert IPADDRs into a special token, url:1.2.3.4,
 #	and also return url:1.2.3, url:1.2, and url:1
-#       to allow identifying spammers by ip address / subnets.
+#	to allow identifying spammers by ip address / subnets.
 #
 #block_on_subnets=no
 
@@ -197,15 +197,16 @@
 #### CUTOFF Values
 #
 #	both ham_cutoff and spam_cutoff are allowed.
-#	setting ham_cutoff to a non-zero value will
-#	enable tristate results (Yes/No/Unsure).
+#	setting ham_cutoff to a zero value will
+#	enable two-state results (Yes/No).
 #
-#ham_cutoff  = 0.00
-#spam_cutoff = 0.99
+#ham_cutoff = 0.45
+#spam_cutoff= 0.99
 #
-## with Yes/No/Unsure output:
-## ham_cutoff = 0.45
-## spam_cutoff= 0.99
+#	for two-state classification:
+#
+##ham_cutoff  = 0.00
+##spam_cutoff = 0.99
 
 #### Effective Size Factor Values
 #
