@@ -44,7 +44,7 @@ YYYYMMDD time_to_date(long days)
 {
     time_t t = time(NULL) - days * 86400;
     struct tm *tm = localtime( &t );
-    YYYYMMDD date = (((tm->tm_year + 1900) * 100 + tm->tm_mon + 1) * 100) + tm->tm_mday;
+    YYYYMMDD date = (((tm->tm_year + (YYYYMMDD)1900) * 100 + tm->tm_mon + 1) * 100) + tm->tm_mday;
     return date;
 }
 

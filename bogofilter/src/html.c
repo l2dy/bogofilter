@@ -50,7 +50,9 @@ int process_html_comments(buff_t *buff)
     byte *buf_start = buff->t.text;
     byte *buf_used = buf_start + buff->t.leng;
 
-    for (tmp = buf_start; tmp < buf_used && (tmp = memchr(tmp, '<', buf_used-tmp)) != NULL; tmp += 1) {
+    for (tmp = buf_start; tmp < buf_used &&
+	    (tmp = memchr(tmp, (int)(unsigned char)'<', (size_t)(buf_used-tmp))) != NULL;
+	    tmp += 1) {
 	int count;
 	size_t comment_offset = tmp - buf_start;
 	count = kill_html_comment(buff, comment_offset);
@@ -143,7 +145,7 @@ static int kill_html_comment(buff_t *buff, size_t comment_offset)
 	}
 	default:
 	    tmp += 1;
-	    done = level == 0;
+	    done = (level == 0);
 	}
 
 	/* The NULL check for comment is needed when handling lines 
