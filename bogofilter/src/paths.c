@@ -124,21 +124,21 @@ int check_directory(const char* path) /*@globals errno,stderr@*/
     if (rc < 0) {
 	if (ENOENT==errno) {
 	    if (bf_mkdir(path, S_IRUSR|S_IWUSR|S_IXUSR)) {
-		fprintf(stderr, "Error creating directory \"%s\": %s\n",
+		fprintf(stderr, "Error creating directory '%s': %s\n",
 			path, strerror(errno));
 		return -1;
 	    } else if (verbose > 0) {
-		(void)fprintf(dbgout, "Created directory %s .\n", path);
+		fprintf(dbgout, "Created directory %s .\n", path);
 	    }
 	    return 0;
 	} else {
-	    fprintf(stderr, "Error accessing directory \"%s\": %s\n",
+	    fprintf(stderr, "Error accessing directory '%s': %s\n",
 		    path, strerror(errno));
 	    return -1;
 	}
     } else {
 	if (! S_ISDIR(sb.st_mode)) {
-	    (void)fprintf(stderr, "Error: %s is not a directory.\n", path);
+	    fprintf(stderr, "Error: %s is not a directory.\n", path);
 	}
     }
     return 0;

@@ -558,8 +558,9 @@ static void load_wordlist(char *file)
     char *path = file;
 
     if (stat(path, &sb) != 0) {
-	fprintf(stderr, "Error accessing file or directory [%s].  %s\n",
-		ds_file, strerror(errno));
+	fprintf(stderr, "Error accessing file or directory '%s'.\n", ds_file);
+	if (errno != 0)
+	    fprintf(stderr, "error #%d - %s.\n", errno, strerror(errno));
 	return;
     }
 

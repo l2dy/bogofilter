@@ -329,33 +329,34 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     /* protect against broken stat(2) that succeeds for empty names */
     if (path == NULL || *path == '\0') {
         fprintf(stderr, "Expecting non-empty directory or file name.\n");
-        return -1;
+        return EX_ERROR;
     }
 
-    if ( stat(path, &sb) != 0 ) {
-	fprintf(stderr, "Error accessing file or directory [%s].  %s\n",
-		path, strerror(errno));
-	return -1;
-    }
+    if ( stat(path, &sb) == 0 ) {
+	/* XXX FIXME: deadlock possible */
+	if ( ! S_ISDIR(sb.st_mode)) {		/* words from file */
+	    dsh = ds_open(CURDIR_S, 1, &path, DB_READ);
+	}
+	else {					/* words from path */
+	    char filepath1[PATH_LEN];
+	    char filepath2[PATH_LEN];
+	    char *filepaths[IX_SIZE];
 
-    /* XXX FIXME: deadlock possible */
-    if ( ! S_ISDIR(sb.st_mode)) {		/* words from file */
-	dsh = ds_open(CURDIR_S, 1, &path, DB_READ);
-    }
-    else {					/* words from path */
-	char filepath1[PATH_LEN];
-	char filepath2[PATH_LEN];
-	char *filepaths[IX_SIZE];
-
-	set_wordlist_mode(path);
-	filepaths[0] = filepath1;
-	filepaths[1] = filepath2;
+	    set_wordlist_mode(path);
+	    filepaths[0] = filepath1;
+	    filepaths[1] = filepath2;
 	
-	count = build_wordlist_paths(filepaths, path);
-	dsh = ds_open(CURDIR_S, count, (const char **)filepaths, DB_READ);
+	    count = build_wordlist_paths(filepaths, path);
+	    dsh = ds_open(CURDIR_S, count, (const char **)filepaths, DB_READ);
+	}
     }
-    if (dsh == NULL)
+
+    if (dsh == NULL) {
+	fprintf(stderr, "Error accessing file or directory '%s'.\n", path);
+	if (errno != 0)
+	    fprintf(stderr, "error #%d - %s.\n", errno, strerror(errno));
 	return EX_ERROR;
+    }
 
     if (show_probability)
     {

@@ -16,7 +16,6 @@ David Relson <relson@osagesoftware.com>  2003
 
 #include <string.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <limits.h>
 
 #include "datastore.h"
@@ -337,7 +336,7 @@ int ds_oper(const char *path, dbmode_t open_mode,
     void *dsh = ds_open(CURDIR_S, 1, &path, open_mode);
 
     if (dsh == NULL) {
-	fprintf(stderr, "Can't open file %s\n", path);
+	fprintf(stderr, "Can't open file '%s'\n", path);
 	exit(EX_ERROR);
     }
 
