@@ -157,7 +157,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
 %%
 
-^From\ 						{ if (msg_header && is_from(yy_text())) { 
+^From\ 						{ if (msg_header && is_from(yytext, yyleng)) { 
 						      BEGIN(INITIAL); 
 						      return FROM;
 						  } else { 

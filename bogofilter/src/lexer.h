@@ -37,7 +37,7 @@ typedef enum {
 extern int yylineno;
 extern bool msg_header;
 
-extern bool is_from(word_t *w);
+extern bool is_from(const byte *text, size_t leng);
 
 /* in lexer_v3.l */
 extern token_t	lexer_v3_lex(void);

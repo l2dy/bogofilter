@@ -51,9 +51,9 @@ static void lexer_display_buffer(buff_t *buff)
 	fputc('\n', dbgout);
 }
 
-bool is_from(word_t *w)
+bool is_from(const byte *text, size_t leng)
 {
-    if (w->leng >= 5 && memcmp(w->text, "From ", 5) == 0)
+    if (leng >= 5 && memcmp(text, "From ", 5) == 0)
 	return true;
     return false;
 }
@@ -83,7 +83,7 @@ static int lgetsl(buff_t *buff)
        If found, handle it immediately.
     */
 
-    if (is_from(&buff->t))
+    if (is_from(buff->t.text+buff->read, buff->t.leng-buff->read))
 	got_from();
 
     if (count >= 0 && DEBUG_LEXER(0))
