@@ -85,7 +85,9 @@
 
         <ul>
           <li><a href="#query-database">How do I manually query the
-          database</a></li>
+          database?</a></li>
+          <li><a href="#page-notfound">Why am I getting DB_PAGE_NOTFOUND 
+	  messages?</a></li>
           <li><a href="#rescue">How can I tell if my wordlists are
           corrupted?</a></li>
 	  <li><a href="#update">How do I upgrade from separate word
@@ -694,6 +696,31 @@
 
     <hr>
 
+    <h2 id="page-notfound">Why am I getting DB_PAGE_NOTFOUND 
+    messages?</h2>
+
+    <p>You have a problem with your BerkeleyDB database.  There are
+    two likely causes: either you've hit a max size limit or the
+    database is corrupt.</p>
+
+    <p>Mail delivery agents, like postfix, have a file size limit.
+    When bogofilter's database reaches that limit problems occur.
+
+    <p>To show the database size use:</p>
+    <pre>	ls -lh $BOGOFILTER_DIR/wordlist.db</pre>
+
+    <p>To show the postfix setting:</p>
+    <pre>	postconf | grep mailbox_size_limit</pre>
+
+    <p>To set the limit to 73MB (or whatever size is right for you):</p>
+    <pre>	postconf -e mailbox_size_limit=73000000</pre>
+
+    <p>If you think your database may be corrupt, read <a
+    href="#rescue">How can I tell if my wordlists are corrupted?</a>
+    FAQ entry.</p>
+
+    <hr>
+
     <h2 id="rescue">How can I tell if my word lists are
     corrupted?</h2>
 
@@ -701,13 +728,19 @@
     BerkeleyDB thinks by running:</p>
     <pre>	db_verify wordlist.db</pre>
 
-    <p>If there is a problem, you may be able to recover some (or
+    <p>If there is a problem, you may be able to fix it with:</p>
+    <pre>	db_recover wordlist.db</pre>
+
+    <p>Alternatively may be able to recover some (or
     all) of the tokens and their counts with the following
     commands:</p>
     <pre>	bogoutil -d wordlist.db | bogoutil -l wordlist.db.new</pre>
     <p>or with</p>
-    <pre>	db_dump -r wordlist.db &gt; wordlist.txt
-	db_load wordlist.new &lt; wordlist.txt</pre>
+    <pre>	db_dump -r wordlist.db | db_load wordlist.new</pre>
+
+    <p>You can also use a text file instead of a pipe, as in:</p>
+    <pre>	bogoutil -d wordlist.db &gt; wordlist.txt
+	bogoutil -l wordlist.db.new &lt; wordlist.txt</pre>
 
     <p>If you've got two wordlists (spamlist.db and goodlist.db), run the above commands for each of them.</p>
 
