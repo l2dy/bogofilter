@@ -107,7 +107,7 @@ static int load_file(const char *ds_file)
     unsigned long count[IX_SIZE], date;
     YYYYMMDD today_save = today;
 
-    dsh = ds_open(CURDIR_S, 1, &ds_file, DB_WRITE);
+    dsh = ds_open(CURDIR_S, ds_file, DB_WRITE);
     if (dsh == NULL)
 	return EX_ERROR;
 
@@ -222,8 +222,6 @@ static int get_token(buff_t *buff, FILE *fp)
 
 static int display_words(const char *path, int argc, char **argv, bool show_probability)
 {
-    uint count = 0;
-
     byte buf[BUFSIZE];
     buff_t *buff = buff_new(buf, 0, BUFSIZE);
     const byte *word = buf;
@@ -244,18 +242,14 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     if ( stat(path, &sb) == 0 ) {
 	/* XXX FIXME: deadlock possible */
 	if ( ! S_ISDIR(sb.st_mode)) {		/* words from file */
-	    dsh = ds_open(CURDIR_S, 1, &path, DB_READ);
+	    dsh = ds_open(CURDIR_S, path, DB_READ);
 	}
 	else {					/* words from path */
-	    char filepath1[PATH_LEN];
-	    char filepath2[PATH_LEN];
-	    char *filepaths[IX_SIZE];
+	    char filepath[PATH_LEN];
 
-	    filepaths[0] = filepath1;
-	    filepaths[1] = filepath2;
-	
-	    count = build_wordlist_paths(filepaths, path);
-	    dsh = ds_open(CURDIR_S, count, (const char **)filepaths, DB_READ);
+	    build_wordlist_path(filepath, sizeof(filepath), path);
+
+	    dsh = ds_open(CURDIR_S, filepath, DB_READ);
 	}
     }
 
@@ -331,31 +325,17 @@ static int get_robx(char *path)
     if (onlyprint)
 	printf("%f\n", rx);
     else {
-	uint count;
-
 	dsv_t val;
 	void  *dsh;
-
-	char filepath1[PATH_LEN];
-	char filepath2[PATH_LEN];
-	char *filepaths[IX_SIZE];
+	char filepath[PATH_LEN];
 
 	word_t *word_robx = word_new((const byte *)ROBX_W, (uint) strlen(ROBX_W));
-
-	filepaths[IX_SPAM] = filepath1;
-	filepaths[IX_GOOD] = filepath2;
-
-	count = build_wordlist_paths(filepaths, path);
-
-	if (count == 0)
-	{
-	    fprintf(stderr, "%s: string too long creating %s file name.\n", progname, DB_EXT);
-	    exit(EX_ERROR);
-	}
-
+	    
+	build_wordlist_path(filepath, sizeof(filepath), path);
+	
 	run_type = REG_SPAM;
 
-	dsh = ds_open(CURDIR_S, count, (const char **) filepaths, DB_WRITE);
+	dsh = ds_open(CURDIR_S, filepath, DB_WRITE);
 	if (dsh == NULL)
 	    return EX_ERROR;
 

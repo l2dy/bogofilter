@@ -71,30 +71,17 @@ static void convert_external_to_internal(dsh_t *dsh, dbv_t *ex_data, dsv_t *in_d
     size_t i = 0;
     uint32_t *cv = ex_data->data;
 
-    if (dsh->count == 1) {
-	in_data->spamcount = !dsh->is_swapped ? cv[i++] : swap_32bit(cv[i++]);
+    in_data->spamcount = !dsh->is_swapped ? cv[i++] : swap_32bit(cv[i++]);
 
-	if (ex_data->leng <= i * sizeof(uint32_t))
-	    in_data->goodcount = 0;
-	else
-	    in_data->goodcount = !dsh->is_swapped ? cv[i++] : swap_32bit(cv[i++]);
+    if (ex_data->leng <= i * sizeof(uint32_t))
+	in_data->goodcount = 0;
+    else
+	in_data->goodcount = !dsh->is_swapped ? cv[i++] : swap_32bit(cv[i++]);
 
-	if (ex_data->leng <= i * sizeof(uint32_t))
-	    in_data->date = 0;
-	else {
-	    in_data->date = !dsh->is_swapped ? cv[i++] : swap_32bit(cv[i++]);
-	}
-    }
-    else {
-	in_data->count[dsh->index] = !dsh->is_swapped ? cv[i++] : swap_32bit(cv[i++]);
-
-	if (ex_data->leng <= i * sizeof(uint32_t))
-	    in_data->date = 0;
-	else {
-	    YYYYMMDD date = !dsh->is_swapped ? cv[i++] : swap_32bit(cv[i++]); 
-	    in_data->date = max(in_data->date, date);
-	}
-    }
+    if (ex_data->leng <= i * sizeof(uint32_t))
+	in_data->date = 0;
+    else
+	in_data->date = !dsh->is_swapped ? cv[i++] : swap_32bit(cv[i++]);
 
     return;
 }
@@ -108,13 +95,8 @@ static void convert_internal_to_external(dsh_t *dsh, dsv_t *in_data, dbv_t *ex_d
     ** separated for output to different wordlists.
     */
 
-    if (dsh->count == 1) {
-	cv[i++] = !dsh->is_swapped ? in_data->spamcount : swap_32bit(in_data->spamcount);
-	cv[i++] = !dsh->is_swapped ? in_data->goodcount : swap_32bit(in_data->goodcount);
-    }
-    else {
-	cv[i++] = !dsh->is_swapped ? in_data->count[dsh->index] : swap_32bit(in_data->count[dsh->index]);
-    }
+    cv[i++] = !dsh->is_swapped ? in_data->spamcount : swap_32bit(in_data->spamcount);
+    cv[i++] = !dsh->is_swapped ? in_data->goodcount : swap_32bit(in_data->goodcount);
 
     if (timestamp_tokens && in_data->date != 0)
 	cv[i++] = !dsh->is_swapped ? in_data->date : swap_32bit(in_data->date);
@@ -126,13 +108,10 @@ static void convert_internal_to_external(dsh_t *dsh, dsv_t *in_data, dbv_t *ex_d
 
 dsh_t *dsh_init(
     void *dbh,			/* database handle from db_open() */
-    size_t count,		/* database count (1 or 2) */
     bool is_swapped)
 {
     dsh_t *val = xmalloc(sizeof(*val));
     val->dbh = dbh;
-    val->index = 0;
-    val->count = count;
     val->is_swapped = is_swapped;
     return val;
 }
@@ -144,9 +123,9 @@ void dsh_free(void *vhandle)
     return;
 }
 
-void *ds_open(const char *db_file, size_t count, const char **names, dbmode_t open_mode)
+void *ds_open(const char *db_file, const char *name, dbmode_t open_mode)
 {
-    void *v = db_open(db_file, count, names, open_mode);
+    void *v = db_open(db_file, name, open_mode);
     return v;
 }
 
@@ -165,8 +144,9 @@ void ds_flush(void *vhandle)
 
 int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 {
-    dsh_t *dsh = vhandle;
+    int ret;
     bool found = false;
+    dsh_t *dsh = vhandle;
     dbv_t ex_key;
     dbv_t ex_data;
     uint32_t cv[3];
@@ -179,44 +159,40 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 
     memset(val, 0, sizeof(*val));
 
-    for (dsh->index = 0; dsh->index < dsh->count; dsh->index++) {
-	int ret;
+    /* init ex_data inside loop since first db_get_value()
+    ** call can change it and cause the second call to fail.
+    */
+    ex_data.data = cv;
+    ex_data.leng = sizeof(cv);
 
-	/* init ex_data inside loop since first db_get_value()
-	** call can change it and cause the second call to fail.
-	*/
-	ex_data.data = cv;
-	ex_data.leng = sizeof(cv);
+    ret = db_get_dbvalue(dsh, &ex_key, &ex_data);
 
-	ret = db_get_dbvalue(dsh, &ex_key, &ex_data);
+    switch (ret) {
+    case 0:
+	found = true;
 
-	switch (ret) {
-	case 0:
-	    found = true;
+	convert_external_to_internal(dsh, &ex_data, val);
 
-	    convert_external_to_internal(dsh, &ex_data, val);
-
-	    if (DEBUG_DATABASE(3)) {
-		fprintf(dbgout, "ds_read: [%.*s] -- %lu,%lu\n",
-			CLAMP_INT_MAX(word->leng), word->text,
-			(unsigned long)val->spamcount,
-			(unsigned long)val->goodcount);
-	    }
-	    break;
-
-	case DS_NOTFOUND:
-	    if (DEBUG_DATABASE(3)) {
-		fprintf(dbgout, "ds_read: [%.*s] not found\n", 
-			CLAMP_INT_MAX(word->leng), (char *) word->text);
-	    }
-	    break;
-	    
-	default:
-	    fprintf(dbgout, "ret=%d, DS_NOTFOUND=%d\n", ret, DS_NOTFOUND);
-	    print_error(__FILE__, __LINE__, "ds_read( '%.*s' ), err: %d, %s", 
-			CLAMP_INT_MAX(word->leng), (char *) word->text, ret, db_str_err(ret));
-	    exit(EX_ERROR);
+	if (DEBUG_DATABASE(3)) {
+	    fprintf(dbgout, "ds_read: [%.*s] -- %lu,%lu\n",
+		    CLAMP_INT_MAX(word->leng), word->text,
+		    (unsigned long)val->spamcount,
+		    (unsigned long)val->goodcount);
 	}
+	break;
+
+    case DS_NOTFOUND:
+	if (DEBUG_DATABASE(3)) {
+	    fprintf(dbgout, "ds_read: [%.*s] not found\n", 
+		    CLAMP_INT_MAX(word->leng), (char *) word->text);
+	}
+	break;
+	    
+    default:
+	fprintf(dbgout, "ret=%d, DS_NOTFOUND=%d\n", ret, DS_NOTFOUND);
+	print_error(__FILE__, __LINE__, "ds_read( '%.*s' ), err: %d, %s", 
+		    CLAMP_INT_MAX(word->leng), (char *) word->text, ret, db_str_err(ret));
+	exit(EX_ERROR);
     }
 
     return found ? 0 : 1;
@@ -242,34 +218,16 @@ int ds_write(void *vhandle, const word_t *word, dsv_t *val)
     if (timestamp_tokens && today != 0)
 	val->date = today;
 
-    for (dsh->index = 0; dsh->index < dsh->count; dsh->index++) {
+    convert_internal_to_external(dsh, val, &ex_data);
 
-	/* With two wordlists, it's necessary to check index and
-	** run_type to avoid writing all tokens to both lists. */
-	if (dsh->count == 2) {
-	    bool ok;
-	    /* if index is spamlist, but not writing to spamlist ... */
-	    /* if index is goodlist, but not writing to goodlist ... */
-	    ok = ((dsh->index == IX_SPAM && (run_type & (REG_SPAM | UNREG_SPAM))) ||
-		  (dsh->index == IX_GOOD && (run_type & (REG_GOOD | UNREG_GOOD))));
-	    if (!ok)
-		continue;
-	}
+    ret = db_set_dbvalue(dsh, &ex_key, &ex_data);
 
-	convert_internal_to_external(dsh, val, &ex_data);
-
-	ret = db_set_dbvalue(dsh, &ex_key, &ex_data);
-
-	if (ret != 0)
-	    break;
-
-	if (DEBUG_DATABASE(3)) {
-	    fprintf(dbgout, "ds_write: [%.*s] -- %lu,%lu,%lu\n",
-		    CLAMP_INT_MAX(word->leng), word->text,
-		    (unsigned long)val->spamcount,
-		    (unsigned long)val->goodcount,
-		    (unsigned long)val->date);
-	}
+    if (DEBUG_DATABASE(3)) {
+	fprintf(dbgout, "ds_write: [%.*s] -- %lu,%lu,%lu\n",
+		CLAMP_INT_MAX(word->leng), word->text,
+		(unsigned long)val->spamcount,
+		(unsigned long)val->goodcount,
+		(unsigned long)val->date);
     }
 
     return ret;		/* 0 if ok */
@@ -337,7 +295,7 @@ int ds_oper(const char *path, dbmode_t open_mode,
 	    ds_foreach_t *hook, void *userdata)
 {
     int  ret = 0;
-    void *dsh = ds_open(CURDIR_S, 1, &path, open_mode);
+    void *dsh = ds_open(CURDIR_S, path, open_mode);
 
     if (dsh == NULL) {
 	fprintf(stderr, "Can't open file '%s'\n", path);

@@ -131,17 +131,11 @@ int histogram(const char *path)
 
     rhistogram_t hist;
 
-    char filepath1[PATH_LEN];
-    char filepath2[PATH_LEN];
-    char *filepaths[IX_SIZE];
-    filepaths[0] = filepath1;
-    filepaths[1] = filepath2;
+    char filepath[PATH_LEN];
 
-    memset(&hist, 0, sizeof(hist));
+    build_wordlist_path(filepath, sizeof(filepath), path);
 
-    count = build_wordlist_paths(filepaths, path);
-
-    dsh = ds_open(CURDIR_S, count, (const char **)filepaths, DB_READ);
+    dsh = ds_open(CURDIR_S, filepath, DB_READ);
     if (dsh == NULL)
 	return EX_ERROR;
 
@@ -151,7 +145,8 @@ int histogram(const char *path)
     
     ds_close(dsh, false);
 
-    rc = ds_oper(filepaths[0], DB_READ, ds_histogram_hook, &hist);
+    memset(&hist, 0, sizeof(hist));
+    rc = ds_oper(filepath, DB_READ, ds_histogram_hook, &hist);
 
     count = print_histogram(&hist);
 

@@ -27,10 +27,9 @@ Gyepi Sam <gyepi@praxis-sw.com>   2003
 
 typedef struct {
     char *path;
-    size_t count;
-    char *name[IX_SIZE];
+    char *name;
     bool locked;
-    TDB_CONTEXT *dbp[IX_SIZE];
+    TDB_CONTEXT *dbp;
 } dbh_t;
 
 /* Function definitions */
@@ -40,21 +39,20 @@ const char *db_version_str(void)
     return "TrivialDB";
 }
 
-static dbh_t *dbh_init(const char *path, size_t count, const char **names)
+static dbh_t *dbh_init(const char *path, const char *name)
 {
     size_t c;
     dbh_t *handle;
+    size_t len = strlen(path) + strlen(name) + 2;
 
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
 
-    handle->count = count;
     handle->path = xstrdup(path);
-    for (c = 0; c < count; c += 1) {
-      size_t len = strlen(path) + strlen(names[c]) + 2;
-      handle->name[c] = xmalloc(len);
-      build_path(handle->name[c], len, path, names[c]);
-    }
+
+    handle->name[c] = xmalloc(len);
+    build_path(handle->name, len, path, name);
+
     handle->locked = false;
 
     return handle;
@@ -64,23 +62,17 @@ static dbh_t *dbh_init(const char *path, size_t count, const char **names)
 static void dbh_free(/*@only@*/ dbh_t *handle)
 {
     if (handle != NULL) {
-      size_t c;
-      for (c = 0; c < handle->count; c += 1)
-          xfree(handle->name[c]);
-
-      xfree(handle->path);
-      xfree(handle);
+	xfree(handle->name);
+	xfree(handle->path);
+	xfree(handle);
     }
     return;
 }
 
 
-static void dbh_print_names(dbh_t *handle, const char *msg)
+static void dbh_print_name(dbh_t *handle, const char *msg)
 {
-    if (handle->count == 1)
-	fprintf(dbgout, "%s (%s)", msg, handle->name[0]);
-    else
-	fprintf(dbgout, "%s (%s,%s)", msg, handle->name[0], handle->name[1]);
+    fprintf(dbgout, "%s (%s)", msg, handle->name);
 }
 
 
@@ -88,12 +80,11 @@ static void dbh_print_names(dbh_t *handle, const char *msg)
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
 */
-void *db_open(const char *db_file, size_t count, const char **names, dbmode_t open_mode)
+void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 {
     dsh_t *dsh;
     dbh_t *handle;
 
-    size_t i;
     int tdb_flags = 0;
     int open_flags;
     TDB_CONTEXT *dbp;
@@ -106,34 +97,31 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
     	open_flags = O_RDONLY;
     }
 
-    handle = dbh_init(db_file, count, names);
+    handle = dbh_init(db_file, name);
 
     if (handle == NULL) return NULL;
 
-    dsh = dsh_init(handle, handle->count, false);
+    dsh = dsh_init(handle, false);
 
-    for (i = 0; i < handle->count; i += 1) {
+    dbp = handle->dbp = tdb_open(handle->name, 0, tdb_flags, open_flags, 0664);
 
-      dbp = handle->dbp[i] = tdb_open(handle->name[i], 0, tdb_flags, open_flags, 0664);
+    if (dbp == NULL)
+	goto open_err;
 
-      if (dbp == NULL)
-	  goto open_err;
-
-      if (DEBUG_DATABASE(1)) {
-	  dbh_print_names(dsh->dbh, "(db) tdb_open( ");
-	  fprintf(dbgout, ", %d )\n", open_mode);
-      }
+    if (DEBUG_DATABASE(1)) {
+	dbh_print_name(dsh->dbh, "(db) tdb_open( ");
+	fprintf(dbgout, ", %d )\n", open_mode);
+    }
       
-      if (open_mode == DB_WRITE) {
-	  if (tdb_lockall(dbp) == 0) {
-	      handle->locked = 1;
-	  }
-	  else {
-	      print_error(__FILE__, __LINE__, "(db) tdb_lockall on file (%s) failed with error %s.",
-			  handle->name[i], tdb_errorstr(dbp));
-	      goto open_err;
-	  }
-      }
+    if (open_mode == DB_WRITE) {
+	if (tdb_lockall(dbp) == 0) {
+	    handle->locked = 1;
+	}
+	else {
+	    print_error(__FILE__, __LINE__, "(db) tdb_lockall on file (%s) failed with error %s.",
+			handle->name, tdb_errorstr(dbp));
+	    goto open_err;
+	}
     }
 
     return dsh;
@@ -146,8 +134,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 
 int db_delete(dsh_t *dsh, const dbv_t *token)
 {
-    int ret = -1; /* cater for handle->count <= 0 */
-    size_t i;
+    int ret;
     dbh_t *handle = dsh->dbh;
     TDB_DATA db_key;
     TDB_CONTEXT *dbp;
@@ -155,16 +142,14 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
     db_key.dptr = token->data;
     db_key.dsize = token->leng;
 
-    for (i = 0; i < handle->count; i += 1) {
-      dbp = handle->dbp[i];
-      ret = tdb_delete(dbp, db_key);
+    dbp = handle->dbp;
+    ret = tdb_delete(dbp, db_key);
 
-      if (ret != 0) {
-          print_error(__FILE__, __LINE__, "(db) tdb_delete('%.*s'), err: %d, %s",
-                      CLAMP_INT_MAX(token->leng), (char *)token->data,
-		      ret, tdb_errorstr(dbp));
-          exit(EX_ERROR);
-      }
+    if (ret != 0) {
+	print_error(__FILE__, __LINE__, "(db) tdb_delete('%.*s'), err: %d, %s",
+		    CLAMP_INT_MAX(token->leng), (char *)token->data,
+		    ret, tdb_errorstr(dbp));
+	exit(EX_ERROR);
     }
 
     return ret;		/* 0 if ok */
@@ -176,7 +161,7 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
     TDB_DATA db_data;
 
     dbh_t *handle = dsh->dbh;
-    TDB_CONTEXT *dbp = handle->dbp[dsh->index];
+    TDB_CONTEXT *dbp = handle->dbp;
 
     db_key.dptr = token->data;
     db_key.dsize = token->leng;
@@ -210,7 +195,7 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
     TDB_DATA db_data;
 
     dbh_t *handle = dsh->dbh;
-    TDB_CONTEXT *dbp = handle->dbp[dsh->index];
+    TDB_CONTEXT *dbp = handle->dbp;
 
     db_key.dptr = token->data;
     db_key.dsize = token->leng;
@@ -233,28 +218,23 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
 /* Close files and clean up. */
 void db_close(void *vhandle, bool nosync)
 {
-    dbh_t *handle = vhandle;
     int ret;
-    size_t i;
+    dbh_t *handle = vhandle;
 
     if (handle == NULL) return;
 
     if (DEBUG_DATABASE(1)) {
-      dbh_print_names(vhandle, "db_close");
-      fprintf(dbgout, " %s\n", nosync ? "nosync" : "sync");
+	dbh_print_name(vhandle, "db_close");
+	fprintf(dbgout, " %s\n", nosync ? "nosync" : "sync");
     }
 
     if (handle->locked) {
-        for (i = 0; i < handle->count; i += 1) {
-            tdb_unlockall(handle->dbp[i]);
-        }
+	tdb_unlockall(handle->dbp);
     }
 
-    for (i = 0; i < handle->count; i += 1) {
-        if ((ret = tdb_close(handle->dbp[i]))) {
-            print_error(__FILE__, __LINE__, "(db) tdb_close on file %s failed with error %s",
-			handle->path, tdb_errorstr(handle->dbp[i]));
-        }
+    if ((ret = tdb_close(handle->dbp))) {
+	print_error(__FILE__, __LINE__, "(db) tdb_close on file %s failed with error %s",
+		    handle->path, tdb_errorstr(handle->dbp));
     }
 
     dbh_free(handle);
@@ -303,10 +283,9 @@ static int tdb_traversor(/*@unused@*/ __attribute__ ((unused)) TDB_CONTEXT * tdb
 
 int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 {
-    dbh_t *handle = dsh->dbh;
-    TDB_CONTEXT *dbp = handle->dbp[dsh->index];
-
     int ret;
+    dbh_t *handle = dsh->dbh;
+    TDB_CONTEXT *dbp = handle->dbp;
 
     userdata_t hookdata;
 

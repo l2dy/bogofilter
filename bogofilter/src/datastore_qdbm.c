@@ -36,10 +36,9 @@ static const double DB_MAXFILL = 0.8;
 
 typedef struct {
     char *path;
-    size_t count;
-    char *name[IX_SIZE];
+    char *name;
     bool locked;
-    DEPOT *dbp[IX_SIZE];
+    DEPOT *dbp;
 } dbh_t;
 
 
@@ -54,21 +53,19 @@ const char *db_version_str(void)
 }
 
 
-static dbh_t *dbh_init(const char *path, size_t count, const char **names)
+static dbh_t *dbh_init(const char *path, const char *name)
 {
-    size_t c;
     dbh_t *handle;
+    size_t len = strlen(path) + strlen(name) + 2;
 
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
 
-    handle->count = count;
     handle->path = xstrdup(path);
-    for (c = 0; c < count; c += 1) {
-	size_t len = strlen(path) + strlen(names[c]) + 2;
-	handle->name[c] = xmalloc(len);
-	build_path(handle->name[c], len, path, names[c]);
-    }
+
+    handle->name = xmalloc(len);
+    build_path(handle->name, len, path, name);
+
     handle->locked = false;
 
     return handle;
@@ -78,10 +75,7 @@ static dbh_t *dbh_init(const char *path, size_t count, const char **names)
 static void dbh_free(/*@only@*/ dbh_t *handle)
 {
     if (handle != NULL) {
-      size_t c;
-      for (c = 0; c < handle->count; c += 1)
-	  xfree(handle->name[c]);
-
+      xfree(handle->name);
       xfree(handle->path);
       xfree(handle);
     }
@@ -89,12 +83,9 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
-static void dbh_print_names(dbh_t *handle, const char *msg)
+static void dbh_print_name(dbh_t *handle, const char *msg)
 {
-    if (handle->count == 1)
-	fprintf(dbgout, "%s (%s)", msg, handle->name[0]);
-    else
-	fprintf(dbgout, "%s (%s,%s)", msg, handle->name[0], handle->name[1]);
+    fprintf(dbgout, "%s (%s)", msg, handle->name);
 }
 
 
@@ -102,12 +93,11 @@ static void dbh_print_names(dbh_t *handle, const char *msg)
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
 */
-void *db_open(const char *db_file, size_t count, const char **names, dbmode_t open_mode)
+void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 {
     dsh_t *dsh;
     dbh_t *handle;
 
-    size_t i;
     int flags;
     DEPOT *dbp;
 
@@ -116,38 +106,34 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
     else
 	flags = DP_OREADER;
 
-    handle = dbh_init(db_file, count, names);
+    handle = dbh_init(db_file, name);
 
     if (handle == NULL) return NULL;
 
-    dsh = dsh_init(handle, handle->count, false);
+    dsh = dsh_init(handle, false);
 
-    for (i = 0; i < handle->count; i += 1) {
+    dbp = handle->dbp = dpopen(handle->name, flags, DB_INITBNUM);
 
-      dbp = handle->dbp[i] = dpopen(handle->name[i], flags, DB_INITBNUM);
+    if (dbp == NULL)
+	goto open_err;
 
-      if (dbp == NULL)
-	  goto open_err;
-
-      if (flags & DP_OWRITER) {
-	  if (!dpsetalign(dbp, DB_ALIGNSIZE)){
-	      dpclose(dbp);
-	      goto open_err;
-	  }
-      }
-
-      if (DEBUG_DATABASE(1)) {
-	  dbh_print_names(dsh->dbh, "(qdbm) dpopen( ");
-	  fprintf(dbgout, ", %d )\n", open_mode);
-      }
-      
+    if (flags & DP_OWRITER) {
+	if (!dpsetalign(dbp, DB_ALIGNSIZE)){
+	    dpclose(dbp);
+	    goto open_err;
+	}
     }
 
+    if (DEBUG_DATABASE(1)) {
+	dbh_print_name(dsh->dbh, "(qdbm) dpopen( ");
+	fprintf(dbgout, ", %d )\n", open_mode);
+    }
+      
     return dsh;
 
  open_err:
     print_error(__FILE__, __LINE__, "(qdbm) dpopen(%s, %d) failed: %s",
-		handle->name[i], flags, dperrmsg(dpecode));
+		handle->name, flags, dperrmsg(dpecode));
     dbh_free(handle);
 
     return NULL;
@@ -156,23 +142,20 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 
 int db_delete(dsh_t *dsh, const dbv_t *token)
 {
-    int ret = -1; /* cater for handle->count <= 0 */
-    size_t i;
+    int ret;
     dbh_t *handle = dsh->dbh;
     DEPOT *dbp;
 
-    for (i = 0; i < handle->count; i += 1) {
-      dbp = handle->dbp[i];
-      ret = dpout(dbp, token->data, token->leng);
+    dbp = handle->dbp;
+    ret = dpout(dbp, token->data, token->leng);
 
-      if (ret == 0) {
-	  print_error(__FILE__, __LINE__, "(qdbm) dpout('%.*s'), err: %s",
-		  CLAMP_INT_MAX(token->leng),
-		      (char *)token->data, dperrmsg(dpecode));
-	  exit(EX_ERROR);
-      }
-      ret = ret ^ 1;	/* ok is 1 in qdbm and 0 in bogofilter */
+    if (ret == 0) {
+	print_error(__FILE__, __LINE__, "(qdbm) dpout('%.*s'), err: %s",
+		    CLAMP_INT_MAX(token->leng),
+		    (char *)token->data, dperrmsg(dpecode));
+	exit(EX_ERROR);
     }
+    ret = ret ^ 1;	/* ok is 1 in qdbm and 0 in bogofilter */
 
     return ret;		/* 0 if ok */
 }
@@ -184,7 +167,7 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
     int dsiz;
 
     dbh_t *handle = dsh->dbh;
-    DEPOT *dbp = handle->dbp[dsh->index];
+    DEPOT *dbp = handle->dbp;
 
     data = dpget(dbp, token->data, token->leng, 0, -1, &dsiz);
 
@@ -228,9 +211,8 @@ static inline void db_optimize(DEPOT *dbp, char *name)
 int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
 {
     int ret;
-
     dbh_t *handle = dsh->dbh;
-    DEPOT *dbp = handle->dbp[dsh->index];
+    DEPOT *dbp = handle->dbp;
 
     ret = dpput(dbp, token->data, token->leng, val->data, val->leng, DP_DOVER);
 
@@ -241,7 +223,7 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
 	exit(EX_ERROR);
     }
 
-    db_optimize(dbp, handle->name[dsh->index]);
+    db_optimize(dbp, handle->name);
 
     return 0;
 }
@@ -253,25 +235,23 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
 void db_close(void *vhandle, bool nosync)
 {
     dbh_t *handle = vhandle;
-    size_t i;
+    DEPOT *dbp;
 
     if (handle == NULL) return;
 
     if (DEBUG_DATABASE(1)) {
-	dbh_print_names(vhandle, "(qdbm) db_close");
+	dbh_print_name(vhandle, "(qdbm) db_close");
 	fprintf(dbgout, " %s\n", nosync ? "nosync" : "sync");
     }
 
-    for (i = 0; i < handle->count; i += 1) {
-	DEPOT *dbp = handle->dbp[i];
+    dbp = handle->dbp;
 
-	db_optimize(dbp, handle->name[i]);
+    db_optimize(dbp, handle->name);
 
-	if (!dpclose(dbp))
-	    print_error(__FILE__, __LINE__, "(qdbm) dpclose for %s failed: %s",
-			handle->name[i], dperrmsg(dpecode));
-	handle->dbp[i] = NULL;
-    }
+    if (!dpclose(dbp))
+	print_error(__FILE__, __LINE__, "(qdbm) dpclose for %s failed: %s",
+		    handle->name, dperrmsg(dpecode));
+    handle->dbp = NULL;
 
     dbh_free(handle);
 }
@@ -283,27 +263,24 @@ void db_close(void *vhandle, bool nosync)
 void db_flush(dsh_t *dsh)
 {
     dbh_t *handle = dsh->dbh;
-    size_t i;
+    DEPOT * dbp = handle->dbp;
 
-    for (i = 0; i < handle->count; i++) {
-	DEPOT * dbp = handle->dbp[i];
-
-	if (!dpsync(dbp))
-	    print_error(__FILE__, __LINE__, "(qdbm) dpsync failed: %s",
-			dperrmsg(dpecode));
-    }
+    if (!dpsync(dbp))
+	print_error(__FILE__, __LINE__, "(qdbm) dpsync failed: %s",
+		    dperrmsg(dpecode));
 }
 
 
 int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 {
+    int ret = 0;
+
     dbh_t *handle = dsh->dbh;
-    DEPOT *dbp = handle->dbp[dsh->index];
+    DEPOT *dbp = handle->dbp;
+
     dbv_t dbv_key, dbv_data;
     int ksiz, dsiz;
     char *key, *data;
-
-    int ret = 0;
 
     ret = dpiterinit(dbp);
     if (ret) {

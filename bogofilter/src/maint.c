@@ -119,7 +119,7 @@ void maintain_wordlists(void)
 int maintain_wordlist_file(const char *db_file)
 {
     int rc;
-    dsh_t *dsh = ds_open(CURDIR_S, 1, &db_file, DB_WRITE);
+    dsh_t *dsh = ds_open(CURDIR_S, db_file, DB_WRITE);
 
     if (dsh == NULL)
 	return EX_ERROR;

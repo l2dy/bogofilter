@@ -19,7 +19,7 @@ extern wordlist_t *word_lists;
 
 void incr_wordlist_mode(void);
 void set_wordlist_mode(const char *filepath);
-size_t build_wordlist_paths(char **filepaths, const char *path);
+bool build_wordlist_path(char *filepath, size_t size, const char *path);
 
 bool configure_wordlist(const char *val);
 

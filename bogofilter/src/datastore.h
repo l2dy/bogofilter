@@ -37,8 +37,6 @@ extern YYYYMMDD today;		/* date as YYYYMMDD */
 
 typedef struct {
     void   *dbh;		/* database handle from db_open() */
-    u_int16_t count;		/* database count (1 or 2) */
-    u_int16_t index;		/* database index (0 or 1) */
     bool is_swapped;
 } dsh_t;
 
@@ -84,8 +82,7 @@ extern int ds_oper(const char *path, dbmode_t open_mode,
  */
 /*@only@*/ /*@null@*/
 extern void *ds_open(const char *path	/** path to database file */, 
-		     size_t count	/** number of data base(s) */,
-		     const char **name /** name(s) of data base(s) */,
+		     const char *name	/** name(s) of data base(s) */,
 		     dbmode_t mode	/** open mode, DB_READ or DB_WRITE */);
 
 /** Close file and clean up. */
@@ -99,7 +96,6 @@ extern void ds_cleanup(void);
 
 dsh_t *dsh_init(
     void *dbh,			/* database handle from db_open() */
-    size_t count,		/* database count (1 or 2) */
     bool is_swapped);
 
 void dsh_free(void *vhandle);
@@ -153,13 +149,11 @@ extern const char *ds_version_str(void);
 /*@only@*/ /*@null@*/
 extern __inline
 void *ds_open(const char *path	/** path to database file */, 
-	      size_t count	/** number of data base(s) */,
-	      const char **name /** name(s) of data base(s) */,
+	      const char *name	/** name(s) of data base(s) */,
 	      dbmode_t mode	/** open mode, DB_READ or DB_WRITE */)
 {
     return *db_open(const char *path	/** path to database file */, 
-	      size_t count	/** number of data base(s) */,
-	      const char **name /** name(s) of data base(s) */,
+	      const char *name		/** name of data base	  */,
 		    dbmode_t mode	/** open mode, DB_READ or DB_WRITE */);
 }
 

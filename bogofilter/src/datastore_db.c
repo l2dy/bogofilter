@@ -35,11 +35,10 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 typedef struct {
     char	*path;
-    size_t	count;
-    char	*name[IX_SIZE];
-    int		fd[IX_SIZE];
+    char	*name;
+    int		fd;
     dbmode_t	open_mode;
-    DB		*dbp[IX_SIZE];
+    DB		*dbp;
     bool	locked;
     bool	is_swapped;
 } dbh_t;
@@ -70,7 +69,7 @@ const char *db_version_str(void)
 static void db_enforce_locking(dbh_t *handle, const char *func_name)
 {
     if (handle->locked == false) {
-	print_error(__FILE__, __LINE__, "%s (%s): Attempt to access unlocked handle.", func_name, handle->name[0]);
+	print_error(__FILE__, __LINE__, "%s (%s): Attempt to access unlocked handle.", func_name, handle->name);
 	exit(EX_ERROR);
     }
 }
@@ -89,24 +88,23 @@ static int db_lock(int fd, int cmd, short int type)
 }
 
 
-static dbh_t *dbh_init(const char *path, size_t count, const char **names)
+static dbh_t *dbh_init(const char *path, const char *name)
 {
-    size_t c;
     dbh_t *handle;
+    size_t len = strlen(path) + strlen(name) + 2;
 
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
 
-    handle->count = count;
+    handle->fd    = -1; /* for lock */
+
     handle->path = xstrdup(path);
-    for (c = 0; c < count ; c += 1) {
-	size_t len = strlen(path) + strlen(names[c]) + 2;
-	handle->name[c] = xmalloc(len);
-	handle->fd[c]    = -1; /* for lock */
-	build_path(handle->name[c], len, path, names[c]);
-    }
-    handle->locked  = false;
-    handle->is_swapped= false;
+    handle->name = xmalloc(len);
+
+    build_path(handle->name, len, path, name);
+    
+    handle->locked     = false;
+    handle->is_swapped = false;
 
     return handle;
 }
@@ -115,9 +113,7 @@ static dbh_t *dbh_init(const char *path, size_t count, const char **names)
 static void dbh_free(/*@only@*/ dbh_t *handle)
 {
     if (handle != NULL) {
-	size_t c;
-	for (c = 0; c < handle->count ; c += 1)
-	    xfree(handle->name[c]);
+	xfree(handle->name);
 	xfree(handle->path);
 	xfree(handle);
     }
@@ -125,12 +121,9 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
-static void dbh_print_names(dbh_t *handle, const char *msg)
+static void dbh_print_name(dbh_t *handle, const char *msg)
 {
-    if (handle->count == 1)
-	fprintf(dbgout, "%s (%s)", msg, handle->name[0]);
-    else
-	fprintf(dbgout, "%s (%s,%s)", msg, handle->name[0], handle->name[1]);
+    fprintf(dbgout, "%s (%s)", msg, handle->name);
 }
 
 
@@ -188,7 +181,7 @@ static void check_fsize_limit(int fd, uint32_t pagesize) {
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
 */
-void *db_open(const char *db_file, size_t count, const char **names, dbmode_t open_mode)
+void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 {
     int ret;
     int is_swapped;
@@ -216,126 +209,120 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 	 * applications try to create a DB at the same time. */
 	opt_flags = 0;
 
-    for (idx = 0; idx < COUNTOF(retryflags); idx += 1) {
-	size_t i;
+    for (idx = 0; idx < COUNTOF(retryflags); idx += 1) 
+    {
+	DB *dbp;
 	uint32_t retryflag = retryflags[idx], pagesize;
 #if DB_AT_LEAST(3,3)
 	DB_BTREE_STAT *dbstat = NULL;
 #endif
 
-	handle = dbh_init(db_file, count, names);
+	handle = dbh_init(db_file, name);
 
 	if (handle == NULL)
 	    break;
 
-	for (i = 0; handle && i < handle->count; i += 1) {
-	    DB *dbp;
+	/* create DB handle */
+	if ((ret = db_create (&dbp, NULL, 0)) != 0) {
+	    print_error(__FILE__, __LINE__, "(db) create, err: %d, %s",
+			ret, db_strerror(ret));
+	    goto open_err;
+	}
 
-	    /* create DB handle */
-	    if ((ret = db_create (&dbp, NULL, 0)) != 0) {
-		print_error(__FILE__, __LINE__, "(db) create, err: %d, %s",
-			    ret, db_strerror(ret));
-		goto open_err;
-	    }
+	handle->dbp = dbp;
 
-	    handle->dbp[i] = dbp;
+	if (db_cachesize != 0 &&
+	    (ret = dbp->set_cachesize(dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
+	    print_error(__FILE__, __LINE__, "(db) setcache( %s ), err: %d, %s",
+			handle->name, ret, db_strerror(ret));
+	    goto open_err;
+	}
 
-	    if (db_cachesize != 0 &&
-		(ret = dbp->set_cachesize(dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
-		print_error(__FILE__, __LINE__, "(db) setcache( %s ), err: %d, %s",
-			    handle->name[0], ret, db_strerror(ret));
-		goto open_err;
-	    }
+	/* open data base */
 
-	    /* open data base */
-
-	    if ((ret = DB_OPEN(dbp, handle->name[i], NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0 && (ret != ENOENT ||
-		(ret = DB_OPEN(dbp, handle->name[i], NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0)) {
-		if (DEBUG_DATABASE(1))
-		    print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s",
-				handle->name[i], ret, db_strerror(ret));
-		goto open_err;
-	    }
-	
+	if ((ret = DB_OPEN(dbp, handle->name, NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0 && (ret != ENOENT ||
+													(ret = DB_OPEN(dbp, handle->name, NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0)) {
 	    if (DEBUG_DATABASE(1))
-		fprintf(dbgout, "db_open( %s, %d ) -> %d\n", handle->name[i], open_mode, ret);
+		print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s",
+			    handle->name, ret, db_strerror(ret));
+	    goto open_err;
+	}
+	
+	if (DEBUG_DATABASE(1))
+	    fprintf(dbgout, "db_open( %s, %d ) -> %d\n", handle->name, open_mode, ret);
 
-	    /* see if the database byte order differs from that of the cpu's */
+	/* see if the database byte order differs from that of the cpu's */
 #if DB_AT_LEAST(3,3)
-	    ret = dbp->get_byteswapped (dbp, &is_swapped);
+	ret = dbp->get_byteswapped (dbp, &is_swapped);
 #else
-	    ret = 0;
-	    is_swapped = dbp->get_byteswapped (dbp);
+	ret = 0;
+	is_swapped = dbp->get_byteswapped (dbp);
 #endif
-	    handle->is_swapped = is_swapped ? true : false;
+	handle->is_swapped = is_swapped ? true : false;
 
-	    if (ret != 0) {
-		dbp->err (dbp, ret, "%s (db) get_byteswapped: %s",
-			  progname, handle->name);
-		db_close(handle, false);
-		return NULL;		/* handle already freed, ok to return */
-	    }
+	if (ret != 0) {
+	    dbp->err (dbp, ret, "%s (db) get_byteswapped: %s",
+		      progname, handle->name);
+	    db_close(handle, false);
+	    return NULL;		/* handle already freed, ok to return */
+	}
 
-	    ret = dbp->fd(dbp, &handle->fd[i]);
-	    if (ret < 0) {
-		dbp->err (dbp, ret, "%s (db) fd: %s",
-			  progname, handle->name);
-		db_close(handle, false);
-		return NULL;		/* handle already freed, ok to return */
-	    }
+	ret = dbp->fd(dbp, &handle->fd);
+	if (ret < 0) {
+	    dbp->err (dbp, ret, "%s (db) fd: %s",
+		      progname, handle->name);
+	    db_close(handle, false);
+	    return NULL;		/* handle already freed, ok to return */
+	}
 
-	    /* query page size */
+	/* query page size */
 #if DB_AT_LEAST(3,3)
-	    ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
-	    if (ret) {
-		dbp->err (dbp, ret, "%s (db) stat: %s", progname, handle->name);
-		db_close(handle, false);
-		return NULL;
-	    }
-	    pagesize = dbstat->bt_pagesize;
+	ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
+	if (ret) {
+	    dbp->err (dbp, ret, "%s (db) stat: %s", progname, handle->name);
+	    db_close(handle, false);
+	    return NULL;
+	}
+	pagesize = dbstat->bt_pagesize;
 #ifndef	ENABLE_MEMDEBUG
-	    free(dbstat);
+	free(dbstat);
 #endif
 #else
-	    /* The old, pre-3.3 API will not fill in the page size with
-	     * DB_CACHED_COUNTS, and without DB_CACHED_COUNTS,
-	     * BerlekeyDB will read the whole data base, incurring a
-	     * severe performance penalty. We'll guess a page size.
-	     * As this is a safety margin for the file size, we'll
-	     * rather choose it too large than too small. */
-	    pagesize = 16384;
+	/* The old, pre-3.3 API will not fill in the page size with
+	 * DB_CACHED_COUNTS, and without DB_CACHED_COUNTS,
+	 * BerlekeyDB will read the whole data base, incurring a
+	 * severe performance penalty. We'll guess a page size.
+	 * As this is a safety margin for the file size, we'll
+	 * rather choose it too large than too small. */
+	pagesize = 16384;
 #endif
 
-	    check_fsize_limit(handle->fd[i], pagesize);
+	check_fsize_limit(handle->fd, pagesize);
 
-	    if (db_lock(handle->fd[i], F_SETLK,
-			(short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
-	    {
-		int e = errno;
-		handle->fd[i] = -1;
-		db_close(handle, true);
-		handle = NULL;	/* db_close freed it, we don't want to use it anymore */
-		errno = e;
-		/* do not bother to retry if the problem wasn't EAGAIN */
-		if (e != EAGAIN && e != EACCES) return NULL;
-		/* do not goto open_err here, db_close frees the handle! */
-		if (errno == EACCES)
-		    errno = EAGAIN;
-	    } else {
-		idx = COUNTOF(retryflags);
-	    }
-	} /* for i over handle */
+	if (db_lock(handle->fd, F_SETLK,
+		    (short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
+	{
+	    int e = errno;
+	    handle->fd = -1;
+	    db_close(handle, true);
+	    handle = NULL;	/* db_close freed it, we don't want to use it anymore */
+	    errno = e;
+	    /* do not bother to retry if the problem wasn't EAGAIN */
+	    if (e != EAGAIN && e != EACCES) return NULL;
+	    /* do not goto open_err here, db_close frees the handle! */
+	    if (errno == EACCES)
+		errno = EAGAIN;
+	} else {
+	    idx = COUNTOF(retryflags);
+	}
     } /* for idx over retryflags */
 
     if (handle) {
-	unsigned int i;
 	dsh_t *dsh;
 	handle->locked = true;
-	for (i = 0; i < handle->count; i += 1) {
-	    if (handle->fd[i] < 0)
-		handle->locked=false;
-	}
-	dsh = dsh_init(handle, handle->count, handle->is_swapped);
+	if (handle->fd < 0)
+	    handle->locked=false;
+	dsh = dsh_init(handle, handle->is_swapped);
 	return (void *)dsh;
     }
 
@@ -351,8 +338,8 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 int db_delete(dsh_t *dsh, const dbv_t *token)
 {
     int ret = 0;
-    size_t i;
     dbh_t *handle = dsh->dbh;
+    DB *dbp = handle->dbp;
 
     DBT db_key;
     DBT_init(db_key);
@@ -360,17 +347,14 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
     db_key.data = token->data;
     db_key.size = token->leng;
 
-    for (i = 0; i < handle->count; i += 1) {
-	DB *dbp = handle->dbp[i];
-	ret = dbp->del(dbp, NULL, &db_key, 0);
+    ret = dbp->del(dbp, NULL, &db_key, 0);
 
-	if (ret != 0 && ret != DB_NOTFOUND) {
-	    print_error(__FILE__, __LINE__, "(db) db_delete('%.*s'), err: %d, %s",
+    if (ret != 0 && ret != DB_NOTFOUND) {
+	print_error(__FILE__, __LINE__, "(db) db_delete('%.*s'), err: %d, %s",
 		    CLAMP_INT_MAX(db_key.size),
 		    (const char *) db_key.data,
     		    ret, db_strerror(ret));
-	    exit(EX_ERROR);
-	}
+	exit(EX_ERROR);
     }
 
     return ret;		/* 0 if ok */
@@ -384,7 +368,7 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
     DBT db_data;
 
     dbh_t *handle = dsh->dbh;
-    DB *dbp = handle->dbp[dsh->index];
+    DB *dbp = handle->dbp;
 
     db_enforce_locking(handle, "db_get_dbvalue");
 
@@ -441,7 +425,7 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
     DBT db_data;
 
     dbh_t *handle = dsh->dbh;
-    DB *dbp = handle->dbp[dsh->index];
+    DB *dbp = handle->dbp;
 
     db_enforce_locking(handle, "db_set_dbvalue");
 
@@ -469,17 +453,15 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
 /* Close files and clean up. */
 void db_close(void *vhandle, bool nosync)
 {
-    dbh_t *handle = vhandle;
     int ret;
-    size_t i;
+    dbh_t *handle = vhandle;
+    DB *dbp = handle->dbp;
     uint32_t f = nosync ? DB_NOSYNC : 0;
 
     if (DEBUG_DATABASE(1)) {
-	dbh_print_names(handle, "db_close");
+	dbh_print_name(handle, "db_close");
 	fprintf(dbgout, " %s\n", nosync ? "nosync" : "sync");
     }
-
-    if (handle == NULL) return;
 
 #if 0
     if (handle->fd >= 0) {
@@ -488,13 +470,8 @@ void db_close(void *vhandle, bool nosync)
     }
 #endif
 
-    for (i = 0; i < handle->count; i += 1) {
-	DB *dbp = handle->dbp[i];
-	if (dbp == NULL)
-	    continue;
-	if ((ret = dbp->close(dbp, f)))
-	    print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
-    }
+    if ((ret = dbp->close(dbp, f)))
+	print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
 
 /*  ds_lock_release(handle); */
     dbh_free(handle);
@@ -506,21 +483,19 @@ void db_close(void *vhandle, bool nosync)
 */
 void db_flush(dsh_t *dsh)
 {
-    dbh_t *handle = dsh->dbh;
     int ret;
-    size_t i;
-    for (i = 0; i < handle->count; i += 1) {
-	DB *dbp = handle->dbp[i];
-	if ((ret = dbp->sync(dbp, 0)))
-	    print_error(__FILE__, __LINE__, "(db) db_sync: err: %d, %s", ret, db_strerror(ret));
-    }
+    dbh_t *handle = dsh->dbh;
+    DB *dbp = handle->dbp;
+
+    if ((ret = dbp->sync(dbp, 0)))
+	print_error(__FILE__, __LINE__, "(db) db_sync: err: %d, %s", ret, db_strerror(ret));
 }
 
 
 int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 {
     dbh_t *handle = dsh->dbh;
-    DB *dbp = handle->dbp[dsh->index];
+    DB *dbp = handle->dbp;
 
     int ret = 0;
 

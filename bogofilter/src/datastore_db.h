@@ -29,8 +29,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
  */
 /*@only@*/ /*@null@*/
 void *db_open(const char *path	/** path to database file */, 
-	      size_t count	/** number of data base(s) */,
-	      const char **name /** name(s) of data base(s) */,
+	      const char *name	/** name(s) of data base(s) */,
 	      dbmode_t mode	/** open mode, DB_READ or DB_WRITE */);
 
 /** Close file and clean up. */

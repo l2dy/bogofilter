@@ -56,51 +56,13 @@ static int robx_hook(word_t *key, dsv_t *data,
 		     void *userdata)
 {
     struct robhook_data *rh = userdata;
-    dsh_t *dsh = rh->dsh;
-    sh_t i = dsh->index;
-
-    bool doit;
 
     /* ignore system meta-data */
     if (*key->text == '.')
 	return 0;
 
-    if (dsh->count == 1) {
-	doit = true;
-    } else {
-	/* tokens in good list were already counted */
-	/* now add in tokens only in spam list */
-	ds_read(dsh, key, data);
-	doit = data->goodcount == 0;
-    }
-
-    if (doit)
-	robx_accum(rh, key, data);
-
-    dsh->index = i;
-
-    return 0;
-}
-
-static int count_hook(word_t *key, dsv_t *data, 
-		      void *userdata)
-{
-    struct robhook_data *rh = userdata;
-    dsh_t *dsh = rh->dsh;
-    sh_t i = dsh->index;
-
-    /* ignore system meta-data */
-    if (*key->text == '.')
-	return 0;
-
-    ds_read(dsh, key, data);
-
-    /* skip tokens with goodness == 0 */
-    if (data->goodcount != 0)
-	robx_accum(rh, key, data);
-
-    dsh->index = i;
-
+    robx_accum(rh, key, data);
+    
     return 0;
 }
 
@@ -128,17 +90,7 @@ static double compute_robx(dsh_t *dsh)
     rh.sum = 0.0;
     rh.count = 0;
 
-    if (dsh->count == 1) {
-	dsh->index = 0;
-	ds_foreach(dsh, robx_hook, &rh);
-    }
-    else {
-	dsh->index = IX_GOOD;	    /* robx needs count of good tokens */
-	ds_foreach(dsh, count_hook, &rh);
-
-	dsh->index = IX_SPAM;	    /* and scores for spam spam tokens */
-	ds_foreach(dsh, robx_hook, &rh);
-    }
+    ds_foreach(dsh, robx_hook, &rh);
 
     rx = rh.sum/rh.count;
     if (verbose > 2)

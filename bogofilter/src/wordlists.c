@@ -46,9 +46,6 @@ static void rand_sleep(double min, double max)
     bf_sleep(delay);
 }
 
-const char *aCombined[] = { WORDLIST };
-size_t	    cCombined = COUNTOF(aCombined);
-
 void open_wordlists(dbmode_t mode)
 {
     wordlist_t *list;
@@ -59,7 +56,7 @@ void open_wordlists(dbmode_t mode)
 	for (list = word_lists; list != NULL; list = list->next) {
 	    if (db_cachesize < 4)
 		db_cachesize = 4;
-	    list->dsh = ds_open(list->filepath, cCombined, aCombined, mode);
+	    list->dsh = ds_open(list->filepath, WORDLIST, mode);
 	    if (list->dsh == NULL) {
 		int err = errno;
 		close_wordlists(true); /* unlock and close */
@@ -75,7 +72,7 @@ void open_wordlists(dbmode_t mode)
 			    return;
 			fprintf(stderr,
 				"Can't open file '%s' in directory '%s'.\n",
-				aCombined[0], list->filepath);
+				WORDLIST, list->filepath);
 			if (err != 0)
 			    fprintf(stderr,
 				    "error #%d - %s.\n", err, strerror(err));
@@ -107,14 +104,13 @@ void close_wordlists(bool nosync /** Normally false, if true, do not synchronize
     }
 }
 
-size_t build_wordlist_paths(char **filepaths, const char *path)
+bool build_wordlist_path(char *filepath, size_t size, const char *path)
 {
     bool ok;
-    size_t count = 1;
 
-    ok = build_path(filepaths[0], sizeof(FILEPATH), path, WORDLIST) == 0;
+    ok = build_path(filepath, size, path, WORDLIST) == 0;
 
-    return count;
+    return ok;
 }
 
 void set_good_weight(double weight)
