@@ -33,15 +33,15 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include "xstrdup.h"
 
 typedef struct {
-    char *filename;
-    size_t count;    
-    char *name[2];
-    int fd;
-    dbmode_t open_mode;
-    DB *dbp[2];
-    pid_t pid;
-    bool locked;
-    int  is_swapped;
+    char	*filename;
+    size_t	count;
+    char	*name[2];
+    int		fd;
+    dbmode_t	open_mode;
+    DB		*dbp[2];
+    pid_t	pid;
+    bool	locked;
+    int		is_swapped;
     /*@owned@*/ void *dbh_word;	/* database handle */
     /*@owned@*/ void *dbh_good;	/* database handle */
     /*@owned@*/ void *dbh_spam;	/* database handle */
@@ -56,8 +56,6 @@ typedef struct {
 #else
 #define	DB_OPEN(db, file, database, dbtype, flags, mode) db->open(db, file, database, dbtype, flags, mode)
 #endif
-
-int db_cachesize = 0;	/* in MB */
 
 /* Function prototypes */
 
@@ -351,7 +349,8 @@ int db_get_dbvalue(void *vhandle, const word_t *word, /*@out@*/ dbv_t *val)
 	    exit(2);
 	}
     }
-    if (!found &&DEBUG_DATABASE(3)) {
+
+    if (!found && DEBUG_DATABASE(3)) {
 	fprintf(dbgout, "db_getvalues (%s): [",
 		handle->name[0]);
 	word_puts(word, 0, dbgout);
@@ -401,7 +400,6 @@ void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val)
 		cv[0] = swap_32bit(val->count[i]);
 		cv[1] = swap_32bit(val->date);
 	    }
-
 	}
 	db_data.data = &cv;			/* and save array in wordlist */
 	if (!datestamp_tokens || val->date == 0)
