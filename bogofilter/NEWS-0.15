@@ -2,11 +2,19 @@
 				BOGOFILTER NEWS
 			       =================
 
-0.15.???
+0.15.4	2003-09-20
 
+* Additional header line tagging as suggested by Michael O'Reilly.
+* No longer discarding message separators.
 * Revise parsing pattern for "encoded text" and regression
   test for folded text.
+* Added BOGOTEST environment variable to enable flex debugging.
+* Report if database file permissions wrong.
+* No longer including pid in syslog error messages.
+* Fixed bogoutil problem with '-w' and '-p'.
 * Use GSL (the Gnu Scientific Library) when it's available.
+* Minor revision of bogotune.
+* Minor revision of bogominitrain.pl
 
 0.15.3	2003-09-10
 

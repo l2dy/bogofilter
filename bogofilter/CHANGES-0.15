@@ -4,6 +4,29 @@
 
 $Id$
 
+0.15.4	2003-09-20
+
+	* Additional header line tagging as suggested by Michael O'Reilly.
+	* Minor revision of bogotune.
+
+	2003-09-17
+
+	* Report if database file permissions wrong.
+	* No longer including pid in syslog error messages.
+
+	2003-09-16
+
+	* No longer discarding message separators.
+
+	2003-09-15
+
+	* Added BOGOTEST environment variable to enable flex debugging.
+	* Minor revision of bogominitrain.pl
+
+	2003-09-13
+
+	* Fixed bogoutil problem with '-w' and '-p'.
+
 	2003-09-12
 
 	* Revise parsing pattern for "encoded text" and regression
