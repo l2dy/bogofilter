@@ -80,13 +80,16 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 {
     bool retry = false;
     void *dbe;
+    char *x;
 
     if (list->type == WL_IGNORE) 	/* open ignore list in read-only mode */
 	mode = DS_READ;
 
     /* FIXME: create or reuse environment from filepath */
 
-    dbe = list_searchinsert(bf_dirname(list->filepath));
+    x = bf_dirname(list->filepath);
+    dbe = list_searchinsert(x);
+    free(x);
     if (dbe == NULL)
 	exit(EX_ERROR);
     list->dsh = ds_open(dbe, bogohome, list->filepath, mode); /* FIXME */
