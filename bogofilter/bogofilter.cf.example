@@ -17,6 +17,7 @@
 
 #algorithm=graham
 algorithm=robinson
+#algorithm=fisher
 
 
 #### SPAM_HEADER_NAME
