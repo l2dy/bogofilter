@@ -135,7 +135,7 @@ done
 %files
 %defattr(-,root,root)
 
-%doc AUTHORS CHANGES* COPYING INSTALL METHODS
+%doc AUTHORS CHANGES* COPYING INSTALL
 %doc NEWS README* RELEASE.NOTES* TODO
 %doc doc/bogofilter-tuning.HOWTO.html
 %doc doc/bogofilter-SA-2002-01
@@ -164,7 +164,7 @@ done
 %files static
 %defattr(-,root,root)
 
-%doc AUTHORS CHANGES* COPYING INSTALL METHODS
+%doc AUTHORS CHANGES* COPYING INSTALL
 %doc NEWS README* RELEASE.NOTES* TODO
 %doc doc/bogofilter-tuning.HOWTO.html
 %doc doc/bogofilter-SA-2002-01
