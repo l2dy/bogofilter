@@ -18,7 +18,6 @@ extern	bool	twostate;		/* '-2' */
 extern	bool	threestate;		/* '-3' */
 extern	bulk_t	bulk_mode;		/* '-B' */
 extern	bool	suppress_config_file;	/* '-C' */
-extern	char	*directory;		/* '-d' */
 extern	bool	nonspam_exits_zero;	/* '-e' */
 extern	bool	fisher;			/* '-f' */
 extern	bool	force;			/* '-F' */

@@ -59,7 +59,6 @@ bool	separate_counts = true;		/* -Ps,-PS - default: enabled  */
 bool	tokenize_html_script = false;	/* -Ps - not yet in use */
 
 /* dual definition options */
-char	*directory;			/* '-d' */
 method_t *method = NULL;
 
 /* from html.c */

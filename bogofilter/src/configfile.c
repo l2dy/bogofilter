@@ -120,12 +120,11 @@ static bool process_config_parameter(const parm_desc *arg, char *val, priority_t
 	case CP_DIRECTORY:
 	    {
 		char *dir = tildeexpand(val);
-		xfree(*arg->addr.s);
-		*arg->addr.s = dir;
 		if (DEBUG_CONFIG(2))
 		    fprintf(dbgout, "%s -> '%s'\n", arg->name, dir);
 		if (setup_wordlists(dir, precedence) != 0)
 		    exit(EX_ERROR);
+		xfree(dir);
 		break;
 	    }
 	case CP_FUNCTION:

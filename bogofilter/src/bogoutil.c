@@ -729,11 +729,6 @@ int main(int argc, char *argv[])
 
     set_today();			/* compute current date for token age */
     
-    /* Get directory name from environment */
-    directory = get_directory(PR_ENV_BOGO);
-    if (directory == NULL)
-	directory = get_directory(PR_ENV_HOME);
-
     count = process_args(argc, argv);
 
     /* Extra or missing parameters */

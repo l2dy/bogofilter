@@ -117,6 +117,7 @@ extern wl_t wl_default;
 **		and on dummy entries for options private to algorithms
 **		so config.c won't generate an error message.
 */
+static char *directory;
 
 const parm_desc sys_parms[] =
 {
@@ -670,11 +671,12 @@ void process_args_2(int argc, char **argv)
 	switch(option)
 	{
 	case 'd':
-	    xfree(directory);
-	    directory = xstrdup(optarg);
-	    if (setup_wordlists(directory, PR_COMMAND) != 0)
+	{
+	    char *dir = optarg;
+	    if (setup_wordlists(dir, PR_COMMAND) != 0)
 		exit(EX_ERROR);
 	    break;
+	}
 
 	case 'k':
 	    db_cachesize=atoi(optarg);

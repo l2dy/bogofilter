@@ -76,7 +76,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     ds_cleanup();
     mime_cleanup();
     token_cleanup();
-    xfree(directory);
 
 #ifdef	ENABLE_MEMDEBUG
     memdisplay();
