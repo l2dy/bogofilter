@@ -95,7 +95,6 @@ EOF
 # suppress timestamps & version info in output
 BUOPTS="-y 0"
 BFOPTS='--header_format=%h: %c, tests=bogofilter, spamicity=%p'
-PAT="s/[,]\? version.*//"
 
 # build wordlists
 $BOGOUTIL $OPTS -l ${TMPDIR}/ignore.db   < ${TMPDIR}/ignore.txt
@@ -107,7 +106,7 @@ $BOGOUTIL $OPTS -l ${TMPDIR}/system.db   < ${TMPDIR}/system.txt
 
 for DB in ${TMPDIR}/*.db ; do
     printf "%-12s" `basename $DB`: >> $OUT
-    $BOGOFILTER "$BFOPTS" -C -D -H -e --wordlist=r,wordlist,`basename $DB`,1 -m0.1 -v -I ${TMPDIR}/message | sed "$PAT" >> $OUT
+    $BOGOFILTER "$BFOPTS" -C -D -H -e --wordlist=r,wordlist,`basename $DB`,1 -m0.1 -v -I ${TMPDIR}/message >> $OUT
 done
 echo >> $OUT
 
@@ -115,7 +114,7 @@ echo >> $OUT
 
 for CFG in ${TMPDIR}/*.cf ; do
     echo Using `basename $CFG`: >> $OUT
-    $BOGOFILTER "$BFOPTS" -D -H -e -c $CFG -m0.1 -vvv -I ${TMPDIR}/message | sed "$PAT" >> $OUT
+    $BOGOFILTER "$BFOPTS" -D -H -e -c $CFG -m0.1 -vvv -I ${TMPDIR}/message >> $OUT
     echo >> $OUT
 done
 
@@ -130,7 +129,7 @@ echo common message ignore | $BOGOFILTER "$BFOPTS" -D -H -n -c ${TMPDIR}/$CF_IGN
 
 for DB in ${TMPDIR}/*.db ; do
     printf "%-12s" `basename $DB`: >> $OUT
-    $BOGOFILTER "$BFOPTS" -C -D -H -e --wordlist=r,wordlist,`basename $DB`,1 -m0.1 -v -I ${TMPDIR}/message | sed "$PAT" >> $OUT
+    $BOGOFILTER "$BFOPTS" -C -D -H -e --wordlist=r,wordlist,`basename $DB`,1 -m0.1 -v -I ${TMPDIR}/message >> $OUT
 done
 echo >> $OUT
 
@@ -138,7 +137,7 @@ echo >> $OUT
 
 for CFG in ${TMPDIR}/*.cf ; do
     echo Using `basename $CFG`: >> $OUT
-    $BOGOFILTER "$BFOPTS" -D -H -e -c $CFG -m0.1 -vvv -I ${TMPDIR}/message | sed "$PAT" >> $OUT
+    $BOGOFILTER "$BFOPTS" -D -H -e -c $CFG -m0.1 -vvv -I ${TMPDIR}/message >> $OUT
     echo >> $OUT
 done
 
