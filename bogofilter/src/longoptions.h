@@ -3,7 +3,7 @@
 /*****************************************************************************
 
 NAME:
-   options.h -- definitions for options.c
+   longoptions.h -- definitions for longoptions.c
 
 AUTHOR:
    David Relson <relson@osagesoftware.com>

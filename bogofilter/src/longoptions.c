@@ -3,9 +3,10 @@
 /*****************************************************************************
 
 NAME:
-   configfile.c -- process config file parameters
+   longoptions.c -- define long options
 
-   2003-02-12 - split out from config.c so bogolexer use the code.
+   2004-12-28 - split out from bogoconfig.c so it can be used by
+		bogolexer and bogoutil.
 
 AUTHOR:
    David Relson <relson@osagesoftware.com>
