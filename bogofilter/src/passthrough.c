@@ -60,6 +60,15 @@ static bool is_blank_line(const char *line, size_t len)
     return true;
 }
 
+/** check if the line we're looking at is a header/body delimiter */
+static bool is_hb_delim(const char *line, size_t len, bool strict_body)
+{
+    if (strict_body)
+	return len == 0;
+
+    return is_blank_line(line, len);
+}
+
 static int read_mem(char **out, void *in) {
     textdata_t **text = in;
     if ((*text)->next) {
@@ -153,7 +162,8 @@ void write_message(rc_t status)
 
 	    /* detect end of headers */
 	    if (is_eol(out, rd) ||
-		is_blank_line(out, rd))		/* check for non-empty blank line */
+		is_hb_delim(out, rd, have_body))
+		/* check for non-empty blank line */
 		break;
 
 	    /* rewrite "Subject: " line */
