@@ -229,8 +229,8 @@ int words_from_path(char *directory, int argc, char **argv, bool show_probabilit
     char filepath[PATH_LEN];
     char buf[BUFSIZE];
     char *token = buf;
-    int spam_count, spam_msg_count; 
-    int good_count, good_msg_count;
+    int spam_count, spam_msg_count = 0 ;
+    int good_count, good_msg_count = 0 ;
 
     char *head_format = !show_probability ? "%-20s %6s %6s\n"   : "%-20s %6s %6s %6s\n";
     char *data_format = !show_probability ? "%-20s %6ld %6ld\n" : "%-20s %6ld %6ld %f\n";
@@ -252,7 +252,7 @@ int words_from_path(char *directory, int argc, char **argv, bool show_probabilit
     printf(head_format, "", "spam", "good", "prob");
     while (argc >= 0)
     {
-	double spamness, goodness, prob;
+	double spamness, goodness, prob = 0.0f;
 	
 	if ( argc == 0)
 	{
