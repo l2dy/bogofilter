@@ -49,6 +49,7 @@ Note: bogolexer also uses configfile.c.
 #include "charset.h"
 #include "configfile.h"
 #include "datastore.h"
+#include "datastore_db.h"
 #include "error.h"
 #include "find_home.h"
 #include "format.h"
@@ -122,6 +123,14 @@ struct option long_options[] = {
     { "verbosity",			N, 0, 'v' },
     { "block_on_subnets",		R, 0, O_BLOCK_ON_SUBNETS },
     { "charset_default",		R, 0, O_CHARSET_DEFAULT },
+#ifdef	HAVE_DECL_DB_CREATE
+    { "db_lk_max_locks",		R, 0, O_DB_MAX_LOCKS },
+    { "db_lk_max_objects",		R, 0, O_DB_MAX_OBJECTS },
+#ifdef	FUTURE_DB_OPTIONS
+    { "db_log_autoremove",		R, 0, O_DB_LOG_AUTOREMOVE },
+    { "db_txn_durable",			R, 0, O_DB_TXN_DURABLE },
+#endif
+#endif
     { "ns_esf",				R, 0, O_NS_ESF },
     { "sp_esf",				R, 0, O_SP_ESF },
     { "ham_cutoff",			R, 0, O_HAM_CUTOFF },
@@ -694,6 +703,14 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case O_TIMESTAMP:			timestamp_tokens = get_bool(name, val);			break;
     case O_UNSURE_SUBJECT_TAG:		unsure_subject_tag = get_string(name, val);		break;
     case O_WORDLIST:			configure_wordlist(val);				break;
+#ifdef	HAVE_DECL_DB_CREATE
+    case O_DB_MAX_OBJECTS:		db_max_objects = atoi(val);				break;
+    case O_DB_MAX_LOCKS:		db_max_locks   = atoi(val);				break;
+#ifdef	FUTURE_DB_OPTIONS
+    case O_DB_LOG_AUTOREMOVE:		db_log_autoremove  = get_bool(name, val);		break;
+    case O_DB_TXN_DURABLE:		db_txn_durable = get_bool(name, val);			break;
+#endif
+#endif
     }
 }
 
@@ -747,7 +764,15 @@ void query_config(void)
     Q2 display_wordlists("%-18s   ");
     Q2 fprintf(stdout, "\n");
 
-    Q2 fprintf(stdout, "%-18s = %d\n", "db_cachesize",    db_cachesize);
+    Q2 fprintf(stdout, "%-18s = %d\n", "db_cachesize",        	db_cachesize);
+#ifdef	HAVE_DECL_DB_CREATE
+    Q2 fprintf(stdout, "%-18s = %d\n", "db_lk_max_locks",   	db_max_locks);
+    Q2 fprintf(stdout, "%-18s = %d\n", "db_lk_max_objects", 	db_max_objects);
+#ifdef	FUTURE_DB_OPTIONS
+    Q2 fprintf(stdout, "%-18s = %s\n", "db_log_autoremove",     YN(db_log_autoremove));
+    Q2 fprintf(stdout, "%-18s = %s\n", "db_log_txn_durable",	YN(db_txn_durable));
+#endif
+#endif
 
     exit(EX_OK);
 }

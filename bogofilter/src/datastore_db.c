@@ -67,6 +67,14 @@ Matthias Andree <matthias.andree@gmx.de> 2003 - 2004
 static DB_ENV *dbe;	/* libdb environment, if in use, NULL otherwise */
 static int lockfd = -1;	/* fd of lock file to prevent concurrent recovery */
 
+u_int32_t db_max_locks = 16384;		/* set_lk_max_locks    32768 */
+u_int32_t db_max_objects = 16384;	/* set_lk_max_objects  32768 */
+
+#ifdef	FUTURE_DB_OPTIONS
+bool	  db_log_autoremove = false;	/* DB_LOG_AUTOREMOVE */
+bool	  db_txn_durable = true;	/* not DB_TXN_NOT_DURABLE */
+#endif
+
 static const DBTYPE dbtype = DB_BTREE;
 
 static bool init = false;
@@ -1009,8 +1017,7 @@ static int db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
  * do not want recovery to stomp over us
  */
 int db_init(void) {
-    const u_int32_t numlocks = 16384;
-    const u_int32_t numobjs = 16384;
+    u_int32_t flags = 0;
 
     /* open lock file, needed to detect previous crashes */
     if (init_dbl(bogohome))
@@ -1030,7 +1037,20 @@ int db_init(void) {
     }
 
     /* initialize */
-    return db_xinit(numlocks, numobjs, /* flags */ 0);
+
+#ifdef	FUTURE_DB_OPTIONS
+#ifdef	DB_LOG_AUTOREMOVE
+    if (db_log_autoremove)
+	flags ^= DB_LOG_AUTOREMOVE;
+#endif
+
+#ifdef	DB_TXN_NOT_DURABLE
+    if (db_txn_durable)
+	flags ^= DB_TXN_NOT_DURABLE;
+#endif
+#endif
+
+    return db_xinit(db_max_locks, db_max_objects, flags);
 }
 
 int db_recover(int catastrophic, int force) {

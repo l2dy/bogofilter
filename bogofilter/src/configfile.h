@@ -31,6 +31,12 @@ typedef enum longopts_e {
     O_IGNORE = 1000,
     O_BLOCK_ON_SUBNETS,
     O_CHARSET_DEFAULT,
+    O_DB_MAX_OBJECTS,
+    O_DB_MAX_LOCKS,
+#ifdef	FUTURE_DB_OPTIONS
+    O_DB_LOG_AUTOREMOVE,
+    O_DB_TXN_DURABLE,
+#endif
     O_NS_ESF,
     O_SP_ESF,
     O_HAM_CUTOFF,

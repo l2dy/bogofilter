@@ -25,8 +25,18 @@ Briefly:
 
 	2004-11-11
 
-	* The README.doc file now has information on the DB_CONFIG file that
+	* The README.db file now has information on the DB_CONFIG file that
 	  can be created and used to configure the Berkeley DB module.
+
+	* Bogofilter's config file now supports setting max lock and
+	  object counts for Berkeley DB using options 
+	      db_lk_max_locks=N 
+	      db_lk_max_objects=N
+
+	* Bogofilter and bogoutil now allow these options on the
+          command line, as:
+	      --db_lk_max_locks=N 
+	      --db_lk_max_objects=N
 
 	2004-11-10
 
@@ -43,6 +53,18 @@ Briefly:
 
 	* Return DB_VERSION_STRING contents in -V (version) output when
 	  compiled against Berkeley DB. Minor change to the output format.
+
+	* Bogofilter's config file  now supports setting max lock and
+	  object counts for Berkeley DB using options 
+	  
+	      db_lk_max_locks=N 
+	      db_lk_max_objects=N
+
+	* Bogofilter and bogoutil now allow these options on the
+          command line, as:
+
+	      --db_lk_max_locks=N 
+	      --db_lk_max_objects=N
 
 	2004-11-09
 

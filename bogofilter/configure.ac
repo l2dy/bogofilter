@@ -171,6 +171,8 @@ dnl May not be complete with future extensions, but appears to work
 dnl today, 2003-10-02. Matthias Andree
 AC_DEFINE(__NO_CTYPE,1,[Define __NO_CTYPE to 1 to avoid GLIBC_2.3-specific ctype.h functions.])
 
+dnl Enable building statically linked executables
+
 AC_ARG_ENABLE(static,
       AC_HELP_STRING([--enable-static], [Build static versions as well.]))
 

@@ -91,6 +91,14 @@ struct option long_options[] = {
     { "block_on_subnets",		R, 0, O_BLOCK_ON_SUBNETS },
     { "bogofilter_dir",			R, 0, O_IGNORE },
     { "charset_default",		R, 0, O_IGNORE },
+#ifdef	HAVE_DECL_DB_CREATE
+    { "db_lk_max_locks",		R, 0, O_IGNORE },
+    { "db_lk_max_objects",		R, 0, O_IGNORE },
+#ifdef	FUTURE_DB_OPTIONS
+    { "db_log_autoremove",		R, 0, O_IGNORE },
+    { "db_txn_durable",			R, 0, O_IGNORE },
+#endif
+#endif
     { "ham_cutoff",			R, 0, O_IGNORE },
     { "header_format",			R, 0, O_IGNORE },
     { "log_header_format",		R, 0, O_IGNORE },
