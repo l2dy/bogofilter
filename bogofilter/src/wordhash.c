@@ -525,6 +525,8 @@ convert_propslist_to_countlist(wordhash_t *whi)
 
 	co->good = ci->good;
 	co->bad  = ci->bad ;
+	co->msgs_good = msgs_good;
+	co->msgs_bad  = msgs_bad ;
     }
 
     return who;
