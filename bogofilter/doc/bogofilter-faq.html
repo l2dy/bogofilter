@@ -95,6 +95,11 @@
 	      "Lock table is out of available locks" or<br>
 	      "Lock table is out of available object entries"?</a></li>
           <li><a href="#page-notfound">Why am I getting DB_PAGE_NOTFOUND messages?</a></li>
+	  <li><a href="#db-private">Why am I getting &quot;Berkeley DB
+	      library configured to support only DB_PRIVATE
+	      environments&quot; or<br>
+	      &quot;Berkeley DB library configured to support only
+	      private environments&quot;?</a>
           <li><a href="#update">How do I upgrade from separate word
           databases to the new combined wordlist format?</a></li>
         </ul>
@@ -998,6 +1003,42 @@
 
     <hr>
 
+	  <h2 id="db-private">Why am I getting &quot;Berkeley DB
+	      library configured to support only DB_PRIVATE
+	      environments&quot; or<br>
+	      &quot;Berkeley DB library configured to support only
+	      private environments&quot;?</h2>
+
+	  <p>Some distributors (for instance the Fedora Project) package
+	  Berkeley DB with support for POSIX threading and hence POSIX
+	  mutexes, but your system does not support POSIX mutexes
+	  (whether it
+	  does, depends on the kernel version and exact processor
+	  type).</p>
+
+	  <p>To work around this problem:
+	  <ol>
+	      <li>download, compile and install <a
+		  href="http://www.sleepycat.com/products/db.shtml">Berkeley
+		  DB</a> on your own and the reconfigure bogofilter:
+	      <ol>
+		  <li><kbd>cd build_unix</kbd></li>
+		  <li><kbd>../dist/configure --enable-cxx</kbd></li>
+		  <li><kbd>make</kbd></li>
+		  <li><kbd>make install</kbd></li>
+	      </ol>
+	      <li>recompile and install bogofilter:
+	      <ol>
+		  <li><kbd>./configure
+		      --with-libdb-prefix=/usr/local/BerkeleyDB.4.3</kbd>
+		  <em>(replace your Berkeley DB version number)</em></li>
+		  <li><kbd>make &amp;&amp; make check</kbd></li>
+		  <li><kbd>make install</kbd> <em>(if space is a
+		      premium, use <kbd>make install-strip)</kbd></em></li>
+	      </ol>
+	  </ol>
+
+    <hr>
     <h2 id="update">How do I upgrade from separate word databases to
     the new combined wordlist format?</h2>
 

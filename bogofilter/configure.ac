@@ -285,7 +285,15 @@ AC_REPLACE_FUNCS(strlcpy strlcat strerror strtoul)
 
 AC_LIB_RPATH
 
+AC_ARG_ENABLE(transactions,
+	      AS_HELP_STRING([--enable-transactions], [Enable transactions in Berkeley DB (yes)]))
+
+AC_ARG_ENABLE(dbshared-test,
+	      AS_HELP_STRING([--disable-dbshared-test], [Defeat test for shared environment (unsafe)]))
+
 AC_CACHE_SAVE
+
+AM_CONDITIONAL(ENABLE_OLD_BDB, test "x$enable_transactions" = "xno")
 
 WITH_DB_ENGINE=db
 AC_ARG_WITH(database,
@@ -367,7 +375,7 @@ Remember to include your config.log.
 	dnl check if run-time link works
 	saveLIBS="$LIBS"
 	LIBS="$LIBS $LIBDB"
-	AC_MSG_CHECKING(if a program can be linked against BerkeleyDB and run)
+	AC_MSG_CHECKING(if a program can be linked against Berkeley DB and run)
 	AC_RUN_IFELSE(
 	AC_LANG_PROGRAM([[
 #ifdef HAVE_INTTYPES_H
@@ -384,7 +392,9 @@ Did you adjust your library search path to include your libdb?])],)
 
 	dnl check if header and library of DB library match
 	dnl ignore if cross compiling
-	AC_MSG_CHECKING(if BerkeleyDB header and library versions match)
+	AC_MSG_CHECKING(if Berkeley DB header and library versions match)
+	rm -r -f bfadtestdir
+	mkdir bfadtestdir
 	AC_RUN_IFELSE(
 	AC_LANG_PROGRAM([[
 		   #include <stdlib.h>
@@ -406,14 +416,54 @@ Did you adjust your library search path to include your libdb?])],)
 		   AC_MSG_ERROR(db.h header file and db library version do not match.)],)
 	AC_MSG_RESULT(yes)
 	AC_CHECK_DECLS(db_create,,
-	       AC_MSG_ERROR([[Can not locate a suitable BerkeleyDB db.h header file.
+	       AC_MSG_ERROR([[Can not locate a suitable Berkeley DB db.h header file.
 Use --with-libdb-prefix=PATH to specify the path to a v3+ install directory.
-You can download BerkeleyDB 4.1.x from http://www.sleepycat.com/]]),
+You can download Berkeley DB 4.3.x from http://www.sleepycat.com/]]),
 	[[#ifdef HAVE_INTTYPES_H
 #include <inttypes.h>
 #endif
 #include <db.h>]]
 	)
+	AC_MSG_CHECKING(if Berkeley DB supports shared environments)
+	if test "x$enable_dbshared_test" != xno ; then
+	AC_RUN_IFELSE(
+	AC_LANG_PROGRAM([[
+#ifdef HAVE_INTTYPES_H
+#include <inttypes.h>
+#endif
+#include <db.h>
+#include <stdio.h>
+#include <stdlib.h>
+#define TESTDIR "bfadtestdir"
+#define barf(where, what) do { fprintf(stderr, "%s failed: %s\n", where, db_strerror(what)); exit(1); } while(0)
+		   ]], [[
+    DB_ENV *e;
+    int r;
+    if ((r = db_env_create(&e, 0))) barf("db_env_create", r);
+    if ((r = e->open(e, TESTDIR, DB_INIT_LOCK|DB_INIT_MPOOL|DB_CREATE, 0664)))
+	barf("DB_ENV->open", r);
+    if ((r = e->close(e, 0)))
+        barf("DB_ENV->close", r);
+    if ((r = db_env_create(&e, 0))) barf("db_env_create", r);
+    if ((r = e->remove(e, TESTDIR, 0))) barf("DB_ENV->remove", r);
+    return 0;
+		   ]]),,
+		   [AC_MSG_RESULT(no)
+	rm -r -f bfadtestdir
+	AC_MSG_ERROR([
+Cannot open a shared environment in Berkeley DB. This is a known problem
+on Fedora Core Linux. Build your own Berkeley DB installation and use
+--with-libdb-prefix to point bogofilter to it. Alternatively, you can
+use the unsafe non-transactional database by configuring with
+--disable-transactions.
+Packagers, if you are absolutely sure that the target system supports
+shared environments, you can use --disable-dbshared-test.])],)
+	rm -r -f bfadtestdir
+	AC_MSG_RESULT(yes)
+    else
+	AC_MSG_RESULT(skipped)
+    fi
+
 	LIBS="$saveLIBS"
     ;;
     *)
@@ -431,10 +481,6 @@ fi
 
 AC_SUBST(STATIC_DB)
 
-AC_ARG_ENABLE(transactions,
-	      AS_HELP_STRING([--enable-transactions], [Enable transactions in Berkeley DB (yes)]))
-
-AM_CONDITIONAL(ENABLE_OLD_BDB, test "x$enable_transactions" = "xno")
 AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xtdb")
 AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
 

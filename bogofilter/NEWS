@@ -21,6 +21,13 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+0.93.3	2004-12-XX
+
+	2004-12-09
+
+	* configure now checks if Berkeley DB supports shared environments and
+	  suggests workarounds if it doesn't, to aid Fedora Core users.
+
 	2004-12-05
 
 	* New directory doc/programmer/OS2 contains configure.os2
