@@ -558,6 +558,10 @@ static int process_arglist(int argc, char **argv)
 	case 'y':		/* date as YYYYMMDD */
 	    maintain = true;
 	    today = string_to_date((char *)optarg);
+	    if (date < 19990000) {
+		fprintf(stderr, "Date format for '-y' option is YYYYMMDD\n");
+		exit(EX_ERROR);
+	    }
 	    break;
 
 	case 'I':
