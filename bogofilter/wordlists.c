@@ -18,6 +18,7 @@
 #include "bogofilter.h"
 #include "datastore.h"
 #include "error.h"
+#include "find_home.h"
 #include "paths.h"
 #include "wordlists.h"
 #include "xmalloc.h"
