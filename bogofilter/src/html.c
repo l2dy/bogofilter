@@ -20,11 +20,11 @@ AUTHOR:
 
 /* Macro Definitions */
 
-#define	COMMENT_START	"<!"
-#define	COMMENT_START_LEN 2		/* strlen(COMMENT_START) */
+#define	COMMENT_START	"<!--"
+#define	COMMENT_START_LEN	4	/* strlen(COMMENT_START) */
 
-#define	COMMENT_END	">"
-#define	COMMENT_END_LEN 1		/* strlen(COMMENT_END) */
+#define	COMMENT_END	"-->"
+#define	COMMENT_END_LEN 	3	/* strlen(COMMENT_END) */
 
 /* Function Declarations */
 
@@ -82,6 +82,8 @@ static int kill_html_comment(buff_t *buff, size_t comment_offset)
 	size_t avail;
 
 /*
+	fails for msg.spam.sky.3343.2
+
 	if (test & 1) {
 	    size_t cspn = strcspn((const char *)tmp, "<>");
 	    tmp += cspn;
@@ -121,14 +123,13 @@ static int kill_html_comment(buff_t *buff, size_t comment_offset)
 	case '>':
 	{
 	    /* Hack to only check for ">" rather than complete terminator "-->" */
-	    bool short_check = true;
+	    bool short_check = false;
 	    if (level == 0)
 		done = true;
+	    tmp += 1;
 	    if (level > 0 && (short_check || 
-			      memcmp(tmp+1-COMMENT_END_LEN, COMMENT_END, COMMENT_END_LEN) == 0))
+			      memcmp(tmp - COMMENT_END_LEN, COMMENT_END, COMMENT_END_LEN) == 0))
 	    {
-		size_t len = short_check ? 1 : COMMENT_END_LEN;
-		tmp += len;
 		/* eat comment */
 		buff_shift(buff, comment, tmp - comment);
 		tmp = comment;
