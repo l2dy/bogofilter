@@ -696,8 +696,9 @@ static ex_t dbe_env_purgelogs(DB_ENV *dbe)
 	    if (DEBUG_DATABASE(1))
 		fprintf(dbgout, " removing logfile %s\n", *i);
 	    if (unlink(*i)) {
-		print_error(__FILE__, __LINE__,
-			"cannot unlink \"%s\": %s", *i, strerror(errno));
+		if (errno != ENOENT)
+		    print_error(__FILE__, __LINE__,
+			    "cannot unlink \"%s\": %s", *i, strerror(errno));
 		/* proceed anyways */
 	    }
 	}
