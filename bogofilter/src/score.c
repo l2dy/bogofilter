@@ -103,7 +103,7 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 	}
 	return;
     }
-    
+
     for (list=word_lists; list != NULL; list=list->next)
     {
 	size_t i;
