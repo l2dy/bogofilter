@@ -26,7 +26,11 @@
 
 	<cmdsynopsis>
 	    <command>bogoutil</command>
-	    <arg choice="plain">-R</arg>
+	    <group choice="req">
+		<arg choice="plain">-r</arg>
+		<arg choice="plain">-R</arg>
+	    </group>
+	    <arg choice="plain"><replaceable>directory</replaceable></arg>
 	</cmdsynopsis>
 
 	<cmdsynopsis>
@@ -93,9 +97,14 @@
 	    to display the value of one or more tokens in one or more databases and add a column of probabilities to the output.  
 	    Option <option>-p</option> takes the same arguments as option  <option>-w</option> .
 	</para>
-	<para>The <option>-R</option> option tells
+	<para>The <option>-r</option> option tells
 	    <application>bogoutil</application> to recalculate the ROBX
-	    value.</para>
+	    value for the word lists in <option>directory</option>.
+        </para>
+	<para>The <option>-R</option> option tells is like <option>-r</option>
+	    except that the calculated ROBX value is also stored as token .ROBX
+	    in <option>directory/spamlist.db</option>.
+	</para>
 	<para>The <option>-I <replaceable>file</replaceable></option> option tells
 	    <application>bogoutil</application> to read its input from
 	    <replaceable>file</replaceable> rather than stdin.</para>
