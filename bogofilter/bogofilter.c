@@ -1,7 +1,11 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.22  2002/10/02 16:12:53  relson
+ * Added SIZEOF(array) macro for readability of for loops iterating over arrays, particularly the extrema array.
+ *
  * Revision 1.21  2002/09/29 03:40:54  gyepi
+ *
  * Modified: bogofilter.c bogofilter.h main.c
  * 1. replace Judy with hash table (wordhash)
  * 2. ensure that databases are always locked in the same order.
@@ -298,6 +302,8 @@ typedef struct
 }
 bogostat_t;
 
+#define SIZEOF(array)	sizeof(array)/sizeof(array[0])
+
 int compare_stats(const void *id1, const void *id2)
 { 
     const discrim_t *d1 = id1;
@@ -363,7 +369,7 @@ bogostat_t *select_indicators(wordhash_t *wordhash)
     discrim_t *pp;
     static bogostat_t stats;
     
-    for (pp = stats.extrema; pp < stats.extrema+sizeof(stats.extrema)/sizeof(*stats.extrema); pp++)
+    for (pp = stats.extrema; pp < stats.extrema+SIZEOF(stats.extrema); pp++)
     {
  	pp->prob = 0.5f;
  	pp->key[0] = '\0';
@@ -377,7 +383,7 @@ bogostat_t *select_indicators(wordhash_t *wordhash)
 	double	hitdev=1;
 
 	// update the list of tokens with maximum deviation
-	for (pp = stats.extrema; pp < stats.extrema+sizeof(stats.extrema)/sizeof(*stats.extrema); pp++)
+	for (pp = stats.extrema; pp < stats.extrema+SIZEOF(stats.extrema); pp++)
         {
 	    double slotdev=DEVIATION(pp->prob);
 
@@ -414,7 +420,7 @@ double compute_spamicity(bogostat_t *stats)
     // Bayes' theorem.
     // For discussion, see <http://www.mathpages.com/home/kmath267.htm>.
     product = invproduct = 1.0f;
-    for (pp = stats->extrema; pp < stats->extrema+sizeof(stats->extrema)/sizeof(*stats->extrema); pp++)
+    for (pp = stats->extrema; pp < stats->extrema+SIZEOF(stats->extrema); pp++)
 	if (pp->prob != 0)
 	{
 	    product *= pp->prob;
