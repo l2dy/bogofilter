@@ -15,7 +15,7 @@ AUTHORS:
 #include "prob.h"
 
 double calc_prob_pure(uint good, uint bad,
-	double goodmsgs, double badmsgs,
+	uint goodmsgs, uint badmsgs,
 	double s, double x)
 {
     int n = good + bad;
@@ -36,7 +36,8 @@ double calc_prob_pure(uint good, uint bad,
 	*/
 
 	/* This modified version, with 1 division, is considerably% faster. */
-	pw = bad * goodmsgs / (bad * goodmsgs + good * badmsgs);
+	pw =   bad * (double)goodmsgs
+	    / (bad * (double)goodmsgs + good * (double)badmsgs);
 
 	fw = (s * x + n * pw) / (s + n);
     }

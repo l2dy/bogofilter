@@ -18,7 +18,7 @@ extern double calc_prob(uint good, uint bad);
 
 /** calculate the probability that a token is bad */
 extern double calc_prob_pure(uint good, uint bad,
-	double goodmsgs, double badmsgs,
+	uint goodmsgs, uint badmsgs,
 	double s, double x);
 
 #endif	/* PROB_H */
