@@ -12,12 +12,10 @@ AUTHOR:
 
 #include <stdio.h>
 #include <stdarg.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include <config.h>
 #include "common.h"
-#include "globals.h"
 
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>

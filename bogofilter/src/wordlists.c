@@ -6,7 +6,6 @@
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <sys/stat.h>
 #include "system.h"
 #ifdef HAVE_SYS_SELECT_H
 #include <sys/select.h>
