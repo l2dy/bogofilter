@@ -335,7 +335,8 @@ static bool check_for_high_ns_scores(void)
     if (ns_scores[t-1] < SPAM_CUTOFF)
 	return false;
     else {
-	fprintf(stderr, "Warning:  high scoring non-spam.\n");
+	if (!quiet)
+	    fprintf(stderr, "Warning:  high scoring non-spam.\n");
 	return true;
     }
 }
@@ -392,7 +393,8 @@ static bool check_for_low_sp_scores(void)
     if (sp_scores[t-1] > HAM_CUTOFF)
 	return false;
     else {
-	fprintf(stderr, "Warning:  low scoring spam.\n");
+	if (!quiet)
+	    fprintf(stderr, "Warning:  low scoring spam.\n");
 	return true;
     }
 }
@@ -400,6 +402,9 @@ static bool check_for_low_sp_scores(void)
 static void scoring_error(void)
 {
     int i;
+
+    if (quiet)
+	return;
 
     printf("    high ham scores:\n");
     for (i = 0; i < 10 && ns_scores[i] > SPAM_CUTOFF; i += 1) 
@@ -428,7 +433,7 @@ static void print_ns_scores(uint beg, uint cnt, uint dlt)
     uint i, m = min(cnt + dlt, ns_cnt);
 
     printf("ns:\n");
-    for (i = beg; i < m; i += 1)
+    for (i = beg; i <= m; i += 1)
 	printf("    %3d %0.16f %c\n", i+1, ns_scores[i], flag(i, cnt, dlt));
 }
 #endif
@@ -440,7 +445,7 @@ static void print_sp_scores(uint beg, uint cnt, uint dlt)
     uint i, m = min(cnt + dlt, sp_cnt);
 
     printf("sp:\n");
-    for (i = beg; i < m; i += 1)
+    for (i = beg; i <= m; i += 1)
 	printf("    %3d %0.16f %c\n", i+1, sp_scores[i], flag(i, cnt, dlt));
 }
 #endif
@@ -490,7 +495,7 @@ static void set_thresh(uint count, double *scores)
     if (verbose >= PARMS)
 	printf("mtarget %d, ftarget %d, percent %6.4f%%\n", mtarget, ftarget, percent * 100.0);
 
-    if (!force && (cutoff < MIN_CUTOFF || cutoff > MAX_CUTOFF)) {
+    if (!force && !quiet && (cutoff < MIN_CUTOFF || cutoff > MAX_CUTOFF)) {
 	fprintf(stderr,
 		"%s high-scoring non-spams in this data set.\n",
 		(cutoff < MIN_CUTOFF) ? "Too few" : "Too many");
@@ -700,6 +705,7 @@ static void help(void)
 		  "\t  -v      - increase level of verbose messages\n"
 		  "\t  -F      - accept initial spam_cutoff < 0.5 and\n"
 		  "\t          - accept high scoring non-spam and low scoring spam\n"
+		  "\t  -Q      - quiet (suppress warnings)\n"
 	);
     (void)fprintf(stderr,
 		  "\n"
@@ -739,6 +745,9 @@ static int process_args(int argc, char **argv)
 		    break;
 		case 'n':
 		    run_type = REG_GOOD;
+		    break;
+		case 'Q':
+		    quiet = true;
 		    break;
 		case 'r':
 		    argc -= 1;
@@ -820,14 +829,15 @@ static int load_hook(word_t *key, dsv_t *data, void *userdata)
 static double get_robx(void)
 {
     double rx;
-    if (user_robx > 0.0)
-	return user_robx;
 
-    printf("Calculating initial x value...\n");
-
-    verbose = -verbose;		/* disable bogofilter debug output */
-    rx = compute_robinson_x(ds_file);
-    verbose = -verbose;		/* enable bogofilter debug output */
+    if (user_robx > 0.0) 
+	rx = user_robx;
+    else {
+	printf("Calculating initial x value...\n");
+	verbose = -verbose;		/* disable bogofilter debug output */
+	rx = compute_robinson_x(ds_file);
+	verbose = -verbose;		/* enable bogofilter debug output */
+    }
 
     if (rx > 0.6) rx = 0.6;
     if (rx < 0.4) rx = 0.4;
@@ -1193,7 +1203,8 @@ static rc_t bogotune(void)
 #ifdef	TEST
     if (test) {
 	printf("m: %8.6f, s: %8.6f, x: %0.16f\n", min_dev, robs, robx);
-	print_ns_scores(target-2, target+2, 0);
+	if (verbose < PARMS)
+	    print_ns_scores(target-2, target+2, 0);
     }
 #endif
 
