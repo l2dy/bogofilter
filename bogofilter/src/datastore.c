@@ -31,10 +31,6 @@ David Relson <relson@osagesoftware.com>  2003
 
 YYYYMMDD today;			/* date as YYYYMMDD */
 
-/* Function prototypes */
-
-static void ds_init(void);
-
 /* Function definitions */
 
 static
@@ -310,16 +306,18 @@ int ds_oper(const char *path, dbmode_t open_mode,
 
 static word_t  *msg_count_tok;
 
-static void ds_init()
+void ds_init()
 {
     if (msg_count_tok == NULL) {
 	msg_count_tok = word_new((const byte *)MSG_COUNT, strlen(MSG_COUNT));
     }
+    db_init();
 }
 
 /* Cleanup storage allocation */
 void ds_cleanup()
 {
+    db_cleanup();
     xfree(msg_count_tok);
     msg_count_tok = NULL;
 }
@@ -331,7 +329,6 @@ bool ds_get_msgcounts(void *vhandle, dsv_t *val)
 {
     int rc;
     dsh_t *dsh = vhandle;
-    ds_init();
     rc = ds_read(dsh, msg_count_tok, val);
     return rc == 0;
 }

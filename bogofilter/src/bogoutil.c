@@ -77,7 +77,9 @@ static int dump_file(char *ds_file)
 
     token_count = 0;
 
+    ds_init();
     rc = ds_oper(ds_file, DB_READ, ds_dump_hook, NULL);
+    ds_cleanup();
 
     if (verbose)
 	fprintf(dbgout, "%d tokens dumped\n", token_count);
@@ -107,6 +109,8 @@ static int load_file(const char *ds_file)
     unsigned long line = 0;
     unsigned long count[IX_SIZE], date;
     YYYYMMDD today_save = today;
+
+    ds_init();
 
     dsh = ds_open(CURDIR_S, ds_file, DB_WRITE);
     if (dsh == NULL)
@@ -186,6 +190,8 @@ static int load_file(const char *ds_file)
 
     ds_close(dsh, false);
 
+    ds_cleanup();
+
     if (verbose)
 	fprintf(dbgout, "%d tokens loaded\n", load_count);
 
@@ -239,6 +245,8 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
         fprintf(stderr, "Expecting non-empty directory or file name.\n");
         return EX_ERROR;
     }
+
+    ds_init();
 
     if ( stat(path, &sb) == 0 ) {
 	/* XXX FIXME: deadlock possible */
@@ -311,6 +319,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     }
 
     ds_close(dsh, false);
+    ds_cleanup();
 
     buff_free(buff);
 
@@ -336,6 +345,7 @@ static int get_robx(char *path)
 	
 	run_type = REG_SPAM;
 
+	ds_init();
 	dsh = ds_open(CURDIR_S, filepath, DB_WRITE);
 	if (dsh == NULL)
 	    return EX_ERROR;
@@ -344,6 +354,7 @@ static int get_robx(char *path)
 	val.spamcount = (uint32_t) (rx * 1000000);
 	ds_write(dsh, word_robx, &val);
 	ds_close(dsh, false);
+	ds_cleanup();
 
 	word_free(word_robx);
     }

@@ -311,3 +311,9 @@ int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 const char *db_str_err(int e) {
     return dperrmsg(e);
 }
+
+/* dummy infrastructure, to be expanded by environment
+ * or transactional initialization/shutdown */
+static bool init = false;
+int db_init(void) { init = true; return 0; }
+void db_cleanup(void) { init = false; }

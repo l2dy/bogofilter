@@ -73,7 +73,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     free_wordlists();
 
     /* cleanup storage */
-    ds_cleanup();
     mime_cleanup();
     token_cleanup();
 

@@ -49,6 +49,8 @@ void open_wordlists(dbmode_t mode)
     int retry;
 
     do {
+	ds_init();
+
 	retry = 0;
 	for (list = word_lists; list != NULL; list = list->next) {
 	    if (db_cachesize < 4)
@@ -106,6 +108,8 @@ void close_wordlists(bool nosync /** Normally false, if true, do not synchronize
 	if (list->dsh) ds_close(list->dsh, nosync);
 	list->dsh = NULL;
     }
+
+    ds_cleanup();
 }
 
 bool build_wordlist_path(char *filepath, size_t size, const char *path)

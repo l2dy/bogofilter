@@ -38,6 +38,10 @@ void  db_close(/*@only@*/ void *vhandle, bool nosync  /** Normally false, if tru
 /** Flush pending writes to disk */
 void db_flush(dsh_t *dsh);
 
+/** Do global initializations. \return 0 for success, non-zero for
+ * error. */
+int db_init(void);
+
 /** Cleanup storage allocation */
 void db_cleanup(void);
 

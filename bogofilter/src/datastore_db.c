@@ -41,6 +41,8 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include "xmalloc.h"
 #include "xstrdup.h"
 
+static bool init;
+
 typedef struct {
     char	*path;
     char	*name;
@@ -200,6 +202,8 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 {
     int ret;
     int is_swapped;
+
+    if (!init) abort();
 
     dbh_t *handle = NULL;
     uint32_t opt_flags = 0;
@@ -548,3 +552,9 @@ int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 const char *db_str_err(int e) {
     return db_strerror(e);
 }
+
+/* dummy infrastructure, to be expanded by environment
+ * or transactional initialization/shutdown */
+static bool init = false;
+int db_init(void) { init = true; return 0; }
+void db_cleanup(void) { init = false; }

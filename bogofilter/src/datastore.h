@@ -91,6 +91,9 @@ extern void  ds_close(/*@only@*/ void *, bool nosync  /** Normally false, if tru
 /** Flush pending writes to disk */
 extern void ds_flush(void *);
 
+/** Global initialization */
+extern void ds_init(void);
+
 /** Cleanup storage allocation */
 extern void ds_cleanup(void);
 
