@@ -51,8 +51,6 @@ map_rc()
 #	3 g vvv		X-Bogosity: Spam, spamicity=1.000000
 #	3 r vvv		X-Bogosity: Spam, spamicity=0.540316
 
-alg="f"
-
 BOGOFILTER_DIR="${TMPDIR}"
 export BOGOFILTER_DIR
 $BOGOFILTER $OPTS -s < ${SYSTEST}/inputs/spam.mbx
@@ -72,8 +70,8 @@ for tst in 1.1.v 2.2a.vv 2.2a.vvv 3.3.vvv ; do
     out=`echo $tst | tr "." " " | $AWK '{print $2}'`
     ver=`echo $tst | tr "." " " | $AWK '{print $3}'`
     map_rc $BOGOFILTER $OPTS -$ver 2>/dev/null \
-    < ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg || :
-    sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/msg.$out.$alg.$ver
+    < ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/out || :
+    sed s/,.version=.*// < ${TMPDIR}/out > ${TMPDIR}/msg.$out.$ver
 done
 #
 # classify msg.2.txt a second time and rerun tests
@@ -85,11 +83,10 @@ for tst in 2.2b.vv 2.2b.vvv ; do
     out=`echo $tst | tr "." " " | $AWK '{print $2}'`
     ver=`echo $tst | tr "." " " | $AWK '{print $3}'`
     map_rc $BOGOFILTER $OPTS -$ver 2>/dev/null \
-    < ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg
-    sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/msg.$out.$alg.$ver
+    < ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/out
+    sed s/,.version=.*// < ${TMPDIR}/out > ${TMPDIR}/msg.$out.$ver
 done
 if  [ $verbose -eq 0 ]; then
-    rm -f ${TMPDIR}/tests-$alg
     rm -f $BOGOFILTER_DIR/*.${DB_EXT}
 fi
 
@@ -97,7 +94,7 @@ rm -f ${CONFIG}
 
 if [ "$BF_SAVEDIR" ] ; then . ${srcdir}/t.save ; fi
 
-for i in $OUTPUTS/*f.v* ; do
+for i in $OUTPUTS/msg.*.v* ; do
     j=`basename $i`
     if  [ $verbose -eq 0 ]; then
 	cmp $i ${TMPDIR}/$j
