@@ -33,29 +33,30 @@ make
 make check
 
 %install
+
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 make DESTDIR=${RPM_BUILD_ROOT} install-strip
 cp $RPM_BUILD_ROOT%{_sysconfdir}/bogofilter.cf.example \
    $RPM_BUILD_ROOT%{_sysconfdir}/bogofilter.cf
 
-for a in xml html contrib ; do
-  mkdir -p .inst/$a
+for d in xml html contrib tuning ; do
+  mkdir -p .inst/$d
 done
 
-for i in doc/*.xml ; do
-  install -m644 $i .inst/xml
+for f in doc/*.xml ; do
+  install -m644 $f .inst/xml
 done
 
-for i in doc/*.html ; do
-  install -m644 $i .inst/html
+for f in doc/*.html ; do
+  install -m644 $f .inst/html
 done
 
 files=`find contrib -maxdepth 1 -type f | grep -v Makefile`
-for i in $files ; do
-  case $i in
+for f in $files ; do
+  case $f in
     *.c|*.o|*.obj) continue ;;
   esac
-  install -m644 $i .inst/contrib
+  install -m644 $f .inst/contrib
 done
 
 for README in randomtrain ; do
@@ -74,6 +75,7 @@ done
 %{_bindir}/bogoupgrade
 %{_sysconfdir}/bogofilter.cf.example
 %config(noreplace) %{_sysconfdir}/bogofilter.cf
+
 %doc AUTHORS CHANGES-0.10 CHANGES-0.11 CHANGES-0.12 COPYING INSTALL METHODS NEWS
 %doc README README.cvs RELEASE.NOTES-0.11 RELEASE.NOTES-0.12 TODO UPGRADE
 %doc doc/bogofilter-tuning.HOWTO doc/integrating-with-qmail
