@@ -151,10 +151,10 @@ double lookup_and_score(const word_t *token, wordcnts_t *cnts)
 
     if (header_degen && token->leng >= 5 && memcmp(token->text, "head:", 5) == 0) {
 	word_t *tword = word_new(token->text+5, token->leng-5);
-	wordcnts_t tprop;
-	memset(&tprop, 0, sizeof(tprop));
-	lookup(tword, &tprop);
-	wordcnts_incr(cnts, &tprop);
+	wordcnts_t tcnts;
+	wordcnts_init(&tcnts);
+	lookup(tword, &tcnts);
+	wordcnts_incr(cnts, &tcnts);
 	prob = wordprob_result(cnts);
 	word_free(tword);
     }

@@ -21,11 +21,16 @@ static void initialize(void)
     init_charset_table(charset_default, true);
 }
 
-/* this is referenced by register.c, must not be static */
 void wordprop_init(void *vwordprop)
 {
     wordprop_t *wordprop = vwordprop;
     memset(wordprop, 0, sizeof(*wordprop));
+}
+
+void wordcnts_init(void *vwordcnts)
+{
+    wordcnts_t *wordcnts = vwordcnts;
+    memset(wordcnts, 0, sizeof(*wordcnts));
 }
 
 /* this is used by robinson.c static */
