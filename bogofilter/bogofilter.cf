@@ -11,6 +11,14 @@
 #	as used in the bogofilter source code.
 
 
+#### ALGORITHM
+#
+#	specify spamitity algorithm
+
+algorithm=graham
+#algorithm=robinson
+
+
 #### SPAM_HEADER_NAME
 #
 #	used in reporting spamicity and
