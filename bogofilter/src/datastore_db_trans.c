@@ -612,7 +612,7 @@ static void dbx_cleanup_lite(dbe_t *env)
 	}
 
 	xfree(env->directory);
-	free(env);
+	xfree(env);
     }
 }
 
@@ -712,7 +712,7 @@ static ex_t dbe_env_purgelogs(DB_ENV *dbe)
 		/* proceed anyways */
 	    }
 	}
-	free(list);
+	xfree(list);
     }
     return EX_OK;
 }
@@ -963,16 +963,16 @@ probe_txn_t probe_txn(bfdir *directory, bffile *file)
 
 	w = stat(t, &st);
 	if (w == 0) {
-	    free(t);
+	    xfree(t);
 	    return P_DISABLE;
 	}
 	if (errno == ENOENT) {
-	    free(t);
+	    xfree(t);
 	    return P_DONT_KNOW;
 	}
 	print_error(__FILE__, __LINE__, "cannot stat %s: %s",
 		t, db_strerror(r));
-	free(t);
+	xfree(t);
 	return P_ERROR;
     }
     if (r != 0) {

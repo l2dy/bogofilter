@@ -195,7 +195,7 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
     val->leng = db_data.dsize;		/* read count */
     memcpy(val->data, db_data.dptr, db_data.dsize);
     
-    free(db_data.dptr);
+    xfree(db_data.dptr);
 
     return 0;
 }

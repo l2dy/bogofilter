@@ -68,9 +68,9 @@ static dbh_t *dbh_init(
 static void free_dbh(dbh_t *dbh) {
     if (!dbh)
 	return;
-    free(dbh->name);
-    free(dbh->path);
-    free(dbh);
+    xfree(dbh->name);
+    xfree(dbh->path);
+    xfree(dbh);
 }
 
 /** Executes the SQL statement \a cmd on the database \a db and returns
@@ -167,8 +167,8 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
 		    if (key.leng != strlen(ENDIAN32)
 			    || memcmp(key.data, ENDIAN32, key.leng) != 0)
 			rc = hook(&key, &val, userdata);
-		    free(val.data);
-		    free(key.data);
+		    xfree(val.data);
+		    xfree(key.data);
 		    if (rc) {
 			sqlite3_finalize(stmt);
 			return rc;
@@ -188,7 +188,7 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
 		return rc;
 	}
     }
-    /* free resources */
+    /* xfree resources */
     sqlite3_finalize(stmt);
     return found ? 0 : DS_NOTFOUND;
 }
@@ -244,7 +244,7 @@ void *db_open(void *dummyenv, const char *dbpath,
 		    v.leng = sizeof(p);
 		    if (sqlexec(dbh->db, LAYOUT)) goto barf;
 		    rc2 = db_set_dbvalue(dbh, &k, &v);
-		    free(k.data);
+		    xfree(k.data);
 		    if (rc2)
 			goto barf;
 		    if (sqlexec(dbh->db, "COMMIT;")) goto barf;
@@ -264,13 +264,13 @@ void *db_open(void *dummyenv, const char *dbpath,
 	k.leng = strlen(k.data);
 
 	ee = db_get_dbvalue(dbh, &k, &v);
-	free(k.data);
+	xfree(k.data);
 	switch(ee) {
 	    case 0: /* found endian marker token, read it */
 		if (v.leng < 4)
 		    goto barf;
 		t = ((u_int32_t *)v.data)[0];
-		free(v.data);
+		xfree(v.data);
 		switch (t) {
 		    case 0x01020304: /* same endian, "UNIX" */
 			dbh->swapped = false;
@@ -299,7 +299,7 @@ barf:
 	    dbh->name, sqlite3_errmsg(dbh->db));
 barf2:
     sqlite3_close(dbh->db);
-    free_dbh(dbh);
+    xfree_dbh(dbh);
     return NULL;
 }
 
@@ -312,7 +312,7 @@ void db_close(void *handle) {
 		dbh->name, rc);
 	exit(EX_ERROR);
     }
-    free_dbh(dbh);
+    xfree_dbh(dbh);
 }
 
 const char *db_version_str(void) {
@@ -337,7 +337,7 @@ static int sqlfexec(sqlite3 *db, const char *cmd, ...)
     buf = sqlite3_vmprintf(cmd, ap);
     va_end(ap);
     rc = sqlexec(db, buf);
-    free(buf);
+    xfree(buf);
     return rc;
 }
 
@@ -358,7 +358,7 @@ int db_txn_commit(void *vhandle) {
 
 /** Converts \a len unsigned characters starting at \a input into the
  * SQL X'b1a4' notation, returns malloc'd string that the caller must
- * free. */
+ * xfree. */
 static char *binenc(const void *input, size_t len) {
     const unsigned char *in = input;
     const char hexdig[] = "0123456789ABCDEF";

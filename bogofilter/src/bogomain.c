@@ -93,7 +93,7 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	closelog();
 #endif
 
-    free(progtype);
+    xfree(progtype);
 
     return (exitcode);
 }
