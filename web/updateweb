@@ -15,12 +15,21 @@ cmdpfx="cvs -d :pserver:anonymous@cvs1:/cvsroot/bogofilter"
 
 # check out
 $cmdpfx update
-for i in bogofilter-faq.html bogofilter-faq-fr.html ; do
-  $cmdpfx checkout -p -Dtomorrow bogofilter/doc/$i >$i
-done
-$cmdpfx checkout -p -Dtomorrow bogofilter/NEWS >NEWS
 
-# remove cruft and internal files
-rsync -av --delete ./ htdocs/ --delete-excluded \
-    --exclude CVS
-    --exclude README_BEFORE_EDITING
+# start ourselves anew
+if [ "x$NORECURSE" = x ] ; then
+    env NORECURSE=1 $0
+else
+
+  for i in bogofilter-faq.html bogofilter-faq-fr.html ; do
+    $cmdpfx checkout -p -Dtomorrow bogofilter/doc/$i >$i
+  done
+  $cmdpfx checkout -p -Dtomorrow bogofilter/NEWS >NEWS
+
+  # copy without cruft and internal files
+  rsync -av --delete ./ htdocs/ --delete-excluded \
+      --exclude CVS \
+      --exclude README_BEFORE_EDITING \
+      # do not remove this comment - it is for the preceding backslash
+
+fi
