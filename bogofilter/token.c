@@ -26,8 +26,6 @@ bool block_on_subnets = false;
 static token_t save_class = NONE;
 static char save_text[256];
 
-static void got_encoding(const char *encoding);
-
 token_t get_token(void)
 {
     token_t class;
@@ -110,10 +108,4 @@ token_t get_token(void)
 
     yylval = yytext;
     return(class);
-}
-
-void got_encoding(const char *encoding)
-{
-    if (verbose > 2 )
-	fprintf(stderr, "got_encoding: %s\n", encoding);
 }
