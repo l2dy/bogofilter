@@ -1,0 +1,12 @@
+
+All files in this directory are rcs controlled. Use "co -l" to check files
+out before editing, and "ci -u" to check them back in when you are done.
+
+Note there is a hidden .htaccess file!
+
+As to the "Permanent" Redirection: I (Matthias) have tried various way to
+either send an Expires: or Cache-Control: public header, to use "Temporary
+redirections" and allow for cacheable results, but all methods I am aware of
+(mod_cern_meta, mod_expires) have failed. So we use Permanent, which is
+cachable.
+
