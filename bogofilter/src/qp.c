@@ -119,9 +119,8 @@ bool qp_validate(const word_t *word, qp_mode mode)
 	byte v = qp_xlate[b];
 	if (v == 0)
 	    switch(b) {
-		case '\n':
-		case '\r':
-		case '=':
+		case '=': /* allowed in encoded words,
+			     but must be encoded */
 		    break;
 		default:
 		    return false;
