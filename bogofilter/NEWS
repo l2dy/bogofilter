@@ -21,7 +21,17 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+0.93.2	2004-11-??
+
+	2004-11-14
+
+	* Added utility scripts bf_copy and bf_compact.
+
 	2004-11-12
+
+	* New entries in bogofilter-faq.html on error messages
+	      "Lock table is out of available locks" and
+	      "Lock table is out of available object entries"
 
 	* Add %u formatting option to print login or user ID information,
 	  SourceForge Feature Request #1056729.
