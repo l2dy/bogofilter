@@ -37,7 +37,7 @@ typedef struct {
     char	*filename;
     size_t	count;
     char	*name[2];
-    int		fd;
+    int		fd[2];
     dbmode_t	open_mode;
     DB		*dbp[2];
     pid_t	pid;
@@ -93,12 +93,12 @@ static dbh_t *dbh_init(const char *path, size_t count, const char **names)
     for (c = 0; c < count ; c += 1) {
 	size_t len = strlen(path) + strlen(names[c]) + 2;
 	handle->name[c] = xmalloc(len);
+	handle->fd[c]    = -1; /* for lock */
 	build_path(handle->name[c], len, path, names[c]);
     }
     handle->pid	    = getpid();
     handle->locked  = false;
     handle->is_swapped= 0;
-    handle->fd	    = -1; /* for lock */
 
     return handle;
 }
@@ -184,7 +184,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 	if (handle == NULL)
 	    break;
 
-	for (i = 0; i < handle->count; i += 1) {
+	for (i = 0; handle && i < handle->count; i += 1) {
 	    DB *dbp;
 
 	    /* create DB handle */
@@ -230,33 +230,37 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 		return NULL;		/* handle already freed, ok to return */
 	    }
 
-	    ret = dbp->fd(dbp, &handle->fd);
+	    ret = dbp->fd(dbp, &handle->fd[i]);
 	    if (ret < 0) {
 		dbp->err (dbp, ret, "%s (db) fd: %s",
 			  progname, handle->name);
 		db_close(handle, false);
 		return NULL;		/* handle already freed, ok to return */
 	    }
-	}
-
-	if (db_lock(handle->fd, F_SETLK,
-		    (short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
-	{
-	    int e = errno;
-	    handle->fd = -1;
-	    db_close(handle, true);
-	    handle = NULL;	/* db_close freed it, we don't want to use it anymore */
-	    errno = e;
-	    /* do not bother to retry if the problem wasn't EAGAIN */
-	    if (e != EAGAIN && e != EACCES) return NULL;
-	    /* do not goto open_err here, db_close frees the handle! */
-	} else {
-	    break;
+	    if (db_lock(handle->fd[i], F_SETLK,
+			(short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
+	    {
+		int e = errno;
+		handle->fd[i] = -1;
+		db_close(handle, true);
+		handle = NULL;	/* db_close freed it, we don't want to use it anymore */
+		errno = e;
+		/* do not bother to retry if the problem wasn't EAGAIN */
+		if (e != EAGAIN && e != EACCES) return NULL;
+		/* do not goto open_err here, db_close frees the handle! */
+	    } else {
+		break;
+	    }
 	}
     }
 
-    if (handle && (handle->fd >= 0)) {
+    if (handle) {
+	unsigned int i;
 	handle->locked = true;
+	for (i = 0; i < handle->count; i += 1) {
+	    if (handle->fd[i] < 0) 
+		handle->locked=false;
+	}
 	return (void *)handle;
     }
 
@@ -264,7 +268,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 
  open_err:
     dbh_free(handle);
-    
+
     return NULL;
 }
 
