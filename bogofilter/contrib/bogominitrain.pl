@@ -8,11 +8,11 @@ my $bogofilter="bogofilter";
 my $bogoutil="bogoutil";
 
 # Not correct number of parameters
-my $commandlineoptions=($ARGV[0]=~/^-(?=[^f]*f?[^f]*$)(?=[^n]*n?[^n]*$)(?=[^s]*s?[^s]*$)[fns]*v{0,2}[fns]*$/);
+my $commandlineoptions=($ARGV[0]=~/^-(?=[^c]*c?[^c]*$)(?=[^f]*f?[^f]*$)(?=[^n]*n?[^n]*$)(?=[^s]*s?[^s]*$)[cfns]*v{0,2}[cfns]*$/);
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.4.2
+bogominitrain.pl version 1.5
   requires bogofilter 0.14.5 or later
 
 Usage:
@@ -21,48 +21,49 @@ Usage:
 
   database-directory is the directory containing your wordlist. It
   will be created as needed.  ham-mboxes and spam-mboxes are the
-  mboxes containing the mails; the will be shell-expanded.
+  mboxes containing the mails; they will be shell-expanded.
   bogofilter-options are given to bogofilter literally.
 
   Uses a "train on error" process to build minimal wordlists that can
   correctly score all messages.
 
   It may be a good idea to run this script command several times.  Use
-  the '-f' option to run the script until no scoring errors occur.
-  The '-n' option will prevent messages from being added more than
-  once; this may leave errors in the end.
+  the '-f' option to run the script until no scoring errors occur
+  (training to exhaustion). The '-n' option will prevent messages from
+  being added more than once; this may leave errors at the end.
 
-  To increase the size of your wordlists and to improve bogofilter's
-  scoring accuracy, use bogofilter's -o option to set ham_cutoff and
-  spam_cutoff to create an "unsure" interval around your normal
-  spam_cutoff.  The script will train so that the messages will avoid
+  To improve bogofilter's accuracy, use bogofilter's -o option to
+  create a "security margin" around your normal cutoff during
+  training.  The script will train so that the messages will avoid
   this interval, i.e., all messages in your training mboxes will be
   marked as ham or spam with values far from your production cutoff.
-  For example if you usually work with spam_cutoff=0.6, you might use
-  the following as bogofilter-options: '-o 0.8,0.3'
+  For example you might want to use spam_cutoff=0.5 and '-o 0.8,0.2'
+  as bogofilter-options.  If you rather use tri-state mode, you could
+  just center this around 0.5 and again use '-o 0.8,0.2'.
+
+  To correct the classification of a message, just move it to the
+  correct mbox and repeat the full training process (which will add a
+  few messages to the existing database).
 
 Example:
   bogominitrain.pl -fnv .bogofilter 'ham*' 'spam*' '-c train.cf'
 
 Options:
   -v   This switch produces info on messages used for training.
-  -vv  also lists messages not used for training.
+  -vv  Also lists messages not used for training.
   -f   Runs the program until no errors remain.
   -n   Prevents repetitions.
   -s   Saves the messages used for training to files
        bogominitrain.ham.* and bogominitrain.spam.*
+  -c   Compacts the database at the end.
   Note: If you need to use more than one option, you must combine them.
-
-Warning:
-  If you've changed the classification of a message, bogofilter's ability to
-  score messages may be affected adversely.  To prevent this, you should train
-  again with your complete mail database to correct the problem.
 
 END
   exit;
 }
 
 # Check input
+my $compact=1 if ($commandlineoptions && $ARGV[0]=~s/c//);
 my $force=1 if ($commandlineoptions && $ARGV[0]=~s/f//);
 my $norepetitions=1 if ($commandlineoptions && $ARGV[0]=~s/n//);
 my ($safe,$safeham,$safespam)=(1,"bogominitrain.ham","bogominitrain.spam")
@@ -89,7 +90,7 @@ do { # Start force loop
   open (HAM,  "cat $ham|")  || die("Cannot open ham: $!\n");
   open (SPAM, "cat $spam|") || die("Cannot open spam: $!\n");
 
-  # Loop through all the mails
+  # Loop through all the mail
   my ($lasthamline,$lastspamline,$hamcount,$spamcount,$skipham,$skipspam) = ("","",0,0,0,0);
   ($hamadd,$spamadd)=(0,0);
   do {
@@ -180,4 +181,9 @@ do { # Start force loop
   }
 } until ($fn+$fp==0 || $hamadd+$spamadd==0 || !$force);
 print "\n$runs run",$runs>1&&"s"," needed to close off.\n" if ($force);
+if ($compact) {
+  print "Compacting database ...\n";
+  system("$bogoutil -d $dir/wordlist.db | $bogoutil -l $dir/bogominitrain.db");
+  rename("$dir/bogominitrain.db","$dir/wordlist.db");
+}
 
