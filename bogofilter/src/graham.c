@@ -158,7 +158,7 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
 	    /* The lexer should not have returned a token longer than
 	     * MAXTOKENLEN */
 	    internal_error;
-	    abort();
+	    bf_abort();
 	}
 	if (hit->key)
 	    word_free(hit->key);

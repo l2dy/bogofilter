@@ -204,7 +204,7 @@ void write_message(rc_t status)
 		rewind(rfarg);
 		break;
 	    default:
-		abort();
+		bf_abort();
 	}
 
 	/* print headers */
