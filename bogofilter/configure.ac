@@ -103,10 +103,6 @@ dgux*)
     ;;
 esac
 
-AC_ARG_WITH(db,
-	    AC_HELP_STRING([--with-db=PATH], [obsolete, use --with-libdb-prefix instead]),
-    AC_MSG_ERROR([--with-db is obsolete. Use --with-libdb-prefix=$withval instead.]))
-
 dnl If we're using gcc, enable some warnings
 dnl missing: -Wunreachable-code
 if test "$GCC" = yes ; then
