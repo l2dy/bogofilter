@@ -1,16 +1,16 @@
-X-Bogosity: Yes, tests=bogofilter, spamicity=0.999999
-  0.010000  0.010000  Build
-  0.010000  0.000102  How
+X-Bogosity: Yes, tests=bogofilter, spamicity=0.990000
+  0.010000  0.010000  How
+  0.010000  0.000102  Online
   0.010000  0.000001  Only
   0.010000  0.000000  current
   0.010000  0.000000  effort
   0.010000  0.000000  having
+  0.010000  0.000000  let
   0.990000  0.000000  $40
+  0.990000  0.000000  EXAMPLE.COM
   0.990000  0.000000  FFFFFF
   0.990000  0.000001  FREE
   0.990000  0.000102  Here
   0.990000  0.010000  Money
-  0.990000  0.500000  Secrets
-  0.990000  0.990000  Verdana
-  0.990000  0.999898  abuse
-  0.990000  0.999999  copy
+  0.990000  0.500000  Verdana
+  0.990000  0.990000  copy
