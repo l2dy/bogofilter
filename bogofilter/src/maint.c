@@ -44,7 +44,7 @@ YYYYMMDD time_to_date(long days)
 {
     time_t t = time(NULL) - days * 86400;
     struct tm *tm = localtime( &t );
-    YYYYMMDD date = (((tm->tm_year + (YYYYMMDD)1900) * 100 + tm->tm_mon + 1) * 100) + tm->tm_mday;
+    YYYYMMDD date = (YYYYMMDD)((((tm->tm_year + 1900) * 100 + tm->tm_mon + 1) * 100) + tm->tm_mday);
     return date;
 }
 
@@ -179,8 +179,7 @@ static int maintain_hook(word_t *key, word_t *data,
 		db_delete(userdata, key);
 		w.text = tmp;
 		w.leng = key->leng;
-		set_date(val.date);
-		db_updvalue(userdata, &w, val.count);
+		db_updvalue(userdata, &w, &val);
 	    }
 	    xfree(tmp);
 	}
