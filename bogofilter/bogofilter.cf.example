@@ -26,6 +26,16 @@
 ##user_config_file=~/.bogofilterrc
 ##user_config_file=~/.bogofilter/config
 
+#### WORDLIST: define additional word lists
+#
+#	char type: 'r,'i' (denoting regular or ignore)
+#	char *name: name of list, e.g. "system", "user", "ignore"
+#	char *path: path to file
+#	int  precedence - search order
+#
+##wordlist i,ignore,~/ignorelist.db,1
+##wordlist r,wordlist,~/wordlist.db,2
+
 #### SPAM_HEADER_NAME
 #
 #	used in reporting spamicity and
@@ -201,3 +211,4 @@
 #	of 0.000000 (surely ham) or 1.000000 (surely spam).
 #
 ## thresh_update=0.01
+
