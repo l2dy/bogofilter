@@ -52,6 +52,7 @@ extern const parm_desc sys_parms[];
 extern const parm_desc *usr_parms;
 
 bool process_config_files(bool warn_on_error);
+bool process_config_option(char *arg, bool warn_on_error, priority_t precedence);
 bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, priority_t precedence);
 
 #endif

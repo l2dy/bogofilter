@@ -187,6 +187,32 @@ static bool process_config_line(char *line,
     return false;
 }
 
+bool process_config_option(char *arg, bool warn_on_error, priority_t precedence)
+/* returns true if ok, false if error */
+{
+    const char delim[] = " \t=";
+    char *val = NULL;
+    bool error = false;
+
+    if (strcspn(arg, delim) < strlen(arg)) { /* if delimiter present */
+	val = arg + strcspn(arg, delim);
+	*val++ = '\0';
+	val += strspn(val, delim);
+    }
+
+    if (val == NULL ||
+	(! process_config_line(arg, val, usr_parms, precedence ) &&
+	 ! process_config_line(arg, val, sys_parms, precedence ) &&
+	 ! process_config_line(arg, val, format_parms, precedence )))
+    {
+	error = true;
+ 	if (warn_on_error)
+	    fprintf(stderr, "Error - bad parameter '%s'\n", arg);
+    }
+
+    return error;
+}
+
 bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, priority_t precedence)
 /* returns true if ok, false if error */
 {
@@ -194,7 +220,6 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
     int lineno = 0;
     FILE *fp;
     char *filename;
-    char *arg = NULL, *val = NULL;
 
     filename = tildeexpand(fname, tilde_expand);
 
@@ -213,7 +238,6 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
 
     while (!feof(fp))
     {
-	const char delim[] = " \t=";
 	size_t len;
 	char buff[MAXBUFFLEN];
 
@@ -231,24 +255,8 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
 	if (DEBUG_CONFIG(1))
 	    fprintf(dbgout, "Testing:  %s\n", buff);
 
-	arg = buff;
-	if (strcspn(arg, delim) < strlen(arg)) { /* if delimiter present */
-	    val = arg + strcspn(arg, delim);
-	    *val++ = '\0';
-	    val += strspn(val, delim);
-	} else {
-	    val = NULL;
-	}
-
-	if (val == NULL ||
-	       (! process_config_line(arg, val, usr_parms, precedence ) &&
-		! process_config_line(arg, val, sys_parms, precedence ) &&
-		! process_config_line(arg, val, format_parms, precedence )))
-	{
+	if (!process_config_option(buff, precedence, warn_on_error))
 	    error = true;
-	    if (warn_on_error)
-		fprintf(stderr, "%s:%d:  Error - bad parameter in '%s ... %s'\n", filename, lineno, buff, val);
-	}
     }
 
     if (ferror(fp)) {

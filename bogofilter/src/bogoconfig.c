@@ -387,6 +387,11 @@ static void help(void)
 		  "\t  -x list - set flags to display debug information.\n"
 	);
     (void)fprintf(stderr, "%s",
+		  "\tconfig file options:\n"
+		  "\t  --option=value - can be used to set the value of a config file option.\n"
+		  "\t                   see bogofilter.cf.example for more info.\n"
+	);
+    (void)fprintf(stderr, "%s",
 		  "\n"
 		  "bogofilter is a tool for classifying email as spam or non-spam.\n"
 		  "\n"
@@ -428,9 +433,9 @@ static void print_version(void)
 #endif
 
 #ifndef	ENABLE_DEPRECATED_CODE
-#define	OPTIONS	":bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pqQRrsStTuUvVx:X:y:"
+#define	OPTIONS	":-:bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pqQRrsStTuUvVx:X:y:"
 #else
-#define	OPTIONS	":23bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pP:qQRrsStTuUvWVx:X:y:" G R F
+#define	OPTIONS	":-:23bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pP:qQRrsStTuUvWVx:X:y:" G R F
 #endif
 
 /** These functions process command line arguments.
@@ -651,6 +656,10 @@ void process_args_2(int argc, char **argv)
 #endif
 	switch(option)
 	{
+	case '-':
+	    process_config_option(optarg, true, PR_COMMAND);
+	    break;
+
 	case 'd':
 	{
 	    char *dir = optarg;

@@ -108,6 +108,12 @@
     <arg choice='opt'>-D</arg>
     <arg choice='opt'>-x <replaceable>flags</replaceable></arg>
     </cmdsynopsis>
+
+  <para><option>config file options</option> are:</para>
+   <cmdsynopsis>
+   <arg choice='opt'>--<replaceable>option=value</replaceable></arg>
+   </cmdsynopsis>
+
 </refsynopsisdiv>
 
 <refsect1 id='description'><title>DESCRIPTION</title>
@@ -493,7 +499,14 @@ timestamping.</para>
 
 <para>The <option>-x <replaceable>flags</replaceable></option> option
 allows setting of debug flags for printing debug information.  See
-header file debug.h for the list of usable flags.</para> </refsect1>
+header file debug.h for the list of usable flags.</para> 
+
+<para>CONFIG FILE OPTIONS</para>
+
+<para>The <option>--<replaceable>option=value</replaceable></option>
+option allows use of config file options on the command line.  See
+<filename>bogofilter.cf.example</filename> for more info on the
+available options.</para></refsect1>
 
 <refsect1 id='environment'><title>ENVIRONMENT</title>
 <para>Bogofilter uses a database directory, which can be set in the
