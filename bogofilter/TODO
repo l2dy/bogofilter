@@ -6,6 +6,10 @@
      http://bugs.gentoo.org/show_bug.cgi?id=69893 - this revealed bugs
      in the stack implementation.
 
+**** Drop/fix MAXTOKENLEN: where it is an allocation, it must die.
+     Where it is a character limit, count characters, not octets, to
+     support UTF-8.
+
 **** Implement Concurrent Data store, quite similar to Transactional.
 
 **** Make sure that RFC-2047 decoder runs only once, not recursively.
