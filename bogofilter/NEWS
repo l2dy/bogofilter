@@ -7,10 +7,26 @@ is in the RELEASE.NOTES files.  Read them!!
 
 RELEASE.NOTES-0.93 has two important sections entitled:
 
-        MAJOR CHANGES IN BOGOFILTER 0.93 
-and     INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
+        INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
+and     MAJOR CHANGES IN BOGOFILTER 0.93
 
 0.93.0	2004-10-??
+
+	2004-10-31
+
+	* Rearranged flag setting for Berkeley DB data store, so as only to set
+	  DB_CHKSUM[_SHA1] when creating the data base.
+	  Fixes "checksum error: catastrophic recovery required" and
+	  consequential "wordlist.db: page 1: reference count overflow" errors
+	  reported by Torsten Veller.
+
+	* Revised RELEASE.NOTES-0.93 to move QDBM change into "Incompatible
+	  Changes" section and to mention BerkeleyDB dump/load for 4.1 and 4.2
+	  to add checksums.
+
+	* Inserted new section 2.2 into doc/README.db to mention that it is
+	  recommended to dump/load the data base when using BerkeleyDB 4.1 and
+	  4.2.
 
 	2004-10-30
 

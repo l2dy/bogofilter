@@ -1,7 +1,6 @@
                INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
                =======================================
 
-
 Defaults changed
 ----------------
 
@@ -17,16 +16,36 @@ as "Unsure" messages are messages that bogofilter has too little
 information to classify (with certainty) as spam or ham.
 
 
+QDBM database format changed to B+ trees
+----------------------------------------
+
+The QDBM database format has been changed from hash tables to B+
+trees, i.e. from the Depot API to the Villa API.  This results in
+significantly better performance, i.e. faster speed.  Unfortunately,
+the two modes are incompatible, so upgrading to 0.93 requires several
+special steps, i.e. dumping and renaming your wordlist before
+installing 0.93 and building a new wordlist afterwards.
+
+Use these commands:
+
+1:  bogoutil -d /your/path/wordlist.qdbm > wordlist.txt
+2:  mv /your/path/wordlist.qdbm /your/path/wordlist.qdbm.old
+3:  install new bogofilter
+4:  bogoutil -l /your/path/wordlist.qdbm < wordlist.txt
+
 
                    MAJOR CHANGES IN BOGOFILTER 0.93
                    ================================
-
 
 Berkeley DB switched to Transactional Data Store
 ------------------------------------------------
 
 Bogofilter will now use the Berkeley DB Transactional Data Store when
 compiled with Berkeley DB as the data base engine (the default).
+
+When using BerkeleyDB 4.1 or 4.2, it is recommended that you dump and
+load the data bases to add checksums, for enhanced reliablity. See
+section 2.2 in doc/README.db for details.
 
 This means that bogofilter programs now exhibit the A C I D traits:
 changes are atomic (all-or-nothing); the data base is always consistent;
@@ -51,21 +70,5 @@ BerkeleyDB documentation.
 These benefits are not available when bogofilter is compiled to use the
 TDB or QDBM data bases.
 
-QDBM database format changed to B+ trees
-----------------------------------------
-
-The QDBM database format has been changed from hash tables to B+
-trees, i.e. from the DEPOT API to the Villa API.  This results in
-significantly better performance, i.e. faster speed.  Unfortunately,
-the two modes are incompatible, so upgrading to 0.9.3 requires several
-special steps, i.e. dumping and renaming your wordlist before
-installing 0.93 and building a new wordlist afterwards.
-
-Use these commands:
-
-1:  bogoutil -d /your/path/wordlist.db > wordlist.txt
-2:  mv /your/path/wordlist.db /your/path/wordlist.db.old
-3:  install new bogofilter
-4:  bogoutil -l /your/path/wordlist.db < wordlist.txt
 
                   --- END of RELEASE.NOTES-0.93 ---

@@ -34,7 +34,25 @@ pages); Berkeley DB 4.2 appears faster than 4.1 under load (i. e. with
 multiple running copies of bogofilter/bogoutil operating on the same
 data base with at least one spam registration in progress).
 
-2.2 Recoverability
+2.2 Upgrading from non-transactional releases of bogofilter (before 0.93)
+
+Bogofilter should transparently upgrade the existing data base to the
+new transactional data base.  Note though that upgrading will not add
+checksums (see the previous section) to existing data bases, so it is
+recommended that, if you are using BerkeleyDB versions 4.1 or 4.2, that
+you dump and reload the data base to add checksums.
+
+The dump/load cycle is necessary only the first time you upgrade from a
+non-transactional to a transactional release.  Use these commands:
+
+cd .bogofilter
+bogoutil -d wordlist.db >wordlist.txt
+mv wordlist.db wordlist.db.old
+bogoutil -l wordlist.db <wordlist.txt
+
+And if all commands succeeded: rm wordlist.txt
+
+2.3 Recoverability
 
 The ability to recover the data base after a crash (power failure!)
 depends on data being written to the disk (or a battery-backed write
@@ -58,7 +76,7 @@ for reliable writes (with the write cache off, for bogofilter, mail
 servers and other applications that need survive a power loss without
 data loss).
 
-2.3 Choosing a file system
+2.4 Choosing a file system
 
 If your computer saves the data on its own disk drive (a "local file
 system"), BerkeleyDB should work fine. Such file systems are ext2, ext3,
@@ -72,7 +90,7 @@ block size must be written atomically. The bogofilter maintainers are
 not currently aware of a file system that meets this requirement and is
 production quality at the same time.
 
-2.4 Do make backups!
+2.5 Do make backups!
 
 The transactional data store is no good if the disk drive has become
 inaccessible (which happens after some months or years with every
