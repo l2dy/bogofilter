@@ -79,7 +79,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	exit(2);
     }
 
-    process_config_files(false);
+    process_config_files();
 
     if (!twostate && !threestate) {
 	twostate = ham_cutoff < EPS;
