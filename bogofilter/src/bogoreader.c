@@ -282,8 +282,12 @@ static bool open_mailstore(const char *name)
 	/*NOTREACHED*/
 	break;
     case IS_ERR:
+	fprintf(stderr, "Can't stat mailstore '%s': %s\n",
+		filename, strerror(errno));
+	break;
     default:
 	fprintf(stderr, "Can't identify type of mailstore '%s'\n", filename);
+	break;
     }
     return false;
 }
