@@ -7,12 +7,14 @@
 	* A defect in the collect_words routines (in 0.9.1) caused
 	  incorrect generation of "must get only one message to
 	  calculate spamicity!" messages.  This has been fixed.
+	* A defect in the contrib/bogopass script caused the unbase64-edited
+	  version of the mail to be printed rather than the original with just
+	  the header added. This has been fixed.
 	* Documentation has been revised and updated.
 	* Robinson-Fisher method now produces a tristate status, i.e.
-	  spam/ham/unsure, if ham_cutoff is non-zero.  ham_cutoff
-	  defaults to 0.1 and can be set via config file.
-	* Script contrib/bogopass has revised error and environment
-          checking.
+	  spam/ham/unsure, if ham_cutoff is non-zero.  ham_cutoff defaults to
+	  0.1 and can be set via config file.
+	* Script contrib/bogopass has revised error and environment checking.
 
 0.9.1	2002-11-30
 
@@ -234,4 +236,4 @@
 0.1: Mon 19 Aug 2002 03:07:31
 
 	* Initial release.
- vim:tw=79 com=bf\:* ts=8 sts=8 sw=8:
+ vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:
