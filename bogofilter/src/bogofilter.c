@@ -130,7 +130,7 @@ rc_t bogofilter(int argc, char **argv)
 		    register_words(REG_GOOD, w, msgcount);
 	    }
 
-	    if (verbose && ! passthrough) {
+	    if (verbose && !passthrough && !quiet) {
 		const char *filename = reader_filename();
 		if (filename)
 		    fprintf(fpo, "%s ", filename); 
