@@ -330,7 +330,7 @@ inline static double prbf(double x, double df) {
 	abort();
     }
     status = gsl_integration_qag(&chi, 0, x, eps, eps,
-	    intervals, GSL_INTEG_GAUSS15, w, &p, &abserr);
+	    intervals, GSL_INTEG_GAUSS41, w, &p, &abserr);
     if (status && status != GSL_EMAXITER) {
 	fprintf(stderr, "Integration error: %s\n", gsl_strerror(status));
 	abort();
