@@ -48,9 +48,9 @@ const char	*update_dir;
 const char	*stats_prefix;
 
 /* for lexer_v3.l */
-bool	ignore_case = true;		/* -Pi */
-bool	header_line_markup = false;	/* -PH */
-bool	tokenize_html_tags = false;	/* -PT */
+bool	ignore_case = false;		/* -PI */
+bool	header_line_markup = true;	/* -Ph */
+bool	tokenize_html_tags = true;	/* -Pt */
 bool	tokenize_html_script = false;	/* -Ps - not yet in use */
 
 /* dual definition options */
