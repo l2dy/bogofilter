@@ -17,13 +17,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <unistd.h>
 #include <pwd.h>
 #include <sys/types.h>
 
 #include "find_home.h"
-#include "string.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
@@ -44,7 +44,7 @@ const char *find_home(int read_env) {
 
     if (read_env) {
 	if ((r = getenv("HOME")) != NULL && *r != '\0')
-	return r;
+	    return r;
     }
 
     u = geteuid();
