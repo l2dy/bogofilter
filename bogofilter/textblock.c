@@ -74,8 +74,7 @@ void textblock_free(textblock_t *t)
 
     if (DEBUG_TEXT(2)) fprintf(stderr, "%s:%d  %p %p free, cur: %d, max: %d, tot: %d\n", 
 			       __FILE__,__LINE__, t, t->head, cur_mem, max_mem, tot_mem );
-    xfree(t->head);
     xfree(t);
-    cur_mem -= sizeof(t->head) + sizeof(t);
+    cur_mem -= sizeof(t);
     if (DEBUG_TEXT(1)) fprintf(stderr, "cur: %d, max: %d, tot: %d\n", cur_mem, max_mem, tot_mem );
 }
