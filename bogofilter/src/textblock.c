@@ -77,7 +77,8 @@ void textblock_free(void)
     textdata_t *cur, *nxt;
     textblock_t *t = textblocks;
 
-    for (cur = t->head; (nxt = cur->next) != NULL; cur = nxt) {
+    for (cur = t->head; cur ; cur = nxt) {
+	nxt = cur->next;
 	mem = cur->size + sizeof(*cur);
 	cur_mem -= mem;
 	if (DEBUG_TEXT(2)) fprintf(dbgout, "%s:%d  %p %p %3lu *rel* cur: %lu, max: %lu, tot: %lu\n", 
