@@ -27,7 +27,7 @@ extern size_t msg_register_size;
 void register_words(run_t _run_type, wordhash_t *h,
 		    int msgcount, int wordcount)
 {
-  char ch = '\0';
+  const char *r="",*u="";
   hashnode_t *node;
   wordprop_t *wordprop;
 
@@ -41,16 +41,12 @@ void register_words(run_t _run_type, wordhash_t *h,
 	  exit(2);
   }
 
-  switch(_run_type)
-  {
-    case REG_SPAM:		ch = 's' ;  break;
-    case REG_GOOD:		ch = 'n' ;  break;
-    case REG_GOOD_TO_SPAM:	ch = 'S' ;  break;
-    case REG_SPAM_TO_GOOD:	ch = 'N' ;  break;
-    default:			abort(); 
-  }
+  if (_run_type & REG_SPAM) r = "s";
+  if (_run_type & REG_GOOD) r = "n";
+  if (_run_type & UNREG_SPAM) u = "S";
+  if (_run_type & UNREG_GOOD) u = "N";
 
-  format_log_update(msg_register, msg_register_size, ch, wordcount, msgcount);
+  format_log_update(msg_register, msg_register_size, r, u, wordcount, msgcount);
 
   if (verbose)
     (void)fprintf(stderr, "# %d word%s, %d message%s\n", 
@@ -58,31 +54,16 @@ void register_words(run_t _run_type, wordhash_t *h,
 
   set_list_active_status(false);
 
-  switch(_run_type)
-  {
-    case REG_GOOD:
-      incr_list = good_list;
-      break;
+  if (run_type & REG_GOOD) incr_list = good_list;
+  if (run_type & REG_SPAM) incr_list = spam_list;
+  if (run_type & UNREG_GOOD) decr_list = good_list;
+  if (run_type & UNREG_SPAM) decr_list = spam_list;
 
-    case REG_SPAM:
-      incr_list = spam_list;
-      break;
+  if (DEBUG_REGISTER(2))
+      fprintf(dbgout, "%s%s -- incr: %08X, decr: %08X\n", r, u, (int)incr_list, (int)decr_list);
 
-    case  REG_GOOD_TO_SPAM:
-      decr_list = good_list;
-      incr_list = spam_list;
-      break;
-
-    case REG_SPAM_TO_GOOD:
-      incr_list = good_list;
-      decr_list = spam_list;
-      break;
-
-    default:
-      abort();
-  }
-
-  incr_list->active = true;
+  if (incr_list)
+    incr_list->active = true;
   if (decr_list)
     decr_list->active = true;
 
@@ -92,9 +73,9 @@ void register_words(run_t _run_type, wordhash_t *h,
     }
   }
 
-  incr_list->msgcount += msgcount;
+  if (incr_list) incr_list->msgcount += msgcount;
 
-  if (decr_list){
+  if (decr_list) {
     if (decr_list->msgcount > msgcount)
       decr_list->msgcount -= msgcount;
     else
@@ -103,7 +84,7 @@ void register_words(run_t _run_type, wordhash_t *h,
 
   for (node = wordhash_first(h); node != NULL; node = wordhash_next(h)){
     wordprop = node->buf;
-    db_increment(incr_list->dbh, node->key, wordprop->freq);
+    if (incr_list) db_increment(incr_list->dbh, node->key, wordprop->freq);
     if (decr_list) db_decrement(decr_list->dbh, node->key, wordprop->freq);
   }
 

@@ -54,11 +54,16 @@ typedef unsigned char byte;
 enum dbmode_e { DB_READ = 0, DB_WRITE = 1 };
 typedef enum dbmode_e dbmode_t;
 
+#define BIT(n)	(1 << n)
+
 typedef enum run_e {
-    RUN_NORMAL='r',
-    RUN_UPDATE='u',
-    REG_SPAM='s', REG_SPAM_TO_GOOD='N', 
-    REG_GOOD='n', REG_GOOD_TO_SPAM='S'
+    RUN_UNKNOWN= 0,
+    RUN_NORMAL = BIT(0),
+    RUN_UPDATE = BIT(1),
+    REG_SPAM   = BIT(2),
+    REG_GOOD   = BIT(3),
+    UNREG_SPAM = BIT(4),
+    UNREG_GOOD = BIT(5),
 } run_t;
 extern run_t run_type;
 

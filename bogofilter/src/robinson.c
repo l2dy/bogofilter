@@ -304,7 +304,7 @@ void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double 
     ** If we're registering tokens, we needn't get .MSG_COUNT
     */
 
-    if (run_type == RUN_NORMAL || run_type == RUN_UPDATE) {
+    if (run_type & (RUN_NORMAL | RUN_UPDATE)) {
 	scalefactor = compute_scale();
 	if (fabs(robs) < EPS)
 	    robs = ROBS;

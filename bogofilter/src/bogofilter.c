@@ -77,7 +77,7 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
     if (xss != NULL)
         *xss = spamicity;
 
-    if (run_type == RUN_UPDATE)		/* Note: don't register if RC_UNSURE */
+    if (run_type & RUN_UPDATE)		/* Note: don't register if RC_UNSURE */
     {
 	if (status == RC_SPAM)
 	    register_words(REG_SPAM, wordhash, msgcount, wordcount);

@@ -97,7 +97,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     }
 
     /* open all wordlists */
-    open_wordlists(run_type == RUN_NORMAL ? DB_READ : DB_WRITE);
+    open_wordlists((run_type & (RUN_NORMAL | RUN_UPDATE)) ? DB_READ : DB_WRITE);
 
     if (*outfname && passthrough) {
 	if ((out = fopen(outfname,"wt"))==NULL)
@@ -141,23 +141,19 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     mime_reset();
 
-    switch(run_type) {
-	case RUN_NORMAL:
-	case RUN_UPDATE:
-	    {
-		double spamicity;
-		rc_t   status = bogofilter(&spamicity);
+    if (run_type & (RUN_NORMAL | RUN_UPDATE))
+    {
+	double spamicity;
+	rc_t   status = bogofilter(&spamicity);
 
-		write_message(out);
+	write_message(out);
 
-		exitcode = (status == RC_SPAM) ? 0 : 1;
-		if (nonspam_exits_zero && passthrough && exitcode == 1)
-		    exitcode = 0;
-	    }
-	    break;
-	default:
-	    register_messages(run_type);
-	    break;
+	exitcode = (status == RC_SPAM) ? 0 : 1;
+	if (nonspam_exits_zero && passthrough && exitcode == 1)
+	    exitcode = 0;
+    }
+    else {
+	register_messages(run_type);
     }
 
     if (passthrough) {

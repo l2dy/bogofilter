@@ -36,7 +36,8 @@ static char *convert_format_to_string(char *buff, size_t size, const char *forma
 
 /* uninitialized static variables */
 
-char reg = ' ';
+const char *reg = "";
+const char *unreg = "";
 int wrdcount = 0;
 int msgcount = 0;
 
@@ -333,8 +334,8 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 	    case 'o':		/* o - spam_cutoff, ex. cutoff=%c */
 		buff += format_float(buff, spam_cutoff, min, prec, flags, end);
 		break;
-	    case 'r':		/* r - run type (s, n, S, or N) */
-		snprintf( temp, sizeof(temp), "%c", reg );
+	    case 'r':		/* r - run type (s, n, S, or N) - two parts (reg/unreg)*/
+		snprintf( temp, sizeof(temp), "%s%s", reg, unreg );
 		buff += format_string(buff, temp, 0, 0, 0, end);
 		break;
 	    case 'w':		/* w - word count */
@@ -379,9 +380,10 @@ char *format_terse(char *buff, size_t size)
     return convert_format_to_string( buff, size, terse_format );
 }
 
-char *format_log_update(char *buff, size_t size, char _reg, int _wrd, int _msg)
+char *format_log_update(char *buff, size_t size, const char *_reg, const char *_unreg, int _wrd, int _msg)
 {
     reg = _reg;
+    unreg = _unreg;
     wrdcount = _wrd;
     msgcount = _msg;
     return convert_format_to_string( buff, size, log_update_format );

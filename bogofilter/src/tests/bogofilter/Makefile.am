@@ -1,6 +1,7 @@
 # $Id$
 
-TESTSCRIPTS = t.lexer.mbx t.robx t.valgrind t.split t.systest t.grftest
+TESTSCRIPTS = t.lexer.mbx t.regtest t.robx t.valgrind t.split t.systest t.grftest
+
 TESTS=$(TESTSCRIPTS)
 
 TESTS_ENVIRONMENT = RUN_FROM_MAKE=1 AWK=$(AWK) srcdir=$(srcdir) $(SHELL) $(VERBOSE)

@@ -63,7 +63,7 @@ AUTHOR:
 
 char outfname[PATH_LEN] = "";
 
-run_t run_type = RUN_NORMAL; 
+run_t run_type = 0;
 
 const char *logtag = NULL;
 
@@ -195,8 +195,8 @@ static int validate_args(void)
     bool registration, classification;
 
 /*  flags '-s', '-n', '-S', or '-N', are mutually exclusive of flags '-p', '-u', '-e', and '-R'. */
-    classification = (run_type == RUN_NORMAL) ||(run_type == RUN_UPDATE) || passthrough || nonspam_exits_zero || (Rtable != 0);
-    registration   = (run_type == REG_SPAM) || (run_type == REG_GOOD) || (run_type == REG_GOOD_TO_SPAM) || (run_type == REG_SPAM_TO_GOOD);
+    classification = (run_type & (RUN_NORMAL | RUN_UPDATE)) || passthrough || nonspam_exits_zero || (Rtable != 0);
+    registration   = (run_type & (REG_SPAM | REG_GOOD | UNREG_SPAM | UNREG_GOOD)) != 0;
 
     if (*outfname && !passthrough)
     {
@@ -219,6 +219,18 @@ static int validate_args(void)
 #else
 		      "    Options '-l', '-d', '-x', and '-v' may be used with either mode.\n"
 #endif
+	    );
+	return 2;
+    }
+
+    if (registration && 
+	(((run_type & REG_SPAM  ) && (run_type & (REG_GOOD | UNREG_SPAM))) ||
+	 ((run_type & UNREG_SPAM) && (run_type & (REG_SPAM | UNREG_GOOD))) ||
+	 ((run_type & REG_GOOD  ) && (run_type & (REG_SPAM | UNREG_GOOD))) ||
+	 ((run_type & UNREG_GOOD) && (run_type & (REG_GOOD | UNREG_SPAM))))) 
+    {
+	(void)fprintf(stderr, 
+		      "Error:  Conflicting registration options.\n"
 	    );
 	return 2;
     }
@@ -250,13 +262,13 @@ static void help(void)
 		  "\t-I file\t- read message from 'file' instead of stdin.\n"
 		  "\t-O file\t- save message to 'file' in passthrough mode.\n"
 		  "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n"
-		  "\t-s\t- register message as spam.\n"
-		  "\t-n\t- register message as non-spam.\n"
+		  "\t-s\t- register message(s) as spam.\n"
+		  "\t-n\t- register message(s) as non-spam.\n"
 		  "\t-m val\t- set user defined min_dev value.\n"
 		  "\t-o val [,val]\t- set user defined spam and ham cutoff values.\n"
 		  "\t-u\t- classify message as spam or non-spam and register accordingly.\n"
-		  "\t-S\t- move message's words from non-spam list to spam list.\n"
-		  "\t-N\t- move message's words from spam list to spam non-list.\n"
+		  "\t-S\t- unregister message(s) from spam list.\n"
+		  "\t-N\t- unregister message(s) from non-spam list.\n"
 		  "\t-R\t- print an R data frame.\n"
 		  "\t-v\t- set debug verbosity level.\n"
 		  "\t-k y/n\t- kill html comments (yes or no).\n"
@@ -359,19 +371,19 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case 's':
-	    run_type = REG_SPAM;
+	    run_type |= REG_SPAM;
 	    break;
 
 	case 'n':
-	    run_type = REG_GOOD;
+	    run_type |= REG_GOOD;
 	    break;
 
 	case 'S':
-	    run_type = REG_GOOD_TO_SPAM;
+	    run_type |= UNREG_SPAM;
 	    break;
 
 	case 'N':
-	    run_type = REG_SPAM_TO_GOOD;
+	    run_type |= UNREG_GOOD;
 	    break;
 
 	case 'v':
@@ -513,6 +525,9 @@ int process_args(int argc, char **argv)
 	    exit(2);
 	}
     }
+
+    if (run_type == RUN_UNKNOWN)
+	run_type = RUN_NORMAL;
 
     exitcode = validate_args();
     if (exitcode) return -exitcode;

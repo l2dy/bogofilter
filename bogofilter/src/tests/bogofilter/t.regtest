@@ -1,0 +1,114 @@
+#! /bin/sh
+
+set -e
+
+# t.regtest
+#
+#	test the registration options, i.e. '-s', '-n', '-S', and '-N'
+
+# Note:  When run via "make check", test output files are automatically deleted.
+#	 When run from the command line, outputs files are left in directory
+#	 regtest.YYYYMMDD.  This is useful when something is different.
+#
+#	 ./inputs  - test inputs
+#	 ./outputs - known correct outputs
+#
+#	 regtest.YYYYMMDD:
+#		output files contain wordlist contents
+
+: ${srcdir=.}
+relpath="`pwd`/../.."
+
+NODB=1 . ${srcdir}/../t.frame
+
+verbose=0
+if [ "$1" = "-v" ]; then
+    verbose=1
+fi
+
+BOGOFILTER_DIR="${TMPDIR}"
+export BOGOFILTER_DIR
+
+INPUT="${srcdir}/inputs"
+
+BOGOFILTER="$VAL ${relpath}/bogofilter"
+BOGOUTIL="$VAL ${relpath}/bogoutil"
+
+#opts="-x rw -vvvv"
+
+function check_counts()
+{
+    if  [ $verbose -ne 0 ]; then
+	echo "test #$T"
+    fi
+    g=`$BOGOUTIL -d $BOGOFILTER_DIR/goodlist.db | grep -v " 0 " | tee $TMPDIR/good.$T.out | wc -l`
+    s=`$BOGOUTIL -d $BOGOFILTER_DIR/spamlist.db | grep -v " 0 " | tee $TMPDIR/spam.$T.out | wc -l`
+    WANT=`printf "%d.%d" $S $G`
+    HAVE=`printf "%d.%d" $s $g`
+
+    if  [ $verbose -ne 0 ]; then
+	echo HAVE: $HAVE, WANT: $WANT
+    fi
+    if [ ! "$HAVE" = "$WANT" ] ; then
+	exit 1
+    fi
+}
+
+rm -f $BOGOFILTER_DIR/*.db
+
+# populate goodlist and spamlist
+
+T=1	# test #1
+S=26	# expected tokens from spam message
+G=32	# expected tokens from good message
+
+$BOGOFILTER $opts -C -y 0 -s -I $INPUT/msg.regtest.s
+$BOGOFILTER $opts -C -y 0 -n -I $INPUT/msg.regtest.n
+
+check_counts
+
+# move msg.regtest.n from goodlist to spamlist in two separate steps
+
+T=2.1	# test #2.1
+S=26	# expected tokens from spam message
+G=0	# expected tokens from good message
+
+$BOGOFILTER $opts -C -y 0 -N -I $INPUT/msg.regtest.n
+
+check_counts
+
+T=2.2	# test #2.2
+S=45	# expected tokens from spam message
+G=0	# expected tokens from good message
+
+$BOGOFILTER $opts -C -y 0 -s -I $INPUT/msg.regtest.n
+
+check_counts
+
+# move msg.regtest.n from goodlist to spamlist in one big step
+
+T=3	# test #3
+S=45	# expected tokens from spam message
+G=0	# expected tokens from good message
+
+rm -f $BOGOFILTER_DIR/*.db
+
+$BOGOFILTER $opts -C -y 0 -s -I $INPUT/msg.regtest.s
+$BOGOFILTER $opts -C -y 0 -n -I $INPUT/msg.regtest.n
+$BOGOFILTER $opts -C -y 0 -Ns -I $INPUT/msg.regtest.n
+
+check_counts
+
+# move msg.regtest.s from spamlist to goodlist in one big step
+
+T=4	# test #4
+S=0	# expected tokens from spam message
+G=45	# expected tokens from good message
+
+rm -f $BOGOFILTER_DIR/*.db
+
+$BOGOFILTER $opts -C -y 0 -s -I $INPUT/msg.regtest.s
+$BOGOFILTER $opts -C -y 0 -n -I $INPUT/msg.regtest.n
+$BOGOFILTER $opts -C -y 0 -Sn -I $INPUT/msg.regtest.s
+
+check_counts
