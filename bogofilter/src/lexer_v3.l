@@ -173,6 +173,8 @@ WHITESPACE	[ \t\n]
 
 NOTWHITESPACE	[^ \t\n]
 
+HTML_ENTITY		"&#"[[:digit:]]+";"
+
 HTML_WI_COMMENTS	"<"[^\>]*">"
 
 HTML_WO_COMMENTS	"<"[^!][^\>]*">"|"<>"
@@ -284,6 +286,10 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 
 {IPADDR}					{ return IPADDR;}
 {TOKEN}						{ return TOKEN;}
+
+<HTML>{HTML_ENTITY}				{ if (BOGOTEST('T')) 	/* token mode ??? */
+						     return TOKEN;
+						}
 
 \${DOLLARS}(\.{CENTS})?				{ return TOKEN;}
 
