@@ -27,6 +27,9 @@ Briefly:
 
 	* Support for BerkeleyDB 4.3 was added.
 
+	* Update manual pages/example outputs and filter recipe examples from
+	  "X-Bogosity: yes" to "X-Bogosity: Spam". Fixes Debian bug #280557.
+
 	2004-11-09
 
 	* Unify and clean up the horrible RELEASE.NOTES-*, CHANGES* and NEWS-*
