@@ -3,6 +3,9 @@
 # Non-comment lines of bogofilter.cf.example show default settings as
 # used in the bogofilter source code.
 
+# NOTE that comments MUST have their hash mark in the leftmost
+# column of a line! Blank lines are allowed though.
+
 ########### General Settings ########################################
 
 #### BOGOFILTER_DIR
@@ -196,7 +199,7 @@ robx=0.415
 #	    enable tristate results (Yes/No/Unsure).
 
 # for graham:
-spam_cutoff = 0.90
+#spam_cutoff = 0.90
 # for robinson:
 spam_cutoff = 0.54
 
