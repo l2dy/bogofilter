@@ -473,10 +473,11 @@ int db_txn_begin(void *vhandle)
     int ret;
 
     dbh_t *dbh = vhandle;
+    dbe_t *env;
     assert(dbh);
     assert(dbh->magic == MAGIC_DBH);
     assert(dbh->txn == 0);
-    dbe_t *env = dbh->dbenv;
+    env = dbh->dbenv;
     assert(env);
     assert(env->dbe);
 
@@ -498,9 +499,10 @@ int db_txn_abort(void *vhandle)
 {
     int ret;
     dbh_t *dbh = vhandle;
+    DB_TXN *t;
     assert(dbh);
     assert(dbh->magic == MAGIC_DBH);
-    DB_TXN *t = dbh->txn;
+    t = dbh->txn;
     assert(t);
 
     ret = BF_TXN_ABORT(t);
@@ -527,10 +529,11 @@ int db_txn_commit(void *vhandle)
 {
     int ret;
     dbh_t *dbh = vhandle;
+    DB_TXN *t;
+    u_int32_t id;
     assert(dbh);
     assert(dbh->magic == MAGIC_DBH);
-    DB_TXN *t = dbh->txn;
-    u_int32_t id;
+    t = dbh->txn;
     assert(t);
 
     id = BF_TXN_ID(t);
