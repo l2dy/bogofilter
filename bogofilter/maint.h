@@ -26,8 +26,7 @@ int  maintain_wordlist_file(const char *db_file);
 bool keep_date(int dat);
 bool keep_count(int cnt);
 bool keep_size(size_t siz);
-void do_replace_nonascii_characters_c(byte *);
-void do_replace_nonascii_characters_l(byte *, size_t);
+void do_replace_nonascii_characters(byte *, size_t);
 
 void set_today(void);
 void set_date(YYYYMMDD date);

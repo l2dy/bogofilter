@@ -103,12 +103,7 @@ bool keep_size(size_t size)
     }
 }
 
-void do_replace_nonascii_characters_c(register byte *str)
-{
-    do_replace_nonascii_characters_l(str, strlen((const char *)str));
-}
-
-void do_replace_nonascii_characters_l(register byte *str, register size_t len) {
+void do_replace_nonascii_characters(register byte *str, register size_t len) {
     assert(str != NULL);
     while(len--) {
 	if (*str & 0x80) *str = '?';
@@ -177,7 +172,7 @@ int maintain_wordlist(void *vhandle)
 	if (ret == 0) {
 	    val = (dbv_t *)db_data.data;
 	    if (replace_nonascii_characters)
-		do_replace_nonascii_characters_l((byte *)db_key.data,db_key.size);
+		do_replace_nonascii_characters((byte *)db_key.data,db_key.size);
 
 	    if (! keep_count(val->count) || ! keep_date(val->date) || ! keep_size(db_key.size)) {
 		char *token = (char *) db_key.data;
