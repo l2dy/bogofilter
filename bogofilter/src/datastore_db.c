@@ -205,7 +205,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
 	    db_close(handle, true);
 	    errno = e;
 	    /* do not bother to retry if the problem wasn't EAGAIN */
-	    if (e != EAGAIN) return NULL;
+	    if (e != EAGAIN && e != EACCES) return NULL;
 	    /* do not goto open_err here, db_close frees the handle! */
 	} else {
 	    break;

@@ -7,9 +7,10 @@ $Id$
 	2003-03-06
 	* Fixed bogoutil's broken maintenance mode.
 	* Update bogofilter documentation and FAQ.
-	* Explicitly check linking against libdb early to avoid
-	  unspecific error messages as "cannot determine size of
-	  unsigned short".
+	* Explicitly check linking against libdb early to avoid unspecific
+	  error messages as "cannot determine size of unsigned short".
+	* Retry locking without mmap() on systems that return the old-fashioned
+	  EACCES rather than EAGAIN for locking failures such as AIX 4.3.3.
 
 0.11.1.1
 
@@ -94,3 +95,5 @@ $Id$
 
 	2003-02-03
 	* Corrected defect in killing of HTML comments.
+
+ vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:
