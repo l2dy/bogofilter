@@ -257,9 +257,6 @@ static int check_zombies(void) {
     off_t pos, savepos;
     cell_t cell;
 
-    if (!fTransaction)
-	return 0;
-
     savepos = lseek(lockfd, 0, SEEK_CUR);
     if (savepos < 0)
 	return -1;
