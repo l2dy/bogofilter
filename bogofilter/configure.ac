@@ -539,6 +539,7 @@ shared environments, you can use --disable-dbshared-test.])],)
 	AC_MSG_RESULT(skipped)
     fi
 
+	AC_DEFINE(ENABLE_DB_DATASTORE,1, [Enable Berkeley DB datastore])
 	LIBS="$saveLIBS"
     ;;
     *)
