@@ -166,16 +166,16 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
     {
 	size_t len;
 	char buff[MAXBUFFLEN];
-	
-	memset(buff, '\0', sizeof(buff));		/* for debugging */
-	
+
 	lineno += 1;
 	if (fgets(buff, sizeof(buff), fp) == NULL)
 	    break;
 	len = strlen(buff);
 	if ( buff[0] == '#' || buff[0] == ';' || buff[0] == '\n' )
 	    continue;
-	while (iscntrl((unsigned char)buff[len-1]) || isspace((unsigned char)buff[len-1]))
+	while (len >= 1
+		&& (iscntrl((unsigned char)buff[len-1])
+		    || isspace((unsigned char)buff[len-1])))
 	    buff[--len] = '\0';
 
 	if (DEBUG_CONFIG(1))
