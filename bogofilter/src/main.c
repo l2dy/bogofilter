@@ -154,7 +154,7 @@ static ex_t arg_foreach(arg_foreach_t hook, int argc, char **argv)
 		done = true;
 	    else {
 		if (status != RC_MORE) {
-		    exitcode = status;	/* SPAM=0, HAM=1, UNSURE=2 */
+		    exitcode = (ex_t) status;	/* SPAM=0, HAM=1, UNSURE=2 */
 		    if (nonspam_exits_zero && exitcode != EX_ERROR)
 			exitcode = EX_OK;
 		    done = true;
