@@ -205,8 +205,8 @@ void got_emptyline(void)
 void set_tag(const char *tag)
 {
     if (tag_header_lines) {
-	word_free(token_prefix_next);
-	token_prefix_next = word_new((const byte *)tag, strlen(tag));
+	word_free(token_prefix);
+	token_prefix = word_new((const byte *)tag, strlen(tag));
     }
 }
 

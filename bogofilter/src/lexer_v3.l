@@ -136,7 +136,7 @@ TOKEN 		{TOKENFRONT}{TOKENMID_NJS_DR}{TOKENBACK}
 <INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); yyless(strlen("Content-Transfer-Encoding:")); return(TOKEN); }
 <INITIAL>^Content-Type:{MTYPE};?		{ mime_type(yy_text()); yyless(strlen("Content-Type:")); return TOKEN; }
 <INITIAL>^Content-Disposition:{MTYPE}		{ mime_disposition(yy_text()); yyless(strlen("Content-Disposition:")); return TOKEN; }
-<INITIAL>^Subject:.* 				{ set_tag("subj:");  yyredo(yy_text(), ':'); }
+<INITIAL>^Subject/:\.*				{ set_tag("subj:"); return TOKEN; }
 <INITIAL>^Date:.*|Delivery-Date:.*		;
 <INITIAL>^Message-ID:.*				;
 <INITIAL>^\tid\ {ID}				;
