@@ -123,7 +123,7 @@ done
 # Add message to user.db (first regular wordlist in CF_IGN_USR_SYS)
 
 echo >> $OUT
-echo common message ignore | $BOGOFILTER -D -H -n -c ${TMPDIR}/$CF_IGN_USR_SYS -y 0 -x d -vvvv
+echo common message ignore | $BOGOFILTER -D -H -n -c ${TMPDIR}/$CF_IGN_USR_SYS -y 0
 
 (echo "#### 2: score message using each wordlist ####"; echo) >> $OUT
 
