@@ -456,7 +456,6 @@ void db_close(void *vhandle, bool nosync)
     if ((ret = dbp->close(dbp, f)))
 	print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
 
-/*  ds_lock_release(handle); */
     dbh_free(handle);
 }
 
