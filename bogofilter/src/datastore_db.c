@@ -430,13 +430,14 @@ const char *db_version_str(void)
 	     DB_VERSION_MAJOR, DB_VERSION_MINOR, DB_VERSION_PATCH);
 #endif
 
-    if (dsm) {
-	if (fTransaction)
-	    strcat(v, " TRANSACTIONAL");
-	else
-	    strcat(v, " NON-TRANSACTIONAL");
-    } else
-	strcat(v, " AUTO-XA");
+#if	!defined(ENABLE_TRANSACTIONS) && !defined(DISABLE_TRANSACTIONS)
+    strcat(v, " AUTO-XA");
+#else
+    if (fTransaction)
+	strcat(v, " TRANSACTIONAL");
+    else
+	strcat(v, " NON-TRANSACTIONAL");
+#endif
 
     return v;
 }
