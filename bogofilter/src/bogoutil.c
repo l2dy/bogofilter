@@ -685,7 +685,7 @@ static int process_arg(int option, const char *name, const char *val, int option
 	break;
 
     case ':':
-	fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+	fprintf(stderr, "Option %s requires an argument.\n", name);
 	exit(EX_ERROR);
 
     case 'h':
