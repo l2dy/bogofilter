@@ -155,7 +155,8 @@ static int maintain_hook(word_t *key, word_t *data,
 	    x = word_new(NULL, x_size);
 	}
 
-	memcpy(x->text, key, key->leng);
+	x->leng = key->leng;
+	memcpy(x->text, key->text, key->leng);
 	x->text[key->leng] = '\0';
 
 	db_delete(userdata, x);
