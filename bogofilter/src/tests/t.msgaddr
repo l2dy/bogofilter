@@ -13,10 +13,12 @@ header_format=%h: %c, ipaddr=%I
 EOF
 
 # build wordlists
-$BOGOFILTER -n -v -D -c $CFG -M -B inputs/good.mbx > /dev/null
-$BOGOFILTER -s -v -D -c $CFG -M -B inputs/spam.mbx > /dev/null
+$BOGOFILTER -n -v -D -c $CFG -M -B ${srcdir}/inputs/good.mbx > /dev/null
+$BOGOFILTER -s -v -D -c $CFG -M -B ${srcdir}/inputs/spam.mbx > /dev/null
 
-$BOGOFILTER -v -D -c $CFG -M -B inputs/good.mbx inputs/spam.mbx > $OUT
+$BOGOFILTER -v -D -c $CFG -M -B ${srcdir}/inputs/good.mbx \
+    ${srcdir}/inputs/spam.mbx \
+| sed 's}.*/inputs/}inputs/}' > $OUT
 
 # compare test output to reference output
 
