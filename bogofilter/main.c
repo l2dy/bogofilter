@@ -229,6 +229,13 @@ int main(int argc, char **argv)
 			    SPAM_HEADER_NAME, 
 			    (status==RC_SPAM) ? "Yes" : "No", 
 			    spamicity, VERSION);
+		    if (passthrough+verbose > 1)
+		    {
+			(void)fputs("\n", stdout);
+			verbose += passthrough;
+			print_bogostats( stdout );
+			verbose -= passthrough;
+		    }
 		}
 
 		if (passthrough)
@@ -253,9 +260,10 @@ int main(int argc, char **argv)
 		if (nonspam_exits_zero && passthrough && exitcode == 1)
 		    exitcode = 0;
 
-		sprintf(msg_bogofilter, "%s: %s, spamicity=%0.6f",
-			SPAM_HEADER_NAME, (status==RC_SPAM) ? "Yes" : "No", spamicity);
-	    }; break;
+		sprintf(msg_bogofilter, "%s: %s, spamicity=%0.6f, version=%s",
+			SPAM_HEADER_NAME, (status==RC_SPAM) ? "Yes" : "No", spamicity, VERSION);
+	    }
+	    break;
 	default:
 	    register_messages(STDIN_FILENO, run_type);
 	    break;

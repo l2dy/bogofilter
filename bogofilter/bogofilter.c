@@ -184,7 +184,7 @@ void register_words(run_t run_type, wordhash_t *h, int msgcount, int wordcount)
     if (list->active) {
       db_setcount(list->dbh, list->msgcount);
       db_flush(list->dbh);
-      if (verbose)
+      if (verbose>1)
 	fprintf(stderr, "bogofilter: %lu messages on the %s list\n", list->msgcount, list->name);
     }
   }
@@ -208,15 +208,17 @@ typedef struct
 }
 discrim_t;
 
-typedef struct
+struct bogostat_s
 {
     discrim_t extrema[KEEPERS];
-}
-bogostat_t;
+};
 
 #define SIZEOF(array)	((size_t)(sizeof(array)/sizeof(array[0])))
 
+typedef struct bogostat_s bogostat_t;
 static bogostat_t bogostats;
+
+double compute_spamicity(bogostat_t *bogostats, FILE *fp);
 
 int compare_extrema(const void *id1, const void *id2)
 { 
@@ -273,18 +275,25 @@ void populate_bogostats(bogostat_t *bogostats, char *text, double prob, int coun
     }
     if (hit) 
     { 
+	if (verbose >= 3)
+	{
+	    int idx = (hit - bogostats->extrema);
+	    char *curkey = hit->key[0] ? hit->key : "";
+	    fprintf(stderr, 
+		    "#  %2d"
+		    "  %f  %f  %-20.20s "
+		    "  %f  %f  %s\n", idx,
+		   DEVIATION(prob),  prob, text,
+		   DEVIATION(hit->prob), hit->prob, curkey);
+	}
 	hit->prob = prob;
 	strncpy(hit->key, text, MAXTOKENLEN);
     }
 }
 
-void print_bogostats( FILE *fp )
+void print_bogostats(FILE *fp)
 {
-    discrim_t *pp;
-    for (pp = bogostats.extrema; pp < bogostats.extrema+SIZEOF(bogostats.extrema); pp++)
-    {
-	fprintf(fp, "#  %f  %s\n", pp->prob, pp->key);
-    }
+    compute_spamicity(&bogostats, fp);
 }
 
 typedef struct {
@@ -379,7 +388,7 @@ bogostat_t *select_indicators(wordhash_t *wordhash)
     return (&bogostats);
 }
 
-double compute_spamicity(bogostat_t *bogostats)
+double compute_spamicity(bogostat_t *bogostats, FILE *fp)
 // computes the spamicity of the words in the bogostat structure
 // returns:  the spamicity
 {
@@ -398,14 +407,30 @@ double compute_spamicity(bogostat_t *bogostats)
     // For discussion, see <http://www.mathpages.com/home/kmath267.htm>.
     product = invproduct = 1.0f;
     for (pp = bogostats->extrema; pp < bogostats->extrema+SIZEOF(bogostats->extrema); pp++)
-	if (pp->prob != 0)
+    {
+	if (pp->prob == 0)
+	    continue;
+
+	product *= pp->prob;
+	invproduct *= (1 - pp->prob);
+	spamicity = product / (product + invproduct);
+
+	if (fp != NULL)
 	{
-	    product *= pp->prob;
-	    invproduct *= (1 - pp->prob);
-	    spamicity = product / (product + invproduct);
-	    if (verbose>1)
-		fprintf(stderr, "#  %f  %f  %s\n", pp->prob, spamicity, pp->key);
+	    switch (verbose)
+	    {
+	    case 1:
+		fprintf(fp, "#  %f  %s\n", pp->prob, pp->key);
+		break;
+	    case 2:
+		fprintf(fp, "#  %f  %f  %s\n", pp->prob, spamicity, pp->key);
+		break;
+	    default:
+		fprintf(fp, "#  %f  %f  %f  %8.5e  %s\n", pp->prob, product, invproduct, spamicity, pp->key);
+		break;
+	    }
 	}
+    }
 
     return spamicity;
 }
@@ -435,7 +460,7 @@ rc_t bogofilter(int fd, double *xss)
     db_lock_release_list(word_lists);
 
 //  computes the spamicity of the spam/nonspam indicators.
-    spamicity = compute_spamicity(bogostats);
+    spamicity = compute_spamicity(bogostats, NULL);
 
     status = (spamicity > SPAM_CUTOFF) ? RC_SPAM : RC_NONSPAM;
 
