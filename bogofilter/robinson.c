@@ -252,18 +252,23 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 #ifdef	ENABLE_ROBINSON_METHOD
 double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 {
-    double r = 1.0 / (double)robn;
-    double ln10 = 2.302585093;			/* log(10) - 2.3025850929940459  */
+    if (robn == 0)
+	rob_stats.s.spamicity = robx;
+    else
+    {
+	double r = 1.0 / (double)max(1,robn);
+	double ln10 = 2.302585093;			/* log(10) - 2.3025850929940459  */
 
-    rob_stats.robn = robn;
+	rob_stats.robn = robn;
 
-    rob_stats.p_ln = log(P.mant) + P.exp * ln10;	/* invlogsum */
-    rob_stats.q_ln = log(Q.mant) + Q.exp * ln10;	/* logsum    */
+	rob_stats.p_ln = log(P.mant) + P.exp * ln10;	/* invlogsum */
+	rob_stats.q_ln = log(Q.mant) + Q.exp * ln10;	/* logsum    */
 
-    rob_stats.p_pr = 1.0 - pow(P.mant, r) * pow(10.0, P.exp * r);	/* Robinson's P */
-    rob_stats.q_pr = 1.0 - pow(Q.mant, r) * pow(10.0, Q.exp * r);	/* Robinson's Q */
+	rob_stats.p_pr = 1.0 - pow(P.mant, r) * pow(10.0, P.exp * r);	/* Robinson's P */
+	rob_stats.q_pr = 1.0 - pow(Q.mant, r) * pow(10.0, Q.exp * r);	/* Robinson's Q */
 
-    rob_stats.s.spamicity = (1.0 + (rob_stats.p_pr - rob_stats.q_pr) / (rob_stats.p_pr + rob_stats.q_pr)) / 2.0;
+	rob_stats.s.spamicity = (1.0 + (rob_stats.p_pr - rob_stats.q_pr) / (rob_stats.p_pr + rob_stats.q_pr)) / 2.0;
+    }
 
     return rob_stats.s.spamicity;
 }
