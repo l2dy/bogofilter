@@ -42,7 +42,7 @@ libbf_gsl_a_SOURCES= \
 noinst_LIBRARIES += libbf_gsl.a
 endif
 
-AM_CPPFLAGS = -I$(top_srcdir)/trio -I$(top_srcdir)
+AM_CPPFLAGS = -I$(top_srcdir)/trio -I$(top_srcdir) @GSL_CFLAGS@
 AM_CFLAGS = -DBOGOFILTER
 
 # what to build
