@@ -117,7 +117,7 @@ rc_t bogofilter(int argc, char **argv)
 	if (register_bef)
 	    register_words(run_type, w, 1);
 	if (register_aft)
-	    add_hash(words, w);
+	    wordhash_add(words, w, &wordprop_init);
 
 	if (classify_msg || write_msg) {
 	    spamicity = method->compute_spamicity(w, NULL);

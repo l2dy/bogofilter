@@ -162,6 +162,26 @@ hash (word_t *t)
     return h % NHASH;
 }
 
+/* this function accumulates the word frequencies from the src hash to
+ * those of the dest hash
+ */
+void wordhash_add(wordhash_t *dest, wordhash_t *src, void (*initializer)(void *))
+{
+    wordprop_t *d;
+    hashnode_t *s;
+
+    int count = dest->count + src->count;	/* use dest count as total */
+
+    dest->wordcount += src->wordcount;
+
+    for (s = wordhash_first(src); s; s = wordhash_next(src)) {
+	d = wordhash_insert(dest, s->key, sizeof(wordprop_t), initializer);
+	d -> freq += ((wordprop_t *)(s -> buf)) ->freq;
+    }
+
+    dest->count = count;
+}
+
 void *
 wordhash_insert (wordhash_t *wh, word_t *t, size_t n, void (*initializer)(void *))
 {

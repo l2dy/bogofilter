@@ -50,6 +50,7 @@ typedef struct wordhash_s {
 void wordhash_free(/*@only@*/ wordhash_t *);
 size_t wordhash_count(wordhash_t * h);
 void wordhash_sort(wordhash_t * h);
+void wordhash_add(wordhash_t *dst, wordhash_t *src, void (*initializer)(void *));
 
 /* Given h, s, n, search for key s.
  * If found, return pointer to associated buffer.

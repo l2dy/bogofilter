@@ -117,21 +117,3 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
   run_type = save_run_type;
 }
 
-/* this function accumulates the word frequencies from the src hash to
- * those of the dest hash
- */
-void add_hash(wordhash_t *dest, wordhash_t *src) {
-    wordprop_t *d;
-    hashnode_t *s;
-
-    int count = dest->count + src->count;	/* use dest count as total */
-
-    dest->wordcount += src->wordcount;
-
-    for (s = wordhash_first(src); s; s = wordhash_next(src)) {
-	d = wordhash_insert(dest, s->key, sizeof(wordprop_t), &wordprop_init);
-	d -> freq += ((wordprop_t *)(s -> buf)) ->freq;
-    }
-
-    dest->count = count;
-}
