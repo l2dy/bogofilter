@@ -21,11 +21,7 @@ David Relson <relson@osagesoftware.com>  2003
 #include <errno.h>
 #include <limits.h>
 
-#ifndef	ENABLE_TDB_DATASTORE
 #include "datastore_db.h"
-#else
-#include "datastore_tdb.h"
-#endif
 
 #include "error.h"
 #include "maint.h"
@@ -175,7 +171,7 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 	    }
 	    break;
 
-	case DB_NOTFOUND:
+	case DS_NOTFOUND:
 	    if (DEBUG_DATABASE(3)) {
 		fprintf(dbgout, "ds_read: [%*s] not found\n", 
 			(int)max(word->leng, INT_MAX), (char *) word->text);
@@ -183,14 +179,9 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 	    break;
 	    
 	default:
-	    fprintf(dbgout, "ret=%d, DB_NOTFOUND=%d\n", ret, DB_NOTFOUND);
-#ifndef	ENABLE_TDB_DATASTORE
+	    fprintf(dbgout, "ret=%d, DS_NOTFOUND=%d\n", ret, DS_NOTFOUND);
 	    print_error(__FILE__, __LINE__, "ds_read( '%*s' ), err: %d, %s", 
-			(int)max(word->leng, INT_MAX), (char *) word->text, ret, db_strerror(ret));
-#else
-	    print_error(__FILE__, __LINE__, "ds_read( '%*s' ), err: %d, %s", 
-			word->leng, (char *) word->text, ret, tdb_errorstr(dsh->dbh));
-#endif
+			(int)max(word->leng, INT_MAX), (char *) word->text, ret, db_str_err(ret));
 	    exit(EX_ERROR);
 	}
     }

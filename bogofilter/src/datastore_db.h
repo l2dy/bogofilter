@@ -20,7 +20,6 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #ifndef DATASTORE_DB_H
 #define DATASTORE_DB_H
 
-#include <db.h>
 #include "datastore.h"
 
 /** Initialize database, open and lock files, etc.
@@ -78,7 +77,10 @@ unsigned long db_handle_pid(dsh_t *dsh);
 char *db_handle_filename(dsh_t *dsh);
 
 /* Prints wordlist name(s) */
-void dbh_print_names(void *handle, const char *msg);
+void dbh_print_names(dsh_t *dsh, const char *msg);
+
+/* Returns error associated with code */
+const char *db_str_err(int);
 
 /* Returns version string */
 const char *db_version_str(void);

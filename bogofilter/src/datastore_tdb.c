@@ -15,11 +15,14 @@ Gyepi Sam <gyepi@praxis-sw.com>   2003
 #include <tdb.h>
 #include <stdlib.h>
 
+/* Map BDB name to TDB equivalents for datastore.c */
+#define        DB_NOTFOUND     TDB_ERR_NOEXIST
+
 #include <unistd.h>
 #include <errno.h>
 
 #include "datastore.h"
-#include "datastore_tdb.h"
+#include "datastore_db.h"
 #include "maint.h"
 #include "error.h"
 #include "xmalloc.h"
@@ -150,7 +153,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 
 int db_delete(dsh_t *dsh, const dbv_t *token)
 {
-    int ret;
+    int ret = -1; /* cater for handle->count <= 0 */
     size_t i;
     dbh_t *handle = dsh->dbh;
     TDB_DATA db_key;
@@ -187,7 +190,7 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
     db_data = tdb_fetch(dbp, db_key);
 
     if (db_data.dptr == NULL)
-	return DB_NOTFOUND;
+	return DS_NOTFOUND;
 
     if (val->size < db_data.dsize) {
 	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%s' ), size error %d::%d",
@@ -323,4 +326,39 @@ int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
     }
 
     return 0;
+}
+
+/*
+ * The following struct and function were taken from tdb-1.0.6
+ *
+ * Samba database functions
+ * Copyright (C) Andrew Tridgell              1999-2000
+ * Copyright (C) Luke Kenneth Casson Leighton      2000
+ * Copyright (C) Paul `Rusty' Russell»··»·······   2000
+ * Copyright (C) Jeremy Allison»»·······»·······   2000
+ *
+ * This code was licensed under conditions of the GPL v2 or later.
+ */
+
+static struct tdb_errname {
+	enum TDB_ERROR ecode; const char *estring;
+} emap[] = { {TDB_SUCCESS, "Success"},
+	     {TDB_ERR_CORRUPT, "Corrupt database"},
+	     {TDB_ERR_IO, "IO Error"},
+	     {TDB_ERR_LOCK, "Locking error"},
+	     {TDB_ERR_OOM, "Out of memory"},
+	     {TDB_ERR_EXISTS, "Record exists"},
+	     {TDB_ERR_NOLOCK, "Lock exists on other keys"},
+	     {TDB_ERR_NOEXIST, "Record does not exist"} };
+
+/* Error string for the last tdb error */
+const char *db_str_err(int j)
+{
+	uint32_t i;
+	enum TDB_ERROR e = j;
+
+	for (i = 0; i < sizeof(emap) / sizeof(struct tdb_errname); i++)
+		if (e == emap[i].ecode)
+			return emap[i].estring;
+	return "Invalid error code";
 }

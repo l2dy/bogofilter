@@ -18,7 +18,6 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-#include <db.h>
 #include <errno.h>
 
 #if NEEDTRIO
@@ -128,9 +127,9 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
-void dbh_print_names(void *vhandle, const char *msg)
+void dbh_print_names(dsh_t *vhandle, const char *msg)
 {
-    dbh_t *handle = vhandle;
+    dbh_t *handle = vhandle->dbh;
 
     if (handle->count == 1)
 	fprintf(dbgout, "%s (%s)", msg, handle->name[0]);
@@ -367,7 +366,7 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 	exit(EX_ERROR);
     }
 
-    return found ? 0 : DB_NOTFOUND;
+    return found ? 0 : DS_NOTFOUND;
 }
 
 
@@ -513,4 +512,8 @@ int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
     }
 
     return ret;
+}
+
+const char *db_str_err(int e) {
+    return db_strerror(e);
 }

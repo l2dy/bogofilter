@@ -56,6 +56,8 @@ typedef struct {
 ** - used to communicate between datastore layer and database layer
 */
 
+#define DS_NOTFOUND (-1)
+
 typedef struct {
     void     *data;		/* addr of buffer       */
     u_int32_t leng;		/* number of data bytes */

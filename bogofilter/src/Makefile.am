@@ -93,12 +93,13 @@ libbogofilter_a_SOURCES= \
 	xstrlcpy.h xstrlcpy.c \
 	$(MEMDEBUG_SRC) \
 	dcdflib/src/dcdflib.c dcdflib/src/ipmpar.c \
-	xatox.h xatof.c xatoi.c
+	xatox.h xatof.c xatoi.c \
+	datastore_db.h
 
 if ENABLE_TDB_DATASTORE
-libbogofilter_a_SOURCES += datastore_tdb.c datastore_tdb.h
+libbogofilter_a_SOURCES += datastore_tdb.c
 else
-libbogofilter_a_SOURCES += datastore_db.c datastore_db.h
+libbogofilter_a_SOURCES += datastore_db.c
 endif
 
 CLEANFILES=version.c directories.c
