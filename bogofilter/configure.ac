@@ -321,25 +321,38 @@ case "x$WITH_DB_ENGINE" in
     xdb)
 	dnl check if we need LIBDB at all (it is harmful on BSD since
 	dnl they rename the library including soname)
+	dnl and try to guess if we need -lpthread or -lthread
 	AC_DEFINE_UNQUOTED(DB_TYPE, "db")
 	AC_DEFINE_UNQUOTED(DB_EXT, ".db")
 	AC_LIB_LINKFLAGS([db])
-	AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],LIBDB="")
+	AC_MSG_CHECKING(db and dependent libraries)
 	saveLIBS="$LIBS"
-	LIBS="$LIBS $LIBDB"
+	havelib=0
+	for dblibs in "" "$LIBDB" ; do
+	    for addlibs in "" -lpthread -lthread ; do
+		LIBDB="$dblibs $addlibs"
+		export LIBDB
+	        LIBS="$saveLIBS $LIBDB"
+		export LIBS
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],havelib=1 ; break)
+	    done
+	done
+	LIBS="$saveLIBS"
 	export LIBS
-	AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <db.h>], [int r, s, t; db_version(&r, &s, &t);])],,
-	AC_MSG_ERROR([[
+	if test $havelib = 0 ; then
+	    AC_MSG_RESULT(error)
+	    AC_MSG_ERROR([[
 ====================================================================
 Cannot link against libdb? Try 'rm config.cache', then re-configure.
 If the problem persists, report it to the bogofilter mailing list.
 Remember to include your config.log.
 ====================================================================
-	]]))
+	    ]])
+	fi
+	AC_MSG_RESULT($LIBDB)
 	LIBS="$saveLIBS"
 	export LIBS
 	AH_TEMPLATE([HAVE_DB_H], [Have suitable db.h header])
-	WITH_DB=
 	AC_SUBST(LIBDB)
 
 	dnl check if run-time link works
