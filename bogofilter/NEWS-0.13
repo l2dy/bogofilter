@@ -1,11 +1,20 @@
 			       =================
 				BOGOFILTER NEWS
 			       =================
-
+ 
+* Update bogotune to version 0.2.7
+* For bogotune change processing of '-t' switch from pass 1 to
+  pass 2 so that it supercedes the config file.
+* Added '-k size' option to bogofilter and bogoutil for
+  setting BerkeleyDB's cache size.
+* '-Q' processing no longer requires that spamlist.db be present.
+* Man pages now use '\ ' when a non-breaking space is needed,
+  instead of 0xA0.
+ 
 0.13.7	2003-06-20
-
+ 
 * Replaced tuning/tuning.sh with tuning/bogotune (and related files).
-
+ 
 0.13.6.3 2003-06-18
  
 * Minor code rewrites to speed up processing messages, mboxes,

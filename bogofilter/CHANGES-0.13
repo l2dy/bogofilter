@@ -4,14 +4,21 @@
 
 $Id$
 
+	2003-06-26
+
+	* Update bogotune to version 0.2.7
+	* Added '-k size' option to bogofilter and bogoutil for
+          setting BerkeleyDB's cache size.
+
 	2003-06-25
 
 	* For bogotune change processing of '-t' switch from pass 1 to
           pass 2 so that it supercedes the config file.
+	* Man pages now use '\ ' when a non-breaking space is needed,
+          instead of 0xA0.
 
 	2003-06-24
 
-	* Update bogotune to version 0.2.6
 	* '-Q' processing no longer requires that spamlist.db be present.
 
 0.13.7	2003-06-20
