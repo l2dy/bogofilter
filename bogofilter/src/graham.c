@@ -57,8 +57,6 @@ struct bogostat_s
     discrim_t extrema[KEEPERS];
 };
 
-#define SIZEOF(array)	((size_t)(sizeof(array)/sizeof(array[0])))
-
 static bogostat_t bogostats;
 
 /* Function Prototypes */
@@ -99,7 +97,7 @@ static void init_bogostats(/*@out@*/ bogostat_t *bs)
 {
     size_t idx;
 
-    for (idx = 0; idx < SIZEOF(bs->extrema); idx++)
+    for (idx = 0; idx < COUNTOF(bs->extrema); idx++)
     {
 	discrim_t *pp = &bs->extrema[idx];
 	pp->prob = EVEN_ODDS;
@@ -122,7 +120,7 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
     hit = NULL;
     hitdev=slotdev=1;
 
-    for (idx = 0; idx < SIZEOF(bs->extrema); idx++)
+    for (idx = 0; idx < COUNTOF(bs->extrema); idx++)
     {
 	pp = &bs->extrema[idx];
 	if (pp->key->leng == 0)
@@ -284,13 +282,13 @@ double gra_compute_spamicity(bogostat_t *bs, FILE *fp) /*@globals errno@*/
     if (verbose)
     {
 	/* put the bs in ascending order by probability and alphabet */
-	qsort(bs->extrema, SIZEOF(bs->extrema), sizeof(discrim_t), compare_extrema);
+	qsort(bs->extrema, COUNTOF(bs->extrema), sizeof(discrim_t), compare_extrema);
     }
 
     /* Bayes' theorem. */
     /* For discussion, see <http://www.mathpages.com/home/kmath267.htm>. */
     product = invproduct = 1.0;
-    for (pp = bs->extrema; pp < bs->extrema+SIZEOF(bs->extrema); pp++)
+    for (pp = bs->extrema; pp < bs->extrema+COUNTOF(bs->extrema); pp++)
     {
 	if (fabs(pp->prob) < EPS)
 	    continue;
