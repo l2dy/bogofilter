@@ -1,5 +1,5 @@
 #! /bin/sh
-#Test bogoutil and upgrade.pl
+#Test bogoutil and bogoupgrade
 
 #Test 1 -- combined count/data text file
 #Test 2 -- separate count, BDB data file.
@@ -38,7 +38,7 @@ fi
 outputdb="output-${num}.db"
 rm -f $tdir/$outputdb
 
-perl ${srcdir}/../../bogoupgrade.pl -b ../../bogoutil \
+perl ${srcdir}/../../bogoupgrade -b ../../bogoutil \
     -i $tdir/$inputfile -o $tdir/$outputdb \
 && ../../bogoutil -d $tdir/$outputdb \
 |LC_COLLATE=C sort\
