@@ -20,6 +20,7 @@ NAME:
 
 #include "passthrough.h"
 #include "bogofilter.h"
+#include "bogoreader.h"		/* for is_eol() */
 #include "fgetsl.h"
 #include "format.h"
 #include "textblock.h"
@@ -35,15 +36,6 @@ static char msg_spam_header[256];
 size_t msg_register_size = sizeof(msg_register);
 
 /* Function Definitions */
-
-static bool is_eol(const char *buf, size_t len)
-{
-    if ((len == 1 && memcmp(buf, NL, 1) == 0) ||
-	(len == 2 && memcmp(buf, CRLF, 2) == 0))
-	return true;
-    else
-	return false;
-}
 
 static void cleanup_exit(ex_t exitcode, int killfiles)
     __attribute__ ((noreturn));

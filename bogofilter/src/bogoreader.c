@@ -115,7 +115,7 @@ typedef enum st_e { IS_DIR, IS_FILE, IS_ERR } st_t;
 
 /* Function Definitions */
 
-static bool is_eol(const char *buf, size_t len)
+bool is_eol(const char *buf, size_t len)
 {
     bool ans = ((len == 1 && memcmp(buf, NL, 1) == 0) ||
 		(len == 2 && memcmp(buf, CRLF, 2) == 0));
