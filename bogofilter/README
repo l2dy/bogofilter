@@ -19,6 +19,7 @@ macro index \ed "<enter-command>unset wait_key\n<pipe-entry>bogofilter -s\n<ente
 
 For the most recent version of this software, see: 
 
-	http://www.tuxedo.org/~esr/bogofilter/
+	http://sourceforge.net/projects/bogofilter/
+
 							Eric S. Raymond
 							August 2002
