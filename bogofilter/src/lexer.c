@@ -36,9 +36,9 @@ lexer_t *lexer = NULL;
 /* Local Variables */
 
 static lexer_t v3_lexer = {
-    lexer_v3_lex,
-    &lexer_v3_text,
-    &lexer_v3_leng
+    yylex,
+    &yytext,
+    &yyleng
 };
 
 lexer_t msg_count_lexer = {
