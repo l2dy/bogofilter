@@ -4,6 +4,13 @@
 
 $Id$
 
+0.11.1.1 2003-03-05
+
+	* Fixed flaw that caused user config file to be ignored.
+	* Fixed broken '-u' (update) code.
+	* Updated documentation of bogolexer and bogoutil.
+
+
 0.11.1 2003-03-04
 
 	 * Using standard html comment delimiters when discarding comments.
