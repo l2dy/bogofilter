@@ -121,7 +121,26 @@ user_config_file=.bogofilter.cf
 
 ### New Message Formatting Options - 12/01/2002
 #
-#	see file format.c for more info
+#	formatting characters:
+#
+#	    h - spam_header_name, e.g. "X-Bogosity"
+#
+#	    a - algorithm, e.g. "graham", "robinson", "fisher"
+#
+#	    c - classification, e.g. Yes/No, Spam/Ham/Unsure, +/-/?
+#
+#	    e - spamicity as 'e' format
+#	    f - spamicity as 'f' format
+#
+#	    l - logging tag (from '-l' option)
+#
+#	    o - spam_cutoff, ex. cutoff=%c
+#
+#	    r - runtype
+#	        w - word count
+#	        m - message count
+#
+#	    v - version, ex. "version=%v"
 #
 #	below are options showing name and current value
 #
