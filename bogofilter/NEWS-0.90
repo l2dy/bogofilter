@@ -2,7 +2,7 @@
 				BOGOFILTER NEWS
 			       =================
 
-0.18.0	2004-05-09
+0.90.0	2004-05-09
 
 * Lower output precision for regression tests, by using %f
   rather than %e, to mask differences between GSL versions.
