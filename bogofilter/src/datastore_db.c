@@ -261,17 +261,15 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 
 	/* open data base */
 	t = handle->name;
-	if (dbe && bogohome && 0 == strncmp(t, bogohome,
-		    strlen(bogohome))) {
+	if (dbe && bogohome && 
+	    strncmp(t, bogohome, strlen(bogohome)) == 0) {
 	    /* strip prefix, BerkeleyDB will add it */
 	    t += strlen(bogohome);
 	    while (*t == DIRSEP_C) t++;
 	}
-	if (
-		(ret = DB_OPEN(dbp, t, NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0
-		&& (ret != ENOENT || opt_flags == DB_RDONLY ||
-		(ret = DB_OPEN(dbp, t, NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0)
-	   )
+	if ((ret = DB_OPEN(dbp, t, NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0
+	    && ( ret != ENOENT || opt_flags == DB_RDONLY ||
+		(ret = DB_OPEN(dbp, t, NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0))
 	{
 	    /* close again and bail out without further tries */
 	    print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s",
