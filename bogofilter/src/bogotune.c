@@ -725,9 +725,9 @@ static void write_msgcount_file(wordhash_t *wh)
 
     for (n = wordhash_first(wh); n != NULL; n = wordhash_next(wh)) {
 	word_t *key = n->key;
-	if (key != NULL && strcmp(key->text, ".MSG_COUNT") != 0) {
+	if (key != NULL && strcmp((char *)key->text, ".MSG_COUNT") != 0) {
 	    wordprop_t *p = wordhash_insert(train, key, sizeof(wordprop_t), NULL);
-	    print_msgcount_entry(key->text, p->cnts.bad, p->cnts.good);
+	    print_msgcount_entry((char *)key->text, p->cnts.bad, p->cnts.good);
 	}
     }
 
@@ -884,7 +884,7 @@ static int load_hook(word_t *key, dsv_t *data, void *userdata)
     tokenprop->cnts.bad = data->spamcount;
     tokenprop->cnts.good = data->goodcount;
 
-    if (strcmp(key->text, ".MSG_COUNT") == 0) {
+    if (strcmp((char *)key->text, ".MSG_COUNT") == 0) {
 	msgs_bad  = data->spamcount;
 	msgs_good = data->goodcount;
     }
