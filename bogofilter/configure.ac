@@ -17,6 +17,15 @@ AC_PATH_PROGS(PERL, perl perl5, $PATH:/usr/local/bin:/usr/bin)
 AC_PATH_PROGS(NSGMLS,onsgmls nsgmls,nsgmls)
 AM_PROG_LEX
 
+dnl Check compiler capabilities
+AC_C_CONST
+AC_C_INLINE
+AC_C_VOLATILE
+if test "$ac_cv_c_inline" != no ; then
+    AC_DEFINE(HAVE_INLINE,1,[Define to 1 if your compiler supports inline])
+    AC_SUBST(HAVE_INLINE)
+fi
+
 dnl Check for extension
 AC_EXEEXT
 
@@ -226,15 +235,7 @@ AC_HEADER_TIME
 AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h stdlib.h string.h strings.h sys/socket.h unistd.h sys/file.h stddef.h sys/time.h sys/select.h inttypes.h stdint.h])
 AC_CHECK_HEADERS([limits.h float.h],,[AC_CHECK_HEADERS(values.h)])
 
-AC_C_INLINE
-AC_C_VOLATILE
-if test "$ac_cv_c_inline" != no ; then
-    AC_DEFINE(HAVE_INLINE,1,[Define to 1 if your compiler supports inline])
-    AC_SUBST(HAVE_INLINE)
-fi
-
 dnl Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_TYPE_UID_T
