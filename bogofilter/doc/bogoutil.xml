@@ -15,9 +15,9 @@
 	    <command>bogoutil</command>
 	    <arg choice="opt">options</arg>
 	    <group choice="req">
-		<arg choice="plain">-d <replaceable>file_or_dir</replaceable></arg>
+		<arg choice="plain">-d <replaceable>file</replaceable></arg>
 		<arg choice="plain">-H</arg>
-		<arg choice="plain">-l</arg>
+		<arg choice="plain">-l <replaceable>file</replaceable></arg>
 		<arg choice="plain">-m</arg>
 		<arg choice="plain">-w <replaceable>file_or_dir</replaceable></arg>
 		<arg choice="plain">-p <replaceable>file_or_dir</replaceable></arg>
@@ -66,10 +66,9 @@
     <refsect1 id="options">
 	<title>OPTIONS</title>
 	<para>
-	    The <option>-d <replaceable>file_or_dir</replaceable></option>
+	    The <option>-d <replaceable>file</replaceable></option> 
 	    option tells <application>bogoutil</application> to print
-	    the contents of the specified database file to
-	    <option>stdout</option>.
+	    the contents of the database file to <option>stdout</option>.
 	</para>
 	<para>
 	    The <option>-H <replaceable>file_or_dir</replaceable></option>
@@ -82,8 +81,9 @@
 	    spam) are counted.
 	</para>
 	<para>
-	    The <option>-l</option> option tells <application>bogoutil</application> 
-	    to load the data from <option>stdin</option> into the specified database file.
+	    The <option>-l <replaceable>file</replaceable></option>
+	    option tells <application>bogoutil</application> to load
+	    to load the data from <option>stdin</option> into the database file.
 	</para>
 	<para>The <option>-m</option> option tells <application>bogoutil</application> 
 	    to perform maintenance functions on the specified database, i.e. discard tokens 
