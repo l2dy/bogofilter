@@ -57,7 +57,7 @@ wordhash_init (void)
   h->bin = xmalloc (NHASH * sizeof (hashnode_t **));
 
   for (i = 0; i < NHASH; i++)
-    h->bin[i] = NULL;
+      h->bin[i] = NULL;
 
   h->nodes = NULL;
   h->strings = NULL;
@@ -92,9 +92,9 @@ wordhash_free (wordhash_t * h)
 
     for (np = h->nodes; np; np = nq)
     {
-      nq = np->next;
-      xfree (np->buf);
-      xfree (np);
+	nq = np->next;
+	xfree (np->buf);
+	xfree (np);
     }
 
     for (sp = h->strings; sp; sp = sq)
@@ -104,8 +104,8 @@ wordhash_free (wordhash_t * h)
 	xfree (sp);
     }
 
-    if( h->order != NULL ) {
-	xfree( h->order );
+    if (h->order != NULL) {
+	xfree (h->order);
     }
 
     xfree (h->bin);
@@ -115,24 +115,23 @@ wordhash_free (wordhash_t * h)
 static hashnode_t *
 nmalloc (wordhash_t * h) /*@modifies h->nodes@*/
 {
-  /*@dependent@*/ wh_alloc_node *n = h->nodes;
-  hashnode_t *t;
+    /*@dependent@*/ wh_alloc_node *n = h->nodes;
+    hashnode_t *t;
 
-  if (n == NULL || n->avail == 0)
+    if (n == NULL || n->avail == 0)
     {
+	n = xmalloc (sizeof (wh_alloc_node));
+	n->next = h->nodes;
+	h->nodes = n;
 
-      n = xmalloc (sizeof (wh_alloc_node));
-      n->next = h->nodes;
-      h->nodes = n;
-
-      n->buf = xmalloc (N_CHUNK * sizeof (hashnode_t));
-      n->avail = N_CHUNK;
-      n->used = 0;
+	n->buf = xmalloc (N_CHUNK * sizeof (hashnode_t));
+	n->avail = N_CHUNK;
+	n->used = 0;
     }
-  n->avail--;
-  t = (n->buf) + n->used;
-  n->used ++;
-  return (t);
+    n->avail--;
+    t = (n->buf) + n->used;
+    n->used ++;
+    return (t);
 }
 
 /* determine architecture's alignment boundary */
@@ -142,74 +141,74 @@ struct dummy { char *c; double d; };
 static char *
 smalloc (wordhash_t * h, size_t n) /*@modifies h->strings@*/
 {
-  wh_alloc_str *s = h->strings;
-  /*@dependent@*/ char *t;
+    wh_alloc_str *s = h->strings;
+    /*@dependent@*/ char *t;
 
-  /* Force alignment on architecture's natural boundary.*/
-  if ((n % ALIGNMENT) != 0)
-      n += ALIGNMENT - ( n % ALIGNMENT);
+    /* Force alignment on architecture's natural boundary.*/
+    if ((n % ALIGNMENT) != 0)
+	n += ALIGNMENT - ( n % ALIGNMENT);
    
-  if (s == NULL || s->avail < n)
+    if (s == NULL || s->avail < n)
     {
-      s = xmalloc (sizeof (wh_alloc_str));
-      s->next = h->strings;
-      h->strings = s;
+	s = xmalloc (sizeof (wh_alloc_str));
+	s->next = h->strings;
+	h->strings = s;
 
-      s->buf = xmalloc (S_CHUNK + n);
-      s->avail = S_CHUNK + n;
-      s->used = 0;
+	s->buf = xmalloc (S_CHUNK + n);
+	s->avail = S_CHUNK + n;
+	s->used = 0;
     }
-  s->avail -= n;
-  t = s->buf + s->used;
-  s->used += n;
-  return (t);
+    s->avail -= n;
+    t = s->buf + s->used;
+    s->used += n;
+    return (t);
 }
 
 static unsigned int
 hash (word_t *t)
 {
-  unsigned int h = 0;
-  size_t l;
-  for (l=0; l<t->leng; l++)
-    h = MULT * h + t->text[l];
-  return h % NHASH;
+    unsigned int h = 0;
+    size_t l;
+    for (l=0; l<t->leng; l++)
+	h = MULT * h + t->text[l];
+    return h % NHASH;
 }
 
 void *
 wordhash_insert (wordhash_t * h, word_t *t, size_t n, void (*initializer)(void *))
 {
-  hashnode_t *p;
-  unsigned int idx = hash (t);
+    hashnode_t *p;
+    unsigned int idx = hash (t);
 
-  for (p = h->bin[idx]; p != NULL; p = p->next) {
-    word_t *key = p->key;
-    if (key->leng == t->leng && memcmp (t->text, key->text, t->leng) == 0)
-      {
-	return p->buf;
-      }
-  }
+    for (p = h->bin[idx]; p != NULL; p = p->next) {
+	word_t *key = p->key;
+	if (key->leng == t->leng && memcmp (t->text, key->text, t->leng) == 0)
+	{
+	    return p->buf;
+	}
+    }
 
-  h->count += 1;
-  p = nmalloc (h);
-  p->buf = smalloc (h, n);
-  if (initializer)
-	  initializer(p->buf);
+    h->count += 1;
+    p = nmalloc (h);
+    p->buf = smalloc (h, n);
+    if (initializer)
+	initializer(p->buf);
 		  
-  p->key = word_dup(t);
-  p->next = h->bin[idx];
-  h->bin[idx] = p;
+    p->key = word_dup(t);
+    p->next = h->bin[idx];
+    h->bin[idx] = p;
 
-  if (h->iter_head == NULL){
-    h->iter_head = p;
-  }
-  else {
-    h->iter_tail->iter_next = p;
-  }
+    if (h->iter_head == NULL){
+	h->iter_head = p;
+    }
+    else {
+	h->iter_tail->iter_next = p;
+    }
 
-  p->iter_next = NULL;
-  h->iter_tail = p;
+    p->iter_next = NULL;
+    h->iter_tail = p;
 
-  return p->buf;
+    return p->buf;
 }
 
 size_t wordhash_count (wordhash_t * h)
