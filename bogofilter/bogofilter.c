@@ -74,7 +74,6 @@ double spam_cutoff;
 extern double min_dev;
 extern double robs;
 extern double robx;
-double unknown_word;
 
 #define PLURAL(count) ((count == 1) ? "" : "s")
 
@@ -474,6 +473,7 @@ static double compute_probability(const char *token)
 		    prob *= scalefactor;
 	    }
 #endif
+
 	    wordprob_add(&wordstats, prob, list->bad);
 	}
     }
@@ -482,7 +482,7 @@ static double compute_probability(const char *token)
     if (algorithm == AL_GRAHAM)
     {
 	if (totalcount < MINIMUM_FREQ) {
-	    prob=unknown_word;
+	    prob=UNKNOWN_WORD;
 	} else {
 	    prob=wordprob_result(&wordstats);
 	    prob = min(MAX_PROB, prob);
@@ -604,8 +604,6 @@ static double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@
     if (Rtable || verbose)
 	rstats_init();
 
-    unknown_word = robx;
-
     for(node = wordhash_first(wordhash); node != NULL; node = wordhash_next(wordhash))
     {
 	char *token = node->key;
@@ -650,7 +648,6 @@ static void initialize_constants(void)
     {
 	spam_cutoff = GRAHAM_SPAM_CUTOFF;
 	max_repeats = GRAHAM_MAX_REPEATS;
-//	unknown_word = UNKNOWN_WORD;
 	if (fabs(min_dev) < EPS)
 	    min_dev     = GRAHAM_MIN_DEV;
     }
