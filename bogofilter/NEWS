@@ -22,7 +22,7 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
-	2005-03-16
+0.94.1	2005-03-16
 
 	* Long options cleanup: options that have no meaning for a particular
 	  program are now rejected, to meet common expectations. The option
@@ -31,6 +31,11 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 	2005-03-14
 
 	* Add 'bogoutil --db-checkpoint', to replace db_checkpoint -1h.
+
+	2005-03-13
+
+	* Modified get_token() to use static storage in order to
+          lessen malloc/free overhead.
 
 	2005-03-09
 
