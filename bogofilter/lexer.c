@@ -175,7 +175,8 @@ int get_decoded_line(byte *buf, size_t max_size)
 
     if (count > 0
 	&& memcmp("From ", buf, 5) != 0
-	&& !msg_header && !msg_state->mime_header) {
+	&& !msg_header && !msg_state->mime_header
+	&& msg_state->mime_type != MIME_TYPE_UNKNOWN) {
 	int decoded_count = mime_decode(buf, count);
 	/*change buffer size only if the decoding worked */
 	if (decoded_count != 0)
