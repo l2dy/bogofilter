@@ -251,7 +251,7 @@ extern int ds_recover(const char *directory, bool catastrophic);
 extern int ds_remove(const char *directory);
 
 /** Verify given database */
-extern int ds_verify(const char *file);
+extern int ds_verify(const char *directory, const char *file);
 
 /** Remove inactive log files in given directory, \return EX_OK. */
 extern int ds_purgelogs(const char *directory);

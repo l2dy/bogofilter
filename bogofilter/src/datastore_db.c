@@ -927,7 +927,7 @@ const char *db_str_err(int e) {
     return db_strerror(e);
 }
 
-ex_t db_verify(const char *db_file)
+ex_t db_verify(const char *directory, const char *db_file)
 {
     DB_ENV *dbe = NULL;
     DB *db;
@@ -938,7 +938,9 @@ ex_t db_verify(const char *db_file)
 	return EX_ERROR;
     }
 
-    dbe = dsm->dsm_recover_open(db_file);
+    dsm_init(directory, db_file);
+
+    dbe = dsm->dsm_recover_open(directory);
     if (dbe == NULL) {
 	exit(EX_ERROR);
     }
@@ -960,7 +962,7 @@ ex_t db_verify(const char *db_file)
 	exit(EX_ERROR);
     }
 
-    e = dsm->dsm_common_close(dbe, db_file);
+    e = dsm->dsm_common_close(dbe, directory);
 
     if (e == 0 && verbose)
 	printf("%s OK.\n", db_file);

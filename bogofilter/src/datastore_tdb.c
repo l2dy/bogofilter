@@ -348,7 +348,8 @@ const char *db_str_err(int j)
 	return "Invalid error code";
 }
 
-ex_t db_verify(const char *f) {
+ex_t db_verify(const char *d, const char *f) {
     (void)f;
+    (void)d;
     return EX_OK;
 }

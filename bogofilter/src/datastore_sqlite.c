@@ -40,10 +40,10 @@ static const char *ENDIAN32 = ".ENDIAN32";
 DUMMYVVP(dbe_cleanup)
 DUMMYVVP(db_flush)
 DUMMYVPVP(db_get_env)
-DUMMYICP(db_verify)
 DUMMYICP(dbe_purgelogs)
 DUMMYICP(dbe_remove)
 void *dbe_init(const char *d1, const char *d2) { (void)d1; (void)d2; return (void *)~0; }
+ex_t db_verify(const char *d1, const char *d2) { (void)d1; (void)d2; return EX_OK; }
 /** dummy function, Sqlite recovers automatically. */
 ex_t dbe_recover(const char *d1, bool d2, bool d3) { (void)d1; d2=d3; return EX_ERROR; }
 

@@ -102,7 +102,7 @@ ex_t dbe_remove(const char *directory);
 ex_t dbe_purgelogs(const char *directory);
 
 /** Check if \a databasefile is a valid database. */
-ex_t db_verify(const char *databasefile);
+ex_t db_verify(const char *directory, const char *databasefile);
 
 /** Returns true if the database is byteswapped. */
 bool db_is_swapped(void *vhandle);

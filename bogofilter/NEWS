@@ -22,6 +22,9 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-03-09
+
+	* bogoutil --db-verify has been repaired (it segfaulted in 0.94.0).
 
 	2005-03-08
 

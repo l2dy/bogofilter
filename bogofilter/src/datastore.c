@@ -471,6 +471,6 @@ int ds_purgelogs(const char *directory) {
     return dbe_purgelogs(directory);
 }
 
-int ds_verify(const char *file) {
-    return db_verify(file);
+int ds_verify(const char *directory, const char *file) {
+    return db_verify(directory, file);
 }

@@ -828,7 +828,7 @@ int main(int argc, char *argv[])
 		rc = ds_remove(ds_file);
 	    break;
 	case M_VERIFY:
-	    rc = ds_verify(ds_file);
+	    rc = ds_verify(bogohome, ds_file);
 	    break;
 	case M_DUMP:
 	    rc = dump_wordlist(ds_file);
