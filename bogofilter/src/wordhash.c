@@ -44,30 +44,23 @@ THEORY:
 #define offsetof(type, member) ( (int) & ((type*)0) -> member )
 #endif
 
+/* 06/14/03
+** profiling shows wordhash_init() is significant portion 
+** of time spent processing msg-count files:
+**
+**   %   cumulative   self              self     total           
+**  time   seconds   seconds    calls  ms/call  ms/call  name    
+**  30.84      0.70     0.70     2535     0.28     0.28  wordhash_init
+**
+** wordhash_init() made faster by using xcalloc() to provide
+** initialized storage.
+*/
+
 wordhash_t *
 wordhash_init (void)
 {
-  int i;
-
-  wordhash_t *wh = xmalloc (sizeof (wordhash_t));
-
-  wh->bin = xmalloc (NHASH * sizeof (hashnode_t **));
-
-  for (i = 0; i < NHASH; i++)
-      wh->bin[i] = NULL;
-
-  wh->nodes = NULL;
-  wh->strings = NULL;
-
-  wh->iter_ptr = NULL;
-  wh->iter_head = NULL;
-  wh->iter_tail = NULL;
-
-  wh->index = 0;
-  wh->count = 0;
-  wh->order = NULL;
-  wh->wordcount = 0;
-
+  wordhash_t *wh = xcalloc (1, sizeof (wordhash_t));
+  wh->bin = xcalloc (NHASH, sizeof (hashnode_t **));
   return wh;
 }
 
