@@ -511,6 +511,9 @@ mime_boundary_set (const byte *text, int leng)
 	     text, leng, text);
 
   boundary = getword (text + strlen ("boundary="), text + leng);
+  if (boundary == NULL)
+      return;
+
   msg_state->boundary = boundary;
   msg_state->boundary_len = strlen (boundary);
 
