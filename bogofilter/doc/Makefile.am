@@ -6,9 +6,7 @@ SUFFIXES= .1 .1in .htmlin .html
 # what to build
 man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
 
-if  ENABLE_XMLTO
 html_MANS = bogofilter.html bogoutil.html bogoupgrade.html bogolexer.html
-endif
 
 all: $(man_MANS) $(html_MANS)
 
@@ -45,6 +43,7 @@ EXTRA_DIST = bogofilter.1in bogoutil.1in bogoupgrade.1in \
 		-e "s|[@]bindir@|$(bindir)|g" <$< >$@ \
 	|| { rm -f $@ ; exit 1 ; }
 
+if  ENABLE_XMLTO
 # Use Perl to fix up br0ken 0xa0 characters that the XML DocBook style
 # sheets emit instead of "\ " for roff or "&nbsp;" for HTML,
 # respectively.
@@ -61,3 +60,4 @@ EXTRA_DIST = bogofilter.1in bogoutil.1in bogoupgrade.1in \
 	if xmlto man $< ; then f=$@ ; mv $${f%in} $@ ; else rm -f $@ ; exit 1 ; fi ; \
 	perl -pl -e "s|\xA0|\\ |g" -i $@ || rm -f $@ ; \
 	fi
+endif
