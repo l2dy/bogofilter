@@ -512,7 +512,7 @@ esac
 # Note the \\\\ for backslashes.  Autoconf eats one layer, leaving \\
 
 /* Generated automatically by configure */
-/* These are here to be redefined by handcrafted src/sysdefs.h. */
+/* These are here to be redefined by handcrafted src/config.h. */
 
 AC_DEFINE( CURDIR_S, ".", [Define current directory])
 AC_DEFINE( EXTSEP_S, ".", [Define extension separator])
