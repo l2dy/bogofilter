@@ -1011,6 +1011,29 @@ static int db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
     return 0;
 }
 
+/* close the environment, but do not release locks */
+static void db_cleanup_lite(void) {
+    if (!init)
+	return;
+    if (dbe) {
+	int ret;
+
+	/* checkpoint if more than 64 kB of logs have been written
+	 * or 120 min have passed since the previous checkpoint */
+	/*                           kB  min flags */
+	ret = BF_TXN_CHECKPOINT(dbe, 64, 120, 0);
+	ret = db_flush_dirty(dbe, ret);
+	if (ret)
+	    print_error(__FILE__, __LINE__, "(db) DBE->txn_checkpoint returned %s", db_strerror(ret));
+
+	ret = dbe->close(dbe, 0);
+	if (DEBUG_DATABASE(1) || ret)
+	    fprintf(dbgout, "DB_ENV->close(%p): %s\n", (void *)dbe, db_strerror(ret));
+    }
+    dbe = NULL;
+    init = false;
+}
+
 /* initialize data base, configure some lock table sizes
  * (which can be overridden in the DB_CONFIG file)
  * and lock the file to tell other parts we're initialized and
@@ -1080,7 +1103,7 @@ retry:
     }
 
     clear_lockfile();
-    ds_cleanup();
+    db_cleanup_lite();
 
     return 0;
 
@@ -1089,26 +1112,8 @@ rec_fail:
 }
 
 void db_cleanup(void) {
-    if (!init)
-	return;
-    if (dbe) {
-	int ret;
-
-	/* checkpoint if more than 64 kB of logs have been written
-	 * or 120 min have passed since the previous checkpoint */
-	/*                           kB  min flags */
-	ret = BF_TXN_CHECKPOINT(dbe, 64, 120, 0);
-	ret = db_flush_dirty(dbe, ret);
-	if (ret)
-	    print_error(__FILE__, __LINE__, "(db) DBE->txn_checkpoint returned %s", db_strerror(ret));
-
-	ret = dbe->close(dbe, 0);
-	if (DEBUG_DATABASE(1) || ret)
-	    fprintf(dbgout, "DB_ENV->close(%p): %s\n", (void *)dbe, db_strerror(ret));
-    }
+    db_cleanup_lite();
     clear_lock();
     if (lockfd >= 0)
 	close(lockfd); /* release locks */
-    dbe = NULL;
-    init = false;
 }

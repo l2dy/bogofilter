@@ -36,6 +36,9 @@ Briefly:
 	      --db_lk_max_locks=N 
 	      --db_lk_max_objects=N
 
+	* When running database recovery automatically, don't let go of the
+	  lockfile, so we can do our actual work subsequently.
+
 	2004-11-10
 
 	* Support for BerkeleyDB 4.3 was added. We'll avoid DB_NOSYNC on
