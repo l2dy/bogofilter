@@ -81,6 +81,7 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 {
     int override=0;
     wordlist_t* list;
+    bool ignored = false;
 
     if (fBogotune) {
 	wordprop_t *wp = wordhash_search_memory(token);
@@ -118,7 +119,7 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 	}
 
 	if (ret == 0 && list->type == WL_IGNORE)	/* if found on ignore list */
-	    break;
+	    ignored = true;
 
 	override=list->override;
 
@@ -127,11 +128,15 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 	cnts->msgs_good += list->msgcount[IX_GOOD];
 	cnts->msgs_bad += list->msgcount[IX_SPAM];
 
-	if (DEBUG_ALGORITHM(1)) {
-	    fprintf(dbgout, "%5u %5u ", cnts->good, cnts->bad);
-	    word_puts(token, 0, dbgout);
-	    fputc('\n', dbgout);
-	}
+    }
+
+    if (ignored)
+	cnts->good = cnts->bad = 0;
+
+    if (DEBUG_ALGORITHM(1)) {
+	fprintf(dbgout, "%5u %5u ", cnts->good, cnts->bad);
+	word_puts(token, 0, dbgout);
+	fputc('\n', dbgout);
     }
 
     return;
