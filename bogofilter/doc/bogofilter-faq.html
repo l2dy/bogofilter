@@ -109,7 +109,7 @@
         Portability Problems
 
         <ul>
-          <li><a href="#port-notes">How do I get Bogofilter working on Solaris, BSD, etc.?</a></li>
+          <li><a href="#port-notes">How do I get bogofilter working on Solaris, BSD, etc.?</a></li>
           <li><a href="#make-notes">Can I use the make command on my operating system?</a></li>
         </ul>
       </li>
@@ -121,25 +121,26 @@
 
     <p>Bogofilter is a fast Bayesian spam filter along the lines
     suggested by <a href="http://www.paulgraham.com/">Paul Graham</a>
-    in his article <a href="http://www.paulgraham.com/spam.html">A
-    Plan For Spam</a>.  Bogofilter uses
-    <a href="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">Gary
-    Robinson</a>'s geometric-mean algorithm with the
-    <a href="http://www.linuxjournal.com/article.php?sid=6467">Fisher's
-    method modification</a> to classify email as spam or non-spam.</p>
+    in his article
+    <a href="http://www.paulgraham.com/spam.html">A Plan For Spam</a>.
+    bogofilter uses
+    <a href="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">Gary Robinson</a>'s
+    geometric-mean algorithm with the
+    <a href="http://www.linuxjournal.com/article.php?sid=6467">Fisher's method modification</a>
+    to classify email as spam or non-spam.</p>
 
     <p>The bogofilter
     <a href="http://bogofilter.sourceforge.net">home page</a> at
     SourceForge is the central clearinghouse for bogofilter
     resources.</p>
 
-    <p>Bogofilter was started by <a href="http://catb.org/~esr/">Eric
-    S. Raymond</a> on August 19, 2002. It gained popularity in
-    September 2002, and a number of other authors have started to
-    contribute to the project.</p>
+    <p>Bogofilter was started by
+    <a href="http://catb.org/~esr/">Eric S. Raymond</a> on August 19,
+    2002. It gained popularity in September 2002, and a number of other
+    authors have started to contribute to the project.</p>
 
-    <p>The <a href="http://bogofilter.sourceforge.net/NEWS">NEWS
-    file</a> describes bogofilter's version history.</p>
+    <p>The <a href="http://bogofilter.sourceforge.net/NEWS">NEWS file</a>
+    describes bogofilter's version history.</p>
 
     <hr>
 
@@ -157,13 +158,11 @@
 
     <h2 id="bogo-how">How does bogofilter work?</h2>
 
-    <p>See the man page's <a
-    href="http://bogofilter.sourceforge.net/man_page.php#theory">
-    THEORY OF OPERATION</a> section for an introduction. The main
-    source for understanding this is Gary Robinson's Linux Journal
-    article <a
-    href="http://www.linuxjournal.com/article.php?sid=6467"> "A
-    Statistical Approach to the Spam Problem"</a>.</p>
+    <p>See the man page's
+    <a href="http://bogofilter.sourceforge.net/man_page.php#theory">THEORY OF OPERATION</a>
+    section for an introduction. The main source for understanding
+    this is Gary Robinson's Linux Journal article
+    <a href="http://www.linuxjournal.com/article.php?sid=6467">"A Statistical Approach to the Spam Problem"</a>.</p>
 
     <p>After you read all this you might ask some questions. The first
     could be "Is bogofilter really a Bayesian spam filter?"
@@ -176,22 +175,22 @@
     not satisfied" and "We don't care as long as it works". A longer
     answer will mention that the basic assumption that "an e-mail is a
     random collection of words, each independent of the others" is
-    violated.  There are other ways that practice doesn't follow
+    violated.  There are several places where practice doesn't follow
     theory.  Some are always present, and some which will depend on
-    the way you use Bogofilter:</p>
+    the way you use bogofilter:</p>
 
     <ul>
-    <li>Words in an e-mail are by no means independent.  In all languages, 
+    <li>Words in an e-mail are by no means independent.  In all languages,
     the opposite is true.</li>
     <li>The words used are not random, though some spammers include random
     words.</li>
     <li>Full training or using a random sample, follows Bayes'
-    principles. Simply choosing messages to use for training violates
+    principles. Choosing messages to use for training violates
     the assumption that the training messages are a random sample of
     the messages received.  This principle is also violated by
-    bogofilter's auto-update function (with the thresh_update
+    Bogofilter's auto-update function (with the thresh_update
     parameter), <a href="#train-on-error">training on error</a>, or
-    anything similar to these approaches .</li>
+    anything similar to these approaches.</li>
     <li>The same applies if you train with the same message more than once.</li>
     <li>Other problems arise if you modify your database by removing tokens
     (like using bogoutil with -a or -c).</li>
@@ -272,17 +271,14 @@
     value, messages which are close to a cutoff will be used for
     training.  Using security margins improves results when training
     on error.  In general, greater margins help more (although too
-    much isn't optimal).  As a rule of thumb spam cutoff +/- 0.3 gives good
+    much also isn't optimal).  As a rule of thumb spam cutoff +/- 0.3 gives good
     results.  For tristate mode, you might try the middle of the unsure
     interval +/- 0.3 for training.</p>
 
     <p>Repeating training on error on the same message corpus can
     improve accuracy.  The idea is that messages which were rated
     correctly in the first place might after some more training be
-    rated wrongly which will then be corrected.  As explained above,
-    this changes the distribution of token scores and violates a basic
-    assumption of Bayesian classification. Though theoretically wrong,
-    in practice repeated training seems to work.</p>
+    rated wrongly which will then be corrected.</p>
 
     <p>"Training to exhaustion" is repeating training on error, with
     the same message corpus, until no errors remain.  Also this method
@@ -322,7 +318,7 @@
 	bogofilter -n &lt; ham.mbox</pre></li>
     </ul>
 
-    <p>Note: bogofilter's contrib directory includes two scripts that
+    <p>Note: Bogofilter's contrib directory includes two scripts that
     both use a train-on-error technique. This technique scores each
     message and adds to the database only those messages that were
     scored incorrectly (messages scored as uncertain, ham scored as
@@ -471,8 +467,7 @@
 
     <hr>
 
-    <h2 id="spamassassin">How can I use SpamAssassin to train
-    Bogofilter?</h2>
+    <h2 id="spamassassin">How can I use SpamAssassin to train Bogofilter?</h2>
 
     <p>If you have a working SpamAssassin installation (or care to
     create one), you can use its return codes to train bogofilter.
@@ -507,8 +502,7 @@
 
     <hr>
 
-    <h2 id="mboxformats">What mailbox (file) formats does bogofilter
-    understand?</h2>
+    <h2 id="mboxformats">What mailbox (file) formats does bogofilter understand?</h2>
 
     <p>Bogofilter understands the traditional Unix mbox format, the
     Maildir and MH formats. Note though that bogofilter does not support
@@ -641,8 +635,8 @@
 
         <p>The "-R" output is formatted for use with the R language
         for statistical computing. More information is available at
-        <a href="http://www.r-project.org/">The R Project for
-        Statistical Computing</a>.</p>
+        <a href="http://www.r-project.org/">The R Project for 
+	Statistical Computing</a>.</p>
       </li>
     </ul>
 
@@ -704,8 +698,7 @@
 
     <hr>
 
-    <h2 id="query-database">How do I manually query the
-    database</h2>
+    <h2 id="query-database">How do I manually query the database</h2>
 
     <p>To find the spam and ham counts for a token (word) use
     bogoutil's '-w' option. For example, "bogoutil -w
@@ -730,8 +723,7 @@
 
     <hr>
 
-    <h2 id="page-notfound">Why am I getting DB_PAGE_NOTFOUND 
-    messages?</h2>
+    <h2 id="page-notfound">Why am I getting DB_PAGE_NOTFOUND messages?</h2>
 
     <p>You have a problem with your BerkeleyDB database.  There are
     two likely causes: either you've hit a max size limit or the
@@ -750,14 +742,13 @@
     <p>To set the limit to 73MB (or whatever size is right for you):</p>
     <pre>	postconf -e mailbox_size_limit=73000000</pre>
 
-    <p>If you think your database may be corrupt, read <a
-    href="#rescue">How can I tell if my wordlists are corrupted?</a>
+    <p>If you think your database may be corrupt, read
+    <a href="#rescue">How can I tell if my wordlists are corrupted?</a>
     FAQ entry.</p>
 
     <hr>
 
-    <h2 id="rescue">How can I tell if my word lists are
-    corrupted?</h2>
+    <h2 id="rescue">How can I tell if my word lists are corrupted?</h2>
 
     <p>If you think your word lists are hosed, you can see what
     BerkeleyDB thinks by running:</p>
@@ -871,8 +862,7 @@
 
     <hr>
 
-    <h2 id="port-notes">How do I get bogofilter working on Solaris,
-    BSD, etc?</h2>
+    <h2 id="port-notes">How do I get bogofilter working on Solaris, BSD, etc?</h2>
 
     <p>If you don't already have a v3.0+ version of
     <a href="http://www.sleepycat.com">BerkeleyDB</a>, then
@@ -884,8 +874,8 @@
 	# make install</pre>
 
     <p>Next, download a
-    <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">portable
-    version</a> of bogofilter.</p>
+    <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">portable version</a>
+    of bogofilter.</p>
 
     <h3>On Solaris</h3>
 
@@ -913,8 +903,8 @@
     <pre>	# pkg_add -r portupgrade cvsup</pre>
 
     <p>To install or upgrade bogofilter, just
-    <a href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html">upgrade
-    your portstree using cvsup</a>, then type:</p>
+    <a href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html">upgrade your portstree using cvsup</a>,
+    then type:</p>
     <pre>	# portupgrade -N bogofilter</pre>
 
     <h3>On HP-UX</h3>
@@ -925,8 +915,7 @@
 
     <hr>
 
-    <h2 id="make-notes">Can I use the make command on my
-          operating system?</h2>
+    <h2 id="make-notes">Can I use the make command on my operating system?</h2>
 
     <p>Bogofilter has been successfully built on many operating
     systems using GNU make and the native make commands.  However,
