@@ -25,8 +25,9 @@ David Relson	<relson@osagesoftware.com> 2005
 u_int32_t db_max_locks = 16384;		/* set_lk_max_locks    32768 */
 u_int32_t db_max_objects = 16384;	/* set_lk_max_objects  32768 */
 
-#ifdef	FUTURE_DB_OPTIONS
 bool	  db_log_autoremove = false;	/* DB_LOG_AUTOREMOVE */
+
+#ifdef	FUTURE_DB_OPTIONS
 bool	  db_txn_durable = true;	/* not DB_TXN_NOT_DURABLE */
 #endif
 

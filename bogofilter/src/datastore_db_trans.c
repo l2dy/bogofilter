@@ -46,8 +46,9 @@ static const u_int32_t dbenv_defflags = DB_INIT_MPOOL | DB_INIT_LOCK
 u_int32_t db_max_locks = 16384;		/* set_lk_max_locks    32768 */
 u_int32_t db_max_objects = 16384;	/* set_lk_max_objects  32768 */
 
+bool	  db_log_autoremove = true;	/* DB_LOG_AUTOREMOVE */
+
 #ifdef	FUTURE_DB_OPTIONS
-bool	  db_log_autoremove = false;	/* DB_LOG_AUTOREMOVE */
 bool	  db_txn_durable = true;	/* not DB_TXN_NOT_DURABLE */
 #endif
 
@@ -62,12 +63,13 @@ static DB_ENV	  *dbx_recover_open	(const char *db_file, DB **dbp);
 static int	   dbx_auto_commit_flags(void);
 static int	   dbx_get_rmw_flag	(int open_mode);
 static int	   dbx_lock		(void *handle, int open_mode);
-static ex_t	   dbx_common_close	(DB_ENV *dbe, const char *db_file);
+static ex_t	   dbx_common_close	(DB_ENV *dbe, const char *directory);
 static int	   dbx_sync		(DB_ENV *dbe, int ret);
 static void	   dbx_log_flush	(DB_ENV *dbe);
 static dbe_t 	  *dbx_init		(const char *dir);
 static void 	   dbx_cleanup		(dbe_t *env);
 static void 	   dbx_cleanup_lite	(dbe_t *env);
+static ex_t	   dbe_env_purgelogs	(DB_ENV *dbe);
 
 /* OO function lists */
 
@@ -100,7 +102,6 @@ static int bf_dbenv_create(DB_ENV **dbe);
 static void dbe_config(void *vhandle, u_int32_t numlocks, u_int32_t numobjs);
 static dbe_t *dbe_xinit(dbe_t *env, const char *directory, u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags);
 static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags);
-static ex_t dbe_common_close(DB_ENV *dbe, const char *directory);
 
 /* support functions */
 
@@ -233,22 +234,6 @@ static DB_ENV *dbx_recover_open(const char *dir, DB **dbp)
     }
 
     return dbe;
-}
-
-static ex_t dbx_common_close(DB_ENV *dbe, const char *directory)
-{
-    int e;
-
-    e = dbe->close(dbe, 0);
-    if (e != 0) {
-	print_error(__FILE__, __LINE__, "Error closing environment \"%s\": %s",
-		directory, db_strerror(e));
-	exit(EX_ERROR);
-    }
-
-    db_try_glock(directory, F_UNLCK, F_SETLKW); /* release lock */
-
-    return EX_OK;
 }
 
 static int dbx_begin(void *vhandle)
@@ -519,13 +504,7 @@ static dbe_t *dbx_init(const char *directory)
     }
 
     /* initialize */
-
 #ifdef	FUTURE_DB_OPTIONS
-#ifdef	DB_LOG_AUTOREMOVE
-    if (db_log_autoremove)
-	flags ^= DB_LOG_AUTOREMOVE;
-#endif
-
 #ifdef	DB_BF_TXN_NOT_DURABLE
     if (db_txn_durable)
 	flags ^= DB_BF_TXN_NOT_DURABLE;
@@ -635,6 +614,9 @@ static void dbx_cleanup_lite(dbe_t *env)
 	    if (ret)
 		print_error(__FILE__, __LINE__, "DBE->dbx_checkpoint returned %s", db_strerror(ret));
 
+	    if (db_log_autoremove)
+		dbe_env_purgelogs(env->dbe);
+
 	    ret = env->dbe->close(env->dbe, 0);
 	    if (DEBUG_DATABASE(1) || ret)
 		fprintf(dbgout, "DB_ENV->close(%p): %s\n", (void *)env->dbe,
@@ -703,9 +685,12 @@ rec_fail:
     exit(EX_ERROR);
 }
 
-static ex_t dbe_common_close(DB_ENV *dbe, const char *directory)
+static ex_t dbx_common_close(DB_ENV *dbe, const char *directory)
 {
     int e;
+
+    if (db_log_autoremove)
+	dbe_env_purgelogs(dbe);
 
     e = dbe->close(dbe, 0);
     if (e != 0) {
@@ -718,29 +703,10 @@ static ex_t dbe_common_close(DB_ENV *dbe, const char *directory)
     return EX_OK;
 }
 
-ex_t dbe_purgelogs(const char *directory)
+static ex_t dbe_env_purgelogs(DB_ENV *dbe)
 {
-    int e;
-    DB_ENV *dbe = dbe_recover_open(directory, 0);
     char **i, **list;
-
-    if (!dbe)
-	exit(EX_ERROR);
-
-    if (DEBUG_DATABASE(0))
-	fprintf(dbgout, "checkpoint database\n");
-
-    /* checkpoint the transactional system */
-    e = BF_TXN_CHECKPOINT(dbe, 0, 0, 0);
-    e = dbx_sync(dbe, e);
-    if (e) {
-	print_error(__FILE__, __LINE__, "DB_ENV->txn_checkpoint failed: %s",
-		db_strerror(e));
-	exit(EX_ERROR);
-    }
-
-    if (DEBUG_DATABASE(0))
-	fprintf(dbgout, "removing inactive logfiles\n");
+    ex_t e;
 
     /* figure redundant log files and nuke them */
     e = BF_LOG_ARCHIVE(dbe, &list, DB_ARCH_ABS);
@@ -763,11 +729,38 @@ ex_t dbe_purgelogs(const char *directory)
 	}
 	free(list);
     }
+    return EX_OK;
+}
+
+ex_t dbe_purgelogs(const char *directory)
+{
+    int e;
+    DB_ENV *dbe = dbe_recover_open(directory, 0);
+
+    if (!dbe)
+	exit(EX_ERROR);
+
+    if (DEBUG_DATABASE(0))
+	fprintf(dbgout, "checkpoint database\n");
+
+    /* checkpoint the transactional system */
+    e = BF_TXN_CHECKPOINT(dbe, 0, 0, 0);
+    e = dbx_sync(dbe, e);
+    if (e) {
+	print_error(__FILE__, __LINE__, "DB_ENV->txn_checkpoint failed: %s",
+		db_strerror(e));
+	exit(EX_ERROR);
+    }
+
+    if (DEBUG_DATABASE(0))
+	fprintf(dbgout, "removing inactive logfiles\n");
+
+    dbe_env_purgelogs(dbe);
 
     if (DEBUG_DATABASE(0))
 	fprintf(dbgout, "closing environment\n");
 
-    return dbe_common_close(dbe, directory);
+    return dbx_common_close(dbe, directory);
 }
 
 ex_t dbe_remove(const char *directory)
@@ -777,7 +770,7 @@ ex_t dbe_remove(const char *directory)
     if (!dbe)
 	exit(EX_ERROR);
 
-    return dbe_common_close(dbe, directory);
+    return dbx_common_close(dbe, directory);
 }
 
 void dbx_log_flush(DB_ENV *dbe)
@@ -814,8 +807,8 @@ const char **dsm_help_bogoutil(void)
 #ifdef	HAVE_DECL_DB_CREATE
 	"      --db-lk-max-locks       - set max lock count.\n",
 	"      --db-lk-max-objects     - set max object count.\n",
-#ifdef	FUTURE_DB_OPTIONS
 	"      --db-log-autoremove     - set autoremoving of logs.\n",
+#ifdef	FUTURE_DB_OPTIONS
 	"      --db-txn-durable        - set durable mode.\n",
 #endif
 #endif
@@ -840,8 +833,8 @@ void dsm_options_bogofilter(int option, const char *name, const char *val)
 #ifdef	HAVE_DECL_DB_CREATE
     case O_DB_MAX_OBJECTS:		db_max_objects = atoi(val);				break;
     case O_DB_MAX_LOCKS:		db_max_locks   = atoi(val);				break;
-#ifdef	FUTURE_DB_OPTIONS
     case O_DB_LOG_AUTOREMOVE:		db_log_autoremove  = get_bool(name, val);		break;
+#ifdef	FUTURE_DB_OPTIONS
     case O_DB_TXN_DURABLE:		db_txn_durable = get_bool(name, val);			break;
 #endif
 #endif
@@ -892,10 +885,10 @@ void dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_f
     case O_DB_MAX_LOCKS:
 	db_max_locks   = atoi(val);
 	break;
-#ifdef	FUTURE_DB_OPTIONS
     case O_DB_LOG_AUTOREMOVE:
 	db_log_autoremove = get_bool(name, val);
 	break;
+#ifdef	FUTURE_DB_OPTIONS
     case O_DB_TXN_DURABLE:
 	db_txn_durable    = get_bool(name, val);
 	break;

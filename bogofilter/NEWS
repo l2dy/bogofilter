@@ -21,6 +21,12 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-02-25
+
+	* Implement --db-log-autoremove=BOOL option, defaults to on.
+	  This option removes outdated log files automatically before closing
+	  the environment, to conserve disk space.
+
 	2005-02-24
 
 	* Transactional datastore autoprobing was completed, it assumes

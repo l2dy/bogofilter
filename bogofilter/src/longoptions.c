@@ -66,8 +66,8 @@ struct option long_options[] = {
 #ifdef	HAVE_DECL_DB_CREATE
     { "db-lk-max-locks",		R, 0, O_DB_MAX_LOCKS },
     { "db-lk-max-objects",		R, 0, O_DB_MAX_OBJECTS },
-#ifdef	FUTURE_DB_OPTIONS
     { "db-log-autoremove",		R, 0, O_DB_LOG_AUTOREMOVE },
+#ifdef	FUTURE_DB_OPTIONS
     { "db-txn-durable",			R, 0, O_DB_TXN_DURABLE },
 #endif
 #endif

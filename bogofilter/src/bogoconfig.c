@@ -655,8 +655,8 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 #ifdef	HAVE_DECL_DB_CREATE
     case O_DB_MAX_OBJECTS:
     case O_DB_MAX_LOCKS:
-#ifdef	FUTURE_DB_OPTIONS
     case O_DB_LOG_AUTOREMOVE:
+#ifdef	FUTURE_DB_OPTIONS
     case O_DB_TXN_DURABLE:
 #endif
 #endif
@@ -723,8 +723,8 @@ rc_t query_config(void)
 #ifdef	HAVE_DECL_DB_CREATE
     Q2 fprintf(stdout, "%-18s = %d\n", "db-lk-max-locks",   	db_max_locks);
     Q2 fprintf(stdout, "%-18s = %d\n", "db-lk-max-objects", 	db_max_objects);
-#ifdef	FUTURE_DB_OPTIONS
     Q2 fprintf(stdout, "%-18s = %s\n", "db-log-autoremove",     YN(db_log_autoremove));
+#ifdef	FUTURE_DB_OPTIONS
     Q2 fprintf(stdout, "%-18s = %s\n", "db-log-txn-durable",	YN(db_txn_durable));
 #endif
 #endif

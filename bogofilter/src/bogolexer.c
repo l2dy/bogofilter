@@ -242,8 +242,8 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 #ifdef	HAVE_DECL_DB_CREATE
     case O_DB_MAX_OBJECTS:
     case O_DB_MAX_LOCKS:
-#ifdef	FUTURE_DB_OPTIONS
     case O_DB_LOG_AUTOREMOVE:
+#ifdef	FUTURE_DB_OPTIONS
     case O_DB_TXN_DURABLE:
 #endif
 #endif
