@@ -4,6 +4,11 @@
 
 $Id$
 
+	2003-09-06
+
+	* Header line unfolding now handled by flex rules.
+	* Initial release of RISC-OS support, including qdbm and sdbm.
+
 	2003-09-05
 
 	* Update bogowordfreq to work with bogoreader.
