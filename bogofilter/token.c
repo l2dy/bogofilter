@@ -212,16 +212,11 @@ token_t get_token(void)
     return(class);
 }
 
-token_t got_from(const char *text)
+void got_from(void)
 {
-    if (memcmp(text, "From ", 5) != 0 )
-	return(TOKEN);
-    else { 
-	change_lexer_state(LEXER_HEAD);
-	mime_reset(); 
-	reset_html_level();
-	return(FROM);
-    }
+    change_lexer_state(LEXER_HEAD);
+    mime_reset(); 
+    reset_html_level();
 }
 
 void got_newline()

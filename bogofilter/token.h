@@ -14,7 +14,7 @@ NAME:
 
 extern token_t get_token(void);
 
-extern token_t got_from(const char *text);
+extern void got_from(void);
 extern void got_newline(void);
 
 /* used by lexer_text_html.l */

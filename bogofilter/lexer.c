@@ -20,6 +20,7 @@
 #include "mime.h"
 #include "fgetsl.h"
 #include "textblock.h"
+#include "token.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
@@ -49,6 +50,14 @@ static int lgetsl(byte *buf, size_t size)
     size_t count = fgetsl((char *)buf, size, fpin);
     yylineno += 1;
     if (DEBUG_LEXER(0)) fprintf(dbgout, "*** %2d %d %s\n", yylineno, msg_header, buf);
+
+    /* Special check for message separator.
+       If found, handle it immediately.
+    */
+
+    if (memcmp(buf, "From ", 5) == 0)
+	got_from();
+
     return count;
 }
 
@@ -177,7 +186,7 @@ int buff_fill(size_t need, byte *buf, size_t used, size_t size)
 {
     int cnt = 0;
     /* check bytes needed vs. bytes in buff */
-    while ( need > used) {
+    while (size-used > 2 && need > used) {
 	/* too few, read more */
 	int add = get_decoded_line(buf+used, size-used);
 	if (add == EOF) return EOF;

@@ -47,7 +47,7 @@
 #include "lexer.h"
 #include "mime.h"		/* for mime_*() */
 #include "textblock.h"
-#include "token.h"		/* for got_from() and got_newline() */
+#include "token.h"		/* for got_newline() */
 
 #define YY_DECL token_t yylex(void)
 #define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, max_size)
@@ -72,7 +72,7 @@ charset=\"?{ID}\"?				{ got_charset(yytext); yyredo((byte *)yytext, '='); }
 ^Content-Transfer-Encoding:{MTYPE}		{ mime_encoding((byte *)yytext, yyleng); yyredo((byte *)yytext, ':'); }
 ^Content-Type:{MTYPE};?				{ mime_type((byte *)yytext, yyleng); yyredo((byte *)yytext, ':'); }
 ^Content-Disposition:{MTYPE}			{ mime_disposition((byte *)yytext, yyleng); yyredo((byte *)yytext, ':'); }
-^From\ 						{ return got_from(yytext); }
+^From\ 						{ return (msg_header ? FROM : TOKEN); }
 ^Date:.*|Delivery-Date:.*			;
 ^Message-ID:.*					;
 ^\tid\ {ID}					;

@@ -16,7 +16,7 @@
 
 #include "lexer.h"
 #include "mime.h"		/* for mime_*() */
-#include "token.h"		/* for got_from() and got_newline() */
+#include "token.h"		/* for got_newline() */
 
 #define YY_DECL token_t yylex(void)
 #define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, max_size)
@@ -38,7 +38,7 @@ TOKEN		[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\
 \<						{ html_tag(1); }
 \>						{ html_tag(0); }
 
-^From\ 						{ return got_from(yytext); }
+^From\ 						{ return (msg_header ? FROM : TOKEN); }
 ^--{MIME_BOUNDARY}(--)?$			{ got_mime_boundary((byte *)yytext, yyleng); return (BOUNDARY); }
 
 {IPADDR}					{ return(IPADDR);}
