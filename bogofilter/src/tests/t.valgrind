@@ -61,8 +61,7 @@ for mth in f t ; do
     $BOGOFILTER $CFG -n < ${SYSTEST}/inputs/good.mbx
 #   if [ $verbose -gt 0 ] ; then $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT ; fi
 
-    for msg in ${SYSTEST}/inputs/msg.3.txt ; do
-	tst=`echo $msg | sed s@${SYSTEST}/inputs/msg.@@ | sed s@.txt@@`
+    for tst in 3 ; do
 	args="$tst $tst $V"
 	run_test $args
     done
