@@ -111,7 +111,7 @@
       </li>
 
       <li>
-        Portability Problems
+        Build and Portability Problems
 
         <ul>
           <li><a href="#port-notes">How do I get bogofilter working on Solaris, BSD, etc.?</a></li>
@@ -120,6 +120,7 @@
 	  user or for a non-standard installation prefix?</a></li>
           <li><a href="#patch">How do I build bogofilter with patches?</a></li>
           <li><a href="#smaller">How do I make the executables smaller?</a></li>
+	  <li><a href="#relativepath">datastore_db.c does not compile!</a></li>
         </ul>
       </li>
     </ul>
@@ -1183,6 +1184,17 @@
     this will save space, but crashes can't be debugged unless more
     information on reproducing the bug is provided to the
     developers.</p>
+
+    <hr>
+
+    <h2 id="relativepath">datastore_db.c does not compile!</h2>
+
+    <p>If you are configuring a data base path for instance with
+    --with-libdb-prefix or via CPPFLAGS and LIBS, be sure to pass in an
+    <em>absolute path</em> (with leading slash), a relative path will
+    not work. Example: use
+    <kbd>--with-libdb-prefix=/usr/local/BerkeleyDB.4.2</kbd>, but
+    <em>not</em> <kbd>--with-libdb-prefix=../BerkeleyDB.4.2</kbd></p>
 
     <hr>
 
