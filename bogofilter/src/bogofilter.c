@@ -136,6 +136,9 @@ rc_t bogofilter(int argc, char **argv)
 
 	passthrough_cleanup();
 	rstats_cleanup();
+
+	if (fDie)
+	    exit(EX_ERROR);
     }
 
     bogoreader_fini();
