@@ -61,7 +61,22 @@ bool	stats_in_header = true;
 
 const parm_desc *usr_parms = NULL;
 
+/*  remove trailing comment from the line.
+ */
+static char *remove_comment(char *line)
+{
+    char *tmp = strchr(line, '#');
+    if (tmp != NULL) {
+	tmp -= 1;
+	while (tmp > line && isspace((unsigned char)*tmp))
+	    tmp -= 1;
+	*(tmp+1) = '\0';
+    }
+    return line;
+}
+
 static bool process_config_parameter(const parm_desc *arg, char *val)
+/* returns true if ok, false if error */
 {
     bool ok = true;
     if (arg->addr.v == NULL)
@@ -78,16 +93,18 @@ static bool process_config_parameter(const parm_desc *arg, char *val)
 	    }
 	case CP_INTEGER:
 	    {
+		remove_comment(val);
 		if (!xatoi(arg->addr.i, val))
-		    fprintf(stderr, "cannot parse integer value '%s'\n", val);
+		    return false;
 		if (DEBUG_CONFIG(0))
 		    fprintf(dbgout, "%s -> %d\n", arg->name, *arg->addr.i);
 		break;
 	    }
 	case CP_DOUBLE:
 	    {
+		remove_comment(val);
 		if (!xatof(arg->addr.d, val))
-		    fprintf(stderr, "cannot parse double value '%s'\n", val);
+		    return false;
 		if (DEBUG_CONFIG(0))
 		    fprintf(dbgout, "%s -> %f\n", arg->name, *arg->addr.d);
 		break;
@@ -125,10 +142,10 @@ static bool process_config_parameter(const parm_desc *arg, char *val)
 	    break;
 	}
 	default:
-	    {
-		ok = false;
-		break;
-	    }
+	{
+	    ok = false;
+	    break;
+	}
     }
     return ok;
 }
@@ -136,6 +153,7 @@ static bool process_config_parameter(const parm_desc *arg, char *val)
 static bool process_config_line(char *line,
 				char *val,
 				const parm_desc *parms )
+/* returns true if parm is processed, false if not */
 {
     const parm_desc *arg;
 
@@ -149,7 +167,7 @@ static bool process_config_line(char *line,
 	if (strcmp(arg->name, line) == 0)
 	{
 	    bool ok = process_config_parameter(arg, val);
-	    if (DEBUG_CONFIG(1) && ok )
+	    if (ok && DEBUG_CONFIG(1))
 		fprintf(dbgout, "%s\n", "   Found it!");
 	    return ok;
 	}
@@ -157,7 +175,8 @@ static bool process_config_line(char *line,
     return false;
 }
 
-void read_config_file(const char *fname, bool fail_on_error, bool tilde_expand)
+bool read_config_file(const char *fname, bool fail_on_error, bool tilde_expand)
+/* returns true if ok, false if error */
 {
     bool error = false;
     int lineno = 0;
@@ -178,7 +197,7 @@ void read_config_file(const char *fname, bool fail_on_error, bool tilde_expand)
 	    fprintf(dbgout, "Debug: cannot open %s: %s\n", filename, strerror(errno));
 	}
 	xfree(filename);
-	return;
+	return false;
     }
 
     if (DEBUG_CONFIG(0))
@@ -213,12 +232,11 @@ void read_config_file(const char *fname, bool fail_on_error, bool tilde_expand)
 	if (val == NULL ||
 	       (! process_config_line(arg, val, usr_parms ) &&
 		! process_config_line(arg, val, sys_parms ) &&
-		! process_config_line(arg, val, format_parms ) &&
-		fail_on_error))
+		! process_config_line(arg, val, format_parms )))
 	{
-	    error = true;
+	    error = fail_on_error;
 	    if (!quiet)
-		fprintf( stderr, "%s:%d:  Error - unknown parameter in '%s'\n", filename, lineno, buff );
+		fprintf(stderr, "%s:%d:  Error - bad parameter in '%s'...'%s'\n", filename, lineno, buff, val);
 	}
     }
 
@@ -230,18 +248,16 @@ void read_config_file(const char *fname, bool fail_on_error, bool tilde_expand)
     (void)fclose(fp); /* we're just reading, so fclose should succeed */
     xfree(filename);
 
-    if (error)
-	exit(2);
+    return (error);
 }
 
 /* exported */
-void process_config_files(bool fail_on_error)
+bool process_config_files(bool fail_on_error)
 {
-    if (! suppress_config_file)
-    {
-	read_config_file(system_config_file, fail_on_error, false);
-	read_config_file(user_config_file, fail_on_error, true);
-    }
+    if (!suppress_config_file &&
+	(!read_config_file(system_config_file, fail_on_error, false) ||
+	 !read_config_file(user_config_file, fail_on_error, true)))
+	 return false;
 
     stats_prefix= stats_in_header ? "\t" : "#   ";
 
@@ -250,5 +266,5 @@ void process_config_files(bool fail_on_error)
 
     init_charset_table(charset_default, true);
 
-    return;
+    return true;
 }
