@@ -265,7 +265,7 @@ void db_lock_reader(void *vhandle){
   if (db_lock(handle, F_SETLKW, F_RDLCK) != 0){
     if (errno == EAGAIN){
   	if (DEBUG_DATABASE(2))
-    	  fprintf(stderr, "[%lu] Faked lock %s.\n", (unsigned long) handle->pid, handle->filename);
+    	  fprintf(stderr, "[%lu] Faked read lock on %s.\n", (unsigned long) handle->pid, handle->filename);
     }
     else {
     fprintf(stderr, "[%lu] Error acquiring read lock on %s\n", (unsigned long) handle->pid, handle->filename);
@@ -390,7 +390,7 @@ static void db_lock_list(wordlist_t *list, int type){
        }
        else if (type == F_RDLCK && errno == EAGAIN){
         if (verbose)
-          do_lock_msg("Faked acquired");
+          do_lock_msg("Faked");
 	
         handle->locked = TRUE;
       }
