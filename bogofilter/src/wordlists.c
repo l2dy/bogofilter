@@ -26,63 +26,76 @@
 
 /* Function Definitions */
 
+static bool open_wordlist(wordlist_t *list, dbmode_t mode)
+{
+    bool retry = false;
+
+    list->dsh = ds_open(bogohome, list->filepath, mode);
+    if (list->dsh == NULL) {
+	int err = errno;
+	close_wordlists(true); /* unlock and close */
+	switch(err) {
+	    /* F_SETLK can't obtain lock */
+	case EAGAIN:
+	    /* case EACCES: */
+	    rand_sleep(MIN_SLEEP, MAX_SLEEP);
+	    retry = true;
+	    break;
+	default:
+	    if (query)	/* If "-Q", failure is OK */
+		return false;
+	    fprintf(stderr,
+		    "Can't open file '%s' in directory '%s'.\n",
+		    list->filepath, bogohome);
+	    if (err != 0)
+		fprintf(stderr,
+			"error #%d - %s.\n", err, strerror(err));
+	    if (err == ENOENT)
+		fprintf(stderr, 
+			"\n"
+			"Remember to register some spam and ham messages before you\n"
+			"use bogofilter to evaluate mail for its probable spam status!\n");
+	    if (err == EINVAL)
+		fprintf(stderr,
+			"\n"
+			"Make sure that the BerkeleyDB version this program is linked against\n"
+			"can handle the format of the data base file (after updates in particular)\n"
+			"and that your NFS locking, if applicable, works.\n");
+	    exit(EX_ERROR);
+	} /* switch */
+    } else { /* ds_open */
+	dsv_t val;
+	ds_get_msgcounts(list->dsh, &val);
+	list->msgcount[IX_GOOD] = val.goodcount;
+	list->msgcount[IX_SPAM] = val.spamcount;
+	if (wordlist_version == 0 &&
+	    ds_get_wordlist_version(list->dsh, &val))
+	    wordlist_version = val.count[0];
+    } /* ds_open */
+
+    return retry;
+}
+
 void open_wordlists(dbmode_t mode)
 {
-    wordlist_t *list;
-    int retry;
+    bool retry = true;
 
     if (word_lists == NULL)
 	init_wordlist("word", WORDLIST, 0, WL_REGULAR);
 
-    do {
-	ds_init();
+    ds_init();
 
-	retry = 0;
-	for (list = word_lists; list != NULL; list = list->next) {
-	    list->dsh = ds_open(bogohome, list->filepath, mode);
-	    if (list->dsh == NULL) {
-		int err = errno;
-		close_wordlists(true); /* unlock and close */
-		switch(err) {
-		    /* F_SETLK can't obtain lock */
-		    case EAGAIN:
-		    /* case EACCES: */
-			rand_sleep(MIN_SLEEP, MAX_SLEEP);
-			retry = 1;
-			break;
-		    default:
-			if (query)	/* If "-Q", failure is OK */
-			    return;
-			fprintf(stderr,
-				"Can't open file '%s' in directory '%s'.\n",
-				list->filepath, bogohome);
-			if (err != 0)
-			    fprintf(stderr,
-				    "error #%d - %s.\n", err, strerror(err));
-			if (err == ENOENT)
-			    fprintf(stderr, 
-				    "\n"
-				    "Remember to register some spam and ham messages before you\n"
-				    "use bogofilter to evaluate mail for its probable spam status!\n");
-			if (err == EINVAL)
-			    fprintf(stderr,
-				    "\n"
-				    "Make sure that the BerkeleyDB version this program is linked against\n"
-				    "can handle the format of the data base file (after updates in particular)\n"
-				    "and that your NFS locking, if applicable, works.\n");
-			exit(EX_ERROR);
-		} /* switch */
-	    } else { /* ds_open */
-		dsv_t val;
-		ds_get_msgcounts(list->dsh, &val);
-		list->msgcount[IX_GOOD] = val.goodcount;
-		list->msgcount[IX_SPAM] = val.spamcount;
-		if (wordlist_version == 0 &&
-		    ds_get_wordlist_version(list->dsh, &val))
-		    wordlist_version = val.count[0];
-	    } /* ds_open */
-	} /* for */
-    } while(retry);
+    while (retry) {
+	if (run_type & (REG_SPAM | REG_GOOD | UNREG_SPAM | UNREG_GOOD))
+	    retry = open_wordlist(default_wordlist(), mode);
+	else {
+	    wordlist_t *list;
+	    retry = false;
+	    for (list = word_lists; list != NULL; list = list->next) {
+		retry |= open_wordlist(list, mode);
+	    }  /* for */
+	}
+    }
 }
 
 /** close all open word lists */
