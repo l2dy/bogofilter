@@ -9,6 +9,10 @@ set -e
 
 NODB=1 . ${srcdir=.}/t.frame
 
+if test "x$EXE_EXT" = "x_static"; then
+    exit 77
+fi
+
 VALGRIND="valgrind 3>${TMPDIR}/vg.out -q --num-callers=20 --logfile-fd=3"
 ( eval $VALGRIND true  ) 2>/dev/null || exit 77
 if ( eval $VALGRIND false ) 2>/dev/null ; then exit 77 ; fi
