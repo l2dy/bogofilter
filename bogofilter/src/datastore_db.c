@@ -164,6 +164,12 @@ int db_lock(int fd, int cmd, short int type)
 
 static void dsm_init(void)
 {
+    /* overrides for test suite etc. */
+    if (getenv("BF_FORCE_NON_TRANSACTIONAL"))
+	fTransaction = false;
+    if (getenv("BF_FORCE_TRANSACTIONAL"))
+	fTransaction = true;
+
     if (!fTransaction)
 	dsm = &dsm_traditional;
     else
