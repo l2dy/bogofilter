@@ -102,7 +102,7 @@ bool base64_validate(const word_t *word)
     for (i = 0; i < word->leng; i += 1) {
 	byte b = word->text[i];
 	byte v = base64_xlate[b];
-	if (v == 0 && b != 'A'  && b != '\n')
+	if (v == 0 && b != 'A' && b != '\n' && b != '\r')
 	    return false;
     }
 
