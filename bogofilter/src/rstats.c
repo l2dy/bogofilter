@@ -155,10 +155,9 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
 	size_t cnt = 0;
 	h->prob = 0.0;
 	h->spamicity=0.0;
-	while ( r<count)
+	while (r < count)
 	{
 	    double prob = rstats_array[r]->prob;
-	    double invn, invproduct, product, spamicity;
 	    if (prob - fin >= EPS)
 		break;
 
@@ -170,13 +169,19 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
 		logsum += log(prob);
 	    }
 
-	    invn = (double)robn;
-	    invproduct = 1.0 - exp(invlogsum / invn);
-	    product = 1.0 - exp(logsum / invn);
-	    spamicity =
-		(1.0 + (invproduct - product) / (invproduct + product)) / 2.0;
-	    h->spamicity=spamicity;
-
+	    if (robn == 0)
+	    {
+		h->spamicity = robx;
+	    }
+	    else
+	    {
+		double invn, invproduct, product;
+		invn = (double)robn;
+		invproduct = 1.0 - exp(invlogsum / invn);
+		product = 1.0 - exp(logsum / invn);
+		h->spamicity =
+		    (1.0 + (invproduct - product) / (invproduct + product)) / 2.0;
+	    }
 	    r += 1;
 	}
 	h->count=cnt;
