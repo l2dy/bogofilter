@@ -34,6 +34,7 @@ CONTRIBUTORS:
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #include "charset.h"
+#include "collect.h"
 #include "datastore.h"
 #include "fgetsl.h"
 #include "format.h"
