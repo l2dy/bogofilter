@@ -327,13 +327,13 @@ inline static double prbf(double x, double df) {
     w = gsl_integration_workspace_alloc(intervals);
     if (!w) {
 	fprintf(stderr, "Out of memory! %s:%d\n", __FILE__, __LINE__);
-	abort();
+	exit(EX_ERROR);
     }
     status = gsl_integration_qag(&chi, 0, x, eps, eps,
 	    intervals, GSL_INTEG_GAUSS41, w, &p, &abserr);
     if (status && status != GSL_EMAXITER) {
 	fprintf(stderr, "Integration error: %s\n", gsl_strerror(status));
-	abort();
+	exit(EX_ERROR);
     }
     gsl_integration_workspace_free(w);
     p = max(0.0, 1.0 - p);
