@@ -104,8 +104,6 @@
 #
 #	    c - classification, e.g. Yes/No, Spam/Ham/Unsure, +/-/?
 #
-#	    D - date, fixed ISO-8601 format for Universal Time ("GMT")
-#
 #	    e - spamicity as 'e' format
 #	    f - spamicity as 'f' format
 #	    g - spamicity as 'g' format
