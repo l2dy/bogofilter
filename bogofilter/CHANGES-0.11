@@ -4,10 +4,18 @@
 
 $Id$
 
+0.11.1.5
+
+	2003-03-28
+	* Bogofilter now frees all memory that it allocates.
+	* FAQ reorganized and info added on asian spam, the 
+	  format of verbose output, and using SpamAssassin to
+	  train bogofilter.
+
 0.11.1.4
 
 	2003-03-25
-	* Cleaned up help messages and added version info.
+	* Cleaned up help messages and added version info to them.
 	* Expanded bogofilter-faq.html
 	* Fixed precedence for directory specifications.
 	* Fixed processing of folded X-Bogosity line.
