@@ -114,6 +114,8 @@ static int read_seek(char **out, void *in) {
 	for (i = 0; i < c ; i++) {
 	    carry[i] = (unsigned char)buf[s+i];
 	}
+    } else {
+        fflush(fpo);
     }
 
     *out = buf;
@@ -326,6 +328,11 @@ void passthrough_setup()
 	}
 	fprintf(fpo, "passthrough mode: %s\n", m);
     }
+}
+
+int passthrough_keepopen()
+{
+    return passthrough && passmode == PASS_SEEK ;
 }
 
 void passthrough_cleanup()

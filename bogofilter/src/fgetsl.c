@@ -29,7 +29,7 @@ int xfgetsl(char *buf, int max_size, FILE *in, int no_nul_terminate)
 	abort();
     }
 
-    if (feof(in))
+    if (in == NULL || feof(in))
 	return(EOF);
 
     while ((cp < fin) && ((c = getc(in)) != EOF)) {

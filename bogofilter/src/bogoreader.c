@@ -120,14 +120,14 @@ static bool is_eol(const char *buf, size_t len)
 		(len == 2 && memcmp(buf, CRLF, 2) == 0));
     return ans;
 }
- 
+
 static reader_line_t *get_reader_line(FILE *fp) {
     uint i;
     int c;
     reader_line_t *fcn = mailbox_getline;
 
     if (fp == NULL)
-	return NULL;
+	return simple_getline ; /* which will return EOF immediately */
 
     c = fgetc(fp);
     ungetc(c, fp);
@@ -663,6 +663,15 @@ void bogoreader_name(const char *name)
 	fprintf(stderr, "Can't read '%s'\n", name);
 	exit(EX_ERROR);
     }
+}
+
+/* cleanup after reading a message, exported. */
+/* Only called if the passthrough code says it is ok to close the file. */
+
+void bogoreader_close_ifeof(void)
+{
+    if (fpin && feof(fpin))
+       bogoreader_close();
 }
 
 /* global cleanup, exported */

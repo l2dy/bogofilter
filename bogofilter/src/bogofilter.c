@@ -98,6 +98,9 @@ rc_t bogofilter(int argc, char **argv)
 	collect_words(w);
 	msgcount += 1;
 
+        if( !passthrough_keepopen() )
+            bogoreader_close_ifeof();
+        
 	if (register_opt && DEBUG_REGISTER(1))
 	    fprintf(dbgout, "Message #%ld\n", (long) msgcount);
 	if (register_bef)
