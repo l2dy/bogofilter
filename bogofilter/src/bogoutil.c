@@ -191,6 +191,15 @@ static int dump_file(char *db_file)
 
 #define BUFSIZE 512
 
+static char *spanword(char *t)
+{
+    while ( isspace(*t)) t += 1;	/* skip leading whitespace  */
+    while (*t && !isspace(*t)) t += 1;	/* span current word        */
+    if (*t)
+	*t++ = '\0';
+    return t;
+}
+
 static int load_file(char *db_file)
 {
     void *dbh;
@@ -226,29 +235,14 @@ static int load_file(char *db_file)
 	if (len < 4)
 	    continue;
 
-	p = buf;
-	while ( *p != '\0' && !isspace(*p) )
-	    ++p;
+	p = spanword(buf);
+	len = strlen(buf);
 
-	len = p - buf;
-	*p++ = '\0';	/* delimit token */
+	count = atoi(p);
+	p = spanword(p);
 
-	while ( *p != '\0' && isspace(*p) )	/* skip whitespace */
-	    ++p;
-
-	count = 0;
-	while (isdigit(*p))			/* parse count */
-	    count = count * 10 + *p++ - '0';
-
-	while ( *p != '\0' && isspace(*p) )	/* skip whitespace */
-	    ++p;
-
-	date = 0;
-	while (isdigit(*p))			/* parse date */
-	    date = date * 10 + *p++ - '0';
-	
-	while ( *p != '\0' && isspace(*p) )	/* skip whitespace */
-	    ++p;
+	date = atoi(p);
+	p = spanword(p);
 
 	if ( *p != '\0' ) {
 	    fprintf(stderr,
