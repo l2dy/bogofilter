@@ -100,27 +100,27 @@ extern double robx;
 
 /* Function Prototypes */
 
-double get_score(const word_t *token, wordprop_t *wordstats);
-double lookup(const word_t *token, wordprop_t *wordstats, double old);
+static double get_score(const word_t *token, wordcnts_t *cnts);
+static double lookup(const word_t *token, wordcnts_t *cnts, double old);
 
 /* Function Definitions */
 
-double get_score(const word_t *token, wordprop_t *wordstats)
+double get_score(const word_t *token, wordcnts_t *cnts)
 {
     double score;
 #ifdef	DEBUG
     score = 0.0;
     printf( "%s\n", token );
 #else
-    wordstats->good = wordstats->bad = 0;
-    score = lookup_and_score(token, wordstats);
+    cnts->good = cnts->bad = 0;
+    score = lookup_and_score(token, cnts);
 #endif
     return score;
 }
 
-double lookup(const word_t *token, wordprop_t *wordstats, double old)
+double lookup(const word_t *token, wordcnts_t *cnts, double old)
 {
-    double n = get_score(token, wordstats);
+    double n = get_score(token, cnts);
     double ans = (fabs(n-EVEN_ODDS) > fabs(old-EVEN_ODDS)) ? n : old;
 
     if (DEBUG_SPAMICITY(2)) {
@@ -132,7 +132,7 @@ double lookup(const word_t *token, wordprop_t *wordstats, double old)
     return ans;
 }
 
-double degen(const word_t *token, wordprop_t *wordstats)
+double degen(const word_t *token, wordcnts_t *cnts)
 {
     bool first = true;
     uint len = token->leng;
@@ -180,7 +180,7 @@ double degen(const word_t *token, wordprop_t *wordstats)
 	    copy->text[l] = (byte) '\0';
 	    copy->leng = l;
 	    if (!first)
-		score = lookup(copy, wordstats, score);	/* score original */
+		score = lookup(copy, cnts, score);	/* score original */
 	    first = false;
 	    if (first_match && HAVE_SCORE(score))
 		return score;
@@ -189,12 +189,12 @@ double degen(const word_t *token, wordprop_t *wordstats)
 		    copy->text[i] = (byte) tolower(copy->text[i]);
 		}
 		if (isupper(copy->text[tag])) {		/* score 'Cap.low' */
-		    score = lookup(copy, wordstats, score);
+		    score = lookup(copy, cnts, score);
 		    if (first_match && HAVE_SCORE(score))
 			return score;
 		    copy->text[tag] = (byte) tolower(copy->text[tag]);
 		}
-		score = lookup(copy, wordstats, score);	/* score 'all.low' */
+		score = lookup(copy, cnts, score);	/* score 'all.low' */
 		if (first_match && HAVE_SCORE(score))
 		    return score;
 	    }

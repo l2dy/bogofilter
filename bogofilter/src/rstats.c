@@ -87,7 +87,7 @@ void rstats_cleanup(void)
     header.list = NULL;
 }
 
-void rstats_add(const word_t *token, wordprop_t *props)
+void rstats_add(const word_t *token, double prob, wordcnts_t *cnts)
 {
     if (token == NULL)
 	return;
@@ -95,9 +95,9 @@ void rstats_add(const word_t *token, wordprop_t *props)
     header.count += 1;
     current->next  = NULL;
     current->token = word_dup(token);
-    current->good  = props->good;
-    current->bad   = props->bad;
-    current->prob  = props->prob;
+    current->prob  = prob;
+    current->good  = cnts->good;
+    current->bad   = cnts->bad;
     current->next = (rstats_t *)xcalloc(1, sizeof(rstats_t));
     current = current->next;
 }
@@ -275,4 +275,22 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 
     /* print trailer */
     (*((rf_method_t *)method)->print_summary)();
+}
+
+void rstats_cnt_rn_ns_sp(uint *cnt, uint *rn, uint *ns, uint *sp)
+{
+    size_t r;
+    size_t count = header.count;
+    rstats_t *cur;
+
+    *sp = *ns = 0;
+    *rn = header.robn;
+    *cnt = header.count;
+
+    for (r= 0, cur = header.list; r<count; r+=1, cur=cur->next) {
+	if (cur->prob < EVEN_ODDS - min_dev)
+	    *ns += 1;
+	if (cur->prob > EVEN_ODDS + min_dev)
+	    *sp += 1;
+    }
 }

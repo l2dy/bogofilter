@@ -197,7 +197,7 @@ static void display_node(hashnode_t *n, const char *str)
 {
     wordprop_t *p = (wordprop_t *)n->buf;
     if (verbose > 2)
-	printf( "%20.20s %5d %5d%s", n->key->text, (int)p->bad, (int)p->good, str);
+	printf( "%20.20s %5d %5d%s", n->key->text, (int)p->cnts.bad, (int)p->cnts.good, str);
 }
 
 /* this function accumulates the word frequencies from the src hash to
@@ -224,8 +224,8 @@ void wordhash_add(wordhash_t *dest, wordhash_t *src, void (*initializer)(void *)
 	    continue;
 	d = wordhash_insert(dest, key, sizeof(wordprop_t), initializer);
 	d->freq += p->freq;
-	d->good += p->good;
-	d->bad  += p->bad;
+	d->cnts.good += p->cnts.good;
+	d->cnts.bad  += p->cnts.bad;
     }
 
     if (verbose > 200)
@@ -305,13 +305,19 @@ size_t wordhash_count (wordhash_t *wh)
     return wh->count;
 }
 
-hashnode_t *
+void *
 wordhash_first (wordhash_t *wh)
 {
-    hashnode_t *val = NULL;
+    void *val = NULL;
 
+    if (wh->cnts) {
+	wh->index = 0;
+	val = wh->cnts;
+    }
+    else
     if (wh->order) {
-	val = wh->order[wh->index = 0];
+	wh->index = 0;
+	val = wh->order[wh->index];
     }
     else {
 	val = wh->iter_ptr = wh->iter_head;
@@ -319,20 +325,23 @@ wordhash_first (wordhash_t *wh)
     return val;
 }
 
-hashnode_t *
+void *
 wordhash_next (wordhash_t *wh)
 {
-    hashnode_t *val = NULL;
+    void *val = NULL;
 
+    if (wh->cnts) {
+	if (++wh->index < wh->count)
+	    val = &wh->cnts[wh->index];
+    }
+    else
     if (wh->order) {
-	if (++wh->index < wh->count) {
+	if (++wh->index < wh->count)
 	    val = wh->order[wh->index];
-	}
     }
     else {
-	if (wh->iter_ptr != NULL) {
+	if (wh->iter_ptr != NULL)
 	    val = wh->iter_ptr = wh->iter_ptr->iter_next;
-	}
     }
     return val;
 }
@@ -351,8 +360,8 @@ wordhash_set_counts(wordhash_t *wh, int good, int bad)
 
     for (n = wordhash_first(wh); n != NULL; n = wordhash_next(wh)) {
 	wordprop_t *p = (wordprop_t *)n->buf;
-	p->good += good;
-	p->bad  += bad;
+	p->cnts.good += good;
+	p->cnts.bad  += bad;
     }
 }
 
@@ -379,38 +388,32 @@ wordhash_sort (wordhash_t *wh)
 }
 
 void
-wordhash_convert_to_proplist(wordhash_t *wh, wordhash_t *db)
+wordhash_convert_to_countlist(wordhash_t *wh, wordhash_t *db)
 {
+    size_t count;
     hashnode_t *node;
-    hashnode_t *props;
-    hashnode_t **order;
-    size_t count = wh->count;
+    wordcnts_t *cnts;
 
-    if (count == 0 || wh->order != NULL)
+    if (wh->count == 0 || wh->cnts != NULL)
 	return;
 
-    props = (hashnode_t *)  xcalloc(count, sizeof(hashnode_t));
-    order = (hashnode_t **) xcalloc(count, sizeof(hashnode_t *));
+    cnts = (wordcnts_t *) xcalloc(wh->count, sizeof(wordcnts_t));
 
     count = 0;
     for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh)) {
 	wordprop_t *wp;
 	if (!msg_count_file)
 	    wp = wordhash_insert(db, node->key, sizeof(wordprop_t), NULL);
-	else {
-	    wp = xcalloc(1, sizeof(wordprop_t));
-	    memcpy(wp, node->buf, sizeof(wordprop_t));
-	}
-	props[count].buf = wp;
-	order[count] = &props[count];
+	else
+	    wp = (wordprop_t *) node->buf;
+	cnts[count].good = wp->cnts.good;
+	cnts[count].bad  = wp->cnts.bad ;
 	count += 1;
 	word_free(node->key);
 	node->key = NULL;
     }
 
-    wh->props = props;
-    wh->order = order;
-
+    wh->cnts = cnts;
     wordhash_free_alloc_nodes (wh);
     wordhash_free_strings (wh);
     xfree(wh->bin);

@@ -12,6 +12,6 @@ NAME:
 
 #include "word.h"
 
-double degen(const word_t *token, wordprop_t *wordstats);
+double degen(const word_t *token, wordcnts_t *cnts);
 
 #endif	/* HAVE_DEGEN_H */

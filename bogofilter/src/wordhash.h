@@ -43,6 +43,7 @@ typedef struct wordhash_s {
   /*@null@*/  /*@dependent@*/ uint wordcount;		/* count of words */
   /*@null@*/  /*@dependent@*/ hashnode_t **order;	/* array of nodes */
   /*@null@*/  /*@dependent@*/ hashnode_t  *props;	/* array of nodes */
+  /*@null@*/  /*@dependent@*/ wordcnts_t  *cnts;	/* array of counts */
 } wordhash_t;
 
 /*@only@*/ wordhash_t *wordhash_new(void);
@@ -61,13 +62,13 @@ void * wordhash_search (wordhash_t *wh, word_t *t, unsigned int hash);
 /*@observer@*/ void *wordhash_insert(wordhash_t *, word_t *, size_t, void (*)(void *));
 
 /* Starts an iteration over the hash entries */
-/*@null@*/ /*@exposed@*/ hashnode_t *wordhash_first(wordhash_t *);
+/*@null@*/ /*@exposed@*/ void *wordhash_first(wordhash_t *);
 
 /* returns next entry or NULL if at end */
-/*@null@*/ /*@exposed@*/ hashnode_t *wordhash_next(wordhash_t *);
+/*@null@*/ /*@exposed@*/ void *wordhash_next(wordhash_t *);
 
 typedef void wh_foreach_t(word_t *token, void *data, void *userdata);
 void wordhash_foreach(wordhash_t *wh, wh_foreach_t *hook, void *userdata);
-void wordhash_convert_to_proplist(wordhash_t *wh, wordhash_t *db);
+void wordhash_convert_to_countlist(wordhash_t *wh, wordhash_t *db);
 
 #endif

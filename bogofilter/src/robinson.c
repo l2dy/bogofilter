@@ -81,18 +81,18 @@ void rob_print_stats(FILE *fp)
 	rstats_print();
 }
 
-static void wordprob_add(wordprop_t* wordstats, uint count, uint bad)
+static void wordprob_add(wordcnts_t *cnts, uint count, uint bad)
 {
     if (bad)
-	wordstats->bad += count;
+	cnts->bad += count;
     else
-	wordstats->good += count;
+	cnts->good += count;
 }
 
-static double wordprob_result(wordprop_t* wordstats)
+static double wordprob_result(wordcnts_t *cnts)
 {
-    double g = (double) min(wordstats->good, msgs_good);
-    double b = (double) min(wordstats->bad,  msgs_bad);
+    double g = (double) min(cnts->good, msgs_good);
+    double b = (double) min(cnts->bad,  msgs_bad);
     double n = g + b;
 
     double pw = (n < EPS) ? 0.0 : ((b / bad_cnt) / 
@@ -102,7 +102,7 @@ static double wordprob_result(wordprop_t* wordstats)
     return (fw);
 }
 
-static void lookup(const word_t *token, wordprop_t *wordstats)
+static void lookup(const word_t *token, wordcnts_t *cnts)
 {
     int override=0;
     wordlist_t* list;
@@ -131,9 +131,9 @@ static void lookup(const word_t *token, wordprop_t *wordstats)
 	    if (val.count[i] == 0)
 		continue;
 
-	    wordprob_add(wordstats, val.count[i], list->bad[i]);
+	    wordprob_add(cnts, val.count[i], list->bad[i]);
 	    if (DEBUG_ROBINSON(1)) {
-		fprintf(dbgout, "%2d %2d \n", (int) wordstats->good, (int) wordstats->bad);
+		fprintf(dbgout, "%2d %2d \n", (int) cnts->good, (int) cnts->bad);
 		word_puts(token, 0, dbgout);
 		fputc('\n', dbgout);
 	    }
@@ -142,53 +142,55 @@ static void lookup(const word_t *token, wordprop_t *wordstats)
     return;
 }
 
-double lookup_and_score(const word_t *token, wordprop_t *wordstats)
+double lookup_and_score(const word_t *token, wordcnts_t *cnts)
 {
     double prob;
 
-    if (wordstats->bad == 0 && wordstats->good == 0)
-	lookup(token, wordstats);
+    if (cnts->bad == 0 && cnts->good == 0)
+	lookup(token, cnts);
 
     if (header_degen && token->leng >= 5 && memcmp(token->text, "head:", 5) == 0) {
 	word_t *tword = word_new(token->text+5, token->leng-5);
-	wordprop_t tprop;
+	wordcnts_t tprop;
 	wordprop_init(&tprop);
 	lookup(tword, &tprop);
-	wordprop_incr(wordstats, &tprop);
-	prob = wordprob_result(wordstats);
+	wordcnts_incr(cnts, &tprop);
+	prob = wordprob_result(cnts);
 	word_free(tword);
     }
     else
-    if (wordstats->bad != 0 || wordstats->good != 0) {
-	prob = wordprob_result(wordstats);
+    if (cnts->bad != 0 || cnts->good != 0) {
+	prob = wordprob_result(cnts);
     }
     else
     if (degen_enabled)
     {
 	degen_enabled = false;	/* Disable further recursion */
-	prob = degen(token, wordstats);
+	prob = degen(token, cnts);
 	degen_enabled = true;	/* Enable further recursion */
     }
     else
-	prob = wordprob_result(wordstats);
+	prob = wordprob_result(cnts);
 
     return prob;
 }
 
-static double compute_probability(const word_t *token, wordprop_t *wordstats)
+static double compute_probability(const word_t *token, wordcnts_t *cnts)
 {
-    if (wordstats->bad != 0 || wordstats->good != 0 || token == NULL)
+    double prob;
+
+    if (cnts->bad != 0 || cnts->good != 0 || token == NULL)
 	/* A msg-count file already has the values needed */
 	/* Note: token == NULL if msg-count file	  */
-	wordstats->prob = wordprob_result(wordstats);
+	prob = wordprob_result(cnts);
     else
 	/* Otherwise lookup the word and get its score */
-	wordstats->prob = lookup_and_score(token, wordstats);
+	prob = lookup_and_score(token, cnts);
 
     if (need_stats)
-	rstats_add(token, wordstats);
+	rstats_add(token, prob, cnts);
 
-    return wordstats->prob;
+    return prob;
 }
 
 double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
@@ -223,9 +225,22 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 
     for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
-	word_t *token = node->key;
-	wordprop_t *props = (wordprop_t *) node->buf;
-	double prob = compute_probability(token, props);
+	double prob;
+	word_t *token;
+	wordcnts_t *cnts;
+	wordprop_t *props;
+
+	if (!fBogotune) {
+	    token = node->key;
+	    props = (wordprop_t *) node->buf;
+	    cnts  = &props->cnts;
+	}
+	else {
+	    token = NULL;
+	    cnts = (wordcnts_t *) node;
+	}
+
+	prob = compute_probability(token, cnts);
 
 	count += 1;
 

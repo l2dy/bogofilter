@@ -59,6 +59,6 @@ extern	const	parm_desc rob_parm_table[];
 extern	void    rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double _spam_cutoff);
 
 /* needed by degen.c */
-extern double lookup_and_score(const word_t *token, wordprop_t *wordstats);
+extern double lookup_and_score(const word_t *token, wordcnts_t *cnts);
 
 #endif	/* ROBINSON_H */

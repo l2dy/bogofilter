@@ -73,6 +73,9 @@ extern	u_int32_t	 msgs_bad;
 /* from html.h */
 extern	bool strict_check;
 
+/* for  bogotune */
+extern	bool fBogotune;
+
 /* other */
 
 enum passmode { PASS_MEM, PASS_SEEK };

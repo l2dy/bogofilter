@@ -65,6 +65,9 @@ method_t *method = NULL;
 /* from html.c */
 bool strict_check = false;
 
+/* for  bogotune */
+bool fBogotune = false;
+
 /* other */
 uint	db_cachesize = 0;		/* in MB */
 enum	passmode passmode;		/* internal */

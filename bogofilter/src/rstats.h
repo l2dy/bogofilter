@@ -17,7 +17,8 @@ void rstats_init(void);
 void rstats_cleanup(void);
 
 void rstats_add(const word_t *token,
-		wordprop_t *props);
+		double prob,
+		wordcnts_t *cnts);
 
 void rstats_fini(size_t robn, 
 		 FLOAT P, 

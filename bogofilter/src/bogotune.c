@@ -397,7 +397,7 @@ static uint read_mailbox(char *arg)
 
 	collect_words(wh);
 
-	wordhash_convert_to_proplist(wh, train);
+	wordhash_convert_to_countlist(wh, train);
 	msglist_add(ns_or_sp->msgs, wh);
 
 	if (verbose && (count % 100) == 0) {
@@ -490,12 +490,12 @@ static void distribute(int mode)
 	    wordhash_add(train, wh, &wordprop_init);
 	    wordhash_free(wh);
 	    train_count += 1;
-	    msg_count->good += good;
-	    msg_count->bad  += bad;
+	    msg_count->cnts.good += good;
+	    msg_count->cnts.bad  += bad;
 	}
 	/* scoring set  */
 	else {
-	    wordhash_convert_to_proplist(wh, train);
+	    wordhash_convert_to_countlist(wh, train);
 	    msglist_add(ns_or_sp->u.sets[MOD(score_count,3)], wh);
 	    score_count += 1;
 	}
@@ -641,8 +641,8 @@ static int ds_read_hook(word_t *key, dsv_t *data, void *userdata)
     wordhash_t *train = userdata;
 
     wordprop_t *tokenprop = wordhash_insert(train, key, sizeof(wordprop_t), &wordprop_init);
-    tokenprop->bad = data->spamcount;
-    tokenprop->good = data->goodcount;
+    tokenprop->cnts.bad = data->spamcount;
+    tokenprop->cnts.good = data->goodcount;
 
     return 0;
 }
@@ -659,8 +659,8 @@ static void robx_accum(word_t *key,
 {
     rh_t *rh = userdata;
     wordprop_t *wp = data;
-    uint goodness = wp->good;
-    uint spamness = wp->bad;
+    uint goodness = wp->cnts.good;
+    uint spamness = wp->cnts.bad;
     double prob = spamness / (goodness * rh->scalefactor + spamness);
     bool doit = goodness + spamness >= 10;
 
@@ -680,8 +680,8 @@ static double robx_compute(wordhash_t *wh)
 {
     double rx;
     wordprop_t *p = wordhash_search(wh, w_msg_count, 0);
-    uint msg_good = p->good;
-    uint msg_spam = p->bad;
+    uint msg_good = p->cnts.good;
+    uint msg_spam = p->cnts.bad;
 
     rh_t rh;
     rh.scalefactor = (double)msg_spam/(double)msg_good;
@@ -982,8 +982,8 @@ static rc_t bogotune(void)
 
     if (msgs_good == 0 && msgs_bad == 0) {
 	props = wordhash_insert(ns_and_sp->train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
-	msgs_good = props->good;
-	msgs_bad  = props->bad;
+	msgs_good = props->cnts.good;
+	msgs_bad  = props->cnts.bad;
 	if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
 	    fprintf(stderr, 
 		    "The wordlist contains %u non-spam and %u spam messages.\n"
@@ -1217,6 +1217,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     atexit(bt_exit);
 
+    fBogotune = true;		/* for rob_compute_spamicity() */
     no_stats = true;		/* suppress rstats */
 
     dbgout = stdout;
