@@ -21,13 +21,19 @@ AUTHORS:
 #include "xmalloc.h"
 
 /* Function Definitions */
-buff_t *buff_new(byte *buff, size_t used, size_t size)
+buff_t *buff_init(buff_t *self, byte *buff, size_t used, size_t size)
 {
-    buff_t *self = xmalloc(sizeof(buff_t));
     self->t.text = buff;
     self->t.leng = used;
     self->read = 0;
     self->size = size;
+    return self;
+}
+
+buff_t *buff_new(byte *buff, size_t used, size_t size)
+{
+    buff_t *self = xmalloc(sizeof(buff_t));
+    buff_init(self, buff, used, size);
     return self;
 }
 

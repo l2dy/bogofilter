@@ -24,6 +24,7 @@ typedef struct {
 } buff_t;
 
 extern buff_t  *buff_new(byte *buff, size_t used, size_t size);
+extern buff_t  *buff_init(buff_t *self, byte *buff, size_t used, size_t size);
 extern void 	buff_free(buff_t *self);
 extern buff_t  *buff_dup(const buff_t *self);
 extern int 	buff_cmp(const buff_t *t1, const buff_t *t2);
