@@ -2,6 +2,23 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.91.2	2004-06-11
+
+	* Bogofilter's creation of new wordlists now includes
+          .WORDLIST_VERSION token.
+	* Fix erroneous double opening of wordlists specified on
+          command line.
+	* Corrected tests so that "make check" passes with qdbm and
+          tdb.
+
+	2004-06-10
+
+	* Fix included GSL compile for compilers that do not support
+	  "extern inline", such as Compaq C V6.3.
+	* FAQ updated with info on multiple wordlists and ignore
+          lists.
+	* FAQ updated with info on building as non-root user.
+
 0.91.1	2004-06-04
 
 	2004-06-04
