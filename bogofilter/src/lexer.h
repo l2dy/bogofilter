@@ -26,7 +26,7 @@ typedef enum {
     HEADKEY,	/* header keyword */
     EOH,	/* end-of-header (empty line) */
     BOUNDARY,	/* MIME multipart boundary line */
-    MESSAGE_ID,	/* Message's ID */
+    QUEUE_ID,	/* Queue ID of message */
     MSGADDR,	/* Message's IP address */
     IPADDR,	/* Generic IP address */
     VERP,	/* Variable Envelope Return Path */

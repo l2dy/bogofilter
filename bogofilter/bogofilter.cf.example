@@ -110,6 +110,7 @@
 #	    g - spamicity as 'g' format
 #
 #	    I - Message ID
+#	    Q - Queue ID (from first id tag found in Received: headers)
 #
 #	    l - logging tag (from '-l' option)
 #

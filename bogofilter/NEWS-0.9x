@@ -2,7 +2,7 @@
 				BOGOFILTER NEWS
 			       =================
 
-0.92.2	2004-07-10
+0.92.2	2004-07-11
 
 * Use an explicit inputs/outputs directory list to avoid shipping test
   files in those directories.
@@ -11,7 +11,8 @@
 
 * Formatting character changes:
   '%A' is now the message's IP address.
-  '%I' is now the message's ID.
+  '%I' is now the Message-ID.
+  '%Q' is now the Queue-ID.
 
 * bogofilter-faq.html:
   corrected editting error that deleted "asian spam" question

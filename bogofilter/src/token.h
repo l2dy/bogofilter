@@ -14,7 +14,8 @@ NAME:
 
 extern word_t *yylval;
 extern word_t *msg_addr;	/* First IP Address in Received: statement */
-extern word_t *msg_id;		/* Message's first Message ID */
+extern word_t *msg_id;		/* Message ID */
+extern word_t *queue_id;	/* Message's first Queue ID */
 
 extern token_t get_token(void);
 

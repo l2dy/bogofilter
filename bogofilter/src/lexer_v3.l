@@ -223,14 +223,22 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); return TOKEN; }
 
 <INITIAL>^(Delivery-)?Date:.*			{ return HEADKEY; }
-<INITIAL>^(Resent-)?Message-ID:.*		{ return HEADKEY; }
+<INITIAL>^Resent-Message-ID:.*			{ return HEADKEY; }
+<INITIAL>^Message-ID:.*				{ /* save token for logging */
+						  int off = 11;
+						  while(isspace((unsigned char)yytext[off]) && off < yyleng)
+						      off++;
+						  word_free(msg_id);
+						  msg_id = word_new((unsigned char *)(yytext+off), yyleng-off);
+						  return HEADKEY;
+						}
 <INITIAL>^(In-Reply-To|References):.* 		{ return HEADKEY; }
 
 <INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
 <INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); skip_to('='); return TOKEN; }
 
 <INITIAL>(file)?name=\"?			/* ignore */
-<INITIAL>\n?[[:blank:]]id\ {ID}			{ return MESSAGE_ID; }
+<INITIAL>\n?[[:blank:]]id\ {ID}			{ return QUEUE_ID; }
 
 <INITIAL>\n[[:blank:]]				{ lineno += 1; }
 <INITIAL>\n\n					{ enum mimetype type = get_content_type();

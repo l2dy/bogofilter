@@ -52,6 +52,8 @@ const char *unsure_subject_tag = NULL;			/* used in passthrough mode */
 /*
 **	formatting characters:
 **
+**	    XXX FIXME XXX this list is outdated and needs revision or removal
+**
 **	    h - spam_header_name, e.g. "X-Bogosity"
 **
 **	    c - classification, e.g. Yes/No, Spam/Ham/Unsure, +/-/?
@@ -340,6 +342,9 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 	    }
 	    case 'I':		/* M - Message ID */
 		buff += format_string(buff, msg_id ? (const char *)msg_id->text : "UNKNOWN", 0, prec, flags, end);
+		break;
+	    case 'Q':		/* Q - Queue ID */
+		buff += format_string(buff, queue_id ? (const char *)queue_id->text : "UNKNOWN", 0, prec, flags, end);
 		break;
 	    case 'p':		/* p - spamicity as a probability */
 	    {
