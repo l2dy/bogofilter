@@ -44,24 +44,6 @@ void buff_free(buff_t *self)
     xfree(self);
 }
 
-#ifdef BROKEN
-void buff_free_text(buff_t *self)
-{
-    xfree(self->t.text);
-    xfree(self);
-}
-#endif
-
-#ifdef UNUSED
-buff_t *buff_dup(const buff_t *self)
-{
-    buff_t *n = xmalloc(sizeof(buff_t));
-    n->size = self->size;
-    n->t.text = self->t.text;
-    return n;
-}
-#endif
-
 int buff_fgetsl(buff_t *self, FILE *in)
 {
     uint readpos = self->t.leng;
@@ -107,21 +89,3 @@ void buff_puts(const buff_t *self, uint width, FILE *fp)
     word.text = self->t.text+self->read;
     word_puts(&word, width, fp);
 }
-
-#ifdef UNUSED
-void buff_shift(buff_t *self, byte *start, uint length)
-{
-    /* Shift buffer contents to delete the specified segment. */
-    /* Implemented for deleting html comments.		      */
-    byte *buff_end = self->t.text+self->t.leng;
-    byte *move_end = start + length;
-
-    BOGO_ASSERT((self->t.text <= start) && (move_end <= buff_end),
-	   "Invalid buff_shift() parameters.");
-
-    memmove(start, start+length, buff_end - move_end);
-    self->t.leng -= length;
-    Z(self->t.text[self->t.leng]);		/* for easier debugging - removable */
-    return;
-}
-#endif

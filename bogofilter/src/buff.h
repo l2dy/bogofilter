@@ -42,15 +42,4 @@ extern int	buff_fgetsl(buff_t *self, FILE *);
 extern int	buff_fgetsln(buff_t *self, FILE *, uint);
 extern void 	buff_puts(const buff_t *self, uint width, FILE *fp);
 
-#ifdef BROKEN
-extern void	buff_free_text(buff_t *self);
-extern int 	buff_cmp(const buff_t *t1, const buff_t *t2); /**< implementation missing */
-#endif
-
-#ifdef UNUSED
-extern buff_t  *buff_dup(const buff_t *self);
-extern void 	buff_shift(buff_t *self, byte *start, uint length);
-#endif
-
 #endif	/* BUFF_H */
-
