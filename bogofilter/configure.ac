@@ -54,6 +54,33 @@ if test "x$target_cpu" = "xs390" && test "x$GCC" = "xyes" ; then
     esac
 fi
 
+dnl crutch for b0rked dgux gcc 2.7 (-g gives unresolved symbols in GSL),
+dnl gcc 2.8.1 is fine according to Message-ID: <199805061718.NAA01272@monty>
+dnl see http://list-archive.xemacs.org/xemacs-beta/199805/msg00291.html
+case "$target_os" in
+dgux*)
+    if test "$GCC" = yes ; then
+        case "`$CC --version`" in
+        2.7*)
+	    case ${CFLAGS} in
+	    *-g*)
+		OCFLAGS="$CFLAGS"
+		CFLAGS=""
+		for i in $OCFLAGS ; do
+		    case x$i in
+			x-g*) ;;
+			*) CFLAGS="$CFLAGS$i " ;;
+		    esac
+		done
+		AC_MSG_NOTICE([dgux: Removing -g options from CFLAGS, new: "$CFLAGS".])
+		;;
+	    esac
+	    ;;
+	esac
+    fi
+    ;;
+esac
+
 AC_ARG_WITH(db,
 	    AC_HELP_STRING([--with-db=PATH], [obsolete, use --with-libdb-prefix instead]),
     AC_MSG_ERROR([--with-db is obsolete. Use --with-libdb-prefix=$withval instead.]))
