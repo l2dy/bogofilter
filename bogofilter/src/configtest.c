@@ -75,6 +75,6 @@ int main( int argc, char **argv)
 	    verbose = 1;
     }
     process_config_files();
-    /* read_config_file("./bogofilter.cf", 0); */
+    /* read_config_file("./bogofilter.cf", false, false); */
     return 0;
 }

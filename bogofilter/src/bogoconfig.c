@@ -435,7 +435,7 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case 'c':
-	    read_config_file(optarg, false);
+	    read_config_file(optarg, false, false);
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
 

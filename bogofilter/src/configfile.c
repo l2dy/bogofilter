@@ -167,7 +167,7 @@ static bool process_config_line( const unsigned char *line, const parm_desc *par
     return false;
 }
 
-void read_config_file(const char *fname, bool tilde_expand)
+void read_config_file(const char *fname, bool tolerate_errors, bool tilde_expand)
 {
     bool error = false;
     int lineno = 0;
@@ -211,7 +211,8 @@ void read_config_file(const char *fname, bool tilde_expand)
 
 	if ( ! process_config_line( buff, usr_parms ) &&
 	     ! process_config_line( buff, sys_parms ) &&
-	     ! process_config_line( buff, format_parms ))
+	     ! process_config_line( buff, format_parms ) &&
+	     ! tolerate_errors)
 	{
 	    error = true;
 	    if (!quiet)
@@ -236,8 +237,8 @@ void process_config_files(void)
 {
     if (! suppress_config_file)
     {
-	read_config_file(system_config_file, false);
-	read_config_file(user_config_file, true);
+	read_config_file(system_config_file, false, false);
+	read_config_file(user_config_file, false, true);
     }
 
     stats_prefix= stats_in_header ? "\t" : "#   ";

@@ -53,6 +53,6 @@ extern const parm_desc sys_parms[];
 extern const parm_desc *usr_parms;
 
 void process_config_files(void);
-void read_config_file(const char *fname, bool tilde_expand);
+void read_config_file(const char *fname, bool tolerate_errors, bool tilde_expand);
 
 #endif
