@@ -17,3 +17,14 @@ and use it.
 Command line switches '-W' and '-WW' can be used to tell bogofilter
 the mode you want.  Also config file options "wordlist_mode=combined"
 and "wordlist_mode=separate" can be used.
+
+Upgrading from an old bogofilter environment with its two wordlists
+(spamlist.db and goodlist.db) to the new 0.14.x environment with its
+single, combined wordlist.db involves 3 main steps - dumping the
+current spamlist.db and goodlist.db files, formatting that output, and
+then loading the data into a new file wordlist.db.  Script bogoupgrade
+is included with bogofilter and performs the task.  Use command
+"bogoupgrade -d /path/to/your/wordlists" to do the upgrade.  After
+running it, your BOGOFILTER_DIR will contain all 3 database files.
+When started, bogofilter checks for wordlist.db and will use it.
+
