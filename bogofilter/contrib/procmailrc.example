@@ -58,7 +58,7 @@ spam-unreadable
 
 
 :0c:
-* ^X-Bogosity:?(Spam|Yes)
+* ^X-Bogosity: (Spam|Yes)
 spam-bogofilter
 
 :0c:
