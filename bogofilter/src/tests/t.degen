@@ -40,16 +40,16 @@ echo xxxx > ${TMPDIR}/msg.xxxx
 (echo free ; echo Free ; echo FREE) > ${TMPDIR}/msg.fff
 (echo FREE ; echo new ; echo Free ; echo free) > ${TMPDIR}/msg.fnff
 
-$BOGOFILTER -y 0 -n -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.free
-$BOGOFILTER -y 0 -n -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.free
-$BOGOFILTER -y 0 -n -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.free
-$BOGOFILTER -y 0 -n -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.free
+$BOGOFILTER -C -y 0 -n -I ${TMPDIR}/msg.free
+$BOGOFILTER -C -y 0 -n -I ${TMPDIR}/msg.free
+$BOGOFILTER -C -y 0 -n -I ${TMPDIR}/msg.free
+$BOGOFILTER -C -y 0 -n -I ${TMPDIR}/msg.free
 
-$BOGOFILTER -y 0 -n -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.ff
-$BOGOFILTER -y 0 -n -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.ff
-$BOGOFILTER -y 0 -s -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.Free
+$BOGOFILTER -C -y 0 -n -I ${TMPDIR}/msg.ff
+$BOGOFILTER -C -y 0 -n -I ${TMPDIR}/msg.ff
+$BOGOFILTER -C -y 0 -s -I ${TMPDIR}/msg.Free
 
-$BOGOFILTER -y 0 -s -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.xxxx
+$BOGOFILTER -C -y 0 -s -I ${TMPDIR}/msg.xxxx
 
 if  [ $verbose -ne 0 ]; then
 #   Note: outputs are different for 1 wordlist than for 2
@@ -59,20 +59,13 @@ if  [ $verbose -ne 0 ]; then
     echo >> ${OUT}
 fi
 
-for flags in PD ; do
-echo $flags >> ${OUT}
-map_rc $BOGOFILTER -y 0 -$flags -d $BOGOFILTER_DIR -C -D -t -vvv -I  ${TMPDIR}/msg.fff | grep -i free >> ${OUT}
-echo >> ${OUT}
+for args in PD.fff Pdf.FREE PdF.FREE PdF.fnff ; do
+    echo $args >> ${OUT}
+    flag=`echo $args | tr "." " " | awk '{print $1}'`
+    file=`echo $args | tr "." " " | awk '{print $2}'`
+    map_rc $BOGOFILTER -C -y 0 -$flag -D -t -vvv -x s -I ${TMPDIR}/msg.$file | grep -i free >> ${OUT}
+    echo >> ${OUT}
 done
-
-for flags in Pdf PdF ; do
-echo $flags >> ${OUT}
-map_rc $BOGOFILTER -y 0 -$flags -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.FREE -C -D -t -vvv -x s | grep -i free >> ${OUT}
-echo >> ${OUT}
-done
-
-echo fff >> ${OUT}
-map_rc $BOGOFILTER -y 0 -d $BOGOFILTER_DIR -C -D -t -PdF -vvv -x s < ${TMPDIR}/msg.fnff | grep -i free >> ${OUT}
 
 OUTPUTS=${SYSTEST}/outputs
 
