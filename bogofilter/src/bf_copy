@@ -43,7 +43,8 @@ if test $COMPACT -eq 1 ; then
 else
   : >$TMP
 fi
-LOGS=`ls "$SRC"/log.* | grep -v -F -f $TMP`
+
+LOGS=`ls "$SRC"/log.* 2&>/dev/null | grep -v -F -f $TMP || :`
 if test "$LOGS" ; then cp -p $LOGS "$DST" ; fi
 if test -f "$SRC"/DB_CONFIG ; then cp -p "$SRC"/DB_CONFIG "$DST" ; fi
 
@@ -53,6 +54,6 @@ for FILE in "$SRC"/*.db ; do
     dd bs=$SIZE if="$FILE" of="$DST/"`basename "$FILE"`
 done
 
-bogoutil --db-recover="$DST"
+if test "$LOGS" ; then bogoutil --db-recover="$DST" ; fi
 rm -f $TMP
 trap - 0
