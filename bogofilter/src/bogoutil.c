@@ -496,8 +496,8 @@ static const char *help_text[] = {
     "\n",
 
     "info options:\n",
-    "  -w dir                      - display counts for words from stdin.\n",
-    "  -p dir                      - display word counts and probabilities.\n",
+    "  -w file_or_dir              - display counts for words from stdin.\n",
+    "  -p file_or_dir              - display word counts and probabilities.\n",
     "  -I, --input-file=file       - read 'file' instead of standard input.\n",
     "  -H dir                      - display histogram and statistics for wordlist.\n",
     "                                - use with -v  to exclude hapaxes.\n",
