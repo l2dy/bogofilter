@@ -13,6 +13,8 @@ AUTHOR:
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+#include "getopt.h"
+
 /* Definitions */
 
 enum field_e {
