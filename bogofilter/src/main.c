@@ -40,6 +40,7 @@ CONTRIBUTORS:
 #include "format.h"
 #include "lexer.h"
 #include "mime.h"
+#include "msgcounts.h"
 #include "register.h"
 #include "rstats.h"
 #include "textblock.h"
@@ -134,11 +135,19 @@ static int classify(int argc, char **argv, FILE *out)
 	    fprintf(out, "%s ", filename ); 
 	}
 
-	initialize(fpin);
 	do {
+	    passthrough_setup();
+	    init_msg_counts();
+	    mime_reset();
+	    init_charset_table(charset_default, true);
+
 	    status = bogofilter(&spamicity);
 	    write_message(out, status);
+
+	    rstats_cleanup();
+	    passthrough_cleanup();
 	} while (status == RC_MORE);
+
 	if (bulk_mode == B_NORMAL && status != RC_MORE) {
 	    exitcode = (status == RC_SPAM) ? 0 : 1;
 	    if (nonspam_exits_zero && passthrough && exitcode == 1)
@@ -166,8 +175,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     initialize(NULL);
 
-    passthrough_setup();
-
     if (run_type & (RUN_NORMAL | RUN_UPDATE)) {
 	exitcode = classify(argc, argv, out);
     }
@@ -175,8 +182,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	register_messages(run_type);
 	exitcode = 0;
     }
-
-    passthrough_cleanup();
 
     close_wordlists(false);
     free_wordlists();
