@@ -280,7 +280,7 @@ int main(int argc, char **argv)
 #ifdef HAVE_SYSLOG_H
     if (logflag)
     {
-	openlog ( "bogofilter", LOG_PID, LOG_DAEMON );
+	openlog( "bogofilter", LOG_PID, LOG_DAEMON );
 
 	switch (run_type)
 	{
@@ -295,7 +295,7 @@ int main(int argc, char **argv)
 	    break;
 	}
 
-	closelog ( "bogofilter", LOG_PID, LOG_DAEMON );
+	closelog();
     }
 #endif
 
