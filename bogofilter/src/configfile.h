@@ -15,33 +15,6 @@ AUTHOR:
 
 /* Definitions */
 
-typedef enum {
-	CP_NONE,
-	CP_BOOLEAN,
-	CP_INTEGER,
-	CP_DOUBLE,
-	CP_STRING,
-	CP_DIRECTORY,
-	CP_FUNCTION
-} parm_t;
-
-typedef bool func(const unsigned char *s);
-
-typedef struct {
-    const char *name;
-    parm_t	type;
-    union
-    {
-	void	*v;
-	func	*f;
-	bool	*b;
-	int	*i;
-	double	*d;
-	char	*c;
-	char   **s;
-    } addr;
-} parm_desc;
-
 typedef enum arg_pass_e {
     PASS_1_CLI = 1,		/* 1 - first command line pass  */
     PASS_2_CFG = 2,		/* 2 - config file options ...  */

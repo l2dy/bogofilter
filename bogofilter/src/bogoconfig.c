@@ -281,59 +281,6 @@ static int validate_args(void)
     return EX_OK;
 }
 
-typedef struct {
-    const char *shortname;
-    const char *longname;
-    parm_t	type;
-    union
-    {
-	void	*v;
-	func	*f;
-	bool	*b;
-	int	*i;
-	double	*d;
-	char	*c;
-	char   **s;
-    } addr;
-} option_names_t;
-
-/*
-option_names_t option_names[] = {
-    { "-h",  "--help",					  CP_FUNCTION,	{ (void *) &help } },
-    { "-V",  "--version",				  CP_FUNCTION,	{ (void *) &print_version } },
-    { "-Q",  "--query",					  CP_FUNCTION,	{ (void *) &query } },
-    { "-p",  "--passthrough",				  CP_TRUE,	{ (void *) &passthrough } },
-    { "-e",  "--ham-true",				  CP_TRUE,	{ (void *) &nonspam_exits_zero } },
-    { "-u",  "--update-as-classed",			  CP_FUNCTION,	{ (void *) &run_update } },
-    { "-M",  "--classify-mbox",				  CP_TRUE,	{ (void *) &mbox_mode } },
-    { "-b",  "--classify-stdin",			  CP_FUNCTION,	{ (void *) &set_stdin } },
-    { "-B",  "--classify-files=nCme1,name2,...",	  CP_FUNCTION,	{ (void *) &set_filenames } },
-    { "-R",  "--dataframe",				  CP_FUNCTION,	{ (void *) &set_dataframe } },
-    { "-s",  "--register-spam",				  CP_FUNCTION,	{ (void *) &reg_spam } },
-    { "-n",  "--register-ham",				  CP_FUNCTION,	{ (void *) &reg_good } },
-    { "-S",  "--unregister-spam",			  CP_FUNCTION,	{ (void *) &unreg_spam } },
-    { "-N",  "--unregister-nonspam",			  CP_FUNCTION,	{ (void *) &unreg_good } },
-    { "-c",  "--config-file=file",			  CP_FUNCTION,	{ (void *) &set_configfile } },
-    { "-C",  "--no-config-file",			  CP_FUNCTION,	{ (void *) &set_no_configfile } },
-    { "-d",  "--bogofilter_dir=path",			  CP_STRING,	{ (void *) &path } },
-    { "-H",  "--no-header-tags",			  CP_FALSE,	{ (void *) &header_line_markup } },
-    { "-k",  "--db_cachesize=size",			  CP_INTEGER,	{ (void *) &size } },
-    { "-l",  "--use-syslog",				  CP_TRUE,	{ (void *) &syslog } },
-    { "-L",  "--syslog-tag=tag",			  CP_STRING,	{ (void *) &tag } },
-    { "-I",  "--input-file=file",			  CP_FUNCTION,	{ (void *) &bogoreader_name } },
-    { "-O",  "--output-file=file",			  CP_FUNCTION,	{ (void *) &set_outfname } },
-    { "-m v1[,v2[,v3]]"," --min_dev=v1, --robs=v2, --robx=v3", CP_NONE,	{ (void *) NULL } },
-    { "-o v1[,v2]",     "--spam_cutoff=v1, --ham_cutoff=v2",   CP_NONE,	{ (void *) NULL } },
-    { "-t",  "--terse",					  CP_IMMD_FUNC,	{ (void *) &set_terse } },
-    { "-T",  "--fixed-terse-format",			  CP_IMMD_FUNC,	{ (void *) &set_inv_terse_mode } },
-    { "-U",  "--report-unsure=bool",			  CP_BOOLEAN,	{ (void *) &unsure_stats } },
-    { "-v",  "--verbosity",				  CP_IMMD_FUNC,	{ (void *) &increment_verbosity } },
-    { "-y",  "--timestamp-date",			  CP_IMMD_FUNC,	{ (void *) &set_string_date } },
-    { "-D",  "--debug-to-stdout",			  CP_FUNCTION,	{ (void *) &set_dbgout } },
-    { "-x list",  "--debug-flags=list",			  CP_IMMD_FUNC,	{ (void *) &set_debug_mask } }
-};
-*/
-
 static const char *help_text[] = {
     "help options:\n",
     "  -h,                       - print this help message.\n",
