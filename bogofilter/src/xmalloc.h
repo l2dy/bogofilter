@@ -49,7 +49,7 @@ void xfree(/*@only@*/ /*@null@*/ void *ptr);
 void *xcalloc(size_t nmemb, size_t size);
 
 /** reallocate \a size bytes of memory and initialize it with the
- * first bytes of the shorter area (old in \a ptr vs. newly allocated),
+ * first bytes of the shorter area (old in \a ptr vs.\ newly allocated),
  * exit program on allocation failure */
 /*@only@*/ /*@out@*/ /*@notnull@*/
 void *xrealloc(/*@only@*/ void *ptr, size_t size);
