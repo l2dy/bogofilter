@@ -29,6 +29,13 @@ AUTHOR:
 
 extern int errno;
 
+static void db_enforce_locking(dbh_t *handle, const char *func_name){
+  if (handle->locked == FALSE){
+    fprintf(stderr, "%s (%s): Attempt to access unlocked handle.\n", func_name, handle->name);
+    exit(2);
+  }
+}
+
 static dbh_t *dbh_init(const char *filename, const char *name){
   dbh_t *handle;
 
@@ -37,7 +44,7 @@ static dbh_t *dbh_init(const char *filename, const char *name){
   handle->filename  = xstrdup(filename);
   handle->name	    = xstrdup(name);
   handle->pid	    = getpid();
-  handle->locked=FALSE;
+  handle->locked    = FALSE;
 
   return handle;
 }
@@ -53,16 +60,22 @@ static void dbh_free(dbh_t *handle){
   Initialize database.
   Returns: pointer database handle on success, NULL otherwise.
 */
-void *db_open(const char *db_file, const char *name){
+void *db_open(const char *db_file, const char *name, dbmode_t open_mode){
     int ret;
     dbh_t *handle;
+    u_int32_t opt_flags = 0;
+
+    if (open_mode == DB_READ)
+      opt_flags = DB_RDONLY;
+    else
+      opt_flags =  DB_CREATE; /*Read-write mode implied. Allow database to be created if necesary */
 
     handle = dbh_init(db_file, name);
 
     if ((ret = db_create (&(handle->dbp), NULL, 0)) != 0){
 	   fprintf (stderr, ERRSTR("db_create: %s\n"), db_strerror (ret));
     }
-    else if ((ret = handle->dbp->open (handle->dbp, db_file, NULL, DB_BTREE, DB_CREATE, 0664)) != 0){
+    else if ((ret = handle->dbp->open (handle->dbp, db_file, NULL, DB_BTREE, opt_flags, 0664)) != 0){
            handle->dbp->err (handle->dbp, ret, ERRSTR("open: %s"), db_file);
     }
     else {
@@ -79,14 +92,15 @@ void *db_open(const char *db_file, const char *name){
     Notes: Will call exit if an error occurs.
 */
 long db_getvalue(void *vhandle, char *word){
-
     DBT db_key;
     DBT db_data;
     long value;
     int  ret;
 
     dbh_t *handle = vhandle;
-
+	
+    db_enforce_locking(handle, "db_getvalue");
+    
     DBT_init(db_key);
     DBT_init(db_data);
 
@@ -122,7 +136,9 @@ void db_setvalue(void *vhandle, char * word, long value){
     DBT key;
     DBT data;
     dbh_t *handle = vhandle;
-    
+   
+    db_enforce_locking(handle, "db_setvalue");
+
     DBT_init(key);
     DBT_init(data);
 
@@ -274,7 +290,7 @@ void db_lock_release(void *vhandle){
 
   dbh_t *handle = vhandle;
 
-  if (handle->locked){
+  if (handle->locked == TRUE){
     if (verbose > 1)
       fprintf(stderr, "[%lu] Releasing lock on %s\n",(unsigned long)handle->pid, handle->filename);
 
@@ -295,7 +311,7 @@ Releases acquired locks on multiple databases
 */
 void db_lock_release_list(wordlist_t *list){
   while (list != NULL) {
-    if (list->active == TRUE)
+    if ((list->active == TRUE) && (((dbh_t *)list->dbh)->locked == TRUE))
       db_lock_release(list->dbh);
 
     list = list->next;

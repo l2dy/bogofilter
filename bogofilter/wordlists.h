@@ -26,8 +26,8 @@ extern wordlist_t good_list, spam_list;
 
 char *get_bogodir(char **dirnames);
 
-int setup_lists(const char *directory);
-void *open_wordlist( const char *name, const char *directory, const char *filename );
+int setup_lists(const char *directory, dbmode_t);
+void *open_wordlist( const char *name, const char *directory, const char *filename, dbmode_t );
 void close_lists(void);
 
 #endif	/* HAVE_WORDLISTS_H */

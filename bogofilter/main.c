@@ -22,6 +22,7 @@ AUTHOR:
 #include "bogofilter.h"
 #include "xmalloc.h"
 #include "datastore.h"
+#include "xstrdup.h"
 
 int verbose, passthrough, update, nonspam_exits_zero;
 
@@ -38,8 +39,7 @@ int main(int argc, char **argv)
 	switch(ch)
 	{
 	case 'd':
-	    directory = optarg;
-	    setup_lists(directory);
+	    directory = xstrdup(optarg);
 	    break;
 
 	case 'e':
@@ -107,11 +107,10 @@ int main(int argc, char **argv)
 	}
 
     if ( directory == NULL )
-    {
 	directory = get_bogodir(dirnames);
-	setup_lists(directory);
-	xfree(directory);
-    }
+
+    setup_lists(directory, register_type == REG_NONE ? DB_READ : DB_WRITE);
+    xfree(directory);
 
     if (register_type == REG_NONE)
     {

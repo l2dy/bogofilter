@@ -46,7 +46,7 @@ char *get_bogodir(char **dirnames)
     return dir;
 }
 
-void *open_wordlist( const char *name, const char *directory, const char *filename )
+void *open_wordlist( const char *name, const char *directory, const char *filename, dbmode_t open_mode )
 {
     int	rc;
     void *dbh;			// database handle 
@@ -69,7 +69,7 @@ void *open_wordlist( const char *name, const char *directory, const char *filena
     }
 
     strcat(path, filename);
-    if ( (dbh = db_open(path, name)) == NULL){
+    if ( (dbh = db_open(path, name, open_mode)) == NULL){
       fprintf(stderr, "bogofilter: Cannot initialize database %s.\n", name);
       exit(2);
     }
@@ -79,12 +79,12 @@ void *open_wordlist( const char *name, const char *directory, const char *filena
 }
 
 /* returns -1 for error, 0 for success */
-int init_list(wordlist_t* list, const char* name, const char* directory, const char* filename, double weight, bool bad, int override, int ignore)
+int init_list(wordlist_t* list, const char* name, const char* directory, const char* filename, double weight, bool bad, int override, int ignore, dbmode_t open_mode)
 {
     wordlist_t* list_index;
     wordlist_t** last_list_ptr;
 
-    list->dbh=open_wordlist(name, directory, filename);
+    list->dbh=open_wordlist(name, directory, filename, open_mode);
     if (list->dbh == NULL) return -1;
     list->name=xstrdup(name);
     list->msgcount=0;
@@ -121,11 +121,11 @@ int init_list(wordlist_t* list, const char* name, const char* directory, const c
 }
 
 /* returns -1 for error, 0 for success */
-int setup_lists(const char *directory)
+int setup_lists(const char *directory, dbmode_t open_mode)
 {
     int rc = 0;
-    if (init_list(&good_list, "good", directory, GOODFILE, GOOD_BIAS, FALSE, 0, 0)) rc = -1;
-    if (init_list(&spam_list, "spam", directory, SPAMFILE,         1, TRUE,  0, 0)) rc = -1;
+    if (init_list(&good_list, "good", directory, GOODFILE, GOOD_BIAS, FALSE, 0, 0, open_mode)) rc = -1;
+    if (init_list(&spam_list, "spam", directory, SPAMFILE,         1, TRUE,  0, 0, open_mode)) rc = -1;
     return rc;
 }
 

@@ -13,4 +13,6 @@ const bool TRUE = true;
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
 #define min(x, y)	(((x) < (y)) ? (x) : (y))
 
+typedef enum dbmode_e { DB_READ = 0, DB_WRITE = 1 } dbmode_t;
+
 #endif

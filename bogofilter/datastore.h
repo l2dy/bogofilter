@@ -11,10 +11,11 @@
  
 */
 
-#include <wordlists.h>
 
 #ifndef DATASTORE_H_GUARD
 #define DATASTORE_H_GUARD
+#include "common.h"
+#include "wordlists.h"
 
 /*
 Initialize database, open files, etc.
@@ -22,7 +23,7 @@ params: char * path to database file, char * name of database
 returns: opaque pointer to database handle, which must be saved and
          passed as the first parameter in all subsequent database function calls. 
 */
-void *db_open(const char *, const char *);
+void *db_open(const char *, const char *, dbmode_t );
 
 
 /* Close files and clean up. */
