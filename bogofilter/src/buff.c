@@ -71,8 +71,7 @@ void buff_shift(buff_t *self, byte *start, size_t length)
 	assert("Invalid buff_shift() parameters.");
     }
     memmove(start, start+length, buff_end - move_end);
-    self->read = 0;
     self->t.leng -= length;
-    Z(self->t.text[self->t.leng]);		/* debug - remove me */
+    Z(self->t.text[self->t.leng]);		/* for easier debugging - removable */
     return;
 }
