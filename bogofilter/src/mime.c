@@ -518,22 +518,20 @@ static void mime_type(word_t * text)
 
     switch (msg_state->mime_type) {
     case MIME_TEXT:
-    case MIME_TEXT_HTML:
     case MIME_TEXT_PLAIN:
 	/* XXX: read charset */
+    case MIME_TEXT_HTML:
 	return;
     case MIME_TYPE_UNKNOWN:
 	return;
     case MIME_MULTIPART:
+	/* XXX: read boundary */
 	return;
     case MIME_MESSAGE:
-	/* XXX: read boundary */
 	return;
     case MIME_APPLICATION:
-	/* XXX: read boundary */
 	return;
     case MIME_IMAGE:
-	/* XXX: read boundary */
 	return;
     }
     return;
