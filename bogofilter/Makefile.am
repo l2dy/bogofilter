@@ -1,5 +1,8 @@
 # $Id$ 
 # $Log$
+# Revision 1.7  2002/09/17 06:21:28  adrian_otto
+# Changed flex to $(LEX)
+#
 # Revision 1.6  2002/09/17 02:16:37  adrian_otto
 # Re-aranged the makefile so that the autoconfigured Makefile gets a correct
 # rule for cleaning lexertest.
@@ -31,8 +34,8 @@ lexertest_LDADD = lexertest.o
 man1_MANS = bogofilter.1
 EXTRA_DIST = $(man1_MANS)
 #
-#lexer_l.c: lexer_l.l
-#	flex lexer_l.l
+lexer_l.c: lexer_l.l
+	$(LEX) lexer_l.l
 #
 lexertest.o: lexer_l.c
 	$(COMPILE) -DMAIN -o lexertest.o -c lexer_l.c

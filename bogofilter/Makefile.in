@@ -79,7 +79,10 @@ install_sh = @install_sh@
 
 # $Id$ 
 # $Log$
-# Revision 1.8  2002/09/17 02:16:37  adrian_otto
+# Revision 1.9  2002/09/17 06:21:28  adrian_otto
+# Changed flex to $(LEX)
+#
+# Revision 1.6  2002/09/17 02:16:37  adrian_otto
 # Re-aranged the makefile so that the autoconfigured Makefile gets a correct
 # rule for cleaning lexertest.
 #
@@ -488,8 +491,8 @@ uninstall-man: uninstall-man1
 	uninstall-man uninstall-man1
 
 #
-#lexer_l.c: lexer_l.l
-#	flex lexer_l.l
+lexer_l.c: lexer_l.l
+	$(LEX) lexer_l.l
 #
 lexertest.o: lexer_l.c
 	$(COMPILE) -DMAIN -o lexertest.o -c lexer_l.c
