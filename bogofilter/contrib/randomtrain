@@ -5,82 +5,106 @@
 #  randomtrain -- bogofilter messages from files in random order
 #                 and train if the result is wrong or uncertain
 #  needs:    bash basename rm grep awk wc perl dd bogofilter
-#  usage:    see function usage() starting on line 10 of this file
+#  usage:    see function usage() of this file
 #  version:  0.6 (Greg Louis <glouis@dynamicro.on.ca>)
 
-pid=$$
-
 function usage() {
-    iam=`basename $0`
-    echo "Usage: $iam [bogodir] [-]n|s filename [-]n|s filename [...]"
+    name=`basename $0`
+    echo "Usage: $name [bogodir] [-p pid] [-c cfg] [-]n|s filename [-]n|s filename [...]"
     echo "       Messages contained in the files are fed to bogofilter"
     echo "       in random order.  If bogofilter is wrong or uncertain"
     echo "       about whether a message is spam, that message is used"
     echo "       for training, with bogofilter's -s or -n option."
+    echo ""
     echo "Parameters:"
-    echo "       bogodir is where bogofilter's .db files are kept"
+    echo "       bogodir is where bogofilter's wrodlists files are kept"
     echo "       (bogodir defaults to $HOME/.bogofilter)."
-    echo "       n (or -n) indicates that the next file contains only"
-    echo "       nonspams, and s (or -s) means it contains only spams."
+    echo "       n (or -n) indicates that the next file contains only nonspams."
+    echo "       s (or -s) means it contains only spams."
     echo "       No one file may contain both spams and nonspams."
     echo "       Filenames may not contain blanks."
+    echo ""
+    echo "       c (or -c) indicates that the next file is the config file."
+    echo "       p (or -p) indicates that a pid comes next (used for re-running a test)."
     echo "NB:    At least one spam and one nonspam file are needed!"
-    rm -f list.$pid
     exit 1
 }
 
-# if the first param isn't s or n, treat it as a directory
-bogodir="${HOME}/.bogofilter"
-test "x$1" = "x" && usage
-indic=${1:0-1:1}
-if [ "$indic" != "s" -a "$indic" != "n" ]; then
-    bogodir=$1
-    shift
-fi
-echo $bogodir
-# check for an even number of params >= 4
-test ${#*} -ge 4 || usage
-let n=${#*}%2
-test $n -eq 0 || usage
-
-# params may be ok, here goes...
-
-# get all the byte offsets in all the files, in one list
-cmd=""
-while [ ${#*} -gt 1 ]; do
-    indic=${1:0-1:1} ; shift
-    test "$indic" != "s" -a "$indic" != "n" && usage
-    file=$1 ; shift
-    if [ ! -r $file ]; then echo "$file not found"; usage; fi
-    cmd=" $cmd -c $indic $file"
-done
-
-# create a shuffled list, with lengths
-scramble '^From ' -l$cmd >scram.$pid
-
-# go through the list, extract the messages, eval with bogofilter
-# and train if bogofilter is wrong or uncertain
-{
-    nspam=0; ngood=0; rspam=0; rgood=0;
+function train() {
+    # go through the list, extract the messages, eval with bogofilter
+    # and train if bogofilter is wrong or uncertain
+    cnt=0; nspam=0; ngood=0; rspam=0; rgood=0;
     echo " spam  reg   good  reg"
     while read expect fnam offset length; do
+	let cnt=cnt+1
 	dd if=$fnam bs=1 skip=$offset count=$length 2>/dev/null >msg.$pid
-	bogofilter -d $bogodir <msg.$pid
-	got=$?	# 0=spam, 1=good, 2=unknown, 3=err
+	result=`bogofilter -t -v -d $bogodir -c cfg.$pid <msg.$pid | tr "SHU" "shu"`
+	got=`echo $result | awk '{print $1}' | tr "YNU" "snu"`
 	if [ "$expect" = "s" ]; then let nspam=$nspam+1
 	else let ngood=$ngood+1; fi
-	if [ $got -eq 0 ]; then got="s"; elif [ $got -eq 1 ]; then got="n"; fi
 	if [ $got != $expect ]; then
 	    if [ "$expect" = "s" ]; then let rspam=$rspam+1
 	    else let rgood=$rgood+1; fi
 	    # comment out the next line for dry-run testing
-	    bogofilter -d $bogodir -$expect <msg.$pid
+	    bogofilter -$expect $cfg -d $bogodir <msg.$pid
 	fi
 	n=`expr \( $nspam + $ngood \) % 10`
 	test $n -eq 0 && \
 	    printf "\r%5d%5d  %5d%5d " $nspam $rspam $ngood $rgood
     done
     printf "\r%5d%5d  %5d%5d\n" $nspam $rspam $ngood $rgood
-} <scram.$pid
+}
+
+# Execution begins here...
+
+cnt=0;
+cmd=""
+cfg='-C'
+pid=$$
+
+while [ ${#*} -gt 1 ]; do
+    indic=${1:0-1:1} ; shift
+    case "$indic" in
+	s | n )
+	    file=$1 ; shift
+	    cmd="$cmd -c $indic $file"
+	    if [ ! -r $file ]; then echo "file '$file' not found"; usage; fi
+	    let cnt=cnt+2
+	    ;;
+	c ) 
+	    file=$1 ; shift
+	    cfg="-c $file"
+	    if [ ! -r $file ]; then echo "file '$file' not found"; usage; fi
+	    ;;
+	p )
+	    pid=$1; shift;
+	    ;;
+	d )
+	    test "x$bogodir" != "x" && usage
+	    bogodir=$1 ; shift
+	    if [ ! -d $bogodir ]; then echo "directory '$bogodir' not found"; usage; fi
+	    ;;
+	* )
+	    usage
+    esac
+done
+
+# if the first param isn't s or n, treat it as a directory
+test "x$bogodir" = "x" && bogodir="${HOME}/.bogofilter"
+
+# check for an even number of s/n files >= 4
+test $cnt -ge 4 || usage
+let n=$cnt%2
+test $n -eq 0 || usage
+
+# params may be ok, here goes...
+
+# create a shuffled list, with lengths
+[ ! -f scram.$pid ] && scramble '^From ' -l $cmd > scram.$pid
+
+train <scram.$pid
+
+if [ $pid = $$ ] ; then
 # next line can be commented out for debugging
-rm scram.$pid msg.$pid
+    rm -f scram.$pid msg.$pid cfg.$pid
+fi
