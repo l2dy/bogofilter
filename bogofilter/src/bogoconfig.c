@@ -407,7 +407,6 @@ static void print_version(void)
 
 static void process_arglist(int argc, char **argv, priority_t precedence, int pass)
 {
-    int option;
     ex_t exitcode;
 
     if (pass != PASS_1_CLI) {
@@ -423,6 +422,7 @@ static void process_arglist(int argc, char **argv, priority_t precedence, int pa
 
     while (1) 
     {
+	int option;
 	int option_index = 0;
 	int this_option_optind = optind ? optind : 1;
 	const char *name;
