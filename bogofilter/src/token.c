@@ -37,7 +37,7 @@ typedef enum {
 word_t *yylval = NULL;
 
 static token_t save_class = NONE;
-static word_t *bfsave = NULL;
+static word_t *ipsave = NULL;
 
 static int html_tag_level = 0;
 static int html_comment_level = 0;
@@ -104,14 +104,14 @@ token_t get_token(void)
     /* If saved IPADDR, truncate last octet */
     if ( block_on_subnets && save_class == IPADDR )
     {
-	byte *t = xmemrchr(bfsave->text, '.', bfsave->leng);
+	byte *t = xmemrchr(ipsave->text, '.', ipsave->leng);
 	if (t == NULL)
 	    save_class = NONE;
 	else
 	{
 	    *t = '\0';	
-	    bfsave->leng = t - bfsave->text;
-	    yylval = bfsave;
+	    ipsave->leng = t - ipsave->text;
+	    yylval = ipsave;
 	    return save_class;
 	}
     }
@@ -193,10 +193,10 @@ token_t get_token(void)
 		    sprintf((char *)yylval->text, "%d.%d.%d.%d", 
 			    q1 & 0xff, q2 & 0xff, q3 & 0xff, q4 & 0xff);		    
 		yylval->leng = strlen((const char *)yylval->text);
-		bfsave = word_new(NULL, plen + yylval->leng);
-		memcpy(bfsave->text, prefix, plen);
-		memcpy(bfsave->text+plen, yylval->text, yylval->leng);
-		yylval = bfsave;
+		ipsave = word_new(NULL, plen + yylval->leng);
+		memcpy(ipsave->text, prefix, plen);
+		memcpy(ipsave->text+plen, yylval->text, yylval->leng);
+		yylval = ipsave;
 		save_class = IPADDR;
 		return (class);
 	    }
