@@ -100,7 +100,27 @@ ls $pattern | $BOGOFILTER -c $CFG $OPT -b | \
 
 NAME="bulk-linend"
 $BOGOFILTER -c $CFG $OPT -B `ls $pattern` | \
-    sed s@.*inputs/@./inputs/@ >${TMPDIR}/$NAME.out> ${TMPDIR}/$NAME.out
+    sed s@.*inputs/@./inputs/@ >${TMPDIR}/$NAME.out >${TMPDIR}/$NAME.out
+
+# test scoring each file twice (using linend)
+
+NAME="bulk-double-1"
+for f in $pattern ; do 
+    map_rc $BOGOFILTER -c $CFG $OPT -B $f $f | \
+	sed s@.*inputs/@./inputs/@ >> ${TMPDIR}/$NAME.tmp
+done
+sort -u < ${TMPDIR}/$NAME.tmp > ${TMPDIR}/$NAME.out
+
+# test scoring each file twice (using linend), when files ar without "From " lines
+
+NAME="bulk-double-2"
+for f in $pattern ; do 
+    t="${TMPDIR}/`basename $f`"
+    grep -v "^From "< $f > $t
+    map_rc $BOGOFILTER -c $CFG $OPT -B $t $t | \
+	sed s@.*/@./inputs/@ >> ${TMPDIR}/$NAME.tmp
+done
+sort -u < ${TMPDIR}/$NAME.tmp > ${TMPDIR}/$NAME.out
 
 # test scoring of individual files using msg-count format
 
