@@ -400,9 +400,6 @@ double compute_spamicity(bogostat_t *stats)
 		fprintf(stderr, "#  %f  %f  %s\n", pp->prob, spamicity, pp->key);
 	}
 
-    if (verbose)
-	fprintf(stderr, "#  Spamicity of %f\n", spamicity);
-
     return spamicity;
 }
 
