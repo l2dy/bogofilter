@@ -17,6 +17,7 @@ Note:
 * Documented bogoutil's histogram ('-H') option.
 * Revised documentation of '-d', '-p', and '-w' options
   for bogoutil.
+* Relax filename vs. path restrictions in bogoutil.
 
 0.17.1	2004-02-09
 
