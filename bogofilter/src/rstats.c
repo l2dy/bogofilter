@@ -52,8 +52,8 @@ struct header_s {
     double    spamicity;
 };
 
-static header_t  header;
-static rstats_t *current = NULL;
+static header_t *stats_head = NULL;
+static rstats_t *stats_tail = NULL;
 
 /* Function Prototypes */
 
@@ -64,24 +64,26 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count);
 
 void rstats_init(void)
 {
-    if (current == NULL)
-	current = (rstats_t *) xcalloc( 1, sizeof(rstats_t));
-    header.list = current;
+    if (stats_head == NULL) {
+	stats_head = xcalloc(1, sizeof(header_t));
+	stats_tail = (rstats_t *) xcalloc( 1, sizeof(rstats_t));
+	stats_head->list = stats_tail;
+    }
 }
 
 void rstats_cleanup(void)
 {
     rstats_t *p, *q;
 
-    for (p = header.list; p != NULL; p = q)
+    for (p = stats_head->list; p != NULL; p = q)
     {
       q = p->next;
       xfree(p->token);
       xfree(p);
     }
-    current = NULL;
-    header.count = 0;
-    header.list = NULL;
+    xfree(stats_head);
+    stats_head = NULL;
+    stats_tail = NULL;
 }
 
 void rstats_add(const word_t *token, double prob, wordcnts_t *cnts)
@@ -89,16 +91,16 @@ void rstats_add(const word_t *token, double prob, wordcnts_t *cnts)
     if (token == NULL)
 	return;
 
-    header.count += 1;
-    current->next  = NULL;
-    current->token = word_dup(token);
-    current->prob  = prob;
-    current->good  = cnts->good;
-    current->bad   = cnts->bad;
-    current->msgs_good = max(1, cnts->msgs_good);
-    current->msgs_bad = max(1, cnts->msgs_bad);
-    current->next = (rstats_t *)xcalloc(1, sizeof(rstats_t));
-    current = current->next;
+    stats_head->count += 1;
+    stats_tail->next  = NULL;
+    stats_tail->token = word_dup(token);
+    stats_tail->prob  = prob;
+    stats_tail->good  = cnts->good;
+    stats_tail->bad   = cnts->bad;
+    stats_tail->msgs_good = max(1, cnts->msgs_good);
+    stats_tail->msgs_bad = max(1, cnts->msgs_bad);
+    stats_tail->next = (rstats_t *)xcalloc(1, sizeof(rstats_t));
+    stats_tail = stats_tail->next;
 }
 
 static int compare_rstats_t(const void *const ir1, const void *const ir2)
@@ -116,21 +118,21 @@ static int compare_rstats_t(const void *const ir1, const void *const ir2)
 
 void rstats_fini(size_t robn, FLOAT P, FLOAT Q, double spamicity)
 {
-    header.robn       = robn;
-    header.p          = P;
-    header.q          = Q;
-    header.spamicity  = spamicity;
+    stats_head->robn      = robn;
+    stats_head->p         = P;
+    stats_head->q         = Q;
+    stats_head->spamicity = spamicity;
 }
 
 void rstats_print(bool unsure)
 {
     size_t r;
-    size_t robn  = header.robn;
-    size_t count = header.count;
+    size_t robn  = stats_head->robn;
+    size_t count = stats_head->count;
     rstats_t *cur;
     rstats_t **rstats_array = (rstats_t **) xcalloc(count, sizeof(rstats_t *));
 
-    for (r=0, cur=header.list; r<count; r+=1, cur=cur->next)
+    for (r=0, cur=stats_head->list; r<count; r+=1, cur=cur->next)
 	rstats_array[r] = cur;
 
     /* sort by ascending probability, then name */
