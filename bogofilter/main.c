@@ -66,15 +66,19 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     process_config_files();
 
+    /* directories from command line and config file are already handled */
     if (directory == NULL)
+    {
 	directory = create_path_from_env("BOGOFILTER_DIR", NULL);
-    if (directory == NULL)
-	directory = create_path_from_env("BOGODIR", NULL);
-    if (directory == NULL)
-	directory = create_path_from_env("HOME", BOGODIR);
+	if (directory == NULL)
+	    directory = create_path_from_env("BOGODIR", NULL);
+	if (directory == NULL)
+	    directory = create_path_from_env("HOME", BOGODIR);
 
-    if (setup_lists(directory) != 0)
-	exit(2);
+	if (directory != NULL)
+	    if (setup_lists(directory) != 0)
+		exit(2);
+    }
 
     if (*outfname && passthrough) {
 	if ((out = fopen(outfname,"wt"))==NULL)

@@ -12,6 +12,7 @@ typedef enum {
 	CP_DOUBLE,
 	CP_CHAR,
 	CP_STRING,
+	CP_DIRECTORY,
 	CP_FUNCTION
 } parm_t;
 
@@ -28,7 +29,7 @@ typedef struct {
 	int	*i;
 	double	*d;
 	char	*c;
-	const char **s;
+	char   **s;
     } addr;
 } parm_desc;
 

@@ -134,7 +134,7 @@ static const parm_desc sys_parms[] =
     { "user_config_file", CP_STRING,	{ &user_config_file } },
 
     { "algorithm",  	  CP_FUNCTION,	{ (void *) &config_algorithm } },
-    { "bogofilter_dir",	  CP_STRING,	{ &directory } },
+    { "bogofilter_dir",	  CP_DIRECTORY,	{ &directory } },
     { "wordlist",	  CP_FUNCTION,	{ (void *) &configure_wordlist } },
 
     { "min_dev",	  CP_DOUBLE,	{ (void *) &min_dev } },
@@ -262,6 +262,18 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 		*arg->addr.s = xstrdup((const char *)val);
 		if (DEBUG_CONFIG(0))
 		    fprintf( stderr, "%s -> '%s'\n", arg->name, *arg->addr.s );
+		break;
+	    }
+	case CP_DIRECTORY:
+	    {
+		char *dir = *arg->addr.s;
+		if (dir)
+		    xfree(dir);
+		*arg->addr.s = dir = xstrdup(val);
+		if (DEBUG_CONFIG(0))
+		    fprintf( stderr, "%s -> '%s'\n", arg->name, dir );
+		if (setup_lists(dir) != 0)
+		    exit(2);
 		break;
 	    }
 	case CP_FUNCTION:
@@ -501,7 +513,11 @@ int process_args(int argc, char **argv)
 	switch(option)
 	{
 	case 'd':
+	    if (directory)
+		xfree(directory);
 	    directory = xstrdup(optarg);
+	    if (setup_lists(directory) != 0)
+		exit(2);
 	    break;
 
 	case 'e':
