@@ -64,9 +64,11 @@ void *dbe_init(bfdir *d, bffile *f) {
 }
 #endif
 
+#ifndef ENABLE_SQLITE_DATASTORE
 int db_txn_begin(void *vhandle) { (void)vhandle; return 0; }
 int db_txn_abort(void *vhandle) { (void)vhandle; return 0; }
 int db_txn_commit(void *vhandle) { (void)vhandle; return 0; }
+#endif
 
 ex_t dbe_recover(bfdir *directory, bool catastrophic, bool force)
 {

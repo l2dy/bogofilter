@@ -1,7 +1,7 @@
 /**
  * \file datastore_sqlite.c SQLite 3 database driver back-end
  * \author Matthias Andree <matthias.andree@gmx.de>
- * \date 2004
+ * \date 2004, 2005
  *
  * This file handles a static table named "bogofilter" in a SQLite3
  * database. The table has two "BLOB"-typed columns, key and value.
@@ -33,21 +33,8 @@ typedef struct dbhsqlite_t dbh_t;
 
 static const char *ENDIAN32 = ".ENDIAN32";
 
-/* dummy functions */
-#define DUMMYVVP(name)  void name(void *dummy) { (void)dummy; }
-#define DUMMYVPVP(name) void *name(void *dummy) { (void)dummy; return NULL; }
-#define DUMMYICP(name)  ex_t name(bfdir *dummy) { (void)dummy; return EX_OK; }
-DUMMYVVP(dbe_cleanup)
-DUMMYVVP(db_flush)
-DUMMYVPVP(db_get_env)
-DUMMYICP(dbe_purgelogs)
-DUMMYICP(dbe_remove)
-DUMMYICP(dbe_checkpoint)
-void *dbe_init(bfdir *d, bffile *f) { (void)d; (void)f; return (void *)~0; }
+void db_flush(void *unused) { (void)unused; }
 ex_t db_verify(bfdir *d, bffile *f) { (void)d; (void)f; return EX_OK; }
-
-/** dummy function, Sqlite recovers automatically. */
-ex_t dbe_recover(bfdir *d, bool b1, bool b2) { (void)d; b1=b2; return EX_ERROR; }
 
 /** The layout of the bogofilter table, formatted as SQL statement. */
 #define LAYOUT \

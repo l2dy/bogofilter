@@ -162,7 +162,8 @@ bogoQDBMupgrade_SOURCES = bogoQDBMupgrade.c datastore_qdbm_cmpkey.c
 bogoQDBMupgrade_LDADD = $(LDADD) $(LIBDB)
 else
 if ENABLE_SQLITE_DATASTORE
-datastore_SOURCE = datastore_sqlite.c datastore_opthelp_dummies.c
+datastore_SOURCE = datastore_sqlite.c datastore_opthelp_dummies.c \
+		   datastore_txn_dummies.c
 else
 if ENABLE_TRANSACTIONS
 datastore_SOURCE = datastore_db.c datastore_db_trans.c \
