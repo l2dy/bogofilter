@@ -2,8 +2,21 @@
 				BOGOFILTER NEWS
 			       =================
  
+0.14.202 2003-08-02
+ 
+* Replaced use of memcpy() by memmove() in an input routine. The
+  overlapping copy migh cause data corruption on some systems.
+* Fixed "make check" failures for bogoutil introduced with the
+  "combined wordlist" feature in 0.14.0. There has been a buffer
+  overflow. All users of bogofilter with combined wordlist prior to
+  0.14.2 are advised to upgrade.
+* Fixed bogus "t.valgrind" test FAILures.
+* Fixed uninitialized data in db_get_dbvalue(), for split word lists.
+* New file, contrib/vm-bogofilter.el, provides an interface
+  between the VM mail reader and bogofilter."
+ 
 0.14.1.1 2003-08-01
-
+ 
 * Fixed check for adding spam_subject_tag to Subject: line.
 * Correct problem with t.degen regression test.
 * Updated French version of FAQ.
@@ -15,7 +28,7 @@
 * Initial release of token degeneration code.
 * Revised lexer pattern to better recognize encoded tokens.
 * Updated English version of FAQ.
-
+ 
 0.14.0.1 2003-07-23
  
 * Fix problem with encoded text.
@@ -44,4 +57,3 @@
  
 * Bogofilter's -V output now includes algorithm and database info.
 * Miscellaneous documentation updates.
-
