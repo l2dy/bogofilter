@@ -467,7 +467,7 @@ static int mailbox_getline(buff_t *buff)
 	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
     }
 
-    emptyline = is_eol(buf, count);
+    emptyline = is_eol((char *)buf, count);
 
     return count;
 }
@@ -520,7 +520,7 @@ static int rmail_getline(buff_t *buff)
 	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
     }
 
-    emptyline = is_eol(buf, count);
+    emptyline = is_eol((char *)buf, count);
 
     return count;
 }
@@ -565,7 +565,7 @@ static int ant_getline(buff_t *buff)
 	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
     }
 
-    emptyline = is_eol(buf, count);
+    emptyline = is_eol((char *)buf, count);
 
     return count;
 }
