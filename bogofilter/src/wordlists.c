@@ -211,7 +211,7 @@ void open_wordlists(dbmode_t mode)
 		switch(err) {
 		    /* F_SETLK can't obtain lock */
 		    case EAGAIN:
-		    case EACCES:
+		    /* case EACCES: */
 			rand_sleep(MIN_SLEEP, MAX_SLEEP);
 			retry = 1;
 			break;

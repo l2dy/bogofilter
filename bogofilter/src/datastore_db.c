@@ -216,8 +216,8 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 
 	    /* open data base */
 
-	    if ((ret = DB_OPEN(dbp, handle->name[i], NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0 &&
-		(ret = DB_OPEN(dbp, handle->name[i], NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0) {
+	    if ((ret = DB_OPEN(dbp, handle->name[i], NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0 && (ret != ENOENT ||
+		(ret = DB_OPEN(dbp, handle->name[i], NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0)) {
 		if (DEBUG_DATABASE(1))
 		    print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s",
 				handle->name[i], ret, db_strerror(ret));
@@ -262,6 +262,8 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 		/* do not bother to retry if the problem wasn't EAGAIN */
 		if (e != EAGAIN && e != EACCES) return NULL;
 		/* do not goto open_err here, db_close frees the handle! */
+		if (errno == EACCES)
+		    errno = EAGAIN;
 	    } else {
 		idx = COUNTOF(retryflags);
 	    }
