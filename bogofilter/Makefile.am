@@ -46,4 +46,5 @@ rsync:	distdir .rsyncs
 
 dist-hook:
 	cd $(distdir) && find doc gnugetopt gsl -name CVS -type d -prune -exec rm -r '{}' ';'
+	cd $(distdir) && find doc gnugetopt gsl -name '.#*' -type f -exec rm '{}' ';'
 	rm -f $(distdir)/doc/.cvsignore
