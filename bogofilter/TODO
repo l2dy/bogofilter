@@ -2,7 +2,8 @@
 
 			bogofilter TODO list
 
-1) New Feature: Token aging
+1) New Feature: Token aging. Support for struct data in the wordlists is
+already present.
 
 2) Unknown Category: Two deletes for kmail? (please explain?)
 
@@ -40,21 +41,14 @@ in both wordlists as neutral by excluding them from the probability
 calculation when their significance to the total probability falls below a
 certain limit.
 
-8) Documentation: Establish a bogofilter FAQ. Put information in about how
-to use SpamAssasin to train bogofilter.
-
-9) New Feature: Shared wordlist support with good shared/exclusive file
-locking. (In progress, Adrian Otto)
-
-10) New Feature: Identify a messages that probably contain viruses. Mark them
-in -p mode with an additional header. This feature to be enabled or disabled
-using a run-time CLI option.
-
-11) New Feature: Web based tool for wordlist management. Allow message
+8) New Feature: Web based tool for wordlist management. Allow message
 registration and whitelist management. HTML Templatized for easy integration
 with existing web mail systems.
 
-12) Performance Enhancement: Investigate if mmap/msync might help
+9) Performance Enhancement: Investigate if mmap/msync might help
 performance. Don't the db3 libraries probably already implement these?
 
-13) New Feature: Add support for a user configurable list of headers that should be used to ignore (single or multi-line) headers that appear in the list. The list should be used to ignore headers both during the message registration and evaluation procedures.
+10) New Feature: Add support for a user configurable list of headers that 
+should be used to ignore (single or multi-line) headers that appear in the 
+list. The list should be used to ignore headers both during the message 
+registration and evaluation procedures.
