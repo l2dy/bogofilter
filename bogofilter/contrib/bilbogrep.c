@@ -25,7 +25,7 @@ static const unsigned char *search(const unsigned char *text,
 {
 	long i, j, k, m, skip[ALPHABET];
 
-	m = strlen(pat);
+	m = strlen((const char *)pat);
 	if (m == 0)
 		return (text);
 	for (k = 0; k < ALPHABET; k++)
@@ -52,8 +52,8 @@ static void usage(int rc, const char *tag) {
 
 int main(int argc, char **argv) {
     int fd;
-    char *base;
-    const char *i;
+    unsigned char *base;
+    const unsigned char *i;
     struct stat st;
     int argindex; /* file name in argv[] vector */
     int rc = 0;
@@ -66,15 +66,15 @@ int main(int argc, char **argv) {
 	    rc = 1;
 	    continue;
 	}
-	
+
 	if (fstat(fd, &st)) {
 	    perror(argv[argindex]);
 	    close(fd);
 	    rc = 1;
 	    continue;
 	}
-	
-	if (MAP_FAILED == (base = mmap(NULL, st.st_size,
+
+	if (MAP_FAILED == (base = (unsigned char *)mmap(NULL, st.st_size,
 			PROT_READ, MAP_SHARED, fd, 0))) {
 	    perror("mmap");
 	    close(fd);
@@ -82,30 +82,32 @@ int main(int argc, char **argv) {
 	    continue;
 	}
 
-	    i = base;
-	    while(NULL != (i = search(i, argv[1], base - i + st.st_size))) {
-		if (i == base || *(i-1) == '\n') {
-		    int l = strcspn(i, "\n");
+	i = base;
+	while(NULL != (i = search((const unsigned char *)i,
+			(unsigned char *)argv[1],
+			base - i + st.st_size))) {
+	    if (i == base || *(i-1) == '\n') {
+		int l = strcspn((const char *)i, "\n");
 
-		    if (l > base - i + st.st_size) l = base - i + st.st_size;
-		    printf("%d:", i - base);
-		    fwrite(i, 1, strcspn(i, "\n"), stdout);
-		    if (EOF == puts("")) {
-			perror("stdout");
-			exit(2);
-		    }
+		if (l > base - i + st.st_size) l = base - i + st.st_size;
+		printf("%d:", i - base);
+		fwrite(i, 1, strcspn((const char *)i, "\n"), stdout);
+		if (EOF == puts("")) {
+		    perror("stdout");
+		    exit(2);
 		}
-		i += strlen(argv[1]);
 	    }
+	    i += strlen(argv[1]);
+	}
 
-	    if (munmap(base, st.st_size)) {
-		perror("munmap");
-		rc = 1;
-	    }
-	    if (close(fd)) {
-		perror("close");
-		rc = 1;
-	    }
+	if (munmap((char *)base, st.st_size)) {
+	    perror("munmap");
+	    rc = 1;
+	}
+	if (close(fd)) {
+	    perror("close");
+	    rc = 1;
+	}
     }
     if (fflush(stdout)) {
 	perror("stdout");
