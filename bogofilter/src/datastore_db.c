@@ -34,12 +34,6 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-#define MSG_COUNT_TOK ((const byte *)".MSG_COUNT")
-word_t  *msg_count_tok;
-
-#undef UINT32_MAX
-#define UINT32_MAX 4294967295lu /* 2 ^ 32 - 1 */
-
 typedef struct {
     char *filename;
     size_t count;    
@@ -69,10 +63,6 @@ int db_cachesize = 0;	/* in MB */
 
 /* Function prototypes */
 
-static int db_get_dbvalue(void *vhandle, const word_t *word, dbv_t *val);
-static void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val);
-static int db_lock(int fd, int cmd, short int type);
-
 /* Function definitions */
 
 static void db_enforce_locking(dbh_t *handle, const char *func_name)
@@ -82,6 +72,7 @@ static void db_enforce_locking(dbh_t *handle, const char *func_name)
 	exit(2);
     }
 }
+
 
 static dbh_t *dbh_init(const char *path, size_t count, const char **names)
 {
@@ -106,6 +97,7 @@ static dbh_t *dbh_init(const char *path, size_t count, const char **names)
     return handle;
 }
 
+
 static void dbh_free(/*@only@*/ dbh_t *handle)
 {
     if (handle != NULL) {
@@ -118,13 +110,17 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
     return;
 }
 
-static void dbh_print_names(dbh_t *handle, const char *msg)
+
+void dbh_print_names(void *vhandle, const char *msg)
 {
+    dbh_t *handle = vhandle;
+
     if (handle->count == 1)
 	fprintf(dbgout, "%s (%s)", msg, handle->name[0]);
     else
 	fprintf(dbgout, "%s (%s,%s)", msg, handle->name[0], handle->name[1]);
 }
+
 
 /*
   Initialize database.
@@ -260,45 +256,6 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
     return NULL;
 }
 
-/* Cleanup storage allocation */
-void db_cleanup()
-{
-    xfree(msg_count_tok);
-    msg_count_tok = NULL;
-}
-
-/*
-    Retrieve numeric value associated with word.
-    Returns: value if the the word is found in database,
-    0 if the word is not found.
-    Notes: Will call exit if an error occurs.
-*/
-bool db_getvalues(void *vhandle, const word_t *word, dbv_t *val)
-{
-    int ret;
-    dbh_t *handle = vhandle;
-
-    ret = db_get_dbvalue(vhandle, word, val);
-
-    if (ret == 0) {
-	if (DEBUG_DATABASE(3)) {
-	    fprintf(dbgout, "[%lu] db_getvalues (%s): [",
-		    (unsigned long) handle->pid, handle->name[0]);
-	    word_puts(word, 0, dbgout);
-	    fprintf(dbgout, "] has values %lu,%lu\n",
-		    (unsigned long)val->spamcount,
-		    (unsigned long)val->goodcount);
-	}
-	if ((int32_t)val->spamcount < (int32_t)0)
-	    val->spamcount = 0;
-	if ((int32_t)val->goodcount < (int32_t)0)
-	    val->goodcount = 0;
-	return true;
-    } else {
-	memset(val, 0, sizeof(*val));
-	return false;
-    }
-}
 
 void db_delete(void *vhandle, const word_t *word)
 {
@@ -325,7 +282,8 @@ void db_delete(void *vhandle, const word_t *word)
     return;
 }
 
-static int db_get_dbvalue(void *vhandle, const word_t *word, /*@out@*/ dbv_t *val)
+
+int db_get_dbvalue(void *vhandle, const word_t *word, /*@out@*/ dbv_t *val)
 {
     int ret;
     bool found = false;
@@ -395,45 +353,20 @@ static int db_get_dbvalue(void *vhandle, const word_t *word, /*@out@*/ dbv_t *va
 	    exit(2);
 	}
     }
+    if (!found &&DEBUG_DATABASE(3)) {
+	fprintf(dbgout, "db_getvalues (%s): [",
+		handle->name[0]);
+	word_puts(word, 0, dbgout);
+	fprintf(dbgout, "] has values %lu,%lu\n",
+		(unsigned long)val->spamcount,
+		(unsigned long)val->goodcount);
+    }
+
     return found ? 0 : DB_NOTFOUND;
 }
 
 
-/*
-Store VALUE in database, using WORD as database key
-Notes: Calls exit if an error occurs.
-*/
-void db_setvalues(void *vhandle, const word_t *word, dbv_t *val)
-{
-    val->date = today;		/* date in form YYYYMMDD */
-    db_set_dbvalue(vhandle, word, val);
-}
-
-
-/*
-Update the VALUE in database, using WORD as database key.
-Adds COUNT to existing count.
-Sets date to newer of TODAY and date in database.
-*/
-void db_updvalues(void *vhandle, const word_t *word, const dbv_t *updval)
-{
-    dbv_t val;
-    int ret = db_get_dbvalue(vhandle, word, &val);
-    if (ret != 0) {
-	val.spamcount = updval->spamcount;
-	val.goodcount = updval->goodcount;
-	val.date      = updval->date;			/* date in form YYYYMMDD */
-    }
-    else {
-	val.spamcount += updval->spamcount;
-	val.goodcount += updval->goodcount;
-	val.date       = max(val.date, updval->date);	/* date in form YYYYMMDD */
-    }
-    db_set_dbvalue(vhandle, word, &val);
-}
-
-
-static void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val)
+void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val)
 {
     int ret;
     DBT db_key;
@@ -498,76 +431,6 @@ static void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val)
 }
 
 
-/*
-  Increment count associated with WORD, by VALUE.
- */
-void db_increment(void *vhandle, const word_t *word, dbv_t *val)
-{
-    dbv_t cur;
-
-    db_getvalues(vhandle, word, &cur);
-
-    cur.spamcount = UINT32_MAX - cur.spamcount < val->spamcount ? UINT32_MAX : cur.spamcount + val->spamcount;
-    cur.goodcount = UINT32_MAX - cur.goodcount < val->goodcount ? UINT32_MAX : cur.goodcount + val->goodcount;
-
-    db_setvalues(vhandle, word, &cur);
-
-    return;
-}
-
-/*
-  Decrement count associated with WORD by VALUE,
-  if WORD exists in the database.
-*/
-void db_decrement(void *vhandle, const word_t *word, dbv_t *val)
-{
-    dbv_t cur;
-
-    db_getvalues(vhandle, word, &cur);
-
-    cur.spamcount = cur.spamcount < val->spamcount ? 0 : cur.spamcount - val->spamcount;
-    cur.goodcount = cur.goodcount < val->goodcount ? 0 : cur.goodcount - val->goodcount;
-    db_setvalues(vhandle, word, &cur);
-
-    return;
-}
-
-/*
-  Get the number of messages associated with database.
-*/
-void db_get_msgcounts(void *vhandle, dbv_t *val)
-{
-    if (msg_count_tok == NULL)
-	msg_count_tok = word_new(MSG_COUNT_TOK, strlen((const char *)MSG_COUNT_TOK));
-
-    db_getvalues(vhandle, msg_count_tok, val);
-
-    if (DEBUG_DATABASE(2)) {
-	dbh_print_names(vhandle, "db_get_msgcounts");
-	fprintf(dbgout, " ->  %lu,%lu\n",
-		(unsigned long)val->spamcount,
-		(unsigned long)val->goodcount);
-    }
-
-    return;
-}
-
-/*
- Set the number of messages associated with database.
-*/
-void db_set_msgcounts(void *vhandle, dbv_t *val)
-{
-    db_setvalues(vhandle, msg_count_tok, val);
-
-    if (DEBUG_DATABASE(2)) {
-	dbh_print_names(vhandle, "db_get_msgcounts");
-	fprintf(dbgout, " ->  %lu,%lu\n",
-		(unsigned long)val->spamcount,
-		(unsigned long)val->goodcount);
-    }
-}
-
-
 /* Close files and clean up. */
 void db_close(void *vhandle, bool nosync)
 {
@@ -600,6 +463,7 @@ void db_close(void *vhandle, bool nosync)
     dbh_free(handle);
 }
 
+
 /*
  flush any data in memory to disk
 */
@@ -615,22 +479,11 @@ void db_flush(void *vhandle)
     }
 }
 
-/* implements locking. */
-static int db_lock(int fd, int cmd, short int type)
-{
-    struct flock lock;
-
-    lock.l_type = type;
-    lock.l_start = 0;
-    lock.l_whence = (short int)SEEK_SET;
-    lock.l_len = 0;
-    return (fcntl(fd, cmd, &lock));
-}
 
 int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 {
     dbh_t *handle = vhandle;
-    int ret;
+    int ret = 0;
     DBC dbc;
     DBC *dbcp = &dbc;
     DBT key, data;
@@ -684,3 +537,4 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     }
     return ret;
 }
+

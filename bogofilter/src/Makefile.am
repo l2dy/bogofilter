@@ -51,7 +51,7 @@ libbogofilter_a_SOURCES= \
 	charset.h charset.c \
 	collect.h collect.c \
 	configfile.h configfile.c \
-	datastore.h datastore_db.c \
+	datastore.h datastore.c db_handle_props.h \
 	debug.h debug.c \
 	error.h error.c \
 	fgetsl.h fgetsl.c \
@@ -80,6 +80,12 @@ libbogofilter_a_SOURCES= \
 	$(MEMDEBUG_SRC) \
 	dcdflib/src/dcdflib.c dcdflib/src/ipmpar.c \
 	xatox.h xatof.c xatoi.c
+
+if !ENABLE_TDB_DATASTORE
+libbogofilter_a_SOURCES += datastore_db.c
+else
+libbogofilter_a_SOURCES += datastore_tdb.c
+endif
 
 CLEANFILES=version.c directories.c
 

@@ -16,9 +16,13 @@
 #define DATASTORE_H
 
 #include "system.h"
-
 #include "word.h"
 #include "wordlists.h"
+
+#define MSG_COUNT_TOK ((const byte *)".MSG_COUNT")
+
+#undef UINT32_MAX
+#define UINT32_MAX 4294967295lu /* 2 ^ 32 - 1 */
 
 typedef struct {
     uint32_t count[2];		/* spam and ham counts */
@@ -56,15 +60,23 @@ void db_increment(void *, const word_t *, dbv_t *);
 void db_decrement(void *, const word_t *, dbv_t *);
 
 /** Retrieve the value associated with a given word in a list. 
- * \return zero if the word does not exist in the database. 
+ * \return zero if the word does not exist in the database. Front-end
  */
 bool db_getvalues(void *, const word_t *, dbv_t *);
+
+/** Retrieve the value associated with a given word in a list. 
+ * \return zero if the word does not exist in the database. Implementation
+ */
+int db_get_dbvalue(void *vhandle, const word_t *word, dbv_t *val);
 
 /** Delete the key */
 void db_delete(void *, const word_t *);
 
-/** Set the value associated with a given word in a list */
+/** Set the value associated with a given word in a list. Front end */
 void db_setvalues(void *, const word_t *, dbv_t *);
+
+/** Set the value associated with a given word in a list. Implementation */
+void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val);
 
 /** Update the value associated with a given word in a list */
 void db_updvalues(void *vhandle, const word_t *word, const dbv_t *updval);
@@ -80,5 +92,28 @@ typedef int (*db_foreach_t)(word_t *w_key, word_t *w_value, void *userdata);
  * \p userdata is passed through to the hook function unaltered.
  */
 int db_foreach(void *, db_foreach_t hook, void *userdata);
+
+/* Get the current process id */
+unsigned long db_handle_pid(void *);
+
+/* Get the database name */
+char *db_handle_name(void *);
+
+/* Get the database filename */
+char *db_handle_filename(void *);
+
+/* Locks and unlocks file descriptor */
+int db_lock(int fd, int cmd, short int type);
+
+/* Prints wordlist name(s) */
+void dbh_print_names(void *vhandle, const char *msg);
+
+/* This is not currently used ...
+ * 
+#define db_write_lock(fd) db_lock(fd, F_SETLKW, F_WRLCK)
+#define db_read_lock(fd) db_lock(fd, F_SETLKW, F_RDLCK)
+#define db_unlock(fd) db_lock(fd, F_SETLK, F_UNLCK)
+
+*/
 
 #endif
