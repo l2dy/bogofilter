@@ -4,8 +4,8 @@
 
 0.7.5
 	* The header in bogofilter -p mode now defaults to X-Bogosity:,
-	  but can be overridden at compile time with
-	  --enable-spam-header-name
+	  but can be changed by using --enable-spam-header-name during
+	  configuration.
 	* The option names -h/-H are back to -n/-N as of 0.6, and -h now
 	  means "help".
 
