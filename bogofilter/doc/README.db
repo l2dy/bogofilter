@@ -118,9 +118,20 @@ db_archive utility for additional documentation of a "hot" backup),
 bogofilter cannot, of course, guess data that got lost through a hard
 drive fault.
 
+When copying or archiving directory contents, be sure to archive the
+*.db files before the log.* files. (The *.db files MUST NOT be newer
+than the newest log file, else the backup will not be recoverable!)
+
+The bf_tar script is provided for your convenience. It requires the pax
+utility and writes a tar archive to stdout, and it can optionally remove
+inactive log files after writing the tarball.
+
+Run bf_tar without arguments to see its synopsis.
+
 Although backup strategies are beyond the scope of this document, be
 sure to store fresh backups of important data outside of your house
-regularly.
+regularly. See the chapter "Database and log file archival" in the
+Berkeley DB documentation for details.
 
 2.6 Updating Berkeley DB version underneath bogofilter
 
@@ -136,7 +147,7 @@ versions 0.17.2 and older) and are about to update to any newer 3.X or
   and bogofilter, then load the wordlists again;
 or
 - use the db_upgrade utility to upgrade the databases in place
-  (this is dangerous and must not be interrupted)
+  (this is dangerous and must not be interrupted, backup first!)
 
 You need a "log file upgrade" if at least one of these conditions is
 true:
@@ -145,10 +156,16 @@ true:
 - you upgraded Berkeley DB from 4.0 or 4.1 to 4.2 or 4.3
 - you upgraded Berkeley DB from 4.2 to 4.3.
 
-If you need a log file upgrade, shut down your mail system, run
-bogoutil --remove-environment ~/.bogofilter,
-then install the new Berkeley DB and bogofilter and restart your mail
-system.
+If you need a log file upgrade, the upgrade procedure is
+(NOTE: DO NOT UPGRADE BERKELEY DB OR BOGOFILTER UNTIL STEP 4!)
+
+1. shut down your mail system,
+2. run bogoutil --remove-environment ~/.bogofilter (for each user)
+   (this implies running forced recovery first)
+3. archive the database for catastrophic recovery (take a backup)
+4. install the new Berkeley DB version, recompile bogofilter (unless
+   using a binary package), install the new bogofilter
+5. restart your mail system.
 
 3. Use and troubleshooting ---------------------------------------------
 
@@ -249,6 +266,9 @@ WARNING: If you need to copy data base files,
 	 DO NOT USE cp, BUT DO USE dd instead and give it a block size
 	 that matches the data base's block size, which can be found by
 	 running db_stat with -d option as shown above.
+
+	 A bf_copy script is provided for your convenience, it can
+	 optionally omit the inactive log files from the copy.
 
 4.2 SPECIFIC INFORMATION ON RESIZING THE LOCK TABLES
 
