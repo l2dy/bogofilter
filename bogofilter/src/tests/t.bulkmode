@@ -40,7 +40,7 @@ $BOGOFILTER -$mth $CFG -n < ${SYSTEST}/inputs/good.mbx
 #    o=`echo $f | sed s@.${DB_EXT}@.txt@`
 #    $BOGOUTIL -d $f > $o
 #done
-[ $verbose -gt 0 ] && $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT
+# [ $verbose -gt 0 ] && $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT
 
 #V="-vvv"	# verbosity level
 OPT="-t -v -D $V"

@@ -66,7 +66,7 @@ for mth in g r f t ; do
     mkdir -p $BOGOFILTER_DIR
     $BOGOFILTER -$alg $CFG -s < ${SYSTEST}/inputs/spam.mbx
     $BOGOFILTER -$alg $CFG -n < ${SYSTEST}/inputs/good.mbx
-    if [ $verbose -gt 0 ] ; then $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT ; fi
+#   if [ $verbose -gt 0 ] ; then $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT ; fi
 
     for msg in ${SYSTEST}/inputs/msg.3.txt ; do
 	tst=`echo $msg | sed s@${SYSTEST}/inputs/msg.@@ | sed s@.txt@@`

@@ -84,7 +84,7 @@ for mth in g r f t ; do
 	n=`basename $f .${DB_EXT}`
 	$BOGOUTIL -d $BOGOFILTER_DIR/$n.${DB_EXT} > $BOGOFILTER_DIR/$n.txt
     done
-    [ $verbose -gt 0 ] && $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT
+#   [ $verbose -gt 0 ] && $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT
     #
     # run tests for msg.[1-8].txt
     #
