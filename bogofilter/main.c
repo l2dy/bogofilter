@@ -19,6 +19,7 @@ AUTHOR:
 #include <sys/stat.h>
 #include <unistd.h>
 #include <errno.h>
+
 #include <config.h>
 
 #ifdef HAVE_SYSLOG_H
@@ -154,12 +155,19 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
 		if (passthrough || verbose)
 		{
-		    /* print spam-status at the end of the header
-		     * then mark the beginning of the message body */
-		    (void)printf("%s: %s, tests=bogofilter, spamicity=%0.6f, version=%s\n", 
-			    spam_header_name, 
-			    (status==RC_SPAM) ? "Yes" : "No", 
-			    spamicity, VERSION);
+		    if ( terse )
+		    {
+			(void)printf("%c %f\n", (status==RC_SPAM) ? 'Y' : 'N', spamicity);
+		    }
+		    else
+		    {
+			/* print spam-status at the end of the header
+			 * then mark the beginning of the message body */
+			(void)printf("%s: %s, tests=bogofilter, spamicity=%0.6f, version=%s\n", 
+				     spam_header_name, 
+				     (status==RC_SPAM) ? "Yes" : "No", 
+				     spamicity, VERSION);
+		    }
 		}
 
 		if (verbose || passthrough || Rtable)
