@@ -157,6 +157,8 @@ static size_t format_float(char *dest, double src,
     int p;
 
     s = ! (flags & F_DELTA) ? src : 1.0 - src;
+    if (flags & F_DELTA && s > 0.001)
+	s = src;
     if (flags & F_PREC)
 	p = prec;
     else

@@ -93,6 +93,8 @@ tag_header_lines=no
 #
 #	    e - spamicity as 'e' format
 #	    f - spamicity as 'f' format
+#	    d - if spamicity < 0.001, difference from 0.1 (as 'f' format)
+#		if spamicity > 0.999, difference from 1.0 (as 'f' format)
 #
 #	    l - logging tag (from '-l' option)
 #
@@ -130,6 +132,15 @@ tag_header_lines=no
 terse=no
 
 ########### Tokenizer Settings ######################################
+
+##### HTML_MODE
+#
+#	if enabled, html gets special treatment and 
+#	tokens between "<" and ">" are discarded.
+#	if disabled, html is treated like plain text.
+
+html_mode=yes
+
 
 ##### STRICT_CHECK
 #
