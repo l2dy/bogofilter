@@ -15,6 +15,7 @@ set -e
 #			      outputs - known correct outputs
 #			      tests   - outputs of the individual tests
 
+verbose=0
 if [ "$1" = "-v" ]; then
     verbose=1
 fi
@@ -38,6 +39,18 @@ BOGOUTIL="../bogoutil"
 BOGOFILTER="../bogofilter"
 SYSTEST="${srcdir}/t.systest.d"
 
+map_rc()
+{
+    (
+	set +e
+	eval "$@"
+	a=$?
+	[ $a -eq 0 ] && exit 0
+	[ $a -eq 1 ] && exit 0
+	exit $a
+    )
+}
+
 run_test()
 {
     id="$1"
@@ -45,7 +58,7 @@ run_test()
     ver="$3"
     OUT="${TMPDIR}/tests/msg.$out.$alg.$ver"
     OPTS="-$alg -t -$ver -c ${TMPDIR}/cfg.$alg"
-    $BOGOFILTER $OPTS < ${SYSTEST}/inputs/msg.$id.txt > ${TMPDIR}/tests-$alg || true
+    map_rc $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt >${TMPDIR}/tests-$alg 
     sed s/,.version=.*// < ${TMPDIR}/tests-$alg > $OUT
 }
 
@@ -82,7 +95,7 @@ for out in ${TMPDIR}/tests/msg.?.r.v ; do
     printf "%2s   %c %s   %c %s   %c %s\n" $id $g $r $f >> ${TMPDIR}/tests/$OUT
 done
 
-if  [ "$verbose" = "1" ]; then
+if  [ $verbose -eq 1 ]; then
     diff -u -s ${SYSTEST}/outputs/$OUT ${TMPDIR}/tests/$OUT
 fi
 
