@@ -4,7 +4,10 @@
 
 $Id$
 
-0.15.13
+0.15.13	2003-12-26
+
+	* Fix problem with separate wordlists that causes
+          "db_get_dbvalue( '...' ), err: 12, out of memory".
 
 	2003-12-25
 

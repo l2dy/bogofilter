@@ -8,7 +8,10 @@ is in the RELEASE.NOTES files.  Read it!!
 If updating from a bogofilter version older than 0.15.4, it's a good
 idea to retrain or else use the '-H' (header tag degeneration) option.
 
-0.15.13
+0.15.13	2003-12-26
+
+	* Fix problem with separate wordlists that causes
+          "db_get_dbvalue( '...' ), err: 12, out of memory".
 
 	2003-12-25
 

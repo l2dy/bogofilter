@@ -5,12 +5,14 @@
 Be sure to read RELEASE.NOTES-0.15, with attention to the section
 about retraining and the '-H' flag...
 
-0.15.13
+0.15.13 2003-12-26
 
 * Fixed memory leak affecting bogotune.
 * Added -V (version) option to bogotune.
 * RPM build fixed.  (with help from Charles A Edwards)
 * Compiler options changed to reduce warnings during gsl builds.
+* Fix problem with separate wordlists that causes 
+  "db_get_dbvalue('...' ), err: 12, out of memory".
 
 0.15.12	2003-12-24
 
