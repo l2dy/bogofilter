@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include "config.h"
 #include "lexer.h"
 
 // Our lexical analysis is different from Paul Graham's rules: 
@@ -55,9 +56,13 @@ int yyinput(char *buf, int max_size)
 {
     char *returned;
 
+    static int hdrlen = 0;
+    if (hdrlen==0)
+	hdrlen=strlen(SPAM_HEADER_NAME);
+
     returned = fgets(buf, max_size, yyin);
 
-    while (returned != NULL && memcmp(buf,"X-Spam-",6) == 0)
+    while (returned != NULL && memcmp(buf,SPAM_HEADER_NAME,hdrlen) == 0)
     {
 	do {
 	    returned = fgets(buf, max_size, yyin);
