@@ -28,16 +28,15 @@ long msgs_bad  = 0L;
 
 /* Function Definitions */
 
-yylex_t	msg_count_lex;
-char	msg_count_text[MSG_COUNT_MAX_LEN];
+char	msg_count_chars[MSG_COUNT_MAX_LEN];
 size_t	msg_count_leng = MSG_COUNT_MAX_LEN;
-char	*msg_count_text_ptr = msg_count_text;
+char   *msg_count_text = msg_count_chars;
 
 const char *msg_count_header = "\".MSG_COUNT\"";
 
 token_t  msg_count_lex(void)
 {
-    char *tmp = fgets(msg_count_text, sizeof(msg_count_text), fpin);
+    char *tmp = fgets(msg_count_chars, sizeof(msg_count_chars), fpin);
     if (tmp == NULL) {
 	msg_count_leng = 0;
 	return NONE;
