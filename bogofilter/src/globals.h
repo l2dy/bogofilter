@@ -24,8 +24,8 @@ extern	bool	mbox_mode;		/* '-M' */
 extern	char	outfname[PATH_LEN];	/* '-O' */
 extern	bool	passthrough;		/* '-p' */
 extern	bool	quiet;			/* '-q' */
-extern	bool	query;			/* '-Q' */
-extern	int	Rtable;			/* '-R' */
+extern	int	query;			/* '-Q' */
+extern	bool	Rtable;			/* '-R' */
 extern	bool	terse;			/* '-t' */
 extern	int	bogotest;		/* '-X', env("BOGOTEST") */
 extern	int	verbose;		/* '-v' */

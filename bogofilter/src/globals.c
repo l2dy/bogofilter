@@ -28,10 +28,10 @@ bool	mbox_mode;			/* '-M' */
 bool	replace_nonascii_characters;	/* '-n' */
 bool	passthrough;			/* '-p' */
 bool	quiet;				/* '-q' */
-bool	query;				/* '-Q' */
-int	Rtable = 0;			/* '-R' */
+int	query;				/* '-Q' */
+bool	Rtable;				/* '-R' */
 bool	terse;				/* '-t' */
-int	bogotest = 0;			/* '-X', env("BOGOTEST") */
+int	bogotest;			/* '-X', env("BOGOTEST") */
 int	verbose;			/* '-v' */
 
 /* config file options */
