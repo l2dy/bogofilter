@@ -52,8 +52,9 @@ void textblock_add(const byte *text, size_t size)
     if (size == 0)
 	cur->data = NULL;
     else {
-	cur->data = (byte *)xmalloc(size);
-	memcpy((char *)cur->data, (const char *)text, size);
+	cur->data = (byte *)xmalloc(size+D);
+	memcpy((char *)cur->data, (const char *)text, size+D);
+	Z(((char *)cur->data)[size]);	/* for easier debugging - removable */
     }
     cur_mem += mem;
     tot_mem += mem;
