@@ -253,10 +253,14 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error)
 /* exported */
 bool process_config_files(bool warn_on_error)
 {
-    if (!suppress_config_file &&
-	(!read_config_file(system_config_file, false, warn_on_error) ||
-	 !read_config_file(user_config_file, true, warn_on_error)))
-	 return false;
+    book ok = true;
 
-    return true;
+    if (!suppress_config_file) {
+	if (!read_config_file(system_config_file, false, warn_on_error))
+	    ok = false;
+	if (!read_config_file(user_config_file, true, warn_on_error))
+	    ok = false;
+    }
+
+    return ok;
 }
