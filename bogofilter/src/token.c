@@ -31,9 +31,13 @@ AUTHOR:
 
 /* Local Variables */
 
-word_t *msg_addr = NULL;	/* First IP Address in Received: statement */
-word_t *msg_id   = NULL;	/* Message ID */
-word_t *queue_id = NULL;	/* Message's first queue ID */
+byte	msg_addr_text[MAXTOKENLEN + D];
+byte	msg_id_text  [MAXTOKENLEN * 3 + D];
+byte	queue_id_text[MAXTOKENLEN + D];
+
+word_t	msg_addr = { 0, msg_addr_text};	/* First IP Address in Received: statement */
+word_t	msg_id   = { 0, msg_id_text};	/* Message ID */
+word_t	queue_id = { 0, queue_id_text};	/* Message's first queue ID */
 
 static token_t save_class = NONE;
 static word_t *ipsave = NULL;
@@ -41,13 +45,13 @@ static word_t *ipsave = NULL;
 byte yylval_text[MAXTOKENLEN + MAX_PREFIX_LEN + D];
 static word_t yylval = { 0, yylval_text };
 
-static word_t *w_to   = NULL;	/* To:          */
-static word_t *w_from = NULL;	/* From:        */
-static word_t *w_rtrn = NULL;	/* Return-Path: */
-static word_t *w_subj = NULL;	/* Subject:     */
-static word_t *w_recv = NULL;	/* Received:    */
-static word_t *w_head = NULL;	/* Header:      */
-static word_t *w_mime = NULL;	/* Mime:        */
+static word_t w_to   = { sizeof("to:")-1,   "to:"};	/* To:          */
+static word_t w_from = { sizeof("from:")-1, "from:"};	/* From:        */
+static word_t w_rtrn = { sizeof("rtrn:")-1, "rtrn:"};	/* Return-Path: */
+static word_t w_subj = { sizeof("subj:")-1, "subj:"};	/* Subject:     */
+static word_t w_recv = { sizeof("rcvd:")-1, "rcvd:"};	/* Received:    */
+static word_t w_head = { sizeof("head:")-1, "head:"};	/* Header:      */
+static word_t w_mime = { sizeof("mime:")-1, "mime:"};	/* Mime:        */
 
 /* Global Variables */
 
@@ -56,13 +60,36 @@ bool block_on_subnets = false;
 static word_t *token_prefix = NULL;
 static uint32_t token_prefix_len;
 
-static word_t *nonblank_line = NULL;
+#define NONBLANK "spc:invalid_end_of_header"
+static word_t nonblank_line = { sizeof(NONBLANK)-1, NONBLANK};
 
-#define WFREE(n)  word_free(n); n = NULL/* Global Variables */
+#define WFREE(n)  n.leng = 0
 
 /* Function Prototypes */
 
 /* Function Definitions */
+
+static void token_copy( word_t *dst, word_t *src )
+{
+    dst->leng = src->leng;
+    memcpy(dst->text, src->text, src->leng + D);
+    Z(dst->text[dst->leng]);		/* for easier debugging - removable */
+}
+
+static void build_prefixed_token( word_t *token, byte *text, uint32_t leng )
+{
+    if (token_prefix != NULL) {
+	token->leng = leng + token_prefix_len;
+	memcpy(token->text, token_prefix->text, token_prefix_len + D);
+	memcpy(token->text+token_prefix_len, text, leng + D);
+	Z(token->text[token->leng]);	/* for easier debugging - removable */
+    }
+    else {
+	token->leng = leng;
+	memcpy(token->text, text, leng + D);
+	Z(token->text[token->leng]);	/* for easier debugging - removable */
+    }
+}
 
 token_t get_token(word_t **token)
 {
@@ -115,8 +142,8 @@ token_t get_token(word_t **token)
 	    if (leng == 2)
 		continue;
 	    else {	/* "spc:invalid_end_of_header" */
-		yylval.leng = nonblank_line->leng;
-		memcpy(yylval.text, nonblank_line->text, nonblank_line->leng + D );
+		yylval.leng = nonblank_line.leng;
+		memcpy(yylval.text, nonblank_line.text, nonblank_line.leng + D );
 		Z(yylval.text[yylval.leng]);	/* for easier debugging - removable */
 		done = true;
 	    }
@@ -147,18 +174,7 @@ token_t get_token(word_t **token)
 		    *ot = *in;
 		leng = (uint) (ot - st);
 	    }
-	    if (token_prefix != NULL) {
-		yylval.leng = leng + token_prefix_len;
-		memcpy(yylval.text, token_prefix->text, token_prefix_len + D);
-		memcpy(yylval.text+token_prefix_len, text, leng + D);
-		Z(yylval.text[yylval.leng]);	/* for easier debugging - removable */
-	    }
-	    else {
-		yylval.leng = leng;
-		memcpy(yylval.text, text, leng + D);
-		Z(yylval.text[yylval.leng]);	/* for easier debugging - removable */
-	    }
-
+	    build_prefixed_token( &yylval, text, leng );
 	}
 	break;
 
@@ -182,17 +198,8 @@ token_t get_token(word_t **token)
 	case TOKEN:	/* ignore anything when not reading text MIME types */
 	    if (leng > MAXTOKENLEN)
 		continue;
-	    if (token_prefix != NULL) {
-		yylval.leng = leng + token_prefix_len;
-		memcpy(yylval.text, token_prefix->text, token_prefix_len + D);
-		memcpy(yylval.text+token_prefix_len, text, leng + D);
-		Z(yylval.text[yylval.leng]);	/* for easier debugging - removable */
-	    }
-	    else {
-		yylval.leng = leng;
-		memcpy(yylval.text, text, leng + D);
-		Z(yylval.text[yylval.leng]);	/* for easier debugging - removable */
-
+	    build_prefixed_token( &yylval, text, leng );
+	    if (token_prefix == NULL) {
 		switch (msg_state->mime_type) {
 		case MIME_TEXT:
 		case MIME_TEXT_HTML:
@@ -227,7 +234,7 @@ token_t get_token(word_t **token)
 
 	case QUEUE_ID:
 	    /* special token;  saved for formatted output, but not returned to bogofilter */
-	/** \bug: the parser MUST be aligned with lexer_v3.l! */
+	    /** \bug: the parser MUST be aligned with lexer_v3.l! */
 	    if (queue_id == NULL) {
 		size_t skip = 0;
 		while (isspace(text[skip]))
@@ -254,13 +261,12 @@ token_t get_token(word_t **token)
 	    memmove(yylval.text, text, yylval.leng);
 	    Z(yylval.text[yylval.leng]);	/* for easier debugging - removable */
 	    /* if top level, no address, not localhost, .... */
-	    if (token_prefix == w_recv &&
+	    if (token_prefix == &w_recv &&
 		msg_state == msg_state->parent && 
-		msg_addr == NULL &&
-		strcmp((char *)yylval.text, "127.0.0.1") != 0) {
+		msg_addr.leng == 0 &&
+		strcmp((char *)text, "127.0.0.1") != 0) {
 		/* Not guaranteed to be the originating address of the message. */
-		word_free(msg_addr);
-		msg_addr = word_dup(&yylval);
+		token_copy( &msg_addr, &yylval );
 	    }
 	}
 
@@ -293,22 +299,12 @@ token_t get_token(word_t **token)
 		memcpy(ipsave->text+plen, yylval.text, yylval.leng+1);
 		yylval.leng = ipsave->leng;
 		memcpy(yylval.text, ipsave->text, ipsave->leng + D);
-		
+
 		save_class = IPADDR;
 		*token = &yylval;
 		return (cls);
 	    }
-	    if (token_prefix != NULL) {
-		yylval.leng = leng + token_prefix_len;
-		memcpy(yylval.text, token_prefix->text, token_prefix_len + D);
-		memcpy(yylval.text+token_prefix_len, text, leng + D);
-		Z(yylval.text[yylval.leng]);	/* for easier debugging - removable */
-	    }
-	    else {
-		yylval.leng = leng;
-		memcpy(yylval.text, text, leng + D);
-		Z(yylval.text[yylval.leng]);	/* for easier debugging - removable */
-	    }
+	    build_prefixed_token( &yylval, text, leng );
 	    break;
 
 	case NONE:		/* nothing to do */
@@ -377,21 +373,6 @@ void token_init(void)
     if (!msg_count_file)
 	mime_reset();
 
-    if (nonblank_line == NULL) {
-	const char *s = "spc:invalid_end_of_header";
-	nonblank_line = word_new((const byte *)s, strlen(s));
-    }
-
-    if (w_to == NULL) {
-	w_to   = word_new((const byte *) "to:",   0);	/* To:          */
-	w_from = word_new((const byte *) "from:", 0);	/* From:        */
-	w_rtrn = word_new((const byte *) "rtrn:", 0);	/* Return-Path: */
-	w_subj = word_new((const byte *) "subj:", 0);	/* Subject:     */
-	w_recv = word_new((const byte *) "rcvd:", 0);	/* Received:    */
-	w_head = word_new((const byte *) "head:", 0);	/* Header:      */
-	w_mime = word_new((const byte *) "mime:", 0);	/* Mime:        */
-    }
-
     WFREE(msg_addr);
     WFREE(msg_id);
     WFREE(queue_id);
@@ -420,25 +401,25 @@ void set_tag(const char *text)
     switch (tolower(*text)) {
     case 'c':				/* CC: */
     case 't':
-	token_prefix = w_to;		/* To: */
+	token_prefix = &w_to;		/* To: */
 	break;
     case 'f':
-	token_prefix = w_from;		/* From: */
+	token_prefix = &w_from;		/* From: */
 	break;
     case 'h':
 	if (msg_state == msg_state->parent)
-	    token_prefix = w_head;	/* Header: */
+	    token_prefix = &w_head;	/* Header: */
 	else
-	    token_prefix = w_mime;	/* Mime:   */
+	    token_prefix = &w_mime;	/* Mime:   */
 	break;
     case 'r':
 	if (tolower(text[2]) == 't')
-	    token_prefix = w_rtrn;	/* Return-Path: */
+	    token_prefix = &w_rtrn;	/* Return-Path: */
 	else
-	    token_prefix = w_recv;	/* Received: */
+	    token_prefix = &w_recv;	/* Received: */
 	break;
     case 's':
-	token_prefix = w_subj;		/* Subject: */
+	token_prefix = &w_subj;		/* Subject: */
 	break;
     default:
 	fprintf(stderr, "%s:%d  invalid tag - '%s'\n",
@@ -459,17 +440,18 @@ void set_tag(const char *text)
     return;
 }
 
+void set_msg_id(byte *text, uint leng)
+{
+    if (leng > sizeof(msg_id_text))
+	leng = sizeof(msg_id_text);
+    msg_id.leng = leng;
+    memcpy(msg_id.text, text, leng + D);
+    Z(msg_id.text[msg_id.leng]);
+}
+
 /* Cleanup storage allocation */
 void token_cleanup()
 {
-    WFREE(nonblank_line);
-    WFREE(w_to);
-    WFREE(w_from);
-    WFREE(w_rtrn);
-    WFREE(w_subj);
-    WFREE(w_recv);
-    WFREE(w_head);
-    WFREE(w_mime);
     WFREE(msg_addr);
     WFREE(msg_id);
     WFREE(queue_id);
