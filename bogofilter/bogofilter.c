@@ -28,6 +28,7 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 ******************************************************************************/
 
 #include <math.h>
+#include <float.h> /* has DBL_EPSILON */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -135,7 +136,7 @@ static void *collect_words(/*@unused@*/ int fd, /*@out@*/ int *message_count,
 }
 
 
-static void register_words(run_t run_type, wordhash_t *h,
+static void register_words(run_t _run_type, wordhash_t *h,
 	int msgcount, int wordcount)
 /* tokenize text on stdin and register it to  a specified list
  * and possibly out of another list
@@ -149,7 +150,7 @@ static void register_words(run_t run_type, wordhash_t *h,
   wordlist_t *incr_list = NULL;
   wordlist_t *decr_list = NULL;
 
-  switch(run_type)
+  switch(_run_type)
   {
   case REG_SPAM:		ch = 's' ;  break;
   case REG_GOOD:		ch = 'n' ;  break;
@@ -167,7 +168,7 @@ static void register_words(run_t run_type, wordhash_t *h,
 
   good_list.active = spam_list.active = FALSE;
 
-  switch(run_type)
+  switch(_run_type)
     {
     case REG_GOOD:
       incr_list = &good_list;
@@ -232,20 +233,20 @@ static void register_words(run_t run_type, wordhash_t *h,
   db_lock_release_list(word_lists);
 }
 
-void register_messages(int fdin, run_t run_type)
+void register_messages(int fdin, run_t _run_type)
 {
   wordhash_t *h;
   int	wordcount, msgcount;
   initialize_constants();
   h = collect_words(fdin, &msgcount, &wordcount);
-  register_words(run_type, h, msgcount, wordcount);
+  register_words(_run_type, h, msgcount, wordcount);
   wordhash_free(h);
 }
 
 typedef struct 
 {
     /*@unique@*/ char        key[MAXTOKENLEN+1];
-    double      prob;
+    double      prob; /* WARNING: DBL_EPSILON IN USE, DON'T CHANGE */
 }
 discrim_t;
 
@@ -265,8 +266,8 @@ static int compare_extrema(const void *id1, const void *id2)
 { 
     const discrim_t *d1 = id1;
     const discrim_t *d2 = id2;
-    return ( (d1->prob > d2->prob) ||
-	     ((d1->prob == d2->prob) && (strcmp(d1->key, d2->key) > 0)));
+    return ((d1->prob > d2->prob) ||
+	     ((fabs(d1->prob - d2->prob) < DBL_EPSILON) && (strcmp(d1->key, d2->key) > 0)));
 }
 
 static void init_bogostats(/*@out@*/ bogostat_t *bogostats)
@@ -321,7 +322,7 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bogostats,
 	if (verbose >= 3)
 	{
 	    int i = (hit - bogostats->extrema);
-	    char *curkey = hit->key[0] ? hit->key : "";
+	    const char *curkey = hit->key[0] ? hit->key : "";
 	    (void)fprintf(stderr, 
 		    "#  %2d"
 		    "  %f  %f  %-20.20s "
@@ -337,15 +338,11 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bogostats,
 
 void print_bogostats(FILE *fp, double spamicity)
 {
-    extern int thresh_index;
-    extern double thresh_stats;
-    extern double thresh_rtable;
-
     switch(algorithm) {
     case AL_GRAHAM:
     {
-	int index = (thresh_index >= 0) ? thresh_index : KEEPERS+thresh_index;
-	discrim_t *pp = &bogostats.extrema[index];
+	int idx = (thresh_index >= 0) ? thresh_index : KEEPERS+thresh_index;
+	discrim_t *pp = &bogostats.extrema[idx];
 	if (pp->prob >= thresh_stats)
 	    (void)compute_spamicity(&bogostats, fp);
 	break;
@@ -527,7 +524,7 @@ static double compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errn
     product = invproduct = 1.0f;
     for (pp = bogostats->extrema; pp < bogostats->extrema+SIZEOF(bogostats->extrema); pp++)
     {
-	if (pp->prob == 0)
+	if (fabs(pp->prob) < DBL_EPSILON)
 	    continue;
 
 	product *= pp->prob;
@@ -570,7 +567,7 @@ static double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@
     double spamicity;
     int robn = 0;
 
-    if (robx == 0.0f)		/* if not yet set ... */
+    if (fabs(robx) < DBL_EPSILON)
     {
 	/* Note: .ROBX is scaled by 1000000 in the wordlist */
 	long l_robx = db_getvalue(spam_list.dbh, ".ROBX");
@@ -624,7 +621,7 @@ static void initialize_constants(void)
 	case AL_GRAHAM:
 	    spam_cutoff = GRAHAM_SPAM_CUTOFF;
 	    max_repeats = GRAHAM_MAX_REPEATS;
-	    if ( min_dev == 0.0f )		/* if not yet set ... */
+	    if (fabs(min_dev) < DBL_EPSILON)
 		min_dev     = GRAHAM_MIN_DEV;
 	    break;
 
@@ -632,9 +629,9 @@ static void initialize_constants(void)
 	    spam_cutoff = ROBINSON_SPAM_CUTOFF;
 	    max_repeats = ROBINSON_MAX_REPEATS;
 	    scalefactor = compute_scale();
-	    if ( min_dev == 0.0f )		/* if not yet set ... */
+	    if (fabs(min_dev) < DBL_EPSILON)
 		min_dev     = ROBINSON_MIN_DEV;
-	    if ( robs == 0.0f )			/* if not yet set ... */
+	    if (fabs(robs) < DBL_EPSILON)
 		robs = ROBS;
 	    break;
 
