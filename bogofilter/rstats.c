@@ -218,6 +218,6 @@ void rstats_print_rtable(int robn, rstats_t **rstats_array)
 
     /* print trailer */
     (void)fprintf(stdout, "%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
-		  robn, "P_Q_S_invsum_logsum", header.invproduct, header.product, header.spamicity,
-		  header.invlogsum, header.logsum);
+		  robn+1, "P_Q_S_invsum_logsum", header.invproduct, header.product, 
+		  header.spamicity, header.invlogsum, header.logsum);
 }
