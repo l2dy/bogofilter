@@ -87,4 +87,4 @@ AC_FUNC_STAT
 
 AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl)
 
-AC_OUTPUT(Makefile bogofilter.spec)
+AC_OUTPUT(Makefile tests/Makefile bogofilter.spec)

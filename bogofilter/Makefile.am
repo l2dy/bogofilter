@@ -3,6 +3,7 @@
 # foreign: don't insist on ChangeLog
 # 1.6: minimum version
 AUTOMAKE_OPTIONS = foreign 1.6
+SUBDIRS = . tests
 
 # what to build
 bin_PROGRAMS = bogofilter bogoutil
@@ -28,8 +29,7 @@ bogoutil_SOURCES = bogoutil.c \
 EXTRA_DIST = $(man1_MANS) \
 	     bogofilter.xml bogoutil.xml \
 	     bogofilter.spec bogofilter.spec.in \
-	     UPGRADE bogoupgrade.pl \
-	     $(TESTSCRIPTS) t.frame
+	     UPGRADE bogoupgrade.pl
 
 #
 .xml.pdf:
@@ -45,7 +45,3 @@ EXTRA_DIST = $(man1_MANS) \
 .PHONY: rpm
 rpm:	    dist $(distdir).tar.gz
 	rpm -ta $(distdir).tar.gz
-
-TESTSCRIPTS=t.score1 t.score2 t.lock1 t.skel
-TESTS=$(TESTSCRIPTS)
-XFAIL_TESTS=t.skel

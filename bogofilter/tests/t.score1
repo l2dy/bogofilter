@@ -3,4 +3,4 @@
 . ${srcdir}/t.frame
 # make sure that an uninitialized data base will not lead to bogus
 # spam qualifications
-echo | ./bogofilter -p -e >/dev/null
+echo | ../bogofilter -p -e >/dev/null
