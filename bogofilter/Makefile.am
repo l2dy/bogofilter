@@ -24,7 +24,10 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 .PHONY:	check
 
 rpm:	dist
-	case `rpm --version` in "Version 3*") rpm -ta $(distdir).tar.gz ;; *) rpmbuild -ta $(distdir).tar.gz ;; esac
+	case `rpm --version` in \
+	  "Version 3*")	rpm --define 'bogostatic 1' --sign -ta $(distdir).tar.gz ;; \
+	  *)		rpmbuild --define 'bogostatic 1' --sign -ta $(distdir).tar.gz ;; \
+	esac
 
 cvs-check:
 	rm -rf $(PACKAGE)-$(VERSION)-export
