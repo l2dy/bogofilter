@@ -141,9 +141,8 @@ static char *ds_path;
 static ds_loc ds_flag = DS_NONE;
 static void *env = NULL;
 
-static bool    bogolex = false;		/* true if convert input to msg-count format */
 static bool    esf_flag = true;		/* test ESF factors if true */
-static char   *bogolex_file = NULL;
+static char   *bogolex_file = NULL;	/* non-NULL if creating msg-count output */
 static word_t *w_msg_count;
 
 static uint message_count;
@@ -724,22 +723,21 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 	    bt_trap();
 	}
 
-	if (whc->count != 0) {
-	    if (bogolex) {
-		wordhash_sort(whc);
-		lookup_words(whc);
-		write_msgcount_file(whc);
-	    }
-	    else {
-		if (!msg_count_file)
-		    whp = convert_wordhash_to_propslist(whc, train);
-		else
-		    whp = convert_propslist_to_countlist(whc);
-		msglist_add(msgs, whp);
-	    }
-	    update_count();
+	if (bogolex_file != NULL) {
+	    wordhash_sort(whc);
+	    lookup_words(whc);
+	    write_msgcount_file(whc);
+	}
+	else if (whc->count != 0) {
+	    if (!msg_count_file)
+		whp = convert_wordhash_to_propslist(whc, train);
+	    else
+		whp = convert_propslist_to_countlist(whc);
+	    msglist_add(msgs, whp);
 	}
 
+	update_count();
+	
 	if (whc != whp)
 	    wordhash_free(whc);
     }
@@ -936,7 +934,6 @@ static int process_arglist(int argc, char **argv)
 	    esf_flag ^= true;
 	    break;
 	case 'M':
-	    bogolex = true;
 	    bogolex_file = optarg;
 	    break;
 	case 'n':
@@ -984,7 +981,7 @@ static int process_arglist(int argc, char **argv)
 	exit(EX_ERROR);
     }
 
-    if (!bogolex &&
+    if (bogolex_file == NULL &&
 	(spam_files->count == 0 || ham_files->count == 0)) {
 	fprintf(stderr,
 		"Bogotune needs both non-spam and spam message sets for its parameter testing.\n");
@@ -1391,11 +1388,12 @@ static rc_t bogotune(void)
 
     bogotune_init();
 
-    if (bogolex) {
-	if (check_msgcount_parms())
-	    load_wordlist(load_hook, ns_and_sp->train);
-	else
+    if (bogolex_file != NULL) {
+	if (!check_msgcount_parms())
 	    exit(EX_ERROR);
+	load_wordlist(load_hook, ns_and_sp->train);
+	read_mailbox(bogolex_file, NULL);
+	return status;
     }
 
     beg = time(NULL);
@@ -1405,12 +1403,6 @@ static rc_t bogotune(void)
 
     /* Note: memory usage highest while reading messages */
     /* usage decreases as distribute() converts to count format */
-
-    if (bogolex_file != NULL) {
-	robx = ROBX;			/* needed for degen */
-	read_mailbox(bogolex_file, NULL);
-	return status;
-    }
 
     /* read all messages, merge training sets, look up scoring sets */
     ns_cnt = filelist_read(REG_GOOD, ham_files);
