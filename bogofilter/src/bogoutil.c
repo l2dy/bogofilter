@@ -475,9 +475,9 @@ typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST } cmd_
 cmd_t flag = M_NONE;
 
 #ifndef	ENABLE_DEPRECATED_CODE
-#define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:vVw:x:y:"
+#define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:vVw:x:X:y:"
 #else
-#define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:vVw:Wx:y:"
+#define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:vVw:Wx:X:y:"
 #endif
 
 static int process_args(int argc, char **argv)
@@ -564,6 +564,10 @@ static int process_args(int argc, char **argv)
 
 	case 'x':
 	    set_debug_mask( (char *) optarg );
+	    break;
+
+	case 'X':
+	    set_bogotest( optarg );
 	    break;
 
 	case 'a':
