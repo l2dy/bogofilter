@@ -181,22 +181,24 @@ if($msgformat ne "msgcount") {
     } else {
 	unlink($spwork);
 	foreach my $dir (@spfiles) {
-	    open FL, "find $dir -xtype f -name '[0-9]*'|" or yuk(7, "Problem processing spam files");
+	    open FL, "find $dir -xtype f -name '[0-9]*'|" or
+		yuk(7, "Problem processing spam files");
 	    foreach my $msg (<FL>) {
 		chomp($msg);
 		my $cmd = "cat $msg | bogol $bogodir $cf >>$spwork";
 		system($cmd) == 0 or
-			yuk(7, "Problem writing spam msg-count file");
+		    yuk(7, "Problem writing spam msg-count file");
 	    }
 	}
 	unlink($nswork);
 	foreach my $dir (@nsfiles) {
-	    open FL, "find $dir -xtype f -name '[0-9]*'|" or yuk(7, "Problem processing nonspam files");
+	    open FL, "find $dir -xtype f -name '[0-9]*'|" or
+		yuk(7, "Problem processing nonspam files");
 	    foreach my $msg (<FL>) {
 		chomp($msg);
 		my $cmd = "cat $msg | bogol $bogodir $cf >>$nswork";
 		system($cmd) == 0 or
-			yuk(7, "Problem writing nonspam msg-count file");
+		    yuk(7, "Problem writing nonspam msg-count file");
 	    }
 	}
     }
