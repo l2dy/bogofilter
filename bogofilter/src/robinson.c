@@ -77,6 +77,8 @@ rf_method_t rf_robinson_method = {	/* needed by config.c */
 };
 #endif
 
+/* Function Definitions */
+
 void rob_print_stats(FILE *fp)
 {
     fp = NULL; 	/* quench compiler warning */
@@ -215,7 +217,7 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 
     if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() begins\n");
 
-    need_stats = Rtable || (verbose + passthrough) > 1;
+    need_stats = !no_stats && (Rtable || (verbose + passthrough) > 1);
     Rtable |= verbose > 3;
 
     if (need_stats)
