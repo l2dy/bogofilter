@@ -9,6 +9,8 @@
 
 set -e
 
+yday="-y 0"
+
 while : ; do
     tdir=./checks.$$.`date +"%Y%m%dT%H%M%S"`
     mkdir $tdir && break
@@ -37,14 +39,14 @@ inputdb="input-${num}.db"
 
 if [ -f "$datafile" ]; then
 	rm -f $tdir/$inputdb
-	../../bogoutil -l $tdir/$inputdb <  $datafile
+	../../bogoutil $yday -l $tdir/$inputdb <  $datafile
 fi
 
 outputdb="output-${num}.db"
 rm -f $tdir/$outputdb
 
-perl ${srcdir}/../../bogoupgrade -b ../../bogoutil \
+perl ${srcdir}/../../bogoupgrade $yday -b ../../bogoutil \
     -i $tdir/$inputfile -o $tdir/$outputdb \
-&& ../../bogoutil -d $tdir/$outputdb \
+&& ../../bogoutil $yday -d $tdir/$outputdb \
 |LC_COLLATE=C sort\
 |diff -u - ${srcdir}/output-${num}.txt

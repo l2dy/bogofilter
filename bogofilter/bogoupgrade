@@ -29,6 +29,9 @@ for (my $i = 0; $i < @ARGV; $i++){
   elsif ($arg eq '-b'){
     $bogoutil = $ARGV[++$i];
   }
+  elsif ($arg eq '-y'){
+    $yday = "-y $ARGV[++$i]";
+  }
   elsif ($arg eq '-h'){
     help();
     exit(1);
@@ -52,7 +55,7 @@ chomp($sig);
 if ($sig =~ m/^\# bogofilter wordlist \(format version A\):\s(\d+)$/){ 
   
   my $msg_count = $1;
-  my $cmd = qq[$bogoutil -l $out];
+  my $cmd = qq[$bogoutil $yday -l $out];
   open(OUT, "|$cmd") or die "Cannot run command [$cmd]. $!\n";
   while(<F>){
     print OUT $_;
@@ -71,11 +74,11 @@ elsif ($sig =~ m/^\# bogofilter email-count \(format version B\):\s(\d+)/){
     exit;
   }
   
-  my $cmd = qq[$bogoutil -l $out];
+  my $cmd = qq[$bogoutil $yday -l $out];
   open(OUT, "|$cmd") or die "Cannot run command [$cmd]. $!\n";
 
   close(F);
-  $cmd = qq[$bogoutil -d $in_db];
+  $cmd = qq[$bogoutil $yday -d $in_db];
   open(F, "$cmd|") or die "Cannot run command [$cmd]. $!\n";
 
   while(<F>){
