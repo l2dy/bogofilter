@@ -36,7 +36,6 @@ static word_t *ipsave = NULL;
 bool block_on_subnets = false;
 
 static word_t *token_prefix = NULL;
-static word_t *token_prefix_next = NULL;
 
 /* Function Definitions */
 
@@ -191,8 +190,7 @@ void got_from(void)
 void got_newline()
 {
     word_free(token_prefix);
-    token_prefix = token_prefix_next;
-    token_prefix_next = NULL;
+    token_prefix = NULL;
 }
 
 void got_emptyline(void)
