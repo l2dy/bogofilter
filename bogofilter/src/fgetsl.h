@@ -18,7 +18,7 @@
  * - zero or positive: number of characters read (not counting the
  *   trailing NUL)
  */
-extern int fgetsl(byte *buf /*@out@*/ /** output buffer */,
+extern int fgetsl(/*@out@*/ char *buf /** output buffer */,
 	int siz /** capacity of buffer */,
 	FILE *stream /** input stream */);
 
@@ -33,7 +33,7 @@ extern int fgetsl(byte *buf /*@out@*/ /** output buffer */,
  *   trailing NUL)
  */
 
-extern int xfgetsl(byte *buf /*@out@*/ /** output buffer */,
+extern int xfgetsl(/*@out@*/ char *buf /** output buffer */,
 	int siz /** capacity of buffer */,
 	FILE *stream /** input stream */,
 	int no_NUL_terminate /** \li if 0, the maximum amount of bytes read is size-1 and the buffer is NUL terminated.

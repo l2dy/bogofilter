@@ -12,17 +12,17 @@
 #include "fgetsl.h"
 
 /* calls exit(2) on read error or when max_size < 2 */
-int fgetsl(byte *buf, int max_size, FILE *s)
+int fgetsl(char *buf, int max_size, FILE *s)
 {
     return xfgetsl(buf, max_size, s, 0);
 }
 
-int xfgetsl(byte *buf, int max_size, FILE *s, int no_nul_terminate)
+int xfgetsl(char *buf, int max_size, FILE *s, int no_nul_terminate)
 {
     int c = 0;
-    byte *cp = buf;
-    byte *end = buf + max_size;				/* Physical end of buffer */
-    byte *fin = end - (no_nul_terminate ? 0 : 1);	/* Last available byte    */
+    char *cp = buf;
+    char *end = buf + max_size;				/* Physical end of buffer */
+    char *fin = end - (no_nul_terminate ? 0 : 1);	/* Last available byte    */
 
     if (cp >= fin) {
 	fprintf(stderr, "Invalid buffer size, exiting.\n");
@@ -34,7 +34,7 @@ int xfgetsl(byte *buf, int max_size, FILE *s, int no_nul_terminate)
 	return(EOF);
 
     while ((cp < fin) && ((c = getc(s)) != EOF)) {
-	*cp++ = (byte)c;
+	*cp++ = (char)c;
 	if (c == '\n')
 	    break;
     }
@@ -57,7 +57,7 @@ int xfgetsl(byte *buf, int max_size, FILE *s, int no_nul_terminate)
 #include <xmalloc.h>
 
 int main(int argc, char **argv) {
-    byte *buf;
+    char *buf;
     int size, count, non_nul_terminate;
 
     if (argc != 3) {
@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
 
     non_nul_terminate = atoi(argv[2]);
     size = atoi(argv[1]);
-    buf = (byte *)xmalloc(size);
+    buf = xmalloc(size);
     while(1) {
 	count = xfgetsl(buf, size, stdin, non_nul_terminate);
 	if (count == EOF) break;
