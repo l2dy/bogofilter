@@ -1,13 +1,5 @@
 /* $Id$ */
 /*
- * $Log$
- * Revision 1.2  2002/09/23 11:31:53  m-a
- * Unnest comments, and move $ line down by one to prevent CVS from adding nested comments again.
- *
- * Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
- * 0.7.3 Base Source
- * */
-/*****************************************************************************
 
 NAME:
    autodaemon.c -- self-starting daemon using Unix-domain sockets

@@ -1,34 +1,4 @@
 /* $Id$ */
-/* 
- * $Log$
- * Revision 1.8  2002/10/05 22:13:12  relson
- * If environment variables BOGODIR or HOME is defined, use its value for bogofilters
- * wordlist directory.  If neither is defined, use the current directory.
- *
- * Revision 1.7  2002/10/04 11:58:46  relson
- * Removed obsolete "file" field from wordlist_t.
- * Cleaned up list name, directory, and filename code in open_wordlist().
- * Changed parameters to "const char *" for open_wordlist(), dbh_init(), and db_open().
- *
- * Revision 1.6  2002/10/04 04:34:11  relson
- * Changed "char *" parameters of setup_lists() and init_lists() to "const char *".
- *
- * Revision 1.5  2002/10/04 01:42:36  m-a
- * Cleanup, fixing memory leaks, adding error checking. TODO: let callers (main.c) also check for error return.
- *
- * Revision 1.4  2002/10/04 01:35:06  gyepi
- * Integration of wordlists with datastore and bogofilter code.
- * David Relson did most of the work. I just tweaked the locking code
- * and made a few minor changes.
- *
- * Revision 1.3  2002/10/04 00:39:57  m-a
- * First set of type fixes.
- *
- * Revision 1.2  2002/10/02 17:14:54  relson
- * main.c now calls setup_lists() for initializing the wordlist structures, including the opening of the wordlist.db files.
- * setup_list() takes a directory name as its argument and passes it to init_list(), which calls open_wordlist() for the actual open.
- *
- * */
 
 /*  constants and declarations for wordlists */
 

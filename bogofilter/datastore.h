@@ -1,15 +1,4 @@
 /* $Id$ */
-/*
- * $Log$
- * Revision 1.5  2002/10/04 11:58:46  relson
- * Removed obsolete "file" field from wordlist_t.
- * Cleaned up list name, directory, and filename code in open_wordlist().
- * Changed parameters to "const char *" for open_wordlist(), dbh_init(), and db_open().
- *
- * Revision 1.4  2002/10/04 04:01:51  relson
- * Added cvs keywords Id and Log to the files' headers.
- *
- */
 
 /* 
  API for bogofilter datastore.

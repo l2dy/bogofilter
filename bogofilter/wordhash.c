@@ -1,26 +1,4 @@
-/* $Id$
- *
- * $Log$
- * Revision 1.4  2002/10/04 04:43:59  relson
- * Converted header to standard format.
- *
- * Added comment with command for building the standalone wordhash utility.
- *
- * Revision 1.3  2002/10/04 02:48:29  m-a
- * Fix types.
- *
- * Revision 1.2  2002/10/04 02:06:55  gyepi
- *
- * 1. Use multiple buffer lists in wordhash to avoid alignment problems
- * on more restrictive architectures.
- * 2. Add initializer arg to wordhash_insert.
- *
- * Thanks to Clint Adams for helping debug both of these.
- *
- * Revision 1.1  2002/09/29 03:37:56  gyepi
- * replace Judy with hash table (wordhash)
- *
- */
+/* $Id$ */
 
 /*
 NAME:

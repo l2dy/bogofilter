@@ -1,10 +1,4 @@
 /* $Id$ */
-/*
- * $Log$
- * Revision 1.2  2002/10/04 04:01:51  relson
- * Added cvs keywords Id and Log to the files' headers.
- *
- */
 
 /*****************************************************************************
 
