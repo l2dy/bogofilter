@@ -200,7 +200,12 @@ bogofilter[1440]: register-n, 255 words, 1 messages
 the input mail to the output with an X-Bogosity header (in the
 style of SpamAssassin) inserted.  The header will begin with "Yes" or
 "No" according as the mail is judged to be spam or non-spam
-respectively.</para>
+respectively. Note: the memory consumption depends on whether the input
+file is regular and allows seek operations. Within these constraints,
+the file will be rewound and read a second time, without using much
+memory. If the input file however is not regular (for example, a
+pipeline or socket), then bogofilter will cache a copy if the entire
+mail in memory.</para>
 
 <para>The <option>-e</option> (embed) option is only effective when
     <option>-p</option> is also active. If both options are used, then
