@@ -107,8 +107,7 @@ token_t get_token(void)
 	    break;
 
 	case BOUNDARY:	/* don't return boundary tokens to the user */
-	    if (mime_is_boundary(yylval))
-		continue;
+	    continue;
 
 	case TOKEN:	/* ignore anything when not reading text MIME types */
 	    if (msg_header)
