@@ -7,28 +7,22 @@ NODB=1 . ${srcdir=.}/t.frame
 
 OUT="$TMPDIR/maint.out"
 
-$BOGOFILTER -C -v -l -s < ${SYSTEST}/inputs/spam.mbx >> $TMPDIR/tmp
-$BOGOFILTER -C -v -l -n < ${SYSTEST}/inputs/good.mbx >> $TMPDIR/tmp
+$BOGOFILTER -C -l -s < ${SYSTEST}/inputs/spam.mbx >> $TMPDIR/tmp
+$BOGOFILTER -C -l -n < ${SYSTEST}/inputs/good.mbx >> $TMPDIR/tmp
 
 cat >>$TMPDIR/result <<EOF
-initial:   5063
+initial: 5063
 count 0 -> 5063
 count 1 -> 1753
-count 2 ->  878
-count 3 ->  571
+count 2 -> 878
+count 3 -> 571
 EOF
 
-echo -n initial:  >> $OUT
-$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db | wc -l >> $OUT
+printf "initial: %d\n" `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db | wc -l` > $OUT
 
 for cnt in 0 1 2 3 ; do
     $BOGOUTIL -c $cnt -m $BOGOFILTER_DIR/wordlist.db
-    echo -n count $cnt "-> " >> $OUT
-    printf "%4d\n" `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db | wc -l` >> $OUT
+    echo "count $cnt ->" `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db | wc -l` >> $OUT
 done
 
-if  [ $verbose -eq 0 ]; then
-    cmp ${TMPDIR}/result $OUT
-else
-    diff $DIFF_BRIEF ${TMPDIR}/result $OUT
-fi
+cmp $OUT ${TMPDIR}/result
