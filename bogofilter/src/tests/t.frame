@@ -174,7 +174,7 @@ boehm-gc)
 valgrind)
     # use valgrind
     if test "x$VALGRIND" != x ; then
-	VAL="$VALGRIND"
+	VAL="$VALGRIND --leak-check=yes"
 	export VAL
     else
 	echo >&2 "WARNING: valgrind not found or unsupported version, ignored."
