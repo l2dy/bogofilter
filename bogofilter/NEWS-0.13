@@ -2,6 +2,10 @@
 				BOGOFILTER NEWS
 			       =================
  
+0.13.7.2 2003-07-02
+ 
+* Fixed loop in yyinput() caused by unexpected EOF.
+ 
 0.13.7.1 2003-06-26
  
 * Update bogotune to version 0.3
