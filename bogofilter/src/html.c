@@ -87,7 +87,8 @@ static int kill_html_comment(byte *buf_start, byte *buf_used, byte *buf_end)
 		    buf_used -= tmp + 1 - buf_start;
 		}
 		tmp = buf_start;
-		level -= 1;
+		if (level > 0)
+		    level -= 1;
 	    }
 	}
 	else {
