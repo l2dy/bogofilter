@@ -99,7 +99,11 @@ libbogofilter_a_SOURCES= \
 if ENABLE_TDB_DATASTORE
 libbogofilter_a_SOURCES += datastore_tdb.c
 else
+if ENABLE_QDBM_DATASTORE
+libbogofilter_a_SOURCES += datastore_qdbm.c
+else
 libbogofilter_a_SOURCES += datastore_db.c
+endif
 endif
 
 CLEANFILES=version.c directories.c

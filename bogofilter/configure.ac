@@ -96,14 +96,20 @@ export STATICLDFLAGS
 AC_SUBST(STATICLDFLAGS)
 AM_CONDITIONAL(ENABLE_STATIC, test x$enable_static = xyes)
 
-WITH_TDB=
-AC_ARG_WITH(tdb,
-	    AC_HELP_STRING([--with-tdb],
-            [Use trivial database (tdb)]),
-    	    [ WITH_TDB=$withval ]
+WITH_DB_ENGINE=db
+AC_ARG_WITH(database,
+	    AC_HELP_STRING([--with-database=ENGINE],
+	    [Choose database engine {db|tdb|qdbm} \[ENGINE=db\]]),
+	    [ WITH_DB_ENGINE=$withval ]
 )
+case "x$WITH_DB_ENGINE" in
+    xdb|xtdb|xqdbm) : ;;
+    *) AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, tdb, qdbm.])
+    ;;
+esac
 
-if test "x$WITH_TDB" = "xyes"; then 
+case "x$WITH_DB_ENGINE" in
+    xtdb)
 AC_CHECK_LIB(tdb,
              tdb_open,,
              [AC_MSG_ERROR(Cannot link to tdb library.
@@ -111,7 +117,12 @@ AC_CHECK_LIB(tdb,
                            LDFLAGS='-L/path/to/tdb/lib' CPPFLAGS='-I/path/to/tdb/include'
                            )],
 )
-else
+;;
+  xqdbm) 
+  AC_CHECK_LIB(qdbm, dbm_open,,[
+    AC_MSG_ERROR(Cannot link to qdbm library.)])
+;;
+    xdb)
 AH_TEMPLATE([HAVE_DB_H], [Have suitable db.h header])
 need_dash_r=
 case $target_os in
@@ -197,7 +208,8 @@ AC_RUN_IFELSE(
 		   [AC_MSG_RESULT(no)
 		   AC_MSG_ERROR(db.h header file and db library version do not match.)],)
 AC_MSG_RESULT(yes)
-fi
+;;
+esac
 
 # Allow the user to specify a header name to use to indicate whether a given
 # message is SPAM or not.
@@ -294,16 +306,25 @@ fi
 
 AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$MEM_DEBUG != xNO)
 
-if test "x$WITH_TDB" = "xyes" ; then
+case "x$WITH_DB_ENGINE" in
+    xtdb)
     AC_DEFINE(ENABLE_TDB_DATASTORE,1, [Enable tdb datastore])
-    AC_DEFINE_UNQUOTED(DB_TYPE, "tdb", [tdb database type])
-    AC_DEFINE_UNQUOTED(DB_EXT, ".tdb", [tdb database file extension])
-else
-    AC_DEFINE_UNQUOTED(DB_TYPE, "db", [default database type])
-    AC_DEFINE_UNQUOTED(DB_EXT, ".db", [default database file extension])
-fi
+    AC_DEFINE_UNQUOTED(DB_TYPE, "tdb", [database type])
+    AC_DEFINE_UNQUOTED(DB_EXT, ".tdb", [database file extension])
+    ;;
+    xqdbm)
+    AC_DEFINE(ENABLE_QDBM_DATASTORE,1, [Enable qdbm datastore])
+    AC_DEFINE_UNQUOTED(DB_TYPE, "tdb")
+    AC_DEFINE_UNQUOTED(DB_EXT, ".tdb")
+    ;;
+    xdb)
+    AC_DEFINE_UNQUOTED(DB_TYPE, "db")
+    AC_DEFINE_UNQUOTED(DB_EXT, ".db")
+    ;;
+esac
 
-AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_TDB" = "xyes")
+AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xtdb")
+AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -319,9 +340,9 @@ AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 AC_TYPE_SIGNAL
-AC_CACHE_SAVE
 AC_FUNC_SELECT_ARGTYPES
 AC_CHECK_TYPES([ulong, uint32_t, u_int32_t, int32_t, int16_t, u_int16_t, uint16_t, u_int8_t])
+AC_CACHE_SAVE
 AC_CHECK_SIZEOF(short)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
