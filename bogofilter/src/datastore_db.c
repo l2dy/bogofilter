@@ -312,7 +312,7 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
 	}
     }
 
-    return ret;
+    return ret;		/* 0 if ok */
 }
 
 
@@ -491,11 +491,14 @@ int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 	/* call user function */
 	rc = hook(&dbv_key, &dbv_data, userdata);
 	xfree(dbv_key.data);
+	
+	/* returns 0 if ok, 1 if not */
 	if (rc != 0)
 	    break;
     }
 
     switch (ret) {
+    case 0:
     case DB_NOTFOUND:
 	/* OK */
 	ret = 0;
@@ -509,7 +512,7 @@ int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 	ret = -1;
     }
 
-    return ret;
+    return ret;		/* 0 if ok */
 }
 
 const char *db_str_err(int e) {

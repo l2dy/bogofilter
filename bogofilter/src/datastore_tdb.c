@@ -168,7 +168,7 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
       }
     }
 
-    return ret;
+    return ret;		/* 0 if ok */
 }
 
 int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)

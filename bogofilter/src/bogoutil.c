@@ -54,6 +54,7 @@ int ds_dump_hook(word_t *key, dsv_t *data,
 
 int ds_dump_hook(word_t *key, dsv_t *data,
 		 /*@unused@*/ void *userdata)
+/* returns 0 if ok, 1 if not ok */
 {
     (void)userdata;
 
@@ -75,7 +76,7 @@ int ds_dump_hook(word_t *key, dsv_t *data,
 	printf(" %lu", (unsigned long)data->date);
     putchar('\n');
 
-    return !!ferror(stdout);
+    return ferror(stdout) ? 1 : 0;
 }
 
 typedef struct robhook_data {

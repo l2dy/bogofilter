@@ -239,22 +239,22 @@ int ds_write(void *vhandle, const word_t *word, dsv_t *val)
 	}
     }
 
-    return ret;
+    return ret;		/* 0 if ok */
 }
 
 int ds_delete(void *vhandle, const word_t *word)
 {
     dsh_t *dsh = vhandle;
-    bool ok;
+    int ret;
     dbv_t ex_key;
 
     struct_init(ex_key);
     ex_key.data = word->text;
     ex_key.leng = word->leng;
 
-    ok = db_delete(dsh, &ex_key);
+    ret = db_delete(dsh, &ex_key);
 
-    return ok ? 0 : 1;
+    return ret;		/* 0 if ok */
 }
 
 typedef struct {
@@ -267,7 +267,7 @@ static int ds_hook(dbv_t *ex_key,
 		   dbv_t *ex_data,
 		   void *userdata)
 {
-    int val;
+    int ret;
     word_t w_key;
     dsv_t in_data;
     ds_userdata_t *ds_data = userdata;
@@ -279,22 +279,23 @@ static int ds_hook(dbv_t *ex_key,
     memset(&in_data, 0, sizeof(in_data));
     convert_external_to_internal(dsh, ex_data, &in_data);
 
-    val = (*ds_data->hook)(&w_key, &in_data, ds_data->data);
-    return val;
+    ret = (*ds_data->hook)(&w_key, &in_data, ds_data->data);
+
+    return ret;		/* 0 if ok */
 }
 
 int ds_foreach(void *vhandle, ds_foreach_t *hook, void *userdata)
 {
     dsh_t *dsh = vhandle;
-    int val;
+    int ret;
     ds_userdata_t ds_data;
     ds_data.hook = hook;
     ds_data.dsh  = dsh;
     ds_data.data = userdata;
 
-    val = db_foreach(dsh, ds_hook, &ds_data);
+    ret = db_foreach(dsh, ds_hook, &ds_data);
 
-    return val;
+    return ret;
 }
 
 word_t  *msg_count_tok;
