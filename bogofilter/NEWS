@@ -9,13 +9,13 @@ RELEASE.NOTES files!
 
 $Id$
 
-       2003-08-04
+       2003-08-05
 
 	* Fixed critical locking bug introduced into bogofilter 0.13.7.4 with
 	  the combined-wordlist code: bogofilter would lock only the first
 	  opened data base file rather than all.
 
-       2003-08-03
+       2003-08-04
 
 	* Merged trio 1.10 (http://ctrio.sourceforge.net/) to support
 	  compilation on ancient systems (Solaris 2.5) that do not have
