@@ -59,7 +59,7 @@
       <ul>
         <li><a href="#asian_spam">What can I do about asian spam?</a></li>
         <li><a href="#vvv">What does bogofilter's verbose output mean?</a></li>
-        <li>How can I use SpamAssassin to train Bogofilter? (coming soon)</li>
+	<li><a href="#spamassassin">How can I use SpamAssassin to train Bogofilter?</a></li>
       </ul>
     </li>
     <li>Database Questions
@@ -194,6 +194,42 @@ The "-R" output is formatted for use with the R language for statistical computi
 The R Project for Statistical Computing</a>.
 </li>
 </ul>
+
+  <h2 id="spamassassin">How can I use SpamAssassin to train Bogofilter?</h2>
+
+<p>If you have a working SpamAssassin installation (or care to create one), you can use its return codes to train bogofilter.  
+The easiest way is to create a script for your MDA that runs SpamAssassin, tests the spam/non-spam return code, and runs bogofilter to register the message as spam (or non-spam).  
+The sample procmail recipe below shows one way to do this:<p>
+ 
+  <pre>
+  BOGOFILTER    = "/usr/bin/bogofilter"
+  BOGOFILTER_DIR = "/var/lib/bogofilter"
+  BOGOFILTER_DIR = "."
+  SPAMASSASSIN  = "/usr/bin/spamassassin"
+
+  :0
+  * ? $SPAMASSASSIN -e
+  #spam yields non-zero
+  #non-spam yields zero
+  {
+	  :0c
+	  | $BOGOFILTER -n -d $BOGOFILTER_DIR
+  }
+  #else (E)
+  :0Ec
+  | $BOGOFILTER -s -d $BOGOFILTER_DIR
+
+  :0fw
+  | $BOGOFILTER -p -e
+
+  :0:
+  * ^X-Bogosity:.Yes
+  spam
+
+  :0:
+  * ^X-Bogosity:.No
+  non-spam
+  </pre>
 
   <hr>
 
