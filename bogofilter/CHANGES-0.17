@@ -8,6 +8,12 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
  
+0.17.?	2004-02-??
+
+	2004-02-22
+
+	* Fixed code causing gcc 2.9x complaint.
+
 0.17.2	2004-02-22
 
 	* Algorithm code cleanup -- created file score.[ch] from

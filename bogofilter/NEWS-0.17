@@ -8,6 +8,10 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
 
+0.17.?	2004-02-??
+
+* Fixed code causing gcc 2.9x complaint.
+
 0.17.2	2004-02-22
 
 * Relax filename vs. path restrictions in bogoutil.
