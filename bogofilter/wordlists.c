@@ -14,6 +14,7 @@
 #include "bogofilter.h"
 #include "datastore.h"
 #include "error.h"
+#include "paths.h"
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
@@ -85,11 +86,21 @@ int setup_lists(const char* dir, double good_weight, double bad_weight)
     int rc = 0;
     char filepath[PATH_LEN];
 
-    if (build_path(filepath, sizeof(filepath), dir, GOODFILE) < 0) rc = -1;
-    if (init_list(&good_list, "good", filepath, good_weight, false, 0, 0)) rc = -1;
+    if (check_directory(dir)) {
+	(void)fprintf(stderr, "%s: cannot find bogofilter directory.\n"
+		      "You must specify a directory on the command line, in the config file,\n"
+		      "or by using the BOGOFILTER_DIR or HOME environment variables.\n"
+		      "Program aborting.\n", progname);
+	exit(2);
+    }
 
-    if (build_path(filepath, sizeof(filepath), dir, SPAMFILE) < 0) rc = -1;
-    if (init_list(&spam_list, "spam", filepath, bad_weight, true,  0, 0)) rc = -1;
+    if ((build_path(filepath, sizeof(filepath), dir, GOODFILE) < 0) ||
+	init_list(&good_list, "good", filepath, good_weight, false, 0, 0) != 0)
+	rc = -1;
+
+    if ((build_path(filepath, sizeof(filepath), dir, SPAMFILE) < 0) ||
+	init_list(&spam_list, "spam", filepath, bad_weight, true,  0, 0) != 0)
+	rc = -1;
 
     return rc;
 }
