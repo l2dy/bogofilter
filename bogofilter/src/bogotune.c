@@ -468,7 +468,7 @@ static uint read_mailbox(char *arg)
 	wordhash_t *whc, *whp = NULL;
 	wordprop_t *msg_count;
 
-	whc = wordhash_init(WH_CNTS, 0);
+	whc = wordhash_new();
 
 	collect_words(whc);
 	
