@@ -5,6 +5,6 @@
 #
 # test below
 # remember to use ${srcdir}
-printf "test\0te\rst\r\n" >input
-../bogofilter -e -p <input >output
-head -1 output | cmp - input
+printf "test\0te\rst\r\n" >${TMPDIR}/input
+../bogofilter -e -p <${TMPDIR}/input >${TMPDIR}/output
+head -1 ${TMPDIR}/output | cmp - ${TMPDIR}/input
