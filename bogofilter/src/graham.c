@@ -158,7 +158,7 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
 	    (void) fputc('\n', fp);
 	}
 	hit->prob = prob;
-	if (word->leng >= MAXTOKENLEN) {
+	if (word->leng > MAXTOKENLEN) {
 	    /* The lexer should not have returned a token longer than
 	     * MAXTOKENLEN */
 	    internal_error;
