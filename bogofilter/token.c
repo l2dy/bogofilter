@@ -165,9 +165,7 @@ token_t get_token(void)
 	    break;
 
 	case IPADDR:
-	    if (!block_on_subnets)
-		break;
-	    else
+	    if (block_on_subnets)
 	    {
 		const char *prefix="url:";
 		size_t len = strlen(prefix);
@@ -194,6 +192,7 @@ token_t get_token(void)
 		yyleng = strlcpy( yylval+len, yytext, avl);
 		return (class);
 	    }
+	    break;
 	case NONE:		/* nothing to do */
 	    break;
 	case FROM:		/* nothing to do */
