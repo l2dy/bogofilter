@@ -266,7 +266,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	if (
 		(ret = DB_OPEN(dbp, handle->name, NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0
 		&& (ret != ENOENT || opt_flags == DB_RDONLY ||
-		(dbp->close(dbp, 0), ret = DB_OPEN(dbp, handle->name, NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0)
+		(ret = DB_OPEN(dbp, handle->name, NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0)
 	   )
 	{
 	    /* close again and bail out without further tries */
