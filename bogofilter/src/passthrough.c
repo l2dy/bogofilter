@@ -14,10 +14,6 @@ NAME:
 #include <unistd.h>
 #include <errno.h>
 
-#ifdef HAVE_SYSLOG_H
-#include <syslog.h>
-#endif
-
 #include "passthrough.h"
 #include "bogofilter.h"
 #include "fgetsl.h"
@@ -223,8 +219,6 @@ void write_message(rc_t status)
 void write_log_message(void)
 {
 #ifdef HAVE_SYSLOG_H
-    openlog("bogofilter", LOG_PID, LOG_MAIL);
-
     format_log_header(msg_bogofilter, sizeof(msg_bogofilter));
 
     switch (run_type)

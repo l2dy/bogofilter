@@ -20,6 +20,10 @@ NAME:
 
 #include <stdio.h>
 
+#ifdef HAVE_SYSLOG_H
+#include <syslog.h>
+#endif
+
 #include "debug.h"
 #include "system.h"	/* defines bool, uint32_t */
 

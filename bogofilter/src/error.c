@@ -14,10 +14,7 @@ AUTHOR:
 
 #include <stdarg.h>
 #include <unistd.h>
-
-#ifdef HAVE_SYSLOG_H
-#include <syslog.h>
-#endif
+#include <ctype.h>
 
 #include "error.h"
 
@@ -27,18 +24,28 @@ AUTHOR:
 
 void print_error( const char *file, unsigned long line, const char *format, ... )
 {
-    pid_t pid = getpid();
     char message[256];
+    int i, l;
 
     va_list ap;
-    va_start (ap, format);
-    vsnprintf( message, sizeof(message), format, ap );
-    va_end (ap);
+    va_start(ap, format);
+    l = vsnprintf(message, sizeof(message), format, ap);
+    if (l >= sizeof(message)) {
+	/* output was truncated, mark truncation */
+	strcpy(message + sizeof(message) - 4, "...");
+    }
+    va_end(ap);
+
+    
+
+    /* security: replace unprintable characters by underscore "_" */
+    for (i = 0; i < strlen(message); i++)
+	if (!isprint((unsigned char)message[i]))
+	    message[i] = '_';
 
     fprintf(stderr, "%s: %s\n", progname, message);
 #ifdef HAVE_SYSLOG_H
     if (logflag)
-	syslog(LOG_INFO, "[%lu] %s:%lu:  %s", (unsigned long)pid,
-		file, line, message );
+	syslog(LOG_INFO, "%s:%lu: %s", file, line, message );
 #endif
 }

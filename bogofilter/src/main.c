@@ -46,6 +46,9 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     argc -= optind;
     argv += optind;
 
+    if (logflag)
+	openlog("bogofilter", LOG_PID, LOG_MAIL);
+
     /* open all wordlists */
     open_wordlists((run_type == RUN_NORMAL) ? DB_READ : DB_WRITE);
 
@@ -81,6 +84,9 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 #ifdef	ENABLE_MEMDEBUG
     memdisplay();
 #endif
+
+    if (logflag)
+	closelog();
 
     exit(exitcode);
 }
