@@ -27,6 +27,9 @@ Briefly:
 	  This option removes outdated log files automatically before closing
 	  the environment, to conserve disk space.
 
+	* Added signal handler to catch SIGINT, SIGKILL, and SIGTERM
+          and exit cleanly.
+
 	2005-02-24
 
 	* Transactional datastore autoprobing was completed, it assumes

@@ -111,6 +111,7 @@ version_sources= \
 	robx.h robx.c \
 	rstats.h rstats.c \
 	score.h score.c \
+	sighandler.h sighandler.c \
 	swap.h swap_32bit.c system.c \
 	textblock.h textblock.c \
 	token.h token.c \

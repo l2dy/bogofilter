@@ -37,6 +37,7 @@ AUTHORS:
 #include "paths.h"
 #include "prob.h"
 #include "robx.h"
+#include "sighandler.h"
 #include "swap.h"
 #include "wordlists.h"
 #include "xmalloc.h"
@@ -781,6 +782,9 @@ static int process_arg(int option, const char *name, const char *val)
 int main(int argc, char *argv[])
 {
     ex_t rc;
+
+    signal_setup();			/* setup to catch signals */
+
     progtype = build_progtype(progname, DB_TYPE);
 
     set_today();			/* compute current date for token age */

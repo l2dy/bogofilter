@@ -15,6 +15,7 @@ AUTHOR:
 #include <stdlib.h>
 
 #include "bogomain.h"
+#include "sighandler.h"
 
 const char *progname = "bogofilter";
 
@@ -22,7 +23,11 @@ const char *progname = "bogofilter";
 
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
-    ex_t exitcode = bogomain(argc, argv);
+    ex_t exitcode;
+
+    signal_setup();		/* setup to catch signals */
+
+    exitcode = bogomain(argc, argv);
 
     exit(exitcode);
 }
