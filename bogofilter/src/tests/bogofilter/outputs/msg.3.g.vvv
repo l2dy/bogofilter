@@ -1,4 +1,4 @@
-X-Bogosity: Yes, tests=bogofilter, spamicity=0.990000
+X-Bogosity: No, tests=bogofilter, spamicity=0.010000
   0.010000  0.010000  AND
   0.010000  0.000102  Message
   0.010000  0.000001  Tom
@@ -6,11 +6,11 @@ X-Bogosity: Yes, tests=bogofilter, spamicity=0.990000
   0.010000  0.000000  around
   0.010000  0.000000  being
   0.010000  0.000000  details
-  0.990000  0.000000  ------------------
+  0.010000  0.000000  his
   0.990000  0.000000  Content-Length
   0.990000  0.000000  FREE
-  0.990000  0.000001  Free
-  0.990000  0.000102  Shipping
-  0.990000  0.010000  ZYPb9G
-  0.990000  0.500000  abuse
-  0.990000  0.990000  bounce.azogle.com
+  0.990000  0.000000  Free
+  0.990000  0.000000  Shipping
+  0.990000  0.000001  ZYPb9G
+  0.990000  0.000102  abuse
+  0.990000  0.010000  bounce.azogle.com

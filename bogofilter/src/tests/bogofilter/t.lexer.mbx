@@ -48,6 +48,8 @@ WANT="1690.3918"
 WANT="1724.3937"
 # v0.13.6.2 - lexer_v3.l changes to exclude brackets
 WANT="1723.3931"
+# v0.13.7.3 - lexer_v3.l changes to allow space in mime boundary
+WANT="1722.3929"
 
 if [ "$RESULT" != "$WANT" ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT

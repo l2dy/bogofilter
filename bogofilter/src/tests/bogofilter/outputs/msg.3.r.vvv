@@ -1,4 +1,4 @@
-X-Bogosity: No, tests=bogofilter, spamicity=0.535301
+X-Bogosity: No, tests=bogofilter, spamicity=0.533577
                                      n    pgood     pbad      fw     U
 "there"                             14  0.291667  0.000000  0.000296 +
 "Message"                            9  0.187500  0.000000  0.000461 +
@@ -208,7 +208,6 @@ X-Bogosity: No, tests=bogofilter, spamicity=0.535301
 "plus"                               1  0.000000  0.047619  0.994208 +
 "Sat"                                2  0.000000  0.095238  0.997090 +
 "Shipping"                           2  0.000000  0.095238  0.997090 +
-"------------------"                 3  0.000000  0.142857  0.998056 +
 "Azoogle"                            3  0.000000  0.142857  0.998056 +
 "Deals"                              3  0.000000  0.142857  0.998056 +
 "GMT"                                3  0.000000  0.142857  0.998056 +
@@ -239,5 +238,5 @@ X-Bogosity: No, tests=bogofilter, spamicity=0.535301
 "subscriber"                         6  0.000000  0.285714  0.999027 +
 "Free"                               9  0.000000  0.428571  0.999351 +
 "FREE"                              10  0.000000  0.476190  0.999416 +
-P_Q_S_invs_logs_md                 239  0.804432  0.698333  0.535301
+P_Q_S_invs_logs_md                 238  0.800605  0.699845  0.533577
                                         1.00e-02  4.15e-01  0.000
