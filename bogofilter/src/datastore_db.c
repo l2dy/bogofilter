@@ -321,13 +321,13 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	    db_close(handle, true);
 	    handle = NULL;	/* db_close freed it, we don't want to use it anymore */
 	    errno = e;
-	    /* do not bother to retry if the problem wasn't EAGAIN */
-	    if (e != EAGAIN && e != EACCES) return NULL;
-	    /* do not goto open_err here, db_close frees the handle! */
 	    if (errno == EACCES)
 		errno = EAGAIN;
+	    if (errno != EAGAIN)
+		return NULL;
 	} else {
-	    idx = COUNTOF(retryflags);
+	    /* have lock */
+	    break;
 	}
     } /* for idx over retryflags */
 
