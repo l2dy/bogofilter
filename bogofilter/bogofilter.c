@@ -560,10 +560,10 @@ double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@*/
     int robn = 0;
 
     // Note: .ROBX is scaled by 1000000 in the wordlist
-    double robx = (double)db_getvalue(spam_list.dbh, ".ROBX");
+    long l_robx = db_getvalue(spam_list.dbh, ".ROBX");
 
     // If found, unscale; else use predefined value
-    robx = robx ? robx / 1000000 : ROBX;
+    double robx = l_robx ? (double)l_robx / 1000000 : ROBX;
 
     if (Rtable || verbose)
 	rstats_init();

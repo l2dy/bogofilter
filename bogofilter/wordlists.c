@@ -214,7 +214,7 @@ bool configure_wordlist(const char *val)
     *tmp++ = '\0';
     while (isspace(*tmp)) tmp += 1;
 
-    override=atof(tmp);
+    override=atoi(tmp);
     tmp += strcspn(tmp, ", \t");
     *tmp++ = '\0';
     while (isspace(*tmp)) tmp += 1;
