@@ -254,7 +254,7 @@ double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 
 void rob_print_summary(void)
 {
-    (void)fprintf(stdout, "%3d  %-20s %9.6f %9.6f %9.6f %9.3f %9.3f %4.2f\n",
+    (void)fprintf(stdout, "%3d  %-20s %9.5f %9.5f %9.6f %9.3f %9.3f %4.2f\n",
 		  rob_stats.robn+1, "P_Q_S_invs_logs_md", 
 		  rob_stats.p_pr, rob_stats.q_pr, rob_stats.s.spamicity, rob_stats.p_ln, rob_stats.q_ln, min_dev);
 }
