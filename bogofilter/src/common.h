@@ -26,6 +26,12 @@ NAME:
 /* length of token will not exceed this... */
 #define MAXTOKENLEN	30
 
+typedef enum sh_e { IX_SPAM = 0, 	/* index for SPAM */
+		    IX_GOOD = 1, 	/* index for GOOD */
+		    IX_SIZE = 2, 	/* array size     */
+		    IX_UNDF = 3 	/* ... undefined  */
+} sh_t;
+
 #define WORDLIST	"wordlist" DB_EXT
 #define GOODFILE	"goodlist" DB_EXT
 #define SPAMFILE	"spamlist" DB_EXT

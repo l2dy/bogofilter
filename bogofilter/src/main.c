@@ -206,7 +206,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	write_log_message();
 
     /* cleanup storage */
-    db_cleanup();
+    ds_cleanup();
     mime_cleanup();
     token_cleanup();
     xfree(directory);

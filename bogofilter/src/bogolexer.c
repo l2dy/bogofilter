@@ -33,7 +33,6 @@ const char *progname = PROGNAME;
 
 /* prevent larger inclusions */
 
-run_t run_type = RUN_NORMAL;
 const char *spam_header_name = SPAM_HEADER_NAME;
 
 const parm_desc sys_parms[] =

@@ -343,7 +343,7 @@ size_t decode_text(word_t *w)
 	fputs("\n", dbgout);
     }
 
-    memcpy(beg, n.text, size+1);
+    memmove(beg, n.text, size+1);
     size += beg-text;
 
     return size;

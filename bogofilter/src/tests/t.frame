@@ -74,6 +74,10 @@ fi
 rm -rf $TMPDIR
 mkdir $TMPDIR
 
+if [ "$1" = "-v" ]; then
+    ${relpath}/bogofilter -V 2> ${TMPDIR}/version.out
+fi
+
 if test "x$SUPPRESS_DELETE" = "x" ; then
     trap "$PRINTCORE ; rm -r -f core ${TMPDIR}" 0
 else

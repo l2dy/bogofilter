@@ -20,18 +20,19 @@
 
 void *
 xmalloc(size_t size){
-	void *x;
-	x = malloc(size);
-	if (x == NULL && size == 0)
-	    x = malloc(1);
-	if (x == NULL) {
-	    xmem_error("xmalloc"); 
-	}
-	return x;
+    void *ptr;
+    ptr = malloc(size);
+    if (ptr == NULL && size == 0)
+	ptr = malloc(1);
+    if (ptr == NULL) {
+	xmem_error("xmalloc"); 
+    }
+    return ptr;
 }
 
 void
 xfree(void *ptr){
-  if (ptr) free(ptr);
+    if (ptr)
+	free(ptr);
 }
 

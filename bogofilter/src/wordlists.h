@@ -6,11 +6,7 @@
 #define	WORDLISTS_H
 
 #include "system.h"
-
-typedef enum sh_e { SPAM, GOOD } sh_t;
-
-#define	spamcount count[SPAM]
-#define	goodcount count[GOOD]
+#include "datastore.h"
 
 extern const char *aCombined[];
 extern size_t	   cCombined;
@@ -26,11 +22,11 @@ struct wordlist_s
     int index;
     /*@owned@*/ char *filename;	/* resource name (for debug/verbose messages) */
     /*@owned@*/ char *filepath;	/* resource path (for debug/verbose messages) */
-    /*@owned@*/ void *dbh;	/* database handle */
-    long msgcount[2];		/* count of messages in wordlist. */
-    double weight[2];
+    /*@owned@*/ dsh_t *dsh;	/* datastore handle */
+    long msgcount[IX_SIZE];	/* count of messages in wordlist. */
+    double weight[IX_SIZE];
     bool active;
-    bool bad[2];
+    bool bad[IX_SIZE];
     int  override;
     bool ignore;
 };

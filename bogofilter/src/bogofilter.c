@@ -33,6 +33,7 @@ THEORY:
 #include "datastore.h"
 #include "collect.h"
 #include "register.h"
+#include "wordlists.h"
 
 void initialize_constants()
 {

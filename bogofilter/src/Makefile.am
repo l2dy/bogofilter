@@ -96,9 +96,9 @@ libbogofilter_a_SOURCES= \
 	xatox.h xatof.c xatoi.c
 
 if ENABLE_TDB_DATASTORE
-libbogofilter_a_SOURCES += datastore_tdb.c
+libbogofilter_a_SOURCES += datastore_tdb.c datastore_tdb.h
 else
-libbogofilter_a_SOURCES += datastore_db.c
+libbogofilter_a_SOURCES += datastore_db.c datastore_db.h
 endif
 
 CLEANFILES=version.c directories.c

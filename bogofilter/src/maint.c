@@ -19,6 +19,7 @@ AUTHOR:
 #include "datastore.h"
 #include "error.h"
 #include "maint.h"
+#include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
@@ -96,7 +97,10 @@ bool keep_size(size_t size)
 	return true;
     else {
 	bool ok = (size_min <= size) && (size <= size_max);
-	if (DEBUG_DATABASE(1)) fprintf(dbgout, "keep_size:  %lu <= %lu <= %lu -> %c\n", (unsigned long)size_min, (unsigned long)size, (unsigned long)size_max, ok ? 't' : 'f' );
+	if (DEBUG_DATABASE(1))
+	    fprintf(dbgout, "keep_size:  %lu <= %lu <= %lu -> %c\n", 
+		    (unsigned long)size_min, (unsigned long)size, (unsigned long)size_max, 
+		    ok ? 't' : 'f' );
 	return ok;
     }
 }
@@ -122,7 +126,7 @@ void maintain_wordlists(void)
     set_list_active_status(true);
 
     for (list = word_lists; list != NULL; list = list->next) {
-	maintain_wordlist(list->dbh);
+	maintain_wordlist(list->dsh);
 	list = list->next;
     }
 }
@@ -132,66 +136,72 @@ int maintain_wordlist_file(const char *db_file)
     int rc;
     void *dbh;
 
-    dbh = db_open(".", 1, &db_file, DB_WRITE);
+    dbh = ds_open(".", 1, &db_file, DB_WRITE);
     if (dbh == NULL)
 	return 2;
 
     rc = maintain_wordlist(dbh);
 
-    db_close(dbh, false);
+    ds_close(dbh, false);
 
     return rc;
 }
 
-static int maintain_hook(word_t *key, word_t *data,
+
+static int maintain_hook(word_t *w_key, dsv_t *in_val,
 			 /*@unused@*/ void *userdata)
 {
-    word_t w;
-    dbv_t val;
+    size_t len;
+    word_t token;
+    void *vhandle = userdata;
 
-    if (data->leng > sizeof(val)) {
-	print_error(__FILE__, __LINE__, "Invalid database value.\n");
-	exit(EX_ERROR);
-    }
+    token.text = w_key->text;
+    token.leng = w_key->leng;
 
-    w.leng = key->leng;
-    w.text = key->text;
-
-    memcpy(&val, data->text, data->leng);
-
-    if (strncmp((char *)key->text, ".MSG_COUNT", key->leng) == 0)
+    len = strlen(MSG_COUNT);
+    if (len == token.leng && 
+	strncmp((char *)token.text, MSG_COUNT, token.leng) == 0)
 	return 0;
 
-    if ((!keep_count(val.spamcount) && !keep_count(val.goodcount)) || 
-	!keep_date(val.date) || !keep_size(key->leng)) {
-	db_delete(userdata, key);
-	if (DEBUG_DATABASE(0)) {
-	    fputs("deleting ", dbgout);
-	    word_puts(&w, 0, dbgout);
-	    fputc('\n', dbgout);
-	}
+    if ((!keep_count(in_val->spamcount) && !keep_count(in_val->goodcount)) || 
+	!keep_date(in_val->date) || !keep_size(token.leng)) {
+	int ret = ds_delete(vhandle, &token);
+	if (DEBUG_DATABASE(0))
+	    fprintf(dbgout, "deleting '%*s'\n", token.leng, (char *)token.text);
+	return ret;
     }
-    else {
-	if (replace_nonascii_characters)
+
+    if (replace_nonascii_characters)
+    {
+	byte *key_tmp = (byte *)xmalloc(token.leng + 1);
+	memcpy(key_tmp, token.text, token.leng);
+	key_tmp[token.leng] = '\0';
+	if (do_replace_nonascii_characters(key_tmp, token.leng))
 	{
-	    byte *tmp = (byte *)xmalloc(key->leng + 1);
-	    memcpy(tmp, key->text, key->leng);
-	    tmp[key->leng] = '\0';
-	    if (do_replace_nonascii_characters(tmp, key->leng))
-	    {
-		db_delete(userdata, key);
-		w.text = tmp;
-		w.leng = key->leng;
-		db_updvalues(userdata, &w, &val);
+	    int	  ret;
+	    dsv_t old_tmp;
+
+	    /* delete original token */
+	    ds_delete(vhandle, &token);	
+
+	    /* retrieve and update nonascii token*/
+	    token.text = key_tmp;
+	    ret = ds_read(vhandle, &token, &old_tmp);
+
+	    if (ret == 0) {
+		in_val->spamcount += old_tmp.spamcount;
+		in_val->goodcount += old_tmp.goodcount;
+		in_val->date       = max(old_tmp.date, in_val->date);	/* date in form YYYYMMDD */
 	    }
-	    xfree(tmp);
+	    set_date(in_val->date);	/* set timestamp */
+	    ds_write(vhandle, &token, in_val);
 	}
+	xfree(key_tmp);
     }
     return 0;
 }
 
 int maintain_wordlist(void *vhandle)
 {
-    void *dbh = vhandle;
-    return db_foreach(dbh, maintain_hook, dbh);
+    return ds_foreach(vhandle, maintain_hook, vhandle);
 }

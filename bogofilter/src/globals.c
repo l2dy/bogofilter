@@ -67,3 +67,5 @@ int	db_cachesize = 0;		/* in MB */
 enum	passmode passmode;		/* internal */
 bool	msg_count_file = false;
 const char *progtype = NULL;
+
+run_t run_type = RUN_UNKNOWN;

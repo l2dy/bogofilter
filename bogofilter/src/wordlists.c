@@ -68,16 +68,16 @@ static int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const ch
 
     *list = new;
 
-    new->dbh=NULL;
+    new->dsh=NULL;
     new->filename=xstrdup(name);
     new->filepath=xstrdup(path);
     new->index = ++listcount;
     new->override=override;
     new->active=false;
-    new->weight[SPAM]=sweight;
-    new->weight[GOOD]=gweight;
-    new->bad[SPAM]=sbad;
-    new->bad[GOOD]=gbad;
+    new->weight[IX_SPAM]=sweight;
+    new->weight[IX_GOOD]=gweight;
+    new->bad[IX_SPAM]=sbad;
+    new->bad[IX_GOOD]=gbad;
     new->ignore=ignore;
 
     if (! word_lists) {
@@ -196,16 +196,16 @@ void open_wordlists(dbmode_t mode)
 	    case WL_M_COMBINED:
 		if (db_cachesize < 4)
 		    db_cachesize = 4;
-		list->dbh = db_open(list->filepath, cCombined, aCombined, mode);
+		list->dsh = ds_open(list->filepath, cCombined, aCombined, mode);
 		break;
 	    case WL_M_SEPARATE:
-		list->dbh = db_open(list->filepath, cSeparate, aSeparate, mode);
+		list->dsh = ds_open(list->filepath, cSeparate, aSeparate, mode);
 		break;
 	    case WL_M_UNKNOWN:
 		fprintf(stderr, "Invalid wordlist mode.\n");
 		exit(EX_ERROR);
 	    }
-	    if (list->dbh == NULL) {
+	    if (list->dsh == NULL) {
 		int err = errno;
 		close_wordlists(true); /* unlock and close */
 		switch(err) {
@@ -222,12 +222,12 @@ void open_wordlists(dbmode_t mode)
 				list->filename, list->filepath, err, strerror(err));
 			exit(EX_ERROR);
 		} /* switch */
-	    } else { /* db_open */
-		dbv_t val;
-		db_get_msgcounts(list->dbh, &val);
-		list->msgcount[GOOD] = val.goodcount;
-		list->msgcount[SPAM] = val.spamcount;
-	    } /* db_open */
+	    } else { /* ds_open */
+		dsv_t val;
+		ds_get_msgcounts(list->dsh, &val);
+		list->msgcount[IX_GOOD] = val.goodcount;
+		list->msgcount[IX_SPAM] = val.spamcount;
+	    } /* ds_open */
 	} /* for */
     } while(retry);
 }
@@ -239,8 +239,8 @@ void close_wordlists(bool nosync /** Normally false, if true, do not synchronize
 
     for ( list = word_lists; list != NULL; list = list->next )
     {
-	if (list->dbh) db_close(list->dbh, nosync);
-	list->dbh = NULL;
+	if (list->dsh) ds_close(list->dsh, nosync);
+	list->dsh = NULL;
     }
 }
 
@@ -319,7 +319,7 @@ void set_good_weight(double weight)
 
     for ( list = word_lists; list != NULL; list = list->next )
     {
-	list->weight[GOOD] = weight;
+	list->weight[IX_GOOD] = weight;
     }
 
     return;
