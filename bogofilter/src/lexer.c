@@ -198,7 +198,7 @@ static int get_unfolded_line(buff_t *buff)
     
 		/* accept non-empty line */
 		if (passthrough && passmode == PASS_MEM && buff->t.leng > 0)
-		    textblock_add(text, add);
+		    textblock_add((const unsigned char *)text, add);
 		count += add;
 
 		/* Convert multiple lines to single line */
