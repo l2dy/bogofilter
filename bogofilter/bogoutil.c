@@ -216,7 +216,7 @@ static int words_from_list(const char *db_file, int argc, char **argv)
     else
     {
 	while (argc-- > 0) {
-	    char *token = *++argv;
+	    char *token = *argv++;
 	    printf("%s %ld\n", token, db_getvalue(dbh, token));
 	}
     }
