@@ -430,10 +430,13 @@ const char *db_version_str(void)
 	     DB_VERSION_MAJOR, DB_VERSION_MINOR, DB_VERSION_PATCH);
 #endif
 
-    if (fTransaction)
-	strcat(v, " TRANSACTIONAL");
-    else
-	strcat(v, " NON-TRANSACTIONAL");
+    if (dsm) {
+	if (fTransaction)
+	    strcat(v, " TRANSACTIONAL");
+	else
+	    strcat(v, " NON-TRANSACTIONAL");
+    } else
+	strcat(v, " AUTO-XA");
 
     return v;
 }
