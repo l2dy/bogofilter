@@ -3,11 +3,10 @@
 </body>
 <h1>Bogofilter FAQ</h1>
 <p>
-Revision: $Id$<br>
 Official Version:
 <a href="http://bogofilter.sourceforge.net/bogofilter-faq.html">
 http://bogofilter.sourceforge.net/bogofilter-faq.html</a><br>
-Maintainer: Adrian Otto &lt aotto at aotto.com &gt
+Maintainer: David Relson &lt; relson &lt; at &gt; osagsoftware.com &gt;
 </p>
 <p>
 This document is intended to answer frequently asked questions about 
@@ -24,7 +23,8 @@ bogofilter.
   <li><a href="#wordlist_size">How do I tell how many tokens are in my wordlists?</a></li>
   <li><a href="#port_notes">How do I get Bogofilter working on Solaris, BSD, etc.?</a></li>
   <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
-  <li><a href="#return_codes">Why does bogofilter give return codes like 0 and 256 when it's run from inside a program?</a></li>
+  <li><a href="#return_codes">Why does bogofilter give return codes like 0 and 256
+         when it's run from inside a program?</a></li>
   <li>How can I use SpamAssasin to train Bogofilter? (coming soon)</li>
 </ul>
 </p>
@@ -36,7 +36,9 @@ bogofilter.
 Bogofilter is a fast Bayesian spam filter along the lines suggested 
 by Paul Graham in his article <a href="http://www.paulgraham.com/spam.html">
 A Plan For Spam</a>.
-<a href="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">Gary Robinson</a>'s geometric-mean algorithm is also included as is his modification of the algorithm to use Fisher's method.
+<a href="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">
+Gary Robinson</a>'s geometric-mean algorithm is also included as is his modification
+of the algorithm to use Fisher's method.
 <p>
 Check the <a href="http://bogofilter.sourceforge.net">
 bogofilter home page</a> for more information.
@@ -77,7 +79,8 @@ There are currently four mailing lists for bogofilter
     <td>A list for sharing patches, development, and technical discussions</td>
   </tr>
   <tr>
-    <td>bogofilter-cvs@lists.sourceforge.net <a href="http://lists.sourceforge.net/mailman/listinfo/bogofilter-cvs">[subscribe]</a></td>
+    <td>bogofilter-cvs@lists.sourceforge.net 
+        <a href="http://lists.sourceforge.net/mailman/listinfo/bogofilter-cvs">[subscribe]</a></td>
     <td>Mailing list for announcing code changes to the CVS archive</td>
   </tr>
 </table>
@@ -95,21 +98,28 @@ sourceforge is the central clearinghouse for bogofilter resources.
 <a name="token_counts"></a>
 <p><b>How do I find the spam and ham counts for a token?</b></p>
 <p>
- Use bogoutil's '-w' option to display info about a token (word).  For example, "bogoutil -d $BOGOFILTER_DIR example.com" gives the good and bad counts for "example.com".
+ Use bogoutil's '-w' option to display info about a token (word).
+ For example, "bogoutil -d $BOGOFILTER_DIR example.com" gives the good and 
+ bad counts for "example.com".
  </p>
 
 <hr>
 <a name="message_count"></a>
 <p><b>How do I tell how many messages are in my wordlists?</b></p>
 <p>
- Use bogoutil's '-w' option to display the value of special token .MSG_COUNT, i.e. run command "bogoutil -w $BOGOFILTER_DIR .MSG_COUNT" to see the counts for the spam and ham wordlists.
+ Use bogoutil's '-w' option to display the value of special token .MSG_COUNT, 
+ i.e. run command "bogoutil -w $BOGOFILTER_DIR .MSG_COUNT" to see the counts 
+ for the spam and ham wordlists.
  </p>
 
 <hr>
 <a name="wordlist_size"></a>
 <p><b>How do I tell how many tokens are in my wordlists?</b></p>
 <p>
- Pipe the output of bogoutil's dump command to command "wc", i.e. use "bogoutil -d $BOGOFILTER_DIR/spamlist.db | wc -l " to display the count for the spamlist and use "bogoutil -d $BOGOFILTER_DIR/goodlist.db | wc -l " to display the count for the goodlist.
+ Pipe the output of bogoutil's dump command to command "wc", 
+ i.e. use "bogoutil -d $BOGOFILTER_DIR/spamlist.db | wc -l " to display the 
+ count for the spamlist and use "bogoutil -d $BOGOFILTER_DIR/goodlist.db | wc -l"
+  to display the count for the goodlist.
  </p>
 
 <hr>
@@ -129,7 +139,8 @@ $ make install
 </pre>
 </p>
 <p>
-Next, download a <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">portable version</a> of bogofilter.</a>
+Next, download a <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">
+portable version</a> of bogofilter.</a>
 </p>
 <p>
 <b>On Solaris</b>
@@ -144,7 +155,8 @@ $ make &amp;&amp; make install
 </pre>
 </p>
 <p>
-You will either want to put a symlink to libdb.so in /usr/lib, or use a modified LD_LIBRARY_PATH environment variable before you start bogofilter.
+You will either want to put a symlink to libdb.so in /usr/lib, or use a modified 
+LD_LIBRARY_PATH environment variable before you start bogofilter.
 </p>
 <p>
 <pre>
@@ -200,7 +212,8 @@ to your NFS documentation for more information about running "lockd" or
 <a name="return_codes"></a>
 <p><b>Why does bogofilter give return codes like 0 and 256 when it's run from inside a program?</b></p>
 <p>
- Likely the return codes are being reformatted by waitpid(2).  Use WEXITSTATUS(status) in sys/wait.h, or comparable macro, to get the correct value.
+ Likely the return codes are being reformatted by waitpid(2).  
+ Use WEXITSTATUS(status) in sys/wait.h, or comparable macro, to get the correct value.
  </p>
 
 <hr>
