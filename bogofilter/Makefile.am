@@ -38,7 +38,8 @@ configtest_SOURCES = configtest.c config.c wordlists.c datastore_db.c $(MYCOMMON
 
 # what to distribute
 EXTRA_DIST = $(man1_MANS) \
-	     bogofilter-faq.html README.hp-ux UPGRADE \
+	     bogofilter.cf bogofilter-faq.html \
+	     README.hp-ux UPGRADE \
 	     bogofilter.xml bogoutil.xml bogoupgrade.xml bogolexer.xml \
 	     bogofilter.spec bogofilter.spec.in \
 	     bogoupgrade bogo.R \

@@ -1,0 +1,30 @@
+#### Sample bogofilter configuration file
+
+#	file should be in /etc/bogofilter.cf and/or ~/.bogofilter.cf
+
+#### SPAM_HEADER_NAME
+#
+#	used in reporting spamicity and
+#	in removing already existing headers
+
+#spam_header_name=X-Bogosity
+
+#### wordlist: define a word list
+#
+#	char type: 's','g','i' (denoting spam, good, or ignore)
+#	char *name: name of list, e.g. "good", "spam", "ignore"
+#	char *path: path to file
+#	double weight - probability BIAS for list
+#	int override - skip lower valued lists
+
+#wordlist i,ignore,~/.ignorelist.db,1,0,0
+
+##### threshold values
+#
+#	used to determine if/when spamicity 
+#	values are output by print_bogostats()
+
+# thresh_index = 12
+# thresh_stats = 0.2f
+# thresh_rtable=0.6f
+
