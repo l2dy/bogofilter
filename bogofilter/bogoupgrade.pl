@@ -85,7 +85,7 @@ elsif ($sig =~ m/^\# bogofilter email-count \(format version B\):\s(\d+)/){
       next;
     }
     elsif (/^$msg_count_token\s(\d+)$/){
-      warn("This database appears to have been upgraded already. But there's no harm in doing it again.\n");
+      warn("This database appears to have been upgraded already.\nBut there's no harm in doing it again.\n");
       $msg_count = $1;
       next;
     }
