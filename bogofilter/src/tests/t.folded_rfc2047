@@ -12,6 +12,10 @@ Subject: =?iso-8859-1?q?ok?=
     =?iso-8859-1?q?ay?=
 	another
   	=?iso-8859-1?q?merge?=	 	=?iso-8859-1?q?_worked?=
+Reply-To: =?iso-8859-1?Q?jo?= =?iso-8859-1?Q?in?=
+Reply-To: =?iso-8859-1?Q?jo?=    =?iso-8859-1?Q?in?=
+Reply-To: =?iso-8859-1?Q?john?= q =?iso-8859-1?Q?doe?=
+Reply-To: =?iso-8859-1?Q?john?=_q_=?iso-8859-1?Q?public?=
 
 - torso -
 header: =?iso-8859-1?q?bo?=
@@ -26,6 +30,15 @@ torso
 header
 iso-8859-1
 iso-8859-1
+Reply-To
+join
+Reply-To
+join
+Reply-To
+john
+doe
+Reply-To
+john_q_public
 _EOF
 
 ../bogolexer -p -C <${TMPDIR}/input >${TMPDIR}/output
