@@ -89,6 +89,9 @@ void rstats_cleanup(void)
 
 void rstats_add(const word_t *token, wordprop_t *props)
 {
+    if (token == NULL)
+	return;
+
     header.count += 1;
     current->next  = NULL;
     current->token = word_dup(token);
