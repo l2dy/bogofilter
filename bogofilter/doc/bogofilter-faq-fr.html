@@ -69,15 +69,15 @@
       <li>
         Questions opérationnelles
         <ul>
-	  <li><a href="#train-on-error">Qu'est-ce que "l'entrainement sur erreur" et
-	  "l'entrainement sur épuisement"?</a></li>
           <li><a href="#training">Comment débuter l'apprentissage de Bogofilter?</a></li>
           <li><a href="#production">Comment conserver une bonne d'acuité?</a></li>
-          <li><a href="#unsure">Qu'est-ce que le mode <i>Unsure</i>?</a></li>
-          <li><a href="#autoupdate">A quoi sert l'option '-u' (autoupdate) ?</a></li>
-          <li><a href="#spamassassin">Comment puis-je utiliser SpamAssassin pour entraîner Bogofilter?</a></li>
 	  <li><a href="#mboxformats">Quels formats de boites aux lettres (fichier) Bogofilter comprend-il?</a></li>
           <li><a href="#vvv">Que signifie la sortie verbeuse de Bogofilter?</a></li>
+          <li><a href="#unsure">Qu'est-ce que le mode <i>Unsure</i>?</a></li>
+	  <li><a href="#train-on-error">Qu'est-ce que "l'entrainement sur erreur" et
+	  "l'entrainement sur épuisement"?</a></li>
+          <li><a href="#autoupdate">A quoi sert l'option '-u' (autoupdate) ?</a></li>
+          <li><a href="#spamassassin">Comment puis-je utiliser SpamAssassin pour entraîner Bogofilter?</a></li>
           <li><a href="#asian-spam">Comment traiter les spams asiatiques?</a></li>
         </ul>
       </li>
@@ -258,43 +258,6 @@
     </table>
 
     <hr>
-    <h2 id="train-on-error">Qu'est-ce que "l'entrainement sur erreur" et "l'entrainement sur épuisement"?</h2>
-
-    <p>"L'entrainement sur erreur" implique l'analyse d'un corpus de messages dont le statut de spam ou ham
-    est connu. Seuls ceux qui sont mal classés, ou dont le classement est incertain, seront intégrés dans
-    la base de données d'apprentissage. Il a été montré que la sélection des seuls messages "mauvais élèves" était
-    un moyen efficace d'entrainement. Si l'on entrainait Bogofilter avec tous les messages, il va
-    réapprendre avec des spams ou hams évidents.</p>
-
-    <p> Cette méthode peut être améliorée en utilisant une "marge de
-    sécurité". En augmentant la valeur "spam cutoff" et en diminuant la valeur "ham cutoff",
-    les messages qui sont proches du seuil seront utilisés, pour l'entrainement. L'utilisation de
-    cette marge de sécurité a montré son efficacité à améliorer les
-    résultats dans l'entrainement sur erreur. En général, des marges plus larges sont
-    une aide supplémentaire (malgré le fait que des marges trop grandes ne soient
-    pas optimales). Pour un mode à triple état, vous pouvez utiliser le milieu de 
-    l'état unsure avec un intervalle de +/- 0.3 pour l'entrainement</p>
-
-    <p>Répéter l'entrainement sur erreur sur le même corpus de message peut améliorer
-    la précision. L'idée est que les messages qui ont été bien classés une première fois
-    peuvent, à la suite de l'entrainement, être mal classés. Fait qui sera compensé par
-    cette répétition.</p>
-    
-    <p>"L'entrainement sur épuisement" est la répétition de l'entrainement sur erreur, avec le même corpus
-    de messages, jusqu'à ce que plus aucune erreur ne subsiste. Cette méthode peut
-    aussi être améliorée grâce aux marges de sécurité. Voir pour cela
-    
-    <a href="http://www.garyrobinson.net/2004/02/spam_filtering_.html">L'article de Gary Robinson</a>
-    pour plus de détail.</p>
-
-    <p>
-    Note: <code>bogominitrain.pl</code> possède une option <code>-f</code> qui permet de réaliser
-    "l'entrainement sur épuisement". Si
-    vous choisissez de l'utiliser, soyez conscient des effets secondaires possibles. L'utilisation
-    de <code>-fn</code> évite de répéter l'entrainement pour chaque message.</p>
-
-    <hr>
-
     <h2 id="training">Comment débuter l'apprentissage de Bogofilter?</h2>
     <p>Pour classifier les messages comme ham ou spam, Bogofilter
     a besoin d'apprendre votre courrier. Pour commencer, le mieux est d'avoir
@@ -449,123 +412,8 @@
     minimum d'espace disque nécessaire.
     </p>
 
-    <h2 id="unsure">Qu'est-ce que le mode <i>Unsure</i> ?</h2>
-
-    <p>La configuration par défaut de Bogofilter classera un message en
-    tant que spam ou non-spam. Le paramètre SPAM_CUTOFF est utilisé pour cela.
-    Les messages avec un score supérieur ou égal à SPAM_CUTOFF sont classés en
-    spam. Les autres en ham.</p>
-
-    <p>Il y a aussi un paramètre HAM_CUTOFF. Quand il est utilisé, les
-    messages doivent avoir un score inférieur ou égal à HAM_CUTOFF pour
-    être classés ham. Les messages avec un score compris entre HAM_CUTOFF et
-    SPAM_CUTOFF sont étiquetés "unsure". Si vous regardez le fichier bogofilter.cf,
-    vous verrez les lignes suivantes :</p>
-
-    <pre>	#### CUTOFF Values
-	#
-	#	both ham_cutoff and spam_cutoff are allowed.
-	#	setting ham_cutoff to a non-zero value will
-	#	enable tristate results (Yes/No/Unsure).
-	#
-	#ham_cutoff  = 0.00
-	#spam_cutoff = 0.99
-	#
-	## with Yes/No/Unsure output:
-	## ham_cutoff = 0.45
-	## spam_cutoff= 0.99</pre>
-
-    <p>Pour activer la classification Yes/No/Unsure, enlevez les dièses devant les
-    deux dernières lignes.</p>
-
-    <p>Alternativement, si vous préférez utiliser les labels Spam/Ham/Unsure
-    au lieu de Yes/No/Unsure, enlevez les dièses devant la ligne :
-
-    </p><pre>	## spamicity_tags = Spam, Ham, Unsure</pre>
-
-    <p>Une fois que cela est fait, vous pourrez inclure les règles de filtrage
-    suivantes pour votre outil de messagerie:</p>
-
-    <pre>	if header contains "X-Bogosity: Spam", put in Spam folder
-	if header contains "X-Bogosity: Unsure", put in Unsure folder</pre>
-
-    <p>De plus, bogofilter.cf possède des directives pour modifier
-    la ligne Sujet:, par exemple.</p>
-
-    <pre>	#### SPAM_SUBJECT_TAG
-	#
-	#	tag added to "Subject: " line for identifying spam or unsure
-	#	default is to add nothing.
-	#
-	##spam_subject_tag=***SPAM***
-	##unsure_subject_tag=???UNSURE???</pre>
-
-    <p>Avec de tels marqueurs, les règles de filtrage ressembleraient à ceci:</p>
-
-    <pre>	if subject contains "***SPAM***", put in Spam folder
-	if subject contains "???UNSURE???", put in Unsure folder</pre>
-
     <hr>
 
-    <h2 id="autoupdate">Que fait l'option '-u' (autoupdate) ?</h2>
-
-    <p>L'option '-u' (autoupdate) est utilisé pour compléter automatiquement
-    la liste de mots. Quand cette option est utilisée et que Bogofilter classe
-    un message en Spam ou Ham, les tokens du message sont ajoutés dans la
-    liste de mots avec un marqueur ham ou spam (suivi le contexte).</p>
-
-    <p>Prenons le cas de l'arrivée d'un nouveau message "Refinance now -
-    best Mortgage rates". Il contient des mots que Bogofilter a déjà vu et, probablement,
-    des nouveaux. En utilisant '-u' ces nouveaux mots seront
-    ajoutés dans la liste des mots, afin que Bogofilter puisse mieux reconnaître
-    les messages suivants qui lui ressembleraient.</p>
-
-    <p>Si vous utilisez '-u', vous avez besoin de regarder attentivement les
-    erreurs de classification et de réentrainer Bogofilter avec les messages
-    qu'il a mal identifiés. Un message incorrectement classé et qui est auto-appris
-    _peut_ amplifier les futures mauvaises classifications de Bogofilter. C'est
-    le même problème que si vous, administrateur système, vous enregistriez mal
-    un message : ham en spam ou vice versa.</p>
-    
-    <hr>
-
-    <hr>
-
-    <h2 id="spamassassin">Comment puis-je utiliser SpamAssassin
-    pour l'apprentissage de Bogofilter?</h2>
-
-    <p>Si vous avez un SpamAssassin actif (ou si vous voulez en
-    créer un), vous pouvez utiliser ses codes de retour pour
-    l'apprentissage de Bogofilter. Le moyen le plus simple est de
-    créer un script pour votre MDA qui fait tourner SpamAssassin,
-    tester l'état du code de retour spam/ham, et lancer Bogofilter
-    pour valider le message. Le script procmail ci-dessous est un
-    moyen de le faire:</p>
-    <pre>	BOGOFILTER     = "/usr/bin/bogofilter"
-	BOGOFILTER_DIR = "training"
-	SPAMASSASSIN  = "/usr/bin/spamassassin"
-
-	:0 HBc
-	* ? $SPAMASSASSIN -e
-	#spam yields non-zero
-	#non-spam yields zero
-	| $BOGOFILTER -n -d $BOGOFILTER_DIR
-	#else (E)
-	:0Ec
-	| $BOGOFILTER -s -d $BOGOFILTER_DIR
-
-	:0fw
-	| $BOGOFILTER -p -e
-
-	:0:
-	* ^X-Bogosity:.Yes
-	spam
-
-	:0:
-	* ^X-Bogosity:.No
-	non-spam</pre>
-  
-    <hr>
     <h2 id="mboxformats">Quels formats de fichier Bogofilter
 	comprend-il?</h2>
 
@@ -677,6 +525,161 @@
       </li>
     </ul>
 
+    <hr>
+
+    <h2 id="unsure">Qu'est-ce que le mode <i>Unsure</i> ?</h2>
+
+    <p>La configuration par défaut de Bogofilter classera un message en
+    tant que spam ou non-spam. Le paramètre SPAM_CUTOFF est utilisé pour cela.
+    Les messages avec un score supérieur ou égal à SPAM_CUTOFF sont classés en
+    spam. Les autres en ham.</p>
+
+    <p>Il y a aussi un paramètre HAM_CUTOFF. Quand il est utilisé, les
+    messages doivent avoir un score inférieur ou égal à HAM_CUTOFF pour
+    être classés ham. Les messages avec un score compris entre HAM_CUTOFF et
+    SPAM_CUTOFF sont étiquetés "unsure". Si vous regardez le fichier bogofilter.cf,
+    vous verrez les lignes suivantes :</p>
+
+    <pre>	#### CUTOFF Values
+	#
+	#	both ham_cutoff and spam_cutoff are allowed.
+	#	setting ham_cutoff to a non-zero value will
+	#	enable tristate results (Yes/No/Unsure).
+	#
+	#ham_cutoff  = 0.00
+	#spam_cutoff = 0.99
+	#
+	## with Yes/No/Unsure output:
+	## ham_cutoff = 0.45
+	## spam_cutoff= 0.99</pre>
+
+    <p>Pour activer la classification Yes/No/Unsure, enlevez les dièses devant les
+    deux dernières lignes.</p>
+
+    <p>Alternativement, si vous préférez utiliser les labels Spam/Ham/Unsure
+    au lieu de Yes/No/Unsure, enlevez les dièses devant la ligne :
+
+    </p><pre>	## spamicity_tags = Spam, Ham, Unsure</pre>
+
+    <p>Une fois que cela est fait, vous pourrez inclure les règles de filtrage
+    suivantes pour votre outil de messagerie:</p>
+
+    <pre>	if header contains "X-Bogosity: Spam", put in Spam folder
+	if header contains "X-Bogosity: Unsure", put in Unsure folder</pre>
+
+    <p>De plus, bogofilter.cf possède des directives pour modifier
+    la ligne Sujet:, par exemple.</p>
+
+    <pre>	#### SPAM_SUBJECT_TAG
+	#
+	#	tag added to "Subject: " line for identifying spam or unsure
+	#	default is to add nothing.
+	#
+	##spam_subject_tag=***SPAM***
+	##unsure_subject_tag=???UNSURE???</pre>
+
+    <p>Avec de tels marqueurs, les règles de filtrage ressembleraient à ceci:</p>
+
+    <pre>	if subject contains "***SPAM***", put in Spam folder
+	if subject contains "???UNSURE???", put in Unsure folder</pre>
+
+    <hr>
+
+    <h2 id="train-on-error">Qu'est-ce que "l'entrainement sur erreur" et "l'entrainement sur épuisement"?</h2>
+
+    <p>"L'entrainement sur erreur" implique l'analyse d'un corpus de messages dont le statut de spam ou ham
+    est connu. Seuls ceux qui sont mal classés, ou dont le classement est incertain, seront intégrés dans
+    la base de données d'apprentissage. Il a été montré que la sélection des seuls messages "mauvais élèves" était
+    un moyen efficace d'entrainement. Si l'on entrainait Bogofilter avec tous les messages, il va
+    réapprendre avec des spams ou hams évidents.</p>
+
+    <p> Cette méthode peut être améliorée en utilisant une "marge de
+    sécurité". En augmentant la valeur "spam cutoff" et en diminuant la valeur "ham cutoff",
+    les messages qui sont proches du seuil seront utilisés, pour l'entrainement. L'utilisation de
+    cette marge de sécurité a montré son efficacité à améliorer les
+    résultats dans l'entrainement sur erreur. En général, des marges plus larges sont
+    une aide supplémentaire (malgré le fait que des marges trop grandes ne soient
+    pas optimales). Pour un mode à triple état, vous pouvez utiliser le milieu de 
+    l'état unsure avec un intervalle de +/- 0.3 pour l'entrainement</p>
+
+    <p>Répéter l'entrainement sur erreur sur le même corpus de message peut améliorer
+    la précision. L'idée est que les messages qui ont été bien classés une première fois
+    peuvent, à la suite de l'entrainement, être mal classés. Fait qui sera compensé par
+    cette répétition.</p>
+    
+    <p>"L'entrainement sur épuisement" est la répétition de l'entrainement sur erreur, avec le même corpus
+    de messages, jusqu'à ce que plus aucune erreur ne subsiste. Cette méthode peut
+    aussi être améliorée grâce aux marges de sécurité. Voir pour cela
+    
+    <a href="http://www.garyrobinson.net/2004/02/spam_filtering_.html">L'article de Gary Robinson</a>
+    pour plus de détail.</p>
+
+    <p>
+    Note: <code>bogominitrain.pl</code> possède une option <code>-f</code> qui permet de réaliser
+    "l'entrainement sur épuisement". Si
+    vous choisissez de l'utiliser, soyez conscient des effets secondaires possibles. L'utilisation
+    de <code>-fn</code> évite de répéter l'entrainement pour chaque message.</p>
+
+    <hr>
+
+    <h2 id="autoupdate">Que fait l'option '-u' (autoupdate) ?</h2>
+
+    <p>L'option '-u' (autoupdate) est utilisé pour compléter automatiquement
+    la liste de mots. Quand cette option est utilisée et que Bogofilter classe
+    un message en Spam ou Ham, les tokens du message sont ajoutés dans la
+    liste de mots avec un marqueur ham ou spam (suivi le contexte).</p>
+
+    <p>Prenons le cas de l'arrivée d'un nouveau message "Refinance now -
+    best Mortgage rates". Il contient des mots que Bogofilter a déjà vu et, probablement,
+    des nouveaux. En utilisant '-u' ces nouveaux mots seront
+    ajoutés dans la liste des mots, afin que Bogofilter puisse mieux reconnaître
+    les messages suivants qui lui ressembleraient.</p>
+
+    <p>Si vous utilisez '-u', vous avez besoin de regarder attentivement les
+    erreurs de classification et de réentrainer Bogofilter avec les messages
+    qu'il a mal identifiés. Un message incorrectement classé et qui est auto-appris
+    _peut_ amplifier les futures mauvaises classifications de Bogofilter. C'est
+    le même problème que si vous, administrateur système, vous enregistriez mal
+    un message : ham en spam ou vice versa.</p>
+    
+    <hr>
+
+    <hr>
+
+    <h2 id="spamassassin">Comment puis-je utiliser SpamAssassin
+    pour l'apprentissage de Bogofilter?</h2>
+
+    <p>Si vous avez un SpamAssassin actif (ou si vous voulez en
+    créer un), vous pouvez utiliser ses codes de retour pour
+    l'apprentissage de Bogofilter. Le moyen le plus simple est de
+    créer un script pour votre MDA qui fait tourner SpamAssassin,
+    tester l'état du code de retour spam/ham, et lancer Bogofilter
+    pour valider le message. Le script procmail ci-dessous est un
+    moyen de le faire:</p>
+    <pre>	BOGOFILTER     = "/usr/bin/bogofilter"
+	BOGOFILTER_DIR = "training"
+	SPAMASSASSIN  = "/usr/bin/spamassassin"
+
+	:0 HBc
+	* ? $SPAMASSASSIN -e
+	#spam yields non-zero
+	#non-spam yields zero
+	| $BOGOFILTER -n -d $BOGOFILTER_DIR
+	#else (E)
+	:0Ec
+	| $BOGOFILTER -s -d $BOGOFILTER_DIR
+
+	:0fw
+	| $BOGOFILTER -p -e
+
+	:0:
+	* ^X-Bogosity:.Yes
+	spam
+
+	:0:
+	* ^X-Bogosity:.No
+	non-spam</pre>
+  
     <hr>
 
     <h2 id="asian-spam">Comment traiter les spams asiatiques?</h2>
