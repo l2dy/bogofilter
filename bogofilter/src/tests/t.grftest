@@ -98,7 +98,6 @@ done
 
 [ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
 
-OUTPUTS=${SYSTEST}/outputs
 
 if  [ $verbose -eq 0 ]; then
     cmp ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT

@@ -64,8 +64,6 @@ if [ "$SEP$COM" != "$EXP$EXP" ] ; then
     exit 1
 fi
 
-OUTPUTS=${SYSTEST}/outputs
-
 for i in $TMPDIR/[cs]*.out ; do
     j=`basename $i`
     if  [ $verbose -eq 0 ]; then

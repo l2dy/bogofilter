@@ -12,7 +12,6 @@
 #		tests   - directory containing individual output files
 
 NODB=1 . ${srcdir=.}/t.frame
-OUTPUTS=${SYSTEST}/outputs
 
 MSG="${SYSTEST}/inputs/msg.parsing.txt"
 flaglist="IhT-2"

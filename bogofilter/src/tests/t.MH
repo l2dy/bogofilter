@@ -13,8 +13,6 @@
 NODB=1 . ${srcdir=.}/t.frame
 
 OUT="${TMPDIR}/MH.out"
-
-OUTPUTS=${SYSTEST}/outputs
 CORRECT="${OUTPUTS}/MH.out"
 
 for f in good spam ; do

@@ -102,8 +102,6 @@ rm -f ${CONFIG}
 
 [ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
 
-OUTPUTS=${SYSTEST}/outputs
-
 for i in $OUTPUTS/*f.v* ; do
     j=`basename $i`
     if  [ $verbose -eq 0 ]; then
