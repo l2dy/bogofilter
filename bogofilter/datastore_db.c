@@ -66,6 +66,7 @@ void *db_open(char *db_file, char *name){
     }
 
     dbh_free(handle);
+    return NULL;
 }
 
 /*  
@@ -229,15 +230,15 @@ void db_lock_reader(void *vhandle){
   dbh_t *handle = vhandle;
 
   if (verbose > 1)
-    fprintf(stderr, "[%ld] Acquiring read lock  on %s\n",handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Acquiring read lock  on %s\n",(unsigned long)handle->pid, handle->filename);
 
   if (db_lock(handle, F_SETLKW, F_RDLCK) != 0){
-    fprintf(stderr, "[%ld] Error acquiring read lock on %s\n",handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Error acquiring read lock on %s\n",(unsigned long)handle->pid, handle->filename);
     exit(2);
   }
 
   if (verbose > 1)
-    fprintf(stderr, "[%ld] Got read lock  on %s\n",handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Got read lock  on %s\n",(unsigned long)handle->pid, handle->filename);
 
 }
 
@@ -247,15 +248,15 @@ Acquires blocking write lock on database.
 void db_lock_writer(void *vhandle){
   dbh_t *handle = vhandle;
   if (verbose > 1)
-    fprintf(stderr, "[%ld] Acquiring write lock on %s\n",handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Acquiring write lock on %s\n",(unsigned long)handle->pid, handle->filename);
 
   if (db_lock(handle, F_SETLKW, F_WRLCK) != 0){
-    fprintf(stderr, "[%ld] Error acquiring write lock on %s\n",handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Error acquiring write lock on %s\n",(unsigned long)handle->pid, handle->filename);
     exit(2);
   }
 
   if (verbose > 1)
-    fprintf(stderr, "[%ld] Got write lock on %s\n",handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Got write lock on %s\n",(unsigned long)handle->pid, handle->filename);
 
 }
 
@@ -267,10 +268,10 @@ void db_lock_release(void *vhandle){
   dbh_t *handle = vhandle;
 
   if (verbose > 1)
-    fprintf(stderr, "[%ld] Releasing lock on %s\n",handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Releasing lock on %s\n",(unsigned long)handle->pid, handle->filename);
 
   if (db_lock(handle, F_SETLK, F_UNLCK) != 0){
-    fprintf(stderr, "[%ld] Error releasing on %s\n", handle->pid, handle->filename);
+    fprintf(stderr, "[%lu] Error releasing on %s\n", (unsigned long)handle->pid, handle->filename);
     exit(2);
   }
 }
