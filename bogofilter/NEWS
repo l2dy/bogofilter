@@ -2,6 +2,13 @@
 
 				bogofilter news
 
+0.7.5
+	* The header in bogofilter -p mode now defaults to X-Bogosity:,
+	  but can be overridden at compile time with
+	  --enable-spam-header-name
+	* The option names -h/-H are back to -n/-N as of 0.6, and -h now
+	  means "help".
+
 0.7.4	Tue Sep 17 02:29:48 EDT 2002
 	* Added infrastructure to support multiple multiple worlists
 	* Fixed classification bug
