@@ -59,7 +59,7 @@ const parm_desc *usr_parms = NULL;
 
 /*  remove trailing comment from the line.
  */
-static char *remove_comment(char *line)
+void remove_comment(const char *line)
 {
     char *tmp = strchr(line, '#');
     if (tmp != NULL) {
@@ -68,7 +68,7 @@ static char *remove_comment(char *line)
 	    tmp -= 1;
 	*(tmp+1) = '\0';
     }
-    return line;
+    return;
 }
 
 static bool process_config_parameter(const parm_desc *arg, char *val, priority_t precedence)
@@ -103,13 +103,6 @@ static bool process_config_parameter(const parm_desc *arg, char *val, priority_t
 		    return false;
 		if (DEBUG_CONFIG(2))
 		    fprintf(dbgout, "%s -> %f\n", arg->name, *arg->addr.d);
-		break;
-	    }
-	case CP_CHAR:
-	    {
-		*arg->addr.c = *val;
-		if (DEBUG_CONFIG(2))
-		    fprintf(dbgout, "%s -> '%c'\n", arg->name, *arg->addr.c);
 		break;
 	    }
 	case CP_STRING:

@@ -20,7 +20,6 @@ typedef enum {
 	CP_BOOLEAN,
 	CP_INTEGER,
 	CP_DOUBLE,
-	CP_CHAR,
 	CP_STRING,
 	CP_DIRECTORY,
 #ifdef	ENABLE_DEPRECATED_CODE
@@ -51,6 +50,7 @@ typedef struct {
 extern const parm_desc sys_parms[];
 extern const parm_desc *usr_parms;
 
+void remove_comment(const char *line);
 bool process_config_files(bool warn_on_error);
 bool process_config_option(char *arg, bool warn_on_error, priority_t precedence);
 bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, priority_t precedence);
