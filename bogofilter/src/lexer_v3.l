@@ -55,6 +55,13 @@
  *    For example. `foo' in the Subject line becomes `subj:foo'.
 */
 
+/* DR 08/29/2003:
+**
+** With flex-2.5.31 and '%option never-interactive noreject', file
+** msg.dr.0118.base64 (in tests/bogofilter/inputs/split.d) parses
+** incorrectly because line 24 isn't base64 decoded.
+*/
+
 #include "common.h"
 
 #include <ctype.h>
@@ -100,7 +107,7 @@ static word_t *yy_text(void)
 
 %option debug nodebug
 %option align caseless 8bit
-%option never-interactive noreject
+%option noreject
 %option noyywrap
 %option prefix="lexer_v3_"
 
