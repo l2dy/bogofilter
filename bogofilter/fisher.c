@@ -20,6 +20,7 @@ NAME:
 #define	RF_DEBUG
 #undef	RF_DEBUG
 
+#define FISHER_HAM_CUTOFF	0.05f
 #define FISHER_SPAM_CUTOFF	0.952f
 #define FISHER_MIN_DEV		0.1f
 
@@ -33,6 +34,8 @@ static double	fis_spamicity(void);
 static rc_t	fis_status(void);
 
 /* Static Variables */
+
+double ham_cutoff = 0.0f;
 
 rf_method_t rf_fisher_method = {	/* used by config.c */
     {
@@ -89,6 +92,8 @@ void fis_print_summary(void)
 
 void fis_initialize_constants(void)
 {
+    if ( ham_cutoff < EPS )
+	ham_cutoff = FISHER_HAM_CUTOFF;
     rob_initialize_with_parameters(FISHER_MIN_DEV, FISHER_SPAM_CUTOFF);
 }
 
@@ -99,7 +104,13 @@ double fis_spamicity(void)
 
 rc_t fis_status(void)
 {
-    return ( stats.spamicity >= spam_cutoff ) ? RC_SPAM : RC_NONSPAM ;
+    if ( stats.spamicity >= spam_cutoff ) 
+	return RC_SPAM;
+
+    if (ham_cutoff > EPS && stats.spamicity > ham_cutoff)
+	return RC_UNSURE;
+
+    return RC_HAM;
 }
 
 /* Done */

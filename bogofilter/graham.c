@@ -339,7 +339,7 @@ double gra_spamicity(void)
 
 rc_t gra_status(void)
 {
-    rc_t status = ( stats.spamicity >= spam_cutoff ) ? RC_SPAM : RC_NONSPAM;
+    rc_t status = ( stats.spamicity >= spam_cutoff ) ? RC_SPAM : RC_HAM;
     return status;
 }
 

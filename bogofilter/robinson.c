@@ -289,7 +289,7 @@ double rob_spamicity(void)
 
 rc_t rob_status(void)
 {
-    rc_t status = ( stats.spamicity >= spam_cutoff ) ? RC_SPAM : RC_NONSPAM;
+    rc_t status = ( stats.spamicity >= spam_cutoff ) ? RC_SPAM : RC_HAM;
     return status;
 }
 
