@@ -11,7 +11,8 @@
 
 #define ROBINSON_GOOD_BIAS	1.0	/* don't give good words more weight */
 
-typedef	double	rf_get_spamicity(size_t robn, double invlogsum, double logsum, double *invproduct, double *product);
+typedef	double	rf_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
+typedef	void	rf_print_summary(size_t robn, FLOAT P, FLOAT Q);
 
 /*
 ** This defines an object oriented API for creating a
@@ -21,6 +22,7 @@ typedef	double	rf_get_spamicity(size_t robn, double invlogsum, double logsum, do
 typedef struct rf_method_s {
     method_t		m;
     rf_get_spamicity	*get_spamicity;
+    rf_print_summary	*print_summary;
 } rf_method_t;
 
 extern	double	rob_bogofilter(wordhash_t *wordhash, FILE *fp); /*@globals errno@*/
@@ -30,8 +32,6 @@ extern	void	rob_cleanup(void);
 
 #ifdef	ENABLE_ROBINSON_METHOD
 extern	rf_method_t rf_robinson_method;
-extern	void	rob_initialize_constants(void);
-extern	double	rob_get_spamicity(size_t robn, double invlogsum, double logsum, double *invproduct, double *product);
 
 /* needed by fisher.c */
 extern	const	parm_desc rob_parm_table[];

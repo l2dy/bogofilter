@@ -18,10 +18,8 @@ void rstats_add(const char *token,
 		double prob);
 
 void rstats_fini(size_t robn, 
-		 double invlogsum, 
-		 double logsum, 
-		 double invproduct, 
-		 double product, 
+		 FLOAT P, 
+		 FLOAT Q, 
 		 double spamicity);
 
 void rstats_print(void);

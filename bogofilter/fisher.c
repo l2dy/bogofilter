@@ -7,12 +7,8 @@ NAME:
 
 ******************************************************************************/
 
+#include <math.h>
 #include <stdio.h>
-/*
- * #include <math.h>
- * #include <string.h>
- * #include <stdlib.h>
- */
 
 #include <config.h>
 #include "common.h"
@@ -27,6 +23,10 @@ NAME:
 #define FISHER_SPAM_CUTOFF	0.952f
 #define FISHER_MIN_DEV		0.1f
 
+void	fis_initialize_constants(void);
+double	fis_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
+void	fis_print_summary(size_t robn, FLOAT P, FLOAT Q);
+
 rf_method_t rf_fisher_method = {
     {
 	"fisher",			/* const char		  *name;		*/
@@ -36,7 +36,8 @@ rf_method_t rf_fisher_method = {
 	rob_print_bogostats, 		/* m_print_bogostats	  *print_stats		*/
 	rob_cleanup, 			/* m_free		  *cleanup		*/
     },
-    fis_get_spamicity			/* rf_get_spamicity	  *get_spamicity	*/
+    fis_get_spamicity,			/* rf_get_spamicity	  *get_spamicity	*/
+    fis_print_summary			/* rf_print_summary	  *print_summary	*/
 };
 
 double prbf(double x, double df)
@@ -47,37 +48,39 @@ double prbf(double x, double df)
     double bound;
     cdfchi(&which, &p, &q, &x, &df, &status, &bound);
 
-#ifdef	RF_DEBUG
-    if ( !quiet )
-	printf( "which: %d, p: %15.8g, q: %15.8g, x: %12.6f, df: %f, status: %d, bound: %f\n",
-		which, p, q, x, df, status, bound);
-/*
-**	which: 1, p: 1.000000, q: 0.000000, x: 699.817846, df: 202.000000, status: 0, bound: 0.000000
-**	which: 1, p: 1.000000, q: 0.000000, x: 377.994523, df: 202.000000, status: 0, bound: 202.000000
-*/
-#endif
-
     return(status==0 ? q : 1.0);
 }
 
-double fis_get_spamicity(size_t robn, double invlogsum, double logsum, double *invproduct, double *product)
+double fis_get_spamicity(size_t robn, FLOAT P, FLOAT Q )
 {
     double df = 2.0 * robn;
-    double p = prbf(-2.0 * invlogsum, df);	/* _invproduct */
-    double q = prbf(-2.0 * logsum, df);		/* _product    */
+    double ln10 = 2.302585093;		 	/* log(10) - 2.3025850929940459  */
 
-    double spamicity = (1.0 + q - p) / 2.0;
+    double p_ln = log(P.mant) + P.exp * ln10;	/* convert to natural logs */
+    double q_ln = log(Q.mant) + Q.exp * ln10;	/* convert to natural logs */
+    double p_pr = prbf(-2.0 * p_ln, df);	/* compute P */
+    double q_pr = prbf(-2.0 * q_ln, df);	/* compute Q */
 
-    *product = q;	/* _product    */
-    *invproduct = p;	/* _invproduct */
-
-#ifdef	RF_DEBUG
-    if ( !quiet )
-	printf( "%d, p: %f, q: %f, spamicity: %f, p': %f, q': %f\n", 
-		robn, p, q, spamicity, invlogsum, logsum);
-#endif
+    double spamicity = (1.0 + q_pr - p_pr) / 2.0;
 
     return spamicity;
+}
+
+void fis_print_summary(size_t robn, FLOAT P, FLOAT Q)
+{
+    double df = 2.0 * robn;
+    double ln10 = 2.302585093;			/* log(10) - 2.3025850929940459  */
+
+    double p_ln = log(P.mant) + P.exp * ln10;	/* invlogsum */
+    double q_ln = log(Q.mant) + Q.exp * ln10;	/* logsum    */
+    double p_pr = prbf(-2.0 * p_ln, df);	/* invproduct */
+    double q_pr = prbf(-2.0 * q_ln, df);	/* product    */
+
+    double spamicity = (1.0 + q_pr - p_pr) / 2.0;
+
+    (void)fprintf(stdout, "%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
+		  robn+1, "P_Q_S_invsum_logsum", 
+		  p_pr, q_pr, spamicity, p_ln, q_ln);
 }
 
 void fis_initialize_constants(void)

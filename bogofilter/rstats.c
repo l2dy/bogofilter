@@ -15,12 +15,14 @@ AUTHOR:
 #include <string.h>
 #include <stdlib.h>
 
+#include <config.h>
 #include "common.h"
+
 #include "bogofilter.h"
+#include "fisher.h"		/* for prbf() */
+#include "rstats.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
-#include "globals.h"
-#include "rstats.h"
 
 extern int Rtable;
 extern double min_dev;
@@ -41,16 +43,13 @@ struct rhistogram_s {
     double spamicity;
 };
 
-
 typedef struct header_s header_t;
 struct header_s {
     rstats_t *list;
     size_t    robn;
-    double invlogsum;
-    double logsum;
-    double invproduct;
-    double product;
-    double spamicity;
+    FLOAT     p;		/* Robinson's P */
+    FLOAT     q;		/* Robinson's Q */
+    double    spamicity;
 };
 
 static size_t	 count;
@@ -92,14 +91,12 @@ static int compare_rstats_t(const void *const ir1, const void *const ir2)
 
 #define	INTERVALS	10
 
-void rstats_fini(size_t robn, double invlogsum, double logsum, double invproduct, double product, double spamicity)
+void rstats_fini(size_t robn, FLOAT P, FLOAT Q, double spamicity)
 {
     header.robn       = robn;
-    header.invproduct = invproduct;	/* P */
-    header.product    = product;	/* Q */
-    header.spamicity  = spamicity;	/* S */
-    header.invlogsum  = invlogsum;
-    header.logsum     = logsum;
+    header.p          = P;
+    header.q          = Q;
+    header.spamicity  = spamicity;
 }
 
 void rstats_print(void)
@@ -198,14 +195,22 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array)
     }
 }
 
-
 void rstats_print_rtable_summary(void)
 {
+    size_t robn = header.robn;
+
+    double df = 2.0 * robn;
+    double ln10 = 2.302585093;				/* log(10) - 2.3025850929940459  */
+
+    double p_ln = log(header.p.mant) + header.p.exp * ln10;	/* invlogsum */
+    double q_ln = log(header.q.mant) + header.q.exp * ln10;	/* logsum    */
+    double p_pr = prbf(-2.0 * p_ln, df);			/* invproduct */
+    double q_pr = prbf(-2.0 * q_ln, df);			/* product    */
+
     /* print trailer */
     (void)fprintf(stdout, "%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
-		  header.robn+1, "P_Q_S_invsum_logsum", 
-		  header.invproduct, header.product, header.spamicity,
-		  header.invlogsum, header.logsum);
+		  robn+1, "P_Q_S_invsum_logsum", 
+		  p_pr, q_pr, header.spamicity, p_ln, q_ln);
 }
 
 void rstats_print_rtable(size_t robn, rstats_t **rstats_array)
@@ -228,5 +233,5 @@ void rstats_print_rtable(size_t robn, rstats_t **rstats_array)
     }
 
     /* print trailer */
-    rstats_print_rtable_summary();
+    ((rf_method_t *)method)->print_summary(robn, header.p, header.q);
 }

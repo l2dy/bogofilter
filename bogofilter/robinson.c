@@ -12,8 +12,9 @@ NAME:
 #include <string.h>
 #include <stdlib.h>
 
-#include "config.h"
+#include <config.h>
 #include "common.h"
+
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #include "datastore.h"
@@ -25,10 +26,9 @@ NAME:
 #define ROBINSON_MIN_DEV	0.0f	/* if nonzero, use characteristic words */
 #define ROBINSON_SPAM_CUTOFF	0.54f	/* if it's spammier than this... */
 
-/* 11/17/02:
-**	   Greg Louis recommends:
-** #define ROBINSON_MIN_DEV	0.1f
+/* 11/17 - Greg Louis recommends the following values:
 ** #define ROBINSON_SPAM_CUTOFF	0.582f
+** #define ROBINSON_MIN_DEV	0.1f
 */
 
 #define ROBINSON_MAX_REPEATS	1	/* cap on word frequency per message */
@@ -53,6 +53,10 @@ const parm_desc rob_parm_table[] =	/* needed by fisher.c */
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
 
+void	rob_initialize_constants(void);
+double	rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
+void	rob_print_summary(size_t robn, FLOAT P, FLOAT Q);
+
 #ifdef	ENABLE_ROBINSON_METHOD
 rf_method_t rf_robinson_method = {
     {
@@ -63,7 +67,8 @@ rf_method_t rf_robinson_method = {
 	rob_print_bogostats, 		/* m_print_bogostats	  *print_stats		*/
 	rob_cleanup, 			/* m_free		  *cleanup		*/
     },
-    rob_get_spamicity			/* rf_get_spamicity	  *get_spamicity	*/
+    rob_get_spamicity,			/* rf_get_spamicity	  *get_spamicity	*/
+    rob_print_summary			/* rf_print_summary	  *print_summary	*/
 };
 #endif
 
@@ -164,8 +169,9 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 {
     hashnode_t *node;
 
-    double invlogsum = 0.0;	/* Robinson's P */
-    double logsum = 0.0;	/* Robinson's Q */
+    FLOAT P = {1.0, 0};		/* Robinson's P */
+    FLOAT Q = {1.0, 0};		/* Robinson's Q */
+
     double spamicity;
     size_t robn = 0;
 
@@ -194,8 +200,17 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
          * Q = 1 - (p1*p2*...*pn)^(1/n)                 [non-spamminess]
 	 */
         if (fabs(EVEN_ODDS - prob) >= min_dev) {
-            invlogsum += log(1.0 - prob);
-	    logsum += log(prob);
+	    P.mant *= 1-prob;
+	    if (P.mant < 1.0e-200) {
+		P.mant *= 1.0e200;
+		P.exp -= 200;
+	    }
+
+	    Q.mant *= prob;
+	    if (Q.mant < 1.0e-200) {
+		Q.mant *= 1.0e200;
+		Q.exp -= 200;
+	    }
             robn ++;
         }
     }
@@ -203,31 +218,45 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     /* Robinson's P, Q and S */
     /* S = (P - Q) / (P + Q)                        [combined indicator]
      */
+
     if (robn) {
-	double invproduct, product;
-
-	spamicity = ((rf_method_t *) method)->get_spamicity( robn, invlogsum, logsum, &invproduct, &product );
-
+	spamicity = ((rf_method_t *) method)->get_spamicity( robn, P, Q );
 	if (Rtable || verbose)
-	    rstats_fini(robn, invlogsum, logsum, invproduct, product, spamicity);
+	    rstats_fini(robn, P, Q, spamicity );
     } else
 	spamicity = robx;
 
     return (spamicity);
 }
 
-double rob_get_spamicity(size_t robn, double invlogsum, double logsum, double *invproduct, double *product)
+double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 {
-    double invn = (double)robn;
-    double _invproduct = 1.0 - exp(invlogsum / invn);
-    double _product = 1.0 - exp(logsum / invn);
+    double r = 1.0 / (double)robn;
 
-    double spamicity = (1.0 + (_invproduct - _product) / (_invproduct + _product)) / 2.0;
+    double p = 1.0 - pow(P.mant, r) * pow(10.0, P.exp * r);	/* Robinson's P */
+    double q = 1.0 - pow(Q.mant, r) * pow(10.0, Q.exp * r);	/* Robinson's Q */
 
-    *product = _product;
-    *invproduct = _invproduct;
+    double spamicity = (1.0 + (p - q) / (p + q)) / 2.0;
 
     return spamicity;
+}
+
+void rob_print_summary(size_t robn, FLOAT P, FLOAT Q)
+{
+    double r = 1.0 / (double)robn;
+
+    double p_pr = 1.0 - pow(P.mant, r) * pow(10.0, P.exp * r);	/* Robinson's P */
+    double q_pr = 1.0 - pow(Q.mant, r) * pow(10.0, Q.exp * r);	/* Robinson's Q */
+
+    double ln10 = 2.302585093;			/* log(10) - 2.3025850929940459  */
+    double p_ln = log(P.mant) + P.exp * ln10;	/* invlogsum */
+    double q_ln = log(Q.mant) + Q.exp * ln10;	/* logsum    */
+
+    double spamicity = (1.0 + (p_pr - q_pr) / (p_pr + q_pr)) / 2.0;
+
+    (void)fprintf(stdout, "%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
+		  robn+1, "P_Q_S_invsum_logsum", 
+		  p_pr, q_pr, spamicity, p_ln, q_ln);
 }
 
 void rob_initialize_with_parameters(double _min_dev, double _spam_cutoff)
