@@ -1,6 +1,6 @@
 # $Id$ 
 
-SUBDIRS = trio src . doc contrib tuning
+SUBDIRS = trio src . doc contrib
 SYSCONFDIR = @sysconfdir@
 DISTCHECK_CONFIGURE_FLAGS= @DISTCHECK_CONFIGURE_FLAGS@
 
