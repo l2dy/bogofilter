@@ -76,13 +76,13 @@
         Questions opérationnelles 
 
         <ul>
+	  <li><a href="#train_on_error">Qu'est-ce que "l'entrainement sur erreur" et
+	  "l'entrainement sur épuisement"?</a></li>
+	 
           <li><a href="#training">Comment débuter l'apprentissage de Bogofilter?</a></li>
 	  
           <li><a href="#production">Comment conserver une bonne d'acuité?</a></li>
 	  
-	  <li><a href="#production">Qu'est-ce que "l'entrainement sur erreur" et
-	  "l'entrainement sur épuisement"?</a></li>
-	 
           <li><a href="#spamassassin">Comment puis-je utiliser
           SpamAssassin pour entraîner Bogofilter?</a></li>
 
@@ -316,9 +316,35 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
 	src=$1;
 	shift
 	formail -s class3 $* <$src
-     </pre></li>
+
+	$ classifie mbox [bogofilter options]
+    </pre></li>
  
-     <hr>
+    <hr>
+ 
+    <h2 id="train_on_error">Qu'est-ce que "l'entrainement sur erreur" et "l'entrainement sur épuisement"?</h2>
+
+    <p>"L'entrainement sur erreur" implique l'analyse d'un corpus de messages dont le statut de spam ou ham
+    est connu. Seuls ceux qui sont mal classés, ou dont le classement est incertain, seront intégrés dans
+    la base de données d'apprentissage. Il a été montré que la sélection des seuls messages "mauvais élèves" était
+    un moyen efficace d'entrainement. Si l'on entrainait Bogofilter avec tous les messages, il va
+    réapprendre avec des spams ou hams évidents. L'apprentissage est un peu plus rapide si l'on a commencé
+    avec une période d'entrainement "brut" de 10 000 spams et 10 000 hams.)</p>
+
+    <p>"L'entrainement sur épuisement" est la répétition de l'entrainement sur erreur, avec le même corpus
+    de messages, jusqu'à ce que plus aucune erreur ne subsiste. Ceci a bien fonctionné sur plusieurs tests,
+    mais peut être risqué. D'abord, l'intégration multipliée de messages crée une distribution
+    des tokens dans la base de données qui diffère de celle des messages d'entrée, ce qui constitue une
+    violation des postulats de la classification bayésienne, et peut donc aboutir à des résultats imprévisibles. Ensuite,
+    les tokens qui apparaissent "normalement" de manière plus ou moins équitable dans les deux catégories, peuvent, s'ils
+    sont présents dans un message d'une catégorie et avec le phénomène de répétition, faire pencher la balance. De tels effets
+    sont temporaires, mais peuvent dégrader l'acuité pendant leur durée.</p>
+
+    <p>
+    Note: <code>bogominitrain.pl</code> possède une option <code>-f</code> qui permet de réaliser "l'entrainement sur épuisement". Si
+    vous choisissez de l'utiliser, soyez conscient des effets secondaires possibles.</p>
+
+    <hr>
 
     <h2 id="production">Comment puis-je conserver une bonne acuité ?</h2>
     <p>Bogofilter fera des erreurs de temps en temps. C'est pourquoi un
@@ -369,29 +395,7 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
     les listes de mots séparés). Ceci compressera les bases de données pour n'occuper que le
     minimum d'expace disque nécessaire.
   
-    </p><hr>
- 
-    <h2 id="train_on_error">Qu'est-ce que "l'entrainement sur erreur" et "l'entrainement sur épuisement"?</h2>
-
-    <p>"L'entrainement sur erreur" implique l'analyse d'un corpus de messages dont le statut de spam ou ham
-    est connu. Seuls ceux qui sont mal classés, ou dont le classement est incertain, seront intégrés dans
-    la base de données d'apprentissage. Il a été montré que la sélection des seuls messages "mauvais élèves" était
-    un moyen efficace d'entrainement. Si l'on entrainait Bogofilter avec tous les messages, il va
-    réapprendre avec des spams ou hams évidents. L'apprentissage est un peu plus rapide si l'on a commencé
-    avec une période d'entrainement "brut" de 10 000 spams et 10 000 hams.)</p>
-
-    <p>"L'entrainement sur épuisement" est la répétition de l'entrainement sur erreur, avec le même corpus
-    de messages, jusqu'à ce que plus aucune erreur ne subsiste. Ceci a bien fonctionné sur plusieurs tests,
-    mais peut être risqué. D'abord, l'intégration multipliée de messages crée une distribution
-    des tokens dans la base de données qui diffère de celle des messages d'entrée, ce qui constitue une
-    violation des postulats de la classification bayésienne, et peut donc aboutir à des résultats imprévisibles. Ensuite,
-    les tokens qui apparaissent "normalement" de manière plus ou moins équitable dans les deux catégories, peuvent, s'ils
-    sont présents dans un message d'une catégorie et avec le phénomène de répétition, faire pencher la balance. De tels effets
-    sont temporaires, mais peuvent dégrader l'acuité pendant leur durée.</p>
-
-    <p>
-    Note: Bogominitrain.pl possède une option <code>-f</code> qui permet de réaliser "l'entrainement sur épuisement". Si
-    vous choisissez de l'utiliser, soyez conscient des effets secondaires possibles.</p>
+    </p>
 
     <hr>
 
@@ -785,8 +789,9 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
     programme?</h2>
 
     <p>Vraisemblablement les codes de retour ont été réécrits par
-    waitpid(2). Utilisez WEXITSTATUS(status) dans sys/wait.h, ou
-    une macro comparable pour obtenir la valeur correcte.</p>
+    waitpid(2). En C utilisez WEXITSTATUS(status) dans sys/wait.h, ou
+    une macro comparable pour obtenir la valeur correcte. En Perl
+    utilisez 'system("bogofilter $input")/256'.</p>
 
     <hr>
 

@@ -75,14 +75,14 @@ French</a>
         Operational Questions 
 
         <ul>
+          <li><a href="#train_on_error">What are "training on error" and
+          "training to exhaustion"?
+	  </a></li>
+
           <li><a href="#training">How do I start my bogofilter training?
 	  </a></li>
 
           <li><a href="#production">How can I keep the scoring accuracy high?
-	  </a></li>
-
-          <li><a href="#production">What are "training on error" and
-          "training to exhaustion"?
 	  </a></li>
 
           <li><a href="#spamassassin">How can I use SpamAssassin to train Bogofilter?
@@ -236,6 +236,37 @@ French</a>
 
     <hr>
 
+    <h2 id="train_on_error">What are "training on error" and "training to exhaustion"?</h2>
+
+    <p> "Training on error" involves scanning a corpus of known spam
+    and nonspam messages; only those that are misclassified, or
+    classed as unsure, get registered in the training database.  It's
+    been found that sampling just messages prone to misclassification
+    is an effective way to train; if you train bogofilter on the hard
+    messages, it learns to handle obvious spam and nonspam too.
+    (Learning is a bit faster if one begins with a period of full
+    training, up to perhaps 10,000 spam and 10,000 nonspam.)</p>
+
+    <p> "Training to exhaustion" is repeating training on error, with
+    the same message corpus, until no errors remain.  This has worked
+    well in some tests, but may be risky: First, registering messages
+    different numbers of times makes the distribution of token scores
+    in the training database differ from the distribution in the input
+    messages; this violates a basic assumption of Bayesian
+    classification, and may lead to unpredictable results.  Second,
+    tokens that appear more or less equally in spam and nonspam may
+    wrongly score highly in one category or the other, if they happen
+    to occur in messages of one type that are registered many times;
+    such effects should be transient, but may degrade accuracy while
+    they last.
+    </p>
+
+    Note: <code>bogominitrain.pl</code> has a <code>-f</code> option
+    to do "training to exhaustion".  If you choose to use it, you need
+    to be aware of its possible effects. </p>
+
+    <hr>
+
     <h2 id="training">How do I start my bogofilter training?</h2>
 
     <p>To classify messages as ham (non-spam) or spam, bogofilter
@@ -328,6 +359,8 @@ French</a>
 	src=$1;
 	shift
 	formail -s class3 $* &lt;$src
+
+	$ classify mbox [bogofilter options]
     </pre></li>
     </ul>
 
@@ -393,37 +426,6 @@ French</a>
     <p>or, for spamlist.db and goodlist.db (if using bogofilter with
     separate spam and ham wordlists).  This will compact the database
     so it occupies the minimum of disk space.</p>
-
-    <hr>
-
-    <h2 id="train_on_errof">What are "training on error" and "training to exhaustion"?</h2>
-
-    <p> "Training on error" involves scanning a corpus of known spam
-    and nonspam messages; only those that are misclassified, or
-    classed as unsure, get registered in the training database.  It's
-    been found that sampling just messages prone to misclassification
-    is an effective way to train; if you train bogofilter on the hard
-    messages, it learns to handle obvious spam and nonspam too.
-    (Learning is a bit faster if one begins with a period of full
-    training, up to perhaps 10,000 spam and 10,000 nonspam.)</p>
-
-    <p> "Training to exhaustion" is repeating training on error, with
-    the same message corpus, until no errors remain.  This has worked
-    well in some tests, but may be risky: First, registering messages
-    different numbers of times makes the distribution of token scores
-    in the training database differ from the distribution in the input
-    messages; this violates a basic assumption of Bayesian
-    classification, and may lead to unpredictable results.  Second,
-    tokens that appear more or less equally in spam and nonspam may
-    wrongly score highly in one category or the other, if they happen
-    to occur in messages of one type that are registered many times;
-    such effects should be transient, but may degrade accuracy while
-    they last.
-    </p>
-
-    <p> Note: Bogominitrain.pl has a <code>-f</code> option to do
-   "training to exhaustion".  If you choose to use it, you need to be
-   aware of its possible effects. </p>
 
     <hr>
 
@@ -780,11 +782,12 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
     HAVE_FCNTL 1" in your config.h file. Popular UNIX operating
     systems will all support this. If you are running an unusual, or
     an older version of an operating system, make sure it supports
-    fcntl().  If "#define HAVE_FCNTL 1" is set, then comment out
-    "#define HAVE_FLOCK 1" so that the locking system uses fcntl()
-    locking instead of the default of flock() locking. If your system
-    does not support fcntl, then you will not be able to share word
-    list files over NFS without the risk of data corruption.</p>
+    fcntl().  If "#define HAVE_FCNTL 1" is set, which indicates
+    fcntl() is supported on your system, then comment out "#define
+    HAVE_FLOCK 1" so that the locking system uses fcntl() locking
+    instead of the default of flock() locking. If your system does not
+    support fcntl(), then you will not be able to share word list
+    files over NFS without the risk of data corruption.</p>
 
     <p>Next, make sure you have NFS set up properly, with "lockd"
     running. Refer to your NFS documentation for more information
@@ -797,8 +800,9 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
     like 0 and 256 when it's run from inside a program?</h2>
 
     <p>Likely the return codes are being reformatted by waitpid(2).
-    Use WEXITSTATUS(status) in sys/wait.h, or comparable macro, to
-    get the correct value.</p>
+    In C use WEXITSTATUS(status) in sys/wait.h, or comparable macro,
+    to get the correct value.  In Perl you can just use
+    'system("bogofilter $input")/256'.</p>
 
     <hr>
 
