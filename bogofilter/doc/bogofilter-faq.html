@@ -1,5 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head><title>Bogofilter FAQ</title></head>
 <body>
@@ -32,8 +32,8 @@ bogofilter.
 </ul>
 
 <hr>
-<a name="what_is_bogofilter"></a>
-<p><b>What is bogofilter?</b></p>
+
+<p><a name="what_is_bogofilter"></a><b>What is bogofilter?</b></p>
 <p>
 Bogofilter is a fast Bayesian spam filter along the lines suggested 
 by Paul Graham in his article <a href="http://www.paulgraham.com/spam.html">
@@ -47,8 +47,8 @@ bogofilter home page</a> for more information.
 </p>
 
 <hr>
-<a name="history"></a>
-<p><b>Bogofilter History</b></p>
+
+<p><a name="history"></a><b>Bogofilter History</b></p>
 <p>
 Bogofilter was written by Eric S. Raymond on August 19, 2002. It gained
 popularity in September 2002, and a number of other authors have started
@@ -56,8 +56,8 @@ to contribute to the project.
 </p>
 
 <hr>
-<a name="lists"></a>
-<p><b>Mailing Lists</b></p>
+
+<p><a name="lists"></a><b>Mailing Lists</b></p>
 <p>
 There are currently four mailing lists for bogofilter
 </p>
@@ -88,16 +88,16 @@ There are currently four mailing lists for bogofilter
 </table>
 
 <hr>
-<a name="home_page"></a>
-<p><b>Bogogfilter Home Page</b></p>
+
+<p><a name="home_page"></a><b>Bogogfilter Home Page</b></p>
 <p>
 The <a href="http://bogofilter.sourceforge.net">bogofilter home page</a> at
 sourceforge is the central clearinghouse for bogofilter resources.
 </p>
 
 <hr>
-<a name="token_counts"></a>
-<p><b>How do I find the spam and ham counts for a token?</b></p>
+
+<p><a name="token_counts"></a><b>How do I find the spam and ham counts for a token?</b></p>
 <p>
  Use bogoutil's '-w' option to display info about a token (word).
  For example, "bogoutil -d $BOGOFILTER_DIR example.com" gives the good and 
@@ -105,8 +105,8 @@ sourceforge is the central clearinghouse for bogofilter resources.
  </p>
 
 <hr>
-<a name="message_count"></a>
-<p><b>How do I tell how many messages are in my wordlists?</b></p>
+
+<p><a name="message_count"></a><b>How do I tell how many messages are in my wordlists?</b></p>
 <p>
  Use bogoutil's '-w' option to display the value of special token .MSG_COUNT, 
  i.e. run command "bogoutil -w $BOGOFILTER_DIR .MSG_COUNT" to see the counts 
@@ -114,8 +114,8 @@ sourceforge is the central clearinghouse for bogofilter resources.
  </p>
 
 <hr>
-<a name="wordlist_size"></a>
-<p><b>How do I tell how many tokens are in my wordlists?</b></p>
+
+<p><a name="wordlist_size"></a><b>How do I tell how many tokens are in my wordlists?</b></p>
 <p>
  Pipe the output of bogoutil's dump command to command "wc", 
  i.e. use "bogoutil -d $BOGOFILTER_DIR/spamlist.db | wc -l " to display the 
@@ -124,8 +124,8 @@ sourceforge is the central clearinghouse for bogofilter resources.
  </p>
 
 <hr>
-<a name="port_notes"></a>
-<p><b>How do I get bogofilter working on Solaris, BSD, etc?</b></p>
+
+<p><a name="port_notes"></a><b>How do I get bogofilter working on Solaris, BSD, etc?</b></p>
 <p>
 If you don't already have a v3.0+ version of 
 <a href="http://www.sleepycat.com">BerkeleyDB</a>, then
@@ -185,8 +185,8 @@ ldconfig.
 See the file README.hp-ux in the source distribution.
 
 <hr>
-<a name="nfs"></a>
-<p><b>Can I share wordlists over NFS?</b></p>
+
+<p><a name="nfs"></a><b>Can I share wordlists over NFS?</b></p>
 <p>
 Yes, provided you use the correct file locking to avoid data corruption.
 When you compile bogofilter, you will need to verify that the configure
@@ -205,24 +205,26 @@ to your NFS documentation for more information about running "lockd" or
 </p>
 
 <hr>
-<a name="return_codes"></a>
-<p><b>Why does bogofilter give return codes like 0 and 256 when it's run from inside a program?</b></p>
+<p><a name="return_codes"></a><b>Why does bogofilter give return codes like 0 and 256 when it's run from inside a program?</b></p>
 <p>
  Likely the return codes are being reformatted by waitpid(2).  
  Use WEXITSTATUS(status) in sys/wait.h, or comparable macro, to get the correct value.
  </p>
 
 <hr>
-<a name="changed_options"></a>
-<p><b>Now that I've upgraded to 0.11 why are my scripts broken?</b></p>
-With version 0.11 bogofilter's options for registering mail as ham or spam have
-been changed.  They now allow registering (or unregistering) messages in the 
-ham and spam wordlists.  Prior to this, there was no way to unregister a 
-message from a wordlist (without registering it in the other wordlist).
-<p>
-Bogofilter has four registration options - '-s', '-n', '-S', and '-N'.  With 
-the release of version 0.11 the meaning of '-S' and '-N' has been changed to 
-allow unregistering messages from the word lists.  Here's what the four options mean:
+<p><a name="changed_options"><b>Now that I've upgraded to 0.11 why are
+	my scripts broken?</b></a></p>
+<p>With version 0.11 bogofilter's options for registering mail as ham or
+spam have been changed.  They now allow registering (or unregistering)
+messages in the ham and spam wordlists.  Prior to this, there was no way
+to unregister a message from a wordlist (without registering it in the
+other wordlist).</p>
+
+<p>Bogofilter has four registration options - '-s', '-n', '-S', and
+'-N'.  With the release of version 0.11 the meaning of '-S' and '-N' has
+been changed to allow unregistering messages from the word lists.
+Here's what the four options mean:</p>
+
 <ul>
   <li>'-s' means to register the current message as spam,
       i.e. add its tokens to spamlist.db</li>
@@ -233,16 +235,21 @@ allow unregistering messages from the word lists.  Here's what the four options 
   <li>'-N' means to unregister the current message from the ham wordlist,
       i.e. remove its tokens from goodlist.db</li>
 </ul>
-Prior to version 0.11, the '-S' option was used to move a message from the ham 
-wordlist to the spam wordlist, i.e. there were two actions.  Now with 0.11 
-each of the two actions is invoked by its own option.  To get the same effect 
-as the old '-S', you should use '-N -s' (or '-Ns' which means the same thing).
-<p>Similarly, the old '-N' option is now '-Sn' (or '-S -n').
+
+<p>Prior to version 0.11, the '-S' option was used to move a message
+from the ham wordlist to the spam wordlist, i.e. there were two actions.
+Now with 0.11 each of the two actions is invoked by its own option.  To
+get the same effect as the old '-S', you should use '-N -s' (or '-Ns'
+which means the same thing).</p>
+
+<p>Similarly, the old '-N' option is now '-Sn' (or '-S -n').</p>
+
 <p>MUA recipes typically use '-s' and '-n' and don't need to change.
 Other scripts which use '-S' and '-N' for fixing registration errors
-<b>do</b> need to be changed.
+<b>do</b> need to be changed.</p>
 
-<hr>
+<hr><pre>
 $Id$
+</pre>
 </body>
 </html>
