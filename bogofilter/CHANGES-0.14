@@ -1,0 +1,26 @@
+			       =================
+				BOGOFILTER NEWS
+			       =================
+
+$Id$
+
+	2003-07-19
+
+	* Bogofilter and bogoutil detect whether there is one or two wordlists in
+	  BOGOFILTER_DIR and use combined or separate wordlist mode (as appropriate).
+
+	* Bogofilter's -V output now includes algorithm and database info.
+
+	2003-07-18
+
+	* Default wordlist mode is single, combined wordlist.
+	  File wordlist.db contains all spam and ham tokens.
+
+	2003-07-17
+
+	* Added tdb (trivial database) support.
+
+	2003-07-16
+
+	* Initial release of code allowing bogofilter to use a single
+	  BerkeleyDB database for storing both ham and spam tokens.
