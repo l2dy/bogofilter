@@ -2,6 +2,14 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.91.4	2004-06-20
+
+* Fix abort during db_open (ds_open wasn't first calling
+  ds_init).
+* Added regression test t.lock3 for this fix.
+* Revise datastore and database levels so that each level
+  calls its own init() and cleanup() routines.
+
 0.91.3	2004-06-15
 	
 * Added format specification '%I' to allow logging of the IP
