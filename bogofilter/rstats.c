@@ -19,7 +19,7 @@ AUTHOR:
 #include "common.h"
 
 #include "bogofilter.h"
-#include "fisher.h"		/* for prbf() */
+#include "robinson.h"
 #include "rstats.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
@@ -193,24 +193,6 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array)
 	    (void)fputc( '#', stdout);
 	(void)fputc( '\n', stdout);
     }
-}
-
-void rstats_print_rtable_summary(void)
-{
-    size_t robn = header.robn;
-
-    double df = 2.0 * robn;
-    double ln10 = 2.302585093;				/* log(10) - 2.3025850929940459  */
-
-    double p_ln = log(header.p.mant) + header.p.exp * ln10;	/* invlogsum */
-    double q_ln = log(header.q.mant) + header.q.exp * ln10;	/* logsum    */
-    double p_pr = prbf(-2.0 * p_ln, df);			/* invproduct */
-    double q_pr = prbf(-2.0 * q_ln, df);			/* product    */
-
-    /* print trailer */
-    (void)fprintf(stdout, "%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
-		  robn+1, "P_Q_S_invsum_logsum", 
-		  p_pr, q_pr, header.spamicity, p_ln, q_ln);
 }
 
 void rstats_print_rtable(size_t robn, rstats_t **rstats_array)
