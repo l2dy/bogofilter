@@ -5,8 +5,9 @@
 NAME:
    buff.c -- support for bogofilter's buff struct
 
-AUTHOR:
+AUTHORS:
    David Relson <relson@osagesoftware.com>
+   Matthias Andree <matthias.andree@gmx.de> (buff_fgetsl)
 
 ******************************************************************************/
 
@@ -20,7 +21,6 @@ AUTHOR:
 #include "xmalloc.h"
 
 /* Function Definitions */
-
 buff_t *buff_new(byte *buff, size_t used, size_t size)
 {
     buff_t *self = xmalloc(sizeof(buff_t));
@@ -47,7 +47,7 @@ buff_t *buff_dup(const buff_t *self)
 
 int buff_fgetsl(buff_t *self, FILE *in)
 {
-    int s = xfgetsl(self->t.text+self->read, self->size, in, 1);
+    int s = xfgetsl((char *)self->t.text+self->read, self->size-self->read, in, 1);
     if (s >= 0)
 	self->t.leng += s;
     return s;
@@ -55,7 +55,9 @@ int buff_fgetsl(buff_t *self, FILE *in)
 
 void buff_puts(const buff_t *self, size_t width, FILE *fp)
 {
-    word_t word = { self->t.leng-self->read, self->t.text+self->read };
+    word_t word;
+    word.leng = self->t.leng-self->read;
+    word.text = self->t.text+self->read;
     word_puts(&word, width, fp);
 }
 
