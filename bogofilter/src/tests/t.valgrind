@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 # only run this when valgrind is in the path, skip otherwise
 # ("exit 77" = skip)
 #

@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
 #	 grftest.YYYYMMDD.  This is useful when something is different.
