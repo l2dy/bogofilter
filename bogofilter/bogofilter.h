@@ -1,6 +1,13 @@
 /* $Id$ */
 /* 
  * $Log$
+ * Revision 1.10  2002/09/29 03:40:54  gyepi
+ * Modified: bogofilter.c bogofilter.h main.c
+ * 1. replace Judy with hash table (wordhash)
+ * 2. ensure that databases are always locked in the same order.
+ *
+ * Apologies for simultaneously submitting loosely related changes.
+ *
  * Revision 1.9  2002/09/27 01:17:38  gyepi
  * removed unused bogodump declaration
  *
@@ -58,6 +65,7 @@
 #include "lexer.h"
 
 typedef enum rc_e {RC_SPAM=0, RC_NONSPAM=1}  rc_t;
+typedef enum reg_e { REG_NONE = 0, REG_SPAM, REG_GOOD, REG_SPAM_TO_GOOD, REG_GOOD_TO_SPAM } reg_t;
 
 typedef struct 
 {
@@ -68,10 +76,15 @@ typedef struct
 }
 wordlist_t;
 
-extern void register_words(int fd, wordlist_t *list, wordlist_t *other);
+extern void register_words(int fd, reg_t register_type);
 extern rc_t bogofilter(int fd, double *xss);
 
 extern wordlist_t good_list, spam_list;
 extern int verbose;
 
-// end
+//Represents the secondary data for a word key
+typedef struct {
+  int freq;                     //total word count
+  int msg_freq;                 //word count for current message
+} wordprop_t;
+

@@ -1,6 +1,13 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.21  2002/09/29 03:40:54  gyepi
+ * Modified: bogofilter.c bogofilter.h main.c
+ * 1. replace Judy with hash table (wordhash)
+ * 2. ensure that databases are always locked in the same order.
+ *
+ * Apologies for simultaneously submitting loosely related changes.
+ *
  * Revision 1.20  2002/09/27 01:18:38  gyepi
  * removed unused #defines and logprint function
  *
@@ -125,7 +132,7 @@ I do the lexical analysis slightly differently, however.
 #include <fcntl.h>
 #include <stdlib.h>
 #include <db.h>
-#include <Judy.h>
+#include <wordhash.h>
 #include "bogofilter.h"
 #include "datastore.h"
 
@@ -147,95 +154,135 @@ wordlist_t good_list	= {"good", NULL, 0, NULL};
 wordlist_t spam_list	= {"spam", NULL, 0, NULL};
 
 
-void register_words(int fdin, wordlist_t *list, wordlist_t *other)
+void *collect_words(int fd, int *msg_count, int *word_count)
+// tokenize input text and save words in wordhash_t hash table
+// returns: the wordhash_t hash table. Sets msg_count and word_count to the appropriate values
+{
+  int tok = 0;
+  int w_count = 0;
+  int m_count = 0;
+ 
+  wordprop_t *w;
+  hashnode_t *n;
+  wordhash_t *h = wordhash_init();
+     
+  for (;;){
+    tok = get_token();
+  
+    if (tok != FROM && tok != 0){
+      w = wordhash_insert(h, yytext, sizeof(wordprop_t));             
+      w->msg_freq++;
+      w_count++;
+    }
+    else {
+      // End of message. Update message counts.
+      if (tok == FROM || (tok == 0 && m_count == 0))
+        m_count++;
+  
+      // Incremenent word frequencies, capping each message's contribution at MAX_REPEATS
+      // in order to be able to cap frequencies.
+      for(n = wordhash_first(h); n != NULL; n = wordhash_next(h)){
+        w = n->buf;
+        if (w->msg_freq > MAX_REPEATS)
+          w->msg_freq = MAX_REPEATS;
+  
+        w->freq += w->msg_freq;
+        w->msg_freq = 0;
+      }
+  
+      // Want to process EOF, *then* drop out
+      if (tok == 0)
+        break;
+    }
+  }
+ 
+  if (word_count)
+    *word_count = w_count;
+ 
+  if (msg_count)
+    *msg_count = m_count;
+ 
+  return(h);
+}
+
+
+void register_words(int fdin, reg_t register_type)
 // tokenize text on stdin and register it to  a specified list
 // and possibly out of another list
 {
-    int	tok, wordcount, msgcount;
-    void  **PPValue;			// associated with Index.
-    void  *PArray = (Pvoid_t) NULL;	// JudySL array.
-    JError_t JError;                    // Judy error structure
-    void	**loc;
-    char	tokenbuffer[BUFSIZ];
+  int	wordcount, msgcount;
 
-    //FIXME -- The database locking time can be minized by using a hash table.
-    db_lock_writer(list->dbh);
-    if (other)
-      db_lock_writer(other->dbh);
+  hashnode_t *node;
+  wordprop_t *wordprop;
+  wordhash_t *h;
 
-    // Grab tokens from the lexical analyzer into our own private Judy array
-    yyin = fdopen(fdin, "r");
-    msgcount = wordcount = 0;
+  wordlist_t *lists[2];
+  wordlist_t *incr_list = NULL;
+  wordlist_t *decr_list = NULL;
+  int i;
+  int nlists = 0;
 
-    list->msgcount = db_getcount(list->dbh);
-    if (other) other->msgcount = db_getcount(other->dbh);
+  h = collect_words(fdin, &msgcount, &wordcount);
 
-    for (;;)
+  if (verbose)
+    fprintf(stderr, "# %d words\n", wordcount);
+  
+  /* If the operation requires both databases, they must be locked in order */
+  switch(register_type)
     {
-	tok = get_token();
+    case REG_GOOD:
+      incr_list = lists[nlists++] = &good_list;
+      break;
 
-	if (tok != FROM && tok != 0)
-	{
-	    // Ordinary word, stash in private per-message array.
-	    if ((PPValue = JudySLIns(&PArray, yytext, &JError)) == PPJERR)
-		return;
-	    (*((PWord_t) PPValue))++;
-	    wordcount++;
-	}
-	else
-	{
-	    // End of message. Update message counts.
-	    if (tok == FROM || (tok == 0 && msgcount == 0))
-	    {
-		list->msgcount++;
-                msgcount++;
-		if (other && other->msgcount > 0)
-		    other->msgcount--;
-	    }
+    case REG_SPAM:
+      incr_list = lists[nlists++] = &spam_list;
+      break;
 
-	    // We copy the incoming words into their own per-message array
-	    // in order to be able to cap frequencies.
-	    tokenbuffer[0]='\0';
-	    for (loc  = JudySLFirst(PArray, tokenbuffer, 0);
-		 loc != (void *) NULL;
-		 loc  = JudySLNext(PArray, tokenbuffer, 0))
-	    {
-		int freq	= (*((PWord_t) loc));
+    case  REG_GOOD_TO_SPAM:
+      decr_list = lists[nlists++] = &good_list;
+      incr_list = lists[nlists++] = &spam_list;
+      break;
 
-		if (freq > MAX_REPEATS)
-		    freq = MAX_REPEATS;
-
-		db_increment(list->dbh, tokenbuffer, freq);
-		if (other)
-		    db_increment(other->dbh, tokenbuffer, -freq);
-	    }
-	    JudySLFreeArray(&PArray, &JError);
-	    PArray = (Pvoid_t)NULL;
-
-	    if (verbose)
-		printf("# %d words\n", wordcount);
-
-	    // Want to process EOF, *then* drop out
-	    if (tok == 0)
-		break;
-	}
+    case REG_SPAM_TO_GOOD:
+      incr_list = lists[nlists++] = &good_list;
+      decr_list = lists[nlists++] = &spam_list;
+      break;
+     
+    default:
+      fprintf(stderr, "Error: Invalid register_type\n");
+      exit(2);      
     }
+  
+  //Note: minimize database locking time.
+  for (i = 0; i < nlists; i++){
+    db_lock_writer(lists[i]->dbh);
+    lists[i]->msgcount = db_getcount(lists[i]->dbh);
+  }
+ 
+  incr_list->msgcount += msgcount;
 
-    db_setcount(list->dbh, list->msgcount);
-    db_flush(list->dbh);
+  if (decr_list){
+    if (decr_list->msgcount > msgcount)
+      decr_list->msgcount -= msgcount;
+    else
+      decr_list->msgcount = 0;
+  }
+
+  for (node = wordhash_first(h); node != NULL; node = wordhash_next(h)){
+    wordprop = node->buf;
+    db_increment(incr_list->dbh, node->key, wordprop->freq);
+    if (decr_list) db_increment(decr_list->dbh, node->key, -wordprop->freq);
+  }
+
+  for (i = 0; i < nlists; i++){
+    db_setcount(lists[i]->dbh, lists[i]->msgcount);
+    db_flush(lists[i]->dbh);
     if (verbose)
-       fprintf(stderr, "bogofilter: %lu messages on the %s list\n", list->msgcount, list->name);
+      fprintf(stderr, "bogofilter: %lu messages on the %s list\n", lists[i]->msgcount, lists[i]->name);
+    db_lock_release(lists[i]->dbh);
+  }
 
-    if (other){
-	   	 db_setcount(other->dbh, other->msgcount);
-		 if (verbose)
-		      fprintf(stderr, "bogofilter: %lu messages on the %s list\n", other->msgcount, other->name);
-
-		 db_flush(other->dbh);
-    		 db_lock_release(other->dbh);
-    }
-    
-    db_lock_release(list->dbh);
+  wordhash_free(h);
 }
 
 typedef struct 
@@ -259,26 +306,6 @@ int compare_stats(const void *id1, const void *id2)
 	     ((d1->prob == d2->prob) && (strcmp(d1->key, d2->key) > 0)));
 }
 
-void *collect_words(int fd)
-// tokenize input text and save words in a Judy array.
-// returns:  the Judy array
-{
-    int tok;
-
-    void	**PPValue;			// associated with Index.
-    void	*PArray = (Pvoid_t) NULL;	// JudySL array.
-    JError_t	JError;				// Judy error structure
-
-    yyin = fdopen(fd, "r");
-    while ((tok = get_token()) != 0)
-    {
-	// Ordinary word, stash in private per-message array.
-	if ((PPValue = JudySLIns(&PArray, yytext, &JError)) == PPJERR)
-	    break;
-	(*((PWord_t) PPValue))++;
-    }
-    return PArray;
-}
 
 double compute_probability( char *token )
 {
@@ -328,13 +355,11 @@ double compute_probability( char *token )
     return prob;
 }
 
-bogostat_t *select_indicators(void  *PArray)
+bogostat_t *select_indicators(wordhash_t *wordhash)
 // selects the best spam/nonspam indicators and
 // populates the stats structure.
 {
-    void	**loc;
-    char	tokenbuffer[BUFSIZ];
-
+    hashnode_t *node;
     discrim_t *pp;
     static bogostat_t stats;
     
@@ -344,12 +369,9 @@ bogostat_t *select_indicators(void  *PArray)
  	pp->key[0] = '\0';
     }
     
-    for (loc  = JudySLFirst(PArray, tokenbuffer, 0);
-	 loc != (void *) NULL;
-	 loc  = JudySLNext(PArray, tokenbuffer, 0))
-    {
-	char  *token = tokenbuffer;
-	double prob = compute_probability( token );
+    for(node = wordhash_first(wordhash); node != NULL; node = wordhash_next(wordhash))
+      {
+	double prob = compute_probability( node->key );
 	double dev = DEVIATION(prob);
 	discrim_t *hit = NULL;
 	double	hitdev=1;
@@ -368,7 +390,7 @@ bogostat_t *select_indicators(void  *PArray)
         if (hit) 
 	{ 
 	    hit->prob = prob;
-	    strncpy(hit->key, token, MAXWORDLEN);
+	    strncpy(hit->key, node->key, MAXWORDLEN);
 	}
     }
     return (&stats);
@@ -413,11 +435,10 @@ rc_t bogofilter(int fd, double *xss)
 {
     rc_t	status;
     double 	spamicity;
-    void	*PArray = (Pvoid_t) NULL;	// JudySL array.
+    wordhash_t  *wordhash;
     bogostat_t	*stats;
 
-//  tokenize input text and save words in a Judy array.
-    PArray = collect_words(fd);
+    wordhash = collect_words(fd, NULL, NULL);
 
     db_lock_reader(good_list.dbh);
     db_lock_reader(spam_list.dbh);
@@ -426,18 +447,20 @@ rc_t bogofilter(int fd, double *xss)
     spam_list.msgcount = db_getcount(spam_list.dbh);
 
 //  select the best spam/nonspam indicators.
-    stats = select_indicators(PArray);
-    
+    stats = select_indicators(wordhash);
+
+    db_lock_release(good_list.dbh);
+    db_lock_release(spam_list.dbh);
+
 //  computes the spamicity of the spam/nonspam indicators.
     spamicity = compute_spamicity(stats);
-
-    db_lock_release(spam_list.dbh);
-    db_lock_release(good_list.dbh);
 
     status = (spamicity > SPAM_CUTOFF) ? RC_SPAM : RC_NONSPAM;
 
     if (xss != NULL)
         *xss = spamicity;
+    
+    wordhash_free(wordhash);
 
     return status;
 }

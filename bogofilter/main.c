@@ -1,6 +1,13 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.15  2002/09/29 03:40:54  gyepi
+ * Modified: bogofilter.c bogofilter.h main.c
+ * 1. replace Judy with hash table (wordhash)
+ * 2. ensure that databases are always locked in the same order.
+ *
+ * Apologies for simultaneously submitting loosely related changes.
+ *
  * Revision 1.14  2002/09/26 23:04:40  relson
  * documentation:
  *     changed to refer to "good" and "spam" tokens and lists.
@@ -105,8 +112,7 @@ int verbose, passthrough;
 int main(int argc, char **argv)
 {
     int	ch;
-    int register_spam = 0, register_good = 0;
-    int spam_to_good = 0, good_to_spam = 0;
+    reg_t register_type = REG_NONE; 
     char	goodfile[PATH_MAX], spamfile[PATH_MAX], directory[PATH_MAX];
     char	*tmp;
     struct stat sb;
@@ -127,19 +133,19 @@ int main(int argc, char **argv)
 	    break;
 
 	case 's':
-	    register_spam = 1;
+	    register_type = REG_SPAM;
 	    break;
 
 	case 'n':
-	    register_good = 1;
+	    register_type = REG_GOOD;
 	    break;
 
 	case 'S':
-	    good_to_spam = 1;
+	    register_type = REG_GOOD_TO_SPAM;
 	    break;
 
 	case 'N':
-	    spam_to_good = 1;
+	    register_type = REG_SPAM_TO_GOOD;
 	    break;
 
 	case 'v':
@@ -198,7 +204,6 @@ int main(int argc, char **argv)
     strcat(spamfile, SPAMFILE);
     spam_list.file = spamfile;
 
-
     if ( (good_list.dbh = db_open(good_list.file, good_list.name)) == NULL){
       fprintf(stderr, "bogofilter: Cannot initialize database %s.\n", good_list.name);
       exit(2);
@@ -210,24 +215,7 @@ int main(int argc, char **argv)
       exit(2);
     }
    
-
-    if (register_spam)
-    {
-	register_words(STDIN_FILENO, &spam_list, NULL);
-    }
-    else if (register_good)
-    {
-	register_words(STDIN_FILENO, &good_list, NULL);
-    }
-    else if (spam_to_good)
-    {
-	register_words(STDIN_FILENO, &good_list, &spam_list);
-    }
-    else if (good_to_spam)
-    {
-	register_words(STDIN_FILENO, &spam_list, &good_list);
-    }
-    else
+    if (register_type == REG_NONE)
     {
 	double spamicity;
 	rc_t	status = bogofilter(STDIN_FILENO, &spamicity);
@@ -266,6 +254,10 @@ int main(int argc, char **argv)
 	}
 
         exitcode = status;
+    }
+    else
+    {
+	register_words(STDIN_FILENO, register_type);
     }
 
     db_close(spam_list.dbh);
