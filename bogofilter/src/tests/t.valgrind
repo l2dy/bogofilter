@@ -32,7 +32,7 @@ spamicity_tags = S,h,u
 spamicity_formats = %6.2e %6.2e %0.6f
 EOF
 
-V="v"	# verbosity level
+#V="v"	# verbosity level
 
 run_test()
 {
