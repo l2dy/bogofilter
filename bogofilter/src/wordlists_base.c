@@ -3,6 +3,7 @@
 #include "common.h"
 
 #include "bogohome.h"
+#include "find_home.h"
 #include "paths.h"
 #include "wordlists.h"
 #include "wordlists_base.h"
@@ -92,7 +93,7 @@ int set_wordlist_dir(const char* d, priority_t precedence)
     if (precedence < saved_precedence)
 	return rc;
 
-    dir = (d != NULL) ? xstrdup(d) : get_directory(precedence);
+    dir = (d != NULL) ? tildeexpand(d, true) : get_directory(precedence);
     if (dir == NULL)
 	return -1;
 
