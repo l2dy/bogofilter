@@ -38,18 +38,6 @@ extern YYYYMMDD today;		/* date as YYYYMMDD */
  */
 #define MSG_COUNT ".MSG_COUNT"
 
-struct bfdir {
-    const char *dirname;
-};
-
-typedef struct bfdir bfdir;
-
-struct bffile {
-    const char *filename;
-};
-
-typedef struct bffile bffile;
-
 /** Datastore handle type
 ** - used to communicate between datastore layer and database layer
 ** - known to program layer as a void*
@@ -113,7 +101,6 @@ typedef int	dsm_i_i		(int open_mode);
 typedef int	dsm_i_pnvi	(DB_ENV *dbe, int ret);
 typedef int	dsm_i_pvi	(void *handle, int open_mode);
 typedef int	dsm_i_v		(void);
-typedef ex_t	dsm_x_pd	(bfdir *db_dir);
 typedef void	dsm_v_pc	(const char *str);
 typedef void	dsm_v_pbe	(dbe_t *env);
 typedef void	dsm_v_pnv	(DB_ENV *dbe);
@@ -123,9 +110,7 @@ typedef ex_t	dsm_x_ppbb	(bfpath *bfp, bool, bool);
 typedef ex_t	dsm_x_pnvpp	(DB_ENV *dbe, bfpath *bfp);
 typedef dbe_t  *dsm_pbe_pp	(bfpath *bfp);
 typedef ex_t	dsm_x_pp	(bfpath *bfp);
-typedef ex_t	dsm_x_pdpf	(bfdir *directory, bffile *db_file);
 typedef u_int32_t dsm_u_pp	(bfpath *bfp);
-typedef u_int32_t dsm_u_pdpf	(bfdir *directory, bffile *db_file);
 typedef DB_ENV *dsm_pnv_pp	(bfpath *bfp);
 typedef DB_ENV *dsm_pnv_pbe	(dbe_t *env);
 

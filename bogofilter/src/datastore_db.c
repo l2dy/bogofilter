@@ -259,7 +259,7 @@ static dbh_t *dbh_init(bfpath *bfp)
     handle->magic= MAGIC_DBH;		/* poor man's type checking */
     handle->fd   = -1;			/* for lock */
 
-    handle->name.filename = xstrdup(bfp->filepath);
+    handle->name = xstrdup(bfp->filepath);
 
     handle->locked     = false;
     handle->is_swapped = false;
@@ -273,8 +273,7 @@ static dbh_t *dbh_init(bfpath *bfp)
 static void handle_free(/*@only@*/ dbh_t *handle)
 {
     if (handle != NULL) {
-	xfree((char *)handle->name.filename);
-	xfree((char *)handle->path.dirname);
+	xfree((char *)handle->name);
 	xfree(handle);
     }
     return;
@@ -530,7 +529,7 @@ void *db_open(void *vhandle,
 	handle->dbenv = env;
 
 	handle->open_mode = open_mode;
-	db_file = dsm->dsm_database_name(handle->name.filename);
+	db_file = dsm->dsm_database_name(handle->name);
 
 #ifdef	ENABLE_MEMDEBUG	
 	if (!fTransaction)
@@ -583,7 +582,7 @@ retry_db_open:
 	    /* close again and bail out without further tries */
 	    if (DEBUG_DATABASE(0))
 		print_error(__FILE__, __LINE__, "DB->open(%s) - actually %s, directory %s, err %s",
-			    handle->name.filename, db_file, env->directory, db_strerror(ret));
+			    handle->name, db_file, env->directory, db_strerror(ret));
 
 	    dbp->close(dbp, 0);
 	    goto open_err;
@@ -830,7 +829,7 @@ void db_close(void *vhandle)
 
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB->close(%s, %s)\n",
-		handle->name.filename, flag & DB_NOSYNC ? "DB_NOSYNC" : "0");
+		handle->name, flag & DB_NOSYNC ? "DB_NOSYNC" : "0");
 
     if (handle->txn) {
 	print_error(__FILE__, __LINE__, "db_close called with transaction still open, program fault!");
@@ -867,7 +866,7 @@ void db_flush(void *vhandle)
     assert(handle->magic == MAGIC_DBH);
 
     if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "db_flush(%s)\n", handle->name.filename);
+	fprintf(dbgout, "db_flush(%s)\n", handle->name);
 
     ret = dbp->sync(dbp, 0);
 #if DB_AT_LEAST(3,2) && DB_AT_MOST(4,0)
@@ -909,7 +908,7 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 
     ret = dbp->cursor(dbp, handle->txn, &dbcp, 0);
     if (ret) {
-	print_error(__FILE__, __LINE__, "(cursor): %s", handle->path.dirname);
+	print_error(__FILE__, __LINE__, "(cursor): %s", handle->path);
 	return EX_ERROR;
     }
 

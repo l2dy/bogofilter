@@ -103,12 +103,6 @@ ex_t dbe_recover(bfpath *bfp, bool catastrophic, bool force);
 /** Remove the environment from \a directory. */
 ex_t dbe_remove(bfpath *bfp);
 
-/** Checkpoint environment in \a directory. */
-ex_t dbe_checkpoint(bfdir *directory);
-
-/** Mark inactive and remove older write-ahead log files. */
-ex_t dbe_purgelogs(bfdir *directory);
-
 /** Return page size of if \a databasefile, 0xffffffff for error, 0 for
  * unknown. */
 u_int32_t db_pagesize(bfpath *bfp);

@@ -25,8 +25,8 @@ David Relson	<relson@osagesoftware.com> 2005
 #ifndef	ENABLE_SQLITE_DATASTORE
 typedef struct {
     int		magic;
-    bfdir	path;
-    bffile	name;
+    char	*path;
+    char	*name;
     int		fd;		/* file descriptor of data base file */
     dbmode_t	open_mode;	/* datastore open mode, DS_READ/DS_WRITE */
 #ifdef	ENABLE_DB_DATASTORE	/* if Berkeley DB */
