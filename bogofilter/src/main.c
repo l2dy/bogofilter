@@ -40,6 +40,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     rc_t status;
     ex_t exitcode = EX_OK;
 
+    dbgout = stderr;
+
     progtype = build_progtype(progname, DB_TYPE);
 
     process_parameters(argc, argv, true);

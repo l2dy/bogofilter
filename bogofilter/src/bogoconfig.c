@@ -189,7 +189,6 @@ void process_parameters(int argc, char **argv, bool warn_on_error)
     verbose = 0;
     run_type = RUN_UNKNOWN;
     fpin = stdin;
-    dbgout = stderr;
     set_today();		/* compute current date for token age */
 
     process_arglist(argc, argv, PR_COMMAND, PASS_1_CLI);
