@@ -1361,8 +1361,8 @@ static bool check_msg_counts(void)
 	ok = false;
     }
 
-    if (msgs_bad * 5.0 < msgs_good ||
-	msgs_bad > msgs_good * 5.0) {
+    if (msgs_bad  * 5 < msgs_good || 
+	msgs_good * 5 < msgs_bad ) {
 	if (!quiet)
 	    fprintf(stderr,
 		    "The wordlist has a ratio of spam to non-spam of %0.1f to 1.0.\n"
