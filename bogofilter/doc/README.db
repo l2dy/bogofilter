@@ -24,7 +24,9 @@ application or system crash.
 
 2.1 Compatibility, Berkeley DB versions
 
-These versions are supported (with all SleepyCat-posted patches applied):
+These versions are supported (with all SleepyCat-posted patches applied
+- if using a pre-packaged Berkeley DB version, the packager should have
+applied the patches, check your vendor's update site regularly):
 
   Sleepycat Software: Berkeley DB 3.1.17: (July 31, 2000)
   Sleepycat Software: Berkeley DB 3.2.9: (January 24, 2001)
@@ -32,37 +34,35 @@ These versions are supported (with all SleepyCat-posted patches applied):
   Sleepycat Software: Berkeley DB 4.0.14: (November 18, 2001)
   Sleepycat Software: Berkeley DB 4.1.25: (December 19, 2002)
   Sleepycat Software: Berkeley DB 4.2.52: (December  3, 2003)
-  Sleepycat Software: Berkeley DB 4.3.21: (November  8, 2004)
+  Sleepycat Software: Berkeley DB 4.3.27: (December 22, 2004)
 
-Other 3.x or 4.x versions of Berkeley DB may or may not work.
+Other 3.x or 4.x versions of Berkeley DB may or may not work but usually
+they will.
 
 Berkeley DB versions 4.1 and newer are recommended over the previous
 versions, because the newer can detect data corruptions more reliably
 (through the use of checksums that detect partially written data base
-pages); Berkeley DB 4.1 appears a bit slower under load than its
-successors (i. e. with multiple running copies of bogofilter/bogoutil
-operating on the same data base with at least one spam registration in
-progress).
+pages); Berkeley DB 4.2 and 4.3 appear a bit faster under load than 4.1
+and older versions.
 
 2.2 Upgrading from non-transactional releases of bogofilter (before 0.93)
 
 NOTE: for updates of Berkeley DB itself, see section 2.6!
 
 Bogofilter should transparently upgrade the existing data base to the
-new transactional data base.  Note though that upgrading will not add
-checksums (see the previous section) to existing data bases, so it is
-recommended that, if you are using Berkeley DB versions 4.1 or newer,
-you dump and reload the data base to add checksums.
+new transactional data base.
 
-The dump/load cycle is necessary only the first time you upgrade from a
-non-transactional to a transactional release.  Use these commands:
+For enhanced reliability (only available with Berkeley DB 4.1 or newer),
+it is recommended that you dump and reload the database once so that
+Berkeley DB adds page checksums.  Skip this procedure for Berkeley DB
+versions 4.0 or older.  For 4.1 and newer, use these commands:
 
   cd ~/.bogofilter
   bogoutil -d wordlist.db > wordlist.txt
   mv wordlist.db wordlist.db.old
   bogoutil -l wordlist.db < wordlist.txt
 
-And if all commands succeeded: rm wordlist.txt
+And if all commands succeeded: rm wordlist.txt wordlist.db.old
 
 NOTE: transactional databases require large lock tables, the exact
 size depends on the size of the database. If the lock table isn't
@@ -101,15 +101,16 @@ If your computer saves the data on its own disk drive (a "local file
 system"), Berkeley DB should work fine. Such file systems are ext2, ext3,
 ffs, jfs, hfs, hfs+, reiserfs, ufs, xfs.
 
-Berkeley DB does not work reliably with a networked file system. AFS,
-CIFS, Coda, NFS, SMBFS fall into this category.
+Berkeley DB Transactional and Concurrent data stores do not work
+reliably with a networked file system for various technical reasons.
+AFS, CIFS, Coda, NFS, SMBFS fall into this category.
 
 Strictly speaking, with Berkeley DB 4.0 and older versions, the data base
 block size must be written atomically. The bogofilter maintainers are
 not currently aware of a file system that meets this requirement and is
 production quality at the same time.
 
-2.5 Do make backups!
+2.5 Making a snapshot backup
 
 The transactional data store is no good if the disk drive has become
 inaccessible (which happens after some months or years with every
@@ -118,20 +119,16 @@ db_archive utility for additional documentation of a "hot" backup),
 bogofilter cannot, of course, guess data that got lost through a hard
 drive fault.
 
-When copying or archiving directory contents, be sure to archive the
-*.db files before the log.* files. (The *.db files MUST NOT be newer
-than the newest log file, else the backup will not be recoverable!)
+When copying or archiving directory contents, be sure to copy or archive
+the *.db files FIRST, BEFORE archiving/copying the log.* files, this
+is needed to let the database copy or archive remain recoverable.
 
-The bf_tar script is provided for your convenience. It requires the pax
-utility and writes a tar archive to stdout, and it can optionally remove
-inactive log files after writing the tarball.
+You can use the bf_tar script for convenience. It requires the pax
+utility (UNIX standard for over a decade now) and writes a tar archive
+to stdout, and it can optionally remove inactive log files before or
+after writing the tarball.
 
 Run bf_tar without arguments to see its synopsis.
-
-Although backup strategies are beyond the scope of this document, be
-sure to store fresh backups of important data outside of your house
-regularly. See the chapter "Database and log file archival" in the
-Berkeley DB documentation for details.
 
 2.6 Updating Berkeley DB version underneath bogofilter
 
@@ -139,15 +136,6 @@ When upgrading the Berkeley DB library to a new version, or recompiling
 bogofilter to use a newer version, two things in the on-disk data format
 can change, generally speaking: the database format (we use the BTree
 access method), the log file format, or both.
-
-If you've been using Berkeley DB 3.0 (only supported with bogofilter
-versions 0.17.2 and older) and are about to update to any newer 3.X or
-4.X version, you need a database format upgrade. You can either:
-- dump the wordlists to a text file, then update Berkeley DB
-  and bogofilter, then load the wordlists again;
-or
-- use the db_upgrade utility to upgrade the databases in place
-  (this is dangerous and must not be interrupted, backup first!)
 
 You need a "log file upgrade" if at least one of these conditions is
 true:
@@ -166,6 +154,15 @@ If you need a log file upgrade, the upgrade procedure is:
   4. install the new Berkeley DB version, recompile bogofilter (unless
      using a binary package), install the new bogofilter
   5. restart your mail system.
+
+If you've been using Berkeley DB 3.0 (only supported with bogofilter
+versions 0.17.2 and older) and are about to update to any newer 3.X or
+4.X version, you need a database format upgrade. You can either:
+- dump the wordlists to a text file, then update Berkeley DB
+  and bogofilter, then load the wordlists again;
+or
+- use the db_upgrade utility to upgrade the databases in place
+  (this is dangerous and must not be interrupted, backup first!)
 
 3. Use and troubleshooting ---------------------------------------------
 
@@ -187,19 +184,18 @@ If you wish to keep and for instance compress (gzip) the log files, you
 can safely use Berkeley DB's db_checkpoint and db_archive utilities,
 which should be run in this order:
 
-- db_checkpoint migrates written-ahead data from the log files into the
-  data base, and places a checkpoint which will speed up data base
-  recovery, for instance after a premature bogofilter abort.
+- First, use db_checkpoint. It migrates written-ahead data from the log files
+  into the data base, and places a checkpoint which will speed up data
+  base recovery, for instance after a premature bogofilter abort.
 
 - db_archive allows to identify log files that are no longer in use so
   that you can compress or remove them.
 
-Before choosing to remove log files, be sure to read the db_archive
-documentation that ships with Berkeley DB, because removing logs has an
-impact on recoverability and can render your data base unrecoverable.
+Note that if you plan to remove log files, you must make snapshot
+backups that contain both the *.db and log.* files (in this order!).
 
-The db_archive documentation also contains suggestions for several
-backup strategies.
+Referral: Berkeley DB's db_archive documentation contains suggestions
+for several backup strategies.
 
 3.2 LOCK TABLE EXHAUSTION
 
@@ -228,6 +224,88 @@ of headroom for future training -- see section 4.2 below to determine
 the size of the data base and data base page. After changing these
 set_lk_max* lines in DB_CONFIG, run 'bogoutil --db-recover ~/.bogofilter'
 to make the change effective.
+
+3.3 RECOVERY AND FAILED RECOVERY
+
+The recovery procedures should be tried in the order shown in this
+section. If you aren't willing to experiment much, but have kept
+sufficient spam and ham that you can easily and quickly retrain
+bogofilter from scratch, read only sections 3.3.1 and 3.3.5, skipping
+subsections 3.3.2 to 3.3.4.
+
+3.3.1 Regular recovery
+
+Bogofilter and related bogo* utilities will automatically detect when
+regular recovery is needed and run it. This process is transparent,
+the user will usually be aware this happens.
+
+This process needs the *.db file and the corresponding _active_ log
+files.
+
+It is possible to trigger regular recovery by running
+bogoutil --db-recover ~/.bogofilter
+although this should not be needed.
+
+If this fails, remove the __db.*, *.db and log.* files,
+restore from the latest snapshot backup (see section 2.5) and force
+recovery as shown in the previous paragraph.
+
+3.3.2 Catastrophic recovery
+
+If regular recovery fails after severe damage to hardware, filesystem,
+database files, you can attempt to run catastrophic recovery. If log
+files have been damaged, catastrophic recovery may not work.
+
+This may need *all* log files from the backup and is therefore not
+available if log files have been pruned.
+
+To run catastrophic recovery, replace the log files from your archives,
+then run:
+bogoutil --db-recover-harder ~/.bogofilter
+
+If this fails, read on.
+
+3.3.3 Last-resort recovery method #1: nuke the environment
+
+This recovery methods do not guarantee you are getting all of your
+database, you may already have lost part or all of your data when this
+is required, and you may lose recent updates to the database and corrupt
+it. Only attempt this methods if the regular and catastrophic recovery
+methods have failed or were unavailable.
+
+To use this method:
+
+  1. remove the __db.* and log.* files
+  2. run: bogoutil -v --db-verify ~/.bogofilter/wordlist.db
+  3a. if that printed OK, watch carefully if bogofilter performs to 
+      the standards you are used to.
+  3b. if verify failed, read the next section.
+
+3.3.4 Last-resort recovery method #2: salvage the raw .db file
+
+This recovery methods do not guarantee you are getting all of your
+database, you may already have lost part or all of your data when this
+is required, and you may lose recent updates to the database and corrupt 
+it. Only attempt this methods if the regular and catastrophic recovery 
+methods have failed or were unavailable.
+
+To try this method:
+
+  db_dump -r ~/.bogofilter/wordlist.db > ~/.bogofilter/wordlist.txn
+  rm ~/.bogofilter/{__db.*,log.*,wordlist.db}
+  db_load ~/.bogofilter/wordlist.db < ~/.bogofilter/wordlist.txn
+
+3.3.5 No recovery possible?
+
+We're sorry. This should happen really rarely. There's nothing left to
+try, so you need to retrain from scratch.
+
+First, remove the database and environment, type:
+
+  rm ~/.bogofilter/{__db.*,log.*,wordlist.db}
+
+Then retrain from scratch with the usual bogofilter -n and bogofilter -s
+commands.
 
 4. Other Information of Interest ---------------------------------------
 
@@ -459,19 +537,8 @@ To verify that the database is intact, type:
 
     bogoutil --db-verify ~/.bogofilter/wordlist.db
 
-There should be no output. If there are errors, try:
-
-  bogoutil --db-recover ~/.bogofilter
-
-and then verify again. If it still prints errors, you must restore
-your database from a backup, rebuild from scratch, or you can attempt
-to salvage it with
-
-  db_dump -r ~/.bogofilter/wordlist.db > ~/.bogofilter/wordlist.txn
-  rm ~/.bogofilter/{__db.*,log.*,wordlist.db}
-  db_load ~/.bogofilter/wordlist.db < ~/.bogofilter/wordlist.txn
-
-NOTE:  There is no guarantee that the salvage procedure will work.
+There should be no output. If there are errors, you must recover your
+database, see section 3.3 for methods.
 
 A. Switching the disk drive's write cache off and on -------------------
 
