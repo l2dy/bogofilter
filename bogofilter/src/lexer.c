@@ -57,10 +57,14 @@ static int get_decoded_line(buff_t *buff);
 
 /* Function Definitions */
 
+extern char yy_get_state(void);
+extern void yy_set_state_initial(void);
+
 static void lexer_display_buffer(buff_t *buff)
 {
-    fprintf(dbgout, "*** %2d %c %ld ", yylineno,
-	    msg_header ? 'h' : 'b', (long)(buff->t.leng - buff->read));
+    fprintf(dbgout, "*** %2d %c%c %2ld ",
+	    yylineno-1, msg_header ? 'h' : 'b', yy_get_state(),
+	    (long)(buff->t.leng - buff->read));
     buff_puts(buff, 0, dbgout);
     if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
 	fputc('\n', dbgout);
@@ -100,9 +104,6 @@ static int lgetsl(buff_t *buff)
     if (is_from(buff->t.text+buff->read, buff->t.leng-buff->read))
 	got_from();
 
-    if (count >= 0 && DEBUG_LEXER(0))
-	lexer_display_buffer(buff);
-
     return count;
 }
 
@@ -114,9 +115,19 @@ static int yy_get_new_line(buff_t *buff)
     if (hdrlen==0)
 	hdrlen=strlen(spam_header_name);
 
+    /* Mime header check needs to be performed on raw input
+    ** -- before mime decoding.  Without it, flex aborts:
+    ** "fatal flex scanner internal error--end of buffer missed" */
+    if (got_mime_boundary(&buff->t)) {
+	yy_set_state_initial();
+    }
+
+    if (count >= 0 && DEBUG_LEXER(0))
+	lexer_display_buffer(buff);
+
     /* skip spam_header ("X-Bogosity:") lines */
     while (msg_header
-	   && count != -1
+	   && count != EOF
 	   && memcmp(buff->t.text,spam_header_name,hdrlen) == 0)
     {
 	count = skip_spam_header(buff);
@@ -143,7 +154,7 @@ static int skip_spam_header(buff_t *buff)
 	    return count;
     }
 
-    return -1;
+    return EOF;
 }
 
 static int get_decoded_line(buff_t *buff)
@@ -177,7 +188,7 @@ static int get_decoded_line(buff_t *buff)
     }
 #endif
 
-    if (count == -1) {
+    if (count == EOF) {
 	if (ferror(fpin)) {
 	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
 	    exit(EX_ERROR);
@@ -297,7 +308,7 @@ int yyinput(byte *buf, size_t max_size)
 	buf[i] = charset_table[ch];
     }
 
-    return (count == -1 ? 0 : count);
+    return (count == EOF ? 0 : count);
 }
 
 size_t decode_text(word_t *w)

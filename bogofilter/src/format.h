@@ -5,19 +5,21 @@
 
 #include "configfile.h"
 
+typedef const char *FIELD;
+
 /* Global variables */
 
 extern const char *spam_header_name;
 extern const char *spam_subject_tag;
 
-/*
-** extern const char *header_format;
-** extern const char *terse_format;
-** extern const char *update_log_format;
-** extern const char *log_header_format;
-*/
-
 /* needed by bogoconfig.c */
+
+extern const char *header_format;
+extern const char *terse_format;
+extern const char *log_update_format;
+extern const char *log_header_format;
+extern FIELD *spamicity_tags;
+extern FIELD *spamicity_formats;
 
 extern const parm_desc format_parms[];
 extern void set_terse_mode_format(int mode);

@@ -76,16 +76,13 @@ const char *terse_format = "%1.1c %f";
 const char *log_header_format = "%h: %c, spamicity=%p, version=%v";
 const char *log_update_format = "register-%r, %w words, %m messages";
 
-#define	RC_COUNT RC_UNSURE+1	/* 3 (for Spam/Ham/Unsure) */
-
-typedef const char *FIELD;
-typedef FIELD FIELDS[RC_COUNT];
-
-FIELDS spamicity_tags_ynu = { "Yes",  "No",  "Unsure" };
-FIELDS spamicity_tags_shu = { "Spam", "Ham", "Unsure" };
+#define RC_COUNT 3
+static FIELD spamicity_tags_ynu[RC_COUNT] = { "Yes",   "No",    "Unsure" };
+static FIELD spamicity_tags_shu[RC_COUNT] = { "Spam",  "Ham",   "Unsure" };
+static FIELD spamicity_format_d[RC_COUNT] = { "%0.6f", "%0.6f", "%0.6f" };
 
 FIELD  *spamicity_tags    = spamicity_tags_ynu;
-FIELDS spamicity_formats = { "%0.6f", "%0.6f", "%0.6f"  };
+FIELD  *spamicity_formats = spamicity_format_d;
 
 static bool set_spamicity_tags(const unsigned char *val);
 static bool set_spamicity_formats(const unsigned char *val);
@@ -202,7 +199,7 @@ static size_t format_string(char *dest, const char *src, int min, int prec, int 
 {
     size_t s_len = strlen(src);
     int len;
-    if (s_len > INT_MAX) {
+    if (s_len > (size_t)INT_MAX) {
 	fprintf(stderr, "cannot handle string length (%lu) above %d, aborting\n", (unsigned long)s_len, INT_MAX);
 	internal_error;
     }
@@ -225,7 +222,9 @@ static size_t format_string(char *dest, const char *src, int min, int prec, int 
 static size_t format_spamicity(char *dest, const char *fmt, double spamicity, const char *destend)
 {
     char temp[20];
-    size_t len = sprintf(temp, fmt, spamicity);
+    size_t len = snprintf(temp, sizeof(temp), fmt, spamicity);
+    if (len > INT_MAX)
+	len = INT_MAX; /* clamp */
     len = format_string(dest, temp, 0, len, 0, destend);
     return len;
 }
@@ -252,7 +251,8 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
     char temp[20];
 
     int state = S_DEFAULT;
-    size_t min = 0, prec = 0;
+    int min = 0;
+    int prec = 0;
     int flags = 0;
 
     rc_t status = method->status();
