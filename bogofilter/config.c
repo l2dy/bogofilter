@@ -489,6 +489,10 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case '?':
+	    help();
+	    exit(2);
+	    break;
+
 	case 'h':
 	    help();
             exit(0);
