@@ -2,6 +2,7 @@
 
 Summary:
 
+  0. Terminology
   1. Installing Bogofilter
   2. Preparing for use
      a. Configuring bogofilter
@@ -14,11 +15,24 @@ Summary:
   8. Other useful commands
   9. Additional information
 
+0. Terminology
+--------------
+
+    spam - unwanted email
+    ham  - wanted mail (also called non-spam)
+    false positive - a ham message that is wrongly scored as spam
+    false negative - a spam message that is wrongly scored as ham
+
 1. Installing Bogofilter
 ------------------------
 
     Bogofilter can be installed from source or from a binary package.
     Releases are made available on SourceForge.net.
+
+    If you're a newbie, installing from a binary package is quickest
+    and easiest.  If you're running an rpm based distro like Mandrake,
+    Suse, or Fedora Core, install bogofilter from an rpm.  Similarly
+    if you're running Debian, install from a deb package.
 
     Source formats include tarballs (in .tar.gz and .tar.bz2 forms)
     and rpms (bogofilter-VER.src.rpm).  Once downloaded and untarred,
@@ -43,8 +57,7 @@ Summary:
 --------------------
 
     Once bogofilter has been installed, it needs to be configured and
-    trained, i.e. given messages that you classify as spam and
-    non-spam (also called "ham").
+    trained, i.e. given messages that you classify as spam and ham.
 
     2a. Configuring bogofilter
     --------------------------
