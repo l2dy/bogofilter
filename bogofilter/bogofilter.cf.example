@@ -131,7 +131,7 @@ tag_header_lines=no
 #	if enabled, html comments are delimited by "<!-->" and "-->".
 #	if disabled, html comments are delimited by "<!>" and ">".
 
-strict_check=yes
+strict_check=no
 
 
 #### BLOCK ON SUBNETS
