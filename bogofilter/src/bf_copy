@@ -49,7 +49,7 @@ if test -f "$SRC"/DB_CONFIG ; then cp -p "$SRC"/DB_CONFIG "$DST" ; fi
 
 for FILE in "$SRC"/*.db ; do
     NAME=`basename $FILE`
-    SIZE=`db_stat -h "$SRC" -d $NAME | awk '/page size/ {print $1}'`
+    SIZE=`bogoutil --db-print-pagesize -d $FILE`
     dd bs=$SIZE if="$FILE" of="$DST/"`basename "$FILE"`
 done
 

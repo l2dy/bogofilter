@@ -110,6 +110,10 @@ ex_t dbe_checkpoint(bfdir *directory);
 /** Mark inactive and remove older write-ahead log files. */
 ex_t dbe_purgelogs(bfdir *directory);
 
+/** Return page size of if \a databasefile, 0xffffffff for error, 0 for
+ * unknown. */
+u_int32_t db_pagesize(bfdir *directory, bffile *databasefile);
+
 /** Check if \a databasefile is a valid database. */
 ex_t db_verify(bfdir *directory, bffile *databasefile);
 
@@ -123,5 +127,8 @@ bool db_created(void *vhandle);
 void *db_get_env(void *vhandle);
 
 int db_lock(int fd, int cmd, short int type);
+
+/** Check if \a file is a regular file or missing */
+bool is_file_or_missing(const char *file);
 
 #endif

@@ -496,3 +496,11 @@ int ds_verify(const char *directory, const char *filename) {
     file.filename = filename;
     return db_verify(&dir, &file);
 }
+
+u_int32_t ds_pagesize(const char *directory, const char *filename) {
+    bfdir dir;
+    bffile file; 
+    dir.dirname = directory;
+    file.filename = filename;
+    return db_pagesize(&dir, &file);
+}

@@ -265,6 +265,10 @@ extern int ds_remove(const char *directory);
 /** Verify given database */
 extern int ds_verify(const char *directory, const char *file);
 
+/** Return page size of given database, \return 0xffffffff for error, 0 for
+ * variable sized pages or unpaged datastores. */
+extern u_int32_t ds_pagesize(const char *directory, const char *file);
+
 /** Remove inactive log files in given directory, \return EX_OK. */
 extern int ds_purgelogs(const char *directory);
 

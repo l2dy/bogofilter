@@ -927,13 +927,82 @@ const char *db_str_err(int e) {
     return db_strerror(e);
 }
 
+bool is_file_or_missing(const char* path) /*@globals errno,stderr@*/
+{
+    int rc;
+    struct stat sb;
+
+    if (path == NULL || *path == '\0')
+	return false;
+
+    rc = stat(path, &sb);
+
+    if (rc == 0) {
+	return S_ISREG(sb.st_mode);
+    }
+
+    if (errno == ENOENT)
+	return true;
+
+    return false;
+}
+
+u_int32_t db_pagesize(bfdir *directory, bffile *db_file)
+{
+    DB_ENV *dbe = NULL;
+    DB *db;
+    int e;
+    u_int32_t s;
+
+    if (!is_file_or_missing(db_file->filename)) {
+	print_error(__FILE__, __LINE__, "\"%s\" is not a file.", db_file->filename);
+	return 0xffffffff;
+    }
+
+    dsm_init(directory, db_file);
+
+    dbe = dsm->dsm_recover_open(directory, db_file);
+
+    e = db_create(&db, dbe, 0);
+
+    if (e != 0) {
+	print_error(__FILE__, __LINE__, "error creating DB handle: %s",
+		db_strerror(e));
+	exit(EX_ERROR);
+    }
+
+    e = DB_OPEN(db, db_file->filename, NULL, dbtype, DB_RDONLY | DB_NOMMAP, DS_MODE);
+    if (e != 0) {
+	print_error(__FILE__, __LINE__, "cannot open database %s: %s",
+		db_file->filename, db_strerror(e));
+	exit(EX_ERROR);
+    }
+    s = get_psize(db);
+
+    e = db->close(db, 0);
+    if (e != 0) {
+	print_error(__FILE__, __LINE__, "cannot close database %s: %s",
+		db_file->filename, db_strerror(e));
+	exit(EX_ERROR);
+    }
+
+    e = dsm->dsm_common_close(dbe, directory);
+    if (e != 0) {
+	print_error(__FILE__, __LINE__, "cannot close environment %s: %s",
+		directory->dirname, db_strerror(e));
+	exit(EX_ERROR);
+    }
+
+    return s;
+}
+
 ex_t db_verify(bfdir *directory, bffile *db_file)
 {
     DB_ENV *dbe = NULL;
     DB *db;
     int e;
 
-    if (!is_file(db_file->filename)) {
+    if (!is_file_or_missing(db_file->filename)) {
 	print_error(__FILE__, __LINE__, "\"%s\" is not a file.", db_file->filename);
 	return EX_ERROR;
     }
@@ -941,9 +1010,6 @@ ex_t db_verify(bfdir *directory, bffile *db_file)
     dsm_init(directory, db_file);
 
     dbe = dsm->dsm_recover_open(directory, db_file);
-    if (dbe == NULL) {
-	exit(EX_ERROR);
-    }
 
     e = db_create(&db, NULL, 0); /* need not use environment here,
 				    DB->verify() does not lock anyways,

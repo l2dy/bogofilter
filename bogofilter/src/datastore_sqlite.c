@@ -16,6 +16,8 @@
 #include "rand_sleep.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
+
+#include <errno.h>
 #include <stdarg.h>
 #include <unistd.h> /* for getpid() */
 #include <sqlite3.h>
@@ -428,4 +430,37 @@ bool db_created(void *vhandle) {
 bool db_is_swapped(void *vhandle) {
     dbh_t *dbh = vhandle;
     return dbh->swapped;
+}
+
+static int pagesize_cb(void *ptr, int argc, char **argv, char **dummy) {
+    u_int32_t *uptr = ptr;
+
+    (void)dummy;
+
+    if (argc != 1)
+	return -1;
+    errno = 0;
+    *uptr = strtoul(argv[0], NULL, 0);
+    return errno;
+}
+
+u_int32_t db_pagesize(bfdir *db_dir, bffile *db_file)
+{
+    dbh_t *dbh;
+    int rc;
+    u_int32_t size;
+
+    (void)db_dir;
+    dbh = db_open(NULL, db_file->filename, db_file->filename, DS_READ);
+    if (!dbh)
+	return 0xffffffff;
+    do {
+	rc = sqlite3_exec(dbh->db, "PRAGMA page_size;", pagesize_cb, &size, NULL);
+	if  (rc == SQLITE_BUSY) rand_sleep(1000, 100000);
+    } while (rc == SQLITE_BUSY);
+    if (rc != SQLITE_OK) {
+	return 0xffffffff;
+    }
+    db_close(dbh);
+    return size;
 }

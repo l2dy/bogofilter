@@ -22,6 +22,9 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	* Add 'bogoutil --db-print-pagesize', to query the database size,
+	  useful to replace running awk on 'db_stat -d database.db' output.
+
 0.94.1	2005-03-16
 
 	* Long options cleanup: options that have no meaning for a particular

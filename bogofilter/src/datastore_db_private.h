@@ -60,7 +60,7 @@ typedef struct {
     dsm_v_pbe	 *dsm_cleanup_lite;
     dsm_pnv_pbe	 *dsm_get_env_dbe;
     dsm_pc_pc	 *dsm_database_name;
-    dsm_pnv_pdpf *dsm_recover_open;
+    dsm_pnv_pdpf *dsm_recover_open; /**< exits on failure */
     dsm_i_v	 *dsm_auto_commit_flags;
     dsm_i_i	 *dsm_get_rmw_flag;
     dsm_i_pvi	 *dsm_lock;

@@ -468,6 +468,10 @@ static void usage(void)
     fprintf(stderr, "   or: %s [OPTIONS] {-d|-l|-u|-m|-w|-p|--db-verify} file%s\n",
 	    progname, DB_EXT);
     fprintf(stderr, "   or: %s [OPTIONS] {-H|-r|-R} directory\n", progname);
+#if defined (ENABLE_DB_DATASTORE)
+    fprintf(stderr, "   or: %s [OPTIONS] {--db-print-pagesize} file%s\n",
+	    progname, DB_EXT);
+#endif
 #if	defined(ENABLE_DB_DATASTORE) && !defined(DISABLE_TRANSACTIONS)
     fprintf(stderr, "   or: %s [OPTIONS] {--db-checkpoint} directory\n",
 	    progname);
@@ -553,6 +557,7 @@ static struct option longopts_bogoutil[] = {
     /* bogoutil specific options */
     { "db-prune",                       R, 0, O_DB_PRUNE },
     { "db-checkpoint",                  R, 0, O_DB_CHECKPOINT },
+    { "db-print-pagesize",		R, 0, O_DB_PRINT_PAGESIZE },
     { "db-recover",                     R, 0, O_DB_RECOVER },
     { "db-recover-harder",              R, 0, O_DB_RECOVER_HARDER },
     { "db-remove-environment",		R, 0, O_DB_REMOVE_ENVIRONMENT },
@@ -654,6 +659,12 @@ static int process_arg(int option, const char *name, const char *val)
 
     case 'w':
 	flag = M_WORD;
+	count += 1;
+	ds_file = val;
+	break;
+
+    case O_DB_PRINT_PAGESIZE:
+	flag = M_PAGESIZE;
 	count += 1;
 	ds_file = val;
 	break;
@@ -812,6 +823,18 @@ int main(int argc, char *argv[])
 	    break;
 	case M_VERIFY:
 	    rc = ds_verify(bogohome, ds_file);
+	    break;
+	case M_PAGESIZE:
+	    {
+		u_int32_t s;
+		s = ds_pagesize(bogohome, ds_file);
+		if (s == 0xffffffff)
+		    fprintf(stderr, "%s: error getting page size.\n", ds_file);
+		else if (s == 0)
+		    printf("UNKNOWN\n");
+		else
+		    printf("%lu\n", (unsigned long)s);
+	    }
 	    break;
 	case M_DUMP:
 	    rc = dump_wordlist(ds_file);
