@@ -355,25 +355,6 @@ inline static double prbf(double x, double df)
 }
 #endif
 
-double calc_prob(uint good, uint bad)
-{
-    uint g = min(good, msgs_good);
-    uint b = min(bad,  msgs_bad);
-    int n = g + b;
-    double fw;
-
-    if (n == 0)
-	fw = robx;
-    else {
-	double bad_cnt  = (double) max(1, msgs_bad);
-	double good_cnt = (double) max(1, msgs_good);
-	double pw = ((b / bad_cnt) / (b / bad_cnt + g / good_cnt));
-	fw = (robs * robx + n * pw) / (robs + n);
-    }
-
-    return fw;
-}
-
 double get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 {
     if (robn == 0)
