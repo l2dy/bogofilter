@@ -25,8 +25,9 @@ unbase64 does the following things:
 2. Decodes text attachments with quoted-printable transfer encoding.
    MIME headers are not updated.
 3. Removes nulls (\0) and carriage return characters (\r) from the input.
+   No longer strictly necessary as bogofilter handles these properly now.
 4. Non-text base64 attachments have the base64 data entirely removed.
-   (Bogofilter would just throw it away anyway).
+   (Bogofilter will just throw it away anyway).
 
 EXAMPLE:
 These rules can be used with procmail and placed in your
@@ -39,9 +40,9 @@ These rules can be used with procmail and placed in your
 
 :0f
 * SPAM ?? yes
-| /usr/bin/formail -A"X-Spam-Status: Yes"
+| /usr/bin/formail -I"X-Bogosity: Yes"
 
 :0f
 * !SPAM ?? yes
-| /usr/bin/formail -A"X-Spam-Status: No"
+| /usr/bin/formail -I"X-Bogosity: No"
 
