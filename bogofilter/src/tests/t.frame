@@ -76,7 +76,7 @@ if [ -z "$NODB" ]; then
 fi
 
 # make GNU libc nasty and abort on memory allocation issues:
-if true ; then
+if false ; then
     MALLOC_CHECK_=2
     export MALLOC_CHECK_
 fi
@@ -88,15 +88,15 @@ if false ; then
 fi
 
 # use Electric Fence:
-if false ; then
-    LD_PRELOAD=libefence.so.0.0
+if true ; then
+    VAL="env LD_PRELOAD=libefence.so.0.0"
     EF_PROTECT_FREE=1
     EF_FILL=85
     EF_ALLOW_MALLOC_0=1
     EF_PROTECT_BELOW=0
     EF_ALIGNMENT=0
     export LD_PRELOAD EF_PROTECT_FREE EF_FILL EF_ALLOW_MALLOC_0 EF_PROTECT_BELOW
-    export EF_ALIGNMENT
+    export EF_ALIGNMENT VAL
 fi
 
 case `uname -s` in
