@@ -98,7 +98,7 @@ double compute_robinson_x(const char *path)
     ret = ds_foreach(dsh, robx_hook, &rh);
 
     rx = rh.sum/rh.count;
-    if (rh.count == 0) /* C magic: this checks if rx is a number */
+    if (rh.count == 0)
 	ret = -1;
     if (verbose > 2)
 	printf("%s: %u, %u, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
