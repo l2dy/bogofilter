@@ -650,21 +650,24 @@ spam-unreadable
     <p>If you think your word lists are hosed, you can see what
     BerkeleyDB thinks by running:</p>
 <pre>
-db_verify spamlist.db
-db_verify goodlist.db
+  db_verify wordlist.db
+</pre>
+<p>or</p>
+<pre>
+  db_verify spamlist.db
+  db_verify goodlist.db
 </pre>
 
     <p>If there is a problem, you may be able to recover some (or
     all) of the tokens and their counts with the following
     commands:</p>
 <pre>
-bogoutil -d spamlist.db | bogoutil -l spamlist.db.new
+  bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
 </pre>
-
     <p>or with</p>
 <pre>
-db_dump -r spamlist.db &gt; spamlist.txt
-db_load spamlist.new &lt; spamlist.txt
+  db_dump -r wordlist.db &gt; wordlist.txt
+  db_load wordlist.new &lt; wordlist.txt
 </pre>
 
     <hr>
@@ -737,18 +740,17 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
     <h2 id="nfs">Can I share word lists over NFS?</h2>
 
     <p>If all you're just reading from them, there are no problems.
-    When you're updating them, you need to 
-    use the correct file locking to avoid data
-    corruption. When you compile bogofilter, you will need to
-    verify that the configure script has set "#define HAVE_FCNTL 1"
-    in your config.h file. Popular UNIX operating systems will all
-    support this. If you are running an unusual, or an older
-    version of an operating system, make sure it supports fcntl().
-    If "#define HAVE_FCNTL 1" is set, then comment out "#define
-    HAVE_FLOCK 1" so that the locking system uses fcntl() locking
-    instead of the default of flock() locking. If your system does
-    not support fcntl, then you will not be able to share word list
-    files over NFS without the risk of data corruption.</p>
+    When you're updating them, you need to use the correct file
+    locking to avoid data corruption. When you compile bogofilter, you
+    will need to verify that the configure script has set "#define
+    HAVE_FCNTL 1" in your config.h file. Popular UNIX operating
+    systems will all support this. If you are running an unusual, or
+    an older version of an operating system, make sure it supports
+    fcntl().  If "#define HAVE_FCNTL 1" is set, then comment out
+    "#define HAVE_FLOCK 1" so that the locking system uses fcntl()
+    locking instead of the default of flock() locking. If your system
+    does not support fcntl, then you will not be able to share word
+    list files over NFS without the risk of data corruption.</p>
 
     <p>Next, make sure you have NFS set up properly, with "lockd"
     running. Refer to your NFS documentation for more information
@@ -783,23 +785,23 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
     <dl>
       <dt>-s</dt>
 
-      <dd>means to register the current message as spam, i.e. add
-      its tokens to spamlist.db</dd>
+      <dd>means to register the current message as spam,
+      i.e. increment the spam counts of its tokens.</dd>
 
       <dt>-n</dt>
 
-      <dd>means to register the current message as ham, i.e. add
-      its tokens to goodlist.db</dd>
+      <dd>means to register the current message as ham,
+      i.e. increment the ham counts of its tokens.</dd>
 
       <dt>-S</dt>
 
       <dd>means to unregister the current message from the spam
-      word list, i.e. remove its tokens from spamlist.db</dd>
+      word list, i.e. decrement the spam counts.</dd>
 
       <dt>-N</dt>
 
       <dd>means to unregister the current message from the ham
-      word list, i.e. remove its tokens from goodlist.db</dd>
+      word list, i.e. decrement the ham counts.</dd>
     </dl>
 
     <p>Prior to version 0.11, the '-S' option was used to move a
