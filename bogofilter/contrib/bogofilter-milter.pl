@@ -277,7 +277,7 @@ sub my_eom_callback {
 
 	    $archive = ($archive_mbox &&
 			&restrict_permissions($rcpt) &&
-			(-e ($archive = "$dir/$archive_mbox"))) ?
+			(lstat($archive = "$dir/$archive_mbox"))) ?
 			$archive : undef;
 
 	    if ($archive) {
