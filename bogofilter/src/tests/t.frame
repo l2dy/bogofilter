@@ -16,7 +16,7 @@ exec </dev/null
 : ${BF_TESTDIR=.}
 
 # suck in $EXE_EXT
-. t.config
+. ./t.config
 
 BOGOFILTER="$VAL ${relpath}/bogofilter$EXE_EXT"
 BOGOLEXER="$VAL ${relpath}/bogolexer$EXE_EXT"
