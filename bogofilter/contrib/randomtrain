@@ -10,7 +10,7 @@
 
 function usage() {
     name=`basename $0`
-    echo "Usage: $name [bogodir] [-p pid] [-c cfg] [-]n|s filename [-]n|s filename [...]"
+    echo "Usage: $name [-d bogodir] [-p pid] [-c cfg] [-]n|s filename [-]n|s filename [...]"
     echo "       Messages contained in the files are fed to bogofilter"
     echo "       in random order.  If bogofilter is wrong or uncertain"
     echo "       about whether a message is spam, that message is used"
