@@ -7,6 +7,12 @@ is in the RELEASE.NOTES files.  Read them!!
 
 0.92.5	2004-08-??
 
+	2004-08-10
+
+	* Improve documentation of '-B' and '-y' options.
+	* Validate dates used with '-y'.
+	* Diagnose missing wordlist specification.
+
 	2004-08-07
 
 	* Cross reference man pages to one another.
