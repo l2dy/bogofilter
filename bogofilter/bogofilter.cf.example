@@ -75,11 +75,11 @@ stats_in_header=Y
 #db_cachesize=16
 db_cachesize=0
 
-##### TAG_HEADER_LINES
+##### HEADER_LINE_MARKUP
 #
 #	if enabled, add a "subj:" prefix to tokens in the Subject: line
 
-tag_header_lines=no
+header_line_markup=no
 
 #### Format of SPAM_HEADER
 #
