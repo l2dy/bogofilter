@@ -182,8 +182,9 @@ token_t get_token(void)
 		skip += 1;
 	    while (isspace(yylval->text[skip]))
 		skip += 1;
-	    memmove(yylval->text, yylval->text+skip, yylval->leng-skip+D);
 	    yylval->leng -= skip;
+	    memmove(yylval->text, yylval->text+skip, yylval->leng);
+	    Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
 	    word_free(msg_id);
 	    msg_id = word_dup(yylval);
 	}
@@ -199,8 +200,9 @@ token_t get_token(void)
 		    skip += 2;
 		while (isspace(yylval->text[skip]))
 		    skip += 1;
-		memmove(yylval->text, yylval->text+skip, yylval->leng-skip+D);
 		yylval->leng -= skip;
+		memmove(yylval->text, yylval->text+skip, yylval->leng);
+		Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
 		word_free(queue_id);
 		queue_id = word_dup(yylval);
 	    }
@@ -210,7 +212,8 @@ token_t get_token(void)
 	{
 	    /* trim brackets */
 	    yylval->leng -= 2;
-	    memmove(yylval->text, yylval->text+1, yylval->leng+D);
+	    memmove(yylval->text, yylval->text+1, yylval->leng);
+	    Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
 	    /* if top level, no address, not localhost, .... */
 	    if (token_prefix == w_recv &&
 		msg_state == msg_state->parent && 
