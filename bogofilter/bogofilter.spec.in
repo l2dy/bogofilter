@@ -37,7 +37,6 @@ make check
 make DESTDIR=${RPM_BUILD_ROOT} install-strip
 cp $RPM_BUILD_ROOT%{_sysconfdir}/bogofilter.cf.example \
    $RPM_BUILD_ROOT%{_sysconfdir}/bogofilter.cf
-gzip -f -9 $RPM_BUILD_ROOT/%{_mandir}/*/*.[1-9]
 
 for a in xml html contrib ; do
   mkdir -p .inst/$a
