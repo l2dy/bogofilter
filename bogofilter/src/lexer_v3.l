@@ -85,7 +85,6 @@
 #undef	stderr
 #define	stderr	dbgout		/* for debug & -D options */
 
-static word_t yyt;
 static int lineno;
 
 /* Function Prototypes */
@@ -106,6 +105,7 @@ void yy_set_state_initial(void);
 
 static word_t *yy_text(void)
 {
+    static word_t yyt;
     yyt.text = (byte *)yytext;
     yyt.leng = yyleng;
     return &yyt;
