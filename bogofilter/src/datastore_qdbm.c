@@ -109,32 +109,30 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 {
     dbh_t *handle;
 
-    int flags;
+    int open_flags;
     DEPOT *dbp;
 
     if (open_mode & DS_WRITE)
-	flags = DP_OWRITER;		/*  | DP_OCREAT */
+	open_flags = DP_OWRITER;
     else
-	flags = DP_OREADER;
+	open_flags = DP_OREADER;
 
     handle = dbh_init(db_file, name);
 
     if (handle == NULL) return NULL;
 
-    dbp = handle->dbp = dpopen(handle->name, flags, DB_INITBNUM);
+    dbp = handle->dbp = dpopen(handle->name, open_flags, DB_INITBNUM);
 
-    if (dbp == NULL) {
-	if (flags & DP_OWRITER) {
-	    dbp = handle->dbp = dpopen(handle->name, flags | DP_OCREAT, DB_INITBNUM);
-	    if (dbp != NULL)
-		handle->created = true;
-	}
+    if ((dbp == NULL) && (open_mode & DS_WRITE)) {
+	dbp = handle->dbp = dpopen(handle->name, open_flags | DP_OCREAT, DB_INITBNUM);
+	if (dbp != NULL)
+	    handle->created = true;
     }
 
     if (dbp == NULL)
 	goto open_err;
 
-    if (flags & DP_OWRITER) {
+    if (open_flags & DP_OWRITER) {
 	if (!dpsetalign(dbp, DB_ALIGNSIZE)){
 	    dpclose(dbp);
 	    goto open_err;
@@ -148,7 +146,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 
  open_err:
     print_error(__FILE__, __LINE__, "(qdbm) dpopen(%s, %d) failed: %s",
-		handle->name, flags, dperrmsg(dpecode));
+		handle->name, open_flags, dperrmsg(dpecode));
     dbh_free(handle);
 
     return NULL;
