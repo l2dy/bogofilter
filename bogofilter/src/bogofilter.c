@@ -78,10 +78,10 @@ rc_t bogofilter(int argc, char **argv)
 
     wordhash_t *words;
 
-    if (query) {
-	score_initialize();	/* initialize constants */
+    score_initialize();			/* initialize constants */
+
+    if (query)
 	return query_config();
-    }
 
     words = register_aft ? wordhash_new() : NULL;
 
@@ -91,8 +91,8 @@ rc_t bogofilter(int argc, char **argv)
 	double spamicity;
 	wordhash_t *w = wordhash_new();
 
+	rstats_init();
 	passthrough_setup();
-	score_initialize();	/* initialize constants */
 
 	collect_words(w);
 	wordhash_sort(w);
@@ -134,8 +134,8 @@ rc_t bogofilter(int argc, char **argv)
 	}
 	wordhash_free(w);
 
-	score_cleanup();
 	passthrough_cleanup();
+	rstats_cleanup();
     }
 
     bogoreader_fini();
