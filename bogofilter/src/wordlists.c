@@ -74,6 +74,10 @@ void open_wordlists(dbmode_t mode)
 		ds_get_msgcounts(list->dsh, &val);
 		list->msgcount[IX_GOOD] = val.goodcount;
 		list->msgcount[IX_SPAM] = val.spamcount;
+		if (!ds_get_wordlist_version(list->dsh, &val))
+		    wordlist_version = 0;
+		else
+		    wordlist_version = val.count[0];
 	    } /* ds_open */
 	} /* for */
     } while(retry);
