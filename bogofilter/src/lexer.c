@@ -309,46 +309,58 @@ int yyinput(byte *buf, size_t max_size)
 
 size_t decode_text(word_t *w)
 {
-    size_t i;
-    size_t size = w->leng;
-    char *text = (char *) w->text;
-    char *beg = strchr(text, '=');
-    char *enc = strchr(beg+2,  '?');
-    word_t n;
-    n.text = (byte *)(enc + 3);
-    n.leng = size -= enc + 3 - text + 2;;
-    n.text[n.leng] = '\0';
+    char *beg = (char *) w->text;
+    char *fin = beg + w->leng;
+    char *txt = beg;
+    size_t size = 0;
 
-    if (DEBUG_LEXER(2)) {
-	fputs("***  ", dbgout);
-	word_puts(&n, 0, dbgout);
-	fputs("\n", dbgout);
-    }
+    while (txt < fin) {
+	word_t n;
+	char *typ = strchr(txt+2, '?') + 1;	/* Encoding type - 'B' or 'Q' */
+	char *end = strstr(typ+2, "?=");	/* last char of encoded word  */
+	size_t len = end - (typ+2);
 
-    switch (tolower(enc[1])) {
-    case 'b':
-	size = base64_decode(&n);
-	break;
-    case 'q':
-	for (i=0; i < size; i += 1) {
-	    if (n.text[i] == '_')
-		n.text[i] = ' ';
+	n.text = (byte *)(typ + 2);		/* Start of encoded word */
+	n.leng = len;				/* Length of encoded word */
+	n.text[n.leng] = '\0';
+
+	if (DEBUG_LEXER(2)) {
+	    fputs("***  ", dbgout);
+	    word_puts(&n, 0, dbgout);
+	    fputs("\n", dbgout);
 	}
-	size = qp_decode(&n);
-	break;
+
+	switch (tolower(typ[0])) {		/* ... encoding type */
+	case 'b':
+	    len = base64_decode(&n);		/* decode base64 */
+	    break;
+	case 'q':
+	{
+	    size_t i;
+	    for (i = 0; i < len; i += 1) {
+		if (n.text[i] == '_')
+		    n.text[i] = ' ';
+	    }
+	    len = qp_decode(&n);		/* decode quoted-printable */
+	    break;
+	}
+	}
+
+	n.leng = len;
+	n.text[n.leng] = '\0';
+
+	if (DEBUG_LEXER(3)) {
+	    fputs("***  ", dbgout);
+	    word_puts(&n, 0, dbgout);
+	    fputs("\n", dbgout);
+	}
+
+	memmove(beg+size, n.text, len+1);
+	size += len;
+	txt = end + 2;
+	while (isspace(*txt))
+	    txt += 1;
     }
-
-    n.leng = size;
-    n.text[n.leng] = '\0';
-
-    if (DEBUG_LEXER(3)) {
-	fputs("***  ", dbgout);
-	word_puts(&n, 0, dbgout);
-	fputs("\n", dbgout);
-    }
-
-    memmove(beg, n.text, size+1);
-    size += beg-text;
 
     return size;
 }

@@ -117,6 +117,7 @@ BCHARS		[0-9a-zA-Z'()+_,-./:=?# ]
 MIME_BOUNDARY	{BCHARS}{0,69}{BCHARSNOSPC}
 
 ID		[0-9a-zA-Z-]*
+CHARSET		{ID}
 MTYPE		[ \t]*[0-9a-zA-Z/-]*
 TTYPE		[ \t]*[\.0-9a-zA-Z/-]*
 
@@ -132,7 +133,22 @@ TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}{1,70}
 
 BASE64		[0-9a-zA-Z/+=]+
 QP		[!->@-~]+
-ENCODED_TOKEN	{BOGOLEX_TOKEN}*=\?{ID}\?(b\?{BASE64}|q\?{QP})\?\=
+
+/*  RFC2047.2
+    encoded-word = "=?" charset "?" encoding "?" encoded-text "?="
+    charset = token    ; see section 3
+    encoding = token   ; see section 4
+    token = 1*<Any CHAR except SPACE, CTLs, and especials>
+    especials = "(" / ")" / "<" / ">" / "@" / "," / ";" / ":" / "
+		<"> / "/" / "[" / "]" / "?" / "." / "="
+    encoded-text = 1*<Any printable ASCII character other than "?"
+		      or SPACE>
+		   ; (but see "Use of encoded-words in message
+		   ; headers", section 5)
+*/
+
+ENCODED_WORD	=\?{CHARSET}\?(b\?{BASE64}|q\?{QP})\?\=
+ENCODED_TOKEN	{BOGOLEX_TOKEN}?({ENCODED_WORD}\ )*{ENCODED_WORD}
 
 DOLLARS		[0-9]+
 CENTS		[0-9]+
@@ -187,7 +203,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						    unput(w->text[size]);
 						}
 
-<INITIAL>charset=\"?{ID}\"?			{ got_charset(yytext); yyless(strlen("charset")); return TOKEN; }
+<INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); yyless(strlen("charset")); return TOKEN; }
 <INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); yyless(strlen("MIME-Version:")); return TOKEN; }
 <INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); yyless(strlen("Content-Transfer-Encoding:")); return TOKEN; }
 <INITIAL>^Content-Type:{TTYPE};?		{ mime_type(yy_text()); yyless(strlen("Content-Type:")); return TOKEN; }
