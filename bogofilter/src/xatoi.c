@@ -30,7 +30,7 @@ int xatoi(int *i, const char *in) {
     return 1;
 }
 
-#if MAIN
+#ifdef MAIN
 #include <stdio.h>
 
 int main(int argc, char **argv) {

@@ -26,7 +26,7 @@ int xatof(double *d, const char *in) {
     return 1;
 }
 
-#if MAIN
+#ifdef MAIN
 #include <stdio.h>
 
 int main(int argc, char **argv) {
