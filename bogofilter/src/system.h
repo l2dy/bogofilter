@@ -206,7 +206,7 @@ typedef uint8_t u_int8_t;
 #endif
 
 /* Ignore __attribute__ if not using GNU CC */
-#ifndef __GNUC__
+#if	!defined(__GNUC__) && !defined(__attribute__)
 #define __attribute__(a)
 #endif
 
