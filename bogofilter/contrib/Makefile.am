@@ -1,6 +1,6 @@
 # $Id$ 
 
-noinst_PROGRAMS=bilbogrep
+noinst_PROGRAMS=bogogrep
 
 EXTRA_DIST= \
 	README.bogopass \
