@@ -69,8 +69,13 @@ $BOGOFILTER -y 0 -s -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.Free
 
 $BOGOFILTER -y 0 -s -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.xxxx
 
-$BOGOUTIL -d ${TMPDIR}/wordlist.${DB_EXT} >> ${OUT}
-echo >> ${OUT}
+if  [ $verbose -ne 0 ]; then
+#   Note: outputs are different for 1 wordlist than for 2
+    for f in $BOGOFILTER_DIR/*list.${DB_EXT} ; do
+	$BOGOUTIL -d $f | sort >> ${OUT}
+    done
+    echo >> ${OUT}
+fi
 
 for flags in PD ; do
 echo $flags >> ${OUT}
