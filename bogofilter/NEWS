@@ -10,9 +10,10 @@ $Id$
 
 0.14.3	2003-08-05
 
-	* Fixed critical locking bug introduced into bogofilter 0.14.0 with
-	  the combined-wordlist code: bogofilter would lock only the first
-	  opened database file rather than all.
+	* Fixed critical locking bug introduced into bogofilter 0.14.0
+	  with the combined-wordlist code: when working with separate
+	  wordlists, bogofilter would lock only the first one opened,
+	  rather than all.
 	* Documentation updates.
 
 	2003-08-04
@@ -25,15 +26,14 @@ $Id$
 	* Various documentation updates, including the FAQ.
 
 	2003-08-03
-	* Break up very long line into shorter lines for Solaris 2.5
-	  compatibility.
+	* The test suite was adjusted for older grep variants (Solaris
+	  2.5) that don't cope with long lines.
 	* Print database version in print_version().
 
 	2003-08-02
 
 	* Postfix integration instructions have been upgraded.
 	* Debug output for wordlists and databases was enhanced.
-	* Bogofilter is now flex-2.5.31 compatible.
 
 0.14.2	2003-08-02
 
