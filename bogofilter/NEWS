@@ -11,6 +11,10 @@ $Id$
 	  of memory are requested, some AIX versions e. g., that would
 	  previously falsely claim an "out of memory" condition.
 
+	* New message formatting capability allows formats to be put
+	  in config file for X-Bogosity line and logging messages.
+	  Message contant can include status, spamicity, version, etc.
+
 0.9.1.2	2002-12-05
 
 	* A defect in the collect_words routines (in 0.9.1) caused
