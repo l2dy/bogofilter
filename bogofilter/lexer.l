@@ -280,7 +280,7 @@ static int yyinput(char *buf, int max_size)
 	    returned = myfgets(buf, max_size, yyin);
 	    if (returned != -1 && *buf == '\n')
 		break;
-	} while (returned != -1 && isspace(*buf));
+	} while (returned != -1 && isspace((unsigned char)*buf));
     }
 
     if (returned == -1) {
@@ -302,7 +302,7 @@ static int yyinput(char *buf, int max_size)
 	textend->len = returned;
 	memcpy(textend->block, buf, returned);
 	textend->next = (struct textblock *)xmalloc(sizeof(struct textblock));
-	textend->next->block = (char *)NULL;
+	textend->next->block = NULL;
 	textend->next->len = 0;
 	textend = textend->next;
     }
