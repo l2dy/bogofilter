@@ -1,0 +1,76 @@
+# $Id$
+
+				bogofilter news
+
+
+0.7.3	Thu Sep 12 13:28:37 PDT 2002
+	Adrian Otto:
+	* Added portable file locking support for files and databases
+	David Relson
+	* Bug fix for negative counts in word registration
+	* Bug fix for SEGV in $HOME path code
+	* Bug fix for trailing slash in -d option
+
+0.7.2: Wed Sep 11 15:28:00 PDT 2002
+	Adrian Otto:
+	* Introduced GNU configure for portability code
+
+0.7.1: Tue Sep 10 00:59:00 PDT 2002
+	Adrian Otto: 
+	* Skip existing X-Spam-Header
+	* Performance improvement for -p mode
+	Paul Tomblin:
+	* Bug fix in getopt argument
+		
+0.7: Sat Sep  7 14:18:33 EDT 2002
+	Eric S. Raymond:
+	* Check your scripts!  Option names have changed.
+	* Name changes: goodlist -> hamlist, badlist-> spamlist.
+	  This is a step towards supporting more categories.
+	* Autodaemon is gone.  Instead, the new implementation uses
+	  DBM.  Optimization with mmap will be in a future release.
+	* Speed-tuning of the bogofilter function.
+	* We're back to not ignoring HTML comments.
+
+0.6: Fri Aug 30 00:25:49 EDT 2002
+	* Fixed a fluky bug in the socket-transmission logic
+	* Fixed an edge case where a single message with a From line
+	  was getting counted twice.
+	* Unknown-word probability bumped from 0.2 to 0.4, tracking a
+	  change by Paul Graham.
+	* Documented -d option.
+
+0.5: Thu Aug 29 13:38:12 EDT 2002
+	* Passthrough option can be used to add an X-Spam-Status header.
+	* There is now a per-message word frequency cap, so spammers can't do
+	  an equivalent of Google fodder.
+	* HTML comments are now ignored.
+	* HTML 4.0 keywords and attributes are now ignored.
+	* Improved extrema calculation.
+	* Mutt patch withdrawn -- have a better version of mutt macros instead.
+	* -S and -N options from matt@lickey.com (Matt Armstrong).
+	* Client-server partitioning with a persistent server, drastically
+	  reducing startup cost after the first run.
+	* Minor bugfix by Eric Seppanen.
+
+0.4: Sat Aug 24 09:07:45 EDT 2002
+	* regenerated bogofilter mutt patch.
+	* wordlist files are now automatically created in -s and -n modes.
+	* Reversed the exit values, following a suggestion by Michal Elkins
+	  about how to make bogofilter fail gracefully.
+	* -Wall cleanup and uninitialized-variable fix from Eric Seppanen.
+	* fcntl(2) file locking to head off a race condition in write_list.
+	* Added the long-sought procmail recipe.
+
+0.3: Fri 23 Aug 03:30:49 EDT 2002
+	* Specfile/Makefile improvements from Graham Reed.
+	* Caseblindness fix from Eric Seppanen.
+	* Deallocation fix from Mike Mayfield.
+	* Wordlist file format changed.
+
+0.2: Tue Aug 20 06:49:42 EDT 2002
+	* Added mutt-1.4 interface patch
+	* Note:  Location of the base directory has changed.
+
+0.1: Mon 19 Aug 2002 03:07:31
+	* Initial release.

@@ -1,0 +1,128 @@
+# $Id$
+# $Log$
+# Revision 1.1  2002/09/14 22:15:20  adrian_otto
+# Initial revision
+#
+AC_INIT(bogofilter.c)
+AM_INIT_AUTOMAKE(poke, 0.7.3)
+AM_CONFIG_HEADER(config.h:config.in)
+AC_PROG_CC
+AM_PROG_LEX
+
+# Check for extension
+AC_EXEEXT
+
+# Checks for libraries.
+AC_CHECK_LIB([m],  [cos])
+
+AH_TEMPLATE([HAVE_DB_H], [Have suitable db.h header])
+AH_TEMPLATE([HAVE_FLOCK], [Have flock() function])
+AH_TEMPLATE([HAVE_LOCKF], [Have POSIX lockf() function])
+
+AC_ARG_WITH(judy,
+	[  AC_HELP_STRING([--with-judy=PATH],
+		[Specify path to Judy install directory. (default=/opt/Judy/usr)])
+	],
+	[
+		if test "x$withval" = "xno" ; then
+			withval = "/opt/Judy/usr"
+		fi
+		if test "x$withval" != "xno" ; then
+			if test -d "$withval/lib"; then
+				if test -n "${need_dash_r}"; then
+					LDFLAGS="-L${withval}/lib -R${withval}/lib ${LDFLAGS}"
+				else
+					LDFLAGS="-L${withval}/lib ${LDFLAGS}"
+				fi
+			else
+				if test -n "${need_dash_r}"; then
+					LDFLAGS="-L${withval} -R${withval} ${LDFLAGS}"
+				else
+					LDFLAGS="-L${withval} ${LDFLAGS}"
+				fi
+			fi
+			if test -d "$withval/include"; then
+				CPPFLAGS="-I${withval}/include ${CPPFLAGS}"
+			else
+				CPPFLAGS="-I${withval} ${CPPFLAGS}"
+			fi
+		fi
+		LIBS="$LIBS -lJudy"
+	],
+	[
+		AC_CHECK_LIB([Judy], [JudySLIns], LIBS="$LIBS -lJudy", 
+			AC_MSG_ERROR([Can not locate the Judy library in ${withval}. Use --with-judy=PATH to specify a valid Judy install location]) 
+		)
+	]
+)
+
+AC_MSG_CHECKING(Judy)
+AC_TRY_LINK_FUNC(JudySLIns,, AC_MSG_ERROR([Judy package is not working properly. Specify a different one using --with-judy=PATH]))
+AC_MSG_RESULT(Judy)
+
+AC_ARG_WITH(db,
+        [  --with-db=PATH     Specify path to BerkelyDB install directory ],
+        [
+                if test "x$withval" != "xno" ; then
+                        if test -d "$withval/lib"; then
+                                if test -n "${need_dash_r}"; then
+                                        LDFLAGS="-L${withval}/lib -R${withval}/lib ${LDFLAGS}"
+                                else
+                                        LDFLAGS="-L${withval}/lib ${LDFLAGS}"
+                                fi
+                        else
+                                if test -n "${need_dash_r}"; then
+                                        LDFLAGS="-L${withval}/lib -R${withval}/lib ${LDFLAGS}"
+                                else
+                                        LDFLAGS="-L${withval}/lib ${LDFLAGS}"
+                                fi
+                        fi
+                        if test -d "$withval/include"; then
+                                CPPFLAGS="-I${withval}/include ${CPPFLAGS}"
+                        else
+                                CPPFLAGS="-I${withval} ${CPPFLAGS}"
+                        fi
+                fi
+		LIBS="$LIBS -ldb"
+	],
+	[
+		AC_EGREP_HEADER(db_create, [db.h], AC_DEFINE(HAVE_DB_H),
+			AC_MSG_ERROR([Can not locate a suitable BerkeleyDB db.h header file. Use --with-db=PATH to specify the path to a v3+ install directory]) 
+		)
+
+		AC_CHECK_LIB(db-4, db_create, LIBS="$LIBS -ldb-4", 
+        		AC_CHECK_LIB(db-3, db_create, LIBS="$LIBS -ldb-3", 
+        		AC_CHECK_LIB(db-2, db_create, LIBS="$LIBS -ldb-2",
+			AC_CHECK_LIB(db, db_create, LIBS="$LIBS -ldb", 
+			AC_MSG_ERROR([Can not locate a suitable BerkeleyDB libdb.so library. Use --with-db=PATH to specify the path to a v3+ install directory])
+		))))
+	]
+)
+
+
+AC_MSG_CHECKING(BerkeleyDB)
+AC_TRY_LINK_FUNC(db_create,, AC_MSG_ERROR([BerkeleyDB v3+ package is not working properly. Specify a different one using --with-db=PATH]))
+AC_MSG_RESULT(BerkeleyDB)
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS([fcntl.h limits.h stdlib.h string.h sys/socket.h unistd.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_PID_T
+AC_TYPE_SIGNAL
+
+# Checks for library functions.
+AC_CHECK_HEADERS([sys/file.h])
+AC_EGREP_HEADER(lockf, [sys/file.h], AC_DEFINE(HAVE_LOCKF))
+AC_EGREP_HEADER(flock, [sys/file.h], AC_DEFINE(HAVE_FLOCK))
+AC_CHECK_HEADERS([syslog.h])
+AC_FUNC_FORK
+AC_FUNC_MALLOC
+AC_FUNC_STAT
+
+AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror)
+
+AC_OUTPUT(Makefile)
