@@ -5,6 +5,7 @@
 #ifndef	WORDLISTS_H
 #define	WORDLISTS_H
 
+#include "bftypes.h"
 #include "wordlists_base.h"
 
 extern const char *aCombined[];
@@ -26,6 +27,6 @@ void close_wordlists(bool);
 
 void set_list_active_status(bool status);
 
-void compute_msg_counts(void);
+void compute_msg_counts(u_int32_t *, u_int32_t *);
 
 #endif	/* WORDLISTS_H */

@@ -276,7 +276,7 @@ void score_initialize(void)
     ** If we're registering tokens, we needn't get .MSG_COUNT
     */
 
-    compute_msg_counts();
+    compute_msg_counts(&msgs_bad, &msgs_good);
     if (fabs(robs) < EPS)
 	robs = ROBS;
 

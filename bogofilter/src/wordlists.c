@@ -132,13 +132,16 @@ static void sanitycheck_lists(void)
 }
 #endif
 
-void compute_msg_counts(void)
+/** Sum up the msgcount for each of the word lists, store the
+ * count of bad messages in \a mb and the count of good messages in the
+ * data bases in \a mg. */
+void compute_msg_counts(u_int32_t *mb, u_int32_t *mg)
 {
     wordlist_t* list;
 
     for(list=word_lists; list != NULL; list=list->next)
     {
-	msgs_bad  += list->msgcount[IX_SPAM];
-	msgs_good += list->msgcount[IX_GOOD];
+	*mb += list->msgcount[IX_SPAM];
+	*mg += list->msgcount[IX_GOOD];
     }
 }
