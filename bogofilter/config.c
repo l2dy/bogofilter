@@ -21,7 +21,9 @@ AUTHOR:
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
+#ifdef NOT_YET
 #include "charset.h"
+#endif
 #include "common.h"
 #include "find_home.h"
 #include "globals.h"
@@ -61,18 +63,7 @@ bool	stats_in_header = TRUE;
 const char *stats_prefix;
 
 run_t run_type = RUN_NORMAL; 
-#ifdef	GRAHAM_AND_ROBINSON
-  algorithm_t algorithm = AL_GRAHAM;
-#else
-  #if	0
-    #ifdef	ENABLE_GRAHAM_METHOD
-      algorithm_t algorithm = AL_GRAHAM;
-    #endif
-    #ifdef	ENABLE_ROBINSON_METHOD
-      algorithm_t algorithm = AL_ROBINSON;
-    #endif
-  #endif
-#endif
+algorithm_t algorithm = AL_DEFAULT;
 
 double	min_dev = 0.0f;
 double	robx = 0.0f;
@@ -511,5 +502,7 @@ void process_config_files(void)
     if (DEBUG_CONFIG(0))
 	fprintf( stderr, "stats_prefix: '%s'\n", stats_prefix );
 
+#ifdef NOT_YET
     init_charset_table("us-ascii", TRUE);
+#endif
 }

@@ -11,8 +11,6 @@ typedef enum {
     EMPTY	/* empty line */
 } token_t;
 
-extern FILE	*yyin;
-
 extern char *yylval;
 
 struct textblock

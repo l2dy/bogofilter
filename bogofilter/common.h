@@ -44,21 +44,30 @@ const bool TRUE = true;
 #define	GRAHAM_AND_ROBINSON
 #endif
 
-typedef enum algorithm_e { AL_GRAHAM='g', AL_ROBINSON='r' } algorithm_t;
-#ifdef	GRAHAM_AND_ROBINSON
-  extern algorithm_t algorithm;
+typedef enum algorithm_e {
+#ifdef ENABLE_GRAHAM_METHOD
+    AL_GRAHAM='g',
+#endif
+#ifdef ENABLE_ROBINSON_METHOD
+    AL_ROBINSON='r'
+} algorithm_t;
+#endif
+extern algorithm_t algorithm;
+
+/* define default */
+#ifdef ENABLE_GRAHAM_METHOD
+#define AL_DEFAULT AL_GRAHAM
 #else
-  #ifdef	ENABLE_GRAHAM_METHOD
-    #define	algorithm	AL_GRAHAM
-  #endif
-  #ifdef	ENABLE_ROBINSON_METHOD
-    #define	algorithm	AL_ROBINSON
-  #endif
+#define AL_DEFAULT AL_ROBINSON
 #endif
 
-typedef enum dbmode_e { DB_READ = 0, DB_WRITE = 1 } dbmode_t;
+enum dbmode_e { DB_READ = 0, DB_WRITE = 1 };
+typedef enum dbmode_e dbmode_t;
 
-typedef enum run_e { RUN_NORMAL='r', RUN_UPDATE='u', REG_SPAM='s', REG_GOOD='n', REG_SPAM_TO_GOOD='N', REG_GOOD_TO_SPAM='S' } run_t;
+enum run_e { RUN_NORMAL='r', RUN_UPDATE='u',
+    REG_SPAM='s', REG_GOOD='n',
+    REG_SPAM_TO_GOOD='N', REG_GOOD_TO_SPAM='S' };
+typedef enum run_e run_t;
 extern run_t run_type;
 
 void build_path(char* dest, int size, const char* dir, const char* file);

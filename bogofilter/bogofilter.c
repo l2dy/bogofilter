@@ -78,7 +78,6 @@ extern double robx;
 #define PLURAL(count) ((count == 1) ? "" : "s")
 
 extern char msg_register[];
-extern int force;
 extern int Rtable;
 static double scalefactor;
 
