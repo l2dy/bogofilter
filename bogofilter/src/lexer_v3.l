@@ -94,7 +94,6 @@ static word_t *yy_text(void);
 static void reorder_html(void);
 
 static void skip_to(char chr);
-static void use_to(char chr);
 
 void yy_set_state_initial(void);
 
@@ -305,15 +304,6 @@ static void skip_to(char chr)
 {
     size_t len = strchr(yytext, chr) - yytext;
     yyless(len);
-}
-
-static void use_to(char chr)
-{
-    char *del = memchr(yytext, chr, yyleng);
-    if (del) {
-	*del = 0;
-	yyleng = (del - yytext);
-    }
 }
 
 static void reorder_html(void)
