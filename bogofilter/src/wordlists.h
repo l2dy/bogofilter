@@ -27,6 +27,6 @@ void close_wordlists(bool);
 
 void set_list_active_status(bool status);
 
-void compute_msg_counts(u_int32_t *, u_int32_t *);
+void compute_msg_counts(void);
 
 #endif	/* WORDLISTS_H */
