@@ -104,7 +104,7 @@ int setup_wordlists(const char* d, priority_t precedence)
 
     saved_precedence = precedence;
 
-    if (check_directory(dir)) {
+    if (!check_directory(dir)) {
 #ifndef __riscos__
 	const char var[] = "using the BOGOFILTER_DIR or HOME environment variables.";
 #else

@@ -70,11 +70,14 @@ int build_path(char* dest, size_t size, const char* dir, const char* file)
 
     if (strlcpy(dest, dir, size) >= size) return -1;
 
-    if (dest[strlen(dest)-1] != DIRSEP_C) {
-	if (strlcat(dest, DIRSEP_S, size) >= size) return -1; /* RATS: ignore */
+    if (check_directory(dir)) {
+	if (dest[strlen(dest)-1] != DIRSEP_C) {
+	    if (strlcat(dest, DIRSEP_S, size) >= size)
+		return -1; /* RATS: ignore */
+	}
+	if (strlcat(dest, file, size) >= size)
+	    return -1;
     }
-
-    if (strlcat(dest, file, size) >= size) return -1;
 
     return 0;
 }
@@ -111,13 +114,13 @@ char *create_path_from_env(const char *var,
 /* check that our directory exists and try to create it if it doesn't
    return -1 on failure, 0 otherwise.
  */
-int check_directory(const char* path) /*@globals errno,stderr@*/
+bool check_directory(const char* path) /*@globals errno,stderr@*/
 {
     int rc;
     struct stat sb;
 
     if (path == NULL || *path == '\0') {
-	return -1;
+	return false;
     }
 
     rc = stat(path, &sb);
@@ -130,18 +133,18 @@ int check_directory(const char* path) /*@globals errno,stderr@*/
 	    } else if (verbose > 0) {
 		fprintf(dbgout, "Created directory %s .\n", path);
 	    }
-	    return 0;
+	    return true;
 	} else {
 	    fprintf(stderr, "Error accessing directory '%s': %s\n",
 		    path, strerror(errno));
-	    return -1;
+	    return false;
 	}
     } else {
 	if (! S_ISDIR(sb.st_mode)) {
 	    fprintf(stderr, "Error: %s is not a directory.\n", path);
 	}
     }
-    return 0;
+    return true;
 }
 
 char *get_directory(priority_t which)
