@@ -20,9 +20,9 @@ Recent version of bogofilter package is installed and the programs
 
 How:
 
-1. Stop all instances of bogofilter. The upgrade tools do not lock files or guard
-   against multiple processes accessing the same files. If you have cron jobs or daemons
-   that fetch and process mail and could fire off bogofilter, stop them.
+1. Stop all instances of bogofilter. While the upgrade tools lock the database files,
+   the upgrade may take a long time if you have a busy site. Don't forget to stop cron jobs or daemons
+   that fetch and process mail and could fire off bogofilter.
 
 2. Backup your data. Let's assume that you said:
    
