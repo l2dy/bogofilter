@@ -13,6 +13,14 @@
 
 	<cmdsynopsis>
 	    <command>bogoutil</command>
+	    <group choice="req">
+		<arg choice="plain">-h</arg>
+		<arg choice="plain">-V</arg>
+	    </group>
+	</cmdsynopsis>
+
+	<cmdsynopsis>
+	    <command>bogoutil</command>
 	    <arg choice="opt">options</arg>
 	    <group choice="req">
 		<arg choice="plain">-d <replaceable>file</replaceable></arg>
@@ -21,7 +29,6 @@
 		<arg choice="plain">-m</arg>
 		<arg choice="plain">-w <replaceable>file_or_dir</replaceable></arg>
 		<arg choice="plain">-p <replaceable>file_or_dir</replaceable></arg>
-		<arg choice="plain">--db-check <replaceable>file</replaceable></arg>
 	    </group>
 	    <arg choice="plain"><replaceable>file.db</replaceable></arg>
 	</cmdsynopsis>
@@ -31,10 +38,6 @@
 	    <group choice="req">
 		<arg choice="plain">-r</arg>
 		<arg choice="plain">-R</arg>
-		<arg choice="plain">--db-recover</arg>
-		<arg choice="plain">--db-recover-harder</arg>
-		<arg choice="plain">--db-prune</arg>
-		<arg choice="plain">--db-remove-environment</arg>
 	    </group>
 	    <arg choice="plain"><replaceable>directory</replaceable></arg>
 	</cmdsynopsis>
@@ -42,13 +45,17 @@
 	<cmdsynopsis>
 	    <command>bogoutil</command>
 	    <group choice="req">
-		<arg choice="plain">-h</arg>
-		<arg choice="plain">-V</arg>
+		<arg choice="plain">--db-check <replaceable>file</replaceable></arg>
+		<arg choice="plain">--db-prune <replaceable>directory</replaceable></arg>
+		<arg choice="plain">--db-recover <replaceable>directory</replaceable></arg>
+		<arg choice="plain">--db-recover-harder <replaceable>directory</replaceable></arg>
+		<arg choice="plain">--db-remove-environment <replaceable>directory</replaceable></arg>
 	    </group>
 	</cmdsynopsis>
 
 	<para>where <option>options</option> is</para>
 	<cmdsynopsis>
+	    <command>bogoutil</command>
 	    <arg choice="opt">-v</arg>
 	    <arg choice="opt">-n</arg>
 	    <arg choice="opt">-D</arg>
@@ -168,7 +175,7 @@
 	<para>The <option>-V</option> option prints the version number and exits.</para>
     </refsect1>
 
-    <refsect1 id="environment maintenance">
+    <refsect1 id="environment_maintenance">
 	<title>ENVIRONMENT MAINTENANCE</title>
 	<para>
 	    The <option>--db-check <replaceable>file</replaceable></option>
