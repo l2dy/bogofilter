@@ -296,6 +296,7 @@ static void help(void)
     (void)fprintf(stderr,
 		  "\thelp options:\n"
 		  "\t  -h      - print this help message.\n"
+		  "\t  -Q      - query (display) bogofilter configuration.\n"
 		  "\t  -V      - print version information and exit.\n"
 	);
     (void)fprintf(stderr,
@@ -425,7 +426,7 @@ void process_args(int argc, char **argv, int pass)
 #if HAVE_DECL_OPTRESET
     optreset = 1;
 #endif
-    while ((option = getopt(argc, argv, ":23bBc:Cd:DefFghI:lL:m:MnNo:O:pqRrsStTuvVx:y:" G R F)) != -1)
+    while ((option = getopt(argc, argv, ":23bBc:Cd:DefFghI:lL:m:MnNo:O:pqQRrsStTuvVx:y:" G R F)) != -1)
     {
 #if 0
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
@@ -554,6 +555,10 @@ void process_args(int argc, char **argv, int pass)
 
 	case 'q':
 	    quiet = true;
+	    break;
+
+	case 'Q':
+	    query = true;
 	    break;
 
 #ifdef	ROBINSON_OR_FISHER

@@ -59,7 +59,7 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
 
     method->initialize();
 
-    if (quiet && verbose)	/* 'quiet + verbose' means 'query' */
+    if (query)
 	query_config();
 
     /* tokenize input text and save words in a wordhash. */

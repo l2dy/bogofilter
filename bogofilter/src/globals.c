@@ -31,6 +31,7 @@ bool	mbox_mode;			/* '-M' */
 bool	replace_nonascii_characters;	/* '-n' */
 bool	passthrough;			/* '-p' */
 bool	quiet;				/* '-q' */
+bool	query;				/* '-Q' */
 int	Rtable = 0;			/* '-R' */
 bool	terse;				/* '-t' */
 int	test = 0;			/* '-T' */
