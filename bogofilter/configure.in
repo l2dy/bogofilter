@@ -192,7 +192,8 @@ dnl AC_FUNC_STAT
 AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl strchr strrchr memcpy)
 
 if test "$sysconfdir" = "\${prefix}/etc" \
-    && test "$prefix" = "NONE" ; then
+    && { test "$prefix" = "NONE" || test "$prefix" = "/usr" \
+      || test "$prefix" = "/usr/" ; } ; then
     if test "$( (uname -s) )" = "Linux" ; then
       sysconfdir=/etc
     fi
