@@ -17,9 +17,9 @@
         <arg>-l</arg>
         <arg>-w</arg>
       </group>
-      <arg choice="opt">-v</arg>
       <arg choice="plain"><replaceable>file.db</replaceable></arg>
       <group choice="opt">
+        <arg>-v</arg>
         <arg>-h</arg>
         <arg>-V</arg>
       </group>
@@ -41,17 +41,18 @@
        specified database file.
     </para>
     <para>
+       The <option>-w</option> option tells <application>bogoutil</application> to display the value of one or more tokens in one or more databases.
+       <option>-w</option> takes an argument, which is either the name of a wordlist or the name of a directory containing spamlist.db and goodlist.db.
+       Tokens can be listed on the command line or piped to <application>bogoutil</application>.
+       When there are extra arguments on the command line, <application>bogoutil</application> will use them as the tokens to lookup.  
+       If there are no extra arguments, <application>bogoutil</application> will read tokens from stdin.
+       When <option>file.db</option> is the path to a database file, the tokens will be looked up in the database and the value for each token will be displayed.
+       When <option>file.db</option> is a directory name, each token will be looked up in both spamlist.db and goodlist.db and the values will be displayed.
+    </para>
+    <para>
        The <option>-v</option> option produces verbose output on stderr.
        This option is primarily useful for debugging.
     </para>
-    <para>
-       The <option>-w</option> option tells <application>bogoutil</application> to read the specified database file and display
-       display words and their associated count.  stdin provides the input list of words for this option.
-    </para>
-    <para>
-      The <option>file.db</option> is the path to the database file that
-      <application>bogoutil</application> reads or writes.
-    </para>   
     <para>The <option>-h</option> option prints the help message and exits.</para>
     <para>The <option>-V</option> option prints the version number and exits.</para>
   </refsect1>
