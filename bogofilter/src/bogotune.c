@@ -77,6 +77,7 @@ AUTHOR:
 #define	MAX_CUTOFF	0.99	/* maximum cutoff for set_thresh() */
 #define	SPAM_CUTOFF	0.975
 #define FP_CUTOFF	0.999
+#define	SCAN_CUTOFF	0.500	/* skip scans if cutoff is less or equal */
 
 /* bogotune's default parameters */
 #define	DEFAULT_ROBS	0.01
@@ -981,9 +982,9 @@ static void final_warning(void)
 	);
 }
 
-static void final_recommendations(void)
+static void final_recommendations(bool skip)
 {
-    uint m, s;
+    uint m;
     bool printed = false;
     uint minn[] = { 10000, 2000, 1000, 500, 1 };
 
@@ -997,6 +998,13 @@ static void final_recommendations(void)
 
     if (verbose >= PARMS)
 	printf("# ns_cnt %d, sp_cnt %d\n", ns_cnt, sp_cnt);
+
+    if (skip) {
+	printf("\n");
+	printf("### The following recommendations are provisional.\n");
+	printf("### Run bogotune with more messages when possible.\n");
+	printf("\n");
+    }
 
     printf("Recommendations:\n\n");
     printf("---cut---\n");
@@ -1052,12 +1060,17 @@ static void final_recommendations(void)
 	       cutoff, fpp, fp, fnp, fn);
 
 	printed = true;
+	if (skip)
+	    ham_cutoff = cutoff;
     }
 
-    s = ceil(sp_cnt * 0.002 - 1);
-    ham_cutoff = sp_scores[s];
-    if (ham_cutoff < 0.10) ham_cutoff = 0.10;
-    if (ham_cutoff > 0.45) ham_cutoff = 0.45;
+    if (!skip) {
+	uint s = ceil(sp_cnt * 0.002 - 1);
+	ham_cutoff = sp_scores[s];
+	if (ham_cutoff < 0.10) ham_cutoff = 0.10;
+	if (ham_cutoff > 0.45) ham_cutoff = 0.45;
+    }
+
     printf("ham_cutoff=%5.3f\t\n", ham_cutoff);
     printf("---cut---\n");
     printf("\n");
@@ -1137,6 +1150,7 @@ static bool check_msg_counts(void)
 
 static rc_t bogotune(void)
 {
+    bool skip;
     result_t *best;
 
     int beg, end;
@@ -1233,6 +1247,7 @@ static rc_t bogotune(void)
 
     /* set target and spam_cutoff */
     set_thresh(ns_cnt, ns_scores);
+    skip = ROUND(spam_cutoff,100000) <= SCAN_CUTOFF;
     printf("False-positive target is %d (cutoff %8.6f)\n", target, spam_cutoff);
 
 #ifdef	TEST
@@ -1247,7 +1262,7 @@ static rc_t bogotune(void)
     wordhash_free(ns_and_sp->train);
     ns_and_sp->train = NULL;
 
-    for (scan=0; scan <= 1; scan += 1) {
+    for (scan=0; scan <= 1 && !skip; scan += 1) {
 	bool f;
 	uint i;
 	uint r_count;
@@ -1407,7 +1422,7 @@ static rc_t bogotune(void)
     ** that give 0.05%, 0.1% and 0.2% fp.
     */
 
-    final_recommendations();
+    final_recommendations(skip);
 
     return status;
 }
