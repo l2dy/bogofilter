@@ -1318,8 +1318,9 @@ ex_t db_verify(const char *dbfile) {
 	*tmp = '\0';
 
     env = dbe_recover_open(dir, 0); /* this sets an exclusive lock */
-    e = db_create(&db, NULL, 0); /* do not use environment here,
-				    verify does not lock! */
+    e = db_create(&db, NULL, 0); /* do not use environment here, verify
+				    does not lock by itself, we hold the
+				    global lock instead! */
     if (e != 0) {
 	print_error(__FILE__, __LINE__, "error creating DB handle: %s",
 		db_strerror(e));
