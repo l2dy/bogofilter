@@ -297,7 +297,7 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 		buff += format_string(buff, val, 0, prec, flags, end);
 		break;
 	    }
-	    case 'd':		/* d - spam/ham as delta, unsure a probability */
+	    case 'd':		/* d - spam/non-spam as delta, unsure a probability */
 	    {
 		const char *f = spamicity_formats[status];
 		if (status == RC_SPAM)
