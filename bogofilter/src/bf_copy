@@ -31,16 +31,16 @@ db_checkpoint -1h "$SRC" || :
 
 mkdir "$DST"
 
-F=bfc.$$.unneeded
-rm -f $F
-trap "rm -rf $F \"$DST\"" 0
+TMP=bfc.$$.unneeded
+rm -f $TMP
+trap "rm -rf $TMP \"$DST\"" 0
 if test $COMPACT -eq 1 ; then
   # don't copy unneeded logs
-  db_archive -h "$SRC" >$F
+  db_archive -h "$SRC" >$TMP
 else
-  : >$F
+  : >$TMP
 fi
-LOGS=`ls "$SRC"/log.* | grep -v -F -f $F`
+LOGS=`ls "$SRC"/log.* | grep -v -F -f $TMP`
 if test "$LOGS" ; then cp -p $LOGS "$DST" ; fi
 ENV=`ls "$SRC"/__db.* || :`
 if test "$ENV" ; then cp -p $ENV "$DST" ; fi
@@ -53,5 +53,5 @@ for FILE in "$SRC"/*.db ; do
 done
 
 db_recover -h "$DST"
-rm -f $F
+rm -f $TMP
 trap - 0
