@@ -18,13 +18,14 @@ bogofilter.
 <ul>
   <li><a href="#what_is_bogofilter">What is bogofilter?</a></li>
   <li><a href="#history">Bogofilter History</a></li>
-  <li><a href="#lists">Bogofilter Mailing Lists</a></li>
   <li><a href="#home_page">Bogofilter Home Page</a></li>
+  <li><a href="#lists">Bogofilter Mailing Lists</a></li>
   <li><a href="#token_counts">How do I find the spam and ham counts for a token?</a></li>
   <li><a href="#message_count">How do I tell how many messages are in my wordlists?</a></li>
   <li><a href="#wordlist_size">How do I tell how many tokens are in my wordlists?</a></li>
   <li><a href="#port_notes">How do I get Bogofilter working on Solaris, BSD, etc.?</a></li>
   <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
+  <li><a href="#rescue">How can I tell if my wordlists are corrupted?</a></li>
   <li><a href="#return_codes">Why does bogofilter give return codes like 0 and 256
          when it's run from inside a program?</a></li>
   <li><a href="#changed_options">Now that I've upgraded to 0.11 why are my scripts broken?</a></li>
@@ -53,6 +54,14 @@ bogofilter home page</a> for more information.
 Bogofilter was written by Eric S. Raymond on August 19, 2002. It gained
 popularity in September 2002, and a number of other authors have started
 to contribute to the project.
+</p>
+
+<hr>
+
+<p><a name="home_page"></a><b>Bogofilter Home Page</b></p>
+<p>
+The <a href="http://bogofilter.sourceforge.net">bogofilter home page</a> at
+sourceforge is the central clearinghouse for bogofilter resources.
 </p>
 
 <hr>
@@ -111,14 +120,6 @@ discussions.</td>
 archive.</td>
 </tr>
 </table>
-
-<hr>
-
-<p><a name="home_page"></a><b>Bogofilter Home Page</b></p>
-<p>
-The <a href="http://bogofilter.sourceforge.net">bogofilter home page</a> at
-sourceforge is the central clearinghouse for bogofilter resources.
-</p>
 
 <hr>
 
@@ -230,7 +231,27 @@ to your NFS documentation for more information about running "lockd" or
 </p>
 
 <hr>
-<p><a name="return_codes"></a><b>Why does bogofilter give return codes like 0 and 256 when it's run from inside a program?</b></p>
+<p><a name="rescue"><b>How can I tell if my wordlists are corrupted?</b></a></p>
+<p>If you think your wordlists are hosed, you can see what BerkeleyDB thinks by running:
+<p><pre>
+db_verify spamlist.db
+db_verify goodlist.db
+</pre><p>
+
+If there is a problem, you may be able to recover some (or all) of the tokens and their counts with the following commands:
+<p>
+<pre>bogoutil -d spamlist.db | bogoutil -l spamlist.db.new</pre>
+<p>
+or with
+<p><pre>
+db_dump -r spamlist.db &gt; spamlist.txt
+db_load spamlist.new &lt; spamlist.txt
+</pre></p>
+
+
+<hr>
+<p><a name="return_codes"></a><b>Why does bogofilter give return codes
+like 0 and 256 when it's run from inside a program?</b></p>
 <p>
  Likely the return codes are being reformatted by waitpid(2).  
  Use WEXITSTATUS(status) in sys/wait.h, or comparable macro, to get the correct value.
