@@ -73,14 +73,12 @@ const	char *stats_prefix;
 run_t run_type = RUN_NORMAL; 
 method_t *method = NULL;
 
-enum algorithm_e {
 #ifdef ENABLE_GRAHAM_METHOD
-    AL_GRAHAM='g',
+#define	AL_GRAHAM 'g'
 #endif
 #ifdef ENABLE_ROBINSON_METHOD
-    AL_ROBINSON='r'
+#define	AL_ROBINSON 'r'
 #endif
-};
 
 /* define default */
 #ifdef ENABLE_GRAHAM_METHOD
@@ -89,7 +87,7 @@ enum algorithm_e {
 #define AL_DEFAULT AL_ROBINSON
 #endif
 
-static enum algorithm_e algorithm = AL_DEFAULT;
+static char algorithm = AL_DEFAULT;
 
 double	spam_cutoff;
 double	min_dev = 0.0f;
