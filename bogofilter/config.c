@@ -270,9 +270,13 @@ static bool process_config_line( const char *line, const parm_desc *parms )
     len = val - line;
     for ( arg = parms; arg->name != NULL; arg += 1 )
     {
+	if (DEBUG_CONFIG(1))
+	    printf( "Testing:  %s\n", arg->name);
 	if (strncmp(arg->name, line, len) == 0)
 	{
 	    bool ok = process_config_parameter(arg, val);
+	    if (DEBUG_CONFIG(1) && ok )
+		printf( "%s\n", "   Found it!");
 	    return ok;
 	}
     }
