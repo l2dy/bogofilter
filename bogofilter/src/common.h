@@ -63,7 +63,7 @@ typedef enum run_e {
     REG_SPAM   = BIT(2),
     REG_GOOD   = BIT(3),
     UNREG_SPAM = BIT(4),
-    UNREG_GOOD = BIT(5),
+    UNREG_GOOD = BIT(5)
 } run_t;
 extern run_t run_type;
 
