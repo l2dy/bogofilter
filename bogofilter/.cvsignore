@@ -1,9 +1,3 @@
-*.c.*
-*.osage
-*.tgz
-diff*
-test*
-update*
 .deps
 aclocal.m4
 autom4te.cache
@@ -13,6 +7,8 @@ bogofilter-*.tar.gz
 bogofilter.spec
 bogoutil
 bogoutil.1
+bogofilter.html
+bogofilter.pdf
 config.h
 config.in
 config.log
@@ -25,4 +21,3 @@ Makefile
 Makefile.in
 stamp-h1
 config.cache
-bogofilter.pdf

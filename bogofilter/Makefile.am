@@ -35,6 +35,10 @@ EXTRA_DIST = $(man1_MANS) \
 .xml.pdf:
 	xmlto pdf --extensions $<
 
+.xml.html:
+	xmlto html $<
+	mv -f index.html $@
+
 .xml.1:
 	xmlto man $<
 
