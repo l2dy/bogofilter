@@ -25,9 +25,9 @@ EOF
 # ignore list, user & system wordlists
 cat <<EOF > ${TMPDIR}/$CF_IGN_USR_SYS
 bogofilter_dir=${TMPDIR}
+wordlist r,sys,system.db,6
 wordlist i,ign,ignore.db,4
 wordlist r,usr,user.db,5
-wordlist r,sys,system.db,6
 EOF
 
 # merged user & system wordlists
