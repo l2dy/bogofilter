@@ -35,4 +35,5 @@ bool str_to_bool(const char *str)
 	fprintf(stderr, "Invalid boolean value - %s\n", str);
 	exit(2);
     }
+    return (0);
 }
