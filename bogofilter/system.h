@@ -26,6 +26,13 @@ typedef unsigned char _Bool;
 # define __bool_true_false_are_defined 1
 #endif
 
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#if HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+
 #if STDC_HEADERS
 # include <string.h>
 #else
