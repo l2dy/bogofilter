@@ -48,35 +48,34 @@ static struct type_s {
     const char *name;
     size_t len;
 } mime_type_table[] = {
-    {
-    MIME_TEXT_HTML, "text/html", 9,}, {
-    MIME_TEXT_PLAIN, "text/plain", 10,}, {
-    MIME_TEXT, "text", 4,},	/* NON-COMPLIANT; should be "text/" */
-    {
-    MIME_APPLICATION, "application/", 12,}, {
-    MIME_IMAGE, "image/", 6,}, {
-    MIME_MESSAGE, "message/", 8,}, {
-MIME_MULTIPART, "multipart/", 10,},};
+    { MIME_TEXT_HTML, "text/html", 9,},
+    { MIME_TEXT_PLAIN, "text/plain", 10,},
+    { MIME_TEXT, "text", 4,},	/* NON-COMPLIANT; should be "text/" */
+    { MIME_APPLICATION, "application/", 12,},
+    { MIME_IMAGE, "image/", 6,},
+    { MIME_MESSAGE, "message/", 8,},
+    { MIME_MULTIPART, "multipart/", 10,},
+};
 
 static struct encoding_s {
     enum mimeencoding encoding;
     const char *name;
 } mime_encoding_table[] = {
-    {
-    MIME_7BIT, "7BIT",}, {
-    MIME_8BIT, "8BIT",}, {
-    MIME_BINARY, "BINARY",}, {
-    MIME_QP, "QUOTED-PRINTABLE",}, {
-    MIME_BASE64, "BASE64",}, {
-MIME_UUENCODE, "X-UUENCODE",},};
+    { MIME_7BIT, "7BIT",},
+    { MIME_8BIT, "8BIT",},
+    { MIME_BINARY, "BINARY",},
+    { MIME_QP, "QUOTED-PRINTABLE",},
+    { MIME_BASE64, "BASE64",},
+    { MIME_UUENCODE, "X-UUENCODE",},
+};
 
 static struct disposition_s {
     enum mimedisposition disposition;
     const char *name;
 } mime_disposition_table[] = {
-    {
-    MIME_INLINE, "inline",}, {
-MIME_ATTACHMENT, "attachment",},};
+    { MIME_INLINE, "inline",},
+    { MIME_ATTACHMENT, "attachment",},
+};
 
 /* boundary properties */
 typedef struct {
