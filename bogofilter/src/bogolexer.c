@@ -42,14 +42,6 @@ static void usage(void)
     fprintf(stderr, "Usage: %s [ -p | -q | -n | -h ]\n", progname);
 }
 
-static void initialize(void)
-{
-    init_charset_table(charset_default, true);
-    mime_reset();
-    token_init();
-    lexer_v3_init(NULL);
-}
-
 static void help(void)
 {
     usage();
@@ -157,11 +149,20 @@ static void process_arglist(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
+#ifdef __EMX__
+    _response (&argc, &argv);	/* expand response files (@filename) */
+    _wildcard (&argc, &argv);	/* expand wildcards (*.*) */
+#endif
+
     while (1)
     {
 	int option_index = 0;
 	int this_option_optind = optind ? optind : 1;
 	const char *name;
+
+#ifdef __EMX__
+	if (optind == 1) optind = 0;
+#endif
 
 	option = getopt_long(argc, argv, OPTIONS,
 			     long_options, &option_index);
@@ -192,7 +193,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 
     case '?':
 	fprintf(stderr, "Unknown option '%s'.\n", name);
-	exit(EX_ERROR);
+	break;
 
     case 'c':
 	read_config_file(val, false, false, precedence);
@@ -295,7 +296,7 @@ int main(int argc, char **argv)
     bogoreader_init(argc, argv);
 
     while ((*reader_more)()) {
-	initialize();
+	lexer_init();
 
 	while ((t = get_token()) != NONE)
 	{
@@ -304,7 +305,7 @@ int main(int argc, char **argv)
 		fprintf(stdout, "%s\n", yylval->text);
 	    }
 	    else if (!quiet)
-		printf("get_token: %d \"%s\"\n", t, yylval->text);
+		printf("get_token: %d \"%s\"\n", (int)t, yylval->text);
 	}
     }
 

@@ -26,6 +26,7 @@ Most of the ideas in here are stolen from Mutt's snprintf implementation.
 #include "bogofilter.h"
 #include "format.h"
 #include "score.h"
+#include "token.h"
 #include "xstrdup.h"
 
 /* Function Prototypes */
@@ -50,6 +51,8 @@ const char *unsure_subject_tag = NULL;			/* used in passthrough mode */
 
 /*
 **	formatting characters:
+**
+**	    XXX FIXME XXX this list is outdated and needs revision or removal
 **
 **	    h - spam_header_name, e.g. "X-Bogosity"
 **
@@ -198,13 +201,11 @@ static size_t format_float(char *dest, double src,
 
 static size_t format_string(char *dest, const char *src, int min, int prec, int flags, const char *destend)
 {
-    int s_len = (int) strlen(src);
-    int len;
-    if (s_len > INT_MAX) {
-	fprintf(stderr, "cannot handle string length (%lu) above %d, aborting\n", (unsigned long)s_len, INT_MAX);
+    int len = (int) strlen(src);
+    if (len > INT_MAX) {
+	fprintf(stderr, "cannot handle string length (%lu) above %d, aborting\n", (unsigned long)len, INT_MAX);
 	internal_error;
     }
-    len = s_len;
     (void)min; /* kill compiler warning */
 
     if (flags & F_PREC && prec < len)
@@ -317,6 +318,9 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 	    case '%':
 		*buff++ = '%';
 		break;
+	    case 'A':		/* A - Message Address */
+		buff += format_string(buff, msg_addr ? (const char *)msg_addr->text : "UNKNOWN", 0, prec, flags, end);
+		break;
 	    case 'c':		/* c - classification, e.g. Yes/No, Spam/Ham/Unsure, or YN, SHU, +-? */
 	    {
 		const char *val = spamicity_tags[status];
@@ -336,7 +340,12 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 		buff += format_date(buff, end);
 		break;
 	    }
-
+	    case 'I':		/* M - Message ID */
+		buff += format_string(buff, msg_id ? (const char *)msg_id->text : "UNKNOWN", 0, prec, flags, end);
+		break;
+	    case 'Q':		/* Q - Queue ID */
+		buff += format_string(buff, queue_id ? (const char *)queue_id->text : "UNKNOWN", 0, prec, flags, end);
+		break;
 	    case 'p':		/* p - spamicity as a probability */
 	    {
 		const char *f = spamicity_formats[status];

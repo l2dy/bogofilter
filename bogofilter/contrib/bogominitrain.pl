@@ -6,13 +6,14 @@
 # Program locations
 my $bogofilter="bogofilter";
 my $bogoutil="bogoutil";
+my $catcommand="bzcat -f";
 
 # Not correct number of parameters
 my $commandlineoptions=($ARGV[0]=~/^-(?=[^c]*c?[^c]*$)(?=[^f]*f?[^f]*$)(?=[^n]*n?[^n]*$)(?=[^s]*s?[^s]*$)[cfns]*v{0,2}[cfns]*$/);
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.5.1
+bogominitrain.pl version 1.5.2
   requires bogofilter 0.17 or later
 
 Usage:
@@ -75,8 +76,8 @@ my ($dir,$ham,$spam,$options) = @ARGV;
 $bogofilter.=" $options -d $dir";
 die ("$dir is not a directory or not accessible.\n") unless (-d $dir && -r $dir && -w $dir && -x $dir);
 `$bogofilter -n < /dev/null` unless (-s "$dir/wordlist.db");
-my $ham_total=`cat $ham 2>/dev/null |grep -c "^From "`;
-my $spam_total=`cat $spam 2>/dev/null |grep -c "^From "`;
+my $ham_total=`$catcommand $ham 2>/dev/null |grep -c "^From "`;
+my $spam_total=`$catcommand $spam 2>/dev/null |grep -c "^From "`;
 my ($fp,$fn,$hamadd,$spamadd,%trainedham,%trainedspam);
 my $runs=0;
 my @status=("S","H","U","E");
@@ -87,8 +88,8 @@ print `$bogoutil -w $dir .MSG_COUNT`,"\n";
 do { # Start force loop
   my $starttime=time;
   $runs++;
-  open (HAM,  "cat $ham 2>/dev/null |")  || die("Cannot open ham: $!\n");
-  open (SPAM, "cat $spam 2>/dev/null |") || die("Cannot open spam: $!\n");
+  open (HAM,  "$catcommand $ham 2>/dev/null |")  || die("Cannot open ham: $!\n");
+  open (SPAM, "$catcommand $spam 2>/dev/null |") || die("Cannot open spam: $!\n");
 
   # Loop through all the mail
   my ($lasthamline,$lastspamline,$hamcount,$spamcount,$skipham,$skipspam) = ("","",0,0,0,0);
@@ -174,9 +175,9 @@ do { # Start force loop
         " to the database.\n";
   print `$bogoutil -w $dir .MSG_COUNT`;
   unless ($runs>1 && $hamadd+$spamadd==0) {
-    $fn=$spamcount>0 && `cat $spam | $bogofilter -TM | grep -cv ^S` || "0\n";
+    $fn=$spamcount>0 && `$catcommand $spam | $bogofilter -TM | grep -cv ^S` || "0\n";
     print "\nFalse negatives: $fn";
-    $fp=$hamcount>0 && `cat $ham | $bogofilter -TM | grep -cv ^H` || "0\n";
+    $fp=$hamcount>0 && `$catcommand $ham | $bogofilter -TM | grep -cv ^H` || "0\n";
     print "False positives: $fp\n";
   }
 } until ($fn+$fp==0 || $hamadd+$spamadd==0 || !$force);

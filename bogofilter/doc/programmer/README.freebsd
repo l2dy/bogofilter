@@ -5,7 +5,7 @@ To compile bogofilter on a stock FreeBSD 4.x with db3 or db4 installed
 via port or package, try to re-run configure like this:
 
 env CPPFLAGS=-I/usr/local/include/db3 LIBS=-ldb3 LDFLAGS=-L/usr/local/lib \
-  sh ./configure --with-db=/usr/local
+  sh ./configure --with-libdb-prefix=/usr/local
 
 Replace the two "db3" with "db4" if appropriate, and adjust all
 /usr/local occurrences if your PREFIX is not /usr/local.

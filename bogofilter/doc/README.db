@@ -16,82 +16,197 @@ actual bogofilter data base directory.
 
 1. Overview ------------------------------------------------------------
 
-This bogofilter version now contains code to use BerkeleyDB environments
-for locking and caching data base access instead of the proven
-fcntl()/F_SETLK locks bogofilter used to use.
+This bogofilter version has been upgraded to use the Berkeley DB
+Transactional Data Store, to be able to recover a data base after an
+application or system crash.
 
-The ultimate goal is to migrate to the Berkeley DB Transactional Data
-Store, in order to improve data base robustness.
+2. Prerequisites and Caveats -------------------------------------------
 
-The current code is the first step in that direction, the code uses the
-Berkeley DB Concurrent Data Store model, it has the potential of using
-finer grained locks, for improved concurrency - depending on BerkeleyDB
-version, and it uses shared buffer pools to improve performance.
+Berkeley DB version 4.2 has been tested successfully in September 2004.
 
-The former bogofilter locking code allowed either one registration
-process at the same time or an unlimited amount of readers at the same
-time. A high amount of bogofilter processes that were scoring could
-effectively lock out registration altogether, and registration
-interrupted scoring. The new model allows for concurrent use of many
-readers and one writer at the same time.
+Berkeley DB versions 4.1 and 4.2 are recommended over the older versions.
 
-2. Use, restrictions, caveats ------------------------------------------
+Berkeley DB versions 4.1 and newer support checksumming data base pages,
+these will detect if a data base page has been written only partially
+(usually as the result of a system crash or I/O error). We use this
+feature unconditionally because the state of what file system on what
+operating system writes what block sizes atomically is unknown and
+sparsely (if at all) documented on most systems.
 
-The new code is enabled by default. If, for some reason, it does not
-work for you, stop all bogofilter processes and try to recover the
-environment with the db_recover utility. Give it your data base
-directory as argument to the -h option, for instance:
+Requisites to use this code successfully:
 
-    db_recover -h ~/.bogofilter
+- the hardware MUST NOT cheat fsync(2). Virtually all ATA hard disk
+  drives ship with write cache enabled so they give good figures in
+  benchmarks - sacrificing even the least trace of reliability.
 
-If that does not cure your problems, please report to the mailing list
-1. what you did, 2. what you got, 3. what you expected instead of #2.
+  You MUST switch off the drive's or RAID controller's write cache
+  unless the cache is battery backed and permanent.
 
-For a transition phase, the old code is still around and can be used by
-setting an environment variable:
+  If you have an uninterruptible power supply unit attached with a
+  battery charged and in good shape, the risk for data loss may be
+  acceptable.
 
-env BF_TRADITIONAL_DB=1 bogofilter [options]
 
-where [options] is a placeholder for the options you regularly run
-bogofilter with, it can be empty.
+  To switch off the write cache on Linux, run (as root, assuming that
+  the disk drive containing the bogofilter data base is /dev/hda):
 
-BerkeleyDB keeps some additional statistics about locking, caching and
-their efficiency. These can be obtained by running the db_stat utility
-with the -e or -c option, examples:
+      /sbin/hdparm -W0 /dev/hda
+
+  To switch off the write cache on FreeBSD, add the line
+
+      hw.ata.wc="0"
+
+  to /boot/loader.conf.local and reboot.
+
+  Note that switching the write cache off adversely affects the write
+  performance (of bulk transfers in particular), but guarantees on-disk
+  consistency in case of power failure.
+
+  That's the price for getting ultra-cheap hardware. If you want decent
+  performance, buy SCSI.
+
+  While ATA drivers and file systems are under constant development,
+  substantiated statements about the durability issue, about write ordering
+  (ordered tags) or write barriers are non-existent at this time.
+
+- the data base must be on a local file system.
+  AFS, CIFS, Coda, NFS, SMBFS will not work.
+  EXT2FS, EXT3FS, FFS, JFS, REISERFS, UFS, XFS should be fine.
+
+- the data base block size must match what the file system is writing
+  atomically. If the data base block size is larger than the file
+  system's maximum atomic write block size, undetected corruptions can
+  remain even after running a "recovery" that appeared to be successful.
+
+  This requisite does not apply if you are using Berkeley DB version 4.1
+  or 4.2, these checksum data base pages to detect partial writes.
+
+  Repeat: PARTIAL WRITES ARE USUALLY EVIL (this applies to data bases in
+  general, not only those that use transactional models).
+
+Backup your data base regularly (see the db_archive utility for
+additional documentation of a "hot" backup), bogofilter cannot, of
+course, guess data that got lost through a hard drive fault.
+
+3. Use and troubleshooting ---------------------------------------------
+
+NOTE: If you need to copy your data base, DO NOT USE cp! DO USE dd INSTEAD
+      and pass dd the data base page size (you can obtain this size by
+      db_stat, as shown in section 4.1) as block size argument.
+
+One common failure case is known:
+
+3.1 LOCK TABLE EXHAUSTION
+
+Problem: Operations that affect large parts of the data base or the data
+	 base as a whole (bogoutil usually) may require many locks and
+	 exhaust the maximum number of locks or the maximum number of
+	 locked objects that the Berkeley DB environments support.
+
+Symptom: Operations abort with "out of memory" although the machine has
+	 plenty of RAM and/or swap.
+
+	 Operations report lock or object table exhaustion and abort.
+
+Cause:	 Natural data base growth.
+
+Fix:     Resize the lock tables. It is easy and requires these two
+	 steps: (In the next steps, adjust the ~/.bogofilter path if you
+	 don't have the data base in its default location)
+
+a. Create a ~/.bogofilter/DB_CONFIG file (in the same directory as your
+   wordlist.db file) that looks like this:
+
+set_lk_max_objects  32768
+set_lk_max_locks    32768
+
+You may need to adjust these figures. You will need up to one lock per
+data base page and a bit of headroom for future training -- see section
+4.2 below to determine the size of the data base and data base page.
+
+b. Run bogoutil -f ~/.bogofilter (use the path from step a, omitting
+   the /DB_CONFIG part).
+
+4. Other Information of Interest ---------------------------------------
+
+4.1 GENERAL INFORMATION
+
+Berkeley DB keeps some additional statistics about locking, caching and
+their efficiency. These can be obtained by running the db_stat utility:
+
+db_stat -h ~/.bogofilter -d wordlist.db # data base statistics
 
 db_stat -h ~/.bogofilter -e # environment statistics
-db_stat -h ~/.bogofilter -c # lock statistics
+db_stat -h ~/.bogofilter -c # lock statistics - needed for lock resizing
 db_stat -h ~/.bogofilter -m # buffer pool statistics
+db_stat -h ~/.bogofilter -l # log statistics
+db_stat -h ~/.bogofilter -t # transaction statistics
 
-db_stat ~/.bogofilter/wordlist.db # data base statistics
-   (this has also been available with the traditional bogofilter code)
+Note that statistics may disappear when the data base is recovered. They
+will reappear after running bogofilter and are the more reliable the
+more often bogofilter has been used since the last recovery.
 
-The new code will store files named __db.NNN - where NNN are numbers -
-in the ~/.bogofilter directory. These MUST NOT be removed manually as
-they can contain update data for the data base that must be still written back
-to the wordlist.db file - this happens when there are many concurrent
-processes alongside a registration process. The db_recover utility may
-remove these files, but it knows about BerkeleyDB internals.
+You MUST NOT remove files named __db.NNN and log.NNNNNNNNNN - where
+NNN are numbers - in the ~/.bogofilter directory.
+REMOVING THESE FILES CAUSES DATA BASE CORRUPTION
+(there is one exception, see below)
 
-This code is deadlock-free, so if bogofilter hangs with this
-experimental code enabled as documented above, either the data base or
-the environment should be checked for corruptions.
+These can contain update data for the data base that must be still
+written back to the wordlist.db file - this happens when there are many
+concurrent processes alongside a registration process.
 
-3. Open issues and troubleshooting -------------------------------------
+Exception: after reading the Berkeley DB documentation for the
+db_archive utility and using that utility, you may be able to remove
+some of the log.NNNNNNNNNN files. This may be necessary to reclaim disk
+space, but you must strictly adhere to the Berkeley DB documentation
+lest you risk your data base become unrecoverable in case of trouble.
 
-a. The DB_ENV based code appears to be more sensitive (not to say
-   fragile) with respect to premature abortion, hangs of bogofilter
-   processes after an ungraceful bogofilter shutdown have been observed.
-   These can usually be resolved by killing all hanging bogofilter
-   processes, then running
+WARNING: If you need to copy data base files,
+	 DO NOT USE cp, BUT DO USE dd instead and give it a block size
+	 that matches the data base's block size, which can be found by
+	 running db_stat with -d option as shown above.
 
-   db_recover -h ~/.bogofilter
+4.2 SPECIFIC INFORMATION ON RESIZING THE LOCK TABLES
 
-b. TODO: bogofilter should catch common interrupt signals, SIGHUP,
-   SIGINT, SIGTERM, and ensure a graceful shutdown of the data base.
+In all the commands shown below, replace the ~/.bogofilter path by the
+name of the directory holding your wordlist.db file.
 
-c. TODO: The bogofilter utilities need to be taught about the
-   environment, too, to avoid avoidable corruptions.
+a. Determine the data base size:
 
-d. TODO: Make sure that the token updates and the .MSG_COUNT are bundled and
-   the whole bundle is written atomically.
+ls -l ~/.bogofilter/wordlist.db
+
+b. Determine the data base page size:
+
+db_stat -h ~/.bogofilter/ -d wordlist.db
+The relevant line has "database page size"
+
+c. The number of locks and lock objects needed is the data base size
+divided by the data base page size, rounded up generously, for example:
+
+(output from step a)
+-rw-r--r--    1 joe      users    15360000 2004-05-11 12:25 wordlist.db
+
+(output from step b)
+53162   Btree magic number.
+8       Btree version number.
+Flags:
+2       Minimum keys per-page.
+4096    Underlying database page size.
+3       Number of levels in the tree.
+...
+
+Hence: 15360000 / 4096 = 3750
+
+d. Round up, 4096 may be adequate if you train seldomly, use
+higher values if you train often or in preparation of training on a
+large mailbox. Higher values make your lock region, usually __db.004,
+larger, but allow for larger data bases. Lower values save disk space
+but may require you to to resize the lock region more often.
+
+e. Use this rounded-up figure for both of the the two DB_CONFIG file
+   lines mentioned in section 3.1
+
+f. run bogoutil -f ~/.bogofilter
+
+Bogofilter will re-create the lock tables automatically
+the next time it is run.
