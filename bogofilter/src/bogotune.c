@@ -125,8 +125,6 @@ enum e_verbosity {
 const char *progname = "bogotune";
 static char *ds_file;
 static char *ds_path;
-static char *in_file;
-static FILE *in_fp;
 
 static bool    bogolex = false;		/* true if convert input to msg-count format */
 static bool    esf_flag = true;		/* test ESF factors if true */
@@ -890,15 +888,6 @@ static int process_arglist(int argc, char **argv)
 		    argc -= 1;
 		    user_robx = atof(*++argv);
 		    break;
-		case 'R':	/* Results file */
-		    argc -= 1;
-		    in_file = *++argv;
-		    in_fp = fopen(in_file, "r");
-		    if (in_fp == NULL) {
-			fprintf(stderr, "Can't read file '%s'\n", in_file);
-			exit(EX_ERROR);
-		    }
-		    break;
 		case 's':
 		    run_type = REG_SPAM;
 		    break;
@@ -1344,75 +1333,6 @@ static bool check_msg_counts(void)
     return ok;
 }
 
-/*
-  cnt: 3675 (rs: 3, rx: 5, md: 5 spex: 7, nsex: 7)
-  cnt    rs    md     rx    spesf    nsesf  cutoff  fp  fn
-    1 1.0000 0.060 0.600 0.562500 0.562500 0.661535 78 1730
-*/
-
-/* return true if "cnt rs md ..." line is found */
-static bool get_scan_pos(FILE *fp)
-{
-    char buff[256];
-    const char *fpt = "False-positive target is ";
-    size_t fptl = strlen(fpt);
-/*
-    const char *sptc = "sp:  train_count = ";
-    size_t sptcl = strlen(sptc);
-    const char *nstc = "ns:  train_count = ";
-    size_t nstcl = strlen(nstc);
-*/
-
-    if (fp == NULL)
-	return false;
-
-    while (1) {
-	char *tmp = fgets (buff, sizeof(buff), fp);
-
-	if (tmp == NULL)
-	    return false;
-	if (memcmp(tmp, fpt, fptl) == 0)
-	    target = atoi(buff+fptl);
-/*
-	if (memcmp(tmp, spt, sptl) == 0)
-	    sscanf(tmp, "sp:  train_count = %d, score_count = %d", &sptc, &spsc)
-	if (memcmp(tmp, nst, nstl) == 0)
-	    sscanf(tmp, "ns:  train_count = %d, score_count = %d", &nstc, &spsc)
-*/
-	if (memcmp(tmp, "cnt ", 4) == 0)
-	    return true;
-    }
-}
-
-/* return true if count line is found */
-static bool get_count(FILE *fp, int cnt, result_t *r)
-{
-    char buff[256];
-    if (fp == NULL)
-	return false;
-    while (1) {
-	char *tmp = fgets (buff, sizeof(buff), fp);
-	if (tmp == NULL)
-	    return false;
-	if (atoi(buff) != cnt)
-	    continue;
-	// if (verbose >= SUMMARY+1)
-	//     printf("%3u ", cnt);
-	// if (verbose >= SUMMARY+2)
-	//     printf(" %u %u %u %u %u  ",  rsi, mdi, rxi, spi, nsi);
-	sscanf(buff, "%u %lf %lf %lf %lf %lf %lf %d %d",
-	       &r->idx, &r->rs, &r->md, &r->rx, &r->sp_exp, &r->ns_exp, &r->co, &r->fp, &r->fn);
-	if (r->fn == 0)
-	    return false;
-	else {
-	    printf("%3u %6.4f %5.3f %5.3f %8.6f %8.6f %8.6f %2u %3u\n",
-		   r->idx, r->rs, r->md, r->rx, r->sp_exp, r->ns_exp, r->co, r->fp, r->fn);
-	    return true;
-	}
-    }
-}
-
-
 static rc_t bogotune(void)
 {
     bool skip;
@@ -1549,7 +1469,6 @@ static rc_t bogotune(void)
 	result_t *results, *r, *sorted;
 
 	printf("Performing %s scan:\n", scan==0 ? "coarse" : "fine");
-	get_scan_pos(in_fp);
 
 	switch (scan) {
 	case 0:		/* COARSE */
@@ -1617,9 +1536,6 @@ static rc_t bogotune(void)
 		    r->mdi = mdi; r->md = min_dev;
 		    r->spi = spi; r->sp_exp = spex;
 		    r->nsi = nsi; r->ns_exp = nsex;
-
-		    if (get_count(in_fp, cnt, r))
-			continue;
 
 		    if (verbose >= SUMMARY) {
 			if (verbose >= SUMMARY+1)
