@@ -24,8 +24,8 @@
       <arg choice="plain"><replaceable>file.db</replaceable></arg>
     </cmdsynopsis>
 
+    <para>where <option>option</option> is</para>
     <cmdsynopsis>
-    where <option>option</option> is
       <group choice="req">
         <arg choice="plain">-v</arg>
 	<arg choice="plain">-n</arg>
