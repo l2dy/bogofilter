@@ -66,6 +66,7 @@
 	    <arg choice="opt">-y <replaceable>date</replaceable></arg>
 	    <arg choice="opt">-I <replaceable>file</replaceable></arg>
 	    <arg choice="opt">-x <replaceable>flags</replaceable></arg>
+	    <arg choice="opt">--config-file <replaceable>file</replaceable></arg>
 	</cmdsynopsis>
 
     </refsynopsisdiv>
@@ -146,6 +147,10 @@
 	</para>
 	<para>The <option>-C</option> inhibits reading configuration
 	    files and lets bogoutil go with the defaults.</para>
+	<para>The <option>--config-file
+		<replaceable>file</replaceable></option> option tells
+	    bogoutil to read <replaceable>file</replaceable> instead of
+	the standard configuration file.</para>
 	<para>The <option>-D</option> redirects debug output to stdout (it
 	    usually goes to stderr).</para>
 	<para>The <option>-x <replaceable>flags</replaceable></option>
