@@ -29,7 +29,11 @@
 #include "xmalloc.h"
 
 bool memdebug=true;	/* false */
-int  memtrace=0; 	// M_MALLOC+M_FREE  ;	/* M_MALLOC+M_FREE */
+int  memtrace=  0	/* M_MALLOC+M_FREE */ ;
+
+#ifndef HAVE_ULONG
+typedef unsigned long ulong;
+#endif
 
 uint32_t cnt_malloc = 0;
 uint32_t cnt_free   = 0;
@@ -136,6 +140,7 @@ void
 *md_calloc(size_t nmemb, size_t size)
 {
     void *x;
+    mh_t *mh;
 
     size = size * nmemb;
     nmemb = 1;
@@ -153,7 +158,7 @@ void
 
     x = calloc(nmemb, size);
 
-    mh_t *mh = (mh_t *) x;
+    mh = (mh_t *) x;
     mh->size = size - sizeof(mh_t);
     mh->indx = cnt_malloc;
 
