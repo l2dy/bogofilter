@@ -98,7 +98,10 @@ typedef enum bulk_e {
     B_STDIN
 } bulk_t;
 
-typedef enum wl_e { W_SEPARATE=1,
+#define	W_DEFAULT   W_COMBINED
+
+typedef enum wl_e { W_UNKNOWN=0,
+		    W_SEPARATE=1,
 		    W_COMBINED=2 } wl_t;
 
 #include "globals.h"

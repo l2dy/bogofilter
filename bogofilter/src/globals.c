@@ -36,7 +36,7 @@ int	Rtable = 0;			/* '-R' */
 bool	terse;				/* '-t' */
 int	test = 0;			/* '-T' */
 int	verbose;			/* '-v' */
-wl_t	wordlists = W_SEPARATE;		/* '-W' */
+wl_t	wordlists = W_UNKNOWN;		/* '-W' */
 
 /* config file options */
 int	max_repeats;
