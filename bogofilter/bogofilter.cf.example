@@ -129,8 +129,8 @@
 #
 #ifdef	ENABLE_DEPRECATED_CODE
 #	    a - algorithm, e.g. "graham", "robinson", "fisher"
-#
 #endif
+#
 #	    c - classification, e.g. Yes/No, Spam/Ham/Unsure, +/-/?
 #
 #	    D - date, fixed ISO-8601 format for Universal Time ("GMT")
@@ -182,12 +182,14 @@
 
 ########### Tokenizer Settings ######################################
 
+#ifdef	ENABLE_DEPRECATED_CODE
 ##### STRICT_CHECK
 #
 #	if enabled, html comments are delimited by "<!--" and "-->".
 #	if disabled, html comments are delimited by "<!" and ">".
 
 #strict_check=no
+#endif
 
 
 #### BLOCK ON SUBNETS
@@ -214,12 +216,14 @@
 #replace_nonascii_characters=N
 
 
+#ifdef	ENABLE_DEPRECATED_CODE
 ##### HEADER_LINE_MARKUP
 #
 #	if enabled, prefix tokens in header lines, i.e.
 #	use "to:", "from:", "rtrn:", "subj:", "recv:", or "head:"
 
 #header_line_markup=yes
+#endif
 
 
 #ifdef	ENABLE_DEPRECATED_CODE
