@@ -117,10 +117,8 @@ sort -u < ${TMPDIR}/$NAME.tmp > ${TMPDIR}/$NAME.out
 # test scoring each file twice (using linend), when files are without "From " lines
 
 NAME="bulk-double-2"
-for f in $pattern ; do 
-    t="${TMPDIR}/`basename $f`"
-    grep -v "^From "< $f > $t
-    map_rc $BOGOFILTER -B $t $t | \
+for f in $pattern ; do
+    map_rc $BOGOFILTER -B $f $f | \
 	sed s@.*/@./inputs/@ >> ${TMPDIR}/$NAME.tmp
 done
 sort -u < ${TMPDIR}/$NAME.tmp > ${TMPDIR}/$NAME.out
