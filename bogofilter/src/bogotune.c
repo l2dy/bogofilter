@@ -47,6 +47,7 @@ AUTHORS:
 #include <errno.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include "bogotune.h"
 
@@ -872,7 +873,7 @@ static void print_version(void)
 static void help(void)
 {
     (void)fprintf(stderr,
-		  "Usage:  %s [options] { -c config } { -d directory } -n non-spam-files -s spam-files\n",
+		  "Usage:  %s [options] { -c config } { -d directory } -n non-spam-file -s spam-file\n",
 		  progname);
     (void)fprintf(stderr,
 		  "\t  -h      - print this help message.\n"
@@ -907,72 +908,74 @@ static int process_arglist(int argc, char **argv)
     _wildcard (&argc, &argv);	/* expand wildcards (*.*) */
 #endif
 
-    while (--argc > 0) {
-	char *arg = *++argv;
-	count += 1;
-	if (*arg == '-') {
-	    while (*++arg) {
-		switch (*arg) {
-		case 'c':
-		    argc -= 1;
-		    read_config_file(*++argv, false, !quiet, PR_CFG_USER);
-		case 'C':
-		    suppress_config_file = true;
-		    break;
-		case 'd':
-		    argc -= 1;
-		    ds_file = *++argv;
-		    ds_flag = (ds_flag == DS_NONE) ? DS_DSK : DS_ERR;
-		    break;
-		case 'D':
-		    ds_flag = (ds_flag == DS_NONE) ? DS_RAM : DS_ERR;
-		    break;
-		case 'E':
-		    esf_flag ^= true;
-		    break;
-		case 'I':
-		    argc -= 1;
-		    bogolex_file = *++argv;
-		    break;
-		case 'M':
-		    bogolex = true;
-		    break;
-		case 'n':
-		    run_type = REG_GOOD;
-		    break;
-		case 'q':
-		    quiet = true;
-		    break;
-		case 'r':
-		    argc -= 1;
-		    user_robx = atof(*++argv);
-		    break;
-		case 's':
-		    run_type = REG_SPAM;
-		    break;
-		case 'v':
-		    verbose += 1;
-		    break;
+#define	OPTIONS	":c:Cd:DEI:Mnqr:stT:vVX:"
+
+    while (1)
+    {
+	int option;
+	
+	option = getopt(argc, argv, OPTIONS);
+
+	if (option == -1)
+ 	    break;
+
+	switch (option) {
+	case 'c':
+	    read_config_file(optarg, false, !quiet, PR_CFG_USER);
+	case 'C':
+	    suppress_config_file = true;
+	    break;
+	case 'd':
+	    ds_file = optarg;
+	    ds_flag = (ds_flag == DS_NONE) ? DS_DSK : DS_ERR;
+	    break;
+	case 'D':
+	    ds_flag = (ds_flag == DS_NONE) ? DS_RAM : DS_ERR;
+	    break;
+	case 'E':
+	    esf_flag ^= true;
+	    break;
+	case 'I':
+	    bogolex_file = optarg;
+	    break;
+	case 'M':
+	    bogolex = true;
+	    break;
+	case 'n':
+	    run_type = REG_GOOD;
+	    filelist_add( ham_files, optarg );
+	    break;
+	case 'q':
+	    quiet = true;
+	    break;
+	case 'r':
+	    user_robx = atof(optarg);
+	    break;
+	case 's':
+	    run_type = REG_SPAM;
+	    filelist_add( spam_files, optarg );
+	    break;
 #ifdef	TEST
-		case 't':
-		    test += 1;
-		    break;
+	case 't':
+	    test += 1;
+	    break;
 #endif
-		case 'T':
-		    argc -= 1;
-		    coerced_target = atoi(*++argv);
-		    break;
-		case 'V':
-		    print_version();
-		    exit(EX_OK);
-		default:
-		    help();
-		    exit(EX_ERROR);
-		}
-	    }
+	case 'T':
+	    coerced_target = atoi(optarg);
+	    break;
+	case 'v':
+	    verbose += 1;
+	    break;
+	case 'V':
+	    print_version();
+	    exit(EX_OK);
+	case 'x':
+	    set_debug_mask( optarg );
+	    break;
+	default:
+	    help();
+	    exit(EX_ERROR);
 	}
-	else
-	    filelist_add( (run_type == REG_GOOD) ? ham_files : spam_files, arg);
     }
 
     if (ds_flag == DS_NONE)	/* default is "wordlist on disk" */
