@@ -294,7 +294,7 @@ sub progress {
 
 sub col5 { $$a[5] <=> $$b[5]; }
 
-my(@mdval,@rxval,@parms);
+my(@mdval,@rsval,@rxval,@parms);
 
 sub gfn {
     my ($si, $mi, $xi) = @_; my $pi;
@@ -352,7 +352,7 @@ foreach my $scantype ("coarse", "fine") {
 	    foreach $rxi (0 .. $#rxval) {
 		my $mpar = "$mdval[$mdi],$rsval[$rsi],$rxval[$rxi]";
 		### first get cutoff
-		$cmd = "cat $nslist | $prog, -m $mpar, -o 0.01 > $workfn";
+		$cmd = "cat $nslist | $prog -m $mpar -o 0.01 > $workfn";
 		$err = system($cmd) >> 8;
 		if($err > 2) {
 		    print("Warning re processing nonspam messages: ",
