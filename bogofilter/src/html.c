@@ -20,11 +20,11 @@ AUTHOR:
 
 /* Macro Definitions */
 
-#define	COMMENT_START	"<!--"
-#define	COMMENT_START_LEN 4		/* strlen(COMMENT_START) */
+#define	COMMENT_START	"<!"
+#define	COMMENT_START_LEN 2		/* strlen(COMMENT_START) */
 
-#define	COMMENT_END	"-->"
-#define	COMMENT_END_LEN 3		/* strlen(COMMENT_END) */
+#define	COMMENT_END	">"
+#define	COMMENT_END_LEN 1		/* strlen(COMMENT_END) */
 
 /* Function Declarations */
 
