@@ -21,6 +21,7 @@ by sites that process a lot of mail.
 
 %prep
 %setup
+BUILD_ROOT=~/tmp
 CFLAGS="$RPM_OPT_FLAGS" \
 ./configure \
   --prefix=%{_prefix} \
