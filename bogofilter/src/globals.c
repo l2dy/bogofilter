@@ -47,10 +47,10 @@ const char	*stats_prefix;
 bool	header_line_markup = true;	/* -H */
 
 /* for  transactions */
-#ifndef	DISABLE_TRANSACTIONS
-bool fTransaction = true;
-#else
+#ifndef	ENABLE_TRANSACTIONS
 bool fTransaction = false;
+#else
+bool fTransaction = true;
 #endif
 
 /* for  bogotune */
