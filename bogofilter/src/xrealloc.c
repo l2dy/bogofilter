@@ -12,6 +12,7 @@
 #include <stdlib.h>
 
 #include "config.h"
+
 #include "xmalloc.h"
 
 #ifdef	ENABLE_MEMDEBUG
@@ -21,8 +22,12 @@
 void
 *xrealloc(void *ptr, size_t size){
    void *x;
-   x = realloc(ptr, size);
+   if (size != 0)
+       x = realloc(ptr, size);
+   else {
+       xfree(ptr);
+       x = xcalloc(1, size);
+   }
    if (x == NULL) xmem_error("xrealloc");
    return x;
 }
-
