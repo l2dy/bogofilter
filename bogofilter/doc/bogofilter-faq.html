@@ -60,6 +60,7 @@
         <ul>
           <li><a href="#what-is-bogofilter">What is bogofilter?</a></li>
           <li><a href="#bogo-what">Bogo what?</a></li>
+          <li><a href="#bogo-how">How does bogofilter work?</a></li>
           <li><a href="#lists">Bogofilter Mailing Lists</a></li>
         </ul>
       </li>
@@ -154,6 +155,63 @@
 
     <hr>
 
+    <h2 id="bogo-how">How does bogofilter work?</h2>
+
+    <p>See the man page's <a
+    href="http://bogofilter.sourceforge.net/man_page.php#theory">
+    THEORY OF OPERATION</a> section for an introduction. The main
+    source for understanding this is Gary Robinson's Linux Journal
+    article <a
+    href="http://www.linuxjournal.com/article.php?sid=6467"> "A
+    Statistical Approach to the Spam Problem"</a>.</p>
+
+    <p>After you read all this you might ask some questions. The first
+    could be "Is bogofilter really a Bayesian spam filter?"
+    Bogofilter is based on Bayes' theorem and uses it in the initial
+    calculations and other statistical methods later.  Without doubt it
+    is a statistical spam filter with a Bayesian flavor.</p>
+
+    <p>Other questions you might have might concern the basic
+    assumptions of Bayes' theory. Two short answers are: "No, they are
+    not satisfied" and "We don't care as long as it works". A longer
+    answer will mention that the basic assumption that "an e-mail is a
+    random collection of words, each independent of the others" isn't
+    violated.  There are other ways that practice doesn't follow
+    theory.  Some are always present, and some which will depend on
+    the way you use Bogofilter:</p>
+
+    <ul>
+    <li>Words in an e-mail are by no means independent.  In all languages, 
+    the opposite is true.</li>
+    <li>The words used are not random, though some spammers include random
+    words.</li>
+    <li>Simply choosing messages to use for training violates the
+    assumption that the messages used for training are a random sample
+    of the messages received.  Full training or using a random sample,
+    follows Bayes' principles.  This applies to <a
+    href="#train-on-error">training on error</a> or using Bogofilter's
+    auto-update function with the thresh_update parameter or anything
+    similar to those approaches.</li>
+    <li>The same applies if you train with the same message more than once.</li>
+    <li>Other problems arise if you modify your database by removing tokens
+    (like using bogoutil with -a or -c).</li>
+    <li>Undoubtedly there are more.</li>
+    </ul>
+
+    <p>As the man page explains, bogofilter tries to understand how
+    badly the null hypothesis fails. Some people argue that "those
+    departures from reality usually work in our favor" (from Gary's
+    article). Some argue that, even then, we should not violate too
+    much. Nobody really <em>knows</em>. Just keep in mind that
+    problems might occur if you push too hard. The key to bogofilter's
+    approach is: What matters most is simply what works in the real
+    world.</p>
+
+    <p>Now that you have been warned, have fun and use bogofilter as
+    suits you best.</p>
+
+    <hr>
+
     <h2 id="lists">Mailing Lists</h2>
 
     <p>There are currently four mailing lists for bogofilter:</p>
@@ -212,38 +270,28 @@
     <p>This method can be enhanced by using a "security margin".  By
     increasing the spam cutoff value and decreasing the ham cutoff
     value, messages which are close to a cutoff will be used for
-    training.  Using security margins improves results when
-    training on error.  In general, greater margins help more (up to
-    some limit).  As a rule of thumb spam cutoff +/- 0.3 gives good
-    results; for tristate mode, you might try the middle of the unsure
+    training.  Using security margins improves results when training
+    on error.  In general, greater margins help more (although too
+    much is bad).  As a rule of thumb spam cutoff +/- 0.3 gives good
+    results; for tristate mode. You might try the middle of the unsure
     interval +/- 0.3 for training.</p>
 
-    <p>Repeating training on error on the same message corpus
-    also improves accuracy.  The idea is that messages which were
-    rated correctly in the first place might after some more training
-    be rated wrongly which will then be corrected.</p>
+    <p>Repeating training on error on the same message corpus can
+    improve accuracy.  The idea is that messages which were rated
+    correctly in the first place might after some more training be
+    rated wrongly which will then be corrected.  As explained above,
+    this changes the distribution of token scores and violates a basic
+    assumption of Bayesian classification. Though theoretically wrong,
+    in practice repeated training seems to work.</p>
 
     <p>"Training to exhaustion" is repeating training on error, with
     the same message corpus, until no errors remain.  Also this method
-    can be improved with security margins.</p>
-
-    <p>A basic assumption of Bayes' theory is that the messages used
-    for training are a randomly chosen sample of the messages received.
-    This is violated when choosing messages by analyzing them first.
-    Though theoretically wrong, in practice "training on error" seems
-    to work.</p>
-
-    <p>Registering messages different numbers of times (as can happen
-    with repeated training) changes the distribution of token scores
-    in the training database so that it's different from the
-    distribution in the input messages.  This violates a basic
-    assumption of Bayesian classification, and may lead to
-    unpredictable results.  Though theoretically wrong, in practice
-    repeated training seems to work.</p>
+    can be improved with security margins. See
+    <a href="http://www.garyrobinson.net/2004/02/spam_filtering_.html">Gary Robinson's Rants</a>
+    on this topic for more details.</p>
 
     <p>Note: <code>bogominitrain.pl</code> has a <code>-f</code> option
-    to do "training to exhaustion".  If you choose to use it, you need
-    to be aware of its possible effects. Using <code>-fn</code> avoids
+    to do "training to exhaustion".  Using <code>-fn</code> avoids
     repeated training for each message.</p>
 
     <hr>
