@@ -4,6 +4,10 @@
 
 $Id$
 
+	* Fix bug in "boundary" parser, it ignored boundaries with spaces
+	  (these are permitted and generated for example by
+	  "Microsoft Internet E-Mail/MAPI - 8.0.0.4211").
+
 0.13.7.2 2003-07-02
 
 	* Fixed loop in yyinput() caused by unexpected EOF.
