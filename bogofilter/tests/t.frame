@@ -1,8 +1,14 @@
 # testing framework for /bin/sh
 
 set -e
-TMPDIR=`mktemp -d ./checks.$$.XXXXXX`
-trap "rm -r ${TMPDIR}" 0
+
+while : ; do
+  TMPDIR=./checks.$$.`date +"%Y%m%dT%H%M%S"`
+  mkdir $TMPDIR && break
+  sleep 1
+done
+
+trap "rm -rf ${TMPDIR}" 0
 BOGOFILTER_DIR=$TMPDIR
 export BOGOFILTER_DIR
 ../bogofilter -n </dev/null
