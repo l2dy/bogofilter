@@ -13,7 +13,6 @@ AUTHOR:
 #include "common.h"
 
 #include <stdarg.h>
-#include <unistd.h>
 #include <ctype.h>
 
 #include "error.h"

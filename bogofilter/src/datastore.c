@@ -16,8 +16,6 @@ David Relson <relson@osagesoftware.com>  2003
 
 #include <string.h>
 #include <stdlib.h>
-#include <time.h>
-#include <unistd.h>
 #include <errno.h>
 #include <limits.h>
 

@@ -18,8 +18,6 @@ AUTHOR:
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <time.h>
-#include <unistd.h>
 
 #include "bogofilter.h"
 #include "bool.h"

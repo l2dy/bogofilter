@@ -14,10 +14,8 @@ AUTHORS: (C) Copyright 2003 by
 #include "common.h"
 
 #include <ctype.h>
-#include <dirent.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include "bogoreader.h"
 #include "error.h"

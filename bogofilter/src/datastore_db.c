@@ -16,8 +16,6 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include <db.h>
 #include <string.h>
 #include <stdlib.h>
-#include <time.h>
-#include <unistd.h>
 #include <errno.h>
 
 #if NEEDTRIO

@@ -15,7 +15,6 @@ Gyepi Sam <gyepi@praxis-sw.com>   2003
 #include <tdb.h>
 #include <stdlib.h>
 
-#include <unistd.h>
 #include <errno.h>
 
 #include "datastore.h"

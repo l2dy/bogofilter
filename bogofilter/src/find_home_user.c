@@ -17,7 +17,7 @@
 
 #include <stdlib.h>
 
-#include <unistd.h>
+#include "system.h"
 #include <pwd.h>
 #include <sys/types.h>
 
