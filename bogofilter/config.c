@@ -321,6 +321,7 @@ static void help(void)
     (void)printf( "\t-c filename\t- read config file 'filename'.\n" );
     (void)printf( "\t-C\t- don't read standard config files.\n" );
     (void)printf( "\t-q\t- quiet - don't print warning messages.\n" );
+    (void)printf( "\t-f\t- force printing of spamicity numbers.\n" );
     (void)printf( "\n" );
     (void)printf( "bogofilter is a tool for classifying email as spam or non-spam.\n" );
     (void)printf( "\n" );

@@ -345,12 +345,12 @@ void print_bogostats(FILE *fp, double spamicity)
     {
 	int idx = (thresh_index >= 0) ? thresh_index : KEEPERS+thresh_index;
 	discrim_t *pp = &bogostats.extrema[idx];
-	if (pp->prob >= thresh_stats)
+	if (force || pp->prob >= thresh_stats)
 	    (void)compute_spamicity(&bogostats, fp);
 	break;
     }
     case AL_ROBINSON:
-	if (spamicity > thresh_stats || spamicity > thresh_rtable)
+	if (force || spamicity > thresh_stats || spamicity > thresh_rtable)
 	    rstats_print();
 	break;
     default:
