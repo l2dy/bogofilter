@@ -79,9 +79,9 @@ A Plan For Spam</ulink> is recommended reading.</para>
 
 <para>This program substantially improves on Paul's proposal by doing smarter
 lexical analysis.  In particular, hostames and IP addresses are retained
-as recognition features rather than broken up. Various kinds of MTA 
+as recognition features rather than broken up.  Various kinds of MTA 
 cruft such as dates and message-IDs are discarded so as not to bloat
-the word lists. Lex's Swiss-army-knife nature rises again.</para>
+the word lists.  Lex's Swiss-army-knife nature rises again.</para>
 
 <para>Another seeming improvement is that this program offers Gary
 Robinson's suggested modifications (S and f(w) but not g(w)) to the
@@ -123,13 +123,13 @@ on standard input as non-spam.</para>
 
 <para>The <option>-S</option> option tells
 <application>bogofilter</application> to undo a prior registration of the
-same message as spam.   If a message was incorrectly entered in the spam 
+same message as spam.  If a message was incorrectly entered in the spam 
 wordfile by '-n' or '-u' and you want to remove it from the spam wordfile
 and enter it in the non-spam wordfile, use options '-Sn'.</para>
 
 <para>The <option>-N</option> option tells
 <application>bogofilter</application> to undo a prior registration of the
-same message as non-spam.   If a message was incorrectly entered in the non-spam 
+same message as non-spam.  If a message was incorrectly entered in the non-spam 
 wordfile by '-n' or '-u' and you want to remove it from the non-spam wordfile and
 enter it in the spam wordfile, then use '-Ns'.</para>
 
@@ -152,20 +152,20 @@ ham_cutoff is non-zereo.</para>
 
 <para>The <option>-d</option><replaceable> dir</replaceable> option
     allows you to set the directory under which wordlists will be found
-    to <replaceable>dir</replaceable>. If omitted, the default directory
+    to <replaceable>dir</replaceable>.  If omitted, the default directory
     will be <filename>$BOGOFILTER_DIR</filename> if
     <envar>BOGOFILTER_DIR</envar> is set and
     <filename>$HOME/.bogofilter</filename> otherwise.</para>
 
 <para>The <option>-l</option> option writes an informational line
     to the system log each time <application>bogofilter</application>
-    is run. The information logged depends on how
+    is run.  The information logged depends on how
     <application>bogofilter</application> is run.</para>
 
 <para>The <option>-L <replaceable>tag</replaceable></option> option
     configures a tag which can be included in the information being
     logged by the <option>-l</option> option, but it requires a custom
-    format that includes the %l string for now. This option implies
+    format that includes the %l string for now.  This option implies
     <option>-l</option>.</para>
 
 <para>The <option>-m <replaceable>value</replaceable></option> option allows setting min_dev.
@@ -175,8 +175,8 @@ ham_cutoff is non-zereo.</para>
 	<replaceable><optional>value</optional><optional>,value</optional></replaceable></option>
       option allows setting the spam_cutoff value and, optionally, the
       ham_cutoff value.  If one value is supplied, then spam_cutoff is
-      set. If a comma followed by one value is supplied, then ham_cutoff
-      is set. With two values, both spam_cutoff and ham_cutoff are set. Note the
+      set.  If a comma followed by one value is supplied, then ham_cutoff
+      is set.  With two values, both spam_cutoff and ham_cutoff are set.  Note the
       syntax is misleading, at least one of the values MUST be present,
       and the comma determines whether it is to set the spam or the ham
       cutoff.
@@ -186,23 +186,23 @@ ham_cutoff is non-zereo.</para>
 the input mail to the output with an X-Bogosity header (in the
 style of SpamAssassin) inserted.  The header will begin with "Yes" or
 "No" according as the mail is judged to be spam or non-spam
-respectively. Note: the memory consumption depends on whether the input
-file is regular and allows seek operations. Within these constraints,
+respectively.  Note: the memory consumption depends on whether the input
+file is regular and allows seek operations.  Within these constraints,
 the file will be rewound and read a second time, without using much
-memory. If the input file however is not regular (for example, a
+memory.  If the input file however is not regular (for example, a
 pipeline or socket), then bogofilter will cache a copy if the entire
 mail in memory.</para>
 
 <para>The <option>-e</option> (embed) option is only effective when
-    <option>-p</option> is also active. If both options are used, then
-    bogofilter will exit with code 0 even if the mail is not spam. This
+    <option>-p</option> is also active.  If both options are used, then
+    bogofilter will exit with code 0 even if the mail is not spam.  This
     simplifies using bogofilter from procmail or maildrop.</para>
 
 <para>The <option>-u</option> (update) option tells
 <application>bogofilter</application> to update the appropriate
 wordfile automatically.  If the text presented on standard input is
 spam, the spam wordfile will be updated.  If the text is not spam, the
-good wordfile will be updated. Effectively this option runs
+good wordfile will be updated.  Effectively this option runs
 <application>bogofilter</application> with the <option>-s</option> or
 <option>-n</option> flag, as appropriate.  (Caution is urged in the use
 of this capability, as any classification errors
@@ -212,7 +212,7 @@ accumulated until corrected with the <option>-Sn</option> and
   
 <para>The <option>-v</option> option produces a report to standard 
 output on <application>bogofilter</application>'s analysis af the
-input. Each additional <option>v</option> will increase the verbosity of
+input.  Each additional <option>v</option> will increase the verbosity of
 the output, up to a maximum of 4.  With <option>-vv</option>, the report
 lists the tokens with highest deviation from a mean of 0.5 association
 with spam.</para>
@@ -282,7 +282,7 @@ passthrough mode.  Note that this only works when -p is explicitly given.</para>
 	Bogofilter will initialize its data base directory to 
 	<filename>$BOGOFILTER_DIR</filename> if <envar>BOGOFILTER_DIR</envar> is set.
 	If it is not set, bogofilter
-	will use <filename>$HOME/.bogofilter</filename> instead. If neither
+	will use <filename>$HOME/.bogofilter</filename> instead.  If neither
 	 <envar>BOGOFILTER_DIR</envar> nor <envar>HOME</envar> is set, the <option>-d
 	    <replaceable>dir</replaceable></option> option must be present.
 </para></refsect1>
@@ -390,7 +390,7 @@ macro index \ed "&lt;enter-command&gt;unset wait_key\n\
 <procedure>
 <step>
  <para><application>bogofilter</application> can also be integrated into an MTA 
-  to filter all incoming mail. While the specific implementation is MTA dependent, the
+  to filter all incoming mail.  While the specific implementation is MTA dependent, the
   general steps are as follows</para>
 </step>
 
@@ -422,7 +422,7 @@ calculations</para>
 
 <para>The -R option tells <application>bogofilter</application> to
 generate an R data frame.  The data frame contains one row per token
-analysed. Each such row contains the token, the sum of its database
+analysed.  Each such row contains the token, the sum of its database
 "good" and "spam" counts, the "good" count divided by the number of
 non-spam messages used to create the training database, the "spam"
 count divided by the spam message count, Robinson's f(w) for the token,
@@ -501,15 +501,15 @@ without From_ line is counted correctly.  Multiple messages without
 intervening From_ lines will be counted as one message.</para>
 
 <para>Bogofilter does not canonicalize the transport encoding or
-    character set, sacrificing precision. We used to believe that spam
+    character set, sacrificing precision.  We used to believe that spam
     with enclosures invariably gives itself away through cues in the
-    headers and non-enclosure parts, but this is not true. This will be
+    headers and non-enclosure parts, but this is not true.  This will be
     fixed in a future version.</para>
 </refsect1>
 
 <refsect1 id='author'><title>AUTHOR</title>
     <para>Eric S. Raymond <email>esr@thyrsus.com</email>.</para>
     <para>For updates, see <ulink url="http://bogofilter.sourceforge.net/">
-the bogofilter project page</ulink>. </para>
+the bogofilter project page</ulink>.</para>
 </refsect1>
 </refentry>
