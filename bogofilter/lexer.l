@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.3  2002/10/02 19:04:55  relson
+ * Don't allow carriage returns, '\r', in tokens.
+ *
  * Revision 1.2  2002/09/26 23:40:20  relson
  * Added directive so that loginfo is included in file.
  *
@@ -311,7 +314,7 @@ filename=\"					;
 {MIME_BOUNDARY}					;
 
 {IPADDR}					{return(TOKEN);}
-[^[:blank:]\n[:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,\n[]+[^[:blank:][:punct:]\n]	{return(TOKEN);}
+[^[:blank:]\n[:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,\n[]+[^[:blank:][:punct:]\n\r]	{return(TOKEN);}
 
 .						;
 \n						;
