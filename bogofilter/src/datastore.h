@@ -239,6 +239,6 @@ extern int ds_lock(int fd, int cmd, short int type);
 extern const char *ds_version_str(void);
 
 /** Runs forced recovery on data base */
-extern int ds_recover(const char *directory, int catastrophic);
+extern int ds_recover(const char *directory, bool catastrophic);
 
 #endif

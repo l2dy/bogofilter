@@ -1110,8 +1110,8 @@ void *dbe_init(const char *directory) {
 
     /* run recovery if needed */
     if (needs_recovery())
-	dbe_recover(directory, 0, 0); /* DO NOT set force flag here, may cause
-					 multiple recovery! */
+	dbe_recover(directory, false, false); /* DO NOT set force flag here, may cause
+						 multiple recovery! */
 
     /* set (or demote to) shared/read lock for regular operation */
     db_try_glock(directory, F_RDLCK, F_SETLKW);
@@ -1138,7 +1138,7 @@ void *dbe_init(const char *directory) {
     return dbe_xinit(directory, db_max_locks, db_max_objects, flags);
 }
 
-int dbe_recover(const char *directory, int catastrophic, int force) {
+int dbe_recover(const char *directory, bool catastrophic, bool force) {
     dbe_t *env;
 
     /* set exclusive/write lock for recovery */

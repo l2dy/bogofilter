@@ -772,9 +772,9 @@ int main(int argc, char *argv[])
     set_bogohome(ds_file);
 
     if (flag == M_RECOVER) {
-	return ds_recover(ds_file, 0);
+	return ds_recover(ds_file, false);
     } else if (flag == M_CRECOVER) {
-	return ds_recover(ds_file, 1);
+	return ds_recover(ds_file, true);
     }
 
     switch(flag) {
