@@ -25,12 +25,6 @@ OUT="${TMPDIR}/MH.out"
 OUTPUTS=${SYSTEST}/outputs
 CORRECT="${OUTPUTS}/MH.out"
 
-verbose=0
-if [ "$1" = "-v" ]; then
-    verbose=1
-    v="-v"
-fi
-
 ( formail </dev/null >/dev/null 2>/dev/null ) || exit 77
 
 for f in good spam ; do

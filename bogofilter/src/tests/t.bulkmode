@@ -15,11 +15,6 @@ set -e
 
 NODB=1 . ${srcdir=.}/t.frame
 
-verbose=0
-if [ "$1" = "-v" ]; then
-    verbose=1
-fi
-
 map_rc()
 {
     (
@@ -36,7 +31,7 @@ map_rc()
 mth="f"
 
 CFG="-c ${TMPDIR}/cfg.$mth -y 0"
-export BOGOFILTER_DIR
+
 if [   -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
 mkdir -p $BOGOFILTER_DIR
 $BOGOFILTER -$mth $CFG -s < ${SYSTEST}/inputs/spam.mbx

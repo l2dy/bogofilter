@@ -6,15 +6,7 @@ set -e
 #	 When run from the command line, outputs files are left in directory
 #	 bogodir.YYYYMMDD.  This is useful when something is different.
 
-: ${srcdir=.}
-relpath="`pwd`/.."
-
 NODB=1 . ${srcdir=.}/t.frame
-
-verbose=0
-if [ "$1" = "-v" ]; then
-    verbose=1
-fi
 
 HOME="${TMPDIR}/home"
 mkdir $HOME
@@ -73,8 +65,6 @@ expect="${TMPDIR}/command.d"
 map_rc $BOGOFILTER $OPTS -c ${TMPDIR}/bogodir.cf -d ${TMPDIR}/command.d < /dev/null
 
 # $HOME and $BOGOFILTER_DIR should display $TMPDIR
-
-export BOGOFILTER_DIR
 
 expect="$BOGOFILTER_DIR"
 map_rc $BOGOFILTER $OPTS -C < /dev/null

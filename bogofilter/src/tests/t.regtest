@@ -16,17 +16,9 @@ set -e
 #	 regtest.YYYYMMDD:
 #		output files contain wordlist contents
 
-: ${srcdir=.}
 relpath="`pwd`/.."
 
 NODB=1 . ${srcdir=.}/t.frame
-
-verbose=0
-if [ "$1" = "-v" ]; then
-    verbose=1
-fi
-
-export BOGOFILTER_DIR
 
 INPUT="${srcdir}/inputs"
 

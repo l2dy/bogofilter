@@ -12,8 +12,6 @@ set -e
 #	 maildir.YYYYMMDD:
 #		tests   - directory containing individual output files
 
-NODB=1 . ${srcdir=.}/t.frame
-
 if [ "$1" = "save" ]; then
     if [ ! -d $2/$3 ] ; then
 	mkdir $2/$3
@@ -25,14 +23,13 @@ if [ "$1" = "save" ]; then
     exit
 fi
 
+NODB=1 . ${srcdir=.}/t.frame
+
 OUT="${TMPDIR}/maildir.out"
 
-OUTPUTS=${SYSTEST}/outputs
-CORRECT="${OUTPUTS}/maildir.out"
+CORRECT="${SYSTEST}/outputs/maildir.out"
 
-verbose=0
-if [ "$1" = "-v" ]; then
-    verbose=1
+if  [ $verbose -ne 0 ]; then
     v="-v"
 fi
 

@@ -16,17 +16,6 @@ NODB=1 . ${srcdir:=.}/t.frame
 
 OUT="lexer.mbx.out"
 
-verbose=0
-if [ "$1" = "-v" ]; then
-    verbose=1
-    v="-v"
-fi
-
-if [ "$1" = "-vv" ]; then
-    verbose=1
-    v="-v -x l"
-fi
-
 for f in good spam ; do
     $BOGOLEXER -C -D -p $v < ${srcdir}/inputs/$f.mbx > $TMPDIR/$f.1
     sort < $TMPDIR/$f.1 | uniq > $TMPDIR/$f.2
