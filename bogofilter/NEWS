@@ -21,6 +21,11 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2004-11-12
+
+	* Add %u formatting option to print login or user ID information,
+	  SourceForge Feature Request #1056729.
+
 0.93.1	2004-11-11
 
 	* The README.db file now has information on the DB_CONFIG file that

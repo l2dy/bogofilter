@@ -133,6 +133,11 @@
 #	        w - word count
 #	        m - message count
 #
+#	    u - username - this will either be the login from getlogin(),
+#			   if that is empty, the pw_name obtained from
+#			   the password database, or the user id
+#			   prefixed by #, for instance, #1003
+#
 #	    v - version
 #
 #    customizable messages:

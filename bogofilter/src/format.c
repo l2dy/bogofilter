@@ -15,6 +15,8 @@ Most of the ideas in here are stolen from Mutt's snprintf implementation.
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pwd.h>
+#include <unistd.h>
 
 #ifdef NEEDTRIO
 #include "trio.h"
@@ -71,6 +73,8 @@ const char *unsure_subject_tag = NULL;			/* used in passthrough mode */
 **	    r - runtype
 **	        w - word count
 **	        m - message count
+**
+**	    u - user name, f. i. "login=%u"
 **
 **	    v - version, ex. "version=%v"
 */
@@ -250,6 +254,7 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
     char *beg = buff;
     char *end = beg + size;
     char temp[20];
+    char *tptr;
 
     int state = S_DEFAULT;
     int min = 0;
@@ -375,6 +380,21 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 	    case 'r':		/* r - run type (s, n, S, or N) - two parts (reg/unreg)*/
 		snprintf( temp, sizeof(temp), "%s%s", reg, unreg );
 		buff += format_string(buff, temp, 0, 0, 0, end);
+		break;
+	    case 'u':		/* u - user name */
+		{
+		    struct passwd *p;
+		    tptr = getlogin();
+		    if (!tptr) {
+			if ((p = getpwuid(getuid()))) {
+			    tptr = p->pw_name;
+			} else {
+			    snprintf(temp, sizeof(temp), "#%ld", (long)getuid());
+			    tptr = temp;
+			}
+		    }
+		    buff += format_string(buff, tptr, 0, prec, flags, end);
+		}
 		break;
 	    case 'w':		/* w - word count */
 		snprintf( temp, sizeof(temp), "%u", wrdcount );
