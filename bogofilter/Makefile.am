@@ -22,7 +22,7 @@ sysconf_DATA = bogofilter.cf.example
 EXTRA_DIST = autogen.sh \
 	     bogofilter.cf.example \
 	     CHANGES-0.10 \
-	     UPGRADE \
+	     METHODS UPGRADE \
 	     README.cvs \
 	     bogofilter.spec bogofilter.spec.in
 #
