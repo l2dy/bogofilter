@@ -179,9 +179,9 @@ sub help {
 
     -i	<input file>.
 
-	Text file containing message counts, and possibly data.	 If there is
-	no data in the text file, there should be a database file in the same
-	directory as the text file which contains the data.
+	Text file containing message count, and possibly wordlist data records.	If the file
+  only contains a message count but no word list records, there must be a database file,
+  in the same directory as the text file, which contains the word list data.
 
    -o	<output file>
 
