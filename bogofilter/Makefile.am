@@ -16,7 +16,7 @@ $(srcdir)/changelog.txt:
 EXTRA_DIST=	autogen.sh gsl config.rpath \
 		bogofilter.cf.example \
 		bogofilter.spec bogofilter.spec.in \
-		METHODS Doxyfile gnugetopt \
+		Doxyfile gnugetopt \
 		README.cvs \
 		RELEASE.NOTES \
 		CHANGES-0.9x RELEASE.NOTES-0.92
