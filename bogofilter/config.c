@@ -483,6 +483,10 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case '?':
+	    help();
+	    exit(2);
+	    break;
+
 	case 'h':
 	    help();
             exit(0);
@@ -564,9 +568,9 @@ int process_args(int argc, char **argv)
 	    break;
 
 	default:
-	    fprintf( stderr, "Unknown option '%c' (%02X)\n", option,
-		     (unsigned int)option);
-	    exit(2);
+	    fprintf(stderr, "Internal error: unhandled option '%c'
+		    (%02X)\n", option, (unsigned int)option);
+	    exit(2); 
 	}
     }
 
