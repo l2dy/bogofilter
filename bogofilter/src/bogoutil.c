@@ -364,7 +364,7 @@ static int words_from_list(const char *ds_file, int argc, char **argv)
 
 static int words_from_path(const char *dir, int argc, char **argv, bool show_probability)
 {
-    int  count = 0;
+    size_t count = 0;
 
     char filepath1[PATH_LEN];
     char filepath2[PATH_LEN];
@@ -435,10 +435,16 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 		: spamness / (spamness+goodness);
 	    rob_prob = ((ROBS * ROBX + spamness) / (ROBS + spamness+goodness));
 	}
+
 	printf(data_format, token->text, spam_count, good_count, gra_prob, rob_prob);
+
+	if (token != &buff->t)
+	    word_free(token);
     }
 
     ds_close(dsh, false);
+
+    buff_free(buff);
 
     return 0;
 }
@@ -761,6 +767,8 @@ static int process_args(int argc, char **argv)
 
 int main(int argc, char *argv[])
 {
+    int count;
+
     progtype = build_progtype(progname, DB_TYPE);
 
     set_today();			/* compute current date for token age */
@@ -770,7 +778,7 @@ int main(int argc, char *argv[])
     if (directory == NULL)
 	directory = get_directory(PR_ENV_HOME);
 
-    process_args(argc, argv);
+    count = process_args(argc, argv);
 
     /* Extra or missing parameters */
     if (flag != WORD && argc != optind) {
