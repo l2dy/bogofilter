@@ -12,15 +12,15 @@ my $commandlineoptions=($ARGV[0]=~/^-(?=[^f]*f?[^f]*$)(?=[^n]*n?[^n]*$)(?=[^s]*s
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.40
+bogominitrain.pl version 1.4.2
   requires bogofilter 0.14.5 or later
 
 Usage:
   bogominitrain.pl [-[f][v[v]][s]] <database-directory> <ham-mboxes>\\
     <spam-mboxes> [bogofilter-options]
 
-  database-directory is the directory containing your database files.
-  They will be created as needed.  ham-mboxes and spam-mboxes are the
+  database-directory is the directory containing your wordlist. It
+  will be created as needed.  ham-mboxes and spam-mboxes are the
   mboxes containing the mails; the will be shell-expanded.
   bogofilter-options are given to bogofilter literally.
 
@@ -42,7 +42,7 @@ Usage:
   the following as bogofilter-options: '-o 0.8,0.3'
 
 Example:
-  bogominitrain.pl -fv .bogofilter 'ham*' 'spam*' '-c train.cf'
+  bogominitrain.pl -fnv .bogofilter 'ham*' 'spam*' '-c train.cf'
 
 Options:
   -v   This switch produces info on messages used for training.
@@ -73,23 +73,24 @@ shift (@ARGV) if ($commandlineoptions);
 my ($dir,$ham,$spam,$options) = @ARGV;
 $bogofilter.=" $options -d $dir";
 die ("$dir is not a directory or not accessible.\n") unless (-d $dir && -r $dir && -w $dir && -x $dir);
-qx($bogofilter -n < /dev/null) unless (-s "$dir/goodlist.db" || -s "$dir/wordlist.db");
-my $ham_total=qx(cat $ham|grep -c "^From ");
-my $spam_total=qx(cat $spam|grep -c "^From ");
+`$bogofilter -n < /dev/null` unless (-s "$dir/goodlist.db" || -s "$dir/wordlist.db");
+my $ham_total=`cat $ham|grep -c "^From "`;
+my $spam_total=`cat $spam|grep -c "^From "`;
 my ($fp,$fn,$hamadd,$spamadd,%trainedham,%trainedspam);
 my $runs=0;
 my @status=("S","H","U","E");
 
 print "\nStarting with this database:\n";
-print qx($bogoutil -w $dir .MSG_COUNT),"\n";
+print `$bogoutil -w $dir .MSG_COUNT`,"\n";
 
 do { # Start force loop
+  my $starttime=time;
   $runs++;
   open (HAM,  "cat $ham|")  || die("Cannot open ham: $!\n");
   open (SPAM, "cat $spam|") || die("Cannot open spam: $!\n");
 
   # Loop through all the mails
-  my ($lasthamline,$lastspamline,$hamcount,$spamcount) = ("","",0,0);
+  my ($lasthamline,$lastspamline,$hamcount,$spamcount,$skipham,$skipspam) = ("","",0,0,0,0);
   ($hamadd,$spamadd)=(0,0);
   do {
 
@@ -122,7 +123,7 @@ do { # Start force loop
               print TEMP $mail;
               close (TEMP);
             }
-          } else {print "$status -- Skipping ham message $hamcount.\n" if ($verbose);}
+          } else {$skipham++;print "$status -- Skipping ham message $hamcount.\n" if ($verbose);}
         } else {print "$status -- Not training ham message $hamcount.\n" if ($vverbose);}
       }
     }
@@ -156,7 +157,7 @@ do { # Start force loop
               print TEMP $mail;
               close (TEMP);
             }
-          } else {print "$status -- Skipping spam message $spamcount.\n" if ($verbose);}
+          } else {$skipspam++;print "$status -- Skipping spam message $spamcount.\n" if ($verbose);}
         } else {print "$status -- Not training spam message $spamcount.\n" if ($vverbose);}
       }
     }
@@ -165,15 +166,18 @@ do { # Start force loop
   close (HAM);
   close (SPAM);
 
-  print "\nEnd of run #$runs:\n";
+  print "\nEnd of run #$runs (in ",time-$starttime,"s):\n";
   print "Read $hamcount ham mail",$hamcount!=1&&"s"," and $spamcount spam mail",$spamcount!=1&&"s",".\n";
-  print "Added $hamadd ham mail",$hamadd!=1&&"s"," and $spamadd spam mail",$spamadd!=1&&"s"," to the database.\n";
-  print qx($bogoutil -w $dir .MSG_COUNT);
+  print "Added $hamadd ham mail",$hamadd!=1&&"s",$skipham>0&&" (skipping $skipham)",
+        " and $spamadd spam mail",$spamadd!=1&&"s",$skipspam>0&&" (skipping $skipspam)",
+        " to the database.\n";
+  print `$bogoutil -w $dir .MSG_COUNT`;
   unless ($runs>1 && $hamadd+$spamadd==0) {
-    $fn=$spamcount>0 && qx(cat $spam | $bogofilter -TM | grep -cv ^S) || "0\n";
+    $fn=$spamcount>0 && `cat $spam | $bogofilter -TM | grep -cv ^S` || "0\n";
     print "\nFalse negatives: $fn";
-    $fp=$hamcount>0 && qx(cat $ham | $bogofilter -TM | grep -cv ^H) || "0\n";
+    $fp=$hamcount>0 && `cat $ham | $bogofilter -TM | grep -cv ^H` || "0\n";
     print "False positives: $fp\n";
   }
 } until ($fn+$fp==0 || $hamadd+$spamadd==0 || !$force);
 print "\n$runs run",$runs>1&&"s"," needed to close off.\n" if ($force);
+
