@@ -4,6 +4,8 @@
 
 $Id$
      
+0.11.1.2
+
 	2003-03-06
 	* Fixed bogoutil's broken maintenance mode.
 	* Update bogofilter documentation and FAQ.
