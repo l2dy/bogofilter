@@ -1,3 +1,5 @@
+# $Id$ 
+
 noinst_PROGRAMS=bilbogrep
 
 EXTRA_DIST= \
