@@ -79,6 +79,12 @@ French</a>
         Operational Questions 
 
         <ul>
+          <li><a href="#training">How do I start my bogofilter training?
+	  </a></li>
+
+          <li><a href="#production">How can I keep the scoring accuracy high?
+	  </a></li>
+
           <li><a href="#asian-spam">What can I do about asian
           spam?</a></li>
 
@@ -386,6 +392,96 @@ French</a>
   * ^X-Bogosity:.No
   non-spam
 </pre>
+    <hr>
+
+    <h2 id="training">How do I start my bogofilter training?</h2>
+
+    <p>To classify messages as ham (non-spam) or spam, bogofilter
+    needs to learn from your mail. To start with it is best to have
+    collections (that are as large as possible) of messages you know
+    for sure are ham or spam. (Errors here will cause problems later,
+    so try hard;-). Warning: Only use your mail; using other
+    collections (like a spam collection found on the web), might cause
+    bogofilter to draw a wrong conclusion - after all you want it to
+    understand <em>your</em> mail.</p>
+
+    <p>Once you have the spam and ham collections, you have basically
+    three choices. In all cases it works better if your training base
+    (the above collections) is bigger, rather than smaller. The
+    smaller your training collection is, the higher the number of
+    errors bogofilter will make in production. Let's assume your
+    collection is two mbox files:  ham.mbx and spam.mbx.</p>
+
+    <ul>
+    <li><p>Method 1) Train bogofilter with all your messages. In
+    our example:</p>
+    <pre>
+	bogofilter -s &lt; spam.mbx
+	bogofilter -n &lt; ham.mbx
+    </pre></li>
+
+    <li><p>Method 2) Use the script randomtrain (in the contrib
+    directory). It uses a train-on-error technique, i.e. add to the
+    database only those messages which bogofilter cannot score
+    correctly.  The script generates a list of all the messages in the
+    mailboxes, shuffles the list, and then scores each message.  Any
+    message that bogofilter scores incorrectly, e.g. ham as spam or
+    spam as ham, is then used to expand the proper wordlist. This
+    produces a much smaller database than the previous method, but the
+    database works well in production. In our example:</p> 
+    <pre>
+	randomtrain -s spam.mbx -n ham.mbx 
+    </pre></li>
+
+    <li><p>Method 3) Use the script bogominitrain.pl (in the contrib
+    directory). It also uses the train-on-error technique, but the
+    messages are checked in the same order as your mailbox files. You
+    should use the -f option which tells the script to repeat its work
+    until all messages are classified correctly.  If desired, you can adjust
+    the level of certainty. Testing shows that this generates the
+    smallest database of all methods. But since the script makes sure
+    the database knows "everything" about your training collection
+    with a precision of your choice, it works very well. In our
+    example (with spam_cutoff=0.6 in your config file):</p>
+    <pre>
+	bogominitrain.pl -fv ~/.bogofilter ham.mbx spam.mbx '-o 0.7,0.5'
+    </pre></li>
+    </ul>
+
+    <hr>
+
+    <h2 id="production">How can I keep the scoring accuracy high?</h2>
+
+    <p>Bogofilter will make mistakes once in a while. So ongoing
+    training is important. There are two main methodologies for doing this.
+    First, you can train with every incoming message (using the -u
+    option). Second, you can train on error only.</p>
+
+    <p>Since you might want to rebuild your database at some point,
+    for example when a major new feature is implemented in bogofilter,
+    it can be very useful to continously update to your training
+    collection.</p>
+
+    <p>Bogofilter always does the best it can with the information
+    available to it.  However, it will make mistakes, i.e., classify
+    ham as spam (false positives) or spam as ham (false
+    negatives). You need to correct these errors. If you train with
+    every message you need to undo this wrong classification and then
+    train using the correct classification.  Switch combination "-Sn"
+    will reclassify a spam message as ham and "-Ns" will reclassify a
+    ham message as spam.</p>
+
+    <p>Correcting a misclassfied message may affect classification for
+    other message.  The smaller your database is, the higher is the
+    likelihood that a training error will casue a misclassification.
+    </p>
+
+    <p>Using a method like #2 or #3 (above) can compensate for this
+    effect.  Repeat the training with your complete training
+    collection (including all the new messages added since the earlier
+    training). This will add messages to the database which show that
+    adverse effect on both sides until you have a new equilibrium.</p>
+
     <hr>
 
     <h2 id="asian-spam">What can I do about asian spam?</h2>
