@@ -491,9 +491,14 @@ static dbe_t *dbx_init(bfdir *directory)
 	exit(EX_ERROR);
 
     /* run recovery if needed */
-    if (needs_recovery())
+    if (needs_recovery()) {
 	dbe_recover(directory, false, false); /* DO NOT set force flag here, may cause
 						 multiple recovery! */
+
+	/* reinitialize */
+	if (init_dbl(directory->dirname))
+	    exit(EX_ERROR);
+    }
 
     /* set (or demote to) shared/read lock for regular operation */
     db_try_glock(directory, F_RDLCK, F_SETLKW);
@@ -674,6 +679,7 @@ static ex_t dbx_common_close(DB_ENV *dbe, bfdir *directory)
 	exit(EX_ERROR);
     }
 
+    clear_lock();
     db_try_glock(directory, F_UNLCK, F_SETLKW); /* release lock */
     return EX_OK;
 }
