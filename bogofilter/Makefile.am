@@ -46,6 +46,7 @@ libbogofilter_a_SOURCES= \
 	fgetsl.h fgetsl.c \
 	find_home.h find_home.c find_home_user.c find_home_tildeexpand.c \
 	format.h format.c \
+	html.h html.c \
 	lexer.h lexer.c lexer_head.l lexer_text_plain.l lexer_text_html.l \
 	maint.h maint.c \
 	mime.h mime.c \

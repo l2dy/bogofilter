@@ -15,6 +15,7 @@
 
 #include "charset.h"
 #include "error.h"
+#include "html.h"
 #include "lexer.h"
 #include "mime.h"
 #include "fgetsl.h"
@@ -39,9 +40,11 @@ extern char *spam_header_name;
 static int yy_use_redo_text(byte *buf, size_t max_size);
 static int yy_get_new_line(byte *buf, size_t max_size);
 static int skip_spam_header(byte *buf, size_t max_size);
+extern int get_decoded_line(byte *buf, size_t size);
+
 
 /* Function Definitions */
-static int yy_getline(byte *buf, size_t size)
+static int lgetsl(byte *buf, size_t size)
 {
     size_t count = fgetsl((char *)buf, size, fpin);
     yylineno += 1;
@@ -63,7 +66,7 @@ static int yy_use_redo_text(byte *buf, size_t max_size)
 
 static int yy_get_new_line(byte *buf, size_t max_size)
 {
-    int count = yy_getline(buf, max_size);
+    int count = lgetsl(buf, max_size);
 
     static size_t hdrlen = 0;
     if (hdrlen==0)
@@ -93,7 +96,7 @@ static int skip_spam_header(byte *buf, size_t max_size)
     int count;
 
     do {
-	count = yy_getline(buf, max_size);
+	count = lgetsl(buf, max_size);
 	if (count != -1 && *buf == '\n')
 	    break;
     } while (count != -1 && isspace(*buf));
@@ -101,23 +104,7 @@ static int skip_spam_header(byte *buf, size_t max_size)
     return count;
 }
 
-int buff_fill(size_t need, byte *buf, size_t used, size_t size)
-{
-    int cnt = 0;
-    /* check bytes needed vs. bytes in buff */
-    while ( need > used) {
-	/* too few, read more */
-	int add = yy_getline(buf+used, size-used);
-	if (add == EOF) return EOF;
-	if (passthrough)
-	    textblock_add(textblocks, (const char *)(buf+used), add);
-	cnt += add;
-	used += add;
-    }
-    return cnt;
-}
-
-int yygetline(byte *buf, size_t max_size)
+int get_decoded_line(byte *buf, size_t max_size)
 {
     int count;
 
@@ -139,7 +126,7 @@ int yygetline(byte *buf, size_t max_size)
 	    /* continuation line */
 	    ungetc(c,fpin);
 	    if (buf[count - 1] == '\n') count --;
-	    add = yy_getline(buf + count, max_size - count);
+	    add = lgetsl(buf + count, max_size - count);
 	    if (add == EOF) break;
 	    if (passthrough)
 		textblock_add(textblocks, (const char *)(buf+count), add);
@@ -165,6 +152,14 @@ int yygetline(byte *buf, size_t max_size)
 	fprintf(stderr, "\n");
     }
 
+    if ((count > 0) && !msg_header && !msg_state->mime_header) {
+	int decoded_count = mime_decode(buf, count);
+
+	/*change buffer size only if the decoding worked */
+	if (decoded_count != 0)
+	    count = decoded_count;
+    }
+
     /* \r\n -> \n */
     if (count >= 2 && 0 == strcmp((const char *)(buf + count - 2), "\r\n")) {
 	count --;
@@ -174,20 +169,32 @@ int yygetline(byte *buf, size_t max_size)
     return count;
 }
 
+int buff_fill(size_t need, byte *buf, size_t used, size_t size)
+{
+    int cnt = 0;
+    /* check bytes needed vs. bytes in buff */
+    while ( need > used) {
+	/* too few, read more */
+	int add = get_decoded_line(buf+used, size-used);
+	if (add == EOF) return EOF;
+	cnt += add;
+	used += add;
+    }
+    return cnt;
+}
+
 int yyinput(byte *buf, size_t max_size)
 /* input getter for the scanner */
 {
-    int i, count, decoded_count;
+    int i, count;
 
-    count = yygetline(buf, max_size);
+    count = get_decoded_line(buf, max_size);
 
-    if ((count > 0) && !msg_header){
-
-	decoded_count = mime_decode(buf, count);
-
-	/*change buffer size only if the decoding worked */
-	if (decoded_count != 0)
-	    count = decoded_count;
+    if ((count > 0) && !msg_header && !msg_state->mime_header)	/* do nothing if in header */
+    {
+	if (kill_html_comments || score_html_comments ) {
+	    count = process_html_comments(buf, count, max_size);
+	}
     }
 
     for (i = 0; i < count; i++ )

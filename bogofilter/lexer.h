@@ -15,7 +15,11 @@ extern int yyleng;
 extern char *yytext;
 extern char *yylval;
 
-extern bool block_on_subnets;
+extern	bool	block_on_subnets;
+
+extern	bool	kill_html_comments;
+extern	int	count_html_comments;
+extern	bool	score_html_comments;
 
 /* lexer interface */
 typedef enum {
@@ -47,7 +51,6 @@ extern int	text_html_leng;
 extern char   * text_html_text;
 
 /* in lexer.c */
-extern int yygetline(byte *buf, size_t size);
 extern int yyinput(byte *buf, size_t size);
 extern int yyredo(const byte *text, char del);
 
