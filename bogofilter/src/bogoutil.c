@@ -38,11 +38,9 @@ extern int optind, opterr, optopt;
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-#define PROGNAME "bogoutil"
+const char *progname = "bogoutil";
 
 #define MINIMUM_FREQ	5		/* minimum freq */
-
-const char *progname = PROGNAME;
 
 static int token_count = 0;
 
@@ -128,7 +126,7 @@ static int load_file(const char *ds_file)
 	word_t *token;
 	if (fgets((char *)buf, BUFSIZE, stdin) == NULL) {
 	    if (ferror(stdin)) {
-		perror(PROGNAME);
+		perror(progname);
 		rv = 2;
 	    }
 	    break;
@@ -165,7 +163,7 @@ static int load_file(const char *ds_file)
 	    fprintf(stderr,
 		    "%s: Unexpected input [%s] on line %lu. "
 		    "Expecting whitespace before count.\n",
-		    PROGNAME, buf, line);
+		    progname, buf, line);
 	    rv = 1;
 	    break;
 	}
@@ -207,7 +205,7 @@ static int get_token(buff_t *buff, FILE *fp)
 
     if (fgets((char *)buff->t.text, buff->size, fp) == NULL) {
 	if (ferror(fp)) {
-	    perror(PROGNAME);
+	    perror(progname);
 	    rv = 2;
 	} else {
 	    rv = 1;
@@ -223,7 +221,7 @@ static int get_token(buff_t *buff, FILE *fp)
 	    fprintf(stderr,
 		    "%s: Unexpected input [%s]. Does not end with newline "
 		    "or line too long.\n",
-		    PROGNAME, buff->t.text);
+		    progname, buff->t.text);
 	    rv = 1;
 	}
     }
@@ -389,7 +387,7 @@ static int get_robx(char *path)
 
 	if (count == 0)
 	{
-	    fprintf(stderr, "%s: string too long creating %s file name.\n", PROGNAME, DB_EXT);
+	    fprintf(stderr, "%s: string too long creating %s file name.\n", progname, DB_EXT);
 	    exit(EX_ERROR);
 	}
 
@@ -416,17 +414,19 @@ static void print_version(void)
 		  "%s version %s\n"
 		  "    Database: %s\n"
 		  "Copyright (C) 2002-2004 Gyepi Sam, David Relson\n\n"
-		  "%s comes with ABSOLUTELY NO WARRANTY.\n"
-		  "This is free software, and you are welcome to redistribute\n"
-		  "it under the General Public License.\n"
-		  "See the COPYING file with the source distribution for details.\n\n",
-		  progtype, version, ds_version_str(), PROGNAME);
+		  "%s comes with ABSOLUTELY NO WARRANTY.  "
+		  "This is free software, and\nyou are welcome to "
+		  "redistribute it under the General Public License.  "
+		  "See\nthe COPYING file with the source distribution for "
+		  "details.\n"
+		  "\n",
+		  progname, version, ds_version_str(), PACKAGE);
 }
 
 static void usage(void)
 {
     fprintf(stderr, "Usage: %s { -d | -l | -w | -p } file%s | { -r | -R } directory | [ -v | -h | -V ]\n", 
-	    PROGNAME, DB_EXT);
+	    progname, DB_EXT);
 }
 
 static void help(void)
@@ -465,7 +465,7 @@ static void help(void)
 	    "\t-I file\tRead this file instead of standard input.\n"
 	    "\n"
 	    "%s (version %s) is part of the bogofilter package.\n",
-	    PROGNAME, version);
+	    progname, version);
 }
 
 char *ds_file = NULL;
@@ -626,7 +626,7 @@ static int process_args(int argc, char **argv)
     if (count != 1)
     {
       fprintf(stderr, "%s: Exactly one of the -d, -l, -R or -w flags "
-	      "must be present.\n", PROGNAME);
+	      "must be present.\n", progname);
       exit(EX_ERROR);
     }
 

@@ -431,12 +431,13 @@ static void print_version(void)
     (void)fprintf(stderr,
 		  "Copyright (C) 2002-2004 Eric S. Raymond,\n"
 		  "David Relson, Matthias Andree, Greg Louis\n\n"
-		  "%s comes with ABSOLUTELY NO WARRANTY. "
-		  "This is free software, and you\nare welcome to "
-		  "redistribute it under the General Public License. "
-		  "See the\nCOPYING file with the source distribution for "
+
+		  "%s comes with ABSOLUTELY NO WARRANTY.  "
+		  "This is free software, and\nyou are welcome to "
+		  "redistribute it under the General Public License.  "
+		  "See\nthe COPYING file with the source distribution for "
 		  "details.\n"
-		  "\n", 
+		  "\n",
 		  PACKAGE);
 }
 

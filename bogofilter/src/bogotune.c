@@ -773,11 +773,13 @@ static void print_version(void)
 		  "%s version %s\n"
 		  "    Database: %s\n"
 		  "Copyright (C) 2002-2004 Greg Louis, David Relson\n\n"
-		  "%s comes with ABSOLUTELY NO WARRANTY.\n"
-		  "This is free software, and you are welcome to redistribute\n"
-		  "it under the General Public License.\n"
-		  "See the COPYING file with the source distribution for details.\n\n",
-		  progtype, version);
+		  "%s comes with ABSOLUTELY NO WARRANTY.  "
+		  "This is free software, and\nyou are welcome to "
+		  "redistribute it under the General Public License.  "
+		  "See\nthe COPYING file with the source distribution for "
+		  "details.\n"
+		  "\n",
+		  progtype, version, ds_version_str(), PACKAGE);
 }
 
 static void help(void)

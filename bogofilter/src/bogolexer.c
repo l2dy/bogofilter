@@ -30,9 +30,7 @@ extern int optind, opterr, optopt;
 #include "token.h"
 #include "mime.h"
 
-#define PROGNAME "bogolexer"
-
-const char *progname = PROGNAME;
+const char *progname = "bogolexer";
 
 /* prevent larger inclusions */
 
@@ -115,12 +113,12 @@ static void print_version(void)
     (void)fprintf(stderr,
 		  "%s version %s\n"
 		  "Copyright (C) 2002-2004 David Relson\n\n"
-		  "%s comes with ABSOLUTELY NO WARRANTY. "
-		  "This is free software, and you\nare welcome to "
-		  "redistribute it under the General Public License. "
-		  "See the\nCOPYING file with the source distribution for "
+		  "%s comes with ABSOLUTELY NO WARRANTY.  "
+		  "This is free software, and\nyou are welcome to "
+		  "redistribute it under the General Public License.  "
+		  "See\nthe COPYING file with the source distribution for "
 		  "details.\n"
-		  "\n", 
+		  "\n",
 		  progname, version, PACKAGE);
 }
 
