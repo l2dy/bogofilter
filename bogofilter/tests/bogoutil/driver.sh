@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 #Test bogoutil and upgrade.pl
 
 #Test 1 -- combined count/data text file
