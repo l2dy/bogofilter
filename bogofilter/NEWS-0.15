@@ -2,7 +2,7 @@
 				BOGOFILTER NEWS
 			       =================
 
-0.15.0	2003-09-03
+0.15.1	2003-09-03
 
 * Check for xmlto during configuration.
 * Fix problem in empty line parsing rule.
@@ -36,13 +36,4 @@
 
 * 64-bit printf files for %*s string formatting.
 
-0.14.5.4 2003-08-30
-
-* _Really_ fix defective printing in 'bogofilter -Q' output.
-
-0.14.5.3 2003-08-29
-
-* Compiles with TDB again.
-* Fix defective printing in 'bogofilter -Q' output.
-
-0.14.5.2 2003-08-20 - Stable Release
+0.14.5.4 2003-08-30 - Stable Release
