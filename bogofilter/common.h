@@ -49,10 +49,10 @@ typedef enum algorithm_e { AL_GRAHAM='g', AL_ROBINSON='r' } algorithm_t;
   extern algorithm_t algorithm;
 #else
   #ifdef	ENABLE_GRAHAM_METHOD
-    #define	algorithm	GRAHAM
+    #define	algorithm	AL_GRAHAM
   #endif
   #ifdef	ENABLE_ROBINSON_METHOD
-    #define	algorithm	ROBINSON
+    #define	algorithm	AL_ROBINSON
   #endif
 #endif
 
