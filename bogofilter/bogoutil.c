@@ -48,7 +48,7 @@ static int db_dump_hook(char *key, long keylen, char *data, long
     dbv_t val = {0, 0};
     (void)userdata;
 
-    if (datalen != 4 && datalen != 8) {
+    if (datalen != sizeof(long) && datalen != 2 * sizeof(long)) {
 	print_error(__FILE__, __LINE__, "Unknown data size - %ld.\n", datalen);
 	return 0;
     }
