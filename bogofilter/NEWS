@@ -13,6 +13,15 @@ $Id$
 	  train bogofilter.
 	* Fixed processing of '-o' option.
 
+0.11.1.5
+
+	2003-03-28
+	* Bogofilter now frees _all_ memory that it allocates.
+	* FAQ reorganized and info added on asian spam, the 
+	  format of verbose output, and using SpamAssassin to
+	  train bogofilter.
+	* Fixed processing of '-o' option.
+
 0.11.1.4
 
 	2003-03-25
