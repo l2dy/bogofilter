@@ -85,8 +85,8 @@ static void help(void)
 	    "\t     where {opts} is one or more of:\n"
 	    "\t      c   - enables  strict comment checking.\n"
 	    "\t      C   - disables strict comment checking (default).\n"
-	    "\t      u   - enables  uppercase tokens."
-	    "\t      U   - disables uppercase tokens (default)."
+	    "\t      i   - enables  ignoring of upper/lower case."
+	    "\t      I   - disables ignoring of upper/lower case (default)."
 	    "\t      h   - enables  header line tagging (default)."
 	    "\t      H   - disables header line tagging."
 	    "\t      t   - enables  parsing of html tags 'a', 'font', and 'img' (default).\n"
@@ -206,7 +206,7 @@ static void process_args_2(int argc, char **argv)
 		switch (*s)
 		{
 		case 'c': case 'C': strict_check       = *s == 'c';	break;	/* -Pc and -PC */
-		case 'u': case 'U': upper_case         = *s == 'u';	break;	/* -Pu and -PU */
+		case 'i': case 'I': ignore_case        = *s == 'i';	break;	/* -Pi and -PI */
 		case 'h': case 'H': header_line_markup = *s == 'h'; 	break;	/* -Ph and -PH */
 		case 't': case 'T': tokenize_html_tags = *s == 't'; 	break;	/* -Pt and -PT */
 		default:

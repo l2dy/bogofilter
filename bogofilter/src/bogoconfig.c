@@ -159,7 +159,7 @@ const parm_desc sys_parms[] =
     { "header_line_markup", 	     CP_BOOLEAN, { (void *) &header_line_markup } },
     { "strict_check", 	  	     CP_BOOLEAN, { (void *) &strict_check } },
 
-    { "upper_case", 	  	     CP_BOOLEAN, { (void *) &upper_case } },
+    { "ignore_case", 	  	     CP_BOOLEAN, { (void *) &ignore_case } },
     { "tokenize_html_tags",	     CP_BOOLEAN, { (void *) &tokenize_html_tags } },
     { "tokenize_html_script",	     CP_BOOLEAN, { (void *) &tokenize_html_script } },	/* Not yet in use */
 
@@ -317,8 +317,8 @@ static void help(void)
 		  "\t     where {opts} is one or more of:\n"
 		  "\t      c   - enables  strict comment checking.\n"
 		  "\t      C   - disables strict comment checking (default).\n"
-		  "\t      u   - enables  uppercase tokens."
-		  "\t      U   - disables uppercase tokens (default)."
+		  "\t      i   - enables  ignoring of upper/lower case."
+		  "\t      I   - disables ignoring of upper/lower case (default)."
 		  "\t      h   - enables  header line tagging (default)."
 		  "\t      H   - disables header line tagging."
 		  "\t      t   - enables  parsing of html tags 'a', 'font', and 'img' (default).\n"
@@ -661,8 +661,8 @@ void process_args_2(int argc, char **argv)
 		switch (*s)
 		{
 		case 'c': case 'C': strict_check       = *s == 'c';	break;	/* -Pc and -PC */
-		case 'u': case 'U': upper_case         = *s == 'u';	break;	/* -Pu and -PU */
-		case 'h': case 'H': header_line_markup   = *s == 'h'; 	break;	/* -Ph and -PH */
+		case 'i': case 'I': ignore_case        = *s == 'i';	break;	/* -Pi and -PI */
+		case 'h': case 'H': header_line_markup = *s == 'h'; 	break;	/* -Ph and -PH */
 		case 't': case 'T': tokenize_html_tags = *s == 't'; 	break;	/* -Pt and -PT */
 		default:
 		    fprintf(stderr, "Unknown parsing option -P%c.\n", *s);
@@ -713,7 +713,7 @@ void query_config(void)
     fprintf(stdout, "%-17s = %s\n", "block_on_subnets", YN(block_on_subnets));
     fprintf(stdout, "%-17s = %s\n", "strict_check",	YN(strict_check));
     fprintf(stdout, "%-17s = %s\n", "header_line_markup", YN(header_line_markup));
-    fprintf(stdout, "%-17s = %s\n", "upper_case",	YN(upper_case));
+    fprintf(stdout, "%-17s = %s\n", "ignore_case",	YN(ignore_case));
     fprintf(stdout, "%-17s = %s\n", "block_on_subnets", YN(block_on_subnets));
     fprintf(stdout, "%-17s = %s\n", "strict_check",	YN(strict_check));
     fprintf(stdout, "%-17s = %s\n", "header_line_markup", YN(header_line_markup));
