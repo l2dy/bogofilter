@@ -3,8 +3,8 @@
 [ -z "$BOGOLEXER" ] && BOGOLEXER=`which bogolexer`
 [ -z "$BOGOUTIL" ] && BOGOUTIL=`which bogoutil`
 
-if [ -z "$BOGOLEXER"  -o -z "$BOGOUTIL" ] ; then
-    echo BOGOLEXER or BOGOUTIL not set
+if [ -z "$BOGOLEXER" -o -z "$BOGOUTIL" -o -z "$BOGOFILTER_DIR" ] ; then
+    echo BOGOLEXER or BOGOUTIL or BOGOFILTER_DIR not set
 else
 ( echo .MSG_COUNT ; $BOGOLEXER -p $* | sort -u ) | \
     $BOGOUTIL -w $BOGOFILTER_DIR | \
