@@ -4,6 +4,7 @@
 
 2003-09-01
 
+* Allow -I to be used with file or directory.
 * Revise flex rule for encoded text to reduce program size.
 
 2003-08-31
