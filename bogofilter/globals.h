@@ -4,6 +4,7 @@
 #define GLOBALS_H
 
 extern int verbose;
+extern int force;
 extern int passthrough;
 extern int nonspam_exits_zero;
 extern int logflag;
