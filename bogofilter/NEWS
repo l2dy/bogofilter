@@ -21,6 +21,12 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+0.93.1	2004-11-??
+
+	2004-11-07
+
+	* Fixed negative buffer index in mime.c
+
 0.93.0	2004-11-06 "Broken compatibility" release
 
 	* Fix bogotune's '-D' option.
