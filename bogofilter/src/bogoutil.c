@@ -816,18 +816,15 @@ int main(int argc, char *argv[])
 	    break;
 	case M_CHECKPOINT:
 	    ds_init(bogohome, ds_file);
-	    if (fTransaction)
-		rc = ds_checkpoint(ds_file);
+	    rc = ds_checkpoint(ds_file);
 	    break;
 	case M_PURGELOGS:
 	    ds_init(bogohome, ds_file);
-	    if (fTransaction)
-		rc = ds_purgelogs(ds_file);
+	    rc = ds_purgelogs(ds_file);
 	    break;
 	case M_REMOVEENV:
 	    ds_minit(bogohome, ds_file);
-	    if (fTransaction)
-		rc = ds_remove(ds_file);
+	    rc = ds_remove(ds_file);
 	    break;
 	case M_VERIFY:
 	    ds_minit(bogohome, ds_file);
