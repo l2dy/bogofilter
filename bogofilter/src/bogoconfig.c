@@ -215,6 +215,15 @@ void comma_parse(char opt, const char *arg, double *parm1, double *parm2)
     xfree(parse);
 }
 
+static run_t check_run_type(run_t new, run_t conflict)
+{
+    if (run_type & conflict) {
+	(void)fprintf(stderr, "Error:  Invalid combination of options.\n");
+	exit(2);
+    }
+    return (run_type | new );
+}
+
 static bool config_algorithm(const unsigned char *s)
 {
     return select_algorithm(tolower(*s), false);
@@ -275,8 +284,8 @@ static int validate_args(void)
 	(void)fprintf(stderr, 
 		      "Error:  Invalid combination of options.\n"
 		      "\n"
+		      "    Options '-u' and '-R' are used when classifying messages.\n"
 		      "    Options '-s', '-n', '-S', and '-N' are used when registering words.\n"
-		      "    Options '-p', '-u', '-e', and '-R' are used when classifying messages.\n"
 		      "    The two sets of options may not be used together.\n"
 		      "    \n"
 #ifdef	GRAHAM_AND_ROBINSON
@@ -525,11 +534,11 @@ void process_args_1(int argc, char **argv)
 	    break;
 
 	case 'n':
-	    run_type = (run_type | REG_GOOD) & ~REG_SPAM & ~UNREG_GOOD;
+	    run_type = check_run_type(REG_GOOD, REG_SPAM | UNREG_GOOD);
 	    break;
 
 	case 'N':
-	    run_type = (run_type | UNREG_GOOD) & ~REG_GOOD & ~UNREG_SPAM;
+	    run_type = check_run_type(UNREG_GOOD, REG_GOOD | UNREG_SPAM);
 	    break;
 
         case 'O':
@@ -564,11 +573,11 @@ void process_args_1(int argc, char **argv)
 #endif
 
 	case 's':
-	    run_type = (run_type | REG_SPAM) & ~REG_GOOD & ~UNREG_SPAM;
+	    run_type = check_run_type(REG_SPAM, REG_GOOD | UNREG_SPAM);
 	    break;
 
 	case 'S':
-	    run_type = (run_type | UNREG_SPAM) & ~REG_SPAM & ~UNREG_GOOD;
+	    run_type = check_run_type(UNREG_SPAM, REG_SPAM | UNREG_GOOD);
 	    break;
 
 	case 't':
@@ -580,7 +589,7 @@ void process_args_1(int argc, char **argv)
 	    break;
 
 	case 'u':
-	    run_type = RUN_UPDATE;
+	    run_type |= RUN_UPDATE;
 	    break;
 
 	case 'v':
