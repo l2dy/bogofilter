@@ -50,8 +50,8 @@ typedef enum algorithm_e {
 #endif
 #ifdef ENABLE_ROBINSON_METHOD
     AL_ROBINSON='r'
-} algorithm_t;
 #endif
+} algorithm_t;
 extern algorithm_t algorithm;
 
 /* define default */
@@ -64,10 +64,12 @@ extern algorithm_t algorithm;
 enum dbmode_e { DB_READ = 0, DB_WRITE = 1 };
 typedef enum dbmode_e dbmode_t;
 
-enum run_e { RUN_NORMAL='r', RUN_UPDATE='u',
-    REG_SPAM='s', REG_GOOD='n',
-    REG_SPAM_TO_GOOD='N', REG_GOOD_TO_SPAM='S' };
-typedef enum run_e run_t;
+typedef enum run_e {
+    RUN_NORMAL='r',
+    RUN_UPDATE='u',
+    REG_SPAM='s', REG_SPAM_TO_GOOD='N', 
+    REG_GOOD='n', REG_GOOD_TO_SPAM='S'
+} run_t;
 extern run_t run_type;
 
 void build_path(char* dest, int size, const char* dir, const char* file);
