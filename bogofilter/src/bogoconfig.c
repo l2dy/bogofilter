@@ -520,7 +520,7 @@ void process_args(int argc, char **argv, int pass)
 	case 'H':
 	{
 	    char *s;
-	    for (s = optarg; *s ; s += 1)
+	    for (s = optarg; *s && pass == 2; s += 1)
 	    {
 		switch (*s)
 		{
