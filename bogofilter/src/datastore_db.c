@@ -197,7 +197,7 @@ static dbh_t *handle_init(const char *path, const char *name)
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
 
-    handle->magic= MAGIC_DBH;
+    handle->magic= MAGIC_DBH;		/* poor man's type checking */
     handle->fd   = -1;			/* for lock */
 
     handle->path = xstrdup(path);
@@ -342,7 +342,8 @@ const char *db_version_str(void)
 /** Initialize database. Expects open environment.
  * \return pointer to database handle on success, NULL otherwise.
  */
-void *db_open(void *vhandle, const char *path, const char *name, dbmode_t open_mode)
+void *db_open(void *vhandle, const char *path,
+	const char *name, dbmode_t open_mode)
 {
     int ret;
     int is_swapped;
@@ -976,12 +977,12 @@ static int bf_dbenv_create(DB_ENV **env)
 static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
 {
     int ret;
-    u_int32_t logsize = 1048576; /* 1 MByte (default in BDB 10 MByte) */
+    u_int32_t logsize = 1048576;    /* 1 MByte (default in BDB 10 MByte) */
     dbe_t *env = xcalloc(1, sizeof(dbe_t));
 
     assert(directory);
 
-    env->magic = MAGIC_DBE;
+    env->magic = MAGIC_DBE;	    /* poor man's type checking */
     env->directory = xstrdup(directory);
     ret = bf_dbenv_create(&env->dbe);
 
@@ -1265,6 +1266,20 @@ static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags) {
     return env;
 }
 
+static int dbe_common_close(DB_ENV *env, const char *directory) {
+    int e;
+
+    e = env->close(env, 0);
+    if (e != 0) {
+	print_error(__FILE__, __LINE__, "Error closing environment \"%s\": %s",
+		directory, db_strerror(e));
+	exit(EX_ERROR);
+    }
+
+    db_try_glock(directory, F_UNLCK, F_SETLKW); /* release lock */
+    return EX_OK;
+}
+
 int dbe_purgelogs(const char *directory) {
     int e;
     DB_ENV *env = dbe_recover_open(directory, 0);
@@ -1290,14 +1305,14 @@ int dbe_purgelogs(const char *directory) {
 
     /* figure redundant log files and nuke them */
     e = env->log_archive(env, &list, DB_ARCH_ABS);
-    if (e && e != DB_NOTFOUND) {
+    if (e) {
 	print_error(__FILE__, __LINE__,
 		"DB_ENV->log_archive failed: %s",
 		db_strerror(e));
 	exit(EX_ERROR);
     }
 
-    if (list != NULL && e != DB_NOTFOUND) {
+    if (list != NULL) {
 	for (i = list; *i != NULL; i++) {
 	    if (DEBUG_DATABASE(1))
 		fprintf(dbgout, " removing logfile %s\n", *i);
@@ -1313,31 +1328,48 @@ int dbe_purgelogs(const char *directory) {
     if (DEBUG_DATABASE(0))
 	fprintf(dbgout, "closing environment\n");
 
-    e = env->close(env, 0);
+    return dbe_common_close(env, directory);
+}
+
+int db_verify(const char *dbfile) {
+    char *dir = xstrdup(dbfile);
+    char *tmp;
+    DB_ENV *env;
+    DB *db;
+    int e;
+
+    tmp = strrchr(dir, DIRSEP_C);
+    if (!tmp)
+	free(dir), dir = xstrdup(CURDIR_S);
+    else
+	*tmp = '\0';
+
+    env = dbe_recover_open(dir, 0); /* this sets an exclusive lock */
+    e = db_create(&db, NULL, 0); /* do not use environment here,
+				    verify does not lock! */
     if (e != 0) {
-	print_error(__FILE__, __LINE__, "Error closing environment \"%s\": %s",
-		directory, db_strerror(e));
+	print_error(__FILE__, __LINE__, "error creating DB handle: %s",
+		db_strerror(e));
 	exit(EX_ERROR);
     }
-
-    db_try_glock(directory, F_UNLCK, F_SETLKW); /* release lock */
-    return EX_OK;
+    e = db->verify(db, dbfile, NULL, NULL, 0);
+    if (e) {
+	print_error(__FILE__, __LINE__, "database %s does not verify: %s",
+		dbfile, db_strerror(e));
+	exit(EX_ERROR);
+    }
+    e = dbe_common_close(env, dir);
+    free(dir);
+    if (e == 0 && verbose)
+	printf("%s OK.\n", dbfile);
+    return e;
 }
 
 int dbe_remove(const char *directory) {
     DB_ENV *env = dbe_recover_open(directory, DB_PRIVATE);
-    int e;
 
     if (!env)
 	exit(EX_ERROR);
-    
-    e = env->close(env, 0);
-    if (e != 0) {
-	print_error(__FILE__, __LINE__, "Error closing environment \"%s\": %s",
-		directory, db_strerror(e));
-	exit(EX_ERROR);
-    }
 
-    db_try_glock(directory, F_UNLCK, F_SETLKW); /* release lock */
-    return EX_OK;
+    return dbe_common_close(env, directory);
 }

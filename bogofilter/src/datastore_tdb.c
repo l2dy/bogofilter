@@ -349,3 +349,8 @@ const char *db_str_err(int j)
 			return emap[i].estring;
 	return "Invalid error code";
 }
+
+int db_verify(const char *f) {
+    (void)f;
+    return EX_OK;
+}

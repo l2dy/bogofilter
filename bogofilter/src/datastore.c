@@ -444,3 +444,7 @@ int ds_remove(const char *directory) {
 int ds_purgelogs(const char *directory) {
     return dbe_purgelogs(directory);
 }
+
+int ds_verify(const char *file) {
+    return db_verify(file);
+}

@@ -15,6 +15,7 @@
 	    <command>bogoutil</command>
 	    <arg choice="opt">options</arg>
 	    <group choice="req">
+		<arg choice="plain">-C <replaceable>file</replaceable></arg>
 		<arg choice="plain">-d <replaceable>file</replaceable></arg>
 		<arg choice="plain">-H</arg>
 		<arg choice="plain">-l <replaceable>file</replaceable></arg>
@@ -69,6 +70,11 @@
     </refsect1>
     <refsect1 id="options">
 	<title>OPTIONS</title>
+	<para>
+	    The <option>-C <replaceable>file</replaceable></option>
+	    option requests that bogofilter verifies the database file.
+	    It prints only errors, unless in verbose mode.
+	</para>
 	<para>
 	    The <option>-d <replaceable>file</replaceable></option> 
 	    option tells <application>bogoutil</application> to print

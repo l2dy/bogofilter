@@ -454,13 +454,13 @@ DANGEROUS OPTIONS - these can improve performance, but should be avoided
 
 4.4 VERIFYING DATABASES TO CHECK FOR CORRUPTION
 
-To check if the database is intact, stop all applications accessing the
-database and make sure no new applications are started.
+To check if the database is intact, type:
 
-Then, type db_verify ~/.bogofilter/wordlist.db. It should print
-nothing. If it prints errors, try running recovery manually:
+    bogoutil -C ~/.bogofilter/wordlist.db
 
-bogoutil -f ~/.bogofilter
+There should be no output. If there are errors, try:
+
+    bogoutil -f ~/.bogofilter
 
 Then verify again. If it still prints errors, you must restore your
 database from a backup, rebuild from scratch, or you can attempt to

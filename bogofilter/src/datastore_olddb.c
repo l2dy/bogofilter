@@ -285,7 +285,6 @@ void *db_open(void *dummy, const char *path, const char *name, dbmode_t open_mod
 			BerkeleyDB are buggy. */
     char *t;
 
-    void *dbe = NULL;
     dbh_t *handle = NULL;
     uint32_t opt_flags = (open_mode == DS_READ) ? DB_RDONLY : 0;
 
@@ -317,7 +316,7 @@ void *db_open(void *dummy, const char *path, const char *name, dbmode_t open_mod
 	    return NULL;
 
 	/* create DB handle */
-	if ((ret = db_create (&dbp, dbe, 0)) != 0) {
+	if ((ret = db_create (&dbp, NULL, 0)) != 0) {
 	    print_error(__FILE__, __LINE__, "db_create, err: %d, %s",
 			ret, db_strerror(ret));
 	    goto open_err;
@@ -682,4 +681,43 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 
 const char *db_str_err(int e) {
     return db_strerror(e);
+}
+
+int db_verify(const char *file) {
+    DB *dbp;
+    int e;
+    int fd = open(file, O_RDWR);
+
+    if (fd < 0) {
+	print_error(__FILE__, __LINE__, "db_verify: cannot open %s: %s", file,
+	       strerror(errno));
+	exit(EX_ERROR);
+    }
+
+    if (db_lock(fd, F_SETLKW, (short int)F_WRLCK)) {
+	print_error(__FILE__, __LINE__,
+		"db_verify: cannot lock %s for exclusive use: %s", file,
+		strerror(errno));
+	close(fd);
+	exit(EX_ERROR);
+    }
+
+    if ((e = db_create (&dbp, NULL, 0)) != 0) {
+	print_error(__FILE__, __LINE__, "db_create, err: %s",
+		db_strerror(e));
+	close(fd);
+	exit(EX_ERROR);
+    }
+
+    e = dbp->verify(dbp, file, NULL, NULL, 0);
+    if (e) {
+	print_error(__FILE__, __LINE__, "database %s does not verify: %s",
+		file, db_strerror(e));
+	exit(EX_ERROR);
+    } else {
+	if (verbose)
+	    printf("%s OK.\n", file);
+    }
+    close(fd);
+    return EX_OK;
 }

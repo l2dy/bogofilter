@@ -321,8 +321,12 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     return 0;
 }
 
-
 const char *db_str_err(int e)
 {
     return dperrmsg(e);
+}
+
+int db_verify(const char *f) {
+    (void)f;
+    return EX_OK;
 }

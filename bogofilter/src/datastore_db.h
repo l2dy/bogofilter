@@ -83,6 +83,7 @@ int dbe_txn_commit(void *vhandle);
 int dbe_recover(const char *directory, bool catastrophic, bool force);
 int dbe_remove(const char *directory);
 int dbe_purgelogs(const char *directory);
+int db_verify(const char *databasefile);
 
 /** Returns is_swapped flag */
 bool db_is_swapped(void *vhandle);

@@ -24,6 +24,12 @@ Briefly:
 
 0.93.3	2004-12-XX
 
+	2004-12-14
+
+	* bogoutil -C file  now checks if the database file file is intact.
+	  (Only implemented for Berkeley DB stores with and without
+	  transactions.)
+
 	2004-12-13
 
 	* bf_compact now uses db_archive without -d option and loops on the
