@@ -23,7 +23,7 @@ Briefly:
 
 0.93.2	2004-11-??
 
-	2004-11-28
+	2004-11-29
 
 	* Support for Berkeley DB 3.0 was explicitly removed again, so that no
 	  stable bogofilter version since 0.17.5 will have had support for this
