@@ -33,7 +33,6 @@ AUTHOR:
 #define	SP	' '
 
 const char *charset_default = "us-ascii";
-/* bool replace_nonascii_characters = false; */
 
 byte charset_table[256];
 byte casefold_table[256];
