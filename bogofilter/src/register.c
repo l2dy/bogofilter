@@ -24,14 +24,13 @@
 void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 {
     const char *r="",*u="";
+    dsv_t val;
     hashnode_t *node;
     wordprop_t *wordprop;
     run_t save_run_type = run_type;
 
-    u_int32_t g = 0, b = 0;
     u_int32_t wordcount = h->count;	/* use number of unique tokens */
 
-    dsv_t val;
     wordlist_t *list = default_wordlist();	/* use default wordlist */
 
     sh_t incr = IX_UNDF, decr = IX_UNDF;
@@ -63,7 +62,6 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
     for (node = wordhash_first(h); node != NULL; node = wordhash_next(h))
     {
-
 	wordprop = node->buf;
 	ds_read(list->dsh, node->key, &val);
 	if (incr != IX_UNDF) {
@@ -95,18 +93,13 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 	val.goodcount = list->msgcount[IX_GOOD];
 
 	ds_set_msgcounts(list->dsh, &val);
-
-	g += val.goodcount;
-	b += val.spamcount;
+	set_msg_counts(val.goodcount, val.spamcount);
 
 	ds_flush(list->dsh);
 
 	if (DEBUG_REGISTER(1))
 	    (void)fprintf(dbgout, "bogofilter: list %s (%s) - %ul spam, %ul good\n",
-			  list->listname, list->filepath, list->msgcount[IX_SPAM], list->msgcount[IX_GOOD]);
-
-    set_msg_counts(g, b);
+		      list->listname, list->filepath, val.spamcount, val.goodcount);
 
     run_type = save_run_type;
 }
-
