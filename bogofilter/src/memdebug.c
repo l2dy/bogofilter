@@ -30,7 +30,7 @@
 
 int  memtrace= 0 * (M_MALLOC+M_FREE);
 
-uint32_t dbg_index     = 0;
+uint32_t dbg_trap_index= 0;
 uint32_t dbg_size      = 0;
 uint32_t dbg_index_min = 0;
 uint32_t dbg_index_max = 0;
@@ -39,6 +39,9 @@ uint32_t dbg_size_trap = 0;	/* 100000 */
 #define	MB 1000000
 #define	GB 1000*MB
 uint32_t dbg_too_much  = 0;	/* GB */
+
+uint32_t dbg_size_delt = 0;	/* MB */
+uint32_t dbg_delt_save = 0;
 
 const uint32_t md_tag = 0xABCD55AA;
 
@@ -79,6 +82,13 @@ md_malloc(size_t size)
 
     ++cnt_malloc;
     cur_malloc += size;
+    
+    if (dbg_size_delt != 0 &&
+	max_malloc - dbg_delt_save > dbg_size_delt) {
+	dbg_delt_save = max_malloc / dbg_size_delt * dbg_size_delt;
+	fprintf(dbgout, ":: max_malloc = %12lu\n", (ulong) max_malloc);
+    }
+
     max_malloc = max(max_malloc, cur_malloc);
     tot_malloc += size;
     size += sizeof(mh_t);		/* Include size storage */
@@ -100,7 +110,7 @@ md_malloc(size_t size)
 
     if (memtrace & M_MALLOC)
 	mh_disp( "a", mh );
-    if (dbg_index != 0 && mh->indx == dbg_index)
+    if (dbg_trap_index != 0 && mh->indx == dbg_trap_index)
 	md_trap("dbg_index");
 
     x = (void *) (mh+1);
@@ -124,8 +134,8 @@ md_free(void *ptr)
 
     if (mh->tag != md_tag)
 	md_trap("md_tag");
-    if (dbg_index != 0 && mh->indx == dbg_index)
-	md_trap("dbg_index");
+    if (dbg_trap_index != 0 && mh->indx == dbg_trap_index)
+	md_trap("dbg_trap_index");
     if (mh->size > cur_malloc || 
 	(dbg_size_trap != 0 && mh->size > dbg_size_trap))
 	md_trap("dbg_size_trap");
@@ -143,17 +153,17 @@ void memdisplay(const char *file, int lineno)
 
     if (file != NULL) {
 	pfx = "\t";
-	fprintf(stdout, "%s:%d:\n", file, lineno);
+	fprintf(dbgout, "%s:%d:\n", file, lineno);
     }
 
-    fprintf(stdout, "%smalloc:  cur = %lu, max = %lu, tot = %lu\n", pfx,
+    fprintf(dbgout, "%smalloc:  cur = %lu, max = %lu, tot = %lu\n", pfx,
 	    (ulong) cur_malloc, (ulong) max_malloc, (ulong) tot_malloc );
-    fprintf(stdout, "%scounts:  malloc: %lu, calloc: %lu, realloc: %lu, free: %lu\n", pfx,
+    fprintf(dbgout, "%scounts:  malloc: %lu, calloc: %lu, realloc: %lu, free: %lu\n", pfx,
 	    (ulong) cnt_malloc, (ulong) cnt_realloc, (ulong) cnt_calloc, (ulong) cnt_free);
     if (cnt_malloc == cnt_free)
-	fprintf(stdout, "%s         none active.\n", pfx);
+	fprintf(dbgout, "%s         none active.\n", pfx);
     else
-	fprintf(stdout, "%s         active: %lu, average: %lu\n", pfx, 
+	fprintf(dbgout, "%s         active: %lu, average: %lu\n", pfx, 
 		(ulong) cnt_malloc - cnt_free, (ulong) cur_malloc/(cnt_malloc - cnt_free));
 }
 
@@ -186,8 +196,8 @@ void
 
     if (memtrace & M_MALLOC)
 	mh_disp( "c", mh );
-    if (dbg_index != 0 && mh->indx == dbg_index)
-	md_trap("dbg_index");
+    if (dbg_trap_index != 0 && mh->indx == dbg_trap_index)
+	md_trap("dbg_trap_index");
 
     x = (void *) (mh+1);
 
