@@ -4,13 +4,17 @@
 
 $Id$
      
+	2003-01-20
+	* Bogofilter now kills html comments.  The '-k' switch can
+	  be used to change the behavior.
+
 0.10.0  2003-01-19
 
 	2003-01-19
-	* Reworked database code to correct locking and
-	  database corruption issues
-	* Reworked database API to so bogoutil needn't know
-	  internal API for database.
+	* Reworked database code to correct locking and database
+	  corruption issues
+	* Reworked database API to so bogoutil needn't know internal
+	  API for database.
 	
 	2003-01-12
 	* Merged mime processing code into main cvs branch.
