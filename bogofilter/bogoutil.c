@@ -412,6 +412,7 @@ static int display_words(const char *path, int argc, char **argv, bool prob)
 
 static double compute_robx(void *dbh_spam, void *dbh_good)
 {
+    uint32_t robx_cnt = 0;
     uint32_t word_cnt = 0;
     double sum = 0.0;
     double robx;
@@ -424,7 +425,7 @@ static double compute_robx(void *dbh_spam, void *dbh_good)
     rh.scalefactor = (double)msg_spam/msg_good;
     rh.dbh_good = dbh_good;
     rh.sum = &sum;
-    rh.count = &word_cnt;
+    rh.count = &robx_cnt;
 
     db_foreach(dbh_good, count_hook, &word_cnt);
     db_foreach(dbh_spam, robx_hook, &rh);
