@@ -54,7 +54,7 @@ $BOGOFILTER -f -n -C < ${srcdir}/inputs/good.mbx
 
 OUT="split.out"
 
-files=`ls ${srcdir}/inputs/split.d/*`
+files=`ls ${srcdir}/inputs/split.d/msg*`
 for msg in $files ; do
     nam=`basename $msg`
     for cfg in n y ; do
