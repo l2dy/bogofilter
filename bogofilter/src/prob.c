@@ -28,7 +28,14 @@ double calc_prob_pure(uint good, uint bad,
      * a word we don't have enough info about will be spam */
     /* n is the number of messages that contain the word w */
 
-    if (n == 0 || badmsgs == 0 || goodmsgs == 0) {
+    if (n == 0
+#ifdef EXTRA_DOMAIN_CHECKING
+	    /* we had this in place while the ignore lists caused the
+	     * token to have "nan" counts because score.c left the
+	     * message counts at zero - #ifdef'd out for speed */
+	    || badmsgs == 0 || goodmsgs == 0
+#endif
+	    ) {
 	/* in these cases, pw would be undefined and return NaN
 	 * we substitute "we don't know", the x parameter */
 	fw = robx;
