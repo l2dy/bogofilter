@@ -5,6 +5,7 @@
 // lexer interface
 #define TOKEN	1	// Ordinary token
 #define FROM	2	// Mail message delimiter
+
 extern FILE	*yyin;
 extern char	*yytext;
 
@@ -15,4 +16,6 @@ struct textblock
 };
 
 extern struct textblock textblocks, *textend;
+
+extern int get_token(void);
 
