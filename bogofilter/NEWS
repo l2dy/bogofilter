@@ -21,6 +21,10 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+0.94.0	2005-03-05
+
+	Default mode is transactions disabled for Berkeley DB.
+
 	2005-02-26
 
 	* Remove bogus signal handler, remove SIGKILL handling; ignore SIGINT,
@@ -36,6 +40,10 @@ Briefly:
 
 	* Added signal handler to catch SIGINT, SIGKILL, and SIGTERM
           and exit cleanly.
+
+	* Support for Berkeley DB 3.1 has been removed as a side
+	  effect of automatically detecting transactional mode at
+	  run-time, since 3.1 lacks DB_JOINENV.
 
 	2005-02-24
 
