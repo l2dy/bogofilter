@@ -172,7 +172,7 @@ token_t get_token(void)
 		const char *prefix="url:";
 		size_t len = strlen(prefix);
 		size_t avl = sizeof(save_text);
-		int q1, q2, q3;
+		int q1, q2, q3, q4;
 		/*
 		 * Trick collected by ESR in real time during John
 		 * Graham-Cummings's talk at Paul Graham's spam conference
@@ -184,13 +184,13 @@ token_t get_token(void)
 		 * mask their origin.  Nuke the high bits to unmask the 
 		 * address.
 		 */
-		if (sscanf(save_text, "%d.%d.%d", &q1, &q2, &q3) == 3)
+		if (sscanf(yytext, "%d.%d.%d.%d", &q1, &q2, &q3, &q4) == 4)
 		    /* safe because result string guaranteed to be shorter */
-		    sprintf(save_text, "%d.%d.%d", 
-			    q1 & 0xff, q2 & 0xff, q3 & 0xff);		    
+		    sprintf(yytext, "%d.%d.%d.%d", 
+			    q1 & 0xff, q2 & 0xff, q3 & 0xff, q4 & 0xff);		    
 		yylval = save_text;
 		save_class = IPADDR;
-		avl -= strlcpy( yylval, "url:", avl);
+		avl -= strlcpy( yylval, prefix, avl);
 		yyleng = strlcpy( yylval+len, yytext, avl);
 		return (class);
 	    }
