@@ -30,7 +30,7 @@
 
 #include "globals.h"
 
-#undef	HAVE_CHARSET
+/* Default build includes Graham, Robinson, and Robinson-Fisher methods */
 
 #if	defined(ENABLE_GRAHAM_METHOD) && defined(ENABLE_ROBINSON_METHOD)
 #define	GRAHAM_AND_ROBINSON
@@ -38,6 +38,8 @@
 
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
 #define min(x, y)	(((x) < (y)) ? (x) : (y))
+
+#define COUNTOF(array)	(sizeof(array)/sizeof(array[0]))
 
 enum dbmode_e { DB_READ = 0, DB_WRITE = 1 };
 typedef enum dbmode_e dbmode_t;
