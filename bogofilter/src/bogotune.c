@@ -473,8 +473,10 @@ static uint read_mailbox(char *arg)
 	    exit(EX_ERROR);
 	}
 
-	if (whc->count == 0)
+	if (whc->count == 0) {
+	    printf("msg #%d, count is %d\n", count, whc->count);
 	    bt_trap();
+	}
 
 	if (whc->count != 0) {
 	    count += 1;
@@ -495,10 +497,6 @@ static uint read_mailbox(char *arg)
 		printf("\r              \r%d ", count/1000 );
 	    fflush(stdout);
 	}
-
-	if (max_messages_per_mailbox != 0 &&
-	    count > max_messages_per_mailbox)
-	    break;
     }
 
     ns_and_sp->count += count;
@@ -771,21 +769,15 @@ static void top_ten(result_t *sorted)
 
     if (verbose)
 	printf("    ");
-    printf("   rs     md    rx    co      %%fp     %%fn");
-    if (verbose>1)
-	printf("    fp  fn");
-    printf( "\n" );
+    printf("   rs     md    rx    co      %%fp     %%fn    fp  fn\n" );
 
     for (i=0; i < 10; i += 1) {
 	result_t *r = &sorted[i];
 	if (verbose)
 	    printf("%3d  ", r->idx);
-	printf( "%6.4f %5.3f %5.3f %6.4f  %6.4f  %6.4f",
+	printf( "%6.4f %5.3f %5.3f %6.4f  %6.4f  %6.4f  %3d %3d\n",
 		r->rs, r->md, r->rx, r->co, 
-		r->fp*100.0/ns_cnt, r->fn*100.0/sp_cnt);
-	if (verbose>1)
-	    printf( "  %3d %3d", r->fp, r->fn);
-	printf( "\n" );
+		r->fp*100.0/ns_cnt, r->fn*100.0/sp_cnt, r->fp, r->fn);
     }
 
     printf("\n");
@@ -864,7 +856,7 @@ static void progress(uint cur, uint top)
     uint ndots = ceil(70.0 * cur / top);
     if (ndots < 1)
 	ndots = 1;
-     printf("\r[");
+     printf("\r%3d [", cur);
      for (i=0; i < ndots; i += 1)
 	 printf(".");
      for (i=ndots; i < 70; i += 1)
@@ -1012,6 +1004,8 @@ static bool check_msg_counts(void)
 
 static rc_t bogotune(void)
 {
+    result_t *best;
+
     int beg, end;
     uint cnt, scan;
     uint target;
@@ -1119,8 +1113,7 @@ static rc_t bogotune(void)
 	uint i;
 	uint r_count;
 	uint rsi, rxi, mdi;
-	result_t *results, *r;
-	result_t *sorted;
+	result_t *results, *r, *sorted;
 
 	printf("Performing %s scan:\n", scan==0 ? "coarse" : "fine");
 
@@ -1167,6 +1160,20 @@ static rc_t bogotune(void)
 		    uint fp, fn;
 		    robx = rxval->data[rxi];
 
+		    /* save parms */
+		    r = &results[cnt++];
+		    r->idx = cnt;
+		    r->rsi = rsi; r->rs = robs;
+		    r->rxi = rxi; r->rx = robx;
+		    r->mdi = mdi; r->md = min_dev;
+
+		    if (verbose > SUMMARY)
+			printf( "%3d  %d %d %d  ", cnt, rsi, mdi, rxi);
+		    if (verbose >= SUMMARY) {
+			printf( "%6.4f %5.3f %5.3f", robs, min_dev, robx);
+			fflush(stdout);
+		    }
+
 		    spam_cutoff = 0.01;
 		    score_ns(ns_scores);	/* scores in ascending order */
 		    
@@ -1179,27 +1186,20 @@ static rc_t bogotune(void)
 		    if (ns_cnt < fp)
 			fprintf(stderr,
 				"Too few false positives to determine a valid cutoff\n");
+
 		    score_sp(sp_scores);
 		    fn = get_fn_count(sp_cnt, sp_scores);
 
-		    /* save parms and results */
-		    r = &results[cnt++];
-		    r->idx = cnt;
-		    r->rsi = rsi; r->rs = robs;
-		    r->rxi = rxi; r->rx = robx;
-		    r->mdi = mdi; r->md = min_dev;
+		    /* save results */
 		    r->co = spam_cutoff;
 		    r->fp = fp;
 		    r->fn = fn;
 
-		    if (verbose >= SUMMARY) {
-			if (verbose > SUMMARY)
-			    printf( "%3d  %d %d %d  ", cnt, rsi, mdi, rxi);
-			printf( "%6.4f %5.3f %5.3f %8.6f %2d %3d\n", robs, min_dev, robx, spam_cutoff, fp, fn);
-			fflush(stdout);
-		    }
-		    else {
+		    if (verbose < SUMMARY)
 			progress(cnt, r_count);
+		    else {
+			printf(" %8.6f %2d %3d\n", spam_cutoff, fp, fn);
+			fflush(stdout);
 		    }
 		}
 	    }
@@ -1216,8 +1216,8 @@ static rc_t bogotune(void)
 	/* Scan complete, now find minima */
 	f = false;
 	for (i = 0; i < cnt; i += 1) {
-	    r = &results[i];
-	    if (r->fp == target)
+	    best = &results[i];
+	    if (best->fp == target)
 		f = true;
 	}
 	if (!f)
@@ -1226,15 +1226,15 @@ static rc_t bogotune(void)
 	sorted = results_sort(r_count, results);
 	top_ten(sorted);
 
-	r = count_outliers(r_count, sorted, results);
-	robs = rsval->data[r->rsi];
-	robx = rxval->data[r->rxi];
-	min_dev = mdval->data[r->mdi];
+	best = count_outliers(r_count, sorted, results);
+	robs = rsval->data[best->rsi];
+	robx = rxval->data[best->rxi];
+	min_dev = mdval->data[best->mdi];
 
 	printf("Minimum found at s %6.4f, md %5.3f, x %5.3f\n", robs, min_dev, robx);
 	printf("        fp %d (%6.4f%%), fn %d (%6.4f%%)\n",
-		r->fp, r->fp*100.0/ns_cnt, 
-		r->fn, r->fn*100.0/sp_cnt);
+		best->fp, best->fp*100.0/ns_cnt, 
+		best->fn, best->fn*100.0/sp_cnt);
 	printf("\n");
 
 	data_free(rsval);
@@ -1253,7 +1253,10 @@ static rc_t bogotune(void)
     ** that give 0.05%, 0.1% and 0.2% fp.
     */
 
-    if (ns_cnt >= TEST_COUNT && sp_cnt >= TEST_COUNT)	/* HACK */
+    robs = rsval->data[best->rsi];
+    robx = rxval->data[best->rxi];
+    min_dev = mdval->data[best->mdi];
+
     final_recommendations();
 
     return status;
