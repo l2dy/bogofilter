@@ -167,6 +167,18 @@ AC_ARG_ENABLE(spam-header-name,
 	[Use specified header name instead of X-Bogosity])
 )
 
+# Allow the user to enable memory usage debugging methods
+
+AC_ARG_ENABLE(memdebug,
+	AC_HELP_STRING([--enable-memdebug],
+	[Enable memory usage debugging]),
+	if test "$enableval" = no; then
+		[USE_MEMDEBUG=NO]
+	else
+		[USE_MEMDEBUG=YES]
+	fi
+)
+
 # Allow the user to disable Graham methods
 
 AC_ARG_ENABLE(graham-method,
@@ -228,6 +240,14 @@ fi
 AM_CONDITIONAL(ENABLE_GRAHAM_METHOD, test x$USE_GRAHAM != xNO)
 AM_CONDITIONAL(ENABLE_ROBINSON_METHOD, test x$USE_ROBINSON != xNO)
 AM_CONDITIONAL(ENABLE_ROBINSON_FISHER, test x$USE_FISHER != xNO)
+
+# Enable building with memory usage debugging files.
+
+if test x$USE_MEMDEBUG == xYES ; then
+	AC_DEFINE(ENABLE_MEMDEBUG,1,
+	[Enable memory usage debugging])
+fi
+AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$MEM_DEBUG != xNO)
 
 # Checks for header files.
 AC_HEADER_STDC
