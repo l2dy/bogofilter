@@ -38,6 +38,9 @@ nukelogs() {
     rm -f `db_archive -a -h "$bogohome"`
 }
 
+# run db_checkpoint to reduce number of logs
+db_checkpoint -1 -h "$bogohome"
+
 # remove if requested
 if [ $removebef -eq 1 ] ; then nukelogs ; fi
 
