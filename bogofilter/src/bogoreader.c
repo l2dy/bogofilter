@@ -339,11 +339,9 @@ static bool b_args_next_mailstore(void)
  * returns false on all subsequent runs */
 static bool mail_next_mail(void)
 {
-    if (mail_first) {
-	mail_first = false;
-	return true;
-    }
-    return false;
+    bool val = mail_first;
+    mail_first = false;
+    return val;
 }
 
 /* always returns true on the first run
