@@ -1,13 +1,9 @@
 #!/bin/sh
 
-#Test database maintenancee using bogoutil's dump/load capabilities.
+#Test database maintenance using bogoutil's dump/load capabilities.
 
-TMPDIR=tmp
-
-[ -d ${TMPDIR} ] && rm -rf ${TMPDIR}
-mkdir ${TMPDIR}
-
-set -e
+srcdir=..
+. ${srcdir}/t.frame
 
 verbose=0
 if [ "$1" = "-v" ]; then

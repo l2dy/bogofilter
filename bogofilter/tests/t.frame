@@ -36,4 +36,4 @@ fi
 
 BOGOFILTER_DIR=$TMPDIR
 export BOGOFILTER_DIR
-../bogofilter -n -C </dev/null
+${srcdir}/../bogofilter -n -C </dev/null

@@ -3,6 +3,8 @@
 TESTSCRIPTS = driver.sh t.dump.load
 TESTS=$(TESTSCRIPTS)
 
+TESTS_ENVIRONMENT = RUN_FROM_MAKE=1 srcdir=$(srcdir) $(SHELL) $(VERBOSE)
+
 EXTRA_DIST=$(TESTSCRIPTS) input-1.txt input-2-data.txt \
 	    input-3-data.txt input-4-data.txt output-1.txt \
 	    output-2.txt output-3.txt output-4.txt \
