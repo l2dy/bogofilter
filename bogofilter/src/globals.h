@@ -111,6 +111,6 @@ extern	bool	unsure_stats;	/* true if print stats for unsures */
 #define	WORDLIST_VERSION	".WORDLIST_VERSION"
 extern	uint	wordlist_version;
 
-extern	bool	sigdie;		/* true if SIGINT or SIGTERM received */
+extern	bool	fDie;		/* true if SIGINT or SIGTERM received */
 
 #endif
