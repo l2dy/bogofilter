@@ -279,7 +279,7 @@ int yyinput(byte *buf, size_t max_size)
 
 	if (count >= MAXTOKENLEN * 2) {
 	    size_t shift = count - MAXTOKENLEN;
-	    memcpy(buff.t.text, buff.t.text + shift, MAXTOKENLEN+D);
+	    memmove(buff.t.text, buff.t.text + shift, MAXTOKENLEN+D);
 	    count = MAXTOKENLEN;
 	    buff.t.leng = MAXTOKENLEN;
 	}
