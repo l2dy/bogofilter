@@ -81,25 +81,6 @@ static bool not_long_token(byte *buf, size_t count)
     return false;
 }
 
-#if	0
-static int lgetsl(buff_t *buff)
-{
-    int count = buff_fgetsl(buff, fpin);
-
-    if (count > 0)
-	yylineno += 1;
-
-    /* Special check for message separator.
-       If found, handle it immediately.
-    */
-
-    if (count >= 0 && DEBUG_LEXER(0))
-	lexer_display_buffer(buff);
-
-    return count;
-}
-#endif
-
 static int yy_get_new_line(buff_t *buff)
 {
     int count = reader_getline(buff);
