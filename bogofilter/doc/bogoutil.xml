@@ -45,7 +45,7 @@
 	<cmdsynopsis>
 	    <command>bogoutil</command>
 	    <group choice="req">
-		<arg choice="plain">--db-check <replaceable>file</replaceable></arg>
+		<arg choice="plain">--db-verify <replaceable>file</replaceable></arg>
 		<arg choice="plain">--db-prune <replaceable>directory</replaceable></arg>
 		<arg choice="plain">--db-recover <replaceable>directory</replaceable></arg>
 		<arg choice="plain">--db-recover-harder <replaceable>directory</replaceable></arg>
@@ -177,27 +177,22 @@
 
     <refsect1 id="environment_maintenance">
 	<title>ENVIRONMENT MAINTENANCE</title>
-	<para>
-	    The <option>--db-check <replaceable>file</replaceable></option>
-	    option requests that bogofilter verifies the database file.
-	    It prints only errors, unless in verbose mode.
-	</para>
 	<para>The <option>--db-prune <replaceable>dir</replaceable></option>
 	    option causes bogoutil to checkpoint the database
 	    environment and remove inactive log files.</para>
 	<para>The <option>--db-recover <replaceable>dir</replaceable></option>
-	    option runs a regular data base recovery
-	    in the data base directory dir. If that fails, it will retry
-	    with a (usually slower) catastrophic data base recovery. If
-	    that fails, too, your data base cannot be repaired and must
+	    option runs a regular database recovery
+	    in the specified database directory. If that fails, it will retry
+	    with a (usually slower) catastrophic database recovery. If
+	    that fails, too, your database cannot be repaired and must
 	    be rebuilt from scratch.
 	    This is only supported when compiled with Berkeley DB
 	    support with transactions enabled. Trying recovery with QDBM or TDB support will
 	    result in an error.</para>
 	<para>The <option>--db-recover-harder <replaceable>dir</replaceable></option>
 	    option runs a catastrophic data
-	    base recovery in the data base directory dir. If that fails,
-	    your data base cannot be repaired and must be rebuilt from
+	    base recovery in the specified database directory. If that fails,
+	    your database cannot be repaired and must be rebuilt from
 	    scratch.
 	    This is only supported when compiled with Berkeley DB
 	    support with transactions enabled. Trying recovery with QDBM or TDB support will
@@ -209,6 +204,11 @@
 	    this <emphasis>before</emphasis> upgrading to a new Berkeley
 	    DB version if the new version to be installed requires a log
 	    file format update.</para>
+	<para>
+	    The <option>--db-verify <replaceable>file</replaceable></option>
+	    option requests that bogofilter verifies the database file.
+	    It prints only errors, unless in verbose mode.
+	</para>
     </refsect1>
 
     <refsect1 id="dataformat">
