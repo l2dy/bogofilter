@@ -21,7 +21,7 @@ echo  	41 A4 BA B5 B5 20 31     20  30 20  32 30 30 33 30 33 30 33 0A \
 	42 C1 BA B5 B8 B5 20 34  20  30 20  32 30 30 33 30 33 30 34 0A \
 | ../dehex >${TMPDIR}/input
 
-WORDLIST="${TMPDIR}/wordlist.db"
+WORDLIST="${TMPDIR}/wordlist.${DB_EXT}"
 
 rm -f ${WORDLIST}
 

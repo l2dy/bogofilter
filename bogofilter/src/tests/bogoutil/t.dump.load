@@ -15,7 +15,7 @@ BOGOUTIL="$VAL ../../bogoutil"
 
 BASE=t.dump.load
 OUT="${TMPDIR}/$BASE.out"
-DATA="${TMPDIR}/$BASE.db"
+DATA="${TMPDIR}/$BASE.${DB_EXT}"
 SUM="$BASE.sum"
 
 LANG=

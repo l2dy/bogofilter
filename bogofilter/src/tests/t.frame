@@ -17,6 +17,10 @@ set -e
 _POSIX2_VERSION=199209
 export _POSIX2_VERSION
 
+DB_EXT=`${relpath}/bogofilter -V 2>&1 | sed -n 's/^.*bogofilter\-\(.*db\) .*/\1/p'`
+[ -z "$DB_EXT" ] && DB_EXT="db"
+export DB_EXT
+
 # Cater for Solaris "compatibility"
 case $PATH in
 */usr/xpg4/bin:*) ;;
@@ -55,7 +59,7 @@ if [ -z "$RUN_FROM_MAKE" ] ; then
 # standalone, from shell directly
 # THIS IS PRONE TO RACES
    NAME=`basename $0 | sed -e 's/^t\.//'`
-   DATE=`date +"%Y%m%d.%H%M"`
+   DATE=`date +"%Y%m%d"`
    TMPDIR="${BF_TESTDIR}/$NAME.$DATE"
    SUPPRESS_DELETE="NO"
 else

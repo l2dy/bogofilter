@@ -71,9 +71,9 @@ for alg in f r g ; do
     mkdir $BOGOFILTER_DIR
     $BOGOFILTER -$alg -s < ${SYSTEST}/inputs/spam.mbx
     $BOGOFILTER -$alg -n < ${SYSTEST}/inputs/good.mbx
-    for f in $BOGOFILTER_DIR/*.db ; do
-	n=`basename $f .db`
-	$BOGOUTIL -d $BOGOFILTER_DIR/$n.db > $BOGOFILTER_DIR/$n.txt
+    for f in $BOGOFILTER_DIR/*.${DB_EXT} ; do
+	n=`basename $f .${DB_EXT}`
+	$BOGOUTIL -d $BOGOFILTER_DIR/$n.${DB_EXT} > $BOGOFILTER_DIR/$n.txt
     done
     if  [ $verbose -ne 0 ]; then
 	ls -l $BOGOFILTER_DIR/*list.txt
@@ -104,7 +104,7 @@ for alg in f r g ; do
     done
     if  [ $verbose -eq 0 ]; then
 	rm -f ${TMPDIR}/tests-$alg
-	rm -f $BOGOFILTER_DIR/*.db
+	rm -f $BOGOFILTER_DIR/*.${DB_EXT}
     fi
 done
 

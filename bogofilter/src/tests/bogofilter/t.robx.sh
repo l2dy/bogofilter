@@ -44,7 +44,7 @@ $BOGOFILTER -r -n < ${SYSTEST}/inputs/good.mbx
 if [ ! -z "$RUN_FROM_MAKE" ] ; then
     $BOGOUTIL -R $TMPDIR
 else
-    $BOGOUTIL -d $TMPDIR/wordlist.db > ${TMPDIR}/wordlist.txt
+    $BOGOUTIL -d $TMPDIR/wordlist.${DB_EXT} > ${TMPDIR}/wordlist.txt
     $BOGOUTIL -vvv -R $TMPDIR > ${TMPDIR}/output.vvv
 fi
 

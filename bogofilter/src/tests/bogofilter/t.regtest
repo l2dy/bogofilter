@@ -42,11 +42,11 @@ check_counts()
 	echo "test #$T"
     fi
 
-    if [ -f  $BOGOFILTER_DIR/goodlist.db ] ; then
-	g=`$BOGOUTIL -d $BOGOFILTER_DIR/goodlist.db | grep -v " 0 " | tee $TMPDIR/good.$T.out | wc -l`
-	s=`$BOGOUTIL -d $BOGOFILTER_DIR/spamlist.db | grep -v " 0 " | tee $TMPDIR/spam.$T.out | wc -l`
+    if [ -f  $BOGOFILTER_DIR/goodlist.${DB_EXT} ] ; then
+	g=`$BOGOUTIL -d $BOGOFILTER_DIR/goodlist.${DB_EXT} | grep -v " 0 " | tee $TMPDIR/good.$T.out | wc -l`
+	s=`$BOGOUTIL -d $BOGOFILTER_DIR/spamlist.${DB_EXT} | grep -v " 0 " | tee $TMPDIR/spam.$T.out | wc -l`
     else
-	$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db > $TMPDIR/word.$T.out
+	$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.${DB_EXT} > $TMPDIR/word.$T.out
 	g=`grep -v " 0$" < $TMPDIR/word.$T.out | tee $TMPDIR/good.$T.out | wc -l`
 	s=`grep -v " 0 " < $TMPDIR/word.$T.out | tee $TMPDIR/spam.$T.out | wc -l`
     fi
@@ -61,7 +61,7 @@ check_counts()
     fi
 }
 
-rm -f $BOGOFILTER_DIR/*.db
+rm -f $BOGOFILTER_DIR/*.${DB_EXT}
 
 # populate goodlist and spamlist
 
@@ -98,7 +98,7 @@ T=3	# test #3
 S=54	# expected tokens from spam message
 G=0	# expected tokens from good message
 
-rm -f $BOGOFILTER_DIR/*.db
+rm -f $BOGOFILTER_DIR/*.${DB_EXT}
 
 $BOGOFILTER $opts -C -y 0 -s -I $INPUT/msg.regtest.s
 $BOGOFILTER $opts -C -y 0 -n -I $INPUT/msg.regtest.n
@@ -112,7 +112,7 @@ T=4	# test #4
 S=0	# expected tokens from spam message
 G=54	# expected tokens from good message
 
-rm -f $BOGOFILTER_DIR/*.db
+rm -f $BOGOFILTER_DIR/*.${DB_EXT}
 
 $BOGOFILTER $opts -C -y 0 -s -I $INPUT/msg.regtest.s
 $BOGOFILTER $opts -C -y 0 -n -I $INPUT/msg.regtest.n

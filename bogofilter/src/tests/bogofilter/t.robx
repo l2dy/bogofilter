@@ -44,9 +44,9 @@ $BOGOFILTER -r -n < ${SYSTEST}/inputs/good.mbx
 if [ ! -z "$RUN_FROM_MAKE" ] ; then
     $BOGOUTIL -R $TMPDIR
 else
-    for f in $BOGOFILTER_DIR/*.db ; do
-	n=`basename $f .db`
-	$BOGOUTIL -d $BOGOFILTER_DIR/$n.db > ${TMPDIR}/$n.txt
+    for f in $BOGOFILTER_DIR/*.${DB_EXT} ; do
+	n=`basename $f .${DB_EXT}`
+	$BOGOUTIL -d $BOGOFILTER_DIR/$n.${DB_EXT} > ${TMPDIR}/$n.txt
     done
     $BOGOUTIL -vvv -R $TMPDIR > ${TMPDIR}/output.vvv
 fi

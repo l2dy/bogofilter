@@ -90,9 +90,9 @@ for mth in g r f t ; do
     mkdir -p $BOGOFILTER_DIR
     $BOGOFILTER -$alg $CFG -s < ${SYSTEST}/inputs/spam.mbx
     $BOGOFILTER -$alg $CFG -n < ${SYSTEST}/inputs/good.mbx
-    for f in $BOGOFILTER_DIR/*.db ; do
-	n=`basename $f .db`
-	$BOGOUTIL -d $BOGOFILTER_DIR/$n.db > $BOGOFILTER_DIR/$n.txt
+    for f in $BOGOFILTER_DIR/*.${DB_EXT} ; do
+	n=`basename $f .${DB_EXT}`
+	$BOGOUTIL -d $BOGOFILTER_DIR/$n.${DB_EXT} > $BOGOFILTER_DIR/$n.txt
     done
     [ $verbose -gt 0 ] && $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT
     #
