@@ -12,38 +12,38 @@
 
     <style type="text/css">
     <!--
-  h2 {
-    margin-top : 1em;
-    font-size : 125%;
-  }
-  ul {
-    margin-top: 1.5em;
-    margin-bottom: 0.5em;
-  }
-  ul ul {
-    margin-top: 0.25em;
-    margin-bottom: 0;
-  }
-  li {
-    margin-top: 0;
-    margin-bottom: 0.5em;
-  }
-  li li {
-    margin-bottom: 0.25em;
-  }
-  dt {
-    margin-top: 0.5em;
-    margin-bottom: 0;
-  }
-  p.subheading {
-    font-weight: bold
-  }
-  hr {
-    margin-top: 1em;
-    margin-bottom: 1em;
-  }
-  -->
-            </style>
+      h2 {
+	margin-top : 1em;
+	font-size : 125%;
+      }
+      ul {
+	margin-top: 1.5em;
+	margin-bottom: 0.5em;
+      }
+      ul ul {
+	margin-top: 0.25em;
+	margin-bottom: 0;
+      }
+      li {
+	margin-top: 0;
+	margin-bottom: 0.5em;
+      }
+      li li {
+	margin-bottom: 0.25em;
+      }
+      dt {
+	margin-top: 0.5em;
+	margin-bottom: 0;
+      }
+      p.subheading {
+	font-weight: bold
+      }
+      hr {
+	margin-top: 1em;
+	margin-bottom: 1em;
+      }
+    -->
+    </style>
   </head>
 
   <body>
@@ -127,6 +127,7 @@ French</a>
         </ul>
       </li>
     </ul>
+
     <hr>
 
     <h2 id="what-is-bogofilter">What is bogofilter?</h2>
@@ -150,6 +151,7 @@ French</a>
 
     <p>The <a href="http://bogofilter.sourceforge.net/NEWS">NEWS
     file</a> describes bogofilter's version history.</p>
+
     <hr>
 
     <h2 id="bogo-what">Bogo-what?</h2>
@@ -159,6 +161,7 @@ French</a>
 <a href="http://www.catb.org/~esr/jargon/html/B/bogon-filter.html">bogon filter</a>, i.e., it tries to identify 
 <a href="http://www.catb.org/~esr/jargon/html/B/bogus.html">bogus</a> mail by measuring the 
 <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">bogosity</a>.</p>
+
     <hr>
 
     <h2 id="lists">Mailing Lists</h2>
@@ -226,6 +229,7 @@ French</a>
         archive.</td>
       </tr>
     </table>
+
     <hr>
 
     <h2 id="vvv">What does bogofilter's verbose output mean?</h2>
@@ -357,6 +361,7 @@ French</a>
         Statistical Computing</a>.</p>
       </li>
     </ul>
+
     <hr>
 
     <h2 id="spamassassin">How can I use SpamAssassin to train
@@ -393,6 +398,7 @@ French</a>
   * ^X-Bogosity:.No
   non-spam
 </pre>
+
     <hr>
 
     <h2 id="training">How do I start my bogofilter training?</h2>
@@ -540,6 +546,7 @@ spam-unreadable
         see the message.</p>
       </li>
     </ul>
+
     <hr>
 
     <h2 id="query-database">How do I manually query the
@@ -566,6 +573,7 @@ spam-unreadable
     the count for the spamlist and use "bogoutil -d
     $BOGOFILTER_DIR/goodlist.db | wc -l" to display the count for
     the goodlist.</p>
+
     <hr>
 
     <h2 id="rescue">How can I tell if my word lists are
@@ -590,6 +598,7 @@ bogoutil -d spamlist.db | bogoutil -l spamlist.db.new
 db_dump -r spamlist.db &gt; spamlist.txt
 db_load spamlist.new &lt; spamlist.txt
 </pre>
+
     <hr>
 
     <h2 id="port-notes">How do I get bogofilter working on Solaris,
@@ -654,6 +663,7 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
 
     <p>See the file doc/programmer/README.hp-ux in the source
     distribution.</p>
+
     <hr>
 
     <h2 id="nfs">Can I share word lists over NFS?</h2>
@@ -676,6 +686,7 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
     running. Refer to your NFS documentation for more information
     about running "lockd" or "rpc.lockd". Most operating systems
     with NFS turn this on by default.</p>
+
     <hr>
 
     <h2 id="return-codes">Why does bogofilter give return codes
@@ -684,6 +695,7 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
     <p>Likely the return codes are being reformatted by waitpid(2).
     Use WEXITSTATUS(status) in sys/wait.h, or comparable macro, to
     get the correct value.</p>
+
     <hr>
 
     <h2 id="changed-options">Now that I've upgraded to 0.11 why are
@@ -735,6 +747,7 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
     <p>MDA scripts typically use '-s' and '-n' and don't need to
     change. Other scripts which use '-S' and '-N' for fixing
     registration errors <em>do</em> need to be changed.</p>
+
     <hr>
 
     <!--
