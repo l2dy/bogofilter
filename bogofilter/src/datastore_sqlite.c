@@ -40,7 +40,7 @@ DUMMYVPVP(db_get_env)
 DUMMYICP(db_verify)
 DUMMYICP(dbe_purgelogs)
 DUMMYICP(dbe_remove)
-void *dbe_init(const char *dummy) { (void)dummy; return (void *)~0; }
+void *dbe_init(const char *d1, const char *d2) { (void)d1; (void)d2; return (void *)~0; }
 /** dummy function, Sqlite recovers automatically. */
 ex_t dbe_recover(const char *d1, bool d2, bool d3) { (void)d1; d2=d3; return EX_ERROR; }
 bool db_is_swapped(void *dummy) { (void)dummy; return false; }
@@ -149,7 +149,8 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
 	sqlite3_finalize(stmt);
 	return rc;
     }
-    for(loop = true; loop;) {
+    loop = true;
+    while(loop) {
 	switch(sqlite3_step(stmt)) {
 	    case SQLITE_ROW:
 		found = true;
@@ -183,6 +184,9 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
 		break;
 	    case SQLITE_DONE:
 		loop = false;
+		break;
+	    case SQLITE_BUSY:
+		rand_sleep(1000, 100000);
 		break;
 	    default:
 		print_error(__FILE__, __LINE__, "Error executing \"%s\": %s (#%d)\n",
