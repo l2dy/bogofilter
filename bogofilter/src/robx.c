@@ -105,6 +105,8 @@ static double compute_robx(dsh_t *dsh)
 }
 
 /** returns negative for failure */
+/** used by bogoutil and bogotune */
+
 double compute_robinson_x(const char *path)
 {
     double rx;
@@ -119,7 +121,6 @@ double compute_robinson_x(const char *path)
     } else rx = -1;
 
     close_wordlists();
-    free_wordlists();
 
     return rx;
 }

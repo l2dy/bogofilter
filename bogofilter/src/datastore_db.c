@@ -931,6 +931,9 @@ static int db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
 {
     int ret;
 
+    if (dbe != NULL)
+	return 0;
+
     assert(bogohome);
     assert(dbe == NULL);
 

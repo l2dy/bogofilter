@@ -104,6 +104,11 @@ void open_wordlists(dbmode_t mode)
 {
     bool retry = true;
 
+    /* set bogohome using first wordlist's directory */
+    set_wordlist_directory();
+
+    ds_init();
+
     if (word_lists == NULL)
 	init_wordlist("word", WORDLIST, 0, WL_REGULAR);
 
@@ -144,6 +149,7 @@ void close_wordlists(void)
 	if (list->dsh) ds_close(list->dsh);
 	list->dsh = NULL;
     }
+    ds_cleanup();
 }
 
 bool build_wordlist_path(char *filepath, size_t size, const char *path)

@@ -56,11 +56,6 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     output_setup();
 
-    /* set bogohome using first wordlist's directory */
-    set_wordlist_directory();
-
-    ds_init();
-
     /* open all wordlists */
     open_wordlists((run_type == RUN_NORMAL) ? DS_READ : DS_WRITE);
 
@@ -81,7 +76,6 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     close_wordlists();
     free_wordlists();
-    ds_cleanup();
 
     output_cleanup();
 
