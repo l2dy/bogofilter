@@ -1,12 +1,13 @@
-/* collect.c -- tokenize input and cap word frequencies, return a wordhash */
 /* $Id$ */
+
+/* collect.c -- tokenize input and cap word frequencies, return a wordhash */
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <config.h>
-
 #include "common.h"
+
 #include "bogofilter.h"
 #include "wordhash.h"
 #include "lexer.h"
@@ -54,16 +55,17 @@ void collect_words(/*@out@*/ wordhash_t **wh,
 	    w = wordhash_insert(h, yylval, sizeof(wordprop_t), &wordprop_init);
 	    if (w->freq < max_repeats) w->freq++;
 	    w_count++;
-	} else {
-	    if (token_type == FROM && from_seen == false) {
-		from_seen = true;
-		continue;
-	    }
-
-	    /* Want to process EOF, *then* drop out */
-	    *cont = (token_type != 0);
-	    break;
+	    continue;
 	}
+
+	if (token_type == FROM && from_seen == false) {
+	    from_seen = true;
+	    continue;
+	}
+
+	/* Want to process EOF, *then* drop out */
+	*cont = (token_type != 0);
+	break;
     }
 
     if (word_count)
