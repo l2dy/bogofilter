@@ -670,7 +670,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 #define YN(b) (b ? "Yes" : "No")
 #define NB(b) ((b != NULL && *b != '\0') ? b : "''")
 
-void query_config(void)
+rc_t query_config(void)
 {
     Q1 fprintf(stdout, "# %s version %s\n", progname, version);
     Q1 fprintf(stdout, "\n");
@@ -724,7 +724,7 @@ void query_config(void)
 #endif
 #endif
 
-    exit(EX_OK);
+    return EX_OK;
 }
 
 static void display_tag_array(const char *label, FIELD *array)

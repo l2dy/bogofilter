@@ -77,10 +77,12 @@ rc_t bogofilter(int argc, char **argv)
     bool write_msg    = passthrough || Rtable;
     bool classify_msg = write_msg || ((run_type & (RUN_NORMAL | RUN_UPDATE))) != 0;
 
-    wordhash_t *words = register_aft ? wordhash_new() : NULL;
+    wordhash_t *words;
 
     if (query)
-	query_config();
+	return query_config();
+
+    words = register_aft ? wordhash_new() : NULL;
 
     bogoreader_init(argc, argv);
 
