@@ -46,8 +46,6 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     progtype = build_progtype(progname, DB_TYPE);
 
     process_parameters(argc, argv, true);
-    argc -= optind;
-    argv += optind;
 
 #ifdef	HAVE_SYSLOG_H
     if (logflag)
@@ -59,7 +57,7 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     /* open all wordlists */
     open_wordlists(word_lists, (run_type == RUN_NORMAL) ? DS_READ : DS_WRITE);
 
-    status = bogofilter(argc, argv);
+    status = bogofilter(argc - optind, argv + optind);
 
     switch (status) {
     case RC_SPAM:	exitcode = EX_SPAM;	break;
