@@ -1,4 +1,9 @@
-#!/usr/bin/perl
+#! /bin/sh
+echo >&2 "This program is currently unavailable for security reasons."
+exit 2
+
+eval 'exec perl -wS $0 ${1+"$@"}'
+if 0;
 
 # bogopass emulates the -p (passthrough) option of bogofilter with base64
 # decoding. It takes an e-mail message on stdin, filters it through unbase64,
