@@ -222,7 +222,7 @@
 #	spamicity calculation
 #       defaults: 0.0 for graham and 0.1 for robinson and fisher
 
-## min_dev=0.0
+## min_dev=0.1
 
 
 ##### THRESHOLD Values
