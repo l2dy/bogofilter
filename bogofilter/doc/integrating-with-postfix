@@ -10,7 +10,8 @@ Theory:
 
  There are several advantages to doing so:
 
- 1. Mail users on non-Unix platforms will benefit from bogofilter spam filtering
+ 1. Mail users on non-Unix platforms will benefit from bogofilter spam
+    filtering.
  2. bogofilter learns better since it has access to a larger corpus.
 
  There is also a mechanism for users to register new spam/non-spam
@@ -19,8 +20,10 @@ Theory:
 Assumptions:
 
 - Most of the steps described here require root privileges.
-- postfix is installed in /usr/sbin/postfix. If you installed postfix
-  from rpm, it is probably installed there.
+- postfix is installed into /usr. If you installed postfix
+  from rpm, it is probably installed there. If you installed from
+  source, it is installed into /usr/local unless you changed its
+  configuration.
 - bogofilter is installed in /usr/bin/bogofilter on the mail server.
 
 Installation:
@@ -28,9 +31,10 @@ Installation:
 - Build the initial spam and non-spam databases by feeding your corpus of mail.
 
    Assuming that the files are in mbox format in /home/bogofilter, you say:
-  
-   [/home/bogofilter]# bogofilter -d . -s < spam.mbx
-   [/home/bogofilter]# bogofilter -d . -n < nonspam.mbx
+
+   # cd /home/bogofilter
+   # bogofilter -d . -s < spam.mbx
+   # bogofilter -d . -n < nonspam.mbx
 
 Filtering:
 
@@ -41,7 +45,7 @@ Filtering:
 
 	FILTER=/usr/bin/bogofilter
 	FILTER_DIR=/var/spool/filter
-	POSTFIX=/usr/sbin/postfix
+	POSTFIX=/usr/sbin/sendmail
 	export BOGOFILTER_DIR=/home/bogofilter
 
 	# Exit codes from <sysexits.h>
@@ -52,27 +56,27 @@ Filtering:
 	    { echo $FILTER_DIR does not exist; exit $EX_TEMPFAIL; }
 
 	# Clean up when done or when aborting.
-	trap "rm -f inp.$$ msg.$$ ; exit $EX_TEMPFAIL" 0 1 2 3 15
+	trap "rm -f msg.$$ ; exit $EX_TEMPFAIL" 0 1 2 3 15
 
-	# bogofilter returns: 0 for spam; 1 for non-spam;
-	# 2 for I/O or other errors.
+	# bogofilter -e returns: 0 for OK, nonzero for error
+	rm -f msg.$$ || exit $EX_TEMPFAIL
+	$FILTER -p -u -e > msg.$$ || exit $EX_TEMPFAIL
 
-	rm -f inp.$$ || exit $EX_TEMPFAIL
-	cat > inp.$$ || exit $EX_TEMPFAIL
-	$FILTER -p -u -e < inp.$$ > msg.$$ || exit $EX_TEMPFAIL
-
-	exec $POSTFIX "$@" < msg.$$
+	exec <msg.$$ || exit $EX_TEMPFAIL
+	rm -f msg.$$ # safe, we hold the file descriptor
+	exec $POSTFIX "$@"
 	exit $EX_TEMPFAIL
 
    Make sure the script is executable!
- 
+
    Given a good initial corpus, it is better to have bogofilter update
    its lists based on the message classification, since it is quite
    likely to get it right.  Misclassifications will be corrected later.
 
 - Modify your /etc/postfix/master.cf to run the filter.
 
-    After the line that starts "smtp " and ends in "smtpd" and add the
+    After the line that starts "smtp " and ends in "smtpd" (don't
+    confuse it with the one that ends in "smtp", mind the "d"!) and add the
     following line, you must indent it with some spaces or tabs:
 
 	    -o content_filter=filter:
@@ -126,3 +130,4 @@ Registration and Correction:
 Author:
  Gyepi Sam <gyepi@praxis-sw.com>
  David Relson <relson@osagesoftware.com>
+ Matthias Andree <matthias.andree@gmx.de>
