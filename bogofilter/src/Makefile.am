@@ -138,7 +138,7 @@ EXTRA_DIST = \
 	     version.sh \
 	     strlcat.3 strlcpy.3
 #
-version.c:	version.sh
+version.c:	version.sh ../configure.ac Makefile.am
 	$(srcdir)/version.sh $(top_srcdir) >"$@.new" && mv "$@.new" "$@" \
 	    || rm -f "$@"
 #
