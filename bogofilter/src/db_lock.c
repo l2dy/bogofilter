@@ -28,7 +28,9 @@
 #include "globals.h"
 #include "mxcat.h"
 #include "system.h"
+#include "xmalloc.h"
 #include "xstrdup.h"
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -219,7 +221,7 @@ static int open_lockfile(const char *bogohomedir) {
 	}
     }
 
-    free(fn);
+    xfree(fn);
     return (lockfd < 0) ? -1 : 0;
 }
 

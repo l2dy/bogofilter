@@ -89,7 +89,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 
     x = bf_dirname(list->filepath);
     dbe = list_searchinsert(x, list->filepath);
-    free(x);
+    xfree(x);
     if (dbe == NULL)
 	exit(EX_ERROR);
     list->dsh = ds_open(dbe, bogohome, list->filepath, mode); /* FIXME */
@@ -147,6 +147,8 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 		break;
 	}
     }
+
+//    xfree(dbe);
 
     return retry;
 }
@@ -207,7 +209,7 @@ bool close_wordlists(wordlist_t *list, bool commit /** if unset, abort */)
     while ((i = envlisthead.lh_first)) {
 	ds_cleanup(i->dbe);
 	LIST_REMOVE(i, entries);
-	free(i);
+	xfree(i);
     }
     return err;
 }

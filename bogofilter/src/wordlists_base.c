@@ -151,7 +151,7 @@ int set_wordlist_dir(const char* d, priority_t precedence)
     }
 
     set_bogohome(dir);
-    free(dir);
+    xfree(dir);
 
     return rc;
 }

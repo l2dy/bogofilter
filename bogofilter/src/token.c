@@ -471,6 +471,7 @@ void token_cleanup()
     WFREE(w_recv);
     WFREE(w_head);
     WFREE(w_mime);
+    WFREE(nonblank_line);
 
     token_clear();
 }

@@ -401,7 +401,7 @@ static int db_try_glock(bfdir *directory, short locktype, int lockcmd)
 	exit(EX_ERROR);
     }
 
-    free(t);
+    xfree(t);
     /* lock set up */
     return lockfd;
 }
