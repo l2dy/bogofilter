@@ -27,7 +27,7 @@ AUTHOR:
 typedef struct rstats_s rstats_t;
 struct rstats_s {
     rstats_t *next;
-    word_t *token;
+    const word_t *token;
     u_int32_t	good;
     u_int32_t	bad;
     u_int32_t	msgs_good;
@@ -78,7 +78,6 @@ void rstats_cleanup(void)
     for (p = stats_head->list; p != NULL; p = q)
     {
       q = p->next;
-      xfree(p->token);
       xfree(p);
     }
     xfree(stats_head);
@@ -93,7 +92,7 @@ void rstats_add(const word_t *token, double prob, wordcnts_t *cnts)
 
     stats_head->count += 1;
     stats_tail->next  = NULL;
-    stats_tail->token = word_dup(token);
+    stats_tail->token = token;
     stats_tail->prob  = prob;
     stats_tail->good  = cnts->good;
     stats_tail->bad   = cnts->bad;
