@@ -123,9 +123,9 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     int   exitcode;
     FILE  *out;
 
-    if (((directory = create_path_from_env("HOME", BOGODIR)) == NULL) ||
+    if (((directory = create_path_from_env("HOME", BOGODIR)) == NULL) &&
 	((directory = create_path_from_env("BOGOFILTER_DIR", NULL)) == NULL)) {
-	fprintf(stderr, "HOME or BOGOFILTER_DIR too long\n");
+	fprintf(stderr, "Neither of HOME or BOGOFILTER_DIR is defined.\n");
 	exit(2);
     }
 
