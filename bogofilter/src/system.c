@@ -29,9 +29,9 @@ const char *const system_config_file = "<Bogofilter$Dir>.bogofilter/cf";
 /* import select() */
 #ifdef HAVE_SYS_SELECT_H
 #include <sys/select.h>
-#else
-#include <unistd.h>
 #endif
+/* some broken systems define it in unistd.h instead */
+#include <unistd.h>
 
 bool bf_abspath(const char *path)
 {
