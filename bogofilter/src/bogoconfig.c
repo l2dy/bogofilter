@@ -658,17 +658,14 @@ void process_args_2(int argc, char **argv)
 	    {
 		switch (*s)
 		{
-		case 't': tokenize_html_tags ^= true;		/* -Pt */
-		    break;
-		case 's': tokenize_html_script ^= true;		/* -Ps - not yet in use */
-		    break;
+		case 't': tokenize_html_tags ^= true; 	break;	/* -Pt */
+		case 's': tokenize_html_script ^= true; break;	/* -Ps - not yet in use */
+		case 'h': tag_header_lines ^= true; 	break;	/* -Ph */
+		case 'f': fold_case ^= true; 		break;	/* -Pf */
+
 		case 'C': strict_check ^= true;			/* -PC */
 		    /*@fallthrough@*/
 		case 'c': tokenize_html_comments ^= true;	/* -Pc - not yet in use */
-		    break;
-		case 'h': tag_header_lines ^= true;		/* -Ph */
-		    break;
-		case 'f': fold_case ^= true;			/* -Pf */
 		    break;
 		default:
 		    fprintf(stderr, "Unknown parsing option -P%c.\n", *s);
@@ -685,7 +682,6 @@ void process_args_2(int argc, char **argv)
 	case 'o':
 	    comma_parse(option, optarg, &spam_cutoff, &ham_cutoff);
 	    break;
-
 	}
     }
 
