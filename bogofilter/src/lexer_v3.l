@@ -248,7 +248,7 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 						}
 
 <INITIAL>\n					{ set_tag("Header"); lineno += 1; }
-<INITIAL><<EOF>>				{ add_hint("no_body:"); return NONE; }
+<INITIAL><<EOF>>				{ return NONE; }
 
 <INITIAL>{VERP} 				{ skip_to('='); return VERP; }
 
