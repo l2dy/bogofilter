@@ -665,7 +665,7 @@ static int process_args(int argc, char **argv)
 	    exit(0);
 
 	case 'W':
-	    incr_wordlist_mode_flag();
+	    incr_wordlist_mode();
 	    break;
 
 	case 'x':

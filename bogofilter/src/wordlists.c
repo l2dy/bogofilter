@@ -169,6 +169,18 @@ size_t	    cCombined = COUNTOF(aCombined);
 const char *aSeparate[] = { SPAMFILE, GOODFILE };
 size_t	    cSeparate = COUNTOF(aSeparate);
 
+void incr_wordlist_mode(void)
+{
+    switch (wl_mode) {
+    case WL_M_UNKNOWN:  wl_mode = WL_M_COMBINED; break;
+    case WL_M_COMBINED: wl_mode = WL_M_SEPARATE; break;
+    case WL_M_SEPARATE: 
+	fprintf(stderr, "Invalid -W option.\n");
+	exit(2);
+    }
+    return;
+}
+
 void set_wordlist_mode(void **dbhp, const char *filepath, dbmode_t dbmode)
 {
     if (wl_mode == WL_M_UNKNOWN) {
@@ -266,18 +278,6 @@ void free_wordlists(void)
 	xfree(list);
     }
     word_lists = NULL;
-}
-
-void incr_wordlist_mode_flag(void)
-{
-    switch (wl_mode) {
-    case WL_M_UNKNOWN:  wl_mode = WL_M_COMBINED; break;
-    case WL_M_COMBINED: wl_mode = WL_M_SEPARATE; break;
-    case WL_M_SEPARATE: 
-	fprintf(stderr, "Invalid -W option.\n");
-	exit(2);
-    }
-    return;
 }
 
 size_t build_wordlist_paths(char **filepaths, const char *path)

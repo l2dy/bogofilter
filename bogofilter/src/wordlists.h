@@ -39,7 +39,7 @@ struct wordlist_s
 extern wordlist_t *word_list;
 extern wordlist_t *word_lists;
 
-void incr_wordlist_mode_flag(void);
+void incr_wordlist_mode(void);
 void set_wordlist_mode(void **dbh, const char *filepath, dbmode_t dbmode);
 size_t build_wordlist_paths(char **filepaths, const char *path);
 
