@@ -273,7 +273,7 @@ static int yyinput(char *buf, int max_size)
 
     if (returned == -1) {
 	if (ferror(yyin)) {
-	    PRINT_ERROR("input in flex scanner failed\n");
+	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
 	    exit(2);
 	} else {
 	    return YY_NULL;
