@@ -112,11 +112,14 @@ static void wordprob_add(wordprob_t* wordstats, int count, int bad)
 static double wordprob_result(wordprob_t* wordstats)
 {
     double g = min(wordstats->good, msgs_good);
-    double b = min(wordstats->bad, msgs_bad);
+    double b = min(wordstats->bad,  msgs_bad);
     double n = g + b;
 
-    double pw = (n < EPS) ? 0.0 : ((b / msgs_bad) / 
-				   (b / msgs_bad + g / msgs_good));
+    long bad_cnt  = max(1, msgs_bad);
+    long good_cnt = max(1, msgs_good);
+
+    double pw = (n < EPS) ? 0.0 : ((b / bad_cnt) / 
+				   (b / bad_cnt + g / good_cnt));
     double fw = (robs * robx + n * pw) / (robs + n);
 
     return (fw);

@@ -213,6 +213,8 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
 void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 {
     size_t r;
+    long bad_cnt  = max(1, msgs_bad);
+    long good_cnt = max(1, msgs_good);
 
     /* print header */
     if (!Rtable)
@@ -229,13 +231,14 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 	const word_t *token = cur->token;
 	int len = max(0, MAXTOKENLEN-(int)token->leng);
 	double g = min(cur->good, msgs_good);
-	double b = min(cur->bad, msgs_bad);
-	double n = g + b;
-	double pw = ((n < EPS) 
+	double b = min(cur->bad,  msgs_bad);
+	double c = g + b;
+	int n = c;
+	double pw = ((n == 0) 
 		     ? 0.0
-		     : ((b / msgs_bad) /
-			(b / msgs_bad + g / msgs_good)));
-	double fw = (robs * robx + n * pw) / (robs + n);
+		     : ((b / bad_cnt) /
+			(b / bad_cnt + g / good_cnt)));
+	double fw = (robs * robx + c * pw) / (robs + c);
 	char flag = (fabs(fw-EVEN_ODDS) - min_dev >= EPS) ? '+' : '-';
 
 	(void)fputc( '"', stdout);
@@ -244,11 +247,11 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 	if (!Rtable)
 	    (void)fprintf(stdout, "\"%*s %5d  %8.6f  %8.6f  %8.6f %c\n",
 			  len, " ",
-			  (int)n, g / msgs_good, b / msgs_bad, fw, flag);
+			  n, g / good_cnt, b / bad_cnt, fw, flag);
 	else
 	    (void)fprintf(stdout, "\"%*s %5d  %8.6f  %8.6f  %8.6f%10.5f%10.5f %c\n",
 			  len, " ",
-			  (int)n, g / msgs_good, b / msgs_bad, 
+			  n, g / good_cnt, b / bad_cnt,
 			  fw, log(1.0 - fw), log(fw), flag);
     }
 
