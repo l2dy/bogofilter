@@ -80,8 +80,8 @@ void initialize(FILE *fp)
     init_charset_table(charset_default, true);
     mime_reset();
     token_init();
-    if (fp)
-	lexer_v3_init(fp);
+    collect_reset();
+    lexer_v3_init(fp);
 }
 
 int classify(int argc, char **argv, FILE *out)

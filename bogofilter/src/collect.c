@@ -26,12 +26,10 @@ void wordprop_init(void *vwordprop)
 
 static bool from_seen = false;
 
-#if	0	/* 01/26/2003 - not used */
 void collect_reset(void)
 {
     from_seen = false;
 }
-#endif
 
 /* Tokenize input text and save words in the wordhash_t hash table.
  *
