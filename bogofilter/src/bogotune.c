@@ -882,7 +882,7 @@ static void help(void)
 		  "\t  -D      - don't read a wordlist file.\n"
 		  "\t  -d path - specify directory for wordlists.\n"
 		  "\t  -E      - disable ESF (effective size factor) tuning.\n"
-		  "\t  -M      - output input file in message count format.\n"
+		  "\t  -M      - rewrite input file in message count format.\n"
 		  "\t  -r num  - specify robx value\n");
     (void)fprintf(stderr,
 		  "\t  -T num  - specify fp target value\n"
