@@ -2,6 +2,14 @@
 				BOGOFILTER NEWS
 			       =================
  
+0.13.4	2003-05-30
+
+* Changed default value of ROBS from 0.001 to 0.01
+* Fixed options '-M' (mailbox mode) and '-p' (passthrough mode) so
+  they work properly together. 
+* Minor cleanups in bogofilter.cf.example
+* Added db-3.2 and db-3.1 to list for AC_CHECK_DB in configure.ac
+
 0.13.3	2003-05-28
  
 * Tweaked long line check used to prevent scanner buffer overflow.

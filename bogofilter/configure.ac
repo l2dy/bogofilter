@@ -1,5 +1,5 @@
 # $Id$
-AC_INIT(bogofilter, 0.13.3.cvs)
+AC_INIT(bogofilter, 0.13.4)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR([src])
 AC_CANONICAL_TARGET
@@ -144,7 +144,7 @@ export STATICLDFLAGS
 AC_SUBST(STATICLDFLAGS)
 AM_CONDITIONAL(ENABLE_STATIC, test x$enable_static = xyes)
 
-AC_CHECK_DB([db db-4.1 db41 db-4.0 db4 db-3.3 db-3.2 db3],${STATICLDFLAGS},,
+AC_CHECK_DB([db db-4.1 db41 db-4.0 db4 db-3.3 db-3.2 db-3.1 db3],${STATICLDFLAGS},,
 	    AC_MSG_ERROR([[Can not locate a suitable Berkeley DB library.  Use --with-db=PATH to specify the path to a v3+ install directory]]),-lpthread -lthread)
 export LIBS
 
