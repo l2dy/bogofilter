@@ -4,6 +4,16 @@
 
 $Id$
      
+0.10.3.1  2003-02-17
+	* Updated bogofilter and bogoutil man pages.
+	* Give command line options precedence over config file options.
+
+0.10.3  2003-02-14
+
+	* Database access efficiency changes.
+	* Database properly closed at end of maintenance pass.
+	* Improvements in html comment handling code.
+
 0.10.2	2003-02-03
 
 	* Support option '-?'
