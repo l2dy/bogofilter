@@ -107,7 +107,7 @@ static int yy_get_new_line(buff_t *buff)
     ** -- before mime decoding.  Without it, flex aborts:
     ** "fatal flex scanner internal error--end of buffer missed" */
 
-    if (buff->t.leng >= 2 &&
+    if (buff->t.leng > 2 &&
 	buf[0] == '-' && buf[1] == '-' &&
 	got_mime_boundary(&buff->t)) {
 	yy_set_state_initial();
