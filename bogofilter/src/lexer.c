@@ -122,6 +122,15 @@ static int yy_get_new_line(buff_t *buff)
 	}
     }
 
+    /* Mime header check needs to be performed on raw input
+    ** -- before mime decoding.  Without it, flex aborts:
+    ** "fatal flex scanner internal error--end of buffer missed" */
+    if (got_mime_boundary(&buff->t)) {
+	msg_header = true;
+	if (test) fprintf(dbgout, "lexer.c:  yy_get_new_line() -> yy_set_state_initial()\n");
+	yy_set_state_initial();
+    }
+
     if (count >= 0 && DEBUG_LEXER(0))
 	lexer_display_buffer(buff);
     

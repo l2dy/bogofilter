@@ -280,6 +280,7 @@ static void reorder_html(void)
 }
 
 char yy_get_state(void);
+void yy_set_state_initial(void);
 
 char yy_get_state()
 {
@@ -292,6 +293,12 @@ char yy_get_state()
     case LCOMMENT: return 'l';
     default:       return 'o';
     }
+}
+
+void yy_set_state_initial()
+{
+    BEGIN INITIAL;
+    if (test) fprintf(dbgout, "%s:%d BEGIN INITIAL\n", __FILE__, __LINE__);
 }
 
 /*
