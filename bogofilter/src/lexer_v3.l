@@ -87,7 +87,7 @@ static word_t *yy_text(void)
 %option debug nodebug
 %option align caseless 8bit 
 %option never-interactive noreject
-%option noyywrap 
+%option noyywrap nounput
 %option prefix="lexer_v3_"
 
 UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
@@ -187,8 +187,6 @@ TOKEN 		{TOKENFRONT}{TOKENMID_NJS_DR}{TOKENBACK}
 						}
 
 %%
-
-void *v = &yyunput;	/* suppress compiler warning */
 
 void lexer_v3_init(FILE *fp)
 {
