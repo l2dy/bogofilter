@@ -1,7 +1,7 @@
 /* $Id$ */
 
-#ifndef DATASTORE_H
-#define DATASTORE_H
+#ifndef DATASTORE_DB_H
+#define DATASTORE_DB_H
 
 #define MSG_COUNT_TOK ".MSG_COUNT"
 
