@@ -174,7 +174,7 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
 	maxcnt = max(maxcnt, cnt);
     }
 
-    (void)fprintf(stdout, "%s%5s %4s %7s   %9s  %s\n", stats_prefix, "int", "cnt", "prob", "spamicity", "histogram" );
+    (void)fprintf(stdout, "%5s %4s %7s   %9s  %s\n", "int", "cnt", "prob", "spamicity", "histogram" );
 
     // Print histogram
     for (i=0; i<INTERVALS; i+=1)
@@ -185,7 +185,7 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
 	double prob = cnt ? h->prob/cnt : 0.0;
 
 	// print interval, count, probability, and spamicity
-	(void)fprintf(stdout, "%s%5.2f %4d  %f  %f  ", stats_prefix, beg, cnt, prob, h->spamicity );
+	(void)fprintf(stdout, "%5.2f %4d  %f  %f  ", beg, cnt, prob, h->spamicity );
 
 	// scale histogram to 50 characters
 	if (maxcnt>50) cnt = (cnt * 50 + maxcnt - 1) / maxcnt;
@@ -202,7 +202,7 @@ void rstats_print_rtable(int robn, rstats_t **rstats_array)
     int r;
 
     // print header
-    (void)fprintf(stdout, "%s     %-20s%10s%10s%10s%10s%10s\n", stats_prefix,
+    (void)fprintf(stdout, "     %-20s%10s%10s%10s%10s%10s\n",
 		  "Token","pgood","pbad","fw","invfwlog","fwlog");
 
     // Print 1 line per token
@@ -211,13 +211,13 @@ void rstats_print_rtable(int robn, rstats_t **rstats_array)
 	rstats_t *cur = rstats_array[r];
 	double prob = cur->prob;
 
-	(void)fprintf(stdout, "%s%3d  %-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f\n", stats_prefix,
+	(void)fprintf(stdout, "%3d  %-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f\n",
 		      r, cur->token, cur->good, cur->bad, prob, 
 		      log(1.0 - prob), log(prob));
     }
 
     // print trailer
-    (void)fprintf(stdout, "%s%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n", stats_prefix,
+    (void)fprintf(stdout, "%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
 		  robn, "P_Q_S_invsum_logsum", header.invproduct, header.product, header.spamicity,
 		  header.invlogsum, header.logsum);
 }
