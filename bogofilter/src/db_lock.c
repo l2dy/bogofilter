@@ -64,7 +64,7 @@ static int locked;
  * call close() for the file for the first time no matter how many file
  * descriptors to the file we still hold, so we cannot use
  * open-check-close cycles but need to keep the
- * descriptor open until will let go of the locks.i
+ * descriptor open until we'll let go of the locks.
  */
 static int lockfd = -1;
 
