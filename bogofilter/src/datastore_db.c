@@ -156,18 +156,33 @@ static void check_db_version(void)
  * current resource limit and warn if file size is "close" (2 MB) to the
  * limit. errors from the system are ignored, no warning then.
  */
-static void check_fsize_limit(int fd) {
+static void check_fsize_limit(int fd, uint32_t pagesize) {
     struct stat st;
     struct rlimit rl;
 
     if (fstat(fd, &st)) return; /* ignore error */
     if (getrlimit(RLIMIT_FSIZE, &rl)) return; /* ignore error */
-    if (rl.rlim_cur != RLIM_INFINITY && rl.rlim_cur - st.st_size < (2 * 1024 * 1024)) {
-	print_error(__FILE__, __LINE__, "warning: data base file size approaches resource limit.");
-	print_error(__FILE__, __LINE__, "         write errors (bumping into the limit) can cause");
-	print_error(__FILE__, __LINE__, "         data base corruption.");
+    if (rl.rlim_cur != RLIM_INFINITY) {
+	/* WARNING: Be extremely careful that in these comparisons there
+	 * is no unsigned term, it will spoil everything as C will
+	 * coerce into unsigned types, which would then make "file size
+	 * larger than resource limit" undetectable. BUG: this doesn't
+	 * work when pagesize doesn't fit into signed long. ("requires"
+	 * 2**31 for file size and 32-bit integers to fail) */
+	if ((off_t)(rl.rlim_cur/pagesize) - st.st_size/(long)pagesize < 16) {
+	    print_error(__FILE__, __LINE__, "error: the data base file size is only 16 pages");
+	    print_error(__FILE__, __LINE__, "       below the resource limit. Cowardly refusing");
+	    print_error(__FILE__, __LINE__, "       to continue to avoid data base corruption.");
+	    exit(EX_ERROR);
+	}
+	if ((off_t)(rl.rlim_cur >> 20) - (st.st_size >> 20) < 2) {
+	    print_error(__FILE__, __LINE__, "warning: data base file size approaches resource limit.");
+	    print_error(__FILE__, __LINE__, "         write errors (bumping into the limit) can cause");
+	    print_error(__FILE__, __LINE__, "         data base corruption.");
+	}
     }
 }
+
 
 /*
   Initialize database.
@@ -190,7 +205,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
      */
     size_t idx;
     uint32_t retryflags[] = { 0, DB_NOMMAP };
-    
+
     check_db_version();
 
     if (open_mode == DB_READ)
@@ -203,8 +218,9 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 
     for (idx = 0; idx < COUNTOF(retryflags); idx += 1) {
 	size_t i;
-	uint32_t retryflag = retryflags[idx];
+	uint32_t retryflag = retryflags[idx], pagesize;
 	handle = dbh_init(db_file, count, names);
+	DB_BTREE_STAT *dbstat = NULL;
 
 	if (handle == NULL)
 	    break;
@@ -265,7 +281,17 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 		return NULL;		/* handle already freed, ok to return */
 	    }
 
-	    check_fsize_limit(handle->fd[i]);
+	    /* query page size */
+	    ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
+	    if (ret) {
+		dbp->err (dbp, ret, "%s (db) stat: %s", progname, handle->name);
+		db_close(handle, false);
+		return NULL;
+	    }
+	    pagesize = dbstat->bt_pagesize;
+	    free(dbstat);
+
+	    check_fsize_limit(handle->fd[i], pagesize);
 
 	    if (db_lock(handle->fd[i], F_SETLK,
 			(short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
