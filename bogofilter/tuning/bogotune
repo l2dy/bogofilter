@@ -179,7 +179,7 @@ if($msgformat ne "msgcount") {
     } else {
 	unlink($spwork);
 	foreach my $dir (@spfiles) {
-	    open FL, "find $dir -type f -name '[0-9]*'|" or yuk(7, "Problem processing spam files");
+	    open FL, "find $dir -xtype f -name '[0-9]*'|" or yuk(7, "Problem processing spam files");
 	    foreach my $msg (<FL>) {
 		chomp($msg);
 		my $cmd = join(" ", "cat $msg | bogol", $bogodir,
@@ -190,7 +190,7 @@ if($msgformat ne "msgcount") {
 	}
 	unlink($nswork);
 	foreach my $dir (@nsfiles) {
-	    open FL, "find $dir -type f -name '[0-9]*'|" or yuk(7, "Problem processing nonspam files");
+	    open FL, "find $dir -xtype f -name '[0-9]*'|" or yuk(7, "Problem processing nonspam files");
 	    foreach my $msg (<FL>) {
 		chomp($msg);
 		my $cmd = join(" ", "cat $msg | bogol", $bogodir,
