@@ -22,12 +22,11 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #include <string.h>
 #include <stdlib.h>
 
-#include "config.h"
+#include <config.h>
+#include "common.h"
 
 #include "bogofilter.h"
-#include "common.h"
 #include "datastore.h"
-#include "globals.h"
 #include "graham.h"
 #include "lexer.h"
 #include "method.h"

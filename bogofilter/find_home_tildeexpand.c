@@ -17,10 +17,12 @@
 
 #include <string.h>
 
+#include <config.h>
+#include "common.h"
+
+#include "find_home.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
-#include "find_home.h"
-#include "common.h"
 
 /*
  * tildeexpand tries to expand the first tilde argument, similar, but

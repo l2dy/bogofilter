@@ -21,7 +21,6 @@ NAME:
 #include "robinson.h"
 #include "rstats.h"
 #include "wordhash.h"
-#include "globals.h"
 
 #define ROBINSON_MIN_DEV	0.0f	/* if nonzero, use characteristic words */
 #define ROBINSON_SPAM_CUTOFF	0.54f	/* if it's spammier than this... */

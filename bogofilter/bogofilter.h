@@ -4,8 +4,6 @@
 #ifndef	HAVE_BOGOFILTER_H
 #define	HAVE_BOGOFILTER_H
 
-#include <wordlists.h>
-
 #define EVEN_ODDS	0.5f		/* used for words we want to ignore */
 #define UNKNOWN_WORD	0.4f		/* odds that unknown word is spammish */
 #define DEVIATION(n)	fabs((n) - EVEN_ODDS)	/* deviation from average */

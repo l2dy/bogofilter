@@ -3,8 +3,6 @@
 #ifndef BOGOCONFIG_H
 #define BOGOCONFIG_H
 
-#include "common.h"
-
 /* Definitions */
 
 typedef enum {

@@ -15,9 +15,9 @@ AUTHOR:
 #include <stdlib.h>
 #include <string.h>
 
-#include "config.h"
+#include <config.h>
 #include "common.h"
-#include "globals.h"
+
 #include "method.h"
 #include "wordlists.h"
 #include "xmalloc.h"

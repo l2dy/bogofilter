@@ -7,10 +7,13 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include <wordlists.h>
-#include <bogofilter.h>
-#include <datastore.h>
-#include "globals.h"
+
+#include <config.h>
+#include "common.h"
+
+#include "bogofilter.h"
+#include "datastore.h"
+#include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 

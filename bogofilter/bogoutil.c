@@ -20,6 +20,9 @@ AUTHOR:
 #include <sys/stat.h>
 #include <db.h>
 
+#include <config.h>
+#include "common.h"
+
 #include "bogofilter.h"
 #include "datastore.h"
 #include "datastore_db.h"

@@ -21,18 +21,18 @@ AUTHOR:
 #include <errno.h>
 
 #include <config.h>
+#include "common.h"
 
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
 #endif
 
-#include "common.h"
-#include "globals.h"
 #include "lexer.h"
 #include "bogofilter.h"
 #include "bogoconfig.h"
 #include "register.h"
 #include "version.h"
+#include "wordlists.h"
 
 #define BOGODIR ".bogofilter"
 

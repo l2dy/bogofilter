@@ -3,14 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "config.h"
+#include <config.h>
 #include "common.h"
+
 #include "bogofilter.h"
 #include "datastore.h"
 #include "lexer.h"
 #include "register.h"
 #include "wordhash.h"
-#include "globals.h"
 
 #define PLURAL(count) ((count == 1) ? "" : "s")
 

@@ -3,8 +3,6 @@
 #ifndef DATASTORE_DB3_H_GUARD
 #define DATASTORE_DB3_H_GUARD
 
-#include "common.h"
-
 #define MSG_COUNT_TOK ".MSG_COUNT"
 
 typedef struct {

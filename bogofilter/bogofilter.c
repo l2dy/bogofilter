@@ -31,10 +31,9 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #include <string.h>
 #include <stdlib.h>
 
-#include "config.h"
-
+#include <config.h>
 #include "common.h"
-#include "globals.h"
+
 #include "bogofilter.h"
 #include "method.h"
 #include "datastore.h"

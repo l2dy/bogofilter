@@ -18,7 +18,9 @@ AUTHOR:
 #include <db.h>
 #include <errno.h>
 
-#include "config.h"
+#include <config.h>
+#include "common.h"
+
 #ifdef	HAVE_SYSLOG_H
 #include <syslog.h>
 #endif
@@ -27,7 +29,6 @@ AUTHOR:
 #include "xstrdup.h"
 #include "datastore.h"
 #include "datastore_db.h"
-#include "globals.h"
 
 #define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
 
