@@ -57,9 +57,9 @@ token_t collect_words(wordhash_t *wh)
 
 	    if (token_type == BOGO_LEX_LINE)
 	    {
-		char *s = yylval->text+1;
+		char *s = (char *)(yylval->text+1);
 		char *f = strchr(s, '"');
-		token = word_new(s, f-s);
+		token = word_new((unsigned char *)s, f-s);
 	    }
 
 	    w = wordhash_insert(wh, token, sizeof(wordprop_t), &wordprop_init);
@@ -73,7 +73,7 @@ token_t collect_words(wordhash_t *wh)
 
 	    if (token_type == BOGO_LEX_LINE)
 	    {
-		char *s = yylval->text+1;
+		char *s = (char *)yylval->text+1;
 
 		s = strchr(s, '"');
 		w->bad = atoi(s+2);

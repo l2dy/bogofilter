@@ -93,7 +93,7 @@ static int classify(int argc, char **argv, FILE *out)
     bool error = false;
     double spamicity;
     rc_t   status;
-    char *filename;
+    char *filename = NULL;
     char buff[PATH_LEN+1];
 
     while (!done) {
