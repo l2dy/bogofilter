@@ -123,17 +123,14 @@ md_malloc(size_t size)
 void
 md_free(void *ptr)
 {
-    mh_t *mh = NULL;
+    mh_t *mh = ((mh_t *) ptr) - 1;
 
     if (!ptr)
 	return;
 
-    mh = ((mh_t *) ptr) - 1;
-
     ++cnt_free;
     if (memtrace & M_FREE)
 	mh_disp( "f", mh );
-
     if (mh->tag != md_tag)
 	md_trap("md_tag");
     if (dbg_trap_index != 0 && mh->indx == dbg_trap_index)
@@ -172,7 +169,7 @@ void memdisplay(const char *file, int lineno)
 void
 *md_calloc(size_t nmemb, size_t size)
 {
-    void *x;
+    void *ptr;
     mh_t *mh;
 
     size = size * nmemb;
@@ -189,9 +186,9 @@ void
 	exit(EX_ERROR);
     }
 
-    x = calloc(nmemb, size);
+    ptr = calloc(nmemb, size);
 
-    mh = (mh_t *) x;
+    mh = (mh_t *) ptr;
     mh->size = size - sizeof(mh_t);
     mh->indx = ++cnt_alloc;
     mh->tag  = md_tag;
@@ -201,24 +198,20 @@ void
     if (dbg_trap_index != 0 && mh->indx == dbg_trap_index)
 	md_trap("dbg_trap_index");
 
-    x = (void *) (mh+1);
+    ptr = (void *) (mh+1);
 
-    return x;
+    return ptr;
 }
 
 void
 *md_realloc(void *ptr, size_t size)
 {
-    void *x;
-    size_t *s = (size_t *) ptr;
-    size_t oldsize = *--s;
+    mh_t *mh = ((mh_t *) ptr)-1;
+    size_t oldsize = mh->size;
 
-    cur_malloc -= oldsize;
-    ptr = (void *) s;
     cur_malloc += size - oldsize;
     max_malloc = max(max_malloc, cur_malloc);
     tot_malloc += size - oldsize;
-    size += sizeof(size_t);
     ++cnt_realloc;
 
     if (dbg_too_much != 0 && max_malloc > dbg_too_much) {
@@ -227,11 +220,20 @@ void
 	exit(EX_ERROR);
     }
 
-    x = realloc(ptr, size);
+    if (memtrace & M_FREE)
+	mh_disp( "r", mh );
 
-    s = (size_t *) x;
-    *s++ = size;
-    x = (void *) s;
+    size = size + sizeof(mh_t);
+    mh = realloc(mh, size);
 
-    return x;
+    mh->size = size - sizeof(mh_t);
+    mh->indx = ++cnt_realloc;
+    mh->tag  = md_tag;
+
+    if (memtrace & M_MALLOC)
+	mh_disp( "r", mh );
+
+    ptr = (void *) (mh+1);
+
+    return ptr;
 }
