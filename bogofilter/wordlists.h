@@ -11,9 +11,9 @@ typedef struct wordlist_s wordlist_t;
 struct wordlist_s
 {
     wordlist_t *next;
-    char *name;			// resource name (for debug/verbose messages)
-    void *dbh;			// database handle 
-    long msgcount;		// count of messages in wordlist.
+    char *name;			/* resource name (for debug/verbose messages) */
+    void *dbh;			/* database handle */
+    long msgcount;		/* count of messages in wordlist. */
     double weight;
     bool active;
     bool bad;

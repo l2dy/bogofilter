@@ -1,14 +1,14 @@
 /* $Id$ */
 
-// length of *yylval will not exceed this...
+/* length of *yylval will not exceed this... */
 #define MAXTOKENLEN	30
 
-// lexer interface
+/* lexer interface */
 typedef enum {
-    TOKEN = 1,	// regular token
-    FROM,	// mbox message delimiter
-    BOUNDARY,	// MIME multipart boundary line
-    EMPTY	// empty line
+    TOKEN = 1,	/* regular token */
+    FROM,	/* mbox message delimiter */
+    BOUNDARY,	/* MIME multipart boundary line */
+    EMPTY	/* empty line */
 } token_t;
 
 extern FILE	*yyin;
