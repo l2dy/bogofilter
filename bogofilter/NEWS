@@ -4,8 +4,15 @@
 
 $Id$
 
-	2003-05-23
+0.13.2	2003-05-24
+
 	* Autoconfiguration of BerkeleyDB library has been improved.
+	* Build procedure for statically linked binaries has been improved.
+
+	* Fixed defect in replace_nonascii_characters that was
+	  superceding ignore_case option.
+
+	* Portability fix for efence usage in t.frame.
 
 0.13.1	2003-05-23
 
