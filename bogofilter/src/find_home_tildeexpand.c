@@ -63,15 +63,14 @@ char *tildeexpand(const char *name, bool _expand)
 	tmp[l] = '\0';
 
 	home = find_home_user(tmp);
+
+	xfree(tmp);
     } else {
 	/* plain tilde */
 	home = find_home(false);
 	if (home == NULL)
 	    return xstrdup(name);
-	tmp = NULL;
     }
-
-    xfree(tmp);
 
     if (home == NULL) {
 	return xstrdup(name);

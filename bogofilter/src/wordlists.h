@@ -21,6 +21,7 @@ extern wordlist_t *word_lists;
 void incr_wordlist_mode(void);
 void set_wordlist_mode(const char *filepath);
 bool build_wordlist_path(char *filepath, size_t size, const char *path);
+bool configure_wordlist(const char *val);
 
 void open_wordlists(dbmode_t);
 void close_wordlists(bool);

@@ -1,7 +1,7 @@
 From mdlug-return-6174-smythe=example.com@mdlug.org  Fri Nov  1 05:42:47 2002
 Return-Path: <mdlug-return-6174-smythe=example.com@mdlug.org>
 Delivered-To: smythe@example.com
-Received: from mdlug.org (cpe-24-221-90-239.mi.sprintbbd.net [24.221.90.239])
+Received: from mdlug.org (cpe-24-221-90-239.mi.sprintbbd.net [242.21.90.239])
 	by example.com (Postfix) with SMTP id ADE5027F82
 	for <smythe@example.com>; Fri,  1 Nov 2002 05:42:46 -0500 (EST)
 Received: (qmail 21544 invoked by uid 504); 1 Nov 2002 10:38:57 -0000
@@ -89,13 +89,13 @@ you hadn't noticed.  :-)
 From glamb@dynagen.on.ca  Fri Nov  1 06:20:26 2002
 Return-Path: <glamb@dynagen.on.ca>
 Delivered-To: smythe@example.com
-Received: from csl2.consultronics.on.ca (csl2.consultronics.on.ca [204.138.93.2])
+Received: from csl2.contronics.on.ca (csl2.contronics.on.ca [240.138.93.2])
 	by example.com (Postfix) with ESMTP id F007927F82
 	for <smythe@example.com>; Fri,  1 Nov 2002 06:20:25 -0500 (EST)
-Received: from athame.dynagen.internal(localhost[127.0.0.1]) (2517 bytes) by csl2.consultronics.on.ca
+Received: from athame.dynagen.internal(localhost[127.0.0.1]) (2517 bytes) by csl2.contronics.on.ca
 	via sendmail with P:esmtp/R:bind_hosts/T:inet_zone_bind_smtp
 	(sender: <glamb@dynagen.on.ca>) 
-	id <m187Zqj-007Wr4C@csl2.consultronics.on.ca>
+	id <m187Zqj-007Wr4C@csl2.contronics.on.ca>
 	for <smythe@example.com>; Fri, 1 Nov 2002 06:20:25 -0500 (EST)
 	(Smail-3.2.0.114 2001-Aug-6 #5 built 2002-Mar-26)
 Received: (2148 bytes) by athame.dynagen.internal
@@ -151,7 +151,7 @@ round...
 From smythe@example.com  Fri Nov  1 06:32:06 2002
 Return-Path: <smythe@example.com>
 Delivered-To: smythe@example.com
-Received: from oak.example.com (oak.example.com [192.168.1.10])
+Received: from oak.example.com (oak.example.com [219.168.1.10])
 	by example.com (Postfix) with ESMTP id 9156627F82
 	for <smythe@example.com>; Fri,  1 Nov 2002 06:32:05 -0500 (EST)
 Received: by oak.example.com (Postfix, from userid 1000)
@@ -169,13 +169,13 @@ From: smythe@example.com (David Smythe)
 From glamb@dynagen.on.ca  Fri Nov  1 06:38:06 2002
 Return-Path: <glamb@dynagen.on.ca>
 Delivered-To: smythe@example.com
-Received: from csl2.consultronics.on.ca (csl2.consultronics.on.ca [204.138.93.2])
+Received: from csl2.contronics.on.ca (csl2.contronics.on.ca [240.138.93.2])
 	by example.com (Postfix) with ESMTP id B081C27F82
 	for <smythe@example.com>; Fri,  1 Nov 2002 06:38:05 -0500 (EST)
-Received: from athame.dynagen.internal(localhost[127.0.0.1]) (1720 bytes) by csl2.consultronics.on.ca
+Received: from athame.dynagen.internal(localhost[127.0.0.1]) (1720 bytes) by csl2.contronics.on.ca
 	via sendmail with P:esmtp/R:bind_hosts/T:inet_zone_bind_smtp
 	(sender: <glamb@dynagen.on.ca>) 
-	id <m187a7o-007Wr6C@csl2.consultronics.on.ca>
+	id <m187a7o-007Wr6C@csl2.contronics.on.ca>
 	for <smythe@example.com>; Fri, 1 Nov 2002 06:38:04 -0500 (EST)
 	(Smail-3.2.0.114 2001-Aug-6 #5 built 2002-Mar-26)
 Received: (1351 bytes) by athame.dynagen.internal
@@ -217,10 +217,10 @@ Regards..............
 From Online#3.29446.33393435323131.1.b@newsletter.online.com  Fri Nov  1 07:08:32 2002
 Return-Path: <Online#3.29446.33393435323131.1.b@newsletter.online.com>
 Delivered-To: smythe@example.com
-Received: from ABV-SFO1-ACMTA6.CNET.COM (abv-sfo1-acmta6.cnet.com [206.16.1.169])
+Received: from ABV-SFO1-ACMTA6.CNET.COM (abv-sfo1-acmta6.cnet.com [208.16.1.169])
 	by example.com (Postfix) with ESMTP id AC46827F82
 	for <smythe@example.com>; Fri,  1 Nov 2002 07:08:30 -0500 (EST)
-Received: from abv-sfo1-ac-agent6 (206.16.0.241) by ABV-SFO1-ACMTA6.CNET.COM (PowerMTA(TM) v1.5); Fri, 1 Nov 2002 04:12:31 -0800 (envelope-from <Online#3.29446.33393435323131.1.b@newsletter.online.com>)
+Received: from abv-sfo1-ac-agent6 (208.16.0.241) by ABV-SFO1-ACMTA6.CNET.COM (PowerMTA(TM) v1.5); Fri, 1 Nov 2002 04:12:31 -0800 (envelope-from <Online#3.29446.33393435323131.1.b@newsletter.online.com>)
 Message-ID: <1961754.1036152508913.JavaMail.root@abv-sfo1-ac-agent6>
 Date: Fri, 1 Nov 2002 04:08:28 -0800 (PST)
 From: ZDNet Tech Update Today <Online#3.29446.33393435323131.1@newsletter.online.com>
@@ -1217,13 +1217,13 @@ Go to http://www.mandrakestore.com
 From glamb@dynagen.on.ca  Fri Nov  1 08:51:21 2002
 Return-Path: <glamb@dynagen.on.ca>
 Delivered-To: smythe@example.com
-Received: from csl2.consultronics.on.ca (csl2.consultronics.on.ca [204.138.93.2])
+Received: from csl2.contronics.on.ca (csl2.contronics.on.ca [240.138.93.2])
 	by example.com (Postfix) with ESMTP id DBB38280E1
 	for <smythe@example.com>; Fri,  1 Nov 2002 08:51:20 -0500 (EST)
-Received: from athame.dynagen.internal(localhost[127.0.0.1]) (1124 bytes) by csl2.consultronics.on.ca
+Received: from athame.dynagen.internal(localhost[127.0.0.1]) (1124 bytes) by csl2.contronics.on.ca
 	via sendmail with P:esmtp/R:bind_hosts/T:inet_zone_bind_smtp
 	(sender: <glamb@dynagen.on.ca>) 
-	id <m187cCm-007Wr7C@csl2.consultronics.on.ca>
+	id <m187cCm-007Wr7C@csl2.contronics.on.ca>
 	for <smythe@example.com>; Fri, 1 Nov 2002 08:51:20 -0500 (EST)
 	(Smail-3.2.0.114 2001-Aug-6 #5 built 2002-Mar-26)
 Received: (756 bytes) by athame.dynagen.internal
@@ -1524,13 +1524,13 @@ Go to http://www.mandrakestore.com
 From glamb@dynagen.on.ca  Fri Nov  1 09:54:16 2002
 Return-Path: <glamb@dynagen.on.ca>
 Delivered-To: smythe@example.com
-Received: from csl2.consultronics.on.ca (csl2.consultronics.on.ca [204.138.93.2])
+Received: from csl2.contronics.on.ca (csl2.contronics.on.ca [240.138.93.2])
 	by example.com (Postfix) with ESMTP id 7BE3D280E1
 	for <smythe@example.com>; Fri,  1 Nov 2002 09:54:15 -0500 (EST)
-Received: from cmist.concord.internal(localhost[127.0.0.1]) (2311 bytes) by csl2.consultronics.on.ca
+Received: from cmist.concord.internal(localhost[127.0.0.1]) (2311 bytes) by csl2.contronics.on.ca
 	via sendmail with P:esmtp/R:bind_hosts/T:inet_zone_bind_smtp
 	(sender: <glamb@dynagen.on.ca>) 
-	id <m187dBe-007Wr4C@csl2.consultronics.on.ca>
+	id <m187dBe-007Wr4C@csl2.contronics.on.ca>
 	for <smythe@example.com>; Fri, 1 Nov 2002 09:54:14 -0500 (EST)
 	(Smail-3.2.0.114 2001-Aug-6 #5 built 2002-Mar-26)
 Received: (1951 bytes) by cmist.concord.internal
@@ -1585,7 +1585,7 @@ answer; they'll just forward it to him.
 From mdlug-return-6178-smythe=example.com@mdlug.org  Fri Nov  1 10:03:37 2002
 Return-Path: <mdlug-return-6178-smythe=example.com@mdlug.org>
 Delivered-To: smythe@example.com
-Received: from mdlug.org (cpe-24-221-90-239.mi.sprintbbd.net [24.221.90.239])
+Received: from mdlug.org (cpe-24-221-90-239.mi.sprintbbd.net [242.21.90.239])
 	by example.com (Postfix) with SMTP id 99A92280E1
 	for <smythe@example.com>; Fri,  1 Nov 2002 10:03:36 -0500 (EST)
 Received: (qmail 13550 invoked by uid 504); 1 Nov 2002 15:00:16 -0000
@@ -1900,7 +1900,7 @@ To unsubscribe send a blank email to leave-linuxcentral-daily-text-6402291M@list
 From technews@eletter.technews.com  Fri Nov  1 10:38:47 2002
 Return-Path: <technews@eletter.technews.com>
 Delivered-To: smythe@example.com
-Received: from asgard.iproduction.com (unknown [206.10.173.199])
+Received: from asgard.iproduction.com (unknown [208.10.173.199])
 	by example.com (Postfix) with ESMTP id 75C54280E1
 	for <smythe@example.com>; Fri,  1 Nov 2002 10:38:45 -0500 (EST)
 Received: from asgard.iproduction.com (localhost [127.0.0.1])
@@ -2071,13 +2071,13 @@ http://www.washingtonpost.com/wp-dyn/technology/columns/filter?referer=email
 From glamb@dynagen.on.ca  Fri Nov  1 11:00:46 2002
 Return-Path: <glamb@dynagen.on.ca>
 Delivered-To: smythe@example.com
-Received: from csl2.consultronics.on.ca (csl2.consultronics.on.ca [204.138.93.2])
+Received: from csl2.contronics.on.ca (csl2.contronics.on.ca [240.138.93.2])
 	by example.com (Postfix) with ESMTP id EC323280E2
 	for <smythe@example.com>; Fri,  1 Nov 2002 11:00:45 -0500 (EST)
-Received: from cmist.concord.internal(localhost[127.0.0.1]) (2751 bytes) by csl2.consultronics.on.ca
+Received: from cmist.concord.internal(localhost[127.0.0.1]) (2751 bytes) by csl2.contronics.on.ca
 	via sendmail with P:esmtp/R:bind_hosts/T:inet_zone_bind_smtp
 	(sender: <glamb@dynagen.on.ca>) 
-	id <m187eE1-007Wr6C@csl2.consultronics.on.ca>
+	id <m187eE1-007Wr6C@csl2.contronics.on.ca>
 	for <smythe@example.com>; Fri, 1 Nov 2002 11:00:45 -0500 (EST)
 	(Smail-3.2.0.114 2001-Aug-6 #5 built 2002-Mar-26)
 Received: (2391 bytes) by cmist.concord.internal
@@ -2191,13 +2191,13 @@ Unix Guru Universe - www.ugu.com - tips@ugu.com - Copyright 1994-2001
 From glamb@dynagen.on.ca  Fri Nov  1 11:22:01 2002
 Return-Path: <glamb@dynagen.on.ca>
 Delivered-To: smythe@example.com
-Received: from csl2.consultronics.on.ca (csl2.consultronics.on.ca [204.138.93.2])
+Received: from csl2.contronics.on.ca (csl2.contronics.on.ca [240.138.93.2])
 	by example.com (Postfix) with ESMTP id DEAAE280E1
 	for <smythe@example.com>; Fri,  1 Nov 2002 11:22:00 -0500 (EST)
-Received: from cmist.concord.internal(localhost[127.0.0.1]) (1187 bytes) by csl2.consultronics.on.ca
+Received: from cmist.concord.internal(localhost[127.0.0.1]) (1187 bytes) by csl2.contronics.on.ca
 	via sendmail with P:esmtp/R:bind_hosts/T:inet_zone_bind_smtp
 	(sender: <glamb@dynagen.on.ca>) 
-	id <m187eYa-007Wr4C@csl2.consultronics.on.ca>
+	id <m187eYa-007Wr4C@csl2.contronics.on.ca>
 	for <smythe@example.com>; Fri, 1 Nov 2002 11:22:00 -0500 (EST)
 	(Smail-3.2.0.114 2001-Aug-6 #5 built 2002-Mar-26)
 Received: (828 bytes) by cmist.concord.internal
@@ -2574,7 +2574,7 @@ Will-Retry-Until: Wed,  6 Nov 2002 07:59:10 -0500 (EST)
 Content-Description: Undelivered Message Headers
 Content-Type: text/rfc822-headers
 
-Received: from maple.example.com (maple.example.com [192.168.1.20])
+Received: from maple.example.com (maple.example.com [219.168.1.20])
 	by example.com (Postfix) with ESMTP
 	id 6CD7D27F82; Fri,  1 Nov 2002 07:59:10 -0500 (EST)
 Message-Id: <4.3.2.7.2.20021101074812.00d554a0@mail.example.com>
@@ -2595,13 +2595,13 @@ Content-Type: text/plain; charset="us-ascii"; format=flowed
 From glamb@dynagen.on.ca  Fri Nov  1 13:02:19 2002
 Return-Path: <glamb@dynagen.on.ca>
 Delivered-To: smythe@example.com
-Received: from csl2.consultronics.on.ca (csl2.consultronics.on.ca [204.138.93.2])
+Received: from csl2.contronics.on.ca (csl2.contronics.on.ca [240.138.93.2])
 	by example.com (Postfix) with ESMTP id 9D30D280E1
 	for <smythe@example.com>; Fri,  1 Nov 2002 13:02:18 -0500 (EST)
-Received: from cmist.concord.internal(localhost[127.0.0.1]) (1454 bytes) by csl2.consultronics.on.ca
+Received: from cmist.concord.internal(localhost[127.0.0.1]) (1454 bytes) by csl2.contronics.on.ca
 	via sendmail with P:esmtp/R:bind_hosts/T:inet_zone_bind_smtp
 	(sender: <glamb@dynagen.on.ca>) 
-	id <m187g7e-007WqrC@csl2.consultronics.on.ca>
+	id <m187g7e-007WqrC@csl2.contronics.on.ca>
 	for <smythe@example.com>; Fri, 1 Nov 2002 13:02:18 -0500 (EST)
 	(Smail-3.2.0.114 2001-Aug-6 #5 built 2002-Mar-26)
 Received: (1094 bytes) by cmist.concord.internal
@@ -2897,13 +2897,13 @@ Go to http://www.mandrakestore.com
 From glamb@dynagen.on.ca  Fri Nov  1 14:00:53 2002
 Return-Path: <glamb@dynagen.on.ca>
 Delivered-To: smythe@example.com
-Received: from csl2.consultronics.on.ca (csl2.consultronics.on.ca [204.138.93.2])
+Received: from csl2.contronics.on.ca (csl2.contronics.on.ca [240.138.93.2])
 	by example.com (Postfix) with ESMTP id 03EEA280E1
 	for <smythe@example.com>; Fri,  1 Nov 2002 14:00:51 -0500 (EST)
-Received: from cmist.concord.internal(localhost[127.0.0.1]) (2011 bytes) by csl2.consultronics.on.ca
+Received: from cmist.concord.internal(localhost[127.0.0.1]) (2011 bytes) by csl2.contronics.on.ca
 	via sendmail with P:esmtp/R:bind_hosts/T:inet_zone_bind_smtp
 	(sender: <glamb@dynagen.on.ca>) 
-	id <m187h2I-007WqrC@csl2.consultronics.on.ca>
+	id <m187h2I-007WqrC@csl2.contronics.on.ca>
 	for <smythe@example.com>; Fri, 1 Nov 2002 14:00:50 -0500 (EST)
 	(Smail-3.2.0.114 2001-Aug-6 #5 built 2002-Mar-26)
 Received: (1651 bytes) by cmist.concord.internal
@@ -3110,13 +3110,13 @@ Go to http://www.mandrakestore.com
 From glamb@dynagen.on.ca  Fri Nov  1 15:29:45 2002
 Return-Path: <glamb@dynagen.on.ca>
 Delivered-To: smythe@example.com
-Received: from csl2.consultronics.on.ca (csl2.consultronics.on.ca [204.138.93.2])
+Received: from csl2.contronics.on.ca (csl2.contronics.on.ca [240.138.93.2])
 	by example.com (Postfix) with ESMTP id 10A0B280E1
 	for <smythe@example.com>; Fri,  1 Nov 2002 15:29:44 -0500 (EST)
-Received: from athame.dynagen.internal(localhost[127.0.0.1]) (2359 bytes) by csl2.consultronics.on.ca
+Received: from athame.dynagen.internal(localhost[127.0.0.1]) (2359 bytes) by csl2.contronics.on.ca
 	via sendmail with P:esmtp/R:bind_hosts/T:inet_zone_bind_smtp
 	(sender: <glamb@dynagen.on.ca>) 
-	id <m187iQJ-007WqrC@csl2.consultronics.on.ca>
+	id <m187iQJ-007WqrC@csl2.contronics.on.ca>
 	for <smythe@example.com>; Fri, 1 Nov 2002 15:29:43 -0500 (EST)
 	(Smail-3.2.0.114 2001-Aug-6 #5 built 2002-Mar-26)
 Received: (1990 bytes) by athame.dynagen.internal
@@ -3175,7 +3175,7 @@ Regards..................
 From smythe@example.com  Fri Nov  1 16:00:05 2002
 Return-Path: <smythe@example.com>
 Delivered-To: admin@example.com
-Received: from oak.example.com (oak.example.com [192.168.1.10])
+Received: from oak.example.com (oak.example.com [219.168.1.10])
 	by example.com (Postfix) with ESMTP id DB718280E1
 	for <admin@example.com>; Fri,  1 Nov 2002 16:00:03 -0500 (EST)
 Received: by oak.example.com (Postfix, from userid 1000)
@@ -3448,7 +3448,7 @@ Copyright 2002 Ziff Davis Media Inc. All Rights Reserved.
 From clint@dman.com  Fri Nov  1 17:26:45 2002
 Return-Path: <clint@dman.com>
 Delivered-To: smythe@example.com
-Received: from crystal.dman.com (crystal.dman.com [206.137.16.31])
+Received: from crystal.dman.com (crystal.dman.com [208.137.16.31])
 	by example.com (Postfix) with ESMTP id EA0D4280E2
 	for <smythe@example.com>; Fri,  1 Nov 2002 17:26:44 -0500 (EST)
 Received: from crystal.dman.com (clint@localhost [127.0.0.1])
@@ -3480,10 +3480,10 @@ Sounds good to me.
 From Online#3.29500.33393435323131.1.b@newsletter.online.com  Fri Nov  1 17:49:10 2002
 Return-Path: <Online#3.29500.33393435323131.1.b@newsletter.online.com>
 Delivered-To: smythe@example.com
-Received: from acmta4.cnet.com (abv-sfo1-acmta4.cnet.com [206.16.1.163])
+Received: from acmta4.cnet.com (abv-sfo1-acmta4.cnet.com [208.16.1.163])
 	by example.com (Postfix) with ESMTP id A0549280E1
 	for <smythe@example.com>; Fri,  1 Nov 2002 17:49:09 -0500 (EST)
-Received: from abv-sfo1-ac-agent7 (206.16.0.244) by acmta4.cnet.com (PowerMTA(TM) v1.5); Fri, 1 Nov 2002 14:51:59 -0800 (envelope-from <Online#3.29500.33393435323131.1.b@newsletter.online.com>)
+Received: from abv-sfo1-ac-agent7 (208.16.0.244) by acmta4.cnet.com (PowerMTA(TM) v1.5); Fri, 1 Nov 2002 14:51:59 -0800 (envelope-from <Online#3.29500.33393435323131.1.b@newsletter.online.com>)
 Message-ID: <1320492.1036190947757.JavaMail.root@abv-sfo1-ac-agent7>
 Date: Fri, 1 Nov 2002 14:49:07 -0800 (PST)
 From: ZDNet Tech Update Today <Online#3.29500.33393435323131.1@newsletter.online.com>
@@ -3849,13 +3849,13 @@ http://mail.python.org/mailman/listinfo/spambayes
 From glamb@dynagen.on.ca  Fri Nov  1 17:55:48 2002
 Return-Path: <glamb@dynagen.on.ca>
 Delivered-To: smythe@example.com
-Received: from csl2.consultronics.on.ca (csl2.consultronics.on.ca [204.138.93.2])
+Received: from csl2.contronics.on.ca (csl2.contronics.on.ca [240.138.93.2])
 	by example.com (Postfix) with ESMTP id 2F369280E1
 	for <smythe@example.com>; Fri,  1 Nov 2002 17:55:48 -0500 (EST)
-Received: from athame.dynagen.internal(localhost[127.0.0.1]) (1579 bytes) by csl2.consultronics.on.ca
+Received: from athame.dynagen.internal(localhost[127.0.0.1]) (1579 bytes) by csl2.contronics.on.ca
 	via sendmail with P:esmtp/R:bind_hosts/T:inet_zone_bind_smtp
 	(sender: <glamb@dynagen.on.ca>) 
-	id <m187khf-007Wr4C@csl2.consultronics.on.ca>
+	id <m187khf-007Wr4C@csl2.contronics.on.ca>
 	for <smythe@example.com>; Fri, 1 Nov 2002 17:55:47 -0500 (EST)
 	(Smail-3.2.0.114 2001-Aug-6 #5 built 2002-Mar-26)
 Received: (1210 bytes) by athame.dynagen.internal
@@ -3979,7 +3979,7 @@ http://mail.python.org/mailman/listinfo/spambayes
 From mdlug-return-6195-smythe=example.com@mdlug.org  Fri Nov  1 20:02:47 2002
 Return-Path: <mdlug-return-6195-smythe=example.com@mdlug.org>
 Delivered-To: smythe@example.com
-Received: from mdlug.org (cpe-24-221-90-239.mi.sprintbbd.net [24.221.90.239])
+Received: from mdlug.org (cpe-24-221-90-239.mi.sprintbbd.net [242.21.90.239])
 	by example.com (Postfix) with SMTP id F2BEC280E2
 	for <smythe@example.com>; Fri,  1 Nov 2002 20:02:46 -0500 (EST)
 Received: (qmail 2682 invoked by uid 504); 2 Nov 2002 01:00:57 -0000
@@ -4025,7 +4025,7 @@ phone: +1 888 612 4615
 From aadldatedue@aadl.annarbor.lib.mi.us  Fri Nov  1 20:54:30 2002
 Return-Path: <aadldatedue@aadl.annarbor.lib.mi.us>
 Delivered-To: smythe@example.com
-Received: from aadl.annarbor.lib.mi.us (aadl.annarbor.lib.mi.us [204.38.6.9])
+Received: from aadl.annarbor.lib.mi.us (aadl.annarbor.lib.mi.us [240.38.6.9])
 	by example.com (Postfix) with SMTP id EB329280E1
 	for <SMYTHE@EXAMPLE.COM>; Fri,  1 Nov 2002 20:54:28 -0500 (EST)
 Received: by aadl.annarbor.lib.mi.us for SMYTHE@EXAMPLE.COM;
@@ -4057,7 +4057,7 @@ Misty of Chincoteague /
 From mdlug-return-6198-smythe=example.com@mdlug.org  Fri Nov  1 21:50:32 2002
 Return-Path: <mdlug-return-6198-smythe=example.com@mdlug.org>
 Delivered-To: smythe@example.com
-Received: from mdlug.org (cpe-24-221-90-239.mi.sprintbbd.net [24.221.90.239])
+Received: from mdlug.org (cpe-24-221-90-239.mi.sprintbbd.net [242.21.90.239])
 	by example.com (Postfix) with SMTP id EB49D280E1
 	for <smythe@example.com>; Fri,  1 Nov 2002 21:50:31 -0500 (EST)
 Received: (qmail 8076 invoked by uid 504); 2 Nov 2002 02:48:42 -0000
@@ -4201,7 +4201,7 @@ Go to http://www.mandrakestore.com
 From mdlug-return-6207-smythe=example.com@mdlug.org  Fri Nov  1 23:39:26 2002
 Return-Path: <mdlug-return-6207-smythe=example.com@mdlug.org>
 Delivered-To: smythe@example.com
-Received: from mdlug.org (cpe-24-221-90-239.mi.sprintbbd.net [24.221.90.239])
+Received: from mdlug.org (cpe-24-221-90-239.mi.sprintbbd.net [242.21.90.239])
 	by example.com (Postfix) with SMTP id D6150280E1
 	for <smythe@example.com>; Fri,  1 Nov 2002 23:39:25 -0500 (EST)
 Received: (qmail 14212 invoked by uid 504); 2 Nov 2002 04:37:46 -0000
