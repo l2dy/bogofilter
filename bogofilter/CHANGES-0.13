@@ -4,6 +4,10 @@
 
 $Id$
 
+0.13.6.2.1 2003-07-02
+
+	* Backport 0.13.7.2 bugfix that fixes an infinite loop on some emails.
+
 0.13.6.2 2003-06-05
 
 	* Don't allow square brackets in tokens.  Do allow dollar
