@@ -1,57 +1,33 @@
-#### Sample bogofilter configuration file
-#
-#	bogofilter config files should be located in:
-#	    /etc as /etc/bogofilter.cf ; and/or
-#	    $HOME as .bogofilter.cf
+########### BOGOFILTER Configuration File ###########################
 
-# Note: comment lines describe the configuration parameters
-#	and show other possible values for the parameter
-#
-#	non-comment lines show default values 
-#	as used in the bogofilter source code.
+# Non-comment lines of bogofilter.cf.example show default settings as 
+# used in the bogofilter source code.
 
-
-#### ALGORITHM
-#
-#	specify spamicity algorithm
-
-#algorithm=graham
-algorithm=robinson
-#algorithm=fisher
-
-
-#### BLOCK ON SUBNETS
-#
-#	convert IPADDRs into a special token, url:1.2.3.4,
-#	and also return url:1.2.3, url:1.2, and url:1
-
-#block_on_subnets=no
-
+########### General Settings ########################################
 
 #### BOGOFILTER_DIR
 #
-#	set directory for wordlists
+#	directory for wordlists
 
+bogofilter_dir=~/.bogofilter
 #bogofilter_dir=/var/lib/bogofilter
-#bogofilter_dir=~/.bogofilter
+
+#	name/location of user config file
+
+user_config_file=~/.bogofilter.cf
+#user_config_file=~/.bogofilterrc
+#user_config_file=~/.bogofilter/config
 
 
-#### CHARSET info
+#### WORDLIST: define additional word lists
 #
-#	specify default charset
+#	char type: 's','g','i' (denoting spam, good, or ignore)
+#	char *name: name of list, e.g. "good", "spam", "ignore"
+#	char *path: path to file
+#	double weight - probability BIAS for list
+#	int override - skip lower valued lists
 
-charset_default=us-ascii
-#charset_default=iso-8859-1
-#charset_default=iso-8859-2
-#charset_default=iso-8859-3
-#charset_default=iso-8859-4
-
-#### REPLACE_NONASCII_CHARACTERS
-#
-#	replace non-7bit chars with '?'
-
-replace_nonascii_characters=N
-#replace_nonascii_characters=Y
+#wordlist i,ignore,.ignorelist.db,1,0,0
 
 
 #### SPAM_HEADER_NAME
@@ -62,25 +38,6 @@ replace_nonascii_characters=N
 spam_header_name=X-Bogosity
 
 
-#### MINIMUM DEVIATION
-#
-#	if token spamicity closer to EVEN_ODDS (0.5f)
-#	than MIN_DEV, don't use the word in the 
-#	spamicity calculation
-
-min_dev=0.0
-
-# min_dev=0.2
-
-##### Robinson Constants
-#
-#	Specify floating point values for
-#	Robinson S and X coefficients
-
-robs=0.001
-robx=0.415
-
-
 ##### STATS_IN_HEADER
 #
 #	non-zero (default):  put spamicity info in message header
@@ -89,72 +46,8 @@ robx=0.415
 
 stats_in_header=Y
 
-#stats_in_header=N
 
-#### CUTOFF Values
-#
-#	for Graham and Robinson:
-#	    only spam_cutoff is needed.
-#
-#	for Fisher:
-#	    both ham_cutoff and spam_cutoff are allowed.
-#	    setting ham_cutoff to a non-zero value will
-#	    enable tristate results (Yes/No/Unsure).
-#
-# graham:
-#
-# spam_cutoff = 0.90
-
-# robinson:
-#
-# spam_cutoff = 0.54
-
-# fisher (with Yes/No output):
-#
-# ham_cutoff = 0.00
-# spam_cutoff = 0.95
-
-# fisher (with Yes/No/Unsure output):
-#
-# ham_cutoff = 0.10
-# spam_cutoff = 0.95
-
-
-##### THRESHOLD Values
-#
-#	used to determine if/when spamicity 
-#	values are output by print_bogostats()
-
-thresh_index = 0
-thresh_stats = 0.0f
-thresh_rtable = 0.0f
-
-# thresh_index = 12
-# thresh_stats =0.2f
-# thresh_rtable=0.4f
-
-
-#### USER_CONFIG_FILE
-#
-#	name/location of user config file
-
-user_config_file=~/.bogofilter.cf
-
-#user_config_file=~/.bogofilterrc
-#user_config_file=~/.bogofilter/config
-
-
-#### WORDLIST: define a word list
-#
-#	char type: 's','g','i' (denoting spam, good, or ignore)
-#	char *name: name of list, e.g. "good", "spam", "ignore"
-#	char *path: path to file
-#	double weight - probability BIAS for list
-#	int override - skip lower valued lists
-
-#wordlist i,ignore,.ignorelist.db,1,0,0
-
-### New Message Formatting Options - 2002-12-01
+#### Format of SPAM_HEADER
 #
 #	formatting characters:
 #
@@ -177,29 +70,135 @@ user_config_file=~/.bogofilter.cf
 #
 #	    v - version, ex. "version=%v"
 #
-#	below are options showing name and current value
+#    customizable messages:
+#
+#	header_format - the "X-Bogosity" line that '-p' and '-v' add to
+#		the message header.
+#	terse_format - an abbreviated form of header_format;
+#		selected by command line option '-t'
+#	log_header_format - written to syslog by '-u' option 
+#		when classifying messages.
+#	log_update_format - written to syslog by '-u' option 
+#		when registering messages.
+#
+#    below are the current values of the options:
 #
 # header_format = %h: %c, tests=bogofilter, spamicity=%p, version=%v
 # terse_format = %1.1c %f
 # log_header_format = %h: %c, spamicity=%p, version=%v
 # log_update_format = register-%r, %w words, %m messages
 
-# for robinson or fisher (with binary state)
+
+
+########### Tokenizer Settings ######################################
+
+#### BLOCK ON SUBNETS
+#
+#	convert IPADDRs into a special token, url:1.2.3.4,
+#	and also return url:1.2.3, url:1.2, and url:1
+#       to allow identifying spammers by ip address / subnets.
+
+block_on_subnets=no
+
+
+#### CHARSET handling
+#
+#	specify default charset
+
+charset_default=us-ascii
+#charset_default=iso-8859-1
+
+#	replace non-7bit chars with '?'
+
+replace_nonascii_characters=N
+
+
+
+########### Classification Constants General Settings ###############
+
+#### MINIMUM DEVIATION
+#
+#	if token spamicity closer to EVEN_ODDS (0.5f)
+#	than MIN_DEV, don't use the word in the
+#	spamicity calculation
+#       defaults: 0.0 for graham and 0.1 for robinson and fisher
+
+# min_dev=0.0
+
+
+##### THRESHOLD Values
+#
+#	used to determine if/when spamicity
+#	values are output by print_bogostats()
+
+thresh_index = 0
+thresh_stats = 0.0f
+thresh_rtable = 0.0f
+
+# thresh_index = 12
+# thresh_stats =0.2f
+# thresh_rtable=0.4f
+
+
+
+########### Algorithm Settings ######################################
+
+#### ALGORITHM
+#
+#	specify scoring algorithm
+
+#algorithm=graham
+algorithm=robinson
+#algorithm=fisher
+
+
+##### Robinson Constants
+#
+#	Specify floating point values for
+#	Robinson S and X coefficients.
+#       Also applies to Fisher.
+#	Does not apply to Graham.
+
+robs=0.001
+robx=0.415
+
+
+#### CUTOFF Values
+#
+#	for Graham and Robinson:
+#	    only spam_cutoff is needed.
+#
+#	for Fisher:
+#	    both ham_cutoff and spam_cutoff are allowed.
+#	    setting ham_cutoff to a non-zero value will
+#	    enable tristate results (Yes/No/Unsure).
+
+spam_cutoff = 0.90	# for graham
+spam_cutoff = 0.54	# for robinson
+
+# fisher (with Yes/No output, i.e. '-2' option):
+#
+# ham_cutoff = 0.00
+# spam_cutoff = 0.95
+
+# fisher (with Yes/No/Unsure output, i.e. '-3' option):
+#
+# ham_cutoff = 0.10
+# spam_cutoff = 0.95
+
+
+#### Format of spamicity output
+#
+# for two-state output:
 #	using "Yes" and "No" as labels.
 #
-# algorithm=robinson
-# algorithm=fisher
-# ham_cutoff = 0.0
 # spamicity_tags = Yes, No
 # spamicity_formats = %0.6f, %0.6f
 
-
-# for fisher (with 3-way state)
+# for fisher (with 3-state output)
 #	using "Spam", "Ham", and "Unsure" as labels,
 #	format "%6.2e" for displaying Spam/Ham scores.
 #	and format "%0.6f" for Unsure scores.
 #
-# algorithm=fisher
-# ham_cutoff = 0.10
-# spamicity_tags = Spam, Ham, Unsure 
-# spamicity_formats = %6.2e, %6.2e, %0.6f 
+# spamicity_tags = Spam, Ham, Unsure
+# spamicity_formats = %6.2e, %6.2e, %0.6f
