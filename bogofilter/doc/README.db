@@ -57,10 +57,10 @@ you dump and reload the data base to add checksums.
 The dump/load cycle is necessary only the first time you upgrade from a
 non-transactional to a transactional release.  Use these commands:
 
-cd ~/.bogofilter
-bogoutil -d wordlist.db >wordlist.txt
-mv wordlist.db wordlist.db.old
-bogoutil -l wordlist.db <wordlist.txt
+  cd ~/.bogofilter
+  bogoutil -d wordlist.db > wordlist.txt
+  mv wordlist.db wordlist.db.old
+  bogoutil -l wordlist.db < wordlist.txt
 
 And if all commands succeeded: rm wordlist.txt
 
@@ -68,7 +68,7 @@ NOTE: transactional databases require large lock tables, the exact
 size depends on the size of the database. If the lock table isn't
 large enough, you may get errors and need to increase the lock table
 size, see section 3.2 and perhaps 4.2 when you see this problem.
-"bogoutil -d wordlist.db >/dev/null" can be used to check if the lock
+"bogoutil -d wordlist.db > /dev/null" can be used to check if the lock
 table size is sufficient, as it will access the whole data base.
 
 2.3 Recoverability
@@ -279,11 +279,12 @@ name of the directory holding your wordlist.db file.
 
 a. Determine the data base size:
 
-ls -l ~/.bogofilter/wordlist.db
+  ls -l ~/.bogofilter/wordlist.db
 
 b. Determine the data base page size:
 
-db_stat -h ~/.bogofilter/ -d wordlist.db
+  db_stat -h ~/.bogofilter/ -d wordlist.db
+
 The relevant line has "database page size"
 
 c. The number of locks and lock objects needed is the data base size
@@ -454,23 +455,23 @@ DANGEROUS OPTIONS - these can improve performance, but should be avoided
 
 4.4 VERIFYING DATABASES TO CHECK FOR CORRUPTION
 
-To check if the database is intact, type:
+To verify that the database is intact, type:
 
-    bogoutil --db-check ~/.bogofilter/wordlist.db
+    bogoutil --db-verify ~/.bogofilter/wordlist.db
 
 There should be no output. If there are errors, try:
 
-    bogoutil --db-recover ~/.bogofilter
+  bogoutil --db-recover ~/.bogofilter
 
-Then verify again. If it still prints errors, you must restore your
-database from a backup, rebuild from scratch, or you can attempt to
-salvage it with
+and then verify again. If it still prints errors, you must restore
+your database from a backup, rebuild from scratch, or you can attempt
+to salvage it with
 
-db_dump -r ~/.bogofilter/wordlist.db >~/.bogofilter/wordlist.txn
-rm ~/.bogofilter/{__db.*,log.*,wordlist.db}
-db_load ~/.bogofilter/wordlist.db <~/.bogofilter/wordlist.txn
+  db_dump -r ~/.bogofilter/wordlist.db > ~/.bogofilter/wordlist.txn
+  rm ~/.bogofilter/{__db.*,log.*,wordlist.db}
+  db_load ~/.bogofilter/wordlist.db < ~/.bogofilter/wordlist.txn
 
-NOTE that there is no guarantee that the salvage procedure will work.
+NOTE:  There is no guarantee that the salvage procedure will work.
 
 A. Switching the disk drive's write cache off and on -------------------
 
@@ -545,7 +546,7 @@ that starts with /dev/ad0, /dev/wd0 (either means you have ATA) or
 
 If you have ATA, add the line
 
-      hw.ata.wc="0"
+  hw.ata.wc="0"
 
 to /boot/loader.conf.local, shut down all applications and reboot. (To
 revert the change, remove the line, shut down all applications and
@@ -557,8 +558,8 @@ In either case, omit the leading /dev and trailing s<NUMBER><LETTER> parts
 (/dev/da0s1a -> da0; /dev/da4s3f -> da4). Replace da0 by your device name in
 these examples, and leave out the part in parentheses:
 
- camcontrol modepage da0 -m8 -e -P0 (effective until computer is switched off)
- camcontrol modepage da0 -m8 -e -P3 (save parameters permanently)
+  camcontrol modepage da0 -m8 -e -P0 (effective until computer is switched off)
+  camcontrol modepage da0 -m8 -e -P3 (save parameters permanently)
 
 camcontrol will open a temporary file with a WCE: line on top. Edit the
 figure to read 0 (cache disabled) or 1 (cache enabled), then save the
