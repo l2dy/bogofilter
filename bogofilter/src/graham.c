@@ -177,12 +177,17 @@ void gra_print_stats(FILE *fp)
 	(void)gra_compute_spamicity( &bogostats, fp );
 }
 
-static void wordprob_init(/*@out@*/ wordprop_t* wordstats)
+typedef struct {
+    double good;
+    double bad;
+} wordprob_t;
+
+static void wordprob_init(/*@out@*/ wordprob_t* wordstats)
 {
     wordstats->good = wordstats->bad = 0.0;
 }
 
-static void wordprob_add(wordprop_t* wordstats, double newprob, int bad)
+static void wordprob_add(wordprob_t* wordstats, double newprob, int bad)
 {
     if (bad)
 	wordstats->bad+=newprob;
@@ -190,7 +195,7 @@ static void wordprob_add(wordprop_t* wordstats, double newprob, int bad)
 	wordstats->good+=newprob;
 }
 
-static double wordprob_result(wordprop_t* wordstats)
+static double wordprob_result(wordprob_t* wordstats)
 {
     double count = wordstats->good + wordstats->bad;
     double prob = wordstats->bad/count;
@@ -206,7 +211,7 @@ static double compute_probability(const word_t *token)
     double prob;
     int totalcount=0;
 
-    wordprop_t wordstats;
+    wordprob_t wordstats;
 
     wordprob_init(&wordstats);
 
