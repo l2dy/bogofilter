@@ -4,8 +4,11 @@
 
 $Id$
 
-0.12.0	2003-04-23
+0.12.0	2003-04-24
 
+	* Corrected some errors in rpm specfile.
+
+	2003-04-23
 	* Added 'tuning' directory with scripts for tuning bogofilter.
 	  (cf. bogofilter-tuning.HOWTO)
 

@@ -4,7 +4,36 @@
 
 $Id$
 
-0.11.2 - stable release
+0.12.0	2003-04-24
+
+	* Corrected some errors in rpm specfile.
+
+	2003-04-23
+	* Added 'tuning' directory with scripts for tuning bogofilter.
+	  (cf. bogofilter-tuning.HOWTO)
+
+	2003-04-21
+	* Added '-M' to allow classification of multiple messages in
+	  mbox formatted files.
+	* Grouped options into logical groups for help message and
+	  man page.  Revised option descriptions.
+
+	2003-04-19
+	* Added bogofilter-tuning.HOWTO as replacement for README.Robinson
+
+	2003-04-18
+	* Added classification support for msg-count formatted files.
+	* Add bogolex.sh for creating msg-count formatted email file.
+
+	2003-04-17
+	* Added bulk mode procesing for Maildirs.
+	  '-b' reads filenames from stdin.
+	  '-B' gets filenames from the command line.
+
+	2003-04-16
+	* Miscellaneous refactoring in main.c
+
+0.11.2  - stable version
 
 	2003-04-13
 
