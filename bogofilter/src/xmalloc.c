@@ -24,9 +24,8 @@ xmalloc(size_t size){
     ptr = malloc(size);
     if (ptr == NULL && size == 0)
 	ptr = malloc(1);
-    if (ptr == NULL) {
+    if (ptr == NULL)
 	xmem_error("xmalloc"); 
-    }
     return ptr;
 }
 

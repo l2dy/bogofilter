@@ -21,11 +21,10 @@
 
 void
 *xrealloc(void *ptr, size_t size){
-   void *x;
-   x = realloc(ptr, size);
-   if (x == NULL && size == 0)
-       x = calloc(1, 1);
-   if (x == NULL)
+   ptr = realloc(ptr, size);
+   if (ptr == NULL && size == 0)
+       ptr = calloc(1, 1);
+   if (ptr == NULL)
        xmem_error("xrealloc");
-   return x;
+   return ptr;
 }
