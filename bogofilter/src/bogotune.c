@@ -885,7 +885,7 @@ static void check_wordlist_path(void)
     size_t len = strlen(ds_file) + strlen(WORDLIST) + 2;
     ds_path = xmalloc(len);
 
-    build_path(ds_path, len, ds_file, WORDLIST);
+    build_wordlist_path(ds_path, len, ds_file);
 
     if (stat(ds_path, &sb) != 0) {
 	fprintf(stderr, "Error accessing file or directory '%s'.\n", ds_path);
