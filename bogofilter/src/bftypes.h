@@ -2,16 +2,14 @@
 
 /*****************************************************************************/
 /** \file bftypes.h
- * type definitions for bogofilter.
+ * \brief Type definitions for bogofilter.
+ *
+ * This file shall define the bool and uint32_t types.
+ * it shall include inttypes.h and stdbool.h if present.
+ *
+ * Parts were taken from autoconf.info.
  */
 /*****************************************************************************/
-
-/* parts were taken from autoconf.info */
-
-/*
- * this file shall define the bool and uint32_t types.
- * it shall include inttypes.h and stdbool.h if present
- */
 
 #ifndef BFTYPES_H
 #define BFTYPES_H

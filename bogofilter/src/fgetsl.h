@@ -1,8 +1,7 @@
 /**
  * \file fgetsl.h Header file for NUL-proof fgets() replacement.
  * \author Matthias Andree
- * \date 2002
- * \date 2003
+ * \date 2002 - 2003
  */
 
 #ifndef FGETSL_H

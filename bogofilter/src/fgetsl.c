@@ -2,7 +2,7 @@
  * \file fgetsl.c Implementation file for NUL-proof fgets() replacement.
  * Also usable as standalone test code when compiled with -DMAIN.
  * \author Matthias Andree
- * \date 2002,2003
+ * \date 2002 - 2003
  */
 
 #include "common.h"
