@@ -108,6 +108,8 @@ done
 %{_mandir}/man1/bogolexer.1*
 %{_mandir}/man1/bogoutil.1*
 %{_mandir}/man1/bogoupgrade.1*
+%{_mandir}/man1/bogol.1*
+%{_mandir}/man1/bogotune.1*
 
 %doc AUTHORS CHANGES-* COPYING INSTALL METHODS NEWS
 %doc README README.* RELEASE.NOTES-* TODO UPGRADE
@@ -135,6 +137,8 @@ done
 %{_mandir}/man1/bogolexer.1*
 %{_mandir}/man1/bogoutil.1*
 %{_mandir}/man1/bogoupgrade.1*
+%{_mandir}/man1/bogol.1*
+%{_mandir}/man1/bogotune.1*
 
 %doc AUTHORS CHANGES-* COPYING INSTALL METHODS NEWS
 %doc README README.cvs RELEASE.NOTES-* TODO UPGRADE
