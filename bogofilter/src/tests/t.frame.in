@@ -1,0 +1,158 @@
+#!/bin/sh -x
+
+# testing framework for /bin/sh
+
+# if run from "make check", use pid and time to name TMPDIR, 
+# which will automatically be deleted.
+
+# if run from command line, use testname and date for TMPDIR,
+# and suppress directory deletion.
+
+set -e
+
+: ${srcdir=.}
+: ${relpath=..}
+: ${BF_TESTDIR=.}
+
+BOGOFILTER_DIR=$TMPDIR
+export BOGOFILTER_DIR
+
+BOGOFILTER="$VAL ${relpath}/@BOGOFILTER@"
+BOGOLEXER="$VAL ${relpath}/@BOGOLEXER@"
+BOGOTUNE="$VAL ${relpath}/@BOGOTUNE@"
+BOGOUTIL="$VAL ${relpath}/@BOGOUTIL@"
+BOGOLEX_SH="$VAL ${srcdir}/../msg-count.sh"
+export BOGOFILTER
+export BOGOLEXER
+export BOGOUTIL
+
+# Cater for GNU coreutils "compatiblity"
+_POSIX2_VERSION=199209
+export _POSIX2_VERSION
+
+# Obtain data base file suffix
+DB_NAME=`$BOGOFILTER -V 2>&1 | sed -n '2p;'`
+case $DB_NAME in
+    *BerkeleyDB*)   DB_EXT=db ;;
+    *QDBM*)	    DB_EXT=qdbm ;;
+    *TrivialDB*)    DB_EXT=tdb ;;
+    *)		    echo >&2 "Unknown data base type in bogofilter -V: $DB_NAME"
+		    exit 1 ;;
+esac
+
+export DB_EXT
+
+# Cater for Solaris "compatibility"
+case $PATH in
+*/usr/xpg4/bin:*) ;;
+*)
+    if test -d /usr/xpg4/bin ; then
+	PATH=/usr/xpg4/bin:$PATH
+	export PATH
+    fi
+    ;;
+esac
+
+# However, Solaris' /usr/xpg4/bin/grep doesn't support long lines, so we
+# need to use /usr/bin/grep instead
+
+GREP=/bin/grep
+test -x $GREP || GREP=/usr/bin/grep
+test -x $GREP || { echo >&2 'Cannot find grep!' ; exit 1 ; }
+export GREP
+: ${AWK=awk}
+export AWK
+
+LANG=
+LC_COLLATE=
+LC_ALL=
+unset LANG || :
+unset LC_COLLATE || :
+unset LC_ALL || :
+i=0
+INSERT=.
+while [ $i -lt 3 ] ; do
+    PRINTCORE=${srcdir}/$INSERT/printcore
+    if [ -x $PRINTCORE ] ; then break ; fi
+    i=`expr $i + 1`
+    INSERT=$INSERT/..
+done
+
+SYSTEST="${srcdir}"
+
+if [ -z "$RUN_FROM_MAKE" ] ; then
+# standalone, from shell directly
+# THIS IS PRONE TO RACES
+   NAME=`basename $0 | sed -e 's/^t\.//'`
+   DATE=`date +"%Y%m%d"`
+   TMPDIR="${BF_TESTDIR}/$NAME.$DATE"
+   SUPPRESS_DELETE="NO"
+else
+# automated, from make
+    while : ; do
+	TMPDIR=${BF_TESTDIR}/checks.$$.`date +"%Y%m%dT%H%M%S"`
+	if test x$SUPPRESS_DELETE = xNO ; then TMPDIR=${BF_TESTDIR}/outputs.`date +"%m%d"` ; fi
+        mkdir $TMPDIR && break || :
+	sleep 1
+    done
+fi
+rm -rf $TMPDIR
+mkdir $TMPDIR
+
+verbose=0
+if [ "$1" = "-v" ]; then
+    verbose=1
+    $BOGOFILTER -V 2> ${TMPDIR}/version.out
+fi
+
+if [ "$1" = "-vv" ]; then
+    v="-x l -vv -D"
+    verbose=2
+fi
+
+if test "x$BF_TEST_VERBOSE" != "x" ; then
+    verbose=$BF_TEST_VERBOSE
+fi
+
+if test "x$SUPPRESS_DELETE" = "x" ; then
+    trap "$PRINTCORE ; rm -r -f core ${TMPDIR}" 0
+else
+    echo "Results are in ${TMPDIR}.  Remove it after testing."
+fi
+
+if [ -z "$NODB" ]; then
+    $BOGOFILTER -n -C </dev/null
+fi
+
+# make GNU libc nasty and abort on memory allocation issues:
+if true ; then
+    MALLOC_CHECK_=2
+    export MALLOC_CHECK_
+fi
+
+# use valgrind:
+if false ; then
+    VAL='valgrind -q --num-callers=16'
+    export VAL
+fi
+
+# use Electric Fence:
+if false ; then
+    VAL="env LD_PRELOAD=libefence.so.0.0"
+    EF_PROTECT_FREE=1
+    EF_FILL=85
+    EF_ALLOW_MALLOC_0=1
+    EF_PROTECT_BELOW=0
+    EF_ALIGNMENT=0
+    export LD_PRELOAD EF_PROTECT_FREE EF_FILL EF_ALLOW_MALLOC_0 EF_PROTECT_BELOW
+    export EF_ALIGNMENT VAL
+fi
+
+case `uname -s` in
+    Linux)  if test $verbose -eq 1 ; then DIFF_BRIEF="--brief -s" ; fi
+	;;
+esac
+
+splitmbox() {
+      $AWK 'BEGIN { f=0; } /^From / { close(f); f++; } { print $0 > f }'
+}

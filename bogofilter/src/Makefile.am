@@ -154,7 +154,7 @@ bogotune_static_SOURCES = bogotune.c bogotune.h \
 		   tunelist.c tunelist.h \
 		   method.c $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
 		   common.h method.h
-bogotune_static_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
+bogotune_static_LDADD= $(LDADD) $(LIBDB) $(GSL_LIBS)
 
 debugtest_SOURCES = debug.main.c
 

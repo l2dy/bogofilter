@@ -101,7 +101,17 @@ AC_DEFINE(__NO_CTYPE,1,[Define __NO_CTYPE to 1 to avoid GLIBC_2.3-specific ctype
 
 AC_ARG_ENABLE(static,
       AC_HELP_STRING([--enable-static], [Build static versions as well.]))
-if test a$enable_static = ayes ; then
+
+if test a$enable_static != ayes ; then
+    BOGOFILTER="bogofilter"
+    BOGOLEXER="bogolexer"
+    BOGOTUNE="bogotune"
+    BOGOUTIL="bogoutil"
+else
+    BOGOFILTER="bogofilter_static"
+    BOGOLEXER="bogolexer_static"
+    BOGOTUNE="bogotune_static"
+    BOGOUTIL="bogoutil_static"
     AC_MSG_CHECKING([option to link statically])
     LDEFLAGS="$LDFLAGS"
     found=0
@@ -122,9 +132,14 @@ if test a$enable_static = ayes ; then
 	enable_static=no
     fi
 fi
+
 export STATICLDFLAGS
 AC_SUBST(STATICLDFLAGS)
 AM_CONDITIONAL(ENABLE_STATIC, test x$enable_static = xyes)
+AC_SUBST(BOGOFILTER)
+AC_SUBST(BOGOLEXER)
+AC_SUBST(BOGOTUNE)
+AC_SUBST(BOGOUTIL)
 
 dnl Allow the user to specify a header name to use to indicate whether a given
 dnl message is SPAM or not.
@@ -505,6 +520,7 @@ AC_CONFIG_FILES([Makefile \
 		contrib/Makefile doc/Makefile \
 		src/Makefile \
 		src/tests/Makefile \
+		src/tests/t.frame \
 		])
 AC_OUTPUT
 
@@ -515,3 +531,4 @@ AC_MSG_NOTICE([ LDFLAGS=$LDFLAGS])
 AC_MSG_NOTICE([    LIBS=$LIBS])
 AC_MSG_NOTICE([  DB_LIB=$LIBDB])
 AC_MSG_NOTICE([GSL_LIBS=$GSL_LIBS])
+

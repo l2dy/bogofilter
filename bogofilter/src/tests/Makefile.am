@@ -39,7 +39,7 @@ TESTS=$(TESTSCRIPTS)
 
 TESTS_ENVIRONMENT=RUN_FROM_MAKE=1 AWK=$(AWK) srcdir=$(srcdir) $(SHELL) $(VERBOSE)
 
-EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel inputs outputs \
+EXTRA_DIST=$(TESTSCRIPTS) t.frame t.frame.in t.save t.skel inputs outputs \
 	printcore t._abort \
 	run.sh
 
