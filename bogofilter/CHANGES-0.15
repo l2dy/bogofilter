@@ -4,6 +4,15 @@
 
 $Id$
 
+0.15.13
+
+	2003-12-25
+
+	* Fixed memory leak affecting bogotune.
+	* Added -V (version) option to bogotune.
+	* RPM build fixed.  (with help from Charles A Edwards)
+	* Compiler options changed to reduce warnings during gsl builds.
+
 0.15.12	2003-12-24
 
 	* Distinguish between pipe and stdin as input sources.
