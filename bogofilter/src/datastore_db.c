@@ -621,7 +621,7 @@ int db_init(void) {
     if (!bogohome)
 	abort();
 
-    if (bogohome && getenv("BF_EXPERIMENTAL_DBENV")) {
+    if (bogohome && !getenv("BF_TRADITIONAL_DB")) {
 	int ret = db_env_create(&dbe, 0);
 	if (ret != 0) {
 	    print_error(__FILE__, __LINE__, "db_env_create, err: %d, %s", ret, db_strerror(ret));

@@ -1,0 +1,97 @@
+BERKELEY DB ENVIRONMENT CODE
+============================
+
+$Id$
+
+This document does not apply when you are installing a bogofilter
+version that has been configured to use the TDB or QDBM data base
+managers.
+
+0. Definitions ---------------------------------------------------------
+
+Whenever ~/.bogofilter appears in the text below, this is the directory
+where bogofilter keeps its data base by default. If you are overriding
+this directory by configuration or environment variables, replace your
+actual bogofilter data base directory.
+
+1. Overview ------------------------------------------------------------
+
+This bogofilter version now contains code to use BerkeleyDB environments
+for locking and caching data base access instead of the proven
+fcntl()/F_SETLK locks bogofilter used to use.
+
+The ultimate goal is to migrate to the Berkeley DB Transactional Data
+Store, in order to improve data base robustness.
+
+The current code is the first step in that direction, the code uses the
+Berkeley DB Concurrent Data Store model, it has the potential of using
+finer grained locks, for improved concurrency - depending on BerkeleyDB
+version, and it uses shared buffer pools to improve performance.
+
+The former bogofilter locking code allowed either one registration
+process at the same time or an unlimited amount of readers at the same
+time. A high amount of bogofilter processes that were scoring could
+effectively lock out registration altogether, and registration
+interrupted scoring. The new model allows for concurrent use of many
+readers and one writer at the same time.
+
+2. Use, restrictions, caveats ------------------------------------------
+
+The new code is enabled by default. If, for some reason, it does not
+work for you, stop all bogofilter processes and try to recover the
+environment with the db_recover utility. Give it your data base
+directory as argument to the -h option, for instance:
+
+    db_recover -h ~/.bogofilter
+
+If that does not cure your problems, please report to the mailing list
+1. what you did, 2. what you got, 3. what you expected instead of #2.
+
+For a transition phase, the old code is still around and can be used by
+setting an environment variable:
+
+env BF_TRADITIONAL_DB=1 bogofilter [options]
+
+where [options] is a placeholder for the options you regularly run
+bogofilter with, it can be empty.
+
+BerkeleyDB keeps some additional statistics about locking, caching and
+their efficiency. These can be obtained by running the db_stat utility
+with the -e or -c option, examples:
+
+db_stat -h ~/.bogofilter -e # environment statistics
+db_stat -h ~/.bogofilter -c # lock statistics
+db_stat -h ~/.bogofilter -m # buffer pool statistics
+
+db_stat ~/.bogofilter/wordlist.db # data base statistics
+   (this has also been available with the traditional bogofilter code)
+
+The new code will store files named __db.NNN - where NNN are numbers -
+in the ~/.bogofilter directory. These MUST NOT be removed manually as
+they can contain update data for the data base that must be still written back
+to the wordlist.db file - this happens when there are many concurrent
+processes alongside a registration process. The db_recover utility may
+remove these files, but it knows about BerkeleyDB internals.
+
+This code is deadlock-free, so if bogofilter hangs with this
+experimental code enabled as documented above, either the data base or
+the environment should be checked for corruptions.
+
+3. Open issues and troubleshooting -------------------------------------
+
+a. The DB_ENV based code appears to be more sensitive (not to say
+   fragile) with respect to premature abortion, hangs of bogofilter
+   processes after an ungraceful bogofilter shutdown have been observed.
+   These can usually be resolved by killing all hanging bogofilter
+   processes, then running
+
+   db_recover -h ~/.bogofilter
+
+b. TODO: bogofilter should catch common interrupt signals, SIGHUP,
+   SIGINT, SIGTERM, and ensure a graceful shutdown of the data base.
+
+c. TODO: The bogofilter utilities need to be taught about the
+   environment, too, to avoid avoidable corruptions.
+
+d. TODO: Make sure that the token updates and the .MSG_COUNT are bundled and
+   the whole bundle is written atomically.

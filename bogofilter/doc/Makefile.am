@@ -35,7 +35,8 @@ EXTRA_DIST = \
 	     programmer/README.RISC-OS \
 	     programmer/RISC-OS/src/Makefile \
 	     programmer/RISC-OS/gsl/Makefile \
-	     README.tdb README.validation
+	     README.db README.tdb \
+	     README.validation
 
 #	     bogofilter.cf.example 
 #	     strlcat.3 strlcpy.3
