@@ -352,16 +352,12 @@ void yy_set_state_initial(void)
     BEGIN INITIAL;
     msg_header = true;
     set_tag("Header");
+
     if (DEBUG_LEXER(1))
 	fprintf(dbgout, "BEGIN INITIAL\n");
-}
 
-void lexer_set_debug(int v)
-{
-#ifndef	FLEX_DEBUG
-    v;
-#else
-    yy_flex_debug = v & 1;
+#ifdef	FLEX_DEBUG
+    yy_flex_debug = BOGOTEST('L');
 #endif
 }
  

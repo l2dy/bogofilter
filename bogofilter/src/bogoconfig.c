@@ -449,7 +449,7 @@ static void print_version(void)
 #define	F "f"
 #endif
 
-#define	OPTIONS	":23bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pP:qQRrsStTuvWVx:Xy:" G R F
+#define	OPTIONS	":23bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pP:qQRrsStTuvWVx:X:y:" G R F
 
 /** These functions process command line arguments.
  **
@@ -617,7 +617,10 @@ void process_args_1(int argc, char **argv)
 	    break;
 
         case 'X':
-	    bogotest = 1;
+	    /* 'C' - parse "&#61;" as char  */
+	    /* 'T' - parse "&#61;" as token */
+	    /* 'L' - enable lexer_v3 debug output  */
+	    set_bogotest( optarg );
 	    break;
 
 	case 'y':		/* date as YYYYMMDD */

@@ -61,6 +61,9 @@ extern int debug_mask;
 #define DEBUG_WORDLIST(level)	((debug_mask & BIT_WORDLIST)  && (verbose > level))
 #endif
 
+#define	BOGOTEST(c)		(bogotest && ( 1 << (tolower(c) - 'a')))
+
 void set_debug_mask(const char *mask);
+void set_bogotest(const char *mask);
 
 #endif

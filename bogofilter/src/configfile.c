@@ -276,9 +276,7 @@ bool process_config_files(bool warn_on_error)
     }
 
     if (env)
-	bogotest = atoi(env);
-
-    lexer_set_debug(bogotest);	/* 1 - INITEST, 2 - lexer states */
+	set_bogotest(env);
 
     return ok;
 }
