@@ -5,7 +5,7 @@
 #define	BOGOFILTER_H
 
 #define EVEN_ODDS	0.5		/* used for words we want to ignore */
-#define UNKNOWN_WORD	0.4		/* odds that unknown word is spammish */
+
 #define DEVIATION(n)	fabs((n) - EVEN_ODDS)	/* deviation from average */
 
 typedef enum rc_e {RC_SPAM=0, RC_HAM=1, RC_UNSURE=2}  rc_t;

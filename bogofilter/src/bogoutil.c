@@ -27,6 +27,7 @@ AUTHOR:
 #include "buff.h"
 #include "datastore.h"
 #include "error.h"
+#include "graham.h"			/* for UNKNOWN_WORD */
 #include "maint.h"
 #include "paths.h"
 #include "robinson.h"			/* for ROBS and ROBX */
