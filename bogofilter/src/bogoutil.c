@@ -38,27 +38,20 @@ AUTHOR:
 
 const char *progname = PROGNAME;
 
-static int dump_count = 0;
+static int token_count = 0;
 
 bool  maintain = false;
 bool  onlyprint = false;
 
-/* Function Prototypes */
-
-static int process_args(int argc, char **argv);
-
-int ds_dump_hook(word_t *key, dsv_t *data,
-		 /*@unused@*/ void *userdata);
-
 /* Function Definitions */
 
-int ds_dump_hook(word_t *key, dsv_t *data,
-		 /*@unused@*/ void *userdata)
+static int ds_dump_hook(word_t *key, dsv_t *data,
+			/*@unused@*/ void *userdata)
 /* returns 0 if ok, 1 if not ok */
 {
     (void)userdata;
 
-    dump_count += 1;
+    token_count += 1;
 
     if (maintain &&
 	((!keep_count(data->goodcount) && !keep_count(data->spamcount)) ||
@@ -85,12 +78,12 @@ static int dump_file(char *ds_file)
 {
     int rc;
 
-    dump_count = 0;
+    token_count = 0;
 
     rc = ds_oper(ds_file, DB_READ, ds_dump_hook, NULL);
 
     if (verbose)
-	fprintf(dbgout, "%d tokens dumped\n", dump_count);
+	fprintf(dbgout, "%d tokens dumped\n", token_count);
 
     return rc;
 }
