@@ -1,6 +1,8 @@
-#include "memstr.h"
+/* $Id$ */
 
 /* (C) 2004 Matthias Andree. License: GNU GPL v2 */
+
+#include "memstr.h"
 
 void *memstr(const void *hay, size_t n, const char *needle)
 {
