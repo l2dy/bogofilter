@@ -72,6 +72,11 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     process_config_files(false);
 
+    if (!twostate && !threestate) {
+	twostate = ham_cutoff < EPS;
+	threestate = !twostate;
+    }
+
     /* directories from command line and config file are already handled */
     if (directory == NULL)
     {

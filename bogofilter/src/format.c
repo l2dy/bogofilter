@@ -67,10 +67,10 @@ const char *spam_header_name = SPAM_HEADER_NAME;	/* used by lexer */
 **	    v - version, ex. "version=%v"
 */
 
-static const char *header_format = "%h: %c, tests=bogofilter, spamicity=%p, version=%v";
-static const char *terse_format = "%1.1c %f";
-static const char *log_header_format = "%h: %c, spamicity=%p, version=%v";
-static const char *log_update_format = "register-%r, %w words, %m messages";
+const char *header_format = "%h: %c, tests=bogofilter, spamicity=%p, version=%v";
+const char *terse_format = "%1.1c %f";
+const char *log_header_format = "%h: %c, spamicity=%p, version=%v";
+const char *log_update_format = "register-%r, %w words, %m messages";
 
 #define	RC_COUNT RC_UNSURE+1	/* 3 (for Spam/Ham/Unsure) */
 typedef const char *FIELD;

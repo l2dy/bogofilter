@@ -58,11 +58,6 @@ AUTHOR:
 
 /*---------------------------------------------------------------------------*/
 
-/* NOTE: MAXBUFFLEN _MUST_ _NOT_ BE LARGER THAN INT_MAX! */
-#define	MAXBUFFLEN	((int)200)
-
-/*---------------------------------------------------------------------------*/
-
 /* Global variables */
 
 char outfname[PATH_LEN] = "";
@@ -92,6 +87,18 @@ enum algorithm_e {
 
 static enum algorithm_e algorithm = AL_DEFAULT;
 static bool cmd_algorithm = false;		/* true if specified on command line */
+
+static void display_tag_array(const char *label, const char **array);
+
+/* externs for query_config() */
+
+extern double robx, robs;
+extern const char *header_format;
+extern const char *terse_format;
+extern const char *log_update_format;
+extern const char *log_header_format;
+extern const char *spamicity_tags;
+extern const char *spamicity_formats;
 
 /*---------------------------------------------------------------------------*/
 
@@ -475,3 +482,35 @@ int process_args(int argc, char **argv)
 
     return exitcode;
 }
+
+void query_config(void)
+{
+    fprintf(dbgout, "algorithm = %s\n", method->name);
+
+    fprintf(dbgout, "robx = %0.6f (%8.2e)\n", robx, robx);
+    fprintf(dbgout, "robs = %0.6f (%8.2e)\n", robs, robs);
+    fprintf(dbgout, "min_dev = %0.6f (%8.2e)\n", min_dev, min_dev);
+    fprintf(dbgout, "ham_cutoff = %0.6f (%8.2e)\n", ham_cutoff, ham_cutoff);
+    fprintf(dbgout, "spam_cutoff = %0.6f (%8.2e)\n", spam_cutoff, spam_cutoff);
+    fprintf(dbgout, "spam_header_name = '%s'\n", spam_header_name);
+    fprintf(dbgout, "header_format = '%s'\n", header_format);
+    fprintf(dbgout, "terse_format = '%s'\n", terse_format);
+    fprintf(dbgout, "log_header_format = '%s'\n", log_header_format);
+    fprintf(dbgout, "log_update_format = '%s'\n", log_update_format);
+    display_tag_array("spamicity_tags", &spamicity_tags);
+    display_tag_array("spamicity_formats", &spamicity_formats);
+    exit(2);
+}
+
+static void display_tag_array(const char *label, const char **array)
+{
+    size_t i;
+    size_t size = twostate ? 2 : 3;
+    const char *s;
+
+    fprintf(dbgout, "%s =", label);
+    for (i = 0, s = ""; i < size; i += 1, s = ",")
+	fprintf(dbgout, "%s '%s'", s, array[i]);
+    fprintf(dbgout, "\n");
+}
+

@@ -29,6 +29,7 @@ THEORY:
 #include <config.h>
 #include "common.h"
 
+#include "bogoconfig.h"
 #include "bogofilter.h"
 #include "method.h"
 #include "datastore.h"
@@ -57,6 +58,9 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
     set_list_active_status(true);
 
     method->initialize();
+
+    if (quiet && verbose)	/* 'quiet + verbose' means 'query' */
+	query_config();
 
     /* tokenize input text and save words in a wordhash. */
     do {

@@ -191,22 +191,11 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     size_t robn = 0;
     size_t count = 0;
 
-    word_t *word_robx = word_new((const byte *)ROBX_W, strlen(ROBX_W));
-
     (void) fp; 	/* quench compiler warning */
 
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### rob_compute_spamicity() begins\n");
 
     Rtable |= verbose > 3;
-
-    if (fabs(robx) < EPS)
-    {
-	/* Note: .ROBX is scaled by 1000000 in the wordlist */
-	long l_robx = db_getvalue(spam_list->dbh, word_robx);
-
-	/* If found, unscale; else use predefined value */
-	robx = l_robx ? (double)l_robx / 1000000 : ROBX;
-    }
 
     if (Rtable || verbose)
 	rstats_init();
@@ -262,8 +251,6 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### rob_compute_spamicity() ends\n");
 
-    word_free(word_robx);
-
     return (spamicity);
 }
 
@@ -303,6 +290,8 @@ void rob_print_summary(void)
 
 void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double _spam_cutoff)
 {
+    word_t *word_robx = word_new((const byte *)ROBX_W, strlen(ROBX_W));
+
     mth_initialize( stats, ROBINSON_MAX_REPEATS, _min_dev, _spam_cutoff, ROBINSON_GOOD_BIAS );
 
     /*
@@ -316,6 +305,17 @@ void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double 
 	if (fabs(robs) < EPS)
 	    robs = ROBS;
     }
+
+    if (fabs(robx) < EPS)
+    {
+	/* Note: .ROBX is scaled by 1000000 in the wordlist */
+	long l_robx = db_getvalue(spam_list->dbh, word_robx);
+
+	/* If found, unscale; else use predefined value */
+	robx = l_robx ? (double)l_robx / 1000000 : ROBX;
+    }
+
+    word_free(word_robx);
 }
 
 #ifdef	ENABLE_ROBINSON_METHOD
