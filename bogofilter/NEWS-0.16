@@ -9,7 +9,7 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.16 !
 
-0.16.1	2004-??-??
+0.16.1	2004-01-08
 
 * Ignore X-Bogosity lines in message header.
 * Added additional #ifdefs for deprecated code.

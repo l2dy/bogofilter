@@ -5,13 +5,20 @@
 NOTE: More information on important changes for bogofilters updaters
 is in the RELEASE.NOTES files.  Read them!!
 
-0.16.1	2004-??-??
+0.16.1	2004-01-08
+
+	2004-01-07
 
 	* Ignore X-Bogosity lines in message header.
+
+	2004-01-04
 
 	* Updated bogotune man page.
 	* Fixed minor errors in bogotune.
 	* Corrected memory leaks affecting bogotune.
+
+	2004-01-03
+
 	* Added additional ifdefs for deprecated code.
 	* Added database histogram to bogoutil (using '-H' flag).
 
