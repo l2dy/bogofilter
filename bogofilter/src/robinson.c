@@ -272,15 +272,16 @@ double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
     else
     {
 	double r = 1.0 / (double)max(1,robn);
-	double ln10 = 2.302585093;			/* log(10) - 2.3025850929940459  */
+	double ln2  = 0.6931472;				/* ln(2) */
 
 	rob_stats.robn = robn;
 
-	rob_stats.p_ln = log(P.mant) + P.exp * ln10;	/* invlogsum */
-	rob_stats.q_ln = log(Q.mant) + Q.exp * ln10;	/* logsum    */
+	/* convert to natural logs */
+	rob_stats.p_ln = log(P.mant) + P.exp * ln2;		/* invlogsum */
+	rob_stats.q_ln = log(Q.mant) + Q.exp * ln2;		/* logsum    */
 
-	rob_stats.p_pr = 1.0 - pow(P.mant, r) * pow(10.0, P.exp * r);	/* Robinson's P */
-	rob_stats.q_pr = 1.0 - pow(Q.mant, r) * pow(10.0, Q.exp * r);	/* Robinson's Q */
+	rob_stats.p_pr = 1.0 - exp(rob_stats.p_ln * r);		/* Robinson's P */
+	rob_stats.q_pr = 1.0 - exp(rob_stats.q_ln * r);		/* Robinson's Q */
 
 	rob_stats.s.spamicity = (1.0 + (rob_stats.p_pr - rob_stats.q_pr) / (rob_stats.p_pr + rob_stats.q_pr)) / 2.0;
     }
