@@ -37,6 +37,24 @@
  *	3 - mime boundaries
  */
 
+/* 12 May 2003
+ * Added Paul Graham's latest ideas on parsing.
+ * (From http://www.paulgraham.com/better.html)
+ *
+ * 1. Case is preserved.
+ *
+ * 2. Exclamation points are constituent characters.
+ *
+ * 3. Periods and commas are constituents if they occur between two
+ *    digits. This lets me get ip addresses and prices intact.
+ *
+ * 4. A price range like $20-25 yields two tokens, $20 and $25.
+ *
+ * 5. Tokens that occur within the To, From, Subject, and Return-Path
+ *    lines, or within urls, get marked accordingly.
+ *    For example. `foo' in the Subject line becomes `subj:foo'.
+*/
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -67,6 +85,7 @@ static int lineno;
 /* Function Prototypes */
 
 static word_t *yy_text(void);
+static void reorder_html(void);
 
 /* Function Definitions */
 
@@ -82,7 +101,7 @@ static word_t *yy_text(void)
 %option debug nodebug
 %option align caseless 8bit 
 %option never-interactive noreject
-%option noyywrap nounput
+%option noyywrap
 %option prefix="lexer_v3_"
 
 UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
@@ -95,24 +114,48 @@ MTYPE		[ \t]*[0-9a-zA-Z/-]*
 NUM_NUM		\ [0-9]+\ [0-9]+
 MSG_COUNT	^\"\.MSG_COUNT\"
 
-TOKEN_ESR	[A-Za-z$][A-Za-z0-9$\'.-]+[A-Za-z0-9$]
-
-TOKENMID_CA_075	[^][:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:][]+
-TOKENMID_NJS	[^\][:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[]+
-TOKENMID_NJS_DR	[^[:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[\]]+
-
 TOKENFRONT	[^[:blank:][:cntrl:][:digit:][:punct:]]
-TOKENMID	[^[:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[\]]+
-BOGOLEX_TOKEN	[^[:blank:]<>;    &%$ @! |/\\{}^\"  \*,[:cntrl:]\[\]]+
+TOKENMID	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*,[:cntrl:]\[\]]+
+BOGOLEX_TOKEN	[^[:blank:]<>;    &%$ @ |/\\{}^\"  \*,[:cntrl:]\[\]]+
 TOKENBACK	[^[:blank:][:punct:][:cntrl:]]
 
-TOKEN 		{TOKENFRONT}{TOKENMID_NJS_DR}{TOKENBACK}
+TOKEN 		{TOKENFRONT}{TOKENMID}{TOKENBACK}{1,70}
+
+DOLLARS		[0-9]+
+CENTS		[0-9]+
+
+A1		[[:alpha:]]+
+A2		[[:alpha:]][[:alnum:]]+
+ALPHA		[[:alpha:]][[:alnum:]]+
+
+WHITESPACE	[ \t\n]
+
+NOTWHITESPACE	[^ \t\n]
+
+HTML_WI_COMMENTS	"<"[^\>]*">"
+
+HTML_WO_COMMENTS	"<"[^!][^\>]*">"|"<>"
+
+HTMLTOKEN		{HTML_WI_COMMENTS}
+
+/* Generally, there are some html tags that cause an "eyebreak" and some that do not.
+   For example, the "P" tag or the "BR" tag cause a break, and can be interpreted
+   in place, while, the B (bold) tag does not.  No close tags seem to cause a break.
+   Comments do not.  This is an attempt to make an exhaustive list of tags that cause
+   an "eyebreak". When the exit tag also causes a break, we include the /?.
+   I believe this to be a complete list of tags that can cause a formatting break. */
+
+HBREAK		p|br|li|h[1-6]|hr|title|table|center|dd|dt|iframe|img|input|select|td|textarea|th|\/?(div|blockquote|pre|dir|dl|fieldset|legend|form|menu|ol|ul)
+
+PARSEHTML	"<"(a|font|img)([ \n\t][^>]*|"")">"
+BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
 %s TEXT HTML BOGO_LEX
-%s HTOKEN SCOMMENT LCOMMENT HSCRIPT
+%s HTOKEN HDISCARD SCOMMENT LCOMMENT HSCRIPT
 
 %%
 
+^Mail-From:\ From\ 			|
 ^From\ 						{ if (msg_header && is_from(yy_text())) { 
 						      BEGIN(INITIAL); return FROM;
 						  } else { 
@@ -131,7 +174,10 @@ TOKEN 		{TOKENFRONT}{TOKENMID_NJS_DR}{TOKENBACK}
 <INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); yyless(strlen("Content-Transfer-Encoding:")); return(TOKEN); }
 <INITIAL>^Content-Type:{MTYPE};?		{ mime_type(yy_text()); yyless(strlen("Content-Type:")); return TOKEN; }
 <INITIAL>^Content-Disposition:{MTYPE}		{ mime_disposition(yy_text()); yyless(strlen("Content-Disposition:")); return TOKEN; }
-<INITIAL>^Subject/:\.*				{ set_tag("subj:"); return TOKEN; }
+<INITIAL>^To/:\.*				{ if (header_line_markup) set_tag("to:"); }
+<INITIAL>^From/:\.*				{ if (header_line_markup) set_tag("from:");  else return TOKEN; }
+<INITIAL>^Return-Path/:\.*			{ if (header_line_markup) set_tag("rtrn:");  else return TOKEN; }
+<INITIAL>^Subject/:\.*				{ if (header_line_markup) set_tag("subj:");  else return TOKEN; }
 <INITIAL>^Date:.*|Delivery-Date:.*		;
 <INITIAL>^Message-ID:.*				;
 <INITIAL>^\tid\ {ID}				;
@@ -160,25 +206,46 @@ TOKEN 		{TOKENFRONT}{TOKENMID_NJS_DR}{TOKENBACK}
 						  }
 						}
 
-<HTML>"<!--"					{ BEGIN SCOMMENT; }
-<HTML>"<!"					{ if (!strict_check) {
-						    BEGIN LCOMMENT;
-						  } else { 
-						    BEGIN HTOKEN;
-						  }
+  /* This has to match just as much or more than the below rules, so as to be the 
+     controlling rule. */
+<HTML>{TOKEN}/{HTMLTOKEN}*{BREAKHTML}+{HTMLTOKEN}*.?	{ return TOKEN; }
+
+<HTML>{TOKEN}/({HTMLTOKEN})+{WHITESPACE}		{ return TOKEN; }
+
+<HTML>{TOKEN}({HTMLTOKEN})+/{NOTWHITESPACE} 	{
+						    reorder_html();
 						}
 
+<HTML>{A2}({HTMLTOKEN})+/{NOTWHITESPACE}	{
+						    reorder_html();
+						}
+
+<HTML>{A1}({HTMLTOKEN})+/{NOTWHITESPACE} 	{
+						    reorder_html();
+						}
+
+<HTML>"<!--"					{ BEGIN SCOMMENT; }
+<HTML>"<!"					{ BEGIN (strict_check ? HTOKEN : LCOMMENT ); }
+<HTML>"<a\ "					{ BEGIN HTOKEN; }
+<HTML>"<img\ "					{ BEGIN HTOKEN; }
+<HTML>"<font\ "					{ BEGIN HTOKEN; }
+<HTML>"<"					{ /* unknown tag */ BEGIN HDISCARD; }
+
+<HTOKEN>{TOKEN}					{ if (tokenize_html_tags)     return TOKEN; }
+<HDISCARD>{TOKEN}				{ /* discard innards of html tags     */ }
+<SCOMMENT,LCOMMENT>{TOKEN}			{ /* discard innards of html comments */ }
+<HSCRIPT>{TOKEN}				{ if (tokenize_html_script)   return TOKEN; }
+
+<HTOKEN,HDISCARD>">"				{ BEGIN HTML; }	/* end of tag; return to normal html processing */
 <LCOMMENT>">"					{ BEGIN HTML; }	/* end of loose comment; return to normal html processing */
 <SCOMMENT>"-->"					{ BEGIN HTML; }	/* end of strict comment; return to normal html processing */
-<HTML>"<"					{ BEGIN HTOKEN; }
-<HTOKEN>">"					{ BEGIN HTML; }	/* end of tag; return to normal html processing */
-
-<HTOKEN>{TOKEN}					{ /* discard innards of html tokens */ }
-<SCOMMENT,LCOMMENT>{TOKEN}			{ /* discard innards of html tokens */ }
-<HSCRIPT>{TOKEN}				{ if (tokenize_html_script)   return TOKEN; }
 
 {IPADDR}					{ return IPADDR;}
 {TOKEN}						{ return TOKEN;}
+
+${DOLLARS}					{ return TOKEN;}
+${DOLLARS}\.{CENTS}				{ return TOKEN;}
+
 .						/* ignore character */ ;
 \n						{ got_newline(); 
 						  lineno += 1;
@@ -190,6 +257,21 @@ void lexer_v3_init(FILE *fp)
     lineno = 0;
     BEGIN(INITIAL);
     yyrestart(fp);
+}
+
+static void reorder_html(void)
+{
+    char *chr = memchr(yytext, '<', yyleng);	/* find start of html tag */
+    size_t len = chr - yytext;
+    char *tmp;
+    char *yycopy = alloca(yyleng);
+
+    memcpy(yycopy, yytext+len, yyleng-len);	/* copy tag to start of buffer */
+    memcpy(yycopy+yyleng-len, yytext, len);	/* copy leading text to end of buffer */
+    yycopy[yyleng] = '\0';			/* for debugging */
+
+    for(tmp = yycopy+yyleng-1 ; tmp >= yycopy; tmp--) 
+	unput(*tmp);
 }
 
 /*
