@@ -39,6 +39,8 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #include "rstats.h"
 #include "wordhash.h"
 
+#include <assert.h>
+
 /* constants for the Graham formula */
 #define KEEPERS		15		/* how many extrema to keep */
 #define MINIMUM_FREQ	5		/* minimum freq */
@@ -546,6 +548,10 @@ static double compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errn
 		    fprintf(fp, "%s%f  %f  %s\n", stats_prefix, pp->prob, spamicity, pp->key);
 		    break;
 		default:
+		    assert(pp != NULL);
+		    assert(pp->key != NULL);
+		    assert(pp->stats != NULL);
+		    assert(stats_prefix != NULL);
 		    fprintf(fp, "%s%f  %f  %f  %8.5e  %s\n", stats_prefix, pp->prob, product, invproduct, spamicity, pp->key);
 		    break;
 	    }
