@@ -17,6 +17,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/resource.h>
 
 #if NEEDTRIO
 #include <trio.h>
@@ -151,6 +152,23 @@ static void check_db_version(void)
     }
 }
 
+/** check limit of open file (given through descriptor \a fd) against
+ * current resource limit and warn if file size is "close" (2 MB) to the
+ * limit. errors from the system are ignored, no warning then.
+ */
+static void check_fsize_limit(int fd) {
+    struct stat st;
+    struct rlimit rl;
+
+    if (fstat(fd, &st)) return; /* ignore error */
+    if (getrlimit(RLIMIT_FSIZE, &rl)) return; /* ignore error */
+    if (rl.rlim_cur != RLIM_INFINITY && rl.rlim_cur - st.st_size < (2 * 1024 * 1024)) {
+	print_error(__FILE__, __LINE__, "warning: data base file size approaches resource limit.");
+	print_error(__FILE__, __LINE__, "         write errors (bumping into the limit) can cause");
+	print_error(__FILE__, __LINE__, "         data base corruption.");
+    }
+}
+
 /*
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
@@ -246,6 +264,8 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 		db_close(handle, false);
 		return NULL;		/* handle already freed, ok to return */
 	    }
+
+	    check_fsize_limit(handle->fd[i]);
 
 	    if (db_lock(handle->fd[i], F_SETLK,
 			(short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
