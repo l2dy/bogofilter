@@ -157,6 +157,7 @@ case `uname -s` in
 	;;
 esac
 
+# split file on stdin into files 1, 2, 3, 4... at "From " lines.
 splitmbox() {
       $AWK 'BEGIN { f=0; } /^From / { close(f); f++; } { print $0 > f }'
 }
