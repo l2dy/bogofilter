@@ -1149,7 +1149,7 @@ static void final_recommendations(bool skip)
 	fnp = 100.0 * fn / sp_cnt;
 
 	if (printed)  printf("#");
-	printf("spam_cutoff=%5.6f\t# for %4.2f%% fpos (%u); expect %4.2f%% fneg (%u).\n",
+	printf("spam_cutoff=%5.3f\t# for %4.2f%% fpos (%u); expect %4.2f%% fneg (%u).\n",
 	       cutoff, fpp, fp, fnp, fn);
 
 	printed = true;
@@ -1164,7 +1164,7 @@ static void final_recommendations(bool skip)
 	if (ham_cutoff > 0.45) ham_cutoff = 0.45;
     }
 
-    printf("ham_cutoff=%5.6f\t\n", ham_cutoff);
+    printf("ham_cutoff=%5.3f\t\n", ham_cutoff);
     printf("---cut---\n");
     printf("\n");
     
