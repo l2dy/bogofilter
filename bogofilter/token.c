@@ -140,7 +140,7 @@ token_t get_token(void)
 	    continue;
 
 	case BOUNDARY:	/* don't return boundary tokens to the user */
-	    if ( mime_is_boundary(yytext, yyleng)){
+	    if (mime_is_boundary((const byte *)yytext, yyleng)){
     	    	change_lexer_state(LEXER_HEAD);
 		continue;
 	    }

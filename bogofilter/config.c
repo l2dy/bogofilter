@@ -197,7 +197,7 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
     {
 	case CP_BOOLEAN:
 	    {
-		*arg->addr.b = str_to_bool(val);
+		*arg->addr.b = str_to_bool((const char *)val);
 		if (DEBUG_CONFIG(0))
 		    fprintf(dbgout, "%s -> %s\n", arg->name,
 			    *arg->addr.b ? "Yes" : "No");
