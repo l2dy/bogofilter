@@ -47,7 +47,7 @@ static void check_alphanum(buff_t *buff);
 static void lexer_display_buffer(buff_t *buff)
 {
     fprintf(dbgout, "*** %2d %c,%c %d ", yylineno,
-	    HORB(msg_header), HORB(msg_state->mime_header), buff->t.leng);
+	    HORB(msg_header), HORB(msg_state->mime_header), buff->t.leng - buff->read);
     buff_puts(buff, 0, dbgout);
     if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
 	fputc('\n', dbgout);
@@ -83,17 +83,16 @@ static int lgetsl(buff_t *buff)
 {
     int count = buff_fgetsl(buff, fpin);
     yylineno += 1;
-    if (count >= 0 && DEBUG_LEXER(0)) {
+
+    if (count >= 0 && DEBUG_LEXER(0))
 	lexer_display_buffer(buff);
-    }
 
     /* Special check for message separator.
        If found, handle it immediately.
     */
 
-    if (is_from(&buff->t)) {
+    if (is_from(&buff->t))
 	got_from();
-    }
 
     return count;
 }
@@ -161,9 +160,8 @@ static int get_decoded_line(buff_t *buff)
     size_t used = buff->t.leng;
     byte *buf;
 
-    buff_shrink(buff, used);
-
-    buf = buff->t.text;
+    /* specify location for reading the next line */
+    buff->read = used;			
 
     if (yysave == NULL)
 	count = yy_get_new_line(buff);
@@ -210,17 +208,20 @@ static int get_decoded_line(buff_t *buff)
 	buff_puts(buff, 0, dbgout);
 	fprintf(dbgout, "\n");
     }
+    
+    buf = buff->t.text + used;
 
     if (count >= 5
 	&& memcmp("From ", buf, 5) != 0
 	&& !msg_header && !msg_state->mime_header
 	&& msg_state->mime_type != MIME_TYPE_UNKNOWN) {
-	int decoded_count = mime_decode(&buff->t);
+	word_t line = { buff->t.leng-used, buff->t.text+used };
+	int decoded_count = mime_decode(&line);
 	/*change buffer size only if the decoding worked */
 	if (decoded_count != 0 && decoded_count < count) {
-	    buff->t.leng = count = decoded_count;
+	    buff->t.leng -= count - decoded_count;
+	    count = decoded_count;
 	    check_alphanum(buff);
-	    memcpy(buf, buff->t.text, buff->t.leng);
 	    if (DEBUG_LEXER(1)) 
 		lexer_display_buffer(buff);
 	}
@@ -232,28 +233,26 @@ static int get_decoded_line(buff_t *buff)
 	*(buf + count - 1) = '\n';
     }
 
-    buff_expand(buff, used);
-
-    if (buff->t.leng < buff->size)	/* debug code - remove */
-	Z(buff->t.text[buff->t.leng]);	/* debug code - remove */
+    if (buff->t.leng < buff->size)	/* for easier debugging - removable */
+	Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
 
     return count;
 }
 
-int buff_fill(size_t need, buff_t *buff)
+int buff_fill(buff_t *buff, size_t used, size_t need)
 {
     int cnt = 0;
-    size_t used = buff->t.leng;
+    size_t leng = buff->t.leng;
     size_t size = buff->size;
 
     /* check bytes needed vs. bytes in buff */
-    while (size-used > 2 && need > used) {
+    while (size - leng > 2 && need > leng - used) {
 	/* too few, read more */
 	int add = get_decoded_line(buff);
 	if (add == EOF) return EOF;
 	if (add == 0) break ;
 	cnt += add;
-	used += add;
+	leng += add;
     }
     return cnt;
 }
@@ -301,14 +300,14 @@ int yyredo(word_t *text, char del)
     if (yysave == NULL) {
 	tmp = buff_new(xmalloc(tlen+D), tlen, tlen+D);
 	memcpy(tmp->t.text, t, tlen);
-	Z(tmp->t.text[tmp->t.leng]);	/* debug code - remove */
+	Z(tmp->t.text[tmp->t.leng]);	/* for easier debugging - removable */
     } else {
 	size_t yu = yysave->t.leng;
 	size_t nlen = yu + tlen;
 	tmp = buff_new(xmalloc(nlen+D), nlen, nlen+D);
 	memcpy(tmp->t.text, yysave->t.text, yu);
 	memcpy(tmp->t.text+yu, t, tlen);
-	Z(tmp->t.text[tmp->t.leng]);	/* debug code - remove */
+	Z(tmp->t.text[tmp->t.leng]);	/* for easier debugging - removable */
 	xfree(yysave->t.text);
 	buff_free(yysave);
     }

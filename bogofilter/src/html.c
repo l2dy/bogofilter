@@ -36,7 +36,7 @@ bool	score_html_comments = false;	/* config file option:  "score_html_comments" 
 
 /* Function Declarations */
 
-static int kill_html_comment(buff_t *buff);
+static int kill_html_comment(buff_t *buff, size_t comment_start);
 
 /* http://www.w3.org/MarkUp/html-spec/html-spec_3.html#SEC3.2.5
 **
@@ -60,10 +60,9 @@ int process_html_comments(buff_t *buff)
 
     for (tmp = buf_start; tmp < buf_used && (tmp = memchr(tmp, '<', buf_used-tmp)) != NULL; tmp += 1) {
 	int count;
-	buff_shrink(buff, tmp - buf_start);
-	count = kill_html_comment(buff);
-	buf_used = tmp + count;
-	buff_expand(buff, tmp - buf_start);
+	size_t comment_offset = tmp - buf_start;
+	count = kill_html_comment(buff, comment_offset);
+	buf_used = buf_start + buff->t.leng;
     }
 
     if (buff->t.leng != (size_t)(buf_used - buf_start)) {
@@ -74,16 +73,16 @@ int process_html_comments(buff_t *buff)
     return buf_used - buf_start;
 }
 
-static int kill_html_comment(buff_t *buff)
+static int kill_html_comment(buff_t *buff, size_t comment_offset)
 {
-    byte *buf_start = buff->t.text;
-    byte *buf_used  = buf_start + buff->t.leng;
-    byte *buf_end   = buf_start + buff->size;
+    byte *buf_beg = buff->t.text + comment_offset;
+    byte *buf_end = buff->t.text + buff->size;
     byte *comment = NULL;
+    byte *buf_used;
 
     int level = 0;
     bool done = false;
-    byte *tmp = buf_start;
+    byte *tmp = buf_beg;
 
     while (!done) {
 	byte c;
@@ -100,15 +99,15 @@ static int kill_html_comment(buff_t *buff)
 
 	need = (c == '<') ? COMMENT_START_LEN : 1;
 
-	buf_used = buf_start + buff->t.leng;
+	buf_used = buf_beg + buff->t.leng - comment_offset;
 	avail = buf_used - tmp;
 
 	if (need > avail) {
 	    int new;
-	    int used = tmp - buf_start;
-	    buff_shrink(buff, used);
-	    new = buff_fill(need, buff);
-	    buff_expand(buff, used);
+	    int used = tmp - buf_beg + comment_offset;
+	    buff->read += buff->t.leng;
+	    new = buff_fill(buff, used, need);
+	    buff->read -= buff->t.leng;
 	    if (new == 0 || new == EOF)
 		break;
 	    continue;
@@ -178,5 +177,5 @@ static int kill_html_comment(buff_t *buff)
 	}
     }
 
-    return buff->t.leng;
+    return buff->t.leng - comment_offset;
 }
