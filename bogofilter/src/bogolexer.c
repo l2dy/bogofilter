@@ -55,6 +55,7 @@ const parm_desc format_parms[] =
 /* Function Prototypes */
 
 static int process_args(int argc, char **argv);
+static void initialize(FILE *fp);
 
 /* Function Definitions */
 
@@ -171,7 +172,6 @@ int main(int argc, char **argv)
 
     process_args(argc, argv);
     process_config_files(false);
-    init_charset_table(charset_default, true);
 
     textblocks = textblock_init();
 
@@ -183,7 +183,7 @@ int main(int argc, char **argv)
 	    puts("normal mode.");
     }
 
-    init_charset_table("default", true);
+    initialize(fpin);
     got_from();	/* initialize */
 
     while ((t = get_token()) > 0)
@@ -202,4 +202,12 @@ int main(int argc, char **argv)
     textblock_free(textblocks);
 
     return 0;
+}
+
+static void initialize(FILE *fp)
+{
+    init_charset_table(charset_default, true);
+    mime_reset();
+    token_init();
+    lexer_v3_init(fp);
 }
