@@ -23,9 +23,9 @@ size_t cur_mem, max_mem, tot_mem;
 
 textblock_t *textblock_init(void)
 {
-    textblock_t *t = (textblock_t *) xmalloc(sizeof(*t));
+    textblock_t *t = (textblock_t *) xcalloc(1, sizeof(*t));
     size_t mem = sizeof(*t)+sizeof(textdata_t);
-    t->head = (textdata_t *) xmalloc(sizeof(textdata_t));
+    t->head = (textdata_t *) xcalloc(1, sizeof(textdata_t));
     t->tail = t->head;
     cur_mem += mem;
     tot_mem += mem;
