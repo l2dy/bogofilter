@@ -41,8 +41,5 @@ done
 
 [ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
 
-if  [ $verbose -eq 0 ]; then
-    cmp ${OUTPUTS}/$OUT ${TMPDIR}/$OUT
-else
-    diff $DIFF_BRIEF ${OUTPUTS}/$OUT ${TMPDIR}/$OUT
-fi
+test $verbose -eq 0 && cmp ${OUTPUTS}/$OUT ${TMPDIR}/$OUT \
+|| diff $DIFF_BRIEF ${OUTPUTS}/$OUT ${TMPDIR}/$OUT
