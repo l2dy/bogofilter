@@ -322,7 +322,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     const char *head_format = !show_probability ? "%-30s %6s %6s\n"   : "%-30s %6s  %6s  %6s  %6s\n";
     const char *data_format = !show_probability ? "%-30s %6lu %6lu\n" : "%-30s %6lu  %6lu  %f  %f\n";
 
-    void *dsh;
+    void *dsh = NULL; /* initialize to silence bogus gcc warning */
 
     struct stat sb;
 
