@@ -74,7 +74,7 @@ $BOGOUTIL -a 20021010 -d $DATA | $SORT > ${TMPDIR}/dump.load-6.txt
 
 [ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
 
-for i in outputs/dump.load-?.out ; do
+for i in ${SYSTEST}/outputs/dump.load-?.out ; do
     j=${TMPDIR}/`basename $i .out`.txt
     if  [ $verbose -eq 0 ]; then
 	cmp $i $j
