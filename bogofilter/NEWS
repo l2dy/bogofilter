@@ -4,9 +4,10 @@
 
 $Id$
      
-0.10.1.1 2003-01-22
+0.10.1.1 2003-01-24
 
-	* Fixed two problems in parsing html.
+	* Fixed two problems in parsing html and one in processing
+	  config file options.
 
 0.10.1	2003-01-22
 
