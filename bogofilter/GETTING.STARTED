@@ -63,7 +63,7 @@
 
     The simple rule when training bogofilter is "more is better".
 
-    As distributed, bogofilter doesn't include a wordlist.  You, the
+    As distributed, bogofilter does not include a wordlist.  You, the
     user, need to tell bogofilter what you consider spam and what you
     consider ham.  This is bogofilter's training process and involves
     running bogofilter with appropriate flags and with messages you've
@@ -107,7 +107,7 @@
     procmail and maildrop).  Each of these has its own configuration
     file and methods for invoking spam filters like bogofilter.  The
     documentation includes files "integrating-with-postfix" and
-    "integrating-with-qmail".  Read them for ideas on how to setup
+    "integrating-with-qmail".  Read them for ideas on how to set up
     bogofilter for your environment.
 
     The most common setup uses bogofilter's "-p" (passthrough) option
@@ -134,7 +134,7 @@
 
 --- Use with mail user agent ---
 
-    Bogofilter is compatible with all mail user agents.  MUA's with
+    Bogofilter is compatible with all mail user agents.  MUAs with
     filtering abilities can check the headers for "X-Bogosity: Spam"
     and "X-Bogosity: Ham" and take the appropriate actions for spam and
     ham.
@@ -142,11 +142,14 @@
     Alternatively, if your MUA has sufficient scripting capabilities,
     the MUA can run bogofilter and take the appropriate action.
 
-    As time goes by and bogofilter encounters messages that it can't
-    classify with certaintly, there will be messages classified as
+    As time goes by and bogofilter encounters messages that it can not
+    classify with certainty, there will be messages classified as
     "Unsure".  As these messages are in the "gray" area, meaning "not
     clearly ham and not clearly spam" it's useful to have your MUA
-    filter these messages so you can use them to train bogofilter.
+    filter these messages to a separate folder (or mailbox) so you can
+    use them to
+
+    train bogofilter.
 
 --- Ongoing training ---
     
@@ -154,18 +157,20 @@
     comprehensive information in its wordlist.
 
     As time goes by and bogofilter classifies messages for you, it
-    will encounter problems time because it doesn't have enough
-    information to correctly classify each and every message.  It's
-    important to check message classifications!
+    will encounter problems because it does not have enough information
+    to correctly classify each and every message.  It's important to
+    check message classifications!
 
     "False negatives", i.e. spam classified as ham, are easy since
     they'll appear in your inbox and be noticed.  "False positives"
     are important to find because they're messages you want!  All
     messages in these groups should be used to train bogofilter.
 
-    Filtering "Unsure" messsages into a separate folder (or mailbox),
-    and separating them into spam and ham, gives a good set of
-    messages for training (using bogofilter's "-s" and "-n" flags).
+    Filtering "Unsure" messages into a separate folder (or mailbox),
+    and manually classifying and separating them into spam and ham,
+    gives a good set of messages for training (using bogofilter's "-s"
+    and "-n" flags).
+
 
 --- Tuning bogofilter ---
 
@@ -204,9 +209,9 @@
 
 --- Additional information ---
 
-    Bogofilter includes a number of files having more information.
-    You'll find them in /usr/share/doc (or comparable location).  The
-    following files are included:
+    Bogofilter's distribution includes a number of files containing
+    more information.  You'll find them in /usr/share/doc (or
+    comparable location).  The following files are included:
 
     FAQs:
 
@@ -235,7 +240,7 @@
 	integrating-with-postfix
 	integrating-with-qmail
 
-    Operating specific README files:
+    Operating System specific README files:
 
 	README.freebsd
 	README.hp-ux
