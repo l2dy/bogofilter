@@ -752,7 +752,7 @@ static void load_wordlist(ds_foreach_t *hook, void *userdata)
     }
 
     ds_oper(path, DB_READ, hook, userdata);
-//  ds_oper(path, DB_READ, load_hook, ns_and_sp->train); XXXXXXXXXX
+/*  ds_oper(path, DB_READ, load_hook, ns_and_sp->train); XXXXXXXXXX */
     db_cachesize = ceil(sb.st_size / 3.0 / 1024.0 / 1024.0);
 
     xfree(path);
@@ -790,7 +790,7 @@ static int robx_accum(word_t *key,
 
     /* check for system meta-data */
     if (*key->text == '.') {
-	if (strcmp(key->text, MSG_COUNT) == 0) {
+	if (strcmp((const char *)key->text, MSG_COUNT) == 0) {
 	    msgs_good = goodness;
 	    msgs_bad  = spamness;
 	    rh->scalefactor = spamness/goodness;
