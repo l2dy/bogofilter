@@ -4,6 +4,9 @@
 #include <errno.h>
 #include <stdio.h>
 
+extern int sys_nerr;
+extern char *sys_errlist[];
+
 char *strerror(int errnum) {
     static char buf[80];
     if (errnum >= 0 && errnum < sys_nerr)
