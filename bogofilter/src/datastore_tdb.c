@@ -47,9 +47,9 @@ static dbh_t *dbh_init(const char *db_path, const char *db_name)
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
 
-    handle->path = xstrdup(path);
+    handle->path = xstrdup(db_path);
 
-    handle->name = build_path(handle->name, len, db_path, db_name);
+    handle->name = build_path(db_path, db_name);
 
     handle->locked  = false;
     handle->created = false;
