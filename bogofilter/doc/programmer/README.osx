@@ -1,0 +1,25 @@
+Compiling Bogofilter on OS-X
+=============================
+Bogofilter has been tested and is used on OS-X.
+
+There are two prerequisites for compiling Bogofilter on OS-X.
+1. Berkeley DB
+2. xlc or gcc
+
+Berkeley DB is available from Sleepycat Software, at
+<http://www.sleepycat.com/>. Users of the fink package manager can
+install it using 'fink install db4-shlibs'. (This only installs the
+libraries; if you want the whole package, which is *not* required for
+bogofilter, use 'fink install db4'.)
+
+Run the `configure' script with the `--with-db=/path/to/berkeley-db-dir'
+option so that `configure' can find your Berkeley DB installation.
+For example, users with the HP Gnome Desktop would use `configure
+--with-db=/opt/gnome'. Fink users would use 'configure
+--with-db=/sw/include/db4'.
+
+Bogofilter can be built with either gcc or xlc.  If using xlc, put
+"CC=xlc" at the beginning of the configure command.
+
+Read the INSTALL file for more information and additional options for
+the `configure' script. 
