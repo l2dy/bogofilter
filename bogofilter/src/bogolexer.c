@@ -94,6 +94,17 @@ static void help(void)
 	    progname, version);
 }
 
+#define	OPTIONS	":c:CDhI:npP:qTvx:"
+
+/** These functions process command line arguments.
+ **
+ ** They are called to perform passes 1 & 2 of command line switch processing.
+ ** The config file is read in between the two function calls.
+ **
+ ** The functions will exit if there's an error, for example if
+ ** there are leftover command line arguments.
+ */
+
 static void process_args_1(int argc, char **argv)
 {
     int option;
@@ -101,7 +112,7 @@ static void process_args_1(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
-    while ((option = getopt(argc, argv, ":c:CDhI:npP:qTvx:")) != -1)
+    while ((option = getopt(argc, argv, OPTIONS)) != -1)
     {
 	switch (option)
 	{
@@ -181,7 +192,7 @@ static void process_args_2(int argc, char **argv)
     optreset = 1;
 #endif
 
-    while ((option = getopt(argc, argv, ":c:CDhI:npP:qTvx:")) != -1)
+    while ((option = getopt(argc, argv, OPTIONS)) != -1)
     {
 	switch (option)
 	{

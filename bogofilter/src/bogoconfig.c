@@ -414,6 +414,8 @@ static void print_version(void)
 #define	F "f"
 #endif
 
+#define	OPTIONS	":23bBc:Cd:DefFghI:lL:m:MnNo:O:pP:qQRrsStTuvVx:y:" G R F
+
 /** These functions process command line arguments.
  **
  ** They are called to perform passes 1 & 2 of command line switch processing.
@@ -436,7 +438,7 @@ void process_args_1(int argc, char **argv)
     set_today();		/* compute current date for token age */
     select_algorithm(algorithm, false);	/* select default algorithm */
 
-    while ((option = getopt(argc, argv, ":23bBc:Cd:DefFghI:lL:m:MnNo:O:pP:qQRrsStTuvVx:y:" G R F)) != -1)
+    while ((option = getopt(argc, argv, OPTIONS)) != -1)
     {
 #if 0
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
@@ -631,7 +633,7 @@ void process_args_2(int argc, char **argv)
     optreset = 1;
 #endif
 
-    while ((option = getopt(argc, argv, ":23bBc:Cd:DefFghI:lL:m:MnNo:O:pP:qQRrsStTuvVx:y:" G R F)) != -1)
+    while ((option = getopt(argc, argv, OPTIONS)) != -1)
     {
 #if 0
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
