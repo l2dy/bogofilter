@@ -56,7 +56,7 @@ int main(int argc, char **argv)
     int option;
     int count=0;
 
-    while ((option = getopt(argc, argv, ":hnpqv")) != -1)
+    while ((option = getopt(argc, argv, ":hnpqvx")) != -1)
 	switch (option) {
 	case 'h':
 	    help();
@@ -73,6 +73,9 @@ int main(int argc, char **argv)
 	    break;
 	case 'v':
 	    verbose += 1;
+	    break;
+	case 'x':
+	    set_debug_mask( optarg );
 	    break;
 	default:
 	    usage();
