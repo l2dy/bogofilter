@@ -32,7 +32,7 @@ function usage() {
     exit 1
 }
 
-function train() {
+function train_mbox() {
     # go through the list, extract the messages, eval with bogofilter
     # and train if bogofilter is wrong or uncertain
     cnt=0; nspam=0; ngood=0; rspam=0; rgood=0;
@@ -40,16 +40,46 @@ function train() {
     while read expect fnam offset length; do
 	let cnt=cnt+1
 	dd if=$fnam bs=1 skip=$offset count=$length 2>/dev/null >msg.$pid
-	result=`bogofilter -t -v -d $bogodir $cfg <msg.$pid | tr "SHU" "shu"`
+	result=`bogofilter -t -v -d $bogodir $cfg -I msg.$pid`
 	got=`echo $result | awk '{print $1}' | tr "YNU" "snu"`
-	if [ "$expect" = "s" ]; then let nspam=$nspam+1
+	if [ "$expect" = "s" ]; 
+	then let nspam=$nspam+1
 	else let ngood=$ngood+1; fi
-	if [ $got != $expect ]; then
-	    if [ "$expect" = "s" ]; then let rspam=$rspam+1
+	if [ "$got" != "$expect" ]; then
+	    if [ "$expect" = "s" ]; 
+	    then let rspam=$rspam+1
 	    else let rgood=$rgood+1; fi
 	    # comment out the next line for dry-run testing
-	    bogofilter -$expect $cfg -d $bogodir <msg.$pid
+	    bogofilter -$expect $cfg -d $bogodir -I msg.$pid
 	fi
+#	echo $expect $got $result, $nspam $rspam, $ngood $rgood
+	n=`expr \( $nspam + $ngood \) % 10`
+	test $n -eq 0 && \
+	    printf "\r%5d%5d  %5d%5d " $nspam $rspam $ngood $rgood
+    done
+    printf "\r%5d%5d  %5d%5d\n" $nspam $rspam $ngood $rgood
+}
+
+function train_maildir() {
+    # go through the list, extract the messages, eval with bogofilter
+    # and train if bogofilter is wrong or uncertain
+    cnt=0; nspam=0; ngood=0; rspam=0; rgood=0;
+    echo " spam  reg   good  reg"
+    while read expect fnam; do
+	let cnt=cnt+1
+	result=`bogofilter -t -v -d $bogodir $cfg -I $fnam`
+	got=`echo $result | awk '{print $1}' | tr "YNU" "snu"`
+	if [ "$expect" = "s" ]; 
+	then let nspam=$nspam+1
+	else let ngood=$ngood+1; fi
+	if [ "$got" != "$expect" ]; then
+	    if [ "$expect" = "s" ]; 
+	    then let rspam=$rspam+1
+	    else let rgood=$rgood+1; fi
+	    # comment out the next line for dry-run testing
+	    bogofilter -$expect $cfg -d $bogodir -I $fnam
+	fi
+#	echo $expect $got $result, $nspam $rspam, $ngood $rgood
 	n=`expr \( $nspam + $ngood \) % 10`
 	test $n -eq 0 && \
 	    printf "\r%5d%5d  %5d%5d " $nspam $rspam $ngood $rgood
@@ -64,14 +94,25 @@ cmd=""
 cfg='-C'
 pid=$$
 
+mode=0		# unknown
+mbox=1		# mbox mode
+mdir=2		# maildir mode
+
 while [ ${#*} -gt 1 ]; do
     indic=${1:0-1:1} ; shift
     case "$indic" in
 	s | n )
-	    file=$1 ; shift
-	    cmd="$cmd -c $indic $file"
-	    if [ ! -r $file ]; then echo "file '$file' not found"; usage; fi
+	    path=$1 ; shift
+	    cmd="$cmd -c $indic $path"
+	    if [ ! -r $path ]; then echo "file '$path' not found"; usage; fi
 	    let cnt=cnt+2
+	    if [ $mode = 0 ] ; then
+		if [ -f $path ]; then	# if mbox
+		    mode=$mbox
+		else			# else maildir
+		    mode=$mdir
+		fi
+	    fi
 	    ;;
 	c ) 
 	    file=$1 ; shift
@@ -82,9 +123,11 @@ while [ ${#*} -gt 1 ]; do
 	    pid=$1; shift;
 	    ;;
 	d )
-	    test "x$bogodir" != "x" && usage
+	    [ -n "$bogodir" ] && usage
 	    bogodir=$1 ; shift
 	    if [ ! -d $bogodir ]; then echo "directory '$bogodir' not found"; usage; fi
+	    [ ! -f $bogodir/spamlist.db ] && bogofilter -d $bogodir -s -C < /dev/null
+	    [ ! -f $bogodir/goodlist.db ] && bogofilter -d $bogodir -n -C < /dev/null
 	    ;;
 	* )
 	    usage
@@ -92,7 +135,7 @@ while [ ${#*} -gt 1 ]; do
 done
 
 # if the first param isn't s or n, treat it as a directory
-test "x$bogodir" = "x" && bogodir="${HOME}/.bogofilter"
+test -z "$bogodir" && bogodir="${HOME}/.bogofilter"
 
 # check for an even number of s/n files >= 4
 test $cnt -ge 4 || usage
@@ -102,9 +145,19 @@ test $n -eq 0 || usage
 # params may be ok, here goes...
 
 # create a shuffled list, with lengths
-[ ! -f scram.$pid ] && scramble '^From ' -l $cmd > scram.$pid
+if [ ! -f scram.$pid ] ; then
+    if [ "$mode" = "$mbox" ] ; then	# mbox
+	scramble "^From " -l $cmd > scram.$pid
+    else				# maildir
+	scramble -d -l $cmd > scram.$pid
+    fi
+fi
 
-train <scram.$pid
+if [ "$mode" = "$mbox" ] ; then	# mbox
+    train_mbox <scram.$pid
+else				# maildir
+    train_maildir <scram.$pid
+fi
 
 if [ $pid = $$ ] ; then
 # next line can be commented out for debugging
