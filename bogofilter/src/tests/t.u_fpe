@@ -1,0 +1,11 @@
+#! /bin/sh
+
+. ${srcdir:=.}/t.frame
+
+# make sure we don't have SIGFPE aborts
+./u_fpe >$TMPDIR/res
+tr <$TMPDIR/res >$TMPDIR/res.lc 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' 'abcdefghijklmnopqrstuvwxyz'
+cmp - $TMPDIR/res.lc <<_EOF
+nan
+inf
+_EOF

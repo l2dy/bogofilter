@@ -122,34 +122,13 @@ production by sites that process a lot of mail.</para>
 </refsect1>
 
 <refsect1 id='theory'><title>THEORY OF OPERATION</title>
+
 <para><application>Bogofilter</application> treats its input as a bag
-of tokens.  Each token is checked against "good" and "bad" wordlists,
-which maintain counts of the numbers of times it has occurred in
-non-spam and spam mails.  These numbers are used to compute the
-probability that a mail in which the token occurs is spam.  After
-probabilities for all input tokens have been computed,
-the probabilities that deviate furthest from average are combined
-using Bayes's theorem on conditional probabilities.  Various parameters
-influence this process, the most important are:</para>
-
-<para>robx: the score given to a token which has not seen before.
-robx is the probabilty that the token is spammish.</para>
-
-<para>robs: a weight on robx which moves the probability of a little seen
-token towards robx.</para>
-
-<para>min_dev: a minimum distance from .5 for tokens to use in the
-calculation.  Only tokens farther away from 0.5 than this value are
-used.</para>
-
-<para>spam_cutoff: messages with scores greater than or equal to will
-be marked as spam.</para>
-
-<para>ham_cutoff: If zero, all messages with values below spam_cutoff
-are marked as ham.  If bigger than zero, values less than or equal to
-ham_cutoff are marked as ham.  Messages with values between ham_cutoff
-and spam_cutoff are marked as unsure.  If ham_cutoff equals
-spam_cutoff, messages with this score are marked as spam.</para>
+of tokens.  Each token is checked against a wordlist, which maintains
+counts of the numbers of times it has occurred in non-spam and spam
+mails.  These numbers are used to compute an estimate of the
+probability that a message in which the token occurs is spam.  Those are
+combined to indicate whether the message is spam or ham.</para>
 
 <para>While this method sounds crude compared to the more usual
 pattern-matching approach, it turns out to be extremely effective.
@@ -164,16 +143,62 @@ features rather than broken up.  Various kinds of MTA cruft such as
 dates and message-IDs are ignored so as not to bloat the wordlists.
 Tokens found in various header fields are marked appropriately.</para>
 
-<para>Another seeming improvement is that this program offers Gary
-Robinson's suggested modifications to the calculations.  These modifications
-are described in Robinson's paper
-<ulink url="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">
-Spam Detection</ulink>.</para>
+<para>Another improvement is that this program offers Gary Robinson's
+suggested modifications to the calculations (see the parameters robx
+and robs below).  These modifications are described in Robinson's
+paper <ulink
+url="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">Spam
+Detection</ulink>.</para>
 
-<para>Since then, Robinson and others have realized that the
-calculation can be further optimized.  Bogofilter offers the option of
-applying this test (known as Fisher's method).</para>
+<para>Since then, Robinson (see his Linux Journal article <ulink
+url="http://www.linuxjournal.com/article.php?sid=6467">A Statistical
+Approach to the Spam Problem</ulink>) and others have realized that
+the calculation can be further optimized using Fisher's method.</para>
+
+<para>In short words this is how it works: The estimates for the spam
+probabilities of the individual tokens are combined using the "inverse
+chi-square function".  Its value indicates how badly the null
+hypothesis that the message is just a random collection of independent
+words with probabilities given by our previous estimates fails.  This
+function is very sensitive to small probabilities (hammish words), but
+not to high probabilities (spammish words); so the value only
+indicates strong hammish signs in a message. Now using inverse
+probabilities for the tokens, the same computation is done again,
+giving an indicator that a message looks strongly spammish.  Finally,
+those two indicators are subtracted (and scaled into a 0-1-interval).
+This combined indicator (bogosity) is close to 0 if the signs for a
+hammish message are stronger than for a spammish message and close to
+1 if the situation is the other way round.  If signs for both are
+equally strong, the value will be near 0.5.  Since those message don't
+give a clear indication there is a tristate mode in
+<application>bogofilter</application> to mark those messages as
+unsure, while the clear messages are marked as spam or ham,
+respectively.  In two-state mode, every message is marked as either
+spam or ham.</para>
+
+<para>Various parameters influence these calculations, the most
+important are:</para>
+
+<para>robx: the score given to a token which has not seen before.
+robx is the probability that the token is spammish.</para>
+
+<para>robs: a weight on robx which moves the probability of a little seen
+token towards robx.</para>
+
+<para>min_dev: a minimum distance from .5 for tokens to use in the
+calculation.  Only tokens farther away from 0.5 than this value are
+used.</para>
+
+<para>spam_cutoff: messages with scores greater than or equal to will
+be marked as spam.</para>
+
+<para>ham_cutoff: If zero or spam_cutoff, all messages with values
+strictly below spam_cutoff are marked as ham, all others as spam
+(two-state).  Else values less than or equal to ham_cutoff are marked
+as ham, messages with values strictly between ham_cutoff and
+spam_cutoff are marked as unsure; the rest as spam (tristate)</para>
 </refsect1>
+
 
 <refsect1 id='options'><title>OPTIONS</title>
 
@@ -435,7 +460,7 @@ the message's tokens.  Enabling this option increases
       robs and robx values.  If one value is supplied, then min_dev is
       set.  If a comma followed by one value is supplied, then robs
       is set.  With two values, both min_dev and robs are set; with
-      three, mindev, robs and robx are set; and other combinations of
+      three, min_dev, robs and robx are set; and other combinations of
       values and commas behave as one would expect.  Note the
       syntax is misleading, at least one of the values MUST be present,
       and the commas determine what value(s) will be set.  Note: spaces
@@ -454,7 +479,7 @@ the message's tokens.  Enabling this option increases
 <para>INFO OPTIONS</para>
 
 <para>The <option>-v</option> option produces a report to standard
-output on <application>bogofilter</application>'s analysis af the
+output on <application>bogofilter</application>'s analysis of the
 input.  Each additional <option>v</option> will increase the verbosity of
 the output, up to a maximum of 4.  With <option>-vv</option>, the report
 lists the tokens with highest deviation from a mean of 0.5 association
@@ -615,7 +640,7 @@ calculations</para>
 
 <para>The -R option tells <application>bogofilter</application> to
 generate an R data frame.  The data frame contains one row per token
-analysed.  Each such row contains the token, the sum of its database
+analyzed.  Each such row contains the token, the sum of its database
 "good" and "spam" counts, the "good" count divided by the number of
 non-spam messages used to create the training database, the "spam"
 count divided by the spam message count, Robinson's f(w) for the token,
