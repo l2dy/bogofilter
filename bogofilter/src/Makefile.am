@@ -94,10 +94,12 @@ fgetsl_test_SOURCES = fgetsl.c
 fgetsl_test_CFLAGS= -DMAIN
 
 # what to distribute
-EXTRA_DIST = Makefile-static.am \
+EXTRA_DIST = Makefile-static.am Makefile-static.in \
 	     bogoupgrade \
 	     version.sh \
 	     strlcat.3 strlcpy.3
+#
+DISTCLEANFILES = Makefile-static
 #
 VERSION_FROM=../configure.ac main.c bogofilter.c bogoutil.c lexer.c lexer_v3.l
 version.c:	version.sh $(VERSION_FROM)
