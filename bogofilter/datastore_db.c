@@ -87,7 +87,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode){
     }
     else if
 #if DB_VERSION_MAJOR == 4 && DB_VERSION_MINOR > 0
-    ((ret = handle->dbp->open(handle->dbp, NULL, db_file, NULL, DB_BTREE, opt_flags | DB_AUTO_COMMIT, 0664)) != 0)
+    ((ret = handle->dbp->open(handle->dbp, NULL, db_file, NULL, DB_BTREE, opt_flags, 0664)) != 0)
 #else
     ((ret = handle->dbp->open (handle->dbp, db_file, NULL, DB_BTREE, opt_flags, 0664)) != 0)
 #endif	    
