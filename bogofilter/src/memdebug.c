@@ -32,7 +32,8 @@
 int  memtrace= 1 * (M_MALLOC+M_FREE);
 
 uint32_t dbg_trap_index= 36;
-uint32_t dbg_size      = 0;
+uint32_t dbg_size_min  = 0;
+uint32_t dbg_size_max  = 0;
 uint32_t dbg_index_min = 0;	/* 1 */
 uint32_t dbg_index_max = 0;	/* 1000 */
 uint32_t dbg_size_trap = 0;	/* 100000 */
@@ -84,13 +85,19 @@ typedef struct memtrailer {
 void mh_disp(const char *s, mh_t *p);
 void mh_disp(const char *s, mh_t *p)
 {
+    if (!DEBUG_MEMORY(1))
+	return;
+
     if (dbg_index_min != 0 && p->indx < dbg_index_min)
 	return;
     if (dbg_index_max != 0 && p->indx > dbg_index_max)
 	return;
 
-/*    if (p->size == dbg_size) */
-	fprintf(dbgout, "::%3d  %08lX  %s  %lu\n", p->indx, (ulong) (p+1), s, (ulong) p->size);
+    if (dbg_size_min <- p->size && p->size <- dbg_size_max)
+	fprintf(dbgout, "::%s  %lu\n", s, (ulong) p->size);
+//	fprintf(dbgout, "::%3d  %08lX  %s  %lu\n", p->indx, (ulong) (p+1), s, (ulong) p->size);
+
+	return;
 }
 
 void *
@@ -99,9 +106,6 @@ md_malloc(size_t size)
     void *ptr;
     mt_t *mt;
     mh_t *mh = NULL;
-
-    if (!verbose)
-	memtrace = 0;
 
     ++cnt_malloc;
     cur_malloc += size;
@@ -178,6 +182,9 @@ md_free(void *ptr)
 void memdisplay(const char *file, int lineno)
 {
     const char *pfx  = "";
+
+    if (!DEBUG_MEMORY(0))
+	return;
 
     if (file != NULL) {
 	pfx = "\t";
