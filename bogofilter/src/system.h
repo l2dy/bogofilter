@@ -157,6 +157,12 @@ typedef uint8_t u_int8_t;
 #define true 1
 #endif
 
+#if HAVE_SIZE_T
+#if SIZEOF_INT > SIZEOF_SIZE_T
+#error "int is wider than size_t. The current code is not designed to work on such systems and needs review."
+#endif
+#endif
+
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
