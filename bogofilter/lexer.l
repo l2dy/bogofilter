@@ -319,17 +319,20 @@ int get_token(void)
 
     alt_text[0] = 0;
 
-    while ((class = yylex()) > 0)
+    while ((class = yylex()) > 0) {
+	/* when we have a boundary line, eliminate the distinction between
+	 * start and end boundary, chopping of the distinct trailing -- of
+	 * the end boundary. */
+	if (class == BOUNDARY && yyleng >= 4) {
+	    if (t = strstr(yytext+yyleng-2, "--")) {
+		strcpy(t, "");
+	    }
+	    break;
+	}
+
+	/* eat all long words */
 	if (yyleng <= MAXWORDLEN)
 	    break;
-
-    /* when we have a boundary line, eliminate the distinction between
-     * start and end boundary, chopping of the distinct trailing -- of
-     * the end boundary. */
-    if (class == BOUNDARY && yyleng >= 4
-	    && (t = strstr(yytext+yyleng-2, "--")))
-    {
-	strcpy(t, "");
     }
 
     for (cp = yytext; *cp; cp++)
