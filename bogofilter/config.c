@@ -15,6 +15,7 @@ AUTHOR:
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 #include <unistd.h>
 
 #include <config.h>
@@ -487,10 +488,13 @@ int process_args(int argc, char **argv)
     int option;
     int exitcode;
 
+    time_t t = time(NULL);
+    struct tm *tm = localtime( &t );
+    today = tm->tm_yday + 1;
+
     select_algorithm(algorithm, false);	/* select default algorithm */
 
-    while ((option = getopt(argc, argv,
-		    "d:eFhl::o:snSNvVpuc:CgrRx:fqtO:" G R F)) != EOF)
+    while ((option = getopt(argc, argv, "d:eFhl::o:snSNvVpuc:CgrRx:fqtO:y:" G R F)) != EOF)
     {
 	switch(option)
 	{
@@ -609,6 +613,10 @@ int process_args(int argc, char **argv)
 
 	case 't':
 	    terse = true;
+	    break;
+
+	case 'y':		/* day of year (1..366) */
+	    today = atol((char *)optarg);
 	    break;
 
 	default:
