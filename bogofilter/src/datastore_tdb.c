@@ -70,13 +70,19 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
+bool db_is_swapped(void *vhandle)
+{
+    dbh_t *handle = vhandle;
+    return handle->is_swapped;
+}
+
+
 /*
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
 */
 void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 {
-    dsh_t *dsh;
     dbh_t *handle;
 
     int tdb_flags = 0;
@@ -94,8 +100,6 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     handle = dbh_init(db_file, name);
 
     if (handle == NULL) return NULL;
-
-    dsh = dsh_init(handle, false);
 
     dbp = handle->dbp = tdb_open(handle->name, 0, tdb_flags, open_flags, 0664);
 
@@ -116,7 +120,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	}
     }
 
-    return dsh;
+    return handle;
 
  open_err:
     dbh_free(handle);
@@ -124,10 +128,10 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     return NULL;
 }
 
-int db_delete(dsh_t *dsh, const dbv_t *token)
+int db_delete(void *vhandle, const dbv_t *token)
 {
     int ret;
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     TDB_DATA db_key;
     TDB_CONTEXT *dbp;
 
@@ -147,12 +151,12 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
     return ret;		/* 0 if ok */
 }
 
-int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
+int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 {
     TDB_DATA db_key;
     TDB_DATA db_data;
 
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     TDB_CONTEXT *dbp = handle->dbp;
 
     db_key.dptr = token->data;
@@ -180,13 +184,13 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 }
 
 
-int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
+int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
 {
     int ret;
     TDB_DATA db_key;
     TDB_DATA db_data;
 
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     TDB_CONTEXT *dbp = handle->dbp;
 
     db_key.dptr = token->data;
@@ -233,7 +237,7 @@ void db_close(void *vhandle, bool nosync)
 /*
  flush any data in memory to disk
 */
-void db_flush(/*@unused@*/  __attribute__ ((unused)) dsh_t *dsh)
+void db_flush(/*@unused@*/  __attribute__ ((unused)) void *vhandle)
 {
     /* noop */
 }
@@ -271,10 +275,10 @@ static int tdb_traversor(/*@unused@*/ __attribute__ ((unused)) TDB_CONTEXT * tdb
 }
 
 
-int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
+int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 {
     int ret;
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     TDB_CONTEXT *dbp = handle->dbp;
 
     userdata_t hookdata;

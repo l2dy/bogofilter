@@ -146,6 +146,13 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
+bool db_is_swapped(void *vhandle)
+{
+    dbh_t *handle = vhandle;
+    return handle->is_swapped;
+}
+
+
 static void check_db_version(void)
 {
     int maj, min;
@@ -385,12 +392,11 @@ retry_db_open:
     } /* for idx over retryflags */
 
     if (handle) {
-	dsh_t *dsh;
 	handle->locked = true;
 	if (handle->fd < 0)
 	    handle->locked=false;
-	dsh = dsh_init(handle, handle->is_swapped);
-	return (void *)dsh;
+
+	return handle;
     }
 
     return NULL;
@@ -406,10 +412,10 @@ retry_db_open:
 }
 
 
-int db_delete(dsh_t *dsh, const dbv_t *token)
+int db_delete(void *vhandle, const dbv_t *token)
 {
     int ret = 0;
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
 
     DBT db_key;
@@ -432,13 +438,13 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
 }
 
 
-int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
+int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 {
     int ret = 0;
     DBT db_key;
     DBT db_data;
 
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
 
     DBT_init(db_key);
@@ -476,14 +482,14 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 }
 
 
-int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
+int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
 {
     int ret;
 
     DBT db_key;
     DBT db_data;
 
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
 
     DBT_init(db_key);
@@ -535,10 +541,10 @@ void db_close(void *vhandle, bool nosync)
 /*
  flush any data in memory to disk
 */
-void db_flush(dsh_t *dsh)
+void db_flush(void *vhandle)
 {
     int ret;
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
 
     ret = dbp->sync(dbp, 0);
@@ -552,9 +558,9 @@ void db_flush(dsh_t *dsh)
 }
 
 
-int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
+int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 {
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
 
     int ret = 0;

@@ -96,8 +96,7 @@ extern void ds_init(void);
 extern void ds_cleanup(void);
 
 dsh_t *dsh_init(
-    void *dbh,			/* database handle from db_open() */
-    bool is_swapped);
+    void *dbh);			/* database handle from db_open() */
 
 void dsh_free(void *vhandle);
 

@@ -83,13 +83,19 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
+bool db_is_swapped(void *vhandle)
+{
+    dbh_t *handle = vhandle;
+    return handle->is_swapped;
+}
+
+
 /*
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
 */
 void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 {
-    dsh_t *dsh;
     dbh_t *handle;
 
     int flags;
@@ -103,8 +109,6 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     handle = dbh_init(db_file, name);
 
     if (handle == NULL) return NULL;
-
-    dsh = dsh_init(handle, false);
 
     dbp = handle->dbp = dpopen(handle->name, flags, DB_INITBNUM);
 
@@ -121,7 +125,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "(qdbm) dpopen( %s, %d )\n", handle->name, open_mode);
 
-    return dsh;
+    return handle;
 
  open_err:
     print_error(__FILE__, __LINE__, "(qdbm) dpopen(%s, %d) failed: %s",
@@ -132,10 +136,10 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 }
 
 
-int db_delete(dsh_t *dsh, const dbv_t *token)
+int db_delete(void *vhandle, const dbv_t *token)
 {
     int ret;
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     DEPOT *dbp;
 
     dbp = handle->dbp;
@@ -153,12 +157,12 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
 }
 
 
-int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
+int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 {
     char *data;
     int dsiz;
 
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     DEPOT *dbp = handle->dbp;
 
     data = dpget(dbp, token->data, token->leng, 0, -1, &dsiz);
@@ -200,10 +204,10 @@ static inline void db_optimize(DEPOT *dbp, char *name)
 }
 
 
-int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
+int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
 {
     int ret;
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     DEPOT *dbp = handle->dbp;
 
     ret = dpput(dbp, token->data, token->leng, val->data, val->leng, DP_DOVER);
@@ -252,9 +256,9 @@ void db_close(void *vhandle, bool nosync)
 /*
    Flush any data in memory to disk
 */
-void db_flush(dsh_t *dsh)
+void db_flush(void *vhandle)
 {
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     DEPOT * dbp = handle->dbp;
 
     if (!dpsync(dbp))
@@ -263,11 +267,11 @@ void db_flush(dsh_t *dsh)
 }
 
 
-int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
+int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 {
     int ret = 0;
 
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     DEPOT *dbp = handle->dbp;
 
     dbv_t dbv_key, dbv_data;

@@ -102,12 +102,11 @@ static void convert_internal_to_external(dsh_t *dsh, dsv_t *in_data, dbv_t *ex_d
 }
 
 dsh_t *dsh_init(
-    void *dbh,			/* database handle from db_open() */
-    bool is_swapped)
+    void *dbh)			/* database handle from db_open() */
 {
     dsh_t *val = xmalloc(sizeof(*val));
     val->dbh = dbh;
-    val->is_swapped = is_swapped;
+    val->is_swapped = db_is_swapped(dbh);
     return val;
 }
 
@@ -120,16 +119,24 @@ void dsh_free(void *vhandle)
 
 void *ds_open(const char *path, const char *name, dbmode_t open_mode)
 {
+    dsh_t *dsh;
+    bool create = false;
     void *v = db_open(path, name, open_mode);
 
     if (v == NULL && open_mode != DS_READ) {
+	create = true;
 	v = db_open(path, name, DS_CREATE);
-	
-	if (v && (open_mode & DS_WRITE) && ! (open_mode & DS_LOAD))
-	    ds_set_wordlist_version(v, NULL);
     }
 
-    return v;
+    if (!v)
+	return NULL;
+
+    dsh = dsh_init(v);
+
+    if (create && (open_mode & DS_WRITE) && ! (open_mode & DS_LOAD))
+	ds_set_wordlist_version(dsh, NULL);
+
+    return dsh;
 }
 
 void ds_close(/*@only@*/ void *vhandle, bool nosync  /** Normally false, if true, do not synchronize data. This should not be used in regular operation but only to ease the disk I/O load when the lock operation failed. */)
@@ -142,7 +149,7 @@ void ds_close(/*@only@*/ void *vhandle, bool nosync  /** Normally false, if true
 void ds_flush(void *vhandle)
 {
     dsh_t *dsh = vhandle;
-    db_flush(dsh);
+    db_flush(dsh->dbh);
 }
 
 int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
@@ -168,7 +175,7 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
     ex_data.data = cv;
     ex_data.leng = sizeof(cv);
 
-    ret = db_get_dbvalue(dsh, &ex_key, &ex_data);
+    ret = db_get_dbvalue(dsh->dbh, &ex_key, &ex_data);
 
     switch (ret) {
     case 0:
@@ -223,7 +230,7 @@ int ds_write(void *vhandle, const word_t *word, dsv_t *val)
 
     convert_internal_to_external(dsh, val, &ex_data);
 
-    ret = db_set_dbvalue(dsh, &ex_key, &ex_data);
+    ret = db_set_dbvalue(dsh->dbh, &ex_key, &ex_data);
 
     if (DEBUG_DATABASE(3)) {
 	fprintf(dbgout, "ds_write: [%.*s] -- %lu,%lu,%lu\n",
@@ -246,7 +253,7 @@ int ds_delete(void *vhandle, const word_t *word)
     ex_key.data = word->text;
     ex_key.leng = word->leng;
 
-    ret = db_delete(dsh, &ex_key);
+    ret = db_delete(dsh->dbh, &ex_key);
 
     return ret;		/* 0 if ok */
 }
@@ -287,7 +294,7 @@ int ds_foreach(void *vhandle, ds_foreach_t *hook, void *userdata)
     ds_data.dsh  = dsh;
     ds_data.data = userdata;
 
-    ret = db_foreach(dsh, ds_hook, &ds_data);
+    ret = db_foreach(dsh->dbh, ds_hook, &ds_data);
 
     return ret;
 }
