@@ -11,20 +11,20 @@ umask 02
 
 cd /home/groups/b/bo/bogofilter/web
 
-cmdpfx="cvs -d :pserver:anonymous@cvs1:/cvsroot/bogofilter"
+CMDPFX="cvs -d :pserver:anonymous@cvs1:/cvsroot/bogofilter"
 
 # check out
-$cmdpfx update
+$CMDPFX update
 
 # start ourselves anew
 if [ "x$NORECURSE" = x ] ; then
     env NORECURSE=1 $0
 else
 
-  for i in bogofilter-faq.html bogofilter-faq-fr.html ; do
-    $cmdpfx checkout -p -Dtomorrow bogofilter/doc/$i >$i
+  for FILE in bogofilter-faq.html bogofilter-faq-fr.html ; do
+    $CMDPFX checkout -p -Dtomorrow bogofilter/doc/$FILE > $FILE
   done
-  $cmdpfx checkout -p -Dtomorrow bogofilter/NEWS >NEWS
+  $CMDPFX checkout -p -Dtomorrow bogofilter/NEWS >NEWS
 
   # copy without cruft and internal files
   rsync -av --delete ./ ../htdocs/ --delete-excluded \
