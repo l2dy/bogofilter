@@ -155,6 +155,9 @@ void lookup_words(wordhash_t *wh)
 {
     hashnode_t *node;
 
+    if (msg_count_file)	/* if mc file, already done */
+	return;
+
     for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
 	word_t *token     = node->key;
