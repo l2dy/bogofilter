@@ -49,16 +49,16 @@
 allows setting of debug flags for printing debug messages.</para>
 
 <para>The <option>-c</option><replaceable>filename</replaceable> option
-tells <application>bogofilter</application> to read the config file named.
+tells <application>bogolexer</application> to read the config file named.
 </para>
 
-<para>The <option>-C</option> option prevents bogofilter from reading
+<para>The <option>-C</option> option prevents bogolexer from reading
     configuration files.</para>
 <para>The <option>-D</option> option redirects the debugging output to
     stdout (it defaults to stderr).</para>
 
 <para>The <option>-I </option><replaceable>filename</replaceable> option
-tells <application>bogofilter</application> to read its input from the specified file, 
+tells <application>bogolexer</application> to read its input from the specified file, 
 rather than from <emphasis>stdin</emphasis>.</para>
 
 <para>The <option>-V</option> option prints the version number and 
