@@ -87,9 +87,11 @@ done
 echo fff >> ${OUT}
 map_rc $BOGOFILTER -y 0 -d $BOGOFILTER_DIR -C -D -t -PdF -vvv -x s < ${TMPDIR}/msg.fnff | grep -i free >> ${OUT}
 
+OUTPUTS=${SYSTEST}/outputs
+
 if  [ $verbose -eq 0 ]; then
-    cmp outputs/degen.out $OUT
+    cmp $(OUTPUTS)/degen.out $OUT
 else
-    diff outputs/degen.out $OUT
+    diff $(OUTPUTS)/degen.out $OUT
 fi
 
