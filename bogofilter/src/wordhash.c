@@ -49,86 +49,88 @@ wordhash_init (void)
 {
   int i;
 
-  wordhash_t *h = xmalloc (sizeof (wordhash_t));
+  wordhash_t *wh = xmalloc (sizeof (wordhash_t));
 
-  h->bin = xmalloc (NHASH * sizeof (hashnode_t **));
+  wh->bin = xmalloc (NHASH * sizeof (hashnode_t **));
 
   for (i = 0; i < NHASH; i++)
-      h->bin[i] = NULL;
+      wh->bin[i] = NULL;
 
-  h->nodes = NULL;
-  h->strings = NULL;
+  wh->nodes = NULL;
+  wh->strings = NULL;
 
-  h->iter_ptr = NULL;
-  h->iter_head = NULL;
-  h->iter_tail = NULL;
+  wh->iter_ptr = NULL;
+  wh->iter_head = NULL;
+  wh->iter_tail = NULL;
 
-  h->index = 0;
-  h->count = 0;
-  h->order = NULL;
-  h->wordcount = 0;
+  wh->index = 0;
+  wh->count = 0;
+  wh->order = NULL;
+  wh->wordcount = 0;
 
-  return h;
+  return wh;
 }
 
 void
-wordhash_free (wordhash_t * h)
+wordhash_free (wordhash_t *wh)
 {
     hashnode_t *p, *q;
     wh_alloc_str *sp, *sq;
     wh_alloc_node *np, *nq;
 
-    if (h == NULL)
+    if (wh == NULL)
 	return;
 
-    for (p = h->iter_head; p != NULL ; p = q)
+    for (p = wh->iter_head; p != NULL ; p = q)
     {
 	q = p->iter_next;
 	word_free( p->key );
+    fprintf(dbgout, "::%3s  %08lX  %s\n", "", 
+	    (ulong) (p->key), "hf");
     }
 
-    for (np = h->nodes; np; np = nq)
+    for (np = wh->nodes; np; np = nq)
     {
 	nq = np->next;
 	xfree (np->buf);
 	xfree (np);
     }
 
-    for (sp = h->strings; sp; sp = sq)
+    for (sp = wh->strings; sp; sp = sq)
     {
 	sq = sp->next;
 	xfree (sp->buf);
 	xfree (sp);
     }
 
-    if (h->order != NULL) {
-	xfree (h->order);
+    if (wh->order != NULL) {
+	xfree (wh->order);
     }
 
-    xfree (h->bin);
-    xfree (h);
+    xfree (wh->bin);
+    xfree (wh);
 }
 
 static hashnode_t *
-nmalloc (wordhash_t * h) /*@modifies h->nodes@*/
+nmalloc (wordhash_t *wh) /*@modifies wh->nodes@*/
 {
-    /*@dependent@*/ wh_alloc_node *n = h->nodes;
-    hashnode_t *t;
+    /*@dependent@*/ wh_alloc_node *wn = wh->nodes;
+    hashnode_t *hn;
 
-    if (n == NULL || n->avail == 0)
+    if (wn == NULL || wn->avail == 0)
     {
-	n = xmalloc (sizeof (wh_alloc_node));
-	n->next = h->nodes;
-	h->nodes = n;
+	wn = xmalloc (sizeof (wh_alloc_node));
+	wn->next = wh->nodes;
+	wh->nodes = wn;
 
-	n->buf = xmalloc (N_CHUNK * sizeof (hashnode_t));
-	n->avail = N_CHUNK;
-	n->used = 0;
+	wn->buf = xmalloc (N_CHUNK * sizeof (hashnode_t));
+	wn->avail = N_CHUNK;
+	wn->used = 0;
     }
-    n->avail--;
-    t = (n->buf) + n->used;
-    n->used ++;
-    return (t);
+    wn->avail--;
+    hn = (wn->buf) + wn->used;
+    wn->used ++;
+    return (hn);
 }
 
 /* determine architecture's alignment boundary */
@@ -136,9 +138,9 @@ struct dummy { char *c; double d; };
 #define ALIGNMENT offsetof(struct dummy, d)
 
 static char *
-smalloc (wordhash_t * h, size_t n) /*@modifies h->strings@*/
+smalloc (wordhash_t *wh, size_t n) /*@modifies wh->strings@*/
 {
-    wh_alloc_str *s = h->strings;
+    wh_alloc_str *s = wh->strings;
     /*@dependent@*/ char *t;
 
     /* Force alignment on architecture's natural boundary.*/
@@ -148,8 +150,8 @@ smalloc (wordhash_t * h, size_t n) /*@modifies h->strings@*/
     if (s == NULL || s->avail < n)
     {
 	s = xmalloc (sizeof (wh_alloc_str));
-	s->next = h->strings;
-	h->strings = s;
+	s->next = wh->strings;
+	wh->strings = s;
 
 	s->buf = xmalloc (S_CHUNK + n);
 	s->avail = S_CHUNK + n;
@@ -172,74 +174,75 @@ hash (word_t *t)
 }
 
 void *
-wordhash_insert (wordhash_t * h, word_t *t, size_t n, void (*initializer)(void *))
+wordhash_insert (wordhash_t *wh, word_t *t, size_t n, void (*initializer)(void *))
 {
-    hashnode_t *p;
+    hashnode_t *hn;
     unsigned int idx = hash (t);
 
-    for (p = h->bin[idx]; p != NULL; p = p->next) {
-	word_t *key = p->key;
+    for (hn = wh->bin[idx]; hn != NULL; hn = hn->next) {
+	word_t *key = hn->key;
 	if (key->leng == t->leng && memcmp (t->text, key->text, t->leng) == 0)
 	{
-	    return p->buf;
+	    return hn->buf;
 	}
     }
 
-    h->count += 1;
-    p = nmalloc (h);
-    p->buf = smalloc (h, n);
+    wh->count += 1;
+    hn = nmalloc (wh);
+    hn->buf = smalloc (wh, n);
     if (initializer)
-	initializer(p->buf);
+	initializer(hn->buf);
 		  
-    p->key = word_dup(t);
-    p->next = h->bin[idx];
-    h->bin[idx] = p;
+    hn->key = word_dup(t);
 
-    if (h->iter_head == NULL){
-	h->iter_head = p;
+    hn->next = wh->bin[idx];
+    wh->bin[idx] = hn;
+
+    if (wh->iter_head == NULL){
+	wh->iter_head = hn;
     }
     else {
-	h->iter_tail->iter_next = p;
+	wh->iter_tail->iter_next = hn;
     }
 
-    p->iter_next = NULL;
-    h->iter_tail = p;
+    hn->iter_next = NULL;
+    wh->iter_tail = hn;
 
-    return p->buf;
+    return hn->buf;
 }
 
-size_t wordhash_count (wordhash_t * h)
+size_t wordhash_count (wordhash_t *wh)
 {
-    return h->count;
+    return wh->count;
 }
 
 hashnode_t *
-wordhash_first (wordhash_t * h)
+wordhash_first (wordhash_t *wh)
 {
     hashnode_t *val = NULL;
 
-    if (h->order) {
-	val = h->order[h->index = 0];
+    if (wh->order) {
+	val = wh->order[wh->index = 0];
     }
     else {
-	val = h->iter_ptr = h->iter_head;
+	val = wh->iter_ptr = wh->iter_head;
     }
     return val;
 }
 
 hashnode_t *
-wordhash_next (wordhash_t * h)
+wordhash_next (wordhash_t *wh)
 {
     hashnode_t *val = NULL;
 
-    if (h->order) {
-	if (++h->index < h->count) {
-	    val = h->order[h->index];
+    if (wh->order) {
+	if (++wh->index < wh->count) {
+	    val = wh->order[wh->index];
 	}
     }
     else {
-	if (h->iter_ptr != NULL) {
-	    val = h->iter_ptr = h->iter_ptr->iter_next;
+	if (wh->iter_ptr != NULL) {
+	    val = wh->iter_ptr = wh->iter_ptr->iter_next;
 	}
     }
     return val;
@@ -253,20 +256,20 @@ static int compare_hashnode_t(const void *const ihn1, const void *const ihn2)
 }
 
 void
-wordhash_sort (wordhash_t * h)
+wordhash_sort (wordhash_t *wh)
 {
     hashnode_t *node;
     hashnode_t **order;
 
-    if (h->count == 0 || h->order != NULL)
+    if (wh->count == 0 || wh->order != NULL)
 	return;
 
-    order = (hashnode_t **) xcalloc(h->count, sizeof(hashnode_t *));
+    order = (hashnode_t **) xcalloc(wh->count, sizeof(hashnode_t *));
 
-    h->count = 0;
-    for(node = wordhash_first(h); node != NULL; node = wordhash_next(h))
-	order[h->count++] = node;
+    wh->count = 0;
+    for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
+	order[wh->count++] = node;
 
-    qsort(order, h->count, sizeof(hashnode_t *), compare_hashnode_t);
-    h->order = order;
+    qsort(order, wh->count, sizeof(hashnode_t *), compare_hashnode_t);
+    wh->order = order;
 }
