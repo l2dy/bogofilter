@@ -60,7 +60,7 @@ void wordhash_sort(wordhash_t * h);
 void wordhash_add(wordhash_t *dst, wordhash_t *src, void (*initializer)(void *));
 void wordhash_set_counts(wordhash_t *wh, int good, int bad);
 
-void * wordhash_search (wordhash_t *wh, word_t *t, unsigned int hash);
+void *wordhash_search (const wordhash_t *wh, const word_t *t, unsigned int hash);
 
 /* Given h, s, n, search for key s.
  * If found, return pointer to associated buffer.

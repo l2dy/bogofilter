@@ -220,7 +220,7 @@ smalloc (wordhash_t *wh, size_t n) /*@modifies wh->strings@*/
 }
 
 static unsigned int
-hash (word_t *t)
+hash (const word_t *t)
 {
     unsigned int h = 0;
     size_t l;
@@ -283,7 +283,7 @@ wordhash_foreach (wordhash_t *wh, wh_foreach_t *hook, void *userdata)
 }
 
 void *
-wordhash_search (wordhash_t *wh, word_t *t, unsigned int idx)
+wordhash_search (const wordhash_t *wh, const word_t *t, unsigned int idx)
 {
     hashnode_t *hn;
 
@@ -293,9 +293,7 @@ wordhash_search (wordhash_t *wh, word_t *t, unsigned int idx)
     for (hn = wh->bin[idx]; hn != NULL; hn = hn->next) {
 	word_t *key = hn->key;
 	if (key->leng == t->leng && memcmp (t->text, key->text, t->leng) == 0)
-	{
 	    return hn->buf;
-	}
     }
     return NULL;
 }
