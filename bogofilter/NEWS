@@ -5,6 +5,31 @@
 NOTE: More information on important changes for bogofilters updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+0.16.2
+
+	2004-01-14
+
+	* Tag Cc: lines as To: lines.e
+	* Allow setting threshold for auto-updating, using the "-u
+	  value" flag or the "thresh_update=value" option.
+
+	2004-01-12
+
+	* Pass -mieee to GCC on machines that know this option (Alpha, SH).
+	  Prevents SIGFPE and program termination with coredumps in some
+	  conditions. Reported by Paul Ackersville, fix suggested by Clint
+	  Adams.
+
+	* Fix defined minimum autoconf/automake versions to match actual
+	  requirements: autoconf 2.54, automake 1.7.
+
+	* Change AS_HELP_STRING to AC_HELP_STRING for compatibility with older
+	  autoconf than version 2.58.
+
+	* Fix two compiler warnings in BerkeleyDB data store code. It is
+	  unknown whether one has real-world impact when opening data bases,
+	  fixing nonetheless. The other is cosmetic in any case.
+
 0.16.1	2004-01-08
 
 	2004-01-07
