@@ -57,7 +57,6 @@ X-Bogosity: Unsure, tests=bogofilter, spamicity=0.500000
 "head:Content-Disposition"          30  0.479167  0.333333  0.410258 -
 "head:inline"                       30  0.479167  0.333333  0.410258 -
 "$495"                               0  0.000000  0.000000  0.415000 -
-"216.177.60.45"                      0  0.000000  0.000000  0.415000 -
 "ABSOLUTELY"                         0  0.000000  0.000000  0.415000 -
 "Cash!"                              0  0.000000  0.000000  0.415000 -
 "Charge"                             0  0.000000  0.000000  0.415000 -
@@ -137,6 +136,7 @@ X-Bogosity: Unsure, tests=bogofilter, spamicity=0.500000
 "previously"                         0  0.000000  0.000000  0.415000 -
 "promotional"                        0  0.000000  0.000000  0.415000 -
 "qoute.jpg"                          0  0.000000  0.000000  0.415000 -
+"rcvd:216.177.60.45"                 0  0.000000  0.000000  0.415000 -
 "rcvd:LINDA"                         0  0.000000  0.000000  0.415000 -
 "rcvd:OC31.YOURMAILSOURCE.COM"       0  0.000000  0.000000  0.415000 -
 "rcvd:om40.yourmailsource.com"       0  0.000000  0.000000  0.415000 -
