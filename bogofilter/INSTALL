@@ -2,11 +2,30 @@
 
 ========================================================================
 
-NOTE: Whenever you are about to update your bogofilter version, be
-sure to read the corresponding RELEASE.NOTES file.  Any major changes
-to bogofilter's mode of operation will be documented in it.  In some
-releases major changes may require updating files or scripts used for
-running bogofilter.
+NOTE: Whenever you are about to update your bogofilter version, be sure
+to read the corresponding RELEASE.NOTES file first.  Any INCOMPATIBLE or
+major changes to bogofilter's mode of operation will be documented in it.
+
+Bogofilter supports several different database back ends, at the time of
+this writing in alphabetical order
+
+   database, with version (patchlevel omitted)	URL to home page
+  --------------------------------------------- ---------------------
+1a.Berkeley DB (3.1 - 4.3) with transactions	http://sleepycat.com/
+1b.Berkeley DB (3.1 - 4.3) without transactions	http://sleepycat.com/
+2. QDBM						http://qdbm.sf.net/
+3. SQLite (3.0.8 or newer)			http://sqlite.org/
+4. TDB (1.0)					http://tdb.sf.net/
+
+You can use --with-database=ARG (pick from db, tdb, qdbm, sqlite) to
+pick the database backend (you must have installed the database and the
+corresponding developer package). db is the default.
+
+If you are using db, you can use --disable-transactions to switch back
+to an unsafe Berkeley DB mode that drops fewer files in your directory
+and that does not use transactions and can hence corrupt data bases in
+application crashes.
+
 
 REMEMBER to read the doc/programmer/README.* file for your operating
 systems in case of trouble.

@@ -24,6 +24,11 @@ Briefly:
 
 0.93.3	2004-12-XX
 
+	2004-12-21
+
+	* Early Christmas Gift: Bogofilter now supports SQLite v3.
+	  Requires SQLite v3.0.8. See the RELEASE.NOTES.
+
 	2004-12-20
 
 	* Internal cleanup: Move transaction handling back into database space,

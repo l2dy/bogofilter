@@ -298,11 +298,19 @@ AM_CONDITIONAL(ENABLE_OLD_BDB, test "x$enable_transactions" = "xno")
 WITH_DB_ENGINE=db
 AC_ARG_WITH(database,
 	    AC_HELP_STRING([--with-database=ENGINE],
-	    [Choose database engine {db|tdb|qdbm} [[ENGINE=db]]]),
+	    [Choose database engine {db|tdb|qdbm|sqlite} [[ENGINE=db]]]),
 	    [ WITH_DB_ENGINE=$withval ]
 )
 
 case "x$WITH_DB_ENGINE" in
+    xsqlite)
+	AC_DEFINE(ENABLE_SQLITE_DATASTORE,1, [Enable sqlite datastore])
+	AC_DEFINE_UNQUOTED(DB_TYPE, "sqlite", [database type])
+	AC_DEFINE_UNQUOTED(DB_EXT, ".db", [database file extension])
+	AC_CHECK_HEADERS([sqlite3.h],,AC_MSG_ERROR(Cannot find sqlite3.h header file))
+	AC_LIB_LINKFLAGS([sqlite3])
+	LIBDB="$LIBSQLITE3"
+	;;
     xtdb)
 	AC_DEFINE(ENABLE_TDB_DATASTORE,1, [Enable tdb datastore])
 	AC_DEFINE_UNQUOTED(DB_TYPE, "tdb", [database type])
@@ -483,6 +491,7 @@ AC_SUBST(STATIC_DB)
 
 AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xtdb")
 AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
+AM_CONDITIONAL(ENABLE_SQLITE_DATASTORE, test "x$WITH_DB_ENGINE" = "xsqlite")
 
 dnl Use TRIO to replace missing snprintf/vsnprintf.
 needtrio=0

@@ -136,6 +136,11 @@ will be: bogotune -n good1 -n good2 -s bad1 -s bad2
 MAJOR CHANGES IN BOGOFILTER 0.93
 ================================
 
+Bogofilter 0.93.3 and newer add support for SQLite 3.0.8 (older versions
+do not work). It isn't nearly as fast as Berkeley DB but uses only one
+permanent and one transient file (hence less maintenance work) and is
+supposed to be proof against application and system crashes.
+
 Bogofilter 0.93.1 and newer add support for Berkeley DB 4.3.
 
 ########################################################################
