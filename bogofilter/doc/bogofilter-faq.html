@@ -340,12 +340,12 @@ French</a>
 
     <p>Bogofilter always does the best it can with the information
     available to it.  However, it will make mistakes, i.e., classify
-    ham as spam (false positives) or spam as ham (false
-    negatives). You need to correct these errors. If you train with
-    every message you need to undo this wrong classification and then
-    train using the correct classification.  Switch combination <code>-Sn</code>
-    will reclassify a spam message as ham and <code>-Ns</code> will reclassify a
-    ham message as spam.</p>
+    ham as spam (false positives) or spam as ham (false negatives). To
+    reduce the likelihood of repeating the mistake, it is necessary to
+    train bogofilter with the errant message.  If a message is
+    incorrectly classified as spam, use switch <code>-n</code> to
+    train with it as ham.  Use switch <code>-s</code> to train with a
+    spam message.</p>
 
     <p>Correcting a misclassfied message may affect classification for
     other message.  The smaller your database is, the higher is the
