@@ -16,6 +16,8 @@ NAME:
 #include "paths.h"
 #include "xmalloc.h"
 
+#define BOGODIR ".bogofilter"
+
 /* build an path to a file given a directory and file name,
  * concatenating dir and file, adding a slash if necessary
  *
@@ -94,4 +96,13 @@ int check_directory(const char* path) /*@globals errno,stderr@*/
 	}
     }
     return 0;
+}
+
+char *get_directory(void) {
+	char *dir = create_path_from_env("BOGOFILTER_DIR", NULL);
+	if (dir == NULL)
+	    dir = create_path_from_env("BOGODIR", NULL);
+	if (dir == NULL)
+	    dir = create_path_from_env("HOME", BOGODIR);
+	return dir;
 }

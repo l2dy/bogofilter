@@ -31,6 +31,7 @@ AUTHOR:
 #include "maint.h"
 #include "robinson.h"			/* for ROBS and ROBX */
 #include "swap.h"
+#include "paths.h"
 
 #define PROGNAME "bogoutil"
 
@@ -39,6 +40,7 @@ AUTHOR:
 run_t run_type = RUN_NORMAL;
 
 const char *progname = PROGNAME;
+char *directory;
 
 static int dump_file(char *db_file)
 {
@@ -56,7 +58,7 @@ static int dump_file(char *db_file)
     memset(&key, 0, sizeof(DBT));
     memset(&data, 0, sizeof(DBT));
 
-    if ((dbh = db_open(db_file, db_file, DB_READ)) == NULL) {
+    if ((dbh = db_open(db_file, db_file, DB_READ, directory)) == NULL) {
 	rv = 2;
     }
     else {
@@ -119,7 +121,7 @@ static int load_file(char *db_file)
     long count, date;
     YYYYMMDD today_save = today;
 
-    if ((dbh = db_open(db_file, db_file, DB_WRITE)) == NULL)
+    if ((dbh = db_open(db_file, db_file, DB_WRITE, directory)) == NULL)
 	return 2;
 
     memset(buf, '\0', BUFSIZE);
@@ -196,6 +198,7 @@ static int load_file(char *db_file)
     return rv;
 }
 
+#if 0
 static dbh_t *db_open_and_lock_file( const char *db_file, const char *name, dbmode_t mode)
 {
     dbh_t *dbh = db_open(db_file, name, mode);
@@ -203,6 +206,7 @@ static dbh_t *db_open_and_lock_file( const char *db_file, const char *name, dbmo
 	db_lock_reader(dbh);
     return dbh;
 }
+#endif
 
 static int get_token(char *buf, int bufsize, FILE *fp)
 {
@@ -238,7 +242,7 @@ static int words_from_list(const char *db_file, int argc, char **argv)
     dbh_t *dbh;
     int rv = 0;
 
-    dbh = db_open_and_lock_file(db_file, db_file, DB_READ);
+    dbh = db_open(db_file, db_file, DB_READ, directory);
     if ( dbh == NULL )
 	return 2;
 
@@ -278,13 +282,13 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     if (build_path(filepath, sizeof(filepath), dir, GOODFILE) < 0)
 	return 2;
 
-    if ((dbh_good = db_open_and_lock_file(filepath, GOODFILE, DB_READ)) == NULL)
+    if ((dbh_good = db_open(filepath, GOODFILE, DB_READ, directory)) == NULL)
 	return 2;
 
     if (build_path(filepath, sizeof(filepath), dir, SPAMFILE) < 0)
 	return 2;
 
-    if ((dbh_spam = db_open_and_lock_file(filepath, SPAMFILE, DB_READ)) == NULL)
+    if ((dbh_spam = db_open(filepath, SPAMFILE, DB_READ, directory)) == NULL)
 	return 2;
 
     if (show_probability)
@@ -476,8 +480,8 @@ static int compute_robinson_x(char *path)
     e = build_path(db_good_file, sizeof(db_good_file), path, "goodlist.db");
     if (e < 0) goto overflow;
 
-    dbh_good = db_open(db_good_file, "good", DB_READ);
-    dbh_spam = db_open(db_spam_file, "spam", DB_WRITE);
+    dbh_good = db_open(db_good_file, "good", DB_READ, directory);
+    dbh_spam = db_open(db_spam_file, "spam", DB_READ, directory);
 
     db_lock_reader(dbh_good);
     db_lock_writer(dbh_spam);
@@ -551,6 +555,8 @@ int main(int argc, char *argv[])
 
     fpin = stdin;
     dbgout = stderr;
+
+    directory = get_directory();
 
     while ((option = getopt(argc, argv, "d:l:m:w:R:phvVx:a:c:s:ny:I:")) != -1)
 	switch (option) {

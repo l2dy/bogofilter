@@ -23,7 +23,7 @@ params: char * path to database file, char * name of database
 returns: opaque pointer to database handle, which must be saved and
          passed as the first parameter in all subsequent database function calls. 
 */
-void *db_open(const char *, const char *, dbmode_t );
+void *db_open(const char *, const char *, dbmode_t, const char *);
 
 
 /* Close files and clean up. */

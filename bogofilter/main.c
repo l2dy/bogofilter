@@ -38,8 +38,6 @@ AUTHOR:
 #include "xmalloc.h"
 #include "mime.h"
 
-#define BOGODIR ".bogofilter"
-
 #define	NL	"\n"
 #define	CRLF	"\r\n"
 
@@ -72,11 +70,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     /* directories from command line and config file are already handled */
     if (directory == NULL)
     {
-	directory = create_path_from_env("BOGOFILTER_DIR", NULL);
-	if (directory == NULL)
-	    directory = create_path_from_env("BOGODIR", NULL);
-	if (directory == NULL)
-	    directory = create_path_from_env("HOME", BOGODIR);
+	directory = get_directory();
 
 	if (directory != NULL)
 	    if (setup_wordlists(directory) != 0)

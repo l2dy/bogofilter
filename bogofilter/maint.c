@@ -132,7 +132,7 @@ int maintain_wordlist_file(const char *db_file)
     int rc;
     dbh_t *dbh;
 
-    dbh = db_open(db_file, db_file, DB_WRITE);
+    dbh = db_open(db_file, db_file, DB_WRITE, directory);
     if (dbh == NULL)
 	return 2;
 

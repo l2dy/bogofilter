@@ -29,7 +29,7 @@ void *open_wordlist( const char *name, const char *filepath )
 
     dbmode_t open_mode = (run_type==RUN_NORMAL) ? DB_READ : DB_WRITE;
 
-    if ( (dbh = db_open(filepath, name, open_mode)) == NULL){
+    if ( (dbh = db_open(filepath, name, open_mode, directory)) == NULL){
       print_error(__FILE__, __LINE__, "Cannot initialize database %s.", name);
       exit(2);
     }

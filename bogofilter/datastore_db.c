@@ -18,6 +18,7 @@ AUTHOR:
 #include <unistd.h>
 #include <db.h>
 #include <errno.h>
+#include <assert.h>
 
 #include <config.h>
 #include "common.h"
@@ -82,10 +83,12 @@ static void dbh_free(dbh_t *handle){
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
 */
-void *db_open(const char *db_file, const char *name, dbmode_t open_mode){
+void *db_open(const char *db_file, const char *name, dbmode_t open_mode, const char *dir) {
     int ret;
     dbh_t *handle;
     u_int32_t opt_flags = 0;
+
+    assert(dir && *dir);
 
     if (open_mode == DB_READ)
       opt_flags = DB_RDONLY;
