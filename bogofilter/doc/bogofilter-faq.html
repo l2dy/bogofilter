@@ -1,6 +1,8 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head><title>Bogofilter FAQ</title></head>
-</body>
+<body>
 <h1>Bogofilter FAQ</h1>
 <p>
 Official Version:
@@ -28,7 +30,6 @@ bogofilter.
   <li><a href="#changed_options">Now that I've upgraded to 0.11 why are my scripts broken?</a></li>
   <li>How can I use SpamAssasin to train Bogofilter? (coming soon)</li>
 </ul>
-</p>
 
 <hr>
 <a name="what_is_bogofilter"></a>
@@ -85,7 +86,6 @@ There are currently four mailing lists for bogofilter
     <td>Mailing list for announcing code changes to the CVS archive</td>
   </tr>
 </table>
-</p>
 
 <hr>
 <a name="home_page"></a>
@@ -138,10 +138,9 @@ $ ./configure
 $ make
 $ make install
 </pre>
-</p>
 <p>
 Next, download a <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">
-portable version</a> of bogofilter.</a>
+portable version</a> of bogofilter.
 </p>
 <p>
 <b>On Solaris</b>
@@ -149,12 +148,10 @@ portable version</a> of bogofilter.</a>
 <p>
 Unpack it, and then do:
 </p>
-<p>
 <pre>
 $ ./configure --with-db=/usr/local/BerkeleyDB-4.0
 $ make &amp;&amp; make install
 </pre>
-</p>
 <p>
 You will either want to put a symlink to libdb.so in /usr/lib, or use a modified 
 LD_LIBRARY_PATH environment variable before you start bogofilter.
@@ -163,7 +160,6 @@ LD_LIBRARY_PATH environment variable before you start bogofilter.
 <pre>
 $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.0
 </pre>
-</p>
 <p>
 <b>On FreeBSD</b>
 </p>
@@ -177,7 +173,6 @@ $ make &amp;&amp; make install
 $ ldconfig /usr/lib /usr/local/lib \
 /usr/local/BerkeleyDB.4.0/lib
 </pre>
-</p>
 <p>
 The 'ldconfig' command gives the runtime linker a way to find the new 
 libraries. Be careful not to clobber other paths you may haev added using
