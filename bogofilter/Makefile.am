@@ -25,7 +25,7 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 .PHONY:	check
 
 rpm:	dist
-	rpm -ta $(distdir).tar.gz
+	case `rpm --version` in "Version 3*") rpm -ta $(distdir).tar.gz ;; *) rpmbuild -ta $(distdir).tar.gz ;; esac
 
 cvs-check:
 	rm -rf $(PACKAGE)-$(VERSION)-export
