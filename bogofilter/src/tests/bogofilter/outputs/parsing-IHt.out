@@ -1,0 +1,43 @@
+******  IHt  ******
+***  0 h 12 From bounce
+From
+bounce
+***  1 h 9 To: junk
+junk
+***  2 h 24 Content-Type: text/html
+Content-Type
+text
+html
+***  3 h 1 
+***  4 b 5 DONE
+DONE
+***  5 b 5 Done
+Done
+***  6 b 5 done
+done
+***  7 b 1 
+***  8 b 18 com<!innards>ment
+comment
+***  9 b 13 two<br>words
+two
+words
+*** 10 b 21 word<a www.com/>list
+www.com
+wordlist
+*** 11 b 19 word<tag junk>list
+wordlist
+*** 12 b 20 <junk href=href.a/>
+*** 13 b 26 <a href=url.example.com/>
+href
+url.example.com
+*** 14 b 20 <img href=file.img>
+href
+file.img
+*** 15 b 19 <img picture.gif/>
+picture.gif
+*** 16 b 31 <font verdana,arial color=red>
+verdana
+arial
+color
+red
+*** 17 b 13 <fontx font>
