@@ -45,6 +45,17 @@ The default location for the configuration files is /etc on Linux and
 included with the distribution.
 
 
+*** CHANGING BOGOFILTER ***
+
+If you make modifications to bogofilter, you may need to have a recent
+DocBook XML tool chain, the xmlto program, PassiveTeX and XMLTeX, a
+recent automake (1.7) and autoconf (2.5X) and Perl 5.6 or newer
+installed to be able to rebuild bogofilter.
+
+These requirements do not apply if you are building an unmodified
+tarball.
+
+
 *** NEWEST SOFTWARE ***
 
 For the most recent version of this software, see: 
