@@ -6,9 +6,10 @@
 
 #include <wordlists.h>
 
-enum algorithm { AL_GRAHAM = 1, AL_ROBINSON };
+enum algorithm_e { AL_GRAHAM = 1, AL_ROBINSON };
+typedef enum algorithm_e algorithm_t;
 
-extern enum algorithm algorithm;
+extern algorithm_t algorithm;
 
 #define EVEN_ODDS	0.5f		// used for words we want to ignore
 #define UNKNOWN_WORD	0.4f		// odds that unknown word is spammish

@@ -36,7 +36,7 @@ AUTHOR:
 int verbose, passthrough, nonspam_exits_zero;
 int Rtable = 0;
 /*@null@*/ /*@dependent@*/ FILE *Rfp;
-enum algorithm algorithm = AL_GRAHAM;
+algorithm_t algorithm = AL_GRAHAM;
 
 char directory[PATH_LEN] = "";
 
