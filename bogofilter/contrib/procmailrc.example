@@ -44,8 +44,8 @@ spam-unreadable
 #### begin error catcher ####
 
 # m-a 10/28/02
-#     if bogofilter failed, return the mail to the queue, the MTA will
-#     retry to deliver it later
+#     If bogofilter failed, return the mail to the queue.
+#     Later, the MTA will try again to deliver it.
 #     75 is the value for EX_TEMPFAIL in /usr/include/sysexits.h
 
 :0e
@@ -58,11 +58,7 @@ spam-unreadable
 
 
 :0c:
-* ^X-Bogosity: Spam
-spam-bogofilter
-
-:0c:
-* ^X-Bogosity: Yes
+* ^X-Bogosity:?(Spam|Yes)
 spam-bogofilter
 
 :0c:
