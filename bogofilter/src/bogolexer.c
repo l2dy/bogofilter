@@ -264,7 +264,7 @@ int main(int argc, char **argv)
 
     bogoreader_init(argc, argv);
 
-    while (lexer_more()) {
+    while (reader_more()) {
 	initialize();
 	while ((t = get_token()) != NONE)
 	{

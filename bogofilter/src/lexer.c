@@ -14,6 +14,7 @@
 #include <stdlib.h>
 
 #include "base64.h"
+#include "bogoreader.h"
 #include "charset.h"
 #include "error.h"
 #include "html.h"
@@ -31,10 +32,6 @@
 int yylineno;
 bool msg_header = true;
 lexer_t *lexer = NULL;
-
-lexer_more_t *lexer_more;
-lexer_line_t *lexer_getline;
-lexer_file_t *lexer_filename;
 
 /* Local Variables */
 
@@ -103,7 +100,7 @@ static int lgetsl(buff_t *buff)
 
 static int yy_get_new_line(buff_t *buff)
 {
-    int count = lexer_getline(buff);
+    int count = reader_getline(buff);
 
     static size_t hdrlen = 0;
     if (hdrlen==0)
@@ -148,7 +145,7 @@ static int skip_spam_header(buff_t *buff)
     while (true) {
 	int count;
 	buff->t.leng = 0;		/* discard X-Bogosity line */
-	count = lexer_getline(buff);
+	count = reader_getline(buff);
 	if (count <= 1 || !isspace(buff->t.text[0])) 
 	    return count;
     }
@@ -175,7 +172,7 @@ static int get_decoded_line(buff_t *buff)
 	    int add;
 	    /* continuation line */
 	    ungetc(c,fpin);
-	    add = lexer_getline(buff);
+	    add = reader_getline(buff);
 	    if (add == EOF) break;
 	    if (passthrough && passmode == PASS_MEM && buff->t.leng > 0)
 		textblock_add(buff->t.text+buff->read, buff->t.leng);

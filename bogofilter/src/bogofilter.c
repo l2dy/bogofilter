@@ -110,7 +110,7 @@ rc_t bogofilter(int argc, char **argv)
 
     bogoreader_init(argc, argv);
 
-    while (lexer_more()) {
+    while (reader_more()) {
 	double spamicity;
 	wordhash_t *w = wordhash_init();
 
@@ -140,7 +140,7 @@ rc_t bogofilter(int argc, char **argv)
 	    }
 
 	    if (verbose || passthrough) {
-		const char *filename = lexer_filename();
+		const char *filename = reader_filename();
 		if (filename)
 		    fprintf(fpo, "%s ", filename); 
 	    }

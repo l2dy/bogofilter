@@ -17,6 +17,7 @@ AUTHOR:
 #include <ctype.h>
 #include <stdlib.h>
 
+#include "bogoreader.h"
 #include "charset.h"
 #include "error.h"
 #include "mime.h"
@@ -168,7 +169,7 @@ token_t get_token(void)
 	case MSG_COUNT_LINE:
 	    msg_count_file = true;
 	    lexer = &msg_count_lexer;
-	    lexer_more = msgcount_more;
+	    reader_more = msgcount_more;
 	case BOGO_LEX_LINE:
 	    done = true;
 	    break;

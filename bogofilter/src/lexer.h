@@ -73,14 +73,4 @@ extern int	buff_fill(buff_t *buff, size_t used, size_t need);
 
 extern size_t	decode_text(word_t *w);
 
-/* Reader Interface */
-
-typedef int   lexer_line_t(buff_t *buff);
-typedef bool  lexer_more_t(void);
-typedef const char *lexer_file_t(void);
-
-extern lexer_line_t *lexer_getline;
-extern lexer_more_t *lexer_more;
-extern lexer_file_t *lexer_filename;
-
 #endif	/* LEXER_H */

@@ -44,26 +44,32 @@ static word_t *line_save = NULL;
 static bool    have_message = false;
 #endif
 
+/* Lexer-Reader Interface */
+
+reader_more_t *reader_more;
+reader_line_t *reader_getline;
+reader_file_t *reader_filename;
+
 /* Function Prototypes */
 
 /* these functions check if there are more file names in bulk modes,
  * read-mail/mbox-from-stdin for uniformity */
-static lexer_more_t stdin_next_mailstore;
-static lexer_more_t b_stdin_next_mailstore;
-static lexer_more_t b_args_next_mailstore;
+static reader_more_t stdin_next_mailstore;
+static reader_more_t b_stdin_next_mailstore;
+static reader_more_t b_args_next_mailstore;
 
 /* these functions check if there is more mail in a mailbox/maildir/...
  * to process, trivial mail_next_mail for uniformity */
-static lexer_more_t mail_next_mail;
-static lexer_more_t mailbox_next_mail;
-static lexer_more_t maildir_next_mail;
+static reader_more_t mail_next_mail;
+static reader_more_t mailbox_next_mail;
+static reader_more_t maildir_next_mail;
 /* maildir is the mailbox format specified in
  * http://cr.yp.to/proto/maildir.html */
 
-static lexer_line_t mailbox_getline; /* minds   /^From / */
-static lexer_line_t maildir_getline; /* ignores /^From / */
+static reader_line_t mailbox_getline; /* minds   /^From / */
+static reader_line_t maildir_getline; /* ignores /^From / */
 
-static lexer_file_t get_filename;
+static reader_file_t get_filename;
 
 static void maildir_init(const char *name);
 static void maildir_fini(void);
@@ -113,8 +119,8 @@ static int ismaildir(const char *dir) {
 
 static void dummy_fini(void) { }
 
-static lexer_more_t *object_next_mailstore;
-static lexer_more_t *object_next_mail = NULL;
+static reader_more_t *object_next_mailstore;
+static reader_more_t *object_next_mail = NULL;
 
 /* this is the 'nesting driver' for our input.
  * object := one out of { mail, mbox, maildir }
@@ -122,7 +128,7 @@ static lexer_more_t *object_next_mail = NULL;
  * further input in the object first. if we don't, see if we have
  * further objects to process
  */
-static bool lexer__next_mail(void)
+static bool reader__next_mail(void)
 {
     for (;;) {
 	/* check object-specific method */
@@ -160,7 +166,7 @@ static bool open_object(char *obj)
     }
     if (ismaildir(filename) == 1) {
 	/* MAILDIR */
-	lexer_getline = maildir_getline;
+	reader_getline = maildir_getline;
 	object_next_mail = maildir_next_mail;
 	maildir_init(filename);
 	return true;
@@ -177,7 +183,7 @@ static bool open_object(char *obj)
 	    return false;
 	}
 	emptyline = false;
-	lexer_getline = mbox_mode ? mailbox_getline : maildir_getline;
+	reader_getline = mbox_mode ? mailbox_getline : maildir_getline;
 	object_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
 	mail_first = true;
 	return true;
@@ -190,7 +196,7 @@ static bool open_object(char *obj)
 static bool stdin_next_mailstore(void)
 {
     bool val = mailstore_first;
-    lexer_getline = mbox_mode ? mailbox_getline : maildir_getline;
+    reader_getline = mbox_mode ? mailbox_getline : maildir_getline;
     object_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
     mailstore_first = false;
     return val;
@@ -424,8 +430,8 @@ static const char *get_filename(void)
 void bogoreader_init(int _argc, char **_argv)
 {
     mailstore_first = mail_first = true;
-    lexer_getline = mailbox_getline;
-    lexer_more = lexer__next_mail;
+    reader_getline = mailbox_getline;
+    reader_more = reader__next_mail;
     fini = dummy_fini;
     if (run_type & (REG_SPAM|REG_GOOD|UNREG_SPAM|UNREG_GOOD))
 	mbox_mode = true;
@@ -448,7 +454,7 @@ void bogoreader_init(int _argc, char **_argv)
 	abort();
 	break;
     }
-    lexer_filename = get_filename;
+    reader_filename = get_filename;
 }
 
 /* global cleanup, exported */
