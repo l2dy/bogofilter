@@ -16,8 +16,22 @@ NAME:
 
 #include "paths.h"
 #include "xmalloc.h"
+#include "xstrdup.h"
 
 #define BOGODIR ".bogofilter"
+
+char *build_progtype(const char *name, const char *db_type) 
+{
+    char *type;
+    if (strcmp(db_type, "db") == 0)
+	type = xstrdup(name);
+    else {
+	size_t len = strlen(name) + strlen(db_type) + 1;
+	type = xmalloc(len);
+	sprintf(type, "%s-%s", name, db_type);
+    }
+    return type;
+}
 
 /* build an path to a file given a directory and file name,
  * concatenating dir and file, adding a slash if necessary

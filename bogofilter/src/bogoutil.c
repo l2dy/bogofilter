@@ -565,7 +565,7 @@ static void print_version(void)
 	    "This is free software, and you are welcome to redistribute\n"
 	    "it under the General Public License.\n"
 	    "See the COPYING file with the source distribution for details.\n\n",
-	    PROGNAME, version, PROGNAME);
+	    progtype, version, PROGNAME);
 }
 
 static void usage(void)
@@ -610,7 +610,7 @@ char *db_file = NULL;
 bool  prob = false;
 cmd_t flag = NONE;
 
-#define	OPTIONS	":d:l:m:w:R:r:p:hvVa:c:s:ny:I:x:D"
+#define	OPTIONS	":a:c:d:DhI:l:m:np:r:R:s:vVw:x:y:"
 
 static int process_args(int argc, char **argv)
 {
@@ -751,7 +751,9 @@ static int process_args(int argc, char **argv)
 
 int main(int argc, char *argv[])
 {
-    set_today();		/* compute current date for token age */
+    progtype = build_progtype(progname, DB_TYPE);
+
+    set_today();			/* compute current date for token age */
     
     /* Get directory name from environment */
     directory = get_directory(PR_ENV_BOGO);

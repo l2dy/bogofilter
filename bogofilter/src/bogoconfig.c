@@ -317,7 +317,7 @@ static void help(void)
 		  "%s version %s\n"
 		  "\n"
 		  "Usage:  %s [options] < message\n",
-		  PACKAGE, version, PACKAGE
+		  progtype, version, PACKAGE
     );
     (void)fprintf(stderr,
 		  "\thelp options:\n"
@@ -415,7 +415,7 @@ static void print_version(void)
 		  "See the\nCOPYING file with the source distribution for "
 		  "details.\n"
 		  "\n", 
-		  PACKAGE, version, PACKAGE);
+		  progtype, version, PACKAGE);
 }
 
 #ifndef	ENABLE_GRAHAM_METHOD

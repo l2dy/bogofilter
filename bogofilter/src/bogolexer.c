@@ -110,7 +110,7 @@ static void print_version(void)
 		  "See the\nCOPYING file with the source distribution for "
 		  "details.\n"
 		  "\n", 
-		  PACKAGE, version, PACKAGE);
+		  progname, version, PACKAGE);
 }
 
 #define	OPTIONS	":c:CDhI:npP:qTvVx:"

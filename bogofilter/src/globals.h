@@ -55,6 +55,7 @@ extern	int	db_cachesize;
 
 extern	const char	*update_dir;
 extern	const char	*progname;
+extern	const char	*progtype;
 /*@observer@*/
 extern	const char	*stats_prefix;
 extern	const char *const version;

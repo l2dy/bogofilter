@@ -12,6 +12,8 @@ NAME:
 
 int build_path(char* dest, size_t size, const char* dir, const char* file);
 
+char *build_progtype(const char *name, const char *db_type);
+
 char *create_path_from_env(const char *var,
 			   /*@null@*/ const char *subdir);
 

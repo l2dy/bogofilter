@@ -42,6 +42,7 @@ CONTRIBUTORS:
 #include "lexer.h"
 #include "mime.h"
 #include "msgcounts.h"
+#include "paths.h"
 #include "register.h"
 #include "rstats.h"
 #include "textblock.h"
@@ -183,6 +184,8 @@ static bool is_blank_line(const char *line, size_t len)
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
     int   exitcode;
+
+    progtype = build_progtype(progname, DB_TYPE);
 
     process_args_and_config_file(argc, argv, true);
     argc -= optind;
