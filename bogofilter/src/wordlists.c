@@ -142,14 +142,7 @@ int setup_wordlists(const char* d, priority_t precedence)
 	fprintf(dbgout, "d: %s\n", dir);
 
     if (saved_precedence != precedence && word_lists != NULL) {
-	wordlist_t *list, *next;
-	for (list = word_lists; list != NULL; list = next) {
-	    xfree(list->filename);
-	    xfree(list->filepath);
-	    next = list->next;
-	    xfree(list);
-	}
-	word_lists = NULL;
+	free_wordlists();
     }
 
     saved_precedence = precedence;
@@ -229,6 +222,7 @@ void free_wordlists(void)
 	next = list->next;
 	xfree(list);
     }
+    word_lists = NULL;
 }
 
 void set_good_weight(double weight)
