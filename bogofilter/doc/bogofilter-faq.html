@@ -244,10 +244,9 @@ The sample procmail recipe below shows one way to do this:<p>
       <p>Here's a procmail recipe that will sideline messages written with asian charsets:</p>
 <pre>
 ## Silently drop all asian language mail
-UNREADABLE="big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987|windows-1251|windows-1256"
 :0:
-* 1^0 ^\/Subject:.*=\?(.*$UNREADABLE)\?
-* 1^0 ^\/Content-Type:.*charset="(.*$UNREADABLE)"
+* 1^0 ^\/Subject:.*=\?(.*big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987|windows-1251|windows-1256)\?
+* 1^0 ^\/Content-Type:.*charset="(.*big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987|windows-1251|windows-1256)"
 spam-unreadable
 </pre>
       <p>With the above recipe, bogofilter will <em>never</em> see the message.</p>
