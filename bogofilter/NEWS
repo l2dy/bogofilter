@@ -4,68 +4,27 @@
 
 $Id$
      
-	2003-01-20
-	* Bogofilter now kills html comments.  The '-k' switch can
-	  be used to change the behavior.
-
 0.10.0  2003-01-19
 
 	2003-01-19
-	* Reworked database code to correct locking and database
-	  corruption issues
-	* Reworked database API to so bogoutil needn't know internal
-	  API for database.
-	
-	2003-01-12
-	* Merged mime processing code into main cvs branch.
+	* Long-standing locking bugs that caused corruption in the data base
+	  have been resolved.
 	* Moved most documentation files to doc directory.
-	* Renamed regression t.systest.d to bogofilter.
-	
-	2002-12-31
 	* Added sample procmail file, contrib/procmailrc.example
-	
-	2002-12-30
 	* Spamicity score now computed from multiple word list pairs, i.e. all
 	  spam and ham word lists in directories named on command line or in
 	  config file (via "wordlist=" lines).
-
-	2002-12-28
 	* Added mime processing capability, with decoding of base64,
 	  quoted-printable and uuencoded sections.  Ignores attachments when
 	  computing spamicity.
 	* lexer is now case insensitive
-
-	2002-12-24
-	* Cleaned up code for specifying wordlist directory(s).
-
-	2002-12-15
 	* Added dates to wordlist tokens.  Option "datestamp_tokens=true|false"
 	  can be used to enable/disable them.
 	* Added wordlist maintenance capability to bogoutil.  Can discard
 	  tokens based on count, age, or length.  Can replace non-ASCII with
 	  question marks.
-
-	2002-12-28
-	* Added mime processing capability, with decoding of base64,
-	  quoted-printable and uuencoded sections.  Ignores attachments when
-	  computing spamicity.
-	* lexer is now case insensitive
-
-	2002-12-24
-	* Cleaned up code for specifying wordlist directory(s).
-
-	2002-12-15
-	* Added dates to wordlist tokens.  Option "datestamp_tokens=true|false"
-	  can be used to enable/disable them.
-	* Added wordlist maintenance capability to bogoutil.  Can discard
-	  tokens based on count, age, or length.  Can replace non-ASCII with
-	  question marks.
-
-	2002-12-08
 	* Increase MAXTOKENLEN from 20 to 30, allowing more and longer tokens
 	  to be processed.
-
-	2002-12-07
 	* Using new character set handling routines to provide charset specific
 	  token parsing.
 	* Added new config file options for setting of default charset and
@@ -74,10 +33,11 @@ $Id$
 	  if '-l' (logging) is enabled, to syslog.
 	* Work around ash-0.2 and bash-1 bugs, needed for make check.
 	* Reorder gcc __attribute__ lines for gcc-2.7 compatibility.
+	  (also available as patch for 0.9.1.2)
 	* Cater for malloc/calloc implementations that return NULL when 0 bytes
 	  of memory are requested, some AIX versions e. g., that would
 	  previously falsely claim an "out of memory" condition.
-
+	  (also available as patch for 0.9.1.2)
 	* New message formatting capability allows formats to be put in config
 	  file for X-Bogosity line and logging messages.  Message content can
 	  include status, spamicity, version, etc.
