@@ -24,23 +24,34 @@ application or system crash.
 
 2.1 Compatibility, Berkeley DB versions
 
-Berkeley DB version 4.2 has been tested successfully in September 2004,
-but version 3.0, 3.1, 3.2, 3.3, 4.0 and 4.1 should also work.
+These versions are supported:
 
-Berkeley DB versions 4.1 and 4.2 are recommended over the previous
-versions, because these can detect data corruptions more reliably
+  Sleepycat Software: Berkeley DB 3.0.55: (November 15, 1999)
+  Sleepycat Software: Berkeley DB 3.1.17: (July 31, 2000)
+  Sleepycat Software: Berkeley DB 3.2.9: (January 24, 2001)
+  Sleepycat Software: Berkeley DB 3.3.11: (July 12, 2001)
+  Sleepycat Software: Berkeley DB 4.0.14: (November 18, 2001)
+  Sleepycat Software: Berkeley DB 4.1.25: (December 19, 2002)
+  Sleepycat Software: Berkeley DB 4.2.52: (December  3, 2003)
+  Sleepycat Software: Berkeley DB 4.3.21: (November  8, 2004)
+
+Other 3.x or 4.x versions of Berkeley DB may or may not work.
+
+Berkeley DB versions 4.1 and newer are recommended over the previous
+versions, because the newer can detect data corruptions more reliably
 (through the use of checksums that detect partially written data base
-pages); Berkeley DB 4.2 appears faster than 4.1 under load (i. e. with
-multiple running copies of bogofilter/bogoutil operating on the same
-data base with at least one spam registration in progress).
+pages); Berkeley DB 4.1 appears a bit slower under load than its
+successors (i. e. with multiple running copies of bogofilter/bogoutil
+operating on the same data base with at least one spam registration in
+progress).
 
 2.2 Upgrading from non-transactional releases of bogofilter (before 0.93)
 
 Bogofilter should transparently upgrade the existing data base to the
 new transactional data base.  Note though that upgrading will not add
 checksums (see the previous section) to existing data bases, so it is
-recommended that, if you are using BerkeleyDB versions 4.1 or 4.2, that
-you dump and reload the data base to add checksums.
+recommended that, if you are using BerkeleyDB versions 4.1 or newer,
+that you dump and reload the data base to add checksums.
 
 The dump/load cycle is necessary only the first time you upgrade from a
 non-transactional to a transactional release.  Use these commands:
