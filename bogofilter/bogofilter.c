@@ -74,11 +74,6 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
 	++msgcount;
     } while(cont);
 
-    if (msgcount > 1) {
-	fprintf(stderr, "%s: must get only one message to calculate spamicity!\n", progname);
-	exit(2);
-    }
-
     spamicity = method->compute_spamicity(wordhash, NULL);
 
     db_lock_release_list(word_lists);
