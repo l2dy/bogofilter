@@ -10,6 +10,7 @@ about retraining and the '-H' flag...
 * The test suite no longer depends on procmail for t.MH and t.maildir.
 * Moved robx calculation code to new file for sharing by bogoutil and
   bogotune.
+* Fix segfault when using '-H' (header_degen) option.
 
 0.15.9	2003-11-23
 
