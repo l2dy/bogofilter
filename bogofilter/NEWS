@@ -21,9 +21,7 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
-0.93.1	2004-11-??
-
-	2004-11-11
+0.93.1	2004-11-11
 
 	* The README.db file now has information on the DB_CONFIG file that
 	  can be created and used to configure the Berkeley DB module.
