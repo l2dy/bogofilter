@@ -27,6 +27,7 @@ FILE  *fpo;
 
 char msg_register[256];
 char msg_bogofilter[256];
+char msg_spam_header[256];
 size_t msg_register_size = sizeof(msg_register);
 
 /* Function Definitions */
@@ -135,7 +136,7 @@ static bool write_header(rc_t status, readfunc_t rf, void *rfarg)
     /* print headers */
     while ((rd = rf(&out, rfarg)) > 0)
     {
-	/* skip over spam_header ("X-Bogosity:") lines */
+	/* skip over spam_header_name ("X-Bogosity:") lines */
 	while (rd >= bogolen && 
 	       memcmp(out, spam_header_name, bogolen) == 0) {
 	    while (((rd = rf(&out, rfarg)) > 0) && 
@@ -147,7 +148,7 @@ static bool write_header(rc_t status, readfunc_t rf, void *rfarg)
 	if (is_eol(out, rd) ||
 	    is_hb_delim(out, rd, have_body))
 	    /* check for non-empty blank line */
-	break;
+	    break;
 
 	/* rewrite "Subject: " line */
 	if (!seen_subj && rd >= subjlen) {
@@ -206,16 +207,13 @@ static void write_body(readfunc_t rf, void *rfarg)
     }
 }
 
-static void write_spam_header(void)
+static void build_spam_header(void)
 {
-    typedef char *formatter(char *buff, size_t size);
-    formatter *fcn = terse ? format_terse : format_header;
-    char buff[256];
-    /* print spam-status at the end of the header
-     * then mark the beginning of the message body */
-    (*fcn)(buff, sizeof(buff));
-    fputs (buff, fpo);
-    fputs ("\n", fpo);
+    if (passthrough || verbose || terse) {
+	typedef char *formatter(char *buff, size_t size);
+	formatter *fcn = terse ? format_terse : format_header;
+	(*fcn)(msg_spam_header, sizeof(msg_spam_header));
+    }
 }
 
 void write_message(rc_t status)
@@ -224,6 +222,8 @@ void write_message(rc_t status)
     void *rfarg = 0;		/* assignment to quench warning */
     textdata_t *text;
     bool seen_subj = false;
+
+    build_spam_header();
 
     if (passthrough) {
 	/* initialize */
@@ -245,11 +245,12 @@ void write_message(rc_t status)
 	seen_subj = write_header(status, rf, rfarg);
     }
 
-    if (passthrough || verbose || terse) {
-	write_spam_header();
-    }
+    /* print spam-status at the end of the header
+     * then mark the beginning of the message body */
+    if (passthrough || verbose || terse)
+	fprintf(fpo, "%s\n", msg_spam_header);
 
-    if (verbose || passthrough || Rtable) {
+    if (passthrough || verbose || Rtable) {
 	verbose += passthrough;
 	print_stats( stdout );
 	verbose -= passthrough;
