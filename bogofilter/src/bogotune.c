@@ -358,14 +358,15 @@ static bool check_for_high_ns_scores(void)
 
     if (ns_scores[t-1] < SPAM_CUTOFF)
 	return false;
-    else {
-	if (!quiet)
-	    fprintf(stderr,
+
+    if (!quiet) {
+	fprintf(stderr,
 	        "Warning: test messages include many high scoring nonspam.\n");
-	    fprintf(stderr,
+	fprintf(stderr,
 	        "         You may wish to reclassify them and rerun.\n");
-	return true;
     }
+
+    return true;
 }
 
 /* Score all spam to determine false negative counts */
