@@ -68,16 +68,16 @@ bool  run_register = false;
 
 const char *logtag = NULL;
 
+#ifdef	ENABLE_DEPRECATED_CODE
 /* define default */
 #define AL_DEFAULT AL_FISHER
 
 enum algorithm_e {
-#ifdef	ENABLE_DEPRECATED_CODE
     AL_GRAHAM='g',
-#endif
     AL_ROBINSON='r',
     AL_FISHER='f'
 };
+#endif
 
 /* Local variables and declarations */
 
