@@ -22,7 +22,7 @@ BOGOFILTER="$VAL ${relpath}/bogofilter$EXE_EXT"
 BOGOLEXER="$VAL ${relpath}/bogolexer$EXE_EXT"
 BOGOTUNE="$VAL ${relpath}/bogotune$EXE_EXT"
 BOGOUTIL="$VAL ${relpath}/bogoutil$EXE_EXT"
-BOGOLEX_SH="$VAL ${relpath}/msg-count.sh"
+BOGOLEX_SH="$VAL ${srcdir}/../msg-count.sh"
 export BOGOFILTER
 export BOGOLEXER
 export BOGOUTIL
