@@ -41,6 +41,9 @@ WANT="1102.3073"
 #loose checking
 WANT="1103.3073"
 
+# v0.12.4 - parsing adds '!' and money amounts
+WANT="1126.3080"
+
 if [ "$RESULT" != "$WANT" ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT
 fi
