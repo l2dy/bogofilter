@@ -21,6 +21,8 @@ NAME:
 #include "textblock.h"
 #include "xmalloc.h"
 
+#include "lexer.h" /* need have_body */
+
 FILE  *fpo;
 
 char msg_register[256];
@@ -45,7 +47,7 @@ static void cleanup_exit(ex_t exitcode, int killfiles) {
 static bool is_blank_line(const char *line, size_t len)
 {
     while (len > 0) {
-	if (!isspace((unsigned char)*line) && *line != '\b')
+	if (*line != '\b' && (have_body || !isspace((unsigned char)*line)))
 	    return false;
 	len -= 1;
 	line++;

@@ -85,6 +85,8 @@
 #undef	stderr
 #define	stderr	dbgout		/* for debug & -D options */
 
+int have_body;
+
 static word_t yyt;
 static int lineno;
 
@@ -236,7 +238,8 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>[:blank:]*id\ {ID}			/* ignore */
 
 <INITIAL>\n[ \t]				{ lineno += 1; }
-<INITIAL>\n\n					{ if (get_content_type() == MIME_TEXT_HTML)
+<INITIAL>\n\n					{ have_body=1;
+						  if (get_content_type() == MIME_TEXT_HTML)
 						      BEGIN HTML;
 						  else
 						      BEGIN TEXT; 
@@ -295,6 +298,7 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 void lexer_v3_init(FILE *fp)
 {
     lineno = 0;
+    have_body = 0;
     yy_set_state_initial();
     yyrestart(fp);
 }
