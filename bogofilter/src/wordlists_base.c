@@ -29,7 +29,9 @@ static bool is_dup_wordlist(wordlist_t *a, wordlist_t *b)
     if (strcmp(a->listname, b->listname) != 0)
 	return false;
 
-    if (strcmp(a->filepath, b->filepath) != 0)
+    if (a->filepath != NULL &&
+	b->filepath != NULL &&
+	strcmp(a->filepath, b->filepath) != 0)
 	return false;
 
     return true;
@@ -42,6 +44,8 @@ static wordlist_t *free_wordlistnode(wordlist_t *node)
 
     xfree(node->listname);
     xfree(node->filepath);
+    xfree(node->dirname);
+    xfree(node->filename);
     xfree(node);
 
     return next;
@@ -55,7 +59,8 @@ void init_wordlist(const char* name, const char* path,
 
     /* initialize list node */
     n->listname=xstrdup(name);
-    n->filepath=xstrdup(path);
+    n->dirname =get_directory_from_path(path);
+    n->filename=get_file_from_path(path);
     n->type    =type;
     n->override=override;
 
