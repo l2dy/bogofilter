@@ -32,7 +32,11 @@ AUTHOR:
 
 #define	SP	' '
 
-const char *charset_default = "us-ascii";
+#ifndef	DEFAULT_CHARSET
+#define	DEFAULT_CHARSET	"us-ascii"
+#endif
+
+const char *charset_default = DEFAULT_CHARSET;
 
 byte charset_table[256];
 byte casefold_table[256];

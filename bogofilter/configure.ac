@@ -235,6 +235,15 @@ if test x$USE_CP866 = xYES ; then
 	[Enable Russian language support])
 fi
 
+dnl Allow the user to specify a default charset
+AC_ARG_WITH(charset, 
+	    AC_HELP_STRING([--with-charset=name], 
+	    [Use specified charset instead of us-ascii]), 
+	    AC_DEFINE_UNQUOTED(DEFAULT_CHARSET, 
+	    ["$withval"], 
+	    [Use specified charset instead of us-ascii])
+)
+
 dnl Allow the user to enable memory usage debugging methods
 
 AC_ARG_ENABLE(memdebug,
