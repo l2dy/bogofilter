@@ -18,15 +18,15 @@ AUTHOR:
 #include <unistd.h>
 
 #include "config.h"
+
+#include "bogoconfig.h"
+#include "bogofilter.h"
 #include "common.h"
-#include "debug.h"
+#include "find_home.h"
+#include "globals.h"
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
-#include "find_home.h"
-#include "globals.h"
-#include "bogoconfig.h"
-#include "bogofilter.h"
 
 #ifndef	DEBUG_CONFIG
 #define DEBUG_CONFIG(level)	(verbose > level)
@@ -320,7 +320,7 @@ static void help(void)
     (void)printf( "\t-V\t- print version information and exit.\n" );
     (void)printf( "\t-c filename\t- read config file 'filename'.\n" );
     (void)printf( "\t-C\t- don't read standard config files.\n" );
-    (void)printf( "\t-q\t- quite - don't print warning messages.\n" );
+    (void)printf( "\t-q\t- quiet - don't print warning messages.\n" );
     (void)printf( "\n" );
     (void)printf( "bogofilter is a tool for classifying email as spam or non-spam.\n" );
     (void)printf( "\n" );
@@ -404,9 +404,7 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case 'R':
-	{
 	    Rtable = 1;
-	}
 	/*@fallthrough@*/
 	/* fall through to force Robinson calculations */
 	case 'r':
