@@ -26,6 +26,7 @@ struct textblock
     size_t		len;
 };
 
+extern bool block_on_subnets;
 extern struct textblock textblocks, *textend;
 
 extern int lexer_fgets(char *buf, int max_size, FILE *s);
