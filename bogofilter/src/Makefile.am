@@ -46,7 +46,7 @@ bin_PROGRAMS += bogofilter_static bogoutil_static bogolexer_static bogotune_stat
 endif
 
 check_PROGRAMS = debugtest configtest wordhash find_home.test \
-		 bogowordfreq fgetsl.test
+		 fgetsl.test
 
 TESTS=
 
