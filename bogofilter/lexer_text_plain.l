@@ -9,6 +9,8 @@
  *
 */
 
+#include <stdlib.h>
+
 #include <config.h>
 #include "common.h"
 

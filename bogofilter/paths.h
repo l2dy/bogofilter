@@ -10,8 +10,6 @@ NAME:
 #ifndef PATHS_H
 #define PATHS_H
 
-#include <stdlib.h>
-
 int build_path(char* dest, size_t size, const char* dir, const char* file);
 
 char *create_path_from_env(const char *var,

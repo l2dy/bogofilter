@@ -9,6 +9,7 @@ NAME:
 
 #include <errno.h>
 #include <sys/stat.h>
+#include <stdlib.h>
 
 #include <config.h>
 #include "common.h"

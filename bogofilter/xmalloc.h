@@ -2,7 +2,6 @@
 
 #ifndef XMALLOC_H
 #define XMALLOC_H
-#include <stdlib.h>
 
 /*@noreturn@*/
 void xmem_error(const char *)

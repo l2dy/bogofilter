@@ -10,6 +10,7 @@ NAME:
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "common.h"
 #include "fgetsl.h"
 
 /* calls exit(2) on read error or when max_size < 2 */
