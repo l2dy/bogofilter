@@ -25,13 +25,13 @@ AUTHOR:
 #include <syslog.h>
 #endif
 
-#include "version.h"
 #include "common.h"
 #include "globals.h"
 #include "lexer.h"
 #include "bogofilter.h"
 #include "bogoconfig.h"
 #include "register.h"
+#include "version.h"
 
 #define BOGODIR ".bogofilter"
 

@@ -115,7 +115,7 @@ void register_words(run_t _run_type, wordhash_t *h,
     (void)fprintf(stderr, "# %d word%s, %d message%s\n", 
 	    wordcount, PLURAL(wordcount), msgcount, PLURAL(msgcount));
 
-  good_list.active = spam_list.active = FALSE;
+  good_list.active = spam_list.active = false;
 
   switch(_run_type)
     {
@@ -142,14 +142,14 @@ void register_words(run_t _run_type, wordhash_t *h,
       exit(2);      
     }
 
-  incr_list->active = TRUE;
+  incr_list->active = true;
   if (decr_list)
-    decr_list->active = TRUE;
+    decr_list->active = true;
 
   db_lock_writer_list(word_lists);
 
   for (list = word_lists; list != NULL; list = list->next){
-    if (list->active == TRUE) {
+    if (list->active) {
       list->msgcount = db_getcount(list->dbh);
     }
   }

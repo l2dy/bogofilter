@@ -44,7 +44,7 @@ static int init_list(/*@out@*/ wordlist_t* list, const char* name, const char* f
     list->name=xstrdup(name);
     list->msgcount=0;
     list->override=override;
-    list->active=FALSE;
+    list->active=false;
     list->weight=weight;
     list->bad=bad;
     list->ignore=ignore;
@@ -102,10 +102,10 @@ int setup_lists(const char* dir, double good_weight, double bad_weight)
     char filepath[PATH_LEN];
 
     build_path(filepath, PATH_LEN, dir, GOODFILE);
-    if (init_list(&good_list, "good", filepath, good_weight, FALSE, 0, 0)) rc = -1;
+    if (init_list(&good_list, "good", filepath, good_weight, false, 0, 0)) rc = -1;
 
     build_path(filepath, PATH_LEN, dir, SPAMFILE);
-    if (init_list(&spam_list, "spam", filepath, bad_weight, TRUE,  0, 0)) rc = -1;
+    if (init_list(&spam_list, "spam", filepath, bad_weight, true,  0, 0)) rc = -1;
 
     return rc;
 }
@@ -179,9 +179,9 @@ bool configure_wordlist(const char *val)
     char* name;
     char* path;
     double weight = 0.0f;
-    bool bad = FALSE;
+    bool bad = false;
     int override = 0;
-    bool ignore = FALSE;
+    bool ignore = false;
 
     char *tmp = xstrdup(val);
 	
@@ -196,10 +196,10 @@ bool configure_wordlist(const char *val)
 	    break;
 	case 's':
 	case 'b':		/* spam */
-	    bad = TRUE;
+	    bad = true;
 	    break;
 	case 'i':		/* ignore */
-	    ignore = TRUE;
+	    ignore = true;
 	    break;
 	default:
 	    fprintf( stderr, "Unknown list type - '%c'\n", type[0]);

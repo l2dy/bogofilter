@@ -3,7 +3,7 @@
 #ifndef BOGOCONFIG_H
 #define BOGOCONFIG_H
 
-#include <common.h>
+#include "common.h"
 
 /* Definitions */
 

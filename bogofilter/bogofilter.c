@@ -58,7 +58,7 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
     wordhash_t  *wordhash;
     int		wordcount, msgcount;
 
-    good_list.active = spam_list.active = TRUE;
+    good_list.active = spam_list.active = true;
 
     db_lock_reader_list(word_lists);
 

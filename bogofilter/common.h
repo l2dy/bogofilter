@@ -10,6 +10,7 @@
 #endif
 
 #include "debug.h"
+#include "system.h" /* defines bool */
 
 #define GOODFILE	"goodlist.db"
 #define SPAMFILE	"spamlist.db"
@@ -24,13 +25,6 @@
 
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
 #define min(x, y)	(((x) < (y)) ? (x) : (y))
-
-#ifndef __cplusplus
-typedef enum bool { FALSE = 0, TRUE = 1 } bool;
-#else
-const bool FALSE = false;
-const bool TRUE = true;
-#endif
 
 #undef	HAVE_CHARSET
 

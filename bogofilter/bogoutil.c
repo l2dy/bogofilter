@@ -20,11 +20,11 @@ AUTHOR:
 #include <sys/stat.h>
 #include <db.h>
 
-#include "version.h"
 #include "bogofilter.h"
 #include "datastore.h"
 #include "datastore_db.h"
 #include "robinson.h"			/* for ROBS and ROBX */
+#include "version.h"
 
 #define PROGNAME "bogoutil"
 
@@ -492,7 +492,7 @@ int main(int argc, char *argv[])
     int option;
     char *db_file = NULL;
     cmd_t flag = NONE;
-    bool  prob = FALSE;
+    bool  prob = false;
 
     while ((option = getopt(argc, argv, "d:l:w:R:phvVx:")) != -1)
 	switch (option) {
@@ -521,7 +521,7 @@ int main(int argc, char *argv[])
 	    break;
 
 	case 'p':
-	    prob = TRUE;
+	    prob = true;
 	    break;
 
 	case 'v':

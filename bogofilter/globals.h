@@ -5,6 +5,7 @@
 
 #undef	HAVE_CHARSET
 
+#include "system.h" /* defines bool */
 #include <float.h> /* has DBL_EPSILON */
 #define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
 

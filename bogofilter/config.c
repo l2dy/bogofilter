@@ -60,14 +60,14 @@ int passthrough;	/* '-p' */
 int verbose;		/* '-v' */
 int Rtable = 0;		/* '-R' */
 
-static bool suppress_config_file = FALSE;
+static bool suppress_config_file = false;
 
 char directory[PATH_LEN + 100] = "";
 const char *system_config_file = SYSCONFDIR "/bogofilter.cf";
 const char *user_config_file   = "~/.bogofilter.cf";
 const char *spam_header_name = SPAM_HEADER_NAME;
 
-bool	stats_in_header = TRUE;
+bool	stats_in_header = true;
 const	char *stats_prefix;
 
 run_t run_type = RUN_NORMAL; 
@@ -127,7 +127,7 @@ static const parm_desc *usr_parms = NULL;
 
 static bool select_method(enum algorithm_e al)
 {
-    bool ok = TRUE;
+    bool ok = true;
     switch (al)
     {
 #ifdef ENABLE_GRAHAM_METHOD
@@ -141,7 +141,7 @@ static bool select_method(enum algorithm_e al)
 	break;
 #endif
     default:
-	ok = FALSE;
+	ok = false;
 	break;
     }
     usr_parms = method->config_parms;
@@ -150,7 +150,7 @@ static bool select_method(enum algorithm_e al)
 
 static bool process_config_parameter(const parm_desc *arg, const char *val)
 {
-    bool ok = TRUE;
+    bool ok = true;
     while (isspace(*val) || *val == '=') val += 1;
     if ( arg->addr.v == NULL )
 	return ok;
@@ -164,16 +164,17 @@ static bool process_config_parameter(const parm_desc *arg, const char *val)
 		case 'Y':		/* Yes */
 		case 'T':		/* True */
 		case '1':
-		    *arg->addr.b = TRUE;
+		    *arg->addr.b = true;
 		    break;
 		case 'N':		/* No */
 		case 'F':		/* False */
 		case '0':
-		    *arg->addr.b = FALSE;
+		    *arg->addr.b = false;
 		    break;
 		}
 		if (DEBUG_CONFIG(0))
-		    fprintf( stderr, "%s -> %s\n", arg->name, *arg->addr.b == TRUE ? "Yes" : "No" );
+		    fprintf(stderr, "%s -> %s\n", arg->name,
+			    *arg->addr.b ? "Yes" : "No");
 		break;
 	    }
 	case CP_INTEGER:
@@ -220,12 +221,12 @@ static bool process_config_parameter(const parm_desc *arg, const char *val)
 	case CP_WORDLIST:
 	    {
 		if (!configure_wordlist(val))
-		    ok = FALSE;
+		    ok = false;
 		break;
 	    }
 	default:
 	    {
-		ok = FALSE;
+		ok = false;
 		break;
 	    }
     }
@@ -239,7 +240,7 @@ static bool process_config_line( const char *line, const parm_desc *parms )
     const parm_desc *arg;
 
     if (parms == NULL)
-	return FALSE;
+	return false;
 
     for (val=line; *val != '\0'; val += 1) {
 	if (isspace((unsigned char)*val) || *val == '=') {
@@ -255,12 +256,12 @@ static bool process_config_line( const char *line, const parm_desc *parms )
 	    return ok;
 	}
     }
-    return FALSE;
+    return false;
 }
 
 static void read_config_file(const char *fname, bool tilde_expand)
 {
-    bool error = FALSE;
+    bool error = false;
     int lineno = 0;
     FILE *fp;
     char *filename;
@@ -301,7 +302,7 @@ static void read_config_file(const char *fname, bool tilde_expand)
 	if ( ! process_config_line( buff, usr_parms ) &&
 	     ! process_config_line( buff, sys_parms ))
 	{
-	    error = TRUE;
+	    error = true;
 	    if (!quiet)
 		fprintf( stderr, "%s:%d:  Error - unknown parameter in '%s'\n", filename, lineno, buff );
 	}
@@ -309,7 +310,7 @@ static void read_config_file(const char *fname, bool tilde_expand)
 
     if (ferror(fp)) {
 	fprintf(stderr, "Read error while reading file \"%s\".", filename);
-	error = TRUE;
+	error = true;
     }
 
     (void)fclose(fp); /* we're just reading, so fclose should succeed */
@@ -485,12 +486,12 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case 'c':
-	    read_config_file(optarg, FALSE);
+	    read_config_file(optarg, false);
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
 
 	case 'C':
-	    suppress_config_file = TRUE;
+	    suppress_config_file = true;
 	    break;
 
 	default:
@@ -512,8 +513,8 @@ void process_config_files(void)
 
     if (! suppress_config_file)
     {
-	read_config_file(system_config_file, FALSE);
-	read_config_file(user_config_file, TRUE);
+	read_config_file(system_config_file, false);
+	read_config_file(user_config_file, true);
     }
 
     stats_prefix= stats_in_header ? "\t" : "#   ";
@@ -522,7 +523,7 @@ void process_config_files(void)
 	fprintf( stderr, "stats_prefix: '%s'\n", stats_prefix );
 
 #ifdef	HAVE_CHARSET
-    init_charset_table("us-ascii", TRUE);
+    init_charset_table("us-ascii", true);
 #endif
 
     return;

@@ -16,7 +16,7 @@ sysconf_DATA = bogofilter.cf.example
 # what to build that from
 MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h debug.h \
 	debug.c find_home.h find_home.c find_home_user.c \
-	find_home_tildeexpand.c bogoconfig.h
+	find_home_tildeexpand.c bogoconfig.h system.h
 
 BUILT_SOURCES = version.h directories.h
 

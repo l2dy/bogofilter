@@ -38,7 +38,7 @@ AUTHOR:
 #endif
 
 static void db_enforce_locking(dbh_t *handle, const char *func_name){
-  if (handle->locked == FALSE){
+  if (handle->locked == false){
     fprintf(stderr, "%s (%s): Attempt to access unlocked handle.\n", func_name, handle->name);
     exit(2);
   }
@@ -52,7 +52,7 @@ static dbh_t *dbh_init(const char *filename, const char *name){
   handle->filename  = xstrdup(filename);
   handle->name	    = xstrdup(name);
   handle->pid	    = getpid();
-  handle->locked    = FALSE;
+  handle->locked    = false;
 
   return handle;
 }
@@ -277,7 +277,7 @@ void db_lock_reader(void *vhandle){
   if (DEBUG_DATABASE(1))
     fprintf(stderr, "[%lu] Got read lock  on %s\n", (unsigned long) handle->pid, handle->filename);
 
-  handle->locked = TRUE;
+  handle->locked = true;
 }
 
 /*
@@ -298,7 +298,7 @@ void db_lock_writer(void *vhandle){
   if (DEBUG_DATABASE(1))
     fprintf(stderr, "[%lu] Got write lock on %s\n", (unsigned long) handle->pid, handle->filename);
 
-  handle->locked = TRUE;
+  handle->locked = true;
 }
 
 /*
@@ -307,7 +307,7 @@ Releases acquired lock
 void db_lock_release(void *vhandle){
   dbh_t *handle = vhandle;
 
-  if (handle->locked == TRUE){
+  if (handle->locked){
     if (DEBUG_DATABASE(1))
       fprintf(stderr, "[%lu] Releasing lock on %s\n", (unsigned long) handle->pid, handle->filename);
 
@@ -321,7 +321,7 @@ void db_lock_release(void *vhandle){
     fprintf(stderr, "[%lu] Attempt to release open lock on %s\n", (unsigned long) handle->pid, handle->filename);
   }
 
-  handle->locked = FALSE;
+  handle->locked = false;
 }
 
 /*
@@ -329,7 +329,7 @@ Releases acquired locks on multiple databases
 */
 void db_lock_release_list(wordlist_t *list){
   while (list != NULL) {
-    if ((list->active == TRUE) && (((dbh_t *)list->dbh)->locked == TRUE))
+    if (list->active && ((dbh_t *)list->dbh)->locked)
       db_lock_release(list->dbh);
 
     list = list->next;
@@ -376,7 +376,7 @@ static void db_lock_list(wordlist_t *list, int type){
 
       dbh_t *handle = tmp->dbh;
       
-      if (tmp->active == FALSE)
+      if (tmp->active == false)
 	continue;
 
       if (DEBUG_DATABASE(1))
@@ -386,13 +386,13 @@ static void db_lock_list(wordlist_t *list, int type){
         if (DEBUG_DATABASE(1))
           do_lock_msg("Got");
         
-        handle->locked = TRUE;
+        handle->locked = true;
        }
        else if (type == F_RDLCK && errno == EAGAIN){
         if (verbose)
           do_lock_msg("Faked");
 	
-        handle->locked = TRUE;
+        handle->locked = true;
       }
       else if (errno == EACCES || errno == EAGAIN || errno == EINTR){
         if (verbose)

@@ -43,7 +43,7 @@ method_t robinson_method = {
 #ifdef COMPILE_DEAD_CODE
 static bool x_configure_wordlist(const char *val)
 {
-    return FALSE;
+    return false;
 }
 
 static int x_init_list(wordlist_t* list, const char* name, const char* filepath, double weight, bool bad, int override, bool ignore)

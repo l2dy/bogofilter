@@ -50,7 +50,7 @@ char *tildeexpand(const char *name) {
 	home = find_home_user(tmp);
     } else {
 	/* plain tilde */
-	home = find_home(FALSE);
+	home = find_home(false);
 	if (home == NULL)
 	    return xstrdup(name);
 	tmp = NULL;
