@@ -121,6 +121,7 @@ bogolexer_static_LDFLAGS = $(STATICLDFLAGS)
 
 bogoutil_static_SOURCES = bogoutil.c
 bogoutil_static_LDFLAGS = $(STATICLDFLAGS)
+bogoutil_static_LDADD = $(LDADD) $(GSL_LIBS)
 
 debugtest_SOURCES = debug.main.c
 
