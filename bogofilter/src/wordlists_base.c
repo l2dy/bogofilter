@@ -60,7 +60,7 @@ wordlist_t *default_wordlist(void)
     wordlist_t *list;
     for ( list = word_lists; list != NULL; list = list->next )
     {
- 	if (list->type != 'I')
+ 	if (list->type != WL_IGNORE)
  	    return list;
     }
     return NULL;
