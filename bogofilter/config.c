@@ -23,11 +23,15 @@ AUTHOR:
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
-#ifdef	HAVE_CHARSET
 #include "charset.h"
-#endif
 #include "find_home.h"
+#include "format.h"
 #include "lexer.h"
+#include "wordlists.h"
+#include "xmalloc.h"
+#include "xstrdup.h"
+
+/* includes for scoring algorithms */
 #include "method.h"
 #ifdef	ENABLE_GRAHAM_METHOD
 #include "graham.h"
@@ -38,10 +42,6 @@ AUTHOR:
 #ifdef	ENABLE_ROBINSON_FISHER
 #include "fisher.h"
 #endif
-#include "wordlists.h"
-#include "xmalloc.h"
-#include "xstrdup.h"
-#include "format.h"
 
 #ifndef	DEBUG_CONFIG
 #define DEBUG_CONFIG(level)	(verbose > level)
@@ -596,9 +596,7 @@ void process_config_files(void)
     if (DEBUG_CONFIG(0))
 	fprintf( stderr, "stats_prefix: '%s'\n", stats_prefix );
 
-#ifdef	HAVE_CHARSET
-    init_charset_table("us-ascii", true);
-#endif
+    init_charset_table(charset_default, true);
 
     return;
 }
