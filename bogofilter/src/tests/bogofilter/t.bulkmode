@@ -157,8 +157,7 @@ for OUT in ${TMPDIR}/bulk-*.out ; do
     if  [ $verbose -eq 0 ]; then
 	cmp $CORRECT $OUT
     else
-	[ `uname -s` = "Linux" ] && OPTS="-u -s --brief"
-	diff $OPTS $CORRECT $OUT
+	diff $DIFF_BRIEF $CORRECT $OUT
     fi
 done
 
@@ -168,7 +167,6 @@ for OUT in ${TMPDIR}/bogolex-*.out ; do
     if  [ $verbose -eq 0 ]; then
 	cmp $CORRECT $OUT
     else
-	[ `uname -s` = "Linux" ] && OPTS="-u -s --brief"
-	diff $OPTS $CORRECT $OUT
+	diff $DIFF_BRIEF $CORRECT $OUT
     fi
 done

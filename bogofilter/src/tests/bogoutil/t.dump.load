@@ -81,7 +81,6 @@ for i in ${TMPDIR}/output-dl-?.txt ; do
     if  [ $verbose -eq 0 ]; then
 	cmp $i $j
     else
-	[ `uname -s` = "Linux" ] && OPTS="-u -s --brief"
-	diff $OPTS $i $j
+	diff $DIFF_BRIEF $i $j
     fi
 done

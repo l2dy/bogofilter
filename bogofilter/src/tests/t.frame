@@ -98,3 +98,6 @@ if false ; then
     export LD_PRELOAD EF_PROTECT_FREE EF_FILL EF_ALLOW_MALLOC_0 EF_PROTECT_BELOW
     export EF_ALIGNMENT
 fi
+
+DIFF_BRIEF=""
+[ "`uname -s`" = "Linux" ] && DIFF_BRIEF="--brief -s"

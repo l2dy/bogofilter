@@ -49,8 +49,7 @@ for OUT in ${srcdir}/outputs/parsing-???.out ; do
     if  [ $verbose -eq 0 ]; then
 	cmp $OUT ${TMPDIR}/`basename $OUT`
     else
-	[ `uname -s` = "Linux" ] && OPTS="-u -s --brief"
-	diff $OPTS $OUT ${TMPDIR}/`basename $OUT`
+	diff $DIFF_BRIEF $OUT ${TMPDIR}/`basename $OUT`
     fi
 done
 

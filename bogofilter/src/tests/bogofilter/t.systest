@@ -117,7 +117,6 @@ for i in $OUTPUTS/*v ; do
     if  [ $verbose -eq 0 ]; then
 	cmp $i ${TMPDIR}/tests/$j
     else
-	[ `uname -s` = "Linux" ] && OPTS="-u -s --brief"
-	diff $OPTS ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
+	diff $DIFF_BRIEF ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
     fi
 done
