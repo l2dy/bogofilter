@@ -35,6 +35,7 @@ CONTRIBUTORS:
 #include "maint.h"
 #include "error.h"
 #include "find_home.h"
+#include "html.h"
 #include "format.h"
 #include "lexer.h"
 #include "maint.h"
@@ -152,6 +153,7 @@ const parm_desc sys_parms[] =
     { "replace_nonascii_characters",	CP_BOOLEAN, { (void *) &replace_nonascii_characters } },
     { "db_cachesize",	  CP_INTEGER,	{ (void *) &db_cachesize } },
     { "tag_header_lines", CP_BOOLEAN,	{ (void *) &tag_header_lines } },
+    { "strict_check", 	  CP_BOOLEAN,	{ (void *) &strict_check } },
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
 

@@ -18,28 +18,25 @@ AUTHOR:
 #include "html.h"
 #include "lexer.h"
 
-/* Macro Definitions */
-
-#define	COMMENT_START	"<!--"
-#define	COMMENT_START_LEN	4	/* strlen(COMMENT_START) */
-
-#define	COMMENT_END	"-->"
-#define	COMMENT_END_LEN 	3	/* strlen(COMMENT_END) */
-
 /* Function Declarations */
 
 static int kill_html_comment(buff_t *buff, size_t comment_start);
 
-/* http://www.w3.org/MarkUp/html-spec/html-spec_3.html#SEC3.2.5
+bool strict_check = true;
+
+/* If strict_check is enabled, bogofilter will check for  "<!--" and "-->".
+** If strict_check is disabled, bogofilter will check for  "<!" and ">".
 **
-** Comments:
+** The strict mode corresponds to the comment definition at:
 **
-** To include comments in an HTML document, use a comment declaration.  A comment
-** declaration consists of `<!' followed by zero or more comments followed by `>'. 
-** Each comment starts with `--' and includes all text up to and including the 
-** next occurrence of `--'. In a comment declaration, white space is allowed after 
-** each comment, but not before the first comment. The entire comment declaration 
-** is ignored.
+** 	http://www.w3.org/MarkUp/html-spec/html-spec_3.html#SEC3.2.5
+**
+**	"To include comments in an HTML document, use a comment declaration.  A 
+**	comment declaration consists of `<!' followed by zero or more comments 
+**	followed by `>'.   Each comment starts with `--' and includes all text 
+**	up to and including the next occurrence of `--'. In a comment declar-
+**	ation, white space is allowed after each comment, but not before the 
+**	first comment. The entire comment declaration is ignored."
 */
 
 /* Function Definitions */
@@ -79,6 +76,11 @@ static int kill_html_comment(buff_t *buff, size_t comment_offset)
     bool done = false;
     byte *tmp = buf_beg;
 
+    const char *start = strict_check ? "<!--" : "<!";
+    const char *finish = strict_check ? "-->" : ">";
+    size_t start_len = strlen(start);
+    size_t finish_len = strlen(finish);
+
     while (!done) {
 	byte c;
 	size_t need;
@@ -94,7 +96,7 @@ static int kill_html_comment(buff_t *buff, size_t comment_offset)
 */
 	c = *tmp;
 
-	need = (c == '<') ? COMMENT_START_LEN : 1;
+	need = (c == '<') ? start_len : finish_len;
 
 	buf_used = buf_beg + buff->t.leng - comment_offset;
 	avail = buf_used - tmp;
@@ -114,24 +116,21 @@ static int kill_html_comment(buff_t *buff, size_t comment_offset)
 	{
 	    /* ensure buffer has sufficient characters for test */
 	    /* check for comment delimiter */
-	    if (memcmp(tmp, COMMENT_START, COMMENT_START_LEN) != 0)
+	    if (memcmp(tmp, start, start_len) != 0)
 		tmp += 1;
 	    else {
 		comment = tmp;
 		level += 1;
-		tmp += COMMENT_START_LEN;
+		tmp += start_len;
 	    }
 	    break;
 	}
 	case '>':
 	{
-	    /* Hack to only check for ">" rather than complete terminator "-->" */
-	    bool short_check = false;
 	    if (level == 0)
 		done = true;
 	    tmp += 1;
-	    if (level > 0 && (short_check || 
-			      memcmp(tmp - COMMENT_END_LEN, COMMENT_END, COMMENT_END_LEN) == 0))
+	    if (level > 0 && (memcmp(tmp - finish_len, finish, finish_len) == 0))
 	    {
 		/* eat comment */
 		buff_shift(buff, comment, tmp - comment);
@@ -155,7 +154,7 @@ static int kill_html_comment(buff_t *buff, size_t comment_offset)
 
 	/* When killing html comments, there's no need to keep it in memory */
 	if (comment != NULL && 
-	    buf_end - buf_used < COMMENT_END_LEN) 
+	    (size_t)(buf_end - buf_used) < finish_len)
 	{
 	    /* Leave enough to recognize the end of comment string. */
 	    size_t shift = tmp - comment;

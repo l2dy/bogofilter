@@ -19,6 +19,8 @@ AUTHOR:
 
 /* Global variables */
 
+extern	bool	strict_check;
+
 /* - in globals.h
 extern	bool	kill_html_comments;
 extern	int	count_html_comments;
