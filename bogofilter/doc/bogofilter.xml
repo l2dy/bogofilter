@@ -647,6 +647,7 @@ bogofilter[6244]: register-s, 1273 words, 4 messages
 <term><filename>~/.bogofilter/spamlist.db</filename></term>
 <listitem><para>List of spam tokens.</para></listitem>
 </varlistentry>
+<varlistentry>
 <term><filename>~/.bogofilter/wordlist.db</filename></term>
 <listitem><para>Combined list of good and spam tokens.</para></listitem>
 </varlistentry>
