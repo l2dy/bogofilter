@@ -10,7 +10,7 @@
 #include "common.h" /* has PATH_LEN */
 
 #ifdef __LCLINT__
-#define bool int
+typedef int  bool;
 #endif
 
 /* command line options */
@@ -61,8 +61,7 @@ extern	int	db_cachesize;
 extern	const char	*update_dir;
 extern	const char	*progname;
 extern	const char	*progtype;
-/*@obs
-erver@*/
+/*@observer@*/
 extern	const char	*stats_prefix;
 extern	const char *const version;
 extern	const char *const system_config_file;
