@@ -79,6 +79,7 @@
           <li><a href="#production">How can I keep the scoring accuracy high?</a></li>
 
           <li><a href="#spamassassin">How can I use SpamAssassin to train Bogofilter?</a></li>
+	  <li><a href="#mboxformats">What mailbox (file) formats does bogofilter understand?</a></li>
 
           <li><a href="#vvv">What does bogofilter's verbose output mean?</a></li>
 
@@ -293,14 +294,14 @@
     (the above collections) is bigger, rather than smaller. The
     smaller your training collection is, the higher the number of
     errors bogofilter will make in production. Let's assume your
-    collection is two mbox files:  ham.mbx and spam.mbx.</p>
+    collection is two mbox files:  ham.mbox and spam.mbox.</p>
 
     <ul>
     <li><p>Method 1) Full training. Train bogofilter with all your messages. In
     our example:</p>
 
-    <pre>	bogofilter -s &lt; spam.mbx
-	bogofilter -n &lt; ham.mbx</pre></li>
+    <pre>	bogofilter -s &lt; spam.mbox
+	bogofilter -n &lt; ham.mbox</pre></li>
     </ul>
 
     <p>Note: bogofilter's contrib directory includes two scripts that
@@ -325,14 +326,14 @@
     spam_cutoff=0.6 you might want to score all ham in your
     collection below 0.3 and all spam above 0.8. Our example is:</p>
 
-    <pre>	bogominitrain.pl -fnv ~/.bogofilter ham.mbx spam.mbx '-o 0.8,0.3'</pre></li>
+    <pre>	bogominitrain.pl -fnv ~/.bogofilter ham.mbox spam.mbox '-o 0.8,0.3'</pre></li>
 
     <li><p>Method 3) Use the script randomtrain (in the contrib
     directory). The script generates a list of all the messages in the
     mailboxes, randomly shuffles the list, and then scores each
     message, with training as needed. In our example:</p>
 
-    <pre>	randomtrain -s spam.mbx -n ham.mbx</pre>
+    <pre>	randomtrain -s spam.mbox -n ham.mbox</pre>
 
     <p>As with method 4, it works better if you start with full
     training using several thousand messages.  This will give a
@@ -369,10 +370,10 @@
 
     <p>In our example (after the initial full training):</p>
 
-    <pre>	classify spam.mbx [bogofilter options]
+    <pre>	classify spam.mbox [bogofilter options]
         bogofilter -s &lt; corpus.good
         rm -f corpus.*
-        classify ham.mbx [bogofilter options]
+        classify ham.mbox [bogofilter options]
         bogofilter -n &lt; corpus.bad
         rm -f corpus.*</pre></li>
     </ul>
@@ -485,6 +486,26 @@
 	:0:
 	* ^X-Bogosity:.No
 	non-spam</pre>
+
+    <hr>
+    <h2 id="mboxformats">What mailbox (file) formats does bogofilter
+	understand?</h2>
+
+    <P>Bogofilter understands the traditional unix mbox format, the
+    Maildir and MH formats. Note though that bogofilter does not support
+    subfolders, you will have to explicitly list them in MH or Maildir++
+    folders - just mention the full path to the subfolder.</P>
+
+    <P>For unsupported formats, you will have to convert the mailbox to
+    a format bogofilter understands. Mbox is often convenient because it can
+    be piped into bogofilter.<P>
+
+    <P>The following list may be able help you:</P>
+    <DL>
+	<DT>UW-IMAP/PINE mbx format</DT><DD>To convert to mbox:
+	<KBD>mailtool copy /full/path/to/mail.mbx
+	    '#driver.unix//full/path/to/mbox'</KBD></DD>
+    </DL>
 
     <hr>
 
