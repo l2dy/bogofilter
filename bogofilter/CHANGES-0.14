@@ -7,12 +7,15 @@ $Id$
 0.14.1.1 2003-08-01
 
 	* Fixed check for adding spam_subject_tag to Subject: line.
+	* Updated French version of FAQ.
 
 	2003-07-31
 
 	* Correct problem with t.degen regression test.
 
 0.14.1	2003-07-31
+
+	* Updated English version of FAQ.
 
 	2003-07-29
 

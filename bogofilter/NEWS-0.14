@@ -6,6 +6,7 @@
 
 * Fixed check for adding spam_subject_tag to Subject: line.
 * Correct problem with t.degen regression test.
+* Updated French version of FAQ.
  
 0.14.1	2003-07-31
  
@@ -13,7 +14,8 @@
   and changing the value for error from 2 to 3.
 * Initial release of token degeneration code.
 * Revised lexer pattern to better recognize encoded tokens.
- 
+* Updated English version of FAQ.
+
 0.14.0.1 2003-07-23
  
 * Fix problem with encoded text.
