@@ -46,8 +46,7 @@ static int dump_count = 0;
 
 /* Function Definitions */
 
-static int db_dump_hook(char *key,  uint32_t keylen, 
-			char *data, uint32_t datalen,
+static int db_dump_hook(word_t *key, word_t *data,
 			 /*@unused@*/ void *userdata)
 {
     dbv_t val = {0, 0};
@@ -55,18 +54,18 @@ static int db_dump_hook(char *key,  uint32_t keylen,
 
     dump_count += 1;
 
-    if (datalen != sizeof(uint32_t) && datalen != 2 * sizeof(uint32_t)) {
-	print_error(__FILE__, __LINE__, "Unknown data size - %d.\n", datalen);
+    if (data->leng != sizeof(uint32_t) && data->leng != 2 * sizeof(uint32_t)) {
+	print_error(__FILE__, __LINE__, "Unknown data size - %d.\n", data->leng);
 	return 0;
     }
 
-    memcpy(&val, data, datalen);
+    memcpy(&val, data->text, data->leng);
 
-    if (!keep_count(val.count) || !keep_date(val.date) || !keep_size(keylen))
+    if (!keep_count(val.count) || !keep_date(val.date) || !keep_size(key->leng))
 	return 0;
     if (replace_nonascii_characters)
-	do_replace_nonascii_characters((byte *)key, keylen);
-    fwrite(key, 1, keylen, stdout);
+	do_replace_nonascii_characters(key->text, key->leng);
+    word_puts(key, stdout);
     putchar(' ');
     printf("%lu", (unsigned long)val.count);
     if (val.date) {
@@ -76,23 +75,18 @@ static int db_dump_hook(char *key,  uint32_t keylen,
     return !!ferror(stdout);
 }
 
-static int count_hook(char *key,  uint32_t keylen, 
-		      char *data, uint32_t datalen,
+static int count_hook(word_t *key, word_t *data,
 		      void *userdata)
 {
     uint32_t *counter = userdata;
 
-    (void)key;
-    (void)keylen;
-    (void)data;
-    (void)datalen;
-
-    (*counter)++;
+    (void)data;		/* unused */
+    *counter += 1;
 
     if (verbose > 3) {
-	printf("count: ");
-	fwrite(key, 1, keylen, stdout);
-	putchar('\n');
+	fputs("count: ", dbgout);
+	word_puts(key, dbgout);
+	fputc('\n', dbgout);
     }
 
     return 0;
@@ -105,8 +99,7 @@ struct robhook_data {
     double scalefactor;
 };
 
-static int robx_hook(char *key,  uint32_t keylen, 
-		     char *data, uint32_t datalen, 
+static int robx_hook(word_t *key, word_t *data, 
 		     void *userdata)
 {
     struct robhook_data *rd = userdata;
@@ -118,24 +111,22 @@ static int robx_hook(char *key,  uint32_t keylen,
     static size_t x_size = MAXTOKENLEN + 1;
 
     /* ignore system meta-data */
-    if (*key == '.')
+    if (*key->text == '.')
 	return 0;
 
     /* ignore short read */
-    if (datalen < sizeof(uint32_t))
+    if (data->leng < sizeof(uint32_t))
 	return 0;
 
-    if (x == NULL || keylen + 1 > x_size) {
+    if (x == NULL || key->leng + 1 > x_size) {
 	if (x) word_free(x);
-	x_size = max(x_size, keylen + 1);
+	x_size = max(x_size, key->leng + 1);
 	x = word_new(NULL, x_size);
     }
 
-    x->leng = keylen;
-    memcpy(x->text, key, keylen);
-    x->text[keylen] = '\0';
+    word_cpy(x, key);
 
-    memcpy(&spamness, data, sizeof(uint32_t));
+    memcpy(&spamness, data->text, sizeof(uint32_t));
     goodness = db_getvalue(rd->dbh_good, x);
 
     prob = spamness / (goodness * rd->scalefactor + spamness);
@@ -148,10 +139,10 @@ static int robx_hook(char *key,  uint32_t keylen,
 
     /* print if token in both word lists */
     if ((verbose > 1 && goodness && spamness) || verbose > 2) {
-	printf("cnt: %4lu,  sum: %11.6f,  ratio: %9.6f,  sp: %3lu,  gd: %3lu,"
-		"  p: %9.6f,  t: ", (unsigned long)*rd->count, *rd->sum,
-		*rd->sum / *rd->count,
-		(unsigned long)spamness, (unsigned long)goodness, prob);
+	printf("cnt: %4lu,  sum: %11.6f,  ratio: %9.6f,"
+		"  sp: %3lu,  gd: %3lu,  p: %9.6f,  t: ", 
+	       (unsigned long)*rd->count, *rd->sum, *rd->sum / *rd->count,
+	       (unsigned long)spamness, (unsigned long)goodness, prob);
 	word_puts(x, stdout);
 	fputc( '\n', stdout);
     }
