@@ -236,7 +236,7 @@ is_mime_container (mime_t * m)
 void
 mime_reset (void)
 {
-  if (DEBUG_MIME (1))
+  if (DEBUG_MIME (0))
     fprintf (dbgout, "*** mime_reset\n");
 
   while (stackp > -1)
@@ -312,7 +312,7 @@ got_mime_boundary(word_t *boundary)
   if (!b.is_valid)
     return false;
 
-  if (DEBUG_MIME (1))
+  if (DEBUG_MIME (0))
     fprintf (dbgout, "*** got_mime_boundary:  stackp: %d, boundary: '%s'\n",
 	     stackp, boundary->text);
 
@@ -441,9 +441,10 @@ mime_disposition (word_t *text)
       break;
     }
   }
-  if (DEBUG_MIME (1) &&  msg_state->mime_disposition == MIME_DISPOSITION_UNKNOWN)
+  if (DEBUG_MIME (0) &&  msg_state->mime_disposition == MIME_DISPOSITION_UNKNOWN)
     fprintf (stderr, "Unknown mime disposition - '%s'\n", w);
   xfree (w);
+  return;
 }
 
 /*********
@@ -485,6 +486,8 @@ mime_encoding (word_t *text)
       break;
     }
   }
+  if (DEBUG_MIME (0) && msg_state->mime_encoding == MIME_ENCODING_UNKNOWN)
+    fprintf (stderr, "Unknown mime encoding - '%s'\n", w);
   xfree (w);
   return;
 }
@@ -510,12 +513,12 @@ mime_type (word_t *text)
     if (strncasecmp (w, typ->name, typ->len) == 0)
     {
       msg_state->mime_type = typ->type;
-      if (DEBUG_MIME (1))
+      if (DEBUG_MIME (1) || DEBUG_LEXER(1))
 	fprintf (dbgout, "*** mime_type: %s\n", text->text);
       break;
     }
   }
-  if (DEBUG_MIME (1) &&  msg_state->mime_type == MIME_TYPE_UNKNOWN)
+  if (DEBUG_MIME (0) &&  msg_state->mime_type == MIME_TYPE_UNKNOWN)
     fprintf (stderr, "Unknown mime type - '%s'\n", w);
   xfree (w);
 
