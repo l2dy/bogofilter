@@ -1,4 +1,5 @@
 /* $Id$ */
+
 /*****************************************************************************
 
 NAME:
@@ -25,6 +26,7 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
     a deviation (fabs (0.5f - prob)) >= MIN_DEV, currently set to 0.0.
 
 ******************************************************************************/
+
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -368,26 +370,26 @@ double compute_probability( char *token )
 
     for (list=word_lists; list != NULL ; list=list->next)
     {
-	if (verbose >= 2)
+	if (verbose*0 >= 2)
 	    fprintf(stderr, "checking list %s for word '%s'.\n", list->name, token);
 	if (override > list->override) break;
 	count=db_getvalue(list->dbh, token);
 	if (count) {
 	    if (list->ignore)
 		return EVEN_ODDS;
-	    if (verbose >= 3)
+	    if (verbose*0 >= 3)
 		fprintf(stderr, "word '%s' found on list %s with count %ld.\n", token, list->name, count);
 	    totalcount+=count*list->weight;
 	    override=list->override;
 	    prob = (double)count;
 	    prob /= list->msgcount;
 	    prob *= list->weight;
-	    if (verbose >= 4)
+	    if (verbose*0 >= 4)
 		fprintf(stderr, "word '%s' has uncorrected spamicity %f.\n", token, prob);
 
 	    prob = min(1.0, prob);
 
-	    if (verbose >= 4)
+	    if (verbose*0 >= 4)
 		fprintf(stderr, "word '%s' has spamicity %f.\n", token, prob);
 
 	    wordprob_add(&wordstats, prob, list->bad);
