@@ -32,6 +32,7 @@ CONTRIBUTORS:
 #include "bool.h"
 #include "charset.h"
 #include "configfile.h"
+#include "datastore.h"
 #include "maint.h"
 #include "error.h"
 #include "find_home.h"
@@ -45,6 +46,10 @@ CONTRIBUTORS:
 #include "xmalloc.h"
 #include "xstrdup.h"
 #include "xstrlcpy.h"
+
+//#ifndef	ENABLE_TDB_DATASTORE
+#include <db.h>
+//#endif
 
 /* includes for scoring algorithms */
 #include "method.h"
@@ -431,23 +436,18 @@ static void print_version(void)
 		  " Robinson"
 #endif
 		  "\n"
+		  "    Database: %s\n",
+		  progtype, version, db_version_str());
 
-		  "    Database:"
-#ifdef	ENABLE_TDB_DATASTORE
-		  " TrivialDB"
-#else
-		  " BerkeleyDB"
-#endif
-		  "\n"
-
+    (void)fprintf(stderr,
 		  "Copyright (C) 2002 Eric S. Raymond\n\n"
 		  "%s comes with ABSOLUTELY NO WARRANTY. "
 		  "This is free software, and you\nare welcome to "
 		  "redistribute it under the General Public License. "
 		  "See the\nCOPYING file with the source distribution for "
 		  "details.\n"
-		  "\n",
-		  progtype, version, PACKAGE);
+		  "\n", 
+		  PACKAGE);
 }
 
 #ifndef	ENABLE_GRAHAM_METHOD
@@ -635,10 +635,6 @@ void process_args_1(int argc, char **argv)
 	    verbose++;
 	    break;
 
-        case 'V':
-	    print_version();
-	    exit(EX_OK);
-
 	case 'W':
 	    incr_wordlist_mode();
 	    break;
@@ -751,6 +747,10 @@ void process_args_2(int argc, char **argv)
 	    else
 		terse_format = "%0.16f";
 	    break;
+
+        case 'V':
+	    print_version();
+	    exit(EX_OK);
 	}
     }
 

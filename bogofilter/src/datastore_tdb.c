@@ -10,14 +10,14 @@ Gyepi Sam <gyepi@praxis-sw.com>   2003
 
 ******************************************************************************/
 
-#include "system.h"
+#include "common.h"
+
 #include <tdb.h>
 #include <stdlib.h>
-#include <sys/types.h>
+
 #include <unistd.h>
 #include <errno.h>
 
-#include "common.h"
 #include "datastore.h"
 #include "maint.h"
 #include "error.h"
@@ -34,6 +34,12 @@ typedef struct {
     TDB_CONTEXT *dbp[2];
 } dbh_t;
 
+/* Function definitions */
+
+const char *db_version_str(void)
+{
+    return "TrivialDB";
+}
 
 static dbh_t *dbh_init(const char *path, size_t count, const char **names)
 {

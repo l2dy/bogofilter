@@ -58,6 +58,19 @@ typedef struct {
 
 /* Function definitions */
 
+const char *db_version_str(void)
+{
+    if (verbose == 0)
+	return "BerkeleyDB";
+    else {
+	static char v[20];
+	snprintf(v, sizeof(v), "BerkeleyDB (%d.%d.%d)",
+		 DB_VERSION_MAJOR, DB_VERSION_MINOR, DB_VERSION_PATCH);
+	return v;
+    }
+}
+
+
 static void db_enforce_locking(dbh_t *handle, const char *func_name)
 {
     if (handle->locked == false) {

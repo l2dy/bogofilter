@@ -110,6 +110,9 @@ int db_lock(int fd, int cmd, short int type);
 /* Prints wordlist name(s) */
 void dbh_print_names(void *vhandle, const char *msg);
 
+/* Returns version string */
+const char *db_version_str(void);
+
 /* This is not currently used ...
  * 
 #define db_write_lock(fd) db_lock(fd, F_SETLKW, F_WRLCK)
