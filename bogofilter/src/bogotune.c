@@ -1007,12 +1007,11 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
     uint mdc = mdval->cnt - 1;
 
     result_t *r;
-    uint pct = 33;
-    uint q33 = sorted[r_count * pct / 100].fn;		/* 33% quantile */
-    uint med = sorted[r_count *  50 / 100].fn;		/* median false negative */
+    uint q33 = sorted[r_count * 33 / 100].fn;		/* 33% quantile */
+    uint med = sorted[r_count * 50 / 100].fn;		/* median false negative */
 
     if (verbose)
-	printf("%d%% fn count was %d\n", pct, med);
+	printf("%d%% fn count was %d\n", 50, med);
 
     for (i = 0; i < r_count; i += 1) {
 	r = &sorted[i];
