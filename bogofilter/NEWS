@@ -5,11 +5,13 @@
 NOTE: More information on important changes for bogofilters updaters
 is in the RELEASE.NOTES files.  Read them!!
 
-0.16.2
+0.16.2	2004-01-16
+
+	* Added '-c' (compact) option to bogominitrain.pl
 
 	2004-01-14
 
-	* Tag Cc: lines as To: lines.e
+	* Tag Cc: lines as To: lines.
 	* Allow setting threshold for auto-updating, using the "-u
 	  value" flag or the "thresh_update=value" option.
 	* Minor FAQ updates.
