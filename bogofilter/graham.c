@@ -113,9 +113,7 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
 	{
 	    hit = pp;
 	    break;
-	}
-	else
-	{
+	} else {
 	    slotdev=DEVIATION(pp->prob);
 	    if (dev-slotdev>EPS && hitdev-slotdev>EPS)
 	    {
@@ -138,8 +136,12 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
 		   DEVIATION(hit->prob), hit->prob, curkey);
 	}
 	hit->prob = prob;
-	strncpy(hit->key, text, MAXTOKENLEN);
-	hit->key[MAXTOKENLEN] = '\0';
+	if (strlcpy(hit->key, text, MAXTOKENLEN) >= MAXTOKENLEN) {
+	    /* The lexer should not have returned a token longer than
+	     * MAXTOKENLEN */
+	    internal_error;
+	    abort();
+	}
     }
     return;
 }
