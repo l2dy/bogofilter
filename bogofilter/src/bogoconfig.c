@@ -44,10 +44,6 @@ CONTRIBUTORS:
 #include "xstrdup.h"
 #include "xstrlcpy.h"
 
-/* #ifndef	ENABLE_TDB_DATASTORE */
-#include <db.h>
-/* #endif */
-
 /* includes for scoring algorithms */
 #include "method.h"
 #ifdef	ENABLE_GRAHAM_METHOD
