@@ -395,7 +395,6 @@ static void help(void)
 static void print_version(void)
 {
     (void)fprintf(stderr,
-		  "\n"
 		  "%s version %s\n"
 		  "Copyright (C) 2002 Eric S. Raymond\n\n"
 		  "%s comes with ABSOLUTELY NO WARRANTY. "
