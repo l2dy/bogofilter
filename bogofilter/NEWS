@@ -21,9 +21,7 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
-0.93.2	2004-12-??
-
-	2004-12-03
+0.93.2	2004-12-03
 
 	* New script bf_resize DIR that checks the sizes of all databases in an
 	  environment and writes a lock size to DB_CONFIG.
