@@ -16,6 +16,7 @@ AUTHOR:
 extern	long msgs_good;
 extern 	long msgs_bad;
 
+void init_msg_counts(void);
 void compute_msg_counts(void);
 void set_msg_counts(char *s);
 

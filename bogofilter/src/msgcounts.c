@@ -24,6 +24,13 @@ long msgs_good = 0L;
 long msgs_bad  = 0L;
 
 /* Function Definitions */
+
+void init_msg_counts()
+{
+    msgs_good = 0L;
+    msgs_bad  = 0L;
+}
+
 void compute_msg_counts()
 {
     wordlist_t* list;
