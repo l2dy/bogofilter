@@ -340,7 +340,7 @@ static void db_lock_list(wordlist_t *list, int type){
 
       dbh_t *handle = tmp->dbh;
       
-      if (list->active == FALSE)
+      if (tmp->active == FALSE)
 	continue;
 
       if (verbose > 1)
