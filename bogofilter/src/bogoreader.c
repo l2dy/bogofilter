@@ -66,20 +66,28 @@ static reader_more_t maildir_next_mail;
 /* maildir is the mailbox format specified in
  * http://cr.yp.to/proto/maildir.html */
 
-static reader_line_t mailbox_getline; /* minds   /^From / */
-static reader_line_t maildir_getline; /* ignores /^From / */
+/* this function checks if there is more mail in a MH directory...
+ * to process, trivial mail_next_mail for uniformity */
+static reader_more_t mh_next_mail;
+
+static reader_line_t simple_getline;	/* ignores /^From / */
+static reader_line_t mailbox_getline;	/* minds   /^From / */
 
 static reader_file_t get_filename;
 
 static void maildir_init(const char *name);
 static void maildir_fini(void);
 
+static void mh_init(const char *name);
+static void mh_fini(void);
+
 typedef enum st_e { IS_DIR, IS_FILE, IS_ERR } st_t;
 
 /* Function Definitions */
 
 /* Checks if name is a directory.
- * Returns IS_DIR for directory, IS_FILE for other type, IS_ERR for error */
+ * Returns IS_DIR for directory, IS_FILE for other type, IS_ERR for error
+ */
 static st_t isdir(const char *name)
 {
     struct stat stat_buf;
@@ -87,14 +95,23 @@ static st_t isdir(const char *name)
     return (S_ISDIR(stat_buf.st_mode) != 0) ? IS_DIR : IS_FILE;
 }
 
+static void save_dirname(const char *name)
+{
+    size_t l = strlen(name);
+    l = min(l, sizeof(dirname)-2);
+    memcpy(dirname, name, l);
+    if (dirname[l-1] != '/')
+	memcpy(dirname+l, "/", 2);
+}
+
 static const char* const maildir_subs[]={ "/new", "/cur", NULL };
 static const char *const *maildir_sub;
-static DIR *maildir_dir;
+static DIR *reader_dir;
 
 /* MA: Check if the given name points to a Maildir. We don't require the
  * /tmp directory for simplicity.
  * This function checks if dir, dir/new and dir/cur are all directories.
- * Returns 1 for "yes", 0 for "no" or -1 for "error"
+ * Returns IS_DIR for directory, IS_FILE for other type, IS_ERR for error
  */
 static st_t ismaildir(const char *dir) {
     st_t r;
@@ -118,6 +135,7 @@ static st_t ismaildir(const char *dir) {
     free(x);
     return IS_DIR;
 }
+
 
 static void dummy_fini(void) { }
 
@@ -178,17 +196,24 @@ static bool open_object(char *obj)
 	}
 	else {
 	    emptyline = false;
-	    reader_getline = mbox_mode ? mailbox_getline : maildir_getline;
-	    object_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
 	    mail_first = true;
+	    reader_getline   = mbox_mode ? mailbox_getline   : simple_getline;
+	    object_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
 	    return true;
 	}
     case IS_DIR:
 	if (ismaildir(filename) == IS_DIR) {
 	    /* MAILDIR */
-	    reader_getline = maildir_getline;
-	    object_next_mail = maildir_next_mail;
 	    maildir_init(filename);
+	    reader_getline   = simple_getline;
+	    object_next_mail = maildir_next_mail;
+	    return true;
+	} 
+	else {
+	    /* MH */
+	    mh_init(filename);
+	    reader_getline   = simple_getline;
+	    object_next_mail = mh_next_mail;
 	    return true;
 	} 
 	/* fallthrough to error */
@@ -204,7 +229,7 @@ static bool open_object(char *obj)
 static bool stdin_next_mailstore(void)
 {
     bool val = mailstore_first;
-    reader_getline = mbox_mode ? mailbox_getline : maildir_getline;
+    reader_getline = mbox_mode ? mailbox_getline : simple_getline;
     object_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
     mailstore_first = false;
     return val;
@@ -268,7 +293,7 @@ static bool maildir_next_mail(void)
     struct dirent *dirent;
 
 trynext: /* ugly but simple */
-    if (maildir_dir == NULL) {
+    if (reader_dir == NULL) {
 	/* open next directory */
 	char *x;
 	size_t siz;
@@ -279,15 +304,15 @@ trynext: /* ugly but simple */
 	x = xmalloc(siz);
 	strlcpy(x, dirname, siz);
 	strlcat(x, *(maildir_sub++), siz);
-	maildir_dir = opendir(x);
-	if (!maildir_dir) {
+	reader_dir = opendir(x);
+	if (!reader_dir) {
 	    fprintf(stderr, "cannot open directory '%s': %s", x,
 		    strerror(errno));
 	}
 	free(x);
     }
 
-    while ((dirent = readdir(maildir_dir)) != NULL) {
+    while ((dirent = readdir(reader_dir)) != NULL) {
 	/* skip dot files */
 	if (dirent->d_name[0] == '.')
 	    continue;
@@ -298,9 +323,9 @@ trynext: /* ugly but simple */
     }
 
     if (dirent == NULL) {
-	if (maildir_dir)
-	    closedir(maildir_dir);
-	maildir_dir = NULL;
+	if (reader_dir)
+	    closedir(reader_dir);
+	reader_dir = NULL;
 	goto trynext;
     }
 
@@ -323,6 +348,55 @@ trynext: /* ugly but simple */
 	fprintf(dbgout, "%s:%d - reading %s (%p)\n", __FILE__, __LINE__, filename, fpin);
 
     return true;
+}
+
+/* iterates over files in a MH directory */
+static bool mh_next_mail(void)
+{
+    struct dirent *dirent;
+
+    while (true) {
+	if (reader_dir == NULL) {
+	    reader_dir = opendir(dirname);
+	    if (!reader_dir) {
+		fprintf(stderr, "cannot open directory '%s': %s", dirname,
+			strerror(errno));
+	    }
+	}
+
+	while ((dirent = readdir(reader_dir)) != NULL) {
+	    /* skip private files */
+	    if (dirent->d_name[0] != '.' &&
+		dirent->d_type == DT_REG)
+		break;
+	}
+
+	if (dirent == NULL) {
+	    if (reader_dir)
+		closedir(reader_dir);
+	    reader_dir = NULL;
+	    return false;
+	}
+
+	filename = namebuff;
+	snprintf(namebuff, sizeof(namebuff), "%s%s", dirname, dirent->d_name);
+
+	if (fpin)
+	    fclose(fpin);
+	fpin = fopen( filename, "r" );
+	if (fpin == NULL) {
+	    fprintf(stderr, "Warning: can't open file '%s': %s\n", filename,
+		    strerror(errno));
+	    /* don't barf, the file may have been changed by another MUA,
+	     * or a directory that just doesn't belong there, just skip it */
+	    continue;
+	}
+
+	if (DEBUG_READER(0))
+	    fprintf(dbgout, "%s:%d - reading %s (%p)\n", __FILE__, __LINE__, filename, fpin);
+
+	return true;
+    }
 }
 
 /*** _getline functions ***********************************************/
@@ -375,7 +449,7 @@ static int mailbox_getline(buff_t *buff)
 }
 
 /* reads a whole file as a mail, no ^From detection */
-static int maildir_getline(buff_t *buff)
+static int simple_getline(buff_t *buff)
 {
     size_t used = buff->t.leng;
     byte *buf = buff->t.text + used;
@@ -407,9 +481,9 @@ static int maildir_getline(buff_t *buff)
 
 static void maildir_fini(void)
 {
-    if (maildir_dir)
-	closedir(maildir_dir);
-    maildir_dir = NULL;
+    if (reader_dir)
+	closedir(reader_dir);
+    reader_dir = NULL;
     return;
 }
 
@@ -418,21 +492,41 @@ static void maildir_fini(void)
 static void maildir_init(const char *name)
 {
     maildir_sub = maildir_subs;
-    maildir_dir = NULL;
+    reader_dir = NULL;
     fini = maildir_fini;
 
-    strlcpy(dirname, name, sizeof(dirname));
+    save_dirname(name);
 
     return;
 }
 
+/* MH specific functions */
+
+static void mh_fini(void)
+{
+    if (reader_dir)
+	closedir(reader_dir);
+    reader_dir = NULL;
+    return;
+}
+
+/* initialize iterators for MH subdirectories, 
+ * cur and new. */
+static void mh_init(const char *name)
+{
+    reader_dir = NULL;
+    fini = mh_fini;
+
+    save_dirname(name);
+
+    return;
+}
 
 /* returns current file name */
 static const char *get_filename(void)
 {
     return filename;
 }
-
 
 /* global reader initialization, exported */
 void bogoreader_init(int _argc, char **_argv)
