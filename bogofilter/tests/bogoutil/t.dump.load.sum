@@ -1,15 +1,15 @@
      23      64 ../t.dump.load.inp
-      8      19 ../t.dump.load.upd
+      8      22 ../t.dump.load.upd
      23      69 tst.out.1
      28      84 tst.out.2
-     14      42 tst.out.3
-     13      39 tst.out.4
-      8      24 tst.out.5
-      5      15 tst.out.6
-    122     356 total
+      9      27 tst.out.3
+      9      27 tst.out.4
+      5      15 tst.out.5
+      2       6 tst.out.6
+    107     314 total
      27      83 diff.1.2
-     26      79 diff.2.3
-      5      16 diff.3.4
-     17      52 diff.4.5
-     11      34 diff.5.6
-     86     264 total
+     28      85 diff.2.3
+      1       0 diff.3.4
+     12      37 diff.4.5
+      7      22 diff.5.6
+     75     227 total
