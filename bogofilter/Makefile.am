@@ -17,17 +17,11 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 		bogofilter.cf.example \
 		bogofilter.spec bogofilter.spec.in \
 		METHODS Doxyfile gnugetopt \
-		CHANGES-0.10 README.cvs \
-		CHANGES-0.11 RELEASE.NOTES-0.11 \
-		CHANGES-0.12 RELEASE.NOTES-0.12 \
-		CHANGES-0.13 RELEASE.NOTES-0.13 \
-		CHANGES-0.14 RELEASE.NOTES-0.14 \
-		CHANGES-0.15 RELEASE.NOTES-0.15 \
-		CHANGES-0.16 RELEASE.NOTES-0.16 \
-		CHANGES-0.17 RELEASE.NOTES-0.17 \
-		CHANGES-0.9x RELEASE.NOTES-0.92
+		README.cvs \
+		RELEASE.NOTES \
+		RELEASE.NOTES-0.92
 
-.PHONY:	rpm cvs-check
+.PHONY:	check
 
 rpm:	dist
 	rpm -ta $(distdir).tar.gz
