@@ -13,7 +13,7 @@ sysconf_DATA = bogofilter.cf.example
 # what to build that from
 
 # what to distribute
-EXTRA_DIST = autogen.sh \
+EXTRA_DIST = autogen.sh gsl \
 	     bogofilter.cf.example \
 	     bogofilter.spec bogofilter.spec.in \
 	     METHODS UPGRADE Doxyfile \
@@ -41,3 +41,7 @@ cvs-check:
 # each of them, running them in parallel
 rsync:	distdir .rsyncs
 	@( cat .rsyncs | sed -e 's}^}rsync -av --delete $(PACKAGE)-$(VERSION)/ }; s/\($$\)/ \&/;' ; echo "wait" ) | $(SHELL) -x
+
+dist-hook:
+	cd $(distdir) && find doc -name CVS -type d -prune -exec rm -r '{}' ';'
+	rm -f $(distdir)/doc/.cvsignore

@@ -430,8 +430,34 @@ AC_MSG_CHECKING([whether xmlto is available])
 AC_MSG_RESULT($ac_cv_enable_xmlto)
 
 AM_CONDITIONAL(ENABLE_XMLTO, test x$ac_cv_enable_xmlto = xyes)
-
 dnl end of tests
+
+dnl BEGIN EMBEDDED GSL
+AC_CACHE_CHECK([for extended floating point registers],ac_cv_c_extended_fp,
+	       [case "$host" in
+		*sparc*-*-*) ac_cv_c_extended_fp=no ;;     
+		*powerpc*-*-*) ac_cv_c_extended_fp=no ;;      
+		*hppa*-*-*) ac_cv_c_extended_fp=no ;;      
+		*alpha*-*-*) ac_cv_c_extended_fp=no ;;      
+		*68k*-*-*) ac_cv_c_extended_fp=yes ;;      
+		*86*-*-*) ac_cv_c_extended_fp=yes ;;      
+		*) ac_cv_c_extended_fp=unknown ;;
+	    esac])
+
+if test $ac_cv_c_extended_fp != "no" ; then
+  AC_DEFINE(HAVE_EXTENDED_PRECISION_REGISTERS,1)
+  AC_SUBST(HAVE_EXTENDED_PRECISION_REGISTERS)
+fi
+dnl END EMBEDDED GSL
+
+AH_BOTTOM([
+#if HAVE_EXTENDED_PRECISION_REGISTERS
+#define GSL_COERCE_DBL(x) (gsl_coerce_double(x))
+#else
+#define GSL_COERCE_DBL(x) (x)
+#endif
+])
+
 
 AC_CACHE_SAVE
 
@@ -449,14 +475,19 @@ if test "$sysconfdir" = "\${prefix}/etc" \
     )
 fi
 
-AM_PATH_GSL(1.4, AC_DEFINE(HAVE_GSL_14,,[Define if you have GNU Scientific Library 1.4 or newer]),GSL_LIBS="")
+need_my_gsl=0
+AM_PATH_GSL(1.4, AC_DEFINE(HAVE_GSL_14,,[Define if you have GNU Scientific Library 1.4 or newer]),
+GSL_LIBS="libbf_gsl.a"
+need_my_gsl=1)
+
+AM_CONDITIONAL(NEED_GSL,test $need_my_gsl = 1)
 
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 AC_CONFIG_FILES([Makefile \
 		bogofilter.spec \
 		trio/Makefile \
 		contrib/Makefile doc/Makefile \
-		src/Makefile src/dcdflib/Makefile src/dcdflib/src/Makefile \
+		src/Makefile \
 		src/tests/Makefile \
 		tuning/Makefile \
 		])

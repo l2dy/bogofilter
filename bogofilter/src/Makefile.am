@@ -2,7 +2,7 @@
 
 # foreign: don't insist on ChangeLog
 # 1.6: minimum version of automake/aclocal
-SUBDIRS =  dcdflib . tests
+SUBDIRS = . tests
 SYSCONFDIR = @sysconfdir@
 DISTCHECK_CONFIGURE_FLAGS= @DISTCHECK_CONFIGURE_FLAGS@
 
@@ -25,7 +25,23 @@ if ENABLE_MEMDEBUG
 MEMDEBUG_SRC = memdebug.c memdebug.h
 endif
 
-AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc -I$(top_srcdir)/trio
+noinst_LIBRARIES = libbogofilter.a
+
+if NEED_GSL
+libbf_gsl_a_CFLAGS=$(AM_CFLAGS) -DRENAMEFILES
+libbf_gsl_a_SOURCES= \
+../gsl/cdf/chisq.c ../gsl/cdf/gamma.c \
+../gsl/specfunc/gamma_inc.c ../gsl/err/error.c \
+../gsl/sys/infnan.c ../gsl/sys/fdiv.c \
+../gsl/specfunc/exp.c ../gsl/specfunc/trig.c \
+../gsl/specfunc/log.c ../gsl/specfunc/psi.c \
+../gsl/specfunc/zeta.c ../gsl/specfunc/elementary.c \
+../gsl/err/stream.c ../gsl/specfunc/expint.c \
+../gsl/specfunc/erfc.c ../gsl/sys/coerce.c
+noinst_LIBRARIES += libbf_gsl.a
+endif
+
+AM_CPPFLAGS = -I$(top_srcdir)/trio -I$(top_srcdir)
 AM_CFLAGS = -DBOGOFILTER
 
 # what to build
@@ -38,7 +54,6 @@ endif
 check_PROGRAMS = debugtest configtest wordhash find_home.test \
 		 bogowordfreq fgetsl.test
 
-noinst_LIBRARIES = libbogofilter.a
 TESTS=
 
 if NEEDTRIO
@@ -96,7 +111,6 @@ libbogofilter_a_SOURCES= \
 	xstrlcat.h xstrlcat.c \
 	xstrlcpy.h xstrlcpy.c \
 	$(MEMDEBUG_SRC) \
-	dcdflib/src/dcdflib.c dcdflib/src/ipmpar.c \
 	xatox.h xatof.c xatoi.c \
 	datastore_db.h
 

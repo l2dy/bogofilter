@@ -9,15 +9,10 @@ NAME:
 
 #include "common.h"
 
+#include <gsl/gsl_cdf.h>
 #include <math.h>
 
-#include <dcdflib.h>
-
 #include "fisher.h"
-
-#ifdef HAVE_GSL_14
-#include <gsl/gsl_cdf.h>
-#endif
 
 #define	RF_DEBUG
 #undef	RF_DEBUG
@@ -70,22 +65,10 @@ static rob_stats_t fis_stats;
 
 /* Function Definitions */
 
-static double prbf(double x, double df)
+inline static double prbf(double x, double df)
 {
-#ifdef HAVE_GSL_14
     double r = gsl_cdf_chisq_Q(x, df);
     return (r < DBL_EPSILON) ? 0.0 : r;
-#else
-    int which=1;
-    double p, q;
-    int status;
-    double bound;
-
-    /* pass in x, df; want p and q; return q */
-    cdfchi(&which, &p, &q, &x, &df, &status, &bound);
-
-    return(status==0 ? q : 1.0);
-#endif
 }
 
 double fis_get_spamicity(size_t robn, FLOAT P, FLOAT Q )
