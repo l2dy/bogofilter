@@ -147,6 +147,11 @@ token_t get_token(void)
 	case NONE:		/* nothing to do */
 	    break;
 	case MSG_COUNT_LINE:
+	    {
+		char *s = (char *)yylval->text+1;
+		s = strchr(s, ' ');
+		set_msg_counts(s);
+	    }
 	case BOGO_LEX_LINE:
 	    done = true;
 	    break;

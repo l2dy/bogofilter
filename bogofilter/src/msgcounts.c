@@ -10,6 +10,7 @@ AUTHOR:
 
 ******************************************************************************/
 
+#include <ctype.h>
 #include <stdlib.h>
 
 #include <config.h>
@@ -46,8 +47,11 @@ void compute_msg_counts()
 
 void set_msg_counts(char *s)
 {
+    while (isspace((unsigned char) *s))
+	   s += 1;
     msgs_bad = atoi(s);
-    s = strtok(s+1, " ");
+    while (isdigit((unsigned char) *s))
+	   s += 1;
     msgs_good = atoi(s);
 }
 
