@@ -17,7 +17,7 @@ AUTHOR:
 #include <ctype.h>
 #include <db.h>
 
-#include "version.h
+#include "version.h"
 #include "datastore.h"
 #include "datastore_db.h"
 
