@@ -41,7 +41,6 @@ AUTHOR:
 
 /* Global variables */
 
-
 int nonspam_exits_zero;	/* '-e' */
 int force;		/* '-f' */
 int logflag;		/* '-l' */
@@ -61,8 +60,16 @@ bool	stats_in_header = TRUE;
 const char *stats_prefix;
 
 run_t run_type = RUN_NORMAL; 
-#ifndef DISABLE_GRAHAM_METHOD
+
+#ifdef	GRAHAM_AND_ROBINSON
 algorithm_t algorithm = AL_GRAHAM;
+#else
+#ifdef	ENABLE_GRAHAM_METHOD
+algorithm_t algorithm = AL_GRAHAM;
+#endif
+#ifdef	ENABLE_ROBINSON_METHOD
+algorithm_t algorithm = AL_ROBINSON;
+#endif
 #endif
 
 double	min_dev = 0.0f;
@@ -294,7 +301,7 @@ static int validate_args(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 	(void)fprintf(stderr, "    The two sets of options may not be used together.\n");
 	(void)fprintf(stderr, "    \n");
 #if 0
-#ifndef DISABLE_GRAHAM_METHOD
+#ifdef	GRAHAM_AND_ROBINSON
 	(void)fprintf(stderr, "    Options '-g', '-r', '-l', '-d', '-x', and '-v' may be used with either mode.\n");
 #else
 	(void)fprintf(stderr, "    Options '-l', '-d', '-x', and '-v' may be used with either mode.\n");
@@ -312,7 +319,7 @@ static void help(void)
     (void)printf( "Usage: bogofilter [options] < message\n" );
     (void)printf( "\t-h\t- print this help message.\n" );
     (void)printf( "\t-d path\t- specify directory for wordlists.\n" );
-#ifndef DISABLE_GRAHAM_METHOD
+#ifdef	GRAHAM_AND_ROBINSON
     (void)printf( "\t-g\t- select Graham spam calulation method (default).\n" );
     (void)printf( "\t-r\t- select Robinson spam calulation method.\n" );
 #endif
@@ -354,7 +361,7 @@ int process_args(int argc, char **argv)
     int option;
     int exitcode;
 
-#ifdef DISABLE_GRAHAM_METHOD
+#ifndef	GRAHAM_AND_ROBINSON
 #define	OPTIONS "d:ehlsnSNvVpuc:CRx:fq"
 #else
 #define	OPTIONS "d:ehlsnSNvVpuc:CgrRx:fq"
@@ -415,14 +422,14 @@ int process_args(int argc, char **argv)
 	    logflag = 1;
 	    break;
 
-#ifndef DISABLE_GRAHAM_METHOD
+#ifdef	GRAHAM_AND_ROBINSON
 	case 'g':
 	    algorithm = AL_GRAHAM;
 	    break;
 #endif
 	case 'R':
 	    Rtable = 1;
-#ifndef DISABLE_GRAHAM_METHOD
+#ifdef	GRAHAM_AND_ROBINSON
 	/*@fallthrough@*/
 	/* fall through to force Robinson calculations */
 	case 'r':
@@ -450,6 +457,7 @@ int process_args(int argc, char **argv)
 	case 'C':
 	    suppress_config_file = TRUE;
 	    break;
+
 	default:
 	    fprintf( stderr, "Unknown option '%c' (%02X)\n", option,
 		    (unsigned int)option);

@@ -32,13 +32,25 @@ const bool FALSE = false;
 const bool TRUE = true;
 #endif
 
+#ifndef	DISABLE_GRAHAM_METHOD
+#define	ENABLE_GRAHAM_METHOD
+#endif
+
+#ifndef	DISABLE_ROBINSON_METHOD
+#define	ENABLE_ROBINSON_METHOD
+#endif
+
+#if	defined(ENABLE_ROBINSON_METHOD) && defined(ENABLE_GRAHAM_METHOD)
+#define	GRAHAM_AND_ROBINSON
+#endif
+
+typedef enum algorithm_e { AL_GRAHAM='g', AL_ROBINSON='r' } algorithm_t;
+extern algorithm_t algorithm;
+
 typedef enum dbmode_e { DB_READ = 0, DB_WRITE = 1 } dbmode_t;
 
-typedef enum run_e { RUN_NORMAL=0, RUN_UPDATE, REG_SPAM, REG_GOOD, REG_SPAM_TO_GOOD, REG_GOOD_TO_SPAM } run_t;
+typedef enum run_e { RUN_NORMAL='r', RUN_UPDATE='u', REG_SPAM='s', REG_GOOD='n', REG_SPAM_TO_GOOD='N', REG_GOOD_TO_SPAM='S' } run_t;
 extern run_t run_type;
-
-typedef enum algorithm_e { AL_GRAHAM = 1, AL_ROBINSON } algorithm_t;
-extern algorithm_t algorithm;
 
 void build_path(char* dest, int size, const char* dir, const char* file);
 
