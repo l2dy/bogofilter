@@ -58,3 +58,12 @@ not have fcntl support.
 12) Record the message count as a value in the db file. Use a magic key that 
 can't collide with any words (by using uppercase letters or nonprintable 
 characters). This will obviate the need for .count files.
+
+13) Create a wordlist import/export tool that runs as a separate CLI
+program. It should be able to dump wordlists into 'makemap' compatible text
+files, and be able to convert those files back to wordlist files.
+
+14) Provide support for the BerkeleyDB v1 API. If the configure script can't
+find a version 2+ version of the BerkeleyDB package, it should #define
+a variable that allows alternate database procedures to be compiled in.
+
