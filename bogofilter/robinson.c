@@ -166,8 +166,7 @@ static double compute_probability(const char *token)
     }
 
     prob=wordprob_result(&wordstats);
-    if ((Rtable || verbose) &&
-	(fabs(EVEN_ODDS - prob) >= min_dev))
+    if (Rtable || verbose)
 	rstats_add(token, wordstats.good, wordstats.bad, prob);
 
     return prob;
@@ -257,9 +256,9 @@ double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 
 void rob_print_summary(void)
 {
-    (void)fprintf(stdout, "%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
-		  rob_stats.robn+1, "P_Q_S_invsum_logsum", 
-		  rob_stats.p_pr, rob_stats.q_pr, rob_stats.s.spamicity, rob_stats.p_ln, rob_stats.q_ln);
+    (void)fprintf(stdout, "%3d  %-20s %9.6f %9.6f %9.6f %9.3f %9.3f %4.2f\n",
+		  rob_stats.robn+1, "P_Q_S_invs_logs_md", 
+		  rob_stats.p_pr, rob_stats.q_pr, rob_stats.s.spamicity, rob_stats.p_ln, rob_stats.q_ln, min_dev);
 }
 
 void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double _spam_cutoff)
