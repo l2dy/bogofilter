@@ -334,7 +334,9 @@ int process_args(int argc, char **argv)
     {
 #if 0
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
-	    fprintf(stderr, "config: option=%c (%d), optind=%d, opterr=%d, optarg=%s\n", isprint((unsigned char)option) ? option : '_', option, optind, opterr, optarg ? optarg : "(null)");
+	    fprintf(stderr, "config: option=%c (%d), optind=%d, opterr=%d, optarg=%s\n", 
+		    isprint((unsigned char)option) ? option : '_', option, 
+		    optind, opterr, optarg ? optarg : "(null)");
 	}
 #endif
 	switch(option)
