@@ -3,16 +3,15 @@
     <td colspan="3" height=55 style="background-image:url(images/header.inc_r2_c2.gif)">&nbsp;</td>
   </tr>
 
-  <tr> <td width="30%"
-	  style="background-image:url(images/header.inc_r2_c2.gif)">
-	  <img src="images/header.inc_r2.gif" alt="Bogofilter
-	  Logo"></td> <td
-	  style="background-image:url(images/header.inc_r2_c2.gif)"
-	  valign=top><span class="header_version">
-	  &nbsp;V<!--#include virtual="version.inc.txt" -->
-	  </span></td>
-      <td width="20%" ><img src="images/header.inc_r2_c3.gif"
-	  alt="SourceForge Logo"></td> </tr>
+  <tr> <td style="background-image:url(images/header.inc_r2_c2.gif)">
+	  <img src="images/header.inc_r2.gif" alt="Bogofilter Logo">
+	  </td>
+       <td style="background-image:url(images/header.inc_r2_c2.gif)"
+	  valign=top><span class="header_version"> &nbsp;V<!--#include
+	  virtual="version.inc.txt" --> </span></td>
+      <td><img src="images/header.inc_r2_c3.gif"
+	  alt="SourceForge Logo"></td>
+  </tr>
 
   <tr bgcolor="#FFFFFF">
     <td height="18" colspan="3">
