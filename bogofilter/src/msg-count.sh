@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/sh   
 
 # msg-count.sh
 #
@@ -7,7 +7,6 @@
 #
 # $Id$ 
 
-
 # split file on stdin at "From " lines and pipe the parts into a command
 # which is given in the arguments.
 # WARNING: this does not escape any shell prompts or something
@@ -15,14 +14,13 @@ pipesplitmbox() {
       ${AWK=awk} "BEGIN { cmd=\"$*\"; } /^From / { close(cmd); } { print | cmd; }"
 }
 
-
 if [ "x$1" = "x-?" ] || [ "x$1" = "x-h" ]; then
     cat <<EOT
 NAME
   msg-count.sh - lexical analysis and database lookup for an email message
                  to convert it to the msg-count format	
 SYNOPSIS
-  msg-count.sh [-h | path/to/bogofilter/directory [bogolexer options]]
+  msg-count.sh [-h | wordlist/dir/path {message_dir} [bogolexer options]]
 
 DESCRIPTION
   msg-count.sh creates a message digest consisting of a .MSG_COUNT line,
@@ -82,7 +80,6 @@ else
     DIR="$1"
     shift
     for f in $DIR/* ; do
-	cat $f | pipesplitmbox $GET_TOKENS | $GET_COUNTS | \
-	    ${AWK=awk} 'NF == 3 { printf( "\"%s\" %s %s\n", $1, $2, $3 ) } '
+	cat $f | $0 $BOGOFILTER_DIR "$@"
     done
 fi
