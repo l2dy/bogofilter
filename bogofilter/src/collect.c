@@ -2,10 +2,6 @@
 
 /* collect.c -- tokenize input and cap word frequencies, return a wordhash */
 
-#ifdef __EMX__
-#include <os2.h>
-#endif
-
 #include "common.h"
 
 #include <stdlib.h>
