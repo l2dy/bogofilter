@@ -8,5 +8,5 @@
 # remember to use ${srcdir}
 echo 74 65 73 74 00 74 65 0d 73 74 0d 0a \
 | ./dehex >${TMPDIR}/input
-$VAL ../bogofilter -e -p -C <${TMPDIR}/input >${TMPDIR}/output
+$VAL ${relpath}/bogofilter -e -p -C <${TMPDIR}/input >${TMPDIR}/output
 ./dumbhead -1 <${TMPDIR}/output | cmp - ${TMPDIR}/input

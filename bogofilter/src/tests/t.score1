@@ -4,4 +4,4 @@
 
 # make sure that an uninitialized data base will not lead to bogus
 # spam qualifications
-echo | $VAL ../bogofilter -p -e -C >/dev/null
+echo | $VAL ${relpath}/bogofilter -p -e -C >/dev/null

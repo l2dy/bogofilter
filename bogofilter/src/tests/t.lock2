@@ -15,7 +15,7 @@ EOF
 
 grind() {
     a=0
-    ../bogofilter -n -d $TMPDIR -c $CONFIG <$TMPDIR/inp 2>> $TMPDIR/log || a=$?
+    ${relpath}/bogofilter -n -d $TMPDIR -c $CONFIG <$TMPDIR/inp 2>> $TMPDIR/log || a=$?
     echo >>$TMPDIR/res $a
 }
 

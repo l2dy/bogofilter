@@ -6,6 +6,6 @@
 # spam qualifications
 # ensure that "nonspam" exits with code 1
 ( set +e
-echo | $VAL ../bogofilter -p -C >/dev/null
+echo | $VAL ${relpath}/bogofilter -p -C >/dev/null
 if [ $? -eq 1 ] ; then exit 0 ; else exit 1 ; fi
 )

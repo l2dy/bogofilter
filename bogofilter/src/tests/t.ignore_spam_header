@@ -19,7 +19,7 @@ Friend,
 
 EOF
 
-$VAL ../bogofilter -p -e -C < $TMPDIR/input > $TMPDIR/output
+$VAL ${relpath}/bogofilter -p -e -C < $TMPDIR/input > $TMPDIR/output
 
 count=`grep $shn $TMPDIR/output | wc -l`
 test $count = "1"
