@@ -29,7 +29,7 @@ AUTHOR:
 /* Local Variables */
 
 word_t *yylval = NULL;
-word_t *ipaddr = NULL;		/* First IP Address in Received: statement */
+word_t *msg_addr = NULL;	/* First IP Address in Received: statement */
 
 static token_t save_class = NONE;
 static word_t *ipsave = NULL;
@@ -180,11 +180,11 @@ token_t get_token(void)
 	    /* if top level, no address, not localhost, .... */
 	    if (token_prefix == w_recv &&
 		msg_state == msg_state->parent && 
-		ipaddr == NULL &&
+		msg_addr == NULL &&
 		strcmp(yylval->text, "127.0.0.1") != 0) {
 		/* Not guaranteed to be the originating address of the message. */
-		word_free(ipaddr);
-		ipaddr = word_dup(yylval);
+		word_free(msg_addr);
+		msg_addr = word_dup(yylval);
 	    }
 	case IPADDR:
 	    if (block_on_subnets)
@@ -277,7 +277,6 @@ token_t get_token(void)
 void token_init(void)
 {
     yyinit();
-    WFREE(ipaddr);
 
     if (!msg_count_file)
 	mime_reset();
@@ -296,6 +295,8 @@ void token_init(void)
 	w_head = word_new((const byte *) "head:", 0);	/* Header:      */
 	w_mime = word_new((const byte *) "mime:", 0);	/* Mime:        */
     }
+
+    WFREE(msg_addr);
 
     return;
 }
@@ -360,5 +361,5 @@ void token_cleanup()
     WFREE(w_recv);
     WFREE(w_head);
     WFREE(w_mime);
-    WFREE(ipaddr);
+    WFREE(msg_addr);
 }
