@@ -24,7 +24,7 @@ unset LC_ALL
 LC_COLLATE=
 unset LC_COLLATE
 
-GREP="grep -v /tst.out"
+GREP="grep -v /output-dl-"
 
 rm -f $DATA
 
@@ -32,58 +32,52 @@ rm -f $DATA
 $BOGOUTIL -l $DATA -y 20020815 < $BASE.inp
 
 #dump database (no restrictions, all dates should by 'yday')
-$BOGOUTIL -d $DATA -y 20020815 $sort > ${TMPDIR}/tst.out.1
+$BOGOUTIL -d $DATA -y 20020815 > ${TMPDIR}/output-dl-1.txt
 
 #update some words, including some old dates
 $BOGOUTIL -l $DATA -y 20021215 < $BASE.upd
 #dump database
-$BOGOUTIL -d $DATA $sort > ${TMPDIR}/tst.out.2
+$BOGOUTIL -d $DATA > ${TMPDIR}/output-dl-2.txt
 
 #confirm that updated words have different counts and dates
-( diff -u ${TMPDIR}/tst.out.1 ${TMPDIR}/tst.out.2 ; echo "" ) | $GREP | tee ${TMPDIR}/diff.1.2 >> $OUT
+( diff -u ${TMPDIR}/output-dl-1.txt ${TMPDIR}/output-dl-2.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.1.2.txt >> $OUT
 
 #dump wordlist, excluding oldest entries
-$BOGOUTIL -a 20020815 -d $DATA $sort > ${TMPDIR}/tst.out.3
+$BOGOUTIL -a 20020815 -d $DATA > ${TMPDIR}/output-dl-3.txt
 
 #confirm exclusion of oldest entries
-( diff -u ${TMPDIR}/tst.out.2 ${TMPDIR}/tst.out.3 ; echo "" ) | $GREP | tee ${TMPDIR}/diff.2.3 >> $OUT
+( diff -u ${TMPDIR}/output-dl-2.txt ${TMPDIR}/output-dl-3.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.2.3.txt >> $OUT
 
 #dump wordlist, excluding oldest, shortest, and longest entries
-$BOGOUTIL -a 20020815 -s4,30 -d $DATA $sort > ${TMPDIR}/tst.out.4
+$BOGOUTIL -a 20020815 -s4,30 -d $DATA > ${TMPDIR}/output-dl-4.txt
 
 #confirm exclusion of oldest, shortest(<, and longest entries
-( diff -u ${TMPDIR}/tst.out.3 ${TMPDIR}/tst.out.4 ; echo "" ) | $GREP | tee ${TMPDIR}/diff.3.4 >> $OUT
+( diff -u ${TMPDIR}/output-dl-3.txt ${TMPDIR}/output-dl-4.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.3.4.txt >> $OUT
 
 rm -f $DATA
 
 #load wordlist, excluding shortest entries
-$BOGOUTIL -s5,30 -l $DATA < ${TMPDIR}/tst.out.4
+$BOGOUTIL -s5,30 -l $DATA < ${TMPDIR}/output-dl-4.txt
 #dump using replace_non-ascii option
-$BOGOUTIL -n -d $DATA $sort > ${TMPDIR}/tst.out.5
+$BOGOUTIL -n -d $DATA > ${TMPDIR}/output-dl-5.txt
 
 #confirm effect of non-ascii option
-( diff -u ${TMPDIR}/tst.out.4 ${TMPDIR}/tst.out.5 ; echo "" ) | $GREP | tee ${TMPDIR}/diff.4.5 >> $OUT
+( diff -u ${TMPDIR}/output-dl-4.txt ${TMPDIR}/output-dl-5.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.4.5.txt >> $OUT
 
 rm -f $DATA
 
 #load wordlist non-ascii list and dump to show value combining
-$BOGOUTIL -a 20021010 -l $DATA < ${TMPDIR}/tst.out.5
-$BOGOUTIL -a 20021010 -d $DATA $sort > ${TMPDIR}/tst.out.6
+$BOGOUTIL -a 20021010 -l $DATA < ${TMPDIR}/output-dl-5.txt
+$BOGOUTIL -a 20021010 -d $DATA > ${TMPDIR}/output-dl-6.txt
 
 #confirm token merging
-( diff -u ${TMPDIR}/tst.out.5 ${TMPDIR}/tst.out.6 ; echo "" ) | $GREP | tee ${TMPDIR}/diff.5.6 >> $OUT
+( diff -u ${TMPDIR}/output-dl-5.txt ${TMPDIR}/output-dl-6.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.5.6.txt >> $OUT
 
-cd ${TMPDIR}
-wc -l -c ../$BASE.*p* tst.out.? > $SUM
-wc -l -c diff.?.? >> $SUM
-cd ..
-
-if  [ $verbose -eq 0 ]; then
-    cmp $SUM ${TMPDIR}/$SUM
-else
-    diff -u -s --brief $SUM ${TMPDIR}/$SUM
-fi
-
-if [ ! -z "$RUN_FROM_MAKE" ] ; then
-    rm -rf ${TMPDIR}
-fi
+for i in ${TMPDIR}/output-dl-?.txt ; do
+    j=`basename $i`
+    if  [ $verbose -eq 0 ]; then
+	cmp $i $j
+    else
+	diff -u -s --brief $i $j
+    fi
+done
