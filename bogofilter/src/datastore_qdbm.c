@@ -7,13 +7,13 @@ datastore_qdbm.c -- implements the datastore, using qdbm.
 
 AUTHORS:
 Gyepi Sam <gyepi@praxis-sw.com>    2003
-Stefan Bellon <sbellon@sbellon.de> 2003
+Matthias Andree <matthias.andree@gmx.de> 2003
 
 ******************************************************************************/
 
 #include "common.h"
 
-#include <relic.h>
+#include <depot.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -36,7 +36,7 @@ typedef struct {
     char *name[IX_SIZE];
     pid_t pid;
     bool locked;
-    DBM *dbp[IX_SIZE];
+    DEPOT *dbp[IX_SIZE];
 } dbh_t;
 
 /* Function definitions */
@@ -102,10 +102,10 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 
     size_t i;
     int flags;
-    DBM *dbp;
+    DEPOT *dbp;
 
     if (open_mode == DB_WRITE)
-	flags = O_RDWR | O_CREAT;
+	flags = DP_OWRITER | DP_OCREAT;
     else
     	flags = O_RDONLY;
 
@@ -117,13 +117,13 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 
     for (i = 0; i < handle->count; i += 1) {
 
-      dbp = handle->dbp[i] = dbm_open(handle->name[i], flags, 0664);
+      dbp = handle->dbp[i] = dpopen(handle->name[i], flags, 0);
 
       if (dbp == NULL)
 	  goto open_err;
 
       if (DEBUG_DATABASE(1)) {
-	  dbh_print_names(dsh->dbh, "(db) dbm_open( ");
+	  dbh_print_names(dsh->dbh, "(qdbm) dpopen( ");
 	  fprintf(dbgout, ", %d )\n", open_mode);
       }
       
@@ -132,6 +132,8 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
     return dsh;
 
  open_err:
+    print_error(__FILE__, __LINE__, "(qdbm) dpopen(%s, %d) failed: %s",
+	    handle->name[i], flags, dperrmsg(dpecode));
     dbh_free(handle);
 
     return NULL;
@@ -142,19 +144,15 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
     int ret = -1; /* cater for handle->count <= 0 */
     size_t i;
     dbh_t *handle = dsh->dbh;
-    datum db_key;
-    DBM *dbp;
-
-    db_key.dptr = token->data;
-    db_key.dsize = token->leng;
+    DEPOT *dbp;
 
     for (i = 0; i < handle->count; i += 1) {
       dbp = handle->dbp[i];
-      ret = dbm_delete(dbp, db_key);
+      ret = dpout(dbp, token->data, token->leng);
 
-      if (ret != 0) {
-          print_error(__FILE__, __LINE__, "(db) dbm_delete('%s'), err: %d",
-                      (char *)token->data, ret);
+      if (ret == 0) {
+          print_error(__FILE__, __LINE__, "(qdbm) dpout('%s'), err: %s",
+                      (char *)token->data, dperrmsg(dpecode));
           exit(EX_ERROR);
       }
     }
@@ -164,30 +162,27 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
 
 int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 {
-    datum db_key;
-    datum db_data;
+    char *data;
+    int dsiz;
 
     dbh_t *handle = dsh->dbh;
-    DBM *dbp = handle->dbp[dsh->index];
+    DEPOT *dbp = handle->dbp[dsh->index];
 
-    db_key.dptr = token->data;
-    db_key.dsize = token->size;
+    data = dpget(dbp, token->data, token->leng, 0, -1, &dsiz);
 
-    db_data = dbm_fetch(dbp, db_key);
-
-    if (db_data.dptr == NULL)
+    if (data == NULL)
 	return DS_NOTFOUND;
 
-    if (val->size < db_data.dsize) {
-	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%s' ), size error %d::%d",
-		    (char *)token->data, val->size, db_data.dsize);
+    if (val->size < dsiz) {
+	print_error(__FILE__, __LINE__, "(qdbm) db_get_dbvalue( '%s' ), size error %d: %d",
+		    (char *)token->data, val->size, dsiz);
 	exit(EX_ERROR);
     }
 
-    val->leng = db_data.dsize;		/* read count */
-    memcpy(val->data, db_data.dptr, db_data.dsize);
-    
-    // don't free db_data.dptr as qdbm/relic has it's own internal buffer!
+    val->leng = dsiz;		/* read count */
+    memcpy(val->data, data, dsiz);
+
+    free(data);
 
     return 0;
 }
@@ -196,27 +191,19 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
 {
     int ret;
-    datum db_key;
-    datum db_data;
 
     dbh_t *handle = dsh->dbh;
-    DBM *dbp = handle->dbp[dsh->index];
+    DEPOT *dbp = handle->dbp[dsh->index];
 
-    db_key.dptr = token->data;
-    db_key.dsize = token->leng;
+    ret = dpput(dbp, token->data, token->leng, val->data, val->leng, DP_DOVER);
 
-    db_data.dptr = val->data;
-    db_data.dsize = val->leng;		/* write count */
-
-    ret = dbm_store(dbp, db_key, db_data, DBM_REPLACE);
-
-    if (ret != 0) {
-	print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%*s' ), err: %d",
-		    token->size, (char *)token->data, ret);
+    if (ret == 0) {
+	print_error(__FILE__, __LINE__, "(qdbm) db_set_dbvalue( '%*s' ), err: %d",
+		    token->size, (char *)token->data, dpecode);
 	exit(EX_ERROR);
     }
 
-    return ret;
+    return 0;
 }
 
 
@@ -229,12 +216,12 @@ void db_close(void *vhandle, bool nosync)
     if (handle == NULL) return;
 
     if (DEBUG_DATABASE(1)) {
-      dbh_print_names(vhandle, "db_close");
+      dbh_print_names(vhandle, "(qdbm) db_close");
       fprintf(dbgout, " %s\n", nosync ? "nosync" : "sync");
     }
 
     for (i = 0; i < handle->count; i += 1) {
-        dbm_close(handle->dbp[i]);
+        dpclose(handle->dbp[i]);
     }
 
     dbh_free(handle);
@@ -243,49 +230,59 @@ void db_close(void *vhandle, bool nosync)
 /*
  flush any data in memory to disk
 */
-void db_flush(/*@unused@*/  __attribute__ ((unused)) dsh_t *dsh)
+void db_flush(dsh_t *dsh)
 {
-    /* noop */
+    dbh_t *handle = dsh->dbh;
+    size_t i;
+
+    for (i = 0; i < handle->count; i++) {
+	DEPOT * dbp = handle->dbp[i];
+
+	if (!dpsync(dbp))
+	    print_error(__FILE__, __LINE__, "(qdbm) dpsync failed: %s",
+		    dperrmsg(dpecode));
+    }
 }
 
 int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 {
     dbh_t *handle = dsh->dbh;
-    DBM *dbp = handle->dbp[dsh->index];
-    datum key, data;
+    DEPOT *dbp = handle->dbp[dsh->index];
     dbv_t dbv_key, dbv_data;
+    int ksiz, dsiz;
+    char *key, *data;
 
     int ret = 0;
 
-    key = dbm_firstkey(dbp);
-    while (key.dptr) {
-        data = dbm_fetch(dbp, key);
-        if (data.dptr) {
-           /* Question: Is there a way to avoid using malloc/free? */
+    ret = dpiterinit(dbp);
+    if (ret) {
+	while ((key = dpiternext(dbp, &ksiz))) {
+	    data = dpget(dbp, key, ksiz, 0, -1, &dsiz);
+	    if (data) {
+		/* switch to "dbv_t *" variables */
+		dbv_key.leng = ksiz;
+		dbv_key.data = xmalloc(dbv_key.leng+1);
+		memcpy(dbv_key.data, key, ksiz);
+		((char *)dbv_key.data)[dbv_key.leng] = '\0';
 
-           /* switch to "dbv_t *" variables */
-           dbv_key.leng = key.dsize;
-           dbv_key.data = xmalloc(dbv_key.leng+1);
-           memcpy(dbv_key.data, key.dptr, dbv_key.leng);
-           ((char *)dbv_key.data)[dbv_key.leng] = '\0';
+		dbv_data.data = data;
+		dbv_data.leng = dsiz;		/* read count */
+		dbv_data.size = dsiz;
 
-           dbv_data.data = data.dptr;
-           dbv_data.leng = data.dsize;		/* read count */
-           dbv_data.size = data.dsize;
+		/* call user function */
+		ret = hook(&dbv_key, &dbv_data, userdata);
 
-           /* call user function */
-           ret = hook(&dbv_key, &dbv_data, userdata);
+		xfree(dbv_key.data);
 
-           xfree(dbv_key.data);
-
-           if (ret != 0)
-              break;
-        }
-        key = dbm_nextkey(dbp);
-    }
-
-    if (ret == -1) {
-	print_error(__FILE__, __LINE__, "(db) db_foreach err: %d", ret);
+		if (ret != 0)
+		    break;
+		free(data);
+	    }
+	    free(key);
+	}
+    } else {
+	print_error(__FILE__, __LINE__, "(qdbm) dpiterinit err: %s",
+		dperrmsg(dpecode));
 	exit(EX_ERROR);
     }
 
@@ -293,5 +290,5 @@ int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 }
 
 const char *db_str_err(int e) {
-    return "QDBM error";
+    return dperrmsg(e);
 }
