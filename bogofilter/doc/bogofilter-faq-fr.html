@@ -80,6 +80,9 @@
 	  
           <li><a href="#production">Comment conserver une bonne d'acuité?</a></li>
 	  
+	  <li><a href="#production">Qu'est-ce que "l'entrainement sur erreur" et
+	  "l'entrainement sur épuisement"?</a></li>
+	 
           <li><a href="#spamassassin">Comment puis-je utiliser
           SpamAssassin pour entraîner Bogofilter?</a></li>
 
@@ -240,52 +243,82 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
     a besoin d'apprendre votre courrier. Pour commencer, le mieux est d'avoir
     un corpus (aussi large que possible) de messages dont vous êtes sûr de
     l'état de ham ou de spam. (Des erreurs à ce stade occasionneront des problèmes plus tard,
-    aussi, soyez attentifs). Attention, n'utilisez que votre email. L'utilisation d'autres
-    corpus (tel qu'un corpus trouvé sur Internet), peut entraîner
-    Bogofilter à tirer de mauvaises conclusions, après tout, votre but est de lui
+    aussi, soyez attentifs <code>;-)</code>). Attention, n'utilisez que votre email. L'utilisation d'autres
+    corpus (tel qu'un corpus trouvé sur Internet), peut pousser
+    Bogofilter à tirer de mauvaises conclusions&#8212 après tout, votre but est de lui
     faire comprendre <em>votre</em> courrier.</p>
     
-    <p>Une fois que vous avez vos corpus de spam et de ham, vous avez trois
+    <p>Une fois que vous avez vos corpus de spam et de ham, vous avez quatre
     choix possibles. Dans tous les cas, cela fonctionnera mieux si votre base
     d'apprentissage (les corpus ci-dessus) est conséquente. Plus un corpus est
     petit, plus grand sera le nombre d'erreurs que fera Bogofilter en production. Supposons
     que vos corpus se trouvent dans deux fichiers mbox: ham.mbx et spam.mbx.</p>
 
     <ul>
-    <li><p>Méthode 1) Entraînez Bogofilter avec tous vos messages. Dans notre
+    <li><p>Méthode 1) Entrainement complet : Entraînez Bogofilter avec tous vos messages. Dans notre
     example :</p>
     <pre>
     bogofilter -s &lt; spam.mbx
     bogofilter -n &lt; ham.mbx
     </pre></li>
-    <li><p>Méthode 2) Utilisez le script randomtrain (dans le répertoire contrib).
-    Il applique une technique d'apprentissage sur erreur, en clair : n'ajouter à la
-    base de données que les messages que Bogofilter ne peut évaluer correctement.
-    Le script génère une liste de l'ensemble des messages dans les mailbox, mélange la liste, puis
-    évalue chaque message. Tout message que Bogofilter évalue incorrectement, par exemple un ham
-    en spam ou inversement, est alors utilisé pour agrandir la liste des mots.
-    Ceci produit une base de données beaucoup plus petite que la méthode précédente,
-    tout en conservant une bonne acuité en production. Dans notre exemple:</p>
-    <pre> 
-    randomtrain -s spam.mbx -n ham.mbx 
-    </pre></li>
-    <li><p>Méthode 3) Utilisez le script  bogominitrain.pl (dans le répertoire contrib).
-    Il applique, lui aussi une technique d'apprentissage sur erreur, mais les messages
-    sont évalués dans le même ordre que vos fichiers mailbox. Vous devriez utiliser
+    </ul>
+    Note : Le répertoire contrib de Bogofilter contient 2 scripts qui tous les deux utilisent une
+    technique d'entrainement sur erreur. Cette technique évalue chaque message et n'ajoute à la
+    base de données que les messages qui ont été mal évalués (messages marqués comme incertains, ham
+    évalués en tant que spam ou inversement). Le but est de créer une base de données des mots réellement
+    <em>nécessaires</em> pour classer correctement les messages. La base de données résultante est plus
+    petite que celle de l'entrainement complet.
+    <ul>
+
+    <li><p>Méthode 2) Utilisez le script  bogominitrain.pl (dans le répertoire contrib).
+    Il évalue les messages le même ordre que vos fichiers mailbox. Vous devriez utiliser
     l'option -f qui va demander au script de répéter le travail, jusqu'à ce que tous
-    les messages soient classifiés correctement.
-    Si nécessaire, vous pouvez ajuster le niveau de certitude. Les tests
-    ont montré que cela générait la base de données la plus petite de toutes les
-    méthodes citées. Malgré cela, comme le script s'assure que la base de données
-    connaît "tout" votre corpus d'entrainement avec la précision de votre choix, cela
+    les messages soient classés correctement.
+    (Si nécessaire, vous pouvez même ajuster le niveau de certitude). Comme le script s'assure
+    que la base de données
+    connaît &quot;tout&quot; votre corpus d'entrainement (avec la précision de votre choix), cela
     fonctionne très bien.
-    Dans notre exemple (avec spam_cutoff=0.6 dans votre fichier de configuration):</p>
+    Avec spam_cutoff=0.6 et un intervalle de 0.1 notre exemple donne:</p>
     <pre>
     bogominitrain.pl -fv ~/.bogofilter ham.mbx spam.mbx '-o 0.7,0.5'
     </pre></li>
-    </ul>
 
-    <hr>
+    <li><p>Méthode 3) Utilisez le script randomtrain (dans le répertoire contrib).
+    Le script génère une liste de tous les messages dans les mailbox, mélange la liste, puis
+    évalue chaque message, suiv d'un entrainement si nécessaire. Dans notre exemple:</p>
+    <pre> 
+    randomtrain -s spam.mbx -n ham.mbx 
+    </pre></li>
+
+    <li><p>Méthode 4)  Si vous avez suffisamment de spam et de ham dans votre corpus, &quot;réservez
+    &quot; 10000 spams et 10000 hams dans des fichiers mbox séparés, puis utilisez ce corpus pour
+    l'entraînement. Lancez alors Bogofilter pour classer les spams et hams restants. Prenez tout message
+    incorrectement évalué ou ayant le statut incertain, et utilisez les pour un nouvel apprentissage. Cette méthode
+    donne la meilleure méthode possible de discrimination. Voici deux petits scripts qui peuvent
+    être utilisés pour classifier les messages "mauvais élèves".</p>
+    <pre> 
+	#! /bin/sh
+	#  class3 -- classe un message en mauvais, bon ou incertain
+	cat >msg.$$
+	/usr/bin/bogofilter $* <msg.$$
+	res=$?
+	if [ $res = 0 ]; then
+		cat msg.$$ >>corpus.bad
+	elif [ $res = 1 ]; then
+		cat msg.$$ >>corpus.good
+	elif [ $res = 2 ]; then
+		cat msg.$$ >>corpus.unsure
+	fi
+		/bin/rm msg.$$
+
+	#! /bin/sh
+	# classifie -- Place tous les messages dans un fichier mbox à l'aide de class3
+	src=$1;
+	shift
+	formail -s class3 $* <$src
+     </pre></li>
+ 
+     <hr>
 
     <h2 id="production">Comment puis-je conserver une bonne acuité ?</h2>
     <p>Bogofilter fera des erreurs de temps en temps. C'est pourquoi un
@@ -294,15 +327,15 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
     -u). Deuxièmement, vous pouvez ne l'entraîner que sur des erreurs.</p>
     
     <p>De plus, vous pouvez reconstruire votre base à certains moments,
-    par exemple quand une nouvelle fonctionnalité importante est ajoutée à Bogofilter,
-    il peut être fort utile de mettre à jour régulièrement votre corpus d'apprentissage.</p>
+    par exemple quand une nouvelle fonctionnalité importante est ajoutée à Bogofilter.
+    Il peut être alors fort utile de mettre à jour régulièrement votre corpus d'apprentissage.</p>
     
     <p>Bogofilter fait toujours de son mieux avec les informations
     disponibles. Cependant, il fera des erreurs, tel que classer des ham en spam
-    (faux positifs) ou spam en ham (faux négatifs). Vous avez besoin de corriger ces erreurs.
-    Si vous entrainez Bogofilter avec chaque message entrant, vous devrez annuler
-    cette mauvaise classification puis la refaire correctement. La combinaison d'option "-Sn"
-    reclassera un faux-positif et "-Ns" fera de même pour un faux-négatif.
+    (faux positifs) ou spam en ham (faux négatifs). Pour réduire la probabilité d'un réapparition
+    de l'erreur, il sera nécessaire d'entrainer Bogofilter avec le message erroné. Si un message est
+    classé incorrectement spam, utilisez l'option <code>-n</code> pour l'intégrer en tant que ham.
+    Utilisez l'option <code>-s</code> pour l'intégrer en tant que spam.</p>
     
     <p> Corriger un message incorrectement classé peut affecter la classification d'autres
     messages. Plus votre base de données sera petite, plus grande sera la probabilité qu'une
@@ -311,7 +344,56 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
     <p>L'utilisation de la méthode 2 ou 3 (ci-dessus) peut compenser cet effet.
     Repéter l'entrainement avec le corpus complet (y compris les messages de corrections ajoutés
     depuis le précédent apprentissage). Ceci ajoutera des messages dans la base de données afin
-    que d'atteindre un nouvel équilibre, annulant les effets éventuellement de "surcompensation".
+    que d'atteindre un nouvel équilibre, annulant les effets éventuellement de "surcompensation".</p>
+
+    <p>Bogofilter a une option <code>-u</code> qui, automagiquement, met à jour la liste des mots
+    après chaque évaluation de messages. Comme Bogofilter fait parfois des erreurs, cette méthode a
+    l'inconvénient de dégrader la base d'entrainement avec des entrées erronées. Vous aurez alors
+    besoin de la regarder et la corriger fréquemment. Une stratégie alternative, basée sur la méthode 4 de
+    la section précédente est la suivante : Périodiquement, prenez des blocs de messages et utilisez les
+    scripts de la méthode 4 pour les classer. Analyser manuellement les spams, ham et incertains, corriger
+    les erreurs, puis séparer les incertains en hams et spam. Jusqu'à ce que vous ayez 10000 spams et 10000 hams
+    dans votre base d'apprentissage, entraînez avec les hams, les spams, puis les erreurs et enfin les incertains.
+    Plus tard, vous n'entrainerez qu'avec les erreurs et les incertains, en ignorant les messagess que Bogofilter
+    a correctement classé. Cette methode vous donnera une discrimination proche de l'optimal tout en
+    limitant au minimum le nombre de messages traités.
+    </p>
+    <p>
+    Notez que vous devrez régulièrement lancer :</p>
+    <pre>
+    bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
+    mv wordlist.db wordlist.db.prv
+    mv wordlist.db.new wordlist.db
+    </pre>
+    <p>ou pour les fichiers spamlist.db et goodlist.db (si vous utilisez Bogofilter avec
+    les listes de mots séparés). Ceci compressera les bases de données pour n'occuper que le
+    minimum d'expace disque nécessaire.
+  
+    </p><hr>
+ 
+    <h2 id="train_on_error">Qu'est-ce que "l'entrainement sur erreur" et "l'entrainement sur épuisement"?</h2>
+
+    <p>"L'entrainement sur erreur" implique l'analyse d'un corpus de messages dont le statut de spam ou ham
+    est connu. Seuls ceux qui sont mal classés, ou dont le classement est incertain, seront intégrés dans
+    la base de données d'apprentissage. Il a été montré que la sélection des seuls messages "mauvais élèves" était
+    un moyen efficace d'entrainement. Si l'on entrainait Bogofilter avec tous les messages, il va
+    réapprendre avec des spams ou hams évidents. L'apprentissage est un peu plus rapide si l'on a commencé
+    avec une période d'entrainement "brut" de 10 000 spams et 10 000 hams.)</p>
+
+    <p>"L'entrainement sur épuisement" est la répétition de l'entrainement sur erreur, avec le même corpus
+    de messages, jusqu'à ce que plus aucune erreur ne subsiste. Ceci a bien fonctionné sur plusieurs tests,
+    mais peut être risqué. D'abord, l'intégration multipliée de messages crée une distribution
+    des tokens dans la base de données qui diffère de celle des messages d'entrée, ce qui constitue une
+    violation des postulats de la classification bayésienne, et peut donc aboutir à des résultats imprévisibles. Ensuite,
+    les tokens qui apparaissent "normalement" de manière plus ou moins équitable dans les deux catégories, peuvent, s'ils
+    sont présents dans un message d'une catégorie et avec le phénomène de répétition, faire pencher la balance. De tels effets
+    sont temporaires, mais peuvent dégrader l'acuité pendant leur durée.</p>
+
+    <p>
+    Note: Bogominitrain.pl possède une option <code>-f</code> qui
+    permet de réaliser "l'entrainement sur épuisement". Si vous
+    choisissez de l'utiliser, soyez conscient des effets secondaires
+    possibles.</p> <hr>
 
     <hr>
 
@@ -574,10 +656,9 @@ spam-unreadable
     <p>Pour dire combien de tokens sont présents dans votre liste
     de mots, envoyez la sortie de la commande dump de bogoutil vers
     la commande "wc". Par exemple utilisez "bogoutil -d
-    $BOGOFILTER_DIR/spamlist.db | wc -l " pour afficher le nombre
-    de mots dans la liste spam, et utilisez "bogoutil -d
-    $BOGOFILTER_DIR/goodlist.db | wc -l" pour afficher le nombre de
-    mots dans la liste ham.</p>
+    $BOGOFILTER_DIR/wordlist.db | wc -l " pour afficher le nombre d'apparitions
+    des tokens (Si vous utilisez spamlist.db et goodlist.db, lancez la commande pour
+    chacun d'eux).</p>
 
     <hr>
 
@@ -587,21 +668,24 @@ spam-unreadable
     <p>Si vous pensez que vos listes de mots ont été dégradées,
     vous pouvez regarder ce qu'en dit BerkeleyDB en lançant:</p>
 <pre>
-db_verify spamlist.db
-db_verify goodlist.db
+db_verify wordlist.db
 </pre>
 
     <p>S'il y a un problème, vous pouvez récupérer tout ou partie
     des tokens et leur nombre avec la commande suivante:</p>
 <pre>
-bogoutil -d spamlist.db | bogoutil -l spamlist.db.new
+bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
 </pre>
 
     <p>ou avec</p>
 <pre>
-db_dump -r spamlist.db &gt; spamlist.txt
-db_load spamlist.new &lt; spamlist.txt
+db_dump -r wordlist.db &gt; wordlist.txt
+db_load wordlist.new &lt; wordlist.txt
 </pre>
+<p>
+Si vous utilisez deux listes de mots (spamlist.db et goodlist.db), lancez les mêmes commandes
+pour chacun d'eux.
+</p>
 
     <hr>
 
@@ -725,24 +809,14 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
 
     <dl>
       <dt>-s</dt>
-
-      <dd>indique l'enregistrement du message comme spam.
-      C'est-à-dire mettre les tokens dans spamlist.db.</dd>
-
-      <dt>-n</dt>
-
-      <dd>indique l'enregistrement du message comme ham. C'est à
-      dire mettre les tokens dans goodlist.db.</dd>
-
-      <dt>-S</dt>
-
-      <dd>indique le désenregistrement du message des spams. C'est
-      à dire enlever les tokens de spamlist.db.</dd>
-
-      <dt>-N</dt>
-
-      <dd>indique le désenregistrement du messages des hams. C'est
-      à dire enlever les tokens de goodlist.db.</dd>
+       C'est-à-dire incrémenter le nombre de spam pour ce token.
+       </dd><dt>-n</dt><dd>indique l'enregistrement du message comme ham. C'est à
+       dire incrémenter le nombre de ham pour ce token.
+       </dd><dt>-S</dt><dd>indique le désenregistrement du message des spams. C'est
+       à dire décrémenter le nombre de spam pour ce token.
+       </dd><dt>-N</dt><dd>indique le désenregistrement du messages des hams. C'est
+       à dire décrémenter le nombre de ham pour cd token.
+       </dd></dl>
     </dl>
 
     <p>Avant la version 0.11, l'option '-S' était utilisée pour
