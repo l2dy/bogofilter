@@ -1305,7 +1305,7 @@ ex_t dbe_purgelogs(const char *directory) {
 }
 
 ex_t db_verify(const char *dbfile) {
-    char *dir = xstrdup(dbfile);
+    char *dir;
     char *tmp;
     DB_ENV *env;
     DB *db;
@@ -1316,6 +1316,7 @@ ex_t db_verify(const char *dbfile) {
 	return EX_ERROR;
     }
 
+    dir = xstrdup(dbfile);
     tmp = strrchr(dir, DIRSEP_C);
     if (!tmp)
 	free(dir), dir = xstrdup(CURDIR_S);
@@ -1329,12 +1330,14 @@ ex_t db_verify(const char *dbfile) {
     if (e != 0) {
 	print_error(__FILE__, __LINE__, "error creating DB handle: %s",
 		db_strerror(e));
+	free(dir);
 	exit(EX_ERROR);
     }
     e = db->verify(db, dbfile, NULL, NULL, 0);
     if (e) {
 	print_error(__FILE__, __LINE__, "database %s does not verify: %s",
 		dbfile, db_strerror(e));
+	free(dir);
 	exit(EX_ERROR);
     }
     e = dbe_common_close(env, dir);
