@@ -18,15 +18,15 @@ There are two prerequisites for compiling Bogofilter on RISC OS:
 Place the top-level Bogofilter directory alongside the top-level database
 directory.
 
+In doc.programmer.RISC-OS you'll find (along-side to this README, so
+you already have found the correct place to look at!) a directory gsl
+and a directory src both containing a Makefile and a config/h
+file. Copy the contents of gsl over the directory gsl in bogofilter
+and the directory src over the directory src in bogofilter.
+
 Rename the source files of bogofilter from foobar/c to c.foobar (you can use
 utilities like unixify (http://www.mk-net.demon.co.uk/software/risc_os/) in
 order to ease up this task.
-
-In doc.programmer.RISC-OS you'll find (along-side to this README, so
-you already have found the correct place to look at!) a directory gsl
-and a directory src both containing a Makefile and a h.config
-file. Copy the contents of gsl over the directory gsl in bogofilter
-and the directory src over the directory src in bogofilter.
 
 Edit the first few lines of the Makefiles to suit your needs, then set
 your CSD (currently selected directory) to bogofilter.src and type

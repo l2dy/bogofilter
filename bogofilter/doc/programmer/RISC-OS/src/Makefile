@@ -24,7 +24,7 @@ CC = cc
 LD = link
 AR = libfile
 DEPEND = -depend !Depend
-CC_FLAGS = -Wpc -zo -fw -throwback -Otime -I@,^,^.^,$(DBINCLUDE),Unix: -JUnix: -D__riscos__ -DHAVE_CONFIG_H -zpq262144
+CC_FLAGS = -Wdp -throwback -Otime -I@,^,^.^,$(DBINCLUDE),Unix: -JUnix: -D__riscos__ -DHAVE_CONFIG_H
 UNIXLIB = Unix:o.UnixLib
 else
 ifeq (${CC},gcc)
@@ -84,11 +84,13 @@ COMMON_OBJS = o.base64 \
 	o.textblock \
 	o.token \
 	o.transaction \
+	o.tunelist \
 	o.uudecode \
 	o.version \
 	o.word \
 	o.wordhash \
 	o.wordlists \
+	o.wordlists_base \
 	o.xatof \
 	o.xatoi \
 	o.xcalloc \
@@ -101,8 +103,10 @@ COMMON_OBJS = o.base64 \
 	o.xstrlcpy
 
 BOGOFILTER_OBJS = o.main
-
+	
 BOGOLEXER_OBJS = o.bogolexer
+
+BOGOTUNE_OBJS = o.bogotune
 
 BOGOUTIL_OBJS = o.bogoutil
 
@@ -124,31 +128,34 @@ CONFIGTEST_OBJS = o.configtest
 
 # Static dependencies:
 
-all: bogofilter bogolexer bogoutil bogowordfreq configtest
+all: bogofilter bogolexer bogotune bogoutil bogowordfreq configtest
 
 dist: install
-	-cdir <Bogofilter$Dir>.docs
-	-copy ^.AUTHORS <Bogofilter$Dir>.docs.* ~CF~V
-	-copy ^.COPYING <Bogofilter$Dir>.docs.* ~CF~V
-	-copy ^.NEWS <Bogofilter$Dir>.docs.* ~CF~V
-	-copy ^.doc.bogofilter-faq/html <Bogofilter$Dir>.docs.* ~CF~V
-	-copy ^.doc.bogofilter/htmlin <Bogofilter$Dir>.docs.bogofilter/html ~CF~V
-	-copy ^.doc.bogolexer/htmlin <Bogofilter$Dir>.docs.bogolexer/html ~CF~V
-	-copy ^.doc.bogoutil/htmlin <Bogofilter$Dir>.docs.bogoutil/html ~CF~V
-	-settype <Bogofilter$Dir>.docs.AUTHORS Text
-	-settype <Bogofilter$Dir>.docs.COPYING Text
-	-settype <Bogofilter$Dir>.docs.NEWS Text
-	-settype <Bogofilter$Dir>.docs.bogofilter-faq/html HTML
-	-settype <Bogofilter$Dir>.docs.bogofilter/html HTML
-	-settype <Bogofilter$Dir>.docs.bogolexer/html HTML
-	-settype <Bogofilter$Dir>.docs.bogoutil/html HTML
+	-cdir <Bogofilter$Dir>.doc
+	-copy ^.AUTHORS <Bogofilter$Dir>.doc.* ~CF~V
+	-copy ^.COPYING <Bogofilter$Dir>.doc.* ~CF~V
+	-copy ^.NEWS <Bogofilter$Dir>.doc.* ~CF~V
+	-copy ^.doc.bogofilter-faq/html <Bogofilter$Dir>.doc.* ~CF~V
+	-copy ^.doc.bogofilter/htmlin <Bogofilter$Dir>.doc.bogofilter/html ~CF~V
+	-copy ^.doc.bogolexer/htmlin <Bogofilter$Dir>.doc.bogolexer/html ~CF~V
+	-copy ^.doc.bogotune/htmlin <Bogofilter$Dir>.doc.bogotune/html ~CF~V
+	-copy ^.doc.bogoutil/htmlin <Bogofilter$Dir>.doc.bogoutil/html ~CF~V
+	-settype <Bogofilter$Dir>.doc.AUTHORS Text
+	-settype <Bogofilter$Dir>.doc.COPYING Text
+	-settype <Bogofilter$Dir>.doc.NEWS Text
+	-settype <Bogofilter$Dir>.doc.bogofilter-faq/html HTML
+	-settype <Bogofilter$Dir>.doc.bogofilter/html HTML
+	-settype <Bogofilter$Dir>.doc.bogolexer/html HTML
+	-settype <Bogofilter$Dir>.doc.bogotune/html HTML
+	-settype <Bogofilter$Dir>.doc.bogoutil/html HTML
 
-install: bogofilter bogolexer bogoutil bogowordfreq configtest
-	-copy bogofilter <Bogofilter$Dir>.* ~CF~V
-	-copy bogolexer <Bogofilter$Dir>.* ~CF~V
-	-copy bogoutil <Bogofilter$Dir>.* ~CF~V
-	-copy bogowordfreq <Bogofilter$Dir>.* ~CF~V
-	-copy configtest <Bogofilter$Dir>.* ~CF~V
+install: bogofilter bogolexer bogotune bogoutil bogowordfreq configtest
+	-copy bogofilter <Bogofilter$Dir>.bin.* ~CF~V
+	-copy bogolexer <Bogofilter$Dir>.bin.* ~CF~V
+	-copy bogotune <Bogofilter$Dir>.bin.* ~CF~V
+	-copy bogoutil <Bogofilter$Dir>.bin.* ~CF~V
+	-copy bogowordfreq <Bogofilter$Dir>.bin.* ~CF~V
+	-copy configtest <Bogofilter$Dir>.bin.* ~CF~V
 
 libbogo: $(COMMON_OBJS)
 	$(AR) $(AR_FLAGS) -c -o $@ $(COMMON_OBJS)
@@ -164,6 +171,9 @@ bogofilter: libbogo $(LIBGSL) $(BOGOFILTER_OBJS) $(DBLIB)
 bogolexer: libbogo $(BOGOLEXER_OBJS) $(DBLIB)
 	$(LD) $(LD_FLAGS) -o $@ $(BOGOLEXER_OBJS) libbogo $(DBLIB) $(UNIXLIB)
 
+bogotune: libbogo $(LIBGSL) $(BOGOTUNE_OBJS) $(DBLIB)
+	$(LD) $(LD_FLAGS) -o $@ $(BOGOTUNE_OBJS) libbogo $(LIBGSL) $(DBLIB) $(UNIXLIB)
+
 bogoutil: libbogo $(BOGOUTIL_OBJS) $(DBLIB)
 	$(LD) $(LD_FLAGS) -o $@ $(BOGOUTIL_OBJS) libbogo $(DBLIB) $(UNIXLIB)
 
@@ -176,6 +186,7 @@ configtest: libbogo $(CONFIGTEST_OBJS) $(DBLIB)
 clean:
 	-ifthere bogofilter then wipe bogofilter ~CF~V
 	-ifthere bogolexer then wipe bogolexer ~CF~V
+	-ifthere bogotune then wipe bogotune ~CF~V
 	-ifthere bogoutil then wipe bogoutil ~CF~V
 	-ifthere bogowordfreq then wipe bogowordfreq ~CF~V
 	-ifthere configtest then wipe configtest ~CF~V
