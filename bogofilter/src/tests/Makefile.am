@@ -12,7 +12,6 @@ CLEANFILES= $(BUILT_SOURCES)
 
 t.config: Makefile
 	( echo  >$@ 'EXE_EXT="@EXE_EXT@"' ; \
-	  echo >>$@ 'DB_EXT="@DB_EXT@"' ; \
 	  echo >>$@ 'DB_TYPE="@DB_TYPE@"' ) || rm -f $@
 
 ENVIRON_TESTS = t.abort t.env t.ctype t.bogodir t.leakfind t.u_fpe
@@ -35,7 +34,7 @@ SCORING_TESTS =  t.query.config t.score1 t.score2 t.systest t.grftest t.wordhist
 
 BULKMODE_TESTS = t.bulkmode t.MH t.maildir
 
-INTEGRITY_TESTS = t.lock1 t.lock3 t.valgrind
+INTEGRITY_TESTS = t.lock1 t.lock3 t.valgrind t.bogoutil
 # INTEGRITY_TESTS += t.lock2
 
 TESTSCRIPTS = ${ENVIRON_TESTS} ${PARSING_TESTS} ${WORDLIST_TESTS} ${SCORING_TESTS} ${BULKMODE_TESTS} ${INTEGRITY_TESTS}
