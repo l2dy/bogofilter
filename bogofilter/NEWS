@@ -5,6 +5,26 @@
 NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+0.91.1	2004-??-??
+
+	2004-05-29
+
+	* Distinguish open modes of READ, WRITE, and CREATE so
+	* bogofilter will include .WORDLIST_VERSION in new database.
+
+	2004-05-28
+
+	* Modify contrib scripts so they're sh compatible.
+	* Fix problem with not expanding tildes.
+
+	2004-05-23
+
+	* Use named constants for wordlist 'type' attribute.
+
+	2004-05-22
+
+	* Fix problem when bogofilter's home is a symlink.
+
 0.91.0	2004-05-22
 
 	* Miscellaneous cleanups for multiple wordlist code.
