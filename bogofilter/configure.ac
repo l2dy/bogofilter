@@ -394,6 +394,15 @@ dnl END TRIO
 fi
 AM_CONDITIONAL(NEEDTRIO, test "$needtrio" = "1")
 
+dnl check if XMLTO is somewhere
+AC_CHECK_PROG(ac_cv_enable_xmlto, xxmlto, yes, no)
+AC_MSG_CHECKING([whether xmlto is available])
+AC_MSG_RESULT($ac_cv_enable_xmlto)
+
+AM_CONDITIONAL(ENABLE_XMLTO, test x$ac_cv_enable_xmlto = xyes)
+
+dnl end of tests
+
 AC_CACHE_SAVE
 
 if test "$sysconfdir" = "\${prefix}/etc" \

@@ -5,7 +5,10 @@ SUFFIXES= .1 .1in .htmlin .html
 
 # what to build
 man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
+
+if  ENABLE_XMLTO
 html_MANS = bogofilter.html bogoutil.html bogoupgrade.html bogolexer.html
+endif
 
 all: $(man_MANS) $(html_MANS)
 
