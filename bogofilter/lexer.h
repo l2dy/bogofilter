@@ -4,12 +4,12 @@
 #define MAXTOKENLEN	30
 
 // lexer interface
-enum {
+typedef enum {
     TOKEN = 1,	// regular token
     FROM,	// mbox message delimiter
     BOUNDARY,	// MIME multipart boundary line
     EMPTY	// empty line
-};
+} token_t;
 
 extern FILE	*yyin;
 
@@ -24,6 +24,6 @@ struct textblock
 
 extern struct textblock textblocks, *textend;
 
-extern int myfgets(char *buf, int max_size, FILE *s);
-extern int get_token(void);
+extern int lexer_fgets(char *buf, int max_size, FILE *s);
+extern token_t get_token(void);
 

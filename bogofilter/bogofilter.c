@@ -84,7 +84,6 @@ static void *collect_words(/*@unused@*/ int fd, /*@out@*/ int *message_count,
      * Sets messageg_count and word_count to the appropriate values
      * if their pointers are non-NULL.  */
 {
-  int tok = 0;
   int w_count = 0;
   int msg_count = 0;
  
@@ -93,7 +92,7 @@ static void *collect_words(/*@unused@*/ int fd, /*@out@*/ int *message_count,
   wordhash_t *h = wordhash_init();
      
   for (;;){
-    tok = get_token();
+    token_t tok = get_token();
   
     if (tok != FROM && tok != 0){
       w = wordhash_insert(h, yylval, sizeof(wordprop_t), &wordprop_init);

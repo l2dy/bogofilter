@@ -244,7 +244,7 @@ filename=\"?					;
 %%
 
 /* returns -1 for EOF or max_size < 2, characters read otherwise */
-int myfgets(char *buf, int max_size, FILE *s)
+int lexer_fgets(char *buf, int max_size, FILE *s)
 {
 	int c;
 	char *cp = buf;
@@ -270,14 +270,14 @@ static int yyinput(char *buf, int max_size)
     if (hdrlen==0)
 	hdrlen=strlen(spam_header_name);
 
-    returned = myfgets(buf, max_size, yyin);
+    returned = lexer_fgets(buf, max_size, yyin);
 
     while (returned != -1
 	    && !past_header
 	    && memcmp(buf,spam_header_name,hdrlen) == 0)
     {
 	do {
-	    returned = myfgets(buf, max_size, yyin);
+	    returned = lexer_fgets(buf, max_size, yyin);
 	    if (returned != -1 && *buf == '\n')
 		break;
 	} while (returned != -1 && isspace((unsigned char)*buf));
@@ -316,14 +316,14 @@ static int yyinput(char *buf, int max_size)
     return(returned == -1 ? YY_NULL : returned);
 }
 
-int get_token(void)
+token_t get_token(void)
 {
-    int class;
+    token_t class;
     char *cp, *t;
 
     alt_text[0] = 0;
 
-    while ((class = yylex()) > 0) {
+    while ((class = (token_t) yylex()) > 0) {
 	/* when we have a boundary line, eliminate the distinction between
 	 * start and end boundary, chopping of the distinct trailing -- of
 	 * the end boundary. */

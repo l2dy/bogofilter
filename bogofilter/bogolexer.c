@@ -11,6 +11,7 @@ NAME:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "config.h"
 #include "lexer.h"
@@ -38,7 +39,7 @@ void help(void)
 
 int main(int argc, char **argv)
 {
-    int	t;
+    token_t t;
     int option;
     int count=0;
     int quiet = 0;
