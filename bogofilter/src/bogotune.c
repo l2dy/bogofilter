@@ -77,6 +77,8 @@ AUTHORS:
 #define	LARGE_COUNT	40000
 
 #define	HAM_CUTOFF	0.10
+#define MIN_HAM_CUTOFF	0.10	/* minimum final ham_cutoff */
+#define MAX_HAM_CUTOFF	0.45	/* maximum final ham_cutoff */
 #define	MIN_CUTOFF	0.55	/* minimum cutoff  for set_thresh() */
 #define	WARN_MIN	0.50	/* warning minimum for set_thresh() */
 #define	WARN_MAX	0.99	/* warning maximum for set_thresh() */
@@ -1235,8 +1237,8 @@ static void final_recommendations(bool skip)
     if (!skip) {
 	uint s = ceil(sp_cnt * 0.002 - 1);
 	ham_cutoff = sp_scores[s];
-	if (ham_cutoff < 0.10) ham_cutoff = 0.10;
-	if (ham_cutoff > 0.45) ham_cutoff = 0.45;
+	if (ham_cutoff < MIN_HAM_CUTOFF) ham_cutoff = MIN_HAM_CUTOFF;
+	if (ham_cutoff > MAX_HAM_CUTOFF) ham_cutoff = MAX_HAM_CUTOFF;
     }
 
     printf("ham_cutoff=%5.3f\t\n", ham_cutoff);
