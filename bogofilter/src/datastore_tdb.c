@@ -353,23 +353,23 @@ const char *db_str_err(int j)
 	return "Invalid error code";
 }
 
-int db_init(void)
+int dbe_init(void)
 {
     init = true;
     return 0;
 }
 
-void db_cleanup(void)
+void dbe_cleanup(void)
 {
     init = false;
 }
 
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
-int db_txn_begin(void *d) { (void)d; return 0; }
-int db_txn_abort(void *d) { (void)d; return 0; }
-int db_txn_commit(void *d) { (void)d; return 0; }
-int db_recover(int a, int b) {
+int dbe_txn_begin(void *d) { (void)d; return 0; }
+int dbe_txn_abort(void *d) { (void)d; return 0; }
+int dbe_txn_commit(void *d) { (void)d; return 0; }
+int dbe_recover(int a, int b) {
     (void)a;
     (void)b;
 

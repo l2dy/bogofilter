@@ -330,40 +330,40 @@ const char *db_str_err(int e)
     return dperrmsg(e);
 }
 
-int db_init(void)
+int dbe_init(void)
 {
     init = true; 
     return 0;
 }
 
-void db_cleanup(void)
+void dbe_cleanup(void)
 {
     init = false;
 }
 
 /** begin transaction. Returns 0 for success. */
-int db_txn_begin(void *d)
+int dbe_txn_begin(void *d)
 {
     UNUSED(d);
 
     return 0;
 }
 
-int db_txn_abort(void *d)
+int dbe_txn_abort(void *d)
 {
     UNUSED(d);
 
     return 0;
 }
 
-int db_txn_commit(void *d)
+int dbe_txn_commit(void *d)
 {
     UNUSED(d);
 
     return 0;
 }
 
-int db_recover(int a, int b)
+int dbe_recover(int a, int b)
 {
     UNUSED(a);
     UNUSED(b);

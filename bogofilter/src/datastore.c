@@ -272,17 +272,17 @@ int ds_delete(void *vhandle, const word_t *word)
 
 int ds_txn_begin(void *vhandle) {
     dsh_t *h = vhandle;
-    return db_txn_begin(h->dbh);
+    return dbe_txn_begin(h->dbh);
 }
 
 int ds_txn_abort(void *vhandle) {
     dsh_t *h = vhandle;
-    return db_txn_abort(h->dbh);
+    return dbe_txn_abort(h->dbh);
 }
 
 int ds_txn_commit(void *vhandle) {
     dsh_t *h = vhandle;
-    return db_txn_commit(h->dbh);
+    return dbe_txn_commit(h->dbh);
 }
 
 typedef struct {
@@ -359,7 +359,7 @@ static word_t  *wordlist_version_tok;
 
 void ds_init()
 {
-    db_init();
+    dbe_init();
     if (msg_count_tok == NULL) {
 	msg_count_tok = word_new((const byte *)MSG_COUNT, strlen(MSG_COUNT));
     }
@@ -371,7 +371,7 @@ void ds_init()
 /* Cleanup storage allocation */
 void ds_cleanup()
 {
-    db_cleanup();
+    dbe_cleanup();
     xfree(msg_count_tok);
     xfree(wordlist_version_tok);
     msg_count_tok = NULL;
@@ -437,5 +437,5 @@ const char *ds_version_str(void)
 
 int ds_recover(int catastrophic)
 {
-    return db_recover(catastrophic, 1);
+    return dbe_recover(catastrophic, 1);
 }

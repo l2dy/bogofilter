@@ -486,7 +486,7 @@ retry_db_open:
 #endif
 
 /** begin transaction. Returns 0 for success. */
-int db_txn_begin(void *vhandle)
+int dbe_txn_begin(void *vhandle)
 {
     DB_TXN *t;
     int ret;
@@ -509,7 +509,7 @@ int db_txn_begin(void *vhandle)
     return 0;
 }
 
-int db_txn_abort(void *vhandle)
+int dbe_txn_abort(void *vhandle)
 {
     int ret;
     dbh_t *handle = vhandle;
@@ -537,7 +537,7 @@ int db_txn_abort(void *vhandle)
     }
 }
 
-int db_txn_commit(void *vhandle)
+int dbe_txn_commit(void *vhandle)
 {
     int ret;
     dbh_t *handle = vhandle;
@@ -638,13 +638,13 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 	ret = DS_NOTFOUND;
 	break;
     case DB_LOCK_DEADLOCK:
-	db_txn_abort(handle);
+	dbe_txn_abort(handle);
 	ret = DS_ABORT_RETRY;
 	break;
     default:
 	print_error(__FILE__, __LINE__, "(db) DB->get(TXN=%lu,  '%.*s' ), err: %d, %s",
 		    (unsigned long)handle->txn, CLAMP_INT_MAX(token->leng), (char *) token->data, ret, db_strerror(ret));
-	db_txn_abort(handle);
+	dbe_txn_abort(handle);
 	exit(EX_ERROR);
     }
 
@@ -677,7 +677,7 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
     ret = dbp->put(dbp, handle->txn, &db_key, &db_data, 0);
 
     if (ret == DB_LOCK_DEADLOCK) {
-	db_txn_abort(handle);
+	dbe_txn_abort(handle);
 	return DS_ABORT_RETRY;
     }
 
@@ -1015,7 +1015,7 @@ static int db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
 }
 
 /* close the environment, but do not release locks */
-static void db_cleanup_lite(void) {
+static void dbe_cleanup_lite(void) {
     if (!init)
 	return;
     if (dbe) {
@@ -1042,7 +1042,7 @@ static void db_cleanup_lite(void) {
  * and lock the file to tell other parts we're initialized and
  * do not want recovery to stomp over us
  */
-int db_init(void) {
+int dbe_init(void) {
     u_int32_t flags = 0;
 
     /* open lock file, needed to detect previous crashes */
@@ -1051,7 +1051,7 @@ int db_init(void) {
 
     /* run recovery if needed */
     if (needs_recovery())
-	db_recover(0, 0); /* DO NOT set force flag here, may cause
+	dbe_recover(0, 0); /* DO NOT set force flag here, may cause
 			     multiple recovery! */
 
     /* set (or demote to) shared/read lock for regular operation */
@@ -1079,7 +1079,7 @@ int db_init(void) {
     return db_xinit(db_max_locks, db_max_objects, flags);
 }
 
-int db_recover(int catastrophic, int force) {
+int dbe_recover(int catastrophic, int force) {
     int ret;
 
     /* set exclusive/write lock for recovery */
@@ -1106,7 +1106,7 @@ retry:
     }
 
     clear_lockfile();
-    db_cleanup_lite();
+    dbe_cleanup_lite();
 
     return 0;
 
@@ -1114,8 +1114,8 @@ rec_fail:
     exit(EX_ERROR);
 }
 
-void db_cleanup(void) {
-    db_cleanup_lite();
+void dbe_cleanup(void) {
+    dbe_cleanup_lite();
     clear_lock();
     if (lockfd >= 0)
 	close(lockfd); /* release locks */

@@ -46,15 +46,10 @@ void db_flush(void *handle);
 
 /** Do global initializations. \return 0 for success, non-zero for
  * error. */
-int db_init(void);
+int dbe_init(void);
 
 /** Cleanup storage allocation */
-void db_cleanup(void);
-
-/** Retrieve the value associated with a given word in a list.
- * \return zero if the word does not exist in the database. Front-end
- */
-bool db_getvalues(void *handle, const dbv_t *key, dbv_t *val);
+void dbe_cleanup(void);
 
 /** Retrieve the value associated with a given word in a list. 
  * \return zero if the word does not exist in the database. Implementation
@@ -64,23 +59,14 @@ int db_get_dbvalue(void *handle, const dbv_t *token, /*@out@*/ dbv_t *val);
 /** Delete the key */
 int db_delete(void *handle, const dbv_t *data);
 
-/** Set the value associated with a given word in a list. Front end */
-int db_setvalues(void *handle, const dbv_t *token, dbv_t *val);
-
 /** Set the value associated with a given word in a list. Implementation */
 int db_set_dbvalue(void *handle, const dbv_t *token, dbv_t *val);
-
-/** Update the value associated with a given word in a list */
-void db_updvalues(void *handle, const dbv_t *token, const dbv_t *updval);
 
 /** Iterate over all elements in data base and call \p hook for each item.
  * \p userdata is passed through to the hook function unaltered.
  */
 typedef int (*db_foreach_t)(dbv_t *token, dbv_t *data, void *userdata);
 int db_foreach(void *handle, db_foreach_t hook, void *userdata);
-
-/* Get the database filename */
-char *db_handle_filename(void *handle);
 
 /* Returns error associated with code */
 const char *db_str_err(int);
@@ -89,11 +75,11 @@ const char *db_str_err(int);
 const char *db_version_str(void);
 
 /* Transactional interfaces */
-int  db_txn_begin(void *handle);
-int  db_txn_abort(void *handle);
-int db_txn_commit(void *handle);
+int dbe_txn_begin(void *handle);
+int dbe_txn_abort(void *handle);
+int dbe_txn_commit(void *handle);
 
-int db_recover(int catastrophic, int force);
+int dbe_recover(int catastrophic, int force);
 
 /* Returns is_swapped flag */
 bool db_is_swapped(void *vhandle);
