@@ -172,10 +172,14 @@ ham_cutoff is non-zereo.</para>
 </para>
 
 <para>The <option>-o
-	<replaceable>value<optional>,value</optional></replaceable></option>
+	<replaceable><optional>value</optional><optional>,value</optional></replaceable></option>
       option allows setting the spam_cutoff value and, optionally, the
-      ham_cutoff value.  If one value is supplied, then spam_cutoff is set.
-      With two values, both spam_cutoff and ham_cutoff are set.
+      ham_cutoff value.  If one value is supplied, then spam_cutoff is
+      set. If a comma followed by one value is supplied, then ham_cutoff
+      is set. With two values, both spam_cutoff and ham_cutoff are set. Note the
+      syntax is misleading, at least one of the values MUST be present,
+      and the comma determines whether it is to set the spam or the ham
+      cutoff.
 </para>
 
 <para>The <option>-p</option> (passthrough) option writes a copy of
