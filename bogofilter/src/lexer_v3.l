@@ -94,8 +94,11 @@ static word_t *yy_text(void);
 static void html_char(void);
 static void html_reorder(void);
 
+static void url_char(void);
+
 static void skip_to(char chr);
 
+char yy_get_state(void);
 void yy_set_state_initial(void);
 
 /* Function Definitions */
@@ -136,6 +139,7 @@ BOGOLEX_TOKEN	[^[:blank:]<>;    &%  @ |/\\{}^\"  \*,[:cntrl:]\[\]]+
 TOKENBACK	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*\._\-\+,\[\][:cntrl:]]
 
 TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}{1,70}
+TOKEN_12 	({TOKEN}|{A2}|{A1})
 
 BASE64		[0-9a-zA-Z/+=]+
 QP		[!->@-~]+
@@ -174,7 +178,8 @@ WHITESPACE	[ \t\n]
 
 NOTWHITESPACE	[^ \t\n]
 
-HTML_ENTITY		"&#"x?[[:xdigit:]]+";"
+HTML_ENCODING		"&#"x?[[:xdigit:]]+";"
+URL_ENCODING		"\%"[[:xdigit:]][[:xdigit:]]
 
 HTML_WI_COMMENTS	"<"[^\>]*">"
 
@@ -269,7 +274,7 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 			return TOKEN;
 			}
 
-<HTML>({TOKEN}|{A2}|{A1})({HTMLTOKEN})+/{NOTWHITESPACE} 	{ html_reorder(); }
+<HTML>{TOKEN_12}({HTMLTOKEN})+/{NOTWHITESPACE}	{ html_reorder(); }
 
 <HTML>"<!--"					{ BEGIN SCOMMENT; }
 <HTML>"<!"					{ BEGIN (strict_check ? HTOKEN : LCOMMENT ); }
@@ -286,7 +291,8 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 {IPADDR}					{ return IPADDR;}
 {TOKEN}						{ return TOKEN;}
 
-<HTML>({TOKEN}|{A2}|{A1})?{HTML_ENTITY}		{ html_char(); }	/* process escaped chars, eg '&#61;' is 'A' */
+<HTML>{TOKEN_12}?{HTML_ENCODING}		{ html_char(); }	/* process escaped chars, eg '&#101;' is 'a' */
+<HTOKEN>{TOKEN_12}?{URL_ENCODING}+		{ url_char(); }		/* process escaped chars, eg '%61'    is 'a' */
 
 \${DOLLARS}(\.{CENTS})?				{ return TOKEN;}
 
@@ -325,10 +331,10 @@ static void html_reorder(void)
     xfree(yycopy);
 }
 
-static int xtoi(char *in)
+static int xtoi(char *in, size_t len)
 {
     int val = 0;
-    while (isxdigit(*in)) {
+    while (isxdigit((byte) *in) && (len-- > 0)) {
 	char c = *in++;
 	val <<= 4;
 	val += isdigit(c) ? (c - '0') : (tolower(c) - 'a' + 10);
@@ -341,7 +347,7 @@ static void html_char(void)
     char *txt = strstr(yytext, "&#");	/* find decodable char */
     size_t len = txt - yytext;
     int  val;
-    byte *yycopy = NULL;
+    char *yycopy = NULL;
 
     if (len != 0) {
 	yycopy = xmalloc(yyleng + 1);	/* +1 for NUL byte below */
@@ -350,9 +356,8 @@ static void html_char(void)
     }
 
     txt += 2;
-    val = isdigit((byte) *txt) ? atoi(txt) : xtoi(txt+1);
-
-    if ((val < 256) && isalnum(val)) {	/* use it if alphanumeric */
+    val = isdigit((byte) *txt) ? atoi(txt) : xtoi(txt+1, 4);
+    if ((val < 256) && isprint(val)) {	/* use it if printable */
 	yyunput(val, yytext);
 	yyleng = len;			/* adjust len to pre-char count */
     }
@@ -368,7 +373,23 @@ static void html_char(void)
     }
 }
 
-char yy_get_state(void);
+static void url_char(void)
+{
+    char *src, *dst;
+    src = dst = yytext;
+
+    while (src < yytext + yyleng) {
+	char c = *src++;
+	if (c == '%') {
+	    c = xtoi(src, 2);
+	    src += 2;
+	}
+	*dst++ = c;
+    }
+    while (dst > yytext) {
+	yyunput(*--dst, yytext);
+    }
+}
 
 char yy_get_state()
 {
