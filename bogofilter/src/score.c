@@ -181,9 +181,6 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     Rtable |= verbose > 3;
     need_stats = Rtable || verbose || passthrough;
 
-    if (need_stats)
-	rstats_init();
-
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
 				    min_dev, robs, robx);
 
@@ -262,6 +259,8 @@ void score_initialize(void)
     word_t *word_robx = word_new((const byte *)ROBX_W, strlen(ROBX_W));
 
     wordlist_t *list = get_default_wordlist(word_lists);
+
+    rstats_init();
 
     if (fabs(min_dev) < EPS)
 	min_dev = MIN_DEV;

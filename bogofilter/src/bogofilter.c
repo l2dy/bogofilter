@@ -81,8 +81,6 @@ rc_t bogofilter(int argc, char **argv)
 
     // atexit(bf_exit);
 
-    score_initialize();	/* initialize constants */
-
     if (query)
 	query_config();
 
@@ -93,6 +91,7 @@ rc_t bogofilter(int argc, char **argv)
 	wordhash_t *w = wordhash_new();
 
 	passthrough_setup();
+	score_initialize();	/* initialize constants */
 
 	collect_words(w);
 	msgcount += 1;
