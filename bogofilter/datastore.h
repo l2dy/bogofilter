@@ -1,3 +1,11 @@
+/* $Id$ */
+/*
+ * $Log$
+ * Revision 1.4  2002/10/04 04:01:51  relson
+ * Added cvs keywords Id and Log to the files' headers.
+ *
+ */
+
 /* 
  API for bogofilter datastore.
  The idea here is to make bogofilter independent of the database system
@@ -106,5 +114,3 @@ Releases acquired locks on multiple databases
 void db_lock_release_list(wordlist_t *list);
 
 #endif
-
-
