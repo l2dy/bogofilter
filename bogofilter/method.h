@@ -18,6 +18,11 @@ typedef	double	m_compute_spamicity(wordhash_t *wordhash, FILE *fp); /*@globals e
 typedef	void	m_print_bogostats(FILE *fp, double spamicity);
 typedef	void	m_cleanup(void);
 
+/*
+** This defines an object oriented API for accessing 
+** the methods needed by an object for spamicity computing.
+*/
+
 typedef struct method_s {
     const char		*name;
     const parm_desc	*config_parms;
