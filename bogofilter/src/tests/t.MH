@@ -33,8 +33,9 @@ done
 
 $BOGOFILTER -C -D -n $v -B $TMPDIR/good
 $BOGOFILTER -C -D -s $v -B $TMPDIR/spam
+wordlist=".MSG_COUNT Lotus Magazine Min Service connection more most set that unsubscribe"
 
-$BOGOFILTER -C -D -T -B $TMPDIR/good $TMPDIR/spam | sort | sed s@$TMPDIR/@@ | egrep -v " (H 0|S 1)$" > $OUT
+$BOGOUTIL -w $TMPDIR/wordlist.$DB_EXT $wordlist >$OUT || rm -f $OUT
 
 if  [ $verbose -eq 0 ]; then
     cmp $CORRECT $OUT
