@@ -1344,11 +1344,14 @@ static rc_t bogotune(void)
     ns_scores = xcalloc(ns_cnt, sizeof(double));
     sp_scores = xcalloc(sp_cnt, sizeof(double));
 
+    msgs_good = ns_cnt;
+    msgs_bad  = sp_cnt;
+
     robs = DEFAULT_ROBS;
     robx = DEFAULT_ROBX;
     min_dev = DEFAULT_MIN_DEV;
 
-    if(check_for_high_ns_scores() | check_for_low_sp_scores())
+    if (check_for_high_ns_scores() | check_for_low_sp_scores())
 	scoring_error();
 
     /*
