@@ -190,10 +190,11 @@ dbe_t *bft_init(const char *directory)
 
 void bft_cleanup(dbe_t *env)
 {
-    (void) env;
+    bft_cleanup_lite(env);
 }
 
 void bft_cleanup_lite(dbe_t *env)
 {
-    (void) env;
+    xfree(env->directory);
+    xfree(env);
 }
