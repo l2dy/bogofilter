@@ -18,7 +18,7 @@ AUTHOR:
 /* Globals */
 
 #define	MSG_COUNT_MAX_LEN 100
-extern	yylex_t	 msg_count_lex;
+extern	yylex_t	 read_msg_count_line;
 extern	char	*msg_count_text;
 extern	int	 msg_count_leng;
 

@@ -42,7 +42,7 @@ lexer_t v3_lexer = {
 };
 
 lexer_t msg_count_lexer = {
-    msg_count_lex,
+    read_msg_count_line,
     &msg_count_text,
     &msg_count_leng
 };

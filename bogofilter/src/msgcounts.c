@@ -35,7 +35,7 @@ long	msgs_bad  = 0L;
 
 /* Function Definitions */
 
-token_t  msg_count_lex(void)
+token_t  read_msg_count_line(void)
 {
     char *tmp = fgets(msg_count_chars, sizeof(msg_count_chars), fpin);
     if (tmp == NULL) {
