@@ -133,7 +133,7 @@ token_t get_token(void)
 		yylval->leng = strlen((const char *)yylval->text);
 		ipsave = word_new(NULL, plen + yylval->leng);
 		memcpy(ipsave->text, prefix, plen);
-		memcpy(ipsave->text+plen, yylval->text, yylval->leng);
+		memcpy(ipsave->text+plen, yylval->text, yylval->leng+1);
 		word_free(yylval);
 		yylval = ipsave;
 		save_class = IPADDR;
@@ -169,7 +169,7 @@ token_t get_token(void)
     }
 
     /* Need separate loop so lexer can see "From", "Date", etc */
-    if (!upper_case)
+    if (ignore_case)
 	for (cp = yylval->text; cp < yylval->text+yylval->leng; cp += 1)
 	    *cp = casefold_table[*cp];
 
