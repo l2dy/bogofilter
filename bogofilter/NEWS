@@ -27,6 +27,8 @@ Briefly:
 
 	* Accuracy fix: no longer pretend that we had seen an empty message
 	  registered when there was no registration. Use ROBX for spamicity.
+	  This changes the output format of bogofilter -vvv mode when no spam
+	  or no ham messages have been registered previously.
 
 	2004-11-29
 
