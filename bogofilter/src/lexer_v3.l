@@ -160,13 +160,13 @@ QP		[!->@-~]+
 */
 
 /* 09/01/03
-  Using "[^\?]" in the pattern and validating the charset in 'C'
+  Using "[^?]" in the pattern and validating the charset in 'C'
   reduces executable size by approx 290k.
-  new: ENCODED_WORD =\?{CHARSET}\?[bq]\?[^\?]*\?\=
-  old: ENCODED_WORD =\?{CHARSET}\?(b\?{BASE64}|q\?{QP})\?\=
+  new: ENCODED_WORD =\?{CHARSET}\?[bq]\?[^?]*\?=
+  old: ENCODED_WORD =\?{CHARSET}\?(b\?{BASE64}|q\?{QP})\?=
 */
 
-ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^\?]*\?=
+ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^?]*\?=
 ENCODED_TOKEN	({TOKENFRONT}{TOKENMID})?({ENCODED_WORD}[ \t\n]+)*{ENCODED_WORD}
 
 WHITESPACE	[ \t\n]
@@ -175,8 +175,8 @@ NOTWHITESPACE	[^ \t\n]
 HTML_ENCODING		"&#"x?[[:xdigit:]]+";"
 URL_ENCODING		"%"[[:xdigit:]][[:xdigit:]]
 
-HTML_WI_COMMENTS	"<"[^\>]*">"
-HTML_WO_COMMENTS	"<"[^!][^\>]*">"|"<>"
+HTML_WI_COMMENTS	"<"[^>]*">"
+HTML_WO_COMMENTS	"<"[^!][^>]*">"|"<>"
 
 HTMLTOKEN		{HTML_WI_COMMENTS}
 
