@@ -305,7 +305,8 @@ static void help(void)
 		  "\t  -e      - in -p mode, exit with code 0 when the mail is not spam.\n"
 		  "\t  -u      - classify message as spam or non-spam and register accordingly.\n"
 		  "\t  -2      - set binary classification mode (yes/no).\n"
-		  "\t  -3      - set ternary classification mode (yes/no/unsure).\n"
+		  "\t  -3      - set ternary classification mode (yes/no/unsure).\n");
+    (void)fprintf(stderr,
 		  "\t  -M      - set mailbox mode. Classify multiple messages in an mbox formatted file.\n"
 		  "\t  -b      - set streaming bulk mode. Classify multiple messages whose filenames are read from STDIN.\n"
 		  "\t  -B name1 name2 ... - set bulk mode. Classify multiple messages named as files on the command line.\n"
