@@ -249,7 +249,6 @@ static void display_node(hashnode_t *n, const char *str)
  */
 void wordhash_add(wordhash_t *dest, wordhash_t *src, void (*initializer)(void *))
 {
-    wordprop_t *d;
     hashnode_t *s;
 
     uint count = dest->count + src->count;	/* use dest count as total */
@@ -264,6 +263,7 @@ void wordhash_add(wordhash_t *dest, wordhash_t *src, void (*initializer)(void *)
     for (s = wordhash_first(src); s != NULL; s = wordhash_next(src)) {
 	wordprop_t *p = (wordprop_t *)s->buf;
 	word_t *key = s->key;
+	wordprop_t *d;
 	if (key == NULL)
 	    continue;
 	d = wordhash_insert(dest, key, sizeof(wordprop_t), initializer);
@@ -309,8 +309,10 @@ wordhash_search (const wordhash_t *wh, const word_t *t, unsigned int idx)
 
     for (hn = wh->bin[idx]; hn != NULL; hn = hn->next) {
 	word_t *key = hn->key;
-	if (key->leng == t->leng && memcmp (t->text, key->text, t->leng) == 0)
-	    return hn->buf;
+	if (key->leng == t->leng && memcmp (t->text, key->text, t->leng) == 0) {
+	    wordprop_t *p = (wordprop_t *)hn->buf;
+	    return p;
+	}
     }
     return NULL;
 }
@@ -454,10 +456,10 @@ static wordcnts_t *wordhash_get_counts(wordhash_t *wh, hashnode_t *n)
 void
 wordhash_set_counts(wordhash_t *wh, int good, int bad)
 {
-    hashnode_t *n;
+    hashnode_t *hn;
 
-    for (n = wordhash_first(wh); n != NULL; n = wordhash_next(wh)) {
-	wordcnts_t *c = wordhash_get_counts(wh, n);
+    for (hn = wordhash_first(wh); hn != NULL; hn = wordhash_next(wh)) {
+	wordcnts_t *c = wordhash_get_counts(wh, hn);
 	c->good += good;
 	c->bad  += bad;
     }
@@ -467,25 +469,19 @@ void
 wordhash_sort (wordhash_t *wh)
 {
     hashnode_t *node;
-    hashnode_t **order;
 
-    if (wh->type != WH_NORMAL)
+    if (wh->size == 0
+	|| wh->type != WH_NORMAL
+	|| msg_count_file)
 	return;
 
-    if (wh->size == 0)
-	return;
-
-    if (msg_count_file)
-	return;
-
-    order = (hashnode_t **) xcalloc(wh->size, sizeof(hashnode_t *));
+    wh->order = (hashnode_t **) xcalloc(wh->size, sizeof(hashnode_t *));
 
     wh->size = 0;
     for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
-	order[wh->size++] = node;
+	wh->order[wh->size++] = node;
 
-    qsort(order, wh->size, sizeof(hashnode_t *), compare_hashnode_t);
-    wh->order = order;
+    qsort(wh->order, wh->size, sizeof(hashnode_t *), compare_hashnode_t);
 
     wh->type = WH_ORDERED;
 
