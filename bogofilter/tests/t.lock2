@@ -24,7 +24,6 @@ explode() {
     grind &
     grind &
     grind &
-    grind &
     grind
     wait
     )
