@@ -7,19 +7,12 @@
 #include <stdlib.h>
 
 #include "charset.h"
+#include "hints.h"
 #include "mime.h"
 #include "wordhash.h"
 #include "token.h"
 
 #include "collect.h"
-
-static void initialize(void)
-{
-    mime_reset();
-    token_init();
-    lexer_v3_init(NULL);
-    init_charset_table(charset_default, true);
-}
 
 void wordprop_init(void *vwordprop)
 {
@@ -47,7 +40,7 @@ void collect_words(wordhash_t *wh)
 {
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### collect_words() begins\n");
 
-    initialize();
+    lexer_init();
 
     for (;;){
 	wordprop_t *wp;
@@ -87,6 +80,15 @@ void collect_words(wordhash_t *wh)
 	    s = strchr(s+1, ' ') + 1;
 	    wp->cnts.good = atoi(s);
 	}
+    }
+
+    while (true) {
+	word_t *token = get_hint();
+	wordprop_t *w;
+	if (token == NULL)
+	    break;
+	w = wordhash_insert(wh, token, sizeof(wordprop_t), &wordprop_init);
+	w->freq += 1;
     }
 
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### collect_words() ends\n");

@@ -54,6 +54,14 @@ static int skip_folded_line(buff_t *buff);
 
 /* Function Definitions */
 
+void lexer_init(void)
+{
+    mime_reset();
+    token_init();
+    lexer_v3_init(NULL);
+    init_charset_table(charset_default, true);
+}
+
 static void lexer_display_buffer(buff_t *buff)
 {
     fprintf(dbgout, "*** %2d %c%c %2ld ",
