@@ -59,6 +59,7 @@ static rstats_t *current = NULL;
 
 void rstats_print_histogram(size_t robn, rstats_t **rstats_array);
 void rstats_print_rtable(size_t robn, rstats_t **rstats_array);
+void rstats_print_rtable_summary(void);
 
 void rstats_init(void)
 {
@@ -94,9 +95,9 @@ static int compare_rstats_t(const void *const ir1, const void *const ir2)
 void rstats_fini(size_t robn, double invlogsum, double logsum, double invproduct, double product, double spamicity)
 {
     header.robn       = robn;
-    header.invproduct = invproduct;
-    header.product    = product;
-    header.spamicity  = spamicity;
+    header.invproduct = invproduct;	/* P */
+    header.product    = product;	/* Q */
+    header.spamicity  = spamicity;	/* S */
     header.invlogsum  = invlogsum;
     header.logsum     = logsum;
 }
@@ -197,6 +198,16 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array)
     }
 }
 
+
+void rstats_print_rtable_summary(void)
+{
+    /* print trailer */
+    (void)fprintf(stdout, "%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
+		  header.robn+1, "P_Q_S_invsum_logsum", 
+		  header.invproduct, header.product, header.spamicity,
+		  header.invlogsum, header.logsum);
+}
+
 void rstats_print_rtable(size_t robn, rstats_t **rstats_array)
 {
     size_t r;
@@ -217,7 +228,5 @@ void rstats_print_rtable(size_t robn, rstats_t **rstats_array)
     }
 
     /* print trailer */
-    (void)fprintf(stdout, "%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
-		  robn+1, "P_Q_S_invsum_logsum", header.invproduct, header.product, 
-		  header.spamicity, header.invlogsum, header.logsum);
+    rstats_print_rtable_summary();
 }

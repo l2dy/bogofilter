@@ -63,18 +63,18 @@ double prbf(double x, double df)
 double fis_get_spamicity(size_t robn, double invlogsum, double logsum, double *invproduct, double *product)
 {
     double df = 2.0 * robn;
-    double _invproduct = prbf(-2.0 * invlogsum, df);
-    double _product = prbf(-2.0 * logsum, df);
+    double p = prbf(-2.0 * invlogsum, df);	/* _invproduct */
+    double q = prbf(-2.0 * logsum, df);		/* _product    */
 
-    double spamicity = (1.0 + _product - _invproduct) / 2.0;
+    double spamicity = (1.0 + q - p) / 2.0;
 
-    *product = _product;
-    *invproduct = _invproduct;
+    *product = q;	/* _product    */
+    *invproduct = p;	/* _invproduct */
 
 #ifdef	RF_DEBUG
     if ( !quiet )
-	printf( "%d, invproduct: %f, product: %f, spamicity: %f, invlogsum: %f, logsum: %f\n", 
-		robn, _invproduct, _product, spamicity, invlogsum, logsum);
+	printf( "%d, p: %f, q: %f, spamicity: %f, p': %f, q': %f\n", 
+		robn, p, q, spamicity, invlogsum, logsum);
 #endif
 
     return spamicity;
