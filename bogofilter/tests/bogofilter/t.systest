@@ -1,0 +1,110 @@
+#! /bin/sh
+
+set -e
+
+#        In directory t.systest.d are:
+#
+#		inputs  - test inputs
+#		outputs - known correct outputs
+
+: ${srcdir=.}
+relpath="`pwd`/../.."
+. ${srcdir}/../t.frame -no-db
+
+verbose=0
+if [ "$1" = "-v" ]; then
+    verbose=1
+fi
+
+[ -d ${TMPDIR}/tests ] && rm -rf ${TMPDIR}/tests
+mkdir -p ${TMPDIR}/tests
+
+CONFIG="${TMPDIR}/test.cf"
+BOGOFILTER="$VAL ${relpath}/bogofilter -c ${CONFIG} -y 0"
+BOGOUTIL="$VAL ${relpath}/bogoutil"
+SYSTEST="${srcdir}"
+
+cat <<EOF > ${CONFIG}
+robx=0.415
+min_dev=0.0
+spam_header_name=X-Bogosity
+stats_in_header=Y
+EOF
+
+map_rc()
+{
+    (
+	set +e
+	eval "$@"
+	a=$?
+	[ $a -eq 0 ] && exit 0
+	[ $a -eq 1 ] && exit 0
+	exit $a
+    )
+}
+
+# Expected spamicity values (11/17/02 13:13):
+#
+#	1 g v		X-Bogosity: No,  spamicity=0.000000
+#	1 r v		X-Bogosity: No,  spamicity=0.402296
+#	2a g vv		X-Bogosity: Yes, spamicity=1.000000
+#	2a r vv		X-Bogosity: No,  spamicity=0.527095
+#	2b g vv		X-Bogosity: Yes, spamicity=1.000000
+#	2b g vvv	X-Bogosity: Yes, spamicity=1.000000
+#	2b r vv		X-Bogosity: Yes, spamicity=0.540124
+#	2b r vvv	X-Bogosity: Yes, spamicity=0.540124
+#	3 g vvv		X-Bogosity: Yes, spamicity=1.000000
+#	3 r vvv		X-Bogosity: Yes, spamicity=0.540316
+
+for alg in r g ; do
+    BOGOFILTER_DIR="${TMPDIR}/words.$alg"
+    export BOGOFILTER_DIR
+    rm -rf $BOGOFILTER_DIR
+    mkdir $BOGOFILTER_DIR
+    $BOGOFILTER -$alg -s < ${SYSTEST}/inputs/spam.mbx
+    $BOGOFILTER -$alg -n < ${SYSTEST}/inputs/good.mbx
+    $BOGOUTIL -d $BOGOFILTER_DIR/spamlist.db > $BOGOFILTER_DIR/spamlist.txt
+    $BOGOUTIL -d $BOGOFILTER_DIR/goodlist.db > $BOGOFILTER_DIR/goodlist.txt
+    if  [ $verbose -ne 0 ]; then
+	ls -l $BOGOFILTER_DIR/*list.txt
+    fi
+    #
+    # run tests for msg.1.txt, msg.2.txt, and msg.3.txt
+    #
+    for tst in 1.1.v 2.2a.vv 2.2a.vvv 3.3.vvv ; do
+	in=`echo $tst | tr "." " " | awk '{print $1}'`
+	out=`echo $tst | tr "." " " | awk '{print $2}'`
+	ver=`echo $tst | tr "." " " | awk '{print $3}'`
+	map_rc $BOGOFILTER -$alg -$ver 2>/dev/null \
+	< ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg || :
+	sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
+    done
+    #
+    # classify msg.2.txt a second time and rerun tests
+    #    (expect different results from first run)
+    #
+    $BOGOFILTER -$alg -s < ${SYSTEST}/inputs/msg.3.txt
+    for tst in 2.2b.vv 2.2b.vvv ; do
+	in=`echo $tst | tr "." " " | awk '{print $1}'`
+	out=`echo $tst | tr "." " " | awk '{print $2}'`
+	ver=`echo $tst | tr "." " " | awk '{print $3}'`
+	map_rc $BOGOFILTER -$alg -$ver 2>/dev/null \
+	< ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg
+	sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
+    done
+    rm -f ${TMPDIR}/tests-$alg
+    rm -f $BOGOFILTER_DIR/*.db
+done
+
+rm -f ${CONFIG}
+
+OUTPUTS=${SYSTEST}/outputs
+
+for i in $OUTPUTS/*v ; do
+    j=`basename $i`
+    if  [ $verbose -eq 0 ]; then
+	cmp $i ${TMPDIR}/tests/$j
+    else
+	diff -u -s --brief ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
+    fi
+done
