@@ -59,8 +59,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     int   exitcode;
     FILE  *out;
 
-    dbgout = stderr;
-
     exitcode = process_args(argc, argv);
     if (exitcode != 0)
 	exit(exitcode);
