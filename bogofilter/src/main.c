@@ -30,6 +30,7 @@ AUTHOR:
 #include "lexer.h"
 #include "bogofilter.h"
 #include "bogoconfig.h"
+#include "fgetsl.h"
 #include "format.h"
 #include "paths.h"
 #include "register.h"
@@ -108,8 +109,22 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     } else {
 	out = stdout;
     }
-    
-    textblocks = textblock_init();
+
+    /* check if the input is seekable, if it is, we don't need to buffer
+     * things in memory => configure passmode accordingly
+     */
+
+    passmode = PASS_MEM;
+    if (fseek(stdin, 0, SEEK_END) == 0) {
+	passmode = PASS_SEEK;
+	(void)rewind(stdin);
+    } else {
+	if (errno != ESPIPE && errno != ENOTTY) {
+	    fprintf(stderr, "cannot determine if input is seekable: %s", strerror(errno));
+	    exit(2);
+	}
+	textblocks = textblock_init();
+    }
 
     mime_reset();
 
@@ -132,7 +147,13 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	    break;
     }
 
-    textblock_free(textblocks);
+    switch(passmode) {
+	case PASS_MEM:
+	    textblock_free(textblocks);
+	    break;
+	case PASS_SEEK: default:
+	    break;
+    }
 
     close_wordlists(false);
     free_wordlists();
@@ -143,27 +164,108 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     exit(exitcode);
 }
 
-static void write_message(FILE *fp)
-{
-    textdata_t *text = textblocks->head;
+static int read_mem(char **out, void *in) {
+    textdata_t **text = in;
+    if ((*text)->next) {
+	int s = (*text)->size;
+	*out = (*text)->data;
+	*text = (*text)->next;
+	return s;
+    }
+    return 0;
+}
 
-    if (passthrough)
-    {
-	/* print headers */
-	while (text->next)
-	{
-	    if ((text->size == 1 && memcmp(text->data, NL, 1) == 0) ||
-		(text->size == 2 && memcmp(text->data, CRLF, 2) == 0))
-		break;
+static int read_seek(char **out, void *in) {
+    static char buf[4096];
+    FILE *inf = in;
+    static int carry[2] = { -1, -1 }; /* carry over bytes */
+    int s, i;
+    char *b = buf;
+    int cap = sizeof(buf);
 
-	    (void) fwrite(text->data, 1, text->size, fp);
-	    if (ferror(fp)) cleanup_exit(2, 1);
-	    text=text->next;
+    for (i = 0; i < (int)sizeof(carry) && carry[i] != -1 ; i++) {
+	buf[i] = carry[i];
+	carry[i] = -1;
+    }
+    b += i;
+    cap -= i;
+
+    s = xfgetsl(b, cap, inf, 1);
+    if (s == EOF) {
+       if (i) s = i;
+    } else {
+	s += i;
+    }
+
+    /* we must take care that on overlong lines, the \n doesn't appear
+     * at the beginning of the buffer, so we pull two characters out and 
+     * store them in the carry array */
+    if (s && buf[s-1] != '\n') {
+	int c = 2;
+	if (c > s) c = s;
+	s -= c;
+	for (i = 0; i < c ; i++) {
+	    carry[i] = (unsigned char)buf[s+i];
 	}
     }
 
-    if (passthrough || verbose)
-    {
+    *out = buf;
+    return s;
+}
+
+typedef int (*readfunc_t)(char **, void *);
+
+static void write_message(FILE *fp)
+{
+    ssize_t rd = 0; /* assignment to quench warning */
+    readfunc_t rf = 0; /* dito */
+    void *rfarg = 0; /* dito */
+    char *out;
+    textdata_t *text;
+
+    if (passthrough) {
+	int hadlf = 1;
+	int hdrlen;
+	/* initialize */
+	switch (passmode) {
+	    case PASS_MEM:
+		rf = read_mem;
+		text = textblocks->head;
+		rfarg = &text;
+		break;
+	    case PASS_SEEK:
+		rf = read_seek;
+		rfarg = stdin;
+		rewind(rfarg);
+		break;
+	    default:
+		abort();
+	}
+
+	hdrlen = strlen(spam_header_name);
+	/* print headers */
+	while ((rd = rf(&out, rfarg)) > 0)
+	{
+	    /* detect end of headers */
+	    if ((rd == 1 && memcmp(out, NL, 1) == 0) ||
+		    (rd == 2 && memcmp(out, CRLF, 2) == 0)) {
+		break;
+	    }
+
+	    /* skip over spam_header ("X-Bogosity:") lines */
+	    if (rd >= hdrlen && 0 == memcmp(out, spam_header_name, hdrlen))
+		continue;
+
+	    hadlf = (out[rd-1] == '\n');
+	    (void) fwrite(out, 1, rd, fp);
+	    if (ferror(fp)) cleanup_exit(2, 1);
+	}
+
+	if (!hadlf)
+	    fputc('\n', fp);
+    }
+
+    if (passthrough || verbose) {
 	typedef char *formatter(char *buff, size_t size);
 	formatter *fcn = terse ? format_terse : format_header;
 	char buff[256];
@@ -174,8 +276,7 @@ static void write_message(FILE *fp)
 	fputs ("\n", fp);
     }
 
-    if (verbose || passthrough || Rtable)
-    {
+    if (verbose || passthrough || Rtable) {
 	if (! stats_in_header)
 	    (void)fputs("\n", stdout);
 	verbose += passthrough;
@@ -183,21 +284,22 @@ static void write_message(FILE *fp)
 	verbose -= passthrough;
     }
 
-    if (passthrough)
-    {
+    if (passthrough) {
+	int hadlf = 1;
 	/* If the message terminated early (without body or blank
 	 * line between header and body), enforce a blank line to
 	 * prevent anything past us from choking. */
-	if (!text->data)
-	    (void)fputs("\n", fp);
+	(void)fputc('\n', fp);
 
 	/* print body */
-	while (text->next)
+	while ((rd = rf(&out, rfarg)) > 0)
 	{
-	    (void) fwrite(text->data, 1, text->size, fp);
+	    (void) fwrite(out, 1, rd, fp);
+	    hadlf = (out[rd-1] == '\n');
 	    if (ferror(fp)) cleanup_exit(2, 1);
-	    text=text->next;
 	}
+
+	if (!hadlf) fputc('\n', fp);
 
 	if (fflush(fp) || ferror(fp) || (fp != stdout && fclose(fp))) {
 	    cleanup_exit(2, 1);
