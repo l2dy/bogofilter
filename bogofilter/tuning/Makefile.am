@@ -5,4 +5,5 @@ EXTRA_DIST= \
 	ANNOUNCE \
 	README.bogotune	 \
 	bogotune \
-	bogol
+	bogol \
+	sample.output/tune.nochange sample.output/tune.normal sample.output/tune.verbose
