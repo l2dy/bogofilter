@@ -91,8 +91,9 @@ static int yy_get_new_line(buff_t *buff)
 	yylineno += 1;
 
     if (count == EOF) {
-	if ( !ferror(fpin)) 
+	if (fpin == NULL || !ferror(fpin)) {
 	    return YY_NULL;
+	}
 	else {
 	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
 	    exit(EX_ERROR);
