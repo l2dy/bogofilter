@@ -127,6 +127,7 @@ endif
 datastore_OBJECT = $(datastore_SOURCE:.c=.o)
 
 libbogofilter_a_SOURCES += $(datastore_SOURCE)
+EXTRA_libbogofilter_a_SOURCES = datastore_db.c datastore_qdbm.c datastore_tdb.c
 
 CLEANFILES=version.c directories.c bogoupgrade
 

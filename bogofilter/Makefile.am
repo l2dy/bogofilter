@@ -39,5 +39,5 @@ rsync:	distdir .rsyncs
 	@( cat .rsyncs | sed -e 's}^}rsync -av --delete $(PACKAGE)-$(VERSION)/ }; s/\($$\)/ \&/;' ; echo "wait" ) | $(SHELL) -x
 
 dist-hook:
-	cd $(distdir) && find doc -name CVS -type d -prune -exec rm -r '{}' ';'
+	cd $(distdir) && find doc gsl -name CVS -type d -prune -exec rm -r '{}' ';'
 	rm -f $(distdir)/doc/.cvsignore
