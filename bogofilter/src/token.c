@@ -292,6 +292,7 @@ void set_tag(const char *text)
     }
 
     switch (tolower(*text)) {
+    case 'c':				/* CC: */
     case 't':
 	token_prefix = w_to;		/* To: */
 	break;

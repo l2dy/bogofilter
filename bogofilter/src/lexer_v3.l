@@ -219,7 +219,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 						  yy_unput(w->text, text_decode(w));
 						}
 
-<INITIAL>^(To|From|Return-Path|Subject):	{ set_tag(yytext); }
+<INITIAL>^(To|CC|From|Return-Path|Subject):	{ set_tag(yytext); }
 <INITIAL>^Received:				{ set_tag(yytext); }
 <INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); return TOKEN; }
 
