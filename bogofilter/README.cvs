@@ -5,24 +5,15 @@ $Id$
 of the GNU Free Documentation License 1.0. No front- or back-matter
 parts, no invariant parts.
 ------------------------------------------------------------------------
+After you have checked out bogofilter from CVS, some files are missing,
+for example, configure, ylwrap and others.
 
-So you have checked out bogofilter from CVS and are missing the
-./configure and Makefile.in files. We omitted them deliberately from the
-CVS, because these files can be automatically generated on your system,
-and we don't want to track the huge GNU auto* files in our CVS.
+These files can be created automatically with recent autoconf versions.
 
-To regenerate the files, you will need the GNU autoconf and GNU automake
-packages. The oldest acceptable versions are GNU autoconf 2.53 and GNU
-automake 1.6, but autoconf 2.54 and automake 1.7 are fine. Install these
-if they are missing. You will also need a real Bourne shell. If your
-system's /bin/sh fails, go for pdksh or GNU bash instead.
+To recreate these files, run: autoreconf -i -s -f
 
-Then, run ./cvs-bootstrap.sh and add your ./configure options.
-
-If you don't know the options yet, try ./cvs-bootstrap.sh --help, it
-will generate Makefile.in, configure and print the ./configure help.
-Then, continue as usual, with ./configure, make, ... you know the rest
-(or you can read INSTALL).
+Then proceed as usual: ./configure && make && make check
+and so on.
 
 Have fun!
 ------------------------------------------------------------------------
