@@ -20,6 +20,11 @@
 set -e
 
 DIR=${1:-.}
+if [ ! -d $DIR ] ; then
+    echo "$DIR" must be a directory, not a file
+    exit
+fi
+
 : ${DB_ARCHIVE:=db_archive}
 : ${AWK:=awk}
 

@@ -16,6 +16,11 @@ if [ -z "$1" ] ; then
 fi
 
 ORIG="$1"
+if [ ! -d $ORIG ] ; then
+    echo "$ORIG" must be a directory, not a file
+    exit
+fi
+
 if [ -z "$2" ] ; then
     FILE="wordlist.db"
 else
