@@ -16,7 +16,7 @@ typedef struct bogostat_s bogostat_t;
 
 typedef	void	m_initialize(void);
 typedef	double	m_compute_spamicity(wordhash_t *wordhash, FILE *fp); /*@globals errno@*/
-typedef	void	m_print_bogostats(FILE *fp, double spamicity);
+typedef	void	m_print_stats(FILE *fp);
 typedef	void	m_cleanup(void);
 typedef	double	m_spamicity(void);
 typedef	rc_t	m_status(void);
@@ -33,7 +33,7 @@ typedef struct method_s {
     m_compute_spamicity	*compute_spamicity;
     m_spamicity		*spamicity;		/* numeric */
     m_status		*status;		/* string - Yes, No, ... */
-    m_print_bogostats	*print_stats;
+    m_print_stats	*print_stats;
     m_cleanup		*cleanup;
 } method_t;
 

@@ -57,7 +57,7 @@ rf_method_t rf_fisher_method = {	/* used by config.c */
 	rob_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
 	mth_spamicity,			/* m_spamicity		  *spamicity		*/
 	fis_status,			/* m_status		  *status		*/
-	rob_print_bogostats, 		/* m_print_bogostats	  *print_stats		*/
+	rob_print_stats, 		/* m_print_bogostats	  *print_stats		*/
 	rob_cleanup, 			/* m_free		  *cleanup		*/
     },
     fis_get_spamicity,			/* rf_get_spamicity	  *get_spamicity	*/

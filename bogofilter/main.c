@@ -171,7 +171,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 		    if (! stats_in_header)
 			(void)fputs("\n", stdout);
 		    verbose += passthrough;
-		    print_stats( stdout, spamicity );
+		    print_stats( stdout );
 		    verbose -= passthrough;
 		}
 

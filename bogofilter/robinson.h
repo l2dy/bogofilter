@@ -41,7 +41,7 @@ typedef struct rob_stats_s {
 /* needed by fisher.c, else should be declared in robinson.c as static */
 extern	double	rob_bogofilter(wordhash_t *wordhash, FILE *fp); /*@globals errno@*/
 extern	double	rob_compute_spamicity(wordhash_t *wordhash, FILE *fp); /*@globals errno@*/
-extern	void	rob_print_bogostats(FILE *fp, double spamicity);
+extern	void	rob_print_stats(FILE *fp);
 extern	void	rob_cleanup(void);
 
 #ifdef	ENABLE_ROBINSON_METHOD

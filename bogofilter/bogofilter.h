@@ -12,6 +12,6 @@ typedef enum rc_e {RC_SPAM=0, RC_HAM=1, RC_UNSURE=2}  rc_t;
 
 extern void initialize_constants(void);
 extern rc_t bogofilter(/*@out@*/ double *xss);
-extern void print_stats(FILE *fp, double spamicity);
+extern void print_stats(FILE *fp);
 
 #endif	/* HAVE_BOGOFILTER_H */

@@ -71,7 +71,7 @@ rf_method_t rf_robinson_method = {	/* needed by config.c */
 	rob_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
 	mth_spamicity,			/* m_spamicity		  *spamicity		*/
 	mth_status,			/* m_status		  *status		*/
-	rob_print_bogostats, 		/* m_print_bogostats	  *print_stats		*/
+	rob_print_stats, 		/* m_print_bogostats	  *print_stats		*/
 	rob_cleanup, 			/* m_free		  *cleanup		*/
     },
     rob_get_spamicity,			/* rf_get_spamicity	  *get_spamicity	*/
@@ -79,11 +79,11 @@ rf_method_t rf_robinson_method = {	/* needed by config.c */
 };
 #endif
 
-void rob_print_bogostats(FILE *fp, double spamicity)
+void rob_print_stats(FILE *fp)
 {
     if (force || 
-	spamicity > thresh_stats || 
-	spamicity > thresh_rtable || 
+	rob_stats.s.spamicity > thresh_stats || 
+	rob_stats.s.spamicity > thresh_rtable || 
 	method->status() == RC_UNSURE )
 	rstats_print();
 }

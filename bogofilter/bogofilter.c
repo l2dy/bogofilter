@@ -45,9 +45,9 @@ void initialize_constants()
     method->initialize();
 }
 
-void print_stats(FILE *fp, double spamicity)
+void print_stats(FILE *fp)
 {
-    method->print_stats(fp, spamicity);
+    method->print_stats(fp);
 }
 
 rc_t bogofilter(double *xss) /*@globals errno@*/
