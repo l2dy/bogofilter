@@ -17,6 +17,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#ifdef __DGUX__
+#define MAP_FAILED (-1)
+#endif
+
 #define ALPHABET 256
 
 /* vanilla Boyer-Moore-Horspool */
