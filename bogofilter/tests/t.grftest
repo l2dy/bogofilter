@@ -43,13 +43,14 @@ EOF
 cat <<EOF > ${TMPDIR}/cfg.t
 robx=0.415
 min_dev=0.1
+ham_cutoff=0.1
 terse_format = %1.1c %d
 spamicity_tags = S,h,u
 spamicity_formats = %6.2e %6.2e %0.6f
 EOF
 
-BOGOUTIL="../bogoutil"
 BOGOFILTER="../bogofilter"
+BOGOUTIL="../bogoutil"
 SYSTEST="${srcdir}/t.systest.d"
 
 map_rc()
@@ -88,6 +89,7 @@ for mth in g r f t ; do
     mkdir -p $BOGOFILTER_DIR
     $BOGOFILTER -$alg $CFG -s < ${SYSTEST}/inputs/spam.mbx
     $BOGOFILTER -$alg $CFG -n < ${SYSTEST}/inputs/good.mbx
+    [ $verbose -gt 0 ] && $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT
     #
     # run tests for msg.[1-8].txt
     #
