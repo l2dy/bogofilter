@@ -40,15 +40,14 @@ RESULT=`echo $RESULT | sed s@\ @@g`
 WANT="1102.3073"
 #loose checking
 WANT="1103.3073"
-
 # v0.12.4 - parsing adds '!' and money amounts
 WANT="1126.3080"
-
 # v0.13.0 - new parsing rules - case sensitive, header_line_markup, tokenize_html_tags
 WANT="1690.3918"
-
 # v0.13.5 - new parsing rules - allow terminal exclamation points
 WANT="1724.3937"
+# v0.13.6.2 - lexer_v3.l changes to exclude brackets
+WANT="1723.3931"
 
 if [ "$RESULT" != "$WANT" ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT

@@ -1,6 +1,5 @@
 ******  IHT  ******
 ***  0 h 12 From bounce
-From
 bounce
 ***  1 h 9 To: junk
 junk
@@ -33,7 +32,6 @@ wordlist
 *** 17 b 13 <fontx font>
 ******  iHT  ******
 ***  0 h 12 From bounce
-from
 bounce
 ***  1 h 9 To: junk
 junk
@@ -66,7 +64,6 @@ wordlist
 *** 17 b 13 <fontx font>
 ******  IhT  ******
 ***  0 h 12 From bounce
-From
 bounce
 ***  1 h 9 To: junk
 to:junk
@@ -99,7 +96,6 @@ wordlist
 *** 17 b 13 <fontx font>
 ******  IHt  ******
 ***  0 h 12 From bounce
-From
 bounce
 ***  1 h 9 To: junk
 junk
@@ -142,7 +138,6 @@ red
 *** 17 b 13 <fontx font>
 ******  Iht  ******
 ***  0 h 12 From bounce
-From
 bounce
 ***  1 h 9 To: junk
 to:junk
@@ -185,7 +180,6 @@ red
 *** 17 b 13 <fontx font>
 ******  iHt  ******
 ***  0 h 12 From bounce
-from
 bounce
 ***  1 h 9 To: junk
 junk
@@ -228,7 +222,6 @@ red
 *** 17 b 13 <fontx font>
 ******  ihT  ******
 ***  0 h 12 From bounce
-from
 bounce
 ***  1 h 9 To: junk
 to:junk
@@ -261,7 +254,6 @@ wordlist
 *** 17 b 13 <fontx font>
 ******  iht  ******
 ***  0 h 12 From bounce
-from
 bounce
 ***  1 h 9 To: junk
 to:junk

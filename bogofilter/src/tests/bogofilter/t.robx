@@ -64,6 +64,8 @@ WANT="356086"
 WANT="370952"
 # v0.13.5 - new parsing rules - allow terminal exclamation points
 WANT="367743"
+# v0.13.6.2 - lexer_v3.l changes to exclude brackets
+WANT="367104"
 
 if [ "$RESULT" != "$WANT" ] ; then
     echo want: $WANT, have: $RESULT
