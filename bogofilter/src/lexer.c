@@ -107,6 +107,8 @@ static int yy_use_redo_text(buff_t *buff)
     byte  *buf = buff->t.text+used;
     size_t count = min(yysave->size, avail-2);
 
+    if (avail < 2) abort();
+
     memcpy(buf, yysave->t.text, count );
     buf[count++] = '\n';
     buf[count] = '\0';
