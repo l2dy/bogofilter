@@ -89,7 +89,9 @@ done
 
 rm -f ${CONFIG}
 
+OUTPUTS=${SYSTEST}/outputs
 REFDIR=$srcdir/t.systest.d/outputs
+
 for i in $REFDIR/*v ; do
     j=`basename $i`
     if  [ $verbose -eq 0 ]; then
