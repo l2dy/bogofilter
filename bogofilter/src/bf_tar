@@ -48,4 +48,4 @@ if [ $removebef -eq 1 ] ; then nukelogs ; fi
 | pax -w -v -x ustar
 
 # remove if requested
-if [ $removeaft 1 ] ; then nukelogs ; fi
+if [ $removeaft -eq 1 ] ; then nukelogs ; fi
