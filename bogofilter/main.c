@@ -101,13 +101,16 @@ static int check_directory(const char* path)
 int main(int argc, char **argv)
 {
     int	  ch;
+    int	  optind_save;
     int   exitcode = 0;
     char  *Rfn = NULL;
 
     set_dir_from_env(directory, "HOME", BOGODIR);
     set_dir_from_env(directory, "BOGOFILTER_DIR", NULL);
 
-    while ((ch = getopt(argc, argv, "d:ehlsnSNvVxpugR::r")) != EOF)
+    optind_save=1;
+    while ((ch = getopt(argc, argv, "d:ehlsnSNvVpugR::rx:")) != EOF)
+    {
 	switch(ch)
 	{
 	case 'd':
@@ -186,16 +189,19 @@ int main(int argc, char **argv)
 	    break;
 
 	case 'R':
+	{
+	    char *tmp;
 	    Rtable = 1;
-	    if(optarg) {
-	        Rfn = strdup(optarg-1);
+	    tmp = (optind_save == optind) ? argv[optind] : optarg;
+	    Rfn = tmp ? strdup(tmp) : NULL;
+	    if (Rfn != NULL) {
 	        if(!(Rfp = fopen(Rfn, "w"))) {
 	            fprintf(stderr, "Error: can't write %s\n", Rfn);
 	            Rtable = 0;
 	        }
 	    } else Rfp = stdout;
+	}
 	    // fall through to force Robinson calculations
-
 	case 'r':
 	    algorithm = AL_ROBINSON;
 	    break;
@@ -204,6 +210,8 @@ int main(int argc, char **argv)
 	    set_debug_mask( argv[optind] );
 	    break;
 	}
+	optind_save = optind+1;
+    }
 
     if (!directory[0]) {
 	fprintf(stderr, "%s: cannot find bogofilter directory.\n"
