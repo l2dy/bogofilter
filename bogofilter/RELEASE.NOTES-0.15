@@ -37,4 +37,4 @@ header tagging to be used to fullest advantage.
 
 With release 0.15, bogofilter's code for processing multiple messages
 has been rewritten.  In addition to understanding mbox format files,
-bogofilter now understands MH and Mailder folder formats.
+bogofilter now understands maildirs and MH folders.
