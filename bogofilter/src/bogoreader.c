@@ -34,8 +34,8 @@ static char dirname[PATH_LEN+1];
 
 static FILE *yy_file;
 
-static bool first = true;  /* for the _more functions */
-static bool nfirst = true; /* for the _next functions */
+static bool mail_first = true;  /* for the _next_mail functions */
+static bool mailstore_first = true; /* for the _next_mailstore functions */
 static bool emptyline = false; /* for mailbox /^From / match */
 
 #ifdef	DUP_REF_RSLTS
@@ -48,15 +48,15 @@ static bool    have_message = false;
 
 /* these functions check if there are more file names in bulk modes,
  * read-mail/mbox-from-stdin for uniformity */
-static lexer_more_t stdin_next;
-static lexer_more_t b_stdin_next;
-static lexer_more_t b_args_next;
+static lexer_more_t stdin_next_mailstore;
+static lexer_more_t b_stdin_next_mailstore;
+static lexer_more_t b_args_next_mailstore;
 
 /* these functions check if there is more mail in a mailbox/maildir/...
- * to process, trivial mail_more for uniformity */
-static lexer_more_t mail_more;
-static lexer_more_t mailbox_more;
-static lexer_more_t maildir_more;
+ * to process, trivial mail_next_mail for uniformity */
+static lexer_more_t mail_next_mail;
+static lexer_more_t mailbox_next_mail;
+static lexer_more_t maildir_next_mail;
 /* maildir is the mailbox format specified in
  * http://cr.yp.to/proto/maildir.html */
 
@@ -113,8 +113,8 @@ static int ismaildir(const char *dir) {
 
 static void dummy_fini(void) { }
 
-static lexer_more_t *object_next;
-static lexer_more_t *object_more = NULL; /* for universal_more */
+static lexer_more_t *object_next_mailstore;
+static lexer_more_t *object_next_mail = NULL;
 
 /* this is the 'nesting driver' for our input.
  * object := one out of { mail, mbox, maildir }
@@ -122,20 +122,20 @@ static lexer_more_t *object_more = NULL; /* for universal_more */
  * further input in the object first. if we don't, see if we have
  * further objects to process
  */
-static bool lexer__more(void)
+static bool lexer__next_mail(void)
 {
     for (;;) {
 	/* check object-specific method */
-	if (object_more) {
-	    if ((*object_more)()) /* more mails in the object */
+	if (object_next_mail) {
+	    if ((*object_next_mail)()) /* more mails in the object */
 		return true;
-	    object_more = NULL;
+	    object_next_mail = NULL;
 	}
 
 	/* ok, that one has been exhausted, try the next object */
 
-	/* object_next opens the object */
-	if (!object_next())
+	/* object_next_mailstore opens the object */
+	if (!object_next_mailstore())
 	    return NULL;
 
 	/* ok, we have more objects, so check if the current object has
@@ -145,7 +145,7 @@ static bool lexer__more(void)
 }
 
 /* open object (Maildir, mbox file or file with a single mail) and set
- * _getline and _more pointers dependent on what the obj is.
+ * _getline and _next_mail pointers dependent on what the obj is.
  *
  * - automatically detects maildir
  * - does not automatically distinguish between mbox and mail
@@ -161,7 +161,7 @@ static bool open_object(char *obj)
     if (ismaildir(filename) == 1) {
 	/* MAILDIR */
 	lexer_getline = maildir_getline;
-	object_more = maildir_more;
+	object_next_mail = maildir_next_mail;
 	maildir_init(filename);
 	return true;
     } else if (isdir(filename) == 1) {
@@ -178,27 +178,27 @@ static bool open_object(char *obj)
 	}
 	emptyline = false;
 	lexer_getline = mbox_mode ? mailbox_getline : maildir_getline;
-	object_more = mbox_mode ? mailbox_more : mail_more;
-	first = true;
+	object_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
+	mail_first = true;
 	return true;
     }
 }
 
-/*** _next functions ***********************************************/
+/*** _next_mailstore functions ***********************************************/
 
 /* this initializes for reading a single mail or a mbox from stdin */
-static bool stdin_next(void)
+static bool stdin_next_mailstore(void)
 {
-    bool val = nfirst;
+    bool val = mailstore_first;
     lexer_getline = mbox_mode ? mailbox_getline : maildir_getline;
-    object_more = mbox_mode ? mailbox_more : mail_more;
-    nfirst = false;
+    object_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
+    mailstore_first = false;
     return val;
 }
 
 /* this reads file names from stdin and processes them according to
  * their type */
-static bool b_stdin_next(void)
+static bool b_stdin_next_mailstore(void)
 {
     int len;
     filename = namebuff;
@@ -214,21 +214,21 @@ static bool b_stdin_next(void)
 
 /* this reads file names from the command line and processes them
  * according to their type */
-static bool b_args_next(void)
+static bool b_args_next_mailstore(void)
 {
     if (!*argv) return false;
     filename = *(argv++);
     return open_object(filename);
 }
 
-/*** _more functions ***********************************************/
+/*** _next_mail functions ***********************************************/
 
 /* trivial function, returns true on first run,
  * returns false on all subsequent runs */
-static bool mail_more(void)
+static bool mail_next_mail(void)
 {
-    if (first) {
-	first = false;
+    if (mail_first) {
+	mail_first = false;
 	return true;
     }
     return false;
@@ -236,20 +236,20 @@ static bool mail_more(void)
 
 /* always returns true on the first run
  * subsequent runs return true when a From line was encountered */
-static bool mailbox_more(void)
+static bool mailbox_next_mail(void)
 {
 #ifndef	DUP_REF_RSLTS
     bool val = have_message;
 #else
     bool val = line_save != NULL;
 #endif
-    val = val || first;
-    first = false;
+    val = val || mail_first;
+    mail_first = false;
     return val;
 }
 
 /* iterates over files in a maildir */
-static bool maildir_more(void)
+static bool maildir_next_mail(void)
 {
     struct dirent *dirent;
 
@@ -423,9 +423,9 @@ static const char *get_filename(void)
 /* global reader initialization, exported */
 void bogoreader_init(int _argc, char **_argv)
 {
-    nfirst = first = true;
+    mailstore_first = mail_first = true;
     lexer_getline = mailbox_getline;
-    lexer_more = lexer__more;
+    lexer_more = lexer__next_mail;
     fini = dummy_fini;
     if (run_type & (REG_SPAM|REG_GOOD|UNREG_SPAM|UNREG_GOOD))
 	mbox_mode = true;
@@ -433,15 +433,15 @@ void bogoreader_init(int _argc, char **_argv)
     switch (bulk_mode) {
     case B_NORMAL:		/* read mail (mbox) from stdin */
 	yy_file = fpin;
-	object_next = stdin_next;
+	object_next_mailstore = stdin_next_mailstore;
 	break;
     case B_STDIN:		/* '-b' - streaming (stdin) mode */
-	object_next = b_stdin_next;
+	object_next_mailstore = b_stdin_next_mailstore;
 	break;
     case B_CMDLINE:		 /* '-B' - command line mode */
 	argc = _argc;
 	argv = _argv;
-	object_next = b_args_next;
+	object_next_mailstore = b_args_next_mailstore;
 	break;
     default:
 	fprintf(stderr, "Unknown bulk_mode = %d\n", (int) bulk_mode);
