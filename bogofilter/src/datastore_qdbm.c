@@ -8,13 +8,15 @@ datastore_qdbm.c -- implements the datastore, using qdbm.
 AUTHORS:
 Gyepi Sam <gyepi@praxis-sw.com>          2003
 Matthias Andree <matthias.andree@gmx.de> 2003
-Stefan Bellon <sbellon@sbellon.de>       2003
+Stefan Bellon <sbellon@sbellon.de>       2003-2004
 
 ******************************************************************************/
 
 #include "common.h"
 
 #include <depot.h>
+#include <cabin.h>
+#include <villa.h>
 #include <stdlib.h>
 
 #include "datastore.h"
@@ -24,24 +26,15 @@ Stefan Bellon <sbellon@sbellon.de>       2003
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-/* initial bucket array element count (for new data base) */
-static const int DB_INITBNUM = 1913;
-
-/* align to size for quick overwrites. */
-static const int DB_ALIGNSIZE = 12;
-
-/* reorganize data base if record/bucket ratio grows above this 
- * hence "FILL" for "bucket fill ratio". */
-static const double DB_MAXFILL = 0.8;
+#define UNUSED(x) ((void)&x)
 
 typedef struct {
     char *path;
     char *name;
     bool locked;
     bool created;
-    DEPOT *dbp;
+    VILLA *dbp;
 } dbh_t;
-
 
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
@@ -50,11 +43,27 @@ static bool init = false;
 
 /* Function definitions */
 
+int cmpkey(const char *aptr, int asiz, const char *bptr, int bsiz)
+{
+    int aiter, biter;
+    
+    for (aiter = 0, biter = 0; aiter < asiz && biter < bsiz; ++aiter, ++biter) {
+        if (aptr[aiter] != bptr[biter])
+            return (aptr[aiter] < bptr[biter]) ? -1 : 1;
+    }
+    
+    if (aiter == asiz && biter == bsiz)
+        return 0;
+    
+    return (aiter == asiz) ? -1 : 1;
+}
+
+
 const char *db_version_str(void)
 {
     static char v[80];
     if (!v[0])
-	snprintf(v, sizeof(v), "QDBM (version %s, Depot API)", dpversion);
+	snprintf(v, sizeof(v), "QDBM (Depot version %s, Villa API)", dpversion);
     return v;
 }
 
@@ -93,7 +102,8 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 /* Returns is_swapped flag */
 bool db_is_swapped(void *vhandle)
 {
-    (void) vhandle;		/* suppress compiler warning */
+    UNUSED(vhandle);
+
     return false;
 }
 
@@ -115,21 +125,21 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     dbh_t *handle;
 
     int open_flags;
-    DEPOT *dbp;
+    VILLA *dbp;
 
     if (open_mode & DS_WRITE)
-	open_flags = DP_OWRITER;
+	open_flags = VL_OWRITER;
     else
-	open_flags = DP_OREADER;
+	open_flags = VL_OREADER;
 
     handle = dbh_init(db_file, name);
 
     if (handle == NULL) return NULL;
 
-    dbp = handle->dbp = dpopen(handle->name, open_flags, DB_INITBNUM);
+    dbp = handle->dbp = vlopen(handle->name, open_flags, cmpkey);
 
     if ((dbp == NULL) && (open_mode & DS_WRITE)) {
-	dbp = handle->dbp = dpopen(handle->name, open_flags | DP_OCREAT, DB_INITBNUM);
+	dbp = handle->dbp = vlopen(handle->name, open_flags|VL_OCREAT, cmpkey);
 	if (dbp != NULL)
 	    handle->created = true;
     }
@@ -137,20 +147,13 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     if (dbp == NULL)
 	goto open_err;
 
-    if (open_flags & DP_OWRITER) {
-	if (!dpsetalign(dbp, DB_ALIGNSIZE)){
-	    dpclose(dbp);
-	    goto open_err;
-	}
-    }
-
     if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "(qdbm) dpopen( %s, %d )\n", handle->name, open_mode);
+	fprintf(dbgout, "(qdbm) vlopen( %s, %d )\n", handle->name, open_mode);
 
     return handle;
 
  open_err:
-    print_error(__FILE__, __LINE__, "(qdbm) dpopen(%s, %d) failed: %s",
+    print_error(__FILE__, __LINE__, "(qdbm) vlopen(%s, %d) failed: %s",
 		handle->name, open_flags, dperrmsg(dpecode));
     dbh_free(handle);
 
@@ -162,13 +165,13 @@ int db_delete(void *vhandle, const dbv_t *token)
 {
     int ret;
     dbh_t *handle = vhandle;
-    DEPOT *dbp;
+    VILLA *dbp;
 
     dbp = handle->dbp;
-    ret = dpout(dbp, token->data, token->leng);
+    ret = vlout(dbp, token->data, token->leng);
 
     if (ret == 0) {
-	print_error(__FILE__, __LINE__, "(qdbm) dpout('%.*s'), err: %s",
+	print_error(__FILE__, __LINE__, "(qdbm) vlout('%.*s'), err: %s",
 		    CLAMP_INT_MAX(token->leng),
 		    (char *)token->data, dperrmsg(dpecode));
 	exit(EX_ERROR);
@@ -185,9 +188,9 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
     int dsiz;
 
     dbh_t *handle = vhandle;
-    DEPOT *dbp = handle->dbp;
+    VILLA *dbp = handle->dbp;
 
-    data = dpget(dbp, token->data, token->leng, 0, -1, &dsiz);
+    data = vlget(dbp, token->data, token->leng, &dsiz);
 
     if (data == NULL)
 	return DS_NOTFOUND;
@@ -204,25 +207,25 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
     val->leng = dsiz;		/* read count */
     memcpy(val->data, data, dsiz);
 
-    free(data); /* not xfree() as allocated by dpget() */
+    free(data); /* not xfree() as allocated by vlget() */
 
     return 0;
 }
 
 
 /*
-   Re-organize database when fill ratio > DB_MAXFILL
+   Re-organize database according to some heuristics
 */
-static inline void db_optimize(DEPOT *dbp, char *name)
+static inline void db_optimize(VILLA *dbp, char *name)
 {
-    int bnum = dpbnum(dbp); /* very cheap: O(1) */
-    int rnum = dprnum(dbp); /* very cheap: O(1) */
-    if (bnum > 0 && rnum > 0 && ((double)rnum / bnum > DB_MAXFILL)) {
-	if (!dpoptimize(dbp, -1))
-	    print_error(__FILE__, __LINE__,
-			"(qdbm) dpoptimize for %s failed: %s",
-			name, dperrmsg(dpecode));
-    }
+    UNUSED(dbp);
+    UNUSED(name);
+
+    /* The Villa API doesn't need optimizing like the formerly used
+       Depot API because Villa uses B+ trees and Depot uses hash tables.
+       Database size may grow larger and could get compacted with
+       vloptimize() however as the database size with Villa is smaller
+       anyway, I don't think it is worth it. */
 }
 
 
@@ -230,9 +233,9 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
 {
     int ret;
     dbh_t *handle = vhandle;
-    DEPOT *dbp = handle->dbp;
+    VILLA *dbp = handle->dbp;
 
-    ret = dpput(dbp, token->data, token->leng, val->data, val->leng, DP_DOVER);
+    ret = vlput(dbp, token->data, token->leng, val->data, val->leng, VL_DOVER);
 
     if (ret == 0) {
 	print_error(__FILE__, __LINE__,
@@ -254,19 +257,19 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
 void db_close(void *vhandle)
 {
     dbh_t *handle = vhandle;
-    DEPOT *dbp;
+    VILLA *dbp;
 
     if (handle == NULL) return;
 
     if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "(qdbm) dpclose(%s)\n", handle->name);
+	fprintf(dbgout, "(qdbm) vlclose(%s)\n", handle->name);
 
     dbp = handle->dbp;
 
     db_optimize(dbp, handle->name);
 
-    if (!dpclose(dbp))
-	print_error(__FILE__, __LINE__, "(qdbm) dpclose for %s failed: %s",
+    if (!vlclose(dbp))
+	print_error(__FILE__, __LINE__, "(qdbm) vlclose for %s failed: %s",
 		    handle->name, dperrmsg(dpecode));
 
     handle->dbp = NULL;
@@ -281,10 +284,10 @@ void db_close(void *vhandle)
 void db_flush(void *vhandle)
 {
     dbh_t *handle = vhandle;
-    DEPOT * dbp = handle->dbp;
+    VILLA * dbp = handle->dbp;
 
-    if (!dpsync(dbp))
-	print_error(__FILE__, __LINE__, "(qdbm) dpsync failed: %s",
+    if (!vlsync(dbp))
+	print_error(__FILE__, __LINE__, "(qdbm) vlsync failed: %s",
 		    dperrmsg(dpecode));
 }
 
@@ -294,16 +297,16 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     int ret = 0;
 
     dbh_t *handle = vhandle;
-    DEPOT *dbp = handle->dbp;
+    VILLA *dbp = handle->dbp;
 
     dbv_t dbv_key, dbv_data;
     int ksiz, dsiz;
     char *key, *data;
 
-    ret = dpiterinit(dbp);
+    ret = vlcurfirst(dbp);
     if (ret) {
-	while ((key = dpiternext(dbp, &ksiz))) {
-	    data = dpget(dbp, key, ksiz, 0, -1, &dsiz);
+	while ((key = vlcurkey(dbp, &ksiz))) {
+	    data = vlcurval(dbp, &dsiz);
 	    if (data) {
 		/* switch to "dbv_t *" variables */
 		dbv_key.leng = ksiz;
@@ -324,9 +327,11 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 		free(data); /* not xfree() as allocated by dpget() */
 	    }
 	    free(key); /* not xfree() as allocated by dpiternext() */
+
+	    vlcurnext(dbp);
 	}
     } else {
-	print_error(__FILE__, __LINE__, "(qdbm) dpiterinit err: %s",
+	print_error(__FILE__, __LINE__, "(qdbm) vlcurfirst err: %s",
 		    dperrmsg(dpecode));
 	exit(EX_ERROR);
     }
@@ -335,7 +340,8 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 }
 
 
-const char *db_str_err(int e) {
+const char *db_str_err(int e)
+{
     return dperrmsg(e);
 }
 
@@ -350,18 +356,32 @@ void db_cleanup(void)
     init = false;
 }
 
-/* dummy infrastructure, to be expanded by environment
- * or transactional initialization/shutdown */
-int db_txn_begin(void *d) { (void)d; return 0; }
-int db_txn_abort(void *d) { (void)d; return 0; }
-int db_txn_commit(void *d) { (void)d; return 0; }
-int db_recover(int a, int b) {
-    (void)a;
-    (void)b;
+/** begin transaction. Returns 0 for success. */
+int db_txn_begin(void *d)
+{
+    UNUSED(d);
 
-    fprintf(stderr, "ERROR: bogofilter can not recover QDBM data bases.\n"
-    "If you experience hangs, strange behavior, inaccurate output,\n"
-    "you must delete your data base and rebuild it, or restore an older version\n"
-    "that you know is good from your backups.\n");
-    exit(EX_ERROR);
+    return 0;
+}
+
+int db_txn_abort(void *d)
+{
+    UNUSED(d);
+
+    return 0;
+}
+
+int db_txn_commit(void *d)
+{
+    UNUSED(d);
+
+    return 0;
+}
+
+int db_recover(int a, int b)
+{
+    UNUSED(a);
+    UNUSED(b);
+
+    return 0;
 }
