@@ -25,7 +25,11 @@ else
     while : ; do
 	TMPDIR=${BF_TESTDIR}/checks.$$.`date +"%Y%m%dT%H%M%S"`
 	if test x$SUPPRESS_DELETE = xNO ; then TMPDIR=${BF_TESTDIR}/outputs.`date +"%m%d"` ; fi
-	[ -d $TMPDIR ] || mkdir $TMPDIR
+	if [ ! -d $TMPDIR ] ; then
+	    mkdir $TMPDIR
+	else
+	    rm -rf $TMPDIR/*
+	fi
         [ -d $TMPDIR ] && break
 	sleep 1
     done
