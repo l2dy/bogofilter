@@ -112,7 +112,7 @@ sort -u < ${TMPDIR}/$NAME.tmp > ${TMPDIR}/$NAME.out
 
 NAME="bogolex-single"
 for f in $pattern ; do 
-    $BOGOLEX_SH -c $CFG -I $f | $BOGOFILTER >> ${TMPDIR}/$NAME.out
+    map_rc "$BOGOLEX_SH -c $CFG -I $f | $BOGOFILTER >> ${TMPDIR}/$NAME.out"
 done
 
 # test scoring of mbox batch of msg-count messages
@@ -125,7 +125,7 @@ map_rc $BOGOFILTER -M < ${TMPDIR}/test.fr > ${TMPDIR}/$NAME.out
 NAME="bogolex-batch"
 cat /dev/null > ${TMPDIR}/test.bl
 for f in $pattern ; do 
-    $BOGOLEX_SH -c $CFG -I $f >> ${TMPDIR}/test.bl
+    map_rc "$BOGOLEX_SH -c $CFG -I $f >> ${TMPDIR}/test.bl"
 done
 
 map_rc $BOGOFILTER < ${TMPDIR}/test.bl > ${TMPDIR}/$NAME.out
