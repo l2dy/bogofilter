@@ -36,12 +36,15 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include "error.h"
 #include "maint.h"
 #include "paths.h"		/* for build_path */
+#include "rand_sleep.h"
 #include "swap.h"
 #include "word.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
 static DB_ENV *dbe; /* libdb environment, if in use, NULL otherwise */
+
+static const DBTYPE dbtype = DB_BTREE;
 
 static bool init;
 
@@ -186,7 +189,7 @@ static uint32_t get_psize(DB *dbp)
 
     ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
     if (ret) {
-	dbp->err (dbp, ret, "%s (db) stat", progname);
+	dbp->err (dbp, ret, "%s (db) DB->stat", progname);
 	return 0xffffffff;
     }
     pagesize = dbstat->bt_pagesize;
@@ -205,6 +208,9 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 {
     int ret;
     int is_swapped;
+    int retries = 2; /* how often do we retry to open after ENOENT+EEXIST
+			races? 2 is sufficient unless the kernel or
+			BerkeleyDB are buggy. */
     char *t;
 
     dbh_t *handle = NULL;
@@ -245,7 +251,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 
 	/* create DB handle */
 	if ((ret = db_create (&dbp, dbe, 0)) != 0) {
-	    print_error(__FILE__, __LINE__, "(db) create, err: %d, %s",
+	    print_error(__FILE__, __LINE__, "(db) db_create, err: %d, %s",
 			ret, db_strerror(ret));
 	    goto open_err;
 	}
@@ -255,7 +261,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	/* set cache size, but only unless we're using an environment */
 	if (dbe == NULL && db_cachesize != 0 &&
 	    (ret = dbp->set_cachesize(dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
-	    print_error(__FILE__, __LINE__, "(db) setcache( %s ), err: %d, %s",
+	    print_error(__FILE__, __LINE__, "(db) DB->set_cachesize( %s ), err: %d, %s",
 			handle->name, ret, db_strerror(ret));
 	    goto open_err;
 	}
@@ -266,12 +272,21 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	else
 	    t = handle->name;
 
-	if ((ret = DB_OPEN(dbp, t, NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0
+retry_db_open:
+	if ((ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | retryflag, 0664)) != 0
 	    && ( ret != ENOENT || opt_flags == DB_RDONLY ||
-		(ret = DB_OPEN(dbp, t, NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0))
+		(ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0))
 	{
+	    if (opt_flags != DB_RDONLY && ret == EEXIST && --retries) {
+		/* sleep for 4 to 100 ms - this is just to give up the CPU
+		 * to another process and let it create the data base
+		 * file in peace */
+		rand_sleep(4 * 1000, 100 * 1000);
+		goto retry_db_open;
+	    }
+
 	    /* close again and bail out without further tries */
-	    print_error(__FILE__, __LINE__, "(db) open(%s) - actually %s bogohome: %s -, err: %d, %s",
+	    print_error(__FILE__, __LINE__, "(db) DB->open(%s) - actually %s bogohome: %s -, err: %d, %s",
 		    handle->name, t, bogohome, ret, db_strerror(ret));
 	    dbp->close(dbp, 0);
 	    goto open_err;
@@ -290,7 +305,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	handle->is_swapped = is_swapped ? true : false;
 
 	if (ret != 0) {
-	    dbp->err (dbp, ret, "%s (db) get_byteswapped: %s",
+	    dbp->err (dbp, ret, "%s (db) DB->get_byteswapped: %s",
 		      progname, handle->name);
 	    db_close(handle, false);
 	    return NULL;		/* handle already freed, ok to return */
@@ -298,7 +313,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 
 	ret = dbp->fd(dbp, &handle->fd);
 	if (ret != 0) {
-	    dbp->err (dbp, ret, "%s (db) fd: %s",
+	    dbp->err (dbp, ret, "%s (db) DB->fd: %s",
 		      progname, handle->name);
 	    db_close(handle, false);
 	    return NULL;		/* handle already freed, ok to return */
@@ -580,26 +595,40 @@ const char *db_str_err(int e) {
  * or transactional initialization/shutdown */
 static bool init = false;
 int db_init(void) {
+    char *t;
+    int cdb_alldb = 1;
+
     if (!bogohome)
 	abort();
 
     if (bogohome && getenv("BF_EXPERIMENTAL_DBENV")) {
 	int ret = db_env_create(&dbe, 0);
 	if (ret != 0) {
-	    print_error(__FILE__, __LINE__, "db_env_create create, err: %d, %s", ret, db_strerror(ret));
+	    print_error(__FILE__, __LINE__, "db_env_create, err: %d, %s", ret, db_strerror(ret));
 	    abort();
 	}
 	if (db_cachesize != 0 &&
 	    (ret = dbe->set_cachesize(dbe, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
 	    print_error(__FILE__, __LINE__, "DBENV->set_cachesize(%d), err: %d, %s",
 			db_cachesize, ret, db_strerror(ret));
-	    abort();
+	    exit(EXIT_FAILURE);
 	}
-	ret = dbe->open(dbe, bogohome, DB_INIT_MPOOL | DB_INIT_CDB | DB_CREATE, /* mode */ 0644);
+
+	/* Allow user to override DB_CDB_ALLDB to 0 */
+	if ((t = getenv("DB_CDB_ALLDB")))
+	    cdb_alldb = atoi(t);
+
+	if ((ret = dbe->set_shm_key(dbe, 0xBFDB42))) {
+	    dbe->close(dbe, 0);
+	    print_error(__FILE__, __LINE__, "DBENV->set_shm_key, err: %d, %s", ret, db_strerror(ret));
+	    exit(EXIT_FAILURE);
+	}
+
+	ret = dbe->open(dbe, bogohome, DB_INIT_MPOOL | DB_SYSTEM_MEM | DB_INIT_CDB | DB_CREATE, /* mode */ 0644);
 	if (ret != 0) {
 	    dbe->close(dbe, 0);
-	    print_error(__FILE__, __LINE__, "db_env_create create, err: %d, %s", ret, db_strerror(ret));
-	    abort();
+	    print_error(__FILE__, __LINE__, "DBENV->open, err: %d, %s", ret, db_strerror(ret));
+	    exit(EXIT_FAILURE);
 	}
     }
     init = true;
