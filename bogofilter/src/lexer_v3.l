@@ -126,7 +126,7 @@ TOKENBACK	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*\._\-\+,\[\][:cntrl:]]
 TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}{1,70}
 
 BASE64		[0-9a-zA-Z/+=]+
-QP		[^[:blank:]]+
+QP		[^[:blank:]\?]+
 ENCODED_TOKEN	{BOGOLEX_TOKEN}*=\?{ID}\?(b\?{BASE64}|q\?{QP})\?\=
 
 DOLLARS		[0-9]+
