@@ -111,6 +111,16 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
     int ret;
     dbh_t *handle;
     uint32_t opt_flags = 0;
+    /*
+     * If locking fails with EAGAIN, then try without MMAP, fcntl()
+     * locking may be forbidden on mmapped files, or mmap may not be
+     * available for NFS. Thanks to Piotr Kucharski and Casper Dik,
+     * see news:comp.protocols.nfs and the bogofilter mailing list,
+     * message #1520, Message-ID: <20030206172016.GS1214@sgh.waw.pl>
+     * Date: Thu, 6 Feb 2003 18:20:16 +0100
+     */
+    uint32_t retryflags[] = { 0, DB_NOMMAP, 0xffffffff };
+    uint32_t *retryflag_i;
 
     assert(dir && *dir);
 
@@ -122,69 +132,77 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
 	 * applications try to create a DB at the same time. */
 	opt_flags = 0;
 
-    handle = dbh_init(db_file, name);
-    handle->open_mode = open_mode;
-    /* create DB handle */
-    if ((ret = db_create (&(handle->dbp), NULL, 0)) != 0) {
-	print_error(__FILE__, __LINE__, "(db) create, err: %d, %s",
-		ret, db_strerror(ret));
-	goto open_err;
-    }
+    for(retryflag_i = &retryflags[0] ; *retryflag_i != 0xffffffff; retryflag_i++) {
+	handle = dbh_init(db_file, name);
+	handle->open_mode = open_mode;
+	/* create DB handle */
+	if ((ret = db_create (&(handle->dbp), NULL, 0)) != 0) {
+	    print_error(__FILE__, __LINE__, "(db) create, err: %d, %s",
+		    ret, db_strerror(ret));
+	    goto open_err;
+	}
 
-    if (db_cachesize != 0 &&
-	(ret = DB_CACHE(handle->dbp, 0, db_cachesize, 1)) != 0) {
-        print_error(__FILE__, __LINE__, "(db) setcache( %s ), err: %d, %s",
-            db_file, ret, db_strerror(ret));
-        goto open_err; 
-    }
+	if (db_cachesize != 0 &&
+		(ret = DB_CACHE(handle->dbp, 0, db_cachesize, 1)) != 0) {
+	    print_error(__FILE__, __LINE__, "(db) setcache( %s ), err: %d, %s",
+		    db_file, ret, db_strerror(ret));
+	    goto open_err; 
+	}
 
-    /* open data base */
-    if ((ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags, 0664)) != 0 &&
-	    (ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags |  DB_CREATE | DB_EXCL, 0664)) != 0) {
-	print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s",
-		db_file, ret, db_strerror(ret));
-	goto open_err;
-    }
+	/* open data base */
+	if ((ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags | *retryflag_i, 0664)) != 0 &&
+		(ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags |  DB_CREATE | DB_EXCL | *retryflag_i, 0664)) != 0) {
+	    print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s",
+		    db_file, ret, db_strerror(ret));
+	    goto open_err;
+	}
 
-    if (DEBUG_DATABASE(1)) {
-      fprintf(dbgout, "db_open( %s, %s, %d )\n", name, db_file, open_mode);
-    }
+	if (DEBUG_DATABASE(1)) {
+	    fprintf(dbgout, "db_open( %s, %s, %d )\n", name, db_file, open_mode);
+	}
 
-    /* see if the database byte order differs from that of the cpu's */
+	/* see if the database byte order differs from that of the cpu's */
 #if DB_AT_LEAST(3,3)
-    ret = handle->dbp->get_byteswapped (handle->dbp, &(handle->is_swapped));
+	ret = handle->dbp->get_byteswapped (handle->dbp, &(handle->is_swapped));
 #else
-    ret = 0;
-    handle->is_swapped = handle->dbp->get_byteswapped (handle->dbp);
+	ret = 0;
+	handle->is_swapped = handle->dbp->get_byteswapped (handle->dbp);
 #endif
-    if (ret != 0) {
-	handle->dbp->err (handle->dbp, ret, "%s (db) get_byteswapped: %s",
-		progname, db_file);
-	db_close(handle, false);
-	goto open_err;
+	if (ret != 0) {
+	    handle->dbp->err (handle->dbp, ret, "%s (db) get_byteswapped: %s",
+		    progname, db_file);
+	    db_close(handle, false);
+	    goto open_err;
+	}
+
+	ret = handle->dbp->fd(handle->dbp, &handle->fd);
+	if (ret < 0) {
+	    handle->dbp->err (handle->dbp, ret, "%s (db) fd: %s",
+		    progname, db_file);
+	    db_close(handle, false);
+	    goto open_err;
+	}
+
+	if (db_lock(handle->fd, F_SETLK,
+		    (short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
+	{
+	    int e = errno;
+	    handle->fd = -1;
+	    db_close(handle, true);
+	    errno = e;
+	    /* do not bother to retry if the problem wasn't EAGAIN */
+	    if (e != EAGAIN) return NULL;
+	    /* do not goto open_err here, db_close frees the handle! */
+	} else {
+	    break;
+	}
     }
 
-    ret = handle->dbp->fd(handle->dbp, &handle->fd);
-    if (ret < 0) {
-	handle->dbp->err (handle->dbp, ret, "%s (db) fd: %s",
-		progname, db_file);
-	db_close(handle, false);
-	goto open_err;
+    if (handle -> fd >= 0) {
+	handle->locked = true;
+	return (void *)handle;
     }
-
-    if (db_lock(handle->fd, F_SETLK,
-		(short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
-    {
-	int e = errno;
-	handle->fd = -1;
-	db_close(handle, true);
-	errno = e;
-	/* do not goto open_err here, db_close frees the handle! */
-	return NULL;
-    }
-
-    handle->locked = true;
-    return (void *)handle;
+    return NULL;
 
 open_err:
     dbh_free(handle);
@@ -199,7 +217,7 @@ open_err:
 */
 uint32_t db_getvalue(void *vhandle, const word_t *word){
   dbv_t val;
-  uint32_t ret;
+  int ret;
   uint32_t value = 0;
   dbh_t *handle = vhandle;
 
@@ -215,10 +233,10 @@ uint32_t db_getvalue(void *vhandle, const word_t *word){
       fprintf(dbgout, "] has value %lu\n",
 	      (unsigned long)value);
     }
-    return(value);
-  }
-  else
+    return value;
+  } else {
     return 0;
+  }
 }
 
 void db_delete(void *vhandle, const word_t *word) {
