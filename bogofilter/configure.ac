@@ -449,7 +449,7 @@ if test "$sysconfdir" = "\${prefix}/etc" \
     )
 fi
 
-AM_PATH_GSL(1.4, AC_DEFINE(HAVE_GSL_14,,[Define if you have GNU Scientific Library 1.4 or newer]))
+AM_PATH_GSL(1.4, AC_DEFINE(HAVE_GSL_14,,[Define if you have GNU Scientific Library 1.4 or newer]),GSL_LIBS="")
 
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 AC_CONFIG_FILES([Makefile \
