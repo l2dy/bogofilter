@@ -2,7 +2,7 @@
 				BOGOFILTER NEWS
 			       =================
 
-0.91.3	2004-06-??
+0.91.3	2004-06-15
 	
 * Added format specification '%I' to allow logging of the IP
   address from which an email was received.
