@@ -293,7 +293,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	}
 
 	ret = dbp->fd(dbp, &handle->fd);
-	if (ret < 0) {
+	if (ret != 0) {
 	    dbp->err (dbp, ret, "%s (db) fd: %s",
 		      progname, handle->name);
 	    db_close(handle, false);
