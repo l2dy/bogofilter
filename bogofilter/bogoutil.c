@@ -293,10 +293,16 @@ int words_from_path(char *directory, int argc, char **argv, bool show_probabilit
     return 0;
 }
 
-int display_words(char *path, int argc, char **argv, bool prob)
+int display_words(const char *path, int argc, char **argv, bool prob)
 {
     struct stat sb;
-    int rc = stat(path, &sb);
+    int rc;
+
+    /* protect against broken stat(2) that succeeds for empty names */
+    if (*path)
+	rc = stat(path, &sb);
+    else
+	rc = -1, errno = ENOENT;
 
     if (rc >= 0) 
     {
