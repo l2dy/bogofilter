@@ -61,8 +61,6 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
 
     set_list_active_status(true);
 
-    db_lock_reader_list(word_lists);
-
     method->initialize();
 
     /* tokenize input text and save words in a wordhash. */
@@ -72,8 +70,6 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
     } while(cont);
 
     spamicity = method->compute_spamicity(wordhash, NULL);
-
-    db_lock_release_list(word_lists);
 
     status = method->status();
 

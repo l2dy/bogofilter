@@ -61,19 +61,13 @@ AUTHOR:
 
 /* Global variables */
 
-int Rtable = 0;		/* '-R' */
-
-char *directory = NULL;
-char *update_dir = NULL;
 char outfname[PATH_LEN] = "";
 
 const char *user_config_file   = "~/.bogofilter.cf";
 
 bool	stats_in_header = true;
-const	char *stats_prefix;
 
 run_t run_type = RUN_NORMAL; 
-method_t *method = NULL;
 
 const char *logtag = NULL;
 

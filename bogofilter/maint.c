@@ -21,9 +21,9 @@ AUTHOR:
 #include <assert.h>
 
 #include "common.h"
+#include "xmalloc.h"
 
 #include "datastore.h"
-#include "datastore_db.h"
 #include "maint.h"
 
 YYYYMMDD today;			/* date as YYYYMMDD */
@@ -117,82 +117,58 @@ void maintain_wordlists(void)
 
     set_list_active_status(true);
 
-    db_lock_writer_list(word_lists);
-
     for (list = word_lists; list != NULL; list = list->next) {
 	maintain_wordlist(list->dbh);
 	list = list->next;
     }
-
-    db_lock_release_list(word_lists);
 }
 
 int maintain_wordlist_file(const char *db_file)
 {
     int rc;
-    dbh_t *dbh;
+    void *dbh;
 
     dbh = db_open(db_file, db_file, DB_WRITE, directory);
     if (dbh == NULL)
 	return 2;
 
-    db_lock_writer(dbh);
-
     rc = maintain_wordlist(dbh);
-
-    db_lock_release(dbh);
 
     return rc;
 }
 
+static int maintain_hook(char *key, long keylen, char *data, long
+	datalen, void *userdata /*@unused@*/)
+{
+    static int x_size = 40;
+    static char *x;
+    dbv_t val;
+    memcpy(&val, data, datalen);
+
+    (void)datalen;
+    if (replace_nonascii_characters)
+	do_replace_nonascii_characters((byte *)key,keylen);
+
+    if (!keep_count(val.count) || !keep_date(val.date) || !keep_size(keylen)) {
+	if (keylen + 1 > x_size) {
+	    free(x);
+	    x = NULL;
+	    x_size = keylen + 1;
+	}
+	if (!x) x = xmalloc(x_size);
+
+	memcpy(x, key, keylen);
+	x[keylen] = '\0';
+
+	db_delete(userdata, x);
+
+	if (DEBUG_DATABASE(0)) fprintf(dbgout, "deleting %s\n", x);
+    }
+    return 0;
+}
+
 int maintain_wordlist(void *vhandle)
 {
-    dbh_t *dbh = vhandle;
-
-    DBC dbc;
-    DBC *dbcp;
-    DBT db_key, db_data;
-
-    int ret;
-    int rv = 0;
-    dbv_t *val;
-
-    dbcp = &dbc;
-
-    memset(&db_key, 0, sizeof(DBT));
-    memset(&db_data, 0, sizeof(DBT));
-
-    if ((ret = dbh->dbp->cursor(dbh->dbp, NULL, &dbcp, 0) != 0)) {
-	dbh->dbp->err(dbh->dbp, ret, "%s (cursor): %s", progname, dbh->filename);
-	return (2);
-    }
-
-    for (;;) {
-	ret = dbcp->c_get(dbcp, &db_key, &db_data, DB_NEXT);
-	if (ret == 0) {
-	    val = (dbv_t *)db_data.data;
-	    if (replace_nonascii_characters)
-		do_replace_nonascii_characters((byte *)db_key.data,db_key.size);
-
-	    if (! keep_count(val->count) || ! keep_date(val->date) || ! keep_size(db_key.size)) {
-		char *token = (char *) db_key.data;
-		int rc1, rc2;
-		token[db_key.size] = '\0';
-		rc1 = dbcp->c_del(dbcp, 0);
-		rc2 = dbh->dbp->del(dbh->dbp, NULL, &db_key, 0);
-
-		if (DEBUG_DATABASE(0)) fprintf(dbgout, "deleting %s --> %d, %d\n", (char *)db_key.data, rc1, rc2);
-	    }
-	}
-	else if (ret == DB_NOTFOUND) {
-	    break;
-	}
-	else {
-	    dbh->dbp->err(dbh->dbp, ret, "%s (c_get)", progname);
-	    rv = 2;
-	    break;
-	}
-    }
-
-    return rv;
+    void *dbh = vhandle;
+    return db_foreach(dbh, maintain_hook, dbh);
 }

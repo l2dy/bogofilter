@@ -17,7 +17,7 @@
 #include "token.h"		/* for got_from() and got_newline() */
 
 #define YY_DECL token_t yylex(void)
-#define YY_INPUT(buf,result,max_size) result = yyinput(buf, max_size)
+#define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, max_size)
 
 %}
 

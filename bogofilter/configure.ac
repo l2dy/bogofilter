@@ -1,5 +1,5 @@
 # $Id$
-AC_INIT(bogofilter, 0.9.2.cvs)
+AC_INIT(bogofilter, 0.9.2.cvs+locking)
 AC_PREREQ(2.55)
 AC_CONFIG_SRCDIR([bogofilter.c])
 AM_INIT_AUTOMAKE
@@ -19,13 +19,18 @@ if test "$GCC" = yes
 then
   echo "void dummy(void);" >configure-dummy.c
   echo "void dummy(void) {}" >>configure-dummy.c
+  addopts=
+  case `$CC --version` in
+      *2.7*) ;;
+      *) addopts="$addopts -Wpointer-arith" ;;
+  esac
   for i in -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wshadow \
       -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings \
       -Waggregate-return -Wmissing-declarations \
       -Wmissing-format-attribute -Wnested-externs \
       -ggdb -fno-common -Wchar-subscripts -Wcomment \
       -Wimplicit -Wsequence-point -Wreturn-type \
-      -Wfloat-equal -Wpointer-arith \
+      -Wfloat-equal $addopts \
       -Wno-system-headers
       # -Wmissing-noreturn -Wconversion -pedantic -Wredundant-decls
   do
@@ -180,7 +185,7 @@ AC_HEADER_STDC
 AC_HEADER_STDBOOL
 AC_HEADER_TIME
 AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h stdlib.h string.h sys/socket.h])
-AC_CHECK_HEADERS([unistd.h sys/file.h stddef.h sys/time.h])
+AC_CHECK_HEADERS([unistd.h sys/file.h stddef.h sys/time.h sys/select.h])
 AC_CHECK_HEADERS([limits.h float.h],,[AC_CHECK_HEADERS(values.h)])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -189,6 +194,7 @@ AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 AC_TYPE_SIGNAL
+AC_FUNC_SELECT_ARGTYPES
 
 # Checks for library functions.
 dnl AC_FUNC_MALLOC

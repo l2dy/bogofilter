@@ -94,10 +94,10 @@ typedef struct {
 
 /* Function Prototypes */
 
-static const char *skipws (const char *t, const char *e);
-static char *getword (const char *t, const char *e);
+static const byte *skipws (const byte *t, const byte *e);
+static char *getword (const byte *t, const byte *e);
 #if	0
-static char *getparam (const char *t, char *e, const char *param);
+static char *getparam (const byte *t, char *e, const byte *param);
 #endif
 
 /* Function Definitions */
@@ -232,7 +232,7 @@ mime_add_child (mime_t * parent)
 }
 
 static
-bool get_boundary_props(const char *boundary, int boundary_len, boundary_t *b)
+bool get_boundary_props(const byte *boundary, int boundary_len, boundary_t *b)
 {
   int i;
   
@@ -273,7 +273,7 @@ bool get_boundary_props(const char *boundary, int boundary_len, boundary_t *b)
 }
 
 void
-got_mime_boundary (const char *boundary, int boundary_len)
+got_mime_boundary (const byte *boundary, int boundary_len)
 {
   mime_t *parent;
   boundary_t b;
@@ -301,10 +301,10 @@ got_mime_boundary (const char *boundary, int boundary_len)
 }
 
 /* skips whitespace, returns NULL when ran into end of string */
-const char *
-skipws (const char *t, const char *e)
+const byte *
+skipws (const byte *t, const byte *e)
 {
-  while (t < e && isspace ((byte) * t))
+  while (t < e && isspace (*t))
     t++;
   if (t < e)
     return t;
@@ -314,7 +314,7 @@ skipws (const char *t, const char *e)
 /* skips [ws]";"[ws] */
 #if	0
 char *
-skipsemi (const char *t, const char *e)
+skipsemi (const byte *t, const byte *e)
 {
   if (!(t = skipws (t, e)))
     return NULL;
@@ -327,11 +327,11 @@ skipsemi (const char *t, const char *e)
 /* get next MIME word, NULL when none found.
  * caller must free returned string with xfree() */
 char *
-getword (const char *t, const char *e)
+getword (const byte *t, const byte *e)
 {
   int quote = 0;
   int l;
-  const char *ts;
+  const byte *ts;
   char *n;
 
   t = skipws (t, e);
@@ -343,7 +343,7 @@ getword (const char *t, const char *e)
     t++;
   }
   ts = t;
-  while ((t < e) && (quote ? *t != '"' : !isspace ((byte) * t)))
+  while ((t < e) && (quote ? *t != '"' : !isspace (*t)))
   {
     t++;
   }
@@ -356,7 +356,7 @@ getword (const char *t, const char *e)
 
 #if	0
 char *
-getparam (char *t, char *e, const char *param)
+getparam (char *t, char *e, const byte *param)
 {
 /*    char *w, *u; */
 
@@ -365,7 +365,7 @@ getparam (char *t, char *e, const char *param)
 #endif
 
 void
-mime_version (const char *text, int leng)
+mime_version (const byte *text, int leng)
 {
   size_t l = strlen ("MIME-Version:");
   char *w = getword (text + l, text + leng);
@@ -373,7 +373,7 @@ mime_version (const char *text, int leng)
 }
 
 void
-mime_disposition (const char *text, int leng)
+mime_disposition (const byte *text, int leng)
 {
   size_t l = strlen ("Content-Disposition:");
   char *w = getword (text + l, text + leng);
@@ -408,7 +408,7 @@ mime_disposition (const char *text, int leng)
 *********/
 
 void
-mime_encoding (const char *text, int leng)
+mime_encoding (const byte *text, int leng)
 {
   size_t l = strlen ("Content-Transfer-Encoding:");
   char *w = getword (text + l, text + leng);
@@ -429,7 +429,7 @@ mime_encoding (const char *text, int leng)
 }
 
 void
-mime_type (const char *text, int leng)
+mime_type (const byte *text, int leng)
 {
   size_t l = strlen ("Content-Type:");
   char *w = getword (text + l, text + leng);
@@ -475,7 +475,7 @@ mime_type (const char *text, int leng)
 }
 
 void
-mime_boundary_set (const char *text, int leng)
+mime_boundary_set (const byte *text, int leng)
 {
   char *boundary;
 
@@ -495,7 +495,7 @@ mime_boundary_set (const char *text, int leng)
 }
 
 size_t
-mime_decode (char *buff, size_t size)
+mime_decode (byte *buff, size_t size)
 {
   size_t count = size;
   boundary_t b;
@@ -535,14 +535,14 @@ mime_decode (char *buff, size_t size)
     /* do nothing */
     break;
   case MIME_QP:
-    count = qp_decode (buff, size);
+    count = qp_decode(buff, size);
     break;
   case MIME_BASE64:
     if (size > 4)
-      count = base64_decode (buff, size);
+      count = base64_decode(buff, size);
     break;
   case MIME_UUENCODE:
-    count = uudecode (buff, size);
+    count = uudecode(buff, size);
     break;
   case MIME_ENCODING_UNKNOWN:
     break;

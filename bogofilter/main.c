@@ -78,7 +78,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     }
 
     /* open all wordlists */
-    open_wordlists();
+    open_wordlists(run_type == RUN_NORMAL ? DB_READ : DB_WRITE);
 
     if (*outfname && passthrough) {
 	if ((out = fopen(outfname,"wt"))==NULL)
@@ -175,6 +175,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     textblock_free(textblocks);
 
     close_wordlists();
+    free_wordlists();
 
 #ifdef HAVE_SYSLOG_H
     if (logflag)

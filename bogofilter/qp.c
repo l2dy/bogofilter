@@ -37,7 +37,7 @@ static int hex_to_bin(byte c) {
     }
 }
 
-int qp_decode(byte *buff, size_t size)
+size_t qp_decode(byte *buff, size_t size)
 {
     byte *s = buff;		/* src */
     byte *d = buff;		/* dst */

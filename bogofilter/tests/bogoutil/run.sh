@@ -12,7 +12,7 @@ set -e
 yday="-y 0"
 
 while : ; do
-    tdir=./checks.$$.`date +"%Y%m%dT%H%M%S"`
+    tdir=${BF_TESTDIR=.}/checks.$$.`date +"%Y%m%dT%H%M%S"`
     mkdir $tdir && break
     sleep 1
 done
