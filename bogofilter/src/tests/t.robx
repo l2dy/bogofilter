@@ -26,8 +26,8 @@ EOF
 
 OPTS="-c ${CONFIG} -y 0"
 
-$BOGOFILTER $OPTS -r -s < ${SYSTEST}/inputs/spam.mbx
-$BOGOFILTER $OPTS -r -n < ${SYSTEST}/inputs/good.mbx
+$BOGOFILTER $OPTS -s < ${SYSTEST}/inputs/spam.mbx
+$BOGOFILTER $OPTS -n < ${SYSTEST}/inputs/good.mbx
 
 if [ ! -z "$RUN_FROM_MAKE" ] ; then
     $BOGOUTIL -D -R $TMPDIR

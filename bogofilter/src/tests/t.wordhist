@@ -48,8 +48,8 @@ EOF
 
 OPTS="-C -y 0"
 
-$BOGOFILTER $OPTS -r -s < ${SYSTEST}/inputs/spam.mbx
-$BOGOFILTER $OPTS -r -n < ${SYSTEST}/inputs/good.mbx
+$BOGOFILTER $OPTS -s < ${SYSTEST}/inputs/spam.mbx
+$BOGOFILTER $OPTS -n < ${SYSTEST}/inputs/good.mbx
 
 $BOGOUTIL -H $BOGOFILTER_DIR >$OUT
 $BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db >${TMPDIR}/wordlist.txt
