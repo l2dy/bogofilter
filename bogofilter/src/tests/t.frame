@@ -19,8 +19,15 @@ _POSIX2_VERSION=199209
 export _POSIX2_VERSION
 
 # Obtain data base file suffix
-DB_EXT=`${relpath}/bogofilter -V 2>&1 | sed -n '1 {s/^.*bogofilter-\(.*dbm\) .*/\1/;p;}'`
-[ -z "$DB_EXT" ] && DB_EXT="db"
+DB_NAME=`${relpath}/bogofilter -V 2>&1 | sed -n '2p;'`
+case $DB_NAME in
+    *BerkeleyDB*)   DB_EXT=db ;;
+    *QDBM*)	    DB_EXT=qdbm ;;
+    *TrivialDB*)    DB_EXT=tdb ;;
+    *)		    echo >&2 "Unknown data base type in bogofilter -V: $DB_NAME"
+		    exit 1 ;;
+esac
+
 export DB_EXT
 
 # Cater for Solaris "compatibility"
