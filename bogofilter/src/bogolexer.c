@@ -131,7 +131,7 @@ static char *get_string(const char *name, const char *arg)
     return s;
 }
 
-#define	OPTIONS	":c:CDhHI:npP:qvVx:X:m"
+#define	OPTIONS	":c:CDhHI:npqvVx:X:m"
 
 /** These functions process command line arguments.
  **
