@@ -133,15 +133,6 @@ terse=no
 
 ########### Tokenizer Settings ######################################
 
-##### HTML_MODE
-#
-#	if enabled, html gets special treatment and 
-#	tokens between "<" and ">" are discarded.
-#	if disabled, html is treated like plain text.
-
-html_mode=yes
-
-
 ##### STRICT_CHECK
 #
 #	if enabled, html comments are delimited by "<!-->" and "-->".
