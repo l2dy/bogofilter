@@ -53,6 +53,6 @@ typedef struct {
     int    exp;
 } FLOAT;
 
-void build_path(char* dest, int size, const char* dir, const char* file);
+int build_path(char* dest, size_t size, const char* dir, const char* file);
 
 #endif
