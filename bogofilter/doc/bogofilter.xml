@@ -42,7 +42,7 @@
     <arg choice='opt'>-H</arg>
     <arg choice='opt'>-M</arg>
     <arg choice='opt'>-b</arg>
-    <arg choice='opt'>-B <replaceable>filename ...</replaceable></arg>
+    <arg choice='opt'>-B <replaceable>object ...</replaceable></arg>
     <arg choice='opt'>-R</arg>
     <arg choice='opt'>general options</arg>
     <arg choice='opt'>parameter options</arg>
@@ -277,9 +277,11 @@ header is not taken into account currently.)</para>
 <para>When reading mbox format, bogofilter relies on the empty line
 after a mail.  If needed, formail -es will ensure this is the case.</para>
 
-<para>The <option>-B <replaceable>filename ...</replaceable></option>
+<para>The <option>-B <replaceable>object ...</replaceable></option>
 (bulk mode) option tells <application>bogofilter</application> to
-classify multiple objects named on the command line.  If the
+classify multiple objects named on the command line.  The objects may
+be filenames (for single messages), mailboxes (files with multiple
+messages), or directories (of maildir and MH format).  If the
 <option>-v</option> or <option>-t</option> option is also given,
 <application>bogofilter</application> will print a line giving file
 name and classification information for each file.  This is an alternative to 
