@@ -1,13 +1,21 @@
-				       vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:
-
 			       =================
 				BOGOFILTER NEWS
 			       =================
 
 NOTE: More information on important changes for bogofilters updaters
-is in the RELEASE.NOTES files!
+is in the RELEASE.NOTES files.  Read it!!
 
-$Id$
+	2003-10-08
+
+	* Disable header line tagging when processing msg-count files.
+
+	2003-10-06
+
+	* Added decoding of escaped characters in html.
+	* Revised mailbox processing so type recognition is now
+	  table driven.
+	* Added support for ANT mailboxes.
+	* Made portability changes for OS/2 and RISC-OS
 
 0.15.6	2003-10-02
 
@@ -1051,6 +1059,10 @@ $Id$
 0.1: Mon 19 Aug 2002 03:07:31
 
 	* Initial release.
+
+$Id$
+
+ vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:
 
  LocalWords:  BOGOFILTER Exp procmail contrib Spamicity config spamicity
  LocalWords:  bogoutil datestamp MAXTOKENLEN charset stderr syslog gcc malloc

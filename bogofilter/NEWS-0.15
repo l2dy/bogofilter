@@ -2,6 +2,19 @@
 				BOGOFILTER NEWS
 			       =================
 
+Be sure to read RELEASE.NOTES-0.15 ...
+
+2003-10-08
+
+* Disable header line tagging when processing msg-count files.
+
+2003-10-06
+
+* Added decoding of escaped characters in html.
+* Revised mailbox processing so type recognition is now table driven.
+* Added support for ANT mailboxes.
+* Made portability changes for OS/2 and RISC-OS
+
 0.15.6	2003-10-02
 
 * Fixed problem in bogoupgrade.
