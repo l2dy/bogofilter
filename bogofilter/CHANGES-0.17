@@ -8,7 +8,23 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
  
-0.17.?	2004-02-??
+0.17.?	2004-03-??
+
+	2004-03-04
+
+	* Switched from Berkeley DB Data Store to Berkeley DB
+	  Concurrent Data Store, which uses a "DB_ENV" BerkeleyDB
+	  environment and the BerkeleyDB Lock Manager.  This is
+	  documented in file doc/README.db.
+
+	2004-03-03
+
+	* "bogofilter -Q" output now includes all config file options
+          and is formatted to be read in as a config file.
+
+	2004-02-27
+
+	* Removed t.lock2 from "make check".
 
 	2004-02-26
 

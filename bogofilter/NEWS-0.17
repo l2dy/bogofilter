@@ -8,13 +8,20 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
 
-0.17.?	2004-02-??
+0.17.?	2004-03-??
 
+* Switched from Berkeley DB Data Store to Berkeley DB
+  Concurrent Data Store, which uses a "DB_ENV" BerkeleyDB
+  environment and the BerkeleyDB Lock Manager.
+  This is documented in file doc/README.db.
 * Fixed minor bogotune problems related to building wordlists.
 * If message uses CRLF, put CRLF after added header lines.
+* "bogofilter -Q" output now includes all config file options and is
+   formatted to be read in as a config file.
 * Fixed code causing gcc 2.9x complaint.
 * Exempt tokens .MSG_COUNT and .ROBX from maintenance operations.
 * Remove unused 'active' and 'weight' attributes of wordlists.
+* Removed t.lock2 from "make check".
 
 0.17.2	2004-02-22
 
