@@ -45,10 +45,10 @@ static void db_set_dbvalue(void *vhandle, const char *word, dbv_t *val);
 /* Function definitions */
 
 static void db_enforce_locking(dbh_t *handle, const char *func_name){
-  if (handle->locked == false){
-      PRINT_ERROR("%s (%s): Attempt to access unlocked handle.", func_name, handle->name );
-      exit(2);
-  }
+    if (handle->locked == false){
+	print_error(__FILE__, __LINE__, "%s (%s): Attempt to access unlocked handle.", func_name, handle->name);
+	exit(2);
+    }
 }
 
 /* stolen from glibc's byteswap.c */
@@ -95,11 +95,11 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode){
 
     handle = dbh_init(db_file, name);
     if ((ret = db_create (&(handle->dbp), NULL, 0)) != 0){
-	PRINT_ERROR("(db) create, err: %d, %s", ret, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "(db) create, err: %d, %s", ret, db_strerror(ret));
     }
     else if ((ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags, 0664)) != 0)
     {
-	PRINT_ERROR("(db) open( %s ), err: %d, %s", db_file, ret, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s", db_file, ret, db_strerror(ret));
     }
     else {
       /* see if the database byte order differs from that of the cpu's */
@@ -193,7 +193,7 @@ long db_get_dbvalue(void *vhandle, const char *word, dbv_t *val){
     }
     return ret;
   default:
-    PRINT_ERROR("(db) db_getvalue( '%s' ), err: %d, %s", word, ret, db_strerror(ret));
+    print_error(__FILE__, __LINE__, "(db) db_getvalue( '%s' ), err: %d, %s", word, ret, db_strerror(ret));
     exit(2);
   }
 }
@@ -254,7 +254,7 @@ void db_set_dbvalue(void *vhandle, const char * word, dbv_t *val){
     }
   }
   else {
-    PRINT_ERROR("(db) db_set_dbvalue( '%s' ), err: %d, %s", word, ret, db_strerror(ret));
+    print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%s' ), err: %d, %s", word, ret, db_strerror(ret));
     exit(2);
   }
 }
@@ -323,7 +323,7 @@ static int db_lock(dbh_t *handle, int cmd, int type){
   struct flock lock;
 
   if ( (ret = handle->dbp->fd(handle->dbp, &fd)) != 0){
-    PRINT_ERROR("(db) db_lock: %d, err: %d, %s", cmd, ret, db_strerror(ret));
+    print_error(__FILE__, __LINE__, "(db) db_lock: %d, err: %d, %s", cmd, ret, db_strerror(ret));
     exit(2);
   }
 
@@ -351,7 +351,7 @@ void db_lock_reader(void *vhandle){
     	  fprintf(stderr, "[%lu] Faked read lock on %s.\n", (unsigned long) handle->pid, handle->filename);
     }
     else {
-	PRINT_ERROR( "Error acquiring read lock on %s\n", handle->filename);
+	print_error(__FILE__, __LINE__, "Error acquiring read lock on %s\n", handle->filename);
 	exit(2);
     }
   }
@@ -372,7 +372,7 @@ void db_lock_writer(void *vhandle){
     fprintf(stderr, "[%lu] Acquiring write lock on %s\n", (unsigned long) handle->pid, handle->filename);
 
   if (db_lock(handle, F_SETLKW, F_WRLCK) != 0){
-      PRINT_ERROR( "Error acquiring write lock on %s\n", handle->filename);
+      print_error(__FILE__, __LINE__, "Error acquiring write lock on %s\n", handle->filename);
       exit(2);
   }
 
@@ -393,7 +393,7 @@ void db_lock_release(void *vhandle){
       fprintf(stderr, "[%lu] Releasing lock on %s\n", (unsigned long) handle->pid, handle->filename);
 
     if (db_lock(handle, F_SETLK, F_UNLCK) != 0){
-	PRINT_ERROR( "Error releasing on %s\n", handle->filename);
+	print_error(__FILE__, __LINE__, "Error releasing on %s\n", handle->filename);
 	exit(2);
     }
   }
@@ -421,7 +421,7 @@ static void lock_msg(const dbh_t *handle, int idx, const char *msg, int cmd, int
   const char *block_type[] = { "nonblocking", "blocking" };
   const char *lock_type[]  = { "write", "read" };
 
-  PRINT_ERROR("[%lu] [%d] %s %s %s lock on %s", 
+  print_error(__FILE__, __LINE__, "[%lu] [%d] %s %s %s lock on %s", 
 	          (unsigned long)handle->pid,
                   idx,
 		  msg,
