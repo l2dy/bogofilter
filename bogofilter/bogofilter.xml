@@ -20,6 +20,7 @@
   <arg choice='opt'>-S</arg>
   <arg choice='opt'>-N</arg>
   <arg choice='opt'>-d <replaceable>dir</replaceable></arg>
+  <arg choice='opt'>-l</arg>
   <arg choice='opt'>-p</arg>
   <arg choice='opt'>-e</arg>
   <arg choice='opt'>-u</arg>
@@ -102,6 +103,31 @@ same message as spam.</para>
     allows you to set the directory under which wordlists will be found
     to <replaceable>dir</replaceable>. If omitted,
     <filename>$HOME/.bogofilter</filename> is assumed.</para>
+
+<para>The <option>-l</option> (log) option writes an informational line
+to the system log each time <application>bogofilter</application> is run.
+The information logged depends on how <application>bogofilter</application> is run.</para>
+
+
+
+
+
+
+<programlisting>
+   <lineannotation>
+    A classification run will generate:
+  </lineannotation>
+        Oct 11 09:26:34 osage bogofilter[1412]: X-Bogosity: No, spamicity=0.000227
+        Oct 11 09:26:34 osage bogofilter[1415]: X-Bogosity: Yes, spamicity=0.998918
+  <lineannotation>
+    Using '-u' to classify a message and update a wordlist will produce:
+  </lineannotation>
+        Oct 11 09:26:56 osage bogofilter[1426]: X-Bogosity: Yes, spamicity=0.998918, register -s, 329 words, 1 messages
+   <lineannotation>
+    Registering words ('-l' and '-s', '-n', '-S', or '-N') will produce:
+  </lineannotation>
+        Oct 11 09:27:22 osage bogofilter[1440]: register-n, 255 words, 1 messages
+</programlisting>
 
 <para>The <option>-p</option> (passthrough) option writes a copy of
 the input mail to the output with an X-Spam-Status header (in the

@@ -10,7 +10,7 @@
 #define GOOD_BIAS	2		// give good words more weight
 
 typedef enum rc_e {RC_SPAM=0, RC_NONSPAM=1}  rc_t;
-typedef enum reg_e { REG_NONE = 0, REG_SPAM, REG_GOOD, REG_SPAM_TO_GOOD, REG_GOOD_TO_SPAM } reg_t;
+typedef enum reg_e { REG_NONE=0, REG_SPAM, REG_GOOD, REG_SPAM_TO_GOOD, REG_GOOD_TO_SPAM, REG_UPDT } reg_t;
 
 //Represents the secondary data for a word key
 typedef struct {

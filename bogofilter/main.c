@@ -32,6 +32,10 @@ int verbose, passthrough, update, nonspam_exits_zero;
 
 char directory[PATH_LEN];
 
+int  logflag;
+char msg_register[80];
+char msg_bogofilter[80];
+
 /* if the given environment variable 'var' exists, copy it to 'dest' and
    tack on the optional 'subdir' value.
  */
@@ -112,11 +116,15 @@ int main(int argc, char **argv)
     reg_t register_type = REG_NONE; 
     int   exitcode = 0;
 
+#ifdef HAVE_SYSLOG_H
+    openlog ( "bogofilter", LOG_PID, LOG_DAEMON );
+#endif
+
     strcpy(directory, BOGODIR);
     set_dir_from_env(directory, "HOME", BOGODIR);
     set_dir_from_env(directory, "BOGOFILTER_DIR", NULL);
 
-    while ((ch = getopt(argc, argv, "d:ehsnSNvVpu")) != EOF)
+    while ((ch = getopt(argc, argv, "d:ehlsnSNvVpu")) != EOF)
 	switch(ch)
 	{
 	case 'd':
@@ -184,6 +192,11 @@ int main(int argc, char **argv)
 
 	case 'u':
 	    update = 1;
+	    register_type = REG_UPDT;
+	    break;
+
+	case 'l':
+	    logflag = 1;
 	    break;
 	}
 
@@ -191,7 +204,7 @@ int main(int argc, char **argv)
 
     setup_lists(directory, DB_WRITE);
 
-    if (register_type == REG_NONE)
+    if (register_type == REG_NONE || register_type == REG_UPDT)
     {
 	double spamicity;
 	rc_t	status = bogofilter(STDIN_FILENO, &spamicity);
@@ -239,11 +252,31 @@ int main(int argc, char **argv)
 	if (nonspam_exits_zero && passthrough && exitcode == 1)
 	    exitcode = 0;
 
+	sprintf(msg_bogofilter, "%s: %s, spamicity=%0.6f",
+		SPAM_HEADER_NAME, (status==RC_SPAM) ? "Yes" : "No", spamicity);
     } else {
 	register_messages(STDIN_FILENO, register_type);
     }
 
     close_lists();
+
+#ifdef HAVE_SYSLOG_H
+    if (logflag)
+    {
+	switch (register_type)
+	{
+	case REG_NONE:
+	    syslog(LOG_INFO, "%s\n", msg_bogofilter);
+	    break;
+	case REG_UPDT:
+	    syslog(LOG_INFO, "%s, %s\n", msg_bogofilter, msg_register);
+	    break;
+	default:
+	    syslog(LOG_INFO, msg_register);
+	    break;
+	}
+    }
+#endif
 
     exit(exitcode);
 }

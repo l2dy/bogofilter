@@ -38,6 +38,8 @@ I do the lexical analysis slightly differently, however.
 #define EVEN_ODDS	0.5f		// used for words we want to ignore
 #define DEVIATION(n)	fabs((n) - EVEN_ODDS)		// deviation from average
 
+extern char msg_register[];
+
 static void wordprop_init(void *vwordprop){
 	wordprop_t *wordprop = vwordprop;
 
@@ -101,12 +103,23 @@ void register_words(reg_t register_type, wordhash_t *h, int msgcount, int wordco
 // tokenize text on stdin and register it to  a specified list
 // and possibly out of another list
 {
+  char ch;
   hashnode_t *node;
   wordprop_t *wordprop;
 
   wordlist_t *list;
   wordlist_t *incr_list = NULL;
   wordlist_t *decr_list = NULL;
+
+  switch(register_type)
+  {
+  case REG_SPAM:		ch = 's' ; break;
+  case REG_GOOD:		ch = 'n' ; break;
+  case REG_GOOD_TO_SPAM:	ch = 'S' ; break;
+  case REG_SPAM_TO_GOOD:	ch = 'N' ; break;
+  }
+
+  sprintf(msg_register, "register-%c, %d words, %d messages\n", ch, wordcount, msgcount);
 
   if (verbose)
     fprintf(stderr, "# %d words, %d messages\n", wordcount, msgcount);
