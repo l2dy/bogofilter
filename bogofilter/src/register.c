@@ -75,30 +75,30 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 	ds_write(list->dsh, node->key, &val);
     }
 
-	ds_get_msgcounts(list->dsh, &val);
-	list->msgcount[IX_SPAM] = val.spamcount;
-	list->msgcount[IX_GOOD] = val.goodcount;
+    ds_get_msgcounts(list->dsh, &val);
+    list->msgcount[IX_SPAM] = val.spamcount;
+    list->msgcount[IX_GOOD] = val.goodcount;
 
-	if (incr != IX_UNDF)
-	    list->msgcount[incr] += msgcount;
+    if (incr != IX_UNDF)
+	list->msgcount[incr] += msgcount;
 
-	if (decr != IX_UNDF) {
-	    if (list->msgcount[decr] > msgcount)
-		list->msgcount[decr] -= msgcount;
-	    else
-		list->msgcount[decr] = 0;
-	}
+    if (decr != IX_UNDF) {
+	if (list->msgcount[decr] > msgcount)
+	    list->msgcount[decr] -= msgcount;
+	else
+	    list->msgcount[decr] = 0;
+    }
 
-	val.spamcount = list->msgcount[IX_SPAM];
-	val.goodcount = list->msgcount[IX_GOOD];
+    val.spamcount = list->msgcount[IX_SPAM];
+    val.goodcount = list->msgcount[IX_GOOD];
 
-	ds_set_msgcounts(list->dsh, &val);
-	set_msg_counts(val.goodcount, val.spamcount);
+    ds_set_msgcounts(list->dsh, &val);
+    set_msg_counts(val.goodcount, val.spamcount);
 
-	ds_flush(list->dsh);
+    ds_flush(list->dsh);
 
-	if (DEBUG_REGISTER(1))
-	    (void)fprintf(dbgout, "bogofilter: list %s (%s) - %ul spam, %ul good\n",
+    if (DEBUG_REGISTER(1))
+	(void)fprintf(dbgout, "bogofilter: list %s (%s) - %ul spam, %ul good\n",
 		      list->listname, list->filepath, val.spamcount, val.goodcount);
 
     run_type = save_run_type;
