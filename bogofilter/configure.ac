@@ -85,21 +85,10 @@ Use --with-db=PATH to specify the path to a v3+ install directory.
 You can download BerkeleyDB 4.0.x from http://www.sleepycat.com])
 )
 
-AC_CHECK_LIB(db-4, db_create, LIBS="$LIBS -ldb-4", 
-AC_CHECK_LIB(db4, db_create, LIBS="$LIBS -ldb4", 
-		AC_CHECK_LIB(db-3, db_create, LIBS="$LIBS -ldb-3", 
-		AC_CHECK_LIB(db3, db_create, LIBS="$LIBS -ldb3", 
-			AC_CHECK_LIB(db-2, db_create, LIBS="$LIBS -ldb-2",
-			AC_CHECK_LIB(db2, db_create, LIBS="$LIBS -ldb2",
-				AC_CHECK_LIB(db, db_create, LIBS="$LIBS -ldb", 
-					AC_MSG_ERROR([Can not locate a suitable BerkeleyDB libdb.so library.
-Use --with-db=PATH to specify the path to a v3+ install directory])
-					)))))))
-
-
-AC_MSG_CHECKING(BerkeleyDB)
-AC_TRY_LINK_FUNC(db_create,, AC_MSG_ERROR([BerkeleyDB v3+ package is not working properly. Specify a different one using --with-db=PATH]))
-AC_MSG_RESULT(BerkeleyDB)
+AC_CHECK_DB([db-4 db4 db-3.1 db-3 db3 db-2 db2 db],,
+		    AC_MSG_ERROR([Can not locate a suitable Berkeley DB
+				  library.  Use --with-db=PATH to specify
+				  the path to a v3+ install directory]))
 
 # Allow the user to specify a header name to use to indicate whether a given
 # message is SPAM or not.

@@ -103,3 +103,28 @@ if test $ac_cv_header_stdbool_h = yes; then
   AC_DEFINE(HAVE_STDBOOL_H, 1, [Define to 1 if stdbool.h conforms to C99.])
 fi
 ])# AC_HEADER_STDBOOL
+
+AC_DEFUN([AC_CHECK_DB],[
+for lib in $1
+do
+   AS_VAR_PUSHDEF([ac_tr_db], [ac_cv_db_lib_${lib}])dnl
+   bogo_saved_LIBS="$LIBS"
+   LIBS="$LIBS -l$lib"
+   AC_CACHE_CHECK([for db_create in -l${lib}], ac_tr_db,
+      [AC_TRY_LINK([#include <db.h>], [int foo=db_create((void *)0, (void *) 0, 0 )],
+                   [AS_VAR_SET(ac_tr_db, yes)],
+                   [AS_VAR_SET(ac_tr_db, no)])
+      ])
+   AS_IF([test AS_VAR_GET(ac_tr_db) = yes],
+         [$2
+          db=yes],
+         [LIBS="$bogo_saved_LIBS"
+          db=no])
+   AS_VAR_POPDEF([ac_tr_db])dnl
+test "$db" = "yes" && break
+done
+if test "$db" = "no"; then
+$3
+fi
+])# AC_CHECK_DB
+
