@@ -43,12 +43,10 @@ token_t  read_msg_count_line(void)
 	return NONE;
     }
     else {
-	msg_count_leng = strlen(msg_count_text);
+	msg_count_leng = strlen(msg_count_chars);
 
-	if (msg_count_header_len == 0)
-	    msg_count_header_len= strlen(msg_count_header);
-
-	if ( memcmp(msg_count_text, msg_count_header, msg_count_header_len) == 0 )
+	if ( msg_count_chars[1] == '.' && 
+	     memcmp(msg_count_chars, msg_count_header, msg_count_header_len) == 0 )
 	    return MSG_COUNT_LINE;
 	else
 	    return BOGO_LEX_LINE;
@@ -59,6 +57,7 @@ void init_msg_counts()
 {
     msgs_good = 0L;
     msgs_bad  = 0L;
+    msg_count_header_len= strlen(msg_count_header);
 }
 
 void compute_msg_counts()
