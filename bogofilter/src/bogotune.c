@@ -22,7 +22,7 @@ AUTHORS:
 **       2. discard words
 **    c. replace wordhashs with wordcnts
 **    d. de-allocate resident wordlist
-** 
+**
 ** 2. internal wordlist ("-D") flag
 **    a. read all messages
 **    b. distribute messages
@@ -85,7 +85,7 @@ AUTHORS:
 #define FP_CUTOFF	0.999
 #define	SCAN_CUTOFF	0.500	/* skip scans if cutoff is less or equal */
 
-#define	CHECK_PCT	0.01	/* for checking high scoring non-spam 
+#define	CHECK_PCT	0.01	/* for checking high scoring non-spam
 				** and low scoring spam */
 
 /* bogotune's default parameters */
@@ -171,13 +171,13 @@ static void bt_exit(void);
 static void check_wordlist_path(void);
 static int  load_hook(word_t *key, dsv_t *data, void *userdata);
 static void load_wordlist(ds_foreach_t *hook, void *userdata);
-static void show_elapsed_time(int beg, int end, uint cnt, double val, 
+static void show_elapsed_time(int beg, int end, uint cnt, double val,
 			      const char *lbl1, const char *lbl2);
 static void write_msgcount_file(wordhash_t *wh);
 
 /* Function Definitions */
 
-static void bt_trap(void) {} 
+static void bt_trap(void) {}
 
 static int get_cnt(double fst, double lst, double amt)
 {
@@ -262,12 +262,12 @@ static void init_fine(double _rs, double _md, double _rx,
 
     s0 = max(_spex - 1.5,  0.0);
     s1 = min(_spex + 1.5, 20.0);
-    
+
     spexp = seq_by_amt(s0, ESF_SEL(s0,s1), 0.5);
-    
+
     s0 = max(_nsex - 1.5,  0.0);
     s1 = min(_nsex + 1.5, 20.0);
-    
+
     nsexp = seq_by_amt(s0, ESF_SEL(s0,s1), 0.5);
 }
 
@@ -380,9 +380,9 @@ static bool check_for_high_ns_scores(void)
 
     if (!quiet) {
 	fprintf(stderr,
-	        "Warning: test messages include many high scoring nonspam.\n");
+		"Warning: test messages include many high scoring nonspam.\n");
 	fprintf(stderr,
-	        "         You may wish to reclassify them and rerun.\n");
+		"         You may wish to reclassify them and rerun.\n");
     }
 
     return true;
@@ -442,9 +442,9 @@ static bool check_for_low_sp_scores(void)
 
     if (!quiet) {
 	fprintf(stderr,
-	        "Warning: test messages include many low scoring spam.\n");
+		"Warning: test messages include many low scoring spam.\n");
 	fprintf(stderr,
-	        "         You may wish to reclassify them and rerun.\n");
+		"         You may wish to reclassify them and rerun.\n");
     }
 
     return true;
@@ -453,16 +453,16 @@ static bool check_for_low_sp_scores(void)
 static void scoring_error(void)
 {
     int i;
-    
+
     if (quiet)
 	return;
 
     printf("    high ham scores:\n");
-    for (i = 0; i < 10 && ns_scores[i] > SPAM_CUTOFF; i += 1) 
+    for (i = 0; i < 10 && ns_scores[i] > SPAM_CUTOFF; i += 1)
 	printf("      %2d %8.6f\n", i+1, ns_scores[i]);
 
     printf("    low spam scores:\n");
-    for (i = 0; i < 10 && sp_scores[i] < HAM_CUTOFF; i += 1) 
+    for (i = 0; i < 10 && sp_scores[i] < HAM_CUTOFF; i += 1)
 	printf("      %2d %8.6f\n", i+1, sp_scores[i]);
 }
 
@@ -521,7 +521,7 @@ static double scale(uint cnt, uint lo, uint hi, double beg, double end)
 **	 spam_cutoff
 **
 ** As count increases from 500 to 4000 ...
-**	1) initial target percent drops from 1% to 0.25% 
+**	1) initial target percent drops from 1% to 0.25%
 **	2) initial minimum target increases from 5 to 10
 */
 
@@ -695,7 +695,7 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
     int train_good = 0;
     int train_bad  = 0;
 
-    double ratio = scale(msgs->count,  
+    double ratio = scale(msgs->count,
 			 LIST_COUNT + TEST_COUNT,	/* small count */
 			 LIST_COUNT + LIST_COUNT,	/* large count */
 			 LIST_COUNT / TEST_COUNT,	/* small ratio */
@@ -729,7 +729,7 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
     }
 
     if (verbose > 1)
-	printf("%s:  train_count = %d, score_count = %d\n",  
+	printf("%s:  train_count = %d, score_count = %d\n",
 	       good ? "ns" : "sp",
 	       train_count, score_count);
 
@@ -812,8 +812,8 @@ static void print_version(void)
 
 static void help(void)
 {
-    (void)fprintf(stderr, 
-                  "Usage:  %s [options] { -c config } { -d directory } -n non-spam-files -s spam-files\n", 
+    (void)fprintf(stderr,
+		  "Usage:  %s [options] { -c config } { -d directory } -n non-spam-files -s spam-files\n",
 		  progname);
     (void)fprintf(stderr,
 		  "\t  -h      - print this help message.\n"
@@ -827,14 +827,14 @@ static void help(void)
     (void)fprintf(stderr,
 		  "\t  -T num  - specify fp target value\n"
 		  "\t  -s file1 file2 ... - spam files\n"
-		  "\t  -n file1 file2 ... - non-spam files\n" 
+		  "\t  -n file1 file2 ... - non-spam files\n"
 		  "\t  -v      - increase level of verbose messages\n"
 		  "\t          - accept high scoring non-spam and low scoring spam\n"
 		  "\t  -q      - quiet (suppress warnings)\n"
 	);
     (void)fprintf(stderr,
 		  "\n"
-		  "%s (version %s) is part of the bogofilter package.\n", 
+		  "%s (version %s) is part of the bogofilter package.\n",
 		  progname, version);
 }
 
@@ -916,9 +916,9 @@ static int process_arglist(int argc, char **argv)
 	    filelist_add( (run_type == REG_GOOD) ? ham_files : spam_files, arg);
     }
 
-    if (!bogolex && 
+    if (!bogolex &&
 	(spam_files->count == 0 || ham_files->count == 0)) {
-	fprintf(stderr, 
+	fprintf(stderr,
 		"Bogotune needs both non-spam and spam messages sets for its testing.\n");
 	exit(EX_ERROR);
     }
@@ -974,7 +974,7 @@ static int load_hook(word_t *key, dsv_t *data, void *userdata)
 
     if (strcmp((char *)key->text, ".MSG_COUNT") == 0)
 	set_msg_counts(data->goodcount, data->spamcount);
-	
+
     return 0;
 }
 
@@ -982,7 +982,7 @@ static double get_robx(void)
 {
     double rx;
 
-    if (user_robx > 0.0) 
+    if (user_robx > 0.0)
 	rx = user_robx;
     else {
 	printf("Calculating initial x value...\n");
@@ -1021,7 +1021,7 @@ static void top_ten(result_t *sorted, uint n)
  	if (!f && r->fp != target) continue;
 	printf("%5u %6.4f %5.3f %5.3f %8.6f %8.6f %6.4f  %3u %3u  %6.4f %6.4f\n",
 	       r->idx, r->rs, r->md, r->rx,
-	       pow(0.75, r->sp_exp), pow(0.75, r->ns_exp), r->co, 
+	       pow(0.75, r->sp_exp), pow(0.75, r->ns_exp), r->co,
 	       r->fp, r->fn, r->fp*100.0/ns_cnt, r->fn*100.0/sp_cnt);
 	++i;
       }
@@ -1037,7 +1037,7 @@ static void top_ten(result_t *sorted, uint n)
 
 /* get false negative */
 
-static int gfn(result_t *results, 
+static int gfn(result_t *results,
 	       uint rsi, uint mdi, uint rxi,
 	       uint spi, uint nsi)
 {
@@ -1046,7 +1046,7 @@ static int gfn(result_t *results,
     int fn = r->fn;
     if (r->fp != target) return INT_MAX;
     if (verbose > 100)
-	printf("   %2u, %2u, %2u, %2u, %2u, %2d\n", 
+	printf("   %2u, %2u, %2u, %2u, %2u, %2d\n",
 	       rsi, mdi, rxi, spi, nsi, fn);
     ncnt += 1;
     nsum += fn;
@@ -1240,7 +1240,7 @@ static void final_recommendations(bool skip)
     printf("ham_cutoff=%5.3f\t\n", ham_cutoff);
     printf("---cut---\n");
     printf("\n");
-    
+
     if (skip)
 	final_warning();
 
@@ -1304,7 +1304,7 @@ static bool check_msg_counts(void)
 
     if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
 	if (!quiet)
-	    fprintf(stderr, 
+	    fprintf(stderr,
 		    "The wordlist contains %d non-spam and %d spam messages.\n"
 		    "Bogotune must be run with at least %d of each.\n",
 		    (int) msgs_good, (int) msgs_bad, LIST_COUNT);
@@ -1323,7 +1323,7 @@ static bool check_msg_counts(void)
 
     if (ns_cnt < TEST_COUNT || sp_cnt < TEST_COUNT) {
 	if (!quiet)
-	    fprintf(stderr, 
+	    fprintf(stderr,
 		    "The messages sets contain %u non-spam and %u spam.  Bogotune "
 		    "requires at least %d non-spam and %d spam messages to run.\n",
 		    ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
@@ -1404,7 +1404,7 @@ static rc_t bogotune(void)
 
     fflush(stdout);
 
-    check_percent = CHECK_PCT;	/* for checking high scoring non-spam 
+    check_percent = CHECK_PCT;	/* for checking high scoring non-spam
 				** and low scoring spam */
 
     ns_scores = xcalloc(ns_cnt, sizeof(double));
@@ -1435,7 +1435,7 @@ static rc_t bogotune(void)
     ** shipped, and determine the count that will result from a spam cutoff
     ** of 0.95; if that is < 0.25%, try 0.9375 etc.
     */
-    
+
     min_dev = 0.02;
 
     /* set target and spam_cutoff */
@@ -1508,7 +1508,7 @@ static rc_t bogotune(void)
 		printf("%3s ", "cnt");
 	    if (verbose >= SUMMARY+2)
 		printf(" %s %s %s  ", "s", "m", "x");
-	    printf(" %4s %5s   %4s %8s %8s %7s %3s %3s\n", 
+	    printf(" %4s %5s   %4s %8s %8s %7s %3s %3s\n",
 		   "rs", "md", "rx", "spesf", "nsesf", "cutoff", "fp", "fn");
 	}
 
@@ -1550,7 +1550,7 @@ static rc_t bogotune(void)
 
 		    spam_cutoff = 0.01;
 		    score_ns(ns_scores);	/* scores in descending order */
-		    
+
 		    /* Determine spam_cutoff and false_pos */
 		    for (fp = target; fp < ns_cnt; fp += 1) {
 			spam_cutoff = ns_scores[fp-1];
@@ -1610,12 +1610,12 @@ static rc_t bogotune(void)
 	min_dev = mdval->data[best->mdi];
 	spex = spexp->data[best->spi]; sp_esf = ESF_SEL(sp_esf, pow(0.75, spex));
 	nsex = nsexp->data[best->nsi]; ns_esf = ESF_SEL(ns_esf, pow(0.75, nsex));
-	
+
 	printf(
     "Minimum found at s %6.4f, md %5.3f, x %5.3f, spesf %8.6f, nsesf %8.6f\n",
-	        robs, min_dev, robx, sp_esf, ns_esf);
+    		robs, min_dev, robx, sp_esf, ns_esf);
 	printf("        fp %u (%6.4f%%), fn %u (%6.4f%%)\n",
-		best->fp, best->fp*100.0/ns_cnt, 
+		best->fp, best->fp*100.0/ns_cnt,
 		best->fn, best->fn*100.0/sp_cnt);
 	printf("\n");
 
@@ -1687,7 +1687,7 @@ static void bt_exit(void)
     return;
 }
 
-static void show_elapsed_time(int beg, int end, uint cnt, double val, 
+static void show_elapsed_time(int beg, int end, uint cnt, double val,
 			      const char *lbl1, const char *lbl2)
 {
     int tm = end - beg;
