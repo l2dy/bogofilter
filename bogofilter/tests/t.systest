@@ -72,6 +72,7 @@ rm -f ${TMPDIR}/bogofilter.cf
 
 pfx=$srcdir/t.systest.d/outputs
 for i in $pfx/*v ; do
-    test ${i##$pfx/} = CVS && continue
-    cmp $i ${TMPDIR}/tests/${i##$pfx/}
+    # SunOS /bin/sh does not like ${i##$pfx/}
+    j=`echo $i | sed "s'^$pfx/''"`
+    cmp $i ${TMPDIR}/tests/$j
 done
