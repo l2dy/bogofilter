@@ -1,8 +1,14 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.5  2002/09/17 07:19:04  adrian_otto
- * Added -V mode for printing out version information.
+ * Revision 1.6  2002/09/20 15:27:27  m-a
+ * Optimize bogofilter -p: use tighter loop, print our X-Spam-Status: header after
+ * all other headers, and ensure that there is always an empty line after the
+ * headers. We have much less checks in the loops, so it should be somewhat
+ * faster now.
  *
+/* Revision 1.5  2002/09/17 07:19:04  adrian_otto
+/* Added -V mode for printing out version information.
+/*
 /* Revision 1.4  2002/09/16 20:44:13  m-a
 /* Do not increment passthrough on -p, but set it to 1.
 /*
@@ -188,35 +194,28 @@ int main(int argc, char **argv)
 	{
 	    int	inheaders = 1;
 
+	    /* print headers */
 	    for (textend=&textblocks; textend->block; textend=textend->next)
 	    {
-		if (inheaders == 0) {
-			/* print message body lines without further checks */
-			(void) fputs(textend->block, stdout);
-		}
-		else if (strncmp(textend->block, "X-Spam-Status:", 14) == 0) {
-			/* Don't print existing X-Spam-Status: headers */
-			#ifdef HAVE_SYSLOG_H
-			syslog(LOG_INFO, "Ignored exising X-Spam-Status header");
-			#endif
-		}
-		else if (strncmp(textend->block, "Subject:", 8) == 0) {
-			/* Append the X-Spam-Status: header before subject */
-			printf("X-Spam-Status: %s, tests=bogofilter\n", 
-			(status==RC_SPAM) ? "Yes" : "No");
-			(void) fputs(textend->block, stdout);
-		}
-		else if (strcmp(textend->block, "\n") == 0) {
-			/* Mark the beginning of the message body */
-			inheaders = 0;
-			(void) fputs(textend->block, stdout);
-		}
-		else {
-			/* in case none of the above conditions were met */
-			(void) fputs(textend->block, stdout);
-		}
+		if (strcmp(textend->block, "\n") == 0) break;
+		(void) fputs(textend->block, stdout);
 	    }
 
+	    /* print spam-status at the end of the header
+	     * then mark the beginning of the message body */
+	    printf("X-Spam-Status: %s, tests=bogofilter\n", 
+		    (status==RC_SPAM) ? "Yes" : "No");
+	    /* If the message terminated early (without body or blank
+	     * line between header and body), enforce a blank line to
+	     * prevent anything past us from choking. */
+	    if (!textend->block)
+		(void)fputs("\n", stdout);
+
+	    /* print body */
+	    for (; textend->block; textend=textend->next)
+	    {
+		(void) fputs(textend->block, stdout);
+	    }
 	}
 	exit(status);
     }
