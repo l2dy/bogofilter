@@ -375,7 +375,7 @@ double get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 	score.p_pr = prbf(-2.0 * score.p_ln, sp_df);		/* compute P */
 	score.q_pr = prbf(-2.0 * score.q_ln, ns_df);		/* compute Q */
   
-        if (!fBogotune && sp_esf == 1.0 && ns_esf == 1.0) {
+        if (!fBogotune && sp_esf >= 1.0 && ns_esf >= 1.0) {
             score.spamicity = (1.0 + score.q_pr - score.p_pr) / 2.0;
         } else if (score.q_pr < DBL_EPSILON && score.p_pr < DBL_EPSILON) {
             score.spamicity = 0.5;

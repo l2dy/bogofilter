@@ -1485,6 +1485,9 @@ static rc_t bogotune(void)
     }
 #endif
 
+    if (!esf_flag && (sp_esf < 1.0 || ns_esf < 1.0))
+	fprintf(stderr, "Warning:  Using ESF values (sp=%8.6f, ns=%8.6f) from config file.\n", sp_esf, ns_esf);
+
     /* No longer needed */
     wordhash_free(ns_and_sp->train);
     ns_and_sp->train = NULL;
