@@ -39,8 +39,6 @@ void set_debug_mask(const char *mask)
     }
 }
 
-/* 'C' - parse "&#61;" as char  */
-/* 'T' - parse "&#61;" as token */
 /* 'L' - enable lexer_v3 debug output */
 
 void set_bogotest(const char *mask)
