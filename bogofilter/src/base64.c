@@ -24,9 +24,6 @@ static byte base64_charset[] = {
 static byte base64_xlate[256];
 static const byte base64_invalid = 0x7F;
 
-static void base64_init(void);
-static bool base64_validate(word_t *word);
-
 /* Function Definitions  */
 
 uint base64_decode(word_t *word)
@@ -35,8 +32,6 @@ uint base64_decode(word_t *word)
     uint size = word->leng;
     byte *s = word->text;		/* src */
     byte *d = word->text;		/* dst */
-
-    base64_init();
 
     if (!base64_validate(word))
 	return size;
@@ -96,14 +91,16 @@ static void base64_init(void)
     return;
 }
 
-static bool base64_validate(word_t *word)
+bool base64_validate(word_t *word)
 {
     uint i;
+
+    base64_init();
 
     for (i = 0; i < word->leng; i += 1) {
 	byte b = word->text[i];
 	byte v = base64_xlate[b];
-	if (b != 'A' && v == 0 && b != '\n')
+	if (b != 'A' && v == 0)
 	    return false;
     }
 
