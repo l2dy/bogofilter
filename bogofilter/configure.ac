@@ -1,9 +1,9 @@
 # $Id$
 AC_INIT(bogofilter, 0.10.2)
 AC_PREREQ(2.53)
-AC_CONFIG_SRCDIR([bogofilter.c])
+AC_CONFIG_SRCDIR([src])
 AM_INIT_AUTOMAKE
-AM_CONFIG_HEADER(config.h:config.in)
+AM_CONFIG_HEADER(src/config.h:config.in)
 AC_PROG_CC
 AC_PROG_RANLIB
 AM_PROG_LEX
@@ -234,7 +234,9 @@ fi
 
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 AC_CONFIG_FILES([Makefile \
-		tests/Makefile tests/bogoutil/Makefile tests/bogofilter/Makefile \
 		bogofilter.spec \
-		dcdflib/Makefile dcdflib/src/Makefile contrib/Makefile doc/Makefile])
+		contrib/Makefile doc/Makefile \
+		src/Makefile src/dcdflib/Makefile src/dcdflib/src/Makefile \
+		src/tests/Makefile src/tests/bogoutil/Makefile src/tests/bogofilter/Makefile \
+		])
 AC_OUTPUT
