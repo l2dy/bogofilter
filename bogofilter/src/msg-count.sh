@@ -72,28 +72,17 @@ then
     exit
 fi
 
-case $1 in
-    convert)
-	shift
-	( echo .MSG_COUNT ; $BOGOLEXER -p "$@" | sort -u ) | \
-	    $BOGOUTIL -w $BOGOFILTER_DIR | \
-	    awk 'NF == 3 { printf( "\"%s\" %s %s\n", $1, $2, $3 ) } '
-	;;
+GET_TOKENS="echo .MSG_COUNT ; $BOGOLEXER -p $@ | sort -u"
+GET_COUNTS="$BOGOUTIL -w $BOGOFILTER_DIR"
 
-    -*)
-	formail -es "$0" convert "$@"
-	;;
-
-    *)
-	if [ ! -d "$1" ] ; then
-	    formail -es "$0" convert "$@"
-	else
-	    DIR="$1"
-	    shift
-	    for f in $DIR/* ; do
-		msg-count.sh convert "$@" < $f
-	    done
-	fi
-	;;
-esac
-
+if [ ! -d "$1" ] ; then
+    pipesplitmbox $GET_TOKENS | $GET_COUNTS | \
+	${AWK=awk} 'NF == 3 { printf( "\"%s\" %s %s\n", $1, $2, $3 ) } '
+else
+    DIR="$1"
+    shift
+    for f in $DIR/* ; do
+	cat $f | pipesplitmbox $GET_TOKENS | $GET_COUNTS | \
+	    ${AWK=awk} 'NF == 3 { printf( "\"%s\" %s %s\n", $1, $2, $3 ) } '
+    done
+fi
