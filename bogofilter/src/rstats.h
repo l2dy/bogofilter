@@ -26,4 +26,6 @@ void rstats_fini(size_t robn,
 
 void rstats_print(void);
 
+void rstats_cnt_rn_ns_sp(uint *cnt, uint *rn, uint *ns, uint *sp);
+
 #endif	/* RSTATS_H */

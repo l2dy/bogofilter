@@ -17,10 +17,10 @@ AUTHOR:
 
 /* Function Definitions */
 
-word_t *word_new(const byte *text, size_t leng)
+word_t *word_new(const byte *text, uint leng)
 {
     /* to lessen malloc/free calls, allocate struct and data in one block */
-    size_t len   = (leng || !text) ? leng : strlen((const char *) text);
+    uint len   = (leng || !text) ? leng : (uint) strlen((const char *) text);
     word_t *self = xmalloc(sizeof(word_t)+len+D);
     self->leng = len;
     self->text = (byte *)((char *)self+sizeof(word_t));
@@ -61,10 +61,10 @@ int word_cmp(const word_t *w1, const word_t *w2)
 #if	1
     return strcmp((const char *)w1->text, (const char *)w2->text);
 #else
-    size_t s1 = w1->leng;
-    size_t s2 = w2->leng;
-    size_t l  = min(s1, s2);
-    size_t i;
+    uint s1 = w1->leng;
+    uint s2 = w2->leng;
+    uint l  = min(s1, s2);
+    uint i;
 
     for (i = 0; i < l ; i += 1) {
 	int d = w1->text[i] -  w2->text[i];
@@ -78,7 +78,7 @@ int word_cmp(const word_t *w1, const word_t *w2)
 
 word_t *word_concat(const word_t *w1, const word_t *w2)
 {
-    size_t len = w1->leng + w2->leng;
+    uint len = w1->leng + w2->leng;
     word_t *ans = word_new(NULL, len);
     memcpy(ans->text, w1->text, w1->leng);
     memcpy(ans->text+w1->leng, w2->text, w2->leng);
@@ -86,13 +86,13 @@ word_t *word_concat(const word_t *w1, const word_t *w2)
     return ans;
 }
 
-void word_puts(const word_t *self, size_t width, FILE *fp)
+void word_puts(const word_t *self, uint width, FILE *fp)
 {
     /* width = 0 - output all of the word
     **       > 0 - use 'width' as count, 
     **		   blank fill if 'width' < length
     */
-    size_t l = (width == 0) ? self->leng : min(width, self->leng);
+    uint l = (width == 0) ? self->leng : min(width, self->leng);
     (void)fwrite(self->text, 1, l, fp);
     if (l < width)
 	(void) fprintf(fp, "%*s", (int)(width - l), " ");

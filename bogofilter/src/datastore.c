@@ -42,7 +42,7 @@ void ds_cleanup(void);
 /* Function definitions */
 
 static
-YYYYMMDD time_to_date(long days)
+YYYYMMDD time_to_date(YYYYMMDD days)
 {
     time_t t = time(NULL) - days * 86400;
     struct tm *tm = localtime( &t );
@@ -52,7 +52,7 @@ YYYYMMDD time_to_date(long days)
 
 YYYYMMDD string_to_date(const char *s)
 {
-    YYYYMMDD date = atol(s);
+    YYYYMMDD date = (YYYYMMDD) atol(s);
     if (date < 20020801 && date != 0) {
 	date = time_to_date(date);
     }

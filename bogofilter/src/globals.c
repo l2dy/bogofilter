@@ -66,7 +66,7 @@ method_t *method = NULL;
 bool strict_check = false;
 
 /* other */
-int	db_cachesize = 0;		/* in MB */
+uint	db_cachesize = 0;		/* in MB */
 enum	passmode passmode;		/* internal */
 bool	msg_count_file = false;
 const char *progtype = NULL;

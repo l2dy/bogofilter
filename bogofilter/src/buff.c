@@ -22,7 +22,7 @@ AUTHORS:
 #define BOGO_ASSERT(expr, msg) if (!(expr)) { fprintf(stderr, "%s: %s:%d %s\n", progname, __FILE__, __LINE__, msg); abort(); }
 
 /* Function Definitions */
-buff_t *buff_init(buff_t *self, byte *buff, size_t used, size_t size)
+buff_t *buff_init(buff_t *self, byte *buff, uint used, uint size)
 {
     self->t.text = buff;
     self->t.leng = used;
@@ -31,7 +31,7 @@ buff_t *buff_init(buff_t *self, byte *buff, size_t used, size_t size)
     return self;
 }
 
-buff_t *buff_new(byte *buff, size_t used, size_t size)
+buff_t *buff_new(byte *buff, uint used, uint size)
 {
     buff_t *self = xmalloc(sizeof(buff_t));
     buff_init(self, buff, used, size);
@@ -59,7 +59,7 @@ buff_t *buff_dup(const buff_t *self)
 
 int buff_fgetsl(buff_t *self, FILE *in)
 {
-    int readpos = self->t.leng;
+    uint readpos = self->t.leng;
     int readcnt = xfgetsl((char *)self->t.text+readpos, self->size-readpos, in, 1);
     self->read = readpos;
     if (readcnt >= 0)
@@ -67,9 +67,9 @@ int buff_fgetsl(buff_t *self, FILE *in)
     return readcnt;
 }
 
-int buff_fgetsln(buff_t *self, FILE *in, size_t maxlen)
+int buff_fgetsln(buff_t *self, FILE *in, uint maxlen)
 {
-    int readpos = self->t.leng;
+    uint readpos = self->t.leng;
     int readcnt = xfgetsl((char *)self->t.text+readpos, min(self->size - readpos, maxlen), in, 1);
     /* WARNING: do not add NUL termination, the size must be exact! */
     self->read = readpos;
@@ -80,9 +80,9 @@ int buff_fgetsln(buff_t *self, FILE *in, size_t maxlen)
 
 int buff_add(buff_t *self, word_t *in)
 {
-    int readpos = self->t.leng;
+    uint readpos = self->t.leng;
     int readcnt = in->leng;
-    size_t new_size = self->t.leng + in->leng;
+    uint new_size = self->t.leng + in->leng;
     if (new_size > self->size) {
 	self->t.text = xrealloc(self->t.text, new_size);
 	self->size = new_size;
@@ -95,7 +95,7 @@ int buff_add(buff_t *self, word_t *in)
     return readcnt;
 }
 
-void buff_puts(const buff_t *self, size_t width, FILE *fp)
+void buff_puts(const buff_t *self, uint width, FILE *fp)
 {
     word_t word;
     word.leng = self->t.leng-self->read;
@@ -103,7 +103,7 @@ void buff_puts(const buff_t *self, size_t width, FILE *fp)
     word_puts(&word, width, fp);
 }
 
-void buff_shift(buff_t *self, byte *start, size_t length)
+void buff_shift(buff_t *self, byte *start, uint length)
 {
     /* Shift buffer contents to delete the specified segment. */
     /* Implemented for deleting html comments.		      */

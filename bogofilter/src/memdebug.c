@@ -44,7 +44,7 @@ uint32_t dbg_too_much  = 0;	/* GB */
 uint32_t dbg_size_delt = 0;	/* MB */
 uint32_t dbg_delt_save = 0;
 
-const uint32_t md_tag = 0xABCD55AA;
+const uint32_t md_tag = (uint32_t) 0xABCD55AA;
 
 uint32_t cnt_malloc = 0;
 uint32_t cnt_free   = 0;

@@ -78,7 +78,7 @@ static void map_nonascii_characters(void);
 static void print_charset_table(void)
 {
     int c,r,i;
-    int ch;
+    char ch;
     if (!DEBUG_GENERAL(1))
 	return;
     printf( "\n" );
@@ -100,7 +100,7 @@ static void print_charset_table(void)
 
 static void map_nonascii_characters(void)
 {
-    size_t ch;
+    uint ch;
     for (ch = 0; ch < COUNTOF(charset_table); ch += 1)
     {
 	/* convert high-bit characters to '?' */
@@ -109,9 +109,9 @@ static void map_nonascii_characters(void)
     }
 }
 
-static void map_xlate_characters( byte *xlate, size_t size )
+static void map_xlate_characters( char *xlate, uint size )
 {
-    size_t i;
+    uint i;
     for (i = 0; i < size; i += 2)
     {
 	byte from = xlate[i];
@@ -206,7 +206,7 @@ static void map_iso_8859_14(void)	/* ISOIEC 8859-14:1998 Latin Alphabet No. 8 (C
 
 static void map_iso_8859_15(void)	/* ISOIEC 8859-15:1999 Latin Alphabet No. 9 */
 {
-    static byte xlate_15[] = {
+    static char xlate_15[] = {
 	0xA0, ' ',		/* A0  160      160 NO-BREAK SPACE */
 	0xA1, '!',		/* A1  161  ¡   161 INVERTED EXCLAMATION MARK */
 	0xA2, '$',		/* A2  162  ¢   162 CENT SIGN */
@@ -241,7 +241,7 @@ static void map_iso_8859_15(void)	/* ISOIEC 8859-15:1999 Latin Alphabet No. 9 */
     /* Not yet implemented */
 }
 
-static byte xlate_us[] = {
+static char xlate_us[] = {
     0xA0, ' ',	/* no-break space      to space        */
     0x92, '\'',	/* windows apostrophe  to single quote */
     0x93, '"',	/* windows left  quote to double quote */
@@ -272,7 +272,7 @@ static void map_windows_1251(void)
 #ifdef	WINDOWS_1251_to_CYRILLIC
     /* Map:  windows-1251 -> KOI8-R (Cyrillic) */
     /* Contributed by: Yar Tikhiy (yarq@users.sourceforge.net) */
-    static byte xlate_1251[] = {
+    static char xlate_1251[] = {
 	0xA8, 0xB3,	
 	0xB8, 0xA3,	
 	0xE0, 0xC1,  0xE1, 0xC2,  0xE2, 0xD7,  0xE3, 0xC7,  0xE4, 0xC4,  0xE5, 0xC5,  0xE6, 0xD6,  0xE7, 0xDA,
@@ -363,7 +363,7 @@ charset_def_t charsets[] = {
 
 void init_charset_table(const char *charset_name, bool use_default)
 {
-    size_t idx;
+    uint idx;
     bool found = false;
     for (idx = 0; idx < COUNTOF(charsets); idx += 1)
     {

@@ -135,15 +135,16 @@ double lookup(const word_t *token, wordprop_t *wordstats, double old)
 double degen(const word_t *token, wordprop_t *wordstats)
 {
     bool first = true;
-    int len = token->leng;
-    const unsigned char *text = token->text;
+    uint len = token->leng;
+    const byte *text = token->text;
 
     double score = EVEN_ODDS;
-    int i, t;
-    int excl = 0, alpha = 0, upper = 0, lower = 0, tag = 0;
+    uint i, t;
+    int excl = 0;
+    uint alpha = 0, upper = 0, lower = 0, tag = 0;
 
     for (i = 0; i < len; i += 1) {
-	unsigned char c = text[i];
+	byte c = text[i];
 
 	/* if tag delimiter, record it and clear char counts */
 	if (c == TAG) {
@@ -169,14 +170,14 @@ double degen(const word_t *token, wordprop_t *wordstats)
     
     /* loop for original and original w/o 'tag:' */
     for (t = 0; ; t += tag, tag = 0) {
-	int l = len - t;
+	uint l = len - t;
 	int x = excl;
 	word_t *copy = word_dup(token);
 
 	/* loop for terminal exclamation points */
 	while (x >= 0) {
 	    memcpy(copy->text, text + t, l);
-	    copy->text[l] = '\0';
+	    copy->text[l] = (byte) '\0';
 	    copy->leng = l;
 	    if (!first)
 		score = lookup(copy, wordstats, score);	/* score original */
@@ -185,13 +186,13 @@ double degen(const word_t *token, wordprop_t *wordstats)
 		return score;
 	    if (upper != 0) {				/* if any capital letters */
 		for (i=tag+1; i<l; i+=1) {
-		    copy->text[i] = tolower(copy->text[i]);
+		    copy->text[i] = (byte) tolower(copy->text[i]);
 		}
 		if (isupper(copy->text[tag])) {		/* score 'Cap.low' */
 		    score = lookup(copy, wordstats, score);
 		    if (first_match && HAVE_SCORE(score))
 			return score;
-		    copy->text[tag] = tolower(copy->text[tag]);
+		    copy->text[tag] = (byte) tolower(copy->text[tag]);
 		}
 		score = lookup(copy, wordstats, score);	/* score 'all.low' */
 		if (first_match && HAVE_SCORE(score))

@@ -7,7 +7,6 @@ NAME:
 
 ******************************************************************************/
 
-#include "config.h"
 #include "common.h"
 
 #if defined(HAVE_GSL_10) && !defined(HAVE_GSL_14)
@@ -167,7 +166,7 @@ void fis_initialize_constants(void)
 
 rc_t fis_status(void)
 {
-    if ( fis_stats.s.spamicity >= spam_cutoff ) 
+    if (fis_stats.s.spamicity >= spam_cutoff)
 	return RC_SPAM;
 
     if (twostate ||

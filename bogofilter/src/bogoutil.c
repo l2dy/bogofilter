@@ -293,10 +293,10 @@ static int get_token(buff_t *buff, FILE *fp)
 	    rv = 1;
 	}
     } else {
-	buff->t.leng = strlen((const char *)buff->t.text);
+	buff->t.leng = (uint) strlen((const char *)buff->t.text);
 	if (buff->t.text[buff->t.leng - 1] == '\n' ) {
 	    buff->t.leng -= 1;
-	    buff->t.text[buff->t.leng] = '\0';
+	    buff->t.text[buff->t.leng] = (byte) '\0';
 	}
 	else
 	{
@@ -384,7 +384,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	    word = (const byte *) *argv++;
 	    if (--argc == 0)
 		argc = -1;
-	    token = word_new(word, strlen((const char *)word));
+	    token = word_new(word, (uint) strlen((const char *)word));
 	}
 
 	ds_read(dsh, token, &val);
@@ -457,7 +457,7 @@ static double compute_robx(dsh_t *dsh)
 static int compute_robinson_x(char *path)
 {
     double robx;
-    word_t *word_robx = word_new((const byte *)ROBX_W, strlen(ROBX_W));
+    word_t *word_robx = word_new((const byte *)ROBX_W, (uint) strlen(ROBX_W));
 
     setup_wordlists(path, PR_NONE);
     open_wordlists(DB_READ);
@@ -651,7 +651,7 @@ static int process_args(int argc, char **argv)
 
 	case 'c':
 	    maintain = true;
-	    thresh_count = atol((char *)optarg);
+	    thresh_count = (uint) atoi((char *)optarg);
 	    break;
 
 	case 's':

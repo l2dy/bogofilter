@@ -197,3 +197,14 @@ bogoupgrade: bogoupgrade.in Makefile
 	rm -f $@
 	sed 's}[@]PERL@}$(PERL)}' <$(srcdir)/bogoupgrade.in >$@ || rm -f $@
 	chmod a=rx bogoupgrade
+
+#splint - weak
+splint.check:
+	splint -weak `	ls \
+	$(version_sources)	\
+	$(bogofilter_SOURCES)	\
+	$(bogolexer_SOURCES)	\
+	$(bogoutil_SOURCES)	\
+	$(bogotune_SOURCES) | sort -u | egrep -v "(lexer_v3.l|db_handle_props.h)"` > splint.tmp 
+	grep ^F splint.tmp
+	wc -l splint.tmp

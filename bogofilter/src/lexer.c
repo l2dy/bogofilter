@@ -71,11 +71,11 @@ static void lexer_display_buffer(buff_t *buff)
 /* Check for lines wholly composed of printable characters as they can cause a scanner abort 
    "input buffer overflow, can't enlarge buffer because scanner uses REJECT"
 */
-static bool not_long_token(byte *buf, size_t count)
+static bool not_long_token(byte *buf, uint count)
 {
-    size_t i;
+    uint i;
     for (i=0; i < count; i += 1) {
-	unsigned char c = (unsigned char)buf[i];
+	byte c = buf[i];
 	if ((iscntrl(c) || isspace(c) || ispunct(c)) && (c != '_'))
 	    return true;
     }
@@ -231,7 +231,7 @@ int yyinput(byte *buf, size_t max_size)
     int count = 0;
     buff_t buff;
 
-    buff_init(&buff, buf, 0, max_size);
+    buff_init(&buff, buf, 0, (uint) max_size);
 
     /* After reading a line of text, check if it has special characters.
      * If not, trim some, but leave enough to match a max length token.
@@ -242,7 +242,7 @@ int yyinput(byte *buf, size_t max_size)
 
     while ((cnt = get_decoded_line(&buff)) != 0) {
 	count += cnt;
-	if ((count <= (MAXTOKENLEN * 3 / 2)) || not_long_token(buff.t.text, count))
+	if ((count <= (MAXTOKENLEN * 3 / 2)) || not_long_token(buff.t.text, (uint) count))
 	    break;
 
 	if (count >= MAXTOKENLEN * 2) {
@@ -267,7 +267,7 @@ size_t text_decode(word_t *w)
     char *beg = (char *) w->text;
     char *fin = beg + w->leng;
     char *txt = strstr(beg, "=?");		/* skip past leading text */
-    size_t size = txt - beg;
+    uint size = (uint) (txt - beg);
 
     while (txt < fin) {
 	word_t n;

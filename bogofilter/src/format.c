@@ -217,9 +217,9 @@ static size_t format_float(char *dest, double src,
 
 static size_t format_string(char *dest, const char *src, int min, int prec, int flags, const char *destend)
 {
-    size_t s_len = strlen(src);
+    int s_len = (int) strlen(src);
     int len;
-    if (s_len > (size_t)INT_MAX) {
+    if (s_len > INT_MAX) {
 	fprintf(stderr, "cannot handle string length (%lu) above %d, aborting\n", (unsigned long)s_len, INT_MAX);
 	internal_error;
     }
@@ -242,7 +242,7 @@ static size_t format_string(char *dest, const char *src, int min, int prec, int 
 static size_t format_spamicity(char *dest, const char *fmt, double spamicity, const char *destend)
 {
     char temp[20];
-    size_t len = snprintf(temp, sizeof(temp), fmt, spamicity);
+    uint len = snprintf(temp, sizeof(temp), fmt, spamicity);
     if (len > INT_MAX)
 	len = INT_MAX; /* clamp */
     len = format_string(dest, temp, 0, len, 0, destend);

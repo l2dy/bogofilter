@@ -77,7 +77,7 @@ typedef enum sh_e { IX_SPAM = 0, 	/* index for SPAM */
 #define	GRAHAM_AND_ROBINSON
 #endif
 
-#define COUNTOF(array)	(uint)(sizeof(array)/sizeof(array[0]))
+#define COUNTOF(array)	(uint) (sizeof(array)/sizeof(array[0]))
 
 typedef unsigned char byte;
 

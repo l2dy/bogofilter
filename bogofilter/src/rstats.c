@@ -48,8 +48,8 @@ struct rhistogram_s {
 typedef struct header_s header_t;
 struct header_s {
     rstats_t *list;
-    size_t    count;		/* words in list */
-    size_t    robn;		/* words in score */
+    uint      count;		/* words in list */
+    uint      robn;		/* words in score */
     FLOAT     p;		/* Robinson's P */
     FLOAT     q;		/* Robinson's Q */
     double    spamicity;

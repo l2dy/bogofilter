@@ -150,7 +150,7 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
 	    (void) fprintf(dbgout, "   %f  %f  ",
 			   DEVIATION(hit->prob), hit->prob);
 	    /* print token (max width=20) */
-	    (void) word_puts(key, min(20,key->leng), dbgout);
+	    (void) word_puts(key, (uint) min(20,key->leng), dbgout);
 	    (void) fputc('\n', dbgout);
 	}
 	hit->prob = prob;

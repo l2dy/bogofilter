@@ -56,7 +56,7 @@ extern	bool	degen_enabled;		/* -Pd,-PD - default: disabled */
 extern	bool	separate_counts;	/* -Ps,-PS - default: enabled  */
 #endif
 
-extern	int	db_cachesize;
+extern	uint	db_cachesize;
 
 extern	const char	*update_dir;
 extern	const char	*progname;
