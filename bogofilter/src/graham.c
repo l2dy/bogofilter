@@ -86,8 +86,8 @@ static int compare_extrema(const void *id1, const void *id2)
     const discrim_t *d1 = id1;
     const discrim_t *d2 = id2;
 
-    if (d1->prob - d2->prob > EPS) return 1;
-    if (d2->prob - d1->prob > EPS) return -1;
+    if (d1->prob - d2->prob > 0.0) return 1;
+    if (d2->prob - d1->prob > 0.0) return -1;
 
     return word_cmp(d1->key, d2->key);
 }
