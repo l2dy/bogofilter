@@ -275,26 +275,26 @@ int ds_delete(void *vhandle, const word_t *word)
 
 int ds_txn_begin(void *vhandle) {
     dsh_t *dsh = vhandle;
-    if (dsm)
-	return dsm->dsm_begin(dsh->dbh);
-    else
+    if (dsm == NULL)
 	return 0;
+    else
+	return dsm->dsm_begin(dsh->dbh);
 }
 
 int ds_txn_abort(void *vhandle) {
     dsh_t *dsh = vhandle;
-    if (dsm)
-	return dsm->dsm_abort(dsh->dbh);
-    else
+    if (dsm == NULL)
 	return 0;
+    else
+	return dsm->dsm_abort(dsh->dbh);
 }
 
 int ds_txn_commit(void *vhandle) {
     dsh_t *dsh = vhandle;
-    if (dsm)
-	return dsm->dsm_commit(dsh->dbh);
-    else
+    if (dsm == NULL)
 	return 0;
+    else
+	return dsm->dsm_commit(dsh->dbh);
 }
 
 typedef struct {
@@ -393,7 +393,7 @@ void *ds_init(const char *directory, const char *filename)
 /* Cleanup storage allocation */
 void ds_cleanup(void *dbe)
 {
-    if (dsm && dsm->dsm_cleanup)
+    if (dsm != NULL && dsm->dsm_cleanup)
 	dsm->dsm_cleanup(dbe);
     xfree(msg_count_tok);
     xfree(wordlist_version_tok);
