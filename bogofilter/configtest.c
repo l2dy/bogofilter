@@ -34,10 +34,10 @@ const char *progname = "configtest";
 
 /* Dummy struct definitions to support config.c */
 method_t graham_method = {
-    NULL, NULL, NULL, NULL
+    NULL, NULL, NULL, NULL, NULL, NULL
 } ;
 method_t robinson_method = {
-    NULL, NULL, NULL, NULL
+    NULL, NULL, NULL, NULL, NULL, NULL
 } ;
 
 #ifdef COMPILE_DEAD_CODE
@@ -61,10 +61,12 @@ static int x_init_list(wordlist_t* list, const char* name, const char* filepath,
 }
 #endif
 
+#ifdef	HAVE_CHARSET
 void init_charset_table(const char *charset_name, bool use_default)
 {
     return;
 }
+#endif
 
 int main( int argc, char **argv)
 {
