@@ -9,18 +9,20 @@
  * GNU GENERAL PUBLIC LICENSE v2
  */
 
-#include "config.h"
+#include "common.h"
+
+#include <errno.h>
+#include <unistd.h>		/* for getpid() */
+#include <sqlite3.h>
+
 #include "datastore_db.h"
+#include "datastore_db_private.h"
+
 #include "error.h"
-#include "paths.h"
+#include "paths.h"		/* for build_path */
 #include "rand_sleep.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
-
-#include <errno.h>
-#include <stdarg.h>
-#include <unistd.h> /* for getpid() */
-#include <sqlite3.h>
 
 /** Structure to hold database handle and associated data. */
 struct dbhsqlite_t {
