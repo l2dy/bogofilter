@@ -39,22 +39,22 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #include "rstats.h"
 #include "wordhash.h"
 
-// constants for the Graham formula 
-#define KEEPERS		15		// how many extrema to keep
-#define MINIMUM_FREQ	5		// minimum freq
+/* constants for the Graham formula */
+#define KEEPERS		15		/* how many extrema to keep */
+#define MINIMUM_FREQ	5		/* minimum freq */
 
-#define MAX_PROB	0.99f		// max probability value used
-#define MIN_PROB	0.01f		// min probability value used
-#define DEVIATION(n)	fabs((n) - EVEN_ODDS)	// deviation from average
+#define MAX_PROB	0.99f		/* max probability value used */
+#define MIN_PROB	0.01f		/* min probability value used */
+#define DEVIATION(n)	fabs((n) - EVEN_ODDS)	/* deviation from average */
 
-#define GRAHAM_MIN_DEV		0.4f	// look for characteristic words
-#define ROBINSON_MIN_DEV	0.0f	// if nonzero, use characteristic words
+#define GRAHAM_MIN_DEV		0.4f	/* look for characteristic words */
+#define ROBINSON_MIN_DEV	0.0f	/* if nonzero, use characteristic words */
 
-#define GRAHAM_SPAM_CUTOFF	0.90f	// if it's spammier than this...
-#define ROBINSON_SPAM_CUTOFF	0.54f	// if it's spammier than this...
+#define GRAHAM_SPAM_CUTOFF	0.90f	/* if it's spammier than this... */
+#define ROBINSON_SPAM_CUTOFF	0.54f	/* if it's spammier than this... */
 
-#define GRAHAM_MAX_REPEATS	4	// cap on word frequency per message
-#define ROBINSON_MAX_REPEATS	1	// cap on word frequency per message
+#define GRAHAM_MAX_REPEATS	4	/* cap on word frequency per message */
+#define ROBINSON_MAX_REPEATS	1	/* cap on word frequency per message */
 
 double min_dev;
 double spam_cutoff;
@@ -77,10 +77,10 @@ static void wordprop_init(void *vwordprop){
 
 static void *collect_words(/*@unused@*/ int fd, /*@out@*/ int *message_count,
 	/*@out@*/ int *word_count)
-    // tokenize input text and save words in wordhash_t hash table
-    // returns: the wordhash_t hash table.
-    // Sets messageg_count and word_count to the appropriate values
-    // if their pointers are non-NULL.
+    /* tokenize input text and save words in wordhash_t hash table 
+     * returns: the wordhash_t hash table.
+     * Sets messageg_count and word_count to the appropriate values
+     * if their pointers are non-NULL.  */
 {
   int tok = 0;
   int w_count = 0;
@@ -99,12 +99,13 @@ static void *collect_words(/*@unused@*/ int fd, /*@out@*/ int *message_count,
       w_count++;
     }
     else {
-      // End of message. Update message counts.
+      /* End of message. Update message counts. */
       if (tok == FROM || (tok == 0 && msg_count == 0))
         msg_count++;
   
-      // Incremenent word frequencies, capping each message's contribution at MAX_REPEATS
-      // in order to be able to cap frequencies.
+      /* Incremenent word frequencies, capping each message's
+       * contribution at MAX_REPEATS in order to be able to cap
+       * frequencies. */
       for(n = wordhash_first(h); n != NULL; n = wordhash_next(h)){
         w = n->buf;
         if (w->msg_freq > max_repeats)
@@ -114,7 +115,7 @@ static void *collect_words(/*@unused@*/ int fd, /*@out@*/ int *message_count,
         w->msg_freq = 0;
       }
   
-      // Want to process EOF, *then* drop out
+      /* Want to process EOF, *then* drop out */
       if (tok == 0)
         break;
     }
@@ -132,8 +133,9 @@ static void *collect_words(/*@unused@*/ int fd, /*@out@*/ int *message_count,
 
 static void register_words(run_t run_type, wordhash_t *h,
 	int msgcount, int wordcount)
-// tokenize text on stdin and register it to  a specified list
-// and possibly out of another list
+/* tokenize text on stdin and register it to  a specified list
+ * and possibly out of another list
+ */
 {
   char ch = '\0';
   hashnode_t *node;
@@ -278,15 +280,15 @@ static void init_bogostats(/*@out@*/ bogostat_t *bogostats)
 static void populate_bogostats(/*@out@*/ bogostat_t *bogostats,
 	const char *text, double prob,
 	/*@unused@*/ int count)
-// if  the new word,prob pair is a better indicator.
-// add them to the bogostats structure, 
+/* if  the new word,prob pair is a better indicator.
+ * add them to the bogostats structure */
 {
     size_t idx;
     double dev;
     double slotdev, hitdev;
     discrim_t *pp, *hit;
 
-    // update the list of tokens with maximum deviation
+    /* update the list of tokens with maximum deviation */
     dev = DEVIATION(prob);
     hit = NULL;
     hitdev=1;
@@ -482,8 +484,9 @@ static double compute_probability(const char *token)
 }
 
 static bogostat_t *select_indicators(wordhash_t *wordhash)
-// selects the best spam/nonspam indicators and
-// populates the bogostats structure.
+/* selects the best spam/nonspam indicators and
+ * populates the bogostats structure.
+ */
 {
     hashnode_t *node;
 
@@ -501,8 +504,8 @@ static bogostat_t *select_indicators(wordhash_t *wordhash)
 }
 
 static double compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errno@*/
-// computes the spamicity of the words in the bogostat structure
-// returns:  the spamicity
+/* computes the spamicity of the words in the bogostat structure
+ * returns:  the spamicity */
 {
     double product, invproduct;
     double spamicity = 0.0;
@@ -511,12 +514,12 @@ static double compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errn
 
     if (verbose)
     {
-	// put the bogostats in ascending order by probability and alphabet
+	/* put the bogostats in ascending order by probability and alphabet */
 	qsort(bogostats->extrema, SIZEOF(bogostats->extrema), sizeof(discrim_t), compare_extrema);
     }
 
-    // Bayes' theorem.
-    // For discussion, see <http://www.mathpages.com/home/kmath267.htm>.
+    /* Bayes' theorem. */
+    /* For discussion, see <http://www.mathpages.com/home/kmath267.htm>. */
     product = invproduct = 1.0f;
     for (pp = bogostats->extrema; pp < bogostats->extrema+SIZEOF(bogostats->extrema); pp++)
     {
@@ -551,20 +554,19 @@ static double compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errn
 }
 
 static double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@*/
-// selects the best spam/nonspam indicators and
-// calculates Robinson's S
+/* selects the best spam/nonspam indicators and calculates Robinson's S */
 {
     hashnode_t *node;
 
-    double invlogsum = 0.0;	// Robinson's P
-    double logsum = 0.0;	// Robinson's Q
+    double invlogsum = 0.0;	/* Robinson's P */
+    double logsum = 0.0;	/* Robinson's Q */
     double spamicity;
     int robn = 0;
 
-    // Note: .ROBX is scaled by 1000000 in the wordlist
+    /* Note: .ROBX is scaled by 1000000 in the wordlist */
     long l_robx = db_getvalue(spam_list.dbh, ".ROBX");
 
-    // If found, unscale; else use predefined value
+    /* If found, unscale; else use predefined value */
     double robx = l_robx ? (double)l_robx / 1000000 : ROBX;
 
     if (Rtable || verbose)
@@ -575,9 +577,11 @@ static double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@
 	char *token = node->key;
 	double prob = compute_probability( token );
 
-	// Robinson's P and Q; accumulation step
-        // P = 1 - ((1-p1)*(1-p2)*...*(1-pn))^(1/n)     [spamminess]
-        // Q = 1 - (p1*p2*...*pn)^(1/n)                 [non-spamminess]
+	/* Robinson's P and Q; accumulation step */
+        /*
+	 * P = 1 - ((1-p1)*(1-p2)*...*(1-pn))^(1/n)     [spamminess]
+         * Q = 1 - (p1*p2*...*pn)^(1/n)                 [non-spamminess]
+	 */
         if (fabs(EVEN_ODDS - prob) >= min_dev) {
             invlogsum += log(1.0 - prob);
 	    logsum += log(prob);
@@ -585,8 +589,9 @@ static double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@
         }
     }
 
-    // Robinson's P, Q and S
-    // S = (P - Q) / (P + Q)                        [combined indicator]
+    /* Robinson's P, Q and S */
+    /* S = (P - Q) / (P + Q)                        [combined indicator]
+     */
     if (robn) {
 	double invn = (double)robn;
 	double invproduct = 1.0 - exp(invlogsum / invn);
@@ -633,7 +638,7 @@ rc_t bogofilter(int fd, double *xss) /*@globals errno@*/
     bogostat_t	*bogostats;
     int		wordcount, msgcount;
 
-//  tokenize input text and save words in a wordhash.
+    /* tokenize input text and save words in a wordhash. */
     wordhash = collect_words(fd, &msgcount, &wordcount);
 
     good_list.active = spam_list.active = TRUE;
@@ -647,15 +652,15 @@ rc_t bogofilter(int fd, double *xss) /*@globals errno@*/
 
     switch(algorithm) {
 	case AL_GRAHAM:
-	    // select the best spam/nonspam indicators.
+	    /* select the best spam/nonspam indicators. */
 	    bogostats = select_indicators(wordhash);
 
-	    // computes the spamicity of the spam/nonspam indicators.
+	    /* computes the spamicity of the spam/nonspam indicators. */
 	    spamicity = compute_spamicity(bogostats, NULL);
 	    break;
 
 	case AL_ROBINSON:
-	    // computes the spamicity of the spam/nonspam indicators.
+	    /* computes the spamicity of the spam/nonspam indicators. */
 	    spamicity = compute_robinson_spamicity(wordhash);
 	    break;
 
@@ -671,11 +676,12 @@ rc_t bogofilter(int fd, double *xss) /*@globals errno@*/
         *xss = spamicity;
 
     if (run_type == RUN_UPDATE)
-      register_words((status==RC_SPAM) ? REG_SPAM : REG_GOOD, wordhash, msgcount, wordcount);
+      register_words((status==RC_SPAM) ? REG_SPAM : REG_GOOD, wordhash,
+	      msgcount, wordcount);
 
     wordhash_free(wordhash);
 
     return status;
 }
 
-// Done
+/* Done */
