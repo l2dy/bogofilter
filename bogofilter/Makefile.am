@@ -33,8 +33,9 @@ EXTRA_DIST = $(man1_MANS) \
 	     doc/integrating-with-qmail contrib/bogofilter-qfe \
 	     version.sh
 #
-version.h:	main.c bogofilter.c
-	version.sh $^ > $@
+VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
+version.h:	version.sh $(VERSION_FROM)
+	version.sh $(VERSION_FROM) >$@
 #
 .xml.pdf:
 	xmlto pdf --extensions $<
