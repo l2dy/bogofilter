@@ -67,7 +67,7 @@ static void help(void)
 	    "\t-q\t- quiet mode, no tokens are printed.\n"
 	    "\t-h\t- help, this output.\n"
 	    "\t-n\t- map non-ascii characters to '?'.\n"
-	    "\t-v\t- set debug verbosity level.\n"
+	    "\t-v\t- set verbosity level.\n"
 	    "\t-c file\t- read specified config file.\n"
 	    "\t-C\t- don't read standard config files.\n"
 	    "\t-I file\t- read message from file instead of stdin.\n"
