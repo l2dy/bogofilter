@@ -109,7 +109,7 @@ int main(int argc, char **argv)
     if ( directory == NULL )
 	directory = get_bogodir(dirnames);
 
-    setup_lists(directory, register_type == REG_NONE ? DB_READ : DB_WRITE);
+    setup_lists(directory, DB_WRITE);
     xfree(directory);
 
     if (register_type == REG_NONE)
