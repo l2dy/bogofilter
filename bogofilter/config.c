@@ -203,7 +203,7 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 		int sign = (*val == '-') ? -1 : 1;
 		if (*val == '-' || *val == '+')
 		    val += 1;
-		*arg->addr.i = atoi(val) * sign;
+		*arg->addr.i = atoi((const char *)val) * sign;
 		if (DEBUG_CONFIG(0))
 		    fprintf( stderr, "%s -> %d\n", arg->name, *arg->addr.i );
 		break;
@@ -213,7 +213,7 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 		double sign = (*val == '-') ? -1.0f : 1.0f;
 		if (*val == '-' || *val == '+')
 		    val += 1;
-		*arg->addr.d = atof(val) * sign;
+		*arg->addr.d = atof((const char *)val) * sign;
 		if (DEBUG_CONFIG(0))
 		    fprintf( stderr, "%s -> %f\n", arg->name, *arg->addr.d );
 		break;
@@ -267,7 +267,7 @@ static bool process_config_line( const unsigned char *line, const parm_desc *par
     {
 	if (DEBUG_CONFIG(1))
 	    fprintf( stderr, "Testing:  %s\n", arg->name);
-	if (strncmp(arg->name, line, len) == 0)
+	if (strncmp(arg->name, (const char *)line, len) == 0)
 	{
 	    bool ok = process_config_parameter(arg, val);
 	    if (DEBUG_CONFIG(1) && ok )
@@ -312,7 +312,7 @@ static void read_config_file(const char *fname, bool tilde_expand)
 	lineno += 1;
 	if (fgets((char *)buff, sizeof(buff), fp) == NULL)
 	    break;
-	len = strlen(buff);
+	len = strlen((char *)buff);
 	if ( buff[0] == '#' || buff[0] == ';' || buff[0] == '\n' )
 	    continue;
 	while (iscntrl(buff[len-1]))
@@ -559,7 +559,7 @@ int process_args(int argc, char **argv)
 /* exported */
 void process_config_files(void)
 {
-    char buff[2] = { 0, 0 };
+    unsigned char buff[2] = { 0, 0 };
     buff[0] = algorithm;
     select_algorithm(buff);
 
