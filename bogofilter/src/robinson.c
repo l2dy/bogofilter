@@ -29,7 +29,9 @@ NAME:
 
 extern int Rtable;
 
+#ifdef	ENABLE_DEPRECATED_CODE
 double	thresh_rtable = 0.0;		/* used in fisher.c */
+#endif
 
 static rob_stats_t  rob_stats;
 
@@ -77,9 +79,13 @@ void rob_print_stats(FILE *fp)
     bool unsure = unsure_stats && ((*method->status)() == RC_UNSURE) && verbose;
 
     fp = NULL; 	/* quench compiler warning */
-    if (Rtable || unsure || verbose >= 2 ||
+    if (Rtable || unsure || verbose >= 2
+#ifdef	ENABLE_DEPRECATED_CODE
+	||
 	rob_stats.s.spamicity > thresh_stats ||
-	rob_stats.s.spamicity > thresh_rtable)
+	rob_stats.s.spamicity > thresh_rtable
+#endif
+	)
 	rstats_print(unsure);
 }
 

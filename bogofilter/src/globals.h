@@ -45,7 +45,9 @@ extern	int	max_repeats;
 extern	double	min_dev;
 extern	double	ham_cutoff;
 extern	double	spam_cutoff;
+#ifdef	ENABLE_DEPRECATED_CODE
 extern	double	thresh_stats;
+#endif
 extern	double	thresh_update;
 
 extern	int	abort_on_error;

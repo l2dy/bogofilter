@@ -42,7 +42,9 @@ int	verbose;			/* '-v' */
 int	max_repeats;
 double	min_dev;
 double	spam_cutoff;
+#ifdef	ENABLE_DEPRECATED_CODE
 double	thresh_stats;
+#endif
 double	thresh_update;
 
 const char	*update_dir;

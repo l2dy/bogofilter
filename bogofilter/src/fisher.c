@@ -39,13 +39,17 @@ static rc_t	fis_status(void);
 
 double ham_cutoff = FISHER_HAM_CUTOFF;
 
+#ifdef	ENABLE_DEPRECATED_CODE
 extern double thresh_rtable;	/* in robinson.c */
+#endif
 
 const parm_desc fis_parm_table[] =
 {
     { "robx",		  CP_DOUBLE,	{ (void *) &robx } },
     { "robs",		  CP_DOUBLE,	{ (void *) &robs } },
+#ifdef	ENABLE_DEPRECATED_CODE
     { "thresh_rtable",	  CP_DOUBLE,	{ (void *) &thresh_rtable } },
+#endif
     { "ham_cutoff",	  CP_DOUBLE,	{ (void *) &ham_cutoff } },
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };

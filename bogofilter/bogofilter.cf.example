@@ -267,20 +267,22 @@
 
 ##### THRESHOLD Values
 #
+#ifdef	ENABLE_DEPRECATED_CODE
 #	used to determine if/when spamicity
 #	values are output by print_bogostats()
+#endif
 
 #ifdef	ENABLE_DEPRECATED_CODE
 #thresh_index = 0
-#endif
 #thresh_stats = 0.0
 #thresh_rtable = 0.0
+#endif
 
 #ifdef	ENABLE_DEPRECATED_CODE
 ## thresh_index = 12
-#endif
 ## thresh_stats =0.2
 ## thresh_rtable=0.4
+#endif
 
 #	When using '-u' (auto-update), update wordlist if
 #	value less than score and score less than 1-value.
