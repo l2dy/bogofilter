@@ -423,9 +423,10 @@ header file debug.h for the list of usable flags.</para>
 <para>Using GNU longopt <option>--</option> syntax, a config file's
 <option><replaceable>name=value</replaceable></option> statement
 becomes a command line's
-<option>--<replaceable>option=value</replaceable></option>.  See
-<filename>bogofilter.cf.example</filename> for more info on the
-available options.</para>
+<option>--<replaceable>option=value</replaceable></option>.  Use
+command <command>bogofilter --help</command> for a list of options and
+see <filename>bogofilter.cf.example</filename> for more info on
+them.</para>
 
 </refsect1>
 
