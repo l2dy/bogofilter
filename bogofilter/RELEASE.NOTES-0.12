@@ -7,11 +7,12 @@ bogofilter/tuning/README for more information.
 
 Bogofilter's man page and help message describe the many command line
 switches.  They have been divided into groups (help, classification,
-registration, general, algorithm, parameter, and info) in both places.
+registration, general, algorithm, parameter, and info) in both
+places.
 
-Bogofilter 0.12.0 has three new command line switches for rapidly scoring
-large numbers of messages.  These "bulk mode" switches are especially
-useful for the tuning process.  The new switches are:
+Bogofilter 0.12.0 has three new command line switches for rapidly
+scoring large numbers of messages.  These "bulk mode" switches are
+especially useful for the tuning process.  The new switches are:
 
 -M - allows scoring all the messages in a mbox formatted file.  If
 used with "-v", an X-Bogosity line is printed as each message is
@@ -22,7 +23,7 @@ amount of output.
 containing a single message.  With this option, bogofilter expects the
 file names to be at the end of the command line.  If used with "-v",
 the file name is included in each printed line.  Using "-t" is
-recommended. 
+recommended.
 
 -b - allows scoring of multiple message files, with each file
 containing a single message.  With this option, bogofilter reads the
