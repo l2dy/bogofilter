@@ -17,6 +17,7 @@ CONTRIBUTORS:
 #include "common.h"
 
 #include <stdlib.h>
+#include <syslog.h>
 
 #include "bogoconfig.h"
 #include "bogofilter.h"

@@ -10,8 +10,9 @@ NAME:
 #include "common.h"
 
 #include <ctype.h>
-#include <stdlib.h>
 #include <errno.h>
+#include <stdlib.h>
+#include <syslog.h>
 
 #include "passthrough.h"
 #include "bogofilter.h"
