@@ -448,8 +448,8 @@ static int display_words(const char *path, int argc, char **argv, bool prob)
 
 static double compute_robx(void *dbh_spam, void *dbh_good)
 {
-    size_t good_cnt = 0;
-    size_t spam_cnt = 0;
+    uint32_t good_cnt = 0;
+    uint32_t spam_cnt = 0;
     double sum = 0.0;
     double robx;
 
