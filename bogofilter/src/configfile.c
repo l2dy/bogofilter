@@ -61,7 +61,7 @@ bool	stats_in_header = true;
 
 const parm_desc *usr_parms = NULL;
 
-static bool process_config_parameter(const parm_desc *arg, const unsigned char *val)
+static bool process_config_parameter(const parm_desc *arg, char *val)
 {
     bool ok = true;
     if (arg->addr.v == NULL)
@@ -70,7 +70,7 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
     {
 	case CP_BOOLEAN:
 	    {
-		*arg->addr.b = str_to_bool((const char *)val);
+		*arg->addr.b = str_to_bool(val);
 		if (DEBUG_CONFIG(0))
 		    fprintf(dbgout, "%s -> %s\n", arg->name,
 			    *arg->addr.b ? "Yes" : "No");
@@ -78,7 +78,7 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 	    }
 	case CP_INTEGER:
 	    {
-		if (!xatoi(arg->addr.i, (const char *)val))
+		if (!xatoi(arg->addr.i, val))
 		    fprintf(stderr, "cannot parse integer value '%s'\n", val);
 		if (DEBUG_CONFIG(0))
 		    fprintf(dbgout, "%s -> %d\n", arg->name, *arg->addr.i);
@@ -86,7 +86,7 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 	    }
 	case CP_DOUBLE:
 	    {
-		if (!xatof(arg->addr.d, (const char *)val))
+		if (!xatof(arg->addr.d, val))
 		    fprintf(stderr, "cannot parse double value '%s'\n", val);
 		if (DEBUG_CONFIG(0))
 		    fprintf(dbgout, "%s -> %f\n", arg->name, *arg->addr.d);
@@ -94,14 +94,14 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 	    }
 	case CP_CHAR:
 	    {
-		*arg->addr.c = *(const char *)val;
+		*arg->addr.c = *val;
 		if (DEBUG_CONFIG(0))
 		    fprintf(dbgout, "%s -> '%c'\n", arg->name, *arg->addr.c);
 		break;
 	    }
 	case CP_STRING:
 	    {
-		*arg->addr.s = xstrdup((const char *)val);
+		*arg->addr.s = xstrdup(val);
 		if (DEBUG_CONFIG(0))
 		    fprintf(dbgout, "%s -> '%s'\n", arg->name, *arg->addr.s);
 		break;
@@ -110,7 +110,7 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 	    {
 		char *dir = *arg->addr.s;
 		xfree(dir);
-		*arg->addr.s = dir = tildeexpand((const char *)val);
+		*arg->addr.s = dir = tildeexpand(val);
 		if (DEBUG_CONFIG(0))
 		    fprintf(dbgout, "%s -> '%s'\n", arg->name, dir);
 		if (setup_wordlists(dir) != 0)
@@ -133,9 +133,9 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
     return ok;
 }
 
-static bool process_config_line(const unsigned char *line,
-       const unsigned char *val,
-       const parm_desc *parms )
+static bool process_config_line(char *line,
+				char *val,
+				const parm_desc *parms )
 {
     const parm_desc *arg;
 
@@ -146,7 +146,7 @@ static bool process_config_line(const unsigned char *line,
     {
 	if (DEBUG_CONFIG(1))
 	    fprintf(dbgout, "Testing:  %s\n", arg->name);
-	if (strcmp(arg->name, (const char *)line) == 0)
+	if (strcmp(arg->name, line) == 0)
 	{
 	    bool ok = process_config_parameter(arg, val);
 	    if (DEBUG_CONFIG(1) && ok )
@@ -188,17 +188,17 @@ void read_config_file(const char *fname, bool fail_on_error, bool tilde_expand)
     {
 	const char delim[] = " \t=";
 	size_t len;
-	unsigned char buff[MAXBUFFLEN];
+	char buff[MAXBUFFLEN];
 
 	memset(buff, '\0', sizeof(buff));		/* for debugging */
 
 	lineno += 1;
-	if (fgets((char *)buff, sizeof(buff), fp) == NULL)
+	if (fgets(buff, sizeof(buff), fp) == NULL)
 	    break;
-	len = strlen((char *)buff);
+	len = strlen(buff);
 	if ( buff[0] == '#' || buff[0] == ';' || buff[0] == '\n' )
 	    continue;
-	while (iscntrl(buff[len-1]) || isspace(buff[len-1]))
+	while (iscntrl((unsigned char)buff[len-1]) || isspace((unsigned char)buff[len-1]))
 	    buff[--len] = '\0';
 
 	arg = buff;
@@ -210,7 +210,7 @@ void read_config_file(const char *fname, bool fail_on_error, bool tilde_expand)
 	    val = NULL;
 	}
 
-	if (!arg || !val ||
+	if (val == NULL ||
 	       (! process_config_line(arg, val, usr_parms ) &&
 		! process_config_line(arg, val, sys_parms ) &&
 		! process_config_line(arg, val, format_parms ) &&
