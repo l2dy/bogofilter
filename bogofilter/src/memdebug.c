@@ -46,8 +46,9 @@ uint32_t dbg_delt_save = 0;
 
 const uint32_t md_tag = (uint32_t) 0xABCD55AA;
 
-uint32_t cnt_malloc = 0;
+uint32_t cnt_alloc  = 0;
 uint32_t cnt_free   = 0;
+uint32_t cnt_malloc = 0;
 uint32_t cnt_realloc= 0;
 uint32_t cnt_calloc = 0;
 uint32_t cur_malloc = 0;
@@ -106,7 +107,7 @@ md_malloc(size_t size)
 
     mh = (mh_t *) x;
     mh->size = size - sizeof(mh_t);
-    mh->indx = cnt_malloc;
+    mh->indx = ++cnt_alloc;
     mh->tag  = md_tag;
 
     if (memtrace & M_MALLOC)
@@ -160,12 +161,12 @@ void memdisplay(const char *file, int lineno)
     fprintf(dbgout, "%smalloc:  cur = %lu, max = %lu, tot = %lu\n", pfx,
 	    (ulong) cur_malloc, (ulong) max_malloc, (ulong) tot_malloc );
     fprintf(dbgout, "%scounts:  malloc: %lu, calloc: %lu, realloc: %lu, free: %lu\n", pfx,
-	    (ulong) cnt_malloc, (ulong) cnt_realloc, (ulong) cnt_calloc, (ulong) cnt_free);
-    if (cnt_malloc == cnt_free)
+	    (ulong) cnt_malloc, (ulong) cnt_calloc, (ulong) cnt_realloc, (ulong) cnt_free);
+    if (cnt_alloc == cnt_free)
 	fprintf(dbgout, "%s         none active.\n", pfx);
     else
 	fprintf(dbgout, "%s         active: %lu, average: %lu\n", pfx, 
-		(ulong) cnt_malloc - cnt_free, (ulong) cur_malloc/(cnt_malloc - cnt_free));
+		(ulong) cnt_alloc - cnt_free, (ulong) cur_malloc/(cnt_alloc - cnt_free));
 }
 
 void
@@ -180,7 +181,7 @@ void
     max_malloc = max(max_malloc, cur_malloc);
     tot_malloc += size;
     size += sizeof(mh_t);		/* Include size storage */
-    ++cnt_malloc;
+    ++cnt_calloc;
 
     if (dbg_too_much != 0 && max_malloc > dbg_too_much) {
 	fprintf(stderr, "max_malloc = %12lu, tot_malloc = %12lu\n", 
@@ -192,7 +193,7 @@ void
 
     mh = (mh_t *) x;
     mh->size = size - sizeof(mh_t);
-    mh->indx = cnt_malloc;
+    mh->indx = ++cnt_alloc;
     mh->tag  = md_tag;
 
     if (memtrace & M_MALLOC)
