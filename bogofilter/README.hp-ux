@@ -2,13 +2,6 @@ Compiling Bogofilter on HP-UX
 =============================
 Bogofilter has been tested on HP-UX 11.00 and 11i.
 
-There is an issue in the Makefile that requires a change if
-using the HP-UX version of the make utility.  At approximately
-line 781 is a line that looks like this:
-CFLAGS ?= -g -Os -Wall
-This line must be deleted before HP-UX's make utility will properly
-process the Makefile.
-
 There are two prerequisites for compiling Bogofilter on HP-UX.
 1. Berkeley DB
 2. HP ANSI C or gcc
