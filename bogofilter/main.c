@@ -46,8 +46,8 @@ char *spam_header_name = SPAM_HEADER_NAME;
 run_t run_type = RUN_NORMAL; 
 
 int thresh_index = 0;
-double thresh_stats = EVEN_ODDS;
-double thresh_rtable = 0.4f;
+double thresh_stats = 0.0f;
+double thresh_rtable = 0.0f;
 
 extern	void read_config_file(const char *filename);
 
@@ -287,7 +287,7 @@ int main(int argc, char **argv)
 		    /* print spam-status at the end of the header
 		     * then mark the beginning of the message body */
 		    printf("%s: %s, tests=bogofilter, spamicity=%0.6f, version=%s\n", 
-			    SPAM_HEADER_NAME, 
+			    spam_header_name, 
 			    (status==RC_SPAM) ? "Yes" : "No", 
 			    spamicity, VERSION);
 		}
@@ -323,7 +323,7 @@ int main(int argc, char **argv)
 		    exitcode = 0;
 
 		sprintf(msg_bogofilter, "%s: %s, spamicity=%0.6f, version=%s",
-			SPAM_HEADER_NAME, (status==RC_SPAM) ? "Yes" : "No", spamicity, VERSION);
+			spam_header_name, (status==RC_SPAM) ? "Yes" : "No", spamicity, VERSION);
 	    }
 	    break;
 	default:

@@ -45,6 +45,7 @@
 #define MAXWORDLEN 20
 
 extern int passthrough;
+extern char *spam_header_name;
 
 struct textblock textblocks, *textend = &textblocks;
 
@@ -79,11 +80,11 @@ int yyinput(char *buf, int max_size)
 
     static int hdrlen = 0;
     if (hdrlen==0)
-	hdrlen=strlen(SPAM_HEADER_NAME);
+	hdrlen=strlen(spam_header_name);
 
     returned = myfgets(buf, max_size, yyin);
 
-    while (returned != -1 && memcmp(buf,SPAM_HEADER_NAME,hdrlen) == 0)
+    while (returned != -1 && memcmp(buf,spam_header_name,hdrlen) == 0)
     {
 	do {
 	    returned = myfgets(buf, max_size, yyin);

@@ -13,12 +13,14 @@ NAME:
 #include <string.h>
 #include <getopt.h>
 
+#include "config.h"
 #include "lexer.h"
 
 /* exports */
 int passthrough;
 
 #define PROGNAME "bogolexer"
+char *spam_header_name = SPAM_HEADER_NAME;
 
 void usage(void)
 {
