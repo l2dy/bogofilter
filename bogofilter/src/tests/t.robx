@@ -45,8 +45,7 @@ fi
 
 RESULT=`$BOGOUTIL -w $TMPDIR .ROBX | $AWK '/.ROBX/ { print $2; }'`
 
-# v0.16.0 - Don't create token from "Received:"
-WANT="364391"
+WANT="366405"
 
 if [ "$RESULT" != "$WANT" ] ; then
     echo want: $WANT, have: $RESULT

@@ -82,6 +82,11 @@ const char *db_str_err(int);
 /* Returns version string */
 const char *db_version_str(void);
 
+/* */
+int db_txn_begin(dsh_t *dsh);
+int db_txn_abort(dsh_t *dsh);
+int db_txn_commit(dsh_t *dsh);
+
 /* This is not currently used ...
  * 
 #define db_write_lock(fd) db_lock(fd, F_SETLKW, F_WRLCK)

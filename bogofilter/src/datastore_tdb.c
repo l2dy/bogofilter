@@ -41,7 +41,6 @@ const char *db_version_str(void)
 
 static dbh_t *dbh_init(const char *path, const char *name)
 {
-    size_t c;
     dbh_t *handle;
     size_t len = strlen(path) + strlen(name) + 2;
 
@@ -332,3 +331,7 @@ const char *db_str_err(int j)
 static bool init = false;
 int db_init(void) { init = true; return 0; }
 void db_cleanup(void) { init = false; }
+
+int db_txn_begin(dsh_t *d) { (void)d; return 0; }
+int db_txn_abort(dsh_t *d) { (void)d; return 0; }
+int db_txn_commit(dsh_t *d) { (void)d; return 0; }

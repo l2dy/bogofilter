@@ -109,6 +109,8 @@ rc_t bogofilter(int argc, char **argv)
 
 	if (classify_msg || write_msg) {
 	    spamicity = msg_compute_spamicity(w, NULL);
+	    if (spamicity < 0)
+		abort();
 	    status = msg_status();
 	    if (run_type & RUN_UPDATE)		/* Note: don't register if RC_UNSURE */
 	    {
@@ -124,7 +126,7 @@ rc_t bogofilter(int argc, char **argv)
 		    fprintf(fpo, "%s ", filename); 
 	    }
 
-	    write_message(status);
+	    write_message(status);		/* passthrough */
 	    if (logflag && !register_opt) {
 		write_log_message(status);
 		msgcount = 0;

@@ -28,50 +28,67 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 extern YYYYMMDD today;		/* date as YYYYMMDD */
 
+/** Name of the special token that counts the spam and ham messages
+ * in the data base.
+ */
 #define MSG_COUNT ".MSG_COUNT"
 
-/* typedef:  Datastore handle type
-** - used to communicate between datastore layer and database layer
-** - known to program layer as a void*
-*/
-
+/** Datastore handle type, used to communicate between datastore layer
+ * and database layer.
+ */
 typedef struct {
-    void   *dbh;		/* database handle from db_open() */
+    /** database handle from db_open() */
+    void   *dbh;
+    /** tracks endianness */
     bool is_swapped;
 } dsh_t;
 
-/* typedef:  Datastore value type
-** - used to communicate between program layer and datastore layer
-*/
-
+/** Datastore value type, used to communicate between program layer and
+ * datastore layer.
+ */
 typedef struct {
-    u_int32_t count[IX_SIZE];	/* spam and ham counts */
+    /** spam and ham counts */
+    u_int32_t count[IX_SIZE];
+    /** time stamp */
     u_int32_t date;
 } dsv_t;
 
 #define	spamcount count[IX_SPAM]
 #define	goodcount count[IX_GOOD]
 
-/* typedef:  Database value type
-** - used to communicate between datastore layer and database layer
-*/
-
+/** Status value used when a key is not found in the data base. */
 #define DS_NOTFOUND (-1)
 
+/** Macro that clamps its argument to INT_MAX and casts it to int. */
 #define CLAMP_INT_MAX(i) ((int)min(INT_MAX, (i)))
 
+/** Database value type, used to communicate between datastore layer and
+ * database layer.
+ */
 typedef struct {
-    void     *data;		/* addr of buffer       */
-    u_int32_t leng;		/* number of data bytes */
+    /** address of buffer    */
+    void     *data;
+    /** number of data bytes */
+    u_int32_t leng;
 } dbv_t;
 
-/** Iterate over all elements in data base and call \p hook for each item.
+/** Type of the callback function that ds_foreach calls. */
+typedef int ds_foreach_t(
+	/** current token that ds_foreach is looking at */
+	word_t *token,
+	/** data store value */
+	dsv_t *data,
+	/** unaltered value from ds_foreach call. */
+	void *userdata);
+/** Iterate over all records in data base and call \p hook for each item.
  * \p userdata is passed through to the hook function unaltered.
  */
-typedef int ds_foreach_t(word_t *token, dsv_t *data, void *userdata);
-extern int ds_foreach(void *, ds_foreach_t *hook, void *userdata);
+extern int ds_foreach(void *vhandle /** data store handle */,
+	ds_foreach_t *hook /** callback function */,
+	void *userdata /** opaque data that is passed to the callback function
+			 unaltered */);
 
-/* Wrapper for ds_foreach that opens and closes file */
+/** Wrapper for ds_foreach that opens and closes file */
 extern int ds_oper(const char *path, dbmode_t open_mode, 
 		   ds_foreach_t *hook, void *userdata);
 
@@ -86,21 +103,25 @@ extern void *ds_open(const char *path	/** path to database file */,
 		     dbmode_t mode	/** open mode, DB_READ or DB_WRITE */);
 
 /** Close file and clean up. */
-extern void  ds_close(/*@only@*/ void *, bool nosync  /** Normally false, if true, do not synchronize data. This should not be used in regular operation but only to ease the disk I/O load when the lock operation failed. */);
+extern void  ds_close(/*@only@*/ void *vhandle, bool nosync  /** Normally false, if true, do not synchronize data. This should not be used in regular operation but only to ease the disk I/O load when the lock operation failed. */);
 
 /** Flush pending writes to disk */
-extern void ds_flush(void *);
+extern void ds_flush(void *vhandle);
 
-/** Global initialization */
+/** Global initialization of datastore layer. */
 extern void ds_init(void);
 
-/** Cleanup storage allocation */
+/** Cleanup storage allocation of datastore layer. After calling this,
+ * datastore access is no longer permitted. */
 extern void ds_cleanup(void);
 
+/** Initialize datastore handle. */
 dsh_t *dsh_init(
     void *dbh,			/* database handle from db_open() */
     bool is_swapped);
 
+/** Free data store handle that must not be used after calling this
+ * function. */
 void dsh_free(void *vhandle);
 
 /** Retrieve the value associated with a given word in a list. 
@@ -113,173 +134,90 @@ extern int  ds_read  (void *vhandle, const word_t *word, /*@out@*/ dsv_t *val);
  */
 extern int ds_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val);
 
-/** Delete the key */
+/** Delete the key. */
 extern int  ds_delete(void *vhandle, const word_t *word);
 
-/** Set the value associated with a given word in a list. Front end */
+/** Set the value associated with a given word in a list. Front end. */
 extern int  ds_write (void *vhandle, const word_t *word, dsv_t *val);
 
-/** Set the value associated with a given word in a list. Implementation */
+/** Set the value associated with a given word in a list. Implementation. */
 extern int ds_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val);
 
-/** Update the value associated with a given word in a list */
+/** Update the value associated with a given word in a list. */
 extern void ds_updvalues(void *vhandle, const dbv_t *token, const dbv_t *updval);
 
-/** Get the database message count */
+/** Get the database message count. */
 extern bool ds_get_msgcounts(void *vhandle, dsv_t *val);
 
-/** set the database message count */
+/** Set the database message count. */
 extern void ds_set_msgcounts(void *vhandle, dsv_t *val);
 
-/* Get the current process id */
+/* transactional code */
+/** Start a transaction for the data store identified by vhandle.
+ * All data base operations, including reading, must be "opened" by
+ * ds_txn_begin and must be "closed" by either ds_txn_commit (to keep
+ * changes) or ds_txn_abort (to discard changes made since the last
+ * ds_txn_begin for the data base). Application or system crash will
+ * lose any changes made since ds_txn_begin that have not been
+ * acknowledged by successful ds_txn_commit().
+ * \returns
+ * - DST_OK for success. It is OK to proceed in data base access.
+ * - DST_TEMPFAIL for problem. It is unknown whether this actually
+ *   happens. You must not touch the data base.
+ * - DST_FAILURE for problem. You must not touch the data base.
+ */
+extern int ds_txn_begin(void *vhandle);
+
+/** Commit a transaction, keeping changes. As with any transactional
+ * data base, concurrent updates to the same pages in the data base can
+ * cause a deadlock of the writers. The datastore_xxx.c code will handle
+ * the detection for you, in a way that it aborts as many transactions
+ * until one can proceed. The aborted transactions will return
+ * DST_TEMPFAIL and must be retried. No data base access must happen
+ * after this call until the next ds_txn_begin().
+ * \returns
+ * - DST_OK to signify that the data has made it to the disk
+ *   (which means nothing if the disk's write cache is enabled and the
+ *   kernel has no means of synchronizing the cache - this is unknown for
+ *   most kernels)
+ * - DST_TEMPFAIL when a transaction has been aborted by the deadlock
+ *   detector and must be retried
+ * - DST_FAILURE when a permanent error has occurred that cannot be
+ *   recovered from by the application (for instance, because corruption
+ *   has occurred and needs to be recovered).
+ */
+extern int ds_txn_commit(void *vhandle);
+
+/** Abort a transaction, discarding all changes since the previous
+ * ds_txn_begin(). Changes are rolled back as though the transaction had
+ * never been tried. No data base access must happen after this call
+ * until the next ds_txn_begin().
+ * \returns
+ * - DST_OK for success.
+ * - DST_TEMPFAIL for failure. It is uncertain if this actually happens.
+ * - DST_FAILURE for failure. The application cannot continue.
+ */
+extern int ds_txn_abort(void *vhandle);
+
+/** Successful return from ds_txn_* operation. */
+#define DST_OK (0)
+/** Temporary failure return from ds_txn_* operation, the application
+ * should retry the failed data base transaction. */
+#define DST_TEMPFAIL (1)
+/** Permanent failure return from ds_txn_* operation, the application
+ * should clean up and exit. */
+#define DST_FAILURE (2)
+
+/** Get the current process ID. */
 extern unsigned long ds_handle_pid(void *vhandle);
 
-/* Get the database filename */
+/** Get the database filename. */
 extern char *ds_handle_filename(void *vhandle);
 
-/* Locks and unlocks file descriptor */
+/** Locks and unlocks file descriptor. */
 extern int ds_lock(int fd, int cmd, short int type);
 
-/* Returns version string */
+/** Returns version string. */
 extern const char *ds_version_str(void);
-
-#if	0
-/** Initialize database, open and lock files, etc.
- * params: char * path to database file, char * name of database
- * \return opaque pointer to database handle, which must be saved and
- * passed as the first parameter in all subsequent database function calls. 
- */
-/*@only@*/ /*@null@*/
-extern __inline
-void *ds_open(const char *path	/** path to database file */, 
-	      const char *name	/** name(s) of data base(s) */,
-	      dbmode_t mode	/** open mode, DB_READ or DB_WRITE */)
-{
-    return *db_open(const char *path	/** path to database file */, 
-	      const char *name		/** name of data base	  */,
-		    dbmode_t mode	/** open mode, DB_READ or DB_WRITE */);
-}
-
-/** Close file and clean up. */
-extern __inline 
-void  ds_close(/*@only@*/ void *, bool nosync  /** Normally false, if true, do not synchronize data. This should not be used in regular operation but only to ease the disk I/O load when the lock operation failed. */)
-{
-    return  db_close(/*@only@*/ void *, bool nosync  /** Normally false, if true, do not synchronize data. This should not be used in regular operation but only to ease the disk I/O load when the lock operation failed. */)
-}
-
-/** Flush pending writes to disk */
-extern __inline 
-void ds_flush(void *vhandle)
-{
-    return db_flush(void *vhandle)
-}
-
-/** Cleanup storage allocation */
-extern __inline 
-void ds_cleanup(void)
-{
-    return db_cleanup(void)
-}
-
-/** Retrieve the value associated with a given word in a list. 
- * \return zero if the word does not exist in the database. Front-end
- */
-extern __inline 
-bool ds_getvalues(void *vhandle, const dbv_t *, dbv_t *)
-{
-    return db_getvalues(void *vhandle, const dbv_t *, dbv_t *)
-}
-
-/** Retrieve the value associated with a given word in a list. 
- * \return zero if the word does not exist in the database. Implementation
- */
-extern __inline 
-int ds_get_dbvalue(void *vhandlevhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
-{
-    return db_get_dbvalue(void *vhandlevhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
-}
-
-/** Delete the key */
-extern __inline 
-int ds_delete(void *vhandle, const dbv_t *)
-{
-    return db_delete(void *vhandle, const dbv_t *)
-}
-
-/** Set the value associated with a given word in a list. Front end */
-extern __inline 
-int ds_setvalues(void *vhandle, const dbv_t *, dbv_t *)
-{
-    return db_setvalues(void *vhandle, const dbv_t *, dbv_t *)
-}
-
-/** Set the value associated with a given word in a list. Implementation */
-extern __inline 
-int ds_set_dbvalue(void *vhandlevhandle, const dbv_t *token, dbv_t *val)
-{
-    return db_set_dbvalue(void *vhandlevhandle, const dbv_t *token, dbv_t *val)
-}
-
-/** Update the value associated with a given word in a list */
-extern __inline 
-void ds_updvalues(void *vhandlevhandle, const dbv_t *token, const dbv_t *updval)
-{
-    return db_updvalues(void *vhandlevhandle, const dbv_t *token, const dbv_t *updval)
-}
-
-/** Get the database message count */
-extern __inline 
-void ds_get_msgcounts(void*, dbv_t *)
-{
-    return db_get_msgcounts(void*, dbv_t *)
-}
-
-/** set the database message count */
-extern __inline 
-void ds_set_msgcounts(void*, dbv_t *)
-{
-    return db_set_msgcounts(void*, dbv_t *)
-}
-
-/** Iterate over all elements in data base and call \p hook for each item.
- * \p userdata is passed through to the hook function unaltered.
- */
-typedef int (*db_foreach_t)(dbv_t *token, dbv_t *data, void *userdata);
-extern __inline 
-int ds_foreach(void *vhandle, db_foreach_t hook, void *userdata)
-{
-    return db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
-}
-
-/* Get the database filename */
-extern __inline 
-char *ds_handle_filename(void *vhandle)
-{
-    return *db_handle_filename(void *vhandle)
-}
-
-/* Locks and unlocks file descriptor */
-extern __inline 
-int ds_lock(int fd, int cmd, short int type)
-{
-    return db_lock(int fd, int cmd, short int type)
-}
-
-/* Returns version string */
-extern __inline 
-const char *ds_version_str(void)
-{
-    return char *db_version_str(void)
-}
-
-#endif
-
-/* This is not currently used ...
- * 
-#define db_write_lock(fd) db_lock(fd, F_SETLKW, F_WRLCK)
-#define db_read_lock(fd) db_lock(fd, F_SETLKW, F_RDLCK)
-#define db_unlock(fd) db_lock(fd, F_SETLK, F_UNLCK)
-
-*/
 
 #endif

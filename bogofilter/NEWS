@@ -5,14 +5,41 @@
 NOTE: More information on important changes for bogofilters updaters
 is in the RELEASE.NOTES files.  Read them!!
 
-0.17.?	2004-03-??
+0.17.5	2004-03-??
+
+	2004-03-22
+
+	* Fix check for PGP signatures.
+
+0.17.4	2004-03-20
+
+	* Ignore data portion of PGP signatures.
+	* Use "mime:" (rather than "head:") to tag mime part headers.
+
+	2004-03-19
+
+	* Fix "Can't find '.MSG_COUNT'" problem in bogotune.
+	* Fix defect that continues decoding base64/qp after invalid chars.
+
+	2004-03-18
+
+	* Fix message reporting lack of config file.
+
+0.17.3	2004-03-17
+
+	2004-03-15
+	
+	* Warn if user specified config file doesn't exist.
+
+	2004-03-09
+
+	* Fix tagging of IPAddrs in header lines.
 
 	2004-03-04
 
-	* Switched from Berkeley DB Data Store to Berkeley DB
-	  Concurrent Data Store, which uses a "DB_ENV" BerkeleyDB
-	  environment and the BerkeleyDB Lock Manager.  This is
-	  documented in file doc/README.db.
+	* Added code to use Berkeley DB Concurrent Data Store, which
+	  uses a "DB_ENV" BerkeleyDB environment and the BerkeleyDB
+	  Lock Manager.  This is documented in file doc/README.db.
 
 	2004-03-03
 
