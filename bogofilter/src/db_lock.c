@@ -388,7 +388,7 @@ int init_dbl(const char *bogodir) {
     return open_lockfile(bogodir) ? -1 : 0;
 }
 
-int needs_recovery() {
+int needs_recovery(void) {
     return 0 != check_zombies();
 }
 
