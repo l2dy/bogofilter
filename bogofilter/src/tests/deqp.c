@@ -8,6 +8,7 @@
 
 #include "qp.h"
 
+static void die(void) __attribute__((noreturn));
 static void die(void) {
     perror("deqp");
     exit(EXIT_FAILURE);

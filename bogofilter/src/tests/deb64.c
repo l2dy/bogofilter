@@ -8,6 +8,7 @@
 
 #include "base64.h"
 
+static void die(void) __attribute__((noreturn));
 static void die(void) {
     perror("debase64");
     exit(EXIT_FAILURE);

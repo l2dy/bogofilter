@@ -39,7 +39,9 @@ static bool is_eol(const char *buf, size_t len)
 		(len == 2 && memcmp(buf, CRLF, 2) == 0));
     return ans;
 }
- 
+
+static void cleanup_exit(ex_t exitcode, int killfiles)
+    __attribute__ ((noreturn));
 static void cleanup_exit(ex_t exitcode, int killfiles) {
     if (killfiles && outfname[0] != '\0') unlink(outfname);
     exit(exitcode);

@@ -254,10 +254,7 @@ static size_t format_spamicity(char *dest, const char *fmt, double spamicity, co
 }
 
 static void die (const char *msg, ...)
-#ifdef __GNUC__
-__attribute__ ((format(printf, 1, 2)))
-#endif
-    ;
+__attribute__ ((format(printf, 1, 2))) __attribute__ ((noreturn));
 static void die (const char *msg, ...)
 {
     va_list ap;

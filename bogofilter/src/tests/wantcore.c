@@ -20,7 +20,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static void barf(const char *e) {
+static void barf(const char *e) __attribute__((noreturn));
+static void barf(const char *e)
+{
     perror(e);
     exit(EXIT_FAILURE);
 }
@@ -40,5 +42,4 @@ int main(int argc, char **argv) {
     execv(argv[1], argv+1);
     fprintf(stderr, "execv: ");
     barf(argv[1]);
-    return 0;
 }
