@@ -97,10 +97,8 @@
 
   <para><option>parameter options</option> are:</para>
     <cmdsynopsis>
-    <arg choice='opt'>-m <replaceable><optional>value</optional>
-      <optional>,value</optional><optional>,value</optional></replaceable></arg>
-    <arg choice='opt'>-o <replaceable><optional>value</optional>
-      <optional>,value</optional></replaceable></arg>
+    <arg choice='opt'>-m <replaceable><optional>value</optional><optional>,value</optional><optional>,value</optional></replaceable></arg>
+    <arg choice='opt'>-o <replaceable><optional>value</optional><optional>,value</optional></replaceable></arg>
     </cmdsynopsis>
 
   <para><option>info options</option> are:</para>
@@ -266,7 +264,8 @@ message.</para>
 whose names are read from stdin.  If the <option>-v</option> or
 <option>-t</option> option is also given,
 <application>bogofilter</application> will print a line giving file
-name and classification information for each file.</para>
+name and classification information for each file.  This is an alternative to 
+<option>-B</option> which lists objects on the command line.</para>
 
 <para>An object in this context shall be a maildir (autodetected), or
 if it's not a maildir, a single mail unless <option>-M</option> is
@@ -276,12 +275,13 @@ header is not taken into account currently.)</para>
 <para>When reading mbox format, bogofilter relies on the empty line
 after a mail.  If needed, formail -es will ensure this is the case.</para>
 
-<para>The <option>-B</option><replaceable>filename</replaceable> (bulk mode)
-option tells <application>bogofilter</application> to classify multiple
-objects (see the previous paragraph) named as files on the command line.
-If the <option>-v</option> or <option>-t</option> option is also given,
-<application>bogofilter</application> will print a line giving file name and
-classification information for each file.</para>
+<para>The <option>-B <replaceable>filename ...</replaceable></option>
+(bulk mode) option tells <application>bogofilter</application> to
+classify multiple objects named on the command line.  If the
+<option>-v</option> or <option>-t</option> option is also given,
+<application>bogofilter</application> will print a line giving file
+name and classification information for each file.  This is an alternative to 
+<option>-b</option> which lists objects on stdin.</para>
 
 <para>The <option>-R</option> option tells
 <application>bogofilter</application> to output an R data frame in
@@ -323,18 +323,18 @@ registered as non-spam, the counts will still be decremented.</para>
 
 <para>GENERAL OPTIONS</para>
 
-<para>The <option>-c</option><replaceable>filename</replaceable>
+<para>The <option>-c <replaceable>filename</replaceable></option>
 option tells <application>bogofilter</application> to read the config
 file named.</para>
 
 <para>The <option>-C</option> option prevents bogofilter from reading
 configuration files.</para>
 
-<para>The <option>-d</option> <replaceable>dir</replaceable> option
+<para>The <option>-d <replaceable>dir</replaceable></option> option
 allows you to set the directory for the database.  See the ENVIRONMENT
 section for other directory setting options.</para>
 
-<para>The <option>-k <replaceable>tag</replaceable></option> option
+<para>The <option>-k <replaceable>size</replaceable></option> option
 sets the cache size for the BerkeleyDB subsystem.  Properly sizing the
 cache improves <application>bogofilter</application>'s performance.
 The recommended size is one third of the size of the database file.
@@ -352,12 +352,12 @@ by the <option>-l</option> option, but it requires a custom format
 that includes the %l string for now.  This option implies
 <option>-l</option>.</para>
 
-<para>The <option>-I</option> <replaceable>filename</replaceable>
+<para>The <option>-I <replaceable>filename</replaceable></option>
 option tells <application>bogofilter</application> to read its input
 from the specified file, rather than from
 <option>stdin</option>.</para>
 
-<para>The <option>-O</option> <replaceable>filename</replaceable> option
+<para>The <option>-O <replaceable>filename</replaceable></option> option
 tells <application>bogofilter</application> where to write its output in
 passthrough mode.  Note that this only works when -p is explicitly given.</para>
 
@@ -430,7 +430,7 @@ the message's tokens.  Enabling this option increases
 <para>PARAMETER OPTIONS</para>
 
 <para>The <option>-m
-	<replaceable><optional>value</optional><optional>,value</optional><optional>,value</optional></replaceable></option>
+      <replaceable><optional>value</optional><optional>,value</optional><optional>,value</optional></replaceable></option>
       option allows setting the min_dev value and, optionally, the
       robs and robx values.  If one value is supplied, then min_dev is
       set.  If a comma followed by one value is supplied, then robs
@@ -442,7 +442,7 @@ the message's tokens.  Enabling this option increases
       are not allowed after the comma.</para>
 
 <para>The <option>-o
-	<replaceable><optional>value</optional><optional>,value</optional></replaceable></option>
+      <replaceable><optional>value</optional><optional>,value</optional></replaceable></option>
       option allows setting the spam_cutoff value and, optionally, the
       ham_cutoff value.  If one value is supplied, then spam_cutoff is
       set.  If a comma followed by one value is supplied, then ham_cutoff
@@ -474,7 +474,7 @@ header file debug.h for the list of usable flags.</para> </refsect1>
 <para>Bogofilter uses a database directory, which can be set in the
 config file.  If not set there, bogofilter will use the value of
 <envar>BOGOFILTER_DIR</envar>.  Both can be overridden by the
-<option>-d<replaceable>dir</replaceable></option> option.  If none of
+<option>-d <replaceable>dir</replaceable></option> option.  If none of
 that is available, bogofilter will use directory
 <filename>$HOME/.bogofilter</filename>.</para>
 </refsect1>
@@ -643,7 +643,7 @@ option is used.  What is written depends on which other flags are used.</para>
 
 <para>A classification run will generate (we are not showing the date
     and host part here):
-<screen>
+    <screen>
 bogofilter[1412]: X-Bogosity: No, spamicity=0.000227
 bogofilter[1415]: X-Bogosity: Yes, spamicity=0.998918
 </screen></para>
@@ -654,10 +654,9 @@ bogofilter[1426]: X-Bogosity: Yes, spamicity=0.998918,
   register -s, 329 words, 1 messages
     </screen></para>
     <para>Registering words ('-l' and '-s', '-n', '-S', or '-N') will produce:
-	<screen>
+    <screen>
 bogofilter[1440]: register-n, 255 words, 1 messages
-    </screen>
-</para>
+</screen></para>
 
 <para>A registration run (using '-s', '-n', '-N', or '-S') will generate messages like:
 <screen>
@@ -706,6 +705,6 @@ Greg Louis <email>glouis@dynamicro.on.ca</email>.
 </literallayout>
 
     <para>For updates, see the <ulink url="http://bogofilter.sourceforge.net/">
- bogofilter project page</ulink>.</para>
+    bogofilter project page</ulink>.</para>
 </refsect1>
 </refentry>
