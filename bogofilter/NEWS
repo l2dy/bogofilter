@@ -4,6 +4,19 @@
 
 $Id$
      
+0.10.1	2003-01-22
+
+	* Bogofilter now kills html comments.  The '-k' switch can
+	  be used to change the behavior.
+	* Added convenience options '-2' and '-3' to set binary/ternary
+	  modes when using Robinson-Fisher classification.
+	* Fixed spamicity computation problem when using graham
+	  wordlist and robinson or robinson-fisher algorithm.
+	* Fixed problem processing mime boundaries which caused
+	  an incorrect message count when processing a mailbox
+	* Fixed configuration problems for building bogofilter to support
+	  some, but not all, classification algorithms.
+
 0.10.0  2003-01-19
 
 	* Added mime processing capability, with decoding of base64,
