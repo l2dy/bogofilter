@@ -306,7 +306,7 @@ double gra_compute_spamicity(bogostat_t *bs, FILE *fp) /*@globals errno@*/
 		fprintf(fp, "%f  ", spamicity);
 	    if (verbose >= 4)
 		fprintf(fp, "%f  %f  %8.5e  ", product, invproduct, spamicity);
-	    fwrite(pp->key->text, 1, pp->key->leng, fp);
+	    word_puts(pp->key, 0, fp);
 	    fputc('\n', fp);
 	}
     }
