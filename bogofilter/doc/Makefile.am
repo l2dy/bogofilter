@@ -44,7 +44,7 @@ EXTRA_DIST = \
 		-e "s|[@]bindir@|$(bindir)|g" <$< >$@ \
 	|| { rm -f $@ ; exit 1 ; }
 
-if  ENABLE_XMLTO
+if ENABLE_XMLTO
 # Use Perl to fix up br0ken 0xa0 characters that the XML DocBook style
 # sheets emit instead of "\ " for roff or "&nbsp;" for HTML,
 # respectively.
@@ -61,4 +61,12 @@ if  ENABLE_XMLTO
 	if xmlto man $< ; then f=$@ ; mv $${f%in} $@ ; else rm -f $@ ; exit 1 ; fi ; \
 	perl -pl -e "s|\xA0|\\ |g" -i $@ || rm -f $@ ; \
 	fi
+else
+.xml.1in:
+	echo 1>&2 "You need xmlto to build bogofilter documentation."
+	exit 1
+
+.xml.htmlin:
+	echo 1>&2 "You need xmlto to build bogofilter documentation."
+	exit 1
 endif
