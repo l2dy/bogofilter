@@ -26,7 +26,7 @@ map_rc()
     )
 }
 
-if [   -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
+if [ -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
 mkdir -p $BOGOFILTER_DIR
 $BOGOFILTER -C -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER -C -n < ${SYSTEST}/inputs/good.mbx
