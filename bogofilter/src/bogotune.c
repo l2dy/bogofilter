@@ -38,6 +38,8 @@ AUTHOR:
 #define	LIST_COUNT	2000
 #define	TEST_COUNT	500
 
+#define FP_CUTOFF	0.999
+
 enum e_verbosity {
     SUMMARY	   = 1,	/* summarize main loop iterations */
     PARMS	   = 2,	/* print parameter sets (rs, md, rx) */
@@ -818,11 +820,11 @@ static void final_recommendations(void)
 	if (mn > 1 ) {
 	    uint t = (ns_cnt + mn - 1) / mn;
 	    cutoff = ns_scores[ns_cnt-t];
-	    if (cutoff > 0.999)
+	    if (cutoff > FP_CUTOFF)
 		continue;
 	}
 	else {
-	    cutoff = 0.999;
+	    cutoff = FP_CUTOFF;
 	    if (printed)
 		break;
 	    for (i = 0; i < ns_cnt && ns_scores[i] < cutoff; i += 1)
