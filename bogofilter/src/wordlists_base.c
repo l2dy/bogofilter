@@ -4,6 +4,7 @@
 
 #include "bogohome.h"
 #include "find_home.h"
+#include "mxcat.h"
 #include "paths.h"
 #include "wordlists.h"
 #include "wordlists_base.h"
@@ -61,6 +62,7 @@ void init_wordlist(const char* name, const char* path,
     n->listname=xstrdup(name);
     n->dirname =get_directory_from_path(path);
     n->filename=get_file_from_path(path);
+    n->filepath=mxcat(n->dirname, DIRSEP_S, n->filename, NULL);
     n->type    =type;
     n->override=override;
 
