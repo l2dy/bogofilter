@@ -714,6 +714,6 @@ static void display_tag_array(const char *label, FIELD *array)
 
     fprintf(stdout, "%s =", label);
     for (i = 0; i < count; i += 1)
-	fprintf(stdout, "%s ", array[i]);
+	fprintf(stdout, "%s %s", (i == 0) ? "" : ",", array[i]);
     fprintf(stdout, "\n");
 }
