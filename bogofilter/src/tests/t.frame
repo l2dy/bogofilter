@@ -125,7 +125,7 @@ else
 fi
 
 if [ -z "$NODB" ]; then
-    $BOGOFILTER -n -C </dev/null
+    $BOGOFILTER -n -C -y 0 </dev/null
 fi
 
 BF_CHECKTOOL=${BF_CHECKTOOL-glibc}

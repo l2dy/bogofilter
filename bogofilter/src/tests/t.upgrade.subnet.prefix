@@ -52,14 +52,16 @@ EOF
 
 WORDLIST="${TMPDIR}/wordlist.${DB_EXT}"
 
-echo this is a test 127.0.0.1 192.168.3.4 | $BOGOFILTER -d ${TMPDIR} -C -H -n --block_on_subnets=y -y 0
+OPTS="-D -y 0"
 
-$BOGOUTIL -D -d ${WORDLIST} >  ${TMPDIR}/t.before.out
-$BOGOUTIL -D -u ${WORDLIST} >> ${TMPDIR}/t.after.out
-$BOGOUTIL -D -d ${WORDLIST} >> ${TMPDIR}/t.after.out
+$BOGOUTIL $OPTS -l ${WORDLIST} < ${TMPDIR}/t.before.ref
+$BOGOUTIL $OPTS -d ${WORDLIST} > ${TMPDIR}/t.before.out
 
-$BOGOUTIL -D -u ${WORDLIST} >> ${TMPDIR}/t.already.out
-$BOGOUTIL -D -d ${WORDLIST} >> ${TMPDIR}/t.already.out
+$BOGOUTIL $OPTS -u ${WORDLIST} >  ${TMPDIR}/t.after.out
+$BOGOUTIL $OPTS -d ${WORDLIST} >> ${TMPDIR}/t.after.out
+
+$BOGOUTIL $OPTS -u ${WORDLIST} >  ${TMPDIR}/t.already.out
+$BOGOUTIL $OPTS -d ${WORDLIST} >> ${TMPDIR}/t.already.out
 
 for i in ${TMPDIR}/*.ref ; do
     j=`basename $i .ref`
