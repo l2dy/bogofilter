@@ -13,8 +13,8 @@ $BOGOFILTER -C -n < ${SYSTEST}/inputs/good.mbx
 CORRECT="$TMPDIR/result"
 
 cat >> $CORRECT <<EOF
-initial: 5284
-count 0 -> 5284
+initial: 5286
+count 0 -> 5286
 count 1 -> 1841
 count 2 -> 937
 count 3 -> 602
@@ -25,6 +25,9 @@ echo initial: `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.$DB_EXT | wc -l` > $OUT
 for cnt in 0 1 2 3 ; do
     $BOGOUTIL -c $cnt -m $BOGOFILTER_DIR/wordlist.$DB_EXT
     echo "count $cnt ->" `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.$DB_EXT | wc -l` >> $OUT
+    if  [ $verbose -ne 0 ]; then
+	$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.$DB_EXT > $OUT.$cnt
+    fi
 done
 
 if  [ $verbose -eq 0 ]; then

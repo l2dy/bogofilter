@@ -28,7 +28,8 @@ RESULT=`cat $TMPDIR/spam.2 | wc -l`.`cat $TMPDIR/good.2 | wc -l`
 RESULT=`echo $RESULT | sed s@\ @@g`
 
 # v0.16.0 - Don't create token from "Received:"
-WANT="1786.4023"
+#         - Expand VERP rule
+WANT="1786.4025"
 
 if [ "$RESULT" != "$WANT" ] || [ $verbose -ne 0 ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT
