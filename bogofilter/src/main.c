@@ -69,9 +69,27 @@ static void cleanup_exit(int exitcode, int killfiles) {
     exit(exitcode);
 }
 
+int classify(FILE *out);
+
+int classify(FILE *out)
+{
+    int   exitcode;
+    double spamicity;
+    rc_t   status;
+
+    status = bogofilter(&spamicity);
+    write_message(out, status);
+
+    exitcode = (status == RC_SPAM) ? 0 : 1;
+    if (nonspam_exits_zero && passthrough && exitcode == 1)
+	exitcode = 0;
+
+    return exitcode;
+}
+
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
-    int   exitcode = 0;
+    int   exitcode;
     FILE  *out;
 
     process_args_and_config_file(argc, argv, true);
@@ -124,19 +142,12 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     mime_reset();
 
-    if (run_type & (RUN_NORMAL | RUN_UPDATE))
-    {
-	double spamicity;
-	rc_t   status = bogofilter(&spamicity);
-
-	write_message(out, status);
-
-	exitcode = (status == RC_SPAM) ? 0 : 1;
-	if (nonspam_exits_zero && passthrough && exitcode == 1)
-	    exitcode = 0;
+    if (run_type & (RUN_NORMAL | RUN_UPDATE)) {
+	exitcode = classify(out);
     }
     else {
 	register_messages(run_type);
+	exitcode = 0;
     }
 
     if (passthrough) {
