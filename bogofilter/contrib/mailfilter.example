@@ -1,0 +1,43 @@
+# $Id$
+#
+# mailfilter.example
+#
+#	This is a sample procmail setup file that 
+#	1 - retains an unprocessed copy of all incoming mail
+#	2 - diverts incoming mail with asian character sets
+#	3 - runs bogofilter
+#	4 - retains a processed copy of all messages identified as spam.
+#	5 - retains a processed copy of all messages identified as unsure.
+#
+
+### bogofilter - filter & update word lists
+
+MAILDIR=/var/spool/mail
+BOGOFILTER_DIR=/var/lib/bogofilter
+
+#### backup ####
+cc "mail.backup"
+####
+
+## Silently drop all completely unreadable mail into separate folder
+if (/^Subject:.*=\?(.*big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987|windows-1251|windows-1256)\?/ || /^Content-Type:.*charset="(.*big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987|windows-1251|windows-1256)/)
+to "spam-unreadable"
+####
+
+
+#### bogofilter passthrough-update ####
+
+xfilter 'bogofilter -f -p -u -l -e -v'
+
+if (/^X-Bogosity: (Spam|Yes)/)
+cc "spam-bogofilter"
+
+if (/^X-Bogosity: Unsure/)
+cc "unsure-bogofilter"
+#### end bogofilter passthrough-update ####
+
+
+#### SpamAssassin ####
+# if (/^X-Spam-Status: Yes)
+# cc "spam-spamassassin"
+#### end SpamAssassin ####
