@@ -562,7 +562,9 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
 
     <h2 id="nfs">Can I share word lists over NFS?</h2>
 
-    <p>Yes, provided you use the correct file locking to avoid data
+    <p>If all you're just reading from them, there are no problems.
+    When you're updating them, you need to 
+    use the correct file locking to avoid data
     corruption. When you compile bogofilter, you will need to
     verify that the configure script has set "#define HAVE_FCNTL 1"
     in your config.h file. Popular UNIX operating systems will all
