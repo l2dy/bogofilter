@@ -31,7 +31,8 @@ bool bf_abspath(const char *path)
     return (bool) strchr(path, ':');
   #endif
   #ifdef	__riscos__
-    return (bool) (strchr(path, ':') || strchr(path, '$'));
+    return (bool) (strchr(path, ':') || strchr(path, '$') || strchr(path, '#') ||
+		   strchr(path, '@') || strchr(path, '%') || strchr(path, '&'));
   #endif
 #endif
 }
