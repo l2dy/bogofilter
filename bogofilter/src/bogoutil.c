@@ -517,8 +517,8 @@ static int compute_robinson_x(char *path)
     free_wordlists();
 
     if (!onlyprint) {
-	bool ok;
-	size_t count;
+	bool ok = true;
+	size_t count = 0;
 	char filepath1[PATH_LEN];
 	char filepath2[PATH_LEN];
 	const char *filepaths[] = { (const char *) &filepath1, (const char *) &filepath2 };
