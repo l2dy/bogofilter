@@ -351,7 +351,13 @@ static void html_char(void)
 
     txt += 2;
     val = isdigit((byte) *txt) ? atoi(txt) : xtoi(txt+1, 4);
-    if ((val < 256) && isprint(val)) {	/* use it if printable */
+
+    /* xtoi() limits conversion to 4 characters */
+    /* atoi() limits value to 0x7fffffff, i.e. 2147483647 */
+    /* no problem on linux */
+
+    if ((val > 0) && (val < 256) && 
+	isprint(val)) {			/* use it if printable */
 	yyunput(val, yytext);
 	yyleng = len;			/* adjust len to pre-char count */
     }
