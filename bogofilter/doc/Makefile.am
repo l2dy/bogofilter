@@ -7,6 +7,8 @@ SUFFIXES= .1 .1in .htmlin .html
 man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
 html_MANS = bogofilter.html bogoutil.html bogoupgrade.html bogolexer.html
 
+all: $(man_MANS) $(html_MANS)
+
 CLEANFILES = $(man_MANS)
 
 # what to distribute
