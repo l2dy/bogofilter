@@ -90,8 +90,8 @@ typedef struct {
 
 /* Function definitions */
 
-/** translate BerkeleyDB \a flags bitfield back to symbols */
-static const char *resolveflags(u_int32_t flags) {
+/** translate BerkeleyDB \a flags bitfield for DB->open method back to symbols */
+static const char *resolveopenflags(u_int32_t flags) {
     static char buf[160];
     char b2[80];
     strlcpy(buf, "", sizeof(buf));
@@ -129,10 +129,40 @@ static int DB_OPEN(DB *db, const char *file,
 		"type=%x, flags=%#lx=%s, mode=%#o) -> %d %s\n",
 		(unsigned long)getpid(), (void *)db, file,
 		database ? database : "NIL", type, (unsigned long)flags,
-		resolveflags(flags), mode, ret, db_strerror(ret));
+		resolveopenflags(flags), mode, ret, db_strerror(ret));
 
     return ret;
 }
+
+#if DB_AT_LEAST(4,1)
+/** translate BerkeleyDB \a flags bitfield for DB->set_flags method back to symbols */
+static const char *resolvesetflags(u_int32_t flags) {
+    static char buf[160];
+    char b2[80];
+    strlcpy(buf, "", sizeof(buf));
+#if DB_EQUAL(4,1)
+    if (flags & DB_CHKSUM_SHA1) flags &= ~DB_CHKSUM_SHA1, strlcat(buf, "DB_CHKSUM_SHA1 ", sizeof(buf));
+#endif
+#if DB_EQUAL(4,2)
+    if (flags & DB_CHKSUM) flags &= ~DB_CHKSUM, strlcat(buf, "DB_CHKSUM ", sizeof(buf));
+#endif
+    snprintf(b2, sizeof(b2), "%#lx", (unsigned long)flags);
+    if (flags) strlcat(buf, b2, sizeof(buf));
+    return buf;
+}
+
+/** Set flags and print debugging info */
+static int DB_SET_FLAGS(DB *db, u_int32_t flags)
+{
+    int ret = db->set_flags(db, flags);
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "[pid %lu] DB->set_flags(db=%p, flags=%#lx=%s) -> %d %s\n",
+		(unsigned long)getpid(), (void *)db, (unsigned long)flags,
+		resolvesetflags(flags), ret, db_strerror(ret));
+
+    return ret;
+}
+#endif
 
 /** "constructor" - allocate our handle and initialize its contents */
 static dbh_t *dbh_init(const char *path, const char *name)
@@ -299,9 +329,6 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
     check_db_version();
 
     {
-#if DB_AT_LEAST(4,1)
-	int flags;
-#endif
 	DB *dbp;
 	uint32_t pagesize;
 
@@ -319,25 +346,6 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 
 	handle->dbp = dbp;
 
-	/* set flags */
-#if DB_EQUAL(4,1)
-	    flags = DB_CHKSUM_SHA1;
-#endif
-#if DB_AT_LEAST(4,2)
-	    flags = DB_CHKSUM;
-#endif
-
-#if DB_AT_LEAST(4,1)
-	    ret = dbp->set_flags(dbp, flags);
-	    if (ret) {
-		print_error(__FILE__, __LINE__,
-			"(db) DB->set_flags(%d) failed: %s",
-			flags, db_strerror(ret));
-		dbp->close(dbp, 0);
-		goto open_err;
-	    }
-#endif
-
 	/* open data base */
 	if ((t = strrchr(handle->name, DIRSEP_C)))
 	    t++;
@@ -349,6 +357,12 @@ retry_db_open:
 	if ((ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags, 0664)) != 0
 	    && ( ret != ENOENT || opt_flags == DB_RDONLY ||
 		((handle->created = true),
+#if DB_EQUAL(4,1)
+		 (ret = DB_SET_FLAGS(dbp, DB_CHKSUM_SHA1)) != 0 ||
+#endif
+#if DB_EQUAL(4,2)
+		 (ret = DB_SET_FLAGS(dbp, DB_CHKSUM)) != 0 ||
+#endif
 		(ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL, 0664)) != 0)))
 	{
 	    if (open_mode != DB_RDONLY && ret == EEXIST && --retries) {
