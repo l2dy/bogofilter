@@ -65,8 +65,6 @@ static uint32_t token_prefix_len;
 #define NONBLANK "spc:invalid_end_of_header"
 static word_t *nonblank_line = NULL;
 
-#define WFREE(n)	do { word_free((n)); (n) = NULL; } while(0)
-
 /* Function Prototypes */
 
 void token_clear(void);
@@ -459,6 +457,8 @@ void set_msg_id(byte *text, uint leng)
 	leng  = sizeof(msg_id_text) - 1;
     token_set( &msg_id, text, leng );
 }
+
+#define WFREE(n)	word_free(n); n = NULL
 
 /* Cleanup storage allocation */
 void token_cleanup()
