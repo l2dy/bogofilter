@@ -144,7 +144,8 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
 	rhistogram_t *h = &hist[i];
 	double fin = 1.0*(i+1)/INTERVALS;
 	int cnt = 0;
-	h->prob = 0;
+	h->prob = 0.0;
+	h->spamicity=0.0;
 	while ( r<robn)
 	{
 	    double prob = rstats_array[r]->prob;
