@@ -125,13 +125,15 @@ on standard input as non-spam.</para>
 <application>bogofilter</application> to undo a prior registration of the
 same message as spam.  If a message was incorrectly entered in the spam 
 wordfile by '-n' or '-u' and you want to remove it from the spam wordfile
-and enter it in the non-spam wordfile, use options '-Sn'.</para>
+and enter it in the non-spam wordfile, use options '-Sn'.  If '-S' is used
+for a message that wasn't registered as spam, the counts will still be decremented.</para>
 
 <para>The <option>-N</option> option tells
 <application>bogofilter</application> to undo a prior registration of the
 same message as non-spam.  If a message was incorrectly entered in the non-spam 
 wordfile by '-n' or '-u' and you want to remove it from the non-spam wordfile and
-enter it in the spam wordfile, then use '-Ns'.</para>
+enter it in the spam wordfile, then use '-Ns'.  If '-N' is used for a message that 
+wasn't registered as non-spam, the counts will still be decremented.</para>
 
 <para>The <option>-u</option> option tells
 <application>bogofilter</application> to register the message's text 
