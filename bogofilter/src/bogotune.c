@@ -376,7 +376,8 @@ static void score_ns(double *results)
 	    wordhash_t *wh = item->wh;
 	    double score = msg_compute_spamicity(wh, NULL);
 	    results[count++] = score;
-	    if (-verbose >= SCORE_DETAIL)
+	    if ( -verbose =  SCORE_DETAIL ||
+		(-verbose >= SCORE_DETAIL && EPS < score && score < 1 - EPS))
 		printf("%6u %0.16f\n", count-1, score);
 	}
     }
@@ -425,7 +426,8 @@ static void score_sp(double *results)
 	    wordhash_t *wh = item->wh;
 	    double score = msg_compute_spamicity(wh, NULL);
 	    results[count++] = score;
-	    if (-verbose >= SCORE_DETAIL)
+	    if ( -verbose =  SCORE_DETAIL ||
+		(-verbose >= SCORE_DETAIL && EPS < score && score < 1 - EPS))
 		printf("%6u %0.16f\n", count-1, score);
 	}
     }
@@ -780,7 +782,7 @@ static void create_countlists(tunelist_t *ns_or_sp)
 {
     uint i;
     uint c = COUNTOF(ns_or_sp->u.sets);
-    for (i = 0; i<c; i += 1) {
+    for (i = 0; i < c; i += 1) {
 	mlhead_t *list = ns_or_sp->u.sets[i];
 	mlitem_t *item;
 
