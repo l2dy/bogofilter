@@ -929,7 +929,7 @@ probe_txn_t probe_txn(bfdir *directory, bffile *file)
 	int w;
 	char *t = build_path(directory->dirname, file->filename);
 	struct dirent *de;
-	probe_txn_t rc;
+	probe_txn_t rc = P_DONT_KNOW;
 	DIR *d;
 
 	/* no environment found by JOINENV, but clean up handle */
@@ -943,35 +943,34 @@ probe_txn_t probe_txn(bfdir *directory, bffile *file)
 	    print_error(__FILE__, __LINE__, "cannot open directory %s: %s",
 		    t, strerror(r));
 	    rc = P_ERROR;
-	}
-	else {
-	    while ((de = readdir(d))) {
+	} else {
+	    while ((errno = 0, de = readdir(d))) {
 		if (strlen(de->d_name) == 14
 		    && strncmp(de->d_name, "log.", 4) == 0
 		    && strspn(de->d_name + 4, "0123456789") == 10)
 		{
-		    closedir(d);
 		    rc = P_ENABLE;
+		    break;
 		}
 	    }
-	    closedir(d);
-	    
-	    w = stat(t, &st);
-	    if (w == 0) {
-		rc = P_DISABLE;
-	    }
-	    else if (errno == ENOENT) {
-		rc = P_DONT_KNOW;
-	    }
-	    else {
+	    if (errno)
 		rc = P_ERROR;
-		print_error(__FILE__, __LINE__, "cannot stat %s: %s",
+	    closedir(d);
+
+	    if (rc != P_ERROR && rc != P_ENABLE) {
+		w = stat(t, &st);
+		if (w == 0) {
+		    rc = P_DISABLE;
+		} else if (errno != ENOENT) {
+		    rc = P_ERROR;
+		    print_error(__FILE__, __LINE__, "cannot stat %s: %s",
 			    t, db_strerror(r));
+		}
 	    }
 	}
 	xfree(t);
 	return rc;
-    }
+    } /* if (r == ENOENT) for environment join */
 
     if (r != 0) {
 	print_error(__FILE__, __LINE__, "cannot join environment: %s",
