@@ -302,7 +302,7 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 	    {
 		const char *f = spamicity_formats[status];
 		if (status == RC_SPAM)
-		    spamicity = 1.0f - spamicity;
+		    spamicity = 1.0 - spamicity;
 		buff += format_spamicity(buff, f, spamicity, end);
 		break;
 	    }

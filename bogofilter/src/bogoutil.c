@@ -377,7 +377,7 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     while (argc >= 0)
     {
 	word_t *token;
-	double gra_prob = 0.0f, rob_prob = 0.0f;
+	double gra_prob = 0.0, rob_prob = 0.0;
 	
 	if ( argc == 0)
 	{

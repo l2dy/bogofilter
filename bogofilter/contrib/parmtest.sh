@@ -59,8 +59,8 @@ if [ -z "$1" ] ; then
 
     cat <<EOF > base.cf
 algorithm = fisher
-ham_cutoff = 0.10f
-spam_cutoff = 0.95f
+ham_cutoff = 0.10
+spam_cutoff = 0.95
 terse_format = %1.1c %f
 header_format = %1.1c
 spamicity_tags = S, H, U

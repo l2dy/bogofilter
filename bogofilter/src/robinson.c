@@ -23,12 +23,12 @@ NAME:
 #include "wordhash.h"
 #include "xmalloc.h"
 
-#define ROBINSON_MIN_DEV	0.0f	/* if nonzero, use characteristic words */
-#define ROBINSON_SPAM_CUTOFF	0.54f	/* if it's spammier than this... */
+#define ROBINSON_MIN_DEV	0.0	/* if nonzero, use characteristic words */
+#define ROBINSON_SPAM_CUTOFF	0.54	/* if it's spammier than this... */
 
 /* 11/17 - Greg Louis recommends the following values:
-** #define ROBINSON_SPAM_CUTOFF	0.582f
-** #define ROBINSON_MIN_DEV	0.1f
+** #define ROBINSON_SPAM_CUTOFF	0.582
+** #define ROBINSON_MIN_DEV	0.1
 */
 
 #define ROBINSON_MAX_REPEATS	1	/* cap on word frequency per message */
@@ -39,9 +39,9 @@ static double scalefactor;
 long msgs_good = 0L;			/* used in rstats.c */
 long msgs_bad  = 0L;			/* used in rstats.c */
 
-double	thresh_rtable = 0.0f;		/* used in fisher.c */
-double	robx = 0.0f;			/* used in fisher.c and rstats.c */
-double	robs = 0.0f;			/* used in fisher.c and rstats.c */
+double	thresh_rtable = 0.0;		/* used in fisher.c */
+double	robx = 0.0;			/* used in fisher.c and rstats.c */
+double	robs = 0.0;			/* used in fisher.c and rstats.c */
 
 #define ROBX_S ".ROBX"
 
@@ -136,7 +136,7 @@ static double compute_scale(void)
     }
 
     if (msgs_good == 0L)
-	return(1.0f);
+	return(1.0);
     else
 	return ((double)msgs_bad / (double)msgs_good);
 }

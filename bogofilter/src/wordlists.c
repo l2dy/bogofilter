@@ -265,7 +265,7 @@ bool configure_wordlist(const char *val)
     char* type;
     char* name;
     char* path;
-    double weight = 0.0f;
+    double weight = 0.0;
     bool bad = false;
     bool override = false;
     bool ignore = false;

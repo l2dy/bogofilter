@@ -6,7 +6,7 @@
 
 #include <method.h>
 
-#define UNKNOWN_WORD		0.4f	/* odds that unknown word is spammish */
+#define UNKNOWN_WORD		0.4	/* odds that unknown word is spammish */
 
 #define GRAHAM_GOOD_BIAS	2.0	/* don't give good words more weight */
 

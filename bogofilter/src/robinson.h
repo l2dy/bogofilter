@@ -6,8 +6,8 @@
 
 #include <method.h>
 
-#define ROBS			0.001f	/* Robinson's s */
-#define ROBX			0.415f	/* Robinson's x */
+#define ROBS			0.001	/* Robinson's s */
+#define ROBX			0.415	/* Robinson's x */
 
 #define ROBINSON_GOOD_BIAS	1.0	/* don't give good words more weight */
 

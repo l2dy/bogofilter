@@ -24,11 +24,11 @@ NAME:
 #define KEEPERS		15		/* how many extrema to keep */
 #define MINIMUM_FREQ	5		/* minimum freq */
 
-#define MAX_PROB	0.99f		/* max probability value used */
-#define MIN_PROB	0.01f		/* min probability value used */
+#define MAX_PROB	0.99		/* max probability value used */
+#define MIN_PROB	0.01		/* min probability value used */
 
-#define GRAHAM_MIN_DEV		0.4f	/* look for characteristic words */
-#define GRAHAM_SPAM_CUTOFF	0.90f	/* if it's spammier than this... */
+#define GRAHAM_MIN_DEV		0.4	/* look for characteristic words */
+#define GRAHAM_SPAM_CUTOFF	0.90	/* if it's spammier than this... */
 #define GRAHAM_MAX_REPEATS	4	/* cap on word frequency per message */
 
 int	thresh_index = 0;
@@ -289,7 +289,7 @@ double gra_compute_spamicity(bogostat_t *bs, FILE *fp) /*@globals errno@*/
 
     /* Bayes' theorem. */
     /* For discussion, see <http://www.mathpages.com/home/kmath267.htm>. */
-    product = invproduct = 1.0f;
+    product = invproduct = 1.0;
     for (pp = bs->extrema; pp < bs->extrema+SIZEOF(bs->extrema); pp++)
     {
 	if (fabs(pp->prob) < EPS)
