@@ -318,11 +318,9 @@ static bool get_boundary_props(const word_t * boundary, /**< input line */
 	/* search stack for matching boundary, in reverse order */
 	for (i = stackp; i > -1; i--) {
 	    if (is_mime_container(&msg_stack[i])
-		&& msg_stack[i].boundary
-#ifdef THIS_BUGFIX_TWISTS_TEST_SUITE
-		&& blen == msg_stack[i].boundary_len
-#endif
-		&& memcmp(msg_stack[i].boundary, buf, blen) == 0)
+		&& msg_stack[i].boundary != NULL
+		&& msg_stack[i].boundary_len == blen
+		&& (memcmp(msg_stack[i].boundary, buf, blen) == 0))
 	    {
 		b->depth = i;
 		b->is_valid = true;
