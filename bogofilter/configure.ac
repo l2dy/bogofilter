@@ -2,6 +2,7 @@
 AC_INIT(bogofilter, 0.10.3.1.cvs)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR([src])
+AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(src/config.h:config.in)
 AC_PROG_CC
@@ -48,47 +49,55 @@ AC_SUBST(CFLAGS)
 AC_CHECK_LIB([m],  [cos])
 
 AH_TEMPLATE([HAVE_DB_H], [Have suitable db.h header])
-
+need_dash_r=
+case $target_os in
+    solaris*) need_dash_r=yes ;;
+esac
 WITH_DB=
 
+dnl old test, going to be phased out
 AC_ARG_WITH(db,
-        [  --with-db=PATH     Specify path to BerkelyDB install directory ],
-        [
-                if test "x$withval" != "xno" ; then
-		        WITH_DB=$withval
-                        if test -d "$withval/lib"; then
-                                if test -n "${need_dash_r}"; then
-                                        LDFLAGS="-R${withval}/lib ${LDFLAGS}"
-                                fi
-				LDFLAGS="-L${withval}/lib ${LDFLAGS}"
-                        else
-                                if test -n "${need_dash_r}"; then
-                                        LDFLAGS="-R${withval} ${LDFLAGS}"
-                                fi
-				LDFLAGS="-L${withval} ${LDFLAGS}"
-                        fi
-                        if test -d "$withval/include"; then
-                                CPPFLAGS="-I${withval}/include ${CPPFLAGS}"
-                        else
-                                CPPFLAGS="-I${withval} ${CPPFLAGS}"
-                        fi
-                fi
-    ]
+	    [  --with-db=PATH          Specify path to BerkeleyDB install directory ],
+	    [
+	     if test "x$withval" != "xno" ; then
+		 WITH_DB=$withval
+		 if test -d "$withval/lib"; then
+		     if test -n "${need_dash_r}"; then
+			 LDFLAGS="-R${withval}/lib ${LDFLAGS}"
+		     fi
+		     LDFLAGS="-L${withval}/lib ${LDFLAGS}"
+		 else
+		     if test -n "${need_dash_r}"; then
+			 LDFLAGS="-R${withval} ${LDFLAGS}"
+		     fi
+		     LDFLAGS="-L${withval} ${LDFLAGS}"
+		 fi
+		 if test -f "$withval/include/db.h"; then
+		     CPPFLAGS="-I${withval}/include ${CPPFLAGS}"
+		 else
+		     if test -f "$withval/db.h";then
+			 CPPFLAGS="-I${withval} ${CPPFLAGS}"
+		     else
+			 AC_MSG_ERROR(Not a BerkeleyDB path. Use LDFLAGS and CPPFLAGS to specify the path.)
+			 fi
+		     fi
+		 fi
+		 ]
 )
+
 if test "x$WITH_DB" != "x" ; then
     DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --with-db=$WITH_DB"
 fi
 
-AC_EGREP_HEADER(db_create, [db.h], AC_DEFINE(HAVE_DB_H),
-		AC_MSG_ERROR([Can not locate a suitable BerkeleyDB db.h header file.
+AC_CHECK_DECLS(db_create,,
+	       AC_MSG_ERROR([[Can not locate a suitable BerkeleyDB db.h header file.
 Use --with-db=PATH to specify the path to a v3+ install directory.
-You can download BerkeleyDB 4.0.x from http://www.sleepycat.com])
+You can download BerkeleyDB 4.0.x from http://www.sleepycat.com/]]),
+[[#include <db.h>]]
 )
 
-AC_CHECK_DB([db db-4.1 db-4 db4 db-3.1 db-3 db3 db-2 db2],,
-		    AC_MSG_ERROR([Can not locate a suitable Berkeley DB
-				  library.  Use --with-db=PATH to specify
-				  the path to a v3+ install directory]))
+AC_CHECK_DB([db db-4.1 db-4 db4 db-3.3 db-3.2 db-3.1 db-3 db3],,
+	    AC_MSG_ERROR([[Can not locate a suitable Berkeley DB library.  Use --with-db=PATH to specify the path to a v3+ install directory]]))
 
 # Allow the user to specify a header name to use to indicate whether a given
 # message is SPAM or not.
@@ -207,6 +216,26 @@ AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup)
 AC_CHECK_FUNCS(strerror flock lockf fcntl strchr strrchr memcpy)
 AC_CHECK_FUNCS(munmap pow sqrt strcasecmp strcspn strspn strstr)
 AC_REPLACE_FUNCS(strlcpy strlcat)
+
+AC_CACHE_SAVE
+
+dnl check if header and library of DB library match
+dnl ignore if cross compiling
+AC_MSG_CHECKING(if db header and library versions match)
+AC_RUN_IFELSE(
+  AC_LANG_PROGRAM([[
+		   #include <stdlib.h>
+		   #include <db.h>
+		   ]], [[
+			int maj, min;
+			(void)db_version(&maj, &min, (void *)0);
+			if (maj != DB_VERSION_MAJOR) exit(1);
+			  if (min != DB_VERSION_MINOR) exit(1);
+			    exit(0);
+		   ]]),,
+		   [AC_MSG_RESULT(no)
+		   AC_MSG_ERROR(db.h header file and db library version do not match.)],)
+AC_MSG_RESULT(yes)
 
 if test "$sysconfdir" = "\${prefix}/etc" \
     && { test "$prefix" = "NONE" || test "$prefix" = "/usr" \
