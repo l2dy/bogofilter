@@ -15,6 +15,9 @@ set -e
 
 NODB=1 . ${srcdir=.}/t.frame
 
+# skip test if formail is not in $PATH
+( formail ) </dev/null >/dev/null 2>/dev/null || exit 77
+
 map_rc()
 {
     (
