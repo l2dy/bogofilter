@@ -31,11 +31,11 @@ PARSING_TESTS = \
 
 WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest t.upgrade.subnet.prefix t.multiple.wordlists
 
-SCORING_TESTS =  t.query.config t.score1 t.score2 t.systest t.grftest t.wordhist
+SCORING_TESTS = t.query.config t.score1 t.score2 t.systest t.grftest t.wordhist
 
 BULKMODE_TESTS = t.bulkmode t.MH t.maildir t.bogoutil
 
-#INTEGRITY_TESTS = t.bogoutil t.lock1 t.lock3 t.valgrind
+INTEGRITY_TESTS = t.lock1 t.lock3 t.valgrind
 # INTEGRITY_TESTS += t.lock2
 
 TESTSCRIPTS = ${ENVIRON_TESTS} ${PARSING_TESTS} ${WORDLIST_TESTS} ${SCORING_TESTS} ${BULKMODE_TESTS} ${INTEGRITY_TESTS}
@@ -90,7 +90,7 @@ EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel \
 	outputs/msg.2b.vv \
 	outputs/msg.2b.vvv \
 	outputs/msg.3.vvv \
-	outputs/multiple.wordlists.ref   \
+	outputs/multiple.wordlists.ref \
 	outputs/parsing.out \
 	outputs/queue_id.ref \
 	outputs/split.out
