@@ -79,24 +79,6 @@ static int init_list(/*@out@*/ wordlist_t* list, const char* name, const char* f
     return 0;
 }
 
-/* build an path to a file given a directory and file name,
- * concatenating dir and file, adding a slash if necessary
- *
- * returns: -1 for overflow
- *	     0 for success
- */
-int build_path(char* dest, size_t size, const char* dir, const char* file)
-{
-    if (strlcpy(dest, dir, size) >= size) return -1;
-
-    if ('/' != dest[strlen(dest)-1]) {
-	if (strlcat(dest, "/", size) >= size) return -1; /* RATS: ignore */
-    }
-
-    if (strlcat(dest, file, size) >= size) return -1;
-    return 0;
-}
-
 /* returns -1 for error, 0 for success */
 int setup_lists(const char* dir, double good_weight, double bad_weight)
 {

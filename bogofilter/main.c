@@ -31,6 +31,7 @@ AUTHOR:
 #include "bogofilter.h"
 #include "bogoconfig.h"
 #include "format.h"
+#include "paths.h"
 #include "register.h"
 #include "wordlists.h"
 #include "xmalloc.h"
@@ -47,71 +48,6 @@ char msg_bogofilter[256];
 size_t msg_register_size = sizeof(msg_register);
 
 const char *progname = "bogofilter";
-
-/* if the given environment variable 'var' exists, create a path from it and
-   tack on the optional 'subdir' value.
-   return value: buffer address if successful
-                 NULL if failure
- */
-static char *create_path_from_env(const char *var,
-		       /*@null@*/ const char *subdir)
-{
-    char *buff, *env;
-    size_t path_size, env_size;
-
-    env = getenv(var);
-    if (env == NULL) return NULL;
-
-    env_size = strlen(env);
-    path_size = env_size + (subdir ? strlen(subdir) : 0) + 2;
-    buff = xmalloc(path_size);
-
-    strcpy(buff, env);
-    if ('/' != buff[env_size-1]) {
-	strcat(buff, "/");
-    }
-    if (subdir != NULL) {
-	strcat(buff, subdir);
-    }
-    return buff;
-}
-
-/* check that our directory exists and try to create it if it doesn't
-   return -1 on failure, 0 otherwise.
- */
-static int check_directory(const char* path) /*@globals errno,stderr@*/
-{
-    int rc;
-    struct stat sb;
-
-    if (*path == '\0') {
-	(void)fprintf(stderr, "%s: cannot find bogofilter directory.\n"
-		"You must set the BOGOFILTER_DIR or HOME environment variables\n"
-		"or use the -d DIR option. The program aborts.\n", progname);
-	return 0;
-    }
-
-    rc = stat(path, &sb);
-    if (rc < 0) {
-	if (ENOENT==errno) {
-	    if(mkdir(path, S_IRUSR|S_IWUSR|S_IXUSR)) {
-		perror("Error creating directory");
-		return -1;
-	    } else if (verbose > 0) {
-		(void)fprintf(stderr, "Created directory %s .\n", path);
-	    }
-	    return 0;
-	} else {
-	    perror("Error accessing directory");
-	    return -1;
-	}
-    } else {
-	if (! S_ISDIR(sb.st_mode)) {
-	    (void)fprintf(stderr, "Error: %s is not a directory.\n", path);
-	}
-    }
-    return 0;
-}
 
 static void cleanup_exit(int exitcode, int killfiles) {
     if (killfiles && outfname[0] != '\0') unlink(outfname);
