@@ -1,5 +1,10 @@
 # $Id$
 # $Log$
+# Revision 1.5  2002/09/17 11:33:37  m-a
+# Build .spec automatically from .spec.in.
+# In the .spec file: include all documentation, add --manpath and ,
+# and add %defattr to the %files section.
+#
 # Revision 1.4  2002/09/17 06:19:27  adrian_otto
 # Added check for <sys/file.h>
 #
@@ -132,4 +137,4 @@ AC_FUNC_STAT
 
 AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl)
 
-AC_OUTPUT(Makefile)
+AC_OUTPUT(Makefile bogofilter.spec)

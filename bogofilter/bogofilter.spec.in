@@ -1,5 +1,10 @@
 # $Id$
 # $Log$
+# Revision 1.1  2002/09/17 11:33:37  m-a
+# Build .spec automatically from .spec.in.
+# In the .spec file: include all documentation, add --manpath and ,
+# and add %defattr to the %files section.
+#
 # Revision 1.3  2002/09/17 07:21:54  adrian_otto
 # Removed ChangeLog section. Information was redundant with the NEWS file,
 # and was causing problems for 'rpmbuild'.
@@ -10,8 +15,8 @@
 # Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
 # 0.7.3 Base Source
 #
-Name: bogofilter
-Version: 0.7.4
+Name: @PACKAGE@
+Version: @VERSION@
 Release: 1
 URL: http://bogofilter.sourceforge.net
 Source0: %{name}-%{version}.tar.gz
@@ -31,7 +36,10 @@ by sites that process a lot of mail.
 
 %prep
 %setup
-./configure --prefix=/usr
+CFLAGS="$RPM_OPT_FLAGS" \
+./configure \
+  --prefix=%{_prefix} \
+  --mandir=%{_mandir}
 
 %build
 make
@@ -40,12 +48,12 @@ make
 rm -rf ${RPM_BUILD_ROOT}/*
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 make DESTDIR=${RPM_BUILD_ROOT} install
-gzip $RPM_BUILD_ROOT/%{_mandir}/*/*.?
-
+gzip -f -9 $RPM_BUILD_ROOT/%{_mandir}/*/*.[1-9]
 
 %files
+%defattr(-,root,root)
 %{_mandir}/man1/bogofilter.1.gz
 %{_bindir}/bogofilter
-%doc README COPYING
+%doc AUTHORS COPYING NEWS README TODO bogofilter.xml
 
 %changelog
