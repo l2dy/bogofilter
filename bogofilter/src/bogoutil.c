@@ -465,7 +465,10 @@ static void usage(void)
 	    progname);
     fprintf(stderr, "   or: %s { -d | -l | -m | -w | -p | --db-verify } file%s\n",
 	    progname, DB_EXT);
-#ifdef	ENABLE_DB_DATASTORE
+#if	!defined(ENABLE_DB_DATASTORE) || defined(DISABLE_TRANSACTIONS)
+    fprintf(stderr, "   or: %s { -r | -R } directory\n",
+	    progname);
+#else
     fprintf(stderr, "   or: %s { -r | -R | --db-prune --db-recover --db-recover-harder --db-remove-environment } directory\n",
 	    progname);
 #endif
