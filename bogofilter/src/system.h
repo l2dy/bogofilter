@@ -1,3 +1,12 @@
+/* $Id$ */
+
+/*****************************************************************************
+
+NAME:
+   system.h -- system definitions and prototypes for bogofilter
+
+******************************************************************************/
+
 /* parts were taken from autoconf.info */
 
 /*
