@@ -193,10 +193,10 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); yyless(strlen("Content-Transfer-Encoding:")); return(TOKEN); }
 <INITIAL>^Content-Type:{MTYPE};?		{ mime_type(yy_text()); yyless(strlen("Content-Type:")); return TOKEN; }
 <INITIAL>^Content-Disposition:{MTYPE}		{ mime_disposition(yy_text()); yyless(strlen("Content-Disposition:")); return TOKEN; }
-<INITIAL>^To/:\.*				{ if (header_line_markup) set_tag("to:"); }
-<INITIAL>^From/:\.*				{ if (header_line_markup) set_tag("from:"); else return TOKEN; }
-<INITIAL>^Return-Path/:\.*			{ if (header_line_markup) set_tag("rtrn:"); else return TOKEN; }
-<INITIAL>^Subject/:\.*				{ if (header_line_markup) set_tag("subj:"); else return TOKEN; }
+<INITIAL>^To/:.*				{ if (header_line_markup) set_tag("to:"); }
+<INITIAL>^From/:.*				{ if (header_line_markup) set_tag("from:"); else return TOKEN; }
+<INITIAL>^Return-Path/:.*			{ if (header_line_markup) set_tag("rtrn:"); else return TOKEN; }
+<INITIAL>^Subject/:.*				{ if (header_line_markup) set_tag("subj:"); else return TOKEN; }
 <INITIAL>^Date:.*|Delivery-Date:.*		;
 <INITIAL>^Message-ID:.*				;
 <INITIAL>^\tid\ {ID}				;
