@@ -366,12 +366,13 @@ void ds_cleanup()
 /*
   Get the number of messages associated with database.
 */
-void ds_get_msgcounts(void *vhandle, dsv_t *val)
+bool ds_get_msgcounts(void *vhandle, dsv_t *val)
 {
+    int rc;
     dsh_t *dsh = vhandle;
     ds_init();
-    ds_read(dsh, msg_count_tok, val);
-    return;
+    rc = ds_read(dsh, msg_count_tok, val);
+    return rc == 0;
 }
 
 /*

@@ -109,10 +109,17 @@ static double compute_robx(dsh_t *dsh)
     double rx;
 
     dsv_t val;
+    bool ok;
     uint32_t good_cnt, spam_cnt;
     struct robhook_data rh;
 
-    ds_get_msgcounts(dsh, &val);
+    ok = ds_get_msgcounts(dsh, &val);
+
+    if (!ok) {
+	fprintf(stderr, "Can't find message counts.\n");
+	exit(EX_ERROR);
+    }
+
     spam_cnt = val.spamcount;
     good_cnt = val.goodcount;
 

@@ -126,7 +126,7 @@ extern int ds_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val);
 extern void ds_updvalues(void *vhandle, const dbv_t *token, const dbv_t *updval);
 
 /** Get the database message count */
-extern void ds_get_msgcounts(void *vhandle, dsv_t *val);
+extern bool ds_get_msgcounts(void *vhandle, dsv_t *val);
 
 /** set the database message count */
 extern void ds_set_msgcounts(void *vhandle, dsv_t *val);
