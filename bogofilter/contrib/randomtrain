@@ -1,10 +1,12 @@
 #! /bin/bash
 #
+# $Id$ #
+#
 #  randomtrain -- bogofilter messages from files in random order
 #                 and train if the result is wrong or uncertain
 #  needs:    bash basename rm grep awk wc perl dd bogofilter
 #  usage:    see function usage() starting on line 10 of this file
-#  version:  0.5 (Greg Louis <glouis@dynamicro.on.ca>)
+#  author:   (Greg Louis <glouis@dynamicro.on.ca>)
 
 pid=$$
 BOGOFILTER="../bogofilter"
@@ -69,7 +71,7 @@ while [ ${#*} -gt 1 ]; do
     test "$indic" != "s" -a "$indic" != "n" && usage
     file=$1 ; shift
     if [ ! -r $file ]; then echo "$file not found"; usage; fi
-    grep -b '^From ' $file | \
+    grep -a -b '^From ' $file | \
 	awk "BEGIN {FS=\":\"} {print \"$indic $file \"\$1}" >>list.$pid
     wc -c $file | awk "{print \"$indic $file \"\$1}" >>list.$pid
 done
