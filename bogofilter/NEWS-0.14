@@ -2,15 +2,16 @@
 				BOGOFILTER NEWS
 			       =================
  
-2003-08-08
+0.14.4	2003-08-10
  
 * Revised database API so that there are 3 distinct layers
   (program, datastore, and database) with a clean interface
   between them.
 * Correct exitcodes in bogoutil by using EX_ERROR.
+* Updated FAQ.
 * Fixed token registration bug in 0.14.x versions.
 * Fixed seg fault caused by database lock contention.
-
+ 
 0.14.3	2003-08-05
  
 * Fixed critical locking bug introduced into bogofilter 0.14.0 with

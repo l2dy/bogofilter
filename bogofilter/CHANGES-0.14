@@ -4,6 +4,10 @@
 
 $Id$
 
+0.14.4	2003-08-10
+
+	* Updated FAQ.
+
 	2003-08-08
 
 	* Revised database API so that there are 3 distinct layers
