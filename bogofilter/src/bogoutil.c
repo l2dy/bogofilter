@@ -3,18 +3,20 @@
 /*****************************************************************************
 
 NAME:
-   bogoutil.c -- dumps and loads bogofilter text files from/to Berkeley DB format.
+  bogoutil.c -- dumps & loads bogofilter text files from/to Berkeley DB format.
 
 AUTHOR:
-   Gyepi Sam <gyepi@praxis-sw.com>
-   
+  Gyepi Sam <gyepi@praxis-sw.com>
+
 ******************************************************************************/
+
+/* __USE_POSIX2 tells GNU libc to provide a getopt prototype */
+#define __USE_POSIX2 1
 
 #include "common.h"
 
 #include <ctype.h>
 #include <errno.h>
-#include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
