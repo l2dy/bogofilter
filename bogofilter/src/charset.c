@@ -27,8 +27,6 @@ AUTHOR:
 #include <unistd.h>
 
 #include "charset.h"
-#include "lexer.h"
-#include "maint.h"		/* for replace_nonascii_characters */
 #include "xmalloc.h"
 #include "xstrdup.h"
 
