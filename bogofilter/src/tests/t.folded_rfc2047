@@ -2,13 +2,16 @@
 
 . ${srcdir:=.}/t.frame
 
-# test description here
+# This test checks if merging of folded header lines with encoded words
+# is working properly.
 #
 # test below
 # remember to use ${srcdir}
 cat >${TMPDIR}/input <<_EOF
 Subject: =?iso-8859-1?q?ok?=
     =?iso-8859-1?q?ay?=
+	another
+  	=?iso-8859-1?q?merge?=	 	=?iso-8859-1?q?_worked?=
 
 - torso -
 header: =?iso-8859-1?q?bo?=
@@ -16,6 +19,9 @@ header: =?iso-8859-1?q?bo?=
 _EOF
 cat >${TMPDIR}/reference <<_EOF
 subj:okay
+subj:another
+subj:merge
+subj:worked
 torso
 header
 iso-8859-1
