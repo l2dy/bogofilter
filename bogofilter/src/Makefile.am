@@ -37,7 +37,8 @@ libbf_gsl_a_SOURCES= \
 ../gsl/specfunc/log.c ../gsl/specfunc/psi.c \
 ../gsl/specfunc/zeta.c ../gsl/specfunc/elementary.c \
 ../gsl/err/stream.c ../gsl/specfunc/expint.c \
-../gsl/specfunc/erfc.c ../gsl/sys/coerce.c
+../gsl/specfunc/erfc.c ../gsl/sys/coerce.c \
+../gsl/sys/pow_int.c
 noinst_LIBRARIES += libbf_gsl.a
 endif
 
