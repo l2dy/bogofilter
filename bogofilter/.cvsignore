@@ -25,3 +25,4 @@ Makefile
 Makefile.in
 stamp-h1
 config.cache
+bogofilter.pdf
