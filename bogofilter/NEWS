@@ -9,6 +9,8 @@
 
 0.8.0	2002-10-30 XXX FIXME XXX (fix the date)
 
+	* The lexer code now detects read errors (and exits with code 2
+	  if it finds one.)
 	* Fixed passthrough mode in bogofilter: it no longer strips the
 	  spam-header from a mail body.
 	* Fixed portability to some systems, notably, Solaris
