@@ -166,7 +166,7 @@ void sanitycheck_lists()
 	exit(2);
     }
     if (verbose >= 2)
-	printf("%d lists look OK.\n", listcount);
+	fprintf(stderr, "%d lists look OK.\n", listcount);
 }
 
 // Done

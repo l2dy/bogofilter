@@ -255,7 +255,7 @@ void print_stats( bogostat_t *stats )
     for (idx = 0; idx < SIZEOF(stats->extrema); idx++)
     {
 	discrim_t *pp = &stats->extrema[idx];
-	printf("#  %2ld  %f  %s\n", (long)idx, pp->prob, pp->key);
+	fprintf(stderr, "#  %2ld  %f  %s\n", (long)idx, pp->prob, pp->key);
     }
 }
 
@@ -297,26 +297,26 @@ double compute_probability( char *token )
     for (list=word_lists; list != NULL ; list=list->next)
     {
 	if (verbose >= 2)
-	    printf("checking list %s for word '%s'.\n", list->name, token);
+	    fprintf(stderr, "checking list %s for word '%s'.\n", list->name, token);
 	if (override > list->override) break;
 	count=db_getvalue(list->dbh, token);
 	if (count) {
 	    if (list->ignore)
 		return EVEN_ODDS;
 	    if (verbose >= 3)
-		printf("word '%s' found on list %s with count %ld.\n", token, list->name, count);
+		fprintf(stderr, "word '%s' found on list %s with count %ld.\n", token, list->name, count);
 	    totalcount+=count*list->weight;
 	    override=list->override;
 	    prob = (double)count;
 	    prob /= list->msgcount;
 	    prob *= list->weight;
 	    if (verbose >= 4)
-		printf("word '%s' has uncorrected spamicity %f.\n", token, prob);
+		fprintf(stderr, "word '%s' has uncorrected spamicity %f.\n", token, prob);
 
 	    prob = min(1.0, prob);
 
 	    if (verbose >= 4)
-		printf("word '%s' has spamicity %f.\n", token, prob);
+		fprintf(stderr, "word '%s' has spamicity %f.\n", token, prob);
 
 	    wordprob_add(&stats, prob, list->bad);
 	}
