@@ -70,6 +70,7 @@
 #include "msgcounts.h"
 #include "textblock.h"
 #include "token.h"
+#include "xmalloc.h"
 
 #define YY_DECL token_t yylex(void)
     YY_DECL;			/* declare function */
@@ -262,7 +263,7 @@ static void reorder_html(void)
     char *chr = memchr(yytext, '<', yyleng);	/* find start of html tag */
     size_t len = chr - yytext;
     char *tmp;
-    char *yycopy = alloca(yyleng);
+    char *yycopy = xmalloc(yyleng + 1); /* +1 for NUL byte below */
 
     memcpy(yycopy, yytext+len, yyleng-len);	/* copy tag to start of buffer */
     memcpy(yycopy+yyleng-len, yytext, len);	/* copy leading text to end of buffer */
@@ -270,6 +271,7 @@ static void reorder_html(void)
 
     for(tmp = yycopy+yyleng-1 ; tmp >= yycopy; tmp--) 
 	unput(*tmp);
+    xfree(yycopy);
 }
 
 /*
