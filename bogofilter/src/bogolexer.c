@@ -208,8 +208,12 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	replace_nonascii_characters = true;
 	break;
 
+    case O_CHARSET_DEFAULT:
+	charset_default = get_string(name, val);
+	break;
+
     case O_REPLACE_NONASCII_CHARACTERS:
-	replace_nonascii_characters = get_bool(name, val);	
+	replace_nonascii_characters = get_bool(name, val);
 	break;
 
     case 'p':

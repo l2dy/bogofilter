@@ -121,7 +121,6 @@ static struct option longopts_bogofilter[] = {
     { "no-header-tags",			N, 0, 'H' },
     { "query",				N, 0, 'Q' },
     { "db-cachesize",			N, 0, 'k' },
-    { "charset-default",		R, 0, O_CHARSET_DEFAULT },
     { "ns-esf",				R, 0, O_NS_ESF },
     { "sp-esf",				R, 0, O_SP_ESF },
     { "ham-cutoff",			R, 0, O_HAM_CUTOFF },

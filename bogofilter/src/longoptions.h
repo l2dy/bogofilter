@@ -77,6 +77,7 @@ typedef enum longopts_e {
 /* options for bogofilter and bogolexer */
 #define LONGOPTIONS_LEX \
     { "block-on-subnets",		R, 0, O_BLOCK_ON_SUBNETS }, \
+    { "charset-default",		R, 0, O_CHARSET_DEFAULT }, \
     { "output-file",			N, 0, 'O' }, \
     { "user-config-file",		R, 0, O_USER_CONFIG_FILE }, \
     { "replace-nonascii-characters",	R, 0, O_REPLACE_NONASCII_CHARACTERS },
