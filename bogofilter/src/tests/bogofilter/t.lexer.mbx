@@ -38,7 +38,7 @@ RESULT=`echo $RESULT | sed s@\ @@g`
 
 WANT="1103.3073"
 
-if  [ $verbose -ne 0 ]; then
+if [ "$RESULT" != "$WANT" ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT
 fi
 

@@ -56,7 +56,7 @@ RESULT=`$BOGOUTIL -w $TMPDIR .ROBX | $AWK '/.ROBX/ { print $2; }'`
 
 WANT="244724"
 
-if  [ $verbose -ne 0 ]; then
+if [ "$RESULT" != "$WANT" ] ; then
     echo want: $WANT, have: $RESULT
 #   $BOGOFILTER -x ml -vvv -r -s < ${SYSTEST}/inputs/spam.mbx > ${TMPDIR}/spam.txt
 #   $BOGOFILTER -x ml -vvv -r -n < ${SYSTEST}/inputs/good.mbx > ${TMPDIR}/good.txt
