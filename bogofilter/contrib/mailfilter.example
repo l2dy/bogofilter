@@ -29,8 +29,9 @@ to "spam-unreadable"
 
 xfilter 'bogofilter -f -p -u -l -e -v'
 
+# if spam, 
 if (/^X-Bogosity: (Spam|Yes)/)
-cc "spam-bogofilter"
+to "spam-bogofilter"
 
 if (/^X-Bogosity: Unsure/)
 cc "unsure-bogofilter"
@@ -38,6 +39,12 @@ cc "unsure-bogofilter"
 
 
 #### SpamAssassin ####
-# if (/^X-Spam-Status: Yes)
-# cc "spam-spamassassin"
+# if spamassassin detects spam (this example assumes spamd is running),
+# teach bogofilter about it (avoiding to register spamassassin markup)
+# and store it to spam-spamassassin
+xfilter "/usr/bin/spamc"
+if (/^X-Spam-Status: YES) {
+    cc "|/usr/bin/spamassassin -d -L|bogofilter -s"
+    to "spam-spamassassin"
+}
 #### end SpamAssassin ####
