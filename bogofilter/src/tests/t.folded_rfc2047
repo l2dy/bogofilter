@@ -16,11 +16,13 @@ Reply-To: =?iso-8859-1?Q?jo?= =?iso-8859-1?Q?in?=
 Reply-To: =?iso-8859-1?Q?jo?=    =?iso-8859-1?Q?in?=
 Reply-To: =?iso-8859-1?Q?john?= q =?iso-8859-1?Q?doe?=
 Reply-To: =?iso-8859-1?Q?john?=_q_=?iso-8859-1?Q?public?=
+X-Subject: =?ISO-8859-1?Q?Zur=FCckbehaltungsre?=cht an Dateien =?ISO-8859-1?Q?f=FCr_?=?iso-8859-1?Q?Website?=
 
 - torso -
 header: =?iso-8859-1?q?bo?=
     =?iso-8859-1?q?dy?=
 _EOF
+
 cat >${TMPDIR}/reference <<_EOF
 subj:okay
 subj:another
@@ -35,6 +37,12 @@ john
 doe
 Reply-To
 john_q_public
+X-Subject
+Zurückbehaltungsrecht
+Dateien
+für
+iso-8859-1
+Website
 torso
 header
 iso-8859-1
