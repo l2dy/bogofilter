@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<refentry id="bogotune.1">
+<refmeta>
+<refentrytitle>bogotune</refentrytitle>
+    <manvolnum>1</manvolnum>
+</refmeta>
+
+  <refnamediv id="name">
+    <refname>bogotune</refname>
+    <refpurpose> find optimum parameter settings for
+    <application>bogofilter</application> </refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv id="synopsis">
+    <cmdsynopsis>
+      <command>bogotune</command> 
+	 <arg>-c <replaceable>config</replaceable></arg>
+	 <arg>-C</arg>
+	 <arg>-d <replaceable>file.db</replaceable></arg>
+	 <arg>-D</arg>
+	 <arg choice="plain">-n <emphasis>okfile</emphasis> [<emphasis>okfile</emphasis>...]</arg>
+	 <arg choice="plain">-s <emphasis>spamfile</emphasis> [<emphasis>spamfile</emphasis>...]</arg>
+      </cmdsynopsis>
+
+    <cmdsynopsis>
+      <command>bogotune</command> <arg>-h</arg>
+    </cmdsynopsis>
+
+  </refsynopsisdiv>
+
+  <refsect1 id="description">
+    <title>DESCRIPTION</title>
+
+    <para><application>Bogotune</application> determines optimum
+    parameter settings for <application>bogofilter</application>.  To
+    run it requires a set of spam messages and a set of non-spam
+    messages.  It can be run using the production wordlist or, with
+    large message sets it is able to build a wordlist using half of the
+    messages.  The training database should have been built from at
+    least 1,000 spam and 1,000 nonspam messages, and the ratio of spam
+    to nonspam should be in the range 0.2 to 5. There should be at
+    least 1,000 spam messages and 1,000 nonspam in the message
+    files. Message files may be in mbox, maildir, or MH folder or any
+    combination.  Msg-count files can also be used, but not mixed with
+    other formats.</para>
+
+  </refsect1>
+
+  <refsect1 id="options">
+    <title>OPTIONS</title>
+
+    <para>The <option>-h</option> option prints the help message and exits.</para>
+
+    <para>The <option>-v</option> option increases the verbosity
+    level.  Level 1 displays the scan output in detail instead of using a progress meter.</para>
+
+    <para>The <option>-c</option> <replaceable>filename</replaceable>
+    option tells <application>bogofilter</application> to read the
+    config file named.  </para>
+
+    <para>The <option>-C</option> option prevents <application>bogotune</application> from
+    reading a configuration file.</para>
+
+    <para>The <option>-d</option> <replaceable>dir</replaceable>
+    option specifies the directory for the database.  See the
+    ENVIRONMENT section for other directory setting options.</para>
+
+    <para>The <option>-D</option> option tells
+    <application>bogotune</application> to build a wordlist in memory
+    from half the input messages.</para>
+
+    <para>The <option>-n</option> option tells
+    <application>bogotune</application> that the following arguments
+    are files (or folders) containing non-spam.</para>
+
+    <para>The <option>-s</option> option tells
+    <application>bogotune</application> that the following arguments
+    are files (or folders) containing spam.</para>
+
+</refsect1>
+
+<refsect1 id='environment'><title>ENVIRONMENT</title>
+
+    <para>Bogofilter uses a database directory, which can be set in
+    the config file.  If not set there, bogofilter will use the value
+    of <envar>BOGOFILTER_DIR</envar>.  Both can be overridden by the
+    <option>-d<replaceable>dir</replaceable></option> option.  If none
+    of that is available, bogofilter will use directory
+    <filename>$HOME/.bogofilter</filename>.</para>
+
+</refsect1>
+
+<refsect1>
+<title>Bugs</title>
+<para><application>Bogotune</application> is not particularly robust when presented with garbage input. 
+</para>
+</refsect1>
+
+  <refsect1 id="author">
+    <title>AUTHOR</title>
+    <para>The bogofilter developer team.</para>
+    <para>
+       For updates, see <ulink url="http://bogofilter.sourceforge.net/">
+       the bogofilter project page</ulink>.
+    </para>
+  </refsect1>
+</refentry>

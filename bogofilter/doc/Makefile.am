@@ -4,22 +4,23 @@
 SUFFIXES= .1 .1in .htmlin .html
 
 # what to build
-man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
+man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1 bogotune.1
 
-html_MANS = bogofilter.html bogoutil.html bogoupgrade.html bogolexer.html
+html_MANS = bogofilter.html bogoutil.html bogoupgrade.html bogolexer.html bogotune.html
 
 all: $(man_MANS) $(html_MANS)
 
 CLEANFILES = $(man_MANS) $(html_MANS)
 
 # what to distribute
-EXTRA_DIST = bogofilter.1in bogoutil.1in bogoupgrade.1in \
-		bogolexer.1in \
-	     bogofilter.htmlin bogoutil.htmlin bogoupgrade.htmlin \
-		bogolexer.htmlin \
+EXTRA_DIST = \
+	     bogofilter.xml bogofilter.1in bogofilter.htmlin \
+	     bogolexer.xml bogolexer.1in bogolexer.htmlin \
+	     bogotune.xml bogotune.1in bogotune.htmlin \
+	     bogoupgrade.xml bogoupgrade.1in bogoupgrade.htmlin \
+	     bogoutil.xml bogoutil.1in bogoutil.htmlin \
 	     bogofilter-faq.html \
 	     bogofilter-tuning.HOWTO \
-	     bogofilter.xml bogoutil.xml bogoupgrade.xml bogolexer.xml \
 	     bogofilter-SA-2002-01 \
 	     integrating-with-postfix \
 	     integrating-with-qmail \
