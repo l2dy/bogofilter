@@ -96,7 +96,7 @@ do { # Start force loop
         open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
         print TEMP $mail;
         close (TEMP);
-        unless ($dbexists && (system("$bogofilter <$temp")/256==1)) {
+        unless ($dbexists && system("$bogofilter <$temp")/256==1) {
           system("$bogofilter -n <$temp");
           $hamadd++;
           $dbexists=1;
@@ -106,7 +106,7 @@ do { # Start force loop
             print TEMP $mail;
             close (TEMP);
           }
-        } else {print "Not training ham message $hamcount..\n" if ($vverbose);}
+        } else {print "Not training ham message $hamcount.\n" if ($vverbose);}
         unlink ($temp);
       }
     }
