@@ -201,6 +201,10 @@ typedef uint8_t u_int8_t;
 #include <unistd.h>
 #endif
 
+#ifdef __DGUX__
+#undef EX_OK
+#endif
+
 /* system.c - function prototypes */
 
 extern bool bf_abspath(const char *path);
