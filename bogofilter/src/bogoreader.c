@@ -66,13 +66,17 @@ static reader_more_t b_args_next_mailstore;
 static reader_more_t dir_next_mail;
 static reader_more_t mail_next_mail;
 static reader_more_t mailbox_next_mail;
+
 /* maildir is the mailbox format specified in
  * http://cr.yp.to/proto/maildir.html */
 
 static reader_line_t simple_getline;	/* ignores /^From / */
 static reader_line_t mailbox_getline;	/* minds   /^From / */
+static reader_line_t brmail_getline;	/* minds   /^#! rmail / */
 
 static reader_file_t get_filename;
+
+static void check_brmail(FILE *fp);
 
 static void dir_init(const char *name);
 static void dir_fini(void);
@@ -193,6 +197,7 @@ static bool open_mailstore(const char *name)
 	} else {
 	    mail_first = true;
 	    reader_getline      = mbox_mode ? mailbox_getline   : simple_getline;
+	    check_brmail(fpin);
 	    mailstore_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
 	    return true;
 	}
@@ -223,11 +228,25 @@ static bool open_mailstore(const char *name)
 
 /*** _next_mailstore functions ***********************************************/
 
+static void check_brmail(FILE *fp) {
+    int c;
+
+    if (reader_getline == mailbox_getline) {
+	/* peek at the first character -- cannot unget more than one char */
+	c = fgetc(fp);
+	ungetc(c, fp);
+	if (c == '#')
+	    reader_getline = brmail_getline;
+    }
+}
+
 /* this initializes for reading a single mail or a mbox from stdin */
 static bool stdin_next_mailstore(void)
 {
     bool val = mailstore_first;
+
     reader_getline = mbox_mode ? mailbox_getline : simple_getline;
+    check_brmail(stdin);
     mailstore_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
     mailstore_first = false;
     return val;
@@ -393,6 +412,43 @@ static int mailbox_getline(buff_t *buff)
     return count;
 }
 
+/* reads from an rmail batch, paying attention to ^#! rmail lines */
+static int brmail_getline(buff_t *buff)
+{
+    size_t used = buff->t.leng;
+    byte *buf = buff->t.text + used;
+    int count;
+    static unsigned long bytesleft;
+
+    if (bytesleft) {
+	count = buff_fgetsln(buff, fpin, bytesleft);
+	bytesleft -= count;
+	return count;
+    }
+
+    count = buff_fgetsl(buff, fpin);
+    have_message = false;
+
+    if (count >= 9 && memcmp("#! rmail ", buf, 9) == 0)
+    {
+	int i;
+	bytesleft = 0;
+	for (i = 9; i < count; i++) {
+	    if (!isdigit(buf[i])) break;
+	    bytesleft = bytesleft * 10 + (buf[i] - '0');
+	}
+	have_message = true;
+	if (firstline) {
+	    firstline = false;
+	    return brmail_getline(buff);
+	}
+    } else {
+	if (buff->t.leng < buff->size)		/* for easier debugging - removable */
+	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
+    }
+    return EOF;
+}
+
 /* reads a file as a single mail ( no ^From detection ). */
 static int simple_getline(buff_t *buff)
 {
@@ -459,7 +515,7 @@ void bogoreader_init(int _argc, char **_argv)
 	break;
     default:
 	fprintf(stderr, "Unknown bulk_mode = %d\n", (int) bulk_mode);
-	abort();
+	bf_abort();
 	break;
     }
     reader_filename = get_filename;
