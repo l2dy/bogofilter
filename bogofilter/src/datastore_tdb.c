@@ -50,7 +50,7 @@ static dbh_t *dbh_init(const char *path, const char *name)
 
     handle->path = xstrdup(path);
 
-    handle->name[c] = xmalloc(len);
+    handle->name = xmalloc(len);
     build_path(handle->name, len, path, name);
 
     handle->locked = false;
