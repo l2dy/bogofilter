@@ -142,6 +142,7 @@ static const parm_desc sys_parms[] =
     { "count_html_comments",  		CP_INTEGER, { (void *) &count_html_comments } },
     { "score_html_comments",  		CP_BOOLEAN, { (void *) &score_html_comments } },
     { "db_cachesize",	  CP_INTEGER,	{ (void *) &db_cachesize } },
+    { "tag_header_lines", CP_BOOLEAN,	{ (void *) &tag_header_lines } },
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
 

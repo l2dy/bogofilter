@@ -41,6 +41,7 @@ extern	double	thresh_stats;
 
 extern	int	abort_on_error;
 extern	bool	stats_in_header;
+extern	bool	tag_header_lines;
 
 extern	int	db_cachesize;
 

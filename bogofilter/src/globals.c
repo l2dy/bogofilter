@@ -38,6 +38,7 @@ int	max_repeats;
 double	min_dev;
 double	spam_cutoff;
 double	thresh_stats;
+bool	tag_header_lines;
 
 const char	*update_dir;
 /*@observer@*/
