@@ -14,6 +14,7 @@ Note:
   rather than %e, to mask differences between GSL versions.
 
 0.17.5	2004-04-01
+	2004-04-08 - Promoted to Stable Release
 
 * Change default parameters to the results of Greg's 300k ham
   and 300k spam bogotune run:
