@@ -208,11 +208,7 @@ void got_emptyline(void)
     return;
 }
 
-#if	1
-const char *prefixes = "|subj:";
-#else
 const char *prefixes = "|to:|from:|rtrn:|subj:";
-#endif
 
 void set_tag(const char *tag)
 {
