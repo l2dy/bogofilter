@@ -153,11 +153,11 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array)
 	    double invn, invproduct, product, spamicity;
 	    if (prob >= fin)
 		break;
-	    cnt += 1;
-	    h->prob += prob;
 
 	    if (fabs(EVEN_ODDS - prob) >= min_dev)
 	    {
+		cnt += 1;
+		h->prob += prob;
 		invlogsum += log(1.0 - prob);
 		logsum += log(prob);
 	    }
