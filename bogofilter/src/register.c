@@ -46,7 +46,7 @@ void register_words(run_t _run_type, wordhash_t *h,
   if (_run_type & UNREG_SPAM) u = "S";
   if (_run_type & UNREG_GOOD) u = "N";
 
-  format_log_update(msg_register, msg_register_size, r, u, wordcount, msgcount);
+  format_log_update(msg_register, msg_register_size, u, r, wordcount, msgcount);
 
   if (verbose)
     (void)fprintf(stderr, "# %d word%s, %d message%s\n", 
