@@ -4,6 +4,16 @@
 
 $Id$
 
+	2003-06-25
+
+	* For bogotune change processing of '-t' switch from pass 1 to
+          pass 2 so that it supercedes the config file.
+
+	2003-06-24
+
+	* Update bogotune to version 0.2.6
+	* '-Q' processing no longer requires that spamlist.db be present.
+
 0.13.7	2003-06-20
 
 	* Replaced tuning/tuning.sh with tuning/bogotune (and related files).
@@ -17,7 +27,6 @@ $Id$
 	  "Top 10 Results" output.
 	* Minor changes to bogoutil to support bogotune script.
 	* Added newlines to correct usage messages.
-
 
 0.13.6.2 2003-06-05
 
