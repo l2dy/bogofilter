@@ -50,7 +50,7 @@ bogoutil_SOURCES = bogoutil.c \
 		   datastore.h datastore_db.h datastore_db.c wordlists.h wordlists.c \
 		   $(MYCOMMON)
 
-configtest_SOURCES = configtest.c config.c directories.h wordlists.c \
+configtest_SOURCES = configtest.c config.c wordlists.c \
 		     datastore_db.c $(MYCOMMON)
 
 wordhash_SOURCES = wordhash.c wordhash.h wordhash.main.c $(MYCOMMON)
@@ -66,7 +66,8 @@ EXTRA_DIST = $(man_MANS) \
 	     bogofilter.spec bogofilter.spec.in \
 	     bogoupgrade bogo.R \
 	     version.sh \
-	     README.cvs README.freebsd README.hp-ux README.Robinson \
+	     README.cvs README.freebsd README.hp-ux \
+	     README.dcdflib README.Robinson \
 	     $(extradistdirs)
 #
 #
