@@ -26,7 +26,7 @@ word_t *word_new(const byte *text, size_t leng)
     self->text = (byte *)((char *)self+sizeof(word_t));
     if (text) {
 	memcpy(self->text, text, leng);
-	Z(self->text[self->leng]);		/* debug code - remove */
+	Z(self->text[self->leng]);		/* for easier debugging - removable */
     }
     return self;
 }
@@ -43,7 +43,7 @@ word_t *word_dup(const word_t *word)
     self->text = xmalloc(word->leng+D);
     if (word->text) {
 	memcpy(self->text, word->text, self->leng);
-	Z(self->text[self->leng]);		/* debug code - remove */
+	Z(self->text[self->leng]);		/* for easier debugging - removable */
     }
     return self;
 }
@@ -52,7 +52,7 @@ word_t *word_cpy(word_t *dst, const word_t *src)
 {
     dst->leng = src->leng;
     memcpy(dst->text, src->text, src->leng+D);
-    Z(dst->text[dst->leng]);			/* debug code - remove */
+    Z(dst->text[dst->leng]);			/* for easier debugging - removable */
     return dst;
 }
 
@@ -82,7 +82,7 @@ word_t *word_concat(const word_t *w1, const word_t *w2)
     word_t *ans = word_new(NULL, len);
     memcpy(ans->text, w1->text, w1->leng);
     memcpy(ans->text+w1->leng, w2->text, w2->leng);
-    Z(ans->text[ans->leng]);		/* debug code - remove */
+    Z(ans->text[ans->leng]);		/* for easier debugging - removable */
     return ans;
 }
 
