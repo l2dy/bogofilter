@@ -87,13 +87,12 @@ enum e_verbosity {
 #define	MIN(n)		((n)/60)
 #define SECONDS(n)	((n) - MIN(n)*60)
 
-#define	ROUND(f)	floor(f+0.5)
-
 /* Global Variables */
 
 const char *progname = "bogotune";
 char *ds_file;
 
+uint test = 0;
 uint memdebug = 0;
 uint max_messages_per_mailbox = 0;
 
@@ -376,8 +375,8 @@ static void scoring_error(void)
     int i;
 
     printf("    high ham scores:\n");
-    for (i = 0; i < 10 && ns_scores[ns_cnt-i-1] > SPAM_CUTOFF; i += 1) 
-	printf("      %2d %8.6f\n", i+1, ns_scores[ns_cnt-i-1]);
+    for (i = 1; i <= 10 && ns_scores[ns_cnt-i] > SPAM_CUTOFF; i += 1) 
+	printf("      %2d %8.6f\n", i, ns_scores[ns_cnt-i]);
 
     printf("    low spam scores:\n");
     for (i = 0; i < 10 && sp_scores[i] < HAM_CUTOFF; i += 1) 
@@ -409,8 +408,8 @@ static uint get_thresh(uint count, double *scores)
 {
     uint   ftarget = 0;
     uint   mtarget = scale(count, TEST_COUNT, PREF_COUNT, 3, 10);
+    double cutoff = 0.0;
     double percent = scale(count, TEST_COUNT, PREF_COUNT, 0.0050, 0.0025);
-    double cutoff;
     static bool show_first = false;
 
     score_ns(scores);				/* get scores */
@@ -457,7 +456,7 @@ static uint read_mailbox(char *arg)
 {
     uint count = 0;
     wordhash_t *train = ns_and_sp->train;
-    wordlist_t *ns_or_sp = (run_type == REG_GOOD) ? ns_msglists : sp_msglists;
+    mlhead_t *msgs = (run_type == REG_GOOD) ? ns_msglists->msgs : sp_msglists->msgs;
 
     if (verbose) {
 	printf("Reading %s\n", arg);
@@ -469,13 +468,18 @@ static uint read_mailbox(char *arg)
     while ((*reader_more)()) {
 	wordhash_t *whc, *whp;
 
-	whc = wordhash_new();
+	if (user_robx < EPS)
+	    whc = wordhash_new();
+	else
+	    whc = wordhash_init(WH_CNTS, 0);
+
 	collect_words(whc);
 
 	whp = convert_wordhash_to_propslist(whc, train);
-	msglist_add(ns_or_sp->msgs, whp);
+	msglist_add(msgs, whp);
 
-	wordhash_free(whc);
+	if (whc != whp)
+	    wordhash_free(whc);
 
 	if (verbose && (count % 100) == 0) {
 	    if ((count % 1000) != 0)
@@ -532,38 +536,31 @@ static void distribute(int mode, wordlist_t *ns_or_sp)
     int bad  = 1 - good;
 
     wordhash_t *train = ns_and_sp->train;
-    mlhead_t *list = ns_or_sp->msgs;
+    mlhead_t *msgs = ns_or_sp->msgs;
     mlitem_t *item;
     wordprop_t *msg_count;
 
     int score_count = 0;
     int train_count = 0;
 
-    double ratio;
-
-    if (ds_file != NULL)
-	ratio = 0.0;
-    else {
-	int count = list->count;
-	const double small_count = LIST_COUNT + TEST_COUNT;
-	const double large_count = LIST_COUNT + LIST_COUNT;
-	const double small_ratio = LIST_COUNT / TEST_COUNT;
-	const double large_ratio = LIST_COUNT / LIST_COUNT;
-	if (count > large_count)
-	    count = large_count;
-	if (count < small_count)
-	    count = small_count;
-	ratio = small_ratio + (large_ratio - small_ratio) * (count - small_count) / (large_count - small_count);
-    }
+    double ratio = (ds_file != NULL || user_robx < EPS)
+	? 0.0
+	: scale(msgs->count,  
+		LIST_COUNT + TEST_COUNT,	/* small count */
+		LIST_COUNT + LIST_COUNT,	/* large count */
+		LIST_COUNT / TEST_COUNT,	/* small ratio */
+		LIST_COUNT / LIST_COUNT);	/* large ratio */
     
     /* Update .MSG_COUNT */
     msg_count = wordhash_insert(train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
 
-    for (item = list->head; item != NULL; item = item->next) {
+    for (item = msgs->head; item != NULL; item = item->next) {
 	wordhash_t *wh = item->wh;
 
 	/* training set */
-	if ((ds_file == NULL) && (train_count / ratio < score_count + 1)) {
+	if (ds_file == NULL && 
+	    user_robx < EPS &&
+	    train_count / ratio < score_count + 1) {
 	    wordhash_set_counts(wh, good, bad);
 	    wordhash_add(train, wh, &wordprop_init);
 	    train_count += 1;
@@ -573,7 +570,8 @@ static void distribute(int mode, wordlist_t *ns_or_sp)
 	}
 	/* scoring set  */
 	else {
-	    msglist_add(ns_or_sp->u.sets[MOD(score_count,3)], wh);
+	    uint bin = MOD(score_count,3);
+	    msglist_add(ns_or_sp->u.sets[bin], wh);
 	    score_count += 1;
 	}
 	item->wh = NULL;
@@ -593,8 +591,10 @@ static void create_countlists(wordlist_t *ns_or_sp)
 	for (item = list->head; item != NULL; item = item->next) {
 	    wordhash_t *who = item->wh;
 	    wordhash_t *whn = convert_propslist_to_countlist(who);
-	    wordhash_free(who);
-	    item->wh = whn;
+	    if (whn != who) {
+		wordhash_free(who);
+		item->wh = whn;
+	    }
 	}
     }
 
@@ -670,6 +670,9 @@ static int process_args(int argc, char **argv)
 		case 's':
 		    run_type = REG_SPAM;
 		    break;
+		case 't':
+		    test += 1;
+		    break;
 		case 'v':
 		    verbose += 1;
 		    break;
@@ -684,6 +687,13 @@ static int process_args(int argc, char **argv)
 			dbg_trap_index=atoi(*++argv);
 		    }
 		    break;
+		case 'T':
+		{
+		    uint c = 100;
+		    wordcnts_t *w = (wordcnts_t *) xcalloc(c, sizeof(wordcnts_t));
+		    w = (wordcnts_t *) xrealloc(w, (c * 2) * sizeof(wordcnts_t));
+		    break;
+		}
 #endif
 		default:
 		    help();
@@ -794,10 +804,12 @@ static double robx_compute(wordhash_t *wh)
 	rx = rh.sum/rh.count;
 
     if (verbose > 1) {
-	printf("%s: %lu, %lu\n",
+	printf("%s: %lu spam, %lu ham\n",
 	       MSG_COUNT, (unsigned long)msg_spam, (unsigned long)msg_good);
+/*
 	printf("scale: %f, sum: %f, cnt: %6d\n",
 	       rh.scalefactor, rh.sum, (int)rh.count);
+*/
     }
 
     return rx;
@@ -860,7 +872,7 @@ static int gfn(result_t *results, uint rsi, uint mdi, uint rxi)
     result_t *r = &results[i];
     int fn = r->fn;
     if (verbose > 100)
-	printf("   %d, %d, %d, %2d\n", rsi, mdi, rxi, fn);
+	printf("   %2d, %2d, %2d, %2d\n", rsi, mdi, rxi, fn);
     return fn;
 }
 
@@ -951,7 +963,7 @@ static void final_recommendations(void)
     printf("---cut---\n");
     printf("db_cachesize=%d\n", db_cachesize);
 
-    printf("robx=%5.3f\n", robx);
+    printf("robx=%8.6f\n", robx);
     printf("min_dev=%5.3f\n", min_dev);
     printf("robs=%6.4f\n", robs);
 
@@ -1096,16 +1108,16 @@ static rc_t bogotune(void)
     ns_cnt = filelist_read(REG_GOOD, ham_files);
     sp_cnt = filelist_read(REG_SPAM, spam_files);
 
+    end = time(NULL);
     if (verbose) {
-	end = time(NULL);
 	cnt = ns_cnt + sp_cnt;
 	show_elapsed_time(beg, end, ns_cnt + sp_cnt, (double)cnt/(end-beg), "messages", "msg/sec");
     }
 
     if (memdebug) { MEMDISPLAY; }
 
-    distribute(REG_GOOD, ns_msglists);
     distribute(REG_SPAM, sp_msglists);
+    distribute(REG_GOOD, ns_msglists);
 
     if (memdebug) { MEMDISPLAY; }
 
@@ -1181,9 +1193,7 @@ static rc_t bogotune(void)
     else
 	robx = robx_init();
 
-    robx = ROUND(robx*1000.0)/1000.0;
-
-    printf("Initial x value is %5.3f\n", robx);
+    printf("Initial x value is %8.6f\n", robx);
 
     /* No longer needed */
     wordhash_free(ns_and_sp->train);
@@ -1247,6 +1257,14 @@ static rc_t bogotune(void)
 		    spam_cutoff = 0.01;
 		    score_ns(ns_scores);	/* scores in ascending order */
 		    qsort(ns_scores, ns_cnt, sizeof(double), compare_double);
+		    
+		    if (test && rsi == 0 && mdi == 0 && rxi == 0) {
+			printf("robx        = %8.6f (%8.2e)\n", robx, robx);
+			printf("robs        = %8.6f (%8.2e)\n", robs, robs);
+			printf("min_dev     = %8.6f (%8.2e)\n", min_dev, min_dev);
+			for (fp = 1; fp <= target+2; fp += 1)
+			    printf("%2d %8.6f %c\n", fp, ns_scores[ns_cnt - fp], fp <= target ? '+' : '-');
+		    }
 
 		    /* Determine spam_cutoff and false_pos */
 		    for (fp = target; fp < ns_cnt; fp += 1) {
