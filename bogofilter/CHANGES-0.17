@@ -8,6 +8,21 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
  
+0.17.5	2004-04-??
+
+	2004-03-31
+
+	* Change default parameters to the results of Greg's 300k ham
+	  and 300k spam bogotune run:
+
+		     robs     robx    min_dev  spam_co
+	      old  0.010000 0.415000 0.100000 0.950000
+	      new  0.017800 0.520000 0.375000 0.990000
+
+	2004-03-22
+
+	* Fix check for PGP signatures.
+
 0.17.4	2004-03-20
 
 	* Ignore data portion of PGP signatures.
