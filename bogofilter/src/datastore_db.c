@@ -101,6 +101,7 @@ typedef struct {
     int		fd;		/* file descriptor of data base file */
     dbmode_t	open_mode;	/* datastore open mode, DS_READ/DS_WRITE */
     DB		*dbp;		/* data base handle */
+    bool	locked;
     bool	is_swapped;	/* set if CPU and data base endianness differ */
     bool	created;	/* if newly created; for datastore.c (to add .WORDLIST_VERSION) */
     dbe_t	*dbenv;		/* "parent" environment */
@@ -108,8 +109,6 @@ typedef struct {
 } dbh_t;
 
 #define DBT_init(dbt)		(memset(&dbt, 0, sizeof(DBT)))
-
-/* Function definitions */
 
 /** translate BerkeleyDB \a flags bitfield for DB->open method back to symbols */
 static const char *resolveopenflags(u_int32_t flags) {
@@ -136,7 +135,8 @@ static int DB_OPEN(DB *db, const char *db_path,
     int ret;
 
 #if DB_AT_LEAST(4,1)
-    flags |= DB_AUTO_COMMIT;
+    if (fTransaction)
+	flags |= DB_AUTO_COMMIT;
 #endif
 
     ret = db->open(db,
@@ -186,6 +186,19 @@ static int DB_SET_FLAGS(DB *db, u_int32_t flags)
 }
 #endif
 
+/* implements locking. */
+static int db_lock(int fd, int cmd, short int type)
+{
+    struct flock lock;
+
+    lock.l_type = type;
+    lock.l_start = 0;
+    lock.l_whence = (short int)SEEK_SET;
+    lock.l_len = 0;
+    return (fcntl(fd, cmd, &lock));
+}
+
+
 /** "constructor" - allocate our handle and initialize its contents */
 static dbh_t *handle_init(const char *db_path, const char *db_name)
 {
@@ -198,11 +211,13 @@ static dbh_t *handle_init(const char *db_path, const char *db_name)
     handle->fd   = -1;			/* for lock */
 
     handle->path = xstrdup(db_path);
-
     handle->name = build_path(db_path, db_name);
 
+    handle->locked     = false;
     handle->is_swapped = false;
     handle->created    = false;
+
+    handle->txn = NULL;
 
     return handle;
 }
@@ -247,6 +262,10 @@ static void check_db_version(void)
 {
     int maj, min;
     static bool version_ok = false;
+
+#if DB_AT_MOST(3,0)
+#error "Berkeley DB 3.0 is not supported"
+#endif
 
     if (!version_ok) {
 	version_ok = true;
@@ -334,8 +353,9 @@ const char *db_version_str(void)
     static const char v[] = DB_VERSION_STRING;
 #else
     static char v[80];
-    snprintf(v, sizeof(v), "BerkeleyDB (%d.%d.%d)",
-	    DB_VERSION_MAJOR, DB_VERSION_MINOR, DB_VERSION_PATCH);
+    snprintf(v, sizeof(v), "BerkeleyDB (%d.%d.%d)%s",
+	     DB_VERSION_MAJOR, DB_VERSION_MINOR, DB_VERSION_PATCH,
+	     fTransactional ? "" : "NONTRANSACTIONAL");
 #endif
     return v;
 }
@@ -357,14 +377,30 @@ void *db_open(void *vhandle, const char *path,
     dbh_t *handle = NULL;
     uint32_t opt_flags = (open_mode == DS_READ) ? DB_RDONLY : 0;
 
+    size_t idx;
+    uint32_t retryflags[] = { 0, DB_NOMMAP };
+
+    /*
+     * If locking fails with EAGAIN, then try without MMAP, fcntl()
+     * locking may be forbidden on mmapped files, or mmap may not be
+     * available for NFS. Thanks to Piotr Kucharski and Casper Dik,
+     * see news:comp.protocols.nfs and the bogofilter mailing list,
+     * message #1520, Message-ID: <20030206172016.GS1214@sgh.waw.pl>
+     * Date: Thu, 6 Feb 2003 18:20:16 +0100
+     */
+
     assert(env);
     assert(env->dbe);
 
     check_db_version();
 
+    /* retry when locking failed */
+    for (idx = 0; idx < COUNTOF(retryflags); idx += 1)
     {
 	DB *dbp;
+	bool err = false;
 	uint32_t pagesize;
+	uint32_t retryflag = retryflags[idx];
 
 	handle = handle_init(path, name);
 
@@ -372,7 +408,7 @@ void *db_open(void *vhandle, const char *path,
 	    return NULL;
 
 	/* create DB handle */
-	if ((ret = db_create (&dbp, env->dbe, 0)) != 0) {
+	if ((ret = db_create (&dbp, fTransaction ? env->dbe : NULL, 0)) != 0) {
 	    print_error(__FILE__, __LINE__, "(db) db_create, err: %s",
 			db_strerror(ret));
 	    goto open_err;
@@ -382,7 +418,8 @@ void *db_open(void *vhandle, const char *path,
 	handle->dbenv = env;
 
 	/* open data base */
-	if ((t = strrchr(handle->name, DIRSEP_C)))
+	if (fTransaction && 
+	    (t = strrchr(handle->name, DIRSEP_C)))
 	    t++;
 	else
 	    t = handle->name;
@@ -392,8 +429,9 @@ void *db_open(void *vhandle, const char *path,
 retry_db_open:
 	handle->created = false;
 
-	ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags, DS_MODE);
+	ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | retryflag, DS_MODE);
 
+	if (fTransaction) {	/* TRANSACTION */
 	if (ret != 0 && ( ret != ENOENT || opt_flags == DB_RDONLY ||
 		((handle->created = true),
 #if DB_EQUAL(4,1)
@@ -403,6 +441,29 @@ retry_db_open:
 		 (ret = DB_SET_FLAGS(dbp, DB_CHKSUM)) != 0 ||
 #endif
 		(ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL, DS_MODE)) != 0)))
+	    err = true;
+	}
+	else {			/* NON-TRANSACTION */
+	if (ret != 0) {
+	    err = (ret != ENOENT) || (opt_flags == DB_RDONLY);
+	    if (!err) {
+		ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL | retryflag, DS_MODE);
+		if (ret != 0)
+		    err = true;
+		else
+		    handle->created = true;
+	    }
+	}
+
+	if (ret != 0) {
+	    if (ret == ENOENT && opt_flags != DB_RDONLY)
+		return NULL;
+	    else
+		err = true;
+	}
+	}
+
+	if (err)
 	{
 	    if (open_mode != DB_RDONLY && ret == EEXIST && --retries) {
 		/* sleep for 4 to 100 ms - this is just to give up the CPU
@@ -463,6 +524,33 @@ retry_db_open:
 
 	/* check file size limit */
 	check_fsize_limit(handle->fd, pagesize);
+
+	if (fTransaction)	/* done if transactions */
+	    break;
+	else {			/* continue if non-transactional */
+	/* try fcntl lock */
+	if (db_lock(handle->fd, F_SETLK,
+		    (short int)(open_mode == DS_READ ? F_RDLCK : F_WRLCK)))
+	{
+	    int e = errno;
+	    db_close(handle);
+	    handle = NULL;	/* db_close freed it, we don't want to use it anymore */
+	    errno = e;
+	    if (errno == EACCES)
+		errno = EAGAIN;
+	    if (errno != EAGAIN)
+		return NULL;
+	} else {
+	    /* have lock */
+	    break;
+	}
+	}
+    } /* for idx over retryflags */
+
+    if (!fTransaction && handle) {
+	handle->locked = true;
+	if (handle->fd < 0)
+	    handle->locked=false;
     }
 
     return handle;
@@ -489,6 +577,9 @@ int db_txn_begin(void *vhandle)
     assert(dbh);
     assert(dbh->magic == MAGIC_DBH);
     assert(dbh->txn == 0);
+
+    if (!fTransaction)
+	return 0;
 
     env = dbh->dbenv;
 
@@ -519,6 +610,9 @@ int db_txn_abort(void *vhandle)
     assert(dbh);
     assert(dbh->magic == MAGIC_DBH);
 
+    if (!fTransaction)
+	return 0;
+
     t = dbh->txn;
 
     assert(t);
@@ -548,18 +642,16 @@ int db_txn_commit(void *vhandle)
 {
     int ret;
     dbh_t *dbh = vhandle;
-    DB_TXN *t;
     u_int32_t id;
 
     assert(dbh);
     assert(dbh->magic == MAGIC_DBH);
 
-    t = dbh->txn;
+    if (!fTransaction)
+	return 0;
 
-    assert(t);
-
-    id = BF_TXN_ID(t);
-    ret = BF_TXN_COMMIT(t, 0);
+    id = BF_TXN_ID(dbh->txn);
+    ret = BF_TXN_COMMIT(dbh->txn, 0);
     if (ret)
 	print_error(__FILE__, __LINE__, "DB_TXN->commit(%lx) error: %s",
 		(unsigned long)id, db_strerror(ret));
@@ -594,7 +686,7 @@ int db_delete(void *vhandle, const dbv_t *token)
     DBT_init(db_key);
 
     assert(handle->magic == MAGIC_DBH);
-    assert(handle->txn);
+    assert((fTransaction == false) == (handle->txn == NULL));
 
     db_key.data = token->data;
     db_key.size = token->leng;
@@ -627,7 +719,7 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 
     assert(handle);
     assert(handle->magic == MAGIC_DBH);
-    assert(handle->txn);
+    assert((fTransaction == false) == (handle->txn == NULL));
 
     DBT_init(db_key);
     DBT_init(db_data);
@@ -641,7 +733,7 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
     db_data.flags = DB_DBT_USERMEM;	/* saves the memcpy */
 
     /* DB_RMW can avoid deadlocks */
-    ret = dbp->get(dbp, handle->txn, &db_key, &db_data, handle->open_mode == DS_READ ? 0 : DB_RMW);
+    ret = dbp->get(dbp, handle->txn, &db_key, &db_data, (!fTransaction || handle->open_mode == DS_READ) ? 0 : DB_RMW);
 
     if (DEBUG_DATABASE(3))
 	fprintf(dbgout, "DB->get(%.*s): %s\n",
@@ -682,7 +774,7 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *val)
     DB *dbp = handle->dbp;
 
     assert(handle->magic == MAGIC_DBH);
-    assert(handle->txn);
+    assert((fTransaction == false) == (handle->txn == NULL));
 
     DBT_init(db_key);
     DBT_init(db_data);
@@ -779,7 +871,15 @@ void db_close(void *vhandle)
     }
 
     ret = dbp->close(dbp, f);
-    ret = db_flush_dirty(dbe, ret);
+#if DB_AT_LEAST(3,2) && DB_AT_MOST(4,0)
+    /* ignore dirty pages in buffer pool */
+    if (ret == DB_INCOMPLETE)
+	ret = 0;
+#endif
+
+    if (fTransaction)
+	ret = db_flush_dirty(dbe, ret);
+
     if (ret)
 	print_error(__FILE__, __LINE__, "DB->close error: %s",
 		db_strerror(ret));
@@ -804,6 +904,11 @@ void db_flush(void *vhandle)
 	fprintf(dbgout, "db_flush(%s)\n", handle->name);
 
     ret = dbp->sync(dbp, 0);
+#if DB_AT_LEAST(3,2) && DB_AT_MOST(4,0)
+    /* ignore dirty pages in buffer pool */
+    if (ret == DB_INCOMPLETE)
+	ret = 0;
+#endif
     ret = db_flush_dirty(handle->dbenv->dbe, ret);
 
     if (DEBUG_DATABASE(1))
@@ -812,10 +917,12 @@ void db_flush(void *vhandle)
     if (ret)
 	print_error(__FILE__, __LINE__, "db_sync: err: %s", db_strerror(ret));
 
-    ret = BF_LOG_FLUSH(handle->dbenv->dbe, NULL);
-    if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "DB_ENV->log_flush(%p): %s\n", (void *)handle->dbenv->dbe,
-		db_strerror(ret));
+    if (fTransaction) {
+	ret = BF_LOG_FLUSH(handle->dbenv->dbe, NULL);
+	if (DEBUG_DATABASE(1))
+	    fprintf(dbgout, "DB_ENV->log_flush(%p): %s\n", (void *)handle->dbenv->dbe,
+		    db_strerror(ret));
+    }
 }
 
 ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
@@ -834,7 +941,7 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 
     assert(handle->magic == MAGIC_DBH);
     assert(handle->dbenv->dbe);
-    assert(handle->txn);
+    assert((fTransaction == false) == (handle->txn == NULL));
 
     memset(&key, 0, sizeof(key));
     memset(&data, 0, sizeof(data));
@@ -975,30 +1082,11 @@ static int bf_dbenv_create(DB_ENV **env)
     return ret;
 }
 
-
-/* dummy infrastructure, to be expanded by environment
- * or transactional initialization/shutdown */
-static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
+static void dbe_xinit_nums(void *vhandle, u_int32_t numlocks, u_int32_t numobjs)
 {
-    int ret;
+    dbe_t *env = vhandle;
+    int ret = 0;
     u_int32_t logsize = 1048576;    /* 1 MByte (default in BDB 10 MByte) */
-    dbe_t *env = xcalloc(1, sizeof(dbe_t));
-
-    assert(directory);
-
-    env->magic = MAGIC_DBE;	    /* poor man's type checking */
-    env->directory = xstrdup(directory);
-    ret = bf_dbenv_create(&env->dbe);
-
-    if (db_cachesize != 0 &&
-	    (ret = env->dbe->set_cachesize(env->dbe, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
-	print_error(__FILE__, __LINE__, "DB_ENV->set_cachesize(%u), err: %s",
-		db_cachesize, db_strerror(ret));
-	exit(EX_ERROR);
-    }
-
-    if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "DB_ENV->set_cachesize(%u)\n", db_cachesize);
 
     /* configure lock system size - locks */
 #if DB_AT_LEAST(3,2)
@@ -1048,9 +1136,41 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB_ENV->set_lg_max(%lu)\n", (unsigned long)logsize);
+}
 
-    ret = env->dbe->open(env->dbe, directory,
-	    dbenv_defflags | DB_CREATE | flags, DS_MODE);
+/* dummy infrastructure, to be expanded by environment
+ * or transactional initialization/shutdown */
+static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
+{
+    int ret;
+    dbe_t *env = xcalloc(1, sizeof(dbe_t));
+
+    assert(directory);
+
+    env->magic = MAGIC_DBE;	    /* poor man's type checking */
+    env->directory = xstrdup(directory);
+
+    ret = bf_dbenv_create(&env->dbe);
+
+    if (db_cachesize != 0 &&
+	    (ret = env->dbe->set_cachesize(env->dbe, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
+	print_error(__FILE__, __LINE__, "DB_ENV->set_cachesize(%u), err: %s",
+		db_cachesize, db_strerror(ret));
+	exit(EX_ERROR);
+    }
+
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "DB_ENV->set_cachesize(%u)\n", db_cachesize);
+
+    if (fTransaction)
+	dbe_xinit_nums(env, numlocks, numobjs);
+
+    if (!fTransaction)
+	flags |= DB_CREATE;
+    else
+	flags |= DB_CREATE | dbenv_defflags;
+
+    ret = env->dbe->open(env->dbe, directory, flags, DS_MODE);
     if (ret != 0) {
 	env->dbe->close(env->dbe, 0);
 	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %s", db_strerror(ret));
@@ -1103,7 +1223,7 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 
 /* close the environment, but do not release locks */
 static void dbe_cleanup_lite(dbe_t *env) {
-    if (env->dbe) {
+    if (fTransaction && env->dbe) {
 	int ret;
 
 	/* checkpoint if more than 64 kB of logs have been written
@@ -1169,7 +1289,7 @@ void *dbe_init(const char *directory) {
 	exit(EX_ERROR);
 
     /* run recovery if needed */
-    if (needs_recovery())
+    if (fTransaction && needs_recovery())
 	dbe_recover(directory, false, false); /* DO NOT set force flag here, may cause
 						 multiple recovery! */
 
@@ -1363,7 +1483,7 @@ ex_t dbe_purgelogs(const char *directory) {
 ex_t db_verify(const char *db_file) {
     char *dir;
     char *tmp;
-    DB_ENV *env;
+    DB_ENV *env = NULL;
     DB *db;
     int e;
 
@@ -1379,16 +1499,42 @@ ex_t db_verify(const char *db_file) {
     else
 	*tmp = '\0';
 
-    env = dbe_recover_open(dir, 0); /* this sets an exclusive lock */
-    e = db_create(&db, NULL, 0); /* do not use environment here, verify
-				    does not lock by itself, we hold the
-				    global lock instead! */
-    if (e != 0) {
-	print_error(__FILE__, __LINE__, "error creating DB handle: %s",
-		db_strerror(e));
-	free(dir);
-	exit(EX_ERROR);
+    if (fTransaction) {
+	env = dbe_recover_open(dir, 0); /* this sets an exclusive lock */
+	e = db_create(&db, NULL, 0); /* do not use environment here, verify
+					does not lock by itself, we hold the
+					global lock instead! */
+	if (e != 0) {
+	    print_error(__FILE__, __LINE__, "error creating DB handle: %s",
+			db_strerror(e));
+	    free(dir);
+	    exit(EX_ERROR);
+	}
     }
+    else {
+	int fd = open(db_file, O_RDWR);
+	if (fd < 0) {
+	    print_error(__FILE__, __LINE__, "db_verify: cannot open %s: %s", db_file,
+			strerror(errno));
+	    exit(EX_ERROR);
+	}
+
+	if (db_lock(fd, F_SETLKW, (short int)F_WRLCK)) {
+	    print_error(__FILE__, __LINE__,
+			"db_verify: cannot lock %s for exclusive use: %s", db_file,
+			strerror(errno));
+	    close(fd);
+	    exit(EX_ERROR);
+	}
+
+	if ((e = db_create (&db, NULL, 0)) != 0) {
+	    print_error(__FILE__, __LINE__, "db_create, err: %s",
+			db_strerror(e));
+	    close(fd);
+	    exit(EX_ERROR);
+	}
+    }
+
     e = db->verify(db, db_file, NULL, NULL, 0);
     if (e) {
 	print_error(__FILE__, __LINE__, "database %s does not verify: %s",
