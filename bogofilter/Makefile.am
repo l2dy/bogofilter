@@ -28,8 +28,9 @@ bogoutil_SOURCES = bogoutil.c \
 EXTRA_DIST = $(man1_MANS) \
 	     bogofilter.xml bogoutil.xml \
 	     bogofilter.spec bogofilter.spec.in \
-	     UPGRADE bogoupgrade.pl
-	     
+	     UPGRADE bogoupgrade.pl \
+	     $(TESTSCRIPTS) t.frame
+
 #
 .xml.pdf:
 	xmlto pdf --extensions $<
@@ -41,5 +42,6 @@ EXTRA_DIST = $(man1_MANS) \
 rpm:	    dist $(distdir).tar.gz
 	rpm -ta $(distdir).tar.gz
 
-TESTS=t.score1 t.score2 t.lock1 t.skel
+TESTSCRIPTS=t.score1 t.score2 t.lock1 t.skel
+TESTS=$(TESTSCRIPTS)
 XFAIL_TESTS=t.skel

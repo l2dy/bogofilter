@@ -1,6 +1,6 @@
 #! /bin/sh
 
-. ./t.frame
+. ${srcdir}/t.frame
 # make sure that an uninitialized data base will not lead to bogus
 # spam qualifications
 # ensure that "nonspam" exits with code 1
