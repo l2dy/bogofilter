@@ -94,13 +94,13 @@ if ( $dir ) {
 
 sub convert_format_A() {  
   my $msg_count = $1;
-  my @cmd = ($bogoutil,$yday,'-l',$out);
-  open(OUT, "|-", @cmd) or die "Cannot run command \"@cmd\": $!\n";
+  my $cmd = "$bogoutil $yday -l $out";
+  open(OUT, "| $cmd") or die "Cannot run command \"$cmd\": $!\n";
   while(<F>){
     print OUT $_;
   }
   print OUT "$msg_count_token $msg_count\n";
-  close(OUT) or die "Error executing command \"@cmd\": $!\n";
+  close(OUT) or die "Error executing command \"$cmd\": $!\n";
   close(F);
 }
 
@@ -115,12 +115,12 @@ sub convert_format_B() {
     exit;
   }
 
-  my @cmd = ($bogoutil,$yday,'-l',$out);
-  open(OUT, "|-", @cmd) or die "Cannot run command [@cmd]: $!\n";
+  my $cmd = "$bogoutil $yday -l $out";
+  open(OUT, "| $cmd") or die "Cannot run command \"$cmd\": $!\n";
 
   close(F);
-  @cmd = ($bogoutil,$yday,'-d',$in_db);
-  open(F, "-|", @cmd) or die "Cannot run command [@cmd]: $!\n";
+  $cmd = "$bogoutil $yday -d $in_db";
+  open(F, "$cmd |") or die "Cannot run command \"$cmd\": $!\n";
 
   while(<F>){
     if (m/^\.count\s+(\d+)$/){
@@ -145,17 +145,17 @@ sub convert_format_B() {
 sub cvt2to1_get($$) {
     my ($filename, $format) = @_;
     my @tmp;
-    my @cmd;
+    my $cmd;
 
     die "need array context in cvs2to1_get" unless wantarray;
-    @cmd = ($bogoutil, '-d', $filename);
-    open I, "-|", @cmd or die "cannot run \"@cmd\": $!";
+    $cmd = "$bogoutil -d $filename";
+    open(I, "$cmd |") or die "cannot run \"$cmd\": $!";
     while (<I>) {
 	chomp;
 	my @a = split;
 	push @tmp, sprintf($format, $a[0], $a[1], $a[2]);
     }
-    close I or die "error running \"@cmd\": $!";
+    close I or die "error running \"$cmd\": $!";
     return @tmp;
 }
 
@@ -170,10 +170,10 @@ sub convert_double_to_single() {
 
     push @tmp, cvt2to1_get($spam, "%s %d 0 %d");
     push @tmp, cvt2to1_get($good, "%s 0 %d %d");
-    my @cmd = ($bogoutil, '-l', $word);
-    open O, "|-", @cmd or die "cannot run \"@cmd\": $!";
+    my $cmd = "$bogoutil -l $word";
+    open(O, "| $cmd") or die "cannot run \"$cmd\": $!";
     print O join("\n", sort @tmp), "\n";
-    close O or die "error executing \"@cmd\": $!";
+    close O or die "error executing \"$cmd\": $!";
 }
 
 exit(0);
