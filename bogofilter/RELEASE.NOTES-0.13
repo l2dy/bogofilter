@@ -1,7 +1,5 @@
 NOTE: Please also see the CHANGES-0.13 document for a detailed summary.
 
-NOTE: Read README.nonlinux if "make check" fails for you.
-
 With release 0.13, bogofilter's parsing has changed.  As background,
 Paul Graham has done work to improve the results of his bayesian
 filter and has published them in "Better Bayesian Filtering" at
