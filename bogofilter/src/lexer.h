@@ -59,7 +59,6 @@ extern token_t	lexer_v3_lex(void);
 extern int	lexer_v3_leng;
 extern char   * lexer_v3_text;
 extern void	lexer_v3_init(FILE *fp);
-extern void	lexer_set_debug(int v);
 
 /* in lexer_v4.l */
 extern token_t	lexer_v4_lex(void);
