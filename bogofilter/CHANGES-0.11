@@ -5,7 +5,7 @@
 $Id$
      
 	2003-03-06
-	* Fixed bogoutil's broken maintenance modee.
+	* Fixed bogoutil's broken maintenance mode.
 	* Update bogofilter documentation and FAQ.
 
 0.11.1.1
@@ -30,7 +30,7 @@ $Id$
 	  modifier for Subject: line of a spam message.
 
 	2003-03-02
-	* Discarding of html comments is the standard action.  Removed
+	* Discarding of HTML comments is the standard action.  Removed
 	  code to enable/disable that action.
 
 	2003-03-01
@@ -46,7 +46,7 @@ $Id$
 
 	2003-02-26
 	* Database locking has been improved.
-	* Bogofilter's -p (passthrough) mode will no longer read the entire
+	* Bogofilter's -p (pass-through) mode will no longer read the entire
 	  mail into memory if the standard input is a seekable regular file.
 
 	2003-02-25
@@ -77,7 +77,7 @@ $Id$
 	2003-02-09
 	* Manual pages now contain the proper path to bogofilter.cf.
 	* Added options '-D' and '-T' to support testing.
-	* Improvements in html comment handling code.
+	* Improvements in HTML comment handling code.
 
 	2003-02-07
 	* Internal cleanup of storage used in parsing messages and
@@ -90,4 +90,4 @@ $Id$
 	* Added support for setting BerkeleyDB cache size.
 
 	2003-02-03
-	* Corrected defect in killing of html comments.
+	* Corrected defect in killing of HTML comments.
