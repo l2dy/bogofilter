@@ -13,7 +13,7 @@
 <refsynopsisdiv id='synopsis'>
 
 <cmdsynopsis>
-  <command>bogofilter</command>
+  <command>bogoupgrade</command>
   <arg choice='plain'>-i <replaceable>input file</replaceable></arg>
   <arg choice='plain'>-o <replaceable>output file</replaceable></arg>
   <arg choice='opt'>-b <replaceable>path to bogoutil</replaceable></arg>
@@ -24,9 +24,40 @@
 
 <refsect1 id='description'><title>DESCRIPTION</title>
 <para><command>bogoupgrade</command> is a command to upgrade
-<application>bogofilter</application>'s databases to the latest version. Since
-the format of the database changes once in a while, the utility is designed to 
-make the upgrade easy.</para>
+<application>bogofilter</application>'s databases from (before version 0.7.5)
+to a version compatible with 0.7.5+. Since the format of the database changes
+once in a while, the utility is designed to make the upgrade easy.</para>
+</refsect1>
+
+<refsect1 id='upgrading'><title>UPGRADING</title>
+<para>Follow these instructions to upgrade
+<application>bogofilter</application>'s databases to the latest version.</para>
+
+<orderedlist>
+<listitem><para>Stop all instances of bogofilter. While the upgrade tools lock
+the database files, the upgrade may take a long time if you have a busy site.
+Don't forget to stop cron jobs or daemons that fetch and process mail and could
+fire off bogofilter.</para></listitem>
+
+<listitem><para>Backup your data. Let's assume that you said:</para>
+<screen>
+<prompt>$</prompt> <userinput>mv ~/.bogofilter ~/.bogofilter.safe</userinput>
+<prompt>$</prompt> <userinput>mkdir ~/.bogofilter</userinput>
+</screen></listitem>
+<listitem><para>If your bogofilter version is less than 0.7, say:</para>
+<screen>
+<prompt>$</prompt> <userinput>/usr/bin/bogoupgrade -b /usr/bin/bogoutil -i ~/.bogofilter.safe/goodlist -o ~/.bogofilter/goodlist.db</userinput>
+<prompt>$</prompt> <userinput>/usr/bin/bogoupgrade -b /usr/bin/bogoutil -i ~/.bogofilter.safe/badlist -o ~/.bogofilter/spamlist.db</userinput>
+</screen>
+<para>If your bogofilter version is 0.7 or greater, say:</para>
+<screen>
+<prompt>$</prompt> <userinput>/usr/bin/bogoupgrade -b /usr/bin/bogoutil -i ~/.bogofilter.safe/hamlist.count -o ~/.bogofilter/goodlist.db</userinput>
+<prompt>$</prompt> <userinput>/usr/bin/bogoupgrade -b /usr/bin/bogoutil -i ~/.bogofilter.safe/spamlist.count -o ~/.bogofilter/spamlist.db</userinput>
+</screen></listitem>
+
+<listitem><para>Done. Restart any stopped daemons, cron tasks,
+etc.</para></listitem>
+</orderedlist>
 </refsect1>
 
 <refsect1 id='options'><title>OPTIONS</title>
