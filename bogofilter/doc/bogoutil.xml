@@ -137,7 +137,7 @@
 	    This is only supported when compiled with Berkeley DB
 	    support with transactions enabled. Trying recovery with QDBM or TDB support will
 	    result in an error.</para>
-	<para>The <option>-p <replaceable>dir</replaceable></option>
+	<para>The <option>-P <replaceable>dir</replaceable></option>
 	    option causes bogoutil to checkpoint the database
 	    environment and remove inactive log files.</para>
 	<para>The <option>-r <replaceable>dir</replaceable></option> option tells
