@@ -30,7 +30,7 @@
 
 #undef	HAVE_CHARSET
 
-#if	defined(ENABLE_ROBINSON_METHOD) && defined(ENABLE_GRAHAM_METHOD)
+#if	defined(ENABLE_GRAHAM_METHOD) && defined(ENABLE_ROBINSON_METHOD)
 #define	GRAHAM_AND_ROBINSON
 #endif
 
@@ -56,4 +56,3 @@ typedef struct {
 void build_path(char* dest, int size, const char* dir, const char* file);
 
 #endif
-
