@@ -1126,7 +1126,7 @@ static void final_recommendations(bool skip)
 		    fp += 1;
 	    }
 	    cutoff = ns_scores[fp-1];
-	    fpp = 100.0 * (ns_cnt - fp) / ns_cnt;
+	    fpp = 100.0 * fp / ns_cnt;
 	}
 
 	for (i = 0; i < sp_cnt; i += 1) {
