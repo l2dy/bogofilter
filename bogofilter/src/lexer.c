@@ -76,19 +76,18 @@ static void lexer_display_buffer(buff_t *buff)
 
 /*
  * Check for lines wholly composed of printable characters as they can
- * cause a scanner abort
- * "input buffer overflow, can't enlarge buffer because scanner uses
- * REJECT"
+ * cause a scanner abort "input buffer overflow, can't enlarge buffer
+ * because scanner uses REJECT"
  */
-static bool not_long_token(byte *buf, uint count)
+static bool long_token(byte *buf, uint count)
 {
     uint i;
     for (i=0; i < count; i += 1) {
        byte c = buf[i];
        if ((iscntrl(c) || isspace(c) || ispunct(c)) && (c != '_'))
-	   return true;
+	   return false;
     }
-    return false;
+    return true;
 }
 
 static int yy_get_new_line(buff_t *buff)
@@ -270,7 +269,7 @@ int yyinput(byte *buf, size_t used, size_t size)
 
        count += cnt;
 
-       if ((count <= (MAXTOKENLEN * 3 / 2)) || not_long_token(buff.t.text, (uint) count))
+       if ((count <= (MAXTOKENLEN * 3 / 2)) || ! long_token(buff.t.text, (uint) count))
 	   if (!nearly_full)
 	       break;
 
