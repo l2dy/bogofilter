@@ -7,28 +7,12 @@ CC = cc
 #CC = gcc
 
 
-# Define exactly one of the following two in order to use that database:
-
-USE_DB = qdbm
-#USE_DB = tdb
-
-
 # You might have to change the paths in the DBLIB and DBINCLUDE variables
 # to suit your configuration.
 
-ifeq (${USE_DB},qdbm)
 DBINCLUDE = ^.^.qdbm
 DBLIB = ^.^.qdbm.libqdbm
-DBSTORE = o.datastore_qdbm
-else
-ifeq (${USE_DB},tdb)
-DBINCLUDE = ^.^.tdb
-DBLIB = ^.^.tdb.libtdb
-DBSTORE = o.datastore_tdb
-else
-# No other database supported!
-endif
-endif
+
 
 #########################################
 # DO NOT EDIT ANYTHING BELOW THIS LINE! #
@@ -40,7 +24,7 @@ CC = cc
 LD = link
 AR = libfile
 DEPEND = -depend !Depend
-CC_FLAGS = -Wpc -zo -fw -throwback -Otime -I@,^,^.^,$(DBINCLUDE),Unix: -JUnix: -D__riscos__ -DHAVE_CONFIG_H
+CC_FLAGS = -Wpc -zo -fw -throwback -Otime -I@,^,^.^,$(DBINCLUDE),Unix: -JUnix: -D__riscos__ -DHAVE_CONFIG_H -zpq262144
 UNIXLIB = Unix:o.UnixLib
 else
 ifeq (${CC},gcc)
@@ -67,7 +51,7 @@ COMMON_OBJS = o.base64 \
 	o.collect \
 	o.configfile \
 	o.datastore \
-	$(DBSTORE) \
+	o.datastore_qdbm \
 	o.debug \
 	o.degen \
 	o.directories \
@@ -127,6 +111,8 @@ BOGOWORDFREQ_OBJS = o.bogowordfreq
 
 CONFIGTEST_OBJS = o.configtest
 
+.PHONY:	all dist install clean
+
 .INIT:
 	@cdir o
 
@@ -141,12 +127,29 @@ CONFIGTEST_OBJS = o.configtest
 
 all: bogofilter bogolexer bogoutil bogowordfreq configtest
 
+dist: all
+	-cdir <Bogofilter$Dir>.docs
+	-copy ^.AUTHORS <Bogofilter$Dir>.docs.* ~CF~V
+	-copy ^.COPYING <Bogofilter$Dir>.docs.* ~CF~V
+	-copy ^.NEWS <Bogofilter$Dir>.docs.* ~CF~V
+	-copy ^.doc.bogofilter-faq/html <Bogofilter$Dir>.docs.* ~CF~V
+	-copy ^.doc.bogofilter/htmlin <Bogofilter$Dir>.docs.bogofilter/html ~CF~V
+	-copy ^.doc.bogolexer/htmlin <Bogofilter$Dir>.docs.bogolexer/html ~CF~V
+	-copy ^.doc.bogoutil/htmlin <Bogofilter$Dir>.docs.bogoutil/html ~CF~V
+	-settype <Bogofilter$Dir>.docs.AUTHORS Text
+	-settype <Bogofilter$Dir>.docs.COPYING Text
+	-settype <Bogofilter$Dir>.docs.NEWS Text
+	-settype <Bogofilter$Dir>.docs.bogofilter-faq/html HTML
+	-settype <Bogofilter$Dir>.docs.bogofilter/html HTML
+	-settype <Bogofilter$Dir>.docs.bogolexer/html HTML
+	-settype <Bogofilter$Dir>.docs.bogoutil/html HTML
+
 install: bogofilter bogolexer bogoutil bogowordfreq configtest
-	-copy bogofilter <Bogofilter$Dir>.bogofilter ~CF~N~V
-	-copy bogolexer <Bogofilter$Dir>.bogolexer ~CF~N~V
-	-copy bogoutil <Bogofilter$Dir>.bogoutil ~CF~N~V
-	-copy bogowordfreq <Bogofilter$Dir>.bogowordfreq ~CF~N~V
-	-copy configtest <Bogofilter$Dir>.configtest ~CF~N~V
+	-copy bogofilter <Bogofilter$Dir>.* ~CF~V
+	-copy bogolexer <Bogofilter$Dir>.* ~CF~V
+	-copy bogoutil <Bogofilter$Dir>.* ~CF~V
+	-copy bogowordfreq <Bogofilter$Dir>.* ~CF~V
+	-copy configtest <Bogofilter$Dir>.* ~CF~V
 
 libbogo: $(COMMON_OBJS)
 	$(AR) $(AR_FLAGS) -c -o $@ $(COMMON_OBJS)
@@ -172,12 +175,12 @@ configtest: libbogo $(CONFIGTEST_OBJS) $(DBLIB)
 	$(LD) $(LD_FLAGS) -o $@ $(CONFIGTEST_OBJS) libbogo $(DBLIB) $(UNIXLIB)
 
 clean:
-	-ifthere bogofilter then wipe bogofilter ~CFR~V
-	-ifthere bogolexer then wipe bogolexer ~CFR~V
-	-ifthere bogoutil then wipe bogoutil ~CFR~V
-	-ifthere bogowordfreq then wipe bogowordfreq ~CFR~V
-	-ifthere configtest then wipe configtest ~CFR~V
-	-ifthere libbogo then wipe libbogo ~CFR~V
-	-ifthere o.* then wipe o.* ~CFR~V
+	-ifthere bogofilter then wipe bogofilter ~CF~V
+	-ifthere bogolexer then wipe bogolexer ~CF~V
+	-ifthere bogoutil then wipe bogoutil ~CF~V
+	-ifthere bogowordfreq then wipe bogowordfreq ~CF~V
+	-ifthere configtest then wipe configtest ~CF~V
+	-ifthere libbogo then wipe libbogo ~CF~V
+	-ifthere o.* then wipe o.* ~CF~V
 
 # Dynamic dependencies:
