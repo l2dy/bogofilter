@@ -130,10 +130,12 @@ void *ds_open(void *dbe, const char *path, const char *name, dbmode_t open_mode)
 
     dsh = dsh_init(v);
 
-    if (db_created(v) && ! (open_mode & DS_LOAD)) {
+    if (!(open_mode & DS_LOAD)) {
 	if (DST_OK != ds_txn_begin(dsh))
 	    exit(EX_ERROR);
-	ds_set_wordlist_version(dsh, NULL);
+	if (db_created(v)) {
+	    ds_set_wordlist_version(dsh, NULL);
+	}
 	if (ds_txn_commit(dsh))
 	    exit(EX_ERROR);
     }
