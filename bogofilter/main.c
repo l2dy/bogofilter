@@ -193,9 +193,10 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 		    if (fflush(stdout) || ferror(stdout)) exit(2);
 		}
 
-		exitcode = status;
+		exitcode = (status == RC_SPAM) ? 0 : 1;
 		if (nonspam_exits_zero && passthrough && exitcode == 1)
 		    exitcode = 0;
+
 		format_log_header(msg_bogofilter, sizeof(msg_bogofilter));
 	    }
 	    break;
