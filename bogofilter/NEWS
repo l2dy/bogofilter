@@ -22,6 +22,10 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-03-07
+
+	* Fixed query_config ('-Q') option.
+
 0.94.0	2005-03-05
 
 	Default mode is transactions disabled for Berkeley DB.

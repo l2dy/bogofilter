@@ -78,8 +78,10 @@ rc_t bogofilter(int argc, char **argv)
 
     wordhash_t *words;
 
-    if (query)
+    if (query) {
+	score_initialize();	/* initialize constants */
 	return query_config();
+    }
 
     words = register_aft ? wordhash_new() : NULL;
 
