@@ -276,7 +276,7 @@ static void print_all_parms(void)
 	print_parms("mdval", "%5.3f", mdval);
     }
     else if (verbose >= TIME)
-	printf("cnt: %u (rs: %u, rx: %u, md: %u)\n",
+	printf("cnt: %d ( rs: %d, rx: %d, md: %d )\n",
 	       rsval->cnt * rxval->cnt * mdval->cnt,
 	       rsval->cnt, rxval->cnt, mdval->cnt);
 }

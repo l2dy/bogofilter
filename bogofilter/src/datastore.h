@@ -71,7 +71,7 @@ typedef struct {
 typedef int ds_foreach_t(word_t *token, dsv_t *data, void *userdata);
 extern int ds_foreach(void *, ds_foreach_t *hook, void *userdata);
 
-/** Wrapper for ds_foreach that opens and closes file */
+/* Wrapper for ds_foreach that opens and closes file */
 extern int ds_oper(const char *path, dbmode_t open_mode, 
 		   ds_foreach_t *hook, void *userdata);
 
@@ -142,5 +142,144 @@ extern int ds_lock(int fd, int cmd, short int type);
 
 /* Returns version string */
 extern const char *ds_version_str(void);
+
+#if	0
+/** Initialize database, open and lock files, etc.
+ * params: char * path to database file, char * name of database
+ * \return opaque pointer to database handle, which must be saved and
+ * passed as the first parameter in all subsequent database function calls. 
+ */
+/*@only@*/ /*@null@*/
+extern __inline
+void *ds_open(const char *path	/** path to database file */, 
+	      const char *name	/** name(s) of data base(s) */,
+	      dbmode_t mode	/** open mode, DB_READ or DB_WRITE */)
+{
+    return *db_open(const char *path	/** path to database file */, 
+	      const char *name		/** name of data base	  */,
+		    dbmode_t mode	/** open mode, DB_READ or DB_WRITE */);
+}
+
+/** Close file and clean up. */
+extern __inline 
+void  ds_close(/*@only@*/ void *, bool nosync  /** Normally false, if true, do not synchronize data. This should not be used in regular operation but only to ease the disk I/O load when the lock operation failed. */)
+{
+    return  db_close(/*@only@*/ void *, bool nosync  /** Normally false, if true, do not synchronize data. This should not be used in regular operation but only to ease the disk I/O load when the lock operation failed. */)
+}
+
+/** Flush pending writes to disk */
+extern __inline 
+void ds_flush(void *vhandle)
+{
+    return db_flush(void *vhandle)
+}
+
+/** Cleanup storage allocation */
+extern __inline 
+void ds_cleanup(void)
+{
+    return db_cleanup(void)
+}
+
+/** Retrieve the value associated with a given word in a list. 
+ * \return zero if the word does not exist in the database. Front-end
+ */
+extern __inline 
+bool ds_getvalues(void *vhandle, const dbv_t *, dbv_t *)
+{
+    return db_getvalues(void *vhandle, const dbv_t *, dbv_t *)
+}
+
+/** Retrieve the value associated with a given word in a list. 
+ * \return zero if the word does not exist in the database. Implementation
+ */
+extern __inline 
+int ds_get_dbvalue(void *vhandlevhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
+{
+    return db_get_dbvalue(void *vhandlevhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
+}
+
+/** Delete the key */
+extern __inline 
+int ds_delete(void *vhandle, const dbv_t *)
+{
+    return db_delete(void *vhandle, const dbv_t *)
+}
+
+/** Set the value associated with a given word in a list. Front end */
+extern __inline 
+int ds_setvalues(void *vhandle, const dbv_t *, dbv_t *)
+{
+    return db_setvalues(void *vhandle, const dbv_t *, dbv_t *)
+}
+
+/** Set the value associated with a given word in a list. Implementation */
+extern __inline 
+int ds_set_dbvalue(void *vhandlevhandle, const dbv_t *token, dbv_t *val)
+{
+    return db_set_dbvalue(void *vhandlevhandle, const dbv_t *token, dbv_t *val)
+}
+
+/** Update the value associated with a given word in a list */
+extern __inline 
+void ds_updvalues(void *vhandlevhandle, const dbv_t *token, const dbv_t *updval)
+{
+    return db_updvalues(void *vhandlevhandle, const dbv_t *token, const dbv_t *updval)
+}
+
+/** Get the database message count */
+extern __inline 
+void ds_get_msgcounts(void*, dbv_t *)
+{
+    return db_get_msgcounts(void*, dbv_t *)
+}
+
+/** set the database message count */
+extern __inline 
+void ds_set_msgcounts(void*, dbv_t *)
+{
+    return db_set_msgcounts(void*, dbv_t *)
+}
+
+/** Iterate over all elements in data base and call \p hook for each item.
+ * \p userdata is passed through to the hook function unaltered.
+ */
+typedef int (*db_foreach_t)(dbv_t *token, dbv_t *data, void *userdata);
+extern __inline 
+int ds_foreach(void *vhandle, db_foreach_t hook, void *userdata)
+{
+    return db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
+}
+
+/* Get the database filename */
+extern __inline 
+char *ds_handle_filename(void *vhandle)
+{
+    return *db_handle_filename(void *vhandle)
+}
+
+/* Locks and unlocks file descriptor */
+extern __inline 
+int ds_lock(int fd, int cmd, short int type)
+{
+    return db_lock(int fd, int cmd, short int type)
+}
+
+/* Returns version string */
+extern __inline 
+const char *ds_version_str(void)
+{
+    return char *db_version_str(void)
+}
+
+#endif
+
+/* This is not currently used ...
+ * 
+#define db_write_lock(fd) db_lock(fd, F_SETLKW, F_WRLCK)
+#define db_read_lock(fd) db_lock(fd, F_SETLKW, F_RDLCK)
+#define db_unlock(fd) db_lock(fd, F_SETLK, F_UNLCK)
+
+*/
 
 #endif
