@@ -32,7 +32,7 @@ main (void)
   char buf[100];
   word_t *w;
 
-  while (scanf ("%s", buf) != EOF)
+  while (scanf ("%.99s", buf) != EOF)
     {
       w = wordhash_insert (h, buf, sizeof (word_t), &word_init);
       w->count++;
