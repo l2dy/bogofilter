@@ -38,6 +38,8 @@ extern	rc_t	msg_status(void);
 extern	void	msg_print_stats(FILE *fp);
 extern	void	msg_print_summary(void);
 
+extern	 void	print_summary(void);
+
 /* needed by degen.c */
 extern	double	msg_lookup_and_score(const word_t *token, wordcnts_t *cnts);
 

@@ -41,7 +41,6 @@ NAME:
 
 /* Function Prototypes */
 
-	 void	print_summary(void);
 static	double	get_spamicity(size_t robn, FLOAT P, FLOAT Q);
 
 /* Global Variables */
