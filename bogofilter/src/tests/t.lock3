@@ -36,7 +36,7 @@ pid=
 if [ $verbose -gt 0 ] ; then echo "#### Part 2 ####" ; fi
 for I in $seq ; do
     (   set +e
-	$BOGOFILTER $OPTS -u -p -I ${srcdir}/inputs/spam.mbx >> ${TMPDIR}.$I.out
+	$BOGOFILTER $OPTS -u -p -I ${srcdir}/inputs/spam.mbx >> ${TMPDIR}/$I.out
 	echo $? >>$TMPDIR/exits
     ) &
     pid="$pid $!"
