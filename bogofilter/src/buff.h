@@ -30,5 +30,7 @@ extern buff_t  *buff_dup(const buff_t *t);
 extern int 	buff_cmp(const buff_t *t1, const buff_t *t2);
 extern void 	buff_puts(const buff_t *t, FILE *fp);
 
+extern void 	buff_shift(buff_t *t, byte *start, size_t length);
+
 #endif	/* BUFF_H */
 
