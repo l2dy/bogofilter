@@ -5,7 +5,7 @@
 #	test the registration options, i.e. '-s', '-n', '-S', and '-N'
 
 # Note:  When run via "make check", test output files are automatically deleted.
-#	 When run from the command line, outputs files are left in directory
+#	 When run from the command line, output files are left in directory
 #	 regtest.YYYYMMDD.  This is useful when something is different.
 #
 #	 ./inputs  - test inputs
