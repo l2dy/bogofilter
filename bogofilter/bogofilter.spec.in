@@ -119,6 +119,7 @@ done
 %doc doc/integrating-with-postfix
 %doc doc/integrating-with-qmail
 %doc doc/programmer
+%doc doc/README.tdb
 %doc .inst/html .inst/xml
 
 %{_datadir}/%{name}/contrib/*
