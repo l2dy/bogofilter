@@ -53,7 +53,11 @@ static void lexer_display_buffer(buff_t *buff)
 
 bool is_from(word_t *w)
 {
-    return (w->leng >= 5 && memcmp(w->text, "From ", 5) == 0);
+    if (w->leng >= 5 && memcmp(w->text, "From ", 5) == 0)
+	return true;
+    if (w->leng >= 16 && memcmp(w->text, "Mail-from: From ", 16) == 0)
+	return true;
+    return false;
 }
 
 static bool check_alphanum(byte *buf, size_t count)

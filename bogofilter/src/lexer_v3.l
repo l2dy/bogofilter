@@ -155,7 +155,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
 %%
 
-^Mail-From:\ From\ 			|
+^Mail-From:\ From\ 				|
 ^From\ 						{ if (msg_header && is_from(yy_text())) { 
 						      BEGIN(INITIAL); return FROM;
 						  } else { 
