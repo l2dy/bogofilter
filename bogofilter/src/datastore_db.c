@@ -258,13 +258,20 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 
     check_db_version();
 
-    if (open_mode == DB_READ)
+    switch (open_mode)
+    {
+    case DS_READ:
 	opt_flags = DB_RDONLY;
-    else
+	break;
+    case DS_CREATE:
+	opt_flags = DB_CREATE | DB_EXCL;
+	break;
+    default:
 	/* Read-write mode implied.  Allow database to be created if
 	 * necessary. DB_EXCL makes sure our locking doesn't fail if two
 	 * applications try to create a DB at the same time. */
 	opt_flags = 0;
+    }
 
     /* retry when locking failed */
     for (idx = 0; idx < COUNTOF(retryflags); idx += 1)
@@ -363,7 +370,7 @@ retry_db_open:
 
 	/* try fcntl lock */
 	if (db_lock(handle->fd, F_SETLK,
-		    (short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
+		    (short int)(open_mode == DS_READ ? F_RDLCK : F_WRLCK)))
 	{
 	    int e = errno;
 	    db_close(handle, true);

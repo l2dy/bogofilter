@@ -83,7 +83,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     int open_flags;
     TDB_CONTEXT *dbp;
 
-    if (open_mode == DB_WRITE) {
+    if (open_mode == DS_WRITE) {
 	open_flags = O_RDWR | O_CREAT;
     }
     else {
@@ -105,7 +105,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "(db) tdb_open( %s ), %d )\n", handle->name, open_mode);
       
-    if (open_mode == DB_WRITE) {
+    if (open_mode == DS_WRITE) {
 	if (tdb_lockall(dbp) == 0) {
 	    handle->locked = 1;
 	}

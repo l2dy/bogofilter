@@ -171,7 +171,7 @@ int maintain_wordlist_file(const char *db_file)
     bool done = false;
 
     ds_init();
-    dsh = ds_open(CURDIR_S, db_file, DB_WRITE);
+    dsh = ds_open(CURDIR_S, db_file, DS_WRITE);
 
     if (dsh == NULL)
 	return EX_ERROR;

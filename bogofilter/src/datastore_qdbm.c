@@ -95,7 +95,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     int flags;
     DEPOT *dbp;
 
-    if (open_mode == DB_WRITE)
+    if (open_mode == DS_WRITE)
 	flags = DP_OWRITER | DP_OCREAT;
     else
 	flags = DP_OREADER;

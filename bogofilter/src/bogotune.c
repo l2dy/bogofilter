@@ -954,7 +954,7 @@ static void load_wordlist(ds_foreach_t *hook, void *userdata)
     }
 
     ds_init();
-    ds_oper(ds_path, DB_READ, hook, userdata);
+    ds_oper(ds_path, DS_READ, hook, userdata);
     ds_cleanup();
 
     return;
