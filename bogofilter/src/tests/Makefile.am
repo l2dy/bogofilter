@@ -2,11 +2,12 @@
 
 SUBDIRS=. bogoutil bogofilter
 
-check_PROGRAMS=dehex spam_header_name dumbhead deqp deb64
+check_PROGRAMS=dehex spam_header_name dumbhead deqp deb64 escnp
 dehex_SOURCES=dehex.c
 dumbhead_SOURCES=dumbhead.c
 deqp_SOURCES=deqp.c
 deb64_SOURCES=deb64.c
+escnp_SOURCES=escnp.c
 spam_header_name_SOURCES=spam_header_name.c
 
 AM_CPPFLAGS = -I$(srcdir)/..
@@ -15,7 +16,7 @@ LDADD = -lbogofilter
 
 TESTSCRIPTS=t.env \
 	    t.ignore_spam_header \
-	    t.integrity t.integrity2 \
+	    t.integrity t.integrity2 t.integrity3 \
 	    t.lexer \
 	    t.lock1 t.lock2 \
 	    t.nullstatsprefix \
