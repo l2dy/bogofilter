@@ -693,6 +693,11 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
 	item->wh = NULL;
     }
 
+    if (verbose > 1)
+	printf("%s:  train_count = %d, score_count = %d\n",  
+	       good ? "ns" : "sp",
+	       train_count, score_count);
+
     return;
 }
 
