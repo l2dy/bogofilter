@@ -4,8 +4,10 @@
 
 $Id$
 
-0.13.0	2003-05-20
+0.13.0	2003-05-21
+
 	* Added file RELEASE.NOTES-0.13.  Read it!!!
+
 	* Bogofilter now recognizes a line composed of whitespace
 	  characters as the end of the message header and creates
 	  special token "spc:invalid_end_of_header" for it.
