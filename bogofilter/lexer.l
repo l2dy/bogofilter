@@ -47,9 +47,6 @@
  * The list of HTML keywords and attributes to be ignored is from the 4.0 DTD.
  */
 
-/* ignore words longer than this */
-#define MAXWORDLEN 20
-
 extern char *spam_header_name;
 
 bool block_on_subnets = false;
@@ -395,7 +392,7 @@ token_t get_token(void)
 	}
 
 	/* eat all long words */
-	if (yyleng <= MAXWORDLEN)
+	if (yyleng <= MAXTOKENLEN)
 	    break;
     }
 
