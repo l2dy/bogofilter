@@ -378,6 +378,14 @@ bool ds_get_wordlist_version(void *vhandle, dsv_t *val)
 void ds_set_wordlist_version(void *vhandle, dsv_t *val)
 {
     dsh_t *dsh = vhandle;
+    dsv_t  tmp;
+
+    if (val == NULL)
+    {
+	val = &tmp;
+	val->count[0] = CURRENT_VERSION;
+	val->count[1] = 0;
+    }
 
     val->date = today;
 
