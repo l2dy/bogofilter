@@ -54,10 +54,12 @@ struct textblock textblocks;
 
 #define YY_INPUT(buf,result,max_size) result = yyinput(buf, max_size)
 
+#define YY_DECL token_t yylex(void)
+
 char *yylval;
 static char alt_text[MAXTOKENLEN];
 static int past_header;
-static int yyinput(unsigned char *buf, int max_size);
+static int yyinput(char *buf, int max_size);
 
 %}
 
@@ -268,7 +270,7 @@ int lexer_fgets(char *buf, int max_size, FILE *s)
 	return(cp - buf);
 }
 
-static int yyinput(unsigned char *buf, int max_size)
+static int yyinput(char *buf, int max_size)
 /* input getter for the scanner */
 {
     int returned;
@@ -332,7 +334,7 @@ token_t get_token(void)
 
     alt_text[0] = 0;
 
-    while ((class = (token_t) yylex()) > 0) {
+    while ((class = yylex()) > 0) {
 	/* when we have a boundary line, eliminate the distinction between
 	 * start and end boundary, chopping of the distinct trailing -- of
 	 * the end boundary. */
@@ -349,7 +351,7 @@ token_t get_token(void)
     }
 
     for (cp = yytext; *cp; cp++)
-	*cp = tolower(*cp);
+	*cp = tolower((unsigned char)*cp);
 
     yylval = (alt_text[0] ? alt_text : yytext);
     return(class);
