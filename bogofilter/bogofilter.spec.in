@@ -2,7 +2,7 @@
 
 %define	name	@PACKAGE@
 %define	version	@VERSION@
-%define	release	2
+%define	release	1
 
 Summary:	Fast anti-spam filtering by Bayesian statistical analysis
 Name:		%{name}
@@ -108,7 +108,7 @@ done
 %defattr(-,root,root)
 
 %doc AUTHORS CHANGES* COPYING INSTALL METHODS
-%doc NEWS README* RELEASE.NOTES* TODO UPGRADE
+%doc NEWS README* RELEASE.NOTES* TODO
 %doc doc/bogofilter-tuning.HOWTO
 %doc doc/bogofilter-SA-2002-01
 %doc doc/integrating*
@@ -136,7 +136,7 @@ done
 %defattr(-,root,root)
 
 %doc AUTHORS CHANGES* COPYING INSTALL METHODS
-%doc NEWS README* RELEASE.NOTES* TODO UPGRADE
+%doc NEWS README* RELEASE.NOTES* TODO
 %doc doc/bogofilter-tuning.HOWTO
 %doc doc/bogofilter-SA-2002-01
 %doc doc/integrating*

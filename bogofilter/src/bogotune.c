@@ -728,8 +728,10 @@ static void write_msgcount_file(wordhash_t *wh)
 
     wordhash_sort(wh);
 
+#ifdef	ENABLE_DEPRECATED_CODE
     if (degen_enabled || header_degen)
 	wordhash_degen(wh, train);
+#endif
 
     for (hn = wordhash_first(wh); hn != NULL; hn = wordhash_next(wh)) {
 	word_t *token = hn->key;
@@ -843,7 +845,6 @@ static int process_args(int argc, char **argv)
 		case 'V':
 		    print_version();
 		    exit(EX_OK);
-
 		default:
 		    help();
 		    exit(EX_ERROR);

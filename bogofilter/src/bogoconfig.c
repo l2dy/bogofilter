@@ -66,7 +66,9 @@ const char *logtag = NULL;
 #define AL_DEFAULT AL_FISHER
 
 enum algorithm_e {
+#ifdef	ENABLE_DEPRECATED_CODE
     AL_GRAHAM='g',
+#endif
     AL_ROBINSON='r',
     AL_FISHER='f'
 };
@@ -128,19 +130,22 @@ const parm_desc sys_parms[] =
     { "charset_default",  	     CP_STRING,  { &charset_default } },
     { "timestamp",		     CP_BOOLEAN, { (void *) &timestamp_tokens } },
     { "replace_nonascii_characters", CP_BOOLEAN, { (void *) &replace_nonascii_characters } },
+
+#ifdef	ENABLE_DEPRECATED_CODE
     { "header_line_markup", 	     CP_BOOLEAN, { (void *) &header_line_markup } },
     { "strict_check", 	  	     CP_BOOLEAN, { (void *) &strict_check } },
-
     { "header_degen",		     CP_BOOLEAN, { (void *) &header_degen } }, 
     { "degen_enabled",		     CP_BOOLEAN, { (void *) &degen_enabled } }, 
     { "first_match",		     CP_BOOLEAN, { (void *) &first_match } }, 
-
     { "ignore_case", 	  	     CP_BOOLEAN, { (void *) &ignore_case } },
     { "tokenize_html_tags",	     CP_BOOLEAN, { (void *) &tokenize_html_tags } },
     { "tokenize_html_script",	     CP_BOOLEAN, { (void *) &tokenize_html_script } },	/* Not yet in use */
+#endif
 
     { "db_cachesize",	  	     CP_INTEGER, { (void *) &db_cachesize } },
+#ifdef	ENABLE_DEPRECATED_CODE
     { "wordlist_mode",	  	     CP_WORDLIST,{ (void *) &wl_mode } },
+#endif
     { "terse",	 	  	     CP_BOOLEAN, { (void *) &terse } },
 
     { NULL,		  	     CP_NONE,	 { (void *) NULL } },
@@ -152,10 +157,12 @@ void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
     process_config_files(warn_on_error);
     process_args_2(argc, argv);
 
+#ifdef	ENABLE_DEPRECATED_CODE
     if (!twostate && !threestate) {
 	twostate = ham_cutoff < EPS;
 	threestate = !twostate;
     }
+#endif
 
     /* directories from command line and config file are already handled */
 
@@ -229,9 +236,11 @@ static bool select_algorithm(const unsigned char ch, bool cmdline)
 
     switch (al)
     {
+#ifdef	ENABLE_DEPRECATED_CODE
     case AL_GRAHAM:
 	method = (method_t *) &graham_method;
 	break;
+#endif
     case AL_ROBINSON:
 	method = (method_t *) &rf_robinson_method;
 	break;
@@ -290,8 +299,12 @@ static void help(void)
 		  "\t  -p      - passthrough.\n"
 		  "\t  -e      - in -p mode, exit with code 0 when the mail is not spam.\n"
 		  "\t  -u      - classify message as spam or non-spam and register accordingly.\n"
+#ifdef	ENABLE_DEPRECATED_CODE
 		  "\t  -2      - set binary classification mode (yes/no).\n"
-		  "\t  -3      - set ternary classification mode (yes/no/unsure).\n");
+		  "\t  -3      - set ternary classification mode (yes/no/unsure).\n"
+#endif
+	);
+#ifdef	ENABLE_DEPRECATED_CODE
     (void)fprintf(stderr, "%s",
 		  "\t  -H      - enables combined counts for tagged header tokens.\n"
 		  "\t  -P {opts} - set html processing flag(s).\n"
@@ -313,6 +326,7 @@ static void help(void)
 		  "\t      S   - enables  combined counts for related tokens.\n"
 		  */
 		 );
+#endif
     (void)fprintf(stderr, "%s",
 		  "\t  -M      - set mailbox mode.  Classify multiple messages in an mbox formatted file.\n"
 		  "\t  -b      - set streaming bulk mode. Process multiple messages whose filenames are read from STDIN.\n"
@@ -332,16 +346,20 @@ static void help(void)
 		  "\t  -C      - don't read standard config files.\n"
 		  "\t  -d path - specify directory for wordlists.\n"
 		  "\t  -k size - set BerkeleyDB cache size (MB).\n"
-		  "\t  -W      - use combined wordlist%s for spam and ham tokens.\n"
+#ifdef	ENABLE_DEPRECATED_CODE
+		  "\t  -W      - use combined wordlist for spam and ham tokens.\n"
 		  "\t  -WW     - use separate wordlists for spam and ham tokens.\n"
+#endif
 		  "\t  -l      - write messages to syslog.\n"
 		  "\t  -L tag  - specify the tag value for log messages.\n"
 		  "\t  -I file - read message from 'file' instead of stdin.\n"
-		  "\t  -O file - save message to 'file' in passthrough mode.\n",
-		  DB_EXT);
+		  "\t  -O file - save message to 'file' in passthrough mode.\n"
+		  );
     (void)fprintf(stderr, "%s",
 		  "\talgorithm options:\n"
+#ifdef	ENABLE_DEPRECATED_CODE
 		  "\t  -g      - select Graham spam calculation method.\n"
+#endif
 		  "\t  -r      - select Robinson spam calculation method.\n"
 		  "\t  -f      - select Fisher spam calculation method (default).\n"
 	);
@@ -370,11 +388,19 @@ static void help(void)
 
 static void print_version(void)
 {
+#ifndef	ENABLE_DEPRECATED_CODE
+    (void)fprintf(stderr,
+		  "%s version %s\n"
+		  "    Database: %s\n",
+		  progtype, version, ds_version_str());
+
+#else
     (void)fprintf(stderr,
 		  "%s version %s\n"
 		  "    Database: %s, %s\n",
 		  progtype, version, ds_version_str(),
 		  (wl_default == WL_M_SEPARATE) ? "separate" : "combined");
+#endif
 
     (void)fprintf(stderr,
 		  "Copyright (C) 2002 Eric S. Raymond\n\n"
@@ -387,11 +413,17 @@ static void print_version(void)
 		  PACKAGE);
 }
 
+#ifdef	ENABLE_DEPRECATED_CODE
 #define	G "g"
 #define	R "r"
 #define	F "f"
+#endif
 
+#ifndef	ENABLE_DEPRECATED_CODE
+#define	OPTIONS	":bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pqQRrsStTuUvVx:X:y:"
+#else
 #define	OPTIONS	":23bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pP:qQRrsStTuUvWVx:X:y:" G R F
+#endif
 
 /** These functions process command line arguments.
  **
@@ -426,11 +458,13 @@ void process_args_1(int argc, char **argv)
 #endif
 	switch(option)
 	{
+#ifdef	ENABLE_DEPRECATED_CODE
 	case '2':
 	case '3':
 	    twostate = option == '2';
 	    threestate = option == '3';
 	    break;
+#endif
 
 	case 'b':
 	    bulk_mode = B_STDIN;
@@ -463,9 +497,11 @@ void process_args_1(int argc, char **argv)
 	    select_algorithm(AL_FISHER, true);
 	    break;
 
+#ifdef	ENABLE_DEPRECATED_CODE
 	case 'g':
 	    select_algorithm(AL_GRAHAM, true);
 	    break;
+#endif
 
 	case 'h':
 	    help();
@@ -538,9 +574,11 @@ void process_args_1(int argc, char **argv)
 	    verbose++;
 	    break;
 
+#ifdef	ENABLE_DEPRECATED_CODE
 	case 'W':
 	    incr_wordlist_mode();
 	    break;
+#endif
 
 	case 'x':
 	    set_debug_mask( optarg );
@@ -613,8 +651,13 @@ void process_args_2(int argc, char **argv)
 	    break;
 	}
 
+
 	case 'H':
+#ifdef	ENABLE_DEPRECATED_CODE
 	    header_degen = true;
+#else
+	    header_line_markup = true;
+#endif
 	    break;
 
 	case 'k':
@@ -633,6 +676,7 @@ void process_args_2(int argc, char **argv)
 		printf("sc %6.4f, hc %6.4f\n", spam_cutoff, ham_cutoff);
 	    break;
 
+#ifdef	ENABLE_DEPRECATED_CODE
 	case 'P':
 	{
 	    char *s;
@@ -640,12 +684,12 @@ void process_args_2(int argc, char **argv)
 	    {
 		switch (*s)
 		{
-		case 'c': case 'C': strict_check       = *s == 'c';	break;	/* -Pc and -PC */
-		case 'i': case 'I': ignore_case        = *s == 'i';	break;	/* -Pi and -PI */
 		case 'h': case 'H': header_line_markup = *s == 'h'; 	break;	/* -Ph and -PH */
-		case 't': case 'T': tokenize_html_tags = *s == 't'; 	break;	/* -Pt and -PT */
 		case 'f': case 'F': first_match        = *s == 'f';	break;	/* -Pf and -PF */
 		case 'd': case 'D': degen_enabled      = *s == 'd';	break;	/* -Pd and -PD */
+		case 'c': case 'C': strict_check       = *s == 'c';	break;	/* -Pc and -PC */
+		case 'i': case 'I': ignore_case        = *s == 'i';	break;	/* -Pi and -PI */
+		case 't': case 'T': tokenize_html_tags = *s == 't'; 	break;	/* -Pt and -PT */
 #if	0
 		case 's': case 'S': separate_counts    = *s == 's';	break;	/* -Ps and -PS */
 #endif
@@ -656,6 +700,7 @@ void process_args_2(int argc, char **argv)
 	    }
 	    break;
 	}
+#endif
 
 	case 't':
 	    terse = true;
@@ -706,10 +751,12 @@ void query_config(void)
     fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "spam_cutoff", spam_cutoff, spam_cutoff);
     fprintf(stdout, "\n");
     fprintf(stdout, "%-17s = %s\n", "block_on_subnets",		YN(block_on_subnets));
+#ifdef	ENABLE_DEPRECATED_CODE
     fprintf(stdout, "%-17s = %s\n", "strict_check",		YN(strict_check));
     fprintf(stdout, "%-17s = %s\n", "ignore_case",		YN(ignore_case));
     fprintf(stdout, "%-17s = %s\n", "header_line_markup",	YN(header_line_markup));
     fprintf(stdout, "%-17s = %s\n", "tokenize_html_tags",	YN(tokenize_html_tags));
+#endif
     fprintf(stdout, "%-17s = %s\n", "replace_nonascii_characters", YN(replace_nonascii_characters));
     fprintf(stdout, "\n");
     fprintf(stdout, "%-17s = '%s'\n", "spam_header_name", spam_header_name);
@@ -725,7 +772,11 @@ void query_config(void)
 static void display_tag_array(const char *label, FIELD *array)
 {
     int i;
+#ifdef	ENABLE_DEPRECATED_CODE
     int count = twostate ? 2 : 3;
+#else
+    int count = (ham_cutoff < EPS) ? 2 : 3;
+#endif
     const char *s;
 
     fprintf(stdout, "%s =", label);

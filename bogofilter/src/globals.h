@@ -14,8 +14,10 @@ typedef int  bool;
 #endif
 
 /* command line options */
+#ifdef	ENABLE_DEPRECATED_CODE
 extern	bool	twostate;		/* '-2' */
 extern	bool	threestate;		/* '-3' */
+#endif
 extern	bulk_t	bulk_mode;		/* '-B' */
 extern	bool	suppress_config_file;	/* '-C' */
 extern	bool	nonspam_exits_zero;	/* '-e' */
@@ -31,7 +33,9 @@ extern	int	Rtable;			/* '-R' */
 extern	bool	terse;			/* '-t' */
 extern	int	bogotest;		/* '-X', env("BOGOTEST") */
 extern	int	verbose;		/* '-v' */
+#ifdef	ENABLE_DEPRECATED_CODE
 extern	wl_t	wl_mode;		/* '-W' */
+#endif
 
 /* config file options */
 extern	int	max_repeats;
@@ -44,15 +48,25 @@ extern	int	abort_on_error;
 extern	bool	stats_in_header;
 
 /* for lexer_v3.l */
+#ifdef	ENABLE_DEPRECATED_CODE
 extern	bool	header_degen;		/* -H 	   - default: disabled */
-extern	bool	ignore_case;		/* -Pu,-PU */
-extern	bool	header_line_markup;	/* -Ph,-PH */
-extern	bool	tokenize_html_tags;	/* -Pt,-PT */
-extern	bool	tokenize_html_script;
 extern	bool	first_match;		/* -Pf,-PF - default: disabled */
 extern	bool	degen_enabled;		/* -Pd,-PD - default: disabled */
+#endif
+
+extern	bool	header_line_markup;	/* -Ph,-PH */
+
+#ifndef	ENABLE_DEPRECATED_CODE
+#define	ignore_case		false	/* -PI */
+#define	tokenize_html_tags 	true	/* -Pt */
+#define	tokenize_html_script 	false	/* -Ps - not yet in use */
+#else
+extern	bool	ignore_case;		/* -Pu,-PU */
+extern	bool	tokenize_html_tags;	/* -Pt,-PT */
+extern	bool	tokenize_html_script;
 #if	0
 extern	bool	separate_counts;	/* -Ps,-PS - default: enabled  */
+#endif
 #endif
 
 extern	uint	db_cachesize;
@@ -70,7 +84,11 @@ extern	u_int32_t	 msgs_good;
 extern	u_int32_t	 msgs_bad;
 
 /* from html.h */
+#ifdef	ENABLE_DEPRECATED_CODE
 extern	bool strict_check;
+#else
+#define strict_check	false
+#endif
 
 /* from robinson.h */
 #define ROBS			0.010	/* Robinson's s */

@@ -159,7 +159,10 @@ rc_t fis_status(void)
     if (fis_stats.s.spamicity >= spam_cutoff)
 	return RC_SPAM;
 
-    if (twostate ||
+    if (
+#ifdef	ENABLE_DEPRECATED_CODE
+	twostate ||
+#endif
 	(ham_cutoff < EPS) ||
 	(fis_stats.s.spamicity <= ham_cutoff))
 	return RC_HAM;

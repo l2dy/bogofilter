@@ -18,6 +18,11 @@ CLEANFILES= $(BUILT_SOURCES)
 t.config: Makefile
 	echo >$@ 'EXE_EXT="@EXE_EXT@"' || rm -f $@
 
+if ENABLE_DEPRECATED_CODE
+DEGEN_TEST=t.degen
+SEPARATE_WORDLIST=t.separate
+endif
+
 ENVIRON_TESTS = t.abort t.env t.bogodir
 
 PARSING_TESTS = \
@@ -29,9 +34,9 @@ PARSING_TESTS = \
 	t.split t.parsing \
 	t.lexer t.lexer.mbx \
 	t.folded_rfc2047 \
-	t.degen
+	$(DEGEN_TEST)
 
-WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest t.separate
+WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest $(SEPARATE_WORDLIST)
 
 SCORING_TESTS =  t.score1 t.score2 t.systest t.grftest
 

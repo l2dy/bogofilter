@@ -48,9 +48,13 @@ static void rand_sleep(double min, double max)
 
 const char *aCombined[] = { WORDLIST };
 size_t	    cCombined = COUNTOF(aCombined);
+
+#ifdef	ENABLE_DEPRECATED_CODE
 const char *aSeparate[] = { SPAMFILE, GOODFILE };
 size_t	    cSeparate = COUNTOF(aSeparate);
+#endif
 
+#ifdef	ENABLE_DEPRECATED_CODE
 void incr_wordlist_mode(void)
 {
     switch (wl_mode) {
@@ -62,6 +66,7 @@ void incr_wordlist_mode(void)
     }
     return;
 }
+#endif
 
 void open_wordlists(dbmode_t mode)
 {
@@ -71,13 +76,16 @@ void open_wordlists(dbmode_t mode)
     do {
 	retry = 0;
 	for (list = word_lists; list != NULL; list = list->next) {
+#ifdef	ENABLE_DEPRECATED_CODE
 	    if (wl_mode == WL_M_UNKNOWN)
 		set_wordlist_mode(list->filepath);
 	    switch (wl_mode) {
 	    case WL_M_COMBINED:
+#endif
 		if (db_cachesize < 4)
 		    db_cachesize = 4;
 		list->dsh = ds_open(list->filepath, cCombined, aCombined, mode);
+#ifdef	ENABLE_DEPRECATED_CODE
 		break;
 	    case WL_M_SEPARATE:
 		list->dsh = ds_open(list->filepath, cSeparate, aSeparate, mode);
@@ -86,6 +94,7 @@ void open_wordlists(dbmode_t mode)
 		fprintf(stderr, "Invalid wordlist mode.\n");
 		exit(EX_ERROR);
 	    }
+#endif
 	    if (list->dsh == NULL) {
 		int err = errno;
 		close_wordlists(true); /* unlock and close */
@@ -99,6 +108,11 @@ void open_wordlists(dbmode_t mode)
 		    default:
 			if (query)	/* If "-Q", failure is OK */
 			    return;
+#ifndef	ENABLE_DEPRECATED_CODE
+			    fprintf(stderr,
+				    "Can't open file '%s' in directory '%s'.\n",
+				    aCombined[0], list->filepath);
+#else
 			if (wl_mode != WL_M_SEPARATE)
 			    fprintf(stderr,
 				    "Can't open file '%s' in directory '%s'.\n",
@@ -107,6 +121,7 @@ void open_wordlists(dbmode_t mode)
 			    fprintf(stderr,
 				    "Can't open files '%s' and '%s' in directory '%s'.\n",
 				    aSeparate[0], aSeparate[1], list->filepath);
+#endif
 			if (err != 0)
 			    fprintf(stderr,
 				    "error #%d - %s.\n", err, strerror(err));
@@ -142,10 +157,14 @@ size_t build_wordlist_paths(char **filepaths, const char *path)
 {
     bool ok;
     size_t count = 0;
+
+#ifdef	ENABLE_DEPRECATED_CODE
     switch (wl_mode) {
     case WL_M_COMBINED:
+#endif
 	count = 1;
 	ok = build_path(filepaths[0], sizeof(FILEPATH), path, WORDLIST) == 0;
+#ifdef	ENABLE_DEPRECATED_CODE
 	break;
     case WL_M_SEPARATE:
 	count = 2;
@@ -156,9 +175,12 @@ size_t build_wordlist_paths(char **filepaths, const char *path)
 	fprintf(stderr, "Invalid wordlist mode.\n");
 	exit(EX_ERROR);
     }
+#endif
+
     return count;
 }
 
+#ifdef	ENABLE_DEPRECATED_CODE
 static bool check_wordlist_paths(const char *path, size_t count, const char **names)
 {
     size_t i;
@@ -177,9 +199,13 @@ static bool check_wordlist_paths(const char *path, size_t count, const char **na
     }
     return true;
 }
+#endif
 
+#ifdef	ENABLE_DEPRECATED_CODE
 void set_wordlist_mode(const char *filepath)
 {
+    check_wordlist_paths(filepath, cCombined, aCombined);
+
     if (wl_mode != WL_M_UNKNOWN)
 	return;
 
@@ -192,6 +218,7 @@ void set_wordlist_mode(const char *filepath)
 
     return;
 }
+#endif
 
 void set_good_weight(double weight)
 {

@@ -258,7 +258,10 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	    char filepath2[PATH_LEN];
 	    char *filepaths[IX_SIZE];
 
+#ifdef	ENABLE_DEPRECATED_CODE
 	    set_wordlist_mode(path);
+#endif
+
 	    filepaths[0] = filepath1;
 	    filepaths[1] = filepath2;
 	
@@ -413,8 +416,10 @@ static void help(void)
 	    "\t-R dir\tCompute Robinson's X and save it in the wordlist.\n");
     fprintf(stderr,
 	    "\t-k size\tset BerkeleyDB cache size (MB).\n"
+#ifdef	ENABLE_DEPRECATED_CODE
 	    "\t-W\tUse combined wordlist%s for spam and ham tokens.\n"
 	    "\t-WW\tUse separate wordlists for spam and ham tokens.\n",
+#endif
 	    DB_EXT);
     fprintf(stderr,
 	    "\t-a age\tExclude tokens with older ages.\n"
@@ -437,7 +442,11 @@ bool  prob = false;
 typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX } cmd_t;
 cmd_t flag = M_NONE;
 
+#ifndef	ENABLE_DEPRECATED_CODE
+#define	OPTIONS	":a:c:d:DhI:k:l:m:np:r:R:s:vVw:x:y:"
+#else
 #define	OPTIONS	":a:c:d:DhI:k:l:m:np:r:R:s:vVw:Wx:y:"
+#endif
 
 static int process_args(int argc, char **argv)
 {
@@ -509,9 +518,11 @@ static int process_args(int argc, char **argv)
 	    print_version();
 	    exit(EX_OK);
 
+#ifdef	ENABLE_DEPRECATED_CODE
 	case 'W':
 	    incr_wordlist_mode();
 	    break;
+#endif
 
 	case 'x':
 	    set_debug_mask( (char *) optarg );

@@ -27,6 +27,7 @@
 ##user_config_file=~/.bogofilter/config
 
 
+#ifdef	ENABLE_DEPRECATED_CODE
 #### WORDLIST: define additional word lists
 #
 #	char type: 's','g','i' (denoting spam, good, or ignore)
@@ -36,6 +37,7 @@
 #	int override - skip lower valued lists
 
 ##wordlist i,ignore,.ignorelist.db,1,0,0
+#endif
 
 
 #### SPAM_HEADER_NAME
@@ -81,6 +83,7 @@
 ##db_cachesize=16
 
 
+#ifdef	ENABLE_DEPRECATED_CODE
 #### Degeneration options
 #
 #	header_degen - if tagged header token isn't found, 
@@ -91,6 +94,7 @@
 #header_degen=N
 #degen_enabled=N
 #first_match=N
+#endif
 
 
 ##### TIMESTAMP
@@ -101,6 +105,7 @@
 #timestamp=Y
 
 
+#ifdef	ENABLE_DEPRECATED_CODE
 ##### WORDLIST_MODE
 #
 #	combined - store spam and ham tokens in a single, combined
@@ -113,6 +118,7 @@
 
 #wordlist_mode=combined
 ##wordlist_mode=separate
+#endif
 
 
 #### Format of SPAM_HEADER
@@ -121,8 +127,10 @@
 #
 #	    h - spam_header_name, e.g. "X-Bogosity"
 #
+#ifdef	ENABLE_DEPRECATED_CODE
 #	    a - algorithm, e.g. "graham", "robinson", "fisher"
 #
+#endif
 #	    c - classification, e.g. Yes/No, Spam/Ham/Unsure, +/-/?
 #
 #	    D - date, fixed ISO-8601 format for Universal Time ("GMT")
@@ -214,25 +222,31 @@
 #header_line_markup=yes
 
 
+#ifdef	ENABLE_DEPRECATED_CODE
 ##### IGNORE_CASE
 #
 #	if enabled, all letters are converted to lower case
 
 #ignore_case=no
+#endif
 
 
+#ifdef	ENABLE_DEPRECATED_CODE
 #### TOKENIZE_HTML_TAGS
 #
 #	when enabled, the innards of html tags are tokenized
 
 #tokenize_html_tags=yes
+#endif
 
 
+#ifdef	ENABLE_DEPRECATED_CODE
 #### TOKENIZE_HTML_SCRIPT --- 	*** NOT YET WORKING ***
 #
 #	when enabled, the innards of html script blocks are tokenized
 
 #tokenize_html_script=no
+#endif
 
 
 ########### Classification Constants General Settings ###############
@@ -264,6 +278,7 @@
 
 ########### Algorithm Settings ######################################
 
+#ifdef	ENABLE_DEPRECATED_CODE
 #### ALGORITHM
 #
 #	specify scoring algorithm
@@ -271,6 +286,7 @@
 ##algorithm=graham
 ##algorithm=robinson
 #algorithm=fisher
+#endif
 
 
 ##### Robinson Constants
@@ -286,16 +302,20 @@
 
 #### CUTOFF Values
 #
+#ifdef	ENABLE_DEPRECATED_CODE
 #	for Graham and Robinson:
 #	    only spam_cutoff is needed.
+#endif
 #
 #	for Fisher:
 #	    both ham_cutoff and spam_cutoff are allowed.
 #	    setting ham_cutoff to a non-zero value will
 #	    enable tristate results (Yes/No/Unsure).
 
+#ifdef	ENABLE_DEPRECATED_CODE
 ## spam_cutoff = 0.90	# for graham
 ## spam_cutoff = 0.54	# for robinson
+#endif
 
 # Fisher (with Yes/No output, i.e. '-2' option):
 #

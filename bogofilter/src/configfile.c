@@ -136,6 +136,7 @@ static bool process_config_parameter(const parm_desc *arg, char *val, priority_t
 		fprintf(dbgout, "%s -> '%s'\n", arg->name, val);
 	    break;
 	}
+#ifdef	ENABLE_DEPRECATED_CODE
 	case CP_WORDLIST:
 	{
 	    char c = *val;
@@ -150,6 +151,7 @@ static bool process_config_parameter(const parm_desc *arg, char *val, priority_t
 		fprintf(dbgout, "%s -> '%s'\n", arg->name, val);
 	    break;
 	}
+#endif
 	default:
 	{
 	    ok = false;

@@ -80,7 +80,9 @@ wordhash_t *convert_wordhash_to_propslist(wordhash_t *wh, wordhash_t *db);
 
 /* for bogotune */
 
-void wordhash_degen(wordhash_t *wh, wordhash_t *db);
 void *wordhash_search_memory (const word_t *t);
+#ifdef	ENABLE_DEPRECATED_CODE
+void wordhash_degen(wordhash_t *wh, wordhash_t *db);
+#endif
 
 #endif

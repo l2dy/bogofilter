@@ -33,7 +33,6 @@ void wordcnts_init(void *vwordcnts)
     memset(wc, 0, sizeof(*wc));
 }
 
-/* this is used by robinson.c static */
 void wordcnts_incr(wordcnts_t *w1, wordcnts_t *w2)
 {
     w1->good += w2->good;

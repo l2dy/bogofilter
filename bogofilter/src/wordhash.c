@@ -504,7 +504,7 @@ wordhash_t *
 convert_propslist_to_countlist(wordhash_t *whi)
 {
     hashnode_t *node;
-    wordhash_t *who;
+    wordhash_t *who = wordhash_init(WH_CNTS, whi->count);
     uint count = 0;
 
     if (whi->type == WH_CNTS)
@@ -569,6 +569,7 @@ convert_wordhash_to_propslist(wordhash_t *whi, wordhash_t *db)
     }
 } 
 
+#ifdef	ENABLE_DEPRECATED_CODE
 void wordhash_degen(wordhash_t *wh, wordhash_t *db)
 {
     if (degen_enabled) {
@@ -598,3 +599,4 @@ void wordhash_degen(wordhash_t *wh, wordhash_t *db)
 
     return;
 }
+#endif

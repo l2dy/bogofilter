@@ -6,7 +6,11 @@ SYSCONFDIR = @sysconfdir@
 
 PERL = @PERL@
 
+if ENABLE_DEPRECATED_CODE
 GRAHAM_SRC = graham.c graham.h
+DEGEN = degen.h degen.c
+endif
+
 FISHER_SRC = fisher.c fisher.h
 ROBINSON_SRC = robinson.c robinson.h
 
@@ -80,7 +84,7 @@ version_sources= \
 	configfile.h configfile.c \
 	datastore.h datastore.c db_handle_props.h \
 	debug.h debug.c \
-	degen.h degen.c \
+	$(DEGEN) \
 	error.h error.c \
 	fgetsl.h fgetsl.c \
 	find_home.h find_home.c find_home_user.c find_home_tildeexpand.c \

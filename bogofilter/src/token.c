@@ -135,6 +135,7 @@ token_t get_token(void)
 	break;
 
 	case HEADKEY:
+	{
 	    if (!header_line_markup)
 		continue;
 	    else {
@@ -142,6 +143,7 @@ token_t get_token(void)
 		yylval->leng = (uint) (delim - (const char *)yylval->text);
 		Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
 	    }
+	}
 
 	/*@fallthrough@*/
 

@@ -17,7 +17,9 @@ NAME:
 #include "bogofilter.h"
 #include "collect.h"
 #include "datastore.h"
+#ifdef	ENABLE_DEPRECATED_CODE
 #include "degen.h"
+#endif
 #include "msgcounts.h"
 #include "prob.h"
 #include "robinson.h"
@@ -108,14 +110,16 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 	size_t i;
 	dsv_t val;
 
-	if (list->ignore)
+	if (override > list->override)	/* if already found */
+	    break;
+
+	if (ds_read(list->dsh, token, &val) != 0)
+	    continue;			/* not found */
+
+	if (list->ignore)		/* if on ignore list */
 	    return;
 
-	if (override > list->override)
-	    break;
 	override=list->override;
-
-	ds_read(list->dsh, token, &val);
 
 	for (i=0; i<COUNTOF(val.count); i++) {
 	    /* Protect against negatives */
@@ -123,29 +127,31 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 		val.count[i] = 0;
 		ds_write(list->dsh, token, &val);
 	    }
-
-	    if (val.count[i] == 0)
-		continue;
-
 	    wordprob_add(cnts, val.count[i], list->bad[i]);
-	    if (DEBUG_ROBINSON(1)) {
-		fprintf(dbgout, "%2d %2d \n", (int) cnts->good, (int) cnts->bad);
-		word_puts(token, 0, dbgout);
-		fputc('\n', dbgout);
-	    }
+	}
+
+	if (DEBUG_ROBINSON(1)) {
+	    fprintf(dbgout, "%2d %2d \n", (int) cnts->good, (int) cnts->bad);
+	    word_puts(token, 0, dbgout);
+	    fputc('\n', dbgout);
 	}
     }
+
     return;
 }
 
 double lookup_and_score(const word_t *token, wordcnts_t *cnts)
 {
     double prob;
+
+#ifdef	ENABLE_DEPRECATED_CODE
     const char *colon;
+#endif
 
     if (cnts->bad == 0 && cnts->good == 0)
 	lookup(token, cnts);
 
+#ifdef	ENABLE_DEPRECATED_CODE
     if (header_degen && cnts->bad == 0 && cnts->good == 0 && (colon = strchr((const char *)(token->text), ':')) != NULL) {
 	word_t *tword = word_new((unsigned const char *)(colon+1), strlen(colon+1));
 	wordcnts_t tcnts;
@@ -167,6 +173,7 @@ double lookup_and_score(const word_t *token, wordcnts_t *cnts)
 	degen_enabled = true;	/* Enable further recursion */
     }
     else
+#endif
 	prob = wordprob_result(cnts);
 
     return prob;

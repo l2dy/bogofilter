@@ -53,8 +53,10 @@ const char *unsure_subject_tag = NULL;			/* used in passthrough mode */
 **
 **	    h - spam_header_name, e.g. "X-Bogosity"
 **
+#ifdef	ENABLE_DEPRECATED_CODE
 **	    a - algorithm, e.g. "graham", "robinson", "fisher"
 **
+#endif
 **	    c - classification, e.g. Yes/No, Spam/Ham/Unsure, +/-/?
 **
 **	    D - date, fixed ISO-8601 format for Universal Time ("GMT")
@@ -341,9 +343,11 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 	    case '%':
 		*buff++ = '%';
 		break;
+#ifdef	ENABLE_DEPRECATED_CODE
 	    case 'a':		/* a - algorithm, e.g. "graham", "robinson", "fisher" */
 		buff += format_string(buff, method->name, 0, prec, flags, end);
 		break;
+#endif
 	    case 'c':		/* c - classification, e.g. Yes/No, Spam/Ham/Unsure, or YN, SHU, +-? */
 	    {
 		const char *val = spamicity_tags[status];

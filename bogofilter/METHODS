@@ -30,7 +30,5 @@ Robinson-Fisher because the calculation is based on Fisher's method,
 published in the 1950s, for combining independently derived
 probabilities.
 
-When building bogofilter, the user can specify (at configuration) any
-or all of the above methods for inclusion in the program being built.
-The method to use when running bogofilter can be specified on the
-command line or in the configuration file.
+Note:  Bogofilter now only supports Robinson-Fisher method.  The
+other two are described for historical reasons.
