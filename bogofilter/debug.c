@@ -31,7 +31,7 @@ void set_debug_mask(const char *mask)
 	/*@=shiftnegative@*/
 	else
 	{
-	    (void)fprintf(stderr, "unknown mask option '%c'\n", ch);
+	    (void)fprintf(stderr, "set_debug_mask:  unknown mask specification '%c'\n", ch);
 	    exit(2);
 	}
     }
