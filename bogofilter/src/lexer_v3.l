@@ -166,7 +166,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 %%
 
 <INITIAL,BOGO_LEX>{MSG_COUNT}{NUM_NUM}		{ if (lineno == 0) { 
-						      BEGIN(BOGO_LEX); 
+						      BEGIN BOGO_LEX; 
 						      set_msg_counts(strchr(yytext, ' ') + 1); 
 						  }
 						  return MSG_COUNT_LINE;
@@ -199,13 +199,13 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <INITIAL>filename=\"?				;
 <INITIAL>^[ \b\t]*\n				{ lineno += 1;
 						  if (get_content_type() == MIME_TEXT_HTML)
-						      BEGIN(HTML);
+						      BEGIN HTML;
 						  else
-						      BEGIN(TEXT); 
+						      BEGIN TEXT; 
 						  return(EMPTY);
 						}
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
-						      BEGIN(INITIAL);
+						      BEGIN INITIAL;
 						      return BOUNDARY;
 						  } else {
 						      yyless(2);
@@ -256,7 +256,7 @@ ${DOLLARS}\.{CENTS}				{ return TOKEN;}
 void lexer_v3_init(FILE *fp)
 {
     lineno = 0;
-    BEGIN(INITIAL);
+    BEGIN INITIAL;
     yyrestart(fp);
 }
 
