@@ -238,6 +238,7 @@ AC_FUNC_SETVBUF_REVERSED
 fi
 AC_CHECK_TYPES([uint, ulong, uint32_t, u_int32_t, int32_t, int16_t, u_int16_t, uint16_t, u_int8_t, ssize_t])
 AC_CHECK_TYPE(u_long, unsigned long)
+AC_CHECK_TYPES([rlim_t],,,[#include <sys/resource.h>])
 AC_CACHE_SAVE
 AC_CHECK_SIZEOF(short)
 AC_CHECK_SIZEOF(int)

@@ -114,6 +114,10 @@ typedef unsigned int uint;
 typedef int ssize_t;
 #endif
 
+#ifndef HAVE_RLIM_T
+typedef int rlim_t;
+#endif
+
 /* prevent db.h from redefining the types above */
 #undef	__BIT_TYPES_DEFINED__
 #define	__BIT_TYPES_DEFINED__ 1
