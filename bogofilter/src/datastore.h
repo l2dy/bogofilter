@@ -96,9 +96,6 @@ int db_foreach(void *, db_foreach_t hook, void *userdata);
 /* Get the current process id */
 unsigned long db_handle_pid(void *);
 
-/* Get the database name */
-char *db_handle_name(void *);
-
 /* Get the database filename */
 char *db_handle_filename(void *);
 
