@@ -20,6 +20,8 @@ MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h debug.h \
 
 BUILT_SOURCES = version.h directories.h
 
+CLEANFILES=directories.h
+
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c \
 		     config.c directories.h register.c register.h \
@@ -50,15 +52,12 @@ find_home_test_SOURCES = find_home.test.c $(MYCOMMON)
 EXTRA_DIST = $(man_MANS) \
 	     bogofilter.cf.example bogofilter-faq.html \
 	     README.hp-ux UPGRADE \
-	     bogofilter.xml.in bogoutil.xml bogoupgrade.xml bogolexer.xml \
+	     bogofilter.xml bogoutil.xml bogoupgrade.xml bogolexer.xml \
 	     bogofilter.spec bogofilter.spec.in \
 	     bogoupgrade bogo.R \
 	     version.sh \
 	     README.cvs README.freebsd
 #
-bogofilter.xml: bogofilter.xml.in Makefile
-	sed 's}@sysconfdir\@}$(SYSCONFDIR)}g' $< >$@
-CLEANFILES=bogofilter.xml
 #
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
 $(srcdir)/version.h:	version.sh $(VERSION_FROM)

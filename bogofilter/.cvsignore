@@ -34,3 +34,4 @@ stamp-h.in
 stamp-h1
 version.h
 wordhash
+directories.h
