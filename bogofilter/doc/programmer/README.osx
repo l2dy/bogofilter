@@ -12,11 +12,11 @@ install it using 'fink install db4-shlibs'. (This only installs the
 libraries; if you want the whole package, which is *not* required for
 bogofilter, use 'fink install db4'.)
 
-Run the 'configure' script with the '--with-db=/path/to/berkeley-db-dir'
+Run the 'configure' script with the '--with-libdb-prefix=/path/to/berkeley-db-dir'
 option so that 'configure' can find your Berkeley DB installation.
 For example, users with the HP Gnome Desktop would use 'configure
---with-db=/opt/gnome'. Fink users would use 'configure
---with-db=/sw/include/db4'.
+--with-libdb-prefix=/opt/gnome'. Fink users would use 'configure
+--with-libdb-prefix-db=/sw/include/db4'.
 
 Bogofilter can be built with either gcc or xlc.  If using xlc, put
 "CC=xlc" at the beginning of the configure command.

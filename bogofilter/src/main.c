@@ -40,6 +40,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     rc_t status;
     ex_t exitcode = EX_OK;
 
+    dbgout = stderr;
+
     progtype = build_progtype(progname, DB_TYPE);
 
     process_parameters(argc, argv, true);
@@ -50,7 +52,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	openlog("bogofilter", LOG_PID, LOG_MAIL);
 
     /* open all wordlists */
-    open_wordlists((run_type == RUN_NORMAL) ? DB_READ : DB_WRITE);
+    ds_init();
+    open_wordlists((run_type == RUN_NORMAL) ? DS_READ : DS_WRITE);
 
     output_setup();
 
@@ -62,15 +65,16 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     case RC_UNSURE:	exitcode = EX_UNSURE;	break;
     case RC_OK:		exitcode = EX_OK;	break;
     default:
-	fprintf(dbgout, "Unexpected status code - %d\n", status);
+	fprintf(dbgout, "Unexpected status code - %d\n", (int)status);
 	exit(EX_ERROR);
     }
 
     if (nonspam_exits_zero && exitcode != EX_ERROR)
 	exitcode = EX_OK;
 
-    close_wordlists(false);
+    close_wordlists();
     free_wordlists();
+    ds_cleanup();
 
     /* cleanup storage */
     mime_cleanup();
@@ -80,6 +84,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     if (logflag)
 	closelog();
+
+    free(progtype);
 
     exit(exitcode);
 }

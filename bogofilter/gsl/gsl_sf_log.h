@@ -78,7 +78,7 @@ int gsl_sf_log_1plusx_mx_e(const double x, gsl_sf_result * result);
 double gsl_sf_log_1plusx_mx(const double x);
 
 
-#if HAVE_INLINE
+#if HAVE_EXTERN_INLINE
 extern inline
 int
 gsl_sf_log_e(const double x, gsl_sf_result * result)
@@ -113,7 +113,7 @@ gsl_sf_log_abs_e(const double x, gsl_sf_result * result)
     return GSL_SUCCESS;
   }
 }
-#endif /* HAVE_INLINE */
+#endif /* HAVE_EXTERN_INLINE */
 
 
 __END_DECLS

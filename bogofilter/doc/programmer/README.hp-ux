@@ -19,9 +19,9 @@ Also available from the HP-UX Porting and Archive Centre,
 at http://hpux.connect.org.uk/ (and mirrors around the world).
 
 Be sure to run the 'configure' script with the
-'--with-db=/path/to/berkeley-db-dir' option so that 'configure' can find
+'--with-libdb-prefix=/path/to/berkeley-db-dir' option so that 'configure' can find
 your Berkeley DB installation.  For example, users with the HP Gnome
-Desktop would use 'configure --with-db=/opt/gnome'.
+Desktop would use 'configure --with-libdb-prefixxo=/opt/gnome'.
 
 Read the INSTALL file in this directory for more information and
 additional options for the 'configure' script.

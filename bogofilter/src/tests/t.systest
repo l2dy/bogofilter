@@ -1,7 +1,5 @@
 #! /bin/sh
 
-set -e
-
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
 #	 systest.YYYYMMDD.  This is useful when something is different.
@@ -103,8 +101,6 @@ alg="f"
 rm -f ${CONFIG}
 
 [ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
-
-OUTPUTS=${SYSTEST}/outputs
 
 for i in $OUTPUTS/*f.v* ; do
     j=`basename $i`

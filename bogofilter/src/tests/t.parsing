@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
 #	 parsing.YYYYMMDD.  This is useful when something is different.
@@ -14,6 +12,18 @@ set -e
 #		tests   - directory containing individual output files
 
 NODB=1 . ${srcdir=.}/t.frame
+
+map_rc()
+{
+    (
+	set +e
+	eval "$@"
+	a=$?
+	[ $a -eq 0 ] && exit 0
+	[ $a -eq 1 ] && exit 0
+	exit $a
+    )
+}
 
 MSG="${SYSTEST}/inputs/msg.parsing.txt"
 flaglist="IhT-2"
@@ -32,21 +42,7 @@ if  [ $verbose -ne 0 ]; then
     wc -l ${TMPDIR}/parsing.sor
 fi
 
-OUT="${srcdir}/outputs/parsing.out"
-if  [ $verbose -eq 0 ]; then
-    cmp $OUT ${TMPDIR}/`basename $OUT`
-else
-    diff $DIFF_BRIEF $OUT ${TMPDIR}/`basename $OUT`
-fi
+OUT="${OUTPUTS}/parsing.out"
 
-map_rc()
-{
-    (
-	set +e
-	eval "$@"
-	a=$?
-	[ $a -eq 0 ] && exit 0
-	[ $a -eq 1 ] && exit 0
-	exit $a
-    )
-}
+test  $verbose -eq 0 && cmp $OUT ${TMPDIR}/parsing.out \
+|| diff $DIFF_BRIEF $OUT ${TMPDIR}/parsing.out
