@@ -1521,12 +1521,12 @@ static rc_t bogotune(void)
 	    for (rxi = 0; rxi < rxval->cnt; rxi++) {
 	      robx = rxval->data[rxi];
 	      for (spi = 0; spi < spexp->cnt; spi++) {
-	        spex = spexp->data[spi];
-	        sp_esf = pow(0.75,spex);
+		spex = spexp->data[spi];
+		sp_esf = ESF_SEL(sp_esf, pow(0.75, spex));
 		for (nsi = 0; nsi < nsexp->cnt; nsi++) {
 		    uint fp, fn;
 		    nsex = nsexp->data[nsi];
-		    ns_esf = pow(0.75, nsex);
+		    ns_esf = ESF_SEL(ns_esf, pow(0.75, nsex));
 
 		    /* save parms */
 		    r = &results[cnt++];
@@ -1608,9 +1608,9 @@ static rc_t bogotune(void)
 	robs = rsval->data[best->rsi];
 	robx = rxval->data[best->rxi];
 	min_dev = mdval->data[best->mdi];
-	spex = spexp->data[best->spi]; sp_esf = pow(0.75, spex);
-	nsex = nsexp->data[best->nsi]; ns_esf = pow(0.75, nsex);
-
+	spex = spexp->data[best->spi]; sp_esf = ESF_SEL(sp_esf, pow(0.75, spex));
+	nsex = nsexp->data[best->nsi]; ns_esf = ESF_SEL(ns_esf, pow(0.75, nsex));
+	
 	printf(
     "Minimum found at s %6.4f, md %5.3f, x %5.3f, spesf %8.6f, nsesf %8.6f\n",
 	        robs, min_dev, robx, sp_esf, ns_esf);
