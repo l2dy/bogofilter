@@ -29,6 +29,7 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
   const char *r="",*u="";
   hashnode_t *node;
   wordprop_t *wordprop;
+  run_t save_run_type = run_type;
 
   int wordcount = h->count;	/* use number of unique tokens */
 
@@ -57,6 +58,11 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
     (void)fprintf(dbgout, "# %d word%s, %d message%s\n", 
 		  wordcount, PLURAL(wordcount), msgcount, PLURAL(msgcount));
 
+  /* When using auto-update with separate wordlists , 
+     datastore.c needs to know which to update */
+
+  run_type |= _run_type;
+
 /*
   set_list_active_status(false);
 */
@@ -78,7 +84,6 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
 
   for (list = word_lists; list != NULL; list = list->next)
   {
-
 /*
       if (!list->active)
 	  continue;
@@ -109,6 +114,8 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
 	  (void)fprintf(stderr, "bogofilter: list %s - %ld spam, %ld good\n",
 			list->filename, list->msgcount[IX_SPAM], list->msgcount[IX_GOOD]);
   }
+
+  run_type = save_run_type;
 }
 
 /* this function accumulates the word frequencies from the src hash to

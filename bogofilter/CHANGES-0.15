@@ -8,6 +8,8 @@ $Id$
 
 	* VERPs (Variable Envelope Return Paths) now have their
           sequence numbers replaced by a '#' for scoring.
+	* Fixed problem that caused auto-update ("-u") to not update
+          separate wordlists.
 
 	2003-09-25
 
