@@ -1,5 +1,8 @@
 # $Id$
 # $Log$
+# Revision 1.2  2002/09/24 12:47:09  gyepi
+# added bogoupgrade.pl + UPGRADE
+#
 # Revision 1.1  2002/09/17 11:33:37  m-a
 # Build .spec automatically from .spec.in.
 # In the .spec file: include all documentation, add --manpath and ,
@@ -54,6 +57,8 @@ gzip -f -9 $RPM_BUILD_ROOT/%{_mandir}/*/*.[1-9]
 %defattr(-,root,root)
 %{_mandir}/man1/bogofilter.1.gz
 %{_bindir}/bogofilter
-%doc AUTHORS COPYING NEWS README TODO bogofilter.xml
+%{_bindir}/bogoutil
+%{_bindir}/bogoupgrade.pl
+%doc AUTHORS COPYING NEWS README TODO UPGRADE bogofilter.xml
 
 %changelog
