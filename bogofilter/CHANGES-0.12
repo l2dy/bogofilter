@@ -4,32 +4,8 @@
 
 $Id$
 
-	2003-05-19
-	* Removed RMAIL/Babyl-5 support again, it was broken. We cannot
-	  fix it without compiling in emacs MULE. Workaround: run
-	  emacs --no-site-file --batch -f batch-unrmail RMAIL
-	  and train bogofilter on the resulting RMAIL.mail file. (The
-	  line above is valid for emacs 21.3.)
-
-	2003-05-17
-	* Added basic support for emacs RMAIL mailboxes.
-
-	2003-05-16
-	* Parsing code now recognizes money amounts, includes
-	  exclamation points in tokens, and allows tokenizing of html
-	  tags FONT, A, and IMG.
-
-	2003-05-15
-	* New parsing options (command line and config filee) for
-	  ignore_case (-Pi/-PI), header_line_markup (-Ph/-PH), and
-	  tokenize_html_tags (-Pt/-PT).
-	* Registration code modified to count unique tokens for each
-	  message and display the total of the counts.
-
-	2003-05-14
-	* Added 'bogo-what?' to FAQ.
-
 0.12.3	2003-05-10
+
 	* Modified parsing so that yyredo() and yy_use_redo_text()
 	  are no longer needed.
 	* Added doc/integrating-with-postfix.
