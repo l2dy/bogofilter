@@ -223,6 +223,7 @@ static void die (const char *msg, ...)
     exit (2);
 }
 
+static
 char *convert_format_to_string(char *buff, size_t size, const char *format)
 {
     char *beg = buff;

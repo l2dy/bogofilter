@@ -322,7 +322,7 @@ got_mime_boundary (const byte *boundary, int boundary_len)
 }
 
 /* skips whitespace, returns NULL when ran into end of string */
-const byte *
+static const byte *
 skipws (const byte *t, const byte *e)
 {
   while (t < e && isspace (*t))
@@ -347,7 +347,7 @@ skipsemi (const byte *t, const byte *e)
 
 /* get next MIME word, NULL when none found.
  * caller must free returned string with xfree() */
-char *
+static char *
 getword (const byte *t, const byte *e)
 {
   int quote = 0;

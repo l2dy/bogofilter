@@ -40,6 +40,7 @@ static int maintain_wordlist(void *vhandle);
 
 /* Function Definitions */
 
+static
 YYYYMMDD time_to_date(long days)
 {
     time_t t = time(NULL) - days * 86400;
