@@ -19,7 +19,7 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 		METHODS Doxyfile gnugetopt \
 		README.cvs \
 		RELEASE.NOTES \
-		RELEASE.NOTES-0.92
+		CHANGES-0.9x RELEASE.NOTES-0.92
 
 .PHONY:	check
 
