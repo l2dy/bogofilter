@@ -1,14 +1,19 @@
 # $Id$ 
 
+# Tell BSD make(1) to not remake the .1in and .htmlin files.
+.PRECIOUS:
+
 # what to build
 man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
 html_MANS = bogofilter.html bogoutil.html bogoupgrade.html bogolexer.html
 
-# what to build that from
+CLEANFILES = $(man_MANS)
 
 # what to distribute
-EXTRA_DIST = $(man_MANS) \
-	     $(html_MANS) \
+EXTRA_DIST = bogofilter.1in bogoutil.1in bogoupgrade.1in \
+		bogolexer.1in \
+	     bogofilter.htmlin bogoutil.htmlin bogoupgrade.htmlin \
+		bogolexer.htmlin \
 	     bogofilter-faq.html \
 	     bogofilter.xml bogoutil.xml bogoupgrade.xml bogolexer.xml \
 	     bogofilter-SA-2002-01 \
@@ -20,11 +25,12 @@ EXTRA_DIST = $(man_MANS) \
 #	     bogofilter.cf.example 
 #	     strlcat.3 strlcpy.3
 
-.xml.pdf:
-	xmlto pdf --extensions $<
+.1in.1 .htmlin.html:
+	sed -e "s|[@]SYSCONFDIR@|$(sysconfdir)|g" $< >$@ \
+	|| { rm -f $@ ; exit 1 ; }
 
-.xml.html:
-	xmlto html-nochunks $<
+.xml.htmlin:
+	if xmlto html-nochunks $< ; then f=$@ ; mv $${f%%in} $@ ; else rm -f $@ ; exit 1 ; fi
 
-.xml.1:
-	xmlto man $< || { rm -f $@ ; exit 1 ; }
+.xml.1in:
+	if xmlto man $< ; then f=$@ ; mv $${f%in} $@ ; else rm -f $@ ; exit 1 ; fi

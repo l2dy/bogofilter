@@ -8,3 +8,5 @@ bogoupgrade.1
 bogoupgrade.html
 bogoutil.1
 bogoutil.html
+*.htmlin
+*.1in
