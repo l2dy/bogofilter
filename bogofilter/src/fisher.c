@@ -66,7 +66,7 @@ static rob_stats_t fis_stats;
 
 /* Function Definitions */
 
-double prbf(double x, double df)
+static double prbf(double x, double df)
 {
     int which=1;
     double p, q;
