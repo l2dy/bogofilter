@@ -320,7 +320,7 @@ AC_ARG_ENABLE(dbshared-test,
 
 AC_CACHE_SAVE
 
-AM_CONDITIONAL(ENABLE_TRANSACTIONS, test "x$enable_transactions" != "xyes")
+AM_CONDITIONAL(ENABLE_TRANSACTIONS, test "x$enable_transactions" != "xno")
 
 WITH_DB_ENGINE=db
 AC_ARG_WITH(database,
