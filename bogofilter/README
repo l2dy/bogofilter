@@ -14,7 +14,13 @@ the word lists.
 
 *** DOCUMENTATION ***
 
-When installed there are man pages for bogofilter, bogoutil,
+It is recommended, although not necessary, that you install the GNU
+Scientific Library (GSL) version 1.4 or newer before configuring
+bogofilter. This allows bogofilter to link dynamically against a
+system-wide GSL rather than statically against a shipped GSL subset,
+conserving memory and disk space.
+
+When installed, there are man pages for bogofilter, bogoutil,
 bogolexer, and bogoupgrade.  Additional documentation is in
 /usr/src/bogofilter-1.2.3/doc or comparable directory (depending on
 your operating system).
