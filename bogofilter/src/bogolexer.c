@@ -63,6 +63,7 @@ int main(int argc, char **argv)
     dbgout = stderr;
 
     while ((option = getopt(argc, argv, ":hnpqvnx:I:k:DT")) != -1)
+    {
 	switch (option)
 	{
 	case '?':
@@ -117,6 +118,7 @@ int main(int argc, char **argv)
 	    usage();
 	    exit(0);
 	}
+    }
 
     textblocks = textblock_init();
 
