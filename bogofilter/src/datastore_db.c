@@ -1049,8 +1049,8 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 		fprintf(stderr,
 			"Reconfigure and recompile Berkeley DB with the right mutex interface,\n"
 			"see the docs/ref/build_unix/conf.html file that comes with your db source code.\n"
-			"If you installed Berkeley DB from a binary package, complain to the packager.\n"
-			"This is a known bug on Fedora Core that they won't fix, Red Hat Bugzilla #91933.\n");
+			"This can happen when the DB library was compiled with POSIX threads\n"
+			"but your system does not support NPTL.\n");
 		break;
 	}
 
@@ -1074,7 +1074,7 @@ static void dbe_cleanup_lite(dbe_t *env) {
 
 	/* checkpoint if more than 64 kB of logs have been written
 	 * or 120 min have passed since the previous checkpoint */
-	/*                           kB  min flags */
+	/*                                kB  min flags */
 	ret = BF_TXN_CHECKPOINT(env->dbe, 64, 120, 0);
 	ret = db_flush_dirty(env->dbe, ret);
 	if (ret)
