@@ -180,6 +180,16 @@ Summary:
     gives a good set of messages for training (using bogofilter's "-s"
     and "-n" flags).
 
+    Bogofilter's FAQ has two entries that provide additional info:
+
+       How do I start my bogofilter training?"
+       What are "training on error" and "training to exhaustion"?
+
+    The FAQ can be online in English and French at:
+
+       http://bogofilter.sourceforge.net/bogofilter-faq.html
+       http://bogofilter.sourceforge.net/bogofilter-faq-fr.html
+
 6. Tuning bogofilter
 --------------------
 
