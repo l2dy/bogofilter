@@ -68,7 +68,7 @@ bool build_path(char* dest, size_t size, const char* dir, const char* file)
     if (bf_abspath(file))
     {
 	if (filelen < size) {
-	    memcpy(dest, file, filelen);
+	    memcpy(dest, file, filelen+1);
 	    return true;
 	}
 	else
