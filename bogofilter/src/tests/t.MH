@@ -12,12 +12,6 @@ set -e
 #	 MH.YYYYMMDD:
 #		tests   - directory containing individual output files
 
-if [ "$1" = "save" ]; then
-    [ -d $2/$3 ] || mkdir $2/$3
-    cat > $2/$3/$FILENO
-    exit
-fi
-
 NODB=1 . ${srcdir=.}/t.frame
 
 OUT="${TMPDIR}/MH.out"
@@ -25,10 +19,9 @@ OUT="${TMPDIR}/MH.out"
 OUTPUTS=${SYSTEST}/outputs
 CORRECT="${OUTPUTS}/MH.out"
 
-( formail ) </dev/null >/dev/null 2>/dev/null || exit 77
-
 for f in good spam ; do
-    cat ${srcdir}/inputs/$f.mbx | formail -s $0 save $TMPDIR $f 
+    mkdir $TMPDIR/$f
+    cat ${srcdir}/inputs/$f.mbx | (cd $TMPDIR/$f && splitmbox )
 done
 
 $BOGOFILTER -C -D -n $v -B $TMPDIR/good

@@ -151,3 +151,7 @@ case `uname -s` in
     Linux)  if test $verbose -eq 1 ; then DIFF_BRIEF="--brief -s" ; fi
 	;;
 esac
+
+splitmbox() {
+      $AWK 'BEGIN { f=0; } /^From / { close(f); f++; } { print $0 > f }'
+}
