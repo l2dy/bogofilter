@@ -23,6 +23,10 @@ Briefly:
 
 0.93.1	2004-11-??
 
+	2004-11-10
+
+	* Support for BerkeleyDB 4.3 was added.
+
 	2004-11-09
 
 	* Unify and clean up the horrible RELEASE.NOTES-*, CHANGES* and NEWS-*

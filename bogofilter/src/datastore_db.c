@@ -143,7 +143,7 @@ static const char *resolvesetflags(u_int32_t flags) {
 #if DB_EQUAL(4,1)
     if (flags & DB_CHKSUM_SHA1) flags &= ~DB_CHKSUM_SHA1, strlcat(buf, "DB_CHKSUM_SHA1 ", sizeof(buf));
 #endif
-#if DB_EQUAL(4,2)
+#if DB_AT_LEAST(4,2)
     if (flags & DB_CHKSUM) flags &= ~DB_CHKSUM, strlcat(buf, "DB_CHKSUM ", sizeof(buf));
 #endif
     snprintf(b2, sizeof(b2), "%#lx", (unsigned long)flags);
@@ -286,7 +286,11 @@ static uint32_t get_psize(DB *dbp)
     uint32_t ret, pagesize;
     DB_BTREE_STAT *dbstat = NULL;
 
+#if DB_AT_LEAST(4,3)
+    ret = dbp->stat(dbp, NULL, &dbstat, DB_FAST_STAT);
+#else
     ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
+#endif
     if (ret) {
 	print_error(__FILE__, __LINE__, "(db) DB->stat");
 	return 0xffffffff;
@@ -362,7 +366,7 @@ retry_db_open:
 #if DB_EQUAL(4,1)
 		 (ret = DB_SET_FLAGS(dbp, DB_CHKSUM_SHA1)) != 0 ||
 #endif
-#if DB_EQUAL(4,2)
+#if DB_AT_LEAST(4,2)
 		 (ret = DB_SET_FLAGS(dbp, DB_CHKSUM)) != 0 ||
 #endif
 		(ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL, 0664)) != 0)))

@@ -95,6 +95,12 @@ bogoQDBMupgrade wordlist.qdbm wordlist.tmp wordlist.qdbm.old
 If this command didn't print anything, everything has gone well and it
 has left your old data base in wordlist.qdbm.old.
 
+
+MAJOR CHANGES IN BOGOFILTER 0.93
+================================
+
+Bogofilter 0.93.1 and newer support BerkeleyDB 4.3.
+
 ########################################################################
 
 INCOMPATIBLE CHANGES IN BOGOFILTER 0.92
