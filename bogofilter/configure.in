@@ -19,16 +19,14 @@ AC_ARG_WITH(db,
                 if test "x$withval" != "xno" ; then
                         if test -d "$withval/lib"; then
                                 if test -n "${need_dash_r}"; then
-                                        LDFLAGS="-L${withval}/lib -R${withval}/lib ${LDFLAGS}"
-                                else
-                                        LDFLAGS="-L${withval}/lib ${LDFLAGS}"
+                                        LDFLAGS="-R${withval}/lib ${LDFLAGS}"
                                 fi
+				LDFLAGS="-L${withval}/lib ${LDFLAGS}"
                         else
                                 if test -n "${need_dash_r}"; then
-                                        LDFLAGS="-L${withval}/lib -R${withval}/lib ${LDFLAGS}"
-                                else
-                                        LDFLAGS="-L${withval}/lib ${LDFLAGS}"
+                                        LDFLAGS="-R${withval} ${LDFLAGS}"
                                 fi
+				LDFLAGS="-L${withval} ${LDFLAGS}"
                         fi
                         if test -d "$withval/include"; then
                                 CPPFLAGS="-I${withval}/include ${CPPFLAGS}"
