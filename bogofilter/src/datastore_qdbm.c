@@ -203,7 +203,6 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
 {
     int ret;
-    int bnum, rnum;
 
     dbh_t *handle = dsh->dbh;
     DEPOT *dbp = handle->dbp[dsh->index];
@@ -225,6 +224,7 @@ void db_close(void *vhandle, bool nosync)
 {
     dbh_t *handle = vhandle;
     size_t i;
+    int bnum, rnum;
 
     if (handle == NULL) return;
 
