@@ -261,8 +261,6 @@ static bool open_mailstore(const char *name)
 	    mailstore_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
 	    return true;
 	}
-	/*NOTREACHED*/
-	break;
     case IS_DIR:
 	if (ismaildir(filename) == IS_DIR) {
 	    /* MAILDIR */
@@ -279,8 +277,6 @@ static bool open_mailstore(const char *name)
 	    mailstore_next_mail = dir_next_mail;
 	    return true;
 	}
-	/*NOTREACHED*/
-	break;
     case IS_ERR:
 	fprintf(stderr, "Can't stat mailstore '%s': %s\n",
 		filename, strerror(errno));
