@@ -24,7 +24,7 @@ application or system crash.
 
 2.1 Compatibility, Berkeley DB versions
 
-These versions are supported (with all SleepyCat-posted patches applied
+These versions are supported (with all Sleepycat-posted patches applied
 - if using a pre-packaged Berkeley DB version, the packager should have
 applied the patches, check your vendor's update site regularly):
 
@@ -133,7 +133,7 @@ Run bf_tar without arguments to see its synopsis.
 
 When upgrading the Berkeley DB library to a new version, or recompiling
 bogofilter to use a newer version, two things in the on-disk data format
-can change, generally speaking: the database format (we use the BTree
+can change, generally speaking: the database format (we use the Btree
 access method), the log file format, or both.
 
 You need a "log file upgrade" if at least one of these conditions is
@@ -214,7 +214,7 @@ Cause:	 Natural data base growth.
 
 Fix:     Resize the lock tables. Just run "bf_resize ~/.bogofilter" and
 	 that's it. This script will modify the ~/.bogofilter/DB_CONFIG
-	 file and run recovery to perform the reize. It'll resize the
+	 file and run recovery to perform the resize. It'll resize the
 	 lock and object tables to twice of what is currently in use.
 
 You may need to adjust these figures before larger updates or to conserve
@@ -555,7 +555,7 @@ If the drive name starts with /dev/hd, type the following line, but
 replace hda by hde or what else you may have found:
 
 /sbin/hdparm -W0 /dev/hda
-                 (replace -W0 by -W1 to reenable the write cache)
+                 (replace -W0 by -W1 to re-enable the write cache)
 
 If your drive name starts with /dev/sd, use the graphical scsi-config
 utility and add a blank the device name on the command line; for
