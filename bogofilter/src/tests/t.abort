@@ -1,5 +1,0 @@
-#! /bin/sh
-
-. ${srcdir:=.}/t.frame
-
-if (${srcdir}/t._abort junk arguments here) ; then exit 1 ; fi

@@ -1,8 +1,0 @@
-The cdfchi function comes from dcdflib.c-1.1, a free library of
-routines for cumulative distribution functions.  The library is
-distributed by the M. D. Anderson Cancer Center's Department of
-Biomathematics and Biostatistics.  Source is available from
-  http://odin.mdacc.tmc.edu/anonftp/
-
-The dcdflib cdfchi function is both faster and more accurate than the
-prbf approximation used in early testing.

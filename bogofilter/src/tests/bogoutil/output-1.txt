@@ -1,7 +1,0 @@
-.MSG_COUNT 1
-Bell 22
-Habanero 1
-Marbles 333
-Pimento 666666
-Serrano 55555
-Tabasco 4444
