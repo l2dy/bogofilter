@@ -26,15 +26,13 @@ while (<>) {
 	if (/^$/) {
 		$inqp = $qpapproaching;
 		$inbase64 = $base64approaching;
-	}
-	if (/^--[^>]/ || /^From /) {
+	} elsif (/^--[^>]/ || /^From /) {
 		$inbase64 = 0;
 		$inqp = 0;
 		$base64approaching = 0;
 		$qpapproaching = 0;
 		$textattachment = 0;
-	}
-	if ($textattachment) {
+	} elsif ($textattachment) {
 		if ($inbase64) {
 			print db64($_);
 			next;
@@ -44,17 +42,15 @@ while (<>) {
 			next;
 		}
 	}
-	next if ($inbase64);
-	if (/^Content-Type.*text\//i) {
+
+	if (/^Content-Type:.*text\//i) {
 		$textattachment++;
 	}
-	if (/^Content-Transfer-Encoding.*base64/i) {
+	if (/^Content-Transfer-Encoding:.*base64/i) {
 		$base64approaching++;
-	}
-	if (/^Content-Transfer-Encoding.*quoted-printable/i) {
+	} elsif (/^Content-Transfer-Encoding:.*quoted-printable/i) {
 		$qpapproaching++;
 	}
-	$_ =~ s/\0//g;	# bogofilter can't deal with \0 correctly
 	print;
 }
 
