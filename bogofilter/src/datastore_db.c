@@ -49,6 +49,7 @@ static DB_ENV *dbe; /* libdb environment, if in use, NULL otherwise */
 static const DBTYPE dbtype = DB_BTREE;
 
 static bool init = false;
+bool create_flag = false;		/* For datastore.c (to add .WORDLIST_VERSION) */
 
 typedef struct {
     char	*path;
@@ -58,6 +59,7 @@ typedef struct {
     DB		*dbp;		/* data base handle */
     bool	locked;
     bool	is_swapped;	/* set if CPU and data base endianness differ */
+    bool	created;	/* if newly created; for datastore.c (to add .WORDLIST_VERSION) */
 } dbh_t;
 
 #define DBT_init(dbt) (memset(&dbt, 0, sizeof(DBT)))
@@ -136,6 +138,7 @@ static dbh_t *dbh_init(const char *path, const char *name)
 
     handle->locked     = false;
     handle->is_swapped = false;
+    handle->created    = false;
 
     return handle;
 }
@@ -153,11 +156,21 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
+/* Returns is_swapped flag */
 bool db_is_swapped(void *vhandle)
 {
     dbh_t *handle = vhandle;
     return handle->is_swapped;
 }
+
+
+/* Returns created flag */
+bool db_created(void *vhandle)
+{
+    dbh_t *handle = vhandle;
+    return handle->created;
+}
+
 
 /* If header and library version do not match,
  * print an error message on stderr and exit with EX_ERROR. */
@@ -313,7 +326,19 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 	    t = handle->name;
 
 retry_db_open:
+
 	ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | retryflag, 0664);
+
+	if (ret != 0) {
+	    err = (ret != ENOENT) || (opt_flags & DB_RDONLY);
+	    if (!err) {
+		ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664);
+		if (ret != 0)
+		    err = true;
+		else
+		    handle->created = true;
+	    }
+	}
 
 	if (ret != 0) {
 	    if (ret == ENOENT && opt_flags != DB_RDONLY)
