@@ -64,6 +64,10 @@ is in the RELEASE.NOTES files.  Read them!!
 	  unknown whether one has real-world impact when opening data bases,
 	  fixing nonetheless. The other is cosmetic in any case.
 
+	2004-01-09
+
+	* '-H' now disables header tagging for bogofilter and bogolexer.
+
 0.16.1	2004-01-08
 
 	2004-01-07
