@@ -37,11 +37,10 @@ EOF
 run_test()
 {
     tst="$1"
-    ver="$2"
     IN="${SYSTEST}/inputs/msg.$tst.txt"
     OT="${TMPDIR}/msg.$tst.$mth"
-    if [ -n "$ver" ] ; then OT="$OT.$ver" ; fi
-    OPTS="-e -t $ver $CFG"
+    if [ -n "$V" ] ; then OT="$OT.$V" ; fi
+    OPTS="-e -t $V $CFG"
     eval $VALGRIND $BOGOFILTER $OPTS < $IN > $OT
     if test -s $TMPDIR/vg.out ; then cat $TMPDIR/vg.out ; exit 2 ; fi
 }
@@ -50,8 +49,6 @@ if [   -d ${TMPDIR}/tests ] ; then rm -f ${TMPDIR}/tests/* ; else : ; fi
 mkdir -p ${TMPDIR}/tests
 
 for mth in f t ; do
-    alg="$mth"
-    if [ "$alg" = "t" ] ; then alg=f ; else : ; fi
     BOGOFILTER_DIR="${TMPDIR}/words.$mth"
     CFG="-c ${TMPDIR}/cfg.$mth -y 0"
     export BOGOFILTER_DIR
@@ -62,9 +59,7 @@ for mth in f t ; do
 #   if [ $verbose -gt 0 ] ; then $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT ; fi
 
     for tst in 3 ; do
-	args="$tst $V"
-	run_test $args
+	run_test $tst
     done
 
-    rm -f ${TMPDIR}/tests-$alg
 done
