@@ -11,7 +11,7 @@ bin_SCRIPTS = bogoupgrade
 check_PROGRAMS = debugtest configtest
 man1_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1
 
-CFLAGS = -g -O2 -Wall
+CFLAGS ?= -g -Os -Wall
 
 # what to build that from
 MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h debug.h debug.c
@@ -53,8 +53,7 @@ version.h:	version.sh $(VERSION_FROM)
 	xmlto pdf --extensions $<
 
 .xml.html:
-	xmlto html $<
-	mv -f index.html $@
+	xmlto html-nochunks $<
 
 .xml.1:
 	xmlto man $<
