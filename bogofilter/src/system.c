@@ -11,6 +11,10 @@ NAME:
 
 #if defined(__IBMC__) || defined(__IBMCPP__) || defined(__WATCOMC__)
 #define _OS2_
+/* OS/2 stores the configuration file in the same directory as the
+ * programs are run from.
+ * Requested by Evgeny Kotsuba <evgen@shatura.laser.ru> */
+const char * const system_config_file = "bogofilter.cf";
 #include "direct.h"
 #endif
 
