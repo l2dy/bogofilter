@@ -178,26 +178,6 @@ ham_cutoff is non-zereo.</para>
       With two values, both spam_cutoff and ham_cutoff are set.
 </para>
 
-<para>A classification run will generate (we are not showing the date
-    and host part here):
-
-presentation):
-<screen>
-bogofilter[1412]: X-Bogosity: No, spamicity=0.000227
-bogofilter[1415]: X-Bogosity: Yes, spamicity=0.998918
-</screen></para>
-<para>Using '-u' to classify a message and update a wordlist will
-    produce (one a single line):
-    <screen>
-bogofilter[1426]: X-Bogosity: Yes, spamicity=0.998918,
-  register -s, 329 words, 1 messages
-    </screen></para>
-    <para>Registering words ('-l' and '-s', '-n', '-S', or '-N') will produce:
-	<screen>
-bogofilter[1440]: register-n, 255 words, 1 messages
-    </screen>
-</para>
-
 <para>The <option>-p</option> (passthrough) option writes a copy of
 the input mail to the output with an X-Bogosity header (in the
 style of SpamAssassin) inserted.  The header will begin with "Yes" or
@@ -457,6 +437,36 @@ distribution is a simple R script (file bogo.R) that can be used to
 verify <application>bogofilter</application>'s calculations.
 Instructions for its use are included in the script in the form of
 comments.</para>
+</refsect1>
+
+<refsect1 id='log messages'><title>Log messages</title>
+
+<para>Bogofilter writes messages to the system log when the <option>-l</option> 
+option is used.  What is written depends on which other flags are used.</para>
+
+<para>A classification run will generate (we are not showing the date
+    and host part here):
+<screen>
+bogofilter[1412]: X-Bogosity: No, spamicity=0.000227
+bogofilter[1415]: X-Bogosity: Yes, spamicity=0.998918
+</screen></para>
+<para>Using '-u' to classify a message and update a wordlist will
+    produce (one a single line):
+    <screen>
+bogofilter[1426]: X-Bogosity: Yes, spamicity=0.998918,
+  register -s, 329 words, 1 messages
+    </screen></para>
+    <para>Registering words ('-l' and '-s', '-n', '-S', or '-N') will produce:
+	<screen>
+bogofilter[1440]: register-n, 255 words, 1 messages
+    </screen>
+</para>
+
+<para>A registration run (using '-s', '-n', '-N', or '-S') will generate messages like:
+<screen>
+bogofilter[17330]: register-n, 574 words, 3 messages
+bogofilter[6244]: register-s, 1273 words, 4 messages
+</screen></para>
 </refsect1>
 
 <refsect1 id='files'><title>FILES</title>
