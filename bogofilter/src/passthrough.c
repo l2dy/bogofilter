@@ -119,9 +119,10 @@ static int read_seek(char **out, void *in) {
 
 typedef int (*readfunc_t)(char **, void *);
 
-static bool write_header(rc_t status, readfunc_t rf, char *out, void *rfarg)
+static bool write_header(rc_t status, readfunc_t rf, void *rfarg)
 {
     ssize_t rd;
+    char   *out;
 
     bool hadlf = true;
     bool seen_subj = false;
@@ -171,9 +172,10 @@ static bool write_header(rc_t status, readfunc_t rf, char *out, void *rfarg)
     return seen_subj;
 }
 
-static void write_body(readfunc_t rf, char *out, void *rfarg)
+static void write_body(readfunc_t rf, void *rfarg)
 {
     ssize_t rd;
+    char   *out;
 
     int hadlf = 1;
     /* If the message terminated early (without body or blank
@@ -212,7 +214,6 @@ void write_message(rc_t status)
 {
     readfunc_t rf = NULL;	/* assignment to quench warning */
     void *rfarg = 0;		/* assignment to quench warning */
-    char *out;
     textdata_t *text;
     bool seen_subj = false;
 
@@ -233,7 +234,7 @@ void write_message(rc_t status)
 		abort();
 	}
 
-	seen_subj = write_header(status, rf, out, rfarg);
+	seen_subj = write_header(status, rf, rfarg);
     }
 
     if (passthrough || verbose || terse) {
@@ -252,7 +253,7 @@ void write_message(rc_t status)
     }
 
     if (passthrough) 
-	write_body(rf, out, rfarg);
+	write_body(rf, rfarg);
 }
 
 void write_log_message(rc_t status)
