@@ -473,6 +473,8 @@ void db_close(void *vhandle, bool nosync)
 
     for (i = 0; i < handle->count; i += 1) {
 	DB *dbp = handle->dbp[i];
+	if (dbp == NULL)
+	    continue;
 	if ((ret = dbp->close(dbp, f)))
 	    print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
     }
