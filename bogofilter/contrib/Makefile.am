@@ -1,3 +1,7 @@
+noinst_PROGRAMS=bilbogrep
+
+#bilbogrep_SOURCES=bilbogrep.c
+
 EXTRADIST= \
 	README.bogopass
 	README.randomtrain
