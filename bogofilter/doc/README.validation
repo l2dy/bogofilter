@@ -1,0 +1,23 @@
+$Id$
+
+The bogofilter package will validate its SGML/XML documents prior to building
+either derived versions or the distribution tarball.
+
+The names of required packages differ greatly among the various distributions,
+some don't ship with the needed packages at all.
+
+Here's what packages are needed:
+
+Mandrake Linux 9.?:
+  HTML: opensp, screem
+  XML:  ?
+
+SuSE Linux 8.2:
+  HTML: opensp, html-dtd
+  XML:  libxml2, libxslt, xmlto (needs to be installed manually)
+
+FreeBSD:
+  HTML: jade, html
+  XML:  xmlto
+
+ vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:
