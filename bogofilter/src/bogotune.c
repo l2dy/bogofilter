@@ -72,9 +72,6 @@ AUTHOR:
 #define	PREF_COUNT	4000	/* preferred message count         */
 #define	LARGE_COUNT	40000
 
-#define	MIN_THR_PCT	0.0014	/* minimum threshold percent */
-#define	MAX_THR_PCT	0.0050	/* maximum threshold percent */
-
 #define	HAM_CUTOFF	0.10
 #define	MIN_CUTOFF	0.55	/* minimum cutoff for set_thresh() */
 #define	MAX_CUTOFF	0.99	/* maximum cutoff for set_thresh() */
@@ -142,7 +139,6 @@ uint target;
 uint ns_cnt, sp_cnt;
 
 double check_percent;		/* initial check for excessively high/low scores */
-double thresh_percent;		/* for selecting cutoff during parameter scans */
 double *ns_scores;
 double *sp_scores;
 double user_robx = 0.0;		/* from '-r' option */
@@ -1192,9 +1188,6 @@ static rc_t bogotune(void)
 
     check_percent = 0.0025;	/* for checking high scoring non-spam 
 				** and low scoring spam */
-
-    /* for selecting cutoff during parameter scans */
-    thresh_percent = scale(cnt, TEST_COUNT, PREF_COUNT, MAX_THR_PCT, MIN_THR_PCT);
 
     ns_scores = xcalloc(ns_cnt, sizeof(double));
     sp_scores = xcalloc(sp_cnt, sizeof(double));
