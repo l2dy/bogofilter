@@ -37,8 +37,6 @@ THEORY:
 #define N_CHUNK 2000
 #define S_CHUNK 20000
 
-#undef offsetof
-
 #ifndef offsetof
 #define offsetof(type, member) ( (int) & ((type*)0) -> member )
 #endif
