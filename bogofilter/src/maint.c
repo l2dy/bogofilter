@@ -71,7 +71,10 @@ YYYYMMDD string_to_date(const char *s)
 bool keep_count(uint32_t count)
 {
     bool ok = count > thresh_count;
-    if (count > 0 && DEBUG_DATABASE(1)) fprintf(dbgout, "keep_count:  %d > %d -> %c\n", count, thresh_count, ok ? 't' : 'f' );
+    if (count > 0 && DEBUG_DATABASE(1))
+	fprintf(dbgout, "keep_count:  %lu > %lu -> %c\n",
+		(unsigned long)count, (unsigned long)thresh_count,
+		ok ? 't' : 'f' );
     return ok;
 }
 
@@ -82,7 +85,9 @@ bool keep_date(YYYYMMDD date)
 	return true;
     else {
 	bool ok = thresh_date < date;
-	if (DEBUG_DATABASE(1)) fprintf(dbgout, "keep_date:  %d < %d -> %c\n", (int) thresh_date, date, ok ? 't' : 'f' );
+	if (DEBUG_DATABASE(1))
+	    fprintf(dbgout, "keep_date: %ld < %ld -> %c\n",
+		    (long)thresh_date, (long)date, ok ? 't' : 'f' );
 	return ok;
     }
 }
@@ -142,7 +147,7 @@ int maintain_wordlist_file(const char *db_file)
 }
 
 static int maintain_hook(word_t *key, word_t *data,
-			 void *userdata /*@unused@*/)
+			 /*@unused@*/ void *userdata)
 {
     word_t w;
     dbv_t val;

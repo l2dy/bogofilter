@@ -35,7 +35,8 @@ void print_error( const char *file, unsigned long line, const char *format, ... 
     vsnprintf( message, sizeof(message), format, ap );
     va_end (ap);
 
-    fprintf( stderr, "%s: %s\n", progname, message );
+    fprintf(stderr, "%s: %s\n", progname, message);
     if (logflag)
-	syslog( LOG_INFO, "[%u] %s:%lu:  %s", pid, file, line, message );
+	syslog(LOG_INFO, "[%lu] %s:%lu:  %s", (unsigned long)pid,
+		file, line, message );
 }

@@ -60,7 +60,8 @@ void register_words(run_t _run_type, wordhash_t *h,
   if (_run_type & UNREG_SPAM) decr_list = spam_list;
 
   if (DEBUG_REGISTER(2))
-      fprintf(dbgout, "%s%s -- incr: %08X, decr: %08X\n", r, u, (int)incr_list, (int)decr_list);
+      fprintf(dbgout, "%s%s -- incr: %08lX, decr: %08lX\n", r, u,
+	      (unsigned long)incr_list, (unsigned long)decr_list);
 
   if (incr_list)
     incr_list->active = true;
