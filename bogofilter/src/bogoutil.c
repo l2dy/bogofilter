@@ -791,7 +791,7 @@ static int process_arg(int option, const char *name, const char *val)
 
 int main(int argc, char *argv[])
 {
-    ex_t rc;
+    ex_t rc = EX_OK;
 
     signal_setup();			/* setup to catch signals */
 
@@ -818,10 +818,14 @@ int main(int argc, char *argv[])
 	    rc = ds_recover(ds_file, true);
 	    break;
 	case M_PURGELOGS:
-	    rc = ds_purgelogs(ds_file);
+	    ds_init(bogohome, ds_file);
+	    if (fTransaction)
+		rc = ds_purgelogs(ds_file);
 	    break;
 	case M_REMOVEENV:
-	    rc = ds_remove(ds_file);
+	    ds_init(bogohome, ds_file);
+	    if (fTransaction)
+		rc = ds_remove(ds_file);
 	    break;
 	case M_VERIFY:
 	    rc = ds_verify(ds_file);
