@@ -21,6 +21,14 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-01-25
+
+	* Removed unused program bogowordfreq.
+
+	2005-01-23
+
+	* Included charset_iconv.c in the build.
+
 0.93.5	2005-01-22
 
 	2005-01-21
