@@ -455,7 +455,7 @@ static void passthrough_setup()
 	case PASS_SEEK: m = "rewind and reread file"; break;
 	default:        m = "unknown"; break;
 	}
-	fprintf(out, "passthrough mode: %s\n", m);
+	fprintf(fpo, "passthrough mode: %s\n", m);
     }
 }
 
