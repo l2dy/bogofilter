@@ -6,7 +6,7 @@ filelist=`find $srcdir -maxdepth 1 -type f -print`
 
 grind() {
     a=0
-    cat $filelist | ../bogofilter -n -d $TMPDIR -xd -vvv 2>>$TMPDIR/log || a=$?
+    cat $filelist | ../bogofilter -n -d $TMPDIR -xd -vvv 2>> $TMPDIR/log || a=$?
     echo >>$TMPDIR/res $a
 }
 
@@ -16,6 +16,9 @@ for i in 1 2 3 4 5 6 7 8 9 10 ; do
 done
 wait
 # check exit codes
-test "x`sed '/[01]/ d'  $BOGOFILTER_DIR/res`" == "x"
+sed '/[01]/ d' $TMPDIR/res >$TMPDIR/nook
+if grep . $TMPDIR/nook >/dev/null 2>&1 ; then
+    exit 1
+fi
 # check data base consistency
 db_verify $TMPDIR/goodlist.db
