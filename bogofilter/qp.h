@@ -12,6 +12,6 @@ NAME:
 
 #include "common.h"
 
-int qp_decode(byte *buff, size_t size);
+size_t qp_decode(byte *buff, size_t size);
 
 #endif	/* HAVE_QP_H */

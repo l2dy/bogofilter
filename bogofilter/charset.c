@@ -38,8 +38,8 @@ AUTHOR:
 const char *charset_default = "us-ascii";
 /* bool replace_nonascii_characters = false; */
 
-unsigned char charset_table[256];
-unsigned char casefold_table[256];
+byte charset_table[256];
+byte casefold_table[256];
 
 static void map_default(void);
 static void map_us_ascii(void);
@@ -115,13 +115,13 @@ static void map_nonascii_characters(void)
     }
 }
 
-static void map_xlate_characters( unsigned char *xlate, size_t size )
+static void map_xlate_characters( byte *xlate, size_t size )
 {
     size_t i;
     for (i = 0; i < size; i += 2)
     {
-	unsigned char from = xlate[i];
-	unsigned char to   = xlate[i+1];
+	byte from = xlate[i];
+	byte to   = xlate[i+1];
 	charset_table[from] = to;
     }
 }
@@ -211,7 +211,7 @@ static void map_iso_8859_14(void)	/* ISOIEC 8859-14:1998 Latin Alphabet No. 8 (C
 
 static void map_iso_8859_15(void)	/* ISOIEC 8859-15:1999 Latin Alphabet No. 9 */
 {
-    static unsigned char xlate_15[] = {
+    static byte xlate_15[] = {
 	0xA0, ' ',		/* A0  160      160 NO-BREAK SPACE */
 	0xA1, '!',		/* A1  161  ¡   161 INVERTED EXCLAMATION MARK */
 	0xA2, '$',		/* A2  162  ¢   162 CENT SIGN */
@@ -246,7 +246,7 @@ static void map_iso_8859_15(void)	/* ISOIEC 8859-15:1999 Latin Alphabet No. 9 */
     /* Not yet implemented */
 }
 
-static unsigned char xlate_us[] = {
+static byte xlate_us[] = {
     0xA0, ' ',	/* no-break space      to space        */
     0x92, '\'',	/* windows apostrophe  to single quote */
     0x93, '"',	/* windows left  quote to double quote */

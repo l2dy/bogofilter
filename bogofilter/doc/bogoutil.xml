@@ -7,21 +7,42 @@
   </refmeta>
   <refnamediv id="name">
     <refname>bogoutil</refname>
-    <refpurpose>Dumps and load bogofilter database files</refpurpose>
+    <refpurpose>Dumps, loads, and maintains bogofilter database files</refpurpose>
   </refnamediv>
   <refsynopsisdiv id="synopsis">
 
     <cmdsynopsis>
       <command>bogoutil</command>
+      <arg choice="opt">options</arg>
       <group choice="req">
         <arg choice="plain">-d</arg>
 	<arg choice="plain">-l</arg>
+	<arg choice="plain">-m</arg>
         <arg choice="plain">-w
         <arg choice="opt">-p</arg></arg>
       </group>
-      <arg choice="opt">-v</arg>
       <arg choice="plain"><replaceable>file.db</replaceable></arg>
     </cmdsynopsis>
+
+    <cmdsynopsis>
+    where <option>option</option> is
+      <group choice="req">
+        <arg choice="plain">-v</arg>
+	<arg choice="plain">-n</arg>
+	<arg choice="plain">-a age</arg>
+	<arg choice="plain">-c count</arg>
+	<arg choice="plain">-s min,max</arg>
+	<arg choice="plain">-y date</arg>
+      </group>
+    </cmdsynopsis>
+
+    <cmdsynopsis>
+      <command>bogoutil</command>
+      <group choice="req">
+        <arg choice="plain">-R</arg>
+    </group>
+    </cmdsynopsis>
+
     <cmdsynopsis>
       <command>bogoutil</command>
       <group choice="req">
@@ -29,37 +50,73 @@
 	<arg choice="plain">-V</arg>
     </group>
     </cmdsynopsis>
+
   </refsynopsisdiv>
   <refsect1 id="description">
     <title>DESCRIPTION</title>
     <para><application>Bogoutil</application> is part of the bogofilter Bayesian spam filter package.</para>
-    <para>It is used to dump and load bogofilter's Berkeley DB databases to and from text files, and to display the values for specific words.</para>
+    <para>It is used to dump and load bogofilter's Berkeley DB databases to and 
+    from text files, perform database maintenance functions, and to display the 
+    values for specific words.</para>
   </refsect1>
   <refsect1 id="options">
     <title>OPTIONS</title>
     <para>
        The <option>-d</option> option tells <application>bogoutil</application> to
-       print the contents of the specified database file to stdout.
+       print the contents of the specified database file to <option>stdout</option>.
     </para>
     <para>
-       The <option>-l</option> option tells <application>bogoutil</application> to load the data on stdin into the
-       specified database file.
+       The <option>-l</option> option tells <application>bogoutil</application> 
+       to load the data from <option>stdin</option> into the specified database file.
     </para>
+    <para>The <option>-m</option> option tell <application>bogoutil</application> 
+    to perform maintenance functions on the specified database, i.e. discard tokens 
+    that are older than desired, have counts that are too small, or sizes (lengths) 
+    that are too long or too short.
+    </para>
+
     <para>
-       The <option>-w</option> option tells <application>bogoutil</application> to display the value of one or more tokens in one or more databases.
-       <option>-w</option> takes an argument, which is either the name of a wordlist or the name of a directory containing spamlist.db and goodlist.db.
+       The <option>-w</option> option tells <application>bogoutil</application> 
+       to display the value of one or more tokens in one or more databases.
+       <option>-w</option> takes an argument, which is either the name of a wordlist
+       or the name of a directory containing spamlist.db and goodlist.db.
        Tokens can be listed on the command line or piped to <application>bogoutil</application>.
-       When there are extra arguments on the command line, <application>bogoutil</application> will use them as the tokens to lookup.  
-       If there are no extra arguments, <application>bogoutil</application> will read tokens from stdin.
-       When <option>file.db</option> is the path to a database file, the tokens will be looked up in the database and the value for each token will be displayed.
-       When <option>file.db</option> is a directory name, each token will be looked up in both spamlist.db and goodlist.db and the values will be displayed.
+       When there are extra arguments on the command line, <application>bogoutil</application> 
+       will use them as the tokens to lookup.  If there are no extra arguments, 
+       <application>bogoutil</application> will read tokens from <option>stdin</option>.  When 
+       <option>file.db</option> is the path to a database file, the tokens will be looked up in
+       the database and the value for each token will be displayed.  When <option>file.db</option>
+       is a directory name, each token will be looked up in both spamlist.db and goodlist.db and 
+       the values will be displayed.
     </para>
     <para>
        The <option>-p</option> option adds a column of probabilities to the output of the <option>-w</option> option.
     </para>
     <para>
-       The <option>-v</option> option produces verbose output on stderr.
+       The <option>-v</option> option produces verbose output on <option>stderr</option>.
        This option is primarily useful for debugging.
+    </para>
+    <para>
+      Option <option>-n</option> stands for "replace non-ascii characters".  
+      It will replace characters with the high bit (0x80) by question marks.  
+      This can be useful if a word list has lots of unreadable tokens, for example from asian spam.
+      The "bad" characters will be converted to question marks and matching tokens will be combined.
+    </para>
+    <para>
+      Option <option>-a age</option> indicates an acceptable token age, with older ones being discarded.  
+      The age can be a date (in form YYYYMMMDD) or a day count, i.e. discard tokens older than 
+      <option>age</option> days.
+    </para>
+    <para>
+      Option <option>-c min</option> indicates that tokens with counts less than <option>min</option> 
+      are to be discarded.
+    </para>
+    <para>
+      Option <option>-s min,max</option> is used to discard tokens based on their size, i.e. length.  
+      All tokens shorter than <option>min</option> or longer than <option>max</option> will be discarded.
+    </para>
+    <para>
+      Option <option>-y date</option> is specifies the date to give to tokens that don't have dates.
     </para>
     <para>The <option>-h</option> option prints the help message and exits.</para>
     <para>The <option>-V</option> option prints the version number and exits.</para>
@@ -68,8 +125,9 @@
   <refsect1 id="dataformat">
     <title>DATA FORMAT</title>
     <para>
-      <application>bogoutil</application> reads and writes text files where each nonblank
-        line consists of a word, any amount of horizontal whitespace, and a numeric word count.
+      <application>Bogoutil</application> reads and writes text files where each nonblank
+        line consists of a word, any amount of horizontal whitespace, a numeric word count, 
+	more whitespace, and (optionally) a date in form YYYYMMDD.
       Blank lines are skipped.
     </para>
   </refsect1>
@@ -86,6 +144,8 @@
   <refsect1 id="author">
     <title>AUTHOR</title>
     <para>Gyepi Sam <email>gyepi@praxis-sw.com</email>.</para>
+    <para>Matthias Andree <email>matthias.andree@gmx.de</email>.</para>
+    <para>David Relson <email>relson@osagesoftware.com</email>.</para>
     <para>
        For updates, see <ulink url="http://bogofilter.sourceforge.net/">
        the bogofilter project page</ulink>.

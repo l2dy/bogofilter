@@ -31,7 +31,7 @@ static void base64_init(void)
     return;
 }
 
-int base64_decode(byte *buff, size_t size)
+size_t base64_decode(byte *buff, size_t size)
 {
     static int table_set_up = 0;
     size_t count = 0;

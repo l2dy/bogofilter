@@ -37,17 +37,27 @@ make DESTDIR=${RPM_BUILD_ROOT} install-strip
 cp $RPM_BUILD_ROOT%{_sysconfdir}/bogofilter.cf.example \
    $RPM_BUILD_ROOT%{_sysconfdir}/bogofilter.cf
 gzip -f -9 $RPM_BUILD_ROOT/%{_mandir}/*/*.[1-9]
+
 for a in xml html contrib ; do
-mkdir -p .inst/$a
+  mkdir -p .inst/$a
 done
+
 for i in doc/*.xml ; do
-install -m644 $i .inst/xml
+  install -m644 $i .inst/xml
 done
+
 for i in doc/*.html ; do
-install -m644 $i .inst/html
+  install -m644 $i .inst/html
 done
-find contrib -maxdepth 1 '(' -name "Makefile*" -prune ')' -or '(' -exec \
-    install -m644 '{}' .inst/contrib ';' ')'
+
+files=`find contrib -maxdepth 1 -type f | grep -v Makefile`
+for i in $files ; do
+  install -m644 $i .inst/contrib
+done
+
+for README in bogopass randomtrain unbase64 ; do
+  ln -s ../contrib/README.$README doc/README.$README
+done
 
 %files
 %defattr(-,root,root)

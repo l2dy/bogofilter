@@ -23,10 +23,11 @@ AUTHOR:
 
 #include <config.h>
 #include "common.h"
+#include "xmalloc.h"
+#include "xstrdup.h"
 
 #include "bogofilter.h"
 #include "datastore.h"
-#include "datastore_db.h"
 #include "error.h"
 #include "maint.h"
 #include "robinson.h"			/* for ROBS and ROBX */
@@ -40,81 +41,132 @@ AUTHOR:
 run_t run_type = RUN_NORMAL;
 
 const char *progname = PROGNAME;
-char *directory;
+
+static int db_dump_hook(char *key, long keylen, char *data, long
+	datalen, void *userdata /*@unused@*/)
+{
+    dbv_t val = {0, 0};
+    (void)userdata;
+
+    if (datalen != 4 && datalen != 8) {
+	print_error(__FILE__, __LINE__, "Unknown data size - %ld.\n", datalen);
+	return 0;
+    }
+
+    memcpy(&val, data, datalen);
+
+    if (!keep_count(val.count) || !keep_date(val.date) || !keep_size(keylen))
+	return 0;
+    if (replace_nonascii_characters)
+	do_replace_nonascii_characters((byte *)key, keylen);
+    fwrite(key, 1, keylen, stdout);
+    putchar(' ');
+    printf("%lu", val.count);
+    if (val.date) {
+	printf(" %lu", val.date);
+    }
+    putchar('\n');
+    return !!ferror(stdout);
+}
+
+static int count_hook(char *key, long keylen, char *data, long
+	datalen, void *userdata)
+{
+    long *counter = userdata;
+
+    (void)key;
+    (void)keylen;
+    (void)data;
+    (void)datalen;
+
+    (*counter)++;
+    return 0;
+}
+
+struct robhook_data {
+    double *sum;
+    long *count;
+    void *dbh_good;
+    double scalefactor;
+};
+
+static int robx_hook(char *key, long keylen, char *data, long
+	datalen, void *userdata)
+{
+    struct robhook_data *rd = userdata;
+
+    long goodness;
+    unsigned long spamness;
+    double        prob;
+    static int x_size = 40;
+    static char *x;
+
+    /* ignore system meta-data */
+    if (*key == '.')
+	return 0;
+
+    /* ignore short read */
+    if (datalen < 4)
+	return 0;
+
+    if (keylen + 1 > x_size) {
+	free(x);
+	x = NULL;
+	x_size = keylen + 1;
+    }
+    if (!x) x = xmalloc(x_size);
+
+    memcpy(x, key, keylen);
+    x[keylen] = '\0';
+
+    memcpy(&spamness, data, 4);
+    goodness = db_getvalue(rd->dbh_good, x);
+
+    prob = spamness / (goodness * rd->scalefactor + spamness);
+    (*rd->sum) += prob;
+
+    /* tokens in good list were already counted */
+    /* now add in tokens only in spam list */
+    if (goodness == 0)
+	(*rd->count) ++;
+
+    /* print if token in both word lists */
+    if (verbose > 1 && (goodness && spamness))
+	printf("cnt: %6ld,  sum: %12.6f,  ratio: %f,  sp: %4lu,  gd: %4ld,"
+		"  p: %f,  t: %s\n", *rd->count, *rd->sum,
+		*rd->sum / *rd->count, spamness, goodness, prob, x);
+
+    return 0;
+}
+
+static int db_oper(const char *path, dbmode_t open_mode, db_foreach_t funct,
+	void *userdata) {
+    void *dbh;
+
+    if ((dbh = db_open(path, path, open_mode, directory)) == NULL) {
+	exit(2);
+    } else {
+	int r = db_foreach(dbh, funct, userdata);
+	if (r) {
+	    db_close(dbh);
+	    return r;
+	}
+    }
+    return 0;
+}
 
 static int dump_file(char *db_file)
 {
-    dbh_t *dbh;
-
-    DBC dbc;
-    DBC *dbcp;
-    DBT key, data;
-
-    int ret;
-    int rv = 0;
-
-    dbcp = &dbc;
-
-    memset(&key, 0, sizeof(DBT));
-    memset(&data, 0, sizeof(DBT));
-
-    if ((dbh = db_open(db_file, db_file, DB_READ, directory)) == NULL) {
-	rv = 2;
-    }
-    else {
-	db_lock_reader(dbh);
-
-	if ((ret = dbh->dbp->cursor(dbh->dbp, NULL, &dbcp, 0) != 0)) {
-	    dbh->dbp->err(dbh->dbp, ret, PROGNAME " (cursor): %s", db_file);
-	    rv = 2;
-	}
-	else {
-	    for (;;) {
-		ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT);
-		if (ret == 0) {
-		    long cv[2];
-		    dbv_t val;
-		    memcpy( &cv, data.data, data.size );
-		    if (!dbh->is_swapped){			/* convert from struct to array */
-			val.count = cv[0];
-			val.date  = cv[1];
-		    } else {
-			val.count = swap_32bit(cv[0]);
-			val.date  = swap_32bit(cv[1]);
-		    }
-		    if (!keep_count(val.count) || !keep_date(val.date) || !keep_size(key.size))
-			continue;
-		    if (replace_nonascii_characters)
-			do_replace_nonascii_characters((byte *)key.data, key.size);
-		    if (data.size != 4 && data.size != 8)
-			print_error(__FILE__, __LINE__, "Unknown data size - %d.\n", data.size);
-		    if (data.size == 4 || val.date == 0)
-			printf("%.*s %lu\n", (int)key.size, (char *) key.data, val.count);
-		    else
-			printf("%.*s %lu %lu\n", (int)key.size, (char *) key.data, val.count, val.date);
-		}
-		else if (ret == DB_NOTFOUND) {
-		    break;
-		}
-		else {
-		    dbh->dbp->err(dbh->dbp, ret, PROGNAME " (c_get)");
-		    rv = 2;
-		    break;
-		}
-	    }
-	}
-	db_lock_release(dbh);
-    }
-    return rv;
+    return db_oper(db_file, DB_READ, db_dump_hook, NULL);
 }
 
 #define BUFSIZE 512
 
 static int load_file(char *db_file)
 {
-    dbh_t *dbh;
+    void *dbh;
     byte buf[BUFSIZE];
-    unsigned char *p;
+    byte *p;
     int rv = 0;
     size_t len;
     long line = 0;
@@ -126,10 +178,7 @@ static int load_file(char *db_file)
 
     memset(buf, '\0', BUFSIZE);
 
-    db_lock_writer(dbh);
-
     for (;;) {
-
 	if (fgets((char *)buf, BUFSIZE, stdin) == NULL) {
 	    if (ferror(stdin)) {
 		perror(PROGNAME);
@@ -147,26 +196,26 @@ static int load_file(char *db_file)
 	    continue;
 
 	p = buf;
-	while ( *p != '\0' && !isspace((unsigned char)*p) )
+	while ( *p != '\0' && !isspace(*p) )
 	    ++p;
 
 	*p++ = '\0';	/* delimit token */
 
-	while ( *p != '\0' && isspace((unsigned char)*p) )	/* skip whitespace */
+	while ( *p != '\0' && isspace(*p) )	/* skip whitespace */
 	    ++p;
 
 	count = 0;
-	while (isdigit((unsigned char)*p))			/* parse count */
+	while (isdigit(*p))			/* parse count */
 	    count = count * 10 + *p++ - '0';
 
-	while ( *p != '\0' && isspace((unsigned char)*p) )	/* skip whitespace */
+	while ( *p != '\0' && isspace(*p) )	/* skip whitespace */
 	    ++p;
 
 	date = 0;
-	while (isdigit((unsigned char)*p))			/* parse date */
+	while (isdigit(*p))			/* parse date */
 	    date = date * 10 + *p++ - '0';
 	
-	while ( *p != '\0' && isspace((unsigned char)*p) )	/* skip whitespace */
+	while ( *p != '\0' && isspace(*p) )	/* skip whitespace */
 	    ++p;
 
 	if ( *p != '\0' ) {
@@ -192,21 +241,10 @@ static int load_file(char *db_file)
 	count += db_getvalue(dbh, (char *)buf);
 	db_setvalue(dbh, (char *)buf, count);
     }
-    db_lock_release(dbh);
     db_close(dbh);
 
     return rv;
 }
-
-#if 0
-static dbh_t *db_open_and_lock_file( const char *db_file, const char *name, dbmode_t mode)
-{
-    dbh_t *dbh = db_open(db_file, name, mode);
-    if (dbh != NULL)
-	db_lock_reader(dbh);
-    return dbh;
-}
-#endif
 
 static int get_token(char *buf, int bufsize, FILE *fp)
 {
@@ -239,7 +277,7 @@ static int get_token(char *buf, int bufsize, FILE *fp)
 
 static int words_from_list(const char *db_file, int argc, char **argv)
 {
-    dbh_t *dbh;
+    void *dbh;
     int rv = 0;
 
     dbh = db_open(db_file, db_file, DB_READ, directory);
@@ -268,8 +306,8 @@ static int words_from_list(const char *db_file, int argc, char **argv)
 
 static int words_from_path(const char *dir, int argc, char **argv, bool show_probability)
 {
-    dbh_t *dbh_good;
-    dbh_t *dbh_spam;
+    void *dbh_good;
+    void *dbh_spam;
     char filepath[PATH_LEN];
     char buf[BUFSIZE];
     char *token = buf;
@@ -279,6 +317,7 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     const char *head_format = !show_probability ? "%-20s %6s %6s\n"   : "%-20s %6s  %6s  %6s  %6s\n";
     const char *data_format = !show_probability ? "%-20s %6ld %6ld\n" : "%-20s %6ld  %6ld  %f  %f\n";
 
+    /* XXX FIXME: deadlock possible */
     if (build_path(filepath, sizeof(filepath), dir, GOODFILE) < 0)
 	return 2;
 
@@ -307,15 +346,14 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 	{
 	    if (get_token(buf, BUFSIZE, stdin) != 0)
 		break;
-	}
-	else 
-	{
+	} else {
 	    token = *argv++;
 	    if (--argc == 0)
 		argc = -1;
 	}
 	spam_count = db_getvalue(dbh_spam, token);
-	good_count =  db_getvalue(dbh_good, token);
+	good_count = db_getvalue(dbh_good, token);
+
 	if (show_probability)
 	{
 	    double spamness = (double) spam_count / (double) spam_msg_count;
@@ -352,9 +390,7 @@ static int display_words(const char *path, int argc, char **argv, bool prob)
 	    words_from_path(path, argc, argv, prob);
 	else
     	    words_from_list(path, argc, argv);
-    }
-    else
-    {
+    } else {
 	if (errno==ENOENT) {
 	    fprintf(stderr, "No such directory.\n");
 	    return 0;
@@ -367,98 +403,29 @@ static int display_words(const char *path, int argc, char **argv, bool prob)
     return 0;
 }
 
-static double compute_robx(dbh_t *dbh_spam, dbh_t *dbh_good)
+static double compute_robx(void *dbh_spam, void *dbh_good)
 {
-    DBT    key, data;
-    int    ret = 0;
-    int    word_cnt = 0;
+    long    word_cnt = 0;
     double sum = 0.0;
     double robx;
 
-    DBC  dbc_spam;
-    DBC *dbcp_spam = &dbc_spam;
-    DBC  dbc_good;
-    DBC *dbcp_good = &dbc_good;
-
-    double scalefactor;
     long int msg_good, msg_spam;
+    struct robhook_data rh;
 
     msg_good = db_getvalue( dbh_good, ".MSG_COUNT" );
     msg_spam = db_getvalue( dbh_spam, ".MSG_COUNT" );
-    scalefactor = (double) msg_spam / (double) msg_good;
+    rh.scalefactor = (double)msg_spam/msg_good;
+    rh.dbh_good = dbh_good;
+    rh.sum = &sum;
+    rh.count = &word_cnt;
 
-    memset(&key, 0, sizeof(DBT));
-    memset(&data, 0, sizeof(DBT));
-
-    if ((ret = dbh_good->dbp->cursor(dbh_good->dbp, NULL, &dbcp_good, 0) != 0)) {
-	dbh_good->dbp->err(dbh_good->dbp, ret, PROGNAME " (cursor): %s", "dbh_good->file");
-	return 2;
-    }
-
-    for (;;) {
-	ret = dbcp_good->c_get(dbcp_good, &key, &data, DB_NEXT);
-	if (ret == 0) {
-	    word_cnt += 1;		/* count words in good list */
-	}
-	else if (ret == DB_NOTFOUND) {
-	    break;
-	}
-	else {
-	    dbh_good->dbp->err(dbh_spam->dbp, ret, PROGNAME " (c_get)");
-	    ret = 2;
-	    break;
-	}
-    }
-    dbcp_good->c_close(dbcp_good);
-
-    if ((ret = dbh_spam->dbp->cursor(dbh_spam->dbp, NULL, &dbcp_spam, 0) != 0)) {
-	dbh_spam->dbp->err(dbh_spam->dbp, ret, PROGNAME " (cursor): %s", "dbh_spam->file");
-	return 2;
-    }
-
-    for (;;) {
-	ret = dbcp_spam->c_get(dbcp_spam, &key, &data, DB_NEXT);
-	if (ret == 0) {
-	    long goodness;
-	    unsigned long spamness;
-	    double        prob;
-	    char         *token = key.data;
-	    token[key.size] = '\0';
-
-	    /* ignore system meta-data */
-	    if ( *token == '.')
-		continue;
-
-	    spamness = *(unsigned long *) data.data;
-	    goodness = db_getvalue(dbh_good, token);
-
-	    prob = spamness / (goodness*scalefactor + spamness);
-	    sum += prob;
-
-	    /* tokens in good list were already counted */
-	    /* now add in tokens only in spam list */
-	    if (goodness == 0)
-		word_cnt += 1;
-
-	    /* print if token in both word lists */
-	    if (verbose > 1 && (goodness && spamness))
-		printf("cnt: %6d,  sum: %12.6f,  ratio: %f,  sp: %4lu,  gd: %4ld,  p: %f,  t: %s\n", word_cnt, sum, sum/word_cnt, spamness, goodness, prob, token);
-	}
-	else if (ret == DB_NOTFOUND) {
-	    break;
-	}
-	else {
-	    dbh_spam->dbp->err(dbh_spam->dbp, ret, PROGNAME " (c_get)");
-	    ret = 2;
-	    break;
-	}
-    }
-    dbcp_spam->c_close(dbcp_spam);
+    db_foreach(dbh_good, count_hook, &word_cnt);
+    db_foreach(dbh_spam, robx_hook, &rh);
 
     robx = sum/word_cnt;
     if (verbose)
 	printf( ".MSG_COUNT: %ld, %ld, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
-		msg_spam, msg_good, scalefactor, sum, (int)word_cnt, robx);
+		msg_spam, msg_good, rh.scalefactor, sum, (int)word_cnt, robx);
 
     return robx;
 }
@@ -466,35 +433,41 @@ static double compute_robx(dbh_t *dbh_spam, dbh_t *dbh_good)
 static int compute_robinson_x(char *path)
 {
     int e;
+    wordlist_t wl[2];
 
-    dbh_t *dbh_good;
-    dbh_t *dbh_spam;
+    void *dbh_spam;
 
     char db_spam_file[PATH_LEN];
     char db_good_file[PATH_LEN];
 
     double robx;
 
-    e = build_path(db_spam_file, sizeof(db_spam_file), path, "spamlist.db");
+    e = build_path(db_spam_file, sizeof(db_spam_file), path, SPAMFILE);
     if (e < 0) goto overflow;
-    e = build_path(db_good_file, sizeof(db_good_file), path, "goodlist.db");
+    e = build_path(db_good_file, sizeof(db_good_file), path, GOODFILE);
     if (e < 0) goto overflow;
 
-    dbh_good = db_open(db_good_file, "good", DB_READ, directory);
+    memset(wl, 0, sizeof(wl));
+
+    wl[0].next = &wl[1];
+    wl[0].filepath = db_good_file;
+    wl[0].filename = xstrdup("good");
+
+    wl[1].next = NULL;
+    wl[1].filepath = db_spam_file;
+    wl[1].filename = xstrdup("spam");
+
+    word_lists = wl;
+    open_wordlists(DB_READ);
+
+    robx = compute_robx(wl[1].dbh, wl[0].dbh);
+    close_wordlists();
+    free(wl[0].filename);
+    free(wl[1].filename);
+
     dbh_spam = db_open(db_spam_file, "spam", DB_WRITE, directory);
-
-    db_lock_reader(dbh_good);
-    db_lock_writer(dbh_spam);
-
-    robx = compute_robx( dbh_spam, dbh_good );
-
     db_setvalue(dbh_spam, ".ROBX", (int) (robx * 1000000));
-
-    db_lock_release(dbh_spam);
     db_close(dbh_spam);
-
-    db_lock_release(dbh_good);
-    db_close(dbh_good);
 
     return 0;
 overflow:

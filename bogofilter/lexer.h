@@ -47,8 +47,10 @@ extern int	text_html_leng;
 extern char   * text_html_text;
 
 /* in lexer.c */
-extern int yygetline(char *buf, int max_size);
-extern int yyinput(char *buf, int max_size);
-extern int yyredo(const char *text, char del);
+extern int yygetline(byte *buf, size_t size);
+extern int yyinput(byte *buf, size_t size);
+extern int yyredo(const byte *text, char del);
+
+extern int buff_fill(size_t need, byte *buf, size_t used, size_t size);
 
 #endif	/* LEXER_H */

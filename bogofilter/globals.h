@@ -13,31 +13,35 @@
 #define bool int
 #endif
 
-extern bool nonspam_exits_zero;	/* '-e' */
-extern bool fisher;		/* '-f' */
-extern bool force;		/* '-F' */
-extern bool logflag;		/* '-l' */
-extern bool terse;		/* '-t' */
-extern bool quiet;		/* '-q' */
-extern bool passthrough;	/* '-p' */
-extern int verbose;		/* '-v' */
+/* command line options */
+extern	bool	nonspam_exits_zero;	/* '-e' */
+extern	bool	fisher;			/* '-f' */
+extern	bool	force;			/* '-F' */
+extern	bool	logflag;		/* '-l' */
+extern	bool	terse;			/* '-t' */
+extern	bool	quiet;			/* '-q' */
+extern	bool	passthrough;		/* '-p' */
+extern	int	verbose;		/* '-v' */
+extern	FILE	*fpin;			/* '-I' */
 
-extern FILE *fpin;		/* '-I' */
+extern	int	Rtable;			/* '-R' */
 
-extern bool stats_in_header;
+extern	char	*directory;		/* '-d' */
+extern	char	outfname[PATH_LEN];	/* '-O' */
 
-extern int max_repeats;
-extern double min_dev;
-extern double spam_cutoff;
-extern double thresh_stats;
+/* config file options */
+extern	int	max_repeats;
+extern	double	min_dev;
+extern	double	spam_cutoff;
+extern	double	thresh_stats;
 
-extern const char *progname;
+extern	bool	stats_in_header;
+
+extern	const char	*update_dir;
+extern	const char	*progname;
 /*@observer@*/
-extern const char *stats_prefix;
-extern char *directory;
-extern char *update_dir;
-extern char outfname[PATH_LEN];
-extern const char *const version;
-extern const char *const system_config_file;
+extern	const char	*stats_prefix;
+extern	const char *const version;
+extern	const char *const system_config_file;
 
 #endif

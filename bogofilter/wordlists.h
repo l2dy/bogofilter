@@ -27,9 +27,9 @@ extern wordlist_t *good_list, *spam_list;
 int setup_wordlists(const char* dir);
 bool configure_wordlist(const char *val);
 
-void open_wordlists(void);
-void *open_wordlist(const char *name, const char *filepath);
+void open_wordlists(dbmode_t);
 void close_wordlists(void);
+void free_wordlists(void);
 
 void set_good_weight(double weight);
 void set_list_active_status(bool status);

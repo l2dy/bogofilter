@@ -39,17 +39,17 @@ void mime_init(mime_t *parent);
 void mime_push(mime_t *parent);
 void mime_pop(void);
 void mime_free(mime_t *);
-bool get_boundary_props(char *boundary, int boundary_len, boundary_t *b);
+bool get_boundary_props(byte *boundary, int boundary_len, boundary_t *b);
 */
 
 void mime_reset(void);
 void mime_add_child(mime_t *parent);
-void mime_boundary_set(const char *text, int leng);
-void got_mime_boundary(const char *boundary, int len);
-void mime_disposition(const char *text, int leng);
-void mime_encoding(const char *text, int leng);
-void mime_type(const char *text, int leng);
-void mime_version(const char *text, int leng);
-size_t mime_decode(char *buff, size_t size);
+void mime_boundary_set(const byte *text, int leng);
+void got_mime_boundary(const byte *boundary, int len);
+void mime_disposition(const byte *text, int leng);
+void mime_encoding(const byte *text, int leng);
+void mime_type(const byte *text, int leng);
+void mime_version(const byte *text, int leng);
+size_t mime_decode(byte *buff, size_t size);
 
 #endif	/* HAVE_MIME_H */

@@ -22,6 +22,8 @@
 #include "xmalloc.h"
 #include "xstrdup.h"
 
+/* Local Variables */
+
 char *yylval;
 
 int yylineno;
@@ -33,52 +35,97 @@ extern char *spam_header_name;
 
 #define YY_NULL 0
 
-int yygetline(char *buf, int max_size)
-/* input getter for the scanner */
+/* Function Prototypes */
+static int yy_use_redo_text(byte *buf, size_t max_size);
+static int yy_get_new_line(byte *buf, size_t max_size);
+static int skip_spam_header(byte *buf, size_t max_size);
+
+/* Function Definitions */
+static int yy_getline(byte *buf, size_t size)
 {
-    int count;
+    size_t count = fgetsl(buf, size, fpin);
+    yylineno += 1;
+    if (DEBUG_LEXER(0)) fprintf(dbgout, "*** %2d %d %s\n", yylineno, msg_header, buf);
+    return count;
+}
+
+static int yy_use_redo_text(byte *buf, size_t max_size)
+{
+    size_t count;
+
+    count = strlcpy(buf, yysave, max_size-2);
+    buf[count++] = '\n';
+    buf[count] = '\0';
+    xfree(yysave);
+    yysave = NULL;
+    return count;
+}
+
+static int yy_get_new_line(byte *buf, size_t max_size)
+{
+    int count = yy_getline(buf, max_size);
 
     static size_t hdrlen = 0;
     if (hdrlen==0)
 	hdrlen=strlen(spam_header_name);
-
-    if (yysave == NULL) {
-	count = fgetsl(buf, max_size, fpin);
-
-	/* Also, save the text on a linked list of lines.
-	 * Note that we store fixed-length blocks here, not lines.
-	 * One very long physical line could break up into more
-	 * than one of these. */
-	if (passthrough)
-	    textblock_add(textblocks, buf, count);
-	yylineno += 1;
-	if (DEBUG_LEXER(0)) fprintf(dbgout, "### %2d %d %s", yylineno, msg_header, buf);
-    }
-    else {
-	count = strlcpy(buf, yysave, max_size-2);
-	buf[count++] = '\n';
-	buf[count] = '\0';
-	xfree(yysave);
-	yysave = NULL;
-    }
 
     /* skip spam_header ("X-Bogosity:") lines */
     while (msg_header
 	   && count != -1
 	   && memcmp(buf,spam_header_name,hdrlen) == 0)
     {
-	do {
-	    count = fgetsl(buf, max_size, fpin);
-	    if (passthrough)
-		textblock_add(textblocks, buf, count);
-	    yylineno += 1;
-	    if (DEBUG_LEXER(0)) fprintf(dbgout, "*** %2d %d %s\n", yylineno, msg_header, buf);
-
-	    if (count != -1 && *buf == '\n')
-		break;
-	} while (count != -1 && isspace((unsigned char)*buf));
+	count = skip_spam_header(buf, max_size);
     }
 
+    /* Also, save the text on a linked list of lines.
+     * Note that we store fixed-length blocks here, not lines.
+     * One very long physical line could break up into more
+     * than one of these. */
+
+    if (passthrough)
+	textblock_add(textblocks, buf, count);
+
+    return count;
+}
+
+static int skip_spam_header(byte *buf, size_t max_size)
+{
+    int count;
+
+    do {
+	count = yy_getline(buf, max_size);
+	if (count != -1 && *buf == '\n')
+	    break;
+    } while (count != -1 && isspace(*buf));
+
+    return count;
+}
+
+int buff_fill(size_t need, byte *buf, size_t used, size_t size)
+{
+    int cnt = 0;
+    /* check bytes needed vs. bytes in buff */
+    while ( need > used) {
+	/* too few, read more */
+	int add = yy_getline(buf+used, size-used);
+	if (add == EOF) return EOF;
+	if (passthrough)
+	    textblock_add(textblocks, buf+used, add);
+	cnt += add;
+	used += add;
+    }
+    return cnt;
+}
+
+int yygetline(byte *buf, size_t max_size)
+{
+    int count;
+
+    if (yysave == NULL)
+	count = yy_get_new_line(buf, max_size);
+    else
+	count = yy_use_redo_text(buf, max_size);
+	
 /* unfolding:
 ** 	causes "^\tid" to be treated as continuation of previous line
 ** 	hence doesn't match lexer pattern which specifies beginning of line
@@ -87,17 +134,15 @@ int yygetline(char *buf, int max_size)
 	int c = fgetc(fpin);
 	if (c == EOF)
 	    break;
-	if (c == ' ' || c == '\t') {
+	if ((isspace(c))) {
 	    int add;
 	    /* continuation line */
 	    ungetc(c,fpin);
 	    if (buf[count - 1] == '\n') count --;
-	    add = fgetsl(buf + count, max_size - count, fpin);
+	    add = yy_getline(buf + count, max_size - count);
 	    if (add == EOF) break;
 	    if (passthrough)
 		textblock_add(textblocks, buf+count, add);
-	    yylineno += 1;
-	    if (DEBUG_LEXER(1)) fprintf(dbgout, "*** %2d %d %s\n", yylineno, msg_header, buf+count);
 	    count += add;
 	} else {
 	    ungetc(c,fpin);
@@ -129,7 +174,7 @@ int yygetline(char *buf, int max_size)
     return count;
 }
 
-int yyinput(char *buf, int max_size)
+int yyinput(byte *buf, size_t max_size)
 /* input getter for the scanner */
 {
     int i, count, decoded_count;
@@ -147,16 +192,16 @@ int yyinput(char *buf, int max_size)
 
     for (i = 0; i < count; i++ )
     {	
-	unsigned char ch = buf[i];
+	byte ch = buf[i];
 	buf[i] = charset_table[ch];
     }
     
     return (count == -1 ? 0 : count);
 }
 
-int yyredo(const char *text, char del)
+int yyredo(const byte *text, char del)
 {
-    char *tmp;
+    byte *tmp;
 
     if (DEBUG_LEXER(1)) fprintf(dbgout, "yyredo:  %p %s\n", yysave, text );
 

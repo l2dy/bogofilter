@@ -3,13 +3,15 @@
 /*****************************************************************************
 
 NAME:
-   datastore_db.c -- implements the datastore, using Berkeley DB
+datastore_db.c -- implements the datastore, using Berkeley DB
 
-AUTHOR:
-   Gyepi Sam <gyepi@praxis-sw.com>
+AUTHORS:
+Gyepi Sam <gyepi@praxis-sw.com>   2002 - 2003
+Matthias Andree <matthias.andree@gmx.de> 2003
 
 ******************************************************************************/
 
+#include <db.h>
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
@@ -24,28 +26,40 @@ AUTHOR:
 #include "common.h"
 
 #include "datastore.h"
-#include "datastore_db.h"
 #include "error.h"
 #include "maint.h"
 #include "swap.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-#define	MIN_SLEEP	1000		/* 1 millisecond */
-#define	MAX_SLEEP	1000000		/* 1 second      */
+#define MSG_COUNT_TOK ".MSG_COUNT"
+
+typedef struct {
+  char *filename;
+  char *name;
+  int fd;
+  dbmode_t open_mode;
+  DB *dbp;
+  pid_t pid;
+  bool locked;
+  int  is_swapped;
+} dbh_t;
 
 #define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
 
-#if DB_VERSION_MAJOR <= 3 || (DB_VERSION_MAJOR == 4 && DB_VERSION_MINOR == 0)
-#define	DB_OPEN(db, file, database, dbtype, flags, mode) db->open(db, file, database, dbtype, flags, mode)
-#else
+#define DB_AT_LEAST(maj, min) ((DB_VERSION_MAJOR > (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR >= (min))))
+
+#if DB_AT_LEAST(4,1)
 #define	DB_OPEN(db, file, database, dbtype, flags, mode) db->open(db, NULL /*txnid*/, file, database, dbtype, flags, mode)
+#else
+#define	DB_OPEN(db, file, database, dbtype, flags, mode) db->open(db, file, database, dbtype, flags, mode)
 #endif
 
 /* Function prototypes */
 
 static long db_get_dbvalue(void *vhandle, const char *word, dbv_t *val);
 static void db_set_dbvalue(void *vhandle, const char *word, dbv_t *val);
+static int db_lock(int fd, int cmd, int type);
 
 /* Function definitions */
 
@@ -56,7 +70,7 @@ static void db_enforce_locking(dbh_t *handle, const char *func_name){
     }
 }
 
-static dbh_t *dbh_init(const char *filename, const char *name){
+static dbh_t *dbh_init(const char *filename, const char *name) {
   dbh_t *handle;
 
   handle = xmalloc(sizeof(dbh_t));
@@ -67,6 +81,7 @@ static dbh_t *dbh_init(const char *filename, const char *name){
   handle->pid	    = getpid();
   handle->locked    = false;
   handle->is_swapped= 0;
+  handle->fd	    = -1; /* for lock */
 
   return handle;
 }
@@ -78,12 +93,13 @@ static void dbh_free(dbh_t *handle){
     xfree(handle);
 }
 
-
 /*
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
 */
-void *db_open(const char *db_file, const char *name, dbmode_t open_mode, const char *dir) {
+void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
+	const char *dir)
+{
     int ret;
     dbh_t *handle;
     u_int32_t opt_flags = 0;
@@ -91,41 +107,79 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode, const c
     assert(dir && *dir);
 
     if (open_mode == DB_READ)
-      opt_flags = DB_RDONLY;
+	opt_flags = DB_RDONLY;
     else
-      opt_flags = DB_CREATE; /*Read-write mode implied. Allow database to be created if necesary */
+	/* Read-write mode implied.  Allow database to be created if
+	 * necessary. DB_EXCL makes sure out locking doesn't fail if two
+	 * applications try to create a DB at the same time. */
+	opt_flags = 0;
 
     handle = dbh_init(db_file, name);
-    if ((ret = db_create (&(handle->dbp), NULL, 0)) != 0){
-	print_error(__FILE__, __LINE__, "(db) create, err: %d, %s", ret, db_strerror(ret));
+    handle->open_mode = open_mode;
+    /* create DB handle */
+    if ((ret = db_create (&(handle->dbp), NULL, 0)) != 0) {
+	print_error(__FILE__, __LINE__, "(db) create, err: %d, %s",
+		ret, db_strerror(ret));
+	goto open_err;
     }
-    else if ((ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags, 0664)) != 0)
-    {
-	print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s", db_file, ret, db_strerror(ret));
-    }
-    else {
-      /* see if the database byte order differs from that of the cpu's */
-      int had_err = 0;
 
-#if DB_VERSION_MAJOR > 3 || (DB_VERSION_MAJOR == 3 && DB_VERSION_MINOR >= 3)
-      if ( (ret = handle->dbp->get_byteswapped (handle->dbp, &(handle->is_swapped))) != 0){
-	handle->dbp->err (handle->dbp, ret, "%s (db) get_byteswapped: %s", progname, db_file);
-        had_err = 1;
-      }
+    /* open data base */
+    if ((ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags, 0664)) != 0 &&
+	    (ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags |  DB_CREATE | DB_EXCL, 0664)) != 0) {
+	print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s",
+		db_file, ret, db_strerror(ret));
+	goto open_err;
+    }
+
+    if (DEBUG_DATABASE(1)) {
+      fprintf(dbgout, "db_open( %s, %s, %d )\n", name, db_file, open_mode);
+    }
+
+    /* see if the database byte order differs from that of the cpu's */
+#if DB_AT_LEAST(3,3)
+    ret = handle->dbp->get_byteswapped (handle->dbp, &(handle->is_swapped));
 #else
-      handle->is_swapped = handle->dbp->get_byteswapped (handle->dbp);
+    ret = 0;
+    handle->is_swapped = handle->dbp->get_byteswapped (handle->dbp);
 #endif
-      if (!had_err)
-        return (void *)handle;
+    if (ret != 0) {
+	handle->dbp->err (handle->dbp, ret, "%s (db) get_byteswapped: %s",
+		progname, db_file);
+	db_close(handle);
+	goto open_err;
     }
 
+    ret = handle->dbp->fd(handle->dbp, &handle->fd);
+    if (ret < 0) {
+	handle->dbp->err (handle->dbp, ret, "%s (db) fd: %s",
+		progname, db_file);
+	db_close(handle);
+	goto open_err;
+    }
+
+    if (db_lock(handle->fd, F_SETLK,
+		open_mode == DB_READ ? F_RDLCK : F_WRLCK))
+    {
+	int e = errno;
+	handle->fd = -1;
+	db_close(handle);
+	errno = e;
+	/* do not goto open_err here, db_close frees the handle! */
+	return NULL;
+    }
+
+    handle->locked = true;
+    return (void *)handle;
+
+open_err:
     dbh_free(handle);
     return NULL;
 }
 
 /*
     Retrieve numeric value associated with word.
-    Returns: value if the the word is found in database, 0 if the word is not found.
+    Returns: value if the the word is found in database,
+    0 if the word is not found.
     Notes: Will call exit if an error occurs.
 */
 long db_getvalue(void *vhandle, const char *word){
@@ -149,6 +203,22 @@ long db_getvalue(void *vhandle, const char *word){
     return 0;
 }
 
+void db_delete(void *vhandle, const char *word) {
+    int ret;
+    dbh_t *handle = vhandle;
+    char *t;
+
+    DBT db_key;
+    DBT_init(db_key);
+
+    db_key.data = t = xstrdup(word);
+    db_key.size = strlen(word);
+    ret = handle->dbp->del(handle->dbp, NULL, &db_key, 0);
+    free(t);
+    if (ret == 0 || ret == DB_NOTFOUND) return;
+    print_error(__FILE__, __LINE__, "(db) db_delete('%s'), err: %d, %s", word, ret, db_strerror(ret));
+    exit(2);
+}
 
 static long db_get_dbvalue(void *vhandle, const char *word, dbv_t *val){
   int  ret;
@@ -275,14 +345,14 @@ void db_decrement(void *vhandle, const char *word, long value){
 /*
   Get the number of messages associated with database.
 */
-long db_getcount(void *vhandle){
+long db_get_msgcount(void *vhandle){
   return db_getvalue(vhandle, MSG_COUNT_TOK);
 }
 
 /*
  Set the number of messages associated with database.
 */
-void db_setcount(void *vhandle, long count){
+void db_set_msgcount(void *vhandle, long count){
   db_setvalue(vhandle, MSG_COUNT_TOK, count);
 }
 
@@ -293,10 +363,19 @@ void db_close(void *vhandle){
   int ret;
 
   if (handle == NULL) return;
+  if (handle->fd >= 0) {
+      db_lock(handle->fd, F_UNLCK,
+	      handle->open_mode == DB_READ ? F_RDLCK : F_WRLCK);
+  }
   if ((ret = handle->dbp->close(handle->dbp, 0))) {
     print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
   }
-  db_lock_release(handle);
+
+  if (DEBUG_DATABASE(1)) {
+      fprintf(dbgout, "db_close( %s, %s )\n", handle->name, handle->filename);
+  }
+
+/*  db_lock_release(handle); */
   dbh_free(handle);
 }
 
@@ -304,201 +383,67 @@ void db_close(void *vhandle){
  flush any data in memory to disk
 */
 void db_flush(void *vhandle){
-  dbh_t *handle = vhandle;
-  int ret;
-  if ((ret = handle->dbp->sync(handle->dbp, 0))) {
-    print_error(__FILE__, __LINE__, "(db) db_sync: err: %d, %s", ret, db_strerror(ret));
-  }
+    dbh_t *handle = vhandle;
+    int ret;
+    if ((ret = handle->dbp->sync(handle->dbp, 0))) {
+	print_error(__FILE__, __LINE__, "(db) db_sync: err: %d, %s", ret, db_strerror(ret));
+    }
 }
 
 
 /* implements locking. */
-static int db_lock(dbh_t *handle, int cmd, int type){
-  int fd;
-  int ret;
-  struct flock lock;
+static int db_lock(int fd, int cmd, int type){
+    struct flock lock;
 
-  if ( (ret = handle->dbp->fd(handle->dbp, &fd)) != 0){
-    print_error(__FILE__, __LINE__, "(db) db_lock: %d, err: %d, %s", cmd, ret, db_strerror(ret));
-    exit(2);
-  }
-
-  lock.l_type = type;
-  lock.l_start = 0;
-  lock.l_whence = SEEK_SET;
-  lock.l_len = 0;
-  return (fcntl(fd, cmd, &lock));
+    lock.l_type = type;
+    lock.l_start = 0;
+    lock.l_whence = SEEK_SET;
+    lock.l_len = 0;
+    return (fcntl(fd, cmd, &lock));
 }
 
-/*
-Acquires blocking read lock on database.
-*/
-void db_lock_reader(void *vhandle){
-  dbh_t *handle = vhandle;
+int db_foreach(void *vhandle, int (*hook)(char *key, long key_size,
+	    char *value, long key_value, void *userdata), void *userdata) {
+    dbh_t *handle = vhandle;
+    int ret;
+    DBC dbc;
+    DBC *dbcp = &dbc;
+    DBT key, data;
+    memset (&key, 0, sizeof(key));
+    memset (&data, 0, sizeof(data));
 
-  if (DEBUG_DATABASE(1))
-    fprintf(dbgout, "[%lu] Acquiring read lock  on %s\n", (unsigned long) handle->pid, handle->filename);
-
-  errno = 0;
-
-  if (db_lock(handle, F_SETLKW, F_RDLCK) != 0){
-    if (errno == EAGAIN){
-  	if (DEBUG_DATABASE(2))
-    	  fprintf(dbgout, "[%lu] Faked read lock on %s.\n", (unsigned long) handle->pid, handle->filename);
+    ret = handle->dbp->cursor(handle->dbp, NULL, &dbcp, 0);
+    if (ret) {
+	handle->dbp->err(handle->dbp, ret, "(cursor): %s", handle->filename);
+	return -1;
     }
-    else {
-	print_error(__FILE__, __LINE__, "Error acquiring read lock on %s\n", handle->filename);
-	exit(2);
+
+    while((ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) == 0) {
+	long cv[2];
+
+	memcpy(&cv, data.data, data.size);
+	if (handle->is_swapped) {
+	    unsigned int i;
+	    for(i=0;i< (data.size / 4);i++)
+		cv[i] = swap_32bit(cv[i]);
+	}
+
+	/* call user function */
+	if (hook(key.data, key.size, data.data, data.size, userdata))
+	    break;
     }
-  }
-
-  if (DEBUG_DATABASE(1))
-    fprintf(dbgout, "[%lu] Got read lock  on %s\n", (unsigned long) handle->pid, handle->filename);
-
-  handle->locked = true;
-}
-
-/*
-Acquires blocking write lock on database.
-*/
-void db_lock_writer(void *vhandle){
-  dbh_t *handle = vhandle;
-
-  if (DEBUG_DATABASE(1))
-    fprintf(dbgout, "[%lu] Acquiring write lock on %s\n", (unsigned long) handle->pid, handle->filename);
-
-  if (db_lock(handle, F_SETLKW, F_WRLCK) != 0){
-      print_error(__FILE__, __LINE__, "Error acquiring write lock on %s\n", handle->filename);
-      exit(2);
-  }
-
-  if (DEBUG_DATABASE(1))
-    fprintf(dbgout, "[%lu] Got write lock on %s\n", (unsigned long) handle->pid, handle->filename);
-
-  handle->locked = true;
-}
-
-/*
-Releases acquired lock
-*/
-void db_lock_release(void *vhandle){
-  dbh_t *handle = vhandle;
-
-  if (handle->locked){
-    if (DEBUG_DATABASE(1))
-      fprintf(dbgout, "[%lu] Releasing lock on %s\n", (unsigned long) handle->pid, handle->filename);
-
-    if (db_lock(handle, F_SETLK, F_UNLCK) != 0){
-	print_error(__FILE__, __LINE__, "Error releasing on %s\n", handle->filename);
-	exit(2);
+    switch(ret) {
+	case DB_NOTFOUND:
+	    /* OK */
+	    ret = 0;
+	    break;
+	default:
+	    handle->dbp->err(handle->dbp, ret, "(c_get)");
+	    ret = -1;
     }
-  }
-  else if (DEBUG_DATABASE(1)) {
-    fprintf(dbgout, "[%lu] Attempt to release open lock on %s\n", (unsigned long) handle->pid, handle->filename);
-  }
-
-  handle->locked = false;
-}
-
-/*
-Releases acquired locks on multiple databases
-*/
-void db_lock_release_list(wordlist_t *list){
-  while (list != NULL) {
-    if (list->active && ((dbh_t *)list->dbh)->locked)
-      db_lock_release(list->dbh);
-
-    list = list->next;
-  }
-}
-
-static void lock_msg(const dbh_t *handle, int idx, const char *msg, int cmd, int type)
-{
-  const char *block_type[] = { "nonblocking", "blocking" };
-  const char *lock_type[]  = { "write", "read" };
-
-  print_error(__FILE__, __LINE__, "[%lu] [%d] %s %s %s lock on %s",
-	          (unsigned long)handle->pid,
-                  idx,
-		  msg,
-		  block_type[cmd == F_SETLKW],
-		  lock_type[type == F_RDLCK],
-		  handle->filename);
-}
-
-/*
-Acquires locks on multiple database.
-
-Uses the following protocol  to avoid deadlock:
-
-1. The first database in the list is locked in blocking mode,
-   all subsequent databases are locked in non-blocking mode.
-
-2. If a lock attempt on a database fails, all locks on existing databases are relinquished,
-   and the whole operation restarted. In order to avoid syncronicity among contending lockers,
-   each locker sleeps for some small, random time period before restarting.
-
-*/
-static void db_lock_list(wordlist_t *list, int type){
-
-#define do_lock_msg(msg) lock_msg(handle, i, msg, cmd, type)
-  int i;
-  int cmd;
-  wordlist_t *tmp;
-
-  for(;;){
-    for (tmp = list, i = 0, cmd = F_SETLKW; tmp != NULL; tmp = tmp->next, i++, cmd = F_SETLK){
-
-      dbh_t *handle = tmp->dbh;
-
-      if (tmp->active == false)
-	continue;
-
-      if (DEBUG_DATABASE(1))
-	do_lock_msg("Trying");
-
-       if (db_lock(handle, cmd, type) == 0){
-        if (DEBUG_DATABASE(1))
-          do_lock_msg("Got");
-
-        handle->locked = true;
-       }
-       else if (type == F_RDLCK && errno == EAGAIN){
-        if (verbose)
-          do_lock_msg("Faked");
-
-        handle->locked = true;
-      }
-      else if (errno == EACCES || errno == EAGAIN || errno == EINTR){
-        if (verbose)
-          do_lock_msg("Failed to acquire");
-
-        break;
-      }
-      else {
-        do_lock_msg("Error acquiring");
-	exit(2);
-      }
+    if (dbcp->c_close(dbcp)) {
+	    handle->dbp->err(handle->dbp, ret, "(c_close)");
+	    ret = -1;
     }
-    /* All locks acquired. */
-    if (tmp == NULL)
-      break;
-
-    /* Some locks failed. Release all acquired locks */
-    db_lock_release_list(list);
-
-    /*sleep for short, random time */
-    usleep( MIN_SLEEP + (unsigned long) ((MAX_SLEEP-MIN_SLEEP)*rand()/(RAND_MAX+1.0)));
-  }
-}
-
-
-/* Acquires read locks on multiple databases.  */
-void db_lock_reader_list(wordlist_t *list){
-  db_lock_list(list, F_RDLCK);
-}
-
-/* Acquires write locks on multiple database.  */
-void db_lock_writer_list(wordlist_t *list){
-  db_lock_list(list, F_WRLCK);
+    return ret;
 }

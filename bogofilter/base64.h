@@ -12,6 +12,6 @@ NAME:
 
 #include "common.h"
 
-int base64_decode(byte *buff, size_t size);
+size_t base64_decode(byte *buff, size_t size);
 
 #endif	/* HAVE_BASE64_H */

@@ -40,7 +40,7 @@ libbogofilter_a_SOURCES= \
 	bogoconfig.h config.c \
 	charset.h charset.c \
 	collect.h collect.c \
-	datastore.h datastore_db.h datastore_db.c \
+	datastore.h datastore_db.c \
 	debug.h debug.c \
 	error.h error.c \
 	fgetsl.h fgetsl.c \
@@ -76,13 +76,11 @@ wordhash_SOURCES = wordhash.main.c
 find_home_test_SOURCES = find_home.test.c
 
 # what to distribute
-extradistdirs=
 EXTRA_DIST = bogofilter.cf.example \
 	     METHODS UPGRADE \
 	     bogofilter.spec bogofilter.spec.in \
 	     bogoupgrade \
 	     version.sh \
-	     $(extradistdirs) \
 	     strlcat.3 strlcpy.3
 #
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.c lexer_head.l lexer_text_plain.l lexer_text_html.l
@@ -113,7 +111,3 @@ cvs-check:
 	cvs export -rHEAD -d $(PACKAGE)-$(VERSION)-export $(PACKAGE)
 	cd $(PACKAGE)-$(VERSION)-export && autoreconf -i -f -s \
 	&& ./configure && make distcheck
-
-dist-hook:
-	cd $(distdir) && for i in $(extradistdirs) ; do find $$i -name CVS -type d -prune -exec rm -r '{}' ';' ; done
-	cd $(distdir) && for i in $(extradistdirs) ; do find $$i -name .cvsignore -type f -exec rm -r '{}' ';' ; done

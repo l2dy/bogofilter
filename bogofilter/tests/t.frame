@@ -11,19 +11,20 @@
 set -e
 
 : ${relpath=..}
+: ${BF_TESTDIR=.}
 
 if [ -z "$RUN_FROM_MAKE" ] ; then
    NAME=`echo $0 | sed s@.*/t\.@@`
    DATE=`date +"%Y%m%d"`
-   TMPDIR="$NAME.$DATE"
+   TMPDIR="${BF_TESTDIR}/$NAME.$DATE"
    rm -rf $TMPDIR
    mkdir  $TMPDIR
    SUPPRESS_DELETE="NO"
 else
 #   SUPPRESS_DELETE=NO
     while : ; do
-	TMPDIR=./checks.$$.`date +"%Y%m%dT%H%M%S"`
-	if test x$SUPPRESS_DELETE = xNO ; then TMPDIR=./outputs.`date +"%m%d"` ; fi
+	TMPDIR=${BF_TESTDIR}/checks.$$.`date +"%Y%m%dT%H%M%S"`
+	if test x$SUPPRESS_DELETE = xNO ; then TMPDIR=${BF_TESTDIR}/outputs.`date +"%m%d"` ; fi
 	[ -d $TMPDIR ] || mkdir $TMPDIR
         [ -d $TMPDIR ] && break
 	sleep 1

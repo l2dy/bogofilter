@@ -41,5 +41,5 @@ EOF
 $BOGOFILTER -r -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER -r -n < ${SYSTEST}/inputs/good.mbx
 $BOGOUTIL -R $TMPDIR
-ROBX=`echo '.ROBX' | $BOGOUTIL -w $TMPDIR | $AWK '/.ROBX/ { print $2; }'`
+ROBX=`$BOGOUTIL -w $TMPDIR .ROBX | $AWK '/.ROBX/ { print $2; }'`
 test $ROBX = "253445"

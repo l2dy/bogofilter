@@ -15,12 +15,17 @@ LDADD = -lbogofilter
 
 t.integrity: dehex dumbhead
 
-TESTSCRIPTS=t.score1 t.score2 t.integrity t.integrity2 \
-	    t.lock1 t.lock2 t.ignore_spam_header t.env \
-	    t.nullstatsprefix t.lexer
+TESTSCRIPTS=t.env \
+	    t.ignore_spam_header \
+	    t.integrity t.integrity2 \
+	    t.lexer \
+	    t.lock1 t.lock2 \
+	    t.nullstatsprefix \
+	    t.score1 t.score2
+
 TESTS=$(TESTSCRIPTS)
 
-TESTS_ENVIRONMENT=RUN_FROM_MAKE=1 srcdir=$(srcdir) $(SHELL) $(VERBOSE)
+TESTS_ENVIRONMENT=RUN_FROM_MAKE=1 AWK=$(AWK) srcdir=$(srcdir) $(SHELL) $(VERBOSE)
 
 EXTRA_DIST=$(TESTSCRIPTS) t.frame t.skel inputs outputs
 
