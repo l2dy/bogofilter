@@ -23,16 +23,17 @@ AUTHOR:
 
 /* Globals */
 
-long msgs_good = 0L;
-long msgs_bad  = 0L;
-
-/* Function Definitions */
-
+bool	msg_count_file = false;
 char	msg_count_chars[MSG_COUNT_MAX_LEN];
 size_t	msg_count_leng = MSG_COUNT_MAX_LEN;
 char   *msg_count_text = msg_count_chars;
 
 const char *msg_count_header = "\".MSG_COUNT\"";
+
+long	msgs_good = 0L;
+long	msgs_bad  = 0L;
+
+/* Function Definitions */
 
 token_t  msg_count_lex(void)
 {

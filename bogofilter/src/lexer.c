@@ -249,11 +249,7 @@ void yyinit(void)
     yylineno = 0;
     msg_header = true;
 
-    /* Special check to allow quick
-    ** processing of msg-count files
-    */
-
-    if (lexer != &msg_count_lexer)
+    if (!msg_count_file)
 	lexer = &v3_lexer;
 }
 

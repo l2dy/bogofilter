@@ -148,6 +148,7 @@ token_t get_token(void)
 	case NONE:		/* nothing to do */
 	    break;
 	case MSG_COUNT_LINE:
+	    msg_count_file = true;
 	    lexer = &msg_count_lexer;
 	case BOGO_LEX_LINE:
 	    done = true;
@@ -166,25 +167,27 @@ token_t get_token(void)
 	    done = true;
     }
 
-    /* Remove trailing blanks */
-    /* From "From ", for example */
-    while (yylval->leng > 1 && yylval->text[yylval->leng-1] == ' ') {
-	yylval->leng -= 1;
-	yylval->text[yylval->leng] = '\0';
-    }
+    if (!msg_count_file) {
+	/* Remove trailing blanks */
+	/* From "From ", for example */
+	while (yylval->leng > 1 && yylval->text[yylval->leng-1] == ' ') {
+	    yylval->leng -= 1;
+	    yylval->text[yylval->leng] = '\0';
+	}
 
-    /* Remove trailing colon */
-    if (yylval->leng > 1 && yylval->text[yylval->leng-1] == ':') {
-	yylval->leng -= 1;
-	yylval->text[yylval->leng] = '\0';
-    }
+	/* Remove trailing colon */
+	if (yylval->leng > 1 && yylval->text[yylval->leng-1] == ':') {
+	    yylval->leng -= 1;
+	    yylval->text[yylval->leng] = '\0';
+	}
 
-    /* Need separate loop so lexer can see "From", "Date", etc *
-     * depending on options set, replace nonascii characters by '?'s
-     * and/or replace upper case by lower case
-     */
-    for (cp = yylval->text; cp < yylval->text+yylval->leng; cp += 1)
-	*cp = casefold_table[*cp];
+	/* Need separate loop so lexer can see "From", "Date", etc *
+	 * depending on options set, replace nonascii characters by '?'s
+	 * and/or replace upper case by lower case
+	 */
+	for (cp = yylval->text; cp < yylval->text+yylval->leng; cp += 1)
+	    *cp = casefold_table[*cp];
+    }
 
     return(class);
 }
