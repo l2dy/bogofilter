@@ -4,7 +4,7 @@
 
 CFG=${TMPDIR}/test.cf
 OUT=${TMPDIR}/test.out
-CORRECT=${SYSTEST}/outputs/ipaddr.ref
+CORRECT=${SYSTEST}/outputs/msgaddr.ref
 
 cat <<EOF > $CFG
 # include ip address
