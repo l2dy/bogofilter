@@ -437,8 +437,12 @@ static void print_version(void)
 
 static void usage(void)
 {
-    fprintf(stderr, "Usage: %s { -d | -l | -w | -p } file%s | { -r | -R | -f | -F | -P } directory | [ -v | -h | -V ]\n", 
+    fprintf(stderr, "Usage: %s [ -h | -v | -V ]\n",
+	    progname);
+    fprintf(stderr, "   or: %s { -d | -l | -w | -p | --db-verify } file%s\n",
 	    progname, DB_EXT);
+    fprintf(stderr, "   or: %s { -r | -R | --db-prune --db-recover --db-recover-harder --db-remove-environment } directory\n",
+	    progname);
 }
 
 static const char *help_text[] = {
@@ -473,12 +477,12 @@ static const char *help_text[] = {
     "  -y, --timestamp-date=date - set default date (format YYYYMMDD).\n",
 
     "environment maintenance:\n",
-    "  -k, --db_cachesize=size     - set Berkeley DB cache size (MB).\n",
-    "      --db_verify=file        - verify data file.\n",
-    "      --db_prune=dir          - remove inactive log files in dir.\n",
-    "      --db_recover=dir        - run recovery on database in dir.\n",
-    "      --db_recover-harder=dir - run catastrophic recovery on database.\n",
-    "      --db_remove-environment - remove environment.\n",
+    "  -k, --db-cachesize=size     - set Berkeley DB cache size (MB).\n",
+    "      --db-verify=file        - verify data file.\n",
+    "      --db-prune=dir          - remove inactive log files in dir.\n",
+    "      --db-recover=dir        - run recovery on database in dir.\n",
+    "      --db-recover-harder=dir - run catastrophic recovery on database.\n",
+    "      --db-remove-environment - remove environment.\n",
 
 #ifdef	HAVE_DECL_DB_CREATE
     "      --db_lk_max_locks       - set max lock count.\n",
@@ -607,8 +611,8 @@ static int process_arglist(int argc, char **argv)
 
     if (count != 1)
     {
-	fprintf(stderr, "%s: Exactly one of the -C, -d, -f, -F, -P, -l, -R or -w flags "
-		"must be present.\n", progname);
+	usage();
+	fprintf(stderr, "%s: Exactly one of the file or directory commands must be present.\n", progname);
 	exit(EX_ERROR);
     }
 
