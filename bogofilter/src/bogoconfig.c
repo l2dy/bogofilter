@@ -510,7 +510,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'L':
-	logtag = val;
+	logtag = xstrdup(val);
 	/*@fallthrough@*/
 
     case 'l':
@@ -560,7 +560,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 	
     case 'U':
-	unsure_stats = true;
+	unsure_stats = (val == NULL) ? true : get_bool(name, val);
 	break;
 
     case 'v':
@@ -612,7 +612,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'H':
-	header_line_markup = false;
+	header_line_markup = (val == NULL) ? false : get_bool(name, val);
 	break;
 
     case 'k':
@@ -698,7 +698,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 #define	Q2	if (query >= 2)
 
 #define YN(b) (b ? "Yes" : "No")
-#define NB(b) (b ? b : "")
+#define NB(b) ((b != NULL && *b != '\0') ? b : "''")
 
 void query_config(void)
 {
@@ -722,56 +722,29 @@ void query_config(void)
     Q1 fprintf(stdout, "%-17s = %s\n",    "timestamp",           YN(timestamp_tokens));
     Q2 fprintf(stdout, "%-17s = %d\n",    "timestamp-date",      today);
     Q1 fprintf(stdout, "\n");
-    Q1 fprintf(stdout, "%-17s = %s\n", "terse",               YN(terse));
     Q1 fprintf(stdout, "%-17s = %s\n", "spam_header_name",    spam_header_name);
     Q1 fprintf(stdout, "%-17s = %s\n", "spam_subject_tag",    NB(spam_subject_tag));
     Q1 fprintf(stdout, "%-17s = %s\n", "unsure_subject_tag",  NB(unsure_subject_tag));
+    Q2 fprintf(stdout, "%-18s = %s\n", "syslog-tag",          NB(logtag));
     Q1 fprintf(stdout, "%-17s = %s\n", "header_format",       header_format);
     Q1 fprintf(stdout, "%-17s = %s\n", "terse_format",        terse_format);
     Q1 fprintf(stdout, "%-17s = %s\n", "log_header_format",   log_header_format);
     Q1 fprintf(stdout, "%-17s = %s\n", "log_update_format",   log_update_format);
-    display_tag_array("spamicity_tags   ", spamicity_tags);
-    display_tag_array("spamicity_formats", spamicity_formats);
+    Q1 display_tag_array("spamicity_tags   ", spamicity_tags);
+    Q1 display_tag_array("spamicity_formats", spamicity_formats);
 
     Q2 fprintf(stdout, "\n");
 
     Q2 fprintf(stdout, "%-18s = %s\n", "no-config-file",   YN(suppress_config_file));
-    Q2 fprintf(stdout, "%-18s = %s\n", "config-file",      config_file_name);
-    Q2 fprintf(stdout, "%-18s = %s\n", "user_config_file", user_config_file);
+    Q2 fprintf(stdout, "%-18s = %s\n", "config-file",      NB(config_file_name));
+    Q2 fprintf(stdout, "%-18s = %s\n", "user_config_file", NB(user_config_file));
     Q2 fprintf(stdout, "\n");
 
     Q2 fprintf(stdout, "%-18s = %s\n", "bogofilter_dir", bogohome);
-    Q2 fprintf(stdout, "%-18s = ", "wordlist(s)"); display_wordlists("%-18s = ");
-    Q2 fprintf(stdout, "\n");
-
-    Q2 fprintf(stdout, "%-18s = %s\n", "unregister-nonspam", YN(run_type == UNREG_GOOD));
-    Q2 fprintf(stdout, "%-18s = %s\n", "unregister-spam",    YN(run_type == UNREG_SPAM));
-    Q2 fprintf(stdout, "%-18s = %s\n", "register-ham",       YN(run_type == REG_GOOD));
-    Q2 fprintf(stdout, "%-18s = %s\n", "register-spam",      YN(run_type == REG_SPAM));
-    Q2 fprintf(stdout, "%-18s = %s\n", "update-as-scored",   YN(run_type & RUN_UPDATE));
-    Q2 fprintf(stdout, "\n");
-
-    Q2 fprintf(stdout, "%-18s = %s\n", "classify-files",       YN(bulk_mode == B_CMDLINE));
-    Q2 fprintf(stdout, "%-18s = %s\n", "classify-mbox",        YN(mbox_mode));
-    Q2 fprintf(stdout, "%-18s = %s\n", "classify-stdin",       YN(bulk_mode == B_STDIN));
-    Q2 fprintf(stdout, "\n");
-
-    Q2 fprintf(stdout, "%-18s = %s\n", "nonspam-exits-zero", YN(nonspam_exits_zero));
-    Q2 fprintf(stdout, "%-18s = %s\n", "passthrough",        YN(passthrough));
-    Q2 fprintf(stdout, "%-18s = %d\n", "verbosity",          verbose);
-    Q2 fprintf(stdout, "%-18s = %s\n", "fixed-terse-format", YN(inv_terse_mode));
-    Q2 fprintf(stdout, "%-18s = %s\n", "dataframe",          YN(Rtable));
-    Q2 fprintf(stdout, "\n");
-
-    Q2 fprintf(stdout, "%-18s = %s\n", "syslog-tag", logtag);
-    Q2 fprintf(stdout, "%-18s = %s\n", "use-syslog", YN(logflag));
+    Q2 display_wordlists("%-18s   ");
     Q2 fprintf(stdout, "\n");
 
     Q2 fprintf(stdout, "%-18s = %d\n", "db_cachesize",    db_cachesize);
-    Q2 fprintf(stdout, "%-18s = %s\n", "debug-to-stdout", YN(dbgout == stdout));
-/*  Q2 fprintf(stdout, "%-18s = %s\n", "debug-flags", xxx); */
-/*  Q2 fprintf(stdout, "%-18s = %s\n", "input-file", xxx);  */
-/*  Q2 fprintf(stdout, "%-18s = %s\n", "output-file", xxx); */
 
     exit(EX_OK);
 }

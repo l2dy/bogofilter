@@ -181,8 +181,7 @@ void display_wordlists(const char *fmt)
 
     for ( list = word_lists; list != NULL ; list = list->next )
     {
-	if (list != word_lists)
-	    fprintf(stdout, fmt, " ");
+	fprintf(stdout, fmt, "wordlist");
 	fprintf(stdout, "%s,%s,%s,%d\n",
 		(list->type == WL_REGULAR) ? "r" : "i",
 		list->listname,

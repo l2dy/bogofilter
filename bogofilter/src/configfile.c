@@ -111,6 +111,8 @@ bool process_config_option_as_arg(const char *opt, const char *val, priority_t p
 	    break;
 	if (strlen(s) != len || strncasecmp(s, opt, len) != 0)
 	    continue;
+	if (strcmp(val, "''") == 0)
+	    val = "";
 	process_arg(long_options[idx].val, s, val, precedence, PASS_2_CFG);
 	return true;
     }
