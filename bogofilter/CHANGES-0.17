@@ -8,7 +8,13 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
  
-0.17.1	2004-02-??
+0.17.1	2004-02-09
+
+	* 2004-02-05
+
+	* Additional portability fixes for SunOS 4.1.4
+
+	* 2004-02-04
 
 	* Fix '-d' and '--bogofilter_dir=directory' options.
 
