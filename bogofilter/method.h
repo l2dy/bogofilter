@@ -1,5 +1,9 @@
 /* $Id$ */
-/*  constants and declarations for method */
+
+/*
+** This defines an object oriented API for accessing 
+** the methods needed by an object for spamicity computing.
+*/
 
 #ifndef	HAVE_METHOD_H
 #define	HAVE_METHOD_H
@@ -13,11 +17,6 @@ typedef	void	m_initialize(void);
 typedef	double	m_compute_spamicity(wordhash_t *wordhash, FILE *fp); /*@globals errno@*/
 typedef	void	m_print_bogostats(FILE *fp, double spamicity);
 typedef	void	m_cleanup(void);
-
-/*
-** This defines an object oriented API for accessing 
-** the methods needed by an object for spamicity computing.
-*/
 
 typedef struct method_s {
     const char		*name;
