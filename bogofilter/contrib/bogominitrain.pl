@@ -12,7 +12,7 @@ my $commandlineoptions=($ARGV[0]=~/^-(?=[^f]*f?[^f]*$)(?=[^n]*n?[^n]*$)(?=[^s]*s
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.36
+bogominitrain.pl version 1.37
   requires bogofilter 0.14.5 or later
 
 Usage:
@@ -26,9 +26,6 @@ Usage:
 
   Uses a "train on error" process to build minimal wordlists that can
   correctly score all messages.
-
-  Run "formail -es" on your mailboxes before you start to ensure their
-  correctness.
 
   It may be a good idea to run this script command several times.  Use
   the '-f' option to run the script until no scoring errors occur.
@@ -169,9 +166,9 @@ do { # Start force loop
   print "Added $hamadd ham mail",$hamadd!=1&&"s"," and $spamadd spam mail",$spamadd!=1&&"s"," to the database.\n";
   print `$bogoutil -w $dir .MSG_COUNT`;
   unless ($runs>1 && $hamadd+$spamadd==0) {
-    $fn=$spamcount>0 && `cat $spam | $bogofilter -TM | grep -cv ^S` || 0;
+    $fn=$spamcount>0 && `cat $spam | $bogofilter -TM | grep -cv ^S` || "0\n";
     print "\nFalse negatives: $fn";
-    $fp=$hamcount>0 && `cat $ham | $bogofilter -TM | grep -cv ^H` || 0;
+    $fp=$hamcount>0 && `cat $ham | $bogofilter -TM | grep -cv ^H` || "0\n";
     print "False positives: $fp\n";
   }
 } until ($fn+$fp==0 || $hamadd+$spamadd==0 || !$force);
