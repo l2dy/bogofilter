@@ -123,11 +123,11 @@ tag_header_lines=no
 # log_update_format = register-%r, %w words, %m messages
 
 
-##### TERSE_MODE
+##### TERSE
 #
 #	if enabled, format the X-Bogosity use the 'terse_format' specificaton.
 
-terse_mode=no
+terse=no
 
 ########### Tokenizer Settings ######################################
 

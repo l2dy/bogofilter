@@ -153,10 +153,11 @@ const parm_desc sys_parms[] =
     { "charset_default",  	     CP_STRING,  { &charset_default } },
     { "datestamp_tokens",	     CP_BOOLEAN, { (void *) &datestamp_tokens } },
     { "replace_nonascii_characters", CP_BOOLEAN, { (void *) &replace_nonascii_characters } },
-    { "db_cachesize",	  	     CP_INTEGER, { (void *) &db_cachesize } },
     { "tag_header_lines", 	     CP_BOOLEAN, { (void *) &tag_header_lines } },
     { "strict_check", 	  	     CP_BOOLEAN, { (void *) &strict_check } },
-    { "terse_mode", 	  	     CP_BOOLEAN, { (void *) &terse } },
+
+    { "db_cachesize",	  	     CP_INTEGER, { (void *) &db_cachesize } },
+    { "terse",	 	  	     CP_BOOLEAN, { (void *) &terse } },
 
     { NULL,		  	     CP_NONE,	 { (void *) NULL } },
 };
