@@ -26,6 +26,10 @@ Briefly:
 
 	2004-12-13
 
+	* bf_compact now uses db_archive without -d option and loops on the
+	  results instead, calling rm in turn for each file. -d is not
+	  supported by older Berkeley DB versions such as 4.0.
+
 	* bogoutil -P directory  now checkpoints the database and removes
 	  inactive log files. Note you must save the database and remaining log
 	  files, in that order, if you want to be able to recover from
