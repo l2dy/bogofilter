@@ -757,7 +757,7 @@ static void help(void)
 		  "\t  -v      - increase level of verbose messages\n"
 		  "\t  -F      - accept initial spam_cutoff < 0.5 and\n"
 		  "\t          - accept high scoring non-spam and low scoring spam\n"
-		  "\t  -Q      - quiet (suppress warnings)\n"
+		  "\t  -q      - quiet (suppress warnings)\n"
 	);
     (void)fprintf(stderr,
 		  "\n"
@@ -805,7 +805,7 @@ static int process_args(int argc, char **argv)
 		case 'n':
 		    run_type = REG_GOOD;
 		    break;
-		case 'Q':
+		case 'q':
 		    quiet = true;
 		    break;
 		case 'r':
