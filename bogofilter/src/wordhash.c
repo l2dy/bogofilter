@@ -69,6 +69,7 @@ wordhash_init (void)
   h->index = 0;
   h->count = 0;
   h->order = NULL;
+  h->wordcount = 0;
 
   return h;
 }

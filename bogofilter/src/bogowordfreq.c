@@ -35,19 +35,19 @@ static void print_wordlist (wordhash_t *h)
     }
 }
 
-int main(int argc, char **argv) {
-    long count;
-    bool b;
+int main(int argc, char **argv)
+{
+    bool more;
 
     if (argc >= 2) max_repeats=atoi(argv[1]);
     
     do {
 	wordhash_t *h = wordhash_init();
-	collect_words(h, &count, &b);
-	printf("%ld tokens:\n", count);
+	more = collect_words(h);
+	printf("%ld tokens:\n", (long) h->wordcount);
 	print_wordlist(h);
 	printf("\n");
 	wordhash_free(h);
-    } while(b);
+    } while (more);
     return 0;
 }

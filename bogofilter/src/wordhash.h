@@ -31,8 +31,8 @@ typedef /*@null@*/ hashnode_t *hashnode_pt;
 
 typedef struct wordhash_s {
   hashnode_pt *bin;
-  /*@null@*/ /*@owned@*/ wh_alloc_node *nodes; /*list of node buffers */
-  /*@null@*/  wh_alloc_str  *strings; /* list of string buffers */
+  /*@null@*/ /*@owned@*/ wh_alloc_node *nodes;		/*list of node buffers */
+  /*@null@*/  		 wh_alloc_str  *strings;	/* list of string buffers */
 
   /*@null@*/  /*@dependent@*/ hashnode_t *iter_ptr;
   /*@null@*/  /*@dependent@*/ hashnode_t *iter_head;
@@ -40,6 +40,7 @@ typedef struct wordhash_s {
 
   /*@null@*/  /*@dependent@*/ size_t index;		/* access index */
   /*@null@*/  /*@dependent@*/ size_t count;		/* size of array */
+  /*@null@*/  /*@dependent@*/ size_t wordcount;		/* count of words */
   /*@null@*/  /*@dependent@*/ hashnode_t **order;	/* array of nodes */
 
 } wordhash_t;

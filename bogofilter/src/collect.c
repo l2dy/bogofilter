@@ -29,21 +29,13 @@ void collect_reset(void)
 }
 #endif
 
-/* Tokenize input text and save words in the allocated wordhash_t hash table.
- * The caller must free the returned wordhash.
+/* Tokenize input text and save words in the wordhash_t hash table.
  *
- * Sets *word_count to the count of total tokens seen if word_count 
- * is non-NULL.
- *
- * Stores the freshly-allocated wordhash into *wh. wh must not be NULL.
- *
- * *cont is set to true if the EOF token has not been read. cont must
- * not be NULL.
+ * Returns:  true if the EOF token has not been read.
  */
-void collect_words(/*@out@*/ wordhash_t *wh,
-       /*@out@*/ /*@null@*/ long *word_count, /*@out@*/ bool *cont)
+bool collect_words(wordhash_t *wh)
 {
-    long w_count = 0;
+    bool more;
 
     wordprop_t *w;
 
@@ -55,9 +47,9 @@ void collect_words(/*@out@*/ wordhash_t *wh,
 	if (token_type != FROM && token_type != NONE){
 	    w = wordhash_insert(wh, yylval, sizeof(wordprop_t), &wordprop_init);
 	    if (w->freq < max_repeats) w->freq++;
-	    w_count++;
+	    wh->wordcount += 1;
 	    if (DEBUG_WORDLIST(3)) { 
-		fprintf(dbgout, "%3ld ", w_count);
+		fprintf(dbgout, "%3d ", (int) wh->wordcount);
 		word_puts(yylval, 0, dbgout);
 		fputc('\n', dbgout);
 	    }
@@ -70,12 +62,11 @@ void collect_words(/*@out@*/ wordhash_t *wh,
 	}
 
 	/* Process more input if FROM, but not if EOF */
-	*cont = token_type != NONE;
+	more = token_type != NONE;
 	break;
     }
 
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### collect_words() ends\n");
 
-    if (word_count)
-	*word_count = w_count;
+    return more;
 }

@@ -24,12 +24,13 @@ extern size_t msg_register_size;
  * tokenize text on stdin and register it to a specified list
  * and possibly out of another list
  */
-void register_words(run_t _run_type, wordhash_t *h,
-		    int msgcount, int wordcount)
+void register_words(run_t _run_type, wordhash_t *h, int msgcount)
 {
   const char *r="",*u="";
   hashnode_t *node;
   wordprop_t *wordprop;
+
+  int wordcount = h->wordcount;
 
   wordlist_t *list;
   wordlist_t *incr_list = NULL;
@@ -110,6 +111,8 @@ static void add_hash(wordhash_t *dest, wordhash_t *src) {
     wordprop_t *d;
     hashnode_t *s;
 
+    dest->wordcount += src->wordcount;
+
     for (s = wordhash_first(src); s; s = wordhash_next(src)) {
 	d = wordhash_insert(dest, s->key, sizeof(wordprop_t), &wordprop_init);
 	d -> freq += ((wordprop_t *)(s -> buf)) ->freq;
@@ -128,8 +131,8 @@ static void add_hash(wordhash_t *dest, wordhash_t *src) {
 void register_messages(run_t _run_type)
 {
   wordhash_t *words = wordhash_init();
-  long	wordcount, totalwords = 0, msgcount = 0;
-  bool cont;
+  long	msgcount = 0;
+  bool	more;
 
   initialize_constants();
 
@@ -138,14 +141,13 @@ void register_messages(run_t _run_type)
       msgcount++;
       if (DEBUG_REGISTER(1))
 	  fprintf(dbgout, "Message #%ld\n", msgcount);
-      collect_words(h, &wordcount, &cont);
+      more = collect_words(h);
       wordhash_sort(h);
       add_hash(words, h);
       wordhash_free(h);
-      totalwords += wordcount;
-  } while(cont);
+  } while (more);
 
   wordhash_sort(words);
-  register_words(_run_type, words, msgcount, totalwords);
+  register_words(_run_type, words, msgcount);
   wordhash_free(words);
 }
