@@ -162,6 +162,35 @@ int dbx_get_rmw_flag(int open_mode)
     return flag;
 }
 
+/** print user-readable diagnostics and instructions after DB_ENV->open
+ * failed. */
+static void diag_dbeopen(
+	/** DB_ENV->open() flags value  */ u_int32_t flags,
+	/** env directory tried to open */ const char *directory)
+{
+    if (flags & DB_RECOVER) {
+	fprintf(stderr,
+		"\n"
+		"### Standard recovery failed. ###\n"
+		"\n"
+		"Please check section 3.3 in bogofilter's README.db file\n"
+		"for help.\n");
+	/* ask that the user runs catastrophic recovery */
+    } else if (flags & DB_RECOVER_FATAL) {
+	fprintf(stderr,
+		"\n"
+		"### Catastrophic recovery failed. ###\n"
+		"\n"
+		"Please check the README.db file that came with bogofilter for hints,\n"
+		"section 3.3, or remove all __db.*, log.* and *.db files in \"%s\"\n"
+		"and start from scratch.\n", directory);
+	/* catastrophic recovery failed */
+    } else {
+	fprintf(stderr, "To recover, run: bogoutil -v --db-recover \"%s\"\n",
+		directory);
+    }
+}
+
 /** run recovery, open environment and keep the exclusive lock */
 static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags)
 {
@@ -190,16 +219,11 @@ static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags)
 
     e = dbe->open(dbe, directory,
 		  dbenv_defflags | local_flags | DB_RECOVER, DS_MODE);
-    if (e == DB_RUNRECOVERY) {
-	/* that didn't work, try harder */
-	if (DEBUG_DATABASE(0))
-	    fprintf(dbgout, "running catastrophic data base recovery\n");
-	e = dbe->open(dbe, directory,
-		      dbenv_defflags | local_flags | DB_RECOVER_FATAL, DS_MODE);
-    }
     if (e) {
 	print_error(__FILE__, __LINE__, "Cannot recover environment \"%s\": %s",
 		directory, db_strerror(e));
+	if (e == DB_RUNRECOVERY)
+	    diag_dbeopen(flags, directory);
 	exit(EX_ERROR);
     }
 
@@ -524,27 +548,7 @@ static dbe_t *dbe_xinit(dbe_t *env, const char *directory,
 	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %s", db_strerror(ret));
 	switch (ret) {
 	    case DB_RUNRECOVERY:
-		if (flags & DB_RECOVER) {
-		    fprintf(stderr,
-			    "\n"
-			    "### Standard recovery failed. ###\n"
-			    "\n"
-			    "Please check section 3.3 in bogofilter's README.db file\n"
-			    "for help.\n");
-		    /* ask that the user runs catastrophic recovery */
-		} else if (flags & DB_RECOVER_FATAL) {
-		    fprintf(stderr,
-			    "\n"
-			    "### Catastrophic recovery failed. ###\n"
-			    "\n"
-			    "Please check the README.db file that came with bogofilter for hints,\n"
-			    "section 3.3, or remove all __db.*, log.* and *.db files in \"%s\"\n"
-			    "and start from scratch.\n", directory);
-		    /* catastrophic recovery failed */
-		} else {
-		    fprintf(stderr, "To recover, run: bogoutil -v --db-recover \"%s\"\n",
-			    directory);
-		}
+		diag_dbeopen(flags, directory);
 		break;
 	    case EINVAL:
 		fprintf(stderr, "\n"
