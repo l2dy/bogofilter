@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! /usr/bin/perl
 # Script to train bogofilter from mboxes
 # by Boris 'pi' Piwinger <3.14@piology.org>
 # with many useful additions by David Relson <relson@osagesoftware.com>
