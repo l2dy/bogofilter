@@ -97,7 +97,8 @@ static void save_dirname(const char *name)
     l = min(l, sizeof(dirname)-2);
     memcpy(dirname, name, l);
     if (dirname[l-1] == '/')
-	dirname[l-1] = '\0';
+	l -= 1;
+    dirname[l] = '\0';
 }
 
 static const char* const maildir_subs[]={ "/new", "/cur", NULL };
