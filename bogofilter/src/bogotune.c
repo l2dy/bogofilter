@@ -1024,7 +1024,7 @@ static void top_ten(result_t *sorted, uint n)
 	       r->fp, r->fn, r->fp*100.0/ns_cnt, r->fn*100.0/sp_cnt);
 	++i;
       }
-      if(i) break;
+      if (i) break;
       printf("Warning: fp target not met, using original results\n");
     }
 
@@ -1043,7 +1043,7 @@ static int gfn(result_t *results,
     uint i = (((rsi * mdval->cnt + mdi) * rxval->cnt + rxi) * spexp->cnt + spi) * nsexp->cnt + nsi;
     result_t *r = &results[i];
     int fn = r->fn;
-    if(r->fp != target) return INT_MAX;
+    if (r->fp != target) return INT_MAX;
     if (verbose > 100)
 	printf("   %2u, %2u, %2u, %2u, %2u, %2d\n", 
 	       rsi, mdi, rxi, spi, nsi, fn);
@@ -1110,7 +1110,7 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
 	       o, (o > 1) ? "s" : "");
     }
 
-    if (f == 0) {
+    if (!f) {
 	r = &sorted[j-1];
 	printf("No smooth minimum encountered, using lowest fn count (an outlier).         \n");
     }
