@@ -82,10 +82,13 @@ static int ds_dump_hook(word_t *key, dsv_t *data,
 static int dump_wordlist(const char *ds_file)
 {
     int rc;
+    void *dbe;
 
     token_count = 0;
 
-    rc = ds_oper(ds_file, DS_READ, ds_dump_hook, NULL);
+    dbe = ds_init();
+    rc = ds_oper(dbe, ds_file, DS_READ, ds_dump_hook, NULL);
+    ds_cleanup(dbe);
 
     if (rc)
 	fprintf(stderr, "error dumping tokens!\n");

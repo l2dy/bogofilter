@@ -317,30 +317,28 @@ int ds_foreach(void *vhandle, ds_foreach_t *hook, void *userdata)
 
 /* Wrapper for ds_foreach that opens and closes file */
 
-int ds_oper(const char *path, dbmode_t open_mode, 
+int ds_oper(void *env, const char *path, dbmode_t open_mode, 
 	    ds_foreach_t *hook, void *userdata)
 {
     int  ret = 0;
-    void *dsh, *dbe;
+    void *dsh;
 
-    dbe = ds_init();
-    dsh = ds_open(dbe, CURDIR_S, path, open_mode);
+    dsh = ds_open(env, CURDIR_S, path, open_mode);
 
     if (dsh == NULL) {
 	fprintf(stderr, "Can't open file '%s'\n", path);
 	exit(EX_ERROR);
     }
 
-    if (DST_OK == ds_txn_begin(dbe)) {
+    if (DST_OK == ds_txn_begin(env)) {
 	ret = ds_foreach(dsh, hook, userdata);
-	if (ret) { ds_txn_abort(dbe); }
+	if (ret) { ds_txn_abort(env); }
 	else
-	    if (ds_txn_commit(dbe) != DST_OK)
+	    if (ds_txn_commit(env) != DST_OK)
 		ret = -1;
     }
 
     ds_close(dsh);
-    ds_cleanup(dbe);
 
     return ret;
 }
