@@ -46,7 +46,7 @@ WANT="1708.3864"
 #         - no longer discarding message separators
 WANT="1784.4039"
 
-if [ "$RESULT" != "$WANT" -o $verbose -ne 0 ] ; then
+if [ "$RESULT" != "$WANT" ] || [ $verbose -ne 0 ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT
 fi
 
