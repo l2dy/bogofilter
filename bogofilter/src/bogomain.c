@@ -40,6 +40,7 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
     rc_t status;
     ex_t exitcode = EX_OK;
+    bfpath_mode mode;
 
     dbgout = stderr;
 
@@ -47,15 +48,23 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     process_parameters(argc, argv, true);
 
+    output_setup();
+
 #ifdef	HAVE_SYSLOG_H
     if (logflag)
 	openlog("bogofilter", LOG_PID, LOG_MAIL);
 #endif
 
-    output_setup();
+    if (((run_type & UNREG_SPAM) != 0) ||
+	((run_type & UNREG_GOOD) != 0))
+	mode = BFP_MUST_EXIST;
+    else
+	mode = BFP_MAY_CREATE;
+
+    bfpath_set_mode(mode);
 
     /* open all wordlists */
-    open_wordlists(word_lists, (run_type == RUN_NORMAL) ? DS_READ : DS_WRITE);
+    open_wordlists((run_type == RUN_NORMAL) ? DS_READ : DS_WRITE);
 
     status = bogofilter(argc - optind, argv + optind);
 
@@ -72,13 +81,12 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     if (nonspam_exits_zero && exitcode != EX_ERROR)
 	exitcode = EX_OK;
 
-    close_wordlists(word_lists, true);
+    close_wordlists(true);
 
     if (DEBUG_MEMORY(1))
 	MEMDISPLAY;
 
-    free_wordlists(word_lists);
-    word_lists = NULL;
+    free_wordlists();
 
     output_cleanup();
 

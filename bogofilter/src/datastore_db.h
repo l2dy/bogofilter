@@ -35,8 +35,7 @@ extern	bool	  db_txn_durable;	/* not DB_TXN_NOT_DURABLE */
  */
 /*@only@*/ /*@null@*/
 void *db_open(void *env,	/**< database environment to open DB in */
-	      const char *path,	/**< path to database file */
-	      const char *name,	/**< name(s) of data base(s) */
+	      bfpath *bfp,	/**< path info for database file */
 	      dbmode_t mode	/**< open mode, DS_READ or DS_WRITE */);
 
 /** Close file and clean up. */
@@ -47,7 +46,7 @@ void db_flush(void *handle);
 
 /** Do global initializations. \return pointer to environment for success, NULL for
  * error. */
-void *dbe_init(bfdir *directory, bffile *file);
+void *dbe_init(bfpath *bfp);
 
 /** Cleanup storage allocation */
 void dbe_cleanup(void *);
@@ -99,10 +98,10 @@ int db_txn_abort(void *vhandle);
 int db_txn_commit(void *vhandle);
 
 /** Recover the environment given in \a directory. */
-ex_t dbe_recover(bfdir *directory, bool catastrophic, bool force);
+ex_t dbe_recover(bfpath *bfp, bool catastrophic, bool force);
 
 /** Remove the environment from \a directory. */
-ex_t dbe_remove(bfdir *directory);
+ex_t dbe_remove(bfpath *bfp);
 
 /** Checkpoint environment in \a directory. */
 ex_t dbe_checkpoint(bfdir *directory);
@@ -112,10 +111,10 @@ ex_t dbe_purgelogs(bfdir *directory);
 
 /** Return page size of if \a databasefile, 0xffffffff for error, 0 for
  * unknown. */
-u_int32_t db_pagesize(bfdir *directory, bffile *databasefile);
+u_int32_t db_pagesize(bfpath *bfp);
 
 /** Check if \a databasefile is a valid database. */
-ex_t db_verify(bfdir *directory, bffile *databasefile);
+ex_t db_verify(bfpath *bfp);
 
 /** Returns true if the database is byteswapped. */
 bool db_is_swapped(void *vhandle);

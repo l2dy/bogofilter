@@ -19,25 +19,26 @@ $BOGOUTIL -C -v -d ${TMPDIR}/wordlist.$DB_EXT 2>&1 >/dev/null \
 | cmp -s - ${TMPDIR}/ref
 
 # ROBX calculation cannot work, insufficient data
-if $BOGOUTIL -C -r ${TMPDIR}/ ; then false ; fi
+if $BOGOUTIL -C -r ${TMPDIR}/wordlist.${DB_EXT} ; then false ; fi
+if $BOGOUTIL -C -R ${TMPDIR}/wordlist.${DB_EXT} ; then false ; fi
 
 # load more data as ROBX fodder
-$BOGOFILTER -xd -C -n -d ${TMPDIR}/ -M -B ${srcdir}/inputs/good.mbx
-$BOGOFILTER -xd -C -s -d ${TMPDIR}/ -M -B ${srcdir}/inputs/spam.mbx
+$BOGOFILTER -xd -C -n -d ${TMPDIR} -M -B ${srcdir}/inputs/good.mbx
+$BOGOFILTER -xd -C -s -d ${TMPDIR} -M -B ${srcdir}/inputs/spam.mbx
 
 # printing robx must not store the token
-$BOGOUTIL -C -r ${TMPDIR}/ | egrep '^ ?0?.[0-9]+$' >/dev/null
-if $BOGOUTIL -C -w ${TMPDIR}/ .ROBX | egrep '^[[:alnum:]]' ; then
+$BOGOUTIL -C -r ${TMPDIR}/wordlist.${DB_EXT} | egrep '^ ?0?.[0-9]+$' >/dev/null
+if $BOGOUTIL -C -w ${TMPDIR}/wordlist.${DB_EXT} .ROBX | egrep '^[[:alnum:]]' ; then
     false
 fi
 
 # storing robx must store the token, quite obviously :-)
 # also use -p so we test both -p and -w
-$BOGOUTIL -C -R ${TMPDIR}/
-$BOGOUTIL -C -p ${TMPDIR}/ .ROBX | egrep '^\.ROBX' >/dev/null
+$BOGOUTIL -C -R ${TMPDIR}/wordlist.${DB_EXT}
+$BOGOUTIL -C -p ${TMPDIR}/wordlist.${DB_EXT} .ROBX | egrep '^\.ROBX' >/dev/null
 
 # check if it can dump tokens from stdin
-echo "head:toast" | $BOGOUTIL -C -p ${TMPDIR}/ \
+echo "head:toast" | $BOGOUTIL -C -p ${TMPDIR}/wordlist.${DB_EXT} \
 | egrep '^head:toast' >/dev/null
 
 if [ $DB_TYPE = db ] || [ $DB_TYPE = sqlite ] ; then

@@ -2,7 +2,7 @@
 
 #include "common.h"
 
-#include "bogohome.h"
+//#include "bogohome.h"
 #include "find_home.h"
 #include "mxcat.h"
 #include "paths.h"
@@ -30,9 +30,9 @@ static bool is_dup_wordlist(wordlist_t *a, wordlist_t *b)
     if (strcmp(a->listname, b->listname) != 0)
 	return false;
 
-    if (a->filepath != NULL &&
-	b->filepath != NULL &&
-	strcmp(a->filepath, b->filepath) != 0)
+    if (a->bfp->filepath != NULL &&
+	b->bfp->filepath != NULL &&
+	strcmp(a->bfp->filepath, b->bfp->filepath) != 0)
 	return false;
 
     return true;
@@ -44,15 +44,14 @@ static wordlist_t *free_wordlistnode(wordlist_t *node)
     wordlist_t *next = node->next;
 
     xfree(node->listname);
-    xfree(node->filepath);
-    xfree(node->dirname);
-    xfree(node->filename);
+    bfpath_free(node->bfp);
     xfree(node);
 
     return next;
 }
 
-void init_wordlist(const char* name, const char* path,
+void init_wordlist(const char* name, 
+		   const char *path,
 		   int override, WL_TYPE type)
 {
     wordlist_t *n = (wordlist_t *)xcalloc(1, sizeof(*n));
@@ -60,9 +59,7 @@ void init_wordlist(const char* name, const char* path,
 
     /* initialize list node */
     n->listname=xstrdup(name);
-    n->dirname =get_directory_from_path(path);
-    n->filename=get_file_from_path(path);
-    n->filepath=mxcat(n->dirname, DIRSEP_S, n->filename, NULL);
+    n->bfp     =bfpath_create(path);
     n->type    =type;
     n->override=override;
 
@@ -124,53 +121,15 @@ wordlist_t *get_default_wordlist(wordlist_t *list)
    **	$HOME
    */
 
-int set_wordlist_dir(const char* d, priority_t precedence)
+void free_wordlists()
 {
-    int rc = 0;
-    char *dir;
-    static priority_t saved_precedence = PR_NONE;
-
-    if (DEBUG_WORDLIST(2))
-	fprintf(dbgout, "p: %d, s: %d\n", (int) precedence, (int) saved_precedence);
-
-    if (precedence < saved_precedence)
-	return rc;
-
-    dir = (d != NULL) ? tildeexpand(d) : get_directory(precedence);
-    if (dir == NULL)
-	return -1;
-
-    if (DEBUG_WORDLIST(2))
-	fprintf(dbgout, "d: %s\n", dir);
-
-    saved_precedence = precedence;
-
-    if (!check_directory(dir)) {
-	(void)fprintf(stderr, "%s: cannot find bogofilter directory.\n"
-		      "You must specify a directory on the command line, in the config file,\n"
-#ifndef __riscos__
-		      "or by using the BOGOFILTER_DIR or HOME environment variables.\n"
-#else
-		      "or by ensuring that <Bogofilter$Dir> is set correctly.\n"
-#endif
-		      "Program aborting.\n", progname);
-	rc = -1;
-    }
-
-    set_bogohome(dir);
-    xfree(dir);
-
-    return rc;
-}
-
-void free_wordlists(wordlist_t *list)
-{
+    wordlist_t *list = word_lists;
     while (list)
     {
 	list = free_wordlistnode(list);
     }
 
-    free_bogohome();
+    bfpath_cleanup();
 }
 
 void display_wordlists(wordlist_t *list, const char *fmt)
@@ -181,7 +140,7 @@ void display_wordlists(wordlist_t *list, const char *fmt)
 	printf("%s,%s,%s,%d\n",
 		(list->type == WL_REGULAR) ? "r" : "i",
 		list->listname,
-		list->filepath,
+		list->bfp->filepath,
 		list->override);
     }
 }

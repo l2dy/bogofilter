@@ -148,7 +148,7 @@ retry:
 
     if (DEBUG_REGISTER(1))
 	(void)fprintf(dbgout, "bogofilter: list %s (%s) - %ul spam, %ul good\n",
-		      list->listname, list->filepath, val.spamcount, val.goodcount);
+		      list->listname, list->bfp->filepath, val.spamcount, val.goodcount);
 
     run_type = save_run_type;
 }

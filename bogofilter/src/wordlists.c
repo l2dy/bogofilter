@@ -9,7 +9,6 @@
 #include <assert.h>
 
 #include "bogofilter.h"
-#include "bogohome.h"
 #include "datastore.h"
 #include "msgcounts.h"
 #include "mxcat.h"
@@ -49,19 +48,22 @@ struct envnode {
     char directory[1];
 };
 
-static void *list_searchinsert(const char *directory, const char *file) {
+static void *list_searchinsert(bfpath *bfp)
+{
+    uint l;
     struct envnode *i, *n;
 
-    assert(directory);
-
     for (i = envlisthead.lh_first ; i ; i = i->entries.le_next) {
-	if (strcmp(directory, &i->directory[0]) == 0)
+	if (strcmp(bfp->dirname, &i->directory[0]) == 0)
 	    return i->dbe;
     }
 
-    n = xmalloc(sizeof(struct envnode) + strlen(directory) + 1);
-    n->dbe = ds_init(directory, file);
-    strcpy(&n->directory[0], directory);
+    l = strlen(bfp->dirname) + 1;
+    n = xmalloc(sizeof(struct envnode) + l);
+
+    n->dbe = ds_init(bfp);
+
+    memcpy(&n->directory[0], bfp->dirname, l);
     LIST_INSERT_HEAD(&envlisthead, n, entries);
     return n->dbe;
 }
@@ -70,20 +72,23 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 {
     bool retry = false;
     void *dbe;
+    bfpath *bfp = list->bfp;
 
     if (list->type == WL_IGNORE) 	/* open ignore list in read-only mode */
 	mode = DS_READ;
 
     /* FIXME: create or reuse environment from filepath */
 
-    dbe = list_searchinsert(list->dirname, list->filepath);
+    dbe = list_searchinsert(bfp);
 
     if (dbe == NULL)
 	exit(EX_ERROR);
-    list->dsh = ds_open(dbe, list->dirname, list->filename, mode); /* FIXME */
+
+    list->dsh = ds_open(dbe, bfp, mode); /* FIXME */
+
     if (list->dsh == NULL) {
 	int err = errno;
-	close_wordlists(word_lists, false); /* unlock and close */
+	close_wordlists(false);	/* unlock and close */
 	switch(err) {
 	    /* F_SETLK can't obtain lock */
 	case EAGAIN:
@@ -99,7 +104,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 		return false;
 	    fprintf(stderr,
 		    "Can't open file '%s' in directory '%s'.\n",
-		    list->filename, list->dirname);
+		    bfp->filename, bfp->dirname);
 	    if (err != 0)
 		fprintf(stderr,
 			"error #%d - %s.\n", err, strerror(err));
@@ -141,25 +146,33 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
     return retry;
 }
 
+/* Note: seems like some cleanup around here should be possible....
+** It seems wrong to call set_bogohome() from outside of paths.c.
+** (DR 04/03/05)
+*/
 static void check_wordlist_path(wordlist_t *list)
 {
-    if (list->dirname == NULL) {
-	list->dirname = xstrdup(bogohome);
-	list->filepath = mxcat(list->dirname, DIRSEP_S, list->filename, NULL);
-    }
+    bfpath *bfp = list->bfp;
+    bfpath_check_mode(bfp, BFP_MAY_CREATE);
+    bfpath_update(bfp);
 }
 
 /* set bogohome using first wordlist's directory
 */
 void set_wordlist_directory(void)
 {
-    if (word_lists != NULL) {
-	check_wordlist_path(word_lists);
-	set_bogohome(word_lists->dirname);
+    wordlist_t *list = word_lists;	/* get first wordlist */
+    if (list != NULL) {
+	bfpath *bfp = list->bfp;
+	const char *dir = get_directory_from_path(bfp->filepath);
+	if (dir != NULL) {
+	    check_wordlist_path(list);
+	    set_bogohome(dir);
+	}
     }
 }
 
-void open_wordlists(wordlist_t *list, dbmode_t mode)
+void open_wordlists(dbmode_t mode)
 {
     bool retry = true;
 
@@ -169,23 +182,24 @@ void open_wordlists(wordlist_t *list, dbmode_t mode)
     LIST_INIT(&envs);
 
     while (retry) {
-	wordlist_t *l;
+	wordlist_t *list;
 	retry = false;
-	for (l = list; l ; l = l->next) {
-	    check_wordlist_path(l);
-	    retry |= open_wordlist(l, l->type == WL_IGNORE ? DS_READ : mode);
+	for (list = word_lists; list != NULL ; list = list->next) {
+	    check_wordlist_path(list);
+	    retry |= open_wordlist(list, list->type == WL_IGNORE ? DS_READ : mode);
 	}
     }
 }
 
 /** close all open word lists */
-bool close_wordlists(wordlist_t *list, bool commit /** if unset, abort */)
+bool close_wordlists(bool commit /** if unset, abort */)
     /* FIXME: we really need to look at the list's environments */
 {
     bool err = false;
+    wordlist_t *list;
     struct envnode *i;
 
-    while (list) {
+    for (list = word_lists; list != NULL ; list = list->next) {
 	if (list->dsh) {
 	    if (commit) {
 		if (ds_txn_commit(list->dsh))
@@ -196,7 +210,6 @@ bool close_wordlists(wordlist_t *list, bool commit /** if unset, abort */)
 	    ds_close(list->dsh);
 	    list->dsh = NULL;
 	}
-	list = list->next;
     }
 
     while ((i = envlisthead.lh_first)) {
@@ -291,7 +304,7 @@ bool configure_wordlist(const char *val)
     tmp = spanword(tmp);
     
     init_wordlist(listname, filename, precedence, type);
-    
+
     config_setup = true;
 
     return true;

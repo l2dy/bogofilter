@@ -11,6 +11,8 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 
+#include "find_home.h"
+#include "mxcat.h"
 #include "paths.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
@@ -21,9 +23,9 @@ typedef struct {
     priority_t p;	/* precedence */
     const char *v;	/* env var    */
     const char *s;	/* sub dir    */
-} pri_2_env_t;
+} map_pri_env;
 
-static pri_2_env_t pri_2_env[] = {
+static map_pri_env pri_2_env[] = {
 #ifndef __riscos__
     { PR_ENV_BOGO, "BOGOFILTER_DIR", NULL },
     { PR_ENV_BOGO, "BOGODIR",	     NULL },
@@ -36,6 +38,183 @@ static pri_2_env_t pri_2_env[] = {
 
 /* Function Definitions */
 
+char *bogohome = NULL;
+
+bfpath_mode mode;
+
+void set_bogohome(const char *path)
+{
+    if (path) {
+	xfree(bogohome);
+	bogohome = xstrdup(path);
+    }
+    return;
+}
+
+void bfpath_cleanup(void)
+{
+    xfree(bogohome);
+    bogohome = NULL;
+    return;
+}
+
+void bfpath_set_bogohome_using_priority(priority_t p)
+{
+    const char *h = get_directory(p);
+    set_bogohome(h);
+    return;
+}
+
+int set_wordlist_dir(const char* d, priority_t precedence)
+{
+    int rc = 0;
+    char *dir;
+    static priority_t saved_precedence = PR_NONE;
+
+    if (DEBUG_WORDLIST(2))
+	fprintf(dbgout, "p: %d, s: %d\n", (int) precedence, (int) saved_precedence);
+
+    if (precedence < saved_precedence)
+	return rc;
+
+    dir = (d != NULL) ? tildeexpand(d) : get_directory(precedence);
+    if (dir == NULL)
+	return -1;
+
+    if (DEBUG_WORDLIST(2))
+	fprintf(dbgout, "d: %s\n", dir);
+
+    saved_precedence = precedence;
+
+    if (!check_directory(dir)) {
+	(void)fprintf(stderr, "%s: cannot find bogofilter directory.\n"
+		      "You must specify a directory on the command line, in the config file,\n"
+#ifndef __riscos__
+		      "or by using the BOGOFILTER_DIR or HOME environment variables.\n"
+#else
+		      "or by ensuring that <Bogofilter$Dir> is set correctly.\n"
+#endif
+		      "Program aborting.\n", progname);
+	rc = -1;
+    }
+
+    set_bogohome(dir);
+    xfree(dir);
+
+    return rc;
+}
+
+char *get_directory(priority_t which)
+{
+    size_t i;
+    char *dir = NULL;
+
+    for (i = 0; i < COUNTOF(pri_2_env) ; i += 1) {
+	map_pri_env *p2e = &pri_2_env[i];
+	if (p2e->p == which) {
+	    dir = create_path_from_env(p2e->v, p2e->s);
+	    if (dir)
+		break;
+	}
+    }
+    return dir;
+}
+
+bfpath *bfpath_create(const char *path)
+{
+    bfpath *bfp = xcalloc(1, sizeof(bfpath));
+    bfp->filepath = xstrdup(path);
+    return bfp;
+}
+
+bool bfpath_check_mode(bfpath *bfp, bfpath_mode m)
+{
+    int rc;
+    bool ok = true;
+    struct stat sb;
+
+    bfp->checked = true;
+
+    if (bfp->filepath != NULL && bfp->dirname == NULL && bfp->filename == NULL) {
+	char *t = strrchr(bfp->filepath, DIRSEP_C);
+	if (t == NULL) 
+	    bfp->filename = xstrdup(bfp->filepath);
+	else {
+	    bfp->dirname = xstrdup(bfp->filepath);
+	    bfp->dirname[t - bfp->filepath] = '\0';
+	    bfp->filename = xstrdup(t+1);
+	}
+    }
+
+    rc = stat(bfp->filepath, &sb);
+    if (rc == 0) {
+	bfp->exists = true;
+	if (S_ISDIR(sb.st_mode)) {
+	    bfp->isdir = true;
+	    bfp->dirname = xstrdup(bfp->filepath);
+	}
+	if (!S_ISDIR(sb.st_mode)) {
+	    bfp->isfile = true;
+	    bfp->filename = get_file_from_path(bfp->filepath);
+	    bfp->dirname = get_directory_from_path(bfp->filepath);
+	}
+    }
+
+    switch (m)
+    {
+    case BFP_MUST_EXIST:
+	if (!bfp->exists)
+	    ok = false;
+	break;
+    case BFP_MAY_CREATE:
+	break;
+    case BFP_ERROR:
+	/* can't get here */
+	abort();
+    }
+
+    if (bfp->dirname != NULL)
+	set_bogohome(bfp->dirname);
+
+    return ok;
+}
+
+void bfpath_set_mode(bfpath_mode m)
+{
+    mode = m;
+}
+
+void bfpath_update(bfpath *bfp)
+{
+    char *t = strrchr(bfp->filepath, DIRSEP_C);
+
+    xfree(bfp->dirname);
+    xfree(bfp->filename);
+
+    if (t != NULL) {
+	/* if directory separator present .... */
+	*t = '\0';
+	bfp->dirname = xstrdup(bfp->filepath);
+	*t = DIRSEP_C;
+	bfp->filename = xstrdup(t+1);
+    }
+    else {
+	/* if directory separator not present, use bogohome */
+	bfp->dirname = xstrdup(bogohome);
+	bfp->filename = bfp->filepath;
+	bfp->filepath = mxcat(bfp->dirname, DIRSEP_S, bfp->filename, NULL);
+    }
+}
+
+bfpath *bfpath_free(bfpath *bfp)
+{
+    xfree(bfp->dirname);
+    xfree(bfp->filename);
+    xfree(bfp->filepath);
+    xfree(bfp);
+    return NULL;
+}
+
 char *build_progtype(const char *name, const char *db_type) 
 {
     char *type;
@@ -47,34 +226,6 @@ char *build_progtype(const char *name, const char *db_type)
 	snprintf(type, len, "%s-%s", name, db_type);
     }
     return type;
-}
-
-char *build_path(const char* path, const char* file)
-{
-    size_t pathlen = strlen(path);
-    size_t filelen = strlen(file);
-    size_t size = pathlen + filelen + strlen(DIRSEP_S) + 1;
-    char  *dest = xmalloc( size );
-    
-    /* If absolute path ... */
-    if (bf_abspath(file))
-    {
-	memcpy(dest, file, filelen+1);
-	return dest;
-    }
-
-    memcpy(dest, path, pathlen+1);
-
-    if (pathlen >= filelen && strcmp(path+(pathlen-filelen), file) == 0)
-	return dest;
-
-    if (!is_file(path) && check_directory(path)) {
-	if (dest[strlen(dest)-1] != DIRSEP_C)
-	    strlcat(dest, DIRSEP_S, size);
-	strlcat(dest, file, size);
-    }
-
-    return dest;
 }
 
 char *create_path_from_env(const char *var,
@@ -134,37 +285,23 @@ bool check_directory(const char* path) /*@globals errno,stderr@*/
     return true;
 }
 
+#if	0
 bool is_file(const char* path) /*@globals errno,stderr@*/
 {
-    int rc;
-    struct stat sb;
+    bool ok;
 
     if (path == NULL || *path == '\0')
-	return false;
+	ok = false;
+    else {
+	struct stat sb;
+	int rc = stat(path, &sb);
 
-    rc = stat(path, &sb);
-
-    if (rc == 0 && !S_ISDIR(sb.st_mode))
-	return true;
-    else
-	return false;
-}
-
-char *get_directory(priority_t which)
-{
-    size_t i;
-    char *dir = NULL;
-
-    for (i = 0; i < COUNTOF(pri_2_env) ; i += 1) {
-	pri_2_env_t *p2e = &pri_2_env[i];
-	if (p2e->p == which) {
-	    dir = create_path_from_env(p2e->v, p2e->s);
-	    if (dir)
-		break;
-	}
+	ok = (rc == 0) && !S_ISDIR(sb.st_mode);
     }
-    return dir;
+
+    return ok;
 }
+#endif
 
 /** returns malloc()ed copy of the file name part of \a path.
  */

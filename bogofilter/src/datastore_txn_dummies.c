@@ -49,9 +49,9 @@ dsm_t dsm_dummies = {
 
 dsm_t *dsm = &dsm_dummies;
 
-ex_t dbe_recover(bfdir *directory, bool catastrophic, bool force)
+ex_t dbe_recover(bfpath *bfp, bool catastrophic, bool force)
 {
-    (void) directory;
+    (void) bfp;
     (void) catastrophic;
     (void) force;
 

@@ -43,7 +43,6 @@ Note: bogolexer also uses configfile.c.
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
-#include "bogohome.h"
 #include "bogoreader.h"
 #include "bool.h"
 #include "charset.h"

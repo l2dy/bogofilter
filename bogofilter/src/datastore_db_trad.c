@@ -39,11 +39,11 @@ David Relson	<relson@osagesoftware.com> 2003 - 2005
 /* private -- used in datastore_db_*.c */
 static DB_ENV	  *bft_get_env_dbe	(dbe_t *env);
 static const char *bft_database_name	(const char *db_file);
-static DB_ENV	  *bft_recover_open	(bfdir *directory, bffile *db_file);
+static DB_ENV	  *bft_recover_open	(bfpath *bfp);
 static int	   bft_get_rmw_flag	(int open_mode);
 static int	   bft_lock		(void *handle, int open_mode);
 static void	   bft_log_flush	(DB_ENV *dbe);
-static dbe_t	  *bft_init		(bfdir *directory);
+static dbe_t	  *bft_init		(bfpath *bfp);
 static void 	   bft_cleanup		(dbe_t *env);
 static void 	   bft_cleanup_lite	(dbe_t *env);
 
@@ -116,27 +116,24 @@ int bft_get_rmw_flag(int open_mode)
     return 0;
 }
 
-DB_ENV *bft_recover_open(bfdir *directory, bffile *db_file)
+DB_ENV *bft_recover_open(bfpath *bfp)
 {
     int fd;
-    char *path = build_path(directory->dirname, db_file->filename);
-    
-    fd = open(path, O_RDWR);
+
+    fd = open(bfp->filepath, O_RDWR);
     if (fd < 0) {
-	print_error(__FILE__, __LINE__, "bft_recover_open: cannot open %s: %s", path,
+	print_error(__FILE__, __LINE__, "bft_recover_open: cannot open %s: %s", bfp->filepath,
 		    strerror(errno));
 	exit(EX_ERROR);
     }
 
     if (db_lock(fd, F_SETLKW, (short int)F_WRLCK)) {
 	print_error(__FILE__, __LINE__,
-		    "bft_recover_open: cannot lock %s for exclusive use: %s", path,
+		    "bft_recover_open: cannot lock %s for exclusive use: %s", bfp->filepath,
 		    strerror(errno));
 	close(fd);
 	exit(EX_ERROR);
     }
-
-    xfree(path);
 
     return NULL;
 }
@@ -152,12 +149,12 @@ void bft_log_flush(DB_ENV *dbe)
 		db_strerror(ret));
 }
 
-dbe_t *bft_init(bfdir *directory)
+dbe_t *bft_init(bfpath *bfp)
 {
     dbe_t *env = xcalloc(1, sizeof(dbe_t));
 
     env->magic = MAGIC_DBE;	    /* poor man's type checking */
-    env->directory = xstrdup(directory->dirname);
+    env->directory = xstrdup(bfp->dirname);
 
     return env;
 }

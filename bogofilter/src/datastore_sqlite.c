@@ -18,7 +18,6 @@
 #include "datastore_db.h"
 
 #include "error.h"
-#include "paths.h"		/* for build_path */
 #include "rand_sleep.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
@@ -42,7 +41,7 @@ void db_flush(void *unused) { (void)unused; }
 static int sql_txn_begin(void *vhandle);
 static int sql_txn_abort(void *vhandle);
 static int sql_txn_commit(void *vhandle);
-static u_int32_t sql_pagesize(bfdir *db_dir, bffile *db_file);
+static u_int32_t sql_pagesize(bfpath *bfp);
 
 /** The layout of the bogofilter table, formatted as SQL statement. */
 #define LAYOUT \
@@ -86,9 +85,7 @@ dsm_t *dsm = &dsm_sqlite;
 /* real functions */
 /** Initialize database handle and return it. 
  * \returns non-NULL, as it exits with EX_ERROR in case of trouble. */
-static dbh_t *dbh_init(
-	const char *path /** directory to database file */,
-	const char *name /** name of database file */)
+static dbh_t *dbh_init(bfpath *bfp)
 {
     dbh_t *handle;
 
@@ -97,8 +94,7 @@ static dbh_t *dbh_init(
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));
 
-    handle->path = xstrdup(path);
-    handle->name = build_path(path, name);
+    handle->name = xstrdup(bfp->filepath);
 
     return handle;
 }
@@ -248,15 +244,16 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
     return found ? 0 : DS_NOTFOUND;
 }
 
-void *db_open(void *dummyenv, const char *dbpath,
-	const char *dbname, dbmode_t mode) {
+void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
+{
     int rc;
     dbh_t *dbh;
     dbv_t k, v;
     int count = 0;
 
     (void)dummyenv;
-    dbh = dbh_init(dbpath, dbname);
+
+    dbh = dbh_init(bfp);
     if (DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB"))
 	fprintf(dbgout, "SQLite: db_open(%s)\n", dbh->name);
     rc = sqlite3_open(dbh->name, &dbh->db);
@@ -498,14 +495,13 @@ static int pagesize_cb(void *ptr, int argc, char **argv, char **dummy) {
     return errno;
 }
 
-static u_int32_t sql_pagesize(bfdir *db_dir, bffile *db_file)
+static u_int32_t sql_pagesize(bfpath *bfp)
 {
     dbh_t *dbh;
     int rc;
     u_int32_t size;
 
-    (void)db_dir;
-    dbh = db_open(NULL, db_dir->dirname, db_file->filename, DS_READ);
+    dbh = db_open(NULL, bfp, DS_READ);
     if (!dbh)
 	return 0xffffffff;
     do {

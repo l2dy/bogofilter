@@ -48,16 +48,14 @@ const char *db_version_str(void)
 }
 
 
-static dbh_t *dbh_init(const char *path, const char *name)
+static dbh_t *dbh_init(bfpath *bfp)
 {
     dbh_t *handle;
 
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
 
-    handle->path = xstrdup(path);
-
-    handle->name = build_path(path, name);
+    handle->name = xstrdup(bfp->filepath);
 
     handle->locked = false;
     handle->created = false;
@@ -98,7 +96,7 @@ bool db_created(void *vhandle)
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
 */
-void *db_open(void * dummy, const char *db_path, const char *db_name, dbmode_t open_mode)
+void *db_open(void * dummy, bfpath *bfp, dbmode_t open_mode)
 {
     dbh_t *handle;
 
@@ -112,7 +110,7 @@ void *db_open(void * dummy, const char *db_path, const char *db_name, dbmode_t o
     else
 	open_flags = VL_OREADER;
 
-    handle = dbh_init(db_path, db_name);
+    handle = dbh_init(bfp);
 
     if (handle == NULL) return NULL;
 

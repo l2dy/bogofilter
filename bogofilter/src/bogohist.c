@@ -18,14 +18,10 @@ AUTHOR:
 #include <errno.h>
 #include <sys/stat.h>
 
-/* this should go away some day: */
-#include "bogohome.h"
-
 #include "bogohist.h"
 #include "prob.h"
 #include "datastore.h"
 #include "msgcounts.h"
-#include "paths.h"		/* for WORDLIST */
 #include "word.h"
 #include "wordlists.h"
 #include "xmalloc.h"
@@ -130,7 +126,7 @@ static int print_histogram(rhistogram_t *hist)
     return count;
 }
 
-ex_t histogram(const char *path)
+ex_t histogram(bfpath *bfp)
 {
     ex_t rc;
     uint count;
@@ -139,12 +135,11 @@ ex_t histogram(const char *path)
 
     rhistogram_t hist;
 
-    dbe = ds_init(bogohome, path);
+    dbe = ds_init(bfp);
     if (dbe == NULL)
 	return EX_ERROR;
 
-    dsh = ds_open(dbe, path, WORDLIST, DS_READ);
-
+    dsh = ds_open(dbe, bfp, DS_READ);
     if (dsh == NULL)
 	return EX_ERROR;
 

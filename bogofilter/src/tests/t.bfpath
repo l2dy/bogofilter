@@ -1,0 +1,71 @@
+#! /bin/sh
+
+NODB=1 . ${srcdir:=.}/t.frame
+
+while [ -n "$1" ] ; do
+    case $1 in
+	t*)
+	    TUNE="$1"
+	    ;;
+	*)
+	    echo Unknown option \"$1\"
+	    exit
+	    ;;
+    esac
+    shift
+done
+
+set -x
+
+MODES="yes"
+MODES="yes no"
+
+for MODE in $MODES ; do
+
+    DIR="${TMPDIR}/${MODE}"
+    echo "######" MODE: ${MODE} "######"
+    rm -rf ${DIR}
+    mkdir ${DIR}
+
+    TXN="--db-transaction=$MODE"
+
+# initialize database
+    $BOGOFILTER ${TXN} -C -e -v -n -d ${DIR} -M -B ${srcdir}/inputs/good.mbx
+    $BOGOFILTER ${TXN} -C -e -v -s -d ${DIR} -M -B ${srcdir}/inputs/spam.mbx
+    $BOGOFILTER ${TXN} -C -e -v    -d ${DIR}    -I ${srcdir}/inputs/msg.1.txt
+
+# test common bogoutil functions
+    $BOGOUTIL ${TXN} -w ${DIR}/wordlist.$DB_EXT .MSG_COUNT
+    $BOGOUTIL ${TXN} -p ${DIR}/wordlist.$DB_EXT .MSG_COUNT
+    
+    $BOGOUTIL ${TXN} -d ${DIR}/wordlist.$DB_EXT > /dev/null
+    
+    # -r and -R take dirname, not filename
+    $BOGOUTIL ${TXN} -r ${DIR}/wordlist.$DB_EXT
+    $BOGOUTIL ${TXN} -R ${DIR}/wordlist.$DB_EXT
+
+    $BOGOUTIL ${TXN} --db-print-pagesize     ${DIR}/wordlist.${DB_EXT}
+    $BOGOUTIL ${TXN} --db-verify             ${DIR}/wordlist.${DB_EXT}
+    $BOGOUTIL ${TXN} --db-recover            ${DIR}
+    $BOGOUTIL ${TXN} --db-recover-harder     ${DIR}
+    $BOGOUTIL ${TXN} --db-remove-environment ${DIR}
+    $BOGOUTIL ${TXN} --db-prune              ${DIR}
+    $BOGOUTIL ${TXN} --db-checkpoint         ${DIR}
+
+    if [ -n "$TUNE" ] ; then
+#	DEBUG="-d debug"
+	BF="${DIR}"
+	NS="${srcdir}/../../../tune.d/r500.d/r500.ns.mc"
+	SP="${srcdir}/../../../tune.d/r500.d/r500.sp.mc"
+
+	$BOGOTUNE -C $DEBUG -vv -D     -n $NS -s $SP || :
+	$BOGOTUNE -C $DEBUG -vv -d $BF -n $NS -s $SP || :
+	
+	BF="${srcdir}/../bt.0214.d"
+	NS="${srcdir}/../bt.0214.ns.mc"
+	SP="${srcdir}/../bt.0214.sp.mc"
+	
+	$BOGOTUNE -C $DEBUG -vv -D     -n $NS -s $SP || :
+	$BOGOTUNE -C $DEBUG -vv -d $BF -n $NS -s $SP || :
+    fi
+done

@@ -51,7 +51,7 @@ OPTS="-C -y 0"
 $BOGOFILTER $OPTS -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER $OPTS -n < ${SYSTEST}/inputs/good.mbx
 
-$BOGOUTIL -C -H $BOGOFILTER_DIR >$OUT
+$BOGOUTIL -C -H $BOGOFILTER_DIR/wordlist.$DB_EXT >$OUT
 $BOGOUTIL -C -d $BOGOFILTER_DIR/wordlist.$DB_EXT >${TMPDIR}/wordlist.txt
 
 if  [ $verbose -eq 0 ]; then

@@ -13,7 +13,9 @@ AUTHOR:
 #ifndef	HISTOGRAM_H
 #define	HISTOGRAM_H
 
-extern ex_t histogram(const char *path);
+#include "paths.h"
+
+extern ex_t histogram(bfpath *bfp);
 
 #endif	/* HISTOGRAM_H */
 

@@ -24,7 +24,6 @@ AUTHORS:
 
 #include "bogofilter.h"
 #include "bogohist.h"
-#include "bogohome.h"
 #include "bool.h"
 #include "buff.h"
 #include "configfile.h"
@@ -63,6 +62,15 @@ static int process_arg(int option, const char *name, const char *arg);
 double msg_spamicity(void) { return .0; }
 rc_t msg_status(void) { return RC_OK; }
 
+static void ds_open_failure(bfpath *bfp, void *dbe)
+{
+    fprintf(stderr, "Error accessing file or directory '%s'.\n", bfp->filepath);
+    if (errno != 0)
+	fprintf(stderr, "error #%d - %s.\n", errno, strerror(errno));
+    ds_cleanup(dbe);
+    exit(EX_ERROR);
+}
+
 static int ds_dump_hook(word_t *key, dsv_t *data,
 			/*@unused@*/ void *userdata)
 /* returns 0 if ok, 1 if not ok */
@@ -92,15 +100,15 @@ static int ds_dump_hook(word_t *key, dsv_t *data,
     return ferror(stdout) ? 1 : 0;
 }
 
-static ex_t dump_wordlist(const char *ds_file)
+static ex_t dump_wordlist(bfpath *bfp)
 {
     ex_t rc;
     void *dbe;
 
     token_count = 0;
 
-    dbe = ds_init(bogohome, ds_file);
-    rc = ds_oper(dbe, ds_file, DS_READ, ds_dump_hook, NULL);
+    dbe = ds_init(bfp);
+    rc = ds_oper(dbe, bfp, DS_READ, ds_dump_hook, NULL);
     ds_cleanup(dbe);
 
     if (rc != EX_OK)
@@ -142,7 +150,7 @@ static bool is_count(const char *in)
     return false;
 }
 
-static ex_t load_wordlist(const char *ds_file)
+static ex_t load_wordlist(bfpath *bfp)
 {
     void *dsh;
     byte buf[BUFSIZE];
@@ -153,14 +161,13 @@ static ex_t load_wordlist(const char *ds_file)
     unsigned long line = 0;
     unsigned long count[IX_SIZE], date;
     YYYYMMDD today_save = today;
-    void *dbe = ds_init(bogohome, ds_file);
 
-    dsh = ds_open(dbe, CURDIR_S, ds_file, DS_WRITE | DS_LOAD);
+    void *dbe = ds_init(bfp);
 
-    if (dsh == NULL) {
-	ds_cleanup(dbe);
-	return EX_ERROR;
-    }
+    dsh = ds_open(dbe, bfp, DS_WRITE | DS_LOAD);
+    if (dsh == NULL)
+	/* print error, cleanup, and exit */
+	ds_open_failure(bfp, dbe);
 
     memset(buf, '\0', BUFSIZE);
 
@@ -297,11 +304,13 @@ static int get_token(buff_t *buff, FILE *fp)
     return rv;
 }
 
-static ex_t display_words(const char *path, int argc, char **argv, bool show_probability)
+static ex_t display_words(bfpath *bfp, int argc, char **argv, bool show_probability)
 {
     byte buf[BUFSIZE];
     buff_t *buff = buff_new(buf, 0, BUFSIZE);
     const byte *word = buf;
+
+    const char *path = bfp->filepath;
 
     const char *head_format = !show_probability ? "%-30s %6s %6s\n"   : "%-30s %6s  %6s  %6s\n";
     const char *data_format = !show_probability ? "%-30s %6lu %6lu\n" : "%-30s %6lu  %6lu  %f\n";
@@ -309,7 +318,6 @@ static ex_t display_words(const char *path, int argc, char **argv, bool show_pro
     void *dsh = NULL; /* initialize to silence bogus gcc warning */
     void *dbe;
 
-    struct stat sb;
     int rv = 0;
 
     dsv_t msgcnts;
@@ -320,24 +328,11 @@ static ex_t display_words(const char *path, int argc, char **argv, bool show_pro
         return EX_ERROR;
     }
 
-    dbe = ds_init(bogohome, path);
-
-    if ( stat(path, &sb) == 0 ) {
-	/* XXX FIXME: deadlock possible */
-	if ( ! S_ISDIR(sb.st_mode)) {		/* words from file */
-	    dsh = ds_open(dbe, CURDIR_S, path, DS_READ); }
-	else {					/* words from path */
-	    dsh = ds_open(dbe, path, WORDLIST, DS_READ);
-	}
-    }
-
-    if (dsh == NULL) {
-	fprintf(stderr, "Error accessing file or directory '%s'.\n", path);
-	if (errno != 0)
-	    fprintf(stderr, "error #%d - %s.\n", errno, strerror(errno));
-	ds_cleanup(dbe);
-	return EX_ERROR;
-    }
+    dbe = ds_init(bfp);
+    dsh = ds_open(dbe, bfp, DS_READ);;
+    if (dsh == NULL)
+	/* print error, cleanup, and exit */
+	ds_open_failure(bfp, dbe);
 
     if (DST_OK != ds_txn_begin(dsh)) {
 	ds_close(dsh);
@@ -415,13 +410,13 @@ finish:
     return rv;
 }
 
-static ex_t get_robx(const char *path)
+static ex_t get_robx(bfpath *bfp)
 {
     double rx;
     int ret = 0;
 
-    init_wordlist("word", WORDLIST, 0, WL_REGULAR);
-    rx = compute_robinson_x(path);
+    init_wordlist("word", bfp->filepath, 0, WL_REGULAR);
+    rx = compute_robinson_x();
     if (rx < 0)
 	return EX_ERROR;
 
@@ -431,15 +426,14 @@ static ex_t get_robx(const char *path)
 	dsv_t val;
 	word_t *word_robx = word_news(ROBX_W);
 
-	open_wordlists(word_lists, DS_WRITE);
+	open_wordlists(DS_WRITE);
 
 	val.goodcount = 0;
 	val.spamcount = (uint32_t) (rx * 1000000);
 	ret = ds_write(word_lists->dsh, word_robx, &val);
 
-	close_wordlists(word_lists, true);
-	free_wordlists(word_lists);
-	word_lists = NULL;
+	close_wordlists(true);
+	free_wordlists();
 
 	word_free(word_robx);
     }
@@ -467,7 +461,7 @@ static void usage(void)
     fprintf(stderr, "Usage: %s {-h|-V}\n", progname);
     fprintf(stderr, "   or: %s [OPTIONS] {-d|-l|-u|-m|-w|-p|--db-verify} file%s\n",
 	    progname, DB_EXT);
-    fprintf(stderr, "   or: %s [OPTIONS] {-H|-r|-R} directory\n", progname);
+    fprintf(stderr, "   or: %s [OPTIONS] {-H|-r|-R} file\n", progname);
 #if defined (ENABLE_DB_DATASTORE) || defined (ENABLE_SQLITE_DATASTORE)
     fprintf(stderr, "   or: %s [OPTIONS] {--db-print-pagesize} file%s\n",
 	    progname, DB_EXT);
@@ -511,8 +505,8 @@ static const char *help_text[] = {
     "  -H dir                      - display histogram and statistics for wordlist.\n",
     "                                - use with -v  to exclude hapaxes.\n",
     "                                - use with -vv to exclude pure spam/ham.\n",
-    "  -r dir                      - compute Robinson's X for specified directory.\n",
-    "  -R dir                      - compute Robinson's X and save it in wordlist.\n",
+    "  -r file                     - compute Robinson's X for the specified file.\n",
+    "  -R file                     - compute Robinson's X and save it in wordlist.\n",
 
     "\n",
 
@@ -777,16 +771,53 @@ static int process_arg(int option, const char *name, const char *val)
 	break;
 
     default:
-	if (!dsm_options_bogoutil(option, &flag, &count, &ds_file, name, val))
-	    abort();
+	if (!dsm_options_bogoutil(option, &flag, &count, &ds_file, name, val)) {
+	    fprintf(stderr, "Invalid option '%s'\n", name);
+	    exit(EX_ERROR);
+	}
     }
 
     return count;
 }
 
+static bfpath_mode get_mode(cmd_t cmd)
+{
+    bfpath_mode mode = BFP_ERROR;
+
+    switch(cmd) {
+    case M_LOAD:
+	mode = BFP_MAY_CREATE;
+	break;
+    case M_DUMP:
+    case M_HIST:
+    case M_MAINTAIN:
+    case M_ROBX:
+    case M_VERIFY:
+    case M_WORD:
+	mode = BFP_MUST_EXIST;
+	break;
+    case M_CHECKPOINT:	/* database transaction/integrity operations */
+    case M_CRECOVER:
+    case M_PAGESIZE:
+    case M_PURGELOGS:
+    case M_RECOVER:
+    case M_REMOVEENV:
+	mode = BFP_MUST_EXIST;
+	break;
+    case M_NONE:
+	usage();
+	exit(EX_ERROR);
+    }
+
+    return mode;
+}
+
 int main(int argc, char *argv[])
 {
     ex_t rc = EX_OK;
+
+    bfpath *bfp;
+    bfpath_mode mode;
 
     signal_setup();			/* setup to catch signals */
 
@@ -803,66 +834,84 @@ int main(int argc, char *argv[])
 	exit(EX_ERROR);
     }
 
-    set_bogohome(ds_file);
+    bfp = bfpath_create(ds_file);
+    mode = get_mode(flag);
+
+    if (!bfpath_check_mode(bfp, mode)) {
+	fprintf(stderr, "Can't open wordlist '%s'\n", bfp->filepath);
+	exit(EX_ERROR);
+    }
 
     switch(flag) {
 	case M_RECOVER:
-	    ds_minit(bogohome, ds_file);
-	    rc = ds_recover(ds_file, false);
+	{
+	    ds_init(bfp);
+	    rc = ds_recover(bfp, false);
 	    break;
+	}
 	case M_CRECOVER:
-	    ds_minit(bogohome, ds_file);
-	    rc = ds_recover(ds_file, true);
+	{
+	    ds_init(bfp);
+	    rc = ds_recover(bfp, true);
 	    break;
+	}
 	case M_CHECKPOINT:
-	    ds_init(bogohome, ds_file);
-	    rc = ds_checkpoint(ds_file);
+	{
+	    ds_init(bfp);
+	    rc = ds_checkpoint(bfp);
 	    break;
+	}
 	case M_PURGELOGS:
-	    ds_init(bogohome, ds_file);
-	    rc = ds_purgelogs(ds_file);
+	{
+	    ds_init(bfp);
+	    rc = ds_purgelogs(bfp);
 	    break;
+	}
 	case M_REMOVEENV:
-	    ds_minit(bogohome, ds_file);
-	    rc = ds_remove(ds_file);
+	{
+	    dsm_init(bfp);
+	    rc = ds_remove(bfp);
 	    break;
+	}
 	case M_VERIFY:
-	    ds_minit(bogohome, ds_file);
-	    rc = ds_verify(bogohome, ds_file);
+	{
+	    dsm_init(bfp);
+	    rc = ds_verify(bfp);
 	    break;
+	}
 	case M_PAGESIZE:
-	    {
-		u_int32_t s;
-		ds_minit(bogohome, ds_file);
-		s = ds_pagesize(bogohome, ds_file);
-		if (s == 0xffffffff)
-		    fprintf(stderr, "%s: error getting page size.\n", ds_file);
-		else if (s == 0)
-		    printf("UNKNOWN\n");
-		else
-		    printf("%lu\n", (unsigned long)s);
-	    }
+	{
+	    u_int32_t s;
+	    dsm_init(bfp);
+	    s = ds_pagesize(bfp);
+	    if (s == 0xffffffff)
+		fprintf(stderr, "%s: error getting page size.\n", ds_file);
+	    else if (s == 0)
+		printf("UNKNOWN\n");
+	    else
+		printf("%lu\n", (unsigned long)s);
 	    break;
+	}
 	case M_DUMP:
-	    rc = dump_wordlist(ds_file);
+	    rc = dump_wordlist(bfp);
 	    break;
 	case M_LOAD:
-	    rc = load_wordlist(ds_file);
+	    rc = load_wordlist(bfp);
 	    break;
 	case M_MAINTAIN:
 	    maintain = true;
-	    rc = maintain_wordlist_file(ds_file);
+	    rc = maintain_wordlist_file(bfp);
 	    break;
 	case M_WORD:
 	    argc -= optind;
 	    argv += optind;
-	    rc = display_words(ds_file, argc, argv, prob);
+	    rc = display_words(bfp, argc, argv, prob);
 	    break;
 	case M_HIST:
-	    rc = histogram(ds_file);
+	    rc = histogram(bfp);
 	    break;
 	case M_ROBX:
-	    rc = get_robx(ds_file);
+	    rc = get_robx(bfp);
 	    break;
 	case M_NONE:
 	default:

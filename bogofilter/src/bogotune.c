@@ -52,7 +52,6 @@ AUTHORS:
 #include "bogotune.h"
 
 #include "bogoconfig.h"
-#include "bogohome.h"
 #include "bogoreader.h"
 #include "collect.h"
 #include "datastore.h"
@@ -143,6 +142,7 @@ static ds_loc ds_flag = DS_NONE;
 static void *env = NULL;
 
 static bool    esf_flag = true;		/* test ESF factors if true */
+static bool    exit_zero = false;	/* non-error exits zero */
 static char   *bogolex_file = NULL;	/* non-NULL if creating msg-count output */
 static word_t *w_msg_count;
 
@@ -625,12 +625,21 @@ static int update_count(void)
 
 static void load_wordlist(ds_foreach_t *hook, void *userdata)
 {
+    bfpath *bfp = bfpath_create(ds_path);
+
+    if (!bfpath_check_mode(bfp, BFP_MUST_EXIST)) {
+	fprintf(stderr, "Can't open wordlist '%s'\n", bfp->filepath);
+	exit(EX_ERROR);
+    }
+
     if (verbose) {
-	printf("Reading %s\n", ds_file);
+	printf("Reading %s\n", ds_path);
 	fflush(stdout);
     }
 
-    ds_oper(env, ds_file, DS_READ, hook, userdata);
+    ds_oper(env, bfp, DS_READ, hook, userdata);
+
+    bfpath_free(bfp);
 
     return;
 }
@@ -912,7 +921,7 @@ static int process_arglist(int argc, char **argv)
     _wildcard (&argc, &argv);	/* expand wildcards (*.*) */
 #endif
 
-#define	OPTIONS	":c:Cd:DEM:n:qr:s:tT:vVx:"
+#define	OPTIONS	":c:Cd:DeEM:n:qr:s:tT:vVx:"
 
     while (1)
     {
@@ -936,6 +945,9 @@ static int process_arglist(int argc, char **argv)
 	    break;
 	case 'D':
 	    ds_flag = (ds_flag == DS_NONE) ? DS_RAM : DS_ERR;
+	    break;
+	case 'e':
+	    exit_zero = true;
 	    break;
 	case 'E':
 	    esf_flag ^= true;
@@ -1001,22 +1013,6 @@ static int process_arglist(int argc, char **argv)
     return count;
 }
 
-static void check_wordlist_path(const char *path)
-{
-    struct stat sb;
-
-    if (stat(path, &sb) != 0) {
-	fprintf(stderr, "Error accessing file or directory '%s'.\n", path);
-	if (errno != 0)
-	    fprintf(stderr, "error #%d - %s.\n", errno, strerror(errno));
-	return;
-    }
-
-    db_cachesize = ceil(sb.st_size / (3 * 1024 * 1024));
-
-    return;
-}
-
 static double get_robx(void)
 {
     double rx;
@@ -1026,7 +1022,7 @@ static double get_robx(void)
     else if (ds_flag == DS_DSK)	{
 	printf("Calculating initial x value...\n");
 	verbose = -verbose;		/* disable bogofilter debug output */
-	rx = compute_robinson_x(ds_path);
+	rx = compute_robinson_x();
 	verbose = -verbose;		/* enable bogofilter debug output */
     }
     else
@@ -1444,7 +1440,7 @@ static rc_t bogotune(void)
     cnt = ns_cnt + sp_cnt;
 
     if (ds_flag == DS_DSK && !check_msg_counts())
-	exit(EX_ERROR);
+	exit(exit_zero ? EX_OK : EX_ERROR);
 
     fflush(stdout);
 
@@ -1705,28 +1701,38 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     /* directories from command line and config file are already handled */
     if (ds_flag == DS_DSK) {
 
+	bfpath *bfp;
+
 	if (ds_path == NULL)
 	    ds_path = get_directory(PR_ENV_BOGO);
 	if (ds_path == NULL)
 	    ds_path = get_directory(PR_ENV_HOME);
 
-	check_wordlist_path(ds_path);
+//	check_wordlist_path(ds_path);
 	set_bogohome(ds_path);
-	env = ds_init(bogohome, WORDLIST);
 
-	/* ds_path is the directory and
-	** ds_file is directory/WORDLIST.
-	*/
-	if (strcmp(bogohome, ds_path) == 0) {
-	    ds_file = mxcat(ds_path, DIRSEP_S, WORDLIST, NULL);
-	}
-	else {
-	    ds_file = xstrdup(ds_path);
-	    xfree(ds_path);
-	    ds_path = xstrdup(bogohome);
+//	bfp = bfpath_create(ds_file);
+//	fprintf(dbgout, "bf_create( %s )\n", ds_path);
+	bfp = bfpath_create(ds_path);
+
+	if (!bfpath_check_mode(bfp, BFP_MUST_EXIST)) {
+	    fprintf(stderr, "Can't open wordlist '%s'\n", bfp->filepath);
+	    exit(EX_ERROR);
 	}
 
-	init_wordlist("word", ds_file, 0, WL_REGULAR);
+	if (bfp->exists && bfp->isdir) {
+	    bfpath_free(bfp);
+	    ds_path = mxcat(ds_path, DIRSEP_S, WORDLIST, NULL);	
+	    bfp = bfpath_create(ds_path);
+	    if (!bfpath_check_mode(bfp, BFP_MUST_EXIST)) {
+		fprintf(stderr, "Can't open wordlist '%s'\n", bfp->filepath);
+		exit(EX_ERROR);
+	    }
+	}
+
+	env = ds_init(bfp);
+	
+	init_wordlist("word", ds_path, 0, WL_REGULAR);
     }
 
     bogotune();

@@ -68,7 +68,7 @@ static int robx_hook(word_t *key, dsv_t *data,
 
 /** returns negative for failure.
  * used by bogoutil and bogotune */
-double compute_robinson_x(const char *path)
+double compute_robinson_x(void)
 {
     int ret;
     double rx;
@@ -77,12 +77,7 @@ double compute_robinson_x(const char *path)
 
     struct robhook_data rh;
 
-    if (set_wordlist_dir(path, PR_NONE)) {
-	fprintf(stderr, "Can't find HOME or BOGOFILTER_DIR in environment.\n");
-	exit(EX_ERROR);
-    }
-
-    open_wordlists(word_lists, DS_READ);
+    open_wordlists(DS_READ);
     wordlist = get_default_wordlist(word_lists);
 
     dsh = wordlist->dsh;
@@ -105,7 +100,7 @@ double compute_robinson_x(const char *path)
 	       MSG_COUNT, rh.spam_cnt, rh.good_cnt,
 	       rh.scalefactor, rh.sum, (int)rh.count, rx);
 
-    close_wordlists(word_lists, true);
+    close_wordlists(true);
 
     return ret ? -1 : rx;
 }

@@ -28,6 +28,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include <db.h>
 #endif
 
+#include "paths.h"
 #include "word.h"
 
 extern YYYYMMDD today;		/* date as YYYYMMDD */
@@ -118,12 +119,14 @@ typedef void	dsm_v_pbe	(dbe_t *env);
 typedef void	dsm_v_pnv	(DB_ENV *dbe);
 typedef void	dsm_v_pvuiui	(void *vhandle, u_int32_t numlocks, u_int32_t numobjs);
 typedef const char *dsm_pc_pc	(const char *db_file);
-typedef ex_t	dsm_x_pdbb	(bfdir *dir, bool, bool);
-typedef ex_t	dsm_x_pnvpd	(DB_ENV *dbe, bfdir *directory);
-typedef dbe_t  *dsm_pbe_pd	(bfdir *directory);
+typedef ex_t	dsm_x_ppbb	(bfpath *bfp, bool, bool);
+typedef ex_t	dsm_x_pnvpp	(DB_ENV *dbe, bfpath *bfp);
+typedef dbe_t  *dsm_pbe_pp	(bfpath *bfp);
+typedef ex_t	dsm_x_pp	(bfpath *bfp);
 typedef ex_t	dsm_x_pdpf	(bfdir *directory, bffile *db_file);
+typedef u_int32_t dsm_u_pp	(bfpath *bfp);
 typedef u_int32_t dsm_u_pdpf	(bfdir *directory, bffile *db_file);
-typedef DB_ENV *dsm_pnv_pdpf	(bfdir *directory, bffile *db_file);
+typedef DB_ENV *dsm_pnv_pp	(bfpath *bfp);
 typedef DB_ENV *dsm_pnv_pbe	(dbe_t *env);
 
 /** Datastore methods type, used by datastore/database layers to switch
@@ -134,24 +137,24 @@ typedef struct {
     dsm_i_pv	 *dsm_abort;
     dsm_i_pv	 *dsm_commit;
     /* private -- used in datastore_db_*.c */
-    dsm_pbe_pd	 *dsm_env_init;
+    dsm_pbe_pp	 *dsm_env_init;
     dsm_v_pbe	 *dsm_cleanup;
     dsm_v_pbe	 *dsm_cleanup_lite;
     dsm_pnv_pbe	 *dsm_get_env_dbe;
     dsm_pc_pc	 *dsm_database_name;
-    dsm_pnv_pdpf *dsm_recover_open; /**< exits on failure */
+    dsm_pnv_pp	 *dsm_recover_open; /**< exits on failure */
     dsm_i_v	 *dsm_auto_commit_flags;
     dsm_i_i	 *dsm_get_rmw_flag;
     dsm_i_pvi	 *dsm_lock;
-    dsm_x_pnvpd	 *dsm_common_close;
+    dsm_x_pnvpp	 *dsm_common_close;
     dsm_i_pnvi	 *dsm_sync;
     dsm_v_pnv	 *dsm_log_flush;
-    dsm_u_pdpf	 *dsm_pagesize;
-    dsm_x_pd	 *dsm_checkpoint;
-    dsm_x_pd	 *dsm_purgelogs;
-    dsm_x_pdbb	 *dsm_recover;
-    dsm_x_pd	 *dsm_remove;
-    dsm_x_pdpf	 *dsm_verify;
+    dsm_u_pp	 *dsm_pagesize;
+    dsm_x_pp	 *dsm_checkpoint;
+    dsm_x_pp	 *dsm_purgelogs;
+    dsm_x_ppbb	 *dsm_recover;
+    dsm_x_pp	 *dsm_remove;
+    dsm_x_pp	 *dsm_verify;
 } dsm_t;
 
 extern dsm_t *dsm;
@@ -174,7 +177,7 @@ extern ex_t ds_foreach(void *vhandle	  /** data store handle */,
 
 /** Wrapper for ds_foreach that opens and closes file */
 extern ex_t ds_oper(void *dbenv,	/**< parent environment */
-		    const char *path,	/**< path to database file */
+		    bfpath *bfp,	/**< path to database file */
 		    dbmode_t open_mode,	/**< open mode, DS_READ or DS_WRITE */
 		    ds_foreach_t *hook,	/**< function for actual operations */
 		    void *userdata	/**< user data for \a hook */);
@@ -186,8 +189,7 @@ extern ex_t ds_oper(void *dbenv,	/**< parent environment */
  */
 /*@only@*/ /*@null@*/
 extern void *ds_open(void *dbev,	/**< parent environment */
-		     const char *path,	/**< path to database file */
-		     const char *name,	/**< name(s) of data base(s) */
+		     bfpath *bfp,	/**< path to database file */
 		     dbmode_t mode	/**< open mode, DS_READ or DS_WRITE */);
 
 /** Close file and clean up. */
@@ -197,34 +199,14 @@ extern void  ds_close(/*@only@*/ void *vhandle);
 extern void ds_flush(void *vhandle);
 
 /** Global initialization of datastore layer. Implies call to \a dsm_init. */
-extern void *ds_init(
-	/** The directory holds the
-	 * database environment (only for BerkeleyDB TXN store, otherwise
-	 * ignored), you can - for now - pass bogohome.
-	 */
-	const char *directory,
-	/** The file is needed for autoprobing if transactions are used.
-	 * It need not exist. */
-	const char *file);
-
-/** Global initialization of datastore methods only. */
-extern void ds_minit(
-	/** The directory holds the
-	 * database environment (only for BerkeleyDB TXN store, otherwise
-	 * ignored), you can - for now - pass bogohome.
-	 */
-	const char *directory,
-	/** The file is needed for autoprobing if transactions are used.
-	 * It need not exist. */
-	const char *file);
+extern void *ds_init(bfpath *bfp);
 
 /** Cleanup storage allocation of datastore layer. After calling this,
  * datastore access is no longer permitted. */
 extern void ds_cleanup(void *);
 
 /** Initialize datastore handle. */
-dsh_t *dsh_init(
-    void *dbh);			/* database handle from db_open() */
+dsh_t *dsh_init(void *dbh);		/* database handle from db_open() */
 
 /** Free data store handle that must not be used after calling this
  * function. */
@@ -336,25 +318,25 @@ extern int ds_lock(int fd, int cmd, short int type);
 extern const char *ds_version_str(void);
 
 /** Runs forced recovery on data base */
-extern ex_t ds_recover(const char *directory, bool catastrophic);
+extern ex_t ds_recover(bfpath *bfp, bool catastrophic);
 
 /** Remove environment in given directory, \return EX_OK or EX_ERROR */
-extern ex_t ds_remove(const char *directory);
+extern ex_t ds_remove(bfpath *bfp);
 
 /** Verify given database */
-extern ex_t ds_verify(const char *directory, const char *file);
+extern ex_t ds_verify(bfpath *bfp);
 
 /** Return page size of given database, \return 0xffffffff for error, 0 for
  * variable sized pages or unpaged datastores. */
-extern u_int32_t ds_pagesize(const char *directory, const char *file);
+extern u_int32_t ds_pagesize(bfpath *bfp);
 
 /** Remove inactive log files in given directory, \return EX_OK. */
-extern ex_t ds_purgelogs(const char *directory);
+extern ex_t ds_purgelogs(bfpath *bfp);
 
 /** Run checkpoint once */
-extern ex_t ds_checkpoint(const char *directory);
+extern ex_t ds_checkpoint(bfpath *bfp);
 
 /** datastore backends must provide this initializing function */
-extern void dsm_init(bfdir *directory, bffile *file);
+extern void dsm_init(bfpath *bfp);
 
 #endif

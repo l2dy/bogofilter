@@ -78,7 +78,6 @@ version_sources= \
 	globals.h globals.c \
 	base64.h base64.c \
 	bogoconfig.h bogoconfig.c \
-	bogohome.h bogohome.c \
 	bogomain.h bogomain.c \
 	bogoreader.h bogoreader.c \
 	bool.h bool.c \

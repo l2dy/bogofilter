@@ -10,6 +10,8 @@
 
 #include "common.h"
 
+#define	OLD_PATHS
+
 /* Path Definitions */
 
 #if !defined(_OS2_) && !defined(__riscos__)
@@ -18,9 +20,47 @@
   #define BOGODIR "bogofilter"
 #endif
 
-#define WORDLIST	"wordlist" DB_EXT
+#define WORDLIST  "wordlist" DB_EXT
+
+extern char *bogohome;
+
+typedef enum bfmode_e { 
+    BFP_ERROR,
+    BFP_MUST_EXIST,
+    BFP_MAY_CREATE
+} bfpath_mode;
+
+/* typedef and struct definitions */
+
+typedef struct bfpath {
+    bool   checked;	/* if bfpath_check_mode has been called */
+    bool   exists;
+    bool   isdir;
+    bool   isfile;
+    char  *dirname;	/* directory only   */
+    char  *filename;	/* filename only    */
+    char  *filepath;	/* dirname+filename */
+} bfpath;
 
 /* Function Prototypes */
+
+bfpath *bfpath_create(const char *path);
+bfpath *bfpath_initialize(bfpath *bfp, bfpath_mode mode);
+void	bfpath_update(bfpath *bfp);
+void    bfpath_set_mode(bfpath_mode mode);
+void    bfpath_set_bogohome_using_priority(priority_t p);
+void	bfpath_cleanup(void);
+bool	bfpath_check_mode(bfpath *bfp, bfpath_mode mode);
+bfpath *bfpath_fixup(bfpath *path);
+bfpath *bfpath_free(bfpath *path);
+bool    paths_equal(bfpath *p1, bfpath *p2);
+
+void	set_bogohome(const char *dirname);
+void	set_bogohome_using_dirname(const char *dirname);
+int	set_wordlist_dir(const char* dir, priority_t precedence);
+
+enum bfpath_e { BFP_NORMAL = 1 };
+typedef enum bfpath_e bfpath_t;
 
 /** Build a path to a file given a directory and file name in malloc()d
  * memory (caller freed), concatenating dir and file, adding a slash if
@@ -48,6 +88,12 @@ char *get_file_from_path(const char *path);
 
 /** \return malloc'd copy of just the directory name of \a path */
 char *get_directory_from_path(const char *path);
+
+/** Check whether \a path is a directory or a symlink to a directory.
+ * \return
+ * - true if \a path is a directory
+ * - false if \a path is a file or an error occurred */
+bool is_dir(const char* path)		/*@globals errno,stderr@*/;
 
 /** Check whether \a path is a file (everything that is not a directory
  * or a symlink to a directory).

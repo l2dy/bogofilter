@@ -54,6 +54,6 @@ typedef	enum {
     P_DONT_KNOW		/*  2 for don't know */
 } probe_txn_t;
 
-probe_txn_t probe_txn(bfdir *directory, bffile *file);
+probe_txn_t probe_txn(bfpath *bfp);
 
 #endif

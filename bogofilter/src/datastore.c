@@ -151,12 +151,12 @@ void dsh_free(void *vhandle)
     return;
 }
 
-void *ds_open(void *dbe, const char *path, const char *name, dbmode_t open_mode)
+void *ds_open(void *dbe, bfpath *bfp, dbmode_t open_mode)
 {
     dsh_t *dsh;
     void *v;
 
-    v = db_open(dbe, path, name, open_mode); /* FIXME */
+    v = db_open(dbe, bfp, open_mode); /* FIXME */
 
     if (!v)
 	return NULL;
@@ -366,16 +366,16 @@ ex_t ds_foreach(void *vhandle, ds_foreach_t *hook, void *userdata)
 
 /* Wrapper for ds_foreach that opens and closes file */
 
-ex_t ds_oper(void *env, const char *path, dbmode_t open_mode, 
+ex_t ds_oper(void *env, bfpath *bfp, dbmode_t open_mode, 
 	     ds_foreach_t *hook, void *userdata)
 {
     ex_t ret = EX_OK;
     void *dsh;
-
-    dsh = ds_open(env, CURDIR_S, path, open_mode);
+    
+    dsh = ds_open(env, bfp, open_mode);
 
     if (dsh == NULL) {
-	fprintf(stderr, "Can't open file '%s'\n", path);
+	fprintf(stderr, "Can't open file '%s'\n", bfp->filepath);
 	exit(EX_ERROR);
     }
 
@@ -397,25 +397,12 @@ ex_t ds_oper(void *env, const char *path, dbmode_t open_mode,
 static word_t  *msg_count_tok;
 static word_t  *wordlist_version_tok;
 
-void ds_minit(const char *directory, const char *filename)
+void *ds_init(bfpath *bfp)
 {
-    bfdir dir;
-    bffile file;
-
-    dir.dirname = directory;
-    file.filename = filename;
-    dsm_init(&dir, &file);
-}
-
-void *ds_init(const char *directory, const char *filename)
-{
-    bfdir dir;
-    bffile file;
     void *dbe;
 
-    dir.dirname = directory;
-    file.filename = filename;
-    dbe = dbe_init(&dir, &file);
+    dbe = dbe_init(bfp);
+
     if (dsm == NULL)
 	dsm = &dsm_dummies;
 
@@ -425,6 +412,7 @@ void *ds_init(const char *directory, const char *filename)
     if (wordlist_version_tok == NULL) {
 	wordlist_version_tok = word_news(WORDLIST_VERSION);
     }
+
     return dbe;
 }
 
@@ -502,67 +490,50 @@ const char *ds_version_str(void)
     return db_version_str();
 }
 
-ex_t ds_recover(const char *directory, bool catastrophic)
+ex_t ds_recover(bfpath *bfp, bool catastrophic)
 {
     if (dsm->dsm_recover == NULL)
 	return EX_OK;
-    else {
-	bfdir dir;
-	dir.dirname = directory;
-	return dsm->dsm_recover(&dir, catastrophic, true);
-    }
+    else
+	return dsm->dsm_recover(bfp, catastrophic, true);
 }
 
-ex_t ds_remove(const char *directory) {
+ex_t ds_remove(bfpath *bfp)
+{
     if (dsm->dsm_remove == NULL)
 	return EX_OK;
-    else {
-	bfdir dir;
-	dir.dirname = directory;
-	return dsm->dsm_remove(&dir);
-    }
+    else
+	return dsm->dsm_remove(bfp);
 }
 
-ex_t ds_checkpoint(const char *directory) {
+ex_t ds_checkpoint(bfpath *bfp)
+{
     if (dsm->dsm_checkpoint == NULL)
 	return EX_OK;
-    else {
-	bfdir dir;
-	dir.dirname = directory;
-	return dsm->dsm_checkpoint(&dir);
-    }
+    else
+	return dsm->dsm_checkpoint(bfp);
 }
 
-ex_t ds_purgelogs(const char *directory) {
+ex_t ds_purgelogs(bfpath *bfp)
+{
     if (dsm->dsm_purgelogs == NULL)
 	return EX_OK;
-    else {
-	bfdir dir;
-	dir.dirname = directory;
-	return dsm->dsm_purgelogs(&dir);
-    }
+    else
+	return dsm->dsm_purgelogs(bfp);
 }
 
-ex_t ds_verify(const char *directory, const char *filename) {
+ex_t ds_verify(bfpath *bfp)
+{
     if (dsm->dsm_verify == NULL)
 	return EX_OK;
-    else {
-	bfdir dir;
-	bffile file;
-	dir.dirname = directory;
-	file.filename = filename;
-	return dsm->dsm_verify(&dir, &file);
-    }
+    else
+	return dsm->dsm_verify(bfp);
 }
 
-u_int32_t ds_pagesize(const char *directory, const char *filename) {
+u_int32_t ds_pagesize(bfpath *bfp)
+{
     if (dsm->dsm_pagesize == NULL)
 	return 0;
-    else {
-	bfdir dir;
-	bffile file; 
-	dir.dirname = directory;
-	file.filename = filename;
-	return dsm->dsm_pagesize(&dir, &file);
-    }
+    else
+	return dsm->dsm_pagesize(bfp);
 }

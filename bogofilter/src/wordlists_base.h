@@ -9,6 +9,8 @@
 typedef void *dsh_t;
 #endif
 
+#include "paths.h"
+
 /** true when at least one wordlist has been configured */
 extern	bool	config_setup;
 
@@ -22,20 +24,19 @@ typedef struct wordlist_s wordlist_t;
 /** structure of a wordlist node - singly linked priority queue */
 struct wordlist_s
 {
-    /*@null@*/ wordlist_t *next;/**< link to next queue node */
-    /*@owned@*/ char *listname;	/**< resource name (for debug/verbose messages) */
-    /*@owned@*/ char *dirname;	/**< just the directory name */
-    /*@owned@*/ char *filename;	/**< just the filename */
-    /*@owned@*/ char *filepath;	/**< resource path (for debug/verbose messages) */
-    /*@owned@*/ dsh_t *dsh;	/**< datastore handle */
+    /*@null@*/  wordlist_t *next;	/**< link to next queue node */
+    /*@owned@*/ char *listname;		/**< resource name (for debug/verbose messages) */
+    /*@owned@*/ bfpath *bfp;		/**< resource path info */
+    /*@owned@*/ dsh_t *dsh;		/**< datastore handle */
     u_int32_t	msgcount[IX_SIZE];	/**< count of messages in wordlist. */
-    WL_TYPE	type;		/**< datastore type */
-    int		override;	/**< priority in queue */
+    WL_TYPE	type;			/**< datastore type */
+    int		override;		/**< priority in queue */
 };
 
 /** Initialize a wordlist node and insert into the right place of the
  * priority queue, \return -1 for error, 0 for success */
-void init_wordlist(const char* name, const char* path,
+void init_wordlist(const char* name, 
+		   const char *path,
 		   int override, WL_TYPE type);
 
 /** Print wordlists to stdout, prefixing it by \a fmt which is
@@ -45,11 +46,9 @@ void init_wordlist(const char* name, const char* path,
 void display_wordlists(wordlist_t *list, const char *fmt);
 
 /** Free resources of all nodes in the list */
-void free_wordlists(wordlist_t *list);
+void free_wordlists(void);
 
 /** Get default wordlist for registering messages, finding robx, etc */
 wordlist_t *get_default_wordlist(wordlist_t *list);
-
-int  set_wordlist_dir(const char* dir, priority_t precedence);
 
 #endif	/* WORDLISTS_CORE_H */

@@ -15,6 +15,14 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
+	2005-04-03
+
+	* File handling code rewritten to use bfpath structure for
+          holding all info and with a 3 step use of the info.  1 -
+          create bfpaths during command line and config file
+          processing; 2 - validate directories and file names; and 3 -
+          use files for processing.
+
 0.94.3	2005-03-29
 
 	2005-03-27

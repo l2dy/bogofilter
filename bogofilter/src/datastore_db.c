@@ -54,9 +54,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003 - 2004
 #include "datastore_db_private.h"
 #endif
 
-#include "bogohome.h"
 #include "error.h"
-#include "paths.h"		/* for build_path */
 #include "rand_sleep.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
@@ -100,46 +98,57 @@ static const char *resolveopenflags(u_int32_t flags) {
     return buf;
 }
 
-/** wrapper for Berkeley DB's DB->open() method which has changed API and
- * semantics -- this should deal with 3.2, 3.3, 4.0, 4.1 and 4.2. */
-static int DB_OPEN(DB *db, const char *db_path,
-	const char *db_file, DBTYPE type, u_int32_t flags, int mode)
+static void check_env_pagesize(DB *db)
 {
-    int ret;
-    const char *ps;
-
-#if DB_AT_LEAST(4,1)
-    if (dsm->dsm_auto_commit_flags != NULL)
-	flags |= dsm->dsm_auto_commit_flags();
-#endif
-
-    if ((ps = getenv("BF_PAGESIZE"))) {
+    const char *ps = getenv("BF_PAGESIZE");
+    if (ps != NULL) {
 	u_int32_t s = atoi(ps);
 	if (((s - 1) ^ s) != (s * 2 - 1)) {
 	    fprintf(stderr, "BF_PAGESIZE must be a power of 2, ignoring\n");
 	} else if (s < 512 || s > 65536) {
 	    fprintf(stderr, "BF_PAGESIZE must be 512 ... 65536, ignoring\n");
 	} else {
-	    int r;
-
-	    if ((r = db->set_pagesize(db, s))) {
+	    int r = db->set_pagesize(db, s);
+	    if (r != 0) {
 		fprintf(stderr, "setting pagesize to %d failed: %s\n",
 			s, db_strerror(r));
 	    }
 	}
     }
+}
+
+/** wrapper for Berkeley DB's DB->open() method which has changed API and
+ * semantics -- this should deal with 3.2, 3.3, 4.0, 4.1 and 4.2. */
+static int DB_OPEN(DB *db, bfpath *bfp, const char *database, DBTYPE type, u_int32_t flags, int mode)
+{
+    int ret;
+    const char *file;
+
+    check_env_pagesize(db);
+
+#if DB_AT_LEAST(4,1)
+    if (dsm->dsm_auto_commit_flags != NULL)
+	flags |= dsm->dsm_auto_commit_flags();
+#endif
+
+    if (!fTransaction)
+	file = bfp->filepath;
+    else
+	file = bfp->filename;
 
     ret = db->open(db,
 #if DB_AT_LEAST(4,1)
-	    0,	/* TXN handle - we use autocommit instead */
+		   0,	/* TXN handle - we use autocommit instead */
 #endif
-	    db_path, db_file, type, flags, mode);
+		   file, database, type, flags, mode
+	);
 
     if (DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB_OPEN"))
 	fprintf(dbgout, "[pid %lu] DB->open(db=%p, file=%s, database=%s, "
 		"type=%x, flags=%#lx=%s, mode=%#o) -> %d %s\n",
-		(unsigned long)getpid(), (void *)db, db_path,
-		db_file ? db_file : "NIL", type, (unsigned long)flags,
+		(unsigned long)getpid(), (void *)db, 
+		file, database ? database : "NIL",
+		type, (unsigned long)flags,
 		resolveopenflags(flags), mode, ret, db_strerror(ret));
 
     return ret;
@@ -197,7 +206,7 @@ int db_lock(int fd, int cmd, short int type)
     return (fcntl(fd, cmd, &lock));
 }
 
-void dsm_init(bfdir *directory, bffile *file)
+void dsm_init(bfpath *bfp)
 {
     /* Note: we assume that the default dsm initializers above handle
      * this properly, dsm_init is empty if transactions are disabled or
@@ -208,13 +217,13 @@ void dsm_init(bfdir *directory, bffile *file)
 
     if (DEBUG_DATABASE(2))
 	fprintf(dbgout, "probing \"%s\" and \"%s\" for environment...\n",
-		directory->dirname, file->filename);
+		bfp->dirname, bfp->filename);
 
-    txn = probe_txn(directory, file);
+    txn = probe_txn(bfp);
 
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "probing \"%s\" and \"%s\" result %d\n",
-		directory->dirname, file->filename, txn);
+		bfp->dirname, bfp->filename, txn);
 
     if (txn == P_DISABLE)
 	fTransaction = false;
@@ -232,13 +241,12 @@ void dsm_init(bfdir *directory, bffile *file)
     else
 	dsm = &dsm_transactional;
 #else
-    (void)directory;
-    (void)file;
+    (void)bfp;
 #endif
 }
 
 /** "constructor" - allocate our handle and initialize its contents */
-static dbh_t *dbh_init(const char *db_path, const char *db_name)
+static dbh_t *dbh_init(bfpath *bfp)
 {
     dbh_t *handle;
 
@@ -251,8 +259,7 @@ static dbh_t *dbh_init(const char *db_path, const char *db_name)
     handle->magic= MAGIC_DBH;		/* poor man's type checking */
     handle->fd   = -1;			/* for lock */
 
-    handle->path.dirname = xstrdup(db_path);
-    handle->name.filename = build_path(db_path, db_name);
+    handle->name.filename = xstrdup(bfp->filepath);
 
     handle->locked     = false;
     handle->is_swapped = false;
@@ -273,31 +280,33 @@ static void handle_free(/*@only@*/ dbh_t *handle)
     return;
 }
 
+static bool checkpath(const char *path, char *norm)
+{
+    if (realpath(path, norm) != NULL)
+	return true;
+    else {
+	print_error(__FILE__, __LINE__,
+		    "error: cannot normalize path \"%s\": %s",
+		    path, strerror(errno));
+	return false;
+    }
+}
+
 /** Initialize data base, configure some lock table sizes
  * (which can be overridden in the DB_CONFIG file)
  * and lock the file to tell other parts we're initialized and
  * do not want recovery to stomp over us.
  */
-void *dbe_init(bfdir *directory, bffile *file)
+void *dbe_init(bfpath *bfp)
 {
     char norm_dir[PATH_MAX+1]; /* check normalized directory names */
     char norm_home[PATH_MAX+1];/* see man realpath(3) for details */
 
     dbe_t *env;
 
-    if (realpath(directory->dirname, norm_dir) == NULL) {
-	    print_error(__FILE__, __LINE__,
-		    "error: cannot normalize path \"%s\": %s",
-		    directory->dirname, strerror(errno));
-	    exit(EX_ERROR);
-    }
-
-    if (realpath(bogohome, norm_home) == NULL) {
-	    print_error(__FILE__, __LINE__,
-		    "error: cannot normalize path \"%s\": %s",
-		    bogohome, strerror(errno));
-	    exit(EX_ERROR);
-    }
+    if ( !checkpath(bfp->dirname, norm_dir) ||
+	 !checkpath(bogohome, norm_home))
+	exit(EX_ERROR);
 
     if (strcmp(norm_dir, norm_home) != 0)
     {
@@ -316,11 +325,9 @@ void *dbe_init(bfdir *directory, bffile *file)
 	exit(EX_ERROR);
     }
 
-    assert(directory);
-
-    dsm_init(directory, file);
-
-    env = dsm->dsm_env_init(directory);
+    dsm_init(bfp);
+    
+    env = dsm->dsm_env_init(bfp);
 
     return env;
 }
@@ -468,8 +475,7 @@ const char *db_version_str(void)
  * \return pointer to database handle on success, NULL otherwise.
  */
 void *db_open(void *vhandle,
-	      const char *path,
-	      const char *name,
+	      bfpath *bfp,
 	      dbmode_t open_mode)
 {
     int ret;
@@ -507,7 +513,7 @@ void *db_open(void *vhandle,
 	uint32_t pagesize;
 	uint32_t retryflag = retryflags[idx];
 
-	handle = dbh_init(path, name);
+	handle = dbh_init(bfp);
 
 	if (handle == NULL)
 	    return NULL;
@@ -536,7 +542,7 @@ void *db_open(void *vhandle,
 retry_db_open:
 	handle->created = false;
 
-	ret = DB_OPEN(dbp, db_file, NULL, dbtype, opt_flags | retryflag, DS_MODE);
+	ret = DB_OPEN(dbp, bfp, NULL, dbtype, opt_flags | retryflag, DS_MODE);
 
 	/* Begin complex change ... */
 	if (ret != 0) {
@@ -549,7 +555,7 @@ retry_db_open:
 #if DB_AT_LEAST(4,2)
 		 (ret = DB_SET_FLAGS(dbp, DB_CHKSUM)) != 0 ||
 #endif
-		 (ret = DB_OPEN(dbp, db_file, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL | retryflag, DS_MODE)))
+		 (ret = DB_OPEN(dbp, bfp, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL | retryflag, DS_MODE)))
 		    err = true;
 		if (!err)
 		    handle->created = true;
@@ -977,19 +983,19 @@ bool is_file_or_missing(const char* path) /*@globals errno,stderr@*/
     return false;
 }
 
-u_int32_t db_pagesize(bfdir *directory, bffile *db_file)
+u_int32_t db_pagesize(bfpath *bfp)
 {
     DB_ENV *dbe = NULL;
     DB *db;
     int e;
     u_int32_t s;
 
-    if (!is_file_or_missing(db_file->filename)) {
-	print_error(__FILE__, __LINE__, "\"%s\" is not a file.", db_file->filename);
+    if (!is_file_or_missing(bfp->filename)) {
+	print_error(__FILE__, __LINE__, "\"%s\" is not a file.", bfp->filename);
 	return 0xffffffff;
     }
 
-    dbe = dsm->dsm_recover_open(directory, db_file);
+    dbe = dsm->dsm_recover_open(bfp);
 
     e = db_create(&db, dbe, 0);
 
@@ -999,10 +1005,10 @@ u_int32_t db_pagesize(bfdir *directory, bffile *db_file)
 	exit(EX_ERROR);
     }
 
-    e = DB_OPEN(db, db_file->filename, NULL, dbtype, DB_RDONLY | DB_NOMMAP, DS_MODE);
+    e = DB_OPEN(db, bfp, NULL, dbtype, DB_RDONLY | DB_NOMMAP, DS_MODE);
     if (e != 0) {
 	print_error(__FILE__, __LINE__, "cannot open database %s: %s",
-		db_file->filename, db_strerror(e));
+		bfp->filename, db_strerror(e));
 	exit(EX_ERROR);
     }
     s = get_psize(db, true);
@@ -1010,33 +1016,35 @@ u_int32_t db_pagesize(bfdir *directory, bffile *db_file)
     e = db->close(db, 0);
     if (e != 0) {
 	print_error(__FILE__, __LINE__, "cannot close database %s: %s",
-		db_file->filename, db_strerror(e));
+		bfp->filename, db_strerror(e));
 	exit(EX_ERROR);
     }
 
     if (dsm->dsm_common_close)
-	e = dsm->dsm_common_close(dbe, directory);
+	e = dsm->dsm_common_close(dbe, bfp);
     if (e != 0) {
 	print_error(__FILE__, __LINE__, "cannot close environment %s: %s",
-		directory->dirname, db_strerror(e));
+		    bfp->dirname, db_strerror(e));
 	exit(EX_ERROR);
     }
 
     return s;
 }
 
-ex_t db_verify(bfdir *directory, bffile *db_file)
+ex_t db_verify(bfpath *bfp)
 {
     DB_ENV *dbe = NULL;
     DB *db;
     int e;
 
-    if (!is_file_or_missing(db_file->filename)) {
-	print_error(__FILE__, __LINE__, "\"%s\" is not a file.", db_file->filename);
+    assert(bfp->isfile == is_file_or_missing(bfp->filepath));
+
+    if (!bfp->isfile) {
+	print_error(__FILE__, __LINE__, "\"%s\" is not a file.", bfp->filename);
 	return EX_ERROR;
     }
 
-    dbe = dsm->dsm_recover_open(directory, db_file);
+    dbe = dsm->dsm_recover_open(bfp);
 
     e = db_create(&db, NULL, 0); /* need not use environment here,
 				    DB->verify() does not lock anyways,
@@ -1048,18 +1056,19 @@ ex_t db_verify(bfdir *directory, bffile *db_file)
 	exit(EX_ERROR);
     }
 
-    e = db->verify(db, db_file->filename, NULL, NULL, 0);
+    e = db->verify(db, bfp->filepath, NULL, NULL, 0);
     if (e) {
 	print_error(__FILE__, __LINE__, "database %s does not verify: %s",
-		db_file->filename, db_strerror(e));
+		bfp->filename, db_strerror(e));
 	exit(EX_ERROR);
     }
 
     if (dsm->dsm_common_close)
-	e = dsm->dsm_common_close(dbe, directory);
+	e = dsm->dsm_common_close(dbe, bfp);
 
     if (e == 0 && verbose)
-	printf("%s OK.\n", db_file->filename);
+	printf("%s OK.\n", bfp->filename);
 
     return e;
 }
+

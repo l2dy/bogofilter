@@ -50,11 +50,11 @@ bool	header_line_markup = true;	/* -H */
 #ifndef	ENABLE_TRANSACTIONS
 bool fTransaction = false;
 #else
-bool fTransaction = false;
+bool fTransaction = true;
 #endif
 
 /* for  bogotune */
-bool fBogotune = false;
+bool 	fBogotune = false;
 
 /* for  bogoconfig.c, prob.c, rstats.c and score.c */
 double	robx = 0.0;
