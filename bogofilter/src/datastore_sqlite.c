@@ -505,7 +505,7 @@ static u_int32_t sql_pagesize(bfdir *db_dir, bffile *db_file)
     u_int32_t size;
 
     (void)db_dir;
-    dbh = db_open(NULL, db_file->filename, db_file->filename, DS_READ);
+    dbh = db_open(NULL, db_dir->dirname, db_file->filename, DS_READ);
     if (!dbh)
 	return 0xffffffff;
     do {
