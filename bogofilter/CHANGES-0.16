@@ -9,7 +9,12 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.16 !
 
-0.16.4	2004-01-??
+0.16.4	2004-01-21
+
+	2004-01-20
+
+	* Config options 'thresh_stats' and 'thresh_rtable' have been 
+	  deprecated.
 
 	2004-01-19
 

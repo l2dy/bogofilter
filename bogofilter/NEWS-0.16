@@ -9,9 +9,10 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.16 !
 
-0.16.4	2004-01-??
+0.16.4	2004-01-21
 
 * Fix bogus config file warnings from bogolexer.
+* Config options 'thresh_stats' and 'thresh_rtable' have been deprecated.
 * Merge lexer rules to save a few bytes.
 * Additional portability fixes.
 
