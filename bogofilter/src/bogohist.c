@@ -25,6 +25,7 @@ AUTHOR:
 #include "prob.h"
 #include "datastore.h"
 #include "msgcounts.h"
+#include "paths.h"		/* for WORDLIST */
 #include "word.h"
 #include "wordlists.h"
 #include "xmalloc.h"
@@ -138,16 +139,11 @@ ex_t histogram(const char *path)
 
     rhistogram_t hist;
 
-    char *filepath;
-
     dbe = ds_init(bogohome);
     if (dbe == NULL)
 	return EX_ERROR;
 
-    filepath = build_wordlist_path(path);
-
-    dsh = ds_open(dbe, CURDIR_S, filepath, DS_READ);
-    xfree(filepath);
+    dsh = ds_open(dbe, path, WORDLIST, DS_READ);
 
     if (dsh == NULL)
 	return EX_ERROR;
