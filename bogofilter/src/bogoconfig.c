@@ -301,7 +301,7 @@ static int validate_args(void)
 	(void)fprintf(stderr, 
 		      "Error:  Invalid combination of options.\n"
 		      "\n"
-		      "    Options '-u' and '-R' are used when classifying messages.\n"
+		      "    Options '-p, '-e', '-u', and '-R' are used when classifying messages.\n"
 		      "    Options '-s', '-n', '-S', and '-N' are used when registering words.\n"
 		      "    The two sets of options may not be used together.\n"
 		      "    \n"
@@ -311,10 +311,10 @@ static int validate_args(void)
 		      "    Options '-l', '-d', '-x', and '-v' may be used with either mode.\n"
 #endif
 	    );
-	return 2;
+	return EX_ERROR;
     }
 
-    return 0;
+    return EX_OK;
 }
 
 static void help(void)
