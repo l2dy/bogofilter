@@ -13,6 +13,7 @@ AM_LDFLAGS = -L..
 LDADD = -lbogofilter
 
 BUILT_SOURCES = t.config
+CLEANFILES= $(BUILT_SOURCES)
 
 t.config:
 	echo >$@ 'EXE_EXT="@EXE_EXT@"' || rm -f $@
