@@ -80,6 +80,7 @@ void rstats_cleanup(void)
       xfree(p);
     }
     current = NULL;
+    header.count = 0;
     header.list = NULL;
 }
 
