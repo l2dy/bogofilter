@@ -7,8 +7,8 @@ NODB=1 . ${srcdir=.}/t.frame
 
 OUT="$TMPDIR/maint.out"
 
-$BOGOFILTER -C -l -s < ${SYSTEST}/inputs/spam.mbx >> $TMPDIR/tmp
-$BOGOFILTER -C -l -n < ${SYSTEST}/inputs/good.mbx >> $TMPDIR/tmp
+$BOGOFILTER -C -s < ${SYSTEST}/inputs/spam.mbx >> $TMPDIR/tmp
+$BOGOFILTER -C -n < ${SYSTEST}/inputs/good.mbx >> $TMPDIR/tmp
 
 CORRECT="$TMPDIR/result"
 
