@@ -29,8 +29,8 @@ typedef struct {
   int msg_freq;
 } wordprop_t;
 
-extern rc_t bogofilter(int fd, /*@out@*/ double *xss);
-extern void register_messages(int, run_t);
+extern rc_t bogofilter(/*@out@*/ double *xss);
+extern void register_messages(run_t);
 extern void print_bogostats(FILE *fp, double spamicity);
 
 #endif	/* HAVE_BOGOFILTER_H */

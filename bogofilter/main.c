@@ -130,7 +130,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	case RUN_UPDATE:
 	    {
 		double spamicity;
-		rc_t   status = bogofilter(STDIN_FILENO, &spamicity);
+		rc_t   status = bogofilter(&spamicity);
 
 		if (passthrough)
 		{
@@ -193,7 +193,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	    }
 	    break;
 	default:
-	    register_messages(STDIN_FILENO, run_type);
+	    register_messages(run_type);
 	    break;
     }
 

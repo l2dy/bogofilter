@@ -83,7 +83,7 @@ static void wordprop_init(void *vwordprop){
 	wordprop->msg_freq = 0;
 }
 
-static void *collect_words(/*@unused@*/ int fd, /*@out@*/ int *message_count,
+static void *collect_words(/*@out@*/ int *message_count,
 	/*@out@*/ int *word_count)
     /* tokenize input text and save words in wordhash_t hash table 
      * returns: the wordhash_t hash table.
@@ -235,12 +235,12 @@ static void register_words(run_t _run_type, wordhash_t *h,
   db_lock_release_list(word_lists);
 }
 
-void register_messages(int fdin, run_t _run_type)
+void register_messages(run_t _run_type)
 {
   wordhash_t *h;
   int	wordcount, msgcount;
   initialize_constants();
-  h = collect_words(fdin, &msgcount, &wordcount);
+  h = collect_words(&msgcount, &wordcount);
   register_words(_run_type, h, msgcount, wordcount);
   wordhash_free(h);
 }
@@ -642,7 +642,7 @@ static void initialize_constants(void)
     }
 }
 
-rc_t bogofilter(int fd, double *xss) /*@globals errno@*/
+rc_t bogofilter(double *xss) /*@globals errno@*/
 /* evaluate text for spamicity */
 {
     rc_t	status;
@@ -661,7 +661,7 @@ rc_t bogofilter(int fd, double *xss) /*@globals errno@*/
     initialize_constants();
 
     /* tokenize input text and save words in a wordhash. */
-    wordhash = collect_words(fd, &msgcount, &wordcount);
+    wordhash = collect_words(&msgcount, &wordcount);
 
     switch(algorithm) {
 	case AL_GRAHAM:
