@@ -4,11 +4,11 @@
 # with many useful additions by David Relson <relson@osagesoftware.com>
 
 # Not correct number of parameters
-my $commandlineoptions=($ARGV[0]=~/^-(?=[^f]*f?[^f]*$)(?=[^s]*s?[^s]*$)[fs]*v{0,2}[fs]*$/);
+my $commandlineoptions=($ARGV[0]=~/^-(?=[^f]*f?[^f]*$)(?=[^n]*n?[^n]*$)(?=[^s]*s?[^s]*$)[fns]*v{0,2}[fns]*$/);
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.24
+bogominitrain.pl version 1.3
   requires bogofilter 0.14.5 or later
 
 Usage:
@@ -28,6 +28,8 @@ Usage:
 
   It may be a good idea to run this script command several times.  Use
   the '-f' option to run the script until no scoring errors occur.
+  The '-n' option will prevent messages from being added more than
+  once; this may leave errors in the end.
 
   To increase the size of your wordlists and to improve bogofilter's
   scoring accuracy, use bogofilter's -o option to set ham_cutoff and
@@ -36,7 +38,7 @@ Usage:
   this interval, i.e., all messages in your training mboxes will be
   marked as ham or spam with values far from your production cutoff.
   For example if you usually work with spam_cutoff=0.6, you might use
-  the following as bogofilter-options: '-o 0.7,0.5'
+  the following as bogofilter-options: '-o 0.8,0.3'
 
 Example:
   bogominitrain.pl -fv .bogofilter 'ham*' 'spam*' '-c train.cf'
@@ -45,6 +47,7 @@ Options:
   -v   This switch produces info on messages used for training.
   -vv  also lists messages not used for training.
   -f   Runs the program until no errors remain.
+  -n   Prevents repetitions.
   -s   Saves the messages used for training to files
        bogominitrain.ham and bogominitrain.spam
   Note: If you need to use more than one option, you must combine them.
@@ -60,6 +63,7 @@ END
 
 # Check input
 my $force=1 if ($commandlineoptions && $ARGV[0]=~s/f//);
+my $norepetitions=1 if ($commandlineoptions && $ARGV[0]=~s/n//);
 my ($safe,$safeham,$safespam)=(1,"bogominitrain.ham","bogominitrain.spam")
    if ($commandlineoptions && $ARGV[0]=~s/s//);
 my $verbose=1 if ($commandlineoptions && $ARGV[0]=~s/^-v/-/);
@@ -72,7 +76,7 @@ die ("$dir is not a directory or not accessible.\n") unless (-d $dir && -r $dir 
 `$bogofilter -n < /dev/null` unless (-s "$dir/goodlist.db" || -s "$dir/wordlist.db");
 my $ham_total=`cat $ham|grep -c "^From "`;
 my $spam_total=`cat $spam|grep -c "^From "`;
-my ($fp,$fn);
+my ($fp,$fn,$hamadd,$spamadd,%trainedham,%trainedspam);
 my $runs=0;
 
 print "\nStarting with this database:\n";
@@ -84,7 +88,8 @@ do { # Start force loop
   open (SPAM, "cat $spam|") || die("Cannot open spam: $!\n");
 
   # Loop through all the mails
-  my ($lasthamline,$lastspamline,$hamcount,$spamcount,$hamadd,$spamadd) = ("","",0,0,0,0);
+  my ($lasthamline,$lastspamline,$hamcount,$spamcount) = ("","",0,0);
+  ($hamadd,$spamadd)=(0,0);
   do {
 
     # Read one mail from ham box and test, train as needed
@@ -97,20 +102,25 @@ do { # Start force loop
       }
       if ($mail) {
         $hamcount++;
-        open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
-        print TEMP $mail;
-        close (TEMP);
-        unless (system("$bogofilter <$temp") >>8==1) {
-          system("$bogofilter -n <$temp");
-          $hamadd++;
-          print "Training ham message $hamcount.\n" if ($verbose);
-          if ($safe) {
-            open (TEMP, ">>$safeham") || die "Cannot write to $safeham: $!";
-            print TEMP $mail;
-            close (TEMP);
-          }
-        } else {print "Not training ham message $hamcount.\n" if ($vverbose);}
-        unlink ($temp);
+        unless ($norepetitions && $trainedham{$hamcount}) {
+          open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
+          print TEMP $mail;
+          close (TEMP);
+          unless (system("$bogofilter <$temp") >>8==1) {
+            system("$bogofilter -n <$temp");
+            $hamadd++;
+            $trainedham{$hamcount}++;
+            print "Training ham message $hamcount",
+                  $trainedham{$hamcount}>1&&" ($trainedham{$hamcount})",
+                  ".\n" if ($verbose);
+            if ($safe) {
+              open (TEMP, ">>$safeham.$runs") || die "Cannot write to $safeham.$runs: $!";
+              print TEMP $mail;
+              close (TEMP);
+            }
+          } else {print "Not training ham message $hamcount.\n" if ($vverbose);}
+          unlink ($temp);
+        }
       }
     }
 
@@ -124,20 +134,25 @@ do { # Start force loop
       }
       if ($mail) {
         $spamcount++;
-        open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
-        print TEMP $mail;
-        close (TEMP);
-        unless (system("$bogofilter <$temp") >>8==0) {
-          system("$bogofilter -s <$temp");
-          $spamadd++;
-          print "Training spam message $spamcount.\n" if ($verbose);
-          if ($safe) {
-            open (TEMP, ">>$safespam") || die "Cannot write to $safespam: $!";
-            print TEMP $mail;
-            close (TEMP);
-          }
-        } else {print "Not training spam message $spamcount.\n" if ($vverbose);}
-        unlink ($temp);
+        unless ($norepetitions && $trainedspam{$spamcount}) {
+          open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
+          print TEMP $mail;
+          close (TEMP);
+          unless (system("$bogofilter <$temp") >>8==0) {
+            system("$bogofilter -s <$temp");
+            $spamadd++;
+            $trainedspam{$hamcount}++;
+            print "Training spam message $spamcount",
+                  $trainedspam{$spamcount}>1&&" ($trainedspam{$spamcount})",
+                  ".\n" if ($verbose);
+            if ($safe) {
+              open (TEMP, ">>$safespam.$runs") || die "Cannot write to $safespam.$runs: $!";
+              print TEMP $mail;
+              close (TEMP);
+            }
+          } else {print "Not training spam message $spamcount.\n" if ($vverbose);}
+          unlink ($temp);
+        }
       }
     }
 
@@ -153,5 +168,5 @@ do { # Start force loop
   print "\nFalse negatives: $fn";
   $fp=`cat $ham | $bogofilter -TM | grep -cv ^H`;
   print "False positives: $fp\n";
-} until ($fn+$fp==0 || !$force);
-print "\n$runs run",$runs>1&&"s"," needed to close off.\n" if ($force);
+} until ($fn+$fp==0 || $hamadd+$spamadd==0 || !$force);
+print "\n$runs run",$runs>1&&"s"," needed to close off.\n" if ($force); 
