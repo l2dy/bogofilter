@@ -14,16 +14,20 @@ static void die(void) {
     exit(EXIT_FAILURE);
 }
 
-int main(void) {
+int main(int argc, char **argv) {
     size_t size;
+    qp_mode mode = RFC2045;
     word_t *w;
+
+    if (argc > 1 && strcasecmp(argv[1], "rfc2047")) mode = RFC2047;
+    if (argc > 1 && strcasecmp(argv[1], "rfc-2047")) mode = RFC2047;
 
     if (fseek(stdin, 0, SEEK_END)) die();
     size = ftell(stdin);
     if (fseek(stdin, 0, SEEK_SET)) die();
     w = word_new(NULL, size);
     if (fread(w->text, 1, w->leng, stdin) != w->leng) die();
-    size = qp_decode(w);
+    size = qp_decode(w, mode);
     if (fwrite(w->text, 1, size, stdout) != size) die();
     word_free(w);
     if (fflush(stdout)) die();

@@ -1,0 +1,5 @@
+0.92.2 2004-07-11
+NOTE: the formatting parameters have changed,
+  '%A' is now the message's IP address.
+  '%I' is now the Message-ID.
+  '%Q' is now the Queue-ID.

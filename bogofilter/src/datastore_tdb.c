@@ -29,8 +29,14 @@ typedef struct {
     char *path;
     char *name;
     bool locked;
+    bool created;
     TDB_CONTEXT *dbp;
 } dbh_t;
+
+/* dummy infrastructure, to be expanded by environment
+ * or transactional initialization/shutdown */
+
+static bool init = false;
 
 /* Function definitions */
 
@@ -41,7 +47,6 @@ const char *db_version_str(void)
 
 static dbh_t *dbh_init(const char *path, const char *name)
 {
-    size_t c;
     dbh_t *handle;
     size_t len = strlen(path) + strlen(name) + 2;
 
@@ -53,7 +58,8 @@ static dbh_t *dbh_init(const char *path, const char *name)
     handle->name = xmalloc(len);
     build_path(handle->name, len, path, name);
 
-    handle->locked = false;
+    handle->locked  = false;
+    handle->created = false;
 
     return handle;
 }
@@ -70,34 +76,54 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
+/* Returns is_swapped flag */
+bool db_is_swapped(void *vhandle)
+{
+    (void) vhandle;		/* suppress compiler warning */
+    return false;
+}
+
+
+/* Returns created flag */
+bool db_created(void *vhandle)
+{
+    dbh_t *handle = vhandle;
+    return handle->created;
+}
+
+
 /*
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
 */
 void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 {
-    dsh_t *dsh;
     dbh_t *handle;
 
-    int tdb_flags = 0;
+    int tdb_flags;
     int open_flags;
     TDB_CONTEXT *dbp;
 
-    if (open_mode == DB_WRITE) {
-	open_flags = O_RDWR | O_CREAT;
+    if (open_mode & DS_WRITE) {
+	open_flags = O_RDWR;
+	tdb_flags = 0;
     }
     else {
-    	tdb_flags = TDB_NOLOCK;
     	open_flags = O_RDONLY;
+    	tdb_flags = TDB_NOLOCK;
     }
 
     handle = dbh_init(db_file, name);
 
     if (handle == NULL) return NULL;
 
-    dsh = dsh_init(handle, false);
-
     dbp = handle->dbp = tdb_open(handle->name, 0, tdb_flags, open_flags, 0664);
+
+    if ((dbp == NULL) && (open_mode & DS_WRITE)) {
+	dbp = handle->dbp = tdb_open(handle->name, 0, tdb_flags, open_flags | O_CREAT, 0664);
+	if (dbp != NULL)
+	    handle->created = true;
+    }
 
     if (dbp == NULL)
 	goto open_err;
@@ -105,7 +131,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "(db) tdb_open( %s ), %d )\n", handle->name, open_mode);
       
-    if (open_mode == DB_WRITE) {
+    if (open_mode & DS_WRITE) {
 	if (tdb_lockall(dbp) == 0) {
 	    handle->locked = 1;
 	}
@@ -116,7 +142,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	}
     }
 
-    return dsh;
+    return handle;
 
  open_err:
     dbh_free(handle);
@@ -124,10 +150,10 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     return NULL;
 }
 
-int db_delete(dsh_t *dsh, const dbv_t *token)
+int db_delete(void *vhandle, const dbv_t *token)
 {
     int ret;
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     TDB_DATA db_key;
     TDB_CONTEXT *dbp;
 
@@ -147,12 +173,12 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
     return ret;		/* 0 if ok */
 }
 
-int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
+int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 {
     TDB_DATA db_key;
     TDB_DATA db_data;
 
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     TDB_CONTEXT *dbp = handle->dbp;
 
     db_key.dptr = token->data;
@@ -180,13 +206,13 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 }
 
 
-int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
+int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
 {
     int ret;
     TDB_DATA db_key;
     TDB_DATA db_data;
 
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     TDB_CONTEXT *dbp = handle->dbp;
 
     db_key.dptr = token->data;
@@ -233,7 +259,7 @@ void db_close(void *vhandle, bool nosync)
 /*
  flush any data in memory to disk
 */
-void db_flush(/*@unused@*/  __attribute__ ((unused)) dsh_t *dsh)
+void db_flush(/*@unused@*/  __attribute__ ((unused)) void *vhandle)
 {
     /* noop */
 }
@@ -271,10 +297,10 @@ static int tdb_traversor(/*@unused@*/ __attribute__ ((unused)) TDB_CONTEXT * tdb
 }
 
 
-int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
+int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 {
     int ret;
-    dbh_t *handle = dsh->dbh;
+    dbh_t *handle = vhandle;
     TDB_CONTEXT *dbp = handle->dbp;
 
     userdata_t hookdata;
@@ -329,6 +355,9 @@ const char *db_str_err(int j)
 
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
-static bool init = false;
 int db_init(void) { init = true; return 0; }
 void db_cleanup(void) { init = false; }
+
+int db_txn_begin(void *d) { (void)d; return 0; }
+int db_txn_abort(void *d) { (void)d; return 0; }
+int db_txn_commit(void *d) { (void)d; return 0; }

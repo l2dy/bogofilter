@@ -21,24 +21,28 @@ LICENSE:
 #include <stdlib.h>
 
 #include "bogohome.h"
+#include "find_home.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
 char *bogohome=NULL;
 
-void set_bogohome(const char *ds_file) {
+void set_bogohome(const char *path) {
     char *t;
     struct stat st;
 
     if (bogohome)
 	xfree(bogohome);
 
-    bogohome = xstrdup(ds_file);
-    if (lstat(bogohome, &st) != 0 || !S_ISDIR(st.st_mode))
+    bogohome = tildeexpand(path, true);
+    if (stat(bogohome, &st) != 0 || !S_ISDIR(st.st_mode)) {
 	if ((t = strrchr(bogohome, DIRSEP_C)))
 	    *t = '\0';
+	else
+	    *bogohome = '\0';
+    }
     if (!*bogohome) {
-	free(bogohome);
+	xfree(bogohome);
 	bogohome = xstrdup(CURDIR_S);
     }
 }

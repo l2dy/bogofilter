@@ -12,7 +12,9 @@ NAME:
 
 #include "word.h"
 
-uint	qp_decode(word_t *word);
-bool	qp_validate(word_t *word);
+enum	qp_mode { RFC2045=2045, RFC2047=2047 };
+typedef enum qp_mode qp_mode;
+uint	qp_decode(word_t *word, qp_mode mode);
+bool	qp_validate(const word_t *word, qp_mode mode);
 
 #endif	/* HAVE_QP_H */

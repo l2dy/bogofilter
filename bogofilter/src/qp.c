@@ -16,7 +16,8 @@ AUTHOR:
 
 /* Local Variables */
 
-static byte qp_xlate[256];
+static byte qp_xlate2045[256];
+static byte qp_xlate2047[256];
 
 static int hex_to_bin(byte c) {
     switch(c) {
@@ -42,7 +43,7 @@ static int hex_to_bin(byte c) {
 
 /* Function Definitions  */
 
-uint qp_decode(word_t *word)
+uint qp_decode(word_t *word, qp_mode mode)
 {
     uint size = word->leng;
     byte *s = word->text;	/* src */
@@ -53,20 +54,29 @@ uint qp_decode(word_t *word)
     {
 	byte ch = *s++;
 	int x, y;
-	if (ch == '=' && s <= e && s[0] == '\n') {
-	    /* continuation line, trailing = */
-	    s++;
-	    continue;
-	}
-	if (ch == '=' && s + 2 <= e && 
-	    (y = hex_to_bin(s[0])) >= 0 && (x = hex_to_bin(s[1])) >= 0) {
-	    /* encoded character */
-	    ch = (byte) (y << 4 | x);
-	    s += 2;
+	switch (ch) {
+	    case '=':
+		if (mode == RFC2045 && s + 1 <= e && s[0] == '\n') {
+		    /* continuation line, trailing = */
+		    s++;
+		    continue;
+		}
+		if (s + 2 <= e && 
+			(y = hex_to_bin(s[0])) >= 0 && (x = hex_to_bin(s[1])) >= 0) {
+		    /* encoded character */
+		    ch = (byte) (y << 4 | x);
+		    s += 2;
+		}
+		break;
+	    case '_':
+		if (mode == RFC2047)
+		    ch = ' ';
+		break;
 	}
 	*d++ = ch;
     }
-    *d = (byte) '\0';
+    /* do not stuff NUL byte here:
+     * if there was one, it has been copied! */
     return d - word->text;
 }
 
@@ -82,20 +92,25 @@ static void qp_init(void)
 	return;
     first = false;
 
-    for (i = (byte) '!'; i <= '~'; i += 1) {
-	qp_xlate[i] = (byte) i;
+    for (i = 33; i <= 126; i ++) {
+	qp_xlate2045[i] = qp_xlate2047[i] = (byte) i;
     }
 
-    qp_xlate['?'] = 0;
-    qp_xlate[' '] = (byte) ' ';
-    qp_xlate['_'] = (byte) ' ';
+    qp_xlate2045['\t'] = '\t'; /* HTAB */
+    qp_xlate2045[' ']  = ' '; /* SP */
+    qp_xlate2045['=']  = 0; /* illegal */
+
+    qp_xlate2047['_']  = ' '; /* SP */
+    qp_xlate2047['=']  = 0; /* illegal */
+    qp_xlate2047['?']  = 0; /* illegal */
 
     return;
 }
 
-bool qp_validate(word_t *word)
+bool qp_validate(const word_t *word, qp_mode mode)
 {
     uint i;
+    const byte *qp_xlate = mode == RFC2047 ? qp_xlate2047 : qp_xlate2045;
 
     qp_init();
 
@@ -103,9 +118,14 @@ bool qp_validate(word_t *word)
 	byte b = word->text[i];
 	byte v = qp_xlate[b];
 	if (v == 0)
-	    return false;
-	else
-	    word->text[i] = v;
+	    switch(b) {
+		case '\n':
+		case '\r':
+		case '=':
+		    break;
+		default:
+		    return false;
+	    }
     }
 
     return true;
