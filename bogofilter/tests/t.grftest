@@ -20,9 +20,6 @@ if [ "$1" = "-v" ]; then
     verbose=1
 fi
 
-if [   -d ${TMPDIR} ] ; then rm -rf ${TMPDIR} ; else : ; fi
-mkdir -p ${TMPDIR}
-
 # Graham config
 cat /dev/null > ${TMPDIR}/cfg.g
 

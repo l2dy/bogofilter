@@ -14,7 +14,7 @@ if [ "$1" = "-v" ]; then
     verbose=1
 fi
 
-if [   -d ${TMPDIR}/tests ] ; then rm -rf ${TMPDIR}/tests ; else : ; fi
+[ -d ${TMPDIR}/tests ] && rm -rf ${TMPDIR}/tests
 mkdir -p ${TMPDIR}/tests
 
 CONFIG="${TMPDIR}/test.cf"
