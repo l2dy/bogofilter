@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.22  2002/10/04 18:40:17  relson
+ * If the HOME path already contains 'bogofilter', use it without tacking on BOGODIR.
+ *
  * Revision 1.21  2002/10/04 18:08:25  relson
  * Added a '-u' (update) option so that the appropriate wordlist, i.e. spamlist.db
  * or goodlist.db,  is updated after classifying the message.
@@ -210,7 +213,8 @@ int main(int argc, char **argv)
 	} else {
 	    directory = xmalloc( strlen(tmp) + strlen(BOGODIR) + 1 );
 	    strcpy(directory, tmp );
-	    strcat(directory, BOGODIR);
+	    if ( strstr(tmp, "bogofilter") == NULL )
+		strcat(directory, BOGODIR);
 	    setup_lists(directory);
 	    xfree(directory);
 	}
