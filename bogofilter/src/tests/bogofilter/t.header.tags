@@ -30,7 +30,7 @@ fi
 BOGOLEXER="$VAL ${relpath}/bogolexer"
 for f in good spam ; do
     $BOGOLEXER -t -p < ${srcdir}/inputs/$f.mbx > $TMPDIR/$f.1
-    sort -u < $TMPDIR/$f.1 > $TMPDIR/$f.2
+    sort < $TMPDIR/$f.1 | uniq > $TMPDIR/$f.2
     if  [ $verbose -ne 0 ]; then
 	$BOGOLEXER -x ml -vvv -p < ${srcdir}/inputs/$f.mbx > $TMPDIR/$f.v
     fi

@@ -11,6 +11,7 @@ unset LC_ALL
 LC_COLLATE=
 unset LC_COLLATE
 
-cat ${srcdir}/inputs/t.lexer.inp | ${relpath}/bogolexer -p -C | sort -u > ${TMPDIR}/t.lexer.out
+cat ${srcdir}/inputs/t.lexer.inp | ${relpath}/bogolexer -p -C \
+| sort | uniq > ${TMPDIR}/t.lexer.out
 
 cmp ${srcdir}/outputs/t.lexer.out ${TMPDIR}/t.lexer.out
