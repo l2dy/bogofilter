@@ -223,18 +223,6 @@ static int validate_args(void)
 	return 2;
     }
 
-    if (registration && 
-	(((run_type & REG_SPAM  ) && (run_type & (REG_GOOD | UNREG_SPAM))) ||
-	 ((run_type & UNREG_SPAM) && (run_type & (REG_SPAM | UNREG_GOOD))) ||
-	 ((run_type & REG_GOOD  ) && (run_type & (REG_SPAM | UNREG_GOOD))) ||
-	 ((run_type & UNREG_GOOD) && (run_type & (REG_GOOD | UNREG_SPAM))))) 
-    {
-	(void)fprintf(stderr, 
-		      "Error:  Conflicting registration options.\n"
-	    );
-	return 2;
-    }
-
     return 0;
 }
 
@@ -371,19 +359,19 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case 's':
-	    run_type |= REG_SPAM;
+	    run_type = (run_type | REG_SPAM) & ~REG_GOOD & ~UNREG_SPAM;
 	    break;
 
 	case 'n':
-	    run_type |= REG_GOOD;
+	    run_type = (run_type | REG_GOOD) & ~REG_SPAM & ~UNREG_GOOD;
 	    break;
 
 	case 'S':
-	    run_type |= UNREG_SPAM;
+	    run_type = (run_type | UNREG_SPAM) & ~REG_SPAM & ~UNREG_GOOD;
 	    break;
 
 	case 'N':
-	    run_type |= UNREG_GOOD;
+	    run_type = (run_type | UNREG_GOOD) & ~REG_GOOD & ~UNREG_SPAM;
 	    break;
 
 	case 'v':
