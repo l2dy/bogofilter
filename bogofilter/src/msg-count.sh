@@ -7,6 +7,15 @@
 #
 # $Id$ 
 
+
+# split file on stdin at "From " lines and pipe the parts into a command
+# which is given in the arguments.
+# WARNING: this does not escape any shell prompts or something
+pipesplitmbox() {
+      $AWK "BEGIN { cmd=\"$*\"; } /^From / { close(cmd); } { print | cmd; }"
+}
+
+
 if [ "x$1" = "x-?" ] || [ "x$1" = "x-h" ]; then
     cat <<EOT
 NAME
