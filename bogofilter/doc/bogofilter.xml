@@ -258,7 +258,7 @@ on standard input as non-spam.</para>
 If you do this by accident, the token counts will off by 1 from what you really want 
 and the corresponding spam scores will be slightly off.
 Given a large number of tokens and messages in the wordlists, this doesn't matter.
-The problem _can_ be corrected by using the <option>-S</option> option or the <option>-N</option> option.
+The problem _can_ be corrected by using the <option>-S</option> option or the <option>-N</option> option.</para>
 
 <para>The <option>-S</option> option tells
 <application>bogofilter</application> to undo a prior registration of the
@@ -389,7 +389,8 @@ allows setting of debug flags for printing debug information.</para>
 	will use <filename>$HOME/.bogofilter</filename> instead.  If neither
 	 <envar>BOGOFILTER_DIR</envar> nor <envar>HOME</envar> is set, the <option>-d
 	    <replaceable>dir</replaceable></option> option must be present.
-</para></refsect1>
+    </para>
+</refsect1>
 
 <refsect1 id='configuration'><title>CONFIGURATION</title>
 <para>The <application>bogofilter</application> command line allows setting of many 
