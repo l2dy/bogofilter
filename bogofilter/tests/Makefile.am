@@ -16,7 +16,7 @@ TESTSCRIPTS=t.score1 t.score2 t.integrity t.integrity2 \
 	    t.nullstatsprefix t.lexer $(SYSTEM_TESTS)
 TESTS=$(TESTSCRIPTS)
 
-TESTS_ENVIRONMENT=RUN_FROM_MAKE=1
+TESTS_ENVIRONMENT=RUN_FROM_MAKE=1 srcdir=$(srcdir) $(SHELL) $(VERBOSE)
 
 EXTRA_DIST=$(TESTSCRIPTS) t.frame t.skel t.systest.d inputs outputs
 
