@@ -339,7 +339,7 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
     
     <p> Corriger un message incorrectement classé peut affecter la classification d'autres
     messages. Plus votre base de données sera petite, plus grande sera la probabilité qu'une
-    erreur d'apprentissage créee des classifications incorrectes.
+    erreur d'apprentissage créee des classifications incorrectes.</p>
     
     <p>L'utilisation de la méthode 2 ou 3 (ci-dessus) peut compenser cet effet.
     Repéter l'entrainement avec le corpus complet (y compris les messages de corrections ajoutés
@@ -390,10 +390,8 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
     sont temporaires, mais peuvent dégrader l'acuité pendant leur durée.</p>
 
     <p>
-    Note: Bogominitrain.pl possède une option <code>-f</code> qui
-    permet de réaliser "l'entrainement sur épuisement". Si vous
-    choisissez de l'utiliser, soyez conscient des effets secondaires
-    possibles.</p> <hr>
+    Note: Bogominitrain.pl possède une option <code>-f</code> qui permet de réaliser "l'entrainement sur épuisement". Si
+    vous choisissez de l'utiliser, soyez conscient des effets secondaires possibles.</p>
 
     <hr>
 
@@ -808,7 +806,7 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
     messages. La définition des quatre options est la suivante:</p>
 
     <dl>
-      <dt>-s</dt>
+      <dt>-s</dt><dd>indique l'enregistrement du message comme spam.
        C'est-à-dire incrémenter le nombre de spam pour ce token.
        </dd><dt>-n</dt><dd>indique l'enregistrement du message comme ham. C'est à
        dire incrémenter le nombre de ham pour ce token.
@@ -816,7 +814,7 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
        à dire décrémenter le nombre de spam pour ce token.
        </dd><dt>-N</dt><dd>indique le désenregistrement du messages des hams. C'est
        à dire décrémenter le nombre de ham pour cd token.
-       </dd></dl>
+       </dd>
     </dl>
 
     <p>Avant la version 0.11, l'option '-S' était utilisée pour
