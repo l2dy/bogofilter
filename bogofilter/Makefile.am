@@ -23,7 +23,7 @@ bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 
 lexertest_SOURCES = lexertest.c lexer.l lexer.h
 
-debugtest_SOURCES = debug.c debug.h
+debugtest_SOURCES = debug.c debug.h debug.main.c
 
 bogoutil_SOURCES = bogoutil.c \
 		   datastore.h datastore_db.h datastore_db.c wordlists.h wordlists.c \
@@ -40,9 +40,6 @@ EXTRA_DIST = $(man1_MANS) \
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
 version.h:	version.sh $(VERSION_FROM)
 	./version.sh $(VERSION_FROM) >$@
-#
-debugtest: debug.c
-	$(CC) -DMAIN $(CFLAGS) -o debugtest debug.c
 #
 .xml.pdf:
 	xmlto pdf --extensions $<
