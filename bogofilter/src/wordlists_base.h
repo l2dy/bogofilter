@@ -20,15 +20,13 @@ struct wordlist_s
     u_int32_t	msgcount[IX_SIZE];	/* count of messages in wordlist. */
     bool	bad[IX_SIZE];
     int		override;
-    bool	ignore;
 };
 
 /*@null@*/ 
 extern wordlist_t *word_list;
 
 int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* path,
-		  bool sbad, bool gbad, 
-		  int override, bool ignore);
+		  bool sbad, bool gbad, int override);
 
 void free_wordlists(void);
 int  setup_wordlists(const char* dir, priority_t precedence);

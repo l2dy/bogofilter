@@ -17,8 +17,7 @@ wordlist_t *word_list;
 
 /* returns -1 for error, 0 for success */
 int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* path,
-			 bool sbad, bool gbad, 
-			 int override, bool ignore)
+			 bool sbad, bool gbad, int override)
 {
     wordlist_t *n = (wordlist_t *)xcalloc(1, sizeof(*n));
     wordlist_t *list_ptr;
@@ -33,7 +32,6 @@ int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* pat
     n->override=override;
     n->bad[IX_SPAM]=sbad;
     n->bad[IX_GOOD]=gbad;
-    n->ignore=ignore;
 
     if (word_lists == NULL) {
 	word_lists=n;
@@ -110,7 +108,7 @@ int setup_wordlists(const char* d, priority_t precedence)
 	rc = -1;
     }
 
-    if (init_wordlist(&word_list, "word", dir, true, false, 0, false) != 0)
+    if (init_wordlist(&word_list, "word", dir, true, false, 0) != 0)
 	rc = -1;
 
     set_bogohome(dir);
