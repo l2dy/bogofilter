@@ -64,7 +64,6 @@ static rstats_t *current = NULL;
 
 void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count);
 void rstats_print_rtable(rstats_t **rstats_array, size_t count);
-void rstats_print_rtable_summary(void);
 
 /* Function Definitions */
 
@@ -83,8 +82,10 @@ void rstats_cleanup(void)
     for (p = current; p != NULL; p = q)
     {
       q = p->next;
-      xfree (p);
+      xfree(p);
     }
+    current = NULL;
+    header.list = NULL;
 }
 
 void rstats_add(const word_t *token, wordprop_t *props)
