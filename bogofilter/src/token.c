@@ -394,8 +394,6 @@ void token_init(void)
 void clr_tag(void)
 {
     token_prefix = NULL;
-    if (DEBUG_LEXER(2))
-	fprintf(dbgout,"--- clr_tag()\n");
 }
 
 void set_tag(const char *text)
