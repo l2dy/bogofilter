@@ -110,7 +110,7 @@ done
 %{_mandir}/man1/bogoupgrade.1*
 
 %doc AUTHORS CHANGES-* COPYING INSTALL METHODS NEWS
-%doc README README.cvs RELEASE.NOTES-* TODO UPGRADE
+%doc README README.* RELEASE.NOTES-* TODO UPGRADE
 %doc doc/bogofilter-tuning.HOWTO
 %doc doc/integrating-with-postfix
 %doc doc/integrating-with-qmail

@@ -1,12 +1,13 @@
 # $Id$
 
 ========================================================================
-========================================================================
 
 NOTE: If you are about to build from code checked out via CVS, then
 please read the README.cvs file first before you proceed with this file!
 
-========================================================================
+NOTE: If you are building this on a Non-Linux system, look into the
+README.nonlinux file, it may have special build instructions!
+
 ========================================================================
 
 

@@ -1,3 +1,7 @@
+NOTE: Please also see the CHANGES-0.13 document for a detailed summary.
+
+NOTE: Read README.nonlinux if "make check" fails for you.
+
 With release 0.13, bogofilter's parsing has changed.  As background,
 Paul Graham has done work to improve the results of his bayesian
 filter and has published them in "Better Bayesian Filtering" at
@@ -53,4 +57,4 @@ Similarly, the use of header_line_markup will tokenize "Subject: great
 p0rn site" as "subj:great", "subj:p0rn", and "subj:site".  At first
 these tokens won't be recognized, so bogofilter won't use them to
 score the message.  After being trained, bogofilter will have these
-additional tokens to aid in the classification process. 
+additional tokens to aid in the classification process.
