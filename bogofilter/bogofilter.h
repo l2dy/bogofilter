@@ -19,7 +19,8 @@ typedef struct {
 
 extern int   verbose;
 
-extern void register_messages(int fd, run_t run_type);
 extern rc_t bogofilter(int fd, double *xss);
+extern void register_messages(int fd, run_t run_type);
+extern void print_bogostats(FILE *fp);
 
 #endif	/* HAVE_BOGOFILTER_H */

@@ -276,13 +276,12 @@ void populate_bogostats( bogostat_t *bogostats, char *text, double prob, int cou
     }
 }
 
-void print_bogostats( bogostat_t *bogostats )
+void print_bogostats( FILE *fp )
 {
-    size_t idx;
-    for (idx = 0; idx < SIZEOF(bogostats->extrema); idx++)
+    discrim_t *pp;
+    for (pp = bogostats.extrema; pp < bogostats.extrema+SIZEOF(bogostats.extrema); pp++)
     {
-	discrim_t *pp = &bogostats->extrema[idx];
-	fprintf(stderr, "#  %2ld  %f  %s\n", (long)idx, pp->prob, pp->key);
+	fprintf(fp, "#  %f  %s\n", pp->prob, pp->key);
     }
 }
 
