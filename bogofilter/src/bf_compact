@@ -15,9 +15,10 @@ if [ -z "$1" ] ; then
     exit 1
 fi
 
-ORIG="$1"
-if [ ! -d $ORIG ] ; then
-    echo "$ORIG" must be a directory, not a file
+BOGOHOME="$1"
+
+if [ ! -d $BOGOHOME ] ; then
+    echo "$BOGOHOME" must be a directory, not a file
     exit
 fi
 
@@ -37,11 +38,11 @@ else
     mkdir $TEMP
 fi
 
-if test -f "$ORIG"/DB_CONFIG ; then cp -p "$ORIG"/DB_CONFIG "$TEMP" ; fi
-bogoutil -d "$ORIG"/"$FILE" | bogoutil -l $TEMP/"$FILE"
+if test -f "$BOGOHOME"/DB_CONFIG ; then cp -p "$BOGOHOME"/DB_CONFIG "$TEMP" ; fi
+bogoutil -d "$BOGOHOME"/"$FILE" | bogoutil -l $TEMP/"$FILE"
 
 #checkpoint and remove unneeded log files
 bogoutil --db-prune=$TEMP
 
-mv "$ORIG" "$ORIG.old"
-mv  $TEMP  "$ORIG"
+mv "$BOGOHOME" "$BOGOHOME.old"
+mv  $TEMP      "$BOGOHOME"
