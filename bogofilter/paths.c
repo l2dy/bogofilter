@@ -48,7 +48,7 @@ char *create_path_from_env(const char *var,
     size_t path_size, env_size;
 
     env = getenv(var);
-    if (env == NULL) return NULL;
+    if (env == NULL || strlen(env) == 0) return NULL;
 
     env_size = strlen(env);
     path_size = env_size + (subdir ? strlen(subdir) : 0) + 2;
