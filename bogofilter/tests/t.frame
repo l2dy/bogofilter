@@ -8,7 +8,7 @@ while : ; do
   sleep 1
 done
 
-trap "rm -rf ${TMPDIR}" 0
+trap "rm -r -f ${TMPDIR}" 0
 BOGOFILTER_DIR=$TMPDIR
 export BOGOFILTER_DIR
 ../bogofilter -n </dev/null
