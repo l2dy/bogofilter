@@ -49,7 +49,7 @@ map_rc()
 #	3 r vvv		X-Bogosity: Yes, spamicity=0.540316
 
 for alg in r g ; do
-    BOGOFILTER_DIR="${TMPDIR}/tests.$alg"
+    BOGOFILTER_DIR="${TMPDIR}/words.$alg"
     rm -rf $BOGOFILTER_DIR
     mkdir $BOGOFILTER_DIR
     $BOGOFILTER -$alg -s < ${SYSTEST}/inputs/spam.mbx
