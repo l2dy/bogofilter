@@ -211,7 +211,7 @@ static inline void db_optimize(VILLA *dbp, char *name)
 }
 
 
-int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
+int db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *val)
 {
     int ret;
     dbh_t *handle = vhandle;

@@ -52,16 +52,16 @@ void *dbe_init(const char *directory);
 /** Cleanup storage allocation */
 void dbe_cleanup(void *);
 
-/** Retrieve the value associated with a given word in a list. 
- * \return zero if the word does not exist in the database. Implementation
+/** Retrieve the value associated with a given word in a list.
+ * \return zero if the word does not exist in the database.
  */
 int db_get_dbvalue(void *handle, const dbv_t *token, /*@out@*/ dbv_t *val);
 
 /** Delete the key */
 int db_delete(void *handle, const dbv_t *data);
 
-/** Set the value associated with a given word in a list. Implementation */
-int db_set_dbvalue(void *handle, const dbv_t *token, dbv_t *val);
+/** Set the value associated with a given word in a list. */
+int db_set_dbvalue(void *handle, const dbv_t *token, const dbv_t *val);
 
 /** Iterate over all elements in data base and call \p hook for each item.
  * \p userdata is passed through to the hook function unaltered.
