@@ -231,7 +231,7 @@ static bool open_mailstore(const char *name)
 static void check_brmail(FILE *fp) {
     int c;
 
-    if (reader_getline == mailbox_getline) {
+    if (reader_getline == mailbox_getline && !feof(fp)) {
 	/* peek at the first character -- cannot unget more than one char */
 	c = fgetc(fp);
 	ungetc(c, fp);
@@ -246,7 +246,7 @@ static bool stdin_next_mailstore(void)
     bool val = mailstore_first;
 
     reader_getline = mbox_mode ? mailbox_getline : simple_getline;
-    check_brmail(stdin);
+    check_brmail(fpin);
     mailstore_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
     mailstore_first = false;
     return val;
