@@ -1,12 +1,16 @@
 /* $Id$ */
-/* $Log$
+/*
+ * $Log$
+ * Revision 1.3  2002/09/23 11:31:53  m-a
+ * Unnest comments, and move $ line down by one to prevent CVS from adding nested comments again.
+ *
  * Revision 1.2  2002/09/17 06:23:46  adrian_otto
  * Changed HAVE_FCNTL_H to HAVE_FCNTL and added safeguard chacks to make sure
  * the lock contants LOCK_EX and LOCK_SH get defined.
  *
-/* Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
-/* 0.7.3 Base Source
-/* */
+ * Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
+ * 0.7.3 Base Source
+ * */
 /*****************************************************************************
 
 NAME:

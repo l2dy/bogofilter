@@ -1,34 +1,38 @@
 /* $Id$ */
-/* $Log$
+/*
+ * $Log$
+ * Revision 1.7  2002/09/23 11:31:53  m-a
+ * Unnest comments, and move $ line down by one to prevent CVS from adding nested comments again.
+ *
  * Revision 1.6  2002/09/22 21:24:36  relson
  * Modify the lexer to allow the full range of alphabetic characters.
  * Thanks to Clint Adams for the new token matching expression.
  *
-/* Revision 1.5  2002/09/18 22:30:22  relson
-/* Created lexer.h with the definitions needed by lexer_l.l from bogofilter.h.
-/* This removes the compile-time dependency between the two files.
-/*
-/* Revision 1.4  2002/09/18 20:56:43  m-a
-/* Let automake deal with the lexer.
-/*
-/* Revision 1.3  2002/09/16 18:58:14  m-a
-/* Fix 'last line occasionally emitted twice' bug, cleaning up our yyinput().
-/*
-/* Revision 1.2  2002/09/15 15:52:24  relson
-/*
-/*
-/* Makefile.in:
-/* 	- fix .l.c rule so that lexer_l.c is correctly generated from lexer_l.l
-/* 	- added lexer_l.c to target mostlyclean-compile
-/* 	- removed lexer_l.c from  DIST_COMMON.  As it can can be generated, it no longer needs to be distributed.
-/* 	- added target lexertest (from original bogofilter release)
-/*
-/* lexer_l.l:
-/* 	- defined global variable passthrough so that linking lexertest succeeds.
-/*
-/* Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
-/* 0.7.3 Base Source
-/* */
+ * Revision 1.5  2002/09/18 22:30:22  relson
+ * Created lexer.h with the definitions needed by lexer_l.l from bogofilter.h.
+ * This removes the compile-time dependency between the two files.
+ *
+ * Revision 1.4  2002/09/18 20:56:43  m-a
+ * Let automake deal with the lexer.
+ *
+ * Revision 1.3  2002/09/16 18:58:14  m-a
+ * Fix 'last line occasionally emitted twice' bug, cleaning up our yyinput().
+ *
+ * Revision 1.2  2002/09/15 15:52:24  relson
+ *
+ *
+ * Makefile.in:
+ * 	- fix .l.c rule so that lexer_l.c is correctly generated from lexer_l.l
+ * 	- added lexer_l.c to target mostlyclean-compile
+ * 	- removed lexer_l.c from  DIST_COMMON.  As it can can be generated, it no longer needs to be distributed.
+ * 	- added target lexertest (from original bogofilter release)
+ *
+ * lexer_l.l:
+ * 	- defined global variable passthrough so that linking lexertest succeeds.
+ *
+ * Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
+ * 0.7.3 Base Source
+ * */
 %{
 /*
  * NAME

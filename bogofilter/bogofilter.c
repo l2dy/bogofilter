@@ -1,62 +1,66 @@
 /* $Id$ */
-/* $Log$
+/*
+ * $Log$
+ * Revision 1.14  2002/09/23 11:31:53  m-a
+ * Unnest comments, and move $ line down by one to prevent CVS from adding nested comments again.
+ *
  * Revision 1.13  2002/09/23 10:08:49  m-a
  * Integrate patch by Zeph Hull and Clint Adams to present spamicity in
  * X-Spam-Status header in bogofilter -p mode.
  *
-/* Revision 1.12  2002/09/22 21:26:28  relson
-/* Remove the definition and use of strlwr() since get_token() in lexer_l.l already converts the token to lower case.
-/*
-/* Revision 1.11  2002/09/19 03:20:32  relson
-/* Move "msg_prob" assignment to proper function, i.e. from select_indicators() to compute_probability().
-/* Move some local variables from the beginning of the function to the innermost block where they're needed.
-/*
-/* Revision 1.10  2002/09/18 22:41:07  relson
-/* Separated probability calculation out of select_indicators() into new function compute_probability().
-/*
-/* Revision 1.7  2002/09/15 19:22:51  relson
-/* Refactor the main bogofilter() function into three smaller, more coherent pieces:
-/*
-/* void *collect_words(int fd)
-/* 	- returns a set of tokens in a Judy array
-/*
-/* bogostat_t *select_indicators(void  *PArray)
-/* 	- processes the set of words
-/* 	- returns an array of spamicity indicators (words & probabilities)
-/*
-/* double compute_spamicity(bogostat_t *stats)
-/*    	- processes the array of spamicity indicators
-/* 	- returns the spamicity
-/*
-/* rc_t bogofilter(int fd)
-/* 	- calls the 3 component functions
-/* 	- returns RC_SPAM or RC_NONSPAM
-/*
-/* Revision 1.6  2002/09/15 19:07:13  relson
-/* Add an enumerated type for return codes of RC_SPAM and RC_NONSPAM, which  values of 0 and 1 as called for by procmail.
-/* Use the new codes and type for bogofilter() and when generating the X-Spam-Status message.
-/*
-/* Revision 1.5  2002/09/15 18:29:04  relson
-/* bogofilter.c:
-/*
-/* Use a Judy array to provide a set of (unique) tokens to speed up the filling of the stat.extrema array.
-/*
-/* Revision 1.4  2002/09/15 17:41:20  relson
-/* The printing of tokens used for computing the spamicity has been changed.  They are now printed in increasing order (by probability and alphabet).  The cumulative spamicity is also printed.
-/*
-/* The spamicity element of the bogostat_t struct has become a local variable in bogofilter() as it didn't need to be in the struct.
-/*
-/* Revision 1.3  2002/09/15 16:37:27  relson
-/* Implement Eric Seppanen's fix so that bogofilter() properly populates the stats.extrema array.
-/* A new word goes into the first empty slot of the array.  If there are no empty slots, it replaces
-/* the word with the spamicity index closest to 0.5.
-/*
-/* Revision 1.2  2002/09/15 16:16:50  relson
-/* Clean up underflow checking for word counts by using max() instead of if...then...
-/*
-/* Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
-/* 0.7.3 Base Source
-/* */
+ * Revision 1.12  2002/09/22 21:26:28  relson
+ * Remove the definition and use of strlwr() since get_token() in lexer_l.l already converts the token to lower case.
+ *
+ * Revision 1.11  2002/09/19 03:20:32  relson
+ * Move "msg_prob" assignment to proper function, i.e. from select_indicators() to compute_probability().
+ * Move some local variables from the beginning of the function to the innermost block where they're needed.
+ *
+ * Revision 1.10  2002/09/18 22:41:07  relson
+ * Separated probability calculation out of select_indicators() into new function compute_probability().
+ *
+ * Revision 1.7  2002/09/15 19:22:51  relson
+ * Refactor the main bogofilter() function into three smaller, more coherent pieces:
+ *
+ * void *collect_words(int fd)
+ * 	- returns a set of tokens in a Judy array
+ *
+ * bogostat_t *select_indicators(void  *PArray)
+ * 	- processes the set of words
+ * 	- returns an array of spamicity indicators (words & probabilities)
+ *
+ * double compute_spamicity(bogostat_t *stats)
+ *    	- processes the array of spamicity indicators
+ * 	- returns the spamicity
+ *
+ * rc_t bogofilter(int fd)
+ * 	- calls the 3 component functions
+ * 	- returns RC_SPAM or RC_NONSPAM
+ *
+ * Revision 1.6  2002/09/15 19:07:13  relson
+ * Add an enumerated type for return codes of RC_SPAM and RC_NONSPAM, which  values of 0 and 1 as called for by procmail.
+ * Use the new codes and type for bogofilter() and when generating the X-Spam-Status message.
+ *
+ * Revision 1.5  2002/09/15 18:29:04  relson
+ * bogofilter.c:
+ *
+ * Use a Judy array to provide a set of (unique) tokens to speed up the filling of the stat.extrema array.
+ *
+ * Revision 1.4  2002/09/15 17:41:20  relson
+ * The printing of tokens used for computing the spamicity has been changed.  They are now printed in increasing order (by probability and alphabet).  The cumulative spamicity is also printed.
+ *
+ * The spamicity element of the bogostat_t struct has become a local variable in bogofilter() as it didn't need to be in the struct.
+ *
+ * Revision 1.3  2002/09/15 16:37:27  relson
+ * Implement Eric Seppanen's fix so that bogofilter() properly populates the stats.extrema array.
+ * A new word goes into the first empty slot of the array.  If there are no empty slots, it replaces
+ * the word with the spamicity index closest to 0.5.
+ *
+ * Revision 1.2  2002/09/15 16:16:50  relson
+ * Clean up underflow checking for word counts by using max() instead of if...then...
+ *
+ * Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
+ * 0.7.3 Base Source
+ * */
 /*****************************************************************************
 
 NAME:

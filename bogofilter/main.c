@@ -1,5 +1,9 @@
 /* $Id$ */
-/* $Log$
+/*
+ * $Log$
+ * Revision 1.9  2002/09/23 11:31:53  m-a
+ * Unnest comments, and move $ line down by one to prevent CVS from adding nested comments again.
+ *
  * Revision 1.8  2002/09/23 11:27:25  m-a
  * Drop unused `inheaders' variable, unnest comments.
  *
