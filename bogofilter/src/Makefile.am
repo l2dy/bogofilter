@@ -206,6 +206,7 @@ version.c: version.sh ../configure.ac Makefile.am	\
 	    || { rm -f "$@" ; false ; }
 #
 directories.c: ../config.status
+	rm -f $@
 	( echo "#include \"globals.h\"" && \
 	echo "const char *const system_config_file = \"$(SYSCONFDIR)/bogofilter.cf\";" ) >"$@" \
 	    || { rm -f "$@" ; false ; }
