@@ -1,3 +1,5 @@
+/* $Id$ */
+
 /* find_home.h -- library function to figure out the home dir of current user */
 
 #ifndef FIND_HOME_H
@@ -15,8 +17,6 @@
  * General Public License for more details, it is in the file named
  * COPYING.
  */
-
-/* $Id$ */
 
 /*@null@*/ /*@observer@*/
 const char *

@@ -1,3 +1,5 @@
+/* $Id$ */
+
 #ifndef BOGOCONFIG_H
 #define BOGOCONFIG_H
 
