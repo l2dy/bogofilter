@@ -51,6 +51,25 @@ struct textblock textblocks, *textend = &textblocks;
 char *yylval;
 static char alt_text[MAXTOKENLEN];
 
+char *fgetsnonull(char *buf, int max_size, FILE *s)
+{
+	int c;
+	char *cp = buf;
+
+	if ((max_size <= 0) || feof(s)) return(NULL);
+
+	while ((--max_size > 0) && ((c = getc(s)) != EOF)) {
+		if (c == '\0')
+			c = ' ';	/* NULL becomes space */
+		*cp++ = c;
+		if (c == '\n')
+			break;
+	}
+	*cp++ = '\0';
+	return(buf);
+}
+
+
 int yyinput(char *buf, int max_size)
 // input getter for the scanner
 {
@@ -60,12 +79,12 @@ int yyinput(char *buf, int max_size)
     if (hdrlen==0)
 	hdrlen=strlen(SPAM_HEADER_NAME);
 
-    returned = fgets(buf, max_size, yyin);
+    returned = fgetsnonull(buf, max_size, yyin);
 
     while (returned != NULL && memcmp(buf,SPAM_HEADER_NAME,hdrlen) == 0)
     {
 	do {
-	    returned = fgets(buf, max_size, yyin);
+	    returned = fgetsnonull(buf, max_size, yyin);
 	    if (returned != NULL && *buf == '\n')
 		break;
 	} while (returned != NULL && isspace(*buf));
