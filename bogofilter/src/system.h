@@ -216,4 +216,9 @@ extern bool bf_abspath(const char *path);
 extern int  bf_mkdir(const char *path, mode_t mode);
 extern void bf_sleep(long delay);
 
+/* For gcc 2.7.2.1 compatibility */
+#ifndef	__attribute__
+#define	__attribute__(x)
+#endif
+
 #endif /* SYSTEM_H */
