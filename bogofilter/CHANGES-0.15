@@ -8,7 +8,7 @@ $Id$
 
 	* Print "X-Bogosity" line when "-t" is used alone.
 	* Modified handling of mime attachments to decode rfc822 and
-	  to discard applications and images.
+	  to ignore applications and images.
 
 	2003-10-27
 
@@ -50,7 +50,7 @@ $Id$
           one msg-count file.
 	* Initialize wordhash storage.
 
-0.15.7	2003-10-13
+0.15.7	2003-10-13 - Stable Release
 
 	* Include all tokens in bogoutil dump output (unless in
 	  maintenance mode).
@@ -153,7 +153,7 @@ $Id$
 
 	2003-09-16
 
-	* No longer discarding message separators.
+	* No longer ignoring message separators.
 
 	2003-09-15
 
@@ -185,7 +185,7 @@ $Id$
 
 	2003-09-08
 
-	* Revised parsing to discard additional headers, i.e.
+	* Revised parsing to ignore additional headers, i.e.
           Resent-Message-ID, In-Reply-To, and References.
 
 	2003-09-07

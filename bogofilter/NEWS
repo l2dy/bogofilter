@@ -18,7 +18,7 @@ idea to retrain or else use the '-H' (header tag degeneration) option.
 
 	* Print "X-Bogosity" line when "-t" is used alone.
 	* Modified handling of mime attachments to decode rfc822 and
-	  to discard applications and images.
+	  to ignore applications and images.
 
 	2003-10-27
 
@@ -165,7 +165,7 @@ idea to retrain or else use the '-H' (header tag degeneration) option.
 
 	2003-09-16
 
-	* No longer discarding message separators.
+	* No longer ignoring message separators.
 
 	2003-09-15
 
@@ -197,7 +197,7 @@ idea to retrain or else use the '-H' (header tag degeneration) option.
 
 	2003-09-08
 
-	* Revised parsing to discard additional headers, i.e.
+	* Revised parsing to ignore additional headers, i.e.
           Resent-Message-ID, In-Reply-To, and References.
 
 	2003-09-07
@@ -529,7 +529,7 @@ idea to retrain or else use the '-H' (header tag degeneration) option.
 
 	* Don't allow square brackets in tokens.  Do allow dollar
 	  signs in tokens in msg-count files.
-	* Bogolexer now discards first 'From' token to match scoring
+	* Bogolexer now ignores first 'From' token to match scoring
 	  behavior of bogofilter.
 
 0.13.6.1 2003-06-05
@@ -797,7 +797,7 @@ idea to retrain or else use the '-H' (header tag degeneration) option.
 
 0.11.1 2003-03-04
 
-	 * Using standard html comment delimiters when discarding comments.
+	 * Using standard html comment delimiters when ignoring comments.
 	 * Fixed charset initialization flaw.
 
 0.11.0	 2003-03-03
@@ -854,7 +854,7 @@ idea to retrain or else use the '-H' (header tag degeneration) option.
 	* Added mime processing capability, with decoding of base64,
 	  quoted-printable and uuencoded sections.  Ignores attachments when
 	  computing spamicity.
-	* Added wordlist maintenance capability to bogoutil.  Can discard
+	* Added wordlist maintenance capability to bogoutil.  Can ignore
 	  tokens based on count, age, or length.  Can replace non-ASCII chars
 	  with question marks.
 	* Added dates to wordlist tokens.  Option "datestamp_tokens=true|false"
