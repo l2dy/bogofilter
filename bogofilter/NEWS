@@ -4,6 +4,8 @@
 
 $Id$
 
+0.11.1.7
+
 	2003-04-07
 
 	* Change bogoutil's '-p' option to require a database.
@@ -14,10 +16,6 @@ $Id$
 	* Improve bogoutil's reporting of a bad directory or filename.
 	* Simplify configure check for BerkeleyDB.
 	* Extend configure's compiler checks for AIX.
-
-	2003-04-03
-
-	* Added AIX info to bogofilter-FAQ and new file doc/programmer/README.aix.
 
 0.11.1.6
 
