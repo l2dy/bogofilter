@@ -115,7 +115,7 @@ static bool process_config_parameter(const ArgDefinition * arg, const char *val)
     {
 	case CP_BOOLEAN:
 	    {
-		char ch=tolower(*val);
+		char ch=toupper(*val);
 		switch (ch)
 		{
 		case 'Y':		// Yes
@@ -269,6 +269,10 @@ void read_config_file(const char *filename, bool home_dir)
     (void)fclose(fp); /* we're just reading, so fclose should succeed */
     xfree(tmp);
 
+    stats_prefix= stats_in_header ? "\t" : "#    ";
+    if (DEBUG_CONFIG(0))
+	fprintf( stderr, "stats_prefix: '%s'\n", stats_prefix );
+
     if (error)
 	exit(2);
 }
@@ -407,8 +411,6 @@ int process_args(int argc, char **argv)
     }
 
     exitcode = validate_args(argc, argv);
-
-    stats_prefix= stats_in_header ? "\t" : "#    ";
 
     return exitcode;
 }
