@@ -21,7 +21,6 @@ AUTHOR:
 #include "method.h"
 #include "wordlists.h"
 #include "xmalloc.h"
-#include "xstrdup.h"
 
 #include "bogoconfig.h"
 

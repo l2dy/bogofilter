@@ -22,7 +22,6 @@ AUTHOR:
 #include "robinson.h"
 #include "rstats.h"
 #include "xmalloc.h"
-#include "xstrdup.h"
 
 extern int Rtable;
 extern double min_dev;

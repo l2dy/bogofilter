@@ -37,7 +37,6 @@ AUTHOR:
 #include "xatox.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
-#include "xstrlcpy.h"
 
 #ifndef	DEBUG_CONFIG
 #define DEBUG_CONFIG(level)	(verbose > level)

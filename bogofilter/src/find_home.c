@@ -25,7 +25,6 @@
 
 #include "find_home.h"
 #include "xmalloc.h"
-#include "xstrdup.h"
 
 /* This function will try to figure out the home directory of the user.
  * 
