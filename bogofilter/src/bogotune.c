@@ -583,10 +583,11 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 	collect_words(whc);
 
 	if (ds_path != NULL && (int)(msgs_good + msgs_bad) == 0) {
-	    wordprop_t *msg_count = wordhash_insert(whc, w_msg_count, sizeof(wordprop_t), NULL);
+	    wordprop_t *msg_count;
+	    msg_count = wordhash_insert(whc, w_msg_count, sizeof(wordprop_t), NULL);
 	    if (msg_count->cnts.good == 0 || msg_count->cnts.bad == 0)
 		load_wordlist(load_hook, train);
-	    if (msg_count->cnts.good == 0 && msg_count->cnts.bad == 0) {
+	    if (msgs_good == 0 && msgs_bad == 0) {
 		fprintf(stderr, "Can't find '.MSG_COUNT'.\n");
 		exit(EX_ERROR);
 	    }
@@ -932,9 +933,7 @@ static void load_wordlist(ds_foreach_t *hook, void *userdata)
 	fflush(stdout);
     }
 
-    ds_init();
     ds_oper(ds_path, DB_READ, hook, userdata);
-    ds_cleanup();
 
     return;
 }

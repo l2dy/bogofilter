@@ -249,7 +249,7 @@ static bool open_mailstore(const char *name)
     switch (isdir(filename)) {
     case IS_FILE:
 	if (DEBUG_READER(0))
-	    fprintf(dbgout, "%s:%d - assuming %s is a %s\n", __FILE__, __LINE__, filename, mbox_mode ? "mbox" : "mail");
+	    fprintf(dbgout, "%s:%d - assuming %s is a %s\n", __FILE__, __LINE__, filename, mbox_mode ? "mbox" : "message");
 	fpin = fopen( filename, "r" );
 	if (fpin == NULL) {
 	    fprintf(stderr, "Can't open file '%s': %s\n", filename,

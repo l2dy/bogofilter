@@ -82,8 +82,11 @@ static int dump_file(char *ds_file)
     set_bogohome(ds_file);
     rc = ds_oper(ds_file, DB_READ, ds_dump_hook, NULL);
 
-    if (verbose)
-	fprintf(dbgout, "%d tokens dumped\n", token_count);
+    if (rc)
+	fprintf(stderr, "error dumping tokens!\n");
+    else
+	if (verbose)
+	    fprintf(dbgout, "%d tokens dumped\n", token_count);
 
     return rc;
 }
@@ -120,6 +123,8 @@ static int load_file(const char *ds_file)
 	return EX_ERROR;
 
     memset(buf, '\0', BUFSIZE);
+
+    ds_txn_begin(dsh);
 
     for (;;) {
 	dsv_t data;
@@ -189,6 +194,15 @@ static int load_file(const char *ds_file)
 	    ds_write(dsh, token, &data);
 	}
 	word_free(token);
+    }
+
+    switch (ds_txn_commit(dsh)) {
+	case DST_FAILURE:
+	case DST_TEMPFAIL:
+	    fprintf(stderr, "commit failed\n");
+	    exit(EXIT_FAILURE);
+	case DST_OK:
+	    break;
     }
 
     ds_close(dsh, false);
@@ -282,6 +296,11 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     }
 
     printf(head_format, "", "spam", "good", "  Fisher");
+    if (DST_OK != ds_txn_begin(dsh)) {
+	ds_close(dsh, false);
+	fprintf(stderr, "Cannot begin transaction.\n");
+	return EX_ERROR;
+    }
 
     while (argc >= 0)
     {
@@ -320,6 +339,11 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	    word_free(token);
     }
 
+    if (DST_OK != ds_txn_commit(dsh)) {
+	ds_close(dsh, false);
+	fprintf(stderr, "Cannot commit transaction.\n");
+	return EX_ERROR;
+    }
     ds_close(dsh, false);
     ds_cleanup();
 
@@ -331,6 +355,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 static int get_robx(char *path)
 {
     double rx;
+    int ret = 0;
 
     rx = compute_robinson_x(path);
 
@@ -353,16 +378,20 @@ static int get_robx(char *path)
 	if (dsh == NULL)
 	    return EX_ERROR;
 
-	val.goodcount = 0;
-	val.spamcount = (uint32_t) (rx * 1000000);
-	ds_write(dsh, word_robx, &val);
+	if (DST_OK == ds_txn_begin(dsh)) {
+	    val.goodcount = 0;
+	    val.spamcount = (uint32_t) (rx * 1000000);
+	    ret = ds_write(dsh, word_robx, &val);
+	    if (DST_OK != ds_txn_commit(dsh))
+		ret = 1;
+	}
 	ds_close(dsh, false);
 	ds_cleanup();
 
 	word_free(word_robx);
     }
 
-    return EX_OK;
+    return ret ? EX_ERROR : EX_OK;
 }
 
 static void print_version(void)

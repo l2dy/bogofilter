@@ -57,7 +57,7 @@ double	robs = 0.0;
 
 /* other */
 FILE	*fpo;
-uint	db_cachesize = 0;		/* in MB */
+uint	db_cachesize = DB_CACHESIZE;	/* in MB */
 enum	passmode passmode;		/* internal */
 bool	msg_count_file = false;
 const char *progtype = NULL;

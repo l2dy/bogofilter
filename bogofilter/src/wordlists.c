@@ -36,8 +36,6 @@ void open_wordlists(dbmode_t mode)
 
 	retry = 0;
 	for (list = word_lists; list != NULL; list = list->next) {
-	    if (db_cachesize < 4)
-		db_cachesize = 4;
 	    list->dsh = ds_open(list->filepath, WORDLIST, mode);
 	    if (list->dsh == NULL) {
 		int err = errno;
@@ -73,9 +71,11 @@ void open_wordlists(dbmode_t mode)
 		} /* switch */
 	    } else { /* ds_open */
 		dsv_t val;
+		ds_txn_begin(list->dsh);
 		ds_get_msgcounts(list->dsh, &val);
 		list->msgcount[IX_GOOD] = val.goodcount;
 		list->msgcount[IX_SPAM] = val.spamcount;
+		ds_txn_commit(list->dsh);
 	    } /* ds_open */
 	} /* for */
     } while(retry);

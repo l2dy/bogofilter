@@ -29,7 +29,7 @@ min_dev=0.1
 ham_cutoff=0.1
 terse_format = %1.1c %d
 spamicity_tags = S,h,u
-spamicity_formats = %6.2e %6.2e %0.6f
+spamicity_formats = %0.6f %0.6f %0.6f
 EOF
 
 V="v"	# verbosity level

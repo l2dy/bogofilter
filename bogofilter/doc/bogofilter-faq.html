@@ -13,7 +13,7 @@
 	font-size: 110%;
       }
       p {
-	margin-top : 0.5em;
+	margin-top: 0.5em;
 	margin-bottom: 0.5em;
       }
       ul {
@@ -60,6 +60,7 @@
         <ul>
           <li><a href="#what-is-bogofilter">What is bogofilter?</a></li>
           <li><a href="#bogo-what">Bogo what?</a></li>
+          <li><a href="#bogo-how">How does bogofilter work?</a></li>
           <li><a href="#lists">Bogofilter Mailing Lists</a></li>
         </ul>
       </li>
@@ -108,7 +109,7 @@
         Portability Problems
 
         <ul>
-          <li><a href="#port-notes">How do I get Bogofilter working on Solaris, BSD, etc.?</a></li>
+          <li><a href="#port-notes">How do I get bogofilter working on Solaris, BSD, etc.?</a></li>
           <li><a href="#make-notes">Can I use the make command on my operating system?</a></li>
         </ul>
       </li>
@@ -120,25 +121,26 @@
 
     <p>Bogofilter is a fast Bayesian spam filter along the lines
     suggested by <a href="http://www.paulgraham.com/">Paul Graham</a>
-    in his article <a href="http://www.paulgraham.com/spam.html">A
-    Plan For Spam</a>.  Bogofilter uses
-    <a href="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">Gary
-    Robinson</a>'s geometric-mean algorithm with the
-    <a href="http://www.linuxjournal.com/article.php?sid=6467">Fisher's
-    method modification</a> to classify email as spam or non-spam.</p>
+    in his article
+    <a href="http://www.paulgraham.com/spam.html">A Plan For Spam</a>.
+    bogofilter uses
+    <a href="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">Gary Robinson</a>'s
+    geometric-mean algorithm with the
+    <a href="http://www.linuxjournal.com/article.php?sid=6467">Fisher's method modification</a>
+    to classify email as spam or non-spam.</p>
 
     <p>The bogofilter
     <a href="http://bogofilter.sourceforge.net">home page</a> at
     SourceForge is the central clearinghouse for bogofilter
     resources.</p>
 
-    <p>Bogofilter was started by <a href="http://catb.org/~esr/">Eric
-    S. Raymond</a> on August 19, 2002. It gained popularity in
-    September 2002, and a number of other authors have started to
-    contribute to the project.</p>
+    <p>Bogofilter was started by
+    <a href="http://catb.org/~esr/">Eric S. Raymond</a> on August 19,
+    2002. It gained popularity in September 2002, and a number of other
+    authors have started to contribute to the project.</p>
 
-    <p>The <a href="http://bogofilter.sourceforge.net/NEWS">NEWS
-    file</a> describes bogofilter's version history.</p>
+    <p>The <a href="http://bogofilter.sourceforge.net/NEWS">NEWS file</a>
+    describes bogofilter's version history.</p>
 
     <hr>
 
@@ -151,6 +153,61 @@
     <a href="http://www.catb.org/~esr/jargon/html/B/bogus.html">bogus</a>
     mail by measuring the
     <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">bogosity</a>.</p>
+
+    <hr>
+
+    <h2 id="bogo-how">How does bogofilter work?</h2>
+
+    <p>See the man page's
+    <a href="http://bogofilter.sourceforge.net/man_page.php#theory">THEORY OF OPERATION</a>
+    section for an introduction. The main source for understanding
+    this is Gary Robinson's Linux Journal article
+    <a href="http://www.linuxjournal.com/article.php?sid=6467">"A Statistical Approach to the Spam Problem"</a>.</p>
+
+    <p>After you read all this you might ask some questions. The first
+    could be "Is bogofilter really a Bayesian spam filter?"
+    Bogofilter is based on Bayes' theorem and uses it in the initial
+    calculations and other statistical methods later.  Without doubt it
+    is a statistical spam filter with a Bayesian flavor.</p>
+
+    <p>Other questions you might have might concern the basic
+    assumptions of Bayes' theory. Two short answers are: "No, they are
+    not satisfied" and "We don't care as long as it works". A longer
+    answer will mention that the basic assumption that "an e-mail is a
+    random collection of words, each independent of the others" is
+    violated.  There are several places where practice doesn't follow
+    theory.  Some are always present, and some which will depend on
+    the way you use bogofilter:</p>
+
+    <ul>
+    <li>Words in an e-mail are by no means independent.  In all languages,
+    the opposite is true.</li>
+    <li>The words used are not random, though some spammers include random
+    words.</li>
+    <li>Full training or using a random sample, follows Bayes'
+    principles. Choosing messages to use for training violates
+    the assumption that the training messages are a random sample of
+    the messages received.  This principle is also violated by
+    Bogofilter's auto-update function (with the thresh_update
+    parameter), <a href="#train-on-error">training on error</a>, or
+    anything similar to these approaches.</li>
+    <li>The same applies if you train with the same message more than once.</li>
+    <li>Other problems arise if you modify your database by removing tokens
+    (like using bogoutil with -a or -c).</li>
+    <li>Undoubtedly there are more.</li>
+    </ul>
+
+    <p>As the man page explains, bogofilter tries to understand how
+    badly the null hypothesis fails. Some people argue that "those
+    departures from reality usually work in our favor" (from Gary's
+    article). Some argue that, even then, we should not violate too
+    much. Nobody really <em>knows</em>. Just keep in mind that
+    problems might occur if you push too hard. The key to bogofilter's
+    approach is: What matters most is simply what works in the real
+    world.</p>
+
+    <p>Now that you have been warned, have fun and use bogofilter as
+    suits you best.</p>
 
     <hr>
 
@@ -212,38 +269,25 @@
     <p>This method can be enhanced by using a "security margin".  By
     increasing the spam cutoff value and decreasing the ham cutoff
     value, messages which are close to a cutoff will be used for
-    training.  Using security margins improves results when
-    training on error.  In general, greater margins help more (up to
-    some limit).  As a rule of thumb spam cutoff +/- 0.3 gives good
-    results; for tristate mode, you might try the middle of the unsure
+    training.  Using security margins improves results when training
+    on error.  In general, greater margins help more (although too
+    much also isn't optimal).  As a rule of thumb spam cutoff +/- 0.3 gives good
+    results.  For tristate mode, you might try the middle of the unsure
     interval +/- 0.3 for training.</p>
 
-    <p>Repeating training on error on the same message corpus
-    also improves accuracy.  The idea is that messages which were
-    rated correctly in the first place might after some more training
-    be rated wrongly which will then be corrected.</p>
+    <p>Repeating training on error on the same message corpus can
+    improve accuracy.  The idea is that messages which were rated
+    correctly in the first place might after some more training be
+    rated wrongly which will then be corrected.</p>
 
     <p>"Training to exhaustion" is repeating training on error, with
     the same message corpus, until no errors remain.  Also this method
-    can be improved with security margins.</p>
-
-    <p>A basic assumption of Bayes' theory is that the messages used
-    for training are a randomly chosen sample of the messages received.
-    This is violated when choosing messages by analyzing them first.
-    Though theoretically wrong, in practice "training on error" seems
-    to work.</p>
-
-    <p>Registering messages different numbers of times (as can happen
-    with repeated training) changes the distribution of token scores
-    in the training database so that it's different from the
-    distribution in the input messages.  This violates a basic
-    assumption of Bayesian classification, and may lead to
-    unpredictable results.  Though theoretically wrong, in practice
-    repeated training seems to work.</p>
+    can be improved with security margins. See
+    <a href="http://www.garyrobinson.net/2004/02/spam_filtering_.html">Gary Robinson's Rants</a>
+    on this topic for more details.</p>
 
     <p>Note: <code>bogominitrain.pl</code> has a <code>-f</code> option
-    to do "training to exhaustion".  If you choose to use it, you need
-    to be aware of its possible effects. Using <code>-fn</code> avoids
+    to do "training to exhaustion".  Using <code>-fn</code> avoids
     repeated training for each message.</p>
 
     <hr>
@@ -274,7 +318,7 @@
 	bogofilter -n &lt; ham.mbox</pre></li>
     </ul>
 
-    <p>Note: bogofilter's contrib directory includes two scripts that
+    <p>Note: Bogofilter's contrib directory includes two scripts that
     both use a train-on-error technique. This technique scores each
     message and adds to the database only those messages that were
     scored incorrectly (messages scored as uncertain, ham scored as
@@ -423,8 +467,7 @@
 
     <hr>
 
-    <h2 id="spamassassin">How can I use SpamAssassin to train
-    Bogofilter?</h2>
+    <h2 id="spamassassin">How can I use SpamAssassin to train Bogofilter?</h2>
 
     <p>If you have a working SpamAssassin installation (or care to
     create one), you can use its return codes to train bogofilter.
@@ -459,8 +502,7 @@
 
     <hr>
 
-    <h2 id="mboxformats">What mailbox (file) formats does bogofilter
-    understand?</h2>
+    <h2 id="mboxformats">What mailbox (file) formats does bogofilter understand?</h2>
 
     <p>Bogofilter understands the traditional Unix mbox format, the
     Maildir and MH formats. Note though that bogofilter does not support
@@ -593,8 +635,8 @@
 
         <p>The "-R" output is formatted for use with the R language
         for statistical computing. More information is available at
-        <a href="http://www.r-project.org/">The R Project for
-        Statistical Computing</a>.</p>
+        <a href="http://www.r-project.org/">The R Project for 
+	Statistical Computing</a>.</p>
       </li>
     </ul>
 
@@ -656,8 +698,7 @@
 
     <hr>
 
-    <h2 id="query-database">How do I manually query the
-    database</h2>
+    <h2 id="query-database">How do I manually query the database</h2>
 
     <p>To find the spam and ham counts for a token (word) use
     bogoutil's '-w' option. For example, "bogoutil -w
@@ -676,14 +717,11 @@
 
     <p>To tell how many tokens are in your wordlists pipe the output
     of bogoutil's dump command to command "wc", i.e. use "bogoutil -d
-    $BOGOFILTER_DIR/wordlist.db | wc -l " to display the count.  (If
-    you've got spamlist.db and goodlist.db, run the command for each
-    of them).</p>
+    $BOGOFILTER_DIR/wordlist.db | wc -l " to display the count.</p>
 
     <hr>
 
-    <h2 id="page-notfound">Why am I getting DB_PAGE_NOTFOUND 
-    messages?</h2>
+    <h2 id="page-notfound">Why am I getting DB_PAGE_NOTFOUND messages?</h2>
 
     <p>You have a problem with your BerkeleyDB database.  There are
     two likely causes: either you've hit a max size limit or the
@@ -702,34 +740,28 @@
     <p>To set the limit to 73MB (or whatever size is right for you):</p>
     <pre>	postconf -e mailbox_size_limit=73000000</pre>
 
-    <p>If you think your database may be corrupt, read <a
-    href="#rescue">How can I tell if my wordlists are corrupted?</a>
+    <p>If you think your database may be corrupt, read
+    <a href="#rescue">How can I tell if my wordlists are corrupted?</a>
     FAQ entry.</p>
 
     <hr>
 
-    <h2 id="rescue">How can I tell if my word lists are
-    corrupted?</h2>
+    <h2 id="rescue">How can I tell if my word lists are corrupted?</h2>
 
     <p>If you think your word lists are hosed, you can see what
     BerkeleyDB thinks by running:</p>
     <pre>	db_verify wordlist.db</pre>
 
-    <p>If there is a problem, you may be able to fix it with:</p>
-    <pre>	db_recover wordlist.db</pre>
-
-    <p>Alternatively may be able to recover some (or
+    <p>Alternatively you may be able to recover some (or
     all) of the tokens and their counts with the following
     commands:</p>
     <pre>	bogoutil -d wordlist.db | bogoutil -l wordlist.db.new</pre>
-    <p>or with</p>
+    <p>or - if there has been more damage to the token list - with</p>
     <pre>	db_dump -r wordlist.db | db_load wordlist.new</pre>
 
     <p>You can also use a text file instead of a pipe, as in:</p>
     <pre>	bogoutil -d wordlist.db &gt; wordlist.txt
 	bogoutil -l wordlist.db.new &lt; wordlist.txt</pre>
-
-    <p>If you've got two wordlists (spamlist.db and goodlist.db), run the above commands for each of them.</p>
 
     <hr>
 
@@ -823,12 +855,12 @@
 
     <hr>
 
-    <h2 id="port-notes">How do I get bogofilter working on Solaris,
-    BSD, etc?</h2>
+    <h2 id="port-notes">How do I get bogofilter working on Solaris, BSD, etc?</h2>
 
     <p>If you don't already have a v3.0+ version of
     <a href="http://www.sleepycat.com">BerkeleyDB</a>, then
-    <a href="http://www.sleepycat.com/download.html">download it</a>,
+    <a href="http://www.sleepycat.com/download/db/index.shtml">download it (take
+	one of the 4.2.X versions)</a>,
     unpack it, and do these commands in the db directory:</p>
     <pre>	$ cd build_unix
 	$ sh ../dist/configure
@@ -836,20 +868,20 @@
 	# make install</pre>
 
     <p>Next, download a
-    <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">portable
-    version</a> of bogofilter.</p>
+    <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">portable version</a>
+    of bogofilter.</p>
 
     <h3>On Solaris</h3>
 
     <p>Unpack it, and then do:</p>
-    <pre>	$ ./configure --with-db=/usr/local/BerkeleyDB.4.1
+    <pre>	$ ./configure --with-db=/usr/local/BerkeleyDB.4.2
 	$ make
 	# make install-strip</pre>
 
     <p>You will either want to put a symlink to libdb.so in
     /usr/lib, or use a modified LD_LIBRARY_PATH environment
     variable before you start bogofilter.</p>
-    <pre>	$ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1</pre>
+    <pre>	$ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.2</pre>
 
     <p>Note that some make versions shipped with Solaris break when
     you try to build bogofilter outside of its source directory.
@@ -865,8 +897,8 @@
     <pre>	# pkg_add -r portupgrade cvsup</pre>
 
     <p>To install or upgrade bogofilter, just
-    <a href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html">upgrade
-    your portstree using cvsup</a>, then type:</p>
+    <a href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html">upgrade your portstree using cvsup</a>,
+    then type:</p>
     <pre>	# portupgrade -N bogofilter</pre>
 
     <h3>On HP-UX</h3>
@@ -877,8 +909,7 @@
 
     <hr>
 
-    <h2 id="make-notes">Can I use the make command on my
-          operating system?</h2>
+    <h2 id="make-notes">Can I use the make command on my operating system?</h2>
 
     <p>Bogofilter has been successfully built on many operating
     systems using GNU make and the native make commands.  However,

@@ -206,9 +206,6 @@ void process_parameters(int argc, char **argv, bool warn_on_error)
 
     stats_prefix= stats_in_header ? "  " : "# ";
 
-    if (DEBUG_CONFIG(0))
-	fprintf(dbgout, "stats_prefix: '%s'\n", stats_prefix);
-
     return;
 }
 
@@ -470,8 +467,12 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'c':
-	if (pass == PASS_1_CLI)
-	    read_config_file(val, false, !quiet, PR_CFG_USER);
+	if (pass == PASS_1_CLI) {
+	    if (!read_config_file(val, false, !quiet, PR_CFG_USER)) {
+		fprintf(stderr, "Cannot open %s: %s\n", val, strerror(errno));
+		exit(EX_ERROR);
+	    }
+	}
 
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
@@ -713,6 +714,6 @@ static void display_tag_array(const char *label, FIELD *array)
 
     fprintf(stdout, "%s =", label);
     for (i = 0; i < count; i += 1)
-	fprintf(stdout, "%s ", array[i]);
+	fprintf(stdout, "%s %s", (i == 0) ? "" : ",", array[i]);
     fprintf(stdout, "\n");
 }
