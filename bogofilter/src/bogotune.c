@@ -1087,7 +1087,19 @@ static rc_t bogotune(void)
     }
 
     /*
-    ** 5.  Calculate fp target
+    ** 5.  Calculate x
+    ** Calculate x with bogoutil's -r option (a new addition).
+    ** Bound the calculated value within [0.4, 0.6] and set the range to be
+    ** investigated to [x-0.1, x+0.1].
+    */
+
+    if (user_robx > EPS)
+	robx = user_robx;
+    else if (ds_file != NULL)
+	robx = get_robx();
+
+    /*
+    ** 6.  Calculate fp target
     ** The fp target will be derived thus: score non-spams with s and md as
     ** shipped, and determine the count that will result from a spam cutoff
     ** of 0.95; if that is < 0.25%, try 0.9375 etc.
@@ -1098,18 +1110,6 @@ static rc_t bogotune(void)
     target = get_thresh(ns_cnt, ns_scores);
     spam_cutoff = ns_scores[target-1];
     printf("False-positive target is %d (cutoff %8.6f)\n", target, spam_cutoff);
-
-    /*
-    ** 6.  Calculate x
-    ** Calculate x with bogoutil's -r option (a new addition).
-    ** Bound the calculated value within [0.4, 0.6] and set the range to be
-    ** investigated to [x-0.1, x+0.1].
-    */
-
-    if (user_robx > EPS)
-	robx = user_robx;
-    else if (ds_file != NULL)
-	robx = get_robx();
 
     /* No longer needed */
     wordhash_free(ns_and_sp->train);
