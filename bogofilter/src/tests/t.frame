@@ -90,6 +90,10 @@ if [ "$1" = "-vv" ]; then
     verbose=2
 fi
 
+if test "x$BF_TEST_VERBOSE" != "x" ; then
+    verbose=$BF_TEST_VERBOSE
+fi
+
 if test "x$SUPPRESS_DELETE" = "x" ; then
     trap "$PRINTCORE ; rm -r -f core ${TMPDIR}" 0
 else
