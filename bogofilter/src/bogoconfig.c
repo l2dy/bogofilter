@@ -424,7 +424,7 @@ static void print_version(void)
 		  "\n"
 
 		  "    Database:"
-#ifdef	ENABLE_TDB
+#ifdef	ENABLE_TDB_DATASTORE
 		  " TrivialDB"
 #else
 		  " BerkeleyDB"
