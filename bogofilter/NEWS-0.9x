@@ -2,6 +2,13 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.91.0	2004-05-22
+
+* Add ignore list capability.
+* Revive and revise multiple wordlist code.
+* Increase width of 'count' column for -vvv output.
+* Cleanup variable names in database open() code.
+
 0.90.0	2004-05-09
 
 * Lower output precision for regression tests, by using %f

@@ -2,6 +2,17 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.91.0	2004-05-22
+
+	* Miscellaneous cleanups for multiple wordlist code.
+	* Cleanup variable names in database open() code.
+	* Increase width of 'count' column for -vvv output.
+
+	2004-05-17
+
+	* Add ignore list capability.
+	* Revive and revise multiple wordlist code.
+
 0.90.0	2004-05-09
 
 	* Revised bogotune's parameter ranges for coarse scan.
