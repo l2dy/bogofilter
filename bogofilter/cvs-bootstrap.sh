@@ -1,12 +1,15 @@
-#! /bin/bash
+#! /bin/sh
 
 ###############################################################################
 # cvs-bootstrap.sh -- rebuild auto* files after fresh CVS checkout
 # (C) 2002 by Matthias Andree
 #
-# this program tries to work around Red Hat braindeadness installing
-# "autoconf" as the old version and the newer version under
-# "autoconf-2.53"
+# This program tries to work around Red Hat braindeadness installing
+# the old autoconf version as "autoconf" and the newer version as
+# "autoconf-2.53".
+#
+# This program DOES NOT WORK with ash or zsh. Get a real shell. Most
+# /bin/sh are fine, bash, ksh, pdksh are also fine.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License as
@@ -23,24 +26,42 @@
 # USA
 ###############################################################################
 
+isinpath() {
+    (
+    IFS=:
+    for i in $PATH ; do
+	if [ -x $i/$1 ] ; then
+	    return 0;
+	fi
+    done
+    return 1
+    )
+}
+
 try() {
     opts=
-    prg=
+    prg=$1
+    shift
     while [ "$1" != "--" ] ; do
 	opts="$opts $1"
 	shift
     done
     shift
+    l=$prg
+    set -- $@
     while [ "$1" ] ; do
-	type -p $1 >/dev/null && { prg=$1 ; break ; }
-	l=$1
+	if isinpath "$prg-$1" ; then
+	    prg=$prg-$1
+	    break
+	fi
 	shift
     done
-    if test "$prg" = "" ; then
+    isinpath "$prg" || prg=
+    if [ "x$prg" = "x" ] ; then
 	echo "$l: not found" >&2
 	exit 1
     fi
-    ( 
+    (
 	set -x
 	$prg $opts
     )
@@ -49,11 +70,13 @@ try() {
 # -------------------------
 
 set -e
+unset IFS
 
-am='{-1.6.3,-1.6,-1.5,}'
-ac='{-2.54,-2.53,-2.52,}'
-eval try    -- aclocal$am
-eval try    -- autoheader$ac
-eval try -af -- automake$am
-eval try    -- autoconf$ac
+amlist='1.7 1.6.3 1.6 1.5'
+aclist='2.54 2.53 2.52'
+
+try aclocal -- $amlist
+try autoheader -- $aclist
+try automake -a -f -- $amlist
+try autoconf -- $aclist
 ./configure "$@"
