@@ -6,7 +6,7 @@
 
 #include <wordlists.h>
 
-enum algorithm { AL_GRAHAM, AL_ROBINSON } algorithm;
+enum algorithm { AL_GRAHAM = 1, AL_ROBINSON };
 
 extern enum algorithm algorithm;
 
@@ -16,8 +16,8 @@ extern enum algorithm algorithm;
 #define ROBS			0.001f	// Robinson's s
 #define ROBX			0.200f	// Robinson's x
 
-#define GRAHAM_GOOD_BIAS	2	// don't give good words more weight
-#define ROBINSON_GOOD_BIAS	1	// don't give good words more weight
+#define GRAHAM_GOOD_BIAS	2.0	// don't give good words more weight
+#define ROBINSON_GOOD_BIAS	1.0	// don't give good words more weight
 #define GOOD_BIAS (algorithm == AL_GRAHAM ? GRAHAM_GOOD_BIAS : ROBINSON_GOOD_BIAS)
 
 typedef enum rc_e {RC_SPAM=0, RC_NONSPAM=1}  rc_t;
@@ -30,7 +30,7 @@ typedef struct {
 
 extern int   verbose;
 
-extern rc_t bogofilter(int fd, double *xss);
+extern rc_t bogofilter(int fd, /*@out@*/ double *xss);
 extern void register_messages(int fd, run_t run_type);
 extern void print_bogostats(FILE *fp, double spamicity);
 

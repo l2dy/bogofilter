@@ -9,13 +9,18 @@ AUTHOR:
 
 THEORY:
   See 'Programming Pearls' by Jon Bentley for a good treatment of word hashing.
-  The algorithm, magic number selections, and hash function are based on his implementation.
+  The algorithm, magic number selections, and hash function are based on
+  his implementation.
 
-  This module has been tuned to perform fast inserts and searches, using the following techniques:
+  This module has been tuned to perform fast inserts and searches, using
+  the following techniques:
 
-  1. Insert operation allocates and returns a pointer to a memory buffer, in which the
-     caller can store associated data, eliminating the need for further  retrieval or storage operations.
-  2. Maintains a linked list of hash nodes in insert order for fast traversal of hash table.
+  1. Insert operation allocates and returns a pointer to a memory
+  buffer, in which the caller can store associated data, eliminating the
+  need for further  retrieval or storage operations.
+
+  2. Maintains a linked list of hash nodes in insert order for fast
+  traversal of hash table.
 */
 
 #ifdef MAIN
@@ -45,7 +50,7 @@ wordhash_t *
 wordhash_init (void)
 {
   int i;
-  
+
   wordhash_t *h = xmalloc (sizeof (wordhash_t));
 
   h->bin = xmalloc (NHASH * sizeof (hashnode_t **));
@@ -91,9 +96,10 @@ wordhash_free (wordhash_t * h)
 }
 
 static hashnode_t *
-nmalloc (wordhash_t * h)
+nmalloc (wordhash_t * h) /*@modifies h->nodes@*/
 {
-  wh_alloc_node *x = h->nodes;
+  /*@dependent@*/ wh_alloc_node *x = h->nodes;
+  hashnode_t *t;
 
   if (x == NULL || x->avail == 0)
     {
@@ -107,7 +113,9 @@ nmalloc (wordhash_t * h)
       x->used = 0;
     }
   x->avail--;
-  return (x->buf + x->used++);
+  t = (x->buf) + x->used;
+  x->used ++;
+  return (t);
 }
 
 /* determine architecture's alignment boundary */
@@ -115,10 +123,10 @@ struct dummy { char *c; int  i; };
 #define ALIGNMENT offsetof(struct dummy, i)
 
 static char *
-smalloc (wordhash_t * h, size_t n)
+smalloc (wordhash_t * h, size_t n) /*@modifies h->strings@*/
 {
   wh_alloc_str *x = h->strings;
-  char *t;
+  /*@dependent@*/ char *t;
 
   /* Force alignment on architecture's natural boundary.*/
   n += ALIGNMENT - ( n % ALIGNMENT);
@@ -198,48 +206,3 @@ wordhash_next (wordhash_t * h)
   return h->iter_ptr;
 }
 
-#ifdef MAIN
-typedef struct
-{
-  int count;
-}
-word_t;
-
-static void word_init(void *vw){
-     word_t *w = vw;
-     w->count = 0;   
-}
-
-void
-dump_hash (wordhash_t * h)
-{
-  hashnode_t *p;
-  for (p = wordhash_first (h); p != NULL; p = wordhash_next (h))
-    {
-      printf ("%s %d\n", p->key, ((word_t *) p->buf)->count);
-    }
-}
-
-/* build wordhash utility using
-**
-**	gcc -DMAIN -o wordhash wordhash.c xmalloc.c
-*/
-
-int
-main ()
-{
-  wordhash_t *h = wordhash_init ();
-  char buf[100];
-  word_t *w;
-
-  while (scanf ("%s", buf) != EOF)
-    {
-      w = wordhash_insert (h, buf, sizeof (word_t), &word_init);
-      w->count++;
-    }
-
-  dump_hash (h);
-  wordhash_free (h);
-  return 0;
-}
-#endif

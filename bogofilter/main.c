@@ -12,13 +12,15 @@ AUTHOR:
 
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include <errno.h>
 #include <config.h>
+
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
 #endif
@@ -32,14 +34,14 @@ AUTHOR:
 
 int verbose, passthrough, nonspam_exits_zero;
 int Rtable = 0;
-FILE *Rfp;
+/*@null@*/ /*@dependent@*/ FILE *Rfp;
 enum algorithm algorithm = AL_GRAHAM;
 
 char directory[PATH_LEN] = "";
 
 int  logflag;
-char msg_register[80];
-char msg_bogofilter[80];
+char msg_register[1024];
+char msg_bogofilter[1024];
 
 const char *progname = "bogofilter";
 const char *system_config_file = "/etc/bogofilter.cf";
@@ -58,10 +60,12 @@ extern	void read_config_file(const char *filename);
 /* if the given environment variable 'var' exists, copy it to 'dest' and
    tack on the optional 'subdir' value.
  */
-static void set_dir_from_env(char* dest, const char *var, const char* subdir)
+static void set_dir_from_env(/*@reldef@*/ /*@unique@*/ char* dest,
+	const char *var,
+	/*@null@*/ const char *subdir)
 {
     char *env;
-    int path_left=PATH_LEN-1;
+    size_t path_left=PATH_LEN-1;
 
     env = getenv(var);
     if (env == NULL) return;
@@ -80,13 +84,13 @@ static void set_dir_from_env(char* dest, const char *var, const char* subdir)
 /* check that our directory exists and try to create it if it doesn't
    return -1 on failure, 0 otherwise.
  */
-static int check_directory(const char* path)
+static int check_directory(const char* path) /*@globals errno,stderr@*/
 {
     int rc;
     struct stat sb;
 
     if (*path == '\0') {
-	fprintf(stderr, "%s: cannot find bogofilter directory.\n"
+	(void)fprintf(stderr, "%s: cannot find bogofilter directory.\n"
 		"You must set the BOGOFILTER_DIR or HOME environment variables\n"
 		"or use the -d DIR option. The program aborts.\n", progname);
 	return 0;
@@ -100,7 +104,7 @@ static int check_directory(const char* path)
 		return -1;
 	    }
 	    else if (verbose > 0) {
-		fprintf(stderr, "Created directory %s .\n", path);
+		(void)fprintf(stderr, "Created directory %s .\n", path);
 	    }
 	    return 0;
 	}
@@ -111,13 +115,13 @@ static int check_directory(const char* path)
     }
     else {
 	if (! S_ISDIR(sb.st_mode)) {
-	    fprintf(stderr, "Error: %s is not a directory.\n", path);
+	    (void)fprintf(stderr, "Error: %s is not a directory.\n", path);
 	}
     }
     return 0;
 }
 
-int validate_args(int argc, char **argv)
+int validate_args(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 {
     bool registration, classification;
 
@@ -127,13 +131,13 @@ int validate_args(int argc, char **argv)
 
     if ( registration && classification)
     {
-	fprintf(stderr, "Error:  Invalid combination of options.\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "    Options '-s', '-n', '-S', and '-N' are used when registering words.\n");
-	fprintf(stderr, "    Options '-p', '-u', '-e', and '-R' are used when classifying messages.\n");
-	fprintf(stderr, "    The two sets of options may not be used together.\n");
-	fprintf(stderr, "    \n");
-//	fprintf(stderr, "    Options '-g', '-r', '-l', '-d', '-x', and '-v' may be used with either mode.\n");
+	(void)fprintf(stderr, "Error:  Invalid combination of options.\n");
+	(void)fprintf(stderr, "\n");
+	(void)fprintf(stderr, "    Options '-s', '-n', '-S', and '-N' are used when registering words.\n");
+	(void)fprintf(stderr, "    Options '-p', '-u', '-e', and '-R' are used when classifying messages.\n");
+	(void)fprintf(stderr, "    The two sets of options may not be used together.\n");
+	(void)fprintf(stderr, "    \n");
+//	(void)fprintf(stderr, "    Options '-g', '-r', '-l', '-d', '-x', and '-v' may be used with either mode.\n");
 	return 2;
     }
 
@@ -178,34 +182,34 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case 'h':
-	    printf( "\n" );
-	    printf( "Usage: bogofilter [options] < message\n" );
-	    printf( "\t-h\t- print this help message.\n" );
-	    printf( "\t-d path\t- specify directory for wordlists.\n" );
-	    printf( "\t-p\t- passthrough.\n" );
-	    printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
-	    printf( "\t-s\t- register message as spam.\n" );
-	    printf( "\t-n\t- register message as non-spam.\n" );
-	    printf( "\t-S\t- move message's words from non-spam list to spam list.\n" );
-	    printf( "\t-N\t- move message's words from spam list to spam non-list.\n" );
-	    printf( "\t-v\t- set debug verbosity level.\n" );
-	    printf( "\t-V\t- print version info.\n" );
-	    printf( "\n" );
-	    printf( "bogofilter is a tool for classifying email as spam or non-spam.\n" );
-	    printf( "\n" );
-	    printf( "For updates and additional information, see\n" );
-	    printf( "URL: http://bogofilter.sourceforge.net\n" );
-	    printf( "\n" );
+	    (void)printf( "\n" );
+	    (void)printf( "Usage: bogofilter [options] < message\n" );
+	    (void)printf( "\t-h\t- print this help message.\n" );
+	    (void)printf( "\t-d path\t- specify directory for wordlists.\n" );
+	    (void)printf( "\t-p\t- passthrough.\n" );
+	    (void)printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
+	    (void)printf( "\t-s\t- register message as spam.\n" );
+	    (void)printf( "\t-n\t- register message as non-spam.\n" );
+	    (void)printf( "\t-S\t- move message's words from non-spam list to spam list.\n" );
+	    (void)printf( "\t-N\t- move message's words from spam list to spam non-list.\n" );
+	    (void)printf( "\t-v\t- set debug verbosity level.\n" );
+	    (void)printf( "\t-V\t- print version info.\n" );
+	    (void)printf( "\n" );
+	    (void)printf( "bogofilter is a tool for classifying email as spam or non-spam.\n" );
+	    (void)printf( "\n" );
+	    (void)printf( "For updates and additional information, see\n" );
+	    (void)printf( "URL: http://bogofilter.sourceforge.net\n" );
+	    (void)printf( "\n" );
 	    exit(0);
 
         case 'V':
-            printf("\n%s version %s ", PACKAGE, VERSION);
-            printf("Copyright (C) 2002 Eric S. Raymond\n\n");
-            printf("%s comes with ABSOLUTELY NO WARRANTY. ", PACKAGE);
-            printf("This is free software, and you\nare welcome to ");
-            printf("redistribute it under the General Public License. ");
-            printf("See the\nCOPYING file with the source distribution for ");
-            printf("details.\n\n");
+            (void)printf("\n%s version %s ", PACKAGE, VERSION);
+            (void)printf("Copyright (C) 2002 Eric S. Raymond\n\n");
+            (void)printf("%s comes with ABSOLUTELY NO WARRANTY. ", PACKAGE);
+            (void)printf("This is free software, and you\nare welcome to ");
+            (void)printf("redistribute it under the General Public License. ");
+            (void)printf("See the\nCOPYING file with the source distribution for ");
+            (void)printf("details.\n\n");
             exit(0);
 
 	case 'p':
@@ -229,11 +233,12 @@ int process_args(int argc, char **argv)
 	    Rtable = 1;
 	    Rfp = fopen(optarg, "w");
 	    if(Rfp == NULL) {
-		fprintf(stderr, "Error: can't write %s\n", optarg);
+		(void)fprintf(stderr, "Error: can't write %s\n", optarg);
 		Rtable = 0;
 	    }
 	}
-	// fall through to force Robinson calculations
+	/*@fallthrough@*/
+	/* fall through to force Robinson calculations */
 	case 'r':
 	    algorithm = AL_ROBINSON;
 	    break;
@@ -249,7 +254,7 @@ int process_args(int argc, char **argv)
     return exitcode;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
     int   exitcode;
 
@@ -263,7 +268,8 @@ int main(int argc, char **argv)
     if (check_directory(directory))
 	exit(2);
 
-    setup_lists(directory);
+    if (setup_lists(directory, GOOD_BIAS, 1.0))
+	exit(2);
 
     read_config_file( system_config_file );
     read_config_file( user_config_file );
@@ -290,7 +296,7 @@ int main(int argc, char **argv)
 		{
 		    /* print spam-status at the end of the header
 		     * then mark the beginning of the message body */
-		    printf("%s: %s, tests=bogofilter, spamicity=%0.6f, version=%s\n", 
+		    (void)printf("%s: %s, tests=bogofilter, spamicity=%0.6f, version=%s\n", 
 			    spam_header_name, 
 			    (status==RC_SPAM) ? "Yes" : "No", 
 			    spamicity, VERSION);
@@ -313,7 +319,7 @@ int main(int argc, char **argv)
 			(void)fputs("\n", stdout);
 
 		    /* print body */
-		    for (; textend->block; textend=textend->next)
+		    for (; textend->block != NULL; textend=textend->next)
 		    {
 			(void) fwrite(textend->block, 1, textend->len, stdout);
 			if (ferror(stdout)) exit(2);
@@ -326,8 +332,9 @@ int main(int argc, char **argv)
 		if (nonspam_exits_zero && passthrough && exitcode == 1)
 		    exitcode = 0;
 
-		sprintf(msg_bogofilter, "%s: %s, spamicity=%0.6f, version=%s",
-			spam_header_name, (status==RC_SPAM) ? "Yes" : "No", spamicity, VERSION);
+		(void)sprintf(msg_bogofilter, "%s: %s, spamicity=%0.6f, version=%s",
+			spam_header_name, (status==RC_SPAM) ? "Yes" : "No",
+			spamicity, VERSION);
 	    }
 	    break;
 	default:
@@ -336,7 +343,7 @@ int main(int argc, char **argv)
     }
     
     if(Rtable && Rfp != NULL && fclose(Rfp) != 0)
-	fprintf(stderr, "Error: couldn't close Rtable file\n");
+	(void)fprintf(stderr, "Error: couldn't close Rtable file\n");
 
     close_lists();
 
@@ -354,7 +361,7 @@ int main(int argc, char **argv)
 	    syslog(LOG_INFO, "%s, %s\n", msg_bogofilter, msg_register);
 	    break;
 	default:
-	    syslog(LOG_INFO, msg_register);
+	    syslog(LOG_INFO, "%s", msg_register);
 	    break;
 	}
 

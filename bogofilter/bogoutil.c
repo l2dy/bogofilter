@@ -15,9 +15,10 @@ AUTHOR:
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <db.h>
 #include <errno.h>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <db.h>
 
 #include "version.h"
 #include "bogofilter.h"
@@ -63,7 +64,7 @@ int dump_file(char *db_file)
 	    for (;;) {
 		ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT);
 		if (ret == 0) {
-		    printf("%.*s %lu\n", key.size, (char *) key.data, *(unsigned long *) data.data);
+		    printf("%.*s %lu\n", (int)key.size, (char *) key.data, *(unsigned long *) data.data);
 		}
 		else if (ret == DB_NOTFOUND) {
 		    break;
@@ -123,7 +124,7 @@ int load_file(char *db_file)
 	if (*(p--) != '\n') {
 	    fprintf(stderr,
 		    PROGNAME
-		    ": Unexpected input [%s] on line %lu. Does not end with newline\n",
+		    ": Unexpected input [%s] on line %ld. Does not end with newline\n",
 		    buf, line);
 	    rv = 1;
 	    break;
@@ -135,7 +136,7 @@ int load_file(char *db_file)
 	if (!isspace(*p)) {
 	    fprintf(stderr,
 		    PROGNAME
-		    ": Unexpected input [%s] on line %lu. Expecting whitespace before count\n",
+		    ": Unexpected input [%s] on line %ld. Expecting whitespace before count\n",
 		    buf, line);
 	    rv = 1;
 	    break;
@@ -164,7 +165,7 @@ dbh_t *db_open_and_lock_file( const char *db_file, const char *name, dbmode_t mo
     return dbh;
 }
 
-int get_token(char *buf, size_t bufsize, FILE *fp)
+static int get_token(char *buf, int bufsize, FILE *fp)
 {
     char *p;
     int rv = 0;
@@ -230,8 +231,8 @@ int words_from_path(char *directory, int argc, char **argv, bool show_probabilit
     char filepath[PATH_LEN];
     char buf[BUFSIZE];
     char *token = buf;
-    int spam_count, spam_msg_count = 0 ;
-    int good_count, good_msg_count = 0 ;
+    long int spam_count, spam_msg_count = 0 ;
+    long int good_count, good_msg_count = 0 ;
 
     char *head_format = !show_probability ? "%-20s %6s %6s\n"   : "%-20s %6s  %6s  %6s  %6s\n";
     char *data_format = !show_probability ? "%-20s %6ld %6ld\n" : "%-20s %6ld  %6ld  %f  %f\n";
@@ -332,7 +333,7 @@ double compute_robx( dbh_t *dbh_spam, dbh_t *dbh_good )
     DBC *dbcp_good = &dbc_good;
 
     double scalefactor;
-    int msg_good, msg_spam;
+    long int msg_good, msg_spam;
 
     msg_good = db_getvalue( dbh_good, ".MSG_COUNT" );
     msg_spam = db_getvalue( dbh_spam, ".MSG_COUNT" );
@@ -370,7 +371,7 @@ double compute_robx( dbh_t *dbh_spam, dbh_t *dbh_good )
     for (;;) {
 	ret = dbcp_spam->c_get(dbcp_spam, &key, &data, DB_NEXT);
 	if (ret == 0) {
-	    unsigned long goodness;
+	    long goodness;
 	    unsigned long spamness;
 	    double        prob;
 	    char         *token = key.data;
@@ -393,7 +394,7 @@ double compute_robx( dbh_t *dbh_spam, dbh_t *dbh_good )
 
 	    // print if token in both word lists
 	    if (verbose > 1 && (goodness && spamness))
-		printf("cnt: %6d,  sum: %12.6f,  ratio: %f,  sp: %4lu,  gd: %4lu,  p: %f,  t: %s\n", word_cnt, sum, sum/word_cnt, spamness, goodness, prob, token);
+		printf("cnt: %6d,  sum: %12.6f,  ratio: %f,  sp: %4lu,  gd: %4ld,  p: %f,  t: %s\n", word_cnt, sum, sum/word_cnt, spamness, goodness, prob, token);
 	}
 	else if (ret == DB_NOTFOUND) {
 	    break;
@@ -408,7 +409,7 @@ double compute_robx( dbh_t *dbh_spam, dbh_t *dbh_good )
 
     robx = sum/word_cnt;
     if (verbose)
-	printf( ".MSG_COUNT: %d, %d, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
+	printf( ".MSG_COUNT: %ld, %ld, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
 		msg_spam, msg_good, scalefactor, sum, (int)word_cnt, robx);
 
     return robx;

@@ -24,7 +24,7 @@ struct wordlist_s
 extern wordlist_t *word_lists;
 extern wordlist_t good_list, spam_list;
 
-int setup_lists(const char* directory);
+int setup_lists(const char* directory, double, double);
 bool configure_wordlist(const char *val);
 
 void *open_wordlist( const char *name, const char *filepath);

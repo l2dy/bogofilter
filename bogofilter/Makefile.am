@@ -8,7 +8,7 @@ SUBDIRS = . tests
 # what to build
 bin_PROGRAMS = bogofilter bogoutil bogolexer
 bin_SCRIPTS = bogoupgrade
-check_PROGRAMS = debugtest configtest
+check_PROGRAMS = debugtest configtest wordhash
 man1_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1
 
 CFLAGS ?= -g -Os -Wall
@@ -34,6 +34,8 @@ bogoutil_SOURCES = bogoutil.c \
 		   $(MYCOMMON)
 
 configtest_SOURCES = configtest.c config.c wordlists.c datastore_db.c $(MYCOMMON)
+
+wordhash_SOURCES = wordhash.c wordhash.h wordhash.main.c $(MYCOMMON)
 
 # what to distribute
 EXTRA_DIST = $(man1_MANS) \

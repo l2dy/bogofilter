@@ -33,7 +33,8 @@ void *open_wordlist( const char *name, const char *filepath )
 }
 
 /* returns -1 for error, 0 for success */
-int init_list(wordlist_t* list, const char* name, const char* filepath, double weight, bool bad, int override, bool ignore)
+int init_list(wordlist_t* list, const char* name, const char* filepath,
+	      double weight, bool bad, int override, bool ignore)
 {
     wordlist_t* list_index;
     wordlist_t** last_list_ptr;
@@ -94,16 +95,16 @@ void build_path(char* dest, int size, const char* dir, const char* file)
 }
 
 /* returns -1 for error, 0 for success */
-int setup_lists(const char* directory)
+int setup_lists(const char* directory, double good_weight, double bad_weight)
 {
     int rc = 0;
     char filepath[PATH_LEN];
 
     build_path(filepath, PATH_LEN, directory, GOODFILE);
-    if (init_list(&good_list, "good", filepath, GOOD_BIAS, FALSE, 0, 0)) rc = -1;
+    if (init_list(&good_list, "good", filepath, good_weight, FALSE, 0, 0)) rc = -1;
 
     build_path(filepath, PATH_LEN, directory, SPAMFILE);
-    if (init_list(&spam_list, "spam", filepath, 1, TRUE,  0, 0)) rc = -1;
+    if (init_list(&spam_list, "spam", filepath, bad_weight, TRUE,  0, 0)) rc = -1;
 
     return rc;
 }

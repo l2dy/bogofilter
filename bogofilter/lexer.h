@@ -15,8 +15,8 @@ extern char *yylval;
 struct textblock
 {
     char		*block;
-    struct textblock	*next;
-    int			len;
+    /*@owned@*/ struct textblock	*next;
+    size_t		len;
 };
 
 extern struct textblock textblocks, *textend;

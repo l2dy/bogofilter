@@ -47,7 +47,8 @@
 extern int passthrough;
 extern char *spam_header_name;
 
-struct textblock textblocks, *textend = &textblocks;
+struct textblock textblocks;
+/*@dependent@*/ struct textblock *textend = &textblocks;
 
 #define YY_INPUT(buf,result,max_size) result = yyinput(buf, max_size)
 

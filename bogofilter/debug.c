@@ -24,12 +24,14 @@ void set_debug_mask( char *mask )
     char *maskbits = MASKNAMES;
     for (ch = *mask; ch != '\0'; ch = *++mask)
     {
-	char *pos = index(maskbits, ch);
+	/*@-shiftnegative@*/
+	char *pos = strchr(maskbits, ch);
 	if (pos != NULL)
-	    debug_mask |= ( 1 << (pos-maskbits) );
+	    debug_mask |= (1 << (pos-maskbits));
+	/*@=shiftnegative@*/
 	else
 	{
-	    fprintf( stderr, "unknown mask option '%c'\n", ch );
+	    (void)fprintf(stderr, "unknown mask option '%c'\n", ch);
 	    exit(2);
 	}
     }

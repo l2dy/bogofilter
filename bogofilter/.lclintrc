@@ -7,4 +7,5 @@
 -realcompare
 -exportlocal
 -boolops
+-predboolint
 -I.
