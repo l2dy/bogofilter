@@ -74,7 +74,7 @@ static int count_hook(char *key,  uint32_t keylen,
 		      char *data, uint32_t datalen,
 		      void *userdata)
 {
-    long *counter = userdata;
+    size_t *counter = userdata;
 
     (void)key;
     (void)keylen;
@@ -84,14 +84,14 @@ static int count_hook(char *key,  uint32_t keylen,
     (*counter)++;
 
     if (verbose > 3)
-	printf( "count:  %4ld %*.*s\n", *counter, (int)keylen, (int)keylen, key);
+	printf( "count:  %4u %*.*s\n", *counter, (int)keylen, (int)keylen, key);
 
     return 0;
 }
 
 struct robhook_data {
     double *sum;
-    uint32_t *count;
+    size_t *count;
     void *dbh_good;
     double scalefactor;
 };
@@ -412,12 +412,12 @@ static int display_words(const char *path, int argc, char **argv, bool prob)
 
 static double compute_robx(void *dbh_spam, void *dbh_good)
 {
-    uint32_t good_cnt = 0;
-    uint32_t spam_cnt = 0;
+    size_t good_cnt = 0;
+    size_t spam_cnt = 0;
     double sum = 0.0;
     double robx;
 
-    unsigned long msg_good, msg_spam;
+    uint32_t long msg_good, msg_spam;
     struct robhook_data rh;
 
     msg_good = db_getvalue( dbh_good, ".MSG_COUNT" );
