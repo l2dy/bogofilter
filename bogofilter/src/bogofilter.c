@@ -9,21 +9,16 @@ AUTHOR:
    Eric S. Raymond <esr@thyrsus.com>
 
 THEORY:
-   This is Paul Graham's variant of Bayes filtering described at 
 
-	http://www.paulgraham.com/spam.html
+   Originally implemented as Paul Graham's variant of Bayes filtering,
+   as described in 
 
-I do the lexical analysis slightly differently, however.
+     "A Plan For Spam", http://www.paulgraham.com/spam.html
 
-MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
-    Robinson's proposed modifications to the "spamicity" calculation and
-    uses his f(w) individual probability calculation.  See
+   Updated in accordance with Gary Robinson's proposed modifications,
+   as described at
 
     http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html
-    
-    Robinson's method does not store "extrema."  Instead it accumulates
-    Robinson's P and Q using all words deemed "characteristic," i.e. having
-    a deviation (fabs (0.5f - prob)) >= MIN_DEV, currently set to 0.0.
 
 ******************************************************************************/
 
