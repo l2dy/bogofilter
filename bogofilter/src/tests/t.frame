@@ -28,7 +28,7 @@ export BOGOFILTER
 export BOGOLEXER
 export BOGOUTIL
 
-# Cater for GNU coreutils "compatiblity"
+# Cater for GNU coreutils "compatibility"
 _POSIX2_VERSION=199209
 export _POSIX2_VERSION
 
