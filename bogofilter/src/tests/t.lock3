@@ -8,7 +8,7 @@ seq="1 2 3 4 5"
 # IOPTS used for initialization
 OPTS="-C -d $TMPDIR -M"
 IOPTS=
-if [ "$BF_TEST_VERBOSE" ] ; then IOPTS="$IOPTS -v" ; fi
+if [ "$verbose" ] ; then IOPTS="$IOPTS -v" ; fi
 
 rc=0
 
@@ -18,7 +18,7 @@ $BOGOFILTER $OPTS $IOPTS -s -I ${srcdir}/inputs/spam.mbx
 trap >$TMPDIR/oldtraps
 trap 'kill $pid' 1 2 3
 
-if [ "$BF_TEST_VERBOSE" ] ; then echo "#### Part 1 ####" ; fi
+if [ "$verbose" ] ; then echo "#### Part 1 ####" ; fi
 for I in $seq ; do
     (   set +e
 	$BOGOFILTER $OPTS -u -I ${srcdir}/inputs/spam.mbx 
@@ -30,7 +30,7 @@ done
 wait
 pid=
 
-if [ "$BF_TEST_VERBOSE" ] ; then echo "#### Part 2 ####" ; fi
+if [ "$verbose" ] ; then echo "#### Part 2 ####" ; fi
 for I in $seq ; do
     (   set +e
 	$BOGOFILTER $OPTS -u -p -I ${srcdir}/inputs/spam.mbx >> ${TMPDIR}.$I.out
