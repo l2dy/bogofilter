@@ -1,8 +1,12 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.10  2002/09/18 22:41:07  relson
- * Separated probability calculation out of select_indicators() into new function compute_probability().
+ * Revision 1.11  2002/09/19 03:20:32  relson
+ * Move "msg_prob" assignment to proper function, i.e. from select_indicators() to compute_probability().
+ * Move some local variables from the beginning of the function to the innermost block where they're needed.
  *
+/* Revision 1.10  2002/09/18 22:41:07  relson
+/* Separated probability calculation out of select_indicators() into new function compute_probability().
+/*
 /* Revision 1.7  2002/09/15 19:22:51  relson
 /* Refactor the main bogofilter() function into three smaller, more coherent pieces:
 /*
@@ -476,6 +480,11 @@ double compute_probability( char *token )
     hamness = getcount(token, &ham_list);
     spamness = getcount(token, &spam_list);
 
+#ifdef NON_EQUIPROBABLE
+    // There is an argument that we should by by number of *words* here.
+    double	msg_prob = (spam_list.msgcount / ham_list.msgcount);
+#endif // NON_EQUIPROBABLE
+
     // Paul Graham's original formula:
     // 
     // (let ((g (* 2 (or (gethash word ham) 0))) 
@@ -518,43 +527,30 @@ bogostat_t *select_indicators(void  *PArray)
 {
     void	**loc;
     char	tokenbuffer[BUFSIZ];
-    char	*token;
-    double	slotdev, hitdev;
 
-    discrim_t *pp, *hit;
+    discrim_t *pp;
     static bogostat_t stats;
     
-#ifdef NON_EQUIPROBABLE
-    // There is an argument that we should by by number of *words* here.
-    double	msg_prob = (spam_list.msgcount / ham_list.msgcount);
-#endif // NON_EQUIPROBABLE
-
     for (pp = stats.extrema; pp < stats.extrema+sizeof(stats.extrema)/sizeof(*stats.extrema); pp++)
     {
  	pp->prob = 0.5f;
  	pp->key[0] = '\0';
     }
  
-    token = tokenbuffer;
     for (loc  = JudySLFirst(PArray, tokenbuffer, 0);
 	 loc != (void *) NULL;
 	 loc  = JudySLNext(PArray, tokenbuffer, 0))
     {
-	double prob;
-	double dev;
-
-	prob = compute_probability( token );
-
-	if ( verbose >=3 )
-	    printf("#  %15.12f  %s\n", prob, tokenbuffer);
+	char  *token = tokenbuffer;
+	double prob = compute_probability( token );
+	double dev = DEVIATION(prob);
+	discrim_t *hit = NULL;
+	double	hitdev=1;
 
 	// update the list of tokens with maximum deviation
-	dev = DEVIATION(prob);
-        hit = NULL;
-        hitdev=1;
 	for (pp = stats.extrema; pp < stats.extrema+sizeof(stats.extrema)/sizeof(*stats.extrema); pp++)
         {
-	    slotdev=DEVIATION(pp->prob);
+	    double slotdev=DEVIATION(pp->prob);
 
 	    if (dev>slotdev && hitdev>slotdev)
 	    {
