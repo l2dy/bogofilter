@@ -203,11 +203,6 @@ static void data_free(data_t *val)
     xfree(val->data); xfree(val);
 }
 
-/*
-canonical, -0.05, +0.05, -0.1, +0.1 and Cbogotune is doing -0.1, -0.05,
-canonical, +0.05, +0.1.  If, as I do, you always take the first of a
-*/
-
 static void init_coarse(double _rx)
 {
     rxval = seq_canonical(_rx, 0.05);
@@ -300,6 +295,8 @@ static void score_ns(double *results)
 	}
     }
 
+    qsort(results, count, sizeof(double), compare_double);
+
     return;
 }
 
@@ -309,7 +306,6 @@ static bool check_for_high_ns_scores(void)
     uint target = ceil(ns_cnt * percent);
 
     score_ns(ns_scores);	/* scores in ascending order */
-    qsort(ns_scores, ns_cnt, sizeof(double), compare_double);
 
     if (ns_scores[ns_cnt-target] < SPAM_CUTOFF)
 	return false;
@@ -341,6 +337,8 @@ static void score_sp(double *results)
 	}
     }
 
+    qsort(results, count, sizeof(double), compare_double);
+
     return;
 }
 
@@ -363,8 +361,7 @@ static bool check_for_low_sp_scores(void)
     double percent = 0.0025;
     uint target = ceil(sp_cnt * percent);
 
-    score_sp(sp_scores);	/* scores in ascending order */
-    qsort(sp_scores, sp_cnt, sizeof(double), compare_double);
+    score_sp(sp_scores);			/* get scores */
 
     if (sp_scores[target] > HAM_CUTOFF)
 	return false;
@@ -412,12 +409,11 @@ static uint get_thresh(uint count, double *scores)
 {
     uint   ftarget = 0;
     uint   mtarget = scale(count, TEST_COUNT, PREF_COUNT, 3, 10);
-    double percent = scale(count, TEST_COUNT, PREF_COUNT, 0.01, 0.0025);
+    double percent = scale(count, TEST_COUNT, PREF_COUNT, 0.0050, 0.0025);
     double cutoff;
     static bool show_first = false;
 
-    score_ns(scores);			/* scores in ascending order */
-    qsort(scores, count, sizeof(double), compare_double);
+    score_ns(scores);				/* get scores */
 
     while (percent > 0.0001) {
 	ftarget = ceil(count * percent);	/* compute fp count */
@@ -944,13 +940,9 @@ static void final_recommendations(void)
 
     printf("Non-Spam...\n");
     score_ns(ns_scores);		/* get scores */
-    /* ... ascending */
-    qsort(ns_scores, ns_cnt, sizeof(double), compare_double);
 
     printf("Spam...\n");
     score_sp(sp_scores);		/* get scores */
-    /* ... ascending */
-    qsort(sp_scores, sp_cnt, sizeof(double), compare_double);
 
     if (verbose >= PARMS)
 	printf("# ns_cnt %d, sp_cnt %d\n", ns_cnt, sp_cnt);
@@ -967,6 +959,7 @@ static void final_recommendations(void)
 	double cutoff;
 	uint i, fp = 0, fn = 0;
 	uint mn = minn[m];
+	double fpp, fnp;
 
 	if (ns_cnt < mn)
 	    continue;
@@ -976,6 +969,8 @@ static void final_recommendations(void)
 	    cutoff = ns_scores[ns_cnt-t];
 	    if (cutoff > FP_CUTOFF)
 		continue;
+	    fpp = 100.0 / mn;
+	    fp = ns_cnt / mn;
 	}
 	else {
 	    cutoff = SPAM_CUTOFF;
@@ -985,12 +980,12 @@ static void final_recommendations(void)
 		fp = i;
 	    if (fp == 0) {
 		fprintf(stderr, 
-			"too few low scoring spam.\n");
+			"Too few low scoring spam.\n");
 		exit(EX_ERROR);
 	    }
 	    fp -= 1;
 	    cutoff = ns_scores[fp];
-	    fp = ns_cnt - fp;
+	    fpp = 100.0 * (ns_cnt - fp) / ns_cnt;
 	}
 
 	for (i = 0; i < sp_cnt; i += 1) {
@@ -999,12 +994,11 @@ static void final_recommendations(void)
 		break;
 	    }
 	}
+	fnp = 100.0 * fn / sp_cnt;
 
 	if (printed)  printf("#");
-	printf("spam_cutoff=%5.3f\t# for %4.2f%% false positives (%d); expect %4.2f%% false neg (%d).\n",
-	       cutoff,
-	       (mn != 1) ? 100.0 / mn : 100.0 * fp / ns_cnt, fp,
-	       100.0 * fn / sp_cnt, fn);
+	printf("spam_cutoff=%5.3f\t# for %4.2f%% false pos (%d); expect %4.2f%% false neg (%d).\n",
+	       cutoff, fpp, fp, fnp, fn);
 
 	printed = true;
     }
@@ -1013,7 +1007,7 @@ static void final_recommendations(void)
     ham_cutoff = sp_scores[s];
     if (ham_cutoff < 0.10) ham_cutoff = 0.10;
     if (ham_cutoff > 0.45) ham_cutoff = 0.45;
-    printf("ham_cutoff=%5.3f\t# %5.3f%%\n", ham_cutoff,sp_scores[s]);
+    printf("ham_cutoff=%5.3f\t\n", ham_cutoff);
     printf("---cut---\n");
     printf("\n");
     printf("Tuning completed.\n");
