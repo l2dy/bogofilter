@@ -34,8 +34,7 @@ AUTHOR:
 #define BOGODIR ".bogofilter"
 
 int verbose, passthrough, nonspam_exits_zero;
-int Rtable = 0;
-algorithm_t algorithm = AL_GRAHAM;
+extern int Rtable;
 
 char directory[PATH_LEN] = "";
 
@@ -44,7 +43,7 @@ char msg_register[1024];
 char msg_bogofilter[1024];
 
 const char *progname = "bogofilter";
-char *system_config_file = "/etc/bogofilter.cf";
+extern const char *system_config_file;
 
 /* if the given environment variable 'var' exists, copy it to 'dest' and
    tack on the optional 'subdir' value.
@@ -110,142 +109,7 @@ static int check_directory(const char* path) /*@globals errno,stderr@*/
     return 0;
 }
 
-static int validate_args(/*@unused@*/ int argc, /*@unused@*/ char **argv)
-{
-    bool registration, classification;
-
-//  flags '-s', '-n', '-S', or '-N', are mutually exclusive of flags '-p', '-u', '-e', and '-R'.
-    classification = (run_type == RUN_NORMAL) ||(run_type == RUN_UPDATE) || passthrough || nonspam_exits_zero || (Rtable != 0);
-    registration   = (run_type == REG_SPAM) || (run_type == REG_GOOD) || (run_type == REG_GOOD_TO_SPAM) || (run_type == REG_SPAM_TO_GOOD);
-
-    if ( registration && classification)
-    {
-	(void)fprintf(stderr, "Error:  Invalid combination of options.\n");
-	(void)fprintf(stderr, "\n");
-	(void)fprintf(stderr, "    Options '-s', '-n', '-S', and '-N' are used when registering words.\n");
-	(void)fprintf(stderr, "    Options '-p', '-u', '-e', and '-R' are used when classifying messages.\n");
-	(void)fprintf(stderr, "    The two sets of options may not be used together.\n");
-	(void)fprintf(stderr, "    \n");
-//	(void)fprintf(stderr, "    Options '-g', '-r', '-l', '-d', '-x', and '-v' may be used with either mode.\n");
-	return 2;
-    }
-
-    return 0;
-}
-
-static int quell_config_read = 0;
-
-static int process_args(int argc, char **argv)
-{
-    int option;
-    int exitcode;
-
-    while ((option = getopt(argc, argv, "d:ehlsnSNvVpugqRrx:")) != EOF)
-    {
-	switch(option)
-	{
-	case 'd':
-	    strncpy(directory, optarg, PATH_LEN);
-	    break;
-
-	case 'e':
-	    nonspam_exits_zero = 1;
-	    break;
-
-	case 's':
-	    run_type = REG_SPAM;
-	    break;
-
-	case 'n':
-	    run_type = REG_GOOD;
-	    break;
-
-	case 'S':
-	    run_type = REG_GOOD_TO_SPAM;
-	    break;
-
-	case 'N':
-	    run_type = REG_SPAM_TO_GOOD;
-	    break;
-
-	case 'v':
-	    verbose++;
-	    break;
-
-	case 'h':
-	    (void)printf( "\n" );
-	    (void)printf( "Usage: bogofilter [options] < message\n" );
-	    (void)printf( "\t-h\t- print this help message and exit.\n" );
-	    (void)printf( "\t-d path\t- specify directory for wordlists.\n" );
-	    (void)printf( "\t-g\t- select Graham spam calulation method (default).\n" );
-	    (void)printf( "\t-r\t- select Robinson spam calulation method.\n" );
-	    (void)printf( "\t-R\t- write R data frame for Robinson calculation.\n" );
-	    (void)printf( "\t-p\t- passthrough.\n" );
-	    (void)printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
-	    (void)printf( "\t-s\t- register message as spam.\n" );
-	    (void)printf( "\t-n\t- register message as non-spam.\n" );
-	    (void)printf( "\t-S\t- move message's words from non-spam list to spam list.\n" );
-	    (void)printf( "\t-N\t- move message's words from spam list to spam non-list.\n" );
-	    (void)printf( "\t-v\t- set verbosity level.\n" );
-	    (void)printf( "\t-x LIST\t- set debug flags.\n" );
-	    (void)printf( "\t-V\t- print version information and exit.\n" );
-	    (void)printf( "\t-q\t- prevent reading configuration files.\n" );
-	    (void)printf( "\n" );
-	    (void)printf( "bogofilter is a tool for classifying email as spam or non-spam.\n" );
-	    (void)printf( "\n" );
-	    (void)printf( "For updates and additional information, see\n" );
-	    (void)printf( "URL: http://bogofilter.sourceforge.net\n" );
-	    (void)printf( "\n" );
-	    exit(0);
-
-        case 'V':
-            (void)printf("\n%s version %s ", PACKAGE, VERSION);
-            (void)printf("Copyright (C) 2002 Eric S. Raymond\n\n");
-            (void)printf("%s comes with ABSOLUTELY NO WARRANTY. ", PACKAGE);
-            (void)printf("This is free software, and you\nare welcome to ");
-            (void)printf("redistribute it under the General Public License. ");
-            (void)printf("See the\nCOPYING file with the source distribution for ");
-            (void)printf("details.\n\n");
-            exit(0);
-
-	case 'p':
-	    passthrough = 1;
-	    break;
-
-	case 'u':
-	    run_type = RUN_UPDATE;
-	    break;
-
-	case 'l':
-	    logflag = 1;
-	    break;
-
-	case 'g':
-	    algorithm = AL_GRAHAM;
-	    break;
-
-	case 'R':
-	    Rtable = 1;
-	/*@fallthrough@*/
-	/* fall through to force Robinson calculations */
-	case 'r':
-	    algorithm = AL_ROBINSON;
-	    break;
-
-	case 'x':
-	    set_debug_mask( optarg );
-	    break;
-
-	case 'q':
-	    quell_config_read = 1;
-	    break;
-	}
-    }
-
-    exitcode = validate_args(argc, argv);
-
-    return exitcode;
-}
+extern int quell_config_read;
 
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
