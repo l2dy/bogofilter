@@ -50,11 +50,11 @@ typedef unsigned char _Bool;
 #endif
 
 #if !HAVE_STRLCPY
-size_t strlcpy(char *dst, const char *src, size_t size);
+size_t strlcpy(/*@out@*/ char *dst, const char *src, size_t size);
 #endif
 
 #if !HAVE_STRLCAT
-size_t strlcat(char *dst, const char *src, size_t size);
+size_t strlcat(/*@out@*/ char *dst, const char *src, size_t size);
 #endif
 
 #if TIME_WITH_SYS_TIME
