@@ -131,9 +131,9 @@ done
 %files
 %defattr(-,root,root)
 
-%doc AUTHORS CHANGES* COPYING INSTALL
+%doc AUTHORS COPYING INSTALL
 %doc GETTING.STARTED
-%doc NEWS README* RELEASE.NOTES* TODO
+%doc NEWS README* RELEASE.NOTES TODO
 %doc doc/bogofilter-tuning.HOWTO.html
 %doc doc/bogofilter-SA-2002-01
 %doc doc/integrating*
