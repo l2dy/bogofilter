@@ -136,7 +136,8 @@ of the probabilities that deviate furthest from average are combined
 using Bayes's theorem on conditional probabilities.  If the computed
 probability that the input is spam exceeds a cutoff determined at 
 compile time (currently 0.95, for the Robinson-Fisher algorithm),
-<application>bogofilter</application> returns 0, otherwise 1.</para>
+<application>bogofilter</application> returns 0 if spam, 1 if ham, 
+2 if unsure.</para>
 
 <para>While this method sounds crude compared to the more usual
 pattern-matching approach, it turns out to be extremely effective.
@@ -172,7 +173,7 @@ miscounts.</para>
 
 <refsect1 id='options'><title>OPTIONS</title>
 <para>Without command-line options, <application>bogofilter</application>
-returns 1 if the message is non-spam, 0 if it is spam.  The non-spam
+returns 0 if it is spam,  1 if the message is ham.  The
 wordfile is created if absent.</para>
 
 <para>HELP OPTIONS</para>
@@ -363,10 +364,6 @@ a timestamp.</para>
 to operate with a pair of wordlists, named spamlist.db and goodlist.db.  Spamlist.db
 stores tokens, counts, and timestamps for tokens from spam messages.  Goodlist.db
 stores tokens, counts, and timestamps for tokens from ham messages.</para>
-
-<para>The <option>-O </option><replaceable>filename</replaceable> option
-tells <application>bogofilter</application> where to write its output in
-passthrough mode.  Note that this only works when -p is explicitly given.</para>
 
 <para>ALGORITHM OPTIONS</para>
 
