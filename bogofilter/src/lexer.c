@@ -281,6 +281,8 @@ int yyinput(byte *buf, size_t max_size)
 	buf[i] = charset_table[ch];
     }
     
+    buff_free(buff);
+
     return (count == -1 ? 0 : count);
 }
 
