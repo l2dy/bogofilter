@@ -176,7 +176,7 @@ base changes so that they can be rolled back or restored after an
 application crash.
 
 The logs of the transactional data store, log.NNNNNNNNNN files of up to
-10 MB in size (in the default configuration), can consume considerable
+1 MB in size (in the default configuration), can consume considerable
 amounts of disk space and many users wish to purge or compress these log
 files. These can safely be handled with Berkeley DB's db_checkpoint and
 db_archive utilities, which should be run in this order:
@@ -349,13 +349,11 @@ SIZING OPTIONS:
    Choosing these figures too high wastes disk space,
    choosing them too low may cause bogofilter applications to abort.
 
- - set_lg_max         1048576
+ - set_lg_max         250000
    (valid in Berkeley DB 3.1 - 4.3, takes effect immediately)
 
    this option configures the maximum log file size, in bytes, before
-   Berkeley DB starts a new log file. The default is 10 MB. Reducing
-   this can save disk space if combined with the (unsafe)
-   DB_LOG_AUTOREMOVE flag.
+   Berkeley DB starts a new log file. The default is 1 MB.
 
 SAFE OPTIONS:
 

@@ -976,6 +976,7 @@ static int bf_dbenv_create(DB_ENV **env)
 static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
 {
     int ret;
+    u_int32_t logsize = 1048576; /* 1 MByte (default in BDB 10 MByte) */
     dbe_t *env = xcalloc(1, sizeof(dbe_t));
 
     assert(directory);
@@ -1029,6 +1030,16 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
     }
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT)\n");
+
+    /* configure log file size */
+    ret = env->dbe->set_lg_max(env->dbe, logsize);
+    if (ret) {
+	print_error(__FILE__, __LINE__, "DB_ENV->set_lg_max(%lu) err: %s",
+		(unsigned long)logsize, db_strerror(ret));
+	exit(EX_ERROR);
+    }
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "DB_ENV->set_lg_max(%lu)\n", (unsigned long)logsize);
 
     ret = env->dbe->open(env->dbe, directory,
 	    dbenv_defflags | DB_CREATE | flags, /* mode */ 0664);
