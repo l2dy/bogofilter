@@ -98,7 +98,7 @@ struct option long_options[] = {
     { "output-file",			N, 0, 'O' },
     { "query",				N, 0, 'Q' },
     { "verbosity",			N, 0, 'v' },
-    { "block_on_subnets",		R, 0, O_IGNORE },
+    { "block_on_subnets",		R, 0, O_BLOCK_ON_SUBNETS },
     { "bogofilter_dir",			R, 0, O_IGNORE },
     { "charset_default",		R, 0, O_IGNORE },
     { "ham_cutoff",			R, 0, O_IGNORE },
@@ -106,7 +106,7 @@ struct option long_options[] = {
     { "log_header_format",		R, 0, O_IGNORE },
     { "log_update_format",		R, 0, O_IGNORE },
     { "min_dev",			R, 0, O_IGNORE },
-    { "replace_nonascii_characters",	R, 0, O_REPLACE_NONASCII_CHARACTERS },
+    { "replace_nonascii_characters",	R, 0, 'n' },
     { "robs",				R, 0, O_IGNORE },
     { "robx",				R, 0, O_IGNORE },
     { "spam_cutoff",			R, 0, O_IGNORE },
@@ -257,6 +257,10 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	set_bogotest(val);
 	break;
 	
+    case O_BLOCK_ON_SUBNETS:
+	block_on_subnets = get_bool(name, val);
+	break;
+
     default:
 	/* config file options:
 	**  ok    - if from config file
