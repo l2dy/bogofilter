@@ -223,6 +223,6 @@ if test "$sysconfdir" = "\${prefix}/etc" \
 fi
 
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
-AC_CONFIG_FILES([Makefile tests/Makefile tests/bogoutil/Makefile tests/t.systest.d/Makefile bogofilter.spec
+AC_CONFIG_FILES([Makefile tests/Makefile tests/bogoutil/Makefile tests/bogofilter/Makefile bogofilter.spec
 		 dcdflib/Makefile dcdflib/src/Makefile contrib/Makefile])
 AC_OUTPUT
