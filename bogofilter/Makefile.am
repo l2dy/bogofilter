@@ -7,10 +7,10 @@ SYSCONFDIR = @sysconfdir@
 sysconf_DATA=	bogofilter.cf.example
 
 # ChangeLog, cvs2cl lives at http://www.red-bean.com/cvs2cl
-.PHONY:		changelog.txt
-changelog.txt:
+.PHONY:		$(srcdir)/changelog.txt
+$(srcdir)/changelog.txt:
 		test -f $@ || : >$@ || { rm -f $@ ; exit 1; }
-		cvs2cl.pl --fsf --accum --utc --file $@
+		( cd $(srcdir) && cvs2cl.pl --fsf --accum --utc --file changelog.txt )
 
 # what to distribute
 EXTRA_DIST=	autogen.sh gsl config.rpath \
