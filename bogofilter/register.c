@@ -50,7 +50,7 @@ void *collect_words(/*@out@*/ int *message_count,
   
     if (token_type != FROM && token_type != 0){
       w = wordhash_insert(h, yylval, sizeof(wordprop_t), &wordprop_init);
-      w->msg_freq++;
+      if (w->msg_freq < max_repeats) w->msg_freq++;
       w_count++;
     }
     else {
@@ -63,8 +63,6 @@ void *collect_words(/*@out@*/ int *message_count,
        * frequencies. */
       for(n = wordhash_first(h); n != NULL; n = wordhash_next(h)){
         w = n->buf;
-        if (w->msg_freq > max_repeats)
-          w->msg_freq = max_repeats;
         w->freq += w->msg_freq;
         w->msg_freq = 0;
       }
