@@ -2,8 +2,8 @@
 #
 # Before running this script,
 # prepare file bogo.tbl as follows: run
-#   bogofilter -R <mailbox >bogo.tbl
-# where mailbox is a file with only one email message in it.
+#   bogofilter -R <message >bogo.tbl
+# where message is a file with only one email in it.
 
 # Then run R and type
 #   source("bogo.R")
@@ -36,11 +36,6 @@ S <- ( 1 + (P-Q)/(P+Q) ) / 2
 
 # display S as calculated by bogofilter and by R and compare
 print.noquote("")
-print.noquote("Bogofilter S:")
-print(fw[length(fw)])
-print.noquote("")
-print.noquote("R S:")
-print(S)
-print.noquote("")
-print.noquote("Difference (R - bogo):")
-print(S - fw[length(fw)])
+print.noquote(
+    sprintf("Bogo S: %8.6f, R S: %8.6f, Difference (R-bogo): %12.7g",
+             fw[length(fw)], S, S - fw[length(fw)]))

@@ -61,7 +61,9 @@ bool	stats_in_header = TRUE;
 const char *stats_prefix;
 
 run_t run_type = RUN_NORMAL; 
+#ifndef DISABLE_GRAHAM_METHOD
 algorithm_t algorithm = AL_GRAHAM;
+#endif
 
 double	min_dev = 0.0f;
 double	robx = 0.0f;
@@ -293,7 +295,11 @@ static int validate_args(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 	(void)fprintf(stderr, "    The two sets of options may not be used together.\n");
 	(void)fprintf(stderr, "    \n");
 #if 0
+#ifndef DISABLE_GRAHAM_METHOD
 	(void)fprintf(stderr, "    Options '-g', '-r', '-l', '-d', '-x', and '-v' may be used with either mode.\n");
+#else
+	(void)fprintf(stderr, "    Options '-l', '-d', '-x', and '-v' may be used with either mode.\n");
+#endif
 #endif
 	return 2;
     }
@@ -307,8 +313,10 @@ static void help(void)
     (void)printf( "Usage: bogofilter [options] < message\n" );
     (void)printf( "\t-h\t- print this help message.\n" );
     (void)printf( "\t-d path\t- specify directory for wordlists.\n" );
+#ifndef DISABLE_GRAHAM_METHOD
     (void)printf( "\t-g\t- select Graham spam calulation method (default).\n" );
     (void)printf( "\t-r\t- select Robinson spam calulation method.\n" );
+#endif
     (void)printf( "\t-p\t- passthrough.\n" );
     (void)printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
     (void)printf( "\t-s\t- register message as spam.\n" );
@@ -347,7 +355,13 @@ int process_args(int argc, char **argv)
     int option;
     int exitcode;
 
-    while ((option = getopt(argc, argv, "d:ehlsnSNvVpuc:CgrRx:fq")) != EOF)
+#ifdef DISABLE_GRAHAM_METHOD
+#define	OPTIONS "d:ehlsnSNvVpuc:CRx:fq"
+#else
+#define	OPTIONS "d:ehlsnSNvVpuc:CgrRx:fq"
+#endif
+
+    while ((option = getopt(argc, argv, OPTIONS)) != EOF)
     {
 	switch(option)
 	{
@@ -402,16 +416,19 @@ int process_args(int argc, char **argv)
 	    logflag = 1;
 	    break;
 
+#ifndef DISABLE_GRAHAM_METHOD
 	case 'g':
 	    algorithm = AL_GRAHAM;
 	    break;
-
+#endif
 	case 'R':
 	    Rtable = 1;
+#ifndef DISABLE_GRAHAM_METHOD
 	/*@fallthrough@*/
 	/* fall through to force Robinson calculations */
 	case 'r':
 	    algorithm = AL_ROBINSON;
+#endif
 	    break;
 
 	case 'x':

@@ -96,6 +96,15 @@ AC_ARG_ENABLE(spam-header-name,
 	[Use specified header name instead of X-Bogosity])
 )
 
+# Allow the user to disable Graham or Robinson methods
+AC_ARG_ENABLE(graham-method,
+	AC_HELP_STRING([--disable-graham-method],
+	[Disable Graham calculation method]),
+	if test "$enableval" = no; then
+		AC_DEFINE(DISABLE_GRAHAM_METHOD,1,
+		[Disable Graham calculation method])
+	fi
+)
 
 # Checks for header files.
 AC_HEADER_STDC

@@ -21,7 +21,7 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 
     http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html
     
-    In addition, this version does not store "extrema."  Instead it accumulates
+    Robinson's method does not store "extrema."  Instead it accumulates
     Robinson's P and Q using all words deemed "characteristic," i.e. having
     a deviation (fabs (0.5f - prob)) >= MIN_DEV, currently set to 0.0.
 
@@ -33,6 +33,7 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #include <string.h>
 #include <stdlib.h>
 
+#include "config.h"
 #include "common.h"
 #include "bogofilter.h"
 #include "datastore.h"
@@ -43,15 +44,17 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 
 #include <assert.h>
 
+#define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
+
+#ifndef DISABLE_GRAHAM_METHOD
 /* constants for the Graham formula */
 #define KEEPERS		15		/* how many extrema to keep */
 #define MINIMUM_FREQ	5		/* minimum freq */
 
-#define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
-
 #define MAX_PROB	0.99f		/* max probability value used */
 #define MIN_PROB	0.01f		/* min probability value used */
 #define DEVIATION(n)	fabs((n) - EVEN_ODDS)	/* deviation from average */
+#endif
 
 #define GRAHAM_MIN_DEV		0.4f	/* look for characteristic words */
 #define ROBINSON_MIN_DEV	0.0f	/* if nonzero, use characteristic words */
@@ -61,9 +64,13 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 
 #define GRAHAM_MAX_REPEATS	4	/* cap on word frequency per message */
 #define ROBINSON_MAX_REPEATS	1	/* cap on word frequency per message */
+  
+#define ROBS			0.001f	/* Robinson's s */
+#define ROBX			0.415f	/* Robinson's x */
 
 int max_repeats;
 double spam_cutoff;
+
 extern double min_dev;
 extern double robs;
 extern double robx;
@@ -117,7 +124,6 @@ static void *collect_words(/*@out@*/ int *message_count,
         w = n->buf;
         if (w->msg_freq > max_repeats)
           w->msg_freq = max_repeats;
-  
         w->freq += w->msg_freq;
         w->msg_freq = 0;
       }
@@ -245,6 +251,7 @@ void register_messages(run_t _run_type)
   wordhash_free(h);
 }
 
+#ifndef DISABLE_GRAHAM_METHOD
 typedef struct 
 {
     /*@unique@*/ char        key[MAXTOKENLEN+1];
@@ -337,9 +344,11 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bogostats,
 	hit->key[MAXTOKENLEN] = '\0';
     }
 }
+#endif
 
 void print_bogostats(FILE *fp, double spamicity)
 {
+#ifndef DISABLE_GRAHAM_METHOD 
     switch(algorithm) {
     case AL_GRAHAM:
     {
@@ -350,12 +359,15 @@ void print_bogostats(FILE *fp, double spamicity)
 	break;
     }
     case AL_ROBINSON:
+#endif
 	if (force || spamicity > thresh_stats || spamicity > thresh_rtable)
 	    rstats_print();
+#ifndef DISABLE_GRAHAM_METHOD 
 	break;
     default:
 	abort();
     }
+#endif
 }
 
 typedef struct {
@@ -381,18 +393,22 @@ static double wordprob_result(wordprob_t* wordstats)
     double prob;
     double count = wordstats->good + wordstats->bad;
 
+#ifndef DISABLE_GRAHAM_METHOD
     switch(algorithm) {
 	case AL_GRAHAM:
 	    prob = wordstats->bad/count;
 	    break;
 
 	case AL_ROBINSON:
+#endif
 	    prob = ((ROBS * ROBX + wordstats->bad) / (ROBS + count));
+#ifndef DISABLE_GRAHAM_METHOD
 	    break;
 
 	default:
 	    abort();
     }
+#endif
 
     return (prob);
 }
@@ -421,8 +437,10 @@ static double compute_probability(const char *token)
     wordlist_t* list;
     int override=0;
     long count;
-    int totalcount=0;
     double prob;
+#ifndef DISABLE_GRAHAM_METHOD
+    int totalcount=0;
+#endif
 
     wordprob_t wordstats;
 
@@ -437,10 +455,13 @@ static double compute_probability(const char *token)
 	if (count) {
 	    if (list->ignore)
 		return EVEN_ODDS;
+#ifndef DISABLE_GRAHAM_METHOD
 	    totalcount+=count*list->weight;
+#endif
 	    override=list->override;
 	    prob = (double)count;
 
+#ifndef DISABLE_GRAHAM_METHOD
 	    switch (algorithm)
 	    {
 	    case AL_GRAHAM:
@@ -450,18 +471,21 @@ static double compute_probability(const char *token)
 		break;
 
 	    case AL_ROBINSON:
+#endif
  	        if (!list->bad)
 		    prob *= scalefactor;
+#ifndef DISABLE_GRAHAM_METHOD
 		break;
 
 	    default:
 		abort();
 	    }
-
+#endif
 	    wordprob_add(&wordstats, prob, list->bad);
 	}
     }
 
+#ifndef DISABLE_GRAHAM_METHOD
     switch(algorithm) {
     case AL_GRAHAM:
 	if (totalcount < MINIMUM_FREQ) {
@@ -474,19 +498,23 @@ static double compute_probability(const char *token)
 	break;
 
     case AL_ROBINSON:
+#endif
 	prob=wordprob_result(&wordstats);
 	if ((Rtable || verbose) &&
 	    (fabs(EVEN_ODDS - prob) >= min_dev))
 	    rstats_add(token, wordstats.good, wordstats.bad, prob);
+#ifndef DISABLE_GRAHAM_METHOD
 	break;
 
     default:
 	abort();
     }
+#endif
 
     return prob;
 }
 
+#ifndef DISABLE_GRAHAM_METHOD
 static bogostat_t *select_indicators(wordhash_t *wordhash)
 /* selects the best spam/nonspam indicators and
  * populates the bogostats structure.
@@ -559,6 +587,7 @@ static double compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errn
 
     return spamicity;
 }
+#endif  /* ndef DISABLE_GRAHAM_METHOD */
 
 static double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@*/
 /* selects the best spam/nonspam indicators and calculates Robinson's S */
@@ -620,6 +649,7 @@ static double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@
 
 static void initialize_constants(void)
 {
+#ifndef DISABLE_GRAHAM_METHOD
     switch(algorithm) {
 	case AL_GRAHAM:
 	    spam_cutoff = GRAHAM_SPAM_CUTOFF;
@@ -629,6 +659,7 @@ static void initialize_constants(void)
 	    break;
 
 	case AL_ROBINSON:
+#endif
 	    spam_cutoff = ROBINSON_SPAM_CUTOFF;
 	    max_repeats = ROBINSON_MAX_REPEATS;
 	    scalefactor = compute_scale();
@@ -636,11 +667,13 @@ static void initialize_constants(void)
 		min_dev     = ROBINSON_MIN_DEV;
 	    if (fabs(robs) < EPS)
 		robs = ROBS;
+#ifndef DISABLE_GRAHAM_METHOD
 	    break;
 
 	default:
 	    abort();
     }
+#endif
 }
 
 rc_t bogofilter(double *xss) /*@globals errno@*/
@@ -649,7 +682,9 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
     rc_t	status;
     double 	spamicity;
     wordhash_t  *wordhash;
+#ifndef DISABLE_GRAHAM_METHOD
     bogostat_t	*bogostats;
+#endif
     int		wordcount, msgcount;
 
     good_list.active = spam_list.active = TRUE;
@@ -664,6 +699,7 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
     /* tokenize input text and save words in a wordhash. */
     wordhash = collect_words(&msgcount, &wordcount);
 
+#ifndef DISABLE_GRAHAM_METHOD
     switch(algorithm) {
 	case AL_GRAHAM:
 	    /* select the best spam/nonspam indicators. */
@@ -674,14 +710,16 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
 	    break;
 
 	case AL_ROBINSON:
+#endif
 	    /* computes the spamicity of the spam/nonspam indicators. */
 	    spamicity = compute_robinson_spamicity(wordhash);
+#ifndef DISABLE_GRAHAM_METHOD
 	    break;
 
 	default:
 	    abort();
     }
-
+#endif
     db_lock_release_list(word_lists);
 
     status = (spamicity > spam_cutoff) ? RC_SPAM : RC_NONSPAM;
@@ -690,8 +728,7 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
         *xss = spamicity;
 
     if (run_type == RUN_UPDATE)
-      register_words((status==RC_SPAM) ? REG_SPAM : REG_GOOD, wordhash,
-	      msgcount, wordcount);
+      register_words((status==RC_SPAM) ? REG_SPAM : REG_GOOD, wordhash, msgcount, wordcount);
 
     wordhash_free(wordhash);
 
