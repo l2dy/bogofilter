@@ -46,15 +46,6 @@ char msg_bogofilter[1024];
 
 const char *progname = "bogofilter";
 char *system_config_file = "/etc/bogofilter.cf";
-char *user_config_file   = ".bogofilter.cf";
-
-char *spam_header_name = SPAM_HEADER_NAME;
-
-run_t run_type = RUN_NORMAL; 
-
-int thresh_index = 0;
-double thresh_stats = 0.0f;
-double thresh_rtable = 0.0f;
 
 /* if the given environment variable 'var' exists, copy it to 'dest' and
    tack on the optional 'subdir' value.

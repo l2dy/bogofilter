@@ -25,6 +25,7 @@ AUTHOR:
 #include "find_home.h"
 #include "globals.h"
 #include "bogoconfig.h"
+#include "bogofilter.h"
 
 #ifndef	DEBUG_CONFIG
 #define DEBUG_CONFIG(level)	(verbose > level)
@@ -34,6 +35,27 @@ AUTHOR:
 
 /* NOTE: MAXBUFFLEN _MUST_ _NOT_ BE LARGER THAN INT_MAX! */
 #define	MAXBUFFLEN	((int)200)
+
+/*---------------------------------------------------------------------------*/
+
+/* Global variables */
+
+int logflag;
+
+int verbose, passthrough, force, nonspam_exits_zero;
+
+char directory[PATH_LEN+73];
+const char *user_config_file   = "~/.bogofilter.cf";
+const char *spam_header_name = SPAM_HEADER_NAME;
+const char *stats_prefix;
+
+run_t run_type = RUN_NORMAL; 
+
+int thresh_index = 0;
+double thresh_stats = 0.0f;
+double thresh_rtable = 0.0f;
+
+/*---------------------------------------------------------------------------*/
 
 typedef enum {
 	CP_INTEGER,

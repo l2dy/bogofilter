@@ -31,14 +31,6 @@ AUTHOR:
 int verbose = 0;
 int logflag = 0;
 
-int thresh_index = 1;
-double thresh_stats = 0.2f;		// EVEN_ODDS
-double thresh_rtable=0.3f;
-char *spam_header_name = "X-Bogosity";
-char *user_config_file   = ".bogofilter.cf";
-
-run_t run_type = RUN_NORMAL; 
-
 int main( int argc, char **argv)
 {
     while (--argc > 0)
