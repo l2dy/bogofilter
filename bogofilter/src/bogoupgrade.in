@@ -31,7 +31,7 @@ David Relson <relson@osagesoftware.com>
 # BerkeleyDB with single wordlist
 #	wordlist.db
 
-require 5.006_000;
+require 5.005_03;
 use strict;
 
 sub convert_double_to_single();
@@ -76,7 +76,7 @@ if ( $dir ) {
 
     my $msg_count_token = '.MSG_COUNT';
 
-    open(F, "<", $in) or die "Cannot open input file [$in]. $!.\n";
+    open(F, "< $in") or die "Cannot open input file [$in]. $!.\n";
     my $sig = <F>;
     chomp($sig);
     if ($sig =~ m/^\# bogofilter wordlist \(format version A\):\s(\d+)$/){ 
