@@ -88,9 +88,6 @@ static void mime_disposition(word_t * text);
 static void mime_encoding(word_t * text);
 static void mime_type(word_t * text);
 
-static const byte *skipws(const byte * t, const byte * e);
-static byte *getword(const byte * t, const byte * e);
-
 static void mime_push(mime_t * parent);
 static void mime_pop(void);
 
@@ -369,12 +366,14 @@ bool got_mime_boundary(word_t * boundary)
     return true;
 }
 
-/** Skip leading whitespace from t. \return pointer to first non-whitespace character, or NULL if the string is all whitespace or empty */
+/** Skip leading whitespace from t.
+ * \return - pointer to first non-whitespace character,
+ *         - NULL if the string is all whitespace or empty */
 static const byte *skipws(
 	const byte * t, /**< string to find non-whitespace in */
 	const byte * e  /**< pointer to the byte after the last byte in \a t */)
 {
-    while (t < e && isspace(*t))
+    while (t < e && (*t == ' ' || *t == '\t'))
 	t++;
     if (t < e)
 	return t;
@@ -403,7 +402,7 @@ static byte *getword(
 	t++;
     }
     ts = t;
-    while ((t < e) && (quote ? *t != '"' : !isspace(*t))) {
+    while ((t < e) && (quote ? *t != '"' : (*t != ' ' && *t != '\t'))) {
 	t++;
     }
     l = t - ts;
