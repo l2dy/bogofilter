@@ -210,8 +210,6 @@ static void process_args_1(int argc, char **argv)
 	    break;
 
 	case 'X':
-	    /* 'C' - parse "&#61;" as char  */
-	    /* 'T' - parse "&#61;" as token */
 	    /* 'L' - enable lexer_v3 debug output  */
 	    set_bogotest( optarg );
 	    break;
