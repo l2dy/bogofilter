@@ -41,7 +41,11 @@ const char *progname = PROGNAME;
 
 static int dump_count = 0;
 
-bool onlyprint = false;
+#undef	ROBX
+typedef enum { NONE, DUMP, LOAD, WORD, MAINTAIN, ROBX } cmd_t;
+cmd_t flag = NONE;
+bool  maintain = false;
+bool  onlyprint = false;
 
 /* Function Prototypes */
 
@@ -60,9 +64,10 @@ int ds_dump_hook(word_t *key, dsv_t *data,
 
     dump_count += 1;
 
-    if ((!keep_count(data->goodcount) && !keep_count(data->spamcount)) ||
-	!keep_date(data->date) ||
-	!keep_size(key->leng))
+    if (maintain &&
+	((!keep_count(data->goodcount) && !keep_count(data->spamcount)) ||
+	 !keep_date(data->date) ||
+	 !keep_size(key->leng)))
 	return 0;
 
     if (replace_nonascii_characters)
@@ -254,9 +259,10 @@ static int load_file(const char *ds_file)
 
 	if (replace_nonascii_characters)
 	    do_replace_nonascii_characters(buf, len);
-	if ((!keep_count(goodcount) && !keep_count(spamcount)) ||
-	    !keep_date(date) || 
-	    !keep_size(strlen((const char *)buf)))
+	if (maintain &&
+	    ((!keep_count(goodcount) && !keep_count(spamcount)) ||
+	     !keep_date(date) || 
+	     !keep_size(strlen((const char *)buf))))
 	    continue;
 
 	load_count += 1;
@@ -554,12 +560,8 @@ static void help(void)
 	    PROGNAME, version);
 }
 
-#undef	ROBX
-
-typedef enum { NONE, DUMP, LOAD, WORD, MAINTAIN, ROBX } cmd_t;
 char *ds_file = NULL;
 bool  prob = false;
-cmd_t flag = NONE;
 
 #define	OPTIONS	":a:c:d:DhI:k:l:m:np:r:R:s:vVw:Wx:y:"
 
@@ -642,33 +644,39 @@ static int process_args(int argc, char **argv)
 	    break;
 
 	case 'a':
+	    maintain = true;
 	    thresh_date = string_to_date((char *)optarg);
 	    break;
 
 	case 'c':
+	    maintain = true;
 	    thresh_count = atol((char *)optarg);
 	    break;
 
 	case 's':
-	    {
-		unsigned long mi, ma;
+	{
+	    unsigned long mi, ma;
 
-		if (2 == sscanf((const char *)optarg, "%lu,%lu", &mi, &ma)) {
-		    size_min = mi;
-		    size_max = ma;
-		} else {
-		    fprintf(stderr, "syntax error in argument \"%s\" of -s\n.",
-			    optarg);
-		    exit(EX_ERROR);
-		}
+	    maintain = true;
+	    
+	    if (2 == sscanf((const char *)optarg, "%lu,%lu", &mi, &ma)) {
+		size_min = mi;
+		size_max = ma;
+	    } else {
+		fprintf(stderr, "syntax error in argument \"%s\" of -s\n.",
+			optarg);
+		exit(EX_ERROR);
 	    }
-	    break;
+	}
+	break;
 
 	case 'n':
+	    maintain = true;
 	    replace_nonascii_characters ^= true;
 	    break;
 
 	case 'y':		/* date as YYYYMMDD */
+	    maintain = true;
 	    today = string_to_date((char *)optarg);
 	    break;
 
@@ -727,6 +735,7 @@ int main(int argc, char *argv[])
 	case LOAD:
 	    return load_file(ds_file);
 	case MAINTAIN:
+	    maintain = true;
 	    return maintain_wordlist_file(ds_file);
 	case WORD:
 	    argc -= optind;

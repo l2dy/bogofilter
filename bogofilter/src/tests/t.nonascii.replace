@@ -20,9 +20,9 @@ echo  	41 A4 BA B5 B5 20 31     20  30 20  32 30 30 33 30 33 30 33 0A \
 WORDLIST="${TMPDIR}/wordlist.${DB_EXT}"
 
 $BOGOUTIL -l ${WORDLIST} < ${TMPDIR}/input
-$BOGOUTIL -d ${WORDLIST} > ${TMPDIR}/output.1
+$BOGOUTIL -d ${WORDLIST} | grep -v MSG_COUNT > ${TMPDIR}/output.1
 $BOGOUTIL -n -m ${WORDLIST}
-$BOGOUTIL -d ${WORDLIST} > ${TMPDIR}/output.2
+$BOGOUTIL -d ${WORDLIST} | grep -v MSG_COUNT > ${TMPDIR}/output.2
 
 LEN1=`wc -l ${TMPDIR}/output.1 | $AWK '{print $1}'`
 LEN2=`wc -l ${TMPDIR}/output.2 | $AWK '{print $1}'`
