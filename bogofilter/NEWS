@@ -5,6 +5,18 @@
 NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+	2004-07-07
+
+	* Formatting character changes:
+	  '%A' is now the message's IP address.
+	  '%I' is now the message's ID.
+
+	* bogofilter-faq.html - corrected editting error that deleted
+	  "asian spam" question and added answer to "multi-user"
+	  question.
+
+	2004-07-01
+
 	* Remove obsolete '-f' from t.valgrind, too.
 
 0.92.1	2004-07-01

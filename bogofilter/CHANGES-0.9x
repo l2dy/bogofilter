@@ -2,6 +2,16 @@
 				BOGOFILTER NEWS
 			       =================
 
+	2004-07-07
+
+	* bogofilter-faq.html - corrected editting error that deleted
+	  "asian spam" question and added answer to "multi-user"
+	  question.
+
+	2004-07-01
+
+	* Remove obsolete '-f' from t.valgrind, too.
+
 0.92.1	2004-07-01
 
 	* Remove 'g', 'r', and 'f' from bogofilter's OPTIONS list as
