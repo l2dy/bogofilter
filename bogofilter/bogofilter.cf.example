@@ -89,12 +89,14 @@
 #
 #	    e - spamicity as 'e' format
 #	    f - spamicity as 'f' format
-#	    d - if spamicity < 0.001, difference from 0.1 (as 'f' format)
-#		if spamicity > 0.999, difference from 1.0 (as 'f' format)
+#	    d - if ham, difference from 0.0 (as 'f' format)
+#		if spam, difference from 1.0 (as 'f' format)
 #
 #	    l - logging tag (from '-l' option)
 #
 #	    o - spam_cutoff, ex. cutoff=%c
+#
+#	    p - spamicity as a probability
 #
 #	    r - runtype
 #	        w - word count
@@ -115,10 +117,10 @@
 #
 #    below are the current values of the options:
 #
-## header_format = %h: %c, tests=bogofilter, spamicity=%p, version=%v
-## terse_format = %1.1c %f
-## log_header_format = %h: %c, spamicity=%p, version=%v
-## log_update_format = register-%r, %w words, %m messages
+#header_format = %h: %c, tests=bogofilter, spamicity=%p, version=%v
+#terse_format = %1.1c %f
+#log_header_format = %h: %c, spamicity=%p, version=%v
+#log_update_format = register-%r, %w words, %m messages
 
 
 ##### TERSE
