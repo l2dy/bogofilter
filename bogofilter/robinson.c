@@ -225,16 +225,14 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
         }
     }
 
-    /* Robinson's P, Q and S */
-    /* S = (P - Q) / (P + Q)                        [combined indicator]
-     */
+    /* Robinson's P, Q and S
+    ** S = (P - Q) / (P + Q)                        [combined indicator]
+    */
 
-    if (robn) {
-	spamicity = ((rf_method_t *) method)->get_spamicity( robn, P, Q );
-	if (Rtable || verbose)
-	    rstats_fini(robn, P, Q, spamicity );
-    } else
-	spamicity = robx;
+    spamicity = ((rf_method_t *) method)->get_spamicity( robn, P, Q );
+
+    if (robn && (Rtable || verbose))
+	rstats_fini(robn, P, Q, spamicity );
 
     return (spamicity);
 }
