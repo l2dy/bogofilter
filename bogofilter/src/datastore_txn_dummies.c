@@ -37,9 +37,9 @@ bool	  db_txn_durable = true;	/* not DB_TXN_NOT_DURABLE */
 
 dsm_t dsm_transactional = {
     /* public -- used in datastore.c */
-    NULL,
-    NULL,
-    NULL,
+    &db_txn_begin,
+    &db_txn_abort,
+    &db_txn_commit,
 
     /* private -- used in datastore_db_*.c */
     NULL,
@@ -56,7 +56,8 @@ dsm_t dsm_transactional = {
     NULL
 };
 
-#if	!defined(DISABLE_TRANSACTIONS) && !defined(ENABLE_TRANSACTIONS)
+#ifndef ENABLE_SQLITE_DATASTORE
+#if !defined(DISABLE_TRANSACTIONS) && !defined(ENABLE_TRANSACTIONS)
 void *dbe_init(bfdir *d, bffile *f) {
     (void)d;
     (void)f;
@@ -64,10 +65,17 @@ void *dbe_init(bfdir *d, bffile *f) {
 }
 #endif
 
-#ifndef ENABLE_SQLITE_DATASTORE
 int db_txn_begin(void *vhandle) { (void)vhandle; return 0; }
 int db_txn_abort(void *vhandle) { (void)vhandle; return 0; }
 int db_txn_commit(void *vhandle) { (void)vhandle; return 0; }
+#else
+extern void *dsm;
+void *dbe_init(bfdir *d, bffile *f) {
+    dsm = &dsm_transactional;
+    (void)d;
+    (void)f;
+    return (void *)~0;
+}
 #endif
 
 ex_t dbe_recover(bfdir *directory, bool catastrophic, bool force)

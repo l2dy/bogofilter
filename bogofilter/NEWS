@@ -22,6 +22,9 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	* Fix SQLite3 regression in 0.94.0 that broke consistency guarantees
+	  and caused a _massive_ slowdown.
+
 	* Add 'bogoutil --db-print-pagesize', to query the database size,
 	  useful to replace running awk on 'db_stat -d database.db' output.
 
