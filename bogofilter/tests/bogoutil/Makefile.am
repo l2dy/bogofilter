@@ -1,6 +1,6 @@
 # $Id$
 
-TESTSCRIPTS=driver.sh
+TESTSCRIPTS = driver.sh t.dump.load
 TESTS=$(TESTSCRIPTS)
 
 EXTRA_DIST=$(TESTSCRIPTS) input-1.txt input-2-data.txt \

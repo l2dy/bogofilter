@@ -1,0 +1,91 @@
+#!/bin/sh
+
+TMPDIR=tmp
+
+[ -d ${TMPDIR} ] && rm -rf ${TMPDIR}
+mkdir ${TMPDIR}
+
+set -e
+
+verbose=0
+if [ "$1" = "-v" ]; then
+    verbose=1
+fi
+
+BOGOUTIL="../../bogoutil"
+
+BASE=`basename $0`
+OUT="${TMPDIR}/$BASE.out"
+DATA="${TMPDIR}/$BASE.db"
+SUM="$BASE.sum"
+
+LANG=
+unset LANG
+LC_ALL=
+unset LC_ALL
+LC_COLLATE=
+unset LC_COLLATE
+
+GREP="grep -v /tst.out"
+
+rm -f $DATA
+
+#load database
+$BOGOUTIL -l $DATA -y 100 < $BASE.inp
+
+#dump database (no restrictions, all dates should by 'yday')
+$BOGOUTIL -d $DATA -y 100 $sort > ${TMPDIR}/tst.out.1
+
+#update some words, including some old dates
+$BOGOUTIL -l $DATA -y 250 < $BASE.upd
+#dump database
+$BOGOUTIL -d $DATA $sort > ${TMPDIR}/tst.out.2
+
+#confirm that updated words have different counts and dates
+( diff -u ${TMPDIR}/tst.out.1 ${TMPDIR}/tst.out.2 ; echo "" ) | $GREP | tee ${TMPDIR}/diff.1.2 >> $OUT
+
+#dump wordlist, excluding oldest entries
+$BOGOUTIL -a 200 -y 275 -d $DATA $sort > ${TMPDIR}/tst.out.3
+
+#confirm exclusion of oldest entries
+( diff -u ${TMPDIR}/tst.out.2 ${TMPDIR}/tst.out.3 ; echo "" ) | $GREP | tee ${TMPDIR}/diff.2.3 >> $OUT
+
+#dump wordlist, excluding oldest, shortest, and longest entries
+$BOGOUTIL -y 275 -s4,30 -d $DATA $sort > ${TMPDIR}/tst.out.4
+
+#confirm exclusion of oldest, shortest(<, and longest entries
+( diff -u ${TMPDIR}/tst.out.3 ${TMPDIR}/tst.out.4 ; echo "" ) | $GREP | tee ${TMPDIR}/diff.3.4 >> $OUT
+
+rm -f $DATA
+
+#load wordlist, excluding shortest entries
+$BOGOUTIL -s5,30 -l $DATA < ${TMPDIR}/tst.out.4
+#dump using replace_non-ascii option
+$BOGOUTIL -a 175 -n -d $DATA $sort > ${TMPDIR}/tst.out.5
+
+#confirm effect of non-ascii option
+( diff -u ${TMPDIR}/tst.out.4 ${TMPDIR}/tst.out.5 ; echo "" ) | $GREP | tee ${TMPDIR}/diff.4.5 >> $OUT
+
+rm -f $DATA
+
+#load wordlist non-ascii list and dump to show value combining
+$BOGOUTIL -a 100 -l $DATA < ${TMPDIR}/tst.out.5
+$BOGOUTIL -a 100 -d $DATA $sort > ${TMPDIR}/tst.out.6
+
+#confirm token merging
+( diff -u ${TMPDIR}/tst.out.5 ${TMPDIR}/tst.out.6 ; echo "" ) | $GREP | tee ${TMPDIR}/diff.5.6 >> $OUT
+
+cd ${TMPDIR}
+wc ../$BASE.*p* tst.out.? > $SUM
+wc diff.?.? >> $SUM
+cd ..
+
+if  [ $verbose -eq 0 ]; then
+    cmp $SUM ${TMPDIR}/$SUM
+else
+    diff -u -s --brief $SUM ${TMPDIR}/$SUM
+fi
+
+if [ ! -z "$RUN_FROM_MAKE" ] ; then
+    rm -rf ${TMPDIR}
+fi
