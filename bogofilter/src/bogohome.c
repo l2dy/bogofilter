@@ -34,7 +34,7 @@ void set_bogohome(const char *path) {
 	xfree(bogohome);
 
     bogohome = xstrdup(path);
-    if (lstat(bogohome, &st) != 0 || !S_ISDIR(st.st_mode)) {
+    if (stat(bogohome, &st) != 0 || !S_ISDIR(st.st_mode)) {
 	if ((t = strrchr(bogohome, DIRSEP_C)))
 	    *t = '\0';
 	else
