@@ -1006,7 +1006,7 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
     uint rxc = rxval->cnt - 1;
     uint mdc = mdval->cnt - 1;
 
-    result_t *r;
+    result_t *r = NULL;					/* quench bogus compiler warning */
     uint q33 = sorted[r_count * 33 / 100].fn;		/* 33% quantile */
     uint med = sorted[r_count * 50 / 100].fn;		/* median false negative */
 

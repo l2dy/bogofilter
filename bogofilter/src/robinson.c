@@ -48,8 +48,8 @@ const parm_desc rob_parm_table[] =	/* needed by fisher.c */
 #ifdef	ENABLE_DEPRECATED_CODE
 static void	rob_initialize_constants(void);
 static double	rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
-#endif
 static void	rob_print_summary(void);
+#endif
 
 /* Static Variables */
 
