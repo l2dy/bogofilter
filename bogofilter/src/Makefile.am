@@ -106,7 +106,8 @@ version_sources= \
 	xstrlcpy.h xstrlcpy.c \
 	$(MEMDEBUG_SRC) \
 	xatox.h xatof.c xatoi.c \
-	datastore_db.h
+	datastore_db.h \
+	mysetvbuf.c mysetvbuf.h
 
 BUILT_SOURCES=	version.c
 
