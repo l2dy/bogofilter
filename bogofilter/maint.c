@@ -27,7 +27,7 @@ AUTHOR:
 #include "maint.h"
 
 YYYYMMDD today;			/* date as YYYYMMDD */
-int	 thresh_count = 0;
+uint32_t thresh_count = 0;
 YYYYMMDD thresh_date  = 0;
 size_t	 size_min = 0;
 size_t	 size_max = 0;
@@ -68,7 +68,7 @@ YYYYMMDD string_to_date(const char *s)
 }
 
 /* Keep high counts */
-bool keep_count(int count)
+bool keep_count(uint32_t count)
 {
     if (thresh_count == 0)
 	return true;
@@ -80,7 +80,7 @@ bool keep_count(int count)
 }
 
 /* Keep recent dates */
-bool keep_date(int date)
+bool keep_date(YYYYMMDD date)
 {
     if (thresh_date == 0 || date == 0 || date == today)
 	return true;
