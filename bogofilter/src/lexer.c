@@ -294,7 +294,7 @@ int yyinput(byte *buf, size_t used, size_t size)
   }
 
 //EK decoding things like &#1084 and charset_table;
-#ifdef	CH66
+#ifdef	CP866
     count = htmlUNICODE_decode(buf, count);
 #else
     for (i = 0; i < count; i++ )
