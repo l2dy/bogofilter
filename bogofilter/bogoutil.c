@@ -481,7 +481,7 @@ static int compute_robinson_x(char *path)
     if (e < 0) goto overflow;
 
     dbh_good = db_open(db_good_file, "good", DB_READ, directory);
-    dbh_spam = db_open(db_spam_file, "spam", DB_READ, directory);
+    dbh_spam = db_open(db_spam_file, "spam", DB_WRITE, directory);
 
     db_lock_reader(dbh_good);
     db_lock_writer(dbh_spam);
