@@ -67,6 +67,7 @@ static word_t *yy_text(void)
 
 %}
 
+%option debug nodebug
 %option align nounput noyywrap noreject 8bit caseless
 %option prefix="lexer_v3_"
 
@@ -144,9 +145,16 @@ T1		{TOKENFRONT}
 						  }
 						  return(EMPTY);
 						}
-\n						{ got_newline(); }
+\n						{ got_newline(); 
+						}
 
 %%
+
+void lexer_v3_init(FILE *fp)
+{
+    BEGIN(INITIAL);
+    yyrestart(fp);
+}
 
 /*
  * The following sets edit modes for GNU EMACS

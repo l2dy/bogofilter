@@ -29,6 +29,7 @@ bool	passthrough;			/* '-p' */
 bool	quiet;				/* '-q' */
 bool	terse;				/* '-t' */
 int	verbose;			/* '-v' */
+int	bulk_mode = B_NORMAL;		/* '-b, -B' */
 
 FILE	*fpin = NULL;			/* '-I' */
 int	Rtable = 0;			/* '-R' */

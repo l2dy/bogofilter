@@ -72,21 +72,80 @@ static void cleanup_exit(int exitcode, int killfiles) {
     exit(exitcode);
 }
 
-int classify(FILE *out);
+int classify(int argc, char **argv, FILE *out);
+void initialize(FILE *fp);
 
-int classify(FILE *out)
+void initialize(FILE *fp)
 {
-    int   exitcode;
+    init_charset_table(charset_default, true);
+    mime_reset();
+    token_init();
+    if (fp)
+	lexer_v3_init(fp);
+}
+
+int classify(int argc, char **argv, FILE *out)
+{
+    int  exitcode = 0;
+    bool done = false;
+    bool error = false;
     double spamicity;
     rc_t   status;
+    char *filename;
+    char buff[PATH_LEN+1];
 
-    status = bogofilter(&spamicity);
-    write_message(out, status);
+    while (!done) {
+	switch (bulk_mode) {
+	case B_NORMAL:
+	    break;
+	case B_STDIN:	/* streaming (stdin) mode */
+	{
+	    size_t len;
+	    filename = buff;
+	    if (fgets(buff, sizeof(buff), stdin) == 0) {
+		done = true;
+		continue;
+	    }
+	    len = strlen(filename);
+	    if (len > 0 && filename[len-1] == '\n')
+		filename[len-1] = '\0';
+	    break;
+	}
+	default:		/* command line mode */
+	    if (bulk_mode < argc && !error) {
+		filename = argv[bulk_mode++];
+	    }
+	    else {
+		done = true;
+		continue;
+	    }
+	    break;
+	}
+	if (bulk_mode != B_NORMAL) {
+	    if (fpin)
+		fclose(fpin);
+	    fpin = fopen( filename, "r" );
+	    if (fpin == NULL) {
+		error = true;
+		fprintf(stderr, "Can't read file '%s'\n", filename);
+		continue;
+	    }
+	    fprintf(out, "%s ", filename ); 
+	}
 
-    exitcode = (status == RC_SPAM) ? 0 : 1;
-    if (nonspam_exits_zero && passthrough && exitcode == 1)
-	exitcode = 0;
-
+	initialize(fpin);
+	status = bogofilter(&spamicity);
+	write_message(out, status);
+	if (bulk_mode == B_NORMAL) {
+	    exitcode = (status == RC_SPAM) ? 0 : 1;
+	    if (nonspam_exits_zero && passthrough && exitcode == 1)
+		exitcode = 0;
+	    done = true;
+	}
+	else {
+	    exitcode = !error ? 0 : 1;
+	}
+    }
     return exitcode;
 }
 
@@ -97,20 +156,17 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     process_args_and_config_file(argc, argv, true);
 
-    /* initialize */
-    init_charset_table(charset_default, true);
-
     /* open all wordlists */
     open_wordlists((run_type == RUN_NORMAL) ? DB_READ : DB_WRITE);
 
-    mime_reset();
-
     out = output_setup();
+
+    initialize(NULL);
 
     passthrough_setup();
 
     if (run_type & (RUN_NORMAL | RUN_UPDATE)) {
-	exitcode = classify(out);
+	exitcode = classify(argc, argv, out);
     }
     else {
 	register_messages(run_type);

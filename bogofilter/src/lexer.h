@@ -41,11 +41,13 @@ extern bool is_from(word_t *w);
 extern token_t	lexer_v3_lex(void);
 extern int	lexer_v3_leng;
 extern char   * lexer_v3_text;
+extern void	lexer_v3_init(FILE *fp);
 
 /* in lexer.c */
-extern int yyinput(byte *buf, size_t size);
-extern int yyredo(word_t *text, char del);
+extern void	yyinit(void);
+extern int	yyinput(byte *buf, size_t size);
+extern int	yyredo(word_t *text, char del);
 
-extern int buff_fill(buff_t *buff, size_t used, size_t need);
+extern int	buff_fill(buff_t *buff, size_t used, size_t need);
 
 #endif	/* LEXER_H */

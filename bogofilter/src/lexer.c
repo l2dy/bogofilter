@@ -258,6 +258,12 @@ int buff_fill(buff_t *buff, size_t used, size_t need)
     return cnt;
 }
 
+void yyinit(void)
+{
+    yylineno = 0;
+    msg_header = true;
+}
+
 int yyinput(byte *buf, size_t max_size)
 /* input getter for the scanner */
 {

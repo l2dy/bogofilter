@@ -32,8 +32,6 @@
 #define PATH_LEN 1024
 #endif
 
-#include "globals.h"
-
 /* Default build includes Graham, Robinson, and Robinson-Fisher methods */
 
 #if	defined(ENABLE_ROBINSON_METHOD) || defined(ENABLE_ROBINSON_FISHER)
@@ -81,6 +79,14 @@ typedef enum priority_e {
     PR_ENV_BOGO,	/* 5 */
     PR_COMMAND		/* 6 */
 } priority_t;
+
+typedef enum bulk_e {
+    B_NORMAL,
+    B_CMDLINE,
+    B_STDIN
+} bulk_t;
+
+#include "globals.h"
 
 extern int build_path(char* dest, size_t size, const char* dir, const char* file);
 

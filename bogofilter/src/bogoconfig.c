@@ -330,6 +330,9 @@ static void help(void)
 		  "\t-q\t- quiet - don't print warning messages.\n"
 		  "\t-l\t- write messages to syslog.\n");
     (void)fprintf(stderr,
+		  "\t-b\t- set streaming bulk mode. Classify multiple messages whose filenames are read from STDIN.\n"
+		  "\t-B name1 name2 ...\t- set bulk mode. Classify multiple messages named as files on the command line.\n");
+    (void)fprintf(stderr,
 		  "\t-L tag\t- specify the tag value for log messages.\n"
 		  "\t-F\t- force printing of spamicity numbers.\n"
 		  "\t-x list\t- set debug flags.\n"
@@ -404,7 +407,7 @@ void process_args(int argc, char **argv, int pass)
 #if HAVE_DECL_OPTRESET
     optreset = 1;
 #endif
-    while ((option = getopt(argc, argv, ":23d:eFhlL:m:o:snSNvVpuc:CgrRfqtI:O:y:x:DT" G R F)) != -1)
+    while ((option = getopt(argc, argv, ":23d:eFhlL:m:o:snSNvVpuc:CgrRfqtI:O:y:x:BbDT" G R F)) != -1)
     {
 #if 0
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
@@ -566,6 +569,15 @@ void process_args(int argc, char **argv, int pass)
 	    today = string_to_date((char *)optarg);
 	    break;
 
+	case 'B':
+	    bulk_mode = B_CMDLINE;
+	    break;
+
+	case 'b':
+	    bulk_mode = B_STDIN;
+	    fpin = NULL;	/* Ensure that input file isn't stdin */
+	    break;
+
 	case 'D':
 	    dbgout = stdout;
 	    break;
@@ -592,10 +604,13 @@ void process_args(int argc, char **argv, int pass)
     if (exitcode) 
 	exit (exitcode);
 
-    if (optind < argc) {
+    if (bulk_mode == B_NORMAL && optind < argc) {
 	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
 	exit(2);
     }
+
+    if (bulk_mode == B_CMDLINE)
+ 	bulk_mode = optind;	/* save index of first filename */
 
     return;
 }

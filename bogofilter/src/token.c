@@ -196,6 +196,7 @@ token_t get_token(void)
 void token_init(void)
 {
     msg_header = true;
+    yyinit();
     mime_reset(); 
     reset_html_level();
 }
