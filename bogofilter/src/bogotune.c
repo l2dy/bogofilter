@@ -586,7 +586,7 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 	    wordprop_t *msg_count = wordhash_insert(whc, w_msg_count, sizeof(wordprop_t), NULL);
 	    if (msg_count->cnts.good == 0 || msg_count->cnts.bad == 0)
 		load_wordlist(load_hook, train);
-	    if (msg_count->cnts.good == 0 && msg_count->cnts.bad == 0) {
+	    if (msgs_good == 0 && msgs_bad == 0) {
 		fprintf(stderr, "Can't find '.MSG_COUNT'.\n");
 		exit(EX_ERROR);
 	    }

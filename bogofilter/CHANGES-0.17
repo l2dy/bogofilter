@@ -10,6 +10,10 @@ Note:
  
 0.17.4	2004-03-??
 
+	2004-03-19
+
+	* Fix "Can't find '.MSG_COUNT'" problem in bogotune.
+
 	2004-03-18
 
 	* Fix message reporting lack of config file.
