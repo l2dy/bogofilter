@@ -2,11 +2,13 @@
 
 e=".mc"
 
-printf "       "
-for file in r?.ns; do
-    printf "%5s  " `echo $file | sed s@.ns@@`
-done
-printf "\n"
+if [ "$1" = "-h" ] ; then
+    printf "       "
+    for file in r?.ns; do
+	printf "%5s  " `echo $file | sed s@.ns@@`
+    done
+    printf "\n"
+fi
 
 for type in sp ns; do
     printf "%5s  " $type$e

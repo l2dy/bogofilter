@@ -6,9 +6,9 @@
 
 # range of values for testing
 
-svals="1 3.2e-1 1e-1 3.2e-2 1e-2 3.2e-3 1e-3"
+svals="1 3.2e-1 1e-1 3.2e-2 1e-2"
 mvals=`seq 0.025 0.025 0.47501`		# wide value range 
-mvals=`seq 0.420 0.020 0.46001`		# high value range
+#mvals=`seq 0.420 0.020 0.46001` 	# high value range
 
 # approx 0.1%-0.3% of nonspam corpus size for selecting spam_cutoff value
 
@@ -112,8 +112,8 @@ function doit () {
 	$date $s $md  $fpos $co $fneg1 $fneg2 $fneg3 $fneg >> $RESULTS
 }
 
-./sizes | tee $RESULTS
-./sizes | grep mc > $PARM_TBL
+./sizes    > $PARM_TBL
+./sizes -h | tee $RESULTS
 
 for s in $svals; do
   echo robs=$s >> $CFG
