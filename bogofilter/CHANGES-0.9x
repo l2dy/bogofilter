@@ -5,6 +5,10 @@
 
 0.92.8	2004-10-??
 
+	2004-10-15
+
+	* Limit bogotune's scanning to rx values between 0.4 and 0.6.
+
 	2004-10-13
 
 	* Ignore 'X-Bogosity' lines in mime attachments.
@@ -15,7 +19,13 @@
 
 	2004-10-10
 
-	* Make portability changes for OS/2 compability.
+	* OS/2 compatibility fixes for configure, bogofilter, and
+          bogoutil (thanks to Yuri Dario).
+
+	2004-10-09
+
+	* Fix a potential crash on malformatted input (writing a NUL byte to
+	  the wrong place) in the RFC-2047 decoder. Reported by Clint Adams.
 
 0.92.7	2004-10-02
 

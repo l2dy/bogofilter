@@ -7,6 +7,10 @@ is in the RELEASE.NOTES files.  Read them!!
 
 0.92.8	2004-10-??
 
+	2004-10-15
+
+	* Limit bogotune's scanning to rx values between 0.4 and 0.6.
+
 	2004-10-13
 
 	* Ignore 'X-Bogosity' lines in mime attachments.
