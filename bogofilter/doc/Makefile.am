@@ -27,6 +27,8 @@ EXTRA_DIST = bogofilter.1in bogoutil.1in bogoupgrade.1in \
 	     integrating-with-qmail \
 	     programmer/README.freebsd programmer/README.hp-ux \
 	     programmer/README.dcdflib \
+	     programmer/README.RISC-OS \
+	     programmer/RISC-OS/config.h programmer/RISC-OS/Makefile \
 	     README.tdb
 
 #	     bogofilter.cf.example 
