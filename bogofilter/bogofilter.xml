@@ -190,8 +190,8 @@ intervening From_ lines will be counted as one message.</para>
 
 <refsect1 id='author'><title>AUTHOR</title>
 <para>Eric S. Raymond <email>esr@thyrsus.com</email>.
-For updates, see <ulink url="http://www.tuxedo.org/~esr/bogofilter/">
-the bogofilter project page</ulink>.</para>
+For updates, see <ulink url="http://bogofilter.sourceforge.net/">
+the bogofilter project page</ulink>. </para>
 </refsect1>
 </refentry>
 

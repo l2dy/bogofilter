@@ -79,10 +79,10 @@ install_sh = @install_sh@
 
 # $Id$ 
 # $Log$
-# Revision 1.5  2002/09/17 01:30:21  adrian_otto
-# Improved configure script for locking functions, and improved the error
-# messag when the configure script can't find a suitable BerkeleyDB version
-# installed.
+# Revision 1.6  2002/09/17 01:47:51  adrian_otto
+# Fixed the Makefile configuration so that it knows how to build the man
+# page properly. Updated the man page to reflect the Sourceforge web site,
+# which contains references to ESR's site.
 #
 # Revision 1.4  2002/09/17 01:20:24  adrian_otto
 # Modified Makefile configuration so that lexer_l.c gets deleted when the
@@ -483,6 +483,9 @@ lexertest: lexer_l.c
 #
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core lexer_l.c
+#
+bogofilter.1: bogofilter.xml
+	xmlto man bogofilter.xml
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
