@@ -1,4 +1,5 @@
 # $Id$
+
 Eric S. Raymond	(Initial Version)
 Adrian Otto	(portability code, file locking)
 Paul Tomblin	(bug fixes)
@@ -7,3 +8,4 @@ Matthias Andree	(bug fixes, improvements, auto tools build environment)
 Gyepi Sam	(database abstraction, berkelydb support, wordhash, bogoupgrade, bogoutil, documentation, bug fixes)
 Allyn Fratkin	(bug fixes, bug database maintainer)
 Clint Adams	(bug fixes, portability, debian packaging)
+Greg Louis	(spamicity calculation methods)
