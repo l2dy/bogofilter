@@ -32,20 +32,26 @@
   <refsect1 id="description">
     <title>DESCRIPTION</title>
 
-    <para><application>Bogotune</application> determines optimum
-    parameter settings for <application>bogofilter</application>.  To
-    run it requires a set of spam messages and a set of non-spam
-    messages.  It can be run using the production wordlist or, with
-    large message sets it is able to build a wordlist using half of the
-    messages.  The training database should have been built from at
-    least 1,000 spam and 1,000 nonspam messages, and the ratio of spam
-    to nonspam should be in the range 0.2 to 5. There should be at
-    least 1,000 spam messages and 1,000 nonspam in the message
-    files. Message files may be in mbox, maildir, or MH folder or any
-    combination.  Msg-count files can also be used, but not mixed with
-    other formats.</para>
+    <para><application>Bogotune</application> tries to find optimum
+    parameter settings for <application>bogofilter</application>.  It
+    needs at least one set each of spam and non-spam messages.  The
+    production wordlist is normally used, but it can be directed to
+    read a different wordlist, or to build its own from half the
+    supplied messages.</para> 
 
-  </refsect1>
+    <para>In order to produce useful results,
+    <application>bogotune</application> has minimum message count
+    requirements.  The wordlist it uses must have at least 2,000 spam
+    and 2,000 non-spam in it and the message files must contain at
+    least 500 spam and 500 non-spam messages.  Also, the ratio of spam
+    to non-spam should be in the range 0.2 to 5.  If you direct
+    <application>bogotune</application> to build its own wordlist, it
+    will use the half the input or 2000 messages (whichever is larger)
+    for the wordlist.</para>
+
+    <para>Message files may be in mbox, maildir, or MH folder or any
+    combination.  Msg-count files can also be used, but not mixed with
+    other formats.</para> </refsect1>
 
   <refsect1 id="options">
     <title>OPTIONS</title>
@@ -68,7 +74,12 @@
 
     <para>The <option>-D</option> option tells
     <application>bogotune</application> to build a wordlist in memory
-    from half the input messages.</para>
+    from the input messages.  To meet the minimum requirements of 2000
+    messages in the wordlist and 500 messages for testing, when
+    <option>-D</option> is used, there must be 2500 non-spam and 2500
+    spam in the input files.  If there are enough messages (more than
+    4000), they will be split evenly between wordlist and testing.
+    Otherwise, they will be split proportionately.</para>
 
     <para>The <option>-n</option> option tells
     <application>bogotune</application> that the following arguments
