@@ -8,16 +8,17 @@ about retraining and the '-H' flag...
 0.15.10	2003-12-08
 
 * Multiple fixes, revisions, and changes to bogotune.
+* Added -M option to bogotune for creating message count files.
 * Fixed bug in header degeneration.
 * Added degeneration options to config file.
 * Added subject line tagging for Unsures.
-* Script msg-count.sh has been added to create message count files
-  from mailboxes and mail directories.
+* Formatting and portability fixes for DGUX.
 * Fixed "configure --enable-static" for building statically linked
   executables.
-* The test suite no longer depends on procmail for t.MH and t.maildir.
 * The test suite now uses static executables when "configure
   --enable-static" has been used.
+* The test suite no longer depends on procmail for t.MH and t.maildir
+  or formail for t.bulkmode.
 * Moved robx calculation code to new file for sharing by bogoutil and
   bogotune.
 * Fix segfault when using '-H' (header_degen) option.

@@ -6,6 +6,12 @@ $Id$
 
 0.15.10	2003-12-08
 
+	* Formatting and portability fixes for DGUX.
+	* The test suite ("make check") now works without formail for
+	  t.bulkmode.
+	* Added -M option to bogotune for creating message count
+	  files.  msg-count.sh no longer needed.
+
 	2003-12-07
 
 	* Fixed "configure --enable-static" for building statically
