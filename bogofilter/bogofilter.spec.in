@@ -62,8 +62,10 @@ for d in contrib tuning ; do
   for f in $files ; do
     case $f in
       *.c|*.o|*.obj|*/Makefile*) continue ;;
+      *.1)
+	cp -p $f $RPM_BUILD_ROOT%{_mandir}/man1 ;;
       *)
-        cp -p $f $RPM_BUILD_ROOT%{_datadir}/%{name}/$d ;;
+	cp -p $f $RPM_BUILD_ROOT%{_datadir}/%{name}/$d ;;
     esac
   done
 done
