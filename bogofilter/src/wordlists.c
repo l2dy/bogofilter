@@ -216,12 +216,6 @@ bool close_wordlists(wordlist_t *list, bool commit /** if unset, abort */)
     return err;
 }
 
-char *build_wordlist_path(const char *path)
-{
-    char *result = build_path(path, WORDLIST);
-    return result;
-}
-
 #ifdef COMPILE_DEAD_CODE
 /* some sanity checking of lists is needed because we may
    allow users to specify lists eventually and there are

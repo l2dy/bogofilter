@@ -20,7 +20,6 @@ extern wordlist_t *word_lists;
 
 void incr_wordlist_mode(void);
 void set_wordlist_mode(const char *filepath);
-char *build_wordlist_path(const char *path);
 bool configure_wordlist(const char *val);
 
 void open_wordlists(wordlist_t *, dbmode_t);
