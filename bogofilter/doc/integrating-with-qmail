@@ -122,6 +122,10 @@ as well as to correct misclassification.
  
 - Done!
 
+NOTE:
+
+If bogofilter generates "out of memory" error messages, check the ulimits setting.
+
 TODO:
  
  A message that is delivered to a group alias will be filtered once, but may be corrected multiple
