@@ -113,10 +113,6 @@ strip contrib-static/bogogrep_static
 )
 %endif
 
-for README in randomtrain ; do
-  ln -s ../contrib/README.$README doc/README.$README
-done
-
 %post static
 for file in bogofilter bogolexer bogoutil bogotune ; do
     if [ $1 -lt 2 ] ; then
