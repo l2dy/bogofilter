@@ -1,6 +1,10 @@
 # $Id$
 
-TESTSCRIPTS = t.MH t.maildir t.robx t.split t.bogodir t.lexer.mbx t.parsing t.degen t.regtest t.valgrind t.systest t.grftest t.bulkmode
+TESTSCRIPTS = t.MH t.maildir t.robx t.split t.bogodir \
+	t.lexer.mbx t.parsing t.degen \
+	t.separate t.regtest t.bulkmode \
+	t.valgrind \
+	t.systest t.grftest
 
 TESTS=$(TESTSCRIPTS)
 
