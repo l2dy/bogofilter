@@ -113,6 +113,13 @@ enum e_verbosity {
     SCORE_DETAIL	/* verbosity level for printing scores	*/
 };
 
+typedef enum e_ds_loc {
+    DS_NONE	   = 0,	/* datastore locn not specified */
+    DS_ERR	   = 1,	/* error in datastore locn spec */
+    DS_DSK	   = 2,	/* datastore on disk */
+    DS_RAM	   = 4,	/* datastore in ram  */
+} ds_loc;
+
 #define	MOD(n,m)	((n) - (floor((n)/(m)))*(m))
 #define	ROUND(m,n)	floor((m)*(n)+.5)/(n)
 
@@ -127,6 +134,7 @@ enum e_verbosity {
 const char *progname = "bogotune";
 static char *ds_file;
 static char *ds_path;
+static ds_loc ds_flag = DS_NONE;
 
 static bool    bogolex = false;		/* true if convert input to msg-count format */
 static bool    esf_flag = true;		/* test ESF factors if true */
@@ -868,13 +876,10 @@ static int process_arglist(int argc, char **argv)
 		case 'd':
 		    argc -= 1;
 		    ds_file = *++argv;
+		    ds_flag = (ds_flag = DS_NONE) ? DS_DSK : DS_ERR;
 		    break;
 		case 'D':
-		    if (ds_file) {
-			fprintf(stderr, "Using both \"-d\" and \"-D\" options is not allowed.\n");
-			exit(EX_ERROR);
-		    }
-		    ds_file = NULL;
+		    ds_flag = (ds_flag = DS_NONE) ? DS_RAM : DS_ERR;
 		    break;
 		case 'E':
 		    esf_flag ^= true;
@@ -922,6 +927,11 @@ static int process_arglist(int argc, char **argv)
 	}
 	else
 	    filelist_add( (run_type == REG_GOOD) ? ham_files : spam_files, arg);
+    }
+
+    if (ds_flag == DS_ERR) {
+	fprintf(stderr, "Only one '-d dir' or '-D' option is allowed.\n");
+	exit(EX_ERROR);
     }
 
     if (!bogolex &&
