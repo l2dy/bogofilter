@@ -152,7 +152,7 @@ static int classify(int argc, char **argv, FILE *out)
 
 	if (bulk_mode == B_NORMAL && status != RC_MORE) {
 	    exitcode = (status == RC_SPAM) ? 0 : 1;
-	    if (nonspam_exits_zero && passthrough && exitcode == 1)
+	    if (nonspam_exits_zero && exitcode == 1)
 		exitcode = 0;
 	    done = true;
 	}
