@@ -282,7 +282,7 @@ token_t get_token(word_t **token)
 	    if (block_on_subnets)
 	    {
 		const byte *ptext = (wordlist_version >= IP_PREFIX) ? (const byte *)"ip:" : (const byte *)"url:";
-		word_t *prefix = word_new(ptext, 0);
+		word_t *prefix = word_news(ptext);
 		int q1, q2, q3, q4;
 		/*
 		 * Trick collected by ESR in real time during John
@@ -381,14 +381,14 @@ void token_init(void)
 
     if (w_to == NULL) {
 	/* word_new() used to avoid compiler complaints */
-	w_to   = word_new( "to:",   0);	/* To:          */
-	w_from = word_new( "from:", 0);	/* From:        */
-	w_rtrn = word_new( "rtrn:", 0);	/* Return-Path: */
-	w_subj = word_new( "subj:", 0);	/* Subject:     */
-	w_recv = word_new( "rcvd:", 0);	/* Received:    */
-	w_head = word_new( "head:", 0);	/* Header:      */
-	w_mime = word_new( "mime:", 0);	/* Mime:        */
-	nonblank_line = word_new(NONBLANK, 0);
+	w_to   = word_news("to:");	/* To:          */
+	w_from = word_news("from:");	/* From:        */
+	w_rtrn = word_news("rtrn:");	/* Return-Path: */
+	w_subj = word_news("subj:");	/* Subject:     */
+	w_recv = word_news("rcvd:");	/* Received:    */
+	w_head = word_news("head:");	/* Header:      */
+	w_mime = word_news("mime:");	/* Mime:        */
+	nonblank_line = word_news(NONBLANK);
     }
 
     return;

@@ -1286,7 +1286,7 @@ static void final_recommendations(bool skip)
 static void bogotune_init(void)
 {
     const char *msg_count = MSG_COUNT;
-    w_msg_count = word_new((const byte *)msg_count, strlen(msg_count));
+    w_msg_count = word_news(msg_count);
     ns_and_sp   = tunelist_new("tr");		/* training lists */
     ns_msglists = tunelist_new("ns");		/* non-spam scoring lists */
     sp_msglists = tunelist_new("sp");		/* spam     scoring lists */
