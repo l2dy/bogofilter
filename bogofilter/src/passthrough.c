@@ -275,13 +275,22 @@ void write_log_message(rc_t status)
 #ifdef HAVE_SYSLOG_H
     format_log_header(msg_bogofilter, sizeof(msg_bogofilter));
 
-    if (run_type == RUN_NORMAL ||
-	(run_type == RUN_UPDATE && status == RC_UNSURE))
+    switch (run_type) {
+    case RUN_NORMAL:
 	syslog(LOG_INFO, "%s\n", msg_bogofilter);
-    else if (run_type == RUN_UPDATE)
-	syslog(LOG_INFO, "%s, %s\n", msg_bogofilter, msg_register);
-    else
+	break;
+    case RUN_UPDATE:
+	if (status == RC_UNSURE || msg_register[0] == '\0')
+	    syslog(LOG_INFO, "%s\n", msg_bogofilter);
+	else {
+	    syslog(LOG_INFO, "%s, %s\n", msg_bogofilter, msg_register);
+	    msg_register[0] = '\0';
+	}
+	break;
+    default:
 	syslog(LOG_INFO, "%s", msg_register);
+	msg_register[0] = '\0';
+    }
 
     closelog();
 #endif
