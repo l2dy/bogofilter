@@ -20,7 +20,7 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 		GETTING.STARTED \
 		README.cvs \
 		RELEASE.NOTES \
-		CHANGES-0.9x RELEASE.NOTES-0.93
+		CHANGES-0.9x
 
 .PHONY:	check
 
