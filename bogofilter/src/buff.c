@@ -61,22 +61,6 @@ void buff_puts(const buff_t *self, size_t width, FILE *fp)
     word_puts(&word, width, fp);
 }
 
-buff_t *buff_shrink(buff_t *self, int offset)	/* shrink buffer */
-{
-    self->t.text += offset;
-    self->t.leng -= offset;
-    self->size -= offset;
-    return self;
-}
-
-buff_t *buff_expand(buff_t *self, int offset)	/* expand buffer */
-{
-    self->t.text -= offset;
-    self->t.leng += offset;
-    self->size += offset;
-    return self;
-}
-
 void buff_shift(buff_t *self, byte *start, size_t length)
 {
     /* Shift buffer contents to delete the specified segment. */
