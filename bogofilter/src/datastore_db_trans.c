@@ -42,16 +42,7 @@ static int lockfd = -1;	/* fd of lock file to prevent concurrent recovery */
 
 /** Default flags for DB_ENV->open() */
 static const u_int32_t dbenv_defflags = DB_INIT_MPOOL | DB_INIT_LOCK
-				      | DB_INIT_LOG | DB_INIT_TXN;
-
-u_int32_t db_max_locks = 16384;		/* set_lk_max_locks    32768 */
-u_int32_t db_max_objects = 16384;	/* set_lk_max_objects  32768 */
-
-bool	  db_log_autoremove = true;	/* DB_LOG_AUTOREMOVE */
-
-#ifdef	FUTURE_DB_OPTIONS
-bool	  db_txn_durable = true;	/* not DB_TXN_NOT_DURABLE */
-#endif
+					| DB_INIT_LOG | DB_INIT_TXN;
 
 /* public -- used in datastore.c */
 static int	   dbx_begin		(void *vhandle);
@@ -856,12 +847,6 @@ bool dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_f
     switch (option) {
 	case O_DB_TRANSACTION:
 	    fTransaction = get_bool(name, val);
-	    return true;
-
-	case O_DB_VERIFY:
-	    *flag = M_VERIFY;
-	    *count += 1;
-	    *ds_file = val;
 	    return true;
 
 	case O_DB_RECOVER:

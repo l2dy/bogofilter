@@ -38,11 +38,9 @@ David Relson <relson@osagesoftware.com>  2003
 
 YYYYMMDD today;			/* date as YYYYMMDD */
 
-dsm_t *dsm = NULL;
-
 /* OO function list */
 
-dsm_t dsm_dummies = {
+static dsm_t dsm_dummies = {
     /* public -- used in datastore.c */
     NULL,	/* dsm_begin           */
     NULL,	/* dsm_abort           */
@@ -399,6 +397,16 @@ ex_t ds_oper(void *env, const char *path, dbmode_t open_mode,
 static word_t  *msg_count_tok;
 static word_t  *wordlist_version_tok;
 
+void ds_minit(const char *directory, const char *filename)
+{
+    bfdir dir;
+    bffile file;
+
+    dir.dirname = directory;
+    file.filename = filename;
+    dsm_init(&dir, &file);
+}
+
 void *ds_init(const char *directory, const char *filename)
 {
     bfdir dir;
@@ -511,7 +519,7 @@ ex_t ds_remove(const char *directory) {
     else {
 	bfdir dir;
 	dir.dirname = directory;
-       	return dsm->dsm_remove(&dir);
+	return dsm->dsm_remove(&dir);
     }
 }
 

@@ -61,10 +61,25 @@ Matthias Andree <matthias.andree@gmx.de> 2003 - 2004
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-extern dsm_t *dsm;			/* in datastore.c */
-
 extern dsm_t dsm_traditional;		/* in datastore_db_trad.c */
 extern dsm_t dsm_transactional;		/* in datastore_db_trans.c */
+
+#ifndef ENABLE_TRANSACTIONS
+dsm_t *dsm = &dsm_traditional;
+#else
+dsm_t *dsm = &dsm_transactional;
+#endif
+
+/** Default flags for DB_ENV->open() */
+
+u_int32_t db_max_locks = 16384;		/* set_lk_max_locks    32768 */
+u_int32_t db_max_objects = 16384;	/* set_lk_max_objects  32768 */
+
+bool	  db_log_autoremove = false;	/* DB_LOG_AUTOREMOVE */
+
+#ifdef	FUTURE_DB_OPTIONS
+bool	  db_txn_durable = true;	/* not DB_TXN_NOT_DURABLE */
+#endif
 
 static const DBTYPE dbtype = DB_BTREE;
 
@@ -84,8 +99,6 @@ static const char *resolveopenflags(u_int32_t flags) {
     if (flags) strlcat(buf, b2, sizeof(buf));
     return buf;
 }
-
-static void dsm_init(bfdir *directory, bffile *file);
 
 /** wrapper for Berkeley DB's DB->open() method which has changed API and
  * semantics -- this should deal with 3.2, 3.3, 4.0, 4.1 and 4.2. */
@@ -184,8 +197,13 @@ int db_lock(int fd, int cmd, short int type)
     return (fcntl(fd, cmd, &lock));
 }
 
-static void dsm_init(bfdir *directory, bffile *file)
+void dsm_init(bfdir *directory, bffile *file)
 {
+    /* Note: we assume that the default dsm initializers above handle
+     * this properly, dsm_init is empty if transactions are disabled or
+     * forced. */
+#if !defined(ENABLE_TRANSACTIONS) && !defined(DISABLE_TRANSACTIONS)
+    /* we neither force nor forbid transactions, so add probe code */
     probe_txn_t txn;
 
     if (DEBUG_DATABASE(2))
@@ -204,19 +222,19 @@ static void dsm_init(bfdir *directory, bffile *file)
 	fTransaction = true;
 
     /* overrides for test suite etc. */
-#ifdef DISABLE_TRANSACTIONS
     if (getenv("BF_FORCE_NON_TRANSACTIONAL"))
 	fTransaction = false;
-#endif
-#ifdef ENABLE_TRANSACTIONS
     if (getenv("BF_FORCE_TRANSACTIONAL"))
 	fTransaction = true;
-#endif
 
     if (!fTransaction)
 	dsm = &dsm_traditional;
     else
 	dsm = &dsm_transactional;
+#else
+    (void)directory;
+    (void)file;
+#endif
 }
 
 /** "constructor" - allocate our handle and initialize its contents */
@@ -396,14 +414,20 @@ static void check_fsize_limit(int fd, uint32_t pagesize) {
  * the whole data base, incurring a severe performance penalty. We'll
  * guess a page size.  As this is a safety margin for the file size,
  * we'll return 0 and let the caller guess some size instead. */
-#if DB_AT_LEAST(3,3)
 /* return page size, of 0xffffffff for trouble */
-static uint32_t get_psize(DB *dbp)
+static uint32_t get_psize(DB *dbp,
+	bool wanted /** if set, try harder to get the page size, even if
+		     * it requires to read the whole database */)
 {
     uint32_t ret, pagesize;
     DB_BTREE_STAT *dbstat = NULL;
 
+#if DB_AT_LEAST(3,3)
     ret = BF_DB_STAT(dbp, NULL, &dbstat, DB_FAST_STAT);
+    (void)wanted;
+#else
+    ret = dbp->stat(dbp, &dbstat, malloc, wanted ? 0 : DB_CACHED_COUNTS);
+#endif
     if (ret) {
 	print_error(__FILE__, __LINE__, "DB->stat");
 	return 0xffffffff;
@@ -416,9 +440,6 @@ static uint32_t get_psize(DB *dbp)
     free(dbstat);
     return pagesize;
 }
-#else
-#define get_psize(discard) 0
-#endif
 
 const char *db_version_str(void)
 {
@@ -593,7 +614,7 @@ retry_db_open:
 	    fprintf(dbgout, "DB->fd: %d\n", handle->fd);
 
 	/* query page size */
-	pagesize = get_psize(dbp);
+	pagesize = get_psize(dbp, false);
 	if (pagesize == 0xffffffff) {
 	    dbp->close(dbp, 0);
 	    goto open_err;
@@ -986,7 +1007,7 @@ u_int32_t db_pagesize(bfdir *directory, bffile *db_file)
 		db_file->filename, db_strerror(e));
 	exit(EX_ERROR);
     }
-    s = get_psize(db);
+    s = get_psize(db, true);
 
     e = db->close(db, 0);
     if (e != 0) {
@@ -995,7 +1016,8 @@ u_int32_t db_pagesize(bfdir *directory, bffile *db_file)
 	exit(EX_ERROR);
     }
 
-    e = dsm->dsm_common_close(dbe, directory);
+    if (dsm->dsm_common_close)
+	e = dsm->dsm_common_close(dbe, directory);
     if (e != 0) {
 	print_error(__FILE__, __LINE__, "cannot close environment %s: %s",
 		directory->dirname, db_strerror(e));
@@ -1037,7 +1059,8 @@ ex_t db_verify(bfdir *directory, bffile *db_file)
 	exit(EX_ERROR);
     }
 
-    e = dsm->dsm_common_close(dbe, directory);
+    if (dsm->dsm_common_close)
+	e = dsm->dsm_common_close(dbe, directory);
 
     if (e == 0 && verbose)
 	printf("%s OK.\n", db_file->filename);

@@ -2,25 +2,37 @@
 				BOGOFILTER NEWS
 			       =================
 
-NOTE: More information on important changes for bogofilter updaters
-is in the RELEASE.NOTES files.  Read them!!
+	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
-Important Note:
+	The sections
 
-	** Bogofilter can now use Berkeley DB's Transaction
-	   capability to ensure database integrity.
+        INCOMPATIBLE CHANGES IN BOGOFILTER (version)
+and     MAJOR CHANGES IN BOGOFILTER (version)
 
-	** Bogofilter is now generating tri-state results labeled
-	   Spam, Ham, and Unsure, compared to the old two-state Yes/No
-	   results.
-
-These changes are documented in the RELEASE.NOTES, specifically the
-sections entitled:
-
-        INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
-and     MAJOR CHANGES IN BOGOFILTER 0.93
+	are particularly important.
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
+
+-------------------------------------------------------------------------------
+
+	2005-03-25
+
+	* Add error checking to bogoutil's ROBX calculation.
+
+	* Allow --db-verify to work for non-transactional databases.
+
+	* Repair several minor defects around --db-print-pagesize.  Support
+	  page size detection with Berkeley DB 3.1 and 3.2 (it was already
+	  supported for 3.3 - 4.3). Offer --db-print-pagesize function in
+	  bogoutil --help when compiled against SQLite3.
+
+	* Add more intensive bogoutil inspection to the test suite.
+
+	* Fix incomplete cleanups that broke several bogoutil functions again,
+	  among them --db-recover[-harder], --db-remove-environment,
+	  --db-verify and --db-print-pagesize.
+
+	* Let SQLite3 retry when the database is busy (rather than locked).
 
 0.94.2	2005-03-24
 

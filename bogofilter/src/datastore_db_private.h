@@ -19,67 +19,6 @@ David Relson	<relson@osagesoftware.com> 2005
 #define MAGIC_DBE 0xdbe
 #define MAGIC_DBH 0xdb4
 
-#ifndef	ENABLE_DB_DATASTORE	/* if not Berkeley DB */
-typedef	void DB;
-typedef	void DB_ENV;
-typedef	void DB_TXN;
-#endif
-
-/** implementation internal type to keep track of database environments
- * we have opened. */
-typedef struct {
-    int		magic;
-    DB_ENV	*dbe;		/* stores the environment handle */
-    char	*directory;	/* stores the home directory for this environment */
-} dbe_t;
-
-/* public -- used in datastore.c */
-typedef int	dsm_i_pv	(void *vhandle);
-/* private -- used in datastore_db_*.c */
-typedef int	dsm_i_i		(int open_mode);
-typedef int	dsm_i_pnvi	(DB_ENV *dbe, int ret);
-typedef int	dsm_i_pvi	(void *handle, int open_mode);
-typedef int	dsm_i_v		(void);
-typedef ex_t	dsm_x_pd	(bfdir *db_dir);
-typedef void	dsm_v_pc	(const char *str);
-typedef void	dsm_v_pbe	(dbe_t *env);
-typedef void	dsm_v_pnv	(DB_ENV *dbe);
-typedef void	dsm_v_pvuiui	(void *vhandle, u_int32_t numlocks, u_int32_t numobjs);
-typedef const char *dsm_pc_pc	(const char *db_file);
-typedef ex_t	dsm_x_pdbb	(bfdir *dir, bool, bool);
-typedef ex_t	dsm_x_pnvpd	(DB_ENV *dbe, bfdir *directory);
-typedef dbe_t  *dsm_pbe_pd	(bfdir *directory);
-typedef ex_t	dsm_x_pdpf	(bfdir *directory, bffile *db_file);
-typedef u_int32_t dsm_u_pdpf	(bfdir *directory, bffile *db_file);
-typedef DB_ENV *dsm_pnv_pdpf	(bfdir *directory, bffile *db_file);
-typedef DB_ENV *dsm_pnv_pbe	(dbe_t *env);
-
-typedef struct {
-    /* public -- used in datastore.c */
-    dsm_i_pv	 *dsm_begin;
-    dsm_i_pv	 *dsm_abort;
-    dsm_i_pv	 *dsm_commit;
-    /* private -- used in datastore_db_*.c */
-    dsm_pbe_pd	 *dsm_env_init;
-    dsm_v_pbe	 *dsm_cleanup;
-    dsm_v_pbe	 *dsm_cleanup_lite;
-    dsm_pnv_pbe	 *dsm_get_env_dbe;
-    dsm_pc_pc	 *dsm_database_name;
-    dsm_pnv_pdpf *dsm_recover_open; /**< exits on failure */
-    dsm_i_v	 *dsm_auto_commit_flags;
-    dsm_i_i	 *dsm_get_rmw_flag;
-    dsm_i_pvi	 *dsm_lock;
-    dsm_x_pnvpd	 *dsm_common_close;
-    dsm_i_pnvi	 *dsm_sync;
-    dsm_v_pnv	 *dsm_log_flush;
-    dsm_u_pdpf	 *dsm_pagesize;
-    dsm_x_pd	 *dsm_checkpoint;
-    dsm_x_pd	 *dsm_purgelogs;
-    dsm_x_pdbb	 *dsm_recover;
-    dsm_x_pd	 *dsm_remove;
-    dsm_x_pdpf	 *dsm_verify;
-} dsm_t;
-
 /** implementation internal type to keep track of databases
  * we have opened. */
 
@@ -109,7 +48,8 @@ typedef struct {
 
 typedef	enum {
     P_ERROR = -1,	/* -1 for error */
-    P_DISABLE = 0,	/*  0 for no transactions */
+    P_DISABLE = 0,	/*  0 for no transactions - 0 must mean P_DISABLE
+			    for compatibility with dummy functions */
     P_ENABLE  = 1,	/*  1 for transactions */
     P_DONT_KNOW		/*  2 for don't know */
 } probe_txn_t;

@@ -61,18 +61,18 @@ dsm_t dsm_traditional = {
     &bft_get_env_dbe,
     &bft_database_name,
     &bft_recover_open,
-    NULL,	/* bft_auto_commit_flags*/
+    NULL,		/* bft_auto_commit_flags*/
     &bft_get_rmw_flag,
     &bft_lock,
-    NULL,	/* &bft_common_close    */
-    NULL,	/* &bft_sync            */
+    NULL,		/* &bft_common_close    */
+    NULL,		/* &bft_sync            */
     &bft_log_flush,
-    NULL,	/* dsm_pagesize         */
-    NULL,	/* dsm_checkpoint       */
-    NULL,	/* dsm_purgelogs        */
-    NULL,	/* dsm_recover          */
-    NULL,	/* dsm_remove           */
-    NULL	/* dsm_verify           */
+    &db_pagesize,	/* dsm_pagesize         */
+    NULL,		/* dsm_checkpoint       */
+    NULL,		/* dsm_purgelogs        */
+    NULL,		/* dsm_recover          */
+    NULL,		/* dsm_remove           */
+    NULL		/* dsm_verify           */
 };
 
 DB_ENV *bft_get_env_dbe	(dbe_t *env)

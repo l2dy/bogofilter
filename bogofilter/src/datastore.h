@@ -24,6 +24,10 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 #include <stdlib.h>
 
+#ifdef	ENABLE_DB_DATASTORE	/* if not Berkeley DB */
+#include <db.h>
+#endif
+
 #include "word.h"
 
 extern YYYYMMDD today;		/* date as YYYYMMDD */
@@ -88,6 +92,70 @@ typedef struct {
     u_int32_t leng;
 } dbv_t;
 
+#ifndef	ENABLE_DB_DATASTORE	/* if not Berkeley DB */
+typedef	void DB;
+typedef	void DB_ENV;
+typedef	void DB_TXN;
+#endif
+
+/** type to keep track of database environments we have opened. */
+typedef struct {
+    int		magic;
+    DB_ENV	*dbe;		/* stores the environment handle */
+    char	*directory;	/* stores the home directory for this environment */
+} dbe_t;
+
+/* public -- used in datastore.c */
+typedef int	dsm_i_pv	(void *vhandle);
+/* private -- used in datastore_db_*.c */
+typedef int	dsm_i_i		(int open_mode);
+typedef int	dsm_i_pnvi	(DB_ENV *dbe, int ret);
+typedef int	dsm_i_pvi	(void *handle, int open_mode);
+typedef int	dsm_i_v		(void);
+typedef ex_t	dsm_x_pd	(bfdir *db_dir);
+typedef void	dsm_v_pc	(const char *str);
+typedef void	dsm_v_pbe	(dbe_t *env);
+typedef void	dsm_v_pnv	(DB_ENV *dbe);
+typedef void	dsm_v_pvuiui	(void *vhandle, u_int32_t numlocks, u_int32_t numobjs);
+typedef const char *dsm_pc_pc	(const char *db_file);
+typedef ex_t	dsm_x_pdbb	(bfdir *dir, bool, bool);
+typedef ex_t	dsm_x_pnvpd	(DB_ENV *dbe, bfdir *directory);
+typedef dbe_t  *dsm_pbe_pd	(bfdir *directory);
+typedef ex_t	dsm_x_pdpf	(bfdir *directory, bffile *db_file);
+typedef u_int32_t dsm_u_pdpf	(bfdir *directory, bffile *db_file);
+typedef DB_ENV *dsm_pnv_pdpf	(bfdir *directory, bffile *db_file);
+typedef DB_ENV *dsm_pnv_pbe	(dbe_t *env);
+
+/** Datastore methods type, used by datastore/database layers to switch
+ * implementations after detection of database type. */
+typedef struct {
+    /* public -- used in datastore.c */
+    dsm_i_pv	 *dsm_begin;
+    dsm_i_pv	 *dsm_abort;
+    dsm_i_pv	 *dsm_commit;
+    /* private -- used in datastore_db_*.c */
+    dsm_pbe_pd	 *dsm_env_init;
+    dsm_v_pbe	 *dsm_cleanup;
+    dsm_v_pbe	 *dsm_cleanup_lite;
+    dsm_pnv_pbe	 *dsm_get_env_dbe;
+    dsm_pc_pc	 *dsm_database_name;
+    dsm_pnv_pdpf *dsm_recover_open; /**< exits on failure */
+    dsm_i_v	 *dsm_auto_commit_flags;
+    dsm_i_i	 *dsm_get_rmw_flag;
+    dsm_i_pvi	 *dsm_lock;
+    dsm_x_pnvpd	 *dsm_common_close;
+    dsm_i_pnvi	 *dsm_sync;
+    dsm_v_pnv	 *dsm_log_flush;
+    dsm_u_pdpf	 *dsm_pagesize;
+    dsm_x_pd	 *dsm_checkpoint;
+    dsm_x_pd	 *dsm_purgelogs;
+    dsm_x_pdbb	 *dsm_recover;
+    dsm_x_pd	 *dsm_remove;
+    dsm_x_pdpf	 *dsm_verify;
+} dsm_t;
+
+extern dsm_t *dsm;
+
 /** Type of the callback function that ds_foreach calls. */
 typedef int ds_foreach_t(
 	/** current token that ds_foreach is looking at */
@@ -128,8 +196,19 @@ extern void  ds_close(/*@only@*/ void *vhandle);
 /** Flush pending writes to disk */
 extern void ds_flush(void *vhandle);
 
-/** Global initialization of datastore layer. */
+/** Global initialization of datastore layer. Implies call to \a dsm_init. */
 extern void *ds_init(
+	/** The directory holds the
+	 * database environment (only for BerkeleyDB TXN store, otherwise
+	 * ignored), you can - for now - pass bogohome.
+	 */
+	const char *directory,
+	/** The file is needed for autoprobing if transactions are used.
+	 * It need not exist. */
+	const char *file);
+
+/** Global initialization of datastore methods only. */
+extern void ds_minit(
 	/** The directory holds the
 	 * database environment (only for BerkeleyDB TXN store, otherwise
 	 * ignored), you can - for now - pass bogohome.
@@ -274,5 +353,8 @@ extern ex_t ds_purgelogs(const char *directory);
 
 /** Run checkpoint once */
 extern ex_t ds_checkpoint(const char *directory);
+
+/** datastore backends must provide this initializing function */
+extern void dsm_init(bfdir *directory, bffile *file);
 
 #endif

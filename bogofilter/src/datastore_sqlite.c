@@ -16,7 +16,6 @@
 #include <sqlite3.h>
 
 #include "datastore_db.h"
-#include "datastore_db_private.h"
 
 #include "error.h"
 #include "paths.h"		/* for build_path */
@@ -39,8 +38,6 @@ typedef struct dbhsqlite_t dbh_t;
 static const char *ENDIAN32 = ".ENDIAN32";
 
 void db_flush(void *unused) { (void)unused; }
-
-extern dsm_t *dsm;			/* in datastore.c */
 
 static int sql_txn_begin(void *vhandle);
 static int sql_txn_abort(void *vhandle);
@@ -79,6 +76,8 @@ dsm_t dsm_sqlite = {
     NULL,	/* dsm_remove           */
     NULL	/* dsm_verify           */
 };
+
+dsm_t *dsm = &dsm_sqlite;
 
 /** The command to begin a regular transaction. */
 #define BEGIN \
@@ -179,14 +178,14 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
     /* sqlite3_exec doesn't allow us to retrieve BLOBs */
     do {
 	rc = sqlite3_prepare(db, cmd, strlen(cmd), &stmt, &tail);
-	if (rc == SQLITE_LOCKED) {
+	if (rc == SQLITE_BUSY) {
 	    if (stmt)
 		sqlite3_finalize(stmt);
 	    if (DEBUG_DATABASE(2))
-		fprintf(dbgout, "database locked, sleeping and retrying...\n");
+		fprintf(dbgout, "database busy, sleeping and retrying...\n");
 	    rand_sleep(1000, 100000);
 	}
-    } while (rc == SQLITE_LOCKED);
+    } while (rc == SQLITE_BUSY);
     if (rc) {
 	print_error(__FILE__, __LINE__,
 		"Error preparing \"%s\": %s (#%d)\n",
@@ -373,8 +372,9 @@ void db_close(void *handle) {
 
 const char *db_version_str(void) {
     static char buf[80];
+
     if (!buf[0])
-	snprintf(buf, sizeof(buf), "SQLite %s", sqlite3_libversion());
+	snprintf(buf, sizeof(buf), "SQLite %s", sqlite3_version);
     return buf;
 }
 

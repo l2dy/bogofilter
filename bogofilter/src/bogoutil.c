@@ -468,7 +468,7 @@ static void usage(void)
     fprintf(stderr, "   or: %s [OPTIONS] {-d|-l|-u|-m|-w|-p|--db-verify} file%s\n",
 	    progname, DB_EXT);
     fprintf(stderr, "   or: %s [OPTIONS] {-H|-r|-R} directory\n", progname);
-#if defined (ENABLE_DB_DATASTORE)
+#if defined (ENABLE_DB_DATASTORE) || defined (ENABLE_SQLITE_DATASTORE)
     fprintf(stderr, "   or: %s [OPTIONS] {--db-print-pagesize} file%s\n",
 	    progname, DB_EXT);
 #endif
@@ -770,6 +770,12 @@ static int process_arg(int option, const char *name, const char *val)
 	dbgout = stdout;
 	break;
 
+    case O_DB_VERIFY:
+	flag = M_VERIFY;
+	count += 1;
+	ds_file = val;
+	break;
+
     default:
 	if (!dsm_options_bogoutil(option, &flag, &count, &ds_file, name, val))
 	    abort();
@@ -798,13 +804,14 @@ int main(int argc, char *argv[])
     }
 
     set_bogohome(ds_file);
-    ds_init(bogohome, ds_file);
 
     switch(flag) {
 	case M_RECOVER:
+	    ds_minit(bogohome, ds_file);
 	    rc = ds_recover(ds_file, false);
 	    break;
 	case M_CRECOVER:
+	    ds_minit(bogohome, ds_file);
 	    rc = ds_recover(ds_file, true);
 	    break;
 	case M_CHECKPOINT:
@@ -818,16 +825,19 @@ int main(int argc, char *argv[])
 		rc = ds_purgelogs(ds_file);
 	    break;
 	case M_REMOVEENV:
+	    ds_minit(bogohome, ds_file);
 	    if (fTransaction)
 		rc = ds_remove(ds_file);
 	    break;
 	case M_VERIFY:
+	    ds_minit(bogohome, ds_file);
 	    rc = ds_verify(bogohome, ds_file);
 	    break;
 	case M_PAGESIZE:
 	    {
 		u_int32_t s;
-		s = ds_pagesize(bogohome, ds_file);
+		ds_minit(bogohome, ds_file);
+		s = ds_pagesize(CURDIR_S, ds_file);
 		if (s == 0xffffffff)
 		    fprintf(stderr, "%s: error getting page size.\n", ds_file);
 		else if (s == 0)

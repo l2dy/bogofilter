@@ -14,28 +14,13 @@ David Relson	<relson@osagesoftware.com> 2005
 
 #include "common.h"
 
-#ifdef ENABLE_DB_DATASTORE
-#include <db.h>
-#endif
-
 #include "datastore.h"
 #include "datastore_db.h"
 #include "datastore_db_private.h"
 
-/** Default flags for DB_ENV->open() */
-
-u_int32_t db_max_locks = 16384;		/* set_lk_max_locks    32768 */
-u_int32_t db_max_objects = 16384;	/* set_lk_max_objects  32768 */
-
-bool	  db_log_autoremove = false;	/* DB_LOG_AUTOREMOVE */
-
-#ifdef	FUTURE_DB_OPTIONS
-bool	  db_txn_durable = true;	/* not DB_TXN_NOT_DURABLE */
-#endif
-
 /* OO function lists */
 
-dsm_t dsm_transactional = {
+dsm_t dsm_dummies = {
     /* public -- used in datastore.c */
     NULL,	/* dsm_begin            */
     NULL,	/* dsm_abort            */
@@ -62,15 +47,7 @@ dsm_t dsm_transactional = {
     NULL	/* dsm_verify           */
 };
 
-#ifndef DISABLE_TRANSACTIONS
-#ifndef ENABLE_TRANSACTIONS
-void *dbe_init(bfdir *d, bffile *f) {
-    (void)d;
-    (void)f;
-    return (void *)~0;
-}
-#endif
-#endif
+dsm_t *dsm = &dsm_dummies;
 
 ex_t dbe_recover(bfdir *directory, bool catastrophic, bool force)
 {
@@ -84,21 +61,4 @@ ex_t dbe_recover(bfdir *directory, bool catastrophic, bool force)
 	    "you must delete your data base and rebuild it, or restore an older version\n"
 	    "that you know is good from your backups.\n");
     exit(EX_ERROR);
-}
-
-#if	!defined(DISABLE_TRANSACTIONS) && !defined(ENABLE_TRANSACTIONS)
-void *db_get_env(void *vhandle) {
-    (void)vhandle;
-    return NULL;
-}
-#endif
-
-/** probe if the directory contains an environment, and if so,
- * if it has transactions
- */
-probe_txn_t probe_txn(bfdir *directory, bffile *file)
-{
-    (void) directory;
-    (void) file;
-    return P_DISABLE;
 }
