@@ -254,7 +254,7 @@ static uint32_t get_psize(DB *dbp)
 const char *db_version_str(void)
 {
     static char v[80];
-    snprintf(v, sizeof(v), "BerkeleyDB (%d.%d.%d)",
+    snprintf(v, sizeof(v), "Berkeley DB (%d.%d.%d) NONTRANSACTIONAL",
 	    DB_VERSION_MAJOR, DB_VERSION_MINOR, DB_VERSION_PATCH);
     return v;
 }
