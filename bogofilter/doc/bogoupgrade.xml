@@ -14,60 +14,23 @@
 
 <cmdsynopsis>
   <command>bogoupgrade</command>
-  <arg choice='plain'>-d <replaceable>directory</replaceable></arg>
-  <arg choice='plain'>-i <replaceable>input file</replaceable></arg>
-  <arg choice='plain'>-o <replaceable>output file</replaceable></arg>
-  <arg choice='opt'>-b <replaceable>path to bogoutil</replaceable></arg>
   <arg choice='opt'>-h</arg>
+  <arg choice='plain'>-d <replaceable>directory</replaceable></arg>
+  <arg choice='opt'>-i <replaceable>input file</replaceable></arg>
+  <arg choice='opt'>-o <replaceable>output file</replaceable></arg>
+  <arg choice='opt'>-b <replaceable>path to bogoutil</replaceable></arg>
 </cmdsynopsis>
 
 </refsynopsisdiv>
 
 <refsect1 id='description'><title>DESCRIPTION</title>
 <para><command>bogoupgrade</command> is a command to upgrade
-<application>bogofilter</application>'s databases from (before version 0.7.5)
-to a version compatible with 0.7.5+. Since the format of the database changes
-once in a while, the utility is designed to make the upgrade easy.</para>
-</refsect1>
-
-<refsect1 id='upgrading'><title>UPGRADING</title>
-<para>Follow these instructions to upgrade
-<application>bogofilter</application>'s databases to the latest version.</para>
-
-<orderedlist>
-<listitem><para>Stop all instances of bogofilter. While the upgrade tools lock
-the database files, the upgrade may take a long time if you have a busy site.
-Don't forget to stop cron jobs or daemons that fetch and process mail and could
-fire off bogofilter.</para></listitem>
-
-<listitem><para>Backup your data. Let's assume that you said:</para>
-<screen>
-<prompt>$</prompt> <userinput>mv ~/.bogofilter ~/.bogofilter.safe</userinput>
-<prompt>$</prompt> <userinput>mkdir ~/.bogofilter</userinput>
-</screen></listitem>
-<listitem><para>If your bogofilter version is less than 0.7, say:</para>
-<screen>
-<prompt>$</prompt> <userinput>@bindir@/bogoupgrade -b @bindir@/bogoutil \
--i ~/.bogofilter.safe/goodlist -o ~/.bogofilter/goodlist.db</userinput>
-<prompt>$</prompt> <userinput>@bindir@/bogoupgrade -b @bindir@/bogoutil \
--i ~/.bogofilter.safe/badlist -o ~/.bogofilter/spamlist.db</userinput>
-</screen>
-<para>If your bogofilter version is 0.7 or greater, say:</para>
-<screen>
-<prompt>$</prompt> <userinput>@bindir@/bogoupgrade -b @bindir@/bogoutil \
--i ~/.bogofilter.safe/hamlist.count -o ~/.bogofilter/goodlist.db</userinput>
-<prompt>$</prompt> <userinput>@bindir@/bogoupgrade -b @bindir@/bogoutil \
--i ~/.bogofilter.safe/spamlist.count -o ~/.bogofilter/spamlist.db</userinput>
-</screen></listitem>
-
-<listitem><para>Done. Restart any stopped daemons, cron tasks,
-etc.</para></listitem>
-</orderedlist>
+<application>bogofilter</application>'s databases from an old format
+to the current format. Since the format of the database changes once
+in a while, the utility is designed to make the upgrade easy.</para>
 </refsect1>
 
 <refsect1 id='options'><title>OPTIONS</title>
-<para>You must specify the the <option>-i</option> and the <option>-o</option>
-options to bogoupgrade.</para>
 
 <para>The <option>-h</option> option prints the help message and exits.</para>
 
@@ -89,9 +52,42 @@ command. It defaults to 'bogoutil', in the hopes that your shell will find
 it.</para>
 </refsect1>
 
+<refsect1 id='upgrading'><title>UPGRADING</title>
+<para>Follow these instructions to upgrade
+<application>bogofilter</application>'s databases to the latest version.</para>
+
+<orderedlist>
+<listitem><para>Stop all instances of bogofilter. While the upgrade tools lock
+the database files, the upgrade may take a long time if you have a busy site.
+Don't forget to stop cron jobs or daemons that fetch and process mail and could
+fire off bogofilter.</para></listitem>
+
+<listitem><para>Backup your data. Let's assume that you said:</para>
+<screen>
+<prompt>$</prompt> <userinput>mv ~/.bogofilter ~/.bogofilter.safe</userinput>
+<prompt>$</prompt> <userinput>mkdir ~/.bogofilter</userinput>
+</screen></listitem>
+
+<listitem><para>If your bogofilter version is less than 0.7, say:</para>
+<screen>
+<prompt>$</prompt> <userinput>bogoupgrade -i ~/.bogofilter.safe/goodlist -o ~/.bogofilter/goodlist.db</userinput>
+<prompt>$</prompt> <userinput>bogoupgrade -i ~/.bogofilter.safe/badlist -o ~/.bogofilter/spamlist.db</userinput>
+</screen>
+<para>If your bogofilter version is 0.7 or greater, say:</para>
+<screen>
+<prompt>$</prompt> <userinput>bogoupgrade -i ~/.bogofilter.safe/hamlist.count -o ~/.bogofilter/goodlist.db</userinput>
+<prompt>$</prompt> <userinput>bogoupgrade -i ~/.bogofilter.safe/spamlist.count -o ~/.bogofilter/spamlist.db</userinput>
+</screen></listitem>
+
+<listitem><para>Done. Restart any stopped daemons, cron tasks,
+etc.</para></listitem>
+</orderedlist>
+</refsect1>
+
 <refsect1 id='author'><title>AUTHOR</title>
-<para><command>bogoupgrade</command> was written by Gyepi Sam
-<email>gyepi@praxis-sw.com</email>.</para>
+<para><command>bogoupgrade</command> was written by 
+Gyepi Sam <email>gyepi@praxis-sw.com</email> and 
+David Relson <email>relson@osagesoftware.com</email>.</para>
 <para>For updates, see <ulink url="http://bogofilter.sourceforge.net/">the
 bogofilter project page</ulink>.</para>
 </refsect1>
