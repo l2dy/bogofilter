@@ -91,6 +91,9 @@ static bool cmd_algorithm = false;		/* true if specified on command line */
 
 static void display_tag_array(const char *label, const char **array);
 
+static bool config_algorithm(const unsigned char *s);
+static bool select_algorithm(const unsigned char ch, bool cmdline);
+
 /* externs for query_config() */
 
 extern double robx, robs;
@@ -149,12 +152,12 @@ const parm_desc sys_parms[] =
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
 
-bool config_algorithm(const unsigned char *s)
+static bool config_algorithm(const unsigned char *s)
 {
     return select_algorithm(tolower(*s), false);
 }
 
-bool select_algorithm(const unsigned char ch, bool cmdline)
+static bool select_algorithm(const unsigned char ch, bool cmdline)
 {
     enum algorithm_e al = ch;
 

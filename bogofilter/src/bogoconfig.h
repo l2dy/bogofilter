@@ -21,9 +21,6 @@ extern const char *user_config_file;
 
 extern int  process_args(int argc, char **argv);
 
-extern bool select_algorithm(const unsigned char ch, bool cmdline);
-extern bool config_algorithm(const unsigned char *s);
-
 void query_config(void);
 
 #endif
