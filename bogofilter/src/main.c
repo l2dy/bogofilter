@@ -181,7 +181,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     initialize(NULL);
 
-    if (run_classify)
+    if (run_classify || passthrough)
 	exitcode = arg_foreach(classify, argc, argv);
     else
 	exitcode = arg_foreach(register_messages, argc, argv);
