@@ -28,7 +28,7 @@ DESCRIPTION
   counts of the token in the spam and nonspam wordlists, respectively.
   The msg-count script is meant to be invoked by commands like:
 
-    formail -s msg-count.sh db_dir <mboxfile >digestfile
+    msg-count.sh db_dir <mboxfile >digestfile
 
     msg-count.sh db_dir msg_dir >digestfile
 
@@ -63,10 +63,14 @@ then
     exit
 fi
 
-if [ ! -d "$1" ] ; then
+if [ "$1" = "formail" ] ; then
+    shift
     ( echo .MSG_COUNT ; $BOGOLEXER -p $* | sort -u ) | \
 	$BOGOUTIL -w $BOGOFILTER_DIR | \
 	awk 'NF == 3 { printf( "\"%s\" %s %s\n", $1, $2, $3 ) } '
+elif [ ! -d "$1" ] ; then
+    shift
+    formail -es msg-count.sh formail $*
 else
     DIR="$1"
     shift
