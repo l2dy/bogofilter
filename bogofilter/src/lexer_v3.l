@@ -93,6 +93,8 @@ static int lineno;
 static word_t *yy_text(void);
 static void reorder_html(void);
 
+static void skip_to(char chr);
+
 /* Function Definitions */
 
 static word_t *yy_text(void)
@@ -203,11 +205,11 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						    unput(w->text[size]);
 						}
 
-<INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); yyless(strlen("charset")); return TOKEN; }
-<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); yyless(strlen("MIME-Version:")); return TOKEN; }
-<INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); yyless(strlen("Content-Transfer-Encoding:")); return TOKEN; }
-<INITIAL>^Content-Type:{TTYPE};?		{ mime_type(yy_text()); yyless(strlen("Content-Type:")); return TOKEN; }
-<INITIAL>^Content-Disposition:{MTYPE}		{ mime_disposition(yy_text()); yyless(strlen("Content-Disposition:")); return TOKEN; }
+<INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext);	 	skip_to('='); return TOKEN; }
+<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); 	skip_to(':'); return TOKEN; }
+<INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); 	skip_to(':'); return TOKEN; }
+<INITIAL>^Content-Type:{TTYPE};?		{ mime_type(yy_text()); 	skip_to(':'); return TOKEN; }
+<INITIAL>^Content-Disposition:{MTYPE}		{ mime_disposition(yy_text()); 	skip_to(':'); return TOKEN; }
 <INITIAL>^To/:.*				{ if (header_line_markup) set_tag("to:"); }
 <INITIAL>^From/:.*				{ if (header_line_markup) set_tag("from:"); else return TOKEN; }
 <INITIAL>^Return-Path/:.*			{ if (header_line_markup) set_tag("rtrn:"); else return TOKEN; }
@@ -285,6 +287,12 @@ void lexer_v3_init(FILE *fp)
     yyrestart(fp);
 }
 
+static void skip_to(char chr)
+{
+    size_t len = strchr(yytext, chr) - yytext;
+    yyless(len);
+}
+ 
 static void reorder_html(void)
 {
     char *chr = memchr(yytext, '<', yyleng);	/* find start of html tag */
