@@ -114,6 +114,11 @@ for f in $pattern ; do
     map_rc "$BOGOLEX_SH -c $CFG < $f | $BOGOFILTER -c $CFG $OPT >> ${TMPDIR}/$NAME.out"
 done
 
+NAME="bogolex-mbox"
+cat $pattern >> ${TMPDIR}/test.fr
+
+map_rc $BOGOFILTER -c $CFG $OPT -M < ${TMPDIR}/test.fr > ${TMPDIR}/$NAME.out
+
 NAME="bogolex-batch"
 cat /dev/null > ${TMPDIR}/test.bl
 for f in $pattern ; do 
