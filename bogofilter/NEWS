@@ -5,6 +5,11 @@
 NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+	2004-10-09
+
+	* Fix a potential crash on malformatted input (writing a NUL byte to
+	  the wrong place) in the RFC-2047 decoder. Reported by Clint Adams.
+
 0.92.7	2004-10-02
 
 	* '-M' allows processing 1 msg-count file with multiple
