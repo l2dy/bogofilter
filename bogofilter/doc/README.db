@@ -52,7 +52,7 @@ Bogofilter should transparently upgrade the existing data base to the
 new transactional data base.  Note though that upgrading will not add
 checksums (see the previous section) to existing data bases, so it is
 recommended that, if you are using Berkeley DB versions 4.1 or newer,
-that you dump and reload the data base to add checksums.
+you dump and reload the data base to add checksums.
 
 The dump/load cycle is necessary only the first time you upgrade from a
 non-transactional to a transactional release.  Use these commands:
@@ -90,7 +90,7 @@ Switching the write cache off may however adversely affect the
 performance below acceptable levels, particularly for large writes such
 as recording live audio or video data to hard disk.
 If performance is degraded too much, consider getting a separate disk
-drive and using one for fast writes (with the write cache one) and one
+drive and using one for fast writes (with the write cache on) and one
 for reliable writes (with the write cache off, for bogofilter, mail
 servers and other applications that need survive a power loss without
 data loss).
@@ -156,7 +156,7 @@ true:
 - you upgraded Berkeley DB from 4.0 or 4.1 to 4.2 or 4.3
 - you upgraded Berkeley DB from 4.2 to 4.3.
 
-If you need a log file upgrade, the upgrade procedure is
+If you need a log file upgrade, the upgrade procedure is:
 (NOTE: DO NOT UPGRADE BERKELEY DB OR BOGOFILTER UNTIL STEP 4!)
 
 1. shut down your mail system,
@@ -178,8 +178,14 @@ application crash.
 The logs of the transactional data store, log.NNNNNNNNNN files of up to
 1 MB in size (in the default configuration), can consume considerable
 amounts of disk space and many users wish to purge or compress these log
-files. These can safely be handled with Berkeley DB's db_checkpoint and
-db_archive utilities, which should be run in this order:
+files. For the simple removal of log files that are no longer active,
+you can run bogoutil -P ~/.bogofilter. It will checkpoint the database
+(to make some more log files inactive) and then remove the inactive log
+files.
+
+If you wish to keep and for instance compress (gzip) the log files, you
+can safely use Berkeley DB's db_checkpoint and db_archive utilities,
+which should be run in this order:
 
 - db_checkpoint migrates written-ahead data from the log files into the
   data base, and places a checkpoint which will speed up data base
@@ -211,22 +217,17 @@ Symptom: Operations abort with "out of memory" although the machine has
 
 Cause:	 Natural data base growth.
 
-Fix:     Resize the lock tables. It is easy and requires these two
-	 steps: (In the next steps, adjust the ~/.bogofilter path if you
-	 don't have the data base in its default location)
+Fix:     Resize the lock tables. Just run "bf_resize ~/.bogofilter" and
+	 that's it. This script will modify the ~/.bogofilter/DB_CONFIG
+	 file and run recovery to perform the reize. It'll resize the
+	 lock and object tables to twice of what is currently in use.
 
-a. Create a ~/.bogofilter/DB_CONFIG file (in the same directory as your
-   wordlist.db file) that looks like this:
-
-set_lk_max_objects  32768
-set_lk_max_locks    32768
-
-You may need to adjust these figures. You will need up to one lock per
-data base page and a bit of headroom for future training -- see section
-4.2 below to determine the size of the data base and data base page.
-
-b. Run bogoutil -f ~/.bogofilter (use the path from step a, omitting
-   the /DB_CONFIG part).
+You may need to adjust these figures before larger updates or to
+conserve disk space. You will need up to one lock per data base page and
+a bit of headroom for future training -- see section 4.2 below to
+determine the size of the data base and data base page. After changing
+these set_lk_max* lines in DB_CONFIG, run bogoutil -f ~/.bogofilter to
+make the change effective.
 
 4. Other Information of Interest ---------------------------------------
 
@@ -247,9 +248,9 @@ Note that statistics may disappear when the data base is recovered. They
 will reappear after running bogofilter and are the more reliable the
 more often bogofilter has been used since the last recovery.
 
-You MUST NOT remove files named __db.NNN and log.NNNNNNNNNN - where
-NNN are numbers - in the ~/.bogofilter directory.
-REMOVING THESE FILES CAUSES DATA BASE CORRUPTION
+You MUST NOT remove files named __db.NNN and log.NNNNNNNNNN manually
+from the ~/.bogofilter directory.
+REMOVING THESE FILES CAUSES DATABASE CORRUPTION!
 (there is one exception, see below)
 
 These can contain update data for the data base that must be still
@@ -258,9 +259,10 @@ concurrent processes alongside a registration process.
 
 Exception: after reading the Berkeley DB documentation for the
 db_archive utility and using that utility, you may be able to remove
-some of the log.NNNNNNNNNN files. This may be necessary to reclaim disk
-space, but you must strictly adhere to the Berkeley DB documentation
-lest you risk your data base become unrecoverable in case of trouble.
+the INACTIVE log.NNNNNNNNNN files, or use bogoutil -P. This may be
+necessary to reclaim disk space, but you must strictly adhere to the
+Berkeley DB documentation lest you risk your data base become
+unrecoverable in case of trouble.
 
 WARNING: If you need to copy data base files,
 	 DO NOT USE cp, BUT DO USE dd instead and give it a block size
