@@ -1,9 +1,12 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.3  2002/09/15 19:07:13  relson
- * Add an enumerated type for return codes of RC_SPAM and RC_NONSPAM, which  values of 0 and 1 as called for by procmail.
- * Use the new codes and type for bogofilter() and when generating the X-Spam-Status message.
+ * Revision 1.4  2002/09/16 20:44:13  m-a
+ * Do not increment passthrough on -p, but set it to 1.
  *
+/* Revision 1.3  2002/09/15 19:07:13  relson
+/* Add an enumerated type for return codes of RC_SPAM and RC_NONSPAM, which  values of 0 and 1 as called for by procmail.
+/* Use the new codes and type for bogofilter() and when generating the X-Spam-Status message.
+/*
 /* Revision 1.2  2002/09/15 16:31:41  relson
 /* Substitute STDIN_FILENO where numeric constant 0 is used as a file descriptor.
 /*
@@ -88,7 +91,7 @@ int main(int argc, char **argv)
 	    break;
 
 	case 'p':
-	    passthrough++;
+	    passthrough = 1;
 	    break;
 
 	case 'l':
