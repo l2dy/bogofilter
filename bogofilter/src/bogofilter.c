@@ -38,7 +38,6 @@ THEORY:
 #include "register.h"
 #include "rstats.h"
 #include "score.h"
-#include "wordlists.h"
 
 /*
 **	case B_NORMAL:		
