@@ -2,6 +2,19 @@
 				BOGOFILTER NEWS
 			       =================
  
+0.13.7.3 2003-07-16
+ 
+* Added contrib/bogominitrain.pl
+ 
+* Fix bug in "boundary" parser, which ignored boundaries with spaces.
+ 
+* Updated doc/integrating-with-qmail
+ 
+* Accept whitespace in html tags.
+* Checks for "Subject:" are now case insensitive.
+* Adds "Subject:" header if needed for including
+  spam_subject_tag.
+ 
 0.13.7.2 2003-07-02
  
 * Fixed loop in yyinput() caused by unexpected EOF.

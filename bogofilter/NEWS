@@ -4,9 +4,25 @@
 
 $Id$
 
-	* Fix bug in "boundary" parser, it ignored boundaries with spaces
-	  (these are permitted and generated for example by
-	  "Microsoft Internet E-Mail/MAPI - 8.0.0.4211").
+0.13.7.3 2003-07-16
+
+	* Added contrib/bogominitrain.pl
+
+	2003-07-15
+
+	* Fix bug in "boundary" parser, which ignored boundaries with spaces.
+
+	2003-07-05
+
+	* Updated doc/integrating-with-qmail
+
+	2003-07-03
+
+	* Accept whitespace in html tags.
+	* Checks for "Subject:" are now case insensitive.
+	* Adds "Subject:" header if needed for including
+	  spam_subject_tag.
+	  (Thanks to Pavel Kankovsky for these patches.)
 
 0.13.7.2 2003-07-02
 
