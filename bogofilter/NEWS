@@ -8,7 +8,7 @@ is in the RELEASE.NOTES files.  Read it!!
 If updating from a bogofilter version older than 0.15.4, it's a good
 idea to retrain or else use the '-H' (header tag degeneration) option.
 
-0.15.10
+0.15.10	2003-12-08
 
 	2003-12-07
 
@@ -16,6 +16,7 @@ idea to retrain or else use the '-H' (header tag degeneration) option.
           linked executables.
 	* "make check" now uses static executables when "configure
           --enable-static" was used.
+	* Revised msg-count.sh so that formail isn't needed.
 
 	2003-12-03
 

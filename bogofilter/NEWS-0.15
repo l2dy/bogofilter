@@ -5,12 +5,12 @@
 Be sure to read RELEASE.NOTES-0.15, with attention to the section
 about retraining and the '-H' flag...
 
-0.15.10
+0.15.10	2003-12-08
 
+* Multiple fixes, revisions, and changes to bogotune.
 * Fixed bug in header degeneration.
 * Added degeneration options to config file.
 * Added subject line tagging for Unsures.
-* Multiple fixes, revisions, and changes to bogotune.
 * Script msg-count.sh has been added to create message count files
   from mailboxes and mail directories.
 * Fixed "configure --enable-static" for building statically linked
