@@ -10,10 +10,9 @@
 #endif
 
 #include <stdio.h>
-#include <inttypes.h>
 
 #include "debug.h"
-#include "system.h" /* defines bool */
+#include "system.h" /* defines bool, uint32_t */
 
 /* length of *yylval will not exceed this... */
 #define MAXTOKENLEN	30

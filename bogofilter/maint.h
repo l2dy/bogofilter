@@ -4,7 +4,6 @@
 #define MAINT_H
 
 #include <time.h>
-#include <inttypes.h>
 
 #define	AGE_IS_YDAY
 #undef	AGE_IS_YDAY
