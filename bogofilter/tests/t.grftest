@@ -20,8 +20,8 @@ if [ "$1" = "-v" ]; then
     verbose=1
 fi
 
-[   -d ${TMPDIR} ] && rm -f ${TMPDIR}/*
-[ ! -d ${TMPDIR} ] && mkdir ${TMPDIR}
+[   -d ${TMPDIR} ] && rm -rf ${TMPDIR}
+[ ! -d ${TMPDIR} ] && mkdir  ${TMPDIR}
 
 cat <<EOF > ${TMPDIR}/cfg.r
 robx=0.415
@@ -96,8 +96,9 @@ for out in ${TMPDIR}/tests/msg.?.r.v ; do
     printf "%2s   %c %s   %c %s   %c %s\n" $id $g $r $f >> ${TMPDIR}/tests/$OUT
 done
 
+OUTPUTS=$srcdir/t.systest.d/outputs
 if  [ $verbose -eq 1 ]; then
-    diff -u -s ${SYSTEST}/outputs/$OUT ${TMPDIR}/tests/$OUT
+    diff -u -s ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
 fi
 
-cmp ${SYSTEST}/outputs/$OUT ${TMPDIR}/tests/$OUT
+cmp ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
