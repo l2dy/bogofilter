@@ -48,8 +48,10 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     argc -= optind;
     argv += optind;
 
+#ifdef	HAVE_SYSLOG_H
     if (logflag)
 	openlog("bogofilter", LOG_PID, LOG_MAIL);
+#endif
 
     /* open all wordlists */
     open_wordlists((run_type == RUN_NORMAL) ? DS_READ : DS_WRITE);
@@ -80,8 +82,10 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     MEMDISPLAY;
 
+#ifdef	HAVE_SYSLOG_H
     if (logflag)
 	closelog();
+#endif
 
     free(progtype);
 
