@@ -4,13 +4,13 @@ set -e
 
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
-#	 bulkmode.YYYYMMDD.  This is useful when something is different.
+#	 parsing.YYYYMMDD.  This is useful when something is different.
 #
 #	 ./inputs  - test inputs
 #	 ./outputs - known correct outputs
-#		     esp. bulkmode.out
+#		     esp. parsing.out
 #
-#	 bulkmode.YYYYMMDD:
+#	 parsing.YYYYMMDD:
 #		tests   - directory containing individual output files
 
 : ${srcdir=.}
@@ -63,4 +63,3 @@ map_rc()
 	exit $a
     )
 }
-

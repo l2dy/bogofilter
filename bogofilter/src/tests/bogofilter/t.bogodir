@@ -4,12 +4,9 @@ set -e
 
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
-#	 lexer.mbx.YYYYMMDD.  This is useful when something is different.
+#	 bogodir.YYYYMMDD.  This is useful when something is different.
 #
-#	 ./inputs  - test inputs
-#	 ./outputs - known correct outputs
-#
-#	 lexer.mbx.YYYYMMDD:
+#	 bogodir.YYYYMMDD:
 #		tests   - directory containing individual output files
 
 : ${srcdir=.}
