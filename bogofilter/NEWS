@@ -8,6 +8,10 @@ is in the RELEASE.NOTES files.  Read it!!
 If updating from a bogofilter version older than 0.15.4, it's a good
 idea to retrain or else use the '-H' (header tag degeneration) option.
 
+	2003-11-19
+
+	* TDB passes all checks again.
+
 	2003-11-14
 
 	* Bogotune now checks for incorrectly classified messages in the test
