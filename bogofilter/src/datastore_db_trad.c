@@ -140,14 +140,14 @@ DB_ENV *bft_recover_open(const char *db_file, DB **dbp)
 
     fd = open(db_file, O_RDWR);
     if (fd < 0) {
-	print_error(__FILE__, __LINE__, "db_verify: cannot open %s: %s", db_file,
+	print_error(__FILE__, __LINE__, "bft_recover_open: cannot open %s: %s", db_file,
 		    strerror(errno));
 	exit(EX_ERROR);
     }
 
     if (db_lock(fd, F_SETLKW, (short int)F_WRLCK)) {
 	print_error(__FILE__, __LINE__,
-		    "db_verify: cannot lock %s for exclusive use: %s", db_file,
+		    "bft_recover_open: cannot lock %s for exclusive use: %s", db_file,
 		    strerror(errno));
 	close(fd);
 	exit(EX_ERROR);
