@@ -43,12 +43,13 @@ extern	double	thresh_stats;
 
 extern	int	abort_on_error;
 extern	bool	stats_in_header;
-extern	bool	tag_header_lines;
 
 /* for lexer_v3.l */
-extern	bool	tokenize_html_tags;
-extern	bool	tokenize_html_script;
-extern	bool	tokenize_html_comments;
+extern	bool	fold_case;		/* -Pf */
+extern	bool	tag_header_lines;	/* -Ph */
+extern	bool	tokenize_html_tags;	/* -Pt */
+extern	bool	tokenize_html_script;	/* -Ps */
+extern	bool	tokenize_html_comments;	/* -Pc */
 
 extern	int	db_cachesize;
 

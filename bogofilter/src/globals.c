@@ -42,16 +42,17 @@ int	max_repeats;
 double	min_dev;
 double	spam_cutoff;
 double	thresh_stats;
-bool	tag_header_lines = false;	/* true */
 
 const char	*update_dir;
 /*@observer@*/
 const char	*stats_prefix;
 
 /* for lexer_v3.l */
-bool	tokenize_html_tags = false;
-bool	tokenize_html_script = false;	/* Not yet in use */
-bool	tokenize_html_comments = false;	/* Not yet in use */
+bool	fold_case = true;		/* -Pf */
+bool	tag_header_lines = false;	/* -Ph */
+bool	tokenize_html_tags = false;	/* -Pt */
+bool	tokenize_html_script = false;	/* -Ps - not yet in use */
+bool	tokenize_html_comments = false;	/* -Pc - Not yet in use */
 
 /* dual definition options */
 char	*directory;			/* '-d' */

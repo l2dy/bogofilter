@@ -69,6 +69,11 @@ token_t get_token(void)
 	yylval->leng = lexer_v3_leng;
 	yylval->text = (byte *)lexer_v3_text;
 
+	if (DEBUG_TEXT(1)) { 
+	    word_puts(yylval, 0, dbgout);
+	    fputc('\n', dbgout);
+	}
+	    
 	if (class <= 0)
 	    break;
 
@@ -164,8 +169,9 @@ token_t get_token(void)
     }
 
     /* Need separate loop so lexer can see "From", "Date", etc */
-    for (cp = yylval->text; cp < yylval->text+yylval->leng; cp += 1)
-	*cp = casefold_table[*cp];
+    if (fold_case)
+	for (cp = yylval->text; cp < yylval->text+yylval->leng; cp += 1)
+	    *cp = casefold_table[*cp];
 
     return(class);
 }
@@ -202,12 +208,28 @@ void got_emptyline(void)
     return;
 }
 
+#if	1
+const char *prefixes = "|subj:";
+#else
+const char *prefixes = "|to:|from:|rtrn:|subj:";
+#endif
+
 void set_tag(const char *tag)
 {
     if (tag_header_lines) {
-	word_free(token_prefix);
-	token_prefix = word_new((const byte *)tag, strlen(tag));
+	const char *tmp;
+	size_t len = strlen(tag);
+	
+	for (tmp = prefixes; tmp != NULL;
+	     (tmp = strchr(tmp, '|')) && (tmp += 1)) {
+	    if (memcmp(tmp, tag, len) == 0) {
+		word_free(token_prefix);
+		token_prefix = word_new((const byte *)tag, strlen(tag));
+		return;
+	    }
+	}
     }
+    return;
 }
 
 /* Cleanup storage allocation */

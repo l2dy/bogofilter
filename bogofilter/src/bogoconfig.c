@@ -156,6 +156,7 @@ const parm_desc sys_parms[] =
     { "tag_header_lines", 	     CP_BOOLEAN, { (void *) &tag_header_lines } },
     { "strict_check", 	  	     CP_BOOLEAN, { (void *) &strict_check } },
 
+    { "fold_case", 	  	     CP_BOOLEAN, { (void *) &fold_case } },
     { "tokenize_html_tags",	     CP_BOOLEAN, { (void *) &tokenize_html_tags } },
     { "tokenize_html_script",	     CP_BOOLEAN, { (void *) &tokenize_html_script } },	/* Not yet in use */
     { "tokenize_html_comments",	     CP_BOOLEAN, { (void *) &tokenize_html_comments } },/* Not yet in use */
@@ -311,7 +312,7 @@ static void help(void)
 		  "\t  -2      - set binary classification mode (yes/no).\n"
 		  "\t  -3      - set ternary classification mode (yes/no/unsure).\n");
     (void)fprintf(stderr,
-		  "\t  -H {opts} - set html processing flag(s).\n"
+		  "\t  -P {opts} - set html processing flag(s).\n"
 		  "\t     where {opts} is one or more of:\n"
 		  "\t      C   - enable strict comment checking (default is loose checking).\n"
 		  "\t      t   - return tokens from inside html tags.\n"
@@ -442,7 +443,7 @@ void process_args(int argc, char **argv, int pass)
 #if HAVE_DECL_OPTRESET
     optreset = 1;
 #endif
-    while ((option = getopt(argc, argv, ":23bBc:Cd:DefFghH:I:lL:m:MnNo:O:pqQRrsStTuvVx:y:" G R F)) != -1)
+    while ((option = getopt(argc, argv, ":23bBc:Cd:DefFghI:lL:m:MnNo:O:pP:qQRrsStTuvVx:y:" G R F)) != -1)
     {
 #if 0
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
@@ -517,21 +518,28 @@ void process_args(int argc, char **argv, int pass)
 	    help();
             exit(0);
 
-	case 'H':
+	case 'P':
 	{
 	    char *s;
 	    for (s = optarg; *s && pass == 2; s += 1)
 	    {
 		switch (*s)
 		{
-		case 't': tokenize_html_tags ^= true;
+		case 't': tokenize_html_tags ^= true;		/* -Ht */
 		    break;
-		case 's': tokenize_html_script ^= true;		/* Not yet in use */
+		case 's': tokenize_html_script ^= true;		/* -Hs - not yet in use */
 		    break;
-		case 'C': strict_check ^= true;
+		case 'C': strict_check ^= true;			/* -HC */
 		    /*@fallthrough@*/
-		case 'c': tokenize_html_comments ^= true;	/* Not yet in use */
+		case 'c': tokenize_html_comments ^= true;	/* -Hc - not yet in use */
 		    break;
+		case 'h': tag_header_lines ^= true;		/* -Hh */
+		    break;
+		case 'f': fold_case ^= true;			/* -Hf */
+		    break;
+		default:
+		    fprintf(stderr, "Unknown parsing option -H%c.\n", *s);
+		    exit(2);
 		}
 	    }
 	    break;
