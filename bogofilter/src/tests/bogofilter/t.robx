@@ -54,7 +54,7 @@ fi
 
 RESULT=`$BOGOUTIL -w $TMPDIR .ROBX | $AWK '/.ROBX/ { print $2; }'`
 
-WANT="244707"
+WANT="244724"
 
 if  [ $verbose -ne 0 ]; then
     echo want: $WANT, have: $RESULT
