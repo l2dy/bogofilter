@@ -11,7 +11,7 @@
 
 #include "word.h"
 
-/** $name is a type to store an arbitrary string with actual length,
+/** Type to store an arbitrary string with actual length,
  * maximum capacity and a pointer to the last byte read.
  */
 typedef struct {
@@ -33,7 +33,6 @@ extern buff_t  *buff_init(buff_t *self, byte *buff, uint used, uint size);
 /** free the buff_t \a self, without freeing the string */
 extern void 	buff_free(buff_t *self);
 
-
 /** append word \a in to the existing buffer \a self, reallocating more
  * room if necessary */
 extern int	buff_add(buff_t *self, word_t *in);
@@ -42,6 +41,7 @@ extern int	buff_add(buff_t *self, word_t *in);
  * whichever comes first, from the stdio stream \a in into the buff_t \a
  * self. */
 #define buff_fgetsl(self, in) buff_fgetsln(self, in, UINT_MAX)
+
 /** read up to \a maxlen characters, a line feed or exhaustion of the
  * buffer capacity, whichever comes first, from the stdio stream \a in
  * into the buff_t \a self. */
