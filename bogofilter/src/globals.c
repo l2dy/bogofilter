@@ -37,6 +37,7 @@ int	verbose;			/* '-v' */
 /* config file options */
 int	max_repeats;
 double	min_dev;
+double	ham_cutoff = HAM_CUTOFF;
 double	spam_cutoff;
 double	thresh_update;
 

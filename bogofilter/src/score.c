@@ -43,10 +43,6 @@ NAME:
 
 static	double	get_spamicity(size_t robn, FLOAT P, FLOAT Q);
 
-/* Global Variables */
-
-double ham_cutoff = HAM_CUTOFF;
-
 /* Static Variables */
 
 static score_t  score;
