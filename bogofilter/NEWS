@@ -23,6 +23,10 @@ Briefly:
 
 	2005-02-24
 
+	* Transactional datastore autoprobing was completed, it assumes
+	  transactional mode if log.NNNNNNNNNN files (where N in {0, 1, ... 9})
+	  are found.
+
 	* Add swapped endian support for SQlite3 database, to support reading
 	  big endian (SPARC) generated databases on little endian machines
 	  (x86) and vice versa. To enable reading databases on machines with

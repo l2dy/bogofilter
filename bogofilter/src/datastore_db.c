@@ -262,9 +262,8 @@ static void handle_free(/*@only@*/ dbh_t *handle)
     return;
 }
 
-/** probe if the directory contains an environment, and if so, if it has
- * transactions
- * \return
+/** probe if the directory contains an environment, and if so,
+ * if it has transactions
  */
 static int probe_txn(const char *directory, const char *file)
 {
@@ -286,10 +285,30 @@ static int probe_txn(const char *directory, const char *file)
 	struct stat st;
 	int w;
 	char *t = build_path(directory, file);
+	struct dirent *de;
+	DIR *d;
 
-	/* no environment found by JOINENV
-	 * FIXME: retry globbing for log.* files */
+	/* no environment found by JOINENV */
 	dbe->close(dbe, 0);
+
+	/* retry globbing for log.* files - needed for instance after
+	 * bogoutil --db-remove DIR */
+	d = opendir(directory);
+	if (!d) {
+	    print_error(__FILE__, __LINE__, "cannot open directory %s: %s",
+		    t, strerror(r));
+	    return P_ERROR;
+	}
+	while ((de = readdir(d))) {
+	    if (strlen(de->d_name) == 14
+		    && strncmp(de->d_name, "log.", 4) == 0
+		    && strspn(de->d_name + 4, "0123456789") == 10)
+	    {
+		closedir(d);
+		return P_ENABLE;
+	    }
+	}
+	closedir(d);
 
 	w = stat(t, &st);
 	if (w == 0) {
