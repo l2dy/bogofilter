@@ -16,9 +16,9 @@ typedef struct {
 
 typedef struct {
     long count;
-    long yday;
+    long date;
 } dbv_t;
 
-void db_setvalue_and_date(void *vhandle, const char * word, long value, long yday);
+void db_setvalue_and_date(void *vhandle, const char * word, long value, long date);
 
 #endif	/* DATASTORE_H */

@@ -25,6 +25,7 @@ AUTHOR:
 #include "datastore.h"
 #include "datastore_db.h"
 #include "error.h"
+#include "maint.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
@@ -35,10 +36,6 @@ AUTHOR:
 #else
 #define	DB_OPEN(db, file, database, dbtype, flags, mode) db->open(db, NULL /*txnid*/, file, database, dbtype, flags, mode)
 #endif
-
-/* Global Variables */
-
-YEARDAY today;		/* day of year (1..366) */
 
 /* Function prototypes */
 
@@ -179,15 +176,15 @@ long db_get_dbvalue(void *vhandle, const char *word, dbv_t *val){
     memcpy(cv, db_data.data, db_data.ulen);	/* save array from wordlist */
     if (!handle->is_swapped){			/* convert from struct to array */
       val->count = cv[0];
-      val->yday  = cv[1];
+      val->date  = cv[1];
     } else {
       val->count = swap_long(cv[0]);
-      val->yday  = swap_long(cv[1]);
+      val->date  = swap_long(cv[1]);
     }
     if (handle->is_swapped){
       val->count = swap_long(val->count);
       if (db_data.ulen > sizeof(long))
-	val->yday  = swap_long(val->yday);
+	val->date  = swap_long(val->date);
     }
     return ret;
   case DB_NOTFOUND:
@@ -209,14 +206,14 @@ Notes: Calls exit if an error occurs.
 void db_setvalue(void *vhandle, const char * word, long value){
   dbv_t val;
   val.count = value;
-  val.yday  = today;		/* day is 1..366 */
+  val.date  = today;		/* date in form YYYYMMDD */
   db_set_dbvalue(vhandle, word, &val);
 }
 
-void db_setvalue_and_date(void *vhandle, const char * word, long value, long yday){
+void db_setvalue_and_date(void *vhandle, const char * word, long value, long date){
   dbv_t val;
   val.count = value;
-  val.yday  = yday;		/* day is 1..366 */
+  val.date  = date;		/* date in form YYYYMMDD */
   db_set_dbvalue(vhandle, word, &val);
 }
 
@@ -239,13 +236,13 @@ void db_set_dbvalue(void *vhandle, const char * word, dbv_t *val){
 
   if (!handle->is_swapped){		/* convert from struct to array */
     cv[0] = val->count;
-    cv[1] = val->yday;
+    cv[1] = val->date;
   } else {
     val->count = swap_long(cv[0]);
-    val->yday  = swap_long(cv[1]);
+    val->date  = swap_long(cv[1]);
   }
 
-  db_data.data = &cv;		/* and save array in wordlist */
+  db_data.data = &cv;			/* and save array in wordlist */
   db_data.size = sizeof(cv);
   db_data.ulen = sizeof(cv);
 
@@ -272,9 +269,9 @@ void db_increment(void *vhandle, const char *word, long value){
 }
 
 
-void db_increment_with_date(void *vhandle, const char *word, long value, long yday){
+void db_increment_with_date(void *vhandle, const char *word, long value, long date){
   value = db_getvalue(vhandle, word) + value;
-  db_setvalue_and_date(vhandle, word, value < 0 ? 0 : value, yday);
+  db_setvalue_and_date(vhandle, word, value < 0 ? 0 : value, date);
 }
 
 
