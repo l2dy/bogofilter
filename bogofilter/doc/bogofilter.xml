@@ -299,7 +299,7 @@ option.</para>
 <para>The <option>-S</option> option tells
 <application>bogofilter</application> to undo a prior registration of
 the same message as spam.  If a message was incorrectly entered as
-spam by '-n' or '-u' and you want to remove it and enter it as
+spam by '-s' or '-u' and you want to remove it and enter it as
 non-spam, use options '-Sn'.  If '-S' is used for a message that
 wasn't registered as spam, the counts will still be
 decremented.</para>
