@@ -46,7 +46,7 @@ int Rtable = 0;
 
 int verbose, passthrough, force, nonspam_exits_zero, quell_config_read;
 
-char directory[PATH_LEN+73];
+char directory[PATH_LEN + 100] = "";
 const char *system_config_file = "/etc/bogofilter.cf";
 const char *user_config_file   = "~/.bogofilter.cf";
 const char *spam_header_name = SPAM_HEADER_NAME;
@@ -118,13 +118,13 @@ static bool process_config_parameter(const ArgDefinition * arg, const char *val)
 		char ch=toupper(*val);
 		switch (ch)
 		{
-		case 'Y':		// Yes
-		case 'T':		// True
+		case 'Y':		/* Yes */
+		case 'T':		/* True */
 		case '1':
 		    *arg->addr.b = TRUE;
 		    break;
-		case 'N':		// No
-		case 'F':		// False
+		case 'N':		/* No */
+		case 'F':		/* False */
 		case '0':
 		    *arg->addr.b = FALSE;
 		    break;
@@ -155,14 +155,14 @@ static bool process_config_parameter(const ArgDefinition * arg, const char *val)
 	    }
 	case CP_CHAR:
 	    {
-		*arg->addr.c = * (char *)val;
+		*arg->addr.c = *(const char *)val;
 		if (DEBUG_CONFIG(0))
 		    fprintf( stderr, "%s -> '%c'\n", arg->name, *arg->addr.c );
 		break;
 	    }
 	case CP_STRING:
 	    {
-		*arg->addr.s = xstrdup( (char *) val );
+		*arg->addr.s = xstrdup((const char *)val);
 		if (DEBUG_CONFIG(0))
 		    fprintf( stderr, "%s -> '%s'\n", arg->name, *arg->addr.s );
 		break;
@@ -188,12 +188,13 @@ static bool process_config_line( const char *line )
     size_t len;
     const char *val;
 
-    for (val=line; *val != '\0'; val += 1)
-	if (isspace(*val) || *val == '=' )
+    for (val=line; *val != '\0'; val += 1) {
+	if (isspace((unsigned char)*val) || *val == '=') {
 	    break;
+	}
+    }
     len = val - line;
-    for (i=0; i<ArgDefListSize; i += 1)
-    {
+    for (i=0; i<ArgDefListSize; i += 1) {
 	const ArgDefinition *arg = &ArgDefList[i];
 	if (strncmp(arg->name, line, len) == 0)
 	{
@@ -284,7 +285,7 @@ static int validate_args(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 {
     bool registration, classification;
 
-//  flags '-s', '-n', '-S', or '-N', are mutually exclusive of flags '-p', '-u', '-e', and '-R'.
+/*  flags '-s', '-n', '-S', or '-N', are mutually exclusive of flags '-p', '-u', '-e', and '-R'. */
     classification = (run_type == RUN_NORMAL) ||(run_type == RUN_UPDATE) || passthrough || nonspam_exits_zero || (Rtable != 0);
     registration   = (run_type == REG_SPAM) || (run_type == REG_GOOD) || (run_type == REG_GOOD_TO_SPAM) || (run_type == REG_SPAM_TO_GOOD);
 
@@ -296,7 +297,9 @@ static int validate_args(/*@unused@*/ int argc, /*@unused@*/ char **argv)
 	(void)fprintf(stderr, "    Options '-p', '-u', '-e', and '-R' are used when classifying messages.\n");
 	(void)fprintf(stderr, "    The two sets of options may not be used together.\n");
 	(void)fprintf(stderr, "    \n");
-//	(void)fprintf(stderr, "    Options '-g', '-r', '-l', '-d', '-x', and '-v' may be used with either mode.\n");
+#if 0
+	(void)fprintf(stderr, "    Options '-g', '-r', '-l', '-d', '-x', and '-v' may be used with either mode.\n");
+#endif
 	return 2;
     }
 

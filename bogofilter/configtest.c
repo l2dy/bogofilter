@@ -18,23 +18,43 @@ AUTHOR:
 #include "config.h"
 #include "common.h"
 #include "debug.h"
+#include "globals.h"
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
 #include "bogoconfig.h"
 
-const char progname[] = "configtest";
+const char *progname = "configtest";
 
 #ifndef	DEBUG_CONFIG
 #define DEBUG_CONFIG(level)	(verbose > level)
 #endif
 
-int verbose = 0;
-int logflag = 0;
+static bool x_configure_wordlist(const char *val)
+{
+    return FALSE;
+}
+
+static int x_init_list(wordlist_t* list, const char* name, const char* filepath, double weight, bool bad, int override, bool ignore)
+{
+    if (DEBUG_CONFIG(0)) {
+	fprintf( stderr, "list:     %p\n", (void *)list);
+	fprintf( stderr, "name:     %s\n", name);
+	fprintf( stderr, "filepath: %s\n", filepath);
+	fprintf( stderr, "weight:   %f\n", weight);
+	fprintf( stderr, "bad:      %s\n", bad ? "T" : "F" );
+	fprintf( stderr, "override: %d\n", override);
+	fprintf( stderr, "ignore:   %s\n", ignore ? "T" : "F" );
+    }
+    return 0;
+}
 
 int main( int argc, char **argv)
 {
+    verbose = 0;
+    logflag = 0;
+
     while (--argc > 0)
     {
 	char *arg = *++argv;
@@ -46,23 +66,3 @@ int main( int argc, char **argv)
     /* read_config_file("./bogofilter.cf", 0); */
     return 0;
 }
-
-bool x_configure_wordlist(const char *val)
-{
-    return FALSE;
-}
-
-int x_init_list(wordlist_t* list, const char* name, const char* filepath, double weight, bool bad, int override, bool ignore)
-{
-    if (DEBUG_CONFIG(0)) {
-	fprintf( stderr, "list:     %p\n", list);
-	fprintf( stderr, "name:     %s\n", name);
-	fprintf( stderr, "filepath: %s\n", filepath);
-	fprintf( stderr, "weight:   %f\n", weight);
-	fprintf( stderr, "bad:      %s\n", bad ? "T" : "F" );
-	fprintf( stderr, "override: %d\n", override);
-	fprintf( stderr, "ignore:   %s\n", ignore ? "T" : "F" );
-    }
-    return 0;
-}
-

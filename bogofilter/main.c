@@ -27,18 +27,15 @@ AUTHOR:
 
 #include "version.h"
 #include "common.h"
+#include "globals.h"
 #include "lexer.h"
 #include "bogofilter.h"
 #include "bogoconfig.h"
 
 #define BOGODIR ".bogofilter"
 
-int verbose, passthrough, nonspam_exits_zero;
 extern int Rtable;
 
-char directory[PATH_LEN] = "";
-
-int  logflag;
 char msg_register[1024];
 char msg_bogofilter[1024];
 
@@ -58,7 +55,7 @@ static void set_dir_from_env(/*@reldef@*/ /*@unique@*/ char* dest,
     env = getenv(var);
     if (env == NULL) return;
 
-    strncpy(dest, env, path_left-1);  // leave one char left for '/'
+    strncpy(dest, env, path_left-1);  /* leave one char left for '/' */
     path_left -= strlen(env);
     if ('/' != dest[strlen(dest)-1]) {
 	strcat(dest, "/");
@@ -166,7 +163,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
 		if (verbose || passthrough || Rtable)
 		{
-		    extern bool stats_in_header;
 		    if (! stats_in_header)
 			(void)fputs("\n", stdout);
 		    verbose += passthrough;
@@ -233,4 +229,4 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     exit(exitcode);
 }
 
-// End
+/* End */
