@@ -120,9 +120,10 @@ static const parm_desc sys_parms[] =
     { "stats_in_header",  CP_BOOLEAN,	{ (void *) &stats_in_header } },
     { "spam_header_name", CP_STRING,	{ &spam_header_name } },
     { "user_config_file", CP_STRING,	{ &user_config_file } },
-    { "wordlist",	  CP_WORDLIST,	{ (void *) NULL } },	/* Processed by configure_wordlist() */
-    
-    { "algorithm",  	  CP_ALGORITHM,	{ (void *) NULL } },	/* Processed by select_method() */
+
+    { "algorithm",  	  CP_ALGORITHM,	{ (void *) "algorithm" } },	/* Processed by select_method() */
+    { "wordlist",	  CP_WORDLIST,	{ (void *) "wordlist" } },	/* Processed by configure_wordlist() */
+    /* Above, string addresses are used to circumvent the NULL check in process_config_parameter() */
 
     { "min_dev",	  CP_DOUBLE,	{ (void *) &min_dev } },
     { "spam_cutoff",	  CP_DOUBLE,	{ (void *) &spam_cutoff } },
