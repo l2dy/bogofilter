@@ -4,8 +4,6 @@
 
 set -e
 
-cd t.systest.d
-
 # Note:  This test DOES leave its output files on the hard drive.
 #	 This makes it easier to see what has happened, which is
 #		especially useful when something is different.
@@ -21,69 +19,73 @@ if [ "$1" = "-v" ]; then
     verbose=1
 fi
 
-cat <<EOF > cfg.r
+[   -d ${TMPDIR} ] && rm -f ${TMPDIR}/*
+[ ! -d ${TMPDIR} ] && mkdir ${TMPDIR}
+
+cat <<EOF > ${TMPDIR}/cfg.r
 robx=0.415
 min_dev=0.0
 EOF
 
-cat <<EOF > cfg.f
+cat <<EOF > ${TMPDIR}/cfg.f
 robx=0.415
 min_dev=0.1
 EOF
 
-cat /dev/null > cfg.g
+cat /dev/null > ${TMPDIR}/cfg.g
 
-BOGOUTIL="../../bogoutil"
-BOGOFILTER="../../bogofilter"
+BOGOUTIL="../bogoutil"
+BOGOFILTER="../bogofilter"
+SYSTEST="${srcdir}/t.systest.d"
 
 run_test()
 {
     id="$1"
     out="$2"
     ver="$3"
-    OUT="tests/msg.$out.$alg.$ver"
-    OPTS="-$alg -t -$ver -c cfg.$alg"
-    $BOGOFILTER $OPTS < inputs/msg.$id.txt > tests-$alg || true
-    sed s/,.version=.*// < tests-$alg > $OUT
+    OUT="${TMPDIR}/tests/msg.$out.$alg.$ver"
+    OPTS="-$alg -t -$ver -c ${TMPDIR}/cfg.$alg"
+    $BOGOFILTER $OPTS < ${SYSTEST}/inputs/msg.$id.txt > ${TMPDIR}/tests-$alg || true
+    sed s/,.version=.*// < ${TMPDIR}/tests-$alg > $OUT
 }
 
-[   -d tests ] && rm -f tests/*
-[ ! -d tests ] && mkdir tests
+[   -d ${TMPDIR}/tests ] && rm -f ${TMPDIR}/tests/*
+[ ! -d ${TMPDIR}/tests ] && mkdir -p ${TMPDIR}/tests
 
 for alg in r f g ; do
-    BOGOFILTER_DIR="tests.$alg"
+    BOGOFILTER_DIR="${TMPDIR}/tests.$alg"
     export BOGOFILTER_DIR
     [   -d $BOGOFILTER_DIR ] && rm -f $BOGOFILTER_DIR/*
     [ ! -d $BOGOFILTER_DIR ] && mkdir $BOGOFILTER_DIR
-    $BOGOFILTER -$alg -s < inputs/spam.mbx
-    $BOGOFILTER -$alg -n < inputs/good.mbx
+    $BOGOFILTER -$alg -s < ${SYSTEST}/inputs/spam.mbx
+    $BOGOFILTER -$alg -n < ${SYSTEST}/inputs/good.mbx
     #
     # run tests for msg.[1-8].txt
     #
-    for msg in inputs/msg.?.txt ; do
-	tst=`echo $msg | sed s@inputs/msg.@@ | sed s@.txt@@`
+    for msg in ${SYSTEST}/inputs/msg.?.txt ; do
+	tst=`echo $msg | sed s@${SYSTEST}/inputs/msg.@@ | sed s@.txt@@`
 	args="$tst $tst v"
 	run_test $args
     done
 
-    rm -f tests-$alg
+    rm -f ${TMPDIR}/tests-$alg
 done
 
 OUT="grftest.out"
 
-printf "%2s     %-10s   %-10s   %-10s\n" id graham robinson fisher > tests/$OUT
-for out in tests/msg.?.r.v ; do
-    id=`echo $out | sed s@tests/msg.@@ | sed s@.r.v@@`
-    g=`cat tests/msg.$id.g.v | tr "NY" "hS"`
-    r=`cat tests/msg.$id.r.v | tr "NY" "hS"`
-    f=`cat tests/msg.$id.f.v | tr "NY" "hS"`
-    printf "%2s   %c %s   %c %s   %c %s\n" $id $g $r $f >> tests/$OUT
+printf "%2s     %-10s   %-10s   %-10s\n" id graham robinson fisher > ${TMPDIR}/tests/$OUT
+for out in ${TMPDIR}/tests/msg.?.r.v ; do
+    id=`echo $out | sed s@${TMPDIR}/tests/msg.@@ | sed s@.r.v@@`
+    g=`cat ${TMPDIR}/tests/msg.$id.g.v | tr "NY" "hS"`
+    r=`cat ${TMPDIR}/tests/msg.$id.r.v | tr "NY" "hS"`
+    f=`cat ${TMPDIR}/tests/msg.$id.f.v | tr "NY" "hS"`
+    printf "%2s   %c %s   %c %s   %c %s\n" $id $g $r $f >> ${TMPDIR}/tests/$OUT
 done
 
-if test x$SUPPRESS_DELETE != x ; then rm -rf t.systest.d/cfg.?; fi
+if test x$SUPPRESS_DELETE != x ; then rm -rf ${TMPDIR}/cfg.?; fi
 
 if  [ "$verbose" = "1" ]; then
-    diff -u -s outputs/$OUT tests/$OUT
+    diff -u -s ${SYSTEST}/outputs/$OUT ${TMPDIR}/tests/$OUT
 fi
 
-cmp outputs/$OUT tests/$OUT
+cmp ${SYSTEST}/outputs/$OUT ${TMPDIR}/tests/$OUT
