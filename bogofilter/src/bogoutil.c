@@ -20,20 +20,19 @@ AUTHOR:
 #include <sys/stat.h>
 #include <time.h>
 
-#include <db.h>
-
 #include <config.h>
 #include "common.h"
-#include "xmalloc.h"
-#include "xstrdup.h"
 
 #include "bogofilter.h"
+#include "buff.h"
 #include "datastore.h"
 #include "error.h"
 #include "maint.h"
+#include "paths.h"
 #include "robinson.h"			/* for ROBS and ROBX */
 #include "swap.h"
-#include "paths.h"
+#include "xmalloc.h"
+#include "xstrdup.h"
 
 #define PROGNAME "bogoutil"
 
@@ -279,13 +278,11 @@ static int load_file(char *db_file)
     return rv;
 }
 
-static int get_token(char *buf, int bufsize, FILE *fp)
+static int get_token(buff_t *buff, FILE *fp)
 {
-    char *p;
     int rv = 0;
-    size_t len;
 
-    if (fgets(buf, bufsize, fp) == NULL) {
+    if (fgets(buff->t.text, buff->size, fp) == NULL) {
 	if (ferror(fp)) {
 	    perror(PROGNAME);
 	    rv = 2;
@@ -293,17 +290,18 @@ static int get_token(char *buf, int bufsize, FILE *fp)
 	    rv = 1;
 	}
     } else {
-	len = strlen(buf);
-	p = &buf[len - 1];
+	char *p;
+	buff->t.leng = strlen(buff->t.text);
+	p = buff->t.text + buff->t.leng - 1;
 	
-	if (*(p--) != '\n') {
+	if (*p != '\n') {
 	    fprintf(stderr,
 		    "%s: Unexpected input [%s]. Does not end with newline "
 		    "or line too long.\n",
-		    PROGNAME, buf);
+		    PROGNAME, buff->t.text);
 	    rv = 1;
 	}
-	*(p + 1) = '\0';
+	*p = '\0';
     }
     return rv;
 }
@@ -320,13 +318,14 @@ static int words_from_list(const char *db_file, int argc, char **argv)
     if ( argc == 0)
     {
 	char buf[BUFSIZE];
-	while (get_token(buf, BUFSIZE, stdin) == 0) {
-	    word_t *token = word_new(buf, strlen(buf));
+	buff_t *buff = buff_new(buf, 0, BUFSIZE);
+	while (get_token(buff, stdin) == 0) {
+	    word_t *token = &buff->t;
 	    uint32_t count = db_getvalue(dbh, token);
 	    word_puts(token, stdout);
 	    printf(" %lu\n", (unsigned long) count);
-	    word_free(token);
 	}
+	buff_free(buff);
     }
     else
     {
@@ -351,6 +350,7 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     void *dbh_spam;
     char filepath[PATH_LEN];
     char buf[BUFSIZE];
+    buff_t *buff = buff_new(buf, 0, BUFSIZE);
     char *word = buf;
     unsigned long spam_count, spam_msg_count = 0 ;
     unsigned long good_count, good_msg_count = 0 ;
@@ -386,9 +386,9 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 	
 	if ( argc == 0)
 	{
-	    if (get_token(buf, BUFSIZE, stdin) != 0)
+	    if (get_token(buff, stdin) != 0)
 		break;
-	    token = word_new(buf, strlen(buf));
+	    token = &buff->t;
 	} else {
 	    word = *argv++;
 	    if (--argc == 0)
@@ -410,7 +410,8 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 	    rob_prob = ((ROBS * ROBX + spamness) / (ROBS + spamness+goodness));
 	}
 	printf(data_format, token->text, spam_count, good_count, gra_prob, rob_prob);
-	word_free(token);
+	if (argc != 0)
+	    word_free(token);
     }
 
     db_close(dbh_good, false);
