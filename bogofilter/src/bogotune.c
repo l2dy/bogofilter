@@ -784,7 +784,8 @@ static void help(void)
 		  "\t  -D      - don't read a wordlist file.\n"
 		  "\t  -d path - specify directory for wordlists.\n"
 		  "\t  -M      - output input file in message count format.\n"
-		  "\t  -r num  - specify robx value\n"
+		  "\t  -r num  - specify robx value\n");
+    (void)fprintf(stderr,
 		  "\t  -T num  - specify fp target value\n"
 		  "\t  -s file1 file2 ... - spam files\n"
 		  "\t  -n file1 file2 ... - non-spam files\n" 
