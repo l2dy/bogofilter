@@ -39,7 +39,7 @@ EXTRA_DIST = $(man1_MANS) \
 #
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
 version.h:	version.sh $(VERSION_FROM)
-	version.sh $(VERSION_FROM) >$@
+	./version.sh $(VERSION_FROM) >$@
 #
 debugtest: debug.c
 	$(CC) -DMAIN $(CFLAGS) -o debugtest debug.c

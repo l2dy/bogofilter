@@ -322,6 +322,7 @@ void populate_bogostats(bogostat_t *bogostats, char *text, double prob, int coun
 	}
 	hit->prob = prob;
 	strncpy(hit->key, text, MAXTOKENLEN);
+	hit->key[MAXTOKENLEN] = '\0';
     }
 }
 

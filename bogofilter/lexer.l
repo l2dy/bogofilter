@@ -25,7 +25,7 @@
 // We throw away *all* tokens of length 1 or 2.
 //
 // These are optimizations to keep the token lists from bloating.
-// The big win is regognizing machine-generated unique IDs that
+// The big win is recognizing machine-generated unique IDs that
 // we'll never see again and shouldn't 
 //
 // We don't treat dot between two alphanumerics as a separator,

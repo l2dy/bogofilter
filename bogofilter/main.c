@@ -105,10 +105,6 @@ int main(int argc, char **argv)
     int	  ch;
     int   exitcode = 0;
 
-#ifdef HAVE_SYSLOG_H
-    openlog ( "bogofilter", LOG_PID, LOG_DAEMON );
-#endif
-
     set_dir_from_env(directory, "HOME", BOGODIR);
     set_dir_from_env(directory, "BOGOFILTER_DIR", NULL);
 
@@ -284,6 +280,8 @@ int main(int argc, char **argv)
 #ifdef HAVE_SYSLOG_H
     if (logflag)
     {
+	openlog ( "bogofilter", LOG_PID, LOG_DAEMON );
+
 	switch (run_type)
 	{
 	case RUN_NORMAL:
@@ -296,6 +294,8 @@ int main(int argc, char **argv)
 	    syslog(LOG_INFO, msg_register);
 	    break;
 	}
+
+	closelog ( "bogofilter", LOG_PID, LOG_DAEMON );
     }
 #endif
 
