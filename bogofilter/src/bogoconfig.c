@@ -742,7 +742,7 @@ void query_config(void)
     Q2 fprintf(stdout, "\n");
 
     Q2 fprintf(stdout, "%-18s = %s\n", "bogofilter_dir", bogohome);
-    Q2 fprintf(stdout, "wordlist(s)\n"); display_wordlists();
+    Q2 fprintf(stdout, "%-18s = ", "wordlist(s)"); display_wordlists("%-18s = ");
     Q2 fprintf(stdout, "\n");
 
     Q2 fprintf(stdout, "%-18s = %s\n", "unregister-nonspam", YN(run_type == UNREG_GOOD));

@@ -175,13 +175,15 @@ void free_wordlists(void)
     free_bogohome();
 }
 
-void display_wordlists(void)
+void display_wordlists(const char *fmt)
 {
     wordlist_t *list;
 
     for ( list = word_lists; list != NULL ; list = list->next )
     {
-	fprintf(stdout, "\t%s,%s,%s,%d\n",
+	if (list != word_lists)
+	    fprintf(stdout, fmt, " ");
+	fprintf(stdout, "%s,%s,%s,%d\n",
 		(list->type == WL_REGULAR) ? "r" : "i",
 		list->listname,
 		list->filepath,
