@@ -5,6 +5,20 @@
 Be sure to read RELEASE.NOTES-0.15, with attention to the section
 about retraining and the '-H' flag...
 
+* Configure now finds a bash compatible shell for running version.sh
+* Remove --disable-* options for algorithms. Has never been supported
+  well and serves no useful purpose, the algorithm code is irrelevant
+  compared to lexer or other stuff.
+* Bogotune now checks for incorrectly classified messages in the test
+  data and exits if so.
+* Fixed timestamp config option.
+* Lexer changes reduce size of bogofilter executable by approx 90%.
+* Removed repetition counts in lexer for TOKEN and MIME_BOUNDARY
+  patterns to reduce executable size.
+* Several minor lexer bugs fixed.
+* Minor documentation fixes.
+* Minor error message cleanups.
+
 0.15.8	2003-10-29
 
 * Modified handling of mime attachments to decode rfc822 and to

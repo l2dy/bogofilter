@@ -4,6 +4,23 @@
 
 $Id$
      
+	2003-11-14
+
+	* Bogotune now checks for incorrectly classified messages in the test
+	  data and exits if so.
+
+	* Configure now finds a bash compatible shell for running version.sh
+
+	2003-11-12
+
+	* Several minor lexer bugs fixed.
+	* Lexer changes reduce size of bogofilter executable by approx 90%.
+
+	2003-11-07
+
+	* Minor error message cleanups.
+	* Minor documentation fixes.
+
 	2003-11-05
 
 	* Fixed timestamp config option.
