@@ -103,6 +103,7 @@ libbogofilter_a_SOURCES= \
 	swap.h swap_32bit.c system.c \
 	textblock.h textblock.c \
 	token.h token.c \
+	transaction.h transaction.c \
 	uudecode.h uudecode.c \
 	word.h word.c \
 	wordhash.h wordhash.c wordlists.h wordlists.c \

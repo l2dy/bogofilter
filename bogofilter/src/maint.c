@@ -19,6 +19,7 @@ AUTHOR:
 #include "datastore.h"
 #include "error.h"
 #include "maint.h"
+#include "transaction.h"
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
@@ -146,13 +147,18 @@ int maintain_wordlist_file(const char *db_file)
     return rc;
 }
 
+struct userdata_t {
+    void *vhandle;
+    ta_t *transaction;
+};
 
 static int maintain_hook(word_t *w_key, dsv_t *in_val,
-			 /*@unused@*/ void *userdata)
+			 void *userdata)
 {
     size_t len;
     word_t token;
-    void *vhandle = userdata;
+    void *vhandle = ((struct userdata_t *) userdata)->vhandle;
+    ta_t *transaction = ((struct userdata_t *) userdata)->transaction;
 
     token.text = w_key->text;
     token.leng = w_key->leng;
@@ -160,11 +166,11 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
     len = strlen(MSG_COUNT);
     if (len == token.leng && 
 	strncmp((char *)token.text, MSG_COUNT, token.leng) == 0)
-	return 0;
+	return EX_OK;
 
     if ((!keep_count(in_val->spamcount) && !keep_count(in_val->goodcount)) || 
 	!keep_date(in_val->date) || !keep_size(token.leng)) {
-	int ret = ds_delete(vhandle, &token);
+	int ret = ta_delete(transaction, vhandle, &token);
 	if (DEBUG_DATABASE(0))
 	    fprintf(dbgout, "deleting '%*s'\n", (int)min(INT_MAX, token.leng), (char *)token.text);
 	return ret;
@@ -179,9 +185,10 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 	{
 	    int	  ret;
 	    dsv_t old_tmp;
-
+	    ta_t *tr = ta_init();
+	    
 	    /* delete original token */
-	    ds_delete(vhandle, &token);	
+	    ta_delete(tr, vhandle, &token);	
 
 	    /* retrieve and update nonascii token*/
 	    token.text = key_tmp;
@@ -193,14 +200,25 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 		in_val->date       = max(old_tmp.date, in_val->date);	/* date in form YYYYMMDD */
 	    }
 	    set_date(in_val->date);	/* set timestamp */
-	    ds_write(vhandle, &token, in_val);
+	    ta_write(tr, vhandle, &token, in_val);
+	    ta_commit(tr);
 	}
 	xfree(key_tmp);
     }
-    return 0;
+    return EX_OK;
 }
 
 int maintain_wordlist(void *vhandle)
 {
-    return ds_foreach(vhandle, maintain_hook, vhandle);
+    ta_t *transaction = ta_init();
+
+    struct userdata_t userdata;
+    int ret;
+    
+    userdata.vhandle = vhandle;
+    userdata.transaction = transaction;
+    
+    ret = ds_foreach(vhandle, maintain_hook, &userdata);
+    
+    return ret | ta_commit(transaction);
 }
