@@ -152,6 +152,8 @@ double *sp_scores;
 double user_robx = 0.0;		/* from option '-r value' */
 uint   coerced_target = 0;	/* user supplied with '-T value' */
 
+uint   ncnt, nsum;		/* neighbor count and sum - for gfn() averaging */
+
 #undef	TEST
 
 #ifdef	TEST
@@ -989,6 +991,8 @@ static int gfn(result_t *results, uint rsi, uint mdi, uint rxi)
     int fn = r->fn;
     if (verbose > 100)
 	printf("   %2d, %2d, %2d, %2d\n", rsi, mdi, rxi, fn);
+    ncnt += 1;
+    nsum += fn;
     return fn;
 }
 
@@ -1001,28 +1005,32 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
     uint rsc = rsval->cnt - 1;
     uint rxc = rxval->cnt - 1;
     uint mdc = mdval->cnt - 1;
-    result_t *r = &sorted[r_count / 4];
-    uint mfn = r->fn;			/* median false negative */
+
+    result_t *r;
+    uint pct = 33;
+    uint q33 = sorted[r_count * pct / 100].fn;		/* 33% quantile */
+    uint med = sorted[r_count *  50 / 100].fn;		/* median false negative */
 
     if (verbose)
-	printf("25%% fn count was %d\n", mfn);
+	printf("%d%% fn count was %d\n", pct, med);
 
     for (i = 0; i < r_count; i += 1) {
 	r = &sorted[i];
 	rsi = r->rsi; mdi = r->mdi; rxi = r->rxi;
-
+	ncnt = nsum = 0;
 	if (((rsi == 0   ||
-	      (fn = gfn(unsorted, rsi-1, mdi, rxi)) < mfn)) &&
+	      (fn = gfn(unsorted, rsi-1, mdi, rxi)) < med)) &&
 	    ((rsi == rsc ||
-	      (fn = gfn(unsorted, rsi+1, mdi, rxi)) < mfn)) &&
+	      (fn = gfn(unsorted, rsi+1, mdi, rxi)) < med)) &&
 	    ((mdi == 0   ||
-	      (fn = gfn(unsorted, rsi, mdi-1, rxi)) < mfn)) &&
+	      (fn = gfn(unsorted, rsi, mdi-1, rxi)) < med)) &&
 	    ((mdi == mdc ||
-	      (fn = gfn(unsorted, rsi, mdi+1, rxi)) < mfn)) &&
+	      (fn = gfn(unsorted, rsi, mdi+1, rxi)) < med)) &&
 	    ((rxi == 0   ||
-	      (fn = gfn(unsorted, rsi, mdi, rxi-1)) < mfn)) &&
+	      (fn = gfn(unsorted, rsi, mdi, rxi-1)) < med)) &&
 	    ((rxi == rxc ||
-	      (fn = gfn(unsorted, rsi, mdi, rxi+1)) < mfn)))
+	      (fn = gfn(unsorted, rsi, mdi, rxi+1)) < med)) &&
+	    (nsum / ncnt <  q33))
 	{
 	    f = true;
 	    break;
@@ -1037,7 +1045,6 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
 
     if (!f) {
 	r = &sorted[0];
-	rsi = r->rsi; mdi = r->mdi; rxi = r->rxi;
 	printf("No smooth minimum encountered, using lowest fn count (an outlier).         \n");
     }
 
