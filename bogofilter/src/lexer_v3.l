@@ -207,9 +207,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
 <INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); 		skip_to('='); return TOKEN; }
 <INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); 	skip_to(':'); return TOKEN; }
-<INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); 	skip_to(':'); return TOKEN; }
-<INITIAL>^Content-Type:{TTYPE};?		{ mime_type(yy_text()); 	skip_to(':'); return TOKEN; }
-<INITIAL>^Content-Disposition:{MTYPE}		{ mime_disposition(yy_text()); 	skip_to(':'); return TOKEN; }
+<INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); return TOKEN; }
 <INITIAL>^To/:.*				{ if (header_line_markup) set_tag(yy_text()); }
 <INITIAL>^From/:.*				{ if (header_line_markup) set_tag(yy_text()); }
 <INITIAL>^Return-Path/:.*			{ if (header_line_markup) set_tag(yy_text()); }

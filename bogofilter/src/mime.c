@@ -94,6 +94,10 @@ typedef struct {
 
 /* Function Prototypes */
 
+void mime_disposition (word_t *text);
+void mime_encoding (word_t *text);
+void mime_type (word_t *text);
+
 static const byte *skipws (const byte *t, const byte *e);
 static byte *getword (const byte *t, const byte *e);
 #if	0
@@ -407,6 +411,23 @@ mime_version (word_t *text)
   if (msg_state->version)
       xfree(msg_state->version);
   msg_state->version = w;
+}
+
+void 
+mime_content(word_t *text)
+{
+    char *key = (char *) text->text;
+    switch (tolower(key[9])) {
+    case 'r':			/*  Content-Transfer-Encoding: */
+	mime_encoding(text);
+	break;
+    case 'y':			/*  Content-Type: */
+	mime_type(text);
+	break;
+    case 'i':			/*  Content-Disposition: */
+	mime_disposition(text);
+	break;
+    }
 }
 
 void
