@@ -123,11 +123,9 @@ AC_ARG_ENABLE(robinson-method,
 )
 
 if test "$ROBDIS" != yes; then
-echo ROBDIS .ne. yes
 	AC_ARG_ENABLE(robinson-fisher,
 		AC_HELP_STRING([--enable-robinson-fisher],
 		[Enable Fisher's method of combining P]),
-echo enableval is .$enableval.
 		if test "$enableval" = yes; then
 			AC_DEFINE(ENABLE_ROBINSON_FISHER,1,
 			[Enable Fisher's method of combining P])
