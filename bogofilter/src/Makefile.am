@@ -30,7 +30,8 @@ libbf_gsl_a_SOURCES= \
 noinst_LIBRARIES += libbf_gsl.a
 endif
 
-AM_CPPFLAGS = -I$(top_srcdir)/gnugetopt -I$(top_srcdir)/trio -I$(top_srcdir) @GSL_CFLAGS@
+AM_CPPFLAGS = -I$(top_srcdir)/gnugetopt -I$(top_srcdir)/trio -I$(srcdir) \
+	      @GSL_CFLAGS@ -I-
 AM_CFLAGS = -DBOGOFILTER
 
 if ENABLE_MEMDEBUG
