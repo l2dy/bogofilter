@@ -76,9 +76,9 @@ const char *db_str_err(int);
 const char *db_version_str(void);
 
 /* Transactional interfaces */
-int dbe_txn_begin(void *handle);
-int dbe_txn_abort(void *handle);
-int dbe_txn_commit(void *handle);
+int dbe_txn_begin(void *vhandle);
+int dbe_txn_abort(void *vhandle);
+int dbe_txn_commit(void *vhandle);
 
 int dbe_recover(int catastrophic, int force);
 
@@ -89,6 +89,6 @@ bool db_is_swapped(void *vhandle);
 bool db_created(void *vhandle);
 
 /* Returns parent environment */
-void *db_get_env(void *);
+void *db_get_env(void *vhandle);
 
 #endif

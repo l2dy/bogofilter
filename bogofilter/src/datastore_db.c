@@ -180,7 +180,7 @@ static int DB_SET_FLAGS(DB *db, u_int32_t flags)
 #endif
 
 /** "constructor" - allocate our handle and initialize its contents */
-static dbh_t *dbh_init(const char *path, const char *name)
+static dbh_t *handle_init(const char *path, const char *name)
 {
     dbh_t *handle;
     size_t len = strlen(path) + strlen(name) + 2;
@@ -203,7 +203,7 @@ static dbh_t *dbh_init(const char *path, const char *name)
 
 /** free \a handle and associated data.
  * NB: does not close transactions, data bases or the environment! */
-static void dbh_free(/*@only@*/ dbh_t *handle)
+static void handle_free(/*@only@*/ dbh_t *handle)
 {
     if (handle != NULL) {
 	xfree(handle->name);
@@ -333,7 +333,7 @@ const char *db_version_str(void)
 /** Initialize database. Expects open environment.
  * \return pointer to database handle on success, NULL otherwise.
  */
-void *db_open(void *dbenv, const char *path, const char *name, dbmode_t open_mode)
+void *db_open(void *vhandle, const char *path, const char *name, dbmode_t open_mode)
 {
     int ret;
     int is_swapped;
@@ -341,7 +341,7 @@ void *db_open(void *dbenv, const char *path, const char *name, dbmode_t open_mod
 			races? 2 is sufficient unless the kernel or
 			BerkeleyDB are buggy. */
     char *t;
-    dbe_t *env = dbenv;
+    dbe_t *env = vhandle;
 
     dbh_t *handle = NULL;
     uint32_t opt_flags = (open_mode == DS_READ) ? DB_RDONLY : 0;
@@ -355,7 +355,7 @@ void *db_open(void *dbenv, const char *path, const char *name, dbmode_t open_mod
 	DB *dbp;
 	uint32_t pagesize;
 
-	handle = dbh_init(path, name);
+	handle = handle_init(path, name);
 
 	if (handle == NULL)
 	    return NULL;
@@ -454,7 +454,7 @@ retry_db_open:
     return handle;
 
  open_err:
-    dbh_free(handle);
+    handle_free(handle);
 
     if (ret >= 0)
 	errno = ret;
@@ -499,22 +499,22 @@ int dbe_txn_begin(void *vhandle)
     DB_TXN *t;
     int ret;
 
-    dbe_t *handle = vhandle;
-    assert(handle);
-    assert(handle->magic == MAGIC_DBE);
-    assert(handle->dbe);
-    assert(handle->txn == 0);
+    dbe_t *env = vhandle;
+    assert(env);
+    assert(env->magic == MAGIC_DBE);
+    assert(env->dbe);
+    assert(env->txn == 0);
 
-    ret = BF_TXN_BEGIN(handle->dbe, NULL, &t, 0);
+    ret = BF_TXN_BEGIN(env->dbe, NULL, &t, 0);
     if (ret) {
 	print_error(__FILE__, __LINE__, "DB_ENV->txn_begin(%p), err: %s",
-		(void *)handle->dbe, db_strerror(ret));
+		(void *)env->dbe, db_strerror(ret));
 	return ret;
     }
-    handle->txn = t;
+    env->txn = t;
     if (DEBUG_DATABASE(2))
 	fprintf(dbgout, "DB_ENV->txn_begin(%p), tid: %lx\n",
-		(void *)handle->dbe, (unsigned long)BF_TXN_ID(t));
+		(void *)env->dbe, (unsigned long)BF_TXN_ID(t));
 
     return 0;
 }
@@ -522,9 +522,9 @@ int dbe_txn_begin(void *vhandle)
 int dbe_txn_abort(void *vhandle)
 {
     int ret;
-    dbe_t *handle = vhandle;
-    DB_TXN *t = handle->txn;
-    assert(handle->magic == MAGIC_DBE);
+    dbe_t *env = vhandle;
+    DB_TXN *t = env->txn;
+    assert(env->magic == MAGIC_DBE);
     assert(t);
 
     ret = BF_TXN_ABORT(t);
@@ -535,7 +535,7 @@ int dbe_txn_abort(void *vhandle)
 	if (DEBUG_DATABASE(2))
 	    fprintf(dbgout, "DB_TXN->abort(%lx)\n",
 		    (unsigned long)BF_TXN_ID(t));
-    handle->txn = NULL;
+    env->txn = NULL;
 
     switch (ret) {
 	case 0:
@@ -550,10 +550,10 @@ int dbe_txn_abort(void *vhandle)
 int dbe_txn_commit(void *vhandle)
 {
     int ret;
-    dbe_t *handle = vhandle;
-    DB_TXN *t = handle->txn;
+    dbe_t *env = vhandle;
+    DB_TXN *t = env->txn;
     u_int32_t id;
-    assert(handle->magic == MAGIC_DBE);
+    assert(env->magic == MAGIC_DBE);
     assert(t);
 
     id = BF_TXN_ID(t);
@@ -565,13 +565,13 @@ int dbe_txn_commit(void *vhandle)
 	if (DEBUG_DATABASE(2))
 	    fprintf(dbgout, "DB_TXN->commit(%lx, 0)\n",
 		    (unsigned long)id);
-    handle->txn = NULL;
+    env->txn = NULL;
 
     switch (ret) {
 	case 0:
 	    /* push out buffer pages so that >=15% are clean - we
 	     * can ignore errors here, as the log has all the data */
-	    BF_MEMP_TRICKLE(handle->dbe, 15, NULL);
+	    BF_MEMP_TRICKLE(env->dbe, 15, NULL);
 
 	    return DST_OK;
 	case DB_LOCK_DEADLOCK:
@@ -771,7 +771,7 @@ void db_close(void *vhandle)
 		db_strerror(ret));
 
     handle->dbp = NULL;
-    dbh_free(handle);
+    handle_free(handle);
 }
 
 
@@ -948,24 +948,24 @@ static int db_try_glock(short locktype, int lockcmd) {
 static dbe_t *db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
 {
     int ret;
-    dbe_t *e = xcalloc(1, sizeof(dbe_t));
+    dbe_t *env = xcalloc(1, sizeof(dbe_t));
 
     assert(bogohome);
 
-    e->magic = MAGIC_DBE;
-    ret = db_env_create(&e->dbe, 0);
+    env->magic = MAGIC_DBE;
+    ret = db_env_create(&env->dbe, 0);
     if (ret != 0) {
 	print_error(__FILE__, __LINE__, "db_env_create, err: %d, %s", ret,
 		db_strerror(ret));
 	exit(EX_ERROR);
     }
     if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "db_env_create: %p\n", (void *)e->dbe);
+	fprintf(dbgout, "db_env_create: %p\n", (void *)env->dbe);
 
-    e->dbe->set_errfile(e->dbe, stderr);
+    env->dbe->set_errfile(env->dbe, stderr);
 
     if (db_cachesize != 0 &&
-	    (ret = e->dbe->set_cachesize(e->dbe, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
+	    (ret = env->dbe->set_cachesize(env->dbe, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
 	print_error(__FILE__, __LINE__, "DB_ENV->set_cachesize(%u), err: %d, %s",
 		db_cachesize, ret, db_strerror(ret));
 	exit(EX_ERROR);
@@ -976,45 +976,45 @@ static dbe_t *db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
 
     /* configure lock system size - locks */
 #if DB_AT_LEAST(3,2)
-    if ((ret = e->dbe->set_lk_max_locks(e->dbe, numlocks)) != 0)
+    if ((ret = env->dbe->set_lk_max_locks(env->dbe, numlocks)) != 0)
 #else
-    if ((ret = e->dbe->set_lk_max(e->dbe, numlocks)) != 0)
+    if ((ret = env->dbe->set_lk_max(env->dbe, numlocks)) != 0)
 #endif
     {
-	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_max_locks(%p, %lu), err: %s", (void *)e->dbe,
+	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_max_locks(%p, %lu), err: %s", (void *)env->dbe,
 		(unsigned long)numlocks, db_strerror(ret));
 	exit(EX_ERROR);
     }
     if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "DB_ENV->set_lk_max_locks(%p, %lu)\n", (void *)e->dbe, (unsigned long)numlocks);
+	fprintf(dbgout, "DB_ENV->set_lk_max_locks(%p, %lu)\n", (void *)env->dbe, (unsigned long)numlocks);
 
 #if DB_AT_LEAST(3,2)
     /* configure lock system size - objects */
-    if ((ret = e->dbe->set_lk_max_objects(e->dbe, numobjs)) != 0) {
-	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_max_objects(%p, %lu), err: %s", (void *)e->dbe,
+    if ((ret = env->dbe->set_lk_max_objects(env->dbe, numobjs)) != 0) {
+	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_max_objects(%p, %lu), err: %s", (void *)env->dbe,
 		(unsigned long)numobjs, db_strerror(ret));
 	exit(EX_ERROR);
     }
     if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "DB_ENV->set_lk_max_objects(%p, %lu)\n", (void *)e->dbe, (unsigned long)numlocks);
+	fprintf(dbgout, "DB_ENV->set_lk_max_objects(%p, %lu)\n", (void *)env->dbe, (unsigned long)numlocks);
 #endif
 
     /* configure automatic deadlock detector */
-    if ((ret = e->dbe->set_lk_detect(e->dbe, DB_LOCK_DEFAULT)) != 0) {
+    if ((ret = env->dbe->set_lk_detect(env->dbe, DB_LOCK_DEFAULT)) != 0) {
 	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT), err: %s", db_strerror(ret));
 	exit(EX_ERROR);
     }
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT)\n");
 
-    ret = e->dbe->open(e->dbe, bogohome,
+    ret = env->dbe->open(env->dbe, bogohome,
 #if DB_AT_MOST(3,0)
 	    NULL,
 #endif
 	    DB_INIT_MPOOL | DB_INIT_LOCK
 	    | DB_INIT_LOG | DB_INIT_TXN | DB_CREATE | flags, /* mode */ 0644);
     if (ret != 0) {
-	e->dbe->close(e->dbe, 0);
+	env->dbe->close(env->dbe, 0);
 	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %d, %s", ret, db_strerror(ret));
 	if (ret == DB_RUNRECOVERY) {
 	    fprintf(stderr, "To recover, run: bogoutil -v -f \"%s\"\n",
@@ -1028,7 +1028,7 @@ static dbe_t *db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB_ENV->open(home=%s)\n", bogohome);
 
-    return e;
+    return env;
 }
 
 /* close the environment, but do not release locks */
@@ -1094,8 +1094,7 @@ void *dbe_init(void) {
 }
 
 int dbe_recover(int catastrophic, int force) {
-    int ret;
-    dbe_t *e;
+    dbe_t *env;
 
     /* set exclusive/write lock for recovery */
     while((force || needs_recovery())
@@ -1111,8 +1110,8 @@ retry:
     if (DEBUG_DATABASE(0))
         fprintf(dbgout, "running %s data base recovery\n",
 	    catastrophic ? "catastrophic" : "regular");
-    e = db_xinit(1024, 1024, catastrophic ? DB_RECOVER_FATAL : DB_RECOVER);
-    if (!e) {
+    env = db_xinit(1024, 1024, catastrophic ? DB_RECOVER_FATAL : DB_RECOVER);
+    if (env == NULL) {
 	if(!catastrophic) {
 	    catastrophic = 1;
 	    goto retry;
@@ -1121,7 +1120,7 @@ retry:
     }
 
     clear_lockfile();
-    dbe_cleanup_lite(e);
+    dbe_cleanup_lite(env);
 
     return 0;
 
@@ -1129,17 +1128,17 @@ rec_fail:
     exit(EX_ERROR);
 }
 
-void dbe_cleanup(void *e) {
-    dbe_t *handle=e;
-    assert(handle->magic == MAGIC_DBE);
-    dbe_cleanup_lite(handle);
+void dbe_cleanup(void *vhandle) {
+    dbe_t *env = vhandle;
+    assert(env->magic == MAGIC_DBE);
+    dbe_cleanup_lite(env);
     clear_lock();
     if (lockfd >= 0)
 	close(lockfd); /* release locks */
 }
 
-void *db_get_env(void *d) {
-    dbh_t *handle = d;
+void *db_get_env(void *vhandle) {
+    dbh_t *handle = vhandle;
     assert(handle->magic == MAGIC_DBH);
     return handle->dbenv;
 }

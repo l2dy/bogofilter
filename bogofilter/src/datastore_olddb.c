@@ -124,7 +124,7 @@ static int db_lock(int fd, int cmd, short int type)
 
 
 /** "constructor" - allocate our handle and initialize its contents */
-static dbh_t *dbh_init(const char *path, const char *name)
+static dbh_t *handle_init(const char *path, const char *name)
 {
     dbh_t *handle;
     size_t len = strlen(path) + strlen(name) + 2;
@@ -149,7 +149,7 @@ static dbh_t *dbh_init(const char *path, const char *name)
 
 /** free \a handle and associated data.
  * NB: does not close transactions, data bases or the environment! */
-static void dbh_free(/*@only@*/ dbh_t *handle)
+static void handle_free(/*@only@*/ dbh_t *handle)
 {
     if (handle != NULL) {
 	xfree(handle->name);
@@ -305,7 +305,7 @@ void *db_open(void *dummy, const char *path, const char *name, dbmode_t open_mod
 	uint32_t pagesize;
 	uint32_t retryflag = retryflags[idx];
 
-	handle = dbh_init(path, name);
+	handle = handle_init(path, name);
 
 	if (handle == NULL)
 	    return NULL;
@@ -440,7 +440,7 @@ retry_db_open:
     return handle;
 
  open_err:
-    dbh_free(handle);
+    handle_free(handle);
 
     if (ret >= 0)
 	errno = ret;
@@ -580,7 +580,7 @@ void db_close(void *vhandle)
 	print_error(__FILE__, __LINE__, "DB->close error: %s",
 		db_strerror(ret));
 
-    dbh_free(handle);
+    handle_free(handle);
 }
 
 
@@ -683,14 +683,14 @@ void *dbe_init(void) {
     return (void *)~0;
 }
 
-void dbe_cleanup(void *d) {
-    (void)d;
+void dbe_cleanup(void *vhandle) {
+    (void)vhandle;
     init = false;
 }
 
-int dbe_txn_begin(void *d) { (void)d; return 0; }
-int dbe_txn_abort(void *d) { (void)d; return 0; }
-int dbe_txn_commit(void *d) { (void)d; return 0; }
+int dbe_txn_begin(void *vhandle) { (void)vhandle; return 0; }
+int dbe_txn_abort(void *vhandle) { (void)vhandle; return 0; }
+int dbe_txn_commit(void *vhandle) { (void)vhandle; return 0; }
 int dbe_recover(int a, int b) {
     (void)a;
     (void)b;
@@ -704,7 +704,7 @@ int dbe_recover(int a, int b) {
     exit(EX_ERROR);
 }
 
-void *db_get_env(void *d) {
-    (void)d;
+void *db_get_env(void *vhandle) {
+    (void)vhandle;
     return 0;
 }
