@@ -4,23 +4,23 @@ SUBDIRS = trio src . doc contrib
 SYSCONFDIR = @sysconfdir@
 
 # what to build
-sysconf_DATA = bogofilter.cf.example
+sysconf_DATA=	bogofilter.cf.example
 
 # what to build that from
 
 # what to distribute
-EXTRA_DIST = autogen.sh gsl config.rpath \
-	     bogofilter.cf.example \
-	     bogofilter.spec bogofilter.spec.in \
-	     METHODS UPGRADE Doxyfile \
-	     CHANGES-0.10 README.cvs \
-	     CHANGES-0.11 RELEASE.NOTES-0.11 \
-	     CHANGES-0.12 RELEASE.NOTES-0.12 \
-	     CHANGES-0.13 RELEASE.NOTES-0.13 \
-	     CHANGES-0.14 RELEASE.NOTES-0.14 \
-	     CHANGES-0.15 RELEASE.NOTES-0.15
+EXTRA_DIST=	autogen.sh gsl config.rpath \
+		bogofilter.cf.example \
+		bogofilter.spec bogofilter.spec.in \
+		METHODS UPGRADE Doxyfile \
+		CHANGES-0.10 README.cvs \
+		CHANGES-0.11 RELEASE.NOTES-0.11 \
+		CHANGES-0.12 RELEASE.NOTES-0.12 \
+		CHANGES-0.13 RELEASE.NOTES-0.13 \
+		CHANGES-0.14 RELEASE.NOTES-0.14 \
+		CHANGES-0.15 RELEASE.NOTES-0.15
 
-.PHONY: rpm cvs-check
+.PHONY:	rpm cvs-check
 
 rpm:	dist
 	rpm -ta $(distdir).tar.gz
