@@ -1,6 +1,6 @@
 ########### BOGOFILTER Configuration File ###########################
 
-# Non-comment lines of bogofilter.cf.example show default settings as 
+# Non-comment lines of bogofilter.cf.example show default settings as
 # used in the bogofilter source code.
 
 ########### General Settings ########################################
@@ -98,9 +98,9 @@ tag_header_lines=no
 #		the message header.
 #	terse_format - an abbreviated form of header_format;
 #		selected by command line option '-t'
-#	log_header_format - written to syslog by '-u' option 
+#	log_header_format - written to syslog by '-u' option
 #		when classifying messages.
-#	log_update_format - written to syslog by '-u' option 
+#	log_update_format - written to syslog by '-u' option
 #		when registering messages.
 #
 #    below are the current values of the options:
@@ -195,8 +195,10 @@ robx=0.415
 #	    setting ham_cutoff to a non-zero value will
 #	    enable tristate results (Yes/No/Unsure).
 
-spam_cutoff = 0.90	# for graham
-spam_cutoff = 0.54	# for robinson
+# for graham:
+spam_cutoff = 0.90
+# for robinson:
+spam_cutoff = 0.54
 
 # fisher (with Yes/No output, i.e. '-2' option):
 #
