@@ -533,11 +533,10 @@ static void set_thresh(uint count, double *scores)
     return;
 }
 
-static uint read_mailbox(char *arg)
+static uint read_mailbox(char *arg, mlhead_t *msgs)
 {
     uint count = 0;
     wordhash_t *train = ns_and_sp->train;
-    mlhead_t *msgs = (run_type == REG_GOOD) ? ns_msglists->msgs : sp_msglists->msgs;
 
     if (verbose) {
 	printf("Reading %s\n", arg);
@@ -605,11 +604,13 @@ static uint filelist_read(int mode, flhead_t *list)
 {
     uint count = 0;
     flitem_t *item;
+    mlhead_t *msgs = (mode == REG_GOOD) ? ns_msglists->msgs : sp_msglists->msgs;
     run_type = mode;
+
     for (item = list->head; item != NULL; item = item->next) {
 	lexer = NULL;
 	msg_count_file = false;
-	count += read_mailbox(item->name);
+	count += read_mailbox(item->name, msgs);
     }
     return count;
 }
