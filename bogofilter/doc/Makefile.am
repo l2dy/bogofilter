@@ -63,10 +63,14 @@ if ENABLE_XMLTO
 	fi
 else
 .xml.1in:
-	echo 1>&2 "You need xmlto to build bogofilter documentation."
-	exit 1
+	@echo 1>&2
+	@echo 1>&2 "You need xmlto to build bogofilter documentation."
+	@echo 1>&2
+	@exit 1
 
 .xml.htmlin:
-	echo 1>&2 "You need xmlto to build bogofilter documentation."
-	exit 1
+	@echo 1>&2
+	@echo 1>&2 "You need xmlto to build bogofilter documentation."
+	@echo 1>&2
+	@exit 1
 endif
