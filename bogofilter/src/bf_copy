@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#  db_copy [-c] source_dir dest_dir
+#  bf_copy [-c] source_dir dest_dir
 #
 #    use to copy wordlist.db and related files
 #    from one directory to another
@@ -20,7 +20,7 @@ while test "$1" ; do
 done
 
 if [ $# -ne 2 ] ; then
-    echo usage: db_copy [-c] source_dir dest_dir
+    echo usage: bf_copy [-c] source_dir dest_dir
     echo "   use -c to copy active logs, not all"
     exit 1
 fi
