@@ -4,6 +4,12 @@
 
 $Id$
      
+0.10.1.5 2003-02-01
+
+	* Locking: use random sleep interval in case of lock conflict.
+	* Portability: Remove special characters from regression test data.
+	* Robustness: don't decode unknown content types.
+
 0.10.1.4 2003-01-30
 
 	* Robustness: protect token count against overflow.
