@@ -23,13 +23,8 @@
 
 #include "find_home.h"
 
-/* This function will try to figure out the home directory of the user.
- * 
- * If read_env is not zero, it will try to obtain the HOME environment
- * variable and return if it is defined and not empty.
- * 
- * Then, it will look up the password entry of the current effective
- * user id and return the pw_dir field.
+/* This function will try to figure out the home directory of the user
+ * whose name is given as argument.
  *
  * This function returns NULL in case of failure.
  */
