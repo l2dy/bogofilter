@@ -13,8 +13,8 @@
    ../../COPYING.
  */
 
-#include "config.h"
 #include "system.h"
+
 #include <sys/resource.h>
 #include <unistd.h>
 #include <stdlib.h>
