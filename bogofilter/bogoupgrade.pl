@@ -8,7 +8,6 @@ upgrade.pl -- upgrade a bogofilter database to current version.
 Author:
 Gyepi Sam <gyepi@praxis-sw.com>
 
-
 =cut
 
 my $VERSION = '0.1';
@@ -39,6 +38,10 @@ for (my $i = 0; $i < @ARGV; $i++){
     exit(1);
   }
 }
+
+
+die "Missing input filename\n" unless $in;
+die "Missing output filename\n" unless $out;
 
 my $msg_count_token = '.MSG_COUNT';
 
@@ -94,14 +97,14 @@ elsif ($sig =~ m/^\# bogofilter email-count \(format version B\):\s(\d+)/){
   close(OUT);
 }
 else {
-  print STDERR "Cannot recognize signature [$sig].\n";
+  warn "Cannot recognize signature [$sig].\n";
   exit(2);
 }
 
 exit(0);
 
 sub usage {
-  print STDERR "usage: $0 [ -i <input text file> -o <output db file> [ -b <path to bogoutil>] ] [ -h ]\n";
+  warn "usage: $0 [ -i <input text file> -o <output db file> [ -b <path to bogoutil>] ] [ -h ]\n";
 }
 
 sub help {
