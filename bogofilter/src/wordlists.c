@@ -286,9 +286,13 @@ static bool check_wordlist_paths(const char *path, size_t count, const char **na
 	char filepath[PATH_LEN];
 	struct stat statbuf;
 	const char *name = names[i];
+	int rc;
 	build_path(filepath, sizeof(filepath), path, name);
 	memset(&statbuf, 0, sizeof(statbuf));
-	if (stat(filepath, &statbuf) != 0)
+	rc = stat(filepath, &statbuf);
+	if (DEBUG_WORDLIST(1))
+	    fprintf(dbgout, "fn: %s, rc: %d\n", filepath, rc);
+	if (rc != 0)
 	    return false;
     }
     return true;
