@@ -33,22 +33,21 @@ const char *const system_config_file = "<Bogofilter$Dir>.bogofilter/cf";
 /* some broken systems define it in unistd.h instead */
 #include <unistd.h>
 
-bool bf_abspath(const char *path)
+/** Checks if \a path is absolute. */
+bool bf_abspath(const char *path /** path to check for absoluteness */)
 {
-#if	!defined(__OS2__) && !defined(__riscos__)
-    return (bool) (*path == DIRSEP_C);
-#else
-  #ifdef	__OS2__
+#if defined(__OS2__)
     return (bool) strchr(path, ':');
-  #endif
-  #ifdef	__riscos__
+#elif defined(__riscos__)
     return (bool) (strchr(path, ':') || strchr(path, '$') || strchr(path, '#') ||
 		   strchr(path, '@') || strchr(path, '%') || strchr(path, '&'));
-  #endif
+#else /* POSIX and similar*/
+    return (bool) (*path == DIRSEP_C);
 #endif
 }
 
-/** sleep for a certain time */
+/** sleep for \a delay microseconds (rounded to nearest millisecond on
+ * OS/2) */
 void bf_sleep(long delay /** microseconds to wait */)
 {
 #ifndef _OS2_
@@ -62,10 +61,13 @@ void bf_sleep(long delay /** microseconds to wait */)
 #endif
 }
 
-int bf_mkdir(const char *path, mode_t mode)
+/** Create a new directory \a path with permissions \a mode, modified by
+ * the current umask. \a mode is ignored on OS/2. */
+int bf_mkdir(const char *path /** new directory to be created */,
+	mode_t mode /** permissions for new directory, subject to umask restrictions */)
 {
     int rc;
-#ifndef _OS2_
+#ifndef _OS2_ /* POSIX and similar */
     rc = mkdir(path, mode);
 #else
     rc = mkdir((unsigned char *)path);
