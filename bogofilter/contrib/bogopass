@@ -1,51 +1,92 @@
-#! /bin/sh
-echo >&2 "This program is currently unavailable for security reasons."
-exit 2
+#! /usr/bin/env perl
+# $Id$
 
-eval 'exec perl -wS $0 ${1+"$@"}'
-if 0;
-
-# bogopass emulates the -p (passthrough) option of bogofilter with base64
-# decoding. It takes an e-mail message on stdin, filters it through unbase64,
-# then sends it to bogofilter with the "-v" option. The X-Bogosity header
-# output by bogofilter is added to the original message by formail, and
-# the updated message is output to stdout.
+# bogopass -- emulate bogofilter -p with base64 decoder
+# Copyright (C) 2002, Suzanne Skinner
+# ----------------------------------------------------------------------
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
 #
-# Any options given to bogopass will be passed on to bogofilter along with
-# "-v". For instance, call "bogopass -r" to use the Robinson algorithm.
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
 #
-# This script requires formail (part of the procmail suite) to be installed.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+# USA
+# ----------------------------------------------------------------------
 
-#Copyright (C) 2002, Suzanne Skinner
+# bogopass emulates the -p (passthrough) option of bogofilter with
+# base64 decoding. It takes an e-mail message on stdin, filters it
+# through unbase64, then sends it to bogofilter with the "-v" option.
+# The X-Bogosity header output by bogofilter is added to the original
+# message by formail, and the updated message is output to stdout.
+#
+# Make sure that base64 is installed in /usr/local/bin or /usr/bin,
+# because this script is NOT going to look at your $PATH for security
+# reasons.
+#
+# Any options given to bogopass will be passed on to bogofilter along
+# with "-v". For instance, call "bogopass -r" to use the Robinson
+# algorithm.
+#
+# This script requires formail (part of the procmail suite) to be
+# installed in /usr/local/bin or /usr/bin.
 
+require 5.004;
 use strict;
+use File::Temp qw(tempfile unlink0);
 
-sub my_die;
+sub my_die($ );
+sub parsewait($ );
 
 my $PROG = 'bogopass';
+$ENV{PATH} = '/bin:/usr/bin:/usr/local/bin';
 
 ### Begin Main ###
 
-my $fn = "/tmp/$PROG.$$";
-open F, ">$fn" or my_die "Can't open $fn for writing ($!)";
-print F $_ while <STDIN>;
-close F or my_die "Can't close $fn after writing ($!)";
+my ($fh, $fn) = tempfile("/tmp/$PROG.XXXXXXXXXX");
+open P, "|unbase64 >\"$fn\"" or my_die "Can't pipe to unbase64: $?";
+while (<STDIN>) {
+    print P $_ or my_die("Error writing to unbase64 pipe: " . parsewait($?));
+}
+close P or my_die("Error writing to unbase64 pipe: " . parsewait($?));
 
 my $options = join ' ', @ARGV;
-my $bogo_header = `unbase64 $fn | bogofilter -v $options`;
+my $bogo_header = `bogofilter -v $options <$fn`;
 chomp $bogo_header;
 $bogo_header =~ /^X-Bogosity:/ or
     my_die "bogofilter returned invalid output (\"$bogo_header\")";
 
 system("formail -I \"$bogo_header\" < $fn") == 0 or
     my_die "formail failed ($?)";
-unlink $fn;
+unlink0 ($fh,$fn) or
+    my_die "cannot unlink temporary file $fn: $?";
+close $fh or my_die "strange error: could not open temporary file";
 exit 0;
 
 ### End Main ###
 
-sub my_die {
+# as die, but prepend our program name
+sub my_die($ ) {
     my $msg = shift;
-    die "$PROG: $msg\n";
+    die "$PROG: $msg";
 }
 
+# figure if the pipe open failure code was because the child crashed
+# or returned a nonzero exit condition.
+sub parsewait($ ) {
+    my $c = shift;
+    my $r;
+    if ($c & 255) {
+	$r = sprintf("signal %u%s", $c & 127, $c & 128 ? " (core dumped)" : "");
+    } else {
+	$r = sprintf("exit code %u", $c >> 8);
+    }
+
+    return wantarray ? ($r) : $r;
+}
