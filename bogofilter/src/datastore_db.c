@@ -104,7 +104,7 @@ static dbh_t *dbh_init(const char *path, const char *name)
     handle->path = xstrdup(path);
     handle->name = xmalloc(len);
     build_path(handle->name, len, path, name);
-    
+
     handle->locked     = false;
     handle->is_swapped = false;
 
@@ -233,7 +233,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	opt_flags = 0;
 
     /* retry when locking failed */
-    for (idx = 0; idx < COUNTOF(retryflags); idx += 1) 
+    for (idx = 0; idx < COUNTOF(retryflags); idx += 1)
     {
 	DB *dbp;
 	uint32_t retryflag = retryflags[idx], pagesize;
@@ -276,7 +276,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	    dbp->close(dbp, 0);
 	    goto open_err;
 	}
-	
+
 	if (DEBUG_DATABASE(1))
 	    fprintf(dbgout, "db_open( %s, %d ) -> %d\n", handle->name, open_mode, ret);
 
@@ -320,7 +320,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	/* skip manual lock when run in environment */
 	if (dbe)
 	    break;
-	
+
 	/* try fcntl lock */
 	if (db_lock(handle->fd, F_SETLK,
 		    (short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
@@ -548,7 +548,7 @@ int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 	/* call user function */
 	rc = hook(&dbv_key, &dbv_data, userdata);
 	xfree(dbv_key.data);
-	
+
 	/* returns 0 if ok, 1 if not */
 	if (rc != 0)
 	    break;
