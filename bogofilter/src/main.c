@@ -19,6 +19,8 @@ CONTRIBUTORS:
 #include <stdlib.h>
 #include <syslog.h>
 
+#include "getopt.h"
+
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #include "datastore.h"
