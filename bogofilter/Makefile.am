@@ -42,6 +42,7 @@ libbogofilter_a_SOURCES= \
 	    find_home_tildeexpand.c \
 	collect.h collect.c \
 	datastore.h datastore_db.h datastore_db.c \
+	error.h error.c \
 	format.h format.c \
 	lexer.h lexer.l \
 	register.h register.c \
