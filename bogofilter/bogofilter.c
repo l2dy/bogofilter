@@ -102,16 +102,16 @@ static void *collect_words(/*@out@*/ int *message_count,
   wordhash_t *h = wordhash_init();
      
   for (;;){
-    token_t tok = get_token();
+    token_t token_type = get_token();
   
-    if (tok != FROM && tok != 0){
+    if (token_type != FROM && token_type != 0){
       w = wordhash_insert(h, yylval, sizeof(wordprop_t), &wordprop_init);
       w->msg_freq++;
       w_count++;
     }
     else {
       /* End of message. Update message counts. */
-      if (tok == FROM || (tok == 0 && msg_count == 0))
+      if (token_type == FROM || (token_type == 0 && msg_count == 0))
         msg_count++;
   
       /* Incremenent word frequencies, capping each message's
@@ -126,7 +126,7 @@ static void *collect_words(/*@out@*/ int *message_count,
       }
   
       /* Want to process EOF, *then* drop out */
-      if (tok == 0)
+      if (token_type == 0)
         break;
     }
   }
