@@ -128,7 +128,9 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     {
 	double spamicity;
 	rc_t   status = bogofilter(&spamicity);
+
 	write_message(out, status);
+
 	exitcode = (status == RC_SPAM) ? 0 : 1;
 	if (nonspam_exits_zero && passthrough && exitcode == 1)
 	    exitcode = 0;
