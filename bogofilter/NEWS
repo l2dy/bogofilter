@@ -4,11 +4,20 @@
 
 $Id$
 
+	2003-04-13
+
+	* Added 'terse_mode' option for bogofiltre.cf
+
+	2003-04-11
+
+	* Use frexp() to retain maximum precision of floating point results.
+
 0.11.1.9
 
 	2003-04-10
 
 	* Reformat histogram output (from "-vv") to fit in 80 columns.
+	* Added sample configuration for maildrop.
 
 	2003-04-09
 
