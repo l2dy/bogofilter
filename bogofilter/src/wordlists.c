@@ -253,8 +253,7 @@ static char *spanword(char *p)
     const char *delim = ", \t";
     p += strcspn(p, delim);		/* skip to end of word */
     *p++ = '\0';
-    while (isspace((unsigned char)*p)) 	/* skip trailing whitespace */
-	p += 1;
+    p += strspn(p, " \t");		/* skip trailing whitespace */
     return p;
 }
 
