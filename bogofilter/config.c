@@ -24,6 +24,7 @@ AUTHOR:
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
+#include "bool.h"
 #include "charset.h"
 #include "maint.h"
 #include "error.h"
@@ -143,6 +144,9 @@ static const parm_desc sys_parms[] =
     { "charset_default",  CP_STRING,	{ &charset_default } },
     { "datestamp_tokens",		CP_BOOLEAN, { (void *) &datestamp_tokens } },
     { "replace_nonascii_characters",	CP_BOOLEAN, { (void *) &replace_nonascii_characters } },
+    { "kill_html_comments", 		CP_BOOLEAN, { (void *) &kill_html_comments } },
+    { "count_html_comments",  		CP_INTEGER, { (void *) &count_html_comments } },
+    { "score_html_comments",  		CP_BOOLEAN, { (void *) &score_html_comments } },
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
 
@@ -199,20 +203,7 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
     {
 	case CP_BOOLEAN:
 	    {
-		char ch = toupper(*val);
-		switch (ch)
-		{
-		case 'Y':		/* Yes */
-		case 'T':		/* True */
-		case '1':
-		    *arg->addr.b = true;
-		    break;
-		case 'N':		/* No */
-		case 'F':		/* False */
-		case '0':
-		    *arg->addr.b = false;
-		    break;
-		}
+		*arg->addr.b = str_to_bool(val);
 		if (DEBUG_CONFIG(0))
 		    fprintf(dbgout, "%s -> %s\n", arg->name,
 			    *arg->addr.b ? "Yes" : "No");
@@ -428,20 +419,21 @@ static void help(void)
 #endif
 #endif
 		  "\t-p\t- passthrough.\n"
-		  "\t-I filename\t- read message from filename instead of stdin.\n"
-		  "\t-O filename\t- save message to filename in passthrough mode.\n"
+		  "\t-I file\t- read message from 'file' instead of stdin.\n"
+		  "\t-O file\t- save message to 'file' in passthrough mode.\n"
 		  "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n"
 		  "\t-s\t- register message as spam.\n"
 		  "\t-n\t- register message as non-spam.\n"
-		  "\t-o cutoff\t- set user defined spamicity cutoff.\n"
+		  "\t-o val\t- set user defined spamicity cutoff.\n"
 		  "\t-u\t- classify message as spam or non-spam and register appropriately.\n"
 		  "\t-S\t- move message's words from non-spam list to spam list.\n"
 		  "\t-N\t- move message's words from spam list to spam non-list.\n"
 		  "\t-R\t- print an R data frame.\n"
+		  "\t-x list\t- set debug flags.\n"
 		  "\t-v\t- set debug verbosity level.\n"
-		  "\t-x LIST\t- set debug flags.\n"
+		  "\t-k y/n\t- kill html comments (yes or no).\n"
 		  "\t-V\t- print version information and exit.\n"
-		  "\t-c filename\t- read config file 'filename'.\n"
+		  "\t-c file\t- read specified config file.\n"
 		  "\t-C\t- don't read standard config files.\n"
 		  "\t-q\t- quiet - don't print warning messages.\n"
 		  "\t-F\t- force printing of spamicity numbers.\n"
@@ -498,7 +490,7 @@ int process_args(int argc, char **argv)
 
     fpin = stdin;
 
-    while ((option = getopt(argc, argv, "d:eFhl::o:snSNvVpuc:CgrRx:fqtI:O:y:" G R F)) != EOF)
+    while ((option = getopt(argc, argv, "d:eFhl::o:snSNvVpuc:CgrRx:fqtI:O:y:k:" G R F)) != EOF)
     {
 	switch(option)
 	{
@@ -566,6 +558,10 @@ int process_args(int argc, char **argv)
 
 	case 'u':
 	    run_type = RUN_UPDATE;
+	    break;
+
+	case 'k':
+	    kill_html_comments = str_to_bool( optarg );
 	    break;
 
 	case 'l':
