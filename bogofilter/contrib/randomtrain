@@ -10,6 +10,8 @@
 #  original author: 	Greg Louis <glouis@dynamicro.on.ca>
 #  modified by: 	David Relson <relson@osagesoftware.com>
 
+BOGOFILTER="bogofilter"
+
 function usage() {
     name=`basename $0`
     echo "Usage: $name [-d bogodir] [-p pid] [-c cfg] [-]n|s filename [-]n|s filename [...]"
@@ -40,7 +42,7 @@ function train_mbox() {
     while read expect fnam offset length; do
 	let cnt=cnt+1
 	dd if=$fnam bs=1 skip=$offset count=$length 2>/dev/null >msg.$pid
-	result=`bogofilter -t -v -d $bogodir $cfg -I msg.$pid`
+	result=`$BOGOFILTER -t -v -d $bogodir $cfg -I msg.$pid`
 	got=$?	# 0=spam, 1=ham, 2=unsure, 3=err
 	if [ "$expect" = "s" ]; 
 	then let nspam=$nspam+1
@@ -51,7 +53,7 @@ function train_mbox() {
 	    then let rspam=$rspam+1
 	    else let rgood=$rgood+1; fi
 	    # comment out the next line for dry-run testing
-	    bogofilter -$expect $cfg -d $bogodir -I msg.$pid
+	    $BOGOFILTER -$expect $cfg -d $bogodir -I msg.$pid
 	fi
 #	echo $expect $got $result, $nspam $rspam, $ngood $rgood
 	n=`expr \( $nspam + $ngood \) % 10`
@@ -68,7 +70,7 @@ function train_maildir() {
     echo " spam  reg   good  reg"
     while read expect fnam; do
 	let cnt=cnt+1
-	result=`bogofilter -t -v -d $bogodir $cfg -I $fnam`
+	result=`$BOGOFILTER -t -v -d $bogodir $cfg -I $fnam`
 	got=$?	# 0=spam, 1=ham, 2=unsure, 3=err
 	if [ "$expect" = "s" ]; 
 	then let nspam=$nspam+1
@@ -79,7 +81,7 @@ function train_maildir() {
 	    then let rspam=$rspam+1
 	    else let rgood=$rgood+1; fi
 	    # comment out the next line for dry-run testing
-	    bogofilter -$expect $cfg -d $bogodir -I $fnam
+	    $BOGOFILTER -$expect $cfg -d $bogodir -I $fnam
 	fi
 #	echo $expect $got $result, $nspam $rspam, $ngood $rgood
 	n=`expr \( $nspam + $ngood \) % 10`
@@ -128,8 +130,8 @@ while [ ${#*} -gt 1 ]; do
 	    [ -n "$bogodir" ] && usage
 	    bogodir=$1 ; shift
 	    if [ ! -d $bogodir ]; then echo "directory '$bogodir' not found"; usage; fi
-	    [ ! -f $bogodir/spamlist.db ] && bogofilter -d $bogodir -s -C < /dev/null
-	    [ ! -f $bogodir/goodlist.db ] && bogofilter -d $bogodir -n -C < /dev/null
+	    [ ! -f $bogodir/spamlist.db ] && $BOGOFILTER -d $bogodir -s -C < /dev/null
+	    [ ! -f $bogodir/goodlist.db ] && $BOGOFILTER -d $bogodir -n -C < /dev/null
 	    ;;
 	* )
 	    usage
