@@ -72,6 +72,11 @@ static void 	   dbx_cleanup		(dbe_t *env);
 static void 	   dbx_cleanup_lite	(dbe_t *env);
 static ex_t	   dbe_env_purgelogs	(DB_ENV *dbe);
 
+static ex_t	   dbx_checkpoint	(bfdir *directory);
+static ex_t	   dbx_purgelogs	(bfdir *directory);
+static ex_t	   dbx_recover		(bfdir *directory, bool catastrophic, bool force);
+static ex_t	   dbx_remove		(bfdir *directory);
+
 /* OO function lists */
 
 dsm_t dsm_transactional = {
@@ -92,7 +97,13 @@ dsm_t dsm_transactional = {
     &dbx_lock,
     &dbx_common_close,
     &dbx_sync,
-    &dbx_log_flush
+    &dbx_log_flush,
+    &db_pagesize,
+    &dbx_checkpoint,
+    &dbx_purgelogs,
+    &dbx_recover,
+    &dbx_remove,
+    &db_verify
 };
 
 /* non-OO static function prototypes */
@@ -492,7 +503,7 @@ static dbe_t *dbx_init(bfdir *directory)
 
     /* run recovery if needed */
     if (needs_recovery()) {
-	dbe_recover(directory, false, false); /* DO NOT set force flag here, may cause
+	dbx_recover(directory, false, false); /* DO NOT set force flag here, may cause
 						 multiple recovery! */
 
 	/* reinitialize */
@@ -632,7 +643,7 @@ static int dbx_sync(DB_ENV *dbe, int ret)
     return ret;
 }
 
-ex_t dbe_recover(bfdir *directory, bool catastrophic, bool force)
+ex_t dbx_recover(bfdir *directory, bool catastrophic, bool force)
 {
     dbe_t *env = xcalloc(1, sizeof(dbe_t));
 
@@ -749,7 +760,7 @@ static ex_t dbe_simpleop(bfdir *directory, ex_t func(DB_ENV *env))
     return e;
 }
 
-ex_t dbe_checkpoint(bfdir *directory)
+ex_t dbx_checkpoint(bfdir *directory)
 {
     return dbe_simpleop(directory, dbe_env_checkpoint);
 }
@@ -762,12 +773,12 @@ static ex_t i_purgelogs(DB_ENV *dbe)
     return dbe_env_purgelogs(dbe);
 }
 
-ex_t dbe_purgelogs(bfdir *directory)
+ex_t dbx_purgelogs(bfdir *directory)
 {
     return dbe_simpleop(directory, i_purgelogs);
 }
 
-ex_t dbe_remove(bfdir *directory)
+ex_t dbx_remove(bfdir *directory)
 {
     DB_ENV *dbe = dbe_recover_open(directory, DB_PRIVATE);
 
@@ -998,3 +1009,4 @@ probe_txn_t probe_txn(bfdir *directory, bffile *file)
 #endif
     return P_ENABLE;
 }
+
