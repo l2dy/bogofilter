@@ -5,7 +5,7 @@ AC_CONFIG_SRCDIR([src])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(src/config.h:config.in)
-AC_PROG_CC
+AC_PROG_CC(gcc xlc cc)
 AC_PROG_RANLIB
 AM_PROG_LEX
 
@@ -117,8 +117,9 @@ AC_CHECK_DECLS(optreset,,,[[
 #include <stdlib.h>
 ]])
 
-AC_CHECK_DB([db db-4.1 db-4 db4 db-3.3 db-3.2 db-3.1 db-3 db3],,
-	    AC_MSG_ERROR([[Can not locate a suitable Berkeley DB library.  Use --with-db=PATH to specify the path to a v3+ install directory]]))
+AC_CHECK_DB([db db41 db4 db3],,
+	    AC_MSG_ERROR([[Can not locate a suitable Berkeley DB library.  Use --with-db=PATH to specify the path to a v3+ install directory]]),-lpthread -lthread)
+export LIBS
 
 dnl check if run-time link works
 dnl XXX FIXME: try -rpath and -R with the library path component.
