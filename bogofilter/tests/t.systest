@@ -9,6 +9,11 @@ set -e
 #		inputs  - test inputs
 #		outputs - known correct outputs
 
+verbose=0
+if [ "$1" = "-v" ]; then
+    verbose=1
+fi
+
 [   -d ${TMPDIR}/tests ] && rm -rf ${TMPDIR}/tests
 [ ! -d ${TMPDIR}/tests ] && mkdir -p ${TMPDIR}/tests
 
@@ -87,5 +92,9 @@ rm -f ${CONFIG}
 REFDIR=$srcdir/t.systest.d/outputs
 for i in $REFDIR/*v ; do
     j=`basename $i`
-    cmp $i ${TMPDIR}/tests/$j
+    if  [ $verbose -eq 0 ]; then
+	cmp $i ${TMPDIR}/tests/$j
+    else
+	diff -u -s --brief ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
+    fi
 done

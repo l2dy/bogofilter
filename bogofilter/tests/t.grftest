@@ -112,9 +112,9 @@ for out in ${TMPDIR}/tests/msg.?.r.v ; do
     printf "%2s   %c %s   %c %s   %c %s   %c %s\n" $id $g $r $f $t >> ${TMPDIR}/tests/$OUT
 done
 
-OUTPUTS=$srcdir/t.systest.d/outputs
-if  [ $verbose -eq 1 ]; then
-    diff -u -s ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
+OUTPUTS=${SYSTEST}/outputs
+if  [ $verbose -eq 0 ]; then
+    cmp ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
+else
+    diff -u -s --brief ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
 fi
-
-cmp ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
