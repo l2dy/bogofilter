@@ -1103,21 +1103,17 @@ static void final_recommendations(bool skip)
 	    cutoff = ns_scores[t-1];
 	    if (cutoff > FP_CUTOFF)
 		continue;
-	    fpp = 100.0 / mn;
 	    fp = ns_cnt / mn;
+	    fpp = 100.0 / mn;
 	}
 	else {
 	    cutoff = SPAM_CUTOFF;
 	    if (printed)
 		break;
-	    for (i = 0; i < ns_cnt && ns_scores[i-1] < cutoff; i += 1)
-		fp = i;
-	    if (fp == 0) {
-		fprintf(stderr, 
-			"Too few low scoring spam.\n");
-		exit(EX_ERROR);
+	    for (i = 0; i < ns_cnt; i += 1) {
+		if (ns_scores[i] >= cutoff)
+		    fp += 1;
 	    }
-	    fp -= 1;
 	    cutoff = ns_scores[fp-1];
 	    fpp = 100.0 * (ns_cnt - fp) / ns_cnt;
 	}
