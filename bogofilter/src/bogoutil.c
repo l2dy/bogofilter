@@ -394,7 +394,7 @@ finish:
     return rv;
 }
 
-static int get_robx(const char *path)
+static ex_t get_robx(const char *path)
 {
     double rx;
     int ret = 0;
