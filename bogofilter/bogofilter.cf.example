@@ -154,12 +154,12 @@ replace_nonascii_characters=N
 #	values are output by print_bogostats()
 
 thresh_index = 0
-thresh_stats = 0.0f
-thresh_rtable = 0.0f
+thresh_stats = 0.0
+thresh_rtable = 0.0
 
 # thresh_index = 12
-# thresh_stats =0.2f
-# thresh_rtable=0.4f
+# thresh_stats =0.2
+# thresh_rtable=0.4
 
 
 
