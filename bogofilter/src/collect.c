@@ -67,8 +67,6 @@ void collect_words(wordhash_t *wh)
 	    wp->freq < max_repeats)
 	    wp->freq += 1;
 
-	wh->count += 1;
-
 /******* EK **********/
 
 #ifdef	CP866

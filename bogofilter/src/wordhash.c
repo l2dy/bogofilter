@@ -80,6 +80,7 @@ wordhash_init (wh_t t, uint c)
     wordhash_t *wh = xcalloc (1, sizeof (wordhash_t));
 
     wh->type = t;
+    wh->count = 0;
     wh->size = (t == WH_NORMAL) ? 0 : ((c == 0) ? WH_INIT : c);
 
     if (t == WH_NORMAL)
@@ -328,7 +329,6 @@ wordhash_standard_insert (wordhash_t *wh, word_t *t, size_t n, void (*initialize
     if (buf != NULL)
 	return buf;
 
-    wh->size += 1;
     hn = nmalloc (wh);
     hn->buf = smalloc (wh, n);
     if (initializer)
@@ -351,17 +351,23 @@ wordhash_standard_insert (wordhash_t *wh, word_t *t, size_t n, void (*initialize
     hn->iter_next = NULL;
     wh->iter_tail = hn;
 
+    wh->count += 1;
+    wh->size  += 1;
+
     return hn->buf;
 }
 
 static void *
 wordhash_counts_insert (wordhash_t *wh)
 {
-    wh->index += 1;
-    if (wh->index == wh->size) {
+    if (wh->count == wh->size) {
 	wh->size += WH_INCR;
 	wh->cnts = (wordcnts_t *) xrealloc(wh->cnts, wh->size * sizeof(wordcnts_t));
     }
+
+    wh->index = wh->count;
+    wh->count += 1;
+
     return & wh->cnts[wh->index];
 }
 
@@ -501,7 +507,6 @@ convert_propslist_to_countlist(wordhash_t *whi)
 {
     hashnode_t *node;
     wordhash_t *who = NULL;
-    uint count = 0;
 
     if (whi->type == WH_CNTS)
 	return whi;
@@ -516,7 +521,7 @@ convert_propslist_to_countlist(wordhash_t *whi)
 
     for(node = wordhash_first(whi); node != NULL; node = wordhash_next(whi)) {
 	wordcnts_t *ci = wordhash_get_counts(whi, node);
-	wordcnts_t *co = &who->cnts[count++];
+	wordcnts_t *co = &who->cnts[who->count++];
 
 	co->good = ci->good;
 	co->bad  = ci->bad ;

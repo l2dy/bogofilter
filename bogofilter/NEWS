@@ -21,6 +21,11 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-01-15
+
+	* Fixed segfault caused by using non-existant option 'F'
+	* Fixed size/count errors in wordhash code used by bogotune.
+
 	2005-01-12
 	
 	* Fixed an array overrun in bogotune that caused problems when
