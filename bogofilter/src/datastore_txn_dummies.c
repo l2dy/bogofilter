@@ -96,38 +96,3 @@ ex_t dbe_remove(const char *directory)
     (void) directory;
     return EX_OK;
 }
-
-/* help messages and option processing */
-
-const char **dsm_help_bogofilter(void)
-{
-    static const char *help_text[] = {
-	NULL
-    };
-    return &help_text[0]; 
-}
-
-const char **dsm_help_bogoutil(void)
-{
-    static const char *help_text[] = {
-	NULL
-    };
-    return &help_text[0]; 
-}
-
-void dsm_options_bogofilter(int option, const char *name, const char *val)
-{
-    (void) option;
-    (void) name;
-    (void) val;
-}
-
-void dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_file, const char *name, const char *val)
-{
-    (void) option;
-    (void) flag;
-    (void) count;
-    (void) ds_file;
-    (void) name;
-    (void) val;
-}

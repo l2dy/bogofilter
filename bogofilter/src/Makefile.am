@@ -149,24 +149,27 @@ endif
 LDADD += @LIBOBJS@
 
 if ENABLE_TDB_DATASTORE
-datastore_SOURCE = datastore_tdb.c datastore_txn_dummies.c
+datastore_SOURCE = datastore_tdb.c \
+		   datastore_txn_dummies.c datastore_opthelp_dummies.c
 else
 if ENABLE_QDBM_DATASTORE
 datastore_SOURCE = datastore_qdbm.c datastore_qdbm.h datastore_qdbm_cmpkey.c \
-		   datastore_txn_dummies.c
+		   datastore_txn_dummies.c datastore_opthelp_dummies.c
 
 bin_PROGRAMS += bogoQDBMupgrade
 bogoQDBMupgrade_SOURCES = bogoQDBMupgrade.c datastore_qdbm_cmpkey.c
 bogoQDBMupgrade_LDADD = $(LDADD) $(LIBDB)
 else
 if ENABLE_SQLITE_DATASTORE
-datastore_SOURCE = datastore_sqlite.c
+datastore_SOURCE = datastore_sqlite.c datastore_opthelp_dummies.c
 else
 if ENABLE_TRANSACTIONS
-datastore_SOURCE = datastore_db.c datastore_db_trans.c datastore_trad_dummies.c
+datastore_SOURCE = datastore_db.c datastore_db_trans.c \
+		   datastore_trad_dummies.c
 else
 if DISABLE_TRANSACTIONS
-datastore_SOURCE = datastore_db.c datastore_db_trad.c datastore_txn_dummies.c
+datastore_SOURCE = datastore_db.c datastore_db_trad.c \
+		   datastore_txn_dummies.c datastore_opthelp_dummies.c
 else
 datastore_SOURCE = datastore_db.c datastore_db_trad.c datastore_db_trans.c
 endif
@@ -178,9 +181,14 @@ endif
 datastore_OBJECT = $(datastore_SOURCE:.c=.o)
 
 libbogofilter_a_SOURCES += $(datastore_SOURCE)
-EXTRA_libbogofilter_a_SOURCES = datastore_db.c datastore_db_trad.c datastore_db_trans.c \
-				datastore_trad_dummies.c datastore_txn_dummies.c 	\
-				datastore_qdbm.c datastore_tdb.c datastore_sqlite.c
+EXTRA_libbogofilter_a_SOURCES = datastore_db.c datastore_db_trad.c \
+				datastore_db_trans.c \
+				datastore_opthelp_dummies.c \
+				datastore_trad_dummies.c \
+				datastore_txn_dummies.c \
+				datastore_qdbm.c \
+				datastore_tdb.c \
+				datastore_sqlite.c
 
 CLEANFILES=version.c directories.c bogoupgrade
 
