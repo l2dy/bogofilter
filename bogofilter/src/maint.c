@@ -135,7 +135,7 @@ int maintain_wordlist_file(const char *db_file)
     int rc;
     void *dbh;
 
-    dbh = db_open(db_file, db_file, DB_WRITE);
+    dbh = db_open(".", 1, &db_file, DB_WRITE);
     if (dbh == NULL)
 	return 2;
 
@@ -162,7 +162,8 @@ static int maintain_hook(word_t *key, word_t *data,
 
     memcpy(&val, data->text, data->leng);
 
-    if (!keep_count(val.count) || !keep_date(val.date) || !keep_size(key->leng)) {
+    if ((!keep_count(val.spamcount) && !keep_count(val.goodcount)) || 
+	!keep_date(val.date) || !keep_size(key->leng)) {
 	db_delete(userdata, key);
 	if (DEBUG_DATABASE(0)) {
 	    fputs("deleting ", dbgout);
@@ -181,7 +182,7 @@ static int maintain_hook(word_t *key, word_t *data,
 		db_delete(userdata, key);
 		w.text = tmp;
 		w.leng = key->leng;
-		db_updvalue(userdata, &w, &val);
+		db_updvalues(userdata, &w, &val);
 	    }
 	    xfree(tmp);
 	}

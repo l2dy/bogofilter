@@ -7,6 +7,16 @@
 
 #include "system.h"
 
+typedef enum sh_e { SPAM, GOOD } sh_t;
+
+#define	spamcount count[SPAM]
+#define	goodcount count[GOOD]
+
+extern const char *aCombined[];
+extern size_t	   cCombined;
+extern const char *aSeparate[];
+extern size_t	   cSeparate;
+
 typedef struct wordlist_s wordlist_t;
 struct wordlist_s
 {
@@ -15,16 +25,17 @@ struct wordlist_s
     /*@owned@*/ char *filename;	/* resource name (for debug/verbose messages) */
     /*@owned@*/ char *filepath;	/* resource path (for debug/verbose messages) */
     /*@owned@*/ void *dbh;	/* database handle */
-    long msgcount;		/* count of messages in wordlist. */
-    double weight;
+    long msgcount[2];		/* count of messages in wordlist. */
+    double weight[2];
     bool active;
-    bool bad;
+    bool bad[2];
     int  override;
     bool ignore;
 };
 
-/*@null@*/ extern wordlist_t *word_lists;
-extern wordlist_t *good_list, *spam_list;
+/*@null@*/ 
+extern wordlist_t *word_list;
+extern wordlist_t *word_lists;
 
 int setup_wordlists(const char* dir, priority_t precedence);
 bool configure_wordlist(const char *val);

@@ -21,7 +21,7 @@
 #include "wordlists.h"
 
 typedef struct {
-    uint32_t count;
+    uint32_t count[2];		/* spam and ham counts */
     uint32_t date;
 } dbv_t;
 
@@ -31,8 +31,10 @@ typedef struct {
  * passed as the first parameter in all subsequent database function calls. 
  */
 /*@only@*/ /*@null@*/
-void *db_open(const char *path /** path to database file */, const char *name /** name of data base */,
-	dbmode_t mode /** open mode, DB_READ or DB_WRITE */);
+void *db_open(const char *path	/** path to database file */, 
+	      size_t count	/** number of data base(s) */,
+	      const char **name /** name(s) of data base(s) */,
+	      dbmode_t mode	/** open mode, DB_READ or DB_WRITE */);
 
 /** Close file and clean up. */
 void  db_close(/*@only@*/ void *, bool nosync  /** Normally false, if true, do not synchronize data. This should not be used in regular operation but only to ease the disk I/O load when the lock operation failed. */);
@@ -46,32 +48,32 @@ void db_cleanup(void);
 /** Increments count for given word.  Note: negative results are set to
  * zero.
  */
-void db_increment(void *, const word_t *, uint32_t);
+void db_increment(void *, const word_t *, dbv_t *);
 
 /** Decrement count for a given word, if it exists in the datastore.
  * Note: negative results are set to zero. 
  */
-void db_decrement(void *, const word_t *, uint32_t);
+void db_decrement(void *, const word_t *, dbv_t *);
 
 /** Retrieve the value associated with a given word in a list. 
  * \return zero if the word does not exist in the database. 
  */
-uint32_t db_getvalue(void *, const word_t *);
+bool db_getvalues(void *, const word_t *, dbv_t *);
 
 /** Delete the key */
 void db_delete(void *, const word_t *);
 
 /** Set the value associated with a given word in a list */
-void db_setvalue(void *, const word_t *, uint32_t);
+void db_setvalues(void *, const word_t *, dbv_t *);
 
 /** Update the value associated with a given word in a list */
-void db_updvalue(void *vhandle, const word_t *word, const dbv_t *updval);
+void db_updvalues(void *vhandle, const word_t *word, const dbv_t *updval);
 
 /** Get the database message count */
-uint32_t db_get_msgcount(void*);
+void db_get_msgcounts(void*, dbv_t *);
 
 /** set the database message count */
-void db_set_msgcount(void*, uint32_t);
+void db_set_msgcounts(void*, dbv_t *);
 
 typedef int (*db_foreach_t)(word_t *w_key, word_t *w_value, void *userdata);
 /** Iterate over all elements in data base and call \p hook for each item.

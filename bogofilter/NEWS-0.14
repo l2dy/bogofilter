@@ -1,0 +1,8 @@
+			       =================
+				BOGOFILTER NEWS
+			       =================
+ 
+2003-07-16
+ 
+* Initial release of code allowing bogofilter to use a single
+  BerkeleyDB database for storing both ham and spam tokens.

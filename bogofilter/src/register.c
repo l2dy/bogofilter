@@ -33,8 +33,7 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
   int wordcount = h->count;	/* use number of unique tokens */
 
   wordlist_t *list;
-  wordlist_t *incr_list = NULL;
-  wordlist_t *decr_list = NULL;
+  int incr = -1, decr = -1;
 
   /* If update directory explicity supplied, setup the wordlists. */
   if (update_dir) {
@@ -42,10 +41,10 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
 	  exit(2);
   }
 
-  if (_run_type & REG_SPAM) r = "s";
-  if (_run_type & REG_GOOD) r = "n";
-  if (_run_type & UNREG_SPAM) u = "S";
-  if (_run_type & UNREG_GOOD) u = "N";
+  if (_run_type & REG_SPAM)	{ r = "s"; incr = SPAM; }
+  if (_run_type & REG_GOOD)	{ r = "n"; incr = GOOD; }
+  if (_run_type & UNREG_SPAM)	{ u = "S"; decr = SPAM; }
+  if (_run_type & UNREG_GOOD)	{ u = "N"; decr = GOOD; }
 
   if (wordcount == 0)
       msgcount = 0;
@@ -56,51 +55,57 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
     (void)fprintf(dbgout, "# %d word%s, %d message%s\n", 
 		  wordcount, PLURAL(wordcount), msgcount, PLURAL(msgcount));
 
+/*
   set_list_active_status(false);
-
-  if (_run_type & REG_GOOD) incr_list = good_list;
-  if (_run_type & REG_SPAM) incr_list = spam_list;
-  if (_run_type & UNREG_GOOD) decr_list = good_list;
-  if (_run_type & UNREG_SPAM) decr_list = spam_list;
-
-  if (DEBUG_REGISTER(2))
-      fprintf(dbgout, "%s%s -- incr: %08lX, decr: %08lX\n", r, u,
-	      (unsigned long)incr_list, (unsigned long)decr_list);
-
-  if (incr_list)
-    incr_list->active = true;
-  if (decr_list)
-    decr_list->active = true;
-
-  for (list = word_lists; list != NULL; list = list->next){
-    if (list->active) {
-      list->msgcount = db_get_msgcount(list->dbh);
-    }
-  }
-
-  if (incr_list) incr_list->msgcount += msgcount;
-
-  if (decr_list) {
-    if (decr_list->msgcount > msgcount)
-      decr_list->msgcount -= msgcount;
-    else
-      decr_list->msgcount = 0;
-  }
+*/
 
   for (node = wordhash_first(h); node != NULL; node = wordhash_next(h)){
-    wordprop = node->buf;
-    if (incr_list) db_increment(incr_list->dbh, node->key, wordprop->freq);
-    if (decr_list) db_decrement(decr_list->dbh, node->key, wordprop->freq);
+      wordprop = node->buf;
+      if (incr >= 0) {
+	  dbv_t val;
+	  val.goodcount = val.spamcount = val.date = 0;
+	  val.count[incr] = wordprop->freq;
+	  db_increment(word_list->dbh, node->key, &val);
+      }
+      if (decr >= 0) {
+	  dbv_t val;
+	  val.goodcount = val.spamcount = val.date = 0;
+	  val.count[decr] = wordprop->freq;
+	  db_decrement(word_list->dbh, node->key, &val);
+      }
   }
 
   for (list = word_lists; list != NULL; list = list->next){
-    if (list->active) {
-      db_set_msgcount(list->dbh, list->msgcount);
+      dbv_t val;
+
+/*
+      if (!list->active)
+	  continue;
+*/
+
+      db_get_msgcounts(list->dbh, &val);
+      list->msgcount[SPAM] = val.spamcount;
+      list->msgcount[GOOD] = val.goodcount;
+
+      if (incr >= 0)
+	  list->msgcount[incr] += msgcount;
+      
+      if (decr >= 0) {
+	  if (list->msgcount[decr] > msgcount)
+	      list->msgcount[decr] -= msgcount;
+	  else
+	      list->msgcount[decr] = 0;
+      }
+
+      val.spamcount = list->msgcount[SPAM];
+      val.goodcount = list->msgcount[GOOD];
+
+      db_set_msgcounts(list->dbh, &val);
+
       db_flush(list->dbh);
       if (verbose>1)
-	(void)fprintf(stderr, "bogofilter: %ld messages on the %s list\n",
-		      list->msgcount, list->filename);
-    }
+	  (void)fprintf(stderr, "bogofilter: list %s - %ld spam, %ld good\n",
+			list->filename, list->msgcount[SPAM], list->msgcount[GOOD]);
   }
 }
 

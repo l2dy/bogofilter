@@ -41,14 +41,18 @@ word_t  *msg_count_tok;
 #define UINT32_MAX 4294967295lu /* 2 ^ 32 - 1 */
 
 typedef struct {
-  char *filename;
-  char *name;
-  int fd;
-  dbmode_t open_mode;
-  DB *dbp;
-  pid_t pid;
-  bool locked;
-  int  is_swapped;
+    char *filename;
+    size_t count;    
+    char *name[2];
+    int fd;
+    dbmode_t open_mode;
+    DB *dbp[2];
+    pid_t pid;
+    bool locked;
+    int  is_swapped;
+    /*@owned@*/ void *dbh_word;	/* database handle */
+    /*@owned@*/ void *dbh_good;	/* database handle */
+    /*@owned@*/ void *dbh_spam;	/* database handle */
 } dbh_t;
 
 #define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
@@ -71,44 +75,65 @@ static int db_lock(int fd, int cmd, short int type);
 
 /* Function definitions */
 
-static void db_enforce_locking(dbh_t *handle, const char *func_name){
-    if (handle->locked == false){
-	print_error(__FILE__, __LINE__, "%s (%s): Attempt to access unlocked handle.", func_name, handle->name);
+static void db_enforce_locking(dbh_t *handle, const char *func_name)
+{
+    if (handle->locked == false) {
+	print_error(__FILE__, __LINE__, "%s (%s): Attempt to access unlocked handle.", func_name, handle->name[0]);
 	exit(2);
     }
 }
 
-static dbh_t *dbh_init(const char *filename, const char *name) {
-  dbh_t *handle;
+static dbh_t *dbh_init(const char *path, size_t count, const char **names)
+{
+    size_t c;
+    dbh_t *handle;
 
-  handle = xmalloc(sizeof(dbh_t));
-  memset(handle, 0, sizeof(dbh_t));	/* valgrind */
+    handle = xmalloc(sizeof(dbh_t));
+    memset(handle, 0, sizeof(dbh_t));	/* valgrind */
 
-  handle->filename  = xstrdup(filename);
-  handle->name	    = xstrdup(name);
-  handle->pid	    = getpid();
-  handle->locked    = false;
-  handle->is_swapped= 0;
-  handle->fd	    = -1; /* for lock */
+    handle->count = count;
+    handle->filename = xstrdup(path);
+    for (c = 0; c < count ; c += 1) {
+	size_t len = strlen(path) + strlen(names[c]) + 2;
+	handle->name[c] = xmalloc(len);
+	build_path(handle->name[c], len, path, names[c]);
+    }
+    handle->pid	    = getpid();
+    handle->locked  = false;
+    handle->is_swapped= 0;
+    handle->fd	    = -1; /* for lock */
 
-  return handle;
+    return handle;
 }
 
-static void dbh_free(/*@only@*/ dbh_t *handle){
-    if (handle == NULL) return;
-    xfree(handle->filename);
-    xfree(handle->name);
-    xfree(handle);
+static void dbh_free(/*@only@*/ dbh_t *handle)
+{
+    if (handle != NULL) {
+	size_t c;
+	for (c = 0; c < handle->count ; c += 1)
+	    xfree(handle->name[c]);
+	xfree(handle->filename);
+	xfree(handle);
+    }
+    return;
+}
+
+static void dbh_print_names(dbh_t *handle, const char *msg)
+{
+    if (handle->count == 1)
+	fprintf(dbgout, "%s (%s)", msg, handle->name[0]);
+    else
+	fprintf(dbgout, "%s (%s,%s)", msg, handle->name[0], handle->name[1]);
 }
 
 /*
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
 */
-void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
+void *db_open(const char *db_file, size_t count, const char **names, dbmode_t open_mode)
 {
     int ret;
-    dbh_t *handle = NULL;
+    dbh_t *handle;
     uint32_t opt_flags = 0;
     /*
      * If locking fails with EAGAIN, then try without MMAP, fcntl()
@@ -144,55 +169,66 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	opt_flags = 0;
 
     for (idx = 0; idx < COUNTOF(retryflags); idx += 1) {
+	size_t i;
 	uint32_t retryflag = retryflags[idx];
-	handle = dbh_init(db_file, name);
-	handle->open_mode = open_mode;
-	/* create DB handle */
-	if ((ret = db_create (&(handle->dbp), NULL, 0)) != 0) {
-	    print_error(__FILE__, __LINE__, "(db) create, err: %d, %s",
-		    ret, db_strerror(ret));
-	    goto open_err;
-	}
+	handle = dbh_init(db_file, count, names);
 
-	if (db_cachesize != 0 &&
-	    (ret = handle->dbp->set_cachesize(handle->dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
-	    print_error(__FILE__, __LINE__, "(db) setcache( %s ), err: %d, %s",
-		    db_file, ret, db_strerror(ret));
-	    goto open_err; 
-	}
+	if (handle == NULL)
+	    break;
 
-	/* open data base */
-	if ((ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0 &&
-	    (ret = DB_OPEN(handle->dbp, db_file, NULL, DB_BTREE, opt_flags |  DB_CREATE | DB_EXCL | retryflag, 0664)) != 0) {
-	    print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s",
-		    db_file, ret, db_strerror(ret));
-	    goto open_err;
-	}
+	for (i = 0; i < handle->count; i += 1) {
+	    DB *dbp = handle->dbp[i];
+	    /* create DB handle */
+	    if ((ret = db_create (&dbp, NULL, 0)) != 0) {
+		print_error(__FILE__, __LINE__, "(db) create, err: %d, %s",
+			    ret, db_strerror(ret));
+		goto open_err;
+	    }
 
-	if (DEBUG_DATABASE(1)) {
-	    fprintf(dbgout, "db_open( %s, %s, %d )\n", name, db_file, open_mode);
-	}
+	    handle->dbp[i] = dbp;
 
-	/* see if the database byte order differs from that of the cpu's */
+	    if (db_cachesize != 0 &&
+		(ret = dbp->set_cachesize(dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
+		print_error(__FILE__, __LINE__, "(db) setcache( %s ), err: %d, %s",
+			    handle->name[0], ret, db_strerror(ret));
+		goto open_err; 
+	    }
+
+	    /* open data base */
+
+	    if ((ret = DB_OPEN(dbp, handle->name[i], NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0 &&
+		(ret = DB_OPEN(dbp, handle->name[i], NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0) {
+/*
+  print_error(__FILE__, __LINE__, "(db) open( %s ), err: %d, %s",
+  handle->name[i], ret, db_strerror(ret));
+*/
+		goto open_err;
+	    }
+	    
+	    if (DEBUG_DATABASE(1))
+		fprintf(dbgout, "db_open( %s, %d ) -> %d\n", handle->name[i], open_mode, ret);
+
+	    /* see if the database byte order differs from that of the cpu's */
 #if DB_AT_LEAST(3,3)
-	ret = handle->dbp->get_byteswapped (handle->dbp, &(handle->is_swapped));
+	    ret = dbp->get_byteswapped (dbp, &(handle->is_swapped));
 #else
-	ret = 0;
-	handle->is_swapped = handle->dbp->get_byteswapped (handle->dbp);
+	    ret = 0;
+	    handle->is_swapped = dbp->get_byteswapped (dbp);
 #endif
-	if (ret != 0) {
-	    handle->dbp->err (handle->dbp, ret, "%s (db) get_byteswapped: %s",
-		    progname, db_file);
-	    db_close(handle, false);
-	    return NULL;		/* handle already freed, ok to return */
-	}
+	    if (ret != 0) {
+		dbp->err (dbp, ret, "%s (db) get_byteswapped: %s",
+			  progname, handle->name);
+		db_close(handle, false);
+		return NULL;		/* handle already freed, ok to return */
+	    }
 
-	ret = handle->dbp->fd(handle->dbp, &handle->fd);
-	if (ret < 0) {
-	    handle->dbp->err (handle->dbp, ret, "%s (db) fd: %s",
-		    progname, db_file);
-	    db_close(handle, false);
-	    return NULL;		/* handle already freed, ok to return */
+	    ret = dbp->fd(dbp, &handle->fd);
+	    if (ret < 0) {
+		dbp->err (dbp, ret, "%s (db) fd: %s",
+			  progname, handle->name);
+		db_close(handle, false);
+		return NULL;		/* handle already freed, ok to return */
+	    }
 	}
 
 	if (db_lock(handle->fd, F_SETLK,
@@ -211,14 +247,16 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	}
     }
 
-    if (handle && (handle -> fd >= 0)) {
+    if (handle && (handle->fd >= 0)) {
 	handle->locked = true;
 	return (void *)handle;
     }
+
     return NULL;
 
-open_err:
+ open_err:
     dbh_free(handle);
+    
     return NULL;
 }
 
@@ -235,34 +273,37 @@ void db_cleanup()
     0 if the word is not found.
     Notes: Will call exit if an error occurs.
 */
-uint32_t db_getvalue(void *vhandle, const word_t *word){
-  dbv_t val;
-  int ret;
-  uint32_t value = 0;
-  dbh_t *handle = vhandle;
+bool db_getvalues(void *vhandle, const word_t *word, dbv_t *val)
+{
+    int ret;
+    dbh_t *handle = vhandle;
 
-  ret = db_get_dbvalue(vhandle, word, &val);
+    ret = db_get_dbvalue(vhandle, word, val);
 
-  if (ret == 0) {
-    value = val.count;
-
-    if (DEBUG_DATABASE(3)) {
-      fprintf(dbgout, "[%lu] db_getvalue (%s): [",
-	      (unsigned long) handle->pid, handle->name);
-      word_puts(word, 0, dbgout);
-      fprintf(dbgout, "] has value %lu\n",
-	      (unsigned long)value);
+    if (ret == 0) {
+	if (DEBUG_DATABASE(3)) {
+	    fprintf(dbgout, "[%lu] db_getvalues (%s): [",
+		    (unsigned long) handle->pid, handle->name[0]);
+	    word_puts(word, 0, dbgout);
+	    fprintf(dbgout, "] has values %lu,%lu\n",
+		    (unsigned long)val->spamcount,
+		    (unsigned long)val->goodcount);
+	}
+	if ((int32_t)val->spamcount < (int32_t)0)
+	    val->spamcount = 0;
+	if ((int32_t)val->goodcount < (int32_t)0)
+	    val->goodcount = 0;
+	return true;
+    } else {
+	memset(val, 0, sizeof(*val));
+	return false;
     }
-    if ((int32_t)value < (int32_t)0)
-	value = 0;
-    return value;
-  } else {
-    return 0;
-  }
 }
 
-void db_delete(void *vhandle, const word_t *word) {
+void db_delete(void *vhandle, const word_t *word)
+{
     int ret;
+    size_t i;
     dbh_t *handle = vhandle;
 
     DBT db_key;
@@ -271,61 +312,90 @@ void db_delete(void *vhandle, const word_t *word) {
     db_key.data = word->text;
     db_key.size = word->leng;
 
-    ret = handle->dbp->del(handle->dbp, NULL, &db_key, 0);
+    for (i = 0; i < handle->count; i += 1) {
+	DB *dbp = handle->dbp[i];
+	ret = dbp->del(dbp, NULL, &db_key, 0);
 
-    if (ret == 0 || ret == DB_NOTFOUND) return;
-    print_error(__FILE__, __LINE__, "(db) db_delete('%s'), err: %d, %s", word->text, ret, db_strerror(ret));
-    exit(2);
+	if (ret != 0 && ret != DB_NOTFOUND) {
+	    print_error(__FILE__, __LINE__, "(db) db_delete('%s'), err: %d, %s", word->text, ret, db_strerror(ret));
+	    exit(2);
+	}
+    }
+
+    return;
 }
 
-static int db_get_dbvalue(void *vhandle, const word_t *word, /*@out@*/ dbv_t *val){
-  int ret;
-  DBT db_key;
-  DBT db_data;
-  uint32_t cv[2] = { 0l, 0l };
+static int db_get_dbvalue(void *vhandle, const word_t *word, /*@out@*/ dbv_t *val)
+{
+    int ret;
+    bool found = false;
+    size_t i;
+    DBT db_key;
+    DBT db_data;
+    uint32_t cv[3] = { 0l, 0l, 0l };
 
-  dbh_t *handle = vhandle;
+    dbh_t *handle = vhandle;
 
-  db_enforce_locking(handle, "db_getvalue");
+    db_enforce_locking(handle, "db_get_dbvalue");
 
-  DBT_init(db_key);
-  DBT_init(db_data);
+    DBT_init(db_key);
+    DBT_init(db_data);
 
-  db_key.data = word->text;
-  db_key.size = word->leng;
+    db_key.data = word->text;
+    db_key.size = word->leng;
 
-  db_data.data = &cv;
-  db_data.size = sizeof(cv);
-  db_data.ulen = sizeof(cv);
-  db_data.flags = DB_DBT_USERMEM; /* saves the memcpy */
+    db_data.data = &cv;
+    db_data.size = sizeof(cv);
+    db_data.ulen = sizeof(cv);
+    db_data.flags = DB_DBT_USERMEM; /* saves the memcpy */
 
-  ret = handle->dbp->get(handle->dbp, NULL, &db_key, &db_data, 0);
+    for (i = 0; i < handle->count; i += 1) {
+	DB *dbp = handle->dbp[i];
+	ret = dbp->get(dbp, NULL, &db_key, &db_data, 0);
 
-  switch (ret) {
-  case 0:
-      /* we used to do this: but DB_DBT_USERMEM saves us the copy
-      memcpy(cv, db_data.data, db_data.size);
-      */
-    if (!handle->is_swapped){		/* convert from struct to array */
-      val->count = cv[0];
-      val->date  = cv[1];
-    } else {
-      val->count = swap_32bit(cv[0]);
-      val->date  = swap_32bit(cv[1]);
+	switch (ret) {
+	case 0:
+	    found = true;
+	    /* we used to do this: but DB_DBT_USERMEM saves us the copy
+	       memcpy(cv, db_data.data, db_data.size);
+	    */
+	    if (handle->count == 1) {
+		if (!handle->is_swapped) {		/* convert from struct to array */
+		    val->spamcount = cv[0];
+		    val->goodcount = cv[1];
+		    val->date      = cv[2];
+		} else {
+		    val->spamcount = swap_32bit(cv[0]);
+		    val->goodcount = swap_32bit(cv[1]);
+		    val->date      = swap_32bit(cv[2]);
+		}
+	    } else {
+		uint32_t date;
+		if (!handle->is_swapped) {		/* load from struct into array */
+		    val->count[i] = cv[0];
+		    date          = cv[1];
+		} else {
+		    val->count[i] = swap_32bit(cv[0]);
+		    date          = swap_32bit(cv[1]);
+		}
+		val->date = max(val->date, date);
+	    }
+	    break;
+	case DB_NOTFOUND:
+	    if (handle->count != 1)
+		val->count[i] = 0;
+	    if (DEBUG_DATABASE(3)) {
+		fprintf(dbgout, "db_get_dbvalue (%s): [", handle->name[i]);
+		word_puts(word, 0, dbgout);
+		fputs("] not found\n", dbgout);
+	    }
+	    break;
+	default:
+	    print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%s' ), err: %d, %s", word->text, ret, db_strerror(ret));
+	    exit(2);
+	}
     }
-    break;
-  case DB_NOTFOUND:
-    if (DEBUG_DATABASE(3)) {
-      fprintf(dbgout, "[%lu] db_getvalue (%s): [", (unsigned long) handle->pid, handle->name);
-      word_puts(word, 0, dbgout);
-      fputs("] not found\n", dbgout);
-    }
-    break;
-  default:
-    print_error(__FILE__, __LINE__, "(db) db_getvalue( '%s' ), err: %d, %s", word->text, ret, db_strerror(ret));
-    exit(2);
-  }
-  return ret;
+    return found ? 0 : DB_NOTFOUND;
 }
 
 
@@ -333,11 +403,10 @@ static int db_get_dbvalue(void *vhandle, const word_t *word, /*@out@*/ dbv_t *va
 Store VALUE in database, using WORD as database key
 Notes: Calls exit if an error occurs.
 */
-void db_setvalue(void *vhandle, const word_t *word, uint32_t count){
-  dbv_t val;
-  val.count = count;
-  val.date  = today;		/* date in form YYYYMMDD */
-  db_set_dbvalue(vhandle, word, &val);
+void db_setvalues(void *vhandle, const word_t *word, dbv_t *val)
+{
+    val->date = today;		/* date in form YYYYMMDD */
+    db_set_dbvalue(vhandle, word, val);
 }
 
 
@@ -346,159 +415,209 @@ Update the VALUE in database, using WORD as database key.
 Adds COUNT to existing count.
 Sets date to newer of TODAY and date in database.
 */
-void db_updvalue(void *vhandle, const word_t *word, const dbv_t *updval){
-  dbv_t val;
-  int ret = db_get_dbvalue(vhandle, word, &val);
-  if (ret != 0) {
-      val.count = updval->count;
-      val.date  = updval->date;		/* date in form YYYYMMDD */
-  }
-  else {
-      val.count += updval->count;
-      val.date  = max(val.date, updval->date);	/* date in form YYYYMMDD */
-  }
-  db_set_dbvalue(vhandle, word, &val);
+void db_updvalues(void *vhandle, const word_t *word, const dbv_t *updval)
+{
+    dbv_t val;
+    int ret = db_get_dbvalue(vhandle, word, &val);
+    if (ret != 0) {
+	val.spamcount = updval->spamcount;
+	val.goodcount = updval->goodcount;
+	val.date      = updval->date;			/* date in form YYYYMMDD */
+    }
+    else {
+	val.spamcount += updval->spamcount;
+	val.goodcount += updval->goodcount;
+	val.date       = max(val.date, updval->date);	/* date in form YYYYMMDD */
+    }
+    db_set_dbvalue(vhandle, word, &val);
 }
 
 
-static void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val){
-  int ret;
-  DBT db_key;
-  DBT db_data;
-  uint32_t cv[2];
-  dbh_t *handle = vhandle;
+static void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val)
+{
+    int ret;
+    DBT db_key;
+    DBT db_data;
+    size_t i;
+    uint32_t cv[3];
+    dbh_t *handle = vhandle;
 
-  db_enforce_locking(handle, "db_set_dbvalue");
+    db_enforce_locking(handle, "db_set_dbvalue");
 
-  DBT_init(db_key);
-  DBT_init(db_data);
+    DBT_init(db_key);
+    DBT_init(db_data);
 
-  db_key.data = word->text;
-  db_key.size = word->leng;
+    db_key.data = word->text;
+    db_key.size = word->leng;
 
-  if (!handle->is_swapped){		/* convert from struct to array */
-      cv[0] = val->count;
-      cv[1] = val->date;
-  } else {
-      cv[0] = swap_32bit(val->count);
-      cv[1] = swap_32bit(val->date);
-  }
+    for (i = 0; i < handle->count; i += 1) {
+	DB *dbp = handle->dbp[i];
+	if (handle->count == 1) {
+	    if (!handle->is_swapped) {		/* convert from struct to array */
+		cv[0] = val->spamcount;
+		cv[1] = val->goodcount;
+		cv[2] = val->date;
+	    } else {
+		cv[0] = swap_32bit(val->spamcount);
+		cv[1] = swap_32bit(val->goodcount);
+		cv[2] = swap_32bit(val->date);
+	    }
+	} else {
+	    if (!handle->is_swapped) {		/* convert from struct to array */
+		cv[0] = val->count[i];
+		cv[1] = val->date;
+	    } else {
+		cv[0] = swap_32bit(val->count[i]);
+		cv[1] = swap_32bit(val->date);
+	    }
 
-  db_data.data = &cv;			/* and save array in wordlist */
-  if (!datestamp_tokens || val->date == 0)
-      db_data.size = db_data.ulen = sizeof(cv[0]);
-  else
-      db_data.size = db_data.ulen = sizeof(cv);
+	}
+	db_data.data = &cv;			/* and save array in wordlist */
+	if (!datestamp_tokens || val->date == 0)
+	    db_data.size = db_data.ulen = 2 * sizeof(cv[0]);
+	else
+	    db_data.size = db_data.ulen = sizeof(cv);
 
-  ret = handle->dbp->put(handle->dbp, NULL, &db_key, &db_data, 0);
+	ret = dbp->put(dbp, NULL, &db_key, &db_data, 0);
 
-  if (ret == 0){
-    if (DEBUG_DATABASE(3)) {
-      fprintf(dbgout, "db_set_dbvalue (%s): [",
-	      handle->name);
-      word_puts(word, 0, dbgout);
-      fprintf(dbgout, "] has value %lu\n",
-	      (unsigned long)val->count);
+	if (ret == 0) {
+	    if (DEBUG_DATABASE(3)) {
+		dbh_print_names(handle, "db_set_dbvalue");
+		fputs(": [", dbgout);
+		word_puts(word, 0, dbgout);
+		fprintf(dbgout, "] has values %lu,%lu\n",
+			(unsigned long)val->spamcount,
+			(unsigned long)val->goodcount);
+	    }
+	}
+	else {
+	    print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%s' ), err: %d, %s", word->text, ret, db_strerror(ret));
+	    exit(2);
+	}
     }
-  }
-  else {
-    print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%s' ), err: %d, %s", word->text, ret, db_strerror(ret));
-    exit(2);
-  }
 }
 
 
 /*
   Increment count associated with WORD, by VALUE.
  */
-void db_increment(void *vhandle, const word_t *word, uint32_t value){
-    uint32_t dv = db_getvalue(vhandle, word);
-    value = UINT32_MAX - dv < value ? UINT32_MAX : dv + value;
-    db_setvalue(vhandle, word, value);
+void db_increment(void *vhandle, const word_t *word, dbv_t *val)
+{
+    dbv_t cur;
+
+    db_getvalues(vhandle, word, &cur);
+
+    cur.spamcount = UINT32_MAX - cur.spamcount < val->spamcount ? UINT32_MAX : cur.spamcount + val->spamcount;
+    cur.goodcount = UINT32_MAX - cur.goodcount < val->goodcount ? UINT32_MAX : cur.goodcount + val->goodcount;
+
+    db_setvalues(vhandle, word, &cur);
+
+    return;
 }
 
 /*
   Decrement count associated with WORD by VALUE,
   if WORD exists in the database.
 */
-void db_decrement(void *vhandle, const word_t *word, uint32_t value){
-    uint32_t dv = db_getvalue(vhandle, word);
-    value = dv < value ? 0 : dv - value;
-    db_setvalue(vhandle, word, value);
+void db_decrement(void *vhandle, const word_t *word, dbv_t *val)
+{
+    dbv_t cur;
+
+    db_getvalues(vhandle, word, &cur);
+
+    cur.spamcount = cur.spamcount < val->spamcount ? 0 : cur.spamcount - val->spamcount;
+    cur.goodcount = cur.goodcount < val->goodcount ? 0 : cur.goodcount - val->goodcount;
+    db_setvalues(vhandle, word, &cur);
+
+    return;
 }
 
 /*
   Get the number of messages associated with database.
 */
-uint32_t db_get_msgcount(void *vhandle){
-    uint32_t msg_count;
-
+void db_get_msgcounts(void *vhandle, dbv_t *val)
+{
     if (msg_count_tok == NULL)
 	msg_count_tok = word_new(MSG_COUNT_TOK, strlen((const char *)MSG_COUNT_TOK));
-    msg_count = db_getvalue(vhandle, msg_count_tok);
+
+    db_getvalues(vhandle, msg_count_tok, val);
 
     if (DEBUG_DATABASE(2)) {
-	dbh_t *handle = vhandle;
-	fprintf(dbgout, "db_get_msgcount( %s ) -> %lu\n", handle->name,
-		(unsigned long)msg_count);
+	dbh_print_names(vhandle, "db_get_msgcounts");
+	fprintf(dbgout, " ->  %lu,%lu\n",
+		(unsigned long)val->spamcount,
+		(unsigned long)val->goodcount);
     }
 
-    return msg_count;
+    return;
 }
 
 /*
  Set the number of messages associated with database.
 */
-void db_set_msgcount(void *vhandle, uint32_t count){
-    db_setvalue(vhandle, msg_count_tok, count);
+void db_set_msgcounts(void *vhandle, dbv_t *val)
+{
+    db_setvalues(vhandle, msg_count_tok, val);
 
     if (DEBUG_DATABASE(2)) {
-	dbh_t *handle = vhandle;
-	fprintf(dbgout, "db_set_msgcount( %s ) -> %lu\n", handle->name,
-		(unsigned long)count);
+	dbh_print_names(vhandle, "db_get_msgcounts");
+	fprintf(dbgout, " ->  %lu,%lu\n",
+		(unsigned long)val->spamcount,
+		(unsigned long)val->goodcount);
     }
 }
 
 
 /* Close files and clean up. */
-void db_close(void *vhandle, bool nosync){
-  dbh_t *handle = vhandle;
-  int ret;
-  uint32_t f = nosync ? DB_NOSYNC : 0;
+void db_close(void *vhandle, bool nosync)
+{
+    dbh_t *handle = vhandle;
+    int ret;
+    size_t i;
+    uint32_t f = nosync ? DB_NOSYNC : 0;
 
-  if (DEBUG_DATABASE(1)) {
-      fprintf(dbgout, "db_close(%s, %s, %s)\n", handle->name, handle->filename,
-	      nosync ? "nosync" : "sync");
-  }
+    if (DEBUG_DATABASE(1)) {
+	dbh_print_names(vhandle, "db_close");
+	fprintf(dbgout, " %s\n", nosync ? "nosync" : "sync");
+    }
 
-  if (handle == NULL) return;
+    if (handle == NULL) return;
+
 #if 0
-  if (handle->fd >= 0) {
-      db_lock(handle->fd, F_UNLCK,
-	      (short int)(handle->open_mode == DB_READ ? F_RDLCK : F_WRLCK));
-  }
+    if (handle->fd >= 0) {
+	db_lock(handle->fd, F_UNLCK,
+		(short int)(handle->open_mode == DB_READ ? F_RDLCK : F_WRLCK));
+    }
 #endif
-  if ((ret = handle->dbp->close(handle->dbp, f))) {
-    print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
-  }
+
+    for (i = 0; i < handle->count; i += 1) {
+	DB *dbp = handle->dbp[i];
+	if ((ret = dbp->close(dbp, f)))
+	    print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
+    }
 
 /*  db_lock_release(handle); */
-  dbh_free(handle);
+    dbh_free(handle);
 }
 
 /*
  flush any data in memory to disk
 */
-void db_flush(void *vhandle){
+void db_flush(void *vhandle)
+{
     dbh_t *handle = vhandle;
     int ret;
-    if ((ret = handle->dbp->sync(handle->dbp, 0))) {
-	print_error(__FILE__, __LINE__, "(db) db_sync: err: %d, %s", ret, db_strerror(ret));
+    size_t i;
+    for (i = 0; i < handle->count; i += 1) {
+	DB *dbp = handle->dbp[i];
+	if ((ret = dbp->sync(dbp, 0)))
+	    print_error(__FILE__, __LINE__, "(db) db_sync: err: %d, %s", ret, db_strerror(ret));
     }
 }
 
 /* implements locking. */
-static int db_lock(int fd, int cmd, short int type){
+static int db_lock(int fd, int cmd, short int type)
+{
     struct flock lock;
 
     lock.l_type = type;
@@ -508,54 +627,60 @@ static int db_lock(int fd, int cmd, short int type){
     return (fcntl(fd, cmd, &lock));
 }
 
-int db_foreach(void *vhandle, db_foreach_t hook, void *userdata) {
+int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
+{
     dbh_t *handle = vhandle;
     int ret;
     DBC dbc;
     DBC *dbcp = &dbc;
     DBT key, data;
+    size_t i;
     word_t w_key, w_data;
     memset (&key, 0, sizeof(key));
     memset (&data, 0, sizeof(data));
 
-    ret = handle->dbp->cursor(handle->dbp, NULL, &dbcp, 0);
-    if (ret) {
-	handle->dbp->err(handle->dbp, ret, "(cursor): %s", handle->filename);
-	return -1;
-    }
+    for (i = 0; i < handle->count; i += 1) {
+	DB *dbp = handle->dbp[i];
 
-    while((ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) == 0) {
-	uint32_t cv[2];
-
-	memcpy(&cv, data.data, data.size);
-	if (handle->is_swapped) {
-	    unsigned int i;
-	    for(i=0;i< (data.size / 4);i++)
-		cv[i] = swap_32bit(cv[i]);
+	ret = dbp->cursor(dbp, NULL, &dbcp, 0);
+	if (ret) {
+	    dbp->err(dbp, ret, "(cursor): %s", handle->filename);
+	    return -1;
 	}
 
-	/* switch to "word_t *" variables */
-	w_key.text = key.data;
-	w_key.leng = key.size;
-	w_data.text = data.data;
-	w_data.leng = data.size;
+	while((ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) == 0) {
+	    uint32_t cv[2];
 
-	/* call user function */
-	if (hook(&w_key, &w_data, userdata))
-	    break;
-    }
-    switch(ret) {
+	    memcpy(&cv, data.data, data.size);
+	    if (handle->is_swapped) {
+		unsigned int s;
+		for(s = 0; s < (data.size / 4); s++)
+		    cv[s] = swap_32bit(cv[s]);
+	    }
+
+	    /* switch to "word_t *" variables */
+	    w_key.text = key.data;
+	    w_key.leng = key.size;
+	    w_data.text = data.data;
+	    w_data.leng = data.size;
+
+	    /* call user function */
+	    if (hook(&w_key, &w_data, userdata))
+		break;
+	}
+	switch(ret) {
 	case DB_NOTFOUND:
 	    /* OK */
 	    ret = 0;
 	    break;
 	default:
-	    handle->dbp->err(handle->dbp, ret, "(c_get)");
+	    dbp->err(dbp, ret, "(c_get)");
 	    ret = -1;
-    }
-    if (dbcp->c_close(dbcp)) {
-	    handle->dbp->err(handle->dbp, ret, "(c_close)");
+	}
+	if (dbcp->c_close(dbcp)) {
+	    dbp->err(dbp, ret, "(c_close)");
 	    ret = -1;
+	}
     }
     return ret;
 }

@@ -33,6 +33,7 @@ extern	int	Rtable;			/* '-R' */
 extern	bool	terse;			/* '-t' */
 extern	int	test;			/* '-T' */
 extern	int	verbose;		/* '-v' */
+extern	wl_t	wordlists;		/* '-w', '-W' */
 
 /* config file options */
 extern	int	max_repeats;

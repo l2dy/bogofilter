@@ -27,6 +27,7 @@
 #define	MIN_SLEEP	0.5e+3		/* .5 milliseconds */
 #define	MAX_SLEEP	2.0e+6		/* 2 seconds */
 
+wordlist_t *word_list;
 wordlist_t *good_list;
 wordlist_t *spam_list;
 /*@null@*/ wordlist_t* word_lists=NULL;
@@ -56,9 +57,11 @@ static void rand_sleep(double min, double max)
 
 /* returns -1 for error, 0 for success */
 static int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* path,
-			 double weight, bool bad, int override, bool ignore)
+			 double sweight, bool sbad, 
+			 double gweight, bool gbad, 
+			 int override, bool ignore)
 {
-    wordlist_t *new = (wordlist_t *)xmalloc(sizeof(*new));
+    wordlist_t *new = (wordlist_t *)xcalloc(1, sizeof(*new));
     wordlist_t *list_ptr;
     static int listcount;
 
@@ -68,13 +71,12 @@ static int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const ch
     new->filename=xstrdup(name);
     new->filepath=xstrdup(path);
     new->index = ++listcount;
-#if 0
-    new->msgcount=0;
-#endif
     new->override=override;
     new->active=false;
-    new->weight=weight;
-    new->bad=bad;
+    new->weight[SPAM]=sweight;
+    new->weight[GOOD]=gweight;
+    new->bad[SPAM]=sbad;
+    new->bad[GOOD]=gbad;
     new->ignore=ignore;
 
     if (! word_lists) {
@@ -118,7 +120,6 @@ int setup_wordlists(const char* d, priority_t precedence)
 {
     int rc = 0;
     char *dir;
-    char filepath[PATH_LEN];
     double good_weight = 1.0;
     double bad_weight  = 1.0;
     static priority_t saved_precedence = PR_NONE;
@@ -155,18 +156,18 @@ int setup_wordlists(const char* d, priority_t precedence)
 	rc = -1;
     }
 
-    if ((build_path(filepath, sizeof(filepath), dir, GOODFILE) < 0) ||
-	init_wordlist(&good_list, "good", filepath, good_weight, false, 0, false) != 0)
-	rc = -1;
-
-    if ((build_path(filepath, sizeof(filepath), dir, SPAMFILE) < 0) ||
-	init_wordlist(&spam_list, "spam", filepath, bad_weight, true, 0, false) != 0)
+    if (init_wordlist(&word_list, "word", dir, bad_weight, true, good_weight, false, 0, false) != 0)
 	rc = -1;
 
     xfree(dir);
 
     return rc;
 }
+
+const char *aCombined[] = { WORDLIST };
+size_t	    cCombined = COUNTOF(aCombined);
+const char *aSeparate[] = { SPAMFILE, GOODFILE };
+size_t	    cSeparate = COUNTOF(aSeparate);
 
 void open_wordlists(dbmode_t mode)
 {
@@ -176,7 +177,22 @@ void open_wordlists(dbmode_t mode)
     do {
 	retry = 0;
 	for (list = word_lists; list != NULL; list = list->next) {
-	    list->dbh = db_open(list->filepath, list->filename, mode);
+	    switch (wordlists) {
+	    case W_COMBINED:
+		list->dbh = db_open(list->filepath, cCombined, aCombined, mode);
+		break;
+	    case W_SEPARATE:
+		list->dbh = db_open(list->filepath, cSeparate, aSeparate, mode);
+		break;
+	    default:
+		fprintf(stderr, "Unknown wordlist type.\n");
+		exit(2);
+		if (list->dbh == NULL)
+		    list->dbh = db_open(list->filepath, cCombined, aCombined, mode);
+		if (list->dbh == NULL)
+		    list->dbh = db_open(list->filepath, cSeparate, aSeparate, mode);
+		break;
+	    }
 	    if (list->dbh == NULL) {
 		int err = errno;
 		close_wordlists(true); /* unlock and close */
@@ -195,7 +211,10 @@ void open_wordlists(dbmode_t mode)
 			exit(2);
 		} /* switch */
 	    } else { /* db_open */
-		list->msgcount = db_get_msgcount(list->dbh);
+		dbv_t val;
+		db_get_msgcounts(list->dbh, &val);
+		list->msgcount[GOOD] = val.goodcount;
+		list->msgcount[SPAM] = val.spamcount;
 	    } /* db_open */
 	} /* for */
     } while(retry);
@@ -233,8 +252,7 @@ void set_good_weight(double weight)
 
     for ( list = word_lists; list != NULL; list = list->next )
     {
-	if ( ! list->bad )
-	    list->weight = weight;
+	list->weight[GOOD] = weight;
     }
 
     return;
@@ -309,9 +327,9 @@ bool configure_wordlist(const char *val)
     char* type;
     char* name;
     char* path;
-    double weight = 0.0;
+    double sweight, gweight;
     bool bad = false;
-    int  override = 0;
+    int  override;
     bool ignore = false;
 
     char *tmp = xstrdup(val);
@@ -338,7 +356,10 @@ bool configure_wordlist(const char *val)
     path=tildeexpand(tmp);	/* path to wordlist */
     tmp = spanword(tmp);
 
-    weight=atof(tmp);
+    sweight=atof(tmp);
+    tmp = spanword(tmp);
+
+    gweight=atof(tmp);
     tmp = spanword(tmp);
 
     override=atoi(tmp);
@@ -361,7 +382,7 @@ bool configure_wordlist(const char *val)
     }
     tmp = spanword(tmp);
 
-    rc = init_wordlist(&list, name, path, weight, bad, override, ignore);
+    rc = init_wordlist(&list, name, path, sweight, bad, gweight, false, override, ignore);
     ok = rc == 0;
 
     xfree(path);

@@ -116,28 +116,37 @@ static double wordprob_result(wordprop_t* wordstats)
 static double compute_probability(const word_t *token, wordprop_t *wordstats)
 {
     int override=0;
-    long count;
     wordlist_t* list;
 
     if (wordstats->bad == 0 && wordstats->good == 0)
     for (list=word_lists; list != NULL ; list=list->next)
     {
+	size_t i;
+	dbv_t val;
 	if (override > list->override)
 	    break;
-	count=db_getvalue(list->dbh, token);
+	db_getvalues(list->dbh, token, &val);
 
-	/* Protect against negatives */
-	if (count < 0) {
-	    count = 0;
-	    db_setvalue(list->dbh, token, count);
-	}
+	if (val.count[0] == 0 && val.count[1] == 0)
+	    continue;
+	if (list->ignore)
+	    return EVEN_ODDS;
+	override=list->override;
 
-	if (count) {
+	for (i=0; i<COUNTOF(val.count); i++) {
+	    /* Protect against negatives */
+	    if ((int) val.count[i] < 0) {
+		val.count[i] = 0;
+		db_setvalues(list->dbh, token, &val);
+	    }
+
+	    if (val.count[i] == 0)
+		continue;
 	    if (list->ignore)
 		return EVEN_ODDS;
 	    override=list->override;
 
-	    wordprob_add(wordstats, count, list->bad);
+	    wordprob_add(wordstats, val.count[i], list->bad[i]);
 	    if (DEBUG_ROBINSON(1)) {
 		fprintf(dbgout, "%2d %2d \n", (int) wordstats->good, (int) wordstats->bad);
 		word_puts(token, 0, dbgout);
@@ -300,10 +309,14 @@ void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double 
 	    robs = ROBS;
     }
 
-    if (fabs(robx) < EPS && spam_list->dbh)
+    if (fabs(robx) < EPS && word_list->dbh)
     {
+	dbv_t val;
+	long l_robx;
+
 	/* Note: .ROBX is scaled by 1000000 in the wordlist */
-	long l_robx = db_getvalue(spam_list->dbh, word_robx);
+	db_getvalues(word_list->dbh, word_robx, &val);
+	l_robx = val.count[SPAM];
 
 	/* If found, unscale; else use predefined value */
 	robx = l_robx ? (double)l_robx / 1000000 : ROBX;

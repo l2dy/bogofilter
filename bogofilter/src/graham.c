@@ -207,7 +207,6 @@ static double compute_probability(const word_t *token)
 {
     wordlist_t* list;
     int override=0;
-    long count;
     double prob;
     int totalcount=0;
 
@@ -217,21 +216,26 @@ static double compute_probability(const word_t *token)
 
     for (list=word_lists; list != NULL ; list=list->next)
     {
+	int   i;
+	dbv_t val;
 	if (override > list->override)
 	    break;
-	count=db_getvalue(list->dbh, token);
+	db_getvalues(list->dbh, token, &val);
+	if (val.count[0] == 0 && val.count[1] == 0)
+	    continue;
 
-	if (count) {
-	    if (list->ignore)
-		return EVEN_ODDS;
-	    totalcount+=count*list->weight;
-	    override=list->override;
-	    prob = (double)count;
-	    prob /= list->msgcount;
-	    prob *= list->weight;
+	if (list->ignore)
+	    return EVEN_ODDS;
+	override=list->override;
+
+	for (i=0; i<2; i++) {
+	    totalcount+=val.count[i]*list->weight[i];
+	    prob = (double)val.count[i];
+	    prob /= list->msgcount[i];
+	    prob *= list->weight[i];
 	    prob = min(1.0, prob);
 	    
-	    wordprob_add(&wordstats, prob, list->bad);
+	    wordprob_add(&wordstats, prob, list->bad[i]);
 	}
     }
 

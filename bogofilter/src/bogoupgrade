@@ -7,10 +7,31 @@ bogoupgrade -- upgrade a bogofilter database to current version.
 
 Author:
 Gyepi Sam <gyepi@praxis-sw.com>
+David Relson <relson@osagesoftware.com>
 
 =cut
 
-my $VERSION = '0.1';
+# bogofilter-0.3 through bogofilter-0.6.3
+#
+#	HEADER "# bogofilter email-count (format version A): %lu"
+#
+
+# bogofilter-0.7.x
+#
+#	HEADER "# bogofilter email-count (format version B): %lu"
+#
+
+# bogofilter-0.8 to bogofilter-0.13.x
+#
+# BerkeleyDB with double wordlists 
+#	spamlist.db and goodlist.db
+
+# bogofilter-0.14 and later
+#
+# BerkeleyDB with single wordlist
+#	wordlist.db
+
+my $VERSION = '0.2';
 
 my ($in, $out, $help);
 
@@ -20,7 +41,10 @@ for (my $i = 0; $i < @ARGV; $i++){
 
   my $arg = $ARGV[$i];
 
-  if ($arg eq '-i'){
+  if ($arg eq '-d'){
+    $dir = $ARGV[++$i];
+  }
+  elsif ($arg eq '-i'){
     $in = $ARGV[++$i];
   }
   elsif ($arg eq '-o'){
@@ -42,18 +66,31 @@ for (my $i = 0; $i < @ARGV; $i++){
   }
 }
 
+if ( $dir ) {
+    convert_double_to_single();
+}
+else {
+    die "Missing input filename\n" unless $in;
+    die "Missing output filename\n" unless $out;
 
-die "Missing input filename\n" unless $in;
-die "Missing output filename\n" unless $out;
+    my $msg_count_token = '.MSG_COUNT';
 
-my $msg_count_token = '.MSG_COUNT';
+    open(F, $in) or die "Cannot open input file [$in]. $!.\n";
+    my $sig = <F>;
+    chomp($sig);
+    if ($sig =~ m/^\# bogofilter wordlist \(format version A\):\s(\d+)$/){ 
+	convert_format_A();
+    }
+    elsif ($sig =~ m/^\# bogofilter wordlist \(format version A\):\s(\d+)$/){ 
+	convert_format_B();
+    }
+    else {
+	warn "Cannot recognize signature [$sig].\n";
+	exit(2);
+    }
+}
 
-open(F, $in) or die "Cannot open input file [$in]. $!.\n";
-my $sig = <F>;
-chomp($sig);
-
-if ($sig =~ m/^\# bogofilter wordlist \(format version A\):\s(\d+)$/){ 
-  
+sub convert_format_A() {  
   my $msg_count = $1;
   my $cmd = qq[$bogoutil $yday -l $out];
   open(OUT, "|$cmd") or die "Cannot run command [$cmd]. $!\n";
@@ -64,7 +101,8 @@ if ($sig =~ m/^\# bogofilter wordlist \(format version A\):\s(\d+)$/){
   close(OUT);
   close(F);
 }
-elsif ($sig =~ m/^\# bogofilter email-count \(format version B\):\s(\d+)/){
+
+sub convert_format_B() {
   my $msg_count = $1;
   my $in_db = $in;
   $in_db =~ s/count$/db/;
@@ -99,9 +137,26 @@ elsif ($sig =~ m/^\# bogofilter email-count \(format version B\):\s(\d+)/){
   close(F);
   close(OUT);
 }
-else {
-  warn "Cannot recognize signature [$sig].\n";
-  exit(2);
+
+sub convert_double_to_single() {  
+    $word = "$dir/wordlist.db";
+    open(F, $word) and die "$word already exists.\n";
+    close(F);
+
+    $spam = "$dir/spamlist.db";
+    open(F, $spam) or die "Cannot open file [$spam].\n";
+    close(F);
+
+    $good = "$dir/goodlist.db";
+    open(F, $good) or die "Cannot open file [$good].\n";
+    close(F);
+
+    $cmd = qq[
+    ( $bogoutil -d $spam | awk '{ printf \"%s %d 0 %d\\n\", \$1, \$2, \$3}' ; \
+      $bogoutil -d $good | awk '{ printf \"%s 0 %d %d\\n\", \$1, \$2, \$3}'   \
+      ) | sort | $bogoutil -l $word ];
+
+    system( $cmd );
 }
 
 exit(0);

@@ -34,6 +34,7 @@ int build_path(char* dest, size_t size, const char* dir, const char* file)
     }
 
     if (strlcat(dest, file, size) >= size) return -1;
+
     return 0;
 }
 

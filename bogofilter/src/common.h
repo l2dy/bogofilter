@@ -17,8 +17,10 @@
 /* length of token will not exceed this... */
 #define MAXTOKENLEN	30
 
+#define WORDLIST	"wordlist.db"
 #define GOODFILE	"goodlist.db"
 #define SPAMFILE	"spamlist.db"
+
 #define IGNOREFILE	"ignorelist.db"
 
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
@@ -87,6 +89,9 @@ typedef enum bulk_e {
     B_CMDLINE,
     B_STDIN
 } bulk_t;
+
+typedef enum wl_e { W_SEPARATE=1,
+		    W_COMBINED=2 } wl_t;
 
 #include "globals.h"
 
