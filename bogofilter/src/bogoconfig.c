@@ -631,8 +631,10 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'd':
-	if (setup_wordlists(val, precedence) != 0)
-	    exit(EX_ERROR);
+	if (pass != PASS_1) {
+	    if (setup_wordlists(val, precedence) != 0)
+		exit(EX_ERROR);
+	}
 	break;
 
     case 'H':
