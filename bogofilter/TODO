@@ -39,11 +39,6 @@ message belongs to at above 0.9 confidence level.
 structure and a selection of lexers to analyze the tokens.
 Use a functional approach to nest these lexers?
 
-**** Design Enhancement: Improve evaluation accuracy by treating words common
-in both wordlists as neutral by excluding them from the probability
-calculation when their significance to the total probability falls below a
-certain limit.
-
 **** New Feature: Web based tool for wordlist management. Allow message
 registration and whitelist management. HTML Templatized for easy integration
 with existing web mail systems.
