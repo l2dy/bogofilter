@@ -78,11 +78,9 @@
           <li><a href="#spamassassin">How can I use SpamAssassin to train Bogofilter?</a></li>
           <li><a href="#mboxformats">What mailbox (file) formats does bogofilter understand?</a></li>
           <li><a href="#vvv">What does bogofilter's verbose output mean?</a></li>
-	  <li><a href="#lists">Can bogofilter be used in a multi-user environment?</a></li>
+          <li><a href="#asian-spam">What can I do about Asian spam?</a></li>
         </ul>
       </li>
-
-xxxx	  <li><a href="#lists">Can bogofilter be used in a multi-user environment?</a></li>  xxx
 
       <li>
         Database Questions
@@ -102,6 +100,7 @@ xxxx	  <li><a href="#lists">Can bogofilter be used in a multi-user environment?<
         Technical problems
 
         <ul>
+	  <li><a href="#multi-user">Can bogofilter be used in a multi-user environment?</a></li>  
           <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
           <li><a href="#return-codes">Why does bogofilter give return codes like 0 and
           256 when it's run from inside a program?</a></li>
@@ -953,6 +952,26 @@ xxxx	  <li><a href="#lists">Can bogofilter be used in a multi-user environment?<
     to add a single token, for example "ignore.me", as in:</p>
 
     <pre>  echo ignore.me | bogoutil -l ~/ignorelist.db</pre>
+
+    <hr>
+
+    <h2 id="multi-user">Can bogofilter be used in a multi-user environment?</h2>
+
+    <p>Yes, it can.  There are multiple, distinct strategies for doing
+    this.  The two extremes are:</p>
+
+    <ul>
+        <li>Having a bogofilter administrator who maintains a global
+	    wordlist that everybody uses.</li>
+        <li>Having each user maintain his/her own wordlist.</li>
+    </ul>
+
+    <p>As a middle ground, the bogofilter administrator can create and
+    maintain the global wordlists and each user can be given the
+    choice of using the global wordlist or a private wordlist.  An
+    MDA, such as procmail, can be programmed to first apply the global
+    wordlist (with a very stringent spam cutoff) and then (if
+    necessary) apply the user's wordlist.</p>
 
     <hr>
 
