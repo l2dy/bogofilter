@@ -60,7 +60,50 @@ void iconvert(buff_t *src, buff_t *dst)
 	 * bytes, and it updates the conversion state contained in cd. The
 	 * conversion can stop for four reasons:
 	 */
+
 	count = iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
+
+	/*
+	 * 1. An invalid multibyte sequence is encountered
+	 * in the input. In this case it sets errno to
+	 * EILSEQ and returns (size_t)(-1). *inbuf is left
+	 * pointing to the beginning of the invalid
+	 * multibyte sequence.
+
+	 * 2. The input byte sequence has been entirely
+	 * converted, i.e. *inbytesleft has gone down to
+	 * 0. In this case iconv returns the number of
+	 * non-reversible conversions performed during
+	 * this call.
+
+	 * 3. An incomplete multibyte sequence is
+	 * encountered in the input, and the input byte
+	 * sequence terminates after it. In this case it
+	 * sets errno to EINVAL and returns
+	 * (size_t)(-1). *inbuf is left pointing to the
+	 * beginning of the incomplete multibyte sequence.
+
+	 * 4. The output buffer has no more room for the
+	 * next converted character. In this case it sets
+	 * errno to E2BIG and returns (size_t)(-1).
+
+	 * A different case is when inbuf is NULL or *inbuf is
+	 * NULL, but outbuf is not NULL and *outbuf is not
+	 * NULL. In this case, the iconv function attempts to
+	 * set cd's conversion state to the initial state and
+	 * store a corresponding shift sequence at *outbuf. At
+	 * most *outbytesleft bytes, starting at *outbuf, will
+	 * be written. If the output buffer has no more room
+	 * for this reset sequence, it sets errno to E2BIG and
+	 * returns (size_t)(-1). Otherwise it increments
+	 * *outbuf and decrements *outbytesleft by the number
+	 * of bytes written.
+	 * 
+	 * A third case is when inbuf is NULL or inbuf is
+	 * NULL, and outbuf is NULL or outbuf is NULL. In this
+	 * case, the iconv function sets cd's conversion state
+	 * to the initial state.
+	 */
 
 	if (count == (size_t)(-1)) {
 
@@ -68,50 +111,22 @@ void iconvert(buff_t *src, buff_t *dst)
 	    switch (err) {
 
 	    case EILSEQ:		/* invalid multibyte sequence */
-		/*
-		 * 1. An invalid multibyte sequence is encountered
-		 * in the input. In this case it sets errno to
-		 * EILSEQ and returns (size_t)(-1). *inbuf is left
-		 * pointing to the beginning of the invalid
-		 * multibyte sequence.
-		 */
-		inbytesleft -= 1;		/* copy 1 byte */
+		inbytesleft -= 1;	/* copy 1 byte */
 		outbytesleft -= 1;
 		*outbuf++ = *inbuf++;
 		if (DEBUG_ICONV(1))
 		    fprintf(dbgout, "EILSEQ - t: %p, r: %d, l: %d, s: %d\n", src->t.text, src->read, src->t.leng, src->size);
 		break;
 
-		/*
-		 * 2. The input byte sequence has been entirely
-		 * converted, i.e. *inbytesleft has gone down to
-		 * 0. In this case iconv returns the number of
-		 * non-reversible conversions performed during
-		 * this call.
-		 */
-
 	    case EINVAL:		/* incomplete multibyte sequence */
-		/*
-		 * 3. An incomplete multibyte sequence is
-		 * encountered in the input, and the input byte
-		 * sequence terminates after it. In this case it
-		 * sets errno to EINVAL and returns
-		 * (size_t)(-1). *inbuf is left pointing to the
-		 * beginning of the incomplete multibyte sequence.
-		 */
-		inbytesleft -= 1;		/* copy 1 byte */
+		inbytesleft -= 1;	/* copy 1 byte */
 		outbytesleft -= 1;
 		*outbuf++ = *inbuf++;
 		if (DEBUG_ICONV(1))
 		    fprintf(dbgout, "EINVAL - t: %p, r: %d, l: %d, s: %d\n", src->t.text, src->read, src->t.leng, src->size);
 		break;
 
-	    case E2BIG:		/* output buffer has no more room */
-		/*
-		 * 4. The output buffer has no more room for the
-		 * next converted character. In this case it sets
-		 * errno to E2BIG and returns (size_t)(-1).
-		 */
+	    case E2BIG:			/* output buffer has no more room */
 		if (DEBUG_ICONV(1))
 		    fprintf(dbgout, "E2BIG - t: %p, r: %d, l: %d, s: %d\n", src->t.text, src->read, src->t.leng, src->size);
 		break;
@@ -119,24 +134,6 @@ void iconvert(buff_t *src, buff_t *dst)
 	    default:
 		break;
 	    }
-	    /*
-	     * A different case is when inbuf is NULL or *inbuf is
-	     * NULL, but outbuf is not NULL and *outbuf is not
-	     * NULL. In this case, the iconv function attempts to
-	     * set cd's conversion state to the initial state and
-	     * store a corresponding shift sequence at *outbuf. At
-	     * most *outbytesleft bytes, starting at *outbuf, will
-	     * be written. If the output buffer has no more room
-	     * for this reset sequence, it sets errno to E2BIG and
-	     * returns (size_t)(-1). Otherwise it increments
-	     * *outbuf and decrements *outbytesleft by the number
-	     * of bytes written.
-	     * 
-	     * A third case is when inbuf is NULL or inbuf is
-	     * NULL, and outbuf is NULL or outbuf is NULL. In this
-	     * case, the iconv function sets cd's conversion state
-	     * to the initial state.
-	     */
 	}
 	src->read = src->t.leng - inbytesleft;
 	dst->t.leng = dst->size - dst->read - outbytesleft;
