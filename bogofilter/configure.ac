@@ -105,6 +105,39 @@ AC_CHECK_DECLS(optreset,,,[[
 AC_CHECK_DB([db db-4.1 db-4 db4 db-3.3 db-3.2 db-3.1 db-3 db3],,
 	    AC_MSG_ERROR([[Can not locate a suitable Berkeley DB library.  Use --with-db=PATH to specify the path to a v3+ install directory]]))
 
+dnl check if run-time link works
+dnl XXX FIXME: try -rpath and -R with the library path component.
+AC_MSG_CHECKING(if a program can be linked against BerkeleyDB and run)
+AC_RUN_IFELSE(
+  AC_LANG_PROGRAM([[
+		   #include <stdlib.h>
+		   #include <db.h>
+		   ]], [[
+			    exit(0);
+		   ]]),,
+		   [AC_MSG_RESULT(no)
+AC_MSG_ERROR([Cannot run a program linked against libdb.
+Did you adjust your library search path to include your libdb?])],)
+AC_MSG_RESULT(yes)
+
+dnl check if header and library of DB library match
+dnl ignore if cross compiling
+AC_MSG_CHECKING(if BerkeleyDB header and library versions match)
+AC_RUN_IFELSE(
+  AC_LANG_PROGRAM([[
+		   #include <stdlib.h>
+		   #include <db.h>
+		   ]], [[
+			int maj, min;
+			(void)db_version(&maj, &min, (void *)0);
+			if (maj != DB_VERSION_MAJOR) exit(1);
+			  if (min != DB_VERSION_MINOR) exit(1);
+			    exit(0);
+		   ]]),,
+		   [AC_MSG_RESULT(no)
+		   AC_MSG_ERROR(db.h header file and db library version do not match.)],)
+AC_MSG_RESULT(yes)
+
 # Allow the user to specify a header name to use to indicate whether a given
 # message is SPAM or not.
 AC_ARG_ENABLE(spam-header-name, 
@@ -155,9 +188,6 @@ AC_ARG_ENABLE(robinson-fisher,
 		[USE_FISHER=YES]
  		AC_DEFINE(ENABLE_ROBINSON_FISHER,1,
 		[Enable Fisher's method of combining probabilities])
-# trouble ???
-#		AC_CHECK_LIB([dcdf], [cdfchi], LIBS="$LIBS -ldcdf",
-#		    AC_MSG_ERROR([libdcdf (from package dcdflib.c) was not found.]))
 	fi
 )
 
@@ -224,24 +254,6 @@ AC_CHECK_FUNCS(munmap pow sqrt strcasecmp strcspn strspn strstr)
 AC_REPLACE_FUNCS(strlcpy strlcat)
 
 AC_CACHE_SAVE
-
-dnl check if header and library of DB library match
-dnl ignore if cross compiling
-AC_MSG_CHECKING(if db header and library versions match)
-AC_RUN_IFELSE(
-  AC_LANG_PROGRAM([[
-		   #include <stdlib.h>
-		   #include <db.h>
-		   ]], [[
-			int maj, min;
-			(void)db_version(&maj, &min, (void *)0);
-			if (maj != DB_VERSION_MAJOR) exit(1);
-			  if (min != DB_VERSION_MINOR) exit(1);
-			    exit(0);
-		   ]]),,
-		   [AC_MSG_RESULT(no)
-		   AC_MSG_ERROR(db.h header file and db library version do not match.)],)
-AC_MSG_RESULT(yes)
 
 if test "$sysconfdir" = "\${prefix}/etc" \
     && { test "$prefix" = "NONE" || test "$prefix" = "/usr" \
