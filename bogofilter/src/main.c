@@ -234,15 +234,18 @@ static void write_message(FILE *fp, rc_t status)
 	/* print headers */
 	while ((rd = rf(&out, rfarg)) > 0)
 	{
+	    /* skip over spam_header ("X-Bogosity:") lines */
+	    while (rd >= bogolen && memcmp(out, spam_header_name, bogolen) == 0) {
+		while (((rd = rf(&out, rfarg)) > 0) && 
+		       (out[0] == ' ' || out[0] == '\t') )
+		    /* empty loop */ ;
+	    }
+
 	    /* detect end of headers */
 	    if ((rd == 1 && memcmp(out, NL, 1) == 0) ||
 		(rd == 2 && memcmp(out, CRLF, 2) == 0)) {
 		break;
 	    }
-
-	    /* skip over spam_header ("X-Bogosity:") lines */
-	    if (rd >= bogolen && memcmp(out, spam_header_name, bogolen) == 0)
-		continue;
 
 	    /* rewrite "Subject: " line */
 	    if (status == RC_SPAM &&
