@@ -97,8 +97,8 @@ void rstats_add(const word_t *token, double prob, wordcnts_t *cnts)
     stats_tail->prob  = prob;
     stats_tail->good  = cnts->good;
     stats_tail->bad   = cnts->bad;
-    stats_tail->msgs_good = max(1, cnts->msgs_good);
-    stats_tail->msgs_bad = max(1, cnts->msgs_bad);
+    stats_tail->msgs_good = cnts->msgs_good;
+    stats_tail->msgs_bad = cnts->msgs_bad;
     stats_tail->next = (rstats_t *)xcalloc(1, sizeof(rstats_t));
     stats_tail = stats_tail->next;
 }
