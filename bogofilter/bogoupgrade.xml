@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+                   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<refentry id='bogoupgrade.1'>
+<refmeta>
+<refentrytitle>bogoupgrade</refentrytitle>
+<manvolnum>1</manvolnum>
+</refmeta>
+<refnamediv id='name'>
+<refname>bogoupgrade</refname>
+<refpurpose>upgrades bogofilter database to current version</refpurpose>
+</refnamediv>
+<refsynopsisdiv id='synopsis'>
+
+<cmdsynopsis>
+  <command>bogofilter</command>
+  <arg choice='plain'>-i <replaceable>input file</replaceable></arg>
+  <arg choice='plain'>-o <replaceable>output file</replaceable></arg>
+  <arg choice='opt'>-b <replaceable>path to bogoutil</replaceable></arg>
+  <arg choice='opt'>-h</arg>
+</cmdsynopsis>
+
+</refsynopsisdiv>
+
+<refsect1 id='description'><title>DESCRIPTION</title>
+<para><command>bogoupgrade</command> is a command to upgrade
+<application>bogofilter</application>'s databases to the latest version. Since
+the format of the database changes once in a while, the utility is designed to 
+make the upgrade easy.</para>
+</refsect1>
+
+<refsect1 id='options'><title>OPTIONS</title>
+<para>You must specify the the <option>-i</option> and the <option>-o</option>
+options to bogoupgrade.</para>
+
+<para>The <option>-h</option> option prints the help message and exits.</para>
+
+<para>The <option>-i</option> specifys the input file to be converted. It
+should be a text file containing message counts, and possibly data. If there is
+no data in the text file, there should be a  Berkeley DB file in the same
+directory as the text file which contains the data.</para>
+
+<para>The <option>-o</option> specifies the output Berkeley DB file.</para>
+
+<para>The <option>-b</option> gives the path to the <command>bogoutil</command>
+command. It defaults to 'bogoutil', in the hopes that your shell will find
+it.</para>
+</refsect1>
+
+<refsect1 id='author'><title>AUTHOR</title>
+<para><command>bogoupgrade</command> was written by Gyepi Sam
+<email>gyepi@praxis-sw.com</email>.</para>
+<para>For updates, see <ulink url="http://bogofilter.sourceforge.net/">the
+bogofilter project page</ulink>.</para>
+</refsect1>
+</refentry>

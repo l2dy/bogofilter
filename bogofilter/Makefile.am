@@ -7,10 +7,11 @@ SUBDIRS = . tests
 
 # what to build
 bin_PROGRAMS = bogofilter bogoutil
-bin_SCRIPTS = bogoupgrade.pl
+bin_SCRIPTS = bogoupgrade
 check_PROGRAMS = lexertest
 man1_MANS = bogofilter.1 bogoutil.1
 
+CFLAGS=-g
 # what to build that from
 MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c
 
@@ -27,9 +28,9 @@ bogoutil_SOURCES = bogoutil.c \
 
 # what to distribute
 EXTRA_DIST = $(man1_MANS) \
-	     bogofilter.xml bogoutil.xml \
+	     bogofilter.xml bogoutil.xml bogoupgrade.xml \
 	     bogofilter.spec bogofilter.spec.in \
-	     UPGRADE bogoupgrade.pl \
+	     UPGRADE bogoupgrade \
 	     doc/integrating-with-qmail contrib/bogofilter-qfe \
 	     version.sh
 #
