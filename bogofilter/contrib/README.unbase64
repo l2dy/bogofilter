@@ -1,0 +1,47 @@
+"unbase64" is a quick-and-dirty preprocessor for bogofilter
+that decodes text attachments using base64 or quoted-printable
+transfer encoding.  A good deal of the spam I receive is
+now encoded in one of these ways, which makes spam detection
+more difficult.  I found bogofilter was less-capable at classifying
+messages encoded in base64, since it was relying solely on the headers.
+
+IMPORTANT:
+The unbase64 script does not understand mime syntax very well and
+is not intended to transform the message in syntactically correct ways.
+Thus, it is only useful as a dead-end "nobody but bogofilter will be
+looking at the output so it doesn't need to be correct" filter.
+It is NOT suitable for using with the -p (passthrough) option
+of bogofilter that passes the message through while adding the
+X-Bogosity header.  See below for example .procmailrc rules for
+using unbase64.
+
+To repeat:
+THIS IS NOT TO BE USED WITH -p OPTION!!
+
+Functionality:
+unbase64 does the following things:
+1. Decodes text attachments with base64 transfer encoding.  MIME headers
+   are not updated.
+2. Decodes text attachments with quoted-printable transfer encoding.
+   MIME headers are not updated.
+3. Removes nulls (\0) and carriage return characters (\r) from the input.
+4. Non-text base64 attachments have the base64 data entirely removed.
+   (Bogofilter would just throw it away anyway).
+
+EXAMPLE:
+These rules can be used with procmail and placed in your
+.procmailrc file.
+
+# classify as spam or not with bogofilter
+:0HB
+* ? unbase64 | bogofilter
+{ SPAM=yes }
+
+:0f
+* SPAM ?? yes
+| /usr/bin/formail -A"X-Spam-Status: Yes"
+
+:0f
+* !SPAM ?? yes
+| /usr/bin/formail -A"X-Spam-Status: No"
+
