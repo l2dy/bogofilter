@@ -22,7 +22,7 @@ AUTHOR:
 
 static int kill_html_comment(buff_t *buff, size_t comment_start);
 
-bool strict_check = true;
+bool strict_check = false;
 
 /* If strict_check is enabled, bogofilter will check for  "<!--" and "-->".
 ** If strict_check is disabled, bogofilter will check for  "<!" and ">".
