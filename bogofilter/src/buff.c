@@ -13,8 +13,8 @@ AUTHOR:
 #include <assert.h>
 
 #include "config.h"
-
 #include "common.h"
+
 #include "buff.h"
 #include "xmalloc.h"
 
@@ -73,7 +73,9 @@ void buff_shift(buff_t *self, byte *start, size_t length)
     /* Implemented for deleting html comments.		      */
     byte *buff_end = self->t.text+self->t.leng;
     byte *move_end = start + length;
-    assert( (self->t.text <= start) && (move_end <= buff_end) );
+    if ( ! ((self->t.text <= start) && (move_end <= buff_end)) ) {
+	assert("Invalid buff_shift() parameters.");
+    }
     memmove(start, start+length, buff_end - move_end);
     self->read = 0;
     self->t.leng -= length;
