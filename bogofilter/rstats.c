@@ -212,7 +212,7 @@ void rstats_print_rtable(int robn, rstats_t **rstats_array)
 	double prob = cur->prob;
 
 	(void)fprintf(stdout, "%3d  %-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f\n",
-		      r, cur->token, cur->good, cur->bad, prob, 
+		      r+1, cur->token, cur->good, cur->bad, prob, 
 		      log(1.0 - prob), log(prob));
     }
 
