@@ -176,6 +176,7 @@ token_t get_token(void)
 
 	case MESSAGE_ID:
 	    /* special token;  saved for formatted output, but not returned to bogofilter */
+	    /** \bug: the parser MUST be aligned with lexer_v3.l! */
 	{
 	    size_t skip = 0;
 	    while (!isspace(yylval->text[skip]))
@@ -192,6 +193,7 @@ token_t get_token(void)
 
 	case QUEUE_ID:
 	    /* special token;  saved for formatted output, but not returned to bogofilter */
+	/** \bug: the parser MUST be aligned with lexer_v3.l! */
 	    if (queue_id == NULL) {
 		size_t skip = 0;
 		while (isspace(yylval->text[skip]))
