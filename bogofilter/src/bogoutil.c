@@ -537,14 +537,23 @@ static int compute_robinson_x(char *path)
 
 static void print_version(void)
 {
-    fprintf(stderr,
-	    "%s: version: %s\n"
-	    "Copyright (C) 2002 Gyepi Sam\n\n"
-	    "%s comes with ABSOLUTELY NO WARRANTY.\n"
-	    "This is free software, and you are welcome to redistribute\n"
-	    "it under the General Public License.\n"
-	    "See the COPYING file with the source distribution for details.\n\n",
-	    progtype, version, PROGNAME);
+    (void)fprintf(stderr,
+		  "%s version %s\n"
+
+		  "    Database:"
+#ifdef	ENABLE_TDB
+		  " TrivialDB"
+#else
+		  " BerkeleyDB"
+#endif
+		  "\n"
+
+		  "Copyright (C) 2002 Gyepi Sam\n\n"
+		  "%s comes with ABSOLUTELY NO WARRANTY.\n"
+		  "This is free software, and you are welcome to redistribute\n"
+		  "it under the General Public License.\n"
+		  "See the COPYING file with the source distribution for details.\n\n",
+		  progtype, version, PROGNAME);
 }
 
 static void usage(void)
