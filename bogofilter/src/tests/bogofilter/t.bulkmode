@@ -118,7 +118,9 @@ sort -u < ${TMPDIR}/$NAME.tmp > ${TMPDIR}/$NAME.out
 
 NAME="bulk-double-2"
 for f in $pattern ; do
-    map_rc $BOGOFILTER -B $f $f | \
+    t="${TMPDIR}/`basename $f`"
+    $GREP -v "^From "< $f > $t
+    map_rc $BOGOFILTER -B $t $t | \
 	sed s@.*/@./inputs/@ >> ${TMPDIR}/$NAME.tmp
 done
 sort -u < ${TMPDIR}/$NAME.tmp > ${TMPDIR}/$NAME.out

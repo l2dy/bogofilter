@@ -28,6 +28,14 @@ case $PATH in
     ;;
 esac
 
+# However, Solaris' /usr/xpg4/bin/grep doesn't support long lines, so we
+# need to use /usr/bin/grep instead
+
+GREP=/bin/grep
+test -x $GREP || GREP=/usr/bin/grep
+test -x $GREP || { echo >&2 'Cannot find grep!' ; exit 1 ; }
+export GREP
+
 LANG=
 LC_COLLATE=
 LC_ALL=
