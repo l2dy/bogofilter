@@ -1,5 +1,5 @@
 # $Id$
-AC_INIT(bogofilter, 0.10.1.4)
+AC_INIT(bogofilter, 0.10.1.4.cvs)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR([bogofilter.c])
 AM_INIT_AUTOMAKE
