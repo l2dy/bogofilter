@@ -62,6 +62,8 @@ WANT="1720.3925"
 WANT="1720.3927"
 # v0.15.1 - discarding message separators
 WANT="1710.3914"
+# v0.15.1 - discarding additional message ids
+WANT="1708.3909"
 
 if [ "$RESULT" != "$WANT" -o $verbose -ne 0 ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT

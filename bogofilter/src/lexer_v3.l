@@ -117,7 +117,7 @@ BCHARS		[0-9a-zA-Z'()+_,-./:=?# ]
 MIME_BOUNDARY	{BCHARS}{0,69}{BCHARSNOSPC}
 
 ID		[0-9a-zA-Z-]*
-CHARSET		{ID}
+CHARSET		[0-9a-zA-Z-]+
 MTYPE		[ \t]*[0-9a-zA-Z/-]*
 TTYPE		[ \t]*[\.0-9a-zA-Z/-]*
 
@@ -214,8 +214,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <INITIAL>^Subject/:.*				{ if (header_line_markup) set_tag("subj:"); else return TOKEN; }
 <INITIAL>^Date:.*|Delivery-Date:.*		;
 <INITIAL>^Message-ID:.*				;
-<INITIAL>\tid\ {ID}				;
-<INITIAL>E?SMTP\ id\ {ID}			;
+<INITIAL>(ESMTP|SMTP)?[ \t]+id\ {ID}		;
 <INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
 <INITIAL>name=\"?				;
 <INITIAL>filename=\"?				;
