@@ -105,6 +105,7 @@ enum e_verbosity {
 };
 
 #define	MOD(n,m)	((n) - ((int)((n)/(m)))*(m))
+#define	ROUND(m,n)	((int)((m)*(n)+0.5))/((float)(n))
 
 #define	MIN(n)		((n)/60)
 #define SECONDS(n)	((n) - MIN(n)*60)
@@ -479,39 +480,54 @@ static double scale(uint cnt, uint lo, uint hi, double beg, double end)
 static void set_thresh(uint count, double *scores)
 {
     uint   ftarget = 0;
-    uint   mtarget = scale(count, TEST_COUNT, PREF_COUNT, 3, 10);
-    double cutoff, percent;
+    double cutoff, percent, lgc;
 
     score_ns(scores);				/* get scores */
 
-    cutoff = 0.0;
-    for (percent = thresh_percent; percent > 0.0001; percent -= 0.0001) {
-	ftarget = ceil(count * percent);	/* compute fp count */
-	if (ftarget <= mtarget)
-	    break;
-	cutoff = scores[ftarget-1];		/* get cutoff value */
-	if (cutoff >= MIN_CUTOFF)
-	    break;
-    }
+/*
+**	Use parabolic curve to fit data
+**	message counts: (70814, 12645, 2118, 550)
+**	target values:  (   22,    18,    8,   1)
+*/
+    lgc = log(count);
+    ftarget = max(ROUND(((-0.4831 * lgc) + 12.8976) * lgc - 61.5264, 1), 1);
+    cutoff  = ns_scores[ftarget-1];
 
+    percent = ROUND(ftarget/count,10000)/10000 + 0.0001;
     if (verbose >= PARMS)
-	printf("mtarget %d, ftarget %d, percent %6.4f%%\n", mtarget, ftarget, percent * 100.0);
+	printf("m:  cutoff %8.6f, ftarget %d, percent %6.4f%%\n", cutoff, ftarget, percent * 100.0);
 
-    if (!force && !quiet && (cutoff < MIN_CUTOFF || cutoff > MAX_CUTOFF)) {
-	fprintf(stderr,
-		"%s high-scoring non-spams in this data set.\n",
-		(cutoff < MIN_CUTOFF) ? "Too few" : "Too many");
-	fprintf(stderr,
-		"At target %d, cutoff is %8.6f.\n", ftarget, cutoff);
-	exit(EX_ERROR);
+    while (percent > 0.0001 && ftarget > 1 && cutoff < MIN_CUTOFF) {
+	percent = percent - 0.0001;
+	ftarget  = max(ceil(count*percent), 1);
+	cutoff  = ns_scores[ftarget-1];
+	if (verbose >= PARMS)
+	    printf("m:  cutoff %8.6f, ftarget %d, percent %6.4f%%\n", cutoff, ftarget, percent * 100.0);
     }
 
     /* ensure cutoff is below SPAM_CUTOFF */
     if (cutoff > SPAM_CUTOFF) {
- 	while (cutoff > SPAM_CUTOFF && ++ftarget < count)
+ 	while (cutoff > SPAM_CUTOFF && ++ftarget < count) {
  	    cutoff = scores[ftarget-1];
+	    if (verbose >= PARMS)
+		printf("s:  cutoff %8.6f, ftarget %d, percent %6.4f%%\n", cutoff, ftarget, percent * 100.0);
+	}
  	cutoff = SPAM_CUTOFF;
 	--ftarget;
+	if (verbose >= PARMS)
+	    printf("s:  cutoff %8.6f, ftarget %d, percent %6.4f%%\n", cutoff, ftarget, percent * 100.0);
+    }
+
+    if (cutoff < MIN_CUTOFF || cutoff > MAX_CUTOFF) {
+	if (!quiet) {
+	    fprintf(stderr,
+		    "%s high-scoring non-spams in this data set.\n",
+		    (cutoff < MIN_CUTOFF) ? "Too few" : "Too many");
+	    fprintf(stderr,
+		    "At target %d, cutoff is %8.6f.\n", ftarget, cutoff);
+	}
+	if (!force)
+	    exit(EX_ERROR);
     }
 
     if (verbose >= PARMS)
