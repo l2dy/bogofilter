@@ -16,9 +16,9 @@ actual bogofilter data base directory.
 
 1. Overview ------------------------------------------------------------
 
-This bogofilter version has been upgraded to use the Berkeley DB
-Transactional Data Store, to be able to recover a data base after an
-application or system crash.
+This bogofilter version has been upgraded so it can use the Berkeley
+DB Transactional Data Store to be able to recover a data base after
+an application or system crash.
 
 2. Prerequisites and Caveats -------------------------------------------
 
@@ -28,8 +28,8 @@ These versions are supported (with all Sleepycat-posted patches applied
 - if using a pre-packaged Berkeley DB version, the packager should have
 applied the patches, check your vendor's update site regularly):
 
-  Sleepycat Software: Berkeley DB 3.2.9: (January 24, 2001)
-  Sleepycat Software: Berkeley DB 3.3.11: (July 12, 2001)
+  Sleepycat Software: Berkeley DB 3.2.9:  (January  24, 2001)
+  Sleepycat Software: Berkeley DB 3.3.11: (July     12, 2001)
   Sleepycat Software: Berkeley DB 4.0.14: (November 18, 2001)
   Sleepycat Software: Berkeley DB 4.1.25: (December 19, 2002)
   Sleepycat Software: Berkeley DB 4.2.52: (December  3, 2003)
