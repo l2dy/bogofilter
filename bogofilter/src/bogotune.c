@@ -120,8 +120,6 @@ enum e_verbosity {
 #define KEY(r)		((r)->fn + (((r)->co > 0.5) ? (r)->co : 0.99))
 #define	ESF_SEL(a,b)	(!esf_flag ? (a) : (b))
 
-#define	QPRINTF		if (!quiet) fprintf
-
 /* Global Variables */
 
 const char *progname = "bogotune";
@@ -441,15 +439,15 @@ static bool check_for_low_sp_scores(void)
 
     if (sp_scores[t-1] > HAM_CUTOFF)
 	return false;
-    else {
-	if (!quiet) {
-	    fprintf(stderr,
+
+    if (!quiet) {
+	fprintf(stderr,
 	        "Warning: test messages include many low scoring spam.\n");
-	    fprintf(stderr,
+	fprintf(stderr,
 	        "         You may wish to reclassify them and rerun.\n");
-	}
-	return true;
     }
+
+    return true;
 }
 
 static void scoring_error(void)
@@ -1302,27 +1300,30 @@ static bool check_msg_counts(void)
     bool ok = true;
 
     if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
-	QPRINTF(stderr, 
-		"The wordlist contains %d non-spam and %d spam messages.\n"
-		"Bogotune must be run with at least %d of each.\n",
-		(int) msgs_good, (int) msgs_bad, LIST_COUNT);
+	if (!quiet)
+	    fprintf(stderr, 
+		    "The wordlist contains %d non-spam and %d spam messages.\n"
+		    "Bogotune must be run with at least %d of each.\n",
+		    (int) msgs_good, (int) msgs_bad, LIST_COUNT);
 	ok = false;
     }
 
     if (msgs_bad < msgs_good / 5 ||
 	msgs_bad > msgs_good * 5) {
-	QPRINTF(stderr,
-		"The wordlist has a ratio of spam to non-spam of %0.1f to 1.0.\n"
-		"Bogotune requires the ratio be in the range of 0.2 to 5.\n",
-		msgs_bad / msgs_good);
+	if (!quiet)
+	    fprintf(stderr,
+		    "The wordlist has a ratio of spam to non-spam of %0.1f to 1.0.\n"
+		    "Bogotune requires the ratio be in the range of 0.2 to 5.\n",
+		    msgs_bad / msgs_good);
 	ok = false;
     }
 
     if (ns_cnt < TEST_COUNT || sp_cnt < TEST_COUNT) {
-	QPRINTF(stderr, 
-		"The messages sets contain %u non-spam and %u spam.  Bogotune "
-		"requires at least %d non-spam and %d spam messages to run.\n",
-		ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
+	if (!quiet)
+	    fprintf(stderr, 
+		    "The messages sets contain %u non-spam and %u spam.  Bogotune "
+		    "requires at least %d non-spam and %d spam messages to run.\n",
+		    ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
 	exit(EX_ERROR);
     }
 
