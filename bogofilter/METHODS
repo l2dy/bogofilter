@@ -30,5 +30,5 @@ Robinson-Fisher because the calculation is based on Fisher's method,
 published in the 1950s, for combining independently derived
 probabilities.
 
-Note:  Bogofilter now only supports Robinson-Fisher method.  The
+Note:  Bogofilter now only supports the Robinson-Fisher method.  The
 other two are described for historical reasons.
