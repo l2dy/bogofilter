@@ -78,7 +78,7 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
 
     db_lock_release_list(word_lists);
 
-    status = (spamicity > spam_cutoff) ? RC_SPAM : RC_HAM;
+    status = method->status();
 
     if (xss != NULL)
         *xss = spamicity;
