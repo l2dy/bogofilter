@@ -9,7 +9,7 @@ $Id$
 	* The static-build system has been revised. It is not very portable,
 	  but it works on recent Linux distros. This feature is mainly used for
 	  packaging RPMs. The revision now uses ./configure --enable-static
-	  to compile bogofilter_static at all in addition to dynamically linked
+	  to compile bogofilter_static et al in addition to dynamically linked
 	  executables.
 
 	* Some effort has been put in the autoconfiguration of the BerkeleyDB
