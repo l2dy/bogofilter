@@ -171,7 +171,7 @@ void gra_print_stats(FILE *fp)
 {
     int idx = (thresh_index >= 0) ? thresh_index : KEEPERS+thresh_index;
     discrim_t *pp = &bogostats.extrema[idx];
-    if (force || pp->prob >= thresh_stats)
+    if (pp->prob >= thresh_stats)
 	(void)gra_compute_spamicity( &bogostats, fp );
 }
 

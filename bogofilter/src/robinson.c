@@ -74,7 +74,7 @@ rf_method_t rf_robinson_method = {	/* needed by config.c */
 void rob_print_stats(FILE *fp)
 {
     fp = NULL; 	/* quench compiler warning */
-    if (force || Rtable || verbose>=3 ||
+    if (Rtable || verbose >= 2 ||
 	rob_stats.s.spamicity > thresh_stats || 
 	rob_stats.s.spamicity > thresh_rtable || 
 	(*method->status)() == RC_UNSURE )

@@ -317,7 +317,6 @@ static void help(void)
 		  "\t  -M      - set mailbox mode.  Classify multiple messages in an mbox formatted file.\n"
 		  "\t  -b      - set streaming bulk mode. Process multiple messages whose filenames are read from STDIN.\n"
 		  "\t  -B name1 name2 ... - set bulk mode. Process multiple messages named as files on the command line.\n"
-		  "\t  -F      - force printing of spamicity numbers.\n"
 		  "\t  -R      - print an R data frame.\n"
 	);
     (void)fprintf(stderr, "%s",
@@ -461,10 +460,6 @@ void process_args_1(int argc, char **argv)
 
 	case 'f':
 	    select_algorithm(AL_FISHER, true);
-	    break;
-
-	case 'F':
-	    force = true;
 	    break;
 
 	case 'g':

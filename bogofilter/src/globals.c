@@ -23,7 +23,6 @@ bool	threestate;			/* '-3' */
 bulk_t	bulk_mode = B_NORMAL;		/* '-b, -B' */
 bool	suppress_config_file;		/* '-C' */
 bool	nonspam_exits_zero;		/* '-e' */
-bool	force;				/* '-F' */
 FILE	*fpin = NULL;			/* '-I' */
 bool	fisher;				/* '-f' */
 bool	logflag;			/* '-l' */

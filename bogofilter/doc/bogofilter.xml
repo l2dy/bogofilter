@@ -45,7 +45,6 @@
     <arg choice='opt'>-M</arg>
     <arg choice='opt'>-b</arg>
     <arg choice='opt'>-B <replaceable>filename ...</replaceable></arg>
-    <arg choice='opt'>-F</arg>
     <arg choice='opt'>-R</arg>
     <arg choice='opt'>algorithm options</arg>
     <arg choice='opt'>general options</arg>
@@ -283,8 +282,6 @@ objects (see the previous paragraph) named as files on the command line.
 If the <option>-v</option> or <option>-t</option> option is also given,
 <application>bogofilter</application> will print a line giving file name and
 classification information for each file.</para>
-
-<para>The <option>-F</option> option forces the printing of spamicity statistics.</para>
 
 <para>The <option>-R</option> option tells
 <application>bogofilter</application> to output an R data frame in

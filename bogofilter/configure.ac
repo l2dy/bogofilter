@@ -349,6 +349,16 @@ AC_ARG_WITH(db,
 	    AC_HELP_STRING([--with-db=PATH], [obsolete, use --with-libdb-prefix instead]),
     AC_MSG_ERROR([--with-db is obsolete. Use --with-libdb-prefix=$withval instead.]))
 
+dnl Use pthread if available
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([
+#include <sys/types.h>
+#include <pthread.h>
+	], [
+	 pthread_create (NULL,NULL,NULL,NULL);
+	])],
+AC_MSG_ERROR(Cannot link pto tdb library.),
+AC_MSG_ERROR(Cannot link pto tdb library.))
+
 dnl Use TRIO to replace missing snprintf/vsnprintf.
 needtrio=0
 if test "x$ac_cv_func_snprintf" != "xyes" ; then

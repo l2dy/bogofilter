@@ -20,7 +20,6 @@ extern	bulk_t	bulk_mode;		/* '-B' */
 extern	bool	suppress_config_file;	/* '-C' */
 extern	bool	nonspam_exits_zero;	/* '-e' */
 extern	bool	fisher;			/* '-f' */
-extern	bool	force;			/* '-F' */
 extern	FILE	*fpin;			/* '-I' */
 extern	bool	logflag;		/* '-l' */
 extern	bool	mbox_mode;		/* '-M' */
