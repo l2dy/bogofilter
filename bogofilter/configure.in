@@ -26,8 +26,8 @@ then
       -ggdb -fno-common -Wchar-subscripts -Wcomment \
       -Wformat=2 -Wimplicit -Wsequence-point -Wreturn-type \
       -Wfloat-equal -Wpointer-arith \
-      -Wmissing-noreturn -Wmissing-format-attribute -Wredundant-decls
-      # -Wconversion -pedantic
+      -Wmissing-format-attribute
+      # -Wmissing-noreturn -Wconversion -pedantic -Wredundant-decls
   do
        if $CC $i $ac_cv_prog_gcc_flags -c configure-dummy.c >/dev/null 2>&1 
        then ac_cv_prog_gcc_flags="$ac_cv_prog_gcc_flags $i"
@@ -80,7 +80,8 @@ AC_CHECK_LIB(db4, db_create, LIBS="$LIBS -ldb4",
 			AC_CHECK_LIB(db-2, db_create, LIBS="$LIBS -ldb-2",
 			AC_CHECK_LIB(db2, db_create, LIBS="$LIBS -ldb2",
 				AC_CHECK_LIB(db, db_create, LIBS="$LIBS -ldb", 
-					AC_MSG_ERROR([Can not locate a suitable BerkeleyDB libdb.so library. Use --with-db=PATH to specify the path to a v3+ install directory])
+					AC_MSG_ERROR([Can not locate a suitable BerkeleyDB libdb.so library.
+Use --with-db=PATH to specify the path to a v3+ install directory])
 					)))))))
 
 
@@ -200,7 +201,8 @@ if test "$sysconfdir" = "\${prefix}/etc" \
     (
     prefix=$ac_default_prefix
     sysconfdir=`eval echo "$sysconfdir"`
-    AC_MSG_NOTICE([configuration directory is "$sysconfdir". Use --sysconfdir to override.])
+    AC_MSG_NOTICE([configuration directory is "$sysconfdir".])
+    AC_MSG_NOTICE([use --sysconfdir to override.])
     )
 fi
 
