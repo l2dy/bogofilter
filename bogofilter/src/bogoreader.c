@@ -425,7 +425,16 @@ static int brmail_getline(buff_t *buff)
     size_t used = buff->t.leng;
     byte *buf = buff->t.text + used;
     int count;
+    static word_t *saved = NULL;
     static unsigned long bytesleft;
+
+    if (saved != NULL) {
+	count = saved->leng;
+	buff_add(buff, saved);
+	word_free(saved);
+	saved = NULL;
+	return count;
+    }
 
     if (bytesleft) {
 	count = buff_fgetsln(buff, fpin, bytesleft);
@@ -436,7 +445,8 @@ static int brmail_getline(buff_t *buff)
     count = buff_fgetsl(buff, fpin);
     have_message = false;
 
-    if (count >= 9 && memcmp("#! rmail ", buf, 9) == 0)
+    if ((firstline || emptyline) &&
+	count >= 9 && memcmp("#! rmail ", buf, 9) == 0)
     {
 	int i;
 	bytesleft = 0;
@@ -444,16 +454,22 @@ static int brmail_getline(buff_t *buff)
 	    if (!isdigit(buf[i])) break;
 	    bytesleft = bytesleft * 10 + (buf[i] - '0');
 	}
-	have_message = true;
 	if (firstline) {
 	    firstline = false;
-	    return brmail_getline(buff);
+	}
+	else {
+	    have_message = true;
+	    saved = word_new(buf, count);
+	    count = EOF;
 	}
     } else {
 	if (buff->t.leng < buff->size)		/* for easier debugging - removable */
 	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
     }
-    return EOF;
+
+    emptyline = (count == 1 && *buf == '\n');
+
+    return count;
 }
 
 /* reads a file as a single mail ( no ^From detection ). */
