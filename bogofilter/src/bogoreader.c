@@ -424,8 +424,11 @@ static int mailbox_getline(buff_t *buff)
 #endif
 
     buf = buff->t.text + used;
+
     /* XXX FIXME: do we need to unescape the >From, >>From, >>>From, ... lines
      * by discarding the first ">"? */
+
+    /* DR 08/25/03 - NO!!! */
 
     if (emptyline
 	&& count >= 5
