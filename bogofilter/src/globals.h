@@ -78,6 +78,8 @@ extern	bool fBogotune;
 
 /* other */
 
+extern FILE  *fpo;
+
 extern char *bogohome;		/* home directory */
 
 enum passmode { PASS_MEM, PASS_SEEK };

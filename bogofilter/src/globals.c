@@ -55,6 +55,7 @@ double	robx = 0.0;			/* used in fisher.c and rstats.c */
 double	robs = 0.0;			/* used in fisher.c and rstats.c */
 
 /* other */
+FILE	*fpo;
 uint	db_cachesize = 0;		/* in MB */
 enum	passmode passmode;		/* internal */
 bool	msg_count_file = false;

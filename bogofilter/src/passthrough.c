@@ -28,8 +28,6 @@ NAME:
 
 #include "lexer.h" /* need have_body */
 
-FILE  *fpo;
-
 char msg_register[256];
 static char msg_bogofilter[256];
 static char msg_spam_header[256];
