@@ -242,7 +242,7 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
     }
 
     if (ferror(fp)) {
-	fprintf(stderr, "Error while reading file \"%s\"\n.", filename);
+	fprintf(stderr, "Error reading file \"%s\"\n.", filename);
 	error = true;
     }
 
