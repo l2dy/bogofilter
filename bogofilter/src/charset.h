@@ -22,7 +22,7 @@ extern void got_charset(const char *);
 extern void set_charset(const char *charset);
 extern void init_charset_table(const char *charset_name, bool use_default);
 
-#ifdef        CP866
+#ifdef	CP866
 extern int  decode_and_htmlUNICODE_to_cp866(byte *buf, int len);
 #endif
 

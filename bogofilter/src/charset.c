@@ -62,7 +62,7 @@ static void map_iso_8859_15(void);
 
 static void map_unicode(void);
 
-#ifndef        CP866
+#ifndef	CP866
 static void map_windows_1251_to_koi8r(void);
 #else
 static void map_windows_1251_to_cp866(void);
@@ -533,7 +533,7 @@ void set_charset(const char *charset)
     *d++ = '\0';
     if (DEBUG_CONFIG(0))
        fprintf(dbgout, "got_charset( '%s' )\n", t);
-#ifndef        CP866
+#ifndef	CP866
     init_charset_table( t, false ); // bf default
 #else
     init_charset_table( t, true );
