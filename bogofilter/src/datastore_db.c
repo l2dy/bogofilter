@@ -656,6 +656,8 @@ int db_init(void) {
 }
 
 void db_cleanup(void) {
+    if (!init)
+	return;
     if (dbe)
 	dbe->close(dbe, 0);
     dbe = NULL;
