@@ -100,7 +100,7 @@ bool base64_validate(word_t *word)
     for (i = 0; i < word->leng; i += 1) {
 	byte b = word->text[i];
 	byte v = base64_xlate[b];
-	if (b != 'A' && v == 0)
+	if (v == 0 && b != 'A'  && b != '\n')
 	    return false;
     }
 
