@@ -11,6 +11,6 @@ set -e
 
 for num in `seq 1 4`;do
 echo "Running test $num"
-  env num=${num} ${srcdir}/run.sh
+  env num=${num} ${SHELL:=/bin/sh} ${srcdir}/run.sh
 done
 
