@@ -1,6 +1,7 @@
 # $Id$
 
 check_PROGRAMS=dehex spam_header_name dumbhead deqp deb64 escnp abortme
+bin_SCRIPTS = t.frame
 dehex_SOURCES=dehex.c
 dumbhead_SOURCES=dumbhead.c
 deqp_SOURCES=deqp.c
@@ -11,6 +12,8 @@ spam_header_name_SOURCES=spam_header_name.c
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_LDFLAGS = -L..
 LDADD = -lbogofilter
+
+CLEANFILES=t.frame
 
 ENVIRON_TESTS = t.abort t.env t.bogodir
 
@@ -39,7 +42,7 @@ TESTS=$(TESTSCRIPTS)
 
 TESTS_ENVIRONMENT=RUN_FROM_MAKE=1 AWK=$(AWK) srcdir=$(srcdir) $(SHELL) $(VERBOSE)
 
-EXTRA_DIST=$(TESTSCRIPTS) t.frame t.frame.in t.save t.skel inputs outputs \
+EXTRA_DIST=$(TESTSCRIPTS) t.frame.in t.save t.skel inputs outputs \
 	printcore t._abort \
 	run.sh
 
