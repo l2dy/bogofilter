@@ -132,7 +132,7 @@ Paul Graham's paper <ulink url="http://www.paulgraham.com/spam.html">
 A Plan For Spam</ulink> is recommended reading.</para>
 
 <para>This program substantially improves on Paul's proposal by doing smarter
-lexical analysis.  In particular, hostames and IP addresses are retained
+lexical analysis.  In particular, hostnames and IP addresses are retained
 as recognition features rather than broken up.  Various kinds of MTA 
 cruft such as dates and message-IDs are discarded so as not to bloat
 the word lists.  Lex's Swiss-army-knife nature rises again.</para>
@@ -154,7 +154,7 @@ distributed.  Bogofilter now offers the option of applying this test
 the difference as the "spamicity" score.</para>
 
 <para>The input may be one message or many.  Messages are broken up
-on From_ lines.  The algorithm is relatively insensitive to message
+on "From " lines.  The algorithm is relatively insensitive to message
 miscounts.</para>
 </refsect1>
 
@@ -192,7 +192,7 @@ This simplifies using bogofilter from procmail or maildrop.
 </para>
   
 <para>The <option>-t</option> (terse) option tells 
-<application>bogofilter</application> to print an abbreviatd spamicit message containing 1 letter and the score.
+<application>bogofilter</application> to print an abbreviated spamicity message containing 1 letter and the score.
 The letter will be "Y" to indicate spam and "N" to indicate non-spam.
 </para>
   
@@ -217,7 +217,7 @@ a wordlist is always updated.</para>
 <para>The <option>-3</option> option tells
 <application>bogofilter</application> to use tristate classification for the message,
 i.e. classify the message as ham, spam, or unsure.  This option is effective only if
-ham_cutoff is non-zereo.</para>
+ham_cutoff is non-zero.</para>
 
 <para>The <option>-M</option> option tells
 <application>bogofilter</application> to process its input as a mbox formatted file.  If the
@@ -601,9 +601,9 @@ bogofilter[6244]: register-s, 1273 words, 4 messages
 
 <refsect1 id='bugs'><title>BUGS</title>
 <para><application>bogofilter</application> counts messages on input 
-by looking for From_ lines.  As a special case, a single message
-without From_ line is counted correctly.  Multiple messages without 
-intervening From_ lines will be counted as one message.</para>
+by looking for "From " lines.  As a special case, a single message
+without "From " line is counted correctly.  Multiple messages without 
+intervening "From " lines will be counted as one message.</para>
 
 <para>Bogofilter does not canonicalize the transport encoding or
     character set, sacrificing precision.  We used to believe that spam
