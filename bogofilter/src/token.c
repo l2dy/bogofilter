@@ -169,7 +169,7 @@ token_t get_token(void)
     }
 
     /* Need separate loop so lexer can see "From", "Date", etc */
-    if (!ignore_case)
+    if (ignore_case)
 	for (cp = yylval->text; cp < yylval->text+yylval->leng; cp += 1)
 	    *cp = casefold_table[*cp];
 
