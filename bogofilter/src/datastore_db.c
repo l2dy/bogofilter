@@ -219,8 +219,9 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
     for (idx = 0; idx < COUNTOF(retryflags); idx += 1) {
 	size_t i;
 	uint32_t retryflag = retryflags[idx], pagesize;
-	handle = dbh_init(db_file, count, names);
 	DB_BTREE_STAT *dbstat = NULL;
+
+	handle = dbh_init(db_file, count, names);
 
 	if (handle == NULL)
 	    break;
