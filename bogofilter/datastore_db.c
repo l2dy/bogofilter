@@ -407,10 +407,7 @@ static int db_lock(int fd, int cmd, short int type){
     return (fcntl(fd, cmd, &lock));
 }
 
-int db_foreach(void *vhandle, 
-	       int (*hook)(char *key,   uint32_t key_size,
-			   char *value, uint32_t key_value, 
-			   void *userdata), void *userdata) {
+int db_foreach(void *vhandle, db_foreach_t hook, void *userdata) {
     dbh_t *handle = vhandle;
     int ret;
     DBC dbc;
