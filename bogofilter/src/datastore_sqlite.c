@@ -85,8 +85,13 @@ static int sqlexec(sqlite3 *db, const char *cmd) {
     int rc;
     while(1) {
 	rc = sqlite3_exec(db, cmd, NULL, NULL, &e);
-	if (rc == SQLITE_BUSY) rand_sleep(1000, 100000);
-	else break;
+	if (rc == SQLITE_BUSY) {
+	    if (DEBUG_DATABASE(2))
+		fprintf(dbgout, "database busy, sleeping and retrying...\n");
+	    rand_sleep(1000, 100000);
+	} else {
+	    break;
+	}
     }
     if (rc) {
 	print_error(__FILE__, __LINE__,
@@ -181,6 +186,8 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
 		loop = false;
 		break;
 	    case SQLITE_BUSY:
+		if (DEBUG_DATABASE(2))
+		    fprintf(dbgout, "database busy, sleeping and retrying...\n");
 		rand_sleep(1000, 100000);
 		break;
 	    default:
