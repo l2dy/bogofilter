@@ -199,13 +199,11 @@ static size_t format_float(char *dest, double src,
 
 static size_t format_string(char *dest, const char *src, int min, int prec, int flags, const char *destend)
 {
-    int s_len = (int) strlen(src);
-    int len;
-    if (s_len > INT_MAX) {
-	fprintf(stderr, "cannot handle string length (%lu) above %d, aborting\n", (unsigned long)s_len, INT_MAX);
+    int len = (int) strlen(src);
+    if (len > INT_MAX) {
+	fprintf(stderr, "cannot handle string length (%lu) above %d, aborting\n", (unsigned long)len, INT_MAX);
 	internal_error;
     }
-    len = s_len;
     (void)min; /* kill compiler warning */
 
     if (flags & F_PREC && prec < len)
