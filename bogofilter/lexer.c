@@ -116,7 +116,6 @@ static int skip_spam_header(byte *buf, size_t max_size)
 int get_decoded_line(byte *buf, size_t max_size)
 {
     int count;
-    max_size -= 1;	/* leave spot for NUL termination */
 
     if (yysave == NULL)
 	count = yy_get_new_line(buf, max_size);
@@ -177,8 +176,6 @@ int get_decoded_line(byte *buf, size_t max_size)
 	*(buf + count - 1) = '\n';
     }
 
-    buf[count] = '\0';	/* NUL terminate the buffer */
-
     return count;
 }
 
@@ -232,15 +229,14 @@ int yyredo(const byte *text, char del)
     /* if already processing saved text, concatenate new after old */
     if (yysave == NULL) {
 	tmp = xstrdup((const char *)text);
-    }
-    else {
+    } else {
 	size_t t = strlen((const char *)text);
 	size_t s = strlen(yysave);
 	tmp = xmalloc(s + t + 1);
 	memcpy(tmp, yysave, s+1);
 	memcpy(tmp+s, text, t+1);
     }
-	
+
     xfree(yysave);
     yysave = tmp;
     if ((tmp = strchr(tmp,del)) != NULL)
