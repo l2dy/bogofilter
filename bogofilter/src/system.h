@@ -180,5 +180,6 @@ typedef uint8_t u_int8_t;
 
 extern bool bf_abspath(const char *path);
 extern int  bf_mkdir(const char *path, mode_t mode);
+extern void bf_sleep(long delay);
 
 #endif /* SYSTEM_H */
