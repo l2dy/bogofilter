@@ -1,0 +1,9 @@
+#! /bin/sh
+
+. ${srcdir}/t.frame
+# test description here
+#
+# test below
+# remember to use ${srcdir}
+( echo ; echo 'blah' ) | ../bogofilter -p -v -e >$TMPDIR/out
+if egrep '\(null\)' $TMPDIR/out ; then exit 1 ; fi
