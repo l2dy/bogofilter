@@ -99,7 +99,8 @@ static void display_tag_array(const char *label, const char **array);
 static bool config_algorithm(const unsigned char *s);
 static bool select_algorithm(const unsigned char ch, bool cmdline);
 
-static void process_args(int argc, char **argv, int pass);
+static void process_args_1(int argc, char **argv);
+static void process_args_2(int argc, char **argv);
 static void comma_parse(char opt, const char *arg, double *parm1, double *parm2);
 
 /* externs for query_config() */
@@ -169,9 +170,9 @@ const parm_desc sys_parms[] =
 
 void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
 {
-    process_args(argc, argv, 1);
+    process_args_1(argc, argv);
     process_config_files(warn_on_error);
-    process_args(argc, argv, 2);
+    process_args_2(argc, argv);
 
     if (!twostate && !threestate) {
 	twostate = ham_cutoff < EPS;
@@ -413,18 +414,16 @@ static void print_version(void)
 #define	F "f"
 #endif
 
-/** This function processes command line arguments.
+/** These functions process command line arguments.
  **
- ** It is called twice so that command line arguments
- ** will override config file parameters.
- ** The config file is read in between the two calls to
- ** the function.
+ ** They are called to perform passes 1 & 2 of command line switch processing.
+ ** The config file is read in between the two function calls.
  **
- ** The function will exit if there's an error, for example if
+ ** The functions will exit if there's an error, for example if
  ** there are leftover command line arguments.
  */
 
-void process_args(int argc, char **argv, int pass)
+void process_args_1(int argc, char **argv)
 {
     int option;
     int exitcode;
@@ -437,11 +436,6 @@ void process_args(int argc, char **argv, int pass)
     set_today();		/* compute current date for token age */
     select_algorithm(algorithm, false);	/* select default algorithm */
 
-    optind = opterr = 1;
-    /* don't use #ifdef here: */
-#if HAVE_DECL_OPTRESET
-    optreset = 1;
-#endif
     while ((option = getopt(argc, argv, ":23bBc:Cd:DefFghI:lL:m:MnNo:O:pP:qQRrsStTuvVx:y:" G R F)) != -1)
     {
 #if 0
@@ -469,24 +463,13 @@ void process_args(int argc, char **argv, int pass)
 	    break;
 
 	case 'c':
-	    /* only read config file on pass #1 so that 
-	    ** options can be overridden on pass #2
-	    */
-	    if (pass == 1 )			
-		read_config_file(optarg, false, !quiet, PR_CFG_USER);
+	    read_config_file(optarg, false, !quiet, PR_CFG_USER);
 
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
 
 	case 'C':
 	    suppress_config_file = true;
-	    break;
-
-	case 'd':
-	    xfree(directory);
-	    directory = xstrdup(optarg);
-	    if (pass == 2 && setup_wordlists(directory, PR_COMMAND) != 0)
-		exit(2);
 	    break;
 
 	case 'D':
@@ -517,40 +500,11 @@ void process_args(int argc, char **argv, int pass)
 	    help();
             exit(0);
 
-	case 'P':
-	{
-	    char *s;
-	    for (s = optarg; *s && pass == 2; s += 1)
-	    {
-		switch (*s)
-		{
-		case 't': tokenize_html_tags ^= true;		/* -Ht */
-		    break;
-		case 's': tokenize_html_script ^= true;		/* -Hs - not yet in use */
-		    break;
-		case 'C': strict_check ^= true;			/* -HC */
-		    /*@fallthrough@*/
-		case 'c': tokenize_html_comments ^= true;	/* -Hc - not yet in use */
-		    break;
-		case 'h': tag_header_lines ^= true;		/* -Hh */
-		    break;
-		case 'f': fold_case ^= true;			/* -Hf */
-		    break;
-		default:
-		    fprintf(stderr, "Unknown parsing option -H%c.\n", *s);
-		    exit(2);
-		}
-	    }
-	    break;
-	}
-
 	case 'I':
-	    if (pass == 2) {
-		fpin = fopen( optarg, "r" );
-		if (fpin == NULL) {
-		    fprintf(stderr, "Can't read file '%s'\n", optarg);
-		    exit(2);
-		}
+	    fpin = fopen( optarg, "r" );
+	    if (fpin == NULL) {
+		fprintf(stderr, "Can't read file '%s'\n", optarg);
+		exit(2);
 	    }
 	    break;
 
@@ -560,10 +514,6 @@ void process_args(int argc, char **argv, int pass)
 
 	case 'l':
 	    logflag = true;
-	    break;
-
-	case 'm':
-	    comma_parse(option, optarg, &min_dev, &robs);
 	    break;
 
 	case 'M':
@@ -576,10 +526,6 @@ void process_args(int argc, char **argv, int pass)
 
 	case 'N':
 	    run_type = (run_type | UNREG_GOOD) & ~REG_GOOD & ~UNREG_SPAM;
-	    break;
-
-	case 'o':
-	    comma_parse(option, optarg, &spam_cutoff, &ham_cutoff);
 	    break;
 
         case 'O':
@@ -656,12 +602,88 @@ void process_args(int argc, char **argv, int pass)
 	case '?':
 	    fprintf(stderr, "Unknown option -%c.\n", optopt);
 	    exit(2);
+	}
+    }
 
-	default:
-	    /* Mismatch between switch() construct and optstring */
-	    print_error(__FILE__, __LINE__, "Internal error: unhandled option '%c' "
-			"(%02X)\n", isprint((unsigned char)option) ? option : '_', (unsigned int)option);
-	    exit(2);
+    if (run_type == RUN_UNKNOWN)
+	run_type = RUN_NORMAL;
+
+    exitcode = validate_args();
+    if (exitcode) 
+	exit (exitcode);
+
+    if (bulk_mode == B_NORMAL && optind < argc) {
+	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
+	exit(2);
+    }
+
+    return;
+}
+
+void process_args_2(int argc, char **argv)
+{
+    int option;
+    int exitcode;
+
+    optind = opterr = 1;
+    /* don't use #ifdef here: */
+#if HAVE_DECL_OPTRESET
+    optreset = 1;
+#endif
+
+    while ((option = getopt(argc, argv, ":23bBc:Cd:DefFghI:lL:m:MnNo:O:pP:qQRrsStTuvVx:y:" G R F)) != -1)
+    {
+#if 0
+	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
+	    fprintf(stderr, "config: option=%c (%d), optind=%d, opterr=%d, optarg=%s\n", 
+		    isprint((unsigned char)option) ? option : '_', option, 
+		    optind, opterr, optarg ? optarg : "(null)");
+	}
+#endif
+	switch(option)
+	{
+	case 'd':
+	    xfree(directory);
+	    directory = xstrdup(optarg);
+	    if (setup_wordlists(directory, PR_COMMAND) != 0)
+		exit(2);
+	    break;
+
+	case 'P':
+	{
+	    char *s;
+	    for (s = optarg; *s; s += 1)
+	    {
+		switch (*s)
+		{
+		case 't': tokenize_html_tags ^= true;		/* -Ht */
+		    break;
+		case 's': tokenize_html_script ^= true;		/* -Hs - not yet in use */
+		    break;
+		case 'C': strict_check ^= true;			/* -HC */
+		    /*@fallthrough@*/
+		case 'c': tokenize_html_comments ^= true;	/* -Hc - not yet in use */
+		    break;
+		case 'h': tag_header_lines ^= true;		/* -Hh */
+		    break;
+		case 'f': fold_case ^= true;			/* -Hf */
+		    break;
+		default:
+		    fprintf(stderr, "Unknown parsing option -H%c.\n", *s);
+		    exit(2);
+		}
+	    }
+	    break;
+	}
+
+	case 'm':
+	    comma_parse(option, optarg, &min_dev, &robs);
+	    break;
+
+	case 'o':
+	    comma_parse(option, optarg, &spam_cutoff, &ham_cutoff);
+	    break;
+
 	}
     }
 
