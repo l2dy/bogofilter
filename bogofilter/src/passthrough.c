@@ -28,7 +28,7 @@ NAME:
 
 #include "lexer.h" /* need have_body */
 
-const char *eol = NULL;
+static const char *eol = NULL;
 char msg_register[256];
 static char msg_bogofilter[256];
 static char msg_spam_header[256];
