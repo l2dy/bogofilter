@@ -3,10 +3,17 @@
 			       =================
 
 
+0.92.7	2004-??-??
+
+	2004-09-28
+
+	* Remove check for bogohome since it breaks "bogotune -D".
+
 	2004-09-25
 
 	* Fixed minor formatting defects in bogotune.
 	* Fixed bogotune man page error for "-d" option.
+	* Additional portability fix for SunOS 4.1.X
 
 	2004-09-23
 
