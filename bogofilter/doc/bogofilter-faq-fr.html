@@ -550,7 +550,14 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
         plus 2 colonnes supplémentaires:
 
         <dl><dt>invfwlog</dt>
-	<dd>le logarithme of fw</dd><dt>fwlog</dt><dd>le logarithme of (1-fw)</dd></dl>
+
+	  <dd>le logarithme of fw</dd>
+
+	  <dt>fwlog</dt>
+
+	  <dd>le logarithme of (1-fw)</dd>
+
+	</dl>
 
         <p>La sortie de "-R" est présentée pour être utilisé avec
         le langage R de calcul statistique. Plus d'information est
@@ -777,15 +784,27 @@ $ make
     '-N' et '-S' a changé pour permettre le "déclassement" des
     messages. La définition des quatre options est la suivante:</p>
 
-    <dl><dt>-s</dt><dd>indique l'enregistrement du message comme spam.
-       C'est-à-dire incrémenter le nombre de spam pour ce token.
-       </dd><dt>-n</dt><dd>indique l'enregistrement du message comme ham. C'est à
-       dire incrémenter le nombre de ham pour ce token.
-       </dd><dt>-S</dt><dd>indique le désenregistrement du message des spams. C'est
-       à dire décrémenter le nombre de spam pour ce token.
-       </dd><dt>-N</dt><dd>indique le désenregistrement du messages des hams. C'est
-       à dire décrémenter le nombre de ham pour cd token.
-       </dd></dl>
+    <dl><dt>-s</dt>
+
+       <dd>indique l'enregistrement du message comme spam.
+       C'est-à-dire incrémenter le nombre de spam pour ce token.</dd>
+
+       <dt>-n</dt>
+
+       <dd>indique l'enregistrement du message comme ham. C'est à dire
+       incrémenter le nombre de ham pour ce token.</dd>
+
+       <dt>-S</dt>
+
+       <dd>indique le désenregistrement du message des spams. C'est à
+       dire décrémenter le nombre de spam pour ce token.</dd>
+
+       <dt>-N</dt>
+
+       <dd>indique le désenregistrement du messages des hams. C'est à
+       dire décrémenter le nombre de ham pour cd token.</dd>
+
+    </dl>
 
     <p>Avant la version 0.11, l'option '-S' était utilisée pour
     déplacer un message de la liste ham vers la liste spam. Il y
