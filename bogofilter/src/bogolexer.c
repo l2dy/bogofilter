@@ -91,7 +91,7 @@ static int process_args(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
-    while ((option = getopt(argc, argv, ":hnpqvnI:c:Cx:DT")) != -1)
+    while ((option = getopt(argc, argv, ":c:CDhI:npqTvx:")) != -1)
     {
 	switch (option)
 	{
@@ -103,30 +103,6 @@ static int process_args(int argc, char **argv)
 	    fprintf(stderr, "Unknown option -%c.\n", optopt);
 	    exit(2);
 
-	case 'h':
-	    help();
-	    exit(0);
-
-	case 'q':
-	    quiet = true;
-	    break;
-
-	case 'p':
-	    passthrough = true;
-	    break;
-
-	case 'n':
-	    replace_nonascii_characters = true;
-	    break;
-
-	case 'v':
-	    verbose += 1;
-	    break;
-
-	case 'x':
-	    set_debug_mask( optarg );
-	    break;
-
 	case 'c':
 	    read_config_file(optarg, false, false, PR_COMMAND);
 	/*@fallthrough@*/
@@ -136,6 +112,14 @@ static int process_args(int argc, char **argv)
 	    suppress_config_file = true;
 	    break;
 
+	case 'D':
+	    dbgout = stdout;
+	    break;
+
+	case 'h':
+	    help();
+	    exit(0);
+
 	case 'I':
 	    fpin = fopen( optarg, "r" );
 	    if (fpin == NULL) {
@@ -144,12 +128,28 @@ static int process_args(int argc, char **argv)
 	    }
 	    break;
 
-	case 'D':
-	    dbgout = stdout;
+	case 'n':
+	    replace_nonascii_characters = true;
+	    break;
+
+	case 'p':
+	    passthrough = true;
+	    break;
+
+	case 'q':
+	    quiet = true;
 	    break;
 
 	case 'T':
 	    test += 1;
+	    break;
+
+	case 'v':
+	    verbose += 1;
+	    break;
+
+	case 'x':
+	    set_debug_mask( optarg );
 	    break;
 
 	default:
