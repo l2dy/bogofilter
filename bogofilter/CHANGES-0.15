@@ -4,7 +4,9 @@
 
 $Id$
 
-0.15.11
+0.15.11	2003-12-17
+
+	* Additional portability fixes for DGUX in configure.ac and bogogrep.c
 
 	2003-12-15
 

@@ -9,7 +9,8 @@ about retraining and the '-H' flag...
 
 * Fixed CRLF problem in bogoreader.c
 * Exclude ~ (tilde) at the end of tokens.
-* Updates to configure scripts and makefiles to support DGUX.
+* Updates to configure scripts, makefiles and contrib files to support
+  DGUX.
 * bogotune-faq.html - new file
 * bogofilter - man page and FAQ updated
 * bogoupgrade - revised help message and man page
