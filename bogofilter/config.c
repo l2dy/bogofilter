@@ -299,12 +299,48 @@ static int validate_args(/*@unused@*/ int argc, /*@unused@*/ char **argv)
     return 0;
 }
 
+static void help(void)
+{
+    (void)printf( "\n" );
+    (void)printf( "Usage: bogofilter [options] < message\n" );
+    (void)printf( "\t-h\t- print this help message and exit.\n" );
+    (void)printf( "\t-d path\t- specify directory for wordlists.\n" );
+    (void)printf( "\t-p\t- passthrough.\n" );
+    (void)printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
+    (void)printf( "\t-s\t- register message as spam.\n" );
+    (void)printf( "\t-n\t- register message as non-spam.\n" );
+    (void)printf( "\t-S\t- move message's words from non-spam list to spam list.\n" );
+    (void)printf( "\t-N\t- move message's words from spam list to spam non-list.\n" );
+    (void)printf( "\t-v\t- set verbosity level.\n" );
+    (void)printf( "\t-x LIST\t- set debug flags.\n" );
+    (void)printf( "\t-V\t- print version information and exit.\n" );
+    (void)printf( "\t-c filename\t- read config file 'filename'.\n" );
+    (void)printf( "\t-C\t- don't read standard config files.\n" );
+    (void)printf( "\n" );
+    (void)printf( "bogofilter is a tool for classifying email as spam or non-spam.\n" );
+    (void)printf( "\n" );
+    (void)printf( "For updates and additional information, see\n" );
+    (void)printf( "URL: http://bogofilter.sourceforge.net\n" );
+    (void)printf( "\n" );
+}
+
+static void version(void)
+{
+    (void)printf("\n%s version %s ", PACKAGE, VERSION);
+    (void)printf("Copyright (C) 2002 Eric S. Raymond\n\n");
+    (void)printf("%s comes with ABSOLUTELY NO WARRANTY. ", PACKAGE);
+    (void)printf("This is free software, and you\nare welcome to ");
+    (void)printf("redistribute it under the General Public License. ");
+    (void)printf("See the\nCOPYING file with the source distribution for ");
+    (void)printf("details.\n\n");
+}
+
 int process_args(int argc, char **argv)
 {
     int option;
     int exitcode;
 
-    while ((option = getopt(argc, argv, "d:ehlsnSNvVpugc:CRrx:f")) != EOF)
+    while ((option = getopt(argc, argv, "d:ehlsnSNvVpugc:CRrx:fq")) != EOF)
     {
 	switch(option)
 	{
@@ -337,38 +373,14 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case 'h':
-	    (void)printf( "\n" );
-	    (void)printf( "Usage: bogofilter [options] < message\n" );
-	    (void)printf( "\t-h\t- print this help message and exit.\n" );
-	    (void)printf( "\t-d path\t- specify directory for wordlists.\n" );
-	    (void)printf( "\t-p\t- passthrough.\n" );
-	    (void)printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
-	    (void)printf( "\t-s\t- register message as spam.\n" );
-	    (void)printf( "\t-n\t- register message as non-spam.\n" );
-	    (void)printf( "\t-S\t- move message's words from non-spam list to spam list.\n" );
-	    (void)printf( "\t-N\t- move message's words from spam list to spam non-list.\n" );
-	    (void)printf( "\t-v\t- set verbosity level.\n" );
-	    (void)printf( "\t-x LIST\t- set debug flags.\n" );
-	    (void)printf( "\t-V\t- print version information and exit.\n" );
-	    (void)printf( "\t-c filename\t- read config file 'filename'.\n" );
-	    (void)printf( "\t-C\t- don't read standard config files.\n" );
-	    (void)printf( "\n" );
-	    (void)printf( "bogofilter is a tool for classifying email as spam or non-spam.\n" );
-	    (void)printf( "\n" );
-	    (void)printf( "For updates and additional information, see\n" );
-	    (void)printf( "URL: http://bogofilter.sourceforge.net\n" );
-	    (void)printf( "\n" );
-	    exit(0);
+	    help();
+            exit(0);
+	    break;
 
         case 'V':
-            (void)printf("\n%s version %s ", PACKAGE, VERSION);
-            (void)printf("Copyright (C) 2002 Eric S. Raymond\n\n");
-            (void)printf("%s comes with ABSOLUTELY NO WARRANTY. ", PACKAGE);
-            (void)printf("This is free software, and you\nare welcome to ");
-            (void)printf("redistribute it under the General Public License. ");
-            (void)printf("See the\nCOPYING file with the source distribution for ");
-            (void)printf("details.\n\n");
-            exit(0);
+	    version();
+	    exit(0);
+	    break;
 
 	case 'p':
 	    passthrough = 1;
