@@ -119,7 +119,7 @@ const char *progname = "bogotune";
 static char *ds_file;
 static char *ds_path;
 
-bool	bogolex = false;	/* true if convert input to msg-count format */
+static bool	bogolex = false;	/* true if convert input to msg-count format */
 static char   *bogolex_file = NULL;
 static word_t *w_msg_count;
 
@@ -254,7 +254,7 @@ static void init_fine(double _rs, double _md, double _rx)
 static void print_parms(const char *label, const char *format, data_t *data)
 {
     uint i;
-    printf("  %s: %2d ", label, data->cnt);
+    printf("  %s: %2u ", label, data->cnt);
     for (i = 0; i < data->cnt; i += 1) {
 	printf("%s", (i == 0) ? " (" : ", ");
 	printf(format, data->data[i]); /* RATS: ignore */
@@ -324,7 +324,7 @@ static void score_ns(double *results)
 	    double score = (*method->compute_spamicity)(wh, NULL);
 	    results[count++] = score;
 	    if (-verbose >= SCORE_DETAIL)
-		printf("%6d %0.16f\n", count-1, score);
+		printf("%6u %0.16f\n", count-1, score);
 	}
     }
     verbose = -verbose;		/* enable bogofilter debug output */
@@ -371,7 +371,7 @@ static void score_sp(double *results)
 	    double score = (*method->compute_spamicity)(wh, NULL);
 	    results[count++] = score;
 	    if (-verbose >= SCORE_DETAIL)
-		printf("%6d %0.16f\n", count-1, score);
+		printf("%6u %0.16f\n", count-1, score);
 	}
     }
     verbose = -verbose;		/* enable bogofilter debug output */
@@ -506,7 +506,7 @@ static void set_thresh(uint count, double *scores)
     while (1) {
 	cutoff = ns_scores[ftarget-1];
 	if (verbose >= PARMS)
-	    printf("m:  cutoff %8.6f, ftarget %d\n", cutoff, ftarget);
+	    printf("m:  cutoff %8.6f, ftarget %u\n", cutoff, ftarget);
 	if (ftarget == 1 || cutoff >= MIN_CUTOFF)
 	    break;
 	ftarget -= 1;
@@ -517,12 +517,12 @@ static void set_thresh(uint count, double *scores)
  	while (cutoff > SPAM_CUTOFF && ++ftarget < count) {
  	    cutoff = scores[ftarget-1];
 	    if (verbose >= PARMS)
-		printf("s:  cutoff %8.6f, ftarget %d%%\n", cutoff, ftarget);
+		printf("s:  cutoff %8.6f, ftarget %u%%\n", cutoff, ftarget);
 	}
  	cutoff = SPAM_CUTOFF;
 	--ftarget;
 	if (verbose >= PARMS)
-	    printf("s:  cutoff %8.6f, ftarget %d%%\n", cutoff, ftarget);
+	    printf("s:  cutoff %8.6f, ftarget %u%%\n", cutoff, ftarget);
     }
 
     if (cutoff < WARN_MIN || cutoff > WARN_MAX) {
@@ -531,7 +531,7 @@ static void set_thresh(uint count, double *scores)
 		    "%s high-scoring non-spams in this data set.\n",
 		    (cutoff < WARN_MIN) ? "Too few" : "Too many");
 	    fprintf(stderr,
-		    "At target %d, cutoff is %8.6f.\n", ftarget, cutoff);
+		    "At target %u, cutoff is %8.6f.\n", ftarget, cutoff);
 	}
     }
 
@@ -575,7 +575,7 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 	}
 
 	if (whc->count == 0 && !quiet) {
-	    printf("msg #%d, count is %d\n", count, whc->count);
+	    printf("msg #%u, count is %u\n", count, whc->count);
 	    bt_trap();
 	}
 
@@ -600,7 +600,7 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 	    if ((count % 1000) != 0)
 		putchar('.');
 	    else
-		printf("\r              \r%d ", count/1000 );
+		printf("\r              \r%u ", count/1000 );
 	    fflush(stdout);
 	}
     }
@@ -609,7 +609,7 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
     bogoreader_fini();
 
     if (verbose) {
-	printf("\r              \r%d messages\n", count);
+	printf("\r              \r%u messages\n", count);
 	fflush(stdout);
     }
 
@@ -718,7 +718,7 @@ static void create_countlists(tunelist_t *ns_or_sp)
 
 static void print_msgcount_entry(const char *token, uint bad, uint good)
 {
-    printf( "\"%s\" %d %d\n", token, bad, good);
+    printf( "\"%s\" %u %u\n", token, bad, good);
 }
 
 static void write_msgcount_file(wordhash_t *wh)
@@ -968,7 +968,7 @@ static void top_ten(result_t *sorted)
     printf("   rs     md    rx    co     fp  fn      pcts\n");
     for (i = 0; i < 10; i += 1) {
 	result_t *r = &sorted[i];
-	printf("%3d  %6.4f %5.3f %5.3f %6.4f  %3d %3d  %6.4f %5.3f\n",
+	printf("%ud  %6.4f %5.3f %5.3f %6.4f  %3u %3u  %6.4f %5.3f\n",
 	       r->idx,
 	       r->rs, r->md, r->rx, r->co, 
 	       r->fp, r->fn, r->fp*100.0/ns_cnt, r->fn*100.0/sp_cnt);
@@ -988,7 +988,7 @@ static int gfn(result_t *results, uint rsi, uint mdi, uint rxi)
     result_t *r = &results[i];
     int fn = r->fn;
     if (verbose > 100)
-	printf("   %2d, %2d, %2d, %2d\n", rsi, mdi, rxi, fn);
+	printf("   %2u, %2u, %2u, %2d\n", rsi, mdi, rxi, fn);
     ncnt += 1;
     nsum += fn;
     return fn;
@@ -1009,7 +1009,7 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
     uint med = sorted[r_count * 50 / 100].fn;		/* median false negative */
 
     if (verbose)
-	printf("%d%% fn count was %d\n", 50, med);
+	printf("%u%% fn count was %u\n", 50u, med);
 
     for (i = 0; i < r_count; i += 1) {
 	r = &sorted[i];
@@ -1036,7 +1036,7 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
     }
 
     if (o > 0) {
-	printf("%d outlier%s encountered.                                                   \n",
+	printf("%u outlier%s encountered.                                                   \n",
 	       o, (o > 1) ? "s" : "");
     }
 
@@ -1054,7 +1054,7 @@ static void progress(uint cur, uint top)
     uint ndots = ceil(70.0 * cur / top);
     if (ndots < 1)
 	ndots = 1;
-     printf("\r%3d [", cur);
+     printf("\r%3u [", cur);
      for (i = 0; i < ndots; i += 1)
 	 printf(".");
      for (i = ndots; i < 70; i += 1)
@@ -1087,7 +1087,7 @@ static void final_recommendations(bool skip)
     score_sp(sp_scores);		/* get scores (in ascending order) */
 
     if (verbose >= PARMS)
-	printf("# ns_cnt %d, sp_cnt %d\n", ns_cnt, sp_cnt);
+	printf("# ns_cnt %u, sp_cnt %u\n", ns_cnt, sp_cnt);
 
     if (skip) {
 	printf("\n");
@@ -1098,7 +1098,7 @@ static void final_recommendations(bool skip)
 
     printf("Recommendations:\n\n");
     printf("---cut---\n");
-    printf("db_cachesize=%d\n", db_cachesize);
+    printf("db_cachesize=%u\n", db_cachesize);
 
     printf("robx=%8.6f\n", robx);
     printf("min_dev=%5.3f\n", min_dev);
@@ -1142,7 +1142,7 @@ static void final_recommendations(bool skip)
 	fnp = 100.0 * fn / sp_cnt;
 
 	if (printed)  printf("#");
-	printf("spam_cutoff=%5.3f\t# for %4.2f%% fpos (%d); expect %4.2f%% fneg (%d).\n",
+	printf("spam_cutoff=%5.3f\t# for %4.2f%% fpos (%u); expect %4.2f%% fneg (%u).\n",
 	       cutoff, fpp, fp, fnp, fn);
 
 	printed = true;
@@ -1372,7 +1372,7 @@ static rc_t bogotune(void)
     }
 
     skip = ROUND(spam_cutoff,100000) <= SCAN_CUTOFF;
-    printf("False-positive target is %d (cutoff %8.6f)\n", target, spam_cutoff);
+    printf("False-positive target is %u (cutoff %8.6f)\n", target, spam_cutoff);
 
 #ifdef	TEST
     if (test) {
@@ -1456,9 +1456,9 @@ static rc_t bogotune(void)
 
 		    if (verbose >= SUMMARY) {
 			if (verbose >= SUMMARY+1)
-			    printf("%3d ", cnt);
+			    printf("%3u ", cnt);
 			if (verbose >= SUMMARY+2)
-			    printf(" %d %d %d  ", rsi, mdi, rxi);
+			    printf(" %u %u %u  ", rsi, mdi, rxi);
 			printf("%6.4f %5.3f %5.3f", robs, min_dev, robx);
 			fflush(stdout);
 		    }
@@ -1489,7 +1489,7 @@ static rc_t bogotune(void)
 		    if (verbose < SUMMARY)
 			progress(cnt, r_count);
 		    else {
-			printf(" %8.6f %2d %3d\n", spam_cutoff, fp, fn);
+			printf(" %8.6f %2u %3u\n", spam_cutoff, fp, fn);
 			fflush(stdout);
 		    }
 
@@ -1531,7 +1531,7 @@ static rc_t bogotune(void)
 	min_dev = mdval->data[best->mdi];
 
 	printf("Minimum found at s %6.4f, md %5.3f, x %5.3f\n", robs, min_dev, robx);
-	printf("        fp %d (%6.4f%%), fn %d (%6.4f%%)\n",
+	printf("        fp %u (%6.4f%%), fn %u (%6.4f%%)\n",
 		best->fp, best->fp*100.0/ns_cnt, 
 		best->fn, best->fn*100.0/sp_cnt);
 	printf("\n");
@@ -1607,7 +1607,7 @@ static void show_elapsed_time(int beg, int end, uint cnt, double val,
 			      const char *lbl1, const char *lbl2)
 {
     int tm = end - beg;
-    printf("    %dm:%02ds for %d %s.  avg: %.1f %s\n",
+    printf("    %dm:%02ds for %u %s.  avg: %.1f %s\n",
 	   MIN(tm), SECONDS(tm), cnt, lbl1, val, lbl2);
 }
 
