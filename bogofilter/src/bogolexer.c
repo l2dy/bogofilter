@@ -247,6 +247,7 @@ int main(int argc, char **argv)
 {
     token_t t;
     int count=0;
+    bool from_seen = false;
 
     process_args_1(argc, argv);
     process_config_files(false);
@@ -268,6 +269,10 @@ int main(int argc, char **argv)
     while ((t = get_token()) > 0)
     {
 	count += 1;
+	if (t == FROM && from_seen == false) {
+	    from_seen = true;
+	    continue;
+	}
 	if (passthrough) {
 	    fprintf(stdout, "%s\n", yylval->text);
 	}
