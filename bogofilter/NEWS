@@ -4,43 +4,18 @@
 
 $Id$
 
-0.10.2   2003-XX-XX
-
-	* Robustness: protect token count against overflow.
-	* Portability: Switch data base handling to use uint32_t 32-bit
-	  integer, to let bogofilter use the same data widths on all
-	  architectures and platforms.
-	* Cleanup: The bogopass and unbase64 programs have been dropped from
-	  the contrib/ directory. Their functionality is now provided for by
-	  the bogofilter core code.
-
+0.10.1.4 2003-01-30
 0.10.1.3 2003-01-29
-
-	* Fixed problems in Graham initialization code and
-	  processing of config file options.
-	* Portability fixes for 64-bit machines.
-
 0.10.1.2 2003-01-27
-
-	* Config file example updated.
-	* Fixed additional problems in parsing HTML.
-
 0.10.1.1 2003-01-25
+0.10.1	 2003-01-22
 
-	* Fixed problems in parsing HTML and processing config file options.
-
-0.10.1	2003-01-22
-
-	* Bogofilter now kills HTML comments.  The '-k' switch can
-	  be used to change the behavior.
-	* Added convenience options '-2' and '-3' to set binary/ternary
-	  modes when using Robinson-Fisher classification.
-	* Fixed spamicity computation problem when using graham
-	  wordlist and robinson or robinson-fisher algorithm.
-	* Fixed problem processing mime boundaries which caused
-	  an incorrect message count when processing a mailbox
-	* Fixed configuration problems for building bogofilter to support
-	  some, but not all, classification algorithms.
+	* A variety of robustness and portability changes, code and
+          file cleanups and documentation updates.
+	* Multiple fixes for mime and html processing.
+	* Additional support and fixes for the various spam scoring
+	  algorithms.
+	** See file CHANGES-0.10 for details of the above items.
 
 0.10.0  2003-01-19
 

@@ -4,6 +4,17 @@
 
 $Id$
      
+0.10.1.4 2003-01-30
+
+	* Robustness: protect token count against overflow.
+	* Portability: Switch data base handling to use uint32_t 32-bit
+	  integer, to let bogofilter use the same data widths on all
+	  architectures and platforms.
+	* Tweaking of database locking code to improve program speed.
+	* Cleanup: The bogopass and unbase64 programs have been dropped from
+	  the contrib/ directory. Their functionality is now provided for by
+	  the bogofilter core code.
+
 0.10.1.3 2003-01-29
 
 	* Fixed problems in Graham initialization code and
