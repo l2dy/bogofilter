@@ -129,9 +129,7 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
     fp = fopen(filename, "r");
 
     if (fp == NULL) {
-	if (DEBUG_CONFIG(0)) {
-	    fprintf(dbgout, "Cannot open %s: %s\n", filename, strerror(errno));
-	}
+	fprintf(stderr, "Cannot open %s: %s\n", filename, strerror(errno));
 	xfree(filename);
 	return false;
     }
