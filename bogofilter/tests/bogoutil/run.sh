@@ -9,8 +9,13 @@
 
 set -e
 
-tdir=`mktemp -d run.sh.$$.XXXXXXXXXX`
-trap "a=\$? ; rm -f -r $tdir && exit \$a" 0 1 2 3 15
+while : ; do
+    tdir=./checks.$$.`date +"%Y%m%dT%H%M%S"`
+    mkdir $tdir && break
+    sleep 1
+done
+
+trap "rm -f -r $tdir" 0 1 2 3 15
 
 inputfile="input-${num}"
 for ext in txt count; do
