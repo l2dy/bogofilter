@@ -35,11 +35,8 @@ that are still getting through to half or less.
 
 The purpose of this document is to explain how to adjust bogofilter's
 parameters for best results with the Robinson-Fisher classification
-method.  The author recommends using only this method, not
-Robinson-geometric-mean or Graham, for spam filtering.
-
-With Robinson's changes as implemented in bogofilter, there are four
-things to tune, and they're highly interdependent, as explained below:
+method.  As implemented in bogofilter, there are four things to tune,
+and they're highly interdependent, as explained below:
 
 
 ROBINSON'S x
@@ -235,8 +232,9 @@ standard mbox files, use a mail reader to move spam and nonspam into
 separate files, then do "bogofilter -s <spambox" and "bogofilter -n
 <nonspambox" to register the messages.
 
-To find out how many messages have gone into your spamlist and
-goodlist, assuming they're kept in ~/.bogofilter, do
+To find out how many messages have gone into your wordlist, assuming
+it's in ~/.bogofilter, do
+
   bogoutil -w ~/.bogofilter .MSG_COUNT
 
 Once you've accumulated about 5,000 messages in one of the lists, you
