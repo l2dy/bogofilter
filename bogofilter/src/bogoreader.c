@@ -497,13 +497,12 @@ void bogoreader_init(int _argc, char **_argv)
     mailstore_first = mail_first = true;
     reader_more = reader__next_mail;
     fini = dummy_fini;
-    if (run_type & (REG_SPAM|REG_GOOD|UNREG_SPAM|UNREG_GOOD))
-	mbox_mode = true;
-
     switch (bulk_mode) {
     case B_NORMAL:		/* read mail (mbox) from stdin */
 	yy_file = fpin;
 	mailstore_next_store = stdin_next_mailstore;
+	if (run_type & (REG_SPAM|REG_GOOD|UNREG_SPAM|UNREG_GOOD))
+	    mbox_mode = true;
 	break;
     case B_STDIN:		/* '-b' - streaming (stdin) mode */
 	mailstore_next_store = b_stdin_next_mailstore;
