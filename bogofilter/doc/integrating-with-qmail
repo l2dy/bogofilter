@@ -25,11 +25,22 @@ Assumptions:
 
 Installation:
 
+- Create a /home/bogofilter directory if you don't already have one.
+  Note that you may change the name and location, if you wish.
+  Just remember that you did so!
+
+  # mkdir /home/bogofilter
+
+- Change the ownership of /home/bogofilter to the qmail alias user, usually called 'alias'
+
+  # chown -R alias:alias /home/bogofilter
+        
+   
 - Build the initial spam and nonspam databases by feeding your corpus of mail.
    Assuming that the files are in mbox format in /home/bogofilter, you say:
   
-   [/home/bogofilter]# bogofilter -d . -s < spam.mbx
-   [/home/bogofilter]# bogofilter -d . -n < nonspam.mbx
+   # bogofilter -d /home/bogofilter -s < spam.mbx
+   # bogofilter -d /home/bogofilter -n < nonspam.mbx
 
 Filtering:
 
@@ -101,10 +112,6 @@ as well as to correct misclassification.
 - Make sure the script is executable
 	
 	# chmod +x /home/bogofilter/bogofilter-qfe
-
-- Change the ownership of /home/bogofilter to the qmail alias user, usually called 'alias'
-
-       # chown -R alias:alias /home/bogofilter
 
 - Educate your users to bounce their messages to:
 
