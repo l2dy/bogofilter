@@ -29,8 +29,8 @@ char   *msg_count_text = msg_count_buff;
 static const char *msg_count_header = "\"" MSG_COUNT "\" ";
 static size_t	    msg_count_header_len = 0;
 
-u_int32_t    msgs_good = 0L;
-u_int32_t    msgs_bad  = 0L;
+double	msgs_good = 0.0;
+double	msgs_bad  = 0.0;
 
 static	bool	saved = false;
 
@@ -72,10 +72,20 @@ bool msgcount_more(void)
     return val;
 }
 
-void set_msg_counts(char *s)
+void set_msg_counts(u_int32_t good, u_int32_t spam)
 {
-    msgs_bad = atoi(s);
-    s = strchr(s, ' ') + 1;
-    msgs_good = atoi(s);
+    msgs_bad  = spam;
+    msgs_good = good;
+}
+
+void set_msg_counts_from_str(char *str)
+{
+    uint b, g;
+    b = atoi(str);
+    str = strchr(str, ' ') + 1;
+    g = atoi(str);
+
+    set_msg_counts(g, b);
+
     msg_count_header_len= strlen(msg_count_header);
 }

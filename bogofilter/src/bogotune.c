@@ -672,6 +672,8 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
 
     int score_count = 0;
     int train_count = 0;
+    int train_good = 0;
+    int train_bad  = 0;
 
     double ratio = scale(msgs->count,  
 			 LIST_COUNT + TEST_COUNT,	/* small count */
@@ -684,16 +686,12 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
 
 	/* training set */
 	if (divvy && train_count / ratio < score_count + 1) {
-	    static wordprop_t *msg_count = NULL;
 	    wordhash_set_counts(wh, good, bad);
 	    wordhash_add(train, wh, &wordprop_init);
 	    train_count += 1;
 	    wordhash_free(wh);
-
-	    if (msg_count == NULL)	/* Update .MSG_COUNT */
-		msg_count = wordhash_insert(train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
-	    msgs_good = msg_count->cnts.good += good;
-	    msgs_bad  = msg_count->cnts.bad  += bad;
+	    train_good += good;
+	    train_bad  += bad;
 	}
 	/* scoring set  */
 	else {
@@ -702,6 +700,12 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
 	    score_count += 1;
 	}
 	item->wh = NULL;
+    }
+
+    if (divvy) {
+	wordprop_t *msg_count;
+	msg_count = wordhash_insert(train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
+	set_msg_counts(train_good, train_bad);
     }
 
     if (verbose > 1)
@@ -944,10 +948,8 @@ static int load_hook(word_t *key, dsv_t *data, void *userdata)
     tokenprop->cnts.bad = data->spamcount;
     tokenprop->cnts.good = data->goodcount;
 
-    if (strcmp((char *)key->text, ".MSG_COUNT") == 0) {
-	msgs_bad  = data->spamcount;
-	msgs_good = data->goodcount;
-    }
+    if (strcmp((char *)key->text, ".MSG_COUNT") == 0)
+	set_msg_counts(data->goodcount, data->spamcount);
 	
     return 0;
 }
@@ -1252,9 +1254,9 @@ static bool check_msg_counts(void)
 
     if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
 	fprintf(stderr, 
-		"The wordlist contains %u non-spam and %u spam messages.\n"
+		"The wordlist contains %d non-spam and %d spam messages.\n"
 		"Bogotune must be run with at least %d of each.\n",
-		msgs_good, msgs_bad, LIST_COUNT);
+		(int) msgs_good, (int) msgs_bad, LIST_COUNT);
 	ok = false;
     }
 

@@ -29,6 +29,7 @@ AUTHORS:
 #include "datastore.h"
 #include "error.h"
 #include "maint.h"
+#include "msgcounts.h"
 #include "paths.h"
 #include "prob.h"
 #include "robx.h"
@@ -275,8 +276,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     {
 	dsv_t val;
 	ds_get_msgcounts(dsh, &val);
-	msgs_good = val.goodcount;
-	msgs_bad  = val.spamcount;
+	set_msg_counts(val.goodcount, val.spamcount);
 	robs = ROBS;
 	robx = ROBX;
     }

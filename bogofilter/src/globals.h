@@ -54,8 +54,8 @@ extern	const char *const version;
 extern	const char *const system_config_file;
 
 /* for msgcounts.c */
-extern	u_int32_t	 msgs_good;
-extern	u_int32_t	 msgs_bad;
+extern	double		 msgs_good;
+extern	double		 msgs_bad;
 
 /* for passthrough.c */
 extern size_t msg_register_size;

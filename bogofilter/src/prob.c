@@ -16,17 +16,13 @@ AUTHORS:
 
 double calc_prob(uint good, uint bad)
 {
-    uint g = min(good, msgs_good);
-    uint b = min(bad,  msgs_bad);
-    int n = g + b;
+    int n = good + bad;
     double fw;
 
     if (n == 0)
 	fw = robx;
     else {
-	double bad_cnt  = (double) max(1, msgs_bad);
-	double good_cnt = (double) max(1, msgs_good);
-	double pw = ((b / bad_cnt) / (b / bad_cnt + g / good_cnt));
+	double pw = ((bad / msgs_bad) / (bad / msgs_bad + good / msgs_good));
 	fw = (robs * robx + n * pw) / (robs + n);
     }
 

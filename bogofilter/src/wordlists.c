@@ -10,6 +10,7 @@
 #include "bogofilter.h"
 #include "datastore.h"
 #include "find_home.h"
+#include "msgcounts.h"
 #include "paths.h"
 #include "rand_sleep.h"
 #include "wordlists.h"
@@ -135,13 +136,15 @@ static void sanitycheck_lists(void)
 /** Sum up the msgcount for each of the word lists, store the
  * count of bad messages in \a mb and the count of good messages in the
  * data bases in \a mg. */
-void compute_msg_counts(u_int32_t *mb, u_int32_t *mg)
+void compute_msg_counts(void)
 {
+    u_int32_t s = 0, g = 0;
     wordlist_t* list;
 
     for(list=word_lists; list != NULL; list=list->next)
     {
-	*mb += list->msgcount[IX_SPAM];
-	*mg += list->msgcount[IX_GOOD];
+	s += list->msgcount[IX_SPAM];
+	g += list->msgcount[IX_GOOD];
     }
+    set_msg_counts(g, s);
 }

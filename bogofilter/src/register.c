@@ -10,6 +10,7 @@
 #include "datastore.h"
 #include "collect.h"
 #include "format.h"
+#include "msgcounts.h"
 #include "register.h"
 #include "wordhash.h"
 #include "wordlists.h"
@@ -27,6 +28,7 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
   wordprop_t *wordprop;
   run_t save_run_type = run_type;
 
+  u_int32_t g = 0, b = 0;
   u_int32_t wordcount = h->count;	/* use number of unique tokens */
 
   wordlist_t *list;
@@ -101,12 +103,17 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
       ds_set_msgcounts(list->dsh, &val);
 
+      g += val.goodcount;
+      b += val.spamcount;
+
       ds_flush(list->dsh);
 
       if (DEBUG_REGISTER(1))
 	  (void)fprintf(dbgout, "bogofilter: list %s - %ul spam, %ul good\n",
 			list->filename, list->msgcount[IX_SPAM], list->msgcount[IX_GOOD]);
   }
+
+  set_msg_counts(g, b);
 
   run_type = save_run_type;
 }

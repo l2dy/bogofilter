@@ -21,6 +21,7 @@ AUTHOR:
 #include "bogohist.h"
 #include "prob.h"
 #include "datastore.h"
+#include "msgcounts.h"
 #include "word.h"
 #include "wordlists.h"
 
@@ -141,8 +142,7 @@ int histogram(const char *path)
 	return EX_ERROR;
 
     ds_get_msgcounts(dsh, &val);
-    msgs_bad  = val.spamcount;
-    msgs_good = val.goodcount;
+    set_msg_counts(val.goodcount, val.spamcount);
 
     ds_close(dsh, false);
     ds_cleanup();

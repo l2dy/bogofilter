@@ -221,11 +221,6 @@ static void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t 
 static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 {
     size_t r;
-    long bad_cnt  = max(1, msgs_bad);
-    long good_cnt = max(1, msgs_good);
-
-    assert(bad_cnt > 0);
-    assert(good_cnt > 0);
 
     /* print header */
     if (!Rtable)
@@ -239,22 +234,17 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
     for (r= 0; r<count; r+=1)
     {
 	rstats_t *cur = rstats_array[r];
-	const word_t *token = cur->token;
-	int len = max(0, MAXTOKENLEN-(int)token->leng);
-	int good = min(cur->good, msgs_good);
-	int bad  = min(cur->bad,  msgs_bad);
-	double fw = calc_prob(good, bad);
+	int len = max(0, MAXTOKENLEN-(int)cur->token->leng);
+	double fw = calc_prob(cur->good, cur->bad);
 	char flag = (fabs(fw-EVEN_ODDS) - min_dev >= EPS) ? '+' : '-';
 
-	assert(good >= 0 && bad >= 0);
-
 	(void)fputc( '"', fpo);
-	(void)word_puts(token, 0, fpo);
+	(void)word_puts(cur->token, 0, fpo);
 
 	(void)fprintf(fpo, "\"%*s %5d  %8.6f  %8.6f  %8.6f",
-		      len, " ", good + bad,
-		      (double) good / good_cnt,
-		      (double) bad  / bad_cnt,
+		      len, " ", cur->good + cur->bad,
+		      cur->good / msgs_good,
+		      cur->bad  / msgs_bad,
 		      fw);
 	if (Rtable)
 	    (void)fprintf(fpo, "%10.5f%10.5f",
