@@ -135,6 +135,7 @@ int histogram(const char *path)
 
     build_wordlist_path(filepath, sizeof(filepath), path);
 
+    ds_init();
     dsh = ds_open(CURDIR_S, filepath, DB_READ);
     if (dsh == NULL)
 	return EX_ERROR;
@@ -142,11 +143,12 @@ int histogram(const char *path)
     ds_get_msgcounts(dsh, &val);
     msgs_bad  = val.spamcount;
     msgs_good = val.goodcount;
-    
+
     ds_close(dsh, false);
 
     memset(&hist, 0, sizeof(hist));
     rc = ds_oper(filepath, DB_READ, ds_histogram_hook, &hist);
+    ds_cleanup();
 
     count = print_histogram(&hist);
 
