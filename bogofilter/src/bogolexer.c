@@ -83,12 +83,14 @@ static void help(void)
     fprintf(stderr,
 	    "\t  -P {opts} - set html processing flag(s).\n"
 	    "\t     where {opts} is one or more of:\n"
-	    "\t      C   - enable strict comment checking (default is loose checking).\n"
-	    "\t      t   - return tokens from inside html tags.\n"
-/*
-	    "\t      c   - return tokens from inside html comments.\n"
-	    "\t      s   - return tokens from inside html script blocks.\n"
-*/
+	    "\t      c   - enables  strict comment checking.\n"
+	    "\t      C   - disables strict comment checking (default).\n"
+	    "\t      f   - enables  case folding."
+	    "\t      F   - disables case folding (default)."
+	    "\t      h   - enables  header line tagging (default)."
+	    "\t      H   - disables header line tagging."
+	    "\t      t   - enables  parsing of html tags 'a', 'font', and 'img' (default).\n"
+	    "\t      T   - disables parsing of html tags 'a', 'font', and 'img'.\n"
 	    "\n"
 	    "%s (version %s) is part of the bogofilter package.\n", 
 	    progname, version);
@@ -203,14 +205,10 @@ static void process_args_2(int argc, char **argv)
 	    {
 		switch (*s)
 		{
-		case 't': tokenize_html_tags ^= true; 	break;	/* -Pt */
-		case 's': tokenize_html_script ^= true; break;	/* -Ps - not yet in use */
-		case 'h': tag_header_lines ^= true; 	break;	/* -Ph */
-		case 'f': fold_case ^= true; 		break;	/* -Pf */
-		case 'C': strict_check ^= true;			/* -PC */
-		    /*@fallthrough@*/
-		case 'c': tokenize_html_comments ^= true;	/* -Pc - not yet in use */
-		    break;
+		case 'c': case 'C': strict_check       = *s == 'C';	break;	/* -Pc and -PC */
+		case 'f': case 'F': fold_case          = *s == 'F';	break;	/* -Pf and -PF */
+		case 'h': case 'H': tag_header_lines   = *s == 'H'; 	break;	/* -Ph and -PH */
+		case 't': case 'T': tokenize_html_tags = *s == 'T'; 	break;	/* -Pt and -PT */
 		default:
 		    fprintf(stderr, "Unknown parsing option -P%c.\n", *s);
 		    exit(2);

@@ -160,7 +160,6 @@ const parm_desc sys_parms[] =
     { "fold_case", 	  	     CP_BOOLEAN, { (void *) &fold_case } },
     { "tokenize_html_tags",	     CP_BOOLEAN, { (void *) &tokenize_html_tags } },
     { "tokenize_html_script",	     CP_BOOLEAN, { (void *) &tokenize_html_script } },	/* Not yet in use */
-    { "tokenize_html_comments",	     CP_BOOLEAN, { (void *) &tokenize_html_comments } },/* Not yet in use */
 
     { "db_cachesize",	  	     CP_INTEGER, { (void *) &db_cachesize } },
     { "terse",	 	  	     CP_BOOLEAN, { (void *) &terse } },
@@ -314,13 +313,14 @@ static void help(void)
 		  "\t  -3      - set ternary classification mode (yes/no/unsure).\n");
     (void)fprintf(stderr,
 		  "\t  -P {opts} - set html processing flag(s).\n"
-		  "\t     where {opts} is one or more of:\n"
-		  "\t      C   - enable strict comment checking (default is loose checking).\n"
-		  "\t      t   - return tokens from inside html tags.\n"
-/*
-		  "\t      c   - return tokens from inside html comments.\n"
-		  "\t      s   - return tokens from inside html script blocks.\n"
-*/
+		  "\t      c   - enables  strict comment checking.\n"
+		  "\t      C   - disables strict comment checking (default).\n"
+		  "\t      f   - enables  case folding."
+		  "\t      F   - disables case folding (default)."
+		  "\t      h   - enables  header line tagging (default)."
+		  "\t      H   - disables header line tagging."
+		  "\t      t   - enables  parsing of html tags 'a', 'font', and 'img' (default).\n"
+		  "\t      T   - disables parsing of html tags 'a', 'font', and 'img'.\n"
 	);
     (void)fprintf(stderr,
 		  "\t  -M      - set mailbox mode.  Classify multiple messages in an mbox formatted file.\n"
@@ -658,15 +658,10 @@ void process_args_2(int argc, char **argv)
 	    {
 		switch (*s)
 		{
-		case 't': tokenize_html_tags ^= true; 	break;	/* -Pt */
-		case 's': tokenize_html_script ^= true; break;	/* -Ps - not yet in use */
-		case 'h': tag_header_lines ^= true; 	break;	/* -Ph */
-		case 'f': fold_case ^= true; 		break;	/* -Pf */
-
-		case 'C': strict_check ^= true;			/* -PC */
-		    /*@fallthrough@*/
-		case 'c': tokenize_html_comments ^= true;	/* -Pc - not yet in use */
-		    break;
+		case 'c': case 'C': strict_check       = *s == 'C';	break;	/* -Pc and -PC */
+		case 'f': case 'F': fold_case          = *s == 'F';	break;	/* -Pf and -PF */
+		case 'h': case 'H': tag_header_lines   = *s == 'H'; 	break;	/* -Ph and -PH */
+		case 't': case 'T': tokenize_html_tags = *s == 'T'; 	break;	/* -Pt and -PT */
 		default:
 		    fprintf(stderr, "Unknown parsing option -P%c.\n", *s);
 		    exit(2);
@@ -748,4 +743,3 @@ static void display_tag_array(const char *label, const char **array)
 	fprintf(stdout, "%s '%s'", s, array[i]);
     fprintf(stdout, "\n");
 }
-
