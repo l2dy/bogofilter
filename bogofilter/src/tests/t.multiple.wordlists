@@ -93,7 +93,7 @@ message
 EOF
 
 # suppress version info in output
-BFOPTS="-D -H -e -m0.1"
+BFOPTS="-D -H -e -m0.1 -y 0"
 BFHEAD='--header_format=%h: %c, tests=bogofilter, spamicity=%p'
 
 # build wordlists
@@ -107,7 +107,7 @@ $BOGOUTIL -l ${TMPDIR}/system.db   < ${TMPDIR}/system.txt
 for DB in ${TMPDIR}/*.db ; do
     N=`basename $DB`
     printf "%-12s" $N: >> $OUT
-    $BOGOFILTER $BFOPTS "$BFHEAD" -C  --wordlist=r,wordlist,$N,1 -v -I ${TMPDIR}/message >> $OUT
+    $BOGOFILTER $BFOPTS "$BFHEAD" -v -C --wordlist=r,wordlist,$N,1 -I ${TMPDIR}/message >> $OUT
 done
 echo >> $OUT
 
@@ -116,7 +116,7 @@ echo >> $OUT
 for CFG in ${TMPDIR}/*.cf ; do
     N=`basename $CFG`
     echo Using $N: >> $OUT
-    $BOGOFILTER $BFOPTS "$BFHEAD"  -c $CFG -vvv -I ${TMPDIR}/message >> $OUT
+    $BOGOFILTER $BFOPTS "$BFHEAD" -vvv -c $CFG -I ${TMPDIR}/message >> $OUT
     echo >> $OUT
 done
 
@@ -125,14 +125,14 @@ done
 # Add message to user.db (first regular wordlist in CF_IGN_USR_SYS)
 
 echo >> $OUT
-echo common message ignore | $BOGOFILTER $BFOPTS "$BFHEAD" -e  -n -c ${TMPDIR}/$CF_IGN_USR_SYS -y 0
+echo common message ignore | $BOGOFILTER $BFOPTS "$BFHEAD" -n -c ${TMPDIR}/$CF_IGN_USR_SYS
 
 (echo "#### 2: score message using each wordlist ####"; echo) >> $OUT
 
 for DB in ${TMPDIR}/*.db ; do
     N=`basename $DB`
     printf "%-12s" $N: >> $OUT
-    $BOGOFILTER $BFOPTS "$BFHEAD" -C --wordlist=r,wordlist,$N,1 -v -I ${TMPDIR}/message >> $OUT
+    $BOGOFILTER $BFOPTS "$BFHEAD" -v -C --wordlist=r,wordlist,$N,1 -I ${TMPDIR}/message >> $OUT
 done
 echo >> $OUT
 
@@ -141,7 +141,7 @@ echo >> $OUT
 for CFG in ${TMPDIR}/*.cf ; do
     N=`basename $CFG`
     echo Using $N: >> $OUT
-    $BOGOFILTER $BFOPTS "$BFHEAD" -c $CFG -vvv -I ${TMPDIR}/message >> $OUT
+    $BOGOFILTER $BFOPTS "$BFHEAD" -vvv -c $CFG -I ${TMPDIR}/message >> $OUT
     echo >> $OUT
 done
 
