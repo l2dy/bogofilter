@@ -184,7 +184,7 @@ bogofilter$(EXEEXT): $(bogofilter_OBJECTS) $(bogofilter_DEPENDENCIES)
 	$(LINK) $(bogofilter_LDFLAGS) $(bogofilter_OBJECTS) $(bogofilter_LDADD) $(LIBS)
 
 mostlyclean-compile:
-	-rm -f *.$(OBJEXT) core *.core
+	-rm -f *.$(OBJEXT) core *.core lexer_l.c
 
 distclean-compile:
 	-rm -f *.tab.c
