@@ -63,10 +63,14 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
 	query_config();
 
     /* tokenize input text and save words in a wordhash. */
-    do {
+    while (1) {
 	token_type = collect_words(wordhash);
 	++msgcount;
-    } while (token_type != NONE && token_type != FROM && token_type != MSG_COUNT_LINE);
+	if (token_type == NONE || 
+	    token_type == MSG_COUNT_LINE || 
+	    ((token_type == FROM) && mbox_mode))
+	    break;
+    }
 
     wordhash_sort(wordhash);
 
@@ -87,7 +91,7 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
 
     wordhash_free(wordhash);
 
-    return (token_type != MSG_COUNT_LINE) ? status : RC_MORE;
+    return (token_type == NONE ? status : RC_MORE);
 }
 
 /* Done */

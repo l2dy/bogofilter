@@ -24,6 +24,7 @@ extern	bool	fisher;			/* '-f' */
 extern	bool	force;			/* '-F' */
 extern	FILE	*fpin;			/* '-I' */
 extern	bool	logflag;		/* '-l' */
+extern	bool	mbox_mode;		/* '-M' */
 extern	char	outfname[PATH_LEN];	/* '-O' */
 extern	bool	passthrough;		/* '-p' */
 extern	bool	quiet;			/* '-q' */

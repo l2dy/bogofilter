@@ -330,6 +330,7 @@ static void help(void)
 		  "\t-q\t- quiet - don't print warning messages.\n"
 		  "\t-l\t- write messages to syslog.\n");
     (void)fprintf(stderr,
+		  "\t-M- set mailbox mode. Classify multiple messages in an mbox formatted file.\n"
 		  "\t-b\t- set streaming bulk mode. Classify multiple messages whose filenames are read from STDIN.\n"
 		  "\t-B name1 name2 ...\t- set bulk mode. Classify multiple messages named as files on the command line.\n");
     (void)fprintf(stderr,
@@ -407,7 +408,7 @@ void process_args(int argc, char **argv, int pass)
 #if HAVE_DECL_OPTRESET
     optreset = 1;
 #endif
-    while ((option = getopt(argc, argv, ":23bBc:Cd:DefFghI:lL:m:nNo:O:pqRrsStTuvVx:y:" G R F)) != -1)
+    while ((option = getopt(argc, argv, ":23bBc:Cd:DefFghI:lL:m:MnNo:O:pqRrsStTuvVx:y:" G R F)) != -1)
     {
 #if 0
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
@@ -502,6 +503,10 @@ void process_args(int argc, char **argv, int pass)
 
 	case 'm':
 	    comma_parse(option, optarg, &min_dev, &robs);
+	    break;
+
+	case 'M':
+	    mbox_mode = true;
 	    break;
 
 	case 'n':

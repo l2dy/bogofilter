@@ -27,6 +27,7 @@ bool	force;				/* '-F' */
 FILE	*fpin = NULL;			/* '-I' */
 bool	fisher;				/* '-f' */
 bool	logflag;			/* '-l' */
+bool	mbox_mode;			/* '-M' */
 bool	replace_nonascii_characters;	/* '-n' */
 bool	passthrough;			/* '-p' */
 bool	quiet;				/* '-q' */
