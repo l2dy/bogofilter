@@ -53,4 +53,6 @@ extern void 	buff_puts(const buff_t *self,
 	uint width, /**< passed verbatim to word_puts() */
 	FILE *fp);
 
+extern void	buff_shift(buff_t *self, uint start, uint length);
+
 #endif	/* BUFF_H */

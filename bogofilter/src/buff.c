@@ -16,6 +16,8 @@
 #include "fgetsl.h"
 #include "xmalloc.h"
 
+#define BOGO_ASSERT(expr, msg) if (!(expr)) { fprintf(stderr, "%s: %s:%d %s\n", progname, __FILE__, __LINE__, msg); abort(); }
+
 /* Function Definitions */
 buff_t *buff_init(buff_t *self, byte *buff, uint used, uint size)
 {
@@ -73,4 +75,18 @@ void buff_puts(const buff_t *self, uint width, FILE *fp)
     word.leng = self->t.leng - self->read;
     word.text = self->t.text + self->read;
     word_puts(&word, width, fp);
+}
+
+void buff_shift(buff_t *self, uint start, uint length)
+{
+    /* Shift buffer contents to delete the specified segment. */
+    /* Implemented for deleting html comments.		      */
+
+    BOGO_ASSERT(start + length <= self->t.leng,
+		"Invalid buff_shift() parameters.");
+
+    memmove(self->t.text + start, self->t.text + start + length, self->t.leng - length);
+    self->t.leng -= length;
+    Z(self->t.text[self->t.leng]);		/* for easier debugging - removable */
+    return;
 }
