@@ -10,10 +10,11 @@ Note:
 
 0.17.?	2004-02-??
 
+* Fixed minor bogotune problems related to building wordlists.
+* If message uses CRLF, put CRLF after added header lines.
 * Fixed code causing gcc 2.9x complaint.
 * Exempt tokens .MSG_COUNT and .ROBX from maintenance operations.
 * Remove unused 'active' and 'weight' attributes of wordlists.
-* If message uses CRLF, put CRLF after added header lines.
 
 0.17.2	2004-02-22
 

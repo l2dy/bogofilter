@@ -10,6 +10,10 @@ Note:
  
 0.17.?	2004-02-??
 
+	2004-02-26
+
+	* Fixed minor bogotune problems related to building wordlists.
+
 	2004-02-23
 
 	* Exempt tokens .MSG_COUNT and .ROBX from maintenance operations.
