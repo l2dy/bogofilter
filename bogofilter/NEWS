@@ -70,8 +70,8 @@ $Id$
 	* The configuration file parser is stricter and more correct.
 	* Separated message registration options from unregistration
 	  options.  '-S' and '-N' have been changed and now just do
-	  unregistration.  To move a meessage from one wordlist to the
-	  other, use '-S -n' or '-N -S' (as appropriate)
+	  unregistration.  To move a message from one wordlist to the
+	  other, use '-S -n' or '-N -s' (as appropriate)
 	* Bogofilter's -p (passthrough) mode will no longer read the entire
 	  mail into memory if the standard input is a seekable regular file.
 	* Bogofilter's '-l' option was changed and no longer allows an
