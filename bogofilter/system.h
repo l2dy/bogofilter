@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* from autoconf.info */
 
 #ifndef SYSTEM_H
@@ -9,10 +7,6 @@
 
 #if HAVE_STDBOOL_H
 # include <stdbool.h>
-# undef	true
-# undef	false
-# define false (bool) 0
-# define true  (bool) 1
 #else
 # if ! HAVE__BOOL
 #  ifdef __cplusplus
@@ -22,8 +16,8 @@ typedef unsigned char _Bool;
 #  endif
 # endif
 # define bool _Bool
-# define false (bool) 0
-# define true  (bool) 1
+# define false 0
+# define true 1
 # define __bool_true_false_are_defined 1
 #endif
 
