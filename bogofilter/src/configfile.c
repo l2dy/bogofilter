@@ -136,7 +136,7 @@ static bool process_config_parameter(const parm_desc *arg, char *val)
 	    }
 	case CP_FUNCTION:
 	{
-	    ok = (*arg->addr.f)(val);
+	    ok = (*arg->addr.f)((unsigned char *)val);
 	    if (DEBUG_CONFIG(0))
 		fprintf(dbgout, "%s -> '%s'\n", arg->name, val);
 	    break;

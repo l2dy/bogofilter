@@ -151,7 +151,7 @@ static int read_mem(char **out, void *in) {
     textdata_t **text = in;
     if ((*text)->next) {
 	int s = (*text)->size;
-	*out = (*text)->data;
+	*out = (char *)(*text)->data;
 	*text = (*text)->next;
 	return s;
     }

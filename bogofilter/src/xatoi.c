@@ -26,7 +26,7 @@ int xatoi(int *i, const char *in) {
 	errno = ERANGE;
 	return 0;
     }
-    *i = val;
+    *i = (int)val; /* safe after range check */
     return 1;
 }
 
