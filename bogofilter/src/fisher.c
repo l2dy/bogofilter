@@ -9,6 +9,10 @@ NAME:
 
 #include "common.h"
 
+#include <math.h>
+
+#include "fisher.h"
+
 #if defined(HAVE_GSL_10) && !defined(HAVE_GSL_14)
 /* HAVE_GSL_14 implies HAVE_GSL_10
  * if we have neither, we'll use our included GSL 1.4, which knows CDFs
@@ -24,27 +28,17 @@ NAME:
 #include <gsl/gsl_cdf.h>
 #endif
 
-#include <math.h>
-
-#include "fisher.h"
-
-#define	RF_DEBUG
-#undef	RF_DEBUG
-
 /* Function Prototypes */
 
 static void	fis_initialize_constants(void);
 static double	fis_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
 static void	fis_print_summary(void);
-
 static rc_t	fis_status(void);
 
 /* Static Variables */
 
 double ham_cutoff = FISHER_HAM_CUTOFF;
 
-extern double robx;		/* in robinson.c */
-extern double robs;		/* in robinson.c */
 extern double thresh_rtable;	/* in robinson.c */
 
 const parm_desc fis_parm_table[] =
