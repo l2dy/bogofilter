@@ -322,16 +322,6 @@ static int yyinput(unsigned char *buf, int max_size)
 	*(buf + returned - 1) = '\n';
     }
 
-    while (*buf != '\0') {
-	int ch = *buf;
-	if (ch == 0xA0) *buf = ' ';	/* convert no-break space to space */
-	if (ch == 0x92) *buf = '\'';	/* convert 0x92 (windows upper single quote) to apostrophe */
-	if (ch == 0x93) *buf = '"';	/* convert 0x93 (windows left quote) to quote */
-	if (ch == 0x94) *buf = '"';	/* convert 0x94 (windows right quote) to quote */
-	if (ch == 0xA9) *buf = ' ';	/* convert copyright sign to space */
-	buf += 1;
-    }
-			   
     return(returned == -1 ? YY_NULL : returned);
 }
 
