@@ -232,9 +232,7 @@ AM_CONDITIONAL(ENABLE_ROBINSON_FISHER, test x$USE_FISHER != xNO)
 AC_HEADER_STDC
 AC_HEADER_STDBOOL
 AC_HEADER_TIME
-AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h stdlib.h string.h sys/socket.h])
-AC_CHECK_HEADERS([unistd.h sys/file.h stddef.h sys/time.h sys/select.h])
-AC_CHECK_HEADERS([inttypes.h stdint.h])
+AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h stdlib.h string.h sys/socket.h unistd.h sys/file.h stddef.h sys/time.h sys/select.h inttypes.h stdint.h])
 AC_CHECK_HEADERS([limits.h float.h],,[AC_CHECK_HEADERS(values.h)])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -266,9 +264,7 @@ AC_FUNC_MEMCMP
 AC_FUNC_MMAP
 AC_FUNC_VPRINTF
 
-AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup)
-AC_CHECK_FUNCS(strerror flock lockf fcntl strchr strrchr memcpy)
-AC_CHECK_FUNCS(munmap pow sqrt strcasecmp strcspn strspn strstr)
+AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl strchr strrchr memcpy munmap pow sqrt strcasecmp strcspn strspn strstr)
 AC_REPLACE_FUNCS(strlcpy strlcat)
 
 AC_CACHE_SAVE
