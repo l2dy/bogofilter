@@ -33,6 +33,7 @@ typedef enum longopts_e {
     O_DB_REMOVE_ENVIRONMENT,
     O_DB_VERIFY,
     O_DB_LOG_AUTOREMOVE,
+    O_DB_TRANSACTION,
     O_DB_TXN_DURABLE,
     O_NS_ESF,
     O_SP_ESF,

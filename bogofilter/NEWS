@@ -21,6 +21,11 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-01-28
+
+	* Add option "--db-transaction=yes/no" for run-time
+          enabling/disabling of transactions.
+
 	2005-01-25
 
 	* Removed unused program bogowordfreq.

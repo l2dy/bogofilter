@@ -26,6 +26,14 @@
 ##user_config_file=~/.bogofilterrc
 ##user_config_file=~/.bogofilter/config
 
+#### TRANSACTIONS: enable/disable database transactions
+#
+#	boolean indicating whether transactions
+#	should be enabled (yes) or disabled (no)
+#
+#db_transaction=no
+##db_transaction=yes
+
 #### WORDLIST: define additional word lists
 #
 #	char type: 'r' (regular) or 'i' (ignore)

@@ -95,6 +95,9 @@ extern	bool fBogotune;
 #define	DB_CACHESIZE	4	/* in MB */
 extern	uint	db_cachesize;
 
+/* for  transactions */
+extern	bool	fTransaction;
+
 /* other */
 
 extern FILE  *fpo;

@@ -643,6 +643,8 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case O_UNSURE_SUBJECT_TAG:		unsure_subject_tag = get_string(name, val);		break;
     case O_WORDLIST:			configure_wordlist(val);				break;
 
+    case O_DB_TRANSACTION:		fTransaction = get_bool(name, val);			break;
+
     /* ignore options that don't apply to bogofilter */
     case O_DB_PRUNE:
     case O_DB_RECOVER:
