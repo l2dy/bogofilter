@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.8  2002/09/25 00:02:44  relson
+ * Ignore older X-Spam-[...Whatever...] lines.
+ *
  * Revision 1.7  2002/09/23 11:31:53  m-a
  * Unnest comments, and move $ line down by one to prevent CVS from adding nested comments again.
  *
@@ -272,7 +275,8 @@ width	;
 
 ^From\ 					{return(FROM);}
 ^Date:.*|Delivery-Date:.*			;
-^Message-ID:.*				;
+^Message-ID:.*					;
+^X-Spam-[A-Za-z]+:.*				;
 ^{BASE64}+$					;
 ^\tid\ .*					;
 
