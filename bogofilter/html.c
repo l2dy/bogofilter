@@ -90,9 +90,11 @@ static int kill_html_comment(byte *buf_start, byte *buf_used, byte *buf_end)
 		level -= 1;
 	    }
 	}
-	if (level == 0)
-	    break;
-	tmp += 1;
+	else {
+	    tmp += 1;
+	    if (level == 0)
+		break;
+	}
 	/* When killing html comments, there's no need to keep it in memory */
 	if (kill_html_comments && buf_end - buf_used < COMMENT_END_LEN) {
 	    /* Leave enough to recognize the end of comment string. */
