@@ -6,6 +6,7 @@
 #
 # This file is released under the GPL. See http://www.gnu.org/licenses/gpl.txt
 #
+# $Id$ #
 
 function usage()
 {
