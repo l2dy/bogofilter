@@ -49,7 +49,7 @@ bool  onlyprint = false;
 
 /* Function Prototypes */
 
-static int process_arg(int option, const char *name, const char *arg, int option_index);
+static int process_arg(int option, const char *name, const char *arg);
 
 /* Function Definitions */
 
@@ -513,13 +513,10 @@ static const char *ds_file = NULL;
 static bool  prob = false;
 
 typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST,
-    M_RECOVER, M_CRECOVER, M_PURGELOGS, M_VERIFY } cmd_t;
+    M_RECOVER, M_CRECOVER, M_PURGELOGS, M_VERIFY, M_REMOVEENV } cmd_t;
 static cmd_t flag = M_NONE;
 
 #define	OPTIONS	":a:c:C:d:Df:F:hH:I:k:l:m:np:P:r:R:s:u:vVw:x:X:y:"
-
-static int remenv = 0;	/** if set, run recovery and remove the environment */
-static char *remedir;	/** environment to remove */
 
 struct option long_options[] = {
     { "help",				N, 0, 'h' },
@@ -536,7 +533,7 @@ struct option long_options[] = {
     { "db-prune",                       R, 0, O_DB_PRUNE },
     { "db-recover",                     R, 0, O_DB_RECOVER },
     { "db-recover-harder",              R, 0, O_DB_RECOVER_HARDER },
-    { "db-remove-environment",		R, &remenv, O_DB_REMOVE_ENVIRONMENT },
+    { "db-remove-environment",		R, 0, O_DB_REMOVE_ENVIRONMENT },
     { "db-verify",                      R, 0, O_DB_VERIFY },
 #ifdef	HAVE_DECL_DB_CREATE
     { "db_lk_max_locks",		R, 0, O_DB_MAX_LOCKS },
@@ -606,7 +603,7 @@ static int process_arglist(int argc, char **argv)
  	    break;
 
 	name = (option_index == 0) ? argv[this_option_optind] : long_options[option_index].name;
-	count += process_arg(option, name, optarg, option_index);
+	count += process_arg(option, name, optarg);
     }
 
     if (count != 1)
@@ -624,7 +621,7 @@ static int process_arglist(int argc, char **argv)
     return count;
 }
 
-static int process_arg(int option, const char *name, const char *val, int option_index)
+static int process_arg(int option, const char *name, const char *val)
 {
     int count = 0;
 
@@ -790,6 +787,12 @@ static int process_arg(int option, const char *name, const char *val, int option
 	ds_file = val;
 	break;
 
+    case O_DB_REMOVE_ENVIRONMENT:
+	flag = M_REMOVEENV;
+	ds_file = val;
+	count += 1;
+	break;
+
 #ifdef	HAVE_DECL_DB_CREATE
     case O_DB_MAX_OBJECTS:	
 	db_max_objects = atoi(val);
@@ -807,22 +810,6 @@ static int process_arg(int option, const char *name, const char *val, int option
 #endif
 #endif
 
-    case 0:
-	/* long option with no short option correspondence */
-	switch (long_options[option_index].val) {
-	    case O_REMOVE_ENVIRONMENT:
-		if (remedir) {
-		    fprintf(stderr, "can remove only one environment\n");
-		    exit(EX_ERROR);
-		}
-		remedir = xstrdup(optarg);
-		count += 1;
-		break;
-	    default:
-		abort();
-	}
-	break;
-
     default:
 	abort();
     }
@@ -838,13 +825,6 @@ int main(int argc, char *argv[])
     set_today();			/* compute current date for token age */
 
     process_arglist(argc, argv);
-
-    /* process long option arguments first */
-    if (remenv) {
-	/* remove environment */
-	rc = ds_remove(remedir);
-	exit(rc);
-    }
 
     /* Extra or missing parameters */
     if (flag != M_WORD && argc != optind) {
@@ -863,6 +843,9 @@ int main(int argc, char *argv[])
 	    break;
 	case M_PURGELOGS:
 	    rc = ds_purgelogs(ds_file);
+	    break;
+	case M_REMOVEENV:
+	    rc = ds_remove(ds_file);
 	    break;
 	case M_VERIFY:
 	    rc = ds_verify(ds_file);
