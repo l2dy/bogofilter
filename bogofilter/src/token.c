@@ -80,10 +80,10 @@ token_t get_token(void)
 	switch (class) {
 
 	case EMPTY:	/* empty line -- check for bogus end of header */
-	    if (yylval->leng == 0) 
+	    if (yylval->leng == 1) 
 		continue;
 	    else
-		yylval = nonblank_line;
+		yylval = word_dup(nonblank_line);
 	    break;
 
 	case BOUNDARY:	/* don't return boundary tokens to the user */
