@@ -130,13 +130,14 @@
 
   <p>Bogofilter can instructed to display information on the scoring of a message by running it with flags "-v", "-vv", "-vvv", or "-R".</p>
 
-  <li>Using "-v" causes bogofilter to generate the "X-Bogosity:" header line, i.e.</p>
+<ul>
+  <li>Using "-v" causes bogofilter to generate the "X-Bogosity:" header line, i.e.
   <pre>
   X-Bogosity: No, tests=bogofilter, spamicity=0.500000
   </pre>
   </li>
 
-  <li>Using "-vv" causes bogofilter to generate a histogram, i.e.</p>
+  <li>Using "-vv" causes bogofilter to generate a histogram, i.e.
   <pre>
   X-Bogosity: No, tests=bogofilter, spamicity=0.500000
 	  int  cnt    prob   spamicity  histogram
@@ -154,7 +155,7 @@
 <p>Each row shows an interval, the count of tokens with scores in that interval, the average spam probability for those tokens, the message's spamicity score (for those tokens and all lesser valued tokens), and a bar graph corresponding to the token count.</p>
 <p>In the above histogram there are a lot of low scoring tokens and a lot of high scoring tokens.  They "balance" one another to give the spamicity score of 0.5000
 </li>
-<li>Using "-vvv" produces a list of <u>all</u> the tokens in the messages with information on each one, i.e.</p>
+<li>Using "-vvv" produces a list of <em>all</em> the tokens in the messages with information on each one, i.e.
 
   <pre>
   X-Bogosity: No, tests=bogofilter, spamicity=0.500000
@@ -184,14 +185,15 @@ The columns printed contain the following information:
     <li>The values of Robinson's <b>s</b> and <b>x</b> parameters and of <b>min_dev</b></li>
   </ul>
 </li>
-<li>Using "-R" produces the "-vvv" output described above plus two additional columns:</p>
+<li>Using "-R" produces the "-vvv" output described above plus two additional columns:
   <dl>
     <dt>invfwlog<dd>logarithm of fw
     <dt>fwlog<dd>logarithm of (1-fw)
   </dl>
-</li>
 The "-R" output is formatted for use with the R language for statistical computing.  More information is available at <a href="http://www.r-project.org/">
 The R Project for Statistical Computing</a>.
+</li>
+</ul>
 
   <hr>
 
@@ -225,7 +227,7 @@ spam-unreadable
   <h2 id="query_database">How do I manually query the database</h2>
 
   <p>To find the spam and ham counts for a token (word) use bogoutil's '-w' option. For example, "bogoutil -d $BOGOFILTER_DIR example.com" gives the good and bad counts for "example.com".</p>
-p
+
   <p>To find out how many messages are in your wordlists query the special token .MSG_COUNT, i.e., run command "bogoutil -w $BOGOFILTER_DIR .MSG_COUNT" to see the counts for the spam and ham wordlists.</p>
 
   <p>To tell how many tokens are in your wordlists pipe the output of bogoutil's dump command to command "wc", i.e. use "bogoutil -d $BOGOFILTER_DIR/spamlist.db | wc -l " to display the count for the spamlist and use "bogoutil -d $BOGOFILTER_DIR/goodlist.db | wc -l" to display the count for the goodlist.</p>
@@ -330,8 +332,8 @@ $ ldconfig /usr/lib /usr/local/lib \
 
   <hr>
 
-<pre>
+<!--
 $Id$
-</pre>
+-->
 </body>
 </html>
