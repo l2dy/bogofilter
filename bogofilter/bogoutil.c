@@ -83,7 +83,7 @@ static int dump_file(char *db_file)
 		    if (!keep_count(val.count) || !keep_date(val.date) || !keep_size(key.size))
 			continue;
 		    if (replace_nonascii_characters)
-			do_replace_nonascii_characters((byte *)key.data);
+			do_replace_nonascii_characters_l((byte *)key.data, key.size);
 		    if (data.size != 4 && data.size != 8)
 			print_error(__FILE__, __LINE__, "Unknown data size - %d.\n", data.size);
 		    if (data.size == 4 || val.date == 0)
@@ -180,7 +180,7 @@ static int load_file(char *db_file)
 	    date = today_save;
 
 	if (replace_nonascii_characters)
-	    do_replace_nonascii_characters(buf);
+	    do_replace_nonascii_characters_c(buf);
 
 	if (!keep_count(count) || !keep_date(date) || !keep_size(strlen((const char *)buf)))
 	    continue;

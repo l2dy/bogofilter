@@ -18,6 +18,8 @@ AUTHOR:
 #include <unistd.h>
 #include <db.h>
 
+#include <assert.h>
+
 #include "common.h"
 
 #include "datastore.h"
@@ -101,18 +103,16 @@ bool keep_size(size_t size)
     }
 }
 
-void do_replace_nonascii_characters(byte *str)
+void do_replace_nonascii_characters_c(register byte *str)
 {
-    byte ch;
-    if (str == NULL) {
-	fprintf(stderr, "%s:%d  %s( NULL )\n", __FILE__, __LINE__, __PRETTY_FUNCTION__);
-	exit(2);
-    }
-    while ((ch=*str) != '\0')
-    {
-	if ( ch & 0x80)
-	    *str = '?';
-	str += 1;
+    do_replace_nonascii_characters_l(str, strlen((const char *)str));
+}
+
+void do_replace_nonascii_characters_l(register byte *str, register size_t len) {
+    assert(str != NULL);
+    while(len--) {
+	if (*str & 0x80) *str = '?';
+	str++;
     }
 }
 
@@ -177,7 +177,7 @@ int maintain_wordlist(void *vhandle)
 	if (ret == 0) {
 	    val = (dbv_t *)db_data.data;
 	    if (replace_nonascii_characters)
-		do_replace_nonascii_characters((byte *)db_key.data);
+		do_replace_nonascii_characters_l((byte *)db_key.data,db_key.size);
 
 	    if (! keep_count(val->count) || ! keep_date(val->date) || ! keep_size(db_key.size)) {
 		char *token = (char *) db_key.data;
