@@ -201,7 +201,6 @@ to a user's email population can be determined with the aid of the
 <application>bogotune</application> program.</para>
 </refsect1>
 
-
 <refsect1 id='options'><title>OPTIONS</title>
 
 <para>HELP OPTIONS</para>
@@ -434,13 +433,11 @@ becomes a command line's
 <option>--<replaceable>option=value</replaceable></option>.  Use
 command <command>bogofilter --help</command> for a list of options and
 see <filename>bogofilter.cf.example</filename> for more info on
-them. For example to change the X-Bogosity header, use:</para>
+them. For example to change the X-Bogosity header to "X-Spam-Header", use:</para>
 
 <para>
 <option><replaceable>--spam-header-name=X-Spam-Header</replaceable></option>
 </para>  
-
-
 
 </refsect1>
 
