@@ -26,6 +26,7 @@ cscope.out
 debugtest
 depcomp
 directories.c
+doxygen
 fgetsl.test
 find_home.test
 install-sh
