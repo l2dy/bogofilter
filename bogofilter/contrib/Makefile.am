@@ -7,6 +7,7 @@ EXTRA_DIST= \
 	bogo.R \
 	bogofilter-qfe \
 	dot-qmail-bogofilter-default \
+	mailfilter.example \
 	parmtest.sh* \
 	printmaildir.pl \
 	procmailrc.example \
