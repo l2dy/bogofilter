@@ -539,14 +539,14 @@ static dbe_t *dbx_init(const char *directory)
 
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
-static dbe_t *dbe_xinit(dbe_t *env, const char *directory, u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
+static dbe_t *dbe_xinit(dbe_t *env, const char *directory,
+	u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
 {
     int ret;
 
     assert(directory);
 
     env->magic = MAGIC_DBE;	    /* poor man's type checking */
-    env->directory = xstrdup(directory);
 
     ret = bf_dbenv_create(&env->dbe);
 
@@ -618,32 +618,34 @@ static dbe_t *dbe_xinit(dbe_t *env, const char *directory, u_int32_t numlocks, u
 static void dbx_cleanup(dbe_t *env)
 {
     dbx_cleanup_lite(env);
-
-    if (env->directory)
-	free(env->directory);
-    free(env);
 }
 
 /* close the environment, but do not release locks */
 static void dbx_cleanup_lite(dbe_t *env)
 {
-    if (env->dbe) {
-	int ret;
+    if (env) {
+	if (env->dbe) {
+	    int ret;
 
-	/* checkpoint if more than 64 kB of logs have been written
-	 * or 120 min have passed since the previous checkpoint */
-	/*                                kB  min flags */
-	ret = BF_TXN_CHECKPOINT(env->dbe, 64, 120, 0);
-	ret = dbx_sync(env->dbe, ret);
-	if (ret)
-	    print_error(__FILE__, __LINE__, "DBE->dbx_checkpoint returned %s", db_strerror(ret));
+	    /* checkpoint if more than 64 kB of logs have been written
+	     * or 120 min have passed since the previous checkpoint */
+	    /*                                kB  min flags */
+	    ret = BF_TXN_CHECKPOINT(env->dbe, 64, 120, 0);
+	    ret = dbx_sync(env->dbe, ret);
+	    if (ret)
+		print_error(__FILE__, __LINE__, "DBE->dbx_checkpoint returned %s", db_strerror(ret));
 
-	ret = env->dbe->close(env->dbe, 0);
-	if (DEBUG_DATABASE(1) || ret)
-	    fprintf(dbgout, "DB_ENV->close(%p): %s\n", (void *)env->dbe, db_strerror(ret));
-    clear_lock();
-    if (lockfd >= 0)
-	close(lockfd); /* release locks */
+	    ret = env->dbe->close(env->dbe, 0);
+	    if (DEBUG_DATABASE(1) || ret)
+		fprintf(dbgout, "DB_ENV->close(%p): %s\n", (void *)env->dbe,
+			db_strerror(ret));
+	    clear_lock();
+	    if (lockfd >= 0)
+		close(lockfd); /* release locks */
+	}
+
+	xfree(env->directory);
+	free(env);
     }
 }
 
