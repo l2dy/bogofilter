@@ -33,7 +33,8 @@ EXTRA_DIST = \
 	     integrating-with-qmail \
 	     programmer/OS2/configure.os2 \
 	     programmer/README.freebsd programmer/README.hp-ux \
-	     programmer/README.RISC-OS \
+	     programmer/README.RISC-OS programmer/README.memory-checking \
+	     programmer/README.osx \
 	     programmer/RISC-OS/src/Makefile \
 	     programmer/RISC-OS/gsl/Makefile \
 	     rpm.notes.BerkeleyDB \
