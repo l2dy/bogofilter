@@ -27,7 +27,11 @@ NAME:
 #include "debug.h"
 #include "system.h"	/* defines bool, uint32_t */
 
+#ifdef	ENABLE_MEMDEBUG
+#include "memdebug.h"
+#else
 #define	MEMDISPLAY
+#endif
 
 typedef uint32_t YYYYMMDD;	/* date as YYYYMMDD */
 
