@@ -22,6 +22,12 @@
 #include "find_home.h"
 #include "common.h"
 
+/*
+ * tildeexpand tries to expand the first tilde argument, similar, but
+ * not identical, to the way a POSIX sh does. It does not support
+ * multiple tildes, and does not search for a slash, but for the longest
+ * count of characters in the POSIX portable file name character set.
+ */
 /*@only@*/
 char *tildeexpand(const char *name) {
     char *tmp;
