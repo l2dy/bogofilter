@@ -28,9 +28,9 @@ Most of the ideas in here are stolen from Mutt's snprintf implementation.
 #include "xstrdup.h"
 
 /* Function Prototypes */
-static int  format_float( char *dest, double val,      int min, int prec, int flags, const char *destend);
-static int  format_string(char *dest, const char *val, int min, int prec, int flags, const char *destend);
-static int  format_spamicity(char *dest, const char *fmt, double spamicity, const char *destend);
+static size_t format_float( char *dest, double val,      size_t min, size_t prec, int flags, const char *destend);
+static size_t format_string(char *dest, const char *val, size_t min, size_t prec, int flags, const char *destend);
+static size_t format_spamicity(char *dest, const char *fmt, double spamicity, const char *destend);
 static void die (const char *msg, ...);
 static char *convert_format_to_string(char *buff, size_t size, const char *format);
 
@@ -118,12 +118,6 @@ enum flags {
 
 /* Function Definitions */
 
-/*
-    char *tmp = xstrdup(val);
-extern char *strsep (char **__restrict __stringp,
-		     __const char *__restrict __delim) __THROW;
-*/
-
 static bool set_spamicity_fields(FIELD *strings, const char *val)
 {
     size_t i;
@@ -158,11 +152,11 @@ static bool set_spamicity_formats(const char *val)
     return ok;
 }
 
-static int format_float(char *dest, double src, int min, int prec, int flags, const char *destend)
+static size_t format_float(char *dest, double src, size_t min, size_t prec, int flags, const char *destend)
 {
     char buf[20];
     double s;
-    int p;
+    size_t p;
     if (flags & F_DELTA)
 	s = 1.0 - src;
     else
@@ -181,13 +175,13 @@ static int format_float(char *dest, double src, int min, int prec, int flags, co
     return format_string (dest, buf, 0, 0, 0, destend);
 }
 
-static int format_string(char *dest, const char *src, int min, int prec, int flags, const char *destend)
+static size_t format_string(char *dest, const char *src, size_t min, size_t prec, int flags, const char *destend)
 {
-    int len = strlen(src);
+    size_t len = strlen(src);
     if (flags & F_PREC && prec < len)
 	len = prec;
     if (dest + len < destend) {
-	strncpy(dest, src, len);
+	strlcpy(dest, src, len+1);
     } else {
 	fprintf(stderr, "header format is too long.\n");
 	exit (2);
@@ -195,7 +189,7 @@ static int format_string(char *dest, const char *src, int min, int prec, int fla
     return len;
 }
 
-static int format_spamicity(char *dest, const char *fmt, double spamicity, const char *destend)
+static size_t format_spamicity(char *dest, const char *fmt, double spamicity, const char *destend)
 {
     char temp[20];
     size_t len = sprintf(temp, fmt, spamicity);
@@ -219,7 +213,8 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
     char temp[20];
 
     int state = S_DEFAULT;
-    int min = 0, prec = 0, flags = 0;
+    size_t min = 0, prec = 0;
+    int flags = 0;
 
     rc_t status = method->status();
     double spamicity = method->spamicity();
