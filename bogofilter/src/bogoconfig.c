@@ -661,6 +661,14 @@ void process_args_2(int argc, char **argv)
 		exit(2);
 	    break;
 
+	case 'm':
+	    comma_parse(option, optarg, &min_dev, &robs);
+	    break;
+
+	case 'o':
+	    comma_parse(option, optarg, &spam_cutoff, &ham_cutoff);
+	    break;
+
 	case 'P':
 	{
 	    char *s;
@@ -679,14 +687,6 @@ void process_args_2(int argc, char **argv)
 	    }
 	    break;
 	}
-
-	case 'm':
-	    comma_parse(option, optarg, &min_dev, &robs);
-	    break;
-
-	case 'o':
-	    comma_parse(option, optarg, &spam_cutoff, &ham_cutoff);
-	    break;
 	}
     }
 
