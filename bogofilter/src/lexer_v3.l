@@ -248,8 +248,6 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 						}
 
 <INITIAL>\n					{ set_tag("Header"); lineno += 1; }
-<INITIAL><<EOF>>				{ return NONE; }
-
 <INITIAL>{VERP} 				{ skip_to('='); return VERP; }
 
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
@@ -321,7 +319,7 @@ static void html_reorder(void)
     memcpy(yycopy+yyleng-len, yytext, len);	/* copy leading text to end of buffer */
     yycopy[yyleng] = '\0';			/* for debugging */
 
-    yy_unput((unsigned char *)yycopy, yyleng);
+    yy_unput((byte *)yycopy, yyleng);
     xfree(yycopy);
 }
 
@@ -363,7 +361,7 @@ static void html_char(void)
     }
 
     if (yycopy != NULL) {
-	yy_unput((unsigned char *)yycopy, yyleng);
+	yy_unput((byte *)yycopy, yyleng);
 	xfree(yycopy);
     }
 }
@@ -418,7 +416,7 @@ void yy_set_state_initial(void)
     yy_flex_debug = BOGOTEST('L');
 #endif
 }
- 
+
 /*
  * The following sets edit modes for GNU EMACS
  * Local Variables:
