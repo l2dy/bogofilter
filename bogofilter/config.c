@@ -53,9 +53,10 @@ AUTHOR:
 /* Global variables */
 
 int nonspam_exits_zero;	/* '-e' */
-int force;		/* '-f' */
-int logflag;		/* '-l' */
-int quiet;		/* '-q' */
+bool force;		/* '-F' */
+bool logflag;		/* '-l' */
+bool quiet;		/* '-q' */
+bool terse;		/* '-t' */
 int passthrough;	/* '-p' */
 int verbose;		/* '-v' */
 int Rtable = 0;		/* '-R' */

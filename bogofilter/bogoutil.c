@@ -31,7 +31,7 @@ AUTHOR:
 #define MINIMUM_FREQ	5		/* minimum freq */
 
 int verbose = 0;
-int logflag = 0;
+bool logflag = 0;
 
 run_t run_type = RUN_NORMAL;
 

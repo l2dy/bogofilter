@@ -10,9 +10,10 @@
 #define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
 
 extern int nonspam_exits_zero;	/* '-e' */
-extern int force;		/* '-f' */
-extern int logflag;		/* '-l' */
-extern int quiet;		/* '-q' */
+extern bool force;		/* '-f' */
+extern bool logflag;		/* '-l' */
+extern bool terse;		/* '-t' */
+extern bool quiet;		/* '-q' */
 extern int passthrough;		/* '-p' */
 extern int verbose;		/* '-v' */
 
