@@ -162,26 +162,15 @@ int dbx_get_rmw_flag(int open_mode)
     return flag;
 }
 
-static DB_ENV *dbe_recover_open(const char *db_file, uint32_t flags)
+static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags)
 {
     const uint32_t local_flags = flags | DB_CREATE;
     DB_ENV *dbe;
     int e;
 
-    char *dir;
-    char *tmp;
-
-    dir = xstrdup(db_file);
-    tmp = strrchr(dir, DIRSEP_C);
-
-    if (!tmp)
-	free(dir), dir = xstrdup(CURDIR_S);
-    else
-	*tmp = '\0';
-
     if (DEBUG_DATABASE(0))
         fprintf(dbgout, "trying to lock database directory\n");
-    db_try_glock(tmp, F_WRLCK, F_SETLKW); /* wait for exclusive lock */
+    db_try_glock(directory, F_WRLCK, F_SETLKW); /* wait for exclusive lock */
 
     /* run recovery */
     bf_dbenv_create(&dbe);
@@ -198,23 +187,20 @@ static DB_ENV *dbe_recover_open(const char *db_file, uint32_t flags)
      * environment in heap memory, so we don't need to remove it.
      */
 
-    e = dbe->open(dbe, tmp,
+    e = dbe->open(dbe, directory,
 		  dbenv_defflags | local_flags | DB_RECOVER, DS_MODE);
     if (e == DB_RUNRECOVERY) {
 	/* that didn't work, try harder */
 	if (DEBUG_DATABASE(0))
 	    fprintf(dbgout, "running catastrophic data base recovery\n");
-	e = dbe->open(dbe, tmp,
+	e = dbe->open(dbe, directory,
 		      dbenv_defflags | local_flags | DB_RECOVER_FATAL, DS_MODE);
     }
     if (e) {
 	print_error(__FILE__, __LINE__, "Cannot recover environment \"%s\": %s",
-		tmp, db_strerror(e));
-	free(tmp);
+		directory, db_strerror(e));
 	exit(EX_ERROR);
     }
-
-    free(tmp);
 
     return dbe;
 }
