@@ -117,15 +117,22 @@
 	    option <option>-w</option> .
 	</para>
 	<para>The <option>-f <replaceable>dir</replaceable></option>
-	    option runs a regular data base recovery in the data base directory
-	    dir. If that fails, it will retry with a (usually slower)
-	    catastrophic data base recovery. If that fails, too, your
-	    data base cannot be repaired and must be rebuilt from
-	    scratch.</para>
+	    option (mnemonic: "fix") runs a regular data base recovery
+	    in the data base directory dir. If that fails, it will retry
+	    with a (usually slower) catastrophic data base recovery. If
+	    that fails, too, your data base cannot be repaired and must
+	    be rebuilt from scratch.</para>
+	<para>This is only supported when compiled with Berkeley DB
+	    support. Trying recovery with QDBM or TDB support will
+	    result in an error.</para>
 	<para>The <option>-F <replaceable>dir</replaceable></option>
-	    option runs a catastrophic data base recovery in the data base directory
-	    dir. If that fails, your data base cannot be repaired and
-	    must be rebuilt from scratch.</para>
+	    option (mnemonic: "fix harder") runs a catastrophic data
+	    base recovery in the data base directory dir. If that fails,
+	    your data base cannot be repaired and must be rebuilt from
+	    scratch.</para>
+	<para>This is only supported when compiled with Berkeley DB
+	    support. Trying recovery with QDBM or TDB support will
+	    result in an error.</para>
 	<para>The <option>-r</option> option tells
 	    <application>bogoutil</application> to recalculate the ROBX
 	    value and print it as a six-digit fraction.

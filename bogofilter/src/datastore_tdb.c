@@ -369,4 +369,13 @@ void db_cleanup(void)
 int db_txn_begin(void *d) { (void)d; return 0; }
 int db_txn_abort(void *d) { (void)d; return 0; }
 int db_txn_commit(void *d) { (void)d; return 0; }
-int db_recover(int a, int b) { (void)a; (void)b; return 0; }
+int db_recover(int a, int b) {
+    (void)a;
+    (void)b;
+
+    fprintf(stderr, "ERROR: bogofilter can not recover TDB data bases.\n"
+    "If you experience hangs, strange behavior, inaccurate output,\n"
+    "you must delete your data base and rebuild it, or restore an older version\n"
+    "that you know is good from your backups.\n");
+    exit(EX_ERROR);
+}

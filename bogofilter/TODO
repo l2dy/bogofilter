@@ -6,8 +6,6 @@
 
 **** Implement Concurrent Data store, quite similar to Transactional.
 
-**** Print warning when TDB/QDBM attempt recovery.
-
 **** Make sure that RFC-2047 decoder runs only once, not recursively.
 
 **** New Feature: Token aging. Support for struct data in the wordlists is
