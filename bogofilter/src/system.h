@@ -102,4 +102,8 @@ typedef uint8_t u_int8_t;
 #define true 1
 #endif
 
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+
 #endif /* SYSTEM_H */
