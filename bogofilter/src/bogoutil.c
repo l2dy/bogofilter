@@ -734,11 +734,7 @@ static int process_arg(int option, const char *name, const char *val)
     case O_DB_REMOVE_ENVIRONMENT:
 #ifdef	HAVE_DECL_DB_CREATE
     case O_DB_MAX_OBJECTS:	
-	db_max_objects = atoi(val);
-	break;
     case O_DB_MAX_LOCKS:
-	db_max_locks   = atoi(val);
-	break;
 #ifdef	FUTURE_DB_OPTIONS
     case O_DB_LOG_AUTOREMOVE:
     case O_DB_TXN_DURABLE:
