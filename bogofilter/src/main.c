@@ -67,7 +67,7 @@ static FILE *output_setup(void);
 static void passthrough_setup(void);
 static void passthrough_cleanup(void);
 static void write_log_message(void);
-static void write_message(FILE *fp, rc_t status);
+void write_message(rc_t status);
 
 /* Function Definitions */
 
@@ -279,7 +279,7 @@ static rc_t classify()
 	init_charset_table(charset_default, true);
 	
 	status = bogofilter();
-	write_message(fpo, status);
+	write_message(status);
 	
 	rstats_cleanup();
 	passthrough_cleanup();
@@ -288,7 +288,7 @@ static rc_t classify()
     return status;
 }
 
-static void write_message(FILE *fp, rc_t status)
+void write_message(rc_t status)
 {
     ssize_t rd = 0;	/* assignment to quench warning */
     readfunc_t rf = 0;	/* assignment to quench warning */
@@ -339,21 +339,21 @@ static void write_message(FILE *fp, rc_t status)
 		rd >= subjlen && 
 		spam_subject_tag != NULL &&
 		strncasecmp(out, subjstr, subjlen) == 0) {
-		(void) fprintf(fp, "%.*s %s", subjlen, out, spam_subject_tag);
+		(void) fprintf(fpo, "%.*s %s", subjlen, out, spam_subject_tag);
 		if (out[subjlen] != ' ')
-		    fputc(' ', fp);
-		(void) fwrite(out + subjlen, 1, rd - subjlen, fp);
+		    fputc(' ', fpo);
+		(void) fwrite(out + subjlen, 1, rd - subjlen, fpo);
 		seen_subj = 1;
 		continue;
 	    }
 
 	    hadlf = (out[rd-1] == '\n');
-	    (void) fwrite(out, 1, rd, fp);
-	    if (ferror(fp)) cleanup_exit(2, 1);
+	    (void) fwrite(out, 1, rd, fpo);
+	    if (ferror(fpo)) cleanup_exit(2, 1);
 	}
 
 	if (!hadlf)
-	    fputc('\n', fp);
+	    fputc('\n', fpo);
     }
 
     if (passthrough || verbose) {
@@ -363,8 +363,8 @@ static void write_message(FILE *fp, rc_t status)
 	/* print spam-status at the end of the header
 	 * then mark the beginning of the message body */
 	fcn(buff, sizeof(buff));
-	fputs (buff, fp);
-	fputs ("\n", fp);
+	fputs (buff, fpo);
+	fputs ("\n", fpo);
     }
 
     if (verbose || passthrough || Rtable) {
@@ -375,7 +375,7 @@ static void write_message(FILE *fp, rc_t status)
 
     if (passthrough && !seen_subj &&
 	status == RC_SPAM && spam_subject_tag != NULL) {
-	(void) fprintf(fp, "Subject: %s\n", spam_subject_tag);
+	(void) fprintf(fpo, "Subject: %s\n", spam_subject_tag);
     }
 
     if (passthrough) {
@@ -383,19 +383,19 @@ static void write_message(FILE *fp, rc_t status)
 	/* If the message terminated early (without body or blank
 	 * line between header and body), enforce a blank line to
 	 * prevent anything past us from choking. */
-	(void)fputc('\n', fp);
+	(void)fputc('\n', fpo);
 
 	/* print body */
 	while ((rd = rf(&out, rfarg)) > 0)
 	{
-	    (void) fwrite(out, 1, rd, fp);
+	    (void) fwrite(out, 1, rd, fpo);
 	    hadlf = (out[rd-1] == '\n');
-	    if (ferror(fp)) cleanup_exit(2, 1);
+	    if (ferror(fpo)) cleanup_exit(2, 1);
 	}
 
-	if (!hadlf) fputc('\n', fp);
+	if (!hadlf) fputc('\n', fpo);
 
-	if (fflush(fp) || ferror(fp) || (fp != stdout && fclose(fp))) {
+	if (fflush(fpo) || ferror(fpo) || (fpo != stdout && fclose(fpo))) {
 	    cleanup_exit(2, 1);
 	}
     }
