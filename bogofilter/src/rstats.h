@@ -25,7 +25,7 @@ void rstats_fini(size_t robn,
 		 FLOAT Q, 
 		 double spamicity);
 
-void rstats_print(void);
+void rstats_print(bool unsure);
 
 void rstats_cnt_rn_ns_sp(uint *cnt, uint *rn, uint *ns, uint *sp);
 

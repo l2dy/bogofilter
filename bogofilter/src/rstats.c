@@ -123,7 +123,7 @@ void rstats_fini(size_t robn, FLOAT P, FLOAT Q, double spamicity)
     header.spamicity  = spamicity;
 }
 
-void rstats_print(void)
+void rstats_print(bool unsure)
 {
     size_t r;
     size_t robn  = header.robn;
@@ -139,9 +139,8 @@ void rstats_print(void)
 
     if (Rtable || verbose>=3)
 	rstats_print_rtable(rstats_array, count);
-    else
-	if (verbose==2)
-	    rstats_print_histogram(robn, rstats_array, count);
+    else if (verbose==2 || (unsure && verbose == 1))
+	rstats_print_histogram(robn, rstats_array, count);
 
     xfree(rstats_array);
 }

@@ -70,12 +70,13 @@ rf_method_t rf_robinson_method = {	/* needed by config.c */
 
 void rob_print_stats(FILE *fp)
 {
+    bool unsure = (*method->status)() == RC_UNSURE;
+
     fp = NULL; 	/* quench compiler warning */
     if (Rtable || verbose >= 2 ||
 	rob_stats.s.spamicity > thresh_stats || 
-	rob_stats.s.spamicity > thresh_rtable || 
-	(*method->status)() == RC_UNSURE )
-	rstats_print();
+	rob_stats.s.spamicity > thresh_rtable )
+	rstats_print(unsure);
 }
 
 static void wordprob_add(wordcnts_t *cnts, uint count, uint bad)
