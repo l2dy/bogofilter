@@ -1,8 +1,11 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.1  2002/09/14 22:15:20  adrian_otto
- * Initial revision
- * */
+ * Revision 1.2  2002/09/15 16:31:41  relson
+ * Substitute STDIN_FILENO where numeric constant 0 is used as a file descriptor.
+ *
+/* Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
+/* 0.7.3 Base Source
+/* */
 /*****************************************************************************
 
 NAME:
@@ -132,33 +135,33 @@ int main(int argc, char **argv)
     }
     else if (register_spam)
     {
-	register_words(0, &spam_list, NULL);
+	register_words(STDIN_FILENO, &spam_list, NULL);
 	write_list(&spam_list);
 	if (verbose)
 	    printf("bogofilter: %lu messages on the spam list\n", spam_list.msgcount);
     }
     else if (register_ham)
     {
-	register_words(0, &ham_list, NULL);
+	register_words(STDIN_FILENO, &ham_list, NULL);
 	write_list(&ham_list);
 	if (verbose)
 	    printf("bogofilter: %lu messages on the ham list\n", ham_list.msgcount);
     }
     else if (spam_to_ham)
     {
-	register_words(0, &ham_list, &spam_list);
+	register_words(STDIN_FILENO, &ham_list, &spam_list);
 	write_list(&ham_list);
 	write_list(&spam_list);
     }
     else if (ham_to_spam)
     {
-	register_words(0, &spam_list, &ham_list);
+	register_words(STDIN_FILENO, &spam_list, &ham_list);
 	write_list(&ham_list);
 	write_list(&spam_list);
     }
     else
     {
-	int	status = bogofilter(0);
+	int	status = bogofilter(STDIN_FILENO);
 
 	if (passthrough)
 	{
