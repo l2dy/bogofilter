@@ -203,8 +203,8 @@ void rstats_print_rtable(size_t robn, rstats_t **rstats_array)
     size_t r;
 
     /* print header */
-    (void)fprintf(stdout, "     %-20s%10s%10s%10s%10s%10s\n",
-		  "Token","pgood","pbad","fw","invfwlog","fwlog");
+    (void)fprintf(stdout, "%-20s%10s%10s%10s%10s%10s\n",
+		  "","pgood","pbad","fw","invfwlog","fwlog");
 
     /* Print 1 line per token */
     for (r= 0; r<robn; r+=1)
@@ -213,8 +213,8 @@ void rstats_print_rtable(size_t robn, rstats_t **rstats_array)
 	double prob = cur->prob;
 	char flag = (fabs(prob-EVEN_ODDS) < min_dev) ? '-' : '+';
 
-	(void)fprintf(stdout, "%3d  %-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f %c\n",
-		      r+1, cur->token, cur->good, cur->bad, prob, 
+	(void)fprintf(stdout, "%-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f %c\n",
+		      cur->token, cur->good, cur->bad, prob, 
 		      log(1.0 - prob), log(prob), flag);
     }
 
