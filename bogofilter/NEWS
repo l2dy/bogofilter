@@ -8,6 +8,10 @@ is in the RELEASE.NOTES files!
 
 $Id$
 
+	2003-08-29
+
+	* Fix defective printing in 'bogofilter -Q' output.
+
 	2003-08-28
 
 	* Revise mime processing to cure "fatal flex scanner internal
