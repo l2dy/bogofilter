@@ -115,14 +115,18 @@ libbogofilter_a_SOURCES = \
 	$(version_sources)
 
 if ENABLE_TDB_DATASTORE
-libbogofilter_a_SOURCES += datastore_tdb.c
+datastore_SOURCE = datastore_tdb.c
 else
 if ENABLE_QDBM_DATASTORE
-libbogofilter_a_SOURCES += datastore_qdbm.c
+datastore_SOURCE = datastore_qdbm.c
 else
-libbogofilter_a_SOURCES += datastore_db.c
+datastore_SOURCE = datastore_db.c
 endif
 endif
+
+datastore_OBJECT = $(datastore_SOURCE:.c=.o)
+
+libbogofilter_a_SOURCES += $(datastore_SOURCE)
 
 CLEANFILES=version.c directories.c bogoupgrade
 
@@ -186,7 +190,9 @@ directories.c: ../config.status
 	flex -o$@.new $< && \
 	sed 's/yy_rule_linenum\[yy_act\]/(long int)yy_rule_linenum[yy_act]/; s/accepting rule at line %d/accepting rule at line %ld/' <$@.new >$@ && rm -f $@.new || \
 	rm -f $@ $@.new
-
+#
+$(datastore_OBJECT): Makefile $(datastore_SOURCE)
+#
 bogoupgrade: bogoupgrade.in Makefile
 	rm -f $@
 	sed 's}[@]PERL@}$(PERL)}' <$(srcdir)/bogoupgrade.in >$@ || rm -f $@
