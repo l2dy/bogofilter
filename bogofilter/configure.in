@@ -190,7 +190,9 @@ dnl AC_FUNC_STAT
 # AC_FUNC_STAT wants to replace stat(2) if stat("", &st) succeeds.
 # we catch this.
 
-AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl strchr strrchr memcpy)
+AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup)
+AC_CHECK_FUNCS(strerror flock lockf fcntl strchr strrchr memcpy)
+AC_REPLACE_FUNCS(strlcpy strlcat)
 
 if test "$sysconfdir" = "\${prefix}/etc" \
     && { test "$prefix" = "NONE" || test "$prefix" = "/usr" \

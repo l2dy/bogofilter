@@ -29,7 +29,7 @@ man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
 sysconf_DATA = bogofilter.cf.example
 
 noinst_LIBRARIES = libbogofilter.a
-LDADD = libbogofilter.a
+LDADD = libbogofilter.a @LIBOBJS@
 
 # what to build that from
 libbogofilter_a_SOURCES= \
@@ -81,7 +81,8 @@ EXTRA_DIST = $(man_MANS) \
 	     README.cvs README.freebsd README.hp-ux \
 	     README.dcdflib README.Robinson \
 	     $(extradistdirs) \
-	     bogofilter-SA-2002-01
+	     bogofilter-SA-2002-01 \
+	     strlcat.3 strlcpy.3
 #
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
 version.c:	version.sh $(VERSION_FROM)
