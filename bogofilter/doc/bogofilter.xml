@@ -478,25 +478,6 @@ is missing or the hard disk has filled up in <option>-p</option> mode.</para>
 <refsect1 id='integration'><title>INTEGRATION WITH OTHER TOOLS</title>
 
 <para>Use with procmail</para>
-<para>The following procmail rule will take mail on stdin and save
-it to file <filename>spam</filename> if
-<application>bogofilter</application> thinks it's spam:
-<programlisting>:0HB:
-* ? bogofilter
-spam
-</programlisting>
-
-and this similar rule will also register the tokens in the mail
-according to the bogofilter classification:
-
-<programlisting>:0HB:
-* ? bogofilter -u
-spam
-</programlisting>
-</para>
-<para>If <application>bogofilter</application> fails (returning 3) the
-message will be treated as non-spam.</para>
-
 <para>The following recipe (a) spam-bins anything that
 <application>bogofilter</application> rates as spam, (b) registers the
 words in messages rated as spam as such, and (c) registers the
@@ -527,6 +508,25 @@ intervene (with <option>-Ns</option> or <option>-Sn</option>) when
 * ^X-Bogosity: Spam, tests=bogofilter
 spam-bogofilter
 </programlisting>
+
+<para>The following procmail rule will take mail on stdin and save
+it to file <filename>spam</filename> if
+<application>bogofilter</application> thinks it's spam:
+<programlisting>:0HB:
+* ? bogofilter
+spam
+</programlisting>
+
+and this similar rule will also register the tokens in the mail
+according to the bogofilter classification:
+
+<programlisting>:0HB:
+* ? bogofilter -u
+spam
+</programlisting>
+</para>
+<para>If <application>bogofilter</application> fails (returning 3) the
+message will be treated as non-spam.</para>
 
 <para>This one is for maildrop, it automatically defers the mail and
     retries later when the xfilter command fails, use this in your
