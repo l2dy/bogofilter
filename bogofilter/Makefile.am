@@ -6,6 +6,18 @@ AUTOMAKE_OPTIONS = foreign 1.5
 SUBDIRS = . tests doc contrib
 SYSCONFDIR = @sysconfdir@
 
+#if ENABLE_GRAHAM_METHOD
+GRAHAM_FILES = graham.c graham.h 
+#endif
+
+#if ENABLE_ROBINSON_METHOD
+ROBINSON_FILES = robinson.c robinson.h 
+#endif
+
+#if ENABLE_ROBINSON_FISHER
+FISHER_FILES = fisher.c fisher.h 
+#endif
+
 # what to build
 bin_PROGRAMS = bogofilter bogoutil bogolexer
 bin_SCRIPTS = bogoupgrade
@@ -25,7 +37,7 @@ CLEANFILES=directories.h
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c \
 		     config.c directories.h register.c register.h \
-		     graham.c graham.h robinson.c robinson.h \
+		     $(GRAHAM_FILES) $(ROBINSON_FILES) $(FISHER_FILES) \
 		     rstats.h rstats.c \
                      wordhash.h wordhash.c wordlists.h wordlists.c \
 		     $(MYCOMMON) common.h method.h version.h
