@@ -46,7 +46,7 @@ void print_stats(FILE *fp)
     method->print_stats(fp);
 }
 
-rc_t bogofilter(double *xss) /*@globals errno@*/
+rc_t bogofilter()
 /* evaluate text for spamicity */
 {
     rc_t	status;
@@ -77,9 +77,6 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
     spamicity = method->compute_spamicity(wordhash, NULL);
 
     status = method->status();
-
-    if (xss != NULL)
-        *xss = spamicity;
 
     if (run_type & RUN_UPDATE)		/* Note: don't register if RC_UNSURE */
     {

@@ -93,20 +93,20 @@ NAME="bulk-single"
 # test scoring of files listed on stdin
 
 NAME="bulk-stdin"
-ls $pattern | $BOGOFILTER -c $CFG $OPT -b | \
+ls $pattern | $BOGOFILTER -c $CFG $OPT -b -D | \
     sed s@.*inputs/@./inputs/@ >${TMPDIR}/$NAME.out
 
 # test scoring of files listed on linend
 
 NAME="bulk-linend"
-$BOGOFILTER -c $CFG $OPT -B `ls $pattern` | \
+$BOGOFILTER -c $CFG $OPT -B -D `ls $pattern` | \
     sed s@.*inputs/@./inputs/@ >${TMPDIR}/$NAME.out >${TMPDIR}/$NAME.out
 
 # test scoring each file twice (using linend)
 
 NAME="bulk-double-1"
 for f in $pattern ; do 
-    map_rc $BOGOFILTER -c $CFG $OPT -B $f $f | \
+    map_rc $BOGOFILTER -c $CFG $OPT -B -D $f $f | \
 	sed s@.*inputs/@./inputs/@ >> ${TMPDIR}/$NAME.tmp
 done
 sort -u < ${TMPDIR}/$NAME.tmp > ${TMPDIR}/$NAME.out
@@ -117,7 +117,7 @@ NAME="bulk-double-2"
 for f in $pattern ; do 
     t="${TMPDIR}/`basename $f`"
     grep -v "^From "< $f > $t
-    map_rc $BOGOFILTER -c $CFG $OPT -B $t $t | \
+    map_rc $BOGOFILTER -c $CFG $OPT -B -D $t $t | \
 	sed s@.*/@./inputs/@ >> ${TMPDIR}/$NAME.tmp
 done
 sort -u < ${TMPDIR}/$NAME.tmp > ${TMPDIR}/$NAME.out

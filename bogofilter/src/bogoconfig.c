@@ -321,9 +321,9 @@ static void help(void)
 */
 	);
     (void)fprintf(stderr,
-		  "\t  -M      - set mailbox mode. Classify multiple messages in an mbox formatted file.\n"
-		  "\t  -b      - set streaming bulk mode. Classify multiple messages whose filenames are read from STDIN.\n"
-		  "\t  -B name1 name2 ... - set bulk mode. Classify multiple messages named as files on the command line.\n"
+		  "\t  -M      - set mailbox mode.  Classify multiple messages in an mbox formatted file.\n"
+		  "\t  -b      - set streaming bulk mode. Process multiple messages whose filenames are read from STDIN.\n"
+		  "\t  -B name1 name2 ... - set bulk mode. Process multiple messages named as files on the command line.\n"
 		  "\t  -F      - force printing of spamicity numbers.\n"
 		  "\t  -R      - print an R data frame.\n"
 	);

@@ -53,6 +53,8 @@ CONTRIBUTORS:
 
 extern int Rtable;
 
+FILE  *fpo;
+
 char msg_register[256];
 char msg_bogofilter[256];
 size_t msg_register_size = sizeof(msg_register);
@@ -74,7 +76,7 @@ static void cleanup_exit(int exitcode, int killfiles) {
     exit(exitcode);
 }
 
-static int classify(int argc, char **argv, FILE *out);
+static rc_t classify(void);
 static void initialize(FILE *fp);
 
 static void initialize(FILE *fp)
@@ -86,7 +88,9 @@ static void initialize(FILE *fp)
     lexer_v3_init(fp);
 }
 
-static int classify(int argc, char **argv, FILE *out)
+typedef rc_t (*arg_foreach_t)(void);
+
+static int arg_foreach(arg_foreach_t hook, int argc, char **argv)
 {
     int  exitcode = 0;
     bool error = false;
@@ -133,31 +137,24 @@ static int classify(int argc, char **argv, FILE *out)
 		continue;
 	    }
 	    initialize(fpin);
-	    fprintf(out, "%s ", filename ); 
+	    fprintf(dbgout, "%s ", filename ); 
 	}
 
-	passthrough_setup();
-	do {
-	    init_msg_counts();
-	    token_init();
-	    init_charset_table(charset_default, true);
+	status = hook();
 
-	    status = bogofilter(NULL);
-	    write_message(out, status);
+	exitcode = !error ? 0 : 1;
 
-	    rstats_cleanup();
-	} while (status == RC_MORE);
-
-	passthrough_cleanup();
-
-	if (bulk_mode == B_NORMAL && status != RC_MORE) {
-	    exitcode = (status == RC_SPAM) ? 0 : 1;
-	    if (nonspam_exits_zero && exitcode == 1)
-		exitcode = 0;
-	    done = true;
-	}
-	else {
-	    exitcode = !error ? 0 : 1;
+	if (bulk_mode == B_NORMAL) {
+	    if ((run_type & (REG_SPAM | REG_GOOD | UNREG_SPAM | UNREG_GOOD)) != 0)
+		done = true;
+	    else {
+		if (status != RC_MORE) {
+		    exitcode = (status == RC_SPAM) ? 0 : 1;
+		    if (nonspam_exits_zero && exitcode == 1)
+			exitcode = 0;
+		    done = true;
+		}
+	    }
 	}
     }
     return exitcode;
@@ -166,23 +163,21 @@ static int classify(int argc, char **argv, FILE *out)
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
     int   exitcode;
-    FILE  *out;
 
     process_args_and_config_file(argc, argv, true);
 
     /* open all wordlists */
     open_wordlists((run_type == RUN_NORMAL) ? DB_READ : DB_WRITE);
 
-    out = output_setup();
+    fpo = output_setup();
 
     initialize(NULL);
 
     if (run_type & (RUN_NORMAL | RUN_UPDATE)) {
-	exitcode = classify(argc, argv, out);
+	exitcode = arg_foreach(classify, argc, argv);
     }
     else {
-	register_messages(run_type);
-	exitcode = 0;
+	exitcode = arg_foreach(register_messages, argc, argv);
     }
 
     close_wordlists(false);
@@ -194,7 +189,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     /* cleanup storage */
     db_cleanup();
     mime_cleanup();
-    rstats_cleanup();
     token_cleanup();
     xfree(directory);
 
@@ -251,6 +245,27 @@ static int read_seek(char **out, void *in) {
 }
 
 typedef int (*readfunc_t)(char **, void *);
+
+static rc_t classify()
+{
+    rc_t status = RC_MORE;
+    
+    passthrough_setup();
+    do {
+	init_msg_counts();
+	token_init();
+	init_charset_table(charset_default, true);
+	
+	status = bogofilter();
+	write_message(fpo, status);
+	
+	rstats_cleanup();
+    } while (status == RC_MORE);
+    
+    passthrough_cleanup();
+    
+    return status;
+}
 
 static void write_message(FILE *fp, rc_t status)
 {

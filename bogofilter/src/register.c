@@ -53,7 +53,7 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
   format_log_update(msg_register, msg_register_size, u, r, wordcount, msgcount);
 
   if (verbose)
-    (void)fprintf(stderr, "# %d word%s, %d message%s\n", 
+    (void)fprintf(dbgout, "# %d word%s, %d message%s\n", 
 		  wordcount, PLURAL(wordcount), msgcount, PLURAL(msgcount));
 
   set_list_active_status(false);
@@ -128,7 +128,7 @@ static void add_hash(wordhash_t *dest, wordhash_t *src) {
  * cap-and-accumulation phase. we save more than half of the execution
  * time for big mbox inputs, when teaching bogofilter.
  */
-void register_messages(run_t _run_type)
+rc_t register_messages()
 {
   wordhash_t *words = wordhash_init();
   long	msgcount = 0;
@@ -148,6 +148,8 @@ void register_messages(run_t _run_type)
   } while (token_type != NONE);
 
   wordhash_sort(words);
-  register_words(_run_type, words, msgcount);
+  register_words(run_type, words, msgcount);
   wordhash_free(words);
+
+  return RC_OK;
 }
