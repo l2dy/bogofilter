@@ -123,9 +123,9 @@ static bool process_config_parameter(const parm_desc *arg, char *val)
 	    }
 	case CP_DIRECTORY:
 	    {
-		char *dir = *arg->addr.s;
-		xfree(dir);
-		*arg->addr.s = dir = tildeexpand(val);
+		char *dir = tildeexpand(val);
+		xfree(*arg->addr.s);
+		*arg->addr.s = dir;
 		if (DEBUG_CONFIG(2))
 		    fprintf(dbgout, "%s -> '%s'\n", arg->name, dir);
 		if (setup_wordlists(dir) != 0)
