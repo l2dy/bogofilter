@@ -1,5 +1,8 @@
 # $Id$
 # $Log$
+# Revision 1.6  2002/09/17 11:35:08  m-a
+# Remove check for [v]fork(), bogofilter does not fork() at the moment.
+#
 # Revision 1.5  2002/09/17 11:33:37  m-a
 # Build .spec automatically from .spec.in.
 # In the .spec file: include all documentation, add --manpath and ,
@@ -131,7 +134,6 @@ AC_TYPE_SIGNAL
 # Checks for library functions.
 AC_CHECK_HEADERS([sys/file.h])
 AC_CHECK_HEADERS([syslog.h])
-AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_FUNC_STAT
 
