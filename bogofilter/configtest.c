@@ -22,6 +22,8 @@ AUTHOR:
 #include "xmalloc.h"
 #include "xstrdup.h"
 
+#include "bogoconfig.h"
+
 #ifndef	DEBUG_CONFIG
 #define DEBUG_CONFIG(level)	(verbose > level)
 #endif
@@ -33,11 +35,9 @@ int thresh_index = 1;
 double thresh_stats = 0.2f;		// EVEN_ODDS
 double thresh_rtable=0.3f;
 char *spam_header_name = "X-Bogosity";
-const char *user_config_file   = "~/.bogofilter.cf";
+char *user_config_file   = ".bogofilter.cf";
 
 run_t run_type = RUN_NORMAL; 
-
-extern void read_config_file( const char *filename );
 
 int main( int argc, char **argv)
 {
@@ -47,9 +47,9 @@ int main( int argc, char **argv)
 	if (strcmp(arg, "-v") == 0)
 	    verbose = 1;
     }
-    read_config_file( "/etc/bogofilter.cf" );
-    read_config_file( "./bogofilter.cf" );
-    read_config_file( "~/.bogofilter.cf" );
+    read_config_file("/etc/bogofilter.cf", 0);
+    read_config_file(".bogofilter.cf", 1);
+    /* read_config_file("./bogofilter.cf", 0); */
     return 0;
 }
 
