@@ -137,7 +137,7 @@ static double compute_probability(const word_t *token, wordprop_t *wordstats)
 	    override=list->override;
 
 	    wordprob_add(wordstats, count, list->bad);
-	    if (DEBUG_WORDLIST(1)) {
+	    if (DEBUG_ROBINSON(1)) {
 		fprintf(dbgout, "%2d %2d \n", (int) wordstats->good, (int) wordstats->bad);
 		word_puts(token, 0, dbgout);
 		fputc('\n', dbgout);
@@ -167,14 +167,14 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 
     (void) fp; 	/* quench compiler warning */
 
-    if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### rob_compute_spamicity() begins\n");
+    if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() begins\n");
 
     Rtable |= verbose > 3;
 
     if (Rtable || verbose)
 	rstats_init();
 
-    if (DEBUG_WORDLIST(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
+    if (DEBUG_ROBINSON(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
 				   min_dev, robs, robx);
 
     wordhash_sort(wordhash);
@@ -209,7 +209,7 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
             robn ++;
         }
 
-	if (DEBUG_WORDLIST(3)) {
+	if (DEBUG_ROBINSON(3)) {
 	    (void)fprintf(dbgout, "%3lu %3lu %f ",
 			  (unsigned long)robn, (unsigned long)count, prob);
 	    (void)word_puts(token, 0, dbgout);
@@ -226,7 +226,7 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     if (robn && (Rtable || verbose))
 	rstats_fini(robn, P, Q, spamicity );
 
-    if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### rob_compute_spamicity() ends\n");
+    if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() ends\n");
 
     return (spamicity);
 }
