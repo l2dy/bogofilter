@@ -31,7 +31,8 @@ YOU MUST ADJUST YOUR SCRIPTS IF YOU ARE EVALUATING "X-Bogosity" HEADERS!
 
 YOU MAY NEED TO ADJUST YOUR SCRIPTS IF YOU ARE PARSING 'bogofilter -V' OUTPUT!
 
-YOU MUST READ doc/README.db AND POSSIBLY CONFIGURE THE DATABASE!
+WHEN USING BERKELEY DB (DEFAULT), NFS NO LONGER WORKS AND
+YOU   M U S T   READ doc/README.db AND POSSIBLY CONFIGURE THE DATABASE!
 
 
 Defaults changed
@@ -54,6 +55,9 @@ Berkeley DB switched to Transactional Data Store
 
 Bogofilter will now use the Berkeley DB Transactional Data Store when
 compiled with Berkeley DB as the data base engine (the default).
+
+This means the Berkeley DB directory can no longer reside on a networked
+or otherwise shared file system (such as NFS, AFS, Coda).
 
 When using BerkeleyDB 4.1 or 4.2, it is recommended that you dump and
 load the data bases to add checksums, for enhanced reliablity. See
