@@ -308,10 +308,7 @@ token_t get_token(void)
 	    yylval->text[yylval->leng] = (byte) '\0';
 	}
 
-	/* Need separate loop so lexer can see "From", "Date", etc *
-	 * depending on options set, replace nonascii characters by '?'s
-	 * and/or replace upper case by lower case
-	 */
+	/* replace nonascii characters by '?'s */
 	for (cp = yylval->text; cp < yylval->text+yylval->leng; cp += 1)
 	    *cp = casefold_table[*cp];
     }
