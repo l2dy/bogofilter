@@ -79,7 +79,7 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 	    }
 	case CP_INTEGER:
 	    {
-		if (!xatoi(arg->addr.i, val))
+		if (!xatoi(arg->addr.i, (const char *)val))
 		    fprintf(stderr, "cannot parse integer value '%s'\n", val);
 		if (DEBUG_CONFIG(0))
 		    fprintf(dbgout, "%s -> %d\n", arg->name, *arg->addr.i);
