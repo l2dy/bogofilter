@@ -54,10 +54,10 @@ AUTHOR:
 const char *progname = "bogotune";
 char *ds_file;
 
-uint max_messages_per_mailbox = 0;
+u_int32_t max_messages_per_mailbox = 0;
 
 extern double robx, robs;
-uint target = 0;
+u_int32_t target = 0;
 
 word_t *w_msg_count;
 wordhash_t *t_ns, *t_sp;
@@ -68,14 +68,14 @@ wordlist_t *ns_msglists, *sp_msglists;
 flhead_t *spam_files, *ham_files;
 
 typedef struct {
-    uint cnt;
+    u_int32_t cnt;
     double *data;
 } data_t;
 
 data_t *rsval;
 data_t *rxval;
 data_t *mdval;
-uint ns_cnt, sp_cnt;
+u_int32_t ns_cnt, sp_cnt;
 
 double *ns_scores;
 double *sp_scores;
@@ -109,7 +109,7 @@ static int get_cnt(double fst, double lst, double amt)
 
 static data_t *seq_by_amt(double fst, double lst, double amt)
 {
-    uint i;
+    u_int32_t i;
     data_t *val = xcalloc(1, sizeof(data_t));
 
     val->cnt = get_cnt(fst, lst, amt);
@@ -123,7 +123,7 @@ static data_t *seq_by_amt(double fst, double lst, double amt)
 
 static data_t *seq_by_pow(double fst, double lst, double amt)
 {
-    uint i;
+    u_int32_t i;
     data_t *val = xcalloc(1, sizeof(data_t));
 
     val->cnt = get_cnt(fst, lst, amt);
@@ -193,7 +193,7 @@ static void init_fine(double _rs, double _md, double _rx)
 
 static void print_parms(const char *label, const char *format, data_t *data)
 {
-    uint i;
+    u_int32_t i;
     printf("  %s: %2d ", label, data->cnt);
     for (i = 0; i < data->cnt; i += 1) {
 	printf("%s", (i==0) ? " (" : ", ");
@@ -238,8 +238,8 @@ static int compare_results(const void *const ir1, const void *const ir2)
 
 static void score_ns(double *results)
 {
-    uint i;
-    uint count = 0;
+    u_int32_t i;
+    u_int32_t count = 0;
 
     if (verbose >= SCORES)
 	printf("ns:\n");
@@ -261,8 +261,8 @@ static void score_ns(double *results)
 
 static void score_sp(double *results)
 {
-    uint i;
-    uint count = 0;
+    u_int32_t i;
+    u_int32_t count = 0;
 
     for (i=0; i < COUNTOF(sp_msglists->u.sets); i += 1) {
 	mlhead_t *list = sp_msglists->u.sets[i];
@@ -277,10 +277,10 @@ static void score_sp(double *results)
     return;
 }
 
-static uint get_fn_count(uint count, double *results)
+static u_int32_t get_fn_count(u_int32_t count, double *results)
 {
-    uint i;
-    uint fn = 0;
+    u_int32_t i;
+    u_int32_t fn = 0;
 
     for (i=0; i < count; i += 1) {
 	double score = results[i];
@@ -293,9 +293,9 @@ static uint get_fn_count(uint count, double *results)
 
 /* compute scores and get fp target and spam cutoff value */
 
-static uint get_thresh(uint count, double *scores)
+static u_int32_t get_thresh(u_int32_t count, double *scores)
 {
-    uint ft;
+    u_int32_t ft;
     static bool show_first = false;
 
     score_ns(scores);			/* scores in ascending order */
@@ -305,7 +305,7 @@ static uint get_thresh(uint count, double *scores)
     spam_cutoff = scores[count - ft];	/* get cutoff value */
 
     if (show_first) {
-	uint f;
+	u_int32_t f;
 	show_first = false;
 	for (f = 1; f <= ft; f += 1) 
 	    printf("%2d %5d %8.6f\n", f, count-f, scores[count-f]);
@@ -328,9 +328,9 @@ static uint get_thresh(uint count, double *scores)
     return ft;
 }
 
-static uint read_mailbox(char *arg)
+static u_int32_t read_mailbox(char *arg)
 {
-    uint count = 0;
+    u_int32_t count = 0;
     wordlist_t *ns_or_sp = (run_type == REG_GOOD) ? ns_msglists : sp_msglists;
     wordhash_t *train = ns_and_sp->train;
 
@@ -374,9 +374,9 @@ static uint read_mailbox(char *arg)
     return count;
 }
 
-static uint filelist_read(int mode, flhead_t *list)
+static u_int32_t filelist_read(int mode, flhead_t *list)
 {
-    uint count = 0;
+    u_int32_t count = 0;
     flitem_t *item;
     run_type = mode;
     lexer = NULL;
@@ -551,7 +551,7 @@ static void load_wordlist(char *file)
 	size_t path_len = strlen(path);
 	char del = path[path_len-1];
 	path = xmalloc(path_len + strlen(WORDLIST) + 2);
-	sprintf(path, "%s%s%s", path, (del == DIRSEP_C) ? "" : DIRSEP_S, WORDLIST);
+	sprintf(path, "%s%s%s", file, (del == DIRSEP_C) ? "" : DIRSEP_S, WORDLIST);
     }
 	 
     if (verbose) {
@@ -592,8 +592,8 @@ static void robx_accum(word_t *key,
 {
     rh_t *rh = userdata;
     wordprop_t *wp = data;
-    uint32_t goodness = wp->good;
-    uint32_t spamness = wp->bad;
+    u_int32_t goodness = wp->good;
+    u_int32_t spamness = wp->bad;
     double prob = spamness / (goodness * rh->scalefactor + spamness);
     bool doit = goodness + spamness >= 10;
 
@@ -613,8 +613,8 @@ static double robx_compute(wordhash_t *wh)
 {
     double rx;
     wordprop_t *p = wordhash_search(wh, w_msg_count, 0);
-    uint32_t msg_good = p->good;
-    uint32_t msg_spam = p->bad;
+    u_int32_t msg_good = p->good;
+    u_int32_t msg_spam = p->bad;
 
     rh_t rh;
     rh.scalefactor = (double)msg_spam/(double)msg_good;
@@ -645,7 +645,7 @@ static double robx_init(void)
     return x;
 }
 
-static result_t *results_sort(uint r_count, result_t *results)
+static result_t *results_sort(u_int32_t r_count, result_t *results)
 {
     result_t *ans = xcalloc(r_count, sizeof(result_t));
     memcpy(ans, results, r_count * sizeof(result_t));
@@ -655,7 +655,7 @@ static result_t *results_sort(uint r_count, result_t *results)
 
 static void top_ten(result_t *sorted)
 {
-    uint i;
+    u_int32_t i;
 
     printf("Top ten parameter sets from this scan:\n");
 
@@ -686,9 +686,9 @@ static void top_ten(result_t *sorted)
 
 /* get false negative */
 
-static int gfn(result_t *results, uint rsi, uint mdi, uint rxi)
+static int gfn(result_t *results, u_int32_t rsi, u_int32_t mdi, u_int32_t rxi)
 {
-    uint i = (rsi * mdval->cnt + mdi) * rxval->cnt + rxi;
+    u_int32_t i = (rsi * mdval->cnt + mdi) * rxval->cnt + rxi;
     result_t *r = &results[i];
     int fn = r->fn;
     if (verbose > 100)
@@ -696,17 +696,17 @@ static int gfn(result_t *results, uint rsi, uint mdi, uint rxi)
     return fn;
 }
 
-static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsorted)
+static result_t *count_outliers(u_int32_t r_count, result_t *sorted, result_t *unsorted)
 {
     bool f = false;
-    uint i, o = 0;
-    uint fn;
-    uint rsi, mdi, rxi;
-    uint rsc = rsval->cnt - 1;
-    uint rxc = rxval->cnt - 1;
-    uint mdc = mdval->cnt - 1;
+    u_int32_t i, o = 0;
+    u_int32_t fn;
+    u_int32_t rsi, mdi, rxi;
+    u_int32_t rsc = rsval->cnt - 1;
+    u_int32_t rxc = rxval->cnt - 1;
+    u_int32_t mdc = mdval->cnt - 1;
     result_t *r = &sorted[r_count / 4];
-    uint mfn = r->fn;			/* median false negative */
+    u_int32_t mfn = r->fn;			/* median false negative */
 
     if (verbose)
 	printf("25%% fn count was %d\n", mfn);
@@ -748,10 +748,10 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
     return r;
 }
 
-static void progress(uint cur, uint top)
+static void progress(u_int32_t cur, u_int32_t top)
 {
-    uint i;
-    uint ndots = ceil(70.0 * cur / top);
+    u_int32_t i;
+    u_int32_t ndots = ceil(70.0 * cur / top);
     if (ndots < 1)
 	ndots = 1;
      printf("\r[");
@@ -764,10 +764,10 @@ static void progress(uint cur, uint top)
 
 static void final_recommendations(void)
 {
-    uint m, s;
+    u_int32_t m, s;
     bool printed = false;
     const char *comment= "";
-    uint minn[] = { 10000, 2000, 1000, 500, 1 };
+    u_int32_t minn[] = { 10000, 2000, 1000, 500, 1 };
 
     printf("Performing final scoring:\n");
 
@@ -791,14 +791,14 @@ static void final_recommendations(void)
 
     for (m=0; m < COUNTOF(minn); m += 1) {
 	double cutoff;
-	uint i, fp = 0, fn = 0;
-	uint mn = minn[m];
+	u_int32_t i, fp = 0, fn = 0;
+	u_int32_t mn = minn[m];
 
 	if (ns_cnt < mn)
 	    continue;
 
 	if (mn > 1 ) {
-	    uint t = (ns_cnt + mn - 1) / mn;
+	    u_int32_t t = (ns_cnt + mn - 1) / mn;
 	    cutoff = ns_scores[ns_cnt-t];
 	    if (cutoff > 0.999)
 		continue;
@@ -870,8 +870,9 @@ static void bogotune_free(void)
 
 static rc_t bogotune(void)
 {
-    uint scan;
-    uint beg, end, cnt;
+    u_int32_t scan;
+    int beg, end;
+    u_int32_t cnt;
     rc_t status = RC_OK;
 
     wordprop_t *props;
@@ -896,7 +897,7 @@ static rc_t bogotune(void)
     end = time(NULL);
 
     if (verbose) {
-	uint tm = end - beg;
+	int tm = end - beg;
 	cnt = ns_cnt + sp_cnt;
 	printf("    %2dm:%02ds for %d messages.  avg = %5.1f msg/sec\n", MIN(tm), SECONDS(tm), cnt, (double)cnt/(tm));
     }
@@ -975,9 +976,9 @@ static rc_t bogotune(void)
 
     for (scan=0; scan <= 1; scan += 1) {
 	bool f;
-	uint i;
-	uint r_count;
-	uint rsi, rxi, mdi;
+	u_int32_t i;
+	u_int32_t r_count;
+	u_int32_t rsi, rxi, mdi;
 	result_t *results, *r;
 	result_t *sorted;
 
@@ -1023,7 +1024,7 @@ static rc_t bogotune(void)
 	    for (mdi = 0; mdi < mdval->cnt; mdi += 1) {
 		min_dev = mdval->data[mdi];
 		for (rxi = 0; rxi < rxval->cnt; rxi += 1) {
-		    uint fp, fn;
+		    u_int32_t fp, fn;
 		    robx = rxval->data[rxi];
 
 		    spam_cutoff = 0.01;
@@ -1071,7 +1072,7 @@ static rc_t bogotune(void)
 	    printf("\n");
 
 	if (verbose >= SUMMARY) {
-	    uint tm = end - beg;
+	    u_int32_t tm = end - beg;
 	    printf("    %2dm:%02ds for %d iterations.  avg = %5.3fs\n", MIN(tm), SECONDS(tm), cnt, (double)(tm)/cnt);
 	}
 
