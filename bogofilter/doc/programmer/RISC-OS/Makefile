@@ -10,7 +10,6 @@ CC = cc
 # Define exactly one of the following three in order to use that database:
 
 USE_DB = qdbm
-#USE_DB = sdbm
 #USE_DB = tdb
 
 
@@ -22,18 +21,12 @@ DBINCLUDE = ^.^.qdbm
 DBLIB = ^.^.qdbm.libqdbm
 DBSTORE = o.datastore_qdbm
 else
-ifeq (${USE_DB},sdbm)
-DBINCLUDE = ^.^.sdbm
-DBLIB = ^.^.sdbm.libsdbm
-DBSTORE = o.datastore_sdbm
-else
 ifeq (${USE_DB},tdb)
 DBINCLUDE = ^.^.tdb
 DBLIB = ^.^.tdb.libtdb
 DBSTORE = o.datastore_tdb
 else
 # No other database supported!
-endif
 endif
 endif
 

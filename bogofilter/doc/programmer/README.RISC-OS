@@ -8,9 +8,8 @@ There are two prerequisites for compiling Bogofilter on RISC OS:
    - Norcroft C (available from http://www.castle.org.uk/castle/cinfo.htm)
      and UnixLib (available from http://hard-mofo.dsvr.net/unixlib/)
 
-2. One database of the following three:
+2. One database of the following two:
    - TDB
-   - SDBM
    - QDBM
    There are RISC OS ports for all of them are at
     http://www.sbellon.de/sw-ports.html
