@@ -22,8 +22,6 @@ if [ "$1" = "-v" ]; then
     verbose=1
 fi
 
-V="v"	# verbosity level
-
 BOGOFILTER="$VAL ${relpath}/bogofilter"
 BOGOLEXER="$VAL ${relpath}/bogolexer"
 BOGOUTIL="$VAL ${relpath}/bogoutil"
@@ -61,9 +59,11 @@ $BOGOFILTER -$mth $CFG -n < ${SYSTEST}/inputs/good.mbx
 BOGOFILTER_DIR="${TMPDIR}"
 export BOGOFILTER_DIR
 
-CFG="${TMPDIR}/test.cf"
-OPT="-t -v"
+#V="-vvv"	# verbosity level
+OPT="-t -v -D $V"
 pattern="${SYSTEST}/inputs/msg.?.txt"
+
+CFG="${TMPDIR}/test.cf"
 
 # Fisher tristate
 
@@ -94,20 +94,20 @@ NAME="bulk-single"
 # test scoring of files listed on stdin
 
 NAME="bulk-stdin"
-ls $pattern | $BOGOFILTER -c $CFG $OPT -b -D | \
+ls $pattern | $BOGOFILTER -c $CFG $OPT -b | \
     sed s@.*inputs/@./inputs/@ >${TMPDIR}/$NAME.out
 
 # test scoring of files listed on linend
 
 NAME="bulk-linend"
-$BOGOFILTER -c $CFG $OPT -B -D `ls $pattern` | \
+$BOGOFILTER -c $CFG $OPT -B `ls $pattern` | \
     sed s@.*inputs/@./inputs/@ >${TMPDIR}/$NAME.out >${TMPDIR}/$NAME.out
 
 # test scoring each file twice (using linend)
 
 NAME="bulk-double-1"
 for f in $pattern ; do 
-    map_rc $BOGOFILTER -c $CFG $OPT -B -D $f $f | \
+    map_rc $BOGOFILTER -c $CFG $OPT -B $f $f | \
 	sed s@.*inputs/@./inputs/@ >> ${TMPDIR}/$NAME.tmp
 done
 sort -u < ${TMPDIR}/$NAME.tmp > ${TMPDIR}/$NAME.out
@@ -118,7 +118,7 @@ NAME="bulk-double-2"
 for f in $pattern ; do 
     t="${TMPDIR}/`basename $f`"
     grep -v "^From "< $f > $t
-    map_rc $BOGOFILTER -c $CFG $OPT -B -D $t $t | \
+    map_rc $BOGOFILTER -c $CFG $OPT -B $t $t | \
 	sed s@.*/@./inputs/@ >> ${TMPDIR}/$NAME.tmp
 done
 sort -u < ${TMPDIR}/$NAME.tmp > ${TMPDIR}/$NAME.out
