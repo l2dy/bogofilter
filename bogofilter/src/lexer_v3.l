@@ -241,7 +241,8 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <HTML>"<"					{ BEGIN HDISCARD; }	/* unknown tag */
 
 <HTOKEN>{TOKEN}					{ if (tokenize_html_tags)     return TOKEN; }
-<HDISCARD,LCOMMENT>[^>]*>			{ BEGIN HTML; }		/* discard innards of html tags */
+<HDISCARD>{TOKEN}				{ /* discard innards of html tags     */ }
+<LCOMMENT>{TOKEN}				{ /* discard innards of html comments */ }
 <HSCRIPT>{TOKEN}				{ if (tokenize_html_script)   return TOKEN; }
 
 <HTOKEN,HDISCARD>">"				{ BEGIN HTML; }		/* end of tag; return to normal html processing */
