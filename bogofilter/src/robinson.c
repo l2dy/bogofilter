@@ -189,9 +189,8 @@ static double compute_probability(const word_t *token, wordcnts_t *cnts)
 {
     double prob;
 
-    if (cnts->bad != 0 || cnts->good != 0 || token == NULL)
+    if (cnts->bad != 0 || cnts->good != 0 || msg_count_file)
 	/* A msg-count file already has the values needed */
-	/* Note: token == NULL if msg-count file	  */
 	prob = wordprob_result(cnts);
     else
 	/* Otherwise lookup the word and get its score */
