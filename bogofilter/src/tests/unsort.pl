@@ -10,6 +10,7 @@ my @a = <>;
 chomp @a;
 @a = split ' ', join(' ', @a);
 
+srand(time ^ ($$ + ($$ << 15)));
 while(scalar @a) {
     my $pos = int rand scalar @a;
     print $a[$pos], "\n";
