@@ -10,9 +10,14 @@ Note:
  
 0.17.4	2004-03-??
 
+	2004-03-20
+
+	* Ignore data portion of PGP signatures.
+
 	2004-03-19
 
 	* Fix "Can't find '.MSG_COUNT'" problem in bogotune.
+	* Fix defect that continues decoding base64/qp after invalid chars.
 
 	2004-03-18
 

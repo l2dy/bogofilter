@@ -156,9 +156,9 @@ static int get_decoded_line(buff_t *buff)
     {
 	word_t line;
 	uint decoded_count;
-
         line.leng = (uint) (buff->t.leng - used);
 	line.text = buff->t.text + used;
+
 	decoded_count = mime_decode(&line);
 	/*change buffer size only if the decoding worked */
 	if (decoded_count != 0 && decoded_count < (uint) count) {
@@ -189,7 +189,7 @@ static int skip_folded_line(buff_t *buff)
 	count = reader_getline(buff);
 	yylineno += 1;
 	if (count <= 1 || !isspace(buff->t.text[0])) 
-  	    return count;
+	    return count;
     }
 
 /*    return EOF; */

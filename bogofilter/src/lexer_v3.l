@@ -87,6 +87,7 @@
 
 static word_t yyt;
 static int lineno;
+static bool have_pgp = false;
 
 /* Function Prototypes */
 
@@ -203,6 +204,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 
 %s TEXT HTML BOGO_LEX
 %s HTOKEN HDISCARD SCOMMENT LCOMMENT
+%s PGP_HEAD PGP_BODY
 
 %%
 
@@ -248,6 +250,17 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>\n					{ set_tag("Header"); lineno += 1; }
 <INITIAL>{VERP} 				{ skip_to('='); return VERP; }
 
+^-----BEGIN\ PGP\ SIGNED\ MESSAGE-----$		{ have_pgp = true;     
+						  yy_unput(yytext, yyleng); }
+^-----BEGIN\ PGP\ SIGNATURE-----$		{ if (have_pgp)
+						      BEGIN PGP_HEAD;
+						  yy_unput(yytext, yyleng);
+						}
+<PGP_HEAD>^\n					{ BEGIN PGP_BODY; }
+<PGP_BODY>{TOKEN}				{ /* ignore */ }
+^-----END\ PGP\ SIGNATURE-----$ 		{ BEGIN TEXT;
+						  yy_unput(yytext, yyleng);
+						}
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
 						      yy_set_state_initial();
 						      return BOUNDARY;
@@ -411,6 +424,7 @@ void yy_set_state_initial(void)
     BEGIN INITIAL;
     msg_header = true;
     set_tag("Header");
+    have_pgp = false;
 
     if (DEBUG_LEXER(1))
 	fprintf(dbgout, "BEGIN INITIAL\n");
