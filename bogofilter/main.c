@@ -1,4 +1,5 @@
 /* $Id$ */
+
 /*****************************************************************************
 
 NAME:
@@ -8,6 +9,7 @@ AUTHOR:
    Eric S. Raymond <esr@thyrsus.com>
 
 ******************************************************************************/
+
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -18,7 +20,7 @@ AUTHOR:
 #include <errno.h>
 #include <config.h>
 #ifdef HAVE_SYSLOG_H
-#include <sys/syslog.h>
+#include <syslog.h>
 #endif
 #include "common.h"
 #include "bogofilter.h"
