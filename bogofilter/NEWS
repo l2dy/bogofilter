@@ -7,6 +7,16 @@ is in the RELEASE.NOTES files!
 
 $Id$
 
+0.15.1	2003-09-03
+
+	* Limit size of unfolded header lines.
+
+	2003-09-02
+
+	* Check for xmlto during configuration.
+	* Fix problem in empty line parsing rule.
+	* Fix string termination problem for bulk mode paths.
+
 	2003-09-01
 
 	* Allow -I to be used with file or directory.

@@ -2,18 +2,19 @@
 				BOGOFILTER NEWS
 			       =================
 
-2003-09-01
+0.15.0	2003-09-03
+
+* Check for xmlto during configuration.
+* Fix problem in empty line parsing rule.
+* Fix string termination problem for bulk mode paths.
+* Limit size of unfolded header lines.
 
 * Allow -I to be used with file or directory.
 * Revise flex rule for encoded text to reduce program size.
 
-2003-08-31
-
 * Revise flex grammar:
   - to reduce size of generated rules
   - to simplify handling of header tags and mime parts
-
-2003-08-30
 
 * Clean-up message header processing:
   - Don't tokenize message separator lines.
