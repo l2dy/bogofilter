@@ -124,6 +124,10 @@
           <li><a href="#changed-options">Pourquoi depuis que j'ai
           installé la 0.11, mes scripts ne fonctionnent
           plus?</a></li>
+
+          <li><a href="#changed-exitcodes">Pourquoi depuis que j'ai
+          installé la 0.14, mes scripts ne fonctionnent-ils
+          plus?</a></li>
         </ul>
       </li>
     </ul>
@@ -333,11 +337,18 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
 
     <p>"L'entrainement sur épuisement" est la répétition de l'entrainement sur erreur, avec le même corpus
     de messages, jusqu'à ce que plus aucune erreur ne subsiste. Ceci a bien fonctionné sur plusieurs tests,
-    mais peut être risqué. D'abord, l'intégration multipliée de messages crée une distribution
-    des tokens dans la base de données qui diffère de celle des messages d'entrée, ce qui constitue une
-    violation des postulats de la classification bayésienne, et peut donc aboutir à des résultats imprévisibles. Ensuite,
-    les tokens qui apparaissent "normalement" de manière plus ou moins équitable dans les deux catégories, peuvent, s'ils
-    sont présents dans un message d'une catégorie et avec le phénomène de répétition, faire pencher la balance. De tels effets
+    mais peut être risqué.</p>
+
+    <p>L'intégration multipliée de messages crée une distribution
+    des tokens dans la base de données qui diffère de celle des messages d'entrée.
+    Ceci constitue une
+    violation des postulats de la classification bayésienne, et peut donc aboutir
+    à des résultats imprévisibles.</p>
+
+    <p>Les tokens qui apparaissent "normalement" de manière plus ou moins équitable
+    dans les deux catégories, peuvent, s'ils
+    sont présents dans un message d'une catégorie et avec le phénomène de répétition,
+    faire pencher la balance. De tels effets
     sont temporaires, mais peuvent dégrader l'acuité pendant leur durée.</p>
 
     <p>
@@ -375,7 +386,11 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
     <p>Bogofilter a une option <code>-u</code> qui, automagiquement, met à jour la liste des mots
     après chaque évaluation de messages. Comme Bogofilter fait parfois des erreurs, cette méthode a
     l'inconvénient de dégrader la base d'entrainement avec des entrées erronées. Vous aurez alors
-    besoin de la regarder et la corriger fréquemment. Une stratégie alternative, basée sur la méthode 4 de
+    besoin de la regarder et la corriger fréquemment.
+    La correction peut être faite en utilisant <code>-S</code> pour effacer les spams de la base
+    de données et <code>-N</code> pour enlever les hams.
+
+    <p>Une stratégie alternative, basée sur la méthode 4 de
     la section précédente est la suivante : Périodiquement, prenez des blocs de messages et utilisez les
     scripts de la méthode 4 pour les classer. Analyser manuellement les spams, ham et incertains, corriger
     les erreurs, puis séparer les incertains en hams et spam. Jusqu'à ce que vous ayez 10000 spams et 10000 hams
@@ -393,7 +408,7 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
     </pre>
     <p>ou pour les fichiers spamlist.db et goodlist.db (si vous utilisez Bogofilter avec
     les listes de mots séparés). Ceci compressera les bases de données pour n'occuper que le
-    minimum d'expace disque nécessaire.
+    minimum d'espace disque nécessaire.
   
     </p>
 
@@ -770,7 +785,8 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
     fichier config.h. Les systèmes d'exploitation UNIX supporteront
     quasiment tous ceci. Si vous utilisez une version exotique ou
     particulièrement ancienne, assurez-vous qu'elle supporte
-    fcntl(). Si "#define HAVE_FCNTL 1" est positionné, alors
+    fcntl(). Si "#define HAVE_FCNTL 1" est positionné, ce qui indique
+    que votre système connaît la fonction fcntl(), alors
     décommentez "#define HAVE_FLOCK 1" afin que le système de
     verrouillage utilise fcntl() au lieu du verrouillage flock().
     Si votre système ne supporte pas fcntl, alors vous ne pourrez
@@ -791,8 +807,9 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
     <p>Vraisemblablement les codes de retour ont été réécrits par
     waitpid(2). En C utilisez WEXITSTATUS(status) dans sys/wait.h, ou
     une macro comparable pour obtenir la valeur correcte. En Perl
-    utilisez 'system("bogofilter $input")%256'.</p>
-
+    utilisez 'system("bogofilter $input")>> 8'. 
+    Si vous voulez plus d'information, lancez la commande
+    <code>"man waitpid"</code>.</p>
     <hr>
 
     <h2 id="changed-options">Pourquoi mes scripts échouent depuis
@@ -835,9 +852,19 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
     <p>Les scripts MDA utilisent d'habitude '-s' et '-n' n'ont donc
     pas besoin de modification. Les autres scripts qui utilisaient
     '-S' et '-N' pour corriger les erreurs de classement
-    <i>doivent</i> être changés.</p>
+    <em>doivent</em> être changés.</p>
 
     <hr>
+<hr>
+ 	 
+      <h2 id="changed-exitcodes">Pourquoi depuis que j'ai installé la
+      0.14 mes scripts ne fonctionnent-ils plus?</h2>
+ 	 
+      <p>Bogofilter-0.14 introduit des codes de retour complémentaires pour
+      prendre en compte la troisième classification des mails (spam, ham et
+      unsure). Avant la 0.14, les codes de retour étaient 0 pour spam, 1 pour
+      ham, et 2 pour les erreurs. Désormais c'est 0 pour spam, 1 pour ham, 2
+      pour unsure et 3 pour toute erreur.</p>
 
     <!--
     $Id$
