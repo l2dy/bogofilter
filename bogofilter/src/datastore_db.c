@@ -984,8 +984,6 @@ u_int32_t db_pagesize(bfdir *directory, bffile *db_file)
     int e;
     u_int32_t s;
 
-    char *path = build_path(directory->dirname, db_file->filename);
-
     if (!is_file_or_missing(db_file->filename)) {
 	print_error(__FILE__, __LINE__, "\"%s\" is not a file.", db_file->filename);
 	return 0xffffffff;
@@ -1003,10 +1001,10 @@ u_int32_t db_pagesize(bfdir *directory, bffile *db_file)
 	exit(EX_ERROR);
     }
 
-    e = DB_OPEN(db, path, NULL, dbtype, DB_RDONLY | DB_NOMMAP, DS_MODE);
+    e = DB_OPEN(db, db_file->filename, NULL, dbtype, DB_RDONLY | DB_NOMMAP, DS_MODE);
     if (e != 0) {
 	print_error(__FILE__, __LINE__, "cannot open database %s: %s",
-		path, db_strerror(e));
+		db_file->filename, db_strerror(e));
 	exit(EX_ERROR);
     }
     s = get_psize(db, true);
@@ -1014,7 +1012,7 @@ u_int32_t db_pagesize(bfdir *directory, bffile *db_file)
     e = db->close(db, 0);
     if (e != 0) {
 	print_error(__FILE__, __LINE__, "cannot close database %s: %s",
-		path, db_strerror(e));
+		db_file->filename, db_strerror(e));
 	exit(EX_ERROR);
     }
 
@@ -1025,8 +1023,6 @@ u_int32_t db_pagesize(bfdir *directory, bffile *db_file)
 		directory->dirname, db_strerror(e));
 	exit(EX_ERROR);
     }
-
-    xfree(path);
 
     return s;
 }
