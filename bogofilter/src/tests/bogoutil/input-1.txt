@@ -1,7 +1,0 @@
-# bogofilter wordlist (format version A): 1
-Habanero 1
-Bell	 22
-Marbles  333
-Tabasco  4444
-Serrano  55555
-Pimento  666666
