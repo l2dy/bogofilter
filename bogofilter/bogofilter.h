@@ -11,6 +11,8 @@ enum algorithm { AL_GRAHAM, AL_ROBINSON } algorithm;
 
 extern enum algorithm algorithm;
 
+#define EVEN_ODDS	0.5f		// used for words we want to ignore
+
 #define GRAHAM_GOOD_BIAS	2	// don't give good words more weight
 #define ROBINSON_GOOD_BIAS	1	// don't give good words more weight
 #define GOOD_BIAS (algorithm == AL_GRAHAM ? GRAHAM_GOOD_BIAS : ROBINSON_GOOD_BIAS)

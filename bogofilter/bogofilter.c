@@ -27,15 +27,15 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
 #include <string.h>
-#include <fcntl.h>
 #include <stdlib.h>
 
 #include "common.h"
 #include "bogofilter.h"
 #include "datastore.h"
+#include "rstats.h"
 #include "wordhash.h"
 
 // constants for the Graham formula 
@@ -45,7 +45,6 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 
 #define MAX_PROB	0.99f		// max probability value used
 #define MIN_PROB	0.01f		// min probability value used
-#define EVEN_ODDS	0.5f		// used for words we want to ignore
 #define DEVIATION(n)	fabs((n) - EVEN_ODDS)	// deviation from average
 
 #define GRAHAM_MIN_DEV		0.4f	// look for characteristic words
@@ -68,7 +67,6 @@ int    max_repeats;
 
 extern char msg_register[];
 extern int Rtable;
-extern FILE *Rfp;
 static double scalefactor;
 
 void initialize_constants();
@@ -329,7 +327,10 @@ void populate_bogostats(bogostat_t *bogostats, char *text, double prob, int coun
 
 void print_bogostats(FILE *fp)
 {
-    compute_spamicity(&bogostats, fp);
+    if (algorithm == AL_ROBINSON)
+	rstats_print();
+    else
+	compute_spamicity(&bogostats, fp);
 }
 
 typedef struct {
@@ -339,7 +340,7 @@ typedef struct {
 
 void wordprob_init(wordprob_t* wordstats)
 {
-    wordstats->good=wordstats->bad=0;
+    wordstats->good=wordstats->bad=0.0f;
 }
 
 void wordprob_add(wordprob_t* wordstats, double newprob, int bad)
@@ -353,15 +354,15 @@ void wordprob_add(wordprob_t* wordstats, double newprob, int bad)
 double wordprob_result(wordprob_t* wordstats)
 {
     double prob;
+    double count = wordstats->good + wordstats->bad;
 
     switch(algorithm) {
 	case AL_GRAHAM:
-	    prob = wordstats->bad/(wordstats->good + wordstats->bad);
+	    prob = wordstats->bad/count;
 	    break;
 
 	case AL_ROBINSON:
-	    prob = ((ROBS * ROBX + wordstats->bad) /
-		    (ROBS + wordstats->good + wordstats->bad));
+	    prob = ((ROBS * ROBX + wordstats->bad) / (ROBS + count));
 	    break;
 
 	default:
@@ -407,6 +408,7 @@ double compute_probability( char *token )
 	if (override > list->override)
 	    break;
 	count=db_getvalue(list->dbh, token);
+
 	if (count) {
 	    if (list->ignore)
 		return EVEN_ODDS;
@@ -436,29 +438,24 @@ double compute_probability( char *token )
     }
 
     switch(algorithm) {
-	case AL_GRAHAM:
-	    if (totalcount < MINIMUM_FREQ) {
-		prob=UNKNOWN_WORD;
-	    } else {
-		prob=wordprob_result(&wordstats);
-		prob = min(MAX_PROB, prob);
-		prob = max(MIN_PROB, prob);
-	    }
-	    break;
-
-	case AL_ROBINSON:
+    case AL_GRAHAM:
+	if (totalcount < MINIMUM_FREQ) {
+	    prob=UNKNOWN_WORD;
+	} else {
 	    prob=wordprob_result(&wordstats);
-	    if (Rtable)
-	    {
-		fprintf(Rfp, "%4d %-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f\n",
-		    Rtable, token, wordstats.good, wordstats.bad, prob,
-		    log(1.0 - prob), log(prob));
-		Rtable++;
-	    }
-	    break;
+	    prob = min(MAX_PROB, prob);
+	    prob = max(MIN_PROB, prob);
+	}
+	break;
 
-	default:
-	    abort();
+    case AL_ROBINSON:
+	prob=wordprob_result(&wordstats);
+	if (Rtable || verbose)
+	    rstats_add(token, wordstats.good, wordstats.bad, prob);
+	break;
+
+    default:
+	abort();
     }
 
     return prob;
@@ -547,9 +544,8 @@ double compute_robinson_spamicity(wordhash_t *wordhash)
     // If found, unscale; else use predefined value
     robx = robx ? robx / 1000000 : ROBX;
 
-    if(Rtable)
-     	fprintf(Rfp, "%25s%10s%10s%10s%10s%10s\n",
-		"Token         ","pgood","pbad","fw","invfwlog","fwlog");
+    if (Rtable || verbose)
+	rstats_init();
 
     for(node = wordhash_first(wordhash); node != NULL; node = wordhash_next(wordhash))
     {
@@ -559,7 +555,7 @@ double compute_robinson_spamicity(wordhash_t *wordhash)
 	// Robinson's P and Q; accumulation step
         // P = 1 - ((1-p1)*(1-p2)*...*(1-pn))^(1/n)     [spamminess]
         // Q = 1 - (p1*p2*...*pn)^(1/n)                 [non-spamminess]
-        if (fabs(0.5 - prob) >= min_dev) {
+        if (fabs(EVEN_ODDS - prob) >= min_dev) {
             invlogsum += log(1.0 - prob);
 	    logsum += log(prob);
             robn ++;
@@ -576,10 +572,8 @@ double compute_robinson_spamicity(wordhash_t *wordhash)
         spamicity =
             (1.0 + (invproduct - product) / (invproduct + product)) / 2.0;
 
-	if (Rtable)
-	    fprintf(Rfp, "%4d %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
-	        Rtable, "P_Q_S_invsum_logsum", invproduct, product, spamicity,
-		invlogsum, logsum);
+	if (Rtable || verbose)
+	    rstats_fini(robn, invlogsum, logsum, invproduct, product, spamicity);
     } else
 	spamicity = robx;
 
