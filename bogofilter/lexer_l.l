@@ -1,6 +1,12 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.9  2002/09/25 22:29:21  relson
+ * Correct handling of multi-line "X-Spam-Whatever" headers by correctly ordering
+ * the if() statements and by checking for an empty line.
+ *
+ * Add parameter prototypes so that fewer casts are needed.
+ *
  * Revision 1.8  2002/09/25 00:02:44  relson
  * Ignore older X-Spam-[...Whatever...] lines.
  *
@@ -41,6 +47,8 @@
  * NAME
  *   lexer_l.l -- bogofilter's lexical analyzer
  *
+ * ORIG:	[A-Za-z$][A-Za-z0-9$'.-]+[A-Za-z0-9$]		{return(TOKEN);}
+ * ADAMS:	[^[:blank:]\n[:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,\n[]+[^[:blank:][:punct:]\n]	{return(TOKEN);}
 */
 #include <stdlib.h>
 #include <ctype.h>
@@ -78,12 +86,22 @@ struct textblock textblocks, *textend = &textblocks;
 
 #define YY_INPUT(buf,result,max_size) result = yyinput(buf, max_size)
 
-int yyinput(buf, max_size)
+int yyinput(char *buf, int max_size)
 // input getter for the scanner
 {
     char *returned;
 
-    returned = fgets((char *)buf, max_size, yyin);
+    returned = fgets(buf, max_size, yyin);
+
+    while (returned != NULL && memcmp(buf,"X-Spam-",6) == 0)
+    {
+	do {
+	    returned = fgets(buf, max_size, yyin);
+	    if (returned != NULL && *buf == '\n')
+		break;
+	} while (returned != NULL && isspace(*buf));
+    }
+
     if (returned == NULL) {
 	if (ferror(yyin)) {
 	    fprintf(stderr, "input in flex scanner failed\n");
@@ -99,7 +117,7 @@ int yyinput(buf, max_size)
 	// Note that we store fixed-length blocks here, not lines.
 	// One very long physical line could break up into more
 	// than one of these.
-	textend->block = strdup((char *)buf);
+	textend->block = strdup(buf);
 	textend->next = (struct textblock *)malloc(sizeof(struct textblock));
 	textend->next->block = (char *)NULL;
 	textend = textend->next;
@@ -276,7 +294,6 @@ width	;
 ^From\ 					{return(FROM);}
 ^Date:.*|Delivery-Date:.*			;
 ^Message-ID:.*					;
-^X-Spam-[A-Za-z]+:.*				;
 ^{BASE64}+$					;
 ^\tid\ .*					;
 
@@ -288,6 +305,7 @@ filename=\"					;
 
 {IPADDR}					{return(TOKEN);}
 [^[:blank:]\n[:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,\n[]+[^[:blank:][:punct:]\n]	{return(TOKEN);}
+
 .						;
 \n						;
 
