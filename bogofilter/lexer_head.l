@@ -81,7 +81,7 @@ E?SMTP\ id\ {ID}				;
 boundary=[ ]*\"?{MIME_BOUNDARY}\"?		{ mime_boundary_set((byte *)yytext, yyleng); }
 name=\"?					;
 filename=\"?					;
-^--{MIME_BOUNDARY}(--)?$			{ got_mime_boundary((byte *)yytext, yyleng); return (BOUNDARY); }
+^--{MIME_BOUNDARY}(--)?$			{ return (got_mime_boundary((byte *)yytext, yyleng) ? BOUNDARY : TOKEN); }
 
 {IPADDR}					{ return(IPADDR);}
 {TOKEN}						{ return(TOKEN);}

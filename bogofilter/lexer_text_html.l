@@ -39,7 +39,7 @@ TOKEN		[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\
 \>						{ html_tag(0); }
 
 ^From\ 						{ return (msg_header ? FROM : TOKEN); }
-^--{MIME_BOUNDARY}(--)?$			{ got_mime_boundary((byte *)yytext, yyleng); return (BOUNDARY); }
+^--{MIME_BOUNDARY}(--)?$			{ return (got_mime_boundary((byte *)yytext, yyleng) ? BOUNDARY : TOKEN); }
 
 {IPADDR}					{ return(IPADDR);}
 {TOKEN}						{ return(TOKEN); }

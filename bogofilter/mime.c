@@ -259,18 +259,17 @@ bool get_boundary_props(const byte *boundary, int boundary_len, boundary_t *b)
     /* skip initial -- */
     boundary += 2;
     boundary_len -= 2;
-      
+
     /* skip and note ending --, if any */
-    if (*(boundary + boundary_len - 1) == '-' && *(boundary + boundary_len - 2) == '-'){
+    if (*(boundary + boundary_len - 1) == '-'
+	    && *(boundary + boundary_len - 2) == '-'){
       b->is_final = true;
       boundary_len -= 2;
-    }
-    else {
+    } else {
       b->is_final = false;
     }
-  
+
     for (i = stackp; i > -1; i--){
-	   
       if (is_mime_container (&msg_stack[i]) &&
           msg_stack[i].boundary &&
           (memcmp (msg_stack[i].boundary, boundary, boundary_len) == 0)){
@@ -280,7 +279,7 @@ bool get_boundary_props(const byte *boundary, int boundary_len, boundary_t *b)
       }
     }
   }
-  
+
   return b->is_valid;
 }
 
@@ -291,7 +290,7 @@ mime_is_boundary(const byte *boundary, int len){
     return b.is_valid;
 }
 
-void
+int
 got_mime_boundary (const byte *boundary, int boundary_len)
 {
   mime_t *parent;
@@ -300,8 +299,8 @@ got_mime_boundary (const byte *boundary, int boundary_len)
   get_boundary_props(boundary, boundary_len, &b);
 
   if (!b.is_valid)
-    return; 
-  
+    return 0;
+
   if (DEBUG_MIME (1))
     fprintf (dbgout, "*** got_mime_boundary:  stackp: %d, boundary: '%s'\n",
 	     stackp, boundary);
@@ -314,11 +313,12 @@ got_mime_boundary (const byte *boundary, int boundary_len)
 
     /* explicit end boundary */
     if (b.is_final)
-      return;
+	return 1;
   }
 
   parent = is_mime_container (msg_state) ? msg_state : msg_state->parent;
   mime_push (parent);
+  return 1;
 }
 
 /* skips whitespace, returns NULL when ran into end of string */
