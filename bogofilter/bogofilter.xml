@@ -190,10 +190,10 @@ calculating spamicity.</para>
 <para>The <option>-r</option> option causes 
 <application>bogofilter</application> to use the Robinson algorithm for 
 calculating spamicity.</para>
-</refsect1>
 
 <para>The <option>-x</option> option allows setting of debug classes for 
 printing debug messages.</para>
+</refsect1>
 
 <refsect1 id='environment'><title>ENVIRONMENT</title>
     <para>
