@@ -56,47 +56,47 @@ map_rc()
 
 alg="f"
 
-    BOGOFILTER_DIR="${TMPDIR}/words.$alg"
-    export BOGOFILTER_DIR
-    rm -rf $BOGOFILTER_DIR
-    mkdir $BOGOFILTER_DIR
-    $BOGOFILTER $OPTS -s < ${SYSTEST}/inputs/spam.mbx
-    $BOGOFILTER $OPTS -n < ${SYSTEST}/inputs/good.mbx
-    for f in $BOGOFILTER_DIR/*.${DB_EXT} ; do
-	n=`basename $f .${DB_EXT}`
-	$BOGOUTIL -d $BOGOFILTER_DIR/$n.${DB_EXT} > $BOGOFILTER_DIR/$n.txt
-    done
-    if  [ $verbose -ne 0 ]; then
-	ls -l $BOGOFILTER_DIR/*list.txt
-    fi
-    #
-    # run tests for msg.1.txt, msg.2.txt, and msg.3.txt
-    #
-    for tst in 1.1.v 2.2a.vv 2.2a.vvv 3.3.vvv ; do
-	in=`echo $tst | tr "." " " | $AWK '{print $1}'`
-	out=`echo $tst | tr "." " " | $AWK '{print $2}'`
-	ver=`echo $tst | tr "." " " | $AWK '{print $3}'`
-	map_rc $BOGOFILTER $OPTS -$ver 2>/dev/null \
-	< ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg || :
-	sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
-    done
-    #
-    # classify msg.2.txt a second time and rerun tests
-    #    (expect different results from first run)
-    #
-    $BOGOFILTER $OPTS -s < ${SYSTEST}/inputs/msg.3.txt
-    for tst in 2.2b.vv 2.2b.vvv ; do
-	in=`echo $tst | tr "." " " | $AWK '{print $1}'`
-	out=`echo $tst | tr "." " " | $AWK '{print $2}'`
-	ver=`echo $tst | tr "." " " | $AWK '{print $3}'`
-	map_rc $BOGOFILTER $OPTS -$ver 2>/dev/null \
-	< ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg
-	sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
-    done
-    if  [ $verbose -eq 0 ]; then
-	rm -f ${TMPDIR}/tests-$alg
-	rm -f $BOGOFILTER_DIR/*.${DB_EXT}
-    fi
+BOGOFILTER_DIR="${TMPDIR}/words.$alg"
+export BOGOFILTER_DIR
+rm -rf $BOGOFILTER_DIR
+mkdir $BOGOFILTER_DIR
+$BOGOFILTER $OPTS -s < ${SYSTEST}/inputs/spam.mbx
+$BOGOFILTER $OPTS -n < ${SYSTEST}/inputs/good.mbx
+for f in $BOGOFILTER_DIR/*.${DB_EXT} ; do
+    n=`basename $f .${DB_EXT}`
+    $BOGOUTIL -d $BOGOFILTER_DIR/$n.${DB_EXT} > $BOGOFILTER_DIR/$n.txt
+done
+if  [ $verbose -ne 0 ]; then
+    ls -l $BOGOFILTER_DIR/*list.txt
+fi
+#
+# run tests for msg.1.txt, msg.2.txt, and msg.3.txt
+#
+for tst in 1.1.v 2.2a.vv 2.2a.vvv 3.3.vvv ; do
+    in=`echo $tst | tr "." " " | $AWK '{print $1}'`
+    out=`echo $tst | tr "." " " | $AWK '{print $2}'`
+    ver=`echo $tst | tr "." " " | $AWK '{print $3}'`
+    map_rc $BOGOFILTER $OPTS -$ver 2>/dev/null \
+    < ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg || :
+    sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
+done
+#
+# classify msg.2.txt a second time and rerun tests
+#    (expect different results from first run)
+#
+$BOGOFILTER $OPTS -s < ${SYSTEST}/inputs/msg.3.txt
+for tst in 2.2b.vv 2.2b.vvv ; do
+    in=`echo $tst | tr "." " " | $AWK '{print $1}'`
+    out=`echo $tst | tr "." " " | $AWK '{print $2}'`
+    ver=`echo $tst | tr "." " " | $AWK '{print $3}'`
+    map_rc $BOGOFILTER $OPTS -$ver 2>/dev/null \
+    < ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg
+    sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
+done
+if  [ $verbose -eq 0 ]; then
+    rm -f ${TMPDIR}/tests-$alg
+    rm -f $BOGOFILTER_DIR/*.${DB_EXT}
+fi
 
 rm -f ${CONFIG}
 
