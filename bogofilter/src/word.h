@@ -10,6 +10,7 @@
 #define	WORD_H
 
 #include "bftypes.h"
+#include "xmalloc.h"
 
 /** Structure to store a string of arbitrary content, including '\\0'
  * bytes.
