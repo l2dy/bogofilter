@@ -4,6 +4,13 @@
 
 $Id$
 
+	2003-12-07
+
+	* Fixed "configure --enable-static" for building statically
+          linked executables.
+	* "make check" now uses static executables when "configure
+          --enable-static" was used.
+
 	2003-12-03
 
 	* Script msg-count.sh has been added to create message count
