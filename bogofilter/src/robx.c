@@ -60,11 +60,9 @@ static int robx_hook(word_t *key, dsv_t *data,
     struct robhook_data *rh = userdata;
 
     /* ignore system meta-data */
-    if (*key->text == '.')
-	return 0;
+    if (*key->text != '.')
+	robx_accum(rh, key, data);
 
-    robx_accum(rh, key, data);
-    
     return 0;
 }
 
@@ -100,6 +98,8 @@ double compute_robinson_x(const char *path)
     ret = ds_foreach(dsh, robx_hook, &rh);
 
     rx = rh.sum/rh.count;
+    if (rx != rx) /* C magic: this checks if rx is a number */
+	ret = -1;
     if (verbose > 2)
 	printf("%s: %u, %u, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
 	       MSG_COUNT, rh.spam_cnt, rh.good_cnt,
