@@ -176,10 +176,16 @@ void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
 
     /* directories from command line and config file are already handled */
 
+#ifndef __riscos__
     if (setup_wordlists(NULL, PR_ENV_BOGO) != 0)
 	exit(EX_ERROR);
+#endif
     if (setup_wordlists(NULL, PR_ENV_HOME) != 0)
 	exit(EX_ERROR);
+#ifdef __riscos__
+    if (setup_wordlists(NULL, PR_NONE) != 0)
+	exit(EX_ERROR);
+#endif
 
     stats_prefix= stats_in_header ? "  " : "# ";
 
