@@ -7,8 +7,12 @@ about retraining and the '-H' flag...
 
 0.15.10
 
+* Fixed bug in header degeneration.
+* Added degeneration options to config file.
 * Added subject line tagging for Unsures.
 * Multiple fixes, revisions, and changes to bogotune.
+* Script msg-count.sh has been added to create message count files
+  from mailboxes and mail directories.
 * The test suite no longer depends on procmail for t.MH and t.maildir.
 * Moved robx calculation code to new file for sharing by bogoutil and
   bogotune.

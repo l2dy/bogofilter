@@ -4,8 +4,15 @@
 
 $Id$
 
+	2003-12-03
+
+	* Script msg-count.sh has been added to create message count
+          files from mailboxes and mail directories.
+
 	2003-12-01
 
+	* Fixed bug in header degeneration.
+	* Added degeneration options to config file.
 	* Added subject line tagging for Unsures.  (Contributed by
           Burkhard Kaas). 
 
