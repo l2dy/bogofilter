@@ -18,6 +18,11 @@ override with --sysconfdir=/etc
 If you use mutt, see the bogofilter(1) manual page for helpful macros
 you can add to your .muttrc.
 
+Note that you can safely ignore any of these compile time warnings:
+
+warning: unused parameter ...
+warning: format not a string literal, argument types not checked
+
 For the most recent version of this software, see: 
 
 	http://sourceforge.net/projects/bogofilter/
