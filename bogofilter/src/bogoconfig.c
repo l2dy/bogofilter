@@ -206,9 +206,6 @@ void process_parameters(int argc, char **argv, bool warn_on_error)
 
     stats_prefix= stats_in_header ? "  " : "# ";
 
-    if (DEBUG_CONFIG(0))
-	fprintf(dbgout, "stats_prefix: '%s'\n", stats_prefix);
-
     return;
 }
 
