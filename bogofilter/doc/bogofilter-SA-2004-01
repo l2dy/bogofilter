@@ -12,6 +12,7 @@ Type:		segmentation fault through malformatted input
 Impact:		denial of service
 Credits:	Antti-Juhani Kaijanaho, Clint Adams, David Relson
 Danger:		medium
+URL:		http://bogofilter.sourceforge.net/security/bogofilter-SA-2004-01
 
 Affected:	bogofilter 0.92.6, 0.92.4, 0.92.0, 0.17.5 ("stable")
 		bogofilter 0.17.4 incl. - 0.92.7 incl. ("current")
