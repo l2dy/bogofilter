@@ -48,8 +48,8 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #define EVEN_ODDS	0.5f		// used for words we want to ignore
 #define DEVIATION(n)	fabs((n) - EVEN_ODDS)	// deviation from average
 
-#define GRAHAM_MIN_DEV		0.4f		// look for characteristic words
-#define ROBINSON_MIN_DEV		0.0f		// if nonzero, use characteristic words
+#define GRAHAM_MIN_DEV		0.4f	// look for characteristic words
+#define ROBINSON_MIN_DEV	0.0f	// if nonzero, use characteristic words
 
 #define GRAHAM_SPAM_CUTOFF	0.90f	// if it's spammier than this...
 #define ROBINSON_SPAM_CUTOFF	0.52f	// if it's spammier than this...
@@ -57,16 +57,17 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #define GRAHAM_MAX_REPEATS	4	// cap on word frequency per message
 #define ROBINSON_MAX_REPEATS	1	// cap on word frequency per message
 
-#define ROBS 0.001f                    // Robinson's s
-#define ROBX 0.415f                    // Robinson's x
+#define ROBS			0.001f	// Robinson's s
+#define ROBX			0.415f	// Robinson's x
 
 double min_dev;
 double spam_cutoff;
-double max_repeats;
+int    max_repeats;
 
 #define PLURAL(count) ((count == 1) ? "" : "s")
 
 extern char msg_register[];
+static double scalefactor;
 
 static void wordprop_init(void *vwordprop){
 	wordprop_t *wordprop = vwordprop;
@@ -351,15 +352,36 @@ double wordprob_result(wordprob_t* wordstats)
 	case AL_GRAHAM:
 	    prob = wordstats->bad/(wordstats->good + wordstats->bad);
 	    break;
+
 	case AL_ROBINSON:
 	    prob = ((ROBS * ROBX + wordstats->bad) /
 		    (ROBS + wordstats->good + wordstats->bad));
 	    break;
+
 	default:
 	    abort();
     }
 
     return (prob);
+}
+
+double compute_scale()
+{
+    wordlist_t* list;
+    long goodmsgs=0L, badmsgs=0L;
+    
+    for(list=word_lists; list != NULL; list=list->next)
+    {
+	if (list->bad)
+	    badmsgs += list->msgcount;
+	else
+	    goodmsgs += list->msgcount;
+    }
+
+    if (goodmsgs == 0L)
+	return(1.0f);
+    else
+	return ((double)badmsgs / (double)goodmsgs);
 }
 
 double compute_probability( char *token )
@@ -376,27 +398,32 @@ double compute_probability( char *token )
 
     for (list=word_lists; list != NULL ; list=list->next)
     {
-	if (verbose*0 >= 2)
-	    fprintf(stderr, "checking list %s for word '%s'.\n", list->name, token);
-	if (override > list->override) break;
+	if (override > list->override)
+	    break;
 	count=db_getvalue(list->dbh, token);
 	if (count) {
 	    if (list->ignore)
 		return EVEN_ODDS;
-	    if (verbose*0 >= 3)
-		fprintf(stderr, "word '%s' found on list %s with count %ld.\n", token, list->name, count);
 	    totalcount+=count*list->weight;
 	    override=list->override;
 	    prob = (double)count;
-	    prob /= list->msgcount;
-	    prob *= list->weight;
-	    if (verbose*0 >= 4)
-		fprintf(stderr, "word '%s' has uncorrected spamicity %f.\n", token, prob);
 
-	    prob = min(1.0, prob);
+	    switch (algorithm)
+	    {
+	    case AL_GRAHAM:
+ 	        prob /= list->msgcount;
+ 	        prob *= list->weight;
+		prob = min(1.0, prob);
+		break;
 
-	    if (verbose*0 >= 4)
-		fprintf(stderr, "word '%s' has spamicity %f.\n", token, prob);
+	    case AL_ROBINSON:
+ 	        if (!list->bad)
+		    prob *= scalefactor;
+		break;
+
+	    default:
+		abort();
+	    }
 
 	    wordprob_add(&wordstats, prob, list->bad);
 	}
@@ -412,9 +439,11 @@ double compute_probability( char *token )
 		prob = max(MIN_PROB, prob);
 	    }
 	    break;
+
 	case AL_ROBINSON:
 	    prob=wordprob_result(&wordstats);
 	    break;
+
 	default:
 	    abort();
     }
@@ -540,6 +569,7 @@ void initialize_constants()
 	    min_dev     = ROBINSON_MIN_DEV;
 	    spam_cutoff = ROBINSON_SPAM_CUTOFF;
 	    max_repeats = ROBINSON_MAX_REPEATS;
+	    scalefactor = compute_scale();
 	    break;
 
 	default:
@@ -566,6 +596,8 @@ rc_t bogofilter(int fd, double *xss)
     good_list.msgcount = db_getcount(good_list.dbh);
     spam_list.msgcount = db_getcount(spam_list.dbh);
 
+    initialize_constants();
+
     switch(algorithm) {
 	case AL_GRAHAM:
 	    // select the best spam/nonspam indicators.
@@ -579,6 +611,7 @@ rc_t bogofilter(int fd, double *xss)
 	    // computes the spamicity of the spam/nonspam indicators.
 	    spamicity = compute_robinson_spamicity(wordhash);
 	    break;
+
 	default:
 	    abort();
     }
