@@ -1,8 +1,8 @@
 # $Id$ 
 
 # foreign: don't insist on ChangeLog
-# 1.5: minimum version
-AUTOMAKE_OPTIONS = foreign 1.5
+# 1.6: minimum version of automake/aclocal
+AUTOMAKE_OPTIONS = foreign 1.6
 SUBDIRS =  dcdflib . tests
 SYSCONFDIR = @sysconfdir@
 
@@ -16,8 +16,10 @@ endif
 
 if ENABLE_ROBINSON_FISHER
 FISHER_SRC = fisher.c fisher.h
-AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc
 endif
+
+AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc
+AM_CFLAGS = -DBOGOFILTER
 
 # what to build
 bin_PROGRAMS = bogofilter bogoutil bogolexer
@@ -27,7 +29,7 @@ man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
 sysconf_DATA = bogofilter.cf.example
 
 noinst_LIBRARIES = libbogofilter.a
-LDADD = dcdflib/src/libdcdf.a libbogofilter.a
+LDADD = libbogofilter.a
 
 
 # what to build that from
@@ -44,7 +46,8 @@ libbogofilter_a_SOURCES= \
 	register.h register.c \
 	rstats.h rstats.c \
 	wordhash.h wordhash.c wordlists.h wordlists.c \
-	globals.h system.h version.h
+	globals.h system.h version.h \
+	dcdflib/src/dcdflib.c dcdflib/src/ipmpar.c
 
 BUILT_SOURCES = version.h directories.h
 
