@@ -56,11 +56,6 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #define ROBINSON_SPAM_CUTOFF	0.52f	// if it's spammier than this...
 #define SPAM_CUTOFF (algorithm == AL_ORIGINAL ? ORIGINAL_SPAM_CUTOFF : ROBINSON_SPAM_CUTOFF)
 
-
-#define ORIGINAL_SPAM_CUTOFF	0.90f	// if it's spammier than this...
-#define ROBINSON_SPAM_CUTOFF	0.52f	// if it's spammier than this...
-#define SPAM_CUTOFF (algorithm == AL_ORIGINAL ? ORIGINAL_SPAM_CUTOFF : ROBINSON_SPAM_CUTOFF)
-
 #define ORIGINAL_MAX_REPEATS	4	// cap on word frequency per message
 #define ROBINSON_MAX_REPEATS	1	// cap on word frequency per message
 #define MAX_REPEATS (algorithm == AL_ORIGINAL ? ORIGINAL_MAX_REPEATS : ROBINSON_MAX_REPEATS)
