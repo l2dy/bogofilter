@@ -1,0 +1,48 @@
+			       =================
+				BOGOFILTER NEWS
+			       =================
+ 
+0.13.3	2003-05-28
+ 
+* Tweaked long line check used to prevent scanner buffer overflow.
+* Added -V (version) option to bogolexer.
+* Minor code tweaks to quiet gcc-3.3 warnings.
+* Added doc/programmer/README.osx to distribution.
+* Corrected FAQ's procmail recipe for training with SpamAssassin.
+ 
+0.13.2.1 2003-05-24
+ 
+* In bulkmode, output filenames to stdout.
+* Further fixes for static-build system.
+ 
+0.13.2	2003-05-24
+ 
+* Build procedure for statically linked binaries has been improved.
+* Autoconfiguration of BerkeleyDB library has been improved.
+* Fixed defect in replace_nonascii_characters that was
+  superseding ignore_case option.
+* Portability fix for efence usage in t.frame.
+ 
+0.13.1	2003-05-23
+ 
+* Modified "make rpm" to also build statically linked binaries.
+  They're packaged in bogofilter-static-x.y.z-1.i586.rpm
+* Fixed bogofilter.spec.in to include files CHANGES-0.13 and
+  RELEASE.NOTES-0.13 which had been left out.
+ 
+0.13.0	2003-05-21
+ 
+* Added file RELEASE.NOTES-0.13.  Read it!!!
+* Changed parsing defaults to:
+  -PI	ignore_case		(default is disabled)
+  -Ph	header_line_markup	(default is ensabled)
+  -Pt	tokenize_html_tags	(default is enabled)
+* contrib/randomtrain and contrib/scramble can now process
+  both mbox and maildir formats.
+* Added perl script contrib/mime.get.rfc822 to extract
+  forwaded messages from with a message.
+* Added basic support for emacs RMAIL mailboxes.
+* Remove incomplete RMAIL/Babyl-5 support.
+* Registration code modified to count unique tokens for each
+  message and display the total of the counts.
+* Added 'bogo-what?' to FAQ.

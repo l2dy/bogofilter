@@ -1,0 +1,88 @@
+			       ================= 
+				BOGOFILTER NEWS
+			       ================= 
+ 
+0.11.2	2003-04-13
+* Added 'terse' option to bogofilter.cf for selecting format of
+  X-Bogosity line. 
+* Use frexp() to retain maximum precision of floating point results.
+
+0.11.1.9 2003-04-11
+* Reformat histogram output (from "-vv") to fit in 80 columns.
+* Enhanced '-m' option allows specifying robs value.
+* Added protections against negative token counts to
+  bogoutil.c and database_db.c
+* Additional portability changes made to the regression tests.
+* Added sample configuration for maildrop.
+
+0.11.1.8 2003-04-07
+* Include 'strict_check' in '-qv' output.
+* Correct outdated acinclude.m4, as it causes the configure script to
+  be invalid.
+* Revised UPGRADE document.
+* Added contrib/bogotrain.sh
+ 
+0.11.1.7 2003-04-07
+* Change bogoutil's '-p' option to require a database.
+* Improve bogoutil's reporting of a bad directory or filename.
+* Simplify configure check for BerkeleyDB.
+* Extend configure's compiler checks for AIX.
+* Fix OS X segfault caused by using DB handle after closing database.
+ 
+0.11.1.6 2003-04-01
+* Added config file option 'strict_check' for processing html
+  comments.  Enabled means to use "<!--" and "-->" to delimit
+  comments.  Disabled uses "<!" and ">".
+  Option is disabled by default.
+ 
+0.11.1.5 2003-03-28
+* Bogofilter now frees all memory that it allocates.
+* FAQ reorganized and info added on asian spam, the format of verbose
+  output, and using SpamAssassin to train bogofilter.
+* Fixed processing of '-o' option.
+ 
+0.11.1.4 2003-03-25
+* Cleaned up help messages and added version info.
+* Expanded bogofilter-faq.html
+* Fixed precedence for directory specifications.
+* Fixed processing of folded X-Bogosity line.
+* Fixed processing of spam_subject_tag.
+ 
+0.11.1.3 2003-03-10
+* Expanded regression tests.
+* Cleaned up fprintf() arguments.
+* Cleaned up message and mime header checks.
+* Additional improvements to maintenance code.
+ 
+0.11.1.2 2003-03-07
+* Fixed bogoutil's broken maintenance mode.
+* Update bogofilter documentation and FAQ.
+* Fixed configure problems with libdb and unsigned shorts.
+* Fixed locking issues for additional architectures.
+ 
+0.11.1.1 2003-03-05
+* Fixed flaw that caused user config file to be ignored.
+* Fixed broken '-u' (update) code.
+* Updated documentation of bogolexer and bogoutil.
+ 
+0.11.1 2003-03-04
+* Using standard html comment delimiters when discarding comments.
+* Fixed charset initialization flaw.
+ 
+0.11.0   2003-03-03
+* The Robinson-Fisher algorithm is now the default algorithm.
+* The configuration file parser is stricter and more correct.
+* Separated message registration options from unregistration
+  options.  '-S' and '-N' have been changed and now just do
+  unregistration.  To move a meessage from one wordlist to the
+  other, use '-S -n' or '-N -s' (as appropriate)
+* Bogofilter's -p (passthrough) mode will no longer read the entire
+  mail into memory if the standard input is a seekable regular file.
+* Bogofilter's '-l' option was changed and no longer allows an
+  argument.  Use the new '-L yourtag' option to provide a tag
+  for log messages.
+* Database access efficiency changes.
+* Improvements in html comment handling code.
+* Internal cleanup of storage used in parsing messages and
+  working with databases.
+* Manual pages now contain the proper path to bogofilter.cf.

@@ -1,0 +1,53 @@
+			       =================
+				BOGOFILTER NEWS
+			       =================
+
+0.12.3	2003-05-10
+
+* Modified bulk mode code to allow registering maildirs.
+* Added options to return tokens from inside html tags.
+  Switch '-Ht' and option "tokenize_html_tags" turn it on.
+* Bogofilter's '-e' switch can now be used without '-p'.
+* Added doc/integrating-with-postfix.
+* Added bogofilter-faq-fr.html, a French translation of the FAQ.
+* Revise description of verbose output in FAQ.
+* Update man page documentation of bogofilter's switches.
+* Added basic memory accounting and debug capability.
+* Fixed memory leak in rstats.c
+* Fixed defect in handling of folded spam header lines.
+* Modified parsing so that yyredo() and yy_use_redo_text()
+  are no longer needed.
+
+0.12.2  2003-04-30
+
+* Corrected bulkmode problem processing messages without
+  "^From " lines.
+* Corrected alignment of wordprop_t which caused bus error
+  on risc.
+* Added directory to 'Error creating directory' message.
+
+0.12.1	2003-04-25
+
+* Corrected bad BOGOFILTER_DIR value in t.bulkmode
+* Subdirectories contrib and tuning now install from rpm to 
+  /usr/share/bogofilter.
+
+0.12.0	2003-04-24
+
+* Added bulk mode procesing for Maildirs.
+  '-b' reads filenames from stdin.
+  '-B' gets filenames from the command line.
+* Added '-M' to allow classification of multiple messages in
+  mbox formatted files.
+* New option '-Q' (query/display config) replaces '-qv'.
+* Added bogofilter-tuning.HOWTO as replacement for README.Robinson
+* Added 'tuning' directory with scripts for tuning bogofilter.
+  (cf. bogofilter-tuning.HOWTO)
+* Added classification support for msg-count formatted files.
+* Add bogolex.sh for creating msg-count formatted email file.
+* Grouped options into logical groups for help message and
+  man page.  Revised option descriptions.
+* Miscellaneous refactoring in main.c
+* Corrected some errors in rpm specfile.
+
+0.11.2	2003-04-13 - stable version
