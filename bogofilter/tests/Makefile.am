@@ -15,7 +15,7 @@ TESTSCRIPTS=t.score1 t.score2 t.integrity t.lock1 t.ignore_spam_header \
 	    t.nullstatsprefix $(SYSTEM_TESTS)
 TESTS=$(TESTSCRIPTS)
 
-EXTRA_DIST=$(TESTSCRIPTS) t.frame t.skel t.systest.d
+EXTRA_DIST=$(TESTSCRIPTS) t.frame t.skel t.systest.d inputs outputs
 
 dist-hook:
-	cd $(distdir) && find t.systest.d -name CVS -type d -prune -exec rm -r '{}' ';'
+	cd $(distdir) && for i in t.systest.d inputs outputs ; do find $$i -name CVS -type d -prune -exec rm -r '{}' ';' ; done
