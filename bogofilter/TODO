@@ -27,6 +27,9 @@
 **** New Feature: Token aging. Support for struct data in the wordlists is
 already present.
 
+**** New feature: Token merging, based on delta tokens (Andras Salamon,
+     andras@dns.net on bogofilter-dev, 2005-01-25)
+
 **** Two deletes for kmail?  This wouldn't be a patch for bogofilter
 itself, but a change to give kmail delete-as-spam and delete-as-
 nonspam buttons.  Similarly for other MUAs.
