@@ -49,6 +49,8 @@ WANT="1784.4039"
 WANT="1784.4031"
 # v0.15.6 - Fixed SMTP/ESMPT processing
 WANT="1784.4029"
+# v0.15.9 - Exclude apostrophe and backtick as last chars
+WANT="1781.4024"
 
 if [ "$RESULT" != "$WANT" ] || [ $verbose -ne 0 ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT
