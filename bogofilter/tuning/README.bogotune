@@ -49,12 +49,7 @@ Installation:
 	your execution path.  The bogol script is used by formail to
 	create message-count files.
 
-    2. The bogotune script needs to use a working directory; it
-	defaults to "./work", but you can configure to suit your
-	working environment by changing the definition of $workdir
-	as described in the next section.
-
-    3. If you wish, copy the man pages to the appropriate location
+    2. If you wish, copy the man pages to the appropriate location
 	(typically /usr/man/man1 or /usr/share/man/man1).
 
 Tuning:
@@ -79,22 +74,11 @@ positives and false negatives, respectively.
 The message files may be in either mbox or msg-count format, but they
 must all be one or the other; don't mix them.  If they're in mbox
 format, you'll need enough free disk space so bogotune can create
-msg-count files to use in the scans.  There will need to be a writable
-directory called work for bogotune to use; this defaults to "./work",
-but may be set by editing the value of workdir in bogotune's line 10.
-To use $TMPDIR, for example, you could change
-    $workdir = "./work";
-to
-    $workdir = $ENV{"TMPDIR"};
-or you might keep all the bogofilter-related files together with
-    $workdir = $bogodir;
-but in that case you will need to move lines 9 and 10 to be lines
-95 and 96 (just before dbname is defined), so that workdir isn't set
-before bogodir.
+msg-count files to use in the scans.
 
 If bogotune aborts, there may be leftover files named Rxxx in the
-directory named in $workdir; the xxx stands for some number of more or
-less random digits (actually the pid of the bogotune process).
+directory from which bogotune ran; the xxx stands for some number of
+more or less random digits (actually the pid of the bogotune process).
 
 Running bogotune will take quite a while.  You will usually see output
 that ends like this:

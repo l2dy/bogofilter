@@ -6,9 +6,6 @@
 
 ### 0.  Initialize and process arguments
 use POSIX;
-# edit this line to change bogotune's working directory
-$workdir = "./work"
-chdir($workdir) or die "Can't access $workdir";
 
 # choose apclass (0) or bogofilter (1) for scanning; apclass is twice
 # as fast, if you have it, but it's not yet freely available.
@@ -75,7 +72,7 @@ foreach $arg (@ARGV) {
     elsif($state == 4 ) { $cf = "-c " . $arg; }
 }
 
-$workfn = "R" . $$;
+$workfn = "bt" . $$;
 
 ### 1.  Validate bogofilter database
 # Check that $bogodir contains a valid training database,
@@ -163,8 +160,7 @@ if(! $msgcountfiles) {
 	">", $nswork);
     system($cmd) == 0 or yuk(7, "Problem processing nonspam files");
     @spfiles = $spwork; @nsfiles = $nswork;
-    print("Message-count files ", $workfn, ".{sp,ns} created in ",
-	$workdir, ".\n");
+    print("Message-count files ", $workfn, ".{sp,ns} created\n");
 }
 
 ### 3.  Calculate cache size
@@ -192,8 +188,8 @@ print("Recommended cache size is ", $cachesize, " Mbytes.\n");
 print("Calculating false-positive target...\n");
 
 if($usebogofilter) {
-    $cmd = join(" ", "cat", @nsfiles, "| $bogof $cf -d", $bogodir, "-Mttv >",
-	$workfn);
+    $cmd = join(" ", "cat", @nsfiles, "|", $bogof, $cf, "-d",
+	$bogodir, "-Mttv >", $workfn);
 } else {
     $cmd = join(" ", "cat", @nsfiles, "| apclass -fq >", $workfn);
 }
