@@ -190,8 +190,8 @@ version.c: version.sh ../configure.ac Makefile.am	\
 	$(bogolexer_SOURCES)				\
 	$(bogoutil_SOURCES)				\
 	$(bogotune_SOURCES)
-	$(SHELL) $(srcdir)/version.sh $(top_srcdir) >"$@.new" && mv "$@.new" "$@" \
-	    || rm -f "$@"
+	$(SHELL) $(srcdir)/version.sh $(top_srcdir) >"$@.new" && mv -f "$@.new" "$@" \
+	    || { rm -f "$@" ; false ; }
 #
 directories.c: ../config.status
 	echo "const char *const system_config_file = \"$(SYSCONFDIR)/bogofilter.cf\";" >"$@" \
