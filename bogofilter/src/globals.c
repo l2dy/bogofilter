@@ -18,10 +18,6 @@ AUTHOR:
 
 /* command line options */
 
-#ifdef	ENABLE_DEPRECATED_CODE
-bool	twostate;			/* '-2' */
-bool	threestate;			/* '-3' */
-#endif
 bulk_t	bulk_mode = B_NORMAL;		/* '-b, -B' */
 bool	suppress_config_file;		/* '-C' */
 bool	nonspam_exits_zero;		/* '-e' */
@@ -42,9 +38,6 @@ int	verbose;			/* '-v' */
 int	max_repeats;
 double	min_dev;
 double	spam_cutoff;
-#ifdef	ENABLE_DEPRECATED_CODE
-double	thresh_stats;
-#endif
 double	thresh_update;
 
 const char	*update_dir;
@@ -52,31 +45,10 @@ const char	*update_dir;
 const char	*stats_prefix;
 
 /* for lexer_v3.l */
-#ifdef	ENABLE_DEPRECATED_CODE
-bool	header_degen = false;		/* -H 	   - default: disabled */
-bool	degen_enabled = false;		/* -Pd,-PD - default: disabled */
-bool	first_match = true;		/* -Pf,-PF - default: enabled  */
-#endif
-
-#ifndef	ENABLE_DEPRECATED_CODE
 bool	header_line_markup = true;	/* -H */
-#else
-bool	header_line_markup = true;	/* -Ph */
-bool	ignore_case = false;		/* -PI */
-bool	tokenize_html_tags = true;	/* -Pt */
-#if	0
-bool	separate_counts = true;		/* -Ps,-PS - default: enabled  */
-#endif
-bool	tokenize_html_script = false;	/* -Ps - not yet in use */
-#endif
 
 /* dual definition options */
 method_t *method = NULL;
-
-/* from html.c */
-#ifdef	ENABLE_DEPRECATED_CODE
-bool strict_check = false;
-#endif
 
 /* for  bogotune */
 bool fBogotune = false;

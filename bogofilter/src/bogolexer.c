@@ -43,10 +43,6 @@ const parm_desc sys_parms[] =
     { "block_on_subnets",		CP_BOOLEAN,	{ (void *) &block_on_subnets } },
     { "charset_default",		CP_STRING,	{ &charset_default } },
     { "replace_nonascii_characters",	CP_BOOLEAN,	{ (void *) &replace_nonascii_characters } },
-#ifdef	ENABLE_DEPRECATED_CODE
-    { "header_line_markup",		CP_BOOLEAN,	{ (void *) &header_line_markup } },
-    { "strict_check",			CP_BOOLEAN,	{ (void *) &strict_check } },
-#endif
     { NULL,				CP_NONE,	{ (void *) NULL } },
 };
 
@@ -57,10 +53,6 @@ const parm_desc format_parms[] =
 
 /* Function Prototypes */
 
-static void process_args_1(int argc, char **argv);
-#ifdef	ENABLE_DEPRECATED_CODE
-static void process_args_2(int argc, char **argv);
-#endif
 void initialize(void);
 
 /* Function Definitions */
@@ -82,26 +74,9 @@ static void help(void)
 	    "\t-v\t- set verbosity level.\n"
 	    "\t-c file\t- read specified config file.\n"
 	    "\t-C\t- don't read standard config files.\n"
-#ifndef	ENABLE_DEPRECATED_CODE
-	    "\t-H\t- disables header line tagging.\n"
-#endif   
 	    "\t-I file\t- read message from file instead of stdin.\n"
 	    "\t-x list\t- set debug flags.\n"
 	    "\t-D\t- direct debug output to stdout.\n");
-#ifdef	ENABLE_DEPRECATED_CODE
-    fprintf(stderr,
-	    "\t-P {opts} - set html processing flag(s).\n"
-	    "\t   where {opts} is one or more of:\n"
-	    "\t    c   - enables  strict comment checking.\n"
-	    "\t    C   - disables strict comment checking (default).\n"
-	    "\t    i   - enables  ignoring of upper/lower case.\n"
-	    "\t    I   - disables ignoring of upper/lower case (default).\n"
-	    "\t    h   - enables  header line tagging (default).\n"
-	    "\t    H   - disables header line tagging.\n"
-	    "\t    t   - enables  parsing of html tags 'a', 'font', and 'img' (default).\n"
-	    "\t    T   - disables parsing of html tags 'a', 'font', and 'img'.\n"
-	);
-#endif
     fprintf(stderr,
 	    "\n"
 	    "%s (version %s) is part of the bogofilter package.\n", 
@@ -122,11 +97,7 @@ static void print_version(void)
 		  progname, version, PACKAGE);
 }
 
-#ifndef	ENABLE_DEPRECATED_CODE
 #define	OPTIONS	":c:CDhHI:npP:qvVx:X:m"
-#else
-#define	OPTIONS	":c:CDhHI:npP:qvVx:X:m"
-#endif
 
 /** These functions process command line arguments.
  **
@@ -137,7 +108,7 @@ static void print_version(void)
  ** there are leftover command line arguments.
  */
 
-static void process_args_1(int argc, char **argv)
+static void process_args(int argc, char **argv)
 {
     int option;
 
@@ -173,11 +144,9 @@ static void process_args_1(int argc, char **argv)
 	    help();
 	    exit(EX_OK);
 
-#ifndef	ENABLE_DEPRECATED_CODE
 	case 'H':
 	    header_line_markup = false;
 	    break;
-#endif
 
 	case 'I':
 	    bogoreader_name(optarg);
@@ -221,46 +190,6 @@ static void process_args_1(int argc, char **argv)
     }
 }
 
-#ifdef	ENABLE_DEPRECATED_CODE
-static void process_args_2(int argc, char **argv)
-{
-    int option;
-
-    optind = opterr = 1;
-    /* don't use #ifdef here: */
-#if HAVE_DECL_OPTRESET
-    optreset = 1;
-#endif
-
-    while ((option = getopt(argc, argv, OPTIONS)) != -1)
-    {
-	switch (option)
-	{
-	case 'P':
-	{
-	    char *s;
-	    for (s = optarg; *s ; s += 1)
-	    {
-		switch (*s)
-		{
-		case 'h': case 'H': header_line_markup = *s == 'h'; 	break;	/* -Ph and -PH */
-		case 'c': case 'C': strict_check       = *s == 'c';	break;	/* -Pc and -PC */
-		case 'i': case 'I': ignore_case        = *s == 'i';	break;	/* -Pi and -PI */
-		case 't': case 'T': tokenize_html_tags = *s == 't'; 	break;	/* -Pt and -PT */
-		default:
-		    fprintf(stderr, "Unknown parsing option -P%c.\n", *s);
-		    exit(EX_ERROR);
-		}
-	    }
-	    break;
-	}
-	break;
-	}
-    }
-    return;
-}
-#endif
-
 int count=0;
 
 int main(int argc, char **argv)
@@ -269,11 +198,8 @@ int main(int argc, char **argv)
 
     mbox_mode = true;		/* to allow multiple messages */
 
-    process_args_1(argc, argv);
+    process_args(argc, argv);
     process_config_files(false);
-#ifdef	ENABLE_DEPRECATED_CODE
-    process_args_2(argc, argv);
-#endif
 
     textblock_init();
 

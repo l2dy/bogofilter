@@ -26,9 +26,6 @@ extern int optind, opterr, optopt;
 #include "buff.h"
 #include "datastore.h"
 #include "error.h"
-#ifdef	ENABLE_DEPRECATED_CODE
-#include "graham.h"			/* for UNKNOWN_WORD */
-#endif
 #include "maint.h"
 #include "paths.h"
 #include "prob.h"
@@ -39,8 +36,6 @@ extern int optind, opterr, optopt;
 #include "xstrdup.h"
 
 const char *progname = "bogoutil";
-
-#define MINIMUM_FREQ	5		/* minimum freq */
 
 static int token_count = 0;
 
@@ -236,13 +231,8 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     buff_t *buff = buff_new(buf, 0, BUFSIZE);
     const byte *word = buf;
 
-#ifndef	ENABLE_DEPRECATED_CODE
-    const char *head_format = !show_probability ? "%-30s %6s %6s\n"   : "%-30s %6s  %6s  %6s\n";
-    const char *data_format = !show_probability ? "%-30s %6lu %6lu\n" : "%-30s %6lu  %6lu  %f\n";
-#else
     const char *head_format = !show_probability ? "%-30s %6s %6s\n"   : "%-30s %6s  %6s  %6s  %6s\n";
     const char *data_format = !show_probability ? "%-30s %6lu %6lu\n" : "%-30s %6lu  %6lu  %f  %f\n";
-#endif
 
     void *dsh = NULL; /* initialize to silence bogus gcc warning */
 
@@ -263,10 +253,6 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	    char filepath1[PATH_LEN];
 	    char filepath2[PATH_LEN];
 	    char *filepaths[IX_SIZE];
-
-#ifdef	ENABLE_DEPRECATED_CODE
-	    set_wordlist_mode(path);
-#endif
 
 	    filepaths[0] = filepath1;
 	    filepaths[1] = filepath2;
@@ -293,11 +279,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	robx = ROBX;
     }
 
-#ifndef	ENABLE_DEPRECATED_CODE
-    printf(head_format, "", "spam", "good", "  Fisher");
-#else
     printf(head_format, "", "spam", "good", "Gra prob", "Rob/Fis");
-#endif
 
     while (argc >= 0)
     {
@@ -307,9 +289,6 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	unsigned long spam_count;
 	unsigned long good_count;
 
-#ifdef	ENABLE_DEPRECATED_CODE
-	double gra_prob = 0.0;
-#endif
 	double rob_prob = 0.0;
 	
 	if (argc == 0)
@@ -332,21 +311,8 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	    printf(data_format, token->text, spam_count, good_count);
 	else
 	{
-#ifdef	ENABLE_DEPRECATED_CODE
-	    double spamness = (double) spam_count / (double) spam_msg_count;
-	    double goodness = (double) good_count / (double) good_msg_count;
-
-	    gra_prob = (spam_count + good_count <= MINIMUM_FREQ)
-		? UNKNOWN_WORD
-		: spamness / (spamness+goodness);
-#endif
 	    rob_prob = calc_prob(good_count, spam_count);
-
-#ifndef	ENABLE_DEPRECATED_CODE
 	    printf(data_format, token->text, spam_count, good_count, rob_prob);
-#else
-	    printf(data_format, token->text, spam_count, good_count, gra_prob, rob_prob);
-#endif
 	}
 
 	if (token != &buff->t)
@@ -448,10 +414,6 @@ static void help(void)
 	    "\t-R dir\tCompute Robinson's X and save it in the wordlist.\n");
     fprintf(stderr,
 	    "\t-k size\tset BerkeleyDB cache size (MB).\n"
-#ifdef	ENABLE_DEPRECATED_CODE
-	    "\t-W\tUse combined wordlist%s for spam and ham tokens.\n"
-	    "\t-WW\tUse separate wordlists for spam and ham tokens.\n",
-#endif
 	    DB_EXT);
     fprintf(stderr,
 	    "\t-a age\tExclude tokens with older ages.\n"
@@ -474,11 +436,7 @@ bool  prob = false;
 typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST } cmd_t;
 cmd_t flag = M_NONE;
 
-#ifndef	ENABLE_DEPRECATED_CODE
 #define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:vVw:x:X:y:"
-#else
-#define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:vVw:Wx:X:y:"
-#endif
 
 static int process_args(int argc, char **argv)
 {
@@ -555,12 +513,6 @@ static int process_args(int argc, char **argv)
 	case 'V':
 	    print_version();
 	    exit(EX_OK);
-
-#ifdef	ENABLE_DEPRECATED_CODE
-	case 'W':
-	    incr_wordlist_mode();
-	    break;
-#endif
 
 	case 'x':
 	    set_debug_mask( (char *) optarg );

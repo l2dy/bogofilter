@@ -139,10 +139,6 @@ int histogram(const char *path)
 
     memset(&hist, 0, sizeof(hist));
 
-#ifdef	ENABLE_DEPRECATED_CODE
-    set_wordlist_mode(path);
-#endif
-
     count = build_wordlist_paths(filepaths, path);
 
     dsh = ds_open(CURDIR_S, count, (const char **)filepaths, DB_READ);

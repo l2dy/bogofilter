@@ -52,9 +52,6 @@ AUTHOR:
 #include "bogoreader.h"
 #include "collect.h"
 #include "datastore.h"
-#ifdef	ENABLE_DEPRECATED_CODE
-#include "degen.h"
-#endif
 #include "fisher.h"
 #include "msgcounts.h"
 #include "mime.h"
@@ -67,6 +64,8 @@ AUTHOR:
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
+
+#define PROGNAME "bogotune"
 
 #define	MSG_COUNT	".MSG_COUNT"
 
@@ -735,11 +734,6 @@ static void write_msgcount_file(wordhash_t *wh)
     print_msgcount_entry(".MSG_COUNT", msgs_bad, msgs_good);
 
     wordhash_sort(wh);
-
-#ifdef	ENABLE_DEPRECATED_CODE
-    if (degen_enabled || header_degen)
-	wordhash_degen(wh, train);
-#endif
 
     for (hn = wordhash_first(wh); hn != NULL; hn = wordhash_next(wh)) {
 	word_t *token = hn->key;

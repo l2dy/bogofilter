@@ -269,12 +269,12 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <HTML>{TOKEN_12}({HTMLTOKEN})+/{NOTWHITESPACE}	{ html_reorder(); }
 
 <HTML>"<!--"					{ BEGIN SCOMMENT; }
-<HTML>"<!"					{ BEGIN (strict_check ? HTOKEN : LCOMMENT ); }
+<HTML>"<!"					{ BEGIN LCOMMENT; }
 <HTML>"<"(a|img|font){WHITESPACE}		{ BEGIN HTOKEN; }
 <HTML>"<"					{ BEGIN HDISCARD; }	/* unknown tag */
 
-<HTOKEN>{TOKEN}					{ if (tokenize_html_tags)     return TOKEN; }
-<HSCRIPT>{TOKEN}				{ if (tokenize_html_script)   return TOKEN; }
+<HTOKEN>{TOKEN}					{ return TOKEN; }
+<HSCRIPT>{TOKEN}				{ return TOKEN; }
 <HDISCARD,LCOMMENT,SCOMMENT>{TOKEN}		{ /* discard innards of html tokens and comments */ }
 
 <HTOKEN,HDISCARD,LCOMMENT>">"			{ BEGIN HTML; }	/* end of tag, loose comment; return to normal html processing */

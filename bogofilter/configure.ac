@@ -208,25 +208,6 @@ if test x$USE_MEMDEBUG = xYES ; then
 fi
 AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$MEM_DEBUG = xYES)
 
-dnl Deprecated code dependent stuff
-AC_ARG_ENABLE(deprecated-code,
-	AC_HELP_STRING([--enable-deprecated-code],
-	[Enable deprecated code]),
-	if test "$enableval" = no; then
-		[USE_DEPRECATED_CODE=NO]
-	else
-		[USE_DEPRECATED_CODE=YES]
-	fi
-    AC_DEFINE(HAVE_INLINE,1,[Define to 1 if your compiler supports inline])
-)
-
-dnl Enable building with deprecated code.
-if test x$USE_DEPRECATED_CODE = xYES ; then
-	AC_DEFINE(ENABLE_DEPRECATED_CODE,1,
-	[Enable deprecated code])
-fi
-AM_CONDITIONAL(ENABLE_DEPRECATED_CODE, test x$USE_DEPRECATED_CODE = xYES)
-
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_STDBOOL

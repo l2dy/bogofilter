@@ -6,11 +6,6 @@ SYSCONFDIR = @sysconfdir@
 
 PERL = @PERL@
 
-if ENABLE_DEPRECATED_CODE
-GRAHAM_SRC = graham.c graham.h
-DEGEN = degen.h degen.c
-endif
-
 FISHER_SRC = fisher.c fisher.h
 ROBINSON_SRC = robinson.c robinson.h
 

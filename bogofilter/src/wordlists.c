@@ -49,25 +49,6 @@ static void rand_sleep(double min, double max)
 const char *aCombined[] = { WORDLIST };
 size_t	    cCombined = COUNTOF(aCombined);
 
-#ifdef	ENABLE_DEPRECATED_CODE
-const char *aSeparate[] = { SPAMFILE, GOODFILE };
-size_t	    cSeparate = COUNTOF(aSeparate);
-#endif
-
-#ifdef	ENABLE_DEPRECATED_CODE
-void incr_wordlist_mode(void)
-{
-    switch (wl_mode) {
-    case WL_M_UNKNOWN:  wl_mode = WL_M_COMBINED; break;
-    case WL_M_COMBINED: wl_mode = WL_M_SEPARATE; break;
-    case WL_M_SEPARATE: 
-	fprintf(stderr, "Invalid -W option.\n");
-	exit(EX_ERROR);
-    }
-    return;
-}
-#endif
-
 void open_wordlists(dbmode_t mode)
 {
     wordlist_t *list;
@@ -76,25 +57,9 @@ void open_wordlists(dbmode_t mode)
     do {
 	retry = 0;
 	for (list = word_lists; list != NULL; list = list->next) {
-#ifdef	ENABLE_DEPRECATED_CODE
-	    if (wl_mode == WL_M_UNKNOWN)
-		set_wordlist_mode(list->filepath);
-	    switch (wl_mode) {
-	    case WL_M_COMBINED:
-#endif
-		if (db_cachesize < 4)
-		    db_cachesize = 4;
-		list->dsh = ds_open(list->filepath, cCombined, aCombined, mode);
-#ifdef	ENABLE_DEPRECATED_CODE
-		break;
-	    case WL_M_SEPARATE:
-		list->dsh = ds_open(list->filepath, cSeparate, aSeparate, mode);
-		break;
-	    case WL_M_UNKNOWN:
-		fprintf(stderr, "Invalid wordlist mode.\n");
-		exit(EX_ERROR);
-	    }
-#endif
+	    if (db_cachesize < 4)
+		db_cachesize = 4;
+	    list->dsh = ds_open(list->filepath, cCombined, aCombined, mode);
 	    if (list->dsh == NULL) {
 		int err = errno;
 		close_wordlists(true); /* unlock and close */
@@ -108,20 +73,9 @@ void open_wordlists(dbmode_t mode)
 		    default:
 			if (query)	/* If "-Q", failure is OK */
 			    return;
-#ifndef	ENABLE_DEPRECATED_CODE
-			    fprintf(stderr,
-				    "Can't open file '%s' in directory '%s'.\n",
-				    aCombined[0], list->filepath);
-#else
-			if (wl_mode != WL_M_SEPARATE)
-			    fprintf(stderr,
-				    "Can't open file '%s' in directory '%s'.\n",
-				    aCombined[0], list->filepath);
-			else
-			    fprintf(stderr,
-				    "Can't open files '%s' and '%s' in directory '%s'.\n",
-				    aSeparate[0], aSeparate[1], list->filepath);
-#endif
+			fprintf(stderr,
+				"Can't open file '%s' in directory '%s'.\n",
+				aCombined[0], list->filepath);
 			if (err != 0)
 			    fprintf(stderr,
 				    "error #%d - %s.\n", err, strerror(err));
@@ -156,69 +110,12 @@ void close_wordlists(bool nosync /** Normally false, if true, do not synchronize
 size_t build_wordlist_paths(char **filepaths, const char *path)
 {
     bool ok;
-    size_t count = 0;
+    size_t count = 1;
 
-#ifdef	ENABLE_DEPRECATED_CODE
-    switch (wl_mode) {
-    case WL_M_COMBINED:
-#endif
-	count = 1;
-	ok = build_path(filepaths[0], sizeof(FILEPATH), path, WORDLIST) == 0;
-#ifdef	ENABLE_DEPRECATED_CODE
-	break;
-    case WL_M_SEPARATE:
-	count = 2;
-	ok = (build_path(filepaths[0], sizeof(FILEPATH), path, SPAMFILE) == 0 &&
-	      build_path(filepaths[1], sizeof(FILEPATH), path, GOODFILE) == 0);
-	break;
-    case WL_M_UNKNOWN:
-	fprintf(stderr, "Invalid wordlist mode.\n");
-	exit(EX_ERROR);
-    }
-#endif
+    ok = build_path(filepaths[0], sizeof(FILEPATH), path, WORDLIST) == 0;
 
     return count;
 }
-
-#ifdef	ENABLE_DEPRECATED_CODE
-static bool check_wordlist_paths(const char *path, size_t count, const char **names)
-{
-    size_t i;
-    for (i = 0; i < count ; i += 1) {
-	char filepath[PATH_LEN];
-	struct stat statbuf;
-	const char *name = names[i];
-	int rc;
-	build_path(filepath, sizeof(filepath), path, name);
-	memset(&statbuf, 0, sizeof(statbuf));
-	rc = stat(filepath, &statbuf);
-	if (DEBUG_WORDLIST(1))
-	    fprintf(dbgout, "fn: %s, rc: %d\n", filepath, rc);
-	if (rc != 0)
-	    return false;
-    }
-    return true;
-}
-#endif
-
-#ifdef	ENABLE_DEPRECATED_CODE
-void set_wordlist_mode(const char *filepath)
-{
-    check_wordlist_paths(filepath, cCombined, aCombined);
-
-    if (wl_mode != WL_M_UNKNOWN)
-	return;
-
-    wl_mode = wl_default;
-    if (check_wordlist_paths(filepath, cCombined, aCombined))
-	wl_mode = WL_M_COMBINED;
-    else
-    if (check_wordlist_paths(filepath, cSeparate, aSeparate))
-	wl_mode = WL_M_SEPARATE;
-
-    return;
-}
-#endif
 
 void set_good_weight(double weight)
 {

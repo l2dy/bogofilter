@@ -29,9 +29,6 @@ THEORY:
 #include <string.h>
 #include <stddef.h>	/* for offsetof */
 
-#ifdef	ENABLE_DEPRECATED_CODE
-#include "degen.h"
-#endif
 #include "wordhash.h"
 #include "xmalloc.h"
 
@@ -568,35 +565,3 @@ convert_wordhash_to_propslist(wordhash_t *whi, wordhash_t *db)
 	return who;
     }
 } 
-
-#ifdef	ENABLE_DEPRECATED_CODE
-void wordhash_degen(wordhash_t *wh, wordhash_t *db)
-{
-    if (degen_enabled) {
-	hashnode_t *node;
-
-	memory_db = db;
-	degen_enabled = false;	/* Disable further recursion */
-
-	for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
-	{
-	    wordprop_t *props = (wordprop_t *) node->buf;
-	    wordcnts_t *cnts  = &props->cnts;
-	    if (cnts->good == 0 && cnts->bad == 0) {
-		word_t *token = node->key;
-		props = wordhash_search_memory(token);
-		if (props) {
-		    cnts->good = props->cnts.good;
-		    cnts->bad  = props->cnts.bad;
-		}
-		if (cnts->good == 0 && cnts->bad == 0)
-		    degen(token, cnts);
-	    }
-	}
-	memory_db = NULL;
-	degen_enabled = true;	/* Enable further recursion */
-    }
-
-    return;
-}
-#endif

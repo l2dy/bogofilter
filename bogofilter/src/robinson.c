@@ -17,9 +17,6 @@ NAME:
 #include "bogofilter.h"
 #include "collect.h"
 #include "datastore.h"
-#ifdef	ENABLE_DEPRECATED_CODE
-#include "degen.h"
-#endif
 #include "msgcounts.h"
 #include "prob.h"
 #include "robinson.h"
@@ -29,48 +26,11 @@ NAME:
 
 extern int Rtable;
 
-#ifdef	ENABLE_DEPRECATED_CODE
-double	thresh_rtable = 0.0;		/* used in fisher.c */
-#endif
-
 static rob_stats_t  rob_stats;
-
-#ifdef	ENABLE_DEPRECATED_CODE
-const parm_desc rob_parm_table[] =	/* needed by fisher.c */
-{
-    { "robx",		  CP_DOUBLE,	{ (void *) &robx } },
-    { "robs",		  CP_DOUBLE,	{ (void *) &robs } },
-    { "thresh_rtable",	  CP_DOUBLE,	{ (void *) &thresh_rtable } },
-    { NULL,		  CP_NONE,	{ (void *) NULL } },
-};
-#endif
 
 /* Function Prototypes */
 
-#ifdef	ENABLE_DEPRECATED_CODE
-static void	rob_initialize_constants(void);
-static double	rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
-static void	rob_print_summary(void);
-#endif
-
 /* Static Variables */
-
-#ifdef	ENABLE_DEPRECATED_CODE
-rf_method_t rf_robinson_method = {	/* needed by config.c */
-    {
-	"robinson",			/* const char		  *name;		*/
-	rob_parm_table,	 		/* m_parm_table		  *parm_table		*/
-	rob_initialize_constants,	/* m_initialize_constants *initialize_constants	*/
-	rob_compute_spamicity, 		/* m_compute_spamicity	  *compute_spamicity	*/
-	mth_spamicity,			/* m_spamicity		  *spamicity		*/
-	mth_status,			/* m_status		  *status		*/
-	rob_print_stats, 		/* m_print_bogostats	  *print_stats		*/
-	rob_cleanup, 			/* m_free		  *cleanup		*/
-    },
-    rob_get_spamicity,			/* rf_get_spamicity	  *get_spamicity	*/
-    rob_print_summary			/* rf_print_summary	  *print_summary	*/
-};
-#endif
 
 /* Function Definitions */
 
@@ -80,11 +40,6 @@ void rob_print_stats(FILE *fp)
 
     fp = NULL; 	/* quench compiler warning */
     if (Rtable || unsure || verbose >= 2
-#ifdef	ENABLE_DEPRECATED_CODE
-	||
-	rob_stats.s.spamicity > thresh_stats ||
-	rob_stats.s.spamicity > thresh_rtable
-#endif
 	)
 	rstats_print(unsure);
 }
@@ -156,36 +111,9 @@ double lookup_and_score(const word_t *token, wordcnts_t *cnts)
 {
     double prob;
 
-#ifdef	ENABLE_DEPRECATED_CODE
-    const char *colon;
-#endif
-
     if (cnts->bad == 0 && cnts->good == 0)
 	lookup(token, cnts);
 
-#ifdef	ENABLE_DEPRECATED_CODE
-    if (header_degen && cnts->bad == 0 && cnts->good == 0 && (colon = strchr((const char *)(token->text), ':')) != NULL) {
-	word_t *tword = word_new((unsigned const char *)(colon+1), strlen(colon+1));
-	wordcnts_t tcnts;
-	wordcnts_init(&tcnts);
-	lookup_and_score(tword, &tcnts);
-	wordcnts_incr(cnts, &tcnts);
-	prob = wordprob_result(cnts);
-	word_free(tword);
-    }
-    else
-    if (cnts->bad != 0 || cnts->good != 0) {
-	prob = wordprob_result(cnts);
-    }
-    else
-    if (degen_enabled)
-    {
-	degen_enabled = false;	/* Disable further recursion */
-	prob = degen(token, cnts);
-	degen_enabled = true;	/* Enable further recursion */
-    }
-    else
-#endif
 	prob = wordprob_result(cnts);
 
     return prob;
@@ -303,52 +231,6 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     return (spamicity);
 }
 
-#ifdef	ENABLE_DEPRECATED_CODE
-double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
-{
-    if (robn == 0)
-	rob_stats.s.spamicity = robx;
-    else
-    {
-	double r = 1.0 / robn;
-	static double ln2 = 0.6931472;				/* ln(2) */
-
-	rob_stats.robn = robn;
-
-	/* convert to natural logs */
-	rob_stats.p_ln = log(P.mant) + P.exp * ln2;		/* invlogsum */
-	rob_stats.q_ln = log(Q.mant) + Q.exp * ln2;		/* logsum    */
-
-	rob_stats.p_pr = 1.0 - exp(rob_stats.p_ln * r);		/* Robinson's P */
-	rob_stats.q_pr = 1.0 - exp(rob_stats.q_ln * r);		/* Robinson's Q */
-
-	rob_stats.s.spamicity = (1.0 + (rob_stats.p_pr - rob_stats.q_pr) / (rob_stats.p_pr + rob_stats.q_pr)) / 2.0;
-    }
-
-    return rob_stats.s.spamicity;
-}
-#endif
-
-#ifdef	ENABLE_DEPRECATED_CODE
-void rob_print_summary(void)
-{
-    if (!Rtable) {
-	(void)fprintf(stdout, "%-*s %5lu %9.6f %9.6f %9.6f\n",
-		      MAXTOKENLEN+2, "P_Q_S_invs_logs_md", 
-		      (unsigned long)rob_stats.robn,
-		      rob_stats.p_pr, rob_stats.q_pr, rob_stats.s.spamicity);
-	(void)fprintf(stdout, "%-*s %9.2e %9.2e %6.3f\n",
-		      MAXTOKENLEN+2+6, " ", robs, robx, min_dev);
-    }
-    else
-	(void)fprintf(stdout, "%-*s %5lu %9.6f %9.6f %9.6f %9.3f %9.3f %5.3f\n",
-		      MAXTOKENLEN+2, "P_Q_S_invs_logs_md", 
-		      (unsigned long)rob_stats.robn,
-		      rob_stats.p_pr, rob_stats.q_pr, rob_stats.s.spamicity, 
-		      rob_stats.p_ln, rob_stats.q_ln, min_dev);
-}
-#endif
-
 void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double _spam_cutoff)
 {
     word_t *word_robx = word_new((const byte *)ROBX_W, strlen(ROBX_W));
@@ -390,13 +272,6 @@ void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double 
 
     return;
 }
-
-#ifdef	ENABLE_DEPRECATED_CODE
-void rob_initialize_constants(void)
-{
-    rob_initialize_with_parameters(&rob_stats, ROBINSON_MIN_DEV, ROBINSON_SPAM_CUTOFF);
-}
-#endif
 
 void rob_cleanup(void)
 {

@@ -25,11 +25,6 @@ struct wordlist_s
     bool	ignore;
 };
 
-#ifdef	ENABLE_DEPRECATED_CODE
-extern	wl_t	wl_default;
-extern	wl_t	wl_mode   ;
-#endif
-
 /*@null@*/ 
 extern wordlist_t *word_list;
 

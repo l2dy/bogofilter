@@ -22,9 +22,6 @@ typedef enum {
 	CP_DOUBLE,
 	CP_STRING,
 	CP_DIRECTORY,
-#ifdef	ENABLE_DEPRECATED_CODE
-	CP_WORDLIST,
-#endif
 	CP_FUNCTION
 } parm_t;
 

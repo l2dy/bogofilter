@@ -10,10 +10,6 @@
 
 /* Default wordlist mode is now wordlist.db -
    a single wordlist containing ham and spam tokens */
-#ifdef	ENABLE_DEPRECATED_CODE
-wl_t	wl_default = WL_M_COMBINED;
-wl_t	wl_mode    = WL_M_UNKNOWN;	/* '-W' flag */
-#endif
 
 wordlist_t *word_list;
 /*@null@*/ wordlist_t* word_lists=NULL;
