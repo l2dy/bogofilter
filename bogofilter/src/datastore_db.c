@@ -59,27 +59,41 @@ typedef struct {
     bool	is_swapped;
 } dbh_t;
 
-#define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
+#define DBT_init(dbt) (memset(&dbt, 0, sizeof(DBT)))
 
 #define DB_AT_LEAST(maj, min) ((DB_VERSION_MAJOR > (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR >= (min))))
 #define DB_AT_MOST(maj, min) ((DB_VERSION_MAJOR < (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR <= (min))))
 
-#if DB_AT_LEAST(4,1)
-#define	DB_OPEN(db, file, database, dbtype, flags, mode) db->open(db, NULL /*txnid*/, file, database, dbtype, flags, mode)
-#else
-#define	DB_OPEN(db, file, database, dbtype, flags, mode) db->open(db, file, database, dbtype, flags, mode)
-#endif
-
-/* Function prototypes */
-
 /* Function definitions */
 
-const char *db_version_str(void)
+static const char *resolveflags(u_int32_t flags) {
+    static char buf[160];
+    char b2[80];
+    strlcpy(buf, "", sizeof(buf));
+    if (flags & DB_CREATE) flags &= ~DB_CREATE, strlcat(buf, "DB_CREATE ", sizeof(buf));
+    if (flags & DB_EXCL) flags &= ~DB_EXCL, strlcat(buf, "DB_EXCL ", sizeof(buf));
+    if (flags & DB_NOMMAP) flags &= ~DB_NOMMAP, strlcat(buf, "DB_NOMMAP ", sizeof(buf));
+    if (flags & DB_RDONLY) flags &= ~DB_RDONLY, strlcat(buf, "DB_RDONLY ", sizeof(buf));
+    snprintf(b2, sizeof(b2), "%#lx", (unsigned long)flags);
+    if (flags) strlcat(buf, b2, sizeof(buf));
+    return buf;
+}
+
+static int DB_OPEN(DB *db, const char *file,
+	const char *database, DBTYPE type, u_int32_t flags, int mode)
 {
-    static char v[80];
-    snprintf(v, sizeof(v), "BerkeleyDB (%d.%d.%d)",
-	    DB_VERSION_MAJOR, DB_VERSION_MINOR, DB_VERSION_PATCH);
-    return v;
+    int ret;
+
+    ret = db->open(db,
+#if DB_AT_LEAST(4,1)
+	    NULL,
+#endif
+	    file, database, type, flags, mode);
+
+    if (DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB_OPEN"))
+	fprintf(dbgout, "DB->open(db=%p, file=%s, database=%s, type=%x, flags=%#lx=%s, mode=%#o) -> %d %s\n", db, file, database ? database : "NIL", type, (unsigned long)flags, resolveflags(flags), mode, ret, db_strerror(ret));
+
+    return ret;
 }
 
 /* implements locking. */
@@ -201,6 +215,14 @@ static uint32_t get_psize(DB *dbp)
 #define get_psize(discard) 0
 #endif
 
+const char *db_version_str(void)
+{
+    static char v[80];
+    snprintf(v, sizeof(v), "BerkeleyDB (%d.%d.%d)",
+	    DB_VERSION_MAJOR, DB_VERSION_MINOR, DB_VERSION_PATCH);
+    return v;
+}
+
 /*
   Initialize database.
   Returns: pointer to database handle on success, NULL otherwise.
@@ -262,8 +284,8 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	/* set cache size, but only unless we're using an environment */
 	if (dbe == NULL && db_cachesize != 0 &&
 	    (ret = dbp->set_cachesize(dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
-	    print_error(__FILE__, __LINE__, "(db) DB->set_cachesize( %s ), err: %d, %s",
-			handle->name, ret, db_strerror(ret));
+	    print_error(__FILE__, __LINE__, "(db) DB(%s)->set_cachesize(%u,%u,%u), err: %d, %s",
+			handle->name, db_cachesize/1024u, (db_cachesize % 1024u) * 1024u*1024u, 1u, ret, db_strerror(ret));
 	    goto open_err;
 	}
 
@@ -292,9 +314,6 @@ retry_db_open:
 	    dbp->close(dbp, 0);
 	    goto open_err;
 	}
-
-	if (DEBUG_DATABASE(1))
-	    fprintf(dbgout, "db_open( %s, %d ) -> %d\n", handle->name, open_mode, ret);
 
 	/* see if the database byte order differs from that of the cpu's */
 #if DB_AT_LEAST(3,3)
@@ -610,7 +629,7 @@ int db_init(void) {
 	}
 	if (db_cachesize != 0 &&
 	    (ret = dbe->set_cachesize(dbe, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
-	    print_error(__FILE__, __LINE__, "DBENV->set_cachesize(%d), err: %d, %s",
+	    print_error(__FILE__, __LINE__, "DBENV->set_cachesize(%u), err: %d, %s",
 			db_cachesize, ret, db_strerror(ret));
 	    exit(EXIT_FAILURE);
 	}
