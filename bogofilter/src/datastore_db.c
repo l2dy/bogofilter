@@ -41,7 +41,6 @@ typedef struct {
     int		fd[IX_SIZE];
     dbmode_t	open_mode;
     DB		*dbp[IX_SIZE];
-    pid_t	pid;
     bool	locked;
     bool	is_swapped;
 } dbh_t;
@@ -107,7 +106,6 @@ static dbh_t *dbh_init(const char *path, size_t count, const char **names)
 	handle->fd[c]    = -1; /* for lock */
 	build_path(handle->name[c], len, path, names[c]);
     }
-    handle->pid	    = getpid();
     handle->locked  = false;
     handle->is_swapped= false;
 

@@ -70,9 +70,6 @@ void db_updvalues(dsh_t *dsh, const dbv_t *token, const dbv_t *updval);
 typedef int (*db_foreach_t)(dbv_t *token, dbv_t *data, void *userdata);
 int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata);
 
-/* Get the current process id */
-unsigned long db_handle_pid(dsh_t *dsh);
-
 /* Get the database filename */
 char *db_handle_filename(dsh_t *dsh);
 

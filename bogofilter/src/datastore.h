@@ -247,13 +247,6 @@ int ds_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     return db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 }
 
-/* Get the current process id */
-extern __inline 
-unsigned long ds_handle_pid(void *vhandle)
-{
-    return long db_handle_pid(void *vhandle)
-}
-
 /* Get the database filename */
 extern __inline 
 char *ds_handle_filename(void *vhandle)

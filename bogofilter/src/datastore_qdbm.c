@@ -41,7 +41,6 @@ typedef struct {
     char *path;
     size_t count;
     char *name[IX_SIZE];
-    pid_t pid;
     bool locked;
     DEPOT *dbp[IX_SIZE];
 } dbh_t;
@@ -71,7 +70,6 @@ static dbh_t *dbh_init(const char *path, size_t count, const char **names)
       handle->name[c] = xmalloc(len);
       build_path(handle->name[c], len, path, names[c]);
     }
-    handle->pid = getpid();
     handle->locked = false;
 
     return handle;
