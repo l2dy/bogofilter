@@ -35,8 +35,6 @@ NAME:
 #define ROBS			0.001f	/* Robinson's s */
 #define ROBX			0.415f	/* Robinson's x */
 
-extern double min_dev;
-
 extern int Rtable;
 static double scalefactor;
 

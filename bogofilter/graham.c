@@ -32,8 +32,6 @@ NAME:
 #define GRAHAM_SPAM_CUTOFF	0.90f	/* if it's spammier than this... */
 #define GRAHAM_MAX_REPEATS	4	/* cap on word frequency per message */
 
-extern double min_dev;
-
 int	thresh_index = 0;
 
 /*

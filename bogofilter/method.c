@@ -62,5 +62,3 @@ rc_t mth_status(void)
     rc_t status = ( mth_stats->spamicity >= spam_cutoff ) ? RC_SPAM : RC_HAM;
     return status;
 }
-
-
