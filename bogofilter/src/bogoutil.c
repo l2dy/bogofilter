@@ -474,7 +474,7 @@ static const char *help_text[] = {
 
     "environment maintenance:\n",
     "  -k, --db_cachesize=size     - set Berkeley DB cache size (MB).\n",
-    "      --db_check=file         - check data file.\n",
+    "      --db_verify=file        - verify data file.\n",
     "      --db_prune=dir          - remove inactive log files in dir.\n",
     "      --db_recover=dir        - run recovery on database in dir.\n",
     "      --db_recover-harder=dir - run catastrophic recovery on database in dir.\n",
@@ -529,10 +529,10 @@ struct option long_options[] = {
     { "timestamp-date",			N, 0, 'y' },
 
     { "db-cachesize",			N, 0, 'k' },
-    { "db-check",                       N, 0, O_DB_CHECK },
     { "db-prune",                       N, 0, O_DB_PRUNE },
     { "db-recover",                     N, 0, O_DB_RECOVER },
     { "db-recover-harder",              N, 0, O_DB_RECOVER_HARDER },
+    { "db-verify",                      N, 0, O_DB_VERIFY },
 #ifdef	HAVE_DECL_DB_CREATE
     { "db_lk_max_locks",		R, 0, O_DB_MAX_LOCKS },
     { "db_lk_max_objects",		R, 0, O_DB_MAX_OBJECTS },
