@@ -1,7 +1,16 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN"
    "http://www.w3.org/TR/html4/strict.dtd">
 <html>
-<head><title>Bogofilter FAQ</title></head>
+<head><title>Bogofilter FAQ</title>
+<style type="text/css">
+<!--
+  body {
+    max-width:36em;
+    margin:auto;
+  }
+-->
+</style>
+</head>
 <body>
 <h1>Bogofilter FAQ</h1>
 <p>
@@ -17,12 +26,11 @@ bogofilter.
 <p>
 <ul>
   <li><a href="#what_is_bogofilter">What is bogofilter?</a></li>
-  <li><a href="#history">Bogofilter History</a></li>
-  <li><a href="#home_page">Bogofilter Home Page</a></li>
   <li><a href="#lists">Bogofilter Mailing Lists</a></li>
   <li><a href="#token_counts">How do I find the spam and ham counts for a token?</a></li>
   <li><a href="#message_count">How do I tell how many messages are in my wordlists?</a></li>
   <li><a href="#wordlist_size">How do I tell how many tokens are in my wordlists?</a></li>
+  <li><a href="#asian_spam">What can I do about asian spam?</a></li>
   <li><a href="#port_notes">How do I get Bogofilter working on Solaris, BSD, etc.?</a></li>
   <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
   <li><a href="#rescue">How can I tell if my wordlists are corrupted?</a></li>
@@ -43,32 +51,21 @@ A Plan For Spam</a>.
 Gary Robinson</a>'s geometric-mean algorithm is also included as is his modification
 of the algorithm to use Fisher's method.
 <p>
-Check the <a href="http://bogofilter.sourceforge.net">
-bogofilter home page</a> for more information.
-</p>
-
-<hr>
-
-<p><a name="history"></a><b>Bogofilter History</b></p>
+The bogofilter <a href="http://bogofilter.sourceforge.net">home page</a> at
+SourceForge is the central clearinghouse for bogofilter resources.
 <p>
-Bogofilter was written by Eric S. Raymond on August 19, 2002. It gained
+Bogofilter was started by Eric S. Raymond on August 19, 2002. It gained
 popularity in September 2002, and a number of other authors have started
 to contribute to the project.
-</p>
-
-<hr>
-
-<p><a name="home_page"></a><b>Bogofilter Home Page</b></p>
 <p>
-The <a href="http://bogofilter.sourceforge.net">bogofilter home page</a> at
-sourceforge is the central clearinghouse for bogofilter resources.
+For more detail on bogofilter's history <a href="http://bogofilter.sourceforge.net/NEWS">click here</a>.
 </p>
 
 <hr>
 
 <p><a name="lists"></a><b>Mailing Lists</b></p>
 <p>
-There are currently four mailing lists for bogofilter
+There are currently four mailing lists for bogofilter:
 </p>
 
 <table border="1" width="100%">
@@ -120,7 +117,7 @@ discussions.</td>
 archive.</td>
 </tr>
 </table>
-
+<p>
 <hr>
 
 <p><a name="token_counts"></a><b>How do I find the spam and ham counts for a token?</b></p>
@@ -148,6 +145,46 @@ archive.</td>
  count for the spamlist and use "bogoutil -d $BOGOFILTER_DIR/goodlist.db | wc -l"
   to display the count for the goodlist.
  </p>
+
+<hr>
+
+<p><a name="asian_spam"></a><b>What can I do about asian spam?</b></p>
+<p>
+The good news is that bogofilter does detect them quite successfully.  
+The bad news is that this can be expensive.  
+You have basically two choices:
+<ul><li>
+If you are sure you will not receive any legitimate messages in those languages, 
+you might as well kill them right away.
+This will keep the database smaller.  
+You can do this with an MDA script.
+<br><br>
+Here's a procmail recipe that will sideline messages written with asian charsets:
+<pre>
+## Silently drop all completely unreadable mail
+UNREADABLE="big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987|windows-1251|windows-1256"
+:0:
+* 1^0 ^\/Subject:.*=\?(.*$UNREADABLE)\?
+* 1^0 ^\/Content-Type:.*charset="(.*$UNREADABLE)
+spam-unreadable
+####
+</pre>
+With the above recipe, bogofilter will <u>never</u> see the message.
+<p></li><li>
+Or, you can simply let bogofilter do its job.<p>
+<p>
+Just train bogofilter with the asian language messages identified as spam.  
+Bogofilter will parse the messages as best it can and will add tokens to the
+spam wordlist.  The wordlist will contain many tokens which don't make sense
+to you (since the charset cannot been displayed), but bogofilter can work
+with them and successfully identify asian spam.
+<p>
+A second method is to use the "replace_nonascii_characters" config file option.
+This will replace high-bit characters, i.e. those between 0x80 and 0xFF, with question marks, '?'.
+This  keeps the database much smaller.  Unfortunately this conflicts with european language 
+which have many accented vowels and consonant in the high-bit range.
+</li></ul>
+</p>
 
 <hr>
 
