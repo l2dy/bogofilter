@@ -236,8 +236,8 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     const byte *word = buf;
 
 #ifndef	ENABLE_DEPRECATED_CODE
-    const char *head_format = !show_probability ? "%-30s %6s\n"   : "%-30s %6s  %6s  %6s\n";
-    const char *data_format = !show_probability ? "%-30s %6lu\n" : "%-30s %6lu  %6lu  %f\n";
+    const char *head_format = !show_probability ? "%-30s %6s %6s\n"   : "%-30s %6s  %6s  %6s\n";
+    const char *data_format = !show_probability ? "%-30s %6lu %6lu\n" : "%-30s %6lu  %6lu  %f\n";
 #else
     const char *head_format = !show_probability ? "%-30s %6s %6s\n"   : "%-30s %6s  %6s  %6s  %6s\n";
     const char *data_format = !show_probability ? "%-30s %6lu %6lu\n" : "%-30s %6lu  %6lu  %f  %f\n";
