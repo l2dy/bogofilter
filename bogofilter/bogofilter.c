@@ -1,8 +1,11 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.1  2002/09/14 22:15:20  adrian_otto
- * Initial revision
- * */
+ * Revision 1.2  2002/09/15 16:16:50  relson
+ * Clean up underflow checking for word counts by using max() instead of if...then...
+ *
+/* Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
+/* 0.7.3 Base Source
+/* */
 /*****************************************************************************
 
 NAME:
@@ -122,13 +125,8 @@ void set_word_value(char *word, long value, wordlist_t *list)
 static void increment(char *word,  long incr, wordlist_t *list)
 /* increment a word usage count in the specified list */
 {
-  long count = get_word_value(word, list);
-  if ( incr > 0 || count > -incr ) {
-      count += incr;
-  }
-  else {
-      count = 0;
-  }
+  long count = get_word_value(word, list) + incr;
+  count = max(count, 0);
  
   set_word_value(word, count, list);
 
@@ -140,7 +138,6 @@ static void increment(char *word,  long incr, wordlist_t *list)
 static int getcount(char *word, wordlist_t *list)
 /* get the count associated with a given word in a list */
 {
-
   long value = get_word_value(word, list);
 
   if (value){
@@ -148,10 +145,9 @@ static int getcount(char *word, wordlist_t *list)
       printf("getcount: '%s' has %ld %s hits in %ld\n", word, value, list->name, list->msgcount);
   }
   else {
-	if (verbose >= 3)
-	    printf("getcount: no %s hits for %s\n", list->name, word);
-    }
-
+      if (verbose >= 3)
+	  printf("getcount: no %s hits for %s\n", list->name, word);
+  }
 
   return value; 
 }
@@ -159,7 +155,6 @@ static int getcount(char *word, wordlist_t *list)
 int read_count(wordlist_t *list)
 /* Reads count of emails, if any. */ 
 {
-
     FILE	*infp;
 
     list->msgcount = 0;
