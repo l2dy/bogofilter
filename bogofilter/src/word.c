@@ -1,14 +1,10 @@
 /* $Id$ */
 
-/*****************************************************************************
-
-NAME:
-   word.c -- support for bogofilter's word struct
-
-AUTHOR:
-   David Relson <relson@osagesoftware.com>
-
-******************************************************************************/
+/** \file word.c
+ * support for strings of arbitrary content, implementation
+ *
+ * \author David Relson <relson@osagesoftware.com>
+ */
 
 #include "common.h"
 
@@ -48,6 +44,7 @@ word_t *word_dup(const word_t *word)
     return self;
 }
 
+/** \bug if src doesn't fit into dst, overwrites heap data! */
 word_t *word_cpy(word_t *dst, const word_t *src)
 {
     dst->leng = src->leng;
