@@ -25,6 +25,7 @@ bogofilter.
   <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
   <li><a href="#return_codes">Why does bogofilter give return codes like 0 and 256
          when it's run from inside a program?</a></li>
+  <li><a href="#changed_options">Now that I've upgraded to 0.11 why are my scripts broken?</a></li>
   <li>How can I use SpamAssasin to train Bogofilter? (coming soon)</li>
 </ul>
 </p>
@@ -215,6 +216,36 @@ to your NFS documentation for more information about running "lockd" or
  Likely the return codes are being reformatted by waitpid(2).  
  Use WEXITSTATUS(status) in sys/wait.h, or comparable macro, to get the correct value.
  </p>
+
+<hr>
+<a name="changed_options"></a>
+<p><b>Now that I've upgraded to 0.11 why are my scripts broken?</b></p>
+With version 0.11 bogofilter's options for registering mail as ham or spam have
+been changed.  They now allow registering (or unregistering) messages in the 
+ham and spam wordlists.  Prior to this, there was no way to unregister a 
+message from a wordlist (without registering it in the other wordlist).
+<p>
+Bogofilter has four registration options - '-s', '-n', '-S', and '-N'.  With 
+the release of version 0.11 the meaning of '-S' and '-N' has been changed to 
+allow unregistering messages from the word lists.  Here's what the four options mean:
+<ul>
+  <li>'-s' means to register the current message as spam,
+      i.e. add its tokens to spamlist.db</li>
+  <li>'-n' means to register the current message as ham,
+      i.e. add its tokens to goodlist.db</li>
+  <li>'-S' means to unregister the current message from the spam wordlist,
+      i.e. remove its tokens from spamlist.db</li>
+  <li>'-N' means to unregister the current message from the ham wordlist,
+      i.e. remove its tokens from goodlist.db</li>
+</ul>
+Prior to version 0.11, the '-S' option was used to move a message from the ham 
+wordlist to the spam wordlist, i.e. there were two actions.  Now with 0.11 
+each of the two actions is invoked by its own option.  To get the same effect 
+as the old '-S', you should use '-N -s' (or '-Ns' which means the same thing).
+<p>Similarly, the old '-N' option is now '-Sn' (or '-S -n').
+<p>In terms of scripts, procmail recipes (and their analogs) typically use '-s' 
+and '-n' and don't need to change.  Existing scripts for fixing registration 
+errors which use '-S' and '-N' <b>do</b> need to be changed.
 
 <hr>
 $Id$
