@@ -84,7 +84,7 @@ int check_directory(const char* path) /*@globals errno,stderr@*/
 		perror("Error creating directory");
 		return -1;
 	    } else if (verbose > 0) {
-		(void)fprintf(stderr, "Created directory %s .\n", path);
+		(void)fprintf(dbgout, "Created directory %s .\n", path);
 	    }
 	    return 0;
 	} else {
