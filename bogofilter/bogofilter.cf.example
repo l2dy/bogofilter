@@ -106,7 +106,8 @@
 #	    f - spamicity as 'f' format
 #	    g - spamicity as 'g' format
 #
-#	    I - IP addr (from first Received: statement with one)
+#	    I - IP addr (last IPAddr in first Received: statement having one)
+#		Not guaranteed to be the originating address of the message.
 #
 #	    l - logging tag (from '-l' option)
 #
