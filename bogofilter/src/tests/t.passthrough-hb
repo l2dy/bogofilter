@@ -1,0 +1,14 @@
+#! /bin/sh
+
+. ${srcdir:=.}/t.frame
+
+# test description here
+#
+# test below
+# remember to use ${srcdir}
+# check seekable input
+$VAL ${relpath}/bogofilter -e -p -C <${srcdir}/inputs/headerbody.txt \
+>${TMPDIR}/output
+$AWK '/^X-Bogosity:/ { bl=NR } \
+      /^Summary:/    { bs=NR } \
+      END            { if (bs > br) { exit 1 } }' <${TMPDIR}/output

@@ -18,6 +18,7 @@ PARSING_TESTS = \
 	t.ignore_spam_header \
 	t.nullstatsprefix \
 	t.integrity t.integrity2 t.integrity3 \
+	t.passthrough-hb \
 	t.split t.parsing \
 	t.lexer t.lexer.mbx \
 	t.folded_rfc2047 \
