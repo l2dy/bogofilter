@@ -44,23 +44,28 @@ dsm_t *dsm = NULL;
 
 dsm_t dsm_dummies = {
     /* public -- used in datastore.c */
-    NULL,
-    NULL,
-    NULL,
-
+    NULL,	/* dsm_begin           */
+    NULL,	/* dsm_abort           */
+    NULL,	/* dsm_commit          */
     /* private -- used in datastore_db_*.c */
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL
+    NULL,	/* dsm_env_init         */
+    NULL,	/* dsm_cleanup          */
+    NULL,	/* dsm_cleanup_lite     */
+    NULL,	/* dsm_get_env_dbe      */
+    NULL,	/* dsm_database_name    */
+    NULL,	/* dsm_recover_open     */
+    NULL,	/* dsm_auto_commit_flags*/                    
+    NULL,	/* dsm_get_rmw_flag     */
+    NULL,	/* dsm_lock             */
+    NULL,	/* dsm_common_close     */
+    NULL,	/* dsm_sync             */
+    NULL,	/* dsm_log_flush        */
+    NULL,	/* dsm_recover          */
+    NULL,	/* dsm_remove           */
+    NULL,	/* dsm_checkpoint       */
+    NULL,	/* dsm_purgelogs        */
+    NULL,	/* dsm_verify           */
+    NULL	/* dsm_pagesize         */
 };
 
 /* Function definitions */
@@ -489,43 +494,67 @@ const char *ds_version_str(void)
     return db_version_str();
 }
 
-int ds_recover(const char *directory, bool catastrophic)
+ex_t ds_recover(const char *directory, bool catastrophic)
 {
-    bfdir dir;
-    dir.dirname = directory;
-    return dbe_recover(&dir, catastrophic, true);
+    if (dsm->dsm_recover == NULL)
+	return EX_OK;
+    else {
+	bfdir dir;
+	dir.dirname = directory;
+	return dsm->dsm_recover(&dir, catastrophic, true);
+    }
 }
 
-int ds_remove(const char *directory) {
-    bfdir dir;
-    dir.dirname = directory;
-    return dbe_remove(&dir);
+ex_t ds_remove(const char *directory) {
+    if (dsm->dsm_remove == NULL)
+	return EX_OK;
+    else {
+	bfdir dir;
+	dir.dirname = directory;
+       	return dsm->dsm_remove(&dir);
+    }
 }
 
-int ds_checkpoint(const char *directory) {
-    bfdir dir;
-    dir.dirname = directory;
-    return dbe_checkpoint(&dir);
+ex_t ds_checkpoint(const char *directory) {
+    if (dsm->dsm_checkpoint == NULL)
+	return EX_OK;
+    else {
+	bfdir dir;
+	dir.dirname = directory;
+	return dsm->dsm_checkpoint(&dir);
+    }
 }
 
-int ds_purgelogs(const char *directory) {
-    bfdir dir;
-    dir.dirname = directory;
-    return dbe_purgelogs(&dir);
+ex_t ds_purgelogs(const char *directory) {
+    if (dsm->dsm_purgelogs == NULL)
+	return EX_OK;
+    else {
+	bfdir dir;
+	dir.dirname = directory;
+	return dsm->dsm_purgelogs(&dir);
+    }
 }
 
-int ds_verify(const char *directory, const char *filename) {
-    bfdir dir;
-    bffile file;
-    dir.dirname = directory;
-    file.filename = filename;
-    return db_verify(&dir, &file);
+ex_t ds_verify(const char *directory, const char *filename) {
+    if (dsm->dsm_verify == NULL)
+	return EX_OK;
+    else {
+	bfdir dir;
+	bffile file;
+	dir.dirname = directory;
+	file.filename = filename;
+	return dsm->dsm_verify(&dir, &file);
+    }
 }
 
 u_int32_t ds_pagesize(const char *directory, const char *filename) {
-    bfdir dir;
-    bffile file; 
-    dir.dirname = directory;
-    file.filename = filename;
-    return db_pagesize(&dir, &file);
+    if (dsm->dsm_pagesize == NULL)
+	return 0;
+    else {
+	bfdir dir;
+	bffile file; 
+	dir.dirname = directory;
+	file.filename = filename;
+	return dsm->dsm_pagesize(&dir, &file);
+    }
 }
