@@ -13,6 +13,7 @@ AM_INIT_AUTOMAKE([foreign 1.7 dist-bzip2])
 AM_CONFIG_HEADER(src/config.h:config.in)
 AC_PROG_AWK
 AC_PROG_CC(gcc xlc cc)
+AC_GNU_SOURCE
 AC_CHECK_TOOL(AR, ar)
 AC_PROG_RANLIB
 AC_PATH_PROGS(PERL, perl perl5, $PATH:/usr/local/bin:/usr/bin)
@@ -110,7 +111,7 @@ dnl See http://thread.gmane.org/gmane.mail.bogofilter.general/6352
       -Wmissing-format-attribute -Wnested-externs \
       -fno-common -Wchar-subscripts -Wcomment \
       -Wimplicit -Wsequence-point -Wreturn-type \
-      -Wno-system-headers
+      -Wno-system-headers -Wformat -Wformat=2
       # -Wfloat-equal
       # -Wmissing-noreturn -Wconversion -pedantic -Wredundant-decls
   do
@@ -261,6 +262,8 @@ AC_REPLACE_FUNCS(strlcpy strlcat)
 
 AC_LIB_RPATH
 
+AC_CACHE_SAVE
+
 WITH_DB_ENGINE=db
 AC_ARG_WITH(database,
 	    AC_HELP_STRING([--with-database=ENGINE],
@@ -331,10 +334,12 @@ Remember to include your config.log.
 	AC_MSG_CHECKING(if a program can be linked against BerkeleyDB and run)
 	AC_RUN_IFELSE(
 	AC_LANG_PROGRAM([[
-		   #include <stdlib.h>
-		   #include <db.h>
+#ifdef HAVE_INTTYPES_H
+#include <inttypes.h>
+#endif
+#include <db.h>
 		   ]], [[
-			    exit(0);
+return 0;
 		   ]]),,
 		   [AC_MSG_RESULT(no)
 	AC_MSG_ERROR([Cannot run a program linked against libdb.
@@ -348,6 +353,9 @@ Did you adjust your library search path to include your libdb?])],)
 	AC_LANG_PROGRAM([[
 		   #include <stdlib.h>
 		   #include <stdio.h>
+#ifdef HAVE_INTTYPES_H
+#include <inttypes.h>
+#endif
 		   #include <db.h>
 		   ]], [[
 			int maj, min;
@@ -365,7 +373,10 @@ Did you adjust your library search path to include your libdb?])],)
 	       AC_MSG_ERROR([[Can not locate a suitable BerkeleyDB db.h header file.
 Use --with-libdb-prefix=PATH to specify the path to a v3+ install directory.
 You can download BerkeleyDB 4.1.x from http://www.sleepycat.com/]]),
-	[[#include <db.h>]]
+	[[#ifdef HAVE_INTTYPES_H
+#include <inttypes.h>
+#endif
+#include <db.h>]]
 	)
 	LIBS="$saveLIBS"
     ;;
