@@ -25,8 +25,8 @@
 wl_t	wl_default = WL_M_COMBINED;
 wl_t	wl_mode    = WL_M_UNKNOWN;	/* '-W' flag */
 
-#define	MIN_SLEEP	0.5e+3		/* .5 milliseconds */
-#define	MAX_SLEEP	2.0e+6		/* 2 seconds */
+#define	MIN_SLEEP	0.5e+3		/* 0.5 milliseconds */
+#define	MAX_SLEEP	2.0e+6		/* 2.0 seconds */
 
 wordlist_t *word_list;
 wordlist_t *good_list;
@@ -42,18 +42,16 @@ static void rand_sleep(double min, double max);
 static void rand_sleep(double min, double max)
 {
     static bool need_init = true;
-    struct timeval timeval;
     long delay;
 
     if (need_init) {
+	struct timeval timeval;
 	need_init = false;
 	gettimeofday(&timeval, NULL);
 	srand(timeval.tv_usec);
     }
     delay = min + ((max-min)*rand()/(RAND_MAX+1.0));
-    timeval.tv_sec  = delay / 1000000;
-    timeval.tv_usec = delay % 1000000;
-    select(0,NULL,NULL,NULL,&timeval);
+    bf_sleep(delay);
 }
 
 /* returns -1 for error, 0 for success */

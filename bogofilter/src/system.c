@@ -37,6 +37,19 @@ bool bf_abspath(const char *path)
 #endif
 }
 
+void bf_sleep(long delay)
+{
+#ifndef _OS2_
+    struct timeval timeval;
+    timeval.tv_sec  = delay / 1000000;
+    timeval.tv_usec = delay % 1000000;
+    select(0,NULL,NULL,NULL,&timeval);
+#else
+/*APIRET DosSleep(ULONG  msec )  */
+    DosSleep(1);
+#endif
+}
+
 int bf_mkdir(const char *path, mode_t mode)
 {
     int rc;
