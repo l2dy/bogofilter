@@ -38,6 +38,7 @@ AUTHOR:
 /* Global Variables */
 
 static int stackp = -1;
+static bool overflow_error = false;
 
 static mime_t msg_stack[MIME_STACK_MAX];
 mime_t *msg_state = msg_stack;
@@ -163,6 +164,7 @@ void mime_cleanup()
 {
     while (stackp > -1)
 	mime_pop();
+    overflow_error = false;
 }
 
 static void mime_push(mime_t * parent)
@@ -185,7 +187,10 @@ static void mime_push(mime_t * parent)
 	if (DEBUG_MIME(1))
 	    fprintf(dbgout, "*** mime_push. stackp: %d\n", stackp);
     } else {
-	fprintf(stderr, "Attempt to overflow mime stack\n");
+	if (! overflow_error) {
+	    overflow_error = true;
+	    fprintf(stderr, "Attempt to overflow mime stack\n");
+	}
     }
     if (DEBUG_MIME(2))
 	mime_stack_dump();

@@ -21,7 +21,12 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+
 0.93.3	2004-12-XX
+
+	2004-12-10
+
+	* Limit mime overflow error messages to 1 per email.
 
 	2004-12-09
 
