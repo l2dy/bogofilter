@@ -127,7 +127,7 @@ CONFIGTEST_OBJS = o.configtest
 
 all: bogofilter bogolexer bogoutil bogowordfreq configtest
 
-dist: all
+dist: install
 	-cdir <Bogofilter$Dir>.docs
 	-copy ^.AUTHORS <Bogofilter$Dir>.docs.* ~CF~V
 	-copy ^.COPYING <Bogofilter$Dir>.docs.* ~CF~V

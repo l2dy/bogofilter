@@ -139,14 +139,12 @@ char *get_directory(priority_t which)
 	if (dir == NULL)
 	    dir = create_path_from_env("BOGODIR", NULL);
     }
-
-    if (which == PR_ENV_HOME) {
+    if (which == PR_ENV_HOME)
 	dir = create_path_from_env("HOME", BOGODIR);
-    }
 #else
     if (which == PR_ENV_BOGO)
 	dir = create_path_from_env("Bogofilter$Dir", NULL);
-    else if (which == PR_ENV_HOME)
+    if (which == PR_ENV_HOME)
 	dir = create_path_from_env("Choices$Write", BOGODIR);
 #endif
 
