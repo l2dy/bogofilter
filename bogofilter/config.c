@@ -387,13 +387,13 @@ static void help(void)
     (void)printf( "\t-d path\t- specify directory for wordlists.\n" );
 #ifdef	GRAHAM_AND_ROBINSON
 #ifdef	ENABLE_GRAHAM_METHOD
-    (void)printf( "\t-g\t- select Graham spam calulation method (default).\n" );
+    (void)printf( "\t-g\t- select Graham spam calculation method (default).\n" );
 #endif
 #ifdef	ENABLE_ROBINSON_METHOD
-    (void)printf( "\t-r\t- select Robinson spam calulation method.\n" );
+    (void)printf( "\t-r\t- select Robinson spam calculation method.\n" );
 #endif
 #ifdef	ENABLE_ROBINSON_FISHER
-    (void)printf( "\t-f\t- select Fisher spam calulation method.\n" );
+    (void)printf( "\t-f\t- select Fisher spam calculation method.\n" );
 #endif
 #endif
     (void)printf( "\t-p\t- passthrough.\n" );
