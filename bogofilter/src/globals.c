@@ -22,7 +22,6 @@ bulk_t	bulk_mode = B_NORMAL;		/* '-b, -B' */
 bool	suppress_config_file;		/* '-C' */
 bool	nonspam_exits_zero;		/* '-e' */
 FILE	*fpin = NULL;			/* '-I' */
-bool	fisher;				/* '-f' */
 bool	logflag;			/* '-l' */
 bool	mbox_mode;			/* '-M' */
 bool	replace_nonascii_characters;	/* '-n' */
