@@ -12,7 +12,7 @@ my $commandlineoptions=($ARGV[0]=~/^-(?=[^f]*f?[^f]*$)(?=[^n]*n?[^n]*$)(?=[^s]*s
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.35
+bogominitrain.pl version 1.36
   requires bogofilter 0.14.5 or later
 
 Usage:
@@ -97,7 +97,7 @@ do { # Start force loop
   do {
 
     # Read one mail from ham box and test, train as needed
-    unless (eof(HAM) || $hamcount/$ham_total > $spamcount/$spam_total) {
+    unless (eof(HAM) || $hamcount*$spam_total > $spamcount*$ham_total) {
       my $mail=$lasthamline;
       $lasthamline="";
       while (defined(my $line=<HAM>)) {
@@ -129,7 +129,7 @@ do { # Start force loop
     }
 
     # Read one mail from spam box and test, train as needed
-    unless (eof(SPAM) || $spamcount/$spam_total > $hamcount/$ham_total) {
+    unless (eof(SPAM) || $spamcount*$ham_total > $hamcount*$spam_total) {
       my $mail=$lastspamline;
       $lastspamline="";
       while (!eof(SPAM) && defined(my $line=<SPAM>)) {
@@ -169,9 +169,9 @@ do { # Start force loop
   print "Added $hamadd ham mail",$hamadd!=1&&"s"," and $spamadd spam mail",$spamadd!=1&&"s"," to the database.\n";
   print `$bogoutil -w $dir .MSG_COUNT`;
   unless ($runs>1 && $hamadd+$spamadd==0) {
-    $fn=`cat $spam | $bogofilter -TM | grep -cv ^S`;
+    $fn=$spamcount>0 && `cat $spam | $bogofilter -TM | grep -cv ^S` || 0;
     print "\nFalse negatives: $fn";
-    $fp=`cat $ham | $bogofilter -TM | grep -cv ^H`;
+    $fp=$hamcount>0 && `cat $ham | $bogofilter -TM | grep -cv ^H` || 0;
     print "False positives: $fp\n";
   }
 } until ($fn+$fp==0 || $hamadd+$spamadd==0 || !$force);
