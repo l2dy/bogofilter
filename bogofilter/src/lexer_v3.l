@@ -247,8 +247,6 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <INITIAL><<EOF>>				{ add_hint("no_body:"); return NONE; }
 
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
-						      BEGIN INITIAL;
-						      msg_header = true;
 						      yy_set_state_initial();
 						      return BOUNDARY;
 						  } else {
@@ -352,7 +350,7 @@ void yy_set_state_initial(void)
     msg_header = true;
 
     if (DEBUG_LEXER(1))
-	fprintf(dbgout, "BEGIN INITIAL\n" );
+	fprintf(dbgout, "BEGIN INITIAL\n");
 }
 
 void lexer_set_debug(int v)
