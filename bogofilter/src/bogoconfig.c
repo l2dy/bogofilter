@@ -97,6 +97,8 @@ static struct option longopts_bogofilter[] = {
     LONGOPTIONS_COMMON
     /* longoptions.h - bogofilter/-lexer options */
     LONGOPTIONS_LEX
+    /* longoptions.h - bogofilter/bogoutil options */
+    LONGOPTIONS_DB
     /* bogofilter specific options */
     { "classify-files",			N, 0, 'B' },
     { "syslog-tag",			N, 0, 'L' },
