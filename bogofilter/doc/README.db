@@ -278,6 +278,17 @@ leading spaces and hyphen:
 
 SIZING OPTIONS:
 
+ - set_cachesize      G B C
+   (valid in Berkeley DB 3.1 - 4.3)
+
+   sets the cache size to G gigabytes plus B bytes which are spread out
+   in C equally sized caches (all figures are natural numbers). You
+   cannot configure caches smaller than 20 kB, Berkeley DB will increase
+   all caches under 500 MB by 25%, and you must provide at least one
+   cache per 4 GB.
+
+   This option takes precedence over Bogofilter's db_cachesize option!
+
  - set_lk_max_locks   12345
  - set_lk_max_objects 12346
    (valid in Berkeley DB 3.2 - 4.3)
@@ -329,6 +340,21 @@ SAFE OPTIONS:
    creation. This can improve performance under load, and it allows
    bogofilter or bogoutil to allocate disk space in advance, to avoid
    some out-of-space conditions later on.
+
+ - set_verbose DB_VERB_CHKPOINT
+   (valid in Berkeley DB 3.1 - 4.2, takes effect immediately)
+ - set_verbose DB_VERB_DEADLOCK
+   (valid in Berkeley DB 3.1 - 4.3, takes effect immediately)
+ - set_verbose DB_VERB_RECOVERY
+   (valid in Berkeley DB 3.1 - 4.3, takes effect immediately)
+ - set_verbose DB_VERB_WAITSFOR
+   (valid in Berkeley DB 3.1 - 4.3, takes effect immediately)
+
+   these verbose flags cause extended output for long-lasting
+   operations, ...CHKPOINT prints location information when searching
+   for checkpoints, ...DEADLOCK prints information on deadlock
+   detection, ...RECOVERY prints information during recovery and
+   ...WAITSFOR prints the waits-for table during deadlock detection.
 
 UNSAFE OPTIONS - these may impair robustness/recoverability of the data base
 
