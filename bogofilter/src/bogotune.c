@@ -61,10 +61,10 @@ enum e_verbosity {
 const char *progname = "bogotune";
 char *ds_file;
 
+uint target = 0;
 uint max_messages_per_mailbox = 0;
 
 extern double robx, robs;
-uint target = 0;
 
 word_t *w_msg_count;
 wordhash_t *t_ns, *t_sp;
@@ -362,7 +362,7 @@ static uint get_thresh(uint count, double *scores)
 	    printf("%2d %5d %8.6f\n", f, count-f, scores[count-f]);
     }
 
-    if (spam_cutoff < 0.5) {
+    if (!force && spam_cutoff < 0.5) {
 	fprintf(stderr,
 		"Very few high-scoring non-spams in this data set.\n");
 	fprintf(stderr,
@@ -508,7 +508,7 @@ static void distribute(int mode)
 static void usage(void)
 {
     (void)fprintf(stderr, 
-		  "Usage: %s [ -C | -D | -r | -v ] { -c config } { -d directory } -n non-spam-files -s spam-files\n", 
+		  "Usage: %s [ -C | -D | -r | -h | -v | -F ] { -c config } { -d directory } -n non-spam-files -s spam-files\n", 
 		  progname);
 }
 
@@ -524,7 +524,10 @@ static void help(void)
 		  "\t  -r      - specify robx value\n"
 		  "\t  -s file1 file2 ... - spam files\n"
 		  "\t  -n file1 file2 ... - non-spam files\n" 
-		  "\t  -v      - increase level of verbose messages\n");
+		  "\t  -v      - increase level of verbose messages\n"
+		  "\t  -F      - accept initial spam_cutoff < 0.5 and\n"
+		  "\t          - accept high scoring non-spam and low scoring spam\n"
+	);
     (void)fprintf(stderr,
 		  "\n"
 		  "%s (version %s) is part of the bogofilter package.\n", 
@@ -555,6 +558,11 @@ static int process_args(int argc, char **argv)
 		    break;
 		case 'D':
 		    ds_file = NULL;
+		    break;
+		case 'F':	/* accept initial spam_cutoff < 0.5 and
+				** accept high scoring non-spam and low scoring spam
+				*/
+		    force = true;
 		    break;
 		case 'n':
 		    run_type = REG_GOOD;
@@ -969,7 +977,7 @@ static rc_t bogotune(void)
     if (verbose) {
 	int tm = end - beg;
 	cnt = ns_cnt + sp_cnt;
-	printf("    %2dm:%02ds for %d messages.  avg = %5.1f msg/sec\n", MIN(tm), SECONDS(tm), cnt, (double)cnt/(tm));
+	printf("    %2dm:%02ds for %d messages.  avg - %5.1f msg/sec\n", MIN(tm), SECONDS(tm), cnt, (double)cnt/(tm));
     }
 
     if (msgs_good == 0 && msgs_bad == 0) {
@@ -1023,7 +1031,8 @@ static rc_t bogotune(void)
 
     if (check_for_high_ns_scores() | check_for_low_sp_scores()) {
 	scoring_error();
-	exit(EX_ERROR);
+	if (!force)
+	    exit(EX_ERROR);
     }
 
     /*
@@ -1152,7 +1161,7 @@ static rc_t bogotune(void)
 
 	if (verbose >= SUMMARY) {
 	    uint tm = end - beg;
-	    printf("    %2dm:%02ds for %d iterations.  avg = %5.3fs\n", MIN(tm), SECONDS(tm), cnt, (double)(tm)/cnt);
+	    printf("    %2dm:%02ds for %d iterations.  avg - %5.3fs\n", MIN(tm), SECONDS(tm), cnt, (double)(tm)/cnt);
 	}
 
 	printf("\n");
