@@ -638,13 +638,7 @@ int db_init(void) {
 	if ((t = getenv("DB_CDB_ALLDB")))
 	    cdb_alldb = atoi(t);
 
-	if ((ret = dbe->set_shm_key(dbe, 0xBFDB42))) {
-	    dbe->close(dbe, 0);
-	    print_error(__FILE__, __LINE__, "DBENV->set_shm_key, err: %d, %s", ret, db_strerror(ret));
-	    exit(EXIT_FAILURE);
-	}
-
-	ret = dbe->open(dbe, bogohome, DB_INIT_MPOOL | DB_SYSTEM_MEM | DB_INIT_CDB | DB_CREATE, /* mode */ 0644);
+	ret = dbe->open(dbe, bogohome, DB_INIT_MPOOL | DB_INIT_CDB | DB_CREATE, /* mode */ 0644);
 	if (ret != 0) {
 	    dbe->close(dbe, 0);
 	    print_error(__FILE__, __LINE__, "DBENV->open, err: %d, %s", ret, db_strerror(ret));
