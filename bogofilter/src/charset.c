@@ -106,9 +106,6 @@ static void map_nonascii_characters(void)
     size_t ch;
     for (ch = 0; ch < COUNTOF(charset_table); ch += 1)
     {
-	/* convert uppercase to lower case */
-	if (isupper(ch))
-	    casefold_table[ch] = tolower(ch);
 	/* convert high-bit characters to '?' */
 	if (ch & 0x80 && casefold_table[ch] == ch)
 	    casefold_table[ch] = '?';
