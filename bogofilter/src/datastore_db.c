@@ -266,21 +266,21 @@ void *dbe_init(const char *directory, const char *file)
 
     dbe_t *env;
 
-    if (NULL == realpath(directory, norm_dir)) {
+    if (realpath(directory, norm_dir) == NULL) {
 	    print_error(__FILE__, __LINE__,
 		    "error: cannot normalize path \"%s\": %s",
 		    directory, strerror(errno));
 	    exit(EX_ERROR);
     }
 
-    if (NULL == realpath(bogohome, norm_home)) {
+    if (realpath(bogohome, norm_home) == NULL) {
 	    print_error(__FILE__, __LINE__,
 		    "error: cannot normalize path \"%s\": %s",
 		    bogohome, strerror(errno));
 	    exit(EX_ERROR);
     }
 
-    if (0 != strcmp(norm_dir, norm_home))
+    if (strcmp(norm_dir, norm_home) != 0)
     {
 	fprintf(stderr,
 		"ERROR: only one database _environment_ (directory) can be used at a time.\n"
