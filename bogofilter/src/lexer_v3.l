@@ -186,7 +186,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
 <INITIAL>name=\"?				;
 <INITIAL>filename=\"?				;
-<INITIAL>^\n					{ got_emptyline(); 
+<INITIAL>^[ \b\t]*\n				{ got_emptyline(); 
 						  lineno += 1;
 						  switch (get_content_type()) 
 						  {

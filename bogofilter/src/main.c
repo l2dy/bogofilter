@@ -14,6 +14,7 @@ CONTRIBUTORS:
 
 ******************************************************************************/
 
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -167,6 +168,16 @@ static int arg_foreach(arg_foreach_t hook, int argc, char **argv)
     return exitcode;
 }
 
+static bool is_blank_line(const char *line)
+{
+    while (*line) {
+	if (! isspace(*line) && *line != '\b' )
+	    return false;
+	line++;
+    }
+    return true;
+}
+
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
     int   exitcode;
@@ -318,7 +329,8 @@ static void write_message(FILE *fp, rc_t status)
 
 	    /* detect end of headers */
 	    if ((rd == 1 && memcmp(out, NL, 1) == 0) ||
-		(rd == 2 && memcmp(out, CRLF, 2) == 0)) {
+		(rd == 2 && memcmp(out, CRLF, 2) == 0) ||
+		is_blank_line(out)) {
 		break;
 	    }
 
@@ -355,8 +367,6 @@ static void write_message(FILE *fp, rc_t status)
     }
 
     if (verbose || passthrough || Rtable) {
-	if (passthrough && ! stats_in_header)
-	    (void)fputs("\n", stdout);
 	verbose += passthrough;
 	print_stats( stdout );
 	verbose -= passthrough;

@@ -36,6 +36,7 @@ static word_t *ipsave = NULL;
 bool block_on_subnets = false;
 
 static word_t *token_prefix = NULL;
+static word_t *nonblank_line = NULL;
 
 /* Function Definitions */
 
@@ -68,7 +69,7 @@ token_t get_token(void)
 	yylval->leng = lexer_v3_leng;
 	yylval->text = (byte *)lexer_v3_text;
 
-	if (DEBUG_TEXT(1)) { 
+	if (DEBUG_TEXT(2)) { 
 	    word_puts(yylval, 0, dbgout);
 	    fputc('\n', dbgout);
 	}
@@ -78,8 +79,12 @@ token_t get_token(void)
 
 	switch (class) {
 
-	case EMPTY:	/* empty line -- ignore */
-	    continue;
+	case EMPTY:	/* empty line -- check for bogus end of header */
+	    if (yylval->leng == 0) 
+		continue;
+	    else
+		yylval = nonblank_line;
+	    break;
 
 	case BOUNDARY:	/* don't return boundary tokens to the user */
 	    if (mime_is_boundary(yylval))
@@ -149,6 +154,11 @@ token_t get_token(void)
 	    break;
 	}
 
+	if (DEBUG_TEXT(1)) { 
+	    word_puts(yylval, 0, dbgout);
+	    fputc('\n', dbgout);
+	}
+	    
 	/* eat all long words */
 	if (yylval->leng <= MAXTOKENLEN)
 	    done = true;
@@ -182,6 +192,10 @@ void token_init(void)
     msg_header = true;
     yyinit();
     mime_reset(); 
+    if (nonblank_line == NULL) {
+	const char *s = "spc:invalid_end_of_header";
+	nonblank_line = word_new(s, strlen(s));
+    }
 }
 
 void got_from(void)
@@ -234,4 +248,7 @@ void token_cleanup()
     if (yylval)
 	word_free(yylval);
     yylval = NULL;
+    if (nonblank_line)
+	word_free(nonblank_line);
+    nonblank_line = NULL;
 }
