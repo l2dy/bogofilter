@@ -16,7 +16,7 @@ ROBINSON_FILES = robinson.c robinson.h
 
 #if ENABLE_ROBINSON_FISHER
 FISHER_FILES = fisher.c fisher.h
-AM_CPPFLAGS = -I$(srcdir)/dcdflib.c/doc
+AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc
 LDADD = dcdflib/src/libdcdf.a
 #endif
 

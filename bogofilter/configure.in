@@ -130,8 +130,6 @@ if test "$ROBDIS" != yes; then
 		if test "$enableval" = yes; then
 			AC_DEFINE(ENABLE_ROBINSON_FISHER,1,
 			[Enable Fisher's method of combining P])
-			AC_CHECK_LIB([dcdf], [cdfchi], LIBS="$LIBS -ldcdf",
-			AC_MSG_ERROR([libdcdf (from package dcdflib.c) was not found.]))
 		fi
 	)
 fi
