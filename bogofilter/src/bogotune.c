@@ -145,6 +145,8 @@ static bool    esf_flag = true;		/* test ESF factors if true */
 static char   *bogolex_file = NULL;
 static word_t *w_msg_count;
 
+static uint message_count;
+
 static tunelist_t *ns_and_sp;
 static tunelist_t *ns_msglists, *sp_msglists;
 
@@ -601,9 +603,47 @@ static void set_thresh(uint count, double *scores)
     return;
 }
 
+static void init_count(void)
+{
+    message_count = 0;
+}
+
+static void print_final_count(void)
+{
+    if (verbose) {
+	printf("\r              \r%u messages\n", message_count);
+	fflush(stdout);
+    }
+}
+
+static int update_count(void)
+{
+    message_count += 1;
+
+    if (verbose && (message_count % 100) == 0) {
+	if ((message_count % 1000) != 0)
+	    putchar('.');
+	else
+	    printf("\r              \r%u ", message_count/1000 );
+	fflush(stdout);
+    }
+    return message_count;
+}
+
+static void set_train_msg_counts(wordhash_t *train, wordhash_t *wh)
+{
+    wordprop_t *count;
+    count = wordhash_insert(wh, w_msg_count, sizeof(wordprop_t), NULL);
+    if (count->cnts.good == 0 || count->cnts.bad == 0)
+	load_wordlist(load_hook, train);
+    if (msgs_good == 0 && msgs_bad == 0) {
+	fprintf(stderr, "Can't find '.MSG_COUNT'.\n");
+	exit(EX_ERROR);
+    }
+}
+
 static uint read_mailbox(char *arg, mlhead_t *msgs)
 {
-    uint count = 0;
     wordhash_t *train = ns_and_sp->train;
 
     if (verbose) {
@@ -611,6 +651,7 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 	fflush(stdout);
     }
 
+    init_count();
     mbox_mode = true;
     bogoreader_init(1, &arg);
     while ((*reader_more)()) {
@@ -619,24 +660,15 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 
 	collect_words(whc);
 
-	if (ds_path != NULL && (int)(msgs_good + msgs_bad) == 0) {
-	    wordprop_t *msg_count;
-	    msg_count = wordhash_insert(whc, w_msg_count, sizeof(wordprop_t), NULL);
-	    if (msg_count->cnts.good == 0 || msg_count->cnts.bad == 0)
-		load_wordlist(load_hook, train);
-	    if (msgs_good == 0 && msgs_bad == 0) {
-		fprintf(stderr, "Can't find '.MSG_COUNT'.\n");
-		exit(EX_ERROR);
-	    }
-	}
+	if (ds_path != NULL && (int)(msgs_good + msgs_bad) == 0)
+	    set_train_msg_counts(train, whc);
 
 	if (whc->count == 0 && !quiet) {
-	    printf("msg #%u, count is %u\n", count, whc->count);
+	    printf("msg #%u, count is %u\n", message_count, whc->count);
 	    bt_trap();
 	}
 
 	if (whc->count != 0) {
-	    count += 1;
 	    if (bogolex) {
 		write_msgcount_file(whc);
 	    }
@@ -647,29 +679,19 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 		    whp = convert_propslist_to_countlist(whc);
 		msglist_add(msgs, whp);
 	    }
+	    update_count();
 	}
 
 	if (whc != whp)
 	    wordhash_free(whc);
-
-	if (verbose && (count % 100) == 0) {
-	    if ((count % 1000) != 0)
-		putchar('.');
-	    else
-		printf("\r              \r%u ", count/1000 );
-	    fflush(stdout);
-	}
     }
 
-    ns_and_sp->count += count;
+    print_final_count();
+
+    ns_and_sp->count += message_count;
     bogoreader_fini();
 
-    if (verbose) {
-	printf("\r              \r%u messages\n", count);
-	fflush(stdout);
-    }
-
-    return count;
+    return message_count;
 }
 
 static uint filelist_read(int mode, flhead_t *list)
@@ -704,9 +726,9 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
 
     bool divvy = ds_flag == DS_RAM && user_robx < EPS && !msg_count_file;
 
-    wordhash_t *train = ns_and_sp->train;
-    mlhead_t *msgs = ns_or_sp->msgs;
     mlitem_t *item;
+    mlhead_t *msgs = ns_or_sp->msgs;
+    wordhash_t *train = ns_and_sp->train;
 
     int score_count = 0;
     int train_count = 0;
@@ -741,8 +763,7 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
     }
 
     if (divvy) {
-	wordprop_t *msg_count;
-	msg_count = wordhash_insert(train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
+	wordhash_insert(train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
 	set_msg_counts(train_good, train_bad);
     }
 
@@ -1431,8 +1452,8 @@ static rc_t bogotune(void)
 
     fflush(stdout);
 
-    check_percent = CHECK_PCT;	/* for checking high scoring non-spam
-				** and low scoring spam */
+    check_percent = CHECK_PCT;	/* for checking low scoring spam
+				** and high scoring non-spam */
 
     ns_scores = xcalloc(ns_cnt, sizeof(double));
     sp_scores = xcalloc(sp_cnt, sizeof(double));
