@@ -154,7 +154,8 @@
 	    All tokens shorter than <option>min</option> or longer than <option>max</option> will be discarded.
 	</para>
 	<para>
-	    Option <option>-y date</option> is specifies the date to give to tokens that don't have dates.
+	    Option <option>-y date</option> is specifies the date to
+	give to tokens that don't have dates.  The format is YYYYMMDD.
 	</para>
 	<para>The <option>-h</option> option prints the help message and exits.</para>
 	<para>The <option>-V</option> option prints the version number and exits.</para>

@@ -409,7 +409,7 @@ static void help(void)
 	    "\t-c cnt\tExclude tokens with lower counts.\n"
 	    "\t-s l,h\tExclude tokens with lengths between 'l' and 'h' (low and high).\n"
 	    "\t-n\tReplace non-ascii characters with '?'.\n"
-	    "\t-y day\tSet default day-of-year (1..366).\n"
+	    "\t-y date\tSet default date (format YYYYMMDD).\n"
 	    "\t-x list\tSet debug flags.\n"
 	    "\t-D\tDirect debug output to stdout.\n"
 	    "\t-V\tPrint program version.\n"
