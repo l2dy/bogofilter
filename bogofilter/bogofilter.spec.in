@@ -60,7 +60,6 @@ for f in $files ; do
     *)
       install -m644 $f .inst/contrib ;;
   esac
-
 done
 
 files=`find tuning -maxdepth 1 -type f | grep -v Makefile`
@@ -68,11 +67,10 @@ for f in $files ; do
   case $f in
     *.c|*.o|*.obj) continue ;;
     */README)
-	install -m644 $f .inst/tuning ;;
+      install -m644 $f .inst/tuning ;;
     *)
-	install -m755 $f .inst/tuning ;;
+      install -m755 $f .inst/tuning ;;
   esac
-
 done
 
 for README in randomtrain ; do
@@ -96,6 +94,7 @@ done
 %doc README README.cvs RELEASE.NOTES-0.11 RELEASE.NOTES-0.12 TODO UPGRADE
 %doc doc/bogofilter-tuning.HOWTO doc/integrating-with-qmail
 %doc doc/programmer
-%doc .inst/contrib .inst/tuning .inst/html .inst/xml
+%doc .inst/html .inst/xml
+%doc .inst/contrib .inst/tuning
 
 %changelog
