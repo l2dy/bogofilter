@@ -69,8 +69,26 @@ int dump_file(char *db_file)
 		}
 	    }
 	}
+	db_lock_release(dbh);
     }
-    db_lock_release(dbh);
+    return rv;
+}
+
+int display_token(char *db_file, char *token)
+{
+    dbh_t *dbh;
+
+    int rv = 0;
+
+    if ((dbh = db_open(db_file, db_file, DB_READ)) == NULL) {
+	rv = 2;
+    }
+    else {
+      db_lock_reader(dbh);
+      printf( "%s %d\n", token, db_getvalue( dbh, token ) );
+      db_lock_release(dbh);
+    }
+
     return rv;
 }
 
@@ -163,7 +181,7 @@ void version(void)
 
 void usage(void)
 {
-    fprintf(stderr, "Usage: %s { -d | -l } [ -v ] file.db | [ -h | -V ]\n", PROGNAME);
+    fprintf(stderr, "Usage: %s { -d | -l } [ -v ] file.db [ -w token ] | [ -h | -V ]\n", PROGNAME);
 }
 
 void help(void)
@@ -172,37 +190,39 @@ void help(void)
     fprintf(stderr,
 	    "\t-d\tDump data from file.db to stdout.\n"
 	    "\t-l\tLoad data from stdin into file.db.\n"
+	    "\t-w\tDisplay a token and its count.\n"
 	    "\t-v\tOutput debug messages.\n"
 	    "\t-h\tPrint this message.\n"
 	    "\t-V\tPrint program version.\n"
 	    PROGNAME " is part of the bogofilter package.\n");
 }
 
-void ensure_uniq_flag(int flag)
-{
-    if (flag != 0) {
-	fprintf(stderr, PROGNAME ": Flags -d and -l are mutually exclusive.\n");
-    }
-}
-
 int main(int argc, char *argv[])
 {
-    enum { DUMP = 1, LOAD = 2 };
+    typedef enum { NONE, DUMP = 1, LOAD = 2, WORD = 3 } cmd_t;
 
-    char *db_file;
-    int ch;
-    int flag = 0;
+    int  count = 0;
+    char *db_file, *token;
+    char ch;
+    cmd_t flag = NONE;
 
-    while ((ch = getopt(argc, argv, "dlvhV")) != -1)
+    while ((ch = getopt(argc, argv, "d:l:w:vhV")) != -1)
 	switch (ch) {
 	case 'd':
-	    ensure_uniq_flag(flag);
 	    flag = DUMP;
+	    count += 1;
+	    db_file = (char *) optarg;
 	    break;
 
 	case 'l':
-	    ensure_uniq_flag(flag);
 	    flag = LOAD;
+	    count += 1;
+	    db_file = (char *) optarg;
+	    break;
+
+	case 'w':
+	    flag = WORD;
+	    token = (char *) optarg;
 	    break;
 
 	case 'v':
@@ -211,6 +231,7 @@ int main(int argc, char *argv[])
 
 	case 'h':
 	    help();
+	    usage();
 	    exit(0);
 
 	case 'V':
@@ -222,22 +243,25 @@ int main(int argc, char *argv[])
 	    exit(1);
 	}
 
+    if ( count != 1 )
+    {
+      fprintf(stderr, PROGNAME ": Exactly one of the -d or -l flags must be present.\n");
+      exit(1);
+    }
+
     /* Extra or missing parameters */
-    if ((argc - optind) != 1) {
+    if (argc != optind) {
 	usage();
 	exit(1);
     }
 
-    db_file = argv[optind++];
-
-    if (flag == DUMP) {
-	return dump_file(db_file);
-    }
-    else if (flag == LOAD) {
-	return load_file(db_file);
-    }
-    else {
-	fprintf(stderr, PROGNAME ": One of the -d or -l flags is required\n");
-	exit(1);
+    switch(flag)
+    {
+    case DUMP:
+	 return dump_file(db_file);
+    case LOAD:
+	 return load_file(db_file);
+    case WORD:
+	 return display_token(db_file, token);
     }
 }
