@@ -1,8 +1,12 @@
 # $Id$
-
+n
 				bogofilter news
 
 0.8.1
+	* Changed the default behavior to use the Robinson algorithm.
+	* Corrected incorrect sort order when printing statistics.
+	* Added two more regression tests designed to confirm that
+	  bogofilter's results are matching saved reference results.
 	* New file METHODS describes the Graham, Robinson, and Fisher
 	  methods that bogofilter supports for computing spamicity.
 	* Added support for Fisher's method of combining probabilities,
