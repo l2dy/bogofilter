@@ -21,6 +21,11 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2004-12-05
+
+	* New directory doc/programmer/OS2 contains configure.os2
+          script contributed by Yuri Dario
+
 0.93.2	2004-12-03
 
 	* New script bf_resize DIR that checks the sizes of all databases in an
