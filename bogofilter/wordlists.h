@@ -1,6 +1,11 @@
 /* $Id$ */
 /* 
  * $Log$
+ * Revision 1.4  2002/10/04 01:35:06  gyepi
+ * Integration of wordlists with datastore and bogofilter code.
+ * David Relson did most of the work. I just tweaked the locking code
+ * and made a few minor changes.
+ *
  * Revision 1.3  2002/10/04 00:39:57  m-a
  * First set of type fixes.
  *
@@ -15,7 +20,7 @@
 #ifndef	HAVE_WORDLISTS_H
 #define	HAVE_WORDLISTS_H
 
-typedef enum bool { FALSE = 0, TRUE = 1 } bool;
+#include "common.h"
 
 typedef struct wordlist_s wordlist_t;
 struct wordlist_s
@@ -26,12 +31,13 @@ struct wordlist_s
     long msgcount;	// count of messages in wordlist.
     char *file;			// associated  file
     double weight;
+    bool active;
     bool bad;
     int override;
     int ignore;
 };
 
-extern wordlist_t *first_list;
+extern wordlist_t *word_lists;
 extern wordlist_t good_list, spam_list;
 
 extern void setup_lists();

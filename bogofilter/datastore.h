@@ -9,6 +9,8 @@
  
 */
 
+#include <wordlists.h>
+
 #ifndef DATASTORE_H_GUARD
 #define DATASTORE_H_GUARD
 
@@ -89,19 +91,19 @@ void db_lock_release(void *);
 /*
 Acquires read locks on multiple databases.
 */
-void db_lock_reader_list(void *[], int);
+void db_lock_reader_list(wordlist_t *list);
 
 
 /*
 Acquires write locks on multiple database.
 */
-void db_lock_writer_list(void *[], int);
+void db_lock_writer_list(wordlist_t *list);
 
 
 /*
 Releases acquired locks on multiple databases
 */
-void db_lock_release_list(void *[], int);
+void db_lock_release_list(wordlist_t *list);
 
 #endif
 

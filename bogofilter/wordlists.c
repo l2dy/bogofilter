@@ -1,6 +1,11 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.3  2002/10/04 01:35:07  gyepi
+ * Integration of wordlists with datastore and bogofilter code.
+ * David Relson did most of the work. I just tweaked the locking code
+ * and made a few minor changes.
+ *
  * Revision 1.2  2002/10/02 17:14:54  relson
  * main.c now calls setup_lists() for initializing the wordlist structures, including the opening of the wordlist.db files.
  * setup_list() takes a directory name as its argument and passes it to init_list(), which calls open_wordlist() for the actual open.
@@ -22,7 +27,7 @@
 
 wordlist_t good_list;
 wordlist_t spam_list;
-wordlist_t* first_list=NULL;
+wordlist_t* word_lists=NULL;
 
 void *open_wordlist( wordlist_t *list, char *directory, char *filename )
 {
@@ -66,17 +71,18 @@ void init_list(wordlist_t* list, char* name, char* directory, char* filename, do
     list->msgcount=0;
     list->file=NULL;
     list->override=override;
+    list->active=FALSE;
     list->weight=weight;
     list->bad=bad;
     list->ignore=ignore;
 
-    if (! first_list) {
-	first_list=list;
+    if (! word_lists) {
+	word_lists=list;
 	list->next=NULL;
 	return;
     }
-    list_index=first_list;
-    last_list_ptr=&first_list;
+    list_index=word_lists;
+    last_list_ptr=&word_lists;
 
     // put lists with high override numbers at the front.
     while(1) {
@@ -103,7 +109,7 @@ void setup_lists(char *directory)
 void close_lists()
 {
     wordlist_t* list;
-    for ( list = first_list; list != NULL; list = list->next )
+    for ( list = word_lists; list != NULL; list = list->next )
     {
 	db_close(list->dbh);
     }
@@ -115,7 +121,7 @@ void close_lists()
    follow bogus pointers. */
 void sanitycheck_lists()
 {
-    wordlist_t* list=first_list;
+    wordlist_t* list=word_lists;
     int listcount=0;
 
     while(1) {

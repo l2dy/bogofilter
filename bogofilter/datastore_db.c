@@ -35,6 +35,7 @@ static dbh_t *dbh_init(char *filename, char *name){
   handle->filename  = xstrdup(filename);
   handle->name	    = xstrdup(name);
   handle->pid	    = getpid();
+  handle->locked=FALSE;
 
   return handle;
 }
@@ -131,7 +132,7 @@ void db_setvalue(void *vhandle, char * word, long value){
 
     if ((ret = handle->dbp->put(handle->dbp, NULL, &key, &data, 0)) == 0){
       if (verbose > 2){
-            fprintf(stderr, "db_setvalue (%s): [%s] has value %ld\n", handle->name, word, value);
+	fprintf(stderr, "db_setvalue (%s): [%s] has value %ld\n", handle->name, word, value);
       }
     }
     else 
@@ -241,6 +242,7 @@ void db_lock_reader(void *vhandle){
   if (verbose > 1)
     fprintf(stderr, "[%lu] Got read lock  on %s\n",(unsigned long)handle->pid, handle->filename);
 
+  handle->locked = TRUE;
 }
 
 /*
@@ -248,6 +250,7 @@ Acquires blocking write lock on database.
 */
 void db_lock_writer(void *vhandle){
   dbh_t *handle = vhandle;
+
   if (verbose > 1)
     fprintf(stderr, "[%lu] Acquiring write lock on %s\n",(unsigned long)handle->pid, handle->filename);
 
@@ -259,6 +262,7 @@ void db_lock_writer(void *vhandle){
   if (verbose > 1)
     fprintf(stderr, "[%lu] Got write lock on %s\n",(unsigned long)handle->pid, handle->filename);
 
+  handle->locked = TRUE;
 }
 
 /*
@@ -267,23 +271,32 @@ Releases acquired lock
 void db_lock_release(void *vhandle){
 
   dbh_t *handle = vhandle;
+  if (handle->locked){
+    if (verbose > 1)
+      fprintf(stderr, "[%lu] Releasing lock on %s\n",(unsigned long)handle->pid, handle->filename);
 
-  if (verbose > 1)
-    fprintf(stderr, "[%lu] Releasing lock on %s\n",(unsigned long)handle->pid, handle->filename);
-
-  if (db_lock(handle, F_SETLK, F_UNLCK) != 0){
-    fprintf(stderr, "[%lu] Error releasing on %s\n", (unsigned long)handle->pid, handle->filename);
-    exit(2);
+    if (db_lock(handle, F_SETLK, F_UNLCK) != 0){
+      fprintf(stderr, "[%lu] Error releasing on %s\n", (unsigned long)handle->pid, handle->filename);
+      exit(2);
+    }
   }
-}
+  else if (verbose > 1){
+    fprintf(stderr, "[%lu] Attempt to release open lock on %s\n",(unsigned long)handle->pid, handle->filename);
+  }
 
+  handle->locked = FALSE;
+}
 
 /*
 Releases acquired locks on multiple databases
 */
-void db_lock_release_list(void *vhandle_list[], int n){
-  while (--n >= 0)
-    db_lock_release(vhandle_list[n]);
+void db_lock_release_list(wordlist_t *list){
+  while (list != NULL) {
+    if (list->active == TRUE)
+      db_lock_release(list->dbh);
+
+    list = list->next;
+  }
 }
 
 static void lock_msg(dbh_t *handle, int index, char *msg, int cmd, int type)
@@ -314,62 +327,63 @@ Uses the following protocol  to avoid deadlock:
    each locker sleeps for some small, random time period before restarting.
 
 */
-static void db_lock_list(void *vhandle_list[], int n, int type){
-  int i;
-  int cmd;
-
-  dbh_t *handle;
+static void db_lock_list(wordlist_t *list, int type){
 
 #define do_lock_msg(msg) lock_msg(handle, i, msg, cmd, type)
- 
+  int i;
+  int cmd;
+  wordlist_t *tmp;
+
   for(;;){
-    for(i = 0, cmd = F_SETLKW ; i < n; i++, cmd = F_SETLK){
+    for (tmp = list, i = 0, cmd = F_SETLKW; tmp != NULL; tmp = tmp->next, i++, cmd = F_SETLK){
 
-      handle = vhandle_list[i];
+      dbh_t *handle = list->dbh;
       
+      if (list->active == FALSE)
+	continue;
+
       if (verbose > 1)
-	      do_lock_msg("Trying");
+	do_lock_msg("Trying");
       
-      if (db_lock(handle, cmd, type) != 0){
-        if (errno == EACCES || errno == EAGAIN || errno == EINTR){
-          if (verbose)
-            do_lock_msg("Failed to acquire");
+      if (db_lock(handle, cmd, type) == 0){
+        if (verbose > 1)
+          do_lock_msg("Got");
 
-          break;
-        }
-        else {
-          do_lock_msg("Error acquiring");
-	  exit(2);
-        }
       }
-      else if (verbose) {
-        do_lock_msg("Got");
+      else if (errno == EACCES || errno == EAGAIN || errno == EINTR){
+        if (verbose)
+          do_lock_msg("Failed to acquire");
+
+        break;
+      }
+      else {
+        do_lock_msg("Error acquiring");
+	exit(2);
       }
     }
-
     /* All locks acquired. */
-    if (i == n)
+    if (tmp == NULL)
       break;
 
     /* Some locks failed. Release all acquired locks */
-    if (i > 0)
-      db_lock_release_list(vhandle_list, i);
+    db_lock_release_list(list);
 
     //sleep for short, random time between 1 microsecond and 1 second
     usleep( 1 + (unsigned long) (1000.0*rand()/(RAND_MAX+1.0)));
   }
 }
 
+
 /*
 Acquires read locks on multiple databases.
 */
-void db_lock_reader_list(void *vhandle_list[], int n){
-  db_lock_list(vhandle_list, n, F_RDLCK);
+void db_lock_reader_list(wordlist_t *list){
+  db_lock_list(list, F_RDLCK);
 }
 
 /*
 Acquires write locks on multiple database.
 */
-void db_lock_writer_list(void *vhandle_list[], int n){
-  db_lock_list(vhandle_list, n, F_WRLCK);
+void db_lock_writer_list(wordlist_t *list){
+  db_lock_list(list, F_WRLCK);
 }
