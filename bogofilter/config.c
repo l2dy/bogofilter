@@ -421,7 +421,7 @@ static void help(void)
 		  "\t-s\t- register message as spam.\n"
 		  "\t-n\t- register message as non-spam.\n"
 		  "\t-o val\t- set user defined spamicity cutoff.\n"
-		  "\t-u\t- classify message as spam or non-spam and register accordingly.\n"
+		  "\t-u\t- classify message as spam or non-spam and register appropriately.\n"
 		  "\t-S\t- move message's words from non-spam list to spam list.\n"
 		  "\t-N\t- move message's words from spam list to spam non-list.\n"
 		  "\t-R\t- print an R data frame.\n"
