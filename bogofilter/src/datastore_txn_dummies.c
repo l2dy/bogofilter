@@ -57,7 +57,8 @@ dsm_t dsm_transactional = {
 };
 
 #ifndef ENABLE_SQLITE_DATASTORE
-#if !defined(DISABLE_TRANSACTIONS) && !defined(ENABLE_TRANSACTIONS)
+
+#if 	!defined(DISABLE_TRANSACTIONS) && !defined(ENABLE_TRANSACTIONS)
 void *dbe_init(bfdir *d, bffile *f) {
     (void)d;
     (void)f;
@@ -68,7 +69,9 @@ void *dbe_init(bfdir *d, bffile *f) {
 int db_txn_begin(void *vhandle) { (void)vhandle; return 0; }
 int db_txn_abort(void *vhandle) { (void)vhandle; return 0; }
 int db_txn_commit(void *vhandle) { (void)vhandle; return 0; }
+
 #else
+
 extern void *dsm;
 void *dbe_init(bfdir *d, bffile *f) {
     dsm = &dsm_transactional;
@@ -76,6 +79,7 @@ void *dbe_init(bfdir *d, bffile *f) {
     (void)f;
     return (void *)~0;
 }
+
 #endif
 
 ex_t dbe_recover(bfdir *directory, bool catastrophic, bool force)
