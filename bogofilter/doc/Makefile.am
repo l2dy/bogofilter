@@ -9,7 +9,7 @@ html_MANS = bogofilter.html bogoutil.html bogoupgrade.html bogolexer.html
 
 all: $(man_MANS) $(html_MANS)
 
-CLEANFILES = $(man_MANS)
+CLEANFILES = $(man_MANS) $(html_MANS)
 
 # what to distribute
 EXTRA_DIST = bogofilter.1in bogoutil.1in bogoupgrade.1in \
