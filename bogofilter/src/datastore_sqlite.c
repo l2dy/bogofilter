@@ -30,6 +30,7 @@ struct dbhsqlite_t {
     bool created;  /**< gets set by db_open if it created the database new */
     bool swapped;  /**< if endian swapped on disk vs. current host */
 };
+
 /** Convenience shortcut to avoid typing "struct dbh_t" */
 typedef struct dbhsqlite_t dbh_t;
 
@@ -38,11 +39,38 @@ static const char *ENDIAN32 = ".ENDIAN32";
 void db_flush(void *unused) { (void)unused; }
 ex_t db_verify(bfdir *d, bffile *f) { (void)d; (void)f; return EX_OK; }
 
+extern dsm_t *dsm;			/* in datastore.c */
+
+static int sql_txn_begin(void *vhandle);
+static int sql_txn_abort(void *vhandle);
+static int sql_txn_commit(void *vhandle);
+
 /** The layout of the bogofilter table, formatted as SQL statement. */
 #define LAYOUT \
 	"CREATE TABLE bogofilter (" \
 	"   key   BLOB PRIMARY KEY, "\
 	"   value BLOB);"
+
+dsm_t dsm_sqlite = {
+    /* public -- used in datastore.c */
+    &sql_txn_begin,
+    &sql_txn_abort,
+    &sql_txn_commit,
+
+    /* private -- used in datastore_db_*.c */
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
 
 /* real functions */
 /** Initialize database handle and return it. 
@@ -52,6 +80,8 @@ static dbh_t *dbh_init(
 	const char *name /** name of database file */)
 {
     dbh_t *handle;
+
+    dsm = &dsm_sqlite;
 
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));
@@ -346,17 +376,17 @@ static int sqlfexec(sqlite3 *db, const char *cmd, ...)
     return rc;
 }
 
-int db_txn_begin(void *vhandle) {
+static int sql_txn_begin(void *vhandle) {
     dbh_t *dbh = vhandle;
     return sqlexec(dbh->db, "BEGIN TRANSACTION;");
 }
 
-int db_txn_abort(void *vhandle) {
+static int sql_txn_abort(void *vhandle) {
     dbh_t *dbh = vhandle;
     return sqlexec(dbh->db, "ROLLBACK;");
 }
 
-int db_txn_commit(void *vhandle) {
+static int sql_txn_commit(void *vhandle) {
     dbh_t *dbh = vhandle;
     return sqlexec(dbh->db, "COMMIT;");
 }
