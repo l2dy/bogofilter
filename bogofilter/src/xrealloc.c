@@ -9,8 +9,6 @@
 *
 */
 
-#include <stdlib.h>
-
 #include "config.h"
 
 #define	 BF_MALLOC

@@ -4,6 +4,7 @@
 #define XMALLOC_H
 
 #include <stddef.h>
+#include <stdlib.h>
 
 #ifdef	BF_MALLOC
 /* special defines for xmalloc.c, xcalloc.c, etc */
