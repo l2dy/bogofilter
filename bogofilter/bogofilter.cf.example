@@ -48,10 +48,11 @@
 
 #### SPAM_SUBJECT_TAG
 #
-#	tag added to "Subject: " line for identifying spam
+#	tag added to "Subject: " line for identifying spam or unsure
 #	default is to add nothing.
 
 ##spam_subject_tag=***SPAM***
+##unsure_subject_tag=???UNSURE???
 
 
 ##### STATS_IN_HEADER

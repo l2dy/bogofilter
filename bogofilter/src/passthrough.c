@@ -150,16 +150,23 @@ static bool write_header(rc_t status, readfunc_t rf, void *rfarg)
 	break;
 
 	/* rewrite "Subject: " line */
-	if (status == RC_SPAM &&
-	    rd >= subjlen && 
-	    spam_subject_tag != NULL &&
-	    strncasecmp(out, subjstr, subjlen) == 0) {
-	    (void) fprintf(fpo, "%.*s %s", subjlen, out, spam_subject_tag);
-	    if (out[subjlen] != ' ')
-		fputc(' ', fpo);
-	    (void) fwrite(out + subjlen, 1, rd - subjlen, fpo);
-	    seen_subj = true;
-	    continue;
+	if (!seen_subj && rd >= subjlen) {
+	    const char *tag = NULL;
+
+	    if (status == RC_SPAM && spam_subject_tag != NULL)
+		tag = spam_subject_tag;
+
+	    if (status == RC_UNSURE && unsure_subject_tag != NULL)
+		tag = unsure_subject_tag;
+
+	    if (tag != NULL && strncasecmp(out, subjstr, subjlen) == 0) {
+		seen_subj = true;
+		(void) fprintf(fpo, "%.*s %s", subjlen, out, tag);
+		if (out[subjlen] != ' ')
+		    fputc(' ', fpo);
+		(void) fwrite(out + subjlen, 1, rd - subjlen, fpo);
+		continue;
+	    }
 	}
 
 	hadlf = (out[rd-1] == '\n');
@@ -248,9 +255,11 @@ void write_message(rc_t status)
 	verbose -= passthrough;
     }
 
-    if (passthrough && !seen_subj &&
-	status == RC_SPAM && spam_subject_tag != NULL) {
-	(void) fprintf(fpo, "Subject: %s\n", spam_subject_tag);
+    if (passthrough && !seen_subj) {
+	if (status == RC_SPAM && spam_subject_tag != NULL)
+	    (void) fprintf(fpo, "Subject: %s\n", spam_subject_tag);
+	if (status == RC_UNSURE && unsure_subject_tag != NULL)
+	    (void) fprintf(fpo, "Subject: %s\n", unsure_subject_tag);
     }
 
     if (passthrough) 

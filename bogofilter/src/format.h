@@ -11,6 +11,7 @@ typedef const char *FIELD;
 
 extern const char *spam_header_name;
 extern const char *spam_subject_tag;
+extern const char *unsure_subject_tag;
 
 /* needed by bogoconfig.c */
 
