@@ -185,23 +185,22 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 	{
 	    int	  ret;
 	    dsv_t old_tmp;
-	    ta_t *tr = ta_init();
-	    
+
 	    /* delete original token */
-	    ta_delete(tr, vhandle, &token);	
+	    ta_delete(transaction, vhandle, &token);	
 
 	    /* retrieve and update nonascii token*/
 	    token.text = key_tmp;
-	    ret = ds_read(vhandle, &token, &old_tmp);
+	    ret = ta_read(transaction, vhandle, &token, &old_tmp);
 
-	    if (ret == 0) {
+	    if (ret == EX_OK) {
 		in_val->spamcount += old_tmp.spamcount;
 		in_val->goodcount += old_tmp.goodcount;
 		in_val->date       = max(old_tmp.date, in_val->date);	/* date in form YYYYMMDD */
 	    }
 	    set_date(in_val->date);	/* set timestamp */
-	    ta_write(tr, vhandle, &token, in_val);
-	    ta_commit(tr);
+	    ta_write(transaction, vhandle, &token, in_val);
+	    set_date(0);
 	}
 	xfree(key_tmp);
     }
@@ -211,7 +210,6 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 int maintain_wordlist(void *vhandle)
 {
     ta_t *transaction = ta_init();
-
     struct userdata_t userdata;
     int ret;
     
@@ -219,6 +217,6 @@ int maintain_wordlist(void *vhandle)
     userdata.transaction = transaction;
     
     ret = ds_foreach(vhandle, maintain_hook, &userdata);
-    
+
     return ret | ta_commit(transaction);
 }

@@ -10,8 +10,11 @@ Stefan Bellon <sbellon@sbellon.de>       2003
 
 ******************************************************************************/
 
+#include "common.h"
+
 #include <string.h>
 
+#include "maint.h"
 #include "transaction.h"
 #include "xmalloc.h"
 
@@ -26,6 +29,7 @@ typedef struct ta_iter {
     word_t *word;
     dsv_t *dsvval;
     struct ta_iter *next;
+    struct ta_iter *prev;
 } ta_iter_t;
 
 struct ta_type {
@@ -53,17 +57,15 @@ static int ta_flush(ta_t *ta, bool write)
                 ret |= ds_delete(iter->vhandle, iter->word);
                 break;
             case TA_WRITE:
+		set_date(iter->dsvval->date);
                 ret |= ds_write(iter->vhandle, iter->word, iter->dsvval);
                 break;
             }
         }
-        if (iter->word) {
-            xfree(iter->word->text);
-            xfree(iter->word);
-        }
-        if (iter->dsvval) {
+        if (iter->word)
+            word_free(iter->word);
+        if (iter->dsvval)
             xfree(iter->dsvval);
-        }
         tmp = iter;
         iter = iter->next;
         xfree(tmp);
@@ -96,19 +98,12 @@ static void ta_add(ta_t *ta, ta_kind_t ta_kind, void *vhandle,
     dsv_t *ta_dsvval = NULL;
     ta_iter_t *item = NULL;
 
-    if (word) {
-        ta_word = xmalloc(sizeof(*ta_word));
-        ta_word->leng = word->leng;
-        ta_word->text = xmalloc(word->leng);
-        memcpy(ta_word->text, word->text, word->leng);
-    }
+    if (word)
+        ta_word = word_dup(word);
     
     if (dsvval) {
-        int i;
         ta_dsvval = xmalloc(sizeof(*ta_dsvval));
-        ta_dsvval->date = dsvval->date;
-        for (i = 0; i < IX_SIZE; ++i)
-            ta_dsvval->count[i] = dsvval->count[i];
+	memcpy(ta_dsvval, dsvval, sizeof(*ta_dsvval));
     }
     
     item = xmalloc(sizeof(*item));
@@ -117,12 +112,12 @@ static void ta_add(ta_t *ta, ta_kind_t ta_kind, void *vhandle,
     item->word = ta_word;
     item->dsvval = ta_dsvval;
     item->next = NULL;
+    item->prev = ta->last;
     
     if (ta->head == NULL)
         ta->head = item;
-    if (ta->last) {
+    if (ta->last != NULL)
         ta->last->next = item;
-    }
     ta->last = item;
 }
 
@@ -136,7 +131,7 @@ int ta_delete(ta_t *ta, void *vhandle, const word_t *word)
     return TA_OK;
 }
 
-int ta_write (ta_t *ta, void *vhandle, const word_t *word, dsv_t *val)
+int ta_write(ta_t *ta, void *vhandle, const word_t *word, dsv_t *val)
 {
     if (ta == NULL)
         return TA_ERR;
@@ -144,4 +139,36 @@ int ta_write (ta_t *ta, void *vhandle, const word_t *word, dsv_t *val)
     ta_add(ta, TA_WRITE, vhandle, word, val);
 
     return TA_OK;
+}
+
+int ta_read(ta_t *ta, void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
+{
+    ta_iter_t *iter;
+
+    if (ta == NULL)
+        return TA_ERR;
+    
+    memset(val, 0, sizeof(*val));
+
+    /* search transaction list from end to start */
+    iter = ta->last;
+    while (iter) {
+        if (word_cmp(word, iter->word) == 0) {
+            switch (iter->kind) {
+            case TA_DELETE:
+                return TA_ERR; /* token deleted, so not found */
+            case TA_WRITE:
+                if (iter->dsvval) {
+		    memcpy(val, iter->dsvval, sizeof(*iter->dsvval));
+                    return TA_OK;  /* token found */
+                }
+                else
+                    return TA_ERR; /* value should be present! ERROR! */
+            }
+        }
+        iter = iter->prev;
+    }
+    
+    /* token not found in our transaction list, so ask the database backend */
+    return ds_read(vhandle, word, val);
 }
