@@ -20,10 +20,11 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #ifndef DATASTORE_TDB_H
 #define DATASTORE_TDB_H
 
-#ifndef	DB_NOTFOUND
-/* Next line is from /usr/include/db3.h */
-#define	DB_NOTFOUND		(-30990)/* Key/data pair not found (EOF). */
-#endif
+#include <tdb.h>
+#include "datastore.h"
+
+/* Map BDB name to TDB equivalents for datastore.c */
+#define	DB_NOTFOUND	TDB_ERR_NOEXIST
 
 /** Initialize database, open and lock files, etc.
  * params: char * path to database file, char * name of database

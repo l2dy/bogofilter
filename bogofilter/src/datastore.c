@@ -14,20 +14,18 @@ David Relson <relson@osagesoftware.com>  2003
 
 #include "common.h"
 
-#include <db.h>
-
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
 #include <errno.h>
 
-#include "datastore.h"
 #ifndef	ENABLE_TDB_DATASTORE
 #include "datastore_db.h"
 #else
 #include "datastore_tdb.h"
 #endif
+
 #include "error.h"
 #include "maint.h"
 #include "swap.h"
@@ -184,8 +182,14 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 	    break;
 	    
 	default:
+	    fprintf(dbgout, "ret=%d, DB_NOTFOUND=%d\n", ret, DB_NOTFOUND);
+#ifndef	ENABLE_TDB_DATASTORE
 	    print_error(__FILE__, __LINE__, "ds_read( '%*s' ), err: %d, %s", 
 			word->leng, (char *) word->text, ret, db_strerror(ret));
+#else
+	    print_error(__FILE__, __LINE__, "ds_read( '%*s' ), err: %d, %s", 
+			word->leng, (char *) word->text, ret, tdb_errorstr(dsh->dbh));
+#endif
 	    exit(EX_ERROR);
 	}
     }

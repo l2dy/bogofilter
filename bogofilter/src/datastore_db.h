@@ -20,6 +20,9 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #ifndef DATASTORE_DB_H
 #define DATASTORE_DB_H
 
+#include <db.h>
+#include "datastore.h"
+
 /** Initialize database, open and lock files, etc.
  * params: char * path to database file, char * name of database
  * \return opaque pointer to database handle, which must be saved and
