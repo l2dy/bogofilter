@@ -3,17 +3,7 @@
 /*****************************************************************************
 
 NAME:
-   robinson.c -- code for implementing robinson algorithm for computing spamicity.
-
-MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
-    Robinson's proposed modifications to the "spamicity" calculation and
-    uses his f(w) individual probability calculation.  See
-
-    http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html
-    
-    Robinson's method does not store "extrema."  Instead it accumulates
-    Robinson's P and Q using all words deemed "characteristic," i.e. having
-    a deviation (fabs (0.5f - prob)) >= MIN_DEV, currently set to 0.0.
+   graham.c -- code for implementing graham algorithm for computing spamicity.
 
 ******************************************************************************/
 
@@ -102,8 +92,7 @@ static void init_bogostats(/*@out@*/ bogostat_t *bs)
 }
 
 static void populate_bogostats(/*@out@*/ bogostat_t *bs,
-	const char *text, double prob,
-	/*@unused@*/ int count)
+	const char *text, double prob)
 /* if  the new word,prob pair is a better indicator.
  * add them to the bogostats structure */
 {
@@ -251,7 +240,7 @@ static bogostat_t *select_indicators(wordhash_t *wordhash)
 	double prob = compute_probability( token );
 
 	w_count += 1;
-	populate_bogostats( &bogostats, token, prob, 1 );
+	populate_bogostats( &bogostats, token, prob );
     }
 
     return (&bogostats);

@@ -27,7 +27,6 @@ AUTHOR:
 #include "datastore.h"
 #include "datastore_db.h"
 #include "robinson.h"			/* for ROBS and ROBX */
-#include "version.h"
 
 #define PROGNAME "bogoutil"
 
@@ -454,15 +453,16 @@ static int compute_robinson_x(char *path)
     return 0;
 }
 
-static void version(void)
+static void print_version(void)
 {
     fprintf(stderr,
-	    PROGNAME ": version: " VERSION "\n"
+	    PROGNAME ": version: %s\n"
 	    "Copyright (C) 2002 Gyepi Sam\n\n"
 	    PROGNAME " comes with ABSOLUTELY NO WARRANTY.\n"
 	    "This is free software, and you are welcome to redistribute\n"
 	    "it under the General Public License.\n"
-	    "See the COPYING file with the source distribution for details.\n\n");
+	    "See the COPYING file with the source distribution for details.\n\n",
+	    version);
 }
 
 static void usage(void)
@@ -536,7 +536,7 @@ int main(int argc, char *argv[])
 	    exit(0);
 
 	case 'V':
-	    version();
+	    print_version();
 	    exit(0);
 
 	case 'x':

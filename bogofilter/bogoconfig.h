@@ -7,14 +7,15 @@
 
 typedef enum {
 	CP_NONE,
-	CP_ALGORITHM,
 	CP_BOOLEAN,
 	CP_INTEGER,
 	CP_DOUBLE,
 	CP_CHAR,
 	CP_STRING,
-	CP_WORDLIST
+	CP_FUNCTION
 } parm_t;
+
+typedef bool func(const unsigned char *s);
 
 typedef struct {
     const char *name;
@@ -22,6 +23,7 @@ typedef struct {
     union
     {
 	void	*v;
+	func	*f;
 	bool	*b;
 	int	*i;
 	double	*d;

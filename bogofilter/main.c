@@ -31,7 +31,6 @@ AUTHOR:
 #include "bogofilter.h"
 #include "bogoconfig.h"
 #include "register.h"
-#include "version.h"
 #include "wordlists.h"
 
 #define BOGODIR ".bogofilter"
@@ -45,7 +44,6 @@ char msg_register[1024];
 char msg_bogofilter[1024];
 
 const char *progname = "bogofilter";
-extern const char *system_config_file;
 
 /* if the given environment variable 'var' exists, copy it to 'dest' and
    tack on the optional 'subdir' value.
@@ -166,7 +164,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 			(void)printf("%s: %s, tests=bogofilter, spamicity=%0.6f, version=%s\n", 
 				     spam_header_name, 
 				     (status==RC_SPAM) ? "Yes" : "No", 
-				     spamicity, VERSION);
+				     spamicity, version);
 		    }
 		}
 
@@ -203,7 +201,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
 		(void)sprintf(msg_bogofilter, "%s: %s, spamicity=%0.6f, version=%s",
 			spam_header_name, (status==RC_SPAM) ? "Yes" : "No",
-			spamicity, VERSION);
+			spamicity, version);
 	    }
 	    break;
 	default:
