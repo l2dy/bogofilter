@@ -37,5 +37,7 @@ int main(int argc, char **argv) {
     rl.rlim_cur = rl.rlim_max;
     if (setrlimit(RLIMIT_CORE, &rl))
 	barf("setrlimit");
-    return execv(argv[1], argv+1);
+    execv(argv[1], argv+1);
+    fprintf(stderr, "execv: ");
+    barf(argv[1]);
 }
