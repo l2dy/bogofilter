@@ -74,11 +74,8 @@ static reader_line_t mailbox_getline;	/* minds   /^From / */
 
 static reader_file_t get_filename;
 
-static void maildir_init(const char *name);
-static void maildir_fini(void);
-
-static void mh_init(const char *name);
-static void mh_fini(void);
+static void dir_init(const char *name);
+static void dir_fini(void);
 
 typedef enum st_e { IS_DIR, IS_FILE, IS_ERR } st_t;
 
@@ -204,14 +201,14 @@ static bool open_mailstore(char *obj)
 	if (ismaildir(filename) == IS_DIR) {
 	    /* MAILDIR */
 	    mailstore_type = MS_MAILDIR;
-	    maildir_init(filename);
+	    dir_init(filename);
 	    reader_getline   = simple_getline;
 	    mailstore_next_mail = dir_next_mail;
 	    return true;
 	} else {
 	    /* MH */
 	    mailstore_type = MS_MH;
-	    mh_init(filename);
+	    dir_init(filename);
 	    reader_getline   = simple_getline;
 	    mailstore_next_mail = dir_next_mail;
 	    return true;
@@ -426,48 +423,28 @@ static int simple_getline(buff_t *buff)
     return count;
 }
 
-/* maildir specific functions */
-
-static void maildir_fini(void)
+/* initialize for MH directory and
+ * Maildir subdirectories ( cur and new). */
+static void dir_init(const char *name)
 {
-    if (reader_dir)
-	closedir(reader_dir);
     reader_dir = NULL;
-    return;
-}
+    fini = dir_fini;
 
-/* initialize iterators for Maildir subdirectories, 
- * cur and new. */
-static void maildir_init(const char *name)
-{
-    maildir_sub = maildir_subs;
-    reader_dir = NULL;
-    fini = maildir_fini;
+    if (mailstore_type == MS_MAILDIR)
+	maildir_sub = maildir_subs;
 
     save_dirname(name);
 
     return;
 }
 
-/* MH specific functions */
+/* finish up MH/Maildir store */
 
-static void mh_fini(void)
+static void dir_fini(void)
 {
     if (reader_dir)
 	closedir(reader_dir);
     reader_dir = NULL;
-    return;
-}
-
-/* initialize iterators for MH subdirectories, 
- * cur and new. */
-static void mh_init(const char *name)
-{
-    reader_dir = NULL;
-    fini = mh_fini;
-
-    save_dirname(name);
-
     return;
 }
 
