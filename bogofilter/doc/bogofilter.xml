@@ -439,7 +439,7 @@ Instructions for its use are included in the script in the form of
 comments.</para>
 </refsect1>
 
-<refsect1 id='log messages'><title>Log messages</title>
+<refsect1 id='logmessages'><title>Log messages</title>
 
 <para>Bogofilter writes messages to the system log when the <option>-l</option> 
 option is used.  What is written depends on which other flags are used.</para>
