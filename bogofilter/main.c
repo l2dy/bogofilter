@@ -106,7 +106,7 @@ int validate_args(int argc, char **argv)
 
 //  flags '-s', '-n', '-S', or '-N', are mutually exclusive of flags '-p', '-u', '-e', and '-R'.
     classification = (run_type == RUN_NORMAL) ||(run_type == RUN_UPDATE) || passthrough || nonspam_exits_zero || (Rtable != 0);
-    registration   = (run_type = REG_SPAM) || (run_type = REG_GOOD) || (run_type = REG_GOOD_TO_SPAM) || (run_type = REG_SPAM_TO_GOOD);
+    registration   = (run_type == REG_SPAM) || (run_type == REG_GOOD) || (run_type == REG_GOOD_TO_SPAM) || (run_type == REG_SPAM_TO_GOOD);
 
     if ( registration && classification)
     {
