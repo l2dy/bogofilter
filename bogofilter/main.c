@@ -31,8 +31,11 @@ AUTHOR:
 
 #define BOGODIR ".bogofilter"
 
-int verbose, passthrough, nonspam_exits_zero;
 run_t run_type = RUN_NORMAL; 
+
+int verbose, passthrough, nonspam_exits_zero;
+bool original_algorithm = TRUE;
+bool robinson_algorithm = FALSE;
 
 char directory[PATH_LEN];
 
@@ -127,7 +130,7 @@ int main(int argc, char **argv)
     set_dir_from_env(directory, "HOME", BOGODIR);
     set_dir_from_env(directory, "BOGOFILTER_DIR", NULL);
 
-    while ((ch = getopt(argc, argv, "d:ehlsnSNvVpu")) != EOF)
+    while ((ch = getopt(argc, argv, "d:ehlsnSNvVpuor")) != EOF)
 	switch(ch)
 	{
 	case 'd':
@@ -199,6 +202,16 @@ int main(int argc, char **argv)
 
 	case 'l':
 	    logflag = 1;
+	    break;
+
+	case 'o':
+	    original_algorithm = 1;
+	    robinson_algorithm = 1 ^ original_algorithm;
+	    break;
+
+	case 'r':
+	    robinson_algorithm = 1;
+	    original_algorithm = 1 ^ robinson_algorithm;
 	    break;
 	}
 

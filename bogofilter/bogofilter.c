@@ -14,6 +14,16 @@ THEORY:
 
 I do the lexical analysis slightly differently, however.
 
+MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
+    Robinson's proposed modifications to the "spamicity" calculation and
+    uses his f(w) individual probability calculation.  See
+
+    http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html
+    
+    In addition, this version does not store "extrema."  Instead it accumulates
+    Robinson's P and Q using all words deemed "characteristic," i.e. having
+    a deviation (fabs (0.5f - prob)) >= MIN_DEV, currently set to 0.0.
+
 ******************************************************************************/
 #include <stdio.h>
 #include <math.h>
@@ -30,13 +40,28 @@ I do the lexical analysis slightly differently, however.
 #define KEEPERS		15		// how many extrema to keep
 #define MINIMUM_FREQ	5		// minimum freq
 #define UNKNOWN_WORD	0.4f		// odds that unknown word is spammish
-#define SPAM_CUTOFF	0.9f		// if it's spammier than this...
-#define MAX_REPEATS	4		// cap on word frequency per message
 
 #define MAX_PROB	0.99f		// max probability value used
 #define MIN_PROB	0.01f		// min probability value used
 #define EVEN_ODDS	0.5f		// used for words we want to ignore
-#define DEVIATION(n)	fabs((n) - EVEN_ODDS)		// deviation from average
+#define DEVIATION(n)	fabs((n) - EVEN_ODDS)	// deviation from average
+
+#define MIN_DEV		0.0f		// if nonzero, use characteristic words
+
+#define ORIGINAL_SPAM_CUTOFF	0.90f	// if it's spammier than this...
+#define ROBINSON_SPAM_CUTOFF	0.52f	// if it's spammier than this...
+#define SPAM_CUTOFF (original_algorithm ? ORIGINAL_SPAM_CUTOFF : ROBINSON_SPAM_CUTOFF)
+
+#define ORIGINAL_MAX_REPEATS	4	// cap on word frequency per message
+#define ROBINSON_MAX_REPEATS	1	// cap on word frequency per message
+#define MAX_REPEATS (original_algorithm ? ORIGINAL_MAX_REPEATS : ROBINSON_MAX_REPEATS)
+
+#define ROBS 0.001f                    // Robinson's s
+#define ROBX 0.415f                    // Robinson's x
+
+#define PLURAL(count) ((count == 1) ? "" : "s")
+
+extern bool original_algorithm, robinson_algorithm;
 
 extern char msg_register[];
 
@@ -124,7 +149,8 @@ void register_words(run_t run_type, wordhash_t *h, int msgcount, int wordcount)
 	  wordcount, msgcount);
 
   if (verbose)
-    fprintf(stderr, "# %d words, %d messages\n", wordcount, msgcount);
+    fprintf(stderr, "# %d word%s, %d message%s\n", 
+	    wordcount, PLURAL(wordcount), msgcount, PLURAL(msgcount));
 
   good_list.active = spam_list.active = FALSE;
 
@@ -316,7 +342,15 @@ void wordprob_add(wordprob_t* wordstats, double newprob, int bad)
 
 double wordprob_result(wordprob_t* wordstats)
 {
-    double prob = wordstats->bad/(wordstats->good + wordstats->bad);
+    double prob;
+
+    if (original_algorithm)
+      prob = wordstats->bad/(wordstats->good + wordstats->bad);
+
+    if (robinson_algorithm)
+      prob = ((ROBS * ROBX + wordstats->bad) /
+	      (ROBS + wordstats->good + wordstats->bad));
+
     return (prob);
 }
 
@@ -359,13 +393,21 @@ double compute_probability( char *token )
 	    wordprob_add(&wordstats, prob, list->bad);
 	}
     }
-    if (totalcount < MINIMUM_FREQ)
-	prob=UNKNOWN_WORD;
-    else {
-	prob=wordprob_result(&wordstats);
-	prob = min(MAX_PROB, prob);
-	prob = max(MIN_PROB, prob);
+
+    if (original_algorithm)
+    {
+	if (totalcount < MINIMUM_FREQ)
+	    prob=UNKNOWN_WORD;
+	else {
+	    prob=wordprob_result(&wordstats);
+	    prob = min(MAX_PROB, prob);
+	    prob = max(MIN_PROB, prob);
+	}
     }
+
+    if (robinson_algorithm)
+	prob=wordprob_result(&wordstats);
+
     return prob;
 }
 
@@ -435,6 +477,45 @@ double compute_spamicity(bogostat_t *bogostats, FILE *fp)
     return spamicity;
 }
 
+double compute_robinson_spamicity(wordhash_t *wordhash)
+// selects the best spam/nonspam indicators and
+// calculates Robinson's S
+{
+    hashnode_t *node;
+
+    double invproduct = 0.0;   // Robinson's P
+    double product = 0.0;      // Robinson's Q
+    double spamicity, invn;
+    int robn = 0;
+
+    for(node = wordhash_first(wordhash); node != NULL; node = wordhash_next(wordhash))
+    {
+	char *token = node->key;
+	double prob = compute_probability( token );
+
+        // Robinson's P and Q; accumulation step
+        // P = 1 - ((1-p1)*(1-p2)*...*(1-pn))^(1/n)     [spamminess]
+        // Q = 1 - (p1*p2*...*pn)^(1/n)                 [non-spamminess]
+        if (fabs(0.5 - prob) >= MIN_DEV) {
+            invproduct += log(1.0 - prob);
+            product += log(prob);
+            robn ++;
+        }
+    }
+
+    // Robinson's P, Q and S
+    // S = (P - Q) / (P + Q)                        [combined indicator]
+    if (robn) {
+        invn = (double)robn;
+        invproduct = 1.0 - exp(invproduct / invn);
+        product = 1.0 - exp(product / invn);
+        spamicity =
+            (1.0 + (invproduct - product) / (invproduct + product)) / 2.0;
+    } else spamicity = ROBX;
+
+    return (spamicity);
+}
+
 rc_t bogofilter(int fd, double *xss)
 /* evaluate text for spamicity */
 {
@@ -454,13 +535,22 @@ rc_t bogofilter(int fd, double *xss)
     good_list.msgcount = db_getcount(good_list.dbh);
     spam_list.msgcount = db_getcount(spam_list.dbh);
 
-//  select the best spam/nonspam indicators.
-    bogostats = select_indicators(wordhash);
+    if (original_algorithm)
+    {
+	// select the best spam/nonspam indicators.
+	bogostats = select_indicators(wordhash);
+
+	// computes the spamicity of the spam/nonspam indicators.
+	spamicity = compute_spamicity(bogostats, NULL);
+    }
+
+    if (robinson_algorithm)
+    {
+	// computes the spamicity of the spam/nonspam indicators.
+	spamicity = compute_robinson_spamicity(wordhash);
+    }
 
     db_lock_release_list(word_lists);
-
-//  computes the spamicity of the spam/nonspam indicators.
-    spamicity = compute_spamicity(bogostats, NULL);
 
     status = (spamicity > SPAM_CUTOFF) ? RC_SPAM : RC_NONSPAM;
 
