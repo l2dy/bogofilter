@@ -82,7 +82,7 @@ version_sources= \
 	charset.h charset.c \
 	collect.h collect.c \
 	configfile.h configfile.c \
-	datastore.h datastore.c db_handle_props.h \
+	datastore.h datastore.c \
 	db_lock.h db_lock.c \
 	debug.h debug.c \
 	error.h error.c \
