@@ -62,7 +62,7 @@ rm -f configure-dummy.c configure-dummy.o
 CFLAGS="$CFLAGS $ac_cv_prog_gcc_flags"
 AC_SUBST(CFLAGS)
 
-# Checks for libraries.
+dnl Checks for libraries.
 AC_CHECK_LIB([m],  [cos])
 
 AC_CHECK_DECLS(optreset,,,[[
@@ -70,6 +70,11 @@ AC_CHECK_DECLS(optreset,,,[[
 /* Solaris */
 #include <stdlib.h>
 ]])
+
+dnl Coerce GLIBC 2.3 to GLIBC 2.2 compatibility.
+dnl May not be complete with future extensions, but appears to work
+dnl today, 2003-10-02. Matthias Andree
+AC_DEFINE(__NO_CTYPE,1,[Define __NO_CTYPE to 1 to avoid GLIBC_2.3-specific ctype.h functions.])
 
 AC_ARG_ENABLE(static,
       AC_HELP_STRING([--enable-static], [Build static versions as well.]))
@@ -512,8 +517,10 @@ if test "$have_dosish_system" = yes; then
 fi
 AM_CONDITIONAL(HAVE_DOSISH_SYSTEM, test "$have_dosish_system" = yes)
 
-# Note the \\\\ for backslashes.  Autoconf eats one layer, leaving \\
+# sanitize directory, avoid symlinks
+rm -f src/sysdefs.tmp 2>/dev/null || :
 
+# Note the \\\\ for backslashes.  Autoconf eats one layer, leaving \\
 AC_CONFIG_COMMANDS(sysdefs,[[
 cat >src/sysdefs.tmp <<Eof
 /* Generated automatically by configure */
