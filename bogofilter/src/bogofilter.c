@@ -53,7 +53,7 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
     double 	spamicity;
     wordhash_t  *wordhash = wordhash_init();
     long	msgcount = 0;
-    bool	more;
+    token_t	token_type;
 
     set_list_active_status(true);
 
@@ -64,9 +64,9 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
 
     /* tokenize input text and save words in a wordhash. */
     do {
-	more = collect_words(wordhash);
+	token_type = collect_words(wordhash);
 	++msgcount;
-    } while (more);
+    } while (token_type != NONE && token_type != FROM && token_type != MSG_COUNT_LINE);
 
     wordhash_sort(wordhash);
 
@@ -87,7 +87,7 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
 
     wordhash_free(wordhash);
 
-    return status;
+    return (token_type != MSG_COUNT_LINE) ? status : RC_MORE;
 }
 
 /* Done */

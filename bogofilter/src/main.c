@@ -134,9 +134,11 @@ int classify(int argc, char **argv, FILE *out)
 	}
 
 	initialize(fpin);
-	status = bogofilter(&spamicity);
-	write_message(out, status);
-	if (bulk_mode == B_NORMAL) {
+	do {
+	    status = bogofilter(&spamicity);
+	    write_message(out, status);
+	} while (status == RC_MORE);
+	if (bulk_mode == B_NORMAL && status != RC_MORE) {
 	    exitcode = (status == RC_SPAM) ? 0 : 1;
 	    if (nonspam_exits_zero && passthrough && exitcode == 1)
 		exitcode = 0;
@@ -319,7 +321,7 @@ static void write_message(FILE *fp, rc_t status)
     }
 
     if (verbose || passthrough || Rtable) {
-	if (! stats_in_header)
+	if (passthrough && ! stats_in_header)
 	    (void)fputs("\n", stdout);
 	verbose += passthrough;
 	print_stats( stdout );

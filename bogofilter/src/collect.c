@@ -37,20 +37,20 @@ void collect_reset(void)
  *
  * Returns:  true if the EOF token has not been read.
  */
-bool collect_words(wordhash_t *wh)
+token_t collect_words(wordhash_t *wh)
 {
-    bool more;
+    token_t class;
 
     wordprop_t *w;
 
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### collect_words() begins\n");
 
     for (;;){
-	token_t token_type = get_token();
+	token_t token_type;
+	class = get_token();
 
 	/* treat .MSG_COUNT as FROM */
-	if (token_type == MSG_COUNT_LINE)
-	    token_type = FROM;
+	token_type = (class != MSG_COUNT_LINE) ? class : FROM;
 
 	if (token_type != FROM && 
 	    token_type != NONE)
@@ -91,13 +91,10 @@ bool collect_words(wordhash_t *wh)
 	    from_seen = true;
 	    continue;
 	}
-
-	/* Process more input if FROM, but not if EOF */
-	more = token_type != NONE;
 	break;
     }
 
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### collect_words() ends\n");
 
-    return more;
+    return class;
 }

@@ -132,7 +132,7 @@ void register_messages(run_t _run_type)
 {
   wordhash_t *words = wordhash_init();
   long	msgcount = 0;
-  bool	more;
+  token_t token_type;
 
   initialize_constants();
 
@@ -141,11 +141,11 @@ void register_messages(run_t _run_type)
       msgcount++;
       if (DEBUG_REGISTER(1))
 	  fprintf(dbgout, "Message #%ld\n", msgcount);
-      more = collect_words(h);
+      token_type = collect_words(h);
       wordhash_sort(h);
       add_hash(words, h);
       wordhash_free(h);
-  } while (more);
+  } while (token_type != NONE);
 
   wordhash_sort(words);
   register_words(_run_type, words, msgcount);
