@@ -96,7 +96,7 @@ static enum algorithm_e algorithm = AL_DEFAULT;
 static bool cmd_algorithm = false;		/* true if specified on command line */
 
 static bool select_algorithm(const unsigned char ch, bool cmdline);
-static void config_algorithm(const unsigned char *s);
+static bool config_algorithm(const unsigned char *s);
 
 /*---------------------------------------------------------------------------*/
 
@@ -146,9 +146,9 @@ static const parm_desc sys_parms[] =
 
 static const parm_desc *usr_parms = NULL;
 
-static void config_algorithm(const unsigned char *s)
+static bool config_algorithm(const unsigned char *s)
 {
-    select_algorithm(tolower(*s), false);
+    return select_algorithm(tolower(*s), false);
 }
 
 static bool select_algorithm(const unsigned char ch, bool cmdline)
