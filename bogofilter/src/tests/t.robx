@@ -56,6 +56,8 @@ WANT="356086"
 WANT="368615"
 # v0.15.4 - no longer discarding message separators
 WANT="363576"
+# v0.15.6 - Fixed SMTP/ESMPT processing
+WANT="364905"
 
 if [ "$RESULT" != "$WANT" ] ; then
     echo want: $WANT, have: $RESULT

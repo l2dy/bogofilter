@@ -28,7 +28,7 @@ set -e
 if [ ! -z "$SUFFIX" ]; then
     FILES=`find $srcdir -name CVS -type d | while read a ; do find "$a" -name Entries -type f ; done`
     set +e
-    DATE=CVStime_`perl -MHTTP::Date -e '
+    DATE=`perl -MHTTP::Date -e '
     $max = 0;
     while (<>) {
 	split m(/);
@@ -36,12 +36,16 @@ if [ ! -z "$SUFFIX" ]; then
 	$max=$a if $a and $a > $max;
     }
     $date=HTTP::Date::time2isoz($max);
-    $date=~tr/ :Z-/_/d;
+    $date=~tr/ :Z-/./d;
+    my($sec,$min,$hour,$mday,$mon,$year) = localtime($max);
+    $date=sprintf("%02d%02d.%02d%02d",
+	    $mon+1, $mday, $hour, $min);
     print $date, "\n";
     ' </dev/null $FILES` || DATE=
     if [ "x$FILES" = "x" ] || [ "x$DATE" = "x" ] ; then
        DATE=`env TZ=GMT date "+build_date_%Y%m%d_%Hh"`
     fi
+#   DATE=`date "+%m%d.%H%M"`
     VERSION="$VERSION.$DATE"
 fi
 
