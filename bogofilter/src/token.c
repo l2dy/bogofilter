@@ -110,7 +110,7 @@ token_t get_token(void)
 	      if (html_tag_level > 0 || html_comment_level > 0)
 		continue;
 	      
-	    if (msg_state->mime_header)
+	    if (msg_header)
 	    {
 		if (token_prefix != NULL) {
 		    word_t *w = word_concat(token_prefix, yylval);
@@ -210,10 +210,10 @@ void got_newline()
 
 void got_emptyline(void)
 {
-    if (msg_state->mime_type != MIME_MESSAGE && !msg_state->mime_header)
+    if (msg_state->mime_type != MIME_MESSAGE && !msg_header)
 	return;
 
-    msg_header = msg_state->mime_header = false;
+    msg_header = false;
      
     if (msg_state->mime_type == MIME_MESSAGE)
 	mime_add_child(msg_state);

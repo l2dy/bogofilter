@@ -27,7 +27,7 @@
 /* Local Variables */
 
 int yylineno;
-int msg_header = 1;
+bool msg_header = true;
 
 static buff_t *yysave = NULL;
 
@@ -46,8 +46,8 @@ static void check_alphanum(buff_t *buff);
 
 static void lexer_display_buffer(buff_t *buff)
 {
-    fprintf(dbgout, "*** %2d %c,%c %d ", yylineno,
-	    HORB(msg_header), HORB(msg_state->mime_header), buff->t.leng - buff->read);
+    fprintf(dbgout, "*** %2d %c %d ", yylineno,
+	    msg_header ? 'h' : 'b', buff->t.leng - buff->read);
     buff_puts(buff, 0, dbgout);
     if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
 	fputc('\n', dbgout);
@@ -210,7 +210,7 @@ static int get_decoded_line(buff_t *buff)
 
     if (count >= 5
 	&& memcmp("From ", buf, 5) != 0
-	&& !msg_header && !msg_state->mime_header
+	&& ! msg_header
 	&& msg_state->mime_type != MIME_TYPE_UNKNOWN)
     {
 	word_t line;
@@ -269,7 +269,7 @@ int yyinput(byte *buf, size_t max_size)
     /* do nothing if in header */
 
     if ((count > 0)
-	&& ! (msg_header || msg_state->mime_header)
+	&& ! msg_header
 	&& msg_state->mime_type == MIME_TEXT_HTML)
     {
 	count = process_html_comments(buff);

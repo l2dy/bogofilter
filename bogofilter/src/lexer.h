@@ -33,7 +33,8 @@ typedef enum {
 
 /* in lexer.c */
 extern int yylineno;
-extern int msg_header;
+extern bool msg_header;
+
 extern bool is_from(word_t *w);
 
 /* in lexer_v3.l */

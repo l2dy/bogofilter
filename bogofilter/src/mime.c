@@ -119,7 +119,7 @@ const char *mime_type_name(enum mimetype type)
 static void
 mime_init (mime_t * parent)
 {
-  msg_state->mime_header = true;
+  msg_header = true;
   msg_state->mime_type = MIME_TEXT;
   msg_state->mime_encoding = MIME_7BIT;
   msg_state->boundary = NULL;
@@ -234,7 +234,6 @@ mime_reset (void)
     mime_pop ();
 
   mime_push (NULL);
-  msg_header = true;		/*FIXME: fold this into mime structure */
 }
 
 void
@@ -391,7 +390,7 @@ mime_version (word_t *text)
   size_t l;
   char *w;
 
-  if (!msg_header && !msg_state->mime_header)
+  if (!msg_header)
       return;
 
   l = strlen("MIME-Version:");
@@ -409,7 +408,7 @@ mime_disposition (word_t *text)
   char *w;
   struct disposition_s *dis;
 
-  if (!msg_header && !msg_state->mime_header)
+  if (!msg_header)
       return;
 
   l = strlen("Content-Disposition:");
@@ -453,7 +452,7 @@ mime_encoding (word_t *text)
   char *w;
   struct encoding_s *enc;
 
-  if (!msg_header && !msg_state->mime_header)
+  if (!msg_header)
       return;
 
   l = strlen("Content-Transfer-Encoding:");
@@ -483,7 +482,7 @@ mime_type (word_t *text)
   char *w;
   struct type_s *typ;
 
-  if (!msg_header && !msg_state->mime_header)
+  if (!msg_header)
       return;
 
   l = strlen("Content-Type:");
@@ -556,7 +555,7 @@ mime_decode (word_t *text)
 {
   size_t count = text->leng;
 
-  if (msg_state->mime_header)	/* do nothing if in header */
+  if (msg_header)	/* do nothing if in header */
     return count;
   
   /* early out for the uninteresting cases */
