@@ -32,8 +32,11 @@ SYSTEST="${srcdir}"
 cat <<EOF > ${CONFIG}
 robx=0.415
 min_dev=0.0
+ham_cutoff=0.10
+spam_cutoff=0.95
 spam_header_name=X-Bogosity
 stats_in_header=Y
+tag_header_lines=no
 EOF
 
 map_rc()
