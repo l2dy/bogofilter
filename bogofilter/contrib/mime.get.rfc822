@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+# $Id$ #
+
 =head1 NAME
 
 mime.get.rfc822 - splits out message/rfc822 parts from a MIME message
@@ -54,13 +56,24 @@ $parser->extract_nested_messages(0);
 $parser->output_to_core(1);		 # No temporary files
 my $entity = $parser->parse(\*STDIN);
 
-foreach my $subent ($entity->parts) {
-	if ($subent->effective_type eq "message/rfc822") {
-		print "From invalid\@example.com Mon May 19 18:00:00 2003\n";
-		my $body = $subent->stringify_body;
-		$body =~ s/^From />From /mg;
-		$body =~ s/\n*$/\n\n/;
-		print $body;
+my $found=0;
+# Loop recursing deeper until we find a message/rfc822 part.
+my @check_parts = $entity->parts;
+
+while (!$found) {
+	foreach my $subent (@check_parts) {
+		if ($subent->effective_type eq "message/rfc822") {
+			print "From invalid\@example.com Mon May 19 18:00:00 2003\n";
+			my $body = $subent->stringify_body;
+			$body =~ s/^From />From /mg;
+			$body =~ s/\n*$/\n\n/;
+			print $body;
+			$found++;
+		}
+	}
+	if (!$found) {
+		@check_parts = map { $_->parts; } @check_parts;
+		last if ! @check_parts;
 	}
 }
 
