@@ -158,6 +158,7 @@ static int db_oper(const char *path, dbmode_t open_mode, db_foreach_t funct,
     dbh = db_open(".", 1, &path, open_mode);
 
     if (dbh == NULL) {
+	fprintf(stderr, "Can't open file %s\n", path);
 	exit(2);
     } else {
 	int r = db_foreach(dbh, funct, userdata);
@@ -511,11 +512,11 @@ static int compute_robinson_x(char *path)
     free_wordlists();
 
     if (!onlyprint) {
+	size_t count;
+
 	char filepath1[PATH_LEN];
 	char filepath2[PATH_LEN];
 	char *filepaths[2];
-
-	size_t count;
 
 	filepaths[0] = filepath1;
 	filepaths[1] = filepath2;
