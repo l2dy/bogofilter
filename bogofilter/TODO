@@ -15,6 +15,9 @@
      http://article.gmane.org/gmane.mail.bogofilter.general/9035 and
      followups. (MID <20041222105734.GA30574@sela.f4n.org>, by "John"
      Subject "Size limit?" on 2004-12-22)
+     The fseek() code to determine if the input is seekable got removed
+     when the reader moved out of main.c between 1.66 and 1.67 (CVS) and
+     has never been in bogoreader.c.
 
 **** New Feature: Token aging. Support for struct data in the wordlists is
 already present.
