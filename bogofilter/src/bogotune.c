@@ -137,7 +137,8 @@ typedef enum e_ds_loc {
 /* Global Variables */
 
 const char *progname = "bogotune";
-static char *ds_path;
+static char *ds_path;			/* directory */
+static char *ds_file;			/* directory/file */
 static ds_loc ds_flag = DS_NONE;
 static void *env = NULL;
 
@@ -625,11 +626,11 @@ static int update_count(void)
 static void load_wordlist(ds_foreach_t *hook, void *userdata)
 {
     if (verbose) {
-	printf("Reading %s\n", ds_path);
+	printf("Reading %s\n", ds_file);
 	fflush(stdout);
     }
 
-    ds_oper(env, ds_path, DS_READ, hook, userdata);
+    ds_oper(env, ds_file, DS_READ, hook, userdata);
 
     return;
 }
@@ -930,7 +931,7 @@ static int process_arglist(int argc, char **argv)
 	    suppress_config_file = true;
 	    break;
 	case 'd':
-	    ds_path = optarg;
+	    ds_path = xstrdup(optarg);
 	    ds_flag = (ds_flag == DS_NONE) ? DS_DSK : DS_ERR;
 	    break;
 	case 'D':
@@ -1318,6 +1319,7 @@ static void bogotune_free(void)
     mime_cleanup();
 
     xfree(ds_path);
+    xfree(ds_file);
 
     return;
 }
@@ -1702,7 +1704,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     /* directories from command line and config file are already handled */
     if (ds_flag == DS_DSK) {
-	char *ds_file;
 
 	if (ds_path == NULL)
 	    ds_path = get_directory(PR_ENV_BOGO);
@@ -1713,9 +1714,19 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	set_bogohome(ds_path);
 	env = ds_init(bogohome, WORDLIST);
 
-	ds_file = mxcat(ds_path, DIRSEP_S, WORDLIST, NULL);
+	/* ds_path is the directory and
+	** ds_file is directory/WORDLIST.
+	*/
+	if (strcmp(bogohome, ds_path) == 0) {
+	    ds_file = mxcat(ds_path, DIRSEP_S, WORDLIST, NULL);
+	}
+	else {
+	    ds_file = xstrdup(ds_path);
+	    xfree(ds_path);
+	    ds_path = xstrdup(bogohome);
+	}
+
 	init_wordlist("word", ds_file, 0, WL_REGULAR);
-	xfree(ds_file);
     }
 
     bogotune();
