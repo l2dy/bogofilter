@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.18  2002/10/04 01:35:23  m-a
+ * Free directory if used.
+ *
  * Revision 1.17  2002/10/02 17:14:54  relson
  * main.c now calls setup_lists() for initializing the wordlist structures, including the opening of the wordlist.db files.
  * setup_list() takes a directory name as its argument and passes it to init_list(), which calls open_wordlist() for the actual open.
@@ -107,6 +110,7 @@ AUTHOR:
 #include <sys/syslog.h>
 #endif
 #include "bogofilter.h"
+#include "xmalloc.h"
 #include "datastore.h"
 
 #define BOGODIR		"/.bogofilter/"
@@ -186,11 +190,10 @@ int main(int argc, char **argv)
     if ( directory == NULL )
     {
 	char *tmp = getenv("HOME");
-	if ( tmp == NULL )
+	if ( tmp == NULL ) {
 	    setup_lists(BOGODIR);
-	else
-	{
-	    directory = malloc( strlen(tmp) + strlen(BOGODIR) + 1 );
+	} else {
+	    directory = xmalloc( strlen(tmp) + strlen(BOGODIR) + 1 );
 	    strcpy(directory, tmp );
 	    strcat(directory, BOGODIR);
 	    setup_lists(directory);
@@ -243,6 +246,7 @@ int main(int argc, char **argv)
     }
 
     close_lists();
+    if (directory) xfree(directory);
 
     exit(exitcode);
 }
