@@ -3,6 +3,12 @@
 				bogofilter news
 
 0.8.1
+	* New file METHODS describes the Graham, Robinson, and Fisher
+	  methods that bogofilter supports for computing spamicity.
+	* Added support for Fisher's method of combining probabilities,
+	  as optimized for this purpose by Rob W. W. Hooft, to the
+	  "Robinson" algorithm.
+	* A new '-f' option tells bogofilter to use Fisher's method.
 	* Split the main module into a registration module and two
 	  algorithm modules - for the graham and robinson methods.
 	* Implemented an object oriented API for using computational
