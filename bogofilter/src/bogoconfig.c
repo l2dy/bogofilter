@@ -603,7 +603,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     }
 	
     case ':':
-	fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+	fprintf(stderr, "Option %s requires an argument.\n", name);
 	exit(EX_ERROR);
 
     case '-':
