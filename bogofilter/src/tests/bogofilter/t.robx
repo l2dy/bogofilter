@@ -62,6 +62,8 @@ WANT="244724"
 WANT="356086"
 # v0.13.0 - new parsing rules - case sensitive, header_line_markup, tokenize_html_tags
 WANT="370952"
+# v0.13.5 - new parsing rules - allow terminal exclamation points
+WANT="367743"
 
 if [ "$RESULT" != "$WANT" ] ; then
     echo want: $WANT, have: $RESULT
