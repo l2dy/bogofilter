@@ -352,10 +352,10 @@ void ds_set_msgcounts(void *vhandle, dsv_t *val)
 {
     dsh_t *dsh = vhandle;
 
-    if (timestamp_tokens && val->date != 0)
-	val->date = today;
+    val->date = today;
 
     ds_write(dsh, msg_count_tok, val);
+
     return;
 }
 
@@ -379,10 +379,10 @@ void ds_set_wordlist_version(void *vhandle, dsv_t *val)
 {
     dsh_t *dsh = vhandle;
 
-    if (timestamp_tokens)
-	val->date = today;
+    val->date = today;
 
     ds_write(dsh, wordlist_version_tok, val);
+
     return;
 }
 
