@@ -12,7 +12,7 @@ AUTHOR:
 
 void rstats_init(void);
 
-void rstats_add(char *token,
+void rstats_add(const char *token,
 		double good,
 		double bad,
 		double prob);

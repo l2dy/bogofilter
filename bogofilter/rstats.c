@@ -67,7 +67,7 @@ void rstats_init(void)
     current = header.list;
 }
 
-void rstats_add( char *token,
+void rstats_add( const char *token,
 		 double good,
 		 double bad,
 		 double prob)
