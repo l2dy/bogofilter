@@ -17,12 +17,8 @@ Stefan Bellon <sbellon@sbellon.de>       2003
 #include <depot.h>
 #include <stdlib.h>
 
-#include <unistd.h>
-#include <errno.h>
-
 #include "datastore.h"
 #include "datastore_db.h"
-#include "maint.h"
 #include "error.h"
 #include "paths.h"
 #include "xmalloc.h"
@@ -30,9 +26,10 @@ Stefan Bellon <sbellon@sbellon.de>       2003
 
 /* initial bucket array element count (for new data base) */
 static const int DB_INITBNUM = 1913;
-/* align to size for quick overwrites.
- * XXX FIXME: make this 12 to conserve space? */
-static const int DB_ALIGNSIZE = 16;
+
+/* align to size for quick overwrites. */
+static const int DB_ALIGNSIZE = 12;
+
 /* reorganize data base if record/bucket ratio grows above this 
  * hence "FILL" for "bucket fill ratio". */
 static const double DB_MAXFILL = 0.8;
@@ -45,15 +42,17 @@ typedef struct {
     DEPOT *dbp[IX_SIZE];
 } dbh_t;
 
+
 /* Function definitions */
 
 const char *db_version_str(void)
 {
     static char v[80];
     if (!v[0])
-	snprintf(v, sizeof(v), "QDBM (version %s, depot API)", dpversion);
+	snprintf(v, sizeof(v), "QDBM (version %s, Depot API)", dpversion);
     return v;
 }
+
 
 static dbh_t *dbh_init(const char *path, size_t count, const char **names)
 {
@@ -66,9 +65,9 @@ static dbh_t *dbh_init(const char *path, size_t count, const char **names)
     handle->count = count;
     handle->path = xstrdup(path);
     for (c = 0; c < count; c += 1) {
-      size_t len = strlen(path) + strlen(names[c]) + 2;
-      handle->name[c] = xmalloc(len);
-      build_path(handle->name[c], len, path, names[c]);
+	size_t len = strlen(path) + strlen(names[c]) + 2;
+	handle->name[c] = xmalloc(len);
+	build_path(handle->name[c], len, path, names[c]);
     }
     handle->locked = false;
 
@@ -81,7 +80,7 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
     if (handle != NULL) {
       size_t c;
       for (c = 0; c < handle->count; c += 1)
-          xfree(handle->name[c]);
+	  xfree(handle->name[c]);
 
       xfree(handle->path);
       xfree(handle);
@@ -115,7 +114,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
     if (open_mode == DB_WRITE)
 	flags = DP_OWRITER | DP_OCREAT;
     else
-    	flags = O_RDONLY;
+	flags = DP_OREADER;
 
     handle = dbh_init(db_file, count, names);
 
@@ -131,10 +130,10 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 	  goto open_err;
 
       if (flags & DP_OWRITER) {
-          if (!dpsetalign(dbp, DB_ALIGNSIZE)){
-              dpclose(dbp);
-              goto open_err;
-          }
+	  if (!dpsetalign(dbp, DB_ALIGNSIZE)){
+	      dpclose(dbp);
+	      goto open_err;
+	  }
       }
 
       if (DEBUG_DATABASE(1)) {
@@ -148,11 +147,12 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 
  open_err:
     print_error(__FILE__, __LINE__, "(qdbm) dpopen(%s, %d) failed: %s",
-	    handle->name[i], flags, dperrmsg(dpecode));
+		handle->name[i], flags, dperrmsg(dpecode));
     dbh_free(handle);
 
     return NULL;
 }
+
 
 int db_delete(dsh_t *dsh, const dbv_t *token)
 {
@@ -166,14 +166,15 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
       ret = dpout(dbp, token->data, token->leng);
 
       if (ret == 0) {
-          print_error(__FILE__, __LINE__, "(qdbm) dpout('%s'), err: %s",
-                      (char *)token->data, dperrmsg(dpecode));
-          exit(EX_ERROR);
+	  print_error(__FILE__, __LINE__, "(qdbm) dpout('%s'), err: %s",
+		      (char *)token->data, dperrmsg(dpecode));
+	  exit(EX_ERROR);
       }
     }
 
     return ret;		/* 0 if ok */
 }
+
 
 int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 {
@@ -189,7 +190,8 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 	return DS_NOTFOUND;
 
     if (val->size < (unsigned)dsiz) {
-	print_error(__FILE__, __LINE__, "(qdbm) db_get_dbvalue( '%s' ), size error %d: %d",
+	print_error(__FILE__, __LINE__,
+		    "(qdbm) db_get_dbvalue( '%s' ), size error %d: %d",
 		    (char *)token->data, val->size, dsiz);
 	exit(EX_ERROR);
     }
@@ -197,9 +199,25 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
     val->leng = dsiz;		/* read count */
     memcpy(val->data, data, dsiz);
 
-    free(data);
+    free(data); /* not xfree() as allocated by dpget() */
 
     return 0;
+}
+
+
+/*
+   Re-organize database when fill ratio > DB_MAXFILL
+*/
+static inline void db_optimize(DEPOT *dbp, char *name)
+{
+    int bnum = dpbnum(dbp); /* very cheap: O(1) */
+    int rnum = dprnum(dbp); /* very cheap: O(1) */
+    if (bnum > 0 && rnum > 0 && ((double)rnum / bnum > DB_MAXFILL)) {
+	if (!dpoptimize(dbp, -1))
+	    print_error(__FILE__, __LINE__,
+			"(qdbm) dpoptimize for %s failed: %s",
+			name, dperrmsg(dpecode));
+    }
 }
 
 
@@ -213,44 +231,40 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
     ret = dpput(dbp, token->data, token->leng, val->data, val->leng, DP_DOVER);
 
     if (ret == 0) {
-	print_error(__FILE__, __LINE__, "(qdbm) db_set_dbvalue( '%*s' ), err: %d",
+	print_error(__FILE__, __LINE__,
+		    "(qdbm) db_set_dbvalue( '%*s' ), err: %d",
 		    token->size, (char *)token->data, dpecode);
 	exit(EX_ERROR);
     }
+
+    db_optimize(dbp, handle->name[dsh->index]);
 
     return 0;
 }
 
 
-/* Close files and clean up. */
+/*
+   Close files and clean up.
+*/
 void db_close(void *vhandle, bool nosync)
 {
     dbh_t *handle = vhandle;
     size_t i;
-    int bnum, rnum;
 
     if (handle == NULL) return;
 
     if (DEBUG_DATABASE(1)) {
-      dbh_print_names(vhandle, "(qdbm) db_close");
-      fprintf(dbgout, " %s\n", nosync ? "nosync" : "sync");
+	dbh_print_names(vhandle, "(qdbm) db_close");
+	fprintf(dbgout, " %s\n", nosync ? "nosync" : "sync");
     }
 
     for (i = 0; i < handle->count; i += 1) {
 	DEPOT *dbp = handle->dbp[i];
 
-	/* re-organize DB when fill ratio > DB_MAXFILL */
-	bnum = dpbnum(dbp);
-	rnum = dprnum(dbp);
-	if (bnum > 0 && rnum > 0 && ((double)rnum / bnum > DB_MAXFILL))
-	{
-	    if (!dpoptimize(dbp, -1))
-		print_error(__FILE__, __LINE__, "(qdbm) dpoptimize for %s failed: %s",
-			handle->name[i], dperrmsg(dpecode));
-	}
+	db_optimize(dbp, handle->name[i]);
 
 	if (!dpclose(dbp))
-		print_error(__FILE__, __LINE__, "(qdbm) dpclose for %s failed: %s",
+	    print_error(__FILE__, __LINE__, "(qdbm) dpclose for %s failed: %s",
 			handle->name[i], dperrmsg(dpecode));
 	handle->dbp[i] = NULL;
     }
@@ -258,8 +272,9 @@ void db_close(void *vhandle, bool nosync)
     dbh_free(handle);
 }
 
+
 /*
- flush any data in memory to disk
+   Flush any data in memory to disk
 */
 void db_flush(dsh_t *dsh)
 {
@@ -271,9 +286,10 @@ void db_flush(dsh_t *dsh)
 
 	if (!dpsync(dbp))
 	    print_error(__FILE__, __LINE__, "(qdbm) dpsync failed: %s",
-		    dperrmsg(dpecode));
+			dperrmsg(dpecode));
     }
 }
+
 
 int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 {
@@ -307,18 +323,19 @@ int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 
 		if (ret != 0)
 		    break;
-		free(data);
+		free(data); /* not xfree() as allocated by dpget() */
 	    }
-	    free(key);
+	    free(key); /* not xfree() as allocated by dpiternext() */
 	}
     } else {
 	print_error(__FILE__, __LINE__, "(qdbm) dpiterinit err: %s",
-		dperrmsg(dpecode));
+		    dperrmsg(dpecode));
 	exit(EX_ERROR);
     }
 
     return 0;
 }
+
 
 const char *db_str_err(int e) {
     return dperrmsg(e);
