@@ -469,6 +469,8 @@ static void usage(void)
 	    progname, DB_EXT);
     fprintf(stderr, "   or: %s [OPTIONS] {-H|-r|-R} directory\n", progname);
 #if	defined(ENABLE_DB_DATASTORE) && !defined(DISABLE_TRANSACTIONS)
+    fprintf(stderr, "   or: %s [OPTIONS] {--db-checkpoint} directory\n",
+	    progname);
     fprintf(stderr, "   or: %s [OPTIONS] {--db-prune|--db-remove-environment} directory\n",
 	    progname);
     fprintf(stderr, "   or: %s [OPTIONS] {--db-recover|--db-recover-harder} directory\n",
@@ -742,6 +744,7 @@ static int process_arg(int option, const char *name, const char *val)
 
     case O_DB_TRANSACTION:
     case O_DB_VERIFY:
+    case O_DB_CHECKPOINT:
     case O_DB_RECOVER:
     case O_DB_RECOVER_HARDER:
     case O_DB_PRUNE:
@@ -819,6 +822,11 @@ int main(int argc, char *argv[])
 	    break;
 	case M_CRECOVER:
 	    rc = ds_recover(ds_file, true);
+	    break;
+	case M_CHECKPOINT:
+	    ds_init(bogohome, ds_file);
+	    if (fTransaction)
+		rc = ds_checkpoint(ds_file);
 	    break;
 	case M_PURGELOGS:
 	    ds_init(bogohome, ds_file);

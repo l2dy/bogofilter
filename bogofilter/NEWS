@@ -22,6 +22,10 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-03-14
+
+	* Add 'bogoutil --db-checkpoint', to replace db_checkpoint -1h.
+
 	2005-03-09
 
 	* Fix segfault in 'bogoutil --db-verify'.

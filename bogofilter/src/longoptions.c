@@ -58,6 +58,7 @@ struct option long_options[] = {
     { "charset-default",		R, 0, O_CHARSET_DEFAULT },
     { "db-cachesize",			N, 0, 'k' },
     { "db-prune",                       R, 0, O_DB_PRUNE },
+    { "db-checkpoint",                  R, 0, O_DB_CHECKPOINT },
     { "db-recover",                     R, 0, O_DB_RECOVER },
     { "db-recover-harder",              R, 0, O_DB_RECOVER_HARDER },
     { "db-remove-environment",		R, 0, O_DB_REMOVE_ENVIRONMENT },
