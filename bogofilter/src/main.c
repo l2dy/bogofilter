@@ -291,8 +291,8 @@ static rc_t classify()
 void write_message(rc_t status)
 {
     ssize_t rd;
-    readfunc_t rf;
-    void *rfarg = 0;	/* assignment to quench warning */
+    readfunc_t rf = NULL;	/* assignment to quench warning */
+    void *rfarg = 0;		/* assignment to quench warning */
     char *out;
     textdata_t *text;
     int seen_subj = 0;
