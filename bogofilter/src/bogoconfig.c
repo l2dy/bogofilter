@@ -155,7 +155,7 @@ const parm_desc sys_parms[] =
 void process_args_and_config_file(int argc, char **argv)
 {
     process_args(argc, argv, 1);
-    process_config_files();
+    process_config_files(!quiet);
     process_args(argc, argv, 2);
 
     if (!twostate && !threestate) {
@@ -499,7 +499,7 @@ void process_args(int argc, char **argv, int pass)
 	    ** options can be overridden on pass #2
 	    */
 	    if (pass == 1 )			
-		read_config_file(optarg, false);
+		read_config_file(optarg, false, !quiet);
 
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */

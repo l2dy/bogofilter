@@ -175,7 +175,7 @@ static bool process_config_line(char *line,
     return false;
 }
 
-bool read_config_file(const char *fname, bool tilde_expand)
+bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error)
 /* returns true if ok, false if error */
 {
     bool error = false;
@@ -235,8 +235,8 @@ bool read_config_file(const char *fname, bool tilde_expand)
 		! process_config_line(arg, val, format_parms )))
 	{
 	    error = true;
-	    if (!quiet)
-		fprintf(stderr, "%s:%d:  Error - bad parameter in '%s'...'%s'\n", filename, lineno, buff, val);
+	    if (warn_on_error)
+		fprintf(stderr, "%s:%d:  Error - bad parameter in '%s ... %s'\n", filename, lineno, buff, val);
 	}
     }
 
@@ -252,11 +252,11 @@ bool read_config_file(const char *fname, bool tilde_expand)
 }
 
 /* exported */
-bool process_config_files(void)
+bool process_config_files(bool warn_on_error)
 {
     if (!suppress_config_file &&
-	(!read_config_file(system_config_file, false) ||
-	 !read_config_file(user_config_file, true)))
+	(!read_config_file(system_config_file, false, warn_on_error) ||
+	 !read_config_file(user_config_file, true, warn_on_error)))
 	 return false;
 
     stats_prefix= stats_in_header ? "\t" : "#   ";

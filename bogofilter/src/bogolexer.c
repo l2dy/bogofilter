@@ -117,7 +117,7 @@ static int process_args(int argc, char **argv)
 	    break;
 
 	case 'c':
-	    read_config_file(optarg, false);
+	    read_config_file(optarg, false, false);
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
 
@@ -156,7 +156,7 @@ int main(int argc, char **argv)
 
     process_args(argc, argv);
 
-    process_config_files();
+    process_config_files(false);
 
     textblocks = textblock_init();
 
