@@ -38,3 +38,6 @@ stamp-h1
 version.c
 wordhash
 ylwrap
+bogofilter_static
+bogolexer_static
+bogoutil_static
