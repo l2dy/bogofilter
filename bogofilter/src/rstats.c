@@ -92,6 +92,9 @@ void rstats_add(const word_t *token, double prob, wordcnts_t *cnts)
 
     stats_head->count += 1;
     stats_tail->next  = NULL;
+    /* Using externally controlled data;
+       token must not be freed before calling rstats_cleanup()
+    */
     stats_tail->token = token;
     stats_tail->prob  = prob;
     stats_tail->good  = cnts->good;
