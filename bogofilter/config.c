@@ -54,7 +54,7 @@ static bool suppress_config_file = FALSE;
 
 char directory[PATH_LEN + 100] = "";
 const char *system_config_file = "/etc/bogofilter.cf";
-const char *user_config_file   = ".bogofilter.cf";
+const char *user_config_file   = "~/.bogofilter.cf";
 const char *spam_header_name = SPAM_HEADER_NAME;
 
 bool	stats_in_header = TRUE;
@@ -113,7 +113,7 @@ static const ArgDefinition ArgDefList[] =
     { "wordlist",	  CP_WORDLIST,	{ (void *)&dummy } },
 };
 
-static const int ArgDefListSize = sizeof(ArgDefList)/sizeof(ArgDefList[0]);
+static const int ArgDefListSize = (int)sizeof(ArgDefList)/sizeof(ArgDefList[0]);
 
 static bool process_config_parameter(const ArgDefinition * arg, const char *val)
 {
@@ -177,7 +177,8 @@ static bool process_config_parameter(const ArgDefinition * arg, const char *val)
 	    }
 	case CP_WORDLIST:
 	    {
-		configure_wordlist(val); /* FIXME */
+		if (!configure_wordlist(val))
+		    ok = FALSE;
 		break;
 	    }
 	default:
@@ -214,20 +215,16 @@ static bool process_config_line( const char *line )
     return FALSE;
 }
 
-static void read_config_file(const char *filename, bool home_dir)
+static void read_config_file(const char *filename, bool tilde_expand)
 {
     bool error = FALSE;
     int lineno = 0;
-    char *tmp = NULL;
     FILE *fp;
 
-    if (home_dir && filename[0] != '/')
-    {
-	tmp = resolve_home_directory(filename);
-	if (!tmp) {
-	    fprintf(stderr, "Cannot find home directory.\n");
-	    exit(2);
-	}
+    if (tilde_expand) {
+	filename = tildeexpand(filename);
+    } else {
+	filename = xstrdup(filename);
     }
 
     fp = fopen(filename, "r");
@@ -236,7 +233,7 @@ static void read_config_file(const char *filename, bool home_dir)
 	if (DEBUG_CONFIG(0)) {
 	    fprintf(stderr, "Debug: cannot open %s: %s", filename, strerror(errno));
 	}
-	xfree(tmp);
+	xfree(filename);
 	return;
     }
 
@@ -273,7 +270,7 @@ static void read_config_file(const char *filename, bool home_dir)
     }
 
     (void)fclose(fp); /* we're just reading, so fclose should succeed */
-    xfree(tmp);
+    xfree(filename);
 
     if (error)
 	exit(2);
@@ -464,9 +461,10 @@ int process_args(int argc, char **argv)
     return exitcode;
 }
 
-void process_config_files()
+/* exported */
+void process_config_files(void)
 {
-    if ( ! suppress_config_file)
+    if (! suppress_config_file)
     {
 	read_config_file(system_config_file, FALSE);
 	read_config_file(user_config_file, TRUE);
