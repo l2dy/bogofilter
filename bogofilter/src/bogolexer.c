@@ -57,6 +57,7 @@ static void help(void)
 	    "\t-C\t- don't read standard config files.\n"
 	    "\t-H\t- disables header line tagging.\n"
 	    "\t-I file\t- read message from file instead of stdin.\n"
+	    "\t-O file\t- write to file instead of stdout.\n"
 	    "\t-x list\t- set debug flags.\n"
 	    "\t-D\t- direct debug output to stdout.\n");
     fprintf(stderr,
@@ -96,7 +97,7 @@ static char *get_string(const char *name, const char *arg)
     return s;
 }
 
-#define	OPTIONS	":c:CDhHI:npqvVx:X:m"
+#define	OPTIONS	":c:CDhHI:nO:pqvVx:X:m"
 
 /** These functions process command line arguments.
  **
@@ -187,6 +188,10 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 
     case 'I':
 	bogoreader_name(val);
+	break;
+
+    case 'O':
+	fpo = fopen(val, "wt");
 	break;
 
     case 'n':
@@ -282,6 +287,8 @@ int main(int argc, char **argv)
 {
     token_t t;
 
+    fpo = stdout;
+
     mbox_mode = true;		/* to allow multiple messages */
 
     process_arglist(argc, argv);
@@ -292,9 +299,9 @@ int main(int argc, char **argv)
     if (!passthrough)
     {
 	if (quiet)
-	    puts( "quiet mode.");
+	    fprintf(fpo, "quiet mode.");
 	else
-	    puts("normal mode.");
+	    fprintf(fpo, "normal mode.");
     }
 
     bogoreader_init(argc, argv);
@@ -306,15 +313,15 @@ int main(int argc, char **argv)
 	{
 	    count += 1;
 	    if (passthrough) {
-		fprintf(stdout, "%s\n", yylval->text);
+		fprintf(fpo, "%s\n", yylval->text);
 	    }
 	    else if (!quiet)
-		printf("get_token: %d \"%s\"\n", (int)t, yylval->text);
+		fprintf(fpo, "get_token: %d \"%s\"\n", (int)t, yylval->text);
 	}
     }
 
     if ( !passthrough )
-	printf( "%d tokens read.\n", count );
+	fprintf(fpo, "%d tokens read.\n", count);
 
     textblock_free();
 

@@ -22,6 +22,7 @@
         <arg choice='opt'>-C</arg>
         <arg choice='opt'>-D</arg>
 	<arg choice='opt'>-I <replaceable>file</replaceable></arg>
+	<arg choice='opt'>-O <replaceable>file</replaceable></arg>
 	<arg choice='opt'>-V</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
@@ -60,6 +61,10 @@ tells <application>bogolexer</application> to read the config file named.
 <para>The <option>-I </option><replaceable>filename</replaceable> option
 tells <application>bogolexer</application> to read its input from the specified file, 
 rather than from <emphasis>stdin</emphasis>.</para>
+
+<para>The <option>-O </option><replaceable>filename</replaceable> option
+tells <application>bogolexer</application> to write its output to the specified file, 
+rather than to <emphasis>stdout</emphasis>.</para>
 
 <para>The <option>-V</option> option prints the version number and 
 exits.</para>

@@ -21,6 +21,13 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2004-12-30
+
+	* Bogolexer man page:  replaced incorrect references to
+          'bogofilter' with 'bogolexer'.
+
+	* Added '-O file' to specify bogolexer output file.
+
 	2004-12-28
 
 	* Fixed bogoutil --db-remove-environment DIR, which would just abort.
