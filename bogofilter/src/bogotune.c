@@ -77,6 +77,11 @@ AUTHOR:
 #define	SPAM_CUTOFF	0.95
 #define FP_CUTOFF	0.999
 
+/* bogotune's default parameters */
+#define	DEFAULT_ROBS	0.01
+#define	DEFAULT_ROBX	0.415
+#define	DEFAULT_MIN_DEV	0.02
+
 #define	MD_MIN_C	0.05	/* smallest min_dev to test */
 #define	MD_MAX_C	0.45	/* largest  min_dev to test */
 #define	MD_DLT_C	0.05	/* increment		    */
@@ -691,13 +696,6 @@ static int process_args(int argc, char **argv)
 			dbg_trap_index=atoi(*++argv);
 		    }
 		    break;
-		case 'T':
-		{
-		    uint c = 100;
-		    wordcnts_t *w = (wordcnts_t *) xcalloc(c, sizeof(wordcnts_t));
-		    w = (wordcnts_t *) xrealloc(w, (c * 2) * sizeof(wordcnts_t));
-		    break;
-		}
 #endif
 		default:
 		    help();
@@ -1102,9 +1100,9 @@ static rc_t bogotune(void)
 
     method = (method_t *) &rf_fisher_method;
 
-    robs = ROBS;
-    robx = ROBX;
-    min_dev = FISHER_MIN_DEV;
+    robs = DEFAULT_ROBS;
+    robx = DEFAULT_ROBX;
+    min_dev = DEFAULT_MIN_DEV;
 
     if (check_for_high_ns_scores() | check_for_low_sp_scores()) {
 	scoring_error();
