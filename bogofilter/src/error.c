@@ -41,6 +41,9 @@ void print_error( const char *file, unsigned long line, const char *format, ... 
 	if (!isprint((unsigned char)message[l]))
 	    message[l] = '_';
 
+#if 0
+    fprintf(stderr, "%s:%lu:", file, line);
+#endif
     fprintf(stderr, "%s: %s\n", progname, message);
 #ifdef HAVE_SYSLOG_H
     if (logflag)
