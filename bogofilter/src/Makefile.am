@@ -129,7 +129,7 @@ libbogofilter_a_SOURCES += datastore_db.c
 endif
 endif
 
-CLEANFILES=version.c directories.c
+CLEANFILES=version.c directories.c bogoupgrade
 
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c \
 		     method.c $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
