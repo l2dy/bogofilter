@@ -294,10 +294,6 @@ void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double 
 
     mth_initialize( stats, ROBINSON_MAX_REPEATS, _min_dev, _spam_cutoff, ROBINSON_GOOD_BIAS );
 
-    /* if there's a command line value, use it*/
-    if (c_spam_cutoff > EPS)
-	spam_cutoff = c_spam_cutoff;
-
     /*
     ** If we're classifying messages, we need to compute the scalefactor 
     ** (from the .MSG_COUNT values)

@@ -112,10 +112,6 @@ void fis_print_summary(void)
 void fis_initialize_constants(void)
 {
     rob_initialize_with_parameters(&fis_stats, FISHER_MIN_DEV, FISHER_SPAM_CUTOFF);
-
-    /* if there's a command line value, use it*/
-    if (c_ham_cutoff > EPS)
-	ham_cutoff = c_ham_cutoff;
 }
 
 rc_t fis_status(void)

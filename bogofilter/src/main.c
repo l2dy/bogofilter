@@ -32,7 +32,6 @@ AUTHOR:
 #include "bogoconfig.h"
 #include "fgetsl.h"
 #include "format.h"
-#include "paths.h"
 #include "register.h"
 #include "textblock.h"
 #include "wordlists.h"
@@ -64,37 +63,10 @@ static void cleanup_exit(int exitcode, int killfiles) {
 
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
-    int   exitcode;
+    int   exitcode = 0;
     FILE  *out;
 
-    exitcode = process_args(argc, argv);
-    if (exitcode < 0)
-	exit(-exitcode);
-    argc -= exitcode;
-    argv += exitcode;
-    exitcode = 0;
-
-    if (argc) {
-	fprintf(stderr, "Extra arguments given. Aborting.\n");
-	exit(2);
-    }
-
-    process_config_files();
-
-    if (!twostate && !threestate) {
-	twostate = ham_cutoff < EPS;
-	threestate = !twostate;
-    }
-
-    /* directories from command line and config file are already handled */
-    if (directory == NULL)
-    {
-	directory = get_directory();
-
-	if (directory != NULL)
-	    if (setup_wordlists(directory) != 0)
-		exit(2);
-    }
+    process_args_and_config_file(argc, argv);
 
     /* open all wordlists */
     open_wordlists((run_type & (RUN_NORMAL | RUN_UPDATE)) ? DB_READ : DB_WRITE);

@@ -35,6 +35,7 @@ AUTHOR:
 #include "format.h"
 #include "lexer.h"
 #include "maint.h"
+#include "paths.h"
 #include "wordlists.h"
 #include "xatox.h"
 #include "xmalloc.h"
@@ -63,7 +64,7 @@ AUTHOR:
 
 char outfname[PATH_LEN] = "";
 
-run_t run_type = 0;
+run_t run_type = RUN_UNKNOWN;
 
 const char *logtag = NULL;
 
@@ -93,6 +94,8 @@ static void display_tag_array(const char *label, const char **array);
 
 static bool config_algorithm(const unsigned char *s);
 static bool select_algorithm(const unsigned char ch, bool cmdline);
+
+static void process_args(int argc, char **argv, int pass);
 
 /* externs for query_config() */
 
@@ -151,6 +154,30 @@ const parm_desc sys_parms[] =
     { "tag_header_lines", CP_BOOLEAN,	{ (void *) &tag_header_lines } },
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
+
+void process_args_and_config_file(int argc, char **argv)
+{
+    process_args(argc, argv, 1);
+    process_config_files();
+    process_args(argc, argv, 2);
+
+    if (!twostate && !threestate) {
+	twostate = ham_cutoff < EPS;
+	threestate = !twostate;
+    }
+
+    /* directories from command line and config file are already handled */
+    if (directory == NULL)
+    {
+	directory = get_directory();
+
+	if (directory != NULL)
+	    if (setup_wordlists(directory) != 0)
+		exit(2);
+    }
+
+    return;
+}
 
 static bool config_algorithm(const unsigned char *s)
 {
@@ -315,24 +342,30 @@ static void print_version(void)
 #endif
 
 /** This function processes command line arguments.
- * \returns
- * - a negative number in case of incompatible arguments, it's
- *   the negative of the desired exit code
- * - zero or a positive number in case of success, the number is
- *   the amount of arguments parsed (optind). */
-int process_args(int argc, char **argv)
+ **
+ ** It is called twice so that command line arguments
+ ** will override config file parameters.
+ ** The config file is read in between the two calls to
+ ** the function.
+ **
+ ** The function will exit if there's an error, for example if
+ ** there are leftover command line arguments.
+ */
+
+void process_args(int argc, char **argv, int pass)
 {
     int option;
     int exitcode;
 
+    test = 0;
+    verbose = 0;
+    run_type = RUN_UNKNOWN;
+    fpin = stdin;
     dbgout = stderr;
-
     set_today();		/* compute current date for token age */
-
     select_algorithm(algorithm, false);	/* select default algorithm */
 
-    fpin = stdin;
-
+    optind = 0;
     while ((option = getopt(argc, argv, ":23d:eFhlL:m:o:snSNvVpuc:CgrRfqtI:O:y:k:x:DT" G R F)) != EOF)
     {
 #if 0
@@ -353,7 +386,7 @@ int process_args(int argc, char **argv)
 	case 'd':
 	    xfree(directory);
 	    directory = xstrdup(optarg);
-	    if (setup_wordlists(directory) != 0)
+	    if (pass == 2 && setup_wordlists(directory) != 0)
 		exit(2);
 	    break;
 
@@ -398,10 +431,12 @@ int process_args(int argc, char **argv)
 	    exit(0);
 
 	case 'I':
-	    fpin = fopen( optarg, "r" );
-	    if (fpin == NULL) {
-		fprintf(stderr, "Can't read file '%s'\n", optarg);
-		exit(2);
+	    if (pass == 2) {
+		fpin = fopen( optarg, "r" );
+		if (fpin == NULL) {
+		    fprintf(stderr, "Can't read file '%s'\n", optarg);
+		    exit(2);
+		}
 	    }
 	    break;
 
@@ -468,7 +503,12 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case 'c':
-	    read_config_file(optarg, false);
+	    /* only read config file on pass #1 so that 
+	    ** options can be overridden on pass #2
+	    */
+	    if (pass == 1 )			
+		read_config_file(optarg, false);
+
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
 
@@ -477,7 +517,7 @@ int process_args(int argc, char **argv)
 	    break;
 
 	case 'm':
-	    if (!xatof(&c_min_dev, optarg))
+	    if (!xatof(&min_dev, optarg))
 		fprintf(stderr, "Cannot parse -%c option argument '%s'.\n", option, optarg);
 	    break;
 
@@ -485,9 +525,9 @@ int process_args(int argc, char **argv)
 	{
 	    char *del = strtok(optarg, ",");
 	    bool ok = true;
-	    ok = ok && xatof(&c_spam_cutoff, optarg);
+	    ok = ok && xatof(&spam_cutoff, optarg);
 	    if ((del = strtok(NULL, ",")))
-		ok = ok && xatof(&c_ham_cutoff, del);
+		ok = ok && xatof(&ham_cutoff, del);
 	    if (!ok) {
 		fprintf(stderr, "Cannot parse -%c option argument '%s'.\n", option, optarg);
 	    }
@@ -521,8 +561,15 @@ int process_args(int argc, char **argv)
 	run_type = RUN_NORMAL;
 
     exitcode = validate_args();
-    if (exitcode) return -exitcode;
-    else return optind;
+    if (exitcode) 
+	exit (exitcode);
+
+    if (optind < argc) {
+	fprintf(stderr, "Extra arguments given. Aborting.\n");
+	exit(2);
+    }
+
+    return;
 }
 
 #define YN(b) (b ? "yes" : "no")

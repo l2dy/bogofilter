@@ -36,8 +36,8 @@ int	test = 0;			/* '-T' */
 
 /* config file options */
 int	max_repeats;
-double	min_dev, c_min_dev;
-double	spam_cutoff, c_ham_cutoff, c_spam_cutoff;
+double	min_dev;
+double	spam_cutoff;
 double	thresh_stats;
 bool	tag_header_lines = false;	/* true */
 
