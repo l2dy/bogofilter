@@ -51,6 +51,7 @@
 
 #include "buff.h"
 #include "charset.h"
+#include "html.h"		/* for strict_check */
 #include "lexer.h"
 #include "mime.h"		/* for mime_*() */
 #include "msgcounts.h"
@@ -62,9 +63,17 @@
 
 #define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, max_size)
 
+#undef	stderr
+#define	stderr	dbgout		/* for debug & -D options */
+
 static word_t yyt;
-static word_t *yy_text(void);
 static int lineno;
+
+/* Function Prototypes */
+
+static word_t *yy_text(void);
+
+/* Function Definitions */
 
 static word_t *yy_text(void)
 {
@@ -76,7 +85,9 @@ static word_t *yy_text(void)
 %}
 
 %option debug nodebug
-%option align nounput noyywrap noreject 8bit caseless
+%option align caseless 8bit 
+%option never-interactive noreject
+%option noyywrap 
 %option prefix="lexer_v3_"
 
 UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
@@ -102,10 +113,8 @@ TOKENBACK	[^[:blank:][:punct:][:cntrl:]]
 
 TOKEN 		{TOKENFRONT}{TOKENMID_NJS_DR}{TOKENBACK}
 
-T2		{TOKENFRONT}<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[]+
-T1		{TOKENFRONT}
-
 %s TEXT HTML BOGO_LEX
+%s HTOKEN SCOMMENT LCOMMENT HSCRIPT
 
 %%
 
@@ -142,7 +151,7 @@ T1		{TOKENFRONT}
 						  {
 						    case MIME_TEXT_PLAIN: BEGIN(TEXT); break;
 						    case MIME_TEXT_HTML:  BEGIN(HTML); break;
-						    default:              BEGIN(TEXT); break;
+						    default:		  BEGIN(TEXT); break;
 						  }
 						  return(EMPTY);
 						}
@@ -155,13 +164,22 @@ T1		{TOKENFRONT}
 						      return TOKEN;
 						  }
 						}
-{IPADDR}					{ return(IPADDR);}
-{TOKEN}						{ return(TOKEN);}
 
-<HTML>\<\!--					{ html_comment(+1); }
-<HTML>-->					{ html_comment(-1); }
-<HTML>\<					{ html_tag(1); }
-<HTML>\>					{ html_tag(0); }
+<HTML>"<!--"					{ BEGIN SCOMMENT; }
+<HTML>"<!"					{ if (!strict_check) {
+						  BEGIN LCOMMENT; } else { BEGIN HTOKEN; }}
+
+<LCOMMENT>">"					{ BEGIN HTML; }	/* end of loose comment; return to normal html processing */
+<SCOMMENT>"-->"					{ BEGIN HTML; }	/* end of strict comment; return to normal html processing */
+<HTML>"<"					{ BEGIN HTOKEN; }
+<HTOKEN>">"					{ BEGIN HTML; }	/* end of tag; return to normal html processing */
+
+<HTOKEN>{TOKEN}					{ if (tokenize_html_tags)     return TOKEN; }
+<SCOMMENT,LCOMMENT>{TOKEN}			{ if (tokenize_html_comments) return TOKEN; }
+<HSCRIPT>{TOKEN}				{ if (tokenize_html_script)   return TOKEN; }
+
+{IPADDR}					{ return IPADDR;}
+{TOKEN}						{ return TOKEN;}
 
 .						;
 \n						{ got_newline(); 
@@ -169,6 +187,8 @@ T1		{TOKENFRONT}
 						}
 
 %%
+
+void *v = &yyunput;	/* suppress compiler warning */
 
 void lexer_v3_init(FILE *fp)
 {
@@ -181,5 +201,6 @@ void lexer_v3_init(FILE *fp)
  * The following sets edit modes for GNU EMACS
  * Local Variables:
  * mode:c
+ * indent-tabs-mode:t
  * End:
  */
