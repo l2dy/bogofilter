@@ -25,7 +25,11 @@ else
         [ -d $TMPDIR ] && break
 	sleep 1
     done
-    trap "if test x$SUPPRESS_DELETE = x ; then rm -r -f core ${TMPDIR} ; else echo remove ${TMPDIR} and possibly crash the test ; fi" 0
+fi
+if test "x$SUPPRESS_DELETE" = "x" ; then
+    trap "rm -r -f core ${TMPDIR}" 0
+else
+    echo "clean up ${TMPDIR} after the test yourself"
 fi
 
 BOGOFILTER_DIR=$TMPDIR
