@@ -32,7 +32,7 @@ rpm:	dist
 
 cvs-check:
 	rm -rf $(PACKAGE)-$(VERSION)-export
-	cvs export -rHEAD -d $(PACKAGE)-$(VERSION)-export $(PACKAGE)
+	cvs -d "`cat $(srcdir)/CVS/Root`" export -rHEAD -d $(PACKAGE)-$(VERSION)-export $(PACKAGE)
 	cd $(PACKAGE)-$(VERSION)-export && autoreconf -i -f -s \
 	&& ./configure && make distcheck
 
