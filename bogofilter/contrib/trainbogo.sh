@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Train bogofilter from a ham and spam corpus
 #
@@ -11,7 +11,7 @@
 # Note:  this script has not yet had bogofilter maintainer review.
 # Security concerned people should not run it if in doubt about its security.
 
-function usage()
+usage()
 {
     echo "USAGE:"
     echo
@@ -42,7 +42,7 @@ function usage()
     echo
 }
 
-function help()
+help()
 {
     echo "trainbogo.sh"
     echo
@@ -80,32 +80,32 @@ function help()
     usage
 }
 
-function verbose
+verbose()
 {
     [ -n "${verbose}" ] && echo $@
 }
 
-function normal
+normal()
 {
     [ -z "${quiet}" ] && echo $@
 }
 
-function normaln
+normaln()
 {
     [ -z "${quiet}" ] && echo -n $@
 }
 
-function cleanup
+cleanup()
 {
     verbose "Performing cleanup"
 
-    [ -z "${log}" -o -z "${list}" -o "${docleanup}" != "y" ] && return
+    [ -z "${log}" ] || [ -z "${list}" ] || [ "${docleanup}" != "y" ] && return
 
     rm -f	${log}.[01].success ${log}.[01].fail \
 	${log}.[01].train.success ${log}.[01].train.fail \
 	${list}
 
-    [ "${madestatsdir}" == "y" -a -n "${statsdir}" ] && rmdir --ignore-fail-on-non-empty "${statsdir}"
+    [ "${madestatsdir}" = "y" ] && [ -n "${statsdir}" ] && rmdir --ignore-fail-on-non-empty "${statsdir}"
 }
 
 dofilelist=
@@ -139,12 +139,12 @@ while getopts "H:S:s:b:p:fcmnqvh" optname; do
 done
 
 # Check for required options
-[ -z "${hamdir}" -o ! -d "${hamdir}" ] && echo "Missing or bad -H option" && usage && exit
-[ -z "${spamdir}" -o ! -d "${spamdir}" ] && echo "Missing or bad -S option" && usage && exit
+[ -z "${hamdir}" ] || [ ! -d "${hamdir}" ] && echo "Missing or bad -H option" && usage && exit
+[ -z "${spamdir}" ] || [ ! -d "${spamdir}" ] && echo "Missing or bad -S option" && usage && exit
 [ -z "${statsdir}" ] && echo "Bad statsdir option" && usage && exit
 
 # make the stats dir if its missing, but only if its the default stats dir and not user specified
-[ "${statsdir}" == "${origstatsdir}" -a ! -d "${statsdir}" ] && mkdir "${statsdir}" && madestatsdir=y
+[ "${statsdir}" = "${origstatsdir}" ] && [ ! -d "${statsdir}" ] && mkdir "${statsdir}" && madestatsdir=y
 [ ! -d "${statsdir}" ] && echo "Missing statsdir (-s option)" && exit
 
 # check for bogofilter
@@ -156,7 +156,7 @@ list="${statsdir}/trainbogo.filenames.txt"
 log="${statsdir}/trainbogo.log"
 
 # Init log files
-if [ ! -f "${log}.0.success" -o -n "${dotest}" -o -n "${dotrain}" ] ; then
+if [ ! -f "${log}.0.success" ] || [ -n "${dotest}" ] || [ -n "${dotrain}" ] ; then
     verbose "init log files"
     >"${log}.0.success"
     >"${log}.1.success"
@@ -169,7 +169,7 @@ if [ ! -f "${log}.0.success" -o -n "${dotest}" -o -n "${dotrain}" ] ; then
 fi
 
 # First make a randomly sorted list of all the ham and spam files (if needed)
-if [ ! -f "${list}" -o -n "${dofilelist}" ]; then
+if [ ! -f "${list}" ] || [ -n "${dofilelist}" ]; then
     # MD5 all the spam and ham
 
     [ -z "${rndseed}" ] && rndseed="$$.$(date +%s)"
@@ -204,7 +204,7 @@ if [ ! -f "${list}" -o -n "${dofilelist}" ]; then
 fi
 
 # Read each filename from the filelist and test and train bogofilter.
-if [ -n "${dotest}" -o -n "${dotrain}" ]; then
+if [ -n "${dotest}" ] || [ -n "${dotrain}" ]; then
     normal "Training bogofilter"
     (while read spamstatus fname
 	do
