@@ -2,7 +2,7 @@
 n
 				bogofilter news
 
-0.8.1
+0.8.90
 	* Changed the default behavior to use the Robinson algorithm.
 	* Corrected incorrect sort order when printing statistics.
 	* Added two more regression tests designed to confirm that
