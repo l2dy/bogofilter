@@ -273,9 +273,9 @@ typedef int (*readfunc_t)(char **, void *);
 static rc_t classify()
 {
     rc_t status = RC_MORE;
-    
-    passthrough_setup();
+
     do {
+	passthrough_setup();
 	init_msg_counts();
 	token_init();
 	init_charset_table(charset_default, true);
@@ -284,10 +284,9 @@ static rc_t classify()
 	write_message(fpo, status);
 	
 	rstats_cleanup();
+	passthrough_cleanup();
     } while (status == RC_MORE);
-    
-    passthrough_cleanup();
-    
+
     return status;
 }
 
@@ -447,17 +446,21 @@ static void passthrough_setup()
 
     passmode = PASS_MEM;
 
-    if (fseek(fpin, 0, SEEK_END) == 0) {
-	passmode = PASS_SEEK;
-	(void)rewind(fpin);
-    } else {
-	if (errno != ESPIPE && errno != ENOTTY) {
-	    fprintf(stderr, "cannot determine if input is seekable: %s",
-		    strerror(errno));
-	    exit(2);
+    if (!mbox_mode) {
+	if (fseek(fpin, 0, SEEK_END) == 0) {
+	    passmode = PASS_SEEK;
+	    (void)rewind(fpin);
+	} else {
+	    if (errno != ESPIPE && errno != ENOTTY) {
+		fprintf(stderr, "cannot determine if input is seekable: %s\n",
+			strerror(errno));
+		exit(2);
+	    }
 	}
-	textblocks = textblock_init();
     }
+
+    if (passmode == PASS_MEM)
+	textblocks = textblock_init();
 
     if (DEBUG_GENERAL(2)) {
 	const char *m;
