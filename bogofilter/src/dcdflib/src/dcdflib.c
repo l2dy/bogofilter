@@ -106,6 +106,7 @@ void cdfchi(int *which,double *p,double *q,double *x,double *df,
 
 **********************************************************************/
 {
+#undef	atol		/* For Norcroft C */
 #define tol 1.0e-8
 #define atol 1.0e-50
 #define zero 1.0e-100
