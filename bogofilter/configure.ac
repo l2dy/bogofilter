@@ -99,7 +99,7 @@ AM_CONDITIONAL(ENABLE_STATIC, test x$enable_static = xyes)
 WITH_DB_ENGINE=db
 AC_ARG_WITH(database,
 	    AC_HELP_STRING([--with-database=ENGINE],
-	    [Choose database engine {db|tdb|qdbm} \[ENGINE=db\]]),
+	    [Choose database engine {db|tdb|qdbm} [[ENGINE=db]]]),
 	    [ WITH_DB_ENGINE=$withval ]
 )
 case "x$WITH_DB_ENGINE" in
@@ -314,8 +314,8 @@ case "x$WITH_DB_ENGINE" in
     ;;
     xqdbm)
     AC_DEFINE(ENABLE_QDBM_DATASTORE,1, [Enable qdbm datastore])
-    AC_DEFINE_UNQUOTED(DB_TYPE, "tdb")
-    AC_DEFINE_UNQUOTED(DB_EXT, ".tdb")
+    AC_DEFINE_UNQUOTED(DB_TYPE, "qdbm")
+    AC_DEFINE_UNQUOTED(DB_EXT, ".qdbm")
     ;;
     xdb)
     AC_DEFINE_UNQUOTED(DB_TYPE, "db")
