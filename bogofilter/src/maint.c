@@ -167,7 +167,7 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 	!keep_date(in_val->date) || !keep_size(token.leng)) {
 	int ret = ds_delete(vhandle, &token);
 	if (DEBUG_DATABASE(0))
-	    fprintf(dbgout, "deleting '%*s'\n", token.leng, (char *)token.text);
+	    fprintf(dbgout, "deleting '%*s'\n", (int)min(INT_MAX, token.leng), (char *)token.text);
 	return ret;
     }
 

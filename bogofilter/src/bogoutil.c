@@ -68,7 +68,7 @@ int ds_dump_hook(word_t *key, dsv_t *data,
 	do_replace_nonascii_characters(key->text, key->leng);
 
     printf( "%*s %lu %lu", 
-	    key->leng, key->text,
+	    (int)min(INT_MAX, key->leng), key->text,
 	    (unsigned long)data->spamcount,
 	    (unsigned long)data->goodcount);
     if (data->date)
@@ -105,7 +105,7 @@ static void robx_accum(rhd_t *rh,
 		"  sp: %3lu,  gd: %3lu,  p: %9.6f,  t: %*s\n", 
 		(unsigned long)*rh->count, *rh->sum, *rh->sum / *rh->count,
 		(unsigned long)spamness, (unsigned long)goodness, prob,
-		key->leng, key->text);
+		(int)min(INT_MAX,key->leng), key->text);
     }
 }
 
