@@ -14,10 +14,12 @@ bogoutil.pdf
 bogowordfreq
 compile
 config.cache
+config.guess
 config.h
 config.in
 config.log
 config.status
+config.sub
 configtest
 configure
 cscope.out
