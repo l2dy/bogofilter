@@ -604,23 +604,18 @@ static int process_args(int argc, char **argv)
 static void load_wordlist(char *file)
 {
     struct stat sb;
-    char *path = file;
+    size_t len = strlen(file) + strlen(WORDLIST) + 2;
+    char *path = xmalloc(len);
 
-    if (stat(path, &sb) != 0) {
+    if (stat(file, &sb) != 0) {
 	fprintf(stderr, "Error accessing file or directory '%s'.\n", ds_file);
 	if (errno != 0)
 	    fprintf(stderr, "error #%d - %s.\n", errno, strerror(errno));
 	return;
     }
 
-    if (S_ISDIR(sb.st_mode)) {
-	size_t len = strlen(path) + strlen(WORDLIST) + 2;
-	char del = -1[strchr(path, 0)];
-	path = xmalloc(len);
-	snprintf(path, len, "%s%s%s", file,
-		(del == DIRSEP_C) ? "" : DIRSEP_S, WORDLIST);
-    }
-	 
+    build_path(path, len, file, WORDLIST);
+
     if (verbose) {
 	printf("Reading %s\n", path);
 	fflush(stdout);
