@@ -187,7 +187,7 @@ static int DB_SET_FLAGS(DB *db, u_int32_t flags)
 #endif
 
 /** "constructor" - allocate our handle and initialize its contents */
-static dbh_t *handle_init(const char *path, const char *name)
+static dbh_t *handle_init(const char *db_path, const char *db_name)
 {
     dbh_t *handle;
 
@@ -197,9 +197,9 @@ static dbh_t *handle_init(const char *path, const char *name)
     handle->magic= MAGIC_DBH;		/* poor man's type checking */
     handle->fd   = -1;			/* for lock */
 
-    handle->path = xstrdup(path);
+    handle->path = xstrdup(db_path);
 
-    handle->name = build_path(path, name);
+    handle->name = build_path(db_path, db_name);
 
     handle->is_swapped = false;
     handle->created    = false;
