@@ -132,6 +132,8 @@ retry:
 	}
 
 	if (ret)
+	    /* XXX FIXME: must add message count here when the global is
+	     * eliminated */
 	    continue;			/* not found */
 
 	if (list->type == WL_IGNORE)	/* if on ignore list */
