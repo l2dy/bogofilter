@@ -72,7 +72,7 @@ static word_t nonblank_line = { sizeof(NONBLANK)-1, NONBLANK};
 static void token_set( word_t *token, byte *text, uint leng )
 {
     token->leng = leng;
-    memcpy(token->text, text, leng + 1);	/* include nul terminator */
+    memcpy(token->text, text, leng);		/* include nul terminator */
     token->text[leng] = '\0';			/* ensure nul termination */
 }
 
@@ -86,12 +86,12 @@ static void build_prefixed_token( word_t *token, word_t *prefix, byte *text, uin
     if (token_prefix != NULL) {
 	token->leng = leng +prefix->leng;
 	memcpy(token->text, prefix->text, prefix->leng);
-	memcpy(token->text +prefix->leng, text, leng + 1);	/* include nul terminator */
-	token->text[token->leng] = '\0';			/* ensure nul termination */
+	memcpy(token->text +prefix->leng, text, leng);	/* include nul terminator */
+	token->text[token->leng] = '\0';		/* ensure nul termination */
     }
     else {
 	token->leng = leng;
-	memcpy(token->text, text, leng + 1);	/* include nul terminator */
+	memcpy(token->text, text, leng);	/* include nul terminator */
 	token->text[token->leng] = '\0';	/* ensure nul termination */
     }
 }
@@ -228,8 +228,6 @@ token_t get_token(word_t **token)
 		    text += 1;
 		    leng -= 1;
 		}
-		text[leng] = '\0';		/* ensure nul termination */
-
 		token_set( &yylval, text, leng);
 		token_copy( &msg_id, &yylval );
 	    }
@@ -253,7 +251,6 @@ token_t get_token(word_t **token)
 		    text += 1;
 		    leng -= 1;
 		}
-		text[leng] = '\0';		/* ensure nul termination */
 		token_set( &yylval, text, leng);
 		token_copy( &queue_id, &yylval );
 	    }
@@ -264,7 +261,6 @@ token_t get_token(word_t **token)
 	    /* trim brackets */
 	    text += 1;
 	    leng -= 2;
-	    text[leng] = '\0';		/* ensure nul termination */
 	    token_set( &yylval, text, leng);
 	    /* if top level, no address, not localhost, .... */
 	    if (token_prefix == &w_recv &&
