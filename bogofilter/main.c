@@ -120,11 +120,16 @@ static void cleanup_exit(int exitcode, int killfiles) {
 
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
-    int   exitcode;
+    int   exitcode, ok = 0;
     FILE  *out;
+    char *t;
 
-    if (((directory = create_path_from_env("HOME", BOGODIR)) == NULL) &&
-	((directory = create_path_from_env("BOGOFILTER_DIR", NULL)) == NULL)) {
+    t = create_path_from_env("HOME", BOGODIR);
+    if (t) ok = 1, directory = t;
+    t = create_path_from_env("BOGOFILTER_DIR", NULL);
+    if (t) ok = 1, directory = t;
+
+    if (!ok) {
 	fprintf(stderr, "Neither of HOME or BOGOFILTER_DIR is defined.\n");
 	exit(2);
     }
