@@ -71,8 +71,6 @@ AUTHORS:
 #undef	HAM_CUTOFF	/* ignore value in score.h */
 #undef	SPAM_CUTOFF	/* ignore value in score.h */
 
-#define	MSG_COUNT	".MSG_COUNT"
-
 #define	TEST_COUNT	500	/* minimum allowable message count */
 #define	LIST_COUNT	2000	/* minimum msg count in tunelist   */
 #define	PREF_COUNT	4000	/* preferred message count         */

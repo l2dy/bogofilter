@@ -172,7 +172,7 @@ token_t get_token(void)
 	case IPADDR:
 	    if (block_on_subnets)
 	    {
-		const byte *prefix = (const byte *)"url:";
+		const byte *prefix = (wordlist_version >= IP_PREFIX) ? (const byte *)"ip:" : (const byte *)"url:";
 		size_t plen = strlen((const char *)prefix);
 		int q1, q2, q3, q4;
 		/*

@@ -64,3 +64,5 @@ const char *progtype = NULL;
 bool	unsure_stats = false;		/* true if print stats for unsures */
 
 run_t run_type = RUN_UNKNOWN;
+
+uint	wordlist_version;

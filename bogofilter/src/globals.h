@@ -52,6 +52,7 @@ extern	const char *const version;
 extern	const char *const system_config_file;
 
 /* for msgcounts.c */
+#define	MSG_COUNT	".MSG_COUNT"
 extern	double		 msgs_good;
 extern	double		 msgs_bad;
 
@@ -99,5 +100,8 @@ extern enum passmode passmode;
 
 extern	bool	msg_count_file;
 extern	bool	unsure_stats;	/* true if print stats for unsures */
+
+#define	WORDLIST_VERSION	".WORDLIST_VERSION"
+extern	uint	wordlist_version;
 
 #endif

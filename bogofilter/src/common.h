@@ -144,4 +144,11 @@ extern void bf_exit(void);
 
 #define internal_error do { fprintf(stderr, "Internal error in %s:%lu\n", __FILE__, (unsigned long)__LINE__); abort(); } while(0)
 
+typedef enum e_wordlist_version {
+    ORIGINAL_VERSION = 0,
+    IP_PREFIX = 20040500
+} t_wordlist_version;
+
+#define	CURRENT_VERSION	IP_PREFIX
+
 #endif

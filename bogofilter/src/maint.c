@@ -28,6 +28,7 @@ YYYYMMDD thresh_date  = 0;
 size_t	 size_min = 0;
 size_t	 size_max = 0;
 bool     timestamp_tokens = true;
+bool	 upgrade_wordlist_version = false;
 
 /* Function Prototypes */
 
@@ -65,6 +66,38 @@ static bool keep_size(size_t size)
 		(unsigned long)size_min, (unsigned long)size, (unsigned long)size_max, 
 		ok ? 't' : 'f' );
     return ok;
+}
+
+static void merge_tokens(const word_t *old_token, const word_t *new_token, dsv_t *in_val, ta_t *transaction, void *vhandle)
+{
+    int	  ret;
+    dsv_t old_tmp;
+
+    /* delete original token */
+    ta_delete(transaction, vhandle, old_token);
+
+    /* retrieve and update nonascii token*/
+    ret = ta_read(transaction, vhandle, new_token, &old_tmp);
+
+    if (ret == EX_OK) {
+	in_val->spamcount += old_tmp.spamcount;
+	in_val->goodcount += old_tmp.goodcount;
+	in_val->date       = max(old_tmp.date, in_val->date);	/* date in form YYYYMMDD */
+    }
+    set_date(in_val->date);	/* set timestamp */
+    ta_write(transaction, vhandle, new_token, in_val);
+    set_date(0);
+}
+
+static void replace_token(const word_t *old_token, const word_t *new_token, dsv_t *in_val, ta_t *transaction, void *vhandle)
+{
+    /* delete original token */
+    ta_delete(transaction, vhandle, old_token);	
+
+    /* retrieve and update nonascii token*/
+    set_date(in_val->date);	/* set timestamp */
+    ta_write(transaction, vhandle, new_token, in_val);
+    set_date(0);
 }
 
 /* Keep token if at least one user given constraint should be kept */
@@ -121,10 +154,21 @@ void maintain_wordlists(void)
     }
 }
 
+static bool check_wordlist_version(dsh_t *dsh)
+{
+    dsv_t val;
+    ds_get_wordlist_version(dsh, &val);
+    if (val.count[0] >= CURRENT_VERSION)
+	return true;
+    else
+	return false;
+}
+
 int maintain_wordlist_file(const char *db_file)
 {
-    int rc;
+    int rc = 0;
     dsh_t *dsh;
+    bool done = false;
 
     ds_init();
     dsh = ds_open(CURDIR_S, db_file, DB_WRITE);
@@ -132,7 +176,23 @@ int maintain_wordlist_file(const char *db_file)
     if (dsh == NULL)
 	return EX_ERROR;
 
-    rc = maintain_wordlist(dsh);
+    if (upgrade_wordlist_version) {
+	done = check_wordlist_version(dsh);
+	if (!done)
+	    fprintf(dbgout, "Upgrading wordlist.\n");
+	else
+	    fprintf(dbgout, "Wordlist has already been upgraded.\n");
+    }
+
+    if (!done)
+	rc = maintain_wordlist(dsh);
+
+    if (!done && upgrade_wordlist_version)
+    {
+	dsv_t val;
+	val.count[0] = CURRENT_VERSION;
+	ds_set_wordlist_version(dsh, &val);
+    }
 
     ds_close(dsh, false);
     ds_cleanup();
@@ -170,32 +230,50 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 
     if (replace_nonascii_characters)
     {
-	byte *key_tmp = (byte *)xmalloc(token.leng + 1);
-	memcpy(key_tmp, token.text, token.leng);
-	key_tmp[token.leng] = '\0';
-	if (do_replace_nonascii_characters(key_tmp, token.leng))
-	{
-	    int	  ret;
-	    dsv_t old_tmp;
-
-	    /* delete original token */
-	    ta_delete(transaction, vhandle, &token);	
-
-	    /* retrieve and update nonascii token*/
-	    token.text = key_tmp;
-	    ret = ta_read(transaction, vhandle, &token, &old_tmp);
-
-	    if (ret == EX_OK) {
-		in_val->spamcount += old_tmp.spamcount;
-		in_val->goodcount += old_tmp.goodcount;
-		in_val->date       = max(old_tmp.date, in_val->date);	/* date in form YYYYMMDD */
-	    }
-	    set_date(in_val->date);	/* set timestamp */
-	    ta_write(transaction, vhandle, &token, in_val);
-	    set_date(0);
-	}
-	xfree(key_tmp);
+	word_t new_token;
+	new_token.text = (byte *)xmalloc(token.leng + 1);
+	memcpy(new_token.text, token.text, token.leng);
+	new_token.leng = token.leng;
+	new_token.text[new_token.leng] = '\0';
+	if (do_replace_nonascii_characters(new_token.text, new_token.leng))
+	    merge_tokens(&token, &new_token, in_val, transaction, vhandle);
+	xfree(new_token.text);
     }
+
+    if (upgrade_wordlist_version)
+    {
+	switch (wordlist_version)
+	{
+	case IP_PREFIX:
+	{
+	    /* up-to-date - nothing to do */
+	    break;
+	}
+	case 0:
+	{
+	    /* update to "ip:" prefix level */
+
+	    const char  *url_hdr = "url:";
+	    size_t       url_len = strlen(url_hdr);
+	    const char  *ip_hdr  = "ip:";
+	    size_t       ip_len  = strlen(ip_hdr);
+
+	    if (token.leng > url_len && memcmp(token.text, url_hdr, url_len) == 0)
+	    {
+		word_t new_token;
+		new_token.leng = token.leng + ip_len -  url_len;
+		new_token.text = (byte *)xmalloc(new_token.leng + 1);
+		memcpy(new_token.text, ip_hdr, ip_len);
+		memcpy(new_token.text+ip_len, token.text+url_len, token.leng - url_len);
+		new_token.text[new_token.leng] = '\0';
+		replace_token(&token, &new_token, in_val, transaction, vhandle);
+		xfree(new_token.text);
+	    }
+	    break;
+	}
+	}
+    }
+
     return EX_OK;
 }
 

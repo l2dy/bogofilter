@@ -73,7 +73,7 @@ static int ds_dump_hook(word_t *key, dsv_t *data,
     return ferror(stdout) ? 1 : 0;
 }
 
-static int dump_file(char *ds_file)
+static int dump_wordlist(char *ds_file)
 {
     int rc;
 
@@ -99,7 +99,7 @@ static byte *spanword(byte *t)
     return t;
 }
 
-static int load_file(const char *ds_file)
+static int load_wordlist(const char *ds_file)
 {
     void *dsh;
     byte buf[BUFSIZE];
@@ -394,6 +394,7 @@ static void help(void)
 	    "\t-h\tPrint this message.\n"
 	    "\t-d file\tDump data from file to stdout.\n"
 	    "\t-l file\tLoad data from stdin into file.\n"
+	    "\t-u file\tUpgrade wordlist version.\n"
 	    "\t-w dir\tDisplay counts for words from stdin.\n"
 	    "\t-p dir\tDisplay word counts and probabilities.\n"
 	    "\t-m\tEnable maintenance works (expiring tokens).\n"
@@ -427,7 +428,7 @@ static bool  prob = false;
 typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST } cmd_t;
 static cmd_t flag = M_NONE;
 
-#define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:vVw:x:X:y:"
+#define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:u:vVw:x:X:y:"
 
 static int process_arglist(int argc, char **argv)
 {
@@ -475,6 +476,13 @@ static int process_arglist(int argc, char **argv)
 	    onlyprint = true;
 	case 'R':
 	    flag = M_ROBX;
+	    count += 1;
+	    ds_file = (char *) optarg;
+	    break;
+
+	case 'u':
+	    upgrade_wordlist_version = true;
+	    flag = M_MAINTAIN;
 	    count += 1;
 	    ds_file = (char *) optarg;
 	    break;
@@ -599,9 +607,9 @@ int main(int argc, char *argv[])
 
     switch(flag) {
 	case M_DUMP:
-	    return dump_file(ds_file);
+	    return dump_wordlist(ds_file);
 	case M_LOAD:
-	    return load_file(ds_file);
+	    return load_wordlist(ds_file);
 	case M_MAINTAIN:
 	    maintain = true;
 	    set_bogohome(ds_file);

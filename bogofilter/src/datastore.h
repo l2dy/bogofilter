@@ -28,8 +28,6 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 extern YYYYMMDD today;		/* date as YYYYMMDD */
 
-#define MSG_COUNT ".MSG_COUNT"
-
 /* typedef:  Datastore handle type
 ** - used to communicate between datastore layer and database layer
 ** - known to program layer as a void*
@@ -130,6 +128,12 @@ extern bool ds_get_msgcounts(void *vhandle, dsv_t *val);
 
 /** set the database message count */
 extern void ds_set_msgcounts(void *vhandle, dsv_t *val);
+
+/** Get the database version */
+extern bool ds_get_wordlist_version(void *vhandle, dsv_t *val);
+
+/** set the database version */
+extern void ds_set_wordlist_version(void *vhandle, dsv_t *val);
 
 /* Get the current process id */
 extern unsigned long ds_handle_pid(void *vhandle);

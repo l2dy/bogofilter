@@ -17,6 +17,7 @@ extern	YYYYMMDD thresh_date;
 extern	size_t   size_min, size_max;
 extern	bool     timestamp_tokens;
 extern	bool     replace_nonascii_characters;
+extern	bool     upgrade_wordlist_version;
 
 /* Function Prototypes */
 void maintain_wordlists(void);

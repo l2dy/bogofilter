@@ -25,6 +25,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include <stdlib.h>
 #include <unistd.h>		/* for SEEK_SET for SunOS 4.1.x */
 #include <sys/resource.h>
+#include <assert.h>
 
 #include <db.h>
 #ifdef NEEDTRIO
@@ -622,14 +623,13 @@ int db_init(void) {
     char *t;
     int cdb_alldb = 1;
 
-    if (!bogohome)
-	abort();
+    assert(bogohome);
 
     if (bogohome && getenv("BOGOFILTER_CONCURRENT_DATA_STORE")) {
 	int ret = db_env_create(&dbe, 0);
 	if (ret != 0) {
 	    print_error(__FILE__, __LINE__, "db_env_create, err: %d, %s", ret, db_strerror(ret));
-	    abort();
+	    exit(EX_ERROR);
 	}
 	if (db_cachesize != 0 &&
 	    (ret = dbe->set_cachesize(dbe, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {

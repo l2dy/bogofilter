@@ -8,7 +8,23 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
  
-0.17.6	2004-04-0?
+0.17.6	2004-05-??
+
+	2004-05-02
+
+	* Remove unreferenced enum wl_e.
+	* Add .WORDLIST_VERSION meta symbol.
+	* Change subnet prefix from url: to ip:
+	* Add -u switch to bogoutil to do wordlist upgrade.
+	* Add regression test t.upgrade.subnet.prefix
+
+	2004-04-22
+
+	* Fixed configure's --enable-memdebug option.
+
+	2004-04-12
+
+	* Updated TODO list and procmailrc.example
 
 	2004-04-02
 

@@ -5,7 +5,15 @@
 NOTE: More information on important changes for bogofilters updaters
 is in the RELEASE.NOTES files.  Read them!!
 
-0.17.6	2004-04-0?
+0.17.6	2004-05-??
+
+	2004-05-02
+
+	* Remove unreferenced enum wl_e.
+	* Add .WORDLIST_VERSION meta symbol.
+	* Change subnet prefix from url: to ip:
+	* Add -u switch to bogoutil to do wordlist upgrade.
+	* Add regression test t.upgrade.subnet.prefix
 
 	2004-04-22
 
