@@ -76,7 +76,10 @@ MIME_BOUNDARY	[0-9a-zA-Z\'()+_,-./:=?#]{1,70}
 
 ID		[0-9a-zA-Z-]*
 MTYPE		[ \t]*[0-9a-zA-Z/-]*
-TOKEN		[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:][]+[^[:blank:][:punct:][:cntrl:]]
+TOKENFRONT	[^[:blank:][:cntrl:][:digit:][:punct:]]
+TOKENMID	[^][:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:][]+
+TOKENBACK	[^[:blank:][:punct:][:cntrl:]]
+TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}
 
 %%
 

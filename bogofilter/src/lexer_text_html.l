@@ -31,7 +31,10 @@ MIME_BOUNDARY	[0-9a-zA-Z\'()+_,-./:=?#]{1,70}
 
 UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
 IPADDR		{UINT8}\.{UINT8}\.{UINT8}\.{UINT8}
-TOKEN		[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:][]+[^[:blank:][:punct:][:cntrl:]]
+TOKENFRONT	[^[:blank:][:cntrl:][:digit:][:punct:]]
+TOKENMID	[^][:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:][]+
+TOKENBACK	[^[:blank:][:punct:][:cntrl:]]
+TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}
 
 %%
 
