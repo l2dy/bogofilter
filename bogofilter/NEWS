@@ -7,6 +7,12 @@ is in the RELEASE.NOTES files.  Read them!!
 
 0.17.?	2004-02-??
 
+	2004-02-23
+
+	* Exempt tokens .MSG_COUNT and .ROBX from maintenance operations.
+	* Remove unused 'active' and 'weight' attributes of wordlists.
+	* If message uses CRLF, put CRLF after added header lines.
+
 	2004-02-22
 
 	* Fixed code causing gcc 2.9x complaint.
