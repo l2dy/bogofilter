@@ -62,7 +62,7 @@ void db_delete(void *, const word_t *);
 void db_setvalue(void *, const word_t *, uint32_t);
 
 /** Update the value associated with a given word in a list */
-void db_updvalue(void *vhandle, const word_t *word, dbv_t *updval);
+void db_updvalue(void *vhandle, const word_t *word, const dbv_t *updval);
 
 /** Get the database message count */
 uint32_t db_get_msgcount(void*);

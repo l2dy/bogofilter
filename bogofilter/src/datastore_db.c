@@ -146,7 +146,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
 	 * applications try to create a DB at the same time. */
 	opt_flags = 0;
 
-    for(retryflag_i = &retryflags[0] ; *retryflag_i != 0xffffffff; retryflag_i++) {
+    for(retryflag_i = &retryflags[0] ; *retryflag_i != 0xfffffffful; retryflag_i++) {
 	handle = dbh_init(db_file, name);
 	handle->open_mode = open_mode;
 	/* create DB handle */
@@ -338,7 +338,7 @@ Update the VALUE in database, using WORD as database key.
 Adds COUNT to existing count.
 Sets date to newer of TODAY and date in database.
 */
-void db_updvalue(void *vhandle, const word_t *word, dbv_t *updval){
+void db_updvalue(void *vhandle, const word_t *word, const dbv_t *updval){
   dbv_t val;
   int ret = db_get_dbvalue(vhandle, word, &val);
   if (ret != 0) {
