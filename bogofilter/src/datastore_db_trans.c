@@ -886,7 +886,11 @@ probe_txn_t probe_txn(const char *directory, const char *file)
 	return P_ERROR;
     }
 
+#if DB_AT_LEAST(3,2)
     r = dbe->open(dbe, directory, DB_JOINENV, DS_MODE);
+#else
+    r = ENOENT;
+#endif
     if (r == ENOENT) {
 	struct stat st;
 	int w;
@@ -894,11 +898,12 @@ probe_txn_t probe_txn(const char *directory, const char *file)
 	struct dirent *de;
 	DIR *d;
 
-	/* no environment found by JOINENV */
+	/* no environment found by JOINENV, but clean up handle */
 	dbe->close(dbe, 0);
 
-	/* retry globbing for log.* files - needed for instance after
-	 * bogoutil --db-remove DIR */
+	/* retry, looking for log\.[0-9]{10} files - needed for instance
+	 * after bogoutil --db-remove DIR or when DB_JOINENV is
+	 * unsupported */
 	d = opendir(directory);
 	if (!d) {
 	    print_error(__FILE__, __LINE__, "cannot open directory %s: %s",

@@ -22,6 +22,11 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+
+	2005-03-08
+
+	* Support for Berkeley DB 3.1 is back.
+
 	2005-03-07
 
 	* Fixed query_config ('-Q') option.

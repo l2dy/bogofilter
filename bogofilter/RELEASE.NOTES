@@ -22,6 +22,14 @@ these changes. You should consult them.
 
 ########################################################################
 
+INCOMPATIBLE CHANGES IN BOGOFILTER 0.94
+=======================================
+
+As bogofilter 0.93 has not been released as stable version, please refer
+to the bogofilter 0.93 section below for incompatible changes.
+
+
+
 NEW CAPABILITIES IN BOGOFILTER 0.94
 ===================================
 
@@ -31,6 +39,7 @@ They can also auto-detect whether you've been using transactions or
 not.
 
 Run-time Selection:
+-------------------
 
 For bogofilter and bogoutil, transactions can be enabled or disabled
 in 3 ways -- by command line options, config file options, or
@@ -43,17 +52,19 @@ Config file options "db_transactions=yes" and "db_transactions=no"
 have the same effect.
 
 Auto-detection:
+---------------
 
 If none of the above methods are used to enable/disable transactions,
 bogofilter and bogoutil will query Berkeley DB to see if a transaction
 environment already exists.  If so, transactions will be enabled.  If
 not, they will be disabled.
 
-Note: Support for Berkeley DB 3.1 has been removed as a side effect of
-automatically detecting transactional mode at run-time, since 3.1
-lacks DB_JOINENV.
+Note: bogofilter 0.94.0 did not support Berkeley DB 3.1 as a side effect
+of automatically detecting transactional mode at run-time, support for
+Berkeley DB 3.1 has been reinstated in bogofilter 0.94.1.
 
 Compile-time selection:
+-----------------------
 
 A default build includes the run-time and auto-detect capabilities.
 If you wish to minimize program size, ./configure can be used to
