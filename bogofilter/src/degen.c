@@ -86,9 +86,9 @@ REFERENCE:
 #define	TAG	  ':'	/* tag delimiter */
 
 #ifndef	DEBUG
-#define	TERM	  '!'	/* terminal exclamation point */
+#define	BANG	  '!'	/* terminal exclamation point */
 #else
-#define	TERM	  '+'	/* (debugging substitute) */
+#define	BANG	  '+'	/* (debugging substitute) */
 #endif
 
 extern double robx;
@@ -120,13 +120,13 @@ double get_score(const word_t *token, wordcnts_t *cnts)
 
 double lookup(const word_t *token, wordcnts_t *cnts, double old)
 {
-    double n = get_score(token, cnts);
-    double ans = (fabs(n-EVEN_ODDS) > fabs(old-EVEN_ODDS)) ? n : old;
+    double score = get_score(token, cnts);
+    double ans = (fabs(score-EVEN_ODDS) > fabs(old-EVEN_ODDS)) ? score : old;
 
     if (DEBUG_SPAMICITY(2)) {
 	fputs("***  ", dbgout);
 	word_puts(token, 0, dbgout);
-	fprintf(dbgout, " - o: %f, n: %f, a: %f\n", old, n, ans );
+	fprintf(dbgout, " - o: %f, n: %f, a: %f\n", old, score, ans );
     }
 
     return ans;
@@ -140,7 +140,7 @@ double degen(const word_t *token, wordcnts_t *cnts)
 
     double score = EVEN_ODDS;
     uint i, t;
-    int excl = 0;
+    int bang = 0;
     uint alpha = 0, upper = 0, lower = 0, tag = 0;
 
     for (i = 0; i < len; i += 1) {
@@ -165,17 +165,17 @@ double degen(const word_t *token, wordcnts_t *cnts)
     }
 
     /* count trailing exclamation points */
-    for (i = len-1; i > 0 && text[i] == TERM; i -= 1)
-	excl += 1;
+    for (i = len-1; i > 0 && text[i] == BANG; i -= 1)
+	bang += 1;
     
     /* loop for original and original w/o 'tag:' */
     for (t = 0; ; t += tag, tag = 0) {
 	uint l = len - t;
-	int x = excl;
+	int c = bang;
 	word_t *copy = word_dup(token);
 
 	/* loop for terminal exclamation points */
-	while (x >= 0) {
+	while (c >= 0) {
 	    memcpy(copy->text, text + t, l);
 	    copy->text[l] = (byte) '\0';
 	    copy->leng = l;
@@ -199,13 +199,13 @@ double degen(const word_t *token, wordcnts_t *cnts)
 		    return score;
 	    }
     
-	    if (x <= 1) {	/* If just one, remove it */
+	    if (c <= 1) {	/* If just one, remove it */
 		l -= 1;
-		x -= 1;
+		c -= 1;
 	    } 
 	    else {		/* If more than one, reduce to one */
-		l = l - (x - 1);
-		x = 1;
+		l = l - (c - 1);
+		c = 1;
 	    }
 	}
 	word_free(copy);
