@@ -21,6 +21,7 @@ AUTHOR:
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
+#include "charset.h"
 #include "common.h"
 #include "find_home.h"
 #include "globals.h"
@@ -84,6 +85,9 @@ double thresh_rtable = 0.0f;
 /*---------------------------------------------------------------------------*/
 
 typedef enum {
+#ifdef	GRAHAM_AND_ROBINSON
+	CP_ALGORITHM,
+#endif
 	CP_BOOLEAN,
 	CP_INTEGER,
 	CP_DOUBLE,
@@ -102,6 +106,9 @@ typedef struct {
 	double	*d;
 	char	*c;
 	char	**s;
+#ifdef	GRAHAM_AND_ROBINSON
+	algorithm_t	*a;
+#endif
     } addr;
 } ArgDefinition;
 
@@ -109,6 +116,9 @@ static int dummy;
 
 static const ArgDefinition ArgDefList[] =
 {
+#ifdef	GRAHAM_AND_ROBINSON
+    { "algorithm",  	  CP_ALGORITHM,	{ (void *)&algorithm } },
+#endif
     { "stats_in_header",  CP_BOOLEAN,	{ (void *)&stats_in_header } },
     { "min_dev",	  CP_DOUBLE,	{ (void *)&min_dev } },
     { "robx",		  CP_DOUBLE,	{ (void *)&robx } },
@@ -183,6 +193,27 @@ static bool process_config_parameter(const ArgDefinition * arg, const char *val)
 		    fprintf( stderr, "%s -> '%s'\n", arg->name, *arg->addr.s );
 		break;
 	    }
+#ifdef	GRAHAM_AND_ROBINSON
+	case CP_ALGORITHM:
+	{
+	    char ch = tolower(*val);
+	    switch (ch)
+	    {
+		case 'g':
+		*arg->addr.a = AL_GRAHAM;
+	    break;
+	    case 'r':
+		*arg->addr.a = AL_ROBINSON;
+		break;
+	    default:
+		ok = FALSE;
+		break;
+	    }
+	    if (DEBUG_CONFIG(0))
+		fprintf( stderr, "%s -> '%c'\n", arg->name, *arg->addr.a );
+	    break;
+	}
+#endif
 	case CP_WORDLIST:
 	    {
 		if (!configure_wordlist(val))
@@ -192,8 +223,6 @@ static bool process_config_parameter(const ArgDefinition * arg, const char *val)
 	default:
 	    {
 		ok = FALSE;
-		if (!quiet)
-		    fprintf( stderr, "Unknown parameter type for '%s'\n", arg->name );
 		break;
 	    }
     }
@@ -266,10 +295,7 @@ static void read_config_file(const char *fname, bool tilde_expand)
 	{
 	    error = TRUE;
 	    if (!quiet)
-	    {
-		fprintf( stderr, "Unknown config line #%d\n", lineno );
-		fprintf( stderr, "    %s\n", buff );
-	    }
+		fprintf( stderr, "%s:%d:  Error - unknown parameter in '%s'\n", filename, lineno, buff );
 	}
     }
 
@@ -484,4 +510,6 @@ void process_config_files(void)
 
     if (DEBUG_CONFIG(0))
 	fprintf( stderr, "stats_prefix: '%s'\n", stats_prefix );
+
+    init_charset_table("us-ascii", TRUE);
 }
