@@ -3,8 +3,6 @@
  *
  * $Id$
  *
- * $History$
- *
  */
 
 #ifndef XSTRDUP_H

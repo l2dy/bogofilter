@@ -3,8 +3,6 @@
  *
  * $Id$
  *
- * $History$
- *
  */
 
 #include <string.h>
