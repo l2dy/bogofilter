@@ -1,13 +1,14 @@
 #!/usr/bin/perl
 # Script to train bogofilter from mboxes
 # by Boris 'pi' Piwinger <3.14@piology.org>
+# with many useful additions by David Relson <relson@osagesoftware.com>
 
 # Not correct number of parameters
-my $commandlineoptions=($ARGV[0]=~/^-(?=[^v]*v{0,2}[^v]*$)(?=[^f]*f?[^f]*$)(?=[^s]*s?[^s]*$)[vfs]+$/);
+my $commandlineoptions=($ARGV[0]=~/^-(?=[^f]*f?[^f]*$)(?=[^s]*s?[^s]*$)[fs]*v{0,2}[fs]*$/);
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.2
+bogominitrain.pl version 1.22
   requires bogofilter 0.14.1 or later
 
 Usage:
@@ -57,7 +58,7 @@ END
   exit;
 }
 
-# Check input and open
+# Check input
 my $force=1 if ($commandlineoptions && $ARGV[0]=~s/f//);
 my ($safe,$safeham,$safespam)=(1,"bogominitrain.ham","bogominitrain.spam")
    if ($commandlineoptions && $ARGV[0]=~s/s//);
@@ -67,24 +68,19 @@ shift (@ARGV) if ($commandlineoptions);
 my ($dir,$ham,$spam,$options) = @ARGV;
 my $bogofilter="bogofilter $options -d $dir";
 my $temp; srand; do {$temp="/tmp/".rand();} until (!-e $temp);
-
 die ("$dir is not a directory or not accessible.\n") unless (-d $dir && -r $dir && -w $dir && -x $dir);
-print "\nStarting with this database:\n";
-if (-s "$dir/goodlist.db" || -s "$dir/wordlist.db") {
-    print `bogoutil -w $dir .MSG_COUNT`,"\n";
-} else {
-    print "  (empty)\n\n"; 
-    `$bogofilter -n < /dev/null` ;
-}
-
+`$bogofilter -n < /dev/null` unless (-s "$dir/goodlist.db" || -s "$dir/wordlist.db");
 my $ham_total=`cat $ham|grep -c "^From "`;
 my $spam_total=`cat $spam|grep -c "^From "`;
-
 my ($fp,$fn);
 my $runs=0;
+
+print "\nStarting with this database:\n";
+print `bogoutil -w $dir .MSG_COUNT`,"\n";
+
 do { # Start force loop
   $runs++;
-  open (HAM, "cat $ham|")   || die("Cannot open ham: $!\n");
+  open (HAM,  "cat $ham|")  || die("Cannot open ham: $!\n");
   open (SPAM, "cat $spam|") || die("Cannot open spam: $!\n");
 
   # Loop through all the mails
