@@ -48,7 +48,7 @@ map_rc()
 
 BOGOFILTER_DIR="${TMPDIR}"
 
-rm -f $BOGOFILTER_DIR/wordlist.db 
+rm -f $BOGOFILTER_DIR/wordlist.${DB_EXT}
 
 echo free > ${TMPDIR}/msg.free
 echo Free > ${TMPDIR}/msg.Free
@@ -69,7 +69,7 @@ $BOGOFILTER -y 0 -s -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.Free
 
 $BOGOFILTER -y 0 -s -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.xxxx
 
-$BOGOUTIL -d ${TMPDIR}/wordlist.db >> ${OUT}
+$BOGOUTIL -d ${TMPDIR}/wordlist.${DB_EXT} >> ${OUT}
 echo >> ${OUT}
 
 for flags in PD ; do
