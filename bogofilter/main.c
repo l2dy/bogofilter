@@ -44,6 +44,10 @@ const char *progname = "bogofilter";
 
 run_t run_type = RUN_NORMAL; 
 
+int thresh_index = 0;
+double thresh_prob = 0.0f;		// EVEN_ODDS
+double thresh_rtable=0.0f;
+
 /* if the given environment variable 'var' exists, copy it to 'dest' and
    tack on the optional 'subdir' value.
  */
@@ -284,7 +288,7 @@ int main(int argc, char **argv)
 		{
 		    (void)fputs("\n", stdout);
 		    verbose += passthrough;
-		    print_bogostats( stdout );
+		    print_bogostats( stdout, spamicity );
 		    verbose -= passthrough;
 		}
 

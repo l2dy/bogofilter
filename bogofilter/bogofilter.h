@@ -29,6 +29,6 @@ extern int   verbose;
 
 extern rc_t bogofilter(int fd, double *xss);
 extern void register_messages(int fd, run_t run_type);
-extern void print_bogostats(FILE *fp);
+extern void print_bogostats(FILE *fp, double spamicity);
 
 #endif	/* HAVE_BOGOFILTER_H */

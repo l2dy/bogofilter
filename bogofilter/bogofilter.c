@@ -325,12 +325,28 @@ void populate_bogostats(bogostat_t *bogostats, char *text, double prob, int coun
     }
 }
 
-void print_bogostats(FILE *fp)
+void print_bogostats(FILE *fp, double spamicity)
 {
-    if (algorithm == AL_ROBINSON)
-	rstats_print();
-    else
-	compute_spamicity(&bogostats, fp);
+    extern int thresh_index;
+    extern double thresh_prob;
+    extern double thresh_rtable;
+ 
+    switch(algorithm) {
+    case AL_GRAHAM:
+    {
+	int index = (thresh_index >= 0) ? thresh_index : KEEPERS+thresh_index;
+	discrim_t *pp = &bogostats.extrema[index];
+	if (pp->prob >= thresh_prob)
+	    compute_spamicity(&bogostats, fp);
+	break;
+    }
+    case AL_ROBINSON:
+	if (spamicity > thresh_prob)
+	    rstats_print();
+	break;
+    default:
+	abort();
+    }
 }
 
 typedef struct {
