@@ -185,7 +185,7 @@ NOTWHITESPACE	[^[:blank:]\n]
 HTML_ENCODING	"&#"x?[[:xdigit:]]+";"
 URL_ENCODING	"%"[[:xdigit:]][[:xdigit:]]
 
-ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^?]*\?=
+ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^?\n]*\?=
 ENCODED_TOKEN	({TOKENFRONT}{TOKENMID})?({ENCODED_WORD}{WHITESPACE}+)*{ENCODED_WORD}
 
 /*
