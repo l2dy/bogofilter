@@ -71,8 +71,6 @@ AUTHORS:
 #undef	HAM_CUTOFF	/* ignore value in score.h */
 #undef	SPAM_CUTOFF	/* ignore value in score.h */
 
-#define	MSG_COUNT	".MSG_COUNT"
-
 #define	TEST_COUNT	500	/* minimum allowable message count */
 #define	LIST_COUNT	2000	/* minimum msg count in tunelist   */
 #define	PREF_COUNT	4000	/* preferred message count         */
@@ -96,14 +94,14 @@ AUTHORS:
 #define	DEFAULT_MIN_DEV	0.02
 
 /* coarse scan parms */
-#define	MD_MIN_C	0.05	/* smallest min_dev to test */
-#define	MD_MAX_C	0.45	/* largest  min_dev to test */
-#define	MD_DLT_C	0.05	/* increment		    */
+#define	MD_MIN_C	0.06	/* smallest min_dev to test */
+#define	MD_MAX_C	0.38	/* largest  min_dev to test */
+#define	MD_DLT_C	0.08	/* increment		    */
 
 /* fine scan parms */
 #define	MD_MIN_F	0.02
 #define	MD_MAX_F	MD_MAX_C+MD_DLT_F
-#define	MD_DLT_F	0.015
+#define	MD_DLT_F	0.014
 
 enum e_verbosity {
     SUMMARY	   = 1,	/* summarize main loop iterations	*/
@@ -119,13 +117,19 @@ enum e_verbosity {
 #define	MIN(n)		((n)/60)
 #define SECONDS(n)	((n) - MIN(n)*60)
 
+#define KEY(r)		((r)->fn + (((r)->co > 0.5) ? (r)->co : 0.99))
+#define	ESF_SEL(a,b)	(!esf_flag ? (a) : (b))
+
+#define	QPRINTF		if (!quiet) fprintf
+
 /* Global Variables */
 
 const char *progname = "bogotune";
 static char *ds_file;
 static char *ds_path;
 
-static bool	bogolex = false;	/* true if convert input to msg-count format */
+static bool    bogolex = false;		/* true if convert input to msg-count format */
+static bool    esf_flag = true;		/* test ESF factors if true */
 static char   *bogolex_file = NULL;
 static word_t *w_msg_count;
 
@@ -142,10 +146,13 @@ typedef struct {
 static data_t *rsval;
 static data_t *rxval;
 static data_t *mdval;
+static data_t *spexp;
+static data_t *nsexp;
 
 static uint target;
 static uint ns_cnt, sp_cnt;
 
+static double spex, nsex;
 static double check_percent;		/* initial check for excessively high/low scores */
 static double *ns_scores;
 static double *sp_scores;
@@ -233,28 +240,37 @@ static void data_free(data_t *val)
 static void init_coarse(double _rx)
 {
     rxval = seq_canonical(_rx, 0.05);
-    rsval = seq_by_pow(0.0, -2.0, -0.5);
+    rsval = seq_by_pow(0.0, -2.0, -1.0);
     mdval = seq_by_amt(MD_MIN_C, MD_MAX_C, MD_DLT_C);
+    spexp = seq_by_amt(ESF_SEL(0.0,2.0), ESF_SEL(0.0,20.0), 3.0);
+    nsexp = seq_by_amt(ESF_SEL(0.0,2.0), ESF_SEL(0.0,20.0), 3.0);
 }
 
-static void init_fine(double _rs, double _md, double _rx)
+static void init_fine(double _rs, double _md, double _rx,
+		      double _spex, double _nsex)
 {
     double s0, s1;
 
-    s0 = log10(_rs) - 0.5;
-    s1 = log10(_rs) + 0.5;
-    if (s0 < -2.0) s0 = -2.0;
-    if (s1 >  0.0) s1 =  0.0;
+    s0 = max(log10(_rs) - 0.5, -2.0);
+    s1 = min(log10(_rs) + 0.5,  0.0);
 
     rsval = seq_by_pow(s1, s0, -0.25);
 
-    s0 = _md - 0.075;
-    s1 = _md + 0.075;
-    if (s0 < MD_MIN_F) s0 = MD_MIN_F;
-    if (s1 > MD_MAX_F) s1 = MD_MAX_F;
+    s0 = max(_md - 0.042, MD_MIN_F);
+    s1 = min(_md + 0.042, MD_MAX_F);
 
     mdval = seq_by_amt(s0, s1, MD_DLT_F);
-    rxval = seq_canonical(_rx, 0.02);
+    rxval = seq_canonical(_rx, 0.013);
+
+    s0 = max(_spex - 1.5,  0.0);
+    s1 = min(_spex + 1.5, 20.0);
+    
+    spexp = seq_by_amt(s0, ESF_SEL(s0,s1), 0.5);
+    
+    s0 = max(_nsex - 1.5,  0.0);
+    s1 = min(_nsex + 1.5, 20.0);
+    
+    nsexp = seq_by_amt(s0, ESF_SEL(s0,s1), 0.5);
 }
 
 static void print_parms(const char *label, const char *format, data_t *data)
@@ -274,11 +290,14 @@ static void print_all_parms(void)
 	print_parms("rsval", "%6.4f", rsval);
 	print_parms("rxval", "%5.3f", rxval);
 	print_parms("mdval", "%5.3f", mdval);
+	print_parms("spexp", "%8.2e", spexp);
+	print_parms("nsexp", "%8.2e", nsexp);
     }
     else if (verbose >= TIME)
-	printf("cnt: %u (rs: %u, rx: %u, md: %u)\n",
-	       rsval->cnt * rxval->cnt * mdval->cnt,
-	       rsval->cnt, rxval->cnt, mdval->cnt);
+	printf("cnt: %u (rs: %u, rx: %u, md: %u spex: %u, nsex: %u)\n",
+	       rsval->cnt * rxval->cnt * mdval->cnt * spexp->cnt *
+	       nsexp->cnt, rsval->cnt, rxval->cnt, mdval->cnt,
+	       spexp->cnt, nsexp->cnt);
 }
 
 static int compare_ascending(const void *const ir1, const void *const ir2)
@@ -310,8 +329,8 @@ static int compare_results(const void *const ir1, const void *const ir2)
     result_t const *r1 = (result_t const *)ir1;
     result_t const *r2 = (result_t const *)ir2;
 
-    if (r1->fn > r2->fn ) return  1;
-    if (r2->fn > r1->fn ) return -1;
+    if (KEY(r1) > KEY(r2)) return  1;
+    if (KEY(r2) > KEY(r1)) return -1;
 
     /* Favor cutoffs > 0.5 */
     if (CO(r1) > CO(r2) ) return  1;
@@ -360,14 +379,15 @@ static bool check_for_high_ns_scores(void)
 
     if (ns_scores[t-1] < SPAM_CUTOFF)
 	return false;
-    else {
-	if (!quiet)
-	    fprintf(stderr,
+
+    if (!quiet) {
+	fprintf(stderr,
 	        "Warning: test messages include many high scoring nonspam.\n");
-	    fprintf(stderr,
+	fprintf(stderr,
 	        "         You may wish to reclassify them and rerun.\n");
-	return true;
     }
+
+    return true;
 }
 
 /* Score all spam to determine false negative counts */
@@ -422,11 +442,12 @@ static bool check_for_low_sp_scores(void)
     if (sp_scores[t-1] > HAM_CUTOFF)
 	return false;
     else {
-	if (!quiet)
+	if (!quiet) {
 	    fprintf(stderr,
 	        "Warning: test messages include many low scoring spam.\n");
 	    fprintf(stderr,
 	        "         You may wish to reclassify them and rerun.\n");
+	}
 	return true;
     }
 }
@@ -583,10 +604,11 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 	collect_words(whc);
 
 	if (ds_path != NULL && (int)(msgs_good + msgs_bad) == 0) {
-	    wordprop_t *msg_count = wordhash_insert(whc, w_msg_count, sizeof(wordprop_t), NULL);
+	    wordprop_t *msg_count;
+	    msg_count = wordhash_insert(whc, w_msg_count, sizeof(wordprop_t), NULL);
 	    if (msg_count->cnts.good == 0 || msg_count->cnts.bad == 0)
 		load_wordlist(load_hook, train);
-	    if (msg_count->cnts.good == 0 && msg_count->cnts.bad == 0) {
+	    if (msgs_good == 0 && msgs_bad == 0) {
 		fprintf(stderr, "Can't find '.MSG_COUNT'.\n");
 		exit(EX_ERROR);
 	    }
@@ -775,13 +797,6 @@ static void write_msgcount_file(wordhash_t *wh)
     return;
 }
 
-static void usage(void)
-{
-    (void)fprintf(stderr, 
-		  "Usage: %s [ -C | -D | -r | -h | -v | -F ] { -c config } { -d directory } -n non-spam-files -s spam-files\n", 
-		  progname);
-}
-
 static void print_version(void)
 {
     (void)fprintf(stderr,
@@ -799,13 +814,16 @@ static void print_version(void)
 
 static void help(void)
 {
-    usage();
+    (void)fprintf(stderr, 
+                  "Usage:  %s [options] { -c config } { -d directory } -n non-spam-files -s spam-files\n", 
+		  progname);
     (void)fprintf(stderr,
 		  "\t  -h      - print this help message.\n"
 		  "\t  -C      - don't read standard config files.\n"
 		  "\t  -c file - read specified config file.\n"
 		  "\t  -D      - don't read a wordlist file.\n"
 		  "\t  -d path - specify directory for wordlists.\n"
+		  "\t  -E      - disable ESF (effective size factor) tuning.\n"
 		  "\t  -M      - output input file in message count format.\n"
 		  "\t  -r num  - specify robx value\n");
     (void)fprintf(stderr,
@@ -846,6 +864,9 @@ static int process_arglist(int argc, char **argv)
 		    break;
 		case 'D':
 		    ds_file = NULL;
+		    break;
+		case 'E':
+		    esf_flag ^= true;
 		    break;
 		case 'I':
 		    argc -= 1;
@@ -932,9 +953,7 @@ static void load_wordlist(ds_foreach_t *hook, void *userdata)
 	fflush(stdout);
     }
 
-    ds_init();
     ds_oper(ds_path, DB_READ, hook, userdata);
-    ds_cleanup();
 
     return;
 }
@@ -983,21 +1002,28 @@ static result_t *results_sort(uint r_count, result_t *results)
     return ans;
 }
 
-static void top_ten(result_t *sorted)
+static void top_ten(result_t *sorted, uint n)
 {
-    uint i;
+    uint i, j;
+    bool f;
 
     printf("Top ten parameter sets from this scan:\n");
 
     if (verbose)
 	printf("    ");
-    printf("   rs     md    rx    co     fp  fn      pcts\n");
-    for (i = 0; i < 10; i += 1) {
-	result_t *r = &sorted[i];
-	printf("%3u  %6.4f %5.3f %5.3f %6.4f  %3u %3u  %6.4f %5.3f\n",
-	       r->idx,
-	       r->rs, r->md, r->rx, r->co, 
+    printf("        rs     md    rx    spesf    nsesf    co     fp  fn   fppc   fnpc\n");
+    for(f = false; !f; f = true) {
+      for (i = j = 0; i < 10 && j < n;) {
+ 	result_t *r = &sorted[j++];
+ 	if (!f && r->fp != target) continue;
+	printf("%5u %6.4f %5.3f %5.3f %8.6f %8.6f %6.4f  %3u %3u  %6.4f %6.4f\n",
+	       r->idx, r->rs, r->md, r->rx,
+	       pow(0.75, r->sp_exp), pow(0.75, r->ns_exp), r->co, 
 	       r->fp, r->fn, r->fp*100.0/ns_cnt, r->fn*100.0/sp_cnt);
+	++i;
+      }
+      if (i) break;
+      printf("Warning: fp target not met, using original results\n");
     }
 
     printf("\n");
@@ -1008,13 +1034,17 @@ static void top_ten(result_t *sorted)
 
 /* get false negative */
 
-static int gfn(result_t *results, uint rsi, uint mdi, uint rxi)
+static int gfn(result_t *results, 
+	       uint rsi, uint mdi, uint rxi,
+	       uint spi, uint nsi)
 {
-    uint i = (rsi * mdval->cnt + mdi) * rxval->cnt + rxi;
+    uint i = (((rsi * mdval->cnt + mdi) * rxval->cnt + rxi) * spexp->cnt + spi) * nsexp->cnt + nsi;
     result_t *r = &results[i];
     int fn = r->fn;
+    if (r->fp != target) return INT_MAX;
     if (verbose > 100)
-	printf("   %2u, %2u, %2u, %2d\n", rsi, mdi, rxi, fn);
+	printf("   %2u, %2u, %2u, %2u, %2u, %2d\n", 
+	       rsi, mdi, rxi, spi, nsi, fn);
     ncnt += 1;
     nsum += fn;
     return fn;
@@ -1023,12 +1053,14 @@ static int gfn(result_t *results, uint rsi, uint mdi, uint rxi)
 static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsorted)
 {
     bool f = false;
-    uint i, o = 0;
+    uint i, j = 0, o = 0;
     uint fn;
-    uint rsi, mdi, rxi;
+    uint rsi, mdi, rxi, spi, nsi;
     uint rsc = rsval->cnt - 1;
     uint rxc = rxval->cnt - 1;
     uint mdc = mdval->cnt - 1;
+    uint spc = spexp->cnt - 1;
+    uint nsc = nsexp->cnt - 1;
 
     result_t *r = NULL;					/* quench bogus compiler warning */
     uint q33 = sorted[r_count * 33 / 100].fn;		/* 33% quantile */
@@ -1039,26 +1071,36 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
 
     for (i = 0; i < r_count; i += 1) {
 	r = &sorted[i];
-	rsi = r->rsi; mdi = r->mdi; rxi = r->rxi;
+	if (r->fp != target) continue;
+	if (j == 0) j = i+1;
+	rsi = r->rsi; mdi = r->mdi; rxi = r->rxi; spi = r->spi; nsi = r->nsi;
 	ncnt = nsum = 0;
 	if (((rsi == 0   ||
-	      (fn = gfn(unsorted, rsi-1, mdi, rxi)) < med)) &&
+	      (fn = gfn(unsorted, rsi-1, mdi, rxi, spi, nsi)) < med)) &&
 	    ((rsi == rsc ||
-	      (fn = gfn(unsorted, rsi+1, mdi, rxi)) < med)) &&
+	      (fn = gfn(unsorted, rsi+1, mdi, rxi, spi, nsi)) < med)) &&
 	    ((mdi == 0   ||
-	      (fn = gfn(unsorted, rsi, mdi-1, rxi)) < med)) &&
+	      (fn = gfn(unsorted, rsi, mdi-1, rxi, spi, nsi)) < med)) &&
 	    ((mdi == mdc ||
-	      (fn = gfn(unsorted, rsi, mdi+1, rxi)) < med)) &&
+	      (fn = gfn(unsorted, rsi, mdi+1, rxi, spi, nsi)) < med)) &&
 	    ((rxi == 0   ||
-	      (fn = gfn(unsorted, rsi, mdi, rxi-1)) < med)) &&
+	      (fn = gfn(unsorted, rsi, mdi, rxi-1, spi, nsi)) < med)) &&
 	    ((rxi == rxc ||
-	      (fn = gfn(unsorted, rsi, mdi, rxi+1)) < med)) &&
+	      (fn = gfn(unsorted, rsi, mdi, rxi+1, spi, nsi)) < med)) &&
+	    ((spi == 0   ||
+	      (fn = gfn(unsorted, rsi, mdi, rxi, spi-1, nsi)) < med)) &&
+	    ((spi == spc ||
+	      (fn = gfn(unsorted, rsi, mdi, rxi, spi+1, nsi)) < med)) &&
+	    ((nsi == 0   ||
+	      (fn = gfn(unsorted, rsi, mdi, rxi, spi, nsi-1)) < med)) &&
+	    ((nsi == nsc ||
+	      (fn = gfn(unsorted, rsi, mdi, rxi, spi, nsi+1)) < med)) &&
 	    (nsum / ncnt <  q33))
 	{
 	    f = true;
 	    break;
 	}
-	o = i+1;
+	o++;
     }
 
     if (o > 0) {
@@ -1067,7 +1109,7 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
     }
 
     if (!f) {
-	r = &sorted[0];
+	r = &sorted[j-1];
 	printf("No smooth minimum encountered, using lowest fn count (an outlier).         \n");
     }
 
@@ -1092,7 +1134,7 @@ static void progress(uint cur, uint top)
 static void final_warning(void)
 {
     printf(
-	"The small number and relative uniformity of the test messages imply\n"
+	"The small number and/or relative uniformity of the test messages imply\n"
 	"that the recommended values (above), though appropriate to the test set,\n"
 	"may not remain valid for long.  Bogotune should be run again with more\n"
 	"messages when that becomes possible.\n"
@@ -1107,11 +1149,13 @@ static void final_recommendations(bool skip)
 
     printf("Performing final scoring:\n");
 
+    printf("Spam...  ");
+    score_sp(sp_scores);		/* get scores (in ascending order) */
+
     printf("Non-Spam...\n");
     score_ns(ns_scores);		/* get scores (in descending order) */
 
-    printf("Spam...\n");
-    score_sp(sp_scores);		/* get scores (in ascending order) */
+    for(m=0; m<10; ++m) printf("%8.6f %8.6f\n", sp_scores[m], ns_scores[m]);
 
     if (verbose >= PARMS)
 	printf("# ns_cnt %u, sp_cnt %u\n", ns_cnt, sp_cnt);
@@ -1123,13 +1167,15 @@ static void final_recommendations(bool skip)
 	printf("\n");
     }
 
-    printf("Recommendations:\n\n");
+    printf("\nRecommendations:\n\n");
     printf("---cut---\n");
     printf("db_cachesize=%u\n", db_cachesize);
 
     printf("robx=%8.6f\n", robx);
     printf("min_dev=%5.3f\n", min_dev);
     printf("robs=%6.4f\n", robs);
+    printf("sp_esf=%8.6f\n", sp_esf);
+    printf("ns_esf=%8.6f\n", ns_esf);
 
     for (m=0; m < COUNTOF(minn); m += 1) {
 	double cutoff;
@@ -1169,7 +1215,7 @@ static void final_recommendations(bool skip)
 	fnp = 100.0 * fn / sp_cnt;
 
 	if (printed)  printf("#");
-	printf("spam_cutoff=%5.3f\t# for %4.2f%% fpos (%u); expect %4.2f%% fneg (%u).\n",
+	printf("spam_cutoff=%8.6f\t# for %4.2f%% fp (%u); expect %4.2f%% fn (%u).\n",
 	       cutoff, fpp, fp, fnp, fn);
 
 	printed = true;
@@ -1188,9 +1234,6 @@ static void final_recommendations(bool skip)
     printf("---cut---\n");
     printf("\n");
     
-    printf("note:  fpos means 'false positive' and fneg means 'false negative'.\n");
-    printf("\n");
-
     if (skip)
 	final_warning();
 
@@ -1253,7 +1296,7 @@ static bool check_msg_counts(void)
     bool ok = true;
 
     if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
-	fprintf(stderr, 
+	QPRINTF(stderr, 
 		"The wordlist contains %d non-spam and %d spam messages.\n"
 		"Bogotune must be run with at least %d of each.\n",
 		(int) msgs_good, (int) msgs_bad, LIST_COUNT);
@@ -1262,7 +1305,7 @@ static bool check_msg_counts(void)
 
     if (msgs_bad < msgs_good / 5 ||
 	msgs_bad > msgs_good * 5) {
-	fprintf(stderr,
+	QPRINTF(stderr,
 		"The wordlist has a ratio of spam to non-spam of %0.1f to 1.0.\n"
 		"Bogotune requires the ratio be in the range of 0.2 to 5.\n",
 		msgs_bad / msgs_good);
@@ -1270,12 +1313,11 @@ static bool check_msg_counts(void)
     }
 
     if (ns_cnt < TEST_COUNT || sp_cnt < TEST_COUNT) {
-	if (!quiet)
-	    fprintf(stderr, 
-		    "The messages sets contain %u non-spam and %u spam.  Bogotune "
-		    "requires at least %d non-spam and %d spam messages to run.\n",
-		    ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
-	    exit(EX_ERROR);
+	QPRINTF(stderr, 
+		"The messages sets contain %u non-spam and %u spam.  Bogotune "
+		"requires at least %d non-spam and %d spam messages to run.\n",
+		ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
+	exit(EX_ERROR);
     }
 
     return ok;
@@ -1412,10 +1454,8 @@ static rc_t bogotune(void)
     ns_and_sp->train = NULL;
 
     for (scan=0; scan <= 1 && !skip; scan ++) {
-	bool f;
-	uint i;
 	uint r_count;
-	uint rsi, rxi, mdi;
+	uint rsi, rxi, mdi, spi, nsi;
 	result_t *results, *r, *sorted;
 
 	printf("Performing %s scan:\n", scan==0 ? "coarse" : "fine");
@@ -1443,33 +1483,40 @@ static rc_t bogotune(void)
 	    ** be surrounded on six sides by values below the 33% quantile.  If no
 	    ** such trough exists, a warning is given.
 	    */
-	    init_fine(robs, min_dev, robx);
+	    init_fine(robs, min_dev, robx, spex, nsex);
 	    break;
 	}
 
 	print_all_parms();
 
-	r_count = rsval->cnt * mdval->cnt * rxval->cnt;
-	results = (result_t *) xcalloc(rsval->cnt * mdval->cnt * rxval->cnt, sizeof(result_t));
+	r_count = rsval->cnt * mdval->cnt * rxval->cnt * spexp->cnt
+	    * nsexp->cnt;
+	results = (result_t *) xcalloc(r_count, sizeof(result_t));
 
 	if (verbose >= SUMMARY) {
 	    if (verbose >= SUMMARY+1)
 		printf("%3s ", "cnt");
 	    if (verbose >= SUMMARY+2)
 		printf(" %s %s %s  ", "s", "m", "x");
-	    printf(" %4s %5s   %4s %7s %3s %3s\n", 
-		   "rs", "md", "rx", "cutoff", "fp", "fn");
+	    printf(" %4s %5s   %4s %8s %8s %7s %3s %3s\n", 
+		   "rs", "md", "rx", "spesf", "nsesf", "cutoff", "fp", "fn");
 	}
 
 	cnt = 0;
 	beg = time(NULL);
-	for (rsi = 0; rsi < rsval->cnt; rsi += 1) {
-	    robs = rsval->data[rsi];
-	    for (mdi = 0; mdi < mdval->cnt; mdi += 1) {
-		min_dev = mdval->data[mdi];
-		for (rxi = 0; rxi < rxval->cnt; rxi += 1) {
+	for (rsi = 0; rsi < rsval->cnt; rsi++) {
+	  robs = rsval->data[rsi];
+	  for (mdi = 0; mdi < mdval->cnt; mdi++) {
+	    min_dev = mdval->data[mdi];
+	    for (rxi = 0; rxi < rxval->cnt; rxi++) {
+	      robx = rxval->data[rxi];
+	      for (spi = 0; spi < spexp->cnt; spi++) {
+	        spex = spexp->data[spi];
+	        sp_esf = pow(0.75,spex);
+		for (nsi = 0; nsi < nsexp->cnt; nsi++) {
 		    uint fp, fn;
-		    robx = rxval->data[rxi];
+		    nsex = nsexp->data[nsi];
+		    ns_esf = pow(0.75, nsex);
 
 		    /* save parms */
 		    r = &results[cnt++];
@@ -1477,13 +1524,17 @@ static rc_t bogotune(void)
 		    r->rsi = rsi; r->rs = robs;
 		    r->rxi = rxi; r->rx = robx;
 		    r->mdi = mdi; r->md = min_dev;
+		    r->spi = spi; r->sp_exp = spex;
+		    r->nsi = nsi; r->ns_exp = nsex;
 
 		    if (verbose >= SUMMARY) {
 			if (verbose >= SUMMARY+1)
 			    printf("%3u ", cnt);
 			if (verbose >= SUMMARY+2)
-			    printf(" %u %u %u  ", rsi, mdi, rxi);
-			printf("%6.4f %5.3f %5.3f", robs, min_dev, robx);
+			    printf(" %u %u %u %u %u  ",
+				rsi, mdi, rxi, spi, nsi);
+			printf("%6.4f %5.3f %5.3f %8.6f %8.6f",
+			    robs, min_dev, robx, sp_esf, ns_esf);
 			fflush(stdout);
 		    }
 
@@ -1525,8 +1576,10 @@ static rc_t bogotune(void)
 		    }
 #endif
 		}
+	      }
 	    }
-	    fflush(stdout);
+	  }
+	  fflush(stdout);
 	}
 
 	if (verbose >= TIME) {
@@ -1537,37 +1590,30 @@ static rc_t bogotune(void)
 	printf("\n");
 
 	/* Scan complete, now find minima */
-	f = false;
-	for (i = 0; i < cnt; i += 1) {
-	    best = &results[i];
-	    if (best->fp == target)
-		f = true;
-	}
-	if (!f)
-	    printf("Warning: fp target was not met, using original results\n");
 
 	sorted = results_sort(r_count, results);
-	top_ten(sorted);
+	top_ten(sorted, r_count);
 
 	best = count_outliers(r_count, sorted, results);
 	robs = rsval->data[best->rsi];
 	robx = rxval->data[best->rxi];
 	min_dev = mdval->data[best->mdi];
+	spex = spexp->data[best->spi]; sp_esf = pow(0.75, spex);
+	nsex = nsexp->data[best->nsi]; ns_esf = pow(0.75, nsex);
 
-	printf("Minimum found at s %6.4f, md %5.3f, x %5.3f\n", robs, min_dev, robx);
+	printf(
+    "Minimum found at s %6.4f, md %5.3f, x %5.3f, spesf %8.6f, nsesf %8.6f\n",
+	        robs, min_dev, robx, sp_esf, ns_esf);
 	printf("        fp %u (%6.4f%%), fn %u (%6.4f%%)\n",
 		best->fp, best->fp*100.0/ns_cnt, 
 		best->fn, best->fn*100.0/sp_cnt);
 	printf("\n");
 
-	/* save results before freeing list */
-	robs = rsval->data[best->rsi];
-	robx = rxval->data[best->rxi];
-	min_dev = mdval->data[best->mdi];
-
 	data_free(rsval);
 	data_free(rxval);
 	data_free(mdval);
+	data_free(spexp);
+	data_free(nsexp);
 
 	xfree(results);
 	xfree(sorted);

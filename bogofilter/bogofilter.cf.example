@@ -2,8 +2,8 @@
 
 # $Id$
 
-# Default settings (as defined in the bogofilter source code) have a
-# single hash mark starting their line.
+# Default settings (as defined in the bogofilter source code) 
+# have a single hash mark at the beginning of the line.
 
 # Alternate values have two hash marks.
 
@@ -167,16 +167,15 @@
 #	than MIN_DEV, don't use the word in the
 #	spamicity calculation
 #
-## min_dev=0.1
-
+#min_dev=0.375
 
 #### Robinson Constants
 #
 #	floating point values for
 #	Robinson S and X coefficients.
 #
-#robs=0.010
-#robx=0.415
+#robs=0.0178
+#robx=0.52
 
 #### CUTOFF Values
 #
@@ -184,12 +183,17 @@
 #	setting ham_cutoff to a non-zero value will
 #	enable tristate results (Yes/No/Unsure).
 #
-#ham_cutoff = 0.00
-#spam_cutoff = 0.95
+#ham_cutoff  = 0.00
+#spam_cutoff = 0.99
 #
 ## with Yes/No/Unsure output:
-## ham_cutoff = 0.10
-## spam_cutoff = 0.95
+## ham_cutoff = 0.45
+## spam_cutoff= 0.99
+
+#### Effective Size Factor Values
+#
+#ns_esf = 1.000
+#sp_esf = 1.000
 
 #### Auto-update threshold
 #

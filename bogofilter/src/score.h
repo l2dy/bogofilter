@@ -6,10 +6,6 @@
 
 #include "wordhash.h"
 
-#define HAM_CUTOFF	0.00	/* 0.00 for two-state, 0.10 for three-state */
-#define SPAM_CUTOFF	0.95
-#define MIN_DEV		0.10
-
 #define MAX_REPEATS	1	/* cap on word frequency per message */
 #define GOOD_BIAS	1.0	/* don't give good words more weight */
 

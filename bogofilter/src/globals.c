@@ -54,13 +54,17 @@ bool fBogotune = false;
 /* for  bogoconfig.c, prob.c, rstats.c and score.c */
 double	robx = 0.0;
 double	robs = 0.0;
+double	sp_esf = SP_ESF;
+double	ns_esf = NS_ESF;
 
 /* other */
 FILE	*fpo;
-uint	db_cachesize = 0;		/* in MB */
+uint	db_cachesize = DB_CACHESIZE;	/* in MB */
 enum	passmode passmode;		/* internal */
 bool	msg_count_file = false;
 const char *progtype = NULL;
 bool	unsure_stats = false;		/* true if print stats for unsures */
 
 run_t run_type = RUN_UNKNOWN;
+
+uint	wordlist_version;

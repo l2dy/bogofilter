@@ -34,9 +34,12 @@ void set_bogohome(const char *ds_file) {
 	xfree(bogohome);
 
     bogohome = xstrdup(ds_file);
-    if (lstat(bogohome, &st) != 0 || !S_ISDIR(st.st_mode))
+    if (lstat(bogohome, &st) != 0 || !S_ISDIR(st.st_mode)) {
 	if ((t = strrchr(bogohome, DIRSEP_C)))
 	    *t = '\0';
+	else
+	    *bogohome = '\0';
+    }
     if (!*bogohome) {
 	free(bogohome);
 	bogohome = xstrdup(CURDIR_S);

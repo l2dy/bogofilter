@@ -154,12 +154,6 @@ mime_free (mime_t * t)
     t->charset = NULL;
   }
 
-  if (t->version)
-  {
-    xfree (t->version);
-    t->version = NULL;
-  }
-
   t->parent = NULL;
 }
 
@@ -397,21 +391,6 @@ getparam (char *t, char *e, const byte *param)
   return NULL;			/* NOT YET IMPLEMENTED */
 }
 #endif
-
-void
-mime_version (word_t *text)
-{
-  size_t l;
-  char *w;
-
-  l = strlen("MIME-Version:");
-  w = (char *)getword(text->text + l, text->text + text->leng);
-
-  if (!w) return;
-
-  xfree(msg_state->version);
-  msg_state->version = w;
-}
 
 void 
 mime_content(word_t *text)

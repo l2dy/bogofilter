@@ -125,10 +125,6 @@ typedef enum bulk_e {
     B_STDIN
 } bulk_t;
 
-typedef enum wl_e { WL_M_UNKNOWN ='U',
-		    WL_M_SEPARATE='S',
-		    WL_M_COMBINED='C' } wl_t;
-
 #include "globals.h"
 
 /* Represents the secondary data for a word key */
@@ -147,5 +143,12 @@ extern void bf_abort(void);
 extern void bf_exit(void);
 
 #define internal_error do { fprintf(stderr, "Internal error in %s:%lu\n", __FILE__, (unsigned long)__LINE__); abort(); } while(0)
+
+typedef enum e_wordlist_version {
+    ORIGINAL_VERSION = 0,
+    IP_PREFIX = 20040500
+} t_wordlist_version;
+
+#define	CURRENT_VERSION	IP_PREFIX
 
 #endif
