@@ -45,6 +45,8 @@ WANT="1708.3864"
 # v0.15.4 - tagging all header tokens
 #         - no longer discarding message separators
 WANT="1784.4039"
+# v0.15.5 - Added VERP processing
+WANT="1784.4031"
 
 if [ "$RESULT" != "$WANT" ] || [ $verbose -ne 0 ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT
