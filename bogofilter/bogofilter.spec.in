@@ -13,7 +13,6 @@ Group:		Networking/Mail
 URL:		http://bogofilter.sourceforge.net
 Source0:	%{name}-%{version}.tar.gz
 
-BuildRequires:	gsl >= 1.1
 %define _requires_exceptions perl
 
 Buildroot:	%{_tmppath}/%{name}-%{version}-root
@@ -43,6 +42,7 @@ CFLAGS="$RPM_OPT_FLAGS" \
   --prefix=%{_prefix} \
   --mandir=%{_mandir} \
   --sysconfdir=%{_sysconfdir} \
+  --with-included-gsl \
   --enable-static
 
 %build
