@@ -98,6 +98,7 @@ static int arg_foreach(arg_foreach_t hook, int argc, char **argv)
     int  exitcode = 0;
     bool error = false;
     bool done = false;
+    int  i = 0;
 
     while (!done) {
 	rc_t status = RC_MORE;
@@ -109,25 +110,27 @@ static int arg_foreach(arg_foreach_t hook, int argc, char **argv)
 	    break;
 	case B_STDIN:		/* '-b' - streaming (stdin) mode */
 	{
-	    size_t len;
+	    int len;
 	    filename = buff;
-	    if (fgets(buff, sizeof(buff), stdin) == 0) {
+	    if ((len = fgetsl(buff, sizeof(buff), stdin)) <= 0) {
 		done = true;
 		continue;
 	    }
-	    len = strlen(filename);
 	    if (len > 0 && filename[len-1] == '\n')
 		filename[len-1] = '\0';
 	    break;
 	}
-	default:		/* '-B' - command line mode */
-	    if ((int)bulk_mode < argc && !error) {
-		filename = argv[bulk_mode++];
-	    }
-	    else {
+	case B_CMDLINE: /* '-B' - command line mode */
+	    if (i < argc && !error) {
+		filename = argv[i++];
+	    } else {
 		done = true;
 		continue;
 	    }
+	    break;
+	default:
+	    fprintf(stderr, "Unknown bulk_mode = %d\n", (int) bulk_mode);
+	    abort();
 	    break;
 	}
 	if (bulk_mode != B_NORMAL) {
@@ -168,6 +171,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     int   exitcode;
 
     process_args_and_config_file(argc, argv, true);
+    argc -= optind;
+    argv += optind;
 
     /* open all wordlists */
     open_wordlists((run_type == RUN_NORMAL) ? DB_READ : DB_WRITE);
@@ -178,8 +183,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     if (run_type & (RUN_NORMAL | RUN_UPDATE)) {
 	exitcode = arg_foreach(classify, argc, argv);
-    }
-    else {
+    } else {
 	exitcode = arg_foreach(register_messages, argc, argv);
     }
 
