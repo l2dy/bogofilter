@@ -23,6 +23,7 @@ Gyepi Sam <gyepi@praxis-sw.com>   2003
 #include "error.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
+#include "paths.h"
 
 typedef struct {
     char *path;
