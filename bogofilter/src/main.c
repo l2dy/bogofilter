@@ -59,6 +59,8 @@ const char *progname = "bogofilter";
 
 /* Function Prototypes */
 
+static void passthrough_setup(void);
+static void passthrough_cleanup(void);
 static void write_log_message(void);
 static void write_message(FILE *fp, rc_t status);
 
@@ -111,36 +113,9 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	out = stdout;
     }
 
-    /* check if the input is seekable, if it is, we don't need to buffer
-     * things in memory => configure passmode accordingly
-     */
-
-    passmode = PASS_MEM;
-    if (passthrough) {
-	if (fseek(fpin, 0, SEEK_END) == 0) {
-	    passmode = PASS_SEEK;
-	    (void)rewind(fpin);
-	} else {
-	    if (errno != ESPIPE && errno != ENOTTY) {
-		fprintf(stderr, "cannot determine if input is seekable: %s",
-			strerror(errno));
-		exit(2);
-	    }
-	    textblocks = textblock_init();
-	}
-
-	if (DEBUG_GENERAL(2)) {
-	    const char *m;
-	    switch (passmode) {
-		case PASS_MEM:  m = "cache in memory"; break;
-		case PASS_SEEK: m = "rewind and reread file"; break;
-		default:        m = "unknown"; break;
-	    }
-	    fprintf(dbgout, "passthrough mode: %s\n", m);
-	}
-    }
-
     mime_reset();
+
+    passthrough_setup();
 
     if (run_type & (RUN_NORMAL | RUN_UPDATE)) {
 	exitcode = classify(out);
@@ -150,15 +125,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	exitcode = 0;
     }
 
-    if (passthrough) {
-	switch(passmode) {
-	    case PASS_MEM:
-		textblock_free(textblocks);
-		break;
-	    case PASS_SEEK: default:
-		break;
-	}
-    }
+    passthrough_cleanup();
 
     close_wordlists(false);
     free_wordlists();
@@ -356,6 +323,54 @@ static void write_log_message(void)
 
     closelog();
 #endif
+}
+
+static void passthrough_setup()
+{
+    /* check if the input is seekable, if it is, we don't need to buffer
+     * things in memory => configure passmode accordingly
+     */
+
+    if (!passthrough)
+	return;
+
+    passmode = PASS_MEM;
+
+    if (fseek(fpin, 0, SEEK_END) == 0) {
+	passmode = PASS_SEEK;
+	(void)rewind(fpin);
+    } else {
+	if (errno != ESPIPE && errno != ENOTTY) {
+	    fprintf(stderr, "cannot determine if input is seekable: %s",
+		    strerror(errno));
+	    exit(2);
+	}
+	textblocks = textblock_init();
+    }
+
+    if (DEBUG_GENERAL(2)) {
+	const char *m;
+	switch (passmode) {
+	case PASS_MEM:  m = "cache in memory"; break;
+	case PASS_SEEK: m = "rewind and reread file"; break;
+	default:        m = "unknown"; break;
+	}
+	fprintf(dbgout, "passthrough mode: %s\n", m);
+    }
+}
+
+static void passthrough_cleanup()
+{
+    if (!passthrough)
+	return;
+
+    switch(passmode) {
+    case PASS_MEM:
+	textblock_free(textblocks);
+	break;
+    case PASS_SEEK: default:
+	break;
+    }
 }
 
 /* End */
