@@ -1,0 +1,27 @@
+#! /bin/sh
+
+. ${srcdir:=.}/t.frame
+
+# test description here
+#
+# test below
+# remember to use ${srcdir}
+cat >${TMPDIR}/input <<_EOF
+Subject: =?iso-8859-1?q?ok?=
+    =?iso-8859-1?q?ay?=
+
+- torso -
+header: =?iso-8859-1?q?bo?=
+    =?iso-8859-1?q?dy?=
+_EOF
+cat >${TMPDIR}/reference <<_EOF
+subj:okay
+torso
+header
+iso-8859-1
+iso-8859-1
+_EOF
+
+../bogolexer -p -C <${TMPDIR}/input >${TMPDIR}/output
+cmp ${TMPDIR}/reference ${TMPDIR}/output \
+|| diff ${TMPDIR}/reference ${TMPDIR}/output

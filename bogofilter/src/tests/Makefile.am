@@ -17,6 +17,7 @@ LDADD = -lbogofilter
 TESTSCRIPTS=t.env \
 	    t.ignore_spam_header \
 	    t.integrity t.integrity2 t.integrity3 \
+	    t.folded_rfc2047 \
 	    t.lexer t.abort \
 	    t.lock1 t.lock2 \
 	    t.nullstatsprefix \
