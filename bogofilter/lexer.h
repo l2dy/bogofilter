@@ -21,13 +21,6 @@ typedef enum {
 
 extern char *yylval;
 
-struct textblock
-{
-    char		*block;
-    /*@owned@*/ struct textblock	*next;
-    size_t		len;
-};
-
 extern bool block_on_subnets;
 
 extern token_t yylex(void);
