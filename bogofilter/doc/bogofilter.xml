@@ -469,12 +469,12 @@ allows setting of debug flags for printing debug information.</para>
 </refsect1>
 
 <refsect1 id='environment'><title>ENVIRONMENT</title>
-    <para>
-	Bogofilter uses a database directory, which is set in the config file.
-	If not set there, bogofilter will use the value of <envar>BOGOFILTER_DIR</envar>.
-	Both can be overridden by the <option>-d<replaceable>dir</replaceable></option>
-	option.  If none of that is available, bogofilter will use directory
-	<filename>$HOME/.bogofilter</filename>.</para>
+<para>Bogofilter uses a database directory, which can be set in the
+config file.  If not set there, bogofilter will use the value of
+<envar>BOGOFILTER_DIR</envar>.  Both can be overridden by the
+<option>-d<replaceable>dir</replaceable></option> option.  If none of
+that is available, bogofilter will use directory
+<filename>$HOME/.bogofilter</filename>.</para>
 </refsect1>
 
 <refsect1 id='configuration'><title>CONFIGURATION</title>
