@@ -24,7 +24,13 @@ export BOGOFILTER_DIR
 
 verbose=0
 if [ "$1" = "-v" ]; then
+    v="$1"
     verbose=1
+fi
+
+if [ "$1" = "-vv" ]; then
+    v="-x l -vv -D"
+    verbose=2
 fi
 
 map_rc()
@@ -48,7 +54,7 @@ files=`ls ${srcdir}/inputs/split.d/msg*`
 for msg in $files ; do
     nam=`basename $msg`
     out="$TMPDIR/$nam"
-    map_rc $BOGOLEXER -C -p -I $msg > $out.l
+    map_rc $BOGOLEXER -C -p $v -I $msg > $out.l
     map_rc $BOGOFILTER -vvv -f -C -I $msg > $out.f
     printf "%-20s %s\n" $nam `head -1 $out.f | sed s@spamicity=@@ | tr -d "," | awk '{print $4}'` >> ${TMPDIR}/$OUT
 done
