@@ -147,7 +147,7 @@ long db_getvalue(void *vhandle, const char *word){
 }
 
 
-long db_get_dbvalue(void *vhandle, const char *word, dbv_t *val){
+static long db_get_dbvalue(void *vhandle, const char *word, dbv_t *val){
   int  ret;
   DBT db_key;
   DBT db_data;
@@ -208,7 +208,7 @@ void db_setvalue(void *vhandle, const char * word, long count){
 }
 
 
-void db_set_dbvalue(void *vhandle, const char * word, dbv_t *val){
+static void db_set_dbvalue(void *vhandle, const char * word, dbv_t *val){
   int ret;
   DBT db_key;
   DBT db_data;
