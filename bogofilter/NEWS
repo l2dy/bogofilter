@@ -2,11 +2,20 @@
 				BOGOFILTER NEWS
 			       =================
 
-
 NOTE: More information on important changes for bogofilters updaters
 is in the RELEASE.NOTES files!
 
 $Id$
+
+	2003-09-01
+
+	* Revise flex rule for encoded text to reduce program size.
+
+	2003-08-31
+
+	* Revise flex grammar:
+	  - to reduce size of generated rules
+	  - to simplify handling of header tags and mime parts
 
 	2003-08-30
 

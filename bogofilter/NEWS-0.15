@@ -2,6 +2,16 @@
 				BOGOFILTER NEWS
 			       =================
 
+2003-09-01
+
+* Revise flex rule for encoded text to reduce program size.
+
+2003-08-31
+
+* Revise flex grammar:
+  - to reduce size of generated rules
+  - to simplify handling of header tags and mime parts
+
 2003-08-30
 
 * Clean-up message header processing:
@@ -11,8 +21,8 @@
 
 0.15.0	2003-08-30
 
-* Implemented a new, more robust, mail reading module that knows how to
-  split a mbox into messages and read Maildirs.
+* Implemented a new, more robust, mail reading module that knows how
+  to split a mbox into messages and read Maildirs.
 * Implement support for MH directory (such as used by Sylpheed).
 
 * Change mime boundary line to operate on raw input,
