@@ -364,7 +364,7 @@ static uint get_thresh(uint count, double *scores)
 
     if (spam_cutoff < 0.5) {
 	fprintf(stderr,
-		"Very few high-scoring nonspams in this data set.\n");
+		"Very few high-scoring non-spams in this data set.\n");
 	fprintf(stderr,
 		"At target %d, cutoff is %8.6f.\n", ft, spam_cutoff);
 	exit(EX_ERROR);
@@ -830,7 +830,7 @@ static void final_recommendations(void)
 
     printf("Performing final scoring:\n");
 
-    printf("Nonspam...\n");
+    printf("Non-Spam...\n");
     score_ns(ns_scores);		/* get scores */
     /* ... ascending */
     qsort(ns_scores, ns_cnt, sizeof(double), compare_double);
@@ -1028,7 +1028,7 @@ static rc_t bogotune(void)
 
     /*
     ** 5.  Calculate fp target
-    ** The fp target will be derived thus: score nonspams with s and md as
+    ** The fp target will be derived thus: score non-spams with s and md as
     ** shipped, and determine the count that will result from a spam cutoff
     ** of 0.95; if that is < 0.25%, try 0.9375 etc.
     */
@@ -1190,10 +1190,10 @@ static rc_t bogotune(void)
     }
 
     /*
-    ** 9.  Suggest possible spam and nonspam cutoff values
-    ** With the final x, md and s values, score the spams and nonspams and
-    ** sort the nonspam scores decreasing and the spam scores increasing;
-    ** then, traverse the nonspam list until the 0.2% point; report cutoffs
+    ** 9.  Suggest possible spam and non-spam cutoff values
+    ** With the final x, md and s values, score the spams and non-spams and
+    ** sort the non-spam scores decreasing and the spam scores increasing;
+    ** then, traverse the non-spam list until the 0.2% point; report cutoffs
     ** that give 0.05%, 0.1% and 0.2% fp.
     */
 
