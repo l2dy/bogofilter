@@ -20,7 +20,9 @@ AUTHOR:
 #include "datastore.h"
 #include "datastore_db.h"
 
+#undef  PROGNAME
 #define PROGNAME "bogoutil"
+#undef  VERSION
 #define VERSION "0.2"
 
 int verbose = 0;
