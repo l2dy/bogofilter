@@ -44,6 +44,10 @@ const char *progname = PROGNAME;
 
 static int dump_count = 0;
 
+/* Function Prototypes */
+
+static int process_args(int argc, char **argv);
+
 /* Function Definitions */
 
 static int db_dump_hook(word_t *key, word_t *data,
@@ -554,22 +558,18 @@ static void help(void)
 
 #undef	ROBX
 
-int main(int argc, char *argv[])
+typedef enum { NONE, DUMP, LOAD, WORD, MAINTAIN, ROBX } cmd_t;
+char *db_file = NULL;
+bool  prob = false;
+cmd_t flag = NONE;
+
+static int process_args(int argc, char **argv)
 {
-    typedef enum { NONE, DUMP, LOAD, WORD, MAINTAIN, ROBX } cmd_t;
-
-    int count = 0;
     int option;
-    char *db_file = NULL;
-    cmd_t flag = NONE;
-    bool  prob = false;
-
-    set_today();		/* compute current date for token age */
+    int count = 0;
 
     fpin = stdin;
     dbgout = stderr;
-
-    directory = get_directory();
 
     while ((option = getopt(argc, argv, ":d:l:m:w:R:phvVx:a:c:s:ny:I:D")) != -1)
 	switch (option) {
@@ -681,6 +681,17 @@ int main(int argc, char *argv[])
 	      "must be present.\n", PROGNAME);
       exit(1);
     }
+
+    return count;
+}
+
+int main(int argc, char *argv[])
+{
+    set_today();		/* compute current date for token age */
+
+    directory = get_directory();
+
+    process_args(argc, argv);
 
     /* Extra or missing parameters */
     if (flag != WORD && argc != optind) {
