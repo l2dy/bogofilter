@@ -35,7 +35,7 @@ fi
 BOGOHOME="$1"
 
 nukelogs() {
-    bogoutil --prune="$BOGOHOME"
+    bogoutil --db-prune="$BOGOHOME"
 }
 
 # run db_checkpoint to reduce number of logs

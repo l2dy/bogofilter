@@ -44,4 +44,5 @@ egrep -v '^set_lk_max_(locks|objects)' "$DIR"/DB_CONFIG >"$DIR"/DB_CONFIG.new ||
 echo >>"$DIR"/DB_CONFIG.new set_lk_max_locks $a
 echo >>"$DIR"/DB_CONFIG.new set_lk_max_objects $a
 mv "$DIR"/DB_CONFIG.new "$DIR"/DB_CONFIG
-bogoutil --recover="$DIR"
+yes
+bogoutil --db-recover="$DIR"

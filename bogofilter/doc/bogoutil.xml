@@ -15,13 +15,13 @@
 	    <command>bogoutil</command>
 	    <arg choice="opt">options</arg>
 	    <group choice="req">
-		<arg choice="plain">-C <replaceable>file</replaceable></arg>
 		<arg choice="plain">-d <replaceable>file</replaceable></arg>
 		<arg choice="plain">-H</arg>
 		<arg choice="plain">-l <replaceable>file</replaceable></arg>
 		<arg choice="plain">-m</arg>
 		<arg choice="plain">-w <replaceable>file_or_dir</replaceable></arg>
 		<arg choice="plain">-p <replaceable>file_or_dir</replaceable></arg>
+		<arg choice="plain">--db-check <replaceable>file</replaceable></arg>
 	    </group>
 	    <arg choice="plain"><replaceable>file.db</replaceable></arg>
 	</cmdsynopsis>
@@ -29,12 +29,12 @@
 	<cmdsynopsis>
 	    <command>bogoutil</command>
 	    <group choice="req">
-		<arg choice="plain">-f</arg>
-		<arg choice="plain">-F</arg>
-		<arg choice="plain">-P</arg>
 		<arg choice="plain">-r</arg>
 		<arg choice="plain">-R</arg>
-		<arg choice="plain">--remove-environment</arg>
+		<arg choice="plain">--db-recover</arg>
+		<arg choice="plain">--db-recover-harder</arg>
+		<arg choice="plain">--db-prune</arg>
+		<arg choice="plain">--db-remove-environment</arg>
 	    </group>
 	    <arg choice="plain"><replaceable>directory</replaceable></arg>
 	</cmdsynopsis>
@@ -70,11 +70,6 @@
     </refsect1>
     <refsect1 id="options">
 	<title>OPTIONS</title>
-	<para>
-	    The <option>-C <replaceable>file</replaceable></option>
-	    option requests that bogofilter verifies the database file.
-	    It prints only errors, unless in verbose mode.
-	</para>
 	<para>
 	    The <option>-d <replaceable>file</replaceable></option> 
 	    option tells <application>bogoutil</application> to print
@@ -126,26 +121,6 @@
 	    Option <option>-p</option> takes the same arguments as
 	    option <option>-w</option> .
 	</para>
-	<para>The <option>-f <replaceable>dir</replaceable></option>
-	    option (mnemonic: "fix") runs a regular data base recovery
-	    in the data base directory dir. If that fails, it will retry
-	    with a (usually slower) catastrophic data base recovery. If
-	    that fails, too, your data base cannot be repaired and must
-	    be rebuilt from scratch.
-	    This is only supported when compiled with Berkeley DB
-	    support with transactions enabled. Trying recovery with QDBM or TDB support will
-	    result in an error.</para>
-	<para>The <option>-F <replaceable>dir</replaceable></option>
-	    option (mnemonic: "fix harder") runs a catastrophic data
-	    base recovery in the data base directory dir. If that fails,
-	    your data base cannot be repaired and must be rebuilt from
-	    scratch.
-	    This is only supported when compiled with Berkeley DB
-	    support with transactions enabled. Trying recovery with QDBM or TDB support will
-	    result in an error.</para>
-	<para>The <option>-P <replaceable>dir</replaceable></option>
-	    option causes bogoutil to checkpoint the database
-	    environment and remove inactive log files.</para>
 	<para>The <option>-r <replaceable>dir</replaceable></option> option tells
 	    <application>bogoutil</application> to recalculate the ROBX
 	    value and print it as a six-digit fraction.
@@ -153,13 +128,6 @@
 	<para>The <option>-R <replaceable>dir</replaceable></option> option does the same as <option>-r</option>, but prints more
 	    information and saves the result in the training database.
 	</para>
-	<para>The <option>--remove-environment
-		<replaceable>directory</replaceable></option> option has
-	    no short option equivalent. It runs recovery in the given
-	    directory and then removes the database environment. Use
-	    this <emphasis>before</emphasis> upgrading to a new Berkeley
-	    DB version if the new version to be installed requires a log
-	    file format update.</para>
 	<para>The <option>-I <replaceable>file</replaceable></option> option tells
 	    <application>bogoutil</application> to read its input from
 	    <replaceable>file</replaceable> rather than stdin.
@@ -198,6 +166,42 @@
 	</para>
 	<para>The <option>-h</option> option prints the help message and exits.</para>
 	<para>The <option>-V</option> option prints the version number and exits.</para>
+    </refsect1>
+
+    <refsect1 id="environment maintenance">
+	<title>ENVIRONMENT MAINTENANCE</title>
+	<para>
+	    The <option>--db-check <replaceable>file</replaceable></option>
+	    option requests that bogofilter verifies the database file.
+	    It prints only errors, unless in verbose mode.
+	</para>
+	<para>The <option>--db-prune <replaceable>dir</replaceable></option>
+	    option causes bogoutil to checkpoint the database
+	    environment and remove inactive log files.</para>
+	<para>The <option>--db-recover <replaceable>dir</replaceable></option>
+	    option runs a regular data base recovery
+	    in the data base directory dir. If that fails, it will retry
+	    with a (usually slower) catastrophic data base recovery. If
+	    that fails, too, your data base cannot be repaired and must
+	    be rebuilt from scratch.
+	    This is only supported when compiled with Berkeley DB
+	    support with transactions enabled. Trying recovery with QDBM or TDB support will
+	    result in an error.</para>
+	<para>The <option>--db-recover-harder <replaceable>dir</replaceable></option>
+	    option runs a catastrophic data
+	    base recovery in the data base directory dir. If that fails,
+	    your data base cannot be repaired and must be rebuilt from
+	    scratch.
+	    This is only supported when compiled with Berkeley DB
+	    support with transactions enabled. Trying recovery with QDBM or TDB support will
+	    result in an error.</para>
+	<para>The <option>--db-remove-environment
+		<replaceable>directory</replaceable></option> option has
+	    no short option equivalent. It runs recovery in the given
+	    directory and then removes the database environment. Use
+	    this <emphasis>before</emphasis> upgrading to a new Berkeley
+	    DB version if the new version to be installed requires a log
+	    file format update.</para>
     </refsect1>
 
     <refsect1 id="dataformat">

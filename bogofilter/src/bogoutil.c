@@ -473,19 +473,19 @@ static const char *help_text[] = {
     "  -y, --timestamp-date=date - set default date (format YYYYMMDD).\n",
 
     "environment maintenance:\n",
-    "  -k, --db_cachesize=size   - set Berkeley DB cache size (MB).\n",
-    "  -C, --check=file          - check data file.\n",
-    "  -P, --prune=dir           - remove inactive log files in dir.\n",
-    "  -f, --recover=dir         - run recovery on data base in dir.\n",
-    "  -F, --crecover=dir        - run catastrophic recovery on data base in dir.\n",
-    "      --remove-environment  - remove environment.\n",
+    "  -k, --db_cachesize=size     - set Berkeley DB cache size (MB).\n",
+    "      --db_check=file         - check data file.\n",
+    "      --db_prune=dir          - remove inactive log files in dir.\n",
+    "      --db_recover=dir        - run recovery on data base in dir.\n",
+    "      --db_recover-harder=dir - run catastrophic recovery on data base in dir.\n",
+    "      --db_remove-environment - remove environment.\n",
 
 #ifdef	HAVE_DECL_DB_CREATE
-    "      --db_lk_max_locks     - set max lock count.\n",
-    "      --db_lk_max_objects   - set max object count.\n",
+    "      --db_lk_max_locks       - set max lock count.\n",
+    "      --db_lk_max_objects     - set max object count.\n",
 #ifdef	FUTURE_DB_OPTIONS
-    "      --db_log_autoremove   - set autoremoving of logs.\n",
-    "      --db_txn_durable      - set durable mode.\n",
+    "      --db_log_autoremove     - set autoremoving of logs.\n",
+    "      --db_txn_durable        - set durable mode.\n",
 #endif
 #endif
 
@@ -525,14 +525,14 @@ struct option long_options[] = {
     { "verbosity",			N, 0, 'v' },
     { "input-file",			N, 0, 'I' },
 
-    { "recover",                        N, 0, 'f' },
-    { "crecover",                       N, 0, 'F' },
-    { "prune",                          N, 0, 'P' },
-    { "check",                          N, 0, 'C' },
-
-    { "db_cachesize",			N, 0, 'k' },
     { "replace_nonascii_characters",	R, 0, 'n' },
     { "timestamp-date",			N, 0, 'y' },
+
+    { "db-cachesize",			N, 0, 'k' },
+    { "db-check",                       N, 0, O_DB_CHECK },
+    { "db-prune",                       N, 0, O_DB_PRUNE },
+    { "db-recover",                     N, 0, O_DB_RECOVER },
+    { "db-recover-harder",              N, 0, O_DB_RECOVER_HARDER },
 #ifdef	HAVE_DECL_DB_CREATE
     { "db_lk_max_locks",		R, 0, O_DB_MAX_LOCKS },
     { "db_lk_max_objects",		R, 0, O_DB_MAX_OBJECTS },
@@ -542,7 +542,7 @@ struct option long_options[] = {
 #endif
 #endif
     /* no short option for safety */
-    { "remove-environment",		R, &remenv, O_REMOVE_ENVIRONMENT },
+    { "db-remove-environment",		R, &remenv, O_DB_REMOVE_ENVIRONMENT },
 
     /* The following options are present to allow config files
     ** to be read without complaints (and mostly ignored)
