@@ -8,6 +8,8 @@
 #include <float.h> /* has DBL_EPSILON */
 #define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
 
+#include "system.h" /* has bool */
+
 extern int nonspam_exits_zero;	/* '-e' */
 extern bool fisher;		/* '-f' */
 extern bool force;		/* '-F' */

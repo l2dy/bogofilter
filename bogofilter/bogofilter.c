@@ -37,6 +37,7 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #include "bogofilter.h"
 #include "method.h"
 #include "datastore.h"
+#include "collect.h"
 #include "register.h"
 
 void initialize_constants()
@@ -55,7 +56,8 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
     rc_t	status;
     double 	spamicity;
     wordhash_t  *wordhash;
-    int		wordcount, msgcount;
+    long	wordcount, msgcount = 0;
+    bool	cont;
 
     good_list.active = spam_list.active = true;
 
@@ -67,7 +69,15 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
     method->initialize();
 
     /* tokenize input text and save words in a wordhash. */
-    wordhash = collect_words(&msgcount, &wordcount);
+    do {
+	collect_words(&wordhash, &wordcount, &cont);
+	++msgcount;
+    } while(cont);
+
+    if (msgcount > 1) {
+	fprintf(stderr, "%s: must get only one message to calculate spamicity!\n", progname);
+	exit(2);
+    }
 
     spamicity = method->compute_spamicity(wordhash, NULL);
 

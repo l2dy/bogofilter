@@ -8,8 +8,8 @@
 
 #include "bogofilter.h"
 #include "datastore.h"
-#include "lexer.h"
 #include "register.h"
+#include "collect.h"
 #include "wordhash.h"
 
 #define PLURAL(count) ((count == 1) ? "" : "s")
@@ -17,70 +17,6 @@
 int	max_repeats;
 
 extern char msg_register[];
-
-/* Represents the secondary data for a word key */
-typedef struct {
-  int freq;
-  int msg_freq;
-} wordprop_t;
-
-static void wordprop_init(void *vwordprop){
-	wordprop_t *wordprop = vwordprop;
-
-	wordprop->freq = 0;
-	wordprop->msg_freq = 0;
-}
-
-void *collect_words(/*@out@*/ int *message_count,
-		    /*@out@*/ int *word_count)
-    /* tokenize input text and save words in wordhash_t hash table 
-     * returns: the wordhash_t hash table.
-     * Sets messageg_count and word_count to the appropriate values
-     * if their pointers are non-NULL.  */
-{
-  int w_count = 0;
-  int msg_count = 0;
- 
-  wordprop_t *w;
-  hashnode_t *n;
-  wordhash_t *h = wordhash_init();
-     
-  for (;;){
-    token_t token_type = get_token();
-  
-    if (token_type != FROM && token_type != 0){
-      w = wordhash_insert(h, yylval, sizeof(wordprop_t), &wordprop_init);
-      if (w->msg_freq < max_repeats) w->msg_freq++;
-      w_count++;
-    }
-    else {
-      /* End of message. Update message counts. */
-      if (token_type == FROM || (token_type == 0 && msg_count == 0))
-        msg_count++;
-  
-      /* Incremenent word frequencies, capping each message's
-       * contribution at MAX_REPEATS in order to be able to cap
-       * frequencies. */
-      for(n = wordhash_first(h); n != NULL; n = wordhash_next(h)){
-        w = n->buf;
-        w->freq += w->msg_freq;
-        w->msg_freq = 0;
-      }
-  
-      /* Want to process EOF, *then* drop out */
-      if (token_type == 0)
-        break;
-    }
-  }
- 
-  if (word_count)
-    *word_count = w_count;
-
-  if (message_count)
-    *message_count = msg_count;
- 
-  return(h);
-}
 
 
 void register_words(run_t _run_type, wordhash_t *h,
@@ -180,13 +116,32 @@ void register_words(run_t _run_type, wordhash_t *h,
   db_lock_release_list(word_lists);
 }
 
+static void add_hash(wordhash_t *dest, wordhash_t *src) {
+    wordprop_t *d;
+    hashnode_t *s;
+
+    for (s = wordhash_first(src); s; s = wordhash_next(src)) {
+	d = wordhash_insert(dest, s->key, sizeof(wordprop_t), &wordprop_init);
+	d -> freq += ((wordprop_t *)(s -> buf)) ->freq;
+    }
+}
+
 void register_messages(run_t _run_type)
 {
-  wordhash_t *h;
-  int	wordcount, msgcount;
+  wordhash_t *h, *words = wordhash_init();
+  long	wordcount, msgcount = 0;
+  bool cont;
+
   initialize_constants();
-  h = collect_words(&msgcount, &wordcount);
-  register_words(_run_type, h, msgcount, wordcount);
-  wordhash_free(h);
+
+  do {
+      collect_words(&h, &wordcount, &cont);
+      add_hash(words, h);
+      wordhash_free(h);
+      msgcount++;
+  } while(cont);
+
+  register_words(_run_type, words, msgcount, wordcount);
+  wordhash_free(words);
 }
 

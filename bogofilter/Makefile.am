@@ -25,7 +25,7 @@ endif
 # what to build
 bin_PROGRAMS = bogofilter bogoutil bogolexer
 bin_SCRIPTS = bogoupgrade
-check_PROGRAMS = debugtest configtest wordhash find_home.test
+check_PROGRAMS = debugtest configtest wordhash find_home.test bogowordfreq
 man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
 sysconf_DATA = bogofilter.cf.example
 
@@ -33,39 +33,42 @@ noinst_LIBRARIES = libbogofilter.a
 LDADD += libbogofilter.a
 
 # what to build that from
-libbogofilter_a_SOURCES=xmalloc.h xcalloc.c xmem_error.c xrealloc.c \
-	xmalloc.c xstrdup.h xstrdup.c globals.h debug.h \
-	debug.c find_home.h find_home.c find_home_user.c \
-	find_home_tildeexpand.c
-
-MYCOMMON=  bogoconfig.h system.h version.h
+libbogofilter_a_SOURCES= \
+	xmalloc.h xcalloc.c xmem_error.c xrealloc.c \
+	    xmalloc.c xstrdup.h xstrdup.c \
+	debug.h debug.c \
+	find_home.h find_home.c find_home_user.c \
+	    find_home_tildeexpand.c \
+	collect.h collect.c \
+	datastore.h datastore_db.h datastore_db.c \
+	lexer.h lexer.l \
+	register.h register.c \
+	wordhash.h wordhash.c wordlists.h wordlists.c \
+	bogoconfig.h globals.h system.h version.h
 
 BUILT_SOURCES = version.h directories.h
 
 CLEANFILES= directories.h
 
-bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
-		     datastore.h datastore_db.h datastore_db.c \
-		     config.c register.c register.h \
+bogofilter_SOURCES = bogofilter.c bogofilter.h main.c \
+		     config.c \
 		     $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
 		     rstats.h rstats.c \
-                     wordhash.h wordhash.c wordlists.h wordlists.c \
-		     $(MYCOMMON) common.h method.h
+		     common.h method.h
 
-bogolexer_SOURCES = bogolexer.c lexer.l lexer.h $(MYCOMMON)
+bogowordfreq_SOURCES = bogowordfreq.c
+
+bogolexer_SOURCES = bogolexer.c
 
 debugtest_SOURCES = debug.c debug.h debug.main.c
 
-bogoutil_SOURCES = bogoutil.c \
-		   datastore.h datastore_db.h datastore_db.c wordlists.h wordlists.c \
-		   $(MYCOMMON)
+bogoutil_SOURCES = bogoutil.c
 
-configtest_SOURCES = configtest.c config.c wordlists.c \
-		     datastore_db.c $(MYCOMMON)
+configtest_SOURCES = configtest.c config.c
 
-wordhash_SOURCES = wordhash.c wordhash.h wordhash.main.c $(MYCOMMON)
+wordhash_SOURCES = wordhash.main.c
 
-find_home_test_SOURCES = find_home.test.c $(MYCOMMON)
+find_home_test_SOURCES = find_home.test.c
 
 # what to distribute
 extradistdirs = doc contrib
@@ -79,7 +82,6 @@ EXTRA_DIST = $(man_MANS) \
 	     README.cvs README.freebsd README.hp-ux \
 	     README.dcdflib README.Robinson \
 	     $(extradistdirs)
-#
 #
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
 version.h:	version.sh $(VERSION_FROM)
