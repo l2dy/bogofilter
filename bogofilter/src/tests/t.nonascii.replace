@@ -30,12 +30,12 @@ LEN2=`wc -l ${TMPDIR}/output.2 | $AWK '{print $1}'`
 TOKDAT1=`head -1 ${TMPDIR}/output.2 | $AWK '{print $2 "." $4 }'`
 TOKDAT2=`tail -1 ${TMPDIR}/output.2 | $AWK '{print $2 "." $4 }'`
 
-RESULT=`printf "%d.%d.%s.%s" $LEN1 $LEN2 $TOKDAT1 $TOKDAT2`
+RESULT=`printf "%d.%d %s %s" $LEN1 $LEN2 $TOKDAT1 $TOKDAT2`
 
-WANT="7.2.6.20030303.10.20030304"
+WANT="7.2 6.20030303 10.20030304"
 
-if [ "$RESULT" != "$WANT" ] ; then
-    echo want: $WANT, have: $RESULT
+if [ "$RESULT" != "$WANT" ] || [ $verbose > 0 ] ; then
+    echo want: \"$WANT\", have: \"$RESULT\"
 fi
 
-test $RESULT = "$WANT"
+test "$RESULT" = "$WANT"
