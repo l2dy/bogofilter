@@ -28,7 +28,11 @@
 #define BF_TXN_ABORT(t) (txn_abort((t)))
 #define BF_TXN_COMMIT(t, f) (txn_commit((t), (f)))
 #define BF_TXN_CHECKPOINT(e, k, m, f) (txn_checkpoint((e), (k), (m), (f)))
+#if DB_AT_LEAST(3,3)
 #define BF_LOG_ARCHIVE(e, l, f) (log_archive((e), (l), (f)))
+#else
+#define BF_LOG_ARCHIVE(e, l, f) (log_archive((e), (l), (f), NULL))
+#endif
 #endif
 
 /* DB->stat interface changed in 4.3 */
