@@ -56,6 +56,7 @@ const char *spam_subject_tag = NULL;			/* used in passthrough mode */
 **
 **	    e - spamicity as 'e' format
 **	    f - spamicity as 'f' format
+**	    g - spamicity as 'g' format
 **
 **	    l - logging tag (from '-l' option)
 **
@@ -111,11 +112,12 @@ enum states {
 };
 
 enum flags {
-    F_ZERO = 1,
-    F_FP_F = 2,
-    F_FP_E = 4,
-    F_DELTA = 8,
-    F_PREC = 16
+    F_ZERO  =  1,
+    F_FP_E  =  2,
+    F_FP_F  =  4,
+    F_FP_G  =  8,
+    F_DELTA = 16,
+    F_PREC  = 32
 };
 
 /* Function Definitions */
@@ -162,11 +164,13 @@ static size_t format_float(char *dest, double src,
     if (flags & F_PREC)
 	p = prec;
     else
-	p = (flags & F_FP_F) ? 6 : 2;
+	p = (flags & (F_FP_F|F_FP_G)) ? 6 : 2;
     if (flags & F_FP_F)
 	fmt = flags & F_ZERO ? "%0*.*f" : "%*.*f";
     else
 	fmt = flags & F_ZERO ? "%0*.*e" : "%*.*e";
+    if (flags & F_FP_G)
+	fmt = flags & F_ZERO ? "%0*.*g" : "%*.*g";
     snprintf (buf, SIZ, fmt, min, p, s);
     return format_string (dest, buf, 0, 0, 0, destend);
 }
@@ -315,6 +319,9 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 		break;
 	    case 'f':		/* f - spamicity as 'f' format */
 		buff += format_float(buff, spamicity, min, prec, flags | F_FP_F, end);
+		break;
+	    case 'g':		/* g - spamicity as 'g' format */
+		buff += format_float(buff, spamicity, min, prec, flags | F_FP_G, end);
 		break;
 	    case 'h':		/* h - spam_header_name, e.g. "X-Bogosity" */
 		buff += format_string(buff, spam_header_name, 0, prec, flags, end);

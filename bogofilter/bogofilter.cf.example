@@ -106,6 +106,7 @@
 #
 #	    e - spamicity as 'e' format
 #	    f - spamicity as 'f' format
+#	    g - spamicity as 'g' format
 #
 #	    l - logging tag (from '-l' option)
 #
