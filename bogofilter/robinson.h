@@ -44,12 +44,10 @@ extern	double	rob_compute_spamicity(wordhash_t *wordhash, FILE *fp); /*@globals 
 extern	void	rob_print_stats(FILE *fp);
 extern	void	rob_cleanup(void);
 
-#ifdef	ENABLE_ROBINSON_METHOD
 extern	rf_method_t rf_robinson_method;
 
 /* needed by fisher.c */
 extern	const	parm_desc rob_parm_table[];
 extern	void    rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double _spam_cutoff);
-#endif
 
 #endif	/* ROBINSON_H */
