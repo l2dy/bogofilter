@@ -304,6 +304,11 @@ void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double 
 	robx = l_robx ? (double)l_robx / 1000000 : ROBX;
     }
 
+    if (robx < 0.0 || 1.0 < robx) {
+	fprintf(stderr, "Invalid robx value (%f).  Must be between 0.0 and 1.0\n", robx);
+	exit(2);
+    }
+
     word_free(word_robx);
 }
 
