@@ -25,6 +25,7 @@ AUTHORS:
 #include "bogofilter.h"
 #include "bogohist.h"
 #include "bogohome.h"
+#include "bool.h"
 #include "buff.h"
 #include "configfile.h"
 #include "datastore.h"
@@ -44,7 +45,6 @@ AUTHORS:
 /* prototypes for dummies below: */
 #include "score.h"
 
-
 const char *progname = "bogoutil";
 
 static int token_count = 0;
@@ -61,6 +61,15 @@ static int process_arg(int option, const char *name, const char *arg);
 /* dummies to avoid score.o */
 double msg_spamicity(void) { return .0; }
 rc_t msg_status(void) { return RC_OK; }
+
+static bool get_bool(const char *name, const char *arg)
+{
+    bool b = str_to_bool(arg);
+    if (DEBUG_CONFIG(2))
+	fprintf(dbgout, "%s -> %s\n", name,
+		b ? "Yes" : "No");
+    return b;
+}
 
 static int ds_dump_hook(word_t *key, dsv_t *data,
 			/*@unused@*/ void *userdata)
@@ -740,6 +749,10 @@ static int process_arg(int option, const char *name, const char *val)
 
     case 'D':
 	dbgout = stdout;
+	break;
+
+    case O_DB_TRANSACTION:
+	fTransaction = get_bool(name, val);
 	break;
 
     case O_DB_VERIFY:
