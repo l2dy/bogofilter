@@ -190,11 +190,14 @@ int yyinput(byte *buf, size_t max_size)
 
     count = get_decoded_line(buf, max_size);
 
-    if ((count > 0) && !msg_header && !msg_state->mime_header)	/* do nothing if in header */
+    /* do nothing if in header */
+
+    if ((count > 0)
+	&& ! (msg_header || msg_state->mime_header)
+	&& msg_state->mime_type == MIME_TEXT_HTML)
     {
-	if (kill_html_comments || score_html_comments ) {
+	if (kill_html_comments || score_html_comments )
 	    count = process_html_comments(buf, count, max_size);
-	}
     }
 
     for (i = 0; i < count; i++ )
