@@ -42,7 +42,7 @@ registration and whitelist management. HTML Templatized for easy integration
 with existing web mail systems.
 
 9) Performance Enhancement: Investigate if mmap/msync might help
-performance. Don't the db3 libraries probably already implement these?
+performance. The db4 library does it already.
 
 10) New Feature: Add support for a user configurable list of headers that 
 should be used to ignore (single or multi-line) headers that appear in the 
@@ -55,15 +55,11 @@ undef'ed and make HAVE_FCNTL defined if the system supports it. Cause
 the configure script to fail if this option is used on a system that does 
 not have fcntl support.
 
-12) Record the message count as a value in the db file. Use a magic key that 
-can't collide with any words (by using uppercase letters or nonprintable 
-characters). This will obviate the need for .count files.
-
-13) Create a wordlist import/export tool that runs as a separate CLI
+12) Create a wordlist import/export tool that runs as a separate CLI
 program. It should be able to dump wordlists into 'makemap' compatible text
 files, and be able to convert those files back to wordlist files.
 
-14) Provide support for the BerkeleyDB v1 API. If the configure script can't
+13) Provide support for the BerkeleyDB v1 API. If the configure script can't
 find a version 2+ version of the BerkeleyDB package, it should #define
 a variable that allows alternate database procedures to be compiled in.
 
