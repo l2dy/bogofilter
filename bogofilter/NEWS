@@ -21,6 +21,15 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+0.93.4	2005-01-XX
+
+	2005-01-05
+
+	* Fix --enable-transactions logic, was inverted since 2004-12-26
+	  (affected release: 0.93.3.1 only, 0.93.3 was fine). Note that
+	  giving neither --enable-transactions nor --disable-transactions woudl
+	  still enable transactions.
+
 	2005-01-04
 
 	* bogoutil now reads the configuration files to know the user's
