@@ -94,7 +94,7 @@ void init_wordlist(const char* name, const char* path,
 
 wordlist_t *get_default_wordlist(wordlist_t *list)
 {
-    for (;; list = list->next)
+    for (; list != NULL ; list = list->next)
     {
 	if (list->type != WL_IGNORE)
 	    return list;
