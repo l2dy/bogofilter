@@ -74,30 +74,3 @@ unsure-bogofilter
 # spam-spamassassin
 
 #### end SpamAssassin ####
-
-
-# #### bogofilter query-update-passthrough ####
-#
-#      Alternate approach using return codes from bogofilter.
-# 
-# :0HB
-# * ? bogofilter -e v
-# {
-# 	:0c
-# 	| bogofilter -s
-# 
-# 	:0fw
-# 	| bogofilter -p
-# 	/var/spool/mail/admin
-# }
-# 
-# #else (E)
-# 
-# :0Ec
-# | bogofilter -n
-# 
-# #always
-# :0fw
-# | bogofilter -p 
-# 
-# #### end bogofilter query-update-passthrough ####
