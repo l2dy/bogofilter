@@ -10,7 +10,13 @@
 */
 
 #include <stdlib.h>
+
+#include "config.h"
 #include "xmalloc.h"
+
+#ifdef	ENABLE_MEMDEBUG
+#include "memdebug.h"
+#endif
 
 void
 *xrealloc(void *ptr, size_t size){

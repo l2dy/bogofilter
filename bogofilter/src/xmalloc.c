@@ -10,8 +10,13 @@
 */
 
 #include <stdlib.h>
-#include "xmalloc.h"
 
+#include "config.h"
+
+#include "xmalloc.h"
+#ifdef	ENABLE_MEMDEBUG
+#include "memdebug.h"
+#endif
 
 void *
 xmalloc(size_t size){

@@ -19,6 +19,10 @@ ROBINSON_SRC = robinson.c robinson.h
 endif
 endif
 
+if ENABLE_MEMDEBUG
+MEMDEBUG_SRC = memdebug.c memdebug.h
+endif
+
 AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc
 AM_CFLAGS = -DBOGOFILTER
 
@@ -69,6 +73,7 @@ libbogofilter_a_SOURCES= \
 	xstrdup.h xstrdup.c \
 	xstrlcat.h xstrlcat.c \
 	xstrlcpy.h xstrlcpy.c \
+	$(MEMDEBUG_SRC) \
 	dcdflib/src/dcdflib.c dcdflib/src/ipmpar.c \
 	xatox.h xatof.c xatoi.c
 

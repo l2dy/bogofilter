@@ -47,6 +47,9 @@ CONTRIBUTORS:
 #include "token.h"
 #include "wordlists.h"
 #include "xmalloc.h"
+#ifdef	ENABLE_MEMDEBUG
+#include "memdebug.h"
+#endif
 
 #define	NL	"\n"
 #define	CRLF	"\r\n"
@@ -191,6 +194,10 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     mime_cleanup();
     token_cleanup();
     xfree(directory);
+
+#ifdef	ENABLE_MEMDEBUG
+    memdisplay();
+#endif
 
     exit(exitcode);
 }
