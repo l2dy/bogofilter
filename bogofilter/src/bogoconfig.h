@@ -20,6 +20,6 @@ extern const char *spam_header_name;
 extern const char *user_config_file;
 
 extern void query_config(void);
-extern int  process_args_and_config_file(int argc, char **argv, bool warn_on_error);
+extern void process_args_and_config_file(int argc, char **argv, bool warn_on_error);
 
 #endif

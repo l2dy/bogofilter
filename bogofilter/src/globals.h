@@ -24,7 +24,6 @@ extern	bool	logflag;		/* '-l' */
 extern	bool	terse;			/* '-t' */
 extern	bool	quiet;			/* '-q' */
 extern	bool	passthrough;		/* '-p' */
-extern	bool	bulk_mode;		/* '-B' */
 extern	int	verbose;		/* '-v' */
 extern	FILE	*fpin;			/* '-I' */
 
