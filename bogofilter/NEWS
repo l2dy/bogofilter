@@ -5,6 +5,12 @@
 NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+0.92.6	2004-08-22
+
+	* Revise "-QQ" output so it can be used (unchanged) in a
+          config file.
+	* Remove obsolete "--with-db" option from configure.ac
+
 0.92.5	2004-08-20
 
 	2004-08-17

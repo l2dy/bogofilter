@@ -10,6 +10,11 @@ line tests.  Use options, config files, and wordlists from your
 production environment.  This will help ensure that the new version of
 bogofilter is working properly.
 
+0.92.6	2004-08-22
+
+* Revise "-QQ" output so it can be used (unchanged) in a config file.
+* Remove obsolete "--with-db" option from configure.ac
+
 0.92.5	2004-08-20
 
 * Improve documentation of '-B' and '-y' options.
