@@ -114,9 +114,9 @@ const char POSIX_space[] = " \f\n\r\t\v";
 static byte *spanword(byte *t)
 {
     /* skip leading whitespace */
-    t += strspn(t, POSIX_space);
+    t += strspn((const char *)t, POSIX_space);
     /* span current word */
-    t += strcspn(t, POSIX_space);
+    t += strcspn((const char *)t, POSIX_space);
     if (*t)
 	*t++ = '\0';
     return t;
