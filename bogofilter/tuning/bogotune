@@ -1,6 +1,6 @@
 #! /usr/bin/perl
 # bogotune - a bogofilter tuning tool
-# 20030619, version 0.2.2
+# 20030621, version 0.2.4
 # Copyright (c) 2003 Gregory Louis; distributed wiithout warranty of
 # any kind under the GNU General Public License (GPL).
 
@@ -34,8 +34,8 @@ if(scalar @ARGV == 0 || $ARGV[0] eq "-h") {
 	"  nonspam messages, and the ratio of spam to nonspam must be in\n",
 	"  the range 0.2 to 5. There must be at least 500 spam messages\n",
 	"  and 500 nonspam in the message files. Message files must all\n",
-	"  be in either mbox or message-count format; don't mix files of\n",
-	"  both types.\n",
+	"  be in MH, mbox or message-count format; don't mix files of\n",
+	"  different types.\n",
 	"COMMAND LINE PARAMETERS\n",
 	"  bogodir   The directory where the training database is stored.\n",
 	"	     bogodir defaults to \$BOGOFILTER_DIR, if defined, or\n",
@@ -127,38 +127,80 @@ if($twolist) {
 
 ### 2.  Validate test inputs; create msg-count files if need be
 # Check that at least 500 each of spam and nonspam are available for
-# testing, in either mbox or msg-count format.
+# testing, in MH, mbox or msg-count format.
 
 print("Verifying test files...\n");
-$msgcountfiles = 0;
-$cmd = join(" ", "cat", @spfiles, "| grep -c '^From ' |");
-open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
-$scount = <COUNTS>; chop $scount; close COUNTS;
-$cmd = join(" ", "cat", @nsfiles, "| grep -c '^From ' |");
-open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
-$ncount = <COUNTS>; chop $ncount; close COUNTS;
-if($scount < 500 || $ncount < 500) {
-    $msgcountfiles = 1;
-    $cmd = join(" ", "cat", @spfiles, "| grep -c '^.\.MSG_COUNT' |");
+$msgformat = "mbox";
+if(-d $spfiles[0]) {
+    $msgformat = "MH"; $scount = 0;
+    foreach $dir (@spfiles) {
+	$n = `ls $dir/[0-9]* 2>/dev/null | wc -l`;
+	$scount += $n;
+    }
+    $ncount = 0;
+    foreach $dir (@nsfiles) {
+	$n = `ls $dir/[0-9]* 2>/dev/null | wc -l`;
+	$ncount += $n;
+    }
+} else {
+    $cmd = join(" ", "cat", @spfiles, "| grep -c '^From ' |");
     open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
     $scount = <COUNTS>; chop $scount; close COUNTS;
-    $cmd = join(" ", "cat", @nsfiles, "| grep -c '^.\.MSG_COUNT' |");
+    $cmd = join(" ", "cat", @nsfiles, "| grep -c '^From ' |");
     open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
     $ncount = <COUNTS>; chop $ncount; close COUNTS;
-    if($scount < 500 || $ncount < 500) { yuk(4,
-	"At least 500 spam and 500 nonspam required for testing\n",
-	$scount, " and ", $ncount, " were found."); }
+    if($scount < 500 || $ncount < 500) {
+	$msgformat = "msgcount";
+	$cmd = join(" ", "cat", @spfiles, "| grep -c '^.\.MSG_COUNT' |");
+	open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
+	$scount = <COUNTS>; chop $scount; close COUNTS;
+	$cmd = join(" ", "cat", @nsfiles, "| grep -c '^.\.MSG_COUNT' |");
+	open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
+	$ncount = <COUNTS>; chop $ncount; close COUNTS;
+    }
 }
+if($scount < 500 || $ncount < 500) { yuk(4,
+    "At least 500 spam and 500 nonspam required for testing\n",
+    $scount, " and ", $ncount, " were found."); }
 print("Verification completed successfully.\n");
-if(! $msgcountfiles) {
-    print("Test files are in mbox format, creating message-count files...\n");
+if($msgformat ne "msgcount") {
+    print("Creating message-count files...\n");
     $spwork = $workfn . ".sp"; $nswork = $workfn . ".ns";
-    $cmd = join(" ", "cat", @spfiles, "| formail -s bogol", $bogodir,
-	">", $spwork);
-    system($cmd) == 0 or yuk(7, "Problem processing spam files");
-    $cmd = join(" ", "cat", @nsfiles, "| formail -s bogol", $bogodir,
-	">", $nswork);
-    system($cmd) == 0 or yuk(7, "Problem processing nonspam files");
+    if($msgformat eq "mbox") {
+	$cmd = join(" ", "cat", @spfiles, "| formail -s bogol", $bogodir,
+	    $cf, ">", $spwork);
+	system($cmd) == 0 or yuk(7, "Problem processing spam files");
+	$cmd = join(" ", "cat", @nsfiles, "| formail -s bogol", $bogodir,
+	    $cf, ">", $nswork);
+	system($cmd) == 0 or yuk(7, "Problem processing nonspam files");
+    } else {
+	unlink($spwork);
+	foreach $dir (@spfiles) {
+	    opendir(DH, $dir) or yuk(7, "Problem processing spam files");
+	    @msgs = readdir(DH); closedir(DH);
+	    foreach $msg(@msgs) {
+		if($msg =~ /^[0-9]/) {
+		    $cmd = join(" ", "cat $dir/$msg | bogol", $bogodir, $cf,
+			">>$spwork");
+		    system($cmd) == 0 or
+			yuk(7, "Problem writing spam msg-count file");
+		}
+	    }
+	}
+	unlink($nswork);
+	foreach $dir (@nsfiles) {
+	    opendir(DH, $dir) or yuk(7, "Problem processing nonspam files");
+	    @msgs = readdir(DH); closedir(DH);
+	    foreach $msg(@msgs) {
+		if($msg =~ /^[0-9]/) {
+		    $cmd = join(" ", "cat $dir/$msg | bogol", $bogodir, $cf,
+			">>$nswork");
+		    system($cmd) == 0 or
+			yuk(7, "Problem writing nonspam msg-count file");
+		}
+	    }
+	}
+    }
     @spfiles = $spwork; @nsfiles = $nswork;
     print("Message-count files ", $workfn, ".{sp,ns} created\n");
 }
@@ -174,7 +216,7 @@ if($twolist) {
     $cmd = "ls -l " . $bogodir . "/spamlist.db |";
     open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
     $counts = <COUNTS>; chop $counts; close COUNTS;
-    ($junk1, $junk2, $junk3, $junk4, $dbsize, $junk6) = split(/\s+/, $counts);
+    ($junk1, $junk2, $junk3, $junk4, $dbs2, $junk6) = split(/\s+/, $counts);
     if($dbs2 > $dbsize) { $dbsize = $dbs2; }
 }
 $cachesize = POSIX::ceil($dbsize / (1024*1024*3));
@@ -351,7 +393,7 @@ foreach $scantype ("coarse", "fine") {
     }
     $med = $parms[int(scalar @parms / 2)][5];
     if($verbose) { print("Median fn count was ", $med, "\n"); }
-    $n = 0;
+    $n = $o = 0;
     foreach $i (0 .. $#parms) {
 	$rsi = $parms[$i][0]; $mdi = $parms[$i][1]; $rxi = $parms[$i][2];
 	if(    ($rsi == 0       || gfn($rsi-1, $mdi, $rxi) < $med)
@@ -362,11 +404,16 @@ foreach $scantype ("coarse", "fine") {
 	    && ($rxi == $#rxval || gfn($rsi, $mdi, $rxi+1) < $med)) {
 	    $n = 1; last;
 	}
+	$o = $i;
+    }
+    if($o > 0) {
+	 print($o, " outlier", $o > 1 ? "s" : "", " encountered.",
+	"                                                   \n");
     }
     if($n == 0) {
 	$rsi = $parms[0][0]; $mdi = $parms[0][1]; $rxi = $parms[0][2];
 	print("No smooth minimum encountered, using lowest fn count",
-	    "                       \n");
+	    " (an outlier).         \n");
     }
     $robs = $rsval[$rsi]; $md = $mdval[$mdi]; $robx = $rxval[$rxi];
     printf("Minimum found at s %0.4f, md %0.3f, x %0.3f %s\n",

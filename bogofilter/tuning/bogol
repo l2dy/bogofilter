@@ -5,7 +5,7 @@ cat <<EOT
 NAME
   bogol - lexical analysis and database lookup for an email message
 SYNOPSIS
-  bogol [-h | path/to/bogofilter/directory]
+  bogol [-h | path/to/bogofilter/directory [bogolexer options]]
 DESCRIPTION
   bogol creates a message digest consisting of a .MSG_COUNT line,
   followed by one line per token. The format is
@@ -24,14 +24,16 @@ OPTIONS
   -h    The option -h displays help.
 BOGOFILTER DIRECTORY
   The bogofilter directory is where the wordlists are kept. It defaults
-  to ~/.bogofilter if no path is provided on the command line.
+  to ~/.bogofilter if no path is provided on the command line.  The
+  path must be provided if further options are given; any further
+  options are passed through to bogolexer.
 SEE ALSO
   bogofilter(1), bogolexer(1), bogoutil(1), apclass(1).
 EOT
 exit 0
 fi
 db=~/.bogofilter
-test "x$1" = "x" || db=$1
-( echo .MSG_COUNT; bogolexer -p | sort -u) | \
+if [ "x$1" != "x" ]; then db=$1; shift; fi
+( echo .MSG_COUNT; bogolexer -p $* | sort -u ) | \
     bogoutil -w $db | \
     awk 'NF == 3 {printf("\"%s\" %s %s\n", $1, $2, $3)}'

@@ -1,4 +1,4 @@
-README for bogotune version 0.2.2
+README for bogotune version 0.2.4
 (How to tune bogofilter with minimum effort)
 
 This document describes a script called bogotune that will completely
@@ -71,10 +71,12 @@ for each combination of parameters tried, where the numbers are the
 values of s, min_dev, x, the spam cutoff and the counts of false
 positives and false negatives, respectively.
 
-The message files may be in either mbox or msg-count format, but they
-must all be one or the other; don't mix them.  If they're in mbox
+The message files may be in MH, mbox or msg-count format, but they must
+all be of the same type; don't mix them.  If they're not in msg-count
 format, you'll need enough free disk space so bogotune can create
-msg-count files to use in the scans.
+msg-count files to use in the scans.  (I _think_ bogotune should work
+with maildir format as well, but this has not been tested; feedback
+would be much appreciated.)
 
 If bogotune aborts, there may be leftover files named Rxxx in the
 directory from which bogotune ran; the xxx stands for some number of
