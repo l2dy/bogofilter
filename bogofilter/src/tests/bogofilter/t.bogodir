@@ -33,7 +33,7 @@ map_rc()
 	echo >> $LOG "$@"
 	echo >> $LOG "### expect: $expect/goodlist.db"
 	result=`eval "$@" 2>&1 | tee -a $LOG | grep open | head -1`
-	ok=`echo $result | grep -w $expect/goodlist.db`
+	ok=`echo "$result" | grep "$expect/goodlist.db"`
 	if [ -n "$ok" ] ; then
 	    echo >> $LOG "### ok: $ok"
 	    echo >> $LOG "PASS"
