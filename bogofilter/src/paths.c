@@ -41,6 +41,14 @@ char *build_progtype(const char *name, const char *db_type)
  */
 int build_path(char* dest, size_t size, const char* dir, const char* file)
 {
+    /* If absolute path ... */
+    if (*file == '/') {
+	if (strlcpy(dest, file, size) >= size) 
+	    return -1;
+	else
+	    return 0;
+    }
+
     if (strlcpy(dest, dir, size) >= size) return -1;
 
     if ('/' != dest[strlen(dest)-1]) {
