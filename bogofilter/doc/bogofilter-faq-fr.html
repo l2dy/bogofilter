@@ -31,9 +31,6 @@
 	margin-top: 0.5em;
 	margin-bottom: 0;
       }
-      p.subheading {
-	font-weight: bold
-      }
       hr {
 	margin-top: 1em;
 	margin-bottom: 1em;
@@ -128,6 +125,10 @@
 
           <li><a href="#changed-tagging">Pourquoi, depuis que j'ai
           installé la 0.15, Bogofilter fonctionne-t-il moins bien?</a></li>
+	  
+	  <li><a href="#remove-spam-or-nonspam"> Avec une wordlist combinée, comment
+	  	puis-je détruire tous les tokens spams (ou les non-spams) ?
+		?</a></li>
         </ul>
       </li>
     </ul>
@@ -268,10 +269,12 @@
     (Si nécessaire, vous pouvez même ajuster le niveau de certitude). Comme le script s'assure
     que la base de données
     connaît "tout" votre corpus d'entrainement (avec la précision de votre choix), cela
-    fonctionne très bien.
-    Avec spam_cutoff=0.6 et un intervalle de 0.1 notre exemple donne:</p>
+    fonctionne très bien. Vous pouvez utilisez <code>-o</code> pour créer une marge de
+    sécurité autour de "spam_cutoff" 
+    Avec spam_cutoff=0.6 vous voudrez peut-être évaluer tous les hams
+    dans votre corpus en dessous de 0.3 et tous les spams au delà de 0.8. Notre exemple devient:</p>
 
-    <pre>    bogominitrain.pl -fnv ~/.bogofilter ham.mbx spam.mbx '-o 0.7,0.5'</pre></li>
+    <pre>    bogominitrain.pl -fnv ~/.bogofilter ham.mbx spam.mbx '-o 0.8,0.3'</pre></li> 
 
     <li><p>Méthode 3) Utilisez le script randomtrain (dans le répertoire contrib).
     Le script génère une liste de tous les messages dans les mailbox, mélange la liste, puis
@@ -318,7 +321,17 @@
         bogofilter -n &lt; corpus.bad
 	rm -f corpus.*</pre></li>
     </ul>
- 
+    <h3>Comparaison de ces méthodes</h3>
+    <p>Il est important de comprendre les conséquences des méthodes que
+    nous venons de décrire. Faire un entrainement complet, tel que dans les
+    méthodes 1 et 4 produit une base de données plus grande que ne le
+    ferait un entrainement avec les méthodes 2 ou 3. Si votre base de données
+    doit être de petite taille (par exemple à cause de quotas), utilisez les
+    m&eacutes;thodes 2 ou 3.</p>
+    <p>L'entrainement avec la méthode 1 est le plus rapide. L'entrainement sur erreur
+    (tel que décrit dans les méthodes 2,3 et 4) est efficace, mais
+    l'apprentissage est plut&ocirc;t lent.</p>
+
     <hr>
  
     <h2 id="train_on_error">Qu'est-ce que "l'entrainement sur erreur" et "l'entrainement sur épuisement"?</h2>
@@ -330,6 +343,12 @@
     réapprendre avec des spams ou hams évidents. L'apprentissage est un peu plus rapide si l'on a commencé
     avec une période d'entrainement "brut" de 10 000 spams et 10 000 hams.)</p>
 
+    <p> Cette méthode peut être améliorée en utilisant une "marge de
+    sécurité". En augmentant la valeur "spam cutoff" et en diminuant la valeur "ham cutoff",
+    les messages qui sont proches du seuil seront utilisés, pour l'entrainement. L'utilisation de
+    cette marge de sécurité a montré son efficacité à améliorer les
+    résultats dans l'entrainement sur erreur.</p>
+           
     <p>"L'entrainement sur épuisement" est la répétition de l'entrainement sur erreur, avec le même corpus
     de messages, jusqu'à ce que plus aucune erreur ne subsiste. Ceci a bien fonctionné sur plusieurs tests,
     mais peut être risqué.</p>
@@ -342,7 +361,7 @@
     <p>L'intégration multipliée de messages (telle que décrite dans l'entrainement sur épuisement).
     crée une distribution des tokens dans la base de données qui diffère de celle des messages d'entrée.
     Ceci constitue une violation des postulats de la classification bayésienne, et peut donc aboutir
-    à des résultats imprévisibles. Mais, meme théoriquement faux, en pratique, "l'entrainement
+    à des résultats imprévisibles. Mais, même théoriquement faux, en pratique, "l'entrainement
     sur épuisement" semble fonctionner.</p>
 
     <p>Les tokens qui apparaissent "normalement" de manière plus ou moins équitable
@@ -354,7 +373,8 @@
     <p>
     Note: <code>bogominitrain.pl</code> possède une option <code>-f</code> qui permet de réaliser
     "l'entrainement sur épuisement". Si
-    vous choisissez de l'utiliser, soyez conscient des effets secondaires possibles.</p>
+    vous choisissez de l'utiliser, soyez conscient des effets secondaires possibles. L'utilisation
+    de <code>-fn</code> évite de répéter l'entrainement pour chaque message.</p>
 
     <hr>
 
@@ -397,8 +417,7 @@
     les erreurs, puis séparer les incertains en hams et spam. Jusqu'à ce que vous ayez 10000 spams et 10000 hams
     dans votre base d'apprentissage, entraînez avec les hams, les spams, puis les erreurs et enfin les incertains.
     Plus tard, vous n'entrainerez qu'avec les erreurs et les incertains, en ignorant les messagess que Bogofilter
-    a correctement classé. Cette methode vous donnera une discrimination proche de l'optimal tout en
-    limitant au minimum le nombre de messages traités.
+    a correctement classé.
     </p>
 
     <p>Notez que vous devrez régulièrement lancer :</p>
@@ -698,7 +717,7 @@ pour chacun d'eux.
     <p>Puis, téléchargez la <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">version
     portable</a> de Bogofilter.</p>
 
-    <p class="subheading">Sur Solaris</p>
+    <h3>Sur Solaris</h3>
 
     <p>Décompactez la, puis faites:</p>
     <pre>	$ ./configure --with-db=/usr/local/BerkeleyDB-4.1
@@ -717,7 +736,7 @@ pour chacun d'eux.
     source (comme suggéré ci-avant), soit vous utilisez GNU make
     (gmake).</p>
 
-    <p class="subheading">Sur FreeBSD</p>
+    <h3>Sur FreeBSD</h3>
 
     <p>Des paquetages existent avec des versions très récentes de
     Bogofilter. Cette approche utilisent les paquetages très
@@ -732,7 +751,7 @@ pour chacun d'eux.
     taper</p>
     <pre>	# portupgrade -N bogofilter</pre>
 
-    <p class="subheading">Sur HP-UX</p>
+    <h3>Sur HP-UX</h3>
 
     <p>Regardez le fichier doc/programmer/README.hp-ux dans la
     distribution des sources.</p>
@@ -862,7 +881,30 @@ pour chacun d'eux.
       les entrées "head:token" dans la base. Après un mois environ d'utilisation du "-H",
       la base devrait contenir suffisamment d'entrées avec le préfixe "head:" et l'utilisation
       du "-H" ne sera plus nécessaire.</p>
-      
+      <hr>
+      <h2 id="remove-spam-or-nonspam"> Avec une wordlist combinée, comment
+          puis-je détruire tous les tokens spams (ou les non-spams) ?</h2>
+
+      <p>Bogoutil vous permet de lister (dump) une wordlist et de charger les tokens dans
+      une nouvelle wordlist. Avec l'aide d'outils tels que awk et grep, les nombres peuvent
+      être mis à zéros et les tokens dont les comptes seraient à
+      zéro pour les spams et les hams pourraient être détruits.</p>
+   
+      <p>Les commandes suivantes vont détruire les tokens des messages spams :
+
+      <pre>    bogoutil -d wordlist.db | \
+       awk '{print $1 " " $2 " 0"}' | grep -v " 0 0" | \
+       bogoutil -l wordlist.new.db
+      </pre>
+      </p>
+   
+       <p>Les commandes suivantes vont détruire les tokens provenant des messages hams.
+   <pre>    bogoutil -d wordlist.db | \
+       awk '{print $1 " 0 " $3}' | grep -v " 0 0" | \
+       bogoutil -l wordlist.new.db
+   </pre>
+   </p>
+   
 
     <!--
     $Id$
