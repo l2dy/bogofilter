@@ -80,29 +80,60 @@ static int db_dump_hook(word_t *key, word_t *data,
     return !!ferror(stdout);
 }
 
-static int count_hook(word_t *key, word_t *data,
-		      void *userdata)
-{
-    uint32_t *counter = userdata;
-
-    (void)data;		/* unused */
-    *counter += 1;
-
-    if (verbose > 3) {
-	fputs("count: ", dbgout);
-	word_puts(key, 0, dbgout);
-	fputc('\n', dbgout);
-    }
-
-    return 0;
-}
-
 struct robhook_data {
     double *sum;
     uint32_t *count;
-    void *dbh_good;
+    void *dbh_good, *dbh_spam;
     double scalefactor;
 };
+
+static int count_hook(word_t *key, word_t *data,
+		      void *userdata)
+{
+    struct robhook_data *rd = userdata;
+
+    uint32_t goodness;
+    uint32_t spamness;
+    double   prob;
+    static word_t *x;
+    static size_t x_size = MAXTOKENLEN + 1;
+
+    /* ignore system meta-data */
+    if (*key->text == '.')
+	return 0;
+
+    /* ignore short read */
+    if (data->leng < sizeof(uint32_t))
+	return 0;
+
+    if (x == NULL || key->leng + 1 > x_size) {
+	if (x) word_free(x);
+	x_size = max(x_size, key->leng + 1);
+	x = word_new(NULL, x_size);
+    }
+
+    word_cpy(x, key);
+
+    memcpy(&goodness, data->text, sizeof(uint32_t));
+    spamness = db_getvalue(rd->dbh_spam, x);
+
+    prob = spamness / (goodness * rd->scalefactor + spamness);
+    if (goodness + spamness >= 10) {
+	(*rd->sum) += prob;
+	(*rd->count) += 1;
+    }
+
+    /* print if token in both word lists */
+    if ((verbose > 1 && goodness && spamness) || verbose > 2) {
+	printf("cnt: %4lu,  sum: %11.6f,  ratio: %9.6f,"
+	       "  sp: %3lu,  gd: %3lu,  p: %9.6f,  t: ", 
+	       (unsigned long)*rd->count, *rd->sum, *rd->sum / *rd->count,
+	       (unsigned long)spamness, (unsigned long)goodness, prob);
+	word_puts(x, 0, stdout);
+	fputc( '\n', stdout);
+    }
+    return 0;
+}
 
 static int robx_hook(word_t *key, word_t *data, 
 		     void *userdata)
@@ -134,22 +165,23 @@ static int robx_hook(word_t *key, word_t *data,
     memcpy(&spamness, data->text, sizeof(uint32_t));
     goodness = db_getvalue(rd->dbh_good, x);
 
-    prob = spamness / (goodness * rd->scalefactor + spamness);
-    (*rd->sum) += prob;
-
     /* tokens in good list were already counted */
     /* now add in tokens only in spam list */
-    if (goodness == 0)
-	(*rd->count) ++;
-
-    /* print if token in both word lists */
-    if ((verbose > 1 && goodness && spamness) || verbose > 2) {
-	printf("cnt: %4lu,  sum: %11.6f,  ratio: %9.6f,"
-		"  sp: %3lu,  gd: %3lu,  p: %9.6f,  t: ", 
-	       (unsigned long)*rd->count, *rd->sum, *rd->sum / *rd->count,
-	       (unsigned long)spamness, (unsigned long)goodness, prob);
-	word_puts(x, 0, stdout);
-	fputc( '\n', stdout);
+    if (goodness == 0) {
+	prob = 1.0;
+	if (spamness >= 10) {
+	    (*rd->sum) += prob;
+	    (*rd->count) += 1;
+	}
+	/* print if token in both word lists */
+	if ((verbose > 1 && goodness && spamness) || verbose > 2) {
+	    printf("cnt: %4lu,  sum: %11.6f,  ratio: %9.6f,"
+		   "  sp: %3lu,  gd: %3lu,  p: %9.6f,  t: ", 
+		   (unsigned long)*rd->count, *rd->sum, *rd->sum / *rd->count,
+		   (unsigned long)spamness, (unsigned long)goodness, prob);
+	    word_puts(x, 0, stdout);
+	    fputc( '\n', stdout);
+	}
     }
     return 0;
 }
@@ -188,8 +220,8 @@ static int dump_file(char *db_file)
 
 static byte *spanword(byte *t)
 {
-    while (isspace(*t)) t += 1;	/* skip leading whitespace  */
-    while (*t && !isspace(*t)) t += 1;	/* span current word        */
+    while (isspace(*t)) t += 1;		/* skip leading whitespace */
+    while (*t && !isspace(*t)) t += 1;	/* span current word	   */
     if (*t)
 	*t++ = '\0';
     return t;
@@ -445,8 +477,7 @@ static int display_words(const char *path, int argc, char **argv, bool prob)
 
 static double compute_robx(void *dbh_spam, void *dbh_good)
 {
-    uint32_t good_cnt = 0;
-    uint32_t spam_cnt = 0;
+    uint32_t tok_cnt = 0;
     double sum = 0.0;
     double robx;
 
@@ -457,17 +488,18 @@ static double compute_robx(void *dbh_spam, void *dbh_good)
     msg_spam = db_get_msgcount( dbh_spam );
     rh.scalefactor = (double)msg_spam/msg_good;
     rh.dbh_good = dbh_good;
+    rh.dbh_spam = dbh_spam;
     rh.sum = &sum;
-    rh.count = &spam_cnt;
+    rh.count = &tok_cnt;
 
-    db_foreach(dbh_good, count_hook, &good_cnt);
+    db_foreach(dbh_good, count_hook, &rh);
     db_foreach(dbh_spam, robx_hook, &rh);
 
-    robx = sum/(spam_cnt + good_cnt);
+    robx = sum/tok_cnt;
     if (verbose)
-	printf( ".MSG_COUNT: %lu, %lu, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
-		(unsigned long)msg_spam, (unsigned long)msg_good, rh.scalefactor, sum, (int)(spam_cnt + good_cnt), robx);
-
+	printf(".MSG_COUNT: %lu, %lu, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
+	       (unsigned long)msg_spam, (unsigned long)msg_good, rh.scalefactor,
+	       sum, (int)tok_cnt, robx);
     return robx;
 }
 
