@@ -4,6 +4,11 @@
 
 $Id$
      
+0.11.0.1
+
+	2003-03-05
+	* Fixed flaw that caused user config file to be ignored.
+
 0.11.1  2003-03-04
 
 	2003-03-04
