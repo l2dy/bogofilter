@@ -62,8 +62,10 @@ double thresh_rtable = 0.0f;
 /*---------------------------------------------------------------------------*/
 
 typedef enum {
+	CP_BOOLEAN,
 	CP_INTEGER,
 	CP_DOUBLE,
+	CP_CHAR,
 	CP_STRING,
 	CP_WORDLIST
 } ArgType;
@@ -73,9 +75,11 @@ typedef struct {
     ArgType	type;
     union
     {
-	int *	i;
-	double *	d;
-	char **	s;
+	bool	*b;
+	int	*i;
+	double	*d;
+	char	*c;
+	char	**s;
     } addr;
 } ArgDefinition;
 
@@ -102,6 +106,26 @@ static bool process_config_parameter(const ArgDefinition * arg, const char *val)
     while (isspace(*val) || *val == '=') val += 1;
     switch (arg->type)
     {
+	case CP_BOOLEAN:
+	    {
+		char ch=tolower(*val);
+		switch (ch)
+		{
+		case 'Y':		// Yes
+		case 'T':		// True
+		case '1':
+		    *arg->addr.b = TRUE;
+		    break;
+		case 'N':		// No
+		case 'F':		// False
+		case '0':
+		    *arg->addr.b = FALSE;
+		    break;
+		}
+		if (DEBUG_CONFIG(0))
+		    fprintf( stderr, "%s -> %s\n", arg->name, *arg->addr.b == TRUE ? "Yes" : "No" );
+		break;
+	    }
 	case CP_INTEGER:
 	    {
 		int sign = (*val == '-') ? -1 : 1;
@@ -120,6 +144,13 @@ static bool process_config_parameter(const ArgDefinition * arg, const char *val)
 		*arg->addr.d = atof(val) * sign;
 		if (DEBUG_CONFIG(0))
 		    fprintf( stderr, "%s -> %f\n", arg->name, *arg->addr.d );
+		break;
+	    }
+	case CP_CHAR:
+	    {
+		*arg->addr.c = * (char *)val;
+		if (DEBUG_CONFIG(0))
+		    fprintf( stderr, "%s -> '%c'\n", arg->name, *arg->addr.c );
 		break;
 	    }
 	case CP_STRING:
