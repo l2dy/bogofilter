@@ -21,10 +21,11 @@ NAME:
 #include "token.h"
 
 /* exports */
-bool logflag;		/* '-l' */
-bool quiet;		/* '-q' */
-int  passthrough;	/* '-p' */
-int  verbose;		/* '-v' */
+bool logflag;				/* '-l' */
+bool quiet;				/* '-q' */
+int  passthrough;			/* '-p' */
+int  verbose;				/* '-v' */
+bool replace_nonascii_characters;	/* '-n' */
 
 const char *progname = "bogolexer";
 
