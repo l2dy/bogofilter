@@ -28,7 +28,7 @@ for f in $BOGOFILTER_DIR/????list.db ; do
     basename $f >> $OUT
 done
 $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT $WORDS >> $OUT
-echo Subject: Earn Your College Degree Online | $BOGOFILTER -uT -D -W >> $OUT
+echo Subject: Earn Your College Degree Online | $BOGOFILTER -C -uT -D -W >> $OUT
 $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT $WORDS >> $OUT
 
 COM=`$BOGOUTIL -W -w $BOGOFILTER_DIR .MSG_COUNT | tail -1 | $AWK '{printf "%s %s", $2, $3}'`
@@ -45,7 +45,7 @@ for f in $BOGOFILTER_DIR/????list.db ; do
     basename $f >> $OUT
 done
 $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT $WORDS >> $OUT
-echo Subject: Earn Your College Degree Online | $BOGOFILTER -uT -D -WW >> $OUT
+echo Subject: Earn Your College Degree Online | $BOGOFILTER -C -uT -D -WW >> $OUT
 $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT $WORDS >> $OUT
 
 SEP=`$BOGOUTIL -WW -w $BOGOFILTER_DIR .MSG_COUNT | tail -1 | $AWK '{printf "%s %s", $2, $3}'`
