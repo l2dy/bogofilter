@@ -69,7 +69,7 @@ endif
 if !ENABLE_ICONV
 CHARSET_SOURCES = charset.h charset.c chUnicodeTo866.h
 else
-CHARSET_SOURCES = charset.h iconvert.h iconvert.c
+CHARSET_SOURCES = charset.h charset_iconv.c iconvert.h iconvert.c
 endif
 
 # what to build that from
