@@ -234,18 +234,14 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
   /* This has to match just as much or more than the below rules, so as to be the 
      controlling rule. */
-<HTML>{TOKEN}{HTMLTOKEN}*{BREAKHTML}+{HTMLTOKEN}*.?	|
-
-<HTML>{TOKEN}({HTMLTOKEN})+{WHITESPACE}		{ 
+<HTML>{TOKEN}({HTMLTOKEN}*{BREAKHTML}+{HTMLTOKEN}*.?|({HTMLTOKEN})+{WHITESPACE})		{ 
     			char *chr = memchr(yytext, '<', yyleng);	/* find start of html tag */
 			size_t len = chr - yytext;
 			yyless(len);
 			return TOKEN;
 			}
 
-<HTML>{TOKEN}({HTMLTOKEN})+/{NOTWHITESPACE} 	{ reorder_html(); }
-<HTML>{A2}({HTMLTOKEN})+/{NOTWHITESPACE}	{ reorder_html(); }
-<HTML>{A1}({HTMLTOKEN})+/{NOTWHITESPACE} 	{ reorder_html(); }
+<HTML>({TOKEN}|{A2}|{A1})({HTMLTOKEN})+/{NOTWHITESPACE} 	{ reorder_html(); }
 
 <HTML>"<!--"					{ BEGIN SCOMMENT; }
 <HTML>"<!"					{ BEGIN (strict_check ? HTOKEN : LCOMMENT ); }
@@ -253,20 +249,17 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <HTML>"<"					{ BEGIN HDISCARD; }	/* unknown tag */
 
 <HTOKEN>{TOKEN}					{ if (tokenize_html_tags)     return TOKEN; }
-<HDISCARD>{TOKEN}				{ /* discard innards of html tags     */ }
-<LCOMMENT>{TOKEN}				{ /* discard innards of html comments */ }
 <HSCRIPT>{TOKEN}				{ if (tokenize_html_script)   return TOKEN; }
-<SCOMMENT>{TOKEN}				;			/* discard innards of html comments */ 
+<HDISCARD,LCOMMENT,SCOMMENT>{TOKEN}		{ /* discard innards of html tokens and comments */ }
 
-<HTOKEN,HDISCARD>">"				{ BEGIN HTML; }		/* end of tag; return to normal html processing */
-<LCOMMENT>">"					{ BEGIN HTML; }		/* end of loose  comment; return to normal html processing */
+<HTOKEN,HDISCARD,LCOMMENT>">"			{ BEGIN HTML; }		/* end of tag; return to normal html processing */
+									/* end of loose  comment; return to normal html processing */
 <SCOMMENT>"-->"					{ BEGIN HTML; }		/* end of strict comment; return to normal html processing */
 
 {IPADDR}					{ return IPADDR;}
 {TOKEN}						{ return TOKEN;}
 
-${DOLLARS}					{ return TOKEN;}
-${DOLLARS}\.{CENTS}				{ return TOKEN;}
+${DOLLARS}(\.{CENTS})				{ return TOKEN;}
 
 .						;			/* ignore character */
 \n						{ got_newline(); 
