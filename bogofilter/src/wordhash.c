@@ -213,7 +213,7 @@ void wordhash_add(wordhash_t *dest, wordhash_t *src, void (*initializer)(void *)
     dest->wordcount += src->wordcount;
 
     if (verbose > 20) {
-	printf( "%5d  ", dest->wordcount);
+	printf( "%5lu  ", (unsigned long)dest->wordcount);
 	display_node(src->iter_head, "  ");
     }
 

@@ -71,8 +71,9 @@ void msglist_add(mlhead_t *list, wordhash_t *wh)
     list->count += 1;
     item->wh = wh;
     if (verbose > 1000)
-	printf("%s:  h %p (%d)  t %p  w %p %4d\n", 
-	       list->name, list->head, list->count, list->tail, wh, wh->count);
+	printf("%s:  h %p (%d)  t %p  w %p %4lu\n", 
+	       list->name, list->head, list->count, list->tail, wh,
+	       (unsigned long)wh->count);
     return;
 }
 
@@ -87,7 +88,7 @@ void msglist_print(mlhead_t *list)
     printf("%s:\n", list->name);
     for (item = list->head; item != NULL; item = item->next) {
 	wordhash_t *wh = item->wh;
-	printf("  %4d  %p  %4d\n", count++, item, wh->count);
+	printf("  %4d  %p  %4lu\n", count++, item, (unsigned long)wh->count);
     }
 
     return;
