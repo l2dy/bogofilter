@@ -99,9 +99,9 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     passmode = PASS_MEM;
     if (passthrough) {
-	if (fseek(stdin, 0, SEEK_END) == 0) {
+	if (fseek(fpin, 0, SEEK_END) == 0) {
 	    passmode = PASS_SEEK;
-	    (void)rewind(stdin);
+	    (void)rewind(fpin);
 	} else {
 	    if (errno != ESPIPE && errno != ENOTTY) {
 		fprintf(stderr, "cannot determine if input is seekable: %s",
@@ -237,7 +237,7 @@ static void write_message(FILE *fp, rc_t status)
 		break;
 	    case PASS_SEEK:
 		rf = read_seek;
-		rfarg = stdin;
+		rfarg = fpin;
 		rewind(rfarg);
 		break;
 	    default:
