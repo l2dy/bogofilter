@@ -482,10 +482,10 @@ static uint read_mailbox(char *arg)
 	    exit(EX_ERROR);
 	}
 
-	if (whc->wordcount == 0)
+	if (whc->count == 0)
 	    bt_trap();
 
-	if (whc->wordcount != 0) {
+	if (whc->count != 0) {
 	    count += 1;
 	    if (!msg_count_file)
 		whp = convert_wordhash_to_propslist(whc, train);

@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 	wordhash_t *h = wordhash_new();
 	initialize();
 	collect_words(h);
-	printf("%ld tokens:\n", (long) h->wordcount);
+	printf("%ld tokens:\n", (long) h->count);
 	print_wordlist(h);
 	printf("\n");
 	wordhash_free(h);

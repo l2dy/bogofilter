@@ -73,9 +73,9 @@ void collect_words(wordhash_t *wh)
 	    w->freq < max_repeats) 
 	    w->freq += 1;
 
-	wh->wordcount += 1;
+	wh->count += 1;
 	if (DEBUG_WORDLIST(3)) { 
-	    fprintf(dbgout, "%3d ", (int) wh->wordcount);
+	    fprintf(dbgout, "%3d ", (int) wh->count);
 	    word_puts(token, 0, dbgout);
 	    fputc('\n', dbgout);
 	}

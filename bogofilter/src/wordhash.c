@@ -72,17 +72,17 @@ wordhash_init (wh_t t, uint c)
     wordhash_t *wh = xcalloc (1, sizeof (wordhash_t));
 
     wh->type = t;
-    wh->count = (t == WH_NORMAL) ? 0 : ((c == 0) ? WH_INIT : c);
+    wh->size = (t == WH_NORMAL) ? 0 : ((c == 0) ? WH_INIT : c);
 
     if (t == WH_NORMAL)
 	wh->bin = xcalloc (NHASH, sizeof (hashnode_t **));
 
     if (t == WH_CNTS)
-	wh->cnts = (wordcnts_t *) xcalloc(wh->count, sizeof(wordcnts_t));
+	wh->cnts = (wordcnts_t *) xcalloc(wh->size, sizeof(wordcnts_t));
 
     if (t == WH_PROPS) {
 	wh->freeable = true;
-	wh->props = (hashnode_t *) xcalloc(wh->count, sizeof(hashnode_t));
+	wh->props = (hashnode_t *) xcalloc(wh->size, sizeof(hashnode_t));
     }
 
     return wh;
@@ -158,7 +158,7 @@ wordhash_free (wordhash_t *wh)
     if (wh->type == WH_PROPS) {
 	if (wh->freeable) {
 	    uint i;
-	    for (i=0; i<wh->count; i++)
+	    for (i=0; i<wh->size; i++)
 		xfree(wh->props[i].buf);
 	}
 	xfree (wh->props);
@@ -246,10 +246,10 @@ void wordhash_add(wordhash_t *dest, wordhash_t *src, void (*initializer)(void *)
 
     uint count = dest->count + src->count;	/* use dest count as total */
 
-    dest->wordcount += src->wordcount;
+    dest->count += src->count;
 
     if (verbose > 20) {
-	printf( "%5lu  ", (unsigned long)dest->wordcount);
+	printf( "%5lu  ", (unsigned long)dest->count);
 	display_node(src->iter_head, "  ");
     }
 
@@ -267,7 +267,7 @@ void wordhash_add(wordhash_t *dest, wordhash_t *src, void (*initializer)(void *)
     if (verbose > 200)
 	display_node(dest->iter_head, "\n");
 
-    dest->count = count;
+    dest->size = count;
 }
 
 void
@@ -310,7 +310,7 @@ wordhash_standard_insert (wordhash_t *wh, word_t *t, size_t n, void (*initialize
     if (buf != NULL)
 	return buf;
 
-    wh->count += 1;
+    wh->size += 1;
     hn = nmalloc (wh);
     hn->buf = smalloc (wh, n);
     if (initializer)
@@ -340,9 +340,9 @@ static void *
 wordhash_counts_insert (wordhash_t *wh)
 {
     wh->index += 1;
-    if (wh->index == wh->count) {
-	wh->count += WH_INCR;
-	wh->cnts = (wordcnts_t *) xrealloc(wh->cnts, wh->count * sizeof(wordcnts_t));
+    if (wh->index == wh->size) {
+	wh->size += WH_INCR;
+	wh->cnts = (wordcnts_t *) xrealloc(wh->cnts, wh->size * sizeof(wordcnts_t));
     }
     return & wh->cnts[wh->index];
 }
@@ -360,7 +360,7 @@ wordhash_insert (wordhash_t *wh, word_t *t, size_t n, void (*initializer)(void *
 
 size_t wordhash_count (wordhash_t *wh)
 {
-    return wh->count;
+    return wh->size;
 }
 
 void *
@@ -400,15 +400,15 @@ wordhash_next (wordhash_t *wh)
 	    val = wh->iter_ptr = wh->iter_ptr->iter_next;
 	break;
     case WH_ORDERED:
-	if (++wh->index < wh->count)
+	if (++wh->index < wh->size)
 	    val = wh->order[wh->index];
 	break;
     case WH_PROPS:
-	if (++wh->index < wh->count)
+	if (++wh->index < wh->size)
 	    val = &wh->props[wh->index];
 	break;
     case WH_CNTS:
-	if (++wh->index < wh->count)
+	if (++wh->index < wh->size)
 	    val = &wh->cnts[wh->index];
 	break;
     }
@@ -457,19 +457,19 @@ wordhash_sort (wordhash_t *wh)
     if (wh->type != WH_NORMAL)
 	return;
 
-    if (wh->count == 0)
+    if (wh->size == 0)
 	return;
 
     if (msg_count_file)
 	return;
 
-    order = (hashnode_t **) xcalloc(wh->count, sizeof(hashnode_t *));
+    order = (hashnode_t **) xcalloc(wh->size, sizeof(hashnode_t *));
 
-    wh->count = 0;
+    wh->size = 0;
     for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
-	order[wh->count++] = node;
+	order[wh->size++] = node;
 
-    qsort(order, wh->count, sizeof(hashnode_t *), compare_hashnode_t);
+    qsort(order, wh->size, sizeof(hashnode_t *), compare_hashnode_t);
     wh->order = order;
 
     wh->type = WH_ORDERED;
@@ -494,13 +494,13 @@ convert_propslist_to_countlist(wordhash_t *whi)
 	return whi;
 
     if (whi->type == WH_NORMAL)
-	who = wordhash_init(WH_CNTS, whi->count);
+	who = wordhash_init(WH_CNTS, whi->size);
     else {
 	if (whi->type != WH_PROPS) {
 	    fprintf(stderr, "convert_propslist_to_countlist() called with non-WH_PROPS parameter.\n");
 	    exit(EX_ERROR);
 	}
-	who = wordhash_init(WH_CNTS, whi->count);
+	who = wordhash_init(WH_CNTS, whi->size);
     }
 
     for(node = wordhash_first(whi); node != NULL; node = wordhash_next(whi)) {
@@ -518,14 +518,14 @@ wordhash_t *
 convert_wordhash_to_propslist(wordhash_t *whi, wordhash_t *db)
 {
     if (whi->type == WH_CNTS) {
-	if (whi->index == whi->wordcount && whi->count > whi->wordcount) {
-	    whi->count = whi->wordcount;
-	    whi->cnts = (wordcnts_t *) xrealloc(whi->cnts, whi->count * sizeof(wordcnts_t));
+	if (whi->index == whi->size && whi->count > whi->size) {
+	    whi->size = whi->count;
+	    whi->cnts = (wordcnts_t *) xrealloc(whi->cnts, whi->size * sizeof(wordcnts_t));
 	}
 	return whi;
     }
     else {
-	wordhash_t *who = wordhash_init(WH_PROPS, whi->count);
+	wordhash_t *who = wordhash_init(WH_PROPS, whi->size);
 	hashnode_t *node;
 
 	who->count = 0;

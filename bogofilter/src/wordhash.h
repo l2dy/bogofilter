@@ -35,8 +35,8 @@ typedef struct wordhash_s {
   /*@null@*/  /*@dependent@*/ wh_t type;		/* normal, ordered, props, or cnts */
   /*@null@*/  /*@dependent@*/ bool freeable;
   /*@null@*/  /*@dependent@*/ uint index;		/* access index */
-  /*@null@*/  /*@dependent@*/ uint count;		/* size of array */
-  /*@null@*/  /*@dependent@*/ uint wordcount;		/* count of words */
+  /*@null@*/  /*@dependent@*/ uint count;		/* count of words */
+  /*@null@*/  /*@dependent@*/ uint size;		/* size of array */
 
   hashnode_pt *bin;
   /*@null@*/ /*@owned@*/ wh_alloc_node *nodes;		/*list of node buffers */
