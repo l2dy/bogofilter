@@ -227,7 +227,6 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); return HEADKEY; }
 <INITIAL>^(Delivery-)?Date:.*			{ return HEADKEY; }
 <INITIAL>^(Resent-)?Message-ID:.*		{ return HEADKEY; }
-
 <INITIAL>^(In-Reply-To|References):.* 		{ return HEADKEY; }
 
 <INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
@@ -281,9 +280,8 @@ VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
 <HSCRIPT>{TOKEN}				{ if (tokenize_html_script)   return TOKEN; }
 <HDISCARD,LCOMMENT,SCOMMENT>{TOKEN}		{ /* discard innards of html tokens and comments */ }
 
-<HTOKEN,HDISCARD,LCOMMENT>">"			{ BEGIN HTML; }		/* end of tag; return to normal html processing */
-									/* end of loose  comment; return to normal html processing */
-<SCOMMENT>"-->"					{ BEGIN HTML; }		/* end of strict comment; return to normal html processing */
+<HTOKEN,HDISCARD,LCOMMENT>">"			{ BEGIN HTML; }	/* end of tag, loose comment; return to normal html processing */
+<SCOMMENT>"-->"					{ BEGIN HTML; }	/* end of strict comment; return to normal html processing */
 
 {IPADDR}					{ return IPADDR;}
 {TOKEN}						{ return TOKEN;}
