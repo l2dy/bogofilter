@@ -3,37 +3,36 @@
 			       =================
 
 
-NOTE: A terse version of important changes for updaters are in the
-RELEASE.NOTES files!
-
+NOTE: More information on important changes for bogofilters updaters
+is in the RELEASE.NOTES files!
 
 $Id$
 
 0.14.3	2003-08-05
 
-	* Fixed critical locking bug introduced into bogofilter 0.13.7.4 with
+	* Fixed critical locking bug introduced into bogofilter 0.14.0 with
 	  the combined-wordlist code: bogofilter would lock only the first
-	  opened data base file rather than all.
+	  opened database file rather than all.
 	* Documentation updates.
 
 	2003-08-04
 
+	* %g formatting is now supported by bogofilter's formatting functions.
 	* Merged trio 1.10 (http://ctrio.sourceforge.net/) to support
 	  compilation on ancient systems (Solaris 2.5) that do not have
 	  [v]snprintf functions.
 	  Trio is Copyright (C) 1998-2000 Bjorn Reese and Daniel Stenberg.
-	* %g formatting is now supported.
 	* Various documentation updates, including the FAQ.
 
 	2003-08-03
 	* Break up very long line into shorter lines for Solaris 2.5
 	  compatibility.
-	* Print data base version in print_version().
+	* Print database version in print_version().
 
 	2003-08-02
 
 	* Postfix integration instructions have been upgraded.
-	* Debug output for wordlists and data bases was enhanced.
+	* Debug output for wordlists and databases was enhanced.
 	* Bogofilter is now flex-2.5.31 compatible.
 
 0.14.2	2003-08-02
@@ -527,7 +526,7 @@ $Id$
 	* New message formatting capability allows formats to be put in config
 	  file for X-Bogosity line and logging messages.  Message content can
 	  include status, spamicity, version, etc.
-	* Long-standing locking bugs that caused corruption in the data base
+	* Long-standing locking bugs that caused corruption in the database
 	  have been resolved.
 	* Work around ash-0.2 and bash-1 bugs, needed for make check.
 	* Cater for malloc/calloc implementations that return NULL when 0 bytes
@@ -648,7 +647,7 @@ $Id$
 	  to be useful.
 	* All control characters are now considered token delimiters.
 	* Bogofilter now aborts if it cannot figure where to look for its
-	  data base directory.
+	  database directory.
 	* The software no longer crashes on machines that do not allow
 	  for unaligned memory access (m68k; many RISC, e. g. SPARC).
 	* DB 4.1 is now supported.

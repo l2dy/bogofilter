@@ -7,16 +7,15 @@ $Id$
 0.14.3	2003-08-05
 
 	* Fixed critical locking bug for separate wordlist mode that
-	  existed from bogofilter 0.13.7.4 to 0.14.2: bogofilter would
-	  lock only the first opened data base file.
+	  was introduced in version 0.14.2: bogofilter would lock only
+	  the first opened database file.
 	* Use Bjorn Reese and Daniel Stenberg's Trio 1.10 to fix compilations
 	  on old systems that don't have snprintf or vsnprintf.
 	* Various documentation updates, including the FAQ.
 	* The test suite was adjusted for older grep variants that don't cope
 	  with long lines.
-	* Bogofilter is now flex-2.5.31 compatible.
-	* Print data base version in print_version().
-	* %g formatting is now supported.
+	* Print database version in print_version().
+	* %g formatting is now supported by bogofilter's formatting functions.
 
 0.14.2	2003-08-02
 
