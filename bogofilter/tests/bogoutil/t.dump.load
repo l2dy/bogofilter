@@ -2,8 +2,7 @@
 
 #Test database maintenance using bogoutil's dump/load capabilities.
 
-srcdir=..
-. ${srcdir}/t.frame
+. ${srcdir}/../t.frame "`pwd`/.."
 
 verbose=0
 if [ "$1" = "-v" ]; then
@@ -12,7 +11,7 @@ fi
 
 BOGOUTIL="../../bogoutil"
 
-BASE=`basename $0`
+BASE=t.dump.load
 OUT="${TMPDIR}/$BASE.out"
 DATA="${TMPDIR}/$BASE.db"
 SUM="$BASE.sum"
@@ -29,13 +28,13 @@ GREP="grep -v /output-dl-"
 rm -f $DATA
 
 #load database
-$BOGOUTIL -l $DATA -y 20020815 < $BASE.inp
+$BOGOUTIL -l $DATA -y 20020815 < ${srcdir}/$BASE.inp
 
 #dump database (no restrictions, all dates should by 'yday')
 $BOGOUTIL -d $DATA -y 20020815 > ${TMPDIR}/output-dl-1.txt
 
 #update some words, including some old dates
-$BOGOUTIL -l $DATA -y 20021215 < $BASE.upd
+$BOGOUTIL -l $DATA -y 20021215 < ${srcdir}/$BASE.upd
 #dump database
 $BOGOUTIL -d $DATA > ${TMPDIR}/output-dl-2.txt
 
@@ -74,7 +73,7 @@ $BOGOUTIL -a 20021010 -d $DATA > ${TMPDIR}/output-dl-6.txt
 ( diff -u ${TMPDIR}/output-dl-5.txt ${TMPDIR}/output-dl-6.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.5.6.txt >> $OUT
 
 for i in ${TMPDIR}/output-dl-?.txt ; do
-    j=`basename $i`
+    j=$srcdir/`basename $i`
     if  [ $verbose -eq 0 ]; then
 	cmp $i $j
     else

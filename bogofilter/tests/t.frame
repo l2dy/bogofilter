@@ -10,6 +10,11 @@
 
 set -e
 
+relpath=..
+if [ -n "$1" ] ; then
+    relpath=$1/..
+fi
+
 if [ -z "$RUN_FROM_MAKE" ] ; then
    NAME=`echo $0 | sed s@./t.@@`
    DATE=`date +"%m%d"`
@@ -36,4 +41,4 @@ fi
 
 BOGOFILTER_DIR=$TMPDIR
 export BOGOFILTER_DIR
-${srcdir}/../bogofilter -n -C </dev/null
+${relpath}/bogofilter -n -C </dev/null
