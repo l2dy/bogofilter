@@ -45,7 +45,7 @@ int logflag;
 int Rtable = 0;
 
 int verbose, passthrough, force, nonspam_exits_zero;
-static int suppress_config_file;
+static bool suppress_config_file = FALSE;
 
 char directory[PATH_LEN + 100] = "";
 const char *system_config_file = "/etc/bogofilter.cf";
@@ -414,7 +414,7 @@ int process_args(int argc, char **argv)
 	/* fall through to suppress reading config files */
 
 	case 'C':
-	    suppress_config_file = 1;
+	    suppress_config_file = TRUE;
 	    break;
 	}
     }
