@@ -172,7 +172,7 @@ rc_t fis_status(void)
 
     if (twostate ||
 	(ham_cutoff < EPS) ||
-	(fis_stats.s.spamicity - ham_cutoff < EPS))
+	(fis_stats.s.spamicity <= ham_cutoff))
 	return RC_HAM;
 
     return RC_UNSURE;
