@@ -30,6 +30,7 @@ else
   rsync -av --delete ./ ../htdocs/ --delete-excluded \
       --exclude CVS \
       --exclude README_BEFORE_EDITING \
+      --exclude .nfs* \
       # do not remove this comment - it is for the preceding backslash
 
 fi
