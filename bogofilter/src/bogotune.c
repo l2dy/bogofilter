@@ -1594,9 +1594,10 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     /* process args and read mailboxes */
     process_arglist(argc, argv);
 
-    set_bogohome(ds_file);
-    if (ds_file)
+    if (ds_file) {
+	set_bogohome(ds_file);
 	check_wordlist_path();
+    }
 
     bogotune();
 
