@@ -169,7 +169,7 @@ double degen(const word_t *token, wordcnts_t *cnts)
 	bang += 1;
     
     /* loop for original and original w/o 'tag:' */
-    for (t = 0; ; t += tag, tag = 0) {
+    for (t = 0; ; t += tag) {
 	uint l = len - t;
 	int c = bang;
 	word_t *copy = word_dup(token);
