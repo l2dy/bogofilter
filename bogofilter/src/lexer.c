@@ -19,7 +19,6 @@
 #include "html.h"
 #include "lexer.h"
 #include "mime.h"
-#include "fgetsl.h"
 #include "textblock.h"
 #include "token.h"
 #include "word.h"
@@ -64,7 +63,7 @@ static void check_alphanum(buff_t *buff)
     if (l < MAXTOKENLEN)
 	return;
     for (i = 0; i < buff->t.leng; i += 1) {
-	if (isalnum((char) txt[i]))
+	if (isalnum((unsigned char) txt[i]))
 	    e = i;
 	else
 	    break;
@@ -137,7 +136,7 @@ static int yy_get_new_line(buff_t *buff)
      * One very long physical line could break up into more
      * than one of these. */
 
-    if (passthrough && count > 0)
+    if (passthrough && passmode == PASS_MEM && count > 0)
 	textblock_add(textblocks, (const char *)buff->t.text+buff->read, count);
 
     return count;
