@@ -436,7 +436,7 @@ static void print_version(void)
 #define	F "f"
 #endif
 
-#define	OPTIONS	":23bBc:Cd:DefFghI:lL:m:MnNo:O:pP:qQRrsStTuvVx:y:" G R F
+#define	OPTIONS	":23bBc:Cd:DefFghI:k:lL:m:MnNo:O:pP:qQRrsStTuvVx:y:" G R F
 
 /** These functions process command line arguments.
  **
