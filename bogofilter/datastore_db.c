@@ -31,10 +31,10 @@ AUTHOR:
 
 #define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
 
-#ifndef	HAVE_SYSLOG_H
-#define SYSLOG_ERROR(format, filename)
-#else
+#ifdef	HAVE_SYSLOG_H
 #define SYSLOG_ERROR(format, filename)      if (logflag) syslog( LOG_ERR, format, filename)
+#else
+#define SYSLOG_ERROR(format, filename)
 #endif
 
 static void db_enforce_locking(dbh_t *handle, const char *func_name){
@@ -42,6 +42,12 @@ static void db_enforce_locking(dbh_t *handle, const char *func_name){
     fprintf(stderr, "%s (%s): Attempt to access unlocked handle.\n", func_name, handle->name);
     exit(2);
   }
+}
+
+/* stolen from glibc's byteswap.c */
+static long swap_long(long x){
+  return ((((x) & 0xff000000) >> 24) | (((x) & 0x00ff0000) >>  8) |
+          (((x) & 0x0000ff00) <<  8) | (((x) & 0x000000ff) << 24));
 }
 
 static dbh_t *dbh_init(const char *filename, const char *name){
@@ -53,6 +59,7 @@ static dbh_t *dbh_init(const char *filename, const char *name){
   handle->name	    = xstrdup(name);
   handle->pid	    = getpid();
   handle->locked    = false;
+  handle->is_swapped= 0;
 
   return handle;
 }
@@ -66,7 +73,7 @@ static void dbh_free(dbh_t *handle){
 
 /*
   Initialize database.
-  Returns: pointer database handle on success, NULL otherwise.
+  Returns: pointer to database handle on success, NULL otherwise.
 */
 void *db_open(const char *db_file, const char *name, dbmode_t open_mode){
     int ret;
@@ -92,7 +99,20 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode){
 	handle->dbp->err (handle->dbp, ret, "%s (db) open: %s", progname, db_file);
     }
     else {
-      return (void *)handle;
+      /* see if the database byte order differs from that of the cpu's */
+      int had_err = 0;
+
+#if DB_VERSION_MAJOR == 3 && DB_VERSION_MINOR >= 3
+      if ( (ret = handle->dbp->get_byteswapped (handle->dbp, &(handle->is_swapped))) != 0){
+	handle->dbp->err (handle->dbp, ret, "%s (db) get_byteswapped: %s", progname, db_file);
+        had_err = 1;
+      }
+#else
+      handle->is_swapped = handle->dbp->get_byteswapped (handle->dbp);
+#endif
+      if (!had_err)
+        return (void *)handle;
+
     }
 
     dbh_free(handle);
@@ -123,9 +143,12 @@ long db_getvalue(void *vhandle, const char *word){
 
     ret = handle->dbp->get(handle->dbp, NULL, &db_key, &db_data, 0);
     xfree(t);
-    if (ret == 0) {
+    if (ret == 0) {      
       value = *(long *)db_data.data;
-
+      
+      if (handle->is_swapped)
+        value = swap_long(value);
+      
       if (DEBUG_DATABASE(2)) {
         fprintf(stderr, "[%lu] db_getvalue (%s): [%s] has value %ld\n",
 		(unsigned long) handle->pid, handle->name, word, value);
@@ -164,6 +187,9 @@ void db_setvalue(void *vhandle, const char * word, long value){
 
     key.data = t = xstrdup(word);
     key.size = strlen(word);
+    
+    if (handle->is_swapped)
+      value = swap_long(value);
 
     data.data = &value;
     data.size = sizeof(long);

@@ -13,7 +13,7 @@ typedef struct {
   DB *dbp;
   pid_t pid;
   bool locked;
-
+  int  is_swapped;
 } dbh_t;
 
 #endif
