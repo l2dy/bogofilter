@@ -170,6 +170,7 @@ int db_delete(dsh_t *dsh, const dbv_t *token)
 		      (char *)token->data, dperrmsg(dpecode));
 	  exit(EX_ERROR);
       }
+      ret = ret ^ 1;	/* ok is 1 in qdbm and 0 in bogofilter */
     }
 
     return ret;		/* 0 if ok */
