@@ -515,8 +515,8 @@ void *db_open(void *vhandle,
 	/* create DB handle */
 	dbe = dsm->dsm_get_env_dbe(env);
 	if ((ret = db_create (&dbp, dbe, 0)) != 0) {
-	    print_error(__FILE__, __LINE__, "(db) db_create, err: %s",
-			db_strerror(ret));
+	    print_error(__FILE__, __LINE__, "(db) db_create, err: %d, %s",
+			ret, db_strerror(ret));
 	    goto open_err;
 	}
 
@@ -667,10 +667,10 @@ int db_delete(void *vhandle, const dbv_t *token)
     ret = dbp->del(dbp, handle->txn, &db_key, 0);
 
     if (ret != 0 && ret != DB_NOTFOUND) {
-	print_error(__FILE__, __LINE__, "DB->del('%.*s'), err: %s",
+	print_error(__FILE__, __LINE__, "DB->del('%.*s'), err: %d, %s",
 		    CLAMP_INT_MAX(db_key.size),
 		    (const char *) db_key.data,
-    		    db_strerror(ret));
+    		    ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
 
@@ -727,9 +727,9 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 	ret = DS_ABORT_RETRY;
 	break;
     default:
-	print_error(__FILE__, __LINE__, "(db) DB->get(TXN=%lu,  '%.*s' ), err: %s",
+	print_error(__FILE__, __LINE__, "(db) DB->get(TXN=%lu,  '%.*s' ), err: %d, %s",
 		    (unsigned long)handle->txn, CLAMP_INT_MAX(token->leng),
-		    (char *) token->data, db_strerror(ret));
+		    (char *) token->data, ret, db_strerror(ret));
 	dsm->dsm_abort(handle);
 	exit(EX_ERROR);
     }
@@ -768,8 +768,8 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *val)
     }
 
     if (ret != 0) {
-	print_error(__FILE__, __LINE__, "db_set_dbvalue( '%.*s' ), err: %s",
-		    CLAMP_INT_MAX(token->leng), (char *)token->data, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "db_set_dbvalue( '%.*s' ), err: %d, %s",
+		    CLAMP_INT_MAX(token->leng), (char *)token->data, ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
 
@@ -876,7 +876,7 @@ void db_flush(void *vhandle)
 	fprintf(dbgout, "DB->sync(%p): %s\n", (void *)dbp, db_strerror(ret));
 
     if (ret)
-	print_error(__FILE__, __LINE__, "db_sync: err: %s", db_strerror(ret));
+	print_error(__FILE__, __LINE__, "db_sync: err: %d, %s", ret, db_strerror(ret));
 
     dsm->dsm_log_flush(handle->dbenv->dbe);
 }
@@ -1037,8 +1037,6 @@ ex_t db_verify(bfdir *directory, bffile *db_file)
 	print_error(__FILE__, __LINE__, "\"%s\" is not a file.", db_file->filename);
 	return EX_ERROR;
     }
-
-    dsm_init(directory, db_file);
 
     dbe = dsm->dsm_recover_open(directory, db_file);
 

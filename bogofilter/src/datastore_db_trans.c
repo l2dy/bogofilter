@@ -255,8 +255,8 @@ static int dbx_begin(void *vhandle)
 
     ret = BF_TXN_BEGIN(env->dbe, NULL, &t, 0);
     if (ret) {
-	print_error(__FILE__, __LINE__, "DB_ENV->txn_begin(%p), err: %s",
-		(void *)env->dbe, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "DB_ENV->txn_begin(%p), err: %d, %s",
+		(void *)env->dbe, ret, db_strerror(ret));
 	return ret;
     }
     dbh->txn = t;
@@ -413,8 +413,8 @@ static int bf_dbenv_create(DB_ENV **env)
 {
     int ret = db_env_create(env, 0);
     if (ret != 0) {
-	print_error(__FILE__, __LINE__, "db_env_create, err: %s",
-		db_strerror(ret));
+	print_error(__FILE__, __LINE__, "db_env_create, err: %d, %s",
+		ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
     if (DEBUG_DATABASE(1))
@@ -437,8 +437,8 @@ static void dbe_config(void *vhandle, u_int32_t numlocks, u_int32_t numobjs)
     if ((ret = env->dbe->set_lk_max(env->dbe, numlocks)) != 0)
 #endif
     {
-	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_max_locks(%p, %lu), err: %s", (void *)env->dbe,
-		(unsigned long)numlocks, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_max_locks(%p, %lu), err: %d, %s", (void *)env->dbe,
+		(unsigned long)numlocks, ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
 
@@ -448,8 +448,8 @@ static void dbe_config(void *vhandle, u_int32_t numlocks, u_int32_t numobjs)
 #if DB_AT_LEAST(3,2)
     /* configure lock system size - objects */
     if ((ret = env->dbe->set_lk_max_objects(env->dbe, numobjs)) != 0) {
-	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_max_objects(%p, %lu), err: %s", (void *)env->dbe,
-		(unsigned long)numobjs, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_max_objects(%p, %lu), err#%d: %s", (void *)env->dbe,
+		(unsigned long)numobjs, ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
     if (DEBUG_DATABASE(1))
@@ -461,7 +461,7 @@ static void dbe_config(void *vhandle, u_int32_t numlocks, u_int32_t numobjs)
 
     /* configure automatic deadlock detector */
     if ((ret = env->dbe->set_lk_detect(env->dbe, DB_LOCK_DEFAULT)) != 0) {
-	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT), err: %s", db_strerror(ret));
+	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT), err: %d, %s", ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
 
@@ -471,8 +471,8 @@ static void dbe_config(void *vhandle, u_int32_t numlocks, u_int32_t numobjs)
     /* configure log file size */
     ret = env->dbe->set_lg_max(env->dbe, logsize);
     if (ret) {
-	print_error(__FILE__, __LINE__, "DB_ENV->set_lg_max(%lu) err: %s",
-		(unsigned long)logsize, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "DB_ENV->set_lg_max(%lu) err: %d, %s",
+		(unsigned long)logsize, ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
 
@@ -538,8 +538,8 @@ static dbe_t *dbe_xinit(dbe_t *env, bfdir *directory,
 
     if (db_cachesize != 0 &&
 	    (ret = env->dbe->set_cachesize(env->dbe, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
-	print_error(__FILE__, __LINE__, "DB_ENV->set_cachesize(%u), err: %s",
-		db_cachesize, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "DB_ENV->set_cachesize(%u), err: %d, %s",
+		db_cachesize, ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
 
@@ -553,7 +553,7 @@ static dbe_t *dbe_xinit(dbe_t *env, bfdir *directory,
     ret = env->dbe->open(env->dbe, directory->dirname, flags, DS_MODE);
     if (ret != 0) {
 	env->dbe->close(env->dbe, 0);
-	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %s", db_strerror(ret));
+	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %d, %s", ret, db_strerror(ret));
 	switch (ret) {
 	    case DB_RUNRECOVERY:
 		diag_dbeopen(flags, directory);
@@ -599,7 +599,7 @@ static void dbx_cleanup_lite(dbe_t *env)
 	    ret = BF_TXN_CHECKPOINT(env->dbe, 64, 120, 0);
 	    ret = dbx_sync(env->dbe, ret);
 	    if (ret)
-		print_error(__FILE__, __LINE__, "DBE->dbx_checkpoint returned %s", db_strerror(ret));
+		print_error(__FILE__, __LINE__, "DBE->dbx_checkpoint err: %d, %s", ret, db_strerror(ret));
 
 	    if (db_log_autoremove)
 		dbe_env_purgelogs(env->dbe);
@@ -674,7 +674,7 @@ static ex_t dbx_common_close(DB_ENV *dbe, bfdir *directory)
     if (DEBUG_DATABASE(0))
 	fprintf(dbgout, "closing environment\n");
 
-    e = dbe->close(dbe, 0);
+     e = dbe->close(dbe, 0);
     if (e != 0) {
 	print_error(__FILE__, __LINE__, "Error closing environment \"%s\": %s",
 		directory->dirname, db_strerror(e));
@@ -994,4 +994,3 @@ probe_txn_t probe_txn(bfdir *directory, bffile *file)
 #endif
     return P_ENABLE;
 }
-

@@ -133,8 +133,9 @@ void *db_open(void * dummy, const char *db_path, const char *db_name, dbmode_t o
     return handle;
 
  open_err:
-    print_error(__FILE__, __LINE__, "(qdbm) vlopen(%s, %d) failed: %s",
-		handle->name, open_flags, dperrmsg(dpecode));
+    print_error(__FILE__, __LINE__, "(qdbm) vlopen(%s, %d), err: %d, %s",
+		handle->name, open_flags, 
+		dpecode, dperrmsg(dpecode));
     dbh_free(handle);
 
     return NULL;
@@ -151,9 +152,10 @@ int db_delete(void *vhandle, const dbv_t *token)
     ret = vlout(dbp, token->data, token->leng);
 
     if (ret == 0) {
-	print_error(__FILE__, __LINE__, "(qdbm) vlout('%.*s'), err: %s",
+	print_error(__FILE__, __LINE__, "(qdbm) vlout('%.*s'), err: %d, %s",
 		    CLAMP_INT_MAX(token->leng),
-		    (char *)token->data, dperrmsg(dpecode));
+		    (char *)token->data, 
+		    dpecode, dperrmsg(dpecode));
 	exit(EX_ERROR);
     }
     ret = ret ^ 1;	/* ok is 1 in qdbm and 0 in bogofilter */
@@ -219,9 +221,9 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *val)
 
     if (ret == 0) {
 	print_error(__FILE__, __LINE__,
-		    "(qdbm) db_set_dbvalue( '%.*s' ) failed: %s",
+		    "(qdbm) db_set_dbvalue( '%.*s' ) err: %d, %s",
 		    CLAMP_INT_MAX(token->leng), (char *)token->data,
-		    dperrmsg(dpecode));
+		    dpecode, dperrmsg(dpecode));
 	exit(EX_ERROR);
     }
 
@@ -249,8 +251,9 @@ void db_close(void *vhandle)
     db_optimize(dbp, handle->name);
 
     if (!vlclose(dbp))
-	print_error(__FILE__, __LINE__, "(qdbm) vlclose for %s failed: %s",
-		    handle->name, dperrmsg(dpecode));
+	print_error(__FILE__, __LINE__, "(qdbm) vlclose for %s err: %d, %s",
+		    handle->name, 
+		    dpecode, dperrmsg(dpecode));
 
     handle->dbp = NULL;
 
@@ -267,8 +270,8 @@ void db_flush(void *vhandle)
     VILLA * dbp = handle->dbp;
 
     if (!vlsync(dbp))
-	print_error(__FILE__, __LINE__, "(qdbm) vlsync failed: %s",
-		    dperrmsg(dpecode));
+	print_error(__FILE__, __LINE__, "(qdbm) vlsync err: %d, %s",
+		    dpecode, dperrmsg(dpecode));
 }
 
 
@@ -311,8 +314,8 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 	    vlcurnext(dbp);
 	}
     } else {
-	print_error(__FILE__, __LINE__, "(qdbm) vlcurfirst err: %s",
-		    dperrmsg(dpecode));
+	print_error(__FILE__, __LINE__, "(qdbm) vlcurfirst err: %d, %s",
+		    dpecode, dperrmsg(dpecode));
 	exit(EX_ERROR);
     }
 
