@@ -97,6 +97,9 @@ typedef unsigned short uint32_t;
 choke me because we do not know how to define uint32_t
 #endif
 #endif /* HAVE_UINT32_T */
+#ifndef HAVE_U_INT32_T
+typedef uint32_t u_int32_t;
+#endif
 
 #ifndef HAVE_INT32_T
 #if SIZEOF_SIGNED_LONG == 4
@@ -110,9 +113,36 @@ choke me because we do not know how to define int32_t
 #endif
 #endif /* HAVE_INT32_T */
 
+#ifndef HAVE_UINT16_T
+#if SIZEOF_UNSIGNED_SHORT == 2
+typedef unsigned short uint16_t;
+#else
+choke me because we do not know how to define uint16_t
+#endif
+#endif
+#ifndef HAVE_U_INT16_T
+typedef uint16_t u_int16_t;
+#endif
+
+#ifndef HAVE_INT16_T
+#if SIZEOF_SIGNED_SHORT == 2
+typedef signed short int16_t;
+#else
+choke me because we do not know how to define int16_t
+#endif
+#endif
+
+#ifndef HAVE_U_INT8_T
+typedef unsigned char u_int8_t;
+#endif
+
 #ifndef HAVE_ULONG
 typedef unsigned long ulong;
 #endif
+
+/* prevent db.h from redefining the types above */
+#undef	__BIT_TYPES_DEFINED__
+#define	__BIT_TYPES_DEFINED__ 1
 
 /* splint crutch */
 #ifdef __LCLINT__
