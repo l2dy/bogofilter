@@ -85,40 +85,42 @@ EOF
 # run tests for msg.[1-8].txt
 #
 
+BOGOFILTER="$BOGOFILTER -c $CFG $OPT"
+
 # test scoring of individual files
 
 NAME="bulk-single"
-( for f in $pattern ; do echo $f `$BOGOFILTER -e -c $CFG $OPT -I $f` ; done ) | \
+( for f in $pattern ; do echo $f `$BOGOFILTER -e -I $f` ; done ) | \
     sed s@.*inputs/@./inputs/@ >${TMPDIR}/$NAME.out
 
 # test scoring of files listed on stdin
 
 NAME="bulk-stdin"
-ls $pattern | $BOGOFILTER -c $CFG $OPT -b | \
+ls $pattern | $BOGOFILTER -b | \
     sed s@.*inputs/@./inputs/@ >${TMPDIR}/$NAME.out
 
 # test scoring of files listed on linend
 
 NAME="bulk-linend"
-$BOGOFILTER -c $CFG $OPT -B `ls $pattern` | \
-    sed s@.*inputs/@./inputs/@ >${TMPDIR}/$NAME.out >${TMPDIR}/$NAME.out
+$BOGOFILTER -B `ls $pattern` | \
+    sed s@.*inputs/@./inputs/@ >${TMPDIR}/$NAME.out
 
 # test scoring each file twice (using linend)
 
 NAME="bulk-double-1"
 for f in $pattern ; do 
-    map_rc $BOGOFILTER -c $CFG $OPT -B $f $f | \
+    map_rc $BOGOFILTER -B $f $f | \
 	sed s@.*inputs/@./inputs/@ >> ${TMPDIR}/$NAME.tmp
 done
 sort -u < ${TMPDIR}/$NAME.tmp > ${TMPDIR}/$NAME.out
 
-# test scoring each file twice (using linend), when files ar without "From " lines
+# test scoring each file twice (using linend), when files are without "From " lines
 
 NAME="bulk-double-2"
 for f in $pattern ; do 
     t="${TMPDIR}/`basename $f`"
     grep -v "^From "< $f > $t
-    map_rc $BOGOFILTER -c $CFG $OPT -B $t $t | \
+    map_rc $BOGOFILTER -B $t $t | \
 	sed s@.*/@./inputs/@ >> ${TMPDIR}/$NAME.tmp
 done
 sort -u < ${TMPDIR}/$NAME.tmp > ${TMPDIR}/$NAME.out
@@ -127,7 +129,7 @@ sort -u < ${TMPDIR}/$NAME.tmp > ${TMPDIR}/$NAME.out
 
 NAME="bogolex-single"
 for f in $pattern ; do 
-    map_rc "$BOGOLEX_SH -c $CFG < $f | $BOGOFILTER -c $CFG $OPT >> ${TMPDIR}/$NAME.out"
+    map_rc "$BOGOLEX_SH -c $CFG < $f | $BOGOFILTER >> ${TMPDIR}/$NAME.out"
 done
 
 # test scoring of mbox batch of msg-count messages
@@ -135,7 +137,7 @@ done
 NAME="bogolex-mbox"
 cat $pattern >> ${TMPDIR}/test.fr
 
-map_rc $BOGOFILTER -c $CFG $OPT -M < ${TMPDIR}/test.fr > ${TMPDIR}/$NAME.out
+map_rc $BOGOFILTER -M < ${TMPDIR}/test.fr > ${TMPDIR}/$NAME.out
 
 NAME="bogolex-batch"
 cat /dev/null > ${TMPDIR}/test.bl
@@ -143,7 +145,7 @@ for f in $pattern ; do
     map_rc $BOGOLEX_SH -c $CFG < $f >> ${TMPDIR}/test.bl
 done
 
-map_rc $BOGOFILTER -c $CFG $OPT < ${TMPDIR}/test.bl > ${TMPDIR}/$NAME.out
+map_rc $BOGOFILTER < ${TMPDIR}/test.bl > ${TMPDIR}/$NAME.out
 
 [ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
 
