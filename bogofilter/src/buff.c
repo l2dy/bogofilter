@@ -47,9 +47,10 @@ void buff_free(buff_t *self)
 int buff_fgetsl(buff_t *self, FILE *in)
 {
     uint readpos = self->t.leng;
-    int readcnt = xfgetsl((char *)self->t.text+readpos, self->size-readpos, in, true);
+    int readcnt = xfgetsl((char *)self->t.text + readpos, self->size - readpos,
+	    in, true);
     self->read = readpos;
-    if (readcnt >= 0)
+    if (readcnt >= 0) /* don't decrease on error */
 	self->t.leng += readcnt;
     return readcnt;
 }
@@ -57,7 +58,8 @@ int buff_fgetsl(buff_t *self, FILE *in)
 int buff_fgetsln(buff_t *self, FILE *in, uint maxlen)
 {
     uint readpos = self->t.leng;
-    int readcnt = xfgetsl((char *)self->t.text+readpos, min(self->size - readpos, maxlen), in, true);
+    int readcnt = xfgetsl((char *)self->t.text + readpos,
+	    min(self->size - readpos, maxlen), in, true);
     /* WARNING: do not add NUL termination, the size must be exact! */
     self->read = readpos;
     if (readcnt >= 0)
@@ -76,7 +78,7 @@ int buff_add(buff_t *self, word_t *in)
     }
     self->read = readpos;
     self->t.leng += readcnt;
-    memcpy(self->t.text+readpos, in->text, readcnt);
+    memcpy(self->t.text + readpos, in->text, readcnt);
     Z(self->t.text[self->t.leng]);		/* for easier debugging - removable */
 
     return readcnt;
@@ -85,7 +87,7 @@ int buff_add(buff_t *self, word_t *in)
 void buff_puts(const buff_t *self, uint width, FILE *fp)
 {
     word_t word;
-    word.leng = self->t.leng-self->read;
-    word.text = self->t.text+self->read;
+    word.leng = self->t.leng - self->read;
+    word.text = self->t.text + self->read;
     word_puts(&word, width, fp);
 }
