@@ -4,6 +4,10 @@
 
 $Id$
 
+0.13.4.1 2003-05-31
+
+	* Modified t.parsing test so it works with OSX's default file system.
+	 
 0.13.4	2003-05-30
 
 	* Changed default value of ROBS from 0.001 to 0.01
