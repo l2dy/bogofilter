@@ -20,15 +20,15 @@ $Id$
 0.10.1.2 2003-01-27
 
 	* Config file example updated.
-	* Fixed additional problems in parsing html.
+	* Fixed additional problems in parsing HTML.
 
 0.10.1.1 2003-01-25
 
-	* Fixed problems in parsing html and processing config file options.
+	* Fixed problems in parsing HTML and processing config file options.
 
 0.10.1	2003-01-22
 
-	* Bogofilter now kills html comments.  The '-k' switch can
+	* Bogofilter now kills HTML comments.  The '-k' switch can
 	  be used to change the behavior.
 	* Added convenience options '-2' and '-3' to set binary/ternary
 	  modes when using Robinson-Fisher classification.
