@@ -51,7 +51,7 @@ void collect_words(/*@out@*/ wordhash_t **wh,
     for (;;){
 	token_t token_type = get_token();
 
-	if (token_type != FROM && token_type != NONE){
+	if (token_type != FROM && token_type != 0){
 	    w = wordhash_insert(h, yylval, sizeof(wordprop_t), &wordprop_init);
 	    if (w->freq < max_repeats) w->freq++;
 	    w_count++;
@@ -65,7 +65,7 @@ void collect_words(/*@out@*/ wordhash_t **wh,
 	}
 
 	/* Want to process EOF, *then* drop out */
-	*cont = (token_type != NONE);
+	*cont = (token_type != 0);
 	break;
     }
 
