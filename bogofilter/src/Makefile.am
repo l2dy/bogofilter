@@ -68,7 +68,9 @@ regression_SOURCES= ../trio/regression.c
 endif
 
 LDADD = libbogofilter.a @LIBOBJS@
-bogofilter_LDADD = $(LDADD) $(GSL_LIBS)
+bogofilter_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
+bogoutil_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
+configtest_LDADD = $(LDADD) $(LIBDB)
 
 # what to build that from
 libbogofilter_a_SOURCES= \
@@ -107,6 +109,7 @@ libbogofilter_a_SOURCES= \
 	uudecode.h uudecode.c \
 	word.h word.c \
 	wordhash.h wordhash.c wordlists.h wordlists.c \
+	wordlists_base.h wordlists_base.c \
 	xmalloc.h xcalloc.c xmalloc.c xmem_error.c xrealloc.c \
 	xmemrchr.h xmemrchr.c \
 	xstrdup.h xstrdup.c \

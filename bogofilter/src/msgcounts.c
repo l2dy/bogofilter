@@ -15,6 +15,7 @@ AUTHOR:
 #include <ctype.h>
 #include <stdlib.h>
 
+#include "datastore.h"
 #include "fgetsl.h"
 #include "msgcounts.h"
 #include "wordlists.h"
@@ -77,17 +78,6 @@ void init_msg_counts()
     msgs_good = 0L;
     msgs_bad  = 0L;
     msg_count_header_len= strlen(msg_count_header);
-}
-
-void compute_msg_counts()
-{
-    wordlist_t* list;
-
-    for(list=word_lists; list != NULL; list=list->next)
-    {
-	msgs_bad  += list->msgcount[IX_SPAM];
-	msgs_good += list->msgcount[IX_GOOD];
-    }
 }
 
 void set_msg_counts(char *s)

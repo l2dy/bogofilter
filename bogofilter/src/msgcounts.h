@@ -24,9 +24,6 @@ extern	bool	 msgcount_more(void);
 extern	char	*msg_count_text;
 extern	int	 msg_count_leng;
 
-extern	long	 msgs_good;
-extern 	long	 msgs_bad;
-
 /* Function prototypes */
 
 void init_msg_counts(void);
