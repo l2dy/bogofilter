@@ -27,6 +27,8 @@ AUTHOR:
 
 #define PROGNAME "bogoutil"
 
+#define MINIMUM_FREQ	5		/* minimum freq */
+
 int verbose = 0;
 int logflag = 0;
 
@@ -254,7 +256,7 @@ int words_from_path(char *directory, int argc, char **argv, bool show_probabilit
     printf(head_format, "", "spam", "good", "Gra prob", "Rob prob");
     while (argc >= 0)
     {
-	double spamness, goodness, gra_prob = 0.0f, rob_prob = 0.0f;
+	double gra_prob = 0.0f, rob_prob = 0.0f;
 	
 	if ( argc == 0)
 	{
@@ -271,18 +273,13 @@ int words_from_path(char *directory, int argc, char **argv, bool show_probabilit
 	good_count =  db_getvalue(dbh_good, token);
 	if (show_probability)
 	{
-	    spamness = (double) spam_count / (double) spam_msg_count;
-	    goodness = (double) good_count / (double) good_msg_count;
-	    if (spam_count + good_count == 0)
-	    {
-		gra_prob = UNKNOWN_WORD;
-		rob_prob = UNKNOWN_WORD;
-	    }
-	    else
-	    {
-		gra_prob = spamness / (spamness+goodness);
-		rob_prob = ((ROBS * ROBX + spamness) / (ROBS + spamness+goodness));
-	    }
+	    double spamness = (double) spam_count / (double) spam_msg_count;
+	    double goodness = (double) good_count / (double) good_msg_count;
+
+	    gra_prob = (spam_count + good_count <= MINIMUM_FREQ)
+		? UNKNOWN_WORD
+		: spamness / (spamness+goodness);
+	    rob_prob = ((ROBS * ROBX + spamness) / (ROBS + spamness+goodness));
 	}
 	printf(data_format, token, spam_count, good_count, gra_prob, rob_prob);
     }
