@@ -102,6 +102,38 @@ token_t get_token(void)
 	case BOUNDARY:	/* don't return boundary tokens to the user */
 	    continue;
 
+	case VERP:	/* Variable Envelope Return Path */
+	{
+	    byte *st = (byte *)yylval->text;
+	    byte *in;
+	    byte *ot = NULL;
+
+	    for (in = st; *in != '\0'; in += 1) {
+		if (*in == '-') {
+		    byte c;
+		    in += 1;
+		    for (c = *in; c != '-'; c = *++in) {
+			if (!isdigit(c))
+			    break;
+			if (ot == NULL) {
+			    ot = in;
+			    *ot++ = '#';
+			}
+		    }
+		}
+		if (ot != NULL)
+		    *ot++ = *in;
+	    }
+	    yylval->leng = ot - st;
+	    Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
+	    if (token_prefix != NULL) {
+		word_t *o = yylval;
+		yylval = word_concat(token_prefix, yylval);
+		word_free(o);
+	    }
+	}
+	break;
+
 	case HEADKEY:
 	    if (!header_line_markup)
 		continue;

@@ -196,6 +196,8 @@ HBREAK		p|br|li|h[1-6]|hr|title|table|center|dd|dt|iframe|img|input|select|td|te
 PARSEHTML	"<"(a|font|img)([ \n\t][^>]*|"")">"
 BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
+VERP		{TOKEN}-[0-9]+-{TOKEN}={TOKEN}@{TOKEN}
+
 %s TEXT HTML BOGO_LEX
 %s HTOKEN HDISCARD SCOMMENT LCOMMENT HSCRIPT
 
@@ -245,6 +247,8 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
 <INITIAL>\n					{ set_tag("Header"); lineno += 1; }
 <INITIAL><<EOF>>				{ add_hint("no_body:"); return NONE; }
+
+<INITIAL>{VERP} 				{ skip_to('='); return VERP; }
 
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
 						      yy_set_state_initial();
