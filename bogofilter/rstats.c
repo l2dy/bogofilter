@@ -188,15 +188,15 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
 	double prob = cnt ? h->prob/cnt : 0.0;
 
 	// print interval, count, probability, and spamicity
-	fprintf(Rfp, "\t%5.2f %4d  %f  %f  ", beg, cnt, prob, h->spamicity );
+	(void)fprintf(Rfp, "\t%5.2f %4d  %f  %f  ", beg, cnt, prob, h->spamicity );
 
 	// scale histogram to 50 characters
 	if (maxcnt>50) cnt = (cnt * 50 + maxcnt - 1) / maxcnt;
 
 	// display histogram
 	for (r=0; r<cnt; r+=1)
-	    fputc( '#', Rfp);
-	fputc( '\n', Rfp);
+	    (void)fputc( '#', Rfp);
+	(void)fputc( '\n', Rfp);
     }
 
 }
