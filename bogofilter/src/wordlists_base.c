@@ -12,6 +12,9 @@
 
 bool	config_setup = false;
 
+static wordlist_t *free_wordlist(wordlist_t *list);
+static bool	    dup_wordlist(wordlist_t *a, wordlist_t *b);
+
 /* Default wordlist mode is now wordlist.db -
    a single wordlist containing ham and spam tokens */
 
@@ -43,6 +46,11 @@ void init_wordlist(const char* name, const char* path,
     }
 
     while(1) {
+	if (dup_wordlist(n, list_ptr)) {
+	    free_wordlist(n);
+	    return;
+	}
+
         if (list_ptr->next == NULL) {
 	    /* end of list */
 	    list_ptr->next=n;
@@ -58,6 +66,24 @@ void init_wordlist(const char* name, const char* path,
 	list_ptr=list_ptr->next;
     }
 }
+
+static bool dup_wordlist(wordlist_t *a, wordlist_t *b)
+{
+    if (a->type != b->type)
+	return false;
+
+    if (a->override!= b->override)
+	return false;
+
+    if (strcmp(a->listname, b->listname) != 0)
+	return false;
+
+    if (strcmp(a->filepath, b->filepath) != 0)
+	return false;
+
+    return true;
+}
+
 
 /* Set default wordlist for registering messages, finding robx, etc */
 

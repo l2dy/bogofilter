@@ -1,9 +1,9 @@
 #### 1: score message using each wordlist ####
 
 ignore:     X-Bogosity: No, tests=bogofilter, spamicity=0.520000
-system:     X-Bogosity: No, tests=bogofilter, spamicity=0.213025
-user:       X-Bogosity: No, tests=bogofilter, spamicity=0.227378
-wordlist:   X-Bogosity: No, tests=bogofilter, spamicity=0.246265
+system:     X-Bogosity: No, tests=bogofilter, spamicity=0.213252
+user:       X-Bogosity: No, tests=bogofilter, spamicity=0.227632
+wordlist:   X-Bogosity: No, tests=bogofilter, spamicity=0.246543
 
 #### 1: score message using each config file ####
 
@@ -73,9 +73,9 @@ N_P_Q_S_s_x_md                        6  0.760046  0.294759  0.267356
 #### 2: score message using each wordlist ####
 
 ignore:     X-Bogosity: No, tests=bogofilter, spamicity=0.520000
-system:     X-Bogosity: No, tests=bogofilter, spamicity=0.213025
-user:       X-Bogosity: No, tests=bogofilter, spamicity=0.150631
-wordlist:   X-Bogosity: No, tests=bogofilter, spamicity=0.246265
+system:     X-Bogosity: No, tests=bogofilter, spamicity=0.213252
+user:       X-Bogosity: No, tests=bogofilter, spamicity=0.165188
+wordlist:   X-Bogosity: No, tests=bogofilter, spamicity=0.246543
 
 #### 2: score message using each config file ####
 
