@@ -97,8 +97,10 @@ for alg in f r g ; do
 	< ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg
 	sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
     done
-    rm -f ${TMPDIR}/tests-$alg
-    rm -f $BOGOFILTER_DIR/*.db
+    if  [ $verbose -eq 0 ]; then
+	rm -f ${TMPDIR}/tests-$alg
+	rm -f $BOGOFILTER_DIR/*.db
+    fi
 done
 
 rm -f ${CONFIG}
