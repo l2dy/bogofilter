@@ -4,6 +4,7 @@
   <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
   <title>Bogofilter FAQ</title>
 <style type="text/css">
+    <!--
   h2 {
     margin-top : 1em;
     font-size : 125%;
@@ -34,6 +35,7 @@
     margin-top: 1em;
     margin-bottom: 1em;
   }
+  -->
 </style>
 </head>
 
@@ -48,36 +50,36 @@
   <ul>
     <li>General Information
       <ul>
-        <li><a href="#what_is_bogofilter">What is bogofilter?</a></li>
+        <li><a href="#what-is-bogofilter">What is bogofilter?</a></li>
         <li><a href="#lists">Bogofilter Mailing Lists</a></li>
       </ul>
     </li>
     <li>Operational Questions
       <ul>
-        <li><a href="#asian_spam">What can I do about asian spam?</a></li>
+        <li><a href="#asian-spam">What can I do about asian spam?</a></li>
         <li><a href="#vvv">What does bogofilter's verbose output mean?</a></li>
 	<li><a href="#spamassassin">How can I use SpamAssassin to train Bogofilter?</a></li>
       </ul>
     </li>
     <li>Database Questions
       <ul>
-        <li><a href="#query_database">How do I manually query the database</a></li>
+        <li><a href="#query-database">How do I manually query the database</a></li>
         <li><a href="#rescue">How can I tell if my wordlists are corrupted?</a></li>
       </ul>
     </li>
     <li>Technical problems
       <ul>
-        <li><a href="#port_notes">How do I get Bogofilter working on Solaris, BSD, etc.?</a></li>
+        <li><a href="#port-notes">How do I get Bogofilter working on Solaris, BSD, etc.?</a></li>
         <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
-        <li><a href="#return_codes">Why does bogofilter give return codes like 0 and 256 when it's run from inside a program?</a></li>
-        <li><a href="#changed_options">Now that I've upgraded to 0.11 why are my scripts broken?</a></li>
+        <li><a href="#return-codes">Why does bogofilter give return codes like 0 and 256 when it's run from inside a program?</a></li>
+        <li><a href="#changed-options">Now that I've upgraded to 0.11 why are my scripts broken?</a></li>
       </ul>
     </li>
   </ul>
 
   <hr>
 
-  <h2 id="what_is_bogofilter">What is bogofilter?</h2>
+  <h2 id="what-is-bogofilter">What is bogofilter?</h2>
 
   <p>Bogofilter is a fast Bayesian spam filter along the lines suggested by Paul Graham in his article <a href="http://www.paulgraham.com/spam.html">A Plan For Spam</a>. Bogofilter uses <a href="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">Gary Robinson</a>'s geometric-mean algorithm with the Fisher's method modification to classify email as spam or non-spam.</p>
 
@@ -229,7 +231,7 @@ The sample procmail recipe below shows one way to do this:<p>
 
   <hr>
 
-  <h2 id="asian_spam">What can I do about asian spam?</h2>
+  <h2 id="asian-spam">What can I do about asian spam?</h2>
 
   <p>Many people get unsolicited email using asian language charsets.  Since they don't know the languages and don't know people there, they assume it's spam.</p>
 <p>The good news is that bogofilter does detect them quite successfully. The bad news is that this can be expensive. You have basically two choices:</p>
@@ -255,7 +257,7 @@ spam-unreadable
 
   <hr>
 
-  <h2 id="query_database">How do I manually query the database</h2>
+  <h2 id="query-database">How do I manually query the database</h2>
 
   <p>To find the spam and ham counts for a token (word) use bogoutil's '-w' option. For example, "bogoutil -d $BOGOFILTER_DIR example.com" gives the good and bad counts for "example.com".</p>
 
@@ -286,7 +288,7 @@ db_load spamlist.new &lt; spamlist.txt
 
   <hr>
 
-  <h2 id="port_notes">How do I get bogofilter working on Solaris, BSD, etc?</h2>
+  <h2 id="port-notes">How do I get bogofilter working on Solaris, BSD, etc?</h2>
 
   <p>If you don't already have a v3.0+ version of <a href="http://www.sleepycat.com">BerkeleyDB</a>, then <a href="http://www.sleepycat.com/download.html">download it</a>, unpack it, and do these commands in the 'dist' directory:</p>
 <pre>
@@ -336,13 +338,13 @@ $ ldconfig /usr/lib /usr/local/lib \
 
   <hr>
 
-  <h2 id="return_codes">Why does bogofilter give return codes like 0 and 256 when it's run from inside a program?</h2>
+  <h2 id="return-codes">Why does bogofilter give return codes like 0 and 256 when it's run from inside a program?</h2>
 
   <p>Likely the return codes are being reformatted by waitpid(2). Use WEXITSTATUS(status) in sys/wait.h, or comparable macro, to get the correct value.</p>
 
   <hr>
 
-  <h2 id="changed_options">Now that I've upgraded to 0.11 why are my scripts broken?</h2>
+  <h2 id="changed-options">Now that I've upgraded to 0.11 why are my scripts broken?</h2>
 
   <p>With version 0.11 bogofilter's options for registering mail as ham or spam have been changed. They now allow registering (or unregistering) messages in the ham and spam wordlists. Prior to this, there was no way to unregister a message from a wordlist (without registering it in the other wordlist).</p>
 
