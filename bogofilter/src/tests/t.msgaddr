@@ -1,0 +1,28 @@
+#!/bin/sh
+
+. ${srcdir=.}/t.frame
+
+CFG=${TMPDIR}/test.cf
+OUT=${TMPDIR}/test.out
+CORRECT=${SYSTEST}/outputs/ipaddr.ref
+
+cat <<EOF > $CFG
+# include ip address
+# suppress timestamps & version info in output
+header_format=%h: %c, ipaddr=%I
+EOF
+
+# build wordlists
+$BOGOFILTER -n -v -D -c $CFG -M -B inputs/good.mbx > /dev/null
+$BOGOFILTER -s -v -D -c $CFG -M -B inputs/spam.mbx > /dev/null
+
+$BOGOFILTER -v -D -c $CFG -M -B inputs/good.mbx inputs/spam.mbx > $OUT
+
+# compare test output to reference output
+
+if  [ $verbose -eq 0 ]; then
+    diff $CORRECT $OUT
+    cmp $CORRECT $OUT
+else
+    diff $DIFF_BRIEF $CORRECT $OUT
+fi

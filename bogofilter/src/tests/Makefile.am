@@ -23,7 +23,8 @@ PARSING_TESTS = \
 	t.escaped.html t.escaped.url \
 	t.split t.parsing \
 	t.lexer t.lexer.mbx \
-	t.folded_rfc2047
+	t.folded_rfc2047 \
+	t.msgaddr
 
 WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest t.upgrade.subnet.prefix t.multiple.wordlists
 
