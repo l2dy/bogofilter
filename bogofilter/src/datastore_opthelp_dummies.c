@@ -1,4 +1,5 @@
 #include "common.h"
+#include "datastore_db.h"
 
 /* help messages and option processing */
 
