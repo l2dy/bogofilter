@@ -421,7 +421,8 @@ static bool dir_next_mail(void)
 	    continue;
 
 	if (DEBUG_READER(0))
-	    fprintf(dbgout, "%s:%d - reading %s (%p)\n", __FILE__, __LINE__, filename, fpin);
+	    fprintf(dbgout, "%s:%d - reading %s (%p)\n", __FILE__, __LINE__,
+		    filename, (void *)fpin);
 
 	return true;
     }

@@ -91,7 +91,11 @@ static int DB_OPEN(DB *db, const char *file,
 	    file, database, type, flags, mode);
 
     if (DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB_OPEN"))
-	fprintf(dbgout, "[pid %lu] DB->open(db=%p, file=%s, database=%s, type=%x, flags=%#lx=%s, mode=%#o) -> %d %s\n", (unsigned long)getpid(), db, file, database ? database : "NIL", type, (unsigned long)flags, resolveflags(flags), mode, ret, db_strerror(ret));
+	fprintf(dbgout, "[pid %lu] DB->open(db=%p, file=%s, database=%s, "
+		"type=%x, flags=%#lx=%s, mode=%#o) -> %d %s\n",
+		(unsigned long)getpid(), (void *)db, file,
+		database ? database : "NIL", type, (unsigned long)flags,
+		resolveflags(flags), mode, ret, db_strerror(ret));
 
     return ret;
 }
