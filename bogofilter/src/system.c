@@ -37,7 +37,7 @@ const char *const system_config_file = "<Bogofilter$Dir>.bogofilter/cf";
 bool bf_abspath(const char *path /** path to check for absoluteness */)
 {
 #if defined(__OS2__)
-    return (bool) strchr(path, ':');
+    return (bool) strchr(path, ':') || (bool) (*path == '\\') || (bool) (*path == '/');
 #elif defined(__riscos__)
     return (bool) (strchr(path, ':') || strchr(path, '$') || strchr(path, '#') ||
 		   strchr(path, '@') || strchr(path, '%') || strchr(path, '&'));

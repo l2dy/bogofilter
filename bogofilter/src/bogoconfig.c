@@ -183,6 +183,11 @@ void process_parameters(int argc, char **argv, bool warn_on_error)
     fpin = stdin;
     set_today();		/* compute current date for token age */
 
+#ifdef __EMX__
+    _response (&argc, &argv);	/* expand response files (@filename) */
+    _wildcard (&argc, &argv);	/* expand wildcards (*.*) */
+#endif
+
     process_arglist(argc, argv, PR_COMMAND, PASS_1_CLI);
     process_config_files(warn_on_error);
     process_arglist(argc, argv, PR_COMMAND, PASS_3_CLI);
@@ -389,6 +394,9 @@ static void process_arglist(int argc, char **argv, priority_t precedence, int pa
 
     if (pass != PASS_1_CLI) {
 	optind = opterr = 1;
+#ifdef __EMX__
+	optind = 0;
+#endif
 	/* don't use #ifdef here: */
 #if HAVE_DECL_OPTRESET
 	optreset = 1;

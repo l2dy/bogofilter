@@ -14,7 +14,7 @@ NAME:
 
 /* Path Definitions */
 
-#if !defined(__OS2__) && !defined(__riscos__)
+#if !defined(_OS2_) && !defined(__riscos__)
   #define BOGODIR ".bogofilter"
 #else
   #define BOGODIR "bogofilter"

@@ -75,7 +75,7 @@ i=0
 INSERT=.
 while [ $i -lt 3 ] ; do
     PRINTCORE=${srcdir}/$INSERT/printcore
-    if [ -x $PRINTCORE ] ; then break ; fi
+    if [ -f $PRINTCORE ] ; then break ; fi
     i=`expr $i + 1`
     INSERT=$INSERT/..
 done

@@ -40,6 +40,9 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 	switch(err) {
 	    /* F_SETLK can't obtain lock */
 	case EAGAIN:
+#ifdef __EMX__
+	case EACCES:
+#endif
 	    /* case EACCES: */
 	    rand_sleep(MIN_SLEEP, MAX_SLEEP);
 	    retry = true;

@@ -149,11 +149,20 @@ static void process_arglist(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
+#ifdef __EMX__
+    _response (&argc, &argv);	/* expand response files (@filename) */
+    _wildcard (&argc, &argv);	/* expand wildcards (*.*) */
+#endif
+
     while (1)
     {
 	int option_index = 0;
 	int this_option_optind = optind ? optind : 1;
 	const char *name;
+
+#ifdef __EMX__
+	if (optind == 1) optind = 0;
+#endif
 
 	option = getopt_long(argc, argv, OPTIONS,
 			     long_options, &option_index);

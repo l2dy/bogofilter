@@ -844,6 +844,11 @@ static int process_arglist(int argc, char **argv)
 
     bulk_mode = B_CMDLINE;
 
+#ifdef __EMX__
+    _response (&argc, &argv);	/* expand response files (@filename) */
+    _wildcard (&argc, &argv);	/* expand wildcards (*.*) */
+#endif
+
     while (--argc > 0) {
 	char *arg = *++argv;
 	count += 1;

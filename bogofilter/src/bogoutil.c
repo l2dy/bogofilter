@@ -435,6 +435,11 @@ static int process_arglist(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
+#ifdef __EMX__
+    _response (&argc, &argv);	/* expand response files (@filename) */
+    _wildcard (&argc, &argv);	/* expand wildcards (*.*) */
+#endif
+
     while ((option = getopt(argc, argv, OPTIONS)) != -1)
 	switch (option) {
 	case '?':

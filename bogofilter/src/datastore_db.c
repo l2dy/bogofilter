@@ -197,6 +197,7 @@ static void check_db_version(void)
  * limit. errors from the system are ignored, no warning then.
  */
 static void check_fsize_limit(int fd, uint32_t pagesize) {
+#ifndef __EMX__
     struct stat st;
     struct rlimit rl;
 
@@ -221,6 +222,7 @@ static void check_fsize_limit(int fd, uint32_t pagesize) {
 	    print_error(__FILE__, __LINE__, "         data base corruption.");
 	}
     }
+#endif
 }
 
 /* The old, pre-3.3 API will not fill in the page size with
