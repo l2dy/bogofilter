@@ -13,6 +13,10 @@ set -e
 : ${relpath=..}
 : ${BF_TESTDIR=.}
 
+# Cater for GNU coreutils "compatiblity"
+_POSIX2_VERSION=199209
+export _POSIX2_VERSION
+
 # Cater for Solaris "compatibility"
 case $PATH in
 */usr/xpg4/bin:*) ;;
