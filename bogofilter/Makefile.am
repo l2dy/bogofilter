@@ -1,5 +1,8 @@
 # $Id$ 
 # $Log$
+# Revision 1.18  2002/10/04 20:12:27  relson
+# Added common.h to bogofilter_SOURCES.
+#
 # Revision 1.17  2002/10/04 01:29:33  m-a
 # (dbh_free) Fix memory leak: handle->name not freed.
 # Switch to xstrdup.
@@ -89,7 +92,7 @@ MYLIB= xmalloc.h xmalloc.c xstrdup.h xstrdup.c
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c \
                      wordhash.h wordhash.c wordlists.h wordlists.c \
-		     $(MYLIB)
+		     $(MYLIB) common.h
 
 lexertest_SOURCES = lexer.l
 lexertest_CFLAGS = -DMAIN
