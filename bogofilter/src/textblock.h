@@ -13,7 +13,7 @@ NAME:
 typedef struct textdata_s {
     struct textdata_s *next;
     size_t             size;
-    char              *data;
+    byte              *data;
 } textdata_t;
 
 typedef struct textblock_s {
@@ -24,7 +24,7 @@ typedef struct textblock_s {
 extern textblock_t *textblocks;
 
 textblock_t *textblock_init(void);
-void textblock_add(textblock_t *textblock, const char *text, size_t size);
+void textblock_add(textblock_t *textblock, const byte *text, size_t size);
 void textblock_free(textblock_t *textblock);
 
 #endif	/* HAVE_TEXTBLOCK_H */

@@ -37,7 +37,7 @@ textblock_t *textblock_init(void)
     return t;
 }
 
-void textblock_add(textblock_t *t, const char *text, size_t size)
+void textblock_add(textblock_t *t, const byte *text, size_t size)
 {
     size_t mem = size+sizeof(textdata_t);
     textdata_t *cur = t->tail;
@@ -46,8 +46,8 @@ void textblock_add(textblock_t *t, const char *text, size_t size)
     if (size == 0)
 	cur->data = NULL;
     else {
-	cur->data = (char *)xmalloc(size);
-	memcpy(cur->data, text, size);
+	cur->data = (byte *)xmalloc(size);
+	memcpy((char *)cur->data, (const char *)text, size);
     }
     cur_mem += mem;
     tot_mem += mem;
