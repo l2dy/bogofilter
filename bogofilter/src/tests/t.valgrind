@@ -36,11 +36,10 @@ EOF
 
 run_test()
 {
-    id="$1"
-    fil="$2"
-    ver="$3"
-    IN="${SYSTEST}/inputs/msg.$id.txt"
-    OT="${TMPDIR}/msg.$fil.$mth"
+    tst="$1"
+    ver="$2"
+    IN="${SYSTEST}/inputs/msg.$tst.txt"
+    OT="${TMPDIR}/msg.$tst.$mth"
     if [ -n "$ver" ] ; then OT="$OT.$ver" ; fi
     OPTS="-e -t $ver $CFG"
     eval $VALGRIND $BOGOFILTER $OPTS < $IN > $OT
@@ -63,7 +62,7 @@ for mth in f t ; do
 #   if [ $verbose -gt 0 ] ; then $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT ; fi
 
     for tst in 3 ; do
-	args="$tst $tst $V"
+	args="$tst $V"
 	run_test $args
     done
 
