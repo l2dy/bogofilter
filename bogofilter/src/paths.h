@@ -1,11 +1,9 @@
 /* $Id$ */
 
 /**
-
-\file
-   paths.h -- prototypes and definitions for paths.c.
-
-******************************************************************************/
+ * \file
+ * paths.h -- prototypes and definitions for paths.c.
+ */
 
 #ifndef PATHS_H
 #define PATHS_H

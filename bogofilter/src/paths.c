@@ -1,7 +1,8 @@
 /* $Id$ */
 
 /**
- * \file paths.c -- routines for working with file paths.
+ * \file
+ * paths.c -- routines for working with file paths.
  */
 
 #include "common.h"
