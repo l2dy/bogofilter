@@ -165,7 +165,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
 %%
 
-^From\ 						{ if (is_from((const unsigned char *)yytext, yyleng)) { 
+^From\ 						{ if (msg_header && is_from((const unsigned char *)yytext, yyleng)) { 
 						      BEGIN(INITIAL); 
 						      return FROM;
 						  } else { 
