@@ -194,7 +194,7 @@ respectively.  Note: the memory consumption depends on whether the input
 file is regular and allows seek operations.  Within these constraints,
 the file will be rewound and read a second time, without using much
 memory.  If the input file however is not regular (for example, a
-pipeline or socket), then bogofilter will cache a copy if the entire
+pipeline or socket), then bogofilter will cache a copy of the entire
 mail in memory.</para>
 
 <para>The <option>-e</option> (embed) option tells 
@@ -384,11 +384,11 @@ of the available methods.</para>
 <para>PARSING OPTIONS</para>
 
 <para><application>Bogofilter</application> has three special parsing options which can be enabled (or disabled) at the user's discretion.
-The options ar of form <option>-Px</option> and <option>-PX</option> where <option>x</option> designates an option letter.
+The options are of form <option>-Px</option> and <option>-PX</option> where <option>x</option> designates an option letter.
 For the parsing options, a lower case letter enables the option and an upper case letter disables it.</para>
 
 <para>Options <option>-Ph</option> and <option>-PH</option> are for header line markup, i.e. whether to create special tags for header lines.
-When enable, tokens in "To:", "From:", "Return-Path:", and "Subject:" lines will be given special prefixes.
+When enabled, tokens in "To:", "From:", "Return-Path:", and "Subject:" lines will be given special prefixes.
 Enabling this option increases <application>bogofilter's</application> accuracy.</para>
 
 <para>Options <option>-Pi</option> and <option>-PI</option> are for ignoring case, i.e. whether to map upper case to lower case (or not).
@@ -450,8 +450,8 @@ allows setting of debug flags for printing debug information.</para>
 
 <refsect1 id='environment'><title>ENVIRONMENT</title>
     <para>
-	Bogofilter will initialize its data base directory to 
-	<filename>$BOGOFILTER_DIR</filename> if <envar>BOGOFILTER_DIR</envar> is set.
+	Bogofilter will initialize its data base directory to <filename>$BOGOFILTER_DIR</filename> 
+	if <envar>BOGOFILTER_DIR</envar> is set.
 	If it is not set, bogofilter
 	will use <filename>$HOME/.bogofilter</filename> instead.  If neither
 	 <envar>BOGOFILTER_DIR</envar> nor <envar>HOME</envar> is set, the <option>-d
