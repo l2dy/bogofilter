@@ -22,6 +22,11 @@ OUT="lexer.mbx.out"
 verbose=0
 if [ "$1" = "-v" ]; then
     verbose=1
+    v="-v"
+fi
+
+if [ "$1" = "-vv" ]; then
+    verbose=1
     v="-v -x l"
 fi
 
@@ -52,7 +57,7 @@ WANT="1723.3931"
 # v0.13.7.3 - lexer_v3.l changes to allow space in mime boundary
 WANT="1722.3929"
 
-if [ "$RESULT" != "$WANT" ] ; then
+if [ "$RESULT" != "$WANT" -o $verbose ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT
 fi
 
