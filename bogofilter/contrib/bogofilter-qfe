@@ -13,20 +13,22 @@ TMPDIR='/tmp'
 opt="X"
 
 case "$EXT2" in
-	register-spam)
+	register-spam)		# register as spam
 		opt="-s"
 	;;
 
-	register-nonspam)
+	register-nonspam)	# register as non-spam
 		opt="-n"
 	;;
 
-	spam)
-		opt="-S"
+	spam)			# unregister as ham
+				# register as spam
+		opt="-Ns"
 	;;
 
-	nonspam)
-		opt="-N"
+	nonspam)		# unregister as spam
+				# register as ham
+		opt="-Sn"
 	;;
 esac
 
