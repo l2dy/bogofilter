@@ -31,7 +31,6 @@ sysconf_DATA = bogofilter.cf.example
 noinst_LIBRARIES = libbogofilter.a
 LDADD = libbogofilter.a
 
-
 # what to build that from
 libbogofilter_a_SOURCES= \
 	xmalloc.h xcalloc.c xmem_error.c xrealloc.c \
@@ -82,7 +81,8 @@ EXTRA_DIST = $(man_MANS) \
 	     version.sh \
 	     README.cvs README.freebsd README.hp-ux \
 	     README.dcdflib README.Robinson \
-	     $(extradistdirs)
+	     $(extradistdirs) \
+	     bogofilter-SA-2002-01
 #
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
 version.h:	version.sh $(VERSION_FROM)
