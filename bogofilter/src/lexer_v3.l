@@ -123,7 +123,7 @@ UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
 IPADDR		{UINT8}\.{UINT8}\.{UINT8}\.{UINT8}
 BCHARSNOSPC	[0-9a-zA-Z'()+_,-./:=?#]
 BCHARS		[0-9a-zA-Z'()+_,-./:=?# ]
-MIME_BOUNDARY	{BCHARS}{0,69}{BCHARSNOSPC}
+MIME_BOUNDARY	{BCHARS}*{BCHARSNOSPC}
 
 ID		<?[0-9a-zA-Z-]*>?
 CHARSET		[0-9a-zA-Z-]+
