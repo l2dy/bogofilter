@@ -18,15 +18,18 @@
     <arg choice='plain'>help options</arg>
     <arg choice='plain'>classification options</arg>
     <arg choice='plain'>registration options</arg>
+    <arg choice='plain'>parameter options</arg>
     <arg choice='plain'>info options</arg>
   </group>
   <arg choice='opt'>general options</arg>
+  <arg choice='opt'>config file options</arg>
 </cmdsynopsis>
 
   <para>where</para>
   <para><option>help options</option> are:</para>
 <cmdsynopsis>
     <arg choice='opt'>-h</arg>
+    <arg choice='opt'>--help</arg>
     <arg choice='opt'>-V</arg>
     <arg choice='opt'>-Q</arg>
 </cmdsynopsis>
@@ -93,6 +96,9 @@
     <cmdsynopsis>
     <arg choice='opt'>--<replaceable>option=value</replaceable></arg>
     </cmdsynopsis>
+    <para>Note:  Use <command>bogofilter --help</command> to display
+    the complete list of options.</para>
+
 </refsynopsisdiv>
 
 <refsect1 id='description'><title>DESCRIPTION</title>
@@ -426,7 +432,13 @@ becomes a command line's
 <option>--<replaceable>option=value</replaceable></option>.  Use
 command <command>bogofilter --help</command> for a list of options and
 see <filename>bogofilter.cf.example</filename> for more info on
-them.</para>
+them. For example to change the X-Bogosity header, use:</para>
+
+<para>
+<option><replaceable>--spam_header_name=X-Spam-Header</replaceable></option>
+</para>  
+
+
 
 </refsect1>
 
