@@ -1,5 +1,8 @@
 # $Id$
 # $Log$
+# Revision 1.4  2002/09/17 06:19:27  adrian_otto
+# Added check for <sys/file.h>
+#
 # Revision 1.3  2002/09/17 01:51:53  adrian_otto
 # Prepared this snapshot for 0.7.4 release
 #
@@ -113,7 +116,7 @@ AC_MSG_RESULT(BerkeleyDB)
 # Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([fcntl.h limits.h stdlib.h string.h sys/socket.h unistd.h])
+AC_CHECK_HEADERS([fcntl.h limits.h stdlib.h string.h sys/socket.h unistd.h sys/file.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

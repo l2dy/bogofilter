@@ -3772,7 +3772,8 @@ done
 
 
 
-for ac_header in fcntl.h limits.h stdlib.h string.h sys/socket.h unistd.h
+
+for ac_header in fcntl.h limits.h stdlib.h string.h sys/socket.h unistd.h sys/file.h
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if eval "test \"\${$as_ac_Header+set}\" = set"; then
