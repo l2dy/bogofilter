@@ -142,9 +142,14 @@ static int maintain_hook(word_t *key, word_t *data,
     static word_t *x = NULL;
     static uint32_t x_size = MAXTOKENLEN+1;
     dbv_t val;
+
+    if (data->leng > sizeof(val)) {
+	print_error(__FILE__, __LINE__, "Invalid database value.\n");
+	exit(2);
+    }
+
     memcpy(&val, data->text, data->leng);
 
-    (void)data->leng;
     if (replace_nonascii_characters)
 	do_replace_nonascii_characters(key->text, key->leng);
 
