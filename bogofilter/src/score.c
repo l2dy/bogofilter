@@ -115,7 +115,7 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 	if (ds_read(list->dsh, token, &val) != 0)
 	    continue;			/* not found */
 
-	if (list->type == 'I')	/* if on ignore list */
+	if (list->type == WL_IGNORE)	/* if on ignore list */
 	    break;
 
 	override=list->override;
