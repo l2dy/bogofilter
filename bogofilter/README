@@ -31,6 +31,10 @@ you can add to your .muttrc.
 
 *** BUILDING BOGOFILTER ***
 
+When updating, check the RELEASE.NOTES files.
+
+For fresh installs, check the rest of this file and the INSTALL file.
+
 You can safely ignore any of these compile time warnings:
 
 warning: unused parameter ...

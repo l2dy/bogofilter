@@ -2,6 +2,9 @@
 
 ========================================================================
 
+NOTE: Whenever you are about to update your bogofilter version, check
+out the corresponding RELEASE.NOTES file at the very least.
+
 NOTE: If you are about to build from code checked out via CVS, then
 please read the README.cvs file first before you proceed with this file!
 
