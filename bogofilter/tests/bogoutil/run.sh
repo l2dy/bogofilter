@@ -1,11 +1,14 @@
-#!/bin/sh -xe
+#! /bin/sh
 #Test bogoutil and upgrade.pl
 
 #Test 1 -- combined count/data text file
 #Test 2 -- separate count, BDB data file.
 #Test 3 -- Same as 2 except that BDB file has a .count token.
-#Test 4 -- Same as 2 except that BDB file has a  .MSG_COUNT token. Technically already upgraded.
- 
+#Test 4 -- Same as 2 except that BDB file has a  .MSG_COUNT token.
+#          Technically already upgraded.
+
+set -e
+
 for num in `seq 1 4`;do
 echo "Running test $num"
 (
@@ -36,6 +39,6 @@ echo "Running test $num"
 
 	perl bogoupgrade.pl -b ./bogoutil -i $inputfile -o $outputdb && \
 	./bogoutil -d $outputdb |sort|diff -u - tests/bogoutil/output-${num}.txt
-) || echo "failed test $num"
+) || { echo "failed test $num" ; exit 1 ; }
 done
 
