@@ -224,6 +224,7 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
     double spamicity = method->spamicity();
 
     memset(buff, '\0', size);		/* for debugging */
+    memset(temp, '\0', sizeof(temp));	/* for debugging */
 
     while (buff < end && *format)
     {
@@ -331,7 +332,7 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 		buff += format_string(buff, temp, 0, 0, 0, end);
 		break;
 	    case 'v':		/* v - version, ex. "version=%v" */
-		buff += format_string(buff, VERSION, 0, prec, flags, end);
+		buff += format_string(buff, version, 0, prec, flags, end);
 		break;
 	    default:
 		die ("unknown header format directive: '%c'\n", *format);

@@ -42,8 +42,8 @@ AUTHOR:
 
 extern int Rtable;
 
-char msg_register[80];
-char msg_bogofilter[80];
+char msg_register[256];
+char msg_bogofilter[256];
 size_t msg_register_size = sizeof(msg_register);
 
 const char *progname = "bogofilter";
@@ -160,7 +160,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 		{
 		    typedef char *formatter(char *buff, size_t size);
 		    formatter *fcn = terse ? format_terse : format_header;
-		    char buff[80];
+		    char buff[256];
 		    /* print spam-status at the end of the header
 		     * then mark the beginning of the message body */
 		    fcn(buff, sizeof(buff));
