@@ -7,7 +7,9 @@
 #include <stdlib.h>
 
 #include "charset.h"
+#ifdef NOT_YET
 #include "hints.h"
+#endif
 #include "mime.h"
 #include "wordhash.h"
 #include "token.h"
