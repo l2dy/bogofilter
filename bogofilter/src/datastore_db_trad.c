@@ -30,6 +30,7 @@ David Relson	<relson@osagesoftware.com> 2003 - 2005
 #include "db_lock.h"
 #include "error.h"
 #include "longoptions.h"
+#include "paths.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
@@ -118,23 +119,24 @@ int bft_get_rmw_flag(int open_mode)
 DB_ENV *bft_recover_open(bfdir *directory, bffile *db_file)
 {
     int fd;
-
-    (void) directory;		/* quiet compiler warning */
-
-    fd = open(db_file->filename, O_RDWR);
+    char *path = build_path(directory->dirname, db_file->filename);
+    
+    fd = open(path, O_RDWR);
     if (fd < 0) {
-	print_error(__FILE__, __LINE__, "bft_recover_open: cannot open %s: %s", db_file->filename,
+	print_error(__FILE__, __LINE__, "bft_recover_open: cannot open %s: %s", path,
 		    strerror(errno));
 	exit(EX_ERROR);
     }
 
     if (db_lock(fd, F_SETLKW, (short int)F_WRLCK)) {
 	print_error(__FILE__, __LINE__,
-		    "bft_recover_open: cannot lock %s for exclusive use: %s", db_file->filename,
+		    "bft_recover_open: cannot lock %s for exclusive use: %s", path,
 		    strerror(errno));
 	close(fd);
 	exit(EX_ERROR);
     }
+
+    xfree(path);
 
     return NULL;
 }
