@@ -210,8 +210,9 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
 
     if (ret == 0) {
 	print_error(__FILE__, __LINE__,
-		    "(qdbm) db_set_dbvalue( '%.*s' ), err: %d",
-		    CLAMP_INT_MAX(token->leng), (char *)token->data, dpecode);
+		    "(qdbm) db_set_dbvalue( '%.*s' ) failed: %s",
+		    CLAMP_INT_MAX(token->leng), (char *)token->data,
+		    dperrmsg(dpecode));
 	exit(EX_ERROR);
     }
 
