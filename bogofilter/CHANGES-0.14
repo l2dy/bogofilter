@@ -5,25 +5,6 @@
 
 $Id$
 
-	2003-08-24
-
-	* Fix some printf calls for 64-bit machines (%*s).
-	* Fix compilation with TDB.
-	* The -b and -B options now autodetect Maildir/s and iterate over each
-	  mail in them. When the named input is a file, it is assumed to be a
-	  single mail unless -s, -S, -n, -N or -M is given - in that case it's
-	  an mbox.
-	* Revised message reader implementation so the way of specifing the
-	  input is independent from the input format (such as mbox vs.
-	  Maildir).
-	* Bugfixed Maildir implementation to read cur/ and new/.
-
-	2003-08-23
-
-	* Implemented new message reading protocol for processing
-          bulk mode, splitting mailboxes into messages, reading
-          messages in maildirs, etc.
-
 0.14.5.2 2003-08-20
 
 	* bogominitrain.pl - removed email 'cruft' and revised format

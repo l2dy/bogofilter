@@ -2,13 +2,6 @@
 				BOGOFILTER NEWS
 			       =================
  
-2003-08-24
-
-* Implemented a new, more robust, mail reading module that knows how to
-  split a mbox into messages and read Maildirs.
-* 64-bit printf files for %*s string formatting.
-* Compiles with TDB again.
-
 0.14.5.2 2003-08-20
 
 * bogominitrain.pl - removed email 'cruft' and revised format
