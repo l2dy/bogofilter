@@ -648,7 +648,6 @@ ex_t dbe_recover(const char *directory, bool catastrophic, bool force)
     if (!(force || needs_recovery()))
 	return EX_OK;
 
-retry:
     if (DEBUG_DATABASE(0))
         fprintf(dbgout, "running %s data base recovery\n",
 	    catastrophic ? "catastrophic" : "regular");
@@ -656,20 +655,13 @@ retry:
 		    db_max_locks, db_max_objects,
 		    catastrophic ? DB_RECOVER_FATAL : DB_RECOVER);
     if (env == NULL) {
-	if(!catastrophic) {
-	    catastrophic = true;
-	    goto retry;
-	}
-	goto rec_fail;
+	exit(EX_ERROR);
     }
 
     clear_lockfile();
     dbx_cleanup_lite(env);
 
     return EX_OK;
-
-rec_fail:
-    exit(EX_ERROR);
 }
 
 static ex_t dbx_common_close(DB_ENV *dbe, const char *directory)
