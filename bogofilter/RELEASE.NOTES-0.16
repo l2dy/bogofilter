@@ -155,6 +155,3 @@ status, or for a month, whichever is longer.
 
 Bogofilter 0.17.0 will be the "Code Clean-Up - Phase 2" release.  All the
 deprecated code will be removed.
-
-Once release 0.17.X is promoted to "stable" status, the goal is to
-release bogofilter version 1.
