@@ -18,6 +18,8 @@ void *
 xmalloc(size_t size){
 	void *x;
 	x = malloc(size);
+	if (x == NULL && size == 0)
+	    x = malloc(1);
 	if (x == NULL) {
 	    xmem_error("xmalloc"); 
 	}

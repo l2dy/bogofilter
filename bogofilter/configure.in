@@ -191,7 +191,7 @@ AC_TYPE_SIGNAL
 # Checks for library functions.
 dnl AC_FUNC_MALLOC
 # AC_FUNC_MALLOC wants rpl_malloc in malloc.c, to protect against
-# malloc(0) == NULL. We don't care, xmalloc handles it.
+# malloc(0) == NULL. xmalloc handles this by retrying with size 1.
 
 dnl AC_FUNC_STAT
 # AC_FUNC_STAT wants to replace stat(2) if stat("", &st) succeeds.
