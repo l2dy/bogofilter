@@ -87,6 +87,7 @@ charset=\"?{ID}\"?				{ got_charset(yytext);
 ^Content-Type:{MTYPE};?				{  mime_type(yy_text()); yyredo(yy_text(), ':'); }
 ^Content-Disposition:{MTYPE}			{  mime_disposition(yy_text()); yyredo(yy_text(), ':'); }
 ^From\ 						{ return (msg_header ? FROM : TOKEN); }
+^Subject:.* 					{ set_tag("subj:");  yyredo(yy_text(), ':'); }
 ^Date:.*|Delivery-Date:.*			;
 ^Message-ID:.*					;
 ^\tid\ {ID}					;
@@ -100,7 +101,7 @@ filename=\"?					;
 {TOKEN}						{ return(TOKEN);}
 .						;
 ^\n						{ got_emptyline(); return(EMPTY);}
-\n						;
+\n						{ got_newline(); }
 
 %%
 
