@@ -49,6 +49,6 @@ iso-8859-1
 iso-8859-1
 _EOF
 
-../bogolexer -p -C <${TMPDIR}/input >${TMPDIR}/output
+$BOGOLEXER -p -C <${TMPDIR}/input >${TMPDIR}/output
 cmp ${TMPDIR}/reference ${TMPDIR}/output \
 || diff ${TMPDIR}/reference ${TMPDIR}/output

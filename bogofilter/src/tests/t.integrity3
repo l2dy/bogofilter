@@ -11,8 +11,8 @@ echo 0a 74 65 73 74 00 74 65 0d 73 74 0d 0a \
 ./escnp <${TMPDIR}/input >${TMPDIR}/reference
 shn="`./spam_header_name`:"
 # check seekable input
-$VAL ${relpath}/bogofilter -e -p -C <${TMPDIR}/input | ./escnp >${TMPDIR}/output
+$VAL $BOGOFILTER -e -p -C <${TMPDIR}/input | ./escnp >${TMPDIR}/output
 grep -v "$shn" ${TMPDIR}/output | cmp - ${TMPDIR}/reference
 # check non-seekable input
-cat ${TMPDIR}/input | $VAL ${relpath}/bogofilter -e -p -C | ./escnp >${TMPDIR}/output
+cat ${TMPDIR}/input | $VAL $BOGOFILTER -e -p -C | ./escnp >${TMPDIR}/output
 grep -v "$shn" ${TMPDIR}/output | cmp - ${TMPDIR}/reference
