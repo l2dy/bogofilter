@@ -20,6 +20,7 @@ AUTHOR:
 #include "charset.h"
 #include "error.h"
 #include "mime.h"
+#include "msgcounts.h"
 #include "word.h"
 #include "token.h"
 #include "xmemrchr.h"
@@ -65,9 +66,9 @@ token_t get_token(void)
 	yylval = word_new(NULL, 0);
 
     while (!done) {
-	class  = lexer_v3_lex();
-	yylval->leng = lexer_v3_leng;
-	yylval->text = (byte *)lexer_v3_text;
+	class = lexer->yylex();
+	yylval->leng = *lexer->yyleng;
+	yylval->text = *lexer->yytext;
 
 	if (DEBUG_TEXT(2)) { 
 	    word_puts(yylval, 0, dbgout);
@@ -147,6 +148,7 @@ token_t get_token(void)
 	case NONE:		/* nothing to do */
 	    break;
 	case MSG_COUNT_LINE:
+	    lexer = &msg_count_lexer;
 	case BOGO_LEX_LINE:
 	    done = true;
 	    break;

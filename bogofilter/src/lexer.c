@@ -19,6 +19,7 @@
 #include "html.h"
 #include "lexer.h"
 #include "mime.h"
+#include "msgcounts.h"
 #include "textblock.h"
 #include "token.h"
 #include "word.h"
@@ -28,10 +29,23 @@
 
 int yylineno;
 bool msg_header = true;
+lexer_t *lexer = NULL;
 
 /* Local Variables */
 
 extern char *spam_header_name;
+
+lexer_t v3_lexer = {
+    lexer_v3_lex,
+    &lexer_v3_text,
+    &lexer_v3_leng
+};
+
+lexer_t msg_count_lexer = {
+    msg_count_lex,
+    &msg_count_text_ptr,
+    &msg_count_leng
+};
 
 #define YY_NULL 0
 
@@ -234,6 +248,13 @@ void yyinit(void)
 {
     yylineno = 0;
     msg_header = true;
+
+    /* Special check to allow quick
+    ** processing of msg-count files
+    */
+
+    if (lexer != &msg_count_lexer)
+	lexer = &v3_lexer;
 }
 
 int yyinput(byte *buf, size_t max_size)
