@@ -140,6 +140,10 @@ typedef unsigned char u_int8_t;
 typedef unsigned long ulong;
 #endif
 
+#ifndef HAVE_UINT
+typedef unsigned int uint;
+#endif
+
 /* prevent db.h from redefining the types above */
 #undef	__BIT_TYPES_DEFINED__
 #define	__BIT_TYPES_DEFINED__ 1

@@ -342,7 +342,7 @@ AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 AC_TYPE_SIGNAL
 AC_FUNC_SELECT_ARGTYPES
-AC_CHECK_TYPES([ulong, uint32_t, u_int32_t, int32_t, int16_t, u_int16_t, uint16_t, u_int8_t])
+AC_CHECK_TYPES([uint, ulong, uint32_t, u_int32_t, int32_t, int16_t, u_int16_t, uint16_t, u_int8_t])
 AC_CACHE_SAVE
 AC_CHECK_SIZEOF(short)
 AC_CHECK_SIZEOF(int)
