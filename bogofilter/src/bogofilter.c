@@ -61,8 +61,7 @@ THEORY:
 
 void print_stats(FILE *fp)
 {
-    if (Rtable || verbose>=2)
-	(*method->print_stats)(fp);
+    (*method->print_stats)(fp);
 }
 
 rc_t bogofilter(int argc, char **argv)
