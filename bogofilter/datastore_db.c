@@ -256,16 +256,17 @@ static long db_get_dbvalue(void *vhandle, const char *word, dbv_t *val){
       val->count = swap_32bit(cv[0]);
       val->date  = swap_32bit(cv[1]);
     }
-    return ret;
+    break;
   case DB_NOTFOUND:
     if (DEBUG_DATABASE(2)) {
       fprintf(dbgout, "[%lu] db_getvalue (%s): [%s] not found\n", (unsigned long) handle->pid, handle->name, word);
     }
-    return ret;
+    break;
   default:
     print_error(__FILE__, __LINE__, "(db) db_getvalue( '%s' ), err: %d, %s", word, ret, db_strerror(ret));
     exit(2);
   }
+  return ret;
 }
 
 
