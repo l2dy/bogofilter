@@ -197,7 +197,8 @@ pipeline or socket), then bogofilter will cache a copy if the entire
 mail in memory.</para>
 
 <para>The <option>-e</option> (embed) option tells 
-<application>bogofilter</application> to exit with code 0 even if the mail is not spam.  
+<application>bogofilter</application> to exit with code 0 unless there
+was an error (even if the mail is not spam or classified as unsure).  
 This simplifies using bogofilter from procmail or maildrop.
 </para>
   
