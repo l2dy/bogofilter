@@ -49,7 +49,7 @@ static void lexer_display_buffer(buff_t *buff)
     fprintf(dbgout, "*** %2d %c,%c %d ", yylineno,
 	    HORB(msg_header), HORB(msg_state->mime_header), buff->t.leng);
     buff_puts(buff, 0, dbgout);
-    if (buff->t.text[buff->t.leng-1] != '\n')
+    if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
 	fputc('\n', dbgout);
 }
 
