@@ -14,6 +14,7 @@ AUTHOR:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include "config.h"
 #include "common.h"
@@ -21,6 +22,9 @@ AUTHOR:
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
+#include "find_home.h"
+#include "globals.h"
+#include "bogoconfig.h"
 
 #ifndef	DEBUG_CONFIG
 #define DEBUG_CONFIG(level)	(verbose > level)
@@ -28,18 +32,8 @@ AUTHOR:
 
 /*---------------------------------------------------------------------------*/
 
-// Global variables
-
-extern int verbose;
-extern int thresh_index;
-extern double thresh_stats;
-extern double thresh_rtable;
-extern char *spam_header_name;
-extern char *user_config_file;
-
-/*---------------------------------------------------------------------------*/
-
-#define	MAXBUFFLEN	200
+/* NOTE: MAXBUFFLEN _MUST_ _NOT_ BE LARGER THAN INT_MAX! */
+#define	MAXBUFFLEN	((int)200)
 
 typedef enum {
 	CP_INTEGER,
@@ -49,80 +43,82 @@ typedef enum {
 } ArgType;
 
 typedef struct {
-    const char 	*name;
+    const char *name;
     ArgType	type;
-    union	
+    union
     {
-	int	*i;
-	double	*d;
-	char	**s;
+	int *	i;
+	double *	d;
+	char **	s;
     } addr;
 } ArgDefinition;
 
-ArgDefinition ArgDefList[] =
+static int dummy;
+
+static const ArgDefinition ArgDefList[] =
 {
-    { "thresh_index",	  CP_INTEGER,	{ (void *) &thresh_index } },
-    { "thresh_rtable",	  CP_DOUBLE,	{ (void *) &thresh_rtable } },
-    { "thresh_stats",	  CP_DOUBLE,	{ (void *) &thresh_stats } },
-    { "spam_header_name", CP_STRING,	{ (void *) &spam_header_name } },
-    { "user_config_file", CP_STRING,	{ (void *) &user_config_file } },
-    { "wordlist",	  CP_WORDLIST,	{ (void *) NULL } },
+    { "thresh_index",	  CP_INTEGER,	{ (void *)&thresh_index } },
+    { "thresh_rtable",	  CP_DOUBLE,	{ (void *)&thresh_rtable } },
+    { "thresh_stats",	  CP_DOUBLE,	{ (void *)&thresh_stats } },
+    { "spam_header_name", CP_STRING,	{ (void *)&spam_header_name } },
+    { "user_config_file", CP_STRING,	{ (void *)&user_config_file } },
+    { "wordlist",	  CP_WORDLIST,	{ (void *)&dummy } },
 };
 
-int	ArgDefListSize = sizeof(ArgDefList)/sizeof(ArgDefList[0]);
+static const int ArgDefListSize = sizeof(ArgDefList)/sizeof(ArgDefList[0]);
 
-bool process_config_parameter( ArgDefinition * arg, const char *val)
+static bool process_config_parameter(const ArgDefinition * arg, const char *val)
 {
     bool ok = TRUE;
     while (isspace(*val) || *val == '=') val += 1;
     switch (arg->type)
     {
-    case CP_INTEGER:
-    {
-	int sign = (*val == '-') ? -1 : 1;
-	if (*val == '-' || *val == '+')
-	    val += 1;
-	*arg->addr.i = atoi(val) * sign;
-	if (DEBUG_CONFIG(0))
-	    fprintf( stderr, "%s -> %d\n", arg->name, *arg->addr.i );
-	break;
-    }
-    case CP_DOUBLE:
-    {
-	double sign = (*val == '-') ? -1.0f : 1.0f;
-	if (*val == '-' || *val == '+')
-	    val += 1;
-	*arg->addr.d = atof(val) * sign;
-	if (DEBUG_CONFIG(0))
-	    fprintf( stderr, "%s -> %f\n", arg->name, *arg->addr.d );
-	break;
-    }
-    case CP_STRING:
-    {
-	*arg->addr.s = xstrdup( (char *) val );
-	if (DEBUG_CONFIG(0))
-	    fprintf( stderr, "%s -> '%s'\n", arg->name, *arg->addr.s );
-	break;
-    }
-    case CP_WORDLIST:
-    {
-	configure_wordlist(val);
-	break;
-    }
-    default:
-    {
-	ok = FALSE;
-	fprintf( stderr, "Unknown parameter type for '%s'\n", arg->name );
-	break;
-    }
+	case CP_INTEGER:
+	    {
+		int sign = (*val == '-') ? -1 : 1;
+		if (*val == '-' || *val == '+')
+		    val += 1;
+		*arg->addr.i = atoi(val) * sign;
+		if (DEBUG_CONFIG(0))
+		    fprintf( stderr, "%s -> %d\n", arg->name, *arg->addr.i );
+		break;
+	    }
+	case CP_DOUBLE:
+	    {
+		double sign = (*val == '-') ? -1.0f : 1.0f;
+		if (*val == '-' || *val == '+')
+		    val += 1;
+		*arg->addr.d = atof(val) * sign;
+		if (DEBUG_CONFIG(0))
+		    fprintf( stderr, "%s -> %f\n", arg->name, *arg->addr.d );
+		break;
+	    }
+	case CP_STRING:
+	    {
+		*arg->addr.s = xstrdup( (char *) val );
+		if (DEBUG_CONFIG(0))
+		    fprintf( stderr, "%s -> '%s'\n", arg->name, *arg->addr.s );
+		break;
+	    }
+	case CP_WORDLIST:
+	    {
+		configure_wordlist(val); /* FIXME */
+		break;
+	    }
+	default:
+	    {
+		ok = FALSE;
+		fprintf( stderr, "Unknown parameter type for '%s'\n", arg->name );
+		break;
+	    }
     }
     return ok;
 }
 
-bool process_config_line( const char *line )
+static bool process_config_line( const char *line )
 {
     int i;
-    int len;
+    size_t len;
     const char *val;
 
     for (val=line; *val != '\0'; val += 1)
@@ -131,7 +127,7 @@ bool process_config_line( const char *line )
     len = val - line;
     for (i=0; i<ArgDefListSize; i += 1)
     {
-	ArgDefinition *arg = &ArgDefList[i];
+	const ArgDefinition *arg = &ArgDefList[i];
 	if (strncmp(arg->name, line, len) == 0)
 	{
 	    bool ok = process_config_parameter(arg, val);
@@ -141,42 +137,45 @@ bool process_config_line( const char *line )
     return FALSE;
 }
 
-void read_config_file(const char *filename)
+void read_config_file(const char *filename, bool home_dir)
 {
     bool error = FALSE;
     int lineno = 0;
     char *tmp = NULL;
     FILE *fp;
 
-    if ( *filename == '~' )
+    if (home_dir && filename[0] != '/')
     {
-	char *home = getenv( "HOME" );
-	if ( home == NULL )
+	const char *home = find_home(1);
+	if (home == NULL)
 	{
-	    fprintf( stderr, "Can't find $HOME.\n" );
+	    fprintf(stderr, "Can't find home directory.\n");
 	    exit(2);
 	}
 	tmp = xmalloc(strlen(home) + strlen(filename) + 2);
-	strcpy( tmp, home );
-	if (tmp[strlen(tmp)-1] != '/' )
-	    strcat( tmp, "/" );
-	while (*filename == '~' || *filename == '/')
-	    filename += 1;
-	strcat( tmp, filename );
+	strcpy(tmp, home);
+	if (tmp[strlen(tmp)-1] != '/')
+	    strcat(tmp, "/");
+	strcat(tmp, filename);
 	filename = tmp;
     }
 
-    fp = fopen( filename, "r");
+    fp = fopen(filename, "r");
 
-    if (fp == NULL)
+    if (fp == NULL) {
+	if (DEBUG_CONFIG(0)) {
+	    fprintf(stderr, "Debug: cannot open %s: %s", filename, strerror(errno));
+	}
+	xfree(tmp);
 	return;
+    }
 
     if (DEBUG_CONFIG(0))
-	fprintf( stderr, "Reading %s\n", filename );
+	fprintf(stderr, "Reading %s\n", filename);
 
     while (!feof(fp))
     {
-	int len;
+	size_t len;
 	char buff[MAXBUFFLEN];
 
 	lineno += 1;
@@ -195,7 +194,13 @@ void read_config_file(const char *filename)
 	}
     }
 
-    fclose(fp);
+    if (ferror(fp)) {
+	fprintf(stderr, "Read error while reading file \"%s\".", filename);
+	error = TRUE;
+    }
+
+    (void)fclose(fp); /* we're just reading, so fclose should succeed */
+    xfree(tmp);
 
     if (error)
 	exit(2);
