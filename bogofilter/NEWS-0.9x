@@ -10,6 +10,19 @@ line tests.  Use options, config files, and wordlists from your
 production environment.  This will help ensure that the new version of
 bogofilter is working properly.
 
+0.92.7	2004-10-02
+
+* Additional portability fix for SunOS 4.1.X
+* '-M' allows processing 1 msg-count file with multiple messages.
+  Otherwise allow multiple msg-count files with 1 message in each.
+* bogofilter-tuning.HOWTO revised and converted to html.
+* Fixed help messages for bogofilter's "-m" and "-o" options.
+
+* Allow only one of '-d' and '-D' options for bogotune.
+* Remove check for bogohome since it breaks "bogotune -D".
+* Fixed minor formatting defects in bogotune.
+* Fixed bogotune man page error for "-d" option.
+
 0.92.6	2004-08-22
 
 * Revise "-QQ" output so it can be used (unchanged) in a config file.

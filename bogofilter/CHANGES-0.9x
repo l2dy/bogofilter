@@ -3,7 +3,15 @@
 			       =================
 
 
-0.92.7	2004-??-??
+0.92.7	2004-10-02
+
+	* '-M' allows processing 1 msg-count file with multiple
+	  messages.  Otherwise allow multiple msg-count files with 1
+	  message in each.
+
+	2004-09-30
+
+	* Allow only one of '-d' and '-D' options for bogotune.
 
 	2004-09-28
 
