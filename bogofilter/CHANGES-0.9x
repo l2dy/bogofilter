@@ -2,6 +2,24 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.92.0	2004-06-26
+
+	* Added ESF options to bogofilter's man page.
+	* Revised man pages' description of multi-parameter options.
+
+	2004-06-25
+
+	* Fixed problem recognizing empty line ending of header in
+          files with CRLFs and X-Bogosity line as last header line.
+
+	2004-06-24
+
+	* Added ESF options to bogofilter's help message.
+
+	2004-06-22
+
+	* t.lock3 regression modified for solaris shell compatibility.
+
 0.91.4	2004-06-20
 
 	2004-06-19
