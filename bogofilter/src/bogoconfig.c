@@ -24,8 +24,6 @@ CONTRIBUTORS:
 #include <errno.h>
 
 #include <unistd.h>
-extern char *optarg;
-extern int optind, opterr, optopt;
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
@@ -76,9 +74,6 @@ static void display_tag_array(const char *label, FIELD *array);
 static void process_args(int argc, char **argv, priority_t precedence, int pass);
 static bool get_parsed_value(char **arg, double *parm);
 static void comma_parse(char opt, const char *arg, double *parm1, double *parm2, double *parm3);
-
-static void help(void);
-static void print_version(void);
 
 /*---------------------------------------------------------------------------*/
 
