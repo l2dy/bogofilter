@@ -66,6 +66,10 @@ Matthias Andree <matthias.andree@gmx.de> 2003 - 2004
 
 static int lockfd = -1;	/* fd of lock file to prevent concurrent recovery */
 
+/** Default flags for DB_ENV->open() */
+static const u_int32_t dbenv_defflags = DB_INIT_MPOOL | DB_INIT_LOCK
+				      | DB_INIT_LOG | DB_INIT_TXN;
+
 u_int32_t db_max_locks = 16384;		/* set_lk_max_locks    32768 */
 u_int32_t db_max_objects = 16384;	/* set_lk_max_objects  32768 */
 
@@ -367,8 +371,8 @@ void *db_open(void *vhandle, const char *path, const char *name, dbmode_t open_m
 
 	/* create DB handle */
 	if ((ret = db_create (&dbp, env->dbe, 0)) != 0) {
-	    print_error(__FILE__, __LINE__, "(db) db_create, err: %d, %s",
-			ret, db_strerror(ret));
+	    print_error(__FILE__, __LINE__, "(db) db_create, err: %s",
+			db_strerror(ret));
 	    goto open_err;
 	}
 
@@ -406,8 +410,8 @@ retry_db_open:
 
 	    /* close again and bail out without further tries */
 	    if (DEBUG_DATABASE(0))
-		print_error(__FILE__, __LINE__, "DB->open(%s) - actually %s, directory %s, err %d, %s",
-			    handle->name, t, env->directory, ret, db_strerror(ret));
+		print_error(__FILE__, __LINE__, "DB->open(%s) - actually %s, directory %s, err %s",
+			    handle->name, t, env->directory, db_strerror(ret));
 	    dbp->close(dbp, 0);
 	    goto open_err;
 	}
@@ -604,10 +608,10 @@ int db_delete(void *vhandle, const dbv_t *token)
     ret = dbp->del(dbp, handle->dbenv->txn, &db_key, 0);
 
     if (ret != 0 && ret != DB_NOTFOUND) {
-	print_error(__FILE__, __LINE__, "DB->del('%.*s'), err: %d, %s",
+	print_error(__FILE__, __LINE__, "DB->del('%.*s'), err: %s",
 		    CLAMP_INT_MAX(db_key.size),
 		    (const char *) db_key.data,
-    		    ret, db_strerror(ret));
+    		    db_strerror(ret));
 	exit(EX_ERROR);
     }
 
@@ -661,8 +665,9 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 	ret = DS_ABORT_RETRY;
 	break;
     default:
-	print_error(__FILE__, __LINE__, "(db) DB->get(TXN=%lu,  '%.*s' ), err: %d, %s",
-		    (unsigned long)handle->dbenv->txn, CLAMP_INT_MAX(token->leng), (char *) token->data, ret, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "(db) DB->get(TXN=%lu,  '%.*s' ), err: %s",
+		    (unsigned long)handle->dbenv->txn, CLAMP_INT_MAX(token->leng),
+		    (char *) token->data, db_strerror(ret));
 	dbe_txn_abort(handle->dbenv);
 	exit(EX_ERROR);
     }
@@ -700,8 +705,8 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
     }
 
     if (ret != 0) {
-	print_error(__FILE__, __LINE__, "db_set_dbvalue( '%.*s' ), err: %d, %s",
-		    CLAMP_INT_MAX(token->leng), (char *)token->data, ret, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "db_set_dbvalue( '%.*s' ), err: %s",
+		    CLAMP_INT_MAX(token->leng), (char *)token->data, db_strerror(ret));
 	exit(EX_ERROR);
     }
 
@@ -800,7 +805,7 @@ void db_flush(void *vhandle)
 	fprintf(dbgout, "DB->sync(%p): %s\n", (void *)dbp, db_strerror(ret));
 
     if (ret)
-	print_error(__FILE__, __LINE__, "db_sync: err: %d, %s", ret, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "db_sync: err: %s", db_strerror(ret));
 
     ret = BF_LOG_FLUSH(handle->dbenv->dbe, NULL);
     if (DEBUG_DATABASE(1))
@@ -948,6 +953,23 @@ static int db_try_glock(const char *directory, short locktype, int lockcmd) {
     return lockfd;
 }
 
+/** Create environment or exit with EX_ERROR */
+static int bf_dbenv_create(DB_ENV **env)
+{
+    int ret = db_env_create(env, 0);
+    if (ret != 0) {
+	print_error(__FILE__, __LINE__, "db_env_create, err: %s",
+		db_strerror(ret));
+	exit(EX_ERROR);
+    }
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "db_env_create: %p\n", (void *)env);
+    (*env)->set_errfile(*env, stderr);
+
+    return ret;
+}
+
+
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
 static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
@@ -959,21 +981,12 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 
     env->magic = MAGIC_DBE;
     env->directory = xstrdup(directory);
-    ret = db_env_create(&env->dbe, 0);
-    if (ret != 0) {
-	print_error(__FILE__, __LINE__, "db_env_create, err: %d, %s", ret,
-		db_strerror(ret));
-	exit(EX_ERROR);
-    }
-    if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "db_env_create: %p\n", (void *)env->dbe);
-
-    env->dbe->set_errfile(env->dbe, stderr);
+    ret = bf_dbenv_create(&env->dbe);
 
     if (db_cachesize != 0 &&
 	    (ret = env->dbe->set_cachesize(env->dbe, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
-	print_error(__FILE__, __LINE__, "DB_ENV->set_cachesize(%u), err: %d, %s",
-		db_cachesize, ret, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "DB_ENV->set_cachesize(%u), err: %s",
+		db_cachesize, db_strerror(ret));
 	exit(EX_ERROR);
     }
 
@@ -1017,11 +1030,10 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 #if DB_AT_MOST(3,0)
 	    NULL,
 #endif
-	    DB_INIT_MPOOL | DB_INIT_LOCK
-	    | DB_INIT_LOG | DB_INIT_TXN | DB_CREATE | flags, /* mode */ 0644);
+	    dbenv_defflags | DB_CREATE | flags, /* mode */ 0644);
     if (ret != 0) {
 	env->dbe->close(env->dbe, 0);
-	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %d, %s", ret, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %s", db_strerror(ret));
 	if (ret == DB_RUNRECOVERY) {
 	    fprintf(stderr, "To recover, run: bogoutil -v -f \"%s\"\n",
 		    directory);
@@ -1040,7 +1052,7 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 /* close the environment, but do not release locks */
 static void dbe_cleanup_lite(dbe_t *env) {
     if (env->txn) {
-	print_error(__FILE__, __LINE__, "dbe_cleanup called with open transaction, aborting.");
+	print_error(__FILE__, __LINE__, "dbe_cleanup called with open transaction, aborting transaction.");
 	dbe_txn_abort(env);
     }
     if (env->dbe) {
@@ -1186,4 +1198,48 @@ void *db_get_env(void *vhandle) {
     dbh_t *handle = vhandle;
     assert(handle->magic == MAGIC_DBH);
     return handle->dbenv;
+}
+
+int dbe_remove(const char *directory) {
+    DB_ENV *env;
+    int e;
+
+    if (DEBUG_DATABASE(0))
+        fprintf(dbgout, "trying to lock database directory\n");
+    db_try_glock(directory, F_WRLCK, F_SETLKW); /* wait for exclusive lock */
+
+    /* run recovery */
+    bf_dbenv_create(&env);
+    if (DEBUG_DATABASE(0))
+        fprintf(dbgout, "running regular data base recovery\n");
+    /* quirk: DB_RECOVER doesn't appear to work without DB_CREATE */
+    e = env->open(env, directory, dbenv_defflags | DB_CREATE | DB_RECOVER, 0644);
+    if (e == DB_RUNRECOVERY) {
+	/* that didn't work, try harder */
+	if (DEBUG_DATABASE(0))
+	    fprintf(dbgout, "running catastrophic data base recovery\n");
+	e = env->open(env, directory, dbenv_defflags | DB_CREATE | DB_RECOVER_FATAL, 0644);
+    }
+    if (e) {
+	print_error(__FILE__, __LINE__, "Cannot recover environment \"%s\": %s",
+		directory, db_strerror(e));
+	exit(EX_ERROR);
+    }
+    (void)env->close(env, 0); /* FIXME: is ignoring errors right? */
+
+    /* remove - requires new handle, hence close/create */
+    bf_dbenv_create(&env);
+    if (DEBUG_DATABASE(0))
+        fprintf(dbgout, "removing database environment\n");
+    e = env->remove(env, directory, 0);
+    if (e) {
+	print_error(__FILE__, __LINE__, "Cannot remove environment \"%s\": %s",
+		directory, db_strerror(e));
+	exit(EX_ERROR);
+    }
+
+    /* no env->close() here, env->remove() does that for us */
+
+    db_try_glock(directory, F_UNLCK, F_SETLKW); /* release lock */
+    return EX_OK;
 }

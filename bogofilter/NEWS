@@ -23,6 +23,16 @@ Briefly:
 
 0.93.2	2004-11-??
 
+	2004-11-28
+
+	* Support long options in bogoutil.
+
+	* Add --remove-environment DIR long option to bogoutil, to remove the
+	  environment. Only one such option can be used and there is no
+	  corresponding short option.
+
+	* Remove useless numeric Berkeley DB error codes from error messages.
+
 	2004-11-26
 
 	* bogofilter processes will refuse to open multiple wordlists in

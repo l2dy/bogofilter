@@ -81,14 +81,15 @@ int dbe_txn_abort(void *vhandle);
 int dbe_txn_commit(void *vhandle);
 
 int dbe_recover(const char *directory, bool catastrophic, bool force);
+int dbe_remove(const char *directory);
 
-/* Returns is_swapped flag */
+/** Returns is_swapped flag */
 bool db_is_swapped(void *vhandle);
 
-/* Returns created flag */
+/** Returns created flag */
 bool db_created(void *vhandle);
 
-/* Returns parent environment */
+/** Returns parent environment */
 void *db_get_env(void *vhandle);
 
 #endif

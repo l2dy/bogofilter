@@ -436,3 +436,10 @@ int ds_recover(const char *directory, bool catastrophic)
 {
     return dbe_recover(directory, catastrophic, true);
 }
+
+int ds_remove(const char *directory) {
+    int e;
+    void *env;
+
+    return dbe_remove(directory);
+}

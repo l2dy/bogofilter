@@ -49,7 +49,7 @@ bool  onlyprint = false;
 
 /* Function Prototypes */
 
-static int process_arg(int option, const char *name, const char *arg);
+static int process_arg(int option, const char *name, const char *arg, int option_index);
 
 /* Function Definitions */
 
@@ -489,6 +489,9 @@ static cmd_t flag = M_NONE;
 
 #define	OPTIONS	":a:c:d:Df:F:hH:I:k:l:m:np:r:R:s:u:vVw:x:X:y:"
 
+static int remenv = 0;	/** if set, run recovery and remove the environment */
+static char *remedir;	/** environment to remove */
+
 struct option long_options[] = {
 #ifdef	HAVE_DECL_DB_CREATE
     { "db_lk_max_locks",		R, 0, O_DB_MAX_LOCKS },
@@ -501,6 +504,8 @@ struct option long_options[] = {
     { "debug-flags",			R, 0, 'x' },
     { "debug-to-stdout",		N, 0, 'D' },
     { "verbosity",			N, 0, 'v' },
+    /* no short option for safety */
+    { "remove-environment",		R, &remenv, O_REMOVE_ENVIRONMENT },
     /* The following options are present to allow config files
     ** to be read without complaints (and mostly ignored)
     */
@@ -562,7 +567,7 @@ static int process_arglist(int argc, char **argv)
  	    break;
 
 	name = (option_index == 0) ? argv[this_option_optind] : long_options[option_index].name;
-	count += process_arg(option, name, optarg);
+	count += process_arg(option, name, optarg, option_index);
     }
 
     if (count != 1)
@@ -580,7 +585,7 @@ static int process_arglist(int argc, char **argv)
     return count;
 }
 
-static int process_arg(int option, const char *name, const char *val)
+static int process_arg(int option, const char *name, const char *val, int option_index)
 {
     int count = 0;
 
@@ -735,13 +740,37 @@ static int process_arg(int option, const char *name, const char *val)
 	break;
 
 #ifdef	HAVE_DECL_DB_CREATE
-    case O_DB_MAX_OBJECTS:	db_max_objects = atoi(val);		  break;
-    case O_DB_MAX_LOCKS:	db_max_locks   = atoi(val);		  break;
+    case O_DB_MAX_OBJECTS:	
+	db_max_objects = atoi(val);
+	break;
+    case O_DB_MAX_LOCKS:
+	db_max_locks   = atoi(val);
+	break;
 #ifdef	FUTURE_DB_OPTIONS
-    case O_DB_LOG_AUTOREMOVE:	db_log_autoremove = get_bool(name, val);  break;
-    case O_DB_TXN_DURABLE:	db_txn_durable    = get_bool(name, val);  break;
+    case O_DB_LOG_AUTOREMOVE:
+	db_log_autoremove = get_bool(name, val);
+	break;
+    case O_DB_TXN_DURABLE:
+	db_txn_durable    = get_bool(name, val);
+	break;
 #endif
 #endif
+
+    case 0:
+	/* long option with no short option correspondence */
+	switch (long_options[option_index].val) {
+	    case O_REMOVE_ENVIRONMENT:
+		if (remedir) {
+		    fprintf(stderr, "can remove only one environment\n");
+		    exit(EX_ERROR);
+		}
+		remedir = xstrdup(optarg);
+		count += 1;
+		break;
+	    default:
+		abort();
+	}
+	break;
 
     default:
 	abort();
@@ -758,6 +787,13 @@ int main(int argc, char *argv[])
     set_today();			/* compute current date for token age */
 
     process_arglist(argc, argv);
+
+    /* process long option arguments first */
+    if (remenv) {
+	/* remove environment */
+	rc = ds_remove(remedir);
+	exit(rc);
+    }
 
     /* Extra or missing parameters */
     if (flag != M_WORD && argc != optind) {

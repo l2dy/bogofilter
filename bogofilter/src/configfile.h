@@ -59,7 +59,8 @@ typedef enum longopts_e {
     O_TIMESTAMP,
     O_UNSURE_SUBJECT_TAG,
     O_USER_CONFIG_FILE,
-    O_WORDLIST
+    O_WORDLIST,
+    O_REMOVE_ENVIRONMENT
 } longopts_t;
 
 /* Global variables */

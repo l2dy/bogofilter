@@ -241,4 +241,7 @@ extern const char *ds_version_str(void);
 /** Runs forced recovery on data base */
 extern int ds_recover(const char *directory, bool catastrophic);
 
+/** Remove environment in given directory, \return EX_OK or EX_ERROR */
+extern int ds_remove(const char *directory);
+
 #endif

@@ -32,6 +32,7 @@
 		<arg choice="plain">-F</arg>
 		<arg choice="plain">-r</arg>
 		<arg choice="plain">-R</arg>
+		<arg choice="plain">--remove-environment</arg>
 	    </group>
 	    <arg choice="plain"><replaceable>directory</replaceable></arg>
 	</cmdsynopsis>
@@ -123,18 +124,25 @@
 	    in the data base directory dir. If that fails, it will retry
 	    with a (usually slower) catastrophic data base recovery. If
 	    that fails, too, your data base cannot be repaired and must
-	    be rebuilt from scratch.</para>
-	<para>This is only supported when compiled with Berkeley DB
-	    support. Trying recovery with QDBM or TDB support will
+	    be rebuilt from scratch.
+	    This is only supported when compiled with Berkeley DB
+	    support with transactions enabled. Trying recovery with QDBM or TDB support will
 	    result in an error.</para>
 	<para>The <option>-F <replaceable>dir</replaceable></option>
 	    option (mnemonic: "fix harder") runs a catastrophic data
 	    base recovery in the data base directory dir. If that fails,
 	    your data base cannot be repaired and must be rebuilt from
-	    scratch.</para>
-	<para>This is only supported when compiled with Berkeley DB
-	    support. Trying recovery with QDBM or TDB support will
+	    scratch.
+	    This is only supported when compiled with Berkeley DB
+	    support with transactions enabled. Trying recovery with QDBM or TDB support will
 	    result in an error.</para>
+	<para>The <option>--remove-environment
+		<replaceable>directory</replaceable></option> option has
+	    no short option equivalent. It runs recovery in the given
+	    directory and then removes the database environment. Use
+	    this <emphasis>before</emphasis> upgrading to a new Berkeley
+	    DB version if the new version to be installed requires a log
+	    file format update.</para>
 	<para>The <option>-r</option> option tells
 	    <application>bogoutil</application> to recalculate the ROBX
 	    value and print it as a six-digit fraction.
