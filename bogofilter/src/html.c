@@ -54,6 +54,8 @@ int process_html_comments(buff_t *buff)
 	size_t comment_offset = tmp - buf_start;
 	count = kill_html_comment(buff, comment_offset);
 	buf_used = buf_start + buff->t.leng;
+	if (msg_header)		/* If message header encoutered, ... */
+	    break;
     }
 
     if (buff->t.leng != (size_t)(buf_used - buf_start)) {
@@ -107,6 +109,8 @@ static int kill_html_comment(buff_t *buff, size_t comment_offset)
 	    new = buff_fill(buff, used, need);
 	    if (new == 0 || new == EOF)
 		break;
+	    if (msg_header)	/* If message header encoutered, ... */
+		done = true;
 	    continue;
 	}
 
