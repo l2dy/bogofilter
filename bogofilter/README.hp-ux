@@ -2,26 +2,41 @@ Compiling Bogofilter on HP-UX
 =============================
 Bogofilter has been tested on HP-UX 11.00 and 11i.
 
-There are two prerequisites for compiling Bogofilter on HP-UX.
-1. gcc
-2. Berkeley DB
+There is an issue in the Makefile that requires a change if
+using the HP-UX version of the make utility.  At approximately
+line 781 is a line that looks like this:
+CFLAGS ?= -g -Os -Wall
+This line must be deleted before HP-UX's make utility will properly
+process the Makefile.
 
-gcc (and other open-source software) is available from HP, at
-http://h21007.www2.hp.com/dev/technologies/topic/1,2608,10602,00.html .
-Also available from the HP-UX Porting and Archive Centre,
-at http://hpux.connect.org.uk/ (and mirrors around the world).
+There are two prerequisites for compiling Bogofilter on HP-UX.
+1. Berkeley DB
+2. HP ANSI C or gcc
 
 Berkeley DB may be obtained from Sleepycat Software, at
 http://www.sleepycat.com/ .  Also available from HP as part of the HP
 release of the Gnome Desktop, at http://www.software.hp.com/products/GNOME/ .
 The Gnome Desktop and Gnome Developer bundles are required.
 
-After the prerequistes have been met, make certain that gcc
-is available through your PATH environment variable.  Be sure to
-run the `configure' script with the `--with-db=/path/to/berkeley-db-dir'
-option so that `configure' can find your Berkeley DB installation.
-For example, users of the HP Gnome Desktop would use
-`configure --with-db=/opt/gnome'.
+HP ANSI C is available for purchase from HP, at http://www.software.hp.com/ .
+gcc is an open-source ANSI C compiler available for free.  gcc (and other
+open-source software) is available from HP, at
+http://h21007.www2.hp.com/dev/technologies/topic/1,2608,10602,00.html .
+Also available from the HP-UX Porting and Archive Centre,
+at http://hpux.connect.org.uk/ (and mirrors around the world).
+
+When running the `configure' script, the proper options must be
+given so that `configure' knows which compiler to use and where
+to find your Berkeley DB installation.
+
+If using the HP ANSI C compiler, use the CC='cc -Ae' option.
+If using gcc, no `CC' option is required.
+
+The option to tell `configure' where to find your Berkeley DB installation
+is always required.  Use the `--with-db=/path/to/berkeley-db-dir' option.
+
+For example, users with the HP Gnome Desktop using the HP ANSI C compiler
+would use `configure CC='cc -Ae' --with-db=/opt/gnome'.
 
 Read the INSTALL file in this directory for more information and
 additional options for the `configure' script.
@@ -30,3 +45,9 @@ Please note that `make check' fails on HP-UX due to portability
 issues in the testing framework.  This does not mean bogofilter
 is not operating properly.  This will be corrected in a future
 release.
+
+Also note that HP's lex is insufficient for generating lexer.c from
+lexer.l so a pre-generated lexer.c is included in the distribution.
+If you wish to make any changes or improvements to lexer.l
+this would require access to flex, an open-source version of lex.
+flex is available in the same locations as gcc (see above).
