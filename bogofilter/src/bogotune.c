@@ -582,6 +582,8 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 
 	collect_words(whc);
 	
+	/* FIXME: consideration necessary for msgs_* == 0 comparations
+	   as these variables are now of type "double". */
 	if (ds_path != NULL && msgs_good == 0 && msgs_bad == 0) {
 	    wordprop_t *msg_count = wordhash_insert(whc, w_msg_count, sizeof(wordprop_t), NULL);
 	    if (msg_count->cnts.good == 0 || msg_count->cnts.bad == 0)
