@@ -101,7 +101,6 @@ cellspacing	;
 center	;
 char	;
 charoff	;
-charset	;
 circle	;
 cite	;
 colspan	;
@@ -344,15 +343,14 @@ token_t get_token(void)
     /* If saved IPADDR, truncate last octet */
     if ( save_class == IPADDR )
     {
-	yylval = save_text;
-	t = strrchr(yylval, '.');
+	t = strrchr(save_text, '.');
 	if (t == NULL)
 	    save_class = NONE;
 	else
 	{
 	    *t = '\0';	
-	    yylval = yytext;
-	    yyleng = strlcpy( yytext, save_text, MAXWORDLEN );
+	    yylval = save_text;
+	    yyleng = strlen(save_text);
 	    return save_class;
 	}
     }
