@@ -129,9 +129,16 @@ void iconvert(buff_t *src, buff_t *dst)
 	    switch (err) {
 	    case EILSEQ:		/* invalid multibyte sequence */
 	    case EINVAL:		/* incomplete multibyte sequence */
-		inbytesleft -= 1;	/* copy 1 byte (or substitute a '?') */
+		/* copy 1 byte (or substitute a '?') */
+		if (!replace_nonascii_characters)
+		    *outbuf = *inbuf;
+		else
+		    *outbuf = '?';
+		/* update counts and pointers */
+		inbytesleft -= 1;
 		outbytesleft -= 1;
-		*outbuf++ = *inbuf++;
+		inbuf  += 1;
+		outbuf += 1;
 		break;
 
 	    case E2BIG:			/* output buffer has no more room */
