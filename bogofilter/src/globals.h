@@ -4,7 +4,7 @@
 #define GLOBALS_H
 
 #include <float.h> /* has DBL_EPSILON */
-#define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
+#define EPS	DBL_EPSILON	 /* equality cutoff */
 
 #include "system.h" /* has bool */
 #include "common.h" /* has PATH_LEN */
