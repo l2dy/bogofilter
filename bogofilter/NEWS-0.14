@@ -2,8 +2,10 @@
 				BOGOFILTER NEWS
 			       =================
  
-0.14.1.1 2003-07-31
- 
+0.14.1.1 2003-08-01
+
+* Removed case sensitivity for adding spam_subject_tag to message
+  header.
 * Correct problem with t.degen regression test.
  
 0.14.1	2003-07-31
