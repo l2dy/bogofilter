@@ -417,11 +417,11 @@ wordhash_next (wordhash_t *wh)
 	    val = wh->iter_ptr = wh->iter_ptr->iter_next;
 	break;
     case WH_ORDERED:
-	if (++wh->index < wh->size)
+	if (++wh->index < wh->count)
 	    val = wh->order[wh->index];
 	break;
     case WH_PROPS:
-	if (++wh->index < wh->size)
+	if (++wh->index < wh->count)
 	    val = &wh->props[wh->index];
 	break;
     case WH_CNTS:
@@ -477,11 +477,11 @@ wordhash_sort (wordhash_t *wh)
 
     wh->order = (hashnode_t **) xcalloc(wh->size, sizeof(hashnode_t *));
 
-    wh->size = 0;
+    wh->count = 0;
     for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
-	wh->order[wh->size++] = node;
+	wh->order[wh->count++] = node;
 
-    qsort(wh->order, wh->size, sizeof(hashnode_t *), compare_hashnode_t);
+    qsort(wh->order, wh->count, sizeof(hashnode_t *), compare_hashnode_t);
 
     wh->type = WH_ORDERED;
 
