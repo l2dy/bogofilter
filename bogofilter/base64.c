@@ -57,6 +57,8 @@ size_t base64_decode(byte *buff, size_t size)
 	    byte t = base64_xlate[c];
 	    if (t == base64_invalid) {
 		shorten = 4 - i;
+		if (shorten > count)
+		    return count;
 		i = 4;
 		v >>= (shorten * 2);
 		if (shorten == 2) s++;
