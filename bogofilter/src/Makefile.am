@@ -97,6 +97,7 @@ version_sources= \
 	robx.h robx.c \
 	rstats.h rstats.c \
 	score.h score.c \
+	set_bogohome.h set_bogohome.c \
 	swap.h swap_32bit.c system.c \
 	textblock.h textblock.c \
 	token.h token.c \
