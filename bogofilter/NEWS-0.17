@@ -13,6 +13,7 @@ Note:
 * Added code to use to Berkeley DB Concurrent Data Store, which uses a
   "DB_ENV" BerkeleyDB environment and the BerkeleyDB Lock Manager.
   This is documented in file doc/README.db.
+* Warn if user specified config file doesn't exist.
 * Fixed minor bogotune problems related to building wordlists.
 * Fix tagging of IPAddrs in header lines.
 * If message uses CRLF, put CRLF after added header lines.
