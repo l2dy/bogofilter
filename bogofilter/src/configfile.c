@@ -85,7 +85,7 @@ static bool process_config_parameter(const parm_desc *arg, char *val)
 	case CP_BOOLEAN:
 	    {
 		*arg->addr.b = str_to_bool(val);
-		if (DEBUG_CONFIG(0))
+		if (DEBUG_CONFIG(1))
 		    fprintf(dbgout, "%s -> %s\n", arg->name,
 			    *arg->addr.b ? "Yes" : "No");
 		break;
@@ -95,7 +95,7 @@ static bool process_config_parameter(const parm_desc *arg, char *val)
 		remove_comment(val);
 		if (!xatoi(arg->addr.i, val))
 		    return false;
-		if (DEBUG_CONFIG(0))
+		if (DEBUG_CONFIG(1))
 		    fprintf(dbgout, "%s -> %d\n", arg->name, *arg->addr.i);
 		break;
 	    }
@@ -104,21 +104,21 @@ static bool process_config_parameter(const parm_desc *arg, char *val)
 		remove_comment(val);
 		if (!xatof(arg->addr.d, val))
 		    return false;
-		if (DEBUG_CONFIG(0))
+		if (DEBUG_CONFIG(1))
 		    fprintf(dbgout, "%s -> %f\n", arg->name, *arg->addr.d);
 		break;
 	    }
 	case CP_CHAR:
 	    {
 		*arg->addr.c = *val;
-		if (DEBUG_CONFIG(0))
+		if (DEBUG_CONFIG(1))
 		    fprintf(dbgout, "%s -> '%c'\n", arg->name, *arg->addr.c);
 		break;
 	    }
 	case CP_STRING:
 	    {
 		*arg->addr.s = xstrdup(val);
-		if (DEBUG_CONFIG(0))
+		if (DEBUG_CONFIG(1))
 		    fprintf(dbgout, "%s -> '%s'\n", arg->name, *arg->addr.s);
 		break;
 	    }
@@ -127,7 +127,7 @@ static bool process_config_parameter(const parm_desc *arg, char *val)
 		char *dir = *arg->addr.s;
 		xfree(dir);
 		*arg->addr.s = dir = tildeexpand(val);
-		if (DEBUG_CONFIG(0))
+		if (DEBUG_CONFIG(1))
 		    fprintf(dbgout, "%s -> '%s'\n", arg->name, dir);
 		if (setup_wordlists(dir) != 0)
 		    exit(2);
@@ -136,7 +136,7 @@ static bool process_config_parameter(const parm_desc *arg, char *val)
 	case CP_FUNCTION:
 	{
 	    ok = (*arg->addr.f)((unsigned char *)val);
-	    if (DEBUG_CONFIG(0))
+	    if (DEBUG_CONFIG(1))
 		fprintf(dbgout, "%s -> '%s'\n", arg->name, val);
 	    break;
 	}
@@ -161,12 +161,12 @@ static bool process_config_line(char *line,
 
     for ( arg = parms; arg->name != NULL; arg += 1 )
     {
-	if (DEBUG_CONFIG(1))
+	if (DEBUG_CONFIG(2))
 	    fprintf(dbgout, "Testing:  %s\n", arg->name);
 	if (strcmp(arg->name, line) == 0)
 	{
 	    bool ok = process_config_parameter(arg, val);
-	    if (ok && DEBUG_CONFIG(1))
+	    if (ok && DEBUG_CONFIG(2))
 		fprintf(dbgout, "%s\n", "   Found it!");
 	    return ok;
 	}
