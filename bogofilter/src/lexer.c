@@ -55,8 +55,6 @@ bool is_from(word_t *w)
 {
     if (w->leng >= 5 && memcmp(w->text, "From ", 5) == 0)
 	return true;
-    if (w->leng >= 16 && memcmp(w->text, "Mail-from: From ", 16) == 0)
-	return true;
     return false;
 }
 
