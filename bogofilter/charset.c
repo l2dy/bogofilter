@@ -129,9 +129,6 @@ static void map_default(void)
 {
     unsigned int ch;
 
-    const char *alone = "\n\t";				/* Characters to leave alone */
-    const char *blank = "!$%&()*+/;<>?[\\]^`{|}~";	/* Characters to treat as blanks */
-
     for (ch = 0; ch < COUNTOF(charset_table); ch += 1)
     {
 	charset_table[ch] = casefold_table[ch] = ch;
@@ -142,21 +139,9 @@ static void map_default(void)
 
     for (ch=0; ch < COUNTOF(charset_table); ch += 1)
     {
-	if (iscntrl(ch))				/* convert control characters to blanks */
-	{
+	if (iscntrl(ch) && ch != '\n')		/* convert control characters to blanks */
 	    charset_table[ch] = SP;
-	    continue;
-	}
     }
-
-    /* Characters to treat as delimiters.  The ideal would be to treat them as blanks, but
-       that breaks ignoring uuencode, so treat them as '!' (another char not allowed in tokens)
-    */
-    while ((ch = *blank++) != '\0')
-	charset_table[ch] = '!';
-
-    while ((ch = *alone++) != '\0')			/* Characters to leave alone */
-	charset_table[ch] = ch;
 
     PRINT_CHARSET_TABLE;
 }
