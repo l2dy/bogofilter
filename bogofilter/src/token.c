@@ -223,10 +223,7 @@ void got_newline()
 
 void got_emptyline(void)
 {
-    if (msg_state->mime_type != MIME_MESSAGE && !msg_header)
-	return;
-
-    if (msg_state->mime_type == MIME_MESSAGE)
+    if (msg_state->mime_type == MIME_MESSAGE && msg_header)
 	mime_add_child(msg_state);
 
     return;
