@@ -169,6 +169,33 @@ size_t	    cCombined = COUNTOF(aCombined);
 const char *aSeparate[] = { SPAMFILE, GOODFILE };
 size_t	    cSeparate = COUNTOF(aSeparate);
 
+void set_wordlist_mode(void **dbhp, const char *filepath, dbmode_t dbmode)
+{
+    if (wl_mode == WL_M_UNKNOWN) {
+	void *dbh = NULL;
+	wl_mode = WL_M_DEFAULT;
+
+	if (dbh == NULL) {
+	    dbh = db_open(filepath, cCombined, aCombined, dbmode);
+	    if (dbh == NULL)
+		wl_mode = WL_M_COMBINED;
+	}
+	if (dbh == NULL) {
+	    dbh = db_open(filepath, cSeparate, aSeparate, dbmode);
+	    if (dbh == NULL)
+		wl_mode = WL_M_SEPARATE;
+	}
+
+	if (dbhp != NULL)
+	    *dbhp = dbh;
+	else
+	    if (dbh != NULL)
+		db_close(dbh, true);
+    }
+
+    return;
+}
+
 void open_wordlists(dbmode_t mode)
 {
     wordlist_t *list;
@@ -177,24 +204,15 @@ void open_wordlists(dbmode_t mode)
     do {
 	retry = 0;
 	for (list = word_lists; list != NULL; list = list->next) {
-	    switch (wordlists) {
-	    case W_COMBINED:
+	    switch (wl_mode) {
+	    case WL_M_COMBINED:
 		list->dbh = db_open(list->filepath, cCombined, aCombined, mode);
 		break;
-	    case W_SEPARATE:
+	    case WL_M_SEPARATE:
 		list->dbh = db_open(list->filepath, cSeparate, aSeparate, mode);
 		break;
-	    default: /* W_UNKNOWN */
-		if (list->dbh == NULL) {
-		    list->dbh = db_open(list->filepath, cCombined, aCombined, mode);
-		    if (list->dbh == NULL)
-			wordlists = W_COMBINED;
-		}
-		if (list->dbh == NULL) {
-		    list->dbh = db_open(list->filepath, cSeparate, aSeparate, mode);
-		    if (list->dbh == NULL)
-			wordlists = W_SEPARATE;
-		}
+	    case WL_M_UNKNOWN:
+		set_wordlist_mode(&list->dbh, list->filepath, mode);
 		break;
 	    }
 	    if (list->dbh == NULL) {
@@ -248,6 +266,39 @@ void free_wordlists(void)
 	xfree(list);
     }
     word_lists = NULL;
+}
+
+void incr_wordlist_mode_flag(void)
+{
+    switch (wl_mode) {
+    case WL_M_UNKNOWN:  wl_mode = WL_M_COMBINED; break;
+    case WL_M_COMBINED: wl_mode = WL_M_SEPARATE; break;
+    case WL_M_SEPARATE: 
+	fprintf(stderr, "Invalid -W option.\n");
+	exit(2);
+    }
+    return;
+}
+
+size_t build_wordlist_paths(char **filepaths, const char *path)
+{
+    bool ok;
+    size_t count = 0;
+    switch (wl_mode) {
+    case WL_M_COMBINED:
+	count = 1;
+	ok = build_path(filepaths[0], sizeof(FILEPATH), path, WORDLIST) == 0;
+	break;
+    case WL_M_SEPARATE:
+	count = 2;
+	ok = (build_path(filepaths[0], sizeof(FILEPATH), path, WORDLIST) == 0 &&
+	      build_path(filepaths[1], sizeof(FILEPATH), path, WORDLIST) == 0);
+	break;
+    case WL_M_UNKNOWN:
+	fprintf(stderr, "Invalid wordlist mode.\n");
+	exit(2);
+    }
+    return count;
 }
 
 void set_good_weight(double weight)

@@ -33,7 +33,7 @@ extern	int	Rtable;			/* '-R' */
 extern	bool	terse;			/* '-t' */
 extern	int	test;			/* '-T' */
 extern	int	verbose;		/* '-v' */
-extern	wl_t	wordlists;		/* '-W' */
+extern	wl_t	wl_mode;		/* '-W' */
 
 /* config file options */
 extern	int	max_repeats;
@@ -56,7 +56,8 @@ extern	int	db_cachesize;
 extern	const char	*update_dir;
 extern	const char	*progname;
 extern	const char	*progtype;
-/*@observer@*/
+/*@obs
+erver@*/
 extern	const char	*stats_prefix;
 extern	const char *const version;
 extern	const char *const system_config_file;

@@ -356,11 +356,11 @@ static int words_from_list(const char *db_file, int argc, char **argv)
 
 static int words_from_path(const char *dir, int argc, char **argv, bool show_probability)
 {
-    void *dbh;
     int  count = 0;
+
     char filepath1[PATH_LEN];
     char filepath2[PATH_LEN];
-    const char *filepaths[] = { (const char *) &filepath1, (const char *) &filepath2 };
+    char *filepaths[] = { filepath1, filepath2 };
 
     byte buf[BUFSIZE];
     buff_t *buff = buff_new(buf, 0, BUFSIZE);
@@ -372,26 +372,13 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     const char *head_format = !show_probability ? "%-20s %6s %6s\n"   : "%-20s %6s  %6s  %6s  %6s\n";
     const char *data_format = !show_probability ? "%-20s %6lu %6lu\n" : "%-20s %6lu  %6lu  %f  %f\n";
 
-    switch (wordlists) {
-    case W_COMBINED:
-	count = 1;
-	if (build_path(filepath1, sizeof(filepath1), dir, WORDLIST) < 0)
-	    return 2;
-	break;
-    case W_SEPARATE:
-	count = 2;
-	if (build_path(filepath1, sizeof(filepath1), dir, SPAMFILE) < 0)
-	    return 2;
-	if (build_path(filepath2, sizeof(filepath2), dir, GOODFILE) < 0)
-	    return 2;
-	break;
-    default:
-	fprintf(stderr, "Invalid wordlist mode.\n");
-	exit(2);
-    }
+    void *dbh;
+
+    set_wordlist_mode(NULL, dir, DB_READ);
+    count = build_wordlist_paths(filepaths, dir);
 
     /* XXX FIXME: deadlock possible */
-    dbh = db_open(".", count, filepaths, DB_READ);
+    dbh = db_open(".", count, (const char **)filepaths, DB_READ);
     if (dbh == NULL)
 	return 2;
 
@@ -521,34 +508,19 @@ static int compute_robinson_x(char *path)
     free_wordlists();
 
     if (!onlyprint) {
-	bool ok = true;
-	size_t count = 0;
 	char filepath1[PATH_LEN];
 	char filepath2[PATH_LEN];
-	const char *filepaths[] = { (const char *) &filepath1, (const char *) &filepath2 };
+	char *filepaths[] = { filepath1, filepath2 };
 
-	switch (wordlists) {
-	case W_COMBINED:
-	    count = 1;
-	    ok = build_path(filepath1, sizeof(filepath1), path, WORDLIST) == 0;
-	    break;
-	case W_SEPARATE:
-	    count = 2;
-	    ok = (build_path(filepath1, sizeof(filepath1), path, SPAMFILE) == 0 &&
-		  build_path(filepath2, sizeof(filepath2), path, GOODFILE) == 0 );
-	    break;
-	default:
-	    fprintf(stderr, "Invalid wordlist mode.\n");
-	    exit(2);
-	}
+	size_t count = build_wordlist_paths(filepaths, path);
 
-	if (!ok)
+	if (count == 0)
 	{
 	    fprintf(stderr, "%s: string too long creating .db file name.\n", PROGNAME);
 	    exit(2);
 	}
 
-	dbh = db_open(".", count, filepaths, DB_WRITE);
+	dbh = db_open(".", count, (const char **) filepaths, DB_WRITE);
 	if (dbh == NULL)
 	    return 2;
 
@@ -693,15 +665,7 @@ static int process_args(int argc, char **argv)
 	    exit(0);
 
 	case 'W':
-	    wordlists++;
-	    switch (wordlists) {
-	    case W_COMBINED:
-	    case W_SEPARATE:
-		break;
-	    default:
-		fprintf(stderr, "Invalid -W option.\n");
-		exit(2);
-	    }
+	    incr_wordlist_mode_flag();
 	    break;
 
 	case 'x':

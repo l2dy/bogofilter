@@ -98,10 +98,11 @@ typedef enum bulk_e {
     B_STDIN
 } bulk_t;
 
-#define	W_DEFAULT   W_COMBINED
+#define	WL_M_DEFAULT   WL_M_COMBINED
 
-typedef enum wl_e { W_COMBINED=0,
-		    W_SEPARATE=1 } wl_t;
+typedef enum wl_e { WL_M_UNKNOWN ='U',
+		    WL_M_SEPARATE='S',
+		    WL_M_COMBINED='C' } wl_t;
 
 #include "globals.h"
 

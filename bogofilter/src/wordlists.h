@@ -17,6 +17,8 @@ extern size_t	   cCombined;
 extern const char *aSeparate[];
 extern size_t	   cSeparate;
 
+typedef	char FILEPATH[PATH_LEN];
+
 typedef struct wordlist_s wordlist_t;
 struct wordlist_s
 {
@@ -37,7 +39,11 @@ struct wordlist_s
 extern wordlist_t *word_list;
 extern wordlist_t *word_lists;
 
-int setup_wordlists(const char* dir, priority_t precedence);
+void incr_wordlist_mode_flag(void);
+void set_wordlist_mode(void **dbh, const char *filepath, dbmode_t dbmode);
+size_t build_wordlist_paths(char **filepaths, const char *path);
+
+int  setup_wordlists(const char* dir, priority_t precedence);
 bool configure_wordlist(const char *val);
 
 void open_wordlists(dbmode_t);
