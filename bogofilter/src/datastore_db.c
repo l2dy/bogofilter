@@ -33,7 +33,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-#define MSG_COUNT_TOK ".MSG_COUNT"
+#define MSG_COUNT_TOK ((const byte *)".MSG_COUNT")
 word_t  *msg_count_tok;
 
 #undef UINT32_MAX
@@ -390,7 +390,7 @@ void db_decrement(void *vhandle, const word_t *word, uint32_t value){
 */
 uint32_t db_get_msgcount(void *vhandle){
     if (msg_count_tok == NULL)
-	msg_count_tok = word_new(MSG_COUNT_TOK, strlen(MSG_COUNT_TOK));
+	msg_count_tok = word_new(MSG_COUNT_TOK, strlen((const char *)MSG_COUNT_TOK));
     return db_getvalue(vhandle, msg_count_tok);
 }
 

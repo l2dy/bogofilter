@@ -124,17 +124,17 @@ token_t get_token(void)
 	case LEXER_HEAD: 
  	    class  = lexer_lex();
 	    yylval->leng = lexer_leng;
-	    yylval->text = lexer_text;
+	    yylval->text = (byte *)lexer_text;
 	    break;
 	case LEXER_TEXT: 
 	    class  = text_plain_lex();
 	    yylval->leng = text_plain_leng;
-	    yylval->text = text_plain_text;
+	    yylval->text = (byte *)text_plain_text;
 	    break;
 	case LEXER_HTML: 
 	    class  = text_html_lex();
 	    yylval->leng = text_html_leng;
-	    yylval->text = text_html_text;
+	    yylval->text = (byte *)text_html_text;
 	    break;
 	}
 
@@ -174,8 +174,8 @@ token_t get_token(void)
 	case IPADDR:
 	    if (block_on_subnets)
 	    {
-		const byte *prefix="url:";
-		size_t plen = strlen(prefix);
+		const byte *prefix = (const byte *)"url:";
+		size_t plen = strlen((const char *)prefix);
 		int q1, q2, q3, q4;
 		/*
 		 * Trick collected by ESR in real time during John
@@ -188,11 +188,11 @@ token_t get_token(void)
 		 * mask their origin.  Nuke the high bits to unmask the 
 		 * address.
 		 */
-		if (sscanf(yylval->text, "%d.%d.%d.%d", &q1, &q2, &q3, &q4) == 4)
+		if (sscanf((const char *)yylval->text, "%d.%d.%d.%d", &q1, &q2, &q3, &q4) == 4)
 		    /* safe because result string guaranteed to be shorter */
-		    sprintf(yylval->text, "%d.%d.%d.%d", 
+		    sprintf((char *)yylval->text, "%d.%d.%d.%d", 
 			    q1 & 0xff, q2 & 0xff, q3 & 0xff, q4 & 0xff);		    
-		yylval->leng = strlen(yylval->text);
+		yylval->leng = strlen((const char *)yylval->text);
 		bfsave = word_new(NULL, plen + yylval->leng);
 		memcpy(bfsave->text, prefix, plen);
 		memcpy(bfsave->text+plen, yylval->text, yylval->leng);

@@ -68,7 +68,7 @@ static int kill_html_comment(buff_t *buff)
 	size_t avail;
 
 	if (test) {
-	    size_t cspn = strcspn(tmp, "<>");
+	    size_t cspn = strcspn((const char *)tmp, "<>");
 	    tmp += cspn;
 	} 
 	c = *tmp;

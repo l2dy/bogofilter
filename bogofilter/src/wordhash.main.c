@@ -39,7 +39,7 @@ main (void)
 
   while (scanf ("%99s", buf) != EOF)
     {
-      word_t *t = word_new(buf, strlen(buf));
+      word_t *t = word_new((byte *)buf, strlen(buf));
       w = wordhash_insert (h, t, sizeof (word_t), &word_init);
       w->count++;
     }

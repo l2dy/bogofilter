@@ -59,7 +59,7 @@ word_t *word_cpy(word_t *dst, const word_t *src)
 int word_cmp(const word_t *w1, const word_t *w2)
 {
 #if	1
-    return strcmp(w1->text, w2->text);
+    return strcmp((const char *)w1->text, (const char *)w2->text);
 #else
     size_t s1 = w1->leng;
     size_t s2 = w2->leng;

@@ -96,7 +96,7 @@ typedef struct {
 /* Function Prototypes */
 
 static const byte *skipws (const byte *t, const byte *e);
-static char *getword (const byte *t, const byte *e);
+static byte *getword (const byte *t, const byte *e);
 #if	0
 static char *getparam (const byte *t, char *e, const byte *param);
 #endif
@@ -349,30 +349,28 @@ skipsemi (const byte *t, const byte *e)
 
 /* get next MIME word, NULL when none found.
  * caller must free returned string with xfree() */
-static char *
+static byte *
 getword (const byte *t, const byte *e)
 {
   int quote = 0;
   int l;
   const byte *ts;
-  char *n;
+  byte *n;
 
   t = skipws (t, e);
   if (!t)
     return NULL;
-  if (*t == '"')
-  {
+  if (*t == '"') {
     quote++;
     t++;
   }
   ts = t;
-  while ((t < e) && (quote ? *t != '"' : !isspace (*t)))
-  {
+  while ((t < e) && (quote ? *t != '"' : !isspace(*t))) {
     t++;
   }
   l = t - ts;
-  n = xmalloc (l + 1);
-  memcpy (n, ts, l);
+  n = (byte *)xmalloc(l + 1);
+  memcpy(n, ts, l);
   n[l] = '\0';
   return n;
 }
@@ -396,8 +394,8 @@ mime_version (word_t *text)
   if (!msg_header && !msg_state->mime_header)
       return;
 
-  l = strlen ("MIME-Version:");
-  w = getword (text->text + l, text->text + text->leng);
+  l = strlen("MIME-Version:");
+  w = (char *)getword(text->text + l, text->text + text->leng);
 
   if (!w) return;
 
@@ -414,8 +412,8 @@ mime_disposition (word_t *text)
   if (!msg_header && !msg_state->mime_header)
       return;
 
-  l = strlen ("Content-Disposition:");
-  w = getword (text->text + l, text->text + text->leng);
+  l = strlen("Content-Disposition:");
+  w = (char *)getword (text->text + l, text->text + text->leng);
 
   if (!w) return;
 
@@ -458,8 +456,8 @@ mime_encoding (word_t *text)
   if (!msg_header && !msg_state->mime_header)
       return;
 
-  l = strlen ("Content-Transfer-Encoding:");
-  w = getword (text->text + l, text->text + text->leng);
+  l = strlen("Content-Transfer-Encoding:");
+  w = (char *)getword(text->text + l, text->text + text->leng);
 
   if (!w) return;
 
@@ -488,8 +486,8 @@ mime_type (word_t *text)
   if (!msg_header && !msg_state->mime_header)
       return;
 
-  l = strlen ("Content-Type:");
-  w = getword (text->text + l, text->text + text->leng);
+  l = strlen("Content-Type:");
+  w = (char *)getword(text->text + l, text->text + text->leng);
 
   if (!w) return;
 
@@ -539,9 +537,9 @@ mime_boundary_set (word_t *text)
     fprintf (dbgout, "*** --> mime_boundary_set: %d '%-.*s'\n", stackp,
 	     blen, boundary);
 
-  boundary = getword (boundary + strlen ("boundary="), boundary + blen);
-  msg_state->boundary = boundary;
-  msg_state->boundary_len = strlen (boundary);
+  boundary = getword(boundary + strlen("boundary="), boundary + blen);
+  msg_state->boundary = (char *)boundary;
+  msg_state->boundary_len = strlen((char *)boundary);
 
   if (DEBUG_MIME (1))
     fprintf (dbgout, "*** <-- mime_boundary_set: %d '%s'\n", stackp,

@@ -181,9 +181,9 @@ static int dump_file(char *db_file)
 
 #define BUFSIZE 512
 
-static char *spanword(char *t)
+static byte *spanword(byte *t)
 {
-    while ( isspace(*t)) t += 1;	/* skip leading whitespace  */
+    while (isspace(*t)) t += 1;	/* skip leading whitespace  */
     while (*t && !isspace(*t)) t += 1;	/* span current word        */
     if (*t)
 	*t++ = '\0';
@@ -226,12 +226,12 @@ static int load_file(char *db_file)
 	    continue;
 
 	p = spanword(buf);
-	len = strlen(buf);
+	len = strlen((const char *)buf);
 
-	count = atoi(p);
+	count = atoi((const char *)p);
 	p = spanword(p);
 
-	date = atoi(p);
+	date = atoi((const char *)p);
 	p = spanword(p);
 
 	if ( *p != '\0' ) {
@@ -273,7 +273,7 @@ static int get_token(buff_t *buff, FILE *fp)
 {
     int rv = 0;
 
-    if (fgets(buff->t.text, buff->size, fp) == NULL) {
+    if (fgets((char *)buff->t.text, buff->size, fp) == NULL) {
 	if (ferror(fp)) {
 	    perror(PROGNAME);
 	    rv = 2;
@@ -282,9 +282,9 @@ static int get_token(buff_t *buff, FILE *fp)
 	}
     } else {
 	char *p;
-	buff->t.leng = strlen(buff->t.text);
-	p = buff->t.text + buff->t.leng - 1;
-	
+	buff->t.leng = strlen((const char *)buff->t.text);
+	p = (char *)(buff->t.text + buff->t.leng - 1);
+
 	if (*p != '\n') {
 	    fprintf(stderr,
 		    "%s: Unexpected input [%s]. Does not end with newline "
@@ -309,7 +309,7 @@ static int words_from_list(const char *db_file, int argc, char **argv)
     if ( argc == 0)
     {
 	char buf[BUFSIZE];
-	buff_t *buff = buff_new(buf, 0, BUFSIZE);
+	buff_t *buff = buff_new((byte *)buf, 0, BUFSIZE);
 	while (get_token(buff, stdin) == 0) {
 	    word_t *token = &buff->t;
 	    uint32_t count = db_getvalue(dbh, token);
@@ -322,7 +322,7 @@ static int words_from_list(const char *db_file, int argc, char **argv)
     {
 	while (argc-- > 0) {
 	    char *word = *argv++;
-	    word_t *token = word_new(word, strlen(word));
+	    word_t *token = word_new((byte *)word, strlen(word));
 	    uint32_t count = db_getvalue(dbh, token);
 	    word_puts(token, 0, stdout);
 	    printf(" %lu\n", (unsigned long) count);
@@ -341,7 +341,7 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     void *dbh_spam;
     char filepath[PATH_LEN];
     char buf[BUFSIZE];
-    buff_t *buff = buff_new(buf, 0, BUFSIZE);
+    buff_t *buff = buff_new((byte *)buf, 0, BUFSIZE);
     char *word = buf;
     unsigned long spam_count, spam_msg_count = 0 ;
     unsigned long good_count, good_msg_count = 0 ;
@@ -384,7 +384,7 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 	    word = *argv++;
 	    if (--argc == 0)
 		argc = -1;
-	    token = word_new(word, strlen(word));
+	    token = word_new((byte *)word, strlen(word));
 	}
 
 	spam_count = db_getvalue(dbh_spam, token);
@@ -474,7 +474,7 @@ static int compute_robinson_x(char *path)
     wordlist_t wl[2];
 
     double robx;
-    word_t *word_robx = word_new(ROBX_W, strlen(ROBX_W));
+    word_t *word_robx = word_new((const byte *)ROBX_W, strlen(ROBX_W));
 
     void *dbh_spam;
 

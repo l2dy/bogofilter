@@ -25,7 +25,7 @@ typedef struct mime_t mime_t;
 
 struct mime_t {
     char *charset;
-    char   *boundary;	/* only valid if mime_type is MIME_MULTIPART or MIME_MESSAGE */
+    char *boundary;	/* only valid if mime_type is MIME_MULTIPART or MIME_MESSAGE */
     size_t boundary_len;
     char *version;
     bool mime_header;

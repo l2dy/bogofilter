@@ -191,7 +191,7 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     size_t robn = 0;
     size_t count = 0;
 
-    word_t  *word_robx = word_new(ROBX_W, strlen(ROBX_W));
+    word_t *word_robx = word_new((const byte *)ROBX_W, strlen(ROBX_W));
 
     (void) fp; 	/* quench compiler warning */
 
