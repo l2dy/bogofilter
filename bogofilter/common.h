@@ -9,6 +9,8 @@
 #include <sys/param.h>
 #endif
 
+#include <stdio.h>
+
 #include "debug.h"
 #include "system.h" /* defines bool */
 
@@ -53,6 +55,8 @@ typedef struct {
     int    exp;
 } FLOAT;
 
-int build_path(char* dest, size_t size, const char* dir, const char* file);
+extern int build_path(char* dest, size_t size, const char* dir, const char* file);
+
+#define internal_error do { fprintf(stderr, "Internal error in %s:%u\n", __FILE__, __LINE__); abort(); } while(0)
 
 #endif
