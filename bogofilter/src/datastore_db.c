@@ -237,7 +237,7 @@ uint32_t db_getvalue(void *vhandle, const word_t *word){
   if (ret == 0) {
     value = val.count;
 
-    if (DEBUG_DATABASE(2)) {
+    if (DEBUG_DATABASE(3)) {
       fprintf(dbgout, "[%lu] db_getvalue (%s): [",
 	      (unsigned long) handle->pid, handle->name);
       word_puts(word, 0, dbgout);
@@ -304,7 +304,7 @@ static int db_get_dbvalue(void *vhandle, const word_t *word, /*@out@*/ dbv_t *va
     }
     break;
   case DB_NOTFOUND:
-    if (DEBUG_DATABASE(2)) {
+    if (DEBUG_DATABASE(3)) {
       fprintf(dbgout, "[%lu] db_getvalue (%s): [", (unsigned long) handle->pid, handle->name);
       word_puts(word, 0, dbgout);
       fputs("] not found\n", dbgout);
@@ -382,7 +382,7 @@ static void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val){
   ret = handle->dbp->put(handle->dbp, NULL, &db_key, &db_data, 0);
 
   if (ret == 0){
-    if (DEBUG_DATABASE(2)) {
+    if (DEBUG_DATABASE(3)) {
       fprintf(dbgout, "db_set_dbvalue (%s): [",
 	      handle->name);
       word_puts(word, 0, dbgout);
@@ -420,9 +420,18 @@ void db_decrement(void *vhandle, const word_t *word, uint32_t value){
   Get the number of messages associated with database.
 */
 uint32_t db_get_msgcount(void *vhandle){
+    uint32_t msg_count;
+
     if (msg_count_tok == NULL)
 	msg_count_tok = word_new(MSG_COUNT_TOK, strlen((const char *)MSG_COUNT_TOK));
-    return db_getvalue(vhandle, msg_count_tok);
+    msg_count = db_getvalue(vhandle, msg_count_tok);
+
+    if (DEBUG_DATABASE(2)) {
+	dbh_t *handle = vhandle;
+	fprintf(dbgout, "db_get_msgcount( %s ) -> %d\n", handle->name, msg_count);
+    }
+
+    return msg_count;
 }
 
 /*
@@ -430,6 +439,11 @@ uint32_t db_get_msgcount(void *vhandle){
 */
 void db_set_msgcount(void *vhandle, uint32_t count){
     db_setvalue(vhandle, msg_count_tok, count);
+
+    if (DEBUG_DATABASE(2)) {
+	dbh_t *handle = vhandle;
+	fprintf(dbgout, "db_set_msgcount( %s ) -> %d\n", handle->name, count);
+    }
 }
 
 
@@ -441,7 +455,7 @@ void db_close(void *vhandle, bool nosync){
 
   if (DEBUG_DATABASE(1)) {
       fprintf(dbgout, "db_close(%s, %s, %s)\n", handle->name, handle->filename,
-	      nosync ? "true" : "false");
+	      nosync ? "nosync" : "sync");
   }
 
   if (handle == NULL) return;
