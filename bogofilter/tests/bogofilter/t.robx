@@ -2,10 +2,15 @@
 
 set -e
 
-#        In directory t.systest.d are:
+# Note:  When run via "make check", test output files are automatically deleted.
+#	 When run from the command line, outputs files are left in directory
+#	 robx.YYYYMMDD.  This is useful when something is different.
 #
-#		inputs  - test inputs
-#		outputs - known correct outputs
+#	 ./inputs  - test inputs
+#	 ./outputs - known correct outputs
+#
+#	 robx.YYYYMMDD:
+#		tests   - directory containing individual output files
 
 : ${srcdir=.}
 relpath="`pwd`/../.."

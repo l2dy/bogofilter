@@ -2,16 +2,16 @@
 
 set -e
 
-# Note:  This test DOES leave its output files on the hard drive.
-#	 This makes it easier to see what has happened, which is
-#		especially useful when something is different.
+# Note:  When run via "make check", test output files are automatically deleted.
+#	 When run from the command line, outputs files are left in directory
+#	 grftest.YYYYMMDD.  This is useful when something is different.
 #
-#        In directory t.systest.d are:
+#	 ./inputs  - test inputs
+#	 ./outputs - known correct outputs
+#		     esp. grftest.out
 #
+#	 grftest.YYYYMMDD:
 #		tests   - directory containing individual output files
-#		grftest.out - comparison of directories:
-#			      outputs - known correct outputs
-#			      tests   - outputs of the individual tests
 
 : ${srcdir=.}
 relpath="`pwd`/../.."
