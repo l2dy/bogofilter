@@ -112,6 +112,7 @@ MIME_BOUNDARY	{BCHARS}{0,69}{BCHARSNOSPC}
 
 ID		[0-9a-zA-Z-]*
 MTYPE		[ \t]*[0-9a-zA-Z/-]*
+TTYPE		[ \t]*[\.0-9a-zA-Z/-]*
 
 NUM_NUM		\ [0-9]+\ [0-9]+
 MSG_COUNT	^\"\.MSG_COUNT\"
@@ -183,7 +184,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <INITIAL>charset=\"?{ID}\"?			{ got_charset(yytext); yyless(strlen("charset")); return TOKEN; }
 <INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); yyless(strlen("MIME-Version:")); return(TOKEN); }
 <INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); yyless(strlen("Content-Transfer-Encoding:")); return(TOKEN); }
-<INITIAL>^Content-Type:{MTYPE};?		{ mime_type(yy_text()); yyless(strlen("Content-Type:")); return TOKEN; }
+<INITIAL>^Content-Type:{TTYPE};?		{ mime_type(yy_text()); yyless(strlen("Content-Type:")); return TOKEN; }
 <INITIAL>^Content-Disposition:{MTYPE}		{ mime_disposition(yy_text()); yyless(strlen("Content-Disposition:")); return TOKEN; }
 <INITIAL>^To/:.*				{ if (header_line_markup) set_tag("to:"); }
 <INITIAL>^From/:.*				{ if (header_line_markup) set_tag("from:"); else return TOKEN; }
