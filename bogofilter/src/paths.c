@@ -98,13 +98,9 @@ char *create_path_from_env(const char *var,
     buff = xmalloc(path_size);
 
     strcpy(buff, env);
-#ifdef __riscos__
-    if (subdir != NULL) /* don't add a directory separator at the end! */
-#endif
-    if (buff[env_size-1] != DIRSEP_C) {
-	strcat(buff, DIRSEP_S);
-    }
     if (subdir != NULL) {
+	if (buff[env_size-1] != DIRSEP_C)
+	    strcat(buff, DIRSEP_S);
 	strcat(buff, subdir);
     }
     return buff;
