@@ -380,6 +380,15 @@ static int mailbox_getline(buff_t *buff)
     size_t used = buff->t.leng;
     byte *buf = buff->t.text + used;
     int count;
+    static word_t *saved = NULL;
+
+    if (saved != NULL) {
+	count = saved->leng;
+	buff_add(buff, saved);
+	word_free(saved);
+	saved = NULL;
+	return count;
+    }
 
     count = buff_fgetsl(buff, fpin);
     have_message = false;
@@ -392,13 +401,12 @@ static int mailbox_getline(buff_t *buff)
     if ((firstline || emptyline) &&
 	count >= 5 && memcmp("From ", buf, 5) == 0)
     {
-	buff->t.leng = 0;			/* discard message separator */
 	if (firstline) {
 	    firstline = false;
-	    count = mailbox_getline(buff);
 	}
 	else {
 	    have_message = true;
+	    saved = word_new(buf, count);
 	    count = EOF;
 	}
     } else {
@@ -406,7 +414,6 @@ static int mailbox_getline(buff_t *buff)
 	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
     }
 
-    firstline = false;
     emptyline = (count == 1 && *buf == '\n');
 
     return count;
