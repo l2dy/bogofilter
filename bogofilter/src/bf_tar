@@ -11,12 +11,12 @@
 
 set -e
 
-removebef=0
-removeaft=0
+REMOVEBEF=0
+REMOVEAFT=0
 while [ "$1" ] ; do
     case "$1" in
-	-r) removeaft=1 ;;
-	-R) removebef=1 ;;
+	-r) REMOVEAFT=1 ;;
+	-R) REMOVEBEF=1 ;;
 	-*) echo >&2 "`basename $0`: unknown option $1" ; exit 1 ;;
 	*) break;
     esac
@@ -32,23 +32,23 @@ if [ $# -ne 1 ] ; then
     exit 1
 fi
 
-bogohome="$1"
+BOGOHOME="$1"
 
 nukelogs() {
-    bogoutil -P "$bogohome"
+    bogoutil --prune="$BOGOHOME"
 }
 
 # run db_checkpoint to reduce number of logs
-db_checkpoint -1 -h "$bogohome"
+db_checkpoint -1 -h "$BOGOHOME"
 
 # remove if requested
-if [ $removebef -eq 1 ] ; then nukelogs ; fi
+if [ $REMOVEBEF -eq 1 ] ; then nukelogs ; fi
 
 # database first, if it's newer than the log, it's not recoverable!
 # pax options: -w: write archive, -v: verbosely, -x ustar: choose tar
 # format.
-( db_archive -a -s -h "$bogohome" ; db_archive -a -l -h "$bogohome" ) \
+( db_archive -a -s -h "$BOGOHOME" ; db_archive -a -l -h "$BOGOHOME" ) \
 | pax -w -v -x ustar
 
 # remove if requested
-if [ $removeaft -eq 1 ] ; then nukelogs ; fi
+if [ $REMOVEAFT -eq 1 ] ; then nukelogs ; fi

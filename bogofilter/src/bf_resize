@@ -19,19 +19,19 @@
 
 set -e
 
-dir=${1:-.}
+DIR=${1:-.}
 : ${DB_ARCHIVE:=db_archive}
 : ${AWK:=awk}
 
 a=0
-dbs=$(db_archive -s -a -h "$dir")
+dbs=$(db_archive -s -a -h "$DIR")
 if [ ! "$dbs" ] ; then
-    echo >&2 "No database files in \"$dir\" found"
+    echo >&2 "No database files in \"$DIR\" found"
     exit 1
 fi
 
 for i in $dbs ; do
-    pages=$(db_stat -h "$dir" -d "$i" \
+    pages=$(db_stat -h "$DIR" -d "$i" \
 	    | awk '/Number of tree leaf pages/ {print $1;}')
     a=$(( $a + $pages ))
 done
@@ -39,9 +39,9 @@ done
 # be generous
 a=$(( $a * 2 ))
 
-touch "$dir"/DB_CONFIG
-egrep -v '^set_lk_max_(locks|objects)' "$dir"/DB_CONFIG >"$dir"/DB_CONFIG.new
-echo >>"$dir"/DB_CONFIG.new set_lk_max_locks $a
-echo >>"$dir"/DB_CONFIG.new set_lk_max_objects $a
-mv "$dir"/DB_CONFIG.new "$dir"/DB_CONFIG
-bogoutil -f "$dir"
+touch "$DIR"/DB_CONFIG
+egrep -v '^set_lk_max_(locks|objects)' "$DIR"/DB_CONFIG >"$DIR"/DB_CONFIG.new || true
+echo >>"$DIR"/DB_CONFIG.new set_lk_max_locks $a
+echo >>"$DIR"/DB_CONFIG.new set_lk_max_objects $a
+mv "$DIR"/DB_CONFIG.new "$DIR"/DB_CONFIG
+bogoutil --recover="$DIR"
