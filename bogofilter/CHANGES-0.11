@@ -9,6 +9,8 @@ $Id$
 	2003-03-04
 	* Fixed print checks in rob_print_rstats().
 	* Corrected initialization problem in process_config_files().
+	* The HTML comment processing code expects standard compliant
+	  delimiters, i.e. "<!--" and "-->".
 
 0.11.0  2003-03-04
 
@@ -42,9 +44,16 @@ $Id$
 	2003-02-21
 	* Separated option '-l's functions into '-l' and '-L'.
 
+	2003-02-17
+	* Update bogofilter and bogoutil man pages.
+	* Give command line options preference over config file options.
+
 	2003-02-16
 	* Changed the default algorithm to Robinson-Fisher.
 	* Bogofilter option '-qv' now displays the config options and exits.
+
+	2003-02-14
+	* Tighten check for message separating "^From " lines.
 
 	2003-02-12
 	* Split bogofilter's command line and config file processing
