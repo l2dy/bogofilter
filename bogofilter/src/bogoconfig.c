@@ -251,6 +251,7 @@ static void help(void)
 		  "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n"
 		  "\t-s\t- register message as spam.\n"
 		  "\t-n\t- register message as non-spam.\n"
+		  "\t-m val\t- set user defined min_dev value.\n"
 		  "\t-o val [,val]\t- set user defined spam and ham cutoff values.\n"
 		  "\t-u\t- classify message as spam or non-spam and register accordingly.\n"
 		  "\t-S\t- move message's words from non-spam list to spam list.\n"
@@ -320,7 +321,7 @@ int process_args(int argc, char **argv)
 
     fpin = stdin;
 
-    while ((option = getopt(argc, argv, ":23d:eFhl::o:snSNvVpuc:CgrRfqtI:O:y:k:x:DT" G R F)) != EOF)
+    while ((option = getopt(argc, argv, ":23d:eFhl::m:o:snSNvVpuc:CgrRfqtI:O:y:k:x:DT" G R F)) != EOF)
     {
 	switch(option)
 	{
@@ -449,6 +450,10 @@ int process_args(int argc, char **argv)
 
 	case 'C':
 	    suppress_config_file = true;
+	    break;
+
+	case 'm':
+	    c_min_dev = atof( optarg );
 	    break;
 
 	case 'o':

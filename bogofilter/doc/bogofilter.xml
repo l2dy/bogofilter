@@ -21,6 +21,7 @@
   <arg choice='opt'>-N</arg>
   <arg choice='opt'>-d <replaceable>dir</replaceable></arg>
   <arg choice='opt'>-l <replaceable>tag</replaceable></arg>
+  <arg choice='opt'>-m <replaceable>value</replaceable></arg>
   <arg choice='opt'>-o <replaceable>value
       <arg choice='opt'><replaceable>,value</replaceable></arg>
       </replaceable></arg>
@@ -160,11 +161,14 @@ ham_cutoff is non-zereo.</para>
     is run.  The option allows an optional tag which can be included in the information being logged.
 </para>
 
+<para>The <option>-m <replaceable>value</replaceable></option> option allows setting min_dev.
+</para>
+
 <para>The <option>-o <replaceable>value<arg choice='opt'><replaceable>,value</replaceable></arg>
     </replaceable></option>
     option allows setting the spam_cutoff value and, optionally, the ham_cutoff value.  If one
     value is supplied, then spam_cutoff is set.  With two values, both spam_cutoff and ham_cutoff
-    are set
+    are set.
 </para>
 
 <para>A classification run will generate (we are not showing the date

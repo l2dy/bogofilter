@@ -38,6 +38,7 @@ extern	int	max_repeats;
 extern	double	min_dev;
 extern	double	ham_cutoff;
 extern	double	spam_cutoff;
+extern	double	c_min_dev;		/* value from command line */
 extern	double	c_ham_cutoff;		/* value from command line */
 extern	double	c_spam_cutoff;		/* value from command line */
 extern	double	thresh_stats;

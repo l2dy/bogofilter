@@ -43,6 +43,8 @@ void mth_initialize(void *s, int _max_repeats, double _min_dev, double _spam_cut
     max_repeats = _max_repeats;
     if (fabs(min_dev) < EPS)
 	min_dev = _min_dev;
+    if (c_min_dev > EPS)
+	min_dev = c_min_dev;
     if (spam_cutoff < EPS)
 	spam_cutoff = _spam_cutoff;
     set_good_weight( _good_weight );
