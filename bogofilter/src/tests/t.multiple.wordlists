@@ -105,15 +105,17 @@ $BOGOUTIL -l ${TMPDIR}/system.db   < ${TMPDIR}/system.txt
 (echo "#### 1: score message using each wordlist ####"; echo) >> $OUT
 
 for DB in ${TMPDIR}/*.db ; do
-    printf "%-12s" `basename $DB`: >> $OUT
-    $BOGOFILTER $BFOPTS "$BFHEAD" -C  --wordlist=r,wordlist,`basename $DB`,1 -v -I ${TMPDIR}/message >> $OUT
+    N=`basename $DB`
+    printf "%-12s" $N: >> $OUT
+    $BOGOFILTER $BFOPTS "$BFHEAD" -C  --wordlist=r,wordlist,$N,1 -v -I ${TMPDIR}/message >> $OUT
 done
 echo >> $OUT
 
 (echo "#### 1: score message using each config file ####"; echo) >> $OUT
 
 for CFG in ${TMPDIR}/*.cf ; do
-    echo Using `basename $CFG`: >> $OUT
+    N=`basename $CFG`
+    echo Using $N: >> $OUT
     $BOGOFILTER $BFOPTS "$BFHEAD"  -c $CFG -vvv -I ${TMPDIR}/message >> $OUT
     echo >> $OUT
 done
@@ -128,15 +130,17 @@ echo common message ignore | $BOGOFILTER $BFOPTS "$BFHEAD" -e  -n -c ${TMPDIR}/$
 (echo "#### 2: score message using each wordlist ####"; echo) >> $OUT
 
 for DB in ${TMPDIR}/*.db ; do
-    printf "%-12s" `basename $DB`: >> $OUT
-    $BOGOFILTER $BFOPTS "$BFHEAD" -C --wordlist=r,wordlist,`basename $DB`,1 -v -I ${TMPDIR}/message >> $OUT
+    N=`basename $DB`
+    printf "%-12s" $N: >> $OUT
+    $BOGOFILTER $BFOPTS "$BFHEAD" -C --wordlist=r,wordlist,$N,1 -v -I ${TMPDIR}/message >> $OUT
 done
 echo >> $OUT
 
 (echo "#### 2: score message using each config file ####"; echo) >> $OUT
 
 for CFG in ${TMPDIR}/*.cf ; do
-    echo Using `basename $CFG`: >> $OUT
+    N=`basename $CFG`
+    echo Using $N: >> $OUT
     $BOGOFILTER $BFOPTS "$BFHEAD" -c $CFG -vvv -I ${TMPDIR}/message >> $OUT
     echo >> $OUT
 done
