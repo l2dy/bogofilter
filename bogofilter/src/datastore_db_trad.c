@@ -71,7 +71,13 @@ dsm_t dsm_traditional = {
     &bft_lock,
     &bft_common_close,
     &bft_sync,
-    &bft_log_flush
+    &bft_log_flush,
+    NULL,	/* dsm_pagesize         */
+    NULL,	/* dsm_checkpoint       */
+    NULL,	/* dsm_purgelogs        */
+    NULL,	/* dsm_recover          */
+    NULL,	/* dsm_remove           */
+    NULL	/* dsm_verify           */
 };
 
 DB_ENV *bft_get_env_dbe	(dbe_t *env)

@@ -72,12 +72,12 @@ dsm_t dsm_sqlite = {
     NULL,	/* dsm_common_close     */
     NULL,	/* dsm_sync             */
     NULL,	/* dsm_log_flush        */
+    &sql_pagesize,/* dsm_pagesize       */
+    NULL,	/* dsm_purgelogs        */
+    NULL,	/* dsm_checkpoint       */
     NULL,	/* dsm_recover          */
     NULL,	/* dsm_remove           */
-    NULL,	/* dsm_checkpoint       */
-    NULL,	/* dsm_purgelogs        */
-    NULL,	/* dsm_verify           */
-    &sql_pagesize /* dsm_pagesize       */
+    NULL	/* dsm_verify           */
 };
 
 /** The command to begin a regular transaction. */

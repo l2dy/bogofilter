@@ -75,8 +75,8 @@ typedef struct {
     dsm_u_pdpf	 *dsm_pagesize;
     dsm_x_pd	 *dsm_checkpoint;
     dsm_x_pd	 *dsm_purgelogs;
-    dsm_x_pd	 *dsm_remove;
     dsm_x_pdbb	 *dsm_recover;
+    dsm_x_pd	 *dsm_remove;
     dsm_x_pdpf	 *dsm_verify;
 } dsm_t;
 

@@ -323,16 +323,3 @@ const char *db_str_err(int e)
 {
     return dperrmsg(e);
 }
-
-ex_t db_verify(bfdir *d, bffile *f)
-{
-    (void)d;
-    (void)f;
-    return EX_OK;
-}
-
-u_int32_t db_pagesize(bfdir *d, bffile *f) {
-    (void)d;
-    (void)f;
-    return (u_int32_t)0;
-}

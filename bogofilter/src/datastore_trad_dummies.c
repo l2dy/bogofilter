@@ -24,21 +24,27 @@ David Relson	<relson@osagesoftware.com> 2005
 
 dsm_t dsm_traditional = {
     /* public -- used in datastore.c */
-    NULL,
-    NULL,
-    NULL,
+    NULL,	/* dsm_begin          */
+    NULL,	/* dsm_abort          */
+    NULL,	/* dsm_commit         */
 
     /* private -- used in datastore_db_*.c */
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL
+    NULL,	/* dsm_env_init         */
+    NULL,	/* dsm_cleanup          */
+    NULL,	/* dsm_cleanup_lite     */
+    NULL,	/* dsm_get_env_dbe      */
+    NULL,	/* dsm_database_name    */
+    NULL,	/* dsm_recover_open     */
+    NULL,	/* dsm_auto_commit_flags*/                    
+    NULL,	/* dsm_get_rmw_flag     */
+    NULL,	/* dsm_lock             */
+    NULL,	/* dsm_common_close     */
+    NULL,	/* dsm_sync             */
+    NULL,	/* dsm_log_flush        */
+    NULL,	/* dsm_pagesize         */
+    NULL,	/* dsm_checkpoint       */
+    NULL,	/* dsm_purgelogs        */
+    NULL,	/* dsm_recover          */
+    NULL,	/* dsm_remove           */
+    NULL	/* dsm_verify           */
 };
