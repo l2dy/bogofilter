@@ -62,7 +62,7 @@ int main(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
-    while ((option = getopt(argc, argv, ":hnpqvnx:I:k:")) != -1)
+    while ((option = getopt(argc, argv, ":hnpqvnx:I:k:D")) != -1)
 	switch (option)
 	{
 	case '?':
@@ -103,6 +103,10 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Can't read file '%s'\n", optarg);
 		exit(2);
 	    }
+	    break;
+
+	case 'D':
+	    dbgout = stdout;
 	    break;
 
 	default:

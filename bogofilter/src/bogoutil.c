@@ -571,7 +571,7 @@ int main(int argc, char *argv[])
 
     directory = get_directory();
 
-    while ((option = getopt(argc, argv, ":d:l:m:w:R:phvVx:a:c:s:ny:I:")) != -1)
+    while ((option = getopt(argc, argv, ":d:l:m:w:R:phvVx:a:c:s:ny:I:D")) != -1)
 	switch (option) {
 	case 'd':
 	    flag = DUMP;
@@ -663,6 +663,10 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Can't read file '%s'\n", optarg);
 		exit(2);
 	    }
+	    break;
+
+	case 'D':
+	    dbgout = stdout;
 	    break;
 
 	default:
