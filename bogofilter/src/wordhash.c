@@ -44,6 +44,9 @@ THEORY:
 #define N_CHUNK 2000
 #define S_CHUNK 20000
 
+#define	WH_INIT	64
+#define	WH_INCR	64
+
 #ifndef offsetof
 #define offsetof(type, member) ((size_t) &((type*)0)->member )
 #endif
@@ -63,13 +66,13 @@ void wh_trap(void) {}
 ** initialized storage.
 */
 
-static wordhash_t *
+wordhash_t *
 wordhash_init (wh_t t, uint c)
 {
     wordhash_t *wh = xcalloc (1, sizeof (wordhash_t));
 
     wh->type = t;
-    wh->count = c;
+    wh->count = (t == WH_NORMAL) ? 0 : ((c == 0) ? WH_INIT : c);
 
     if (t == WH_NORMAL)
 	wh->bin = xcalloc (NHASH, sizeof (hashnode_t **));
@@ -297,8 +300,8 @@ wordhash_search (wordhash_t *wh, word_t *t, unsigned int idx)
     return NULL;
 }
 
-void *
-wordhash_insert (wordhash_t *wh, word_t *t, size_t n, void (*initializer)(void *))
+static void *
+wordhash_standard_insert (wordhash_t *wh, word_t *t, size_t n, void (*initializer)(void *))
 {
     hashnode_t *hn;
     unsigned int idx = hash (t);
@@ -331,6 +334,28 @@ wordhash_insert (wordhash_t *wh, word_t *t, size_t n, void (*initializer)(void *
     wh->iter_tail = hn;
 
     return hn->buf;
+}
+
+static void *
+wordhash_counts_insert (wordhash_t *wh)
+{
+    wh->index += 1;
+    if (wh->index == wh->count) {
+	wh->count += WH_INCR;
+	wh->cnts = (wordcnts_t *) xrealloc(wh->cnts, wh->count * sizeof(wordcnts_t));
+    }
+    return & wh->cnts[wh->index];
+}
+
+void *
+wordhash_insert (wordhash_t *wh, word_t *t, size_t n, void (*initializer)(void *))
+{
+    void *v;
+    if (wh->type == WH_CNTS)
+	v = wordhash_counts_insert (wh);
+    else
+	v = wordhash_standard_insert (wh, t, n, initializer);
+    return v;
 }
 
 size_t wordhash_count (wordhash_t *wh)
@@ -465,6 +490,9 @@ convert_propslist_to_countlist(wordhash_t *whi)
     wordhash_t *who = wordhash_init(WH_CNTS, whi->count);
     uint count = 0;
 
+    if (whi->type == WH_CNTS)
+	return whi;
+
     if (whi->type != WH_PROPS) {
 	fprintf(stderr, "convert_propslist_to_countlist() called with non-WH_PROPS parameter.\n");
 	exit(EX_ERROR);
@@ -484,30 +512,37 @@ convert_propslist_to_countlist(wordhash_t *whi)
 wordhash_t *
 convert_wordhash_to_propslist(wordhash_t *whi, wordhash_t *db)
 {
-    wordhash_t *who = wordhash_init(WH_PROPS, whi->count);
-
-    size_t count = 0;
-    hashnode_t  *node;
-
-    for(node = wordhash_first(whi); node != NULL; node = wordhash_next(whi)) {
-	wordprop_t *wp;
-	if (!msg_count_file && node->key != NULL) {
-	    who->freeable = false;
-	    wp = wordhash_insert(db, node->key, sizeof(wordprop_t), NULL);
+    if (whi->type == WH_CNTS) {
+	if (whi->index == whi->wordcount && whi->count > whi->wordcount) {
+	    whi->count = whi->wordcount;
+	    whi->cnts = (wordcnts_t *) xrealloc(whi->cnts, whi->count * sizeof(wordcnts_t));
 	}
-	else {
-	    wp = xcalloc(1, sizeof(wordprop_t));
-	    memcpy(wp, node->buf, sizeof(wordprop_t));
-	    if (!who->freeable)
-		wh_trap();
-	}
-	who->props[count].buf = wp;
-	xfree(node->key);
-	node->key = NULL;
-	count += 1;
+	return whi;
     }
+    else {
+	wordhash_t *who = wordhash_init(WH_PROPS, whi->count);
+	hashnode_t *node;
 
-    who->count = count;
+	who->count = 0;
 
-    return who;
-}
+	for(node = wordhash_first(whi); node != NULL; node = wordhash_next(whi)) {
+	    wordprop_t *wp;
+	    if (!msg_count_file && node->key != NULL) {
+		who->freeable = false;
+		wp = wordhash_insert(db, node->key, sizeof(wordprop_t), NULL);
+	    }
+	    else {
+		wp = xcalloc(1, sizeof(wordprop_t));
+		memcpy(wp, node->buf, sizeof(wordprop_t));
+		if (!who->freeable)
+		    wh_trap();
+	    }
+	    who->props[who->count].buf = wp;
+	    xfree(node->key);
+	    node->key = NULL;
+	    who->count += 1;
+	}
+
+	return who;
+    }
+} 

@@ -52,6 +52,7 @@ typedef struct wordhash_s {
 } wordhash_t;
 
 /*@only@*/ wordhash_t *wordhash_new(void);
+/*@only@*/ wordhash_t *wordhash_init(wh_t t, uint c);
 
 void wordhash_free(/*@only@*/ wordhash_t *);
 size_t wordhash_count(wordhash_t * h);
