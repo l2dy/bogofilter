@@ -47,24 +47,17 @@ size_t qp_decode(word_t *word)
     while (s < e)
     {
 	byte ch = *s++;
-	if (ch == '=') {
-	    ch = *s++;
-	    if (ch != '\n') {
-		byte cx = *s++;
-		int x, y;
-		y = hex_to_bin(ch);
-		x = hex_to_bin(cx);
-		if (y < 0 || x < 0) {
-		    /* illegal stuff in =XX sequence */
-		    *d++ = '=';
-		    *d++ = ch;
-		    *d++ = cx;
-		    continue;
-		}
+	int x, y;
+	if (ch == '=' && s <= e && s[0] == '\n') {
+	    /* continuation line, trailing = */
+	    s++;
+	    continue;
+	}
+	if (ch == '=' && s + 2 < e && (y = hex_to_bin(s[0])) >= 0 &&
+		    (x = hex_to_bin(s[1])) >= 0) {
+	    /* encoded character */
 		ch = y << 4 | x;
-	    } else {
-		continue;
-	    }
+		s += 2;
 	}
 	*d++ = ch;
     }
