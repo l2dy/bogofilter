@@ -79,12 +79,17 @@ static const DBTYPE dbtype = DB_BTREE;
 #define MAGIC_DBE 0xdbe
 #define MAGIC_DBH 0xdb4
 
+/** implementation internal type to keep track of database environments
+ * we have opened. */
 typedef struct {
     int		magic;
     DB_ENV	*dbe;		/* stores the environment handle */
     DB_TXN	*txn;		/* stores the transaction handle */
+    char	*directory;	/* stores the home directory for this environment */
 } dbe_t;
 
+/** implementation internal type to keep track of databases
+ * we have opened. */
 typedef struct {
     int		magic;
     char	*path;
@@ -401,8 +406,8 @@ retry_db_open:
 
 	    /* close again and bail out without further tries */
 	    if (DEBUG_DATABASE(0))
-		print_error(__FILE__, __LINE__, "DB->open(%s) - actually %s, bogohome %s, err %d, %s",
-			    handle->name, t, bogohome, ret, db_strerror(ret));
+		print_error(__FILE__, __LINE__, "DB->open(%s) - actually %s, directory %s, err %d, %s",
+			    handle->name, t, env->directory, ret, db_strerror(ret));
 	    dbp->close(dbp, 0);
 	    goto open_err;
 	}
@@ -902,22 +907,22 @@ static int plock(const char *path, short locktype, int mode) {
     return fd;
 }
 
-static int db_try_glock(short locktype, int lockcmd) {
+static int db_try_glock(const char *directory, short locktype, int lockcmd) {
     int ret;
     char *t;
     const char *const tackon = DIRSEP_S "lockfile-d";
 
-    assert(bogohome);
+    assert(directory);
 
     /* lock */
-    ret = mkdir(bogohome, (mode_t)0755);
+    ret = mkdir(directory, (mode_t)0755);
     if (ret && errno != EEXIST) {
 	print_error(__FILE__, __LINE__, "mkdir(%s): %s",
-		bogohome, strerror(errno));
+		directory, strerror(errno));
 	exit(EX_ERROR);
     }
 
-    t = mxcat(bogohome, tackon, NULL);
+    t = mxcat(directory, tackon, NULL);
 
     /* All we are interested in is that this file exists, we'll close it
      * right away as plock down will open it again */
@@ -945,14 +950,15 @@ static int db_try_glock(short locktype, int lockcmd) {
 
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
-static dbe_t *dbe_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
+static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
 {
     int ret;
     dbe_t *env = xcalloc(1, sizeof(dbe_t));
 
-    assert(bogohome);
+    assert(directory);
 
     env->magic = MAGIC_DBE;
+    env->directory = xstrdup(directory);
     ret = db_env_create(&env->dbe, 0);
     if (ret != 0) {
 	print_error(__FILE__, __LINE__, "db_env_create, err: %d, %s", ret,
@@ -1007,7 +1013,7 @@ static dbe_t *dbe_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT)\n");
 
-    ret = env->dbe->open(env->dbe, bogohome,
+    ret = env->dbe->open(env->dbe, directory,
 #if DB_AT_MOST(3,0)
 	    NULL,
 #endif
@@ -1018,7 +1024,7 @@ static dbe_t *dbe_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
 	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %d, %s", ret, db_strerror(ret));
 	if (ret == DB_RUNRECOVERY) {
 	    fprintf(stderr, "To recover, run: bogoutil -v -f \"%s\"\n",
-		    bogohome);
+		    directory);
 	}
 	/* FIXME: return NULL instead so we can retry catastrophic
 	 * recovery perhaps? */
@@ -1026,13 +1032,17 @@ static dbe_t *dbe_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
     }
 
     if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "DB_ENV->open(home=%s)\n", bogohome);
+	fprintf(dbgout, "DB_ENV->open(home=%s)\n", directory);
 
     return env;
 }
 
 /* close the environment, but do not release locks */
 static void dbe_cleanup_lite(dbe_t *env) {
+    if (env->txn) {
+	print_error(__FILE__, __LINE__, "dbe_cleanup called with open transaction, aborting.");
+	dbe_txn_abort(env);
+    }
     if (env->dbe) {
 	int ret;
 
@@ -1048,6 +1058,8 @@ static void dbe_cleanup_lite(dbe_t *env) {
 	if (DEBUG_DATABASE(1) || ret)
 	    fprintf(dbgout, "DB_ENV->close(%p): %s\n", (void *)env->dbe, db_strerror(ret));
     }
+    if (env->directory)
+	free(env->directory);
     free(env);
 }
 
@@ -1093,16 +1105,16 @@ void *dbe_init(const char *directory) {
     }
 
     /* open lock file, needed to detect previous crashes */
-    if (init_dbl(bogohome))
+    if (init_dbl(directory))
 	exit(EX_ERROR);
 
     /* run recovery if needed */
     if (needs_recovery())
-	dbe_recover(0, 0); /* DO NOT set force flag here, may cause
-			     multiple recovery! */
+	dbe_recover(directory, 0, 0); /* DO NOT set force flag here, may cause
+					 multiple recovery! */
 
     /* set (or demote to) shared/read lock for regular operation */
-    db_try_glock(F_RDLCK, F_SETLKW);
+    db_try_glock(directory, F_RDLCK, F_SETLKW);
 
     /* set our cell lock in the crash detector */
     if (set_lock()) {
@@ -1123,15 +1135,15 @@ void *dbe_init(const char *directory) {
 #endif
 #endif
 
-    return dbe_xinit(db_max_locks, db_max_objects, flags);
+    return dbe_xinit(directory, db_max_locks, db_max_objects, flags);
 }
 
-int dbe_recover(int catastrophic, int force) {
+int dbe_recover(const char *directory, int catastrophic, int force) {
     dbe_t *env;
 
     /* set exclusive/write lock for recovery */
     while((force || needs_recovery())
-	    && (db_try_glock(F_WRLCK, F_SETLKW) <= 0))
+	    && (db_try_glock(directory, F_WRLCK, F_SETLKW) <= 0))
 	rand_sleep(10000,1000000);
 
     /* ok, when we have the lock, a concurrent process may have
@@ -1143,7 +1155,7 @@ retry:
     if (DEBUG_DATABASE(0))
         fprintf(dbgout, "running %s data base recovery\n",
 	    catastrophic ? "catastrophic" : "regular");
-    env = dbe_xinit(1024, 1024, catastrophic ? DB_RECOVER_FATAL : DB_RECOVER);
+    env = dbe_xinit(directory, 1024, 1024, catastrophic ? DB_RECOVER_FATAL : DB_RECOVER);
     if (env == NULL) {
 	if(!catastrophic) {
 	    catastrophic = 1;
