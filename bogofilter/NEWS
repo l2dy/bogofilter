@@ -12,6 +12,11 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 
 0.93.0	2004-11-?? "Broken compatibility" release
 
+	2004-11-02
+
+	* Make the signal handler that runs periodically to check for crashed
+	  processes only use reentrant functions. Reported by Pavel Kankovsky.
+
 	2004-11-01
 
 	* Add a debugged and enhanced version of Stefan Bellon's QDBM

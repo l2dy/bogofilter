@@ -1,15 +1,24 @@
-/* Lock handler to detect application crashes
- * (C) 2004 Matthias Andree, GNU GPL v2
- * with optimization ideas by Pavel Kankovsky */
-
-/* Lock file layout:
+/** \file db_lock.c
+ * \brief Lock handler to detect application crashes
+ * \author Matthias Andree
+ * \date 2004
+ *
+ * GNU GPL v2
+ * with optimization ideas by Pavel Kankovsky
+ *
+ * \attention
+ * This code uses signal handlers and must pay extra attention to
+ * reentrancy!
+ *
+ * \par Lock file layout:
  * the lock file has a list of cells, which can be either 0 or 1.
- * 0 means: slot is free
- * 1 means: slot in use
- *   1 with fcntl lock: process running
- *   1 without lock: process quit prematurely, recovery needed
- * see http://article.gmane.org/gmane.mail.bogofilter.devel/3240
- *     http://article.gmane.org/gmane.mail.bogofilter.devel/3260
+ * - 0 means: slot is free
+ * - 1 means: slot in use
+ *   - 1 with fcntl lock: process running
+ *   - 1 without lock: process quit prematurely, recovery needed
+ *
+ * \sa http://article.gmane.org/gmane.mail.bogofilter.devel/3240\n
+ *     http://article.gmane.org/gmane.mail.bogofilter.devel/3260\n
  *     http://article.gmane.org/gmane.mail.bogofilter.devel/3270
  */
 
@@ -26,6 +35,8 @@
 #include <signal.h>
 #include <stdlib.h>
 
+/** figure out which flag we pass to open() to enforce synchronous data
+ * I/O completion */
 #if HAVE_DECL_O_DSYNC
 static const int syncflag = O_DSYNC;
 #elif HAVE_DECL_O_SYNC
@@ -34,30 +45,41 @@ static const int syncflag = O_SYNC;
 static const int syncflag = O_FSYNC;
 #endif
 
-static const int chk_intval = 30;	/* check interval in seconds */
+/** Type we use for a lock cell. */
+typedef char cell_t;
+
+/** Periodic check interval in seconds, for set_lock(). */
+static const int chk_intval = 30;
+/** String to append to base directory, for process table file. */
 static const char aprt[] = DIRSEP_S "lockfile-p";
+/** Size of a cell, must match sizeof(cell_t). */
 static const off_t cellsize = 1;
-static off_t lockpos;			/* lock cell offset */
-static int locked;			/* if we have the lock */
-static int lockfd = -1;			/* lock file descriptor */
-
-static const char cell_inuse = '1';
-static const char cell_free = '0';
-
-static const char *lockdir; /* pointer to lock directory */
-
-static struct sigaction oldact; /* save area */
-
-/* the lock file descriptor must be long-lived because fcntl() or
+/** Offset of our lock cell inside the lock file. */
+static off_t lockpos;
+/** Boolean marker to remember if we hold the lock. */
+static int locked;
+/** File descriptor of the open lock file, or -1 when not open.
+ * The lock file descriptor must be long-lived because fcntl() or
  * lockf() will immediately release all locks held on a file once we
  * call close() for the file for the first time no matter how many file
  * descriptors to the file we still hold, so we cannot use
  * open-check-close cycles but need to keep the
- * descriptor open until will let go of the locks. */
+ * descriptor open until will let go of the locks.i
+ */
+static int lockfd = -1;
 
-typedef char cell_t;
+/** Constant cell content for cells that are in use. */
+static const cell_t cell_inuse = '1';
+/** Constant cell content for cells that are \b not in use. */
+static const cell_t cell_free = '0';
 
+/** Save area for previous SIGALRM signal handler. */
+static struct sigaction oldact;
+
+/** Convert the fcntl lock type to a string.
+ * \return constant string to resolve the numeric \a locktype. */
 static const char *s_locktype(int locktype) {
+    /* reentrant */
     switch (locktype) {
 	case F_UNLCK: return "F_UNLCK";
 	case F_RDLCK: return "F_RDLCK";
@@ -66,8 +88,11 @@ static const char *s_locktype(int locktype) {
     }
 }
 
-/* 1 if locked, 0 if unlocked, negative if error */
+/** Checks if the cell in file \a fd at given \a offset is locked.
+ * \return 1 if locked, 0 if unlocked, negative if error */
+/* part of the signal handler */
 static int check_celllock(int fd, off_t offset) {
+    /* reentrant */
     struct flock fl;
     int r;
 
@@ -84,19 +109,23 @@ static int check_celllock(int fd, off_t offset) {
     fl.l_len = cellsize;
     r = fcntl(fd, F_GETLK, &fl);
     if (r) {
+#if 0 /* stubbed out because fprintf isn't reentrant */
 	if (DEBUG_DATABASE(2))
 	    fprintf(dbgout, "check_celllock(fd=%d, offset=%ld) failed: %s\n",
 		    fd, (long)offset, strerror(errno));
+#endif
 	return -1;
     }
+#if 0 /* stubbed out because fprintf isn't reentrant */
     if (DEBUG_DATABASE(2))
-	fprintf(dbgout, "check_celllock(fd=%d, offset=%ld) = %s (%s)\n",
+e	fprintf(dbgout, "check_celllock(fd=%d, offset=%ld) = %s (%s)\n",
 		fd, (long)offset, s_locktype(fl.l_type),
 		fl.l_type == F_UNLCK ? "unlocked" : "locked");
+#endif
     return fl.l_type == F_UNLCK ? 0 : 1;
 }
 
-/* fast lock function, uses F_SETLK so does not wait */
+/** Fast lock function, uses F_SETLK so does not wait. Not reentrant. */
 static int set_celllock(int fd, off_t offset, int locktype) {
     struct flock fl;
     int r;
@@ -113,6 +142,9 @@ static int set_celllock(int fd, off_t offset, int locktype) {
     return r;
 }
 
+/** initialize the lock file which is presumed to exist and have the
+ * file name \a fn, and which will be deleted in case of trouble.
+ */
 static int init_lockfile(const char *fn) {
     char b[1024];	/* XXX FIXME: make lock size configurable */
     int rc = 0;
@@ -134,8 +166,11 @@ static int init_lockfile(const char *fn) {
     return 0;
 }
 
-/* returns descriptor of open lock file for success,
- * -1 for error */
+/** Create a lock file with name \a fn and open modes \a modes to which
+ * O_CREAT and O_EXCL are or'd. Will retry when a race was detected.
+ * \return descriptor of open lock file for success,
+ * -1 for error
+ */
 static int create_lockfile(const char *fn, int modes) {
     char *tmp = NULL;
     int count=1;
@@ -167,14 +202,16 @@ static int create_lockfile(const char *fn, int modes) {
     return lockfd;
 }
 
-/* returns 0 for success, -1 for error
- * this will do nothing and flag success if the file is open already */
-static int open_lockfile(const char *bogodir) {
+/** Open and possibly create the lock file.
+ * This will do nothing and flag success if the file is open already
+ * \return 0 for success, -1 for error.
+ */
+static int open_lockfile(const char *bogohomedir) {
     char *fn;
     int modes = O_RDWR|syncflag;
 
     if (lockfd >= 0) return 0;
-    fn = mxcat(bogodir, aprt, NULL);
+    fn = mxcat(bogohomedir, aprt, NULL);
 
     do {
 	lockfd = open(fn, modes);
@@ -195,6 +232,8 @@ static int open_lockfile(const char *bogodir) {
     return (lockfd < 0) ? -1 : 0;
 }
 
+/** Close the lock file, releasing all locks.
+ * \return is propagated from the underlying close() function. */
 static int close_lockfile(void) {
     int r = 0;
 
@@ -213,18 +252,23 @@ static int close_lockfile(void) {
     return r;
 }
 
-/*  0 - no zombies
- *  1 - zombies
- *  2 - file not found
- * -1 - other error */
-static int check_zombies(const char *bogodir) {
+/** This function checks if any processes have previously crashed.
+ * \return
+ * - 0 - no zombies
+ * - 1 - zombies
+ * - 2 - file not found
+ * - -1 - other error
+ */
+/* part of the signal handler */
+/* reentrant */
+static int check_zombies(void) {
     ssize_t r;
-    off_t pos;
+    off_t pos, savepos;
     cell_t cell;
 
-    if (open_lockfile(bogodir)) {
-	return errno == ENOENT ? 2 : -1;
-    }
+    savepos = lseek(lockfd, 0, SEEK_CUR);
+    if (savepos < 0)
+	return -1;
 
     if (lseek(lockfd, 0, SEEK_SET) < 0)
 	return -1;
@@ -234,24 +278,33 @@ static int check_zombies(const char *bogodir) {
 	r = read(lockfd, &cell, sizeof(cell));
 	if (r != sizeof(cell)) break;
 	if (cell == cell_inuse && 1 != check_celllock(lockfd, pos)) {
+	    if (lseek(lockfd, savepos, SEEK_SET) != savepos)
+		return -1;
 	    return 1;
 	}
     }
 
+    if (lseek(lockfd, savepos, SEEK_SET) != savepos)
+	return -1;
+
     return r == 0 ? 0 : -1;
 }
 
+/** Signal handler, checks if processes have crashed and if so,
+ * writes an error message to STDERR_FILENO and calls _exit(). */
 static void check_lock(int unused) {
     (void)unused;
 
-    if (0 != check_zombies(lockdir)) {
-	print_error(__FILE__, __LINE__, "bogofilter or related application has crashed or directory damaged, aborting.");
+    if (0 != check_zombies()) {
+	const char *text = "bogofilter or related application has crashed or directory damaged, aborting.";
+	write(STDERR_FILENO, text, strlen(text));
 	_exit(EX_ERROR);	/* use _exit, not exit, to avoid running the atexit handler that might deadlock */
     }
     alarm(chk_intval);
 }
 
-/* returns 0 for success, -1 for error */
+/** Initialize signal handler and start the timer. \return 0 for
+ * success, -1 for error */
 static int init_sig(void) {
     struct sigaction sa;
     sigset_t ss;
@@ -267,26 +320,16 @@ static int init_sig(void) {
     return 0;
 }
 
+/** Shut down the timer and restore the previous SIGALRM handler.
+ * \return is propagated from sigaction(). */
 static int shut_sig(void) {
     alarm(0);
     return sigaction(SIGALRM, &oldact, NULL);
 }
 
-/*
- * lock a cell and returns
- *  0 for success,
- * -2 if zombie was found or
- * -1 in case of trouble
- */
-int set_lock(const char *bogohome) {
+int set_lock(void) {
     cell_t cell;
     ssize_t r;
-
-    lockdir = xstrdup(bogohome);
-
-    if (open_lockfile(lockdir)) {
-	return errno == ENOENT ? -2 : -1;
-    }
 
     if (lseek(lockfd, 0, SEEK_SET) < 0)
 	return -1;
@@ -327,7 +370,6 @@ int set_lock(const char *bogohome) {
     }
 }
 
-/* returns 0 for success */
 int clear_lock(void) {
     shut_sig();
     if (lseek(lockfd, lockpos, SEEK_SET) < 0)
@@ -342,20 +384,15 @@ int clear_lock(void) {
     return 0;
 }
 
-int needs_recovery(const char *bogodir) {
-    return !!check_zombies(bogodir);
+int init_dbl(const char *bogodir) {
+    return open_lockfile(bogodir) ? -1 : 0;
 }
 
+int needs_recovery() {
+    return 0 != check_zombies();
+}
 
-int clear_lockfile(const char *bogodir) {
-    char *fn;
-
-    fn = mxcat(bogodir, aprt, NULL);
-    if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "clear_lockfile(%s)\n", fn);
-
-    if (open_lockfile(bogodir))
-	return -1;
+int clear_lockfile(void) {
     if (init_lockfile(NULL))
 	return -1;
     return 0;
