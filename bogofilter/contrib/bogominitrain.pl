@@ -1,6 +1,3 @@
-I think this is it. Test runs nicely.
-
-pi
 #!/usr/bin/perl
 # Script to train bogofilter from mboxes
 # by Boris 'pi' Piwinger <3.14@piology.org>
@@ -9,6 +6,8 @@ pi
 my $commandlineoptions=($ARGV[0]=~/^-(?=[^v]*v{0,2}[^v]*$)(?=[^f]*f?[^f]*$)(?=[^s]*s?[^s]*$)[vfs]+$/);
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
+
+bogominitrain.pl version 1.01
 
 Usage:
   bogominitrain.pl [-[f][v[v]][s]] <database-directory> <ham-mboxes>\\ 
@@ -70,8 +69,8 @@ my $temp; srand; do {$temp="/tmp/".rand();} until (!-e $temp);
 
 die ("$dir is not a directory or not accessible.\n") unless (-d $dir && -r $dir && -w $dir && -x $dir);
 print "\nStarting with this database:\n";
-my $dbexists=(-s "$dir/goodlist.db");
-if ($dbexists) {print `bogoutil -w $dir .MSG_COUNT`;} else {print "  (empty)\n\n";}
+my $dbexists=(-s "$dir/goodlist.db" || -s "$dir/wordlist.db");
+if ($dbexists) {print `bogoutil -w $dir .MSG_COUNT`,"\n";} else {print "  (empty)\n\n";}
 
 my ($fp,$fn);
 my $runs=0;
@@ -145,11 +144,11 @@ do { # Start force loop
 
   print "\nEnd of run #$runs:\n";
   print "Read $hamcount ham mails and $spamcount spam mails.\n";
-  print "Added $hamadd ham mails and $spamadd spam mails to the database.\n";
+  print "Added $hamadd ham mail",$hamadd!=1&&"s"," and $spamadd spam mail",$spamadd!=1&&"s"," to the database.\n";
   print `bogoutil -w $dir .MSG_COUNT`;
   $fn=`cat $spam | $bogofilter -vtM | egrep -cv ^[YS]`;
   print "\nFalse negatives: $fn";
   $fp=`cat $ham | $bogofilter -vtM| egrep -cv ^[NH]`;
   print "False positives: $fp\n";
 } until ($fn+$fp==0 || !$force);
-print "\n$runs run",($runs==1)?"":"s"," needed to close off.\n" if ($force);
+print "\n$runs run",$runs>1&&"s"," needed to close off.\n" if ($force);
