@@ -10,7 +10,6 @@
 #include "bogofilter.h"
 #include "bogohome.h"
 #include "datastore.h"
-#include "find_home.h"
 #include "msgcounts.h"
 #include "paths.h"
 #include "rand_sleep.h"
@@ -205,7 +204,6 @@ bool configure_wordlist(const char *val)
     
     filename=tmp;		/* path to wordlist */
     tmp = spanword(tmp);
-    filename=tildeexpand(filename, true);
     
     precedence=atoi(tmp);
     tmp = spanword(tmp);
@@ -216,7 +214,5 @@ bool configure_wordlist(const char *val)
     if (ok)
 	config_setup = true;
 
-    xfree(filename);
-    
     return ok;
 }
