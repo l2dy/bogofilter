@@ -19,7 +19,6 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include <unistd.h>
 #include <db.h>
 #include <errno.h>
-#include <assert.h>
 
 #include <config.h>
 #include "common.h"
@@ -509,8 +508,15 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 
 	while ((ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) == 0)
 	{
-	    uint32_t cv[2];
+	    uint32_t cv[3];
 
+	    if (data.size > sizeof(cv)) {
+		fprintf(stderr, "\nerror: data size (%lu) larger than space"
+			" (%lu).\nFix me at %s:%d.\nAborting.\n\n",
+			(unsigned long)data.size, (unsigned long)sizeof(cv),
+			__FILE__, __LINE__);
+		abort();
+	    }
 	    memcpy(&cv, data.data, data.size);
 	    if (handle->is_swapped) {
 		unsigned int s;
