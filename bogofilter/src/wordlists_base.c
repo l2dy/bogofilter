@@ -38,6 +38,11 @@ int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* pat
     n->bad[IX_GOOD]=gbad;
     n->ignore=ignore;
 
+    if (word_lists) {
+	xfree(word_lists);
+	word_lists = 0;
+    }
+
     if (! word_lists) {
 	word_lists=n;
 	n->next=NULL;
