@@ -202,7 +202,7 @@ BREAKHTML	"<"({HBREAK}({WHITESPACE}[^>]*|""))">"
 VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 
 %s TEXT HTML BOGO_LEX
-%s HTOKEN HDISCARD SCOMMENT LCOMMENT HSCRIPT
+%s HTOKEN HDISCARD SCOMMENT LCOMMENT
 
 %%
 
@@ -274,7 +274,6 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <HTML>"<"					{ BEGIN HDISCARD; }	/* unknown tag */
 
 <HTOKEN>{TOKEN}					{ return TOKEN; }
-<HSCRIPT>{TOKEN}				{ return TOKEN; }
 <HDISCARD,LCOMMENT,SCOMMENT>{TOKEN}		{ /* discard innards of html tokens and comments */ }
 
 <HTOKEN,HDISCARD,LCOMMENT>">"			{ BEGIN HTML; }	/* end of tag, loose comment; return to normal html processing */
