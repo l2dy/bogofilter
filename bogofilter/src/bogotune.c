@@ -825,8 +825,7 @@ static void help(void)
 		  "\t  -d path - specify directory for wordlists.\n"
 		  "\t  -E      - disable ESF (effective size factor) tuning.\n"
 		  "\t  -M      - output input file in message count format.\n"
-		  "\t  -r num  - specify robx value\n",
-		  LIST_COUNT);
+		  "\t  -r num  - specify robx value\n");
     (void)fprintf(stderr,
 		  "\t  -T num  - specify fp target value\n"
 		  "\t  -s file1 file2 ... - spam files\n"
@@ -1298,7 +1297,7 @@ static bool check_msg_counts(void)
 {
     bool ok = true;
 
-    if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT)) {
+    if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
 	QPRINTF(stderr, 
 		"The wordlist contains %d non-spam and %d spam messages.\n"
 		"Bogotune must be run with at least %d of each.\n",
