@@ -38,12 +38,7 @@ int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* pat
     n->bad[IX_GOOD]=gbad;
     n->ignore=ignore;
 
-    if (word_lists) {
-	xfree(word_lists);
-	word_lists = 0;
-    }
-
-    if (! word_lists) {
+    if (word_lists == NULL) {
 	word_lists=n;
 	n->next=NULL;
 	return 0;
@@ -57,7 +52,8 @@ int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* pat
 	    n->next=list_ptr;
 	    break;
         }
-        if (! list_ptr->next) {
+
+        if (list_ptr->next == NULL) {
 	    /* end of list */
 	    list_ptr->next=n;
 	    n->next=NULL;
@@ -102,9 +98,8 @@ int setup_wordlists(const char* d, priority_t precedence)
     if (DEBUG_WORDLIST(2))
 	fprintf(dbgout, "d: %s\n", dir);
 
-    if (saved_precedence != precedence && word_lists != NULL) {
+    if (saved_precedence != precedence)
 	free_wordlists();
-    }
 
     saved_precedence = precedence;
 
@@ -128,17 +123,26 @@ int setup_wordlists(const char* d, priority_t precedence)
     return rc;
 }
 
+static wordlist_t *free_wordlist(wordlist_t *list)
+{
+    wordlist_t *next = list->next;
+
+    xfree(list->filename);
+    xfree(list->filepath);
+    xfree(list);
+
+    return next;
+}
+
 void free_wordlists(void)
 {
-    wordlist_t *list, *next;
+    wordlist_t *list = word_lists;
 
-    for ( list = word_lists; list != NULL; list = next )
+    while ( list != NULL )
     {
-	xfree(list->filename);
-	xfree(list->filepath);
-	next = list->next;
-	xfree(list);
+	list = free_wordlist(list);
     }
+
     word_lists = NULL;
 }
 
