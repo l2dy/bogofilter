@@ -87,11 +87,11 @@ size_t strlcat(/*@out@*/ char *dst, const char *src, size_t size);
 #ifndef HAVE_UINT32_T
 #ifdef HAVE_U_INT32_T
 typedef u_int32_t uint32_t;
-#elif SIZEOF_UNSIGNED_LONG == 4
+#elif SIZEOF_LONG == 4
 typedef unsigned long uint32_t;
-#elif SIZEOF_UNSIGNED_INT == 4
+#elif SIZEOF_INT == 4
 typedef unsigned int uint32_t;
-#elif SIZEOF_UNSIGNED_SHORT == 4
+#elif SIZEOF_SHORT == 4
 typedef unsigned short uint32_t;
 #else
 choke me because we do not know how to define uint32_t
@@ -102,11 +102,11 @@ typedef uint32_t u_int32_t;
 #endif
 
 #ifndef HAVE_INT32_T
-#if SIZEOF_SIGNED_LONG == 4
+#if SIZEOF_LONG == 4
 typedef signed long int32_t;
-#elif SIZEOF_SIGNED_INT == 4
+#elif SIZEOF_INT == 4
 typedef signed int int32_t;
-#elif SIZEOF_SIGNED_SHORT == 4
+#elif SIZEOF_SHORT == 4
 typedef signed short int32_t;
 #else
 choke me because we do not know how to define int32_t
@@ -114,7 +114,7 @@ choke me because we do not know how to define int32_t
 #endif /* HAVE_INT32_T */
 
 #ifndef HAVE_UINT16_T
-#if SIZEOF_UNSIGNED_SHORT == 2
+#if SIZEOF_SHORT == 2
 typedef unsigned short uint16_t;
 #else
 choke me because we do not know how to define uint16_t
@@ -125,7 +125,7 @@ typedef uint16_t u_int16_t;
 #endif
 
 #ifndef HAVE_INT16_T
-#if SIZEOF_SIGNED_SHORT == 2
+#if SIZEOF_SHORT == 2
 typedef signed short int16_t;
 #else
 choke me because we do not know how to define int16_t

@@ -69,38 +69,6 @@ AC_CHECK_DECLS(optreset,,,[[
 #include <stdlib.h>
 ]])
 
-dnl BEGIN TRIO
-dnl Alpha floating-point compiler option.
-dnl
-
-AC_MSG_CHECKING(for IEEE compilation options)
-AC_CACHE_VAL(ac_cv_ieee_option, [
-AC_TRY_COMPILE(,[
-#if !(defined(__alpha) && (defined(__DECC) || defined(__DECCXX) || (defined(__osf__) && defined(__LANGUAGE_C__))) && (defined(VMS) || defined(__VMS)))
-# error "Option needed"
-#endif
-],ac_cv_ieee_option="/IEEE_MODE=UNDERFLOW_TO_ZERO/FLOAT=IEEE",
-AC_TRY_COMPILE(,[
-#if !(defined(__alpha) && (defined(__DECC) || defined(__DECCXX) || (defined(__osf__) && defined(__LANGUAGE_C__))) && !(defined(VMS) || defined(__VMS)) && !defined(_CFE))
-# error "Option needed"
-#endif
-],ac_cv_ieee_option="-ieee",
-AC_TRY_COMPILE(,[
-#if !(defined(__alpha) && (defined(__GNUC__) && (defined(__osf__) || defined(__linux__))))
-# error "Option needed"
-#endif
-],ac_cv_ieee_option="-mieee",
-ac_cv_ieee_option="none"
-)
-)
-)
-])
-AC_MSG_RESULT($ac_cv_ieee_option)
-if test $ac_cv_ieee_option != none; then
-  CFLAGS="${CFLAGS} ${ac_cv_ieee_option}"
-fi
-dnl END TRIO
-
 AC_ARG_ENABLE(static,
       AC_HELP_STRING([--enable-static], [Build static versions as well.]))
 if test a$enable_static = ayes ; then
@@ -353,12 +321,9 @@ AC_TYPE_SIGNAL
 AC_CACHE_SAVE
 AC_FUNC_SELECT_ARGTYPES
 AC_CHECK_TYPES([ulong, uint32_t, u_int32_t, int32_t, int16_t, u_int16_t, uint16_t, u_int8_t])
-AC_CHECK_SIZEOF(signed short)
-AC_CHECK_SIZEOF(signed int)
-AC_CHECK_SIZEOF(signed long)
-AC_CHECK_SIZEOF(unsigned short)
-AC_CHECK_SIZEOF(unsigned int)
-AC_CHECK_SIZEOF(unsigned long)
+AC_CHECK_SIZEOF(short)
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(long)
 dnl The next one isn't really needed, but useful for post-mortem analysis of
 dnl automated package build logs such as bento.freebsd.org or buildd.debian.org:
 AC_CHECK_SIZEOF(size_t)
@@ -391,6 +356,38 @@ if test "x$ac_cv_func_vsnprintf" != "xyes" ; then
 fi
 if test $needtrio -gt 0
 then
+dnl BEGIN TRIO
+dnl Alpha floating-point compiler option.
+dnl
+
+AC_MSG_CHECKING(for IEEE compilation options)
+AC_CACHE_VAL(ac_cv_ieee_option, [
+AC_TRY_COMPILE(,[
+#if !(defined(__alpha) && (defined(__DECC) || defined(__DECCXX) || (defined(__osf__) && defined(__LANGUAGE_C__))) && (defined(VMS) || defined(__VMS)))
+# error "Option needed"
+#endif
+],ac_cv_ieee_option="/IEEE_MODE=UNDERFLOW_TO_ZERO/FLOAT=IEEE",
+AC_TRY_COMPILE(,[
+#if !(defined(__alpha) && (defined(__DECC) || defined(__DECCXX) || (defined(__osf__) && defined(__LANGUAGE_C__))) && !(defined(VMS) || defined(__VMS)) && !defined(_CFE))
+# error "Option needed"
+#endif
+],ac_cv_ieee_option="-ieee",
+AC_TRY_COMPILE(,[
+#if !(defined(__alpha) && (defined(__GNUC__) && (defined(__osf__) || defined(__linux__))))
+# error "Option needed"
+#endif
+],ac_cv_ieee_option="-mieee",
+ac_cv_ieee_option="none"
+)
+)
+)
+])
+AC_MSG_RESULT($ac_cv_ieee_option)
+if test $ac_cv_ieee_option != none; then
+  CFLAGS="${CFLAGS} ${ac_cv_ieee_option}"
+fi
+dnl END TRIO
+
     LIBS="$LIBS -ltrio -lm"
     AC_DEFINE(NEEDTRIO, 1, [Define to 1 if trio is to be included.])
 fi
