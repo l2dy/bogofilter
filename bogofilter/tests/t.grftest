@@ -17,7 +17,7 @@ cd t.systest.d
 #			      outputs - known correct outputs
 #			      tests   - outputs of the individual tests
 
-if [ "$1" == "-v" ]; then
+if [ "$1" = "-v" ]; then
     verbose=1
 fi
 
@@ -82,7 +82,7 @@ done
 
 if test x$SUPPRESS_DELETE != x ; then rm -rf t.systest.d/cfg.?; fi
 
-if  [ "$verbose" == "1" ]; then
+if  [ "$verbose" -eq 1 ]; then
     diff -u -s outputs/$OUT tests/$OUT
 fi
 
