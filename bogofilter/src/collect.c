@@ -57,7 +57,11 @@ void collect_words(/*@out@*/ wordhash_t **wh,
 	    w = wordhash_insert(h, yylval, sizeof(wordprop_t), &wordprop_init);
 	    if (w->freq < max_repeats) w->freq++;
 	    w_count++;
-	    if (DEBUG_WORDLIST(3)) fprintf(dbgout, "%3ld %s\n", w_count, yylval);
+	    if (DEBUG_WORDLIST(3)) { 
+		fprintf(dbgout, "%3ld ", w_count);
+		word_puts(yylval, dbgout);
+		fputc('\n', dbgout);
+	    }
 	    continue;
 	}
 

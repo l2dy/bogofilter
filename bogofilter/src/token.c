@@ -19,8 +19,10 @@ AUTHOR:
 
 #include "charset.h"
 #include "error.h"
-#include "token.h"
 #include "mime.h"
+#include "word.h"
+#include "token.h"
+#include "xmemrchr.h"
 
 /* Structure Definitions */
 
@@ -32,11 +34,10 @@ typedef enum {
 
 /* Local Static Variables */
 
-static char *yytext;
-static int yyleng;
+word_t *yylval = NULL;
 
 static token_t save_class = NONE;
-static char save_text[256];
+static word_t *bfsave = NULL;
 
 static int html_tag_level = 0;
 static int html_comment_level = 0;
@@ -103,34 +104,37 @@ token_t get_token(void)
     /* If saved IPADDR, truncate last octet */
     if ( block_on_subnets && save_class == IPADDR )
     {
-	char *t = strrchr(save_text, '.');
+	byte *t = xmemrchr(bfsave->text, '.', bfsave->leng);
 	if (t == NULL)
 	    save_class = NONE;
 	else
 	{
 	    *t = '\0';	
-	    yylval = save_text;
-	    yyleng = strlen(save_text);
+	    bfsave->leng = t - bfsave->text;
+	    yylval = bfsave;
 	    return save_class;
 	}
     }
+
+    if (yylval == NULL)
+	yylval = word_new(NULL, 0);
 
     while (true) {
 	switch (lexer_state) {
 	case LEXER_HEAD: 
  	    class  = lexer_lex();
-	    yyleng = lexer_leng;
-	    yytext = lexer_text;
+	    yylval->leng = lexer_leng;
+	    yylval->text = lexer_text;
 	    break;
 	case LEXER_TEXT: 
 	    class  = text_plain_lex();
-	    yyleng = text_plain_leng;
-	    yytext = text_plain_text;
+	    yylval->leng = text_plain_leng;
+	    yylval->text = text_plain_text;
 	    break;
 	case LEXER_HTML: 
 	    class  = text_html_lex();
-	    yyleng = text_html_leng;
-	    yytext = text_html_text;
+	    yylval->leng = text_html_leng;
+	    yylval->text = text_html_text;
 	    break;
 	}
 
@@ -143,7 +147,7 @@ token_t get_token(void)
 	    continue;
 
 	case BOUNDARY:	/* don't return boundary tokens to the user */
-	    if (mime_is_boundary((const byte *)yytext, yyleng)){
+	    if (mime_is_boundary(yylval)){
     	    	change_lexer_state(LEXER_HEAD);
 		continue;
 	    }
@@ -170,9 +174,8 @@ token_t get_token(void)
 	case IPADDR:
 	    if (block_on_subnets)
 	    {
-		const char *prefix="url:";
-		size_t len = strlen(prefix);
-		size_t avl = sizeof(save_text);
+		const byte *prefix="url:";
+		size_t plen = strlen(prefix);
 		int q1, q2, q3, q4;
 		/*
 		 * Trick collected by ESR in real time during John
@@ -185,14 +188,16 @@ token_t get_token(void)
 		 * mask their origin.  Nuke the high bits to unmask the 
 		 * address.
 		 */
-		if (sscanf(yytext, "%d.%d.%d.%d", &q1, &q2, &q3, &q4) == 4)
+		if (sscanf(yylval->text, "%d.%d.%d.%d", &q1, &q2, &q3, &q4) == 4)
 		    /* safe because result string guaranteed to be shorter */
-		    sprintf(yytext, "%d.%d.%d.%d", 
+		    sprintf(yylval->text, "%d.%d.%d.%d", 
 			    q1 & 0xff, q2 & 0xff, q3 & 0xff, q4 & 0xff);		    
-		yylval = save_text;
+		yylval->leng = strlen(yylval->text);
+		bfsave = word_new(NULL, plen + yylval->leng);
+		memcpy(bfsave->text, prefix, plen);
+		memcpy(bfsave->text+plen, yylval->text, yylval->leng);
+		yylval = bfsave;
 		save_class = IPADDR;
-		avl -= strlcpy( yylval, prefix, avl);
-		yyleng = strlcpy( yylval+len, yytext, avl);
 		return (class);
 	    }
 	    break;
@@ -203,22 +208,21 @@ token_t get_token(void)
 	}
 
 	/* eat all long words */
-	if (yyleng <= MAXTOKENLEN)
+	if (yylval->leng <= MAXTOKENLEN)
 	    break;
     }
 
     /* Remove trailing blanks */
     /* From "From ", for example */
-    while (yyleng > 1 && yytext[yyleng-1] == ' ') {
-	yyleng -= 1;
-	yytext[yyleng] = '\0';
+    while (yylval->leng > 1 && yylval->text[yylval->leng-1] == ' ') {
+	yylval->leng -= 1;
+	yylval->text[yylval->leng] = '\0';
     }
 
     /* Need separate loop so lexer can see "From", "Date", etc */
-    for (cp = (unsigned char *)yytext; *cp; cp++)
-	*cp = casefold_table[(unsigned char)*cp];
+    for (cp = yylval->text; cp < yylval->text+yylval->leng; cp += 1)
+	*cp = casefold_table[*cp];
 
-    yylval = yytext;
     return(class);
 }
 

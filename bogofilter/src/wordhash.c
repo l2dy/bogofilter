@@ -150,25 +150,28 @@ smalloc (wordhash_t * h, size_t n) /*@modifies h->strings@*/
 }
 
 static unsigned int
-hash (char *p)
+hash (word_t *t)
 {
   unsigned int h = 0;
-  for (; *p; p++)
-    h = MULT * h + *p;
+  size_t l;
+  for (l=0; l<t->leng; l++)
+    h = MULT * h + t->text[l];
   return h % NHASH;
 }
 
 void *
-wordhash_insert (wordhash_t * h, char *s, size_t n, void (*initializer)(void *))
+wordhash_insert (wordhash_t * h, word_t *t, size_t n, void (*initializer)(void *))
 {
   hashnode_t *p;
-  unsigned int idx = hash (s);
+  unsigned int idx = hash (t);
 
-  for (p = h->bin[idx]; p != NULL; p = p->next)
-    if (strcmp (s, p->key) == 0)
+  for (p = h->bin[idx]; p != NULL; p = p->next) {
+    word_t *key = p->key;
+    if (key->leng == t->leng && memcmp (t->text, key->text, t->leng) == 0)
       {
 	return p->buf;
       }
+  }
 
   h->count += 1;
   p = nmalloc (h);
@@ -176,8 +179,7 @@ wordhash_insert (wordhash_t * h, char *s, size_t n, void (*initializer)(void *))
   if (initializer)
 	  initializer(p->buf);
 		  
-  p->key = smalloc (h, strlen (s) + 1);
-  strcpy (p->key, s); /* RATS: ignore */
+  p->key = word_dup(t);
   p->next = h->bin[idx];
   h->bin[idx] = p;
 
@@ -235,7 +237,7 @@ static int compare_hashnode_t(const void *const ihn1, const void *const ihn2)
 {
     const hashnode_t *hn1 = *(const hashnode_t *const *)ihn1;
     const hashnode_t *hn2 = *(const hashnode_t *const *)ihn2;
-    return strcmp(hn1->key, hn2->key);
+    return word_cmp(hn1->key, hn2->key);
 }
 
 void

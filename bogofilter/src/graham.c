@@ -48,8 +48,8 @@ static const parm_desc gra_parm_table[] =
 typedef struct 
 {
     /*@unique@*/ 
-    char        key[MAXTOKENLEN+1];
-    double      prob; /* WARNING: DBL_EPSILON IN USE, DON'T CHANGE */
+    word_t	*key;
+    double	prob; /* WARNING: DBL_EPSILON IN USE, DON'T CHANGE */
 } discrim_t;
 
 struct bogostat_s
@@ -92,7 +92,7 @@ static int compare_extrema(const void *id1, const void *id2)
     if (d1->prob - d2->prob > EPS) return 1;
     if (d2->prob - d1->prob > EPS) return -1;
 
-    return strcmp(d1->key, d2->key);
+    return word_cmp(d1->key, d2->key);
 }
 
 static void init_bogostats(/*@out@*/ bogostat_t *bs)
@@ -103,12 +103,12 @@ static void init_bogostats(/*@out@*/ bogostat_t *bs)
     {
 	discrim_t *pp = &bs->extrema[idx];
 	pp->prob = EVEN_ODDS;
-	pp->key[0] = '\0';
+	pp->key = word_new(NULL, 0);
     }
 }
 
 static void populate_bogostats(/*@out@*/ bogostat_t *bs,
-	const char *text, double prob)
+			       const word_t *word, double prob)
 /* if  the new word,prob pair is a better indicator.
  * add them to the bogostats structure */
 {
@@ -125,7 +125,7 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
     for (idx = 0; idx < SIZEOF(bs->extrema); idx++)
     {
 	pp = &bs->extrema[idx];
-	if (pp->key[0] == '\0' )
+	if (pp->key->leng == 0)
 	{
 	    hit = pp;
 	    break;
@@ -143,21 +143,32 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
 	if (verbose >= 3)
 	{
 	    int i = (hit - bs->extrema);
-	    const char *curkey = hit->key[0] ? hit->key : "";
-	    (void)fprintf(stderr, 
-		    "#  %2d"
-		    "  %f  %f  %-20.20s "
-		    "  %f  %f  %s\n", i,
-		   DEVIATION(prob),  prob, text,
-		   DEVIATION(hit->prob), hit->prob, curkey);
+	    const word_t *key = hit->key;
+	    FILE *fp = stderr;	/* dbgout */
+	    (void) fprintf(fp,
+			   "#  %2d"
+			   "  %f  %f  ", i,
+			   DEVIATION(prob),  prob);
+	    /* print token (max width=20) */
+	    (void) fwrite(word->text, 1, min(20,word->leng), fp);
+	    if (word->leng < 20)
+		(void) fprintf(fp, "%*s", 20 - word->leng," ");
+	    (void) fprintf(fp, "   %f  %f  ",
+			   DEVIATION(hit->prob), hit->prob);
+	    /* print token (max width=20) */
+	    (void) fwrite(key->text, 1, min(20,key->leng), fp);
+	    (void) fputc('\n', fp);
 	}
 	hit->prob = prob;
-	if (strlcpy(hit->key, text, MAXTOKENLEN) >= MAXTOKENLEN) {
+	if (word->leng >= MAXTOKENLEN) {
 	    /* The lexer should not have returned a token longer than
 	     * MAXTOKENLEN */
 	    internal_error;
 	    abort();
 	}
+	if (hit->key)
+	    word_free(hit->key);
+	hit->key = word_dup(word);
     }
     return;
 }
@@ -196,7 +207,7 @@ static double wordprob_result(wordprob_t* wordstats)
     return (prob);
 }
 
-static double compute_probability(const char *token)
+static double compute_probability(const word_t *token)
 {
     wordlist_t* list;
     int override=0;
@@ -253,7 +264,7 @@ static bogostat_t *select_indicators(wordhash_t *wordhash)
 
     for(node = wordhash_first(wordhash); node != NULL; node = wordhash_next(wordhash))
     {
-	char *token = node->key;
+	word_t *token = node->key;
 	double prob = compute_probability( token );
 
 	w_count += 1;
@@ -290,23 +301,15 @@ double gra_compute_spamicity(bogostat_t *bs, FILE *fp) /*@globals errno@*/
 	invproduct *= (1 - pp->prob);
 	spamicity = product / (product + invproduct);
 
-	if (fp != NULL)
+	if (fp != NULL && verbose > 1)
 	{
-	    switch (verbose)
-	    {
-		case 0:
-		case 1:
-		    break;
-		case 2:
-		    fprintf(fp, "%s%f  %s\n", stats_prefix, pp->prob, pp->key);
-		    break;
-		case 3:
-		    fprintf(fp, "%s%f  %f  %s\n", stats_prefix, pp->prob, spamicity, pp->key);
-		    break;
-		default:
-		    fprintf(fp, "%s%f  %f  %f  %8.5e  %s\n", stats_prefix, pp->prob, product, invproduct, spamicity, pp->key);
-		    break;
-	    }
+	    fprintf(fp, "%s%f  ", stats_prefix, pp->prob);
+	    if (verbose == 3)
+		fprintf(fp, "%f  ", spamicity);
+	    if (verbose >= 4)
+		fprintf(fp, "%f  %f  %8.5e  ", product, invproduct, spamicity);
+	    fwrite(pp->key->text, 1, pp->key->leng, fp);
+	    fputc('\n', fp);
 	}
     }
 

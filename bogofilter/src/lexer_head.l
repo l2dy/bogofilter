@@ -43,6 +43,7 @@
 #include <config.h>
 #include "common.h"
 
+#include "buff.h"
 #include "charset.h"
 #include "lexer.h"
 #include "mime.h"		/* for mime_*() */
@@ -52,6 +53,7 @@
 #define YY_DECL token_t yylex(void)
 #define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, max_size)
 
+static word_t yy_text;
 %}
 
 %option align nounput noyywrap noreject 8bit caseless
@@ -66,22 +68,34 @@ TOKEN		[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\
 
 %%
 
-charset=\"?{ID}\"?				{ got_charset(yytext); yyredo((byte *)yytext, '='); }
+charset=\"?{ID}\"?				{ got_charset(yytext); 
+						  yy_text.text=yytext; yy_text.leng=yyleng;
+						  yyredo(&yy_text, '='); }
 
-^MIME-Version:.*				{ mime_version((byte *)yytext, yyleng); yyredo((byte *)yytext, ':'); }
-^Content-Transfer-Encoding:{MTYPE}		{ mime_encoding((byte *)yytext, yyleng); yyredo((byte *)yytext, ':'); }
-^Content-Type:{MTYPE};?				{ mime_type((byte *)yytext, yyleng); yyredo((byte *)yytext, ':'); }
-^Content-Disposition:{MTYPE}			{ mime_disposition((byte *)yytext, yyleng); yyredo((byte *)yytext, ':'); }
+^MIME-Version:.*				{ yy_text.text=yytext; yy_text.leng=yyleng;
+						  mime_version(&yy_text);
+						  yyredo(&yy_text, ':'); }
+^Content-Transfer-Encoding:{MTYPE}		{ yy_text.text=yytext; yy_text.leng=yyleng;
+						  mime_encoding(&yy_text);
+						  yyredo(&yy_text, ':'); }
+^Content-Type:{MTYPE};?				{ yy_text.text=yytext; yy_text.leng=yyleng;
+						  mime_type(&yy_text);
+						  yyredo(&yy_text, ':'); }
+^Content-Disposition:{MTYPE}			{ yy_text.text=yytext; yy_text.leng=yyleng;
+						  mime_disposition(&yy_text);
+						  yyredo(&yy_text, ':'); }
 ^From\ 						{ return (msg_header ? FROM : TOKEN); }
 ^Date:.*|Delivery-Date:.*			;
 ^Message-ID:.*					;
 ^\tid\ {ID}					;
 
 E?SMTP\ id\ {ID}				;
-boundary=[ ]*\"?{MIME_BOUNDARY}\"?		{ mime_boundary_set((byte *)yytext, yyleng); }
+boundary=[ ]*\"?{MIME_BOUNDARY}\"?		{ yy_text.text=yytext; yy_text.leng=yyleng;
+						  mime_boundary_set(&yy_text); }
 name=\"?					;
 filename=\"?					;
-^--{MIME_BOUNDARY}(--)?$			{ return (got_mime_boundary((byte *)yytext, yyleng) ? BOUNDARY : TOKEN); }
+^--{MIME_BOUNDARY}(--)?$			{ yy_text.text=yytext; yy_text.leng=yyleng;
+						  return (got_mime_boundary(&yy_text) ? BOUNDARY : TOKEN); }
 
 {IPADDR}					{ return(IPADDR);}
 {TOKEN}						{ return(TOKEN);}

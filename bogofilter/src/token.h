@@ -12,6 +12,8 @@ NAME:
 
 #include "lexer.h"
 
+extern word_t *yylval;
+
 extern token_t get_token(void);
 
 extern void got_from(void);

@@ -239,13 +239,13 @@ static void sanitycheck_lists(void)
 }
 #endif
 
-static char *spanword(char *val)
+static char *spanword(char *p)
 {
-    val += strcspn(val, ", \t");
-    *val++ = '\0';
-    while (isspace((unsigned char)*val)) 
-	val += 1;
-    return val;
+    p += strcspn(p, ", \t");		/* skip to end of word */
+    *p++ = '\0';
+    while (isspace((unsigned char)*p)) 	/* skip trailing whitespace */
+	p += 1;
+    return p;
 }
 
 /* type - 'g', 's', or 'i'
@@ -271,7 +271,7 @@ bool configure_wordlist(const char *val)
 
     char *tmp = xstrdup(val);
 
-    type=tmp;
+    type=tmp;			/* save wordlist type (good/spam) */
     tmp = spanword(tmp);
 
     switch (type[0])
@@ -287,10 +287,10 @@ bool configure_wordlist(const char *val)
 	    break;
     }
 
-    name=tmp;
+    name=tmp;			/* name of wordlist */
     tmp = spanword(tmp);
 
-    path=tildeexpand(tmp);
+    path=tildeexpand(tmp);	/* path to wordlist */
     tmp = spanword(tmp);
 
     weight=atof(tmp);

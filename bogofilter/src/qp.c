@@ -37,11 +37,12 @@ static int hex_to_bin(byte c) {
     }
 }
 
-size_t qp_decode(byte *buff, size_t size)
+size_t qp_decode(word_t *word)
 {
-    byte *s = buff;		/* src */
-    byte *d = buff;		/* dst */
-    byte *e = buff + size;	/* end */
+    size_t size = word->leng;
+    byte *s = word->text;	/* src */
+    byte *d = word->text;	/* dst */
+    byte *e = s + size;		/* end */
 
     while (s < e)
     {
@@ -68,5 +69,5 @@ size_t qp_decode(byte *buff, size_t size)
 	*d++ = ch;
     }
     *d = '\0';
-    return d - buff;
+    return d - word->text;
 }

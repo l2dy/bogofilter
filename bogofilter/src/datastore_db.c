@@ -33,6 +33,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include "xstrdup.h"
 
 #define MSG_COUNT_TOK ".MSG_COUNT"
+word_t  *msg_count_tok;
 
 #undef UINT32_MAX
 #define UINT32_MAX 4294967295lu /* 2 ^ 32 - 1 */
@@ -63,8 +64,8 @@ int db_cachesize = 0;	/* in MB */
 
 /* Function prototypes */
 
-static int db_get_dbvalue(void *vhandle, const char *word, dbv_t *val);
-static void db_set_dbvalue(void *vhandle, const char *word, dbv_t *val);
+static int db_get_dbvalue(void *vhandle, const word_t *word, dbv_t *val);
+static void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val);
 static int db_lock(int fd, int cmd, short int type);
 
 /* Function definitions */
@@ -195,7 +196,7 @@ open_err:
     0 if the word is not found.
     Notes: Will call exit if an error occurs.
 */
-uint32_t db_getvalue(void *vhandle, const char *word){
+uint32_t db_getvalue(void *vhandle, const word_t *word){
   dbv_t val;
   uint32_t ret;
   uint32_t value = 0;
@@ -207,8 +208,11 @@ uint32_t db_getvalue(void *vhandle, const char *word){
     value = val.count;
 
     if (DEBUG_DATABASE(2)) {
-      fprintf(dbgout, "[%lu] db_getvalue (%s): [%s] has value %lu\n",
-	      (unsigned long) handle->pid, handle->name, word, (unsigned long)value);
+      fprintf(dbgout, "[%lu] db_getvalue (%s): [",
+	      (unsigned long) handle->pid, handle->name);
+      word_puts(word, dbgout);
+      fprintf(dbgout, "] has value %lu\n",
+	      (unsigned long)value);
     }
     return(value);
   }
@@ -216,28 +220,27 @@ uint32_t db_getvalue(void *vhandle, const char *word){
     return 0;
 }
 
-void db_delete(void *vhandle, const char *word) {
+void db_delete(void *vhandle, const word_t *word) {
     int ret;
     dbh_t *handle = vhandle;
-    char *t;
 
     DBT db_key;
     DBT_init(db_key);
 
-    db_key.data = t = xstrdup(word);
-    db_key.size = strlen(word);
+    db_key.data = word->text;
+    db_key.size = word->leng;
+
     ret = handle->dbp->del(handle->dbp, NULL, &db_key, 0);
-    free(t);
+
     if (ret == 0 || ret == DB_NOTFOUND) return;
-    print_error(__FILE__, __LINE__, "(db) db_delete('%s'), err: %d, %s", word, ret, db_strerror(ret));
+    print_error(__FILE__, __LINE__, "(db) db_delete('%s'), err: %d, %s", word->text, ret, db_strerror(ret));
     exit(2);
 }
 
-static int db_get_dbvalue(void *vhandle, const char *word, /*@out@*/ dbv_t *val){
+static int db_get_dbvalue(void *vhandle, const word_t *word, /*@out@*/ dbv_t *val){
   int ret;
   DBT db_key;
   DBT db_data;
-  char *t;
   uint32_t cv[2] = { 0l, 0l };
 
   dbh_t *handle = vhandle;
@@ -247,8 +250,8 @@ static int db_get_dbvalue(void *vhandle, const char *word, /*@out@*/ dbv_t *val)
   DBT_init(db_key);
   DBT_init(db_data);
 
-  db_key.data = t = xstrdup(word);
-  db_key.size = strlen(word);
+  db_key.data = word->text;
+  db_key.size = word->leng;
 
   db_data.data = &cv;
   db_data.size = sizeof(cv);
@@ -256,7 +259,7 @@ static int db_get_dbvalue(void *vhandle, const char *word, /*@out@*/ dbv_t *val)
   db_data.flags = DB_DBT_USERMEM; /* saves the memcpy */
 
   ret = handle->dbp->get(handle->dbp, NULL, &db_key, &db_data, 0);
-  xfree(t);
+
   switch (ret) {
   case 0:
       /* we used to do this: but DB_DBT_USERMEM saves us the copy
@@ -272,11 +275,13 @@ static int db_get_dbvalue(void *vhandle, const char *word, /*@out@*/ dbv_t *val)
     break;
   case DB_NOTFOUND:
     if (DEBUG_DATABASE(2)) {
-      fprintf(dbgout, "[%lu] db_getvalue (%s): [%s] not found\n", (unsigned long) handle->pid, handle->name, word);
+      fprintf(dbgout, "[%lu] db_getvalue (%s): [", (unsigned long) handle->pid, handle->name);
+      word_puts(word, dbgout);
+      fputs("] not found\n", dbgout);
     }
     break;
   default:
-    print_error(__FILE__, __LINE__, "(db) db_getvalue( '%s' ), err: %d, %s", word, ret, db_strerror(ret));
+    print_error(__FILE__, __LINE__, "(db) db_getvalue( '%s' ), err: %d, %s", word->text, ret, db_strerror(ret));
     exit(2);
   }
   return ret;
@@ -287,7 +292,7 @@ static int db_get_dbvalue(void *vhandle, const char *word, /*@out@*/ dbv_t *val)
 Store VALUE in database, using WORD as database key
 Notes: Calls exit if an error occurs.
 */
-void db_setvalue(void *vhandle, const char * word, uint32_t count){
+void db_setvalue(void *vhandle, const word_t *word, uint32_t count){
   dbv_t val;
   val.count = count;
   val.date  = today;		/* date in form YYYYMMDD */
@@ -295,21 +300,20 @@ void db_setvalue(void *vhandle, const char * word, uint32_t count){
 }
 
 
-static void db_set_dbvalue(void *vhandle, const char * word, dbv_t *val){
+static void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val){
   int ret;
   DBT db_key;
   DBT db_data;
   uint32_t cv[2];
   dbh_t *handle = vhandle;
-  char *t;
 
   db_enforce_locking(handle, "db_set_dbvalue");
 
   DBT_init(db_key);
   DBT_init(db_data);
 
-  db_key.data = t = xstrdup(word);
-  db_key.size = strlen(word);
+  db_key.data = word->text;
+  db_key.size = word->leng;
 
   if (!handle->is_swapped){		/* convert from struct to array */
       cv[0] = val->count;
@@ -326,14 +330,18 @@ static void db_set_dbvalue(void *vhandle, const char * word, dbv_t *val){
       db_data.size = db_data.ulen = sizeof(cv);
 
   ret = handle->dbp->put(handle->dbp, NULL, &db_key, &db_data, 0);
-  xfree(t);
+
   if (ret == 0){
     if (DEBUG_DATABASE(2)) {
-      fprintf(dbgout, "db_set_dbvalue (%s): [%s] has value %lu\n", handle->name, word, (unsigned long)val->count);
+      fprintf(dbgout, "db_set_dbvalue (%s): [",
+	      handle->name);
+      word_puts(word, dbgout);
+      fprintf(dbgout, "] has value %lu\n",
+	      (unsigned long)val->count);
     }
   }
   else {
-    print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%s' ), err: %d, %s", word, ret, db_strerror(ret));
+    print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%s' ), err: %d, %s", word->text, ret, db_strerror(ret));
     exit(2);
   }
 }
@@ -342,7 +350,7 @@ static void db_set_dbvalue(void *vhandle, const char * word, dbv_t *val){
 /*
   Increment count associated with WORD, by VALUE.
  */
-void db_increment(void *vhandle, const char *word, uint32_t value){
+void db_increment(void *vhandle, const word_t *word, uint32_t value){
     uint32_t dv = db_getvalue(vhandle, word);
     value = UINT32_MAX - dv < value ? UINT32_MAX : dv + value;
     db_setvalue(vhandle, word, value);
@@ -352,7 +360,7 @@ void db_increment(void *vhandle, const char *word, uint32_t value){
   Decrement count associated with WORD by VALUE,
   if WORD exists in the database.
 */
-void db_decrement(void *vhandle, const char *word, uint32_t value){
+void db_decrement(void *vhandle, const word_t *word, uint32_t value){
     uint32_t dv = db_getvalue(vhandle, word);
     value = dv < value ? 0 : dv - value;
     db_setvalue(vhandle, word, value);
@@ -362,14 +370,16 @@ void db_decrement(void *vhandle, const char *word, uint32_t value){
   Get the number of messages associated with database.
 */
 uint32_t db_get_msgcount(void *vhandle){
-  return db_getvalue(vhandle, MSG_COUNT_TOK);
+    if (msg_count_tok == NULL)
+	msg_count_tok = word_new(MSG_COUNT_TOK, strlen(MSG_COUNT_TOK));
+    return db_getvalue(vhandle, msg_count_tok);
 }
 
 /*
  Set the number of messages associated with database.
 */
 void db_set_msgcount(void *vhandle, uint32_t count){
-  db_setvalue(vhandle, MSG_COUNT_TOK, count);
+    db_setvalue(vhandle, msg_count_tok, count);
 }
 
 

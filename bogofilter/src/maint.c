@@ -142,8 +142,8 @@ static int maintain_hook(char *key,  uint32_t keylen,
 			 char *data, uint32_t datalen, 
 			 void *userdata /*@unused@*/)
 {
-    static uint32_t x_size = 40;
-    static char *x;
+    static word_t *x = NULL;
+    static uint32_t x_size = MAXTOKENLEN+1;
     dbv_t val;
     memcpy(&val, data, datalen);
 
@@ -152,19 +152,22 @@ static int maintain_hook(char *key,  uint32_t keylen,
 	do_replace_nonascii_characters((byte *)key,keylen);
 
     if (!keep_count(val.count) || !keep_date(val.date) || !keep_size(keylen)) {
-	if (keylen + 1 > x_size) {
-	    free(x);
-	    x = NULL;
-	    x_size = keylen + 1;
+	if (x == NULL || keylen + 1 > x_size) {
+	    word_free(x);
+	    x_size = max(x_size, keylen + 1);
+	    x = word_new(NULL, x_size);
 	}
-	if (!x) x = xmalloc(x_size);
 
-	memcpy(x, key, keylen);
-	x[keylen] = '\0';
+	memcpy(x->text, key, keylen);
+	x->text[keylen] = '\0';
 
 	db_delete(userdata, x);
 
-	if (DEBUG_DATABASE(0)) fprintf(dbgout, "deleting %s\n", x);
+	if (DEBUG_DATABASE(0)) {
+	    fputs("deleting ", dbgout);
+	    fwrite(x->text, 1, x->leng, dbgout);
+	    fputc('\n', dbgout);
+	}
     }
     return 0;
 }

@@ -127,9 +127,9 @@ int main(int argc, char **argv)
     {
 	count += 1;
 	if ( passthrough )
-	    (void) printf("%s\n", yylval);
+	    fprintf(stdout, "%s\n", yylval->text);
 	else if (!quiet)
-	    (void) printf("get_token: %d '%s'\n", t, yylval);
+	    printf("get_token: %d '%s`\n", t, yylval->text);
     }
 
     if ( !passthrough )

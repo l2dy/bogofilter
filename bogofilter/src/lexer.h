@@ -10,10 +10,10 @@ NAME:
 #ifndef	LEXER_H
 #define	LEXER_H
 
+#include "buff.h"
+#include "word.h"
+
 extern FILE *yyin;
-extern int yyleng;
-extern char *yytext;
-extern char *yylval;
 
 extern	bool	block_on_subnets;
 
@@ -52,8 +52,8 @@ extern char   * text_html_text;
 
 /* in lexer.c */
 extern int yyinput(byte *buf, size_t size);
-extern int yyredo(const byte *text, char del);
+extern int yyredo(word_t *text, char del);
 
-extern int buff_fill(size_t need, byte *buf, size_t used, size_t size);
+extern int buff_fill(size_t need, buff_t *buff);
 
 #endif	/* LEXER_H */

@@ -11,6 +11,8 @@
 
 #define ROBINSON_GOOD_BIAS	1.0	/* don't give good words more weight */
 
+#define ROBX_W			 ".ROBX"
+
 typedef	double	rf_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
 typedef	void	rf_print_summary(void);
  

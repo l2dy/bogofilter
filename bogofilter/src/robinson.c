@@ -43,6 +43,8 @@ double	thresh_rtable = 0.0f;		/* used in fisher.c */
 double	robx = 0.0f;			/* used in fisher.c and rstats.c */
 double	robs = 0.0f;			/* used in fisher.c and rstats.c */
 
+#define ROBX_S ".ROBX"
+
 static rob_stats_t  rob_stats;
 
 const parm_desc rob_parm_table[] =	/* needed by fisher.c */
@@ -139,7 +141,7 @@ static double compute_scale(void)
 	return ((double)msgs_bad / (double)msgs_good);
 }
 
-static double compute_probability(const char *token)
+static double compute_probability(const word_t *token)
 {
     wordlist_t* list;
     int override=0;
@@ -162,8 +164,11 @@ static double compute_probability(const char *token)
 	    override=list->override;
 
 	    wordprob_add(&wordstats, count, list->bad);
-	    if (DEBUG_WORDLIST(1))
-		fprintf(dbgout, "%2d %2d %s\n", (int) wordstats.good, (int) wordstats.bad, token);
+	    if (DEBUG_WORDLIST(1)) {
+		fprintf(dbgout, "%2d %2d \n", (int) wordstats.good, (int) wordstats.bad);
+		fwrite(token->text, 1, token->leng, dbgout);
+		fputc('\n', dbgout);
+	    }
 	}
     }
 
@@ -186,6 +191,8 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     size_t robn = 0;
     size_t count = 0;
 
+    word_t  *word_robx = word_new(ROBX_W, strlen(ROBX_W));
+
     (void) fp; 	/* quench compiler warning */
 
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### rob_compute_spamicity() begins\n");
@@ -195,7 +202,7 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     if (fabs(robx) < EPS)
     {
 	/* Note: .ROBX is scaled by 1000000 in the wordlist */
-	long l_robx = db_getvalue(spam_list->dbh, ".ROBX");
+	long l_robx = db_getvalue(spam_list->dbh, word_robx);
 
 	/* If found, unscale; else use predefined value */
 	robx = l_robx ? (double)l_robx / 1000000 : ROBX;
@@ -211,7 +218,7 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 
     for(node = wordhash_first(wordhash); node != NULL; node = wordhash_next(wordhash))
     {
-	char *token = node->key;
+	word_t *token = node->key;
 	double prob = compute_probability( token );
 
 	count += 1;
@@ -236,8 +243,12 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
             robn ++;
         }
 
-	if (DEBUG_WORDLIST(3)) fprintf(dbgout, "%3lu %3lu %f %s\n",
-		(unsigned long)robn, (unsigned long)count, prob, token);
+	if (DEBUG_WORDLIST(3)) {
+	    fprintf(dbgout, "%3lu %3lu %f ",
+		(unsigned long)robn, (unsigned long)count, prob);
+	    word_puts(token, dbgout);
+	    fputc('\n', dbgout);
+	}
     }
 
     /* Robinson's P, Q and S
@@ -250,6 +261,8 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 	rstats_fini(robn, P, Q, spamicity );
 
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### rob_compute_spamicity() ends\n");
+
+    word_free(word_robx);
 
     return (spamicity);
 }

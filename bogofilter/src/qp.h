@@ -10,8 +10,8 @@ NAME:
 #ifndef	HAVE_QP_H
 #define	HAVE_QP_H
 
-#include "common.h"
+#include "word.h"
 
-size_t qp_decode(byte *buff, size_t size);
+size_t qp_decode(word_t *word);
 
 #endif	/* HAVE_QP_H */

@@ -15,7 +15,7 @@ AUTHOR:
 
 void rstats_init(void);
 
-void rstats_add(const char *token,
+void rstats_add(const word_t *token,
 		double good,
 		double bad,
 		double prob);

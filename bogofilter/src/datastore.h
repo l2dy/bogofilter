@@ -15,8 +15,10 @@
 #ifndef DATASTORE_H
 #define DATASTORE_H
 
-#include "wordlists.h"
 #include "system.h"
+
+#include "word.h"
+#include "wordlists.h"
 
 typedef struct {
     uint32_t count;
@@ -41,23 +43,23 @@ void db_flush(void *);
 /** Increments count for given word.  Note: negative results are set to
  * zero.
  */
-void db_increment(void *, const char *, uint32_t);
+void db_increment(void *, const word_t *, uint32_t);
 
 /** Decrement count for a given word, if it exists in the datastore.
  * Note: negative results are set to zero. 
  */
-void db_decrement(void *, const char *, uint32_t);
+void db_decrement(void *, const word_t *, uint32_t);
 
 /** Retrieve the value associated with a given word in a list. 
  * \return zero if the word does not exist in the database. 
  */
-uint32_t db_getvalue(void *, const char *);
+uint32_t db_getvalue(void *, const word_t *);
 
 /** Delete the key */
-void db_delete(void *, const char *);
+void db_delete(void *, const word_t *);
 
 /** Set the value associated with a given word in a list */
-void db_setvalue(void *, const char *, uint32_t);
+void db_setvalue(void *, const word_t *, uint32_t);
 
 /** Get the database message count */
 uint32_t db_get_msgcount(void*);

@@ -10,6 +10,8 @@ NAME:
 #ifndef	HAVE_UUDECODE_H
 #define	HAVE_UUDECODE_H
 
-int uudecode(byte *buff, size_t size);
+#include "word.h"
+
+int uudecode(word_t *word);
 
 #endif	/* HAVE_UUDECODE_H */

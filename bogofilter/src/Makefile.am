@@ -39,6 +39,7 @@ libbogofilter_a_SOURCES= \
 	base64.h base64.c \
 	bogoconfig.h config.c \
 	bool.h bool.c \
+	buff.h buff.c \
 	charset.h charset.c \
 	collect.h collect.c \
 	datastore.h datastore_db.c \
@@ -59,8 +60,11 @@ libbogofilter_a_SOURCES= \
 	textblock.h textblock.c \
 	token.h token.c \
 	uudecode.h uudecode.c \
+	word.h word.c \
 	wordhash.h wordhash.c wordlists.h wordlists.c \
-	xmalloc.h xcalloc.c xmalloc.c xmem_error.c xrealloc.c xstrdup.h xstrdup.c \
+	xmalloc.h xcalloc.c xmalloc.c xmem_error.c xrealloc.c \
+	xmemrchr.h xmemrchr.c \
+	xstrdup.h xstrdup.c \
 	xstrlcat.h xstrlcat.c \
 	xstrlcpy.h xstrlcpy.c \
 	dcdflib/src/dcdflib.c dcdflib/src/ipmpar.c

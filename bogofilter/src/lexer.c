@@ -7,8 +7,9 @@
  *   01/01/2003 - split out of lexer.l
 */
 
-#include <stdlib.h>
+#include <assert.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 #include <config.h>
 #include "common.h"
@@ -21,68 +22,76 @@
 #include "fgetsl.h"
 #include "textblock.h"
 #include "token.h"
+#include "word.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
 /* Local Variables */
 
-char *yylval;
-
 int yylineno;
 int msg_header = 1;
 
-static char *yysave = NULL;
+static buff_t *yysave = NULL;
 
 extern char *spam_header_name;
 
 #define YY_NULL 0
 
 /* Function Prototypes */
-static int yy_use_redo_text(byte *buf, size_t max_size);
-static int yy_get_new_line(byte *buf, size_t max_size);
-static int skip_spam_header(byte *buf, size_t max_size);
-extern int get_decoded_line(byte *buf, size_t size);
-
+static int yy_use_redo_text(buff_t *buff);
+static int yy_get_new_line(buff_t *buff);
+static int skip_spam_header(buff_t *buff);
+static int get_decoded_line(buff_t *buff);
 
 /* Function Definitions */
-static int lgetsl(byte *buf, size_t size)
+static void lexer_display_buffer(buff_t *buff)
 {
-    size_t count = xfgetsl((char *)buf, size, fpin, 1);
+    fprintf(dbgout, "*** %2d %c,%c %d ", yylineno,
+	    HORB(msg_header), HORB(msg_state->mime_header), buff->t.leng);
+    buff_puts(buff, dbgout);
+    if (buff->t.text[buff->t.leng-1] != '\n')
+	fputc('\n', dbgout);
+}
+
+static int lgetsl(buff_t *buff)
+{
+    int count = xfgetsl(buff, fpin, 1);
     yylineno += 1;
-    if (DEBUG_LEXER(0)) {
-	fprintf(dbgout, "*** %2d %c,%c %d ", yylineno,
-		HORB(msg_header), HORB(msg_state->mime_header), count);
-	fwrite(buf, 1, count, dbgout);
-	if (buf[count-1] != '\n')
-	    fputc('\n', dbgout);
+    if (count >= 0 && DEBUG_LEXER(0)) {
+	lexer_display_buffer(buff);
     }
 
     /* Special check for message separator.
        If found, handle it immediately.
     */
 
-    if (count >= 5 && memcmp(buf, "From ", 5) == 0) {
+    if (count >= 5 && memcmp(buff->t.text, "From ", 5) == 0) {
 	got_from();
     }
 
     return count;
 }
 
-static int yy_use_redo_text(byte *buf, size_t max_size)
+static int yy_use_redo_text(buff_t *buff)
 {
-    size_t count;
+    size_t used  = buff->t.leng;
+    size_t size  = buff->size;
+    size_t avail = size - used;
+    byte  *buf = buff->t.text+used;
+    size_t count = min(yysave->size, avail-2);
 
-    count = strlcpy((char *)buf, yysave, max_size-2);
+    memcpy(buf, yysave->t.text, count );
     buf[count++] = '\n';
     buf[count] = '\0';
-    xfree(yysave);
+    buff->t.leng += count;
+    buff_free(yysave);
     yysave = NULL;
     return count;
 }
 
-static int yy_get_new_line(byte *buf, size_t max_size)
+static int yy_get_new_line(buff_t *buff)
 {
-    int count = lgetsl(buf, max_size);
+    int count = lgetsl(buff);
 
     static size_t hdrlen = 0;
     if (hdrlen==0)
@@ -91,9 +100,9 @@ static int yy_get_new_line(byte *buf, size_t max_size)
     /* skip spam_header ("X-Bogosity:") lines */
     while (msg_header
 	   && count != -1
-	   && memcmp(buf,spam_header_name,hdrlen) == 0)
+	   && memcmp(buff->t.text,spam_header_name,hdrlen) == 0)
     {
-	count = skip_spam_header(buf, max_size);
+	count = skip_spam_header(buff);
     }
 
     /* Also, save the text on a linked list of lines.
@@ -102,32 +111,38 @@ static int yy_get_new_line(byte *buf, size_t max_size)
      * than one of these. */
 
     if (passthrough && count > 0)
-	textblock_add(textblocks, (const char *)buf, count);
+	textblock_add(textblocks, (const char *)buff->t.text+buff->read, count);
 
     return count;
 }
 
-static int skip_spam_header(byte *buf, size_t max_size)
+static int skip_spam_header(buff_t *buff)
 {
-    int count;
+    while (true) {
+	int count;
+	buff->t.leng = 0;		/* discard X-Bogosity line */
+	count = lgetsl(buff);
+	if (count <= 0 || !isspace(buff->t.text[0])) 
+	    return count;
+    }
 
-    do {
-	count = lgetsl(buf, max_size);
-	if (count != -1 && *buf == '\n')
-	    break;
-    } while (count != -1 && isspace(*buf));
-
-    return count;
+    return -1;
 }
 
-int get_decoded_line(byte *buf, size_t max_size)
+static int get_decoded_line(buff_t *buff)
 {
     int count;
+    size_t used = buff->t.leng;
+    byte *buf;
+
+    buff_shrink(buff, used);
+
+    buf = buff->t.text;
 
     if (yysave == NULL)
-	count = yy_get_new_line(buf, max_size);
+	count = yy_get_new_line(buff);
     else
-	count = yy_use_redo_text(buf, max_size);
+	count = yy_use_redo_text(buff);
 
 /* unfolding:
 ** 	causes "^\tid" to be treated as continuation of previous line
@@ -166,18 +181,22 @@ int get_decoded_line(byte *buf, size_t max_size)
 
     if (0) { /* debug */
 	fprintf(stderr, "%d: ", count);
-	fwrite(buf, 1, count, stderr);
+	buff_puts(buff, stderr);
 	fprintf(stderr, "\n");
     }
 
-    if (count > 0
+    if (count >= 5
 	&& memcmp("From ", buf, 5) != 0
 	&& !msg_header && !msg_state->mime_header
 	&& msg_state->mime_type != MIME_TYPE_UNKNOWN) {
-	int decoded_count = mime_decode(buf, count);
+	int decoded_count = mime_decode(&buff->t);
 	/*change buffer size only if the decoding worked */
-	if (decoded_count != 0)
-	    count = decoded_count;
+	if (decoded_count != 0 && decoded_count < count) {
+	    buff->t.leng = count = decoded_count;
+	    memcpy(buf, buff->t.text, count);
+	    if (DEBUG_LEXER(1)) 
+		lexer_display_buffer(buff);
+	}
     }
 
     /* \r\n -> \n */
@@ -186,16 +205,24 @@ int get_decoded_line(byte *buf, size_t max_size)
 	*(buf + count - 1) = '\n';
     }
 
+    buff_expand(buff, used);
+
+    if (buff->t.leng < buff->size)	/* debug code - remove */
+	Z(buff->t.text[buff->t.leng]);	/* debug code - remove */
+
     return count;
 }
 
-int buff_fill(size_t need, byte *buf, size_t used, size_t size)
+int buff_fill(size_t need, buff_t *buff)
 {
     int cnt = 0;
+    size_t used = buff->t.leng;
+    size_t size = buff->size;
+
     /* check bytes needed vs. bytes in buff */
     while (size-used > 2 && need > used) {
 	/* too few, read more */
-	int add = get_decoded_line(buf+used, size-used);
+	int add = get_decoded_line(buff);
 	if (add == EOF) return EOF;
 	if (add == 0) break ;
 	cnt += add;
@@ -208,8 +235,8 @@ int yyinput(byte *buf, size_t max_size)
 /* input getter for the scanner */
 {
     int i, count;
-
-    count = get_decoded_line(buf, max_size);
+    buff_t *buff = buff_new(buf, 0, max_size);
+    count = get_decoded_line(buff);
 
     /* do nothing if in header */
 
@@ -218,11 +245,11 @@ int yyinput(byte *buf, size_t max_size)
 	&& msg_state->mime_type == MIME_TEXT_HTML)
     {
 	if (kill_html_comments || score_html_comments )
-	    count = process_html_comments(buf, count, max_size);
+	    count = process_html_comments(buff);
     }
 
     for (i = 0; i < count; i++ )
-    {	
+    {
 	byte ch = buf[i];
 	buf[i] = charset_table[ch];
     }
@@ -230,27 +257,36 @@ int yyinput(byte *buf, size_t max_size)
     return (count == -1 ? 0 : count);
 }
 
-int yyredo(const byte *text, char del)
+int yyredo(word_t *text, char del)
 {
-    char *tmp;
+    const byte *t = text->text;
+    size_t leng = text->leng;
+    buff_t *tmp;
+    byte *d;
+    size_t tlen = strlen((const char *)t);
+    assert(tlen == leng);
 
-    if (DEBUG_LEXER(1)) fprintf(dbgout, "yyredo:  \"%s\"\n", text);
+    if (DEBUG_LEXER(2)) fprintf(dbgout, "yyredo:  %d \"%s\"\n", leng, text->text);
 
     /* if already processing saved text, concatenate new after old */
     if (yysave == NULL) {
-	tmp = xstrdup((const char *)text);
+	tmp = buff_new(xmalloc(tlen+D), tlen, tlen+D);
+	memcpy(tmp->t.text, t, tlen);
+	Z(tmp->t.text[tmp->t.leng]);	/* debug code - remove */
     } else {
-	size_t t = strlen((const char *)text);
-	size_t s = strlen(yysave);
-	tmp = xmalloc(s + t + 1);
-	memcpy(tmp, yysave, s+1);
-	memcpy(tmp+s, text, t+1);
+	size_t yu = yysave->t.leng;
+	size_t nlen = yu + tlen;
+	tmp = buff_new(xmalloc(nlen+D), nlen, nlen+D);
+	memcpy(tmp->t.text, yysave->t.text, yu);
+	memcpy(tmp->t.text+yu, t, tlen);
+	Z(tmp->t.text[tmp->t.leng]);	/* debug code - remove */
+	xfree(yysave->t.text);
+	buff_free(yysave);
     }
 
-    xfree(yysave);
     yysave = tmp;
-    if ((tmp = strchr(tmp,del)) != NULL)
-	    *tmp++ = ' ';
+    if ((d = memchr(yysave->t.text, del, yysave->size)) != NULL)
+	*d = ' ';
 
     return 1;
 }

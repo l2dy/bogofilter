@@ -36,7 +36,7 @@ extern	double	robs;		/* from robinson.c */
 typedef struct rstats_s rstats_t;
 struct rstats_s {
     rstats_t *next;
-    char *token;
+    word_t *token;
     double good;
     double bad;
     double prob;
@@ -72,14 +72,14 @@ void rstats_init(void)
     current = header.list;
 }
 
-void rstats_add( const char *token,
+void rstats_add( const word_t *token,
 		 double good,
 		 double bad,
 		 double prob)
 {
     header.count += 1;
     current->next  = NULL;
-    current->token = xstrdup(token);
+    current->token = word_dup(token);
     current->good  = good;
     current->bad   = bad;
     current->prob  = prob;
@@ -95,7 +95,7 @@ static int compare_rstats_t(const void *const ir1, const void *const ir2)
     if (r1->prob - r2->prob > EPS) return 1;
     if (r2->prob - r1->prob > EPS) return -1;
 
-    return strcmp(r1->token, r2->token);
+    return word_cmp(r1->token, r2->token);
 }
 
 #define	INTERVALS	10
@@ -119,6 +119,7 @@ void rstats_print(void)
     for (r= 0, cur = header.list; r<count; r+=1, cur=cur->next)
 	rstats_array[r] = cur;
 
+    /* sort by ascending probability, then name */
     qsort(rstats_array, count, sizeof(rstats_t *), compare_rstats_t);
 
     if (Rtable || verbose>=3)
@@ -217,8 +218,8 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count)
     for (r= 0; r<count; r+=1)
     {
 	rstats_t *cur = rstats_array[r];
-	const char *token = cur->token;
-	int len = max(0, MAXTOKENLEN-(int)strlen(token));
+	const word_t *token = cur->token;
+	int len = max(0, MAXTOKENLEN-(int)token->leng);
 	double g = min(cur->good, msgs_good);
 	double b = min(cur->bad, msgs_bad);
 	double n = g + b;
@@ -229,8 +230,10 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 	double fw = (robs * robx + n * pw) / (robs + n);
 	char flag = (fabs(fw-EVEN_ODDS) - min_dev >= EPS) ? '+' : '-';
 
-	(void)fprintf(stdout, "\"%s\"%*s %5d  %8.6f  %8.6f  %8.6f%10.5f%10.5f %c\n",
-		      token, len, " ",
+	(void)fputc( '"', stdout);
+	(void)fwrite(token->text, 1, token->leng, stdout);
+	(void)fprintf(stdout, "\"%*s %5d  %8.6f  %8.6f  %8.6f%10.5f%10.5f %c\n",
+		      len, " ",
 		      (int)n, g / msgs_good, b / msgs_bad, 
 		      fw, log(1.0 - fw), log(fw), flag);
     }

@@ -21,6 +21,7 @@
 #define YY_DECL token_t yylex(void)
 #define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, max_size)
 
+static word_t yy_text;
 %}
 
 %option align nounput noyywrap noreject 8bit caseless
@@ -39,7 +40,8 @@ TOKEN		[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\
 \>						{ html_tag(0); }
 
 ^From\ 						{ return (msg_header ? FROM : TOKEN); }
-^--{MIME_BOUNDARY}(--)?$			{ return (got_mime_boundary((byte *)yytext, yyleng) ? BOUNDARY : TOKEN); }
+^--{MIME_BOUNDARY}(--)?$			{ yy_text.text=yytext; yy_text.leng=yyleng;
+						  return (got_mime_boundary(&yy_text) ? BOUNDARY : TOKEN); }
 
 {IPADDR}					{ return(IPADDR);}
 {TOKEN}						{ return(TOKEN); }

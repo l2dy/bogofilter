@@ -3,12 +3,14 @@
 #ifndef WORDHASH_H
 #define WORDHASH_H
 
+#include "word.h"
+
 /* Hash entry. */
 typedef struct hashnode_t {
-  char *key;                              /* word key */
-  void *buf;                              /* Associated buffer. To be used by caller. */
-  struct hashnode_t *next;               /* Next item in linked list of items with same hash */ 
-  /*@dependent@*/ struct hashnode_t *iter_next;          /* Next item added to hash. For fast traversal */
+  word_t *key;					/* word key */
+  void   *buf;					/* Associated buffer. To be used by caller. */
+  struct hashnode_t *next;			/* Next item in linked list of items with same hash */ 
+  /*@dependent@*/ struct hashnode_t *iter_next;	/* Next item added to hash. For fast traversal */
 } hashnode_t;
 
 typedef struct wh_alloc_node {
@@ -51,7 +53,7 @@ void wordhash_sort(wordhash_t * h);
 /* Given h, s, n, search for key s.
  * If found, return pointer to associated buffer.
  * Else, insert key and return pointer to allocated buffer of size n. */
-/*@observer@*/ void *wordhash_insert(wordhash_t *, char *, size_t, void (*)(void *));
+/*@observer@*/ void *wordhash_insert(wordhash_t *, word_t *, size_t, void (*)(void *));
 
 /* Starts an iteration over the hash entries */
 /*@null@*/ /*@exposed@*/ hashnode_t *wordhash_first(wordhash_t *);

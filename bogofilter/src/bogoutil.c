@@ -10,8 +10,6 @@ AUTHOR:
    
 ******************************************************************************/
 
-#define	WH
-
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,9 +20,7 @@ AUTHOR:
 #include <sys/stat.h>
 #include <time.h>
 
-#ifndef	WH
 #include <db.h>
-#endif
 
 #include <config.h>
 #include "common.h"
@@ -48,6 +44,8 @@ run_t run_type = RUN_NORMAL;
 const char *progname = PROGNAME;
 
 static int dump_count = 0;
+
+/* Function Definitions */
 
 static int db_dump_hook(char *key,  uint32_t keylen, 
 			char *data, uint32_t datalen,
@@ -117,8 +115,8 @@ static int robx_hook(char *key,  uint32_t keylen,
     uint32_t goodness;
     uint32_t spamness;
     double   prob;
-    static size_t x_size = 40;
-    static char *x;
+    static word_t *x;
+    static size_t x_size = MAXTOKENLEN + 1;
 
     /* ignore system meta-data */
     if (*key == '.')
@@ -128,15 +126,15 @@ static int robx_hook(char *key,  uint32_t keylen,
     if (datalen < sizeof(uint32_t))
 	return 0;
 
-    if (keylen + 1 > x_size) {
-	free(x);
-	x = NULL;
-	x_size = keylen + 1;
+    if (x == NULL || keylen + 1 > x_size) {
+	if (x) word_free(x);
+	x_size = max(x_size, keylen + 1);
+	x = word_new(NULL, x_size);
     }
-    if (!x) x = xmalloc(x_size);
 
-    memcpy(x, key, keylen);
-    x[keylen] = '\0';
+    x->leng = keylen;
+    memcpy(x->text, key, keylen);
+    x->text[keylen] = '\0';
 
     memcpy(&spamness, data, sizeof(uint32_t));
     goodness = db_getvalue(rd->dbh_good, x);
@@ -150,12 +148,14 @@ static int robx_hook(char *key,  uint32_t keylen,
 	(*rd->count) ++;
 
     /* print if token in both word lists */
-    if ((verbose > 1 && goodness && spamness) || verbose > 2)
+    if ((verbose > 1 && goodness && spamness) || verbose > 2) {
 	printf("cnt: %4lu,  sum: %11.6f,  ratio: %9.6f,  sp: %3lu,  gd: %3lu,"
-		"  p: %9.6f,  t: %s\n", (unsigned long)*rd->count, *rd->sum,
+		"  p: %9.6f,  t: ", (unsigned long)*rd->count, *rd->sum,
 		*rd->sum / *rd->count,
-		(unsigned long)spamness, (unsigned long)goodness, prob, x);
-
+		(unsigned long)spamness, (unsigned long)goodness, prob);
+	word_puts(x, stdout);
+	fputc( '\n', stdout);
+    }
     return 0;
 }
 
@@ -209,6 +209,7 @@ static int load_file(char *db_file)
     memset(buf, '\0', BUFSIZE);
 
     for (;;) {
+	word_t *token;
 	if (fgets((char *)buf, BUFSIZE, stdin) == NULL) {
 	    if (ferror(stdin)) {
 		perror(PROGNAME);
@@ -229,6 +230,7 @@ static int load_file(char *db_file)
 	while ( *p != '\0' && !isspace(*p) )
 	    ++p;
 
+	len = p - buf;
 	*p++ = '\0';	/* delimit token */
 
 	while ( *p != '\0' && isspace(*p) )	/* skip whitespace */
@@ -261,7 +263,7 @@ static int load_file(char *db_file)
 	    date = today_save;
 
 	if (replace_nonascii_characters)
-	    do_replace_nonascii_characters(buf, strlen((const char *)buf));
+	    do_replace_nonascii_characters(buf, len);
 
 	if (!keep_count(count) || !keep_date(date) || !keep_size(strlen((const char *)buf)))
 	    continue;
@@ -270,8 +272,10 @@ static int load_file(char *db_file)
 
 	/* Slower, but allows multiple lists to be concatenated */
 	set_date(date);
-	count += db_getvalue(dbh, (char *)buf);
-	db_setvalue(dbh, (char *)buf, count);
+	token = word_new(buf, len);
+	count += db_getvalue(dbh, token);
+	db_setvalue(dbh, token, count);
+	word_free(token);
     }
     db_close(dbh, false);
 
@@ -323,14 +327,22 @@ static int words_from_list(const char *db_file, int argc, char **argv)
     {
 	char buf[BUFSIZE];
 	while (get_token(buf, BUFSIZE, stdin) == 0) {
-	    printf("%s %lu\n", buf, (unsigned long)db_getvalue(dbh, buf));
+	    word_t *token = word_new(buf, strlen(buf));
+	    uint32_t count = db_getvalue(dbh, token);
+	    word_puts(token, stdout);
+	    printf(" %lu\n", (unsigned long) count);
+	    word_free(token);
 	}
     }
     else
     {
 	while (argc-- > 0) {
-	    char *token = *argv++;
-	    printf("%s %lu\n", token, (unsigned long)db_getvalue(dbh, token));
+	    char *word = *argv++;
+	    word_t *token = word_new(word, strlen(word));
+	    uint32_t count = db_getvalue(dbh, token);
+	    word_puts(token, stdout);
+	    printf(" %lu\n", (unsigned long) count);
+	    word_free(token);
 	}
     }
 
@@ -345,7 +357,7 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
     void *dbh_spam;
     char filepath[PATH_LEN];
     char buf[BUFSIZE];
-    char *token = buf;
+    char *word = buf;
     unsigned long spam_count, spam_msg_count = 0 ;
     unsigned long good_count, good_msg_count = 0 ;
 
@@ -367,25 +379,29 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 
     if (show_probability)
     {
-	spam_msg_count = db_getvalue(dbh_spam, ".MSG_COUNT"); 
-	good_msg_count = db_getvalue(dbh_good, ".MSG_COUNT");
+	spam_msg_count = db_get_msgcount(dbh_spam);
+	good_msg_count = db_get_msgcount(dbh_good);
     }
 
     printf(head_format, "", "spam", "good", "Gra prob", "Rob prob");
 
     while (argc >= 0)
     {
+	word_t *token;
 	double gra_prob = 0.0f, rob_prob = 0.0f;
 	
 	if ( argc == 0)
 	{
 	    if (get_token(buf, BUFSIZE, stdin) != 0)
 		break;
+	    token = word_new(buf, strlen(buf));
 	} else {
-	    token = *argv++;
+	    word = *argv++;
 	    if (--argc == 0)
 		argc = -1;
+	    token = word_new(word, strlen(word));
 	}
+
 	spam_count = db_getvalue(dbh_spam, token);
 	good_count = db_getvalue(dbh_good, token);
 
@@ -399,7 +415,8 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 		: spamness / (spamness+goodness);
 	    rob_prob = ((ROBS * ROBX + spamness) / (ROBS + spamness+goodness));
 	}
-	printf(data_format, token, spam_count, good_count, gra_prob, rob_prob);
+	printf(data_format, token->text, spam_count, good_count, gra_prob, rob_prob);
+	word_free(token);
     }
 
     db_close(dbh_good, false);
@@ -448,8 +465,8 @@ static double compute_robx(void *dbh_spam, void *dbh_good)
     uint32_t msg_good, msg_spam;
     struct robhook_data rh;
 
-    msg_good = db_getvalue( dbh_good, ".MSG_COUNT" );
-    msg_spam = db_getvalue( dbh_spam, ".MSG_COUNT" );
+    msg_good = db_get_msgcount( dbh_good );
+    msg_spam = db_get_msgcount( dbh_spam );
     rh.scalefactor = (double)msg_spam/msg_good;
     rh.dbh_good = dbh_good;
     rh.sum = &sum;
@@ -470,12 +487,13 @@ static int compute_robinson_x(char *path)
 {
     wordlist_t wl[2];
 
+    double robx;
+    word_t *word_robx = word_new(ROBX_W, strlen(ROBX_W));
+
     void *dbh_spam;
 
     char db_spam_file[PATH_LEN];
     char db_good_file[PATH_LEN];
-
-    double robx;
 
     if (build_path(db_spam_file, sizeof(db_spam_file), path, SPAMFILE) < 0 ||
 	build_path(db_good_file, sizeof(db_good_file), path, GOODFILE) < 0 )
@@ -503,8 +521,10 @@ static int compute_robinson_x(char *path)
     free(wl[1].filename);
 
     dbh_spam = db_open(db_spam_file, "spam", DB_WRITE, directory);
-    db_setvalue(dbh_spam, ".ROBX", (uint32_t) (robx * 1000000));
+    db_setvalue(dbh_spam, word_robx, (uint32_t) (robx * 1000000));
     db_close(dbh_spam, false);
+
+    word_free(word_robx);
 
     return 0;
 }

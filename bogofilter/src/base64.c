@@ -31,11 +31,13 @@ static void base64_init(void)
     return;
 }
 
-size_t base64_decode(byte *buff, size_t size)
+size_t base64_decode(word_t *word)
 {
     static int table_set_up = 0;
     size_t count = 0;
-    byte *s = buff, *d = buff;
+    size_t size = word->leng;
+    byte *s = word->text;		/* src */
+    byte *d = word->text;		/* dst */
 
     if (!table_set_up) {
 	table_set_up ++;

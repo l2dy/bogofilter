@@ -11,8 +11,9 @@ NAME:
 #define FGETSL_H
 
 #include <stdio.h>
+#include "buff.h"
 
-extern int fgetsl(char *, int, FILE *);
-extern int xfgetsl(char *, int, FILE *i, int no_NUL_terminate);
+extern int fgetsl(buff_t *buff, FILE *fp);
+extern int xfgetsl(buff_t *buff, FILE *fp, int no_NUL_terminate);
 
 #endif

@@ -15,11 +15,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "wordhash.h"
-
 #include "common.h"
-#include "system.h"
+
 #include "collect.h"
+#include "wordhash.h"
 
 const char *progname = "bogowordfreq.c";
 const char *spam_header_name = "X-Bogosity:"; /* unused */
@@ -29,7 +28,10 @@ static void print_wordlist (wordhash_t *h)
     hashnode_t *n;
 
     for(n=wordhash_first(h);n;n = wordhash_next(h)) {
-	printf("%d %s\n", ((wordprop_t *)(n->buf))->freq, n->key);
+      word_t *key = n->key;
+      (void) printf ("%d ", ((wordprop_t *)(n->buf))->freq);
+      (void) fwrite(key->text, 1, key->leng, stdout);
+      (void) fputc('\n', stdout);
     }
 }
 

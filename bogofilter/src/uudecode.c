@@ -15,10 +15,14 @@ AUTHOR:
 
 #include "uudecode.h"
 
-int uudecode(byte *buff, size_t size)
+int uudecode(word_t *word)
 {
+    size_t size = word->leng;
     size_t count = 0;
-    byte *s = buff, *d = buff, *e = buff+size;
+    byte *b = word->text;		/* beg */
+    byte *s = b;			/* src */
+    byte *d = b;			/* dst */
+    byte *e = b+size;			/* end */
     int out = (*s++ & 0x7f) - 0x20;
 
     /* don't process lines without leading count character */
@@ -26,8 +30,8 @@ int uudecode(byte *buff, size_t size)
 	return size;
 
     /* don't process begin and end lines */
-    if ((strncasecmp((const char *)buff, "begin ", 6) == 0) ||
-	(strncasecmp((const char *)buff, "end", 3) == 0))
+    if ((strncasecmp((const char *)b, "begin ", 6) == 0) ||
+	(strncasecmp((const char *)b, "end",    3) == 0))
 	return size;
 
     while (s < e - 4)

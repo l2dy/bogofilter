@@ -10,6 +10,9 @@ NAME:
 #ifndef	HAVE_MIME_H
 #define	HAVE_MIME_H
 
+#include "buff.h"
+#include "word.h"
+
 #define MIME_STACK_MAX 100
 
 #define HORB(f) (f ? 'h' : 'b')		/* for textual debug messages */
@@ -41,18 +44,18 @@ void mime_init(mime_t *parent);
 void mime_push(mime_t *parent);
 void mime_pop(void);
 void mime_free(mime_t *);
-bool get_boundary_props(byte *boundary, int boundary_len, boundary_t *b);
+bool get_boundary_props(const word_t *boundary, boundary_t *b);
 */
 
 void mime_reset(void);
 void mime_add_child(mime_t *parent);
-void mime_boundary_set(const byte *text, int leng);
-bool got_mime_boundary(const byte *boundary, int len);
-void mime_disposition(const byte *text, int leng);
-void mime_encoding(const byte *text, int leng);
-void mime_type(const byte *text, int leng);
-void mime_version(const byte *text, int leng);
-size_t mime_decode(byte *buff, size_t size);
-bool mime_is_boundary(const byte *boundary, int len);
+void mime_boundary_set(word_t *text);
+bool got_mime_boundary(word_t *text);
+void mime_disposition(word_t *text);
+void mime_encoding(word_t *text);
+void mime_type(word_t *text);
+void mime_version(word_t *text);
+size_t mime_decode(word_t *buff);
+bool mime_is_boundary(word_t *boundary);
 
 #endif	/* HAVE_MIME_H */

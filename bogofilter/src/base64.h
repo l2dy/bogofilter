@@ -10,8 +10,8 @@ NAME:
 #ifndef	HAVE_BASE64_H
 #define	HAVE_BASE64_H
 
-#include "common.h"
+#include "word.h"
 
-size_t base64_decode(byte *buff, size_t size);
+size_t base64_decode(word_t *word);
 
 #endif	/* HAVE_BASE64_H */
