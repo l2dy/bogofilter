@@ -72,6 +72,19 @@ for README in randomtrain ; do
   ln -s ../contrib/README.$README doc/README.$README
 done
 
+%post static
+
+for file in bogofilter_static bogolexer_static bogoutil_static ; do
+  base=`basename $file _static`
+  ln -s %{_bindir}/$file %{_bindir}/$base
+done
+
+%postun static
+
+for file in bogofilter bogolexer bogoutil ; do
+  rm -f %{_bindir}/$file
+done
+
 %files
 %defattr(-,root,root)
 %{_mandir}/man1/bogofilter.1*
