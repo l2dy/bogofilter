@@ -464,15 +464,12 @@
     unsures, discarding the messages that bogofilter already
     classifies correctly.</p>
 
-    <p>Note that you should periodically run:</p>
+    <p>To compact the database so it occupies the minimum of disk
+    space, you should periodically run:</p>
 
     <pre>	bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
 	mv wordlist.db wordlist.db.prv
 	mv wordlist.db.new wordlist.db</pre>
-
-    <p>or, for spamlist.db and goodlist.db (if using bogofilter with
-    separate spam and ham wordlists).  This will compact the database
-    so it occupies the minimum of disk space.</p>
 
     <hr>
 
