@@ -26,7 +26,7 @@ AUTHOR:
 
 int	html_comment_count = 0;
 
-bool	kill_html_comments  = true;	/* config file option:  "kill_html_comments"  */
+bool	kill_html_comments  = false;	/* config file option:  "kill_html_comments"  */
 int	count_html_comments = 5;	/* config file option:  "count_html_comments" */
 bool	score_html_comments = false;	/* config file option:  "score_html_comments" */
 
@@ -39,58 +39,51 @@ int process_html_comments(byte *buf, size_t used, size_t size)
     byte *buf_end  = buf + size;
 
     for (tmp = buf; (tmp = index(tmp, '<')) != NULL; tmp += 1) {
-	byte *comment_start = tmp;
-	/* ensure buffer has sufficient characters for test */
-	if (COMMENT_START_LEN > (size_t) (buf_used - tmp)) {
-	    int new = buff_fill(COMMENT_START_LEN, tmp, buf_used - tmp, buf_end - tmp);
-	    if (new == EOF)
-		break;
-	    buf_used += new;
-	}
-	/* check for comment delimiter */
-	if (memcmp(tmp, COMMENT_START, COMMENT_START_LEN) == 0 ) {
-	    if (score_html_comments) {
-		html_comment_count = min(count_html_comments, html_comment_count + 1 );
-	    }
-	    if (kill_html_comments) {
-		int count = kill_html_comment(comment_start, buf_used, buf_end);
-		buf_used = comment_start + count;
-	    }
-	}
+	int count = kill_html_comment(tmp, buf_used, buf_end);
+	buf_used = tmp + count;
     }
     return buf_used - buf;
 }
 
-int kill_html_comment(byte *comment_start, byte *buf_used, byte *buf_end)
+int kill_html_comment(byte *buf_start, byte *buf_used, byte *buf_end)
 {
-    byte c;
-    int level = 1;
-    byte *tmp = comment_start;
-    for (c = *tmp; c != '\0'; c = *++tmp) {
+    int level = 0;
+    byte *tmp = buf_start;
+
+    while (1) {
+	byte c = *tmp;
+	size_t need = (c == '<') ? COMMENT_START_LEN : 1;
+	if (need > (size_t) (buf_used - tmp)) {
+	    int new = buff_fill(need, tmp, buf_used - tmp, buf_end - tmp);
+	    if (new == EOF)
+		break;
+	    buf_used += new;
+	    continue;
+	}
 	if (c == '<') {
 	    /* ensure buffer has sufficient characters for test */
-	    if (COMMENT_START_LEN > (size_t) (buf_used - tmp)) {
-		int new = buff_fill(COMMENT_START_LEN, tmp, buf_used - tmp, buf_end - tmp);
-		if (new == EOF)
-		    break;
-		buf_used += new;
-	    }
 	    /* check for comment delimiter */
 	    if (memcmp(tmp, COMMENT_START, COMMENT_START_LEN) == 0) {
+		if (level == 0 && score_html_comments)
+		    html_comment_count = min(count_html_comments, html_comment_count + 1);
 		level += 1;
-		continue;
+		tmp += COMMENT_START_LEN-1;
 	    }
 	} 
 	if (c == '>' && memcmp(tmp+1-COMMENT_END_LEN, COMMENT_END, COMMENT_END_LEN) == 0) {
 	    /* eat comment */
 	    size_t cnt = buf_used - tmp;
-	    memcpy(comment_start, tmp+1, cnt + 1);
-	    buf_used -= tmp + 1 - comment_start;
-	    tmp = comment_start;
+	    if (kill_html_comments) {
+		memcpy(buf_start, tmp+1, cnt + 1);
+		buf_used -= tmp + 1 - buf_start;
+	    }
+	    tmp = buf_start;
 	    level -= 1;
-	    if (level == 0)
-		break;
 	}
+	if (level == 0)
+	    break;
+	tmp += 1;
     }
-    return buf_used - comment_start;
+
+    return buf_used - buf_start;
 }
