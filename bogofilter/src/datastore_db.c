@@ -523,7 +523,9 @@ int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 	return -1;
     }
 
-    while ((ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) == 0)
+    for (ret =  dbcp->c_get(dbcp, &key, &data, DB_FIRST); 
+	 ret == 0;
+	 ret =  dbcp->c_get(dbcp, &key, &data, DB_NEXT))
     {
 	int rc;
 
