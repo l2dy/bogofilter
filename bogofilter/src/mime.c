@@ -55,6 +55,7 @@ mime_type_table[] =
   { MIME_TEXT_PLAIN, 	"text/plain", 	10, } ,
   { MIME_TEXT, 		"text", 	 4, } ,		/* NON-COMPLIANT; should be "text/" */
   { MIME_APPLICATION, 	"application/", 12, } ,
+  { MIME_IMAGE, 	"image/",	 6, } ,
   { MIME_MESSAGE, 	"message/", 	 8, } ,
   { MIME_MULTIPART, 	"multipart/", 	10, } ,
 };
@@ -543,6 +544,9 @@ mime_type (word_t *text)
     /* XXX: read boundary */
     return;
   case MIME_APPLICATION:
+    /* XXX: read boundary */
+    return;
+  case MIME_IMAGE:
     /* XXX: read boundary */
     return;
   }

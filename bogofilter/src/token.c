@@ -157,8 +157,10 @@ token_t get_token(void)
 		case MIME_TEXT_HTML:
 		case MIME_TEXT_PLAIN:
 		case MIME_MULTIPART:
-		case MIME_MESSAGE:
 		    break;
+		case MIME_MESSAGE:
+		case MIME_APPLICATION:
+		case MIME_IMAGE:
 		default:
 		    continue;
 		}
