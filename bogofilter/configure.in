@@ -5,6 +5,7 @@ AC_CONFIG_SRCDIR([bogofilter.c])
 AM_INIT_AUTOMAKE(bogofilter, 0.8.0.cvs)
 AM_CONFIG_HEADER(config.h:config.in)
 AC_PROG_CC
+AC_PROG_RANLIB
 AM_PROG_LEX
 
 AM_INIT_AUTOMAKE(bogofilter, 0.8.0.tst)
@@ -160,5 +161,6 @@ dnl AC_FUNC_STAT
 AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl strchr strrchr memcpy)
 
 AC_CONFIG_FILES([Makefile tests/Makefile tests/bogoutil/Makefile bogofilter.spec
-	   contrib/Makefile doc/Makefile])
+		 contrib/Makefile doc/Makefile dcdflib.c/Makefile
+		 dcdflib.c/doc/Makefile dcdflib.c/src/Makefile])
 AC_OUTPUT

@@ -3,19 +3,21 @@
 # foreign: don't insist on ChangeLog
 # 1.5: minimum version
 AUTOMAKE_OPTIONS = foreign 1.5
-SUBDIRS = . tests doc contrib
+SUBDIRS =  dcdflib.c . tests doc contrib
 SYSCONFDIR = @sysconfdir@
 
 #if ENABLE_GRAHAM_METHOD
-GRAHAM_FILES = graham.c graham.h 
+GRAHAM_FILES = graham.c graham.h
 #endif
 
 #if ENABLE_ROBINSON_METHOD
-ROBINSON_FILES = robinson.c robinson.h 
+ROBINSON_FILES = robinson.c robinson.h
 #endif
 
 #if ENABLE_ROBINSON_FISHER
-FISHER_FILES = fisher.c fisher.h 
+FISHER_FILES = fisher.c fisher.h
+AM_CPPFLAGS = -I$(srcdir)/dcdflib.c/doc
+LDADD = dcdflib.c/src/libdcdf.a
 #endif
 
 # what to build
