@@ -989,8 +989,6 @@ u_int32_t db_pagesize(bfdir *directory, bffile *db_file)
 	return 0xffffffff;
     }
 
-    dsm_init(directory, db_file);
-
     dbe = dsm->dsm_recover_open(directory, db_file);
 
     e = db_create(&db, dbe, 0);
