@@ -1,6 +1,10 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.17  2002/10/02 17:14:54  relson
+ * main.c now calls setup_lists() for initializing the wordlist structures, including the opening of the wordlist.db files.
+ * setup_list() takes a directory name as its argument and passes it to init_list(), which calls open_wordlist() for the actual open.
+ *
  * Revision 1.16  2002/10/02 16:27:40  relson
  * Initial inclusion of multiple wordlist code into bogofilter.
  *
@@ -97,8 +101,6 @@ AUTHOR:
 #include <limits.h>
 #include <stdlib.h>
 #include <signal.h>
-#include <errno.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <config.h>
 #ifdef HAVE_SYSLOG_H
@@ -108,32 +110,22 @@ AUTHOR:
 #include "datastore.h"
 
 #define BOGODIR		"/.bogofilter/"
-#define GOODFILE	"goodlist.db"
-#define SPAMFILE	"spamlist.db"
 
 int verbose, passthrough;
 
 int main(int argc, char **argv)
 {
-    int	ch;
+    int	  ch;
     reg_t register_type = REG_NONE; 
-    char	goodfile[PATH_MAX], spamfile[PATH_MAX], directory[PATH_MAX];
-    char	*tmp;
-    struct stat sb;
-    int exitcode = 0;
-
-    if ( (tmp = getenv("HOME")) != NULL ) {
-    	strcpy(directory, tmp );
-    }
-    strcat(directory, BOGODIR);
+    char  *directory = NULL;
+    int   exitcode = 0;
 
     while ((ch = getopt(argc, argv, "d:hsnSNvVp")) != EOF)
 	switch(ch)
 	{
 	case 'd':
-	    strcpy(directory, optarg);
-	    if (directory[strlen(directory)-1] != '/')
-		strcat(directory, "/" );
+	    directory = optarg;
+	    setup_lists(directory);
 	    break;
 
 	case 's':
@@ -191,36 +183,20 @@ int main(int argc, char **argv)
 	    break;
 	}
 
-
-    ch = stat(directory, &sb);
-    if (!((ch == 0 && S_ISDIR(sb.st_mode))
-	  || (errno==ENOENT && mkdir(directory, S_IRUSR|S_IWUSR|S_IXUSR)==0)))
+    if ( directory == NULL )
     {
-	fprintf(stderr,"bogofilter: something is wrong with %s.\n", directory);
-	exit(2);
+	char *tmp = getenv("HOME");
+	if ( tmp == NULL )
+	    setup_lists(BOGODIR);
+	else
+	{
+	    directory = malloc( strlen(tmp) + strlen(BOGODIR) + 1 );
+	    strcpy(directory, tmp );
+	    strcat(directory, BOGODIR);
+	    setup_lists(directory);
+	}
     }
 
-    setup_lists();
-
-    strcpy(goodfile, directory);
-    strcat(goodfile, GOODFILE);
-    good_list.file = goodfile;
-
-    strcpy(spamfile, directory);
-    strcat(spamfile, SPAMFILE);
-    spam_list.file = spamfile;
-
-    if ( (good_list.dbh = db_open(good_list.file, good_list.name)) == NULL){
-      fprintf(stderr, "bogofilter: Cannot initialize database %s.\n", good_list.name);
-      exit(2);
-    }
-    
-    if ( (spam_list.dbh = db_open(spam_list.file, spam_list.name)) == NULL){
-      fprintf(stderr, "bogofilter: Cannot initialize database %s.\n", spam_list.name);
-      db_close(good_list.dbh);
-      exit(2);
-    }
-    
     if (register_type == REG_NONE)
     {
 	double spamicity;
@@ -266,8 +242,7 @@ int main(int argc, char **argv)
 	register_words(STDIN_FILENO, register_type);
     }
 
-    db_close(spam_list.dbh);
-    db_close(good_list.dbh);
+    close_lists();
 
     exit(exitcode);
 }

@@ -1,5 +1,10 @@
 /* $Id$ */
 /* 
+ * $Log$
+ * Revision 1.2  2002/10/02 17:14:54  relson
+ * main.c now calls setup_lists() for initializing the wordlist structures, including the opening of the wordlist.db files.
+ * setup_list() takes a directory name as its argument and passes it to init_list(), which calls open_wordlist() for the actual open.
+ *
  * */
 
 /*  constants and declarations for wordlists */
