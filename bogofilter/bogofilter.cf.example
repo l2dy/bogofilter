@@ -80,6 +80,20 @@
 ##db_cachesize=16
 
 
+##### WORDLIST_MODE
+#
+#	combined - store spam and ham tokens in a single, combined
+#		wordlist named wordlist.db.  Each entry contains 
+#		spam _and_ ham counts and (optionally) a timestamp.
+#	separate - store spam and ham tokens in two separate
+#		wordlists named spamlist.db and goodlist.db.  
+#		Each entry contains a count and (optionally) a timestamp.
+#
+
+#wordlist_mode=combined
+##wordlist_mode=separate
+
+
 #### Format of SPAM_HEADER
 #
 #	formatting characters:

@@ -165,6 +165,7 @@ const parm_desc sys_parms[] =
     { "tokenize_html_script",	     CP_BOOLEAN, { (void *) &tokenize_html_script } },	/* Not yet in use */
 
     { "db_cachesize",	  	     CP_INTEGER, { (void *) &db_cachesize } },
+    { "wordlist_mode",	  	     CP_WORDLIST,{ (void *) &wl_mode } },
     { "terse",	 	  	     CP_BOOLEAN, { (void *) &terse } },
 
     { NULL,		  	     CP_NONE,	 { (void *) NULL } },

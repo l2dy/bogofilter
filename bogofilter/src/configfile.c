@@ -138,6 +138,20 @@ static bool process_config_parameter(const parm_desc *arg, char *val, priority_t
 		fprintf(dbgout, "%s -> '%s'\n", arg->name, val);
 	    break;
 	}
+	case CP_WORDLIST:
+	{
+	    char c = *val;
+	    switch (c) {
+	    case 'c': wl_mode = WL_M_COMBINED; break;
+	    case 's': wl_mode = WL_M_SEPARATE; break;
+	    default:
+		fprintf(stderr, "Unknown wordlist type - '%s'.\n", val);
+		exit(2);
+	    }
+	    if (DEBUG_CONFIG(2))
+		fprintf(dbgout, "%s -> '%s'\n", arg->name, val);
+	    break;
+	}
 	default:
 	{
 	    ok = false;
