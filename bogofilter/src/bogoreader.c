@@ -25,6 +25,7 @@ AUTHORS: (C) Copyright 2003 by
 #include "lexer.h"
 #include "bogoreader.h"
 #include "system.h"
+#include "token.h"
 #include "xmalloc.h"
 
 static void (*fini)(void);
@@ -39,15 +40,12 @@ static FILE *yy_file;
 typedef enum ms_e {MS_FILE, MS_MAILDIR, MS_MH } ms_t;
 
 static ms_t mailstore_type;
-static bool mail_first = true;  /* for the _next_mail functions */
-static bool mailstore_first = true; /* for the _next_mailstore functions */
-static bool emptyline = false; /* for mailbox /^From / match */
+static bool mail_first = true;		/* for the _next_mail functions */
+static bool mailstore_first = true;	/* for the _next_mailstore functions */
+static bool firstline = true;		/* for mailbox /^From / match */
+static bool emptyline = false;		/* for mailbox /^From / match */
 
-#ifdef	DUP_REF_RSLTS
-static word_t *line_save = NULL;
-#else
 static bool    have_message = false;
-#endif
 
 /* Lexer-Reader Interface */
 
@@ -169,19 +167,20 @@ static bool reader__next_mail(void)
 }
 
 /* open mailstore (Maildir, mbox file or file with a single mail) and set
- * _getline and _next_mail pointers dependent on what the obj is.
+ * _getline and _next_mail pointers dependent on the mailstore's type.
  *
  * - automatically detects maildir
  * - does not automatically distinguish between mbox and mail
  *   and takes mbox_mode instead
  */
-static bool open_mailstore(char *obj)
+static bool open_mailstore(char *name)
 {
-    filename = obj;
+    filename = name;
     if (fpin) {
 	fclose(fpin);
 	fpin = NULL;
     }
+    firstline = true;
     switch (isdir(filename)) {
     case IS_FILE:
 	if (DEBUG_READER(0))
@@ -192,7 +191,6 @@ static bool open_mailstore(char *obj)
 		    strerror(errno));
 	    return false;
 	} else {
-	    emptyline = false;
 	    mail_first = true;
 	    reader_getline   = mbox_mode ? mailbox_getline   : simple_getline;
 	    mailstore_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
@@ -277,11 +275,7 @@ static bool mail_next_mail(void)
  * subsequent runs return true when a From line was encountered */
 static bool mailbox_next_mail(void)
 {
-#ifndef	DUP_REF_RSLTS
     bool val = have_message;
-#else
-    bool val = line_save != NULL;
-#endif
     val = val || mail_first;
     mail_first = false;
     return val;
@@ -369,42 +363,32 @@ static int mailbox_getline(buff_t *buff)
     byte *buf = buff->t.text + used;
     int count;
 
-#ifndef	DUP_REF_RSLTS
     count = buff_fgetsl(buff, fpin);
     have_message = false;
-#else
-    if (!line_save) {
-	count = buff_fgetsl(buff, fpin);
-    }
-    else {
-	count = buff_add(buff, line_save);
-	word_free(line_save);
-	line_save = NULL;
-	emptyline = false;
-    }
-#endif
 
     /* XXX FIXME: do we need to unescape the >From, >>From, >>>From, ... lines
      * by discarding the first ">"? */
 
     /* DR 08/25/03 - NO!!! */
 
-    if (emptyline
-	&& count >= 5
-	&& memcmp("From ", buf, 5) == 0)
+    if ((firstline || emptyline) &&
+	count >= 5 && memcmp("From ", buf, 5) == 0)
     {
-#ifndef	DUP_REF_RSLTS
-	have_message = true;
-#else
-	line_save = word_new(NULL, count);
-	memcpy(line_save->text, buf, count);
-#endif
-	count = EOF;
+	buff->t.leng = 0;			/* discard message separator */
+	if (firstline) {
+	    firstline = false;
+	    count = mailbox_getline(buff);
+	}
+	else {
+	    have_message = true;
+	    count = EOF;
+	}
     } else {
 	if (buff->t.leng < buff->size)		/* for easier debugging - removable */
 	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
     }
 
+    firstline = false;
     emptyline = (count == 1 && *buf == '\n');
 
     return count;

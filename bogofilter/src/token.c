@@ -37,10 +37,6 @@ static word_t *ipsave = NULL;
 
 bool block_on_subnets = false;
 
-#ifdef	DUP_REF_RSLTS
-static int    token_count;
-#endif
-
 static word_t *token_prefix = NULL;
 static word_t *nonblank_line = NULL;
 
@@ -84,14 +80,6 @@ token_t get_token(void)
 	    
 	if (class == NONE)
 	    break;
-
-	/* Skip leading FROM *** HACK * HACK * HACK *** */
-#ifdef	DUP_REF_RSLTS
-	token_count += 1;
-	if (token_count == 1 &&
-	    memcmp(yylval->text, "From", 4) == 0)
-	    continue;
-#endif
 
 	switch (class) {
 
@@ -206,10 +194,6 @@ token_t get_token(void)
 
 void token_init(void)
 {
-#ifdef	DUP_REF_RSLTS
-    token_count = 0;
-#endif
-
     yyinit();
     mime_reset(); 
     if (nonblank_line == NULL) {
