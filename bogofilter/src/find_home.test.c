@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 	    h = find_home_user(argv[1]);
 	    break;
 	case tilde:
-	    h = tofree = tildeexpand(argv[1]);
+	    h = tofree = tildeexpand(argv[1], true);
 	    break;
 	case current:
 	    h = find_home(read_env);

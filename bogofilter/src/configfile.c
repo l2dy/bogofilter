@@ -123,7 +123,7 @@ static bool process_config_parameter(const parm_desc *arg, char *val, priority_t
 	    }
 	case CP_DIRECTORY:
 	    {
-		char *dir = tildeexpand(val);
+		char *dir = tildeexpand(val, true);
 		if (DEBUG_CONFIG(2))
 		    fprintf(dbgout, "%s -> '%s'\n", arg->name, dir);
 		if (setup_wordlists(dir, precedence) != 0)
@@ -196,11 +196,7 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
     char *filename;
     char *arg = NULL, *val = NULL;
 
-    if (tilde_expand) {
-	filename = tildeexpand(fname);
-    } else {
-	filename = xstrdup(fname);
-    }
+    filename = tildeexpand(fname, tilde_expand);
 
     fp = fopen(filename, "r");
 

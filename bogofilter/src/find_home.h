@@ -5,6 +5,8 @@
 #ifndef FIND_HOME_H
 #define FIND_HOME_H
 
+#include "system.h"
+
 /* (C) 2002 by Matthias Andree <matthias.andree@gmx.de>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,6 +30,6 @@ find_home_user(const char *username) /*@globals errno@*/;
 
 /*@only@*/
 char *
-tildeexpand(const char *filename) /*@globals errno@*/;
+tildeexpand(const char *filename, bool expand) /*@globals errno@*/;
 
 #endif

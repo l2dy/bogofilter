@@ -424,7 +424,7 @@ bool configure_wordlist(const char *val)
     name=tmp;			/* name of wordlist */
     tmp = spanword(tmp);
 
-    path=tildeexpand(tmp);	/* path to wordlist */
+    path=tildeexpand(tmp, true);/* path to wordlist */
     tmp = spanword(tmp);
 
     sweight=atof(tmp);

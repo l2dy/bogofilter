@@ -24,6 +24,12 @@
 #include "xmalloc.h"
 #include "xstrdup.h"
 
+#ifndef __riscos__
+bool tilde_expand =  true;
+#else
+bool tilde_expand =  false;
+#endif
+
 /*
  * tildeexpand tries to expand the first tilde argument, similar, but
  * not identical, to the way a POSIX sh does. It does not support
@@ -31,14 +37,15 @@
  * count of characters in the POSIX portable file name character set.
  */
 /*@only@*/
-char *tildeexpand(const char *name) {
+char *tildeexpand(const char *name, bool _expand) 
+{
     char *tmp;
     const char *home;
     size_t l, tl;
 
-#ifdef __riscos__
-    return xstrdup(name);
-#else
+    if (!tilde_expand || !_expand)
+	return xstrdup(name);
+
     if (name[0] != '~')
 	return xstrdup(name);
 
@@ -76,5 +83,4 @@ char *tildeexpand(const char *name) {
     /* no need to insert a slash here, name[l] contains one */
     if (strlcat(tmp, name + l + 1, tl) >= tl) internal_error;
     return tmp;
-#endif
 }
