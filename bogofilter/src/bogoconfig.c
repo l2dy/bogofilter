@@ -37,6 +37,7 @@ CONTRIBUTORS:
 #include "maint.h"
 #include "paths.h"
 #include "wordlists.h"
+#include "wordlists_base.h"
 #include "xatox.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
