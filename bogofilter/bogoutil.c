@@ -20,6 +20,7 @@ AUTHOR:
 #include <sys/stat.h>
 
 #include "version.h"
+#include "bogofilter.h"
 #include "datastore.h"
 #include "datastore_db.h"
 
@@ -232,8 +233,8 @@ int words_from_path(char *directory, int argc, char **argv, bool show_probabilit
     int spam_count, spam_msg_count = 0 ;
     int good_count, good_msg_count = 0 ;
 
-    char *head_format = !show_probability ? "%-20s %6s %6s\n"   : "%-20s %6s %6s %6s\n";
-    char *data_format = !show_probability ? "%-20s %6ld %6ld\n" : "%-20s %6ld %6ld %f\n";
+    char *head_format = !show_probability ? "%-20s %6s %6s\n"   : "%-20s %6s  %6s  %6s  %6s\n";
+    char *data_format = !show_probability ? "%-20s %6ld %6ld\n" : "%-20s %6ld  %6ld  %f  %f\n";
 
     build_path(filepath, PATH_LEN, directory, GOODFILE);
     if ((dbh_good = db_open_and_lock_file(filepath, GOODFILE, DB_READ)) == NULL)
@@ -249,10 +250,10 @@ int words_from_path(char *directory, int argc, char **argv, bool show_probabilit
 	good_msg_count = db_getvalue(dbh_good, ".MSG_COUNT");
     }
 
-    printf(head_format, "", "spam", "good", "prob");
+    printf(head_format, "", "spam", "good", "Gra prob", "Rob prob");
     while (argc >= 0)
     {
-	double spamness, goodness, prob = 0.0f;
+	double spamness, goodness, gra_prob = 0.0f, rob_prob = 0.0f;
 	
 	if ( argc == 0)
 	{
@@ -271,9 +272,18 @@ int words_from_path(char *directory, int argc, char **argv, bool show_probabilit
 	{
 	    spamness = (double) spam_count / (double) spam_msg_count;
 	    goodness = (double) good_count / (double) good_msg_count;
-	    prob = spamness / (spamness+goodness);
+	    if (spam_count + good_count == 0)
+	    {
+		gra_prob = UNKNOWN_WORD;
+		rob_prob = UNKNOWN_WORD;
+	    }
+	    else
+	    {
+		gra_prob = spamness / (spamness+goodness);
+		rob_prob = ((ROBS * ROBX + spamness) / (ROBS + spamness+goodness));
+	    }
 	}
-	printf(data_format, token, spam_count, good_count, prob);
+	printf(data_format, token, spam_count, good_count, gra_prob, rob_prob);
     }
 
     db_close(dbh_good);
@@ -466,6 +476,8 @@ void help(void)
 	    "\t-V\tPrint program version.\n"
 	    PROGNAME " is part of the bogofilter package.\n");
 }
+
+#undef	ROBX
 
 int main(int argc, char *argv[])
 {

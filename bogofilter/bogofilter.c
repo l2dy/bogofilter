@@ -35,13 +35,13 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #include "common.h"
 #include "bogofilter.h"
 #include "datastore.h"
+#include "lexer.h"
 #include "rstats.h"
 #include "wordhash.h"
 
 // constants for the Graham formula 
 #define KEEPERS		15		// how many extrema to keep
 #define MINIMUM_FREQ	5		// minimum freq
-#define UNKNOWN_WORD	0.4f		// odds that unknown word is spammish
 
 #define MAX_PROB	0.99f		// max probability value used
 #define MIN_PROB	0.01f		// min probability value used
@@ -55,9 +55,6 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 
 #define GRAHAM_MAX_REPEATS	4	// cap on word frequency per message
 #define ROBINSON_MAX_REPEATS	1	// cap on word frequency per message
-
-#define ROBS			0.001f	// Robinson's s
-#define ROBX			0.200f	// Robinson's x
 
 double min_dev;
 double spam_cutoff;
@@ -330,7 +327,7 @@ void print_bogostats(FILE *fp, double spamicity)
     extern int thresh_index;
     extern double thresh_stats;
     extern double thresh_rtable;
- 
+
     switch(algorithm) {
     case AL_GRAHAM:
     {

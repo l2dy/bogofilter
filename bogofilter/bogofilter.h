@@ -4,7 +4,6 @@
 #ifndef	HAVE_BOGOFILTER_H
 #define	HAVE_BOGOFILTER_H
 
-#include <lexer.h>
 #include <wordlists.h>
 
 enum algorithm { AL_GRAHAM, AL_ROBINSON } algorithm;
@@ -12,6 +11,10 @@ enum algorithm { AL_GRAHAM, AL_ROBINSON } algorithm;
 extern enum algorithm algorithm;
 
 #define EVEN_ODDS	0.5f		// used for words we want to ignore
+#define UNKNOWN_WORD	0.4f		// odds that unknown word is spammish
+
+#define ROBS			0.001f	// Robinson's s
+#define ROBX			0.200f	// Robinson's x
 
 #define GRAHAM_GOOD_BIAS	2	// don't give good words more weight
 #define ROBINSON_GOOD_BIAS	1	// don't give good words more weight
