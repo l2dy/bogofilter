@@ -12,7 +12,7 @@
 #define BIT_FORMAT	( 1 << ('F' - 'A'))
 #define BIT_GENERAL	( 1 << ('G' - 'A'))
 #define BIT_LEXER	( 1 << ('L' - 'A'))
-#define BIT_MEMORY	( 1 << ('M' - 'A'))
+#define BIT_MIME	( 1 << ('M' - 'A'))
 #define BIT_SPAMICITY	( 1 << ('S' - 'A'))
 #define BIT_TEST	( 1 << ('T' - 'A'))
 #define BIT_WORDLIST	( 1 << ('W' - 'A'))
@@ -26,7 +26,7 @@ extern int debug_mask;
 #define DEBUG_DATABASE(level)	0
 #define DEBUG_FORMAT(level)	0
 #define DEBUG_LEXER(level)	0
-#define DEBUG_MEMORY(level)	0
+#define DEBUG_MIME(level)	0
 #define DEBUG_SPAMICITY(level)	0
 #define DEBUG_TEST(level)	0
 #define DEBUG_WORDLIST(level)	0
@@ -36,7 +36,7 @@ extern int debug_mask;
 #define DEBUG_DATABASE(level)	((debug_mask & BIT_DATABASE)  && (verbose > level))
 #define DEBUG_FORMAT(level)	((debug_mask & BIT_FORMAT)    && (verbose > level))
 #define DEBUG_LEXER(level)	((debug_mask & BIT_LEXER)     && (verbose > level))
-#define DEBUG_MEMORY(level)	((debug_mask & BIT_MEMORY)    && (verbose > level))
+#define DEBUG_MIME(level)	((debug_mask & BIT_MIME)      && (verbose > level))
 #define DEBUG_SPAMICITY(level)	((debug_mask & BIT_SPAMICITY) && (verbose > level))
 #define DEBUG_TEST(level)	((debug_mask & BIT_TEST)      && (verbose > level))
 #define DEBUG_WORDLIST(level)	((debug_mask & BIT_WORDLIST)  && (verbose > level))
