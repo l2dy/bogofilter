@@ -16,10 +16,11 @@
 #define DATASTORE_H
 
 #include "wordlists.h"
+#include <inttypes.h>
 
 typedef struct {
-    long count;
-    long date;
+    uint32_t count;
+    uint32_t date;
 } dbv_t;
 
 /** Initialize database, open and lock files, etc.
@@ -40,29 +41,29 @@ void db_flush(void *);
 /** Increments count for given word.  Note: negative results are set to
  * zero.
  */
-void db_increment(void *, const char *, long);
+void db_increment(void *, const char *, uint32_t);
 
 /** Decrement count for a given word, if it exists in the datastore.
  * Note: negative results are set to zero. 
  */
-void db_decrement(void *, const char *, long);
+void db_decrement(void *, const char *, uint32_t);
 
 /** Retrieve the value associated with a given word in a list. 
  * \return zero if the word does not exist in the database. 
  */
-long db_getvalue(void *, const char *);
+uint32_t db_getvalue(void *, const char *);
 
 /** Delete the key */
 void db_delete(void *, const char *);
 
 /** Set the value associated with a given word in a list */
-void db_setvalue(void *, const char *, long);
+void db_setvalue(void *, const char *, uint32_t);
 
 /** Get the database message count */
-long db_get_msgcount(void*);
+uint32_t db_get_msgcount(void*);
 
 /** set the database message count */
-void db_set_msgcount(void*, long);
+void db_set_msgcount(void*, uint32_t);
 
 typedef int (*db_foreach_t)(char *key,   uint32_t key_size,
 			    char *value, uint32_t key_value, 

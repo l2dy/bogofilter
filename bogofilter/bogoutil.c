@@ -44,7 +44,7 @@ const char *progname = PROGNAME;
 
 static int db_dump_hook(char *key,  uint32_t keylen, 
 			char *data, uint32_t datalen,
-			void *userdata /*@unused@*/)
+			 /*@unused@*/ void *userdata)
 {
     dbv_t val = {0, 0};
     (void)userdata;
@@ -62,9 +62,9 @@ static int db_dump_hook(char *key,  uint32_t keylen,
 	do_replace_nonascii_characters((byte *)key, keylen);
     fwrite(key, 1, keylen, stdout);
     putchar(' ');
-    printf("%lu", val.count);
+    printf("%lu", (unsigned long)val.count);
     if (val.date) {
-	printf(" %lu", val.date);
+	printf(" %lu", (unsigned long)val.date);
     }
     putchar('\n');
     return !!ferror(stdout);
@@ -74,7 +74,7 @@ static int count_hook(char *key,  uint32_t keylen,
 		      char *data, uint32_t datalen,
 		      void *userdata)
 {
-    size_t *counter = userdata;
+    uint32_t *counter = userdata;
 
     (void)key;
     (void)keylen;
@@ -83,15 +83,18 @@ static int count_hook(char *key,  uint32_t keylen,
 
     (*counter)++;
 
-    if (verbose > 3)
-	printf( "count:  %4u %*.*s\n", *counter, (int)keylen, (int)keylen, key);
+    if (verbose > 3) {
+	printf("count: ");
+	fwrite(key, 1, keylen, stdout);
+	putchar('\n');
+    }
 
     return 0;
 }
 
 struct robhook_data {
     double *sum;
-    size_t *count;
+    uint32_t *count;
     void *dbh_good;
     double scalefactor;
 };
@@ -139,9 +142,10 @@ static int robx_hook(char *key,  uint32_t keylen,
 
     /* print if token in both word lists */
     if ((verbose > 1 && goodness && spamness) || verbose > 2)
-	printf("cnt: %4d,  sum: %11.6f,  ratio: %9.6f,  sp: %3d,  gd: %3d,"
-		"  p: %9.6f,  t: %s\n", *rd->count, *rd->sum,
-		*rd->sum / *rd->count, spamness, goodness, prob, x);
+	printf("cnt: %4lu,  sum: %11.6f,  ratio: %9.6f,  sp: %3lu,  gd: %3lu,"
+		"  p: %9.6f,  t: %s\n", (unsigned long)*rd->count, *rd->sum,
+		*rd->sum / *rd->count,
+		(unsigned long)spamness, (unsigned long)goodness, prob, x);
 
     return 0;
 }
@@ -227,7 +231,7 @@ static int load_file(char *db_file)
 
 	if ( *p != '\0' ) {
 	    fprintf(stderr,
-		    "%s: Unexpected input [%s] on line %ld. "
+		    "%s: Unexpected input [%s] on line %lu. "
 		    "Expecting whitespace before count\n",
 		    PROGNAME, buf, line);
 	    rv = 1;
@@ -295,14 +299,14 @@ static int words_from_list(const char *db_file, int argc, char **argv)
     {
 	char buf[BUFSIZE];
 	while (get_token(buf, BUFSIZE, stdin) == 0) {
-	    printf("%s %ld\n", buf, db_getvalue(dbh, buf));
+	    printf("%s %lu\n", buf, (unsigned long)db_getvalue(dbh, buf));
 	}
     }
     else
     {
 	while (argc-- > 0) {
 	    char *token = *argv++;
-	    printf("%s %ld\n", token, db_getvalue(dbh, token));
+	    printf("%s %lu\n", token, (unsigned long)db_getvalue(dbh, token));
 	}
     }
 
@@ -475,7 +479,7 @@ static int compute_robinson_x(char *path)
     free(wl[1].filename);
 
     dbh_spam = db_open(db_spam_file, "spam", DB_WRITE, directory);
-    db_setvalue(dbh_spam, ".ROBX", (int) (robx * 1000000));
+    db_setvalue(dbh_spam, ".ROBX", (uint32_t) (robx * 1000000));
     db_close(dbh_spam);
 
     return 0;

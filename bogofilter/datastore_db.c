@@ -57,7 +57,7 @@ typedef struct {
 
 /* Function prototypes */
 
-static long db_get_dbvalue(void *vhandle, const char *word, dbv_t *val);
+static int db_get_dbvalue(void *vhandle, const char *word, dbv_t *val);
 static void db_set_dbvalue(void *vhandle, const char *word, dbv_t *val);
 static int db_lock(int fd, int cmd, short int type);
 
@@ -158,7 +158,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
     }
 
     if (db_lock(handle->fd, F_SETLK,
-		open_mode == DB_READ ? F_RDLCK : F_WRLCK))
+		(short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
     {
 	int e = errno;
 	handle->fd = -1;
@@ -182,10 +182,10 @@ open_err:
     0 if the word is not found.
     Notes: Will call exit if an error occurs.
 */
-long db_getvalue(void *vhandle, const char *word){
+uint32_t db_getvalue(void *vhandle, const char *word){
   dbv_t val;
-  long ret;
-  long value = 0;
+  uint32_t ret;
+  uint32_t value = 0;
   dbh_t *handle = vhandle;
 
   ret = db_get_dbvalue(vhandle, word, &val);
@@ -194,8 +194,8 @@ long db_getvalue(void *vhandle, const char *word){
     value = val.count;
 
     if (DEBUG_DATABASE(2)) {
-      fprintf(dbgout, "[%lu] db_getvalue (%s): [%s] has value %ld\n",
-	      (unsigned long) handle->pid, handle->name, word, value);
+      fprintf(dbgout, "[%lu] db_getvalue (%s): [%s] has value %lu\n",
+	      (unsigned long) handle->pid, handle->name, word, (unsigned long)value);
     }
     return(value);
   }
@@ -220,12 +220,12 @@ void db_delete(void *vhandle, const char *word) {
     exit(2);
 }
 
-static long db_get_dbvalue(void *vhandle, const char *word, /*@out@*/ dbv_t *val){
-  int  ret;
+static int db_get_dbvalue(void *vhandle, const char *word, /*@out@*/ dbv_t *val){
+  int ret;
   DBT db_key;
   DBT db_data;
   char *t;
-  long cv[2] = { 0l, 0l };
+  uint32_t cv[2] = { 0l, 0l };
 
   dbh_t *handle = vhandle;
 
@@ -274,7 +274,7 @@ static long db_get_dbvalue(void *vhandle, const char *word, /*@out@*/ dbv_t *val
 Store VALUE in database, using WORD as database key
 Notes: Calls exit if an error occurs.
 */
-void db_setvalue(void *vhandle, const char * word, long count){
+void db_setvalue(void *vhandle, const char * word, uint32_t count){
   dbv_t val;
   val.count = count;
   val.date  = today;		/* date in form YYYYMMDD */
@@ -286,7 +286,7 @@ static void db_set_dbvalue(void *vhandle, const char * word, dbv_t *val){
   int ret;
   DBT db_key;
   DBT db_data;
-  long cv[2];
+  uint32_t cv[2];
   dbh_t *handle = vhandle;
   char *t;
 
@@ -316,7 +316,7 @@ static void db_set_dbvalue(void *vhandle, const char * word, dbv_t *val){
   xfree(t);
   if (ret == 0){
     if (DEBUG_DATABASE(2)) {
-      fprintf(dbgout, "db_set_dbvalue (%s): [%s] has value %ld\n", handle->name, word, val->count);
+      fprintf(dbgout, "db_set_dbvalue (%s): [%s] has value %lu\n", handle->name, word, (unsigned long)val->count);
     }
   }
   else {
@@ -329,31 +329,32 @@ static void db_set_dbvalue(void *vhandle, const char * word, dbv_t *val){
 /*
   Increment count associated with WORD, by VALUE.
  */
-void db_increment(void *vhandle, const char *word, long value){
-  value = db_getvalue(vhandle, word) + value;
-  db_setvalue(vhandle, word, value < 0 ? 0 : value);
+void db_increment(void *vhandle, const char *word, uint32_t value){
+    value += db_getvalue(vhandle, word);
+    db_setvalue(vhandle, word, value);
 }
 
 /*
   Decrement count associated with WORD by VALUE,
   if WORD exists in the database.
 */
-void db_decrement(void *vhandle, const char *word, long value){
-  value = db_getvalue(vhandle, word) - value;
-  db_setvalue(vhandle, word, value < 0 ? 0 : value);
+void db_decrement(void *vhandle, const char *word, uint32_t value){
+    uint32_t dv = db_getvalue(vhandle, word);
+    value = dv < value ? 0 : dv - value;
+    db_setvalue(vhandle, word, value);
 }
 
 /*
   Get the number of messages associated with database.
 */
-long db_get_msgcount(void *vhandle){
+uint32_t db_get_msgcount(void *vhandle){
   return db_getvalue(vhandle, MSG_COUNT_TOK);
 }
 
 /*
  Set the number of messages associated with database.
 */
-void db_set_msgcount(void *vhandle, long count){
+void db_set_msgcount(void *vhandle, uint32_t count){
   db_setvalue(vhandle, MSG_COUNT_TOK, count);
 }
 
@@ -366,7 +367,7 @@ void db_close(void *vhandle){
   if (handle == NULL) return;
   if (handle->fd >= 0) {
       db_lock(handle->fd, F_UNLCK,
-	      handle->open_mode == DB_READ ? F_RDLCK : F_WRLCK);
+	      (short int)(handle->open_mode == DB_READ ? F_RDLCK : F_WRLCK));
   }
   if ((ret = handle->dbp->close(handle->dbp, 0))) {
     print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
@@ -421,7 +422,7 @@ int db_foreach(void *vhandle,
     }
 
     while((ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) == 0) {
-	long cv[2];
+	uint32_t cv[2];
 
 	memcpy(&cv, data.data, data.size);
 	if (handle->is_swapped) {
