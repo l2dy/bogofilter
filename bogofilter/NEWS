@@ -10,12 +10,28 @@ RELEASE.NOTES-0.93 has two important sections entitled:
         INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
 and     MAJOR CHANGES IN BOGOFILTER 0.93
 
+Briefly:
+
+	** Bogofilter is now using Berkeley DB's Transaction
+	   capability to ensure database integrity.
+
+	** Bogofilter is now generating tri-state results labeled
+	   Spam, Ham, and Unsure, compared to the old two-state Yes/No
+	   results.
+
+	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
+
 0.93.0	2004-11-?? "Broken compatibility" release
+
+	2004-11-06
+
+	* Fix bogotune's '-D' option.
 
 	2004-11-02
 
-	* Make the signal handler that runs periodically to check for crashed
-	  processes only use reentrant functions. Reported by Pavel Kankovsky.
+	* Use only reentrant functions in the signal handler that runs
+	  periodically to check for crashed processes.
+	  Reported by Pavel Kankovsky.
 
 	2004-11-01
 
@@ -31,7 +47,7 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 	  DB_CHKSUM[_SHA1] when creating the data base.
 	  Fixes "checksum error: catastrophic recovery required" and
 	  consequential "wordlist.db: page 1: reference count overflow" errors
-	  reported by Torsten Veller.
+	  Reported by Torsten Veller.
 
 	* Revised RELEASE.NOTES-0.93 to move QDBM change into "Incompatible
 	  Changes" section and to mention BerkeleyDB dump/load for 4.1 and 4.2

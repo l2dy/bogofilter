@@ -10,12 +10,24 @@ line tests.  Use options, config files, and wordlists from your
 production environment.  This will help ensure that the new version of
 bogofilter is working properly.
 
-0.93.0	2004-10-??
+0.93.0	2004-11-?? "Broken compatibility" release
 
 RELEASE.NOTES-0.93 has two important sections entitled:
 
         MAJOR CHANGES IN BOGOFILTER 0.93 
 and     INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
+
+Briefly:
+
+** Bogofilter is now using Berkeley DB's Transaction capability to
+   ensure database integrity.
+
+** Bogofilter is now generating tri-state results labeled Spam, Ham,
+   and Unsure, compared to the old two-state Yes/No results.
+
+!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
+
+* Added GETTING.STARTED document.
 
 * Changed default mode from two-state to three-state
   - with ham_cutoff=0.45 and spam_cutoff=0.99
@@ -27,7 +39,34 @@ and     INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
   break them.  You will need to change your config file to
   enable the two-state options or else update your scripts.
 
-* Added GETTING.STARTED document.
+* Merged Transactional branch (for BerkeleyDB) back into the trunk.
+* Inserted new section 2.2 into doc/README.db to mention that it is
+  recommended to dump/load the data base when using BerkeleyDB 4.1 and
+  4.2.
+* Rearranged flag setting for Berkeley DB data store, so as only to set
+  DB_CHKSUM[_SHA1] when creating the data base.
+  Fixes "checksum error: catastrophic recovery required" and
+  consequential "wordlist.db: page 1: reference count overflow" errors
+  Reported by Torsten Veller.
+* Use only reentrant functions in the signal handler that runs
+  periodically to check for crashed processes.
+  Reported by Pavel Kankovsky.
+
+* Document that recovery only works for Berkeley DB, but not TDB or
+  QDBM.  When attempting recovery with TDB or QDBM, generate an error,
+  so the user does not think it succeeded.
+
+* Add a debugged and enhanced version of Stefan Bellon's QDBM
+  Hash->B+tree converter.
+* Broke QDBM compatibility with 2004-10-30 change, check unsigned
+  characters to match Berkeley DB behavior of bogoutil -d.
+* Revised RELEASE.NOTES-0.93 to move QDBM change into "Incompatible
+  Changes" section and to mention BerkeleyDB dump/load for 4.1 and 4.2
+  to add checksums.
+* Converted QDBM from hash files (DEPOT API) to B+ trees
+  (Villa API) for better speed (Stefan Bellon).
+
+* Fix bogotune's '-D' option.
 
 0.92.8	2004-10-19
 
