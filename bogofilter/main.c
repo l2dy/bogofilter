@@ -1,6 +1,10 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.21  2002/10/04 18:08:25  relson
+ * Added a '-u' (update) option so that the appropriate wordlist, i.e. spamlist.db
+ * or goodlist.db,  is updated after classifying the message.
+ *
  * Revision 1.20  2002/10/04 04:29:20  relson
  * Clean up allocation and deallocation of directory.
  *
@@ -122,7 +126,7 @@ AUTHOR:
 
 #define BOGODIR		"/.bogofilter/"
 
-int verbose, passthrough;
+int verbose, passthrough, update;
 
 int main(int argc, char **argv)
 {
@@ -131,7 +135,7 @@ int main(int argc, char **argv)
     char  *directory = NULL;
     int   exitcode = 0;
 
-    while ((ch = getopt(argc, argv, "d:hsnSNvVp")) != EOF)
+    while ((ch = getopt(argc, argv, "d:hsnSNvVpu")) != EOF)
 	switch(ch)
 	{
 	case 'd':
@@ -192,6 +196,10 @@ int main(int argc, char **argv)
 	case 'p':
 	    passthrough = 1;
 	    break;
+
+	case 'u':
+	    update = 1;
+	    break;
 	}
 
     if ( directory == NULL )
@@ -246,11 +254,11 @@ int main(int argc, char **argv)
 	    }
 	}
 
-        exitcode = status;
+	exitcode = status;
     }
     else
     {
-	register_words(STDIN_FILENO, register_type);
+	register_messages(STDIN_FILENO, register_type);
     }
 
     close_lists();

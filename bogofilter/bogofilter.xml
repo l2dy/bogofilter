@@ -19,8 +19,9 @@
   <arg choice='opt'>-n</arg>
   <arg choice='opt'>-S</arg>
   <arg choice='opt'>-N</arg>
-  <arg choice='opt'>-p</arg>
   <arg choice='opt'>-d</arg>
+  <arg choice='opt'>-p</arg>
+  <arg choice='opt'>-u</arg>
   <arg choice='opt'>-v</arg>
   <arg choice='opt'>-V</arg>
 </cmdsynopsis>
@@ -105,6 +106,15 @@ the input mail to the output with an X-Spam-Status header (in the
 style of SpamAssassin) inserted.  The header will begin with "Yes" or
 "No" according as the mail is judged to be spam or non-spam
 respectively.</para>
+
+<para>The <option>-u</option> (update) option tells 
+<application>bogofilter</application>
+to automatically update the appropriate wordfile.  
+If the text presented on standard input is spam, the spam wordfile will be updated.  
+If the text is not spam, the good wordfile will be updated.
+Effectively this option runs <application>bogofilter</application> 
+with the '-s' or '-n' flag, as appropriate.
+</para>
 
 <para>The <option>-v</option> option produces a report to standard 
 output on <application>bogofilter</application>'s analysis af the

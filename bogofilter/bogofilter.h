@@ -1,6 +1,10 @@
 /* $Id$ */
 /* 
  * $Log$
+ * Revision 1.12  2002/10/04 18:08:26  relson
+ * Added a '-u' (update) option so that the appropriate wordlist, i.e. spamlist.db
+ * or goodlist.db,  is updated after classifying the message.
+ *
  * Revision 1.11  2002/10/02 16:27:40  relson
  * Initial inclusion of multiple wordlist code into bogofilter.
  *
@@ -83,9 +87,9 @@ typedef struct {
   int msg_freq;
 } wordprop_t;
 
-extern int verbose;
+extern int verbose, update;
 
-extern void register_words(int fd, reg_t register_type);
+extern void register_messages(int fd, reg_t register_type);
 extern rc_t bogofilter(int fd, double *xss);
 
 #endif	/* HAVE_BOGOFILTER_H */

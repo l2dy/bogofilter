@@ -1,7 +1,12 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.29  2002/10/04 18:08:26  relson
+ * Added a '-u' (update) option so that the appropriate wordlist, i.e. spamlist.db
+ * or goodlist.db,  is updated after classifying the message.
+ *
  * Revision 1.28  2002/10/04 02:06:55  gyepi
+ *
  * 1. Use multiple buffer lists in wordhash to avoid alignment problems
  * on more restrictive architectures.
  * 2. Add initializer arg to wordhash_insert.
@@ -235,24 +240,19 @@ void *collect_words(int fd, int *msg_count, int *word_count)
 }
 
 
-void register_words(int fdin, reg_t register_type)
+void register_words(reg_t register_type, wordhash_t *h, int msgcount, int wordcount)
 // tokenize text on stdin and register it to  a specified list
 // and possibly out of another list
 {
-  int	wordcount, msgcount;
-
   hashnode_t *node;
   wordprop_t *wordprop;
-  wordhash_t *h;
 
   wordlist_t *list;
   wordlist_t *incr_list = NULL;
   wordlist_t *decr_list = NULL;
 
-  h = collect_words(fdin, &msgcount, &wordcount);
-
   if (verbose)
-    fprintf(stderr, "# %d words\n", wordcount);
+    fprintf(stderr, "# %d words, %d messages\n", wordcount, msgcount);
 
   good_list.active = spam_list.active = FALSE;
 
@@ -280,7 +280,7 @@ void register_words(int fdin, reg_t register_type)
       fprintf(stderr, "Error: Invalid register_type\n");
       exit(2);      
     }
-  
+
   incr_list->active = TRUE;
   if (decr_list)
     decr_list->active = TRUE;
@@ -318,7 +318,14 @@ void register_words(int fdin, reg_t register_type)
   }
 
   db_lock_release_list(word_lists);
+}
 
+void register_messages(int fdin, reg_t register_type)
+{
+  wordhash_t *h;
+  int	wordcount, msgcount;
+  h = collect_words(fdin, &msgcount, &wordcount);
+  register_words(register_type, h, msgcount, wordcount);
   wordhash_free(h);
 }
 
@@ -549,9 +556,10 @@ rc_t bogofilter(int fd, double *xss)
     double 	spamicity;
     wordhash_t  *wordhash;
     bogostat_t	*stats;
+    int		wordcount, msgcount;
 
 //  tokenize input text and save words in a wordhash.
-    wordhash = collect_words(fd, NULL, NULL);
+    wordhash = collect_words(fd, &msgcount, &wordcount);
 
     good_list.active = spam_list.active = TRUE;
 
@@ -573,6 +581,9 @@ rc_t bogofilter(int fd, double *xss)
     if (xss != NULL)
         *xss = spamicity;
     
+    if (update)
+      register_words((status==RC_SPAM) ? REG_SPAM : REG_GOOD, wordhash, msgcount, wordcount);
+
     wordhash_free(wordhash);
 
     return status;
