@@ -23,6 +23,15 @@ NAME:
 #include "debug.h"
 #include "system.h"	/* defines bool, uint32_t */
 
+/* for easier debugging - can be disabled */
+#if	0
+#define	D		/* size adjustment */
+#define	Z(n)		/* mark end of string */
+#else
+#define	D	1	/* size adjustment */
+#define	Z(n)	n='\0'	/* mark end of string */
+#endif
+
 /* length of token will not exceed this... */
 #define MAXTOKENLEN	30
 
