@@ -69,7 +69,7 @@ probabilities for all input tokens have been computed, a fixed number
 of the probabilities that deviate furtherest from average are combined
 using Bayes's theorem on conditional probabilities.  If the computed
 probability that the input is spam exceeds a cutoff determined at 
-compile time (currently 0.54),
+compile time (currently 0.95, for the Robinson-Fisher algorithm),
 <application>bogofilter</application> returns 0, otherwise 1.</para>
 
 <para>While this method sounds crude compared to the more usual
