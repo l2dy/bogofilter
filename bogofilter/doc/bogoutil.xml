@@ -84,8 +84,10 @@
 	</para>
 	<para>
 	    The <option>-l <replaceable>file</replaceable></option>
-	    option tells <application>bogoutil</application> to load
+	    option tells <application>bogoutil</application>
 	    to load the data from <option>stdin</option> into the database file.
+	    If the database file exists, <option>stdin</option> data is
+	    merged into the database file, with counts added up.
 	</para>
 	<para>The <option>-m</option> option tells <application>bogoutil</application> 
 	    to perform maintenance functions on the specified database, i.e. discard tokens 
