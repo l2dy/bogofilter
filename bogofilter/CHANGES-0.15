@@ -4,6 +4,18 @@
 
 $Id$
 
+	2003-09-22
+
+	* Added support for OS/2's file system.
+
+	2003-09-21
+
+	* Fixed logging behavior when scoring mailboxes, maildirs, etc.
+								
+	2003-09-20
+
+	* Fixed processing of rmail files.
+
 0.15.4	2003-09-20
 
 	* Additional header line tagging as suggested by Michael O'Reilly.

@@ -2,6 +2,10 @@
 				BOGOFILTER NEWS
 			       =================
 
+* Fixed processing of rmail files.
+* Fixed logging behavior when scoring mailboxes, maildirs, etc.
+* Added support for OS/2's file system.
+
 0.15.4	2003-09-20
 
 * Additional header line tagging as suggested by Michael O'Reilly.
