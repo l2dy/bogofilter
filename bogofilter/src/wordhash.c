@@ -23,13 +23,11 @@ THEORY:
   traversal of hash table.
 */
 
+#include "common.h"
+
 #include <stdlib.h>
 #include <string.h>
-
-/* for offsetof */
-#include <stddef.h>
-
-#include "common.h"
+#include <stddef.h>	/* for offsetof */
 
 #include "wordhash.h"
 #include "xmalloc.h"
