@@ -34,7 +34,7 @@ flaglist="IHT-0 iHT-1 IhT-2 IHt-3 Iht-4 iHt-5 ihT-6 iht-7"
 for flags in $flaglist ; do
     opts=`echo $flags | tr -d "01234567-"`
     ( echo "****** " $opts " ******" ; \
-    $BOGOLEXER -C -D -P$opts -p -x l -v < $MSG ) | tee -a ${TMPDIR}/parsing.out > ${TMPDIR}/tmp
+    $BOGOLEXER -C -D -P$opts -p -v < $MSG ) | tee -a ${TMPDIR}/parsing.out > ${TMPDIR}/tmp
     if  [ $verbose -ne 0 ]; then
 	sort -u < ${TMPDIR}/tmp >>  ${TMPDIR}/parsing.sor
     fi
