@@ -42,6 +42,8 @@ int  logflag;
 char msg_register[80];
 char msg_bogofilter[80];
 
+char *progname="bogofilter";
+
 /* if the given environment variable 'var' exists, copy it to 'dest' and
    tack on the optional 'subdir' value.
  */
@@ -62,25 +64,6 @@ void set_dir_from_env(char* dest, char *var, char* subdir)
     if (subdir && (path_left > 0)) {
 	strncat(dest, subdir, path_left);
     }
-}
-
-/* build an absolute path to a file given a directory and file name
- */
-void build_path(char* dest, int size, const char* dir, const char* file)
-{
-    int path_left=size-1;
-
-    strncpy(dest, dir, path_left);
-    path_left -= strlen(dir);
-    if (path_left <= 0) return;
-
-    if ('/' != dest[strlen(dest)-1]) {
-	strcat(dest, "/");
-	path_left--;
-	if (path_left <= 0) return;
-    }
-
-    strncat(dest, file, path_left);
 }
 
 /* check that our directory exists and try to create it if it doesn't

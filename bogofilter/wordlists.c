@@ -15,6 +15,8 @@
 #define GOODFILE	"goodlist.db"
 #define SPAMFILE	"spamlist.db"
 
+extern char *progname;
+
 wordlist_t good_list;
 wordlist_t spam_list;
 wordlist_t* word_lists=NULL;
@@ -26,7 +28,7 @@ void *open_wordlist( const char *name, const char *filepath )
     dbmode_t open_mode = (run_type==RUN_NORMAL) ? DB_READ : DB_WRITE;
 
     if ( (dbh = db_open(filepath, name, open_mode)) == NULL){
-      fprintf(stderr, "bogofilter: Cannot initialize database %s.\n", name);
+      fprintf(stderr, "%s: Cannot initialize database %s.\n", progname, name);
       exit(2);
     }
 
@@ -73,6 +75,25 @@ int init_list(wordlist_t* list, const char* name, const char* filepath, double w
 	list_index=list_index->next;
     }
     return 0;
+}
+
+/* build an absolute path to a file given a directory and file name
+ */
+void build_path(char* dest, int size, const char* dir, const char* file)
+{
+    int path_left=size-1;
+
+    strncpy(dest, dir, path_left);
+    path_left -= strlen(dir);
+    if (path_left <= 0) return;
+
+    if ('/' != dest[strlen(dest)-1]) {
+	strcat(dest, "/");
+	path_left--;
+	if (path_left <= 0) return;
+    }
+
+    strncat(dest, file, path_left);
 }
 
 /* returns -1 for error, 0 for success */
