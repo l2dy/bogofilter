@@ -67,7 +67,7 @@ foreach my $arg (@ARGV) {
     elsif($arg eq "-n") { $state = 3; }
     elsif($arg eq "-C") { $cf = "-C"; }
     elsif($arg eq "-c") { $state = 4; }
-    elsif($arg eq "-v") { $verbose = 1; }
+    elsif($arg eq "-v") { $verbose += 1; }
     elsif($state == 0 ) { $bogodir = $arg; $state = 1; }
     elsif($state == 2 ) { push @spfiles, $arg; }
     elsif($state == 3 ) { push @nsfiles, $arg; }
@@ -342,6 +342,11 @@ foreach my $scantype ("coarse", "fine") {
     print("Performing ", $scantype, " scan:\n");
     my $ord = 0; my $np = scalar @rsval * scalar @mdval * scalar @rxval;
     @parms = ();
+    if($verbose > 1) {
+	printf "  rsval: %d (%s)\n", $#rsval+1, join(', ', @rsval);
+	printf "  mdval: %d (%s)\n", $#mdval+1, join(', ', @mdval);
+	printf "  rxval: %d (%s)\n", $#rxval+1, join(', ', @rxval);
+    }
     foreach $rsi (0 .. $#rsval) {
 	foreach $mdi (0 .. $#mdval) {
 	    foreach $rxi (0 .. $#rxval) {
@@ -384,14 +389,15 @@ foreach my $scantype ("coarse", "fine") {
 		$fn = <COUNTS>; chop $fn; close COUNTS;
 		my @parm = ($rsi, $mdi, $rxi, $cutoff, $fp, $fn);
 		push @parms, [ @parm ];
+		++$ord;
 		if($verbose) {
+		    printf("%3d ", $ord) if $verbose > 1;
 		    printf("%0.4f %0.3f %0.3f %0.6f %0.0f %0.0f\n",
                         $rsval[$rsi], $mdval[$mdi], $rxval[$rxi], $cutoff,
                         $fp, $fn);
 		} else {
 		    progress($ord, $np);
 		}
-		++$ord;
 	    }
 	}
     }
