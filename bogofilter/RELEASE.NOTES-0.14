@@ -1,5 +1,3 @@
-NOTE: Please also see the CHANGES-0.14 document for a detailed summary.
-
 With release 0.14, bogofilter's use of BerkelyDB has changed.  First,
 TrivialDB (tdb) can be used.  Second, instead of separate wordlists
 for spam and ham tokens, bogofilter can now use a single combined,
@@ -28,3 +26,11 @@ is included with bogofilter and performs the task.  Use command
 running it, your BOGOFILTER_DIR will contain all 3 database files.
 When started, bogofilter checks for wordlist.db and will use it.
 
+Also, exit codes returned by bogofilter have been expanded.  They are:
+
+    Spam   = 0 -- unchanged
+    Ham    = 1 -- unchanged
+    Unsure = 2 -- *NEW*
+    Error  = 3 -- *CHANGED*
+
+NOTE:  See the CHANGES-0.14 document for a list of all the changes.
