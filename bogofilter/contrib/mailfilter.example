@@ -2,13 +2,8 @@
 #
 # mailfilter.example
 #
-#	This is a sample procmail setup file that 
-#	1 - retains an unprocessed copy of all incoming mail
-#	2 - diverts incoming mail with asian character sets
-#	3 - runs bogofilter
-#	4 - retains a processed copy of all messages identified as spam.
-#	5 - retains a processed copy of all messages identified as unsure.
-#
+# This is a sample maildrop configuration file which shows some ways
+# of running bogofilter from maildrop.
 
 ### bogofilter - filter & update word lists
 
@@ -29,10 +24,13 @@ to "spam-unreadable"
 
 xfilter 'bogofilter -f -p -u -l -e -v'
 
-# if spam, 
+# if spam, file this into the "spam-bogofilter" folder and exit
+# processing
 if (/^X-Bogosity: (Spam|Yes)/)
 to "spam-bogofilter"
 
+# if unsure, copy this into the "spam-bogofilter" folder and
+# CONTINUE processing
 if (/^X-Bogosity: Unsure/)
 cc "unsure-bogofilter"
 #### end bogofilter passthrough-update ####
