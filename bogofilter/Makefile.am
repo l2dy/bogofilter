@@ -16,7 +16,7 @@ changelog.txt:
 EXTRA_DIST=	autogen.sh gsl config.rpath \
 		bogofilter.cf.example \
 		bogofilter.spec bogofilter.spec.in \
-		METHODS Doxyfile \
+		METHODS Doxyfile gnugetopt \
 		CHANGES-0.10 README.cvs \
 		CHANGES-0.11 RELEASE.NOTES-0.11 \
 		CHANGES-0.12 RELEASE.NOTES-0.12 \
@@ -45,5 +45,5 @@ rsync:	distdir .rsyncs
 	@( cat $(srcdir)/.rsyncs | sed -e 's}^}rsync -av --delete $(PACKAGE)-$(VERSION)/ }; s/\($$\)/ \&/;' ; echo "wait" ) | $(SHELL) -x
 
 dist-hook:
-	cd $(distdir) && find doc gsl -name CVS -type d -prune -exec rm -r '{}' ';'
+	cd $(distdir) && find doc gnugetopt gsl -name CVS -type d -prune -exec rm -r '{}' ';'
 	rm -f $(distdir)/doc/.cvsignore

@@ -250,7 +250,7 @@ AC_FUNC_MEMCMP
 AC_FUNC_MMAP
 AC_FUNC_VPRINTF
 
-AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl strchr strrchr memcpy memmove munmap pow sqrt strcasecmp strcspn strspn strstr snprintf vsnprintf)
+AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl strchr strrchr memcpy memmove munmap pow sqrt strcasecmp strcspn strspn strstr snprintf vsnprintf getopt_long)
 AC_REPLACE_FUNCS(strlcpy strlcat)
 
 AC_LIB_RPATH
@@ -529,6 +529,7 @@ fi
 PATH="$PATH_SAVED"
 
 AM_CONDITIONAL(NEED_GSL,test $need_my_gsl != 0)
+AM_CONDITIONAL(NEED_GETOPT,test $ac_cv_func_getopt_long != yes)
 
 have_dosish_system=no
 case "${target}" in

@@ -30,7 +30,7 @@ libbf_gsl_a_SOURCES= \
 noinst_LIBRARIES += libbf_gsl.a
 endif
 
-AM_CPPFLAGS = -I$(top_srcdir)/trio -I$(top_srcdir) @GSL_CFLAGS@
+AM_CPPFLAGS = -I$(top_srcdir)/gnugetopt -I$(top_srcdir)/trio -I$(top_srcdir) @GSL_CFLAGS@
 AM_CFLAGS = -DBOGOFILTER
 
 if ENABLE_MEMDEBUG
@@ -121,6 +121,12 @@ libbogofilter_a_SOURCES = \
 
 nodist_libbogofilter_a_SOURCES = \
 	directories.c
+
+if NEED_GETOPT
+noinst_LIBRARIES	+= libgnugetopt.a
+LDADD			+= libgnugetopt.a
+libgnugetopt_a_SOURCES	 = ../gnugetopt/getopt1.c ../gnugetopt/getopt.c
+endif
 
 if ENABLE_TDB_DATASTORE
 datastore_SOURCE = datastore_tdb.c
