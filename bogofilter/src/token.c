@@ -237,7 +237,7 @@ token_t get_token(word_t **token)
 	    /* special token;  saved for formatted output, but not returned to bogofilter */
 	    /** \bug: the parser MUST be aligned with lexer_v3.l! */
 	    if (queue_id.leng == 0 &&
-		leng < sizeof(msg_id_text) )
+		leng < sizeof(queue_id_text) )
 	    {
 		while (isspace(text[0])) {
 		    text += 1;
@@ -440,8 +440,8 @@ void set_tag(const char *text)
 
 void set_msg_id(byte *text, uint leng)
 {
-    if (leng > sizeof(msg_id_text))
-	leng = sizeof(msg_id_text);
+    if (leng >= sizeof(msg_id_text))	/* Limit length */
+	leng  = sizeof(msg_id_text) - 1;
     token_set( &msg_id, text, leng );
 }
 
