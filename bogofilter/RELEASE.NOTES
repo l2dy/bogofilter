@@ -1,5 +1,7 @@
 0.11.0
 
+    Command line flags
+	
 	The meaning of command line flags '-S' and '-N' was changed in
 	version 0.11.0.  Previously '-S' meant to unregister a message
 	from the spam wordlist and register the message in the
@@ -18,3 +20,18 @@
 	To duplicate the effect of the old '-N' option, use '-S -n'.
 	The order of the options doesn't matter and they can be
 	concatenated, as in '-Sn' and '-sN'.
+
+   Config file processing
+
+	The code to process config files now checks numeric values
+	for validity.  It complains when it detects something
+	wrong.  In particular, double precision values are no longer
+	allowed to have a terminal 'f'.  For example
+	"spam_cutoff=0.95f" will generate a messages.
+
+    New parameter query option
+
+	Using options "-q -v" in a bogofilter command line will run
+	the query_config() function and will display bogofilter's
+	various parameter values.  This can be very useful in finding
+	the reason for an unexpected message classification.
