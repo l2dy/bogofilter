@@ -355,19 +355,26 @@ double get_spamicity(size_t robn, FLOAT P, FLOAT Q)
     }
     else
     {
-	double df = 2.0 * robn;
+        double sp_df = 2.0 * robn * sp_esf;
+        double ns_df = 2.0 * robn * ns_esf;
 	double ln2 = log(2.0);					/* ln(2) */
 
 	score.robn = robn;
 
 	/* convert to natural logs */
-	score.p_ln = log(P.mant) + P.exp * ln2;		/* invlogsum */
-	score.q_ln = log(Q.mant) + Q.exp * ln2;		/* logsum    */
+        score.p_ln = (log(P.mant) + P.exp * ln2) * sp_esf;  /* invlogsum */
+        score.q_ln = (log(Q.mant) + Q.exp * ln2) * ns_esf;  /* logsum */
 
-	score.p_pr = prbf(-2.0 * score.p_ln, df);	/* compute P */
-	score.q_pr = prbf(-2.0 * score.q_ln, df);	/* compute Q */
-
-	score.spamicity = (1.0 + score.q_pr - score.p_pr) / 2.0;
+        score.p_pr = prbf(-2.0 * score.p_ln, sp_df);        /* compute P */
+        score.q_pr = prbf(-2.0 * score.q_ln, ns_df);        /* compute Q */
+  
+        if (!fBogotune && sp_esf == 1.0 && ns_esf == 1.0) {
+            score.spamicity = (1.0 + score.q_pr - score.p_pr) / 2.0;
+        } else if (score.q_pr < DBL_EPSILON && score.p_pr < DBL_EPSILON) {
+            score.spamicity = 0.5;
+        } else {
+            score.spamicity = score.q_pr / ( score.q_pr + score.p_pr);
+        }
     }
 
     return score.spamicity;

@@ -54,6 +54,8 @@ bool fBogotune = false;
 /* for  bogoconfig.c, prob.c, rstats.c and score.c */
 double	robx = 0.0;
 double	robs = 0.0;
+double	sp_esf = 1.0;
+double	ns_esf = 1.0;
 
 /* other */
 FILE	*fpo;

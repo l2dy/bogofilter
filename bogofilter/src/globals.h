@@ -83,6 +83,8 @@ extern bool onlyprint;
 
 extern	double robs;
 extern	double robx;
+extern	double sp_esf;
+extern	double ns_esf;
 
 /* for  bogotune */
 extern	bool fBogotune;

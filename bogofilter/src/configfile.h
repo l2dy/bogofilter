@@ -31,6 +31,8 @@ typedef enum longopts_e {
     O_IGNORE = 1000,
     O_BLOCK_ON_SUBNETS,
     O_CHARSET_DEFAULT,
+    O_NS_ESF,
+    O_SP_ESF,
     O_HAM_CUTOFF,
     O_HEADER_FORMAT,
     O_LOG_HEADER_FORMAT,

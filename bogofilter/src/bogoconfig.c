@@ -122,6 +122,8 @@ struct option long_options[] = {
     { "verbosity",			N, 0, 'v' },
     { "block_on_subnets",		R, 0, O_BLOCK_ON_SUBNETS },
     { "charset_default",		R, 0, O_CHARSET_DEFAULT },
+    { "ns_esf",				R, 0, O_NS_ESF },
+    { "sp_esf",				R, 0, O_SP_ESF },
     { "ham_cutoff",			R, 0, O_HAM_CUTOFF },
     { "header_format",			R, 0, O_HEADER_FORMAT },
     { "log_header_format",		R, 0, O_LOG_HEADER_FORMAT },
@@ -590,6 +592,16 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	    set_bogofilter_dir(WORDLIST, val, precedence);
 	break;
 
+    case O_NS_ESF:
+	if (pass != PASS_1_CLI)
+	    get_double(name, val, &ns_esf);
+	break;
+
+    case O_SP_ESF:
+	if (pass != PASS_1_CLI)
+	    get_double(name, val, &sp_esf);
+	break;
+
     case 'H':
 	header_line_markup = false;
 	break;
@@ -684,6 +696,8 @@ void query_config(void)
     fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "min_dev", min_dev, min_dev);
     fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "ham_cutoff", ham_cutoff, ham_cutoff);
     fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "spam_cutoff", spam_cutoff, spam_cutoff);
+    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "ns_esf", ns_esf, ns_esf);
+    fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "sp_esf", sp_esf, sp_esf);
     fprintf(stdout, "\n");
     fprintf(stdout, "%-17s = %s\n",    "block_on_subnets",    YN(block_on_subnets));
     fprintf(stdout, "%-17s = %s\n",    "charset_default",     charset_default);
