@@ -12,18 +12,16 @@
 #include <stdlib.h>
 
 #include "config.h"
-#include "xmalloc.h"
 
-#ifdef	ENABLE_MEMDEBUG
-#include "memdebug.h"
-#endif
+#define	 BF_MALLOC
+#include "xmalloc.h"
 
 void
 *xcalloc(size_t nmemb, size_t size){
    void *ptr;
-   ptr = calloc(nmemb, size);
+   ptr = bf_calloc(nmemb, size);
    if (ptr == NULL && (nmemb == 0 || size == 0))
-       ptr = calloc(1, 1);
+       ptr = bf_calloc(1, 1);
    if (ptr == NULL)
        xmem_error("xcalloc");
    return ptr;

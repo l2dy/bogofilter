@@ -13,17 +13,14 @@
 
 #include "config.h"
 
+#define	 BF_MALLOC
 #include "xmalloc.h"
-
-#ifdef	ENABLE_MEMDEBUG
-#include "memdebug.h"
-#endif
 
 void
 *xrealloc(void *ptr, size_t size){
-   ptr = realloc(ptr, size);
+   ptr = bf_realloc(ptr, size);
    if (ptr == NULL && size == 0)
-       ptr = calloc(1, 1);
+       ptr = bf_calloc(1, 1);
    if (ptr == NULL)
        xmem_error("xrealloc");
    return ptr;

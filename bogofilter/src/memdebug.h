@@ -24,11 +24,9 @@ enum { M_MALLOC = 1,
        M_FREE = 2 
 };
 
-#ifndef	NO_MEMDEBUG_MACROS
-#define	malloc	md_malloc
-#define	calloc	md_calloc
-#define	realloc	md_realloc
-#define	free	md_free
-#endif
+#define bf_malloc  md_malloc
+#define bf_calloc  md_calloc
+#define bf_realloc md_realloc
+#define bf_free    md_free
 
-#endif
+#endif	/* MEMDEBUG_H */

@@ -13,17 +13,15 @@
 
 #include "config.h"
 
+#define	 BF_MALLOC
 #include "xmalloc.h"
-#ifdef	ENABLE_MEMDEBUG
-#include "memdebug.h"
-#endif
 
 void *
 xmalloc(size_t size){
     void *ptr;
-    ptr = malloc(size);
+    ptr = bf_malloc(size);
     if (ptr == NULL && size == 0)
-	ptr = malloc(1);
+	ptr = bf_malloc(1);
     if (ptr == NULL)
 	xmem_error("xmalloc"); 
     return ptr;
@@ -32,6 +30,6 @@ xmalloc(size_t size){
 void
 xfree(void *ptr){
     if (ptr)
-	free(ptr);
+	bf_free(ptr);
 }
 
