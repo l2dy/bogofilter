@@ -176,7 +176,7 @@ void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
     if (setup_wordlists(NULL, PR_ENV_HOME) != 0)
 	exit(2);
 
-    stats_prefix= stats_in_header ? "\t" : "#   ";
+    stats_prefix= stats_in_header ? "  " : "# ";
 
     if (DEBUG_CONFIG(0))
 	fprintf(dbgout, "stats_prefix: '%s'\n", stats_prefix);
