@@ -10,8 +10,10 @@
 #include "datastore.h"
 #include "collect.h"
 #include "format.h"
+#include "maint.h"			/* for today */
 #include "register.h"
 #include "wordhash.h"
+#include "wordlists.h"
 
 #define PLURAL(count) ((count == 1) ? "" : "s")
 
@@ -30,8 +32,10 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
 
   int wordcount = h->count;	/* use number of unique tokens */
 
+  dsv_t val;
+
   wordlist_t *list;
-  int incr = -1, decr = -1;
+  sh_t incr = IX_UNDF, decr = IX_UNDF;
 
   /* If update directory explicity supplied, setup the wordlists. */
   if (update_dir) {
@@ -39,10 +43,10 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
 	  exit(EX_ERROR);
   }
 
-  if (_run_type & REG_SPAM)	{ r = "s"; incr = SPAM; }
-  if (_run_type & REG_GOOD)	{ r = "n"; incr = GOOD; }
-  if (_run_type & UNREG_SPAM)	{ u = "S"; decr = SPAM; }
-  if (_run_type & UNREG_GOOD)	{ u = "N"; decr = GOOD; }
+  if (_run_type & REG_SPAM)	{ r = "s"; incr = IX_SPAM; }
+  if (_run_type & REG_GOOD)	{ r = "n"; incr = IX_GOOD; }
+  if (_run_type & UNREG_SPAM)	{ u = "S"; decr = IX_SPAM; }
+  if (_run_type & UNREG_GOOD)	{ u = "N"; decr = IX_GOOD; }
 
   if (wordcount == 0)
       msgcount = 0;
@@ -57,53 +61,53 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
   set_list_active_status(false);
 */
 
-  for (node = wordhash_first(h); node != NULL; node = wordhash_next(h)){
+  for (node = wordhash_first(h); node != NULL; node = wordhash_next(h))
+  {
       wordprop = node->buf;
-      if (incr >= 0) {
-	  dbv_t val;
-	  val.goodcount = val.spamcount = val.date = 0;
-	  val.count[incr] = wordprop->freq;
-	  db_increment(word_list->dbh, node->key, &val);
+      ds_read(word_list->dsh, node->key, &val);
+      if (incr != IX_UNDF) {
+	  uint32_t *counts = val.count;
+	  counts[incr] += wordprop->freq;
       }
-      if (decr >= 0) {
-	  dbv_t val;
-	  val.goodcount = val.spamcount = val.date = 0;
-	  val.count[decr] = wordprop->freq;
-	  db_decrement(word_list->dbh, node->key, &val);
+      if (decr != IX_UNDF) {
+	  uint32_t *counts = val.count;
+	  counts[decr] = ((long)counts[decr] < wordprop->freq) ? 0 : counts[decr] - wordprop->freq;
       }
+      ds_write(word_list->dsh, node->key, &val);
   }
 
-  for (list = word_lists; list != NULL; list = list->next){
-      dbv_t val;
+  for (list = word_lists; list != NULL; list = list->next)
+  {
 
 /*
       if (!list->active)
 	  continue;
 */
 
-      db_get_msgcounts(list->dbh, &val);
-      list->msgcount[SPAM] = val.spamcount;
-      list->msgcount[GOOD] = val.goodcount;
+      ds_get_msgcounts(list->dsh, &val);
+      list->msgcount[IX_SPAM] = val.spamcount;
+      list->msgcount[IX_GOOD] = val.goodcount;
 
-      if (incr >= 0)
+      if (incr != IX_UNDF)
 	  list->msgcount[incr] += msgcount;
       
-      if (decr >= 0) {
+      if (decr != IX_UNDF) {
 	  if (list->msgcount[decr] > msgcount)
 	      list->msgcount[decr] -= msgcount;
 	  else
 	      list->msgcount[decr] = 0;
       }
 
-      val.spamcount = list->msgcount[SPAM];
-      val.goodcount = list->msgcount[GOOD];
+      val.spamcount = list->msgcount[IX_SPAM];
+      val.goodcount = list->msgcount[IX_GOOD];
 
-      db_set_msgcounts(list->dbh, &val);
+      ds_set_msgcounts(list->dsh, &val);
 
-      db_flush(list->dbh);
+      ds_flush(list->dsh);
+
       if (verbose>1)
 	  (void)fprintf(stderr, "bogofilter: list %s - %ld spam, %ld good\n",
-			list->filename, list->msgcount[SPAM], list->msgcount[GOOD]);
+			list->filename, list->msgcount[IX_SPAM], list->msgcount[IX_GOOD]);
   }
 }
 

@@ -25,7 +25,7 @@ char	msg_count_chars[MSG_COUNT_MAX_LEN];
 int	msg_count_leng = MSG_COUNT_MAX_LEN;
 char   *msg_count_text = msg_count_chars;
 
-const char *msg_count_header = "\".MSG_COUNT\"";
+const char *msg_count_header = "\"" MSG_COUNT "\"";
 size_t	    msg_count_header_len = 0;
 
 long	msgs_good = 0L;
@@ -64,8 +64,8 @@ void compute_msg_counts()
 
     for(list=word_lists; list != NULL; list=list->next)
     {
-	msgs_bad  += list->msgcount[SPAM];
-	msgs_good += list->msgcount[GOOD];
+	msgs_bad  += list->msgcount[IX_SPAM];
+	msgs_good += list->msgcount[IX_GOOD];
     }
 }
 

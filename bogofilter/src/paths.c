@@ -7,12 +7,11 @@ NAME:
 
 ******************************************************************************/
 
+#include "common.h"
+
 #include <errno.h>
 #include <sys/stat.h>
 #include <stdlib.h>
-
-#include <config.h>
-#include "common.h"
 
 #include "paths.h"
 #include "xmalloc.h"
