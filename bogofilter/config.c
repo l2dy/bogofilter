@@ -386,17 +386,19 @@ static int validate_args(void)
     
     if (registration && classification)
     {
-	(void)fprintf(stderr, "Error:  Invalid combination of options.\n");
-	(void)fprintf(stderr, "\n");
-	(void)fprintf(stderr, "    Options '-s', '-n', '-S', and '-N' are used when registering words.\n");
-	(void)fprintf(stderr, "    Options '-p', '-u', '-e', and '-R' are used when classifying messages.\n");
-	(void)fprintf(stderr, "    The two sets of options may not be used together.\n");
-	(void)fprintf(stderr, "    \n");
+	(void)fprintf(stderr, 
+		      "Error:  Invalid combination of options.\n"
+		      "\n"
+		      "    Options '-s', '-n', '-S', and '-N' are used when registering words.\n"
+		      "    Options '-p', '-u', '-e', and '-R' are used when classifying messages.\n"
+		      "    The two sets of options may not be used together.\n"
+		      "    \n"
 #ifdef	GRAHAM_AND_ROBINSON
-	(void)fprintf(stderr, "    Options '-g', '-r', '-l', '-d', '-x', and '-v' may be used with either mode.\n");
+		      "    Options '-g', '-r', '-l', '-d', '-x', and '-v' may be used with either mode.\n"
 #else
-	(void)fprintf(stderr, "    Options '-l', '-d', '-x', and '-v' may be used with either mode.\n");
+		      "    Options '-l', '-d', '-x', and '-v' may be used with either mode.\n"
 #endif
+	    );
 	return 2;
     }
 
@@ -405,55 +407,61 @@ static int validate_args(void)
 
 static void help(void)
 {
-    (void)printf( "\n" );
-    (void)printf( "Usage: bogofilter [options] < message\n" );
-    (void)printf( "\t-h\t- print this help message.\n" );
-    (void)printf( "\t-d path\t- specify directory for wordlists.\n" );
+    (void)fprintf(stderr,
+		  "\n"
+		  "Usage: %s [options] < message\n"
+		  "\t-h\t- print this help message.\n"
+		  "\t-d path\t- specify directory for wordlists.\n"
 #ifdef	GRAHAM_AND_ROBINSON
 #ifdef	ENABLE_GRAHAM_METHOD
-    (void)printf( "\t-g\t- select Graham spam calculation method.\n" );
+		  "\t-g\t- select Graham spam calculation method.\n"
 #endif
 #ifdef	ENABLE_ROBINSON_METHOD
-    (void)printf( "\t-r\t- select Robinson spam calculation method (default).\n" );
+		  "\t-r\t- select Robinson spam calculation method (default).\n"
 #endif
 #ifdef	ENABLE_ROBINSON_FISHER
-    (void)printf( "\t-f\t- select Fisher spam calculation method.\n" );
+		  "\t-f\t- select Fisher spam calculation method.\n"
 #endif
 #endif
-    (void)printf( "\t-p\t- passthrough.\n" );
-    (void)printf( "\t-O filename\t- save message to filename in passthrough mode.\n" );
-    (void)printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
-    (void)printf( "\t-s\t- register message as spam.\n" );
-    (void)printf( "\t-n\t- register message as non-spam.\n" );
-    (void)printf( "\t-o cutoff\t- set user defined spamicity cutoff.\n" );
-    (void)printf( "\t-u\t- classify message as spam or non-spam and register appropriately.\n" );
-    (void)printf( "\t-S\t- move message's words from non-spam list to spam list.\n" );
-    (void)printf( "\t-N\t- move message's words from spam list to spam non-list.\n" );
-    (void)printf( "\t-R\t- print an R data frame.\n" );
-    (void)printf( "\t-v\t- set debug verbosity level.\n" );
-    (void)printf( "\t-x LIST\t- set debug flags.\n" );
-    (void)printf( "\t-V\t- print version information and exit.\n" );
-    (void)printf( "\t-c filename\t- read config file 'filename'.\n" );
-    (void)printf( "\t-C\t- don't read standard config files.\n" );
-    (void)printf( "\t-q\t- quiet - don't print warning messages.\n" );
-    (void)printf( "\t-F\t- force printing of spamicity numbers.\n" );
-    (void)printf( "\n" );
-    (void)printf( "bogofilter is a tool for classifying email as spam or non-spam.\n" );
-    (void)printf( "\n" );
-    (void)printf( "For updates and additional information, see\n" );
-    (void)printf( "URL: http://bogofilter.sourceforge.net\n" );
-    (void)printf( "\n" );
+		  "\t-p\t- passthrough.\n"
+		  "\t-O filename\t- save message to filename in passthrough mode.\n"
+		  "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n"
+		  "\t-s\t- register message as spam.\n"
+		  "\t-n\t- register message as non-spam.\n"
+		  "\t-o cutoff\t- set user defined spamicity cutoff.\n"
+		  "\t-u\t- classify message as spam or non-spam and register appropriately.\n"
+		  "\t-S\t- move message's words from non-spam list to spam list.\n"
+		  "\t-N\t- move message's words from spam list to spam non-list.\n"
+		  "\t-R\t- print an R data frame.\n"
+		  "\t-v\t- set debug verbosity level.\n"
+		  "\t-x LIST\t- set debug flags.\n"
+		  "\t-V\t- print version information and exit.\n"
+		  "\t-c filename\t- read config file 'filename'.\n"
+		  "\t-C\t- don't read standard config files.\n"
+		  "\t-q\t- quiet - don't print warning messages.\n"
+		  "\t-F\t- force printing of spamicity numbers.\n"
+		  "\n"
+		  "bogofilter is a tool for classifying email as spam or non-spam.\n"
+		  "\n"
+		  "For updates and additional information, see\n"
+		  "URL: http://bogofilter.sourceforge.net\n"
+		  "\n", 
+		  PACKAGE );
 }
 
 static void print_version(void)
 {
-    (void)printf("\n%s version %s ", PACKAGE, version);
-    (void)printf("Copyright (C) 2002 Eric S. Raymond\n\n");
-    (void)printf("%s comes with ABSOLUTELY NO WARRANTY. ", PACKAGE);
-    (void)printf("This is free software, and you\nare welcome to ");
-    (void)printf("redistribute it under the General Public License. ");
-    (void)printf("See the\nCOPYING file with the source distribution for ");
-    (void)printf("details.\n\n");
+    (void)fprintf(stderr,
+		  "\n"
+		  "%s version %s\n"
+		  "Copyright (C) 2002 Eric S. Raymond\n\n"
+		  "%s comes with ABSOLUTELY NO WARRANTY. "
+		  "This is free software, and you\nare welcome to "
+		  "redistribute it under the General Public License. "
+		  "See the\nCOPYING file with the source distribution for "
+		  "details.\n"
+		  "\n", 
+		  PACKAGE, version, PACKAGE);
 }
 
 #ifndef	ENABLE_GRAHAM_METHOD
