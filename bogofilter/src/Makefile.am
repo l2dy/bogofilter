@@ -168,3 +168,4 @@ directories.c: ../config.status
 
 bogoupgrade: bogoupgrade.in
 	sed 's}[@]PERL@}$(PERL)}' <$(srcdir)/bogoupgrade.in >$@ || rm -f $@
+	chmod +x bogoupgrade
