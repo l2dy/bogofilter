@@ -19,9 +19,8 @@ AUTHOR:
 
 typedef struct {
     word_t t;
-    size_t pos;		/* read/write position  */
-    size_t read;	/* start of last read   */
-    size_t size;	/* capacity   */
+    size_t read;	/* start of last read */
+    size_t size;	/* capacity */
 } buff_t;
 
 extern buff_t  *buff_new(byte *buff, size_t used, size_t size);
