@@ -365,7 +365,7 @@ static bool dir_next_mail(void)
 	    /* open next directory */
 	    if (mailstore_type == MS_MAILDIR) {
 		size_t siz;
-		
+
 		if (*maildir_sub == NULL)
 		    return false; /* IMPORTANT for termination */
 		siz = strlen(dir_name) + 4 + 1;
@@ -382,11 +382,17 @@ static bool dir_next_mail(void)
 		xfree(x);
 	}
 
-	while ((dirent = readdir(reader_dir)) != NULL) {
+	while ((errno = 0, dirent = readdir(reader_dir)) != NULL) {
 	    /* skip private files */
 	    if ((mailstore_type == MS_MAILDIR && dirent->d_name[0] != '.') ||
 		(mailstore_type == MS_MH && isdigit((unsigned char)dirent->d_name[0])))
 		break;
+	}
+
+	if (errno) {
+	    fprintf(stderr, "Cannot read directory %s: %s",
+		    dir_name, strerror(errno));
+	    exit(EX_ERROR);
 	}
 
 	if (dirent == NULL) {
