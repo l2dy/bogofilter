@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.4  2002/09/23 11:38:11  m-a
+ * Fix missing right paranthesis.
+ *
  * Revision 1.3  2002/09/23 11:31:53  m-a
  * Unnest comments, and move $ line down by one to prevent CVS from adding nested comments again.
  *
@@ -211,7 +214,7 @@ void alarm_signal_handler(int signum) {
 	#endif /* HAVE_SYSLOG_H */
 
 	#ifdef HAVE_SIGNAL_H
-	(void) (signal(SIGALRM, SIG_DFL); /* Put the default signal back */
+	(void) (signal(SIGALRM, SIG_DFL)); /* Put the default signal back */
 	#endif /* HAVE_SIGNAL_H */
 
 	/* Don't call return, so that the blocked operation is aborted */
