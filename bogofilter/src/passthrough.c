@@ -192,6 +192,9 @@ static bool write_header(rc_t status, readfunc_t rf, void *rfarg)
 	if (ferror(fpo)) cleanup_exit(2, 1);
     }
 
+    if (eol == NULL)	/* special treatment of empty input */
+	eol = NL;
+
     if (!hadlf)
 	(void)fputs(eol, fpo);
 
