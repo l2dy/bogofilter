@@ -24,7 +24,7 @@ typedef struct {
 extern word_t  *word_new(const byte *text, uint leng);
 
 /** create a new word_t from the NUL-terminated \a cstring */
-#define word_news(cstring) word_new((cstring), strlen((const char *)(cstring)));
+#define word_news(cstring) word_new(cstring, 0)
 
 /** deallocate memory allocated for \a self */
 extern void 	word_free(word_t *self);
