@@ -195,20 +195,11 @@ if test "$sysconfdir" = "\${prefix}/etc" \
     && test "$prefix" = "NONE" ; then
     if test "$( (uname -s) )" = "Linux" ; then
       sysconfdir=/etc
-      AC_MSG_WARN("detected Linux, overriding default --sysconfdir to /etc to match FHS 2.2")
     fi
     (
     prefix=$ac_default_prefix
     sysconfdir=`eval echo "$sysconfdir"`
-
-    AC_MSG_WARN([
-
-    Your bogofilter configuration will be read from
-    $sysconfdir. If you want it in a different location,
-    re-run ./configure with an additional (for example)
-    --sysconfdir=/etc or --sysconfdir=/usr/local/etc
-    argument now.
-    ])
+    AC_MSG_NOTICE([configuration directory is "$sysconfdir". Use --sysconfdir to override.])
     )
 fi
 
