@@ -72,13 +72,13 @@ AUTHOR:
 #define	PREF_COUNT	4000	/* preferred message count         */
 #define	LARGE_COUNT	40000
 
-#define	MIN_THR_PCT	0.0017	/* minimum threshold percent */
+#define	MIN_THR_PCT	0.0015	/* minimum threshold percent */
 #define	MAX_THR_PCT	0.0050	/* maximum threshold percent */
 
 #define	HAM_CUTOFF	0.10
 #define	MIN_CUTOFF	0.55	/* minimum cutoff for set_thresh() */
 #define	MAX_CUTOFF	0.99	/* maximum cutoff for set_thresh() */
-#define	SPAM_CUTOFF	0.95
+#define	SPAM_CUTOFF	0.975
 #define FP_CUTOFF	0.999
 
 /* bogotune's default parameters */
@@ -785,13 +785,16 @@ static void load_wordlist(ds_foreach_t *hook, void *userdata)
 	return;
     }
 
+    db_cachesize = ceil(sb.st_size / 3.0 / 1024.0 / 1024.0);
+    if (verbose>2)
+	printf("st_size: %d, cache: %d\n", (int) sb.st_size, db_cachesize);
+
     if (verbose) {
 	printf("Reading %s\n", path);
 	fflush(stdout);
     }
 
     ds_oper(path, DB_READ, hook, userdata);
-    db_cachesize = ceil(sb.st_size / 3.0 / 1024.0 / 1024.0);
 
     xfree(path);
 
@@ -850,7 +853,7 @@ static void top_ten(result_t *sorted)
 
     for (i = 0; i < 10; i += 1) {
 	result_t *r = &sorted[i];
-	printf("%3d  %6.4f %5.3f %5.3f %6.4f %3d %3d  %6.4f  %6.4f\n",
+	printf("%3d  %6.4f %5.3f %5.3f %6.4f  %3d %3d  %0.4g %0.4g\n",
 	       r->idx,
 	       r->rs, r->md, r->rx, r->co, 
 	       r->fp, r->fn, r->fp*100.0/ns_cnt, r->fn*100.0/sp_cnt);
