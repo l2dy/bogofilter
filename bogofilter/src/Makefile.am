@@ -167,6 +167,7 @@ fgetsl_test_CFLAGS= -DMAIN
 
 # what to distribute
 EXTRA_DIST = \
+	     bogolex.sh \
 	     bogoupgrade.in \
 	     version.sh \
 	     strlcat.3 strlcpy.3

@@ -537,6 +537,5 @@ AC_CONFIG_FILES([Makefile \
 		contrib/Makefile doc/Makefile \
 		src/Makefile \
 		src/tests/Makefile \
-		tuning/Makefile \
 		])
 AC_OUTPUT
