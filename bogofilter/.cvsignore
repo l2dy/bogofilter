@@ -26,3 +26,4 @@ mkinstalldirs
 ylwrap
 ChangeLog
 .rsyncs
+build*
