@@ -40,6 +40,7 @@ AUTHOR:
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
+#include "format.h"
 
 #ifndef	DEBUG_CONFIG
 #define DEBUG_CONFIG(level)	(verbose > level)
@@ -67,7 +68,6 @@ static bool suppress_config_file = false;
 
 char directory[PATH_LEN + 100] = "";
 const char *user_config_file   = "~/.bogofilter.cf";
-const char *spam_header_name = SPAM_HEADER_NAME;
 
 bool	stats_in_header = true;
 const	char *stats_prefix;
@@ -98,7 +98,7 @@ enum algorithm_e {
 
 static enum algorithm_e algorithm = AL_DEFAULT;
 
-double	spam_cutoff;
+double	spam_cutoff = 0.0;	/* set during method initialization */
 double	min_dev = 0.0f;
 
 double	thresh_stats = 0.0f;
@@ -120,7 +120,6 @@ static bool select_algorithm(const unsigned char *s);
 static const parm_desc sys_parms[] =
 {
     { "stats_in_header",  CP_BOOLEAN,	{ (void *) &stats_in_header } },
-    { "spam_header_name", CP_STRING,	{ &spam_header_name } },
     { "user_config_file", CP_STRING,	{ &user_config_file } },
 
     { "algorithm",  	  CP_FUNCTION,	{ (void *) &select_algorithm } },
@@ -136,6 +135,9 @@ static const parm_desc sys_parms[] =
     { "thresh_rtable",	  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
     { "robx",		  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
     { "robs",		  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
+#endif
+#ifdef ENABLE_ROBINSON_FISHER
+    { "ham_cutoff",	  CP_FUNCTION,	{ (void *) NULL } }, /* Robinson-Fisher */
 #endif
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
@@ -321,7 +323,8 @@ static void read_config_file(const char *fname, bool tilde_expand)
 	    buff[--len] = '\0';
 
 	if ( ! process_config_line( buff, usr_parms ) &&
-	     ! process_config_line( buff, sys_parms ))
+	     ! process_config_line( buff, sys_parms ) &&
+	     ! process_config_line( buff, format_parms ))
 	{
 	    error = true;
 	    if (!quiet)
