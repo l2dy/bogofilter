@@ -425,7 +425,7 @@ static void print_version(void)
     (void)fprintf(stderr,
 		  "%s version %s\n"
 		  "    Database: %s\n"
-		  "Copyright (C) 2002-2004 Gyepi Sam, David Relson\n\n"
+		  "Copyright (C) 2002-2004 Gyepi Sam, David Relson, Matthias Andree\n\n"
 		  "%s comes with ABSOLUTELY NO WARRANTY.  "
 		  "This is free software, and\nyou are welcome to "
 		  "redistribute it under the General Public License.  "
@@ -437,8 +437,13 @@ static void print_version(void)
 
 static void usage(void)
 {
+#ifndef	ENABLE_TRANSACTIONS
+    fprintf(stderr, "Usage: %s { -d | -l | -w | -p } file%s | { -r | -R | -f | -F } directory | [ -v | -h | -V ]\n", 
+	    progname, DB_EXT);
+#else
     fprintf(stderr, "Usage: %s { -d | -l | -w | -p } file%s | { -r | -R | -f | -F | -P } directory | [ -v | -h | -V ]\n", 
 	    progname, DB_EXT);
+#endif
 }
 
 static void help(void)
@@ -449,7 +454,9 @@ static void help(void)
 	    "\t-h\tPrint this message.\n"
 	    "\t-f dir\tRun recovery on data base in dir.\n"
 	    "\t-F dir\tRun catastrophic recovery on data base in dir.\n"
+#ifdef	ENABLE_TRANSACTIONS
 	    "\t-P dir\tRemove inactive log files in dir.\n"
+#endif
 	    "\t-d file\tDump data from file to stdout.\n"
 	    "\t-l file\tLoad data from stdin into file.\n"
 	    "\t-u file\tUpgrade wordlist version.\n"
@@ -490,8 +497,10 @@ static cmd_t flag = M_NONE;
 
 #define	OPTIONS	":a:c:d:Df:F:hH:I:k:l:m:np:P:r:R:s:u:vVw:x:X:y:"
 
+#ifdef	ENABLE_TRANSACTIONS
 static int remenv = 0;	/** if set, run recovery and remove the environment */
 static char *remedir;	/** environment to remove */
+#endif
 
 struct option long_options[] = {
 #ifdef	HAVE_DECL_DB_CREATE
@@ -506,7 +515,9 @@ struct option long_options[] = {
     { "debug-to-stdout",		N, 0, 'D' },
     { "verbosity",			N, 0, 'v' },
     /* no short option for safety */
+#ifdef	ENABLE_TRANSACTIONS
     { "remove-environment",		R, &remenv, O_REMOVE_ENVIRONMENT },
+#endif
     /* The following options are present to allow config files
     ** to be read without complaints (and mostly ignored)
     */
@@ -573,8 +584,13 @@ static int process_arglist(int argc, char **argv)
 
     if (count != 1)
     {
+#ifndef	ENABLE_TRANSACTIONS
+	fprintf(stderr, "%s: Exactly one of the -d, -f, -F, -l, -R or -w flags "
+		"must be present.\n", progname);
+#else
 	fprintf(stderr, "%s: Exactly one of the -d, -f, -F, -P, -l, -R or -w flags "
 		"must be present.\n", progname);
+#endif
 	exit(EX_ERROR);
     }
 
@@ -766,6 +782,7 @@ static int process_arg(int option, const char *name, const char *val, int option
     case 0:
 	/* long option with no short option correspondence */
 	switch (long_options[option_index].val) {
+#ifdef	ENABLE_TRANSACTIONS
 	    case O_REMOVE_ENVIRONMENT:
 		if (remedir) {
 		    fprintf(stderr, "can remove only one environment\n");
@@ -774,6 +791,7 @@ static int process_arg(int option, const char *name, const char *val, int option
 		remedir = xstrdup(optarg);
 		count += 1;
 		break;
+#endif
 	    default:
 		abort();
 	}
@@ -795,12 +813,14 @@ int main(int argc, char *argv[])
 
     process_arglist(argc, argv);
 
+#ifdef	ENABLE_TRANSACTIONS
     /* process long option arguments first */
     if (remenv) {
 	/* remove environment */
 	rc = ds_remove(remedir);
 	exit(rc);
     }
+#endif
 
     /* Extra or missing parameters */
     if (flag != M_WORD && argc != optind) {
@@ -817,9 +837,11 @@ int main(int argc, char *argv[])
 	case M_CRECOVER:
 	    rc = ds_recover(ds_file, true);
 	    break;
+#ifdef	ENABLE_TRANSACTIONS
 	case M_PURGELOGS:
 	    rc = ds_purgelogs(ds_file);
 	    break;
+#endif
 	case M_DUMP:
 	    rc = dump_wordlist(ds_file);
 	    break;

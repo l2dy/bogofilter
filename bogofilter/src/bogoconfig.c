@@ -384,7 +384,7 @@ static void print_version(void)
 		  "%s version %s\n"
 		  "    Database: %s\n"
 		  "Copyright (C) 2002-2004 Eric S. Raymond,\n"
-		  "David Relson, Matthias Andree, Greg Louis\n\n"
+		  "    David Relson, Matthias Andree, Greg Louis\n\n"
 		  "%s comes with ABSOLUTELY NO WARRANTY.  "
 		  "This is free software, and\nyou are welcome to "
 		  "redistribute it under the General Public License.  "
