@@ -196,9 +196,10 @@ information, one should not combine the -R and -v options.)</para>
 	<filename>$BOGOFILTER_DIR</filename> if <envar>BOGOFILTER_DIR</envar> is set.
 	If it is unset, bogofilter
 	will use <filename>$HOME/.bogofilter</filename> instead. If both
-	<envar>BOGOFILTER_DIR</envar> and
+	the
+	<envar>BOGOFILTER_DIR</envar> and the
 	<envar>HOME</envar> variables are unset, the <option>-d
-	    <replaceable>dir</replaceable></option> becomes mandatory.
+	    <replaceable>dir</replaceable></option> option becomes mandatory.
 </para></refsect1>
 
 <refsect1 id='integration'><title>INTEGRATION WITH OTHER TOOLS</title>
