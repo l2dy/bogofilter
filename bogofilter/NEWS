@@ -8,6 +8,18 @@ is in the RELEASE.NOTES files!
 
 $Id$
 
+	2003-08-28
+
+	* Revise mime processing to cure "fatal flex scanner internal
+	  error--end of buffer missed".
+	* Restore parsing rule for ending a "loose" html comment.
+
+	2003-08-26
+
+	* Change mime boundary line to operate on raw input,
+	  i.e. before decoding it.
+	* Add charset map for windows-1251 to KOI8-R (Cyrillic).
+
 	2003-08-24
 
 	* Fix some printf calls for 64-bit machines (%*s).
@@ -596,8 +608,8 @@ $Id$
 	* Increase MAXTOKENLEN from 20 to 30, allowing more and longer tokens
 	  to be processed.
 	* New options for setting of default charset and replacing of non-ASCII
-	   characters.	New character set handling routines to provide charset 
-	   specific token parsing.
+	  characters.	New character set handling routines to provide charset 
+	  specific token parsing.
 	* New error handling routine will output error messages to stderr and,
 	  if '-l' (logging) is enabled, to syslog.
 	* New message formatting capability allows formats to be put in config

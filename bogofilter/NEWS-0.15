@@ -2,6 +2,18 @@
 				BOGOFILTER NEWS
 			       =================
  
+2003-08-28
+
+* Revise mime processing to cure "fatal flex scanner internal
+  error--end of buffer missed".
+* Restore parsing rule for ending a "loose" html comment.
+
+2003-08-26
+
+* Change mime boundary line to operate on raw input,
+  i.e. before decoding it.
+* Add charset map for windows-1251 to KOI8-R (Cyrillic).
+
 2003-08-24
 
 * Implemented a new, more robust, mail reading module that knows how to
