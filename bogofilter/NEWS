@@ -22,6 +22,10 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-03-24
+
+	* When using SQLite3, retry opening the table when it is locked.
+
 	2005-03-23
 
 	* Fix --enable-iconv breaking with non-ASCII default charset.

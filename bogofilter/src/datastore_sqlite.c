@@ -177,7 +177,16 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
     bool loop, found;
     found = false;
     /* sqlite3_exec doesn't allow us to retrieve BLOBs */
-    rc = sqlite3_prepare(db, cmd, strlen(cmd), &stmt, &tail);
+    do {
+	rc = sqlite3_prepare(db, cmd, strlen(cmd), &stmt, &tail);
+	if (rc == SQLITE_LOCKED) {
+	    if (stmt)
+		sqlite3_finalize(stmt);
+	    if (DEBUG_DATABASE(2))
+		fprintf(dbgout, "database locked, sleeping and retrying...\n");
+	    rand_sleep(1000, 100000);
+	}
+    } while (rc == SQLITE_LOCKED);
     if (rc) {
 	print_error(__FILE__, __LINE__,
 		"Error preparing \"%s\": %s (#%d)\n",
