@@ -198,8 +198,6 @@
 #### Auto-update threshold
 #
 #	Skip autoupdating if the spamicity is within this value
-#	of 0.000000 (surely ham) or 1.000000 (surely spam) in
-#	order to reduce over-sensitivity to common tokens and
-#	to minimize overall wordlist size.
+#	of 0.000000 (surely ham) or 1.000000 (surely spam).
 #
 ## thresh_update=0.01
