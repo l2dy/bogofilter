@@ -74,7 +74,7 @@ static int print_histogram(rhistogram_t *hist)
     uint i, r;
     uint maxcnt = 0;
 
-    (void)printf(" %3s %8s  %3s  %s\n", "sco", "count", "pct", "histogram");
+    (void)printf("%5s%8s  %3s  %s\n", "score", "count", "pct", "histogram");
 
     for (i=0; i<INTERVALS; i+=1)
     {
