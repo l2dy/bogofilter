@@ -300,9 +300,9 @@ int main(int argc, char **argv)
     if (!passthrough)
     {
 	if (quiet)
-	    fprintf(fpo, "quiet mode.");
+	    fprintf(fpo, "quiet mode.\n");
 	else
-	    fprintf(fpo, "normal mode.");
+	    fprintf(fpo, "normal mode.\n");
     }
 
     bogoreader_init(argc, argv);
