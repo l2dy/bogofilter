@@ -188,7 +188,7 @@ void write_message(rc_t status)
 	    fputc('\n', fpo);
     }
 
-    if (passthrough || verbose) {
+    if (passthrough || verbose || terse) {
 	typedef char *formatter(char *buff, size_t size);
 	formatter *fcn = terse ? format_terse : format_header;
 	char buff[256];
