@@ -18,6 +18,7 @@
 #include "lexer.h"
 #include "xmalloc.h"
 
+#define	URL_TOKENS
 #undef	URL_TOKENS
 
 /*
@@ -335,22 +336,24 @@ token_t get_token(void)
     unsigned char *cp, *t;
 
 #ifdef	URL_TOKENS
-    static token_t alt_tok = NONE;
-    static char alt_text[MAXTOKENLEN];
+    static token_t save_class = NONE;
+    static char save_text[MAXTOKENLEN];
 #endif
 
 #ifdef	URL_TOKENS
     /* If saved IPADDR, truncate last octet */
-    if ( alt_tok == IPADDR )
+    if ( save_class == IPADDR )
     {
-	char *dot = strrchr(alt_text, '.');
-	if (dot == NULL)
-	    alt_tok = NONE;
+	yylval = save_text;
+	t = strrchr(yylval, '.');
+	if (t == NULL)
+	    save_class = NONE;
 	else
 	{
-	    *dot = '\0';	
-	    yylval = alt_text;
-	    return IPADDR;
+	    *t = '\0';	
+	    yylval = yytext;
+	    yyleng = strlcpy( yytext, save_text, MAXWORDLEN );
+	    return save_class;
 	}
     }
 #endif
@@ -371,12 +374,12 @@ token_t get_token(void)
 	{
 	    const char *prefix="url:";
 	    size_t len = strlen(prefix);
-	    size_t avl = sizeof(alt_text);
-	    avl -= strlcpy( alt_text, "url:", avl);
-	    strlcpy( alt_text+len, yytext, avl);
-	    yylval = alt_text;
-	    alt_tok = IPADDR;
-	    return class;
+	    size_t avl = sizeof(save_text);
+	    yylval = save_text;
+	    save_class = class;
+	    avl -= strlcpy( yylval, "url:", avl);
+	    yyleng = strlcpy( yylval+len, yytext, avl);
+	    return (class);
 	}
 #endif
 
