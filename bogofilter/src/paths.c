@@ -166,6 +166,18 @@ char *get_directory(priority_t which)
     return dir;
 }
 
+char *get_file_from_path(const char *path)
+{
+    char *file;
+
+    file = strrchr(path, DIRSEP_C);
+    if (file == NULL)
+	file = xstrdup(path);
+    else
+	file = xstrdup(file + 1);
+    return file;
+}
+
 char *get_directory_from_path(const char *path)
 {
     char *dir = xstrdup(path);

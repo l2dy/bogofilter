@@ -836,14 +836,17 @@ int main(int argc, char *argv[])
 	case M_PAGESIZE:
 	    {
 		u_int32_t s;
-		ds_minit(bogohome, ds_file);
-		s = ds_pagesize(bogohome, ds_file);
+		char *f;
+		f = get_file_from_path(ds_file);
+		ds_minit(bogohome, f);
+		s = ds_pagesize(bogohome, f);
 		if (s == 0xffffffff)
 		    fprintf(stderr, "%s: error getting page size.\n", ds_file);
 		else if (s == 0)
 		    printf("UNKNOWN\n");
 		else
 		    printf("%lu\n", (unsigned long)s);
+		xfree(f);
 	    }
 	    break;
 	case M_DUMP:
