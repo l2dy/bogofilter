@@ -22,6 +22,10 @@
 #define	MIN_SLEEP	0.5e+3		/* 0.5 milliseconds */
 #define	MAX_SLEEP	2.0e+6		/* 2.0 seconds */
 
+#ifndef	RAND_MAX
+#define	RAND_MAX	2147483647	/* May not work on SysV */
+#endif
+
 /* Function Prototypes */
 
 static void rand_sleep(double min, double max);
