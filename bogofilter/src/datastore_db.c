@@ -253,6 +253,8 @@ uint32_t db_getvalue(void *vhandle, const word_t *word){
       fprintf(dbgout, "] has value %lu\n",
 	      (unsigned long)value);
     }
+    if ((int)value < 0)
+	value = 0;
     return value;
   } else {
     return 0;
