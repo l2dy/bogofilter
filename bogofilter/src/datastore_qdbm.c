@@ -216,14 +216,6 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
 	exit(EX_ERROR);
     }
 
-    /* re-organize DB when fill ratio > DB_MAXLOAD */
-    bnum = dpbnum(dbp);
-    rnum = dprnum(dbp);
-    if (bnum > 0 && rnum > 0 && ((double)rnum / (double)bnum > DB_MAXLOAD)) {
-        if (!dpoptimize(dbp, -1))
-            return -1;
-    }
-
     return 0;
 }
 
@@ -242,7 +234,22 @@ void db_close(void *vhandle, bool nosync)
     }
 
     for (i = 0; i < handle->count; i += 1) {
-        dpclose(handle->dbp[i]);
+	DEPOT *dbp = handle->dbp[i];
+
+	/* re-organize DB when fill ratio > DB_MAXLOAD */
+	bnum = dpbnum(dbp);
+	rnum = dprnum(dbp);
+	if (bnum > 0 && rnum > 0 && ((double)rnum / (double)bnum > DB_MAXLOAD))
+	{
+	    if (!dpoptimize(dbp, -1))
+		print_error(__FILE__, __LINE__, "(qdbm) dpoptimize for %s failed: %s",
+			handle->name[i], dperrmsg(dpecode));
+	}
+
+	if (!dpclose(dbp))
+		print_error(__FILE__, __LINE__, "(qdbm) dpclose for %s failed: %s",
+			handle->name[i], dperrmsg(dpecode));
+	handle->dbp[i] = NULL;
     }
 
     dbh_free(handle);
