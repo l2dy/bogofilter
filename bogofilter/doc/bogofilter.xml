@@ -22,7 +22,8 @@
   <arg choice='opt'>-d <replaceable>dir</replaceable></arg>
   <arg choice='opt'>-l</arg>
   <arg choice='opt'>-L <replaceable>tag</replaceable></arg>
-  <arg choice='opt'>-m <replaceable>value</replaceable></arg>
+  <arg choice='opt'>-m <replaceable>><optional>value</optional>
+      <optional>,value</optional></replaceable></arg>
   <arg choice='opt'>-o <replaceable><optional>value</optional>
       <optional>,value</optional></replaceable></arg>
   <arg choice='opt'>-p</arg>
@@ -169,7 +170,15 @@ ham_cutoff is non-zereo.</para>
     format that includes the %l string for now.  This option implies
     <option>-l</option>.</para>
 
-<para>The <option>-m <replaceable>value</replaceable></option> option allows setting min_dev.
+<para>The <option>-m 
+	<replaceable><optional>value</optional><optional>,value</optional></replaceable></option>
+      option allows setting the min_dev value and, optionally, the
+      robs value.  If one value is supplied, then min_dev is
+      set.  If a comma followed by one value is supplied, then robs
+      is set.  With two values, both min_dev and robs are set.  Note the
+      syntax is misleading, at least one of the values MUST be present,
+      and the comma determines whether it is to set the spam or the ham
+      cutoff.  Note: spaces are not allowed after the comma.
 </para>
 
 <para>The <option>-o
