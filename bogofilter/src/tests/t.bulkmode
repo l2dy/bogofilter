@@ -120,10 +120,9 @@ for f in $pattern ; do
     map_rc "$BOGOLEX_SH -c $CFG -I $f >> ${TMPDIR}/test.bl"
 done
 
-map_rc $BOGOFILTER < ${TMPDIR}/test.bl > ${TMPDIR}/$NAME.out
+map_rc $BOGOFILTER -M < ${TMPDIR}/test.bl > ${TMPDIR}/$NAME.out
 
 [ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
-
 
 CORRECT="${OUTPUTS}/bulkmode.out"
 
