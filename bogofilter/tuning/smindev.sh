@@ -112,8 +112,8 @@ function doit () {
 	$date $s $md  $fpos $co $fneg1 $fneg2 $fneg3 $fneg >> $RESULTS
 }
 
-./sizes    > $PARM_TBL
-./sizes -h | tee $RESULTS
+./sizes | tee $RESULTS
+./sizes | grep mc > $PARM_TBL
 
 for s in $svals; do
   echo robs=$s >> $CFG
