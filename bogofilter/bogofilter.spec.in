@@ -152,6 +152,5 @@ done
 %doc .inst/html .inst/xml
 
 %{_datadir}/%{name}/contrib-static/*
-%{_datadir}/%{name}/tuning/*
 
 %changelog
