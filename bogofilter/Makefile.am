@@ -1,5 +1,8 @@
 # $Id$ 
 # $Log$
+# Revision 1.8  2002/09/18 20:56:43  m-a
+# Let automake deal with the lexer.
+#
 # Revision 1.7  2002/09/17 06:21:28  adrian_otto
 # Changed flex to $(LEX)
 #
@@ -27,21 +30,31 @@
 # Revision 1.1.1.1  2002/09/14 22:15:20  adrian_otto
 # 0.7.3 Base Source
 #
-bin_PROGRAMS = bogofilter lexertest
-bogofilter_SOURCES = bogofilter.c bogofilter.h lock.c lock.h main.c lexer_l.c
-lexertest_SOURCES =
-lexertest_LDADD = lexertest.o
+
+# foreign: don't insist on ChangeLog
+# 1.6: minimum version
+AUTOMAKE_OPTIONS = foreign 1.6
+
+# what to build
+bin_PROGRAMS = bogofilter
+noinst_PROGRAMS = lexertest
 man1_MANS = bogofilter.1
-EXTRA_DIST = $(man1_MANS)
+
+# what to build that from
+bogofilter_SOURCES = bogofilter.c bogofilter.h lock.c lock.h main.c lexer_l.l
+
+lexertest_SOURCES = lexer_l.l
+lexertest_CFLAGS = -DMAIN
+
+# what to distribute
+EXTRA_DIST = $(man1_MANS) \
+	     bogofilter.xml \
+	     bogofilter.spec bogofilter.spec.in
+	     
 #
-lexer_l.c: lexer_l.l
-	$(LEX) lexer_l.l
-#
-lexertest.o: lexer_l.c
-	$(COMPILE) -DMAIN -o lexertest.o -c lexer_l.c
-#
-mostlyclean-compile:
-	-rm -f *.$(OBJEXT) core *.core lexer_l.c
-#
-bogofilter.1: bogofilter.xml
-	xmlto man bogofilter.xml
+.xml.1:
+	xmlto man $<
+
+.PHONY: rpm
+rpm:	    dist $(distdir).tar.gz
+	rpm -ta $(distdir).tar.gz

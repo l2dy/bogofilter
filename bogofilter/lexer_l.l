@@ -1,8 +1,11 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.3  2002/09/16 18:58:14  m-a
- * Fix 'last line occasionally emitted twice' bug, cleaning up our yyinput().
+ * Revision 1.4  2002/09/18 20:56:43  m-a
+ * Let automake deal with the lexer.
  *
+/* Revision 1.3  2002/09/16 18:58:14  m-a
+/* Fix 'last line occasionally emitted twice' bug, cleaning up our yyinput().
+/*
 /* Revision 1.2  2002/09/15 15:52:24  relson
 /*
 /*
@@ -93,7 +96,6 @@ int yyinput(buf, max_size)
 %}
 
 %option full align nounput noyywrap noreject 8bit
-%option outfile="lexer_l.c"
 
 BASE64		[A-Za-z0-9/+]
 IPADDR		[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+
