@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 # testing framework for /bin/sh
 

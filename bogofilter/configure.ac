@@ -345,6 +345,14 @@ You can download BerkeleyDB 4.1.x from http://www.sleepycat.com/]]),
     ;;
 esac
 
+if test a$WITH_DB_ENGINE = a ; then
+    STATICDBFLAGS="-ldb"
+else
+    STATICDBFLAGS="-l$WITH_DB_ENGINE"
+fi
+
+AC_SUBST(STATICDBFLAGS)
+
 AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xtdb")
 AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
 

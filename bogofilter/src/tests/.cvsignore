@@ -2,6 +2,7 @@
 Makefile
 Makefile.in
 README
+t.frame
 abortme
 deb64
 dehex
