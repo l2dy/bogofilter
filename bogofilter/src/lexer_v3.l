@@ -144,7 +144,7 @@ TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}
 T12		[[:alpha:]][[:alnum:]]?
 TOKEN_12 	({TOKEN}|{T12})
 
-BASE64		[0-9a-zA-Z/+=]+
+BASE64		[[:alnum:]/+=]+
 QP		[!->@-~]+
 
 /*  RFC2047.2
