@@ -20,6 +20,7 @@ $Id$
 	  input is independent from the input format (such as mbox vs.
 	  Maildir).
 	* Bugfixed Maildir implementation to read cur/ and new/.
+	* Implement support for MH directory (such as used by Sylpheed).
 
 	2003-08-23
 
