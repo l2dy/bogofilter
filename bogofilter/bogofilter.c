@@ -66,7 +66,7 @@ extern char msg_register[];
 extern int Rtable;
 static double scalefactor;
 
-void initialize_constants();
+static void initialize_constants(void);
 
 static void wordprop_init(void *vwordprop){
 	wordprop_t *wordprop = vwordprop;
@@ -75,7 +75,7 @@ static void wordprop_init(void *vwordprop){
 	wordprop->msg_freq = 0;
 }
 
-void *collect_words(/*@unused@*/ int fd, /*@out@*/ int *message_count,
+static void *collect_words(/*@unused@*/ int fd, /*@out@*/ int *message_count,
 	/*@out@*/ int *word_count)
     // tokenize input text and save words in wordhash_t hash table
     // returns: the wordhash_t hash table.
@@ -130,7 +130,8 @@ void *collect_words(/*@unused@*/ int fd, /*@out@*/ int *message_count,
 }
 
 
-void register_words(run_t run_type, wordhash_t *h, int msgcount, int wordcount)
+static void register_words(run_t run_type, wordhash_t *h,
+	int msgcount, int wordcount)
 // tokenize text on stdin and register it to  a specified list
 // and possibly out of another list
 {
@@ -254,7 +255,7 @@ static bogostat_t bogostats;
 
 static double compute_spamicity(bogostat_t *bogostats, /*@null@*/ FILE *fp);
 
-int compare_extrema(const void *id1, const void *id2)
+static int compare_extrema(const void *id1, const void *id2)
 { 
     const discrim_t *d1 = id1;
     const discrim_t *d2 = id2;
@@ -262,7 +263,7 @@ int compare_extrema(const void *id1, const void *id2)
 	     ((d1->prob == d2->prob) && (strcmp(d1->key, d2->key) > 0)));
 }
 
-void init_bogostats(/*@out@*/ bogostat_t *bogostats)
+static void init_bogostats(/*@out@*/ bogostat_t *bogostats)
 {
     size_t idx;
 
@@ -274,7 +275,8 @@ void init_bogostats(/*@out@*/ bogostat_t *bogostats)
     }
 }
 
-void populate_bogostats(/*@out@*/ bogostat_t *bogostats, const char *text, double prob,
+static void populate_bogostats(/*@out@*/ bogostat_t *bogostats,
+	const char *text, double prob,
 	/*@unused@*/ int count)
 // if  the new word,prob pair is a better indicator.
 // add them to the bogostats structure, 
@@ -356,12 +358,12 @@ typedef struct {
     double bad;
 } wordprob_t;
 
-void wordprob_init(/*@out@*/ wordprob_t* wordstats)
+static void wordprob_init(/*@out@*/ wordprob_t* wordstats)
 {
     wordstats->good = wordstats->bad = 0.0;
 }
 
-void wordprob_add(wordprob_t* wordstats, double newprob, int bad)
+static void wordprob_add(wordprob_t* wordstats, double newprob, int bad)
 {
     if (bad)
 	wordstats->bad+=newprob;
@@ -369,7 +371,7 @@ void wordprob_add(wordprob_t* wordstats, double newprob, int bad)
 	wordstats->good+=newprob;
 }
 
-double wordprob_result(wordprob_t* wordstats)
+static double wordprob_result(wordprob_t* wordstats)
 {
     double prob;
     double count = wordstats->good + wordstats->bad;
@@ -390,7 +392,7 @@ double wordprob_result(wordprob_t* wordstats)
     return (prob);
 }
 
-double compute_scale()
+static double compute_scale(void)
 {
     wordlist_t* list;
     long goodmsgs=0L, badmsgs=0L;
@@ -409,7 +411,7 @@ double compute_scale()
 	return ((double)badmsgs / (double)goodmsgs);
 }
 
-double compute_probability( char *token )
+static double compute_probability(const char *token)
 {
     wordlist_t* list;
     int override=0;
@@ -548,7 +550,7 @@ static double compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errn
     return spamicity;
 }
 
-double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@*/
+static double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@*/
 // selects the best spam/nonspam indicators and
 // calculates Robinson's S
 {
@@ -601,7 +603,7 @@ double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@*/
     return (spamicity);
 }
 
-void initialize_constants()
+static void initialize_constants(void)
 {
     switch(algorithm) {
 	case AL_GRAHAM:
