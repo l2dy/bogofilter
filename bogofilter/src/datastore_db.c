@@ -49,7 +49,6 @@ static DB_ENV *dbe; /* libdb environment, if in use, NULL otherwise */
 static const DBTYPE dbtype = DB_BTREE;
 
 static bool init = false;
-bool create_flag = false;		/* For datastore.c (to add .WORDLIST_VERSION) */
 
 typedef struct {
     char	*path;
