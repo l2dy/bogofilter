@@ -21,6 +21,7 @@ NAME:
 #include "robinson.h"
 #include "rstats.h"
 #include "wordhash.h"
+#include "xmalloc.h"
 
 #define ROBINSON_MIN_DEV	0.0f	/* if nonzero, use characteristic words */
 #define ROBINSON_SPAM_CUTOFF	0.54f	/* if it's spammier than this... */
@@ -173,11 +174,9 @@ static double compute_probability(const char *token)
     return prob;
 }
 
-
 double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 /* selects the best spam/nonspam indicators and calculates Robinson's S */
 {
-    int count = 0;
     hashnode_t *node;
 
     FLOAT P = {1.0, 0};		/* Robinson's P */
@@ -185,8 +184,9 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 
     double spamicity;
     size_t robn = 0;
+    size_t count = 0;
 
-    fp = NULL; 	/* quench compiler warning */
+    (void) fp; 	/* quench compiler warning */
 
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### rob_compute_spamicity() begins\n");
 
@@ -207,10 +207,14 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
 				   min_dev, robs, robx);
 
+    wordhash_sort(wordhash);
+
     for(node = wordhash_first(wordhash); node != NULL; node = wordhash_next(wordhash))
     {
 	char *token = node->key;
 	double prob = compute_probability( token );
+
+	count += 1;
 
 	/* Robinson's P and Q; accumulation step */
         /*
@@ -231,6 +235,7 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 	    }
             robn ++;
         }
+
 	if (DEBUG_WORDLIST(3)) fprintf(dbgout, "%3lu %3lu %f %s\n",
 		(unsigned long)robn, (unsigned long)count, prob, token);
     }

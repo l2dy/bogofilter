@@ -153,11 +153,13 @@ void register_messages(run_t _run_type)
     if (DEBUG_REGISTER(1))
 	fprintf(dbgout, "Message #%ld\n", msgcount);
     collect_words(&h, &wordcount, &cont);
+    wordhash_sort(h);
     add_hash(words, h);
     wordhash_free(h);
     totalwords += wordcount;
   } while(cont);
 
+  wordhash_sort(words);
   register_words(_run_type, words, msgcount, totalwords);
   wordhash_free(words);
 }

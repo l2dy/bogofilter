@@ -36,11 +36,17 @@ typedef struct wordhash_s {
   /*@null@*/  /*@dependent@*/ hashnode_t *iter_head;
   /*@null@*/  /*@dependent@*/ hashnode_t *iter_tail;
 
+  /*@null@*/  /*@dependent@*/ size_t index;		/* access index */
+  /*@null@*/  /*@dependent@*/ size_t count;		/* size of array */
+  /*@null@*/  /*@dependent@*/ hashnode_t **order;	/* array of nodes */
+
 } wordhash_t;
 
 /*@only@*/ wordhash_t *wordhash_init(void);
 
 void wordhash_free(/*@only@*/ wordhash_t *);
+size_t wordhash_count(wordhash_t * h);
+void wordhash_sort(wordhash_t * h);
 
 /* Given h, s, n, search for key s.
  * If found, return pointer to associated buffer.

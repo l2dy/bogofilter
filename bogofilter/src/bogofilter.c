@@ -69,6 +69,8 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
 	++msgcount;
     } while(cont);
 
+    wordhash_sort(wordhash);
+
     spamicity = method->compute_spamicity(wordhash, NULL);
 
     status = method->status();

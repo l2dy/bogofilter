@@ -23,18 +23,16 @@ THEORY:
   traversal of hash table.
 */
 
-#ifdef MAIN
-#include <stdio.h>
-#endif
-
 #include <stdlib.h>
 #include <string.h>
 
 /* for offsetof */
 #include <stddef.h>
 
-#include "xmalloc.h"
+#include "common.h"
+
 #include "wordhash.h"
+#include "xmalloc.h"
 
 #define NHASH 29989
 #define MULT 31
@@ -64,6 +62,10 @@ wordhash_init (void)
   h->iter_ptr = NULL;
   h->iter_head = NULL;
   h->iter_tail = NULL;
+
+  h->index = 0;
+  h->count = 0;
+  h->order = NULL;
 
   return h;
 }
@@ -168,6 +170,7 @@ wordhash_insert (wordhash_t * h, char *s, size_t n, void (*initializer)(void *))
 	return p->buf;
       }
 
+  h->count += 1;
   p = nmalloc (h);
   p->buf = smalloc (h, n);
   if (initializer)
@@ -191,18 +194,65 @@ wordhash_insert (wordhash_t * h, char *s, size_t n, void (*initializer)(void *))
   return p->buf;
 }
 
+size_t wordhash_count (wordhash_t * h)
+{
+    return h->count;
+}
+
 hashnode_t *
 wordhash_first (wordhash_t * h)
 {
-  return(h->iter_ptr = h->iter_head);
+    hashnode_t *val = NULL;
+
+    if (h->order) {
+	val = h->order[h->index = 0];
+    }
+    else {
+	val = h->iter_ptr = h->iter_head;
+    }
+    return val;
 }
 
 hashnode_t *
 wordhash_next (wordhash_t * h)
 {
-  if (h->iter_ptr != NULL)
-    h->iter_ptr = h->iter_ptr->iter_next;
-   
-  return h->iter_ptr;
+    hashnode_t *val = NULL;
+
+    if (h->order) {
+	if (++h->index < h->count) {
+	    val = h->order[h->index];
+	}
+    }
+    else {
+	if (h->iter_ptr != NULL) {
+	    val = h->iter_ptr = h->iter_ptr->iter_next;
+	}
+    }
+    return val;
 }
 
+static int compare_hashnode_t(const void *const ihn1, const void *const ihn2)
+{
+    const hashnode_t *hn1 = *(const hashnode_t *const *)ihn1;
+    const hashnode_t *hn2 = *(const hashnode_t *const *)ihn2;
+    return strcmp(hn1->key, hn2->key);
+}
+
+void
+wordhash_sort (wordhash_t * h)
+{
+    hashnode_t *node;
+    hashnode_t **order;
+
+    if (h->count == 0 || h->order != NULL)
+	return;
+
+    order = (hashnode_t **) xcalloc(h->count, sizeof(hashnode_t *));
+
+    h->count = 0;
+    for(node = wordhash_first(h); node != NULL; node = wordhash_next(h))
+	order[h->count++] = node;
+
+    qsort(order, h->count, sizeof(hashnode_t *), compare_hashnode_t);
+    h->order = order;
+}

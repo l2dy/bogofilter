@@ -249,6 +249,8 @@ static bogostat_t *select_indicators(wordhash_t *wordhash)
 
     init_bogostats(&bogostats);
 
+    wordhash_sort(wordhash);
+
     for(node = wordhash_first(wordhash); node != NULL; node = wordhash_next(wordhash))
     {
 	char *token = node->key;
