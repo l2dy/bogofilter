@@ -78,7 +78,7 @@ static int dump_file(char *db_file)
 		    if (replace_nonascii_characters)
 			do_replace_nonascii_characters((byte *)key.data);
 		    if (data.size != 4 && data.size != 8)
-			PRINT_ERROR("Unknown data size - %d.\n", data.size);
+			print_error(__FILE__, __LINE__, "Unknown data size - %d.\n", data.size);
 		    if (data.size == 4 || val->date == 0)
 			printf("%.*s %lu\n", (int)key.size, (char *) key.data, val->count);
 		    else
@@ -105,7 +105,7 @@ static int load_file(char *db_file)
 {
     dbh_t *dbh;
     byte buf[BUFSIZE];
-    char *p;
+    unsigned char *p;
     int rv = 0;
     size_t len;
     long line = 0;
@@ -120,7 +120,7 @@ static int load_file(char *db_file)
 
     for (;;) {
 
-	if (fgets(buf, BUFSIZE, stdin) == NULL) {
+	if (fgets((char *)buf, BUFSIZE, stdin) == NULL) {
 	    if (ferror(stdin)) {
 		perror(PROGNAME);
 		rv = 2;
@@ -130,33 +130,33 @@ static int load_file(char *db_file)
 
 	line++;
 
-	len = strlen(buf);
+	len = strlen((char *)buf);
 
 	/* too short. */
 	if (len < 4)
 	    continue;
 
 	p = buf;
-	while ( *p != '\0' && !isspace(*p) )
+	while ( *p != '\0' && !isspace((unsigned char)*p) )
 	    ++p;
 
 	*p++ = '\0';	/* delimit token */
 
-	while ( *p != '\0' && isspace(*p) )	/* skip whitespace */
+	while ( *p != '\0' && isspace((unsigned char)*p) )	/* skip whitespace */
 	    ++p;
 
 	count = 0;
-	while (isdigit(*p))			/* parse count */
+	while (isdigit((unsigned char)*p))			/* parse count */
 	    count = count * 10 + *p++ - '0';
 
-	while ( *p != '\0' && isspace(*p) )	/* skip whitespace */
+	while ( *p != '\0' && isspace((unsigned char)*p) )	/* skip whitespace */
 	    ++p;
 
 	date = 0;
-	while (isdigit(*p))			/* parse date */
+	while (isdigit((unsigned char)*p))			/* parse date */
 	    date = date * 10 + *p++ - '0';
 	
-	while ( *p != '\0' && isspace(*p) )	/* skip whitespace */
+	while ( *p != '\0' && isspace((unsigned char)*p) )	/* skip whitespace */
 	    ++p;
 
 	if ( *p != '\0' ) {
@@ -174,11 +174,11 @@ static int load_file(char *db_file)
 	if (replace_nonascii_characters)
 	    do_replace_nonascii_characters(buf);
 
-	if (!keep_count(count) || !keep_date(date) || !keep_size(strlen(buf)))
+	if (!keep_count(count) || !keep_date(date) || !keep_size(strlen((const char *)buf)))
 	    continue;
 
 	/* Slower, but allows multiple lists to be concatenated */
-	db_increment_with_date(dbh, buf, count, date);
+	db_increment_with_date(dbh, (char *)buf, count, date);
     }
     db_lock_release(dbh);
     db_close(dbh);
@@ -591,7 +591,7 @@ int main(int argc, char *argv[])
 	    break;
 
 	case 'a':
-	    thresh_date = string_to_date((byte *)optarg);
+	    thresh_date = string_to_date((char *)optarg);
 	    break;
 
 	case 'c':
@@ -607,7 +607,7 @@ int main(int argc, char *argv[])
 	    break;
 
 	case 'y':		/* date as YYYYMMDD */
-	    today = string_to_date((byte *)optarg);
+	    today = string_to_date((char *)optarg);
 	    break;
 
 	default:

@@ -150,7 +150,7 @@ static const parm_desc sys_parms[] =
     { "ham_cutoff",	  CP_FUNCTION,	{ (void *) NULL } },	/* Robinson-Fisher */
 #endif
     { "block_on_subnets", CP_BOOLEAN,	{ (void *) &block_on_subnets } },
-    { "charset_default",  CP_STRING,	{ (void *) &charset_default } },
+    { "charset_default",  CP_STRING,	{ &charset_default } },
     { "replace_nonascii_characters",	CP_BOOLEAN, { (void *) &replace_nonascii_characters } },
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
@@ -191,7 +191,7 @@ static bool select_algorithm(const unsigned char ch, bool cmdline)
 	break;
 #endif
     default:
-	PRINT_ERROR("Algorithm '%c' not supported.\n", al);
+	print_error(__FILE__, __LINE__, "Algorithm '%c' not supported.\n", al);
 	return false;
     }
     usr_parms = method->config_parms;
@@ -619,7 +619,7 @@ int process_args(int argc, char **argv)
 	    break;
 
 	default:
-	    PRINT_ERROR("Internal error: unhandled option '%c' "
+	    print_error(__FILE__, __LINE__, "Internal error: unhandled option '%c' "
 			"(%02X)\n", option, (unsigned int)option);
 	    exit(2);
 	}
