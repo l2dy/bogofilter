@@ -732,8 +732,9 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
 
     int score_count = 0;
     int train_count = 0;
-    int train_good = 0;
-    int train_bad  = 0;
+
+    static int train_good = 0;
+    static int train_bad  = 0;
 
     double ratio = scale(msgs->count,
 			 LIST_COUNT + TEST_COUNT,	/* small count */
