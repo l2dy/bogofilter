@@ -73,16 +73,6 @@ const char *db_version_str(void)
     return v;
 }
 
-
-static void db_enforce_locking(dbh_t *handle, const char *func_name)
-{
-    if (handle->locked == false) {
-	print_error(__FILE__, __LINE__, "%s (%s): Attempt to access unlocked handle.", func_name, handle->name);
-	exit(EX_ERROR);
-    }
-}
-
-
 /* implements locking. */
 static int db_lock(int fd, int cmd, short int type)
 {
@@ -391,8 +381,6 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
     dbh_t *handle = dsh->dbh;
     DB *dbp = handle->dbp;
 
-    db_enforce_locking(handle, "db_get_dbvalue");
-
     DBT_init(db_key);
     DBT_init(db_data);
 
@@ -437,8 +425,6 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
 
     dbh_t *handle = dsh->dbh;
     DB *dbp = handle->dbp;
-
-    db_enforce_locking(handle, "db_set_dbvalue");
 
     DBT_init(db_key);
     DBT_init(db_data);
