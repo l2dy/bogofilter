@@ -61,7 +61,7 @@ EOF
 
 # config file should display "command"
 expect="bogoconf.d"
-map_rc $BOGOFILTER -x d -vv -D -c ${TMPDIR}/bogodir.cf < /dev/null
+map_rc $BOGOFILTER -x dc -vv -D -c ${TMPDIR}/bogodir.cf < /dev/null
 
 # command line and config file should display "command.d"
 expect="command.d"
