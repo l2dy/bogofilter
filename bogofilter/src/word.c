@@ -76,6 +76,16 @@ int word_cmp(const word_t *w1, const word_t *w2)
 #endif
 }
 
+word_t *word_concat(const word_t *w1, const word_t *w2)
+{
+    size_t len = w1->leng + w2->leng;
+    word_t *ans = word_new(NULL, len);
+    memcpy(ans->text, w1->text, w1->leng);
+    memcpy(ans->text+w1->leng, w2->text, w2->leng);
+    Z(ans->text[ans->leng]);		/* debug code - remove */
+    return ans;
+}
+
 void word_puts(const word_t *self, size_t width, FILE *fp)
 {
     /* width = 0 - output all of the word
