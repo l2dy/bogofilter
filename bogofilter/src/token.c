@@ -108,16 +108,16 @@ token_t get_token(void)
 	    else {
 		const char *delim = strchr((const char *)yylval->text, ':');
 		yylval->leng = delim - (const char *)yylval->text;
-		Z(yylval->text[yylval->leng]);
+		Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
 	    }
 
 	/*@fallthrough@*/
 
 	case TOKEN:	/* ignore anything when not reading text MIME types */
 	    if (token_prefix != NULL) {
-		word_t *w = word_concat(token_prefix, yylval);
-		word_free(yylval);
-		yylval = w;
+		word_t *o = yylval;
+		yylval = word_concat(token_prefix, yylval);
+		word_free(o);
 	    }
 	    else {
 		switch (msg_state->mime_type) {
@@ -274,13 +274,17 @@ void add_hint(const char *h)
     (const void *) h;
 }
 
+#define WFREE(n)  word_free(n); n = NULL
+
 /* Cleanup storage allocation */
 void token_cleanup()
 {
-    if (yylval)
-	word_free(yylval);
-    yylval = NULL;
-    if (nonblank_line)
-	word_free(nonblank_line);
-    nonblank_line = NULL;
+    WFREE(yylval);
+    WFREE(nonblank_line);
+    WFREE(w_to);
+    WFREE(w_from);
+    WFREE(w_rtrn);
+    WFREE(w_subj);
+    WFREE(w_recv);
+    WFREE(w_head);
 }
