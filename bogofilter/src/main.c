@@ -59,6 +59,7 @@ const char *progname = "bogofilter";
 
 /* Function Prototypes */
 
+static FILE *output_setup(void);
 static void passthrough_setup(void);
 static void passthrough_cleanup(void);
 static void write_log_message(void);
@@ -102,18 +103,9 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     /* open all wordlists */
     open_wordlists((run_type == RUN_NORMAL) ? DB_READ : DB_WRITE);
 
-    if (*outfname && passthrough) {
-	if ((out = fopen(outfname,"wt"))==NULL)
-	{
-	    fprintf(stderr,"Cannot open %s: %s\n",
-		    outfname, strerror(errno));
-	    exit(2);
-	}
-    } else {
-	out = stdout;
-    }
-
     mime_reset();
+
+    out = output_setup();
 
     passthrough_setup();
 
@@ -323,6 +315,22 @@ static void write_log_message(void)
 
     closelog();
 #endif
+}
+
+static FILE *output_setup(void)
+{
+    FILE *fp;
+    if (*outfname && passthrough) {
+	if ((fp = fopen(outfname,"wt"))==NULL)
+	{
+	    fprintf(stderr,"Cannot open %s: %s\n",
+		    outfname, strerror(errno));
+	    exit(2);
+	}
+    } else {
+	fp = stdout;
+    }
+    return fp;
 }
 
 static void passthrough_setup()
