@@ -81,6 +81,9 @@ static int count_hook(char *key, long keylen, char *data, long
 
     (*counter)++;
 
+    if (verbose > 3)
+	printf( "count:  %4ld %*.*s\n", *counter, (int)keylen, (int)keylen, key);
+
     return 0;
 }
 
@@ -132,7 +135,7 @@ static int robx_hook(char *key, long keylen, char *data, long
 	(*rd->count) ++;
 
     /* print if token in both word lists */
-    if (verbose > 1 && (goodness && spamness))
+    if ((verbose > 1 && goodness && spamness) || verbose > 2)
 	printf("cnt: %6ld,  sum: %12.6f,  ratio: %f,  sp: %4lu,  gd: %4ld,"
 		"  p: %f,  t: %s\n", *rd->count, *rd->sum,
 		*rd->sum / *rd->count, spamness, goodness, prob, x);
