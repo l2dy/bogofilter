@@ -185,20 +185,15 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
 	}
 
 	if (robn == 0)
-	{
 	    h->spamicity = robx;
-	}
-	else
+	else 
 	{
-	    if (logsum < EPS && invlogsum < EPS)
-		h->spamicity = 0.0;
-	    else {
-		double invproduct, product;
-		invproduct = 1.0 - exp(invlogsum / invn);
-		product = 1.0 - exp(logsum / invn);
-		h->spamicity =
-		    (1.0 + (invproduct - product) / (invproduct + product)) / 2.0;
-	    }
+	    double invproduct, product;
+	    invproduct = 1.0 - exp(invlogsum / invn);
+	    product = 1.0 - exp(logsum / invn);
+	    h->spamicity = (invproduct + product < EPS) 
+		? 0.0 
+		: (1.0 + (invproduct - product) / (invproduct + product)) / 2.0;
 	}
 	h->count=cnt;
 	maxcnt = max(maxcnt, cnt);
