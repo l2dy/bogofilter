@@ -13,7 +13,7 @@ Note:
 
 * Promoted to "stable".
 
-0.16.4	2004-01-22
+0.16.4	2004-01-23
 
 * Fix bogus config file warnings from bogolexer.
 * Config options 'thresh_stats' and 'thresh_rtable' have been deprecated.
