@@ -125,6 +125,9 @@ French</a>
 
           <li><a href="#changed-options">Now that I've upgraded to
           0.11 why are my scripts broken?</a></li>
+
+          <li><a href="#changed-exitcodes">Now that I've upgraded to
+          0.14 why are my scripts broken?</a></li>
         </ul>
       </li>
     </ul>
@@ -848,6 +851,17 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
     <p>MDA scripts typically use '-s' and '-n' and don't need to
     change. Other scripts which use '-S' and '-N' for fixing
     registration errors <em>do</em> need to be changed.</p>
+
+    <hr>
+
+    <h2 id="changed-exitcodes">Now that I've upgraded to 0.14 why are
+    my scripts broken?</h2>
+
+    <p>Bogofilter-0.14 introduced an additional exit code to support
+    its third mail classification (of spam, ham, and unsure).  Prior
+    to 0.14, the exit codes were 0 for spam, 1 for ham, and 2 for
+    error.  They are now 0 for spam, 1 for ham, 2 for unsure, and 3
+    for error.</p>
 
     <hr>
 
