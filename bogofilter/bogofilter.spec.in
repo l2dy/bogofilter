@@ -24,7 +24,8 @@ by sites that process a lot of mail.
 CFLAGS="$RPM_OPT_FLAGS" \
 ./configure \
   --prefix=%{_prefix} \
-  --mandir=%{_mandir}
+  --mandir=%{_mandir} \
+  --sysconfdir=%{_sysconfdir}
 
 %build
 make all check
@@ -32,6 +33,8 @@ make all check
 %install
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 make DESTDIR=${RPM_BUILD_ROOT} install
+cp $RPM_BUILD_ROOT%{_sysconfdir}/bogofilter.cf.example \
+   $RPM_BUILD_ROOT%{_sysconfdir}/bogofilter.cf
 gzip -f -9 $RPM_BUILD_ROOT/%{_mandir}/*/*.[1-9]
 
 %files
@@ -44,8 +47,10 @@ gzip -f -9 $RPM_BUILD_ROOT/%{_mandir}/*/*.[1-9]
 %{_bindir}/bogolexer
 %{_bindir}/bogoutil
 %{_bindir}/bogoupgrade
+%{_sysconfdir}/bogofilter.cf.example
+%config(noreplace) %{_sysconfdir}/bogofilter.cf
 %doc AUTHORS COPYING NEWS README TODO UPGRADE
-%doc README.BUGS  README.freebsd  README.cvs   README.hp-ux    README.solaris
+%doc README.freebsd README.hp-ux
 %doc bogoutil.xml bogoupgrade.xml bogofilter.xml bogolexer.xml
 %doc doc/* contrib/* bogo.R
 
