@@ -1,5 +1,9 @@
 # $Id$
 # $Log$
+# Revision 1.3  2002/09/17 07:21:54  adrian_otto
+# Removed ChangeLog section. Information was redundant with the NEWS file,
+# and was causing problems for 'rpmbuild'.
+#
 # Revision 1.2  2002/09/17 06:39:49  adrian_otto
 # Updating for release. Added NEWS items.
 #
@@ -45,18 +49,3 @@ gzip $RPM_BUILD_ROOT/%{_mandir}/*/*.?
 %doc README COPYING
 
 %changelog
-* Tue Sep 17 02:29:48 EDT 2002
-- changed version to 0.7.4 after a number of bug fixes and feature additions
-  see NEWS file for more information.
-
-* Sat Sep 14 15:03:20 PDT 2002
-- changed version to 0.7.3 and added "./configure --prefix=/usr" line
-
-* Wed Aug 28 2002 Gyepi Sam <gyepi@praxis-sw.com>
-- Switched from Judy library to Berkeley DB.
--parameterized version number. One less thing to remember
- 
-* Mon Aug 19 2002 Eric S. Raymond <esr@snark.thyrsus.com>
-- Initial build.
-
-
