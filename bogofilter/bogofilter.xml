@@ -137,7 +137,7 @@ exits.</para>
 <para>The following procmail rule will take mail on stdin and direct
 it to <filename>Mail/spam</filename> if
 <application>bogofilter</application> thinks it's spam:
-<programlisting class="procmail">
+<programlisting>
 :0HB:
 * ? bogofilter
 Mail/spam
@@ -153,7 +153,7 @@ words in messages rated as non-spam to the non-spam wordlist.  With
 this in place, it will normally only be necessary for the user to
 intervene (with <option>-N</option> or <option>-S</option>) when
 <application>bogofilter</application> miscategorizes something.</para>
-<programlisting class="procmail">
+<programlisting>
   <lineannotation>
    # filter mail through bogofilter, tagging it as spam and
    # updating the word lists
@@ -181,7 +181,7 @@ intervene (with <option>-N</option> or <option>-S</option>) when
 <para>This one is for maildrop, it automatically defers the mail and
     retries later when the xfilter command fails, use this in your
     <filename>~/.mailfilter</filename>:</para>
-<programlisting class="maildrop">
+<programlisting>
     xfilter "bogofilter -u -e -p"
     if (/^X-Bogosity: Yes, tests=bogofilter/)
     {
