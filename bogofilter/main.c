@@ -1,6 +1,17 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.14  2002/09/26 23:04:40  relson
+ * documentation:
+ *     changed to refer to "good" and "spam" tokens and lists.
+ *     removed '-l' option as this function is now in bogoutil.
+ *
+ * filenames:
+ *     changed database from "hamlist.db" to "goodlist.db".
+ *
+ * variables:
+ *     renamed "ham_list" and "hamness" to "good_list" and "goodness".
+ *
  * Revision 1.13  2002/09/25 18:17:09  relson
  * Added '-h' option to print help message and exit.
  *
@@ -86,7 +97,7 @@ AUTHOR:
 #include "datastore.h"
 
 #define BOGODIR		"/.bogofilter/"
-#define HAMFILE		"hamlist.db"
+#define GOODFILE	"goodlist.db"
 #define SPAMFILE	"spamlist.db"
 
 int verbose, passthrough;
@@ -94,9 +105,9 @@ int verbose, passthrough;
 int main(int argc, char **argv)
 {
     int	ch;
-    int register_spam = 0, register_ham = 0;
-    int spam_to_ham = 0, ham_to_spam = 0;
-    char	hamfile[PATH_MAX], spamfile[PATH_MAX], directory[PATH_MAX];
+    int register_spam = 0, register_good = 0;
+    int spam_to_good = 0, good_to_spam = 0;
+    char	goodfile[PATH_MAX], spamfile[PATH_MAX], directory[PATH_MAX];
     char	*tmp;
     struct stat sb;
     int exitcode = 0;
@@ -120,15 +131,15 @@ int main(int argc, char **argv)
 	    break;
 
 	case 'n':
-	    register_ham = 1;
+	    register_good = 1;
 	    break;
 
 	case 'S':
-	    ham_to_spam = 1;
+	    good_to_spam = 1;
 	    break;
 
 	case 'N':
-	    spam_to_ham = 1;
+	    spam_to_good = 1;
 	    break;
 
 	case 'v':
@@ -179,23 +190,23 @@ int main(int argc, char **argv)
 	exit(2);
     }
 
-    strcpy(hamfile, directory);
-    strcat(hamfile, HAMFILE);
-    ham_list.file = hamfile;
+    strcpy(goodfile, directory);
+    strcat(goodfile, GOODFILE);
+    good_list.file = goodfile;
 
     strcpy(spamfile, directory);
     strcat(spamfile, SPAMFILE);
     spam_list.file = spamfile;
 
 
-    if ( (ham_list.dbh = db_open(ham_list.file, ham_list.name)) == NULL){
-      fprintf(stderr, "bogofilter: Cannot initialize database %s.\n", ham_list.name);
+    if ( (good_list.dbh = db_open(good_list.file, good_list.name)) == NULL){
+      fprintf(stderr, "bogofilter: Cannot initialize database %s.\n", good_list.name);
       exit(2);
     }
     
     if ( (spam_list.dbh = db_open(spam_list.file, spam_list.name)) == NULL){
       fprintf(stderr, "bogofilter: Cannot initialize database %s.\n", spam_list.name);
-      db_close(ham_list.dbh);
+      db_close(good_list.dbh);
       exit(2);
     }
    
@@ -204,17 +215,17 @@ int main(int argc, char **argv)
     {
 	register_words(STDIN_FILENO, &spam_list, NULL);
     }
-    else if (register_ham)
+    else if (register_good)
     {
-	register_words(STDIN_FILENO, &ham_list, NULL);
+	register_words(STDIN_FILENO, &good_list, NULL);
     }
-    else if (spam_to_ham)
+    else if (spam_to_good)
     {
-	register_words(STDIN_FILENO, &ham_list, &spam_list);
+	register_words(STDIN_FILENO, &good_list, &spam_list);
     }
-    else if (ham_to_spam)
+    else if (good_to_spam)
     {
-	register_words(STDIN_FILENO, &spam_list, &ham_list);
+	register_words(STDIN_FILENO, &spam_list, &good_list);
     }
     else
     {
@@ -258,7 +269,7 @@ int main(int argc, char **argv)
     }
 
     db_close(spam_list.dbh);
-    db_close(ham_list.dbh);
+    db_close(good_list.dbh);
 
     exit(exitcode);
 }

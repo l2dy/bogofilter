@@ -1,6 +1,17 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.19  2002/09/26 23:04:40  relson
+ * documentation:
+ *     changed to refer to "good" and "spam" tokens and lists.
+ *     removed '-l' option as this function is now in bogoutil.
+ *
+ * filenames:
+ *     changed database from "hamlist.db" to "goodlist.db".
+ *
+ * variables:
+ *     renamed "ham_list" and "hamness" to "good_list" and "goodness".
+ *
  * Revision 1.18  2002/09/25 00:51:07  adrian_otto
  * Removed referenced to lock.c and lock.h, because they have been obviated.
  *
@@ -119,7 +130,7 @@ I do the lexical analysis slightly differently, however.
 #define HEADER		"# bogofilter email-count (format version B): %lu\n"
 
 // constants for the Graham formula 
-#define HAM_BIAS	2		// give ham words more weight
+#define GOOD_BIAS	2		// give good words more weight
 #define KEEPERS		15		// how many extrema to keep
 #define MINIMUM_FREQ	5		// minimum freq
 #define UNKNOWN_WORD	0.4f		// odds that unknown word is spammish
@@ -131,7 +142,7 @@ I do the lexical analysis slightly differently, however.
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
 #define min(x, y)	(((x) < (y)) ? (x) : (y))
 
-wordlist_t ham_list	= {"ham", NULL, 0, NULL};
+wordlist_t good_list	= {"good", NULL, 0, NULL};
 wordlist_t spam_list	= {"spam", NULL, 0, NULL};
 
 #define	PLURAL(count) ((count == 1) ? "" : "s")
@@ -289,28 +300,28 @@ void *collect_words(int fd)
 
 double compute_probability( char *token )
 {
-    double prob, hamness, spamness;
+    double prob, goodness, spamness;
     
-    hamness = db_getvalue(ham_list.dbh, token);
+    goodness = db_getvalue(good_list.dbh, token);
     spamness = db_getvalue(spam_list.dbh, token);
 
 #ifdef NON_EQUIPROBABLE
     // There is an argument that we should by by number of *words* here.
-    double	msg_prob = (spam_list.msgcount / ham_list.msgcount);
+    double	msg_prob = (spam_list.msgcount / good_list.msgcount);
 #endif // NON_EQUIPROBABLE
 
     // Paul Graham's original formula:
     // 
-    // (let ((g (* 2 (or (gethash word ham) 0))) 
+    // (let ((g (* 2 (or (gethash word good) 0))) 
     //      (b (or (gethash word spam) 0)))
-    //  (unless (&lt; (+ g b) 5) 
+    //  (unless (< (+ g b) 5) 
     //   (max .01 (min .99 
     //  	    (double (/ 
     // 		    (min 1 (/ b nspam)) 
-    // 		    (+ (min 1 (/ g nham)) (min 1 (/ b nspam)))))))))
+    // 		    (+ (min 1 (/ g ngood)) (min 1 (/ b nspam)))))))))
     // This assumes that spam and non-spam are equiprobable.
-    hamness *= HAM_BIAS;
-    if (hamness + spamness < MINIMUM_FREQ)
+    goodness *= GOOD_BIAS;
+    if (goodness + spamness < MINIMUM_FREQ)
 #ifdef NON_EQUIPROBABLE
 	// In the absence of evidence, the probability that a new word
 	// will be spam is the historical ratio of spam words to
@@ -322,7 +333,7 @@ double compute_probability( char *token )
     else
     {
 	register double pb = min(1, (spamness / spam_list.msgcount));
-	register double pg = min(1, (hamness / ham_list.msgcount));
+	register double pg = min(1, (goodness / good_list.msgcount));
 
 #ifdef NON_EQUIPROBABLE
 	prob = (pb * msg_prob) / ((pg * (1 - msg_prob)) + (pb * msg_prob));
@@ -426,10 +437,10 @@ rc_t bogofilter(int fd, double *xss)
 //  tokenize input text and save words in a Judy array.
     PArray = collect_words(fd);
 
-    db_lock_reader(ham_list.dbh);
+    db_lock_reader(good_list.dbh);
     db_lock_reader(spam_list.dbh);
 
-    ham_list.msgcount = db_getcount(ham_list.dbh);
+    good_list.msgcount = db_getcount(good_list.dbh);
     spam_list.msgcount = db_getcount(spam_list.dbh);
 
 //  select the best spam/nonspam indicators.
@@ -439,7 +450,7 @@ rc_t bogofilter(int fd, double *xss)
     spamicity = compute_spamicity(stats);
 
     db_lock_release(spam_list.dbh);
-    db_lock_release(ham_list.dbh);
+    db_lock_release(good_list.dbh);
 
     status = (spamicity > SPAM_CUTOFF) ? RC_SPAM : RC_NONSPAM;
 

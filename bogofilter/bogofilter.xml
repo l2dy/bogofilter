@@ -32,7 +32,7 @@
 <para><application>Bogofilter</application> is a Bayesian spam filter.
 In its normal mode of operation, it takes an email message or other
 text on standard input, does a statistical check against lists of
-"ham" and "spam" words, and returns a status code indicating whether
+"good" and "bad" words, and returns a status code indicating whether
 or not the message is spam.  Bogofilter is designed with fast
 algorithms, uses the Berkeley DB for fast startup and lookups,
 coded directly in C, and tuned for speed, so it can be used for
@@ -41,7 +41,7 @@ production by sites that process a lot of mail.</para>
 
 <refsect1 id='theory'><title>THEORY OF OPERATION</title>
 <para><application>Bogofilter</application> treats its input as a bag
-of tokens.  Each token is checked against "ham" and "spam" wordlists,
+of tokens.  Each token is checked against "good" and "bad" wordlists,
 which maintain counts of the numbers of times it has occurred in
 non-spam and spam mails.  These numbers are used to compute the
 probability that a mail in which the token occurs is spam.  After
@@ -100,10 +100,6 @@ same message as spam.</para>
 <para>The <option>-d</option> allows you to set the directory under
 which wordlists will be found (normally
 <filename>$HOME/.bogofilter</filename>).</para>
-
-<para>The <option>-l</option> lists wordlists. Used with
-<option>-n</option>, it lists the ham list; used with
-<option>-s</option>, it lists the spam list.</para>
 
 <para>The <option>-p</option> (passthrough) option writes a copy of
 the input mail to the output with an X-Spam-Status header (in the
@@ -179,8 +175,8 @@ are missing.</para>
 <refsect1 id='files'><title>FILES</title>
 <variablelist>
 <varlistentry>
-<term><filename>~/.bogofilter/hamlist</filename></term>
-<listitem><para>List of ham tokens.</para></listitem>
+<term><filename>~/.bogofilter/goodlist</filename></term>
+<listitem><para>List of good tokens.</para></listitem>
 </varlistentry>
 <varlistentry>
 <term><filename>~/.bogofilter/spamlist</filename></term>

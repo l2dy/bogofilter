@@ -1,6 +1,17 @@
 /* $Id$ */
 /* 
  * $Log$
+ * Revision 1.8  2002/09/26 23:04:41  relson
+ * documentation:
+ *     changed to refer to "good" and "spam" tokens and lists.
+ *     removed '-l' option as this function is now in bogoutil.
+ *
+ * filenames:
+ *     changed database from "hamlist.db" to "goodlist.db".
+ *
+ * variables:
+ *     renamed "ham_list" and "hamness" to "good_list" and "goodness".
+ *
  * Revision 1.7  2002/09/26 17:22:01  relson
  * Remove unused function prototypes.
  *
@@ -58,7 +69,7 @@ extern void register_words(int fd, wordlist_t *list, wordlist_t *other);
 extern rc_t bogofilter(int fd, double *xss);
 extern int bogodump(char *file);
 
-extern wordlist_t ham_list, spam_list;
+extern wordlist_t good_list, spam_list;
 extern int verbose;
 
 // end
