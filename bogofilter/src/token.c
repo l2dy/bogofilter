@@ -158,6 +158,7 @@ token_t get_token(void)
 		ipsave = word_new(NULL, plen + yylval->leng);
 		memcpy(ipsave->text, prefix, plen);
 		memcpy(ipsave->text+plen, yylval->text, yylval->leng);
+		word_free(yylval);
 		yylval = ipsave;
 		save_class = IPADDR;
 		return (class);
@@ -213,9 +214,7 @@ void got_from(void)
 
 void got_newline()
 {
-    if (token_prefix) {
-	word_free(token_prefix);
-    }
+    word_free(token_prefix);
     token_prefix = token_prefix_next;
     token_prefix_next = NULL;
 }
