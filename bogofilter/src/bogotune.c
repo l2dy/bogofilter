@@ -1124,7 +1124,7 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
 	    f = true;
 	    break;
 	}
-	o = i+1;
+	o++;
     }
 
     if (o > 0) {
