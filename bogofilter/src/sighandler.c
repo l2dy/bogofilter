@@ -29,6 +29,7 @@ bool fDie = false;
 static void mysignal(int sig, void (*hdl)(int)) {
     struct sigaction sa;
 
+    memset( &sa, 0, sizeof(sa));
     sa.sa_handler = hdl;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
