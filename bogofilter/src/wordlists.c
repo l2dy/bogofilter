@@ -239,6 +239,15 @@ static void sanitycheck_lists(void)
 }
 #endif
 
+static char *spanword(char *val)
+{
+    val += strcspn(val, ", \t");
+    *val++ = '\0';
+    while (isspace((unsigned char)*val)) 
+	val += 1;
+    return val;
+}
+
 /* type - 'g', 's', or 'i'
  * name - 'good', 'spam', etc
  * path - 'goodlist.db'
@@ -263,9 +272,7 @@ bool configure_wordlist(const char *val)
     char *tmp = xstrdup(val);
 
     type=tmp;
-    tmp += strcspn(tmp, ", \t");
-    *tmp++ = '\0';
-    while (isspace((unsigned char)*tmp)) tmp += 1;
+    tmp = spanword(tmp);
 
     switch (type[0])
     {
@@ -281,24 +288,16 @@ bool configure_wordlist(const char *val)
     }
 
     name=tmp;
-    tmp += strcspn(tmp, ", \t");
-    *tmp++ = '\0';
-    while (isspace((unsigned char)*tmp)) tmp += 1;
+    tmp = spanword(tmp);
 
     path=tildeexpand(tmp);
-    tmp += strcspn(tmp, ", \t");
-    *tmp++ = '\0';
-    while (isspace((unsigned char)*tmp)) tmp += 1;
+    tmp = spanword(tmp);
 
     weight=atof(tmp);
-    tmp += strcspn(tmp, ", \t");
-    *tmp++ = '\0';
-    while (isspace((unsigned char)*tmp)) tmp += 1;
+    tmp = spanword(tmp);
 
     override=atoi(tmp);
-    tmp += strcspn(tmp, ", \t");
-    *tmp++ = '\0';
-    while (isspace((unsigned char)*tmp)) tmp += 1;
+    tmp = spanword(tmp);
 
     if (isdigit((unsigned char)*tmp))
 	ignore=atoi(tmp);
@@ -315,9 +314,7 @@ bool configure_wordlist(const char *val)
 	    break;
 	}
     }
-    while (isalnum((unsigned char)*tmp))
-	tmp++;
-    while (isspace((unsigned char)*tmp)) tmp += 1;
+    tmp = spanword(tmp);
 
     rc = init_wordlist(&list, name, path, weight, bad, override, ignore);
     ok = rc == 0;
