@@ -83,10 +83,14 @@ void rstats_add( const char *token,
 
 static int compare_rstats_t(const void *const ir1, const void *const ir2)
 {
+    double d;
     const rstats_t *r1 = *(rstats_t *const *)ir1;
     const rstats_t *r2 = *(rstats_t *const *)ir2;
-    return (r1->prob > r2->prob) ||
-	     ((fabs(r1->prob - r2->prob) < EPS) && (strcmp(r1->token, r2->token) > 0));
+    d = r1->prob - r2->prob;
+    if (fabs(d) < EPS) return strcmp(r1->token, r2->token);
+    if (r1->prob > r2->prob) return 1;
+    if (r1->prob < r2->prob) return -1;
+    return 0;
 }
 
 #define	INTERVALS	10
