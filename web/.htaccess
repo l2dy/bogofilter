@@ -1,3 +1,1 @@
-Redirect /bogofilter-faq.html http://cvs.sourceforge.net/viewcvs.py/*checkout*/bogofilter/bogofilter/doc/bogofilter-faq.html?rev=HEAD&content-type=text/html
-Redirect /bogofilter-faq-fr.html http://cvs.sourceforge.net/viewcvs.py/*checkout*/bogofilter/bogofilter/doc/bogofilter-faq-fr.html?rev=HEAD&content-type=text/html
 Redirect /NEWS http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/*checkout*/bogofilter/bogofilter/NEWS?rev=HEAD
