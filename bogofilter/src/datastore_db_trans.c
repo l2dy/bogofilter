@@ -823,89 +823,86 @@ const char **dsm_help_bogoutil(void)
     return &help_text[0]; 
 }
 
-void dsm_options_bogofilter(int option, const char *name, const char *val)
+bool dsm_options_bogofilter(int option, const char *name, const char *val)
 {
     switch (option) {
-    case O_DB_TRANSACTION:		fTransaction = get_bool(name, val);			break;
-
-	/* ignore options that don't apply to bogofilter */
-    case O_DB_PRUNE:
-    case O_DB_RECOVER:
-    case O_DB_RECOVER_HARDER:
-    case O_DB_REMOVE_ENVIRONMENT:
-    case O_DB_VERIFY:			break;
+	case O_DB_TRANSACTION:		fTransaction		= get_bool(name, val);			return true;
 
 #ifdef	HAVE_DECL_DB_CREATE
-    case O_DB_MAX_OBJECTS:		db_max_objects = atoi(val);				break;
-    case O_DB_MAX_LOCKS:		db_max_locks   = atoi(val);				break;
-    case O_DB_LOG_AUTOREMOVE:		db_log_autoremove  = get_bool(name, val);		break;
+	case O_DB_MAX_OBJECTS:		db_max_objects		= atoi(val);				return true;
+	case O_DB_MAX_LOCKS:		db_max_locks		= atoi(val);				return true;
+	case O_DB_LOG_AUTOREMOVE:	db_log_autoremove	= get_bool(name, val);			return true;
 #ifdef	FUTURE_DB_OPTIONS
-    case O_DB_TXN_DURABLE:		db_txn_durable = get_bool(name, val);			break;
+	case O_DB_TXN_DURABLE:		db_txn_durable		= get_bool(name, val);			return true;
 #endif
 #endif
+	default:				return false;
     }
 }
 
-void dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_file, const char *name, const char *val)
+bool dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_file, const char *name, const char *val)
 {
     switch (option) {
-    case O_DB_TRANSACTION:
-	fTransaction = get_bool(name, val);
-	break;
+	case O_DB_TRANSACTION:
+	    fTransaction = get_bool(name, val);
+	    return true;
 
-    case O_DB_VERIFY:
-	*flag = M_VERIFY;
-	*count += 1;
-	*ds_file = val;
-	break;
+	case O_DB_VERIFY:
+	    *flag = M_VERIFY;
+	    *count += 1;
+	    *ds_file = val;
+	    return true;
 
-    case O_DB_RECOVER:
-	*flag = M_RECOVER;
-	*count += 1;
-	*ds_file = val;
-	break;
+	case O_DB_RECOVER:
+	    *flag = M_RECOVER;
+	    *count += 1;
+	    *ds_file = val;
+	    return true;
 
-    case O_DB_RECOVER_HARDER:
-	*flag = M_CRECOVER;
-	*count += 1;
-	*ds_file = val;
-	break;
+	case O_DB_RECOVER_HARDER:
+	    *flag = M_CRECOVER;
+	    *count += 1;
+	    *ds_file = val;
+	    return true;
 
-    case O_DB_CHECKPOINT:
-	*flag = M_CHECKPOINT;
-	*count += 1;
-	*ds_file = val;
-	break;
+	case O_DB_CHECKPOINT:
+	    *flag = M_CHECKPOINT;
+	    *count += 1;
+	    *ds_file = val;
+	    return true;
 
-    case O_DB_PRUNE:
-	*flag = M_PURGELOGS;
-	*count += 1;
-	*ds_file = val;
-	break;
+	case O_DB_PRUNE:
+	    *flag = M_PURGELOGS;
+	    *count += 1;
+	    *ds_file = val;
+	    return true;
 
-    case O_DB_REMOVE_ENVIRONMENT:
-	*flag = M_REMOVEENV;
-	*ds_file = val;
-	*count += 1;
-	break;
+	case O_DB_REMOVE_ENVIRONMENT:
+	    *flag = M_REMOVEENV;
+	    *ds_file = val;
+	    *count += 1;
+	    return true;
 
 #ifdef	HAVE_DECL_DB_CREATE
-    case O_DB_MAX_OBJECTS:	
-	db_max_objects = atoi(val);
-	break;
-    case O_DB_MAX_LOCKS:
-	db_max_locks   = atoi(val);
-	break;
-    case O_DB_LOG_AUTOREMOVE:
-	db_log_autoremove = get_bool(name, val);
-	break;
+	case O_DB_MAX_OBJECTS:	
+	    db_max_objects = atoi(val);
+	    return true;
+	case O_DB_MAX_LOCKS:
+	    db_max_locks   = atoi(val);
+	    return true;
+	case O_DB_LOG_AUTOREMOVE:
+	    db_log_autoremove = get_bool(name, val);
+	    return true;
 #ifdef	FUTURE_DB_OPTIONS
-    case O_DB_TXN_DURABLE:
-	db_txn_durable    = get_bool(name, val);
-	break;
+	case O_DB_TXN_DURABLE:
+	    db_txn_durable    = get_bool(name, val);
+	    return true;
 #endif
 #endif
-}
+
+	default:
+	    return false;
+    }
 }
 
 /** probe if the directory contains an environment, and if so,

@@ -97,6 +97,15 @@ static char *get_string(const char *name, const char *arg)
     return s;
 }
 
+static struct option longopts_bogolexer[] = {
+    /* longoptions.h - common options */
+    LONGOPTIONS_COMMON
+    /* longoptions.h - options for bogofilter and bogolexer */
+    LONGOPTIONS_LEX
+    /* end of list */
+    { NULL,				0, 0, 0 }
+};
+
 #define	OPTIONS	":c:CDhHI:nO:pqvVx:X:m"
 
 /** These functions process command line arguments.
@@ -131,12 +140,12 @@ static void process_arglist(int argc, char **argv)
 #endif
 
 	option = getopt_long(argc, argv, OPTIONS,
-			     long_options, &option_index);
+			     longopts_bogolexer, &option_index);
 
 	if (option == -1)
 	    break;
 
-	name = (option_index == 0) ? argv[this_option_optind] : long_options[option_index].name;
+	name = (option_index == 0) ? argv[this_option_optind] : longopts_bogolexer[option_index].name;
 	process_arg(option, name, optarg, PR_COMMAND, PASS_1_CLI);
     }
 
@@ -163,7 +172,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 
     case 'c':
     case O_CONFIG_FILE:
-	read_config_file(val, false, false, precedence);
+	read_config_file(val, false, false, precedence, longopts_bogolexer);
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
 
@@ -231,45 +240,6 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	block_on_subnets = get_bool(name, val);
 	break;
 
-    /* ignore options that don't apply to bogolexer */
-
-    case O_CHARSET_DEFAULT:
-    case O_DB_PRUNE:
-    case O_DB_RECOVER:
-    case O_DB_RECOVER_HARDER:
-    case O_DB_REMOVE_ENVIRONMENT:
-    case O_DB_VERIFY:
-#ifdef	HAVE_DECL_DB_CREATE
-    case O_DB_MAX_OBJECTS:
-    case O_DB_MAX_LOCKS:
-    case O_DB_LOG_AUTOREMOVE:
-#ifdef	FUTURE_DB_OPTIONS
-    case O_DB_TXN_DURABLE:
-#endif
-#endif
-    case O_NS_ESF:
-    case O_SP_ESF:
-    case O_HAM_CUTOFF:
-    case O_HEADER_FORMAT:
-    case O_LOG_HEADER_FORMAT:
-    case O_LOG_UPDATE_FORMAT:
-    case O_MIN_DEV:
-    case O_ROBS:
-    case O_ROBX:
-    case O_SPAM_CUTOFF:
-    case O_SPAM_HEADER_NAME:
-    case O_SPAM_SUBJECT_TAG:
-    case O_SPAMICITY_FORMATS:
-    case O_SPAMICITY_TAGS:
-    case O_STATS_IN_HEADER:
-    case O_TERSE:
-    case O_TERSE_FORMAT:
-    case O_THRESH_UPDATE:
-    case O_TIMESTAMP:
-    case O_UNSURE_SUBJECT_TAG:
-    case O_WORDLIST:
-	break;
-
     default:
 	/* config file options:
 	**  ok    - if from config file
@@ -293,7 +263,7 @@ int main(int argc, char **argv)
     mbox_mode = true;		/* to allow multiple messages */
 
     process_arglist(argc, argv);
-    process_config_files(false);
+    process_config_files(false, longopts_bogolexer);
 
     textblock_init();
 

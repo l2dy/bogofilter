@@ -92,6 +92,61 @@ static void comma_parse(char opt, const char *arg, double *parm1, double *parm2,
 
 /*---------------------------------------------------------------------------*/
 
+static struct option longopts_bogofilter[] = {
+    /* longoptions.h - common options */
+    LONGOPTIONS_COMMON
+    /* longoptions.h - bogofilter/-lexer options */
+    LONGOPTIONS_LEX
+    /* bogofilter specific options */
+    { "classify-files",			N, 0, 'B' },
+    { "syslog-tag",			N, 0, 'L' },
+    { "classify-mbox",			N, 0, 'M' },
+    { "unregister-nonspam",		N, 0, 'N' },
+    { "dataframe",			N, 0, 'R' },
+    { "unregister-spam",		N, 0, 'S' },
+    { "fixed-terse-format",		N, 0, 'T' },
+    { "report-unsure",			N, 0, 'U' },
+    { "classify-stdin",			N, 0, 'b' },
+    { "bogofilter-dir",			R, 0, 'd' },
+    { "nonspam-exits-zero",		N, 0, 'e' },
+    { "use-syslog",			N, 0, 'l' },
+    { "register-ham",			N, 0, 'n' },
+    { "passthrough",			N, 0, 'p' },
+    { "register-spam",			N, 0, 's' },
+    { "update-as-scored",		N, 0, 'u' },
+    { "debug-flags",			R, 0, 'x' },
+    { "debug-to-stdout",		N, 0, 'D' },
+    { "no-header-tags",			N, 0, 'H' },
+    { "query",				N, 0, 'Q' },
+    { "db-cachesize",			N, 0, 'k' },
+    { "charset-default",		R, 0, O_CHARSET_DEFAULT },
+    { "ns-esf",				R, 0, O_NS_ESF },
+    { "sp-esf",				R, 0, O_SP_ESF },
+    { "ham-cutoff",			R, 0, O_HAM_CUTOFF },
+    { "header-format",			R, 0, O_HEADER_FORMAT },
+    { "log-header-format",		R, 0, O_LOG_HEADER_FORMAT },
+    { "log-update-format",		R, 0, O_LOG_UPDATE_FORMAT },
+    { "min-dev",			R, 0, O_MIN_DEV },
+    { "robs",				R, 0, O_ROBS },
+    { "robx",				R, 0, O_ROBX },
+    { "spam-cutoff",			R, 0, O_SPAM_CUTOFF },
+    { "spam-header-name",		R, 0, O_SPAM_HEADER_NAME },
+    { "spam-subject-tag",		R, 0, O_SPAM_SUBJECT_TAG },
+    { "spamicity-formats",		R, 0, O_SPAMICITY_FORMATS },
+    { "spamicity-tags",			R, 0, O_SPAMICITY_TAGS },
+    { "stats-in-header",		R, 0, O_STATS_IN_HEADER },
+    { "terse",				R, 0, O_TERSE },
+    { "terse-format",			R, 0, O_TERSE_FORMAT },
+    { "thresh-update",			R, 0, O_THRESH_UPDATE },
+    { "timestamp",			R, 0, O_TIMESTAMP },
+    { "unsure-subject-tag",		R, 0, O_UNSURE_SUBJECT_TAG },
+    { "wordlist",			R, 0, O_WORDLIST },
+    /* end of list */
+    { NULL,				0, 0, 0 }
+};
+
+/*---------------------------------------------------------------------------*/
+
 static bool get_bool(const char *name, const char *arg)
 {
     bool b = str_to_bool(arg);
@@ -133,7 +188,7 @@ void process_parameters(int argc, char **argv, bool warn_on_error)
 #endif
 
     process_arglist(argc, argv, PR_COMMAND, PASS_1_CLI);
-    process_config_files(warn_on_error);
+    process_config_files(warn_on_error, longopts_bogofilter);
     process_arglist(argc, argv, PR_COMMAND, PASS_3_CLI);
 
     /* directories from command line and config file are already handled */
@@ -361,12 +416,12 @@ static void process_arglist(int argc, char **argv, priority_t precedence, int pa
 	const char *name;
 
 	option = getopt_long(argc, argv, OPTIONS,
-			     long_options, &option_index);
+			     longopts_bogofilter, &option_index);
 
 	if (option == -1)
 	    break;
 
-	name = (option_index == 0) ? argv[this_option_optind] : long_options[option_index].name;
+	name = (option_index == 0) ? argv[this_option_optind] : longopts_bogofilter[option_index].name;
 
 #ifdef EXCESSIVE_DEBUG
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
@@ -424,7 +479,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case 'c':
     case O_CONFIG_FILE:
 	if (pass == PASS_1_CLI) {
-	    if (!read_config_file(val, false, !quiet, PR_CFG_USER)) {
+	    if (!read_config_file(val, false, !quiet, PR_CFG_USER, longopts_bogofilter)) {
 		fprintf(stderr, "Cannot open %s: %s\n", val, strerror(errno));
 		exit(EX_ERROR);
 	    }
@@ -544,7 +599,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 
     case '-':
 	if (pass == PASS_3_CLI)
-	    process_config_option(val, true, precedence);
+	    process_config_option(val, true, precedence, longopts_bogofilter);
 	break;
 
     case 'd':
@@ -645,26 +700,9 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 
     case O_DB_TRANSACTION:		fTransaction = get_bool(name, val);			break;
 
-    /* ignore options that don't apply to bogofilter */
-    case O_DB_PRUNE:
-    case O_DB_RECOVER:
-    case O_DB_RECOVER_HARDER:
-    case O_DB_REMOVE_ENVIRONMENT:
-    case O_DB_VERIFY:
-
-#ifdef	HAVE_DECL_DB_CREATE
-    case O_DB_MAX_OBJECTS:
-    case O_DB_MAX_LOCKS:
-    case O_DB_LOG_AUTOREMOVE:
-#ifdef	FUTURE_DB_OPTIONS
-    case O_DB_TXN_DURABLE:
-#endif
-#endif
-	dsm_options_bogofilter(option, name, val);
-	break;
-
     default:
-	abort();
+	if (!dsm_options_bogofilter(option, name, val))
+	    abort();
     }
 }
 

@@ -17,10 +17,11 @@ AUTHOR:
 
 /* Definitions */
 
+/** has_arg symbolic values */
 enum field_e {
-    N,		/* no_argument		(or 0) if the option does not take an argument, */
-    R,		/* required_argument	(or 1) if the option requires an argument, */
-    O		/* optional_argument 	(or 2) if the option takes an optional argument. */
+    N = 0,	/* no_argument		(or 0) if the option does not take an argument, */
+    R = 1,	/* required_argument	(or 1) if the option requires an argument, */
+    O = 2	/* optional_argument 	(or 2) if the option takes an optional argument. */
 };
 
 typedef enum longopts_e {
@@ -63,8 +64,41 @@ typedef enum longopts_e {
     O_WORDLIST
 } longopts_t;
 
-/* Global variables */
+/* common options */
+#define LONGOPTIONS_COMMON \
+    { "config-file",			R, 0, O_CONFIG_FILE }, \
+    { "no-config-file",			N, 0, 'C' }, \
+    { "help",				N, 0, 'h' }, \
+    { "input-file",			N, 0, 'I' }, \
+    { "version",			N, 0, 'V' }, \
+    { "verbosity",			N, 0, 'v' },
 
-extern struct option long_options[];
+/* options for bogofilter and bogolexer */
+#define LONGOPTIONS_LEX \
+    { "block-on-subnets",		R, 0, O_BLOCK_ON_SUBNETS }, \
+    { "output-file",			N, 0, 'O' }, \
+    { "user-config-file",		R, 0, O_USER_CONFIG_FILE }, \
+    { "replace-nonascii-characters",	R, 0, O_REPLACE_NONASCII_CHARACTERS },
+
+/* options for bogofilter and bogoutil - some preprocessor workarounds here */
+#define lo1
+#define lo2
+#ifdef	HAVE_DECL_DB_CREATE
+ #undef lo1
+ #define lo1 \
+    { "db-lk-max-locks",		R, 0, O_DB_MAX_LOCKS }, \
+    { "db-lk-max-objects",		R, 0, O_DB_MAX_OBJECTS }, \
+    { "db-log-autoremove",		R, 0, O_DB_LOG_AUTOREMOVE },
+ #ifdef	FUTURE_DB_OPTIONS
+  #undef lo2
+  #define lo2 \
+    { "db-txn-durable",			R, 0, O_DB_TXN_DURABLE },
+ #endif
+#endif
+
+#define LONGOPTIONS_DB \
+    { "db-transaction",			R, 0, O_DB_TRANSACTION }, \
+    { "timestamp-date",			N, 0, 'y' }, \
+    lo1 lo2
 
 #endif

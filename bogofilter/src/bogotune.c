@@ -895,6 +895,11 @@ static void help(void)
 		  progname, version);
 }
 
+static struct option longopts_bogotune[] = {
+    /* end of list */
+    { NULL,				0, 0, 0 }
+};
+
 static int process_arglist(int argc, char **argv)
 {
     int  count = 1;
@@ -919,7 +924,8 @@ static int process_arglist(int argc, char **argv)
 
 	switch (option) {
 	case 'c':
-	    read_config_file(optarg, false, !quiet, PR_CFG_USER);
+	    read_config_file(optarg, false, false, PR_CFG_USER, longopts_bogotune);
+	    /* FALLTHROUGH */
 	case 'C':
 	    suppress_config_file = true;
 	    break;
@@ -989,7 +995,7 @@ static int process_arglist(int argc, char **argv)
     }
 
     if (!suppress_config_file)
-	process_config_files(false);
+	process_config_files(false, longopts_bogotune);
 
     return count;
 }

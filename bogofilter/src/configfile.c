@@ -74,7 +74,7 @@ void remove_comment(const char *line)
     return;
 }
 
-bool process_config_option(const char *arg, bool warn_on_error, priority_t precedence)
+bool process_config_option(const char *arg, bool warn_on_error, priority_t precedence, struct option *longopts)
 {
     uint pos;
     bool ok = true;
@@ -90,8 +90,8 @@ bool process_config_option(const char *arg, bool warn_on_error, priority_t prece
 	val += strspn(val, delim);
     }
 
-    if (val == NULL || 
-	!process_config_option_as_arg(opt, val, precedence)) {
+    if (val == NULL ||
+	!process_config_option_as_arg(opt, val, precedence, longopts)) {
 	ok = false;
 	if (warn_on_error)
 	    fprintf(stderr, "Error - bad parameter '%s'\n", arg);
@@ -121,16 +121,12 @@ static bool option_compare(const char *opt, const char *name)
     return true;
 }
 
-bool process_config_option_as_arg(const char *opt, const char *val, priority_t precedence)
+bool process_config_option_as_arg(const char *opt, const char *val, priority_t precedence, struct option *long_options)
 {
     struct option *option;
-    const char *name;
 
-    for (option = long_options; ; option += 1) {
-	name = option->name;
-	if (name == NULL)
-	    break;
-	if (!option_compare(opt, name))
+    for (option = long_options; option->name; option += 1) {
+	if (!option_compare(opt, option->name))
 	    continue;
 	if (strcmp(val, "''") == 0)
 	    val = "";
@@ -141,7 +137,8 @@ bool process_config_option_as_arg(const char *opt, const char *val, priority_t p
     return false;
 }
 
-bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, priority_t precedence)
+bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, priority_t precedence,
+	struct option *longopts)
 {
     bool ok = true;
     int lineno = 0;
@@ -181,7 +178,7 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
 	if (DEBUG_CONFIG(1))
 	    fprintf(dbgout, "Testing:  %s\n", buff);
 
-	if (!process_config_option(buff, warn_on_error, precedence))
+	if (!process_config_option(buff, warn_on_error, precedence, longopts))
 	    ok = false;
     }
 
@@ -196,15 +193,15 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
 }
 
 /* exported */
-bool process_config_files(bool warn_on_error)
+bool process_config_files(bool warn_on_error, struct option *longopts)
 {
     bool ok = true;
     const char *env = getenv("BOGOTEST");
 
     if (!suppress_config_file) {
-	if (!read_config_file(system_config_file, false, warn_on_error, PR_CFG_SITE))
+	if (!read_config_file(system_config_file, false, warn_on_error, PR_CFG_SITE, longopts))
 	    ok = false;
-	if (!read_config_file(user_config_file, true, warn_on_error, PR_CFG_USER))
+	if (!read_config_file(user_config_file, true, warn_on_error, PR_CFG_USER, longopts))
 	    ok = false;
     }
 

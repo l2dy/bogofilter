@@ -54,6 +54,11 @@ static int x_init_list(wordlist_t* list, const char* name, const char* filepath,
 }
 #endif
 
+static struct option longopts_dummy[] = {
+    /* end of list */
+    { NULL,				0, 0, 0 }
+};
+
 int main( int argc, char **argv)
 {
     verbose = 0;
@@ -65,7 +70,7 @@ int main( int argc, char **argv)
 	if (strcmp(arg, "-v") == 0)
 	    verbose = 1;
     }
-    if ( !process_config_files(false) )
+    if ( !process_config_files(false, longopts_dummy) )
 	exit(EX_ERROR);
     /* read_config_file("./bogofilter.cf", true, false); */
     return 0;

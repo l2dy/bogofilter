@@ -19,14 +19,15 @@ const char **dsm_help_bogoutil(void)
     return &help_text[0]; 
 }
 
-void dsm_options_bogofilter(int option, const char *name, const char *val)
+bool dsm_options_bogofilter(int option, const char *name, const char *val)
 {
     (void) option;
     (void) name;
     (void) val;
+    return false;
 }
 
-void dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_file, const char *name, const char *val)
+bool dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_file, const char *name, const char *val)
 {
     (void) option;
     (void) flag;
@@ -34,4 +35,5 @@ void dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_f
     (void) ds_file;
     (void) name;
     (void) val;
+    return false;
 }

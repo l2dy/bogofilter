@@ -545,6 +545,23 @@ static bool  prob = false;
 
 static cmd_t flag = M_NONE;
 
+static struct option longopts_bogoutil[] = {
+    /* longoptions.h - common options */
+    LONGOPTIONS_COMMON
+    /* longoptions.h - options for bogofilter and bogoutil */
+    LONGOPTIONS_DB
+    /* bogoutil specific options */
+    { "db-prune",                       R, 0, O_DB_PRUNE },
+    { "db-checkpoint",                  R, 0, O_DB_CHECKPOINT },
+    { "db-recover",                     R, 0, O_DB_RECOVER },
+    { "db-recover-harder",              R, 0, O_DB_RECOVER_HARDER },
+    { "db-remove-environment",		R, 0, O_DB_REMOVE_ENVIRONMENT },
+    { "db-verify",                      R, 0, O_DB_VERIFY },
+
+    /* end of list */
+    { NULL,				0, 0, 0 }
+};
+
 #define	OPTIONS	":a:c:Cd:DhH:I:k:l:m:np:r:R:s:u:vVw:x:X:y:"
 
 static int process_arglist(int argc, char **argv)
@@ -567,12 +584,12 @@ static int process_arglist(int argc, char **argv)
 	const char *name;
 
 	option = getopt_long(argc, argv, OPTIONS,
-			     long_options, &option_index);
+			     longopts_bogoutil, &option_index);
 
 	if (option == -1)
  	    break;
 
-	name = (option_index == 0) ? argv[this_option_optind] : long_options[option_index].name;
+	name = (option_index == 0) ? argv[this_option_optind] : longopts_bogoutil[option_index].name;
 	count += process_arg(option, name, optarg);
     }
 
@@ -607,7 +624,7 @@ static int process_arg(int option, const char *name, const char *val)
 	break;
 
     case O_CONFIG_FILE:
-	read_config_file(val, false, false, PR_COMMAND);
+	read_config_file(val, false, false, PR_COMMAND, longopts_bogoutil);
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
 
@@ -742,54 +759,9 @@ static int process_arg(int option, const char *name, const char *val)
 	dbgout = stdout;
 	break;
 
-    case O_DB_TRANSACTION:
-    case O_DB_VERIFY:
-    case O_DB_CHECKPOINT:
-    case O_DB_RECOVER:
-    case O_DB_RECOVER_HARDER:
-    case O_DB_PRUNE:
-    case O_DB_REMOVE_ENVIRONMENT:
-#ifdef	HAVE_DECL_DB_CREATE
-    case O_DB_MAX_OBJECTS:	
-    case O_DB_MAX_LOCKS:
-    case O_DB_LOG_AUTOREMOVE:
-#ifdef	FUTURE_DB_OPTIONS
-    case O_DB_TXN_DURABLE:
-#endif
-#endif
-	dsm_options_bogoutil(option, &flag, &count, &ds_file, name, val);
-	break;
-
-    /* ignore options that don't apply to bogoutil */
-    case O_BLOCK_ON_SUBNETS:
-    case O_CHARSET_DEFAULT:
-    case O_NS_ESF:
-    case O_SP_ESF:
-    case O_HAM_CUTOFF:
-    case O_HEADER_FORMAT:
-    case O_LOG_HEADER_FORMAT:
-    case O_LOG_UPDATE_FORMAT:
-    case O_MIN_DEV:
-    case O_REPLACE_NONASCII_CHARACTERS:
-    case O_ROBS:
-    case O_ROBX:
-    case O_SPAM_CUTOFF:
-    case O_SPAM_HEADER_NAME:
-    case O_SPAM_SUBJECT_TAG:
-    case O_SPAMICITY_FORMATS:
-    case O_SPAMICITY_TAGS:
-    case O_STATS_IN_HEADER:
-    case O_TERSE:
-    case O_TERSE_FORMAT:
-    case O_THRESH_UPDATE:
-    case O_TIMESTAMP:
-    case O_UNSURE_SUBJECT_TAG:
-    case O_USER_CONFIG_FILE:
-    case O_WORDLIST:
-	break;
-
     default:
-	abort();
+	if (!dsm_options_bogoutil(option, &flag, &count, &ds_file, name, val))
+	    abort();
     }
 
     return count;
@@ -806,7 +778,7 @@ int main(int argc, char *argv[])
     set_today();			/* compute current date for token age */
 
     process_arglist(argc, argv);
-    process_config_files(false);	/* need to read lock sizes */
+    process_config_files(false, longopts_bogoutil);	/* need to read lock sizes */
 
     /* Extra or missing parameters */
     if (flag != M_WORD && argc != optind) {
