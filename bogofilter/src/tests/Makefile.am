@@ -24,7 +24,7 @@ PARSING_TESTS = \
 	t.split t.parsing \
 	t.lexer t.lexer.mbx \
 	t.folded_rfc2047 \
-	t.msgaddr
+	t.msgaddr t.message_id
 
 WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest t.upgrade.subnet.prefix t.multiple.wordlists
 

@@ -316,6 +316,9 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 	    case '%':
 		*buff++ = '%';
 		break;
+	    case 'A':		/* A - Message Address */
+		buff += format_string(buff, msg_addr ? (const char *)msg_addr->text : "UNKNOWN", 0, prec, flags, end);
+		break;
 	    case 'c':		/* c - classification, e.g. Yes/No, Spam/Ham/Unsure, or YN, SHU, +-? */
 	    {
 		const char *val = spamicity_tags[status];
@@ -335,7 +338,9 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 		buff += format_date(buff, end);
 		break;
 	    }
-
+	    case 'I':		/* M - Message ID */
+		buff += format_string(buff, msg_id ? (const char *)msg_id->text : "UNKNOWN", 0, prec, flags, end);
+		break;
 	    case 'p':		/* p - spamicity as a probability */
 	    {
 		const char *f = spamicity_formats[status];
@@ -353,9 +358,6 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 		break;
 	    case 'h':		/* h - spam_header_name, e.g. "X-Bogosity" */
 		buff += format_string(buff, spam_header_name, 0, prec, flags, end);
-		break;
-	    case 'I':		/* I - received IP address */
-		buff += format_string(buff, msg_addr ? (const char *)msg_addr->text : "UNKNOWN", 0, prec, flags, end);
 		break;
 	    case 'l':		/* l - logging tag */
 		buff += format_string(buff, logtag, 0, prec, flags, end);
