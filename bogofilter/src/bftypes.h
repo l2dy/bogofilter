@@ -17,7 +17,10 @@ NAME:
 #ifndef BFTYPES_H
 #define BFTYPES_H
 
-#include "config.h"
+#ifndef	CONFIG_H
+# define  CONFIG_H
+# include "config.h"
+#endif
 
 #if HAVE_STDBOOL_H
 # include <stdbool.h>

@@ -12,9 +12,20 @@ NAME:
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#include "config.h"
+#ifndef	CONFIG_H
+# define  CONFIG_H
+# include "config.h"
+#endif
 
-#include "bftypes.h"
+#ifndef BFTYPES_H
+# include "bftypes.h"
+#endif
+
+#if defined(HAVE_LIMITS_H)
+# include <limits.h>
+#elif defined(HAVE_SYS_PARAM_H)
+# include <sys/param.h>
+#endif
 
 #if HAVE_SYS_STAT_H
 # include <sys/stat.h>

@@ -10,7 +10,16 @@ NAME:
 #ifndef COMMON_H
 #define COMMON_H
 
-#include "config.h"
+#ifndef	CONFIG_H
+# define  CONFIG_H
+# include "config.h"
+#endif
+
+#ifndef BFTYPES_H
+#  include "bftypes.h"
+#endif
+
+#include <stdio.h>
 
 #if defined(HAVE_LIMITS_H)
 #include <limits.h>
@@ -18,9 +27,6 @@ NAME:
 #include <sys/param.h>
 #endif
 
-#include <stdio.h>
-
-#include "system.h"	/* defines bool, uint32_t */
 #include "debug.h"
 
 #ifdef	ENABLE_MEMDEBUG
@@ -28,8 +34,6 @@ NAME:
 #else
 #define	MEMDISPLAY  do { int x; (void)x; } while(0)
 #endif
-
-typedef uint32_t YYYYMMDD;	/* date as YYYYMMDD */
 
 /* for easier debugging - can be disabled */
 #if	0
