@@ -15,15 +15,18 @@
 
 /*@noreturn@*/
 static void mem_error(const char *a) {
-    fprintf(stderr, "%s: Out of memory\n", a);
-    abort(); 
+    (void)fprintf(stderr, "%s: Out of memory\n", a);
+    abort();
 }
 
 void *
 xmalloc(size_t size){
-	char *x;
-	if (!(x = malloc(size))) mem_error("xmalloc"); 
-	return (void *)x;
+	void *x;
+	x = malloc(size);
+	if (x == NULL) {
+	    mem_error("xmalloc"); 
+	}
+	return x;
 }
 
 void
@@ -33,15 +36,19 @@ xfree(void *ptr){
 
 void
 *xcalloc(size_t nmemb, size_t size){
-   char *x;
-   if (!(x = calloc(nmemb, size))) mem_error("xcalloc");
-   return (void *)x;
+   void *x;
+   x = calloc(nmemb, size);
+   if (x == NULL) {
+       mem_error("xcalloc");
+   }
+   return x;
 }
 
 void
 *xrealloc(void *ptr, size_t size){
-   char *x;
-   if (!(x = realloc(ptr, size))) mem_error("xrealloc");
-   return(void *)x;
+   void *x;
+   x = realloc(ptr, size);
+   if (x == NULL) mem_error("xrealloc");
+   return x;
 }
 
