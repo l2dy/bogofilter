@@ -106,8 +106,6 @@ static int check_directory(const char* path) /*@globals errno,stderr@*/
     return 0;
 }
 
-extern int quell_config_read;
-
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
     int   exitcode;
@@ -125,10 +123,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     if (setup_lists(directory, GOOD_BIAS, 1.0))
 	exit(2);
 
-    if (!quell_config_read) {
-	read_config_file(system_config_file, FALSE);
-	read_config_file(user_config_file, TRUE);
-    }
+    process_config_files();
 
     switch(run_type) {
 	case RUN_NORMAL:

@@ -44,15 +44,16 @@ AUTHOR:
 int logflag;
 int Rtable = 0;
 
-int verbose, passthrough, force, nonspam_exits_zero, quell_config_read;
+int verbose, passthrough, force, nonspam_exits_zero;
+static int suppress_config_file;
 
 char directory[PATH_LEN + 100] = "";
 const char *system_config_file = "/etc/bogofilter.cf";
-const char *user_config_file   = "~/.bogofilter.cf";
+const char *user_config_file   = ".bogofilter.cf";
 const char *spam_header_name = SPAM_HEADER_NAME;
 
 bool	stats_in_header = TRUE;
-const char *stats_prefix = "\t";
+const char *stats_prefix;
 
 run_t run_type = RUN_NORMAL; 
 algorithm_t algorithm = AL_GRAHAM;
@@ -205,7 +206,7 @@ static bool process_config_line( const char *line )
     return FALSE;
 }
 
-void read_config_file(const char *filename, bool home_dir)
+static void read_config_file(const char *filename, bool home_dir)
 {
     bool error = FALSE;
     int lineno = 0;
@@ -272,11 +273,6 @@ void read_config_file(const char *filename, bool home_dir)
     (void)fclose(fp); /* we're just reading, so fclose should succeed */
     xfree(tmp);
 
-    if (! stats_in_header)
-	stats_prefix="# ";
-    if (DEBUG_CONFIG(0))
-	fprintf( stderr, "stats_prefix: '%s'\n", stats_prefix );
-
     if (error)
 	exit(2);
 }
@@ -311,7 +307,7 @@ int process_args(int argc, char **argv)
     int option;
     int exitcode;
 
-    while ((option = getopt(argc, argv, "d:ehlsnSNvVpugqRrx:f")) != EOF)
+    while ((option = getopt(argc, argv, "d:ehlsnSNvVpugc:CRrx:f")) != EOF)
     {
 	switch(option)
 	{
@@ -357,7 +353,8 @@ int process_args(int argc, char **argv)
 	    (void)printf( "\t-v\t- set verbosity level.\n" );
 	    (void)printf( "\t-x LIST\t- set debug flags.\n" );
 	    (void)printf( "\t-V\t- print version information and exit.\n" );
-	    (void)printf( "\t-q\t- prevent reading configuration files.\n" );
+	    (void)printf( "\t-c filename\t- read config file 'filename'.\n" );
+	    (void)printf( "\t-C\t- don't read standard config files.\n" );
 	    (void)printf( "\n" );
 	    (void)printf( "bogofilter is a tool for classifying email as spam or non-spam.\n" );
 	    (void)printf( "\n" );
@@ -406,12 +403,18 @@ int process_args(int argc, char **argv)
 	    set_debug_mask( optarg );
 	    break;
 
-	case 'q':
-	    quell_config_read = 1;
-	    break;
-
 	case 'f':
 	    force = 1;
+	    break;
+
+	case 'c':
+	    system_config_file = optarg;
+	    read_config_file(system_config_file, FALSE);
+	/*@fallthrough@*/
+	/* fall through to suppress reading config files */
+
+	case 'C':
+	    suppress_config_file = 1;
 	    break;
 	}
     }
@@ -419,4 +422,18 @@ int process_args(int argc, char **argv)
     exitcode = validate_args(argc, argv);
 
     return exitcode;
+}
+
+void process_config_files()
+{
+    if ( ! suppress_config_file)
+    {
+	read_config_file(system_config_file, FALSE);
+	read_config_file(user_config_file, TRUE);
+    }
+
+    stats_prefix= stats_in_header ? "\t" : "#   ";
+
+    if (DEBUG_CONFIG(0))
+	fprintf( stderr, "stats_prefix: '%s'\n", stats_prefix );
 }
