@@ -99,7 +99,7 @@ static int classify(int argc, char **argv, FILE *out)
 	switch (bulk_mode) {
 	case B_NORMAL:
 	    break;
-	case B_STDIN:	/* streaming (stdin) mode */
+	case B_STDIN:		/* '-b' - streaming (stdin) mode */
 	{
 	    size_t len;
 	    filename = buff;
@@ -112,7 +112,7 @@ static int classify(int argc, char **argv, FILE *out)
 		filename[len-1] = '\0';
 	    break;
 	}
-	default:		/* command line mode */
+	default:		/* '-B' - command line mode */
 	    if ((int)bulk_mode < argc && !error) {
 		filename = argv[bulk_mode++];
 	    }
