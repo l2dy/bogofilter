@@ -48,7 +48,14 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #define EVEN_ODDS	0.5f		// used for words we want to ignore
 #define DEVIATION(n)	fabs((n) - EVEN_ODDS)	// deviation from average
 
-#define MIN_DEV		0.0f		// if nonzero, use characteristic words
+#define ORIGINAL_MIN_DEV		0.4f		// look for characteristic words
+#define ROBINSON_MIN_DEV		0.0f		// if nonzero, use characteristic words
+#define MIN_DEV (original_algorithm ? ORIGINAL_MIN_DEV : ROBINSON_MIN_DEV)
+
+#define ORIGINAL_SPAM_CUTOFF	0.90f	// if it's spammier than this...
+#define ROBINSON_SPAM_CUTOFF	0.52f	// if it's spammier than this...
+#define SPAM_CUTOFF (original_algorithm ? ORIGINAL_SPAM_CUTOFF : ROBINSON_SPAM_CUTOFF)
+
 
 #define ORIGINAL_SPAM_CUTOFF	0.90f	// if it's spammier than this...
 #define ROBINSON_SPAM_CUTOFF	0.52f	// if it's spammier than this...
@@ -62,8 +69,6 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #define ROBX 0.415f                    // Robinson's x
 
 #define PLURAL(count) ((count == 1) ? "" : "s")
-
-extern bool original_algorithm, robinson_algorithm;
 
 extern char msg_register[];
 
