@@ -720,7 +720,7 @@
     <p>To find out how many messages are in your wordlists query
     the special token .MSG_COUNT, i.e., run command "bogoutil -w
     $BOGOFILTER_DIR .MSG_COUNT" to see the counts for the spam and
-    ham word lists.</p>
+    ham wordlists.</p>
 
     <p>To tell how many tokens are in your wordlists pipe the output
     of bogoutil's dump command to command "wc", i.e. use "bogoutil -d
@@ -753,9 +753,9 @@
 
     <hr>
 
-    <h2 id="rescue">How can I tell if my word lists are corrupted?</h2>
+    <h2 id="rescue">How can I tell if my wordlists are corrupted?</h2>
 
-    <p>If you think your word lists are hosed, you can see what
+    <p>If you think your wordlists are hosed, you can see what
     BerkeleyDB thinks by running:</p>
     <pre>	db_verify wordlist.db</pre>
 
@@ -913,7 +913,7 @@
 
     <hr>
 
-    <h2 id="nfs">Can I share word lists over NFS?</h2>
+    <h2 id="nfs">Can I share wordlists over NFS?</h2>
 
     <p>If you're just reading from them, there are no problems.
     When you're updating them, you need to use the correct file
@@ -923,7 +923,7 @@
     systems will all support this. If you are running an unusual, or
     an older version of an operating system, make sure it supports
     fcntl().  If your system does not
-    support fcntl(), then you will not be able to share word list
+    support fcntl(), then you will not be able to share wordlist
     files over NFS without the risk of data corruption.</p>
 
     <p>Next, make sure you have NFS set up properly, with "lockd"
