@@ -122,7 +122,9 @@ const parm_desc sys_parms[] =
     { "min_dev",	  CP_DOUBLE,	{ (void *) &min_dev } },
     { "spam_cutoff",	  CP_DOUBLE,	{ (void *) &spam_cutoff } },
     { "thresh_stats",	  CP_DOUBLE,	{ (void *) &thresh_stats } },
+#ifdef	ENABLE_DEPRECATED_CODE
     { "thresh_index",	  CP_INTEGER,	{ (void *) NULL } },	/* Graham */
+#endif
     { "thresh_rtable",	  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
     { "robx",		  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
     { "robs",		  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
