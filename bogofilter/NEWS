@@ -8,6 +8,23 @@ is in the RELEASE.NOTES files!
 
 $Id$
 
+0.14.5.1 2003-08-19
+
+	* Fixed parameter type error in dbh_print_names() that causes
+          segfault.
+	* Enhanced verbose output of bogominitrain.pl
+	* Documented '-T' option in man page.
+
+	2003-08-18
+
+	* Fixed parsing error that treated "^From " in encoded text as
+          a message separator.
+
+	2003-08-17
+
+	* Revised format for '-T'.
+	* Fixed defect in bogominitrain.pl's norepetition mode.
+
 0.14.5	2003-08-15
 
 	* Updated bogominitrain.pl to version 1.3.

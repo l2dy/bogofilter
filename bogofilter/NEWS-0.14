@@ -2,6 +2,17 @@
 				BOGOFILTER NEWS
 			       =================
  
+0.14.5.1 2003-08-19
+ 
+* Fixed parameter type error in dbh_print_names() that causes
+  segfault.
+* Fixed parsing error that treated "^From " in encoded text as
+  a message separator.
+* Enhanced verbose output of bogominitrain.pl
+* Fixed defect in bogominitrain.pl's norepetition mode.
+* Documented '-T' option in man page.
+* Revised format for '-T'.
+ 
 0.14.5	2003-08-15
 
 * Corrected parsing error (in html code) that caused
