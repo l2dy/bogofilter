@@ -36,3 +36,8 @@ void *db_get_env(void *vhandle) {
     (void)vhandle;
     return 0;
 }
+
+int dbe_remove(const char *d) {
+    (void)d;
+    return 0;
+}
