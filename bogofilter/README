@@ -39,7 +39,6 @@ features rather than broken up. Various kinds of MTA cruft such as
 dates and message-IDs are discarded so as not to bloat the word lists.
 
 
-
 2. Documentation
 ----------------
 
@@ -64,7 +63,6 @@ If you use mutt, see the bogofilter(1) manual page for helpful macros
 you can add to your .muttrc.
 
 
-
 3. Installing Bogofilter
 ----------------------
 
@@ -76,7 +74,6 @@ You can safely ignore any of these compile time warnings:
 
 warning: unused parameter ...
 warning: format not a string literal, argument types not checked
-
 
 
 4. How to contribute
@@ -96,7 +93,6 @@ If you have code to contribute, please post it on the bogofilter
 mailing list or mail it to David Relson (relson@users.sourceforge.net)
 
 
-
 5. How to request features
 --------------------------
 
@@ -107,7 +103,6 @@ until you ask!
 Alternatively, you might want to hack at the code and develop the
 feature on your own, which would be great!  You can then send a patch
 to the list.
-
 
 
 6. Building & Installing Bogofilter from Source Tarball or CVS

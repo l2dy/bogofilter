@@ -10,6 +10,13 @@ line tests.  Use options, config files, and wordlists from your
 production environment.  This will help ensure that the new version of
 bogofilter is working properly.
 
+* Added GETTING.STARTED document.
+* Changed default mode from two-state to three-state
+  - with ham_cutoff=0.45 and spam_cutoff=0.99
+    The ham_cutoff value is new and spam_cutoff is unchanged.
+  - changed the "Yes/No" tags used in the "X-Bogosity:" line
+    to "Spam/Ham/Unsure"
+
 0.92.8	2004-10-19
 
 * Ignore 'X-Bogosity' lines in mime attachments.

@@ -1,0 +1,11 @@
+Bogofilter's defaults have been changed.  It now operates in tri-state
+mode and will classify messages as Spam, Ham, or Unsure.
+
+If you're checking messages for "X-Bogosity: Yes" or "X-Bogosity: No",
+you _need_ to change your checks.  Use "X-Bogosity: Spam" and
+"X-Bogosity: Ham" instead of the old forms.  Also, checking for
+"X-Bogosity: Unsure" and putting those messages in a separate folder
+(or mailbox) will give you an excellent set of messages for training,
+as "Unsure" messages are messages that bogofilter has too little
+information to classify (with certainty) as spam or ham.
+

@@ -3,7 +3,17 @@
 			       =================
 
 
+	2004-10-25
+
+	* Added GETTING.STARTED document.
+	* Changed default mode from two-state to three-state
+	  - with ham_cutoff=0.45 and spam_cutoff=0.99
+            The ham_cutoff value is new and spam_cutoff is unchanged.
+	  - changed the "Yes/No" tags used in the "X-Bogosity:" line
+	    to "Spam/Ham/Unsure"
+
 0.92.8	2004-10-19
+	2004-10-25 - Promoted to Stable Release
 
 	* Bogotune now warns when using '-E' to suppress ESF checking
           and non 1.0 esf values are read from the config file.
