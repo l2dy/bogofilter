@@ -58,6 +58,9 @@ typedef struct {
 #define	DB_OPEN(db, file, database, dbtype, flags, mode) db->open(db, file, database, dbtype, flags, mode)
 #endif
 
+int db_cachesize = 0;	/* in MB */
+#define	DB_CACHE(db, gb, bytes, chunks) db->set_cachesize(db, 0, db_cachesize*1024*1024, chunks)
+
 /* Function prototypes */
 
 static int db_get_dbvalue(void *vhandle, const char *word, dbv_t *val);
@@ -124,6 +127,13 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
 	print_error(__FILE__, __LINE__, "(db) create, err: %d, %s",
 		ret, db_strerror(ret));
 	goto open_err;
+    }
+
+    if (db_cachesize != 0 &&
+	(ret = DB_CACHE(handle->dbp, 0, db_cachesize, 1)) != 0) {
+        print_error(__FILE__, __LINE__, "(db) setcache( %s ), err: %d, %s",
+            db_file, ret, db_strerror(ret));
+        goto open_err; 
     }
 
     /* open data base */

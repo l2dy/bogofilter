@@ -42,6 +42,8 @@ extern	double	thresh_stats;
 extern	int	abort_on_error;
 extern	bool	stats_in_header;
 
+extern	int	db_cachesize;
+
 extern	const char	*update_dir;
 extern	const char	*progname;
 /*@observer@*/
