@@ -92,7 +92,7 @@ void open_wordlists(dbmode_t mode)
 	    wordlist_t *list;
 	    retry = false;
 	    for (list = word_lists; list != NULL; list = list->next) {
-		retry |= open_wordlist(list, mode);
+		retry |= open_wordlist(list, list->type != WL_IGNORE ? mode : DS_READ);
 	    }  /* for */
 	}
     }
