@@ -1,0 +1,176 @@
+<html>
+<head><title>Bogofilter FAQ</title></head>
+</body>
+<h1>Bogofilter FAQ</h1>
+<p>
+Revision: $Id$<br>
+Official Version:
+<a href="http://bogofilter.sourceforge.net/bogofilter-faq.html">
+http://bogofilter.sourceforge.net/bogofilter-faq.html</a><br>
+Maintainer: Adrian Otto &lt aotto at aotto.com &gt
+</p>
+<p>
+This document is intended to answer frequently asked questions about 
+bogofilter. 
+</p>
+<p>
+<ul>
+  <li><a href="#what_is_bogofilter">What is bogofilter?</a></li>
+  <li><a href="#history">Bogofilter History</a></li>
+  <li><a href="#lists">Bogofilter Mailing Lists</a></li>
+  <li><a href="#home_page">Bogofilter Home Page</a></li>
+  <li><a href="#port_notes">How do I get Bogofilter working on Solaris, BSD, etc.?</a></li>
+  <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
+  <li>How can I use SpamAssasin to train Bogofilter? (coming soon)</li>
+</ul>
+</p>
+<hr>
+<a name="what_is_bogofilter"></a>
+<p><b>What is bogofilter?</b></p>
+<p>
+Bogofilter is a fast Bayesian spam filter along the lines suggested 
+by Paul Graham in his article <a href="http://www.paulgraham.com/spam.html">
+A Plan For Spam</a>.
+<a href="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">Gary Robinson</a>'s algorithm is also included.
+<p>
+Check the <a href="http://bogofilter.sourceforge.net">
+bogofilter home page</a> for more information.
+</p>
+
+<hr>
+<a name="history"></a>
+<p><b>Bogofilter History</b></p>
+<p>
+Bogofilter was written by Eric S. Raymond on August 19, 2002. It gained
+popularity in September 2002, and a number of other authors have started
+to contribute to the project.
+</p>
+
+<hr>
+<a name="lists"></a>
+<p><b>Mailing Lists</b></p>
+<p>
+There are currently four mailing lists for bogofilter
+</p>
+<p>
+<table border=1>
+  <tr>
+    <td><b>List Address</b></td>
+    <td><b>Description</b></td>
+  </tr>
+  <tr>
+    <td>bogofilter-announce@aotto.com <a href="mailto:bogofilter-announce-subscribe@aotto.com">[subscribe]</a></td>
+    <td>An announcement-only list where new versions are announced.</td>
+  </tr>
+  <tr>
+    <td>bogofilter@aotto.com <a href="mailto:bogofilter-subscribe@aotto.com">[subscribe]</a></td>
+    <td>A discussion list where any conversation about bogofilter 
+	may take place.</td>
+  </tr>
+  <tr>
+    <td>bogofilter-dev@aotto.com <a href="mailto:bogofilter-dev-subscribe@aotto.com">[subscribe]</a></td>
+    <td>A list for sharing patches, development, and technical discussions</td>
+  </tr>
+  <tr>
+    <td>bogofilter-cvs@lists.sourceforge.net <a href="http://lists.sourceforge.net/mailman/listinfo/bogofilter-cvs">[subscribe]</a></td>
+    <td>Mailing list for announcing code changes to the CVS archive</td>
+  </tr>
+</table>
+</p>
+
+<hr>
+<a name="home_page"></a>
+<p><b>Bogogfilter Home Page</b></p>
+<p>
+The <a href="http://bogofilter.sourceforge.net">bogofilter home page</a> at
+sourceforge is the central clearinghouse for bogofilter resources.
+</p>
+
+<hr>
+<a name="port_notes"></a>
+<p><b>How do I get bogofilter working on Solaris, BSD, etc?</b></p>
+<p>
+If you don't already have a v3.0+ version of 
+<a href="http://www.sleepycat.com">BerkeleyDB</a>, then
+<a href="http://www.sleepycat.com/download.html">
+download it</a> unpack it, and do these commands in the 'dist' directory:
+</p>
+<p>
+<pre>
+$ ./configure
+$ make
+$ make install
+</pre>
+</p>
+<p>
+Next, download a <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">portable version</a> of bogofilter.</a>
+</p>
+<p>
+<b>On Solaris</b>
+</p>
+<p>
+Unpack it, and then do:
+</p>
+<p>
+<pre>
+$ ./configure --with-db=/usr/local/BerkeleyDB-4.0
+$ make && make install
+</pre>
+</p>
+<p>
+You will either want to put a symlink to libdb.so in /usr/lib, or use a modified LD_LIBRARY_PATH environment variable before you start bogofilter.
+</p>
+<p>
+<pre>
+$ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.0
+</pre>
+</p>
+<p>
+<b>On FreeBSD</b>
+</p>
+<p>
+Unpack it, and do:
+</p>
+<p>
+<pre>
+$ ./configure --with-db=/usr/local/BerkeleyDB.4.0
+$ make && make install
+$ ldconfig /usr/lib /usr/local/lib \
+/usr/local/BerkeleyDB.4.0/lib
+</pre>
+</p>
+<p>
+The 'ldconfig' command gives the runtime linker a way to find the new 
+libraries. Be careful not to clobber other paths you may haev added using
+ldconfig.
+</p>
+<p>
+<b>On HP-UX</b>
+</p>
+<p>
+See the file README.hp-ux in the source distribution.
+
+<hr>
+<a name="nfs"></a>
+<p><b>Can I share wordlists over NFS?</b></p>
+<p>
+Yes, provided you use the correct file locking to avoid data corruption.
+When you compile bogofilter, you will need to verify that the configure
+script has set "#define HAVE_FCNTL 1" in your config.h file. Popular UNIX
+operating systems will all support this. If you are running an unsual, or
+an older version of an operating system, make sure it supports fcntl().
+If "#define HAVE_FCNTL 1" is set, then comment out "#define HAVE_FLOCK 1" 
+so that the locking system uses fcntl() locking instead of the default of 
+flock() locking. If your system does not support fcntl, then you will not
+be able to share wordlist files over NFS without the risk of data corruption.
+</p>
+<p>
+Next, make sure you have NFS set up properly, with "lockd" running. Refer
+to your NFS documentation for more information about running "lockd" or
+"rpc.lockd". Most operating systems with NFS turn this on by default.
+</p>
+
+<hr>
+$Id$
+</body>
+</html>
