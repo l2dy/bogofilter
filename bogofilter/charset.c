@@ -372,8 +372,8 @@ void init_charset_table(const char *charset_name, bool use_default)
 
     if ( !found && use_default ) {
 	map_default();
-	if ( !quiet && verbose > 0)
-	    fprintf( stderr, "Can't find charset '%s';  using default.\n", charset_name );
+	if (DEBUG_CONFIG(0))
+	    fprintf(dbgout, "Unknown charset '%s';  using default.\n", charset_name );
     }
 
     return;
