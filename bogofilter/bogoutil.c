@@ -18,6 +18,7 @@ AUTHOR:
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <time.h>
 #include <db.h>
 
 #include <config.h>
@@ -35,9 +36,69 @@ AUTHOR:
 int verbose = 0;
 bool logflag = 0;
 
+int thresh_count = 0;
+int thresh_age   = 0;
+size_t size_min = 0, size_max = 0;
+bool replace_nonascii_characters = false;
+
+typedef unsigned char byte;
+
 run_t run_type = RUN_NORMAL;
 
 const char *progname = PROGNAME;
+
+/* Function Prototypes */
+static bool check_age(int tmp);
+static bool check_count(int tmp);
+static bool check_size(size_t tmp);
+static void do_replace_nonascii_characters(byte *str);
+
+/* Function Definitions */
+
+/* Keep high counts */
+bool check_count(int c)
+{
+    if (thresh_count == 0)
+	return true;
+    else {
+	bool ok = c > thresh_count;
+	return ok;
+    }
+}
+
+/* Keep recent dates */
+bool check_age(int a)
+{
+    if (thresh_age == 0 || a == 0 || a == today)
+	return true;
+    else {
+	int diff = (today - a + 366) % 366;
+	bool ok = diff <= thresh_age;
+	return ok;
+    }
+}
+
+/* Keep sizes within bounds */
+bool check_size(size_t s)
+{
+    if (size_min == 0 || size_max == 0)
+	return true;
+    else {
+	bool ok = (size_min <= s) && (s <= size_max);
+	return ok;
+    }
+}
+
+static void do_replace_nonascii_characters(byte *str)
+{
+    byte ch;
+    while ((ch=*str) != '\0')
+    {
+	if ( ch & 0x80)
+	    *str = '?';
+	str += 1;
+    }
+}
 
 static int dump_file(char *db_file)
 {
@@ -49,6 +110,7 @@ static int dump_file(char *db_file)
 
     int ret;
     int rv = 0;
+    dbv_t *val;
 
     dbcp = &dbc;
 
@@ -69,7 +131,25 @@ static int dump_file(char *db_file)
 	    for (;;) {
 		ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT);
 		if (ret == 0) {
-		    printf("%.*s %lu\n", (int)key.size, (char *) key.data, *(unsigned long *) data.data);
+		    switch (data.size){
+		    case 4:
+			printf("%.*s %lu\n", (int)key.size, (char *) key.data, *(unsigned long *) data.data);
+			break;
+		    case 8:
+			val = (dbv_t *)data.data;
+			if (replace_nonascii_characters)
+			    do_replace_nonascii_characters((byte *)key.data);
+			if (check_count(val->count) && check_age(val->yday) && check_size(key.size))
+			{
+			    if (val->yday == 0 )
+				printf("%.*s %lu\n", (int)key.size, (char *) key.data, val->count);
+			    else
+				printf("%.*s %lu %lu\n", (int)key.size, (char *) key.data, val->count, val->yday);
+			}
+			break;
+		    default:
+			fprintf(stderr, "Unknown data size - %d.\n", data.size);
+		    }
 		}
 		else if (ret == DB_NOTFOUND) {
 		    break;
@@ -90,14 +170,13 @@ static int dump_file(char *db_file)
 
 static int load_file(char *db_file)
 {
-
     dbh_t *dbh;
-    char buf[BUFSIZE];
+    byte buf[BUFSIZE];
     char *p;
     int rv = 0;
     size_t len;
     long line = 0;
-    long count;
+    long count, date;
 
     if ((dbh = db_open(db_file, db_file, DB_WRITE)) == NULL)
 	return 2;
@@ -124,21 +203,30 @@ static int load_file(char *db_file)
 	if (len < 4)
 	    continue;
 
-	p = &buf[len - 1];
+	p = buf;
+	while ( *p != '\0' && !isspace(*p) )
+	    ++p;
 
-	if (*(p--) != '\n') {
-	    fprintf(stderr,
-		    "%s: Unexpected input [%s] on line %ld. "
-		    "Does not end with newline\n",
-		    PROGNAME, buf, line);
-	    rv = 1;
-	    break;
-	}
+	*p++ = '\0';	/* delimit token */
 
-	while (isdigit((unsigned char)*p))
-	    p--;
+	while ( *p != '\0' && isspace(*p) )	/* skip whitespace */
+	    ++p;
 
-	if (!isspace((unsigned char)*p)) {
+	count = 0;
+	while (isdigit(*p))			/* parse count */
+	    count = count * 10 + *p++ - '0';
+
+	while ( *p != '\0' && isspace(*p) )	/* skip whitespace */
+	    ++p;
+
+	date = 0;
+	while (isdigit(*p))			/* parse date */
+	    date = date * 10 + *p++ - '0';
+	
+	while ( *p != '\0' && isspace(*p) )	/* skip whitespace */
+	    ++p;
+
+	if ( *p != '\0' ) {
 	    fprintf(stderr,
 		    "%s: Unexpected input [%s] on line %ld. "
 		    "Expecting whitespace before count\n",
@@ -147,15 +235,14 @@ static int load_file(char *db_file)
 	    break;
 	}
 
-	count = atol(p + 1);
+	if (date == 0)				/* day of year (1..366) */
+	    date = today;
 
-	while (isspace((unsigned char)*p))
-	    p--;
-
-	*(p + 1) = '\0';
+	if (replace_nonascii_characters)
+	    do_replace_nonascii_characters(buf);
 
 	/* Slower, but allows multiple lists to be concatenated */
-	db_increment(dbh, buf, count);
+	db_increment_with_date(dbh, buf, count, date);
     }
     db_lock_release(dbh);
     db_close(dbh);
@@ -484,13 +571,18 @@ static void help(void)
 {
     usage();
     fprintf(stderr,
-	    "\t-d\tDump data from file.db to stdout.\n"
-	    "\t-l\tLoad data from stdin into file.db.\n"
+	    "\t-d file\tDump data from file to stdout.\n"
+	    "\t-l file\tLoad data from stdin into file.\n"
 	    "\t-w\tDisplay counts for words from stdin.\n"
 	    "\t-p\tOutput word probabilities.\n"
 	    "\t-v\tOutput debug messages.\n"
 	    "\t-h\tPrint this message.\n"
 	    "\t-R\tCompute Robinson's X for specified directory.\n"
+	    "\t-a age\tExclude tokens with older ages.\n"
+	    "\t-c count\tExclude tokens with lower counts.\n"
+	    "\t-s min,max\tExclude tokens with lengths between min and max.\n"
+	    "\t-n\tReplace non-ascii characters with '?'.\n"
+	    "\t-y today\tSet default day-of-year (1..366).\n"
 	    "\t-V\tPrint program version.\n"
 	    "%s is part of the bogofilter package.\n", PROGNAME);
 }
@@ -507,7 +599,11 @@ int main(int argc, char *argv[])
     cmd_t flag = NONE;
     bool  prob = false;
 
-    while ((option = getopt(argc, argv, "d:l:w:R:phvVx:")) != -1)
+    time_t t = time(NULL);
+    struct tm *tm = localtime( &t );
+    today = tm->tm_yday + 1;
+
+    while ((option = getopt(argc, argv, "d:l:w:R:phvVx:a:c:s:ny:")) != -1)
 	switch (option) {
 	case 'd':
 	    flag = DUMP;
@@ -551,6 +647,26 @@ int main(int argc, char *argv[])
 
 	case 'x':
 	    set_debug_mask( (char *) optarg );
+	    break;
+
+	case 'a':
+	    thresh_age = atol((char *)optarg);
+	    break;
+
+	case 'c':
+	    thresh_count = atol((char *)optarg);
+	    break;
+
+	case 's':
+	    sscanf((char *)optarg, "%d,%d", &size_min, &size_max);
+	    break;
+
+	case 'n':
+	    replace_nonascii_characters ^= true;
+	    break;
+
+	case 'y':		/* day of year (1..366) */
+	    today = atol((char *)optarg);
 	    break;
 
 	default:
