@@ -62,7 +62,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     case RC_UNSURE:	exitcode = EX_UNSURE;	break;
     case RC_OK:		exitcode = EX_OK;	break;
     default:
-	fprintf(dbgout, "Unexpected status code - %d\n", status);
+	fprintf(dbgout, "Unexpected status code - %d\n", (int)status);
 	exit(EX_ERROR);
     }
 

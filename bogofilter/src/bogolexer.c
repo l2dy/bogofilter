@@ -304,7 +304,7 @@ int main(int argc, char **argv)
 		fprintf(stdout, "%s\n", yylval->text);
 	    }
 	    else if (!quiet)
-		printf("get_token: %d \"%s\"\n", t, yylval->text);
+		printf("get_token: %d \"%s\"\n", (int)t, yylval->text);
 	}
     }
 
