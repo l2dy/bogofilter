@@ -103,7 +103,7 @@ void register_words(run_t run_type, wordhash_t *h, int msgcount, int wordcount)
 // tokenize text on stdin and register it to  a specified list
 // and possibly out of another list
 {
-  char ch;
+  char ch = '\0';
   hashnode_t *node;
   wordprop_t *wordprop;
 
@@ -113,13 +113,15 @@ void register_words(run_t run_type, wordhash_t *h, int msgcount, int wordcount)
 
   switch(run_type)
   {
-  case REG_SPAM:		ch = 's' ; break;
-  case REG_GOOD:		ch = 'n' ; break;
-  case REG_GOOD_TO_SPAM:	ch = 'S' ; break;
-  case REG_SPAM_TO_GOOD:	ch = 'N' ; break;
+  case REG_SPAM:		ch = 's' ;  break;
+  case REG_GOOD:		ch = 'n' ;  break;
+  case REG_GOOD_TO_SPAM:	ch = 'S' ;  break;
+  case REG_SPAM_TO_GOOD:	ch = 'N' ;  break;
+  default:			abort() ;   break;
   }
 
-  sprintf(msg_register, "register-%c, %d words, %d messages\n", ch, wordcount, msgcount);
+  sprintf(msg_register, "register-%c, %d words, %d messages\n", ch,
+	  wordcount, msgcount);
 
   if (verbose)
     fprintf(stderr, "# %d words, %d messages\n", wordcount, msgcount);
@@ -226,7 +228,7 @@ int compare_extrema(const void *id1, const void *id2)
 
 void init_bogostats(bogostat_t *bogostats)
 {
-    int idx;
+    size_t idx;
 
     for (idx = 0; idx < SIZEOF(bogostats->extrema); idx++)
     {
@@ -236,7 +238,7 @@ void init_bogostats(bogostat_t *bogostats)
     }
 }
 
-void populate_bogostats( bogostat_t *bogostats, char *text, double prob, int count )
+void populate_bogostats(bogostat_t *bogostats, char *text, double prob, int count)
 // if  the new word,prob pair is a better indicator.
 // add them to the bogostats structure, 
 {
