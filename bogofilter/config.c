@@ -27,6 +27,7 @@ AUTHOR:
 #include "charset.h"
 #endif
 #include "find_home.h"
+#include "lexer.h"
 #include "method.h"
 #ifdef	ENABLE_GRAHAM_METHOD
 #include "graham.h"
@@ -137,8 +138,9 @@ static const parm_desc sys_parms[] =
     { "robs",		  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
 #endif
 #ifdef ENABLE_ROBINSON_FISHER
-    { "ham_cutoff",	  CP_FUNCTION,	{ (void *) NULL } }, /* Robinson-Fisher */
+    { "ham_cutoff",	  CP_FUNCTION,	{ (void *) NULL } },	/* Robinson-Fisher */
 #endif
+    { "block_on_subnets", CP_BOOLEAN,	{ (void *) &block_on_subnets } },
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
 
