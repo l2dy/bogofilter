@@ -441,7 +441,7 @@ static void mime_disposition(word_t * text)
     msg_state->mime_disposition = MIME_DISPOSITION_UNKNOWN;
     for (i = 0; i < COUNTOF(mime_disposition_table); i += 1) {
 	struct disposition_s *dis = mime_disposition_table + i;
-	if (strcasecmp(w, (const char *)dis->name) == 0) {
+	if (strcasecmp((const char *)w, dis->name) == 0) {
 	    msg_state->mime_disposition = dis->disposition;
 	    if (DEBUG_MIME(1))
 		fprintf(dbgout, "*** mime_disposition: %s\n", text->text);
@@ -479,7 +479,7 @@ static void mime_encoding(word_t * text)
     msg_state->mime_encoding = MIME_ENCODING_UNKNOWN;
     for (i = 0; i < COUNTOF(mime_encoding_table); i += 1) {
 	struct encoding_s *enc = mime_encoding_table + i;
-	if (strcasecmp(w, (const char *)enc->name) == 0) {
+	if (strcasecmp((const char *)w, enc->name) == 0) {
 	    msg_state->mime_encoding = enc->encoding;
 	    if (DEBUG_MIME(1))
 		fprintf(dbgout, "*** mime_encoding: %s\n", text->text);
@@ -505,7 +505,7 @@ static void mime_type(word_t * text)
     msg_state->mime_type = MIME_TYPE_UNKNOWN;
     for (typ = mime_type_table;
 	 typ < mime_type_table + COUNTOF(mime_type_table); typ += 1) {
-	if (strncasecmp(w, (const char *)typ->name, typ->len) == 0) {
+	if (strncasecmp((const char *)w, typ->name, typ->len) == 0) {
 	    msg_state->mime_type = typ->type;
 	    if (DEBUG_MIME(1) || DEBUG_LEXER(1))
 		fprintf(dbgout, "*** mime_type: %s\n", text->text);
@@ -551,7 +551,7 @@ void mime_type2(word_t * text)
     msg_state->mime_type = MIME_TYPE_UNKNOWN;
     for (typ = mime_type_table;
 	 typ < mime_type_table + COUNTOF(mime_type_table); typ += 1) {
-	if (strncasecmp(w, (const char *)typ->name, typ->len) == 0) {
+	if (strncasecmp((const char *)w, typ->name, typ->len) == 0) {
 	    msg_state->mime_type = typ->type;
 	    if (DEBUG_MIME(1) || DEBUG_LEXER(1))
 		fprintf(dbgout, "*** mime_type: %s\n", text->text);
