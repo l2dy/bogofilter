@@ -99,5 +99,7 @@ if false ; then
     export EF_ALIGNMENT
 fi
 
-DIFF_BRIEF=""
-[ "`uname -s`" = "Linux" ] && DIFF_BRIEF="--brief -s"
+case `uname -s` in
+    Linux)  DIFF_BRIEF="--brief -s" ;;
+    *)      DIFF_BRIEF="" ;;
+esac
