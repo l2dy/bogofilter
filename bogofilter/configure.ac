@@ -215,19 +215,14 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl strchr strrchr memcpy munmap pow sqrt strcasecmp strcspn strspn strstr snprintf vsnprintf)
 AC_REPLACE_FUNCS(strlcpy strlcat)
 
+AC_LIB_RPATH
+
 WITH_DB_ENGINE=db
 AC_ARG_WITH(database,
 	    AC_HELP_STRING([--with-database=ENGINE],
 	    [Choose database engine {db|tdb|qdbm} [[ENGINE=db]]]),
 	    [ WITH_DB_ENGINE=$withval ]
 )
-case "x$WITH_DB_ENGINE" in
-    xdb|xtdb|xqdbm) : ;;
-    *) AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, tdb, qdbm.])
-    ;;
-esac
-
-AC_LIB_RPATH
 
 case "x$WITH_DB_ENGINE" in
     xtdb)
@@ -236,7 +231,7 @@ case "x$WITH_DB_ENGINE" in
 	AC_DEFINE_UNQUOTED(DB_EXT, ".tdb", [database file extension])
 	AC_LIB_LINKFLAGS([tdb])
 	LIBDB="$LIBTDB"
-	save_LIBS="$LIBS"
+	saveLIBS="$LIBS"
 	LIBS="$LIBS $LIBDB"
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([
 #include <sys/types.h>
@@ -244,7 +239,7 @@ case "x$WITH_DB_ENGINE" in
 	], [
 	    TDB_CONTEXT *t = tdb_open("", 0, 0, 0, 0);
 	])],,AC_MSG_ERROR(Cannot link to tdb library.))
-	LIBS="$save_LIBS"
+	LIBS="$saveLIBS"
     ;;
     xqdbm)
 	AC_DEFINE(ENABLE_QDBM_DATASTORE,1, [Enable qdbm datastore])
@@ -252,7 +247,7 @@ case "x$WITH_DB_ENGINE" in
 	AC_DEFINE_UNQUOTED(DB_EXT, ".qdbm")
 	AC_LIB_LINKFLAGS([qdbm])
 	LIBDB="$LIBQDBM"
-	save_LIBS="$LIBS"
+	saveLIBS="$LIBS"
 	LIBS="$LIBS $LIBDB"
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([
 #include <stdlib.h>
@@ -260,7 +255,7 @@ case "x$WITH_DB_ENGINE" in
 	], [
 	    DEPOT *d = dpopen("", 0, 0);
 	])],,AC_MSG_ERROR(Cannot link to qdbm library.))
-	LIBS="$save_LIBS"
+	LIBS="$saveLIBS"
     ;;
     xdb)
 	dnl check if we need LIBDB at all (it is harmful on BSD since
@@ -328,9 +323,12 @@ Use --with-libdb-prefix=PATH to specify the path to a v3+ install directory.
 You can download BerkeleyDB 4.1.x from http://www.sleepycat.com/]]),
 	[[#include <db.h>]]
 	)
+	LIBS="$saveLIBS"
+    ;;
+    *)
+	AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, tdb, qdbm.])
     ;;
 esac
-LIBS="$saveLIBS"
 
 AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xtdb")
 AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
@@ -463,7 +461,7 @@ need_my_gsl=0)
 AM_PATH_GSL(1.0, AC_DEFINE(HAVE_GSL_10,,[Define if you have GNU Scientific Library 1.0 or newer])
 need_my_gsl=0)
 if test "$need_my_gsl" = 1 ; then
-  GSL_LIBS="libbf_gsl.a -lm"
+  GSL_LIBS="libbf_gsl.a"
 fi
 
 PATH="$PATH_SAVED"
