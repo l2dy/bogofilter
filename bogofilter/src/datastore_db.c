@@ -109,7 +109,7 @@ static dbh_t *dbh_init(const char *path, const char *name)
     handle->path = xstrdup(path);
     handle->name = xmalloc(len);
     build_path(handle->name, len, path, name);
-
+    
     handle->locked     = false;
     handle->is_swapped = false;
 
@@ -230,10 +230,11 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	opt_flags = DB_RDONLY;
     else
 	/* Read-write mode implied.  Allow database to be created if
-	 * necessary. DB_EXCL makes sure out locking doesn't fail if two
+	 * necessary. DB_EXCL makes sure our locking doesn't fail if two
 	 * applications try to create a DB at the same time. */
 	opt_flags = 0;
 
+    /* retry when locking failed */
     for (idx = 0; idx < COUNTOF(retryflags); idx += 1) 
     {
 	DB *dbp;
@@ -253,6 +254,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 
 	handle->dbp = dbp;
 
+	/* set cache size */
 	if (db_cachesize != 0 &&
 	    (ret = dbp->set_cachesize(dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
 	    print_error(__FILE__, __LINE__, "(db) setcache( %s ), err: %d, %s",
@@ -311,6 +313,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	/* check file size limit */
 	check_fsize_limit(handle->fd, pagesize);
 
+	/* try fcntl lock */
 	if (db_lock(handle->fd, F_SETLK,
 		    (short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
 	{
