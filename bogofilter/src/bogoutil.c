@@ -461,25 +461,35 @@ static void print_version(void)
 
 static void usage(void)
 {
-    fprintf(stderr, "Usage: %s [ -h | -v | -V ]\n",
-	    progname);
-    fprintf(stderr, "   or: %s { -d | -l | -m | -w | -p | --db-verify } file%s\n",
+    fprintf(stderr, "Usage: %s {-h|-V}\n", progname);
+    fprintf(stderr, "   or: %s [OPTIONS] {-d|-l|-u|-m|-w|-p|--db-verify} file%s\n",
 	    progname, DB_EXT);
-#if	!defined(ENABLE_DB_DATASTORE) || defined(DISABLE_TRANSACTIONS)
-    fprintf(stderr, "   or: %s { -r | -R } directory\n",
+    fprintf(stderr, "   or: %s [OPTIONS] {-H|-r|-R} directory\n", progname);
+#if	defined(ENABLE_DB_DATASTORE) && !defined(DISABLE_TRANSACTIONS)
+    fprintf(stderr, "   or: %s [OPTIONS] {--db-prune|--db-remove-environment} directory\n",
 	    progname);
-#else
-    fprintf(stderr, "   or: %s { -r | -R | --db-prune --db-recover --db-recover-harder --db-remove-environment } directory\n",
+    fprintf(stderr, "   or: %s [OPTIONS] {--db-recover|--db-recover-harder} directory\n",
 	    progname);
 #endif
 }
 
 static const char *help_text[] = {
     "\n",
-    "  -h, --help                  - print this help message.\n",
-    "  -V, --version               - print version information and exit.\n",
+    "OPTIONS are:\n",
     "  -C, --no-config-file        - don't read standard config files.\n",
+    "  -D, --debug-to-stdout       - direct debug output to stdout.\n",
+#ifdef	ENABLE_DB_DATASTORE
+    "  -k, --db-cachesize=size     - set Berkeley DB cache size (MB).\n",
+#endif
+    "  -v, --verbosity             - set debug verbosity level.\n",
+    "  -x, --debug-flags=list      - set flags to display debug information.\n",
+    "  -y, --timestamp-date=date   - set default date (format YYYYMMDD).\n",
+    "\n",
+    "Modes of operation are:\n",
 
+    "  -h, --help                  - print this help message and exit.\n",
+    "  -V, --version               - print version information and exit.\n",
+    "\n",
     "  -d, --dump=file             - dump data from file to stdout.\n",
     "  -l, --load=file             - load data from stdin into file.\n",
     "  -u, --upgrade=file          - upgrade wordlist version.\n",
@@ -495,20 +505,15 @@ static const char *help_text[] = {
     "  -r dir                      - compute Robinson's X for specified directory.\n",
     "  -R dir                      - compute Robinson's X and save it in wordlist.\n",
 
-    "  -v, --verbosity             - set debug verbosity level.\n",
-    "  -D, --debug-to-stdout       - direct debug output to stdout.\n",
-    "  -x, --debug-flags=list      - set flags to display debug information.\n",
     "\n",
 
-    "database maintenance:\n",
+    "database maintenance, the \"-m file\" option is required in this group:\n",
     "  -m file                     - enable maintenance works (expiring tokens).\n",
     "  -n                          - replace non-ascii characters with '?'.\n",
     "  -a age                      - exclude tokens with older ages.\n",
     "  -c cnt                      - exclude tokens with lower counts.\n",
     "  -s l,h                      - exclude tokens with lengths between 'l' and 'h'\n"
     "                                (low and high).\n",
-    "  -y, --timestamp-date=date   - set default date (format YYYYMMDD).\n",
-    "  -k, --db-cachesize=size     - set Berkeley DB cache size (MB).\n",
     "\n",
     NULL
     };
