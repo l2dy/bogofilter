@@ -12,7 +12,7 @@ config.status
 configure
 cscope.out
 lexertest
-lexerl.c
+lexer.c
 Makefile
 Makefile.in
 stamp-h1
