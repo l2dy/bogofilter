@@ -36,14 +36,6 @@ struct mime_t {
 extern mime_t *msg_state;
 extern mime_t *msg_top;
 
-/*
-void mime_init(mime_t *parent);
-void mime_push(mime_t *parent);
-void mime_pop(void);
-void mime_free(mime_t *);
-bool get_boundary_props(const word_t *boundary, boundary_t *b);
-*/
-
 void mime_reset(void);
 void mime_add_child(mime_t *parent);
 void mime_boundary_set(word_t *text);
