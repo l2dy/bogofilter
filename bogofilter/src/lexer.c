@@ -48,7 +48,7 @@ static void lexer_display_buffer(buff_t *buff)
 {
     fprintf(dbgout, "*** %2d %c,%c %d ", yylineno,
 	    HORB(msg_header), HORB(msg_state->mime_header), buff->t.leng);
-    buff_puts(buff, dbgout);
+    buff_puts(buff, 0, dbgout);
     if (buff->t.text[buff->t.leng-1] != '\n')
 	fputc('\n', dbgout);
 }
@@ -180,9 +180,9 @@ static int get_decoded_line(buff_t *buff)
     }
 
     if (0) { /* debug */
-	fprintf(stderr, "%d: ", count);
-	buff_puts(buff, stderr);
-	fprintf(stderr, "\n");
+	fprintf(dbgout, "%d: ", count);
+	buff_puts(buff, 0, dbgout);
+	fprintf(dbgout, "\n");
     }
 
     if (count >= 5

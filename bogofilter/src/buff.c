@@ -44,11 +44,9 @@ buff_t *buff_dup(const buff_t *word)
     return self;
 }
 
-void buff_puts(const buff_t *buff, FILE *fp)
+void buff_puts(const buff_t *buff, size_t width, FILE *fp)
 {
-    int beg = buff->read;
-    int len = buff->t.leng - beg;
-    fwrite(buff->t.text+beg, 1, len, fp);
+    word_puts(&buff->t, width, fp);
 }
 
 buff_t *buff_shrink(buff_t *self, int offset)	/* shrink buffer */
