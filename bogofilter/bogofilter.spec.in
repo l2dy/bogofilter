@@ -56,7 +56,6 @@ Conflicts:	bogofilter
 %description static
 Statically linked bogofilter, bogolexer, bogoutil, and bogotune
 
-%prep
 %setup -q
 CFLAGS="$RPM_OPT_FLAGS" \
 ./configure \
