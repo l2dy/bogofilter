@@ -152,10 +152,10 @@ const parm_desc sys_parms[] =
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
 
-void process_args_and_config_file(int argc, char **argv)
+void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
 {
     process_args(argc, argv, 1);
-    process_config_files(!quiet);
+    process_config_files(warn_on_error);
     process_args(argc, argv, 2);
 
     if (!twostate && !threestate) {
@@ -172,6 +172,11 @@ void process_args_and_config_file(int argc, char **argv)
 	    if (setup_wordlists(directory) != 0)
 		exit(2);
     }
+
+    stats_prefix= stats_in_header ? "\t" : "#   ";
+
+    if (DEBUG_CONFIG(0))
+	fprintf(dbgout, "stats_prefix: '%s'\n", stats_prefix);
 
     return;
 }

@@ -30,6 +30,7 @@ AUTHOR:
 #include "lexer.h"
 #include "bogofilter.h"
 #include "bogoconfig.h"
+#include "charset.h"
 #include "fgetsl.h"
 #include "format.h"
 #include "register.h"
@@ -66,7 +67,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     int   exitcode = 0;
     FILE  *out;
 
-    process_args_and_config_file(argc, argv);
+    process_args_and_config_file(argc, argv, true);
+    init_charset_table(charset_default, true);
 
     /* open all wordlists */
     open_wordlists((run_type & (RUN_NORMAL | RUN_UPDATE)) ? DB_READ : DB_WRITE);

@@ -163,8 +163,8 @@ int main(int argc, char **argv)
     int count=0;
 
     process_args(argc, argv);
-
     process_config_files(false);
+    init_charset_table(charset_default, true);
 
     textblocks = textblock_init();
 

@@ -259,12 +259,5 @@ bool process_config_files(bool warn_on_error)
 	 !read_config_file(user_config_file, true, warn_on_error)))
 	 return false;
 
-    stats_prefix= stats_in_header ? "\t" : "#   ";
-
-    if (DEBUG_CONFIG(0))
-	fprintf(dbgout, "stats_prefix: '%s'\n", stats_prefix);
-
-    init_charset_table(charset_default, true);
-
     return true;
 }
