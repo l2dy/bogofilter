@@ -19,7 +19,6 @@ NAME:
 #include "datastore.h"
 #include "graham.h"
 #include "lexer.h"
-#include "method.h"
 #include "wordhash.h"
 
 /* constants for the Graham formula */
@@ -41,11 +40,7 @@ int	thresh_index = 0;
 ** Define a struct so stats can be saved for printing.
 */
 
-typedef struct stats_s {
-    double spamicity;
-} stats_t;
-
-static stats_t  stats;
+stats_t stats;
 
 static const parm_desc gra_parm_table[] =
 {
@@ -324,12 +319,7 @@ double gra_compute_spamicity(bogostat_t *bs, FILE *fp) /*@globals errno@*/
 
 void gra_initialize_constants(void)
 {
-    max_repeats = GRAHAM_MAX_REPEATS;
-    if (fabs(min_dev) < EPS)
-	min_dev = GRAHAM_MIN_DEV;
-    if (spam_cutoff < EPS)
-	spam_cutoff = GRAHAM_SPAM_CUTOFF;
-    set_good_weight( GRAHAM_GOOD_BIAS );
+    mth_initialize( &stats, GRAHAM_MAX_REPEATS, GRAHAM_MIN_DEV, GRAHAM_SPAM_CUTOFF, GRAHAM_GOOD_BIAS );
 }
 
 double gra_spamicity(void)

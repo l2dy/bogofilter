@@ -39,4 +39,20 @@ typedef struct method_s {
 
 extern method_t *method;
 
+/*
+** Define instance storage ...
+*/
+
+typedef struct stats_s {
+    double spamicity;
+} stats_t;
+
+extern stats_t  *mth_stats;
+
+/* Functions for use by graham.c, robinson.c, and fisher.c */
+
+extern void mth_initialize(void *s, int _max_repeats, double _min_dev, double _spam_cutoff, double _good_weight);
+extern double mth_spamicity(void);
+extern rc_t mth_status(void);
+
 #endif	/* HAVE_METHOD_H */
