@@ -8,7 +8,14 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
 
-0.17.0	2004-01-??
+0.17.0	2004-02-01
+
+	* Documentation cleanups.
+
+	2004-01-31
+
+	* Fixed warnings from Intel C++ 8
+	* Portability fixes for SunOS 4.1.4
 
 	2004-01-30
 
@@ -27,5 +34,5 @@ Note:
           config file.
 	* Correct SIGSEGV causes by missing environment variables.
 
-0.16.4	2004-01-22 - Released
+0.16.4	2004-01-23 - Released
 	2004-01-31 - Promoted to Stable Version

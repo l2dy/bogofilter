@@ -8,18 +8,19 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
 
-0.17.0	2004-01-??
+0.17.0	2004-02-01
 
 * Removed DEPRECATED CODE.
 * Bogoutil now 'and's the maintenance operations together.
 * Bogofilter and bogolexer now use standard long option
   parsing.
-
-* Extracted basic typedefs from system.h into bftypes.h.
-
 * Correct processing order as '-V' doesn't need to read the
   config file.
 * Correct SIGSEGV causes by missing environment variables.
+* Documentation cleanups.
+* Extracted basic typedefs from system.h into bftypes.h.
+* Fixed warnings from Intel C++ 8
+* Portability fixes for SunOS 4.1.4
 
-0.16.4	2004-01-22 - Released
+0.16.4	2004-01-23 - Released
 	2004-01-31 - Promoted to Stable Version
