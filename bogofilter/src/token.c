@@ -226,24 +226,21 @@ void got_emptyline(void)
     return;
 }
 
-const char *prefixes = "|to:|from:|rtrn:|subj:";
+const char *prefixes = "to:|from:|rtrn:|subj:";
 
 void set_tag(const char *tag)
 {
-    if (header_line_markup) {
-	const char *tmp;
-	size_t len = strlen(tag);
-	
-	tmp = prefixes;
-	while (tmp != NULL) {
-	    if (memcmp(tmp, tag, len) == 0) {
-		word_free(token_prefix);
-		token_prefix = word_new((const byte *)tag, strlen(tag));
-		return;
-	    }
-	    tmp = strchr(tmp, '|');
-	    if (tmp) tmp++;
+    size_t len = strlen(tag);
+    const char *tmp = prefixes;
+
+    while (tmp != NULL) {
+	if (memcmp(tmp, tag, len) == 0) {
+	    word_free(token_prefix);
+	    token_prefix = word_new((const byte *)tag, strlen(tag));
+	    return;
 	}
+	tmp = strchr(tmp, '|');
+	if (tmp) tmp++;
     }
     return;
 }
