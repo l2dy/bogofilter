@@ -113,8 +113,6 @@ static int read_seek(char **out, void *in) {
 	for (i = 0; i < c ; i++) {
 	    carry[i] = (unsigned char)buf[s+i];
 	}
-    } else {
-        fflush(fpo);
     }
 
     *out = buf;
@@ -323,6 +321,7 @@ void output_setup(void)
     }
 
     if (!passthrough) {
+	fflush(fpo);
 	mysetvbuf(fpo, NULL, _IOLBF, BUFSIZ);
     }
 }
