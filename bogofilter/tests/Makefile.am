@@ -1,6 +1,6 @@
 # $Id$
 
-SUBDIRS=. bogoutil t.systest.d
+SUBDIRS=. bogoutil bogofilter
 
 check_PROGRAMS=dehex spam_header_name dumbhead deqp deb64
 dehex_SOURCES=dehex.c
