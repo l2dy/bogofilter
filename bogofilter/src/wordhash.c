@@ -115,23 +115,23 @@ wordhash_free (wordhash_t * h)
 static hashnode_t *
 nmalloc (wordhash_t * h) /*@modifies h->nodes@*/
 {
-  /*@dependent@*/ wh_alloc_node *x = h->nodes;
+  /*@dependent@*/ wh_alloc_node *n = h->nodes;
   hashnode_t *t;
 
-  if (x == NULL || x->avail == 0)
+  if (n == NULL || n->avail == 0)
     {
 
-      x = xmalloc (sizeof (wh_alloc_node));
-      x->next = h->nodes;
-      h->nodes = x;
+      n = xmalloc (sizeof (wh_alloc_node));
+      n->next = h->nodes;
+      h->nodes = n;
 
-      x->buf = xmalloc (N_CHUNK * sizeof (hashnode_t));
-      x->avail = N_CHUNK;
-      x->used = 0;
+      n->buf = xmalloc (N_CHUNK * sizeof (hashnode_t));
+      n->avail = N_CHUNK;
+      n->used = 0;
     }
-  x->avail--;
-  t = (x->buf) + x->used;
-  x->used ++;
+  n->avail--;
+  t = (n->buf) + n->used;
+  n->used ++;
   return (t);
 }
 
@@ -142,26 +142,26 @@ struct dummy { char *c; double d; };
 static char *
 smalloc (wordhash_t * h, size_t n) /*@modifies h->strings@*/
 {
-  wh_alloc_str *x = h->strings;
+  wh_alloc_str *s = h->strings;
   /*@dependent@*/ char *t;
 
   /* Force alignment on architecture's natural boundary.*/
   if ((n % ALIGNMENT) != 0)
       n += ALIGNMENT - ( n % ALIGNMENT);
    
-  if (x == NULL || x->avail < n)
+  if (s == NULL || s->avail < n)
     {
-      x = xmalloc (sizeof (wh_alloc_str));
-      x->next = h->strings;
-      h->strings = x;
+      s = xmalloc (sizeof (wh_alloc_str));
+      s->next = h->strings;
+      h->strings = s;
 
-      x->buf = xmalloc (S_CHUNK + n);
-      x->avail = S_CHUNK + n;
-      x->used = 0;
+      s->buf = xmalloc (S_CHUNK + n);
+      s->avail = S_CHUNK + n;
+      s->used = 0;
     }
-  x->avail -= n;
-  t = x->buf + x->used;
-  x->used += n;
+  s->avail -= n;
+  t = s->buf + s->used;
+  s->used += n;
   return (t);
 }
 
