@@ -36,12 +36,10 @@ typedef enum {
     BOGO_LEX_LINE
 } token_t;
 
-/* in lexer_v3.l */
-extern int have_body;
-
 /* in lexer.c */
 extern int yylineno;
 extern bool msg_header;
+extern bool have_body;
 
 /* Define a struct for interfacing to a lexer */
 

@@ -29,6 +29,7 @@
 
 int yylineno;
 bool msg_header = true;
+bool have_body  = false;
 lexer_t *lexer = NULL;
 
 /* Local Variables */
