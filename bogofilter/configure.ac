@@ -403,10 +403,12 @@ You can download BerkeleyDB 4.1.x from http://www.sleepycat.com/]]),
     ;;
 esac
 
-if test a$WITH_DB_ENGINE = a ; then
-    STATIC_DB="-ldb"
-else
-    STATIC_DB="-l$WITH_DB_ENGINE"
+if test "a$STATIC_DB" = a ; then
+    if test "a$WITH_DB_ENGINE" = a ; then
+	STATIC_DB="-ldb"
+    else
+	STATIC_DB="-l$WITH_DB_ENGINE"
+    fi
 fi
 
 AC_SUBST(STATIC_DB)
