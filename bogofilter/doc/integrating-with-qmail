@@ -4,7 +4,7 @@ What:
 
 Theory:
 
- The idea is to setup bogofilter on the mail server and have it filter all incoming mail.
+ The idea is to setup a bogofilter on the mail server and have it filter all incoming mail.
 
  There are several advantages to doing so:
 
@@ -33,15 +33,15 @@ Installation:
 
 Filtering:
 
-- Create a script to invoke bogofilter, say /home/bogofilter/bogofilter-run,
-   modeled on the following:
+- Setup a script to invoke bogofilter, say /home/bogofilter/bogofilter-run,
+   and put:
 
 	#!/bin/sh
 	exec /usr/bin/qmail-qfilter /usr/bin/bogofilter -d /home/bogofilter -p -u -e
 
    Make sure the script is executable!
  
-   Given a good initial corpus, it is better to have bogofilter update its lists based
+   Given a good initial corpus, it is better to have bogofilter update it's lists based
    on the message classification, since it is quite likely to get it right.
    Misclassifications will be corrected later.
 

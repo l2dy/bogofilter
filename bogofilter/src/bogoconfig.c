@@ -673,6 +673,9 @@ void process_args(int argc, char **argv, int pass)
 	exit(2);
     }
 
+    if (bulk_mode == B_CMDLINE)
+ 	bulk_mode = optind;	/* save index of first filename */
+
     return;
 }
 

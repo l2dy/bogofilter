@@ -67,16 +67,16 @@ expect="$HOME/.bogofilter"
 map_rc $BOGOFILTER $OPTS -C < /dev/null
 
 cat <<EOF > ${TMPDIR}/bogodir.cf
-bogofilter_dir=${TMPDIR}/bogoconf.d
+bogofilter_dir=bogoconf.d
 EOF
 
 # config file should display "command"
-expect="${TMPDIR}/bogoconf.d"
+expect="bogoconf.d"
 map_rc $BOGOFILTER $OPTS -c ${TMPDIR}/bogodir.cf < /dev/null
 
 # command line and config file should display "command.d"
-expect="${TMPDIR}/command.d"
-map_rc $BOGOFILTER $OPTS -c ${TMPDIR}/bogodir.cf -d ${TMPDIR}/command.d < /dev/null
+expect="command.d"
+map_rc $BOGOFILTER $OPTS -c ${TMPDIR}/bogodir.cf -d command.d < /dev/null
 
 # $HOME and $BOGOFILTER_DIR should display $TMPDIR
 BOGOFILTER_DIR=$TMPDIR
@@ -87,6 +87,6 @@ map_rc $BOGOFILTER $OPTS -C < /dev/null
 map_rc $BOGOFILTER $OPTS -c ${TMPDIR}/bogodir.cf < /dev/null
 
 # command line should display "command.d"
-expect="${TMPDIR}/command.d"
-map_rc $BOGOFILTER $OPTS -C -d ${TMPDIR}/command.d < /dev/null
-map_rc $BOGOFILTER $OPTS -c ${TMPDIR}/bogodir.cf -d ${TMPDIR}/command.d < /dev/null
+expect="command.d"
+map_rc $BOGOFILTER $OPTS -C -d command.d < /dev/null
+map_rc $BOGOFILTER $OPTS -c ${TMPDIR}/bogodir.cf -d command.d < /dev/null
