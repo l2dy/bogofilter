@@ -89,4 +89,13 @@ choke me because we do not know how to define uint32_t
 #endif
 #endif /* HAVE_UINT32_T */
 
+/* splint crutch */
+#ifdef __LCLINT__
+typedef uint32_t u_int32_t;
+typedef uint16_t u_int16_t;
+typedef uint8_t u_int8_t;
+#define false 0
+#define true 1
+#endif
+
 #endif /* SYSTEM_H */
