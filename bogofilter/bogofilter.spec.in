@@ -1,14 +1,22 @@
 # $Id$
 
-# this .spec file will not build the static package by default
-# to do this, run either of the next rpm[build] commands:
-# rpm --define 'bogostatic 1' --sign -bb bogofilter.spec       # RPM 3
-# rpmbuild --define 'bogostatic 1' --sign -bb bogofilter.spec  # RPM 4
+# This .spec file will not build the static package by default.
+# To do this, run either of the next rpm[build] commands:
+#
+# rpm --define 'bogostatic 1' --sign -bb bogofilter.spec
+# rpmbuild --define 'bogostatic 1' --sign -bb bogofilter.spec
+#
+# To build with tdb, use:
+#
+# rpmbuild --define 'with_tdb 1' -bb bogofilter.spec
+# rpmbuild --define 'with_tdb 1' --sign -bb bogofilter.spec
 
 %define	name		@PACKAGE@
 %define	version		@VERSION@
 %define	release		1
+
 %{!?bogostatic: %{expand: %%define bogostatic 0}}
+%{!?with_tdb:%define with_tdb 0}
 
 Summary:	Fast anti-spam filtering by Bayesian statistical analysis
 Name:		%{name}
@@ -33,6 +41,13 @@ Bogofilter is designed with fast algorithms (including Berkeley DB system),
 coded directly in C, and tuned for speed, so it can be used for production
 by sites that process a lot of mail.
 
+%if %{with_tdb}
+This version was built with tdb support.
+%else
+This version was built with Berkeley DB support.
+%endif
+
+%prep
 %package static
 Summary:	Statically linked
 Group:		Networking/Mail
@@ -50,6 +65,9 @@ CFLAGS="$RPM_OPT_FLAGS" \
   --sysconfdir=%{_sysconfdir} \
 %if %{?bogostatic}
   --enable-static \
+%endif
+%if %{with_tdb}
+  --with-tdb \
 %endif
   --with-included-gsl
 
