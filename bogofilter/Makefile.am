@@ -1,5 +1,9 @@
 # $Id$ 
 # $Log$
+# Revision 1.17  2002/10/04 01:29:33  m-a
+# (dbh_free) Fix memory leak: handle->name not freed.
+# Switch to xstrdup.
+#
 # Revision 1.16  2002/10/04 00:31:30  m-a
 # Add convenience function xstrdup() which is a xmalloc() variant of strdup.
 #
@@ -80,16 +84,19 @@ noinst_PROGRAMS = lexertest
 man1_MANS = bogofilter.1
 
 # what to build that from
+MYLIB= xmalloc.h xmalloc.c xstrdup.h xstrdup.c
+
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c \
                      wordhash.h wordhash.c wordlists.h wordlists.c \
-		     xmalloc.h xmalloc.c xstrdup.h xstrdup.c
+		     $(MYLIB)
 
 lexertest_SOURCES = lexer.l
 lexertest_CFLAGS = -DMAIN
 
-bogoutil_SOURCES = bogoutil.c datastore.h datastore_db.h datastore_db.c xmalloc.h xmalloc.c
-
+bogoutil_SOURCES = bogoutil.c \
+		   datastore.h datastore_db.h datastore_db.c \
+		   $(MYLIB)
 
 # what to distribute
 EXTRA_DIST = $(man1_MANS) \

@@ -17,6 +17,7 @@ AUTHOR:
 #include <errno.h>
 
 #include "xmalloc.h"
+#include "xstrdup.h"
 #include "datastore.h"
 #include "datastore_db.h"
 
@@ -31,13 +32,9 @@ static dbh_t *dbh_init(char *filename, char *name){
 
   handle = xmalloc(sizeof(dbh_t));
 
-  handle->filename = xmalloc(strlen(filename) + 1);
-  strcpy(handle->filename,filename);
-
-  handle->name = xmalloc(strlen(name)+1);
-  strcpy(handle->name, name);
-
-  handle->pid = getpid();
+  handle->filename  = xstrdup(filename);
+  handle->name	    = xstrdup(name);
+  handle->pid	    = getpid();
 
   return handle;
 }
@@ -45,6 +42,7 @@ static dbh_t *dbh_init(char *filename, char *name){
 static void dbh_free(dbh_t *handle){
 	if (handle == NULL) return;
 	if (handle->filename != NULL) xfree(handle->filename);
+	if (handle->name != NULL) xfree(handle->name);
         xfree(handle);
 }
 
