@@ -1,6 +1,6 @@
 #! /bin/sh
 
-. ${srcdir}/t.frame
+. ${srcdir:=.}/t.frame
 
 set -e
 
@@ -70,7 +70,7 @@ done
 rm -f ${TMPDIR}/bogofilter.cf
 
 pfx=$srcdir/t.systest.d/outputs
-for i in $pfx/* ; do
+for i in $pfx/*v ; do
     test ${i##$pfx/} = CVS && continue
   cmp $i ${TMPDIR}/tests/${i##$pfx/}
 done
