@@ -106,26 +106,25 @@ token_t get_token(void)
 	{
 	    byte *st = (byte *)yylval->text;
 	    byte *in;
-	    byte *ot = NULL;
+	    byte *fst = NULL;
+	    byte *lst = NULL;
 
 	    for (in = st; *in != '\0'; in += 1) {
 		if (*in == '-') {
-		    byte c;
-		    in += 1;
-		    for (c = *in; c != '-'; c = *++in) {
-			if (!isdigit(c))
-			    break;
-			if (ot == NULL) {
-			    ot = in;
-			    *ot++ = (byte) '#';
-			}
-		    }
+		    if (fst == NULL)
+			fst = in;
+		    lst = in;
 		}
-		if (ot != NULL)
-		    *ot++ = *in;
 	    }
-	    yylval->leng = (uint) (ot - st);
-	    Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
+	    if (fst != NULL && lst != NULL && lst - fst  > 3) {
+		byte *ot = fst;
+		*ot++ = '-';
+		*ot++ = '#';
+		for (in = lst; *in != '\0'; in += 1, ot += 1)
+		    *ot = *in;
+		yylval->leng = (uint) (ot - st);
+		Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
+	    }
 	    if (token_prefix != NULL) {
 		word_t *o = yylval;
 		yylval = word_concat(token_prefix, yylval);

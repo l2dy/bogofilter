@@ -128,6 +128,7 @@ MIME_BOUNDARY	{BCHARS}*{BCHARSNOSPC}
 
 ID		<?[[:alnum:]-]*>?
 CHARSET		[[:alnum:]-]+
+VERPID		[[:alnum:]#-]+
 MTYPE		[[:blank:]]*[[:alnum:]/-]*
 
 NUM		[[:digit:]]+
@@ -198,7 +199,7 @@ HBREAK		p|br|li|h[1-6]|hr|title|table|center|dd|dt|iframe|img|input|select|td|te
 
 BREAKHTML	"<"({HBREAK}({WHITESPACE}[^>]*|""))">"
 
-VERP		{TOKEN}-{NUM}-{TOKEN}={TOKEN}@{TOKEN}
+VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 
 %s TEXT HTML BOGO_LEX
 %s HTOKEN HDISCARD SCOMMENT LCOMMENT HSCRIPT
