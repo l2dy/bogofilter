@@ -4,8 +4,11 @@
 
 set -e
 
+LANG=
 unset LANG
+LC_ALL=
 unset LC_ALL
+LC_COLLATE=
 unset LC_COLLATE
 
 cat ${srcdir}/inputs/t.lexer.inp | ../bogolexer -p | sort -u > ${TMPDIR}/t.lexer.out
