@@ -4,12 +4,19 @@
 
 $Id$
 
+	2003-09-27
+
+	* Transaction code added for wordlist maintenance.
+	* Timestamp code refactored and moved from maint.c to datastore.c
+
 	2003-09-26
 
 	* VERPs (Variable Envelope Return Paths) now have their
           sequence numbers replaced by a '#' for scoring.
 	* Fixed problem that caused auto-update ("-u") to not update
           separate wordlists.
+	* End-of-header code revised to ensure that passthrough ("-p")
+          properly places the X-Bogosity line.
 
 	2003-09-25
 

@@ -8,6 +8,10 @@
 * Fixed problem that caused auto-update ("-u") to not update
   separate wordlists.
 * Fixed processing of rmail files.
+* Transaction code added for wordlist maintenance.
+* Timestamp code refactored and moved from maint.c to datastore.c
+* End-of-header code revised to ensure that passthrough ("-p")
+  properly places the X-Bogosity line.
 * Fixed logging behavior when scoring mailboxes, maildirs, etc.
 * Added support for OS/2's file system.
 
