@@ -503,6 +503,7 @@ int dbe_txn_begin(void *vhandle)
     assert(handle);
     assert(handle->magic == MAGIC_DBE);
     assert(handle->dbe);
+    assert(handle->txn == 0);
 
     ret = BF_TXN_BEGIN(handle->dbe, NULL, &t, 0);
     if (ret) {
@@ -947,7 +948,7 @@ static int db_try_glock(short locktype, int lockcmd) {
 static dbe_t *db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
 {
     int ret;
-    dbe_t *e = xmalloc(sizeof(dbe_t));
+    dbe_t *e = xcalloc(1, sizeof(dbe_t));
 
     assert(bogohome);
 
