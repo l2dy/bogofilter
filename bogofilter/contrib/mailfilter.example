@@ -8,7 +8,7 @@
 ### bogofilter - filter & update word lists
 
 MAILDIR=/var/spool/mail
-BOGOFILTER_DIR=/var/lib/bogofilter
+BOGOFILTER_DIR=/var/spool/bogofilter
 
 #### backup ####
 cc "mail.backup"

@@ -18,7 +18,7 @@
 #	directory for wordlists
 #
 #bogofilter_dir=~/.bogofilter
-##bogofilter_dir=/var/lib/bogofilter
+##bogofilter_dir=/var/spool/bogofilter
 
 #### name/location of user config file
 #
