@@ -7,7 +7,7 @@ David Relson	(new features, release coordinator, bug fixes, cleanups)
 Matthias Andree	(bug fixes, improvements, auto tools build environment,
 		 cleanups, portability, RPM packaging)
 Gyepi Sam	(database abstraction, berkeleydb support, wordhash,
-		 bogoupgrade, bogoutil, documentation, bug fixes)
+		 bogoupgrade, bogoutil, documentation, bug fixes, tdb support)
 Allyn Fratkin	(bug fixes, bug database maintainer)
 Clint Adams	(bug fixes, portability, debian packaging)
 Greg Louis	(spamicity calculation methods)
