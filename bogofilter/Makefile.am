@@ -16,6 +16,8 @@ CFLAGS = -g -O2
 # what to build that from
 MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h debug.h debug.c
 
+BUILT_SOURCES = version.h
+
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c \
 		     rstats.h rstats.c \
