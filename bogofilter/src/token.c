@@ -48,6 +48,9 @@ static lexer_state_t lexer_state = LEXER_HEAD;
 
 bool block_on_subnets = false;
 
+static word_t *token_prefix = NULL;
+static word_t *token_prefix_next = NULL;
+
 /* Function Prototypes */
 
 static void reset_html_level(void);
@@ -157,7 +160,14 @@ token_t get_token(void)
 		continue;
 	      
 	    if (msg_state->mime_header)
+	    {
+		if (token_prefix != NULL) {
+		    word_t *w = word_concat(token_prefix, yylval);
+		    word_free(yylval);
+		    yylval = w;
+		}
 		break;
+	    }
 
             switch (msg_state->mime_type) {
             case MIME_TEXT:
@@ -233,7 +243,16 @@ void got_from(void)
     reset_html_level();
 }
 
-void got_emptyline()
+void got_newline()
+{
+    if (token_prefix) {
+	word_free(token_prefix);
+    }
+    token_prefix = token_prefix_next;
+    token_prefix_next = NULL;
+}
+
+void got_emptyline(void)
 {
     if (msg_state->mime_type != MIME_MESSAGE && !msg_state->mime_header)
 	return;
@@ -267,4 +286,12 @@ void got_emptyline()
     }
 
     return;
+}
+
+void set_tag(const char *tag)
+{
+    if (tag_header_lines) {
+	word_free(token_prefix_next);
+	token_prefix_next = word_new((const byte *)tag, strlen(tag));
+    }
 }
