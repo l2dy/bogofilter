@@ -4,6 +4,15 @@
 
 $Id$
 
+0.11.1.4
+
+	2003-03-25
+	* Cleaned up help messages and added version info.
+	* Expanded bogofilter-faq.html
+	* Fixed precedence for directory specifications.
+	* Fixed processing of folded X-Bogosity line.
+	* Fixed processing of spam_subject_tag.
+
 0.11.1.3
 
 	2003-03-10
