@@ -81,6 +81,10 @@ French</a>
           <li><a href="#production">How can I keep the scoring accuracy high?
 	  </a></li>
 
+          <li><a href="#production">What are "training on error" and
+          "training to exhaustion"?
+	  </a></li>
+
           <li><a href="#spamassassin">How can I use SpamAssassin to train Bogofilter?
 	  </a></li>
 
@@ -383,9 +387,40 @@ French</a>
 	mv wordlist.db.new wordlist.db
     </pre>
 
-    <p>or, for samplist.db and goodlist.db (if using bogofilter with
+    <p>or, for spamlist.db and goodlist.db (if using bogofilter with
     separate spam and ham wordlists).  This will compact the database
     so it occupies the minimum of disk space.</p>
+
+    <hr>
+
+    <h2 id="train_on_errof">What are "training on error" and "training to exhaustion"?</h2>
+
+    <p> "Training on error" involves scanning a corpus of known spam
+    and nonspam messages; only those that are misclassified, or
+    classed as unsure, get registered in the training database.  It's
+    been found that sampling just messages prone to misclassification
+    is an effective way to train; if you train bogofilter on the hard
+    messages, it learns to handle obvious spam and nonspam too.
+    (Learning is a bit faster if one begins with a period of full
+    training, up to perhaps 10,000 spam and 10,000 nonspam.)</p>
+
+    <p> "Training to exhaustion" is repeating training on error, with
+    the same message corpus, until no errors remain.  This has worked
+    well in some tests, but may be risky: First, registering messages
+    different numbers of times makes the distribution of token scores
+    in the training database differ from the distribution in the input
+    messages; this violates a basic assumption of Bayesian
+    classification, and may lead to unpredictable results.  Second,
+    tokens that appear more or less equally in spam and nonspam may
+    wrongly score highly in one category or the other, if they happen
+    to occur in messages of one type that are registered many times;
+    such effects should be transient, but may degrade accuracy while
+    they last.
+    </p>
+
+    <p> Note: Bogominitrain.pl has a <code>-f</code> option to do
+   "training to exhaustion".  If you choose to use it, you need to be
+   aware of its possible effects. </p>
 
     <hr>
 
