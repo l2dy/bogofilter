@@ -123,6 +123,9 @@ int setup_wordlists(const char* d, priority_t precedence)
     double bad_weight  = 1.0;
     static priority_t saved_precedence = PR_NONE;
 
+    if (DEBUG_WORDLIST(2))
+	fprintf(dbgout, "p: %d, s: %d\n", (int) precedence, (int) saved_precedence);
+
     if (precedence < saved_precedence)
 	return rc;
 
@@ -134,6 +137,9 @@ int setup_wordlists(const char* d, priority_t precedence)
 	if (dir == NULL)
 	    return rc;
     }
+
+    if (DEBUG_WORDLIST(2))
+	fprintf(dbgout, "d: %s\n", dir);
 
     if (saved_precedence < precedence && word_lists != NULL) {
 	wordlist_t *list, *next;

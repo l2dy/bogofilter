@@ -49,11 +49,12 @@ map_rc()
     )
 }
 
+OPTS=" -x dcw -vv -D"
 
 # just $HOME should display /home/userid
 unset BOGOFILTER_DIR
 expect="$HOME/.bogofilter"
-map_rc $BOGOFILTER -x d -vv -D -C < /dev/null
+map_rc $BOGOFILTER $OPTS -C < /dev/null
 
 cat <<EOF > ${TMPDIR}/bogodir.cf
 bogofilter_dir=bogoconf.d
@@ -61,21 +62,21 @@ EOF
 
 # config file should display "command"
 expect="bogoconf.d"
-map_rc $BOGOFILTER -x dc -vv -D -c ${TMPDIR}/bogodir.cf < /dev/null
+map_rc $BOGOFILTER $OPTS -c ${TMPDIR}/bogodir.cf < /dev/null
 
 # command line and config file should display "command.d"
 expect="command.d"
-map_rc $BOGOFILTER -x d -vv -D -c ${TMPDIR}/bogodir.cf -d command.d < /dev/null
+map_rc $BOGOFILTER $OPTS -c ${TMPDIR}/bogodir.cf -d command.d < /dev/null
 
 # $HOME and $BOGOFILTER_DIR should display $TMPDIR
 BOGOFILTER_DIR=$TMPDIR
 export BOGOFILTER_DIR
 
 expect="$BOGOFILTER_DIR"
-map_rc $BOGOFILTER -x d -vv -D -C < /dev/null
-map_rc $BOGOFILTER -x d -vv -D -c ${TMPDIR}/bogodir.cf < /dev/null
+map_rc $BOGOFILTER $OPTS -C < /dev/null
+map_rc $BOGOFILTER $OPTS -c ${TMPDIR}/bogodir.cf < /dev/null
 
 # command line should display "command.d"
 expect="command.d"
-map_rc $BOGOFILTER -x d -vv -D -C -d command.d < /dev/null
-map_rc $BOGOFILTER -x d -vv -D -c ${TMPDIR}/bogodir.cf -d command.d < /dev/null
+map_rc $BOGOFILTER $OPTS -C -d command.d < /dev/null
+map_rc $BOGOFILTER $OPTS -c ${TMPDIR}/bogodir.cf -d command.d < /dev/null
