@@ -412,7 +412,7 @@ the form of comments.</para>
 <listitem><para>System configuration file.</para></listitem>
 </varlistentry>
 <varlistentry>
-<term><filename>~/.bogofiltercf</filename></term>
+<term><filename>~/.bogofilter.cf</filename></term>
 <listitem><para>User configuration file.</para></listitem>
 </varlistentry>
 <varlistentry>

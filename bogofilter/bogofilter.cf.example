@@ -104,10 +104,10 @@ thresh_rtable = 0.0f
 #
 #	name/location of user config file
 
-user_config_file=.bogofilter.cf
+user_config_file=~/.bogofilter.cf
 
-#user_config_file=.bogofilterrc
-#user_config_file=.bogofilter/config
+#user_config_file=~/.bogofilterrc
+#user_config_file=~/.bogofilter/config
 
 
 #### wordlist: define a word list
