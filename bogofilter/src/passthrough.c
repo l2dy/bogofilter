@@ -181,7 +181,7 @@ static bool write_header(rc_t status, readfunc_t rf, void *rfarg)
 
 	hadlf = (out[rd-1] == '\n');
 	(void) fwrite(out, 1, rd, fpo);
-	if (ferror(fpo)) cleanup_exit(2, 1);
+	if (ferror(fpo)) cleanup_exit(EX_ERROR, 1);
     }
 
     if (eol == NULL)	/* special treatment of empty input */
@@ -209,13 +209,13 @@ static void write_body(readfunc_t rf, void *rfarg)
     {
 	(void) fwrite(out, 1, rd, fpo);
 	hadlf = (out[rd-1] == '\n');
-	if (ferror(fpo)) cleanup_exit(2, 1);
+	if (ferror(fpo)) cleanup_exit(EX_ERROR, 1);
     }
 
     if (!hadlf) (void) fputs(eol, fpo);
 
     if (fflush(fpo) || ferror(fpo) || (fpo != stdout && fclose(fpo))) {
-	cleanup_exit(2, 1);
+	cleanup_exit(EX_ERROR, 1);
     }
 }
 
