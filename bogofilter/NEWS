@@ -7,6 +7,12 @@ is in the RELEASE.NOTES files!
 
 $Id$
 
+	2003-09-05
+
+	* Update bogowordfreq to work with bogoreader.
+	* Fatal flex errors are now caught and bogofilter exits
+          gracefully.
+
 0.15.1	2003-09-03
 
 	* Limit size of unfolded header lines.

@@ -2,6 +2,11 @@
 				BOGOFILTER NEWS
 			       =================
 
+2003-09-05
+
+* Update bogowordfreq to work with bogoreader.
+* Fatal flex errors are now caught and bogofilter exits gracefully.
+
 0.15.1	2003-09-03
 
 * Check for xmlto during configuration.
