@@ -47,7 +47,7 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #define KEEPERS		15		/* how many extrema to keep */
 #define MINIMUM_FREQ	5		/* minimum freq */
 
-#define EPS		100.0 * DBL_EPSILON /* equality cutoff */
+#define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
 
 #define MAX_PROB	0.99f		/* max probability value used */
 #define MIN_PROB	0.01f		/* min probability value used */
