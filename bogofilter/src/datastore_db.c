@@ -270,7 +270,8 @@ static int probe_txn(const char *directory, const char *file)
 	int w;
 	char *t = build_path(directory, file);
 
-	/* no environment found */
+	/* no environment found by JOINENV
+	 * FIXME: retry globbing for log.* files */
 	dbe->close(dbe, 0);
 
 	w = stat(t, &st);
@@ -293,7 +294,8 @@ static int probe_txn(const char *directory, const char *file)
 	return -1;
     }
 
-    /* environment found */
+    /* environment found, validate if it has transactions */
+#if DB_AT_LEAST(4,2)
     r = dbe->get_open_flags(dbe, &flags);
     if (r) {
 	print_error(__FILE__, __LINE__, "cannot query flags: %s",
@@ -306,6 +308,9 @@ static int probe_txn(const char *directory, const char *file)
 	print_error(__FILE__, __LINE__, "environment found but does not support transactions.");
 	return -1;
     }
+#else
+    dbe->close(dbe, 0);
+#endif
     return 1;
 }
 
