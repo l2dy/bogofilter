@@ -82,8 +82,6 @@ for out in ${TMPDIR}/tests/msg.?.r.v ; do
     printf "%2s   %c %s   %c %s   %c %s\n" $id $g $r $f >> ${TMPDIR}/tests/$OUT
 done
 
-if test x$SUPPRESS_DELETE != x ; then rm -rf ${TMPDIR}/cfg.?; fi
-
 if  [ "$verbose" = "1" ]; then
     diff -u -s ${SYSTEST}/outputs/$OUT ${TMPDIR}/tests/$OUT
 fi
