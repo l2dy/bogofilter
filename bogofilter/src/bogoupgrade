@@ -173,26 +173,28 @@ sub help {
   $0 -- upgrades bogofilter database to current version.
   Options:
     -d	<directory>.
-      
-        Name of directory containing database files.  Old files will be read
+
+	Name of directory containing database files.  Old files will be read
 	and new files will be written.
-            
+
     -i	<input file>.
-      
-        Text file containing message counts, and possibly data. If there is no
-        data in the text file, there should be a Berkeley DB file in the same
-        directory as the text file which contains the data. 
-            
+
+	Text file containing message counts, and possibly data.	 If there is
+	no data in the text file, there should be a database file in the same
+	directory as the text file which contains the data.
+
    -o	<output file>
-              
-        Output database file. The file extension depends whatever database was built into bogofilter.
 
-   -b   <path to bogoutil program>
+	Output database file.  Use the appropriate file extension for your
+	version of bogofilter, i.e. '.db' for Berkeley DB or '.tdb' for
+	Trivial DB.
 
-        Defaults to 'bogoutil', in the hopes that your shell will find it.
-                
+   -b	<path to bogoutil program>
+
+	Defaults to 'bogoutil', in the hopes that your shell will find it.
+
    -h	help
-                  
+
 	You are reading it.
 EOF
 	exit(0);
