@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.20  2002/09/27 01:18:38  gyepi
+ * removed unused #defines and logprint function
+ *
  * Revision 1.19  2002/09/26 23:04:40  relson
  * documentation:
  *     changed to refer to "good" and "spam" tokens and lists.
@@ -126,8 +129,6 @@ I do the lexical analysis slightly differently, however.
 #include "bogofilter.h"
 #include "datastore.h"
 
-// implementation details
-#define HEADER		"# bogofilter email-count (format version B): %lu\n"
 
 // constants for the Graham formula 
 #define GOOD_BIAS	2		// give good words more weight
@@ -145,7 +146,6 @@ I do the lexical analysis slightly differently, however.
 wordlist_t good_list	= {"good", NULL, 0, NULL};
 wordlist_t spam_list	= {"spam", NULL, 0, NULL};
 
-#define	PLURAL(count) ((count == 1) ? "" : "s")
 
 void register_words(int fdin, wordlist_t *list, wordlist_t *other)
 // tokenize text on stdin and register it to  a specified list
@@ -237,24 +237,6 @@ void register_words(int fdin, wordlist_t *list, wordlist_t *other)
     
     db_lock_release(list->dbh);
 }
-
-#ifdef __UNUSED__
-void logprintf(const char *fmt, ... )
-// log data from server
-{
-    char buf[BUFSIZ];
-    va_list ap;
-    int fd;
-
-    va_start(ap, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, ap);
-    va_end(ap);
-    
-    fd=open("/tmp/bogolog", O_RDWR|O_CREAT|O_APPEND,0700);
-    write(fd,buf,strlen(buf));
-    close(fd);
-}
-#endif // __UNUSED__
 
 typedef struct 
 {
