@@ -163,7 +163,7 @@ double lookup_and_score(const word_t *token, wordcnts_t *cnts)
 	word_t *tword = word_new(token->text+5, token->leng-5);
 	wordcnts_t tcnts;
 	wordcnts_init(&tcnts);
-	lookup(tword, &tcnts);
+	lookup_and_score(tword, &tcnts);
 	wordcnts_incr(cnts, &tcnts);
 	prob = wordprob_result(cnts);
 	word_free(tword);
