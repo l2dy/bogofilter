@@ -5,8 +5,11 @@
 NAME:
    bogofilter.c -- detect spam and bogons presented on standard input.
 
-AUTHOR:
+AUTHORS:
    Eric S. Raymond <esr@thyrsus.com>
+   David Relson    <relson@osagesoftware.com>
+   Matthias Andree <matthias.andree@gmx.de>
+   Greg Louis      <glouis@dynamicro.on.ca>
 
 THEORY:
 

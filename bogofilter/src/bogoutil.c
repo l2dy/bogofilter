@@ -5,8 +5,9 @@
 NAME:
   bogoutil.c -- dumps & loads bogofilter text files from/to Berkeley DB format.
 
-AUTHOR:
-  Gyepi Sam <gyepi@praxis-sw.com>
+AUTHORS:
+  Gyepi Sam    <gyepi@praxis-sw.com>
+  David Relson <relson@osagesoftware.com>
 
 ******************************************************************************/
 
