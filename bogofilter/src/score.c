@@ -369,11 +369,11 @@ double get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 	score.robn = robn;
 
 	/* convert to natural logs */
-        score.p_ln = (log(P.mant) + P.exp * ln2) * sp_esf;  /* invlogsum */
-        score.q_ln = (log(Q.mant) + Q.exp * ln2) * ns_esf;  /* logsum */
+	score.p_ln = (log(P.mant) + P.exp * ln2) * sp_esf;	/* invlogsum */
+	score.q_ln = (log(Q.mant) + Q.exp * ln2) * ns_esf;	/* logsum */
 
-        score.p_pr = prbf(-2.0 * score.p_ln, sp_df);        /* compute P */
-        score.q_pr = prbf(-2.0 * score.q_ln, ns_df);        /* compute Q */
+	score.p_pr = prbf(-2.0 * score.p_ln, sp_df);		/* compute P */
+	score.q_pr = prbf(-2.0 * score.q_ln, ns_df);		/* compute Q */
   
         if (!fBogotune && sp_esf == 1.0 && ns_esf == 1.0) {
             score.spamicity = (1.0 + score.q_pr - score.p_pr) / 2.0;
