@@ -8,7 +8,7 @@ SUBDIRS = . tests
 # what to build
 bin_PROGRAMS = bogofilter bogoutil
 bin_SCRIPTS = bogoupgrade
-check_PROGRAMS = lexertest
+check_PROGRAMS = lexertest debugtest
 man1_MANS = bogofilter.1 bogoutil.1
 
 CFLAGS = -g
