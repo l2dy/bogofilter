@@ -391,19 +391,28 @@ macro index \ed "&lt;enter-command&gt;unset wait_key\n\
 </procedure>
 <para>Use of R to verify <application>Bogofilter</application>
 calculations</para>
+
 <para>The -R option tells <application>bogofilter</application> to
-generate an R data frame.  The data frame contains one row per token analysed.
-Each such row contains an index, the token, its database "good" and "spam" 
-counts (the former scaled to the size of the spam list), Robinson's f(w) for 
-the token, and the natural logs of (1 - f(w)) and f(w).  There is one additional 
-row at the end of the table that contains a label in the token field, followed
-by Robinson's P, Q and S values and the sums of the logarithms just
-mentioned.</para>
+generate an R data frame.  The data frame contains one row per token
+analysed. Each such row contains the token, the sum of its database
+"good" and "spam" counts, the "good" count divided by the number of
+non-spam messages used to create the training database, the "spam"
+count divided by the spam message count, Robinson's f(w) for the token,
+the natural logs of (1 - f(w)) and f(w), and an indicator character (+
+if the token's f(w) value exceeded the minimum deviation from 0.5, - if
+it didn't).  There is one additional row at the end of the table that
+contains a label in the token field, followed by the number of words
+actually used (the ones with + indicators), Robinson's P, Q, S, s and x
+values and the minimum deviation.</para>
 
 <para>The R data frame can be saved to a file and later read
 into an R session (see <ulink url="http://cran.r-project.org">the R
 project website</ulink> for information about the mathematics package
-R).</para>
+R).  Provided with the <application>bogofilter</application>
+distribution is a simple R script (file bogo.R) that can be used to
+verify <application>bogofilter</application>'s calculations.
+Instructions for its use are included in the script in the form of
+comments.</para>
 </refsect1>
 
 <refsect1 id='files'><title>FILES</title>
