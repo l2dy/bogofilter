@@ -25,6 +25,7 @@
   <arg choice='opt'>-e</arg>
   <arg choice='opt'>-g</arg>
   <arg choice='opt'>-r</arg>
+  <arg choice='opt'>-R[<replaceable>filename</replaceable>]</arg>
   <arg choice='opt'>-u</arg>
   <arg choice='opt'>-v</arg>
   <arg choice='opt'>-V</arg>
@@ -69,10 +70,11 @@ as regognition features rather than broken up. Various kinds of MTA
 cruft such as dates and message-IDs are discarded so as not to bloat
 the word lists. Lex's Swiss-army-knife nature rises again.</para>
 
-<para>Another seeming improvement is that this program implements Gary
+<para>Another seeming improvement is that this program offers Gary
 Robinson's suggested modifications (S and f(w) but not g(w)) to the
-calculations.  These modifications are described in <ulink
-url="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html"></ulink></para>
+calculations.  These modifications are described in Robinson's paper <ulink
+url="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">
+Spam Detection</ulink>.</para>
 
 <para>The input may be one message or many.  Messages are broken up
 on From_ lines.  The algorithm is relatively insensitive to message
@@ -150,7 +152,7 @@ respectively.</para>
 
 <para>The <option>-u</option> (update) option tells 
 <application>bogofilter</application>
-to automatically update the appropriate wordfile.  
+to update the appropriate wordfile automatically.  
 If the text presented on standard input is spam, the spam wordfile will be updated.  
 If the text is not spam, the good wordfile will be updated.
 Effectively this option runs <application>bogofilter</application> 
@@ -163,6 +165,20 @@ input. Each additional <option>v</option> will increase the verbosity of
 the output, up to a maximum of 4.  With <option>-vv</option>, the report
 lists the tokens with highest deviation from a mean of 0.5 association
 with spam.</para>
+
+<para>The <option>-g</option> option selects the original Graham form
+of the calculation method.  This is the default unless the
+<option>-r</option> option is specified.</para>
+
+<para>The <option>-r</option> option selects the Robinson modifications
+to the calculation method.  This is automatically enabled when the
+<option>-R</option> option is specified.</para>
+
+<para>The <option>-R</option><replaceable>filename</replaceable> option tells
+<application>bogofilter</application> to produce an R data frame in
+text form to the filename specified (or stdout, if none).  See the 
+section on integration with R, below, for further detail.  Option 
+<option>-R</option> implies option <option>-r</option>.</para>
 
 <para>The <option>-V</option> option prints the version number and 
 exits.</para>
@@ -183,15 +199,15 @@ printing debug messages.</para>
     <para>
 	Bogofilter will initialize its data base directory to
 	<filename>$BOGOFILTER_DIR</filename> if <envar>BOGOFILTER_DIR</envar> is set.
-	If it is unset, bogofilter
-	will use <filename>$HOME/.bogofilter</filename> instead. If both
-	the
-	<envar>BOGOFILTER_DIR</envar> and the
-	<envar>HOME</envar> variables are unset, the <option>-d
-	    <replaceable>dir</replaceable></option> option becomes mandatory.
+	If it is not set, bogofilter
+	will use <filename>$HOME/.bogofilter</filename> instead. If neither
+	 <envar>BOGOFILTER_DIR</envar> nor <envar>HOME</envar> is set, the <option>-d
+	    <replaceable>dir</replaceable></option> option must be present.
 </para></refsect1>
 
 <refsect1 id='integration'><title>INTEGRATION WITH OTHER TOOLS</title>
+
+<para>Use with Procmail</para>
 <para>The following procmail rule will take mail on stdin and direct
 it to <filename>Mail/spam</filename> if
 <application>bogofilter</application> thinks it's spam:
@@ -273,19 +289,38 @@ macro index \ed "&lt;enter-command&gt;unset wait_key\n&lt;pipe-entry&gt;bogofilt
  it is important to prime it with a representative set of messages.</para>
 </step>
 <step>
- <para>Setup the MTA to invoke bogofilter on each message.
+ <para>Set up the MTA to invoke bogofilter on each message.
    While this is an MTA specific step, you'll probably need to use the 
    <option>-p</option>, <option>-u</option>, and <option>-e</option> options.</para>
 </step>
 <step>
- <para>Setup a mechanism for users to register spam/nonspam messages, as well as to correct mis-classifications.
- The most generic solution is to setup up alias email addresses to which users bounce messages.</para>
+ <para>Set up a mechanism for users to register spam/nonspam messages,
+ as well as to correct mis-classifications.
+ The most generic solution is to set up alias email addresses to which
+ users bounce messages.</para>
 </step>
 <step>
 <para>See the <filename>doc</filename> and <filename>contrib</filename> directories for more information</para>
 </step>
 </procedure>
+<para>Use of R to verify <application>Bogofilter</application>
+calculations</para>
+<para>The -R option tells <application>bogofilter</application> to
+generate an R data frame.  The data frame contains one row per token analysed.
+Each such row contains an index, the token, its database "good" and "spam" 
+counts (the former scaled to the size of the spam list), Robinson's f(w) for 
+the token, and the natural logs of (1 - f(w)) and f(w).  There is one additional 
+row at the end of the table that contains a label in the token field, followed
+by Robinson's P, Q and S values and the sums of the logarithms just
+mentioned.</para>
 
+<para>The R data frame can be saved to a file and later read
+into an R session (see <ulink url="http://cran.r-project.org">the R
+project website</ulink> for information about the mathematics package
+R).  Provided with the distribution is a simple R script (file bogo.R)
+that can be used to verify <application>bogofilter</application>'s
+calculations.  Instructions for its use are included in the script in
+the form of comments.</para>
 </refsect1>
 
 <refsect1 id='returns'><title>RETURN VALUES</title>
