@@ -324,15 +324,18 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
  */
 
 static struct tdb_errname {
-	enum TDB_ERROR ecode; const char *estring;
-} emap[] = { {TDB_SUCCESS, "Success"},
-	     {TDB_ERR_CORRUPT, "Corrupt database"},
-	     {TDB_ERR_IO, "IO Error"},
-	     {TDB_ERR_LOCK, "Locking error"},
-	     {TDB_ERR_OOM, "Out of memory"},
-	     {TDB_ERR_EXISTS, "Record exists"},
-	     {TDB_ERR_NOLOCK, "Lock exists on other keys"},
-	     {TDB_ERR_NOEXIST, "Record does not exist"} };
+    enum TDB_ERROR ecode; 
+    const char *estring;
+} emap[] = { 
+    {TDB_SUCCESS,     "Success"},
+    {TDB_ERR_CORRUPT, "Corrupt database"},
+    {TDB_ERR_IO,      "IO Error"},
+    {TDB_ERR_LOCK,    "Locking error"},
+    {TDB_ERR_OOM,     "Out of memory"},
+    {TDB_ERR_EXISTS,  "Record exists"},
+    {TDB_ERR_NOLOCK,  "Lock exists on other keys"},
+    {TDB_ERR_NOEXIST, "Record does not exist"}
+};
 
 /* Error string for the last tdb error */
 const char *db_str_err(int j)
