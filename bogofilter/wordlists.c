@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.5  2002/10/04 04:34:11  relson
+ * Changed "char *" parameters of setup_lists() and init_lists() to "const char *".
+ *
  * Revision 1.4  2002/10/04 01:42:36  m-a
  * Cleanup, fixing memory leaks, adding error checking. TODO: let callers (main.c) also check for error return.
  *
@@ -68,7 +71,7 @@ void *open_wordlist( wordlist_t *list, const char *directory, const char *filena
 }
 
 /* returns -1 for error, 0 for success */
-int init_list(wordlist_t* list, char* name, char* directory, char* filename, double weight, bool bad, int override, int ignore)
+int init_list(wordlist_t* list, const char* name, const char* directory, const char* filename, double weight, bool bad, int override, int ignore)
 {
     wordlist_t* list_index;
     wordlist_t** last_list_ptr;
@@ -112,7 +115,7 @@ int init_list(wordlist_t* list, char* name, char* directory, char* filename, dou
 }
 
 /* returns -1 for error, 0 for success */
-int setup_lists(char *directory)
+int setup_lists(const char *directory)
 {
     int rc = 0;
     if (init_list(&good_list, "good", directory, GOODFILE, GOOD_BIAS, FALSE, 0, 0)) rc = -1;

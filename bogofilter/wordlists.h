@@ -1,6 +1,9 @@
 /* $Id$ */
 /* 
  * $Log$
+ * Revision 1.6  2002/10/04 04:34:11  relson
+ * Changed "char *" parameters of setup_lists() and init_lists() to "const char *".
+ *
  * Revision 1.5  2002/10/04 01:42:36  m-a
  * Cleanup, fixing memory leaks, adding error checking. TODO: let callers (main.c) also check for error return.
  *
@@ -43,7 +46,7 @@ struct wordlist_s
 extern wordlist_t *word_lists;
 extern wordlist_t good_list, spam_list;
 
-extern int setup_lists();
+int setup_lists(const char *directory);
 void close_lists(void);
 void *open_wordlist( wordlist_t *list, const char *directory, const char *filename );
 
