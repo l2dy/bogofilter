@@ -120,9 +120,9 @@ AC_DEFUN([AC_CHECK_DB],[
   bogo_saved_LIBS="$LIBS"
   bogo_saved_LDFLAGS="$LDFLAGS"
   AC_CACHE_CHECK([for library providing db_create], ac_tr_db, [
-    for ld in '' $2 ; do
-     for lib in '' $1 ; do
-      for i in '' $5 ; do
+    for lib in '' $1 ; do
+     for i in '' $5 ; do
+      for ld in '' $2 ; do
 	if test "x$lib" != "x" ; then
 	  bogo_libadd="-l$lib $i"
 	else
@@ -130,23 +130,37 @@ AC_DEFUN([AC_CHECK_DB],[
 	fi
 	LDFLAGS="$LDFLAGS $ld"
 	LIBS="$LIBS $bogo_libadd"
-	AC_LINK_IFELSE([AC_LANG_PROGRAM([
-#include <db.h>],[
-int foo=db_create((void *)0, (void *) 0, 0 );
-])],
+	AC_RUN_IFELSE(
+	    AC_LANG_PROGRAM([[
+		   #include <stdlib.h>
+		   #include <db.h>
+		   ]], [[
+			int maj, min;
+			(void)db_version(&maj, &min, (void *)0);
+			if (maj != DB_VERSION_MAJOR) exit(1);
+			  if (min != DB_VERSION_MINOR) exit(1);
+			    exit(0);
+		   ]]),
 	    [AS_VAR_SET(ac_tr_db, $bogo_libadd)],
-	    [AS_VAR_SET(ac_tr_db, no)])
+	    [AS_VAR_SET(ac_tr_db, no)],
+	    AC_LINK_IFELSE([AC_LANG_PROGRAM([
+		#include <db.h>],[
+		int foo=db_create((void *)0, (void *) 0, 0 );
+	    ])],
+	    [AS_VAR_SET(ac_tr_db, $bogo_libadd)],
+	    [AS_VAR_SET(ac_tr_db, no)]))
+
 	AS_IF([test x"AS_VAR_GET(ac_tr_db)" != xno],
 	    [$3
 	    db="$bogo_libadd"],
 	    [LIBS="$bogo_saved_LIBS"
 	     LDFLAGS="$bogo_saved_LDFLAGS"
 	    db=no])
-	test "x$db" != "xno" && break
+	test "x$db" = "xno" && break
       done
       test "x$db" != "xno" && break
      done
-     test "x$db" = "xno" && continue
+     test "x$db" != "xno" && break
     done
     ])
 if test "x$db" = "xno"; then
