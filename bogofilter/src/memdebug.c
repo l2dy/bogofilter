@@ -39,20 +39,25 @@ uint32_t cur_malloc = 0;
 uint32_t max_malloc = 0;
 uint32_t tot_malloc = 0;
 
-uint32_t mem_dbg  = 0;
-uint32_t dbg_size = 0;
+uint32_t dbg_index  = 0;
+uint32_t dbg_size   = 0;
 uint32_t dbg_index_min = 0;
 uint32_t dbg_index_max = 0;
+uint32_t dbg_size_trap = 0 ;	/* 100000 */
+
 #define	MB 1000000
 #define	GB 1000*MB
 uint32_t dbg_too_much = 0;	/* GB */
 
-void debugtrap(void);
-void debugtrap() { }
+const uint32_t md_tag = 0xABCD55AA;
+
+void debugtrap(const char *why);
+void debugtrap(const char *why) { (void)why; }
 
 typedef struct memheader {
     size_t	size;
     uint32_t	indx;
+    uint32_t	tag;
 } mh_t;
 
 void mh_disp(const char *s, mh_t *p);
@@ -79,6 +84,9 @@ md_malloc(size_t size)
     tot_malloc += size;
     size += sizeof(mh_t);		/* Include size storage */
 
+    if (dbg_size_trap != 0 && size > dbg_size_trap)
+	debugtrap("dbg_size_trap");
+
     if (dbg_too_much != 0 && max_malloc > dbg_too_much) {
 	fprintf(stderr, "max_malloc = %12lu, tot_malloc = %12lu\n", (ulong) max_malloc, (ulong) tot_malloc);
 	exit(EX_ERROR);
@@ -89,11 +97,12 @@ md_malloc(size_t size)
     mh = (mh_t *) x;
     mh->size = size - sizeof(mh_t);
     mh->indx = cnt_malloc;
+    mh->tag  = md_tag;
 
     if (memtrace & M_MALLOC)
 	mh_disp( "a", mh );
-    if (mem_dbg != 0 && mh->indx == mem_dbg)
-	debugtrap();
+    if (dbg_index != 0 && mh->indx == dbg_index)
+	debugtrap("dbg_index");
 
     x = (void *) (mh+1);
 
@@ -109,16 +118,21 @@ md_free(void *ptr)
 	return;
 
     mh = ((mh_t *) ptr) - 1;
-    ++cnt_free;
-    if (mh->size > cur_malloc)
-	debugtrap();
-    cur_malloc -= mh->size;
 
+    ++cnt_free;
     if (memtrace & M_FREE)
 	mh_disp( "f", mh );
-    if (mem_dbg != 0 && mh->indx == mem_dbg)
-	debugtrap();
 
+    if (mh->tag != md_tag)
+	debugtrap("md_tag");
+    if (dbg_index != 0 && mh->indx == dbg_index)
+	debugtrap("dbg_index");
+    if (mh->size > cur_malloc || 
+	(dbg_size_trap != 0 && mh->size > dbg_size_trap))
+	debugtrap("dbg_size_trap");
+    cur_malloc -= mh->size;
+
+    mh->tag = -1;
     ptr = (void *) mh;
 
     free(ptr);
@@ -126,10 +140,16 @@ md_free(void *ptr)
 
 void memdisplay(void)
 {
+
     fprintf(stdout, "malloc:  cur = %lu, max = %lu, tot = %lu\n", 
 	    (ulong) cur_malloc, (ulong) max_malloc, (ulong) tot_malloc );
     fprintf(stdout, "counts:  malloc: %lu, calloc: %lu, realloc: %lu, free: %lu\n", 
-	    (ulong) cnt_malloc, (ulong) cnt_realloc, (ulong) cnt_calloc, (ulong) cnt_free );
+	    (ulong) cnt_malloc, (ulong) cnt_realloc, (ulong) cnt_calloc, (ulong) cnt_free);
+    if (cnt_malloc == cnt_free)
+	fprintf(stdout, "         none active.\n");
+    else
+	fprintf(stdout, "         active: %lu, average: %lu\n", 
+		(ulong) cnt_malloc - cnt_free, (ulong) cur_malloc/(cnt_malloc - cnt_free));
 }
 
 void
@@ -157,11 +177,12 @@ void
     mh = (mh_t *) x;
     mh->size = size - sizeof(mh_t);
     mh->indx = cnt_malloc;
+    mh->tag  = md_tag;
 
     if (memtrace & M_MALLOC)
 	mh_disp( "c", mh );
-    if (mem_dbg != 0 && mh->indx == mem_dbg)
-	debugtrap();
+    if (dbg_index != 0 && mh->indx == dbg_index)
+	debugtrap("dbg_index");
 
     x = (void *) (mh+1);
 
