@@ -196,7 +196,7 @@ bool configure_wordlist(const char *val)
 	type = WL_IGNORE;
 	break;
     default:
-	fprintf( stderr, "Unknown wordlist type - '%c'\n", type);
+	fprintf( stderr, "Unknown wordlist type - '%c'\n", ch);
 	return (false);
     }
     
