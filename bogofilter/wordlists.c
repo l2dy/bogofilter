@@ -13,6 +13,7 @@
 
 #include "bogofilter.h"
 #include "datastore.h"
+#include "error.h"
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
@@ -28,7 +29,7 @@ void *open_wordlist( const char *name, const char *filepath )
     dbmode_t open_mode = (run_type==RUN_NORMAL) ? DB_READ : DB_WRITE;
 
     if ( (dbh = db_open(filepath, name, open_mode)) == NULL){
-      fprintf(stderr, "%s: Cannot initialize database %s.\n", progname, name);
+      PRINT_ERROR("Cannot initialize database %s.", name);
       exit(2);
     }
 
