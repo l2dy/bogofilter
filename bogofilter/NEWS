@@ -12,6 +12,20 @@ idea to retrain or else use the '-H' (header tag degeneration) option.
 
 	* TDB passes all checks again.
 
+	2003-11-18
+
+	* Revised wordhash code to minimize storage needed for bogotune.
+
+	2003-11-17
+
+	* Exclude apostrophes and backticks at the end of a token.
+	* Updated bogominitrain.pl to v1.4.2
+
+	2003-11-15
+
+	* "<DOCTYPE HTML PUBLIC...>" is now recognized as starting
+          html text.
+
 	2003-11-14
 
 	* Bogotune now checks for incorrectly classified messages in the test
