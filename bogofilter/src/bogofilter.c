@@ -30,12 +30,8 @@ THEORY:
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #include "bogoreader.h"
-#include "charset.h"
 #include "collect.h"
-#include "datastore.h"
 #include "method.h"
-#include "mime.h"
-#include "msgcounts.h"
 #include "passthrough.h"
 #include "register.h"
 #include "rstats.h"
@@ -62,14 +58,6 @@ THEORY:
 */
 
 /* Function Definitions */
-
-static void initialize(void)
-{
-    mime_reset();
-    token_init();
-    lexer_v3_init(NULL);
-    init_charset_table(charset_default, true);
-}
 
 void print_stats(FILE *fp)
 {
@@ -106,7 +94,6 @@ rc_t bogofilter(int argc, char **argv)
 	double spamicity;
 	wordhash_t *w = wordhash_init();
 
-	initialize();
 	passthrough_setup();
 
 	collect_words(w);

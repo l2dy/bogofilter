@@ -6,11 +6,20 @@
 
 #include <stdlib.h>
 
-#include "bogofilter.h"
+#include "charset.h"
+#include "mime.h"
 #include "wordhash.h"
 #include "token.h"
 
 #include "collect.h"
+
+static void initialize(void)
+{
+    mime_reset();
+    token_init();
+    lexer_v3_init(NULL);
+    init_charset_table(charset_default, true);
+}
 
 /* this is referenced by register.c, must not be static */
 void wordprop_init(void *vwordprop)
@@ -33,6 +42,8 @@ void wordprop_incr(wordprop_t *w1, wordprop_t *w2)
 void collect_words(wordhash_t *wh)
 {
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### collect_words() begins\n");
+
+    initialize();
 
     for (;;){
 	wordprop_t *w;
