@@ -154,6 +154,9 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
     double invlogsum = 0.0;	/* Robinson's P */
     double logsum = 0.0;	/* Robinson's Q */
 
+    if (!stats_in_header)
+	(void)fprintf(stdout, "\n" );
+
     /* Compute histogram */
     for (i=r=0; i<INTERVALS; i+=1)
     {
