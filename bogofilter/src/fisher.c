@@ -66,7 +66,7 @@ rf_method_t rf_fisher_method = {	/* used by config.c */
 	"fisher",			/* const char		  *name;		*/
 	fis_parm_table,	 		/* m_parm_table		  *parm_table		*/
 	fis_initialize_constants,	/* m_initialize_constants *initialize_constants	*/
-	rob_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
+	rob_compute_spamicity, 		/* m_compute_spamicity	  *compute_spamicity	*/
 	mth_spamicity,			/* m_spamicity		  *spamicity		*/
 	fis_status,			/* m_status		  *status		*/
 	rob_print_stats, 		/* m_print_bogostats	  *print_stats		*/

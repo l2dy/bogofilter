@@ -66,7 +66,7 @@ rf_method_t rf_robinson_method = {	/* needed by config.c */
 	"robinson",			/* const char		  *name;		*/
 	rob_parm_table,	 		/* m_parm_table		  *parm_table		*/
 	rob_initialize_constants,	/* m_initialize_constants *initialize_constants	*/
-	rob_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
+	rob_compute_spamicity, 		/* m_compute_spamicity	  *compute_spamicity	*/
 	mth_spamicity,			/* m_spamicity		  *spamicity		*/
 	mth_status,			/* m_status		  *status		*/
 	rob_print_stats, 		/* m_print_bogostats	  *print_stats		*/
@@ -278,6 +278,8 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 
     if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() ends\n");
 
+    rob_stats.s.spamicity = spamicity;
+
     return (spamicity);
 }
 
@@ -375,12 +377,6 @@ void rob_initialize_constants(void)
     rob_initialize_with_parameters(&rob_stats, ROBINSON_MIN_DEV, ROBINSON_SPAM_CUTOFF);
 }
 #endif
-
-double rob_bogofilter(wordhash_t *wh, FILE *fp) /*@globals errno@*/
-{
-    rob_stats.s.spamicity = rob_compute_spamicity(wh, fp);
-    return rob_stats.s.spamicity;
-}
 
 void rob_cleanup(void)
 {
