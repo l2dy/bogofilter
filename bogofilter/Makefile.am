@@ -13,7 +13,7 @@ man1_MANS = bogofilter.1 bogoutil.1
 
 CFLAGS=-g
 # what to build that from
-MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c
+MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h
 
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c \

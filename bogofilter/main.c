@@ -41,7 +41,7 @@ int  logflag;
 char msg_register[80];
 char msg_bogofilter[80];
 
-char *progname="bogofilter";
+const char *progname = "bogofilter";
 
 run_t run_type = RUN_NORMAL; 
 

@@ -22,8 +22,8 @@ AUTHOR:
 #include "xstrdup.h"
 #include "datastore.h"
 #include "datastore_db.h"
+#include "globals.h"
 
-extern char *progname;
 
 #define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
 

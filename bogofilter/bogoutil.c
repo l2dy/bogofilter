@@ -26,6 +26,8 @@ AUTHOR:
 
 int verbose = 0;
 
+const char *progname = PROGNAME;
+
 int dump_file(char *db_file)
 {
     dbh_t *dbh;

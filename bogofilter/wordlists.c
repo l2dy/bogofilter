@@ -9,13 +9,12 @@
 #include <wordlists.h>
 #include <bogofilter.h>
 #include <datastore.h>
+#include "globals.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
 #define GOODFILE	"goodlist.db"
 #define SPAMFILE	"spamlist.db"
-
-extern char *progname;
 
 wordlist_t good_list;
 wordlist_t spam_list;
