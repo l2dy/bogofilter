@@ -3,6 +3,11 @@
 #include <math.h>
 #include "cdflib.h"
 
+#ifdef	BOGOFILTER
+#define	NEED_ONLY_CDFCHI	/* bogofilter only needs cdfchi() 
+				   and the functions it calls  */
+#endif
+
 /*
  * A comment about ints and longs - whether ints or longs are used should
  * make no difference, but where double r-values are assigned to ints the
@@ -27,6 +32,7 @@
 #define	EQ(a,b)	(fabs((a) -(b)) < EPS)
 #define	NE(a,b)	(fabs((a) -(b)) > EPS)
 
+#ifndef	NEED_ONLY_CDFCHI
 double algdiv(double *a,double *b)
 {
 static double c0 = .833333333333333e-01;
@@ -78,8 +84,10 @@ S20:
 S30:
     return w-u-v;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double alngam(double *x)
 /*
 **********************************************************************
@@ -192,8 +200,10 @@ S110:
     return aln_gam;
 #undef hln2pi
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double alnrel(double *a)
 /*
 -----------------------------------------------------------------------
@@ -223,8 +233,10 @@ S10:
     aln_rel = log(x);
     return aln_rel;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double apser(double *a,double *b,double *x,double *eps)
 /*
 -----------------------------------------------------------------------
@@ -259,8 +271,10 @@ S30:
     if(fabs(aj) > tol) goto S30;
     return -(*a*(c+s));
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double basym(double *a,double *b,double *lambda,double *eps)
 /*
 -----------------------------------------------------------------------
@@ -369,8 +383,10 @@ S80:
     ba_sym = e0*t*u*sum;
     return ba_sym;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double bcorr(double *a0,double *b0)
 /*
 -----------------------------------------------------------------------
@@ -419,8 +435,10 @@ static double a,b,c,h,s11,s3,s5,s7,s9,t,w,x,x2;
     t = pow(1.0e0/a,2.0);
     return (((((c5*t+c4)*t+c3)*t+c2)*t+c1)*t+c0)/a+w;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double betaln(double *a0,double *b0)
 /*
 -----------------------------------------------------------------------
@@ -518,8 +536,10 @@ S100:
 S110:
     return -(0.5e0*log(b))+e+w-u-v;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double bfrac(double *a,double *b,double *x,double *y,double *lambda,
 	     double *eps)
 /*
@@ -587,8 +607,10 @@ S20:
     b_frac *= r;
     return b_frac;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void bgrat(double *a,double *b,double *x,double *y,double *w,
 	   double *eps,int *ierr)
 /*
@@ -671,8 +693,10 @@ S70:
     *ierr = 1;
     return;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double bpser(double *a,double *b,double *x,double *eps)
 /*
 -----------------------------------------------------------------------
@@ -771,8 +795,10 @@ S110:
     b_pser *= (1.0e0+*a*sum);
     return b_pser;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void bratio(double *a,double *b,double *x,double *y,double *w,
 	    double *w1,int *ierr)
 /*
@@ -1010,8 +1036,10 @@ S330:
     *ierr = 7;
     return;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double brcmp1(int *mu,double *a,double *b,double *x,double *y)
 /*
 -----------------------------------------------------------------------
@@ -1150,8 +1178,10 @@ S190:
     brcmp1 = Const*sqrt(*b*x0)*z*exp(-bcorr(a,b));
     return brcmp1;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double brcomp(double *a,double *b,double *x,double *y)
 /*
 -----------------------------------------------------------------------
@@ -1290,8 +1320,10 @@ S190:
     b_rcomp = Const*sqrt(*b*x0)*z*exp(-bcorr(a,b));
     return b_rcomp;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double bup(double *a,double *b,double *x,double *y,int *n,double *eps)
 /*
 -----------------------------------------------------------------------
@@ -1370,8 +1402,10 @@ S70:
     b_up *= w;
     return b_up;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cdfbet(int *which,double *p,double *q,double *x,double *y,
 	    double *a,double *b,int *status,double *bound)
 /**********************************************************************
@@ -1746,8 +1780,10 @@ S540:
 #undef inf
 #undef one
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cdfbin(int *which,double *p,double *q,double *s,double *xn,
 	    double *pr,double *ompr,int *status,double *bound)
 /**********************************************************************
@@ -2117,6 +2153,7 @@ S560:
 #undef inf
 #undef one
 }
+#endif
 
 
 void cdfchi(int *which,double *p,double *q,double *x,double *df,
@@ -2405,6 +2442,7 @@ S380:
 }
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cdfchn(int *which,double *p,double *q,double *x,double *df,
 	    double *pnonc,int *status,double *bound)
 /**********************************************************************
@@ -2678,8 +2716,10 @@ S280:
 #undef one
 #undef inf
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cdff(int *which,double *p,double *q,double *f,double *dfn,
 	  double *dfd,int *status,double *bound)
 /**********************************************************************
@@ -2996,8 +3036,10 @@ S420:
 #undef zero
 #undef inf
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cdffnc(int *which,double *p,double *q,double *f,double *dfn,
 	    double *dfd,double *phonc,int *status,double *bound)
 /**********************************************************************
@@ -3322,8 +3364,10 @@ S350:
 #undef one
 #undef inf
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cdfgam(int *which,double *p,double *q,double *x,double *shape,
 	    double *scale,int *status,double *bound)
 /**********************************************************************
@@ -3622,8 +3666,10 @@ S310:
 #undef zero
 #undef inf
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cdfnbn(int *which,double *p,double *q,double *s,double *xn,
 	    double *pr,double *ompr,int *status,double *bound)
 /**********************************************************************
@@ -3995,8 +4041,10 @@ S540:
 #undef inf
 #undef one
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cdfnor(int *which,double *p,double *q,double *x,double *mean,
 	    double *sd,int *status,double *bound)
 /**********************************************************************
@@ -4201,8 +4249,10 @@ S160:
     }
     return;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cdfpoi(int *which,double *p,double *q,double *s,double *xlam,
 	    int *status,double *bound)
 /**********************************************************************
@@ -4459,8 +4509,10 @@ S330:
 #undef atol
 #undef inf
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cdft(int *which,double *p,double *q,double *t,double *df,
 	  int *status,double *bound)
 /**********************************************************************
@@ -4714,8 +4766,10 @@ S310:
 #undef rtinf
 #undef maxdf
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cdftnc(int *which,double *p,double *q,double *t,double *df,
             double *pnonc,int *status,double *bound)
 /**********************************************************************
@@ -4931,8 +4985,10 @@ S250:
 #undef one
 #undef inf
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cumbet(double *x,double *y,double *a,double *b,double *cum,
 	    double *ccum)
 /*
@@ -5009,8 +5065,10 @@ S20:
 */
     return;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cumbin(double *s,double *xn,double *pr,double *ompr,
 	    double *cum,double *ccum)
 /*
@@ -5077,6 +5135,7 @@ S10:
 S20:
     return;
 }
+#endif
 
 
 void cumchi(double *x,double *df,double *cum,double *ccum)
@@ -5131,6 +5190,7 @@ static double a,xx;
 }
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cumchn(double *x,double *df,double *pnonc,double *cum,
             double *ccum)
 /**********************************************************************
@@ -5311,8 +5371,10 @@ S80:
 #undef dg
 #undef qsmall
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cumf(double *f,double *dfn,double *dfd,double *cum,double *ccum)
 /*
 **********************************************************************
@@ -5397,8 +5459,10 @@ S10:
 #undef half
 #undef done
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cumfnc(double *f,double *dfn,double *dfd,double *pnonc,
 	    double *cum,double *ccum)
 /*
@@ -5569,6 +5633,7 @@ S70:
 #undef half
 #undef done
 }
+#endif
 
 
 void cumgam(double *x,double *a,double *cum,double *ccum)
@@ -5632,6 +5697,7 @@ S10:
 }
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cumnbn(double *s,double *xn,double *pr,double *ompr,
 	    double *cum,double *ccum)
 /*
@@ -5697,8 +5763,10 @@ static double T1;
     cumbet(pr,ompr,xn,&T1,cum,ccum);
     return;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cumnor(double *arg,double *result,double *ccum)
 /*
 **********************************************************************
@@ -5910,8 +5978,10 @@ static double del,eps,temp,x,xden,xnum,y,xsq,min;
 */
     if(*ccum < min) *ccum = 0.0e0;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cumpoi(double *s,double *xlam,double *cum,double *ccum)
 /*
 **********************************************************************
@@ -5963,8 +6033,10 @@ static double chi,df;
     cumchi(&chi,&df,ccum,cum);
     return;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cumt(double *t,double *df,double *cum,double *ccum)
 /*
 **********************************************************************
@@ -6027,8 +6099,10 @@ S10:
 S20:
     return;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void cumtnc(double *t,double *df,double *pnonc,double *cum,
             double *ccum)
 /**********************************************************************
@@ -6260,8 +6334,10 @@ S30:
 #undef conv
 #undef tiny
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double devlpl(double a[],int *n,double *x)
 /*
 **********************************************************************
@@ -6303,8 +6379,10 @@ static int i;
     devlpl = term;
     return devlpl;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double dinvnr(double *p,double *q)
 /*
 **********************************************************************
@@ -6401,6 +6479,7 @@ S40:
 #undef nhalf
 #undef dennor
 }
+#endif
 
 
 /* DEFINE DINVR */
@@ -6751,6 +6830,7 @@ void dstinv(double *zsmall,double *zbig,double *zabsst,
 }
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double dt1(double *p,double *q,double *df)
 /*
 **********************************************************************
@@ -6820,6 +6900,7 @@ S30:
     dt1 = xp;
     return dt1;
 }
+#endif
 
 
 /* DEFINE DZROR */
@@ -7275,6 +7356,7 @@ S70:
 }
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double esum(int *mu,double *x)
 /*
 -----------------------------------------------------------------------
@@ -7301,6 +7383,7 @@ S20:
     w = *mu;
     return exp(w)*exp(*x);
 }
+#endif
 
 
 double exparg(int *l)
@@ -7349,6 +7432,7 @@ S50:
 }
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double fpser(double *a,double *b,double *x,double *eps)
 /*
 -----------------------------------------------------------------------
@@ -7393,6 +7477,7 @@ S20:
     fp_ser *= (1.0e0+*a*s);
     return fp_ser;
 }
+#endif
 
 
 double gam1(double *a)
@@ -7452,6 +7537,7 @@ S50:
 }
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void gaminv(double *a,double *x,double *x0,double *p,double *q,
 	    int *ierr)
 /*
@@ -7814,8 +7900,10 @@ S360:
     *ierr = -8;
     return;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double gamln(double *a)
 /*
 -----------------------------------------------------------------------
@@ -7869,8 +7957,10 @@ S40:
     gamln = d+w+(*a-0.5e0)*(log(*a)-1.0e0);
     return gamln;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double gamln1(double *a)
 /*
 -----------------------------------------------------------------------
@@ -7919,6 +8009,7 @@ S10:
     gamln1 = x*w;
     return gamln1;
 }
+#endif
 
 
 double Xgamm(double *a)
@@ -8072,6 +8163,7 @@ S120:
 }
 
 
+#ifndef	NEED_ONLY_CDFCHI
 void grat1(double *a,double *x,double *r,double *p,double *q,
 	   double *eps)
 {
@@ -8175,6 +8267,7 @@ S120:
     if(*x <= *a) goto S80;
     goto S90;
 }
+#endif
 
 
 void gratio(double *a,double *x,double *ans,double *qans,int *ind)
@@ -8596,6 +8689,7 @@ S430:
 }
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double gsumln(double *a,double *b)
 /*
 -----------------------------------------------------------------------
@@ -8623,8 +8717,10 @@ S20:
     gsumln = gamln1(&T2)+log(x*(1.0e0+x));
     return gsumln;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double psi(double *xx)
 /*
 ---------------------------------------------------------------------
@@ -8815,8 +8911,10 @@ S100:
 */
     return 0.0e0;
 }
+#endif
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double rcomp(double *a,double *x)
 /*
      -------------------
@@ -8850,6 +8948,7 @@ S20:
     r_comp = rt2pin*sqrt(*a)*exp(t1);
     return r_comp;
 }
+#endif
 
 
 double rexp(double *x)
@@ -8934,6 +9033,7 @@ S40:
 }
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double rlog1(double *x)
 /*
 -----------------------------------------------------------------------
@@ -8982,6 +9082,7 @@ S40:
     w = *x+0.5e0+0.5e0;
     return *x-log(w);
 }
+#endif
 
 
 double spmpar(int *i)
@@ -9049,6 +9150,7 @@ S20:
 }
 
 
+#ifndef	NEED_ONLY_CDFCHI
 double stvaln(double *p)
 /*
 **********************************************************************
@@ -9106,6 +9208,7 @@ S20:
     y = sqrt(-(2.0e0*log(z)));
     return sign * (y+devlpl(xnum,&K1,&y)/devlpl(xden,&K1,&y));
 }
+#endif
 
 
 /************************************************************************
@@ -9113,6 +9216,7 @@ FIFDINT:
 Truncates a double precision number to an integer and returns the
 value in a double.
 ************************************************************************/
+#ifndef	NEED_ONLY_CDFCHI
 double fifdint(double a)
 /* a     -     number to be truncated */
 {
@@ -9120,6 +9224,7 @@ double fifdint(double a)
   temp = (long)(a);
   return (double)(temp);
 }
+#endif
 
 
 /************************************************************************
