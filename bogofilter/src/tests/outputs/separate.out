@@ -1,5 +1,5 @@
-goodlist.db
-spamlist.db
+goodlist
+spamlist
                                  spam   good
 .MSG_COUNT                         21     48
 subj:Earn                           1      0

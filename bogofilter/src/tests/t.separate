@@ -18,14 +18,14 @@ WORDS="subj:Earn subj:Your subj:College"
 
 # combined wordlists
 
-rm -f $BOGOFILTER_DIR/????list.db
+rm -f $BOGOFILTER_DIR/????list.$DB_EXT
 
 $BOGOFILTER -C -W -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER -C -W -n < ${SYSTEST}/inputs/good.mbx
 
 OUT="$TMPDIR/combined.out"
-for f in $BOGOFILTER_DIR/????list.db ; do
-    basename $f >> $OUT
+for f in $BOGOFILTER_DIR/????list.$DB_EXT ; do
+    basename $f .$DB_EXT >> $OUT
 done
 $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT $WORDS >> $OUT
 echo Subject: Earn Your College Degree Online | $BOGOFILTER -C -uT -D -W >> $OUT
@@ -35,14 +35,14 @@ COM=`$BOGOUTIL -W -w $BOGOFILTER_DIR .MSG_COUNT | tail -1 | $AWK '{printf "%s %s
 
 # separate wordlists
 
-rm -f $BOGOFILTER_DIR/????list.db
+rm -f $BOGOFILTER_DIR/????list.$DB_EXT
 
 $BOGOFILTER -C -WW -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER -C -WW -n < ${SYSTEST}/inputs/good.mbx
 
 OUT="$TMPDIR/separate.out"
-for f in $BOGOFILTER_DIR/????list.db ; do
-    basename $f >> $OUT
+for f in $BOGOFILTER_DIR/????list.$DB_EXT ; do
+    basename $f .$DB_EXT >> $OUT
 done
 $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT $WORDS >> $OUT
 echo Subject: Earn Your College Degree Online | $BOGOFILTER -C -uT -D -WW >> $OUT
@@ -71,9 +71,9 @@ OUTPUTS=${SYSTEST}/outputs
 for i in $TMPDIR/[cs]*.out ; do
     j=`basename $i`
     if  [ $verbose -eq 0 ]; then
-	cmp $i $OUTPUTS/$j
+	cmp $OUTPUTS/$j $i
     else
 	set +e
-	diff $DIFF_BRIEF $i $OUTPUTS/$j
+	diff $DIFF_BRIEF $OUTPUTS/$j $i
     fi
 done
