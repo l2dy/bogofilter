@@ -590,13 +590,6 @@ void process_args_1(int argc, char **argv)
 	    run_type = check_run_type(UNREG_SPAM, REG_SPAM | UNREG_GOOD);
 	    break;
 
-	case 't':
-	    if (!terse)
-		terse = true;
-	    else
-		terse_format = "%0.16f";
-	    break;
-
 	case 'T':
 	    test += 1;
 	    break;
@@ -705,6 +698,13 @@ void process_args_2(int argc, char **argv)
 	    }
 	    break;
 	}
+
+	case 't':
+	    if (!terse)
+		terse = true;
+	    else
+		terse_format = "%0.16f";
+	    break;
 	}
     }
 
