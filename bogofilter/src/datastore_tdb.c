@@ -29,6 +29,7 @@ typedef struct {
     char *path;
     char *name;
     bool locked;
+    bool created;
     TDB_CONTEXT *dbp;
 } dbh_t;
 
@@ -41,7 +42,6 @@ const char *db_version_str(void)
 
 static dbh_t *dbh_init(const char *path, const char *name)
 {
-    size_t c;
     dbh_t *handle;
     size_t len = strlen(path) + strlen(name) + 2;
 
@@ -53,7 +53,8 @@ static dbh_t *dbh_init(const char *path, const char *name)
     handle->name = xmalloc(len);
     build_path(handle->name, len, path, name);
 
-    handle->locked = false;
+    handle->locked  = false;
+    handle->created = false;
 
     return handle;
 }
@@ -70,10 +71,19 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
+/* Returns is_swapped flag */
 bool db_is_swapped(void *vhandle)
 {
+    (void) vhandle;		/* suppress compiler warning */
+    return false;
+}
+
+
+/* Returns created flag */
+bool db_created(void *vhandle)
+{
     dbh_t *handle = vhandle;
-    return handle->is_swapped;
+    return handle->created;
 }
 
 
@@ -89,7 +99,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     int open_flags;
     TDB_CONTEXT *dbp;
 
-    if (open_mode == DS_WRITE) {
+    if (open_mode & DS_WRITE) {
 	open_flags = O_RDWR | O_CREAT;
     }
     else {
@@ -109,7 +119,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "(db) tdb_open( %s ), %d )\n", handle->name, open_mode);
       
-    if (open_mode == DS_WRITE) {
+    if (open_mode & DS_WRITE) {
 	if (tdb_lockall(dbp) == 0) {
 	    handle->locked = 1;
 	}
