@@ -1,4 +1,10 @@
 /* $Id$ */
+/*
+ * $Log$
+ * Revision 1.2  2002/09/26 23:40:20  relson
+ * Added directive so that loginfo is included in file.
+ *
+ */
 
 /****
 **
