@@ -2,6 +2,16 @@
 				BOGOFILTER NEWS
 			       =================
  
+0.14.5	2003-08-15
+
+* Corrected parsing error (in html code) that caused
+  bogofilter to miss message separators.
+* Revised processing of From and empty lines so that parsing
+  works correctly with both flex-2.5.4 and flex-2.5.31.
+* Added '-T' as terse mode (with fixed formatting).
+* Updated bogominitrain.pl to version 1.3.
+* Revised FAQ.
+
 0.14.4	2003-08-10
  
 * Revised database API so that there are 3 distinct layers

@@ -4,6 +4,25 @@
 
 $Id$
 
+0.14.5	2003-08-15
+
+	* Updated bogominitrain.pl to version 1.3.
+
+	2003-08-14
+
+	* Corrected parsing error (in html code) that caused
+	  bogofilter to miss message separators.
+
+	2003-08-12
+
+	* Revised FAQ.
+	* Added '-T' as terse mode (with fixed formatting).
+
+	2003-08-10
+
+	* Revised processing of From and empty lines so that parsing
+	  works correctly with both flex-2.5.4 and flex-2.5.31.
+
 0.14.4	2003-08-10
 
 	* Updated FAQ.
