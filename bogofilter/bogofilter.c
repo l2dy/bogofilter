@@ -401,7 +401,7 @@ static double wordprob_result(wordprob_t* wordstats)
 #ifdef	ENABLE_ROBINSON_METHOD
     if (algorithm == AL_ROBINSON)
     {
-	prob = ((ROBS * ROBX + wordstats->bad) / (ROBS + count));
+	prob = ((robs * robx + wordstats->bad) / (robs + count));
     }
 #endif
 
