@@ -136,9 +136,20 @@ if test "x$BF_CHECKTOOL" = x"glibc" ; then
     export MALLOC_CHECK_
 fi
 
+# check valgrind:
+case `valgrind --version 2>/dev/null` in
+    valgrind-2.1.*) VALGRIND="valgrind --tool=memcheck" ;;
+    valgrind-*) VALGRIND="valgrind" ;;
+    *) VALGRIND= ;;
+esac
+if [ "x$VALGRIND" != x ] ; then
+    VALGRIND="$VALGRIND -q --num-callers=20"
+fi
+export VALGRIND
+
 # use valgrind:
-if test "x$BF_CHECKTOOL" = x"valgrind" && (valgrind -q true) 2>/dev/null ; then
-    VAL='valgrind -q --num-callers=16'
+if test "x$BF_CHECKTOOL" = x"valgrind" && test "x$VALGRIND" != x ; then
+    VAL="$VALGRIND"
     export VAL
 fi
 
