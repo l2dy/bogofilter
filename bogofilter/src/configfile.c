@@ -55,6 +55,7 @@ const char *user_config_file   = "Choices:bogofilter.bogofilter/cf";
 #endif
 
 bool	stats_in_header = true;
+char 	*config_file_name;
 
 /*---------------------------------------------------------------------------*/
 
@@ -122,19 +123,21 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
     bool ok = true;
     int lineno = 0;
     FILE *fp;
-    char *filename;
 
-    filename = tildeexpand(fname, tilde_expand);
+    if (config_file_name != NULL)
+	xfree(config_file_name);
+    config_file_name = tildeexpand(fname, tilde_expand);
 
-    fp = fopen(filename, "r");
+    fp = fopen(config_file_name, "r");
 
     if (fp == NULL) {
-	xfree(filename);
+	xfree(config_file_name);
+	config_file_name = NULL;
 	return false;
     }
 
     if (DEBUG_CONFIG(0))
-	fprintf(dbgout, "Reading %s\n", filename);
+	fprintf(dbgout, "Reading %s\n", config_file_name);
 
     while (!feof(fp))
     {
@@ -160,12 +163,11 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
     }
 
     if (ferror(fp)) {
-	fprintf(stderr, "Error reading file \"%s\"\n.", filename);
+	fprintf(stderr, "Error reading file \"%s\"\n.", config_file_name);
 	ok = false;
     }
 
     (void)fclose(fp); /* we're just reading, so fclose should succeed */
-    xfree(filename);
 
     return ok;
 }

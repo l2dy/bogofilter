@@ -58,6 +58,8 @@ typedef enum longopts_e {
 
 /* Global variables */
 
+extern char *config_file_name;
+
 extern void remove_comment(const char *line);
 extern bool process_config_files(bool warn_on_error);
 extern bool process_config_option(const char *arg, bool warn_on_error, priority_t precedence);
