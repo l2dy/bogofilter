@@ -28,7 +28,7 @@ typedef enum {
     FROM,	/* mbox message delimiter */
     BOUNDARY,	/* MIME multipart boundary line */
     EMPTY,	/* empty line */
-    IPADDR,	/* ip address */
+    IPADDR	/* ip address */
 } token_t;
 
 /* in lexer.c */
