@@ -26,12 +26,6 @@ NAME:
 
 #define ROBINSON_MIN_DEV	0.0	/* if nonzero, use characteristic words */
 #define ROBINSON_SPAM_CUTOFF	0.54	/* if it's spammier than this... */
-
-/* 11/17 - Greg Louis recommends the following values:
-** #define ROBINSON_SPAM_CUTOFF	0.582
-** #define ROBINSON_MIN_DEV	0.1
-*/
-
 #define ROBINSON_MAX_REPEATS	1	/* cap on word frequency per message */
   
 extern int Rtable;
