@@ -1,5 +1,8 @@
 # $Id$ 
 # $Log$
+# Revision 1.12  2002/09/25 00:51:07  adrian_otto
+# Removed referenced to lock.c and lock.h, because they have been obviated.
+#
 # Revision 1.11  2002/09/24 12:46:47  gyepi
 # added bogoupgrade.pl
 #
@@ -65,7 +68,7 @@ noinst_PROGRAMS = lexertest
 man1_MANS = bogofilter.1
 
 # what to build that from
-bogofilter_SOURCES = bogofilter.c bogofilter.h lock.c lock.h main.c lexer_l.l lexer.h \
+bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer_l.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c xmalloc.h xmalloc.c
 
 lexertest_SOURCES = lexer_l.l

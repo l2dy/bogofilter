@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.18  2002/09/25 00:51:07  adrian_otto
+ * Removed referenced to lock.c and lock.h, because they have been obviated.
+ *
  * Revision 1.17  2002/09/24 19:47:49  m-a
  * Add missing #include "datastore.h". Drop unused strlwr.
  *
@@ -110,7 +113,6 @@ I do the lexical analysis slightly differently, however.
 #include <db.h>
 #include <Judy.h>
 #include "bogofilter.h"
-#include "lock.h"
 #include "datastore.h"
 
 // implementation details
