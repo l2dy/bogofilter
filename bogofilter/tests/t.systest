@@ -9,8 +9,8 @@ set -e
 #		inputs  - test inputs
 #		outputs - known correct outputs
 
-[   -d ${TMPDIR}/tests ] && rm -f ${TMPDIR}/tests/*
-[ ! -d ${TMPDIR}/tests ] && mkdir ${TMPDIR}/tests
+[   -d ${TMPDIR}/tests ] && rm -rf ${TMPDIR}/tests
+[ ! -d ${TMPDIR}/tests ] && mkdir -p ${TMPDIR}/tests
 
 CONFIG="${TMPDIR}/test.cf"
 BOGOFILTER="../bogofilter -c ${CONFIG}"
@@ -22,6 +22,18 @@ min_dev=0.0
 spam_header_name=X-Bogosity
 stats_in_header=Y
 EOF
+
+map_rc()
+{
+    (
+	set +e
+	eval "$@"
+	a=$?
+	[ $a -eq 0 ] && exit 0
+	[ $a -eq 1 ] && exit 0
+	exit $a
+    )
+}
 
 # Expected spamicity values (11/17/02 13:13):
 #
@@ -49,7 +61,7 @@ for alg in r g ; do
 	in=`echo $tst | tr "." " " | awk '{print $1}'`
 	out=`echo $tst | tr "." " " | awk '{print $2}'`
 	ver=`echo $tst | tr "." " " | awk '{print $3}'`
-	$BOGOFILTER -$alg -$ver 2>/dev/null \
+	map_rc $BOGOFILTER -$alg -$ver 2>/dev/null \
 	< ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg || :
 	sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
     done
@@ -62,7 +74,7 @@ for alg in r g ; do
 	in=`echo $tst | tr "." " " | awk '{print $1}'`
 	out=`echo $tst | tr "." " " | awk '{print $2}'`
 	ver=`echo $tst | tr "." " " | awk '{print $3}'`
-	$BOGOFILTER -$alg -$ver 2>/dev/null \
+	map_rc $BOGOFILTER -$alg -$ver 2>/dev/null \
 	< ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg
 	sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
     done
