@@ -85,8 +85,6 @@ wordhash_free (wordhash_t *wh)
     {
 	q = p->iter_next;
 	word_free( p->key );
-    fprintf(dbgout, "::%3s  %08lX  %s\n", "", 
-	    (ulong) (p->key), "hf");
     }
 
     for (np = wh->nodes; np; np = nq)
