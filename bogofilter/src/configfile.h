@@ -57,7 +57,6 @@ enum field_e {
 typedef enum longopts_e {
     O_IGNORE = 1000,
     O_BLOCK_ON_SUBNETS,
-    O_BOGOFILTER_DIR,
     O_CHARSET_DEFAULT,
     O_HAM_CUTOFF,
     O_HEADER_FORMAT,
