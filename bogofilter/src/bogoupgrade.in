@@ -165,7 +165,7 @@ sub convert_double_to_single() {
 
     push @tmp, cvt2to1_get($spam, "%s %d 0 %d");
     push @tmp, cvt2to1_get($good, "%s 0 %d %d");
-    my @cmd = ($bogoutil."x", '-l', $word);
+    my @cmd = ($bogoutil, '-l', $word);
     open O, "|-", @cmd or die "cannot run \"@cmd\": $!";
     print O join("\n", sort @tmp), "\n";
     close O or die "error executing \"@cmd\": $!";
