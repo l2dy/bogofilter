@@ -17,6 +17,7 @@ extern double thresh_stats;
 extern double thresh_rtable;
 
 extern const char *progname;
+/*@observer@*/
 extern const char *stats_prefix;
 extern char directory[PATH_LEN + 100];
 

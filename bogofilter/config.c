@@ -215,16 +215,17 @@ static bool process_config_line( const char *line )
     return FALSE;
 }
 
-static void read_config_file(const char *filename, bool tilde_expand)
+static void read_config_file(const char *fname, bool tilde_expand)
 {
     bool error = FALSE;
     int lineno = 0;
     FILE *fp;
+    char *filename;
 
     if (tilde_expand) {
-	filename = tildeexpand(filename);
+	filename = tildeexpand(fname);
     } else {
-	filename = xstrdup(filename);
+	filename = xstrdup(fname);
     }
 
     fp = fopen(filename, "r");

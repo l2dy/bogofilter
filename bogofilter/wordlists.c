@@ -16,7 +16,7 @@
 
 wordlist_t good_list;
 wordlist_t spam_list;
-wordlist_t* word_lists=NULL;
+/*@null@*/ wordlist_t* word_lists=NULL;
 
 void *open_wordlist( const char *name, const char *filepath )
 {
@@ -33,7 +33,7 @@ void *open_wordlist( const char *name, const char *filepath )
 }
 
 /* returns -1 for error, 0 for success */
-int init_list(wordlist_t* list, const char* name, const char* filepath,
+static int init_list(/*@out@*/ wordlist_t* list, const char* name, const char* filepath,
 	      double weight, bool bad, int override, bool ignore)
 {
     wordlist_t* list_index;
@@ -95,15 +95,15 @@ void build_path(char* dest, int size, const char* dir, const char* file)
 }
 
 /* returns -1 for error, 0 for success */
-int setup_lists(const char* directory, double good_weight, double bad_weight)
+int setup_lists(const char* dir, double good_weight, double bad_weight)
 {
     int rc = 0;
     char filepath[PATH_LEN];
 
-    build_path(filepath, PATH_LEN, directory, GOODFILE);
+    build_path(filepath, PATH_LEN, dir, GOODFILE);
     if (init_list(&good_list, "good", filepath, good_weight, FALSE, 0, 0)) rc = -1;
 
-    build_path(filepath, PATH_LEN, directory, SPAMFILE);
+    build_path(filepath, PATH_LEN, dir, SPAMFILE);
     if (init_list(&spam_list, "spam", filepath, bad_weight, TRUE,  0, 0)) rc = -1;
 
     return rc;
@@ -119,11 +119,12 @@ void close_lists(void)
     }
 }
 
+#ifdef COMPILE_DEAD_CODE
 /* some sanity checking of lists is needed because we may
    allow users to specify lists eventually and there are
    opportunities to generate divide-by-zero exceptions or
    follow bogus pointers. */
-void sanitycheck_lists()
+static void sanitycheck_lists(void)
 {
     wordlist_t* list=word_lists;
     int listcount=0;
@@ -148,6 +149,7 @@ void sanitycheck_lists()
     if (DEBUG_WORDLIST(1))
 	fprintf(stderr, "%d lists look OK.\n", listcount);
 }
+#endif
 
 /* type - 'g', 's', or 'i'
  * name - 'good', 'spam', etc
