@@ -1,9 +1,13 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.5  2002/09/18 22:30:22  relson
- * Created lexer.h with the definitions needed by lexer_l.l from bogofilter.h.
- * This removes the compile-time dependency between the two files.
+ * Revision 1.6  2002/09/22 21:24:36  relson
+ * Modify the lexer to allow the full range of alphabetic characters.
+ * Thanks to Clint Adams for the new token matching expression.
  *
+/* Revision 1.5  2002/09/18 22:30:22  relson
+/* Created lexer.h with the definitions needed by lexer_l.l from bogofilter.h.
+/* This removes the compile-time dependency between the two files.
+/*
 /* Revision 1.4  2002/09/18 20:56:43  m-a
 /* Let automake deal with the lexer.
 /*
@@ -275,7 +279,7 @@ filename=\"					;
 {MIME_BOUNDARY}					;
 
 {IPADDR}					{return(TOKEN);}
-[A-Za-z$][A-Za-z0-9$'.-]+[A-Za-z0-9$]		{return(TOKEN);}
+[^[:blank:]\n[:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,\n[]+[^[:blank:][:punct:]\n]	{return(TOKEN);}
 .						;
 \n						;
 
