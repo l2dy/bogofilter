@@ -1,52 +1,3 @@
-Return-Path: <3.14@logic.univie.ac.at>
-Delivered-To: relson@osagesoftware.com
-Received: from server.logic.univie.ac.at (server.logic.univie.ac.at [131.130.190.41])
-	by osagesoftware.com (Postfix) with ESMTP id 7B50C27ED5
-	for <relson@osagesoftware.com>; Tue, 19 Aug 2003 07:28:26 -0400 (EDT)
-Received: from pi.logic.univie.ac.at
-	([131.130.190.46] helo=logic.univie.ac.at ident=[+24Mp1ibB5LxMg9Uk00/5LNkHMasd3Ax])
-	by server.logic.univie.ac.at with esmtp (Exim 4.20)
-	id 19p4f3-0002dk-M5
-	for relson@osagesoftware.com; Tue, 19 Aug 2003 13:28:25 +0200
-Message-ID: <3F4209D8.10703@logic.univie.ac.at>
-Date: Tue, 19 Aug 2003 13:28:24 +0200
-From: Boris 'pi' Piwinger <3.14@logic.univie.ac.at>
-Organization: Institute for Logic, University of Vienna
-User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.4) Gecko/20030618
-X-Accept-Language: en, de, de-AT, de-DE
-MIME-Version: 1.0
-To: David Relson <relson@osagesoftware.com>
-Subject: Re: bogominitrain (continued)
-References: <4.3.2.7.2.20030817193147.02fb2d90@mail.osagesoftware.com>	<9fr0kvci4b16ht1j4bgvijmkie5r658pke@4ax.com>	<20030818083002.53d5de04.relson@osagesoftware.com>	<hvu1kvkbpcnfe50d4u1ts6pc9fotq33rjv@4ax.com> <20030818171103.34e90431.relson@osagesoftware.com>
-In-Reply-To: <20030818171103.34e90431.relson@osagesoftware.com>
-Content-Type: multipart/mixed;
- boundary="------------030805050307010708040004"
-X-Bogosity: Ham, tests=bogofilter-f, spamicity=0.00e+00, version=0.14.5
-Status:   
-
-This is a multi-part message in MIME format.
---------------030805050307010708040004
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-
-[again corrected, sorry, now my reader fouled me]
-
-David Relson wrote:
-
-> Anyhow, here's the patch (in my usual crude perl style).  Feel free to "do it right".
-
-OK, this is really perlish now. Since I don't know against
-which version I should diff, I send you the full version.
-
-pi
-
---------------030805050307010708040004
-Content-Type: text/plain;
- name="bogominitrain.pl.1.32"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="bogominitrain.pl.1.32"
-
 #! /usr/bin/perl
 # Script to train bogofilter from mboxes
 # by Boris 'pi' Piwinger <3.14@piology.org>
@@ -219,5 +170,3 @@ do { # Start force loop
   print "False positives: $fp\n";
 } until ($fn+$fp==0 || $hamadd+$spamadd==0 || !$force);
 print "\n$runs run",$runs>1&&"s"," needed to close off.\n" if ($force);
-
---------------030805050307010708040004--
