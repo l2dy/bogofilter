@@ -41,6 +41,8 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include "xmalloc.h"
 #include "xstrdup.h"
 
+static DB_ENV *dbe; /* libdb environment, if in use, NULL otherwise */
+
 static bool init;
 
 typedef struct {
@@ -202,6 +204,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 {
     int ret;
     int is_swapped;
+    char *t;
 
     if (!init) abort();
 
@@ -240,7 +243,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	    break;
 
 	/* create DB handle */
-	if ((ret = db_create (&dbp, NULL, 0)) != 0) {
+	if ((ret = db_create (&dbp, dbe, 0)) != 0) {
 	    print_error(__FILE__, __LINE__, "(db) create, err: %d, %s",
 			ret, db_strerror(ret));
 	    goto open_err;
@@ -248,8 +251,8 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 
 	handle->dbp = dbp;
 
-	/* set cache size */
-	if (db_cachesize != 0 &&
+	/* set cache size, but only unless we're using an environment */
+	if (dbe == NULL && db_cachesize != 0 &&
 	    (ret = dbp->set_cachesize(dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
 	    print_error(__FILE__, __LINE__, "(db) setcache( %s ), err: %d, %s",
 			handle->name, ret, db_strerror(ret));
@@ -257,10 +260,17 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	}
 
 	/* open data base */
+	t = handle->name;
+	if (dbe && bogohome && 0 == strncmp(t, bogohome,
+		    strlen(bogohome))) {
+	    /* strip prefix, BerkeleyDB will add it */
+	    t += strlen(bogohome);
+	    while (*t == DIRSEP_C) t++;
+	}
 	if (
-		(ret = DB_OPEN(dbp, handle->name, NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0
+		(ret = DB_OPEN(dbp, t, NULL, DB_BTREE, opt_flags | retryflag, 0664)) != 0
 		&& (ret != ENOENT || opt_flags == DB_RDONLY ||
-		(ret = DB_OPEN(dbp, handle->name, NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0)
+		(ret = DB_OPEN(dbp, t, NULL, DB_BTREE, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0)
 	   )
 	{
 	    /* close again and bail out without further tries */
@@ -310,6 +320,10 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
 	/* check file size limit */
 	check_fsize_limit(handle->fd, pagesize);
 
+	/* skip manual lock when run in environment */
+	if (dbe)
+	    break;
+	
 	/* try fcntl lock */
 	if (db_lock(handle->fd, F_SETLK,
 		    (short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
@@ -556,5 +570,33 @@ const char *db_str_err(int e) {
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
 static bool init = false;
-int db_init(void) { init = true; return 0; }
-void db_cleanup(void) { init = false; }
+int db_init(void) {
+    if (bogohome && getenv("BF_EXPERIMENTAL_DBENV")) {
+	int ret = db_env_create(&dbe, 0);
+	if (ret != 0) {
+	    print_error(__FILE__, __LINE__, "db_env_create create, err: %d, %s", ret, db_strerror(ret));
+	    abort();
+	}
+	if (db_cachesize != 0 &&
+	    (ret = dbe->set_cachesize(dbe, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
+	    print_error(__FILE__, __LINE__, "DBENV->set_cachesize(%d), err: %d, %s",
+			db_cachesize, ret, db_strerror(ret));
+	    abort();
+	}
+	ret = dbe->open(dbe, bogohome, DB_INIT_MPOOL | DB_INIT_CDB | DB_CREATE, /* mode */ 0644);
+	if (ret != 0) {
+	    dbe->close(dbe, 0);
+	    print_error(__FILE__, __LINE__, "db_env_create create, err: %d, %s", ret, db_strerror(ret));
+	    abort();
+	}
+    }
+    init = true;
+    return 0;
+}
+
+void db_cleanup(void) {
+    if (dbe)
+	dbe->close(dbe, 0);
+    dbe = NULL;
+    init = false;
+}

@@ -1,0 +1,94 @@
+EXPERIMENTAL BERKELEYDB ENVIRONMENT CODE
+========================================
+
+This document does not apply when you are installing a bogofilter
+version that has been configured to use the TDB or QDBM data base
+managers.
+
+0. Definitions ---------------------------------------------------------
+
+Whenever ~/.bogofilter appears in the text below, this is the directory
+where bogofilter keeps its data base by default. If you are overriding
+this directory by configuration or environment variables, replace your
+actual bogofilter data base directory.
+
+1. Overview ------------------------------------------------------------
+
+This bogofilter version contains experimental (less-tested, but
+"worksforme") code to use BerkeleyDB environments for locking and
+caching data base access instead of the proven fcntl()/F_SETLK locks.
+
+The goals are to collect practical experiences with performance,
+stability, recoverability and other behaviour of BerkeleyDB environment
+and locking code, in preparation (or abandonment) of a migration towards
+the Berkeley DB Transactional Data Store.
+
+The current code is the first step in that direction, the code switches
+to the Berkeley DB Concurrent Data Store model, it has the potential of
+using finer grained locks, for improved concurrency - depending on
+BerkeleyDB version, and it uses shared buffer pools to improve
+performance.
+
+2. Use, restrictions, caveats ------------------------------------------
+
+The code is only used in bogofilter, not in the utilities such as
+bogoutil. As the locking of the experimental code is incompatible with
+the locking bogofilter has used so far, you MUST NOT run bogofilter and
+any of the bogofilter utilities at the same time. If you are running
+bogofilter from .procmailrc, .mailfilter or as otherwise integral part
+of your system, stop your mail system and make sure all bogofilter
+processes have exited before using a utility, to prevent processes from
+trampling over each other.
+
+To enable the new code, the environment variable BF_EXPERIMENTAL_DBENV
+must be defined (the value is ignored for the moment, an empty variable
+is fine) when bogofilter is run. You can use
+
+env BF_EXPERIMENTAL_DBENV=1 bogofilter [options]
+
+where [options] is a placeholder for the options you regularly run
+bogofilter with, it can be empty.
+
+BerkeleyDB keeps some additional statistics about locking, caching and
+their efficiency. These can be obtained by running the db_stat utility
+with the -e or -c option, examples:
+
+db_stat -h ~/.bogofilter -e # environment statistics
+db_stat -h ~/.bogofilter -c # lock statistics
+db_stat -h ~/.bogofilter -m # buffer pool statistics
+
+db_stat ~/.bogofilter/wordlist.db # data base statistics
+   (this has also been available with the traditional bogofilter code)
+
+The new code will store files named __db.NNN - where NNN are numbers -
+in the ~/.bogofilter directory. These MUST NOT be removed. (db_recover may
+however remove some of them to recover the environment)
+
+The data base environment can be configured through an optional file
+~/.bogofilter/DB_CONFIG which is documented in the BerkeleyDB manual.
+
+This code is deadlock-free, so if bogofilter hangs with this
+experimental code enabled as documented above, either the data base or
+the environment should be checked for corruptions.
+
+3. Open issues and troubleshooting -------------------------------------
+
+a. The DBENV based code appears to be more sensitive (not to say
+   fragile) with respect to premature abortion, hangs of bogofilter
+   processes after an ungraceful bogofilter shutdown have been observed.
+   These can usually be resolved by killing all hanging bogofilter
+   processes, then running
+
+   db_recover -h ~/.bogofilter
+
+   TODO: bogofilter should catch common interrupt signals, SIGHUP,
+   SIGINT, SIGTERM, and ensure a graceful shutdown of the data base.
+
+b. TODO: The bogofilter utilities need to be taught about the
+   environment, too, to avoid avoidable corruptions.
+
+c. USER HELP REQUIRED: Benchmark results, comparisons of traditional
+   versus experimental locking code will be highly appreciated.
+
+d. TODO: Make sure that the token updates and the .MSG_COUNT are bundled and
+   the whole bundle is written atomically.
