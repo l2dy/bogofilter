@@ -2,6 +2,15 @@
 				BOGOFILTER NEWS
 			       =================
 
+2003-10-01
+
+* Bogofilter can now use GSL 1.0 to 1.3 as well as 1.4.
+  If your distribution splits GSL into a library and a developer
+  package (Mandrake and Debian Linux), remember to install both!
+* Rebuild i586.rpm with GSL dynamically linked; source rpms
+  and bogofilter-static rpm not affected.
+* Don't allow whitespace in SMTP and ESMTP tokens.
+
 0.15.5.2 2003-10-01
 
 * Rebuild of i586.rpm with GSL-1.4 dynamically linked.
