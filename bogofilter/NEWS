@@ -5,6 +5,13 @@
 NOTE: More information on important changes for bogofilters updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+0.17.2	2004-02-??
+
+	2004-02-20
+	
+	* Corrected typos in doc/bogofilter.xml (the man page)
+	* and in contrib/mailfilter.example
+
 0.17.1	2004-02-09
 
 	* 2004-02-05

@@ -8,6 +8,11 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
 
+0.17.2	2004-02-??
+
+* Corrected typos in doc/bogofilter.xml (the man page) 
+  and in contrib/mailfilter.example
+
 0.17.1	2004-02-09
 
 * Fix '-d' and '--bogofilter_dir=directory' options.
