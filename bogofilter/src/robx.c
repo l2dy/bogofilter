@@ -60,15 +60,8 @@ static int robx_hook(word_t *key, dsv_t *data,
     struct robhook_data *rh = userdata;
 
     /* ignore system meta-data */
-    if (*key->text == '.') {
-	size_t len = strlen(".MSG_COUNT");
-	if (key->leng == len && memcmp(key->text, ".MSG_COUNT", len) == 0) {
-	    rh->spam_cnt = data->spamcount;
-	    rh->good_cnt = data->goodcount;
-	    rh->scalefactor = (double)rh->spam_cnt/(double)rh->good_cnt;
-	}
+    if (*key->text == '.')
 	return 0;
-    }
 
     robx_accum(rh, key, data);
     
@@ -82,12 +75,19 @@ double compute_robinson_x(const char *path)
     int ret;
     double rx;
     dsh_t *dsh;
+    wordlist_t *wordlist;
 
     struct robhook_data rh;
 
     set_wordlist_dir(path, PR_NONE);
     open_wordlists(word_lists, DS_READ);
-    dsh = get_default_wordlist(word_lists)->dsh;
+    wordlist = get_default_wordlist(word_lists);
+
+    dsh = wordlist->dsh;
+
+    rh.spam_cnt = wordlist->msgcount[IX_SPAM];
+    rh.good_cnt = wordlist->msgcount[IX_GOOD];
+    rh.scalefactor = (double)rh.spam_cnt/(double)rh.good_cnt;
 
     rh.dsh = dsh;
     rh.sum = 0.0;
