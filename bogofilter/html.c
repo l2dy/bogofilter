@@ -70,15 +70,19 @@ int kill_html_comment(byte *buf_start, byte *buf_used, byte *buf_end)
 		tmp += COMMENT_START_LEN-1;
 	    }
 	} 
-	if (c == '>' && memcmp(tmp+1-COMMENT_END_LEN, COMMENT_END, COMMENT_END_LEN) == 0) {
-	    /* eat comment */
-	    size_t cnt = buf_used - tmp;
-	    if (kill_html_comments) {
-		memcpy(buf_start, tmp+1, cnt + 1);
-		buf_used -= tmp + 1 - buf_start;
+	if (c == '>') {
+	    /* Hack to only check for ">" rather than complete terminator "-->" */
+	    bool short_check = true;
+	    if (short_check || memcmp(tmp+1-COMMENT_END_LEN, COMMENT_END, COMMENT_END_LEN) == 0) {
+		/* eat comment */
+		size_t cnt = buf_used - tmp;
+		if (kill_html_comments) {
+		    memcpy(buf_start, tmp+1, cnt + 1);
+		    buf_used -= tmp + 1 - buf_start;
+		}
+		tmp = buf_start;
+		level -= 1;
 	    }
-	    tmp = buf_start;
-	    level -= 1;
 	}
 	if (level == 0)
 	    break;
