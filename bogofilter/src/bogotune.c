@@ -117,6 +117,7 @@ char *ds_path;
 extern double robx, robs;
 
 bool	bogolex = false;	/* true if convert input to msg-count format */
+char   *bogolex_file = NULL;
 word_t *w_msg_count;
 wordhash_t *t_ns, *t_sp;
 
@@ -794,6 +795,10 @@ static int process_args(int argc, char **argv)
 				*/
 		    force = true;
 		    break;
+		case 'I':
+		    argc -= 1;
+		    bogolex_file = *++argv;
+		    break;
 		case 'M':
 		    bogolex = true;
 		    break;
@@ -1240,6 +1245,11 @@ static rc_t bogotune(void)
 
     /* Note: memory usage highest while reading messages */
     /* usage decreases as distribute() converts to count format */
+
+    if (bogolex && bogolex_file != NULL) {
+	read_mailbox(bogolex_file, NULL);
+	return status;
+    }
 
     /* read all messages, merge training sets, look up scoring sets */
     ns_cnt = filelist_read(REG_GOOD, ham_files);
