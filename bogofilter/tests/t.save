@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ ! -z $BF_TESTDIR ] ; then
+    NAME=`echo $0 | sed s/t.//`
+    DATE=`date +"%Y%m%d"`
+    TMPDIR="${BF_TESTDIR}/$NAME.$DATE"
+    if [ -d  $NAME.$DATE ] ; then
+	rm -rf $NAME.$DATE
+    fi
+    mkdir $NAME.$DATE
+    ( cd $TMPDIR ; tar cf - *) | ( cd $NAME.$DATE ; tar xf - )
+fi
