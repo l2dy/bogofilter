@@ -27,6 +27,7 @@ AUTHOR:
 #include "bogofilter.h"
 #include "datastore.h"
 #include "datastore_db.h"
+#include "maint.h"
 #include "robinson.h"			/* for ROBS and ROBX */
 
 #define PROGNAME "bogoutil"
@@ -36,69 +37,9 @@ AUTHOR:
 int verbose = 0;
 bool logflag = 0;
 
-int thresh_count = 0;
-int thresh_age   = 0;
-size_t size_min = 0, size_max = 0;
-bool replace_nonascii_characters = false;
-
-typedef unsigned char byte;
-
 run_t run_type = RUN_NORMAL;
 
 const char *progname = PROGNAME;
-
-/* Function Prototypes */
-static bool check_age(int tmp);
-static bool check_count(int tmp);
-static bool check_size(size_t tmp);
-static void do_replace_nonascii_characters(byte *str);
-
-/* Function Definitions */
-
-/* Keep high counts */
-bool check_count(int c)
-{
-    if (thresh_count == 0)
-	return true;
-    else {
-	bool ok = c > thresh_count;
-	return ok;
-    }
-}
-
-/* Keep recent dates */
-bool check_age(int a)
-{
-    if (thresh_age == 0 || a == 0 || a == today)
-	return true;
-    else {
-	int diff = (today - a + 366) % 366;
-	bool ok = diff <= thresh_age;
-	return ok;
-    }
-}
-
-/* Keep sizes within bounds */
-bool check_size(size_t s)
-{
-    if (size_min == 0 || size_max == 0)
-	return true;
-    else {
-	bool ok = (size_min <= s) && (s <= size_max);
-	return ok;
-    }
-}
-
-static void do_replace_nonascii_characters(byte *str)
-{
-    byte ch;
-    while ((ch=*str) != '\0')
-    {
-	if ( ch & 0x80)
-	    *str = '?';
-	str += 1;
-    }
-}
 
 static int dump_file(char *db_file)
 {
@@ -139,12 +80,12 @@ static int dump_file(char *db_file)
 			val = (dbv_t *)data.data;
 			if (replace_nonascii_characters)
 			    do_replace_nonascii_characters((byte *)key.data);
-			if (check_count(val->count) && check_age(val->yday) && check_size(key.size))
+			if (check_count(val->count) && check_date(val->date) && check_size(key.size))
 			{
-			    if (val->yday == 0 )
+			    if (val->date == 0 )
 				printf("%.*s %lu\n", (int)key.size, (char *) key.data, val->count);
 			    else
-				printf("%.*s %lu %lu\n", (int)key.size, (char *) key.data, val->count, val->yday);
+				printf("%.*s %lu %lu\n", (int)key.size, (char *) key.data, val->count, val->date);
 			}
 			break;
 		    default:
@@ -235,7 +176,7 @@ static int load_file(char *db_file)
 	    break;
 	}
 
-	if (date == 0)				/* day of year (1..366) */
+	if (date == 0)				/* date as YYYYMMDD */
 	    date = today;
 
 	if (replace_nonascii_characters)
@@ -599,9 +540,7 @@ int main(int argc, char *argv[])
     cmd_t flag = NONE;
     bool  prob = false;
 
-    time_t t = time(NULL);
-    struct tm *tm = localtime( &t );
-    today = tm->tm_yday + 1;
+    set_today();		/* compute current date for token age */
 
     while ((option = getopt(argc, argv, "d:l:w:R:phvVx:a:c:s:ny:")) != -1)
 	switch (option) {
@@ -650,7 +589,7 @@ int main(int argc, char *argv[])
 	    break;
 
 	case 'a':
-	    thresh_age = atol((char *)optarg);
+	    thresh_date = string_to_date((byte *)optarg);
 	    break;
 
 	case 'c':
@@ -665,11 +604,12 @@ int main(int argc, char *argv[])
 	    replace_nonascii_characters ^= true;
 	    break;
 
-	case 'y':		/* day of year (1..366) */
-	    today = atol((char *)optarg);
+	case 'y':		/* date as YYYYMMDD */
+	    today = string_to_date((byte *)optarg);
 	    break;
 
 	default:
+	    fprintf(stderr, "Unknown option: '%c'\n", option);
 	    usage();
 	    exit(1);
 	}
