@@ -53,7 +53,18 @@
 #define YY_DECL token_t yylex(void)
 #define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, max_size)
 
-static word_t yy_text;
+static word_t *yy_text(void);
+
+static word_t *yy_text(void)
+{
+    static word_t *yyt = NULL;
+    if (yyt == NULL) {
+	yyt = word_new(NULL, 0);
+    }
+    yyt->text = (byte *)yytext;
+    yyt->leng = yyleng;
+    return yyt;
+}
 %}
 
 %option align nounput noyywrap noreject 8bit caseless
@@ -69,34 +80,22 @@ TOKEN		[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\
 %%
 
 charset=\"?{ID}\"?				{ got_charset(yytext); 
-						  yy_text.text=(byte *)yytext; yy_text.leng=yyleng;
-						  yyredo(&yy_text, '='); }
+						  yyredo(yy_text(), '='); }
 
-^MIME-Version:.*				{ yy_text.text=(byte *)yytext; yy_text.leng=yyleng;
-						  mime_version(&yy_text);
-						  yyredo(&yy_text, ':'); }
-^Content-Transfer-Encoding:{MTYPE}		{ yy_text.text=(byte *)yytext; yy_text.leng=yyleng;
-						  mime_encoding(&yy_text);
-						  yyredo(&yy_text, ':'); }
-^Content-Type:{MTYPE};?				{ yy_text.text=(byte *)yytext; yy_text.leng=yyleng;
-						  mime_type(&yy_text);
-						  yyredo(&yy_text, ':'); }
-^Content-Disposition:{MTYPE}			{ yy_text.text=(byte *)yytext; yy_text.leng=yyleng;
-						  mime_disposition(&yy_text);
-						  yyredo(&yy_text, ':'); }
+^MIME-Version:.*				{  mime_version(yy_text()); yyredo(yy_text(), ':'); }
+^Content-Transfer-Encoding:{MTYPE}		{  mime_encoding(yy_text()); yyredo(yy_text(), ':'); }
+^Content-Type:{MTYPE};?				{  mime_type(yy_text()); yyredo(yy_text(), ':'); }
+^Content-Disposition:{MTYPE}			{  mime_disposition(yy_text()); yyredo(yy_text(), ':'); }
 ^From\ 						{ return (msg_header ? FROM : TOKEN); }
 ^Date:.*|Delivery-Date:.*			;
 ^Message-ID:.*					;
 ^\tid\ {ID}					;
 
 E?SMTP\ id\ {ID}				;
-boundary=[ ]*\"?{MIME_BOUNDARY}\"?		{ yy_text.text=(byte *)yytext; yy_text.leng=yyleng;
-						  mime_boundary_set(&yy_text); }
+boundary=[ ]*\"?{MIME_BOUNDARY}\"?		{  mime_boundary_set(yy_text()); }
 name=\"?					;
 filename=\"?					;
-^--{MIME_BOUNDARY}(--)?$			{ yy_text.text=(byte *)yytext; yy_text.leng=yyleng;
-						  return (got_mime_boundary(&yy_text) ? BOUNDARY : TOKEN); }
-
+^--{MIME_BOUNDARY}(--)?$			{  return (got_mime_boundary(yy_text()) ? BOUNDARY : TOKEN); }
 {IPADDR}					{ return(IPADDR);}
 {TOKEN}						{ return(TOKEN);}
 .						;
