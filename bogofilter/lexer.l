@@ -73,13 +73,12 @@ int myfgets(char *buf, int max_size, FILE *s)
 	return(cp - buf);
 }
 
-
-int yyinput(char *buf, int max_size)
+static int yyinput(char *buf, int max_size)
 // input getter for the scanner
 {
     int returned;
 
-    static int hdrlen = 0;
+    static size_t hdrlen = 0;
     if (hdrlen==0)
 	hdrlen=strlen(spam_header_name);
 
@@ -324,7 +323,7 @@ int get_token(void)
 	 * start and end boundary, chopping of the distinct trailing -- of
 	 * the end boundary. */
 	if (class == BOUNDARY && yyleng >= 4) {
-	    if (t = strstr(yytext+yyleng-2, "--")) {
+	    if ((t = strstr(yytext+yyleng-2, "--"))) {
 		strcpy(t, "");
 	    }
 	    break;
