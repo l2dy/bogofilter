@@ -1,6 +1,8 @@
 EXPERIMENTAL BERKELEYDB ENVIRONMENT CODE
 ========================================
 
+$Id$
+
 This document does not apply when you are installing a bogofilter
 version that has been configured to use the TDB or QDBM data base
 managers.
@@ -30,15 +32,6 @@ BerkeleyDB version, and it uses shared buffer pools to improve
 performance.
 
 2. Use, restrictions, caveats ------------------------------------------
-
-The code is only used in bogofilter, not in the utilities such as
-bogoutil. As the locking of the experimental code is incompatible with
-the locking bogofilter has used so far, you MUST NOT run bogofilter and
-any of the bogofilter utilities at the same time. If you are running
-bogofilter from .procmailrc, .mailfilter or as otherwise integral part
-of your system, stop your mail system and make sure all bogofilter
-processes have exited before using a utility, to prevent processes from
-trampling over each other.
 
 To enable the new code, the environment variable BF_EXPERIMENTAL_DBENV
 must be defined (the value is ignored for the moment, an empty variable
@@ -71,6 +64,9 @@ This code is deadlock-free, so if bogofilter hangs with this
 experimental code enabled as documented above, either the data base or
 the environment should be checked for corruptions.
 
+A known issue is that the t.lock2 self-test run by "make check" is very
+slow, it can take several minutes before it makes any progress.
+
 3. Open issues and troubleshooting -------------------------------------
 
 a. The DBENV based code appears to be more sensitive (not to say
@@ -92,8 +88,3 @@ c. USER HELP REQUIRED: Benchmark results, comparisons of traditional
 
 d. TODO: Make sure that the token updates and the .MSG_COUNT are bundled and
    the whole bundle is written atomically.
-
-e. TODO: Make sure that all code paths that use data bases
-   I.  initialize the data base environment properly
-   II. are covered by the test suite. (gcov coverage tests can
-       be helpful here).
