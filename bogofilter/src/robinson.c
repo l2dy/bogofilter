@@ -196,7 +196,7 @@ static double compute_probability(const word_t *token, wordprop_t *wordstats)
     return wordstats->prob;
 }
 
-double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
+double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 /* selects the best spam/non-spam indicators and calculates Robinson's S */
 {
     hashnode_t *node;
@@ -224,9 +224,9 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
     if (DEBUG_ROBINSON(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
 				   min_dev, robs, robx);
 
-    wordhash_sort(wordhash);
+    wordhash_sort(wh);
 
-    for(node = wordhash_first(wordhash); node != NULL; node = wordhash_next(wordhash))
+    for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
 	word_t *token = node->key;
 	wordprop_t *props = (wordprop_t *) node->buf;
@@ -373,9 +373,9 @@ void rob_initialize_constants(void)
 }
 #endif
 
-double rob_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
+double rob_bogofilter(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 {
-    rob_stats.s.spamicity = rob_compute_spamicity(wordhash, fp);
+    rob_stats.s.spamicity = rob_compute_spamicity(wh, fp);
     return rob_stats.s.spamicity;
 }
 
