@@ -68,7 +68,8 @@ libbogofilter_a_SOURCES= \
 	xstrdup.h xstrdup.c \
 	xstrlcat.h xstrlcat.c \
 	xstrlcpy.h xstrlcpy.c \
-	dcdflib/src/dcdflib.c dcdflib/src/ipmpar.c
+	dcdflib/src/dcdflib.c dcdflib/src/ipmpar.c \
+	xatox.h xatof.c xatoi.c
 
 CLEANFILES=version.c directories.c
 
