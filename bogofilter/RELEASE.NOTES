@@ -123,7 +123,7 @@ bogoQDBMupgrade wordlist.qdbm wordlist.tmp wordlist.qdbm.old
 If this command didn't print anything, everything has gone well and it
 has left your old data base in wordlist.qdbm.old.
 
-NOTE: bogoQDBMupgrade needs qdbm-1.8.18 or newer to build.
+NOTE: bogoQDBMupgrade needs qdbm-1.8.12 or newer to build.
 
 Bogotune option parsing changes
 -------------------------------
