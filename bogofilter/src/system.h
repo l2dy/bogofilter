@@ -42,9 +42,18 @@ typedef unsigned char _Bool;
 # include <sys/stat.h>
 #endif
 
-#if STDC_HEADERS
+#if HAVE_STRING_H
+# if !STDC_HEADERS && HAVE_MEMORY_H
+#  include <memory.h>
+# endif
 # include <string.h>
-#else
+#endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
+
+#if !STDC_HEADERS
 # if !HAVE_STRCHR
 #  define strchr index
 # endif
@@ -54,6 +63,8 @@ typedef unsigned char _Bool;
 
 # if !HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
+# endif
+# if !HAVE_MEMMOVE
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
 # endif
 #endif
