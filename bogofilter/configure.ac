@@ -431,6 +431,10 @@ fi
 
 AC_SUBST(STATIC_DB)
 
+AC_ARG_ENABLE(transactions,
+	      AS_HELP_STRING([--enable-transactions], [Enable transactions in Berkeley DB (yes)]))
+
+AM_CONDITIONAL(ENABLE_OLD_BDB, test "x$enable_transactions" = "xno")
 AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xtdb")
 AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
 

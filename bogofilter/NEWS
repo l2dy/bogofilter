@@ -25,6 +25,10 @@ Briefly:
 
 	2004-11-19
 
+	* Restored the old traditional Berkeley DB datastore that cannot be
+	  recovered. Its use is discouraged, to use this, type
+	  ./configure --disable-transactions
+
 	* Restored the error message when recovery is attempted on QDBM
 	  databases, was lost in the DEPOT (hash) ->VILLA (B+tree) switch.
 

@@ -83,6 +83,12 @@ be archived or deleted periodically.
 For detailed instructions, be sure to _read_ doc/README.db and check the
 BerkeleyDB documentation.
 
+As a backwards compatibility option, for instance when space and I/O
+bandwidth are tight, it is possible to use the old non-transactional,
+non-concurrent Berkeley DB Data Store, which can only register messages
+when there are NO scoring processes at all and that may not be able
+recover from application or system crashes.
+
 These benefits are not available when bogofilter is compiled to use the
 TDB or QDBM data bases.
 
