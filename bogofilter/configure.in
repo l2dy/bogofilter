@@ -8,8 +8,6 @@ AC_PROG_CC
 AC_PROG_RANLIB
 AM_PROG_LEX
 
-AM_INIT_AUTOMAKE(bogofilter, 0.8.0.tst)
-
 # Check for extension
 AC_EXEEXT
 
