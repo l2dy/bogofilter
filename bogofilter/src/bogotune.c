@@ -347,13 +347,18 @@ static void scoring_error(void)
 static uint get_thresh(uint count, double *scores)
 {
     uint ft;
+    double percent;
     static bool show_first = false;
 
     score_ns(scores);			/* scores in ascending order */
     qsort(scores, count, sizeof(double), compare_double);
 
-    ft = ceil(count * 0.0025);		/* compute fp count */
-    spam_cutoff = scores[count - ft];	/* get cutoff value */
+    for (percent = 0.0025 ; percent > EPS; percent -= 0.0005) {
+	ft = ceil(count * percent);		/* compute fp count */
+	spam_cutoff = scores[count - ft];	/* get cutoff value */
+	if (spam_cutoff >= 0.5)
+	    break;
+    }
 
     if (show_first) {
 	uint f;
