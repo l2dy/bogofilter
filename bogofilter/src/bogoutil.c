@@ -741,7 +741,6 @@ static int process_args(int argc, char **argv)
 
 	default:
 	    abort();
-	    exit(EX_ERROR);
 	}
 
     if (count != 1)

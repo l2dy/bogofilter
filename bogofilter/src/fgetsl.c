@@ -27,7 +27,6 @@ int xfgetsl(char *buf, int max_size, FILE *in, int no_nul_terminate)
     if (cp >= fin) {
 	fprintf(stderr, "Invalid buffer size, exiting.\n");
 	abort();
-	exit(EX_ERROR);
     }
 
     if (feof(in))

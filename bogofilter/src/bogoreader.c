@@ -515,7 +515,7 @@ void bogoreader_init(int _argc, char **_argv)
 	break;
     default:
 	fprintf(stderr, "Unknown bulk_mode = %d\n", (int) bulk_mode);
-	bf_abort();
+	abort();
 	break;
     }
     reader_filename = get_filename;

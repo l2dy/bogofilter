@@ -19,7 +19,7 @@ AUTHORS:
 #include "fgetsl.h"
 #include "xmalloc.h"
 
-#define BOGO_ASSERT(expr, msg) if (!(expr)) { fprintf(stderr, "%s: %s:%d %s\n", progname, __FILE__, __LINE__, msg); bf_abort(); }
+#define BOGO_ASSERT(expr, msg) if (!(expr)) { fprintf(stderr, "%s: %s:%d %s\n", progname, __FILE__, __LINE__, msg); abort(); }
 
 /* Function Definitions */
 buff_t *buff_init(buff_t *self, byte *buff, size_t used, size_t size)
