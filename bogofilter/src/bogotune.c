@@ -1723,6 +1723,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	build_wordlist_path(ds_path, len, ds_file);
 	check_wordlist_path(ds_file);
 	env = ds_init(bogohome);
+	init_wordlist("word", ds_path, 0, WL_REGULAR);
     }
 
     bogotune();
