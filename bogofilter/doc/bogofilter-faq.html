@@ -128,6 +128,9 @@ French</a>
 
           <li><a href="#changed-exitcodes">Now that I've upgraded to
           0.14 why are my scripts broken?</a></li>
+
+          <li><a href="#changed-tagging">Now that I've upgraded to
+          0.15 why is bogofilter working less well?</a></li>
         </ul>
       </li>
     </ul>
@@ -876,10 +879,35 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
     error.  They are now 0 for spam, 1 for ham, 2 for unsure, and 3
     for error.</p>
 
+    <h2 id="#changed-tagging">Now that I've upgraded to 0.15 why is
+    bogofilter working less well?</a></li>
+
+    <h2 id="#changed-tagging">Now that I've upgraded to 0.15 why is
+    bogofilter working less well?</a></li>
+
+    <p>Prior to version 0.15.4, bogofilter added special prefixes to
+    tags from "Subject:", "From:", "To:", and "Return-Path:" header
+    lines.  As of version 0.15.4, "Received:" line tokens are also
+    specially tagged and all other header line tokens are given a
+    "head:" prefix.  Since bogofilter hasn't previously seen "header:"
+    tokens, these tokens don't contribute to either the ham or spam
+    scores.  This loss of information causes bogofilter to perform
+    less well.</p>
+
+    <p>There are two ways to deal with this problem.  The first is
+    simply to retrain bogofilter with all the old ham and spam.  This
+    will create the needed "head:" entries and all will be fine.</p>
+
+    <p>The second is to use the new header-degen ("-H") option.  When
+    classifying a message, header-degen causes bogofilter to look up
+    both "head:token" and "token" in the wordlist.  The two ham and
+    spam scores are combined to give a cumulative result for scoring.
+    Registering messages will create "head:token" entries in the
+    wordlist.  After a month or so of using '-H', the wordlist should
+    contain plenty of the new "head:" entries and using '-H' should no
+    longer be necessary.</p>
+
     <hr>
 
-    <!--
-    $Id$
-    -->
-  </body>
-</html>
+    <!-- $Id: bogofilter-faq.html,v 1.55 2003/08/13 12:56:37 relson
+    Exp $ --> </body> </html>
