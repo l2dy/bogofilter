@@ -59,7 +59,7 @@ typedef struct {
 
 static long db_get_dbvalue(void *vhandle, const char *word, dbv_t *val);
 static void db_set_dbvalue(void *vhandle, const char *word, dbv_t *val);
-static int db_lock(int fd, int cmd, int type);
+static int db_lock(int fd, int cmd, short int type);
 
 /* Function definitions */
 
