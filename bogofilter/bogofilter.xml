@@ -21,6 +21,7 @@
   <arg choice='opt'>-N</arg>
   <arg choice='opt'>-d</arg>
   <arg choice='opt'>-p</arg>
+  <arg choice='opt'>-e</arg>
   <arg choice='opt'>-u</arg>
   <arg choice='opt'>-v</arg>
   <arg choice='opt'>-V</arg>
@@ -107,6 +108,11 @@ style of SpamAssassin) inserted.  The header will begin with "Yes" or
 "No" according as the mail is judged to be spam or non-spam
 respectively.</para>
 
+<para>The <option>-e</option> (embed) option is only effective when
+    <option>-p</option> is also active. If both options are used, then
+    bogofilter will exit with code 0 even if the mail is not spam. This
+    simplifies using bogofilter from procmail or maildrop.</para>
+
 <para>The <option>-u</option> (update) option tells 
 <application>bogofilter</application>
 to automatically update the appropriate wordfile.  
@@ -130,13 +136,13 @@ exits.</para>
 <refsect1 id='integration'><title>INTEGRATION WITH OTHER TOOLS</title>
 <para>The following procmail rule will take mail on stdin and direct
 it to <filename>Mail/spam</filename> if
-<application>bogofilter</application> thinks it's spam:</para>
+<application>bogofilter</application> thinks it's spam:
 <programlisting class="procmail">
 :0HB:
 * ? bogofilter
 Mail/spam
 </programlisting>
-
+</para>
 <para>If <application>bogofilter</application> fails (returning 2) the
 message will be treated as non-spam.</para>
 
@@ -148,32 +154,39 @@ this in place, it will normally only be necessary for the user to
 intervene (with <option>-N</option> or <option>-S</option>) when
 <application>bogofilter</application> miscategorizes something.</para>
 <programlisting class="procmail">
-   :0HB
-    * ? bogofilter
-    {
-            :0c
-            | bogofilter -s
+  <lineannotation>
+   # filter mail through bogofilter, tagging it as spam and
+   # updating the word lists
+   </lineannotation>
+   :0fw
+   | bogofilter -u -e -p
 
-            :0:
-            spam-bogofilter
-    }
+   <lineannotation>
+   # if bogofilter failed, return the mail to the queue, the MTA will
+   # retry to deliver it later
+   # 75 is the value for EX_TEMPFAIL in /usr/include/sysexits.h
+   </lineannotation>
+   :0e
+   { EXITCODE=75 HOST }
 
-    :0Ec
-    | bogofilter -n
+   <lineannotation>
+   # file the mail to <filename>spam-bogofilter</filename> if it's spam.
+   </lineannotation>
+   :0:
+   * ^X-Bogosity: Yes, tests=bogofilter
+   spam-bogofilter
+
 </programlisting>
 
-<para> An alternate approach is to use the update ('-u') option.  When it is specified
-<application>bogofilter</application> will classify the text and update either the spam wordlist or the good wordlist, as appropriate.
-Here's a procmail recipe that does three things.  The '-u' option causes updating of the word lists;  the '-p' option adds a "X-Spam-Status: Yes/No" line to the message; and the "spam-bogofilter" action line puts all spam into file spam-bogofilter.
-</para>
-
-<programlisting class="procmail">
-   :0fw
-   | bogofilter -u -p
-
-   :0:
-   * ^X-Spam-Status: Yes
-   spam-bogofilter
+<para>This one is for maildrop, it automatically defers the mail and
+    retries later when the xfilter command fails, use this in your
+    <filename>~/.mailfilter</filename>:</para>
+<programlisting class="maildrop">
+    xfilter "bogofilter -u -e -p"
+    if (/^X-Bogosity: Yes, tests=bogofilter/)
+    {
+      to "spam-bogofilter"
+    }
 
 </programlisting>
 
@@ -188,10 +201,13 @@ macro index \ed "&lt;enter-command&gt;unset wait_key\n&lt;pipe-entry&gt;bogofilt
 
 <refsect1 id='returns'><title>RETURN VALUES</title>
 <para>0 for spam; 1 for non-spam; 2 for I/O or other errors.</para>
+<para>If both <option>-p</option> and <option>-e</option> are used, the
+    return values are: 0 for spam or non-spam; 2 for I/O or other
+    errors.</para>
 
 <para>Error 2 usually means that the wordlist files
 <application>bogofilter</application> wants to read at startup 
-are missing.</para>
+are missing or the hard disk has filled up in <option>-p</option> mode.</para>
 </refsect1>
 
 <refsect1 id='files'><title>FILES</title>
@@ -215,8 +231,8 @@ intervening From_ lines will be counted as one message.</para>
 </refsect1>
 
 <refsect1 id='author'><title>AUTHOR</title>
-<para>Eric S. Raymond <email>esr@thyrsus.com</email>.
-For updates, see <ulink url="http://bogofilter.sourceforge.net/">
+    <para>Eric S. Raymond <email>esr@thyrsus.com</email>.</para>
+    <para>For updates, see <ulink url="http://bogofilter.sourceforge.net/">
 the bogofilter project page</ulink>. </para>
 </refsect1>
 </refentry>

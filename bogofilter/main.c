@@ -23,7 +23,7 @@ AUTHOR:
 #include "xmalloc.h"
 #include "datastore.h"
 
-int verbose, passthrough, update;
+int verbose, passthrough, update, nonspam_exits_zero;
 
 char *dirnames[] = { "BOGOFILTER_DIR", "HOME", NULL };
 
@@ -34,12 +34,16 @@ int main(int argc, char **argv)
     char  *directory = NULL;
     int   exitcode = 0;
 
-    while ((ch = getopt(argc, argv, "d:hsnSNvVpu")) != EOF)
+    while ((ch = getopt(argc, argv, "d:ehsnSNvVpu")) != EOF)
 	switch(ch)
 	{
 	case 'd':
 	    directory = optarg;
 	    setup_lists(directory);
+	    break;
+
+	case 'e':
+	    nonspam_exits_zero = 1;
 	    break;
 
 	case 's':
@@ -68,6 +72,7 @@ int main(int argc, char **argv)
 	    printf( "\t-h\t- print this help message.\n" );
 	    printf( "\t-d path\t- specify directory for wordlists.\n" );
 	    printf( "\t-p\t- passthrough.\n" );
+	    printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
 	    printf( "\t-s\t- register message as spam.\n" );
 	    printf( "\t-n\t- register message as non-spam.\n" );
 	    printf( "\t-S\t- move message's words from non-spam list to spam list.\n" );
@@ -128,10 +133,10 @@ int main(int argc, char **argv)
 	{
 	    /* print spam-status at the end of the header
 	     * then mark the beginning of the message body */
-	    printf("%s: %s, tests=bogofilter, spamicity=%0.6f\n", 
+	    printf("%s: %s, tests=bogofilter, spamicity=%0.6f, version=%s\n", 
 		   SPAM_HEADER_NAME, 
 		   (status==RC_SPAM) ? "Yes" : "No", 
-		   spamicity);
+		   spamicity, VERSION);
 	}
 
 	if (passthrough)
@@ -153,6 +158,9 @@ int main(int argc, char **argv)
 	}
 
 	exitcode = status;
+	if (nonspam_exits_zero && passthrough && exitcode == 1)
+	    exitcode = 0;
+
     } else {
 	register_messages(STDIN_FILENO, register_type);
     }
