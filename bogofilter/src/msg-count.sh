@@ -7,7 +7,7 @@
 #
 # $Id$ 
 
-if [ "$1" = "-?" ] || [ "$1" = "-h" ]; then
+if [ "x$1" = "x-?" ] || [ "x$1" = "x-h" ]; then
     cat <<EOT
 NAME
   msg-count.sh - lexical analysis and database lookup for an email message
