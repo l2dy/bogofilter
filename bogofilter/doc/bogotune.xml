@@ -74,12 +74,15 @@
 
     <para>The <option>-D</option> option tells
     <application>bogotune</application> to build a wordlist in memory
-    from the input messages.  To meet the minimum requirements of 2000
-    messages in the wordlist and 500 messages for testing, when
-    <option>-D</option> is used, there must be 2500 non-spam and 2500
-    spam in the input files.  If there are enough messages (more than
-    4000), they will be split evenly between wordlist and testing.
-    Otherwise, they will be split proportionately.</para>
+    using the input messages.w  The messages are read and divided into
+    two groups.  The first group is used to build a wordlist (in ram)
+    and the second is used for tuning.  To meet the minimum
+    requirements of 2000 messages in the wordlist and 500 messages for
+    testing, when <option>-D</option> is used, there must be 2500
+    non-spam and 2500 spam in the input files.  If there are enough
+    messages (more than 4000), they will be split evenly between
+    wordlist and testing.  Otherwise, they will be split
+    proportionately.</para>
 
     <para>The <option>-n</option> option tells
     <application>bogotune</application> that the following arguments
