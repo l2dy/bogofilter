@@ -87,17 +87,20 @@ static void build_prefixed_token( word_t *token, uint32_t token_size,
 				  word_t *prefix, 
 				  byte *text, uint32_t leng )
 {
-    if (token_prefix != NULL) {
-	token->leng = leng +prefix->leng;
-	memcpy(token->text, prefix->text, prefix->leng);
-	memcpy(token->text +prefix->leng, text, leng);	/* include nul terminator */
-	token->text[token->leng] = '\0';		/* ensure nul termination */
-    }
-    else {
-	token->leng = leng;
-	memcpy(token->text, text, leng);	/* include nul terminator */
-	token->text[token->leng] = '\0';	/* ensure nul termination */
-    }
+    uint p = (prefix == NULL) ? 0 : prefix->leng;
+    uint l = leng + p;
+
+    if (l >= token_size)
+	l = token_size - p;
+
+    token->leng = l;
+
+    /* copy prefix, if there is one */
+    if (prefix != NULL)
+	memcpy(token->text, prefix->text, p);
+
+    memcpy(token->text + p, text, l-p);		/* include nul terminator */
+    token->text[token->leng] = '\0';		/* ensure nul termination */
 }
 
 token_t get_token(word_t **token)
