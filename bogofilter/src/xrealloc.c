@@ -1,3 +1,14 @@
+/* $Id$ */
+
+/*
+* NAME:
+*    xrealloc.c -- front-end to standard heap manipulation routines, with error checking.
+*
+* AUTHOR:
+*    Gyepi Sam <gyepi@praxis-sw.com>
+*
+*/
+
 #include <stdlib.h>
 #include "xmalloc.h"
 
