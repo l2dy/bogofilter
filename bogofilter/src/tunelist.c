@@ -82,7 +82,7 @@ void msglist_print(mlhead_t *list)
     int count = 0;
     mlitem_t *item;
 
-    if (verbose <= 2)
+    if (verbose <= 2 || list->count == 0)
 	return;
 
     printf("%s:\n", list->name);
