@@ -4,6 +4,10 @@
 
 $Id$
 
+0.14.1.1 2003-07-31
+
+	* Correct problem with t.degen regression test.
+
 0.14.1	2003-07-31
 
 	2003-07-29
