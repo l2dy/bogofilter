@@ -1,11 +1,14 @@
-/* 
- * \file datastore_sqlite.c - SQLite 3 database driver back-end
- * \author Matthias Andree <matthias.andree@gmx.de
- * \year 2004
+/**
+ * \file datastore_sqlite.c SQLite 3 database driver back-end
+ * \author Matthias Andree <matthias.andree@gmx.de>
+ * \date 2004
  *
- * \bugs does not expose the UPDATE command for fast modification
+ * \bug does not expose the UPDATE command for fast modification
  *
- * LICENSE: GNU GPL v2
+ * This file handles a static table named "bogofilter" in a SQLite3
+ * database. The table has two "BLOB"-typed columns, key and value.
+ *
+ * GNU GENERAL PUBLIC LICENSE v2
  */
 
 #include "config.h"
@@ -19,13 +22,15 @@
 #include <unistd.h> /* for getpid() */
 #include <sqlite3.h>
 
-struct dbh_t {
-    char *path;
-    char *name;
-    sqlite3 *db;
-    bool created;
+/** Structure to hold database handle and associated data. */
+struct dbhsqlite_t {
+    char *path;	   /**< directory to hold database */
+    char *name;	   /**< database file name */
+    sqlite3 *db;   /**< pointer to SQLite3 handle */
+    bool created;  /**< flag, gets set by db_open on creation of the database */
 };
-typedef struct dbh_t dbh_t;
+/** Convenience shortcut to avoid typing "struct dbh_t" */
+typedef struct dbhsqlite_t dbh_t;
 
 /* dummy functions */
 #define DUMMYVVP(name) void name(void *dummy) { (void)dummy; }
@@ -41,7 +46,7 @@ void *dbe_init(const char *dummy) { (void)dummy; return (void *)~0; }
 int dbe_recover(const char *d1, bool d2, bool d3) { (void)d1; d2=d3; return 0; }
 bool db_is_swapped(void *dummy) { (void)dummy; return false; }
 
-/* TABLE LAYOUT */
+/** The layout of the bogofilter table, formatted as SQL statement. */
 #define LAYOUT \
 	"CREATE TABLE bogofilter (" \
 	"   key   BLOB PRIMARY KEY, "\
@@ -51,13 +56,17 @@ bool db_is_swapped(void *dummy) { (void)dummy; return false; }
 	"BEGIN TRANSACTION;"
 
 /* real functions */
-static dbh_t *handle_init(const char *path, const char *name)
+/** Initialize database handle and return it. 
+ * \returns non-NULL, as it exits with EX_ERROR in case of trouble. */
+static dbh_t *handle_init(
+	const char *path /** directory to database file */,
+	const char *name /** name of database file */)
 {
     dbh_t *handle;
     size_t len = strlen(path) + strlen(name) + 2;
 
     handle = xmalloc(sizeof(dbh_t));
-    memset(handle, 0, sizeof(dbh_t));   /* valgrind */
+    memset(handle, 0, sizeof(dbh_t));
 
     handle->path = xstrdup(path);
     handle->name = xmalloc(len);
@@ -66,6 +75,7 @@ static dbh_t *handle_init(const char *path, const char *name)
     return handle;
 }
 
+/** Free internal database handle \a dbh. */
 static void free_dbh(dbh_t *dbh) {
     if (!dbh)
 	return;
@@ -74,6 +84,11 @@ static void free_dbh(dbh_t *dbh) {
     free(dbh);
 }
 
+/** Executes the SQL statement \a cmd on the database \a db and returns
+ * the sqlite3_exec return code, except SQLITE_BUSY which is handled
+ * internally by sleeping and retrying. If the return code is nonzero, this
+ * routine will have printed an error message.
+ */
 static int sqlexec(sqlite3 *db, const char *cmd) {
     char *e = NULL;
     int rc;
@@ -92,11 +107,16 @@ static int sqlexec(sqlite3 *db, const char *cmd) {
     return rc;
 }
 
-static void db_trace(void *userdata, const char *log) {
+/** Short trace handler function, passed to SQLite if debugging is
+ * enabled. */
+static void db_trace(void *userdata /** unused */,
+	const char *log /** log message */) {
     (void)userdata;
     fprintf(dbgout, "SQLite[%ld]: %s\n", (long)getpid(), log);
 }
 
+/** Callback function that increates the int variable that \a userdata
+ * points to, for db_loop. */
 static int db_count(dbv_t *d1, dbv_t *d2, void *userdata) {
     int *counter = userdata;
     ++ *counter;
@@ -105,13 +125,24 @@ static int db_count(dbv_t *d1, dbv_t *d2, void *userdata) {
     return 0;
 }
 
-static int db_loop(sqlite3 *db, const char *cmd, db_foreach_t hook,
-	void *userdata) {
+/** Dual-mode get/foreach function, if \a hook is NULL, we do a get and
+ * treat \a userdata as a dbv_t, if \a hook is non-NULL, we call it for
+ * each (key, value) tuple in the database.
+ */
+static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
+	const char *cmd,	/**< SQL command to obtain data */
+	db_foreach_t hook,	/**< if non-NULL, called for each value */
+	void *userdata		/**  if \a hook is NULL, this is our output dbv_t pointer,
+				 *   if \a hook is non-NULL, this is
+				 *   passed to the \a hook
+				 */
+	) {
     const char *tail;
     sqlite3_stmt *stmt;
     int rc;
     bool loop, found;
     found = false;
+    /* sqlite3_exec doesn't allow us to retrieve BLOBs */
     rc = sqlite3_prepare(db, cmd, strlen(cmd), &stmt, &tail);
     if (rc) {
 	print_error(__FILE__, __LINE__,
@@ -125,7 +156,7 @@ static int db_loop(sqlite3 *db, const char *cmd, db_foreach_t hook,
 	    case SQLITE_ROW:
 		found = true;
 		if (hook == NULL) {
-		    /* get mode */
+		    /* get mode - read value from first row, then return */
 		    dbv_t *val = userdata;
 
 		    loop = false;
@@ -133,7 +164,8 @@ static int db_loop(sqlite3 *db, const char *cmd, db_foreach_t hook,
 		    val->data = xmalloc(val->leng);
 		    memcpy(val->data, sqlite3_column_blob(stmt, 0), val->leng);
 		} else {
-		    /* foreach mode */
+		    /* foreach mode - call hook for each (key, value)
+		     * tuple */
 		    dbv_t key, val;
 
 		    key.leng = sqlite3_column_bytes(stmt, /* column */ 0);
@@ -161,6 +193,7 @@ static int db_loop(sqlite3 *db, const char *cmd, db_foreach_t hook,
 		return rc;
 	}
     }
+    /* free resources */
     sqlite3_finalize(stmt);
     return found ? 0 : DS_NOTFOUND;
 }
@@ -186,7 +219,18 @@ void *db_open(void *dummyenv, const char *dbpath,
 	sqlite3_trace(dbh->db, db_trace, NULL);
 
     if (mode != DS_READ) {
+	/* using IMMEDIATE or DEFERRED here locks up in t.lock3
+	 * or t.bulkmode */
 	if (sqlexec(dbh->db, "BEGIN EXCLUSIVE TRANSACTION;")) goto barf;
+	/*
+	 * trick: the sqlite_master table (see SQLite FAQ) is read-only
+	 * and lists all table, indexes etc. so we use it to check if
+	 * the bogofilter table is already there, the error codes are
+	 * too vague either way, for "no such table" and "table already
+	 * exists" we always get SQLITE_ERROR, which we'll also get for
+	 * syntax errors, such as "EXCLUSIVE" not supported on older
+	 * versions :-(
+	 */
 	rc = db_loop(dbh->db, "SELECT name FROM sqlite_master "
 		"WHERE type='table' AND name='bogofilter';",
 		db_count, &count);
@@ -234,6 +278,9 @@ const char *db_version_str(void) {
 
 static int sqlfexec(sqlite3 *db, const char *cmd, ...)
     __attribute__ ((format(printf,2,3)));
+/** Formats \a cmd and following arguments with sqlite3_vmprintf (hence
+ * supporting %%q for SQL-quoted strings) and executes it using sqlexec.
+ */
 static int sqlfexec(sqlite3 *db, const char *cmd, ...)
 {
     char *buf;
@@ -263,8 +310,9 @@ int db_txn_commit(void *vhandle) {
     return sqlexec(dbh->db, "COMMIT;");
 }
 
-/* allcoates memory and converts len bytes starting at in
- * into a HEX notation string, X'FCE2' or similar */
+/** Converts \a len unsigned characters starting at \a input into the
+ * SQL X'b1a4' notation, returns malloc'd string that the caller must
+ * free. */
 static char *binenc(const void *input, size_t len) {
     const unsigned char *in = input;
     const char hexdig[] = "0123456789ABCDEF";
@@ -305,15 +353,11 @@ int db_set_dbvalue(void *vhandle, const dbv_t *key, const dbv_t *val) {
     return rc;
 }
 
-/* This is a dual-function get/foreach function.
- * If hook is NULL, it has get functionality, treating userdata as dbv_t
- * and filling it in.
- * If hook is non-NULL, it has foreach fucntionality.
- */
 int db_get_dbvalue(void *vhandle, const dbv_t* key, /*@out@*/ dbv_t *val) {
     dbh_t *dbh = vhandle;
     char *k = binenc(key->data, key->leng);
-    char *cmd = sqlite3_mprintf("SELECT value FROM bogofilter WHERE(key = %s) LIMIT 1;", k);
+    char *cmd = sqlite3_mprintf("SELECT value FROM bogofilter "
+				"WHERE(key = %s) LIMIT 1;", k);
     int rc = db_loop(dbh->db, cmd, NULL, val);
     sqlite3_free(cmd);
     xfree(k);
