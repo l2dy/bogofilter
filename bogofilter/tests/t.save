@@ -2,10 +2,10 @@
 
 : ${BF_SAVEDIR=.}
 
-if [ "x$BF_TESTDIR" != "x" ] ; then
+if [ -z "$BF_TESTDIR" ] ; then
     NAME=`basename $0 | sed s@^t\.@@`
     DATE=`date +"%Y%m%d"`
-    if [ -d  $NAME.$DATE ] ; then
+    if [ -d $NAME.$DATE ] ; then
 	rm -rf $NAME.$DATE
     fi
     mkdir $NAME.$DATE
