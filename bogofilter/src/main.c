@@ -54,11 +54,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     /* open all wordlists */
     open_wordlists((run_type == RUN_NORMAL) ? DB_READ : DB_WRITE);
 
-    /* Add default wordlist version to new database. */
-    if (msgs_good == 0 && msgs_bad == 0 && 
-	word_lists != NULL && word_lists->dsh != NULL)
-	ds_set_wordlist_version(word_lists->dsh, NULL);
-
     output_setup();
 
     status = bogofilter(argc, argv);
