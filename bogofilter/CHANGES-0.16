@@ -11,6 +11,10 @@ Note:
 
 0.16.1	2004-??-??
 
+	2004-01-07
+
+	* Ignore X-Bogosity lines in message header.
+
 	2004-01-04
 
 	* Updated bogotune man page.

@@ -11,26 +11,21 @@ Note:
 
 0.16.1	2004-??-??
 
-	2004-01-04
-
-	* Updated bogotune man page.
-	* Fixed minor errors in bogotune.
-	* Corrected memory leaks affecting bogotune.
-
-	2004-01-03
-
-	* Added additional ifdefs for deprecated code.
-	* Added database histogram to bogoutil (using '-H' flag).
+* Ignore X-Bogosity lines in message header.
+* Added additional #ifdefs for deprecated code.
+* Added database histogram to bogoutil (using '-H' flag).
+* Updated bogotune man page.
+* Fixed minor errors in bogotune.
+* Corrected memory leaks affecting bogotune.
 
 0.16.0	2004-01-01
 
-	* Added "#ifdef ENABLE_DEPRECATED_CODE" statements as
-          appropriate.
-	* Corrected configure.ac defect for "--enable-memdebug".
-	* Corrected lexer defect that created unnecessary
-          "rcvd:Received" tokens.
-	* Fixed header file problem that causes sigsegv with qdbm.
-	* Expanded VERP pattern to reduce hapax count.
+* Added "#ifdef ENABLE_DEPRECATED_CODE" statements as appropriate.
+* Corrected configure.ac defect for "--enable-memdebug".
+* Corrected lexer defect that created unnecessary "rcvd:Received"
+  tokens.
+* Fixed header file problem that causes sigsegv with qdbm.
+* Expanded VERP pattern to reduce hapax count.
 
 0.15.13	2003-12-31 - Stable Release
 
