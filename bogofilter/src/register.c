@@ -10,7 +10,6 @@
 #include "datastore.h"
 #include "collect.h"
 #include "format.h"
-#include "maint.h"			/* for today */
 #include "register.h"
 #include "wordhash.h"
 #include "wordlists.h"
