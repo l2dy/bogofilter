@@ -44,4 +44,11 @@ pid=
 
 trap - 1 2 3
 . $TMPDIR/oldtraps
+
+# check for program failures
 test "x`grep -v 0 $TMPDIR/exits`" = x
+
+# check if all programs reported their code
+exits=`cat $TMPDIR/exits | wc -l`
+set -- $seq $seq
+test $exits -eq $#
