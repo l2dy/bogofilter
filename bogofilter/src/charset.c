@@ -252,22 +252,21 @@ static void map_iso_8859_15(void)	/* ISOIEC 8859-15:1999 Latin Alphabet No. 9 */
     /* Not yet implemented */
 }
 
-static unsigned char xlate_us[] = {
-    0xA0, ' ',	/* no-break space      to space        */
-    0x92, '\'',	/* windows apostrophe  to single quote */
-    0x93, '"',	/* windows left  quote to double quote */
-    0x94, '"',	/* windows right quote to double quote */
-    0xA9, ' ',	/* copyright sign      to space        */
-    0xAE, ' ',	/* registered sign     to space        */
-};
-
-/* For us-ascii,
-** first do the iso-8859-1 setup
-** then addin special characters.
+/* For us-ascii, first do the iso-8859-1 setup then add special
+** characters.
 */
 
 static void map_us_ascii(void)
 {
+    static unsigned char xlate_us[] = {
+	0xA0, ' ',	/* no-break space      to space        */
+	0x92, '\'',	/* windows apostrophe  to single quote */
+	0x93, '"',	/* windows left  quote to double quote */
+	0x94, '"',	/* windows right quote to double quote */
+	0xA9, ' ',	/* copyright sign      to space        */
+	0xAE, ' ',	/* registered sign     to space        */
+    };
+
     map_iso_8859_1();
 
     map_xlate_characters( xlate_us, COUNTOF(xlate_us) );
