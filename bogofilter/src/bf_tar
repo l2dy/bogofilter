@@ -35,7 +35,7 @@ fi
 bogohome="$1"
 
 nukelogs() {
-    rm -f `db_archive -a -h "$bogohome"`
+    bogoutil -P "$bogohome"
 }
 
 # run db_checkpoint to reduce number of logs

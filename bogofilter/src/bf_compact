@@ -36,8 +36,7 @@ if test -f "$ORIG"/DB_CONFIG ; then cp -p "$ORIG"/DB_CONFIG "$TEMP" ; fi
 bogoutil -d "$ORIG"/"$FILE" | bogoutil -l $TEMP/"$FILE"
 
 #checkpoint and remove unneeded log files
-db_checkpoint -1h $TEMP
-for i in `db_archive    -ah $TEMP` ; do rm -f "$i" ; done
+bogoutil -P $TEMP
 
 mv "$ORIG" "$ORIG.old"
 mv  $TEMP  "$ORIG"
