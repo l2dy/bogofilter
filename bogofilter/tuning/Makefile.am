@@ -3,10 +3,10 @@
 # what to distribute
 EXTRA_DIST= \
 	README \
-	smindev.sh \
+	tuning.sh \
 	bogolex.sh \
 	distrib \
 	mkdb \
 	setR \
 	sizes \
-	smindev.R
+	tuning.R
