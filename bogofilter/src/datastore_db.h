@@ -38,13 +38,6 @@ void  db_close(/*@only@*/ void *vhandle, bool nosync  /** Normally false, if tru
 /** Flush pending writes to disk */
 void db_flush(void *handle);
 
-/** Do global initializations. \return 0 for success, non-zero for
- * error. */
-int db_init(void);
-
-/** Cleanup storage allocation */
-void db_cleanup(void);
-
 /** Retrieve the value associated with a given word in a list.
  * \return zero if the word does not exist in the database. Front-end
  */

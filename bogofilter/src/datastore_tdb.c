@@ -33,6 +33,13 @@ typedef struct {
     TDB_CONTEXT *dbp;
 } dbh_t;
 
+/* dummy infrastructure, to be expanded by environment
+ * or transactional initialization/shutdown */
+
+static bool init = false;
+static int db_init(void) { init = true; return 0; }
+static void db_cleanup(void) { init = false; }
+
 /* Function definitions */
 
 const char *db_version_str(void)
@@ -111,6 +118,8 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     handle = dbh_init(db_file, name);
 
     if (handle == NULL) return NULL;
+
+    db_init();
 
     dbp = handle->dbp = tdb_open(handle->name, 0, tdb_flags, open_flags, 0664);
 
@@ -249,6 +258,8 @@ void db_close(void *vhandle, bool nosync)
     }
 
     dbh_free(handle);
+
+    db_cleanup();
 }
 
 /*
@@ -347,9 +358,3 @@ const char *db_str_err(int j)
 			return emap[i].estring;
 	return "Invalid error code";
 }
-
-/* dummy infrastructure, to be expanded by environment
- * or transactional initialization/shutdown */
-static bool init = false;
-int db_init(void) { init = true; return 0; }
-void db_cleanup(void) { init = false; }

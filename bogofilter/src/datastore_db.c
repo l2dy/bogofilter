@@ -67,6 +67,12 @@ typedef struct {
 #define DB_AT_LEAST(maj, min) ((DB_VERSION_MAJOR > (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR >= (min))))
 #define DB_AT_MOST(maj, min) ((DB_VERSION_MAJOR < (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR <= (min))))
 
+/* dummy infrastructure, to be expanded by environment
+ * or transactional initialization/shutdown */
+
+static int db_init(void);
+static void db_cleanup(void);
+
 /* Function definitions */
 
 /** translate BerkeleyDB \a flags bitfield back to symbols */
@@ -89,8 +95,6 @@ static int DB_OPEN(DB *db, const char *file,
 	const char *database, DBTYPE type, u_int32_t flags, int mode)
 {
     int ret;
-
-    db_init();
 
     ret = db->open(db,
 #if DB_AT_LEAST(4,1)
@@ -280,6 +284,8 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
      */
     size_t idx;
     uint32_t retryflags[] = { 0, DB_NOMMAP };
+
+    db_init();
 
     if (!init) abort();
 
@@ -568,6 +574,8 @@ void db_close(void *vhandle, bool nosync)
 	print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
 
     dbh_free(handle);
+
+    db_cleanup();
 }
 
 
@@ -663,7 +671,7 @@ const char *db_str_err(int e) {
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
 
-int db_init(void) {
+static int db_init(void) {
     char *t;
     int cdb_alldb = 1;
 
@@ -697,7 +705,7 @@ int db_init(void) {
     return 0;
 }
 
-void db_cleanup(void) {
+static void db_cleanup(void) {
     if (!init)
 	return;
     if (dbe)

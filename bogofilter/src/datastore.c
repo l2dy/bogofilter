@@ -122,13 +122,12 @@ void *ds_open(const char *path, const char *name, dbmode_t open_mode)
     dsh_t *dsh;
     void *v;
 
-    ds_init();
-
     v = db_open(path, name, open_mode);
 
     if (!v)
 	return NULL;
 
+    ds_init();
     dsh = dsh_init(v);
 
     if (db_created(v) && ! (open_mode & DS_LOAD))
@@ -315,7 +314,6 @@ int ds_oper(const char *path, dbmode_t open_mode,
     ret = ds_foreach(dsh, hook, userdata);
 
     ds_close(dsh, false);
-    ds_cleanup();
 
     return ret;
 }
@@ -325,7 +323,6 @@ static word_t  *wordlist_version_tok;
 
 void ds_init()
 {
-    db_init();
     if (msg_count_tok == NULL) {
 	msg_count_tok = word_new((const byte *)MSG_COUNT, strlen(MSG_COUNT));
     }
@@ -337,7 +334,6 @@ void ds_init()
 /* Cleanup storage allocation */
 void ds_cleanup()
 {
-    db_cleanup();
     xfree(msg_count_tok);
     xfree(wordlist_version_tok);
     msg_count_tok = NULL;
