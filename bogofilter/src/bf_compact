@@ -18,9 +18,16 @@ fi
 BOGOHOME="$1"
 
 if [ ! -d $BOGOHOME ] ; then
-    echo "$BOGOHOME" must be a directory, not a file
-    exit
+    echo "$BOGOHOME must be a directory. Abort."
+    exit 1
 fi
+
+while true; do
+    case $BOGOHOME in
+	*/) BOGOHOME=${BOGOHOME%/} ;;
+	*)  break ;;
+    esac
+done
 
 if [ -z "$2" ] ; then
     FILE="wordlist.db"
@@ -30,15 +37,14 @@ fi
 
 TEMP="bf_compact.$$"
 
-if [ -d $TEMP ] ; then
-    echo Directory $TEMP already exists.
-    echo exiting.
+if ! mkdir "$TEMP" ; then
+    echo "Cannot create directory $TEMP. Abort."
     exit 1
-else
-    mkdir $TEMP
 fi
 
-if test -f "$BOGOHOME"/DB_CONFIG ; then cp -p "$BOGOHOME"/DB_CONFIG "$TEMP" ; fi
+if test -f "$BOGOHOME"/DB_CONFIG ; then
+    cp -p "$BOGOHOME"/DB_CONFIG "$TEMP"/
+fi
 bogoutil -d "$BOGOHOME"/"$FILE" | bogoutil -l $TEMP/"$FILE"
 
 #checkpoint and remove unneeded log files
