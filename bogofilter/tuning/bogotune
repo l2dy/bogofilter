@@ -1,8 +1,10 @@
 #! /usr/bin/perl
 # bogotune - a bogofilter tuning tool
-# version 0.4, started 20030626
-# Copyright (c) 2003 Gregory Louis; distributed wiithout warranty of
-# any kind under the GNU General Public License (GPL).
+# version 0.4.1, started 20030626
+# Copyright (c) 2003 Gregory Louis, David Relson
+# distributed wiithout warranty of any kind under the
+# GNU General Public License (GPL).
+
 use strict;
 
 ### 0.  Initialize and process arguments
@@ -209,16 +211,11 @@ if($msgformat ne "msgcount") {
 ### 4.  Calculate cache size
 # Calculate the cache size that should be used.
 
-my $cmd = "ls -l " . $dbname . " |";
-open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
-$counts = <COUNTS>; chop $counts; close COUNTS;
-my $dbsize = (split(/\s+/, $counts))[4];
+my $dbsize = (stat( "$dbname/wordlist.db" ))[7];
+printf "%s\n", $dbsize/(1024*1024*3);
 if($twolist) {
-    my $cmd = "ls -l " . $bogodir . "/spamlist.db |";
-    open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
-    $counts = <COUNTS>; chop $counts; close COUNTS;
-    my $dbs2 = (split(/\s+/, $counts))[4];
-    if($dbs2 > $dbsize) { $dbsize = $dbs2; }
+    my $spamsize = (stat( "$bogodir/spamlist.db" ))[7];
+    $dbsize = $spamsize if $spamsize > $dbsize;
 }
 my $cachesize = POSIX::ceil($dbsize / (1024*1024*3));
 print("Recommended cache size is ", $cachesize, " Mbytes.\n");
