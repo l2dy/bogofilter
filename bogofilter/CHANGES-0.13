@@ -21,7 +21,7 @@ $Id$
 	2003-05-23
 
 	* Fixed defect in replace_nonascii_characters that was
-	  superceding ignore_case option.
+	  superseding ignore_case option.
 
 	* Portability fix for efence usage in t.frame.
 

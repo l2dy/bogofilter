@@ -10,7 +10,7 @@ $Id$
 	* Build procedure for statically linked binaries has been improved.
 
 	* Fixed defect in replace_nonascii_characters that was
-	  superceding ignore_case option.
+	  superseding ignore_case option.
 
 	* Portability fix for efence usage in t.frame.
 
