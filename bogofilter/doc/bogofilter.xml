@@ -278,7 +278,7 @@ If the <option>-v</option> or <option>-t</option> option is also given,
 <application>bogofilter</application> will print a line giving file name and 
 classification information for each file.</para>
 
-<para>The <option>-F</option> (force) ignores threshold values when printing spamicity statistics.</para>
+<para>The <option>-F</option> option forces the printing of spamicity statistics.</para>
 
 <para>The <option>-R</option> option tells
 <application>bogofilter</application> to output an R data frame in
@@ -325,11 +325,8 @@ tells <application>bogofilter</application> to read the config file named.
     configuration files.</para>
 
 <para>The <option>-d</option><replaceable> dir</replaceable> option
-    allows you to set the directory under which the wordlists will be
-    found to <replaceable>dir</replaceable>.  If omitted, the default
-    directory will be <filename>$BOGOFILTER_DIR</filename> if
-    <envar>BOGOFILTER_DIR</envar> is set and
-    <filename>$HOME/.bogofilter</filename> otherwise.</para>
+    allows you to set the directory for the wordlists.  See the
+    ENVIRONMENT section for other directory setting options.</para>
 
 <para>The <option>-k <replaceable>tag</replaceable></option> option
     sets the cache size for the BerkeleyDB subsystem.  Properly sizing
@@ -453,7 +450,8 @@ lists the tokens with highest deviation from a mean of 0.5 association
 with spam.</para>
 
 <para>
-Option <option>-y date</option> specifies the date to give to tokens that don't have dates.
+Option <option>-y date</option> can be used to override the current date when timestamping tokens.  
+A value of zero (0) turns off timestamping.
 </para>
 
 <para>The <option>-D</option> option redirects debug output to stdout.</para>
@@ -465,12 +463,11 @@ allows setting of debug flags for printing debug information.</para>
 
 <refsect1 id='environment'><title>ENVIRONMENT</title>
     <para>
-	Bogofilter will initialize its data base directory to <filename>$BOGOFILTER_DIR</filename> 
-	if <envar>BOGOFILTER_DIR</envar> is set.
-	If it is not set, bogofilter
-	will use <filename>$HOME/.bogofilter</filename> instead.  If neither
-	 <envar>BOGOFILTER_DIR</envar> nor <envar>HOME</envar> is set, the <option>-d
-	    <replaceable>dir</replaceable></option> option must be present.
+	Bogofilter uses a database directory, which is set in the config file.
+	If not set there, bogofilter will use the value of <envar>BOGOFILTER_DIR</envar>.  
+	Both can be overridden by the <option>-d<replaceable>dir</replaceable></option>
+	option.  If none of that is available, bogofilter will use directory
+	<filename>$HOME/.bogofilter</filename>.
     </para>
 </refsect1>
 
