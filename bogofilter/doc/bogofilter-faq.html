@@ -670,12 +670,11 @@ spam-unreadable
     $BOGOFILTER_DIR .MSG_COUNT" to see the counts for the spam and
     ham word lists.</p>
 
-    <p>To tell how many tokens are in your wordlists pipe the
-    output of bogoutil's dump command to command "wc", i.e. use
-    "bogoutil -d $BOGOFILTER_DIR/spamlist.db | wc -l " to display
-    the count for the spamlist and use "bogoutil -d
-    $BOGOFILTER_DIR/goodlist.db | wc -l" to display the count for
-    the goodlist.</p>
+    <p>To tell how many tokens are in your wordlists pipe the output
+    of bogoutil's dump command to command "wc", i.e. use "bogoutil -d
+    $BOGOFILTER_DIR/wordlist.db | wc -l " to display the count.  (If
+    you've got spamlist.db and goodlist.db, run the command for each
+    of them).</p>
 
     <hr>
 
@@ -686,11 +685,6 @@ spam-unreadable
     BerkeleyDB thinks by running:</p>
 <pre>
   db_verify wordlist.db
-</pre>
-<p>or</p>
-<pre>
-  db_verify spamlist.db
-  db_verify goodlist.db
 </pre>
 
     <p>If there is a problem, you may be able to recover some (or
@@ -704,6 +698,8 @@ spam-unreadable
   db_dump -r wordlist.db &gt; wordlist.txt
   db_load wordlist.new &lt; wordlist.txt
 </pre>
+
+    <p>If you've got two wordlists (spamlist.db and goodlist.db), run the above commands for each of them.</p>
 
     <hr>
 
@@ -860,4 +856,3 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
     -->
   </body>
 </html>
-
