@@ -44,6 +44,8 @@ static double	thresh_rtable = 0.0f;
 static double	robx = 0.0f;
 static double	robs = 0.0f;
 
+static stats_t  stats;
+
 const parm_desc rob_parm_table[] =	/* needed by fisher.c */
 {
     { "robx",		  CP_DOUBLE,	{ (void *) &robx } },
@@ -54,7 +56,7 @@ const parm_desc rob_parm_table[] =	/* needed by fisher.c */
 
 void	rob_initialize_constants(void);
 double	rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
-void	rob_print_summary(size_t robn, FLOAT P, FLOAT Q);
+void	rob_print_summary(void);
 
 #ifdef	ENABLE_ROBINSON_METHOD
 rf_method_t rf_robinson_method = {
@@ -231,31 +233,26 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 {
     double r = 1.0 / (double)robn;
+    double ln10 = 2.302585093;			/* log(10) - 2.3025850929940459  */
 
-    double p = 1.0 - pow(P.mant, r) * pow(10.0, P.exp * r);	/* Robinson's P */
-    double q = 1.0 - pow(Q.mant, r) * pow(10.0, Q.exp * r);	/* Robinson's Q */
+    stats.robn = robn;
 
-    double spamicity = (1.0 + (p - q) / (p + q)) / 2.0;
+    stats.p_ln = log(P.mant) + P.exp * ln10;	/* invlogsum */
+    stats.q_ln = log(Q.mant) + Q.exp * ln10;	/* logsum    */
 
-    return spamicity;
+    stats.p_pr = 1.0 - pow(P.mant, r) * pow(10.0, P.exp * r);	/* Robinson's P */
+    stats.q_pr = 1.0 - pow(Q.mant, r) * pow(10.0, Q.exp * r);	/* Robinson's Q */
+
+    stats.spamicity = (1.0 + (stats.p_pr - stats.q_pr) / (stats.p_pr + stats.q_pr)) / 2.0;
+
+    return stats.spamicity;
 }
 
-void rob_print_summary(size_t robn, FLOAT P, FLOAT Q)
+void rob_print_summary(void)
 {
-    double r = 1.0 / (double)robn;
-
-    double p_pr = 1.0 - pow(P.mant, r) * pow(10.0, P.exp * r);	/* Robinson's P */
-    double q_pr = 1.0 - pow(Q.mant, r) * pow(10.0, Q.exp * r);	/* Robinson's Q */
-
-    double ln10 = 2.302585093;			/* log(10) - 2.3025850929940459  */
-    double p_ln = log(P.mant) + P.exp * ln10;	/* invlogsum */
-    double q_ln = log(Q.mant) + Q.exp * ln10;	/* logsum    */
-
-    double spamicity = (1.0 + (p_pr - q_pr) / (p_pr + q_pr)) / 2.0;
-
     (void)fprintf(stdout, "%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
-		  robn+1, "P_Q_S_invsum_logsum", 
-		  p_pr, q_pr, spamicity, p_ln, q_ln);
+		  stats.robn+1, "P_Q_S_invsum_logsum", 
+		  stats.p_pr, stats.q_pr, stats.spamicity, stats.p_ln, stats.q_ln);
 }
 
 void rob_initialize_with_parameters(double _min_dev, double _spam_cutoff)

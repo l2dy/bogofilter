@@ -219,5 +219,5 @@ void rstats_print_rtable(size_t robn, rstats_t **rstats_array)
     }
 
     /* print trailer */
-    ((rf_method_t *)method)->print_summary(robn, header.p, header.q);
+    ((rf_method_t *)method)->print_summary();
 }
