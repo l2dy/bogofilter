@@ -7,9 +7,24 @@ NAME:
 
 ******************************************************************************/
 
+#include "config.h"
 #include "common.h"
 
+#if defined(HAVE_GSL_11) && !defined(HAVE_GSL_14)
+/* HAVE_GSL_14 implies HAVE_GSL_11
+ * if we have neither, we'll use our included GSL 1.4, which knows CDFs
+ * if we have both, we have GSL 1.4, which knows CDFs
+ *
+ * in other cases, we need to integrate the PDF to get the CDF
+ */
+#define GSL_INTEGRATE_PDF
+#include <gsl/gsl_randist.h>
+#include <gsl/gsl_integration.h>
+#include <gsl/gsl_errno.h>
+#else
 #include <gsl/gsl_cdf.h>
+#endif
+
 #include <math.h>
 
 #include "fisher.h"
@@ -65,11 +80,31 @@ static rob_stats_t fis_stats;
 
 /* Function Definitions */
 
+#ifdef GSL_INTEGRATE_PDF
+/* Code by Greg Louis */
+inline static double chisq(double x, void *p) {
+     return(gsl_ran_chisq_pdf(x, *(double *)p));
+}
+
+inline static double prbf(double x, double df) {
+    gsl_function chi; int status;
+    double p, abserr; size_t neval;
+    chi.function = chisq;
+    chi.params = &df;
+    gsl_set_error_handler_off();
+    status = gsl_integration_qng(&chi, 0.00001, x, 0.0001, 0.01, &p,
+	    &abserr, &neval);
+    /* if we didn't converge we might be outside [0,1] */
+    p = max(0.0, 1.0 - p);
+    return(min(1.0, p));
+}
+#else
 inline static double prbf(double x, double df)
 {
     double r = gsl_cdf_chisq_Q(x, df);
     return (r < DBL_EPSILON) ? 0.0 : r;
 }
+#endif
 
 double fis_get_spamicity(size_t robn, FLOAT P, FLOAT Q )
 {
