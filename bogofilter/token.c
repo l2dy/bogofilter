@@ -49,15 +49,6 @@ token_t get_token(void)
 	}
     }
 
-    /* If saved Content-Transfer-Encoding, do it now */
-    if ( save_class == TRANSFER )
-    {
-	save_class = NONE;
-	get_token();
-	got_encoding(yytext);
-	return TOKEN;
-    }
-
     while ((class = yylex()) > 0) {
 	/* when we have a boundary line, eliminate the distinction between
 	 * start and end boundary, chopping of the distinct trailing -- of
@@ -98,20 +89,11 @@ token_t get_token(void)
 	    got_charset(yytext);
 	}
 
-	if (class == TRANSFER)	/* Content-Transfer-Encoding: encoding */
-	{			/* Get encoding; call got_encoding(); return encoding. */
-				/* See RFC 1521 & RFC 1522 */
-	    save_class = TRANSFER;
-	    yytext[--yyleng] = '\0';	/* trim trailing colon */
-	}
-
 	switch (class)
 	{
 	case IPADDR:
 	    break;
 	case FROM:
-	    break;
-	case TRANSFER:
 	    break;
 	case BOUNDARY:
 	    break;
