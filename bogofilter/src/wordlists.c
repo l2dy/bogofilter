@@ -33,7 +33,7 @@ void open_wordlists(dbmode_t mode)
     int retry;
 
     if (word_lists == NULL)
-	init_wordlist(&word_lists, "word", bogohome, true, false, 0, 'R');
+	init_wordlist(&word_lists, "word", bogohome, true, false, 0, WL_REGULAR);
 
     do {
 	ds_init();
@@ -176,18 +176,26 @@ bool configure_wordlist(const char *val)
     bool ok;
     int rc;
     wordlist_t* wl = xcalloc(1, sizeof(wordlist_t));
-    char  type;
+    char  ch;
+    WL_TYPE type;
     char* listname;
     char* filename;
     int  precedence;
 
     char *tmp = xstrdup(val);
     
-    type= toupper(tmp[0]);	/* save wordlist type (good/spam) */
+    ch= tmp[0];		/* save wordlist type (good/spam) */
     tmp = spanword(tmp);
     
-    if (type != 'R' && type != 'I')
+    switch (toupper(ch))
     {
+    case 'R':
+	type = WL_REGULAR;
+	break;
+    case 'I':
+	type = WL_IGNORE;
+	break;
+    default:
 	fprintf( stderr, "Unknown wordlist type - '%c'\n", type);
 	return (false);
     }

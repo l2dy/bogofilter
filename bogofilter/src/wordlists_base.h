@@ -11,6 +11,11 @@ typedef void *dsh_t;
 
 extern	bool	config_setup;
 
+typedef enum e_WL_TYPE {
+    WL_REGULAR =	'R',
+    WL_IGNORE  =	'I'
+} WL_TYPE;
+
 typedef struct wordlist_s wordlist_t;
 struct wordlist_s
 {
@@ -20,7 +25,7 @@ struct wordlist_s
     /*@owned@*/ char *filepath;	/* resource path (for debug/verbose messages) */
     /*@owned@*/ dsh_t *dsh;	/* datastore handle */
     u_int32_t	msgcount[IX_SIZE];	/* count of messages in wordlist. */
-    char	type;		/* 'I' for "ignore" */
+    WL_TYPE	type;		/* 'I' for "ignore" */
     bool	bad[IX_SIZE];
     int		override;
 };
@@ -29,7 +34,7 @@ struct wordlist_s
 extern wordlist_t *word_list;
 
 int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* path,
-		  bool sbad, bool gbad, int override, char type);
+		  bool sbad, bool gbad, int override, WL_TYPE type);
 
 void free_wordlists(void);
 

@@ -20,7 +20,7 @@ wordlist_t *word_list;
 /* returns -1 for error, 0 for success */
 int init_wordlist(/*@out@*/ wordlist_t **list, 
 		  const char* name, const char* path,
-		  bool sbad, bool gbad, int override, char type)
+		  bool sbad, bool gbad, int override, WL_TYPE type)
 {
     wordlist_t *n = (wordlist_t *)xcalloc(1, sizeof(*n));
     wordlist_t *list_ptr;
