@@ -142,6 +142,8 @@ static const parm_desc sys_parms[] =
     { "ham_cutoff",	  CP_FUNCTION,	{ (void *) NULL } },	/* Robinson-Fisher */
 #endif
     { "block_on_subnets", CP_BOOLEAN,	{ (void *) &block_on_subnets } },
+    { "charset_default",  CP_STRING,	{ (void *) &charset_default } },
+    { "replace_nonascii_characters",	CP_BOOLEAN, { (void *) &replace_nonascii_characters } },
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
 
