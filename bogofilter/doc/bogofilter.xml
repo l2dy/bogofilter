@@ -18,8 +18,8 @@
     <arg choice='plain'>help options</arg>
     <arg choice='plain'>classification options</arg>
     <arg choice='plain'>registration options</arg>
+    <arg choice='plain'>info options</arg>
   </group>
-  <arg choice='opt'>algorithm options</arg>
   <arg choice='opt'>general options</arg>
 </cmdsynopsis>
 
@@ -38,15 +38,12 @@
     <arg choice='opt'>-e</arg>
     <arg choice='opt'>-t</arg>
     <arg choice='opt'>-T</arg>
-    <arg choice='opt'>-u</arg>
-    <arg choice='opt'>-2</arg>
-    <arg choice='opt'>-3</arg>
+    <arg choice='opt'>-u <replaceable><optional>value</optional></replaceable></arg>
     <arg choice='opt'>-H</arg>
     <arg choice='opt'>-M</arg>
     <arg choice='opt'>-b</arg>
     <arg choice='opt'>-B <replaceable>filename ...</replaceable></arg>
     <arg choice='opt'>-R</arg>
-    <arg choice='opt'>algorithm options</arg>
     <arg choice='opt'>general options</arg>
     <arg choice='opt'>parameter options</arg>
     </cmdsynopsis>
@@ -61,7 +58,6 @@
       <arg choice='plain'>-S</arg>
       <arg choice='plain'>-N</arg>
     </group>
-    <arg choice='opt'>algorithm options</arg>
     <arg choice='opt'>general options</arg>
     </cmdsynopsis>
 
@@ -71,28 +67,10 @@
     <arg choice='opt'>-C</arg>
     <arg choice='opt'>-d <replaceable>dir</replaceable></arg>
     <arg choice='opt'>-k <replaceable>size</replaceable></arg>
-    <arg choice='opt'>-W</arg>
-    <arg choice='opt'>-WW</arg>
     <arg choice='opt'>-l</arg>
     <arg choice='opt'>-L <replaceable>tag</replaceable></arg>
     <arg choice='opt'>-I <replaceable>filename</replaceable></arg>
     <arg choice='opt'>-O <replaceable>filename</replaceable></arg>
-    </cmdsynopsis>
-
-  <para><option>algorithm options</option> are:</para>
-    <cmdsynopsis>
-    <group>
-      <arg choice='plain'>-g</arg>
-      <arg choice='plain'>-r</arg>
-      <arg choice='plain'>-f</arg>
-    </group>
-    </cmdsynopsis>
-
-  <para><option>parsing options</option> are:</para>
-    <cmdsynopsis>
-    <arg choice='opt'>-Pi/-PI</arg>
-    <arg choice='opt'>-Ph/-PH</arg>
-    <arg choice='opt'>-Pt/-PT</arg>
     </cmdsynopsis>
 
   <para><option>parameter options</option> are:</para>
@@ -121,8 +99,8 @@
 In its normal mode of operation, it takes an email message or other
 text on standard input, does a statistical check against lists of
 "good" and "bad" words, and returns a status code indicating whether
-or not the message is spam.  Bogofilter is designed with fast
-algorithms, uses the Berkeley DB for fast startup and lookups,
+or not the message is spam.  Bogofilter is designed with a fast
+algorithm, uses the Berkeley DB for fast startup and lookups,
 coded directly in C, and tuned for speed, so it can be used for
 production by sites that process a lot of mail.</para>
 </refsect1>
@@ -146,7 +124,7 @@ smarter lexical analysis.  <application>Bogofilter</application> does
 proper MIME decoding and a reasonable HTML parsing.  Special kinds of
 tokens like hostnames and IP addresses are retained as recognition
 features rather than broken up.  Various kinds of MTA cruft such as
-dates and message-IDs are ignored so as not to bloat the wordlists.
+dates and message-IDs are ignored so as not to bloat the wordlist.
 Tokens found in various header fields are marked appropriately.</para>
 
 <para>Another improvement is that this program offers Gary Robinson's
@@ -260,29 +238,16 @@ use of this capability, as any classification errors
 accumulated until corrected with the <option>-Sn</option> and
 <option>-Ns</option> option combinations.)</para>
 
-<para>The <option>-2</option> option tells
-<application>bogofilter</application> to binary classify the message as either
-ham or spam, and never as unsure.  When this option is used with <option>-u</option>,
-the database is always updated.</para>
-
-<para>The <option>-3</option> option tells
-<application>bogofilter</application> to use tristate classification for the message,
-i.e. classify the message as ham, spam, or unsure.  This option is effective only if
-ham_cutoff is non-zero.</para>
+<para>The <option>-u <replaceable>value</replaceable></option> option
+tells <application>bogofilter</application> to skip registering
+obvious ham and spam.  If auto-updating and the message's score is
+less than "value" or greater than "1-value", don't register the
+message. </para>
 
 <para>The <option>-H</option> option tells
-<application>bogofilter</application> to combine scores for "head:"
-tokens.  Since version 0.15.4 bogofilter has been adding special tags
-to ALL header tokens.  Prior to 0.15.4, only tokens in "To:", "From:",
-"Return-Path:", and "Subject:" lines were given special prefixes.  Now
-the rest of the header tokens are given a "head:" prefix.  When using
-an old wordlist, this results in many tokens not being recognized.  To
-compensate for this, using the <option>-H</option> option causes
-<application>bogofilter</application> to retrieve the counts for the
-prefixed token and for the non-prefixed token and then combine the
-counts.  This option is useful if you're using an old wordlist.  If
-you retrained <application>bogofilter</application> bogofilter using
-0.15.4 there is no need to use this option.</para>
+<application>bogofilter</application> to not tag tokens from the
+header. This option is for testing, you should not use it in normal
+operation.</para>
 
 <para>The <option>-M</option> option tells
 <application>bogofilter</application> to process its input as a mbox
@@ -333,7 +298,7 @@ as non-spam.</para>
 message registered twice.  If you do this by accident, the token
 counts will off by 1 from what you really want and the corresponding
 spam scores will be slightly off.  Given a large number of tokens and
-messages in the wordlists, this doesn't matter.  The problem _can_ be
+messages in the wordlist, this doesn't matter.  The problem _can_ be
 corrected by using the <option>-S</option> option or the <option>-N</option>
 option.</para>
 
@@ -391,72 +356,6 @@ from the specified file, rather than from
 <para>The <option>-O <replaceable>filename</replaceable></option> option
 tells <application>bogofilter</application> where to write its output in
 passthrough mode.  Note that this only works when -p is explicitly given.</para>
-
-<para>The <option>-W</option> option tells <application>bogofilter</application>
-to operate with a single wordlist, named wordlist.db.  Each token in wordlist.db
-is stored as an ASCII string with two counts (for spam and ham) and (optionally)
-a timestamp.</para>
-
-<para>The <option>-WW</option> option tells <application>bogofilter</application>
-to operate with a pair of wordlists, named spamlist.db and goodlist.db.  Spamlist.db
-stores tokens, counts, and timestamps for tokens from spam messages.  Goodlist.db
-stores tokens, counts, and timestamps for tokens from ham messages.</para>
-
-<para>ALGORITHM OPTIONS</para>
-
-<para>The Robinson-Fisher method is the default algorithm used for
-computing a message's spamicity score, unless
-<application>bogofilter</application> has been compiled without it, by
-using the <option>--disable-robinson-fisher</option> option to the
-configure script.  The method to be used can be specified on the
-command line or in the configuration file.</para>
-
-<para>The <option>-g</option> option selects the original Graham form
-of the calculation method.</para>
-
-<para>The <option>-r</option> option selects the Robinson modifications
-to the calculation method.</para>
-
-<para>The <option>-f</option> option selects the Robinson-Fisher
-modifications to the calculation method.</para>
-
-<para>The configure script has options
-<option>--disable-graham-method</option>,
-<option>--disable-robinson-method</option>, and
-<option>--disable-robinson-fisher</option> so that
-<application>bogofilter</application> can be built to support a subset
-of the available methods.</para>
-
-<para>Note: "make check" is a comprehensive check of
-<application>bogofilter</application>'s capabilities.  To pass all
-tests, the default configuration must be used.  In particular, all
-three algorithms must be included in the build.</para>
-
-<para>PARSING OPTIONS</para>
-
-<para><application>Bogofilter</application> has three special parsing
-options which can be enabled (or disabled) at the user's discretion.
-The options are of form <option>-Px</option> and <option>-PX</option>
-where <option>x</option> designates an option letter.  For the parsing
-options, a lower case letter enables the option and an upper case
-letter disables it.</para>
-
-<para>Options <option>-Ph</option> and <option>-PH</option> are for
-header line markup, i.e. whether to create special tags for header
-lines.  When enabled, tokens in "To:", "From:", "Return-Path:", and
-"Subject:" lines will be given special prefixes.  Enabling this option
-increases <application>bogofilter's</application> accuracy.</para>
-
-<para>Options <option>-Pi</option> and <option>-PI</option> are for
-ignoring case, i.e. whether to map upper case to lower case (or not).
-Disabling this option increases
-<application>bogofilter's</application> accuracy.</para>
-
-<para>Options <option>-Pt</option> and  <option>-PT</option> are for
-tokenizing the innards of 3 html tags, i.e.  &gt;a&lt;, &gt;img&lt;,
-and &gt;font&lt;.  Tokenizing these tags adds urls and font names to
-the message's tokens.  Enabling this option increases
-<application>bogofilter's</application> accuracy.</para>
 
 <para>PARAMETER OPTIONS</para>
 
@@ -534,9 +433,9 @@ for each site.</para>
     return values are: 0 for spam or non-spam; 3 for I/O or other
     errors.</para>
 
-<para>Error 3 usually means that the wordlist file(s)
+<para>Error 3 usually means that the wordlist file
 <application>bogofilter</application> wants to read at startup
-are missing or the hard disk has filled up in <option>-p</option> mode.</para>
+is missing or the hard disk has filled up in <option>-p</option> mode.</para>
 </refsect1>
 
 <refsect1 id='integration'><title>INTEGRATION WITH OTHER TOOLS</title>
@@ -571,7 +470,7 @@ intervene (with <option>-Ns</option> or <option>-Sn</option>) when
 <programlisting>
 <lineannotation>
 # filter mail through bogofilter, tagging it as spam and
-# updating the wordlists
+# updating the wordlist
 </lineannotation>
 :0fw
 | bogofilter -u -e -p
@@ -665,7 +564,7 @@ actually used (the ones with + indicators), Robinson's P, Q, S, s and x
 values and the minimum deviation.</para>
 
 <para>The R data frame can be saved to a file and later read
-into an R session (see <ulink url="http://cran.r-project.org">the R
+into an R session (see <ulink url="http://cran.r-project.org/">the R
 project website</ulink> for information about the mathematics package
 R).  Provided with the <application>bogofilter</application>
 distribution is a simple R script (file bogo.R) that can be used to
@@ -712,14 +611,6 @@ bogofilter[6244]: register-s, 1273 words, 4 messages
 <varlistentry>
 <term><filename>~/.bogofilter.cf</filename></term>
 <listitem><para>User configuration file.</para></listitem>
-</varlistentry>
-<varlistentry>
-<term><filename>~/.bogofilter/goodlist.db</filename></term>
-<listitem><para>List of good tokens.</para></listitem>
-</varlistentry>
-<varlistentry>
-<term><filename>~/.bogofilter/spamlist.db</filename></term>
-<listitem><para>List of spam tokens.</para></listitem>
 </varlistentry>
 <varlistentry>
 <term><filename>~/.bogofilter/wordlist.db</filename></term>

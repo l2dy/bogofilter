@@ -13,7 +13,7 @@ unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoption
   print <<END;
 
 bogominitrain.pl version 1.5
-  requires bogofilter 0.14.5 or later
+  requires bogofilter 0.17 or later
 
 Usage:
   bogominitrain.pl [-[f][v[v]][s]] <database-directory> <ham-mboxes>\\
@@ -38,8 +38,8 @@ Usage:
   this interval, i.e., all messages in your training mboxes will be
   marked as ham or spam with values far from your production cutoff.
   For example you might want to use spam_cutoff=0.5 and '-o 0.8,0.2'
-  as bogofilter-options.  If you rather use tri-state mode, you could
-  just center this around 0.5 and again use '-o 0.8,0.2'.
+  as bogofilter options.  If you would rather use tri-state mode, you
+  can just center this around 0.5 and again use '-o 0.8,0.2'.
 
   To correct the classification of a message, just move it to the
   correct mbox and repeat the full training process (which will add a
@@ -74,7 +74,7 @@ shift (@ARGV) if ($commandlineoptions);
 my ($dir,$ham,$spam,$options) = @ARGV;
 $bogofilter.=" $options -d $dir";
 die ("$dir is not a directory or not accessible.\n") unless (-d $dir && -r $dir && -w $dir && -x $dir);
-`$bogofilter -n < /dev/null` unless (-s "$dir/goodlist.db" || -s "$dir/wordlist.db");
+`$bogofilter -n < /dev/null` unless (-s "$dir/wordlist.db");
 my $ham_total=`cat $ham|grep -c "^From "`;
 my $spam_total=`cat $spam|grep -c "^From "`;
 my ($fp,$fn,$hamadd,$spamadd,%trainedham,%trainedspam);

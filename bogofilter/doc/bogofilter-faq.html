@@ -13,8 +13,8 @@
 	font-size: 110%;
       }
       p {
-        margin-top : 0.5em;
-        margin-bottom: 0.5em;
+	margin-top : 0.5em;
+	margin-bottom: 0.5em;
       }
       ul {
 	margin-top: 1.5em;
@@ -58,8 +58,7 @@
         General Information
 
         <ul>
-          <li><a href="#what-is-bogofilter">What is
-          bogofilter?</a></li>
+          <li><a href="#what-is-bogofilter">What is bogofilter?</a></li>
           <li><a href="#bogo-what">Bogo what?</a></li>
           <li><a href="#lists">Bogofilter Mailing Lists</a></li>
         </ul>
@@ -74,7 +73,7 @@
           <li><a href="#training">How do I start my bogofilter training?</a></li>
           <li><a href="#production">How can I keep the scoring accuracy high?</a></li>
           <li><a href="#spamassassin">How can I use SpamAssassin to train Bogofilter?</a></li>
-	  <li><a href="#mboxformats">What mailbox (file) formats does bogofilter understand?</a></li>
+          <li><a href="#mboxformats">What mailbox (file) formats does bogofilter understand?</a></li>
           <li><a href="#vvv">What does bogofilter's verbose output mean?</a></li>
           <li><a href="#asian-spam">What can I do about Asian spam?</a></li>
         </ul>
@@ -84,14 +83,11 @@
         Database Questions
 
         <ul>
-          <li><a href="#query-database">How do I manually query the
-          database?</a></li>
-          <li><a href="#page-notfound">Why am I getting DB_PAGE_NOTFOUND 
-	  messages?</a></li>
-          <li><a href="#rescue">How can I tell if my wordlists are
-          corrupted?</a></li>
-	  <li><a href="#update">How do I upgrade from separate word
-	  databases to the new combined wordlist format?</a></li>
+          <li><a href="#query-database">How do I manually query the database?</a></li>
+          <li><a href="#page-notfound">Why am I getting DB_PAGE_NOTFOUND messages?</a></li>
+          <li><a href="#rescue">How can I tell if my wordlists are corrupted?</a></li>
+          <li><a href="#update">How do I upgrade from separate word
+          databases to the new combined wordlist format?</a></li>
         </ul>
       </li>
 
@@ -99,20 +95,12 @@
         Technical problems
 
         <ul>
-          <li><a href="#nfs">Can I share wordlists over
-          NFS?</a></li>
-          <li><a href="#return-codes">Why does bogofilter give
-          return codes like 0 and 256 when it's run from inside a
-          program?</a></li>
-          <li><a href="#changed-options">Now that I've upgraded to
-          0.11 why are my scripts broken?</a></li>
-          <li><a href="#changed-exitcodes">Now that I've upgraded to
-          0.14 why are my scripts broken?</a></li>
-          <li><a href="#changed-tagging">Now that I've upgraded to
-          0.15 why is bogofilter working less well?</a></li>
-          <li><a href="#remove-spam-or-nonspam">Having a combined
-          wordlist, how can I delete all the spam (or non-spam)
-          tokens?</a></li>
+          <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
+          <li><a href="#return-codes">Why does bogofilter give return codes like 0 and
+          256 when it's run from inside a program?</a></li>
+          <li><a href="#changed-options">Now that I've upgraded why are my scripts broken?</a></li>
+          <li><a href="#changed-tagging">Now that I've upgraded why is bogofilter working less well?</a></li>
+          <li><a href="#remove-spam-or-nonspam">How can I delete all the spam (or non-spam) tokens?</a></li>
         </ul>
       </li>
 
@@ -120,10 +108,8 @@
         Portability Problems
 
         <ul>
-          <li><a href="#port-notes">How do I get Bogofilter working
-          on Solaris, BSD, etc.?</a></li>
-          <li><a href="#make-notes">Can I use the make command on my
-          operating system?</a></li>
+          <li><a href="#port-notes">How do I get Bogofilter working on Solaris, BSD, etc.?</a></li>
+          <li><a href="#make-notes">Can I use the make command on my operating system?</a></li>
         </ul>
       </li>
     </ul>
@@ -355,11 +341,11 @@
     <p>In our example (after the initial full training):</p>
 
     <pre>	classify spam.mbox [bogofilter options]
-        bogofilter -s &lt; corpus.good
-        rm -f corpus.*
-        classify ham.mbox [bogofilter options]
-        bogofilter -n &lt; corpus.bad
-        rm -f corpus.*</pre></li>
+	bogofilter -s &lt; corpus.good
+	rm -f corpus.*
+	classify ham.mbox [bogofilter options]
+	bogofilter -n &lt; corpus.bad
+	rm -f corpus.*</pre></li>
     </ul>
 
     <h3>Comparing these methods</h3>
@@ -472,24 +458,24 @@
 	non-spam</pre>
 
     <hr>
-    <h2 id="mboxformats">What mailbox (file) formats does bogofilter
-	understand?</h2>
 
-    <P>Bogofilter understands the traditional unix mbox format, the
+    <h2 id="mboxformats">What mailbox (file) formats does bogofilter
+    understand?</h2>
+
+    <p>Bogofilter understands the traditional Unix mbox format, the
     Maildir and MH formats. Note though that bogofilter does not support
     subfolders, you will have to explicitly list them in MH or Maildir++
-    folders - just mention the full path to the subfolder.</P>
+    folders - just mention the full path to the subfolder.</p>
 
-    <P>For unsupported formats, you will have to convert the mailbox to
+    <p>For unsupported formats, you will have to convert the mailbox to
     a format bogofilter understands. Mbox is often convenient because it can
-    be piped into bogofilter.<P>
+    be piped into bogofilter.<p>
 
-    <P>The following list may be able help you:</P>
-    <DL>
-	<DT>UW-IMAP/PINE mbx format</DT><DD>To convert to mbox:
-	<KBD>mailtool copy /full/path/to/mail.mbx
-	    '#driver.unix//full/path/to/mbox'</KBD></DD>
-    </DL>
+    <p>The following list may be able help you:</p>
+    <dl>
+      <dt>UW-IMAP/PINE mbx format</dt><dd>To convert to mbox:
+      <kbd>mailtool copy /full/path/to/mail.mbx '#driver.unix//full/path/to/mbox'</kbd></dd>
+    </dl>
 
     <hr>
 
@@ -789,129 +775,68 @@
 
     <hr>
 
-    <h2 id="changed-options">Now that I've upgraded to 0.11 why are
+    <h2 id="changed-options">Now that I've upgraded why are
     my scripts broken?</h2>
 
-    <p>With version 0.11 bogofilter's options for registering mail
-    as ham or spam have been changed. They now allow registering
-    (or unregistering) messages in the ham and spam word lists.
-    Prior to this, there was no way to unregister a message from a
-    word list (without registering it in the other word list).</p>
-
-    <p>Bogofilter has four registration options - '-s', '-n', '-S',
-    and '-N'. With the release of version 0.11 the meaning of '-S'
-    and '-N' has been changed to allow unregistering messages from
-    the word lists. Here's what the four options mean:</p>
-
-    <dl>
-      <dt>-s</dt>
-
-      <dd>means to register the current message as spam,
-      i.e. increment the spam counts of its tokens.</dd>
-
-      <dt>-n</dt>
-
-      <dd>means to register the current message as ham,
-      i.e. increment the ham counts of its tokens.</dd>
-
-      <dt>-S</dt>
-
-      <dd>means to unregister the current message from the spam
-      word list, i.e. decrement the spam counts.</dd>
-
-      <dt>-N</dt>
-
-      <dd>means to unregister the current message from the ham
-      word list, i.e. decrement the ham counts.</dd>
-    </dl>
-
-    <p>Prior to version 0.11, the '-S' option was used to move a
-    message from the ham word list to the spam word list, i.e. there
-    were two actions. Now with 0.11 each of the two actions is
-    invoked by its own option. To get the same effect as the old
-    '-S', you should use '-N -s' (or '-Ns' which means the same
-    thing).</p>
-
-    <p>Similarly, the old '-N' option is now '-Sn' (or '-S
-    -n').</p>
-
-    <p>MDA scripts typically use '-s' and '-n' and don't need to
-    change. Other scripts which use '-S' and '-N' for fixing
-    registration errors <em>do</em> need to be changed.</p>
+    <p>Over time bogofilter accumulated a large number of functions.
+    Some of those were discontinued or changed. Please read the
+    <a href="http://bogofilter.sourceforge.net/NEWS">NEWS</a> file
+    for details.</p>
 
     <hr>
 
-    <h2 id="changed-exitcodes">Now that I've upgraded to 0.14 why are
-    my scripts broken?</h2>
-
-    <p>Bogofilter-0.14 introduced an additional exit code to support
-    its third mail classification (of spam, ham, and unsure).  Prior
-    to 0.14, the exit codes were 0 for spam, 1 for ham, and 2 for
-    error.  They are now 0 for spam, 1 for ham, 2 for unsure, and 3
-    for error.</p>
-
-    <hr>
-
-    <h2 id="changed-tagging">Now that I've upgraded to 0.15 why is
+    <h2 id="changed-tagging">Now that I've upgraded why is
     bogofilter working less well?</h2>
 
-    <p>Prior to version 0.15.4, bogofilter added special prefixes to
-    tags from "Subject:", "From:", "To:", and "Return-Path:" header
-    lines.  As of version 0.15.4, "Received:" line tokens are also
-    specially tagged and all other header line tokens are given a
-    "head:" prefix.  Since bogofilter hasn't previously seen "header:"
-    tokens, these tokens don't contribute to either the ham or spam
-    scores.  This loss of information causes bogofilter to perform
-    less well.</p>
+    <p>The lexer, i.e., that part of bogofilter which extracts tokens
+    from a message, evolves. This results in different readings of messages
+    with the consequence that some tokens in the database can no longer be
+    used.</p>
 
-    <p>There are two ways to deal with this problem.  The first is
-    simply to retrain bogofilter with all the old ham and spam.  This
-    will create the needed "head:" entries and all will be fine.</p>
-
-    <p>The second is to use the new header-degen ("-H") option.  When
-    classifying a message, header-degen causes bogofilter to look up
-    both "head:token" and "token" in the wordlist.  The two ham and
-    spam scores are combined to give a cumulative result for scoring.
-    Registering messages will create "head:token" entries in the
-    wordlist.  After a month or so of using '-H', the wordlist should
-    contain plenty of the new "head:" entries and using '-H' should no
-    longer be necessary.</p>
+    <p>If you encounter this problem, you are strongly advised to rebuild your
+    database. If this is not an option for you, you might want to use version
+    <a href="http://sourceforge.net/project/showfiles.php?group_id=62265&amp;package_id=59357">0.15.13</a>
+    and read the documentation which comes with it for how to migrate your
+    database.</p>
 
     <hr>
 
-    <h2 id="remove-spam-or-nonspam">Having a combined wordlist, how can I
+    <h2 id="remove-spam-or-nonspam">How can I
     delete all the spam (or non-spam) tokens?</h2>
 
-    <p>Bogoutil lets you dump a wordlist and load the tokens into a new wordlist.  With the added use of awk and grep, counts can be zeroed and tokens with zero counts for both spam and non-spam can be deleted.</p>
+    <p>Bogoutil lets you dump a wordlist and load the tokens into a
+    new wordlist.  With the added use of awk and grep, counts can be
+    zeroed and tokens with zero counts for both spam and non-spam can be
+    deleted.</p>
 
     <p>The following commands will delete the tokens from spam messages:</p>
 
-    <pre>    bogoutil -d wordlist.db | \
-    awk '{print $1 " " $2 " 0"}' | grep -v " 0 0" | \
-    bogoutil -l wordlist.new.db</pre>
+    <pre>	bogoutil -d wordlist.db | \
+	awk '{print $1 " " $2 " 0"}' | grep -v " 0 0" | \
+	bogoutil -l wordlist.new.db</pre>
 
     <p>The following commands will delete the tokens from non-spam messages:</p>
 
-    <pre>    bogoutil -d wordlist.db | \
-    awk '{print $1 " 0 " $3}' | grep -v " 0 0" | \
-    bogoutil -l wordlist.new.db</pre>
+    <pre>	bogoutil -d wordlist.db | \
+	awk '{print $1 " 0 " $3}' | grep -v " 0 0" | \
+	bogoutil -l wordlist.new.db</pre>
 
     <hr>
 
     <h2 id="port-notes">How do I get bogofilter working on Solaris,
     BSD, etc?</h2>
 
-    <p>If you don't already have a v3.0+ version of <a href=
-    "http://www.sleepycat.com">BerkeleyDB</a>, then <a href=
-    "http://www.sleepycat.com/download.html">download it</a>,
+    <p>If you don't already have a v3.0+ version of
+    <a href="http://www.sleepycat.com">BerkeleyDB</a>, then
+    <a href="http://www.sleepycat.com/download.html">download it</a>,
     unpack it, and do these commands in the db directory:</p>
     <pre>	$ cd build_unix
 	$ sh ../dist/configure
 	$ make
 	# make install</pre>
 
-    <p>Next, download a <a href=
-    "http://sourceforge.net/project/showfiles.php?group_id=62265">portable
+    <p>Next, download a
+    <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">portable
     version</a> of bogofilter.</p>
 
     <h3>On Solaris</h3>
@@ -973,3 +898,4 @@
     -->
 </body>
 </html>
+
