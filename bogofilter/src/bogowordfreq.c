@@ -63,7 +63,7 @@ int main(int argc, char **argv)
     bogoreader_init(argc, argv);
 
     while (reader_more()) {
-	wordhash_t *h = wordhash_init();
+	wordhash_t *h = wordhash_new();
 	initialize();
 	collect_words(h);
 	printf("%ld tokens:\n", (long) h->wordcount);

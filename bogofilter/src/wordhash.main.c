@@ -32,7 +32,7 @@ dump_hash (wordhash_t * h)
 int
 main (void)
 {
-  wordhash_t *h = wordhash_init ();
+  wordhash_t *h = wordhash_new ();
   char buf[100];
   wh_elt_t *w;
 

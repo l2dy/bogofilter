@@ -49,19 +49,19 @@ THEORY:
 #endif
 
 /* 06/14/03
-** profiling shows wordhash_init() is significant portion 
+** profiling shows wordhash_new() is significant portion 
 ** of time spent processing msg-count files:
 **
 **   %   cumulative   self              self     total           
 **  time   seconds   seconds    calls  ms/call  ms/call  name    
-**  30.84      0.70     0.70     2535     0.28     0.28  wordhash_init
+**  30.84      0.70     0.70     2535     0.28     0.28  wordhash_new
 **
-** wordhash_init() made faster by using xcalloc() to provide
+** wordhash_new() made faster by using xcalloc() to provide
 ** initialized storage.
 */
 
 wordhash_t *
-wordhash_init (void)
+wordhash_new (void)
 {
   wordhash_t *wh = xcalloc (1, sizeof (wordhash_t));
   wh->bin = xcalloc (NHASH, sizeof (hashnode_t **));

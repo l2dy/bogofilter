@@ -45,7 +45,7 @@ typedef struct wordhash_s {
   /*@null@*/  /*@dependent@*/ hashnode_t  *props;	/* array of nodes */
 } wordhash_t;
 
-/*@only@*/ wordhash_t *wordhash_init(void);
+/*@only@*/ wordhash_t *wordhash_new(void);
 
 void wordhash_free(/*@only@*/ wordhash_t *);
 size_t wordhash_count(wordhash_t * h);

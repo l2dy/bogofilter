@@ -75,7 +75,7 @@ rc_t bogofilter(int argc, char **argv)
     bool write_msg    = passthrough || Rtable;
     bool classify_msg = write_msg || (run_type & (RUN_NORMAL | RUN_UPDATE));
 
-    wordhash_t *words = register_aft ? wordhash_init() : NULL;
+    wordhash_t *words = register_aft ? wordhash_new() : NULL;
 
     atexit(bf_exit);
 
@@ -92,7 +92,7 @@ rc_t bogofilter(int argc, char **argv)
 
     while (reader_more()) {
 	double spamicity;
-	wordhash_t *w = wordhash_init();
+	wordhash_t *w = wordhash_new();
 
 	passthrough_setup();
 
