@@ -16,6 +16,7 @@ set -e
 NODB=1 . ${srcdir=.}/t.frame
 
 OUT="${TMPDIR}/degen.out"
+OUT2="${TMPDIR}/degen.verbose"
 
 map_rc()
 {
@@ -51,12 +52,11 @@ $BOGOFILTER -C -y 0 -s -I ${TMPDIR}/msg.Free
 
 $BOGOFILTER -C -y 0 -s -I ${TMPDIR}/msg.xxxx
 
-if  [ $verbose -ne 0 ]; then
-#   Note: outputs are different for 1 wordlist than for 2
+if [ $verbose -ne 0 ]; then
     for f in $BOGOFILTER_DIR/*list.${DB_EXT} ; do
-	$BOGOUTIL -d $f | sort >> ${OUT}
+	$BOGOUTIL -d $f | sort >> ${OUT2}
     done
-    echo >> ${OUT}
+    echo >> ${OUT2}
 fi
 
 for args in PD.fff Pdf.FREE PdF.FREE PdF.fnff ; do
@@ -73,4 +73,7 @@ if  [ $verbose -eq 0 ]; then
     cmp ${OUTPUTS}/degen.out $OUT
 else
     diff ${OUTPUTS}/degen.out $OUT
+    echo
+    echo "${OUT2} contents:"
+    cat ${OUT2}
 fi
