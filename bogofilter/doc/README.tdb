@@ -1,42 +1,40 @@
 To build and run bogofilter using the Trivial Database (tdb), you'll
 need to do the following:
 
-1. Dump your current BerkeleyDB wordlists into text files
+** Dump your current BerkeleyDB wordlists into text files
 
-   If you are using a single wordlist, say
+   If you are using a single wordlist, run:
 
-   'bogoutil -d /path/to/wordlist.db > wordlist.txt'
+   "bogoutil -d /path/to/wordlist.db > wordlist.txt"
 
-   Otherwise, say
+   Otherwise, run:
 
-   for f in goodlist spamlist; do bogoutil -d /path/to/${f}.db > ${f}.txt;done
+   for f in goodlist spamlist; do \
+       bogoutil -d /path/to/${f}.db > ${f}.txt; \
+   done
 
-   
-2. Have tdb and gdbm installed.
+** Have tdb installed.
 
-   tdb needs gdbm, so if neither is installed, you'll need to:
+   Download tdb from http://sourceforge.net/projects/tdb.  The current
+   version is tdb-1.0.6 (10 Dec 2001).  After unpacking the tarball,
+   build with the usual commands: "./configure && make && make
+   install".  
 
-   a. Download gdbm from ftp://ftp.gnu.org/pub/gnu/gdbm.  The current
-      version is gdbm-1.8.3.tar.gz (16 Oct 2002).  Build with the
-      usual commands: "./configure && make && make install"
+   Note that file tdbspeed.h depends on gdbm.h.  If you don't have
+   gdbm installed, apply patch tdbspeed-gdbm.patch before building
+   tdb.
 
-   b. Download tdb from http://sourceforge.net/projects/tdb.  The
-      current version is tdb-1.0.6 (10 Dec 2001).  After unpacking the
-      tarball, build with the usual commands: "./configure && make &&
-      make install"
-
-3. From the bogofilter directory, run:
+** From the bogofilter directory, run:
 
    "./configure --with-tdb && make && make check && make install"
-  
+
    To build an rpm, run:
 
    "make with_tdb=1 rpm"
 
+** To verify configuration, run:
 
-4. To verify configuration, run:
-
-   bogofilter -V
+   "bogofilter -V"
 
    Output should resemble:
 
@@ -44,18 +42,67 @@ need to do the following:
       Algorithms: Fisher Graham Robinson
       Database: TrivialDB
 
-5. When running bogofilter, the database files will have a tdb
+** When running bogofilter, the database files will have a tdb
    extension.  For combined list bogofilter, the database is
    wordlist.tdb.  For separate list bogofilter, the databases are
    spamlist.tdb and goodlist.tdb.
 
-6. If you dumped your old databases in step 1, load them now.
+** If you dumped your old databases in step 1, load them now.
 
-   If you are using a single wordlist, say
+   If you are using a single wordlist, run:
 
-   'bogoutil -l /path/to/wordlist.tdb < wordlist.txt'
+   "bogoutil -l /path/to/wordlist.tdb < wordlist.txt"
 
-   Otherwise, say
+   Otherwise, run:
 
-   for f in goodlist spamlist; do bogoutil -l /path/to/${f}.db < ${f}.txt;done
+   for f in goodlist spamlist; do \
+       bogoutil -l /path/to/${f}.tdb < ${f}.txt; \
+   done
 
+
+** Here is the tdb patch:
+
+****** tdbspeed-gdbm.patch ******
+
+--- configure.in.orig	2002-09-03 07:48:38.000000000 +1000
++++ configure.in	2002-09-03 07:45:23.000000000 +1000
+@@ -18,13 +18,14 @@
+ AC_CHECK_LIB(gdbm, gdbm_open,
+ 	[have_gdbm=true],[have_gdbm=false])
+ if test "x$have_gdbm" = "xfalse";then
+-  AC_MSG_WARN(WARNING: tdbtest is disabled. It needs gdbm.)
++  AC_MSG_WARN(WARNING: tdbspeed and tdbtest are disabled. They need gdbm.)
+ fi
+ AC_CHECK_LIB(dl, dlopen,[have_dllib=true],[have_dllib=false])
+ if test "x$have_dllib" = "xfalse";then
+   AC_MSG_WARN(WARNING: tdbtorture is disabled. It needs libdl.)
+ fi
+ 
++AM_CONDITIONAL(BUILD_TDBSPEED,$have_gdbm)
+ AM_CONDITIONAL(BUILD_TDBTEST,$have_gdbm)
+ AM_CONDITIONAL(BUILD_TDBTORTURE,$have_dllib)
+ 
+--- Makefile.am.orig	2002-09-03 07:48:50.000000000 +1000
++++ Makefile.am	2002-09-03 07:42:58.000000000 +1000
+@@ -1,6 +1,12 @@
+ CFLAGS = @CFLAGS@ @WARNS@
+ LDADD=libtdb.la
+ 
++if BUILD_TDBSPEED
++TDBSPEED = tdbspeed
++else
++TDBSPEED =
++endif
++
+ if BUILD_TDBTEST
+ TDBTEST = tdbtest
+ else
+@@ -13,7 +19,7 @@
+ TDBTORTURE =
+ endif
+ 
+-noinst_PROGRAMS=tdbspeed tdbiterate $(TDBTEST) $(TDBTORTURE)
++noinst_PROGRAMS=tdbiterate $(TDBSPEED) $(TDBTEST) $(TDBTORTURE)
+ bin_PROGRAMS=tdbtool tdbdump
+ 
+ lib_LTLIBRARIES=libtdb.la
