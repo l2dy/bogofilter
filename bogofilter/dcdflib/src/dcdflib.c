@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "cdflib.h"
+
 /*
  * A comment about ints and longs - whether ints or longs are used should
  * make no difference, but where double r-values are assigned to ints the
@@ -20,6 +21,12 @@
  
 -----------------------------------------------------------------------
 */
+
+#include <float.h> /* has DBL_EPSILON */
+#define EPS	(100.0 * DBL_EPSILON) /* equality cutoff */
+#define	EQ(a,b)	(fabs((a) -(b)) < EPS)
+#define	NE(a,b)	(fabs((a) -(b)) > EPS)
+
 double algdiv(double *a,double *b)
 {
 static double c0 = .833333333333333e-01;
@@ -71,6 +78,8 @@ S20:
 S30:
     return w-u-v;
 }
+
+
 double alngam(double *x)
 /*
 **********************************************************************
@@ -183,6 +192,8 @@ S110:
     return aln_gam;
 #undef hln2pi
 }
+
+
 double alnrel(double *a)
 /*
 -----------------------------------------------------------------------
@@ -212,6 +223,8 @@ S10:
     aln_rel = log(x);
     return aln_rel;
 }
+
+
 double apser(double *a,double *b,double *x,double *eps)
 /*
 -----------------------------------------------------------------------
@@ -246,6 +259,8 @@ S30:
     if(fabs(aj) > tol) goto S30;
     return -(*a*(c+s));
 }
+
+
 double basym(double *a,double *b,double *lambda,double *eps)
 /*
 -----------------------------------------------------------------------
@@ -295,7 +310,7 @@ S20:
     T2 = *lambda/ *b;
     f = *a*rlog1(&T1)+*b*rlog1(&T2);
     t = exp(-f);
-    if(t == 0.0e0) return ba_sym;
+    if(EQ(t, 0.0e0)) return ba_sym;
     z0 = sqrt(f);
     z = 0.5e0*(z0/e1);
     z2 = f+f;
@@ -354,6 +369,8 @@ S80:
     ba_sym = e0*t*u*sum;
     return ba_sym;
 }
+
+
 double bcorr(double *a0,double *b0)
 /*
 -----------------------------------------------------------------------
@@ -402,6 +419,8 @@ static double a,b,c,h,s11,s3,s5,s7,s9,t,w,x,x2;
     t = pow(1.0e0/a,2.0);
     return (((((c5*t+c4)*t+c3)*t+c2)*t+c1)*t+c0)/a+w;
 }
+
+
 double betaln(double *a0,double *b0)
 /*
 -----------------------------------------------------------------------
@@ -499,6 +518,8 @@ S100:
 S110:
     return -(0.5e0*log(b))+e+w-u-v;
 }
+
+
 double bfrac(double *a,double *b,double *x,double *y,double *lambda,
 	     double *eps)
 /*
@@ -514,7 +535,7 @@ static double b_frac,alpha,an,anp1,beta,bn,bnp1,c,c0,c1,e,n,p,r,r0,s,t,w,yp1;
      .. Executable Statements ..
 */
     b_frac = brcomp(a,b,x,y);
-    if(b_frac == 0.0e0) return b_frac;
+    if(EQ(b_frac, 0.0e0)) return b_frac;
     c = 1.0e0+*lambda;
     c0 = *b/ *a;
     c1 = 1.0e0+1.0e0/ *a;
@@ -566,6 +587,8 @@ S20:
     b_frac *= r;
     return b_frac;
 }
+
+
 void bgrat(double *a,double *b,double *x,double *y,double *w,
 	   double *eps,int *ierr)
 /*
@@ -594,7 +617,7 @@ S10:
     lnx = log(*x);
 S20:
     z = -(nu*lnx);
-    if(*b*z == 0.0e0) goto S70;
+    if(EQ(*b*z, 0.0e0)) goto S70;
 /*
                  COMPUTATION OF THE EXPANSION
                  SET R = EXP(-Z)*Z**B/GAMMA(B)
@@ -603,7 +626,7 @@ S20:
     r *= (exp(*a*lnx)*exp(0.5e0*bm1*lnx));
     u = algdiv(b,a)+*b*log(nu);
     u = r*exp(-u);
-    if(u == 0.0e0) goto S70;
+    if(EQ(u, 0.0e0)) goto S70;
     grat1(b,&z,&r,&p,&q,eps);
     v = 0.25e0*pow(1.0e0/nu,2.0);
     t2 = 0.25e0*lnx*lnx;
@@ -648,6 +671,8 @@ S70:
     *ierr = 1;
     return;
 }
+
+
 double bpser(double *a,double *b,double *x,double *eps)
 /*
 -----------------------------------------------------------------------
@@ -663,7 +688,7 @@ static int i,m;
      .. Executable Statements ..
 */
     b_pser = 0.0e0;
-    if(*x == 0.0e0) return b_pser;
+    if(EQ(*x, 0.0e0)) return b_pser;
 /*
 -----------------------------------------------------------------------
             COMPUTE THE FACTOR X**A/(A*BETA(A,B))
@@ -682,7 +707,7 @@ S10:
             PROCEDURE FOR A0 .LT. 1 AND B0 .LE. 1
 */
     b_pser = pow(*x,*a);
-    if(b_pser == 0.0e0) return b_pser;
+    if(EQ(b_pser, 0.0e0)) return b_pser;
     apb = *a+*b;
     if(apb > 1.0e0) goto S20;
     z = 1.0e0+gam1(&apb);
@@ -728,7 +753,7 @@ S90:
     z = *a*log(*x)-u;
     b_pser = a0/ *a*exp(z);
 S100:
-    if(b_pser == 0.0e0 || *a <= 0.1e0**eps) return b_pser;
+    if(EQ(b_pser, 0.0e0) || *a <= 0.1e0**eps) return b_pser;
 /*
 -----------------------------------------------------------------------
                      COMPUTE THE SERIES
@@ -746,6 +771,8 @@ S110:
     b_pser *= (1.0e0+*a*sum);
     return b_pser;
 }
+
+
 void bratio(double *a,double *b,double *x,double *y,double *w,
 	    double *w1,int *ierr)
 /*
@@ -798,16 +825,16 @@ static double T2,T3,T4,T5;
     eps = spmpar(&K1);
     *w = *w1 = 0.0e0;
     if(*a < 0.0e0 || *b < 0.0e0) goto S270;
-    if(*a == 0.0e0 && *b == 0.0e0) goto S280;
+    if(EQ(*a, 0.0e0) && EQ(*b, 0.0e0)) goto S280;
     if(*x < 0.0e0 || *x > 1.0e0) goto S290;
     if(*y < 0.0e0 || *y > 1.0e0) goto S300;
     z = *x+*y-0.5e0-0.5e0;
     if(fabs(z) > 3.0e0*eps) goto S310;
     *ierr = 0;
-    if(*x == 0.0e0) goto S210;
-    if(*y == 0.0e0) goto S230;
-    if(*a == 0.0e0) goto S240;
-    if(*b == 0.0e0) goto S220;
+    if(EQ(*x, 0.0e0)) goto S210;
+    if(EQ(*y, 0.0e0)) goto S230;
+    if(EQ(*a, 0.0e0)) goto S240;
+    if(EQ(*b, 0.0e0)) goto S220;
     eps = fifdmax1(eps,1.e-15);
     if(fifdmax1(*a,*b) < 1.e-3*eps) goto S260;
     ind = 0;
@@ -906,7 +933,7 @@ S150:
 S160:
     n = (long)(b0);
     b0 -= (double)n;
-    if(b0 != 0.0e0) goto S170;
+    if(NE(b0, 0.0e0)) goto S170;
     n -= 1;
     b0 = 1.0e0;
 S170:
@@ -934,13 +961,13 @@ S210:
 /*
                TERMINATION OF THE PROCEDURE
 */
-    if(*a == 0.0e0) goto S320;
+    if(EQ(*a, 0.0e0)) goto S320;
 S220:
     *w = 0.0e0;
     *w1 = 1.0e0;
     return;
 S230:
-    if(*b == 0.0e0) goto S330;
+    if(EQ(*b, 0.0e0)) goto S330;
 S240:
     *w = 1.0e0;
     *w1 = 0.0e0;
@@ -983,6 +1010,8 @@ S330:
     *ierr = 7;
     return;
 }
+
+
 double brcmp1(int *mu,double *a,double *b,double *x,double *y)
 /*
 -----------------------------------------------------------------------
@@ -1038,7 +1067,7 @@ S40:
                    ALGORITHM FOR B0 .LE. 1
 */
     brcmp1 = esum(mu,&z);
-    if(brcmp1 == 0.0e0) return brcmp1;
+    if(EQ(brcmp1, 0.0e0)) return brcmp1;
     apb = *a+*b;
     if(apb > 1.0e0) goto S50;
     z = 1.0e0+gam1(&apb);
@@ -1121,6 +1150,8 @@ S190:
     brcmp1 = Const*sqrt(*b*x0)*z*exp(-bcorr(a,b));
     return brcmp1;
 }
+
+
 double brcomp(double *a,double *b,double *x,double *y)
 /*
 -----------------------------------------------------------------------
@@ -1142,7 +1173,7 @@ static double T1,T2;
      .. Executable Statements ..
 */
     b_rcomp = 0.0e0;
-    if(*x == 0.0e0 || *y == 0.0e0) return b_rcomp;
+    if(EQ(*x, 0.0e0) || EQ(*y, 0.0e0)) return b_rcomp;
     a0 = fifdmin1(*a,*b);
     if(a0 >= 8.0e0) goto S130;
     if(*x > 0.375e0) goto S10;
@@ -1178,7 +1209,7 @@ S40:
                    ALGORITHM FOR B0 .LE. 1
 */
     b_rcomp = exp(z);
-    if(b_rcomp == 0.0e0) return b_rcomp;
+    if(EQ(b_rcomp, 0.0e0)) return b_rcomp;
     apb = *a+*b;
     if(apb > 1.0e0) goto S50;
     z = 1.0e0+gam1(&apb);
@@ -1259,6 +1290,8 @@ S190:
     b_rcomp = Const*sqrt(*b*x0)*z*exp(-bcorr(a,b));
     return b_rcomp;
 }
+
+
 double bup(double *a,double *b,double *x,double *y,int *n,double *eps)
 /*
 -----------------------------------------------------------------------
@@ -1292,7 +1325,7 @@ static int i,k,kp1,mu,nm1;
     d = exp(-t);
 S10:
     b_up = brcmp1(&mu,a,b,x,y)/ *a;
-    if(*n == 1 || b_up == 0.0e0) return b_up;
+    if(*n == 1 || EQ(b_up, 0.0e0)) return b_up;
     nm1 = *n-1;
     w = d;
 /*
@@ -1337,6 +1370,8 @@ S70:
     b_up *= w;
     return b_up;
 }
+
+
 void cdfbet(int *which,double *p,double *q,double *x,double *y,
 	    double *a,double *b,int *status,double *bound)
 /**********************************************************************
@@ -1711,6 +1746,8 @@ S540:
 #undef inf
 #undef one
 }
+
+
 void cdfbin(int *which,double *p,double *q,double *s,double *xn,
 	    double *pr,double *ompr,int *status,double *bound)
 /**********************************************************************
@@ -1873,7 +1910,7 @@ S120:
 /*
      S
 */
-    if(!(*s < 0.0e0 || *which != 3 && *s > *xn)) goto S160;
+    if(!((*s < 0.0e0) || (*which != 3 && *s > *xn))) goto S160;
     if(!(*s < 0.0e0)) goto S140;
     *bound = 0.0e0;
     goto S150;
@@ -2080,6 +2117,8 @@ S560:
 #undef inf
 #undef one
 }
+
+
 void cdfchi(int *which,double *p,double *q,double *x,double *df,
 	    int *status,double *bound)
 /**********************************************************************
@@ -2364,6 +2403,8 @@ S380:
 #undef zero
 #undef inf
 }
+
+
 void cdfchn(int *which,double *p,double *q,double *x,double *df,
 	    double *pnonc,int *status,double *bound)
 /**********************************************************************
@@ -2637,6 +2678,8 @@ S280:
 #undef one
 #undef inf
 }
+
+
 void cdff(int *which,double *p,double *q,double *f,double *dfn,
 	  double *dfd,int *status,double *bound)
 /**********************************************************************
@@ -2953,6 +2996,8 @@ S420:
 #undef zero
 #undef inf
 }
+
+
 void cdffnc(int *which,double *p,double *q,double *f,double *dfn,
 	    double *dfd,double *phonc,int *status,double *bound)
 /**********************************************************************
@@ -3277,6 +3322,8 @@ S350:
 #undef one
 #undef inf
 }
+
+
 void cdfgam(int *which,double *p,double *q,double *x,double *shape,
 	    double *scale,int *status,double *bound)
 /**********************************************************************
@@ -3535,7 +3582,7 @@ S250:
 S260:
         fx = ccum-*q;
 S270:
-        if(!(qporq && cum > 1.5e0 || !qporq && ccum > 1.5e0)) goto S280;
+        if(!((qporq && cum > 1.5e0) || (!qporq && ccum > 1.5e0))) goto S280;
         *status = 10;
         return;
 S280:
@@ -3575,6 +3622,8 @@ S310:
 #undef zero
 #undef inf
 }
+
+
 void cdfnbn(int *which,double *p,double *q,double *s,double *xn,
 	    double *pr,double *ompr,int *status,double *bound)
 /**********************************************************************
@@ -3946,6 +3995,8 @@ S540:
 #undef inf
 #undef one
 }
+
+
 void cdfnor(int *which,double *p,double *q,double *x,double *mean,
 	    double *sd,int *status,double *bound)
 /**********************************************************************
@@ -4150,6 +4201,8 @@ S160:
     }
     return;
 }
+
+
 void cdfpoi(int *which,double *p,double *q,double *s,double *xlam,
 	    int *status,double *bound)
 /**********************************************************************
@@ -4406,6 +4459,8 @@ S330:
 #undef atol
 #undef inf
 }
+
+
 void cdft(int *which,double *p,double *q,double *t,double *df,
 	  int *status,double *bound)
 /**********************************************************************
@@ -4659,6 +4714,8 @@ S310:
 #undef rtinf
 #undef maxdf
 }
+
+
 void cdftnc(int *which,double *p,double *q,double *t,double *df,
             double *pnonc,int *status,double *bound)
 /**********************************************************************
@@ -4874,6 +4931,8 @@ S250:
 #undef one
 #undef inf
 }
+
+
 void cumbet(double *x,double *y,double *a,double *b,double *cum,
 	    double *ccum)
 /*
@@ -4950,6 +5009,8 @@ S20:
 */
     return;
 }
+
+
 void cumbin(double *s,double *xn,double *pr,double *ompr,
 	    double *cum,double *ccum)
 /*
@@ -5016,6 +5077,8 @@ S10:
 S20:
     return;
 }
+
+
 void cumchi(double *x,double *df,double *cum,double *ccum)
 /*
 **********************************************************************
@@ -5066,6 +5129,8 @@ static double a,xx;
     cumgam(&xx,&a,cum,ccum);
     return;
 }
+
+
 void cumchn(double *x,double *df,double *pnonc,double *cum,
             double *ccum)
 /**********************************************************************
@@ -5246,6 +5311,8 @@ S80:
 #undef dg
 #undef qsmall
 }
+
+
 void cumf(double *f,double *dfn,double *dfd,double *cum,double *ccum)
 /*
 **********************************************************************
@@ -5330,6 +5397,8 @@ S10:
 #undef half
 #undef done
 }
+
+
 void cumfnc(double *f,double *dfn,double *dfd,double *pnonc,
 	    double *cum,double *ccum)
 /*
@@ -5474,7 +5543,7 @@ S40:
      Now sum forwards until convergence
 */
     xmult = centwt;
-    if(aup-1.0+b == 0) upterm = exp(-alngam(&aup)-alngam(&b)+(aup-1.0)*log(xx)+
+    if(EQ(aup-1.0+b, 0)) upterm = exp(-alngam(&aup)-alngam(&b)+(aup-1.0)*log(xx)+
       b*log(yy));
     else  {
         T6 = aup-1.0+b;
@@ -5500,6 +5569,8 @@ S70:
 #undef half
 #undef done
 }
+
+
 void cumgam(double *x,double *a,double *cum,double *ccum)
 /*
 **********************************************************************
@@ -5559,6 +5630,8 @@ S10:
 */
     return;
 }
+
+
 void cumnbn(double *s,double *xn,double *pr,double *ompr,
 	    double *cum,double *ccum)
 /*
@@ -5624,6 +5697,8 @@ static double T1;
     cumbet(pr,ompr,xn,&T1,cum,ccum);
     return;
 }
+
+
 void cumnor(double *arg,double *result,double *ccum)
 /*
 **********************************************************************
@@ -5835,6 +5910,8 @@ static double del,eps,temp,x,xden,xnum,y,xsq,min;
 */
     if(*ccum < min) *ccum = 0.0e0;
 }
+
+
 void cumpoi(double *s,double *xlam,double *cum,double *ccum)
 /*
 **********************************************************************
@@ -5886,6 +5963,8 @@ static double chi,df;
     cumchi(&chi,&df,ccum,cum);
     return;
 }
+
+
 void cumt(double *t,double *df,double *cum,double *ccum)
 /*
 **********************************************************************
@@ -5948,6 +6027,8 @@ S10:
 S20:
     return;
 }
+
+
 void cumtnc(double *t,double *df,double *pnonc,double *cum,
             double *ccum)
 /**********************************************************************
@@ -6179,6 +6260,8 @@ S30:
 #undef conv
 #undef tiny
 }
+
+
 double devlpl(double a[],int *n,double *x)
 /*
 **********************************************************************
@@ -6220,6 +6303,8 @@ static int i;
     devlpl = term;
     return devlpl;
 }
+
+
 double dinvnr(double *p,double *q)
 /*
 **********************************************************************
@@ -6316,6 +6401,8 @@ S40:
 #undef nhalf
 #undef dennor
 }
+
+
 /* DEFINE DINVR */
 static void E0000(int IENTRY,int *status,double *x,double *fx,
 		  unsigned long *qleft,unsigned long *qhi,double *zabsst,
@@ -6389,12 +6476,12 @@ S70:
     goto S300;
 S90:
     yy = *fx;
-    if(!(yy == 0.0e0)) goto S100;
+    if(!(EQ(yy, 0.0e0))) goto S100;
     *status = 0;
     qok = 1;
     return;
 S100:
-    qup = qincr && yy < 0.0e0 || !qincr && yy > 0.0e0;
+    qup = (qincr && yy < 0.0e0) || (!qincr && yy > 0.0e0);
 /*
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
      HANDLE CASE IN WHICH WE MUST STEP HIGHER
@@ -6418,7 +6505,7 @@ S120:
     goto S300;
 S130:
     yy = *fx;
-    qbdd = qincr && yy >= 0.0e0 || !qincr && yy <= 0.0e0;
+    qbdd = (qincr && yy >= 0.0e0) || (!qincr && yy <= 0.0e0);
     qlim = xub >= big;
     qcond = qbdd || qlim;
     if(qcond) goto S140;
@@ -6459,7 +6546,7 @@ S190:
     goto S300;
 S200:
     yy = *fx;
-    qbdd = qincr && yy <= 0.0e0 || !qincr && yy >= 0.0e0;
+    qbdd = (qincr && yy <= 0.0e0) || (!qincr && yy >= 0.0e0);
     qlim = xlb <= small;
     qcond = qbdd || qlim;
     if(qcond) goto S210;
@@ -6522,6 +6609,8 @@ S310:
       4: goto S130;case 5: goto S200;case 6: goto S270;default: break;}
 #undef qxmon
 }
+
+
 void dinvr(int *status,double *x,double *fx,
 	   unsigned long *qleft,unsigned long *qhi)
 /*
@@ -6587,6 +6676,8 @@ void dinvr(int *status,double *x,double *fx,
 {
     E0000(0,status,x,fx,qleft,qhi,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 }
+
+
 void dstinv(double *zsmall,double *zbig,double *zabsst,
 	    double *zrelst,double *zstpmu,double *zabsto,
 	    double *zrelto)
@@ -6658,6 +6749,8 @@ void dstinv(double *zsmall,double *zbig,double *zabsst,
     E0000(1,NULL,NULL,NULL,NULL,NULL,zabsst,zabsto,zbig,zrelst,zrelto,zsmall,
     zstpmu);
 }
+
+
 double dt1(double *p,double *q,double *df)
 /*
 **********************************************************************
@@ -6727,6 +6820,8 @@ S30:
     dt1 = xp;
     return dt1;
 }
+
+
 /* DEFINE DZROR */
 static void E0001(int IENTRY,int *status,double *x,double *fx,
 		  double *xlo,double *xhi,unsigned long *qleft,
@@ -6786,7 +6881,7 @@ S70:
     ext = 0;
 S80:
     if(!(fabs(fc) < fabs(fb))) goto S100;
-    if(!(c != a)) goto S90;
+    if(!NE(c, a)) goto S90;
     d = a;
     fd = fa;
 S90:
@@ -6823,7 +6918,7 @@ S130:
     q = -q;
 S140:
     if(ext == 3) p *= 2.0e0;
-    if(!(p*1.0e0 == 0.0e0 || p <= q*tol)) goto S150;
+    if(!(EQ(p*1.0e0, 0.0e0) || p <= q*tol)) goto S150;
     w = tol;
     goto S180;
 S150:
@@ -6852,7 +6947,7 @@ S200:
     if(!(fc*fb >= 0.0e0)) goto S210;
     goto S70;
 S210:
-    if(!(w == mb)) goto S220;
+    if(!EQ(w, mb)) goto S220;
     ext = 0;
     goto S230;
 S220:
@@ -6861,7 +6956,7 @@ S230:
     goto S80;
 S240:
     *xhi = c;
-    qrzero = fc >= 0.0e0 && fb <= 0.0e0 || fc < 0.0e0 && fb >= 0.0e0;
+    qrzero = (fc >= 0.0e0 && fb <= 0.0e0) || (fc < 0.0e0 && fb >= 0.0e0);
     if(!qrzero) goto S250;
     *status = 0;
     goto S260;
@@ -6886,6 +6981,8 @@ S280:
       default: break;}
 #undef ftol
 }
+
+
 void dzror(int *status,double *x,double *fx,double *xlo,
 	   double *xhi,unsigned long *qleft,unsigned long *qhi)
 /*
@@ -6954,6 +7051,8 @@ void dzror(int *status,double *x,double *fx,double *xlo,
 {
     E0001(0,status,x,fx,xlo,xhi,qleft,qhi,NULL,NULL,NULL,NULL);
 }
+
+
 void dstzr(double *zxlo,double *zxhi,double *zabstl,double *zreltl)
 /*
 **********************************************************************
@@ -7001,6 +7100,8 @@ void dstzr(double *zxlo,double *zxhi,double *zabstl,double *zreltl)
 {
     E0001(1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,zabstl,zreltl,zxhi,zxlo);
 }
+
+
 double erf1(double *x)
 /*
 -----------------------------------------------------------------------
@@ -7064,6 +7165,8 @@ S20:
 S30:
     return fifdsign(1.0e0,*x);
 }
+
+
 double erfc1(int *ind,double *x)
 /*
 -----------------------------------------------------------------------
@@ -7170,6 +7273,8 @@ S70:
     erfc1 = 0.0e0;
     return erfc1;
 }
+
+
 double esum(int *mu,double *x)
 /*
 -----------------------------------------------------------------------
@@ -7196,6 +7301,8 @@ S20:
     w = *mu;
     return exp(w)*exp(*x);
 }
+
+
 double exparg(int *l)
 /*
 --------------------------------------------------------------------
@@ -7240,6 +7347,8 @@ S50:
     m = ipmpar(&K3);
     return 0.99999e0*((double)m*lnb);
 }
+
+
 double fpser(double *a,double *b,double *x,double *eps)
 /*
 -----------------------------------------------------------------------
@@ -7284,6 +7393,8 @@ S20:
     fp_ser *= (1.0e0+*a*s);
     return fp_ser;
 }
+
+
 double gam1(double *a)
 /*
      ------------------------------------------------------------------
@@ -7317,7 +7428,7 @@ static double bot,d,t,top,w,T1;
     if(d > 0.0e0) t = d-0.5e0;
     T1 = t;
     if(T1 < 0) goto S40;
-    else if(T1 == 0) goto S10;
+    else if(EQ(T1, 0)) goto S10;
     else  goto S20;
 S10:
     return 0.0e0;
@@ -7339,6 +7450,8 @@ S40:
 S50:
     return t*w/ *a;
 }
+
+
 void gaminv(double *a,double *x,double *x0,double *p,double *q,
 	    int *ierr)
 /*
@@ -7447,9 +7560,9 @@ static double T4,T5,T6,T7,T9;
     t = *p+*q-1.e0;
     if(fabs(t) > e) goto S320;
     *ierr = 0;
-    if(*p == 0.0e0) return;
-    if(*q == 0.0e0) goto S270;
-    if(*a == 1.0e0) goto S280;
+    if(EQ(*p, 0.0e0)) return;
+    if(EQ(*q, 0.0e0)) goto S270;
+    if(EQ(*a, 1.0e0)) goto S280;
     e2 = 2.0e0*e;
     amax = 0.4e-10/(e*e);
     iop = 1;
@@ -7465,7 +7578,7 @@ static double T4,T5,T6,T7,T9;
     T4 = *a+1.0e0;
     g = Xgamm(&T4);
     qg = *q*g;
-    if(qg == 0.0e0) goto S360;
+    if(EQ(qg, 0.0e0)) goto S360;
     b = qg/ *a;
     if(qg > 0.6e0**a) goto S40;
     if(*a >= 0.30e0 || b < 0.35e0) goto S10;
@@ -7475,7 +7588,7 @@ static double T4,T5,T6,T7,T9;
     goto S160;
 S10:
     if(b >= 0.45e0) goto S40;
-    if(b == 0.0e0) goto S360;
+    if(EQ(b, 0.0e0)) goto S360;
     y = -log(b);
     s = 0.5e0+(0.5e0-*a);
     z = log(y);
@@ -7514,7 +7627,7 @@ S50:
 S60:
     xn = exp(log(*p*g)/ *a);
 S70:
-    if(xn == 0.0e0) goto S310;
+    if(EQ(xn, 0.0e0)) goto S310;
     t = 0.5e0+(0.5e0-xn/(*a+1.0e0));
     xn /= t;
     goto S160;
@@ -7602,9 +7715,9 @@ S190:
     if(*ierr >= 20) goto S330;
     *ierr += 1;
     gratio(a,&xn,&pn,&qn,&K8);
-    if(pn == 0.0e0 || qn == 0.0e0) goto S350;
+    if(EQ(pn, 0.0e0) || EQ(qn, 0.0e0)) goto S350;
     r = rcomp(a,&xn);
-    if(r == 0.0e0) goto S350;
+    if(EQ(r, 0.0e0)) goto S350;
     t = (pn-*p)/r;
     w = 0.5e0*(am1-xn);
     if(fabs(t) <= 0.1e0 && fabs(w*t) <= 0.1e0) goto S200;
@@ -7638,9 +7751,9 @@ S240:
     if(*ierr >= 20) goto S330;
     *ierr += 1;
     gratio(a,&xn,&pn,&qn,&K8);
-    if(pn == 0.0e0 || qn == 0.0e0) goto S350;
+    if(EQ(pn, 0.0e0) || EQ(qn, 0.0e0)) goto S350;
     r = rcomp(a,&xn);
-    if(r == 0.0e0) goto S350;
+    if(EQ(r, 0.0e0)) goto S350;
     t = (*q-qn)/r;
     w = 0.5e0*(am1-xn);
     if(fabs(t) <= 0.1e0 && fabs(w*t) <= 0.1e0) goto S250;
@@ -7701,6 +7814,8 @@ S360:
     *ierr = -8;
     return;
 }
+
+
 double gamln(double *a)
 /*
 -----------------------------------------------------------------------
@@ -7754,6 +7869,8 @@ S40:
     gamln = d+w+(*a-0.5e0)*(log(*a)-1.0e0);
     return gamln;
 }
+
+
 double gamln1(double *a)
 /*
 -----------------------------------------------------------------------
@@ -7802,6 +7919,8 @@ S10:
     gamln1 = x*w;
     return gamln1;
 }
+
+
 double Xgamm(double *a)
 /*
 -----------------------------------------------------------------------
@@ -7883,7 +8002,7 @@ S40:
 S60:
     x += (0.5e0+0.5e0);
     t = x*t;
-    if(t == 0.0e0) return Xgamm;
+    if(EQ(t, 0.0e0)) return Xgamm;
 S70:
 /*
      THE FOLLOWING CODE CHECKS IF 1/T CAN OVERFLOW. THIS
@@ -7927,7 +8046,7 @@ S110:
     if(t > 0.9e0) t = 1.0e0-t;
     s = sin(pi*t)/pi;
     if(fifmod(n,2) == 0) s = -s;
-    if(s == 0.0e0) return Xgamm;
+    if(EQ(s, 0.0e0)) return Xgamm;
 S120:
 /*
      COMPUTE THE MODIFIED ASYMPTOTIC SUM
@@ -7951,6 +8070,8 @@ S120:
     if(*a < 0.0e0) Xgamm = 1.0e0/(Xgamm*s)/x;
     return Xgamm;
 }
+
+
 void grat1(double *a,double *x,double *r,double *p,double *q,
 	   double *eps)
 {
@@ -7968,8 +8089,8 @@ static double a2n,a2nm1,am0,an,an0,b2n,b2nm1,c,cma,g,h,j,l,sum,t,tol,w,z,T1,T3;
      THE INPUT ARGUMENT R HAS THE VALUE E**(-X)*X**A/GAMMA(A).
 -----------------------------------------------------------------------
 */
-    if(*a**x == 0.0e0) goto S120;
-    if(*a == 0.5e0) goto S100;
+    if(EQ(*a**x, 0.0e0)) goto S120;
+    if(EQ(*a, 0.5e0)) goto S100;
     if(*x < 1.1e0) goto S10;
     goto S60;
 S10:
@@ -8054,6 +8175,8 @@ S120:
     if(*x <= *a) goto S80;
     goto S90;
 }
+
+
 void gratio(double *a,double *x,double *ans,double *qans,int *ind)
 /*
  ----------------------------------------------------------------------
@@ -8162,8 +8285,8 @@ static double T6,T7;
 */
     e = spmpar(&K1);
     if(*a < 0.0e0 || *x < 0.0e0) goto S430;
-    if(*a == 0.0e0 && *x == 0.0e0) goto S430;
-    if(*a**x == 0.0e0) goto S420;
+    if(EQ(*a, 0.0e0) && EQ(*x, 0.0e0)) goto S430;
+    if(EQ(*a**x, 0.0e0)) goto S420;
     iop = *ind+1;
     if(iop != 1 && iop != 2) iop = 3;
     acc = fifdmax1(acc0[iop-1],e);
@@ -8173,11 +8296,11 @@ static double T6,T7;
             SELECT THE APPROPRIATE ALGORITHM
 */
     if(*a >= 1.0e0) goto S10;
-    if(*a == 0.5e0) goto S390;
+    if(EQ(*a, 0.5e0)) goto S390;
     if(*x < 1.1e0) goto S160;
     t1 = *a*log(*x)-*x;
     u = *a*exp(t1);
-    if(u == 0.0e0) goto S380;
+    if(EQ(u, 0.0e0)) goto S380;
     r = u*(1.0e0+gam1(a));
     goto S250;
 S10:
@@ -8185,9 +8308,9 @@ S10:
     if(*a > *x || *x >= x0) goto S20;
     twoa = *a+*a;
     m = fifidint(twoa);
-    if(twoa != (double)m) goto S20;
+    if(NE(twoa, (double)m)) goto S20;
     i = m/2;
-    if(*a == (double)i) goto S210;
+    if(EQ(*a, (double)i)) goto S210;
     goto S220;
 S20:
     t1 = *a*log(*x)-*x;
@@ -8195,7 +8318,7 @@ S20:
     goto S40;
 S30:
     l = *x/ *a;
-    if(l == 0.0e0) goto S370;
+    if(EQ(l, 0.0e0)) goto S370;
     s = 0.5e0+(0.5e0-l);
     z = rlog(&l);
     if(z >= 700.0e0/ *a) goto S410;
@@ -8208,7 +8331,7 @@ S30:
     t1 -= y;
     r = rt2pin*rta*exp(t1);
 S40:
-    if(r == 0.0e0) goto S420;
+    if(EQ(r, 0.0e0)) goto S420;
     if(*x <= fifdmax1(*a,alog10)) goto S50;
     if(*x < x0) goto S250;
     goto S100;
@@ -8471,6 +8594,8 @@ S430:
     *ans = 2.0e0;
     return;
 }
+
+
 double gsumln(double *a,double *b)
 /*
 -----------------------------------------------------------------------
@@ -8498,6 +8623,8 @@ S20:
     gsumln = gamln1(&T2)+log(x*(1.0e0+x));
     return gsumln;
 }
+
+
 double psi(double *xx)
 /*
 ---------------------------------------------------------------------
@@ -8572,7 +8699,7 @@ static int i,m,n,nq;
 ---------------------------------------------------------------------
 */
     if(fabs(x) > xsmall) goto S10;
-    if(x == 0.0e0) goto S100;
+    if(EQ(x, 0.0e0)) goto S100;
 /*
 ---------------------------------------------------------------------
      0 .LT. ABS(X) .LE. XSMALL.  USE 1/X AS A SUBSTITUTE
@@ -8629,7 +8756,7 @@ S20:
      CHECK FOR SINGULARITY
 ---------------------------------------------------------------------
 */
-    if(z == 0.0e0) goto S100;
+    if(EQ(z, 0.0e0)) goto S100;
 /*
 ---------------------------------------------------------------------
      USE COS/SIN AS A SUBSTITUTE FOR COTAN, AND
@@ -8688,6 +8815,8 @@ S100:
 */
     return 0.0e0;
 }
+
+
 double rcomp(double *a,double *x)
 /*
      -------------------
@@ -8714,13 +8843,15 @@ S10:
     return r_comp;
 S20:
     u = *x/ *a;
-    if(u == 0.0e0) return r_comp;
+    if(EQ(u, 0.0e0)) return r_comp;
     t = pow(1.0e0/ *a,2.0);
     t1 = (((0.75e0*t-1.0e0)*t+3.5e0)*t-105.0e0)/(*a*1260.0e0);
     t1 -= (*a*rlog(&u));
     r_comp = rt2pin*sqrt(*a)*exp(t1);
     return r_comp;
 }
+
+
 double rexp(double *x)
 /*
 -----------------------------------------------------------------------
@@ -8751,6 +8882,8 @@ S20:
     rexp = w*(0.5e0+(0.5e0-1.0e0/w));
     return rexp;
 }
+
+
 double rlog(double *x)
 /*
      -------------------
@@ -8799,6 +8932,8 @@ S40:
     r = *x-0.5e0-0.5e0;
     return r-log(*x);
 }
+
+
 double rlog1(double *x)
 /*
 -----------------------------------------------------------------------
@@ -8847,6 +8982,8 @@ S40:
     w = *x+0.5e0+0.5e0;
     return *x-log(w);
 }
+
+
 double spmpar(int *i)
 /*
 -----------------------------------------------------------------------
@@ -8910,6 +9047,8 @@ S20:
     z = pow(b,(double)(emax-2));
     return w*z*b*b;
 }
+
+
 double stvaln(double *p)
 /*
 **********************************************************************
@@ -8967,6 +9106,8 @@ S20:
     y = sqrt(-(2.0e0*log(z)));
     return sign * (y+devlpl(xnum,&K1,&y)/devlpl(xden,&K1,&y));
 }
+
+
 /************************************************************************
 FIFDINT:
 Truncates a double precision number to an integer and returns the
@@ -8979,6 +9120,8 @@ double fifdint(double a)
   temp = (long)(a);
   return (double)(temp);
 }
+
+
 /************************************************************************
 FIFDMAX1:
 returns the maximum of two numbers a and b
@@ -8990,6 +9133,8 @@ double fifdmax1(double a,double b)
   if (a < b) return b;
   else return a;
 }
+
+
 /************************************************************************
 FIFDMIN1:
 returns the minimum of two numbers a and b
@@ -9001,6 +9146,8 @@ double fifdmin1(double a,double b)
   if (a < b) return a;
   else return b;
 }
+
+
 /************************************************************************
 FIFDSIGN:
 transfers the sign of the variable "sign" to the variable "mag"
@@ -9014,6 +9161,8 @@ double fifdsign(double mag,double sign)
   return mag;
 
 }
+
+
 /************************************************************************
 FIFIDINT:
 Truncates a double precision number to a long integer
@@ -9023,6 +9172,8 @@ long fifidint(double a)
 {
   return (long)(a);
 }
+
+
 /************************************************************************
 FIFMOD:
 returns the modulo of a and b
@@ -9033,6 +9184,8 @@ long fifmod(long a,long b)
 {
   return a % b;
 }
+
+
 /************************************************************************
 FTNSTOP:
 Prints msg to standard error and then exits
