@@ -11,7 +11,8 @@ spam_header_name_SOURCES=spam_header_name.c
 
 t.integrity: dehex dumbhead
 
-TESTSCRIPTS=t.score1 t.score2 t.integrity t.lock1 t.ignore_spam_header \
+TESTSCRIPTS=t.score1 t.score2 t.integrity t.integrity2 \
+	    t.lock1 t.ignore_spam_header \
 	    t.nullstatsprefix t.lexer $(SYSTEM_TESTS)
 TESTS=$(TESTSCRIPTS)
 
