@@ -1,7 +1,12 @@
 /* $Id$ */
 /* 
  * $Log$
+ * Revision 1.7  2002/09/26 17:22:01  relson
+ * Remove unused function prototypes.
+ *
  * Revision 1.6  2002/09/24 04:34:19  gyepi
+ *
+ *
  *  Modified Files:
  *  	Makefile.am  -- add entries for datastore* + and other new files
  *         bogofilter.c bogofilter.h main.c -- fixup to use database abstraction
@@ -49,11 +54,7 @@ typedef struct
 }
 wordlist_t;
 
-extern int read_list(wordlist_t *list);
-extern void write_list(wordlist_t *ham_list);
 extern void register_words(int fd, wordlist_t *list, wordlist_t *other);
-extern int get_token(void);
-extern void lexer_stream_mode(void);
 extern rc_t bogofilter(int fd, double *xss);
 extern int bogodump(char *file);
 
