@@ -2,7 +2,10 @@
 
 			bogofilter TODO list
 
-**** Perhaps implement helper to resize the BerkeleyDB environment.
+**** Perhaps implement helper to resize the Berkeley DB environment.
+
+**** Implement DB_ENV->remove to help Berkeley DB upgrades, and document
+     them.
 
 **** Implement Concurrent Data store, quite similar to Transactional.
 
