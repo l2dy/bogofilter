@@ -113,13 +113,12 @@ static double wordprob_result(wordprop_t* wordstats)
     return (fw);
 }
 
-double lookup_and_score(const word_t *token, wordprop_t *wordstats)
+static double lookup(const word_t *token, wordprop_t *wordstats)
 {
     int override=0;
     wordlist_t* list;
 
-    if (wordstats->bad == 0 && wordstats->good == 0)
-    for (list=word_lists; list != NULL ; list=list->next)
+    for (list=word_lists; list != NULL; list=list->next)
     {
 	size_t i;
 	dsv_t val;
@@ -151,20 +150,29 @@ double lookup_and_score(const word_t *token, wordprop_t *wordstats)
 	    }
 	}
     }
+    return wordstats->prob;
+}
+
+double lookup_and_score(const word_t *token, wordprop_t *wordstats)
+{
+    double prob;
+
+    if (wordstats->bad == 0 && wordstats->good == 0)
+	prob = lookup(token, wordstats);
 
     if (wordstats->bad != 0 || wordstats->good != 0)
-	wordstats->prob = wordprob_result(wordstats);
+	prob = wordprob_result(wordstats);
     else
 	if (!degen_enabled)
-	    wordstats->prob = wordprob_result(wordstats);
+	    prob = wordprob_result(wordstats);
 	else
 	{
 	    degen_enabled = false;	/* Disable further recursion */
-	    wordstats->prob = degen(token, wordstats);
+	    prob = degen(token, wordstats);
 	    degen_enabled = true;	/* Enable further recursion */
 	}
 
-    return wordstats->prob;
+    return prob;
 }
 
 static double compute_probability(const word_t *token, wordprop_t *wordstats)
