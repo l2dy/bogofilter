@@ -1,0 +1,91 @@
+#!/bin/sh
+
+. ${srcdir:=.}/t.frame
+
+set -e
+
+cd t.systest.d
+
+# Note:  This test DOES leave its output files on the hard drive.
+#	 This makes it easier to see what has happened, which is
+#		especially useful when something is different.
+#
+#        In directory t.systest.d are:
+#
+#		tests   - directory containing individual output files
+#		grftest.out - comparison of directories:
+#			      outputs - known correct outputs
+#			      tests   - outputs of the individual tests
+
+if [ "$1" == "-v" ]; then
+    verbose=1
+fi
+
+cat <<EOF > cfg.r
+robx=0.415
+min_dev=0.0
+EOF
+
+cat <<EOF > cfg.f
+robx=0.415
+min_dev=0.1
+EOF
+
+cat /dev/null > cfg.g
+
+BOGOUTIL="../../bogoutil"
+BOGOFILTER="../../bogofilter"
+
+run_test()
+{
+    id="$1"
+    out="$2"
+    ver="$3"
+    OUT="tests/msg.$out.$alg.$ver"
+    wd=`pwd`
+    $BOGOFILTER -$alg -t -$ver -c cfg.$alg < inputs/msg.$id.txt 2> /dev/null > tests-$alg
+    sed s/,.version=.*// < tests-$alg > $OUT
+}
+
+[   -d tests ] && rm -f tests/*
+[ ! -d tests ] && mkdir tests
+
+pwd
+
+for alg in r f g ; do
+    BOGOFILTER_DIR="tests.$alg"
+    export BOGOFILTER_DIR
+    [   -d $BOGOFILTER_DIR ] && rm -f $BOGOFILTER_DIR/*
+    [ ! -d $BOGOFILTER_DIR ] && mkdir $BOGOFILTER_DIR
+    $BOGOFILTER -$alg -s < inputs/spam.mbx
+    $BOGOFILTER -$alg -n < inputs/good.mbx
+    #
+    # run tests for msg.[1-8].txt
+    #
+    for msg in inputs/msg.?.txt ; do
+	tst=`echo $msg | sed s@inputs/msg.@@ | sed s@.txt@@`
+	args="$tst $tst v"
+	run_test $args
+    done
+
+    rm -f tests-$alg
+done
+
+OUT="grftest.out"
+
+printf "%2s     %-10s   %-10s   %-10s\n" id graham robinson fisher > tests/$OUT
+for out in tests/msg.?.r.v ; do
+    id=`echo $out | sed s@tests/msg.@@ | sed s@.r.v@@`
+    g=`cat tests/msg.$id.g.v | tr "NY" "hS"`
+    r=`cat tests/msg.$id.r.v | tr "NY" "hS"`
+    f=`cat tests/msg.$id.f.v | tr "NY" "hS"`
+    printf "%2s   %c %s   %c %s   %c %s\n" $id $g $r $f >> tests/$OUT
+done
+
+if test x$SUPPRESS_DELETE != x ; then rm -rf t.systest.d/cfg.?; fi"
+
+if  [ "$verbose" == "1" ]; then
+    diff -u -s outputs/$OUT tests/$OUT
+fi
+
+cmp outputs/$OUT tests/$OUT
