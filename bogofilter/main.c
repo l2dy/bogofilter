@@ -1,6 +1,21 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.11  2002/09/24 04:34:19  gyepi
+ *  Modified Files:
+ *  	Makefile.am  -- add entries for datastore* + and other new files
+ *         bogofilter.c bogofilter.h main.c -- fixup to use database abstraction
+ *
+ *  Added Files:
+ *  	datastore_db.c datastore_db.h datastore.h -- database abstraction. Also implements locking
+ * 	xmalloc.c xmalloc.h -- utility
+ *  	bogoutil.c  -- dump/restore utility.
+ *
+ * 1. Implements database abstraction as discussed.
+ *    Also implements multiple readers/single writer file locking.
+ *
+ * 2. Adds utility to dump/restore databases.
+ *
  * Revision 1.10  2002/09/23 11:34:30  relson
  * Modify passthrough code so that X-Spam-Status line will also print in verbose mode.
  *
@@ -59,33 +74,30 @@ AUTHOR:
 #include <sys/syslog.h>
 #endif
 #include "bogofilter.h"
+#include "datastore.h"
 
 #define BOGODIR		"/.bogofilter/"
 #define HAMFILE		"hamlist.db"
 #define SPAMFILE	"spamlist.db"
 
-#define HAMCOUNTFILE	"hamlist.count"
-#define SPAMCOUNTFILE	"spamlist.count"
-
 int verbose, passthrough;
 
 int main(int argc, char **argv)
 {
-    int	ch, dump = 0;
+    int	ch;
     int register_spam = 0, register_ham = 0;
     int spam_to_ham = 0, ham_to_spam = 0;
     char	hamfile[PATH_MAX], spamfile[PATH_MAX], directory[PATH_MAX];
-    char	hamcountfile[PATH_MAX], spamcountfile[PATH_MAX];
     char	*tmp;
     struct stat sb;
-    int readerror=0;
+    int exitcode = 0;
 
     if ( (tmp = getenv("HOME")) != NULL ) {
     	strcpy(directory, tmp );
     }
     strcat(directory, BOGODIR);
 
-    while ((ch = getopt(argc, argv, "d:shSHvVpl")) != EOF)
+    while ((ch = getopt(argc, argv, "d:shSHvVp")) != EOF)
 	switch(ch)
 	{
 	case 'd':
@@ -127,10 +139,6 @@ int main(int argc, char **argv)
 	case 'p':
 	    passthrough = 1;
 	    break;
-
-	case 'l':
-	    dump = 1;
-	    break;
 	}
 
 
@@ -150,55 +158,34 @@ int main(int argc, char **argv)
     strcat(spamfile, SPAMFILE);
     spam_list.file = spamfile;
 
-    strcpy(hamcountfile, directory);
-    strcat(hamcountfile, HAMCOUNTFILE);
-    ham_list.count_file = hamcountfile;
 
-    strcpy(spamcountfile, directory);
-    strcat(spamcountfile, SPAMCOUNTFILE);
-    spam_list.count_file = spamcountfile;
-
-    readerror += read_list(&ham_list);
-    readerror += read_list(&spam_list);
-
-    /* readerror is ok, but only if using register_* modes */
-    if (readerror && ! (register_spam || register_ham)) {
-	fprintf(stderr, "Error: can't open list file(s).\n");
-	exit(2);
+    if ( (ham_list.dbh = db_open(ham_list.file, ham_list.name)) == NULL){
+      fprintf(stderr, "bogofilter: Cannot initialize database %s.\n", ham_list.name);
+      exit(2);
     }
-
-    if (dump)
-    {
-	if (register_ham)
-	    bogodump(hamfile);
-	else if (register_spam)
-	    bogodump(spamfile);
+    
+    if ( (spam_list.dbh = db_open(spam_list.file, spam_list.name)) == NULL){
+      fprintf(stderr, "bogofilter: Cannot initialize database %s.\n", spam_list.name);
+      db_close(ham_list.dbh);
+      exit(2);
     }
-    else if (register_spam)
+   
+
+    if (register_spam)
     {
 	register_words(STDIN_FILENO, &spam_list, NULL);
-	write_list(&spam_list);
-	if (verbose)
-	    printf("bogofilter: %lu messages on the spam list\n", spam_list.msgcount);
     }
     else if (register_ham)
     {
 	register_words(STDIN_FILENO, &ham_list, NULL);
-	write_list(&ham_list);
-	if (verbose)
-	    printf("bogofilter: %lu messages on the ham list\n", ham_list.msgcount);
     }
     else if (spam_to_ham)
     {
 	register_words(STDIN_FILENO, &ham_list, &spam_list);
-	write_list(&ham_list);
-	write_list(&spam_list);
     }
     else if (ham_to_spam)
     {
 	register_words(STDIN_FILENO, &spam_list, &ham_list);
-	write_list(&ham_list);
-	write_list(&spam_list);
     }
     else
     {
@@ -237,10 +224,14 @@ int main(int argc, char **argv)
 		(void) fputs(textend->block, stdout);
 	    }
 	}
-	exit(status);
+
+        exitcode = status;
     }
 
-    exit(0);
+    db_close(spam_list.dbh);
+    db_close(ham_list.dbh);
+
+    exit(exitcode);
 }
 
 // End

@@ -1,5 +1,20 @@
 # $Id$ 
 # $Log$
+# Revision 1.10  2002/09/24 04:34:19  gyepi
+#  Modified Files:
+#  	Makefile.am  -- add entries for datastore* + and other new files
+#         bogofilter.c bogofilter.h main.c -- fixup to use database abstraction
+#
+#  Added Files:
+#  	datastore_db.c datastore_db.h datastore.h -- database abstraction. Also implements locking
+# 	xmalloc.c xmalloc.h -- utility
+#  	bogoutil.c  -- dump/restore utility.
+#
+# 1. Implements database abstraction as discussed.
+#    Also implements multiple readers/single writer file locking.
+#
+# 2. Adds utility to dump/restore databases.
+#
 # Revision 1.9  2002/09/18 23:33:48  relson
 # Added lexer.h to bogofilter_SOURCES list.
 #
@@ -39,15 +54,18 @@
 AUTOMAKE_OPTIONS = foreign 1.6
 
 # what to build
-bin_PROGRAMS = bogofilter
+bin_PROGRAMS = bogofilter bogoutil
 noinst_PROGRAMS = lexertest
 man1_MANS = bogofilter.1
 
 # what to build that from
-bogofilter_SOURCES = bogofilter.c bogofilter.h lock.c lock.h main.c lexer_l.l lexer.h
+bogofilter_SOURCES = bogofilter.c bogofilter.h lock.c lock.h main.c lexer_l.l lexer.h \
+		     datastore.h datastore_db.h datastore_db.c xmalloc.h xmalloc.c
 
 lexertest_SOURCES = lexer_l.l
 lexertest_CFLAGS = -DMAIN
+
+bogoutil_SOURCES = bogoutil.c datastore.h datastore_db.h datastore_db.c xmalloc.h xmalloc.c
 
 # what to distribute
 EXTRA_DIST = $(man1_MANS) \

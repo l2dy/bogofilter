@@ -1,6 +1,21 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.16  2002/09/24 04:34:19  gyepi
+ *  Modified Files:
+ *  	Makefile.am  -- add entries for datastore* + and other new files
+ *         bogofilter.c bogofilter.h main.c -- fixup to use database abstraction
+ *
+ *  Added Files:
+ *  	datastore_db.c datastore_db.h datastore.h -- database abstraction. Also implements locking
+ * 	xmalloc.c xmalloc.h -- utility
+ *  	bogoutil.c  -- dump/restore utility.
+ *
+ * 1. Implements database abstraction as discussed.
+ *    Also implements multiple readers/single writer file locking.
+ *
+ * 2. Adds utility to dump/restore databases.
+ *
  * Revision 1.15  2002/09/23 11:35:51  m-a
  * Fix GCC 3.2 warnings.
  *
@@ -108,250 +123,16 @@ I do the lexical analysis slightly differently, however.
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
 #define min(x, y)	(((x) < (y)) ? (x) : (y))
 
-wordlist_t ham_list	= {"ham", NULL, 0, NULL, NULL};
-wordlist_t spam_list	= {"spam", NULL, 0, NULL, NULL};
+wordlist_t ham_list	= {"ham", NULL, 0, NULL};
+wordlist_t spam_list	= {"spam", NULL, 0, NULL};
 
 #define	PLURAL(count) ((count == 1) ? "" : "s")
 
-#define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
-#define char2DBT(dbt,ptr) do { dbt.data = ptr; dbt.size = strlen(ptr); } while(0)
-
-#define x2DBT(dbt,val,type)  do { dbt.data = &val; dbt.size = sizeof(type); } while(0)
-
-#define long2DBT(dbt,val) x2DBT(dbt,val,long)  
-#define int2DBT(dbt,val)  x2DBT(dbt,val,int)
-
-long get_word_value(char *word, wordlist_t *list)
+static void strlwr(char* s)
 {
-    DB *dbp;
-    DBT key;
-    DBT data;
-    int ret;
-
-    DBT_init(key);
-    DBT_init(data);
-
-    char2DBT(key, word);
-
-    dbp = list->db;
-	
-    if ((ret = dbp->get(dbp, NULL, &key, &data, 0)) == 0){
-	return(*(long *)data.data);
-    }
-    else if (ret == DB_NOTFOUND){
-	return(0);
-    }
-    else {
-	dbp->err (dbp, ret, "bogofilter (get_word_value): %s", word);
-	exit(2);
-    }
-}
-
-void set_word_value(char *word, long value, wordlist_t *list)
-{
-    DB *dbp;
-    DBT key;
-    DBT data;
-    int ret;
-
-    DBT_init(key);
-    DBT_init(data);
-
-    char2DBT(key, word);
-    long2DBT(data, value);
-        
-    dbp = list->db;
-
-    if ((ret = dbp->put(dbp, NULL, &key, &data,0)) == 0){
-	if (verbose >= 3)
-            (void) printf("\"%s\" stored %ld time%s\n", word, value, PLURAL(value));
-    }
-    else 
-    {
-	dbp->err (dbp, ret, "bogofilter (set_word_value): %s", word);
-	exit(2);
-    }
-}
-
-static void increment(char *word,  long incr, wordlist_t *list)
-/* increment a word usage count in the specified list */
-{
-  long count = get_word_value(word, list) + incr;
-  count = max(count, 0);
- 
-  set_word_value(word, count, list);
-
-  if (verbose >= 1) {
-    printf("increment: '%s' has %lu hits\n",word,count);
-  }
-}
-
-static int getcount(char *word, wordlist_t *list)
-/* get the count associated with a given word in a list */
-{
-  long value = get_word_value(word, list);
-
-  if (value){
-    if (verbose >= 2)
-      printf("getcount: '%s' has %ld %s hits in %ld\n", word, value, list->name, list->msgcount);
-  }
-  else {
-      if (verbose >= 3)
-	  printf("getcount: no %s hits for %s\n", list->name, word);
-  }
-
-  return value; 
-}
-
-int read_count(wordlist_t *list)
-/* Reads count of emails, if any. */ 
-{
-    FILE	*infp;
-
-    list->msgcount = 0;
-
-    infp = fopen(list->count_file, "r");   /* Open file for reading */
-
-    if (infp == NULL)
-	return 1;
-
-    lock_fileno(fileno(infp), LOCK_SH);    /* Lock the fole before reading */
-    fscanf(infp, HEADER, &list->msgcount); /* Read contents from the file */
-    unlock_fileno(fileno(infp));           /* Release the lock */
-    fclose(infp);
-    return 0;
-}
-
-
-void write_count(wordlist_t *list)
-/* dump the count of emails to a specified file */
-{
-    FILE	*outfp;
-
-    outfp = fopen(list->count_file, "a+"); /* First open for append */
-
-    if (outfp == NULL)
-    {
-	fprintf(stderr, "bogofilter (write_count): cannot open file %s. %m", 
-		list->count_file);
-	exit(2);
-    }
-
-    /* Lock file before modifying it to avoid a race condition with other
-     * bogofilter instances that may want to read/modify this file */
-    lock_fileno(fileno(outfp), LOCK_EX);   /* Lock the file for writing */
-    freopen(list->count_file, "w", outfp); /* Empty the file, ready to write */
-    (void) fprintf(outfp, HEADER, list->msgcount);
-    unlock_fileno(fileno(outfp));          /* Unlock the file */
-    fclose(outfp);
-
-}
-
-
-int read_list(wordlist_t *list)
-/* initialize database */
-/* return 0 if successful, and 1 if it was unsuccessful. */
-{
-    int ret;
-    int fdp; /* for holding the value of the db file descriptor */
-    DB *dbp;
-    list->file = strdup(list->file);
-
-    dbp = malloc(sizeof(DB));
-    
-    if (dbp == NULL){
-	fprintf(stderr, "bogofilter (readlist): out of memory\n");
-	return 1;
-    }
-    
-    if ((ret = db_create (&dbp, NULL, 0)) != 0){
-	   fprintf (stderr, "bogofilter (db_create): %s\n", db_strerror (ret));
-	   return 1;
-    }
-
-    /* Lock the database file */
-    if(dbp->fd(dbp, &fdp) == 0) {           /* Get file descriptor to lock */
-    	if(lock_fileno(fdp,LOCK_SH) != 0) { /* Get a shared lock */
-		return(1);                  /* Lock attempt failed */
-	}
-    }
-
-    if ((ret = dbp->open (dbp, list->file, NULL, DB_BTREE, DB_CREATE, 0664)) != 0){
-           dbp->err (dbp, ret, "open: %s", list->file);
-	   return 1;
-    }
-
-    list->db = dbp;
-    read_count(list);
-    
-    return 0;
-}
-
-void write_list(wordlist_t *list)
-/* close database */
-{
-    int fdp; /* for holding the value of the db file descriptor */
-    DB *db = list->db;
-
-    write_count(list);
-
-    /* Unock the database file */
-    if(db->fd(db, &fdp) == 0) { /* Get file descriptor to unlock */
-    	unlock_fileno(fdp);     /* Release lock */
-    }
-
-    db->close(db, 0);
-}
-
-int bogodump(char *file)
-/* dump state of database */
-{
-    int ret;
-    DB db;
-    DB *dbp;
-    DBC dbc;
-    DBC *dbcp;
-    DBT key, data;
-  
-    dbp = &db;
-    dbcp = &dbc;
-
-    if ((ret = db_create (&dbp, NULL, 0)) != 0)
-    {
-	fprintf (stderr, "bogodump (db_create): %s\n", db_strerror (ret));
-	return 1;
-    }
-
-    if ((ret = dbp->open (dbp, file, NULL, DB_BTREE, 0, 0)) != 0)
-    {
-	dbp->err (dbp, ret, "bogodump (open): %s", file);
-	return 1;
-    }
-
-    if ((ret = dbp->cursor (dbp, NULL, &dbcp, 0) != 0))
-    {
-	dbp->err (dbp, ret, "bogodump (cursor): %s", file);
-	return 1;
-    }
-
-    memset (&key, 0, sizeof (DBT));
-    memset (&data, 0, sizeof (DBT));
-
-    for (;;)
-    {
-	ret = dbcp->c_get (dbcp, &key, &data, DB_NEXT);
-	if (ret == 0){
-	    printf ("%.*s:%lu\n",key.size, (char *)key.data, *(unsigned long *)data.data);
-	}
-	else if (ret == DB_NOTFOUND){
-	    break;
-	}
-	else {
-	    dbp->err (dbp, ret, "bogodump (c_get)");
-	    break;
-	}
-    }
-    return 0;
+    char c;
+    while((c = *s) != 0)
+	*s++ = tolower(c);
 }
 
 void register_words(int fdin, wordlist_t *list, wordlist_t *other)
@@ -365,9 +146,18 @@ void register_words(int fdin, wordlist_t *list, wordlist_t *other)
     void	**loc;
     char	tokenbuffer[BUFSIZ];
 
+    //FIXME -- The database locking time can be minized by using a hash table.
+    db_lock_writer(list->dbh);
+    if (other)
+      db_lock_writer(other->dbh);
+
     // Grab tokens from the lexical analyzer into our own private Judy array
     yyin = fdopen(fdin, "r");
-    wordcount = msgcount = 0;
+    msgcount = wordcount = 0;
+
+    list->msgcount = db_getcount(list->dbh);
+    if (other) other->msgcount = db_getcount(other->dbh);
+
     for (;;)
     {
 	tok = get_token();
@@ -386,7 +176,7 @@ void register_words(int fdin, wordlist_t *list, wordlist_t *other)
 	    if (tok == FROM || (tok == 0 && msgcount == 0))
 	    {
 		list->msgcount++;
-		msgcount++;
+                msgcount++;
 		if (other && other->msgcount > 0)
 		    other->msgcount--;
 	    }
@@ -403,9 +193,9 @@ void register_words(int fdin, wordlist_t *list, wordlist_t *other)
 		if (freq > MAX_REPEATS)
 		    freq = MAX_REPEATS;
 
-		increment(tokenbuffer, freq, list);
+		db_increment(list->dbh, tokenbuffer, freq);
 		if (other)
-		    increment(tokenbuffer, -freq, other);
+		    db_increment(other->dbh, tokenbuffer, -freq);
 	    }
 	    JudySLFreeArray(&PArray, &JError);
 	    PArray = (Pvoid_t)NULL;
@@ -418,6 +208,22 @@ void register_words(int fdin, wordlist_t *list, wordlist_t *other)
 		break;
 	}
     }
+
+    db_setcount(list->dbh, list->msgcount);
+    db_flush(list->dbh);
+    if (verbose)
+       fprintf(stderr, "bogofilter: %lu messages on the %s list\n", list->msgcount, list->name);
+
+    if (other){
+	   	 db_setcount(other->dbh, other->msgcount);
+		 if (verbose)
+		      fprintf(stderr, "bogofilter: %lu messages on the %s list\n", other->msgcount, other->name);
+
+		 db_flush(other->dbh);
+    		 db_lock_release(other->dbh);
+    }
+    
+    db_lock_release(list->dbh);
 }
 
 #ifdef __UNUSED__
@@ -483,9 +289,9 @@ void *collect_words(int fd)
 double compute_probability( char *token )
 {
     double prob, hamness, spamness;
-
-    hamness = getcount(token, &ham_list);
-    spamness = getcount(token, &spam_list);
+    
+    hamness = db_getvalue(ham_list.dbh, token);
+    spamness = db_getvalue(spam_list.dbh, token);
 
 #ifdef NON_EQUIPROBABLE
     // There is an argument that we should by by number of *words* here.
@@ -543,7 +349,7 @@ bogostat_t *select_indicators(void  *PArray)
  	pp->prob = 0.5f;
  	pp->key[0] = '\0';
     }
- 
+    
     for (loc  = JudySLFirst(PArray, tokenbuffer, 0);
 	 loc != (void *) NULL;
 	 loc  = JudySLNext(PArray, tokenbuffer, 0))
@@ -599,11 +405,11 @@ double compute_spamicity(bogostat_t *stats)
 	    invproduct *= (1 - pp->prob);
 	    spamicity = product / (product + invproduct);
 	    if (verbose>1)
-		printf("#  %f  %f  %s\n", pp->prob, spamicity, pp->key);
+		fprintf(stderr, "#  %f  %f  %s\n", pp->prob, spamicity, pp->key);
 	}
 
     if (verbose)
-	printf("#  Spamicity of %f\n", spamicity);
+	fprintf(stderr, "#  Spamicity of %f\n", spamicity);
 
     return spamicity;
 }
@@ -618,12 +424,21 @@ rc_t bogofilter(int fd, double *xss)
 
 //  tokenize input text and save words in a Judy array.
     PArray = collect_words(fd);
-    
+
+    db_lock_reader(ham_list.dbh);
+    db_lock_reader(spam_list.dbh);
+
+    ham_list.msgcount = db_getcount(ham_list.dbh);
+    spam_list.msgcount = db_getcount(spam_list.dbh);
+
 //  select the best spam/nonspam indicators.
     stats = select_indicators(PArray);
     
 //  computes the spamicity of the spam/nonspam indicators.
     spamicity = compute_spamicity(stats);
+
+    db_lock_release(spam_list.dbh);
+    db_lock_release(ham_list.dbh);
 
     status = (spamicity > SPAM_CUTOFF) ? RC_SPAM : RC_NONSPAM;
 

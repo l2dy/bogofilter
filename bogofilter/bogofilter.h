@@ -1,6 +1,21 @@
 /* $Id$ */
 /* 
  * $Log$
+ * Revision 1.6  2002/09/24 04:34:19  gyepi
+ *  Modified Files:
+ *  	Makefile.am  -- add entries for datastore* + and other new files
+ *         bogofilter.c bogofilter.h main.c -- fixup to use database abstraction
+ *
+ *  Added Files:
+ *  	datastore_db.c datastore_db.h datastore.h -- database abstraction. Also implements locking
+ * 	xmalloc.c xmalloc.h -- utility
+ *  	bogoutil.c  -- dump/restore utility.
+ *
+ * 1. Implements database abstraction as discussed.
+ *    Also implements multiple readers/single writer file locking.
+ *
+ * 2. Adds utility to dump/restore databases.
+ *
  * Revision 1.5  2002/09/23 11:31:53  m-a
  * Unnest comments, and move $ line down by one to prevent CVS from adding nested comments again.
  *
@@ -28,10 +43,9 @@ typedef enum rc_e {RC_SPAM=0, RC_NONSPAM=1}  rc_t;
 typedef struct 
 {
     char *name;			// resource name (for debug/verbose messages)
-    void *db;			// database handle 
+    void *dbh;			// database handle 
     unsigned long msgcount;	// count of messages in wordlist.
     char *file;			// associated  file
-    char *count_file;           // file for counting emails
 }
 wordlist_t;
 
