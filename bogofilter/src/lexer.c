@@ -214,9 +214,14 @@ static int get_decoded_line(buff_t *buff)
     if (count >= 5
 	&& memcmp("From ", buf, 5) != 0
 	&& !msg_header && !msg_state->mime_header
-	&& msg_state->mime_type != MIME_TYPE_UNKNOWN) {
-	word_t line = { buff->t.leng-used, buff->t.text+used };
-	int decoded_count = mime_decode(&line);
+	&& msg_state->mime_type != MIME_TYPE_UNKNOWN)
+    {
+	word_t line;
+	int decoded_count;
+
+        line.leng = buff->t.leng - used;
+	line.text = buff->t.text + used;
+	decoded_count = mime_decode(&line);
 	/*change buffer size only if the decoding worked */
 	if (decoded_count != 0 && decoded_count < count) {
 	    buff->t.leng -= count - decoded_count;
