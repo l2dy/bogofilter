@@ -64,7 +64,10 @@ void collect_words(wordhash_t *wh)
 	}
 
 	w = wordhash_insert(wh, token, sizeof(wordprop_t), &wordprop_init);
-	if (w->freq < max_repeats) w->freq++;
+	if (wh->type != WH_CNTS &&
+	    w->freq < max_repeats) 
+	    w->freq += 1;
+
 	wh->wordcount += 1;
 	if (DEBUG_WORDLIST(3)) { 
 	    fprintf(dbgout, "%3d ", (int) wh->wordcount);
