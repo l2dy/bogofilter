@@ -188,12 +188,7 @@ int maintain_wordlist_file(const char *db_file)
 	rc = maintain_wordlist(dsh);
 
     if (!done && upgrade_wordlist_version)
-    {
-	dsv_t val;
-	val.count[0] = CURRENT_VERSION;
-	val.count[1] = 0;
-	ds_set_wordlist_version(dsh, &val);
-    }
+	ds_set_wordlist_version(dsh, NULL);
 
     ds_close(dsh, false);
     ds_cleanup();
