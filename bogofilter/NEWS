@@ -4,6 +4,11 @@
 
 $Id$
      
+0.10.1.2 2003-01-25
+
+	* Config file example updated.
+	* Fixed additional problems in parsing html.
+
 0.10.1.1 2003-01-25
 
 	* Fixed problems in parsing html and processing config file options.
