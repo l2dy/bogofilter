@@ -179,6 +179,8 @@ user_config_file=~/.bogofilter.cf
 # for robinson or fisher (with binary state)
 #	using "Yes" and "No" as labels.
 #
+# algorithm=robinson
+# algorithm=fisher
 # ham_cutoff = 0.0
 # spamicity_tags = Yes, No
 # spamicity_formats = %0.6f, %0.6f
@@ -189,6 +191,7 @@ user_config_file=~/.bogofilter.cf
 #	format "%6.2e" for displaying Spam/Ham scores.
 #	and format "%0.6f" for Unsure scores.
 #
+# algorithm=fisher
 # ham_cutoff = 0.10
 # spamicity_tags = Spam, Ham, Unsure 
 # spamicity_formats = %6.2e, %6.2e, %0.6f 
