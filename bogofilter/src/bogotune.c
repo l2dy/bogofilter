@@ -11,6 +11,35 @@ AUTHOR:
 
 ******************************************************************************/
 
+/* To allow tuning of large corpora, the memory use must be minimized
+** for each messages.  Given the wordlist in ram, foreach token of a
+** test message bogotune only needs to know its spam and ham counts.
+**
+** 1. external wordlist ("-d") flag
+**    a. read wordlist.db
+**    b. read messages for test set
+**       1. lookup words in wordlist
+**       2. discard words
+**    c. replace wordhashs with wordcnts
+**    d. de-allocate resident wordlist
+** 
+** 2. internal wordlist ("-D") flag
+**    a. read all messages
+**    b. distribute messages
+**        1. proper pct to wordlist
+**        2. proper pct to test set
+** 	  2a. create wordprops from wordlists
+**    c. replace wordprops with wordcnts
+**    d. de-allocate resident wordlist
+*/
+
+/* Limitations:
+**
+**	If all the input messages are in msg-count format,
+**	bogotune will use default ROBX value since an external
+**	wordlist is needed to compute a real robx value.
+*/
+
 #include "common.h"
 
 #include <math.h>
@@ -62,6 +91,7 @@ const char *progname = "bogotune";
 char *ds_file;
 
 uint target = 0;
+uint memdebug = 0;
 uint max_messages_per_mailbox = 0;
 
 extern double robx, robs;
@@ -73,6 +103,10 @@ wordlist_t *ns_and_sp;
 wordlist_t *ns_msglists, *sp_msglists;
 
 flhead_t *spam_files, *ham_files;
+
+#ifdef	ENABLE_MEMDEBUG
+extern uint32_t dbg_trap_index;
+#endif
 
 typedef struct {
     uint cnt;
@@ -268,9 +302,13 @@ static void score_ns(double *results)
 
 static bool check_for_high_ns_scores(void)
 {
+    double percent = 0.0025;
+    target = ceil(ns_cnt * percent);
+
     score_ns(ns_scores);	/* scores in ascending order */
     qsort(ns_scores, ns_cnt, sizeof(double), compare_double);
-    if (ns_scores[ns_cnt-1] < SPAM_CUTOFF)
+
+    if (ns_scores[ns_cnt-target] < SPAM_CUTOFF)
 	return false;
     else {
 	fprintf(stderr, "Error - high scoring non-spam.\n");
@@ -319,9 +357,13 @@ static uint get_fn_count(uint count, double *results)
 
 static bool check_for_low_sp_scores(void)
 {
+    double percent = 0.0025;
+    target = ceil(sp_cnt * percent);
+
     score_sp(sp_scores);	/* scores in ascending order */
     qsort(sp_scores, sp_cnt, sizeof(double), compare_double);
-    if (sp_scores[0] > HAM_CUTOFF)
+
+    if (sp_scores[target] > HAM_CUTOFF)
 	return false;
     else {
 	fprintf(stderr, "Error - low scoring spam.\n");
@@ -387,8 +429,8 @@ static uint get_thresh(uint count, double *scores)
 static uint read_mailbox(char *arg)
 {
     uint count = 0;
-    wordlist_t *ns_or_sp = (run_type == REG_GOOD) ? ns_msglists : sp_msglists;
     wordhash_t *train = ns_and_sp->train;
+    wordlist_t *ns_or_sp = (run_type == REG_GOOD) ? ns_msglists : sp_msglists;
 
     if (verbose) {
 	printf("Reading %s\n", arg);
@@ -398,13 +440,15 @@ static uint read_mailbox(char *arg)
     mbox_mode = true;
     bogoreader_init(1, &arg);
     while ((*reader_more)()) {
-	wordhash_t *whi, *whs;
+	wordhash_t *whc, *whp;
 
-	whi = wordhash_new();
-	collect_words(whi);
+	whc = wordhash_new();
+	collect_words(whc);
 
-	whs = wordhash_convert_to_countlist(whi, train);
-	msglist_add(ns_or_sp->msgs, whs);
+	whp = convert_wordhash_to_propslist(whc, train);
+	msglist_add(ns_or_sp->msgs, whp);
+
+	wordhash_free(whc);
 
 	if (verbose && (count % 100) == 0) {
 	    if ((count % 1000) != 0)
@@ -419,8 +463,6 @@ static uint read_mailbox(char *arg)
 	if (max_messages_per_mailbox != 0 &&
 	    count > max_messages_per_mailbox)
 	    break;
-
-	wordhash_free(whi);
     }
 
     ns_and_sp->count += count;
@@ -457,11 +499,11 @@ static uint filelist_read(int mode, flhead_t *list)
 **	In between 2500 and 4000, do a proportional distribution.
 */
 
-static void distribute(int mode)
+static void distribute(int mode, wordlist_t *ns_or_sp)
 {
     int good = mode == REG_GOOD;
     int bad  = 1 - good;
-    wordlist_t *ns_or_sp = good ? ns_msglists : sp_msglists;
+
     wordhash_t *train = ns_and_sp->train;
     mlhead_t *list = ns_or_sp->msgs;
     mlitem_t *item;
@@ -497,10 +539,10 @@ static void distribute(int mode)
 	if ((ds_file == NULL) && (train_count / ratio < score_count + 1)) {
 	    wordhash_set_counts(wh, good, bad);
 	    wordhash_add(train, wh, &wordprop_init);
-	    wordhash_free(wh);
 	    train_count += 1;
 	    msg_count->cnts.good += good;
 	    msg_count->cnts.bad  += bad;
+	    wordhash_free(wh);
 	}
 	/* scoring set  */
 	else {
@@ -508,6 +550,25 @@ static void distribute(int mode)
 	    score_count += 1;
 	}
 	item->wh = NULL;
+    }
+
+    return;
+}
+
+static void create_countlists(wordlist_t *ns_or_sp)
+{
+    uint i;
+    uint c = COUNTOF(ns_or_sp->u.sets);
+    for (i=0; i<c; i += 1) {
+	mlhead_t *list = ns_or_sp->u.sets[i];
+	mlitem_t *item;
+
+	for (item = list->head; item != NULL; item = item->next) {
+	    wordhash_t *who = item->wh;
+	    wordhash_t *whn = convert_propslist_to_countlist(who);
+	    wordhash_free(who);
+	    item->wh = whn;
+	}
     }
 
     return;
@@ -588,6 +649,13 @@ static int process_args(int argc, char **argv)
 #ifdef	ENABLE_MEMDEBUG
 		case 'm':
 		    memtrace += 1;
+		    break;
+		case 'M': 
+		    memdebug += 1;
+		    if ( argv[1][0] != '-') {
+			argc -= 1;
+			dbg_trap_index=atoi(*++argv);
+		    }
 		    break;
 #endif
 		default:
@@ -693,7 +761,10 @@ static double robx_compute(wordhash_t *wh)
 
     wordhash_foreach(wh, robx_accum, &rh);
 
-    rx = rh.sum/rh.count;
+    if (rh.count == 0)
+	rx = ROBX;
+    else
+	rx = rh.sum/rh.count;
 
     if (verbose > 1) {
 	printf("%s: %lu, %lu\n",
@@ -950,13 +1021,37 @@ static void bogotune_free(void)
     return;
 }
 
+static void get_msg_counts(void)
+{
+    wordprop_t *props = wordhash_insert(ns_and_sp->train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
+    msgs_good = props->cnts.good;
+    msgs_bad  = props->cnts.bad;
+
+    if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
+	fprintf(stderr, 
+		"The wordlist contains %u non-spam and %u spam messages.\n"
+		"Bogotune must be run with at least %d of each.\n",
+		msgs_good, msgs_bad, LIST_COUNT);
+	exit(EX_ERROR);
+    }
+
+    if (msgs_bad < msgs_good / 5 ||
+	msgs_bad > msgs_good * 5) {
+	fprintf(stderr,
+		"The wordlist has a ratio of spam to non-spam of %0.1f to 1.0.\n"
+		"Bogotune requires the ratio be in the range of 0.2 to 5.\n",
+		msgs_bad * 1.0 / msgs_good);
+	exit(EX_ERROR);
+    }
+
+    return;
+}
+
 static rc_t bogotune(void)
 {
     int beg, end;
     uint cnt, scan;
     rc_t status = RC_OK;
-
-    wordprop_t *props;
 
     bogotune_init();
 
@@ -968,41 +1063,38 @@ static rc_t bogotune(void)
     ham_cutoff = 0.0;
     spam_cutoff = 0.1;
 
+    if (memdebug) MEMDISPLAY;
+
+    /* Note: memory usage highest while reading messages */
+    /* usage decreases as distribute() converts to count format */
+
     /* read all messages, merge training sets, look up scoring sets */
     ns_cnt = filelist_read(REG_GOOD, ham_files);
     sp_cnt = filelist_read(REG_SPAM, spam_files);
 
-    distribute(REG_GOOD);
-    distribute(REG_SPAM);
+    if (memdebug) MEMDISPLAY;
+
+    distribute(REG_GOOD, ns_msglists);
+    distribute(REG_SPAM, sp_msglists);
+
+    if (memdebug) MEMDISPLAY;
+
+    create_countlists(ns_msglists);
+    create_countlists(sp_msglists);
+
+    if (memdebug) MEMDISPLAY;
 
     end = time(NULL);
 
     if (verbose) {
 	int tm = end - beg;
 	cnt = ns_cnt + sp_cnt;
-	printf("    %2dm:%02ds for %d messages.  avg - %5.1f msg/sec\n",
+	printf("    %2dm:%02ds for %d messages.  avg: %5.1f msg/sec\n",
 	       MIN(tm), SECONDS(tm), cnt, (double)cnt/(tm));
     }
 
     if (msgs_good == 0 && msgs_bad == 0) {
-	props = wordhash_insert(ns_and_sp->train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
-	msgs_good = props->cnts.good;
-	msgs_bad  = props->cnts.bad;
-	if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
-	    fprintf(stderr, 
-		    "The wordlist contains %u non-spam and %u spam messages.\n"
-		    "Bogotune must be run with at least %d of each.\n",
-		    msgs_good, msgs_bad, LIST_COUNT);
-	    exit(EX_ERROR);
-	}
-	if (msgs_bad < msgs_good / 5 ||
-	    msgs_bad > msgs_good * 5) {
-	    fprintf(stderr,
-		    "The wordlist has a ratio of spam to non-spam of %0.1f to 1.0.\n"
-		    "Bogotune requires the ratio be in the range of 0.2 to 5.\n",
-		    msgs_bad * 1.0 / msgs_good);
-	    exit(EX_ERROR);
-	}
+	get_msg_counts();
     }
 
     if (verbose > 3) {
@@ -1014,7 +1106,7 @@ static rc_t bogotune(void)
     ns_cnt = count_messages(ns_msglists);
     sp_cnt = count_messages(sp_msglists);
 
-    if (ns_cnt < TEST_COUNT || sp_cnt < TEST_COUNT) {
+    if (!force && (ns_cnt < TEST_COUNT || sp_cnt < TEST_COUNT)) {
 	fprintf(stderr, 
 		"The messages sets contain %u non-spam and %u spam.  Bogotune "
 		"requires at least %d non-spam and %d spam messages to run.\n",
@@ -1047,7 +1139,7 @@ static rc_t bogotune(void)
     */
     
     min_dev = 0.02;
-    
+
     target = get_thresh(ns_cnt, ns_scores);
     printf("False-positive target is %d (cutoff %8.6f)\n", target, spam_cutoff);
 
@@ -1066,6 +1158,13 @@ static rc_t bogotune(void)
 
     printf("Initial x value is %5.3f\n", robx);
 
+    /* No longer needed */
+    wordhash_free(ns_and_sp->train);
+    ns_and_sp->train = NULL;
+
+    if (memdebug) MEMDISPLAY;
+
+    if (ns_cnt >= TEST_COUNT && sp_cnt >= TEST_COUNT)	/* HACK */
     for (scan=0; scan <= 1; scan += 1) {
 	bool f;
 	uint i;
@@ -1165,7 +1264,7 @@ static rc_t bogotune(void)
 
 	if (verbose >= SUMMARY) {
 	    uint tm = end - beg;
-	    printf("    %2dm:%02ds for %d iterations.  avg - %5.3fs\n", 
+	    printf("    %2dm:%02ds for %d iterations.  avg: %5.3fs\n", 
 		   MIN(tm), SECONDS(tm), cnt, (double)(tm)/cnt);
 	}
 
@@ -1211,7 +1310,10 @@ static rc_t bogotune(void)
     ** that give 0.05%, 0.1% and 0.2% fp.
     */
 
+    if (ns_cnt >= TEST_COUNT && sp_cnt >= TEST_COUNT)	/* HACK */
     final_recommendations();
+
+    if (memdebug) MEMDISPLAY;
 
     return status;
 }
@@ -1245,15 +1347,15 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     bogotune();
 
+    bogotune_free();
+
+    MEMDISPLAY;
+
     exit(exitcode);
 }
 
 static void bt_exit(void)
 {
-    bogotune_free();
-
-    MEMDISPLAY;
-
     return;
 }
 

@@ -48,6 +48,9 @@ THEORY:
 #define offsetof(type, member) ((size_t) &((type*)0)->member )
 #endif
 
+void wh_trap(void);
+void wh_trap(void) {}
+
 /* 06/14/03
 ** profiling shows wordhash_new() is significant portion 
 ** of time spent processing msg-count files:
@@ -60,12 +63,33 @@ THEORY:
 ** initialized storage.
 */
 
+static wordhash_t *
+wordhash_init (wh_t t, uint c)
+{
+    wordhash_t *wh = xcalloc (1, sizeof (wordhash_t));
+
+    wh->type = t;
+    wh->count = c;
+
+    if (t == WH_NORMAL)
+	wh->bin = xcalloc (NHASH, sizeof (hashnode_t **));
+
+    if (t == WH_CNTS)
+	wh->cnts = (wordcnts_t *) xcalloc(wh->count, sizeof(wordcnts_t));
+
+    if (t == WH_PROPS) {
+	wh->freeable = true;
+	wh->props = (hashnode_t *) xcalloc(wh->count, sizeof(hashnode_t));
+    }
+
+    return wh;
+}
+
 wordhash_t *
 wordhash_new (void)
 {
-  wordhash_t *wh = xcalloc (1, sizeof (wordhash_t));
-  wh->bin = xcalloc (NHASH, sizeof (hashnode_t **));
-  return wh;
+    wordhash_t *wh = wordhash_init(WH_NORMAL, 0);
+    return wh;
 }
 
 static void
@@ -126,7 +150,16 @@ wordhash_free (wordhash_t *wh)
     wordhash_free_strings(wh);
 
     xfree (wh->order);
-    xfree (wh->props);
+    if (wh->type == WH_CNTS)
+	xfree (wh->cnts);
+    if (wh->type == WH_PROPS) {
+	if (wh->freeable) {
+	    uint i;
+	    for (i=0; i<wh->count; i++)
+		xfree(wh->props[i].buf);
+	}
+	xfree (wh->props);
+    }
     xfree (wh->bin);
     xfree (wh);
 }
@@ -310,18 +343,24 @@ wordhash_first (wordhash_t *wh)
 {
     void *val = NULL;
 
-    if (wh->cnts) {
-	wh->index = 0;
-	val = wh->cnts;
-    }
-    else
-    if (wh->order) {
+    switch (wh->type) {
+    case WH_NORMAL:
+	val = wh->iter_ptr = wh->iter_head;
+	break;
+    case WH_ORDERED:
 	wh->index = 0;
 	val = wh->order[wh->index];
+	break;
+    case WH_PROPS:
+	wh->index = 0;
+	val = &wh->props[wh->index];
+	break;
+    case WH_CNTS:
+	wh->index = 0;
+	val = &wh->cnts[wh->index];
+	break;
     }
-    else {
-	val = wh->iter_ptr = wh->iter_head;
-    }
+
     return val;
 }
 
@@ -330,19 +369,25 @@ wordhash_next (wordhash_t *wh)
 {
     void *val = NULL;
 
-    if (wh->cnts) {
-	if (++wh->index < wh->count)
-	    val = &wh->cnts[wh->index];
-    }
-    else
-    if (wh->order) {
-	if (++wh->index < wh->count)
-	    val = wh->order[wh->index];
-    }
-    else {
+    switch (wh->type) {
+    case WH_NORMAL:
 	if (wh->iter_ptr != NULL)
 	    val = wh->iter_ptr = wh->iter_ptr->iter_next;
+	break;
+    case WH_ORDERED:
+	if (++wh->index < wh->count)
+	    val = wh->order[wh->index];
+	break;
+    case WH_PROPS:
+	if (++wh->index < wh->count)
+	    val = &wh->props[wh->index];
+	break;
+    case WH_CNTS:
+	if (++wh->index < wh->count)
+	    val = &wh->cnts[wh->index];
+	break;
     }
+
     return val;
 }
 
@@ -353,15 +398,28 @@ static int compare_hashnode_t(const void *const ihn1, const void *const ihn2)
     return word_cmp(hn1->key, hn2->key);
 }
 
+static wordcnts_t *wordhash_get_counts(wordhash_t *wh, hashnode_t *n)
+{
+    if (wh->cnts == NULL) {
+	wordprop_t *p = (wordprop_t *)n->buf;
+	wordcnts_t *c = &p->cnts;
+	return c;
+    }
+    else {
+	wordcnts_t *c = (wordcnts_t *) n;
+	return c;
+    }
+}
+
 void
 wordhash_set_counts(wordhash_t *wh, int good, int bad)
 {
     hashnode_t *n;
 
     for (n = wordhash_first(wh); n != NULL; n = wordhash_next(wh)) {
-	wordprop_t *p = (wordprop_t *)n->buf;
-	p->cnts.good += good;
-	p->cnts.bad  += bad;
+	wordcnts_t *c = wordhash_get_counts(wh, n);
+	c->good += good;
+	c->bad  += bad;
     }
 }
 
@@ -371,10 +429,13 @@ wordhash_sort (wordhash_t *wh)
     hashnode_t *node;
     hashnode_t **order;
 
-    if (msg_count_file)
+    if (wh->type != WH_NORMAL)
 	return;
 
-    if (wh->count == 0 || wh->order != NULL)
+    if (wh->count == 0)
+	return;
+
+    if (msg_count_file)
 	return;
 
     order = (hashnode_t **) xcalloc(wh->count, sizeof(hashnode_t *));
@@ -385,48 +446,68 @@ wordhash_sort (wordhash_t *wh)
 
     qsort(order, wh->count, sizeof(hashnode_t *), compare_hashnode_t);
     wh->order = order;
+
+    wh->type = WH_ORDERED;
+
+    return;
 }
 
 /* 
-** wordhash_convert_to_countlist() allocates a new wordhash_t struct
+** convert_propslist_to_countlist() allocates a new wordhash_t struct
 ** to improve program locality and lessen need for swapping when
 ** processing lots of messages.
 */
 
 wordhash_t *
-wordhash_convert_to_countlist(wordhash_t *whi, wordhash_t *db)
+convert_propslist_to_countlist(wordhash_t *whi)
 {
     hashnode_t *node;
-    wordhash_t *who = wordhash_new();
+    wordhash_t *who = wordhash_init(WH_CNTS, whi->count);
+    uint count = 0;
 
-    xfree(who->bin);		/* discard extra storage */
-    who->bin = NULL;
+    if (whi->type != WH_PROPS) {
+	fprintf(stderr, "convert_propslist_to_countlist() called with non-WH_PROPS parameter.\n");
+	exit(EX_ERROR);
+    }
 
-    who->cnts = (wordcnts_t *) xcalloc(whi->count, sizeof(wordcnts_t));
+    for(node = wordhash_first(whi); node != NULL; node = wordhash_next(whi)) {
+	wordcnts_t *ci = wordhash_get_counts(whi, node);
+	wordcnts_t *co = &who->cnts[count++];
+
+	co->good = ci->good;
+	co->bad  = ci->bad ;
+    }
+
+    return who;
+}
+
+wordhash_t *
+convert_wordhash_to_propslist(wordhash_t *whi, wordhash_t *db)
+{
+    wordhash_t *who = wordhash_init(WH_PROPS, whi->count);
+
+    size_t count = 0;
+    hashnode_t  *node;
 
     for(node = wordhash_first(whi); node != NULL; node = wordhash_next(whi)) {
 	wordprop_t *wp;
-	wordcnts_t *cnts = &who->cnts[who->count];
-
-	who->count += 1;
-
-	if (!msg_count_file)
+	if (!msg_count_file && node->key != NULL) {
+	    who->freeable = false;
 	    wp = wordhash_insert(db, node->key, sizeof(wordprop_t), NULL);
-	else
-	    wp = (wordprop_t *) node->buf;
-
-	if (whi->cnts == NULL) {
-	    cnts->good = wp->cnts.good;
-	    cnts->bad  = wp->cnts.bad ;
-	    word_free(node->key);
-	    node->key = NULL;
 	}
 	else {
-	    wordcnts_t *old = (wordcnts_t *) node;
-	    cnts->good = old->good;
-	    cnts->bad  = old->bad ;
+	    wp = xcalloc(1, sizeof(wordprop_t));
+	    memcpy(wp, node->buf, sizeof(wordprop_t));
+	    if (!who->freeable)
+		wh_trap();
 	}
+	who->props[count].buf = wp;
+	xfree(node->key);
+	node->key = NULL;
+	count += 1;
     }
+
+    who->count = count;
 
     return who;
 }

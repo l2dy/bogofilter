@@ -231,13 +231,13 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 	wordprop_t *props;
 
 	if (!fBogotune) {
-	    token = node->key;
 	    props = (wordprop_t *) node->buf;
 	    cnts  = &props->cnts;
+	    token = node->key;
 	}
 	else {
-	    token = NULL;
 	    cnts = (wordcnts_t *) node;
+	    token = NULL;
 	}
 
 	prob = compute_probability(token, cnts);

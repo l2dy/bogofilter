@@ -29,7 +29,15 @@ typedef struct wh_alloc_str {
 
 typedef /*@null@*/ hashnode_t *hashnode_pt;
 
+typedef enum wh_e { WH_NORMAL, WH_ORDERED, WH_PROPS, WH_CNTS } wh_t;
+
 typedef struct wordhash_s {
+  /*@null@*/  /*@dependent@*/ wh_t type;		/* normal, ordered, props, or cnts */
+  /*@null@*/  /*@dependent@*/ bool freeable;
+  /*@null@*/  /*@dependent@*/ uint index;		/* access index */
+  /*@null@*/  /*@dependent@*/ uint count;		/* size of array */
+  /*@null@*/  /*@dependent@*/ uint wordcount;		/* count of words */
+
   hashnode_pt *bin;
   /*@null@*/ /*@owned@*/ wh_alloc_node *nodes;		/*list of node buffers */
   /*@null@*/  		 wh_alloc_str  *strings;	/* list of string buffers */
@@ -38,9 +46,6 @@ typedef struct wordhash_s {
   /*@null@*/  /*@dependent@*/ hashnode_t *iter_head;
   /*@null@*/  /*@dependent@*/ hashnode_t *iter_tail;
 
-  /*@null@*/  /*@dependent@*/ uint index;		/* access index */
-  /*@null@*/  /*@dependent@*/ uint count;		/* size of array */
-  /*@null@*/  /*@dependent@*/ uint wordcount;		/* count of words */
   /*@null@*/  /*@dependent@*/ hashnode_t **order;	/* array of nodes */
   /*@null@*/  /*@dependent@*/ hashnode_t  *props;	/* array of nodes */
   /*@null@*/  /*@dependent@*/ wordcnts_t  *cnts;	/* array of counts */
@@ -69,6 +74,7 @@ void * wordhash_search (wordhash_t *wh, word_t *t, unsigned int hash);
 
 typedef void wh_foreach_t(word_t *token, void *data, void *userdata);
 void wordhash_foreach(wordhash_t *wh, wh_foreach_t *hook, void *userdata);
-wordhash_t *wordhash_convert_to_countlist(wordhash_t *wh, wordhash_t *db);
+wordhash_t *convert_propslist_to_countlist(wordhash_t *wh);
+wordhash_t *convert_wordhash_to_propslist(wordhash_t *wh, wordhash_t *db);
 
 #endif
