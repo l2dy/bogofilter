@@ -46,7 +46,7 @@ void *dbe_init(bfdir *d, bffile *f) { (void)d; (void)f; return (void *)~0; }
 ex_t db_verify(bfdir *d, bffile *f) { (void)d; (void)f; return EX_OK; }
 
 /** dummy function, Sqlite recovers automatically. */
-ex_t dbe_recover(const char *d1, bool d2, bool d3) { (void)d1; d2=d3; return EX_ERROR; }
+ex_t dbe_recover(bfdir *d, bool b1, bool b2) { (void)d; b1=b2; return EX_ERROR; }
 
 /** The layout of the bogofilter table, formatted as SQL statement. */
 #define LAYOUT \
