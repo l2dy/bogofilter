@@ -40,7 +40,7 @@ static int  	   bft_commit		(void *vhandle);
 /* private -- used in datastore_db_*.c */
 static DB_ENV	  *bft_get_env_dbe	(dbe_t *env);
 static const char *bft_database_name	(const char *db_file);
-static DB_ENV	  *bft_recover_open	(const char *db_file, DB **dbp);
+static DB_ENV	  *bft_recover_open	(const char *db_file);
 static int	   bft_auto_commit_flags(void);
 static int	   bft_get_rmw_flag	(int open_mode);
 static int	   bft_lock		(void *handle, int open_mode);
@@ -133,9 +133,8 @@ int bft_get_rmw_flag(int open_mode)
     return 0;
 }
 
-DB_ENV *bft_recover_open(const char *db_file, DB **dbp)
+DB_ENV *bft_recover_open(const char *db_file)
 {
-    int e;
     int fd;
 
     fd = open(db_file, O_RDWR);
@@ -149,13 +148,6 @@ DB_ENV *bft_recover_open(const char *db_file, DB **dbp)
 	print_error(__FILE__, __LINE__,
 		    "bft_recover_open: cannot lock %s for exclusive use: %s", db_file,
 		    strerror(errno));
-	close(fd);
-	exit(EX_ERROR);
-    }
-
-    if ((e = db_create (dbp, NULL, 0)) != 0) {
-	print_error(__FILE__, __LINE__, "db_create, err: %s",
-		    db_strerror(e));
 	close(fd);
 	exit(EX_ERROR);
     }

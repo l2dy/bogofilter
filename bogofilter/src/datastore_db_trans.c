@@ -60,7 +60,7 @@ static int  	   dbx_commit		(void *vhandle);
 /* private -- used in datastore_db_*.c */
 static DB_ENV	  *dbx_get_env_dbe	(dbe_t *env);
 static const char *dbx_database_name	(const char *db_file);
-static DB_ENV	  *dbx_recover_open	(const char *db_file, DB **dbp);
+static DB_ENV	  *dbx_recover_open	(const char *db_file);
 static int	   dbx_auto_commit_flags(void);
 static int	   dbx_get_rmw_flag	(int open_mode);
 static int	   dbx_lock		(void *handle, int open_mode);
@@ -162,6 +162,7 @@ int dbx_get_rmw_flag(int open_mode)
     return flag;
 }
 
+/** run recovery, open environment and keep the exclusive lock */
 static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags)
 {
     const uint32_t local_flags = flags | DB_CREATE;
@@ -205,22 +206,9 @@ static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags)
     return dbe;
 }
 
-static DB_ENV *dbx_recover_open(const char *dir, DB **dbp)
+static DB_ENV *dbx_recover_open(const char *dir)
 {
-    int e;
-    DB_ENV *dbe;
-
-    dbe = dbe_recover_open(dir, 0); /* this sets an exclusive lock */
-    e = db_create(dbp, NULL, 0);    /* do not use environment here, verify
-				       does not lock by itself, we hold the
-				       global lock instead! */
-    if (e != 0) {
-	print_error(__FILE__, __LINE__, "error creating DB handle: %s",
-		    db_strerror(e));
-	return NULL;
-    }
-
-    return dbe;
+    return dbe_recover_open(dir, 0);
 }
 
 static int dbx_begin(void *vhandle)

@@ -938,8 +938,18 @@ ex_t db_verify(const char *db_file)
 	return EX_ERROR;
     }
 
-    dbe = dsm->dsm_recover_open(db_file, &db);
+    dbe = dsm->dsm_recover_open(db_file);
     if (dbe == NULL) {
+	exit(EX_ERROR);
+    }
+
+    e = db_create(&db, NULL, 0); /* need not use environment here,
+				    DB->verify() does not lock anyways,
+				    we must hold the global lock instead */
+
+    if (e != 0) {
+	print_error(__FILE__, __LINE__, "error creating DB handle: %s",
+		db_strerror(e));
 	exit(EX_ERROR);
     }
 
