@@ -251,7 +251,8 @@ static byte xlate_us[] = {
     0x92, '\'',	/* windows apostrophe  to single quote */
     0x93, '"',	/* windows left  quote to double quote */
     0x94, '"',	/* windows right quote to double quote */
-    0xA9, ' '	/* copyright sign      to space        */
+    0xA9, ' ',	/* copyright sign      to space        */
+    0xAE, ' ',	/* registered sign     to space        */
 };
 
 /* For us-ascii, 
