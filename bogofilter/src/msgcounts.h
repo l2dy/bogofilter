@@ -27,7 +27,6 @@ extern	int	 msg_count_leng; /* DO NOT MAKE THIS SIZE_T */
 /* Function prototypes */
 
 void init_msg_counts(void);
-void compute_msg_counts(void);
 void set_msg_counts(char *s);
 
 #endif	/* MSGCOUNTS_H */
