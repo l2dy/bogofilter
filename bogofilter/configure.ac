@@ -13,6 +13,7 @@ AM_INIT_AUTOMAKE([foreign 1.6 dist-bzip2])
 AM_CONFIG_HEADER(src/config.h:config.in)
 AC_PROG_AWK
 AC_PROG_CC(gcc xlc cc)
+AC_CHECK_TOOL(AR, ar)
 AC_PROG_RANLIB
 AC_PATH_PROGS(PERL, perl perl5, $PATH:/usr/local/bin:/usr/bin)
 AC_PATH_PROG(NSGMLS,nsgmls,false)
