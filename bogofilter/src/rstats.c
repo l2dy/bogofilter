@@ -153,7 +153,7 @@ static void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t 
     double logsum = 0.0;	/* Robinson's Q */
 
     if (!stats_in_header)
-	(void)fprintf(stdout, "\n" );
+	(void)fprintf(fpo, "\n" );
 
     /* Compute histogram */
     for (i=r=0; i<INTERVALS; i+=1)
@@ -195,7 +195,7 @@ static void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t 
 	maxcnt = max(maxcnt, cnt);
     }
 
-    (void)fprintf(stdout, "%s%4s %4s %6s  %9s %s\n", stats_prefix, "int", "cnt", "prob", "spamicity", "histogram" );
+    (void)fprintf(fpo, "%s%4s %4s %6s  %9s %s\n", stats_prefix, "int", "cnt", "prob", "spamicity", "histogram" );
 
     /* Print histogram */
     for (i=0; i<INTERVALS; i+=1)
@@ -206,15 +206,15 @@ static void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t 
 	double prob = cnt ? h->prob/cnt : 0.0;
 
 	/* print interval, count, probability, and spamicity */
-	(void)fprintf(stdout, "%s%3.2f %4lu %f %f ", stats_prefix, beg, (unsigned long)cnt, prob, h->spamicity );
+	(void)fprintf(fpo, "%s%3.2f %4lu %f %f ", stats_prefix, beg, (unsigned long)cnt, prob, h->spamicity );
 
 	/* scale histogram to 48 characters */
 	if (maxcnt>48) cnt = (cnt * 48 + maxcnt - 1) / maxcnt;
 
 	/* display histogram */
 	for (r=0; r<cnt; r+=1)
-	    (void)fputc( '#', stdout);
-	(void)fputc( '\n', stdout);
+	    (void)fputc( '#', fpo);
+	(void)fputc( '\n', fpo);
     }
 }
 
@@ -229,10 +229,10 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 
     /* print header */
     if (!Rtable)
-	(void)fprintf(stdout, "%*s%6s    %-6s    %-6s    %-6s %s\n",
+	(void)fprintf(fpo, "%*s%6s    %-6s    %-6s    %-6s %s\n",
 		      MAXTOKENLEN+2,"","n", "pgood", "pbad", "fw", "U");
     else
-	(void)fprintf(stdout, "%*s%6s    %-6s    %-6s    %-6s  %-6s    %-6s %s\n",
+	(void)fprintf(fpo, "%*s%6s    %-6s    %-6s    %-6s  %-6s    %-6s %s\n",
 		      MAXTOKENLEN+2,"","n", "pgood", "pbad", "fw","invfwlog", "fwlog", "U");
 
     /* Print 1 line per token */
@@ -248,18 +248,18 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 
 	assert(good >= 0 && bad >= 0);
 
-	(void)fputc( '"', stdout);
-	(void)word_puts(token, 0, stdout);
+	(void)fputc( '"', fpo);
+	(void)word_puts(token, 0, fpo);
 
-	(void)fprintf(stdout, "\"%*s %5d  %8.6f  %8.6f  %8.6f",
+	(void)fprintf(fpo, "\"%*s %5d  %8.6f  %8.6f  %8.6f",
 		      len, " ", good + bad,
 		      (double) good / good_cnt,
 		      (double) bad  / bad_cnt,
 		      fw);
 	if (Rtable)
-	    (void)fprintf(stdout, "%10.5f%10.5f",
+	    (void)fprintf(fpo, "%10.5f%10.5f",
 			  log(1.0 - fw), log(fw));
-	(void)fprintf(stdout, " %c\n", flag);
+	(void)fprintf(fpo, " %c\n", flag);
     }
 
     /* print trailer */

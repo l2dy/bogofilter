@@ -405,14 +405,14 @@ double get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 void msg_print_summary(void)
 {
     if (!Rtable) {
-	(void)fprintf(stdout, "%-*s %5lu %9.2e %9.2e %9.2e\n",
+	(void)fprintf(fpo, "%-*s %5lu %9.2e %9.2e %9.2e\n",
 		      MAXTOKENLEN+2, "N_P_Q_S_s_x_md", (unsigned long)score.robn, 
 		      score.p_pr, score.q_pr, score.spamicity);
-	(void)fprintf(stdout, "%-*s %9.2e %9.2e %6.3f\n",
+	(void)fprintf(fpo, "%-*s %9.2e %9.2e %6.3f\n",
 		      MAXTOKENLEN+2+6, " ", robs, robx, min_dev);
     }
     else
-	(void)fprintf(stdout, "%-*s %5lu %9.2e %9.2e %9.2e %9.2e %9.2e %5.3f\n",
+	(void)fprintf(fpo, "%-*s %5lu %9.2e %9.2e %9.2e %9.2e %9.2e %5.3f\n",
 		      MAXTOKENLEN+2, "N_P_Q_S_s_x_md", (unsigned long)score.robn, 
 		      score.p_pr, score.q_pr, score.spamicity, robs, robx, min_dev);
 }

@@ -261,7 +261,7 @@ void write_message(rc_t status)
 
     if (passthrough || verbose || Rtable) {
 	verbose += passthrough;
-	print_stats( stdout );
+	print_stats( fpo );
 	verbose -= passthrough;
     }
 
