@@ -49,14 +49,24 @@ static int lgetsl(byte *buf, size_t size)
 {
     size_t count = fgetsl((char *)buf, size, fpin);
     yylineno += 1;
-    if (DEBUG_LEXER(0)) fprintf(dbgout, "*** %2d %d %s\n", yylineno, msg_header, buf);
+    if (DEBUG_LEXER(0)) {
+	fprintf(dbgout, "*** %2d %d %d ", yylineno, msg_header, count);
+	fwrite(buf, 1, count, dbgout);
+	fputc('\n', dbgout);
+    }
 
     /* Special check for message separator.
        If found, handle it immediately.
     */
 
-    if (memcmp(buf, "From ", 5) == 0)
+    if (count >= 5 && memcmp(buf, "From ", 5) == 0) {
+	if (DEBUG_LEXER(1)) {
+	    fprintf(dbgout, "*** %d %d ", yylineno, count);
+	    fwrite(buf, 1, count, dbgout);
+	    fputc('\n', dbgout);
+	}
 	got_from();
+    }
 
     return count;
 }
