@@ -482,6 +482,63 @@ need_my_gsl=1)
 
 AM_CONDITIONAL(NEED_GSL,test $need_my_gsl = 1)
 
+have_dosish_system=no
+case "${target}" in
+    *-*-mingw32*)
+        # special stuff for Windoze NT
+        have_dosish_system=yes
+        ;;
+    i?86-emx-os2 | i?86-*-os2*emx )
+        # OS/2 with the EMX environment
+        have_dosish_system=yes
+        ;;
+    i?86-*-msdosdjgpp*)
+        # DOS with the DJGPP environment
+        have_dosish_system=yes
+        ;;
+    *)
+       ;;
+esac
+
+if test "$have_dosish_system" = yes; then
+   AC_DEFINE(HAVE_DOSISH_SYSTEM,1,
+             [defined if we run on some of the PCDOS like systems 
+              (DOS, Windoze. OS/2) with special properties like
+              no file modes])
+fi
+AM_CONDITIONAL(HAVE_DOSISH_SYSTEM, test "$have_dosish_system" = yes)
+
+# Note the \\\\ for backslashes.  Autoconf eats one layer, leaving \\
+
+AC_CONFIG_COMMANDS(sysdefs,[[
+cat >src/sysdefs.tmp <<Eof
+/* Generated automatically by configure */
+/* These are here to be redefined by handcrafted src/sysdefs.h. */
+#define CURDIR_S "."
+#define EXTSEP_S "."
+#ifndef HAVE_DOSISH_SYSTEM
+#define DIRSEP_C '/'
+#define DIRSEP_S "/"
+#else
+#define DIRSEP_C '\\\\'
+#define DIRSEP_S "\\\\"
+#endif
+Eof
+if cmp -s src/sysdefs.h src/sysdefs.tmp 2>/dev/null; then
+    echo "src/sysdefs.h is unchanged"
+    rm -f src/sysdefs.tmp
+else
+    rm -f src/sysdefs.h
+    mv src/sysdefs.tmp src/sysdefs.h
+    echo "src/sysdefs.h created"
+fi
+]],[[
+]])
+
+AH_BOTTOM([
+#include "sysdefs.h"
+])
+
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 AC_CONFIG_FILES([Makefile \
 		bogofilter.spec \
