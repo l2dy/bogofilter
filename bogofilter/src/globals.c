@@ -47,15 +47,7 @@ const char	*stats_prefix;
 bool	header_line_markup = true;	/* -H */
 
 /* for  transactions */
-#if	!defined(DISABLE_TRANSACTIONS) && !defined(ENABLE_TRANSACTIONS)
-bool	fTransaction;
-#else
-#ifdef	ENABLE_TRANSACTIONS
-bool	fTransaction = true;
-#else
-bool	fTransaction = false;
-#endif
-#endif
+bool fTransaction = true;
 
 /* for  bogotune */
 bool fBogotune = false;
