@@ -36,7 +36,9 @@ void print_error( const char *file, unsigned long line, const char *format, ... 
     va_end (ap);
 
     fprintf(stderr, "%s: %s\n", progname, message);
+#ifdef HAVE_SYSLOG_H
     if (logflag)
 	syslog(LOG_INFO, "[%lu] %s:%lu:  %s", (unsigned long)pid,
 		file, line, message );
+#endif
 }
