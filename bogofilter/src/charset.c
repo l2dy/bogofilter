@@ -473,7 +473,7 @@ static charset_def_t charsets[] = {
 
 #define	MAX_LEN 64
 
-void init_charset_table(const char *charset_name, bool use_default)
+void init_charset_table(const char *charset_name)
 {
     uint idx;
     bool found = false;
@@ -494,7 +494,7 @@ void init_charset_table(const char *charset_name, bool use_default)
 	}
     }
 
-    if ( !found && use_default ) {
+    if ( !found ) {
 	map_default();
 	if (DEBUG_CONFIG(0))
 	    fprintf(dbgout, "Unknown charset '%s';  using default.\n", charset_name );
@@ -533,11 +533,7 @@ void set_charset(const char *charset)
     *d++ = '\0';
     if (DEBUG_CONFIG(0))
        fprintf(dbgout, "got_charset( '%s' )\n", t);
-#ifndef	CP866
-    init_charset_table( t, false ); // bf default
-#else
-    init_charset_table( t, true );
-#endif
+    init_charset_table( t );
     xfree(t);
 }
 

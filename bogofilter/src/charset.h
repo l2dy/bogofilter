@@ -20,7 +20,7 @@ extern byte charset_table[256];
 extern byte casefold_table[256];
 extern void got_charset(const char *);
 extern void set_charset(const char *charset);
-extern void init_charset_table(const char *charset_name, bool use_default);
+extern void init_charset_table(const char *charset_name);
 
 #ifdef	CP866
 extern int  decode_and_htmlUNICODE_to_cp866(byte *buf, int len);

@@ -33,7 +33,7 @@ const char *spam_header_name = "X-Bogosity:"; /* unused */
 
 static void initialize(void)
 {
-    init_charset_table(charset_default, true);
+    init_charset_table(charset_default);
     mime_reset();
     token_init();
     lexer_v3_init(NULL);
