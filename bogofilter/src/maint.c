@@ -11,7 +11,6 @@ AUTHOR:
 ******************************************************************************/
 
 #include <assert.h>
-#include <db.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
