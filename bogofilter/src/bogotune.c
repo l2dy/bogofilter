@@ -297,16 +297,13 @@ static int compare_descending(const void *const ir1, const void *const ir2)
     return 0;
 }
 
-/*	fn+(co>0.5?co:0.99)	*/
-#define KEY(r) ((r)->fn + (((r)->co > 0.5) ? (r)->co : 0.99))
-
 static int compare_results(const void *const ir1, const void *const ir2)
 {
     result_t const *r1 = (result_t const *)ir1;
     result_t const *r2 = (result_t const *)ir2;
 
-    if (KEY(r1) > KEY(r2) ) return  1;
-    if (KEY(r2) > KEY(r1) ) return -1;
+    if (r1->fn > r2->fn ) return  1;
+    if (r2->fn > r1->fn ) return -1;
 
     if (r1->idx > r2->idx ) return  1;
     if (r2->idx > r1->idx ) return -1;
