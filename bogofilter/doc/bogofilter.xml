@@ -76,6 +76,7 @@
 
   <para><option>parameter options</option> are:</para>
     <cmdsynopsis>
+    <arg choice='opt'>-E <replaceable><optional>value</optional><optional>,value</optional></replaceable></arg>
     <arg choice='opt'>-m <replaceable><optional>value</optional><optional>,value</optional><optional>,value</optional></replaceable></arg>
     <arg choice='opt'>-o <replaceable><optional>value</optional><optional>,value</optional></replaceable></arg>
     </cmdsynopsis>
@@ -137,9 +138,13 @@ Detection</ulink>.</para>
 <para>Since then, Robinson (see his Linux Journal article <ulink
 url="http://www.linuxjournal.com/article.php?sid=6467">A Statistical
 Approach to the Spam Problem</ulink>) and others have realized that
-the calculation can be further optimized using Fisher's method.</para>
+the calculation can be further optimized using Fisher's method.
+<ulink url="http://www.garyrobinson.net/2004/04/improved_chi.html">Another
+improvement</ulink> compensates for token redundancy by applying separate
+effective size factors (ESF) to spam and nonspam probability calculations.
+</para>
 
-<para>In short words this is how it works: The estimates for the spam
+<para>In short, this is how it works: The estimates for the spam
 probabilities of the individual tokens are combined using the "inverse
 chi-square function".  Its value indicates how badly the null
 hypothesis that the message is just a random collection of independent
@@ -181,6 +186,13 @@ strictly below spam_cutoff are marked as ham, all others as spam
 (two-state).  Else values less than or equal to ham_cutoff are marked
 as ham, messages with values strictly between ham_cutoff and
 spam_cutoff are marked as unsure; the rest as spam (tristate)</para>
+
+<para>sp_esf: the effective size factor (ESF) for spam.</para>
+
+<para>ns_esf: the ESF for nonspam.  These ESF values default to 1.0,
+which is the same as not using ESF in the calculation.  Values suitable
+to a user's email population can be determined with the aid of the
+<application>bogotune</application> program.</para>
 </refsect1>
 
 
@@ -354,6 +366,17 @@ passthrough mode.  Note that this only works when -p is explicitly given.</para>
 
 <para>PARAMETER OPTIONS</para>
 
+<para>The <option>-E
+      <replaceable><optional>value</optional><optional>,value</optional></replaceable></option>
+      option allows setting the sp_esf value and, optionally (though one
+      would normally want to set both), the
+      ns_esf value.  If one value is supplied, then sp_esf is
+      set.  If a comma followed by one value is supplied, then ns_esf
+      is set.  With two values, both sp_esf and ns_esf are set.  The
+      syntax is misleading: at least one of the values MUST be present,
+      and the comma determines whether it is to set the spam or the ham
+      cutoff.  Note: spaces are not allowed after the comma.</para>
+
 <para>The <option>-m
       <replaceable><optional>value</optional><optional>,value</optional><optional>,value</optional></replaceable></option>
       option allows setting the min_dev value and, optionally, the
@@ -361,8 +384,8 @@ passthrough mode.  Note that this only works when -p is explicitly given.</para>
       set.  If a comma followed by one value is supplied, then robs
       is set.  With two values, both min_dev and robs are set; with
       three, min_dev, robs and robx are set; and other combinations of
-      values and commas behave as one would expect.  Note the
-      syntax is misleading, at least one of the values MUST be present,
+      values and commas behave as one would expect.  The
+      syntax is misleading: at least one of the values MUST be present,
       and the commas determine what value(s) will be set.  Note: spaces
       are not allowed after the comma.</para>
 
@@ -371,8 +394,8 @@ passthrough mode.  Note that this only works when -p is explicitly given.</para>
       option allows setting the spam_cutoff value and, optionally, the
       ham_cutoff value.  If one value is supplied, then spam_cutoff is
       set.  If a comma followed by one value is supplied, then ham_cutoff
-      is set.  With two values, both spam_cutoff and ham_cutoff are set.  Note the
-      syntax is misleading, at least one of the values MUST be present,
+      is set.  With two values, both spam_cutoff and ham_cutoff are set.  The
+      syntax is misleading: at least one of the values MUST be present,
       and the comma determines whether it is to set the spam or the ham
       cutoff.  Note: spaces are not allowed after the comma.</para>
 
