@@ -111,7 +111,6 @@ token_t get_token(word_t **token)
 	    save_class = NONE;
 	else
 	{
-	    *t = (byte) '\0';
 	    ipsave.leng = (uint) (t - ipsave.text);
 	    token_set( &yylval, ipsave.text, ipsave.leng);
 	    cls = save_class;
