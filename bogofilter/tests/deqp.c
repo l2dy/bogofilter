@@ -24,5 +24,5 @@ int main(void) {
     if (fwrite(buf, 1, size, stdout) != size) die();
     if (fflush(stdout)) die();
     if (fclose(stdout)) die();
-    exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
