@@ -9,13 +9,6 @@ OUT="${TMPDIR}/$BASE.out"
 DATA="${TMPDIR}/$BASE.${DB_EXT}"
 SUM="$BASE.sum"
 
-LANG=
-unset LANG
-LC_ALL=
-unset LC_ALL
-LC_COLLATE=
-unset LC_COLLATE
-
 GREP="grep -v /dump.load-"
 SORT="sort"
 
