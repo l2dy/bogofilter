@@ -22,7 +22,8 @@ Rename the source files of bogofilter from foobar/c to c.foobar (you can use
 utilities like unixify (http://www.mk-net.demon.co.uk/software/risc_os/) in
 order to ease up this task.
 
-Copy RISC OS files Makefile and config.h into bogofilter/src.
+Copy the RISC OS Makefile into bogofilter.src and config file into
+bogofilter.src.h.
 
 Edit the beginning of the Makefile to suit your needs.
 
