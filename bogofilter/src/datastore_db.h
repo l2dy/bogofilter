@@ -33,7 +33,7 @@ void *db_open(const char *path	/** path to database file */,
 	      dbmode_t mode	/** open mode, DS_READ or DS_WRITE */);
 
 /** Close file and clean up. */
-void  db_close(/*@only@*/ void *vhandle, bool nosync  /** Normally false, if true, do not synchronize data. This should not be used in regular operation but only to ease the disk I/O load when the lock operation failed. */);
+void  db_close(/*@only@*/ void *vhandle);
 
 /** Flush pending writes to disk */
 void db_flush(void *handle);
@@ -82,18 +82,17 @@ const char *db_str_err(int);
 /* Returns version string */
 const char *db_version_str(void);
 
+/* Transactional interfaces */
+int  db_txn_begin(void *handle);
+int  db_txn_abort(void *handle);
+int db_txn_commit(void *handle);
+
+int db_recover(int catastrophic, int force);
+
 /* Returns is_swapped flag */
 bool db_is_swapped(void *vhandle);
 
 /* Returns created flag */
 bool db_created(void *vhandle);
-
-/* This is not currently used ...
- * 
-#define db_write_lock(fd) db_lock(fd, F_SETLKW, F_WRLCK)
-#define db_read_lock(fd) db_lock(fd, F_SETLKW, F_RDLCK)
-#define db_unlock(fd) db_lock(fd, F_SETLK, F_UNLCK)
-
-*/
 
 #endif

@@ -4,6 +4,7 @@
 
 Summary:
 
+0. Important
 1. What is Bogofilter?
 2. Documentation
 3. Installing Bogofilter
@@ -14,6 +15,19 @@ Summary:
   b. Building & Installing
   c. Configuring
   d. Changing Bogofilter
+
+
+0. IMPORTANT
+------------
+
+If you are using bogofilter with the Berkeley DB data base library
+(which is the default, received most testing, is the most powerful of
+the data base engines that bogofilter supports and hence recommended),
+do read the doc/README.db file, it contains important information.
+
+The doc/README.db file contains troubleshooting information and
+requirements that should be read ahead of time so you can fix problems
+quickly should they arise later.
 
 
 1. What is Bogofilter?
@@ -84,7 +98,7 @@ mailing list, bogofilter@bogofilter.org.  You can subscribe to it by
 sending a message to bogofilter-subscribe@bogofilter.org and
 responding to the confirmation message it sends to you.  More
 information is available on the bogofilter home page at
-http://bogofilter.sourceforge.net 
+http://bogofilter.sourceforge.net/
 
 Bugs can be reported via the bogfilter mailing list or through
 http://sourceforge.net/tracker/?atid=499997&group_id=62265&func=browse
@@ -111,7 +125,7 @@ to the list.
   a. Downloading
   --------------
 
-  The most recent version of this software is available at: 
+  The most recent version of this software is available at:
 
 	http://sourceforge.net/projects/bogofilter/
 

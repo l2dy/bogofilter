@@ -36,7 +36,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
     list->dsh = ds_open(bogohome, list->filepath, mode);
     if (list->dsh == NULL) {
 	int err = errno;
-	close_wordlists(true); /* unlock and close */
+	close_wordlists(); /* unlock and close */
 	switch(err) {
 	    /* F_SETLK can't obtain lock */
 	case EAGAIN:
@@ -71,12 +71,30 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 	} /* switch */
     } else { /* ds_open */
 	dsv_t val;
-	ds_get_msgcounts(list->dsh, &val);
-	list->msgcount[IX_GOOD] = val.goodcount;
-	list->msgcount[IX_SPAM] = val.spamcount;
-	if (wordlist_version == 0 &&
-	    ds_get_wordlist_version(list->dsh, &val))
-	    wordlist_version = val.count[0];
+retry:
+	if (DST_OK == ds_txn_begin(list->dsh)) {
+	    switch (ds_get_msgcounts(list->dsh, &val)) {
+		case 0:
+		case 1:
+		    list->msgcount[IX_GOOD] = val.goodcount;
+		    list->msgcount[IX_SPAM] = val.spamcount;
+		    if (wordlist_version == 0 &&
+			ds_get_wordlist_version(list->dsh, &val) == 0)
+			wordlist_version = val.count[0];
+		    if (DST_OK == ds_txn_commit(list->dsh))
+			return retry;
+		    break;
+		case DS_ABORT_RETRY:
+		    fprintf(stderr, "Transaction reading message count/wordlist version failed, retrying.\n");
+		    rand_sleep(4000,3000*1000);
+		    goto retry;
+		    break;
+		default:
+		    break;
+	    }
+	}
+	fprintf(stderr, "Transaction reading message count/wordlist version failed.\n");
+	exit(EX_ERROR);
     } /* ds_open */
 
     return retry;
@@ -88,8 +106,6 @@ void open_wordlists(dbmode_t mode)
 
     if (word_lists == NULL)
 	init_wordlist("word", WORDLIST, 0, WL_REGULAR);
-
-    ds_init();
 
     while (retry) {
 	if (run_type & (REG_SPAM | REG_GOOD | UNREG_SPAM | UNREG_GOOD))
@@ -105,17 +121,15 @@ void open_wordlists(dbmode_t mode)
 }
 
 /** close all open word lists */
-void close_wordlists(bool nosync /** Normally false, if true, do not synchronize data. This should not be used in regular operation but only to ease the disk I/O load when the lock operation failed. */)
+void close_wordlists(void)
 {
     wordlist_t *list;
 
     for ( list = word_lists; list != NULL; list = list->next )
     {
-	if (list->dsh) ds_close(list->dsh, nosync);
+	if (list->dsh) ds_close(list->dsh);
 	list->dsh = NULL;
     }
-
-    ds_cleanup();
 }
 
 bool build_wordlist_path(char *filepath, size_t size, const char *path)

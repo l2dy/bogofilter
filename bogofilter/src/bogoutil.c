@@ -81,8 +81,11 @@ static int dump_wordlist(char *ds_file)
 
     rc = ds_oper(ds_file, DS_READ, ds_dump_hook, NULL);
 
-    if (verbose)
-	fprintf(dbgout, "%d tokens dumped\n", token_count);
+    if (rc)
+	fprintf(stderr, "error dumping tokens!\n");
+    else
+	if (verbose)
+	    fprintf(dbgout, "%d tokens dumped\n", token_count);
 
     return rc;
 }
@@ -115,6 +118,8 @@ static int load_wordlist(const char *ds_file)
 	return EX_ERROR;
 
     memset(buf, '\0', BUFSIZE);
+
+    ds_txn_begin(dsh);
 
     for (;;) {
 	dsv_t data;
@@ -178,15 +183,35 @@ static int load_wordlist(const char *ds_file)
 	    load_count += 1;
 	    /* Slower, but allows multiple lists to be concatenated */
 	    set_date(date);
-	    ds_read(dsh, token, &data);
+	    switch (ds_read(dsh, token, &data)) {
+		case 0:
+		case 1:
+		    break;
+		default:
+		    rv = 1;
+	    }
 	    data.spamcount += spamcount;
 	    data.goodcount += goodcount;
-	    ds_write(dsh, token, &data);
+	    if (ds_write(dsh, token, &data)) rv = 1;
 	}
 	word_free(token);
     }
 
-    ds_close(dsh, false);
+    if (rv) {
+	fprintf(stderr, "read or write error, aborting.\n");
+	ds_txn_abort(dsh);
+    } else {
+	switch (ds_txn_commit(dsh)) {
+	    case DST_FAILURE:
+	    case DST_TEMPFAIL:
+		fprintf(stderr, "commit failed\n");
+		exit(EXIT_FAILURE);
+	    case DST_OK:
+		break;
+	}
+    }
+
+    ds_close(dsh);
 
     ds_cleanup();
 
@@ -237,14 +262,13 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     void *dsh = NULL; /* initialize to silence bogus gcc warning */
 
     struct stat sb;
+    int rv = 0;
 
     /* protect against broken stat(2) that succeeds for empty names */
     if (path == NULL || *path == '\0') {
         fprintf(stderr, "Expecting non-empty directory or file name.\n");
         return EX_ERROR;
     }
-
-    ds_init();
 
     if ( stat(path, &sb) == 0 ) {
 	/* XXX FIXME: deadlock possible */
@@ -277,11 +301,17 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     }
 
     printf(head_format, "", "spam", "good", "  Fisher");
+    if (DST_OK != ds_txn_begin(dsh)) {
+	ds_close(dsh);
+	fprintf(stderr, "Cannot begin transaction.\n");
+	return EX_ERROR;
+    }
 
     while (argc >= 0)
     {
 	dsv_t val;
 	word_t *token;
+	int rc;
 
 	unsigned long spam_count;
 	unsigned long good_count;
@@ -299,35 +329,53 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	    token = word_new(word, (uint) strlen((const char *)word));
 	}
 
-	ds_read(dsh, token, &val);
-	spam_count = val.spamcount;
-	good_count = val.goodcount;
+	rc = ds_read(dsh, token, &val);
+	switch (rc) {
+	    case 0:
+		spam_count = val.spamcount;
+		good_count = val.goodcount;
 
-	if (!show_probability)
-	    printf(data_format, token->text, spam_count, good_count);
-	else
-	{
-	    rob_prob = calc_prob(good_count, spam_count);
-	    printf(data_format, token->text, spam_count, good_count, rob_prob);
+		if (!show_probability)
+		    printf(data_format, token->text, spam_count, good_count);
+		else
+		{
+		    rob_prob = calc_prob(good_count, spam_count);
+		    printf(data_format, token->text, spam_count, good_count, rob_prob);
+		}
+		break;
+	    case 1:
+		break;
+	    default:
+		fprintf(stderr, "Cannot read from data base.\n");
+		rv = EX_ERROR;
+		goto finish;
 	}
 
 	if (token != &buff->t)
 	    word_free(token);
     }
 
-    ds_close(dsh, false);
+finish:
+    if (DST_OK != rv ? ds_txn_abort(dsh) : ds_txn_commit(dsh)) {
+	fprintf(stderr, "Cannot %s transaction.\n", rv ? "abort" : "commit");
+	rv = EX_ERROR;
+    }
+    ds_close(dsh);
     ds_cleanup();
 
     buff_free(buff);
 
-    return 0;
+    return rv;
 }
 
 static int get_robx(char *path)
 {
     double rx;
+    int ret = 0;
 
     rx = compute_robinson_x(path);
+    if (rx < 0)
+	return EX_ERROR;
 
     if (onlyprint)
 	printf("%f\n", rx);
@@ -343,22 +391,25 @@ static int get_robx(char *path)
 	run_type = REG_SPAM;
 
 	set_bogohome(filepath);
-	ds_init();
 
 	dsh = ds_open(CURDIR_S, filepath, DS_WRITE);
 	if (dsh == NULL)
 	    return EX_ERROR;
 
-	val.goodcount = 0;
-	val.spamcount = (uint32_t) (rx * 1000000);
-	ds_write(dsh, word_robx, &val);
-	ds_close(dsh, false);
+	if (DST_OK == ds_txn_begin(dsh)) {
+	    val.goodcount = 0;
+	    val.spamcount = (uint32_t) (rx * 1000000);
+	    ret = ds_write(dsh, word_robx, &val);
+	    if (DST_OK != ds_txn_commit(dsh))
+		ret = 1;
+	}
+	ds_close(dsh);
 	ds_cleanup();
 
 	word_free(word_robx);
     }
 
-    return EX_OK;
+    return ret ? EX_ERROR : EX_OK;
 }
 
 static void print_version(void)
@@ -388,6 +439,8 @@ static void help(void)
     fprintf(stderr,
 	    "\n"
 	    "\t-h\tPrint this message.\n"
+	    "\t-f dir\tRun recovery on data base in dir.\n"
+	    "\t-F dir\tRun catastrophic recovery on data base in dir.\n"
 	    "\t-d file\tDump data from file to stdout.\n"
 	    "\t-l file\tLoad data from stdin into file.\n"
 	    "\t-u file\tUpgrade wordlist version.\n"
@@ -422,10 +475,11 @@ static void help(void)
 static char *ds_file = NULL;
 static bool  prob = false;
 
-typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST } cmd_t;
+typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST,
+    M_RECOVER, M_CRECOVER } cmd_t;
 static cmd_t flag = M_NONE;
 
-#define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:u:vVw:x:X:y:"
+#define	OPTIONS	":a:c:d:Df:F:hH:I:k:l:m:np:r:R:s:u:vVw:x:X:y:"
 
 static int process_arglist(int argc, char **argv)
 {
@@ -444,6 +498,18 @@ static int process_arglist(int argc, char **argv)
 	switch (option) {
 	case '?':
 	    fprintf(stderr, "Unknown option -%c.\n", optopt);
+	    break;
+
+	case 'f':
+	    flag = M_RECOVER;
+	    count += 1;
+	    ds_file = (char *) optarg;
+	    break;
+
+	case 'F':
+	    flag = M_CRECOVER;
+	    count += 1;
+	    ds_file = (char *) optarg;
 	    break;
 
 	case 'd':
@@ -585,7 +651,7 @@ static int process_arglist(int argc, char **argv)
 
     if (count != 1)
     {
-      fprintf(stderr, "%s: Exactly one of the -d, -l, -R or -w flags "
+      fprintf(stderr, "%s: Exactly one of the -d, -f, -F, -l, -R or -w flags "
 	      "must be present.\n", progname);
       exit(EX_ERROR);
     }
@@ -600,6 +666,7 @@ static int process_arglist(int argc, char **argv)
 
 int main(int argc, char *argv[])
 {
+    int rc;
     progtype = build_progtype(progname, DB_TYPE);
 
     set_today();			/* compute current date for token age */
@@ -615,27 +682,44 @@ int main(int argc, char *argv[])
     atexit(bf_exit);
 
     set_bogohome(ds_file);
+
+    if (flag == M_RECOVER) {
+	return ds_recover(0);
+    } else if (flag == M_CRECOVER) {
+	return ds_recover(1);
+    }
+
     ds_init();
 
     switch(flag) {
 	case M_DUMP:
-	    return dump_wordlist(ds_file);
+	    rc = dump_wordlist(ds_file);
+	    break;
 	case M_LOAD:
-	    return load_wordlist(ds_file);
+	    rc = load_wordlist(ds_file);
+	    break;
 	case M_MAINTAIN:
 	    maintain = true;
-	    return maintain_wordlist_file(ds_file);
+	    rc = maintain_wordlist_file(ds_file);
+	    break;
 	case M_WORD:
 	    argc -= optind;
 	    argv += optind;
-	    return display_words(ds_file, argc, argv, prob);
+	    rc = display_words(ds_file, argc, argv, prob);
+	    break;
 	case M_HIST:
-	    return histogram(ds_file);
+	    rc = histogram(ds_file);
+	    break;
 	case M_ROBX:
-	    return get_robx(ds_file);
+	    rc = get_robx(ds_file);
+	    break;
 	case M_NONE:
 	default:
 	    /* should have been handled above */
 	    abort();
+	    break;
     }
+
+    ds_cleanup();
+    return rc;
 }

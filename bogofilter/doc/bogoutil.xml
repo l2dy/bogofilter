@@ -28,6 +28,8 @@
 	<cmdsynopsis>
 	    <command>bogoutil</command>
 	    <group choice="req">
+		<arg choice="plain">-f</arg>
+		<arg choice="plain">-F</arg>
 		<arg choice="plain">-r</arg>
 		<arg choice="plain">-R</arg>
 	    </group>
@@ -114,6 +116,16 @@
 	    Option <option>-p</option> takes the same arguments as
 	    option <option>-w</option> .
 	</para>
+	<para>The <option>-f <replaceable>dir</replaceable></option>
+	    option runs a regular data base recovery in the data base directory
+	    dir. If that fails, it will retry with a (usually slower)
+	    catastrophic data base recovery. If that fails, too, your
+	    data base cannot be repaired and must be rebuilt from
+	    scratch.</para>
+	<para>The <option>-F <replaceable>dir</replaceable></option>
+	    option runs a catastrophic data base recovery in the data base directory
+	    dir. If that fails, your data base cannot be repaired and
+	    must be rebuilt from scratch.</para>
 	<para>The <option>-r</option> option tells
 	    <application>bogoutil</application> to recalculate the ROBX
 	    value and print it as a six-digit fraction.

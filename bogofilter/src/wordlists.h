@@ -24,7 +24,7 @@ bool build_wordlist_path(char *filepath, size_t size, const char *path);
 bool configure_wordlist(const char *val);
 
 void open_wordlists(dbmode_t);
-void close_wordlists(bool);
+void close_wordlists(void);
 
 void set_list_active_status(bool status);
 

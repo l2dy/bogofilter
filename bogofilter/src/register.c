@@ -11,6 +11,7 @@
 #include "collect.h"
 #include "format.h"
 #include "msgcounts.h"
+#include "rand_sleep.h"
 #include "register.h"
 #include "wordhash.h"
 #include "wordlists.h"
@@ -28,6 +29,9 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
     hashnode_t *node;
     wordprop_t *wordprop;
     run_t save_run_type = run_type;
+    int retrycount = 5;			/* we'll retry an aborted
+					   registration five times
+					   before giving up. */
 
     u_int32_t wordcount = h->count;	/* use number of unique tokens */
 
@@ -60,10 +64,31 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
     run_type |= _run_type;
 
+retry:
+    if (retrycount-- == 0) {
+	fprintf(stderr, "retry count exceeded, giving up.\n");
+	exit(EX_ERROR);
+    }
+
+    if (ds_txn_begin(list->dsh)) {
+	fprintf(stderr, "ds_txn_begin error.\n");
+	exit(EX_ERROR);
+    }
+
     for (node = wordhash_first(h); node != NULL; node = wordhash_next(h))
     {
 	wordprop = node->buf;
-	ds_read(list->dsh, node->key, &val);
+	switch (ds_read(list->dsh, node->key, &val)) {
+	    case DS_ABORT_RETRY:
+		rand_sleep(4*1000,1000*1000);
+		goto retry;
+	    case 0:
+	    case 1:
+		break;
+	    default:
+		fprintf(stderr, "cannot read from data base.\n");
+		exit(EX_ERROR);
+	}
 	if (incr != IX_UNDF) {
 	    u_int32_t *counts = val.count;
 	    counts[incr] += wordprop->freq;
@@ -72,10 +97,29 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 	    u_int32_t *counts = val.count;
 	    counts[decr] = ((long)counts[decr] < wordprop->freq) ? 0 : counts[decr] - wordprop->freq;
 	}
-	ds_write(list->dsh, node->key, &val);
+	switch (ds_write(list->dsh, node->key, &val)) {
+	    case DS_ABORT_RETRY:
+		rand_sleep(4*1000,1000*1000);
+		goto retry;
+	    case 0:
+		break;
+	    default:
+		fprintf(stderr, "cannot write to data base.\n");
+		exit(EX_ERROR);
+	}
     }
 
-    ds_get_msgcounts(list->dsh, &val);
+    switch (ds_get_msgcounts(list->dsh, &val)) {
+	case 0:
+	case 1:
+	    break;
+	case DS_ABORT_RETRY:
+	    rand_sleep(4 * 1000, 1000 * 1000);
+	    goto retry;
+	default:
+	    fprintf(stderr, "cannot get message count values.\n");
+	    exit(EX_ERROR);
+    }
     list->msgcount[IX_SPAM] = val.spamcount;
     list->msgcount[IX_GOOD] = val.goodcount;
 
@@ -92,10 +136,41 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
     val.spamcount = list->msgcount[IX_SPAM];
     val.goodcount = list->msgcount[IX_GOOD];
 
-    ds_set_msgcounts(list->dsh, &val);
+    switch (ds_set_msgcounts(list->dsh, &val)) {
+	case 0:
+	    break;
+	case DS_ABORT_RETRY:
+	    fprintf(stderr, "cannot set message count values, retrying\n");
+	    rand_sleep(4 * 1000, 1000 * 1000);
+	    goto retry;
+	default:
+	    fprintf(stderr, "cannot set message count values\n");
+	    exit(EX_ERROR);
+    }
     set_msg_counts(val.goodcount, val.spamcount);
 
+    switch(ds_txn_commit(list->dsh)) {
+	case DST_OK:
+	    break;
+	case DST_TEMPFAIL:
+	    if (--retrycount) {
+		fprintf(stderr, "commit was aborted, retrying...\n");
+		rand_sleep(4 * 1000, 1000 * 1000);
+		goto retry;
+	    }
+	    fprintf(stderr, "giving up on this transaction.\n");
+	    exit(EX_ERROR);
+	case DST_FAILURE:
+	    fprintf(stderr, "commit failed.\n");
+	    exit(EX_ERROR);
+	default:
+	    fprintf(stderr, "unknown return.\n");
+	    abort();
+    }
+
+#if 0
     ds_flush(list->dsh);
+#endif
 
     if (DEBUG_REGISTER(1))
 	(void)fprintf(dbgout, "bogofilter: list %s (%s) - %ul spam, %ul good\n",

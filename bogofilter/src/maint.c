@@ -168,28 +168,15 @@ int maintain_wordlist_file(const char *db_file)
 {
     int rc = 0;
     dsh_t *dsh;
-    bool done = false;
 
     dsh = ds_open(CURDIR_S, db_file, DS_WRITE);
 
     if (dsh == NULL)
 	return EX_ERROR;
-
-    if (upgrade_wordlist_version) {
-	done = check_wordlist_version(dsh);
-	if (!done)
-	    fprintf(dbgout, "Upgrading wordlist.\n");
-	else
-	    fprintf(dbgout, "Wordlist has already been upgraded.\n");
-    }
-
-    if (!done)
+    else
 	rc = maintain_wordlist(dsh);
 
-    if (!done && upgrade_wordlist_version)
-	ds_set_wordlist_version(dsh, NULL);
-
-    ds_close(dsh, false);
+    ds_close(dsh);
     ds_cleanup();
 
     return rc;
@@ -272,16 +259,39 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
     return EX_OK;
 }
 
-int maintain_wordlist(void *vhandle)
+static int maintain_wordlist(void *vhandle)
 {
     ta_t *transaction = ta_init();
     struct userdata_t userdata;
     int ret;
+    bool done = false;
 
     userdata.vhandle = vhandle;
     userdata.transaction = transaction;
 
-    ret = ds_foreach(vhandle, maintain_hook, &userdata);
+    if (DST_OK == ds_txn_begin(vhandle)) {
+	ret = ds_foreach(vhandle, maintain_hook, &userdata);
+    } else
+	ret = -1;
 
-    return ret | ta_commit(transaction);
+    if (upgrade_wordlist_version) {
+	done = check_wordlist_version(vhandle);
+	if (!done)
+	    fprintf(dbgout, "Upgrading wordlist.\n");
+	else
+	    fprintf(dbgout, "Wordlist has already been upgraded.\n");
+    }
+
+    if (!done && upgrade_wordlist_version)
+    {
+	dsv_t val;
+	val.count[0] = CURRENT_VERSION;
+	val.count[1] = 0;
+	ds_set_wordlist_version(vhandle, &val);
+    }
+
+    ret |= ta_commit(transaction);
+    if (DST_OK != ds_txn_commit(vhandle))
+	ret = -1;
+    return ret;
 }

@@ -7,7 +7,7 @@ datastore_db.c -- implements the datastore, using Berkeley DB
 
 AUTHORS:
 Gyepi Sam <gyepi@praxis-sw.com>   2002 - 2003
-Matthias Andree <matthias.andree@gmx.de> 2003
+Matthias Andree <matthias.andree@gmx.de> 2003 - 2004
 
 ******************************************************************************/
 
@@ -16,6 +16,24 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 **	2. Header files for external packages
 **	3. Bogofilter's header files
 */
+
+/* This code has been tested with BerkeleyDB 3.0, 3.1 3.2, 3.3, 4.0,
+ * 4.1 and 4.2.  -- Matthias Andree, 2004-10-04 */
+
+/* TODO:
+ * - implement proper retry when our transaction is aborted after a
+ *   deadlock
+ * - document code changes
+ * - conduct massive tests
+ * - check if we really need the log files for "catastrophic recovery"
+ *   or if we can remove them (see db_archive documentation)
+ *   as the log files are *HUGE* even compared with the data base
+ */
+
+/*
+ * NOTE: this code is an "#if" nightmare due to the many different APIs
+ * in the many different BerkeleyDB versions.
+ */
 
 #define DONT_TYPEDEF_SSIZE_T 1
 #include "common.h"
@@ -43,8 +61,11 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include "word.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
+#include "mxcat.h"
+#include "db_lock.h"
 
-static DB_ENV *dbe; /* libdb environment, if in use, NULL otherwise */
+static DB_ENV *dbe;	/* libdb environment, if in use, NULL otherwise */
+static int lockfd = -1;	/* fd of lock file to prevent concurrent recovery */
 
 static const DBTYPE dbtype = DB_BTREE;
 
@@ -56,18 +77,16 @@ typedef struct {
     int		fd;		/* file descriptor of data base file */
     dbmode_t	open_mode;	/* datastore open mode, DS_READ/DS_WRITE */
     DB		*dbp;		/* data base handle */
-    bool	locked;
     bool	is_swapped;	/* set if CPU and data base endianness differ */
+    DB_TXN	*txn;		/* stores the transaction handle */
     bool	created;	/* if newly created; for datastore.c (to add .WORDLIST_VERSION) */
 } dbh_t;
 
-#define DBT_init(dbt) (memset(&dbt, 0, sizeof(DBT)))
+#define DBT_init(dbt)		(memset(&dbt, 0, sizeof(DBT)))
 
-#define DB_AT_LEAST(maj, min) ((DB_VERSION_MAJOR > (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR >= (min))))
-#define DB_AT_MOST(maj, min) ((DB_VERSION_MAJOR < (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR <= (min))))
-
-/* dummy infrastructure, to be expanded by environment
- * or transactional initialization/shutdown */
+#define DB_AT_LEAST(maj, min)	((DB_VERSION_MAJOR > (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR >= (min))))
+#define DB_AT_MOST(maj, min)	((DB_VERSION_MAJOR < (maj)) || ((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR <= (min))))
+#define DB_EQUAL(maj, min)	((DB_VERSION_MAJOR == (maj)) && (DB_VERSION_MINOR == (min)))
 
 /* Function definitions */
 
@@ -80,6 +99,9 @@ static const char *resolveflags(u_int32_t flags) {
     if (flags & DB_EXCL) flags &= ~DB_EXCL, strlcat(buf, "DB_EXCL ", sizeof(buf));
     if (flags & DB_NOMMAP) flags &= ~DB_NOMMAP, strlcat(buf, "DB_NOMMAP ", sizeof(buf));
     if (flags & DB_RDONLY) flags &= ~DB_RDONLY, strlcat(buf, "DB_RDONLY ", sizeof(buf));
+#if DB_AT_LEAST(4,1)
+    if (flags & DB_AUTO_COMMIT) flags &= ~DB_AUTO_COMMIT, strlcat(buf, "DB_AUTO_COMMIT ", sizeof(buf));
+#endif
     snprintf(b2, sizeof(b2), "%#lx", (unsigned long)flags);
     if (flags) strlcat(buf, b2, sizeof(buf));
     return buf;
@@ -92,9 +114,13 @@ static int DB_OPEN(DB *db, const char *file,
 {
     int ret;
 
+#if DB_AT_LEAST(4,1)
+    flags |= DB_AUTO_COMMIT;
+#endif
+
     ret = db->open(db,
 #if DB_AT_LEAST(4,1)
-    	    0,	/* TXN handle - we use autocommit instead */
+	    0,	/* TXN handle - we use autocommit instead */
 #endif
 	    file, database, type, flags, mode);
 
@@ -108,19 +134,6 @@ static int DB_OPEN(DB *db, const char *file,
     return ret;
 }
 
-/* implements locking. */
-static int db_lock(int fd, int cmd, short int type)
-{
-    struct flock lock;
-
-    lock.l_type = type;
-    lock.l_start = 0;
-    lock.l_whence = (short int)SEEK_SET;
-    lock.l_len = 0;
-    return (fcntl(fd, cmd, &lock));
-}
-
-
 /** "constructor" - allocate our handle and initialize its contents */
 static dbh_t *dbh_init(const char *path, const char *name)
 {
@@ -130,15 +143,16 @@ static dbh_t *dbh_init(const char *path, const char *name)
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
 
-    handle->fd   = -1; /* for lock */
+    handle->fd   = -1;
 
     handle->path = xstrdup(path);
     handle->name = xmalloc(len);
     build_path(handle->name, len, path, name);
 
-    handle->locked     = false;
     handle->is_swapped = false;
     handle->created    = false;
+
+    handle->txn = NULL;
 
     return handle;
 }
@@ -155,6 +169,8 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
     return;
 }
 
+/* If header and library version do not match,
+ * print an error message on stderr and exit with EX_ERROR. */
 
 /* Returns is_swapped flag */
 bool db_is_swapped(void *vhandle)
@@ -182,6 +198,9 @@ static void check_db_version(void)
     if (!version_ok) {
 	version_ok = 1;
 	(void)db_version(&maj, &min, NULL);
+	if (DEBUG_DATABASE(1))
+	    fprintf(dbgout, "db_version: Header version %d.%d, library version %d.%d\n",
+		    DB_VERSION_MAJOR, DB_VERSION_MINOR, maj, min);
 	if (!(maj == DB_VERSION_MAJOR && min == DB_VERSION_MINOR)) {
 	    fprintf(stderr, "The DB versions do not match.\n"
 		    "This program was compiled for DB version %d.%d,\n"
@@ -239,10 +258,12 @@ static uint32_t get_psize(DB *dbp)
 
     ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
     if (ret) {
-	dbp->err (dbp, ret, "%s (db) DB->stat", progname);
+	print_error(__FILE__, __LINE__, "(db) DB->stat");
 	return 0xffffffff;
     }
     pagesize = dbstat->bt_pagesize;
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "DB->stat success, pagesize: %lu\n", (unsigned long)pagesize);
     free(dbstat);
     return pagesize;
 }
@@ -271,36 +292,23 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
     char *t;
 
     dbh_t *handle = NULL;
-    uint32_t open_flags = 0;
-    /*
-     * If locking fails with EAGAIN, then try without MMAP, fcntl()
-     * locking may be forbidden on mmapped files, or mmap may not be
-     * available for NFS. Thanks to Piotr Kucharski and Casper Dik,
-     * see news:comp.protocols.nfs and the bogofilter mailing list,
-     * message #1520, Message-ID: <20030206172016.GS1214@sgh.waw.pl>
-     * Date: Thu, 6 Feb 2003 18:20:16 +0100
-     */
-    size_t idx;
-    uint32_t retryflags[] = { 0, DB_NOMMAP };
+    uint32_t opt_flags = 0;
+
+    assert(init);
 
     check_db_version();
 
-    if (open_mode & DS_READ )
-	open_flags = DB_RDONLY;
-    if (open_mode & DS_CREATE )
-	open_flags = DB_CREATE | DB_EXCL;
-
-    /* retry when locking failed */
-    for (idx = 0; idx < COUNTOF(retryflags); idx += 1)
     {
+#if DB_AT_LEAST(4,1)
+	int flags;
+#endif
 	DB *dbp;
-	bool err = false;
-	uint32_t retryflag = retryflags[idx], pagesize;
+	uint32_t pagesize;
 
 	handle = dbh_init(path, name);
 
 	if (handle == NULL)
-	    break;
+	    return NULL;
 
 	/* create DB handle */
 	if ((ret = db_create (&dbp, dbe, 0)) != 0) {
@@ -311,45 +319,39 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 
 	handle->dbp = dbp;
 
-	/* set cache size, but not when we're using an environment */
-	if (dbe == NULL && db_cachesize != 0 &&
-	    (ret = dbp->set_cachesize(dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
-	    print_error(__FILE__, __LINE__, "(db) DB(%s)->set_cachesize(%u,%u,%u), err: %d, %s",
-			handle->name, db_cachesize/1024u, (db_cachesize % 1024u) * 1024u*1024u, 1u, ret, db_strerror(ret));
-	    goto open_err;
-	}
+	/* set flags */
+#if DB_EQUAL(4,1)
+	    flags = DB_CHKSUM_SHA1;
+#endif
+#if DB_AT_LEAST(4,2)
+	    flags = DB_CHKSUM;
+#endif
+
+#if DB_AT_LEAST(4,1)
+	    ret = dbp->set_flags(dbp, flags);
+	    if (ret) {
+		print_error(__FILE__, __LINE__,
+			"(db) DB->set_flags(%d) failed: %s",
+			flags, db_strerror(ret));
+		dbp->close(dbp, 0);
+		goto open_err;
+	    }
+#endif
 
 	/* open data base */
-	if (dbe && (t = strrchr(handle->name, DIRSEP_C)))
+	if ((t = strrchr(handle->name, DIRSEP_C)))
 	    t++;
 	else
 	    t = handle->name;
 
 retry_db_open:
-
-	ret = DB_OPEN(dbp, t, NULL, dbtype, open_flags | retryflag, 0664);
-
-	if (ret != 0) {
-	    err = (ret != ENOENT) || (open_flags & DB_RDONLY);
-	    if (!err) {
-		ret = DB_OPEN(dbp, t, NULL, dbtype, open_flags | DB_CREATE | DB_EXCL | retryflag, 0664);
-		if (ret != 0)
-		    err = true;
-		else
-		    handle->created = true;
-	    }
-	}
-
-	if (ret != 0) {
-	    if (ret == ENOENT && open_flags != DB_RDONLY)
-		return NULL;
-	    else
-		err = true;
-	}
-
-	if (err)
+	handle->created = false;
+	if ((ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags, 0664)) != 0
+	    && ( ret != ENOENT || opt_flags == DB_RDONLY ||
+		((handle->created = true),
+		(ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL, 0664)) != 0)))
 	{
-	    if (open_flags != DB_RDONLY && ret == EEXIST && --retries) {
+	    if (open_mode != DB_RDONLY && ret == EEXIST && --retries) {
 		/* sleep for 4 to 100 ms - this is just to give up the CPU
 		 * to another process and let it create the data base
 		 * file in peace */
@@ -375,19 +377,25 @@ retry_db_open:
 	handle->is_swapped = is_swapped ? true : false;
 
 	if (ret != 0) {
-	    dbp->err (dbp, ret, "%s (db) DB->get_byteswapped: %s",
-		      progname, handle->name);
-	    db_close(handle, false);
+	    print_error(__FILE__, __LINE__, "(db) DB->get_byteswapped: %s",
+		      db_strerror(ret));
+	    db_close(handle);
 	    return NULL;		/* handle already freed, ok to return */
 	}
 
+	if (DEBUG_DATABASE(1))
+	    fprintf(dbgout, "DB->get_byteswapped: %s\n", is_swapped ? "true" : "false");
+
 	ret = dbp->fd(dbp, &handle->fd);
 	if (ret != 0) {
-	    dbp->err (dbp, ret, "%s (db) DB->fd: %s",
-		      progname, handle->name);
-	    db_close(handle, false);
+	    print_error(__FILE__, __LINE__, "(db) DB->fd: %s",
+		      db_strerror(ret));
+	    db_close(handle);
 	    return NULL;		/* handle already freed, ok to return */
 	}
+
+	if (DEBUG_DATABASE(1))
+	    fprintf(dbgout, "DB->fd: %d\n", handle->fd);
 
 	/* query page size */
 	pagesize = get_psize(dbp);
@@ -401,38 +409,9 @@ retry_db_open:
 
 	/* check file size limit */
 	check_fsize_limit(handle->fd, pagesize);
-
-	/* skip manual lock when run in environment */
-	if (dbe)
-	    break;
-
-	/* try fcntl lock */
-	if (db_lock(handle->fd, F_SETLK,
-		    (short int)(open_mode == DS_READ ? F_RDLCK : F_WRLCK)))
-	{
-	    int e = errno;
-	    db_close(handle, true);
-	    handle = NULL;	/* db_close freed it, we don't want to use it anymore */
-	    errno = e;
-	    if (errno == EACCES)
-		errno = EAGAIN;
-	    if (errno != EAGAIN)
-		return NULL;
-	} else {
-	    /* have lock */
-	    break;
-	}
-    } /* for idx over retryflags */
-
-    if (handle) {
-	handle->locked = true;
-	if (handle->fd < 0)
-	    handle->locked=false;
-
-	return handle;
     }
 
-    return NULL;
+    return handle;
 
  open_err:
     dbh_free(handle);
@@ -444,6 +423,121 @@ retry_db_open:
     return NULL;
 }
 
+/* wrapper for the API that changed in 4.0, to
+ * collect the junk in a location separate from the implementation */
+#if DB_AT_LEAST(4,0)
+/* BerkeleyDB 4.0, 4.1, 4.2 */
+#define BF_LOG_FLUSH(e, i) ((e)->log_flush((e), (i)))
+#define BF_MEMP_SYNC(e, l) ((e)->memp_sync((e), (l)))
+#define BF_MEMP_TRICKLE(e, p, n) ((e)->memp_trickle((e), (p), (n)))
+#define BF_TXN_BEGIN(e, f, g, h) ((e)->txn_begin((e), (f), (g), (h)))
+#define BF_TXN_ID(t) ((t)->id(t))
+#define BF_TXN_ABORT(t) ((t)->abort((t)))
+#define BF_TXN_COMMIT(t, f) ((t)->commit((t), (f)))
+#define BF_TXN_CHECKPOINT(e, k, m, f) ((e)->txn_checkpoint((e), (k), (m), (f)))
+#else
+/* BerkeleyDB 3.0, 3.1, 3.2, 3.3 */
+#define BF_LOG_FLUSH(e, i) (log_flush((e), (i)))
+#define BF_MEMP_SYNC(e, l) (memp_sync((e), (l)))
+#define BF_MEMP_TRICKLE(e, p, n) (memp_trickle((e), (p), (n)))
+#define BF_TXN_BEGIN(e, f, g, h) (txn_begin((e), (f), (g), (h)))
+#define BF_TXN_ID(t) (txn_id(t))
+#define BF_TXN_ABORT(t) (txn_abort((t)))
+#define BF_TXN_COMMIT(t, f) (txn_commit((t), (f)))
+#if DB_AT_LEAST(3,1)
+/* BerkeleyDB 3.1, 3.2, 3.3 */
+#define BF_TXN_CHECKPOINT(e, k, m, f) (txn_checkpoint((e), (k), (m), (f)))
+#else
+/* BerkeleyDB 3.0 */
+#define BF_TXN_CHECKPOINT(e, k, m, f) (txn_checkpoint((e), (k), (m)))
+#endif
+#endif
+
+/** begin transaction. Returns 0 for success. */
+int db_txn_begin(void *vhandle)
+{
+    DB_TXN *t;
+    int ret;
+
+    dbh_t *handle = vhandle;
+    assert(dbe);
+    assert(handle);
+
+    ret = BF_TXN_BEGIN(dbe, NULL, &t, 0);
+    if (ret) {
+	print_error(__FILE__, __LINE__, "DB_ENV->txn_begin(%p), err: %s",
+		(void *)dbe, db_strerror(ret));
+	return ret;
+    }
+    handle->txn = t;
+    if (DEBUG_DATABASE(2))
+	fprintf(dbgout, "DB_ENV->txn_begin(%p), tid: %lx\n",
+		(void *)dbe, (unsigned long)BF_TXN_ID(t));
+
+    return 0;
+}
+
+int db_txn_abort(void *vhandle)
+{
+    int ret;
+    dbh_t *handle = vhandle;
+    DB_TXN *t = handle->txn;
+    assert(dbe);
+    assert(t);
+
+    ret = BF_TXN_ABORT(t);
+    if (ret)
+	print_error(__FILE__, __LINE__, "DB_TXN->abort(%lx) error: %s",
+		(unsigned long)BF_TXN_ID(t), db_strerror(ret));
+    else
+	if (DEBUG_DATABASE(2))
+	    fprintf(dbgout, "DB_TXN->abort(%lx)\n",
+		    (unsigned long)BF_TXN_ID(t));
+    handle->txn = NULL;
+
+    switch (ret) {
+	case 0:
+	    return DST_OK;
+	case DB_LOCK_DEADLOCK:
+	    return DST_TEMPFAIL;
+	default:
+	    return DST_FAILURE;
+    }
+}
+
+int db_txn_commit(void *vhandle)
+{
+    int ret;
+    dbh_t *handle = vhandle;
+    DB_TXN *t = handle->txn;
+    u_int32_t id;
+    assert(dbe);
+    assert(t);
+
+    id = BF_TXN_ID(t);
+    ret = BF_TXN_COMMIT(t, 0);
+    if (ret)
+	print_error(__FILE__, __LINE__, "DB_TXN->commit(%lx) error: %s",
+		(unsigned long)id, db_strerror(ret));
+    else
+	if (DEBUG_DATABASE(2))
+	    fprintf(dbgout, "DB_TXN->commit(%lx, 0)\n",
+		    (unsigned long)id);
+    handle->txn = NULL;
+
+    switch (ret) {
+	case 0:
+	    /* push out buffer pages so that >=15% are clean - we
+	     * can ignore errors here, as the log has all the data */
+	    BF_MEMP_TRICKLE(dbe, 15, NULL);
+
+	    return DST_OK;
+	case DB_LOCK_DEADLOCK:
+	    return DST_TEMPFAIL;
+	default:
+	    return DST_FAILURE;
+    }
+}
 
 int db_delete(void *vhandle, const dbv_t *token)
 {
@@ -454,18 +548,23 @@ int db_delete(void *vhandle, const dbv_t *token)
     DBT db_key;
     DBT_init(db_key);
 
+    assert(handle->txn);
+
     db_key.data = token->data;
     db_key.size = token->leng;
 
-    ret = dbp->del(dbp, NULL, &db_key, 0);
+    ret = dbp->del(dbp, handle->txn, &db_key, 0);
 
     if (ret != 0 && ret != DB_NOTFOUND) {
-	print_error(__FILE__, __LINE__, "(db) db_delete('%.*s'), err: %d, %s",
+	print_error(__FILE__, __LINE__, "(db) DB->del('%.*s'), err: %d, %s",
 		    CLAMP_INT_MAX(db_key.size),
 		    (const char *) db_key.data,
     		    ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
+
+    if (DEBUG_DATABASE(3))
+	fprintf(dbgout, "DB->del(%.*s)\n", CLAMP_INT_MAX(db_key.size), (const char *) db_key.data);
 
     return ret;		/* 0 if ok */
 }
@@ -479,6 +578,8 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
+    assert(handle);
+    assert(handle->txn);
 
     DBT_init(db_key);
     DBT_init(db_data);
@@ -491,25 +592,31 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
     db_data.ulen = val->leng;		/* max size */
     db_data.flags = DB_DBT_USERMEM;	/* saves the memcpy */
 
-    ret = dbp->get(dbp, NULL, &db_key, &db_data, 0);
+    /* DB_RMW can avoid deadlocks */
+    ret = dbp->get(dbp, handle->txn, &db_key, &db_data, handle->open_mode == DS_READ ? 0 : DB_RMW);
 
-    val->leng = db_data.size;		/* read count */
+    if (DEBUG_DATABASE(3))
+	fprintf(dbgout, "DB->get(%.*s): %s\n",
+		CLAMP_INT_MAX(token->leng), (char *) token->data, db_strerror(ret));
 
     switch (ret) {
     case 0:
 	break;
     case DB_NOTFOUND:
 	ret = DS_NOTFOUND;
-	if (DEBUG_DATABASE(3)) {
-	    fprintf(dbgout, "db_get_dbvalue: [%.*s] not found\n",
-		    CLAMP_INT_MAX(token->leng), (char *) token->data);
-	}
+	break;
+    case DB_LOCK_DEADLOCK:
+	db_txn_abort(handle);
+	ret = DS_ABORT_RETRY;
 	break;
     default:
-	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%.*s' ), err: %d, %s",
-		    CLAMP_INT_MAX(token->leng), (char *) token->data, ret, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "(db) DB->get(TXN=%lu,  '%.*s' ), err: %d, %s",
+		    (unsigned long)handle->txn, CLAMP_INT_MAX(token->leng), (char *) token->data, ret, db_strerror(ret));
+	db_txn_abort(handle);
 	exit(EX_ERROR);
     }
+
+    val->leng = db_data.size;		/* read count */
 
     return ret;
 }
@@ -524,6 +631,7 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
 
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
+    assert(handle->txn);
 
     DBT_init(db_key);
     DBT_init(db_data);
@@ -534,7 +642,12 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
     db_data.data = val->data;
     db_data.size = val->leng;		/* write count */
 
-    ret = dbp->put(dbp, NULL, &db_key, &db_data, 0);
+    ret = dbp->put(dbp, handle->txn, &db_key, &db_data, 0);
+
+    if (ret == DB_LOCK_DEADLOCK) {
+	db_txn_abort(handle);
+	return DS_ABORT_RETRY;
+    }
 
     if (ret != 0) {
 	print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%.*s' ), err: %d, %s",
@@ -542,31 +655,61 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
 	exit(EX_ERROR);
     }
 
+    if (DEBUG_DATABASE(3))
+	fprintf(dbgout, "DB->put(%.*s): %s\n",
+		CLAMP_INT_MAX(token->leng), (char *) token->data, db_strerror(ret));
+
     return 0;
 }
 
+static int db_flush_dirty(DB_ENV *env, int ret) {
+#if DB_AT_LEAST(3,0) && DB_AT_MOST(4,0)
+    /* flush dirty pages in buffer pool */
+    while (ret == DB_INCOMPLETE) {
+	rand_sleep(10000,1000000);
+	ret = BF_MEMP_SYNC(env, NULL);
+    }
+#else
+    (void)env;
+#endif
+
+    return ret;
+}
 
 /* Close files and clean up. */
-void db_close(void *vhandle, bool nosync)
+void db_close(void *vhandle)
 {
     int ret;
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
-    uint32_t f = nosync ? DB_NOSYNC : 0;
+    uint32_t f = DB_NOSYNC; /* safe as long as we're logging TXNs*/
+
+#if DB_AT_LEAST(4,2)
+    /* get_flags and DB_TXN_NOT_DURABLE are new in 4.2 */
+    ret = dbe->get_flags(dbe, &f);
+    if (ret) {
+	print_error(__FILE__, __LINE__, "get_flags returned error: %s",
+		db_strerror(ret));
+	f = 0;
+    } else {
+	f = (f & DB_TXN_NOT_DURABLE) ? 0 : DB_NOSYNC;
+    }
+#endif
 
     if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "db_close (%s) %s\n",
-		handle->name, nosync ? "nosync" : "sync");
+	fprintf(dbgout, "DB->close(%s, %s)\n",
+		handle->name, f & DB_NOSYNC ? "nosync" : "sync");
+
+    if (handle->txn) {
+	print_error(__FILE__, __LINE__, "db_close called with transaction still open, program fault!");
+    }
 
     ret = dbp->close(dbp, f);
-#if DB_AT_LEAST(3,2) && DB_AT_MOST(4,0)
-    /* ignore dirty pages in buffer pool */
-    if (ret == DB_INCOMPLETE)
-	ret = 0;
-#endif
+    ret = db_flush_dirty(dbe, ret);
     if (ret)
 	print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
 
+    handle->dbp = NULL;
     dbh_free(handle);
 }
 
@@ -580,23 +723,30 @@ void db_flush(void *vhandle)
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
 
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "db_flush(%s)\n", handle->name);
+
     ret = dbp->sync(dbp, 0);
-#if DB_AT_LEAST(3,2) && DB_AT_MOST(4,0)
-    /* ignore dirty pages in buffer pool */
-    if (ret == DB_INCOMPLETE)
-	ret = 0;
-#endif
+    ret = db_flush_dirty(dbe, ret);
+
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "DB->sync(%p): %s\n", (void *)dbp, db_strerror(ret));
+
     if (ret)
 	print_error(__FILE__, __LINE__, "(db) db_sync: err: %d, %s", ret, db_strerror(ret));
-}
 
+    ret = BF_LOG_FLUSH(dbe, NULL);
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "DB_ENV->log_flush(%p): %s\n", (void *)dbe,
+		db_strerror(ret));
+}
 
 int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 {
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
 
-    int ret = 0;
+    int ret = 0, eflag = 0;
 
     DBC dbc;
     DBC *dbcp = &dbc;
@@ -606,9 +756,12 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     memset(&key, 0, sizeof(key));
     memset(&data, 0, sizeof(data));
 
-    ret = dbp->cursor(dbp, NULL, &dbcp, 0);
+    assert(dbe);
+    assert(handle->txn);
+
+    ret = dbp->cursor(dbp, handle->txn, &dbcp, 0);
     if (ret) {
-	dbp->err(dbp, ret, "(cursor): %s", handle->path);
+	print_error(__FILE__, __LINE__, "(cursor): %s", handle->path);
 	return -1;
     }
 
@@ -645,61 +798,248 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 	ret = 0;
 	break;
     default:
-	dbp->err(dbp, ret, "(c_get)");
-	ret = -1;
-    }
-    if (dbcp->c_close(dbcp)) {
-	dbp->err(dbp, ret, "(c_close)");
-	ret = -1;
+	print_error(__FILE__, __LINE__, "(c_get): %s", db_strerror(ret));
+	eflag = 1;
+	break;
     }
 
-    return ret;		/* 0 if ok */
+    if ((ret = dbcp->c_close(dbcp))) {
+	print_error(__FILE__, __LINE__, "(c_close): %s", db_strerror(ret));
+	eflag = -1;
+    }
+
+    return eflag ? -1 : ret;		/* 0 if ok */
 }
 
 const char *db_str_err(int e) {
     return db_strerror(e);
 }
 
+/** set an fcntl-style lock on \a path.
+ * \a locktype is F_RDLCK, F_WRLCK, F_UNLCK
+ * \a mode is F_SETLK or F_SETLKW
+ * \return file descriptor of locked file if successful
+ * negative value in case of error
+ */
+static int plock(const char *path, short locktype, int mode) {
+    struct flock fl;
+    int fd, r;
+
+    fd = open(path, O_RDWR);
+    if (fd < 0) return fd;
+
+    fl.l_type = locktype;
+    fl.l_whence = SEEK_SET;
+    fl.l_start = (off_t)0;
+    fl.l_len = (off_t)0;
+    r = fcntl(fd, mode, &fl);
+    if (r < 0)
+	return r;
+    return fd;
+}
+
+static int db_try_glock(short locktype, int lockcmd) {
+    int ret;
+    char *t;
+    const char *const tackon = DIRSEP_S "lockfile-d";
+
+    assert(bogohome);
+
+    /* lock */
+    ret = mkdir(bogohome, (mode_t)0755);
+    if (ret && errno != EEXIST) {
+	print_error(__FILE__, __LINE__, "mkdir(%s): %s",
+		bogohome, strerror(errno));
+	exit(EXIT_FAILURE);
+    }
+
+    t = mxcat(bogohome, tackon, NULL);
+
+    /* All we are interested in is that this file exists, we'll close it
+     * right away as plock down will open it again */
+    ret = open(t, O_RDWR|O_CREAT|O_EXCL, (mode_t)0644);
+    if (ret < 0 && errno != EEXIST) {
+	print_error(__FILE__, __LINE__, "open(%s): %s",
+		t, strerror(errno));
+	exit(EXIT_FAILURE);
+    }
+
+    if (ret >= 0)
+	close(ret);
+
+    lockfd = plock(t, locktype, lockcmd);
+    if (lockfd < 0 && errno != EAGAIN && errno != EACCES) {
+	print_error(__FILE__, __LINE__, "lock(%s): %s",
+		t, strerror(errno));
+	exit(EXIT_FAILURE);
+    }
+
+    free(t);
+    /* lock set up */
+    return lockfd;
+}
+
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
+static int db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
+{
+    int ret;
 
-int db_init(void) {
-    char *t;
-    int cdb_alldb = 1;
+    assert(bogohome);
+    assert(dbe == NULL);
 
-    if (bogohome && getenv("BOGOFILTER_CONCURRENT_DATA_STORE")) {
-	int ret = db_env_create(&dbe, 0);
-	if (ret != 0) {
-	    print_error(__FILE__, __LINE__, "db_env_create, err: %d, %s", ret, db_strerror(ret));
-	    exit(EX_ERROR);
-	}
-	if (db_cachesize != 0 &&
-	    (ret = dbe->set_cachesize(dbe, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
-	    print_error(__FILE__, __LINE__, "DBENV->set_cachesize(%u), err: %d, %s",
-			db_cachesize, ret, db_strerror(ret));
-	    exit(EXIT_FAILURE);
-	}
-
-	/* Allow user to override DB_CDB_ALLDB to 0 */
-	if ((t = getenv("DB_CDB_ALLDB")))
-	    cdb_alldb = atoi(t);
-
-	ret = dbe->open(dbe, bogohome, DB_INIT_MPOOL | DB_INIT_CDB | DB_CREATE, /* mode */ 0644);
-	if (ret != 0) {
-	    dbe->close(dbe, 0);
-	    print_error(__FILE__, __LINE__, "DBENV->open, err: %d, %s", ret, db_strerror(ret));
-	    exit(EXIT_FAILURE);
-	}
+    ret = db_env_create(&dbe, 0);
+    if (ret != 0) {
+	print_error(__FILE__, __LINE__, "db_env_create, err: %d, %s", ret,
+		db_strerror(ret));
+	exit(EX_ERROR);
     }
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "db_env_create: %p\n", (void *)dbe);
+
+    dbe->set_errfile(dbe, stderr);
+
+    if (db_cachesize != 0 &&
+	(ret = dbe->set_cachesize(dbe, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
+      print_error(__FILE__, __LINE__, "DB_ENV->set_cachesize(%u), err: %d, %s",
+		  db_cachesize, ret, db_strerror(ret));
+      exit(EXIT_FAILURE);
+    }
+
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "DB_ENV->set_cachesize(%u)\n", db_cachesize);
+
+    /* configure lock system size - locks */
+#if DB_AT_LEAST(3,2)
+    if ((ret = dbe->set_lk_max_locks(dbe, numlocks)) != 0)
+#else
+    if ((ret = dbe->set_lk_max(dbe, numlocks)) != 0)
+#endif
+    {
+	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_max_locks(%p, %lu), err: %s", (void *)dbe,
+		(unsigned long)numlocks, db_strerror(ret));
+	exit(EXIT_FAILURE);
+    }
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "DB_ENV->set_lk_max_locks(%p, %lu)\n", (void *)dbe, (unsigned long)numlocks);
+
+#if DB_AT_LEAST(3,2)
+    /* configure lock system size - objects */
+    if ((ret = dbe->set_lk_max_objects(dbe, numobjs)) != 0) {
+	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_max_objects(%p, %lu), err: %s", (void *)dbe,
+		(unsigned long)numobjs, db_strerror(ret));
+	exit(EXIT_FAILURE);
+    }
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "DB_ENV->set_lk_max_objects(%p, %lu)\n", (void *)dbe, (unsigned long)numlocks);
+#endif
+
+    /* configure automatic deadlock detector */
+    if ((ret = dbe->set_lk_detect(dbe, DB_LOCK_DEFAULT)) != 0) {
+	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT), err: %s", db_strerror(ret));
+	exit(EXIT_FAILURE);
+    }
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT)\n");
+
+    ret = dbe->open(dbe, bogohome,
+#if DB_AT_MOST(3,0)
+	    NULL,
+#endif
+	    DB_INIT_MPOOL | DB_INIT_LOCK
+	    | DB_INIT_LOG | DB_INIT_TXN | DB_CREATE | flags, /* mode */ 0644);
+    if (ret != 0) {
+	dbe->close(dbe, 0);
+	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %d, %s", ret, db_strerror(ret));
+	if (ret == DB_RUNRECOVERY) {
+	    fprintf(stderr, "To recover, run: bogoutil -v -f \"%s\"\n",
+		    bogohome);
+	}
+	exit(EXIT_FAILURE);
+    }
+
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "DB_ENV->open(home=%s)\n", bogohome);
+
     init = true;
     return 0;
+}
+
+/* initialize data base, configure some lock table sizes
+ * (which can be overridden in the DB_CONFIG file)
+ * and lock the file to tell other parts we're initialized and
+ * do not want recovery to stomp over us
+ */
+int db_init(void) {
+    const u_int32_t numlocks = 16384;
+    const u_int32_t numobjs = 16384;
+
+    if (needs_recovery(bogohome)) {
+	db_recover(0, 0);
+    }
+
+    db_try_glock(F_RDLCK, F_SETLKW);
+
+    if (set_lock(bogohome)) {
+	exit(EX_ERROR);
+    }
+
+    return db_xinit(numlocks, numobjs, /* flags */ 0);
+}
+
+int db_recover(int catastrophic, int force) {
+    int ret;
+
+    while((force || needs_recovery(bogohome))
+	    && (db_try_glock(F_WRLCK, F_SETLKW) <= 0))
+	rand_sleep(10000,1000000);
+
+    if (!(force || needs_recovery(bogohome)))
+	return 0;
+
+retry:
+    if (DEBUG_DATABASE(0))
+        fprintf(dbgout, "running %s data base recovery\n",
+	    catastrophic ? "catastrophic" : "regular");
+    ret = db_xinit(1024, 1024, catastrophic ? DB_RECOVER_FATAL : DB_RECOVER);
+    if (ret) {
+	if(!catastrophic) {
+	    catastrophic = 1;
+	    goto retry;
+	}
+	goto rec_fail;
+    }
+
+    clear_lockfile(bogohome);
+    ds_cleanup();
+
+    return 0;
+
+rec_fail:
+    exit(EX_ERROR);
 }
 
 void db_cleanup(void) {
     if (!init)
 	return;
-    if (dbe)
-	dbe->close(dbe, 0);
+    if (dbe) {
+	int ret;
+
+	/* checkpoint if more than 64 kB of logs have been written
+	 * or 120 min have passed since the previous checkpoint */
+	/*                           kB  min flags */
+	ret = BF_TXN_CHECKPOINT(dbe, 64, 120, 0);
+	ret = db_flush_dirty(dbe, ret);
+	if (ret)
+	    print_error(__FILE__, __LINE__, "(db) DBE->txn_checkpoint returned %s", db_strerror(ret));
+
+	ret = dbe->close(dbe, 0);
+	if (DEBUG_DATABASE(1) || ret)
+	    fprintf(dbgout, "DB_ENV->close(%p): %s\n", (void *)dbe, db_strerror(ret));
+    }
+    clear_lock();
+    if (lockfd >= 0)
+	close(lockfd); /* release locks */
     dbe = NULL;
     init = false;
 }

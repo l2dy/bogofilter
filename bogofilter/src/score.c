@@ -19,6 +19,7 @@ NAME:
 #include "datastore.h"
 #include "msgcounts.h"
 #include "prob.h"
+#include "rand_sleep.h"
 #include "rstats.h"
 #include "score.h"
 #include "wordhash.h"
@@ -108,11 +109,29 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
     {
 	size_t i;
 	dsv_t val;
+	int ret;
 
 	if (override > list->override)	/* if already found */
 	    break;
 
-	if (ds_read(list->dsh, token, &val) != 0)
+retry:
+	if (ds_txn_begin(list->dsh) != DST_OK) {
+	    fprintf(stderr, "Problem starting transaction!\n");
+	    exit(EX_ERROR);
+	}
+
+	ret = ds_read(list->dsh, token, &val);
+	if (ret == DS_ABORT_RETRY) {
+	    rand_sleep(4*1000,1000*1000);
+	    goto retry;
+	}
+
+	if (ds_txn_commit(list->dsh) == DST_TEMPFAIL) {
+	    rand_sleep(4*1000,1000*1000);
+	    goto retry;
+	}
+
+	if (ret)
 	    continue;			/* not found */
 
 	if (list->type == WL_IGNORE)	/* if on ignore list */
@@ -177,6 +196,7 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     size_t robn = 0;
     size_t count = 0;
     bool need_stats;
+    int err = 0;
 
     (void) fp; 	/* quench compiler warning */
 
@@ -218,11 +238,11 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 	    rstats_add(token, prob, cnts);
 
 	/* Robinson's P and Q; accumulation step */
-        /*
+	/*
 	 * P = 1 - ((1-p1)*(1-p2)*...*(1-pn))^(1/n)     [spamminess]
-         * Q = 1 - (p1*p2*...*pn)^(1/n)                 [non-spamminess]
+	 * Q = 1 - (p1*p2*...*pn)^(1/n)                 [non-spamminess]
 	 */
-        if (fabs(EVEN_ODDS - prob) - min_dev >= EPS) {
+	if (fabs(EVEN_ODDS - prob) - min_dev >= EPS) {
 	    int e;
 
 	    P.mant *= 1-prob;
@@ -236,8 +256,8 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 		Q.mant = frexp(Q.mant, &e);
 		Q.exp += e;
 	    }
-            robn ++;
-        }
+	    robn ++;
+	}
 
 	if (DEBUG_ALGORITHM(3)) {
 	    (void)fprintf(dbgout, "%3lu %3lu %f ",
@@ -254,11 +274,11 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     spamicity = get_spamicity(robn, P, Q);
 
     if (need_stats && robn != 0)
-	rstats_fini(robn, P, Q, spamicity );
+	rstats_fini(robn, P, Q, spamicity);
 
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "### msg_compute_spamicity() ends\n");
 
-    return (spamicity);
+    return err ? -1 : spamicity;
 }
 
 void score_initialize(void)
@@ -282,7 +302,8 @@ void score_initialize(void)
     if (fabs(robs) < EPS)
 	robs = ROBS;
 
-    if (fabs(robx) < EPS) {
+    if (fabs(robx) < EPS)
+    {
 	/* Assign default value in case there's no wordlist
 	 * or no wordlist entry */
 	robx = ROBX;
@@ -290,12 +311,29 @@ void score_initialize(void)
 	{
 	    int ret;
 	    dsv_t val;
-	    
+
+retry:
 	    /* Note: .ROBX is scaled by 1000000 in the wordlist */
-	    ret = ds_read(list->dsh, word_robx, &val);
-	    if (ret == 0) {
-		uint l_robx = val.count[IX_SPAM];
-		robx = l_robx ? (double)l_robx / 1000000 : ROBX; /* unscale */
+	    if (DST_OK != ds_txn_begin(list->dsh))
+		ret = -1;
+	    else {
+		ret = ds_read(list->dsh, word_robx, &val);
+		if (ret == DS_ABORT_RETRY) {
+		    rand_sleep(4*1000,1000*1000);
+		    goto retry;
+		}
+		if (ret != 0)
+		    robx = ROBX;
+		else {
+		    /* If found, unscale; else use predefined value */
+		    uint l_robx = val.count[IX_SPAM];
+		    robx = l_robx ? (double)l_robx / 1000000 : ROBX;
+		}
+		if (DST_OK != ds_txn_commit(list->dsh)) {
+		    ret = -1;
+		    fprintf(stderr, "transaction commit failed.\n");
+		    exit(EX_ERROR);
+		}
 	    }
 	}
     }

@@ -251,7 +251,7 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
 /*
    Close files and clean up.
 */
-void db_close(void *vhandle, bool nosync)
+void db_close(void *vhandle)
 {
     dbh_t *handle = vhandle;
     DEPOT *dbp;
@@ -259,7 +259,7 @@ void db_close(void *vhandle, bool nosync)
     if (handle == NULL) return;
 
     if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "(qdbm) dpclose(%s, %s)\n", handle->name, nosync ? "nosync" : "sync");
+	fprintf(dbgout, "(qdbm) dpclose(%s)\n", handle->name);
 
     dbp = handle->dbp;
 
@@ -349,3 +349,10 @@ void db_cleanup(void)
 {
     init = false;
 }
+
+/* dummy infrastructure, to be expanded by environment
+ * or transactional initialization/shutdown */
+int db_txn_begin(void *d) { (void)d; return 0; }
+int db_txn_abort(void *d) { (void)d; return 0; }
+int db_txn_commit(void *d) { (void)d; return 0; }
+int db_recover(int a, int b) { (void)a; (void)b; return 0; }

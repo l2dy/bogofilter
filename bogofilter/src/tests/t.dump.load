@@ -12,7 +12,13 @@ SUM="$BASE.sum"
 GREP="grep -v /dump.load-"
 SORT="sort"
 
-rm -f $DATA
+clear_database() {
+    rm -f $DATA
+    rm -f ${TMPDIR}/__db.*
+    rm -f ${TMPDIR}/log.*
+}
+
+clear_database
 
 #load database
 $BOGOUTIL -l $DATA -y 20020815 < ${srcdir}/inputs/$BASE.inp
@@ -38,14 +44,14 @@ $BOGOUTIL -a 20020815 -d $DATA | $SORT > ${TMPDIR}/dump.load-3.txt
 #     and'ing of command line qualifiers forced changing next line to two lines
 #BOGOUTIL -a 20020815 -s4,30 -d $DATA | $SORT > ${TMPDIR}/dump.load-4.txt
 $BOGOUTIL -a 20020815 -d $DATA | $SORT > ${TMPDIR}/dump.load-4.txt
-rm -f $DATA
+clear_database
 $BOGOUTIL -l $DATA < ${TMPDIR}/dump.load-4.txt
 $BOGOUTIL -s4,30      -d $DATA | $SORT > ${TMPDIR}/dump.load-4.txt
 
 #confirm exclusion of oldest, shortest(<, and longest entries
 ( diff ${TMPDIR}/dump.load-3.txt ${TMPDIR}/dump.load-4.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.3.4.txt >> $OUT
 
-rm -f $DATA
+clear_database
 
 #load wordlist, excluding shortest entries
 $BOGOUTIL -s5,30 -l $DATA < ${TMPDIR}/dump.load-4.txt
@@ -55,7 +61,7 @@ $BOGOUTIL -n -d $DATA | $SORT > ${TMPDIR}/dump.load-5.txt
 #confirm effect of non-ascii option
 ( diff ${TMPDIR}/dump.load-4.txt ${TMPDIR}/dump.load-5.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.4.5.txt >> $OUT
 
-rm -f $DATA
+clear_database
 
 #load wordlist non-ascii list and dump to show value combining
 $BOGOUTIL -a 20021010 -l $DATA < ${TMPDIR}/dump.load-5.txt

@@ -1,6 +1,6 @@
 # $Id$
 dnl vim: set noai tw=0:
-AC_INIT(bogofilter, 0.92.8.cvs)
+AC_INIT(bogofilter, 0.92.99.cvs)
 AC_PREREQ(2.54)
 AC_CONFIG_SRCDIR([src/bogofilter.c])
 AC_CANONICAL_TARGET
@@ -153,11 +153,18 @@ AC_SUBST(CFLAGS)
 dnl Checks for libraries.
 AC_CHECK_LIB([m],  [cos])
 
+dnl fdatasync can be faster than fsync but may be in librt on some systems
+dnl such as Solaris. The code is currently stubbed out in db_lock.c
+dnl AC_SEARCH_LIBS([fdatasync],[rt],AC_DEFINE(HAVE_FDATASYNC,1,[Define to 1 if you have the 'fdatasync' function.]))
+
 AC_CHECK_DECLS([getopt,optreset],,,[[
 #include <unistd.h>
 /* Solaris */
 #include <stdlib.h>
 ]])
+
+dnl check for SYNC stuff
+AC_CHECK_DECLS([O_DSYNC, O_SYNC, O_FSYNC],,,[#include <fcntl.h>])
 
 dnl Coerce GLIBC 2.3 to GLIBC 2.2 compatibility.
 dnl May not be complete with future extensions, but appears to work
