@@ -30,7 +30,7 @@ bogoutil_SOURCES = bogoutil.c \
 EXTRA_DIST = $(man1_MANS) \
 	     bogofilter.xml bogoutil.xml bogoupgrade.xml \
 	     bogofilter.spec bogofilter.spec.in \
-	     UPGRADE bogoupgrade \
+	     UPGRADE bogoupgrade bogo.R \
 	     doc/integrating-with-qmail contrib/bogofilter-qfe \
 	     version.sh
 #
