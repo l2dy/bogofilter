@@ -2,8 +2,8 @@
 
 set -e
 
-# only run this when valgrind is in the path, skip otherwise ("exit 77"
-# = skip)
+# only run this when valgrind is in the path, skip otherwise
+# ("exit 77" = skip)
 #
 # this is a stripped-down version of t.grftest
 
@@ -13,18 +13,9 @@ if test "x$EXE_EXT" = "x_static"; then
     exit 77
 fi
 
-VALGRIND="valgrind 3>${TMPDIR}/vg.out -q --num-callers=20 --logfile-fd=3"
+VALGRIND="$VALGRIND 3>${TMPDIR}/vg.out --logfile-fd=3"
 ( eval $VALGRIND true  ) 2>/dev/null || exit 77
 if ( eval $VALGRIND false ) 2>/dev/null ; then exit 77 ; fi
-
-# Graham config
-cat /dev/null > ${TMPDIR}/cfg.g
-
-# Robinson config
-cat <<EOF > ${TMPDIR}/cfg.r
-robx=0.415
-min_dev=0.0
-EOF
 
 # Fisher config
 cat <<EOF > ${TMPDIR}/cfg.f
@@ -60,7 +51,7 @@ run_test()
 if [   -d ${TMPDIR}/tests ] ; then rm -f ${TMPDIR}/tests/* ; else : ; fi
 mkdir -p ${TMPDIR}/tests
 
-for mth in g r f t ; do
+for mth in f t ; do
     alg="$mth"
     if [ "$alg" = "t" ] ; then alg=f ; else : ; fi
     BOGOFILTER_DIR="${TMPDIR}/words.$mth"
