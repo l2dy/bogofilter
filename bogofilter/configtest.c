@@ -16,7 +16,6 @@ AUTHOR:
 #include <string.h>
 
 #include "config.h"
-
 #include "common.h"
 #include "globals.h"
 #include "method.h"
@@ -36,7 +35,10 @@ const char *progname = "configtest";
 method_t graham_method = {
     NULL, NULL, NULL, NULL, NULL, NULL
 } ;
-method_t robinson_method = {
+method_t rf_robinson_method = {
+    NULL, NULL, NULL, NULL, NULL, NULL
+} ;
+method_t rf_fisher_method = {
     NULL, NULL, NULL, NULL, NULL, NULL
 } ;
 
