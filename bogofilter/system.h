@@ -9,6 +9,12 @@
 
 #if HAVE_STDBOOL_H
 # include <stdbool.h>
+/*
+# undef	true
+# undef	false
+# define false (bool) 0
+# define true  (bool) 1
+*/
 #else
 # if ! HAVE__BOOL
 #  ifdef __cplusplus
