@@ -26,15 +26,15 @@ struct wordlist_s
     /*@owned@*/ dsh_t *dsh;	/* datastore handle */
     u_int32_t	msgcount[IX_SIZE];	/* count of messages in wordlist. */
     WL_TYPE	type;		/* 'I' for "ignore" */
-    bool	bad[IX_SIZE];
     int		override;
 };
 
 /*@null@*/ 
 extern wordlist_t *word_list;
 
-int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* path,
-		  bool sbad, bool gbad, int override, WL_TYPE type);
+int init_wordlist(/*@out@*/ wordlist_t **list, 
+		  const char* name, const char* path,
+		  int override, WL_TYPE type);
 
 void free_wordlists(void);
 

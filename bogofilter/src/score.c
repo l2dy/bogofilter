@@ -76,9 +76,9 @@ void msg_print_stats(FILE *fp)
 	rstats_print(unsure);
 }
 
-static void wordprob_add(wordcnts_t *cnts, uint count, uint bad)
+static void wordprob_add(wordcnts_t *cnts, uint count, uint idx)
 {
-    if (bad)
+    if (idx == IX_SPAM)
 	cnts->bad += count;
     else
 	cnts->good += count;
@@ -126,7 +126,7 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 		val.count[i] = 0;
 		ds_write(list->dsh, token, &val);
 	    }
-	    wordprob_add(cnts, val.count[i], list->bad[i]);
+	    wordprob_add(cnts, val.count[i], i);
 	}
 
 	if (DEBUG_ALGORITHM(1)) {

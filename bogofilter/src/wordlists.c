@@ -33,7 +33,7 @@ void open_wordlists(dbmode_t mode)
     int retry;
 
     if (word_lists == NULL)
-	init_wordlist(&word_lists, "word", WORDLIST, true, false, 0, WL_REGULAR);
+	init_wordlist(&word_lists, "word", WORDLIST, 0, WL_REGULAR);
 
     do {
 	ds_init();
@@ -210,7 +210,7 @@ bool configure_wordlist(const char *val)
     precedence=atoi(tmp);
     tmp = spanword(tmp);
     
-    rc = init_wordlist(&wl, listname, filename, true, false, precedence, type);
+    rc = init_wordlist(&wl, listname, filename, precedence, type);
     ok = rc == 0;
 
     if (ok)
