@@ -266,9 +266,19 @@ size_t decode_text(word_t *w)
 
     while (txt < fin) {
 	word_t n;
-	char *typ = strchr(txt+2, '?') + 1;	/* Encoding type - 'B' or 'Q' */
-	char *end = strstr(typ+2, "?=");	/* last char of encoded word  */
-	size_t len = end - (typ+2);
+	char *typ;			/* Encoding type - 'B' or 'Q' */
+	char *end;			/* last char of encoded word  */
+	size_t len;
+
+	if (txt == NULL)
+	    break;
+	typ = strchr(txt+2, '?');
+	if (typ == NULL)
+	    break;
+	end = strstr(typ+2, "?=");
+	if (end == NULL)
+	    break;
+	len = end - (typ+2);
 
 	n.text = (byte *)(typ + 2);		/* Start of encoded word */
 	n.leng = len;				/* Length of encoded word */
