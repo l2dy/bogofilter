@@ -4,6 +4,20 @@
 
 $Id$
 
+0.14.2
+
+	2003-08-02
+
+	* Fixed bug in input routine that used memcpy() rather than memmove()
+	  for an overlapping copy, possibly causing data corruption on some
+	  systems.
+	* Fixed "make check" failures for bogoutil introduced with the
+	  "combined wordlist" feature in 0.14.0. There has been a buffer
+	  overflow. All users of bogofilter with combined wordlist prior to
+	  0.14.2 are advised to upgrade.
+	* Fixed bogus "t.valgrind" test FAILures.
+	* Fixed uninitialized data in db_get_dbvalue(), for split word lists.
+
 0.14.1.1 2003-08-01
 
 	* Fixed check for adding spam_subject_tag to Subject: line.
