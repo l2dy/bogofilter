@@ -74,7 +74,7 @@ void rstats_init(void)
 void rstats_cleanup(void)
 {
     rstats_t *p, *q;
-    
+
     for (p = current; p != NULL; p = q)
     {
       q = p->next;
@@ -93,7 +93,7 @@ void rstats_add( const word_t *token,
     current->good  = good;
     current->bad   = bad;
     current->prob  = prob;
-    current->next = (rstats_t *)xmalloc(sizeof(rstats_t));
+    current->next = (rstats_t *)xcalloc(1, sizeof(rstats_t));
     current = current->next;
 }
 
