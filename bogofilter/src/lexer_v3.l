@@ -118,10 +118,10 @@ MSG_COUNT	^\"\.MSG_COUNT\"
 TOKENFRONT	[^[:blank:][:cntrl:][:digit:][:punct:]]
 TOKENMID	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*,[:cntrl:]\[\]]+
 BOGOLEX_TOKEN	[^[:blank:]<>;    &%$ @ |/\\{}^\"  \*,[:cntrl:]\[\]]+
-TOKENBACK1	[^[:blank:][:punct:][:cntrl:]]
-TOKENBACK2	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*\._\-\+,[:cntrl:]]
+TOKENBACK_OLD	[^[:blank:][:punct:][:cntrl:]]
+TOKENBACK	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*\._\-\+,[:cntrl:]]
 
-TOKEN 		{TOKENFRONT}{TOKENMID}{TOKENBACK2}{1,70}
+TOKEN 		{TOKENFRONT}{TOKENMID}{TOKENBACK}{1,70}
 
 DOLLARS		[0-9]+
 CENTS		[0-9]+
