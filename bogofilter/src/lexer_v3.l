@@ -277,6 +277,18 @@ static void reorder_html(void)
     xfree(yycopy);
 }
 
+char yy_get_state(void);
+
+char yy_get_state(void)
+{
+    switch (YYSTATE) {
+    case INITIAL: return 'i';
+    case TEXT:    return 't';
+    case HTML:    return 'h';
+    default:      return 'o';
+    }
+}
+
 /*
  * The following sets edit modes for GNU EMACS
  * Local Variables:

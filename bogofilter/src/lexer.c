@@ -55,14 +55,18 @@ static int skip_spam_header(buff_t *buff);
 static int get_decoded_line(buff_t *buff);
 
 /* Function Definitions */
+ 
+extern char yy_get_state(void);
+extern void yy_set_state_initial(void);
 
 static void lexer_display_buffer(buff_t *buff)
 {
-    fprintf(dbgout, "*** %2d %c %ld ", yylineno,
-	    msg_header ? 'h' : 'b', (long)(buff->t.leng - buff->read));
-    buff_puts(buff, 0, dbgout);
-    if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
-	fputc('\n', dbgout);
+    fprintf(dbgout, "*** %2d %c%c %2ld ", 
+	    yylineno, msg_header ? 'h' : 'b', yy_get_state(), 
+	    (long)(buff->t.leng - buff->read));
+     buff_puts(buff, 0, dbgout);
+     if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
+ 	fputc('\n', dbgout);
 }
 
 /* Check for lines wholly composed of printable characters as they can cause a scanner abort 
