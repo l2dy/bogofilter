@@ -223,7 +223,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
 <INITIAL>name=\"?				;
 <INITIAL>filename=\"?				;
-<INITIAL>^[ \b\t]*\n				{ lineno += 1;
+<INITIAL>^[ \b\t]*$				{ lineno += 1;
 						  if (get_content_type() == MIME_TEXT_HTML)
 						      BEGIN HTML;
 						  else

@@ -91,7 +91,7 @@ token_t get_token(void)
 	case EMPTY:	/* empty line -- check for bogus end of header */
 	    if (msg_state->mime_type == MIME_MESSAGE)
 		mime_add_child(msg_state);
-	    if (yylval->leng == 1)
+	    if (yylval->leng == 0)
 		continue;
 	    else	/* "spc:invalid_end_of_header" */
 		yylval = word_dup(nonblank_line);
