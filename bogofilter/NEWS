@@ -23,6 +23,9 @@ Briefly:
 
 	2005-01-04
 
+	* bogoutil now reads the configuration files to know the user's
+	  db_lk_max_* values.  Reported by Karl O. Pinc.
+
 	* Berkeley DB Transactional recovery now uses the actual db_lk_max_*
 	  values rather than hardcoded 1024.  Reported by Karl O. Pinc.
 

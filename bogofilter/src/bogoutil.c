@@ -41,6 +41,10 @@ AUTHORS:
 #include "xmalloc.h"
 #include "xstrdup.h"
 
+/* prototypes for dummies below: */
+#include "score.h"
+
+
 const char *progname = "bogoutil";
 
 static int token_count = 0;
@@ -53,6 +57,10 @@ bool  onlyprint = false;
 static int process_arg(int option, const char *name, const char *arg);
 
 /* Function Definitions */
+
+/* dummies to avoid score.o */
+double msg_spamicity(void) { return .0; }
+rc_t msg_status(void) { return RC_OK; }
 
 static int ds_dump_hook(word_t *key, dsv_t *data,
 			/*@unused@*/ void *userdata)
@@ -795,6 +803,7 @@ int main(int argc, char *argv[])
     set_today();			/* compute current date for token age */
 
     process_arglist(argc, argv);
+    process_config_files(false);	/* need to read lock sizes */
 
     /* Extra or missing parameters */
     if (flag != M_WORD && argc != optind) {
