@@ -23,3 +23,5 @@ bogofilter_static
 bogolexer_static
 bogoutil_static
 
+bogotune
+config.log
