@@ -94,8 +94,8 @@ TOKENBACK	[^[:blank:][:punct:][:cntrl:]]
 TOKEN 		{TOKENFRONT}{TOKENMID_NJS_DR}{TOKENBACK}
 
 MSG_COUNT	^\"\.MSG_COUNT\"\ {NUM}\ {NUM}$
-BOGOLEX_MID	[^[:blank:]<>;=()&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[\]]+
-BOGOLEX_TOKEN	{TOKENFRONT}{BOGOLEX_MID}{TOKENBACK}
+BOGOLEX_MID	[^[:blank:]<>;=()&%$#@!+|/\\{}^\"\*,[:cntrl:]\[\]]+
+BOGOLEX_TOKEN	{BOGOLEX_MID}
 
 T2		{TOKENFRONT}<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[]+
 T1		{TOKENFRONT}
