@@ -21,7 +21,9 @@ CONTRIBUTORS:
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
+#include "datastore.h"
 #include "mime.h"
+#include "passthrough.h"
 #include "paths.h"
 #include "token.h"
 #include "wordlists.h"
