@@ -1702,6 +1702,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     /* directories from command line and config file are already handled */
     if (ds_flag == DS_DSK) {
+	char *ds_file;
 
 	if (ds_path == NULL)
 	    ds_path = get_directory(PR_ENV_BOGO);
@@ -1712,8 +1713,9 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	set_bogohome(ds_path);
 	env = ds_init(bogohome, WORDLIST);
 
-	ds_path = mxcat(ds_path, DIRSEP_S, WORDLIST, NULL);
-	init_wordlist("word", ds_path, 0, WL_REGULAR);
+	ds_file = mxcat(ds_path, DIRSEP_S, WORDLIST, NULL);
+	init_wordlist("word", ds_file, 0, WL_REGULAR);
+	xfree(ds_file);
     }
 
     bogotune();
