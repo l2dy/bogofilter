@@ -13,6 +13,8 @@ AUTHOR:
 #ifndef	BUFF_H
 #define	BUFF_H
 
+#include <stdio.h>
+
 #include "word.h"
 
 typedef struct {
@@ -28,6 +30,7 @@ extern buff_t  *buff_expand(buff_t *t, int offset);
 extern void 	buff_free(buff_t *t);
 extern buff_t  *buff_dup(const buff_t *t);
 extern int 	buff_cmp(const buff_t *t1, const buff_t *t2);
+extern int	buff_fgetsl(buff_t *, FILE *);
 extern void 	buff_puts(const buff_t *t, size_t width, FILE *fp);
 
 extern void 	buff_shift(buff_t *t, byte *start, size_t length);

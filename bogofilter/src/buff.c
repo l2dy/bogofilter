@@ -16,6 +16,7 @@ AUTHOR:
 #include "common.h"
 
 #include "buff.h"
+#include "fgetsl.h"
 #include "xmalloc.h"
 
 /* Function Definitions */
@@ -44,9 +45,20 @@ buff_t *buff_dup(const buff_t *word)
     return self;
 }
 
+int buff_fgetsl(buff_t *b, FILE *in)
+{
+    int s = xfgetsl(b->t.text, b->size, in, 1);
+    if (s >= 0) {
+	b->t.leng = s;
+    }
+    b->read = 0;
+    return s;
+}
+
 void buff_puts(const buff_t *buff, size_t width, FILE *fp)
 {
-    word_puts(&buff->t, width, fp);
+    word_t word = { buff->t.leng-buff->read, buff->t.text+buff->read };
+    word_puts(&word, width, fp);
 }
 
 buff_t *buff_shrink(buff_t *self, int offset)	/* shrink buffer */

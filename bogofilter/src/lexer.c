@@ -82,7 +82,7 @@ bool is_from(word_t *w)
 
 static int lgetsl(buff_t *buff)
 {
-    int count = xfgetsl(buff, fpin, 1);
+    int count = buff_fgetsl(buff, fpin);
     yylineno += 1;
     if (count >= 0 && DEBUG_LEXER(0)) {
 	lexer_display_buffer(buff);
