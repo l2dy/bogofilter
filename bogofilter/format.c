@@ -181,7 +181,8 @@ static size_t format_string(char *dest, const char *src, size_t min, size_t prec
     if (flags & F_PREC && prec < len)
 	len = prec;
     if (dest + len + 1 < destend) {
-	memcpy(dest, src, len + 1);
+	memcpy(dest, src, len);
+	dest[len] = '\0';
     } else {
 	fprintf(stderr, "header format is too long.\n");
 	/* abort to obtain a stack backtrace */
@@ -198,6 +199,11 @@ static size_t format_spamicity(char *dest, const char *fmt, double spamicity, co
     return len;
 }
 
+static void die (const char *msg, ...)
+#ifdef __GNUC__
+__attribute__ ((format(printf, 1, 2)))
+#endif
+    ;
 static void die (const char *msg, ...)
 {
     va_list ap;
