@@ -3,7 +3,7 @@
 /*****************************************************************************
 
 NAME:
-   bogoconfig.h -- prototypes and definitions for config.c.
+   bogoconfig.h -- prototypes and definitions for bogoconfig.c.
 
 AUTHOR:
    David Relson <relson@osagesoftware.com>
