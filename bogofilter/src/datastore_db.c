@@ -310,6 +310,7 @@ int db_get_dbvalue(void *vhandle, const word_t *word, /*@out@*/ dbv_t *val)
     db_data.ulen = sizeof(cv);
     db_data.flags = DB_DBT_USERMEM; /* saves the memcpy */
 
+    val->date = 0;
     for (i = 0; i < handle->count; i += 1) {
 	DB *dbp = handle->dbp[i];
 	ret = dbp->get(dbp, NULL, &db_key, &db_data, 0);
