@@ -98,10 +98,6 @@
         Technical problems
 
         <ul>
-          <li><a href="#build">How do I build bogofilter as non-root
-	  user or for a non-standard installation prefix?</a></li>
-          <li><a href="#patch">How do I build bogofilter with patches?</a></li>
-          <li><a href="#smaller">How do I make the executables smaller?</a></li>
           <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
           <li><a href="#return-codes">Why does bogofilter give return codes like 0 and
           256 when it's run from inside a program?</a></li>
@@ -117,6 +113,10 @@
         <ul>
           <li><a href="#port-notes">How do I get bogofilter working on Solaris, BSD, etc.?</a></li>
           <li><a href="#make-notes">Can I use the make command on my operating system?</a></li>
+          <li><a href="#build">How do I build bogofilter as non-root
+	  user or for a non-standard installation prefix?</a></li>
+          <li><a href="#patch">How do I build bogofilter with patches?</a></li>
+          <li><a href="#smaller">How do I make the executables smaller?</a></li>
         </ul>
       </li>
     </ul>
@@ -873,46 +873,6 @@
 
     <hr>
 
-    <h2 id="build">How do I build bogofilter as non-root user or for
-    a non-standard installation prefix?</h2>
-
-    <p>To install bogofilter to a non-standard path (as non-root user
-    you don't have the permission to the normal paths), you need to
-    provide the installation prefix when you run <code>./configure</code>.
-
-    <p> After downloading and unpacking the <a
-    href="http://sourceforge.net/project/showfiles.php?group_id=62265">
-    source code</a>, run <code>./configure --prefix=PATH</code> where
-    PATH is the installation prefix for the generated files (binaries,
-    man pages etc.).  Then run the usual build commands &#8212;
-    <code>make &amp;&amp; make check &amp;&amp; make install</code>.
-    </p>
-
-    <hr>
-
-    <h2 id="patch">How do I build bogofilter with patches?</h2>
-
-    <p>If you need to apply patches, get the <a
-    href="http://sourceforge.net/project/showfiles.php?group_id=62265">source
-    code</a> and unpack it using <code>tar -xzf</code> or <code>gunzip
-    | tar -xf -</code> (as appropriate). Change to the
-    source directory and run <code>./configure --prefix=PATH</code>
-    where PATH is the installation prefix for the generated files
-    (binaries, man pages etc.).  Apply your patches than run
-    <code>make &amp;&amp; make install</code>.
-
-    <hr>
-
-    <h2 id="smaller">How do I make the executables smaller?</h2>
-
-    <p>When space is tight, you can use <code>make
-    install-strip</code> instead of <code>make install</code>.  Doing
-    this will save space, but crashes can't be debugged unless more
-    information on reproducing the bug is provided to the
-    developers.</p>
-
-    <hr>
-
     <h2 id="nfs">Can I share wordlists over NFS?</h2>
 
     <p>If you're just reading from them, there are no problems.
@@ -1081,6 +1041,46 @@
     install GNU make.  If your non-GNU make can't build bogofilter,
     we're sorry but you're on your own. If it takes just a minor and clean
     patch to make it compatible, we might take it.</p>
+
+    <hr>
+
+    <h2 id="build">How do I build bogofilter as non-root user or for
+    a non-standard installation prefix?</h2>
+
+    <p>To install bogofilter to a non-standard path (as non-root user
+    you don't have the permission to the normal paths), you need to
+    provide the installation prefix when you run <code>./configure</code>.
+
+    <p> After downloading and unpacking the <a
+    href="http://sourceforge.net/project/showfiles.php?group_id=62265">
+    source code</a>, run <code>./configure --prefix=PATH</code> where
+    PATH is the installation prefix for the generated files (binaries,
+    man pages etc.).  Then run the usual build commands &#8212;
+    <code>make &amp;&amp; make check &amp;&amp; make install</code>.
+    </p>
+
+    <hr>
+
+    <h2 id="patch">How do I build bogofilter with patches?</h2>
+
+    <p>If you need to apply patches, get the <a
+    href="http://sourceforge.net/project/showfiles.php?group_id=62265">source
+    code</a> and unpack it using <code>tar -xzf</code> or <code>gunzip
+    | tar -xf -</code> (as appropriate). Change to the
+    source directory and run <code>./configure --prefix=PATH</code>
+    where PATH is the installation prefix for the generated files
+    (binaries, man pages etc.).  Apply your patches than run
+    <code>make &amp;&amp; make install</code>.
+
+    <hr>
+
+    <h2 id="smaller">How do I make the executables smaller?</h2>
+
+    <p>When space is tight, you can use <code>make
+    install-strip</code> instead of <code>make install</code>.  Doing
+    this will save space, but crashes can't be debugged unless more
+    information on reproducing the bug is provided to the
+    developers.</p>
 
     <hr>
 
