@@ -19,6 +19,7 @@ NAME:
 
 #include "bool.h"
 #include "charset.h"
+#include "configfile.h"
 #include "lexer.h"
 #include "textblock.h"
 #include "token.h"
@@ -31,7 +32,30 @@ const char *progname = "bogolexer";
 run_t run_type = RUN_NORMAL;
 const char *spam_header_name = SPAM_HEADER_NAME;
 
-/* Function definitions */
+const parm_desc sys_parms[] =
+{
+    { "stats_in_header",		CP_BOOLEAN,	{ (void *) &stats_in_header } },
+    { "user_config_file",		CP_STRING,	{ &user_config_file } },
+    { "block_on_subnets",		CP_BOOLEAN,	{ (void *) &block_on_subnets } },
+    { "charset_default",		CP_STRING,	{ &charset_default } },
+    { "replace_nonascii_characters",	CP_BOOLEAN,	{ (void *) &replace_nonascii_characters } },
+    { "kill_html_comments",		CP_BOOLEAN,	{ (void *) &kill_html_comments } },
+    { "count_html_comments",		CP_INTEGER,	{ (void *) &count_html_comments } },
+    { "score_html_comments",		CP_BOOLEAN,	{ (void *) &score_html_comments } },
+    { "tag_header_lines",		CP_BOOLEAN,	{ (void *) &tag_header_lines } },
+    { NULL,				CP_NONE,	{ (void *) NULL } },
+};
+
+const parm_desc format_parms[] =
+{
+    { NULL, CP_NONE, { (void *) NULL } },
+};
+
+/* Function Prototypes */
+
+static int process_args(int argc, char **argv);
+
+/* Function Definitions */
 
 static void usage(void)
 {
@@ -48,21 +72,20 @@ static void help(void)
 	    "\t-k y/n\t- kill html comments (yes or no).\n"
 	    "\t-n\t- map non-ascii characters to '?'.\n"
 	    "\t-v\t- set debug verbosity level.\n"
-	    "\t-x list\t- set debug flags.\n"
+	    "\t-c file\t- read specified config file.\n"
+	    "\t-C\t- don't read standard config files.\n"
 	    "\t-I file\t- read message from file instead of stdin.\n"
 	    "%s is part of the bogofilter package.\n", progname);
 }
 
-int main(int argc, char **argv)
+static int process_args(int argc, char **argv)
 {
-    token_t t;
     int option;
-    int count=0;
 
     fpin = stdin;
     dbgout = stderr;
 
-    while ((option = getopt(argc, argv, ":hnpqvnx:I:k:DT")) != -1)
+    while ((option = getopt(argc, argv, ":hnpqvnx:I:k:c:CDT")) != -1)
     {
 	switch (option)
 	{
@@ -98,6 +121,15 @@ int main(int argc, char **argv)
 	    kill_html_comments = str_to_bool( optarg );
 	    break;
 
+	case 'c':
+	    read_config_file(optarg, true, false);
+	/*@fallthrough@*/
+	/* fall through to suppress reading config files */
+
+	case 'C':
+	    suppress_config_file = true;
+	    break;
+
 	case 'I':
 	    fpin = fopen( optarg, "r" );
 	    if (fpin == NULL) {
@@ -119,6 +151,17 @@ int main(int argc, char **argv)
 	    exit(0);
 	}
     }
+    return 0;
+}
+
+int main(int argc, char **argv)
+{
+    token_t t;
+    int count=0;
+
+    process_args(argc, argv);
+
+    process_config_files();
 
     textblocks = textblock_init();
 
