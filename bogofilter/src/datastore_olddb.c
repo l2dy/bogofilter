@@ -59,6 +59,7 @@ typedef struct {
     DB		*dbp;		/* data base handle */
     bool	locked;
     bool	is_swapped;	/* set if CPU and data base endianness differ */
+    DB_TXN	*txn;		/* stores the transaction handle */
     bool	created;	/* if newly created; for datastore.c (to add .WORDLIST_VERSION) */
 } dbh_t;
 
@@ -140,6 +141,8 @@ static dbh_t *dbh_init(const char *path, const char *name)
     handle->locked     = false;
     handle->is_swapped = false;
     handle->created    = false;
+
+    handle->txn = NULL;
 
     return handle;
 }
@@ -243,7 +246,7 @@ static uint32_t get_psize(DB *dbp)
 
     ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
     if (ret) {
-	print_error(__FILE__, __LINE__, "(db) DB->stat");
+	print_error(__FILE__, __LINE__, "DB->stat");
 	return 0xffffffff;
     }
     pagesize = dbstat->bt_pagesize;
@@ -276,8 +279,9 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 			BerkeleyDB are buggy. */
     char *t;
 
+    void *dbe = NULL;
     dbh_t *handle = NULL;
-    uint32_t opt_flags = (open_mode & DS_READ) ? DB_RDONLY : 0;
+    uint32_t opt_flags = (open_mode == DS_READ) ? DB_RDONLY : 0;
 
     /*
      * If locking fails with EAGAIN, then try without MMAP, fcntl()
@@ -306,8 +310,8 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 	    return NULL;
 
 	/* create DB handle */
-	if ((ret = db_create (&dbp, NULL, 0)) != 0) {
-	    print_error(__FILE__, __LINE__, "(db) db_create, err: %d, %s",
+	if ((ret = db_create (&dbp, dbe, 0)) != 0) {
+	    print_error(__FILE__, __LINE__, "db_create, err: %d, %s",
 			ret, db_strerror(ret));
 	    goto open_err;
 	}
@@ -317,7 +321,7 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 	/* set cache size, but not when we're using an environment */
 	if (db_cachesize != 0 &&
 	    (ret = dbp->set_cachesize(dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
-	    print_error(__FILE__, __LINE__, "(db) DB(%s)->set_cachesize(%u,%u,%u), err: %d, %s",
+	    print_error(__FILE__, __LINE__, "db(%s)->set_cachesize(%u,%u,%u), err: %d, %s",
 			handle->name, db_cachesize/1024u, (db_cachesize % 1024u) * 1024u*1024u, 1u, ret, db_strerror(ret));
 	    goto open_err;
 	}
@@ -326,11 +330,11 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 	t = handle->name;
 
 retry_db_open:
-
+	handle->created = false;
 	ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | retryflag, 0664);
 
 	if (ret != 0) {
-	    err = (ret != ENOENT) || (opt_flags & DB_RDONLY);
+	    err = (ret != ENOENT) || (opt_flags == DB_RDONLY);
 	    if (!err) {
 		ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664);
 		if (ret != 0)
@@ -359,7 +363,7 @@ retry_db_open:
 
 	    /* close again and bail out without further tries */
 	    if (DEBUG_DATABASE(0))
-		print_error(__FILE__, __LINE__, "(db) DB->open(%s) - actually %s, bogohome %s, err %d, %s",
+		print_error(__FILE__, __LINE__, "DB->open(%s) - actually %s, bogohome %s, err %d, %s",
 			    handle->name, t, bogohome, ret, db_strerror(ret));
 	    dbp->close(dbp, 0);
 	    goto open_err;
@@ -375,7 +379,7 @@ retry_db_open:
 	handle->is_swapped = is_swapped ? true : false;
 
 	if (ret != 0) {
-	    print_error(__FILE__, __LINE__, "(db) DB->get_byteswapped: %s",
+	    print_error(__FILE__, __LINE__, "DB->get_byteswapped: %s",
 		      db_strerror(ret));
 	    db_close(handle);
 	    return NULL;		/* handle already freed, ok to return */
@@ -386,7 +390,7 @@ retry_db_open:
 
 	ret = dbp->fd(dbp, &handle->fd);
 	if (ret != 0) {
-	    print_error(__FILE__, __LINE__, "(db) DB->fd: %s",
+	    print_error(__FILE__, __LINE__, "DB->fd: %s",
 		      db_strerror(ret));
 	    db_close(handle);
 	    return NULL;		/* handle already freed, ok to return */
@@ -457,10 +461,10 @@ int db_delete(void *vhandle, const dbv_t *token)
     db_key.data = token->data;
     db_key.size = token->leng;
 
-    ret = dbp->del(dbp, NULL, &db_key, 0);
+    ret = dbp->del(dbp, handle->txn, &db_key, 0);
 
     if (ret != 0 && ret != DB_NOTFOUND) {
-	print_error(__FILE__, __LINE__, "(db) DB->del('%.*s'), err: %d, %s",
+	print_error(__FILE__, __LINE__, "DB->del('%.*s'), err: %d, %s",
 		    CLAMP_INT_MAX(db_key.size),
 		    (const char *) db_key.data,
     		    ret, db_strerror(ret));
@@ -494,7 +498,8 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
     db_data.ulen = val->leng;		/* max size */
     db_data.flags = DB_DBT_USERMEM;	/* saves the memcpy */
 
-    ret = dbp->get(dbp, NULL, &db_key, &db_data, 0);
+    /* DB_RMW can avoid deadlocks */
+    ret = dbp->get(dbp, handle->txn, &db_key, &db_data, handle->open_mode == DS_READ ? 0 : DB_RMW);
 
     if (DEBUG_DATABASE(3))
 	fprintf(dbgout, "DB->get(%.*s): %s\n",
@@ -509,7 +514,7 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 	ret = DS_NOTFOUND;
 	break;
     default:
-	print_error(__FILE__, __LINE__, "(db) DB->get('%.*s' ), err: %d, %s",
+	print_error(__FILE__, __LINE__, "DB->get('%.*s' ), err: %d, %s",
 		    CLAMP_INT_MAX(token->leng), (char *) token->data, ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
@@ -537,10 +542,10 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
     db_data.data = val->data;
     db_data.size = val->leng;		/* write count */
 
-    ret = dbp->put(dbp, NULL, &db_key, &db_data, 0);
+    ret = dbp->put(dbp, handle->txn, &db_key, &db_data, 0);
 
     if (ret != 0) {
-	print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%.*s' ), err: %d, %s",
+	print_error(__FILE__, __LINE__, "db_set_dbvalue( '%.*s' ), err: %d, %s",
 		    CLAMP_INT_MAX(token->leng), (char *)token->data, ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
@@ -597,7 +602,7 @@ void db_flush(void *vhandle)
 	ret = 0;
 #endif
     if (ret)
-	print_error(__FILE__, __LINE__, "(db) db_sync: err: %d, %s", ret, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "db_sync: err: %d, %s", ret, db_strerror(ret));
 }
 
 
@@ -616,7 +621,7 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     memset(&key, 0, sizeof(key));
     memset(&data, 0, sizeof(data));
 
-    ret = dbp->cursor(dbp, NULL, &dbcp, 0);
+    ret = dbp->cursor(dbp, handle->txn, &dbcp, 0);
     if (ret) {
 	print_error(__FILE__, __LINE__, "(cursor): %s", handle->path);
 	return -1;
