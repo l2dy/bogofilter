@@ -15,6 +15,6 @@ NAME:
 
 extern void	wordprop_init(void *vwordprop);
 
-extern token_t	collect_words(wordhash_t *wh);
+extern void	collect_words(wordhash_t *wh);
 
 #endif

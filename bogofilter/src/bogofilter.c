@@ -90,7 +90,6 @@ rc_t bogofilter(int argc, char **argv)
 {
     int msgcount = 0;
     rc_t status = RC_OK;
-    token_t token_type = NONE;
     bool register_opt = run_type & (REG_SPAM | UNREG_SPAM | REG_GOOD | UNREG_GOOD);
     bool register_bef = register_opt && passthrough;
     bool register_aft = (register_opt && !passthrough) || (run_type & RUN_UPDATE);
@@ -115,10 +114,9 @@ rc_t bogofilter(int argc, char **argv)
 	wordhash_t *w = wordhash_init();
 
 	initialize();
-
 	passthrough_setup();
 
-	token_type = collect_words(w);
+	collect_words(w);
 	msgcount += 1;
 
 	if (register_opt && DEBUG_REGISTER(1))

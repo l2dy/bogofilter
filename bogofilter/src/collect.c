@@ -23,17 +23,15 @@ void wordprop_init(void *vwordprop)
  *
  * Returns:  true if the EOF token has not been read.
  */
-token_t collect_words(wordhash_t *wh)
+void collect_words(wordhash_t *wh)
 {
-    token_t class;
-
     wordprop_t *w;
 
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### collect_words() begins\n");
 
     for (;;){
 	word_t *token;
-	class = get_token();
+	token_t class = get_token();
 
 	if (class == NONE)
 	    break;
@@ -69,5 +67,5 @@ token_t collect_words(wordhash_t *wh)
 
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### collect_words() ends\n");
 
-    return class;
+    return;
 }
