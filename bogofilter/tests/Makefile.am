@@ -16,4 +16,4 @@ TESTS=$(TESTSCRIPTS)
 EXTRA_DIST=$(TESTSCRIPTS) t.frame t.skel t.systest.d
 
 dist-hook:
-	cd $(distdir) && find t.systest.d -name CVS -type d -prune -print -exec rm -r '{}' ';'
+	cd $(distdir) && find t.systest.d -name CVS -type d -prune -exec rm -r '{}' ';'

@@ -3,7 +3,7 @@
 # foreign: don't insist on ChangeLog
 # 1.5: minimum version
 AUTOMAKE_OPTIONS = foreign 1.5
-SUBDIRS =  dcdflib . tests doc contrib
+SUBDIRS =  dcdflib . tests
 SYSCONFDIR = @sysconfdir@
 
 if ENABLE_GRAHAM_METHOD
@@ -63,6 +63,7 @@ wordhash_SOURCES = wordhash.c wordhash.h wordhash.main.c $(MYCOMMON)
 find_home_test_SOURCES = find_home.test.c $(MYCOMMON)
 
 # what to distribute
+extradistdirs = doc contrib
 EXTRA_DIST = $(man_MANS) \
 	     bogofilter.cf.example bogofilter-faq.html \
 	     README.hp-ux UPGRADE \
@@ -70,7 +71,8 @@ EXTRA_DIST = $(man_MANS) \
 	     bogofilter.spec bogofilter.spec.in \
 	     bogoupgrade bogo.R \
 	     version.sh \
-	     README.cvs README.freebsd
+	     README.cvs README.freebsd \
+	     $(extradistdirs)
 #
 #
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
@@ -96,3 +98,7 @@ cvs-check:
 	cvs export -rHEAD -d $(PACKAGE)-$(VERSION)-export $(PACKAGE)
 	cd $(PACKAGE)-$(VERSION)-export && autoreconf -i -f -s \
 	&& ./configure && make distcheck
+
+dist-hook:
+	cd $(distdir) && for i in $(extradistdirs) ; do find $$i -name CVS -type d -prune -exec rm -r '{}' ';' ; done
+	cd $(distdir) && for i in $(extradistdirs) ; do find $$i -name .cvsignore -type f -exec rm -r '{}' ';' ; done
