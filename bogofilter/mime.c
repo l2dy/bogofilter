@@ -235,7 +235,7 @@ static
 bool get_boundary_props(const byte *boundary, int boundary_len, boundary_t *b)
 {
   int i;
-  
+
   b->is_valid = false;
 
   if (boundary_len > 2 && *(boundary) == '-' && *(boundary + 1) == '-'){
@@ -262,9 +262,9 @@ bool get_boundary_props(const byte *boundary, int boundary_len, boundary_t *b)
       if (is_mime_container (&msg_stack[i]) &&
           msg_stack[i].boundary &&
           (memcmp (msg_stack[i].boundary, boundary, boundary_len) == 0)){
-        b->depth = i;
-        b->is_valid = true;
-        break;
+	 b->depth = i;
+	b->is_valid = true;
+	 break;
       }
     }
   }
@@ -272,14 +272,23 @@ bool get_boundary_props(const byte *boundary, int boundary_len, boundary_t *b)
   return b->is_valid;
 }
 
+bool
+mime_is_boundary(const byte *boundary, int len){
+    boundary_t b;
+    get_boundary_props(boundary, len, &b);
+    return b.is_valid;
+}
+
 void
 got_mime_boundary (const byte *boundary, int boundary_len)
 {
   mime_t *parent;
   boundary_t b;
- 
-  if (get_boundary_props(boundary, boundary_len, &b) == false)
-	 return; 
+
+  get_boundary_props(boundary, boundary_len, &b);
+
+  if (!b.is_valid)
+    return; 
   
   if (DEBUG_MIME (1))
     fprintf (dbgout, "*** got_mime_boundary:  stackp: %d, boundary: '%s'\n",
@@ -511,9 +520,6 @@ mime_boundary_set (const byte *text, int leng)
 	     text, leng, text);
 
   boundary = getword (text + strlen ("boundary="), text + leng);
-  if (boundary == NULL)
-      return;
-
   msg_state->boundary = boundary;
   msg_state->boundary_len = strlen (boundary);
 
@@ -528,7 +534,6 @@ size_t
 mime_decode (byte *buff, size_t size)
 {
   size_t count = size;
-  boundary_t b;
 
   if (msg_state->mime_header)	/* do nothing if in header */
     return count;
@@ -545,7 +550,7 @@ mime_decode (byte *buff, size_t size)
 	     buff);
 
   /* Do not decode "real" boundary lines */
-  if (get_boundary_props(buff, size, &b) == true)
+  if (mime_is_boundary(buff, size) == true)
       return count;
 
   switch (msg_state->mime_encoding)

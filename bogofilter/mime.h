@@ -51,5 +51,6 @@ void mime_encoding(const byte *text, int leng);
 void mime_type(const byte *text, int leng);
 void mime_version(const byte *text, int leng);
 size_t mime_decode(byte *buff, size_t size);
+bool mime_is_boundary(const byte *boundary, int len);
 
 #endif	/* HAVE_MIME_H */

@@ -50,8 +50,29 @@ bool block_on_subnets = false;
 /* Function Prototypes */
 
 static void reset_html_level(void);
+static void change_lexer_state(lexer_state_t new);
+static const char *state_name(lexer_state_t new);
 
 /* Function Definitions */
+
+const char *state_name(lexer_state_t state)
+{
+    switch(state) {
+    case LEXER_HEAD: return "HEAD";
+    case LEXER_TEXT: return "TEXT";
+    case LEXER_HTML: return "HTML";
+    }
+    return "unknown";
+}
+
+void change_lexer_state(lexer_state_t new)
+{
+    /* if change of state, show new state */
+    if (DEBUG_LEXER(1) && lexer_state != new)
+	fprintf(dbgout, "lexer_state: %s -> %s\n", state_name(lexer_state), state_name(new));
+    lexer_state = new;
+    return;
+}
 
 void reset_html_level(void)
 {
@@ -119,7 +140,7 @@ token_t get_token(void)
 	    continue;
 
 	case BOUNDARY:	/* don't return boundary tokens to the user */
-	    lexer_state = LEXER_HEAD;
+	    change_lexer_state(LEXER_HEAD);
 	    if (yyleng >= 4)
 		continue;
 
@@ -196,43 +217,12 @@ token_t got_from(const char *text)
     if (memcmp(text, "From ", 5) != 0 )
 	return(TOKEN);
     else { 
-	lexer_state = LEXER_HEAD;
+	change_lexer_state(LEXER_HEAD);
 	mime_reset(); 
 	reset_html_level();
 	return(FROM);
     }
 }
-
-#define	DEBUG 0	
-
-#if	!DEBUG
-
-#define	change_lexer_state(new) lexer_state = new
-
-#else
-
-const char *state_name(lexer_state_t new);
-void change_lexer_state(lexer_state_t new);
-
-const char *state_name(lexer_state_t state)
-{
-    switch(state) {
-    case LEXER_HEAD: return "HEAD";
-    case LEXER_TEXT: return "TEXT";
-    case LEXER_HTML: return "HTML";
-    }
-    return "unknown";
-}
-
-void change_lexer_state(lexer_state_t new)
-{
-    /* if change of state, show new state */
-    if (DEBUG_LEXER(1) && lexer_state != new)
-	fprintf(dbgout, "lexer_state: %s -> %s\n", state_name(lexer_state), state_name(new));
-    lexer_state = new;
-    return;
-}
-#endif
 
 void got_newline()
 {
