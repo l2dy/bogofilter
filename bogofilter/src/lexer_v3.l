@@ -262,7 +262,7 @@ static void reorder_html(void)
     char *chr = memchr(yytext, '<', yyleng);	/* find start of html tag */
     size_t len = chr - yytext;
     char *tmp;
-    char *yycopy = xmalloc(yyleng + 1); /* +1 for NUL byte below */
+    char *yycopy = xmalloc(yyleng + 1); 	/* +1 for NUL byte below */
 
     memcpy(yycopy, yytext+len, yyleng-len);	/* copy tag to start of buffer */
     memcpy(yycopy+yyleng-len, yytext, len);	/* copy leading text to end of buffer */
