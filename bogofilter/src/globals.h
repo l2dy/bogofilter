@@ -29,7 +29,7 @@ extern	int	Rtable;			/* '-R' */
 extern	bool	terse;			/* '-t' */
 extern	int	bogotest;		/* '-X', env("BOGOTEST") */
 extern	int	verbose;		/* '-v' */
-extern bool	replace_nonascii_characters;	/* '-n' */
+extern	bool	replace_nonascii_characters;	/* '-n' */
 
 /* config file options */
 extern	int	max_repeats;

@@ -16,8 +16,8 @@ AUTHOR:
 #include "bftypes.h"
 
 typedef struct {
-    uint	leng;
-    byte		*text;
+    uint leng;
+    byte *text;
 } word_t;
 
 extern word_t  *word_new(const byte *text, uint leng);
@@ -29,4 +29,3 @@ extern word_t  *word_concat(const word_t *w1, const word_t *w2);
 extern void 	word_puts(const word_t *self, uint width, FILE *fp);
 
 #endif	/* WORD_H */
-
