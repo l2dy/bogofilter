@@ -23,14 +23,14 @@ extern size_t msg_register_size;
  * tokenize text on stdin and register it to a specified list
  * and possibly out of another list
  */
-void register_words(run_t _run_type, wordhash_t *h, int msgcount)
+void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 {
   const char *r="",*u="";
   hashnode_t *node;
   wordprop_t *wordprop;
   run_t save_run_type = run_type;
 
-  int wordcount = h->count;	/* use number of unique tokens */
+  u_int32_t wordcount = h->count;	/* use number of unique tokens */
 
   dsv_t val;
 
@@ -71,11 +71,11 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
       wordprop = node->buf;
       ds_read(word_list->dsh, node->key, &val);
       if (incr != IX_UNDF) {
-	  uint32_t *counts = val.count;
+	  u_int32_t *counts = val.count;
 	  counts[incr] += wordprop->freq;
       }
       if (decr != IX_UNDF) {
-	  uint32_t *counts = val.count;
+	  u_int32_t *counts = val.count;
 	  counts[decr] = ((long)counts[decr] < wordprop->freq) ? 0 : counts[decr] - wordprop->freq;
       }
       ds_write(word_list->dsh, node->key, &val);
@@ -110,7 +110,7 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
       ds_flush(list->dsh);
 
       if (DEBUG_REGISTER(1))
-	  (void)fprintf(dbgout, "bogofilter: list %s - %ld spam, %ld good\n",
+	  (void)fprintf(dbgout, "bogofilter: list %s - %ul spam, %ul good\n",
 			list->filename, list->msgcount[IX_SPAM], list->msgcount[IX_GOOD]);
   }
 

@@ -17,12 +17,12 @@ struct wordlist_s
     /*@owned@*/ char *filename;	/* resource name (for debug/verbose messages) */
     /*@owned@*/ char *filepath;	/* resource path (for debug/verbose messages) */
     /*@owned@*/ dsh_t *dsh;	/* datastore handle */
-    long msgcount[IX_SIZE];	/* count of messages in wordlist. */
-    double weight[IX_SIZE];
-    bool active;
-    bool bad[IX_SIZE];
-    int  override;
-    bool ignore;
+    u_int32_t	msgcount[IX_SIZE];	/* count of messages in wordlist. */
+    double	weight[IX_SIZE];
+    bool	active;
+    bool	bad[IX_SIZE];
+    int		override;
+    bool	ignore;
 };
 
 extern	wl_t	wl_default;

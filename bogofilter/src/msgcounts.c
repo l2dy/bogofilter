@@ -23,14 +23,14 @@ AUTHOR:
 /* Globals */
 
 char	msg_count_buff[MSG_COUNT_MAX_LEN];
-int	msg_count_leng = MSG_COUNT_MAX_LEN;
+size_t	msg_count_leng = MSG_COUNT_MAX_LEN;
 char   *msg_count_text = msg_count_buff;
 
 const char *msg_count_header = "\"" MSG_COUNT "\"";
 size_t	    msg_count_header_len = 0;
 
-uint	msgs_good = 0L;
-uint	msgs_bad  = 0L;
+u_int32_t    msgs_good = 0L;
+u_int32_t    msgs_bad  = 0L;
 
 static	bool	saved = false;
 

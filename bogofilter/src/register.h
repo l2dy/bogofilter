@@ -6,6 +6,6 @@
 
 #include "wordhash.h"
 
-extern void register_words(run_t _run_type, wordhash_t *h, int msgcount);
+extern void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount);
 
 #endif	/* REGISTER_H */

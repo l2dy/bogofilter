@@ -31,8 +31,8 @@ NAME:
 #define BIT_WORDLIST	MASK_BIT('W')
 #endif
 
-extern FILE *dbgout;
-extern int debug_mask;
+extern FILE	 *dbgout;
+extern u_int32_t  debug_mask;
 
 #ifdef	NODEBUG
 #define	DEBUG_GENERAL(level)	0

@@ -18,8 +18,8 @@ AUTHOR:
 
 #include "debug.h"
 
-FILE *dbgout;
-int debug_mask = DEBUG_NONE;
+FILE	 *dbgout;
+u_int32_t debug_mask = DEBUG_NONE;
 
 void set_debug_mask(const char *mask)
 {

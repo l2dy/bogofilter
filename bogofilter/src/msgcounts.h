@@ -22,7 +22,7 @@ extern	yylex_t	 read_msg_count_line;
 extern	bool	 msgcount_more(void);
 
 extern	char	*msg_count_text;
-extern	int	 msg_count_leng;
+extern	size_t	 msg_count_leng;
 
 /* Function prototypes */
 

@@ -24,8 +24,8 @@ NAME:
 #include <syslog.h>
 #endif
 
-#include "debug.h"
 #include "system.h"	/* defines bool, uint32_t */
+#include "debug.h"
 
 #ifdef	ENABLE_MEMDEBUG
 #include "memdebug.h"
@@ -141,8 +141,8 @@ typedef enum wl_e { WL_M_UNKNOWN ='U',
 /* Represents the secondary data for a word key */
 typedef struct {
     int freq;
-    uint	good;
-    uint	bad;
+    u_int32_t	good;
+    u_int32_t	bad;
     double 	prob;
 } wordprop_t;
 

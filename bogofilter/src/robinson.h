@@ -35,8 +35,8 @@ typedef struct rf_method_s {
 */
 
 typedef struct rob_stats_s {
-    stats_t s;	/* basic stats */
-    size_t robn;
+    stats_t s;		/* basic stats */
+    u_int32_t robn;
     double p_ln;	/* Robinson P, as a log*/
     double q_ln;	/* Robinson Q, as a log*/
     double p_pr;	/* Robinson P */
