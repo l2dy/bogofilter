@@ -103,6 +103,7 @@ static char *getparam (const byte *t, char *e, const byte *param);
 
 /* Function Definitions */
 
+#if	0	/* Unused */
 const char *mime_type_name(enum mimetype type)
 {
   struct type_s *typ;
@@ -113,6 +114,7 @@ const char *mime_type_name(enum mimetype type)
   }
   return "unknown";
 }
+#endif
 
 static void
 mime_init (mime_t * parent)
