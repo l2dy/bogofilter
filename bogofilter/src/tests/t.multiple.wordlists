@@ -92,15 +92,14 @@ system_hi
 message
 EOF
 
-# suppress timestamps & version info in output
-BUOPTS="-y 0"
+# suppress version info in output
 BFOPTS='--header_format=%h: %c, tests=bogofilter, spamicity=%p'
 
 # build wordlists
-$BOGOUTIL $OPTS -l ${TMPDIR}/ignore.db   < ${TMPDIR}/ignore.txt
-$BOGOUTIL $OPTS -l ${TMPDIR}/wordlist.db < ${TMPDIR}/wordlist.txt
-$BOGOUTIL $OPTS -l ${TMPDIR}/user.db     < ${TMPDIR}/user.txt
-$BOGOUTIL $OPTS -l ${TMPDIR}/system.db   < ${TMPDIR}/system.txt
+$BOGOUTIL -l ${TMPDIR}/ignore.db   < ${TMPDIR}/ignore.txt
+$BOGOUTIL -l ${TMPDIR}/wordlist.db < ${TMPDIR}/wordlist.txt
+$BOGOUTIL -l ${TMPDIR}/user.db     < ${TMPDIR}/user.txt
+$BOGOUTIL -l ${TMPDIR}/system.db   < ${TMPDIR}/system.txt
 
 (echo "#### 1: score message using each wordlist ####"; echo) >> $OUT
 
