@@ -871,7 +871,8 @@ void db_close(void *vhandle)
     int ret;
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
-    uint32_t flag = DB_NOSYNC;	/* safe as long as we're logging TXNs */
+    /* This is _ONLY_ safe as long as we're logging TXNs */
+    uint32_t flag = fTransaction ? DB_NOSYNC : 0;
 
     assert(handle->magic == MAGIC_DBH);
 

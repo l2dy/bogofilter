@@ -21,6 +21,10 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-02-26
+
+	* Fix non-transactional mode for Berkeley DB 4.0 and older.
+
 	2005-02-25
 
 	* Implement --db-log-autoremove=BOOL option, defaults to on.
