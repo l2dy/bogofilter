@@ -1197,7 +1197,8 @@ retry:
     if (DEBUG_DATABASE(0))
         fprintf(dbgout, "running %s data base recovery\n",
 	    catastrophic ? "catastrophic" : "regular");
-    env = dbe_xinit(directory, 1024, 1024, catastrophic ? DB_RECOVER_FATAL : DB_RECOVER);
+    env = dbe_xinit(directory, db_max_locks, db_max_objects,
+	    catastrophic ? DB_RECOVER_FATAL : DB_RECOVER);
     if (env == NULL) {
 	if(!catastrophic) {
 	    catastrophic = true;

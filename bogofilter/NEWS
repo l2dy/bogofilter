@@ -21,6 +21,11 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-01-04
+
+	* Berkeley DB Transactional recovery now uses the actual db_lk_max_*
+	  values rather than hardcoded 1024.  Reported by Karl O. Pinc.
+
 	2005-01-02
 
 	* Initial support for Russian character sets (thanks to Evgeny
