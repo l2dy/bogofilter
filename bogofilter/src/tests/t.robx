@@ -38,7 +38,7 @@ else
 	n=`basename $f .${DB_EXT}`
 	$BOGOUTIL -d $BOGOFILTER_DIR/$n.${DB_EXT} > ${TMPDIR}/$n.txt
     done
-    $BOGOUTIL -vvv -D -R $TMPDIR > ${TMPDIR}/output.vvv
+    $BOGOUTIL -vvvv -D -R $TMPDIR > ${TMPDIR}/output.vvv
 fi
 
 [ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
