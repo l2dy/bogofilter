@@ -154,7 +154,7 @@ datastore_SOURCE = datastore_tdb.c datastore_dummies.c \
 		   datastore_txn_dummies.c datastore_opthelp_dummies.c
 else
 if ENABLE_QDBM_DATASTORE
-datastore_SOURCE = datastore_qdbm.c datastore_qdbm_cmpkey.c \
+datastore_SOURCE = datastore_qdbm.h datastore_qdbm.c datastore_qdbm_cmpkey.c \
 		   datastore_txn_dummies.c datastore_opthelp_dummies.c \
 		   datastore_dummies.c
 
