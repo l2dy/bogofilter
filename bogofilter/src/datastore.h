@@ -34,9 +34,9 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 */
 
 typedef struct {
-    void *dbh;			/* database handle from db_open() */
+    void   *dbh;		/* database handle from db_open() */
     size_t count;		/* database count (1 or 2) */
-    sh_t   index;		/* database index (0 or 1) */
+    size_t index;		/* database index (0 or 1) */
     bool is_swapped;
 } dsh_t;
 
