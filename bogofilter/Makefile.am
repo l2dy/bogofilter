@@ -28,7 +28,7 @@ EXTRA_DIST = autogen.sh \
 #
 .PHONY: rpm cvs-check
 
-rpm:	    dist $(distdir).tar.gz
+rpm:	    dist
 	rpm -ta $(distdir).tar.gz
 
 cvs-check:
