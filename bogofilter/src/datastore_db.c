@@ -196,12 +196,14 @@ static void dsm_init(const char *directory, const char *file)
     probe_txn_t txn;
 
     if (DEBUG_DATABASE(2))
-	fprintf(dbgout, "probing \"%s\" and \"%s\" for environment...\n", directory, file);
+	fprintf(dbgout, "probing \"%s\" and \"%s\" for environment...\n",
+		directory, file);
 
     txn = probe_txn(directory, file);
 
     if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "probing \"%s\" and \"%s\" result %d\n", directory, file, txn);
+	fprintf(dbgout, "probing \"%s\" and \"%s\" result %d\n",
+		directory, file, txn);
 
     if (txn == P_DISABLE)
 	fTransaction = false;
@@ -320,7 +322,8 @@ static int probe_txn(const char *directory, const char *file)
 
     dbe->close(dbe, 0);
     if ((flags & DB_INIT_TXN) == 0) {
-	print_error(__FILE__, __LINE__, "environment found but does not support transactions.");
+	print_error(__FILE__, __LINE__,
+		"environment found but does not support transactions.");
 	return P_ERROR;
     }
 #else
