@@ -84,16 +84,16 @@ static void help(void)
 	    "\t-x list\t- set debug flags.\n"
 	    "\t-D\t- direct debug output to stdout.\n");
     fprintf(stderr,
-	    "\t  -P {opts} - set html processing flag(s).\n"
-	    "\t     where {opts} is one or more of:\n"
-	    "\t      c   - enables  strict comment checking.\n"
-	    "\t      C   - disables strict comment checking (default).\n"
-	    "\t      i   - enables  ignoring of upper/lower case."
-	    "\t      I   - disables ignoring of upper/lower case (default)."
-	    "\t      h   - enables  header line tagging (default)."
-	    "\t      H   - disables header line tagging."
-	    "\t      t   - enables  parsing of html tags 'a', 'font', and 'img' (default).\n"
-	    "\t      T   - disables parsing of html tags 'a', 'font', and 'img'.\n"
+	    "\t-P {opts} - set html processing flag(s).\n"
+	    "\t   where {opts} is one or more of:\n"
+	    "\t    c   - enables  strict comment checking.\n"
+	    "\t    C   - disables strict comment checking (default).\n"
+	    "\t    i   - enables  ignoring of upper/lower case.\n"
+	    "\t    I   - disables ignoring of upper/lower case (default).\n"
+	    "\t    h   - enables  header line tagging (default).\n"
+	    "\t    H   - disables header line tagging.\n"
+	    "\t    t   - enables  parsing of html tags 'a', 'font', and 'img' (default).\n"
+	    "\t    T   - disables parsing of html tags 'a', 'font', and 'img'.\n"
 	    "\n"
 	    "%s (version %s) is part of the bogofilter package.\n", 
 	    progname, version);
