@@ -23,6 +23,11 @@ Briefly:
 
 0.93.2	2004-11-??
 
+	2004-11-19
+
+	* Restored the error message when recovery is attempted on QDBM
+	  databases, was lost in the DEPOT (hash) ->VILLA (B+tree) switch.
+
 	2004-11-15
 
 	* Added utility scripts bf_tar.

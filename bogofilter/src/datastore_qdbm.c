@@ -368,5 +368,9 @@ int dbe_recover(int a, int b)
     UNUSED(a);
     UNUSED(b);
 
-    return 0;
+    fprintf(stderr, "ERROR: bogofilter can not recover QDBM data bases.\n"
+    "If you experience hangs, strange behavior, inaccurate output,\n"
+    "you must delete your data base and rebuild it, or restore an older version\n"
+    "that you know is good from your backups.\n");
+    exit(EX_ERROR);
 }
