@@ -41,9 +41,6 @@ const char *progname = PROGNAME;
 
 static int dump_count = 0;
 
-#undef	ROBX
-typedef enum { NONE, DUMP, LOAD, WORD, MAINTAIN, ROBX } cmd_t;
-cmd_t flag = NONE;
 bool  maintain = false;
 bool  onlyprint = false;
 
@@ -564,6 +561,9 @@ static void help(void)
 char *ds_file = NULL;
 bool  prob = false;
 
+typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX } cmd_t;
+cmd_t flag = M_NONE;
+
 #define	OPTIONS	":a:c:d:DhI:k:l:m:np:r:R:s:vVw:Wx:y:"
 
 static int process_args(int argc, char **argv)
@@ -577,7 +577,7 @@ static int process_args(int argc, char **argv)
     while ((option = getopt(argc, argv, OPTIONS)) != -1)
 	switch (option) {
 	case 'd':
-	    flag = DUMP;
+	    flag = M_DUMP;
 	    count += 1;
 	    ds_file = (char *) optarg;
 	    break;
@@ -587,13 +587,13 @@ static int process_args(int argc, char **argv)
 	    break;
 
 	case 'l':
-	    flag = LOAD;
+	    flag = M_LOAD;
 	    count += 1;
 	    ds_file = (char *) optarg;
 	    break;
 
 	case 'm':
-	    flag = MAINTAIN;
+	    flag = M_MAINTAIN;
 	    count += 1;
 	    ds_file = (char *) optarg;
 	    break;
@@ -603,7 +603,7 @@ static int process_args(int argc, char **argv)
 	    /*@fallthrough@*/
 
 	case 'w':
-	    flag = WORD;
+	    flag = M_WORD;
 	    count += 1;
 	    ds_file = (char *) optarg;
 	    break;
@@ -611,7 +611,7 @@ static int process_args(int argc, char **argv)
 	case 'r':
 	    onlyprint = true;
 	case 'R':
-	    flag = ROBX;
+	    flag = M_ROBX;
 	    count += 1;
 	    ds_file = (char *) optarg;
 	    break;
@@ -704,7 +704,7 @@ static int process_args(int argc, char **argv)
       exit(EX_ERROR);
     }
 
-    if (optind < argc && flag != WORD) {
+    if (optind < argc && flag != M_WORD) {
 	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
 	exit(EX_ERROR);
     }
@@ -723,7 +723,7 @@ int main(int argc, char *argv[])
     count = process_args(argc, argv);
 
     /* Extra or missing parameters */
-    if (flag != WORD && argc != optind) {
+    if (flag != M_WORD && argc != optind) {
 	usage();
 	exit(EX_ERROR);
     }
@@ -731,20 +731,20 @@ int main(int argc, char *argv[])
     atexit(bf_exit);
 
     switch(flag) {
-	case DUMP:
+	case M_DUMP:
 	    return dump_file(ds_file);
-	case LOAD:
+	case M_LOAD:
 	    return load_file(ds_file);
-	case MAINTAIN:
+	case M_MAINTAIN:
 	    maintain = true;
 	    return maintain_wordlist_file(ds_file);
-	case WORD:
+	case M_WORD:
 	    argc -= optind;
 	    argv += optind;
 	    return display_words(ds_file, argc, argv, prob);
-	case ROBX:
+	case M_ROBX:
 	    return compute_robinson_x(ds_file);
-	case NONE:
+	case M_NONE:
 	default:
 	    /* should have been handled above */
 	    abort();
