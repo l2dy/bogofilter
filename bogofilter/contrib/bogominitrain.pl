@@ -22,8 +22,17 @@ Usage:
   Run "formail -es" on your mailboxes before you start to ensure their
   correctness.
 
-  It may be a good idea to run this script command several times.
-  Use the '-f' option to run the script until no scoring errors occur.
+  It may be a good idea to run this script command several times.  Use
+  the '-f' option to run the script until no scoring errors occur.
+
+  To increase the size of your wordlists, which will help bogofilter's
+  scoring accuracy, use bogofilter's -o option to set ham_cutoff and
+  spam_cutoff to create an "unsure" interval around your normal
+  spam_cutoff.  The script will train so that the messages will avoid
+  this interval, i.e., all messages in your training mboxes will be
+  marked as ham or spam with values far from your production cutoff.
+  For example if you usually work with spam_cutoff=0.6, you might use
+  the following as bogofilter-options: '-o 0.7,0.5'
 
 Example:
   bogominitrain.pl -fv .bogofilter 'ham*' 'spam*' '-c train.cf'
@@ -132,7 +141,7 @@ do { # Start force loop
   close (HAM);
   close (SPAM);
 
-  print "\nDone:\n";
+  print "\nEnd of run #$runs:\n";
   print "Read $hamcount ham mails and $spamcount spam mails.\n";
   print "Added $hamadd ham mails and $spamadd spam mails to the database.\n";
   print `bogoutil -w $dir .MSG_COUNT`;
@@ -141,4 +150,4 @@ do { # Start force loop
   $fp=`cat $ham | $bogofilter -vM | grep -c Spam`;
   print "False positives: $fp\n";
 } until ($fn+$fp==0 || !$force);
-print "\n$runs runs needed to close off.\n" if ($force);
+print "\n$runs run(s) needed to close off.\n" if ($force);
