@@ -131,6 +131,7 @@ void *ds_open(const char *path, const char *name, dbmode_t open_mode)
     if (!v)
 	return NULL;
 
+    ds_init();
     dsh = dsh_init(v);
 
     if (create && (open_mode & DS_WRITE) && ! (open_mode & DS_LOAD))
@@ -307,7 +308,6 @@ int ds_oper(const char *path, dbmode_t open_mode,
     int  ret = 0;
     void *dsh;
 
-    ds_init();
     dsh = ds_open(CURDIR_S, path, open_mode);
 
     if (dsh == NULL) {

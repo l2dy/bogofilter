@@ -1669,6 +1669,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	check_wordlist_path();
     }
 
+    ds_init();
+
     bogotune();
 
     bogotune_free();

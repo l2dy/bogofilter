@@ -88,6 +88,8 @@ static int DB_OPEN(DB *db, const char *file,
 {
     int ret;
 
+    db_init();
+
     ret = db->open(db,
 #if DB_AT_LEAST(4,1)
     	    0,	/* TXN handle - we use autocommit instead */
