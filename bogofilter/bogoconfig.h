@@ -9,9 +9,7 @@
 
 typedef enum {
 	CP_NONE,
-#ifdef	GRAHAM_AND_ROBINSON
 	CP_ALGORITHM,
-#endif
 	CP_BOOLEAN,
 	CP_INTEGER,
 	CP_DOUBLE,

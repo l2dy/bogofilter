@@ -73,12 +73,14 @@ const	char *stats_prefix;
 run_t run_type = RUN_NORMAL; 
 method_t *method = NULL;
 
+enum algorithm_e {
 #ifdef ENABLE_GRAHAM_METHOD
-#define	AL_GRAHAM 'g'
+    AL_GRAHAM='g',
 #endif
 #ifdef ENABLE_ROBINSON_METHOD
-#define	AL_ROBINSON 'r'
+    AL_ROBINSON='r'
 #endif
+};
 
 /* define default */
 #ifdef ENABLE_GRAHAM_METHOD
@@ -87,7 +89,7 @@ method_t *method = NULL;
 #define AL_DEFAULT AL_ROBINSON
 #endif
 
-static char algorithm = AL_DEFAULT;
+static enum algorithm_e algorithm = AL_DEFAULT;
 
 double	spam_cutoff;
 double	min_dev = 0.0f;
@@ -123,20 +125,18 @@ static const parm_desc sys_parms[] =
 
 static const parm_desc *usr_parms = NULL;
 
-static bool select_method( int ch )
+static bool select_method(enum algorithm_e al)
 {
     bool ok = TRUE;
-    switch (ch)
+    switch (al)
     {
 #ifdef ENABLE_GRAHAM_METHOD
-    case 'g':
-	algorithm = AL_GRAHAM;
+    case AL_GRAHAM:
 	method = &graham_method;
 	break;
 #endif
 #ifdef ENABLE_ROBINSON_METHOD
-    case 'r':
-	algorithm = AL_ROBINSON;
+    case AL_ROBINSON:
 	method = &robinson_method;
 	break;
 #endif
@@ -508,7 +508,7 @@ int process_args(int argc, char **argv)
 /* exported */
 void process_config_files(void)
 {
-    select_method( algorithm );
+    select_method(algorithm);
 
     if (! suppress_config_file)
     {

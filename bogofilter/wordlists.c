@@ -81,7 +81,8 @@ void build_path(char* dest, int size, const char* dir, const char* file)
 {
     int path_left=size-1;
 
-    strncpy(dest, dir, path_left);
+    *dest = '\0';
+    strncat(dest, dir, path_left);
     path_left -= strlen(dir);
     if (path_left <= 0) return;
 

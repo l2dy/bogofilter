@@ -46,8 +46,6 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 
 extern double min_dev;
 
-static int thresh_index;
-
 static const parm_desc gra_parm_table[] =
 {
     { "thresh_index",	  CP_INTEGER,	{ (void *) &thresh_index } },
@@ -87,19 +85,19 @@ static int compare_extrema(const void *id1, const void *id2)
 	     ((fabs(d1->prob - d2->prob) < EPS) && (strcmp(d1->key, d2->key) > 0)));
 }
 
-static void init_bogostats(/*@out@*/ bogostat_t *bogostats)
+static void init_bogostats(/*@out@*/ bogostat_t *bs)
 {
     size_t idx;
 
-    for (idx = 0; idx < SIZEOF(bogostats->extrema); idx++)
+    for (idx = 0; idx < SIZEOF(bs->extrema); idx++)
     {
-	discrim_t *pp = &bogostats->extrema[idx];
+	discrim_t *pp = &bs->extrema[idx];
 	pp->prob = EVEN_ODDS;
 	pp->key[0] = '\0';
     }
 }
 
-static void populate_bogostats(/*@out@*/ bogostat_t *bogostats,
+static void populate_bogostats(/*@out@*/ bogostat_t *bs,
 	const char *text, double prob,
 	/*@unused@*/ int count)
 /* if  the new word,prob pair is a better indicator.
@@ -115,9 +113,9 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bogostats,
     hit = NULL;
     hitdev=1;
 
-    for (idx = 0; idx < SIZEOF(bogostats->extrema); idx++)
+    for (idx = 0; idx < SIZEOF(bs->extrema); idx++)
     {
-	pp = &bogostats->extrema[idx];
+	pp = &bs->extrema[idx];
 	if (pp->key[0] == '\0' )
 	{
 	    hit = pp;
@@ -138,7 +136,7 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bogostats,
     { 
 	if (verbose >= 3)
 	{
-	    int i = (hit - bogostats->extrema);
+	    int i = (hit - bs->extrema);
 	    const char *curkey = hit->key[0] ? hit->key : "";
 	    (void)fprintf(stderr, 
 		    "#  %2d"
@@ -255,7 +253,7 @@ static bogostat_t *select_indicators(wordhash_t *wordhash)
     return (&bogostats);
 }
 
-double gra_compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errno@*/
+double gra_compute_spamicity(bogostat_t *bs, FILE *fp) /*@globals errno@*/
 /* computes the spamicity of the words in the bogostat structure
  * returns:  the spamicity */
 {
@@ -266,14 +264,14 @@ double gra_compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errno@*
 
     if (verbose)
     {
-	/* put the bogostats in ascending order by probability and alphabet */
-	qsort(bogostats->extrema, SIZEOF(bogostats->extrema), sizeof(discrim_t), compare_extrema);
+	/* put the bs in ascending order by probability and alphabet */
+	qsort(bs->extrema, SIZEOF(bs->extrema), sizeof(discrim_t), compare_extrema);
     }
 
     /* Bayes' theorem. */
     /* For discussion, see <http://www.mathpages.com/home/kmath267.htm>. */
     product = invproduct = 1.0f;
-    for (pp = bogostats->extrema; pp < bogostats->extrema+SIZEOF(bogostats->extrema); pp++)
+    for (pp = bs->extrema; pp < bs->extrema+SIZEOF(bs->extrema); pp++)
     {
 	if (fabs(pp->prob) < EPS)
 	    continue;
@@ -318,12 +316,11 @@ void gra_initialize_constants(void)
 double gra_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 {
     double spamicity;
-    bogostat_t	*bogostats;
+    bogostat_t	*bs;
 
     /* select the best spam/nonspam indicators. */
-    bogostats = select_indicators(wordhash);
-
-    spamicity = gra_compute_spamicity(bogostats, fp);
+    bs = select_indicators(wordhash);
+    spamicity = gra_compute_spamicity(bs, fp);
 
     return spamicity;
 }
