@@ -117,7 +117,34 @@ AC_CHECK_DECLS(optreset,,,[[
 #include <stdlib.h>
 ]])
 
-AC_CHECK_DB([db-4.1 db-4.0 db db41 db4 db3],,
+AC_ARG_ENABLE(static,
+      AC_HELP_STRING([--enable-static], [Build static versions as well.]))
+if test a$enable_static = ayes ; then
+    AC_MSG_CHECKING([option to link statically])
+    LDEFLAGS="$LDFLAGS"
+    found=0
+    for i in -static ; do
+	LDFLAGS="$LDEFLAGS $i"
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdlib.h>]],
+			  [[exit (0);]])],found=1)
+	if test $found -eq 1 ; then break ; fi
+    done
+    if test $found -eq 1 ; then
+	AC_MSG_RESULT($i)
+	STATICLDFLAGS=$i
+	LDFLAGS="$LDEFLAGS"
+    else
+	AC_MSG_RESULT([[?]])
+	AC_MSG_WARN([Cannot figure out how to statically link a program.])
+	STATICLDFLAGS=
+	enable_static=no
+    fi
+fi
+export STATICLDFLAGS
+AC_SUBST(STATICLDFLAGS)
+AM_CONDITIONAL(ENABLE_STATIC, test x$enable_static = xyes)
+
+AC_CHECK_DB([db db-4.1 db-4.0 db41 db4 db3],${STATICLDFLAGS},,
 	    AC_MSG_ERROR([[Can not locate a suitable Berkeley DB library.  Use --with-db=PATH to specify the path to a v3+ install directory]]),-lpthread -lthread)
 export LIBS
 
@@ -248,31 +275,6 @@ if test x$USE_MEMDEBUG = xYES ; then
 	[Enable memory usage debugging])
 fi
 AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$MEM_DEBUG != xNO)
-
-AC_ARG_ENABLE(static,
-      AC_HELP_STRING([--enable-static], [Build static versions as well.]))
-if test a$enable_static = ayes ; then
-    AC_MSG_CHECKING([option to link statically])
-    LDEFLAGS="$LDFLAGS"
-    found=0
-    for i in -static ; do
-	LDFLAGS="$LDEFLAGS $i"
-	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdlib.h>]],
-			  [[exit (0);]])],found=1)
-	if test $found -eq 1 ; then break ; fi
-    done
-    if test $found -eq 1 ; then
-	AC_MSG_RESULT($i)
-	STATICLDFLAGS=$i
-	AC_SUBST(STATICLDFLAGS)
-	LDFLAGS="$LDEFLAGS"
-    else
-	AC_MSG_RESULT([[?]])
-	AC_MSG_WARN([Cannot figure out how to statically link a program.])
-	enable_static=no
-    fi
-fi
-AM_CONDITIONAL(ENABLE_STATIC, test x$enable_static = xyes)
 
 # Checks for header files.
 AC_HEADER_STDC

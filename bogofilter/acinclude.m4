@@ -110,21 +110,25 @@ dnl Matthias Andree.
 
 dnl arguments:
 dnl 1- space delimited list of libraries to check for db_create
-dnl 2- action-if-found
-dnl 3- action-if-not-found
-dnl 4- optional set of libraries to use (pass -lpthread here
+dnl 2- optional LDFLAGS to apply when checking for library, such as -static
+dnl 3- action-if-found
+dnl 4- action-if-not-found
+dnl 5- optional set of libraries to use (pass -lpthread here
 dnl    in case DB is compiled with POSIX mutexes)
 AC_DEFUN([AC_CHECK_DB],[
   AS_VAR_PUSHDEF([ac_tr_db], [ac_cv_db_libdb])dnl
   bogo_saved_LIBS="$LIBS"
+  bogo_saved_LDFLAGS="$LDFLAGS"
   AC_CACHE_CHECK([for library providing db_create], ac_tr_db, [
-    for lib in '' $1 ; do
-      for i in '' $4 ; do
+    for ld in '' $2 ; do
+     for lib in '' $1 ; do
+      for i in '' $5 ; do
 	if test "x$lib" != "x" ; then
 	  bogo_libadd="-l$lib $i"
 	else
 	  bogo_libadd="$i"
 	fi
+	LDFLAGS="$LDFLAGS $ld"
 	LIBS="$LIBS $bogo_libadd"
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([
 #include <db.h>],[
@@ -133,17 +137,20 @@ int foo=db_create((void *)0, (void *) 0, 0 );
 	    [AS_VAR_SET(ac_tr_db, $bogo_libadd)],
 	    [AS_VAR_SET(ac_tr_db, no)])
 	AS_IF([test x"AS_VAR_GET(ac_tr_db)" != xno],
-	    [$2
+	    [$3
 	    db="$bogo_libadd"],
 	    [LIBS="$bogo_saved_LIBS"
+	     LDFLAGS="$bogo_saved_LDFLAGS"
 	    db=no])
 	test "x$db" != "xno" && break
       done
       test "x$db" != "xno" && break
+     done
+     test "x$db" = "xno" && continue
     done
     ])
 if test "x$db" = "xno"; then
-$3
+$4
 else
     LIBS="$bogo_saved_LIBS $ac_tr_db"
 fi
