@@ -299,7 +299,7 @@ barf:
 	    dbh->name, sqlite3_errmsg(dbh->db));
 barf2:
     sqlite3_close(dbh->db);
-    xfree_dbh(dbh);
+    free_dbh(dbh);
     return NULL;
 }
 
@@ -312,7 +312,7 @@ void db_close(void *handle) {
 		dbh->name, rc);
 	exit(EX_ERROR);
     }
-    xfree_dbh(dbh);
+    free_dbh(dbh);
 }
 
 const char *db_version_str(void) {
