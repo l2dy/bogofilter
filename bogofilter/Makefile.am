@@ -80,6 +80,7 @@ find_home_test_SOURCES = find_home.test.c
 # what to distribute
 EXTRA_DIST = bogofilter.cf.example \
 	     METHODS UPGRADE \
+	     README.cvs \
 	     bogofilter.spec bogofilter.spec.in \
 	     bogoupgrade \
 	     version.sh \

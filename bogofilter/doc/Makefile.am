@@ -14,7 +14,6 @@ EXTRA_DIST = $(man_MANS) \
 	     bogofilter-SA-2002-01 \
 	     integrating-with-qmail \
 	     README.Robinson \
-	     programmer/README.cvs \
 	     programmer/README.freebsd programmer/README.hp-ux \
 	     programmer/README.dcdflib
 
