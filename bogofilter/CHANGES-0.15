@@ -9,7 +9,7 @@ $Id$
 	* Bogotune now checks for incorrectly classified messages in the test
 	  data and exits if so.
 
-	* Configure now finds a bash compatible shell for running version.sh
+	* Configure now finds a POSIX compliant shell for running version.sh
 
 	2003-11-12
 
