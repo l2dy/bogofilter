@@ -34,13 +34,14 @@ AUTHOR:
 byte	msg_addr_text[MAXTOKENLEN + D];
 byte	msg_id_text  [MAXTOKENLEN * 3 + D];
 byte	queue_id_text[MAXTOKENLEN + D];
+byte	ipsave_text[MAXTOKENLEN + D];
 
 word_t	msg_addr = { 0, msg_addr_text};	/* First IP Address in Received: statement */
 word_t	msg_id   = { 0, msg_id_text};	/* Message ID */
 word_t	queue_id = { 0, queue_id_text};	/* Message's first queue ID */
 
 static token_t save_class = NONE;
-static word_t *ipsave = NULL;
+static word_t ipsave = { 0, ipsave_text};
 
 byte yylval_text[MAXTOKENLEN + MAX_PREFIX_LEN + D];
 static word_t yylval = { 0, yylval_text };
@@ -105,14 +106,14 @@ token_t get_token(word_t **token)
     /* If saved IPADDR, truncate last octet */
     if ( block_on_subnets && save_class == IPADDR )
     {
-	byte *t = xmemrchr(ipsave->text, '.', ipsave->leng);
+	byte *t = xmemrchr(ipsave.text, '.', ipsave.leng);
 	if (t == NULL)
 	    save_class = NONE;
 	else
 	{
 	    *t = (byte) '\0';
-	    ipsave->leng = (uint) (t - ipsave->text);
-	    token_set( &yylval, ipsave->text, ipsave->leng);
+	    ipsave.leng = (uint) (t - ipsave.text);
+	    token_set( &yylval, ipsave.text, ipsave.leng);
 	    cls = save_class;
 	    done = true;
 	}
@@ -277,8 +278,9 @@ token_t get_token(word_t **token)
 	case IPADDR:
 	    if (block_on_subnets)
 	    {
-		const byte *prefix = (wordlist_version >= IP_PREFIX) ? (const byte *)"ip:" : (const byte *)"url:";
-		size_t plen = strlen((const char *)prefix);
+		const byte *ptext = (wordlist_version >= IP_PREFIX) ? (const byte *)"ip:" : (const byte *)"url:";
+		size_t plen = strlen((const char *)ptext);
+		word_t prefix = { plen, ptext };
 		int q1, q2, q3, q4;
 		/*
 		 * Trick collected by ESR in real time during John
@@ -291,16 +293,15 @@ token_t get_token(word_t **token)
 		 * mask their origin.  Nuke the high bits to unmask the
 		 * address.
 		 */
-		text = yylval.text;
+
 		if (sscanf((const char *)text, "%d.%d.%d.%d", &q1, &q2, &q3, &q4) == 4)
 		    /* safe because result string guaranteed to be shorter */
 		    sprintf((char *)text, "%d.%d.%d.%d",
 			    q1 & 0xff, q2 & 0xff, q3 & 0xff, q4 & 0xff);
 		leng = strlen((const char *)text);
-		ipsave = word_new(NULL, plen + yylval.leng);
 
-		build_prefixed_token( ipsave, &yylval, prefix, plen );
-		token_set( &yylval, ipsave->text, ipsave->leng );
+		build_prefixed_token( &ipsave, &prefix, text, leng );
+		token_copy( &yylval, &ipsave );
 
 		save_class = IPADDR;
 		*token = &yylval;
