@@ -164,7 +164,7 @@
   "million"             4  0.000000  0.190476  0.999854 +
   "copy"                5  0.000000  0.238095  0.999883 +
   N_P_Q_S_s_x_md      138  0.00e+00  0.00e+00  5.00e-01
-			   1.00e-03  4.15e-01  0.100
+                           1.00e-03  4.15e-01  0.100
   </pre>
 The columns printed contain the following information:
   <dl>
@@ -364,10 +364,10 @@ source directory (as suggested above) or use GNU make (gmake).</p>
   <p>Bogofilter has four registration options - '-s', '-n', '-S', and '-N'. With the release of version 0.11 the meaning of '-S' and '-N' has been changed to allow unregistering messages from the word lists. Here's what the four options mean:</p>
 
   <dl>
-    <dt>-s<dd>means to register the current message as spam, i.e. add its tokens to spamlist.db
-    <dt>-n<dd>means to register the current message as ham, i.e. add its tokens to goodlist.db
-    <dt>-S<dd>means to unregister the current message from the spam wordlist, i.e. remove its tokens from spamlist.db
-    <dt>-N<dd>means to unregister the current message from the ham wordlist, i.e. remove its tokens from goodlist.db
+    <dt>-s</dt><dd>means to register the current message as spam, i.e. add its tokens to spamlist.db</dd>
+    <dt>-n</dt><dd>means to register the current message as ham, i.e. add its tokens to goodlist.db</dd>
+    <dt>-S</dt><dd>means to unregister the current message from the spam wordlist, i.e. remove its tokens from spamlist.db</dd>
+    <dt>-N</dt><dd>means to unregister the current message from the ham wordlist, i.e. remove its tokens from goodlist.db</dd>
   </dl>
 
   <p>Prior to version 0.11, the '-S' option was used to move a message from the ham wordlist to the spam wordlist, i.e. there were two actions. Now with 0.11 each of the two actions is invoked by its own option. To get the same effect as the old '-S', you should use '-N -s' (or '-Ns' which means the same thing).</p>
