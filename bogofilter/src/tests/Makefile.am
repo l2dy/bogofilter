@@ -1,7 +1,7 @@
 # $Id$
 
 check_PROGRAMS=dehex spam_header_name dumbhead deqp deb64 escnp abortme \
-	       u_fpe
+	       u_fpe wantcore
 
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_LDFLAGS = -L..
