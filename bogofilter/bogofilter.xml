@@ -20,7 +20,8 @@
   <arg choice='opt'>-S</arg>
   <arg choice='opt'>-N</arg>
   <arg choice='opt'>-d <replaceable>dir</replaceable></arg>
-  <arg choice='opt'>-l</arg>
+  <arg choice='opt'>-l <replaceable>tag</replaceable></arg>
+  <arg choice='opt'>-o <replaceable>value</replaceable></arg>
   <arg choice='opt'>-p</arg>
   <arg choice='opt'>-e</arg>
   <arg choice='opt'>-g</arg>
@@ -129,10 +130,15 @@ same message as spam.</para>
     <envar>BOGOFILTER_DIR</envar> is set and
     <filename>$HOME/.bogofilter</filename> otherwise.</para>
 
-<para>The <option>-l</option> (log) option writes an informational line
+<para>The <option>-l <replaceable>tag</replaceable></option> (log) option writes an informational line
     to the system log each time <application>bogofilter</application> is run.
     The information logged depends on how <application>bogofilter</application>
-    is run.</para>
+    is run.  The option allows an optional tag which can be included in the information being logged.
+</para>
+
+<para>The <option>-o <replaceable>value</replaceable></option> option allows setting the spam_cutoff value
+    from the command line.
+</para>
 
 <para>A classification run will generate (we are not showing the date
     and host part here):
@@ -238,6 +244,28 @@ tells <application>bogofilter</application> to read the config file named.
 	 <envar>BOGOFILTER_DIR</envar> nor <envar>HOME</envar> is set, the <option>-d
 	    <replaceable>dir</replaceable></option> option must be present.
 </para></refsect1>
+
+<refsect1 id='configuration'><title>CONFIGURATION</title>
+<para>The <application>bogofilter</application> command line allows setting of many 
+options that determine how <application>bogofilter</application> operates.
+File <filename>/etc/bogofilter.cf</filename> can be used to set additional
+parameters that affect its operation.  File 
+<filename>/etc/bogofilter.cf.example</filename> has samples of all of the parameters.
+Status and logging messages can be customized for each site (see 
+<filename>/etc/bogofilter.cf.example</filename>).
+</para>
+</refsect1>
+
+<refsect1 id='returns'><title>RETURN VALUES</title>
+<para>0 for spam; 1 for non-spam; 2 for I/O or other errors.</para>
+<para>If both <option>-p</option> and <option>-e</option> are used, the
+    return values are: 0 for spam or non-spam; 2 for I/O or other
+    errors.</para>
+
+<para>Error 2 usually means that the wordlist files
+<application>bogofilter</application> wants to read at startup 
+are missing or the hard disk has filled up in <option>-p</option> mode.</para>
+</refsect1>
 
 <refsect1 id='integration'><title>INTEGRATION WITH OTHER TOOLS</title>
 
@@ -365,17 +393,6 @@ R).  Provided with the distribution is a simple R script (file bogo.R)
 that can be used to verify <application>bogofilter</application>'s
 calculations.  Instructions for its use are included in the script in
 the form of comments.</para>
-</refsect1>
-
-<refsect1 id='returns'><title>RETURN VALUES</title>
-<para>0 for spam; 1 for non-spam; 2 for I/O or other errors.</para>
-<para>If both <option>-p</option> and <option>-e</option> are used, the
-    return values are: 0 for spam or non-spam; 2 for I/O or other
-    errors.</para>
-
-<para>Error 2 usually means that the wordlist files
-<application>bogofilter</application> wants to read at startup 
-are missing or the hard disk has filled up in <option>-p</option> mode.</para>
 </refsect1>
 
 <refsect1 id='files'><title>FILES</title>
