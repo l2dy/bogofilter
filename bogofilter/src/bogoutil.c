@@ -366,7 +366,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	    case 1:
 		break;
 	    default:
-		fprintf(stderr, "Cannot read from data base.\n");
+		fprintf(stderr, "Cannot read from database.\n");
 		rv = EX_ERROR;
 		goto finish;
 	}
@@ -476,8 +476,8 @@ static const char *help_text[] = {
     "  -k, --db_cachesize=size     - set Berkeley DB cache size (MB).\n",
     "      --db_check=file         - check data file.\n",
     "      --db_prune=dir          - remove inactive log files in dir.\n",
-    "      --db_recover=dir        - run recovery on data base in dir.\n",
-    "      --db_recover-harder=dir - run catastrophic recovery on data base in dir.\n",
+    "      --db_recover=dir        - run recovery on database in dir.\n",
+    "      --db_recover-harder=dir - run catastrophic recovery on database in dir.\n",
     "      --db_remove-environment - remove environment.\n",
 
 #ifdef	HAVE_DECL_DB_CREATE
