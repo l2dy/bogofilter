@@ -525,11 +525,12 @@ void process_args(int argc, char **argv, int pass)
 
 	case 'o':
 	{
-	    char *del = strtok(optarg, ",");
-	    bool ok = true;
-	    ok = ok && xatof(&spam_cutoff, optarg);
-	    if ((del = strtok(NULL, ",")))
-		ok = ok && xatof(&ham_cutoff, del);
+	    bool ok = xatof(&spam_cutoff, optarg);
+	    if (ok) {
+		char *del = strtok(optarg, ",");
+		if ((del = strtok(NULL, ",")))
+		    ok = xatof(&ham_cutoff, del);
+	    }
 	    if (!ok) {
 		fprintf(stderr, "Cannot parse -%c option argument '%s'.\n", option, optarg);
 	    }
