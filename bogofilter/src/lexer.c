@@ -53,6 +53,11 @@ static void lexer_display_buffer(buff_t *buff)
 	fputc('\n', dbgout);
 }
 
+bool is_from(word_t *w)
+{
+    return (w->leng >= 5 && memcmp(w->text, "From ", 5) == 0);
+}
+
 static int lgetsl(buff_t *buff)
 {
     int count = xfgetsl(buff, fpin, 1);
@@ -65,7 +70,8 @@ static int lgetsl(buff_t *buff)
        If found, handle it immediately.
     */
 
-    if (count >= 5 && memcmp(buff->t.text, "From ", 5) == 0) {
+    if (is_from(&buff->t)) {
+	if (DEBUG_LEXER(1)) fprintf(dbgout, "%s:%d  %s\n", __FILE__, __LINE__, buff->t.text);
 	got_from();
     }
 
@@ -190,6 +196,7 @@ static int get_decoded_line(buff_t *buff)
 	&& !msg_header && !msg_state->mime_header
 	&& msg_state->mime_type != MIME_TYPE_UNKNOWN) {
 	int decoded_count = mime_decode(&buff->t);
+	if (DEBUG_LEXER(1)) fprintf(dbgout, "%s:%d  %s\n", __FILE__, __LINE__, buff->t.text);
 	/*change buffer size only if the decoding worked */
 	if (decoded_count != 0 && decoded_count < count) {
 	    buff->t.leng = count = decoded_count;

@@ -86,7 +86,7 @@ charset=\"?{ID}\"?				{ got_charset(yytext);
 ^Content-Transfer-Encoding:{MTYPE}		{  mime_encoding(yy_text()); yyredo(yy_text(), ':'); }
 ^Content-Type:{MTYPE};?				{  mime_type(yy_text()); yyredo(yy_text(), ':'); }
 ^Content-Disposition:{MTYPE}			{  mime_disposition(yy_text()); yyredo(yy_text(), ':'); }
-^From\ 						{ return (msg_header ? FROM : TOKEN); }
+^From\ 						{ return (msg_header && is_from(yy_text()) ? FROM : TOKEN); }
 ^Subject:.* 					{ set_tag("subj:");  yyredo(yy_text(), ':'); }
 ^Date:.*|Delivery-Date:.*			;
 ^Message-ID:.*					;
