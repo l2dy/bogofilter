@@ -825,8 +825,8 @@ static void final_recommendations(void)
 		break;
 	    for (i = 0; i < ns_cnt && ns_scores[i] < cutoff; i += 1)
 		fp = i;
-	    target = fp;
-	    cutoff = ns_scores[target];
+	    cutoff = ns_scores[fp];
+	    fp = ns_cnt - fp;
 	}
 
 	for (i = 0; i < sp_cnt; i += 1) {
