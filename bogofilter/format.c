@@ -319,7 +319,8 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 		buff += format_float(buff, spam_cutoff, min, prec, flags, end);
 		break;
 	    case 'r':		/* r - run type (s, n, S, or N) */
-		buff += sprintf(buff, "register-%c, %d words, %d messages", reg, wrdcount, msgcount);
+		snprintf( temp, sizeof(temp), "%c", reg );
+		buff += format_string(buff, temp, 0, 0, 0, end);
 		break;
 	    case 'w':		/* w - word count */
 		snprintf( temp, sizeof(temp), "%d", wrdcount );
