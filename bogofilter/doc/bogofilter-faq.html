@@ -1,9 +1,16 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+
 <html>
-<head>
-  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
-  <title>Bogofilter FAQ</title>
-<style type="text/css">
+  <head>
+    <meta name="generator" content=
+    "HTML Tidy for Linux/x86 (vers 1st April 2002), see www.w3.org">
+    <meta content="text/html; charset=ISO-8859-1" http-equiv=
+    "Content-Type">
+
+    <title>Bogofilter FAQ</title>
+
+    <style type="text/css">
     <!--
   h2 {
     margin-top : 1em;
@@ -36,126 +43,222 @@
     margin-bottom: 1em;
   }
   -->
-</style>
-</head>
+            </style>
+  </head>
 
-<body>
-  <h1>Bogofilter FAQ</h1>
+  <body>
+    <h1>Bogofilter FAQ</h1>
 
-  <p>Official Version: <a href="http://bogofilter.sourceforge.net/bogofilter-faq.html">http://bogofilter.sourceforge.net/bogofilter-faq.html</a><br>
-  Maintainer: David Relson &lt;relson@osagesoftware.com&gt;</p>
+    <p>Official Version: <a href=
+    "http://bogofilter.sourceforge.net/bogofilter-faq.html">http://bogofilter.sourceforge.net/bogofilter-faq.html</a><br>
 
-  <p>This document is intended to answer frequently asked questions about bogofilter.</p>
+     Maintainer: David Relson &lt;relson@osagesoftware.com&gt;</p>
 
-  <ul>
-    <li>General Information
-      <ul>
-        <li><a href="#what-is-bogofilter">What is bogofilter?</a></li>
-        <li><a href="#lists">Bogofilter Mailing Lists</a></li>
-      </ul>
-    </li>
-    <li>Operational Questions
-      <ul>
-        <li><a href="#asian-spam">What can I do about asian spam?</a></li>
-        <li><a href="#vvv">What does bogofilter's verbose output mean?</a></li>
-	<li><a href="#spamassassin">How can I use SpamAssassin to train Bogofilter?</a></li>
-      </ul>
-    </li>
-    <li>Database Questions
-      <ul>
-        <li><a href="#query-database">How do I manually query the database</a></li>
-        <li><a href="#rescue">How can I tell if my wordlists are corrupted?</a></li>
-      </ul>
-    </li>
-    <li>Technical problems
-      <ul>
-        <li><a href="#port-notes">How do I get Bogofilter working on Solaris, BSD, etc.?</a></li>
-        <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
-        <li><a href="#return-codes">Why does bogofilter give return codes like 0 and 256 when it's run from inside a program?</a></li>
-        <li><a href="#changed-options">Now that I've upgraded to 0.11 why are my scripts broken?</a></li>
-      </ul>
-    </li>
-  </ul>
+    <p>This document is intended to answer frequently asked
+    questions about bogofilter.</p>
 
-  <hr>
-  <h2 id="what-is-bogofilter">What is bogofilter?</h2>
+    <ul>
+      <li>
+        General Information 
 
-  <p>Bogofilter is a fast Bayesian spam filter along the lines suggested by Paul Graham in his article <a href="http://www.paulgraham.com/spam.html">A Plan For Spam</a>. Bogofilter uses <a href="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">Gary Robinson</a>'s geometric-mean algorithm with the Fisher's method modification to classify email as spam or non-spam.</p>
+        <ul>
+          <li><a href="#what-is-bogofilter">What is
+          bogofilter?</a></li>
 
-  <p>The bogofilter <a href="http://bogofilter.sourceforge.net">home page</a> at SourceForge is the central clearinghouse for bogofilter resources.</p>
+          <li><a href="#lists">Bogofilter Mailing Lists</a></li>
+        </ul>
+      </li>
 
-  <p>Bogofilter was started by Eric S. Raymond on August 19, 2002. It gained popularity in September 2002, and a number of other authors have started to contribute to the project.</p>
+      <li>
+        Operational Questions 
 
-  <p>The <a href="http://bogofilter.sourceforge.net/NEWS">NEWS file</a> describes bogofilter's version history.</p>
+        <ul>
+          <li><a href="#asian-spam">What can I do about asian
+          spam?</a></li>
 
-  <hr>
-  <h2 id="lists">Mailing Lists</h2>
+          <li><a href="#vvv">What does bogofilter's verbose output
+          mean?</a></li>
 
-  <p>There are currently four mailing lists for bogofilter:</p>
+          <li><a href="#spamassassin">How can I use SpamAssassin to
+          train Bogofilter?</a></li>
+        </ul>
+      </li>
 
-  <table border="1" width="100%">
-    <tr>
-      <th>List Address</th>
-      <th>Links</th>
-      <th>Description</th>
-    </tr>
-    <tr>
-      <td>bogofilter-announce@aotto.com</td>
-      <td><a href="mailto:bogofilter-announce-subscribe@aotto.com">[subscribe]</a><a href="http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.announce">[archive]</a></td>
-      <td>An announcement-only list where new versions are announced.</td>
-    </tr>
-    <tr>
-      <td>bogofilter@aotto.com</td>
-      <td><a href="mailto:bogofilter-subscribe@aotto.com">[subscribe]</a><a href="http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.general">[archive]</a></td>
-      <td>A discussion list where any conversation about bogofilter may take place.</td>
-    </tr>
-    <tr>
-      <td>bogofilter-dev@aotto.com</td>
-      <td><a href="mailto:bogofilter-dev-subscribe@aotto.com">[subscribe]</a><a href="http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.devel">[archive]</a></td>
-      <td>A list for sharing patches, development, and technical discussions.</td>
-    </tr>
-    <tr>
-      <td>bogofilter-cvs@lists.sourceforge.net</td>
-      <td><a href="http://lists.sourceforge.net/mailman/listinfo/bogofilter-cvs">[subscribe]</a><a href="http://sourceforge.net/mailarchive/forum.php?forum=bogofilter-cvs">[archive]</a></td>
-      <td>Mailing list for announcing code changes to the CVS archive.</td>
-    </tr>
-  </table>
+      <li>
+        Database Questions 
 
-  <hr>
-  <h2 id="vvv">What does bogofilter's verbose output mean?</h2>
+        <ul>
+          <li><a href="#query-database">How do I manually query the
+          database</a></li>
 
-  <p>Bogofilter can instructed to display information on the scoring of a message by running it with flags "-v", "-vv", "-vvv", or "-R".</p>
+          <li><a href="#rescue">How can I tell if my wordlists are
+          corrupted?</a></li>
+        </ul>
+      </li>
 
-<ul>
-  <li>Using "-v" causes bogofilter to generate the "X-Bogosity:" header line, i.e.
-  <pre>
+      <li>
+        Technical problems 
+
+        <ul>
+          <li><a href="#port-notes">How do I get Bogofilter working
+          on Solaris, BSD, etc.?</a></li>
+
+          <li><a href="#nfs">Can I share wordlists over
+          NFS?</a></li>
+
+          <li><a href="#return-codes">Why does bogofilter give
+          return codes like 0 and 256 when it's run from inside a
+          program?</a></li>
+
+          <li><a href="#changed-options">Now that I've upgraded to
+          0.11 why are my scripts broken?</a></li>
+        </ul>
+      </li>
+    </ul>
+    <hr>
+
+    <h2 id="what-is-bogofilter">What is bogofilter?</h2>
+
+    <p>Bogofilter is a fast Bayesian spam filter along the lines
+    suggested by Paul Graham in his article <a href=
+    "http://www.paulgraham.com/spam.html">A Plan For Spam</a>.
+    Bogofilter uses <a href=
+    "http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">
+    Gary Robinson</a>'s geometric-mean algorithm with the Fisher's
+    method modification to classify email as spam or non-spam.</p>
+
+    <p>The bogofilter <a href=
+    "http://bogofilter.sourceforge.net">home page</a> at
+    SourceForge is the central clearinghouse for bogofilter
+    resources.</p>
+
+    <p>Bogofilter was started by Eric S. Raymond on August 19,
+    2002. It gained popularity in September 2002, and a number of
+    other authors have started to contribute to the project.</p>
+
+    <p>The <a href="http://bogofilter.sourceforge.net/NEWS">NEWS
+    file</a> describes bogofilter's version history.</p>
+    <hr>
+
+    <h2 id="lists">Mailing Lists</h2>
+
+    <p>There are currently four mailing lists for bogofilter:</p>
+
+    <table border="1" width="100%">
+      <tr>
+        <th>List Address</th>
+
+        <th>Links</th>
+
+        <th>Description</th>
+      </tr>
+
+      <tr>
+        <td>bogofilter-announce@aotto.com</td>
+
+        <td><a href=
+        "mailto:bogofilter-announce-subscribe@aotto.com">[subscribe]</a>
+        <a href=
+        "http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.announce">
+        [archive]</a></td>
+
+        <td>An announcement-only list where new versions are
+        announced.</td>
+      </tr>
+
+      <tr>
+        <td>bogofilter@aotto.com</td>
+
+        <td><a href=
+        "mailto:bogofilter-subscribe@aotto.com">[subscribe]</a> <a
+        href=
+        "http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.general">
+        [archive]</a></td>
+
+        <td>A discussion list where any conversation about
+        bogofilter may take place.</td>
+      </tr>
+
+      <tr>
+        <td>bogofilter-dev@aotto.com</td>
+
+        <td><a href=
+        "mailto:bogofilter-dev-subscribe@aotto.com">[subscribe]</a>
+        <a href=
+        "http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.devel">
+        [archive]</a></td>
+
+        <td>A list for sharing patches, development, and technical
+        discussions.</td>
+      </tr>
+
+      <tr>
+        <td>bogofilter-cvs@lists.sourceforge.net</td>
+
+        <td><a href=
+        "http://lists.sourceforge.net/mailman/listinfo/bogofilter-cvs">
+        [subscribe]</a> <a href=
+        "http://sourceforge.net/mailarchive/forum.php?forum=bogofilter-cvs">
+        [archive]</a></td>
+
+        <td>Mailing list for announcing code changes to the CVS
+        archive.</td>
+      </tr>
+    </table>
+    <hr>
+
+    <h2 id="vvv">What does bogofilter's verbose output mean?</h2>
+
+    <p>Bogofilter can instructed to display information on the
+    scoring of a message by running it with flags "-v", "-vv",
+    "-vvv", or "-R".</p>
+
+    <ul>
+      <li>
+        Using "-v" causes bogofilter to generate the "X-Bogosity:"
+        header line, i.e. 
+<pre>
   X-Bogosity: No, tests=bogofilter, spamicity=0.500000
-  </pre>
-  </li>
+ 
+</pre>
+      </li>
 
-  <li>Using "-vv" causes bogofilter to generate a histogram, i.e.
-  <pre>
+      <li>
+        Using "-vv" causes bogofilter to generate a histogram, i.e.
+        
+<pre>
   X-Bogosity: No, tests=bogofilter, spamicity=0.500000
-	  int  cnt    prob   spamicity  histogram
-	 0.00   29  0.000209  0.000052  #############################
-	 0.10    2  0.179065  0.003425  ##
-	 0.20    2  0.276880  0.008870  ##
-	 0.30   18  0.363295  0.069245  ##################
-	 0.40    0  0.000000  0.069245  
-	 0.50    0  0.000000  0.069245  
-	 0.60   37  0.667823  0.257307  #####################################
-	 0.70    5  0.767436  0.278892  #####
-	 0.80   13  0.836789  0.334980  #############
-	 0.90   32  0.984903  0.499835  ################################
-  </pre>
-<p>Each row shows an interval, the count of tokens with scores in that interval, the average spam probability for those tokens, the message's spamicity score (for those tokens and all lesser valued tokens), and a bar graph corresponding to the token count.</p>
-<p>In the above histogram there are a lot of low scoring tokens and a lot of high scoring tokens.  They "balance" one another to give the spamicity score of 0.5000
-</li>
-<li>Using "-vvv" produces a list of <em>all</em> the tokens in the messages with information on each one, i.e.
+          int  cnt    prob   spamicity  histogram
+         0.00   29  0.000209  0.000052  #############################
+         0.10    2  0.179065  0.003425  ##
+         0.20    2  0.276880  0.008870  ##
+         0.30   18  0.363295  0.069245  ##################
+         0.40    0  0.000000  0.069245  
+         0.50    0  0.000000  0.069245  
+         0.60   37  0.667823  0.257307  #####################################
+         0.70    5  0.767436  0.278892  #####
+         0.80   13  0.836789  0.334980  #############
+         0.90   32  0.984903  0.499835  ################################
+ 
+</pre>
 
-  <pre>
+        <p>Each row shows an interval, the count of tokens with
+        scores in that interval, the average spam probability for
+        those tokens, the message's spamicity score (for those
+        tokens and all lesser valued tokens), and a bar graph
+        corresponding to the token count.</p>
+
+        <p>In the above histogram there are a lot of low scoring
+        tokens and a lot of high scoring tokens. They "balance" one
+        another to give the spamicity score of 0.5000</p>
+      </li>
+
+      <li>
+        Using "-vvv" produces a list of <em>all</em> the tokens in
+        the messages with information on each one, i.e. 
+<pre>
   X-Bogosity: No, tests=bogofilter, spamicity=0.500000
-			n    pgood     pbad      fw     U
+                        n    pgood     pbad      fw     U
   "which"              10  0.208333  0.000000  0.000041 +
   "own"                 7  0.145833  0.000000  0.000059 +
   "having"              6  0.125000  0.000000  0.000069 +
@@ -165,41 +268,85 @@
   "copy"                5  0.000000  0.238095  0.999883 +
   N_P_Q_S_s_x_md      138  0.00e+00  0.00e+00  5.00e-01
                            1.00e-03  4.15e-01  0.100
-  </pre>
-The columns printed contain the following information:
-  <dl>
-    <dt>&quot;&hellip;&quot;</dt><dd>the token in question</dd>
-    <dt>n</dt><dd>number of times this token was encountered in training</dd>
-    <dt>pgood</dt><dd>proportion of good messages that contained this token</dd>
-    <dt>pbad</dt><dd>proportion of spam messages that contained this token</dd>
-    <dt>fw</dt><dd>Robinson's weighted index, which combines pgood and pbad to give a value that will be close to zero if a message containing this token is likely to be non-spam and close to one if it's likely to be spam</dd>
-    <dt>U</dt><dd>'<b>+</b>' if this token contributes to the final bogosity value, '<b>-</b>' otherwise.  A token is excluded when its score is closer to 0.5 than min_dev.</dd>
-  </dl>
-<p>The final lines show:</p>
-  <ul>
-    <li>The cumulative results of the columns</li>
-    <li>The values of Robinson's <b>s</b> and <b>x</b> parameters and of <b>min_dev</b></li>
-  </ul>
-</li>
-<li>Using "-R" produces the "-vvv" output described above plus two additional columns:
-  <dl>
-    <dt>invfwlog<dd>logarithm of fw
-    <dt>fwlog<dd>logarithm of (1-fw)
-  </dl>
-<p>
-The "-R" output is formatted for use with the R language for statistical computing.  More information is available at <a href="http://www.r-project.org/">
-The R Project for Statistical Computing</a>.
-</p>
-</li>
-</ul>
-
-  <h2 id="spamassassin">How can I use SpamAssassin to train Bogofilter?</h2>
-
-<p>If you have a working SpamAssassin installation (or care to create one), you can use its return codes to train bogofilter.  
-The easiest way is to create a script for your MDA that runs SpamAssassin, tests the spam/non-spam return code, and runs bogofilter to register the message as spam (or non-spam).  
-The sample procmail recipe below shows one way to do this:<p>
  
-  <pre>
+</pre>
+        The columns printed contain the following information: 
+
+        <dl>
+          <dt>"&hellip;"</dt>
+
+          <dd>the token in question</dd>
+
+          <dt>n</dt>
+
+          <dd>number of times this token was encountered in
+          training</dd>
+
+          <dt>pgood</dt>
+
+          <dd>proportion of good messages that contained this
+          token</dd>
+
+          <dt>pbad</dt>
+
+          <dd>proportion of spam messages that contained this
+          token</dd>
+
+          <dt>fw</dt>
+
+          <dd>Robinson's weighted index, which combines pgood and
+          pbad to give a value that will be close to zero if a
+          message containing this token is likely to be non-spam
+          and close to one if it's likely to be spam</dd>
+
+          <dt>U</dt>
+
+          <dd>'<b>+</b>' if this token contributes to the final
+          bogosity value, '<b>-</b>' otherwise. A token is excluded
+          when its score is closer to 0.5 than min_dev.</dd>
+        </dl>
+
+        <p>The final lines show:</p>
+
+        <ul>
+          <li>The cumulative results of the columns</li>
+
+          <li>The values of Robinson's <b>s</b> and <b>x</b>
+          parameters and of <b>min_dev</b></li>
+        </ul>
+      </li>
+
+      <li>
+        Using "-R" produces the "-vvv" output described above plus
+        two additional columns: 
+
+        <dl>
+          <dt>invfwlog</dt>
+
+          <dd>logarithm of fw</dd>
+
+          <dt>fwlog</dt>
+
+          <dd>logarithm of (1-fw)</dd>
+        </dl>
+
+        <p>The "-R" output is formatted for use with the R language
+        for statistical computing. More information is available at
+        <a href="http://www.r-project.org/">The R Project for
+        Statistical Computing</a>.</p>
+      </li>
+    </ul>
+
+    <h2 id="spamassassin">How can I use SpamAssassin to train
+    Bogofilter?</h2>
+
+    <p>If you have a working SpamAssassin installation (or care to
+    create one), you can use its return codes to train bogofilter.
+    The easiest way is to create a script for your MDA that runs
+    SpamAssassin, tests the spam/non-spam return code, and runs
+    bogofilter to register the message as spam (or non-spam). The
+    sample procmail recipe below shows one way to do this:</p>
+<pre>
   BOGOFILTER     = "/usr/bin/bogofilter"
   BOGOFILTER_DIR = "training"
   SPAMASSASSIN  = "/usr/bin/spamassassin"
@@ -223,22 +370,47 @@ The sample procmail recipe below shows one way to do this:<p>
   :0:
   * ^X-Bogosity:.No
   non-spam
-  </pre>
+ 
+</pre>
+    <hr>
 
-  <hr>
-  <h2 id="asian-spam">What can I do about asian spam?</h2>
+    <h2 id="asian-spam">What can I do about asian spam?</h2>
 
-  <p>Many people get unsolicited email using asian language charsets.  Since they don't know the languages and don't know people there, they assume it's spam.</p>
-<p>The good news is that bogofilter does detect them quite successfully. The bad news is that this can be expensive. You have basically two choices:</p>
+    <p>Many people get unsolicited email using asian language
+    charsets. Since they don't know the languages and don't know
+    people there, they assume it's spam.</p>
 
-  <ul>
-    <li>
-      <p>You can simply let bogofilter handle it. Just train bogofilter with the asian language messages identified as spam. Bogofilter will parse the messages as best it can and will add tokens to the spam wordlist. The wordlist will contain many tokens which don't make sense to you (since the charset cannot be displayed), but bogofilter can work with them and successfully identify asian spam.</p>
-      <p>A second method is to use the "replace_nonascii_characters" config file option. This will replace high-bit characters, i.e. those between 0x80 and 0xFF, with question marks, '?'. This keeps the database much smaller. Unfortunately this conflicts with european language which have many accented vowels and consonant in the high-bit range.</p>
-    </li>
-    <li>
-      <p>If you are sure you will not receive any legitimate messages in those languages, you can kill them right away. This will keep the database smaller. You can do this with an MDA script.</p>
-      <p>Here's a procmail recipe that will sideline messages written with asian charsets:</p>
+    <p>The good news is that bogofilter does detect them quite
+    successfully. The bad news is that this can be expensive. You
+    have basically two choices:</p>
+
+    <ul>
+      <li>
+        <p>You can simply let bogofilter handle it. Just train
+        bogofilter with the asian language messages identified as
+        spam. Bogofilter will parse the messages as best it can and
+        will add tokens to the spam wordlist. The wordlist will
+        contain many tokens which don't make sense to you (since
+        the charset cannot be displayed), but bogofilter can work
+        with them and successfully identify asian spam.</p>
+
+        <p>A second method is to use the
+        "replace_nonascii_characters" config file option. This will
+        replace high-bit characters, i.e. those between 0x80 and
+        0xFF, with question marks, '?'. This keeps the database
+        much smaller. Unfortunately this conflicts with european
+        language which have many accented vowels and consonant in
+        the high-bit range.</p>
+      </li>
+
+      <li>
+        <p>If you are sure you will not receive any legitimate
+        messages in those languages, you can kill them right away.
+        This will keep the database smaller. You can do this with
+        an MDA script.</p>
+
+        <p>Here's a procmail recipe that will sideline messages
+        written with asian charsets:</p>
 <pre>
 ## Silently drop all asian language mail
 UNREADABLE='[^?"]*big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987'
@@ -252,48 +424,70 @@ spam-unreadable
 * B ?? $ ^Content-Type:.*^?.*charset="?($UNREADABLE)
 spam-unreadable
 </pre>
-      <p>With the above recipe, bogofilter will <em>never</em> see the message.</p>
-    </li>
-  </ul>
 
-  <hr>
-  <h2 id="query-database">How do I manually query the database</h2>
+        <p>With the above recipe, bogofilter will <em>never</em>
+        see the message.</p>
+      </li>
+    </ul>
+    <hr>
 
-  <p>To find the spam and ham counts for a token (word) use bogoutil's '-w' option. For example, "bogoutil -w $BOGOFILTER_DIR example.com" gives the good and bad counts for "example.com".</p>
+    <h2 id="query-database">How do I manually query the
+    database</h2>
 
-  <p>If you want the spam score in addition to the spam and ham counts for a token (word) use bogoutil's '-p' option. For example, "bogoutil -p $BOGOFILTER_DIR example.com" gives the good and bad counts for "example.com".</p>
+    <p>To find the spam and ham counts for a token (word) use
+    bogoutil's '-w' option. For example, "bogoutil -w
+    $BOGOFILTER_DIR example.com" gives the good and bad counts for
+    "example.com".</p>
 
-  <p>To find out how many messages are in your wordlists query the special token .MSG_COUNT, i.e., run command "bogoutil -w $BOGOFILTER_DIR .MSG_COUNT" to see the counts for the spam and ham wordlists.</p>
+    <p>If you want the spam score in addition to the spam and ham
+    counts for a token (word) use bogoutil's '-p' option. For
+    example, "bogoutil -p $BOGOFILTER_DIR example.com" gives the
+    good and bad counts for "example.com".</p>
 
-  <p>To tell how many tokens are in your wordlists pipe the output of bogoutil's dump command to command "wc", i.e. use "bogoutil -d $BOGOFILTER_DIR/spamlist.db | wc -l " to display the count for the spamlist and use "bogoutil -d $BOGOFILTER_DIR/goodlist.db | wc -l" to display the count for the goodlist.</p>
+    <p>To find out how many messages are in your worsts query
+    the special token .MSG_COUNT, i.e., run command "bogoutil -w
+    $BOGOFILTER_DIR .MSG_COUNT" to see the counts for the spam and
+    ham word lists.</p>
 
-  <hr>
-  <h2 id="rescue">How can I tell if my wordlists are corrupted?</h2>
+    <p>To tell how many tokens are in your wordiest pipe the
+    output of bogoutil's dump command to command "wc", i.e. use
+    "bogoutil -d $BOGOFILTER_DIR/spamlist.db | wc -l " to display
+    the count for the spamlist and use "bogoutil -d
+    $BOGOFILTER_DIR/goodlist.db | wc -l" to display the count for
+    the goodlist.</p>
+    <hr>
 
-  <p>If you think your wordlists are hosed, you can see what BerkeleyDB thinks by running:</p>
+    <h2 id="rescue">How can I tell if my word lists are
+    corrupted?</h2>
+
+    <p>If you think your word lists are hosed, you can see what
+    BerkeleyDB thinks by running:</p>
 <pre>
 db_verify spamlist.db
 db_verify goodlist.db
 </pre>
 
-  <p>If there is a problem, you may be able to recover some (or all) of the tokens and their counts with the following commands:</p>
+    <p>If there is a problem, you may be able to recover some (or
+    all) of the tokens and their counts with the following
+    commands:</p>
 <pre>
 bogoutil -d spamlist.db | bogoutil -l spamlist.db.new
 </pre>
 
-  <p>or with</p>
+    <p>or with</p>
 <pre>
 db_dump -r spamlist.db &gt; spamlist.txt
 db_load spamlist.new &lt; spamlist.txt
 </pre>
+    <hr>
 
-  <hr>
-  <h2 id="port-notes">How do I get bogofilter working on Solaris, BSD, etc?</h2>
+    <h2 id="port-notes">How do I get bogofilter working on Solaris,
+    BSD, etc?</h2>
 
-  <p>If you don't already have a v3.0+ version of <a
-      href="http://www.sleepycat.com">BerkeleyDB</a>, then <a
-      href="http://www.sleepycat.com/download.html">download it</a>,
-  unpack it, and do these commands in the db directory:</p>
+    <p>If you don't already have a v3.0+ version of <a href=
+    "http://www.sleepycat.com">BerkeleyDB</a>, then <a href=
+    "http://www.sleepycat.com/download.html">download it</a>,
+    unpack it, and do these commands in the db directory:</p>
 <pre>
 $ cd build_unix
 $ sh ../dist/configure
@@ -301,84 +495,137 @@ $ make
 # make install
 </pre>
 
-  <p>Next, download a <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">portable version</a> of bogofilter.</p>
+    <p>Next, download a <a href=
+    "http://sourceforge.net/project/showfiles.php?group_id=62265">portable
+    version</a> of bogofilter.</p>
 
-  <p class="subheading">On Solaris</p>
+    <p class="subheading">On Solaris</p>
 
-  <p>Unpack it, and then do:</p>
+    <p>Unpack it, and then do:</p>
 <pre>
 $ ./configure --with-db=/usr/local/BerkeleyDB.4.1
 $ make
 # make install-strip
 </pre>
 
-  <p>You will either want to put a symlink to libdb.so in /usr/lib, or use a modified LD_LIBRARY_PATH environment variable before you start bogofilter.</p>
+    <p>You will either want to put a symlink to libdb.so in
+    /usr/lib, or use a modified LD_LIBRARY_PATH environment
+    variable before you start bogofilter.</p>
 <pre>
 $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
 </pre>
 
-<p>Note that some make versions shipped with Solaris break when you try
-to build bogofilter outside of its source directory. Either build in the
-source directory (as suggested above) or use GNU make (gmake).</p>
+    <p>Note that some make versions shipped with Solaris break when
+    you try to build bogofilter outside of its source directory.
+    Either build in the source directory (as suggested above) or
+    use GNU make (gmake).</p>
 
-  <p class="subheading">On FreeBSD</p>
+    <p class="subheading">On FreeBSD</p>
 
-  <p>The FreeBSD ports and packages carry very recent versions of
-  bogofilter. This approach uses the highly recommended portupgrade and
-  cvsup software packages. To install these two fine pieces, type (you
-  need to do this only once):</p>
-
-  <pre>
+    <p>The FreeBSD ports and packages carry very recent versions of
+    bogofilter. This approach uses the highly recommended
+    portupgrade and cvsup software packages. To install these two
+    fine pieces, type (you need to do this only once):</p>
+<pre>
 # pkg_add -r portupgrade cvsup
-  </pre>
+ 
+</pre>
 
-  <p>To install or upgrade bogofilter, just <a
-      href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html">upgrade
-      your portstree using cvsup</a>, then type:</p>
-
-  <pre>
+    <p>To install or upgrade bogofilter, just <a href=
+    "http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html">
+    upgrade your portstree using cvsup</a>, then type:</p>
+<pre>
 # portupgrade -N bogofilter
-  </pre>
+ 
+</pre>
 
-  <p class="subheading">On HP-UX</p>
+    <p class="subheading">On HP-UX</p>
 
-  <p>See the file doc/programmer/README.hp-ux in the source distribution.</p>
+    <p>See the file doc/programmer/README.hp-ux in the source
+    distribution.</p>
+    <hr>
 
-  <hr>
-  <h2 id="nfs">Can I share wordlists over NFS?</h2>
+    <h2 id="nfs">Can I share word lists over NFS?</h2>
 
-  <p>Yes, provided you use the correct file locking to avoid data corruption. When you compile bogofilter, you will need to verify that the configure script has set "#define HAVE_FCNTL 1" in your config.h file. Popular UNIX operating systems will all support this. If you are running an unusual, or an older version of an operating system, make sure it supports fcntl(). If "#define HAVE_FCNTL 1" is set, then comment out "#define HAVE_FLOCK 1" so that the locking system uses fcntl() locking instead of the default of flock() locking. If your system does not support fcntl, then you will not be able to share wordlist files over NFS without the risk of data corruption.</p>
+    <p>Yes, provided you use the correct file locking to avoid data
+    corruption. When you compile bogofilter, you will need to
+    verify that the configure script has set "#define HAVE_FCNTL 1"
+    in your config.h file. Popular UNIX operating systems will all
+    support this. If you are running an unusual, or an older
+    version of an operating system, make sure it supports fcntl().
+    If "#define HAVE_FCNTL 1" is set, then comment out "#define
+    HAVE_FLOCK 1" so that the locking system uses fcntl() locking
+    instead of the default of flock() locking. If your system does
+    not support fcntl, then you will not be able to share word list
+    files over NFS without the risk of data corruption.</p>
 
-  <p>Next, make sure you have NFS set up properly, with "lockd" running. Refer to your NFS documentation for more information about running "lockd" or "rpc.lockd". Most operating systems with NFS turn this on by default.</p>
+    <p>Next, make sure you have NFS set up properly, with "lockd"
+    running. Refer to your NFS documentation for more information
+    about running "lockd" or "rpc.lockd". Most operating systems
+    with NFS turn this on by default.</p>
+    <hr>
 
-  <hr>
-  <h2 id="return-codes">Why does bogofilter give return codes like 0 and 256 when it's run from inside a program?</h2>
+    <h2 id="return-codes">Why does bogofilter give return codes
+    like 0 and 256 when it's run from inside a program?</h2>
 
-  <p>Likely the return codes are being reformatted by waitpid(2). Use WEXITSTATUS(status) in sys/wait.h, or comparable macro, to get the correct value.</p>
+    <p>Likely the return codes are being reformatted by waitpid(2).
+    Use WEXITSTATUS(status) in sys/wait.h, or comparable macro, to
+    get the correct value.</p>
+    <hr>
 
-  <hr>
-  <h2 id="changed-options">Now that I've upgraded to 0.11 why are my scripts broken?</h2>
+    <h2 id="changed-options">Now that I've upgraded to 0.11 why are
+    my scripts broken?</h2>
 
-  <p>With version 0.11 bogofilter's options for registering mail as ham or spam have been changed. They now allow registering (or unregistering) messages in the ham and spam wordlists. Prior to this, there was no way to unregister a message from a wordlist (without registering it in the other wordlist).</p>
+    <p>With version 0.11 bogofilter's options for registering mail
+    as ham or spam have been changed. They now allow registering
+    (or unregistering) messages in the ham and spam word lists.
+    Prior to this, there was no way to unregister a message from a
+    word list (without registering it in the other word list).</p>
 
-  <p>Bogofilter has four registration options - '-s', '-n', '-S', and '-N'. With the release of version 0.11 the meaning of '-S' and '-N' has been changed to allow unregistering messages from the word lists. Here's what the four options mean:</p>
+    <p>Bogofilter has four registration options - '-s', '-n', '-S',
+    and '-N'. With the release of version 0.11 the meaning of '-S'
+    and '-N' has been changed to allow unregistering messages from
+    the word lists. Here's what the four options mean:</p>
 
-  <dl>
-    <dt>-s</dt><dd>means to register the current message as spam, i.e. add its tokens to spamlist.db</dd>
-    <dt>-n</dt><dd>means to register the current message as ham, i.e. add its tokens to goodlist.db</dd>
-    <dt>-S</dt><dd>means to unregister the current message from the spam wordlist, i.e. remove its tokens from spamlist.db</dd>
-    <dt>-N</dt><dd>means to unregister the current message from the ham wordlist, i.e. remove its tokens from goodlist.db</dd>
-  </dl>
+    <dl>
+      <dt>-s</dt>
 
-  <p>Prior to version 0.11, the '-S' option was used to move a message from the ham wordlist to the spam wordlist, i.e. there were two actions. Now with 0.11 each of the two actions is invoked by its own option. To get the same effect as the old '-S', you should use '-N -s' (or '-Ns' which means the same thing).</p>
+      <dd>means to register the current message as spam, i.e. add
+      its tokens to spamlist.db</dd>
 
-  <p>Similarly, the old '-N' option is now '-Sn' (or '-S -n').</p>
+      <dt>-n</dt>
 
-  <p>MUA scripts typically use '-s' and '-n' and don't need to change. Other scripts which use '-S' and '-N' for fixing registration errors <em>do</em> need to be changed.</p>
+      <dd>means to register the current message as ham, i.e. add
+      its tokens to goodlist.db</dd>
 
-  <hr>
-<!--
-$Id$
--->
-</body>
+      <dt>-S</dt>
+
+      <dd>means to unregister the current message from the spam
+      word list, i.e. remove its tokens from spamlist.db</dd>
+
+      <dt>-N</dt>
+
+      <dd>means to unregister the current message from the ham
+      word list, i.e. remove its tokens from goodlist.db</dd>
+    </dl>
+
+    <p>Prior to version 0.11, the '-S' option was used to move a
+    message from the ham word list to the spam word list, i.e. there
+    were two actions. Now with 0.11 each of the two actions is
+    invoked by its own option. To get the same effect as the old
+    '-S', you should use '-N -s' (or '-Ns' which means the same
+    thing).</p>
+
+    <p>Similarly, the old '-N' option is now '-Sn' (or '-S
+    -n').</p>
+
+    <p>MDA scripts typically use '-s' and '-n' and don't need to
+    change. Other scripts which use '-S' and '-N' for fixing
+    registration errors <em>do</em> need to be changed.</p>
+    <hr>
+    <!--
+            $Id$
+            -->
+  </body>
 </html>
+
