@@ -75,8 +75,8 @@ done
 %{_bindir}/bogoupgrade
 %{_sysconfdir}/bogofilter.cf.example
 %config(noreplace) %{_sysconfdir}/bogofilter.cf
-%doc AUTHORS CHANGES-0.10 COPYING INSTALL METHODS NEWS README
-%doc README.cvs TODO UPGRADE
+%doc AUTHORS CHANGES-0.10 CHANGES-0.11 COPYING INSTALL METHODS NEWS
+%doc README README.cvs TODO UPGRADE
 %doc doc/README.Robinson doc/integrating-with-qmail
 %doc doc/programmer
 %doc .inst/contrib .inst/html .inst/xml

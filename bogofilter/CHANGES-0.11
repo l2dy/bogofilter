@@ -12,7 +12,7 @@ $Id$
 
 	2003-03-02
 	* Discarding of html comments is the standard action.  Removed
-	  options to control that action.
+	  code to enable/disable that action.
 
 	2003-03-01
 	* Command line arguments take precedence over config file

@@ -4,32 +4,36 @@
 
 $Id$
 
-0.11.X   2003-XX-YY
+0.11.0   2003-03-03
 
 	* The Robinson-Fisher algorithm is now the default algorithm.
-	* Database access efficiency changes.
-	* Internal cleanup of storage used in parsing messages and
-	  working with databases.
-	* Improvements in html comment handling code.
-	* Manual pages now contain the proper path to bogofilter.cf.
+	* The configuration file parser is stricter and more correct.
+	* Separated message registration options from unregistration
+	  options.  '-S' and '-N' have been changed and now just do
+	  unregistration.  To move a meessage from one wordlist to the
+	  other, use '-S -n' or '-N -S' (as appropriate)
 	* Bogofilter's -p (passthrough) mode will no longer read the entire
 	  mail into memory if the standard input is a seekable regular file.
-	* Separate message registration options from unregistration
-	  options.
-	* The configuration file parser is stricter and more correct; it does
-	  no longer tolerate end-of-line comments and a trailing "f" after
-	  numeric constants though. So change (for instance)
-	  "spam_cutoff = 0.54f  # for robinson" into "spam_cutoff = 0.54"
-	  in your bogofilter.cf files.
+	* Bogofilter's '-l' option was changed and no longer allows an
+          argument.  Use the new '-L yourtag' option to provide a tag
+          for log messages.
+	* Database access efficiency changes.
+	* Improvements in html comment handling code.
+	* Internal cleanup of storage used in parsing messages and
+	  working with databases.
+	* Manual pages now contain the proper path to bogofilter.cf.
 
-0.10.3.2 2003-XX-XX
+0.10.3.1  2003-02-17
 
-	* Bogofilter's -l option was changed. It no longer takes an optional
-	  argument, which is non-portable, it is now complemented by an -L
-	  option with mandatory argument.
+	* Updated bogofilter and bogoutil man pages.
+	* Give command line options preference over config file options.
 
-	  This means: if your scripts use -l, that's fine, if your scripts use
-	  -l yourtag, change them to -L yourtag.
+0.10.3  2003-02-14
+
+	* Database access efficiency changes.
+	* Database properly closed at end of maintenance pass.
+	* Improvements in html comment handling code.
+	* Support option '-?'
 
 0.10.2   2003-02-01
 
@@ -319,8 +323,9 @@ $Id$
 0.1: Mon 19 Aug 2002 03:07:31
 
 	* Initial release.
+
  vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:
 
- LocalWords:  BOGOFILTER relson Exp procmail contrib Spamicity config spamicity
+ LocalWords:  BOGOFILTER Exp procmail contrib Spamicity config spamicity
  LocalWords:  bogoutil datestamp MAXTOKENLEN charset stderr syslog gcc malloc
  LocalWords:  calloc Bogosity
