@@ -110,12 +110,6 @@ static void comma_parse(char opt, const char *arg, double *parm1, double *parm2,
 /* externs for query_config() */
 
 extern double robx, robs;
-extern const char *header_format;
-extern const char *terse_format;
-extern const char *log_update_format;
-extern const char *log_header_format;
-extern const FIELD *spamicity_tags;
-extern const FIELD *spamicity_formats;
 extern wl_t wl_default;
 
 /*---------------------------------------------------------------------------*/
