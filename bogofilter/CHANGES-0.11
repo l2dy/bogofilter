@@ -4,7 +4,7 @@
 
 $Id$
      
-0.11.X  2003-03-??
+0.11.0  2003-03-04
 
 	2003-03-03
 	* Added config file option "spam_subject_tag" to provide
@@ -26,6 +26,7 @@ $Id$
 	  '-N' and '-s'.
 
 	2003-02-26
+	* Database locking has been improved.
 	* Bogofilter's -p (passthrough) mode will no longer read the entire
 	  mail into memory if the standard input is a seekable regular file.
 
