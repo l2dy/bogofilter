@@ -64,7 +64,6 @@ bool terse;		/* '-t' */
 int passthrough;	/* '-p' */
 int verbose;		/* '-v' */
 int Rtable = 0;		/* '-R' */
-bool block_on_subnets = false;
 
 char directory[PATH_LEN + 100] = "";
 const char *user_config_file   = "~/.bogofilter.cf";

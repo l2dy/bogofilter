@@ -51,6 +51,7 @@
 
 extern char *spam_header_name;
 
+bool block_on_subnets = false;
 struct textblock textblocks;
 /*@dependent@*/ struct textblock *textend = &textblocks;
 
