@@ -93,6 +93,8 @@
           databases to the new combined wordlist format?</a></li>
           <li><a href="#multiple">Can I use multiple wordlists?</a></li>
           <li><a href="#ignore">Can I tell bogofilter to ignore certain tokens?</a></li>
+	  <li><a href="#locksize">Why does bogofilter die after printing
+	      "Lock table is out of available object entries"?</a></li>
         </ul>
       </li>
 
@@ -954,8 +956,15 @@
 
     <pre>  echo ignore.me | bogoutil -l ~/ignorelist.db</pre>
 
-    <hr>
+    <h2 id="locksize">Why does bogofilter die after printing
+	"Lock table is out of available object entries"?</h2>
 
+    <p>The transactional and concurrent modes of BerkeleyDB require a
+    lock table that corresponds to the data base in size. See the
+    <samp>README.db</samp> file for a detailed explanation and a
+    remedy.</p>
+
+    <hr>
     <h2 id="multi-user">Can bogofilter be used in a multi-user environment?</h2>
 
     <p>Yes, it can.  There are multiple, distinct strategies for doing
