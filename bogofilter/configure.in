@@ -1,6 +1,6 @@
 # $Id$
 AC_INIT(bogofilter.c)
-AM_INIT_AUTOMAKE(bogofilter, 0.7.7.cvs)
+AM_INIT_AUTOMAKE(bogofilter, 0.8.0.cvs)
 AM_CONFIG_HEADER(config.h:config.in)
 AC_PROG_CC
 AM_PROG_LEX
