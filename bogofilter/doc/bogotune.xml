@@ -17,7 +17,7 @@
       <command>bogotune</command> 
 	 <arg>-c <replaceable>config</replaceable></arg>
 	 <arg>-C</arg>
-	 <arg>-d <replaceable>file.db</replaceable></arg>
+	 <arg>-d <replaceable>dir</replaceable></arg>
 	 <arg>-D</arg>
 	 <arg>-r <replaceable>value</replaceable></arg>
 	 <arg>-T <replaceable>value</replaceable></arg>
