@@ -93,7 +93,7 @@ done
 SYSTEST="${srcdir}"
 OUTPUTS=${SYSTEST}/outputs
 
-if [ -z "$RUN_FROM_MAKE" ] ; then
+if [ -z "$RUN_FROM_MAKE" ] || [ "$SUPPRESS_DELETE" = YES ] ; then
 # standalone, from shell directly
 # THIS IS PRONE TO RACES
    NAME=`basename $0 | sed -e 's/^t\.//'`
