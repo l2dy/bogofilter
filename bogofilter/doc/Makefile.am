@@ -79,6 +79,9 @@ dist-hook:
 	perl -pl -e "s|\xA0|\\ |g" -i $@ || { rm -f $@ ; exit 1 ; }\
 	fi
 else
+dist-hook:
+	true
+
 .xml.1in:
 	@echo 1>&2
 	@echo 1>&2 "You need xmlto to build bogofilter documentation."
