@@ -85,6 +85,7 @@ static bool not_long_token(byte *buf, size_t count)
 static int yy_get_new_line(buff_t *buff)
 {
     int count = reader_getline(buff);
+    const byte *buf = buff->t.text;
 
     static size_t hdrlen = 0;
     if (hdrlen==0)
@@ -105,7 +106,10 @@ static int yy_get_new_line(buff_t *buff)
     /* Mime header check needs to be performed on raw input
     ** -- before mime decoding.  Without it, flex aborts:
     ** "fatal flex scanner internal error--end of buffer missed" */
-    if (got_mime_boundary(&buff->t)) {
+
+    if (buff->t.leng >= 2 &&
+	buf[0] == '-' && buf[1] == '-' &&
+	got_mime_boundary(&buff->t)) {
 	yy_set_state_initial();
     }
 
