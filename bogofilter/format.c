@@ -56,7 +56,7 @@ const char *spam_header_name = SPAM_HEADER_NAME;	/* used by lexer */
 **
 **	    a - algorithm, e.g. "graham", "robinson", "fisher"
 **
-**	    c - classification, e.g. Yes/No, Spam/Ham/Unsure, or YN, SHU, +-?
+**	    c - classification, e.g. Yes/No, Spam/Ham/Unsure, +/-/?
 **
 **	    e - spamicity as 'e' format
 **	    f - spamicity as 'f' format
@@ -92,6 +92,7 @@ const parm_desc format_parms[] =
     { "log_update_format", CP_STRING,	{ &log_update_format } },
     { "spamicity_tags",    CP_FUNCTION,	{ set_spamicity_tags } },
     { "spamicity_formats", CP_FUNCTION,	{ set_spamicity_formats } },
+
     { NULL,                CP_NONE,	{ (void *) NULL } },
 };
 
@@ -221,6 +222,8 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 
     rc_t status = method->status();
     double spamicity = method->spamicity();
+
+    memset(buff, '\0', size);		/* for debugging */
 
     while (buff < end && *format)
     {
