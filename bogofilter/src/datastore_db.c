@@ -219,7 +219,7 @@ static void dsm_init(bfdir *directory, bffile *file)
 }
 
 /** "constructor" - allocate our handle and initialize its contents */
-static dbh_t *handle_init(const char *db_path, const char *db_name)
+static dbh_t *dbh_init(const char *db_path, const char *db_name)
 {
     dbh_t *handle;
 
@@ -485,7 +485,7 @@ void *db_open(void *vhandle,
 	uint32_t pagesize;
 	uint32_t retryflag = retryflags[idx];
 
-	handle = handle_init(path, name);
+	handle = dbh_init(path, name);
 
 	if (handle == NULL)
 	    return NULL;

@@ -61,7 +61,7 @@ ex_t dbe_recover(const char *d1, bool d2, bool d3) { (void)d1; d2=d3; return EX_
 /* real functions */
 /** Initialize database handle and return it. 
  * \returns non-NULL, as it exits with EX_ERROR in case of trouble. */
-static dbh_t *handle_init(
+static dbh_t *dbh_init(
 	const char *path /** directory to database file */,
 	const char *name /** name of database file */)
 {
@@ -213,7 +213,7 @@ void *db_open(void *dummyenv, const char *dbpath,
     int count = 0;
 
     (void)dummyenv;
-    dbh = handle_init(dbpath, dbname);
+    dbh = dbh_init(dbpath, dbname);
     if (DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB"))
 	fprintf(dbgout, "SQLite: db_open(%s)\n", dbh->name);
     rc = sqlite3_open(dbh->name, &dbh->db);
