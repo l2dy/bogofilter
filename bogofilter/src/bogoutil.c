@@ -475,7 +475,7 @@ static int compute_robinson_x(char *path)
     double robx;
     word_t *word_robx = word_new((const byte *)ROBX_W, strlen(ROBX_W));
 
-    setup_wordlists(path, 0);
+    setup_wordlists(path, PR_NONE);
     open_wordlists(DB_READ);
 
     robx = compute_robx(word_lists->dsh);
