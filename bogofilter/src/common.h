@@ -74,7 +74,7 @@ typedef enum sh_e { IX_SPAM = 0, 	/* index for SPAM */
 #define	DS_MODE 	(mode_t) 0664
 
 /** Default directory */
-#define	DIR_MODE	(mode_t) 0755
+#define	DIR_MODE	(mode_t) 0775
 
 #define COUNTOF(array)	(uint) (sizeof(array)/sizeof(array[0]))
 
