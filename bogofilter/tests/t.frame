@@ -38,4 +38,9 @@ fi
 
 BOGOFILTER_DIR=$TMPDIR
 export BOGOFILTER_DIR
+
+# make GNU libc nasty and abort on memory allocation issues:
+MALLOC_CHECK_=2
+export MALLOC_CHECK_
+
 ${relpath}/bogofilter -n -C </dev/null
