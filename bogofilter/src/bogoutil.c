@@ -10,8 +10,6 @@ AUTHOR:
 
 ******************************************************************************/
 
-/* __USE_POSIX2 tells GNU libc to provide a getopt prototype */
-
 #include "common.h"
 
 #include <ctype.h>
@@ -20,9 +18,8 @@ AUTHOR:
 #include <string.h>
 #include <sys/stat.h>
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>		/* for getopt() */
-#endif
+#undef	HAVE_DECL_GETOPT	/* for configure/getopt incompatibility */
+#include "getopt.h"
 
 #include "bogofilter.h"
 #include "bogohist.h"
@@ -414,8 +411,6 @@ static bool  prob = false;
 
 typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST } cmd_t;
 static cmd_t flag = M_NONE;
-
-#include "getopt.h"
 
 #define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:vVw:x:X:y:"
 
