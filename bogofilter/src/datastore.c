@@ -118,9 +118,9 @@ void dsh_free(void *vhandle)
     return;
 }
 
-void *ds_open(const char *db_file, const char *name, dbmode_t open_mode)
+void *ds_open(const char *path, const char *name, dbmode_t open_mode)
 {
-    void *v = db_open(db_file, name, open_mode);
+    void *v = db_open(path, name, open_mode);
     return v;
 }
 

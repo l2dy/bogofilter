@@ -110,7 +110,7 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
       if (DEBUG_REGISTER(1))
 	  (void)fprintf(dbgout, "bogofilter: list %s - %ul spam, %ul good\n",
-			list->filename, list->msgcount[IX_SPAM], list->msgcount[IX_GOOD]);
+			list->listname, list->msgcount[IX_SPAM], list->msgcount[IX_GOOD]);
   }
 
   set_msg_counts(g, b);

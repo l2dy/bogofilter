@@ -16,7 +16,7 @@ struct wordlist_s
 {
     /*@null@*/ wordlist_t *next;
     int index;
-    /*@owned@*/ char *filename;	/* resource name (for debug/verbose messages) */
+    /*@owned@*/ char *listname;	/* resource name (for debug/verbose messages) */
     /*@owned@*/ char *filepath;	/* resource path (for debug/verbose messages) */
     /*@owned@*/ dsh_t *dsh;	/* datastore handle */
     u_int32_t	msgcount[IX_SIZE];	/* count of messages in wordlist. */

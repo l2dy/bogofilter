@@ -175,10 +175,10 @@ bool configure_wordlist(const char *val)
 {
     bool ok;
     int rc;
-    wordlist_t* list = xcalloc(1, sizeof(wordlist_t));
+    wordlist_t* wl = xcalloc(1, sizeof(wordlist_t));
     char  type;
-    char* name;
-    char* path;
+    char* listname;
+    char* filename;
     int  precedence;
 
     char *tmp = xstrdup(val);
@@ -192,23 +192,23 @@ bool configure_wordlist(const char *val)
 	return (false);
     }
     
-    name=tmp;			/* name of wordlist */
+    listname=tmp;		/* name of wordlist */
     tmp = spanword(tmp);
     
-    path=tmp;			/* path to wordlist */
+    filename=tmp;		/* path to wordlist */
     tmp = spanword(tmp);
-    path=tildeexpand(path, true);
+    filename=tildeexpand(filename, true);
     
     precedence=atoi(tmp);
     tmp = spanword(tmp);
     
-    rc = init_wordlist(&list, name, path, true, false, precedence, type);
+    rc = init_wordlist(&wl, listname, filename, true, false, precedence, type);
     ok = rc == 0;
 
     if (ok)
 	config_setup = true;
 
-    xfree(path);
+    xfree(filename);
     
     return ok;
 }

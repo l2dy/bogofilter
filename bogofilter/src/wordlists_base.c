@@ -29,7 +29,7 @@ int init_wordlist(/*@out@*/ wordlist_t **list,
     *list = n;
 
     n->dsh=NULL;
-    n->filename=xstrdup(name);
+    n->listname=xstrdup(name);
     n->filepath=xstrdup(path);
     n->index   =++listcount;
     n->type    =type;
@@ -124,7 +124,7 @@ static wordlist_t *free_wordlist(wordlist_t *list)
 {
     wordlist_t *next = list->next;
 
-    xfree(list->filename);
+    xfree(list->listname);
     xfree(list->filepath);
     xfree(list);
 
