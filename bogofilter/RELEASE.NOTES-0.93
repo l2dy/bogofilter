@@ -48,5 +48,7 @@ be archived or deleted periodically.
 For detailed instructions, be sure to _read_ doc/README.db and check the
 BerkeleyDB documentation.
 
+These benefits are not available when bogofilter is compiled to use the
+TDB or QDBM data bases.
 
                   --- END of RELEASE.NOTES-0.93 ---
