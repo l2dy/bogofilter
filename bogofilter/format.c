@@ -40,11 +40,6 @@ char reg = ' ';
 int wrdcount = 0;
 int msgcount = 0;
 
-#define cls_cnt 3			/* 3 (for Spam/Ham/Unsure) */
-typedef const char *pchar;
-pchar spamicity_tags[cls_cnt]    = {  "Yes",   "No",   "Unsure" };
-pchar spamicity_formats[cls_cnt] = { "%0.6f", "%0.6f", "%0.6f"  };
-
 /* initialized static variables */
 
 const char *spam_header_name = SPAM_HEADER_NAME;	/* used by lexer */
@@ -77,9 +72,15 @@ static const char *terse_format = "%1.1c %f";
 static const char *log_header_format = "%h: %c, spamicity=%p, version=%v";
 static const char *log_update_format = "register-%r, %w words, %m messages";
 
+#define	RC_COUNT RC_UNSURE+1	/* 3 (for Spam/Ham/Unsure) */
+typedef const char *FIELD;
+typedef FIELD FIELDS[RC_COUNT];
+FIELDS spamicity_tags    = {  "Yes",   "No",   "Unsure" };
+FIELDS spamicity_formats = { "%0.6f", "%0.6f", "%0.6f"  };
+
 static bool set_spamicity_tags(const char *val);
 static bool set_spamicity_formats(const char *val);
-static bool set_spamicity_fields(pchar *strings, const char *val);
+static bool set_spamicity_fields(FIELD *strings, const char *val);
 
 /* Descriptors for config file */
  
@@ -123,12 +124,12 @@ extern char *strsep (char **__restrict __stringp,
 		     __const char *__restrict __delim) __THROW;
 */
 
-static bool set_spamicity_fields(pchar *strings, const char *val)
+static bool set_spamicity_fields(FIELD *strings, const char *val)
 {
     size_t i;
     /* dup the value string and break it up */
     char *tmp = xstrdup(val);
-    for (i = 0; i < cls_cnt; i += 1)
+    for (i = 0; i < RC_COUNT; i += 1)
     {
 	strings[i] = tmp;
 	if (*tmp == '\0')
