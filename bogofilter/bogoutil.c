@@ -80,6 +80,7 @@ static int count_hook(char *key, long keylen, char *data, long
     (void)datalen;
 
     (*counter)++;
+
     return 0;
 }
 
@@ -432,7 +433,6 @@ static double compute_robx(void *dbh_spam, void *dbh_good)
 
 static int compute_robinson_x(char *path)
 {
-    int e;
     wordlist_t wl[2];
 
     void *dbh_spam;
@@ -442,10 +442,12 @@ static int compute_robinson_x(char *path)
 
     double robx;
 
-    e = build_path(db_spam_file, sizeof(db_spam_file), path, SPAMFILE);
-    if (e < 0) goto overflow;
-    e = build_path(db_good_file, sizeof(db_good_file), path, GOODFILE);
-    if (e < 0) goto overflow;
+    if (build_path(db_spam_file, sizeof(db_spam_file), path, SPAMFILE) < 0 ||
+	build_path(db_good_file, sizeof(db_good_file), path, GOODFILE) < 0 )
+    {
+	fprintf(stderr, "%s: string too long creating .db file name.\n", PROGNAME);
+	exit(2);
+    }
 
     memset(wl, 0, sizeof(wl));
 
@@ -470,9 +472,6 @@ static int compute_robinson_x(char *path)
     db_close(dbh_spam);
 
     return 0;
-overflow:
-    fprintf(stderr, "%s: string too long creating .db file name.\n", PROGNAME);
-    exit(2);
 }
 
 static void print_version(void)
