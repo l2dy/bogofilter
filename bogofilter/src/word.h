@@ -28,4 +28,7 @@ extern int 	word_cmp(const word_t *w1, const word_t *w2);
 extern word_t  *word_concat(const word_t *w1, const word_t *w2);
 extern void 	word_puts(const word_t *self, uint width, FILE *fp);
 
+/** Compare word \a w to string \a s. */
+extern int	word_cmps(const word_t *w, char *s);
+
 #endif	/* WORD_H */

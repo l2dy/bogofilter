@@ -66,6 +66,14 @@ int word_cmp(const word_t *w1, const word_t *w2)
     return 0;
 }
 
+int word_cmps(const word_t *w, char *s)
+{
+    word_t w2;
+    w2.leng = strlen(s);
+    w2.text = s;
+    return word_cmp(w, &w2);
+}
+
 word_t *word_concat(const word_t *w1, const word_t *w2)
 {
     uint len = w1->leng + w2->leng;
