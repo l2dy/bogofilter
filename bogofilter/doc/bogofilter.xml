@@ -36,6 +36,7 @@
   <arg choice='opt'>-u</arg>
   <arg choice='opt'>-v</arg>
   <arg choice='opt'>-V</arg>
+  <arg choice='opt'>-D</arg>
   <arg choice='opt'>-x <replaceable>flags</replaceable></arg>
   <arg choice='opt'>-c <replaceable>filename</replaceable></arg>
   <arg choice='opt'>-C</arg>
@@ -247,6 +248,8 @@ R, below, for further detail.</para>
 
 <para>The <option>-V</option> option prints the version number and 
 exits.</para>
+
+<para>The <option>-D</option> option redirects debug output to stdout.</para>
 
 <para>The <option>-x <replaceable>flags</replaceable></option> option 
 allows setting of debug flags for printing debug messages.</para>
