@@ -1,11 +1,8 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.9  2002/09/18 22:09:07  relson
- * Remove unused local variables from collect_words().
+ * Revision 1.10  2002/09/18 22:41:07  relson
+ * Separated probability calculation out of select_indicators() into new function compute_probability().
  *
-/* Revision 1.8  2002/09/17 06:20:08  adrian_otto
-/* Removed type cast on qsort call to improve portability
-/*
 /* Revision 1.7  2002/09/15 19:22:51  relson
 /* Refactor the main bogofilter() function into three smaller, more coherent pieces:
 /*
@@ -472,12 +469,57 @@ void *collect_words(int fd)
     return PArray;
 }
 
+double compute_probability( char *token )
+{
+    double prob, hamness, spamness;
+
+    hamness = getcount(token, &ham_list);
+    spamness = getcount(token, &spam_list);
+
+    // Paul Graham's original formula:
+    // 
+    // (let ((g (* 2 (or (gethash word ham) 0))) 
+    //      (b (or (gethash word spam) 0)))
+    //  (unless (&lt; (+ g b) 5) 
+    //   (max .01 (min .99 
+    //  	    (double (/ 
+    // 		    (min 1 (/ b nspam)) 
+    // 		    (+ (min 1 (/ g nham)) (min 1 (/ b nspam)))))))))
+    // This assumes that spam and non-spam are equiprobable.
+    hamness *= HAM_BIAS;
+    if (hamness + spamness < MINIMUM_FREQ)
+#ifdef NON_EQUIPROBABLE
+	// In the absence of evidence, the probability that a new word
+	// will be spam is the historical ratio of spam words to
+	// nonspam words.
+	prob = msg_prob;
+#else
+	prob = UNKNOWN_WORD;
+#endif // NON_EQUIPROBABLE
+    else
+    {
+	register double pb = min(1, (spamness / spam_list.msgcount));
+	register double pg = min(1, (hamness / ham_list.msgcount));
+
+#ifdef NON_EQUIPROBABLE
+	prob = (pb * msg_prob) / ((pg * (1 - msg_prob)) + (pb * msg_prob));
+#else
+	prob = pb / (pg + pb);
+#endif // NON_EQUIPROBABLE
+	prob = min(prob, 0.99);
+	prob = max(prob, 0.01);
+    }
+    return prob;
+}
+
 bogostat_t *select_indicators(void  *PArray)
 // selects the best spam/nonspam indicators and
 // populates the stats structure.
 {
     void	**loc;
     char	tokenbuffer[BUFSIZ];
+    char	*token;
+    double	slotdev, hitdev;
 
     discrim_t *pp, *hit;
     static bogostat_t stats;
@@ -493,51 +535,18 @@ bogostat_t *select_indicators(void  *PArray)
  	pp->key[0] = '\0';
     }
  
-    yytext = tokenbuffer;
+    token = tokenbuffer;
     for (loc  = JudySLFirst(PArray, tokenbuffer, 0);
 	 loc != (void *) NULL;
 	 loc  = JudySLNext(PArray, tokenbuffer, 0))
     {
 	double prob;
 	double dev;
-	double hamness, spamness, slotdev, hitdev;
 
-	hamness = getcount(yytext, &ham_list);
-	spamness  = getcount(yytext, &spam_list);
+	prob = compute_probability( token );
 
-	// Paul Graham's original formula:
-	// 
-	// (let ((g (* 2 (or (gethash word ham) 0))) 
-	//      (b (or (gethash word spam) 0)))
-	//  (unless (&lt; (+ g b) 5) 
-	//   (max .01 (min .99 
-	//  	    (double (/ 
-	// 		    (min 1 (/ b nspam)) 
-	// 		    (+ (min 1 (/ g nham)) (min 1 (/ b nspam)))))))))
-	// This assumes that spam and non-spam are equiprobable.
-	hamness *= HAM_BIAS;
-	if (hamness + spamness < MINIMUM_FREQ)
-#ifdef NON_EQUIPROBABLE
-	    // In the absence of evidence, the probability that a new word
-	    // will be spam is the historical ratio of spam words to
-	    // nonspam words.
-	    prob = msg_prob;
-#else
-	    prob = UNKNOWN_WORD;
-#endif // NON_EQUIPROBABLE
-	else
-	{
-	    register double pb = min(1, (spamness / spam_list.msgcount));
-	    register double pg = min(1, (hamness / ham_list.msgcount));
-
-#ifdef NON_EQUIPROBABLE
-	    prob = (pb * msg_prob) / ((pg * (1 - msg_prob)) + (pb * msg_prob));
-#else
-	    prob = pb / (pg + pb);
-#endif // NON_EQUIPROBABLE
-	    prob = min(prob, 0.99);
-	    prob = max(prob, 0.01);
-	}
+	if ( verbose >=3 )
+	    printf("#  %15.12f  %s\n", prob, tokenbuffer);
 
 	// update the list of tokens with maximum deviation
 	dev = DEVIATION(prob);
@@ -546,6 +555,7 @@ bogostat_t *select_indicators(void  *PArray)
 	for (pp = stats.extrema; pp < stats.extrema+sizeof(stats.extrema)/sizeof(*stats.extrema); pp++)
         {
 	    slotdev=DEVIATION(pp->prob);
+
 	    if (dev>slotdev && hitdev>slotdev)
 	    {
 		hit=pp;
@@ -555,7 +565,7 @@ bogostat_t *select_indicators(void  *PArray)
         if (hit) 
 	{ 
 	    hit->prob = prob;
-	    strncpy(hit->key, yytext, MAXWORDLEN);
+	    strncpy(hit->key, token, MAXWORDLEN);
 	}
     }
     return (&stats);
@@ -585,7 +595,7 @@ double compute_spamicity(bogostat_t *stats)
 	    product *= pp->prob;
 	    invproduct *= (1 - pp->prob);
 	    spamicity = product / (product + invproduct);
-	    if (verbose)
+	    if (verbose>1)
 		printf("#  %f  %f  %s\n", pp->prob, spamicity, pp->key);
 	}
 
