@@ -469,10 +469,7 @@ static uint read_mailbox(char *arg)
 	wordhash_t *whc, *whp = NULL;
 	wordprop_t *msg_count;
 
-	if (user_robx < EPS && !msg_count_file)
-	    whc = wordhash_new();
-	else
-	    whc = wordhash_init(WH_CNTS, 0);
+	whc = wordhash_init(WH_CNTS, 0);
 
 	collect_words(whc);
 	
