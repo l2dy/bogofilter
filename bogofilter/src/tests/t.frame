@@ -36,6 +36,7 @@ export _POSIX2_VERSION
 DB_NAME=`$BOGOFILTER -C -V 2>&1 | sed -n '2p;'`
 case $DB_NAME in
     *BerkeleyDB*)   DB_EXT=db ;;
+    *"Berkeley DB"*)   DB_EXT=db ;;
     *QDBM*)	    DB_EXT=qdbm ;;
     *TrivialDB*)    DB_EXT=tdb ;;
     *)		    echo >&2 "Unknown data base type in bogofilter -V: $DB_NAME"

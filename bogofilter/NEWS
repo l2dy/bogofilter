@@ -36,6 +36,9 @@ Briefly:
 	  DB_NOSYNC is safe on DB->close(). May fix some kinds of database
 	  corruption encountered with DB_TXN_NOT_DURABLE.
 
+	* Return DB_VERSION_STRING contents in -V (version) output when
+	  compiled against Berkeley DB. Minor change to the output format.
+
 	2004-11-09
 
 	* Unify and clean up the horrible RELEASE.NOTES-*, CHANGES* and NEWS-*

@@ -29,6 +29,8 @@ Summary for the hasty
 
 YOU MUST ADJUST YOUR SCRIPTS IF YOU ARE EVALUATING X-Bogosity HEADERS!
 
+YOU MAY NEED TO ADJUST YOUR SCRIPTS IF YOU ARE PARSING bogofilter -V OUTPUT!
+
 YOU MUST READ doc/README.db AND POSSIBLY CONFIGURE THE DATABASE!
 
 
@@ -79,6 +81,21 @@ BerkeleyDB documentation.
 
 These benefits are not available when bogofilter is compiled to use the
 TDB or QDBM data bases.
+
+
+Berkeley DB version strings changed
+-----------------------------------
+
+Bogofilter will now return the verbatim DB_VERSION_STRING in th eoutput
+of bogofilter -V. The OLD format was
+
+    Database: BerkeleyDB (4.3.21)
+
+the NEW format is
+
+    Database: Sleepycat Software: Berkeley DB 4.3.21: (November  8, 2004)
+
+You may need to adjust your scripts.
 
 
 QDBM database format changed to B+ trees
