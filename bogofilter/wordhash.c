@@ -45,16 +45,11 @@ wordhash_t *
 wordhash_init (void)
 {
   int i;
-
-  /*used to determine alignment requirements */
-  struct dummy { char *c; int  i; };
   
   wordhash_t *h = xmalloc (sizeof (wordhash_t));
 
   h->bin = xmalloc (NHASH * sizeof (hashnode_t **));
-  
-  h->alignment = offsetof(struct dummy, i);
-  
+
   for (i = 0; i < NHASH; i++)
     h->bin[i] = NULL;
 
@@ -121,8 +116,12 @@ smalloc (wordhash_t * h, size_t n)
   wh_alloc_str *x = h->strings;
   char *t;
 
+  /* determine architecture's alignment boundary */
+  struct dummy { char *c; int  i; };
+  size_t alignment= offsetof(struct dummy, i);
+
   /* Force alignment on architecture's natural boundary.*/
-  n += h->alignment - ( n % h->alignment);
+  n += alignment - ( n % alignment);
    
   if (x == NULL || x->avail < n)
     {

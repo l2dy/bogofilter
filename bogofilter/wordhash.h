@@ -30,8 +30,6 @@ typedef struct {
   wh_alloc_node *nodes; /*list of node buffers */
   wh_alloc_str  *strings; /* list of string buffers */
 
-  size_t alignment;			 /* Architecture's alignment boundary */
-
   hashnode_t *iter_ptr;
   hashnode_t *iter_head;
   hashnode_t *iter_tail;
