@@ -38,11 +38,12 @@ libbogofilter_a_SOURCES= \
 	    xmalloc.c xstrdup.h xstrdup.c \
 	debug.h debug.c \
 	bogoconfig.h config.c \
-	format.c format.h \
 	find_home.h find_home.c find_home_user.c \
 	    find_home_tildeexpand.c \
+	charset.h charset.c \
 	collect.h collect.c \
 	datastore.h datastore_db.h datastore_db.c \
+	format.h format.c \
 	lexer.h lexer.l \
 	register.h register.c \
 	rstats.h rstats.c \
