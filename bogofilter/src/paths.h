@@ -3,12 +3,33 @@
 /*****************************************************************************
 
 NAME:
-   paths.h -- prototypes for paths.c.
+   paths.h -- prototypes and definitions for paths.c.
 
 ******************************************************************************/
 
 #ifndef PATHS_H
 #define PATHS_H
+
+/* Path Definitions */
+
+#define BOGODIR ".bogofilter"
+
+#ifndef __OS2__
+  #define BOGODIR ".bogofilter"
+  #define SLASH   '/'
+  #define SLASH_STR "/"
+#else
+  #define BOGODIR "bogofilter"
+  #define SLASH   '\\'
+  #define SLASH_STR "\\"
+#endif
+
+#define WORDLIST	"wordlist" DB_EXT
+#define GOODFILE	"goodlist" DB_EXT
+#define SPAMFILE	"spamlist" DB_EXT
+#define IGNOREFILE	"ignorelist" DB_EXT
+
+/* Function Prototypes */
 
 int build_path(char* dest, size_t size, const char* dir, const char* file);
 

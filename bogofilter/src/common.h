@@ -45,23 +45,6 @@ typedef enum sh_e { IX_SPAM = 0, 	/* index for SPAM */
 		    IX_UNDF = 3 	/* ... undefined  */
 } sh_t;
 
-#define BOGODIR ".bogofilter"
-
-#ifndef __OS2__
-  #define BOGODIR ".bogofilter"
-  #define SLASH   '/'
-  #define SLASH_STR "/"
-#else
-  #define BOGODIR "bogofilter"
-  #define SLASH   '\\'
-  #define SLASH_STR "\\"
-#endif
-
-#define WORDLIST	"wordlist" DB_EXT
-#define GOODFILE	"goodlist" DB_EXT
-#define SPAMFILE	"spamlist" DB_EXT
-#define IGNOREFILE	"ignorelist" DB_EXT
-
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
 #define min(x, y)	(((x) < (y)) ? (x) : (y))
 
