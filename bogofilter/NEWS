@@ -5,7 +5,11 @@
 NOTE: More information on important changes for bogofilters updaters
 is in the RELEASE.NOTES files.  Read them!!
 
-0.17.?	2004-03-??
+0.17.3	2004-03-17
+
+	2004-03-15
+	
+	* Warn if user specified config file doesn't exist.
 
 	2004-03-09
 
