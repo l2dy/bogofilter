@@ -15,7 +15,10 @@ $Id$
 	* Fixed bogus "t.valgrind" test FAILures.
 	* Fixed uninitialized data in db_get_dbvalue(), for split word lists.
 	* New file, contrib/vm-bogofilter.el, provides an interface
-          between the VM mail reader and bogofilter."
+	  between the VM mail reader and bogofilter."
+	* Revised lexer_v3.l for compatibility with flex-2.5.31
+	* Break up long line in regression test input for Solaris 2.5
+	  compatibility.
 
 0.14.1.1 2003-08-01
 
