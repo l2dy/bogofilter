@@ -205,7 +205,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
      */
     size_t idx;
     uint32_t retryflags[] = { 0, DB_NOMMAP };
-
+   
     check_db_version();
 
     if (open_mode == DB_READ)
@@ -283,7 +283,12 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 	    }
 
 	    /* query page size */
+#if DB_AT_LEAST(3,3)
 	    ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
+#else
+	    ret = dbp->stat(dbp, &dbstat, NULL, DB_CACHED_COUNTS);
+#endif
+      
 	    if (ret) {
 		dbp->err (dbp, ret, "%s (db) stat: %s", progname, handle->name);
 		db_close(handle, false);
