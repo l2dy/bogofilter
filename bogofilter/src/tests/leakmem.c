@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 int main(void) {
-    volatile char *x;
+    char *x;
 
     x = malloc(42);
     printf("got %p\n", x);
