@@ -72,9 +72,12 @@ AUTHOR:
 #define	PREF_COUNT	4000	/* preferred message count         */
 #define	LARGE_COUNT	40000
 
+#define	MIN_THR_PCT	0.0017	/* minimum threshold percent */
+#define	MAX_THR_PCT	0.0050	/* maximum threshold percent */
+
 #define	HAM_CUTOFF	0.10
-#define	MIN_CUTOFF	0.55	/* minimum for get_thresh() */
-#define	MAX_CUTOFF	0.99	/* maximum for get_thresh() */
+#define	MIN_CUTOFF	0.55	/* minimum cutoff for get_thresh() */
+#define	MAX_CUTOFF	0.99	/* maximum cutoff for get_thresh() */
 #define	SPAM_CUTOFF	0.95
 #define FP_CUTOFF	0.999
 
@@ -83,10 +86,12 @@ AUTHOR:
 #define	DEFAULT_ROBX	0.415
 #define	DEFAULT_MIN_DEV	0.02
 
+/* coarse scan parms */
 #define	MD_MIN_C	0.05	/* smallest min_dev to test */
 #define	MD_MAX_C	0.45	/* largest  min_dev to test */
 #define	MD_DLT_C	0.05	/* increment		    */
 
+/* fine scan parms */
 #define	MD_MIN_F	0.02
 #define	MD_MAX_F	MD_MAX_C+MD_DLT_F
 #define	MD_DLT_F	0.015
@@ -454,12 +459,14 @@ static double scale(uint cnt, uint lo, uint hi, double beg, double end)
 
 /* compute scores and get fp target and spam cutoff value
 **
+**	sets global variables target and spam_cutoff
+**
 ** As count increases from 500 to 4000 ...
 **	1) initial target percent drops from 1% to 0.25% 
 **	2) initial minimum target increases from 5 to 10
 */
 
-static uint get_thresh(uint count, double *scores)
+static void get_thresh(uint count, double *scores)
 {
     uint   ftarget = 0;
     uint   mtarget = scale(count, TEST_COUNT, PREF_COUNT, 3, 10);
@@ -490,10 +497,17 @@ static uint get_thresh(uint count, double *scores)
     }
 
     /* ensure cutoff is below SPAM_CUTOFF */
-    while (cutoff >= SPAM_CUTOFF && ++ftarget < count)
-	cutoff = scores[ftarget-1];
+    if (cutoff > SPAM_CUTOFF) {
+ 	while (cutoff > SPAM_CUTOFF && ++ftarget < count)
+ 	    cutoff = scores[ftarget-1];
+ 	cutoff = SPAM_CUTOFF;
+	--ftarget;
+    }
 
-    return ftarget;
+    target = ftarget;
+    spam_cutoff = cutoff;
+
+    return;
 }
 
 static uint read_mailbox(char *arg)
@@ -830,7 +844,7 @@ static void top_ten(result_t *sorted)
 
     if (verbose)
 	printf("    ");
-    printf("   rs     md    rx    co    fp  fn   %%fp     %%fn\n" );
+    printf("   rs     md    rx    co    fp  fn   fpc      fnc\n" );
 
     for (i = 0; i < 10; i += 1) {
 	result_t *r = &sorted[i];
@@ -1126,7 +1140,7 @@ static rc_t bogotune(void)
 				** and low scoring spam */
 
     /* for selecting cutoff during parameter scans */
-    thresh_percent = scale(cnt, TEST_COUNT, PREF_COUNT,  0.0050, 0.0020);
+    thresh_percent = scale(cnt, TEST_COUNT, PREF_COUNT, MAX_THR_PCT, MIN_THR_PCT);
 
     ns_scores = xcalloc(ns_cnt, sizeof(double));
     sp_scores = xcalloc(sp_cnt, sizeof(double));
@@ -1164,8 +1178,7 @@ static rc_t bogotune(void)
     
     min_dev = 0.02;
 
-    target = get_thresh(ns_cnt, ns_scores);
-    spam_cutoff = ns_scores[target-1];
+    get_thresh(ns_cnt, ns_scores);
     printf("False-positive target is %d (cutoff %8.6f)\n", target, spam_cutoff);
 
 #ifdef	TEST
@@ -1243,10 +1256,10 @@ static rc_t bogotune(void)
 		    
 		    if (verbose >= SUMMARY) {
 			if (verbose >= SUMMARY+1)
-			    printf( "%3d  ", cnt);
+			    printf("%3d ", cnt);
 			if (verbose >= SUMMARY+2)
-			    printf( "%d %d %d  ", rsi, mdi, rxi);
-			printf( "%6.4f %5.3f %5.3f", robs, min_dev, robx);
+			    printf(" %d %d %d  ", rsi, mdi, rxi);
+			printf("%6.4f %5.3f %5.3f", robs, min_dev, robx);
 			fflush(stdout);
 		    }
 
