@@ -165,7 +165,7 @@ static double compute_probability(const word_t *token, wordcnts_t *cnts)
 {
     double prob;
 
-    if (cnts->bad != 0 || cnts->good != 0)
+    if (cnts->bad != 0 || cnts->good != 0 || msg_count_file)
 	/* A msg-count file already has the values needed */
 	prob = calc_prob_pure(cnts->good, cnts->bad, cnts->msgs_good, cnts->msgs_bad, robs, robx);
     else
