@@ -6,11 +6,15 @@
      http://bugs.gentoo.org/show_bug.cgi?id=69893 - this revealed bugs
      in the stack implementation.
 
-**** Perhaps implement helper to resize the Berkeley DB environment.
-
 **** Implement Concurrent Data store, quite similar to Transactional.
 
 **** Make sure that RFC-2047 decoder runs only once, not recursively.
+
+**** Reimplement seeking passthrough mode that got dropped on 2003-08-23
+     with the switch to bogoreader.*
+     http://article.gmane.org/gmane.mail.bogofilter.general/9035 and
+     followups. (MID <20041222105734.GA30574@sela.f4n.org>, by "John"
+     Subject "Size limit?" on 2004-12-22)
 
 **** New Feature: Token aging. Support for struct data in the wordlists is
 already present.
