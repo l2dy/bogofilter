@@ -117,7 +117,7 @@ for out in ${TMPDIR}/tests/msg.?.r.$V ; do
     printf "%2s   %c %s   %c %s   %c %s   %c %s\n" $id $g $r $f $t >> ${TMPDIR}/tests/$OUT
 done
 
-[ ! -z $BF_SAVEDIR ] && . ${srcdir}/../t.save
+[ -n "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
 
 OUTPUTS=${SYSTEST}/outputs
 

@@ -37,6 +37,6 @@ if  [ $verbose -ne 0 ]; then
     echo want: $WANT, have: $RESULT > $TMPDIR/$OUT
 fi
 
-[ ! -z $BF_SAVEDIR ] && . ${srcdir}/../t.save
+[ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
 
 test "$RESULT" = "$WANT"

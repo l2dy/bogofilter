@@ -50,7 +50,7 @@ else
     $BOGOUTIL -vvv -R $TMPDIR > ${TMPDIR}/output.vvv
 fi
 
-[ ! -z $BF_SAVEDIR ] && . ${srcdir}/../t.save
+[ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
 
 RESULT=`$BOGOUTIL -w $TMPDIR .ROBX | $AWK '/.ROBX/ { print $2; }'`
 

@@ -103,7 +103,7 @@ done
 
 rm -f ${CONFIG}
 
-[ ! -z $BF_SAVEDIR ] && . ${srcdir}/../t.save
+[ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
 
 OUTPUTS=${SYSTEST}/outputs
 

@@ -2,7 +2,7 @@
 
 : ${BF_SAVEDIR=.}
 
-if [ ! -z $BF_TESTDIR ] ; then
+if [ "x$BF_TESTDIR" != "x" ] ; then
     NAME=`basename $0 | sed s@^t\.@@`
     DATE=`date +"%Y%m%d"`
     if [ -d  $NAME.$DATE ] ; then
