@@ -26,7 +26,7 @@ then
       -ggdb -fno-common -Wchar-subscripts -Wcomment \
       -Wformat=2 -Wimplicit -Wsequence-point -Wreturn-type \
       -Wfloat-equal -Wpointer-arith \
-      -Wmissing-format-attribute -Wno-system-headers
+      -Wno-system-headers
       # -Wmissing-noreturn -Wconversion -pedantic -Wredundant-decls
   do
        if $CC $i $ac_cv_prog_gcc_flags -c configure-dummy.c >/dev/null 2>&1 
