@@ -4,7 +4,7 @@
 
 $Id$
      
-0.10.0  2003-01-22
+0.10.1  2003-01-22
 	* Added convenience options '-2' and '-3' to set binary/ternary
 	  modes when using Robinson-Fisher classification.
 
