@@ -643,21 +643,25 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case O_UNSURE_SUBJECT_TAG:		unsure_subject_tag = get_string(name, val);		break;
     case O_WORDLIST:			configure_wordlist(val);				break;
 
+    case O_DB_TRANSACTION:		fTransaction = get_bool(name, val);			break;
+
     /* ignore options that don't apply to bogofilter */
     case O_DB_PRUNE:
     case O_DB_RECOVER:
     case O_DB_RECOVER_HARDER:
     case O_DB_REMOVE_ENVIRONMENT:
-    case O_DB_VERIFY:			break;
+    case O_DB_VERIFY:
 
 #ifdef	HAVE_DECL_DB_CREATE
-    case O_DB_MAX_OBJECTS:		db_max_objects = atoi(val);				break;
-    case O_DB_MAX_LOCKS:		db_max_locks   = atoi(val);				break;
+    case O_DB_MAX_OBJECTS:
+    case O_DB_MAX_LOCKS:
 #ifdef	FUTURE_DB_OPTIONS
-    case O_DB_LOG_AUTOREMOVE:		db_log_autoremove  = get_bool(name, val);		break;
-    case O_DB_TXN_DURABLE:		db_txn_durable = get_bool(name, val);			break;
+    case O_DB_LOG_AUTOREMOVE:
+    case O_DB_TXN_DURABLE:
 #endif
 #endif
+	dsm_options_bogofilter(option, name, val);
+	break;
 
     default:
 	abort();
@@ -710,11 +714,12 @@ rc_t query_config(void)
     Q2 fprintf(stdout, "%-18s = %s\n", "user-config-file", NB(user_config_file));
     Q2 fprintf(stdout, "\n");
 
-    Q2 fprintf(stdout, "%-18s = %s\n", "bogofilter-dir", bogohome);
+    Q2 fprintf(stdout, "%-18s = %s\n", "bogofilter-dir", 	bogohome);
     Q2 display_wordlists(word_lists, "%-18s   ");
     Q2 fprintf(stdout, "\n");
 
     Q2 fprintf(stdout, "%-18s = %d\n", "db-cachesize",        	db_cachesize);
+
 #ifdef	HAVE_DECL_DB_CREATE
     Q2 fprintf(stdout, "%-18s = %d\n", "db-lk-max-locks",   	db_max_locks);
     Q2 fprintf(stdout, "%-18s = %d\n", "db-lk-max-objects", 	db_max_objects);

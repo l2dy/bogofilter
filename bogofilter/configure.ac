@@ -334,14 +334,33 @@ AM_CONDITIONAL(ENABLE_ICONV, test x$USE_ICONV = xYES)
 dnl Allow the user to enable/disable use of database transactions
 
 AC_ARG_ENABLE(transactions,
-	      AS_HELP_STRING([--enable-transactions], [Enable transactions in Berkeley DB (yes)]))
+	AC_HELP_STRING([--enable-transactions],
+	[Enable transactions in Berkeley DB]),
+	if test "$enableval" = no; then
+		[USE_TRANSACTIONS=NO]
+	fi
+	if test "$enableval" = yes; then
+		[USE_TRANSACTIONS=YES]
+	fi
+)
+
+AM_CONDITIONAL(DISABLE_TRANSACTIONS, test x$USE_TRANSACTIONS = xNO)
+AM_CONDITIONAL(ENABLE_TRANSACTIONS, test x$USE_TRANSACTIONS = xYES)
+
+if test x$USE_TRANSACTIONS = xNO ; then
+	AC_DEFINE(DISABLE_TRANSACTIONS,1,
+	[Disable transactions in Berkeley DB])
+fi
+
+if test x$USE_TRANSACTIONS = xYES ; then
+	AC_DEFINE(ENABLE_TRANSACTIONS,1,
+	[Enable transactions in Berkeley DB])
+fi
 
 AC_ARG_ENABLE(dbshared-test,
 	      AS_HELP_STRING([--disable-dbshared-test], [Defeat test for shared environment (unsafe)]))
 
 AC_CACHE_SAVE
-
-AM_CONDITIONAL(ENABLE_TRANSACTIONS, test "x$enable_transactions" != "xno")
 
 WITH_DB_ENGINE=db
 AC_ARG_WITH(database,

@@ -21,6 +21,21 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-02-06
+
+	* Code to enable/disable Berkeley DB transactions now uses an
+	  OO paradigm (implemented via struct of method addresses).
+	* Enabling/disabling transactions is now run-time selectable
+          using "--enable-transactions=yes/no" on the command line and
+          "enable_transactions=yes/no" in the config file.
+	* Use "./configure --enable/disable-transactions" for build
+          time specification.
+
+	2005-01-28
+
+	* Add option "--db-transaction=yes/no" for run-time
+          enabling/disabling of transactions.
+
 	2005-01-25
 
 	* Removed unused program bogowordfreq.

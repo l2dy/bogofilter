@@ -46,6 +46,9 @@ const char	*stats_prefix;
 /* for lexer_v3.l */
 bool	header_line_markup = true;	/* -H */
 
+/* for  transactions */
+bool fTransaction = false;
+
 /* for  bogotune */
 bool fBogotune = false;
 

@@ -14,12 +14,16 @@ David Relson <relson@osagesoftware.com>  2003
 
 #include "common.h"
 
+#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
 
+#include <db.h>
+
 #include "datastore.h"
 #include "datastore_db.h"
+#include "datastore_db_private.h"
 
 #include "error.h"
 #include "maint.h"
@@ -31,6 +35,8 @@ David Relson <relson@osagesoftware.com>  2003
 #define struct_init(s) memset(&s, 0, sizeof(s))
 
 YYYYMMDD today;			/* date as YYYYMMDD */
+
+dsm_t *dsm = NULL;
 
 /* Function definitions */
 
@@ -102,8 +108,7 @@ static void convert_internal_to_external(dsh_t *dsh, dsv_t *in_data, dbv_t *ex_d
     return;
 }
 
-dsh_t *dsh_init(
-    void *dbh)			/* database handle from db_open() */
+dsh_t *dsh_init(void *dbh)		/* database handle from db_open() */
 {
     dsh_t *val = xmalloc(sizeof(*val));
     val->dbh = dbh;
@@ -130,12 +135,10 @@ void *ds_open(void *dbe, const char *path, const char *name, dbmode_t open_mode)
 
     dsh = dsh_init(v);
 
-    if (!(open_mode & DS_LOAD)) {
+    if (db_created(v) && ! (open_mode & DS_LOAD)) {
 	if (DST_OK != ds_txn_begin(dsh))
 	    exit(EX_ERROR);
-	if (db_created(v)) {
-	    ds_set_wordlist_version(dsh, NULL);
-	}
+	ds_set_wordlist_version(dsh, NULL);
 	if (ds_txn_commit(dsh))
 	    exit(EX_ERROR);
     }
@@ -270,17 +273,26 @@ int ds_delete(void *vhandle, const word_t *word)
 
 int ds_txn_begin(void *vhandle) {
     dsh_t *dsh = vhandle;
-    return db_txn_begin(dsh->dbh);
+    if (dsm == NULL)
+	return 0;
+    else
+	return dsm->dsm_begin(dsh->dbh);
 }
 
 int ds_txn_abort(void *vhandle) {
     dsh_t *dsh = vhandle;
-    return db_txn_abort(dsh->dbh);
+    if (dsm == NULL)
+	return 0;
+    else
+	return dsm->dsm_abort(dsh->dbh);
 }
 
 int ds_txn_commit(void *vhandle) {
     dsh_t *dsh = vhandle;
-    return db_txn_commit(dsh->dbh);
+    if (dsm == NULL)
+	return 0;
+    else
+	return dsm->dsm_commit(dsh->dbh);
 }
 
 typedef struct {
@@ -373,7 +385,8 @@ void *ds_init(const char *directory)
 /* Cleanup storage allocation */
 void ds_cleanup(void *dbe)
 {
-    dbe_cleanup(dbe);
+    if (dsm != NULL)
+	dsm->dsm_cleanup(dbe);
     xfree(msg_count_tok);
     xfree(wordlist_version_tok);
     msg_count_tok = NULL;
