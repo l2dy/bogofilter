@@ -134,14 +134,6 @@ static int yy_get_new_line(buff_t *buff)
        count = skip_folded_line(buff);
     }
 
-    /* Also, save the text on a linked list of lines.
-     * Note that we store fixed-length blocks here, not lines.
-     * One very long physical line could break up into more
-     * than one of these. */
-
-    if (passthrough && passmode == PASS_MEM && count > 0)
-       textblock_add(buff->t.text+buff->read, (size_t) count);
-
     return count;
 }
 
@@ -150,6 +142,14 @@ static int get_decoded_line(buff_t *buff)
     uint used = buff->t.leng;
     byte *buf = buff->t.text + used;
     int count = yy_get_new_line(buff);
+
+    /* Save the text on a linked list of lines.
+     * Note that we store fixed-length blocks here, not lines.
+     * One very long physical line could break up into more
+     * than one of these. */
+
+    if (passthrough && passmode == PASS_MEM && count > 0)
+       textblock_add(buff->t.text+buff->read, (size_t) count);
 
     if (count == EOF) {
        if ( !ferror(fpin))
