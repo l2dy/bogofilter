@@ -94,14 +94,14 @@ AUTHORS:
 #define	DEFAULT_MIN_DEV	0.02
 
 /* coarse scan parms */
-#define	MD_MIN_C	0.05	/* smallest min_dev to test */
-#define	MD_MAX_C	0.45	/* largest  min_dev to test */
-#define	MD_DLT_C	0.05	/* increment		    */
+#define	MD_MIN_C	0.06	/* smallest min_dev to test */
+#define	MD_MAX_C	0.38	/* largest  min_dev to test */
+#define	MD_DLT_C	0.08	/* increment		    */
 
 /* fine scan parms */
 #define	MD_MIN_F	0.02
 #define	MD_MAX_F	MD_MAX_C+MD_DLT_F
-#define	MD_DLT_F	0.015
+#define	MD_DLT_F	0.014
 
 enum e_verbosity {
     SUMMARY	   = 1,	/* summarize main loop iterations	*/
@@ -241,10 +241,10 @@ static void data_free(data_t *val)
 static void init_coarse(double _rx)
 {
     rxval = seq_canonical(_rx, 0.05);
-    rsval = seq_by_pow(0.0, -2.0, -0.5);
+    rsval = seq_by_pow(0.0, -2.0, -1.0);
     mdval = seq_by_amt(MD_MIN_C, MD_MAX_C, MD_DLT_C);
-    spexp = seq_by_amt(0.0, ESF_SEL(0.0,20.0), 5.0);
-    nsexp = seq_by_amt(0.0, ESF_SEL(0.0,20.0), 5.0);
+    spexp = seq_by_amt(ESF_SEL(0.0,2.0), ESF_SEL(0.0,20.0), 3.0);
+    nsexp = seq_by_amt(ESF_SEL(0.0,2.0), ESF_SEL(0.0,20.0), 3.0);
 }
 
 static void init_fine(double _rs, double _md, double _rx,
@@ -252,34 +252,26 @@ static void init_fine(double _rs, double _md, double _rx,
 {
     double s0, s1;
 
-    s0 = log10(_rs) - 0.5;
-    s1 = log10(_rs) + 0.5;
-    if (s0 < -2.0) s0 = -2.0;
-    if (s1 >  0.0) s1 =  0.0;
+    s0 = max(log10(_rs) - 0.5, -2.0);
+    s1 = min(log10(_rs) + 0.5,  0.0);
 
     rsval = seq_by_pow(s1, s0, -0.25);
 
-    s0 = _md - 0.075;
-    s1 = _md + 0.075;
-    if (s0 < MD_MIN_F) s0 = MD_MIN_F;
-    if (s1 > MD_MAX_F) s1 = MD_MAX_F;
+    s0 = max(_md - 0.042, MD_MIN_F);
+    s1 = min(_md + 0.042, MD_MAX_F);
 
     mdval = seq_by_amt(s0, s1, MD_DLT_F);
-    rxval = seq_canonical(_rx, 0.02);
+    rxval = seq_canonical(_rx, 0.013);
+
+    s0 = max(_spex - 1.5,  0.0);
+    s1 = min(_spex + 1.5, 20.0);
     
-    s0 = _spex - 2.0;
-    s1 = _spex + 2.0;
-    if (s0 < 0.0) s0 = 0.0;
-    if (s1 > 20.0) s1 = 20.0;
+    spexp = seq_by_amt(s0, ESF_SEL(s0,s1), 0.5);
     
-    spexp = seq_by_amt(s0, ESF_SEL(s0,s1), 1.0);
+    s0 = max(_nsex - 1.5,  0.0);
+    s1 = min(_nsex + 1.5, 20.0);
     
-    s0 = _nsex - 2.0;
-    s1 = _nsex + 2.0;
-    if (s0 < 0.0) s0 = 0.0;
-    if (s1 > 20.0) s1 = -20.0;
-    
-    nsexp = seq_by_amt(s0, ESF_SEL(s0,s1), 1.0);
+    nsexp = seq_by_amt(s0, ESF_SEL(s0,s1), 0.5);
 }
 
 static void print_parms(const char *label, const char *format, data_t *data)
@@ -1030,25 +1022,25 @@ static result_t *results_sort(uint r_count, result_t *results)
 static void top_ten(result_t *sorted, uint n)
 {
     uint i, j;
+    bool f;
 
     printf("Top ten parameter sets from this scan:\n");
 
     if (verbose)
 	printf("    ");
     printf("        rs     md    rx    spesf    nsesf    co     fp  fn   fppc   fnpc\n");
-    for (i = j = 0; i < 10 && j < n;) {
+    for(f = false; !f; f = true) {
+      for (i = j = 0; i < 10 && j < n;) {
  	result_t *r = &sorted[j++];
- 	if (r->fp != target) continue;
+ 	if (!f && r->fp != target) continue;
 	printf("%5u %6.4f %5.3f %5.3f %8.6f %8.6f %6.4f  %3u %3u  %6.4f %6.4f\n",
 	       r->idx, r->rs, r->md, r->rx,
 	       pow(0.75, r->sp_exp), pow(0.75, r->ns_exp), r->co, 
 	       r->fp, r->fn, r->fp*100.0/ns_cnt, r->fn*100.0/sp_cnt);
 	++i;
-    }
-
-    if (i == 0) {
- 	printf("fp target not met, aborting\n");
- 	exit(1);
+      }
+      if(i) break;
+      printf("Warning: fp target not met, using original results\n");
     }
 
     printf("\n");
@@ -1066,6 +1058,7 @@ static int gfn(result_t *results,
     uint i = (((rsi * mdval->cnt + mdi) * rxval->cnt + rxi) * spexp->cnt + spi) * nsexp->cnt + nsi;
     result_t *r = &results[i];
     int fn = r->fn;
+    if(r->fp != target) return INT_MAX;
     if (verbose > 100)
 	printf("   %2u, %2u, %2u, %2u, %2u, %2d\n", 
 	       rsi, mdi, rxi, spi, nsi, fn);
@@ -1524,7 +1517,7 @@ static rc_t bogotune(void)
 	    if (verbose >= SUMMARY+2)
 		printf(" %s %s %s  ", "s", "m", "x");
 	    printf(" %4s %5s   %4s %8s %8s %7s %3s %3s\n", 
-		   "rs", "md", "rx", "sp_esf", "ns_esf", "cutoff", "fp", "fn");
+		   "rs", "md", "rx", "spesf", "nsesf", "cutoff", "fp", "fn");
 	}
 
 	cnt = 0;
@@ -1627,7 +1620,7 @@ static rc_t bogotune(void)
 	nsex = nsexp->data[best->nsi]; ns_esf = pow(0.75, nsex);
 
 	printf(
-    "Minimum found at s %6.4f, md %5.3f, x %5.3f, sp.esf %8.6f, ns.esf %8.6f\n",
+    "Minimum found at s %6.4f, md %5.3f, x %5.3f, spesf %8.6f, nsesf %8.6f\n",
 	        robs, min_dev, robx, sp_esf, ns_esf);
 	printf("        fp %u (%6.4f%%), fn %u (%6.4f%%)\n",
 		best->fp, best->fp*100.0/ns_cnt, 
