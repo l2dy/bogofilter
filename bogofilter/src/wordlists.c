@@ -152,7 +152,11 @@ int setup_wordlists(const char* d, priority_t precedence)
     if (check_directory(dir)) {
 	(void)fprintf(stderr, "%s: cannot find bogofilter directory.\n"
 		      "You must specify a directory on the command line, in the config file,\n"
+#ifndef __riscos__
 		      "or by using the BOGOFILTER_DIR or HOME environment variables.\n"
+#else
+                      "or by ensuring that <Bogofilter$Dir> is set correctly.\n"
+#endif
 		      "Program aborting.\n", progname);
 	rc = -1;
     }

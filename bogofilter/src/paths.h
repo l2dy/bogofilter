@@ -10,18 +10,14 @@ NAME:
 #ifndef PATHS_H
 #define PATHS_H
 
+#include "common.h"
+
 /* Path Definitions */
 
-#define BOGODIR ".bogofilter"
-
-#ifndef __OS2__
+#if !defined(__OS2__) && !defined(__riscos__)
   #define BOGODIR ".bogofilter"
-  #define SLASH   '/'
-  #define SLASH_STR "/"
 #else
   #define BOGODIR "bogofilter"
-  #define SLASH   '\\'
-  #define SLASH_STR "\\"
 #endif
 
 #define WORDLIST	"wordlist" DB_EXT

@@ -19,6 +19,20 @@ NAME:
 
 #include "config.h"
 
+#ifdef __OS2__
+  #define CURDIR_S	"."
+  #define DIRSEP_C	'\\'
+  #define DIRSEP_S	"\\"
+  #define EXTSEP_C	"."
+#endif
+
+#ifndef DIRSEP_C
+  #define CURDIR_S	"."
+  #define DIRSEP_C	'/'
+  #define DIRSEP_S	"/"
+  #define EXTSEP_C	"."
+#endif
+ 
 #if HAVE_STDBOOL_H
 # include <stdbool.h>
 #else

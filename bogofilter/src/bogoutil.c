@@ -166,7 +166,7 @@ static int ds_oper(const char *path, dbmode_t open_mode,
 		   ds_foreach_t *hook, void *userdata)
 {
     int  ret = 0;
-    void *dsh = ds_open(".", 1, &path, open_mode);
+    void *dsh = ds_open(CURDIR_S, 1, &path, open_mode);
 
     if (dsh == NULL) {
 	fprintf(stderr, "Can't open file %s\n", path);
@@ -217,7 +217,7 @@ static int load_file(const char *ds_file)
     unsigned long count[IX_SIZE], date;
     YYYYMMDD today_save = today;
 
-    dsh = ds_open(".", 1, &ds_file, DB_WRITE);
+    dsh = ds_open(CURDIR_S, 1, &ds_file, DB_WRITE);
     if (dsh == NULL)
 	return EX_ERROR;
 
@@ -356,7 +356,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 
     /* XXX FIXME: deadlock possible */
     if ( ! S_ISDIR(sb.st_mode)) {		/* words from file */
-	dsh = ds_open(".", 1, &path, DB_READ);
+	dsh = ds_open(CURDIR_S, 1, &path, DB_READ);
     }
     else {					/* words from path */
 	char filepath1[PATH_LEN];
@@ -368,7 +368,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	filepaths[1] = filepath2;
 	
 	count = build_wordlist_paths(filepaths, path);
-	dsh = ds_open(".", count, (const char **)filepaths, DB_READ);
+	dsh = ds_open(CURDIR_S, count, (const char **)filepaths, DB_READ);
     }
     if (dsh == NULL)
 	return EX_ERROR;
@@ -500,13 +500,13 @@ static int compute_robinson_x(char *path)
 
 	if (count == 0)
 	{
-	    fprintf(stderr, "%s: string too long creating .db file name.\n", PROGNAME);
+	    fprintf(stderr, "%s: string too long creating %s file name.\n", PROGNAME, DB_EXT);
 	    exit(EX_ERROR);
 	}
 
 	run_type = REG_SPAM;
 
-	dsh = ds_open(".", count, (const char **) filepaths, DB_WRITE);
+	dsh = ds_open(CURDIR_S, count, (const char **) filepaths, DB_WRITE);
 	if (dsh == NULL)
 	    return EX_ERROR;
 
@@ -536,7 +536,8 @@ static void print_version(void)
 
 static void usage(void)
 {
-    fprintf(stderr, "Usage: %s { -d | -l | -w | -p } file.db | { -r | -R } directory | [ -v | -h | -V ]\n", PROGNAME);
+    fprintf(stderr, "Usage: %s { -d | -l | -w | -p } file%s | { -r | -R } directory | [ -v | -h | -V ]\n", 
+	    PROGNAME, DB_EXT);
 }
 
 static void help(void)
@@ -555,8 +556,9 @@ static void help(void)
 	    "\t-R\tCompute Robinson's X and save it in the spam list.\n");
     fprintf(stderr,
 	    "\t-k size\tset BerkeleyDB cache size (MB).\n"
-	    "\t-W\tUse combined wordlist.db for spam and ham tokens.\n"
-	    "\t-WW\tUse separate wordlists for spam and ham tokens.\n");
+	    "\t-W\tUse combined wordlist%s for spam and ham tokens.\n"
+	    "\t-WW\tUse separate wordlists for spam and ham tokens.\n",
+	    DB_EXT);
     fprintf(stderr,
 	    "\t-a age\tExclude tokens with older ages.\n"
 	    "\t-c count\tExclude tokens with lower counts.\n"

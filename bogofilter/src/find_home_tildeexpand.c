@@ -36,6 +36,9 @@ char *tildeexpand(const char *name) {
     const char *home;
     size_t l, tl;
 
+#ifdef __riscos__
+    return xstrdup(name);
+#else
     if (name[0] != '~')
 	return xstrdup(name);
 
@@ -73,4 +76,5 @@ char *tildeexpand(const char *name) {
     /* no need to insert a slash here, name[l] contains one */
     if (strlcat(tmp, name + l + 1, tl) >= tl) internal_error;
     return tmp;
+#endif
 }

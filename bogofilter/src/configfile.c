@@ -47,7 +47,11 @@ AUTHOR:
 
 /* Global variables */
 
+#ifndef __riscos__
 const char *user_config_file   = "~/.bogofilter.cf";
+#else
+const char *user_config_file   = "Choices:bogofilter.bogofilter/cf";
+#endif
 
 bool	stats_in_header = true;
 

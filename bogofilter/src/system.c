@@ -8,6 +8,7 @@ NAME:
 ******************************************************************************/
 
 #include "common.h"
+
 #if defined(__IBMC__) || defined(__IBMCPP__) || defined(__WATCOMC__)
 #define _OS2_
 #include "direct.h"
@@ -19,7 +20,14 @@ int bf_mkdir(const char *path, mode_t mode)
 #ifndef _OS2_
     rc = mkdir(path, mode);
 #else
-    rc = mkdir((unsigned char*)path);
+    rc = mkdir((unsigned char *)path);
 #endif
     return rc;
 }
+
+#ifdef __riscos__
+/* static symbols that trigger UnixLib behaviour */
+#include <unixlib/local.h> /* __RISCOSIFY_NO_PROCESS */
+int __riscosify_control = __RISCOSIFY_NO_PROCESS;
+int __feature_imagefs_is_file = 1;
+#endif

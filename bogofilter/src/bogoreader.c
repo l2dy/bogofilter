@@ -99,12 +99,12 @@ static void save_dirname(const char *name)
     size_t l = strlen(name);
     l = min(l, sizeof(dirname)-2);
     memcpy(dirname, name, l);
-    if (dirname[l-1] == SLASH)
+    if (dirname[l-1] == DIRSEP_C)
 	l -= 1;
     dirname[l] = '\0';
 }
 
-static const char* const maildir_subs[]={ "/new", "/cur", NULL };
+static const char* const maildir_subs[]={ DIRSEP_S "new", DIRSEP_S "cur", NULL };
 static const char *const *maildir_sub;
 static DIR *reader_dir;
 
@@ -345,9 +345,9 @@ static bool dir_next_mail(void)
 	}
 
 	filename = namebuff;
-	snprintf(namebuff, sizeof(namebuff), "%s%s/%s", dirname, 
+	snprintf(namebuff, sizeof(namebuff), "%s%s%c%s", dirname, 
 		 (mailstore_type == MS_MH) ? "" : *(maildir_sub-1),
-		 dirent->d_name);
+		 DIRSEP_C, dirent->d_name);
 
 	if (fpin)
 	    fclose(fpin);

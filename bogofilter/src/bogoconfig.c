@@ -117,6 +117,7 @@ extern wl_t wl_default;
 **		and on dummy entries for options private to algorithms
 **		so config.c won't generate an error message.
 */
+
 static char *directory;
 
 const parm_desc sys_parms[] =
@@ -354,13 +355,13 @@ static void help(void)
 		  "\t  -C      - don't read standard config files.\n"
 		  "\t  -d path - specify directory for wordlists.\n"
 		  "\t  -k size - set BerkeleyDB cache size (MB).\n"
-		  "\t  -W      - use combined wordlist.db for spam and ham tokens.\n"
+		  "\t  -W      - use combined wordlist%s for spam and ham tokens.\n"
 		  "\t  -WW     - use separate wordlists for spam and ham tokens.\n"
 		  "\t  -l      - write messages to syslog.\n"
 		  "\t  -L tag  - specify the tag value for log messages.\n"
 		  "\t  -I file - read message from 'file' instead of stdin.\n"
-		  "\t  -O file - save message to 'file' in passthrough mode.\n"
-	);
+		  "\t  -O file - save message to 'file' in passthrough mode.\n",
+		  DB_EXT);
     (void)fprintf(stderr,
 		  "\talgorithm options:\n"
 #ifdef	GRAHAM_AND_ROBINSON

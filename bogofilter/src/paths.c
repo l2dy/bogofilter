@@ -39,7 +39,12 @@ char *build_progtype(const char *name, const char *db_type)
 int build_path(char* dest, size_t size, const char* dir, const char* file)
 {
     /* If absolute path ... */
-    if (*file == SLASH) {
+#ifndef __riscos__
+    if (*file == DIRSEP_C)
+#else
+    if (strchr(file, ':') || strchr(file, '$'))
+#endif
+    {
 	if (strlcpy(dest, file, size) >= size) 
 	    return -1;
 	else
@@ -48,8 +53,8 @@ int build_path(char* dest, size_t size, const char* dir, const char* file)
 
     if (strlcpy(dest, dir, size) >= size) return -1;
 
-    if (dest[strlen(dest)-1] != SLASH) {
-	if (strlcat(dest, SLASH_STR, size) >= size) return -1; /* RATS: ignore */
+    if (dest[strlen(dest)-1] != DIRSEP_C) {
+	if (strlcat(dest, DIRSEP_S, size) >= size) return -1; /* RATS: ignore */
     }
 
     if (strlcat(dest, file, size) >= size) return -1;
@@ -76,8 +81,11 @@ char *create_path_from_env(const char *var,
     buff = xmalloc(path_size);
 
     strcpy(buff, env);
-    if (buff[env_size-1] != SLASH) {
-	strcat(buff, SLASH_STR);
+#ifdef __riscos__
+    if (subdir != NULL) /* don't add a directory separator at the end! */
+#endif
+    if (buff[env_size-1] != DIRSEP_C) {
+	strcat(buff, DIRSEP_S);
     }
     if (subdir != NULL) {
 	strcat(buff, subdir);
@@ -125,6 +133,7 @@ char *get_directory(priority_t which)
 {
     char *dir = NULL;
 
+#ifndef __riscos__
     if (which == PR_ENV_BOGO) {
 	dir = create_path_from_env("BOGOFILTER_DIR", NULL);
 	if (dir == NULL)
@@ -134,6 +143,12 @@ char *get_directory(priority_t which)
     if (which == PR_ENV_HOME) {
 	dir = create_path_from_env("HOME", BOGODIR);
     }
+#else
+    if (which == PR_ENV_BOGO)
+	dir = create_path_from_env("Bogofilter$Dir", NULL);
+    else if (which == PR_ENV_HOME)
+	dir = create_path_from_env("Choices$Write", BOGODIR);
+#endif
 
     return dir;
 }
