@@ -122,7 +122,6 @@ static void mime_init(mime_t * parent)
     msg_state->boundary_len = 0;
     msg_state->parent = parent;
     msg_state->charset = xstrdup("US-ASCII");
-    msg_state->child_count = 0;
 }
 
 static void mime_free(mime_t * t)
@@ -153,7 +152,6 @@ void mime_cleanup()
 static void mime_push(mime_t * parent)
 {
     if (stackp < MIME_STACK_MAX) {
-	/* Top level is its own parent, but does not increase child_count */
 	if (parent == NULL) {
 	    if (stackp == -1)
 		parent = &msg_stack[0];
@@ -162,8 +160,6 @@ static void mime_push(mime_t * parent)
 			"**mime_push: expecting non-null parent\n");
 		exit(EX_ERROR);
 	    }
-	} else {
-	    parent->child_count++;
 	}
 
 	msg_state = &msg_stack[++stackp];
@@ -192,9 +188,6 @@ static void mime_pop(void)
 	stackp--;
 
 	msg_state = stackp == -1 ? NULL : &msg_stack[stackp];
-
-	if (msg_state && parent && parent->child_count > 0)
-	    parent->child_count--;
     } else {
 	fprintf(stderr, "Attempt to underflow mime stack\n");
     }

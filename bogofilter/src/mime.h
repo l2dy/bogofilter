@@ -29,7 +29,6 @@ struct mime_t {
     enum mimeencoding mime_encoding;
     enum mimedisposition mime_disposition;
     mime_t *parent;
-    int  child_count;
 };
 
 extern mime_t *msg_state;
