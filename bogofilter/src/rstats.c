@@ -20,15 +20,13 @@ AUTHOR:
 #include "common.h"
 
 #include "bogofilter.h"
+#include "msgcounts.h"
 #include "robinson.h"
 #include "rstats.h"
 #include "xmalloc.h"
 
 extern int Rtable;
 extern double min_dev;
-
-extern	long msgs_good;		/* from robinson.c */
-extern	long msgs_bad;		/* from robinson.c */
 
 extern	double	robx;		/* from robinson.c */
 extern	double	robs;		/* from robinson.c */
@@ -62,9 +60,13 @@ struct header_s {
 static header_t  header;
 static rstats_t *current = NULL;
 
+/* Function Prototypes */
+
 void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count);
 void rstats_print_rtable(rstats_t **rstats_array, size_t count);
 void rstats_print_rtable_summary(void);
+
+/* Function Definitions */
 
 void rstats_init(void)
 {
