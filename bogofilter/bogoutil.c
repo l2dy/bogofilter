@@ -27,6 +27,7 @@ AUTHOR:
 #include "bogofilter.h"
 #include "datastore.h"
 #include "datastore_db.h"
+#include "error.h"
 #include "maint.h"
 #include "robinson.h"			/* for ROBS and ROBX */
 
@@ -51,7 +52,6 @@ static int dump_file(char *db_file)
 
     int ret;
     int rv = 0;
-    dbv_t *val;
 
     dbcp = &dbc;
 
@@ -72,25 +72,17 @@ static int dump_file(char *db_file)
 	    for (;;) {
 		ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT);
 		if (ret == 0) {
-		    switch (data.size){
-		    case 4:
-			printf("%.*s %lu\n", (int)key.size, (char *) key.data, *(unsigned long *) data.data);
-			break;
-		    case 8:
-			val = (dbv_t *)data.data;
-			if (replace_nonascii_characters)
-			    do_replace_nonascii_characters((byte *)key.data);
-			if (check_count(val->count) && check_date(val->date) && check_size(key.size))
-			{
-			    if (val->date == 0 )
-				printf("%.*s %lu\n", (int)key.size, (char *) key.data, val->count);
-			    else
-				printf("%.*s %lu %lu\n", (int)key.size, (char *) key.data, val->count, val->date);
-			}
-			break;
-		    default:
-			fprintf(stderr, "Unknown data size - %d.\n", data.size);
-		    }
+		    dbv_t *val = (dbv_t *)data.data;
+		    if (!check_count(val->count) || !check_date(val->date) || !check_size(key.size))
+			continue;
+		    if (replace_nonascii_characters)
+			do_replace_nonascii_characters((byte *)key.data);
+		    if (data.size != 4 && data.size != 8)
+			PRINT_ERROR("Unknown data size - %d.\n", data.size);
+		    if (data.size == 4 || val->date == 0)
+			printf("%.*s %lu\n", (int)key.size, (char *) key.data, val->count);
+		    else
+			printf("%.*s %lu %lu\n", (int)key.size, (char *) key.data, val->count, val->date);
 		}
 		else if (ret == DB_NOTFOUND) {
 		    break;
@@ -181,6 +173,9 @@ static int load_file(char *db_file)
 
 	if (replace_nonascii_characters)
 	    do_replace_nonascii_characters(buf);
+
+	if (!check_count(count) || !check_date(date) || !check_size(strlen(buf)))
+	    continue;
 
 	/* Slower, but allows multiple lists to be concatenated */
 	db_increment_with_date(dbh, buf, count, date);
