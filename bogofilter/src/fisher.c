@@ -21,11 +21,11 @@ NAME:
  * in other cases, we need to integrate the PDF to get the CDF
  */
 #define GSL_INTEGRATE_PDF
-#include <gsl/gsl_randist.h>
-#include <gsl/gsl_integration.h>
-#include <gsl/gsl_errno.h>
+#include "gsl/gsl_randist.h"
+#include "gsl/gsl_integration.h"
+#include "gsl/gsl_errno.h"
 #else
-#include <gsl/gsl_cdf.h>
+#include "gsl/gsl_cdf.h"
 #endif
 
 /* Function Prototypes */
