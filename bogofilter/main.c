@@ -1,6 +1,10 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.24  2002/10/06 00:27:25  relson
+ * Use environment variable BOGOFILTER_DIR to specify the directory for bogofilter's word lists.
+ * If BOGOFILTER_DIR isn't defined, use HOME instead.
+ *
  * Revision 1.23  2002/10/05 22:13:11  relson
  * If environment variables BOGODIR or HOME is defined, use its value for bogofilters
  * wordlist directory.  If neither is defined, use the current directory.
@@ -132,7 +136,7 @@ AUTHOR:
 
 int verbose, passthrough, update;
 
-char *dirnames[] = { "BOGODIR", "HOME", NULL };
+char *dirnames[] = { "BOGOFILTER_DIR", "HOME", NULL };
 
 int main(int argc, char **argv)
 {
