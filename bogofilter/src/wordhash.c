@@ -252,6 +252,9 @@ wordhash_sort (wordhash_t *wh)
     hashnode_t *node;
     hashnode_t **order;
 
+    if (msg_count_file)
+	return;
+
     if (wh->count == 0 || wh->order != NULL)
 	return;
 
