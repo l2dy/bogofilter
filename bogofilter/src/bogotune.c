@@ -91,8 +91,8 @@ AUTHORS:
 				** and low scoring spam */
 
 /* bogotune's default parameters */
-#define	DEFAULT_ROBS	ROBS	/* 0.010 */
-#define	DEFAULT_ROBX	ROBX	/* 0.415 */
+#define	DEFAULT_ROBS	ROBS	/* 0.0178 */		
+#define	DEFAULT_ROBX	ROBX	/* 0.5200 */
 #define	DEFAULT_MIN_DEV	0.02
 
 /* coarse scan parms */
