@@ -1,16 +1,33 @@
+#!/bin/sh
+
 # testing framework for /bin/sh
 
-#SUPPRESS_DELETE=NO
+# if run from "make check", use pid and time to name TMPDIR, 
+# which will automatically be deleted.
+
+# if run from command line, use testname and date for TMPDIR,
+# and suppress directory deletion.
 
 set -e
 
-while : ; do
-  TMPDIR=./checks.$$.`date +"%Y%m%dT%H%M%S"`
-  mkdir $TMPDIR && break
-  sleep 1
-done
+if [ -z "$MAKELEVEL" ] ; then
+   NAME=`echo $0 | sed s@./t.@@`
+   DATE=`date +"%m%d"`
+   TMPDIR="$NAME.$DATE"
+   rm -rf $TMPDIR
+   mkdir  $TMPDIR
+else
+#   SUPPRESS_DELETE=NO
+    while : ; do
+	TMPDIR=./checks.$$.`date +"%Y%m%dT%H%M%S"`
+	if test x$SUPPRESS_DELETE = xNO ; then TMPDIR=./outputs.`date +"%m%d"` ; fi
+	[ -d $TMPDIR ] || mkdir $TMPDIR
+        [ -d $TMPDIR ] && break
+	sleep 1
+    done
+    trap "if test x$SUPPRESS_DELETE = x ; then rm -r -f core ${TMPDIR} ; else echo remove ${TMPDIR} and possibly crash the test ; fi" 0
+fi
 
-trap "if test x$SUPPRESS_DELETE = x ; then rm -r -f core ${TMPDIR} ; else echo remove ${TMPDIR} and possibly core yourself ; fi" 0
 BOGOFILTER_DIR=$TMPDIR
 export BOGOFILTER_DIR
 ../bogofilter -n </dev/null
