@@ -81,7 +81,9 @@ const char *log_header_format = "%h: %c, spamicity=%p, version=%v";
 const char *log_update_format = "register-%r, %w words, %m messages";
 
 #define RC_COUNT 3
+#ifdef DEAD_CODE
 static FIELD spamicity_tags_ynu[RC_COUNT] = { "Yes",   "No",    "Unsure" };
+#endif
 static FIELD spamicity_tags_shu[RC_COUNT] = { "Spam",  "Ham",   "Unsure" };
 static FIELD spamicity_format_d[RC_COUNT] = { "%0.6f", "%0.6f", "%0.6f" };
 
