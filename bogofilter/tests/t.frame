@@ -30,4 +30,4 @@ fi
 
 BOGOFILTER_DIR=$TMPDIR
 export BOGOFILTER_DIR
-../bogofilter -n </dev/null
+../bogofilter -n -C </dev/null
