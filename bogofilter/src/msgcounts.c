@@ -41,8 +41,7 @@ token_t read_msg_count_line(void)
     bool msg_sep;
 
     if (!saved) {
-	char *tmp = fgets(msg_count_buff, sizeof(msg_count_buff), fpin);
-	if (tmp == NULL) {
+	if (fgets(msg_count_buff, sizeof(msg_count_buff), fpin) == NULL) {
 	    msg_count_leng = 0;
 	    return NONE;
 	}
@@ -53,7 +52,7 @@ token_t read_msg_count_line(void)
     msg_sep = msg_count_buff[1] == '.' && 
 	memcmp(msg_count_buff, msg_count_header, msg_count_header_len) == 0;
 
-    if ( !saved && msg_sep ) {
+    if (!saved && msg_sep) {
 	saved = true;
 	return NONE;
     }

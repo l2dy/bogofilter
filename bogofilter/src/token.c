@@ -254,7 +254,10 @@ token_t get_token(void)
 void token_init(void)
 {
     yyinit();
-    mime_reset();
+
+    if (!msg_count_file)
+	mime_reset();
+
     if (nonblank_line == NULL) {
 	const char *s = "spc:invalid_end_of_header";
 	nonblank_line = word_new((const byte *)s, strlen(s));

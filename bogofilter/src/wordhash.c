@@ -101,8 +101,8 @@ wordhash_init (wh_t t, uint c)
 wordhash_t *
 wordhash_new (void)
 {
-    wordhash_t *wh = wordhash_init(WH_NORMAL, 0);
-    return wh;
+    wh_t t = !msg_count_file ? WH_NORMAL : WH_CNTS;
+    return wordhash_init(t, 0);
 }
 
 static void
