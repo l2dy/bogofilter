@@ -60,7 +60,7 @@ EXTRA_DIST = $(man_MANS) \
 #
 #
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
-$(srcdir)/version.h:	version.sh $(VERSION_FROM)
+version.h:	version.sh $(VERSION_FROM)
 	$(srcdir)/version.sh $(srcdir) $(VERSION_FROM) >$@ || rm -f $@
 #
 .xml.pdf:
