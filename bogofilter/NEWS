@@ -22,9 +22,7 @@ Briefly:
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
 
-0.93.3	2004-12-XX
-
-	2004-12-24
+0.93.3	2004-12-24
 
 	* Bogoutil's options for maintaining the database environment
           are all long options with a "db-" prefix.
