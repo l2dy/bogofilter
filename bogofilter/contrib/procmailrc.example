@@ -40,13 +40,19 @@ spam-unreadable
 
 :0fw
 | bogofilter -f -p -u -l -e -v
+# -f)isher, -p)assthrough -u)pdate, -l)og -e)xitcode 0 for spam and ham
+# -v)erbose
 
 #### begin error catcher ####
 
-# m-a 10/28/02
+# m-a 2002-10-28
 #     If bogofilter failed, return the mail to the queue.
+#     Better put this after _EACH_ delivering recipe (not shown here).
 #     Later, the MTA will try again to deliver it.
 #     75 is the value for EX_TEMPFAIL in /usr/include/sysexits.h
+#
+#     Originally published by Philip Guenther on the postfix-users
+#     mailing list.
 
 :0e
 {
@@ -60,10 +66,13 @@ spam-unreadable
 :0c:
 * ^X-Bogosity: (Spam|Yes)
 spam-bogofilter
+# put copy error catcher here to avoid fallthrough
 
+# unnecessary in twostate mode:
 :0c:
 * ^X-Bogosity: Unsure
 unsure-bogofilter
+# put another copy of error catcher here to avoid fallthrough
 
 #### end bogofilter passthrough-update ####
 
@@ -72,5 +81,4 @@ unsure-bogofilter
 # :0c:
 # * ^X-Spam-Status: Yes
 # spam-spamassassin
-
 #### end SpamAssassin ####
