@@ -44,7 +44,7 @@ AUTHOR:
 int logflag;
 int Rtable = 0;
 
-int verbose, passthrough, force, nonspam_exits_zero;
+int quiet, verbose, passthrough, force, nonspam_exits_zero;
 static bool suppress_config_file = FALSE;
 
 char directory[PATH_LEN + 100] = "";
@@ -176,7 +176,8 @@ static bool process_config_parameter(const ArgDefinition * arg, const char *val)
 	default:
 	    {
 		ok = FALSE;
-		fprintf( stderr, "Unknown parameter type for '%s'\n", arg->name );
+		if (!quiet)
+		    fprintf( stderr, "Unknown parameter type for '%s'\n", arg->name );
 		break;
 	    }
     }
@@ -256,9 +257,12 @@ static void read_config_file(const char *filename, bool home_dir)
 	    buff[--len] = '\0';
 	if ( ! process_config_line( buff ))
 	{
-	    fprintf( stderr, "Unknown config line #%d\n", lineno );
-	    fprintf( stderr, "    %s\n", buff );
 	    error = TRUE;
+	    if (!quiet)
+	    {
+		fprintf( stderr, "Unknown config line #%d\n", lineno );
+		fprintf( stderr, "    %s\n", buff );
+	    }
 	}
     }
 
@@ -316,6 +320,7 @@ static void help(void)
     (void)printf( "\t-V\t- print version information and exit.\n" );
     (void)printf( "\t-c filename\t- read config file 'filename'.\n" );
     (void)printf( "\t-C\t- don't read standard config files.\n" );
+    (void)printf( "\t-q\t- quite - don't print warning messages.\n" );
     (void)printf( "\n" );
     (void)printf( "bogofilter is a tool for classifying email as spam or non-spam.\n" );
     (void)printf( "\n" );
@@ -410,6 +415,10 @@ int process_args(int argc, char **argv)
 
 	case 'x':
 	    set_debug_mask( optarg );
+	    break;
+
+	case 'q':
+	    quiet = 1;
 	    break;
 
 	case 'f':
