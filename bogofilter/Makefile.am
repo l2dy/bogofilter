@@ -33,7 +33,6 @@ bogoutil_SOURCES = bogoutil.c \
 		   datastore.h datastore_db.h datastore_db.c wordlists.h wordlists.c \
 		   $(MYCOMMON)
 
-configtest_CFLAGS = -DMAIN
 configtest_SOURCES = configtest.c config.c wordlists.c datastore_db.c $(MYCOMMON)
 
 # what to distribute
