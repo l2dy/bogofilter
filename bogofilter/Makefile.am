@@ -32,20 +32,15 @@ MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h debug.h \
 	debug.c find_home.h find_home.c find_home_user.c \
 	find_home_tildeexpand.c bogoconfig.h system.h
 
-BUILT_SOURCES = version.h directories.h
-
-CLEANFILES=directories.h
+BUILT_SOURCES = version.h 
 
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c \
-		     config.c directories.h register.c register.h \
+		     config.c register.c register.h \
 		     $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
 		     rstats.h rstats.c \
                      wordhash.h wordhash.c wordlists.h wordlists.c \
 		     $(MYCOMMON) common.h method.h version.h
-
-directories.h: Makefile
-	echo >$@ '#define SYSCONFDIR "$(SYSCONFDIR)"' || rm -f $@
 
 bogolexer_SOURCES = bogolexer.c lexer.l lexer.h $(MYCOMMON)
 
@@ -66,12 +61,12 @@ find_home_test_SOURCES = find_home.test.c $(MYCOMMON)
 extradistdirs = doc contrib
 EXTRA_DIST = $(man_MANS) \
 	     bogofilter.cf.example bogofilter-faq.html \
-	     README.hp-ux UPGRADE \
+	     METHODS UPGRADE \
 	     bogofilter.xml bogoutil.xml bogoupgrade.xml bogolexer.xml \
 	     bogofilter.spec bogofilter.spec.in \
 	     bogoupgrade bogo.R \
 	     version.sh \
-	     README.cvs README.freebsd \
+	     README.cvs README.freebsd README.hp-ux README.Robinson \
 	     $(extradistdirs)
 #
 #
