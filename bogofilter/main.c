@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.19  2002/10/04 03:26:52  gyepi
+ * bug fix: make sure directory points to heap memory when it is used
+ *
  * Revision 1.18  2002/10/04 01:35:23  m-a
  * Free directory if used.
  *
@@ -111,6 +114,7 @@ AUTHOR:
 #endif
 #include "bogofilter.h"
 #include "xmalloc.h"
+#include "xstrdup.h"
 #include "datastore.h"
 
 #define BOGODIR		"/.bogofilter/"
@@ -128,7 +132,7 @@ int main(int argc, char **argv)
 	switch(ch)
 	{
 	case 'd':
-	    directory = optarg;
+	    directory = xstrdup(optarg);
 	    setup_lists(directory);
 	    break;
 
