@@ -4,7 +4,9 @@
 
 $Id$
 
-0.11.2	2003-04-13
+0.11.2 - stable release
+
+	2003-04-13
 
 	* Added 'terse' option to bogofilter.cf for selecting format of
           X-Bogosity line.
@@ -74,7 +76,7 @@ $Id$
 	* Fixed processing of folded X-Bogosity line.
 	* Fixed processing of spam_subject_tag.
 
-0.11.1.3
+0.11.1.3 - stable release
 
 	2003-03-10
 	* Expanded regression tests.
