@@ -63,13 +63,6 @@ static int x_init_list(wordlist_t* list, const char* name, const char* filepath,
 }
 #endif
 
-#ifdef	HAVE_CHARSET
-void init_charset_table(const char *charset_name, bool use_default)
-{
-    return;
-}
-#endif
-
 int main( int argc, char **argv)
 {
     verbose = 0;
