@@ -203,10 +203,12 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						      BEGIN HTML;
 						  else
 						      BEGIN TEXT; 
+						  msg_header = false;
 						  return EMPTY;
 						}
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
 						      BEGIN INITIAL;
+						      msg_header = true;
 						      if (test) fprintf(dbgout, "MIME_BOUNDARY -> BEGIN HTML\n");
 						      return BOUNDARY;
 						  } else {
@@ -261,6 +263,7 @@ void lexer_v3_init(FILE *fp)
 {
     lineno = 0;
     BEGIN INITIAL;
+    msg_header = true;
     yyrestart(fp);
 }
 

@@ -46,8 +46,6 @@ static word_t *nonblank_line = NULL;
 
 /* Function Prototypes */
 
-void got_emptyline(void);
-
 /* Function Definitions */
 
 token_t get_token(void)
@@ -98,8 +96,8 @@ token_t get_token(void)
 	switch (class) {
 
 	case EMPTY:	/* empty line -- check for bogus end of header */
-	    got_emptyline(); 
-	    msg_header = false;
+	    if (msg_state->mime_type == MIME_MESSAGE)
+		mime_add_child(msg_state);
 	    if (yylval->leng == 1)
 		continue;
 	    else	/* "spc:invalid_end_of_header" */
@@ -110,26 +108,23 @@ token_t get_token(void)
 	    continue;
 
 	case TOKEN:	/* ignore anything when not reading text MIME types */
-	    if (msg_header)
-	    {
-		if (token_prefix != NULL) {
-		    word_t *w = word_concat(token_prefix, yylval);
-		    word_free(yylval);
-		    yylval = w;
-		}
-		break;
+	    if (token_prefix != NULL) {
+		word_t *w = word_concat(token_prefix, yylval);
+		word_free(yylval);
+		yylval = w;
 	    }
-
-            switch (msg_state->mime_type) {
-            case MIME_TEXT:
-            case MIME_TEXT_HTML:
-            case MIME_TEXT_PLAIN:
-            case MIME_MULTIPART:
-            case MIME_MESSAGE:
-              break;
-            default:
-              continue;
-            }
+	    else {
+		switch (msg_state->mime_type) {
+		case MIME_TEXT:
+		case MIME_TEXT_HTML:
+		case MIME_TEXT_PLAIN:
+		case MIME_MULTIPART:
+		case MIME_MESSAGE:
+		    break;
+		default:
+		    continue;
+		}
+	    }
 	    break;
 
 	case IPADDR:
@@ -215,7 +210,6 @@ void token_init(void)
     token_count = 0;
 #endif
 
-    msg_header = true;
     yyinit();
     mime_reset(); 
     if (nonblank_line == NULL) {
@@ -228,14 +222,6 @@ void got_newline()
 {
     word_free(token_prefix);
     token_prefix = NULL;
-}
-
-void got_emptyline(void)
-{
-    if (msg_state->mime_type == MIME_MESSAGE && msg_header)
-	mime_add_child(msg_state);
-
-    return;
 }
 
 const char *prefixes = "to:|from:|rtrn:|subj:";

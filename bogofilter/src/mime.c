@@ -122,7 +122,6 @@ const char *mime_type_name(enum mimetype type)
 static void
 mime_init (mime_t * parent)
 {
-  msg_header = true;
   msg_state->mime_type = MIME_TEXT;
   msg_state->mime_encoding = MIME_7BIT;
   msg_state->boundary = NULL;
@@ -400,9 +399,6 @@ mime_version (word_t *text)
   size_t l;
   char *w;
 
-  if (!msg_header)
-      return;
-
   l = strlen("MIME-Version:");
   w = (char *)getword(text->text + l, text->text + text->leng);
 
@@ -419,10 +415,6 @@ mime_disposition (word_t *text)
   size_t i;
   size_t l;
   char *w;
-
-
-  if (!msg_header)
-      return;
 
   l = strlen("Content-Disposition:");
   w = (char *)getword (text->text + l, text->text + text->leng);
@@ -466,9 +458,6 @@ mime_encoding (word_t *text)
   size_t l;
   char *w;
 
-  if (!msg_header)
-      return;
-
   l = strlen("Content-Transfer-Encoding:");
   w = (char *)getword(text->text + l, text->text + text->leng);
 
@@ -498,9 +487,6 @@ mime_type (word_t *text)
   size_t l;
   char *w;
   struct type_s *typ;
-
-  if (!msg_header)
-      return;
 
   l = strlen("Content-Type:");
   w = (char *)getword(text->text + l, text->text + text->leng);
@@ -574,9 +560,6 @@ mime_decode (word_t *text)
 {
   size_t count = text->leng;
 
-  if (msg_header)	/* do nothing if in header */
-    return count;
-  
   /* early out for the uninteresting cases */
   if (msg_state->mime_encoding ==  MIME_7BIT ||
       msg_state->mime_encoding ==  MIME_8BIT ||

@@ -9,7 +9,6 @@
 
 #include "common.h"
 
-#include <assert.h>
 #include <ctype.h>
 #include <stdlib.h>
 
@@ -61,8 +60,8 @@ extern void yy_set_state_initial(void);
 
 static void lexer_display_buffer(buff_t *buff)
 {
-    fprintf(dbgout, "*** %2d %c%c %2ld ", 
-	    yylineno, msg_header ? 'h' : 'b', yy_get_state(), 
+    fprintf(dbgout, "*** %2d %c%c %2ld ",
+	    yylineno-1, msg_header ? 'h' : 'b', yy_get_state(),
 	    (long)(buff->t.leng - buff->read));
      buff_puts(buff, 0, dbgout);
      if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
@@ -126,7 +125,6 @@ static int yy_get_new_line(buff_t *buff)
     ** -- before mime decoding.  Without it, flex aborts:
     ** "fatal flex scanner internal error--end of buffer missed" */
     if (got_mime_boundary(&buff->t)) {
-	msg_header = true;
 	if (test) fprintf(dbgout, "lexer.c:  yy_get_new_line() -> yy_set_state_initial()\n");
 	yy_set_state_initial();
     }
