@@ -12,21 +12,23 @@ NAME:
 
 #define	DEBUG_NONE	0
 
+#define	MASK_BIT(uc)	( 1 << (uc - 'A'))
+
 #ifndef	NODEBUG
 #define BIT_NAMES	"bcdfghlmrstw"
-#define BIT_READER	( 1 << ('B' - 'A'))
-#define BIT_CONFIG	( 1 << ('C' - 'A'))
-#define BIT_DATABASE	( 1 << ('D' - 'A'))
-#define BIT_FORMAT	( 1 << ('F' - 'A'))
-#define BIT_GENERAL	( 1 << ('G' - 'A'))
-#define BIT_HTML	( 1 << ('H' - 'A'))
-#define BIT_LEXER	( 1 << ('L' - 'A'))
-#define BIT_MIME	( 1 << ('M' - 'A'))
-#define BIT_REGISTER	( 1 << ('R' - 'A'))
-#define BIT_ROBINSON	( 1 << ('R' - 'A'))
-#define BIT_SPAMICITY	( 1 << ('S' - 'A'))
-#define BIT_TEXT	( 1 << ('T' - 'A'))
-#define BIT_WORDLIST	( 1 << ('W' - 'A'))
+#define BIT_READER	MASK_BIT('B')
+#define BIT_CONFIG	MASK_BIT('C')
+#define BIT_DATABASE	MASK_BIT('D')
+#define BIT_FORMAT	MASK_BIT('F')
+#define BIT_GENERAL	MASK_BIT('G')
+#define BIT_HTML	MASK_BIT('H')
+#define BIT_LEXER	MASK_BIT('L')
+#define BIT_MIME	MASK_BIT('M')
+#define BIT_REGISTER	MASK_BIT('R')
+#define BIT_ROBINSON	MASK_BIT('R')
+#define BIT_SPAMICITY	MASK_BIT('S')
+#define BIT_TEXT	MASK_BIT('T')
+#define BIT_WORDLIST	MASK_BIT('W')
 #endif
 
 extern FILE *dbgout;
@@ -61,7 +63,7 @@ extern int debug_mask;
 #define DEBUG_WORDLIST(level)	((debug_mask & BIT_WORDLIST)  && (verbose > level))
 #endif
 
-#define	BOGOTEST(c)		(bogotest && ( 1 << (tolower(c) - 'a')))
+#define	BOGOTEST(uc)		((bogotest & MASK_BIT(uc)) != 0)
 
 void set_debug_mask(const char *mask);
 void set_bogotest(const char *mask);

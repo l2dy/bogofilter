@@ -48,7 +48,7 @@ void set_bogotest(const char *mask)
     char ch;
     while ((ch = *mask++) != '\0' && isalpha(ch))
     {
-	ch = tolower(ch);
-	bogotest |= BOGOTEST(ch);
+	ch = toupper(ch);
+	bogotest |= MASK_BIT(ch);
     }
 }
