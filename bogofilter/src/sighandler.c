@@ -20,6 +20,10 @@ AUTHOR:
 #include "sighandler.h"
 #include "wordlists.h"
 
+/* Global Definitions */
+
+bool fDie = false;
+
 /* Function Definitions */
 
 static void mysignal(int sig, void (*hdl)(int)) {
@@ -35,9 +39,19 @@ static void mysignal(int sig, void (*hdl)(int)) {
     }
 }
 
+static void mysigdie(int sig)
+{
+    (void) sig;		/* quiet compiler warning */
+
+    if (!fDie)
+	fDie = true;
+    else
+	exit(EX_ERROR);
+}
+
 void signal_setup(void)
 {
-    mysignal(SIGINT,  SIG_IGN);
+    mysignal(SIGINT,  mysigdie);
     mysignal(SIGPIPE, SIG_IGN);
-    mysignal(SIGTERM, SIG_IGN);
+    mysignal(SIGTERM, mysigdie);
 }

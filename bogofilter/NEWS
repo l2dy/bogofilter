@@ -24,11 +24,12 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 
 	2005-03-09
 
-	* bogoutil --db-verify has been repaired (it segfaulted in 0.94.0).
+	* Fix segfault in 'bogoutil --db-verify'.
 
 	2005-03-08
 
 	* Support for Berkeley DB 3.1 is back.
+	* Terminate 'bogoutil -d' when SIGINT or SIGTERM is received.
 
 	2005-03-07
 

@@ -69,6 +69,10 @@ static int ds_dump_hook(word_t *key, dsv_t *data,
 {
     (void)userdata;
 
+    if (fDie) {
+	exit(EX_ERROR);
+    }
+
     token_count += 1;
 
     if (maintain && discard_token(key, data))
