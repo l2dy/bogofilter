@@ -50,14 +50,14 @@ struct type_s
   const char *name;
   size_t len;
 }
-types[] =
+mime_type_table[] =
 {
-  { MIME_TEXT_HTML, 	"text/html", 	9,} ,
-  { MIME_TEXT_PLAIN, 	"text/plain", 	10,} ,
-  { MIME_TEXT, 		"text/", 	5,} ,
-  { MIME_APPLICATION, 	"application/", 12,} ,
-  { MIME_MESSAGE, 	"message/", 	8,} ,
-  { MIME_MULTIPART, 	"multipart/", 	10,},
+  { MIME_TEXT_HTML, 	"text/html", 	 9, } ,
+  { MIME_TEXT_PLAIN, 	"text/plain", 	10, } ,
+  { MIME_TEXT, 		"text/", 	 5, } ,
+  { MIME_APPLICATION, 	"application/", 12, } ,
+  { MIME_MESSAGE, 	"message/", 	 8, } ,
+  { MIME_MULTIPART, 	"multipart/", 	10, } ,
 };
 
 struct encoding_s
@@ -65,14 +65,14 @@ struct encoding_s
   enum mimeencoding encoding;
   const char *name;
 }
-encodings[] =
+mime_encoding_table[] =
 {
-  { MIME_7BIT, 	   "7BIT",} ,
-  { MIME_8BIT,     "8BIT",} ,
-  { MIME_BINARY,   "BINARY",} ,
-  { MIME_QP,       "QUOTED-PRINTABLE",} ,
-  { MIME_BASE64,   "BASE64",} ,
-  { MIME_UUENCODE, "X-UUENCODE",} ,
+  { MIME_7BIT, 	   "7BIT", 		} ,
+  { MIME_8BIT,     "8BIT", 		} ,
+  { MIME_BINARY,   "BINARY", 		} ,
+  { MIME_QP,       "QUOTED-PRINTABLE", 	} ,
+  { MIME_BASE64,   "BASE64", 		} ,
+  { MIME_UUENCODE, "X-UUENCODE", 	} ,
 };
 
 struct disposition_s
@@ -80,10 +80,10 @@ struct disposition_s
   enum mimedisposition disposition;
   const char *name;
 }
-dispositions[] =
+mime_disposition_table[] =
 {
-  { MIME_INLINE, "inline",} ,
-  { MIME_ATTACHMENT, "attachment",} ,
+  { MIME_INLINE,     "inline",     } ,
+  { MIME_ATTACHMENT, "attachment", } ,
 };
 
 /* boundary properties */
@@ -109,9 +109,10 @@ static void mime_pop (void);
 #if	0	/* Unused */
 const char *mime_type_name(enum mimetype type)
 {
-  struct type_s *typ;
-  for (typ = types; typ < types + COUNTOF (types); typ += 1)
+  size_t i;
+  for (i = 0; i < COUNTOF (mime_type_table); i += 1)
   {
+      struct type_s *typ = mime_type_table + i;
       if (typ->type == type)
 	  return typ->name;
   }
@@ -415,9 +416,10 @@ mime_version (word_t *text)
 void
 mime_disposition (word_t *text)
 {
+  size_t i;
   size_t l;
   char *w;
-  struct disposition_s *dis;
+
 
   if (!msg_header)
       return;
@@ -428,9 +430,9 @@ mime_disposition (word_t *text)
   if (!w) return;
 
   msg_state->mime_disposition = MIME_DISPOSITION_UNKNOWN;
-  for (dis = dispositions; dis < dispositions + COUNTOF (dispositions);
-       dis += 1)
+  for (i = 0; i < COUNTOF (mime_disposition_table); i += 1 )
   {
+    struct disposition_s *dis = mime_disposition_table + i;
     if (strcasecmp (w, dis->name) == 0)
     {
       msg_state->mime_disposition = dis->disposition;
@@ -459,9 +461,9 @@ mime_disposition (word_t *text)
 void
 mime_encoding (word_t *text)
 {
+  size_t i;
   size_t l;
   char *w;
-  struct encoding_s *enc;
 
   if (!msg_header)
       return;
@@ -472,8 +474,9 @@ mime_encoding (word_t *text)
   if (!w) return;
 
   msg_state->mime_encoding = MIME_ENCODING_UNKNOWN;
-  for (enc = encodings; enc < encodings + COUNTOF (encodings); enc += 1)
+  for (i = 0; i < COUNTOF (mime_encoding_table); i += 1 )
   {
+    struct encoding_s *enc = mime_encoding_table + i;
     if (strcasecmp (w, enc->name) == 0)
     {
       msg_state->mime_encoding = enc->encoding;
@@ -502,7 +505,7 @@ mime_type (word_t *text)
   if (!w) return;
 
   msg_state->mime_type = MIME_TYPE_UNKNOWN;
-  for (typ = types; typ < types + COUNTOF (types); typ += 1)
+  for (typ = mime_type_table; typ < mime_type_table + COUNTOF (mime_type_table); typ += 1)
   {
     if (strncasecmp (w, typ->name, typ->len) == 0)
     {
