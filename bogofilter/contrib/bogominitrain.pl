@@ -7,7 +7,7 @@ my $commandlineoptions=($ARGV[0]=~/^-(?=[^v]*v{0,2}[^v]*$)(?=[^f]*f?[^f]*$)(?=[^
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.1
+bogominitrain.pl version 1.2
   requires bogofilter 0.14.1 or later
 
 Usage:
@@ -73,6 +73,10 @@ print "\nStarting with this database:\n";
 my $dbexists=(-s "$dir/goodlist.db" || -s "$dir/wordlist.db");
 if ($dbexists) {print `bogoutil -w $dir .MSG_COUNT`,"\n";} else {print "  (empty)\n\n";}
 
+my $ham_total=`cat $ham|grep -c "^From "`;
+my $spam_total=`cat $spam|grep -c "^From "`;
+my $ham_spam_ratio=$ham_total/$spam_total;
+
 my ($fp,$fn);
 my $runs=0;
 do { # Start force loop
@@ -85,7 +89,7 @@ do { # Start force loop
   do {
 
     # Read one mail from ham box and test, train as needed
-    unless (eof(HAM)) {
+    unless (eof(HAM) || $hamcount>$spamcount*$ham_spam_ratio+2) {
       my $mail=$lasthamline;
       $lasthamline="";
       while (defined(my $line=<HAM>)) {
@@ -113,7 +117,7 @@ do { # Start force loop
     }
 
     # Read one mail from spam box and test, train as needed
-    unless (eof(SPAM)) {
+    unless (eof(SPAM) || $spamcount*$ham_spam_ratio>$hamcount+2) {
       my $mail=$lastspamline;
       $lastspamline="";
       while (!eof(SPAM) && defined(my $line=<SPAM>)) {
