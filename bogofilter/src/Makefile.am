@@ -79,7 +79,7 @@ version_sources= \
 	bool.h bool.c \
 	bsdqueue.h \
 	buff.h buff.c \
-	charset.h charset.c \
+	charset.h charset.c chUnicodeTo866.h \
 	collect.h collect.c \
 	configfile.h configfile.c \
 	datastore.h datastore.c \
