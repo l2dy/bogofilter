@@ -161,6 +161,6 @@ dnl AC_FUNC_STAT
 AC_CHECK_FUNCS(alarm bzero ftruncate memset mkdir socket strdup strerror flock lockf fcntl strchr strrchr memcpy)
 
 AC_CONFIG_FILES([Makefile tests/Makefile tests/bogoutil/Makefile bogofilter.spec
-		 contrib/Makefile doc/Makefile dcdflib.c/Makefile
-		 dcdflib.c/doc/Makefile dcdflib.c/src/Makefile])
+		 contrib/Makefile doc/Makefile dcdflib/Makefile
+		 dcdflib/doc/Makefile dcdflib/src/Makefile])
 AC_OUTPUT
