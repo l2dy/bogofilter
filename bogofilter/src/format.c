@@ -150,25 +150,22 @@ static bool set_spamicity_formats(const unsigned char *val)
 static size_t format_float(char *dest, double src, 
 	int min, int prec, int flags, const char *destend)
 {
-    char buf[20];
+    #define SIZ 20
+    char buf[SIZ];
+    const char *fmt;
     double s;
     int p;
 
-    if (flags & F_DELTA)
-	s = 1.0 - src;
-    else
-	s = src;
+    s = ! (flags & F_DELTA) ? src : 1.0 - src;
     if (flags & F_PREC)
 	p = prec;
     else
-	if (flags & F_FP_F)
-	    p = 6;
-	else
-	    p = 2;
+	p = (flags & F_FP_F) ? 6 : 2;
     if (flags & F_FP_F)
-	snprintf (buf, 20, flags & F_ZERO ? "%0*.*f" : "%*.*f", min, p, s);
+	fmt = flags & F_ZERO ? "%0*.*f" : "%*.*f";
     else
-	snprintf (buf, 20, flags & F_ZERO ? "%0*.*e" : "%*.*e", min, p, s);
+	fmt = flags & F_ZERO ? "%0*.*e" : "%*.*e";
+    snprintf (buf, SIZ, fmt, min, p, s);
     return format_string (dest, buf, 0, 0, 0, destend);
 }
 
@@ -312,12 +309,10 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 		break;
 	    }
 	    case 'e':		/* e - spamicity as 'e' format */
-		flags |= F_FP_E;
-		buff += format_float(buff, spamicity, min, prec, flags, end);
+		buff += format_float(buff, spamicity, min, prec, flags | F_FP_E, end);
 		break;
 	    case 'f':		/* f - spamicity as 'f' format */
-		flags |= F_FP_F;
-		buff += format_float(buff, spamicity, min, prec, flags, end);
+		buff += format_float(buff, spamicity, min, prec, flags | F_FP_F, end);
 		break;
 	    case 'h':		/* h - spam_header_name, e.g. "X-Bogosity" */
 		buff += format_string(buff, spam_header_name, 0, prec, flags, end);
