@@ -333,7 +333,9 @@ bool ds_get_msgcounts(void *vhandle, dsv_t *val)
 {
     int rc;
     dsh_t *dsh = vhandle;
+
     rc = ds_read(dsh, msg_count_tok, val);
+
     return rc == 0;
 }
 
@@ -343,8 +345,10 @@ bool ds_get_msgcounts(void *vhandle, dsv_t *val)
 void ds_set_msgcounts(void *vhandle, dsv_t *val)
 {
     dsh_t *dsh = vhandle;
+
     if (timestamp_tokens && val->date != 0)
 	val->date = today;
+
     ds_write(dsh, msg_count_tok, val);
     return;
 }
