@@ -30,6 +30,8 @@ RESULT=`echo $RESULT | sed s@\ @@g`
 # v0.16.0 - Don't create token from "Received:"
 #         - Expand VERP rule
 WANT="1786.4025"
+# v0.16.1 - Trim X-Bogosity from message header
+WANT="1780.4025"
 
 if [ "$RESULT" != "$WANT" ] || [ $verbose -ne 0 ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT

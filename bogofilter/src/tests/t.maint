@@ -7,14 +7,14 @@ NODB=1 . ${srcdir=.}/t.frame
 
 OUT="$TMPDIR/maint.out"
 
-$BOGOFILTER -C -s < ${SYSTEST}/inputs/spam.mbx
-$BOGOFILTER -C -n < ${SYSTEST}/inputs/good.mbx
+$BOGOFILTER -C -y 0 -s < ${SYSTEST}/inputs/spam.mbx
+$BOGOFILTER -C -y 0 -n < ${SYSTEST}/inputs/good.mbx
 
 CORRECT="$TMPDIR/result"
 
 cat >> $CORRECT <<EOF
-initial: 5286
-count 0 -> 5286
+initial: 5283
+count 0 -> 5283
 count 1 -> 1841
 count 2 -> 937
 count 3 -> 602

@@ -34,6 +34,8 @@ lexer_t *lexer = NULL;
 
 /* Local Variables */
 
+extern char *spam_header_name;
+
 lexer_t v3_lexer = {
     lexer_v3_lex,
     &lexer_v3_text,
@@ -48,6 +50,7 @@ lexer_t msg_count_lexer = {
 
 /* Function Prototypes */
 static int yy_get_new_line(buff_t *buff);
+static int skip_spam_header(buff_t *buff);
 static int get_decoded_line(buff_t *buff);
 
 /* Function Definitions */
@@ -68,11 +71,11 @@ static void lexer_display_buffer(buff_t *buff)
 /* Check for lines wholly composed of printable characters as they can cause a scanner abort 
    "input buffer overflow, can't enlarge buffer because scanner uses REJECT"
 */
-static bool not_long_token(byte *buf, uint count)
+static bool not_long_token(byte *buf, size_t count)
 {
-    uint i;
+    size_t i;
     for (i=0; i < count; i += 1) {
-	byte c = buf[i];
+	unsigned char c = (unsigned char)buf[i];
 	if ((iscntrl(c) || isspace(c) || ispunct(c)) && (c != '_'))
 	    return true;
     }
@@ -83,6 +86,10 @@ static int yy_get_new_line(buff_t *buff)
 {
     int count = (*reader_getline)(buff);
     const byte *buf = buff->t.text;
+
+    static size_t hdrlen = 0;
+    if (hdrlen==0)
+	hdrlen=strlen(spam_header_name);
 
     if (count > 0)
 	yylineno += 1;
@@ -109,6 +116,14 @@ static int yy_get_new_line(buff_t *buff)
     if (count >= 0 && DEBUG_LEXER(0))
 	lexer_display_buffer(buff);
     
+    /* skip spam_header ("X-Bogosity:") lines */
+    while (msg_header
+	   && count != EOF
+	   && memcmp(buff->t.text,spam_header_name,hdrlen) == 0)
+    {
+	count = skip_spam_header(buff);
+    }
+
     /* Also, save the text on a linked list of lines.
      * Note that we store fixed-length blocks here, not lines.
      * One very long physical line could break up into more
@@ -120,6 +135,20 @@ static int yy_get_new_line(buff_t *buff)
     return count;
 }
 
+static int skip_spam_header(buff_t *buff)
+{
+    while (true) {
+	int count;
+	buff->t.leng = 0;		/* discard X-Bogosity line */
+	count = reader_getline(buff);
+	yylineno += 1;
+	if (count <= 1 || !isspace(buff->t.text[0])) 
+  	    return count;
+    }
+
+    return EOF;
+}
+  
 static int get_decoded_line(buff_t *buff)
 {
     uint used = buff->t.leng;
