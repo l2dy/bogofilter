@@ -127,7 +127,7 @@ MIME_BOUNDARY	{BCHARS}*{BCHARSNOSPC}
 
 ID		<?[[:alnum:]-]*>?
 CHARSET		[[:alnum:]-]+
-MTYPE		[ \t]*[[:alnum:]/-]*
+MTYPE		[[:blank:]]*[[:alnum:]/-]*
 
 NUM		[[:digit:]]+
 NUM_NUM		\ {NUM}\ {NUM}
@@ -166,11 +166,11 @@ TOKEN_12 	({TOKEN}|{T12})
   QP		[!->@-~]+
 */
 
-WHITESPACE	[ \t\n]
-NOTWHITESPACE	[^ \t\n]
+WHITESPACE	[[:blank:]\n]
+NOTWHITESPACE	[^[:blank:]\n]
 
-HTML_ENCODING		"&#"x?[[:xdigit:]]+";"
-URL_ENCODING		"%"[[:xdigit:]][[:xdigit:]]
+HTML_ENCODING	"&#"x?[[:xdigit:]]+";"
+URL_ENCODING	"%"[[:xdigit:]][[:xdigit:]]
 
 ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^?]*\?=
 ENCODED_TOKEN	({TOKENFRONT}{TOKENMID})?({ENCODED_WORD}{WHITESPACE}+)*{ENCODED_WORD}
@@ -234,7 +234,7 @@ VERP		{TOKEN}-{NUM}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>(file)?name=\"?			/* ignore */
 <INITIAL>\n?[[:blank:]]id\ {ID}			/* ignore */
 
-<INITIAL>\n[ \t]				{ lineno += 1; }
+<INITIAL>\n[[:blank:]]				{ lineno += 1; }
 <INITIAL>\n\n					{ enum mimetype type = get_content_type();
 						  have_body = true;
 						  msg_header = false;
