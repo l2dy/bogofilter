@@ -109,11 +109,14 @@ static ex_t dump_wordlist(const char *ds_file)
 }
 
 #define BUFSIZE 512
+const char POSIX_space[] = " \f\n\r\t\v";
 
 static byte *spanword(byte *t)
 {
-    while (isspace(*t)) t += 1;		/* skip leading whitespace */
-    while (*t && !isspace(*t)) t += 1;	/* span current word	   */
+    /* skip leading whitespace */
+    t += strspn(t, POSIX_space);
+    /* span current word */
+    t += strcspn(t, POSIX_space);
     if (*t)
 	*t++ = '\0';
     return t;
