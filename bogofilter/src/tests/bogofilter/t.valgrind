@@ -1,0 +1,102 @@
+#!/bin/sh
+
+set -e
+
+# only run this when valgrind is in the path, skip otherwise ("exit 77"
+# = skip)
+#
+# this is a stripped-down version of t.grftest
+
+: ${srcdir=.}
+relpath="`pwd`/../.."
+NODB=1 . ${srcdir}/../t.frame
+
+exec 3>$TMPDIR/vg.out
+VALGRIND="valgrind -q --num-callers=20 --logfile-fd=3"
+( $VALGRIND true ) 2>/dev/null || exit 77
+( $VALGRIND false ) 2>/dev/null && exit 77
+
+verbose=0
+if [ "$1" = "-v" ]; then
+    verbose=1
+fi
+
+# Graham config
+cat /dev/null > ${TMPDIR}/cfg.g
+
+# Robinson config
+cat <<EOF > ${TMPDIR}/cfg.r
+robx=0.415
+min_dev=0.0
+EOF
+
+# Fisher config
+cat <<EOF > ${TMPDIR}/cfg.f
+robx=0.415
+min_dev=0.1
+ham_cutoff=0.0
+EOF
+
+# Fisher tristate
+cat <<EOF > ${TMPDIR}/cfg.t
+robx=0.415
+min_dev=0.1
+ham_cutoff=0.1
+terse_format = %1.1c %d
+spamicity_tags = S,h,u
+spamicity_formats = %6.2e %6.2e %0.6f
+EOF
+
+V="v"	# verbosity level
+
+BOGOFILTER="${relpath}/bogofilter"
+BOGOUTIL="${relpath}/bogoutil"
+SYSTEST="${srcdir}"
+
+map_rc()
+{
+    (
+	set +e
+	eval "$@"
+	a=$?
+	[ $a -eq 0 ] && exit 0
+	[ $a -eq 1 ] && exit 0
+	exit $a
+    )
+}
+
+run_test()
+{
+    id="$1"
+    fil="$2"
+    ver="$3"
+    OUT="${TMPDIR}/tests/msg.$fil.$mth.$ver"
+    OPTS="-$alg -t -$ver $CFG"
+    map_rc $VALGRIND $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt \
+    >${TMPDIR}/tests-$alg
+    if test -s $TMPDIR/vg.out ; then cat $TMPDIR/vg.out ; exit 2 ; fi
+}
+
+if [   -d ${TMPDIR}/tests ] ; then rm -f ${TMPDIR}/tests/* ; else : ; fi
+mkdir -p ${TMPDIR}/tests
+
+for mth in g r f t ; do
+    alg="$mth"
+    if [ "$alg" = "t" ] ; then alg=f ; else : ; fi
+    BOGOFILTER_DIR="${TMPDIR}/words.$mth"
+    CFG="-c ${TMPDIR}/cfg.$mth -y 0"
+    export BOGOFILTER_DIR
+    if [   -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
+    mkdir -p $BOGOFILTER_DIR
+    $BOGOFILTER -$alg $CFG -s < ${SYSTEST}/inputs/spam.mbx
+    $BOGOFILTER -$alg $CFG -n < ${SYSTEST}/inputs/good.mbx
+    [ $verbose -gt 0 ] && $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT
+
+    for msg in ${SYSTEST}/inputs/msg.3.txt ; do
+	tst=`echo $msg | sed s@${SYSTEST}/inputs/msg.@@ | sed s@.txt@@`
+	args="$tst $tst $V"
+	run_test $args
+    done
+
+    rm -f ${TMPDIR}/tests-$alg
+done

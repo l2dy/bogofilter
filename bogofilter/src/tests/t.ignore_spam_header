@@ -1,0 +1,26 @@
+#! /bin/sh
+
+. ${srcdir=.}/t.frame
+
+# t.ignore_spam_header
+#
+# 	bogofilter should remove all copies of the spam 
+#	header line in the incoming message, i.e. 
+#	the output file should exactly 1 copy of it.
+
+shn=`./spam_header_name`
+
+cat > $TMPDIR/input <<EOF
+From somewhere@example.com Fri Nov 22 11:30:23 2002
+$shn: blah1
+$shn: blah2
+
+Friend,
+
+EOF
+
+$VAL ../bogofilter -p -e -C < $TMPDIR/input > $TMPDIR/output
+
+count=`grep $shn $TMPDIR/output | wc -l`
+test $count = "1"
+
