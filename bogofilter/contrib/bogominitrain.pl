@@ -3,12 +3,16 @@
 # by Boris 'pi' Piwinger <3.14@piology.org>
 # with many useful additions by David Relson <relson@osagesoftware.com>
 
+# Program locations
+my $bogofilter="bogofilter";
+my $bogoutil="bogoutil";
+
 # Not correct number of parameters
 my $commandlineoptions=($ARGV[0]=~/^-(?=[^f]*f?[^f]*$)(?=[^n]*n?[^n]*$)(?=[^s]*s?[^s]*$)[fns]*v{0,2}[fns]*$/);
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.33
+bogominitrain.pl version 1.35
   requires bogofilter 0.14.5 or later
 
 Usage:
@@ -70,7 +74,7 @@ my $verbose=1 if ($commandlineoptions && $ARGV[0]=~s/^-v/-/);
 my $vverbose=1 if ($commandlineoptions && $ARGV[0] eq "-v");
 shift (@ARGV) if ($commandlineoptions);
 my ($dir,$ham,$spam,$options) = @ARGV;
-my $bogofilter="bogofilter $options -d $dir";
+$bogofilter.=" $options -d $dir";
 my $temp; srand; do {$temp="/tmp/".rand();} until (!-e $temp);
 die ("$dir is not a directory or not accessible.\n") unless (-d $dir && -r $dir && -w $dir && -x $dir);
 `$bogofilter -n < /dev/null` unless (-s "$dir/goodlist.db" || -s "$dir/wordlist.db");
@@ -80,7 +84,7 @@ my ($fp,$fn,$hamadd,$spamadd,%trainedham,%trainedspam);
 my $runs=0;
 
 print "\nStarting with this database:\n";
-print `bogoutil -w $dir .MSG_COUNT`,"\n";
+print `$bogoutil -w $dir .MSG_COUNT`,"\n";
 
 do { # Start force loop
   $runs++;
@@ -102,11 +106,11 @@ do { # Start force loop
       }
       if ($mail) {
         $hamcount++;
-        unless ($norepetitions && $trainedham{$hamcount}) {
-          open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
-          print TEMP $mail;
-          close (TEMP);
-          unless ((my $sh=sprintf("%s %8.6f",split(/\s/,`$bogofilter -T <$temp`)))=~/^H/) {
+        open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
+        print TEMP $mail;
+        close (TEMP);
+        unless ((my $sh=sprintf("%s %8.6f",split(/\s/,`$bogofilter -T <$temp`)))=~/^H/) {
+          unless ($norepetitions && $trainedham{$hamcount}) {
             system("$bogofilter -n <$temp");
             $hamadd++;
             $trainedham{$hamcount}++;
@@ -118,9 +122,9 @@ do { # Start force loop
               print TEMP $mail;
               close (TEMP);
             }
-          } else {print "$sh -- Not training ham message $hamcount.\n" if ($vverbose);}
-          unlink ($temp);
-        }
+          } else {print "$sh -- Skipping ham message $hamcount.\n" if ($verbose);}
+        } else {print "$sh -- Not training ham message $hamcount.\n" if ($vverbose);}
+        unlink ($temp);
       }
     }
 
@@ -134,11 +138,11 @@ do { # Start force loop
       }
       if ($mail) {
         $spamcount++;
-        unless ($norepetitions && $trainedspam{$spamcount}) {
-          open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
-          print TEMP $mail;
-          close (TEMP);
-          unless ((my $sh=sprintf("%s %8.6f",split(/\s/,`$bogofilter -T <$temp`)))=~/^S/) {
+        open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
+        print TEMP $mail;
+        close (TEMP);
+        unless ((my $sh=sprintf("%s %8.6f",split(/\s/,`$bogofilter -T <$temp`)))=~/^S/) {
+          unless ($norepetitions && $trainedspam{$spamcount}) {
             system("$bogofilter -s <$temp");
             $spamadd++;
             $trainedspam{$spamcount}++;
@@ -150,9 +154,9 @@ do { # Start force loop
               print TEMP $mail;
               close (TEMP);
             }
-          } else {print "$sh -- Not training spam message $spamcount.\n" if ($vverbose);}
-          unlink ($temp);
-        }
+          } else {print "$sh -- Skipping spam message $spamcount.\n" if ($verbose);}
+        } else {print "$sh -- Not training spam message $spamcount.\n" if ($vverbose);}
+        unlink ($temp);
       }
     }
 
@@ -163,10 +167,12 @@ do { # Start force loop
   print "\nEnd of run #$runs:\n";
   print "Read $hamcount ham mails and $spamcount spam mails.\n";
   print "Added $hamadd ham mail",$hamadd!=1&&"s"," and $spamadd spam mail",$spamadd!=1&&"s"," to the database.\n";
-  print `bogoutil -w $dir .MSG_COUNT`;
-  $fn=`cat $spam | $bogofilter -TM | grep -cv ^S`;
-  print "\nFalse negatives: $fn";
-  $fp=`cat $ham | $bogofilter -TM | grep -cv ^H`;
-  print "False positives: $fp\n";
+  print `$bogoutil -w $dir .MSG_COUNT`;
+  unless ($runs>1 && $hamadd+$spamadd==0) {
+    $fn=`cat $spam | $bogofilter -TM | grep -cv ^S`;
+    print "\nFalse negatives: $fn";
+    $fp=`cat $ham | $bogofilter -TM | grep -cv ^H`;
+    print "False positives: $fp\n";
+  }
 } until ($fn+$fp==0 || $hamadd+$spamadd==0 || !$force);
 print "\n$runs run",$runs>1&&"s"," needed to close off.\n" if ($force);
