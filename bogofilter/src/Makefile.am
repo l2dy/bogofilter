@@ -130,9 +130,8 @@ EXTRA_DIST = \
 	     version.sh \
 	     strlcat.3 strlcpy.3
 #
-VERSION_FROM=../configure.ac main.c bogofilter.c bogoutil.c lexer.c lexer_v3.l
-version.c:	version.sh $(VERSION_FROM)
-	$(srcdir)/version.sh $(srcdir) $(VERSION_FROM) >"$@" \
+version.c:	version.sh
+	$(srcdir)/version.sh $(top_srcdir) >"$@.new" && mv "$@.new" "$@" \
 	    || rm -f "$@"
 #
 directories.c: ../config.status
