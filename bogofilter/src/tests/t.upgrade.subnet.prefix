@@ -1,0 +1,72 @@
+#! /bin/sh
+
+. ${srcdir=.}/t.frame
+
+# test upgrading subnet tokens from "url:" to "ip:" prefix
+
+cat <<EOF > ${TMPDIR}/t.before.ref
+.MSG_COUNT 0 1
+test 0 1
+this 0 1
+url:127 0 1
+url:127.0 0 1
+url:127.0.0 0 1
+url:127.0.0.1 0 1
+url:192 0 1
+url:192.168 0 1
+url:192.168.3 0 1
+url:192.168.3.4 0 1
+EOF
+
+cat <<EOF > ${TMPDIR}/t.after.ref
+Upgrading wordlist.
+.MSG_COUNT 0 1
+.WORDLIST_VERSION 20040500 0
+ip:127 0 1
+ip:127.0 0 1
+ip:127.0.0 0 1
+ip:127.0.0.1 0 1
+ip:192 0 1
+ip:192.168 0 1
+ip:192.168.3 0 1
+ip:192.168.3.4 0 1
+test 0 1
+this 0 1
+EOF
+
+cat <<EOF > ${TMPDIR}/t.already.ref
+Wordlist has already been upgraded.
+.MSG_COUNT 0 1
+.WORDLIST_VERSION 20040500 0
+ip:127 0 1
+ip:127.0 0 1
+ip:127.0.0 0 1
+ip:127.0.0.1 0 1
+ip:192 0 1
+ip:192.168 0 1
+ip:192.168.3 0 1
+ip:192.168.3.4 0 1
+test 0 1
+this 0 1
+EOF
+
+WORDLIST="${TMPDIR}/wordlist.${DB_EXT}"
+
+echo this is a test 127.0.0.1 192.168.3.4 | $BOGOFILTER -d ${TMPDIR} -C -H -n --block_on_subnets=y -y 0
+
+$BOGOUTIL -D -d ${WORDLIST} >  ${TMPDIR}/t.before.out
+$BOGOUTIL -D -u ${WORDLIST} >> ${TMPDIR}/t.after.out
+$BOGOUTIL -D -d ${WORDLIST} >> ${TMPDIR}/t.after.out
+
+$BOGOUTIL -D -u ${WORDLIST} >> ${TMPDIR}/t.already.out
+$BOGOUTIL -D -d ${WORDLIST} >> ${TMPDIR}/t.already.out
+
+for i in ${TMPDIR}/*.ref ; do
+    j=`basename $i .ref`
+    if  [ $verbose -eq 0 ]; then
+	cmp $i ${TMPDIR}/$j.out
+    else
+	set +e
+	diff $DIFF_BRIEF $i ${TMPDIR}/$j.out
+    fi
+done
