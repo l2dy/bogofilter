@@ -5,9 +5,6 @@ set -e
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
 #	 bogodir.YYYYMMDD.  This is useful when something is different.
-#
-#	 bogodir.YYYYMMDD:
-#		tests   - directory containing individual output files
 
 : ${srcdir=.}
 relpath="`pwd`/../.."
