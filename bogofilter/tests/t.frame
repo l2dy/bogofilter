@@ -16,6 +16,7 @@ if [ -z "$RUN_FROM_MAKE" ] ; then
    TMPDIR="$NAME.$DATE"
    rm -rf $TMPDIR
    mkdir  $TMPDIR
+   SUPPRESS_DELETE="NO"
 else
 #   SUPPRESS_DELETE=NO
     while : ; do
@@ -26,10 +27,11 @@ else
 	sleep 1
     done
 fi
+
 if test "x$SUPPRESS_DELETE" = "x" ; then
     trap "rm -r -f core ${TMPDIR}" 0
 else
-    echo "clean up ${TMPDIR} after the test yourself"
+    echo "Results are in ${TMPDIR}.  Remove it after testing."
 fi
 
 BOGOFILTER_DIR=$TMPDIR
