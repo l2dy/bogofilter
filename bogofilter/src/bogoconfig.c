@@ -144,6 +144,7 @@ struct option long_options[] = {
     { "timestamp",			R, 0, O_TIMESTAMP },
     { "unsure_subject_tag",		R, 0, O_UNSURE_SUBJECT_TAG },
     { "user_config_file",		R, 0, O_USER_CONFIG_FILE },
+    { "wordlist",			R, 0, O_WORDLIST },
     { NULL,				0, 0, 0 }
 };
 
@@ -174,17 +175,6 @@ static char *get_string(const char *name, const char *arg)
     return s;
 }
 
-static void set_bogofilter_dir(const char *name, const char *arg, int precedence)
-{
-    char *dir = tildeexpand(arg, true);
-    if (DEBUG_CONFIG(2))
-	fprintf(dbgout, "%s -> '%s'\n", name, dir);
-    if (setup_wordlists(dir, precedence) != 0)
-	exit(EX_ERROR);
-    xfree(dir);
-    return;
-}
-
 void process_parameters(int argc, char **argv, bool warn_on_error)
 {
     bogotest = 0;
@@ -199,8 +189,8 @@ void process_parameters(int argc, char **argv, bool warn_on_error)
 
     /* directories from command line and config file are already handled */
 
-    if (setup_wordlists(NULL, PR_ENV_BOGO) != 0 &&
-	setup_wordlists(NULL, PR_ENV_HOME) != 0) {
+    if (set_wordlist_dir(NULL, PR_ENV_BOGO) != 0 &&
+	set_wordlist_dir(NULL, PR_ENV_HOME) != 0) {
 	fprintf(stderr, "Can't find HOME or BOGOFILTER_DIR in environment.\n");
 	exit(EX_ERROR);
     }
@@ -589,7 +579,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 
     case 'd':
 	if (pass != PASS_1_CLI)
-	    set_bogofilter_dir(WORDLIST, val, precedence);
+	    set_wordlist_dir(val, precedence);
 	break;
 
     case O_NS_ESF:
@@ -681,6 +671,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case O_THRESH_UPDATE:		get_double(name, val, &thresh_update);			break;
     case O_TIMESTAMP:			timestamp_tokens = get_bool(name, val);			break;
     case O_UNSURE_SUBJECT_TAG:		unsure_subject_tag = get_string(name, val);		break;
+    case O_WORDLIST:			configure_wordlist(val);				break;
     }
 }
 

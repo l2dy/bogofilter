@@ -9,6 +9,8 @@
 typedef void *dsh_t;
 #endif
 
+extern	bool	config_setup;
+
 typedef struct wordlist_s wordlist_t;
 struct wordlist_s
 {
@@ -18,6 +20,7 @@ struct wordlist_s
     /*@owned@*/ char *filepath;	/* resource path (for debug/verbose messages) */
     /*@owned@*/ dsh_t *dsh;	/* datastore handle */
     u_int32_t	msgcount[IX_SIZE];	/* count of messages in wordlist. */
+    char	type;		/* 'I' for "ignore" */
     bool	bad[IX_SIZE];
     int		override;
 };
@@ -26,10 +29,11 @@ struct wordlist_s
 extern wordlist_t *word_list;
 
 int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* path,
-		  bool sbad, bool gbad, int override);
+		  bool sbad, bool gbad, int override, char type);
 
 void free_wordlists(void);
-void set_default_wordlist(void);
-int  setup_wordlists(const char* dir, priority_t precedence);
 
+void set_default_wordlist(void);
+int  set_wordlist_dir(const char* dir, priority_t precedence);
+  
 #endif	/* WORDLISTS_CORE_H */

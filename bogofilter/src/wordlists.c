@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include "bogofilter.h"
+#include "bogohome.h"
 #include "datastore.h"
 #include "find_home.h"
 #include "msgcounts.h"
@@ -30,6 +31,9 @@ void open_wordlists(dbmode_t mode)
 {
     wordlist_t *list;
     int retry;
+
+    if (word_lists == NULL)
+	init_wordlist(&word_lists, "word", bogohome, true, false, 0, 'R');
 
     do {
 	ds_init();
@@ -74,9 +78,8 @@ void open_wordlists(dbmode_t mode)
 		ds_get_msgcounts(list->dsh, &val);
 		list->msgcount[IX_GOOD] = val.goodcount;
 		list->msgcount[IX_SPAM] = val.spamcount;
-		if (!ds_get_wordlist_version(list->dsh, &val))
-		    wordlist_version = 0;
-		else
+		if (wordlist_version == 0 &&
+		    ds_get_wordlist_version(list->dsh, &val))
 		    wordlist_version = val.count[0];
 	    } /* ds_open */
 	} /* for */
@@ -149,4 +152,63 @@ void compute_msg_counts(void)
 	g += list->msgcount[IX_GOOD];
     }
     set_msg_counts(g, s);
+}
+
+static char *spanword(char *p)
+{
+    const char *delim = ", \t";
+    p += strcspn(p, delim);		/* skip to end of word */
+    *p++ = '\0';
+    while (isspace((unsigned char)*p)) 	/* skip trailing whitespace */
+	p += 1;
+    return p;
+}
+
+/* type - 'n', or 'i' (normal or ignore)
+ * name - 'user', 'system', 'ignore', etc
+ * path - 'wordlist.db', 'ignorelist.db', etc
+ * override - 1,2,...
+ */
+
+/* returns true for success, false for error */
+bool configure_wordlist(const char *val)
+{
+    bool ok;
+    int rc;
+    wordlist_t* list = xcalloc(1, sizeof(wordlist_t));
+    char  type;
+    char* name;
+    char* path;
+    int  precedence;
+
+    char *tmp = xstrdup(val);
+    
+    type= toupper(tmp[0]);	/* save wordlist type (good/spam) */
+    tmp = spanword(tmp);
+    
+    if (type != 'R' && type != 'I')
+    {
+	fprintf( stderr, "Unknown wordlist type - '%c'\n", type);
+	return (false);
+    }
+    
+    name=tmp;			/* name of wordlist */
+    tmp = spanword(tmp);
+    
+    path=tmp;			/* path to wordlist */
+    tmp = spanword(tmp);
+    path=tildeexpand(path, true);
+    
+    precedence=atoi(tmp);
+    tmp = spanword(tmp);
+    
+    rc = init_wordlist(&list, name, path, true, false, precedence, type);
+    ok = rc == 0;
+
+    if (ok)
+	config_setup = true;
+
+    xfree(path);
+    
+    return ok;
 }

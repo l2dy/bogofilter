@@ -52,7 +52,8 @@ typedef enum longopts_e {
     O_THRESH_UPDATE,
     O_TIMESTAMP,
     O_UNSURE_SUBJECT_TAG,
-    O_USER_CONFIG_FILE
+    O_USER_CONFIG_FILE,
+    O_WORDLIST
 } longopts_t;
 
 /* Global variables */

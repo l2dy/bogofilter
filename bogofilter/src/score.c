@@ -103,7 +103,7 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 	}
 	return;
     }
-
+    
     for (list=word_lists; list != NULL; list=list->next)
     {
 	size_t i;
@@ -114,6 +114,9 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 
 	if (ds_read(list->dsh, token, &val) != 0)
 	    continue;			/* not found */
+
+	if (list->type == 'I')	/* if on ignore list */
+	    break;
 
 	override=list->override;
 
@@ -143,7 +146,7 @@ double msg_lookup_and_score(const word_t *token, wordcnts_t *cnts)
     if (cnts->bad == 0 && cnts->good == 0)
 	lookup(token, cnts);
 
-	prob = wordprob_result(cnts);
+    prob = wordprob_result(cnts);
 
     return prob;
 }
