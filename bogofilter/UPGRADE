@@ -3,6 +3,9 @@ What:
 This document explains how to upgrade bogofilter's wordlist files 
 from any earlier version to the current version.
 
+Note:  if you've never used a version of bogofilter older than 0.8,
+you don't need to use bogoupgrade.
+
 There are two possible upgrades paths:
 
 1. Delete current wordlist files and regenerate them from your email corpus.
@@ -16,7 +19,7 @@ There are two possible upgrades paths:
 Assumptions:
 
 Recent version of bogofilter package is installed and the programs
-/usr/bin/bogoutil and /usr/bin/bogoupgrade.pl exist. Adjust paths to suit your taste and system.
+/usr/bin/bogoutil and /usr/bin/bogoupgrade exist. Adjust paths to suit your taste and system.
 
 How:
 
@@ -32,13 +35,13 @@ How:
 
 3. If your bogofilter version is less than 0.7, say
    
-    $ /usr/bin/bogoupgrade.pl -b /usr/bin/bogoutil -i ~/.bogofilter.safe/goodlist -o  ~/.bogofilter/goodlist.db
-    $ /usr/bin/bogoupgrade.pl -b /usr/bin/bogoutil -i ~/.bogofilter.safe/badlist  -o  ~/.bogofilter/spamlist.db
+    $ /usr/bin/bogoupgrade -b /usr/bin/bogoutil -i ~/.bogofilter.safe/goodlist -o  ~/.bogofilter/goodlist.db
+    $ /usr/bin/bogoupgrade -b /usr/bin/bogoutil -i ~/.bogofilter.safe/badlist  -o  ~/.bogofilter/spamlist.db
 
    If your bogofilter version is 0.7 or greater, say
 
-    $ /usr/bin/bogoupgrade.pl -b /usr/bin/bogoutil -i ~/.bogofilter.safe/hamlist.count -o  ~/.bogofilter/goodlist.db
-    $ /usr/bin/bogoupgrade.pl -b /usr/bin/bogoutil -i ~/.bogofilter.safe/spamlist.count  -o  ~/.bogofilter/spamlist.db
+    $ /usr/bin/bogoupgrade -b /usr/bin/bogoutil -i ~/.bogofilter.safe/hamlist.count -o  ~/.bogofilter/goodlist.db
+    $ /usr/bin/bogoupgrade -b /usr/bin/bogoutil -i ~/.bogofilter.safe/spamlist.count  -o  ~/.bogofilter/spamlist.db
 
 4. Done. Restart any stopped daemons, cron tasks, etc.
 
