@@ -74,15 +74,17 @@ static reader_file_t get_filename;
 static void maildir_init(const char *name);
 static void maildir_fini(void);
 
+typedef enum st_e { IS_DIR, IS_FILE, IS_ERR } st_t;
+
 /* Function Definitions */
 
 /* Checks if name is a directory.
- * Returns 1 for directory, 0 for other type, -1 for error */
-static int isdir(const char *name)
+ * Returns IS_DIR for directory, IS_FILE for other type, IS_ERR for error */
+static st_t isdir(const char *name)
 {
     struct stat stat_buf;
-    if (stat(name, &stat_buf)) return -1;
-    return S_ISDIR(stat_buf.st_mode);
+    if (stat(name, &stat_buf)) return IS_ERR;
+    return (S_ISDIR(stat_buf.st_mode) != 0) ? IS_DIR : IS_FILE;
 }
 
 static const char* const maildir_subs[]={ "/new", "/cur", NULL };
@@ -94,27 +96,27 @@ static DIR *maildir_dir;
  * This function checks if dir, dir/new and dir/cur are all directories.
  * Returns 1 for "yes", 0 for "no" or -1 for "error"
  */
-static int ismaildir(const char *dir) {
-    int r;
+static st_t ismaildir(const char *dir) {
+    st_t r;
     size_t l;
     char *x;
     const char *const *y;
     const int maxlen = 4;
 
     r = isdir(dir);
-    if (r != 1) return r;
+    if (r != IS_DIR) return r;
     x = xmalloc((l = strlen(dir)) + maxlen /* append */ + 1 /* NUL */);
     memcpy(x, dir, l);
     for (y = maildir_subs; *y; y++) {
 	strlcpy(x + l, *y, maxlen + 1);
 	r = isdir(x);
-	if (r != 1) {
+	if (r != IS_DIR) {
 	    free(x);
 	    return r;
 	}
     }
     free(x);
-    return 1;
+    return IS_DIR;
 }
 
 static void dummy_fini(void) { }
@@ -164,16 +166,8 @@ static bool open_object(char *obj)
 	fclose(fpin);
 	fpin = NULL;
     }
-    if (ismaildir(filename) == 1) {
-	/* MAILDIR */
-	reader_getline = maildir_getline;
-	object_next_mail = maildir_next_mail;
-	maildir_init(filename);
-	return true;
-    } else if (isdir(filename) == 1) {
-	fprintf(stderr, "Can't identify type of object '%s'\n", filename);
-	return false;
-    } else {
+    switch (isdir(filename)) {
+    case IS_FILE:
 	if (DEBUG_READER(0))
 	    fprintf(dbgout, "%s:%d - assuming %s is a %s\n", __FILE__, __LINE__, filename, mbox_mode ? "mbox" : "mail");
 	fpin = fopen( filename, "r" );
@@ -182,12 +176,26 @@ static bool open_object(char *obj)
 		    strerror(errno));
 	    return false;
 	}
-	emptyline = false;
-	reader_getline = mbox_mode ? mailbox_getline : maildir_getline;
-	object_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
-	mail_first = true;
-	return true;
+	else {
+	    emptyline = false;
+	    reader_getline = mbox_mode ? mailbox_getline : maildir_getline;
+	    object_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
+	    mail_first = true;
+	    return true;
+	}
+    case IS_DIR:
+	if (ismaildir(filename) == IS_DIR) {
+	    /* MAILDIR */
+	    reader_getline = maildir_getline;
+	    object_next_mail = maildir_next_mail;
+	    maildir_init(filename);
+	    return true;
+	} 
+	/* fallthrough to error */
+    case IS_ERR:
+	fprintf(stderr, "Can't identify type of object '%s'\n", filename);
     }
+    return false;
 }
 
 /*** _next_mailstore functions ***********************************************/
