@@ -18,8 +18,8 @@
 		<arg choice="plain">-d</arg>
 		<arg choice="plain">-l</arg>
 		<arg choice="plain">-m</arg>
-		<arg choice="plain">-w
-		    <arg choice="opt">-p</arg></arg>
+		<arg choice="plain">-w</arg>
+		<arg choice="plain">-p</arg>
 	    </group>
 	    <arg choice="plain"><replaceable>file.db</replaceable></arg>
 	</cmdsynopsis>
@@ -89,7 +89,9 @@
 	    the values will be displayed.
 	</para>
 	<para>
-	    The <option>-p</option> option adds a column of probabilities to the output of the <option>-w</option> option.
+	    The <option>-p</option> option tells <application>bogoutil</application> 
+	    to display the value of one or more tokens in one or more databases and add a column of probabilities to the output.  
+	    Option <option>-p</option> takes the same arguments as option  <option>-w</option> .
 	</para>
 	<para>The <option>-R</option> option tells
 	    <application>bogoutil</application> to recalculate the ROBX
