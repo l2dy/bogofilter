@@ -4,6 +4,22 @@
 
 $Id$
 
+0.12.3	2003-05-10
+
+	* Modified bulk mode code to allow registering maildirs.
+	* Added options to return tokens from inside html tags.
+	  Switch '-Ht' and option "tokenize_html_tags" turn it on.
+	* Bogofilter's '-e' switch can now be used without '-p'.
+	* Added doc/integrating-with-postfix.
+	* Added bogofilter-faq-fr.html, a French translation of the FAQ.
+	* Revise description of verbose output in FAQ.
+	* Update man page documentation of bogofilter's switches.
+	* Added basic memory accounting and debug capability.
+	* Fixed memory leak in rstats.c
+	* Fixed defect in handling of folded spam header lines.
+	* Modified parsing so that yyredo() and yy_use_redo_text()
+	  are no longer needed.
+
 0.12.2	2003-04-30
 
 	* Corrected bulkmode problem processing messages without
