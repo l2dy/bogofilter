@@ -219,17 +219,19 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 	rstats_t *cur = rstats_array[r];
 	const char *token = cur->token;
 	int len = max(0, MAXTOKENLEN-(int)strlen(token));
-	double n = cur->good + cur->bad;
-	double pw = ((n < EPS)
+	double g = min(cur->good, msgs_good);
+	double b = min(cur->bad, msgs_bad);
+	double n = g + b;
+	double pw = ((n < EPS) 
 		     ? 0.0
-		     : (pw = (cur->bad / msgs_bad) /
-			(cur->bad / msgs_bad + cur->good / msgs_good)));
+		     : ((b / msgs_bad) /
+			(b / msgs_bad + g / msgs_good)));
 	double fw = (robs * robx + n * pw) / (robs + n);
 	char flag = (fabs(fw-EVEN_ODDS) - min_dev >= EPS) ? '+' : '-';
 
 	(void)fprintf(stdout, "\"%s\"%*s %5d  %8.6f  %8.6f  %8.6f%10.5f%10.5f %c\n",
 		      token, len, " ",
-		      (int)n, cur->good / msgs_good, cur->bad / msgs_bad, 
+		      (int)n, g / msgs_good, b / msgs_bad, 
 		      fw, log(1.0 - fw), log(fw), flag);
     }
 
