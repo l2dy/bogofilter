@@ -1,3 +1,4 @@
+/* register.c -- read input with collect and register to persistent db */
 /* $Id$ */
 
 #include <stdio.h>
@@ -19,11 +20,12 @@ int	max_repeats;
 extern char msg_register[];
 
 
-void register_words(run_t _run_type, wordhash_t *h,
-		    int msgcount, int wordcount)
-/* tokenize text on stdin and register it to  a specified list
+/*
+ * tokenize text on stdin and register it to a specified list
  * and possibly out of another list
  */
+void register_words(run_t _run_type, wordhash_t *h,
+		    int msgcount, int wordcount)
 {
   char ch = '\0';
   hashnode_t *node;
@@ -35,24 +37,24 @@ void register_words(run_t _run_type, wordhash_t *h,
 
   switch(_run_type)
   {
-  case REG_SPAM:		ch = 's' ;  break;
-  case REG_GOOD:		ch = 'n' ;  break;
-  case REG_GOOD_TO_SPAM:	ch = 'S' ;  break;
-  case REG_SPAM_TO_GOOD:	ch = 'N' ;  break;
-  default:			abort(); 
+    case REG_SPAM:		ch = 's' ;  break;
+    case REG_GOOD:		ch = 'n' ;  break;
+    case REG_GOOD_TO_SPAM:	ch = 'S' ;  break;
+    case REG_SPAM_TO_GOOD:	ch = 'N' ;  break;
+    default:			abort(); 
   }
 
   (void)sprintf(msg_register, "register-%c, %d words, %d messages\n", ch,
-	  wordcount, msgcount);
+		wordcount, msgcount);
 
   if (verbose)
     (void)fprintf(stderr, "# %d word%s, %d message%s\n", 
-	    wordcount, PLURAL(wordcount), msgcount, PLURAL(msgcount));
+		  wordcount, PLURAL(wordcount), msgcount, PLURAL(msgcount));
 
   good_list.active = spam_list.active = false;
 
   switch(_run_type)
-    {
+  {
     case REG_GOOD:
       incr_list = &good_list;
       break;
@@ -70,11 +72,10 @@ void register_words(run_t _run_type, wordhash_t *h,
       incr_list = &good_list;
       decr_list = &spam_list;
       break;
-     
+
     default:
-      (void)fprintf(stderr, "Error: Invalid run_type\n");
-      exit(2);      
-    }
+      abort();
+  }
 
   incr_list->active = true;
   if (decr_list)
@@ -87,7 +88,7 @@ void register_words(run_t _run_type, wordhash_t *h,
       list->msgcount = db_getcount(list->dbh);
     }
   }
- 
+
   incr_list->msgcount += msgcount;
 
   if (decr_list){
@@ -109,13 +110,16 @@ void register_words(run_t _run_type, wordhash_t *h,
       db_flush(list->dbh);
       if (verbose>1)
 	(void)fprintf(stderr, "bogofilter: %ld messages on the %s list\n",
-		list->msgcount, list->name);
+		      list->msgcount, list->name);
     }
   }
 
   db_lock_release_list(word_lists);
 }
 
+/* this function accumulates the word frequencies from the src hash to
+ * those of the dest hash
+ */
 static void add_hash(wordhash_t *dest, wordhash_t *src) {
     wordprop_t *d;
     hashnode_t *s;
@@ -126,6 +130,15 @@ static void add_hash(wordhash_t *dest, wordhash_t *src) {
     }
 }
 
+/* read messages from stdin and register according to _run_type.
+ *
+ * performance cheat: we use a per-message hash and a global hash. After
+ * each message, we accumulate the per-message frequencies in the global
+ * hash. This may look long-winded, but is actually fast because it
+ * saves us iterating over tokens with zero frequencies in the
+ * cap-and-accumulation phase. we save more than half of the execution
+ * time for big mbox inputs, when teaching bogofilter.
+ */
 void register_messages(run_t _run_type)
 {
   wordhash_t *h, *words = wordhash_init();
@@ -135,13 +148,12 @@ void register_messages(run_t _run_type)
   initialize_constants();
 
   do {
-      collect_words(&h, &wordcount, &cont);
-      add_hash(words, h);
-      wordhash_free(h);
-      msgcount++;
+    collect_words(&h, &wordcount, &cont);
+    add_hash(words, h);
+    wordhash_free(h);
+    msgcount++;
   } while(cont);
 
   register_words(_run_type, words, msgcount, wordcount);
   wordhash_free(words);
 }
-

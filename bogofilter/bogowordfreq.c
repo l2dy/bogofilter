@@ -1,3 +1,16 @@
+/* bogowordfreq.c -- program to count token frequency of stdin */
+/* (C) 2002 by Matthias Andree
+ * redistributable under the terms of the GNU General Public License v2
+ */
+
+/*
+ * This program parses the input and counts the frequency of the tokens
+ * found, and prints a total token count and the CAPPED token frequency.
+ * The maximum frequency defaults to 1 to match the recent change to the
+ * Robinson algorithm. It can be overriden by giving a positive integer
+ * argument on the command line.
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -10,7 +23,6 @@
 
 const char *spam_header_name = "X-Bogosity:"; /* unused */
 int passthrough = 0; /* unused */
-
 int max_repeats = 1;
 
 static void print_wordlist (wordhash_t *h)

@@ -1,3 +1,6 @@
+/* collect.c -- tokenize input and cap word frequencies, return a wordhash */
+/* $Id$ */
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -5,16 +8,14 @@
 
 #include "common.h"
 #include "bogofilter.h"
-#include "register.h"
-#include "collect.h"
 #include "wordhash.h"
-
-
 #include "lexer.h"
 
+#include "collect.h"
+
+/* this is referenced by register.c, must not be static */
 void wordprop_init(void *vwordprop){
 	wordprop_t *wordprop = vwordprop;
-
 	wordprop->freq = 0;
 }
 
@@ -25,14 +26,19 @@ void collect_reset(void)
     from_seen = false;
 }
 
+/* Tokenize input text and save words in the allocated wordhash_t hash table.
+ * The caller must free the returned wordhash.
+ *
+ * Sets *word_count to the count of total tokens seen if word_count 
+ * is non-NULL.
+ *
+ * Stores the freshly-allocated wordhash into *wh. wh must not be NULL.
+ *
+ * *cont is set to true if the EOF token has not been read. cont must
+ * not be NULL.
+ */
 void collect_words(/*@out@*/ wordhash_t **wh,
        /*@out@*/ /*@null@*/ long *word_count, /*@out@*/ bool *cont)
-    /* tokenize input text and save words in wordhash_t hash table 
-     * Sets word_count to the appropriate values
-     * if the pointer is non-NULL.
-     * wh and cont must not be NULL
-     * cont is set if further data is available.
-     */
 {
     long w_count = 0;
 

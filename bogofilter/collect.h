@@ -1,5 +1,10 @@
+/* collect.h -- global definitions for the collect library, part of bogofilter */
+/* $Id$ */
+
 #ifndef COLLECT_H
 #define COLLECT_H
+
+#include "wordhash.h"
 
 /* Represents the secondary data for a word key */
 typedef struct {
