@@ -8,6 +8,10 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.17 !
 
+0.17.4	2004-03-??
+
+* Fix message reporting lack of config file.
+
 0.17.?	2004-03-??
 
 * Added code to use to Berkeley DB Concurrent Data Store, which uses a
