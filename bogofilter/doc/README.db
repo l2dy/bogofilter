@@ -4,8 +4,8 @@ BERKELEY DB ENVIRONMENT CODE
 $Id$
 
 This document does not apply when you are installing a bogofilter
-version that has been configured to use the TDB or QDBM data base
-managers.
+version that has been configured to use the QDBM, SQLite3 or TDB
+database libraries.
 
 0. Definitions ---------------------------------------------------------
 
@@ -16,9 +16,26 @@ actual bogofilter data base directory.
 
 1. Overview ------------------------------------------------------------
 
-This bogofilter version has been upgraded so it can use the Berkeley
-DB Transactional Data Store to be able to recover a data base after
-an application or system crash.
+Operating bogofilter with a Berkeley DB back-end requires some
+attention. Bogofilter offers two operating modes that can be switched on
+or off a directory-by-directory basis:
+
+  - the traditional, simple Berkeley DB Data Store
+
+    easy to use, but also easy to corrupt, an interrupted registration
+    of spam or non-spam mail, an application crash, a system crash, a
+    disk that runs out of space, a user that runs out of quota.
+
+  - the Berkeley DB Transactional Data Store,
+    transactional, TXN or XA in bogofilter jargon for short
+
+    a bit more complex to use, but pretty crash-proof as long as it is
+    not abused. Upgrading bogofilter, Berkeley DB, copying around
+    databases and backups require special considerations given in this
+    document.
+
+Note that the system administrator can disable either mode of operation
+at compile time; in the default install, either will be present.
 
 2. Prerequisites and Caveats -------------------------------------------
 
@@ -45,12 +62,13 @@ versions, because the newer can detect data corruptions more reliably
 pages); Berkeley DB 4.2 and 4.3 appear a bit faster under load than 4.1
 and older versions.
 
-2.2 Upgrading from non-transactional releases of bogofilter (before 0.93)
+2.2.1 Upgrading to transactional databases, also from older bogofilter versions
 
 NOTE: for updates of Berkeley DB itself, see section 2.6!
 
 Bogofilter should transparently upgrade the existing data base to the
-new transactional data base.
+new transactional data base, but going the reverse way requires manual
+intervention, see section 2.2.2 below.
 
 For enhanced reliability (only available with Berkeley DB 4.1 or newer),
 it is recommended that you dump and reload the database once so that
@@ -60,7 +78,7 @@ versions 4.0 or older.  For 4.1 and newer, use these commands:
   cd ~/.bogofilter
   bogoutil -d wordlist.db > wordlist.txt
   mv wordlist.db wordlist.db.old
-  bogoutil -l wordlist.db < wordlist.txt
+  bogoutil --db-transaction=yes -l wordlist.db < wordlist.txt
 
 And if all commands succeeded: rm wordlist.txt wordlist.db.old
 
@@ -70,6 +88,17 @@ large enough, you may get errors and need to increase the lock table
 size, see section 3.2 and perhaps 4.2 when you see this problem.
 "bogoutil -d wordlist.db > /dev/null" can be used to check if the lock
 table size is sufficient, as it will access the whole data base.
+
+2.2.2 Downgrading to non-transactional database
+
+To downgrade a transactional database to a non-transactional, a
+dump/reload cycle is required. These commands should do the job:
+
+  cd ~/.bogofilter
+  bogoutil -d wordlist.db > wordlist.txt
+  mv wordlist.db wordlist.db.old
+  rm -f log.?????????? __db.???
+  bogoutil --db-transaction=no -l wordlist.db < wordlist.txt
 
 2.3 Recoverability
 
@@ -137,12 +166,15 @@ bogofilter to use a newer version, two things in the on-disk data format
 can change, generally speaking: the database format (we use the Btree
 access method), the log file format, or both.
 
-You need a "log file upgrade" if at least one of these conditions is
-true:
+You need a "log file upgrade" for your transactional databases if at
+least one of these conditions is true:
 
 - you upgraded Berkeley DB from a 3.X version to a 4.Y version
 - you upgraded Berkeley DB from 4.0 or 4.1 to 4.2 or 4.3
 - you upgraded Berkeley DB from 4.2 to 4.3.
+
+Non-transactional databases do not need log file format upgrades as they
+do not use log files.
 
 If you need a log file upgrade, the upgrade procedure is:
 (NOTE: DO NOT UPGRADE BERKELEY DB OR BOGOFILTER UNTIL STEP 4!)
@@ -168,64 +200,60 @@ or
 
 3.1 LOG FILE HANDLING
 
+This section only applies to transactional databases.
+
 The Berkeley DB Transactional Data Store uses log files to store data
 base changes so that they can be rolled back or restored after an
 application crash.
 
 The logs of the transactional data store, log.NNNNNNNNNN files of up to
 1 MB in size (in the default configuration), can consume considerable
-amounts of disk space and many users wish to purge or compress these log
-files. For the simple removal of log files that are no longer active,
-you can run 'bogoutil --db-prune ~/.bogofilter'. It will checkpoint the
-database (to make some more log files inactive) and then remove the
-inactive log files.
+amounts of disk space. Bogofilter therefore removes log files that are
+no longer part of active transactions by default.
 
-If you wish to keep and for instance compress (gzip) the log files, you
-can safely use Berkeley DB's db_checkpoint and db_archive utilities,
-which should be run in this order:
+This automatic removal of log files can be disabled by either using
+--db-log-autoremove=no on the command line, or by configuring
+db_log_autoremove=no in the configuration file.  If automatic removal is
+disabled, it can manually be triggered by running
+'bogoutil --db-prune ~/.bogofilter'.
 
-- First, use db_checkpoint. It migrates written-ahead data from the log files
-  into the data base, and places a checkpoint which will speed up data
-  base recovery, for instance after a premature bogofilter abort.
-
-- db_archive allows to identify log files that are no longer in use so
-  that you can compress or remove them.
-
-Note that if you plan to remove log files, you must make snapshot
-backups that contain both the *.db and log.* files (in this order!).
+Note that removing log files makes catastrophic recovery impossible
+without backups, so you *must* make snapshot
+backups that contain both the *.db and log.* files (in this order!). See
+section 2.5 for details.
 
 Referral: Berkeley DB's db_archive documentation contains suggestions
 for several backup strategies.
 
 3.2 LOCK TABLE EXHAUSTION
 
-One common failure case is known:
+This section only applies to transactional databases.
 
-Problem: Operations that affect large parts of the data base or the data
-	 base as a whole (bogoutil usually) may require many locks and
-	 exhaust the maximum number of locks or the maximum number of
-	 locked objects that the Berkeley DB environments support.
+Operations that affect large parts of the data base or the data base as
+a whole (bogoutil usually) may require many locks and exhaust the
+maximum number of locks or the maximum number of locked objects that the
+Berkeley DB environments support.
 
-Symptom: Operations abort with "out of memory" although the machine has
-	 plenty of RAM and/or swap.
+Exhaustion of the lock table can cause operations to abort with "out of
+memory" although the machine has plenty of memory. The cause can be
+natural database growth.
 
-	 Operations report lock or object table exhaustion and abort.
+This problem is recoverable, by simply resizing the lock tables. Just
+run "bf_resize ~/.bogofilter" and that's it.
+A future version of bogofilter may automate this process.
 
-Cause:	 Natural data base growth.
+This script will modify the ~/.bogofilter/DB_CONFIG file and run
+recovery to perform the resize.  It'll resize the lock and object tables
+to twice of what is currently in use.
 
-Fix:     Resize the lock tables. Just run "bf_resize ~/.bogofilter" and
-	 that's it. This script will modify the ~/.bogofilter/DB_CONFIG
-	 file and run recovery to perform the resize. It'll resize the
-	 lock and object tables to twice of what is currently in use.
+You may need to adjust these figures before applying larger training
+sets. You will need up to one lock per data base page and a bit of
+headroom for future training -- see section 4.2 below to determine the
+size of the data base and data base page. After changing these
+set_lk_max* lines in DB_CONFIG, run 'bogoutil --db-recover
+~/.bogofilter' to make the change effective.
 
-You may need to adjust these figures before larger updates or to conserve
-disk space. You will need up to one lock per data base page and a bit
-of headroom for future training -- see section 4.2 below to determine
-the size of the data base and data base page. After changing these
-set_lk_max* lines in DB_CONFIG, run 'bogoutil --db-recover ~/.bogofilter'
-to make the change effective.
-
-3.3 RECOVERY AND FAILED RECOVERY
+3.3 RECOVERY AND FAILED RECOVERY, FOR TRANSACTIONAL DATABASES ONLY
 
 The recovery procedures should be tried in the order shown in this
 section. If you aren't willing to experiment much, but have kept
@@ -291,9 +319,15 @@ methods have failed or were unavailable.
 
 To try this method:
 
-  db_dump -r ~/.bogofilter/wordlist.db > ~/.bogofilter/wordlist.txn
+  # salvage raw data
+  db_dump -r ~/.bogofilter/wordlist.db > ~/.bogofilter/wordlist.saved
   rm ~/.bogofilter/{__db.*,log.*,wordlist.db}
-  db_load ~/.bogofilter/wordlist.db < ~/.bogofilter/wordlist.txn
+  db_load ~/.bogofilter/wordlist.db < ~/.bogofilter/wordlist.saved
+  # convert to transactional store
+  bogoutil -d ~/.bogofilter/wordlist.db > ~/.bogofilter/wordlist.saved
+  rm ~/.bogofilter/{__db.*,log.*,wordlist.db}
+  bogoutil --db-transaction=yes -l ~/.bogofilter/wordlist.db \
+    < ~/.bogofilter/wordlist.saved
 
 3.3.5 No recovery possible?
 
@@ -307,14 +341,74 @@ First, remove the database and environment, type:
 Then retrain from scratch with the usual bogofilter -n and bogofilter -s
 commands.
 
+3.4 RECOVERY OF TRADITIONAL (NON-TRANSACTIONAL) DATABASES
+
+Non-transactional databases do not store data that could help with
+recovering data, so the recovery options are:
+
+3.4.1 Salvage raw data
+
+Note that your database may already have lost data, so this procedure
+may not recover everything that used to be in the database before the
+corruption happened.
+
+To try this, suspend mail delivery to your directory, run these
+commands:
+
+  db_dump -r ~/.bogofilter/wordlist.db > ~/.bogofilter/wordlist.saved
+  rm ~/.bogofilter/{__db.*,log.*,wordlist.db}
+  db_load ~/.bogofilter/wordlist.db < ~/.bogofilter/wordlist.saved
+
+and resume mail delivery.
+
+3.4.2 Restore from backup
+
+If the previous procedure has provided you with incomplete data, simply
+replace your wordlist.db file by the latest good copy that you have.
+
+3.4.3 Retrain from scratch
+
+If you don't have good backups and the procedure from 3.4.1 also failed,
+you have no other choice than to remove the wordlist.db file and redo
+the whole training process with the usual bogofilter -s and bogofilter
+-n commands.
+
+3.5 COPYING DATABASES
+
+If you intend to copy a transactional database, you MUST copy the *.db
+file(s) first and then the log.* files. Note that the database should
+NOT be subject to training while the copy is in progress, or automatic
+log file removal should be suspended while the copy is made.
+
+If you intend to copy a non-transactional database, you MUST NOT perform
+any training while the copy is in progress.
+
+Note that bogofilter's -u option can cause automatic training as mail
+arrives.
+
+If you need to copy the *.db files, DO NOT USE cp, BUT DO USE dd instead
+and give it a block size that matches the data base's block size, which
+can be found by running db_stat with -d option as shown in section 4.1
+below. Example: dd if=~/.bogofilter/wordlist.db bs=4096 of=/tmp/copy.db
+
+The reason is that some operating systems let their cp command use
+mmap() for efficiency without guaranteeing consistency of mmap() versus
+simultaneous write().
+
+A bf_copy script is provided for your convenience.
+
 4. Other Information of Interest ---------------------------------------
 
 4.1 GENERAL INFORMATION
 
-Berkeley DB keeps some additional statistics about locking, caching and
-their efficiency. These can be obtained by running the db_stat utility:
+Berkeley DB keeps some additional statistics about the database itself,
+and in transactional databases also about locking, caching, logging,
+transactions and their efficiency. These can be obtained by running the
+db_stat utility:
 
 db_stat -h ~/.bogofilter -d wordlist.db # data base statistics
+
+The following are only available in transactional mode:
 
 db_stat -h ~/.bogofilter -e # environment statistics
 db_stat -h ~/.bogofilter -c # lock statistics - needed for lock resizing
@@ -326,29 +420,23 @@ Note that statistics may disappear when the data base is recovered. They
 will reappear after running bogofilter and are the more reliable the
 more often bogofilter has been used since the last recovery.
 
-You MUST NOT remove files named __db.NNN and log.NNNNNNNNNN manually
+You MUST NOT manually remove files named __db.NNN and log.NNNNNNNNNN
 from the ~/.bogofilter directory.
+================================================
 REMOVING THESE FILES CAUSES DATABASE CORRUPTION!
-(there is one exception, see below)
-
+================================================
 These can contain update data for the data base that must be still
 written back to the wordlist.db file - this happens when there are many
 concurrent processes alongside a registration process.
 
-Exception: after reading the Berkeley DB documentation for the
-db_archive utility and using that utility, you may be able to remove
-the INACTIVE log.NNNNNNNNNN files, or use 'bogoutil --db-prune ...'.
-This may be necessary to reclaim disk space, but you must strictly
-adhere to the Berkeley DB documentation lest you risk your data base
-become unrecoverable in case of trouble.
+You can safely remove the __db.NNN files with the following command, but
+note that these will reappear when bogofilter or bogoutil is used:
 
-WARNING: If you need to copy data base files,
-	 DO NOT USE cp, BUT DO USE dd instead and give it a block size
-	 that matches the data base's block size, which can be found by
-	 running db_stat with -d option as shown above.
+  bogoutil --db-remove-environment ~/.bogofilter
 
-	 A bf_copy script is provided for your convenience, it can
-	 optionally omit the inactive log files from the copy.
+log.* files are removed automatically in the default configuration, the
+remaining ones must remain in place. For further information and on safe
+removal, see section 3.1.
 
 4.2 SPECIFIC INFORMATION ON RESIZING THE LOCK TABLES
 
@@ -399,9 +487,10 @@ the next time it is run.
 4.3 INTERESTING CONFIGURATION PARAMETERS FOR DB_CONFIG
 
 A "DB_CONFIG" file that is in your bogofilter home directory, usually
-~/.bogofilter, can be used to configure the data base behavior. Some
-options take effect immediately, some need 'bogoutil --db-recover' to
-become effective.
+~/.bogofilter, can be used to configure the data base behavior of
+transactional databases. Some options take effect immediately, some need
+'bogoutil --db-recover' to become effective. All options are ignored if
+the database in the same directory as DB_CONFIG is non-transactional.
 
 Here is a list of interesting settings, put one at a line, omitting the
 leading spaces and hyphen:
