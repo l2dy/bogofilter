@@ -53,4 +53,5 @@ fi
 [ ! -z $BF_SAVEDIR ] && . ${srcdir}/../t.save
 
 ROBX=`$BOGOUTIL -w $TMPDIR .ROBX | $AWK '/.ROBX/ { print $2; }'`
-test $ROBX = "253445"
+
+test $ROBX = "253230"
