@@ -29,7 +29,9 @@ THEORY:
 #include <string.h>
 #include <stddef.h>	/* for offsetof */
 
+#ifdef	ENABLE_DEPRECATED_CODE
 #include "degen.h"
+#endif
 #include "wordhash.h"
 #include "xmalloc.h"
 

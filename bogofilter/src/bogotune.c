@@ -52,7 +52,9 @@ AUTHOR:
 #include "bogoreader.h"
 #include "collect.h"
 #include "datastore.h"
+#ifdef	ENABLE_DEPRECATED_CODE
 #include "degen.h"
+#endif
 #include "fisher.h"
 #include "msgcounts.h"
 #include "mime.h"
