@@ -51,18 +51,6 @@ size_t	    cCombined = COUNTOF(aCombined);
 const char *aSeparate[] = { SPAMFILE, GOODFILE };
 size_t	    cSeparate = COUNTOF(aSeparate);
 
-void incr_wordlist_mode(void)
-{
-    switch (wl_mode) {
-    case WL_M_UNKNOWN:  wl_mode = WL_M_COMBINED; break;
-    case WL_M_COMBINED: wl_mode = WL_M_SEPARATE; break;
-    case WL_M_SEPARATE: 
-	fprintf(stderr, "Invalid -W option.\n");
-	exit(EX_ERROR);
-    }
-    return;
-}
-
 void open_wordlists(dbmode_t mode)
 {
     wordlist_t *list;
@@ -70,22 +58,12 @@ void open_wordlists(dbmode_t mode)
 
     do {
 	retry = 0;
-	for (list = word_lists; list != NULL; list = list->next) {
-	    if (wl_mode == WL_M_UNKNOWN)
-		set_wordlist_mode(list->filepath);
-	    switch (wl_mode) {
-	    case WL_M_COMBINED:
-		if (db_cachesize < 4)
-		    db_cachesize = 4;
-		list->dsh = ds_open(list->filepath, cCombined, aCombined, mode);
-		break;
-	    case WL_M_SEPARATE:
-		list->dsh = ds_open(list->filepath, cSeparate, aSeparate, mode);
-		break;
-	    case WL_M_UNKNOWN:
-		fprintf(stderr, "Invalid wordlist mode.\n");
-		exit(EX_ERROR);
-	    }
+	list = word_lists; 
+	{
+	    /* set_wordlist_mode(list->filepath); */
+	    if (db_cachesize < 4)
+		db_cachesize = 4;
+	    list->dsh = ds_open(list->filepath, cCombined, aCombined, mode);
 	    if (list->dsh == NULL) {
 		int err = errno;
 		close_wordlists(true); /* unlock and close */
@@ -99,14 +77,9 @@ void open_wordlists(dbmode_t mode)
 		    default:
 			if (query)	/* If "-Q", failure is OK */
 			    return;
-			if (wl_mode != WL_M_SEPARATE)
-			    fprintf(stderr,
-				    "Can't open file '%s' in directory '%s'.\n",
-				    aCombined[0], list->filepath);
-			else
-			    fprintf(stderr,
-				    "Can't open files '%s' and '%s' in directory '%s'.\n",
-				    aSeparate[0], aSeparate[1], list->filepath);
+			fprintf(stderr,
+				"Can't open file '%s' in directory '%s'.\n",
+				aCombined[0], list->filepath);
 			if (err != 0)
 			    fprintf(stderr,
 				    "error #%d - %s.\n", err, strerror(err));
@@ -129,33 +102,16 @@ void open_wordlists(dbmode_t mode)
 /** close all open word lists */
 void close_wordlists(bool nosync /** Normally false, if true, do not synchronize data. This should not be used in regular operation but only to ease the disk I/O load when the lock operation failed. */)
 {
-    wordlist_t *list;
-
-    for ( list = word_lists; list != NULL; list = list->next )
-    {
-	if (list->dsh) ds_close(list->dsh, nosync);
-	list->dsh = NULL;
-    }
+    if (word_lists)
+	if (word_lists->dsh)
+	    ds_close(word_lists->dsh, nosync);
 }
 
 size_t build_wordlist_paths(char **filepaths, const char *path)
 {
     bool ok;
-    size_t count = 0;
-    switch (wl_mode) {
-    case WL_M_COMBINED:
-	count = 1;
-	ok = build_path(filepaths[0], sizeof(FILEPATH), path, WORDLIST) == 0;
-	break;
-    case WL_M_SEPARATE:
-	count = 2;
-	ok = (build_path(filepaths[0], sizeof(FILEPATH), path, SPAMFILE) == 0 &&
-	      build_path(filepaths[1], sizeof(FILEPATH), path, GOODFILE) == 0);
-	break;
-    case WL_M_UNKNOWN:
-	fprintf(stderr, "Invalid wordlist mode.\n");
-	exit(EX_ERROR);
-    }
+    size_t count = 1;
+    ok = build_path(filepaths[0], sizeof(FILEPATH), path, WORDLIST) == 0;
     return count;
 }
 
@@ -178,6 +134,7 @@ static bool check_wordlist_paths(const char *path, size_t count, const char **na
     return true;
 }
 
+#if BROKEN
 void set_wordlist_mode(const char *filepath)
 {
     if (wl_mode != WL_M_UNKNOWN)
@@ -192,62 +149,17 @@ void set_wordlist_mode(const char *filepath)
 
     return;
 }
+#endif
 
 void set_good_weight(double weight)
 {
-    wordlist_t *list;
-
-    for ( list = word_lists; list != NULL; list = list->next )
-    {
-	list->weight[IX_GOOD] = weight;
-    }
-
-    return;
+    word_lists->weight[IX_GOOD] = weight;
 }
 
 void set_list_active_status(bool status)
 {
-    wordlist_t *list;
-
-    for ( list = word_lists; list != NULL; list = list->next )
-    {
-	list->active = status;
-    }
-
-    return;
+    word_lists->active = status;
 }
-
-#ifdef COMPILE_DEAD_CODE
-/* some sanity checking of lists is needed because we may
-   allow users to specify lists eventually and there are
-   opportunities to generate divide-by-zero exceptions or
-   follow bogus pointers. */
-static void sanitycheck_lists(void)
-{
-    wordlist_t* list=word_lists;
-    int listcount=0;
-
-    while(1) {
-	if (!list) break;
-	if (! list->name) {
-	    fprintf(stderr, "A list has no name.\n");
-	    exit(EX_ERROR);
-	}
-	if (list->msgcount==0) {
-	    fprintf(stderr, "list %s has zero message count.\n", list->name);
-	    exit(EX_ERROR);
-	}
-	listcount++;
-	list=list->next;
-    }
-    if (0==listcount) {
-	fprintf(stderr, "No wordlists available!\n");
-	exit(EX_ERROR);
-    }
-    if (DEBUG_WORDLIST(1))
-	fprintf(dbgout, "%d lists look OK.\n", listcount);
-}
-#endif
 
 static char *spanword(char *p)
 {
@@ -339,11 +251,6 @@ bool configure_wordlist(const char *val)
 
 void compute_msg_counts(void)
 {
-    wordlist_t* list;
-
-    for(list=word_lists; list != NULL; list=list->next)
-    {
-	msgs_bad  += list->msgcount[IX_SPAM];
-	msgs_good += list->msgcount[IX_GOOD];
-    }
+    msgs_bad  += word_lists->msgcount[IX_SPAM];
+    msgs_good += word_lists->msgcount[IX_GOOD];
 }

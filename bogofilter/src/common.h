@@ -122,10 +122,6 @@ typedef enum bulk_e {
     B_STDIN
 } bulk_t;
 
-typedef enum wl_e { WL_M_UNKNOWN ='U',
-		    WL_M_SEPARATE='S',
-		    WL_M_COMBINED='C' } wl_t;
-
 #include "globals.h"
 
 /* Represents the secondary data for a word key */

@@ -108,20 +108,15 @@ static double wordprob_result(wordprop_t* wordstats)
 
 static void lookup(const word_t *token, wordprop_t *wordstats)
 {
-    int override=0;
     wordlist_t* list;
 
-    for (list=word_lists; list != NULL; list=list->next)
+    list=word_lists;
     {
 	size_t i;
 	dsv_t val;
 
 	if (list->ignore)
 	    return;
-
-	if (override > list->override)
-	    break;
-	override=list->override;
 
 	ds_read(list->dsh, token, &val);
 

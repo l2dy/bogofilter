@@ -25,7 +25,7 @@ PARSING_TESTS = \
 	t.folded_rfc2047 \
 	t.degen
 
-WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest t.separate
+WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest
 
 SCORING_TESTS =  t.score1 t.score2 t.systest t.grftest
 

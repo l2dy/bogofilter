@@ -322,7 +322,7 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
     const char *head_format = !show_probability ? "%-30s %6s %6s\n"   : "%-30s %6s  %6s  %6s  %6s\n";
     const char *data_format = !show_probability ? "%-30s %6lu %6lu\n" : "%-30s %6lu  %6lu  %f  %f\n";
 
-    void *dsh;
+    void *dsh = NULL; /* quench compiler warning */
 
     struct stat sb;
 
@@ -342,7 +342,9 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 	    char filepath2[PATH_LEN];
 	    char *filepaths[IX_SIZE];
 
+#if BROKEN
 	    set_wordlist_mode(path);
+#endif
 	    filepaths[0] = filepath1;
 	    filepaths[1] = filepath2;
 	
@@ -635,9 +637,11 @@ static int process_args(int argc, char **argv)
 	    print_version();
 	    exit(EX_OK);
 
+#if BROKEN
 	case 'W':
 	    incr_wordlist_mode();
 	    break;
+#endif
 
 	case 'x':
 	    set_debug_mask( (char *) optarg );

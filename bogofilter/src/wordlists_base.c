@@ -7,11 +7,6 @@
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-/* Default wordlist mode is now wordlist.db -
-   a single wordlist containing ham and spam tokens */
-wl_t	wl_default = WL_M_COMBINED;
-wl_t	wl_mode    = WL_M_UNKNOWN;	/* '-W' flag */
-
 wordlist_t *word_list;
 /*@null@*/ wordlist_t* word_lists=NULL;
 
@@ -41,26 +36,9 @@ int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const char* pat
 
     if (! word_lists) {
 	word_lists=n;
-	n->next=NULL;
 	return 0;
     }
-    list_ptr=word_lists;
-
-    /* put lists with high override numbers at the front. */
-    while(1) {
-	if (list_ptr->override < override) {
-	    word_lists=n;
-	    n->next=list_ptr;
-	    break;
-        }
-        if (! list_ptr->next) {
-	    /* end of list */
-	    list_ptr->next=n;
-	    n->next=NULL;
-	    break;
-	}
-	list_ptr=list_ptr->next;
-    }
+    abort();
     return 0;
 }
 
@@ -126,13 +104,12 @@ int setup_wordlists(const char* d, priority_t precedence)
 
 void free_wordlists(void)
 {
-    wordlist_t *list, *next;
+    wordlist_t *list;
 
-    for ( list = word_lists; list != NULL; list = next )
+    list = word_lists;
     {
 	xfree(list->filename);
 	xfree(list->filepath);
-	next = list->next;
 	xfree(list);
     }
     word_lists = NULL;

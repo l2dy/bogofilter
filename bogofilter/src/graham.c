@@ -207,21 +207,16 @@ static double compute_probability(const word_t *token)
     int override=0;
     double prob;
     int totalcount=0;
+    int   i;
+    dsv_t val;
 
     wordprob_t wordstats;
 
     wordprob_init(&wordstats);
 
-    for (list=word_lists; list != NULL ; list=list->next)
-    {
-	int   i;
-	dsv_t val;
-	if (override > list->override)
-	    break;
-	ds_read(list->dsh, token, &val);
-	if (val.count[0] == 0 && val.count[1] == 0)
-	    continue;
-
+    list=word_lists;
+    ds_read(list->dsh, token, &val);
+    if (!(val.count[0] == 0 && val.count[1] == 0)) {
 	if (list->ignore)
 	    return EVEN_ODDS;
 	override=list->override;
@@ -232,7 +227,7 @@ static double compute_probability(const word_t *token)
 	    prob /= list->msgcount[i];
 	    prob *= list->weight[i];
 	    prob = min(1.0, prob);
-	    
+
 	    wordprob_add(&wordstats, prob, list->bad[i]);
 	}
     }
