@@ -19,6 +19,8 @@ extern bool replace_nonascii_characters;
 extern byte charset_table[256];
 extern byte casefold_table[256];
 extern void got_charset(const char *);
+extern void set_charset(const char *charset);
 extern void init_charset_table(const char *charset_name, bool use_default);
+extern int  htmlUNICODE_decode(byte *buf, int len);
 
-#endif	/* CHARSET_H */
+#endif /* CHARSET_H */

@@ -21,6 +21,11 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-01-02
+
+	* Initial support for Russian character sets (thanks to Evgeny
+          Kotsuba).
+
 	2004-12-30
 
 	* Bogolexer man page:  replaced incorrect references to

@@ -217,6 +217,24 @@ AC_ARG_ENABLE(spam-header-name,
 	[Use specified header name instead of X-Bogosity])
 )
 
+dnl Allow the user to enable Russian language support
+
+AC_ARG_ENABLE(russian,
+	AC_HELP_STRING([--enable-russian],
+	[Enable Russian language support]),
+	if test "$enableval" = no; then
+		[USE_CP866=NO]
+	else
+		[USE_CP866=YES]
+	fi
+)
+
+dnl Enable building with Russian language support.
+if test x$USE_CP866 = xYES ; then
+	AC_DEFINE(CP866,1,
+	[Enable Russian language support])
+fi
+
 dnl Allow the user to enable memory usage debugging methods
 
 AC_ARG_ENABLE(memdebug,

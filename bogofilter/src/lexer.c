@@ -71,19 +71,19 @@ static void lexer_display_buffer(buff_t *buff)
 	    (long)(buff->t.leng - buff->read));
     buff_puts(buff, 0, dbgout);
     if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
-	fputc('\n', dbgout);
+       fputc('\n', dbgout);
 }
 
-/* Check for lines wholly composed of printable characters as they can cause a scanner abort 
+/* Check for lines wholly composed of printable characters as they can cause a scanner abort
    "input buffer overflow, can't enlarge buffer because scanner uses REJECT"
 */
 static bool not_long_token(byte *buf, uint count)
 {
     uint i;
     for (i=0; i < count; i += 1) {
-	byte c = buf[i];
-	if ((iscntrl(c) || isspace(c) || ispunct(c)) && (c != '_'))
-	    return true;
+       byte c = buf[i];
+       if ((iscntrl(c) || isspace(c) || ispunct(c)) && (c != '_'))
+	   return true;
     }
     return false;
 }
@@ -95,19 +95,19 @@ static int yy_get_new_line(buff_t *buff)
 
     static size_t hdrlen = 0;
     if (hdrlen==0)
-	hdrlen=strlen(spam_header_name);
+       hdrlen=strlen(spam_header_name);
 
     if (count > 0)
-	yylineno += 1;
+       yylineno += 1;
 
     if (count == EOF) {
-	if (fpin == NULL || !ferror(fpin)) {
-	    return YY_NULL;
-	}
-	else {
-	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
-	    exit(EX_ERROR);
-	}
+       if (fpin == NULL || !ferror(fpin)) {
+	   return YY_NULL;
+       }
+       else {
+	   print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
+	   exit(EX_ERROR);
+       }
     }
 
     /* Mime header check needs to be performed on raw input
@@ -115,21 +115,21 @@ static int yy_get_new_line(buff_t *buff)
     ** "fatal flex scanner internal error--end of buffer missed" */
 
     if (buff->t.leng > 2 &&
-	buf[0] == '-' && buf[1] == '-' &&
-	got_mime_boundary(&buff->t)) {
-	yy_set_state_initial();
+       buf[0] == '-' && buf[1] == '-' &&
+       got_mime_boundary(&buff->t)) {
+       yy_set_state_initial();
     }
 
     if (count >= 0 && DEBUG_LEXER(0))
-	lexer_display_buffer(buff);
-    
+       lexer_display_buffer(buff);
+
     /* skip spam_header ("X-Bogosity:") lines */
     while (msg_header
 	   && count != EOF
-	   /* don't skip if inside message/rfc822 */
+/* don't skip if inside message/rfc822 */
 	   && msg_state == msg_state->parent
 	   && memcmp(buff->t.text,spam_header_name,hdrlen) == 0) {
-	count = skip_folded_line(buff);
+       count = skip_folded_line(buff);
     }
 
     /* Also, save the text on a linked list of lines.
@@ -138,7 +138,7 @@ static int yy_get_new_line(buff_t *buff)
      * than one of these. */
 
     if (passthrough && passmode == PASS_MEM && count > 0)
-	textblock_add(buff->t.text+buff->read, (size_t) count);
+       textblock_add(buff->t.text+buff->read, (size_t) count);
 
     return count;
 }
@@ -150,12 +150,12 @@ static int get_decoded_line(buff_t *buff)
     int count = yy_get_new_line(buff);
 
     if (count == EOF) {
-	if ( !ferror(fpin)) 
-	    return YY_NULL;
-	else {
-	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
-	    exit(EX_ERROR);
-	}
+       if ( !ferror(fpin))
+	   return YY_NULL;
+       else {
+	   print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
+	   exit(EX_ERROR);
+       }
     }
 
 #ifdef EXCESSIVE_DEBUG
@@ -167,29 +167,29 @@ static int get_decoded_line(buff_t *buff)
 
     if ( !msg_header && msg_state->mime_type != MIME_TYPE_UNKNOWN)
     {
-	word_t line;
-	uint decoded_count;
-        line.leng = (uint) (buff->t.leng - used);
-	line.text = buff->t.text + used;
+       word_t line;
+       uint decoded_count;
+       line.leng = (uint) (buff->t.leng - used);
+       line.text = buff->t.text + used;
 
-	decoded_count = mime_decode(&line);
-	/*change buffer size only if the decoding worked */
-	if (decoded_count != 0 && decoded_count < (uint) count) {
-	    buff->t.leng -= (uint) (count - decoded_count);
-	    count = (int) decoded_count;
-	    if (DEBUG_LEXER(1)) 
-		lexer_display_buffer(buff);
-	}
+       decoded_count = mime_decode(&line);
+       /*change buffer size only if the decoding worked */
+       if (decoded_count != 0 && decoded_count < (uint) count) {
+	   buff->t.leng -= (uint) (count - decoded_count);
+	   count = (int) decoded_count;
+	   if (DEBUG_LEXER(1))
+	       lexer_display_buffer(buff);
+       }
     }
 
     /* CRLF -> NL */
     if (count >= 2 && memcmp(buf + count - 2, CRLF, 2) == 0) {
-	count --;
-	*(buf + count - 1) = (byte) '\n';
+       count --;
+       *(buf + count - 1) = (byte) '\n';
     }
 
-    if (buff->t.leng < buff->size)	/* for easier debugging - removable */
-	Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
+    if (buff->t.leng < buff->size)     /* for easier debugging - removable */
+       Z(buff->t.text[buff->t.leng]);  /* for easier debugging - removable */
 
     return count;
 }
@@ -197,15 +197,15 @@ static int get_decoded_line(buff_t *buff)
 static int skip_folded_line(buff_t *buff)
 {
     for(;;) {
-	int count;
-	buff->t.leng = 0;
-	count = reader_getline(buff);
-	yylineno += 1;
-	if (!isspace(buff->t.text[0])) 
-	    return count;
-	/* Check for empty line which terminates message header */
-	if (is_eol((char *)buff->t.text, count))
-	    return count;
+       int count;
+       buff->t.leng = 0;
+       count = reader_getline(buff);
+       yylineno += 1;
+       if (!isspace(buff->t.text[0]))
+	   return count;
+       /* Check for empty line which terminates message header */
+       if (is_eol((char *)buff->t.text, count))
+	   return count;
     }
 
 /*    return EOF; */
@@ -219,12 +219,12 @@ int buff_fill(buff_t *buff, size_t used, size_t need)
 
     /* check bytes needed vs. bytes in buff */
     while (size - leng > 2 && need > leng - used) {
-	/* too few, read more */
-	int add = get_decoded_line(buff);
-	if (add == EOF) return EOF;
-	if (add == 0) break ;
-	cnt += add;
-	leng += add;
+       /* too few, read more */
+       int add = get_decoded_line(buff);
+       if (add == EOF) return EOF;
+       if (add == 0) break ;
+       cnt += add;
+       leng += add;
     }
     return cnt;
 }
@@ -234,7 +234,7 @@ void yyinit(void)
     yylineno = 0;
 
     if ( !msg_count_file)
-	lexer = &v3_lexer;
+       lexer = &v3_lexer;
 }
 
 int yyinput(byte *buf, size_t used, size_t size)
@@ -255,39 +255,51 @@ int yyinput(byte *buf, size_t used, size_t size)
 
     while ((cnt = get_decoded_line(&buff)) != 0) {
 
-	/* Note: some malformed messages can cause xfgetsl() to report
-	** "Invalid buffer size, exiting."  ** and then abort.  This
-	** can happen when the parser is in html mode and there's a
-	** leading '<' but no closing '>'.
-	**
-	** The "fix" is to check for a nearly full lexer buffer and
-	** discard most of it.
-	*/
-	bool nearly_full = used > 1000 && used > size * 10;
+       /* Note: some malformed messages can cause xfgetsl() to report
+       ** "Invalid buffer size, exiting."  ** and then abort.  This
+       ** can happen when the parser is in html mode and there's a
+       ** leading '<' but no closing '>'.
+       **
+       ** The "fix" is to check for a nearly full lexer buffer and
+       ** discard most of it.
+       */
+       bool nearly_full = used > 1000 && used > size * 10;
 
-	count += cnt;
+       count += cnt;
 
-	if ((count <= (MAXTOKENLEN * 3 / 2)) || not_long_token(buff.t.text, (uint) count))
-	    if (!nearly_full)
-		break;
+       if ((count <= (MAXTOKENLEN * 3 / 2)) || not_long_token(buff.t.text, (uint) count))
+	   if (!nearly_full)
+	       break;
 
-	if (count >= MAXTOKENLEN * 2) {
-	    size_t shift = count - MAXTOKENLEN;
-	    memmove(buff.t.text, buff.t.text + shift, MAXTOKENLEN+D);
-	    count = MAXTOKENLEN;
-	    buff.t.leng = MAXTOKENLEN;
-	}
+       if (count >= MAXTOKENLEN * 2) {
+	   size_t shift = count - MAXTOKENLEN;
+	   memmove(buff.t.text, buff.t.text + shift, MAXTOKENLEN+D);
+	   count = MAXTOKENLEN;
+	   buff.t.leng = MAXTOKENLEN;
+       }
 
-	if (nearly_full)
-	    break;
+       if (nearly_full)
+	   break;
     }
 
+//extern mime_t *msg_state;
+  if(msg_state)
+  {  if(msg_state->mime_disposition)
+     {  if(msg_state->mime_type == MIME_APPLICATION ||  msg_state->mime_type == MIME_IMAGE)
+	 return (count == EOF ? 0 : count);   //not decode at all
+     }
+  }
+
+//EK decoding things like &#1084 and charset_table;
+#ifdef	CH66
+    count = htmlUNICODE_decode(buf, count);
+#else
     for (i = 0; i < count; i++ )
     {
 	byte ch = buf[i];
 	buf[i] = charset_table[ch];
     }
-
+#endif
     return (count == EOF ? 0 : count);
 }
 
@@ -300,79 +312,79 @@ size_t text_decode(word_t *w)
     uint size = (uint) (txt - beg);				/* output offset */
 
     if (txt == NULL)
-	return w->leng;
+       return w->leng;
 
     while (txt < fin) {
-	word_t n;
-	byte *typ, *tmp, *end;
-	uint len;
-	bool adjacent;
+       word_t n;
+       byte *typ, *tmp, *end;
+       uint len;
+       bool adjacent;
 
-	typ = (byte *) memchr((char *)txt+2, '?', fin-(txt+2));	/* Encoding type - 'B' or 'Q' */
-	tmp = typ + 3;						/* start of encoded word */
-	end = (byte *) memstr((char *)tmp, fin-tmp, "?=");	/* last byte of encoded word  */
-	len = end - tmp;
+       typ = (byte *) memchr((char *)txt+2, '?', fin-(txt+2));	/* Encoding type - 'B' or 'Q' */
+       tmp = typ + 3;						/* start of encoded word */
+       end = (byte *) memstr((char *)tmp, fin-tmp, "?=");	/* last byte of encoded word  */
+       len = end - tmp;
 
-	n.text = tmp;				/* Start of encoded word */
-	n.leng = len;				/* Length of encoded word */
+       n.text = tmp;				/* Start of encoded word */
+       n.leng = len;				/* Length of encoded word */
 
-	if (DEBUG_LEXER(2)) {
-	    fputs("***  ", dbgout);
-	    word_puts(&n, 0, dbgout);
-	    fputs("\n", dbgout);
-	}
+       if (DEBUG_LEXER(2)) {
+           fputs("***  ", dbgout);
+           word_puts(&n, 0, dbgout);
+           fputs("\n", dbgout);
+       }
 
-	switch (tolower(typ[1])) {		/* ... encoding type */
-	case 'b':
-	    if (base64_validate(&n))
-		len = base64_decode(&n);	/* decode base64 */
-	    break;
-	case 'q':
-	    if (qp_validate(&n, RFC2047))
-		len = qp_decode(&n, RFC2047);	/* decode quoted-printable */
-	    break;
-	}
+       switch (tolower(typ[1])) {		/* ... encoding type */
+       case 'b':
+           if (base64_validate(&n))
+               len = base64_decode(&n);		/* decode base64 */
+           break;
+       case 'q':
+           if (qp_validate(&n, RFC2047))
+               len = qp_decode(&n, RFC2047);	/* decode quoted-printable */
+           break;
+       }
 
-	n.leng = len;
+       n.leng = len;
 
-	if (DEBUG_LEXER(3)) {
-	    fputs("***  ", dbgout);
-	    word_puts(&n, 0, dbgout);
-	    fputs("\n", dbgout);
-	}
+       if (DEBUG_LEXER(3)) {
+           fputs("***  ", dbgout);
+           word_puts(&n, 0, dbgout);
+           fputs("\n", dbgout);
+       }
 
-	/* move decoded word to where the encoded used to be */
-	memmove(beg+size, n.text, len+1);
-	size += len;	/* bump output pointer */
-	txt = end + 2;	/* skip ?= trailer */
-	if (txt >= fin)
-	    break;
+       /* move decoded word to where the encoded used to be */
+       memmove(beg+size, n.text, len+1);
+       size += len;	/* bump output pointer */
+       txt = end + 2;	/* skip ?= trailer */
+       if (txt >= fin)
+           break;
 
-	/* check for next encoded word */
-	end = (byte *) memstr((char *)txt, fin-txt, "=?");
-	adjacent = end != NULL;
+       /* check for next encoded word */
+       end = (byte *) memstr((char *)txt, fin-txt, "=?");
+       adjacent = end != NULL;
 
-	/* clear adjacent flag if non-whitespace character found between
-	 * adjacent encoded words */
-	if (adjacent) {
-	    tmp = txt;
-	    while (adjacent && tmp < end) {
-		if (isspace(*tmp))
-		    tmp += 1;
-		else
-		    adjacent = false;
-	    }
-	}
+       /* clear adjacent flag if non-whitespace character found between
+        * adjacent encoded words */
+       if (adjacent) {
+           tmp = txt;
+           while (adjacent && tmp < end) {
+               if (isspace(*tmp))
+                   tmp += 1;
+               else
+                   adjacent = false;
+           }
+       }
 
-	/* we have a next encoded word and we've had only whitespace
-	 * between the current and the next */
-	if (adjacent)
-	    /* just skip whitespace */
-	    txt = end;
-	else
-	    /* copy everything that was between the encoded words */
-	    while (txt < end)
-		beg[size++] = *txt++;
+       /* we have a next encoded word and we've had only whitespace
+        * between the current and the next */
+       if (adjacent)
+           /* just skip whitespace */
+           txt = end;
+       else
+           /* copy everything that was between the encoded words */
+           while (txt < end)
+               beg[size++] = *txt++;
     }
 
     return size;

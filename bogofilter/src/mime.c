@@ -9,7 +9,7 @@ NOTES:
 
     RFC2045:
 
-       Header fields occur in at least two contexts:
+	Header fields occur in at least two contexts:
 
 	(1)   As part of a regular RFC 822 message header.
 
@@ -122,7 +122,7 @@ static void mime_stack_dump(void)
     if (stackp < 0)
 	fprintf(dbgout, "**** empty\n");
     else
-	for (i = 0; i <= stackp; i++) 
+	for (i = 0; i <= stackp; i++)
 	    fprintf(dbgout, "**** %3d type %d enc %d bnd %s chr %s\n",
 		    i,
 		    msg_stack[i].mime_type,
@@ -395,10 +395,9 @@ void mime_content(word_t * text)
 static void mime_disposition(word_t * text)
 {
     size_t i;
-    size_t l;
+    const size_t l = sizeof("Content-Disposition:");
     char *w;
 
-    l = strlen("Content-Disposition:");
     w = (char *) getword(text->text + l, text->text + text->leng);
 
     if (!w)
@@ -436,10 +435,10 @@ static void mime_disposition(word_t * text)
 static void mime_encoding(word_t * text)
 {
     size_t i;
-    size_t l;
+const size_t l =  sizeof("Content-Transfer-Encoding:") - 1;
     char *w;
 
-    l = strlen("Content-Transfer-Encoding:");
+//    l = strlen("Content-Transfer-Encoding:");
     w = (char *) getword(text->text + l, text->text + text->leng);
 
     if (!w)
@@ -464,11 +463,10 @@ static void mime_encoding(word_t * text)
 
 static void mime_type(word_t * text)
 {
-    size_t l;
+    const size_t l = sizeof("Content-Type:");
     char *w;
     struct type_s *typ;
 
-    l = strlen("Content-Type:");
     w = (char *) getword(text->text + l, text->text + text->leng);
 
     if (!w)
@@ -508,6 +506,51 @@ static void mime_type(word_t * text)
 	/* XXX: read boundary */
 	return;
     }
+    return;
+}
+
+void mime_type2(word_t * text)
+{
+    char *w = text->text;
+    struct type_s *typ;
+
+    if (!w)
+	return;
+
+    msg_state->mime_type = MIME_TYPE_UNKNOWN;
+    for (typ = mime_type_table;
+	 typ < mime_type_table + COUNTOF(mime_type_table); typ += 1) {
+	if (strncasecmp(w, typ->name, typ->len) == 0) {
+	    msg_state->mime_type = typ->type;
+	    if (DEBUG_MIME(1) || DEBUG_LEXER(1))
+		fprintf(dbgout, "*** mime_type: %s\n", text->text);
+	    break;
+	}
+    }
+    if (DEBUG_MIME(0) && msg_state->mime_type == MIME_TYPE_UNKNOWN)
+	fprintf(stderr, "Unknown mime type - '%s'\n", w);
+#if	0
+    switch (msg_state->mime_type) {
+    case MIME_TEXT:
+    case MIME_TEXT_HTML:
+    case MIME_TEXT_PLAIN:
+	/* XXX: read charset */
+	return;
+    case MIME_TYPE_UNKNOWN:
+	return;
+    case MIME_MULTIPART:
+	return;
+    case MIME_MESSAGE:
+	/* XXX: read boundary */
+	return;
+    case MIME_APPLICATION:
+	/* XXX: read boundary */
+	return;
+    case MIME_IMAGE:
+	/* XXX: read boundary */
+	return;
+    }
+#endif
     return;
 }
 

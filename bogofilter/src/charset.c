@@ -26,6 +26,7 @@ AUTHOR:
 #include <string.h>
 
 #include "charset.h"
+#include "chUnicodeTo866.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
 
@@ -44,7 +45,9 @@ static void map_iso_8859_1(void);
 static void map_iso_8859_2(void);
 static void map_iso_8859_3(void);
 static void map_iso_8859_4(void);
+#ifndef	CP866
 static void map_iso_8859_5(void);
+#endif
 static void map_iso_8859_6(void);
 static void map_iso_8859_7(void);
 static void map_iso_8859_8(void);
@@ -161,10 +164,12 @@ static void map_iso_8859_4(void)	/* ISOIEC 8859-4:1998 Latin Alphabet No. 4 */
     /* Not yet implemented */
 }
 
+#ifndef	CP866
 static void map_iso_8859_5(void)	/* ISOIEC 8859-5:1999 LatinCyrillic Alphabet */
 {
     /* Not yet implemented */
 }
+#endif
 
 static void map_iso_8859_6(void)	/* ISOIEC 8859-6:1999 LatinArabic Alphabet */
 {
@@ -247,7 +252,7 @@ static unsigned char xlate_us[] = {
     0xAE, ' ',	/* registered sign     to space        */
 };
 
-/* For us-ascii, 
+/* For us-ascii,
 ** first do the iso-8859-1 setup
 ** then addin special characters.
 */
@@ -266,12 +271,12 @@ static void map_unicode(void)
 
 static void map_windows_1251(void)
 {
-#ifdef	WINDOWS_1251_to_CYRILLIC
+#ifdef	CP866
     /* Map:  windows-1251 -> KOI8-R (Cyrillic) */
     /* Contributed by: Yar Tikhiy (yarq@users.sourceforge.net) */
     static char xlate_1251[] = {
-	0xA8, 0xB3,	
-	0xB8, 0xA3,	
+	0xA8, 0xB3,
+	0xB8, 0xA3,
 	0xE0, 0xC1,  0xE1, 0xC2,  0xE2, 0xD7,  0xE3, 0xC7,  0xE4, 0xC4,  0xE5, 0xC5,  0xE6, 0xD6,  0xE7, 0xDA,
 	0xE8, 0xC9,  0xE9, 0xCA,  0xEA, 0xCB,  0xEB, 0xCC,  0xEC, 0xCD,  0xED, 0xCE,  0xEE, 0xCF,  0xEF, 0xD0,
 	0xF0, 0xD2,  0xF1, 0xD3,  0xF2, 0xD4,  0xF3, 0xD5,  0xF4, 0xC6,  0xF5, 0xC8,  0xF6, 0xC3,  0xF7, 0xDE,
@@ -284,6 +289,98 @@ static void map_windows_1251(void)
     map_xlate_characters( xlate_1251, COUNTOF(xlate_1251) );
 #endif
 }
+
+#ifdef	CP866
+static void map_windows_1251_to_cp866(void)
+{
+    static byte cp1251_to_cp866[] = {
+/*Win-CP1251*/
+	192, '€',  208, '',  224, ' ',  240, 'à',
+	193, '',  209, '‘',  225, '¡',  241, 'á',
+	194, '‚',  210, '’',  226, '¢',  242, 'â',
+	195, 'ƒ',  211, '“',  227, '£',  243, 'ã',
+	196, '„',  212, '”',  228, '¤',  244, 'ä',
+	197, '…',  213, '•',  229, '¥',  245, 'å',
+	198, '†',  214, '–',  230, '¦',  246, 'æ',
+	151 , 'Ä',199,'‡',  215 , '—',  231, '§',  247, 'ç',
+	168 , 'ð',184, 'ñ',  200 , 'ˆ',  216, '˜',  232, '¨',  248, 'è',
+/*; á¨¬¢®« 169 = (á)/255 ¢ ¤®á */
+	169, 255, 201, '‰',  217 , '™',  233, '©',  249, 'é',
+	202, 'Š',  218 , 'š',  234, 'ª',  250, 'ê',
+	203, '‹',  219 , '›',  235, '«',  251, 'ë',
+	204, 'Œ',  220 , 'œ',  236, '¬',  252, 'ì',
+	205, '',  221 , '',  237, '­',  253, 'í',
+	206, 'Ž',  222 , 'ž',  238, '®',  254, 'î',
+	207, '',  223 , 'Ÿ',  239, '¯',  255, 'ï'
+
+    };
+    map_xlate_characters( cp1251_to_cp866, COUNTOF(cp1251_to_cp866) );
+}
+#endif
+
+#ifdef	CP866
+static void map_koi8_r_to_cp866(void)
+{
+/* KOI8-R ¯® —¥p­®¢ã
+KOI8-R
+[CODEPAGE]
+*/
+    static byte koi8_r_to_cp866[] = {
+	128, 'Ä',  144, '°',  160, 'Í',  176, 'Ç',  192, 'î',  208, '¯',  224, 'ž',  240, '',
+	129, '³',  145, '±',  161, 'º',  177, 'Ì',  193, ' ',  209, 'ï',  225, '€',  241, 'Ÿ',
+	130, 'Ú',  146, '² ', 162, 'Õ',  178, 'µ',  194, '¡',  210, 'à',  226, '',  242, '',
+	131, '¿',  147, 'ô',  163, 'ñ',  179, 'ð',  195, 'æ',  211, 'á',  227, '–',  243, '‘',
+	132, 'À',  148, 'þ',  164, 'Ö',  180, '¶',  196, '¤',  212, 'â',  228, '„',  244, '’',
+	133, 'Ù',  149, 'ú',  165, 'É',  181, '¹',  197, '¥',  213, 'ã',  229, '…',  245, '“',
+	134, 'Ã',  150, 'û',  166, '¸',  182, 'Ñ',  198, 'ä',  214, '¦',  230, '”',  246, '†',
+	135, '´',  151, '÷',  167, '·',  183, 'Ò',  199, '£',  215, '¢',  231, 'ƒ',  247, '‚',
+	136, 'Â',  152, 'ó',  168, '»',  184, 'Ë',  200, 'å',  216, 'ì',  232, '•',  248, 'œ',
+	137, 'Á',  153, 'ò',  169, 'Ô',  185, 'Ï',  201, '¨',  217, 'ë',  233, 'ˆ',  249, '›',
+	138, 'Å',  154, 'ü',  170, 'Ó',  186, 'Ð',  202, '©',  218, '§',  234, '‰',  250, '‡',
+	139, 'ß',  155, 'õ',  171, 'È',  187, 'Ê',  203, 'ª',  219, 'è',  235, 'Š',  251, '˜',
+	140, 'Ü',  156, 'ø',  172, '¾',  188, 'Ø',  204, '«',  220, 'í',  236, '‹',  252, '',
+	141, 'Û',  157, 'ý',  173, '½',  189, '×',  205, '¬',  221, 'é',  237, 'Œ',  253, '™',
+	142, 'Ý',  158, 'ù',  174, '¼',  190, 'Î',  206, '­',  222, 'ç',  238, '',  254, '—',
+	143, 'Þ',  159, 'ö',  175, 'Æ',  191, 255,  207, '®',  223, 'ê',  239, 'Ž',  255, 'š'
+    };
+/*; á¨¬¢®« 191 = (á)/255 ¢ ¤®á */
+    map_xlate_characters( koi8_r_to_cp866, COUNTOF( koi8_r_to_cp866) );
+}
+#endif
+
+#ifdef	CP866
+static void map_iso_8859_5_to_cp866(void)
+{
+
+    static byte iso_8859_5_to_cp866[] = {
+    160, 255, 176, '€',  192, '',  208, ' ',  224, 'à',
+    161, 'ð', 177, '',  193, '‘',  209, '¡',  225, 'á',  241, 'ñ',
+              178, '‚',  194, '’',     210, '¢',  226, 'â',
+              179, 'ƒ',  195, '“',  211, '£',  227, 'ã',
+    164, 'ò', 180, '„',  196, '”',  212, '¤',  228, 'ä',  244, 'ó',
+              181, '…',  197, '•',  213, '¥',  229, 'å',
+              182, '†',  198, '–',  214, '¦',  230, 'æ',
+    167, 'ô', 183, '‡',  199, '—',  215, '§',  231, 'ç',  247, 'õ',
+              184, 'ˆ',  200, '˜',  216, '¨',  232, 'è',
+              185, '‰',  201, '™',  217, '©',  233, 'é',
+              186, 'Š',  202, 'š',  218, 'ª',  234, 'ê',
+              187, '‹',  203, '›',  219, '«',  235, 'ë',
+              188, 'Œ',  204, 'œ',  220, '¬',  236, 'ì',
+    173, 'Ä', 189, '',  205, '',  221, '­',  237, 'í',
+    174, 'ö', 190, 'Ž',  206, 'ž',  222, '®',  238, 'î',  254, '÷',
+              191, '',  207, 'Ÿ',  223, '¯',  239, 'ï'
+   };
+
+    map_xlate_characters( iso_8859_5_to_cp866, COUNTOF(iso_8859_5_to_cp866) );
+}
+#endif
+
+/* á¨¬¢®« 160 = (á)/255 ¢ ¤®á */
+#ifdef	CP866
+static void map_cp866(void)
+{
+}
+#endif
 
 static void map_windows_1252(void)
 {
@@ -324,32 +421,41 @@ typedef struct charset_def {
 static charset_def_t charsets[] = {
     { "default",	&map_default,	   T },
     { "us-ascii",	&map_us_ascii,	   T },
-#if	1
-    { "iso8859-1",	&map_us_ascii,	   T },		/* ISOIEC 8859-1:1998 Latin Alphabet No. 1	*/
-    /* tests/t.systest.d/inputs/spam.mbx is iso-8859-1 and contains 8-bit characters - " “Your Account” " */
-#else
-    { "iso8859-1",	&map_iso_8859_1,   T },		/* ISOIEC 8859-1:1998 Latin Alphabet No. 1	*/
+#ifdef	CP866
+    { "cp866",		&map_windows_1251_to_cp866, T },/* selected by 'charset_default=cp866' in bogofilter.cf */
 #endif
+    { "iso8859-1",	&map_iso_8859_1,   T },		/* ISOIEC 8859-1:1998 Latin Alphabet No. 1	*/
+    /* tests/t.systest.d/inputs/spam.mbx is iso-8859-1 and contains 8-bit characters - " “Your Account” " */
     { "iso8859-2",	&map_iso_8859_2,   F },		/* ISOIEC 8859-2:1999 Latin Alphabet No. 2	*/
     { "iso8859-3",	&map_iso_8859_3,   F },		/* ISOIEC 8859-3:1999 Latin Alphabet No. 3	*/
     { "iso8859-4",	&map_iso_8859_4,   F },		/* ISOIEC 8859-4:1998 Latin Alphabet No. 4	*/
+#ifndef	CP866
     { "iso8859-5",	&map_iso_8859_5,   F },		/* ISOIEC 8859-5:1999 LatinCyrillic Alphabet	*/
+#else
+    { "iso8859-5",	&map_iso_8859_5_to_cp866, F },	/* ISOIEC 8859-5:1999 LatinCyrillic Alphabet	*/
+#endif
     { "iso8859-6",	&map_iso_8859_6,   F },		/* ISOIEC 8859-6:1999 LatinArabic Alphabet	*/
-    { "iso8859-7",	&map_iso_8859_7,   F },		/* ISO 8859-7:1987 LatinGreek Alphabet		*/
+    { "iso8859-7",	&map_iso_8859_7,   F },		/* ISO	  8859-7:1987 LatinGreek Alphabet	*/
     { "iso8859-8",	&map_iso_8859_8,   F },		/* ISOIEC 8859-8:1999 LatinHebrew Alphabet	*/
     { "iso8859-9",	&map_iso_8859_9,   F },		/* ISOIEC 8859-9:1999 Latin Alphabet No. 5	*/
     { "iso8859-10",	&map_iso_8859_10,  F },		/* ISOIEC 8859-10:1998 Latin Alphabet No. 6	*/
     { "iso8859-13",	&map_iso_8859_13,  F },		/* ISOIEC 8859-13:1998 Latin Alphabet No. 7 (Baltic Rim)*/
     { "iso8859-14",	&map_iso_8859_14,  F },		/* ISOIEC 8859-14:1998 Latin Alphabet No. 8 (Celtic)	*/
     { "iso8859-15",	&map_iso_8859_15,  F },		/* ISOIEC 8859-15:1999 Latin Alphabet No. 9		*/
+#ifndef	CP866
     { "windows-1251",	&map_windows_1251, T },
+#else
+    { "cp866",		&map_cp866, F },
+    { "koi8-r",		&map_koi8_r_to_cp866, F },
+    { "windows-1251",	&map_windows_1251_to_cp866, F },
+#endif
     { "windows-1252",	&map_windows_1252, T },
     { "windows-1256",	&map_windows_1256, T },
     { "utf-8",		&map_unicode,	   T },
-    { "iso2022-jp",	&map_japanese,	   T },	/* rfc-1468 - japanese */
-    { "euc-kr",		&map_korean,	   T },	/* extended unix code for korean */
-    { "iso2022-kr",	&map_korean,	   T },	/* korean standard code (7-bit)*/
-    { "ks-c-5601-1987",	&map_korean,	   T },	/* korean standard (default) */
+    { "iso2022-jp",	&map_japanese,	   T },		/* rfc-1468 - japanese */
+    { "euc-kr",		&map_korean,	   T },		/* extended unix code for korean */
+    { "iso2022-kr",	&map_korean,	   T },		/* korean standard code (7-bit)*/
+    { "ks-c-5601-1987",	&map_korean,	   T },		/* korean standard (default) */
     { "big5",		&map_chinese,	   T },
     { "csbig5",		&map_chinese,	   T },
     { "gb2312",		&map_chinese,	   T },
@@ -369,7 +475,7 @@ void init_charset_table(const char *charset_name, bool use_default)
 	{
 	    if (DEBUG_CONFIG(1))
 		fprintf(dbgout, " ... found.\n");
-	    map_default();			/* Setup the table defaults. */
+	    map_default();	/* Setup the table defaults. */
 	    (*charset->func)();
 	    found = true;
 	    if (replace_nonascii_characters &&
@@ -388,7 +494,7 @@ void init_charset_table(const char *charset_name, bool use_default)
     return;
 }
 
-
+/* like set_charset() but charset is in form blabla="CharsetName" */
 void got_charset(const char *charset)
 {
     char *t = strchr(charset, '=') + 1;
@@ -410,6 +516,115 @@ void got_charset(const char *charset)
     *d++ = '\0';
     if (DEBUG_CONFIG(0))
 	fprintf(dbgout, "got_charset( '%s' )\n", t);
-    init_charset_table( t, false );
+/*
+    init_charset_table( t, false ); // bf default
+*/
+    init_charset_table( t, true );
     xfree(t);
+}
+
+/* like got_charset() but charset is pure charset name */
+void set_charset(const char *charset)
+{
+    char *t;
+    char *s, *d;
+    t = xstrdup( charset);
+    for (s = d = t; *s != '\0'; s++)
+    {
+       char c = tolower(*s);	/* map upper case to lower */
+       if (c == '_')		/* map underscore to dash */
+	c = '-';
+       if (c == '-' &&		/* map "iso-" to "iso"     */
+	   memcmp(t, "iso", 3) == 0)
+	   continue;
+       *d++ = c;
+    }
+    *d++ = '\0';
+    if (DEBUG_CONFIG(0))
+       fprintf(dbgout, "got_charset( '%s' )\n", t);
+/*
+    init_charset_table( t, false ); //bf default
+*/
+    init_charset_table( t, true );
+    xfree(t);
+}
+
+int  htmlUNICODE_decode(byte *buf, int len)
+{
+    int i,j, j1, l, is=0;
+    char  *pbuf, str[40];
+    int l1, code;
+    const int max_seq_length = 8; /* &#1234; &yacute; */
+    l1 = 0;
+    pbuf = buf;
+    for (i=0;i < len;i++)
+    {
+	pbuf[l1] = charset_table[buf[i]];  /* should be decode table to the same cp as UnicodeTable */
+	l1++;
+	if (buf[i] != '&') 	/* check for &-sequences */
+	    continue;
+	if (buf[i+1] != '#')	/*  "&nbsp;" ? */
+	{
+	    is = 0;
+	    for (j=0, l=1; i+l<len; l++,j++)
+	    {
+		if (l > max_seq_length) break;
+		str[j] = buf[l+i];
+		if (buf[l+i] == ';' )
+		{
+		    str[j] = 0;
+		    for (j1 = 0; html_code[j1].sht; j1++)
+		    {
+			if (!strncasecmp(str, html_code[j1].sht, strlen(html_code[j1].sht)))
+			{
+			    is=1;
+			    code = html_code[j1].cht;
+			}
+		    }
+		    break;
+		}
+   
+	    }
+	    if (is)
+	    { 
+		pbuf[l1-1] = code;
+		i += l;
+	    }
+	    continue;
+	}
+	for (j=0, l=2; i+l<len; l++,j++)  /* &#1055; ? */
+	{
+	    if (l > max_seq_length) break;
+	    str[j] = buf[l+i];
+	    if (buf[l+i] == ';' )
+	    {
+		is=1;
+		str[j] = 0;
+		code = atoi(str);
+		break;
+	    }
+	}
+	if (is)
+	{
+	    is = 0;
+
+	    for (j1 = 0; j1 < 256; j1++)
+	    {
+		if (code == UnicodeTable[j1])
+		{ 
+		    is = 1;
+		    code = j1;
+		    break;
+		}
+	    }
+	    if (is)
+	    {
+
+		pbuf[l1-1] = code;
+		i += l;
+	    }
+	}
+    }
+    pbuf[l1] = 0;
+    return l1;
 }

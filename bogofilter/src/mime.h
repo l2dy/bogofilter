@@ -45,4 +45,6 @@ enum mimetype get_content_type(void);
 
 void mime_cleanup(void);
 
+void mime_type2(word_t * text);
+
 #endif	/* HAVE_MIME_H */

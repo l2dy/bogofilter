@@ -181,6 +181,7 @@
 #
 #charset_default=us-ascii
 ##charset_default=iso-8859-1
+##charset_default=cp866		# for Russian
 
 #### REPLACE_NONASCII_CHARACTERS
 #
