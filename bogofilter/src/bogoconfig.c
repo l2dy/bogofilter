@@ -285,7 +285,7 @@ static int validate_args(void)
 
 static const char *help_text[] = {
     "help options:\n",
-    "  -h,                       - print this help message.\n",
+    "  -h, --help                - print this help message.\n",
     "  -V, --version             - print version information and exit.\n",
     "  -Q, --query               - query (display) base bogofilter configuration.\n",
     "  -QQ                       - display extended configuration info.\n",
@@ -313,12 +313,10 @@ static const char *help_text[] = {
     "  -I, --input-file=file     - read message from 'file' instead of stdin.\n",
     "  -O, --output-file=file    - save message to 'file' in passthrough mode.\n",
     "parameter options:\n",
-    "  -mv1[,v2[,v3]]\n",
+    "  -mv1[,v2[,v3]]            - set user defined min_dev, robs, and robx values.\n",
     "      --min_dev=v1, --robs=v2, --robx=v3\n",
-    "                            - set user defined min_dev, robs, and robx values.\n",
-    "  -ov1[,v2]\n",
+    "  -ov1[,v2]                 - set user defined spam and non-spam cutoff values.\n",
     "      --spam_cutoff=v1, --ham_cutoff=v2\n",
-    "                            - set user defined spam and non-spam cutoff values.\n",
     "info options:\n",
     "  -t, --terse               - set terse output mode.\n",
     "  -T, --fixed-terse-format  - set invariant terse output mode.\n",
