@@ -1,7 +1,7 @@
 # $Id$ 
 
 # Tell BSD make(1) to not remake the .1in and .htmlin files.
-.PRECIOUS:
+SUFFIXES= .1 .1in .htmlin .html
 
 # what to build
 man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
@@ -31,7 +31,13 @@ EXTRA_DIST = bogofilter.1in bogoutil.1in bogoupgrade.1in \
 	|| { rm -f $@ ; exit 1 ; }
 
 .xml.htmlin:
-	if xmlto html-nochunks $< ; then f=$@ ; mv $${f%%in} $@ ; else rm -f $@ ; exit 1 ; fi
+	if test -f $(srcdir)/$@ && test $(srcdir)/$@ -nt $< ; then \
+	    cp $(srcdir)/$@ . ; else \
+	if xmlto html-nochunks $< ; then f=$@ ; mv $${f%%in} $@ ; else rm -f $@ ; exit 1 ; fi \
+	fi
 
 .xml.1in:
-	if xmlto man $< ; then f=$@ ; mv $${f%in} $@ ; else rm -f $@ ; exit 1 ; fi
+	if test -f $(srcdir)/$@ && test $(srcdir)/$@ -nt $< ; then \
+	    cp $(srcdir)/$@ . ; else \
+	if xmlto man $< ; then f=$@ ; mv $${f%in} $@ ; else rm -f $@ ; exit 1 ; fi \
+	fi
