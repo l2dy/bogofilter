@@ -40,4 +40,5 @@ int main(int argc, char **argv) {
     execv(argv[1], argv+1);
     fprintf(stderr, "execv: ");
     barf(argv[1]);
+    return 0;
 }
