@@ -144,6 +144,10 @@ datastore_SOURCE = datastore_tdb.c
 else
 if ENABLE_QDBM_DATASTORE
 datastore_SOURCE = datastore_qdbm.c datastore_qdbm.h datastore_qdbm_cmpkey.c
+
+bin_PROGRAMS += bogoQDBMupgrade
+bogoQDBMupgrade_SOURCES = bogoQDBMupgrade.c datastore_qdbm_cmpkey.c
+bogoQDBMupgrade_LDADD = $(LDADD) $(LIBDB)
 else
 datastore_SOURCE = datastore_db.c
 endif
