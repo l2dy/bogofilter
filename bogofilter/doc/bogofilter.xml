@@ -348,8 +348,8 @@ is stored as an ASCII string with two counts (for spam and ham) and (optionally)
 a timestamp.</para>
 
 <para>The <option>-WW </option> option tells <application>bogofilter</application>
-to operate with a pair of wordlists, named spamlist.db and goodlist.  Spamlist.db
-stores tokens, counts, and timestamps for tokens from spam messages.  Hamlist.db
+to operate with a pair of wordlists, named spamlist.db and goodlist.db.  Spamlist.db
+stores tokens, counts, and timestamps for tokens from spam messages.  Goodlist.db
 stores tokens, counts, and timestamps for tokens from ham messages.</para>
 
 <para>The <option>-O </option><replaceable>filename</replaceable> option

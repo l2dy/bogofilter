@@ -155,8 +155,8 @@
 
 ##### STRICT_CHECK
 #
-#	if enabled, html comments are delimited by "<!-->" and "-->".
-#	if disabled, html comments are delimited by "<!>" and ">".
+#	if enabled, html comments are delimited by "<!--" and "-->".
+#	if disabled, html comments are delimited by "<!" and ">".
 
 #strict_check=no
 
