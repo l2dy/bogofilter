@@ -28,6 +28,12 @@ AUTHOR:
 #include "find_home.h"
 #include "globals.h"
 #include "method.h"
+#ifdef	ENABLE_GRAHAM_METHOD
+#include "graham.h"
+#endif
+#ifdef	ENABLE_ROBINSON_METHOD
+#include "robinson.h"
+#endif
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
@@ -86,8 +92,6 @@ static enum algorithm_e algorithm = AL_DEFAULT;
 
 double	spam_cutoff;
 double	min_dev = 0.0f;
-double	robx = 0.0f;
-double	robs = 0.0f;
 
 int	thresh_index = 0;
 double	thresh_stats = 0.0f;
@@ -95,65 +99,67 @@ double	thresh_rtable = 0.0f;
 
 /*---------------------------------------------------------------------------*/
 
-typedef enum {
-#ifdef	GRAHAM_AND_ROBINSON
-	CP_ALGORITHM,
-#endif
-	CP_BOOLEAN,
-	CP_INTEGER,
-	CP_DOUBLE,
-	CP_CHAR,
-	CP_STRING,
-	CP_WORDLIST
-} ArgType;
-
-typedef struct {
-    const char *name;
-    ArgType	type;
-    union
-    {
-	bool	*b;
-	int	*i;
-	double	*d;
-	char	*c;
-	char	**s;
-#ifdef	GRAHAM_AND_ROBINSON
-	enum algorithm_e *a;
-#endif
-    } addr;
-} ArgDefinition;
-
-static int dummy;
-
-static const ArgDefinition ArgDefList[] =
+static const parm_desc sys_parms[] =
 {
-#ifdef	GRAHAM_AND_ROBINSON
-    { "algorithm",  	  CP_ALGORITHM,	{ (void *)&algorithm } },
+    { "stats_in_header",  CP_BOOLEAN,	{ (void *) &stats_in_header } },
+    { "spam_header_name", CP_STRING,	{ (void *) &spam_header_name } },
+    { "user_config_file", CP_STRING,	{ (void *) &user_config_file } },
+    { "wordlist",	  CP_WORDLIST,	{ (void *) NULL } },
+
+    { "algorithm",  	  CP_ALGORITHM,	{ (void *) NULL } },
+
+    { "min_dev",	  CP_DOUBLE,	{ (void *) &min_dev } },
+    { "spam_cutoff",	  CP_DOUBLE,	{ (void *) &spam_cutoff } },
+    { "thresh_stats",	  CP_DOUBLE,	{ (void *) &thresh_stats } },
+#ifdef ENABLE_GRAHAM_METHOD
+    { "thresh_index",	  CP_INTEGER,	{ (void *) NULL } },	/* Graham */
 #endif
-    { "stats_in_header",  CP_BOOLEAN,	{ (void *)&stats_in_header } },
-    { "min_dev",	  CP_DOUBLE,	{ (void *)&min_dev } },
-    { "robx",		  CP_DOUBLE,	{ (void *)&robx } },
-    { "robs",		  CP_DOUBLE,	{ (void *)&robs } },
-    { "spam_cutoff",	  CP_DOUBLE,	{ (void *)&spam_cutoff } },
-    { "thresh_index",	  CP_INTEGER,	{ (void *)&thresh_index } },
-    { "thresh_rtable",	  CP_DOUBLE,	{ (void *)&thresh_rtable } },
-    { "thresh_stats",	  CP_DOUBLE,	{ (void *)&thresh_stats } },
-    { "spam_header_name", CP_STRING,	{ (void *)&spam_header_name } },
-    { "user_config_file", CP_STRING,	{ (void *)&user_config_file } },
-    { "wordlist",	  CP_WORDLIST,	{ (void *)&dummy } },
+#ifdef ENABLE_ROBINSON_METHOD
+    { "thresh_rtable",	  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
+    { "robx",		  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
+    { "robs",		  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
+#endif
+    { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
 
-static const size_t ArgDefListSize = sizeof(ArgDefList)/sizeof(ArgDefList[0]);
+static const parm_desc *usr_parms = NULL;
 
-static bool process_config_parameter(const ArgDefinition * arg, const char *val)
+static bool select_method( int ch )
+{
+    bool ok = TRUE;
+    switch (ch)
+    {
+#ifdef ENABLE_GRAHAM_METHOD
+    case 'g':
+	algorithm = AL_GRAHAM;
+	method = &graham_method;
+	break;
+#endif
+#ifdef ENABLE_ROBINSON_METHOD
+    case 'r':
+	algorithm = AL_ROBINSON;
+	method = &robinson_method;
+	break;
+#endif
+    default:
+	ok = FALSE;
+	break;
+    }
+    usr_parms = method->config_parms;
+    return ok;
+}
+
+static bool process_config_parameter(const parm_desc *arg, const char *val)
 {
     bool ok = TRUE;
     while (isspace(*val) || *val == '=') val += 1;
+    if ( arg->addr.v == NULL )
+	return ok;
     switch (arg->type)
     {
 	case CP_BOOLEAN:
 	    {
-		char ch=toupper(*val);
+		char ch = toupper(*val);
 		switch (ch)
 		{
 		case 'Y':		/* Yes */
@@ -205,27 +211,13 @@ static bool process_config_parameter(const ArgDefinition * arg, const char *val)
 		    fprintf( stderr, "%s -> '%s'\n", arg->name, *arg->addr.s );
 		break;
 	    }
-#ifdef	GRAHAM_AND_ROBINSON
 	case CP_ALGORITHM:
 	{
-	    char ch = tolower(*val);
-	    switch (ch)
-	    {
-		case 'g':
-		*arg->addr.a = AL_GRAHAM;
-	    break;
-	    case 'r':
-		*arg->addr.a = AL_ROBINSON;
-		break;
-	    default:
-		ok = FALSE;
-		break;
-	    }
+	    ok = select_method( tolower(*val) );
 	    if (DEBUG_CONFIG(0))
-		fprintf( stderr, "%s -> '%c'\n", arg->name, *arg->addr.a );
+		fprintf( stderr, "%s -> '%c'\n", arg->name, *val );
 	    break;
 	}
-#endif
 	case CP_WORDLIST:
 	    {
 		if (!configure_wordlist(val))
@@ -241,11 +233,14 @@ static bool process_config_parameter(const ArgDefinition * arg, const char *val)
     return ok;
 }
 
-static bool process_config_line( const char *line )
+static bool process_config_line( const char *line, const parm_desc *parms )
 {
-    size_t i;
     size_t len;
     const char *val;
+    const parm_desc *arg;
+
+    if (parms == NULL)
+	return FALSE;
 
     for (val=line; *val != '\0'; val += 1) {
 	if (isspace((unsigned char)*val) || *val == '=') {
@@ -253,8 +248,8 @@ static bool process_config_line( const char *line )
 	}
     }
     len = val - line;
-    for (i=0; i<ArgDefListSize; i += 1) {
-	const ArgDefinition *arg = &ArgDefList[i];
+    for ( arg = parms; arg->name != NULL; arg += 1 )
+    {
 	if (strncmp(arg->name, line, len) == 0)
 	{
 	    bool ok = process_config_parameter(arg, val);
@@ -303,7 +298,9 @@ static void read_config_file(const char *fname, bool tilde_expand)
 	    continue;
 	while (iscntrl(buff[len-1]))
 	    buff[--len] = '\0';
-	if ( ! process_config_line( buff ))
+
+	if ( ! process_config_line( buff, usr_parms ) &&
+	     ! process_config_line( buff, sys_parms ))
 	{
 	    error = TRUE;
 	    if (!quiet)
@@ -339,12 +336,10 @@ static int validate_args(void)
 	(void)fprintf(stderr, "    Options '-p', '-u', '-e', and '-R' are used when classifying messages.\n");
 	(void)fprintf(stderr, "    The two sets of options may not be used together.\n");
 	(void)fprintf(stderr, "    \n");
-#if 0
 #ifdef	GRAHAM_AND_ROBINSON
 	(void)fprintf(stderr, "    Options '-g', '-r', '-l', '-d', '-x', and '-v' may be used with either mode.\n");
 #else
 	(void)fprintf(stderr, "    Options '-l', '-d', '-x', and '-v' may be used with either mode.\n");
-#endif
 #endif
 	return 2;
     }
@@ -514,6 +509,8 @@ int process_args(int argc, char **argv)
 /* exported */
 void process_config_files(void)
 {
+    select_method( algorithm );
+
     if (! suppress_config_file)
     {
 	read_config_file(system_config_file, FALSE);
@@ -525,23 +522,9 @@ void process_config_files(void)
     if (DEBUG_CONFIG(0))
 	fprintf( stderr, "stats_prefix: '%s'\n", stats_prefix );
 
-#ifdef	ENABLE_GRAHAM_METHOD
-    if ( algorithm == AL_GRAHAM )
-    {
-	extern method_t graham_method;
-	method = &graham_method;
-    }
-#endif
-
-#ifdef	ENABLE_ROBINSON_METHOD
-    if ( algorithm == AL_ROBINSON )
-    {
-	extern method_t robinson_method;
-	method = &robinson_method;
-    }
-#endif
-
 #ifdef	HAVE_CHARSET
     init_charset_table("us-ascii", TRUE);
 #endif
+
+    return;
 }

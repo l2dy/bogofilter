@@ -3,6 +3,37 @@
 #ifndef BOGOCONFIG_H
 #define BOGOCONFIG_H
 
+#include <common.h>
+
+/* Definitions */
+
+typedef enum {
+	CP_NONE,
+#ifdef	GRAHAM_AND_ROBINSON
+	CP_ALGORITHM,
+#endif
+	CP_BOOLEAN,
+	CP_INTEGER,
+	CP_DOUBLE,
+	CP_CHAR,
+	CP_STRING,
+	CP_WORDLIST
+} parm_t;
+
+typedef struct {
+    const char *name;
+    parm_t	type;
+    union
+    {
+	bool	*b;
+	int	*i;
+	double	*d;
+	char	*c;
+	char	**s;
+	void	*v;
+    } addr;
+} parm_desc;
+
 /* Global variables */
 
 extern const char *spam_header_name;

@@ -4,6 +4,7 @@
 #ifndef	HAVE_METHOD_H
 #define	HAVE_METHOD_H
 
+#include <bogoconfig.h>
 #include <wordhash.h>
 
 typedef struct bogostat_s bogostat_t;
@@ -19,11 +20,13 @@ typedef	void	m_print_bogostats(FILE *fp, double spamicity);
 typedef	void	m_cleanup(void);
 
 typedef struct method_s {
-    
-    m_initialize		*initialize;
-    m_compute_spamicity		*compute_spamicity;
-    m_print_bogostats		*print_stats;
-    m_cleanup			*cleanup;
+
+    const char		*name;
+    const parm_desc	*config_parms;
+    m_initialize	*initialize;
+    m_compute_spamicity	*compute_spamicity;
+    m_print_bogostats	*print_stats;
+    m_cleanup		*cleanup;
 
 } method_t;
 

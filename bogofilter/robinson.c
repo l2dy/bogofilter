@@ -14,6 +14,7 @@ NAME:
 
 #include "config.h"
 #include "common.h"
+#include "bogoconfig.h"
 #include "bogofilter.h"
 #include "datastore.h"
 #include "robinson.h"
@@ -30,17 +31,28 @@ NAME:
 #define ROBX			0.415f	/* Robinson's x */
 
 extern double min_dev;
-extern double robs;
-extern double robx;
 
 extern int Rtable;
 static double scalefactor;
 
+static double	robx = 0.0f;
+static double	robs = 0.0f;
+
+static const parm_desc rob_parm_table[] =
+{
+    { "robx",		  CP_DOUBLE,	{ (void *) &robx } },
+    { "robs",		  CP_DOUBLE,	{ (void *) &robs } },
+    { "thresh_rtable",	  CP_DOUBLE,	{ (void *) &thresh_rtable } },
+    { NULL,		  CP_NONE,	{ (void *) NULL } },
+};
+
 method_t robinson_method = {
-    rob_initialize_constants, 		/* alg_initialize_constants *initialize_constants; */
-    rob_bogofilter,	 		/* alg_compute_spamicity *compute_spamicity; */
-    rob_print_bogostats, 		/* alg_print_bogostats *print_stats; */
-    rob_cleanup 			/* alg_free *cleanup; */
+    "robinson",				/* const char		  *name;		*/
+    rob_parm_table,	 		/* m_parm_table		  *parm_table		*/
+    rob_initialize_constants, 		/* m_initialize_constants *initialize_constants	*/
+    rob_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
+    rob_print_bogostats, 		/* m_print_bogostats	  *print_stats		*/
+    rob_cleanup 			/* m_free		  *cleanup		*/
 } ;
 
 void rob_print_bogostats(FILE *fp, double spamicity)

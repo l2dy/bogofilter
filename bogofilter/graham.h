@@ -10,7 +10,7 @@
 
 #define GRAHAM_GOOD_BIAS	2.0	/* don't give good words more weight */
 
-extern	method_t gra_method;
+extern	method_t graham_method;
 extern	void	gra_initialize_constants(void);
 extern	double	gra_bogofilter(wordhash_t *wordhash, FILE *fp); /*@globals errno@*/
 extern	double	gra_compute_spamicity(bogostat_t *bogostats, FILE *fp); /*@globals errno@*/

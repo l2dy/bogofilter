@@ -33,13 +33,6 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 #include "method.h"
 #include "wordhash.h"
 
-method_t graham_method = {
-    gra_initialize_constants, 		/* alg_initialize_constants *initialize_constants; */
-    gra_bogofilter,	 		/* alg_compute_spamicity *compute_spamicity; */
-    gra_print_bogostats, 		/* alg_print_bogostats *print_stats; */
-    gra_cleanup 			/* alg_free *cleanup; */
-} ;
-
 /* constants for the Graham formula */
 #define KEEPERS		15		/* how many extrema to keep */
 #define MINIMUM_FREQ	5		/* minimum freq */
@@ -52,6 +45,23 @@ method_t graham_method = {
 #define GRAHAM_MAX_REPEATS	4	/* cap on word frequency per message */
 
 extern double min_dev;
+
+static int thresh_index;
+
+static const parm_desc gra_parm_table[] =
+{
+    { "thresh_index",	  CP_INTEGER,	{ (void *) &thresh_index } },
+    { NULL,		  CP_NONE,	{ (void *) NULL } },
+};
+
+method_t graham_method = {
+    "graham",				/* const char		  *name;		*/
+    gra_parm_table,	 		/* m_parm_table		  *parm_table		*/
+    gra_initialize_constants, 		/* m_initialize_constants *initialize_constants	*/
+    gra_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
+    gra_print_bogostats, 		/* m_print_bogostats	  *print_stats		*/
+    gra_cleanup 			/* m_free		  *cleanup		*/
+} ;
 
 typedef struct 
 {
