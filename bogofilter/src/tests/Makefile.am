@@ -23,10 +23,9 @@ PARSING_TESTS = \
 	t.escaped.html t.escaped.url \
 	t.split t.parsing \
 	t.lexer t.lexer.mbx \
-	t.folded_rfc2047 \
-	$(DEGEN_TEST)
+	t.folded_rfc2047
 
-WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest $(SEPARATE_WORDLIST)
+WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest
 
 SCORING_TESTS =  t.score1 t.score2 t.systest t.grftest t.bogoutil-hist
 
