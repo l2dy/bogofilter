@@ -313,7 +313,7 @@ static bool dir_next_mail(void)
 	while ((dirent = readdir(reader_dir)) != NULL) {
 	    /* skip private files */
 	    if ((mailstore_type == MS_MAILDIR && dirent->d_name[0] != '.') ||
-		(mailstore_type == MS_MH && isdigit(dirent->d_name[0])))
+		(mailstore_type == MS_MH && isdigit((unsigned char)dirent->d_name[0])))
 		break;
 	}
 

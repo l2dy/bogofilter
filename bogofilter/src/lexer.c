@@ -380,7 +380,7 @@ size_t decode_text(word_t *w)
 	memmove(beg+size, n.text, len+1);
 	size += len;
 	txt = end + 2;
-	while (isspace(*txt))
+	while (isspace((unsigned char)*txt))
 	    txt += 1;
     }
 
