@@ -47,6 +47,8 @@
 extern int passthrough;
 extern char *spam_header_name;
 
+static int yyinput(char *buf, int max_size);
+
 struct textblock textblocks, *textend = &textblocks;
 
 #define YY_INPUT(buf,result,max_size) result = yyinput(buf, max_size)
@@ -54,77 +56,7 @@ struct textblock textblocks, *textend = &textblocks;
 char *yylval;
 static char alt_text[MAXTOKENLEN];
 
-/* returns -1 for EOF or max_size < 2, characters read otherwise */
-int myfgets(char *buf, int max_size, FILE *s)
-{
-	int c;
-	char *cp = buf;
-
-	if ((max_size < 2) || feof(s)) return(-1);
-
-	while ((--max_size > 0) && ((c = getc(s)) != EOF)) {
-		*cp++ = c;
-		if (c == '\n')
-			break;
-	}
-
-	*cp = '\0'; /* DO NOT ADD ++ HERE! */
-	return(cp - buf);
-}
-
-
-int yyinput(char *buf, int max_size)
-// input getter for the scanner
-{
-    int returned;
-
-    static int hdrlen = 0;
-    if (hdrlen==0)
-	hdrlen=strlen(spam_header_name);
-
-    returned = myfgets(buf, max_size, yyin);
-
-    while (returned != -1 && memcmp(buf,spam_header_name,hdrlen) == 0)
-    {
-	do {
-	    returned = myfgets(buf, max_size, yyin);
-	    if (returned != -1 && *buf == '\n')
-		break;
-	} while (returned != -1 && isspace(*buf));
-    }
-
-    if (returned == -1) {
-	if (ferror(yyin)) {
-	    fprintf(stderr, "input in flex scanner failed\n");
-	    exit(2);
-	} else {
-	    return YY_NULL;
-	}
-    }
-
-    if (passthrough)
-    {
-	// Also, save the text on a linked list of lines.
-	// Note that we store fixed-length blocks here, not lines.
-	// One very long physical line could break up into more
-	// than one of these.
-	textend->block = (char *)xmalloc(returned);
-	textend->len = returned;
-	memcpy(textend->block, buf, returned);
-	textend->next = (struct textblock *)xmalloc(sizeof(struct textblock));
-	textend->next->block = (char *)NULL;
-	textend->next->len = 0;
-	textend = textend->next;
-    }
-
-    /* \r\n -> \n */
-    if (returned >= 2 && 0 == strcmp(buf + returned - 2, "\r\n")) {
-	returned --;
-	*(buf + returned - 1) = '\n';
-    }
-
-    return(returned == -1 ? YY_NULL : returned);
-}
+static int past_header;
 
 %}
 
@@ -292,7 +224,7 @@ width	;
 \<\!--	;
 -->	;
 
-^From\ 						{return(FROM);}
+^From\ 						{past_header = 0; return(FROM);}
 ^Date:.*|Delivery-Date:.*			;
 ^Message-ID:.*					;
 {BASE64}					;
@@ -302,14 +234,95 @@ E?SMTP\ id\ .*					;
 boundary=.*					;
 name=\"?					;
 filename=\"?					;
-{MIME_BOUNDARY}(--)?$			{return (BOUNDARY);}
+{MIME_BOUNDARY}(--)?$				{return (BOUNDARY);}
 
 {IPADDR}					{return(TOKEN);}
 [^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\"?\*,[:cntrl:][]+[^[:blank:][:punct:][:cntrl:]]	{return(TOKEN);} 
 .						;
+^\n						{past_header = 1; /* eat token */}
 \n						;
 
 %%
+
+/* returns -1 for EOF or max_size < 2, characters read otherwise */
+int myfgets(char *buf, int max_size, FILE *s)
+{
+	int c;
+	char *cp = buf;
+
+	if ((max_size < 2) || feof(s)) return(-1);
+
+	while ((--max_size > 0) && ((c = getc(s)) != EOF)) {
+		*cp++ = c;
+		if (c == '\n')
+			break;
+	}
+
+	if (ferror(s)) {
+	    perror("stdin");
+	    exit(2);
+	}
+
+	*cp = '\0'; /* DO NOT ADD ++ HERE! */
+	return(cp - buf);
+}
+
+static int yyinput(char *buf, int max_size)
+// input getter for the scanner
+{
+    int returned;
+
+    static size_t hdrlen = 0;
+    if (hdrlen==0)
+	hdrlen=strlen(spam_header_name);
+
+    returned = myfgets(buf, max_size, yyin);
+
+    while (returned != -1
+	    && !past_header
+	    && memcmp(buf,spam_header_name,hdrlen) == 0)
+    {
+	do {
+	    returned = myfgets(buf, max_size, yyin);
+	    if (returned != -1 && *buf == '\n')
+		break;
+	} while (returned != -1 && isspace((unsigned char)*buf));
+    }
+
+    if (returned == -1) {
+	if (ferror(yyin)) {
+	    fprintf(stderr, "input in flex scanner failed\n");
+	    exit(2);
+	} else {
+	    return YY_NULL;
+	}
+    }
+
+    if (passthrough)
+    {
+	// Also, save the text on a linked list of lines.
+	// Note that we store fixed-length blocks here, not lines.
+	// One very long physical line could break up into more
+	// than one of these.
+	textend->len = returned;
+	if (returned) {
+	    textend->block = (char *)xmalloc(returned);
+	    memcpy(textend->block, buf, returned);
+	}
+	textend->next = (struct textblock *)xmalloc(sizeof(struct textblock));
+	textend->next->block = NULL;
+	textend->next->len = 0;
+	textend = textend->next;
+    }
+
+    /* \r\n -> \n */
+    if (returned >= 2 && 0 == strcmp(buf + returned - 2, "\r\n")) {
+	returned --;
+	*(buf + returned - 1) = '\n';
+    }
+
+    return(returned == -1 ? YY_NULL : returned);
+}
 
 int get_token(void)
 {

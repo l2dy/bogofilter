@@ -7,9 +7,9 @@
 #Test 4 -- Same as 2 except that BDB file has a  .MSG_COUNT token.
 #          Technically already upgraded.
 
+set +e
+tdir=`mktemp -d run.sh.$$.XXXXXXXXXX` || exit 77
 set -e
-
-tdir=`mktemp -d run.sh.$$.XXXXXXXXXX`
 trap "a=\$? ; rm -f -r $tdir && exit \$a" 0 1 2 3 15
 
 inputfile="input-${num}"

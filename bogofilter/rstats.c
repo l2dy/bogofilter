@@ -78,7 +78,7 @@ void rstats_add( char *token,
     current->good  = good;
     current->bad   = bad;
     current->prob  = prob;
-    current->next = (rstats_t *)malloc( sizeof(rstats_t));
+    current->next = (rstats_t *)xmalloc(sizeof(rstats_t));
     current = current->next;
 }
 

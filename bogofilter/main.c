@@ -181,6 +181,8 @@ int process_args(int argc, char **argv)
 	    printf( "Usage: bogofilter [options] < message\n" );
 	    printf( "\t-h\t- print this help message.\n" );
 	    printf( "\t-d path\t- specify directory for wordlists.\n" );
+	    printf( "\t-g\t- select Graham spam calulation method (default).\n" );
+	    printf( "\t-r\t- select Robinson spam calulation method.\n" );
 	    printf( "\t-p\t- passthrough.\n" );
 	    printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
 	    printf( "\t-s\t- register message as spam.\n" );
@@ -279,7 +281,10 @@ int main(int argc, char **argv)
 		    /* print headers */
 		    for (textend=&textblocks; textend->block; textend=textend->next)
 		    {
-			if (strcmp(textend->block, "\n") == 0) break;
+			if (textend->len == 1
+			       && memcmp(textend->block, "\n", 1) == 0)
+			    break;
+
 			(void) fwrite(textend->block, 1, textend->len, stdout);
 			if (ferror(stdout)) exit(2);
 		    }
@@ -353,7 +358,7 @@ int main(int argc, char **argv)
 	    syslog(LOG_INFO, "%s, %s\n", msg_bogofilter, msg_register);
 	    break;
 	default:
-	    syslog(LOG_INFO, msg_register);
+	    syslog(LOG_INFO, "%s", msg_register);
 	    break;
 	}
 

@@ -25,7 +25,7 @@
   <arg choice='opt'>-e</arg>
   <arg choice='opt'>-g</arg>
   <arg choice='opt'>-r</arg>
-  <arg choice='opt'>-R <replaceable><optional>filename</optional></replaceable></arg>
+  <arg choice='opt'>-R <replaceable>filename</replaceable></arg>
   <arg choice='opt'>-u</arg>
   <arg choice='opt'>-v</arg>
   <arg choice='opt'>-V</arg>
