@@ -28,7 +28,8 @@ EXTRA_DIST = bogofilter.1in bogoutil.1in bogoupgrade.1in \
 	     programmer/README.freebsd programmer/README.hp-ux \
 	     programmer/README.dcdflib \
 	     programmer/README.RISC-OS \
-	     programmer/RISC-OS/config.h programmer/RISC-OS/Makefile \
+	     programmer/RISC-OS/src/Makefile programmer/RISC-OS/src/h/config \
+	     programmer/RISC-OS/gsl/Makefile programmer/RISC-OS/gsl/h/config \
 	     README.tdb
 
 #	     bogofilter.cf.example 
