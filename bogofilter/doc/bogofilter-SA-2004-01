@@ -4,22 +4,20 @@ Topic:		vulnerability in bogofilter/bogolexer
 
 Announcement:	bogofilter-SA-2004-01
 Writer:		Matthias Andree
-Version:	0.01 (draft)
-CVE id:		not yet assigned
-Announced:	not yet
+Version:	0.02
+CVE id:		(none yet)
+Announced:	2004-10-30
 Category:	vulnerability
 Type:		segmentation fault through malformatted input
 Impact:		denial of service
 Credits:	Antti-Juhani Kaijanaho, Clint Adams, David Relson
 Danger:		medium
 
-Affects:	bogofilter 0.92.6, 0.92.4, 0.92.0, 0.17.5 ("stable")
-		bogofilter 0.17.4 - 0.92.7 inclusively ("current")
+Affected:	bogofilter 0.92.6, 0.92.4, 0.92.0, 0.17.5 ("stable")
+		bogofilter 0.17.4 incl. - 0.92.7 incl. ("current")
 
 Not affected:	bogofilter 0.17.3 and older
-		bogofilter 0.92.8 and newer
-
-Default install: affected.
+		bogofilter 0.92.8
 
 Introduced:	2004-03-20 21:46:39 UTC (CVS)
 		2004-03-20 22:20    bogofilter 0.17.4 released as current
@@ -36,6 +34,7 @@ References:	Debian Bug #275373
 0. Release history
 
 2004-10-28	0.01 initial draft for internal review
+2004-10-30	0.02 minor revision
 
 1. Background
 
@@ -50,9 +49,7 @@ consider text parts of mails.
 
 Antti-Juhani Kaijanaho provided Debian with a test case that crashed
 bogofilter 0.92.7. The problem was examined and tracked down to a change
-in bogofilter's quoted-printable decoder that was at that time unaware
-of the differences between RFC-2045's quoted-printable MIME part
-encoding and RFC-2047's Q encoding for header words.
+in bogofilter's quoted-printable decoder that went into 0.17.4.
 
 The pertinent change allowed the quoted-printable decoder to accept LF
 in encoded words but replaced these by NUL characters, which the calling
@@ -61,6 +58,9 @@ byte either one byte past the end of a buffer provided by the lexical
 analyzer or to an address that was the negative of the address of the
 first byte of the "encoded text" part of the encoded word that was
 supposed to be decoded.
+
+It was then decided to announce this as vulnerability because bogofilter
+cannot process the pertinent message.
 
 3. Impact
 
@@ -83,5 +83,11 @@ Upgrade your bogofilter to version 0.92.8.
 bogofilter 0.92.8 is available from sourceforge:
 
 http://sourceforge.net/project/showfiles.php?group_id=62265&package_id=59357&release_id=277823
+
+Note that a broken-out bugfix patch is not available at this time,
+because the reversion of the failure-inducing change is not a complete
+fix. Besides, bogofilter is under development and support is limited to
+the latest available "current" plus the latest available "stable"
+versions.
 
 END of bogofilter-SA-2004-01 rfc2047crash
