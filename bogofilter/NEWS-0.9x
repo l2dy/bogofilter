@@ -12,6 +12,9 @@
   corrected editting error that deleted "asian spam" question
   added answer to "multi-user" question.
 
+* Fix self-test suite ("make check") when bogofilter is compiled
+  with QDBM or TDB as the data base engine.
+
 * Remove obsolete '-f' from t.valgrind, too.
 
 0.92.1	2004-07-01

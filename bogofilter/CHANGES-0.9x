@@ -12,6 +12,9 @@
 	  "asian spam" question and added answer to "multi-user"
 	  question.
 
+	* Fix self-test suite ("make check") when bogofilter is compiled
+	  with QDBM or TDB as the data base engine.
+
 	2004-07-01
 
 	* Remove obsolete '-f' from t.valgrind, too.
