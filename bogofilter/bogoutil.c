@@ -198,7 +198,7 @@ static int load_file(char *db_file)
 
 static dbh_t *db_open_and_lock_file( const char *db_file, const char *name, dbmode_t mode)
 {
-    dbh_t *dbh = db_open(db_file, db_file, DB_READ);
+    dbh_t *dbh = db_open(db_file, name, mode);
     if (dbh != NULL)
 	db_lock_reader(dbh);
     return dbh;
