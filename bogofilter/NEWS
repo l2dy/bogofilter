@@ -31,7 +31,7 @@ $Id$
 	* Changed parsing defaults to:
 
 	  -PI	ignore_case		(default is disabled)
-	  -Ph	header_line_markup 	(default is ensabled)
+	  -Ph	header_line_markup 	(default is enabled)
 	  -Pt	tokenize_html_tags 	(default is enabled)
 	
 	* Recognize a line of whitespace as ending the message header.
@@ -39,7 +39,7 @@ $Id$
 	* contrib/randomtrain and contrib/scramble can now process
 	  both mbox and maildir formats.
 	* Added perl script contrib/mime.get.rfc822 to extract
-	  forwaded messages from with a message.
+	  forwarded messages from with a message.
 	
 	* Added basic support for emacs RMAIL mailboxes.
 	* Removed incomplete RMAIL/Babyl-5 support.
@@ -52,7 +52,7 @@ $Id$
 0.12.3	2003-05-10
 
 	* Modified bulk mode code to allow registering maildirs.
-	* Added options to return tokens from inside html tags.
+	* Added options to return tokens from inside HTML tags.
 	  Switch '-Ht' and option "tokenize_html_tags" turn it on.
 	* Bogofilter's '-e' switch can now be used without '-p'.
 	* Added doc/integrating-with-postfix.

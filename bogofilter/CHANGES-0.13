@@ -9,7 +9,7 @@ $Id$
 	* The static-build system has been revised. It is not very portable,
 	  but it works on recent Linux distros. This feature is mainly used for
 	  packaging RPMs. The revision now uses ./configure --enable-static
-	  to compile bogofilter_static et al in addition to dynamically linked
+	  to compile bogofilter_static at all in addition to dynamically linked
 	  executables.
 
 	* Some effort has been put in the autoconfiguration of the BerkeleyDB
@@ -51,13 +51,13 @@ $Id$
 	2003-05-19
 	* Remove incomplete RMAIL/Babyl-5 support.
 	* Added perl script contrib/mime.get.rfc822 to extract
-	  forwaded messages from with a message.
+	  forwarded messages from with a message.
 
 	2003-05-18
 	* Changed parsing defaults to:								
 
 	  -PI	ignore_case		(default is disabled)
-	  -Ph	header_line_markup 	(default is ensabled)
+	  -Ph	header_line_markup 	(default is enabled)
 	  -Pt	tokenize_html_tags 	(default is enabled)
 
 	2003-05-17
@@ -69,7 +69,7 @@ $Id$
 	  tags FONT, A, and IMG.
 
 	2003-05-15
-	* New parsing options (command line and config filee) for
+	* New parsing options (command line and config file) for
 	  ignore_case (-Pi/-PI), header_line_markup (-Ph/-PH), and
 	  tokenize_html_tags (-Pt/-PT).
 	* Registration code modified to count unique tokens for each
