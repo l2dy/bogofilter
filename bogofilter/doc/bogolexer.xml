@@ -11,7 +11,7 @@
   </refnamediv>
   <refsynopsisdiv id="synopsis">
     <cmdsynopsis>
-      <command>bogofilter</command>
+      <command>bogolexer</command>
         <arg choice='opt'>-p</arg>
         <arg choice='opt'>-q</arg>
         <arg choice='opt'>-h</arg>
