@@ -550,7 +550,6 @@ static double compute_spamicity(bogostat_t *bogostats, FILE *fp) /*@globals errn
 		default:
 		    assert(pp != NULL);
 		    assert(pp->key != NULL);
-		    assert(pp->stats != NULL);
 		    assert(stats_prefix != NULL);
 		    fprintf(fp, "%s%f  %f  %f  %8.5e  %s\n", stats_prefix, pp->prob, product, invproduct, spamicity, pp->key);
 		    break;
