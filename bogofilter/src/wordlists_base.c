@@ -18,15 +18,12 @@ bool	config_setup = false;
 /*@null@*/ wordlist_t* word_lists=NULL;
 
 /* returns -1 for error, 0 for success */
-int init_wordlist(/*@out@*/ wordlist_t **list, 
-		  const char* name, const char* path,
+int init_wordlist(const char* name, const char* path,
 		  int override, WL_TYPE type)
 {
     wordlist_t *n = (wordlist_t *)xcalloc(1, sizeof(*n));
     wordlist_t *list_ptr;
     static int listcount;
-
-    *list = n;
 
     n->dsh=NULL;
     n->listname=xstrdup(name);
@@ -43,9 +40,9 @@ int init_wordlist(/*@out@*/ wordlist_t **list,
 	    word_lists=n;
 	    n->next=list_ptr;
 	    break;
-        }
+	}
 
-        if (list_ptr->next == NULL) {
+	if (list_ptr->next == NULL) {
 	    /* end of list */
 	    list_ptr->next=n;
 	    n->next=NULL;
