@@ -12,7 +12,8 @@ cruft such as dates and message-IDs are discarded so as not to bloat
 the word lists.
 
 Note that the default location for the configuration files is
-/usr/local/etc, unless you override with --sysconfdir=/etc
+/etc on Linux and /usr/local/etc on all other systems, unless you
+override with --sysconfdir=/etc
 
 If you use mutt, see the bogofilter(1) manual page for helpful macros
 you can add to your .muttrc.
