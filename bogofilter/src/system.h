@@ -98,6 +98,18 @@ choke me because we do not know how to define uint32_t
 #endif
 #endif /* HAVE_UINT32_T */
 
+#ifndef HAVE_INT32_T
+#if SIZEOF_SIGNED_LONG == 4
+typedef signed long int32_t;
+#elif SIZEOF_SIGNED_INT == 4
+typedef signed int int32_t;
+#elif SIZEOF_SIGNED_SHORT == 4
+typedef signed short int32_t;
+#else
+choke me because we do not know how to define int32_t
+#endif
+#endif /* HAVE_INT32_T */
+
 #ifndef HAVE_ULONG
 typedef unsigned long ulong;
 #endif

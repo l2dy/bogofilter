@@ -320,8 +320,11 @@ AC_TYPE_UID_T
 AC_TYPE_SIGNAL
 AC_CACHE_SAVE
 AC_FUNC_SELECT_ARGTYPES
-AC_CHECK_TYPES([uint32_t, u_int32_t])
+AC_CHECK_TYPES([uint32_t, u_int32_t, int32_t])
 AC_CHECK_TYPES(ulong)
+AC_CHECK_SIZEOF(signed short)
+AC_CHECK_SIZEOF(signed int)
+AC_CHECK_SIZEOF(signed long)
 AC_CHECK_SIZEOF(unsigned short)
 AC_CHECK_SIZEOF(unsigned int)
 AC_CHECK_SIZEOF(unsigned long)
