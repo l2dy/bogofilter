@@ -281,9 +281,20 @@ double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 #ifdef	ENABLE_ROBINSON_METHOD
 void rob_print_summary(void)
 {
-    (void)fprintf(stdout, "%-*s %5lu %9.5f %9.5f %9.6f %9.3f %9.3f %4.2f\n",
-		  MAXTOKENLEN+2, "P_Q_S_invs_logs_md", (unsigned long)rob_stats.robn,
-		  rob_stats.p_pr, rob_stats.q_pr, rob_stats.s.spamicity, rob_stats.p_ln, rob_stats.q_ln, min_dev);
+    if (!Rtable) {
+	(void)fprintf(stdout, "%-*s %5lu %9.6f %9.6f %9.6f\n",
+		      MAXTOKENLEN+2, "P_Q_S_invs_logs_md", 
+		      (unsigned long)rob_stats.robn,
+		      rob_stats.p_pr, rob_stats.q_pr, rob_stats.s.spamicity);
+	(void)fprintf(stdout, "%-*s %9.2e %9.2e %6.3f\n",
+		      MAXTOKENLEN+2+6, " ", robs, robx, min_dev);
+    }
+    else
+	(void)fprintf(stdout, "%-*s %5lu %9.6f %9.6f %9.6f %9.3f %9.3f %5.3f\n",
+		      MAXTOKENLEN+2, "P_Q_S_invs_logs_md", 
+		      (unsigned long)rob_stats.robn,
+		      rob_stats.p_pr, rob_stats.q_pr, rob_stats.s.spamicity, 
+		      rob_stats.p_ln, rob_stats.q_ln, min_dev);
 }
 #endif
 

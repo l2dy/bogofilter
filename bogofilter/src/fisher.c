@@ -104,9 +104,17 @@ double fis_get_spamicity(size_t robn, FLOAT P, FLOAT Q )
 
 void fis_print_summary(void)
 {
-    (void)fprintf(stdout, "%-*s %5lu %9.2e %9.2e %9.2e %9.2e %9.2e %4.2f\n",
-		  MAXTOKENLEN+2, "N_P_Q_S_s_x_md", (unsigned long)fis_stats.robn, 
-		  fis_stats.p_pr, fis_stats.q_pr, fis_stats.s.spamicity, robs, robx, min_dev);
+    if (!Rtable) {
+	(void)fprintf(stdout, "%-*s %5lu %9.2e %9.2e %9.2e\n",
+		      MAXTOKENLEN+2, "N_P_Q_S_s_x_md", (unsigned long)fis_stats.robn, 
+		      fis_stats.p_pr, fis_stats.q_pr, fis_stats.s.spamicity);
+	(void)fprintf(stdout, "%-*s %9.2e %9.2e %6.3f\n",
+		      MAXTOKENLEN+2+6, " ", robs, robx, min_dev);
+    }
+    else
+	(void)fprintf(stdout, "%-*s %5lu %9.2e %9.2e %9.2e %9.2e %9.2e %5.3f\n",
+		      MAXTOKENLEN+2, "N_P_Q_S_s_x_md", (unsigned long)fis_stats.robn, 
+		      fis_stats.p_pr, fis_stats.q_pr, fis_stats.s.spamicity, robs, robx, min_dev);
 }
 
 void fis_initialize_constants(void)

@@ -215,8 +215,12 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count)
     size_t r;
 
     /* print header */
-    (void)fprintf(stdout, "%*s%6s%10s%10s%10s%10s%10s %s\n",
-		  MAXTOKENLEN+2,"","n", "pgood","pbad","fw","invfwlog","fwlog", "U");
+    if (!Rtable)
+	(void)fprintf(stdout, "%*s%6s    %-6s    %-6s    %-6s %s\n",
+		      MAXTOKENLEN+2,"","n", "pgood", "pbad", "fw", "U");
+    else
+	(void)fprintf(stdout, "%*s%6s    %-6s    %-6s    %-6s    %-6s    %-6s %s\n",
+		      MAXTOKENLEN+2,"","n", "pgood", "pbad", "fw","invfwlog", "fwlog", "U");
 
     /* Print 1 line per token */
     for (r= 0; r<count; r+=1)
@@ -236,10 +240,16 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 
 	(void)fputc( '"', stdout);
 	(void)word_puts(token, 0, stdout);
-	(void)fprintf(stdout, "\"%*s %5d  %8.6f  %8.6f  %8.6f%10.5f%10.5f %c\n",
-		      len, " ",
-		      (int)n, g / msgs_good, b / msgs_bad, 
-		      fw, log(1.0 - fw), log(fw), flag);
+
+	if (!Rtable)
+	    (void)fprintf(stdout, "\"%*s %5d  %8.6f  %8.6f  %8.6f %c\n",
+			  len, " ",
+			  (int)n, g / msgs_good, b / msgs_bad, fw, flag);
+	else
+	    (void)fprintf(stdout, "\"%*s %5d  %8.6f  %8.6f  %8.6f%10.5f%10.5f %c\n",
+			  len, " ",
+			  (int)n, g / msgs_good, b / msgs_bad, 
+			  fw, log(1.0 - fw), log(fw), flag);
     }
 
     /* print trailer */
