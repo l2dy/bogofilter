@@ -5,6 +5,10 @@
 NOTE: More information on important changes for bogofilters updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+0.16.2.1 2004-01-17
+
+	* Removed optional argument from "-u" flag.
+
 0.16.2	2004-01-16
 
 	* Added '-c' (compact) option to bogominitrain.pl
