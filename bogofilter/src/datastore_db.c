@@ -258,25 +258,16 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 
     check_db_version();
 
-    switch (open_mode)
-    {
-    case DS_READ:
+    if (open_mode & DS_READ )
 	opt_flags = DB_RDONLY;
-	break;
-    case DS_CREATE:
+    if (open_mode & DS_CREATE )
 	opt_flags = DB_CREATE | DB_EXCL;
-	break;
-    default:
-	/* Read-write mode implied.  Allow database to be created if
-	 * necessary. DB_EXCL makes sure our locking doesn't fail if two
-	 * applications try to create a DB at the same time. */
-	opt_flags = 0;
-    }
 
     /* retry when locking failed */
     for (idx = 0; idx < COUNTOF(retryflags); idx += 1)
     {
 	DB *dbp;
+	bool err = false;
 	uint32_t retryflag = retryflags[idx], pagesize;
 
 	handle = dbh_init(path, name);
@@ -308,9 +299,16 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 	    t = handle->name;
 
 retry_db_open:
-	if ((ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | retryflag, 0664)) != 0
-	    && ( ret != ENOENT || opt_flags == DB_RDONLY ||
-		(ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664)) != 0))
+	ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | retryflag, 0664);
+
+	if (ret != 0) {
+	    if (ret == ENOENT && opt_flags != DB_RDONLY)
+		return NULL;
+	    else
+		err = true;
+	}
+
+	if (err)
 	{
 	    if (opt_flags != DB_RDONLY && ret == EEXIST && --retries) {
 		/* sleep for 4 to 100 ms - this is just to give up the CPU

@@ -121,6 +121,13 @@ void dsh_free(void *vhandle)
 void *ds_open(const char *path, const char *name, dbmode_t open_mode)
 {
     void *v = db_open(path, name, open_mode);
+
+    if (v == NULL && open_mode != DS_READ) {
+	v = db_open(path, name, DS_CREATE);
+	if (v && open_mode != DS_WRITE)
+	    ds_set_wordlist_version(v, NULL);
+    }
+
     return v;
 }
 
