@@ -36,6 +36,7 @@ THEORY:
 #include "method.h"
 #include "mime.h"
 #include "msgcounts.h"
+#include "passthrough.h"
 #include "register.h"
 #include "rstats.h"
 #include "wordlists.h"
@@ -59,16 +60,6 @@ THEORY:
 **
 **end:	register if -snSN && ! -pe
 */
-
-/* Function definitions */
-
-/* in main.c */
-extern FILE *fpo;
-extern void passthrough_setup(void);
-extern void passthrough_cleanup(void);
-extern void write_message(rc_t status);
-
-/* Function Prototypes */
 
 /* Function Definitions */
 
