@@ -77,13 +77,17 @@ enum algorithm_e {
 
 /* Local variables and declarations */
 
+#ifdef	ENABLE_DEPRECATED_CODE
 static enum algorithm_e algorithm = AL_DEFAULT;
 static bool cmd_algorithm = false;		/* true if specified on command line */
+#endif
 
 static void display_tag_array(const char *label, FIELD *array);
 
+#ifdef	ENABLE_DEPRECATED_CODE
 static bool config_algorithm(const unsigned char *s);
 static bool select_algorithm(const unsigned char ch, bool cmdline);
+#endif
 
 static void process_args_1(int argc, char **argv);
 static void process_args_2(int argc, char **argv);
@@ -114,7 +118,9 @@ const parm_desc sys_parms[] =
     { "stats_in_header",  CP_BOOLEAN,	{ (void *) &stats_in_header } },
     { "user_config_file", CP_STRING,	{ &user_config_file } },
 
+#ifdef	ENABLE_DEPRECATED_CODE
     { "algorithm",  	  CP_FUNCTION,	{ (void *) &config_algorithm } },
+#endif
     { "bogofilter_dir",	  CP_DIRECTORY,	{ &directory } },
     { "wordlist",	  CP_FUNCTION,	{ (void *) &configure_wordlist } },
     { "update_dir",	  CP_STRING,	{ &update_dir } },
@@ -223,11 +229,14 @@ static run_t check_run_type(run_t add_type, run_t conflict)
     return (run_type | add_type);
 }
 
+#ifdef	ENABLE_DEPRECATED_CODE
 static bool config_algorithm(const unsigned char *s)
 {
     return select_algorithm((unsigned char)tolower(*s), false);
 }
+#endif
 
+#ifdef	ENABLE_DEPRECATED_CODE
 static bool select_algorithm(const unsigned char ch, bool cmdline)
 {
     enum algorithm_e al = (enum algorithm_e)ch;
@@ -241,11 +250,9 @@ static bool select_algorithm(const unsigned char ch, bool cmdline)
 
     switch (al)
     {
-#ifdef	ENABLE_DEPRECATED_CODE
     case AL_GRAHAM:
 	method = (method_t *) &graham_method;
 	break;
-#endif
     case AL_ROBINSON:
 	method = (method_t *) &rf_robinson_method;
 	break;
@@ -256,13 +263,14 @@ static bool select_algorithm(const unsigned char ch, bool cmdline)
 	print_error(__FILE__, __LINE__, "Algorithm '%c' not supported.\n", al);
 	return false;
     }
+
     usr_parms = method->config_parms;
     return true;
 }
+#endif
 
 static int validate_args(void)
 {
-
 /*  flags '-s', '-n', '-S', or '-N', are mutually exclusive of flags '-p', '-u', '-e', and '-R'. */
     run_classify = (run_type & (RUN_NORMAL | RUN_UPDATE)) != 0;
     run_register = (run_type & (REG_SPAM | REG_GOOD | UNREG_SPAM | UNREG_GOOD)) != 0;
@@ -458,7 +466,12 @@ void process_args_1(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
     set_today();		/* compute current date for token age */
+#ifdef	ENABLE_DEPRECATED_CODE
     select_algorithm(algorithm, false);	/* select default algorithm */
+#else
+    method = (method_t *) &rf_fisher_method;
+    usr_parms = method->config_parms;
+#endif
 
     while ((option = getopt(argc, argv, OPTIONS)) != -1)
     {
@@ -506,9 +519,11 @@ void process_args_1(int argc, char **argv)
 	    nonspam_exits_zero = true;
 	    break;
 
+#ifdef	ENABLE_DEPRECATED_CODE
 	case 'f':
 	    select_algorithm(AL_FISHER, true);
 	    break;
+#endif
 
 #ifdef	ENABLE_DEPRECATED_CODE
 	case 'g':
@@ -552,9 +567,11 @@ void process_args_1(int argc, char **argv)
 	    passthrough = true;
 	    break;
 
+#ifdef	ENABLE_DEPRECATED_CODE
 	case 'r':
 	    select_algorithm(AL_ROBINSON, true);
 	    break;
+#endif
 
 	case 'Q':
 	    query = true;
@@ -562,9 +579,11 @@ void process_args_1(int argc, char **argv)
 
 	case 'R':
 	    Rtable = 1;
+#ifdef	ENABLE_DEPRECATED_CODE
 	    if (algorithm != AL_ROBINSON && algorithm != AL_FISHER)
 		if (AL_DEFAULT == AL_ROBINSON || AL_DEFAULT == AL_FISHER)
 		    algorithm = AL_DEFAULT;
+#endif
 	    break;
 
 	case 's':

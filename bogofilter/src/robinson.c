@@ -33,6 +33,7 @@ double	thresh_rtable = 0.0;		/* used in fisher.c */
 
 static rob_stats_t  rob_stats;
 
+#ifdef	ENABLE_DEPRECATED_CODE
 const parm_desc rob_parm_table[] =	/* needed by fisher.c */
 {
     { "robx",		  CP_DOUBLE,	{ (void *) &robx } },
@@ -40,15 +41,19 @@ const parm_desc rob_parm_table[] =	/* needed by fisher.c */
     { "thresh_rtable",	  CP_DOUBLE,	{ (void *) &thresh_rtable } },
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
+#endif
 
 /* Function Prototypes */
 
+#ifdef	ENABLE_DEPRECATED_CODE
 static void	rob_initialize_constants(void);
 static double	rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
+#endif
 static void	rob_print_summary(void);
 
 /* Static Variables */
 
+#ifdef	ENABLE_DEPRECATED_CODE
 rf_method_t rf_robinson_method = {	/* needed by config.c */
     {
 	"robinson",			/* const char		  *name;		*/
@@ -63,6 +68,7 @@ rf_method_t rf_robinson_method = {	/* needed by config.c */
     rob_get_spamicity,			/* rf_get_spamicity	  *get_spamicity	*/
     rob_print_summary			/* rf_print_summary	  *print_summary	*/
 };
+#endif
 
 /* Function Definitions */
 
@@ -291,6 +297,7 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     return (spamicity);
 }
 
+#ifdef	ENABLE_DEPRECATED_CODE
 double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 {
     if (robn == 0)
@@ -314,7 +321,9 @@ double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 
     return rob_stats.s.spamicity;
 }
+#endif
 
+#ifdef	ENABLE_DEPRECATED_CODE
 void rob_print_summary(void)
 {
     if (!Rtable) {
@@ -332,6 +341,7 @@ void rob_print_summary(void)
 		      rob_stats.p_pr, rob_stats.q_pr, rob_stats.s.spamicity, 
 		      rob_stats.p_ln, rob_stats.q_ln, min_dev);
 }
+#endif
 
 void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double _spam_cutoff)
 {
@@ -375,10 +385,12 @@ void rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double 
     return;
 }
 
+#ifdef	ENABLE_DEPRECATED_CODE
 void rob_initialize_constants(void)
 {
     rob_initialize_with_parameters(&rob_stats, ROBINSON_MIN_DEV, ROBINSON_SPAM_CUTOFF);
 }
+#endif
 
 void rob_cleanup(void)
 {
