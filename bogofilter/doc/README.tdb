@@ -1,7 +1,18 @@
 To build and run bogofilter using the Trivial Database (tdb), you'll
 need to do the following:
 
-1. Have tdb and gdbm installed.
+1. Dump your current BerkeleyDB wordlists into text files
+
+   If you are using a single wordlist, say
+
+   'bogoutil -d /path/to/wordlist.db > wordlist.txt'
+
+   Otherwise, say
+
+   for f in goodlist spamlist; do bogoutil -d /path/to/${f}.db > ${f}.txt;done
+
+   
+2. Have tdb and gdbm installed.
 
    tdb needs gdbm, so if neither is installed, you'll need to:
 
@@ -14,7 +25,7 @@ need to do the following:
       tarball, build with the usual commands: "./configure && make &&
       make install"
 
-2. From the bogofilter directory, run:
+3. From the bogofilter directory, run:
 
    "./configure --with-tdb && make && make check && make install"
   
@@ -23,7 +34,7 @@ need to do the following:
    "make with_tdb=1 rpm"
 
 
-3. To verify configuration, run:
+4. To verify configuration, run:
 
    bogofilter -V
 
@@ -33,7 +44,18 @@ need to do the following:
       Algorithms: Fisher Graham Robinson
       Database: TrivialDB
 
-4. When running bogofilter, the database files will have a tdb
+5. When running bogofilter, the database files will have a tdb
    extension.  For combined list bogofilter, the database is
    wordlist.tdb.  For separate list bogofilter, the databases are
    spamlist.tdb and goodlist.tdb.
+
+6. If you dumped your old databases in step 1, load them now.
+
+   If you are using a single wordlist, say
+
+   'bogoutil -l /path/to/wordlist.tdb < wordlist.txt'
+
+   Otherwise, say
+
+   for f in goodlist spamlist; do bogoutil -l /path/to/${f}.db < ${f}.txt;done
+
