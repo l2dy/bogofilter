@@ -39,6 +39,21 @@ extern bool msg_header;
 
 extern bool is_from(const byte *text, size_t leng);
 
+/* Define a struct for interfacing to a lexer */
+
+typedef token_t yylex_t(void);
+
+typedef struct lexer_s {
+    yylex_t  *yylex;
+    char    **yytext;
+    size_t   *yyleng;
+} lexer_t;
+
+extern lexer_t *lexer;
+
+extern lexer_t v3_lexer;
+extern lexer_t msg_count_lexer;
+
 /* in lexer_v3.l */
 extern token_t	lexer_v3_lex(void);
 extern int	lexer_v3_leng;
