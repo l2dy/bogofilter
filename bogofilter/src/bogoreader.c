@@ -72,10 +72,11 @@ static reader_more_t mailbox_next_mail;
 static reader_line_t simple_getline;	/* ignores /^From / */
 static reader_line_t mailbox_getline;	/* minds   /^From / */
 static reader_line_t rmail_getline;	/* minds   /^#! rmail/ */
+<static reader_line_t ant_getline;	/* minds   /^MAIL TO:/ */
 
 static reader_file_t get_filename;
 
-typedef enum { MBOX, RMAIL } mbox_t;
+typedef enum { MBOX, RMAIL, ANT } mbox_t;
 
 typedef struct {
     const char	*sep;
@@ -86,7 +87,8 @@ typedef struct {
 
 sep_2_box_t sep_2_box[] = {
     { "From ",       5, MBOX,  mailbox_getline },
-    { "#! rmail",    8, RMAIL, rmail_getline }
+    { "#! rmail",    8, RMAIL, rmail_getline },
+    { "MAIL FROM:", 10, ANT,   ant_getline }		/* RISC-OS only */
 };
 
 ssize_t     seplen = 0;
@@ -487,6 +489,51 @@ static int rmail_getline(buff_t *buff)
 	    count = EOF;
 	}
     } else {
+	if (buff->t.leng < buff->size)		/* for easier debugging - removable */
+	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
+    }
+
+    emptyline = (count == 1 && *buf == '\n');
+
+    return count;
+}
+
+/* reads from an ANT batch, paying attention to ^#! rmail lines */
+static int ant_getline(buff_t *buff)
+{
+    int count;
+    size_t used = buff->t.leng;
+    byte *buf = buff->t.text + used;
+    static word_t *saved = NULL;
+    static bool dot_found = true;
+
+    if (saved != NULL) {
+	count = saved->leng;
+	buff_add(buff, saved);
+	word_free(saved);
+	saved = NULL;
+	return count;
+    }
+
+    count = buff_fgetsl(buff, fpin);
+    have_message = false;
+
+    if (dot_found && count >= seplen && memcmp(separator, buf, seplen) == 0)
+    {
+	dot_found = false;		/* ignore until dot */
+	if (firstline) {
+	    firstline = false;
+	}
+	else {
+	    have_message = true;
+	    saved = word_new(buf, count);
+	    count = EOF;
+	}
+    } else {
+        if ((count == 2 || count == 3) && 
+	    (buf[0] == '.') && 
+	    (buf[1] == '\r' || buf[1] == '\n'))
+            dot_found = true;		/* dot found.  look for separator */
 	if (buff->t.leng < buff->size)		/* for easier debugging - removable */
 	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
     }
