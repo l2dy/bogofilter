@@ -504,21 +504,19 @@ wordhash_t *
 convert_propslist_to_countlist(wordhash_t *whi)
 {
     hashnode_t *node;
-    wordhash_t *who = wordhash_init(WH_CNTS, whi->count);
+    wordhash_t *who = NULL;
     uint count = 0;
 
     if (whi->type == WH_CNTS)
 	return whi;
 
-    if (whi->type == WH_NORMAL)
-	who = wordhash_init(WH_CNTS, whi->size);
-    else {
-	if (whi->type != WH_PROPS) {
-	    fprintf(stderr, "convert_propslist_to_countlist() called with non-WH_PROPS parameter.\n");
-	    exit(EX_ERROR);
-	}
-	who = wordhash_init(WH_CNTS, whi->size);
+    if (whi->type != WH_NORMAL &&
+	whi->type != WH_PROPS) {
+	fprintf(stderr, "convert_propslist_to_countlist() called with invalid input.\n");
+	exit(EX_ERROR);
     }
+
+    who = wordhash_init(WH_CNTS, whi->size);
 
     for(node = wordhash_first(whi); node != NULL; node = wordhash_next(whi)) {
 	wordcnts_t *ci = wordhash_get_counts(whi, node);
