@@ -35,11 +35,11 @@ john
 doe
 Reply-To
 john_q_public
-iso-8859-1
-iso-8859-1
 torso
 header
-g_EOF
+iso-8859-1
+iso-8859-1
+_EOF
 
 ../bogolexer -p -C <${TMPDIR}/input >${TMPDIR}/output
 cmp ${TMPDIR}/reference ${TMPDIR}/output \
