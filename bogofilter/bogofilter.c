@@ -1,7 +1,12 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.17  2002/09/24 19:47:49  m-a
+ * Add missing #include "datastore.h". Drop unused strlwr.
+ *
  * Revision 1.16  2002/09/24 04:34:19  gyepi
+ *
+ *
  *  Modified Files:
  *  	Makefile.am  -- add entries for datastore* + and other new files
  *         bogofilter.c bogofilter.h main.c -- fixup to use database abstraction
@@ -106,6 +111,7 @@ I do the lexical analysis slightly differently, however.
 #include <Judy.h>
 #include "bogofilter.h"
 #include "lock.h"
+#include "datastore.h"
 
 // implementation details
 #define HEADER		"# bogofilter email-count (format version B): %lu\n"
@@ -127,13 +133,6 @@ wordlist_t ham_list	= {"ham", NULL, 0, NULL};
 wordlist_t spam_list	= {"spam", NULL, 0, NULL};
 
 #define	PLURAL(count) ((count == 1) ? "" : "s")
-
-static void strlwr(char* s)
-{
-    char c;
-    while((c = *s) != 0)
-	*s++ = tolower(c);
-}
 
 void register_words(int fdin, wordlist_t *list, wordlist_t *other)
 // tokenize text on stdin and register it to  a specified list
