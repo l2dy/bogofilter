@@ -12,6 +12,6 @@ NAME:
 
 #include "word.h"
 
-int uudecode(word_t *word);
+size_t uudecode(word_t *word);
 
 #endif	/* HAVE_UUDECODE_H */

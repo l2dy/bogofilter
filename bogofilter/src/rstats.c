@@ -33,8 +33,8 @@ typedef struct rstats_s rstats_t;
 struct rstats_s {
     rstats_t *next;
     word_t *token;
-    double good;
-    double bad;
+    u_int32_t	good;
+    u_int32_t	bad;
     double prob;
 };
 
@@ -246,10 +246,10 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 	rstats_t *cur = rstats_array[r];
 	const word_t *token = cur->token;
 	int len = max(0, MAXTOKENLEN-(int)token->leng);
-	double g = min(cur->good, msgs_good);
-	double b = min(cur->bad,  msgs_bad);
+	double g = (double) min(cur->good, msgs_good);
+	double b = (double) min(cur->bad,  msgs_bad);
 	double c = g + b;
-	int n = c;
+	int n = (int) c;
 	double pw = ((n == 0) 
 		     ? 0.0
 		     : ((b / bad_cnt) /

@@ -230,17 +230,17 @@ static int load_file(const char *ds_file)
 	p = spanword(buf);
 	len = strlen((const char *)buf);
 
-	spamcount = atoi((const char *)p);
+	spamcount = (uint) atoi((const char *)p);
 	if ((int) spamcount < 0)
 	    spamcount = 0;
 	p = spanword(p);
 
-	goodcount = atoi((const char *)p);
+	goodcount = (uint) atoi((const char *)p);
 	if ((int) goodcount < 0)
 	    goodcount = 0;
 	p = spanword(p);
 
-	date = atoi((const char *)p);
+	date = (uint) atoi((const char *)p);
 	p = spanword(p);
 
 	if (*p != '\0') {
@@ -583,7 +583,7 @@ static int process_args(int argc, char **argv)
 	    break;
 
 	case 'k':
-	    db_cachesize=atoi(optarg);
+	    db_cachesize=(uint) atoi(optarg);
 	    break;
 
 	case 'l':

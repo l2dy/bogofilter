@@ -54,7 +54,7 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
   format_log_update(msg_register, msg_register_size, u, r, wordcount, msgcount);
 
   if (verbose)
-    (void)fprintf(dbgout, "# %d word%s, %d message%s\n", 
+    (void)fprintf(dbgout, "# %u word%s, %u message%s\n", 
 		  wordcount, PLURAL(wordcount), msgcount, PLURAL(msgcount));
 
   /* When using auto-update with separate wordlists , 

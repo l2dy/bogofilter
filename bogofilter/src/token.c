@@ -65,8 +65,8 @@ token_t get_token(void)
 	    save_class = NONE;
 	else
 	{
-	    *t = '\0';	
-	    ipsave->leng = t - ipsave->text;
+	    *t = (byte) '\0';	
+	    ipsave->leng = (uint) (t - ipsave->text);
 	    yylval = ipsave;
 	    return save_class;
 	}
@@ -77,7 +77,7 @@ token_t get_token(void)
 
     while (!done) {
 	cls = lexer->yylex();
-	yylval->leng = *lexer->yyleng;
+	yylval->leng = (uint) *lexer->yyleng;
 	yylval->text = (unsigned char *)(*lexer->yytext);
 
 	if (DEBUG_TEXT(2)) { 
@@ -117,14 +117,14 @@ token_t get_token(void)
 			    break;
 			if (ot == NULL) {
 			    ot = in;
-			    *ot++ = '#';
+			    *ot++ = (byte) '#';
 			}
 		    }
 		}
 		if (ot != NULL)
 		    *ot++ = *in;
 	    }
-	    yylval->leng = ot - st;
+	    yylval->leng = (uint) (ot - st);
 	    Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
 	    if (token_prefix != NULL) {
 		word_t *o = yylval;
@@ -139,7 +139,7 @@ token_t get_token(void)
 		continue;
 	    else {
 		const char *delim = strchr((const char *)yylval->text, ':');
-		yylval->leng = delim - (const char *)yylval->text;
+		yylval->leng = (uint) (delim - (const char *)yylval->text);
 		Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
 	    }
 
@@ -230,13 +230,13 @@ token_t get_token(void)
 	/* From "From ", for example */
 	while (yylval->leng > 1 && yylval->text[yylval->leng-1] == ' ') {
 	    yylval->leng -= 1;
-	    yylval->text[yylval->leng] = '\0';
+	    yylval->text[yylval->leng] = (byte) '\0';
 	}
 
 	/* Remove trailing colon */
 	if (yylval->leng > 1 && yylval->text[yylval->leng-1] == ':') {
 	    yylval->leng -= 1;
-	    yylval->text[yylval->leng] = '\0';
+	    yylval->text[yylval->leng] = (byte) '\0';
 	}
 
 	/* Need separate loop so lexer can see "From", "Date", etc *

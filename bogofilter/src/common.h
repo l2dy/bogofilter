@@ -41,7 +41,7 @@ typedef uint32_t YYYYMMDD;	/* date as YYYYMMDD */
 #define	Z(n)		/* mark end of string */
 #else
 #define	D	1	/* size adjustment */
-#define	Z(n)	n='\0'	/* mark end of string */
+#define	Z(n) n=(byte)'\0' /* mark end of string */
 #endif
 
 /* length of token will not exceed this... */
@@ -77,7 +77,7 @@ typedef enum sh_e { IX_SPAM = 0, 	/* index for SPAM */
 #define	GRAHAM_AND_ROBINSON
 #endif
 
-#define COUNTOF(array)	(size_t)(sizeof(array)/sizeof(array[0]))
+#define COUNTOF(array)	(uint)(sizeof(array)/sizeof(array[0]))
 
 typedef unsigned char byte;
 

@@ -39,8 +39,8 @@ static char *convert_format_to_string(char *buff, size_t size, const char *forma
 
 const char *reg = "";
 const char *unreg = "";
-int wrdcount = 0;
-int msgcount = 0;
+uint wrdcount = 0;
+uint msgcount = 0;
 
 /* initialized static variables */
 
@@ -391,11 +391,11 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 		buff += format_string(buff, temp, 0, 0, 0, end);
 		break;
 	    case 'w':		/* w - word count */
-		snprintf( temp, sizeof(temp), "%d", wrdcount );
+		snprintf( temp, sizeof(temp), "%u", wrdcount );
 		buff += format_string(buff, temp, 0, 0, 0, end);
 		break;
 	    case 'm':		/* m - message count */
-		snprintf( temp, sizeof(temp), "%d", msgcount );
+		snprintf( temp, sizeof(temp), "%u", msgcount );
 		buff += format_string(buff, temp, 0, 0, 0, end);
 		break;
 	    case 'v':		/* v - version, ex. "version=%v" */
@@ -432,7 +432,7 @@ char *format_terse(char *buff, size_t size)
     return convert_format_to_string( buff, size, terse_format );
 }
 
-char *format_log_update(char *buff, size_t size, const char *_reg, const char *_unreg, int _wrd, int _msg)
+char *format_log_update(char *buff, size_t size, const char *_reg, const char *_unreg, uint _wrd, uint _msg)
 {
     reg = _reg;
     unreg = _unreg;

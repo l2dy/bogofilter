@@ -162,7 +162,7 @@ static st_t ismaildir(const char *dir) {
     size_t l;
     char *x;
     const char *const *y;
-    const int maxlen = 4;
+    const size_t maxlen = 4;
 
     r = isdir(dir);
     if (r != IS_DIR) return r;

@@ -69,11 +69,11 @@ rc_t bogofilter(int argc, char **argv)
 {
     int msgcount = 0;
     rc_t status = RC_OK;
-    bool register_opt = run_type & (REG_SPAM | UNREG_SPAM | REG_GOOD | UNREG_GOOD);
+    bool register_opt = (run_type & (REG_SPAM | UNREG_SPAM | REG_GOOD | UNREG_GOOD)) != 0;
     bool register_bef = register_opt && passthrough;
-    bool register_aft = (register_opt && !passthrough) || (run_type & RUN_UPDATE);
+    bool register_aft = ((register_opt && !passthrough) || (run_type & RUN_UPDATE)) != 0;
     bool write_msg    = passthrough || Rtable;
-    bool classify_msg = write_msg || (run_type & (RUN_NORMAL | RUN_UPDATE));
+    bool classify_msg = write_msg || ((run_type & (RUN_NORMAL | RUN_UPDATE))) != 0;
 
     wordhash_t *words = register_aft ? wordhash_new() : NULL;
 

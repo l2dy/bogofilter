@@ -99,8 +99,8 @@ static void wordprob_add(wordprop_t* wordstats, int count, int bad)
 
 static double wordprob_result(wordprop_t* wordstats)
 {
-    double g = min(wordstats->good, msgs_good);
-    double b = min(wordstats->bad,  msgs_bad);
+    double g = (double) min(wordstats->good, msgs_good);
+    double b = (double) min(wordstats->bad,  msgs_bad);
     double n = g + b;
 
     double pw = (n < EPS) ? 0.0 : ((b / bad_cnt) / 

@@ -231,7 +231,7 @@ static run_t check_run_type(run_t add_type, run_t conflict)
 
 static bool config_algorithm(const unsigned char *s)
 {
-    return select_algorithm(tolower(*s), false);
+    return select_algorithm((unsigned char)tolower(*s), false);
 }
 
 static bool select_algorithm(const unsigned char ch, bool cmdline)
@@ -795,8 +795,8 @@ void query_config(void)
 
 static void display_tag_array(const char *label, FIELD *array)
 {
-    size_t i;
-    size_t count = twostate ? 2 : 3;
+    int i;
+    int count = twostate ? 2 : 3;
     const char *s;
 
     fprintf(stdout, "%s =", label);

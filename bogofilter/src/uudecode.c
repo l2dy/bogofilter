@@ -14,7 +14,7 @@ AUTHOR:
 
 #include "uudecode.h"
 
-int uudecode(word_t *word)
+size_t uudecode(word_t *word)
 {
     size_t size = word->leng;
     size_t count = 0;
@@ -54,6 +54,6 @@ int uudecode(word_t *word)
 	*d++ = *s++;
 	count += 1;
     }
-    *d = '\0';
+    *d = (byte) '\0';
     return count;
 }

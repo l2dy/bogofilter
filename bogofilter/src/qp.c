@@ -66,7 +66,7 @@ size_t qp_decode(word_t *word)
 	}
 	*d++ = ch;
     }
-    *d = '\0';
+    *d = (byte) '\0';
     return d - word->text;
 }
 
@@ -75,7 +75,7 @@ size_t qp_decode(word_t *word)
 
 static void qp_init(void)
 {
-    size_t i;
+    uint i;
     static bool first = true;
 
     if (!first)
@@ -87,8 +87,8 @@ static void qp_init(void)
     }
 
     qp_xlate['?'] = 0;
-    qp_xlate[' '] = ' ';
-    qp_xlate['_'] = ' ';
+    qp_xlate[' '] = (byte) ' ';
+    qp_xlate['_'] = (byte) ' ';
 
     return;
 }

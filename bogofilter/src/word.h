@@ -14,7 +14,7 @@ AUTHOR:
 #define	WORD_H
 
 typedef struct {
-    size_t leng;
+    uint    leng;
     byte   *text;
 } word_t;
 

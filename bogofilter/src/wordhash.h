@@ -38,9 +38,9 @@ typedef struct wordhash_s {
   /*@null@*/  /*@dependent@*/ hashnode_t *iter_head;
   /*@null@*/  /*@dependent@*/ hashnode_t *iter_tail;
 
-  /*@null@*/  /*@dependent@*/ size_t index;		/* access index */
-  /*@null@*/  /*@dependent@*/ size_t count;		/* size of array */
-  /*@null@*/  /*@dependent@*/ size_t wordcount;		/* count of words */
+  /*@null@*/  /*@dependent@*/ uint index;		/* access index */
+  /*@null@*/  /*@dependent@*/ uint count;		/* size of array */
+  /*@null@*/  /*@dependent@*/ uint wordcount;		/* count of words */
   /*@null@*/  /*@dependent@*/ hashnode_t **order;	/* array of nodes */
   /*@null@*/  /*@dependent@*/ hashnode_t  *props;	/* array of nodes */
 } wordhash_t;

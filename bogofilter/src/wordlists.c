@@ -23,7 +23,6 @@
 #define	MIN_SLEEP	0.5e+3		/* 0.5 milliseconds */
 #define	MAX_SLEEP	2.0e+6		/* 2.0 seconds */
 
-
 wordlist_t *good_list;
 wordlist_t *spam_list;
 
@@ -42,9 +41,9 @@ static void rand_sleep(double min, double max)
 	struct timeval timeval;
 	need_init = false;
 	gettimeofday(&timeval, NULL);
-	srand(timeval.tv_usec);
+	srand((uint)timeval.tv_usec);
     }
-    delay = min + ((max-min)*rand()/(RAND_MAX+1.0));
+    delay = (int)(min + ((max-min)*rand()/(RAND_MAX+1.0)));
     bf_sleep(delay);
 }
 

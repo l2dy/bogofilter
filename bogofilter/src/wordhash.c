@@ -208,7 +208,7 @@ void wordhash_add(wordhash_t *dest, wordhash_t *src, void (*initializer)(void *)
     wordprop_t *d;
     hashnode_t *s;
 
-    int count = dest->count + src->count;	/* use dest count as total */
+    uint count = dest->count + src->count;	/* use dest count as total */
 
     dest->wordcount += src->wordcount;
 
