@@ -19,6 +19,7 @@ David Relson <relson@osagesoftware.com>  2003
 #include <time.h>
 #include <unistd.h>
 #include <errno.h>
+#include <limits.h>
 
 #ifndef	ENABLE_TDB_DATASTORE
 #include "datastore_db.h"
@@ -168,7 +169,7 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 
 	    if (DEBUG_DATABASE(3)) {
 		fprintf(dbgout, "ds_read: [%*s] -- %lu,%lu\n",
-			word->leng, word->text,
+			(int)max(word->leng, INT_MAX), word->text,
 			(unsigned long)val->spamcount,
 			(unsigned long)val->goodcount);
 	    }
@@ -177,7 +178,7 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 	case DB_NOTFOUND:
 	    if (DEBUG_DATABASE(3)) {
 		fprintf(dbgout, "ds_read: [%*s] not found\n", 
-			word->leng, (char *) word->text);
+			(int)max(word->leng, INT_MAX), (char *) word->text);
 	    }
 	    break;
 	    
@@ -185,7 +186,7 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 	    fprintf(dbgout, "ret=%d, DB_NOTFOUND=%d\n", ret, DB_NOTFOUND);
 #ifndef	ENABLE_TDB_DATASTORE
 	    print_error(__FILE__, __LINE__, "ds_read( '%*s' ), err: %d, %s", 
-			word->leng, (char *) word->text, ret, db_strerror(ret));
+			(int)max(word->leng, INT_MAX), (char *) word->text, ret, db_strerror(ret));
 #else
 	    print_error(__FILE__, __LINE__, "ds_read( '%*s' ), err: %d, %s", 
 			word->leng, (char *) word->text, ret, tdb_errorstr(dsh->dbh));
@@ -241,7 +242,7 @@ int ds_write(void *vhandle, const word_t *word, dsv_t *val)
 
 	if (DEBUG_DATABASE(3)) {
 	    fprintf(dbgout, "ds_write: [%*s] -- %lu,%lu\n",
-		    word->leng, word->text,
+		    (int)max(word->leng, INT_MAX), word->text,
 		    (unsigned long)val->spamcount,
 		    (unsigned long)val->goodcount);
 	}
