@@ -13,6 +13,13 @@ set -e
 : ${relpath=..}
 : ${BF_TESTDIR=.}
 
+LANG=
+LC_COLLATE=
+LC_ALL=
+unset LANG || :
+unset LC_COLLATE || :
+unset LC_ALL || :
+
 if [ -z "$RUN_FROM_MAKE" ] ; then
 # standalone, from shell directly
 # THIS IS PRONE TO RACES
