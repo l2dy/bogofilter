@@ -23,7 +23,7 @@ FreeBSD:
 
 If you encounter a slew of errors, it may be necessary to create a
 catalog file.  The following line will create the needed file for a
-Mandrake 9.1 system:
+Mandrake system (with html-4.01.tar.gz installed in /usr/share/sgml/html/):
 
     echo 'CATALOG "/usr/share/sgml/html/catalog"' > catalog
 
