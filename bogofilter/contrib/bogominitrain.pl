@@ -7,7 +7,8 @@ my $commandlineoptions=($ARGV[0]=~/^-(?=[^v]*v{0,2}[^v]*$)(?=[^f]*f?[^f]*$)(?=[^
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.01
+bogominitrain.pl version 1.1
+  requires bogofilter 0.14.1 or later
 
 Usage:
   bogominitrain.pl [-[f][v[v]][s]] <database-directory> <ham-mboxes>\\ 
