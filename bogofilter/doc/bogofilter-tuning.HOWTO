@@ -188,7 +188,7 @@ lowering the false-positive target too much gives too many false
 negatives).
 
 2. Apply the parameters to classify a number of known nonspam messages.
->From the distribution of scores, pick a spam cutoff value that will
+From the distribution of scores, pick a spam cutoff value that will
 give the selected proportion of false positives.
 
 3. Apply the parameters and the chosen spam cutoff to classify a number
