@@ -248,10 +248,13 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 	(void)word_puts(cur->token, 0, fpo);
 
 	if (cur->msgs_good == 0 && cur->msgs_bad == 0)
+	{
+	    flag = 'i';
 	    (void)fprintf(fpo, "\"%*s %6lu  %8s  %8s  %8.6f",
 			  len, " ", (unsigned long)(cur->good + cur->bad),
 			  "--------", "--------",
 			  fw);
+	}
 	else
 	    (void)fprintf(fpo, "\"%*s %6lu  %8.6f  %8.6f  %8.6f",
 			  len, " ", (unsigned long)(cur->good + cur->bad),
