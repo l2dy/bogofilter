@@ -7,11 +7,13 @@
 #include <lexer.h>
 #include <wordlists.h>
 
-extern bool original_algorithm, robinson_algorithm;
+enum algorithm { AL_ORIGINAL, AL_ROBINSON } algorithm;
+
+extern enum algorithm algorithm;
 
 #define ORIGINAL_GOOD_BIAS	2	// don't give good words more weight
 #define ROBINSON_GOOD_BIAS	1	// don't give good words more weight
-#define GOOD_BIAS (original_algorithm ? ORIGINAL_GOOD_BIAS : ROBINSON_GOOD_BIAS)
+#define GOOD_BIAS (algorithm == AL_ORIGINAL ? ORIGINAL_GOOD_BIAS : ROBINSON_GOOD_BIAS)
 
 typedef enum rc_e {RC_SPAM=0, RC_NONSPAM=1}  rc_t;
 

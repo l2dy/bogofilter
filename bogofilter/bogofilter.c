@@ -50,20 +50,20 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 
 #define ORIGINAL_MIN_DEV		0.4f		// look for characteristic words
 #define ROBINSON_MIN_DEV		0.0f		// if nonzero, use characteristic words
-#define MIN_DEV (original_algorithm ? ORIGINAL_MIN_DEV : ROBINSON_MIN_DEV)
+#define MIN_DEV (algorithm == AL_ORIGINAL ? ORIGINAL_MIN_DEV : ROBINSON_MIN_DEV)
 
 #define ORIGINAL_SPAM_CUTOFF	0.90f	// if it's spammier than this...
 #define ROBINSON_SPAM_CUTOFF	0.52f	// if it's spammier than this...
-#define SPAM_CUTOFF (original_algorithm ? ORIGINAL_SPAM_CUTOFF : ROBINSON_SPAM_CUTOFF)
+#define SPAM_CUTOFF (algorithm == AL_ORIGINAL ? ORIGINAL_SPAM_CUTOFF : ROBINSON_SPAM_CUTOFF)
 
 
 #define ORIGINAL_SPAM_CUTOFF	0.90f	// if it's spammier than this...
 #define ROBINSON_SPAM_CUTOFF	0.52f	// if it's spammier than this...
-#define SPAM_CUTOFF (original_algorithm ? ORIGINAL_SPAM_CUTOFF : ROBINSON_SPAM_CUTOFF)
+#define SPAM_CUTOFF (algorithm == AL_ORIGINAL ? ORIGINAL_SPAM_CUTOFF : ROBINSON_SPAM_CUTOFF)
 
 #define ORIGINAL_MAX_REPEATS	4	// cap on word frequency per message
 #define ROBINSON_MAX_REPEATS	1	// cap on word frequency per message
-#define MAX_REPEATS (original_algorithm ? ORIGINAL_MAX_REPEATS : ROBINSON_MAX_REPEATS)
+#define MAX_REPEATS (algorithm == AL_ORIGINAL ? ORIGINAL_MAX_REPEATS : ROBINSON_MAX_REPEATS)
 
 #define ROBS 0.001f                    // Robinson's s
 #define ROBX 0.415f                    // Robinson's x
@@ -351,12 +351,17 @@ double wordprob_result(wordprob_t* wordstats)
 {
     double prob;
 
-    if (original_algorithm)
-      prob = wordstats->bad/(wordstats->good + wordstats->bad);
-
-    if (robinson_algorithm)
-      prob = ((ROBS * ROBX + wordstats->bad) /
-	      (ROBS + wordstats->good + wordstats->bad));
+    switch(algorithm) {
+	case AL_ORIGINAL:
+	    prob = wordstats->bad/(wordstats->good + wordstats->bad);
+	    break;
+	case AL_ROBINSON:
+	    prob = ((ROBS * ROBX + wordstats->bad) /
+		    (ROBS + wordstats->good + wordstats->bad));
+	    break;
+	default:
+	    abort();
+    }
 
     return (prob);
 }
@@ -401,19 +406,22 @@ double compute_probability( char *token )
 	}
     }
 
-    if (original_algorithm)
-    {
-	if (totalcount < MINIMUM_FREQ)
-	    prob=UNKNOWN_WORD;
-	else {
+    switch(algorithm) {
+	case AL_ORIGINAL:
+	    if (totalcount < MINIMUM_FREQ) {
+		prob=UNKNOWN_WORD;
+	    } else {
+		prob=wordprob_result(&wordstats);
+		prob = min(MAX_PROB, prob);
+		prob = max(MIN_PROB, prob);
+	    }
+	    break;
+	case AL_ROBINSON:
 	    prob=wordprob_result(&wordstats);
-	    prob = min(MAX_PROB, prob);
-	    prob = max(MIN_PROB, prob);
-	}
+	    break;
+	default:
+	    abort();
     }
-
-    if (robinson_algorithm)
-	prob=wordprob_result(&wordstats);
 
     return prob;
 }
@@ -542,19 +550,21 @@ rc_t bogofilter(int fd, double *xss)
     good_list.msgcount = db_getcount(good_list.dbh);
     spam_list.msgcount = db_getcount(spam_list.dbh);
 
-    if (original_algorithm)
-    {
-	// select the best spam/nonspam indicators.
-	bogostats = select_indicators(wordhash);
+    switch(algorithm) {
+	case AL_ORIGINAL:
+	    // select the best spam/nonspam indicators.
+	    bogostats = select_indicators(wordhash);
 
-	// computes the spamicity of the spam/nonspam indicators.
-	spamicity = compute_spamicity(bogostats, NULL);
-    }
+	    // computes the spamicity of the spam/nonspam indicators.
+	    spamicity = compute_spamicity(bogostats, NULL);
+	    break;
 
-    if (robinson_algorithm)
-    {
-	// computes the spamicity of the spam/nonspam indicators.
-	spamicity = compute_robinson_spamicity(wordhash);
+	case AL_ROBINSON:
+	    // computes the spamicity of the spam/nonspam indicators.
+	    spamicity = compute_robinson_spamicity(wordhash);
+	    break;
+	default:
+	    abort();
     }
 
     db_lock_release_list(word_lists);
@@ -563,7 +573,7 @@ rc_t bogofilter(int fd, double *xss)
 
     if (xss != NULL)
         *xss = spamicity;
-    
+
     if (run_type == RUN_UPDATE)
       register_words((status==RC_SPAM) ? REG_SPAM : REG_GOOD, wordhash, msgcount, wordcount);
 

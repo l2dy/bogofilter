@@ -34,8 +34,7 @@ AUTHOR:
 run_t run_type = RUN_NORMAL; 
 
 int verbose, passthrough, nonspam_exits_zero;
-bool original_algorithm = TRUE;
-bool robinson_algorithm = FALSE;
+enum algorithm algorithm = AL_ORIGINAL;
 
 char directory[PATH_LEN];
 
@@ -205,13 +204,11 @@ int main(int argc, char **argv)
 	    break;
 
 	case 'o':
-	    original_algorithm = 1;
-	    robinson_algorithm = 1 ^ original_algorithm;
+	    algorithm = AL_ORIGINAL;
 	    break;
 
 	case 'r':
-	    robinson_algorithm = 1;
-	    original_algorithm = 1 ^ robinson_algorithm;
+	    algorithm = AL_ROBINSON;
 	    break;
 	}
 
