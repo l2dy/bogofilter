@@ -3,4 +3,4 @@
 . ${srcdir:=.}/t.frame
 
 # this test checks that bogofilter -u works
-../bogofilter -u -p -e -d $TMPDIR </dev/null >/dev/null
+../bogofilter -u -p -e -d $TMPDIR -C </dev/null >/dev/null
