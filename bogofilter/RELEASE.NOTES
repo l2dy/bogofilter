@@ -49,9 +49,6 @@ Command line option "--db-transaction=yes" enables transactions and
 Config file options "db_transactions=yes" and "db_transactions=no"
 have the same effect.
 
-Defining environment variable "BF_FORCE_TRANSACTIONAL" enables them
-and "BF_FORCE_NON_TRANSACTIONAL" disables them.
-
 Auto-detection:
 
 If none of the above methods are used to enable/disable transactions,
