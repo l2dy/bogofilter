@@ -99,15 +99,15 @@
 	</para>
 	<para>The <option>-r</option> option tells
 	    <application>bogoutil</application> to recalculate the ROBX
-	    value for the word lists in <option>directory</option>.
-        </para>
-	<para>The <option>-R</option> option tells is like <option>-r</option>
-	    except that the calculated ROBX value is also stored as token .ROBX
-	    in <option>directory/spamlist.db</option>.
+	    value and print it as a six-digit fraction.
+	</para>
+	<para>The <option>-R</option> option does the same as <option>-R</option>, but prints more
+	    information and saves the result in the training database.
 	</para>
 	<para>The <option>-I <replaceable>file</replaceable></option> option tells
 	    <application>bogoutil</application> to read its input from
-	    <replaceable>file</replaceable> rather than stdin.</para>
+	    <replaceable>file</replaceable> rather than stdin.
+	</para>
 	<para>
 	    The <option>-v</option> option produces verbose output on <option>stderr</option>.
 	    This option is primarily useful for debugging.
