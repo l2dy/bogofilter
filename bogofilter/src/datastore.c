@@ -344,8 +344,8 @@ int ds_oper(const char *path, dbmode_t open_mode,
     }
 
     ret = ds_foreach(dsh, hook, userdata);
-    if (ret)
-	ds_close(dsh, false);
+
+    ds_close(dsh, false);
 
     return ret;
 }
