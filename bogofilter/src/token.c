@@ -102,7 +102,7 @@ token_t get_token(void)
 
 	case HEADKEY:
 	{
-	    const char *delim = index((const char *)yylval->text, ':');
+	    const char *delim = memchr((const void *)yylval->text, ':', yylval->leng);
 	    yylval->leng = delim - (const char *)yylval->text;
 	    Z(yylval->text[yylval->leng]);
 	}
