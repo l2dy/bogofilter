@@ -143,7 +143,8 @@ static int arg_foreach(arg_foreach_t hook, int argc, char **argv)
 		continue;
 	    }
 	    initialize(fpin);
-	    fprintf(dbgout, "%s ", filename ); 
+	    if (verbose || passthrough)
+		fprintf(dbgout, "%s ", filename ); 
 	}
 
 	status = hook();
