@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.24  2002/10/02 17:09:04  gyepi
+ * switch to general database locking protocol
+ *
  * Revision 1.23  2002/10/02 16:27:40  relson
  * Initial inclusion of multiple wordlist code into bogofilter.
  *
@@ -226,6 +229,8 @@ void register_words(int fdin, reg_t register_type)
   wordlist_t *lists[2];
   wordlist_t *incr_list = NULL;
   wordlist_t *decr_list = NULL;
+  void *dbh[2];
+
   int i;
   int nlists = 0;
 
@@ -259,10 +264,15 @@ void register_words(int fdin, reg_t register_type)
       fprintf(stderr, "Error: Invalid register_type\n");
       exit(2);      
     }
-  
-  //Note: minimize database locking time.
+
+      
   for (i = 0; i < nlists; i++){
-    db_lock_writer(lists[i]->dbh);
+    dbh[i] = (void *)lists[i]->dbh;
+  }
+
+  db_lock_writer_list(dbh, nlists);
+
+  for (i = 0; i < nlists; i++){
     lists[i]->msgcount = db_getcount(lists[i]->dbh);
   }
  
@@ -286,9 +296,9 @@ void register_words(int fdin, reg_t register_type)
     db_flush(lists[i]->dbh);
     if (verbose)
       fprintf(stderr, "bogofilter: %lu messages on the %s list\n", lists[i]->msgcount, lists[i]->name);
-    db_lock_release(lists[i]->dbh);
   }
 
+  db_lock_release_list(dbh, nlists);
   wordhash_free(h);
 }
 
@@ -519,12 +529,16 @@ rc_t bogofilter(int fd, double *xss)
     double 	spamicity;
     wordhash_t  *wordhash;
     bogostat_t	*stats;
+    void *dbh[2];
 
 //  tokenize input text and save words in a wordhash.
     wordhash = collect_words(fd, NULL, NULL);
 
-    db_lock_reader(good_list.dbh);
-    db_lock_reader(spam_list.dbh);
+    //FIXME: This needs to be done as part of the application initialization
+    dbh[0] = (void *)good_list.dbh;
+    dbh[1] = (void *)spam_list.dbh;
+
+    db_lock_reader_list(dbh, 2);
 
     good_list.msgcount = db_getcount(good_list.dbh);
     spam_list.msgcount = db_getcount(spam_list.dbh);
@@ -532,8 +546,7 @@ rc_t bogofilter(int fd, double *xss)
 //  select the best spam/nonspam indicators.
     stats = select_indicators(wordhash);
 
-    db_lock_release(good_list.dbh);
-    db_lock_release(spam_list.dbh);
+    db_lock_release_list(dbh, 2);
 
 //  computes the spamicity of the spam/nonspam indicators.
     spamicity = compute_spamicity(stats);

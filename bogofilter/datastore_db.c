@@ -14,6 +14,7 @@ AUTHOR:
 #include <sys/types.h>
 #include <unistd.h>
 #include <db.h>
+#include <errno.h>
 
 #include "xmalloc.h"
 #include "datastore.h"
@@ -22,6 +23,8 @@ AUTHOR:
 #define ERRSTR(str) "bogofilter (db) " str
 
 #define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
+
+extern int errno;
 
 static dbh_t *dbh_init(char *filename, char *name){
   dbh_t *handle;
@@ -274,4 +277,101 @@ void db_lock_release(void *vhandle){
     fprintf(stderr, "[%lu] Error releasing on %s\n", (unsigned long)handle->pid, handle->filename);
     exit(2);
   }
+}
+
+
+/*
+Releases acquired locks on multiple databases
+*/
+void db_lock_release_list(void *vhandle_list[], int n){
+  while (--n >= 0)
+    db_lock_release(vhandle_list[n]);
+}
+
+static void lock_msg(dbh_t *handle, int index, char *msg, int cmd, int type)
+{
+
+  char *block_type[] = { "nonblocking", "blocking" };
+  char *lock_type[]  = { "write", "read" };
+                                                     
+  fprintf(stderr, "[%lu] [%d] %s %s %s lock on %s\n", 
+	          (unsigned long)handle->pid,
+                  index,
+		  msg,
+		  block_type[cmd == F_SETLKW],
+		  lock_type[type == F_RDLCK],
+		  handle->filename);
+}
+
+/*
+Acquires locks on multiple database.
+
+Uses the following protocol  to avoid deadlock:
+
+1. The first database in the list is locked in blocking mode,
+   all subsequent databases are locked in non-blocking mode.
+
+2. If a lock attempt on a database fails, all locks on existing databases are relinquished,
+   and the whole operation restarted. In order to avoid syncronicity among contending lockers,
+   each locker sleeps for some small, random time period before restarting.
+
+*/
+static void db_lock_list(void *vhandle_list[], int n, int type){
+  int i;
+  int cmd;
+
+  dbh_t *handle;
+
+#define do_lock_msg(msg) lock_msg(handle, i, msg, cmd, type)
+ 
+  for(;;){
+    for(i = 0, cmd = F_SETLKW ; i < n; i++, cmd = F_SETLK){
+
+      handle = vhandle_list[i];
+      
+      if (verbose > 1)
+	      do_lock_msg("Trying");
+      
+      if (db_lock(handle, cmd, type) != 0){
+        if (errno == EACCES || errno == EAGAIN || errno == EINTR){
+          if (verbose)
+            do_lock_msg("Failed to acquire");
+
+          break;
+        }
+        else {
+          do_lock_msg("Error acquiring");
+	  exit(2);
+        }
+      }
+      else if (verbose) {
+        do_lock_msg("Got");
+      }
+    }
+
+    /* All locks acquired. */
+    if (i == n)
+      break;
+
+    /* Some locks failed. Release all acquired locks */
+    if (i > 0)
+      db_lock_release_list(vhandle_list, i);
+
+    //sleep for short, random time between 1 microsecond and 1 second
+    usleep( 1 + (unsigned long) (1000.0*rand()/(RAND_MAX+1.0)));
+  }
+}
+
+/*
+Acquires read locks on multiple databases.
+*/
+void db_lock_reader_list(void *vhandle_list[], int n){
+  db_lock_list(vhandle_list, n, F_RDLCK);
+}
+
+/*
+Acquires write locks on multiple database.
+*/
+void db_lock_writer_list(void *vhandle_list[], int n){
+  db_lock_list(vhandle_list, n, F_WRLCK);
 }

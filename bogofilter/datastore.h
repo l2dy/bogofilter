@@ -53,7 +53,6 @@ long db_getvalue(void *, char *);
 /* Set the value associated with a given word in a list */
 void db_setvalue(void *, char *, long);
 
-
 /* Get the database message count */
 long db_getcount(void*);
 
@@ -84,6 +83,25 @@ void db_lock_writer(void *);
 
 /* Release acquired lock */
 void db_lock_release(void *);
+
+
+
+/*
+Acquires read locks on multiple databases.
+*/
+void db_lock_reader_list(void *[], int);
+
+
+/*
+Acquires write locks on multiple database.
+*/
+void db_lock_writer_list(void *[], int);
+
+
+/*
+Releases acquired locks on multiple databases
+*/
+void db_lock_release_list(void *[], int);
 
 #endif
 
