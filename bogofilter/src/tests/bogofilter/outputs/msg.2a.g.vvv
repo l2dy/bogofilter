@@ -1,7 +1,8 @@
-X-Bogosity: No, tests=bogofilter, spamicity=0.000001
+X-Bogosity: No, tests=bogofilter, spamicity=0.000000
 	0.010000  0.010000  around
-	0.010000  0.000102  build
-	0.010000  0.000001  call
+	0.010000  0.000102  being
+	0.010000  0.000001  build
+	0.010000  0.000000  call
 	0.010000  0.000000  current
 	0.010000  0.000000  effort
 	0.010000  0.000000  having
@@ -13,4 +14,3 @@ X-Bogosity: No, tests=bogofilter, spamicity=0.000001
 	0.990000  0.000000  cars
 	0.990000  0.000000  copy
 	0.990000  0.000000  million
-	0.990000  0.000001  secrets
