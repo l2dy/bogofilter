@@ -100,7 +100,8 @@ wordhash_t *
 wordhash_new (void)
 {
     wh_t t = (!fBogotune || !msg_count_file) ? WH_NORMAL : WH_CNTS;
-    return wordhash_init(t, 0);
+    wordhash_t *wh = wordhash_init(t, 0);
+    return wh;
 }
 
 static void
@@ -437,7 +438,8 @@ static int compare_hashnode_t(const void *const ihn1, const void *const ihn2)
 {
     const hashnode_t *hn1 = *(const hashnode_t *const *)ihn1;
     const hashnode_t *hn2 = *(const hashnode_t *const *)ihn2;
-    return word_cmp(hn1->key, hn2->key);
+    int   cmp = word_cmp(hn1->key, hn2->key);
+    return cmp;
 }
 
 static wordcnts_t *wordhash_get_counts(wordhash_t *wh, hashnode_t *n)
