@@ -4,9 +4,9 @@
 
 $Id$
 
-	2003-06-26
+0.13.7.1 2003-06-26
 
-	* Update bogotune to version 0.2.7
+	* Update bogotune to version 0.3
 	* Added '-k size' option to bogofilter and bogoutil for
           setting BerkeleyDB's cache size.
 

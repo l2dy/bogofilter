@@ -2,7 +2,9 @@
 				BOGOFILTER NEWS
 			       =================
  
-* Update bogotune to version 0.2.7
+0.13.7.1 2003-06-26
+ 
+* Update bogotune to version 0.3
 * For bogotune change processing of '-t' switch from pass 1 to
   pass 2 so that it supercedes the config file.
 * Added '-k size' option to bogofilter and bogoutil for
