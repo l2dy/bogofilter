@@ -394,8 +394,8 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 
     if (val->size < db_data.size) {
 	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%.*s' ), size error %lu::%lu",
-		    CLAMP_INT_MAX(token->size), (char *)token->data,
-		    (unsigned long)val->size,
+		    CLAMP_INT_MAX(token->leng), (char *)token->data,
+		    (unsigned long)val->leng,
 		    (unsigned long)db_data.size);
 	exit(EX_ERROR);
     }
@@ -447,7 +447,7 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
 
     if (ret != 0) {
 	print_error(__FILE__, __LINE__, "(db) db_set_dbvalue( '%.*s' ), err: %d, %s", 
-		    CLAMP_INT_MAX(token->size), (char *)token->data, ret, db_strerror(ret));
+		    CLAMP_INT_MAX(token->leng), (char *)token->data, ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
 
