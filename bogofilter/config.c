@@ -102,7 +102,7 @@ double	min_dev = 0.0f;
 
 double	thresh_stats = 0.0f;
 
-static bool select_algorithm(const char *s);
+static bool select_algorithm(const unsigned char *s);
 
 /*---------------------------------------------------------------------------*/
 
@@ -141,9 +141,9 @@ static const parm_desc sys_parms[] =
 
 static const parm_desc *usr_parms = NULL;
 
-static bool select_algorithm(const char *s)
+static bool select_algorithm(const unsigned char *s)
 {
-    enum algorithm_e al = tolower((unsigned char)*s);
+    enum algorithm_e al = tolower(*s);
     bool ok = true;
     switch (al)
     {
@@ -170,17 +170,17 @@ static bool select_algorithm(const char *s)
     return ok;
 }
 
-static bool process_config_parameter(const parm_desc *arg, const char *val)
+static bool process_config_parameter(const parm_desc *arg, const unsigned char *val)
 {
     bool ok = true;
-    while (isspace((unsigned char)*val) || *val == '=') val += 1;
+    while (isspace(*val) || *val == '=') val += 1;
     if (arg->addr.v == NULL)
 	return ok;
     switch (arg->type)
     {
 	case CP_BOOLEAN:
 	    {
-		char ch = toupper((unsigned char)*val);
+		char ch = toupper(*val);
 		switch (ch)
 		{
 		case 'Y':		/* Yes */
@@ -249,17 +249,17 @@ static bool process_config_parameter(const parm_desc *arg, const char *val)
     return ok;
 }
 
-static bool process_config_line( const char *line, const parm_desc *parms )
+static bool process_config_line( const unsigned char *line, const parm_desc *parms )
 {
     size_t len;
-    const char *val;
+    const unsigned char *val;
     const parm_desc *arg;
 
     if (parms == NULL)
 	return false;
 
     for (val=line; *val != '\0'; val += 1) {
-	if (isspace((unsigned char)*val) || *val == '=') {
+	if (isspace(*val) || *val == '=') {
 	    break;
 	}
     }
@@ -308,15 +308,15 @@ static void read_config_file(const char *fname, bool tilde_expand)
     while (!feof(fp))
     {
 	size_t len;
-	char buff[MAXBUFFLEN];
+	unsigned char buff[MAXBUFFLEN];
 
 	lineno += 1;
-	if (fgets(buff, sizeof(buff), fp) == NULL)
+	if (fgets((char *)buff, sizeof(buff), fp) == NULL)
 	    break;
 	len = strlen(buff);
 	if ( buff[0] == '#' || buff[0] == ';' || buff[0] == '\n' )
 	    continue;
-	while (iscntrl((unsigned char)buff[len-1]))
+	while (iscntrl(buff[len-1]))
 	    buff[--len] = '\0';
 
 	if ( ! process_config_line( buff, usr_parms ) &&
