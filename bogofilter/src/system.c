@@ -26,6 +26,13 @@ int __feature_imagefs_is_file = 1;
 const char *const system_config_file = "<Bogofilter$Dir>.bogofilter/cf";
 #endif
 
+/* import select() */
+#ifdef HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#else
+#include <unistd.h>
+#endif
+
 bool bf_abspath(const char *path)
 {
 #if	!defined(__OS2__) && !defined(__riscos__)
