@@ -359,14 +359,14 @@ static void help(void)
 		  "\t  -I file - read message from 'file' instead of stdin.\n"
 		  "\t  -O file - save message to 'file' in passthrough mode.\n"
 		  );
+#ifdef	ENABLE_DEPRECATED_CODE
     (void)fprintf(stderr, "%s",
 		  "\talgorithm options:\n"
-#ifdef	ENABLE_DEPRECATED_CODE
 		  "\t  -g      - select Graham spam calculation method.\n"
-#endif
 		  "\t  -r      - select Robinson spam calculation method.\n"
 		  "\t  -f      - select Fisher spam calculation method (default).\n"
 	);
+#endif
     (void)fprintf(stderr, "%s",
 		  "\tparameter options:\n"
 		  "\t  -m v1[,v2[,v3]] - set user defined min_dev, robs, and robx values.\n"

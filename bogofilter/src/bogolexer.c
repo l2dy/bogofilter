@@ -187,18 +187,6 @@ static void process_args_1(int argc, char **argv)
 	    passthrough = true;
 	    break;
 
-#ifndef	ENABLE_DEPRECATED_CODE
-	case 'P':
-	{
-	    while (*optarg != '\0')
-	    {
-		if (*optarg == 'h' || *optarg == 'H')
-		    header_line_markup = *optarg == 'h';
-		optarg += 1;
-	    }
-	}
-#endif
-
 	case 'q':
 	    quiet = true;
 	    break;
@@ -254,11 +242,9 @@ static void process_args_2(int argc, char **argv)
 		switch (*s)
 		{
 		case 'h': case 'H': header_line_markup = *s == 'h'; 	break;	/* -Ph and -PH */
-#ifdef	ENABLE_DEPRECATED_CODE
 		case 'c': case 'C': strict_check       = *s == 'c';	break;	/* -Pc and -PC */
 		case 'i': case 'I': ignore_case        = *s == 'i';	break;	/* -Pi and -PI */
 		case 't': case 'T': tokenize_html_tags = *s == 't'; 	break;	/* -Pt and -PT */
-#endif
 		default:
 		    fprintf(stderr, "Unknown parsing option -P%c.\n", *s);
 		    exit(EX_ERROR);
