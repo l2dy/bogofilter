@@ -70,7 +70,7 @@ int word_cmps(const word_t *w, const char *s)
 {
     word_t w2;
     w2.leng = strlen(s);
-    w2.text = s;
+    w2.text = (byte *) s;
     return word_cmp(w, &w2);
 }
 
