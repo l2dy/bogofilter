@@ -27,7 +27,8 @@ extern double thresh_stats;
 extern const char *progname;
 /*@observer@*/
 extern const char *stats_prefix;
-extern char directory[PATH_LEN + 100];
+extern char directory[PATH_LEN];
+extern char outfname[PATH_LEN];
 extern const char *const version;
 extern const char *const system_config_file;
 

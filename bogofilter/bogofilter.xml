@@ -36,6 +36,7 @@
   <arg choice='opt'>-C</arg>
   <arg choice='opt'>-q</arg>
   <arg choice='opt'>-F</arg>
+  <arg choice='opt'>-O <replaceable>filename</replaceable></arg>
 </cmdsynopsis>
 
 </refsynopsisdiv>
@@ -241,6 +242,11 @@ tells <application>bogofilter</application> to read the config file named.
 <para>The <option>-q</option> (quiet) suppresses warning messages.</para>
 
 <para>The <option>-F</option> (force) ignores threshold values when printing spamicity statistics.</para>
+
+<para>The <option>-O</option><replaceable>filename</replaceable> option
+tells <application>bogofilter</application> where to write its output in
+passthrough mode. Note that this only works when -p is explicitly given,
+-p is not implied.</para>
 </refsect1>
 
 <refsect1 id='environment'><title>ENVIRONMENT</title>

@@ -31,6 +31,7 @@ AUTHOR:
 #include "wordlists.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
+#include "xstrlcpy.h"
 
 /* includes for scoring algorithms */
 #include "method.h"
@@ -66,7 +67,9 @@ int passthrough;	/* '-p' */
 int verbose;		/* '-v' */
 int Rtable = 0;		/* '-R' */
 
-char directory[PATH_LEN + 100] = "";
+char directory[PATH_LEN] = "";
+char outfname[PATH_LEN] = "";
+
 const char *user_config_file   = "~/.bogofilter.cf";
 
 bool	stats_in_header = true;
@@ -374,6 +377,13 @@ static int validate_args(void)
     classification = (run_type == RUN_NORMAL) ||(run_type == RUN_UPDATE) || passthrough || nonspam_exits_zero || (Rtable != 0);
     registration   = (run_type == REG_SPAM) || (run_type == REG_GOOD) || (run_type == REG_GOOD_TO_SPAM) || (run_type == REG_SPAM_TO_GOOD);
 
+    if (*outfname && !passthrough)
+    {
+	(void)fprintf(stderr,
+		      "Warning: Option -O %s has no effect without -p\n",
+		      outfname);
+    }
+    
     if (registration && classification)
     {
 	(void)fprintf(stderr, "Error:  Invalid combination of options.\n");
@@ -411,6 +421,7 @@ static void help(void)
 #endif
 #endif
     (void)printf( "\t-p\t- passthrough.\n" );
+    (void)printf( "\t-O filename\t- save message to filename in passthrough mode.\n" );
     (void)printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
     (void)printf( "\t-s\t- register message as spam.\n" );
     (void)printf( "\t-n\t- register message as non-spam.\n" );
@@ -470,12 +481,13 @@ int process_args(int argc, char **argv)
 
     select_algorithm(algorithm, false);	/* select default algorithm */
 
-    while ((option = getopt(argc, argv, "d:eFhl::o:snSNvVpuc:CgrRx:fqt" G R F)) != EOF)
+    while ((option = getopt(argc, argv,
+		    "d:eFhl::o:snSNvVpuc:CgrRx:fqtO:" G R F)) != EOF)
     {
 	switch(option)
 	{
 	case 'd':
-	    strlcpy(directory, optarg, PATH_LEN);
+	    xstrlcpy(directory, optarg, sizeof(directory));
 	    break;
 
 	case 'e':
@@ -515,6 +527,10 @@ int process_args(int argc, char **argv)
         case 'V':
 	    print_version();
 	    exit(0);
+	    break;
+
+        case 'O':
+	    xstrlcpy(outfname, optarg, sizeof(outfname));
 	    break;
 
 	case 'p':

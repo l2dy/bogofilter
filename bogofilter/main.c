@@ -113,6 +113,7 @@ static int check_directory(const char* path) /*@globals errno,stderr@*/
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
     int   exitcode;
+    FILE  *out;
 
     if ((set_dir_from_env(directory, "HOME", BOGODIR, sizeof(directory)) < 0)
 	|| (set_dir_from_env(directory, "BOGOFILTER_DIR", NULL, sizeof(directory)) < 0)) {
@@ -132,6 +133,17 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     process_config_files();
 
+    if (*outfname && passthrough) {
+	if ((out = fopen(outfname,"wt"))==NULL)
+	{
+	    fprintf(stderr,"Cannot open %s: %s\n",
+		    outfname, strerror(errno));
+	    exit(2);
+	}
+    } else {
+	out = stdout;
+    }
+
     switch(run_type) {
 	case RUN_NORMAL:
 	case RUN_UPDATE:
@@ -150,8 +162,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 				&& memcmp(textend->block, CRLF, 2) == 0))
 			    break;
 
-			(void) fwrite(textend->block, 1, textend->len, stdout);
-			if (ferror(stdout)) exit(2);
+			(void) fwrite(textend->block, 1, textend->len, out);
+			if (ferror(out)) exit(2);
 		    }
 		}
 
@@ -163,7 +175,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 		    /* print spam-status at the end of the header
 		     * then mark the beginning of the message body */
 		    fcn(buff, sizeof(buff));
-		    puts (buff);
+		    fputs (buff, out);
+		    fputs ("\n", out);
 		}
 
 		if (verbose || passthrough || Rtable)
@@ -181,16 +194,17 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 		     * line between header and body), enforce a blank line to
 		     * prevent anything past us from choking. */
 		    if (!textend->block)
-			(void)fputs("\n", stdout);
+			(void)fputs("\n", out);
 
 		    /* print body */
 		    for (; textend->block != NULL; textend=textend->next)
 		    {
-			(void) fwrite(textend->block, 1, textend->len, stdout);
-			if (ferror(stdout)) exit(2);
+			(void) fwrite(textend->block, 1, textend->len, out);
+			if (ferror(out)) exit(2);
 		    }
 
-		    if (fflush(stdout) || ferror(stdout)) exit(2);
+		    if (fflush(out) || ferror(out)) exit(2);
+		    if (out != stdout && fclose(out)) exit(2);
 		}
 
 		exitcode = (status == RC_SPAM) ? 0 : 1;
