@@ -9,15 +9,19 @@
 # and suppress directory deletion.
 
 set -e
+exec </dev/null
 
 : ${srcdir=.}
 : ${relpath=..}
 : ${BF_TESTDIR=.}
 
-BOGOFILTER="$VAL ${relpath}/bogofilter@EXE_EXT@"
-BOGOLEXER="$VAL ${relpath}/bogolexer@EXE_EXT@"
-BOGOTUNE="$VAL ${relpath}/bogotune@EXE_EXT@"
-BOGOUTIL="$VAL ${relpath}/bogoutil@EXE_EXT@"
+# suck in $EXE_EXT
+. t.config
+
+BOGOFILTER="$VAL ${relpath}/bogofilter$EXE_EXT"
+BOGOLEXER="$VAL ${relpath}/bogolexer$EXE_EXT"
+BOGOTUNE="$VAL ${relpath}/bogotune$EXE_EXT"
+BOGOUTIL="$VAL ${relpath}/bogoutil$EXE_EXT"
 BOGOLEX_SH="$VAL ${relpath}/msg-count.sh"
 export BOGOFILTER
 export BOGOLEXER
