@@ -290,7 +290,7 @@ mime_is_boundary(const byte *boundary, int len){
     return b.is_valid;
 }
 
-int
+bool
 got_mime_boundary (const byte *boundary, int boundary_len)
 {
   mime_t *parent;
@@ -299,7 +299,7 @@ got_mime_boundary (const byte *boundary, int boundary_len)
   get_boundary_props(boundary, boundary_len, &b);
 
   if (!b.is_valid)
-    return 0;
+    return false;
 
   if (DEBUG_MIME (1))
     fprintf (dbgout, "*** got_mime_boundary:  stackp: %d, boundary: '%s'\n",
@@ -313,12 +313,12 @@ got_mime_boundary (const byte *boundary, int boundary_len)
 
     /* explicit end boundary */
     if (b.is_final)
-	return 1;
+	return true;
   }
 
   parent = is_mime_container (msg_state) ? msg_state : msg_state->parent;
   mime_push (parent);
-  return 1;
+  return true;
 }
 
 /* skips whitespace, returns NULL when ran into end of string */
