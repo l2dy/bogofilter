@@ -157,6 +157,8 @@ done
 %{_bindir}/bogoupgrade
 %{_bindir}/bf_copy
 %{_bindir}/bf_compact
+%{_bindir}/bf_tar
+%{_bindir}/bf_resize
 
 %{_mandir}/man1/bogofilter.1*
 %{_mandir}/man1/bogolexer.1*
@@ -190,6 +192,8 @@ done
 %{_bindir}/bogoupgrade
 %{_bindir}/bf_copy
 %{_bindir}/bf_compact
+%{_bindir}/bf_tar
+%{_bindir}/bf_resize
 
 %{_mandir}/man1/bogofilter.1*
 %{_mandir}/man1/bogolexer.1*
