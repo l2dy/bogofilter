@@ -9,7 +9,15 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.16 !
 
-0.16.4	2004-01-21
+0.16.5	2004-01-??
+
+	2004-01-23
+
+	* Correct processing order as '-V' doesn't need to read the
+          config file.
+	* Correct SIGSEGV causes by missing environment variables.
+
+0.16.4	2004-01-22
 
 	2004-01-20
 
