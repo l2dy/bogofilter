@@ -12,15 +12,17 @@ NAME:
 
 #include "lexer.h"
 
-extern word_t *msg_addr;	/* First IP Address in Received: statement */
-extern word_t *msg_id;		/* Message ID */
-extern word_t *queue_id;	/* Message's first Queue ID */
+extern word_t msg_addr;		/* First IP Address in Received: statement */
+extern word_t msg_id;		/* Message ID */
+extern word_t queue_id;		/* Message's first Queue ID */
 
 extern token_t get_token(word_t **token);
 
 extern void got_from(void);
 extern void clr_tag(void);
 extern void set_tag(const char *text);
+
+extern void set_msg_id(byte *text, uint leng);
 
 extern void token_init(void);
 extern void token_cleanup(void);

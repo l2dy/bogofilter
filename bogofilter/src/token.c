@@ -218,24 +218,26 @@ token_t get_token(word_t **token)
 	case MESSAGE_ID:
 	    /* special token;  saved for formatted output, but not returned to bogofilter */
 	    /** \bug: the parser MUST be aligned with lexer_v3.l! */
-	{
-	    size_t skip = 0;
-	    while (!isspace(yylval.text[skip]))
-		skip += 1;
-	    while (isspace(yylval.text[skip]))
-		skip += 1;
-	    yylval.leng -= skip;
-	    memmove(yylval.text, yylval.text+skip, yylval.leng);
-	    Z(yylval.text[yylval.leng]);	/* for easier debugging - removable */
-	    word_free(msg_id);
-	    msg_id = word_dup(&yylval);
-	}
+	    if (leng < sizeof(msg_id_text))
+	    {
+		size_t skip = 0;
+		while (!isspace(yylval.text[skip]))
+		    skip += 1;
+		while (isspace(yylval.text[skip]))
+		    skip += 1;
+		yylval.leng -= skip;
+		memmove(yylval.text, yylval.text+skip, yylval.leng);
+		Z(yylval.text[yylval.leng]);	/* for easier debugging - removable */
+		token_copy( &msg_id, &yylval );
+	    }
 	continue;
 
 	case QUEUE_ID:
 	    /* special token;  saved for formatted output, but not returned to bogofilter */
 	    /** \bug: the parser MUST be aligned with lexer_v3.l! */
-	    if (queue_id == NULL) {
+	    if (queue_id.leng == 0 &&
+		leng < sizeof(msg_id_text) )
+	    {
 		size_t skip = 0;
 		while (isspace(text[skip]))
 		    skip += 1;
@@ -247,8 +249,7 @@ token_t get_token(word_t **token)
 		yylval.leng = leng;
 		memmove(yylval.text, text+skip, yylval.leng);
 		Z(yylval.text[yylval.leng]);	/* for easier debugging - removable */
-		word_free(queue_id);
-		queue_id = word_dup(&yylval);
+		token_copy( &queue_id, &yylval );
 	    }
 	    continue;
 

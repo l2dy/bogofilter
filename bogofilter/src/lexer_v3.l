@@ -240,8 +240,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 						  int off = 11;
 						  while(isspace((unsigned char)yytext[off]) && off < yyleng)
 						      off++;
-						  word_free(msg_id);
-						  msg_id = word_new((unsigned char *)(yytext+off), yyleng-off);
+						  set_msg_id((unsigned char *)(yytext+off), yyleng-off);
 						  return HEADKEY;
 						}
 <INITIAL>^(In-Reply-To|References):.* 		{ return HEADKEY; }
