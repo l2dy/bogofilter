@@ -30,7 +30,7 @@ static mask_char_to_symbol_t const char_to_symbol[] =
     { "w",	BIT_WORDLIST }
 };
 
-int main(int argc, char **argv)
+int main(void)
 {
     size_t i;
     for (i=0; i<sizeof(char_to_symbol)/sizeof(char_to_symbol[0]); i += 1)
