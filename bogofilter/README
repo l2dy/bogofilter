@@ -6,12 +6,12 @@ Summary:
 
 1. What is Bogofilter?
 2. Documentation
-3. Building Bogofilter
+3. Installing Bogofilter
 4. How to contribute
 5. How to request features
-6. Installing Bogofilter from source tarball or CVS
+6. Building & Installing Bogofilter from Source Tarball or CVS
   a. Downloading
-  b. Installing
+  b. Building & Installing
   c. Configuring
   d. Changing Bogofilter
 
@@ -66,7 +66,7 @@ you can add to your .muttrc.
 
 
 
-3. Building Bogofilter
+3. Installing Bogofilter
 ----------------------
 
 When updating, check the RELEASE.NOTES files.
@@ -111,8 +111,8 @@ to the list.
 
 
 
-6. Installing Bogofilter from CVS
----------------------------------
+6. Building & Installing Bogofilter from Source Tarball or CVS
+--------------------------------------------------------------
 
   a. Downloading
   --------------
@@ -133,8 +133,8 @@ to the list.
 
   cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/bogofilter co bogofilter
 
-  b. Installing
-  -------------
+  b. Building & Installing
+  ------------------------
 
   To compile and install the standard configuration, use the following
   commands:
