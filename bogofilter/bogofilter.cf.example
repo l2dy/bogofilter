@@ -139,7 +139,7 @@
 #terse_format = %1.1c %f
 #log_header_format = %h: %c, spamicity=%p, version=%v
 #log_update_format = register-%r, %w words, %m messages
-##log_header_format = %h: %c, spamicity=%p, IPADDR=%I, version=%v, 
+##log_header_format = %h: %c, spamicity=%p, IPADDR=%I, version=%v
 
 #### TERSE
 #
