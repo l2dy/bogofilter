@@ -4,8 +4,10 @@
 
 $Id$
 
+0.11.1.6
+
 	2003-04-01
-	* Changed default value of 'strict_check' to No.
+	* Changed default value of 'strict_check' to 'no' (disabled).
 
 	2003-03-30
 	* Added config file option 'strict_check' for processing
@@ -16,9 +18,8 @@ $Id$
 
 	2003-03-28
 	* Bogofilter now frees _all_ memory that it allocates.
-	* FAQ reorganized and info added on asian spam, the 
-	  format of verbose output, and using SpamAssassin to
-	  train bogofilter.
+	* FAQ reorganized and info added on asian spam, the format of
+	  verbose output, and using SpamAssassin to train bogofilter.
 	* Fixed processing of '-o' option.
 
 0.11.1.4
