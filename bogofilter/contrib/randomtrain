@@ -41,10 +41,11 @@ function train_mbox() {
 	let cnt=cnt+1
 	dd if=$fnam bs=1 skip=$offset count=$length 2>/dev/null >msg.$pid
 	result=`bogofilter -t -v -d $bogodir $cfg -I msg.$pid`
-	got=`echo $result | awk '{print $1}' | tr "YNU" "snu"`
+	got=$?	# 0=spam, 1=ham, 2=unsure, 3=err
 	if [ "$expect" = "s" ]; 
 	then let nspam=$nspam+1
 	else let ngood=$ngood+1; fi
+	if [ $got -eq 0 ]; then got="s"; elif [ $got -eq 1 ]; then got="n"; fi
 	if [ "$got" != "$expect" ]; then
 	    if [ "$expect" = "s" ]; 
 	    then let rspam=$rspam+1
@@ -68,10 +69,11 @@ function train_maildir() {
     while read expect fnam; do
 	let cnt=cnt+1
 	result=`bogofilter -t -v -d $bogodir $cfg -I $fnam`
-	got=`echo $result | awk '{print $1}' | tr "YNU" "snu"`
+	got=$?	# 0=spam, 1=ham, 2=unsure, 3=err
 	if [ "$expect" = "s" ]; 
 	then let nspam=$nspam+1
 	else let ngood=$ngood+1; fi
+	if [ $got -eq 0 ]; then got="s"; elif [ $got -eq 1 ]; then got="n"; fi
 	if [ "$got" != "$expect" ]; then
 	    if [ "$expect" = "s" ]; 
 	    then let rspam=$rspam+1
