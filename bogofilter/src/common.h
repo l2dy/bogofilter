@@ -30,7 +30,7 @@ NAME:
 #ifdef	ENABLE_MEMDEBUG
 #include "memdebug.h"
 #else
-#define	MEMDISPLAY
+#define	MEMDISPLAY  do { int x; (void)x; } while(0)
 #endif
 
 typedef uint32_t YYYYMMDD;	/* date as YYYYMMDD */
