@@ -417,7 +417,7 @@ static double compute_robx(void *dbh_spam, void *dbh_good)
     double sum = 0.0;
     double robx;
 
-    uint32_t long msg_good, msg_spam;
+    uint32_t msg_good, msg_spam;
     struct robhook_data rh;
 
     msg_good = db_getvalue( dbh_good, ".MSG_COUNT" );
@@ -433,7 +433,7 @@ static double compute_robx(void *dbh_spam, void *dbh_good)
     robx = sum/(spam_cnt + good_cnt);
     if (verbose)
 	printf( ".MSG_COUNT: %lu, %lu, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
-		msg_spam, msg_good, rh.scalefactor, sum, (int)(spam_cnt + good_cnt), robx);
+		(unsigned long)msg_spam, (unsigned long)msg_good, rh.scalefactor, sum, (int)(spam_cnt + good_cnt), robx);
 
     return robx;
 }
