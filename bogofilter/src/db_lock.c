@@ -109,19 +109,10 @@ static int check_celllock(int fd, off_t offset) {
     fl.l_len = cellsize;
     r = fcntl(fd, F_GETLK, &fl);
     if (r) {
-#if 0 /* stubbed out because fprintf isn't reentrant */
-	if (DEBUG_DATABASE(2))
-	    fprintf(dbgout, "check_celllock(fd=%d, offset=%ld) failed: %s\n",
-		    fd, (long)offset, strerror(errno));
-#endif
+	/* cannot use fprintf for debugging here - isn't reentrant! */
 	return -1;
     }
-#if 0 /* stubbed out because fprintf isn't reentrant */
-    if (DEBUG_DATABASE(2))
-e	fprintf(dbgout, "check_celllock(fd=%d, offset=%ld) = %s (%s)\n",
-		fd, (long)offset, s_locktype(fl.l_type),
-		fl.l_type == F_UNLCK ? "unlocked" : "locked");
-#endif
+    /* cannot use fprintf for debugging here - isn't reentrant! */
     return fl.l_type == F_UNLCK ? 0 : 1;
 }
 
