@@ -60,6 +60,8 @@ typedef struct {
 
 #define DS_NOTFOUND (-1)
 
+#define CLAMP_INT_MAX(i) ((int)min(INT_MAX, (i)))
+
 typedef struct {
     void     *data;		/* addr of buffer       */
     u_int32_t leng;		/* number of data bytes */
