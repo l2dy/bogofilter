@@ -205,6 +205,11 @@ typedef uint8_t u_int8_t;
 #undef EX_OK
 #endif
 
+/* Ignore __attribute__ if not using GNU CC */
+#ifndef __GNUC__
+#define __attribute__(a)
+#endif
+
 /* system.c - function prototypes */
 
 extern bool bf_abspath(const char *path);
