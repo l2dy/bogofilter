@@ -19,6 +19,9 @@ NAME:
 #  include "bftypes.h"
 #endif
 
+#ifdef HAVE_STDARG_H
+#include <stdarg.h>
+#endif
 #include <stdio.h>
 
 #if defined(HAVE_LIMITS_H)
@@ -32,7 +35,7 @@ NAME:
 #ifdef	ENABLE_MEMDEBUG
 #include "memdebug.h"
 #else
-#define	MEMDISPLAY  do { int x; (void)x; } while(0)
+#define	MEMDISPLAY  do { } while(0)
 #endif
 
 /* for easier debugging - can be disabled */
@@ -143,6 +146,10 @@ typedef struct {
 extern void bf_abort(void);
 extern void bf_exit(void);
 
-#define internal_error do { fprintf(stderr, "Internal error in %s:%u\n", __FILE__, __LINE__); abort(); } while(0)
+/* getopt stuff */
+extern char *optarg;
+extern int optind, opterr, optopt;
+
+#define internal_error do { fprintf(stderr, "Internal error in %s:%lu\n", __FILE__, (unsigned long)__LINE__); abort(); } while(0)
 
 #endif
