@@ -10,24 +10,24 @@ AUTHOR:
 
 ******************************************************************************/
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "debug.h"
 
-bit_t debug_mask = DEBUG_NONE;
+int debug_mask = DEBUG_NONE;
 
 void set_debug_mask(const char *mask)
 {
     char ch;
-    const char *maskbits = MASKNAMES;
-    for (ch = *mask; ch != '\0'; ch = *++mask)
+    const char *maskbits = BIT_NAMES;
+    for (ch = tolower((unsigned char)*mask); ch != '\0'; ch = *++mask)
     {
 	/*@-shiftnegative@*/
-	char *pos = strchr(maskbits, ch);
-	if (pos != NULL)
-	    debug_mask |= (1 << (pos-maskbits));
+	if (strchr(maskbits, ch) != NULL)
+	    debug_mask |= (1 << (ch - 'a'));
 	/*@=shiftnegative@*/
 	else
 	{

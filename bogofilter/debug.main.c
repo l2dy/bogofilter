@@ -18,7 +18,7 @@ AUTHOR:
 
 typedef struct mask_char_to_symbol_s {
     const char *str;
-    bit_t bit;
+    int bit;
 }  mask_char_to_symbol_t;
 
 static mask_char_to_symbol_t const char_to_symbol[] =
