@@ -105,8 +105,15 @@ fi
 ])# AC_HEADER_STDBOOL
 
 dnl This is the end of the part extracted from autoconf.
-dnl The next part was added by Clint Adams.
+dnl The next part was added by Clint Adams and modified by
+dnl Matthias Andree.
 
+dnl arguments:
+dnl 1- space delimited list of libraries to check for db_create
+dnl 2- action-if-found
+dnl 3- action-if-not-found
+dnl 4- optional set of libraries to use (pass -lpthread here
+dnl    in case DB is compiled with POSIX mutexes)
 AC_DEFUN([AC_CHECK_DB],[
 for lib in $1
 do
@@ -114,9 +121,16 @@ do
    bogo_saved_LIBS="$LIBS"
    LIBS="$LIBS -l$lib"
    AC_CACHE_CHECK([for db_create in -l${lib}], ac_tr_db,
-      [AC_TRY_LINK([#include <db.h>], [int foo=db_create((void *)0, (void *) 0, 0 )],
-                   [AS_VAR_SET(ac_tr_db, yes)],
+      [for i in '' $4 ; do
+	LIBS="$LIBS $i"
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([
+#include <db.h>],[
+int foo=db_create((void *)0, (void *) 0, 0 );
+])],
+                   [AS_VAR_SET(ac_tr_db, yes)
+		    break],
                    [AS_VAR_SET(ac_tr_db, no)])
+      done
       ])
    AS_IF([test AS_VAR_GET(ac_tr_db) = yes],
          [$2
