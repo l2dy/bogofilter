@@ -92,7 +92,6 @@ static void qp_init(void)
     return;
 }
 
-#if	0	/* unused */
 bool qp_validate(word_t *word)
 {
     uint i;
@@ -110,4 +109,3 @@ bool qp_validate(word_t *word)
 
     return true;
 }
-#endif

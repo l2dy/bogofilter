@@ -286,10 +286,12 @@ size_t text_decode(word_t *w)
 
 	switch (tolower(typ[1])) {		/* ... encoding type */
 	case 'b':
-	    len = base64_decode(&n);		/* decode base64 */
+	    if (base64_validate(&n))
+		len = base64_decode(&n);	/* decode base64 */
 	    break;
 	case 'q':
-	    len = qp_decode(&n);		/* decode quoted-printable */
+	    if (qp_validate(&n))
+		len = qp_decode(&n);		/* decode quoted-printable */
 	    break;
 	}
 
