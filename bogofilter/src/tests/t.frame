@@ -119,8 +119,8 @@ if [ "$1" = "-vv" ]; then
     verbose=2
 fi
 
-if test "x$BF_TEST_VERBOSE" != "x" ; then
-    verbose=$BF_TEST_VERBOSE
+if test "x$BF_TESTVERBOSE" != "x" ; then
+    verbose=$BF_TESTVERBOSE
 fi
 
 if test "x$SUPPRESS_DELETE" = "x" ; then
