@@ -15,6 +15,9 @@ AUTHOR:
 
 #include "configfile.h"
 
+/* pull in struct option */
+#include "getopt.h"
+
 /* Global variables */
 
 extern const char *logtag;
