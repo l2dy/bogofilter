@@ -16,6 +16,7 @@ NAME:
 #include <config.h>
 #include "common.h"
 
+#include "charset.h"
 #include "lexer.h"
 
 /* exports */
@@ -30,7 +31,7 @@ const char *spam_header_name = SPAM_HEADER_NAME;
 
 static void usage(void)
 {
-    fprintf(stderr, "Usage: %s [ -p | -q | -h ]\n", progname);
+    fprintf(stderr, "Usage: %s [ -p | -q | -n | -h ]\n", progname);
 }
 
 static void help(void)
@@ -39,6 +40,7 @@ static void help(void)
     fprintf(stderr,
 	    "\t-p\tprint the tokens from stdin.\n"
 	    "\t-q\tquiet mode, no tokens are printed.\n"
+	    "\t-n\tmap non-ascii characters to '?'.\n"
 	    "\t-h\thelp, this output.\n"
 	    "%s is part of the bogofilter package.\n", progname);
 }
@@ -49,17 +51,23 @@ int main(int argc, char **argv)
     int option;
     int count=0;
 
-    while ((option = getopt(argc, argv, ":hpq")) != -1)
+    while ((option = getopt(argc, argv, ":hnpqv")) != -1)
 	switch (option) {
 	case 'h':
 	    help();
 	    exit(0);
 	    break;
 	case 'q':
-	    quiet = 1;
+	    quiet = true;
 	    break;
 	case 'p':
-	    passthrough = 1;
+	    passthrough = true;
+	    break;
+	case 'n':
+	    replace_nonascii_characters = true;
+	    break;
+	case 'v':
+	    verbose += 1;
 	    break;
 	default:
 	    usage();
@@ -73,6 +81,8 @@ int main(int argc, char **argv)
 	else
 	    puts("normal mode.");
     }
+
+    init_charset_table("default", true);
 
     while ((t = get_token()) > 0)
     {
