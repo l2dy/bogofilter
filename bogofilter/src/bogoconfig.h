@@ -15,7 +15,7 @@ AUTHOR:
 
 #include "system.h"
 
-#include <getopt.h>
+#include "getopt.h"
 
 #include "configfile.h"
 
