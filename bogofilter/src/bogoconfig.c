@@ -106,7 +106,7 @@ struct option long_options[] = {
     { "report-unsure",			N, 0, 'U' },
     { "version",			N, 0, 'V' },
     { "classify-stdin",			N, 0, 'b' },
-    { "bogofilter_dir",			N, 0, 'd' },
+    { "bogofilter_dir",			R, 0, 'd' },
     { "ham",				N, 0, 'e' },
     { "help",				N, 0, 'h' },
     { "db_cachesize",			N, 0, 'k' },
@@ -127,7 +127,6 @@ struct option long_options[] = {
     { "query",				N, 0, 'Q' },
     { "verbosity",			N, 0, 'v' },
     { "block_on_subnets",		R, 0, O_BLOCK_ON_SUBNETS },
-    { "bogofilter_dir",			R, 0, O_BOGOFILTER_DIR },
     { "charset_default",		R, 0, O_CHARSET_DEFAULT },
     { "ham_cutoff",			R, 0, O_HAM_CUTOFF },
     { "header_format",			R, 0, O_HEADER_FORMAT },
@@ -645,15 +644,9 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	    process_config_option(val, true, precedence);
 	break;
 
-    case O_BOGOFILTER_DIR:
-	set_bogofilter_dir(name, val, precedence);
-	break;
-
     case 'd':
-	if (pass != PASS_1_CLI) {
-	    if (setup_wordlists(val, precedence) != 0)
-		exit(EX_ERROR);
-	}
+	if (pass != PASS_1_CLI)
+	    set_bogofilter_dir(WORDLIST, val, precedence);
 	break;
 
     case 'H':
