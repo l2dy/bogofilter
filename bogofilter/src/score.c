@@ -148,6 +148,25 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
     return;
 }
 
+
+/* do wordlist lookups for the words in the wordhash
+ */
+void lookup_words(wordhash_t *wh)
+{
+    hashnode_t *node;
+
+    for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
+    {
+	word_t *token     = node->key;
+	wordprop_t *props = (wordprop_t *) node->buf;
+	wordcnts_t *cnts  = &props->cnts;
+	lookup(token, cnts);
+    }
+
+    return;
+}
+
+
 /** selects the best spam/non-spam indicators and calculates Robinson's S,
  * \return -1.0 for error, S otherwise */
 double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
@@ -170,8 +189,6 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
 				    min_dev, robs, robx);
 
-    wordhash_sort(wh);
-
     for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
 	double prob;
@@ -189,9 +206,6 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 	}
 
 	count += 1;
-
-	if (!msg_count_file)
-	    lookup(token, cnts);
 
 	prob = calc_prob(cnts->good, cnts->bad,
 		cnts->msgs_good, cnts->msgs_bad);

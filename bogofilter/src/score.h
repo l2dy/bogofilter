@@ -22,6 +22,7 @@ typedef struct score_s {
     double q_pr;	/* Robinson Q */
 } score_t;
 
+extern	void	lookup_words(wordhash_t *wh);
 extern	void	score_initialize(void);
 extern	void	score_cleanup(void);
 
