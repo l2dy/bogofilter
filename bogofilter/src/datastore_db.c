@@ -53,11 +53,11 @@ static bool init;
 typedef struct {
     char	*path;
     char	*name;
-    int		fd;
-    dbmode_t	open_mode;
-    DB		*dbp;
+    int		fd;		/* file descriptor of data base file */
+    dbmode_t	open_mode;	/* datastore open mode, DS_READ/DS_WRITE */
+    DB		*dbp;		/* data base handle */
     bool	locked;
-    bool	is_swapped;
+    bool	is_swapped;	/* set if CPU and data base endianness differ */
 } dbh_t;
 
 #define DBT_init(dbt) (memset(&dbt, 0, sizeof(DBT)))
@@ -67,6 +67,7 @@ typedef struct {
 
 /* Function definitions */
 
+/** translate BerkeleyDB \a flags bitfield back to symbols */
 static const char *resolveflags(u_int32_t flags) {
     static char buf[160];
     char b2[80];
@@ -80,6 +81,8 @@ static const char *resolveflags(u_int32_t flags) {
     return buf;
 }
 
+/** wrapper for Berkeley DB's DB->open() method which has changed API and
+ * semantics -- this should deal with 3.2, 3.3, 4.0, 4.1 and 4.2. */
 static int DB_OPEN(DB *db, const char *file,
 	const char *database, DBTYPE type, u_int32_t flags, int mode)
 {
@@ -87,7 +90,7 @@ static int DB_OPEN(DB *db, const char *file,
 
     ret = db->open(db,
 #if DB_AT_LEAST(4,1)
-	    NULL,
+    	    0,	/* TXN handle - we use autocommit instead */
 #endif
 	    file, database, type, flags, mode);
 
@@ -114,6 +117,7 @@ static int db_lock(int fd, int cmd, short int type)
 }
 
 
+/** "constructor" - allocate our handle and initialize its contents */
 static dbh_t *dbh_init(const char *path, const char *name)
 {
     dbh_t *handle;
@@ -134,7 +138,8 @@ static dbh_t *dbh_init(const char *path, const char *name)
     return handle;
 }
 
-
+/** free \a handle and associated data.
+ * NB: does not close transactions, data bases or the environment! */
 static void dbh_free(/*@only@*/ dbh_t *handle)
 {
     if (handle != NULL) {
@@ -152,7 +157,8 @@ bool db_is_swapped(void *vhandle)
     return handle->is_swapped;
 }
 
-
+/* If header and library version do not match,
+ * print an error message on stderr and exit with EX_ERROR. */
 static void check_db_version(void)
 {
     int maj, min;
@@ -206,7 +212,7 @@ static void check_fsize_limit(int fd, uint32_t pagesize) {
  * DB_CACHED_COUNTS, and without DB_CACHED_COUNTS, BerlekeyDB will read
  * the whole data base, incurring a severe performance penalty. We'll
  * guess a page size.  As this is a safety margin for the file size,
- * we'll let the code below guess some size. */
+ * we'll return 0 and let the caller guess some size instead. */
 #if DB_AT_LEAST(3,3)
 /* return page size, of 0xffffffff for trouble */
 static uint32_t get_psize(DB *dbp)
@@ -235,10 +241,9 @@ const char *db_version_str(void)
     return v;
 }
 
-/*
-  Initialize database.
-  Returns: pointer to database handle on success, NULL otherwise.
-*/
+/** Initialize database. Expects open environment.
+ * \return pointer to database handle on success, NULL otherwise.
+ */
 void *db_open(const char *path, const char *name, dbmode_t open_mode)
 {
     int ret;
