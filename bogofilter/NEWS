@@ -2,7 +2,28 @@
 
 				bogofilter news
 
+0.7.7	2002-10-30
+
+	* Bogofilter now supports a configuration file named
+          /etc/bogofilter.cf and/or ~/.bogofilter.cf.
+	* Bogofilter's use of '-v' for printing spamicity statistics
+	  has been organized with increasing levels of details as
+	  additional '-v's are added.
+	* When using the Robinson algorithm, bogofilter can print a
+	  simple histogram showing word probability distribution.
+	* Bogoutil supports a new '-w' switch for displaying tokens
+	  from the word list databases.
+	* Bogolexer added to distribution.  Provides easy access to
+	  parsing a file to examine the tokens.
+	* Bogolexer has a new '-p' (passthrough) for printing tokens and
+	  bogoutil has a new '-p' (probability) for printing the
+	  probabilities of one or more tokens.  They can be connected
+	  via pipe to display the probabilities of all words in a message.
+	* DB 4.1 support has been fixed.
+	* Documentation updates.
+
 0.7.6	2002-10-27
+
 	* Added README.hp-ux for those using HP-UX.
 	* Added support for additional architectures - ia64, arm,
 	  powerpc, and s390.
