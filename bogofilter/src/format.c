@@ -78,12 +78,10 @@ const char *terse_format = "%1.1c %f";
 const char *log_header_format = "%h: %c, spamicity=%p, version=%v";
 const char *log_update_format = "register-%r, %w words, %m messages";
 
-typedef const char *FIELD;
-
 #define RC_COUNT 3
-static FIELD spamicity_tags_ynu[] = { "Yes",  "No",  "Unsure" };
-static FIELD spamicity_tags_shu[] = { "Spam", "Ham", "Unsure" };
-static FIELD spamicity_format_d[] = { "%0.6f", "%0.6f", "%0.6f"  };
+static FIELD spamicity_tags_ynu[RC_COUNT] = { "Yes",   "No",    "Unsure" };
+static FIELD spamicity_tags_shu[RC_COUNT] = { "Spam",  "Ham",   "Unsure" };
+static FIELD spamicity_format_d[RC_COUNT] = { "%0.6f", "%0.6f", "%0.6f" };
 
 FIELD  *spamicity_tags    = spamicity_tags_ynu;
 FIELD  *spamicity_formats = spamicity_format_d;

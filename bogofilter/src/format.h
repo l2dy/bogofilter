@@ -5,6 +5,8 @@
 
 #include "configfile.h"
 
+typedef const char *FIELD;
+
 /* Global variables */
 
 extern const char *spam_header_name;
