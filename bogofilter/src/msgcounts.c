@@ -12,13 +12,9 @@ AUTHOR:
 
 #include "common.h"
 
-#include <ctype.h>
 #include <stdlib.h>
 
-#include "datastore.h"
-#include "fgetsl.h"
 #include "msgcounts.h"
-#include "wordlists.h"
 
 /* Globals */
 
