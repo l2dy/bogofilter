@@ -407,31 +407,24 @@ static uint get_thresh(uint count, double *scores)
 {
     uint   ftarget = 0;
     uint   mtarget = scale(count, TEST_COUNT, PREF_COUNT, 3, 10);
-    double cutoff = 0.0;
-    double percent = scale(count, TEST_COUNT, PREF_COUNT, 0.0050, 0.0025);
-    static bool show_first = false;
+    double cutoff, percent;
 
     score_ns(scores);				/* get scores */
 
-    while (percent > 0.0001) {
+    cutoff = 0.0;
+    for (percent = scale(count, TEST_COUNT, PREF_COUNT, 0.0050, 0.0025);
+	 percent > 0.0001;
+	 percent -= 0.0001) {
 	ftarget = ceil(count * percent);	/* compute fp count */
 	if (ftarget <= mtarget)
 	    break;
 	cutoff = scores[count - ftarget];	/* get cutoff value */
 	if (cutoff >= MIN_CUTOFF)
 	    break;
-	percent -= 0.0001;
     }
 
     if (verbose >= PARMS)
 	printf("mtarget %d, ftarget %d, percent %6.4f%%\n", mtarget, ftarget, percent * 100.0);
-
-    if (show_first) {
-	uint f;
-	show_first = false;
-	for (f = 1; f <= ftarget; f += 1) 
-	    printf("%2d %5d %8.6f\n", f, count-f, scores[count-f]);
-    }
 
     if (!force && (cutoff < MIN_CUTOFF || cutoff > MAX_CUTOFF)) {
 	fprintf(stderr,
