@@ -35,8 +35,8 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 typedef struct {
     void   *dbh;		/* database handle from db_open() */
-    size_t count;		/* database count (1 or 2) */
-    size_t index;		/* database index (0 or 1) */
+    u_int16_t count;		/* database count (1 or 2) */
+    u_int16_t index;		/* database index (0 or 1) */
     bool is_swapped;
 } dsh_t;
 
@@ -45,8 +45,8 @@ typedef struct {
 */
 
 typedef struct {
-    uint32_t count[IX_SIZE];	/* spam and ham counts */
-    uint32_t date;
+    u_int32_t count[IX_SIZE];	/* spam and ham counts */
+    u_int32_t date;
 } dsv_t;
 
 #define	spamcount count[IX_SPAM]
