@@ -137,7 +137,7 @@ rc_t bogofilter(int argc, char **argv)
 	    }
 
 	    write_message(status);
-	    if (!register_opt) {
+	    if (logflag && !register_opt) {
 		write_log_message(status);
 		msgcount = 0;
 	    }
@@ -155,7 +155,7 @@ rc_t bogofilter(int argc, char **argv)
 	register_words(run_type, words, msgcount);
     }
 
-    if (register_opt)
+    if (logflag && register_opt)
 	write_log_message(status);
 
     wordhash_free(words);
