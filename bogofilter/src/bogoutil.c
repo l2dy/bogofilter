@@ -607,7 +607,7 @@ char *db_file = NULL;
 bool  prob = false;
 cmd_t flag = NONE;
 
-#define	OPTIONS	":a:c:d:DhI:kl:m:np:r:R:s:vVw:Wx:y:"
+#define	OPTIONS	":a:c:d:DhI:k:l:m:np:r:R:s:vVw:Wx:y:"
 
 static int process_args(int argc, char **argv)
 {
