@@ -133,7 +133,8 @@ static void map_default(void)
     for (ch = 0; ch < COUNTOF(charset_table); ch += 1)
     {
 	charset_table[ch] = casefold_table[ch] = ch;
-	casefold_table[ch] = isupper(ch) ? ch + 'a' - 'A' : ch;
+	if (ignore_case)
+	    casefold_table[ch] = isupper(ch) ? ch + 'a' - 'A' : ch;
     }
 
     PRINT_CHARSET_TABLE;

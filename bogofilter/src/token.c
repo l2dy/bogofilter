@@ -167,10 +167,12 @@ token_t get_token(void)
 	yylval->text[yylval->leng] = '\0';
     }
 
-    /* Need separate loop so lexer can see "From", "Date", etc */
-    if (ignore_case)
-	for (cp = yylval->text; cp < yylval->text+yylval->leng; cp += 1)
-	    *cp = casefold_table[*cp];
+    /* Need separate loop so lexer can see "From", "Date", etc *
+     * depending on options set, replace nonascii characters by '?'s
+     * and/or replace upper case by lower case
+     */
+    for (cp = yylval->text; cp < yylval->text+yylval->leng; cp += 1)
+	*cp = casefold_table[*cp];
 
     return(class);
 }
