@@ -297,20 +297,6 @@ int get_token(void)
     return(class);
 }
 
-#ifdef MAIN
-int passthrough;
-int main(void)
-{
-    int	t;
-
-    while ((t = get_token()) > 0)
-    {
-	(void) printf("get_token: %d '%s'\n", t, yytext);
-    }
-    return 0;
-}
-#endif /* MAIN */
-
 // The following sets edit modes for GNU EMACS
 // Local Variables:
 // mode:fundamental

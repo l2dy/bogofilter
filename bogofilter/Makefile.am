@@ -18,8 +18,7 @@ bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
                      wordhash.h wordhash.c wordlists.h wordlists.c \
 		     $(MYLIB) common.h
 
-lexertest_SOURCES = lexer.l
-lexertest_CFLAGS = -DMAIN
+lexertest_SOURCES = lexertest.c lexer.l lexer.h
 
 bogoutil_SOURCES = bogoutil.c \
 		   datastore.h datastore_db.h datastore_db.c \
