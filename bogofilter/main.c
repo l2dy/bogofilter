@@ -31,9 +31,8 @@ AUTHOR:
 
 #define BOGODIR ".bogofilter"
 
-run_t run_type = RUN_NORMAL; 
-
 int verbose, passthrough, nonspam_exits_zero;
+int Rtable = 0;
 enum algorithm algorithm = AL_GRAHAM;
 
 char directory[PATH_LEN];
@@ -43,6 +42,8 @@ char msg_register[80];
 char msg_bogofilter[80];
 
 char *progname="bogofilter";
+
+run_t run_type = RUN_NORMAL; 
 
 /* if the given environment variable 'var' exists, copy it to 'dest' and
    tack on the optional 'subdir' value.
@@ -112,7 +113,7 @@ int main(int argc, char **argv)
     set_dir_from_env(directory, "HOME", BOGODIR);
     set_dir_from_env(directory, "BOGOFILTER_DIR", NULL);
 
-    while ((ch = getopt(argc, argv, "d:ehlsnSNvVpugr")) != EOF)
+    while ((ch = getopt(argc, argv, "d:ehlsnSNvVpugrR")) != EOF)
 	switch(ch)
 	{
 	case 'd':
@@ -192,6 +193,10 @@ int main(int argc, char **argv)
 
 	case 'r':
 	    algorithm = AL_ROBINSON;
+	    break;
+
+	case 'R':
+	    Rtable = 1;
 	    break;
 	}
 

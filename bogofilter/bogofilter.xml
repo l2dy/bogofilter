@@ -26,6 +26,7 @@
   <arg choice='opt'>-u</arg>
   <arg choice='opt'>-v</arg>
   <arg choice='opt'>-V</arg>
+  <arg choice='opt'>-R</arg>
 </cmdsynopsis>
 
 </refsynopsisdiv>
@@ -50,7 +51,8 @@ probability that a mail in which the token occurs is spam.  After
 probabilities for all input tokens have been computed, a fixed number
 of the probabilities that deviate furtherest from average are combined
 using Bayes's theorem on conditional probabilities.  If the computed
-probability that the input is spam exceeds 0.9,
+probability that the input is spam exceeds a cutoff value defined at
+compile time,
 <application>bogofilter</application> returns 0, otherwise 1.</para>
 
 <para>While this method sounds crude compared to the more usual
@@ -63,6 +65,13 @@ lexical analysis.  In particular, hostames and IP addresses are retained
 as regognition features rather than broken up. Various kinds of MTA 
 cruft such as dates and message-IDs are discarded so as not to bloat
 the word lists. Lex's Swiss-army-knife nature rises again.</para>
+
+<para>Another seeming improvement is that this program offers
+modifications to the calculations that were suggested by Gary Robinson
+in his paper <ulink
+url="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">
+Spam Detection</ulink>; specifically, his S and f(w) calculations but
+not g(w) have been implemented.</para>
 
 <para>The input may be one message or many.  Messages are broken up
 on From_ lines.  The algorithm is relatively insensitive to message
@@ -106,12 +115,8 @@ same message as spam.</para>
 
 <para>The <option>-l</option> (log) option writes an informational line
 to the system log each time <application>bogofilter</application> is run.
-The information logged depends on how <application>bogofilter</application> is run.</para>
-
-
-
-
-
+The information logged depends on how <application>bogofilter</application>
+s run.</para>
 
 <programlisting>
    <lineannotation>
@@ -158,6 +163,29 @@ with spam.</para>
 
 <para>The <option>-V</option> option prints the version number and 
 exits.</para>
+
+<para>The <option>-R</option> option causes
+<application>bogofilter</application> to print out,
+for each message it processes, a table in the form of an R (see
+<ulink url="http://cran.r-project.org">the R project homepage</ulink>
+for details) data frame.  There is a row in the data frame for each
+token in the message, containing the token itself, the counts for that
+token in the good and bad lists of the database (scaled to the size of
+the bad list), Robinson's f(w) for that token, and the logarithms of
+(1 - f(w)) and f(w) (these are used in the calculations of Robinson's
+P and Q parameters).  There is one additional row at the end of the
+table that contains a label in the token field, followed by Robinson's
+P, Q and S values and the sums of the logarithms just mentioned.  This
+information makes it easy to see how
+<application>bogofilter</application> calculated the overall spam
+probability (Robinson's S), which is useful in investigating any
+misclassifications that might occur.  In addition, because the data are
+presented in the form of an R data frame, they can be loaded directly
+into R and used to verify <application>bogofilter</application>'s
+calculations.  With the distribution is provided a simple R script
+called <application>bogo.R</application> that does just that.  (In
+order not to clutter the data frame with extraneous or duplicate
+information, one should not combine the -R and -v options.)</para>
 </refsect1>
 
 <refsect1 id='integration'><title>INTEGRATION WITH OTHER TOOLS</title>
@@ -294,4 +322,3 @@ intervening From_ lines will be counted as one message.</para>
 the bogofilter project page</ulink>. </para>
 </refsect1>
 </refentry>
-
