@@ -1,0 +1,10 @@
+-standard
+-warnunixlib
++unixlib
+-DHAVE_CONFIG_H
+-booltype bool
+-exitarg
+-realcompare
+-exportlocal
+-boolops
+-I.
