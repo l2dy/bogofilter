@@ -100,4 +100,21 @@ done
 %{_bindir}/bogolexer_static
 %{_bindir}/bogoutil_static
 
+%defattr(-,root,root)
+%{_mandir}/man1/bogofilter.1*
+%{_mandir}/man1/bogolexer.1*
+%{_mandir}/man1/bogoutil.1*
+%{_mandir}/man1/bogoupgrade.1*
+%{_sysconfdir}/bogofilter.cf.example
+%config(noreplace) %{_sysconfdir}/bogofilter.cf
+
+%doc AUTHORS CHANGES-* COPYING INSTALL METHODS NEWS
+%doc README README.cvs RELEASE.NOTES-* TODO UPGRADE
+%doc doc/bogofilter-tuning.HOWTO doc/integrating-with-qmail
+%doc doc/programmer
+%doc .inst/html .inst/xml
+
+%dir %{_datadir}/%{name}/contrib/*
+%dir %{_datadir}/%{name}/tuning/*
+
 %changelog
