@@ -4,7 +4,7 @@
 #ifndef	FISHER_H
 #define	FISHER_H
 
-#include <robinson.h>
+#include "robinson.h"
 
 #define FISHER_HAM_CUTOFF	0.00	/* 0.00 for two-state, 0.10 for three-state */
 #define FISHER_SPAM_CUTOFF	0.95

@@ -4,7 +4,7 @@
 #ifndef	ROBINSON_H
 #define	ROBINSON_H
 
-#include <method.h>
+#include "method.h"
 
 #define ROBINSON_MIN_DEV	0.0	/* if nonzero, use characteristic words */
 #define ROBINSON_SPAM_CUTOFF	0.54	/* if it's spammier than this... */
