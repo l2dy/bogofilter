@@ -136,7 +136,9 @@ will be: bogotune -n good1 -n good2 -s bad1 -s bad2
 MAJOR CHANGES IN BOGOFILTER 0.93
 ================================
 
-Bogofilter 0.93.1 and newer support BerkeleyDB 4.3.
+Bogofilter 0.93.1 and newer add support for Berkeley DB 4.3.
+
+Bogofilter 0.93.0 and newer add support for Berkeley DB 3.1.
 
 ########################################################################
 
