@@ -2,6 +2,8 @@
 
 			bogofilter TODO list
 
+**** Perhaps implement helper to resize the BerkeleyDB environment.
+
 **** Implement Concurrent Data store, quite similar to Transactional.
 
 **** Print warning when TDB/QDBM attempt recovery.
