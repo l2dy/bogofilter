@@ -31,6 +31,7 @@ extern int	buff_add(buff_t *self, word_t *in);
 extern buff_t  *buff_dup(const buff_t *self);
 extern int 	buff_cmp(const buff_t *t1, const buff_t *t2);
 extern int	buff_fgetsl(buff_t *self, FILE *);
+extern int	buff_fgetsln(buff_t *self, FILE *, size_t);
 extern void 	buff_puts(const buff_t *self, size_t width, FILE *fp);
 
 extern void 	buff_shift(buff_t *self, byte *start, size_t length);

@@ -19,7 +19,7 @@ AUTHORS:
 #include "fgetsl.h"
 #include "xmalloc.h"
 
-#define BOGO_ASSERT(expr, msg) if (!(expr)) { fprintf(stderr, "%s: %s:%d %s\n", progname, __FILE__, __LINE__, msg); abort(); }
+#define BOGO_ASSERT(expr, msg) if (!(expr)) { fprintf(stderr, "%s: %s:%d %s\n", progname, __FILE__, __LINE__, msg); bf_abort(); }
 
 /* Function Definitions */
 buff_t *buff_init(buff_t *self, byte *buff, size_t used, size_t size)
@@ -61,6 +61,17 @@ int buff_fgetsl(buff_t *self, FILE *in)
 {
     int readpos = self->t.leng;
     int readcnt = xfgetsl((char *)self->t.text+readpos, self->size-readpos, in, 1);
+    self->read = readpos;
+    if (readcnt >= 0)
+	self->t.leng += readcnt;
+    return readcnt;
+}
+
+int buff_fgetsln(buff_t *self, FILE *in, size_t maxlen)
+{
+    int readpos = self->t.leng;
+    int readcnt = xfgetsl((char *)self->t.text+readpos, min(self->size - readpos, maxlen), in, 1);
+    /* WARNING: do not add NUL termination, the size must be exact! */
     self->read = readpos;
     if (readcnt >= 0)
 	self->t.leng += readcnt;
