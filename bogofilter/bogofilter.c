@@ -328,7 +328,7 @@ void populate_bogostats(bogostat_t *bogostats, char *text, double prob, int coun
 void print_bogostats(FILE *fp, double spamicity)
 {
     extern int thresh_index;
-    extern double thresh_prob;
+    extern double thresh_stats;
     extern double thresh_rtable;
  
     switch(algorithm) {
@@ -336,12 +336,12 @@ void print_bogostats(FILE *fp, double spamicity)
     {
 	int index = (thresh_index >= 0) ? thresh_index : KEEPERS+thresh_index;
 	discrim_t *pp = &bogostats.extrema[index];
-	if (pp->prob >= thresh_prob)
+	if (pp->prob >= thresh_stats)
 	    compute_spamicity(&bogostats, fp);
 	break;
     }
     case AL_ROBINSON:
-	if (spamicity > thresh_prob)
+	if (spamicity > thresh_stats || spamicity > thresh_rtable)
 	    rstats_print();
 	break;
     default:

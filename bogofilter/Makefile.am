@@ -8,10 +8,10 @@ SUBDIRS = . tests
 # what to build
 bin_PROGRAMS = bogofilter bogoutil bogolexer
 bin_SCRIPTS = bogoupgrade
-check_PROGRAMS = debugtest
+check_PROGRAMS = debugtest configtest
 man1_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1
 
-CFLAGS = -g -O2
+CFLAGS = -g -O2 -Wall
 
 # what to build that from
 MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h debug.h debug.c
@@ -20,6 +20,7 @@ BUILT_SOURCES = version.h
 
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c \
+		     config.c \
 		     rstats.h rstats.c \
                      wordhash.h wordhash.c wordlists.h wordlists.c \
 		     $(MYCOMMON) common.h version.h
@@ -31,6 +32,9 @@ debugtest_SOURCES = debug.c debug.h debug.main.c
 bogoutil_SOURCES = bogoutil.c \
 		   datastore.h datastore_db.h datastore_db.c wordlists.h wordlists.c \
 		   $(MYCOMMON)
+
+configtest_CFLAGS = -DMAIN
+configtest_SOURCES = config.c $(MYCOMMON)
 
 # what to distribute
 EXTRA_DIST = $(man1_MANS) \

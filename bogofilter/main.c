@@ -41,12 +41,15 @@ char msg_register[80];
 char msg_bogofilter[80];
 
 const char *progname = "bogofilter";
+char *spam_header_name = SPAM_HEADER_NAME;
 
 run_t run_type = RUN_NORMAL; 
 
 int thresh_index = 0;
-double thresh_prob = 0.0f;		// EVEN_ODDS
-double thresh_rtable=0.0f;
+double thresh_stats = EVEN_ODDS;
+double thresh_rtable = 0.4f;
+
+extern	void read_config_file(const char *filename);
 
 /* if the given environment variable 'var' exists, copy it to 'dest' and
    tack on the optional 'subdir' value.
@@ -77,6 +80,13 @@ static int check_directory(const char* path)
 {
     int rc;
     struct stat sb;
+
+    if (*path == '\0') {
+	fprintf(stderr, "%s: cannot find bogofilter directory.\n"
+		"You must set the BOGOFILTER_DIR or HOME environment variables\n"
+		"or use the -d DIR option. The program aborts.\n", progname);
+	return 0;
+    }
 
     rc = stat(path, &sb);
     if (rc < 0) {
@@ -246,15 +256,13 @@ int main(int argc, char **argv)
     if (exitcode != 0)
 	exit(exitcode);
 
-    if (!directory[0]) {
-	fprintf(stderr, "%s: cannot find bogofilter directory.\n"
-		"You must set the BOGOFILTER_DIR or HOME environment variables\n"
-		"or use the -d DIR option. The program aborts.\n", progname);
+    if (check_directory(directory))
 	exit(2);
-    }
-    if (check_directory(directory)) exit(2);
 
     setup_lists(directory);
+
+    read_config_file( "/etc/bogofilter.cf" );
+    read_config_file( "~/.bogofilter.cf" );
 
     switch(run_type) {
 	case RUN_NORMAL:
