@@ -12,13 +12,14 @@ set -e
 [   -d ${TMPDIR}/tests ] && rm -f ${TMPDIR}/tests/*
 [ ! -d ${TMPDIR}/tests ] && mkdir ${TMPDIR}/tests
 
-cat <<EOF >${TMPDIR}/bogofilter.cf
+cat <<EOF > ${TMPDIR}/bogofilter.cf
 robx=0.415
 min_dev=0.0
 spam_header_name=X-Bogosity
 EOF
 
 BOGOFILTER="../bogofilter -c ${TMPDIR}/bogofilter.cf"
+SYSTEST="${srcdir}/t.systest.d"
 
 # Expected spamicity values (11/17/02 13:13):
 #
@@ -37,8 +38,8 @@ for alg in r g ; do
     BOGOFILTER_DIR="${TMPDIR}/tests.$alg"
     rm -rf $BOGOFILTER_DIR
     mkdir $BOGOFILTER_DIR
-    $BOGOFILTER -$alg -s <${srcdir}/t.systest.d/inputs/spam.mbx
-    $BOGOFILTER -$alg -n <${srcdir}/t.systest.d/inputs/good.mbx
+    $BOGOFILTER -$alg -s < ${SYSTEST}/inputs/spam.mbx
+    $BOGOFILTER -$alg -n < ${SYSTEST}/inputs/good.mbx
     #
     # run tests for msg.1.txt, msg.2.txt, and msg.3.txt
     #
@@ -47,21 +48,21 @@ for alg in r g ; do
 	out=`echo $tst | tr "." " " | awk '{print $2}'`
 	ver=`echo $tst | tr "." " " | awk '{print $3}'`
 	$BOGOFILTER -$alg -$ver 2>/dev/null \
-	<${srcdir}/t.systest.d/inputs/msg.$in.txt >${TMPDIR}/tests-$alg || :
-	sed s/,.version=.*// <${TMPDIR}/tests-$alg >${TMPDIR}/tests/msg.$out.$alg.$ver
+	< ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg || :
+	sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
     done
     #
     # classify msg.2.txt a second time and rerun tests
     #    (expect different results from first run)
     #
-    $BOGOFILTER -$alg -s <${srcdir}/t.systest.d/inputs/msg.3.txt
+    $BOGOFILTER -$alg -s < ${SYSTEST}/inputs/msg.3.txt
     for tst in 2.2b.vv 2.2b.vvv ; do
 	in=`echo $tst | tr "." " " | awk '{print $1}'`
 	out=`echo $tst | tr "." " " | awk '{print $2}'`
 	ver=`echo $tst | tr "." " " | awk '{print $3}'`
 	$BOGOFILTER -$alg -$ver 2>/dev/null \
-	<${srcdir}/t.systest.d/inputs/msg.$in.txt >${TMPDIR}/tests-$alg
-	sed s/,.version=.*// <${TMPDIR}/tests-$alg >${TMPDIR}/tests/msg.$out.$alg.$ver
+	< ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/tests-$alg
+	sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
     done
     rm -f ${TMPDIR}/tests-$alg
     rm -rf $BOGOFILTER_DIR
@@ -72,5 +73,5 @@ rm -f ${TMPDIR}/bogofilter.cf
 pfx=$srcdir/t.systest.d/outputs
 for i in $pfx/*v ; do
     test ${i##$pfx/} = CVS && continue
-  cmp $i ${TMPDIR}/tests/${i##$pfx/}
+    cmp $i ${TMPDIR}/tests/${i##$pfx/}
 done
