@@ -249,7 +249,7 @@ static double compute_probability(const word_t *token)
 }
 
 static bogostat_t *select_indicators(wordhash_t *wordhash)
-/* selects the best spam/nonspam indicators and
+/* selects the best spam/non-spam indicators and
  * populates the bogostats structure.
  */
 {
@@ -332,7 +332,7 @@ rc_t gra_status(void)
 
 double gra_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 {
-    bogostat_t	*bs = select_indicators(wordhash);    /* select the best spam/nonspam indicators. */
+    bogostat_t	*bs = select_indicators(wordhash);    /* select the best spam/non-spam indicators. */
 
     gra_stats.spamicity = gra_compute_spamicity(bs, fp);
 

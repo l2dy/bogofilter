@@ -179,7 +179,7 @@ static double compute_probability(const word_t *token)
 }
 
 double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
-/* selects the best spam/nonspam indicators and calculates Robinson's S */
+/* selects the best spam/non-spam indicators and calculates Robinson's S */
 {
     hashnode_t *node;
 
