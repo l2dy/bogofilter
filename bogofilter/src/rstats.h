@@ -14,6 +14,7 @@ AUTHOR:
 #define RSTATS_H
 
 void rstats_init(void);
+void rstats_cleanup(void);
 
 void rstats_add(const word_t *token,
 		double good,

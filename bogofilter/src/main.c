@@ -40,6 +40,7 @@ CONTRIBUTORS:
 #include "lexer.h"
 #include "mime.h"
 #include "register.h"
+#include "rstats.h"
 #include "textblock.h"
 #include "token.h"
 #include "wordlists.h"
@@ -74,6 +75,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     FILE  *out;
 
     process_args_and_config_file(argc, argv, true);
+
+    /* initialize */
     init_charset_table(charset_default, true);
 
     /* open all wordlists */
@@ -155,6 +158,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     /* cleanup storage */
     db_cleanup();
     mime_cleanup();
+    rstats_cleanup();
     token_cleanup();
     xfree(directory);
 

@@ -101,6 +101,9 @@ static byte *getword (const byte *t, const byte *e);
 static char *getparam (const byte *t, char *e, const byte *param);
 #endif
 
+static void mime_push (mime_t * parent);
+static void mime_pop (void);
+
 /* Function Definitions */
 
 #if	0	/* Unused */
@@ -154,13 +157,13 @@ mime_free (mime_t * t)
   }
 
   t->parent = NULL;
-
 }
 
 /** Cleanup storage allocation */
 void mime_cleanup()
 {
-    mime_free(msg_state);
+    while (stackp > -1)
+	mime_pop ();
 }
 
 static void

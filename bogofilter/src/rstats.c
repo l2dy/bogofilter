@@ -71,6 +71,17 @@ void rstats_init(void)
     current = header.list;
 }
 
+void rstats_cleanup(void)
+{
+    rstats_t *p, *q;
+    
+    for (p = current; p != NULL; p = q)
+    {
+      q = p->next;
+      xfree (p);
+    }
+}
+
 void rstats_add( const word_t *token,
 		 double good,
 		 double bad,
