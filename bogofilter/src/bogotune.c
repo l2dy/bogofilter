@@ -908,7 +908,7 @@ static int process_arglist(int argc, char **argv)
     _wildcard (&argc, &argv);	/* expand wildcards (*.*) */
 #endif
 
-#define	OPTIONS	":c:Cd:DEI:Mnqr:stT:vVX:"
+#define	OPTIONS	":c:Cd:DEI:Mnqr:stT:vVx:"
 
     while (1)
     {
