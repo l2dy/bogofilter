@@ -136,6 +136,8 @@ int histogram(const char *path)
 
     build_wordlist_path(filepath, sizeof(filepath), path);
 
+    ds_init();
+
     dsh = ds_open(CURDIR_S, filepath, DS_READ);
     if (dsh == NULL)
 	return EX_ERROR;
@@ -149,6 +151,9 @@ int histogram(const char *path)
     ds_get_msgcounts(dsh, &val);
     set_msg_counts(val.goodcount, val.spamcount);
 
+    memset(&hist, 0, sizeof(hist));
+    rc = ds_foreach(dsh, ds_histogram_hook, &hist);
+
     if (DST_OK != ds_txn_commit(dsh)) {
 	ds_close(dsh);
 	fprintf(stderr, "cannot commit transaction!\n");
@@ -157,10 +162,6 @@ int histogram(const char *path)
 
     ds_close(dsh);
     ds_cleanup();
-
-    memset(&hist, 0, sizeof(hist));
-    ds_init();
-    rc = ds_oper(filepath, DS_READ, ds_histogram_hook, &hist);
 
     count = print_histogram(&hist);
 
