@@ -355,8 +355,9 @@ const char *db_str_err(int j)
 	return "Invalid error code";
 }
 
-void *dbe_init(void)
+void *dbe_init(const char *dummy)
 {
+    (void)dummy;
     init = true;
     return (void *)~0;
 }

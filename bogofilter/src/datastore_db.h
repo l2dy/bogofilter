@@ -47,7 +47,7 @@ void db_flush(void *handle);
 
 /** Do global initializations. \return pointer to environment for success, NULL for
  * error. */
-void *dbe_init(void);
+void *dbe_init(const char *directory);
 
 /** Cleanup storage allocation */
 void dbe_cleanup(void *);

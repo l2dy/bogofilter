@@ -678,7 +678,8 @@ const char *db_str_err(int e) {
     return db_strerror(e);
 }
 
-void *dbe_init(void) {
+void *dbe_init(const char *unused) {
+    (void)unused;
     init = true;
     return (void *)~0;
 }

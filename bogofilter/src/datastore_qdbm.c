@@ -332,8 +332,9 @@ const char *db_str_err(int e)
     return dperrmsg(e);
 }
 
-void * dbe_init(void)
+void * dbe_init(const char *dummy)
 {
+    UNUSED(dummy);
     init = true;
     return (void *)~0;
 }
