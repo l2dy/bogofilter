@@ -6,8 +6,15 @@
 #ifdef	NODEBUG
 typedef enum bit_e {DEBUG_NONE=0}  bit_t;
 #else
-#define MASKNAMES "gldswc"
-typedef enum bit_e {DEBUG_NONE=0, BIT_GENERAL=1, BIT_LEXER=2, BIT_DATABASE=4, BIT_SPAMICITY=8, BIT_WORDLIST=16, BIT_CONFIG=32}  bit_t;
+#define MASKNAMES "gldswcf"
+typedef enum bit_e {DEBUG_NONE    = 0,
+		    BIT_GENERAL   = 1,
+		    BIT_LEXER     = 2,
+		    BIT_DATABASE  = 4,
+		    BIT_SPAMICITY = 8,
+		    BIT_WORDLIST  =16,
+		    BIT_CONFIG    =32,
+		    BIT_FORMAT    =64}  bit_t;
 #endif
 
 extern bit_t debug_mask;
@@ -19,6 +26,7 @@ extern bit_t debug_mask;
 #define DEBUG_LEXER(level)	0
 #define DEBUG_WORDLIST(level)	0
 #define DEBUG_CONFIG(level)	0
+#define DEBUG_FORMAT(level)	0
 #else
 #define	DEBUG_GENERAL(level) 	((debug_mask & BIT_GENERAL)   && (verbose > level))
 #define DEBUG_SPAMICITY(level)	((debug_mask & BIT_SPAMICITY) && (verbose > level))
@@ -26,6 +34,7 @@ extern bit_t debug_mask;
 #define DEBUG_LEXER(level)	((debug_mask & BIT_LEXER)     && (verbose > level))
 #define DEBUG_WORDLIST(level)	((debug_mask & BIT_WORDLIST)  && (verbose > level))
 #define DEBUG_CONFIG(level)	((debug_mask & BIT_CONFIG)    && (verbose > level))
+#define DEBUG_FORMAT(level)	((debug_mask & BIT_FORMAT)    && (verbose > level))
 #endif
 
 void set_debug_mask(const char *mask);
