@@ -15,7 +15,7 @@
 typedef struct bogostat_s bogostat_t;
 
 typedef	void	m_initialize(void);
-typedef	double	m_compute_spamicity(wordhash_t *wordhash, FILE *fp); /*@globals errno@*/
+typedef	double	m_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/;
 typedef	void	m_print_stats(FILE *fp);
 typedef	void	m_cleanup(void);
 typedef	double	m_spamicity(void);
