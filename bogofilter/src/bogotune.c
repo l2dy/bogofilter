@@ -1122,6 +1122,10 @@ static void progress(uint cur, uint top)
 {
     uint i;
     uint ndots = ceil(70.0 * cur / top);
+
+    if (quiet)
+	return;
+
     if (ndots < 1)
 	ndots = 1;
      printf("\r%3u [", cur);
