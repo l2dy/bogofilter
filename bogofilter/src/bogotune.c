@@ -117,13 +117,16 @@ enum e_verbosity {
 #define	MIN(n)		((n)/60)
 #define SECONDS(n)	((n) - MIN(n)*60)
 
+#define	QPRINTF		if (!quiet) fprintf
+
 /* Global Variables */
 
 const char *progname = "bogotune";
 static char *ds_file;
 static char *ds_path;
 
-static bool	bogolex = false;	/* true if convert input to msg-count format */
+static bool    bogolex = false;		/* true if convert input to msg-count format */
+static bool    force   = true;		/* force adherence to minimum message counts */
 static char   *bogolex_file = NULL;
 static word_t *w_msg_count;
 
@@ -775,13 +778,6 @@ static void write_msgcount_file(wordhash_t *wh)
     return;
 }
 
-static void usage(void)
-{
-    (void)fprintf(stderr, 
-		  "Usage: %s [ -C | -D | -r | -h | -v | -F ] { -c config } { -d directory } -n non-spam-files -s spam-files\n", 
-		  progname);
-}
-
 static void print_version(void)
 {
     (void)fprintf(stderr,
@@ -799,15 +795,19 @@ static void print_version(void)
 
 static void help(void)
 {
-    usage();
+    (void)fprintf(stderr, 
+                  "Usage:  %s [options] { -c config } { -d directory } -n non-spam-files -s spam-files\n", 
+		  progname);
     (void)fprintf(stderr,
 		  "\t  -h      - print this help message.\n"
 		  "\t  -C      - don't read standard config files.\n"
 		  "\t  -c file - read specified config file.\n"
 		  "\t  -D      - don't read a wordlist file.\n"
 		  "\t  -d path - specify directory for wordlists.\n"
+		  "\t  -F      - force tuning with fewer than %d messages.\n"
 		  "\t  -M      - output input file in message count format.\n"
-		  "\t  -r num  - specify robx value\n");
+		  "\t  -r num  - specify robx value\n",
+		  LIST_COUNT);
     (void)fprintf(stderr,
 		  "\t  -T num  - specify fp target value\n"
 		  "\t  -s file1 file2 ... - spam files\n"
@@ -846,6 +846,9 @@ static int process_arglist(int argc, char **argv)
 		    break;
 		case 'D':
 		    ds_file = NULL;
+		    break;
+		case 'F':
+		    force ^= true;
 		    break;
 		case 'I':
 		    argc -= 1;
@@ -1234,18 +1237,33 @@ static bool check_msgcount_parms(void)
 {
     bool ok = true;
 
-    if (ds_file == NULL) {
-	fprintf(stderr, "A wordlist directory must be specified for converting message to the message count format.\n");
+    if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
+	QPRINTF(stderr, 
+		"The wordlist contains %d non-spam and %d spam messages.\n"
+		"Bogotune must be run with at least %d of each.\n",
+		(int) msgs_good, (int) msgs_bad, LIST_COUNT);
 	ok = false;
     }
 
-    if (ham_files->count != 0 && spam_files->count != 0) {
-	fprintf(stderr, "Message count files may be created from spam or non-spam inputs but not both.\n");
-	fprintf(stderr, "Run bogotune once for the spam and again for the non-spam.\n");
+    if (msgs_bad < msgs_good / 5 ||
+	msgs_bad > msgs_good * 5) {
+	QPRINTF(stderr,
+		"The wordlist has a ratio of spam to non-spam of %0.1f to 1.0.\n"
+		"Bogotune requires the ratio be in the range of 0.2 to 5.\n",
+		msgs_bad / msgs_good);
 	ok = false;
     }
 
-    return ok;
+    if (ns_cnt < TEST_COUNT || sp_cnt < TEST_COUNT) {
+	QPRINTF(stderr, 
+		"The messages sets contain %u non-spam and %u spam.  Bogotune "
+		"requires at least %d non-spam and %d spam messages to run.\n",
+		ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
+	if (!force)
+	    exit(EX_ERROR);
+    }
+
+    return !force ? ok : true;
 }
 
 static bool check_msg_counts(void)
