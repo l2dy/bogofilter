@@ -17,14 +17,14 @@ AUTHOR:
 #include <errno.h>
 #include <unistd.h>
 
-#include "config.h"
+#include <config.h>
+#include "common.h"
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #ifdef	HAVE_CHARSET
 #include "charset.h"
 #endif
-#include "common.h"
 #include "directories.h"
 #include "find_home.h"
 #include "globals.h"
