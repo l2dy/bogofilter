@@ -44,9 +44,6 @@ THEORY:
 #define offsetof(type, member) ( (int) & ((type*)0) -> member )
 #endif
 
-void wordhash_free_1 (wordhash_t * h);
-void wordhash_free_2 (wordhash_t * h);
-
 wordhash_t *
 wordhash_init (void)
 {
