@@ -522,6 +522,7 @@ void set_charset(const char *charset)
 	if (c == '_')		/* map underscore to dash */
 	    c = '-';
 	if (c == '-' &&		/* map "iso-" to "iso"     */
+	    d - t == 3 &&	/* ensure 3 chars avail    */
 	    memcmp(t, "iso", 3) == 0)
 	    continue;
 	if (q && c == '"')
