@@ -28,7 +28,8 @@ Briefly:
 	* Berkeley DB mode: do not create data base in read mode (properly map
 	  open_mode to DB_RDONLY flag, store open_mode).
 
-	* Berkeley DB mode: exit with error code if lock file cannot be created.
+	* Berkeley DB mode: exit with error code if lock file cannot be
+	  created. Attempt recovery even if creation of lock file succeeded.
 
 	2004-11-07
 
