@@ -105,6 +105,7 @@ done
 %{_bindir}/bogoutil
 %{_bindir}/bogotune
 %{_bindir}/bogoupgrade
+%{_bindir}/msg-count.sh
 %{_sysconfdir}/bogofilter.cf.example
 %config(noreplace) %{_sysconfdir}/bogofilter.cf
 
@@ -133,6 +134,7 @@ done
 %{_bindir}/bogoutil_static
 %{_bindir}/bogotune_static
 %{_bindir}/bogoupgrade
+%{_bindir}/msg-count.sh
 
 %{_sysconfdir}/bogofilter.cf.example
 %config(noreplace) %{_sysconfdir}/bogofilter.cf

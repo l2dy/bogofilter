@@ -36,7 +36,7 @@ AM_CFLAGS = -DBOGOFILTER
 
 # what to build
 bin_PROGRAMS = bogofilter bogoutil bogolexer bogotune
-bin_SCRIPTS = bogoupgrade
+bin_SCRIPTS = bogoupgrade msg-count.sh
 if ENABLE_STATIC
 bin_PROGRAMS += bogofilter_static bogoutil_static bogolexer_static bogotune_static
 endif
@@ -163,8 +163,8 @@ fgetsl_test_CFLAGS= -DMAIN
 
 # what to distribute
 EXTRA_DIST = \
-	     bogolex.sh \
 	     bogoupgrade.in \
+	     msg-count.sh \
 	     version.sh \
 	     strlcat.3 strlcpy.3
 #

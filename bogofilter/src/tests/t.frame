@@ -114,7 +114,7 @@ export BOGOFILTER_DIR
 BOGOFILTER="$VAL ${relpath}/bogofilter"
 BOGOLEXER="$VAL ${relpath}/bogolexer"
 BOGOUTIL="$VAL ${relpath}/bogoutil"
-BOGOLEX_SH="$VAL ${srcdir}/../bogolex.sh"
+BOGOLEX_SH="$VAL ${srcdir}/../msg-count.sh"
 export BOGOFILTER
 export BOGOLEXER
 export BOGOUTIL
