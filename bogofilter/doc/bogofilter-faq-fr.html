@@ -3,47 +3,43 @@
 
 <html>
   <head>
-    <meta name="generator" content=
-    "HTML Tidy for Linux/x86 (vers 1st April 2002), see www.w3.org">
-    <meta content="text/html; charset=ISO-8859-1" http-equiv=
-    "Content-Type">
-
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
     <title>Bogofilter FAQ</title>
 
     <style type="text/css">
-<!--
-  h2 {
-    margin-top: 1em;
-    font-size: 125%;
-  }
-  ul {
-    margin-top: 1.5em;
-    margin-bottom: 0.5em;
-  }
-  ul ul {
-    margin-top: 0.25em;
-    margin-bottom: 0;
-  }
-  li {
-    margin-top: 0;
-    margin-bottom: 0.5em;
-  }
-  li li {
-    margin-bottom: 0.25em;
-  }
-  dt {
-    margin-top: 0.5em;
-    margin-bottom: 0;
-  }
-  p.subheading {
-    font-weight: bold
-  }
-  hr {
-    margin-top: 1em;
-    margin-bottom: 1em;
-  }
-  -->
-      </style>
+    <!--
+      h2 {
+	margin-top: 1em;
+	font-size: 125%;
+      }
+      ul {
+	margin-top: 1.5em;
+	margin-bottom: 0.5em;
+      }
+      ul ul {
+	margin-top: 0.25em;
+	margin-bottom: 0;
+      }
+      li {
+	margin-top: 0;
+	margin-bottom: 0.5em;
+      }
+      li li {
+	margin-bottom: 0.25em;
+      }
+      dt {
+	margin-top: 0.5em;
+	margin-bottom: 0;
+      }
+      p.subheading {
+	font-weight: bold
+      }
+      hr {
+	margin-top: 1em;
+	margin-bottom: 1em;
+      }
+    -->
+    </style>
   </head>
 
   <body>
@@ -128,6 +124,7 @@
         </ul>
       </li>
     </ul>
+
     <hr>
 
     <h2 id="what-is-bogofilter">Qu'est ce que Bogofilter?</h2>
@@ -154,6 +151,7 @@
     <p>Le fichier <a href=
     "http://bogofilter.sourceforge.net/NEWS">NEWS</a> décrit
     l'historique des versions de Bogofilter.</p>
+
     <hr>
 
     <h2 id="bogo-what">Bogo-quoi?</h2>
@@ -163,8 +161,9 @@ bogomètre <a href="http://www.catb.org/~esr/jargon/html/B/bogometer.html">(bogom
 filtre à bogues <a href="http://www.catb.org/~esr/jargon/html/B/bogon-filter.html">(bogon-filter)</a>, c'est à dire qu'il essaie d'identifier des mails
 bogués <a href="http://www.catb.org/~esr/jargon/html/B/bogus.html">(bogus)</a> en mesurant leur
 bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosity)</a>.</p>
+
     <hr>
-    
+
     <h2 id="lists">Listes de diffusion</h2>
 
     <p>Il existe actuellement 4 listes de diffusion pour
@@ -233,6 +232,7 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
         </tr>
       </tbody>
     </table>
+
     <hr>
 
     <h2 id="training">Comment débuter l'apprentissage de Bogofilter?</h2>
@@ -284,7 +284,9 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
     bogominitrain.pl -fv ~/.bogofilter ham.mbx spam.mbx '-o 0.7,0.5'
     </pre></li>
     </ul>
+
     <hr>
+
     <h2 id="production">Comment puis-je conserver une bonne acuité ?</h2>
     <p>Bogofilter fera des erreurs de temps en temps. C'est pourquoi un
     apprentissage régulier est important. Il existe principalement deux méthodes pour le faire.
@@ -310,6 +312,7 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
     Repéter l'entrainement avec le corpus complet (y compris les messages de corrections ajoutés
     depuis le précédent apprentissage). Ceci ajoutera des messages dans la base de données afin
     que d'atteindre un nouvel équilibre, annulant les effets éventuellement de "surcompensation".
+
     <hr>
 
     <h2 id="spamassassin">Comment puis-je utiliser SpamAssassin
@@ -347,7 +350,9 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
   * ^X-Bogosity:.No
   non-spam
 </pre>
+
 <hr>
+
     <h2 id="vvv">Quelle est la signification de la sortie verbeuse
     de Bogofilter?</h2>
 
@@ -482,7 +487,9 @@ bogosité <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosit
         "http://www.r-project.org/">http://www.r-project.org/</a>.</p>
       </li>
     </ul>
+
     <hr>
+
     <h2 id="asian-spam">Comment traiter les spams asiatiques?</h2>
 
     <p>Beaucoup de personnes reçoivent du mail non sollicité
@@ -543,6 +550,7 @@ spam-unreadable
         le message.</p>
       </li>
     </ul>
+
     <hr>
 
     <h2 id="query-database">Comment faire une requête manuelle sur
@@ -570,6 +578,7 @@ spam-unreadable
     de mots dans la liste spam, et utilisez "bogoutil -d
     $BOGOFILTER_DIR/goodlist.db | wc -l" pour afficher le nombre de
     mots dans la liste ham.</p>
+
     <hr>
 
     <h2 id="rescue">Comment faire si ma liste de mots est
@@ -593,6 +602,7 @@ bogoutil -d spamlist.db | bogoutil -l spamlist.db.new
 db_dump -r spamlist.db &gt; spamlist.txt
 db_load spamlist.new &lt; spamlist.txt
 </pre>
+
     <hr>
 
     <h2 id="port-notes">Comment faire fonctionner Bogofilter sur
@@ -661,6 +671,7 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
 
     <p>Regardez le fichier doc/programmer/README.hp-ux dans la
     distribution des sources.</p>
+
     <hr>
 
     <h2 id="nfs">Puis-je partager une liste de mots par NFS?</h2>
@@ -684,6 +695,7 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
     avec "lockd" en fonctionnement. Référez vous à la documentation
     NFS à propos du lancement de "lockd" ou de "rpc.lockd". La
     plupart des systèmes avec NFS l'active par défaut.</p>
+
     <hr>
 
     <h2 id="return-codes">Pourquoi Bogofilter fournit des codes de
@@ -693,6 +705,7 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
     <p>Vraisemblablement les codes de retour ont été réécrits par
     waitpid(2). Utilisez WEXITSTATUS(status) dans sys/wait.h, ou
     une macro comparable pour obtenir la valeur correcte.</p>
+
     <hr>
 
     <h2 id="changed-options">Pourquoi mes scripts échouent depuis
@@ -746,7 +759,9 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
     pas besoin de modification. Les autres scripts qui utilisaient
     '-S' et '-N' pour corriger les erreurs de classement
     <i>doivent</i> être changés.</p>
+
     <hr>
+
     <!--
     $Id$
     -->
