@@ -237,6 +237,7 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 		db_close(handle, false);
 		return NULL;		/* handle already freed, ok to return */
 	    }
+
 	    if (db_lock(handle->fd[i], F_SETLK,
 			(short int)(open_mode == DB_READ ? F_RDLCK : F_WRLCK)))
 	    {
@@ -249,16 +250,16 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 		if (e != EAGAIN && e != EACCES) return NULL;
 		/* do not goto open_err here, db_close frees the handle! */
 	    } else {
-		break;
+		idx = COUNTOF(retryflags);
 	    }
-	}
-    }
+	} /* for i over handle */
+    } /* for idx over retryflags */
 
     if (handle) {
 	unsigned int i;
 	handle->locked = true;
 	for (i = 0; i < handle->count; i += 1) {
-	    if (handle->fd[i] < 0) 
+	    if (handle->fd[i] < 0)
 		handle->locked=false;
 	}
 	return (void *)handle;
