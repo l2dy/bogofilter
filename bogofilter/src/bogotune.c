@@ -149,7 +149,7 @@ double *ns_scores;
 double *sp_scores;
 double user_robx = 0.0;		/* from '-r' option */
 
-#define	TEST
+#undef	TEST
 
 #ifdef	TEST
 uint test = 0;
@@ -536,8 +536,10 @@ static void set_thresh(uint count, double *scores)
 	}
     }
 
+#ifdef	TEST
     if (verbose >= PARMS)
 	print_ns_scores(ftarget-4, ftarget+4, 0);
+#endif
 
     target = ftarget;
     spam_cutoff = cutoff;
