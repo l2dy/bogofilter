@@ -172,7 +172,7 @@ static int arg_foreach(arg_foreach_t hook, int argc, char **argv)
 static bool is_blank_line(const char *line, size_t len)
 {
     while (len > 0) {
-	if (! isspace(*line) && *line != '\b' )
+	if (!isspace((unsigned char)*line) && *line != '\b')
 	    return false;
 	len -= 1;
 	line++;
