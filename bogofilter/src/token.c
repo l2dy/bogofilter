@@ -20,6 +20,7 @@ AUTHOR:
 #include "charset.h"
 #include "error.h"
 #include "mime.h"
+#include "msgcounts.h"
 #include "word.h"
 #include "token.h"
 #include "xmemrchr.h"
@@ -34,6 +35,10 @@ static word_t *ipsave = NULL;
 /* Global Variables */
 
 bool block_on_subnets = false;
+
+#ifdef	DUP_REF_RSLTS
+static int    token_count;
+#endif
 
 static word_t *token_prefix = NULL;
 static word_t *nonblank_line = NULL;
@@ -78,14 +83,18 @@ token_t get_token(void)
 	    fputc('\n', dbgout);
 	}
 	    
-	if (class <= 0)
+	if (class == NONE)
 	    break;
+
+	/* Skip leading FROM *** HACK * HACK * HACK *** */
+#ifdef	DUP_REF_RSLTS
+	token_count += 1;
+	if (token_count == 1 &&
+	    memcmp(yylval->text, "From", 4) == 0)
+	    continue;
+#endif
 
 	switch (class) {
-
-	case FROM:	/* change state to header processing */
-	    msg_header = true;
-	    break;
 
 	case EMPTY:	/* empty line -- check for bogus end of header */
 	    got_emptyline(); 
@@ -159,6 +168,7 @@ token_t get_token(void)
 	case MSG_COUNT_LINE:
 	    msg_count_file = true;
 	    lexer = &msg_count_lexer;
+	    lexer_more = msgcount_more;
 	case BOGO_LEX_LINE:
 	    done = true;
 	    break;
@@ -201,6 +211,10 @@ token_t get_token(void)
 
 void token_init(void)
 {
+#ifdef	DUP_REF_RSLTS
+    token_count = 0;
+#endif
+
     msg_header = true;
     yyinit();
     mime_reset(); 
@@ -208,11 +222,6 @@ void token_init(void)
 	const char *s = "spc:invalid_end_of_header";
 	nonblank_line = word_new((const unsigned char *)s, strlen(s));
     }
-}
-
-void got_from(void)
-{
-    token_init();
 }
 
 void got_newline()

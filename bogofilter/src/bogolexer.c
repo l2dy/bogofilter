@@ -18,6 +18,7 @@ AUTHOR:
 #include <string.h>
 #include <unistd.h>
 
+#include "bogoreader.h"
 #include "bool.h"
 #include "charset.h"
 #include "configfile.h"
@@ -56,7 +57,7 @@ const parm_desc format_parms[] =
 
 static void process_args_1(int argc, char **argv);
 static void process_args_2(int argc, char **argv);
-static void initialize(FILE *fp);
+void initialize(void);
 
 /* Function Definitions */
 
@@ -110,7 +111,7 @@ static void print_version(void)
 		  progname, version, PACKAGE);
 }
 
-#define	OPTIONS	":c:CDhI:npP:qTvVx:"
+#define	OPTIONS	":c:CDhI:npP:qvVx:X"
 
 /** These functions process command line arguments.
  **
@@ -177,7 +178,7 @@ static void process_args_1(int argc, char **argv)
 	    quiet = true;
 	    break;
 
-	case 'T':
+	case 'X':
 	    test += 1;
 	    break;
 
@@ -244,7 +245,8 @@ int main(int argc, char **argv)
 {
     token_t t;
     int count=0;
-    bool from_seen = false;
+
+    mbox_mode = true;		/* to allow multiple messages */
 
     process_args_1(argc, argv);
     process_config_files(false);
@@ -260,21 +262,19 @@ int main(int argc, char **argv)
 	    puts("normal mode.");
     }
 
-    initialize(fpin);
-    got_from();	/* initialize */
+    bogoreader_init(argc, argv);
 
-    while ((t = get_token()) > 0)
-    {
-	count += 1;
-	if (t == FROM && from_seen == false) {
-	    from_seen = true;
-	    continue;
+    while (lexer_more()) {
+	initialize();
+	while ((t = get_token()) != NONE)
+	{
+	    count += 1;
+	    if (passthrough) {
+		fprintf(stdout, "%s\n", yylval->text);
+	    }
+	    else if (!quiet)
+		printf("get_token: %d '%s`\n", t, yylval->text);
 	}
-	if (passthrough) {
-	    fprintf(stdout, "%s\n", yylval->text);
-	}
-	else if (!quiet)
-	    printf("get_token: %d '%s`\n", t, yylval->text);
     }
 
     if ( !passthrough )
@@ -285,10 +285,10 @@ int main(int argc, char **argv)
     return 0;
 }
 
-static void initialize(FILE *fp)
+void initialize()
 {
     init_charset_table(charset_default, true);
     mime_reset();
     token_init();
-    lexer_v3_init(fp);
+    lexer_v3_init(NULL);
 }

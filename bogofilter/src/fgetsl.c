@@ -12,12 +12,12 @@
 #include "fgetsl.h"
 
 /* calls exit(EX_ERROR) on read error or when max_size < 2 */
-int fgetsl(char *buf, int max_size, FILE *s)
+int fgetsl(char *buf, int max_size, FILE *in)
 {
-    return xfgetsl(buf, max_size, s, 0);
+    return xfgetsl(buf, max_size, in, 0);
 }
 
-int xfgetsl(char *buf, int max_size, FILE *s, int no_nul_terminate)
+int xfgetsl(char *buf, int max_size, FILE *in, int no_nul_terminate)
 {
     int c = 0;
     char *cp = buf;
@@ -30,23 +30,23 @@ int xfgetsl(char *buf, int max_size, FILE *s, int no_nul_terminate)
 	exit(EX_ERROR);
     }
 
-    if (feof(s))
+    if (feof(in))
 	return(EOF);
 
-    while ((cp < fin) && ((c = getc(s)) != EOF)) {
+    while ((cp < fin) && ((c = getc(in)) != EOF)) {
 	*cp++ = (char)c;
 	if (c == '\n')
 	    break;
     }
 
-    if (c == EOF && ferror(s)) {
+    if (c == EOF && ferror(in)) {
 	perror("stdin");
 	exit(EX_ERROR);
     }
 
     if (cp < end)
 	*cp = '\0'; /* DO NOT ADD ++ HERE! */
-    if (cp == buf && feof(s)) return EOF;
+    if (cp == buf && feof(in)) return EOF;
     return(cp - buf);
 }
 

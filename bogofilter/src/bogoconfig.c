@@ -458,7 +458,7 @@ static void print_version(void)
 #define	F "f"
 #endif
 
-#define	OPTIONS	":23bBc:Cd:DefFghI:k:lL:m:MnNo:O:pP:qQRrsStTuvWVx:y:" G R F
+#define	OPTIONS	":23bBc:Cd:DefFghI:k:lL:m:MnNo:O:pP:qQRrsStTuvWVx:Xy:" G R F
 
 /** These functions process command line arguments.
  **
@@ -740,6 +740,9 @@ void process_args_2(int argc, char **argv)
         case 'V':
 	    print_version();
 	    exit(EX_OK);
+
+        case 'X':
+	    test = 1;
 	}
     }
 

@@ -67,6 +67,23 @@ int buff_fgetsl(buff_t *self, FILE *in)
     return readcnt;
 }
 
+int buff_add(buff_t *self, word_t *in)
+{
+    int readpos = self->t.leng;
+    int readcnt = in->leng;
+    size_t new_size = self->t.leng + in->leng;
+    if (new_size > self->size) {
+	self->t.text = xrealloc(self->t.text, new_size);
+	self->size = new_size;
+    }
+    self->read = readpos;
+    self->t.leng += readcnt;
+    memcpy(self->t.text+readpos, in->text, readcnt);
+    Z(self->t.text[self->t.leng]);		/* for easier debugging - removable */
+
+    return readcnt;
+}
+
 void buff_puts(const buff_t *self, size_t width, FILE *fp)
 {
     word_t word;

@@ -114,7 +114,7 @@ void register_words(run_t _run_type, wordhash_t *h, int msgcount)
 /* this function accumulates the word frequencies from the src hash to
  * those of the dest hash
  */
-static void add_hash(wordhash_t *dest, wordhash_t *src) {
+void add_hash(wordhash_t *dest, wordhash_t *src) {
     wordprop_t *d;
     hashnode_t *s;
 
@@ -128,39 +128,4 @@ static void add_hash(wordhash_t *dest, wordhash_t *src) {
     }
 
     dest->count = count;
-}
-
-/* read messages from stdin and register according to _run_type.
- *
- * performance cheat: we use a per-message hash and a global hash. After
- * each message, we accumulate the per-message frequencies in the global
- * hash. This may look long-winded, but is actually fast because it
- * saves us iterating over tokens with zero frequencies in the
- * cap-and-accumulation phase. we save more than half of the execution
- * time for big mbox inputs, when teaching bogofilter.
- */
-rc_t register_messages()
-{
-  wordhash_t *words = wordhash_init();
-  long	msgcount = 0;
-  token_t token_type;
-
-  initialize_constants();
-
-  do {
-      wordhash_t *h = wordhash_init();
-      msgcount++;
-      if (DEBUG_REGISTER(1))
-	  fprintf(dbgout, "Message #%ld\n", msgcount);
-      token_type = collect_words(h);
-      wordhash_sort(h);
-      add_hash(words, h);
-      wordhash_free(h);
-  } while (token_type != NONE);
-
-  wordhash_sort(words);
-  register_words(run_type, words, msgcount);
-  wordhash_free(words);
-
-  return RC_OK;
 }

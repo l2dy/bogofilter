@@ -19,6 +19,8 @@ AUTHOR:
 
 #define	MSG_COUNT_MAX_LEN 100
 extern	yylex_t	 read_msg_count_line;
+extern	bool	 msgcount_more(void);
+
 extern	char	*msg_count_text;
 extern	int	 msg_count_leng;
 

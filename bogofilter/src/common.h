@@ -12,6 +12,9 @@ NAME:
 
 #include "config.h"
 
+#undef	DUP_REF_RSLTS
+#define	DUP_REF_RSLTS
+
 #if defined(HAVE_LIMITS_H)
 #include <limits.h>
 #elif defined(HAVE_SYS_PARAM_H)

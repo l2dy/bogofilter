@@ -4,6 +4,12 @@
 
 $Id$
 
+	2003-08-23
+
+	* Implemented new message readering protocol for processing
+          bulk mode, splitting mailboxes into messages, reading
+          messages in maildirs, etc.
+
 0.14.5.2 2003-08-20
 
 	* bogominitrain.pl - removed email 'cruft' and revised format

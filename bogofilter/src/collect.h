@@ -14,7 +14,7 @@ NAME:
 #include "wordhash.h"
 
 extern void	wordprop_init(void *vwordprop);
-extern void	collect_reset(void);
+
 extern token_t	collect_words(wordhash_t *wh);
 
 #endif

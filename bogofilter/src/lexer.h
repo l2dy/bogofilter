@@ -21,10 +21,11 @@ extern	bool	kill_html_comments;
 extern	int	count_html_comments;
 extern	bool	score_html_comments;
 
+#define YY_NULL 0
+
 /* lexer interface */
 typedef enum {
     NONE,
-    FROM,	/* mbox message delimiter */
     TOKEN,	/* regular token */
     EMPTY,	/* empty line */
     BOUNDARY,	/* MIME multipart boundary line */
@@ -36,8 +37,6 @@ typedef enum {
 /* in lexer.c */
 extern int yylineno;
 extern bool msg_header;
-
-extern bool is_from(const byte *text, size_t leng);
 
 /* Define a struct for interfacing to a lexer */
 
@@ -60,6 +59,12 @@ extern int	lexer_v3_leng;
 extern char   * lexer_v3_text;
 extern void	lexer_v3_init(FILE *fp);
 
+/* in lexer_v4.l */
+extern token_t	lexer_v4_lex(void);
+extern int	lexer_v4_leng;
+extern char   * lexer_v4_text;
+extern void	lexer_v4_init(FILE *fp);
+
 /* in lexer.c */
 extern void	yyinit(void);
 extern int	yyinput(byte *buf, size_t size);
@@ -67,5 +72,18 @@ extern int	yyinput(byte *buf, size_t size);
 extern int	buff_fill(buff_t *buff, size_t used, size_t need);
 
 extern size_t	decode_text(word_t *w);
+
+/* Reader Interface */
+
+typedef int   lexer_line_t(buff_t *buff);
+typedef bool  lexer_more_t(void);
+typedef char *lexer_file_t(void);
+
+extern lexer_line_t *lexer_getline;
+extern lexer_more_t *lexer_more;
+extern lexer_file_t *lexer_filename;
+
+typedef int yy_getline_t(buff_t *buff);
+extern	yy_getline_t *yy_getline;
 
 #endif	/* LEXER_H */

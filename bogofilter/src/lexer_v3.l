@@ -165,14 +165,6 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
 %%
 
-^From\ 						{ if (msg_header && is_from((const unsigned char *)yytext, yyleng)) { 
-						      BEGIN(INITIAL); 
-						      return FROM;
-						  } else { 
-						      return TOKEN;
-						  }
-						}
-
 <INITIAL,BOGO_LEX>{MSG_COUNT}{NUM_NUM}		{ if (lineno == 0) { 
 						      BEGIN(BOGO_LEX); 
 						      set_msg_counts(strchr(yytext, ' ') + 1); 

@@ -23,7 +23,6 @@ if ENABLE_MEMDEBUG
 MEMDEBUG_SRC = memdebug.c memdebug.h
 endif
 
-
 AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc -I$(top_srcdir)/trio
 AM_CFLAGS = -DBOGOFILTER
 
@@ -59,6 +58,7 @@ libbogofilter_a_SOURCES= \
 	directories.c version.c \
 	base64.h base64.c \
 	bogoconfig.h bogoconfig.c \
+	bogoreader.h bogoreader.c \
 	bool.h bool.c \
 	buff.h buff.c \
 	charset.h charset.c \

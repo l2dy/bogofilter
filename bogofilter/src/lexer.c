@@ -31,6 +31,11 @@
 int yylineno;
 bool msg_header = true;
 lexer_t *lexer = NULL;
+yy_getline_t *yy_getline = NULL;
+
+lexer_more_t *lexer_more;
+lexer_line_t *lexer_getline;
+lexer_file_t *lexer_filename;
 
 /* Local Variables */
 
@@ -48,8 +53,6 @@ lexer_t msg_count_lexer = {
     &msg_count_leng
 };
 
-#define YY_NULL 0
-
 /* Function Prototypes */
 static int yy_get_new_line(buff_t *buff);
 static int skip_spam_header(buff_t *buff);
@@ -66,12 +69,6 @@ static void lexer_display_buffer(buff_t *buff)
 	fputc('\n', dbgout);
 }
 
-bool is_from(const byte *text, size_t leng)
-{
-    bool val = (leng >= 5) && (memcmp(text, "From ", 5) == 0);
-    return val;
-}
-
 /* Check for lines wholly composed of printable characters as they can cause a scanner abort 
    "input buffer overflow, can't enlarge buffer because scanner uses REJECT"
 */
@@ -86,6 +83,7 @@ static bool not_long_token(byte *buf, size_t count)
     return false;
 }
 
+#if	0
 static int lgetsl(buff_t *buff)
 {
     int count = buff_fgetsl(buff, fpin);
@@ -97,26 +95,39 @@ static int lgetsl(buff_t *buff)
        If found, handle it immediately.
     */
 
-    if (is_from(buff->t.text+buff->read, buff->t.leng-buff->read))
-	got_from();
-
     if (count >= 0 && DEBUG_LEXER(0))
 	lexer_display_buffer(buff);
 
     return count;
 }
+#endif
 
 static int yy_get_new_line(buff_t *buff)
 {
-    int count = lgetsl(buff);
+    int count = lexer_getline(buff);
 
     static size_t hdrlen = 0;
     if (hdrlen==0)
 	hdrlen=strlen(spam_header_name);
 
+    if (count > 0)
+	yylineno += 1;
+
+    if (count == EOF) {
+	if (ferror(fpin)) {
+	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
+	    exit(EX_ERROR);
+	} else {
+	    return YY_NULL;
+	}
+    }
+
+    if (count >= 0 && DEBUG_LEXER(0))
+	lexer_display_buffer(buff);
+    
     /* skip spam_header ("X-Bogosity:") lines */
     while (msg_header
-	   && count != -1
+	   && count != EOF
 	   && memcmp(buff->t.text,spam_header_name,hdrlen) == 0)
     {
 	count = skip_spam_header(buff);
@@ -138,12 +149,12 @@ static int skip_spam_header(buff_t *buff)
     while (true) {
 	int count;
 	buff->t.leng = 0;		/* discard X-Bogosity line */
-	count = lgetsl(buff);
+	count = lexer_getline(buff);
 	if (count <= 1 || !isspace(buff->t.text[0])) 
 	    return count;
     }
 
-    return -1;
+    return EOF;
 }
 
 static int get_decoded_line(buff_t *buff)
@@ -165,7 +176,7 @@ static int get_decoded_line(buff_t *buff)
 	    int add;
 	    /* continuation line */
 	    ungetc(c,fpin);
-	    add = lgetsl(buff);
+	    add = lexer_getline(buff);
 	    if (add == EOF) break;
 	    if (passthrough && passmode == PASS_MEM && buff->t.leng > 0)
 		textblock_add(buff->t.text+buff->read, buff->t.leng);
@@ -177,7 +188,7 @@ static int get_decoded_line(buff_t *buff)
     }
 #endif
 
-    if (count == -1) {
+    if (count == EOF) {
 	if (ferror(fpin)) {
 	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
 	    exit(EX_ERROR);
@@ -192,10 +203,7 @@ static int get_decoded_line(buff_t *buff)
 	fprintf(dbgout, "\n");
     }
 
-    if (count >= 5
-	&& memcmp("From ", buf, 5) != 0
-	&& ! msg_header
-	&& msg_state->mime_type != MIME_TYPE_UNKNOWN)
+    if ( ! msg_header && msg_state->mime_type != MIME_TYPE_UNKNOWN)
     {
 	word_t line;
 	int decoded_count;
@@ -266,7 +274,10 @@ int yyinput(byte *buf, size_t max_size)
      */
 
     while (1) {
-	int cnt = get_decoded_line(&buff);
+	int cnt;
+
+	cnt = get_decoded_line(&buff);
+
 	if (cnt == 0)
 	    break;
 
@@ -284,12 +295,14 @@ int yyinput(byte *buf, size_t max_size)
 
     /* do nothing if in header */
 
+#if	1
     if ((count > 0)
 	&& ! msg_header
 	&& msg_state->mime_type == MIME_TEXT_HTML)
     {
 	count = process_html_comments(&buff);
     }
+#endif
 
     for (i = 0; i < count; i++ )
     {
@@ -297,7 +310,7 @@ int yyinput(byte *buf, size_t max_size)
 	buf[i] = charset_table[ch];
     }
 
-    return (count == -1 ? 0 : count);
+    return (count == EOF ? 0 : count);
 }
 
 size_t decode_text(word_t *w)

@@ -29,17 +29,10 @@ CONTRIBUTORS:
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
-#include "charset.h"
-#include "collect.h"
-#include "datastore.h"
 #include "fgetsl.h"
 #include "format.h"
-#include "lexer.h"
 #include "mime.h"
-#include "msgcounts.h"
 #include "paths.h"
-#include "register.h"
-#include "rstats.h"
 #include "textblock.h"
 #include "token.h"
 #include "wordlists.h"
@@ -64,8 +57,8 @@ const char *progname = "bogofilter";
 /* Function Prototypes */
 
 static FILE *output_setup(void);
-static void passthrough_setup(void);
-static void passthrough_cleanup(void);
+void passthrough_setup(void);
+void passthrough_cleanup(void);
 static void write_log_message(void);
 void write_message(rc_t status);
 
@@ -74,94 +67,6 @@ void write_message(rc_t status);
 static void cleanup_exit(ex_t exitcode, int killfiles) {
     if (killfiles && outfname[0] != '\0') unlink(outfname);
     exit(exitcode);
-}
-
-static rc_t classify(void);
-static void initialize(FILE *fp);
-
-static void initialize(FILE *fp)
-{
-    init_charset_table(charset_default, true);
-    mime_reset();
-    token_init();
-    collect_reset();
-    lexer_v3_init(fp);
-}
-
-typedef rc_t (*arg_foreach_t)(void);
-
-static ex_t arg_foreach(arg_foreach_t hook, int argc, char **argv)
-{
-    ex_t  exitcode = EX_OK;
-    bool error = false;
-    bool done = false;
-    int  i = 0;
-
-    while (!done) {
-	rc_t status = RC_MORE;
-	char *filename = NULL;
-	char buff[PATH_LEN+1];
-
-	switch (bulk_mode) {
-	case B_NORMAL:
-	    break;
-	case B_STDIN:		/* '-b' - streaming (stdin) mode */
-	{
-	    int len;
-	    filename = buff;
-	    if ((len = fgetsl(buff, sizeof(buff), stdin)) <= 0) {
-		done = true;
-		continue;
-	    }
-	    if (len > 0 && filename[len-1] == '\n')
-		filename[len-1] = '\0';
-	    break;
-	}
-	case B_CMDLINE: /* '-B' - command line mode */
-	    if (i < argc && !error) {
-		filename = argv[i++];
-	    } else {
-		done = true;
-		continue;
-	    }
-	    break;
-	default:
-	    fprintf(stderr, "Unknown bulk_mode = %d\n", (int) bulk_mode);
-	    abort();
-	    break;
-	}
-	if (bulk_mode != B_NORMAL) {
-	    if (fpin)
-		fclose(fpin);
-	    fpin = fopen( filename, "r" );
-	    if (fpin == NULL) {
-		error = true;
-		fprintf(stderr, "Can't read file '%s'\n", filename);
-		continue;
-	    }
-	    initialize(fpin);
-	    if (verbose || passthrough)
-		fprintf(fpo, "%s ", filename ); 
-	}
-
-	status = hook();
-
-	exitcode = !error ? RC_SPAM : RC_HAM;
-
-	if (bulk_mode == B_NORMAL) {
-	    if (run_register)
-		done = true;
-	    else {
-		if (status != RC_MORE) {
-		    exitcode = (ex_t) status;	/* SPAM=0, HAM=1, UNSURE=2 */
-		    if (nonspam_exits_zero && exitcode != EX_ERROR)
-			exitcode = EX_OK;
-		    done = true;
-		}
-	    }
-	}
-    }
-    return exitcode;
 }
 
 /* check for non-empty blank line */
@@ -178,7 +83,8 @@ static bool is_blank_line(const char *line, size_t len)
 
 int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 {
-    ex_t exitcode;
+    rc_t status;
+    ex_t exitcode = EX_OK;
 
     progtype = build_progtype(progname, DB_TYPE);
 
@@ -191,12 +97,20 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     fpo = output_setup();
 
-    initialize(NULL);
+    status = bogofilter(argc, argv);
 
-    if (run_classify || passthrough)
-	exitcode = arg_foreach(classify, argc, argv);
-    else
-	exitcode = arg_foreach(register_messages, argc, argv);
+    switch (status) {
+    case RC_SPAM:	exitcode = EX_SPAM;	break;
+    case RC_HAM:	exitcode = EX_HAM;	break;
+    case RC_UNSURE:	exitcode = EX_UNSURE;	break;
+    case RC_OK:		exitcode = EX_OK;	break;
+    default:
+	fprintf(dbgout, "Unexpected status code - %d\n", status);
+	exit(EX_ERROR);
+    }
+
+    if (nonspam_exits_zero && exitcode != EX_ERROR)
+	exitcode = EX_OK;
 
     close_wordlists(false);
     free_wordlists();
@@ -267,26 +181,6 @@ static int read_seek(char **out, void *in) {
 }
 
 typedef int (*readfunc_t)(char **, void *);
-
-static rc_t classify()
-{
-    rc_t status = RC_MORE;
-
-    do {
-	passthrough_setup();
-	init_msg_counts();
-	token_init();
-	init_charset_table(charset_default, true);
-	
-	status = bogofilter();
-	write_message(status);
-	
-	rstats_cleanup();
-	passthrough_cleanup();
-    } while (status == RC_MORE);
-
-    return status;
-}
 
 void write_message(rc_t status)
 {
@@ -441,7 +335,7 @@ static FILE *output_setup(void)
     return fp;
 }
 
-static void passthrough_setup()
+void passthrough_setup()
 {
     /* check if the input is seekable, if it is, we don't need to buffer
      * things in memory => configure passmode accordingly
@@ -451,19 +345,6 @@ static void passthrough_setup()
 	return;
 
     passmode = PASS_MEM;
-
-    if (!mbox_mode) {
-	if (fseek(fpin, 0, SEEK_END) == 0) {
-	    passmode = PASS_SEEK;
-	    (void)rewind(fpin);
-	} else {
-	    if (errno != ESPIPE && errno != ENOTTY) {
-		fprintf(stderr, "cannot determine if input is seekable: %s\n",
-			strerror(errno));
-		exit(EX_ERROR);
-	    }
-	}
-    }
 
     if (passmode == PASS_MEM)
 	textblock_init();
@@ -479,7 +360,7 @@ static void passthrough_setup()
     }
 }
 
-static void passthrough_cleanup()
+void passthrough_cleanup()
 {
     if (!passthrough)
 	return;

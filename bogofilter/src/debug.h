@@ -13,7 +13,8 @@ NAME:
 #define	DEBUG_NONE	0
 
 #ifndef	NODEBUG
-#define BIT_NAMES	"cdfghlmrstw"
+#define BIT_NAMES	"bcdfghlmrstw"
+#define BIT_READER	( 1 << ('B' - 'A'))
 #define BIT_CONFIG	( 1 << ('C' - 'A'))
 #define BIT_DATABASE	( 1 << ('D' - 'A'))
 #define BIT_FORMAT	( 1 << ('F' - 'A'))
@@ -52,6 +53,7 @@ extern int debug_mask;
 #define DEBUG_HTML(level)	((debug_mask & BIT_HTML)      && (verbose > level))
 #define DEBUG_LEXER(level)	((debug_mask & BIT_LEXER)     && (verbose > level))
 #define DEBUG_MIME(level)	((debug_mask & BIT_MIME)      && (verbose > level))
+#define DEBUG_READER(level)	((debug_mask & BIT_READER)    && (verbose > level))
 #define DEBUG_REGISTER(level)	((debug_mask & BIT_REGISTER)  && (verbose > level))
 #define DEBUG_ROBINSON(level)	((debug_mask & BIT_ROBINSON)  && (verbose > level))
 #define DEBUG_SPAMICITY(level)	((debug_mask & BIT_SPAMICITY) && (verbose > level))

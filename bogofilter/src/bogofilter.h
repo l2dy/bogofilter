@@ -8,8 +8,8 @@
 
 #define DEVIATION(n)	fabs((n) - EVEN_ODDS)	/* deviation from average */
 
-extern void initialize_constants(void);
-extern rc_t bogofilter(void);
+extern rc_t bogofilter(int argc, char **argv);
+
 extern void print_stats(FILE *fp);
 
 #endif	/* BOGOFILTER_H */
