@@ -48,6 +48,7 @@ libbogofilter_a_SOURCES= \
 	error.h error.c \
 	format.h format.c \
 	lexer.h lexer.l \
+	maint.h maint.c \
 	register.h register.c \
 	rstats.h rstats.c \
 	token.h token.c \
