@@ -4,7 +4,7 @@
 
 $Id$
 
-0.14.202 2003-08-02
+0.14.2	2003-08-02
 
 	* Replaced use of memcpy() by memmove() in an input routine. The
 	  overlapping copy migh cause data corruption on some systems.
