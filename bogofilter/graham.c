@@ -115,7 +115,7 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
     /* update the list of tokens with maximum deviation */
     dev = DEVIATION(prob);
     hit = NULL;
-    hitdev=1;
+    hitdev=slotdev=1;
 
     for (idx = 0; idx < SIZEOF(bs->extrema); idx++)
     {
@@ -128,8 +128,7 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
 	else
 	{
 	    slotdev=DEVIATION(pp->prob);
-
-	    if (dev>slotdev && hitdev>slotdev)
+	    if (dev-slotdev>EPS && hitdev-slotdev>EPS)
 	    {
 		hit=pp;
 		hitdev=slotdev;
@@ -153,6 +152,7 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
 	strncpy(hit->key, text, MAXTOKENLEN);
 	hit->key[MAXTOKENLEN] = '\0';
     }
+    return;
 }
 
 void gra_print_bogostats(FILE *fp, double spamicity)
