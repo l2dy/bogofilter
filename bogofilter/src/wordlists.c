@@ -59,7 +59,7 @@ static int init_wordlist(/*@out@*/ wordlist_t **list, const char* name, const ch
 			 double weight, bool bad, int override, bool ignore)
 {
     wordlist_t *new = (wordlist_t *)xmalloc(sizeof(*new));
-    wordlist_t* list_ptr;
+    wordlist_t *list_ptr;
     static int listcount;
 
     *list = new;
@@ -172,7 +172,8 @@ void close_wordlists(bool nosync /** Normally false, if true, do not synchronize
     }
 }
 
-void free_wordlists(void) {
+void free_wordlists(void)
+{
     wordlist_t *list;
 
     for ( list = word_lists; list != NULL; list = list->next )
