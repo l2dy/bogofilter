@@ -95,6 +95,8 @@ wordlist_t *default_wordlist(void)
  	if (list->type != WL_IGNORE)
  	    return list;
     }
+    fprintf(stderr, "Can't find default wordlist.\n");
+    exit(EX_ERROR);
     return NULL;
 }
 
