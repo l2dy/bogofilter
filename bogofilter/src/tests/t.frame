@@ -18,6 +18,7 @@ set -e
 _POSIX2_VERSION=199209
 export _POSIX2_VERSION
 
+# Obtain data base file suffix
 DB_EXT=`${relpath}/bogofilter -V 2>&1 | sed -n 's/^.*bogofilter\-\(.*dbm\?\) .*/\1/p'`
 [ -z "$DB_EXT" ] && DB_EXT="db"
 export DB_EXT
