@@ -128,20 +128,22 @@ if [ -z "$NODB" ]; then
     $BOGOFILTER -n -C </dev/null
 fi
 
+BF_CHECKTOOL=${BF_CHECKTOOL-glibc}
+
 # make GNU libc nasty and abort on memory allocation issues:
-if true ; then
+if test "x$BF_CHECKTOOL" = x"glibc" ; then
     MALLOC_CHECK_=2
     export MALLOC_CHECK_
 fi
 
 # use valgrind:
-if false ; then
+if test "x$BF_CHECKTOOL" = x"valgrind" && (valgrind -q true) 2>/dev/null ; then
     VAL='valgrind -q --num-callers=16'
     export VAL
 fi
 
 # use Electric Fence:
-if false ; then
+if test "x$BF_CHECKTOOL" = x"efence" ; then
     VAL="env LD_PRELOAD=libefence.so.0.0"
     EF_PROTECT_FREE=1
     EF_FILL=85
