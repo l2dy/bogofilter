@@ -46,7 +46,7 @@ void set_debug_mask(const char *mask)
 void set_bogotest(const char *mask)
 {
     char ch;
-    while ((ch = *mask++) != '\0' && isalpha(ch))
+    while ((ch = *mask++) != '\0' && isalpha((int)(unsigned char)ch))
     {
 	ch = toupper(ch);
 	bogotest |= MASK_BIT(ch);
