@@ -19,7 +19,9 @@ int xatof(double *d, const char *in) {
     if (end == in /* input string empty or does not start with sign/digit */
 	    || end < in + strlen(in) /* junk at end of in */
 	    || errno == EINVAL /* SUSv3: "no conversion could be performed" */
-	    || errno == ERANGE /* overflow, SUSv3 CX underflow */) return 0;
+	    || errno == ERANGE /* overflow, SUSv3 CX underflow */) 
+	if (*end != ',')
+	    return 0;
     *d = val;
     return 1;
 }
