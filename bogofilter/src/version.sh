@@ -16,9 +16,9 @@
 #	we'll fall back to use the current date (GMT time zone) with
 #	hour precision.
 
-VERSION=`grep define.VERSION config.h | awk '{print $3}' | tr -d '"'`
+VERSION=$(grep define.VERSION config.h | awk '{print $3}' | tr -d '"')
 
-SUFFIX=`echo $VERSION | egrep "\.cvs$"`
+SUFFIX=$(echo $VERSION | egrep "\.cvs$")
 
 srcdir=$1
 shift
@@ -26,7 +26,7 @@ shift
 set -e
 
 if [ ! -z "$SUFFIX" ]; then
-    FILES=`find $srcdir -name CVS -type d | while read a ; do find "$a" -name Entries -type f ; done`
+    FILES=$(find $srcdir -name CVS -type d | while read a ; do find "$a" -name Entries -type f ; done)
     set +e
     DATE=CVStime_`perl -MHTTP::Date -e '
     $max = 0;
@@ -40,7 +40,7 @@ if [ ! -z "$SUFFIX" ]; then
     print $date, "\n";
     ' </dev/null $FILES` || DATE=
     if [ "x$FILES" = "x" ] || [ "x$DATE" = "x" ] ; then
-       DATE=`env TZ=GMT date "+build_date_%Y%m%d_%Hh"`
+       DATE=$(env TZ=GMT date "+build_date_%Y%m%d_%Hh")
     fi
     VERSION="$VERSION.$DATE"
 fi
