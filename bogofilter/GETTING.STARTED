@@ -1,50 +1,3 @@
-**** 29 Sep 2004 ****
-
-1. Install
-   rpm -ivh bogofilter
-   apt-get bogofilter
-
-   get tarball, unpack it, run:
-
-     ./configure && make && make check && make install
-
-2. Familiarization and initial training
-
-   default wordlist directory: $HOME/.bogofilter, e.g.
-/home/john/.bogofilter
-
-   Initial training:
-      more is better
-      sample commands:
-
-       bogofilter -vn< ham.message.file
-       bogofilter -vnM < ham.message.mbox
-       bogofilter -vnMB < ham.maildir
-
-       bogofilter -vs < spam.message.file
-       bogofilter -vsM < spam.message.mbox
-       bogofilter -vsMB < spam.maildir
-
-   Useful commands:
-
-   To display wordlist contents:
-      bogoutil -d ~/.bogofilter/wordlist.db
-
-   To display message counts:
-      bogoutil -w ~/.bogofilter .MSG_COUNT
-
-   To test scoring of individual words:
-
-      echo show these words | bogofilter -H -vvv
-     or:
-      bogoutil -p ~/.bogofilter show these words
-
-   To see the tokens and their spamicity scores for a message:
-
-     bogofilter -vvv < message
-
-**** Oct 24 2004 ****
-
 			   GETTING STARTED
 
 - Installing Bogofilter
@@ -54,14 +7,14 @@
 - Setting up the mail transfer and delivery agents
 - Use with mail user agent
 - Ongoing training
-- Additional information
+- Tuning bogofilter
 - The bogoutil program
 - Other useful commands
-- Tuning bogofilter
+- Additional information
 
 --- Installing Bogofilter ---
 
-    Bogofilter can be installed from  source or from a binary package.
+    Bogofilter can be installed from source or from a binary package.
     Releases are made available on SourceForge.net.
 
     Source formats include tarballs (in .tar.gz and .tar.bz2 forms)
@@ -77,6 +30,9 @@
     Binary formats include builds for dynamically linked (shared)
     libaries, e.g. bogofilter-VER.i586.rpm, and a statically linked
     executable, e.g. bogofilter-static-VER.i586.rpm.
+
+    It is also available as a .deb pack (use "apt-get bogofilter" to
+    install) and via yum (use "yum install bogofilter").
 
     See the INSTALL file for more info.
 
