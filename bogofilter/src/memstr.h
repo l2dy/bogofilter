@@ -6,6 +6,6 @@
 #include <string.h>
 
 /** find needle in haystack (which is treated as unsigned char *). */
-void *memstr(const void *haystack, size_t n, const unsigned char *needle);
+void *memstr(const void *haystack, size_t n, const char *needle);
 
 #endif
