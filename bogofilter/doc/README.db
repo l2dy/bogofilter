@@ -159,13 +159,13 @@ true:
 If you need a log file upgrade, the upgrade procedure is:
 (NOTE: DO NOT UPGRADE BERKELEY DB OR BOGOFILTER UNTIL STEP 4!)
 
-1. shut down your mail system,
-2. run 'bogoutil --db-remove-environment ~/.bogofilter' (for each user)
-   (this implies running forced recovery first)
-3. archive the database for catastrophic recovery (take a backup)
-4. install the new Berkeley DB version, recompile bogofilter (unless
-   using a binary package), install the new bogofilter
-5. restart your mail system.
+  1. shut down your mail system,
+  2. run 'bogoutil --db-remove-environment ~/.bogofilter' (for each user)
+     (this implies running forced recovery first)
+  3. archive the database for catastrophic recovery (take a backup)
+  4. install the new Berkeley DB version, recompile bogofilter (unless
+     using a binary package), install the new bogofilter
+  5. restart your mail system.
 
 3. Use and troubleshooting ---------------------------------------------
 
