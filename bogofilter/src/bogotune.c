@@ -679,8 +679,6 @@ static void write_msgcount_file(wordhash_t *wh)
 
     print_msgcount_entry(".MSG_COUNT", msgs_bad, msgs_good);
 
-    wordhash_sort(wh);
-
     for (hn = wordhash_first(wh); hn != NULL; hn = wordhash_next(wh)) {
 	word_t *token = hn->key;
 	wordprop_t *wp = (wordprop_t *) hn->buf;
@@ -728,6 +726,8 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 
 	if (whc->count != 0) {
 	    if (bogolex) {
+		wordhash_sort(whc);
+		lookup_words(whc);
 		write_msgcount_file(whc);
 	    }
 	    else {
