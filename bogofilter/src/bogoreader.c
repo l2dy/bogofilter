@@ -71,11 +71,26 @@ static reader_more_t mailbox_next_mail;
 
 static reader_line_t simple_getline;	/* ignores /^From / */
 static reader_line_t mailbox_getline;	/* minds   /^From / */
-static reader_line_t brmail_getline;	/* minds   /^#! rmail / */
+static reader_line_t rmail_getline;	/* minds   /^#! rmail/ */
 
 static reader_file_t get_filename;
 
-static void check_brmail(FILE *fp);
+typedef enum { MBOX, RMAIL } mbox_t;
+
+typedef struct {
+    const char	*sep;
+    size_t	len;
+    mbox_t	type;
+    reader_line_t *fcn;
+} sep_2_box_t;
+
+sep_2_box_t sep_2_box[] = {
+    { "From ",       5, MBOX,  mailbox_getline },
+    { "#! rmail",    8, RMAIL, rmail_getline }
+};
+
+ssize_t     seplen = 0;
+const char *separator = NULL;
 
 static void dir_init(const char *name);
 static void dir_fini(void);
@@ -83,6 +98,29 @@ static void dir_fini(void);
 typedef enum st_e { IS_DIR, IS_FILE, IS_ERR } st_t;
 
 /* Function Definitions */
+
+static reader_line_t *get_reader_line(FILE *fp) {
+    size_t i;
+    int c;
+    reader_line_t *fcn = mailbox_getline;
+    
+    c = fgetc(fp);
+    ungetc(c, fp);
+
+    for (i = 0; i < COUNTOF(sep_2_box); i += 1) {
+	sep_2_box_t *s = sep_2_box + i;
+        if (s->sep[0] == c) {
+            fcn = s->fcn;
+	    seplen = s->len;
+	    separator = s->sep;
+	}
+    }
+    
+    if (fcn == mailbox_getline && !mbox_mode)
+        fcn = simple_getline;
+    
+    return fcn;
+}
 
 /* Checks if name is a directory.
  * Returns IS_DIR for directory, IS_FILE for other type, IS_ERR for error
@@ -195,8 +233,7 @@ static bool open_mailstore(const char *name)
 	    return false;
 	} else {
 	    mail_first = true;
-	    reader_getline      = mbox_mode ? mailbox_getline   : simple_getline;
-	    check_brmail(fpin);
+	    reader_getline = get_reader_line(fpin);
 	    mailstore_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
 	    return true;
 	}
@@ -227,25 +264,12 @@ static bool open_mailstore(const char *name)
 
 /*** _next_mailstore functions ***********************************************/
 
-static void check_brmail(FILE *fp) {
-    int c;
-
-    if (reader_getline == mailbox_getline && !feof(fp)) {
-	/* peek at the first character -- cannot unget more than one char */
-	c = fgetc(fp);
-	ungetc(c, fp);
-	if (c == '#')
-	    reader_getline = brmail_getline;
-    }
-}
-
 /* this initializes for reading a single mail or a mbox from stdin */
 static bool stdin_next_mailstore(void)
 {
     bool val = mailstore_first;
 
-    reader_getline = mbox_mode ? mailbox_getline : simple_getline;
-    check_brmail(fpin);
+    reader_getline = get_reader_line(fpin);
     mailstore_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
     mailstore_first = false;
     return val;
@@ -398,7 +422,7 @@ static int mailbox_getline(buff_t *buff)
     /* DR 08/25/03 - NO!!! */
 
     if ((firstline || emptyline) &&
-	count >= 5 && memcmp("From ", buf, 5) == 0)
+	seplen != 0 && count >= seplen && memcmp(separator, buf, seplen) == 0)
     {
 	if (firstline) {
 	    firstline = false;
@@ -408,7 +432,8 @@ static int mailbox_getline(buff_t *buff)
 	    saved = word_new(buf, count);
 	    count = EOF;
 	}
-    } else {
+    }
+    else {
 	if (buff->t.leng < buff->size)		/* for easier debugging - removable */
 	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
     }
@@ -419,15 +444,13 @@ static int mailbox_getline(buff_t *buff)
 }
 
 /* reads from an rmail batch, paying attention to ^#! rmail lines */
-static int brmail_getline(buff_t *buff)
+static int rmail_getline(buff_t *buff)
 {
     int count;
     size_t used = buff->t.leng;
     byte *buf = buff->t.text + used;
-    const char *separator = "#! rmail";
-    const int   seplen = 8;
     static word_t *saved = NULL;
-    static unsigned long bytesleft;
+    static unsigned long bytesleft = 0;
 
     if (saved != NULL) {
 	count = saved->leng;
