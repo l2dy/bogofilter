@@ -19,8 +19,6 @@ AUTHOR:
 #include "method.h"
 #include "wordlists.h"
 
-#include "bogoconfig.h"
-
 const char *progname = "configtest";
 
 double robs, robx;

@@ -18,6 +18,7 @@ AUTHOR:
 #include <string.h>
 #include <unistd.h>
 
+#include "bogoconfig.h"
 #include "bogoreader.h"
 #include "bool.h"
 #include "charset.h"

@@ -29,7 +29,6 @@ CONTRIBUTORS:
 #include "bogoreader.h"
 #include "bool.h"
 #include "charset.h"
-#include "configfile.h"
 #include "datastore.h"
 #include "maint.h"
 #include "error.h"

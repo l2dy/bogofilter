@@ -46,10 +46,6 @@ typedef struct {
 
 /* Global variables */
 
-extern const char *logtag;
-extern const char *spam_header_name;
-extern const char *user_config_file;
-
 extern const parm_desc sys_parms[];
 extern const parm_desc *usr_parms;
 
