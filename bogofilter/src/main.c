@@ -135,8 +135,8 @@ static int classify(int argc, char **argv, FILE *out)
 	    fprintf(out, "%s ", filename ); 
 	}
 
+	passthrough_setup();
 	do {
-	    passthrough_setup();
 	    init_msg_counts();
 	    mime_reset();
 	    init_charset_table(charset_default, true);
@@ -145,8 +145,8 @@ static int classify(int argc, char **argv, FILE *out)
 	    write_message(out, status);
 
 	    rstats_cleanup();
-	    passthrough_cleanup();
 	} while (status == RC_MORE);
+	passthrough_cleanup();
 
 	if (bulk_mode == B_NORMAL && status != RC_MORE) {
 	    exitcode = (status == RC_SPAM) ? 0 : 1;
