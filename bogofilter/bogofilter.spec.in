@@ -50,16 +50,12 @@ done
 
 for d in contrib tuning ; do
   install -d $RPM_BUILD_ROOT%{_datadir}/%{name}/$d
-  files=`find $d -maxdepth 1 -type f | grep -v Makefile`
+  files=`find $d -maxdepth 1 -type f`
   for f in $files ; do
     case $f in
-      *.c|*.o|*.obj) continue ;;
-      *.sh|*.pl|*/randomtrain|*/scramble|*/distrib|*R|*/mkdb)
-        cp -p $f $RPM_BUILD_ROOT%{_datadir}/%{name}/$d ;;
-#	install -m755 $f $RPM_BUILD_ROOT%{_datadir}/%{name}/$d ;;
+      *.c|*.o|*.obj|*/Makefile*) continue ;;
       *)
         cp -p $f $RPM_BUILD_ROOT%{_datadir}/%{name}/$d ;;
-#	install -m644 $f $RPM_BUILD_ROOT%{_datadir}/%{name}/$d ;;
     esac
   done
 done
