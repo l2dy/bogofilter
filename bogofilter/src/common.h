@@ -74,7 +74,7 @@ typedef enum sh_e { IX_SPAM = 0, 	/* index for SPAM */
 
 typedef unsigned char byte;
 
-enum dbmode_e { DS_READ = 1, DS_WRITE = 2, DS_CREATE = 4, DS_LOAD = 8 };
+enum dbmode_e { DS_READ = 1, DS_WRITE = 2, DS_LOAD = 8 };
 typedef enum dbmode_e dbmode_t;
 
 #define BIT(n)	(1 << n)
