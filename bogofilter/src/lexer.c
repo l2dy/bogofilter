@@ -62,9 +62,9 @@ static void lexer_display_buffer(buff_t *buff)
     fprintf(dbgout, "*** %2d %c%c %2ld ",
 	    yylineno-1, msg_header ? 'h' : 'b', yy_get_state(),
 	    (long)(buff->t.leng - buff->read));
-     buff_puts(buff, 0, dbgout);
-     if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
- 	fputc('\n', dbgout);
+    buff_puts(buff, 0, dbgout);
+    if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
+	fputc('\n', dbgout);
 }
 
 /* Check for lines wholly composed of printable characters as they can cause a scanner abort 
