@@ -34,18 +34,13 @@ David Relson	<relson@osagesoftware.com> 2003 - 2005
 #include "xstrdup.h"
 
 /* public -- used in datastore.c */
-static int	   bft_begin		(void *vhandle);
-static int  	   bft_abort		(void *vhandle);
-static int  	   bft_commit		(void *vhandle);
+
 /* private -- used in datastore_db_*.c */
 static DB_ENV	  *bft_get_env_dbe	(dbe_t *env);
 static const char *bft_database_name	(const char *db_file);
 static DB_ENV	  *bft_recover_open	(bfdir *directory, bffile *db_file);
-static int	   bft_auto_commit_flags(void);
 static int	   bft_get_rmw_flag	(int open_mode);
 static int	   bft_lock		(void *handle, int open_mode);
-static ex_t	   bft_common_close	(DB_ENV *dbe, bfdir *directory);
-static int	   bft_sync		(DB_ENV *dbe, int ret);
 static void	   bft_log_flush	(DB_ENV *dbe);
 static dbe_t	  *bft_init		(bfdir *directory);
 static void 	   bft_cleanup		(dbe_t *env);
@@ -55,9 +50,9 @@ static void 	   bft_cleanup_lite	(dbe_t *env);
 
 dsm_t dsm_traditional = {
     /* public -- used in datastore.c */
-    &bft_begin,
-    &bft_abort,
-    &bft_commit,
+    NULL,	/* bft_begin           */
+    NULL,	/* bft_abort           */
+    NULL,	/* bft_commit          */
 
     /* private -- used in datastore_db_*.c */
     &bft_init,
@@ -66,11 +61,11 @@ dsm_t dsm_traditional = {
     &bft_get_env_dbe,
     &bft_database_name,
     &bft_recover_open,
-    &bft_auto_commit_flags,
+    NULL,	/* bft_auto_commit_flags*/
     &bft_get_rmw_flag,
     &bft_lock,
-    &bft_common_close,
-    &bft_sync,
+    NULL,	/* &bft_common_close    */
+    NULL,	/* &bft_sync            */
     &bft_log_flush,
     NULL,	/* dsm_pagesize         */
     NULL,	/* dsm_checkpoint       */
@@ -89,25 +84,6 @@ DB_ENV *bft_get_env_dbe	(dbe_t *env)
 const char *bft_database_name(const char *db_file)
 {
     return db_file;
-}
-
-int  bft_auto_commit_flags(void)
-{
-    return 0;
-}
-
-ex_t bft_common_close(DB_ENV *dbe, bfdir *directory)
-{
-    (void) dbe;
-    (void) directory;
-    return EX_OK;
-}
-
-int bft_sync(DB_ENV *dbe, int ret)
-{
-    (void) dbe;
-    (void) ret;
-    return 0;
 }
 
 int bft_lock(void *vhandle, int open_mode)
@@ -173,10 +149,6 @@ void bft_log_flush(DB_ENV *dbe)
 	fprintf(dbgout, "DB_ENV->log_flush(%p): %s\n", (void *)dbe,
 		db_strerror(ret));
 }
-
-int  bft_begin	(void *vhandle) { (void) vhandle; return 0; }
-int  bft_abort	(void *vhandle) { (void) vhandle; return 0; }
-int  bft_commit	(void *vhandle) { (void) vhandle; return 0; }
 
 dbe_t *bft_init(bfdir *directory)
 {

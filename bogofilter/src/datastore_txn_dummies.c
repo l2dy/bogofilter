@@ -37,9 +37,10 @@ bool	  db_txn_durable = true;	/* not DB_TXN_NOT_DURABLE */
 
 dsm_t dsm_transactional = {
     /* public -- used in datastore.c */
-    NULL,	/* dsm_begin           */
-    NULL,	/* dsm_abort           */
-    NULL,	/* dsm_commit          */
+    NULL,	/* dsm_begin            */
+    NULL,	/* dsm_abort            */
+    NULL,	/* dsm_commit           */
+
     /* private -- used in datastore_db_*.c */
     NULL,	/* dsm_env_init         */
     NULL,	/* dsm_cleanup          */
@@ -61,30 +62,14 @@ dsm_t dsm_transactional = {
     NULL	/* dsm_verify           */
 };
 
-#ifndef ENABLE_SQLITE_DATASTORE
-
-#if 	!defined(DISABLE_TRANSACTIONS) && !defined(ENABLE_TRANSACTIONS)
+#ifndef DISABLE_TRANSACTIONS
+#ifndef ENABLE_TRANSACTIONS
 void *dbe_init(bfdir *d, bffile *f) {
     (void)d;
     (void)f;
     return (void *)~0;
 }
 #endif
-
-int db_txn_begin(void *vhandle) { (void)vhandle; return 0; }
-int db_txn_abort(void *vhandle) { (void)vhandle; return 0; }
-int db_txn_commit(void *vhandle) { (void)vhandle; return 0; }
-
-#else
-
-extern void *dsm;
-void *dbe_init(bfdir *d, bffile *f) {
-    dsm = &dsm_transactional;
-    (void)d;
-    (void)f;
-    return (void *)~0;
-}
-
 #endif
 
 ex_t dbe_recover(bfdir *directory, bool catastrophic, bool force)
@@ -107,24 +92,6 @@ void *db_get_env(void *vhandle) {
     return NULL;
 }
 #endif
-
-ex_t dbe_checkpoint(bfdir *directory)
-{
-    (void) directory;
-    return EX_OK;
-}
-
-ex_t dbe_purgelogs(bfdir *directory)
-{
-    (void) directory;
-    return EX_OK;
-}
-
-ex_t dbe_remove(bfdir *directory)
-{
-    (void) directory;
-    return EX_OK;
-}
 
 /** probe if the directory contains an environment, and if so,
  * if it has transactions

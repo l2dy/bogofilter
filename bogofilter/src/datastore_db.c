@@ -96,7 +96,8 @@ static int DB_OPEN(DB *db, const char *db_path,
     const char *ps;
 
 #if DB_AT_LEAST(4,1)
-    flags |= dsm->dsm_auto_commit_flags();
+    if (dsm->dsm_auto_commit_flags != NULL)
+	flags |= dsm->dsm_auto_commit_flags();
 #endif
 
     if ((ps = getenv("BF_PAGESIZE"))) {
@@ -815,7 +816,8 @@ void db_close(void *vhandle)
 	ret = 0;
 #endif
 
-    ret = dsm->dsm_sync(handle->dbenv->dbe, ret);
+    if (dsm->dsm_sync != NULL)
+	ret = dsm->dsm_sync(handle->dbenv->dbe, ret);
 
     if (ret)
 	print_error(__FILE__, __LINE__, "DB->close error: %s",
