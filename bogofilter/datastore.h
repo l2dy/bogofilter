@@ -38,25 +38,25 @@ void db_flush(void *);
 Increments count for given word.
 Note: negative results are set to zero, 
 */
-void db_increment(void *, char *, long);
+void db_increment(void *, const char *, long);
 
 
 /*
 Decrement count for a given word, if it exists in the datastore.
 Note: negative results are set to zero, 
 */
-void db_decrement(void *, char *, long);
+void db_decrement(void *, const char *, long);
 
 
 /*
 Retrieve the value associated with a given word in a list
 Returns zero if the word does not exist in the database.
 */
-long db_getvalue(void *, char *);
+long db_getvalue(void *, const char *);
 
 
 /* Set the value associated with a given word in a list */
-void db_setvalue(void *, char *, long);
+void db_setvalue(void *, const char *, long);
 
 
 /* Get the database message count */

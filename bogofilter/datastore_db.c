@@ -31,7 +31,6 @@ AUTHOR:
 
 #define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
 
-extern int errno;
 extern int logflag;
 
 #ifndef	HAVE_SYSLOG_H
@@ -107,11 +106,12 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode){
     Returns: value if the the word is found in database, 0 if the word is not found.
     Notes: Will call exit if an error occurs.
 */
-long db_getvalue(void *vhandle, char *word){
+long db_getvalue(void *vhandle, const char *word){
     DBT db_key;
     DBT db_data;
     long value;
     int  ret;
+    char *t;
 
     dbh_t *handle = vhandle;
 	
@@ -120,14 +120,17 @@ long db_getvalue(void *vhandle, char *word){
     DBT_init(db_key);
     DBT_init(db_data);
 
-    db_key.data = word;
+    db_key.data = t = xstrdup(word);
     db_key.size = strlen(word);
 
-    if ((ret = handle->dbp->get(handle->dbp, NULL, &db_key, &db_data, 0)) == 0){
+    ret = handle->dbp->get(handle->dbp, NULL, &db_key, &db_data, 0);
+    xfree(t);
+    if (ret == 0) {
       value = *(long *)db_data.data;
 
       if (DEBUG_DATABASE(2)) {
-        fprintf(stderr, "[%lu] db_getvalue (%s): [%s] has value %ld\n", (unsigned long) handle->pid, handle->name, word, value);
+        fprintf(stderr, "[%lu] db_getvalue (%s): [%s] has value %ld\n",
+		(unsigned long) handle->pid, handle->name, word, value);
       }
 
       return(value);
@@ -149,24 +152,27 @@ long db_getvalue(void *vhandle, char *word){
 Store VALUE in database, using WORD as database key
 Notes: Calls exit if an error occurs.
 */
-void db_setvalue(void *vhandle, char * word, long value){
+void db_setvalue(void *vhandle, const char * word, long value){
     int ret;
     DBT key;
     DBT data;
     dbh_t *handle = vhandle;
+    char *t;
    
     db_enforce_locking(handle, "db_setvalue");
 
     DBT_init(key);
     DBT_init(data);
 
-    key.data = word;
+    key.data = t = xstrdup(word);
     key.size = strlen(word);
 
     data.data = &value;
     data.size = sizeof(long);
 
-    if ((ret = handle->dbp->put(handle->dbp, NULL, &key, &data, 0)) == 0){
+    ret = handle->dbp->put(handle->dbp, NULL, &key, &data, 0);
+    xfree(t);
+    if (ret == 0){
       if (DEBUG_DATABASE(2)) {
 	fprintf(stderr, "db_setvalue (%s): [%s] has value %ld\n", handle->name, word, value);
       }
@@ -182,13 +188,10 @@ void db_setvalue(void *vhandle, char * word, long value){
 /*
   Increment count associated with WORD, by VALUE.
  */
-void db_increment(void *vhandle, char *word, long value){
+void db_increment(void *vhandle, const char *word, long value){
   value += db_getvalue(vhandle, word);
 
-  if (value < 0)
-    value = 0;
-
-  db_setvalue(vhandle, word, value);
+  db_setvalue(vhandle, word, value < 0 ? 0 : value);
 }
 
 
@@ -196,13 +199,10 @@ void db_increment(void *vhandle, char *word, long value){
   Decrement count associated with WORD by VALUE,
   if WORD exists in the database.
 */
-void db_decrement(void *vhandle, char *word, long value){
+void db_decrement(void *vhandle, const char *word, long value){
   value = db_getvalue(vhandle, word) - value;
 
-  if (value < 0)
-    value = 0;
-
-  db_setvalue(vhandle, word, value);
+  db_setvalue(vhandle, word, value < 0 ? 0 : value);
 }
 
 /*
