@@ -134,11 +134,11 @@ NUM_NUM		\ [0-9]+\ [0-9]+
 MSG_COUNT	^\"\.MSG_COUNT\"
 
 TOKENFRONT	[^[:blank:][:cntrl:][:digit:][:punct:]]
-TOKENMID	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*,[:cntrl:]\[\]]+
-BOGOLEX_TOKEN	[^[:blank:]<>;    &%  @ |/\\{}^\"  \*,[:cntrl:]\[\]]+
-TOKENBACK	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*\._\-\+,\[\][:cntrl:]]
+TOKENMID	[^[:blank:]<>;=():&%$#@+|/\\{}^\"?*,[:cntrl:][\]]+
+BOGOLEX_TOKEN	[^[:blank:]<>;    &%  @ |/\\{}^\" *,[:cntrl:][\]]+
+TOKENBACK	[^[:blank:]<>;=():&%$#@+|/\\{}^\"?*,[:cntrl:][\]._+-]
 
-TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}{1,70}
+TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}
 TOKEN_12 	({TOKEN}|{A2}|{A1})
 
 BASE64		[0-9a-zA-Z/+=]+
