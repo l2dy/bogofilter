@@ -36,7 +36,7 @@ BOGOUTIL="$VAL ${relpath}/bogoutil"
 
 #opts="-x rw -vvvv"
 
-function check_counts()
+check_counts()
 {
     if  [ $verbose -ne 0 ]; then
 	echo "test #$T"
