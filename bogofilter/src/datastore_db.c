@@ -726,57 +726,56 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *val)
     return 0;
 }
 
+#if DB_AT_LEAST(4,2)
+/* get_flags is new in 4.2 */
+static uint32_t db_get_flags(DB *dbp, uint32_t test)
+{
+    int ret;
+    uint32_t flags;
+    uint32_t mask = ~1;
+
+    ret = dbp->get_flags(dbp, &flags);
+    if (ret) {
+	print_error(__FILE__, __LINE__, "DB->get_flags returned error: %s",
+		    db_strerror(ret));
+	mask = 0;
+    } else {
+	if (flags & test)
+	    mask &= ~DB_NOSYNC;
+    }
+    return mask;
+}
+#endif
+
 /* Close files and clean up. */
 void db_close(void *vhandle)
 {
     int ret;
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
-    uint32_t f = DB_NOSYNC;	/* safe as long as we're logging TXNs */
+    uint32_t flag = DB_NOSYNC;	/* safe as long as we're logging TXNs */
 
     assert(handle->magic == MAGIC_DBH);
 
-#if DB_AT_LEAST(4,2)
-    {
-	/* get_flags and DB_TXN_NOT_DURABLE are new in 4.2 */
-	uint32_t t;
-	ret = dbp->get_flags(dbp, &t);
-	if (ret) {
-	    print_error(__FILE__, __LINE__, "DB->get_flags returned error: %s",
-		    db_strerror(ret));
-	    f = 0;
-	} else {
-	    if (t & DB_TXN_NOT_DURABLE)
-		f &= ~DB_NOSYNC;
-	}
-    }
+#ifdef	DB_TXN_NOT_DURABLE
+    /* DB_TXN_NOT_DURABLE is new in 4.2 */
+    flag &= db_get_flags(dbp, DB_TXN_NOT_DURABLE);
 #endif
 
-#if DB_AT_LEAST(4,3)
-    /* DB_LOG_INMEMORY is new in 4,3 */
-    {
-	uint32_t t;
-	ret = dbp->get_flags(dbp, &t);
-	if (ret) {
-	    print_error(__FILE__, __LINE__, "DB_ENV->get_flags returned error: %s",
-		    db_strerror(ret));
-	    f = 0;
-	} else {
-	    if (t & DB_LOG_INMEMORY)
-		f &= ~DB_NOSYNC;
-	}
-    }
+#ifdef	DB_LOG_INMEMORY
+    /* DB_LOG_INMEMORY is new in 4.3 */
+    flag &= db_get_flags(dbp, DB_LOG_INMEMORY)
 #endif
 
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB->close(%s, %s)\n",
-		handle->name, f & DB_NOSYNC ? "nosync" : "sync");
+		handle->name, flag & DB_NOSYNC ? "nosync" : "sync");
 
     if (handle->txn) {
 	print_error(__FILE__, __LINE__, "db_close called with transaction still open, program fault!");
     }
 
-    ret = dbp->close(dbp, f);
+    ret = dbp->close(dbp, flag);
 #if DB_AT_LEAST(3,2) && DB_AT_MOST(4,0)
     /* ignore dirty pages in buffer pool */
     if (ret == DB_INCOMPLETE)
