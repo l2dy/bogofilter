@@ -42,7 +42,8 @@ run_test()
     out="$2"
     ver="$3"
     OUT="tests/msg.$out.$alg.$ver"
-    $BOGOFILTER -$alg -t -$ver -c cfg.$alg < inputs/msg.$id.txt 2> /dev/null > tests-$alg
+    OPTS="-$alg -t -$ver -c cfg.$alg"
+    $BOGOFILTER $OPTS < inputs/msg.$id.txt > tests-$alg || true
     sed s/,.version=.*// < tests-$alg > $OUT
 }
 
