@@ -190,7 +190,8 @@ int yyinput(byte *buf, size_t max_size)
 {
     int i, count;
 
-    count = get_decoded_line(buf, max_size);
+    count = get_decoded_line(buf, max_size-1);
+    buf[count] = 0;
 
     /* do nothing if in header */
 
