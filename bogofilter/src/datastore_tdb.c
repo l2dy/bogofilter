@@ -348,17 +348,3 @@ const char *db_str_err(int j)
 			return emap[i].estring;
 	return "Invalid error code";
 }
-
-ex_t db_verify(bfdir *d, bffile *f)
-{
-    (void)d;
-    (void)f;
-    return EX_OK;
-}
-
-u_int32_t db_pagesize(bfdir *d, bffile *f)
-{
-    (void)d;
-    (void)f;
-    return (u_int32_t)0;
-}
