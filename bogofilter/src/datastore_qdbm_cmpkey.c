@@ -1,8 +1,10 @@
 #include "datastore_qdbm.h"
 
-int cmpkey(const char *aptr, int asiz, const char *bptr, int bsiz)
+int cmpkey(const char *aptrin, int asiz, const char *bptrin, int bsiz)
 {
     int aiter, biter;
+    const unsigned char *aptr = aptrin;
+    const unsigned char *bptr = bptrin;
 
     for (aiter = 0, biter = 0; aiter < asiz && biter < bsiz; ++aiter, ++biter) {
 	if (aptr[aiter] != bptr[biter])

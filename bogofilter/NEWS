@@ -10,7 +10,15 @@ RELEASE.NOTES-0.93 has two important sections entitled:
         INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
 and     MAJOR CHANGES IN BOGOFILTER 0.93
 
-0.93.0	2004-10-??
+0.93.0	2004-11-?? "Broken compatibility" release
+
+	2004-11-01
+
+	* Add a debugged and enhanced version of Stefan Bellon's QDBM
+	  Hash->B+tree converter.
+
+	* Broke QDBM compatibility with 2004-10-30 change, check unsigned
+	  characters to match Berkeley DB behavior of bogoutil -d.
 
 	2004-10-31
 
@@ -31,7 +39,7 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 	2004-10-30
 
 	* Converted QDBM from hash files (DEPOT API) to B+ trees
-          (Villa API) for better speed.  (Stefan Bellon).
+          (Villa API) for better speed (Stefan Bellon).
 
 	2004-10-29
 
