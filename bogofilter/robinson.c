@@ -54,17 +54,26 @@ const parm_desc rob_parm_table[] =	/* needed by fisher.c */
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
 
-void	rob_initialize_constants(void);
-double	rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
-void	rob_print_summary(void);
+/* Function Prototypes */
+
+static void	rob_initialize_constants(void);
+static double	rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q);
+static void	rob_print_summary(void);
+
+static double	rob_spamicity(void);
+static rc_t	rob_status(void);
+
+/* Static Variables */
 
 #ifdef	ENABLE_ROBINSON_METHOD
-rf_method_t rf_robinson_method = {
+rf_method_t rf_robinson_method = {	/* needed by config.c */
     {
 	"robinson",			/* const char		  *name;		*/
 	rob_parm_table,	 		/* m_parm_table		  *parm_table		*/
 	rob_initialize_constants,	/* m_initialize_constants *initialize_constants	*/
 	rob_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
+	rob_spamicity,			/* m_spamicity		  *spamicity		*/
+	rob_status,			/* m_status		  *status		*/
 	rob_print_bogostats, 		/* m_print_bogostats	  *print_stats		*/
 	rob_cleanup, 			/* m_free		  *cleanup		*/
     },
@@ -273,15 +282,26 @@ void rob_initialize_constants(void)
     rob_initialize_with_parameters(ROBINSON_MIN_DEV, ROBINSON_SPAM_CUTOFF);
 }
 
+double rob_spamicity(void)
+{
+    return stats.spamicity;
+}
+
+rc_t rob_status(void)
+{
+    rc_t status = ( stats.spamicity >= spam_cutoff ) ? RC_SPAM : RC_NONSPAM;
+    return status;
+}
+
 double rob_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 {
-    double spamicity;
-    spamicity = rob_compute_spamicity(wordhash, fp);
-    return spamicity;
+    stats.spamicity = rob_compute_spamicity(wordhash, fp);
+    return stats.spamicity;
 }
 
 void rob_cleanup(void)
 {
+    /* Not yet implemented. */
 }
 
 /* Done */

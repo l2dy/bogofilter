@@ -37,20 +37,21 @@ extern double min_dev;
 
 int	thresh_index = 0;
 
+/*
+** Define a struct so stats can be saved for printing.
+*/
+
+typedef struct stats_s {
+    double spamicity;
+} stats_t;
+
+static stats_t  stats;
+
 static const parm_desc gra_parm_table[] =
 {
     { "thresh_index",	  CP_INTEGER,	{ (void *) &thresh_index } },
     { NULL,		  CP_NONE,	{ (void *) NULL } },
 };
-
-method_t graham_method = {
-    "graham",				/* const char		  *name;		*/
-    gra_parm_table,	 		/* m_parm_table		  *parm_table		*/
-    gra_initialize_constants, 		/* m_initialize_constants *initialize_constants	*/
-    gra_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
-    gra_print_bogostats, 		/* m_print_bogostats	  *print_stats		*/
-    gra_cleanup 			/* m_free		  *cleanup		*/
-} ;
 
 typedef struct 
 {
@@ -67,6 +68,29 @@ struct bogostat_s
 #define SIZEOF(array)	((size_t)(sizeof(array)/sizeof(array[0])))
 
 static bogostat_t bogostats;
+
+/* Function Prototypes */
+
+static	void	gra_initialize_constants(void);
+static	double	gra_bogofilter(wordhash_t *wordhash, FILE *fp); /*@globals errno@*/
+static	double	gra_compute_spamicity(bogostat_t *bogostats, FILE *fp); /*@globals errno@*/
+static	void	gra_print_bogostats(FILE *fp, double spamicity);
+static	double	gra_spamicity(void);
+static	rc_t	gra_status(void);
+static	void	gra_cleanup(void);
+
+method_t graham_method = {
+    "graham",				/* const char		  *name;		*/
+    gra_parm_table,	 		/* m_parm_table		  *parm_table		*/
+    gra_initialize_constants, 		/* m_initialize_constants *initialize_constants	*/
+    gra_bogofilter,	 		/* m_compute_spamicity	  *compute_spamicity	*/
+    gra_spamicity,			/* m_spamicity		  *spamicity		*/
+    gra_status,				/* m_status		  *status		*/
+    gra_print_bogostats, 		/* m_print_bogostats	  *print_stats		*/
+    gra_cleanup 			/* m_free		  *cleanup		*/
+} ;
+
+/* Function Definitions */
 
 static int compare_extrema(const void *id1, const void *id2)
 {
@@ -308,16 +332,24 @@ void gra_initialize_constants(void)
     set_good_weight( GRAHAM_GOOD_BIAS );
 }
 
+double gra_spamicity(void)
+{
+    return stats.spamicity;
+}
+
+rc_t gra_status(void)
+{
+    rc_t status = ( stats.spamicity >= spam_cutoff ) ? RC_SPAM : RC_NONSPAM;
+    return status;
+}
+
 double gra_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 {
-    double spamicity;
-    bogostat_t	*bs;
+    bogostat_t	*bs = select_indicators(wordhash);    /* select the best spam/nonspam indicators. */
 
-    /* select the best spam/nonspam indicators. */
-    bs = select_indicators(wordhash);
-    spamicity = gra_compute_spamicity(bs, fp);
+    stats.spamicity = gra_compute_spamicity(bs, fp);
 
-    return spamicity;
+    return stats.spamicity;
 }
 
 void gra_cleanup(void)
