@@ -91,6 +91,7 @@ version_sources= \
 	find_home.h find_home.c find_home_user.c find_home_tildeexpand.c \
 	format.h format.c \
 	lexer.h lexer.c lexer_v3.l \
+	longoptions.h longoptions.c \
 	maint.h maint.c \
 	memstr.h memstr.c \
 	mime.h mime.c \

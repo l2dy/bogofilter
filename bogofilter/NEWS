@@ -27,6 +27,15 @@ Briefly:
 
 	* Fixed several memory leaks.
 
+	* Refactored long option code.  All definitions are now in one
+	  file (longoptions.c).  Programs bogolexer and bogoutil
+	  ignore options that don't apply to them, rather than abort.
+
+	* Long options used in the config file use underscores in
+	  their names.  Used on the command line, they have hyphens.
+	  This fixes a problem where some options had hyphens and some
+	  had underscores.
+
 0.93.3.1 2004-12-26
 
 	* Fixed errors in bogoutil's usage and help messages.

@@ -29,6 +29,7 @@ AUTHOR:
 #include "find_home.h"
 #include "format.h"
 #include "lexer.h"
+#include "longoptions.h"
 #include "maint.h"
 #include "wordlists.h"
 #include "xatox.h"
@@ -100,20 +101,40 @@ bool process_config_option(const char *arg, bool warn_on_error, priority_t prece
     return ok;
 }
 
+/* option_compare()
+**
+** Returns true if options are equal, without regard to case and
+** allows underscore from config file to match hyphen
+*/
+
+static bool option_compare(const char *opt, const char *name)
+{
+    char co, cn;
+    if (strlen(opt) != strlen(name))
+	return false;
+    while (((co = *opt++) != '\0') && ((cn = *name++) != '\0')) {
+	if ((co == cn) || (tolower(co) == tolower(cn)))
+	    continue;
+	if (co != '_' || cn != '-')
+	    return false;
+    }
+    return true;
+}
+
 bool process_config_option_as_arg(const char *opt, const char *val, priority_t precedence)
 {
-    int idx = 0;
-    size_t len = strlen(opt);
+    struct option *option;
+    const char *name;
 
-    for (idx = 0; ; idx += 1) {
-	const char *s = long_options[idx].name;
-	if (s == NULL)
+    for (option = long_options; ; option += 1) {
+	name = option->name;
+	if (name == NULL)
 	    break;
-	if (strlen(s) != len || strncasecmp(s, opt, len) != 0)
+	if (!option_compare(opt, name))
 	    continue;
 	if (strcmp(val, "''") == 0)
 	    val = "";
-	process_arg(long_options[idx].val, s, val, precedence, PASS_2_CFG);
+	process_arg(option->val, opt, val, precedence, PASS_2_CFG);
 	return true;
     }
 

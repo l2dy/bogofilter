@@ -94,7 +94,7 @@ EOF
 
 # suppress version info in output
 BFOPTS="-D -H -e -m0.1 -y 0"
-BFHEAD='--header_format=%h: %c, tests=bogofilter, spamicity=%p'
+BFHEAD='--header-format=%h: %c, tests=bogofilter, spamicity=%p'
 
 # build wordlists
 $BOGOUTIL -l ${TMPDIR}/ignore.${DB_EXT}   < ${TMPDIR}/ignore.txt

@@ -180,22 +180,22 @@ robx is the probability that the token is spammish.</para>
 <para>robs: a weight on robx which moves the probability of a little seen
 token towards robx.</para>
 
-<para>min_dev: a minimum distance from .5 for tokens to use in the
+<para>min-dev: a minimum distance from .5 for tokens to use in the
 calculation.  Only tokens farther away from 0.5 than this value are
 used.</para>
 
-<para>spam_cutoff: messages with scores greater than or equal to will
+<para>spam-cutoff: messages with scores greater than or equal to will
 be marked as spam.</para>
 
-<para>ham_cutoff: If zero or spam_cutoff, all messages with values
-strictly below spam_cutoff are marked as ham, all others as spam
-(two-state).  Else values less than or equal to ham_cutoff are marked
-as ham, messages with values strictly between ham_cutoff and
-spam_cutoff are marked as unsure; the rest as spam (tristate)</para>
+<para>ham-cutoff: If zero or spam-cutoff, all messages with values
+strictly below spam-cutoff are marked as ham, all others as spam
+(two-state).  Else values less than or equal to ham-cutoff are marked
+as ham, messages with values strictly between ham-cutoff and
+spam-cutoff are marked as unsure; the rest as spam (tristate)</para>
 
-<para>sp_esf: the effective size factor (ESF) for spam.</para>
+<para>sp-esf: the effective size factor (ESF) for spam.</para>
 
-<para>ns_esf: the ESF for nonspam.  These ESF values default to 1.0,
+<para>ns-esf: the ESF for nonspam.  These ESF values default to 1.0,
 which is the same as not using ESF in the calculation.  Values suitable
 to a user's email population can be determined with the aid of the
 <application>bogotune</application> program.</para>
@@ -378,22 +378,22 @@ passthrough mode.  Note that this only works when -p is explicitly given.</para>
 
 <para>The <option>-E
       <replaceable>value<optional>,value</optional></replaceable></option>
-      option allows setting the sp_esf value and the ns_esf value.
-      With two values, both sp_esf and ns_esf are set.  If only one
+      option allows setting the sp-esf value and the ns-esf value.
+      With two values, both sp-esf and ns-esf are set.  If only one
       value is given, parameters are set as decribed in the note
       below.</para>
 
 <para>The <option>-m
       <replaceable>value<optional>,value</optional><optional>,value</optional></replaceable></option>
-      option allows setting the min_dev value and, optionally, the
-      robs and robx values.  With three values, min_dev, robs, and
+      option allows setting the min-dev value and, optionally, the
+      robs and robx values.  With three values, min-dev, robs, and
       robx are all set.  If fewer valuesare given, parameters are set
       as decribed in the note below.</para>
 
 <para>The <option>-o
       <replaceable>value<optional>,value</optional></replaceable></option>
-      option allows setting the spam_cutoff ham_cutoff values.  With
-      two values, both spam_cutoff and ham_cutoff are set.  If only
+      option allows setting the spam-cutoff ham-cutoff values.  With
+      two values, both spam-cutoff and ham-cutoff are set.  If only
       one value is given, parameters are set as decribed in the note
       below.</para>
 
@@ -437,7 +437,7 @@ see <filename>bogofilter.cf.example</filename> for more info on
 them. For example to change the X-Bogosity header, use:</para>
 
 <para>
-<option><replaceable>--spam_header_name=X-Spam-Header</replaceable></option>
+<option><replaceable>--spam-header-name=X-Spam-Header</replaceable></option>
 </para>  
 
 

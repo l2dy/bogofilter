@@ -54,6 +54,7 @@ Note: bogolexer also uses configfile.c.
 #include "find_home.h"
 #include "format.h"
 #include "lexer.h"
+#include "longoptions.h"
 #include "maint.h"
 #include "paths.h"
 #include "score.h"
@@ -90,72 +91,6 @@ static bool get_parsed_value(char **arg, double *parm);
 static void comma_parse(char opt, const char *arg, double *parm1, double *parm2, double *parm3);
 
 /*---------------------------------------------------------------------------*/
-
-struct option long_options[] = {
-    { "classify-files",			N, 0, 'B' },
-    { "syslog-tag",			N, 0, 'L' },
-    { "classify-mbox",			N, 0, 'M' },
-    { "unregister-nonspam",		N, 0, 'N' },
-    { "dataframe",			N, 0, 'R' },
-    { "unregister-spam",		N, 0, 'S' },
-    { "fixed-terse-format",		N, 0, 'T' },
-    { "report-unsure",			N, 0, 'U' },
-    { "version",			N, 0, 'V' },
-    { "classify-stdin",			N, 0, 'b' },
-    { "bogofilter_dir",			R, 0, 'd' },
-    { "nonspam-exits-zero",		N, 0, 'e' },
-    { "help",				N, 0, 'h' },
-    { "use-syslog",			N, 0, 'l' },
-    { "register-ham",			N, 0, 'n' },
-    { "passthrough",			N, 0, 'p' },
-    { "register-spam",			N, 0, 's' },
-    { "update-as-scored",		N, 0, 'u' },
-    { "timestamp-date",			N, 0, 'y' },
-    { "config-file",			R, 0, 'c' },
-    { "no-config-file",			N, 0, 'C' },
-    { "debug-flags",			R, 0, 'x' },
-    { "debug-to-stdout",		N, 0, 'D' },
-    { "no-header-tags",			N, 0, 'H' },
-    { "input-file",			N, 0, 'I' },
-    { "output-file",			N, 0, 'O' },
-    { "query",				N, 0, 'Q' },
-    { "verbosity",			N, 0, 'v' },
-    { "block_on_subnets",		R, 0, O_BLOCK_ON_SUBNETS },
-    { "charset_default",		R, 0, O_CHARSET_DEFAULT },
-    { "db_cachesize",			N, 0, 'k' },
-#ifdef	HAVE_DECL_DB_CREATE
-    { "db_lk_max_locks",		R, 0, O_DB_MAX_LOCKS },
-    { "db_lk_max_objects",		R, 0, O_DB_MAX_OBJECTS },
-#ifdef	FUTURE_DB_OPTIONS
-    { "db_log_autoremove",		R, 0, O_DB_LOG_AUTOREMOVE },
-    { "db_txn_durable",			R, 0, O_DB_TXN_DURABLE },
-#endif
-#endif
-    { "ns_esf",				R, 0, O_NS_ESF },
-    { "sp_esf",				R, 0, O_SP_ESF },
-    { "ham_cutoff",			R, 0, O_HAM_CUTOFF },
-    { "header_format",			R, 0, O_HEADER_FORMAT },
-    { "log_header_format",		R, 0, O_LOG_HEADER_FORMAT },
-    { "log_update_format",		R, 0, O_LOG_UPDATE_FORMAT },
-    { "min_dev",			R, 0, O_MIN_DEV },
-    { "replace_nonascii_characters",	R, 0, O_REPLACE_NONASCII_CHARACTERS },
-    { "robs",				R, 0, O_ROBS },
-    { "robx",				R, 0, O_ROBX },
-    { "spam_cutoff",			R, 0, O_SPAM_CUTOFF },
-    { "spam_header_name",		R, 0, O_SPAM_HEADER_NAME },
-    { "spam_subject_tag",		R, 0, O_SPAM_SUBJECT_TAG },
-    { "spamicity_formats",		R, 0, O_SPAMICITY_FORMATS },
-    { "spamicity_tags",			R, 0, O_SPAMICITY_TAGS },
-    { "stats_in_header",		R, 0, O_STATS_IN_HEADER },
-    { "terse",				R, 0, O_TERSE },
-    { "terse_format",			R, 0, O_TERSE_FORMAT },
-    { "thresh_update",			R, 0, O_THRESH_UPDATE },
-    { "timestamp",			R, 0, O_TIMESTAMP },
-    { "unsure_subject_tag",		R, 0, O_UNSURE_SUBJECT_TAG },
-    { "user_config_file",		R, 0, O_USER_CONFIG_FILE },
-    { "wordlist",			R, 0, O_WORDLIST },
-    { NULL,				0, 0, 0 }
-};
 
 static bool get_bool(const char *name, const char *arg)
 {
@@ -706,6 +641,14 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case O_TIMESTAMP:			timestamp_tokens = get_bool(name, val);			break;
     case O_UNSURE_SUBJECT_TAG:		unsure_subject_tag = get_string(name, val);		break;
     case O_WORDLIST:			configure_wordlist(val);				break;
+
+    /* ignore options that don't apply to bogofilter */
+    case O_DB_PRUNE:
+    case O_DB_RECOVER:
+    case O_DB_RECOVER_HARDER:
+    case O_DB_REMOVE_ENVIRONMENT:
+    case O_DB_VERIFY:			break;
+
 #ifdef	HAVE_DECL_DB_CREATE
     case O_DB_MAX_OBJECTS:		db_max_objects = atoi(val);				break;
     case O_DB_MAX_LOCKS:		db_max_locks   = atoi(val);				break;
@@ -714,6 +657,9 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case O_DB_TXN_DURABLE:		db_txn_durable = get_bool(name, val);			break;
 #endif
 #endif
+
+    default:
+	abort();
     }
 }
 

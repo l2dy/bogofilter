@@ -23,6 +23,7 @@ AUTHOR:
 #include "charset.h"
 #include "configfile.h"
 #include "lexer.h"
+#include "longoptions.h"
 #include "mime.h"
 #include "textblock.h"
 #include "token.h"
@@ -77,50 +78,6 @@ static void print_version(void)
 		  "\n", 
 		  progname, version, PACKAGE);
 }
-
-struct option long_options[] = {
-    { "config-file",			N, 0, 'c' },
-    { "no-config-file",			N, 0, 'C' },
-    { "debug-flags",			R, 0, 'x' },
-    { "debug-to-stdout",		N, 0, 'D' },
-    { "no-header-tags",			N, 0, 'H' },
-    { "input-file",			N, 0, 'I' },
-    { "output-file",			N, 0, 'O' },
-    { "query",				N, 0, 'Q' },
-    { "verbosity",			N, 0, 'v' },
-    { "block_on_subnets",		R, 0, O_BLOCK_ON_SUBNETS },
-    { "bogofilter_dir",			R, 0, O_IGNORE },
-    { "charset_default",		R, 0, O_IGNORE },
-#ifdef	HAVE_DECL_DB_CREATE
-    { "db_lk_max_locks",		R, 0, O_IGNORE },
-    { "db_lk_max_objects",		R, 0, O_IGNORE },
-#ifdef	FUTURE_DB_OPTIONS
-    { "db_log_autoremove",		R, 0, O_IGNORE },
-    { "db_txn_durable",			R, 0, O_IGNORE },
-#endif
-#endif
-    { "ham_cutoff",			R, 0, O_IGNORE },
-    { "header_format",			R, 0, O_IGNORE },
-    { "log_header_format",		R, 0, O_IGNORE },
-    { "log_update_format",		R, 0, O_IGNORE },
-    { "min_dev",			R, 0, O_IGNORE },
-    { "replace_nonascii_characters",	R, 0, 'n' },
-    { "robs",				R, 0, O_IGNORE },
-    { "robx",				R, 0, O_IGNORE },
-    { "spam_cutoff",			R, 0, O_IGNORE },
-    { "spam_header_name",		R, 0, O_IGNORE },
-    { "spam_subject_tag",		R, 0, O_IGNORE },
-    { "spamicity_formats",		R, 0, O_IGNORE },
-    { "spamicity_tags",			R, 0, O_IGNORE },
-    { "stats_in_header",		R, 0, O_IGNORE },
-    { "terse",				R, 0, O_IGNORE },
-    { "terse_format",			R, 0, O_IGNORE },
-    { "thresh_update",			R, 0, O_IGNORE },
-    { "timestamp",			R, 0, O_IGNORE },
-    { "unsure_subject_tag",		R, 0, O_IGNORE },
-    { "user_config_file",		R, 0, O_USER_CONFIG_FILE },
-    { NULL,				0, 0, 0 }
-};
 
 static bool get_bool(const char *name, const char *arg)
 {
@@ -268,6 +225,45 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	block_on_subnets = get_bool(name, val);
 	break;
 
+    /* ignore options that don't apply to bogolexer */
+
+    case O_CHARSET_DEFAULT:
+    case O_DB_PRUNE:
+    case O_DB_RECOVER:
+    case O_DB_RECOVER_HARDER:
+    case O_DB_REMOVE_ENVIRONMENT:
+    case O_DB_VERIFY:
+#ifdef	HAVE_DECL_DB_CREATE
+    case O_DB_MAX_OBJECTS:
+    case O_DB_MAX_LOCKS:
+#ifdef	FUTURE_DB_OPTIONS
+    case O_DB_LOG_AUTOREMOVE:
+    case O_DB_TXN_DURABLE:
+#endif
+#endif
+    case O_NS_ESF:
+    case O_SP_ESF:
+    case O_HAM_CUTOFF:
+    case O_HEADER_FORMAT:
+    case O_LOG_HEADER_FORMAT:
+    case O_LOG_UPDATE_FORMAT:
+    case O_MIN_DEV:
+    case O_ROBS:
+    case O_ROBX:
+    case O_SPAM_CUTOFF:
+    case O_SPAM_HEADER_NAME:
+    case O_SPAM_SUBJECT_TAG:
+    case O_SPAMICITY_FORMATS:
+    case O_SPAMICITY_TAGS:
+    case O_STATS_IN_HEADER:
+    case O_TERSE:
+    case O_TERSE_FORMAT:
+    case O_THRESH_UPDATE:
+    case O_TIMESTAMP:
+    case O_UNSURE_SUBJECT_TAG:
+    case O_WORDLIST:
+	break;
+
     default:
 	/* config file options:
 	**  ok    - if from config file
@@ -326,4 +322,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-

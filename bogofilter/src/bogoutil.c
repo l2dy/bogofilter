@@ -30,6 +30,7 @@ AUTHORS:
 #include "datastore.h"
 #include "datastore_db.h"
 #include "error.h"
+#include "longoptions.h"
 #include "maint.h"
 #include "msgcounts.h"
 #include "paths.h"
@@ -518,65 +519,6 @@ static cmd_t flag = M_NONE;
 
 #define	OPTIONS	":a:c:C:d:Df:F:hH:I:k:l:m:np:P:r:R:s:u:vVw:x:X:y:"
 
-struct option long_options[] = {
-    { "help",				N, 0, 'h' },
-    { "version",			N, 0, 'V' },
-    { "debug-flags",			R, 0, 'x' },
-    { "debug-to-stdout",		N, 0, 'D' },
-    { "verbosity",			N, 0, 'v' },
-    { "input-file",			N, 0, 'I' },
-
-    { "replace_nonascii_characters",	R, 0, 'n' },
-    { "timestamp-date",			N, 0, 'y' },
-
-    { "db-cachesize",			R, 0, 'k' },
-    { "db-prune",                       R, 0, O_DB_PRUNE },
-    { "db-recover",                     R, 0, O_DB_RECOVER },
-    { "db-recover-harder",              R, 0, O_DB_RECOVER_HARDER },
-    { "db-remove-environment",		R, 0, O_DB_REMOVE_ENVIRONMENT },
-    { "db-verify",                      R, 0, O_DB_VERIFY },
-#ifdef	HAVE_DECL_DB_CREATE
-    { "db_lk_max_locks",		R, 0, O_DB_MAX_LOCKS },
-    { "db_lk_max_objects",		R, 0, O_DB_MAX_OBJECTS },
-#ifdef	FUTURE_DB_OPTIONS
-    { "db_log_autoremove",		R, 0, O_DB_LOG_AUTOREMOVE },
-    { "db_txn_durable",			R, 0, O_DB_TXN_DURABLE },
-#endif
-#endif
-
-    /* The following options are present to allow config files
-    ** to be read without complaints (and mostly ignored)
-    */
-    { "config-file",			N, 0, O_IGNORE },
-    { "no-config-file",			N, 0, O_IGNORE },
-    { "no-header-tags",			N, 0, O_IGNORE },
-    { "output-file",			N, 0, O_IGNORE },
-    { "query",				N, 0, O_IGNORE },
-    { "block_on_subnets",		R, 0, O_IGNORE },
-    { "bogofilter_dir",			R, 0, O_IGNORE },
-    { "charset_default",		R, 0, O_IGNORE },
-    { "ham_cutoff",			R, 0, O_IGNORE },
-    { "header_format",			R, 0, O_IGNORE },
-    { "log_header_format",		R, 0, O_IGNORE },
-    { "log_update_format",		R, 0, O_IGNORE },
-    { "min_dev",			R, 0, O_IGNORE },
-    { "robs",				R, 0, O_IGNORE },
-    { "robx",				R, 0, O_IGNORE },
-    { "spam_cutoff",			R, 0, O_IGNORE },
-    { "spam_header_name",		R, 0, O_IGNORE },
-    { "spam_subject_tag",		R, 0, O_IGNORE },
-    { "spamicity_formats",		R, 0, O_IGNORE },
-    { "spamicity_tags",			R, 0, O_IGNORE },
-    { "stats_in_header",		R, 0, O_IGNORE },
-    { "terse",				R, 0, O_IGNORE },
-    { "terse_format",			R, 0, O_IGNORE },
-    { "thresh_update",			R, 0, O_IGNORE },
-    { "timestamp",			R, 0, O_IGNORE },
-    { "unsure_subject_tag",		R, 0, O_IGNORE },
-    { "user_config_file",		R, 0, O_IGNORE },
-    { NULL,				0, 0, 0 }
-};
-
 static int process_arglist(int argc, char **argv)
 {
     int option;
@@ -809,6 +751,34 @@ static int process_arg(int option, const char *name, const char *val)
 	break;
 #endif
 #endif
+
+    /* ignore options that don't apply to bogoutil */
+    case O_BLOCK_ON_SUBNETS:
+    case O_CHARSET_DEFAULT:
+    case O_NS_ESF:
+    case O_SP_ESF:
+    case O_HAM_CUTOFF:
+    case O_HEADER_FORMAT:
+    case O_LOG_HEADER_FORMAT:
+    case O_LOG_UPDATE_FORMAT:
+    case O_MIN_DEV:
+    case O_REPLACE_NONASCII_CHARACTERS:
+    case O_ROBS:
+    case O_ROBX:
+    case O_SPAM_CUTOFF:
+    case O_SPAM_HEADER_NAME:
+    case O_SPAM_SUBJECT_TAG:
+    case O_SPAMICITY_FORMATS:
+    case O_SPAMICITY_TAGS:
+    case O_STATS_IN_HEADER:
+    case O_TERSE:
+    case O_TERSE_FORMAT:
+    case O_THRESH_UPDATE:
+    case O_TIMESTAMP:
+    case O_UNSURE_SUBJECT_TAG:
+    case O_USER_CONFIG_FILE:
+    case O_WORDLIST:
+	break;
 
     default:
 	abort();
