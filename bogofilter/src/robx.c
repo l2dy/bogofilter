@@ -115,8 +115,8 @@ static double compute_robx(dsh_t *dsh)
     struct robhook_data rh;
 
     ds_get_msgcounts(dsh, &val);
-    msgs_good = spam_cnt = val.spamcount;
-    msgs_bad  = good_cnt = val.goodcount;
+    msgs_bad  = spam_cnt = val.spamcount;
+    msgs_good = good_cnt = val.goodcount;
 
     rh.scalefactor = (double)spam_cnt/(double)good_cnt;
     rh.dsh = dsh;
