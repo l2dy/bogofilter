@@ -103,6 +103,17 @@ static char *getparam (const byte *t, char *e, const byte *param);
 
 /* Function Definitions */
 
+const char *mime_type_name(enum mimetype type)
+{
+  struct type_s *typ;
+  for (typ = types; typ < types + COUNTOF (types); typ += 1)
+  {
+      if (typ->type == type)
+	  return typ->name;
+  }
+  return "unknown";
+}
+
 static void
 mime_init (mime_t * parent)
 {
@@ -214,7 +225,6 @@ is_mime_container (mime_t * m)
 void
 mime_reset (void)
 {
-
   if (DEBUG_MIME (1))
     fprintf (dbgout, "*** mime_reset\n");
 
@@ -385,6 +395,8 @@ mime_version (const byte *text, int leng)
   l = strlen ("MIME-Version:");
   w = getword (text + l, text + leng);
 
+  if (!w) return;
+
   msg_state->version = w;
 }
 
@@ -400,6 +412,8 @@ mime_disposition (const byte *text, int leng)
 
   l = strlen ("Content-Disposition:");
   w = getword (text + l, text + leng);
+
+  if (!w) return;
 
   msg_state->mime_disposition = MIME_DISPOSITION_UNKNOWN;
   for (dis = dispositions; dis < dispositions + COUNTOF (dispositions);
@@ -443,6 +457,8 @@ mime_encoding (const byte *text, int leng)
   l = strlen ("Content-Transfer-Encoding:");
   w = getword (text + l, text + leng);
 
+  if (!w) return;
+
   msg_state->mime_encoding = MIME_ENCODING_UNKNOWN;
   for (enc = encodings; enc < encodings + COUNTOF (encodings); enc += 1)
   {
@@ -471,8 +487,7 @@ mime_type (const byte *text, int leng)
   l = strlen ("Content-Type:");
   w = getword (text + l, text + leng);
 
-  if (!w)
-    return;
+  if (!w) return;
 
   msg_state->mime_type = MIME_TYPE_UNKNOWN;
   for (typ = types; typ < types + COUNTOF (types); typ += 1)
@@ -516,16 +531,16 @@ mime_boundary_set (const byte *text, int leng)
   char *boundary;
 
   if (DEBUG_MIME (1))
-    fprintf (dbgout, "*** --> mime_boundary_set: %d  %p '%-.*s'\n", stackp,
-	     text, leng, text);
+    fprintf (dbgout, "*** --> mime_boundary_set: %d '%-.*s'\n", stackp,
+	     leng, text);
 
   boundary = getword (text + strlen ("boundary="), text + leng);
   msg_state->boundary = boundary;
   msg_state->boundary_len = strlen (boundary);
 
   if (DEBUG_MIME (1))
-    fprintf (dbgout, "*** <-- mime_boundary_set: %d  %p '%s'\n", stackp,
-	     boundary, boundary);
+    fprintf (dbgout, "*** <-- mime_boundary_set: %d '%s'\n", stackp,
+	     boundary);
 
   return;
 }
