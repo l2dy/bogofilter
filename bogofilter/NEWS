@@ -7,6 +7,10 @@ is in the RELEASE.NOTES files.  Read them!!
 
 0.16.5	2004-01-??
 
+	2004-01-25
+
+	* Extracted basic typedefs from system.h into bftypes.h.
+
 	2004-01-23
 
 	* Correct processing order as '-V' doesn't need to read the

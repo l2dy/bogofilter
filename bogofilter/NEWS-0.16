@@ -14,6 +14,7 @@ Note:
 * Correct processing order as '-V' doesn't need to read the config
   file.
 * Correct SIGSEGV causes by missing environment variables.
+* Extracted basic typedefs from system.h into bftypes.h.
 
 0.16.4	2004-01-22
 
