@@ -3,15 +3,15 @@
 #Test database maintenance using bogoutil's dump/load capabilities.
 
 : ${srcdir=.}
-
-relpath="`pwd`/../.." . ${srcdir}/../t.frame
+relpath="`pwd`/../.."
+. ${srcdir}/../t.frame
 
 verbose=0
 if [ "$1" = "-v" ]; then
     verbose=1
 fi
 
-BOGOUTIL="../../bogoutil"
+BOGOUTIL="$VAL ../../bogoutil"
 
 BASE=t.dump.load
 OUT="${TMPDIR}/$BASE.out"

@@ -1,13 +1,15 @@
 #! /bin/sh
 
-. ${srcdir:=.}/t.frame
-
 set -e
 
 #        In directory t.systest.d are:
 #
 #		inputs  - test inputs
 #		outputs - known correct outputs
+
+: ${srcdir=.}
+relpath="`pwd`/../.."
+. ${srcdir}/../t.frame -no-db
 
 verbose=0
 if [ "$1" = "-v" ]; then
@@ -18,8 +20,9 @@ fi
 mkdir -p ${TMPDIR}/tests
 
 CONFIG="${TMPDIR}/test.cf"
-BOGOFILTER="../bogofilter -c ${CONFIG}"
-SYSTEST="${srcdir}/t.systest.d"
+BOGOFILTER="$VAL ${relpath}/bogofilter -c ${CONFIG} -y 0"
+BOGOUTIL="$VAL ${relpath}/bogoutil"
+SYSTEST="${srcdir}"
 
 cat <<EOF > ${CONFIG}
 robx=0.415
@@ -55,10 +58,16 @@ map_rc()
 
 for alg in r g ; do
     BOGOFILTER_DIR="${TMPDIR}/words.$alg"
+    export BOGOFILTER_DIR
     rm -rf $BOGOFILTER_DIR
     mkdir $BOGOFILTER_DIR
     $BOGOFILTER -$alg -s < ${SYSTEST}/inputs/spam.mbx
     $BOGOFILTER -$alg -n < ${SYSTEST}/inputs/good.mbx
+    $BOGOUTIL -d $BOGOFILTER_DIR/spamlist.db > $BOGOFILTER_DIR/spamlist.txt
+    $BOGOUTIL -d $BOGOFILTER_DIR/goodlist.db > $BOGOFILTER_DIR/goodlist.txt
+    if  [ $verbose -ne 0 ]; then
+	ls -l $BOGOFILTER_DIR/*list.txt
+    fi
     #
     # run tests for msg.1.txt, msg.2.txt, and msg.3.txt
     #
@@ -84,15 +93,14 @@ for alg in r g ; do
 	sed s/,.version=.*// < ${TMPDIR}/tests-$alg > ${TMPDIR}/tests/msg.$out.$alg.$ver
     done
     rm -f ${TMPDIR}/tests-$alg
-    rm -rf $BOGOFILTER_DIR
+    rm -f $BOGOFILTER_DIR/*.db
 done
 
 rm -f ${CONFIG}
 
 OUTPUTS=${SYSTEST}/outputs
-REFDIR=$srcdir/t.systest.d/outputs
 
-for i in $REFDIR/*v ; do
+for i in $OUTPUTS/*v ; do
     j=`basename $i`
     if  [ $verbose -eq 0 ]; then
 	cmp $i ${TMPDIR}/tests/$j

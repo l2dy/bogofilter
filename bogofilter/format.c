@@ -125,17 +125,17 @@ static bool set_spamicity_fields(FIELD *strings, const char *val)
     char *tmp = xstrdup(val);
     for (i = 0; i < RC_COUNT; i += 1)
     {
+	/* skip delimiters */
+	while (*tmp == ',' || *tmp == ' ')
+	    tmp += 1;
 	strings[i] = tmp;
 	if (*tmp == '\0')
 	    continue;
 	/* find delimiter */
 	while (*tmp != ',' && *tmp != ' ' && *tmp != '\0')
 	    tmp += 1;
-	/* terminate field */
-	*tmp++ = '\0';
-	/* skip delimiters */
-	while (*tmp == ',' || *tmp == ' ')
-	    tmp += 1;
+	if (*tmp != '\0')
+	    *tmp++ = '\0';
     }
     return true;
 }
@@ -363,7 +363,7 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
     *buff = '\0';
 
     if (DEBUG_FORMAT(0))
-	fprintf( stderr, "%s\n", beg );
+	fprintf(dbgout, "%s\n", beg);
 
     return beg;
 }

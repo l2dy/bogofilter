@@ -104,8 +104,8 @@ double fis_get_spamicity(size_t robn, FLOAT P, FLOAT Q )
 
 void fis_print_summary(void)
 {
-    (void)fprintf(stdout, "%-20s %9.2e %9.2e %9.2e %9.3f %9.3f %4.2f\n",
-		  "P_Q_S_invs_logs_md", 
+    (void)fprintf(stdout, "%-*s %5d %9.2e %9.2e %9.2e %9.2e %9.2e %4.2f\n",
+		  MAXTOKENLEN+2, "N_P_Q_S_s_x_md", fis_stats.robn, 
 		  fis_stats.p_pr, fis_stats.q_pr, fis_stats.s.spamicity, fis_stats.p_ln, fis_stats.q_ln, min_dev);
 }
 

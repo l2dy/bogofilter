@@ -29,6 +29,7 @@ bool keep_size(size_t siz);
 void do_replace_nonascii_characters(byte *str);
 
 void set_today(void);
+void set_date(YYYYMMDD date);
 time_t long_to_date(long l);
 YYYYMMDD string_to_date(const char *s);
 

@@ -9,6 +9,13 @@
 
 set -e
 
+LANG=
+unset LANG
+LC_ALL=
+unset LC_ALL
+LC_COLLATE=
+unset LC_COLLATE
+
 # Note FreeBSD has no "seq" command.
 for num in 1 2 3 4 ;do
 echo "Running test $num"

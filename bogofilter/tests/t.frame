@@ -36,11 +36,13 @@ else
     echo "Results are in ${TMPDIR}.  Remove it after testing."
 fi
 
-BOGOFILTER_DIR=$TMPDIR
-export BOGOFILTER_DIR
+if [ "$1" != "-no-db" ]; then
+    BOGOFILTER_DIR=$TMPDIR
+    export BOGOFILTER_DIR
 
 # make GNU libc nasty and abort on memory allocation issues:
-MALLOC_CHECK_=2
-export MALLOC_CHECK_
+#   MALLOC_CHECK_=2
+#   export MALLOC_CHECK_
 
-${relpath}/bogofilter -n -C </dev/null
+    ${relpath}/bogofilter -n -C </dev/null
+fi

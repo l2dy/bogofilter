@@ -36,6 +36,7 @@ AUTHOR:
 #include "textblock.h"
 #include "wordlists.h"
 #include "xmalloc.h"
+#include "mime.h"
 
 #define BOGODIR ".bogofilter"
 
@@ -60,6 +61,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     int   exitcode;
     FILE  *out;
 
+    dbgout = stderr;
+
     exitcode = process_args(argc, argv);
     if (exitcode != 0)
 	exit(exitcode);
@@ -76,9 +79,12 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	    directory = create_path_from_env("HOME", BOGODIR);
 
 	if (directory != NULL)
-	    if (setup_lists(directory) != 0)
+	    if (setup_wordlists(directory) != 0)
 		exit(2);
     }
+
+    /* open all wordlists */
+    open_wordlists();
 
     if (*outfname && passthrough) {
 	if ((out = fopen(outfname,"wt"))==NULL)
@@ -92,6 +98,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     }
     
     textblocks = textblock_init();
+
+    mime_reset();
 
     switch(run_type) {
 	case RUN_NORMAL:
@@ -172,7 +180,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     textblock_free(textblocks);
 
-    close_lists();
+    close_wordlists();
 
 #ifdef HAVE_SYSLOG_H
     if (logflag)

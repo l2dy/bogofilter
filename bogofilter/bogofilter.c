@@ -59,12 +59,9 @@ rc_t bogofilter(double *xss) /*@globals errno@*/
     long	wordcount, msgcount = 0;
     bool	cont;
 
-    good_list.active = spam_list.active = true;
+    set_list_active_status(true);
 
     db_lock_reader_list(word_lists);
-
-    good_list.msgcount = db_getcount(good_list.dbh);
-    spam_list.msgcount = db_getcount(spam_list.dbh);
 
     method->initialize();
 

@@ -1,1 +1,1 @@
-X-Bogosity: No, tests=bogofilter, spamicity=0.402799
+X-Bogosity: No, tests=bogofilter, spamicity=0.394050

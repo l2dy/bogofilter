@@ -3,6 +3,8 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#include <string.h>
+
 #include "config.h"
 
 #if HAVE_STDBOOL_H
@@ -30,7 +32,7 @@ typedef unsigned char _Bool;
 # if !HAVE_STRRCHR
 #  define strrchr rindex
 # endif
-char *strchr (), *strrchr ();
+
 # if !HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
 #  define memmove(d, s, n) bcopy ((s), (d), (n))

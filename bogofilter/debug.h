@@ -18,6 +18,7 @@
 #define BIT_WORDLIST	( 1 << ('W' - 'A'))
 #endif
 
+extern FILE *dbgout;
 extern int debug_mask;
 
 #ifdef	NODEBUG

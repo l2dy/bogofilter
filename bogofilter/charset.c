@@ -140,7 +140,8 @@ static void map_default(void)
 
     for (ch=0; ch < COUNTOF(charset_table); ch += 1)
     {
-	if (iscntrl(ch) && ch != '\n')		/* convert control characters to blanks */
+	if (iscntrl(ch) &&		/* convert control characters to blanks */
+	    ch != '\t' && ch != '\n')	/* except tabs and newlines		*/
 	    charset_table[ch] = SP;
     }
 
@@ -250,7 +251,7 @@ static unsigned char xlate_us[] = {
     0x92, '\'',	/* windows apostrophe  to single quote */
     0x93, '"',	/* windows left  quote to double quote */
     0x94, '"',	/* windows right quote to double quote */
-    0xA9, ' '		/* copyright sign      to space        */
+    0xA9, ' '	/* copyright sign      to space        */
 };
 
 /* For us-ascii, 
@@ -358,7 +359,7 @@ void init_charset_table(const char *charset_name, bool use_default)
 	if (strcasecmp(charset->name, charset_name) == 0)
 	{
 	    if (DEBUG_CONFIG(1))
-		printf(" ... found.\n");
+		fprintf(dbgout, " ... found.\n");
 	    map_default();			/* Setup the table defaults. */
 	    (*charset->func)();
 	    found = true;
@@ -381,24 +382,25 @@ void init_charset_table(const char *charset_name, bool use_default)
 
 void got_charset( const char *charset )
 {
-    char *lcl;
-    char *tmp = strchr( charset, '=' );
+    char *t = strchr( charset, '=' ) + 1;
+    bool q = *t == '"';
     char *s, *d;
-    lcl = xstrdup( tmp ? tmp+1 : charset);
-    for (s = d = lcl; *s != '\0'; s++)
+    t = xstrdup( t + q);
+    for (s = d = t; *s != '\0'; s++)
     {
-	if (*s == '"')		/* skip quotes */
+	char c = tolower(*s);	/* map upper case to lower */
+	if (c == '_')		/* map underscore to dash */
+	    c = '-';
+	if (c == '-' &&		/* map "iso-" to "iso"     */
+	    memcmp(t, "iso", 3) == 0)
 	    continue;
-	if (*s == '_')		/* map underscore to dash */
-	    *s = '-';
-	*d++ = tolower(*s);	/* map upper case to lower */
-	if (*s == '-' &&	/* map "iso-" to "iso"     */
-	    memcmp(lcl, "iso-", 4) == 0)
-	    d -= 1;
+	if (q && c == '"')
+	    break;
+	*d++ = c;
     }
     *d++ = '\0';
     if (DEBUG_CONFIG(0))
-	fprintf( stderr, "got_charset( '%s' )\n", lcl );
-    init_charset_table( lcl, false );
-    xfree(lcl);
+	fprintf(dbgout, "got_charset( '%s' )\n", t);
+    init_charset_table( t, false );
+    xfree(t);
 }

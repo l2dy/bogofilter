@@ -4,26 +4,66 @@
 
 $Id$
 
+	2002-12-31
+	* Added sample procmail file, contrib/procmailrc.example
+	
+	2002-12-30
+	* Spamicity score now computed from multiple word list pairs, i.e. all
+	  spam and ham word lists in directories named on command line or in
+	  config file (via "wordlist=" lines).
+
+	2002-12-28
+	* Added mime processing capability, with decoding of base64,
+	  quoted-printable and uuencoded sections.  Ignores attachments when
+	  computing spamicity.
+	* lexer is now case insensitive
+
+	2002-12-24
+	* Cleaned up code for specifying wordlist directory(s).
+
+	2002-12-15
+	* Added dates to wordlist tokens.  Option "datestamp_tokens=true|false"
+	  can be used to enable/disable them.
+	* Added wordlist maintenance capability to bogoutil.  Can discard
+	  tokens based on count, age, or length.  Can replace non-ASCII with
+	  question marks.
+
+	2002-12-28
+	* Added mime processing capability, with decoding of base64,
+	  quoted-printable and uuencoded sections.  Ignores attachments when
+	  computing spamicity.
+	* lexer is now case insensitive
+
+	2002-12-24
+	* Cleaned up code for specifying wordlist directory(s).
+
+	2002-12-15
+	* Added dates to wordlist tokens.  Option "datestamp_tokens=true|false"
+	  can be used to enable/disable them.
+	* Added wordlist maintenance capability to bogoutil.  Can discard
+	  tokens based on count, age, or length.  Can replace non-ASCII with
+	  question marks.
+
 	2002-12-08
-	* Increase MAXTOKENLEN from 20 to 30, allowing more and longer
-	  tokens to be processed.
+	* Increase MAXTOKENLEN from 20 to 30, allowing more and longer tokens
+	  to be processed.
 
 	2002-12-07
-	* Using new charset handling routines to provide charset
-	  specific token parsing.
-	* Added new config file options for setting of default charset
-	  and replacing of nonascii characters.
-	* New error handling routine will output error messages to stderr
-	  and, if '-l' (logging) is enabled, to syslog.
+	* Using new character set handling routines to provide charset specific
+	  token parsing.
+	* Added new config file options for setting of default charset and
+	  replacing of non-ASCII characters.
+	* New error handling routine will output error messages to stderr and,
+	  if '-l' (logging) is enabled, to syslog.
 	* Work around ash-0.2 and bash-1 bugs, needed for make check.
 	* Reorder gcc __attribute__ lines for gcc-2.7 compatibility.
 	* Cater for malloc/calloc implementations that return NULL when 0 bytes
 	  of memory are requested, some AIX versions e. g., that would
 	  previously falsely claim an "out of memory" condition.
 
-	* New message formatting capability allows formats to be put
-	  in config file for X-Bogosity line and logging messages.
-	  Message contant can include status, spamicity, version, etc.
+	* New message formatting capability allows formats to be put in config
+	  file for X-Bogosity line and logging messages.  Message content can
+	  include status, spamicity, version, etc.
 
 0.9.1.2	2002-12-05
 
@@ -260,3 +300,7 @@ $Id$
 
 	* Initial release.
  vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:
+
+ LocalWords:  BOGOFILTER relson Exp procmail contrib Spamicity config spamicity
+ LocalWords:  bogoutil datestamp MAXTOKENLEN charset stderr syslog gcc malloc
+ LocalWords:  calloc Bogosity

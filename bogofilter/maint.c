@@ -30,7 +30,6 @@ YYYYMMDD thresh_date  = 0;
 size_t	 size_min = 0;
 size_t	 size_max = 0;
 bool     datestamp_tokens = true;
-bool	 replace_nonascii_characters = false;
 
 /* Function Prototypes */
 static YYYYMMDD time_to_date(long days);
@@ -45,6 +44,11 @@ YYYYMMDD time_to_date(long days)
     struct tm *tm = localtime( &t );
     YYYYMMDD date = (((tm->tm_year + 1900) * 100 + tm->tm_mon + 1) * 100) + tm->tm_mday;
     return date;
+}
+
+void set_date(YYYYMMDD date)
+{
+    today = date;
 }
 
 void set_today(void)
@@ -68,7 +72,7 @@ bool keep_count(int count)
 	return true;
     else {
 	bool ok = count > thresh_count;
-	if (DEBUG_DATABASE(1)) fprintf(stderr, "keep_count:  %d > %d -> %c\n", count, thresh_count, ok ? 't' : 'f' );
+	if (DEBUG_DATABASE(1)) fprintf(dbgout, "keep_count:  %d > %d -> %c\n", count, thresh_count, ok ? 't' : 'f' );
 	return ok;
     }
 }
@@ -80,7 +84,7 @@ bool keep_date(int date)
 	return true;
     else {
 	bool ok = thresh_date < date;
-	if (DEBUG_DATABASE(1)) fprintf(stderr, "keep_date:  %d < %d -> %c\n", (int) thresh_date, date, ok ? 't' : 'f' );
+	if (DEBUG_DATABASE(1)) fprintf(dbgout, "keep_date:  %d < %d -> %c\n", (int) thresh_date, date, ok ? 't' : 'f' );
 	return ok;
     }
 }
@@ -92,7 +96,7 @@ bool keep_size(size_t size)
 	return true;
     else {
 	bool ok = (size_min <= size) && (size <= size_max);
-	if (DEBUG_DATABASE(1)) fprintf(stderr, "keep_size:  %d <= %d <= %d -> %c\n", size_min, size, size_max, ok ? 't' : 'f' );
+	if (DEBUG_DATABASE(1)) fprintf(dbgout, "keep_size:  %d <= %d <= %d -> %c\n", size_min, size, size_max, ok ? 't' : 'f' );
 	return ok;
     }
 }
@@ -100,6 +104,10 @@ bool keep_size(size_t size)
 void do_replace_nonascii_characters(byte *str)
 {
     byte ch;
+    if (str == NULL) {
+	fprintf(stderr, "%s:%d  %s( NULL )\n", __FILE__, __LINE__, __PRETTY_FUNCTION__);
+	exit(2);
+    }
     while ((ch=*str) != '\0')
     {
 	if ( ch & 0x80)
@@ -112,7 +120,7 @@ void maintain_wordlists(void)
 {
     wordlist_t *list;
 
-    good_list.active = spam_list.active = true;
+    set_list_active_status(true);
 
     db_lock_writer_list(word_lists);
 
@@ -178,7 +186,7 @@ int maintain_wordlist(void *vhandle)
 		rc1 = dbcp->c_del(dbcp, 0);
 		rc2 = dbh->dbp->del(dbh->dbp, NULL, &db_key, 0);
 
-		if (DEBUG_DATABASE(0)) fprintf(stderr, "deleting %s --> %d, %d\n", (char *)db_key.data, rc1, rc2);
+		if (DEBUG_DATABASE(0)) fprintf(dbgout, "deleting %s --> %d, %d\n", (char *)db_key.data, rc1, rc2);
 	    }
 	}
 	else if (ret == DB_NOTFOUND) {

@@ -7,15 +7,22 @@
 #define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
 
 #include "system.h" /* has bool */
+#include "common.h" /* has PATH_LEN */
 
-extern int nonspam_exits_zero;	/* '-e' */
+#ifdef __LCLINT__
+#define bool int
+#endif
+
+extern bool nonspam_exits_zero;	/* '-e' */
 extern bool fisher;		/* '-f' */
 extern bool force;		/* '-F' */
 extern bool logflag;		/* '-l' */
 extern bool terse;		/* '-t' */
 extern bool quiet;		/* '-q' */
-extern int passthrough;		/* '-p' */
+extern bool passthrough;	/* '-p' */
 extern int verbose;		/* '-v' */
+
+extern FILE *fpin;		/* '-I' */
 
 extern bool stats_in_header;
 
@@ -28,6 +35,7 @@ extern const char *progname;
 /*@observer@*/
 extern const char *stats_prefix;
 extern char *directory;
+extern char *update_dir;
 extern char outfname[PATH_LEN];
 extern const char *const version;
 extern const char *const system_config_file;

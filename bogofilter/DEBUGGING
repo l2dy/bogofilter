@@ -1,9 +1,9 @@
 # How to debug the lexer
 
 The most effective way seems to be adding "debug" to the "%option" line,
-compile "lexertest" and run that against a small set of words. The
+compile "bogolexer" and run that against a small set of words. The
 "debug" option will make the generated lexer output what rules it
-accepts (with lexer.l line number) -- if lexertest does not print a
+accepts (with lexer.l line numbers).  If bogolexer does not print a
 get_token line, then the lexer has not returned the value TOKEN, but
 ignored the token.
 

@@ -9,7 +9,9 @@ typedef struct wordlist_s wordlist_t;
 struct wordlist_s
 {
     /*@null@*/ wordlist_t *next;
-    /*@owned@*/ char *name;	/* resource name (for debug/verbose messages) */
+    int index;
+    /*@owned@*/ char *filename;	/* resource name (for debug/verbose messages) */
+    /*@owned@*/ char *filepath;	/* resource path (for debug/verbose messages) */
     /*@owned@*/ void *dbh;	/* database handle */
     long msgcount;		/* count of messages in wordlist. */
     double weight;
@@ -20,14 +22,16 @@ struct wordlist_s
 };
 
 /*@null@*/ extern wordlist_t *word_lists;
-extern wordlist_t good_list, spam_list;
+extern wordlist_t *good_list, *spam_list;
 
-int setup_lists(const char* dir);
+int setup_wordlists(const char* dir);
 bool configure_wordlist(const char *val);
 
+void open_wordlists(void);
 void *open_wordlist(const char *name, const char *filepath);
-void close_lists(void);
+void close_wordlists(void);
 
 void set_good_weight(double weight);
+void set_list_active_status(bool status);
 
 #endif	/* WORDLISTS_H */

@@ -27,6 +27,12 @@ AUTHOR:
 extern int Rtable;
 extern double min_dev;
 
+extern	long msgs_good;		/* from robinson.c */
+extern	long msgs_bad;		/* from robinson.c */
+
+extern	double	robx;		/* from robinson.c */
+extern	double	robs;		/* from robinson.c */
+
 typedef struct rstats_s rstats_t;
 struct rstats_s {
     rstats_t *next;
@@ -86,8 +92,8 @@ static int compare_rstats_t(const void *const ir1, const void *const ir2)
     const rstats_t *r1 = *(const rstats_t *const *)ir1;
     const rstats_t *r2 = *(const rstats_t *const *)ir2;
 
-    if (r1->prob > r2->prob) return 1;
-    if (r1->prob < r2->prob) return -1;
+    if (r1->prob - r2->prob > EPS) return 1;
+    if (r2->prob - r1->prob > EPS) return -1;
 
     return strcmp(r1->token, r2->token);
 }
@@ -108,7 +114,7 @@ void rstats_print(void)
     size_t robn  = header.robn;
     size_t count = header.count;
     rstats_t *cur;
-    rstats_t **rstats_array = (rstats_t **) xcalloc( count, sizeof(rstats_t *));
+    rstats_t **rstats_array = (rstats_t **) xcalloc(count, sizeof(rstats_t *));
 
     for (r= 0, cur = header.list; r<count; r+=1, cur=cur->next)
 	rstats_array[r] = cur;
@@ -152,10 +158,10 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
 	{
 	    double prob = rstats_array[r]->prob;
 	    double invn, invproduct, product, spamicity;
-	    if (prob >= fin)
+	    if (prob - fin >= EPS)
 		break;
 
-	    if (fabs(EVEN_ODDS - prob) >= min_dev)
+	    if (fabs(EVEN_ODDS - prob) - min_dev >= EPS)
 	    {
 		cnt += 1;
 		h->prob += prob;
@@ -204,19 +210,27 @@ void rstats_print_rtable(rstats_t **rstats_array, size_t count)
     size_t r;
 
     /* print header */
-    (void)fprintf(stdout, "%-20s%10s%10s%10s%10s%10s\n",
-		  "","pgood","pbad","fw","invfwlog","fwlog");
+    (void)fprintf(stdout, "%*s%6s%10s%10s%10s%10s%10s %s\n",
+		  MAXTOKENLEN+2,"","n", "pgood","pbad","fw","invfwlog","fwlog", "U");
 
     /* Print 1 line per token */
     for (r= 0; r<count; r+=1)
     {
 	rstats_t *cur = rstats_array[r];
-	double prob = cur->prob;
-	char flag = (fabs(prob-EVEN_ODDS) < min_dev) ? '-' : '+';
+	const char *token = cur->token;
+	int len = max(0, MAXTOKENLEN-(int)strlen(token));
+	double n = cur->good + cur->bad;
+	double pw = ((n < EPS)
+		     ? 0.0
+		     : (pw = (cur->bad / msgs_bad) /
+			(cur->bad / msgs_bad + cur->good / msgs_good)));
+	double fw = (robs * robx + n * pw) / (robs + n);
+	char flag = (fabs(fw-EVEN_ODDS) - min_dev >= EPS) ? '+' : '-';
 
-	(void)fprintf(stdout, "%-20s  %8.2f  %8.0f  %8.6f  %8.5f  %8.5f %c\n",
-		      cur->token, cur->good, cur->bad, prob, 
-		      log(1.0 - prob), log(prob), flag);
+	(void)fprintf(stdout, "\"%s\"%*s %5d  %8.6f  %8.6f  %8.6f%10.5f%10.5f %c\n",
+		      token, len, " ",
+		      (int)n, cur->good / msgs_good, cur->bad / msgs_bad, 
+		      fw, log(1.0 - fw), log(fw), flag);
     }
 
     /* print trailer */

@@ -30,13 +30,11 @@ AUTHOR:
 #include "error.h"
 #include "maint.h"
 #include "robinson.h"			/* for ROBS and ROBX */
+#include "swap.h"
 
 #define PROGNAME "bogoutil"
 
 #define MINIMUM_FREQ	5		/* minimum freq */
-
-int verbose = 0;
-bool logflag = 0;
 
 run_t run_type = RUN_NORMAL;
 
@@ -72,17 +70,26 @@ static int dump_file(char *db_file)
 	    for (;;) {
 		ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT);
 		if (ret == 0) {
-		    dbv_t *val = (dbv_t *)data.data;
-		    if (!keep_count(val->count) || !keep_date(val->date) || !keep_size(key.size))
+		    long cv[2];
+		    dbv_t val;
+		    memcpy( &cv, data.data, data.size );
+		    if (!dbh->is_swapped){			/* convert from struct to array */
+			val.count = cv[0];
+			val.date  = cv[1];
+		    } else {
+			val.count = swap_32bit(cv[0]);
+			val.date  = swap_32bit(cv[1]);
+		    }
+		    if (!keep_count(val.count) || !keep_date(val.date) || !keep_size(key.size))
 			continue;
 		    if (replace_nonascii_characters)
 			do_replace_nonascii_characters((byte *)key.data);
 		    if (data.size != 4 && data.size != 8)
 			print_error(__FILE__, __LINE__, "Unknown data size - %d.\n", data.size);
-		    if (data.size == 4 || val->date == 0)
-			printf("%.*s %lu\n", (int)key.size, (char *) key.data, val->count);
+		    if (data.size == 4 || val.date == 0)
+			printf("%.*s %lu\n", (int)key.size, (char *) key.data, val.count);
 		    else
-			printf("%.*s %lu %lu\n", (int)key.size, (char *) key.data, val->count, val->date);
+			printf("%.*s %lu %lu\n", (int)key.size, (char *) key.data, val.count, val.date);
 		}
 		else if (ret == DB_NOTFOUND) {
 		    break;
@@ -110,6 +117,7 @@ static int load_file(char *db_file)
     size_t len;
     long line = 0;
     long count, date;
+    YYYYMMDD today_save = today;
 
     if ((dbh = db_open(db_file, db_file, DB_WRITE)) == NULL)
 	return 2;
@@ -169,7 +177,7 @@ static int load_file(char *db_file)
 	}
 
 	if (date == 0)				/* date as YYYYMMDD */
-	    date = today;
+	    date = today_save;
 
 	if (replace_nonascii_characters)
 	    do_replace_nonascii_characters(buf);
@@ -178,10 +186,13 @@ static int load_file(char *db_file)
 	    continue;
 
 	/* Slower, but allows multiple lists to be concatenated */
-	db_increment_with_date(dbh, (char *)buf, count, date);
+	set_date(date);
+	count += db_getvalue(dbh, (char *)buf);
+	db_setvalue(dbh, (char *)buf, count);
     }
     db_lock_release(dbh);
     db_close(dbh);
+
     return rv;
 }
 
@@ -473,7 +484,7 @@ static int compute_robinson_x(char *path)
 
     robx = compute_robx( dbh_spam, dbh_good );
 
-    db_setvalue( dbh_spam, ".ROBX", (int) (robx * 1000000) );
+    db_setvalue(dbh_spam, ".ROBX", (int) (robx * 1000000));
 
     db_lock_release(dbh_spam);
     db_close(dbh_spam);
@@ -538,7 +549,10 @@ int main(int argc, char *argv[])
 
     set_today();		/* compute current date for token age */
 
-    while ((option = getopt(argc, argv, "d:l:m:w:R:phvVx:a:c:s:ny:")) != -1)
+    fpin = stdin;
+    dbgout = stderr;
+
+    while ((option = getopt(argc, argv, "d:l:m:w:R:phvVx:a:c:s:ny:I:")) != -1)
 	switch (option) {
 	case 'd':
 	    flag = DUMP;
@@ -608,6 +622,14 @@ int main(int argc, char *argv[])
 
 	case 'y':		/* date as YYYYMMDD */
 	    today = string_to_date((char *)optarg);
+	    break;
+
+	case 'I':
+	    fpin = fopen( optarg, "r" );
+	    if (fpin == NULL) {
+		fprintf(stderr, "Can't read file '%s'\n", optarg);
+		exit(2);
+	    }
 	    break;
 
 	default:

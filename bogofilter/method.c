@@ -26,11 +26,7 @@ NAME:
 #include "common.h"
 
 #include "bogofilter.h"
-/*#include "datastore.h"*/
-/*#include "graham.h"*/
-/*#include "lexer.h"*/
 #include "method.h"
-/*#include "wordhash.h"*/
 #include "wordlists.h"
 
 /*

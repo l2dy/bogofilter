@@ -1,7 +1,9 @@
+.deps
 Makefile
 Makefile.in
-dehex
-.deps
 README
+deb64
+dehex
+deqp
 dumbhead
 spam_header_name

@@ -17,7 +17,7 @@ function usage() {
     echo "       for training, with bogofilter's -s or -n option."
     echo ""
     echo "Parameters:"
-    echo "       bogodir is where bogofilter's wrodlists files are kept"
+    echo "       bogodir is where bogofilter's wordlists files are kept"
     echo "       (bogodir defaults to $HOME/.bogofilter)."
     echo "       n (or -n) indicates that the next file contains only nonspams."
     echo "       s (or -s) means it contains only spams."
