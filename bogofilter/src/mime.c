@@ -579,7 +579,7 @@ mime_decode (word_t *text)
   switch (msg_state->mime_encoding)
   {
   case MIME_QP:
-    count = qp_decode(text);
+    count = qp_decode(text, RFC2045);
     break;
   case MIME_BASE64:
       if (count > 4)

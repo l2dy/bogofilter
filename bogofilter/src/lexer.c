@@ -318,8 +318,8 @@ size_t text_decode(word_t *w)
 		len = base64_decode(&n);	/* decode base64 */
 	    break;
 	case 'q':
-	    if (qp_validate(&n))
-		len = qp_decode(&n);		/* decode quoted-printable */
+	    if (qp_validate(&n, RFC2047))
+		len = qp_decode(&n, RFC2047);		/* decode quoted-printable */
 	    break;
 	}
 
