@@ -1,0 +1,95 @@
+#!/bin/sh
+
+set -e
+
+# Note:  When run via "make check", test output files are automatically deleted.
+#	 When run from the command line, outputs files are left in directory
+#	 degen.YYYYMMDD.  This is useful when something is different.
+#
+#	 ./inputs  - test inputs
+#	 ./outputs - known correct outputs
+#		     esp. degen.out
+#
+#	 degen.YYYYMMDD:
+#		tests   - directory containing individual output files
+
+: ${srcdir=.}
+relpath="`pwd`/../.."
+NODB=1 . ${srcdir}/../t.frame
+
+verbose=0
+if [ "$1" = "-v" ]; then
+    verbose=1
+fi
+
+BOGOFILTER="$VAL ${relpath}/bogofilter"
+BOGOLEXER="$VAL ${relpath}/bogolexer"
+BOGOUTIL="$VAL ${relpath}/bogoutil"
+BOGOLEX_SH="$VAL ${srcdir}/../../../tuning/bogolex.sh"
+SYSTEST="${srcdir}"
+OUT="${TMPDIR}/degen.out"
+
+export BOGOFILTER
+export BOGOLEXER
+export BOGOUTIL
+
+map_rc()
+{
+    (
+	set +e
+	eval "$@"
+	a=$?
+	[ $a -eq 0 ] && exit 0
+	[ $a -eq 1 ] && exit 0
+	[ $a -eq 2 ] && exit 0
+	exit $a
+    )
+}
+
+BOGOFILTER_DIR="${TMPDIR}"
+
+rm -f $BOGOFILTER_DIR/wordlist.db 
+
+echo free > ${TMPDIR}/msg.free
+echo Free > ${TMPDIR}/msg.Free
+echo FREE > ${TMPDIR}/msg.FREE
+echo xxxx > ${TMPDIR}/msg.xxxx
+(echo free ; echo Free) > ${TMPDIR}/msg.ff
+(echo free ; echo Free ; echo FREE) > ${TMPDIR}/msg.fff
+(echo FREE ; echo new ; echo Free ; echo free) > ${TMPDIR}/msg.fnff
+
+$BOGOFILTER -y 0 -n -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.free
+$BOGOFILTER -y 0 -n -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.free
+$BOGOFILTER -y 0 -n -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.free
+$BOGOFILTER -y 0 -n -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.free
+
+$BOGOFILTER -y 0 -n -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.ff
+$BOGOFILTER -y 0 -n -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.ff
+$BOGOFILTER -y 0 -s -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.Free
+
+$BOGOFILTER -y 0 -s -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.xxxx
+
+$BOGOUTIL -d ${TMPDIR}/wordlist.db >> ${OUT}
+echo >> ${OUT}
+
+for flags in PD ; do
+echo $flags >> ${OUT}
+map_rc $BOGOFILTER -y 0 -$flags -d $BOGOFILTER_DIR -C -D -t -vvv -I  ${TMPDIR}/msg.fff | grep -i free >> ${OUT}
+echo >> ${OUT}
+done
+
+for flags in Pdf PdF ; do
+echo $flags >> ${OUT}
+map_rc $BOGOFILTER -y 0 -$flags -d $BOGOFILTER_DIR -I ${TMPDIR}/msg.FREE -C -D -t -vvv -x s | grep -i free >> ${OUT}
+echo >> ${OUT}
+done
+
+echo fff >> ${OUT}
+map_rc $BOGOFILTER -y 0 -d $BOGOFILTER_DIR -C -D -t -PdF -vvv -x s < ${TMPDIR}/msg.fnff | grep -i free >> ${OUT}
+
+if  [ $verbose -eq 0 ]; then
+    cmp outputs/degen.out $OUT
+else
+    diff outputs/degen.out $OUT
+fi
+
