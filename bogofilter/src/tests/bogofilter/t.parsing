@@ -45,7 +45,7 @@ for flags in $flaglist ; do
     fi
 done
 
-for OUT in outputs/parsing-???.out ; do
+for OUT in ${srcdir}/outputs/parsing-???.out ; do
     if  [ $verbose -eq 0 ]; then
 	cmp $OUT ${TMPDIR}/`basename $OUT`
     else
