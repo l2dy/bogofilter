@@ -22,6 +22,10 @@ CONTRIBUTORS:
 #include <string.h>
 #include <errno.h>
 
+#include <unistd.h>
+extern char *optarg;
+extern int optind, opterr, optopt;
+
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #include "bogoreader.h"

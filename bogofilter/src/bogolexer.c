@@ -16,6 +16,9 @@ AUTHOR:
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+extern char *optarg;
+extern int optind, opterr, optopt;
 
 #include "bogoconfig.h"
 #include "bogoreader.h"

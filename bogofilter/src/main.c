@@ -18,6 +18,9 @@ CONTRIBUTORS:
 
 #include <stdlib.h>
 #include <syslog.h>
+#include <unistd.h>
+extern char *optarg;
+extern int optind, opterr, optopt;
 
 #include "bogoconfig.h"
 #include "bogofilter.h"

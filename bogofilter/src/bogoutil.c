@@ -17,6 +17,9 @@ AUTHOR:
 #include <ctype.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include <unistd.h>
+extern char *optarg;
+extern int optind, opterr, optopt;
 
 #include "bogofilter.h"
 #include "bogohist.h"
