@@ -19,7 +19,8 @@ sysconf_DATA = bogofilter.cf.example
 # what to build that from
 
 # what to distribute
-EXTRA_DIST = bogofilter.cf.example \
+EXTRA_DIST = autogen.sh \
+	     bogofilter.cf.example \
 	     CHANGES-0.10 \
 	     UPGRADE \
 	     README.cvs \
