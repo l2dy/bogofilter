@@ -257,7 +257,7 @@ bool configure_wordlist(const char *val)
     *tmp++ = '\0';
     while (isspace((unsigned char)*tmp)) tmp += 1;
 
-    path=tmp;
+    path=tildeexpand(tmp);
     tmp += strcspn(tmp, ", \t");
     *tmp++ = '\0';
     while (isspace((unsigned char)*tmp)) tmp += 1;
@@ -293,6 +293,8 @@ bool configure_wordlist(const char *val)
 
     rc = init_wordlist(&list, name, path, weight, bad, override, ignore);
     ok = rc == 0;
+
+    free(path);
 
     return ok;
 }

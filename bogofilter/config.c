@@ -241,7 +241,7 @@ static bool process_config_parameter(const parm_desc *arg, const unsigned char *
 	    {
 		char *dir = *arg->addr.s;
 		xfree(dir);
-		*arg->addr.s = dir = xstrdup((const char *)val);
+		*arg->addr.s = dir = tildeexpand((const char *)val);
 		if (DEBUG_CONFIG(0))
 		    fprintf(dbgout, "%s -> '%s'\n", arg->name, dir);
 		if (setup_wordlists(dir) != 0)
