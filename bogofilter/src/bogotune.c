@@ -448,8 +448,6 @@ static uint get_thresh(uint count, double *scores)
     while (cutoff >= SPAM_CUTOFF && ++ftarget < count)
 	cutoff = scores[ftarget-1];
 
-    spam_cutoff = scores[ftarget+1] + 0.0005;
-
     return ftarget;
 }
 
@@ -1098,6 +1096,7 @@ static rc_t bogotune(void)
     min_dev = 0.02;
 
     target = get_thresh(ns_cnt, ns_scores);
+    spam_cutoff = ns_scores[target-1];
     printf("False-positive target is %d (cutoff %8.6f)\n", target, spam_cutoff);
 
     /*
