@@ -15,7 +15,7 @@ set -e
 
 : ${srcdir=.}
 relpath="`pwd`/../.."
-. ${srcdir}/../t.frame -no-db
+NODB=1 . ${srcdir}/../t.frame
 
 verbose=0
 if [ "$1" = "-v" ]; then

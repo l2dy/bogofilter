@@ -39,7 +39,7 @@ fi
 BOGOFILTER_DIR=$TMPDIR
 export BOGOFILTER_DIR
 
-if [ "$1" != "-no-db" ]; then
+if [ -z "$NODB" ]; then
     ${relpath}/bogofilter -n -C </dev/null
 fi
 

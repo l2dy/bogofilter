@@ -14,7 +14,7 @@ set -e
 
 : ${srcdir=.}
 relpath="`pwd`/../.."
-. ${srcdir}/../t.frame -no-db
+NODB=1 . ${srcdir}/../t.frame
 
 : ${AWK=awk}
 
