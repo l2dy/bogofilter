@@ -2,8 +2,18 @@
 
 				bogofilter news
 
-0.7.7	2002-10-30
+0.8.0	2002-11-06
 
+	* The lexer code now detects read errors (and exits with code 2
+	  if it finds one.)
+	* Fixed passthrough mode in bogofilter: it no longer strips the
+	  spam-header from a mail body.
+	* Fixed portability to some systems, notably, Solaris and HP-UX,
+	  added README.* for some systems to describe build issues.
+	* Fixed "rpl_malloc" link failures.
+	* Fixed bogofilter 0.7.6 passthrough regression on some systems:
+	  The X-Bogofilter header would be added to the body and a bogus
+	  blank line would be added.
 	* Bogofilter now supports a configuration file named
           /etc/bogofilter.cf and/or ~/.bogofilter.cf.
 	* Bogofilter's use of '-v' for printing spamicity statistics

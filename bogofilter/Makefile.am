@@ -9,9 +9,7 @@ SUBDIRS = . tests
 bin_PROGRAMS = bogofilter bogoutil bogolexer
 bin_SCRIPTS = bogoupgrade
 check_PROGRAMS = debugtest configtest
-man1_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1
-
-CFLAGS ?= -g -Os -Wall
+man1_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
 
 # what to build that from
 MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h debug.h debug.c
@@ -43,7 +41,8 @@ EXTRA_DIST = $(man1_MANS) \
 	     bogofilter.spec bogofilter.spec.in \
 	     bogoupgrade bogo.R \
 	     doc/integrating-with-qmail contrib/bogofilter-qfe \
-	     version.sh
+	     contrib/unbase64 contrib/README.unbase64 \
+	     version.sh README.BUGS README.freebsd README.solaris
 #
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
 version.h:	version.sh $(VERSION_FROM)

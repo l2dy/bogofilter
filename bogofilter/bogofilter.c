@@ -629,9 +629,6 @@ rc_t bogofilter(int fd, double *xss)
     bogostat_t	*bogostats;
     int		wordcount, msgcount;
 
-//  tokenize input text and save words in a wordhash.
-    wordhash = collect_words(fd, &msgcount, &wordcount);
-
     good_list.active = spam_list.active = TRUE;
 
     db_lock_reader_list(word_lists);
@@ -640,6 +637,9 @@ rc_t bogofilter(int fd, double *xss)
     spam_list.msgcount = db_getcount(spam_list.dbh);
 
     initialize_constants();
+
+//  tokenize input text and save words in a wordhash.
+    wordhash = collect_words(fd, &msgcount, &wordcount);
 
     switch(algorithm) {
 	case AL_GRAHAM:

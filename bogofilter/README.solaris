@@ -1,0 +1,9 @@
+When using Sun's WorkShop compiler, the bogofilter compile will fail.
+Sun's WorkShop compiler does now allow for C++-style (//) comments in C
+code. There is a workaround: add -xCC to the environment variable
+CFLAGS, example:
+
+env CFLAGS="-O -xCC" CC="/opt/SUNWspro/bin/cc" ksh ./configure \
+  --with-db=/usr/local/BerkeleyDB.3.2/
+
+Adjust the SUNWspro and BerkeleyDB paths if necessary.
