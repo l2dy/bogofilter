@@ -13,13 +13,39 @@
 #spam_header_name=X-Bogosity
 
 
+##### Robinson Constants
+#
+#	Specify floating point values for
+#	Robinson S and X coefficients
+
+# robs=0.01
+# robx=0.40
+
+##### spam_in_header
+#
+#	non-zero (default):  put spamicity info in message header
+#	zero:  put spamicity info in message body
+#	can use "bool" values of True, False, Yes, No, 1, or 0
+
+# spam_in_header=Y
+# spam_in_header=N
+
+##### threshold values
+#
+#	used to determine if/when spamicity 
+#	values are output by print_bogostats()
+
+# thresh_index = 12
+# thresh_stats = 0.2f
+# thresh_rtable=0.6f
+
 #### USER_CONFIG_FILE
 #
 #	name/location of user config file
 
-#user_config_file=~/.bogofilter.cf
-#user_config_file=~/.bogofilterrc
-#user_config_file=~/.bogofilter/config
+#user_config_file=.bogofilter.cf
+#user_config_file=.bogofilterrc
+#user_config_file=.bogofilter/config
 
 
 #### wordlist: define a word list
@@ -30,15 +56,6 @@
 #	double weight - probability BIAS for list
 #	int override - skip lower valued lists
 
-#wordlist i,ignore,~/.ignorelist.db,1,0,0
+#wordlist i,ignore,.ignorelist.db,1,0,0
 
-
-##### threshold values
-#
-#	used to determine if/when spamicity 
-#	values are output by print_bogostats()
-
-# thresh_index = 12
-# thresh_stats = 0.2f
-# thresh_rtable=0.6f
 
