@@ -73,5 +73,5 @@ if  [ $verbose -eq 0 ]; then
     cmp ${OUTPUTS}/$OUT ${TMPDIR}/$OUT
 else
     [ `uname -s` = "Linux" ] && OPTS="-u -s --brief"
-    diff $OPTS ${OUTPUTS}/$OUT ${TMPDIR}/tests/$OUT
+    diff $OPTS ${OUTPUTS}/$OUT ${TMPDIR}/$OUT
 fi
