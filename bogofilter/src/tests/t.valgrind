@@ -39,10 +39,11 @@ run_test()
     id="$1"
     fil="$2"
     ver="$3"
-    OUT="${TMPDIR}/tests/msg.$fil.$mth.$ver"
+    IN="${SYSTEST}/inputs/msg.$id.txt"
+    OT="${TMPDIR}/msg.$fil.$mth"
+    if [ -n "$ver" ] ; then OT="$OT.$ver" ; fi
     OPTS="-e -t $ver $CFG"
-    eval $VALGRIND $BOGOFILTER $OPTS <${SYSTEST}/inputs/msg.$id.txt \
-    >${TMPDIR}/tests-$alg
+    eval $VALGRIND $BOGOFILTER $OPTS < $IN > $OT
     if test -s $TMPDIR/vg.out ; then cat $TMPDIR/vg.out ; exit 2 ; fi
 }
 
