@@ -5,7 +5,7 @@
 NAME:
    bogoconfig.c -- process config file parameters
 
-   2003-02-12 - split out from config.c	
+   2003-02-12 - split out from config.c
 
 AUTHOR:
    David Relson <relson@osagesoftware.com>
@@ -110,7 +110,7 @@ struct option long_options[] = {
     { "register-ham",			N, 0, 'n' },
     { "passthrough",			N, 0, 'p' },
     { "register-spam",			N, 0, 's' },
-    { "update-as-classified",		N, 0, 'u' },
+    { "update-as-scored",		N, 0, 'u' },
     { "timestamp-date",			N, 0, 'y' },
     { "config-file",			R, 0, 'c' },
     { "no-config-file",			N, 0, 'C' },
@@ -279,7 +279,7 @@ static const char *help_text[] = {
     "classification options:\n",
     "  -p, --passthrough         - passthrough.\n",
     "  -e, --ham-true            - in -p mode, exit with code 0 when the mail is not spam.\n",
-    "  -u, --update-as-classified- classify message as spam or non-spam and register accordingly.\n",
+    "  -u, --update-as-scored    - score message as spam or non-spam and register accordingly.\n",
     "  -M, --clasify-mbox        - set mailbox mode.  Classify multiple messages in an mbox formatted file.\n",
     "  -b, --clasify-stdin       - set streaming bulk mode. Process multiple messages (files or directories) read from STDIN.\n",
     "  -B, --classify-files=list - set bulk mode. Process multiple messages (files or directories) named on the command line.\n",
@@ -674,7 +674,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case 'V':
 	print_version();
 	exit(EX_OK);
-	
+
     case O_BLOCK_ON_SUBNETS:		block_on_subnets = get_bool(name, val);			break;
     case O_CHARSET_DEFAULT:		charset_default = get_string(name, val);		break;
     case O_HEADER_FORMAT:		header_format = get_string(name, val);			break;
@@ -686,7 +686,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case O_SPAM_HEADER_NAME:		spam_header_name = get_string(name, val);		break;
     case O_SPAM_SUBJECT_TAG:		spam_subject_tag = get_string(name, val);		break;
     case O_STATS_IN_HEADER:		stats_in_header = get_bool(name, val);			break;
-    case O_TERSE:			terse = get_bool(name, val);				break;	
+    case O_TERSE:			terse = get_bool(name, val);				break;
     case O_TERSE_FORMAT:		terse_format = get_string(name, val);			break;
     case O_THRESH_UPDATE:		get_double(name, val, &thresh_update);			break;
     case O_TIMESTAMP:			timestamp_tokens = get_bool(name, val);			break;
@@ -698,7 +698,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 #define	Q1	if (query >= 1)
 #define	Q2	if (query >= 2)
 
-#define YN(b) (b ? "yes" : "no")
+#define YN(b) (b ? "Yes" : "No")
 #define NB(b) (b ? b : "")
 
 void query_config(void)
@@ -716,10 +716,12 @@ void query_config(void)
     Q1 fprintf(stdout, "%-17s = %s\n",    "block_on_subnets",    YN(block_on_subnets));
     Q1 fprintf(stdout, "%-17s = %s\n",    "charset_default",     charset_default);
     Q1 fprintf(stdout, "%-17s = %s\n",    "replace_nonascii_characters", YN(replace_nonascii_characters));
+    Q2 fprintf(stdout, "%-17s = %s\n",    "no-header-tags",      YN(header_line_markup));
     Q1 fprintf(stdout, "%-17s = %s\n",    "stats_in_header",     YN(stats_in_header));
+    Q2 fprintf(stdout, "%-17s = %s\n",    "report-unsure",       YN(unsure_stats));
     Q1 fprintf(stdout, "%-17s = %0.6f\n", "thresh_update",       thresh_update);
     Q1 fprintf(stdout, "%-17s = %s\n",    "timestamp",           YN(timestamp_tokens));
-    Q2 fprintf(stdout, "%-17s = %d\n", 	  "timestamp-date", 	 today);
+    Q2 fprintf(stdout, "%-17s = %d\n",    "timestamp-date",      today);
     Q1 fprintf(stdout, "\n");
     Q1 fprintf(stdout, "%-17s = %s\n", "terse",               YN(terse));
     Q1 fprintf(stdout, "%-17s = %s\n", "spam_header_name",    spam_header_name);
@@ -734,45 +736,43 @@ void query_config(void)
 
     Q2 fprintf(stdout, "\n");
 
-    Q2 fprintf(stdout, "%-17s = %s\n", "no-config-file", YN(suppress_config_file));
-    Q2 fprintf(stdout, "%-17s = %s\n", "config-file", config_file_name);
-    Q2 fprintf(stdout, "%-17s = %s\n", "user_config_file", user_config_file);
+    Q2 fprintf(stdout, "%-18s = %s\n", "no-config-file",   YN(suppress_config_file));
+    Q2 fprintf(stdout, "%-18s = %s\n", "config-file",      config_file_name);
+    Q2 fprintf(stdout, "%-18s = %s\n", "user_config_file", user_config_file);
     Q2 fprintf(stdout, "\n");
 
-    Q2 fprintf(stdout, "%-17s = %s\n", "bogofilter_dir", bogohome);
+    Q2 fprintf(stdout, "%-18s = %s\n", "bogofilter_dir", bogohome);
     Q2 fprintf(stdout, "wordlist(s)\n"); display_wordlists();
     Q2 fprintf(stdout, "\n");
 
-    Q2 fprintf(stdout, "%-17s = %s\n", "classify-files", YN(bulk_mode == B_CMDLINE));
-    Q2 fprintf(stdout, "%-17s = %s\n", "classify-mbox", YN(mbox_mode));
-    Q2 fprintf(stdout, "%-17s = %s\n", "classify-stdin", YN(bulk_mode == B_STDIN));
+    Q2 fprintf(stdout, "%-18s = %s\n", "unregister-nonspam", YN(run_type == UNREG_GOOD));
+    Q2 fprintf(stdout, "%-18s = %s\n", "unregister-spam",    YN(run_type == UNREG_SPAM));
+    Q2 fprintf(stdout, "%-18s = %s\n", "register-ham",       YN(run_type == REG_GOOD));
+    Q2 fprintf(stdout, "%-18s = %s\n", "register-spam",      YN(run_type == REG_SPAM));
+    Q2 fprintf(stdout, "%-18s = %s\n", "update-as-scored",   YN(run_type & RUN_UPDATE));
     Q2 fprintf(stdout, "\n");
 
-    Q2 fprintf(stdout, "%-17s = %s\n", "unregister-nonspam", YN(run_type == UNREG_GOOD));
-    Q2 fprintf(stdout, "%-17s = %s\n", "unregister-spam", YN(run_type == UNREG_SPAM));
-    Q2 fprintf(stdout, "%-17s = %s\n", "register-ham", YN(run_type == REG_GOOD));
-    Q2 fprintf(stdout, "%-17s = %s\n", "register-spam", YN(run_type == REG_SPAM));
-    Q2 fprintf(stdout, "%-17s = %s\n", "update-as-classified", YN(run_type & RUN_UPDATE));
+    Q2 fprintf(stdout, "%-18s = %s\n", "classify-files",       YN(bulk_mode == B_CMDLINE));
+    Q2 fprintf(stdout, "%-18s = %s\n", "classify-mbox",        YN(mbox_mode));
+    Q2 fprintf(stdout, "%-18s = %s\n", "classify-stdin",       YN(bulk_mode == B_STDIN));
     Q2 fprintf(stdout, "\n");
 
-    Q2 fprintf(stdout, "%-17s = %s\n", "syslog-tag", logtag);
-    Q2 fprintf(stdout, "%-17s = %s\n", "use-syslog", YN(logflag));
+    Q2 fprintf(stdout, "%-18s = %s\n", "nonspam-exits-zero", YN(nonspam_exits_zero));
+    Q2 fprintf(stdout, "%-18s = %s\n", "passthrough",        YN(passthrough));
+    Q2 fprintf(stdout, "%-18s = %d\n", "verbosity",          verbose);
+    Q2 fprintf(stdout, "%-18s = %s\n", "fixed-terse-format", YN(inv_terse_mode));
+    Q2 fprintf(stdout, "%-18s = %s\n", "dataframe",          YN(Rtable));
     Q2 fprintf(stdout, "\n");
 
-    Q2 fprintf(stdout, "%-17s = %s\n", "dataframe", YN(Rtable));
-    Q2 fprintf(stdout, "%-17s = %s\n", "fixed-terse-format", YN(inv_terse_mode));
-    Q2 fprintf(stdout, "%-17s = %s\n", "report-unsure", YN(unsure_stats));
+    Q2 fprintf(stdout, "%-18s = %s\n", "syslog-tag", logtag);
+    Q2 fprintf(stdout, "%-18s = %s\n", "use-syslog", YN(logflag));
     Q2 fprintf(stdout, "\n");
 
-    Q2 fprintf(stdout, "%-17s = %d\n", "db_cachesize", db_cachesize);
-    Q2 fprintf(stdout, "%-17s = %s\n", "debug-to-stdout", YN(dbgout == stdout));
-    Q2 fprintf(stdout, "%-17s = %s\n", "no-header-tags", YN(header_line_markup));
-    Q2 fprintf(stdout, "%-17s = %s\n", "nonspam-exits-zero", YN(nonspam_exits_zero));
-    Q2 fprintf(stdout, "%-17s = %s\n", "passthrough", YN(passthrough));
-/*  Q2 fprintf(stdout, "%-17s = %s\n", "debug-flags", xxx); */
-/*  Q2 fprintf(stdout, "%-17s = %s\n", "input-file", xxx);	 */
-/*  Q2 fprintf(stdout, "%-17s = %s\n", "output-file", xxx); */
-    Q2 fprintf(stdout, "%-17s = %d\n", "verbosity", verbose);
+    Q2 fprintf(stdout, "%-18s = %d\n", "db_cachesize",    db_cachesize);
+    Q2 fprintf(stdout, "%-18s = %s\n", "debug-to-stdout", YN(dbgout == stdout));
+/*  Q2 fprintf(stdout, "%-18s = %s\n", "debug-flags", xxx); */
+/*  Q2 fprintf(stdout, "%-18s = %s\n", "input-file", xxx);  */
+/*  Q2 fprintf(stdout, "%-18s = %s\n", "output-file", xxx); */
 
     exit(EX_OK);
 }
