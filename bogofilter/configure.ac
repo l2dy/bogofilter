@@ -1,6 +1,6 @@
 # $Id$
 dnl vim: set noai tw=0:
-AC_INIT(bogofilter, 0.15.11)
+AC_INIT(bogofilter, 0.15.11.cvs)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR([src])
 AC_CANONICAL_TARGET
