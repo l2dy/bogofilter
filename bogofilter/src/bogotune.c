@@ -292,20 +292,18 @@ static void print_parms(const char *label, const char *format, data_t *data)
     printf(")\n"); fflush(stdout);
 }
 
-static void print_all_parms(void)
+static void print_all_parms(uint r_count)
 {
     if (verbose >= PARMS) {
 	print_parms("rsval", "%6.4f", rsval);
 	print_parms("rxval", "%5.3f", rxval);
 	print_parms("mdval", "%5.3f", mdval);
-	print_parms("spexp", "%8.2e", spexp);
-	print_parms("nsexp", "%8.2e", nsexp);
+	print_parms("spexp", "%5.2f", spexp);
+	print_parms("nsexp", "%5.2f", nsexp);
     }
-    else if (verbose >= TIME)
+    if (verbose >= TIME)
 	printf("cnt: %u (rs: %u, rx: %u, md: %u spex: %u, nsex: %u)\n",
-	       rsval->cnt * rxval->cnt * mdval->cnt * spexp->cnt *
-	       nsexp->cnt, rsval->cnt, rxval->cnt, mdval->cnt,
-	       spexp->cnt, nsexp->cnt);
+	       r_count, rsval->cnt, rxval->cnt, mdval->cnt, spexp->cnt, nsexp->cnt);
 }
 
 static int compare_ascending(const void *const ir1, const void *const ir2)
@@ -1515,11 +1513,10 @@ static rc_t bogotune(void)
 	    break;
 	}
 
-	print_all_parms();
-
-	r_count = rsval->cnt * mdval->cnt * rxval->cnt * spexp->cnt
-	    * nsexp->cnt;
+	r_count = rsval->cnt * mdval->cnt * rxval->cnt * spexp->cnt * nsexp->cnt;
 	results = (result_t *) xcalloc(r_count, sizeof(result_t));
+
+	print_all_parms(r_count);
 
 	if (verbose >= SUMMARY) {
 	    if (verbose >= SUMMARY+1)
