@@ -71,7 +71,7 @@ foreach my $arg (@ARGV) {
     elsif($state == 0 ) { $bogodir = $arg; $state = 1; }
     elsif($state == 2 ) { push @spfiles, $arg; }
     elsif($state == 3 ) { push @nsfiles, $arg; }
-    elsif($state == 4 ) { $cf = "-c " . $arg; }
+    elsif($state == 4 ) { $cf = "-c " . $arg; $state = 0; }
 }
 
 print "Using apclass.\n" unless $usebogofilter or ! $verbose;
@@ -138,11 +138,11 @@ my $msgformat = "mbox";
 if(-d $spfiles[0]) {
     $msgformat = "MH"; $scount = 0;
     foreach my $dir (@spfiles) {
-	$scount += `ls $dir/[0-9]* 2>/dev/null | wc -l`;
+	$scount += `find $dir -type f -name '[0-9]*' 2>/dev/null | wc -l`;
     }
     $ncount = 0;
     foreach my $dir (@nsfiles) {
-	$ncount += `ls $dir/[0-9]* 2>/dev/null | wc -l`;
+	$ncount += `find $dir -type f -name '[0-9]*' 2>/dev/null | wc -l`;
     }
 } else {
     my $cmd = join(" ", "cat", @spfiles, "| grep -c '^From ' |");
@@ -178,28 +178,24 @@ if($msgformat ne "msgcount") {
     } else {
 	unlink($spwork);
 	foreach my $dir (@spfiles) {
-	    opendir(DH, $dir) or yuk(7, "Problem processing spam files");
-	    my @msgs = readdir(DH); closedir(DH);
-	    foreach my $msg(@msgs) {
-		if($msg =~ /^[0-9]/) {
-		    my $cmd = join(" ", "cat $dir/$msg | bogol", $bogodir,
+	    open FL, "find $dir -type f -name '[0-9]*'|" or yuk(7, "Problem processing spam files");
+	    foreach my $msg (<FL>) {
+		chomp($msg);
+		my $cmd = join(" ", "cat $msg | bogol", $bogodir,
 			$cf, ">>$spwork");
-		    system($cmd) == 0 or
+		system($cmd) == 0 or
 			yuk(7, "Problem writing spam msg-count file");
-		}
 	    }
 	}
 	unlink($nswork);
 	foreach my $dir (@nsfiles) {
-	    opendir(DH, $dir) or yuk(7, "Problem processing nonspam files");
-	    my @msgs = readdir(DH); closedir(DH);
-	    foreach my $msg (@msgs) {
-		if($msg =~ /^[0-9]/) {
-		    my $cmd = join(" ", "cat $dir/$msg | bogol", $bogodir,
+	    open FL, "find $dir -type f -name '[0-9]*'|" or yuk(7, "Problem processing nonspam files");
+	    foreach my $msg (<FL>) {
+		chomp($msg);
+		my $cmd = join(" ", "cat $msg | bogol", $bogodir,
 			$cf, ">>$nswork");
-		    system($cmd) == 0 or
+		system($cmd) == 0 or
 			yuk(7, "Problem writing nonspam msg-count file");
-		}
 	    }
 	}
     }

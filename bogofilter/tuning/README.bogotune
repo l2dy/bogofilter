@@ -1,4 +1,4 @@
-README for bogotune version 0.3
+README for bogotune version 0.3.1
 (How to tune bogofilter with minimum effort)
 
 This document describes a script called bogotune that will completely
@@ -32,12 +32,7 @@ Prerequisites:
 	two myriad) of each.
     3. You must be using bogofilter version 0.13.7.1 or later, with
 	the Robinson-Fisher algorithm.  Programs bogofilter, bogoutil
-	and bogolexer must all be in your execution path.  If it's
-	version 0.13.6.3 you're using, you need to apply the patch
-	supplied with bogotune; cd to the base of the bogofilter
-	source tree, copy 0.13.6.3.patch into that directory; then
-	run the command "patch -p0 <0.13.6.3.patch" and then the
-	command "make install".
+	and bogolexer must all be in your execution path.
     4. You must have perl on your system.  If /usr/bin/perl is not
 	the path to a valid perl executable, change the first line of
 	bogotune accordingly.
