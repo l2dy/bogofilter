@@ -21,6 +21,11 @@ Briefly:
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	2005-02-10
+
+	* Fixed problem causing SIGSEGV when using options "-p" and
+          "-s" with multiple wordlists.
+
 	2005-02-06
 
 	* Code to enable/disable Berkeley DB transactions now uses an

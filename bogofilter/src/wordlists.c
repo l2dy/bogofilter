@@ -161,14 +161,10 @@ void open_wordlists(wordlist_t *list, dbmode_t mode)
     LIST_INIT(&envs);
 
     while (retry) {
-	if (run_type & (REG_SPAM | REG_GOOD | UNREG_SPAM | UNREG_GOOD))
-	    retry = open_wordlist(get_default_wordlist(list), mode);
-	else {
-	    wordlist_t *i;
-	    retry = false;
-	    for (i = list; i ; i = i->next) {
-		retry |= open_wordlist(i, i->type == WL_IGNORE ? DS_READ : mode);
-	    }  /* for */
+	wordlist_t *l;
+	retry = false;
+	for (l = list; l ; l = l->next) {
+	    retry |= open_wordlist(l, l->type == WL_IGNORE ? DS_READ : mode);
 	}
     }
 }
