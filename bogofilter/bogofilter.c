@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.27  2002/10/04 00:39:57  m-a
+ * First set of type fixes.
+ *
  * Revision 1.26  2002/10/03 17:57:06  relson
  * Changed interface to lexer.l as a first step towards adding the advanced
  * tokenizing features of spambayes into bogofilter.
@@ -174,7 +177,7 @@ void *collect_words(int fd, int *msg_count, int *word_count)
 {
   int tok = 0;
   int w_count = 0;
-  int m_count = 0;
+  int mm_count = 0;
  
   wordprop_t *w;
   hashnode_t *n;
@@ -190,8 +193,8 @@ void *collect_words(int fd, int *msg_count, int *word_count)
     }
     else {
       // End of message. Update message counts.
-      if (tok == FROM || (tok == 0 && m_count == 0))
-        m_count++;
+      if (tok == FROM || (tok == 0 && mm_count == 0))
+        mm_count++;
   
       // Incremenent word frequencies, capping each message's contribution at MAX_REPEATS
       // in order to be able to cap frequencies.
@@ -214,7 +217,7 @@ void *collect_words(int fd, int *msg_count, int *word_count)
     *word_count = w_count;
  
   if (msg_count)
-    *msg_count = m_count;
+    *msg_count = mm_count;
  
   return(h);
 }
@@ -299,7 +302,7 @@ void register_words(int fdin, reg_t register_type)
     db_setcount(lists[i]->dbh, lists[i]->msgcount);
     db_flush(lists[i]->dbh);
     if (verbose)
-      fprintf(stderr, "bogofilter: %lu messages on the %s list\n", lists[i]->msgcount, lists[i]->name);
+      fprintf(stderr, "bogofilter: %ld messages on the %s list\n", lists[i]->msgcount, lists[i]->name);
   }
 
   db_lock_release_list(dbh, nlists);
@@ -319,7 +322,7 @@ typedef struct
 }
 bogostat_t;
 
-#define SIZEOF(array)	sizeof(array)/sizeof(array[0])
+#define SIZEOF(array)	((size_t)(sizeof(array)/sizeof(array[0])))
 
 int compare_stats(const void *id1, const void *id2)
 { 
@@ -333,7 +336,7 @@ void populate_stats( bogostat_t *stats, char *text, double prob, int count )
 // if  the new word,prob pair is a better indicator.
 // add them to the stats structure, 
 {
-    int idx;
+    size_t idx;
     double dev;
     double slotdev, hitdev;
     discrim_t *pp, *hit;
@@ -371,11 +374,11 @@ void populate_stats( bogostat_t *stats, char *text, double prob, int count )
 
 void print_stats( bogostat_t *stats )
 {
-    int idx;
+    size_t idx;
     for (idx = 0; idx < SIZEOF(stats->extrema); idx++)
     {
 	discrim_t *pp = &stats->extrema[idx];
-	printf("#  %2d  %f  %s\n", idx, pp->prob, pp->key);
+	printf("#  %2ld  %f  %s\n", (long)idx, pp->prob, pp->key);
     }
 }
 
@@ -407,7 +410,7 @@ double compute_probability( char *token )
 {
     wordlist_t* list;
     int override=0;
-    int count;
+    long count;
     int totalcount=0;
     wordprob_t stats;
     double prob;
@@ -424,10 +427,10 @@ double compute_probability( char *token )
 	    if (list->ignore)
 		return EVEN_ODDS;
 	    if (verbose >= 3)
-		printf("word '%s' found on list %s with count %d.\n", token, list->name, count);
+		printf("word '%s' found on list %s with count %ld.\n", token, list->name, count);
 	    totalcount+=count*list->weight;
 	    override=list->override;
-	    prob = count;
+	    prob = (double)count;
 	    prob /= list->msgcount;
 	    prob *= list->weight;
 	    if (verbose >= 4)
