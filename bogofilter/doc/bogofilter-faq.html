@@ -98,10 +98,10 @@
         Technical problems
 
         <ul>
-          <li><a href="#build">How do I build bogofilter (as non-root
-	  user)?  or for a non-standard installation prefix?</a></li>
+          <li><a href="#build">How do I build bogofilter as non-root
+	  user or for a non-standard installation prefix?</a></li>
           <li><a href="#patch">How do I build bogofilter with patches?</a></li>
-          <li><a href="#smaller">How do I make the executables smaller</a></li>
+          <li><a href="#smaller">How do I make the executables smaller?</a></li>
           <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
           <li><a href="#return-codes">Why does bogofilter give return codes like 0 and
           256 when it's run from inside a program?</a></li>
@@ -221,7 +221,8 @@
 
     <p>There are currently four mailing lists for bogofilter:</p>
 
-    <table border="1" width="100%">
+    <table border="1" width="100%" summary="[You need a table-capable
+	browser to read this overview of mailing lists]">
       <tr>
         <th>List Address</th>
         <th>Links</th>
@@ -517,7 +518,7 @@
 
     <p>For unsupported formats, you will have to convert the mailbox to
     a format bogofilter understands. Mbox is often convenient because it can
-    be piped into bogofilter.<p>
+    be piped into bogofilter.</p>
 
     <p>The following list may be able help you:</p>
     <dl>
@@ -704,7 +705,7 @@
 
     <hr>
 
-    <h2 id="query-database">How do I manually query the database</h2>
+    <h2 id="query-database">How do I manually query the database?</h2>
 
     <p>To find the spam and ham counts for a token (word) use
     bogoutil's '-w' option. For example, "bogoutil -w
@@ -863,7 +864,7 @@
 
     <p>First, a text file can be created and maintained using any text
     editor.  Bogoutil can convert the text file to database format,
-    e.g. "bogoutil -l ignorelist.db < ignorelist.txt".</p>
+    e.g. "bogoutil -l ignorelist.db &lt; ignorelist.txt".</p>
 
     <p>Alternatively, <code>echo ... | bogoutil ...</code> can be used
     to add a single token, for example "ignore.me", as in:</p>
@@ -872,7 +873,7 @@
 
     <hr>
 
-    <h2 id="build">How do I build bogofilter (as non-root user) or for
+    <h2 id="build">How do I build bogofilter as non-root user or for
     a non-standard installation prefix?</h2>
 
     <p>To install bogofilter to a non-standard path (as non-root user
@@ -902,7 +903,7 @@
 
     <hr>
 
-    <h2 id="smaller">How do I make the executables smaller</h2>
+    <h2 id="smaller">How do I make the executables smaller?</h2>
 
     <p>You can use <code>make install-strip</code> when space is tight.
     Doing this will save space, but crashes can't be debugged unless
@@ -1021,17 +1022,20 @@
 
     <p>You will either want to put a symlink to libdb.so in
     /usr/lib, or use a modified LD_LIBRARY_PATH environment
-    variable before you start bogofilter.</p>
-    <pre>	$ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.2</pre>
+    variable before you start bogofilter. On newer systems, the most
+    convenient way is probably to use the crle(1) tool to set the path
+    permanently so BerkeleyDB is available to all applications.</p>
+    <pre>	$ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.2
+	$ export LD_LIBRARY_PATH</pre>
 
-    <p>Note that some make versions shipped with Solaris break when
+    <p>Note that some "make" versions shipped with Solaris break when
     you try to build bogofilter outside of its source directory.
     Either build in the source directory (as suggested above) or
     use GNU make (gmake).</p>
 
     <h3>On FreeBSD</h3>
 
-    <p>The FreeBSD ports and packages carry very recent versions of
+    <p>The FreeBSD ports and packages carry the latest stable versions of
     bogofilter. This approach uses the highly recommended
     portupgrade and cvsup software packages. To install these two
     fine pieces, type (you need to do this only once):</p>
@@ -1042,9 +1046,11 @@
     then type:</p>
     <pre>	# portupgrade -N bogofilter</pre>
 
-    <p><em>Note: This assumes you are root.</em> If not,
-    <a href="#build">build</a> as usual for yourself.
-    Depending on your system you may have to set some environment
+    <p><em>Note: This assumes you are root.</em> If not, read through
+    the remainder of this FreeBSD section and then see how you can
+    <a href="#build">build</a> if you haven't got root privileges.</p>
+
+    <p>Depending on your system you may have to set some environment
     variables for the <code>./configure</code> command. Example:</p>
 
     <pre>	# env CPPFLAGS=-I/usr/local/include/db3 LIBS=-ldb3 LDFLAGS=-L/usr/local/lib ./configure</pre>
@@ -1072,7 +1078,8 @@
     your non-GNU make command can successfully build bogofilter,
     that's great.  If you encounter problems, the right thing to do is
     install GNU make.  If your non-GNU make can't build bogofilter,
-    we're sorry but you're on your own.</p>
+    we're sorry but you're on your own. If it takes just a minor and clean
+    patch to make it compatible, we might take it.</p>
 
     <hr>
 
