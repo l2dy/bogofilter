@@ -1,0 +1,494 @@
+#! /usr/bin/perl
+# bogotune - a bogofilter tuning tool
+# 20030619, version 0.2.1
+# Copyright (c) 2003 Gregory Louis; distributed wiithout warranty of
+# any kind under the GNU General Public License (GPL).
+
+### 0.  Initialize and process arguments
+use POSIX;
+# edit this line to change bogotune's working directory
+$workdir = "/proj/Rwork"; chdir($workdir) or die "Can't access $workdir";
+
+# choose apclass (0) or bogofilter (1) for scanning; apclass is twice
+# as fast, if you have it, but it's not yet freely available.
+$usebogofilter = 1;
+
+# provide full paths to bogofilter and bogoutil; this is normally
+# not needed, but handy for testing.
+# $bogop = "";
+$bogop = "/store/src/bogo/bogofilter-0.13.6.3/src/";
+$bogof = $bogop . "bogofilter"; $bogou = $bogop . "bogoutil";
+
+# besides being human-readable, this help text is formatted for automatic
+# man-page generation by the txt2man utility (http://mvertes.free.fr);
+# don't change the format unless you know what you're doing!
+if(scalar @ARGV == 0 || $ARGV[0] eq "-h") {
+    print("NAME\n",
+	"  bogotune - find optimum parameter settings for bogofilter\n",
+	"SYNOPSIS\n",
+	"  bogotune [bogodir] [-v] -s spamfile [spamfile...]",
+	" -n okfile [okfile...]\n",
+	"  bogotune -h\n",
+	"DESCRIPTION\n",
+	"  bogotune determines optimum parameter settings for bogofilter\n",
+	"  using the production training database and one or more files of\n",
+	"  spam messages, plus one or more files of nonspam. The training\n",
+	"  database must have been built from at least 2,000 spam and 2,000\n",
+	"  nonspam messages, and the ratio of spam to nonspam must be in\n",
+	"  the range 0.2 to 5. There must be at least 500 spam messages\n",
+	"  and 500 nonspam in the message files. Message files must all\n",
+	"  be in either mbox or message-count format; don't mix files of\n",
+	"  both types.\n",
+	"COMMAND LINE PARAMETERS\n",
+	"  bogodir   The directory where the training database is stored.\n",
+	"	     bogodir defaults to \$BOGOFILTER_DIR, if defined, or\n",
+	"	     otherwise to ~/.bogofilter\n",
+	"  -v	List scan output in detail instead of using a progress\n",
+	"	     meter.\n",
+	"  -s	Following parameters are absolute paths to message\n",
+	"	     files containing spam.\n",
+	"  -n	Following parameters are absolute paths to nonspam\n",
+	"	     files.\n",
+	"  -h	Display help.\n",
+	"  -C   Tell bogofilter not to use any configuration file.\n",
+	"  -c   Following parameter is the absolute path to a\n",
+	"            configuration file that bogofilter should use.\n",
+	"BUGS\n",
+	"  bogotune is not particularly robust when presented with\n",
+	"  garbage input.\n",
+	"SEE ALSO\n",
+	"  bogofilter(1), bogolexer(1), bogoutil(1), apclass(1),\n",
+	"  bogol(1), README.bogotune.\n\n");
+    exit(0);
+}
+
+$state = $verbose = 0; $cf = "";
+foreach $arg (@ARGV) {
+       if($arg eq "-s") { $state = 2; }
+    elsif($arg eq "-n") { $state = 3; }
+    elsif($arg eq "-C") { $cf = "-C"; }
+    elsif($arg eq "-c") { $state = 4; }
+    elsif($arg eq "-v") { $verbose = 1; }
+    elsif($state == 0 ) { $bogodir = $arg; $state = 1; }
+    elsif($state == 2 ) { push @spfiles, $arg; }
+    elsif($state == 3 ) { push @nsfiles, $arg; }
+    elsif($state == 4 ) { $cf = "-c " . $arg; }
+}
+
+$workfn = "R" . $$;
+
+### 1.  Validate bogofilter database
+# Check that $bogodir contains a valid training database,
+# consisting of not fewer than 2000 each of spam and nonspam,
+# and a ratio of spam to nonspam that lies in [0.2,5].
+
+sub yuk {
+    my $retcode = shift @_;
+    my $str=join " ", @_; print $str, "\n\n";
+    unlink $workfn; exit($retcode);
+}
+
+if(!$bogodir) {
+    $bogodir = $ENV{"BOGOFILTER_DIR"};
+    if($bogodir eq "") {
+	$bogodir = $ENV{"HOME"} . "/.bogofilter";
+    }
+}
+$dbname = $bogodir . "/wordlist.db";
+$twolist = 0;
+if(! -r $dbname) {
+    $dbname = $bogodir . "/goodlist.db";
+    $twolist = 1;
+}
+print("Verifying training db ", $dbname, "...\n");
+open(COUNTS,"$bogou -w" . $bogodir . " .MSG_COUNT |") or
+    yuk(255, "Couldn't run bogoutil");
+while(<COUNTS>) { $counts = $_; }
+chop $counts; close COUNTS;
+$err = 0;
+if(!$counts) { $err = 1; }
+else {
+    ($junk, $scount, $ncount) = split /\s+/, $counts;
+    if($scount < 2000 || $ncount < 2000) { $err = 2; }
+    else {
+	$scalefactor = $scount / $ncount;
+	if($scalefactor < 0.2 || $scalefactor > 5) { $err = 3; }
+    }
+}
+if($err > 0) {
+    @errstr = ("No wordlist found",
+	"At least 2000 spam and 2000 nonspam required in training db",
+	"Wordlist is out of balance");
+    yuk($err, $errstr[$err-1]);
+}
+system("db_verify", $dbname) == 0 or yuk(6, "Verification failed!");
+if($twolist) {
+    print("Verifying training db ", $bogodir, "/spamlist.db...\n");
+    system("db_verify", $bogodir . "/spamlist.db") == 0 or
+	yuk(6, "Verification failed!");
+}
+
+### 2.  Validate test inputs; create msg-count files if need be
+# Check that at least 500 each of spam and nonspam are available for
+# testing, in either mbox or msg-count format.
+
+print("Verifying test files...\n");
+$msgcountfiles = 0;
+$cmd = join(" ", "cat", @spfiles, "| grep -c '^From ' |");
+open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
+$scount = <COUNTS>; chop $scount; close COUNTS;
+$cmd = join(" ", "cat", @nsfiles, "| grep -c '^From ' |");
+open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
+$ncount = <COUNTS>; chop $ncount; close COUNTS;
+if($scount < 500 || $ncount < 500) {
+    $msgcountfiles = 1;
+    $cmd = join(" ", "cat", @spfiles, "| grep -c '^.\.MSG_COUNT' |");
+    open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
+    $scount = <COUNTS>; chop $scount; close COUNTS;
+    $cmd = join(" ", "cat", @nsfiles, "| grep -c '^.\.MSG_COUNT' |");
+    open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
+    $ncount = <COUNTS>; chop $ncount; close COUNTS;
+    if($scount < 500 || $ncount < 500) { yuk(4,
+	"At least 500 spam and 500 nonspam required for testing\n",
+	$scount, " and ", $ncount, " were found."); }
+}
+print("Verification completed successfully.\n");
+if(! $msgcountfiles) {
+    print("Test files are in mbox format, creating message-count files...\n");
+    $spwork = $workfn . ".sp"; $nswork = $workfn . ".ns";
+    $cmd = join(" ", "cat", @spfiles, "| formail -s bogol", $bogodir,
+	">", $spwork);
+    system($cmd) == 0 or yuk(7, "Problem processing spam files");
+    $cmd = join(" ", "cat", @nsfiles, "| formail -s bogol", $bogodir,
+	">", $nswork);
+    system($cmd) == 0 or yuk(7, "Problem processing nonspam files");
+    @spfiles = $spwork; @nsfiles = $nswork;
+    print("Message-count files ", $workfn, ".{sp,ns} created in ",
+	$workdir, ".\n");
+}
+
+### 3.  Calculate cache size
+# Calculate the cache size that should be used.
+
+$cmd = "ls -l " . $dbname . " |";
+open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
+$counts = <COUNTS>; chop $counts; close COUNTS;
+($junk1, $junk2, $junk3, $junk4, $dbsize, $junk6) = split(/\s+/, $counts);
+if($twolist) {
+    $cmd = "ls -l " . $bogodir . "/spamlist.db |";
+    open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
+    $counts = <COUNTS>; chop $counts; close COUNTS;
+    ($junk1, $junk2, $junk3, $junk4, $dbsize, $junk6) = split(/\s+/, $counts);
+    if($dbs2 > $dbsize) { $dbsize = $dbs2; }
+}
+$cachesize = POSIX::ceil($dbsize / (1024*1024*3));
+print("Recommended cache size is ", $cachesize, " Mbytes.\n");
+
+### 4.  Calculate fp target
+# The fp target will be derived thus: score nonspams with s and md as
+# shipped, and determine the count that will result from a spam cutoff
+# of 0.95; if that is < 3, try 0.85 etc.
+
+print("Calculating false-positive target...\n");
+
+if($usebogofilter) {
+    $cmd = join(" ", "cat", @nsfiles, "| $bogof $cf -d", $bogodir, "-Mttv >",
+	$workfn);
+} else {
+    $cmd = join(" ", "cat", @nsfiles, "| apclass -fq >", $workfn);
+}
+$err = system($cmd) >> 8;
+if($err > 2) { print("Warning re processing nonspam messages: ", $err, "\n"); }
+open(SCORES, $workfn) or yuk(8, "Couldn't open nonspam scores");
+$target = 0; $thresh = 0.95;
+while(<SCORES>) {
+    chop; ($V1, $V2) = split(/\s+/);
+    if($V2 == "") { $V2 = $V1; } elsif($V1 == 1) { $V2 = 1 - $V2; }
+    push @nsscores, $V2;
+    if($V2 > $thresh) { ++$target; }
+}
+close SCORES;
+while($target < 3) {
+    $thresh -= 0.1;
+    if ($thresh < 0.5) {
+	print("Very few high-scoring nonspams in this data set.\n",
+	    "Retain the current settings:\n");
+	open(SCORES, "$bogof $cf -d $bogodir -Q |"); $n = 0;
+	while(<SCORES>) {
+	    ++$n;
+	    if($n > 3) { print($_); }
+	    last if($n >= 8);
+	}
+	close SCORES;
+	yuk(0, "Tuning aborted.")
+    }
+    $target = 0;
+    foreach $n (@nsscores) {
+	if($n > $thresh) { ++$target; }
+    }
+}
+print("False-positive target is ", $target, "\n");
+
+### 5.  Calculate x
+# Calculate x with bogoutil's -r option (a new addition).
+# Bound the calculated value within [0.4, 0.6] and set the range to be
+# investigated to [x-0.1, x+0.1].
+
+print("Calculating initial x value...\n");
+open(SCORES, "$bogou -r " . $bogodir . " |") or
+    yuk(9, "Couldn't run bogoutil");
+$robx = <SCORES>; chop $robx; close SCORES;
+$robx = 0.6 if $robx > 0.6; $robx = 0.4 if $robx < 0.4;
+$x0 = $robx - 0.1; $x1 = $robx + 0.1;
+printf("Initial x value is %0.6f\n", $robx);
+
+### 6.  Coarsely scan s, md and x
+# The coarse s scan will range from 1 to 0.01 in half decades, and the
+# coarse md scan will range from 0.05 to 0.45 in steps of 0.05.  The
+# coarse x scan will use steps of 0.05. The peak must be surrounded on
+# six sides by values above the median (unless bounded on one or more
+# sides).
+
+sub progress {
+    my ($cur, $top) = @_;
+    my $i, $ndots; $ndots = POSIX::ceil(70 * $cur / $top);
+    if($ndots < 1) { $ndots = 1; }
+    print("\r["); for $i (0 .. $ndots-1) { print("."); }
+    for($i = $ndots; $i < 70; ++$i) { print(" "); }
+    print("]");
+}
+
+sub col5 { $$a[5] <=> $$b[5]; }
+
+sub gfn {
+    my ($si, $mi, $xi) = @_; my $pi;
+    $pi = $si * ($#mdval+1) * ($#rxval+1) + $mi * ($#rxval+1) + $xi;
+    return($unsorted[$pi][5]);
+}
+
+sub log10 { my $n = shift; return log($n) / log(10); }
+
+@rsval = (10 ** 0, 10 ** -0.5, 10 ** -1, 10 ** -1.5, 10 ** -2);
+@mdval = (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45);
+$n = ($x1 - $x0);
+@rxval = ($x0 + $n/2, $x0 + $n/4, $x0 + $n*0.75, $x0, $x1);
+foreach $scantype ("coarse", "fine") {
+    print("Performing ", $scantype, " scan:\n");
+    $ord = 0; $np = scalar @rsval * scalar @mdval * scalar @rxval;
+    @parms = ();
+    foreach $rsi (0 .. $#rsval) {
+	foreach $mdi (0 .. $#mdval) {
+	    foreach $rxi (0 .. $#rxval) {
+		$mpar = $mdval[$mdi] . "," . $rsval[$rsi] . "," . $rxval[$rxi];
+		### first get cutoff
+		if($usebogofilter) {
+		    $cmd = join(" ", "cat", @nsfiles, "|", $bogof, $cf, "-d",
+			$bogodir, "-Mttv -m", $mpar, "-o 0.01 >", $workfn);
+		} else {
+		    $cmd = join(" ", "cat", @nsfiles, "| apclass -fq -m",
+			$mpar, "-o 0.01 >", $workfn);
+		}
+		$err = system($cmd) >> 8;
+		if($err > 2) {
+		    print("Warning re processing nonspam messages: ",
+			$err, "\n");
+		}
+		open(SCORES, $workfn) or
+		    yuk(8, "Couldn't open nonspam scores");
+		@scores = ();
+		while(<SCORES>) {
+		    chop; ($V1, $V2) = split(/\s+/);
+		    if($V2 == "") { push @scores, 1-$V1; }
+		    elsif($V1 == 1) { push @scores, $V2; }
+		}
+		close SCORES;
+		@nsscores = sort { $a <=> $b } @scores;
+		$fp = $target;
+		if(scalar @nsscores >= $fp) {
+		    while($nsscores[$fp-1] < 0.000001) { ++$fp; }
+		    $cutoff = 1 - $nsscores[$fp-1];
+		} else { yuk(10,
+		    "Too few false positives to determine a valid cutoff");
+		}
+		### now get fn count
+		if($usebogofilter) {
+		    $cmd = join(" ", "cat", @spfiles, "|", $bogof, $cf, "-d",
+			$bogodir, "-Mttv -m", $mpar, "-o", $cutoff,
+			"| grep -c -v '^1' |");
+		} else {
+		    $cmd = join(" ", "cat", @spfiles, "| apclass -fq -m",
+			$mpar, "-o", $cutoff, "| grep -c -v '^1' |");
+		}
+		open(COUNTS, $cmd) or yuk(5, "$cmd pipe failed");
+		$fn = <COUNTS>; chop $fn; close COUNTS;
+		@parm = ($rsi, $mdi, $rxi, $cutoff, $fp, $fn);
+		push @parms, [ @parm ];
+		if($verbose) {
+		    printf("%0.4f %0.3f %0.3f %0.6f %0.0f %0.0f\n",
+                        $rsval[$rsi], $mdval[$mdi], $rxval[$rxi], $cutoff,
+                        $fp, $fn);
+		} else {
+		    progress($ord, $np);
+		}
+		++$ord;
+	    }
+	}
+    }
+    if(! $verbose) { print "\r"; }
+    # Scan complete, now find minima
+    @unsorted = ();
+    foreach $row (@parms) {
+	push @unsorted, [ @$row ] if $$row[4] == $target;
+    }
+    if(scalar @unsorted == 0) {
+	@unsorted = @parms;
+	print("Warning: fp target was not met, using original results\n");
+    }
+    @parms = sort col5 @unsorted;
+    if($verbose) {
+	print("Top ten parameter sets from this scan:\n");
+	foreach $i (0 .. 10) {
+	    ($rsi, $mdi, $rxi, $cutoff, $fp, $fn) = @{$parms[$i]};
+	    printf("%6.4f %5.3f %5.3f %5.3f %2.0f %3.0f\n",
+		$rsval[$rsi], $mdval[$mdi], $rxval[$rxi], $cutoff, $fp, $fn);
+	}
+    }
+    $med = $parms[int(scalar @parms / 2)][5];
+    if($verbose) { print("Median fn count was ", $med, "\n"); }
+    $n = 0;
+    foreach $i (0 .. $#parms) {
+	$rsi = $parms[$i][0]; $mdi = $parms[$i][1]; $rxi = $parms[$i][2];
+	if(    ($rsi == 0       || gfn($rsi-1, $mdi, $rxi) < $med)
+	    && ($rsi == $#rsval || gfn($rsi+1, $mdi, $rxi) < $med)
+	    && ($mdi == 0       || gfn($rsi, $mdi-1, $rxi) < $med)
+	    && ($mdi == $#mdval || gfn($rsi, $mdi+1, $rxi) < $med)
+	    && ($rxi == 0       || gfn($rsi, $mdi, $rxi-1) < $med)
+	    && ($rxi == $#rxval || gfn($rsi, $mdi, $rxi+1) < $med)) {
+	    $n = 1; last;
+	}
+    }
+    if($n == 0) {
+	$rsi = $parms[0][0]; $mdi = $parms[0][1]; $rxi = $parms[0][2];
+	print("No smooth minimum encountered, using lowest fn count",
+	    "                       \n");
+    }
+    $robs = $rsval[$rsi]; $md = $mdval[$mdi]; $robx = $rxval[$rxi];
+    printf("Minimum found at s %0.4f, md %0.3f, x %0.3f %s\n",
+	$robs, $md, $robx, "                           ");
+
+    ### 7.  Finely scan the peak region
+    # The fine s scan will range over the estimated s +/- half a decade in
+    # steps of a quarter decade, and the fine md scan will range over the
+    # estimated md +/- 0.075 in steps of 0.015.  The fine x scan will range
+    # over the estimated x +/- 0.04 in steps of 0.02.  Scans of s and md
+    # are bounded by the limits of the coarse scan.  Again, the peak must be
+    # surrounded on six sides by values above the median.  If no such peak
+    # exists, a warning is given.
+
+    if($scantype == "coarse") {
+	@rsval = @mdval = ();
+	$s0 = log10($robs) - 0.5; $s0 = -2 if $s0 < -2;
+	$s1 = log10($robs) + 0.5; $s1 = 0 if $s1 > 0;
+	for($i=$s1; $i>=$s0; $i-=0.25) { push @rsval, 10 ** $i; }
+	$s0 = $md - 0.075; $s0 = 0.02 if $s0 < 0.02;
+	$s1 = $md + 0.075; $s1 = 0.465 if $s1 > 0.465;
+	for($i=$s0; $i<=$s1; $i+=0.015) { push @mdval, $i; }
+	@rxval = ($robx, $robx-0.02, $robx+0.02, $robx-0.04, $robx+0.04);
+    }
+}
+
+### 8.  Suggest possible spam and nonspam cutoff values
+# With the final x, md and s values, score the spams and nonspams and
+# sort the nonspam scores decreasing and the spam scores increasing;
+# then, traverse the nonspam list until the 0.2% point; report cutoffs
+# that give 0.05%, 0.1% and 0.2% fp.
+
+print("Performing final scoring:\n        Nonspam...\n");
+$mpar = $md . "," . $robs . "," . $robx;
+if($usebogofilter) {
+    $cmd = join(" ", "cat", @nsfiles, "|", $bogof, $cf, "-d",
+	$bogodir, "-Mttv -m", $mpar, ">", $workfn);
+} else {
+    $cmd = join(" ", "cat", @nsfiles, "| apclass -fq -m",
+	$mpar, ">", $workfn);
+}
+$err = system($cmd) >> 8;
+if($err > 2) {
+    print("Warning re processing nonspam messages: ", $err, "\n");
+}
+open(SCORES, $workfn) or yuk(8, "Couldn't open nonspam scores");
+@scores = ();
+while(<SCORES>) {
+    chop; ($V1, $V2) = split(/\s+/);
+    if($V2 == "") { $V2 = $V1; }
+    elsif($V1 == 1) { $V2 = 1 - $V2; }
+    push @scores, $V2;
+}
+close SCORES;
+@nsscores = sort { $b <=> $a } @scores;
+print("           Spam...\n");
+if($usebogofilter) {
+    $cmd = join(" ", "cat", @spfiles, "|", $bogof, $cf, "-d",
+        $bogodir, "-Mttv -m", $mpar, ">", $workfn);
+} else {
+    $cmd = join(" ", "cat", @spfiles, "| apclass -fq -m",  
+        $mpar, ">", $workfn);
+}
+$err = system($cmd) >> 8;
+if($err > 2) {
+    print("Warning re processing spam messages: ", $err, "\n");
+}
+open(SCORES, $workfn) or yuk(8, "Couldn't open spam scores");
+@scores = ();
+while(<SCORES>) {
+    chop; ($V1, $V2) = split(/\s+/);
+    if($V2 == "") { $V2 = $V1; }
+    elsif($V1 == 1) { $V2 = 1 - $V2; }
+    push @scores, $V2;
+}
+close SCORES;
+@spscores = sort { $a <=> $b } @scores;
+print("Recommended cache: ", $cachesize, " Mbytes\n",
+      "                x: "); printf("%0.6f\n", $robx);
+print("   min. deviation: "); printf("%0.3f\n", $md);
+print("                s: "); printf("%0.4f\n", $robs);
+if($ncount > 2000) {
+    $cutoff = sprintf("%0.3f", $nsscores[POSIX::ceil($ncount * 0.0005)-1]);
+    if($cutoff < 0.999) {
+        $n = $#spscores;
+	for $i (0 .. $#spscores) { if($spscores[$i] > $cutoff) { $n=$i; last; }}
+	$fneg = sprintf("%0.2f", 100 * $n / $scount);
+	print("Spam cutoff for 0.05% false positives is ", $cutoff,
+	    "; expect ", $fneg, "% false neg.\n");
+    }
+}
+if($ncount > 1000) {
+    $cutoff = sprintf("%0.3f", $nsscores[POSIX::ceil($ncount * 0.001)-1]);
+    if($cutoff < 0.999) {
+	$n = $#spscores;
+	for $i (0 .. $#spscores) { if($spscores[$i] > $cutoff) { $n=$i; last; }}
+	$fneg = sprintf("%0.2f", 100 * $n / $scount);
+	print("Spam cutoff for 0.1% false positives is ", $cutoff,
+	    "; expect ", $fneg, "% false neg.\n");
+    }
+}
+$cutoff = sprintf("%0.3f", $nsscores[POSIX::ceil($ncount * 0.002)-1]);
+if($cutoff < 0.999) {
+    $n = $#spscores;
+    for $i (0 .. $#spscores) { if($spscores[$i] > $cutoff) { $n=$i; last; }}
+    $fneg = sprintf("%0.2f", 100 * $n / $scount);
+    print("Spam cutoff for 0.2% false positives is ", $cutoff,
+	"; expect ", $fneg, "% false neg.\n");
+} else {
+    for $i (0 .. $#nsscores) { if($nsscores[$i] <= 0.999) { $target=$i; last; }}
+    $cutoff = sprintf("%0.3f", $nsscores[$target]); $n = $#spscores;
+    for $i (0 .. $#spscores) { if($spscores[$i] > $cutoff) { $n=$i; last; }}
+    $fneg = sprintf("%0.2f", 100 * $n / $scount);
+    $fp = sprintf("%0.2f", 100 * $target / $ncount);
+    print("Spam cutoff for ", $fp, " false positives is ", $cutoff,
+	"; expect ", $fneg, "% false neg.\n");
+}
+$cutoff = sprintf("%0.3f", $spscores[POSIX::ceil($scount * 0.002)-1]);
+$cutoff = 0.2 if $cutoff < 0.2;
+print("Recommended nonspam cutoff is ", $cutoff, "\n");
+yuk(0, "Tuning completed.");

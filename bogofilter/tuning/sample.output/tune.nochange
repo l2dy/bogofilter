@@ -1,0 +1,15 @@
+bogotune -s /home/spamtest/sp0608.bl -n /home/spamtest/ns0608.bl 
+Verifying training db /home/spamtest/.bogofilter/goodlist.db...
+Verifying training db /home/spamtest/.bogofilter/spamlist.db...
+Verifying test files...
+Verification completed successfully.
+Recommended cache size is 17 Mbytes.
+Calculating false-positive target...
+Very few high-scoring nonspams in this data set;
+Retain the current settings:
+robx        = 0.600000 (6.00e-01)
+robs        = 0.021500 (2.15e-02)
+min_dev     = 0.020000 (2.00e-02)
+ham_cutoff  = 0.400000 (4.00e-01)
+spam_cutoff = 0.800000 (8.00e-01)
+Tuning aborted.

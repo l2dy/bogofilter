@@ -1,0 +1,37 @@
+#! /bin/sh
+# bogol - perform lexical analysis and database lookup
+if [ "x$1" = "x-?" -o "x$1" = "x-h" ]; then
+cat <<EOT
+NAME
+  bogol - lexical analysis and database lookup for an email message
+SYNOPSIS
+  bogol [-h | path/to/bogofilter/directory]
+DESCRIPTION
+  bogol creates a message digest consisting of a .MSG_COUNT line,
+  followed by one line per token. The format is
+
+    ".MSG_COUNT" 1234 2345
+    "token" 234 345
+    ...
+
+  The .MSG_COUNT line gives the numbers of messages that make up the
+  spam and nonspam wordlists, respectively; each token line gives the
+  counts of the token in the spam and nonspam wordlists, respectively.
+  The bogol script is meant to be invoked by a command similar to
+
+    formail -s bogol dbdir <mboxfile >digestfile
+OPTIONS
+  -h    The option -h displays help.
+BOGOFILTER DIRECTORY
+  The bogofilter directory is where the wordlists are kept. It defaults
+  to ~/.bogofilter if no path is provided on the command line.
+SEE ALSO
+  bogofilter(1), bogolexer(1), bogoutil(1), apclass(1).
+EOT
+exit 0
+fi
+db=~/.bogofilter
+test "x$1" = "x" || db=$1
+( echo .MSG_COUNT; bogolexer -p | sort -u) | \
+    bogoutil -w $db | \
+    awk 'NF == 3 {printf("\"%s\" %s %s\n", $1, $2, $3)}'

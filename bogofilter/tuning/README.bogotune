@@ -1,0 +1,153 @@
+README for bogotune version 0.2.1 (perl)
+(How to tune bogofilter with minimum effort)
+
+This document describes a script called bogotune that will completely
+automate the process of finding good parameters for bogofilter,
+provided the user meets a few minimum requirements (see Prerequisites
+below).
+
+There are six parameters you can tweak that may affect the performance,
+accuracy or operating convenience of bogofilter.  They are:
+    1. The database cache size (performance)
+    2. Robinson's x parameter  (accuracy)
+    3. The minimum deviation   (accuracy)
+    4. Robinson's s            (accuracy)
+    5. The spam cutoff         (accuracy)
+    6. The nonspam cutoff      (convenience)
+
+The bogotune script will use your training database and some spam and
+nonspam message files furnished by you to estimate the values you need
+to assign to these six parameters.
+
+Prerequisites:
+
+    1. You must have a bogofilter training database built from no
+	fewer than 2,000 spams and 2,000 nonspams (bigger is better),
+	and the ratio of spams to nonspams must be between 0.2 and 5
+	(closer to 1 is better).
+    2. You must have at least 500 nonspams and 500 spams that have
+	not been used in the training database.  This is a minimum,
+	but results will be much more reliable if you can use several
+	thousand of each.
+    3. You must be using bogofilter version 0.13.6.3 or later, with
+	the Robinson-Fisher algorithm.  Programs bogofilter, bogoutil
+	and bogolexer must all be in your execution path.  If it's
+	version 0.13.6.3 you're using, you need to apply the patch
+	supplied with bogotune; cd to the base of the bogofilter
+	source tree, copy 0.13.6.3.patch into that directory; then
+	run the command "patch -p0 <0.13.6.3.patch" and then the
+	command "make install".
+    4. You must have perl on your system.  If /usr/bin/perl is not
+	the path to a valid perl executable, change the first line of
+	bogotune accordingly.
+    5. You will need formail (supplied with procmail) to create
+	message-count files from mbox-format ones.
+
+Installation:
+
+    1. Copy bogotune and its helper utility, bogol, to somewhere in
+	your execution path.  The bogol script is used by formail to
+	create message-count files.
+
+    2. If you wish, copy the man pages to the appropriate location
+	(typically /usr/man/man1 or /usr/share/man/man1).
+
+Tuning:
+
+Run the command
+    bogotune -s /absolute/paths/to/one/or/more/spam/files \
+	-n /absolute/paths/to/one/or/more/nonspam/files
+
+The script needs to know where to find your training database. The
+default is ~/.bogofilter, or $BOGOFILTER_DIR if that's defined. 
+Otherwise, use the absolute path to the directory as the first
+argument in the command line, e.g. bogotune /var/bogo -s ...
+
+To see details of the results obtained during the scans, put -v in the
+command line.  Then, instead of displaying a progress bar, bogotune
+will print a line like
+    0.0316 0.400 0.605 0.505781 46 274
+for each combination of parameters tried, where the numbers are the
+values of s, min_dev, x, the spam cutoff and the counts of false
+positives and false negatives, respectively.
+
+The message files may be in either mbox or msg-count format, but they
+must all be one or the other; don't mix them.  If they're in mbox
+format, you'll need enough free disk space so bogotune can create
+msg-count files to use in the scans.  There will need to be a writable
+directory called /proj/Rwork for bogotune to use; this name can be
+changed by editing the value of workdir in bogotune's line 10.  To use
+$TMPDIR, for example, you could change
+    $workdir = "/proj/Rwork";
+to
+    $workdir = $ENV{"TMPDIR"};
+or you might keep all the bogofilter-related files together with
+    $workdir = $bogodir;
+but in that case you will need to move lines 9 and 10 to be lines
+95 and 96 (just before dbname is defined), so that workdir isn't set
+before bogodir.
+
+If bogotune aborts, there may be leftover files named Rxxx in the
+directory named in $workdir; the xxx stands for some number of more or
+less random digits (actually the pid of the bogotune process).
+
+Running bogotune will take quite a while.  You will usually see output
+that ends like this:
+
+Recommended cache: 10 Mbytes
+                x: 0.503238
+   min. deviation: 0.040
+                s: 0.0178
+Spam cutoff for 0.05% false positives is 0.59; expect 3.07% false neg.
+Spam cutoff for 0.1% false positives is 0.511; expect 2.81% false neg.
+Spam cutoff for 0.2% false positives is 0.463; expect 1.84% false neg.
+Recommended nonspam cutoff is 0.312
+Tuning complete.
+
+Normally, three possible spam cutoffs are suggested, as shown above, to
+give you an opportunity to judge of the tradeoff between false
+positives and false negatives.  If there are too few messages in your
+test files, one or two of the suggestions may be omitted.  Also, if
+it's not practicable to get a false-positive rate of 0.2% or less, only
+one suggestion will be provided.
+
+The values will, of course, differ from those shown here, depending on
+the composition of your training and test database files.  Install the
+parameter values, with your chosen spam cutoff, in your bogofilter.cf
+file and enjoy.  When setting the cache size, be careful not to use a
+larger value than bogotune suggests, unless you can afford to go to
+three times the suggested value; in between, serious performance
+degradation may result.  If you want to use a smaller cache than
+suggested, that's ok; it will slow bogofilter down, but not
+catastrophically (don't set it to zero, though, if you're using the
+single-list version of bogofilter; that will be a bit too slow).
+
+If your current bogofilter parameters are giving near-optimal results,
+bogotune may report something like:
+
+Recommended cache size is 17 Mbytes.
+Calculating false-positive target...
+Very few high-scoring nonspams in this data set.
+Retain the current settings:
+robx        = 0.600000 (6.00e-01)
+robs        = 0.021500 (2.15e-02)
+min_dev     = 0.020000 (2.00e-02)
+ham_cutoff  = 0.400000 (4.00e-01)
+spam_cutoff = 0.800000 (8.00e-01)
+Tuning aborted.
+
+In that case, you just need to consider setting the cache size.
+
+Usually, bogotune's estimates of false negatives to expect are on the
+conservative side; you might find you do a bit better in production.
+
+NOTES
+1.  When determining parameter values, bogotune usually needs to set
+    a higher false-positive target than would be desirable in
+    production.  Don't panic: it will suggest a more appropriate value
+    when it's finished scanning.
+2.  The quality of your training database and your spam and nonspam
+    message files (i.e, their freedom from contamination with wrongly
+    classified messages) can make a big difference to the outcome of
+    the bogotune run.  Bogotune is not very robust when confronted with
+    garbage input.

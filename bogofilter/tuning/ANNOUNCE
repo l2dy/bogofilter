@@ -1,0 +1,57 @@
+Announcing the release of bogotune (version 0.2.1):
+
+The bogofilter-tuning.HOWTO that accompanies bogofilter discusses the
+parameters that can be adjusted to optimize bogofilter's accuracy, and
+gives some instructions as to how to determine appropriate values for
+them.  The /tuning directory includes some scripts and further
+documentation to help with this, but it's a somewhat complex and
+tedious process.
+
+To make it simpler, I've written a perl script called bogotune that
+will completely automate the process of finding good parameters for
+bogofilter, namely:
+    1. The database cache size (performance)
+    2. Robinson's x parameter  (accuracy)
+    3. The minimum deviation   (accuracy)
+    4. Robinson's s            (accuracy)
+    5. The spam cutoff         (accuracy)
+    6. The nonspam cutoff      (convenience)
+
+The bogotune script will use your training database and some spam and
+nonspam message files furnished by you to estimate the values you need
+to assign to these six parameters.
+
+Prerequisites:
+
+    1. You must have a bogofilter training database built from no
+        fewer than 2,000 spams and 2,000 nonspams (bigger is better),
+        and the ratio of spams to nonspams must be between 0.2 and 5
+        (closer to 1 is better).
+    2. You must have at least 500 nonspams and 500 spams that have
+        not been used in the training database.  This is a minimum,
+        but results will be much more reliable if you can use several
+        thousand of each.
+    3. You must be using bogofilter version 0.13.6.3 or later, with
+        the Robinson-Fisher algorithm.  Programs bogofilter, bogoutil
+        and bogolexer must all be in your execution path.
+    4. You must have perl on your system.  If /usr/bin/perl is not
+        the path to a valid perl executable, you can change the first
+	line of bogotune accordingly.
+    5. You will need formail (supplied with procmail) to create
+        message-count files from mbox-format ones.
+
+Download:
+
+    http://www.bgl.nu/bogofilter/bogotune-0.2.1.tgz
+
+(Future releases of bogofilter will include the then-current
+bogotune package.)
+
+Installation and use are described in README.bogotune and in the
+manpages; these documents are included in the package.
+
+Author:
+
+    Greg Louis <glouis@dynamicro.on.ca>
+
+2003-06-19.

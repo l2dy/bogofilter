@@ -1,0 +1,29 @@
+bogotune -s /root/scratch/s* -n /root/scratch/n*
+Verifying training db /root/.bogofilter/wordlist.db...
+Verifying test files...
+Verification completed successfully.
+Test files are in mbox format, creating message-count files...
+Message-count files R0.978894.sp and R0.978894.ns created in /proj/Rwork.
+Recommended cache size is 10 Mbytes.
+Calculating false-positive target...
+False-positive target is 6
+Calculating initial x value...
+Initial x value is 0.543238
+Performing coarse scan:
+[..................................................................... ]
+Minimum found at s 0.0100, md 0.100, x 0.543
+Performing fine scan:
+[..................................................................... ]
+Minimum found at s 0.0178, md 0.040, x 0.503
+Performing final scoring:
+        Nonspam...
+           Spam...
+Recommended cache: 10 Mbytes
+                x: 0.503238
+   min. deviation: 0.040
+                s: 0.0178
+Spam cutoff for 0.05% false positives is 0.59; expect 3.07% false neg.
+Spam cutoff for 0.1% false positives is 0.511; expect 2.81% false neg.
+Spam cutoff for 0.2% false positives is 0.463; expect 1.84% false neg.
+Recommended nonspam cutoff is 0.312
+Tuning complete.
