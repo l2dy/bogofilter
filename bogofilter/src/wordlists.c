@@ -215,7 +215,12 @@ void open_wordlists(dbmode_t mode)
 		    default:
 			if (query)	/* If "-Q", failure is OK */
 			    return;
-			fprintf(stderr, "Can't open %s db directory (%s), errno %d, %s\n",
+			fprintf(stderr,
+				"Can't open %s list from db directory \"%s\",\n"
+				"errno #%d %s.\n\n"
+				""
+				"Remember to register some spam and ham mails before you can use bogofilter\n"
+				"to evaluate mail for its probable spam status!\n",
 				list->filename, list->filepath, err, strerror(err));
 			exit(EX_ERROR);
 		} /* switch */
