@@ -234,7 +234,7 @@ static size_t format_string(char *dest, const char *src, int min, int prec, int 
     } else {
 	fprintf(stderr, "header format is too long.\n");
 	/* abort to obtain a stack backtrace */
-	bf_abort();
+	abort();
     }
     return len;
 }
