@@ -22,7 +22,7 @@ int fgetsl(buff_t *buff, FILE *s)
 
 int xfgetsl(buff_t *buff, FILE *s, int no_nul_terminate)
 {
-    int c;
+    int c = 0;
     size_t read = buff->t.leng;
     size_t size = buff->size - read;
     size_t min_size = no_nul_terminate ? 1 : 2;
