@@ -49,7 +49,6 @@ static void rand_sleep(double min, double max)
 	srand(timeval.tv_usec);
     }
     delay = min + ((max-min)*rand()/(RAND_MAX+1.0));
-    printf("%d\n", delay);
     timeval.tv_sec  = delay / 1000000;
     timeval.tv_usec = delay % 1000000;
     select(0,NULL,NULL,NULL,&timeval);
