@@ -1,5 +1,10 @@
 /* config.in.  Generated from configure.ac by autoheader.  */
 
+#define DIRSEP_C '.'
+#define EXTSEP_C '/'
+#define DIRSEP_S "."
+#define EXTSEP_S "/"
+
 /* default database file extension */
 #define DB_EXT ".db"
 

@@ -7,7 +7,7 @@ CC = cc
 #CC = gcc
 
 
-# Define exactly one of the following three in order to use that database:
+# Define exactly one of the following two in order to use that database:
 
 USE_DB = qdbm
 #USE_DB = tdb
@@ -30,28 +30,34 @@ else
 endif
 endif
 
-
 #########################################
 # DO NOT EDIT ANYTHING BELOW THIS LINE! #
 #########################################
 
 ifeq (${CC},cc)
+MAKE = amu
 CC = cc
 LD = link
+AR = libfile
 DEPEND = -depend !Depend
-CC_FLAGS = -Wpc -zo -fw -throwback -Otime -I@,dcdflib.src,$(DBINCLUDE),Unix: -JUnix: -D__riscos__ -DHAVE_CONFIG_H
+CC_FLAGS = -Wpc -zo -fw -throwback -Otime -I@,^,^.^,$(DBINCLUDE),Unix: -JUnix: -D__riscos__ -DHAVE_CONFIG_H
 UNIXLIB = Unix:o.UnixLib
 else
 ifeq (${CC},gcc)
+MAKE = make
 CC = gcc
 LD = gcc
-CC_FLAGS = -mthrowback -O3 -I. -Idcdflib/src -I$(DBINCLUDE) -D__riscos__ -DHAVE_CONFIG_H
+AR = ar
+CC_FLAGS = -mthrowback -O3 -I@ -I^ -I^.^ -I$(DBINCLUDE) -D__riscos__ -DHAVE_CONFIG_H
 else
 # No other compiler supported!
 endif
 endif
 
-BOGOFILTER_OBJS = o.base64 \
+LIBGSL = ^.gsl.libgsl
+
+COMMON_OBJS = o.base64 \
+	o.bf_exit \
 	o.bogoconfig \
 	o.bogofilter \
 	o.bogoreader \
@@ -82,6 +88,7 @@ BOGOFILTER_OBJS = o.base64 \
 	o.method \
 	o.mime \
 	o.msgcounts \
+	o.passthrough \
 	o.paths \
 	o.qp \
 	o.register \
@@ -90,8 +97,10 @@ BOGOFILTER_OBJS = o.base64 \
 	o.strlcat \
 	o.strlcpy \
 	o.swap_32bit \
+	o.system \
 	o.textblock \
 	o.token \
+	o.transaction \
 	o.uudecode \
 	o.version \
 	o.word \
@@ -106,150 +115,20 @@ BOGOFILTER_OBJS = o.base64 \
 	o.xrealloc \
 	o.xstrdup \
 	o.xstrlcat \
-	o.xstrlcpy \
-	dcdflib.src.o.dcdflib \
-	dcdflib.src.o.ipmpar
+	o.xstrlcpy
+
+BOGOFILTER_OBJS = o.main
 	
-BOGOLEXER_OBJS = o.base64 \
-	o.bogoreader \
-	o.bool \
-	o.buff \
-	o.charset \
-	o.configfile \
-	o.datastore \
-	$(DBSTORE) \
-	o.debug \
-	o.directories \
-	o.error \
-	o.fgetsl \
-	o.find_home \
-	o.find_home_tildeexpand \
-	o.find_home_user \
-	o.globals \
-	o.lexer \
-	o.lexer_v3 \
-	o.maint \
-	o.memdebug \
-	o.mime \
-	o.msgcounts \
-	o.paths \
-	o.qp \
-	o.strlcat \
-	o.strlcpy \
-	o.swap_32bit \
-	o.textblock \
-	o.token \
-	o.uudecode \
-	o.version \
-	o.word \
-	o.wordlists \
-	o.xatoi \
-	o.xatof \
-	o.xcalloc \
-	o.xmalloc \
-	o.xmemrchr \
-	o.xmem_error \
-	o.xrealloc \
-	o.xstrdup
+BOGOLEXER_OBJS = o.bogolexer
 
-BOGOUTIL_OBJS = o.buff \
-	o.datastore \
-	$(DBSTORE) \
-	o.debug \
-	o.error \
-	o.fgetsl \
-	o.find_home \
-	o.find_home_tildeexpand \
-	o.find_home_user \
-	o.globals \
-	o.maint \
-	o.memdebug \
-	o.paths \
-	o.strlcat \
-	o.strlcpy \
-	o.swap_32bit \
-	o.version \
-	o.word \
-	o.wordlists \
-	o.xcalloc \
-	o.xmalloc \
-	o.xmem_error \
-	o.xrealloc \
-	o.xstrdup
+BOGOUTIL_OBJS = o.bogoutil
 
-BOGOWORDFREQ_OBJS = o.base64 \
-	o.bogoreader \
-	o.buff \
-	o.charset \
-	o.collect \
-	o.debug \
-	o.error \
-	o.fgetsl \
-	o.globals \
-	o.lexer \
-	o.lexer_v3 \
-	o.memdebug \
-	o.mime \
-	o.msgcounts \
-	o.qp \
-	o.strlcat \
-	o.strlcpy \
-	o.textblock \
-	o.token \
-	o.uudecode \
-	o.word \
-	o.wordhash \
-	o.xcalloc \
-	o.xmalloc \
-	o.xmemrchr \
-	o.xmem_error \
-	o.xrealloc \
-	o.xstrdup
+BOGOWORDFREQ_OBJS = o.bogowordfreq
 
-CONFIGTEST_OBJS = o.base64 \
-	o.bogoreader \
-	o.bool \
-	o.buff \
-	o.charset \
-	o.datastore \
-	$(DBSTORE) \
-	o.debug \
-	o.directories \
-	o.error \
-	o.fgetsl \
-	o.find_home \
-	o.find_home_tildeexpand \
-	o.find_home_user \
-	o.globals \
-	o.lexer \
-	o.lexer_v3 \
-	o.maint \
-	o.memdebug \
-	o.mime \
-	o.msgcounts \
-	o.paths \
-	o.qp \
-	o.strlcat \
-	o.strlcpy \
-	o.swap_32bit \
-	o.textblock \
-	o.token \
-	o.uudecode \
-	o.version \
-	o.word \
-	o.wordlists \
-	o.xatoi \
-	o.xatof \
-	o.xcalloc \
-	o.xmalloc \
-	o.xmemrchr \
-	o.xmem_error \
-	o.xrealloc \
-	o.xstrdup
+CONFIGTEST_OBJS = o.configtest
 
 .INIT:
 	@cdir o
-	@cdir dcdflib.src.o
 
 ## Rule Patterns ##
 
@@ -260,22 +139,37 @@ CONFIGTEST_OBJS = o.base64 \
 
 # Static dependencies:
 
-all: bogofilter bogolexer bogoutil bogowordfreq # configtest
+all: bogofilter bogolexer bogoutil bogowordfreq configtest
 
-bogofilter: $(BOGOFILTER_OBJS) $(DBLIB) o.main
-	$(LD) $(LD_FLAGS) -o bogofilter o.main $(BOGOFILTER_OBJS) $(DBLIB) $(UNIXLIB)
+install: bogofilter bogolexer bogoutil bogowordfreq configtest
+	-copy bogofilter <Bogofilter$Dir>.bogofilter ~CF~N~V
+	-copy bogolexer <Bogofilter$Dir>.bogolexer ~CF~N~V
+	-copy bogoutil <Bogofilter$Dir>.bogoutil ~CF~N~V
+	-copy bogowordfreq <Bogofilter$Dir>.bogowordfreq ~CF~N~V
+	-copy configtest <Bogofilter$Dir>.configtest ~CF~N~V
 
-bogolexer: $(BOGOLEXER_OBJS) $(DBLIB) o.bogolexer
-	$(LD) $(LD_FLAGS) -o bogolexer o.bogolexer $(BOGOLEXER_OBJS) $(DBLIB) $(UNIXLIB)
+libbogo: $(COMMON_OBJS)
+	$(AR) $(AR_FLAGS) -c -o $@ $(COMMON_OBJS)
 
-bogoutil: $(BOGOUTIL_OBJS) $(DBLIB) o.bogoutil
-	$(LD) $(LD_FLAGS) -o bogoutil o.bogoutil $(BOGOUTIL_OBJS) $(DBLIB) $(UNIXLIB)
+$(LIBGSL):
+	dir ^.gsl
+	$(MAKE)
+	dir ^.src
 
-bogowordfreq: $(BOGOWORDFREQ_OBJS) $(DBLIB) o.bogowordfreq
-	$(LD) $(LD_FLAGS) -o bogowordfreq o.bogowordfreq $(BOGOWORDFREQ_OBJS) $(DBLIB) $(UNIXLIB)
+bogofilter: libbogo $(LIBGSL) $(BOGOFILTER_OBJS) $(DBLIB)
+	$(LD) $(LD_FLAGS) -o $@ $(BOGOFILTER_OBJS) libbogo $(LIBGSL) $(DBLIB) $(UNIXLIB)
 
-configtest: $(CONFIGTEST_OBJS) $(DBLIB) o.configtest
-	$(LD) $(LD_FLAGS) -o configtest o.configtest $(CONFIGTEST_OBJS) $(DBLIB) $(UNIXLIB)
+bogolexer: libbogo $(BOGOLEXER_OBJS) $(DBLIB)
+	$(LD) $(LD_FLAGS) -o $@ $(BOGOLEXER_OBJS) libbogo $(DBLIB) $(UNIXLIB)
+
+bogoutil: libbogo $(BOGOUTIL_OBJS) $(DBLIB)
+	$(LD) $(LD_FLAGS) -o $@ $(BOGOUTIL_OBJS) libbogo $(DBLIB) $(UNIXLIB)
+
+bogowordfreq: libbogo $(BOGOWORDFREQ_OBJS) $(DBLIB)
+	$(LD) $(LD_FLAGS) -o $@ $(BOGOWORDFREQ_OBJS) libbogo $(DBLIB) $(UNIXLIB)
+
+configtest: libbogo $(CONFIGTEST_OBJS) $(DBLIB)
+	$(LD) $(LD_FLAGS) -o $@ $(CONFIGTEST_OBJS) libbogo $(DBLIB) $(UNIXLIB)
 
 clean:
 	-ifthere bogofilter then wipe bogofilter ~CFR~V
@@ -283,7 +177,7 @@ clean:
 	-ifthere bogoutil then wipe bogoutil ~CFR~V
 	-ifthere bogowordfreq then wipe bogowordfreq ~CFR~V
 	-ifthere configtest then wipe configtest ~CFR~V
+	-ifthere libbogo then wipe libbogo ~CFR~V
 	-ifthere o.* then wipe o.* ~CFR~V
-	-ifthere dcdflib.src.o.* then wipe dcdflib.src.o.* ~CFR~V
 
 # Dynamic dependencies:
