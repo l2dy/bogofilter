@@ -101,11 +101,11 @@ void open_wordlists(dbmode_t mode)
 			    return;
 			if (wl_mode != WL_M_SEPARATE)
 			    fprintf(stderr,
-				    "Can't open file '%s' in directory '%s',\n",
+				    "Can't open file '%s' in directory '%s'.\n",
 				    aCombined[0], list->filepath);
 			else
 			    fprintf(stderr,
-				    "Can't open files '%s' and '%s' in directory '%s',\n",
+				    "Can't open files '%s' and '%s' in directory '%s'.\n",
 				    aSeparate[0], aSeparate[1], list->filepath);
 			if (err != 0)
 			    fprintf(stderr,
