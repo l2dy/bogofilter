@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
     char ch;
     cmd_t flag = NONE;
 
-    while ((ch =getopt(argc, argv, "d:l:w:hvVx")) != -1)
+    while ((ch =getopt(argc, argv, "d:l:w:hvVx:")) != -1)
 	switch (ch) {
 	case 'd':
 	    flag = DUMP;
