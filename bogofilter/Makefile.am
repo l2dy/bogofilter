@@ -1,5 +1,8 @@
 # $Id$ 
 # $Log$
+# Revision 1.9  2002/09/18 23:33:48  relson
+# Added lexer.h to bogofilter_SOURCES list.
+#
 # Revision 1.8  2002/09/18 20:56:43  m-a
 # Let automake deal with the lexer.
 #
@@ -41,7 +44,7 @@ noinst_PROGRAMS = lexertest
 man1_MANS = bogofilter.1
 
 # what to build that from
-bogofilter_SOURCES = bogofilter.c bogofilter.h lock.c lock.h main.c lexer_l.l
+bogofilter_SOURCES = bogofilter.c bogofilter.h lock.c lock.h main.c lexer_l.l lexer.h
 
 lexertest_SOURCES = lexer_l.l
 lexertest_CFLAGS = -DMAIN
