@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.4  2002/10/04 01:42:36  m-a
+ * Cleanup, fixing memory leaks, adding error checking. TODO: let callers (main.c) also check for error return.
+ *
  * Revision 1.3  2002/10/04 01:35:07  gyepi
  * Integration of wordlists with datastore and bogofilter code.
  * David Relson did most of the work. I just tweaked the locking code
@@ -21,6 +24,8 @@
 #include <wordlists.h>
 #include <bogofilter.h>
 #include <datastore.h>
+#include "xmalloc.h"
+#include "xstrdup.h"
 
 #define GOODFILE	"goodlist.db"
 #define SPAMFILE	"spamlist.db"
@@ -29,17 +34,17 @@ wordlist_t good_list;
 wordlist_t spam_list;
 wordlist_t* word_lists=NULL;
 
-void *open_wordlist( wordlist_t *list, char *directory, char *filename )
+void *open_wordlist( wordlist_t *list, const char *directory, const char *filename )
 {
     int	rc;
     void *dbh;			// database handle 
     char *path;
     struct stat sb;
-    int dirlen = strlen(directory);
-    int namlen = strlen(filename);
+    size_t dirlen = strlen(directory);
+    size_t namlen = strlen(filename);
 
-    list->file = path = malloc( dirlen + namlen + 2 );
-
+    path = (char *)xmalloc( dirlen + namlen + 2 );
+    list->file = path;
     strcpy(path, directory);
     if (path[dirlen-1] != '/')
 	strcat(path, "/");
@@ -58,16 +63,21 @@ void *open_wordlist( wordlist_t *list, char *directory, char *filename )
       exit(2);
     }
 
+    free(path);
     return dbh;
 }
 
-void init_list(wordlist_t* list, char* name, char* directory, char* filename, double weight, bool bad, int override, int ignore)
+/* returns -1 for error, 0 for success */
+int init_list(wordlist_t* list, char* name, char* directory, char* filename, double weight, bool bad, int override, int ignore)
 {
     wordlist_t* list_index;
     wordlist_t** last_list_ptr;
 
-    list->name=strdup(name);
+    list->name=xstrdup(name);
+    /* warning: open_wordlist requires list->name initialized, do not
+     * reorder */
     list->dbh=open_wordlist(list, directory, filename);
+    if (list->dbh == NULL) return -1;
     list->msgcount=0;
     list->file=NULL;
     list->override=override;
@@ -79,7 +89,7 @@ void init_list(wordlist_t* list, char* name, char* directory, char* filename, do
     if (! word_lists) {
 	word_lists=list;
 	list->next=NULL;
-	return;
+	return 0;
     }
     list_index=word_lists;
     last_list_ptr=&word_lists;
@@ -98,20 +108,26 @@ void init_list(wordlist_t* list, char* name, char* directory, char* filename, do
 	    break;
 	}
     }
+    return 0;
 }
 
-void setup_lists(char *directory)
+/* returns -1 for error, 0 for success */
+int setup_lists(char *directory)
 {
-    init_list(&good_list, "good", directory, GOODFILE, GOOD_BIAS, FALSE, 0, 0);
-    init_list(&spam_list, "spam", directory, SPAMFILE,         1, TRUE,  0, 0);
+    int rc = 0;
+    if (init_list(&good_list, "good", directory, GOODFILE, GOOD_BIAS, FALSE, 0, 0)) rc = -1;
+    if (init_list(&spam_list, "spam", directory, SPAMFILE,         1, TRUE,  0, 0)) rc = -1;
+    return rc;
 }
 
-void close_lists()
+void close_lists(void)
 {
     wordlist_t* list;
     for ( list = word_lists; list != NULL; list = list->next )
     {
 	db_close(list->dbh);
+	if (list->name) free(list->name);
+	if (list->file) free(list->file);
     }
 }
 

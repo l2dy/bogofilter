@@ -1,6 +1,9 @@
 /* $Id$ */
 /* 
  * $Log$
+ * Revision 1.5  2002/10/04 01:42:36  m-a
+ * Cleanup, fixing memory leaks, adding error checking. TODO: let callers (main.c) also check for error return.
+ *
  * Revision 1.4  2002/10/04 01:35:06  gyepi
  * Integration of wordlists with datastore and bogofilter code.
  * David Relson did most of the work. I just tweaked the locking code
@@ -40,8 +43,8 @@ struct wordlist_s
 extern wordlist_t *word_lists;
 extern wordlist_t good_list, spam_list;
 
-extern void setup_lists();
-void close_lists();
-void *open_wordlist( wordlist_t *list, char *directory, char *filename );
+extern int setup_lists();
+void close_lists(void);
+void *open_wordlist( wordlist_t *list, const char *directory, const char *filename );
 
 #endif	/* HAVE_WORDLISTS_H */
