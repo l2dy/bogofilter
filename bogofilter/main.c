@@ -1,6 +1,9 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.20  2002/10/04 04:29:20  relson
+ * Clean up allocation and deallocation of directory.
+ *
  * Revision 1.19  2002/10/04 03:26:52  gyepi
  * bug fix: make sure directory points to heap memory when it is used
  *
@@ -132,7 +135,7 @@ int main(int argc, char **argv)
 	switch(ch)
 	{
 	case 'd':
-	    directory = xstrdup(optarg);
+	    directory = optarg;
 	    setup_lists(directory);
 	    break;
 
@@ -201,6 +204,7 @@ int main(int argc, char **argv)
 	    strcpy(directory, tmp );
 	    strcat(directory, BOGODIR);
 	    setup_lists(directory);
+	    xfree(directory);
 	}
     }
 
@@ -250,7 +254,6 @@ int main(int argc, char **argv)
     }
 
     close_lists();
-    if (directory) xfree(directory);
 
     exit(exitcode);
 }
