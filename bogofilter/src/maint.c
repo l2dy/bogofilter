@@ -191,6 +191,7 @@ int maintain_wordlist_file(const char *db_file)
     {
 	dsv_t val;
 	val.count[0] = CURRENT_VERSION;
+	val.count[1] = 0;
 	ds_set_wordlist_version(dsh, &val);
     }
 

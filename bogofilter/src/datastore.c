@@ -379,7 +379,7 @@ void ds_set_wordlist_version(void *vhandle, dsv_t *val)
 {
     dsh_t *dsh = vhandle;
 
-    if (timestamp_tokens && val->date != 0)
+    if (timestamp_tokens)
 	val->date = today;
 
     ds_write(dsh, wordlist_version_tok, val);
