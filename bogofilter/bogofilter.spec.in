@@ -16,9 +16,15 @@ Bogofilter is a Bayesian spam filter.  In its normal mode of
 operation, it takes an email message or other text on standard input,
 does a statistical check against lists of "good" and "bad" words, and
 returns a status code indicating whether or not the message is spam.
-Bogofilter is designed with fast algorithms  (including Berkeley DB system),
+Bogofilter is designed with fast algorithms (including Berkeley DB system),
 coded directly in C, and tuned for speed, so it can be used for production
 by sites that process a lot of mail.
+
+%package static
+Summary: Statically linked
+Group: bogous
+%description static
+Statically linked bogofilter, bogolexer, and bogoutil
 
 %prep
 %setup
@@ -31,6 +37,8 @@ CFLAGS="$RPM_OPT_FLAGS" \
 %build
 make
 make DESTDIR=$RPM_BUILD_ROOT check
+cd src
+make -f Makefile-static DESTDIR=$RPM_BUILD_ROOT static install-binPROGRAMS
 
 %clean
 
@@ -77,13 +85,19 @@ done
 %{_sysconfdir}/bogofilter.cf.example
 %config(noreplace) %{_sysconfdir}/bogofilter.cf
 
-%doc AUTHORS CHANGES-0.10 CHANGES-0.11 CHANGES-0.12 COPYING INSTALL METHODS NEWS
-%doc README README.cvs RELEASE.NOTES-0.11 RELEASE.NOTES-0.12 TODO UPGRADE
+%doc AUTHORS CHANGES-* COPYING INSTALL METHODS NEWS
+%doc README README.cvs RELEASE.NOTES-* TODO UPGRADE
 %doc doc/bogofilter-tuning.HOWTO doc/integrating-with-qmail
 %doc doc/programmer
 %doc .inst/html .inst/xml
 
 %dir %{_datadir}/%{name}/contrib/*
 %dir %{_datadir}/%{name}/tuning/*
+
+%files static
+
+%{_bindir}/bogofilter_static
+%{_bindir}/bogolexer_static
+%{_bindir}/bogoutil_static
 
 %changelog
