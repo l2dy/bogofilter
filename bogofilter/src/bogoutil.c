@@ -439,6 +439,8 @@ static void help(void)
 	    "\t-m\tEnable maintenance works (expiring tokens).\n"
 	    "\t-v\tOutput debug messages.\n"
 	    "\t-H dir\tDisplay histogram and statistics for the wordlist.\n"
+	    "\t"    "\tUse -v  to exclude hapaxes."
+	    "\t"    "\tUse -vv to exclude pure spam/ham.\n"
 	    "\t-r dir\tCompute Robinson's X for specified directory.\n"
 	    "\t-R dir\tCompute Robinson's X and save it in the wordlist.\n");
     fprintf(stderr,

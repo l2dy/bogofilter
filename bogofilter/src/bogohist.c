@@ -27,10 +27,9 @@ AUTHOR:
 uint msgs_good, msgs_bad;
 uint ham_only,  ham_hapax;
 uint spam_only, spam_hapax;
-uint token_count;
 
 #define	INTERVALS	20
-#define PCT(n)		100.0 * n / token_count
+#define PCT(n)		100.0 * n / count
 
 typedef struct rhistogram_s rhistogram_t;
 struct rhistogram_s {
@@ -73,6 +72,22 @@ static int print_histogram(rhistogram_t *hist)
 {
     uint i, r;
     uint maxcnt = 0;
+    uint count = 0;
+
+    if (verbose == 0)
+	(void)printf("Histogram\n");
+
+    if (verbose == 1) {
+	hist->count[0]           -= ham_hapax;
+	hist->count[INTERVALS-1] -= spam_hapax;
+	(void)printf("Histogram without hapaxes\n");
+    }
+
+    if (verbose == 2) {
+	hist->count[0]           -= ham_only;
+	hist->count[INTERVALS-1] -= spam_only;
+	(void)printf("Histogram without pure ham and spam\n");
+    }
 
     (void)printf("%5s%8s  %3s  %s\n", "score", "count", "pct", "histogram");
 
@@ -81,7 +96,7 @@ static int print_histogram(rhistogram_t *hist)
 	uint32_t cnt = hist->count[i];
 	if (cnt > maxcnt) 
 	    maxcnt = cnt;
-	token_count += cnt;
+	count += cnt;
     }
 
     /* Print histogram */
@@ -103,9 +118,9 @@ static int print_histogram(rhistogram_t *hist)
 	(void)fputc( '\n', stdout);
     }
 
-    (void)printf("tot  %8u\n", token_count);
+    (void)printf("tot  %8u\n", count);
 
-    return 0;
+    return count;
 }
 
 int histogram(const char *path)
@@ -143,10 +158,16 @@ int histogram(const char *path)
 
     rc = ds_oper(filepaths[0], DB_READ, ds_histogram_hook, &hist);
 
-    print_histogram(&hist);
+    count = print_histogram(&hist);
 
-    printf("hapaxes:  ham %7d (%5.2f%%), spam %7d (%5.2f%%)\n", ham_hapax, PCT(ham_hapax), spam_hapax, PCT(spam_hapax));
-    printf("   pure:  ham %7d (%5.2f%%), spam %7d (%5.2f%%)\n", ham_only,  PCT(ham_only),  spam_only,  PCT(spam_only));
+    if (verbose > 0) {
+	printf("hapaxes:  ham %7d, spam %7d\n", ham_hapax, spam_hapax);
+	printf("   pure:  ham %7d, spam %7d\n", ham_only,  spam_only);
+    }
+    else {
+	printf("hapaxes:  ham %7d (%5.2f%%), spam %7d (%5.2f%%)\n", ham_hapax, PCT(ham_hapax), spam_hapax, PCT(spam_hapax));
+	printf("   pure:  ham %7d (%5.2f%%), spam %7d (%5.2f%%)\n", ham_only,  PCT(ham_only),  spam_only,  PCT(spam_only));
+    }
 
     return rc;
 }
