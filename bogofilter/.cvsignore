@@ -24,6 +24,7 @@ cscope.out
 debugtest
 depcomp
 directories.c
+fgetsl.test
 find_home.test
 install-sh
 lexer_head.c
