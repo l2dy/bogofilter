@@ -76,7 +76,14 @@ int word_cmp(const word_t *w1, const word_t *w2)
 #endif
 }
 
-void word_puts(const word_t *self, FILE *fp)
+void word_puts(const word_t *self, size_t width, FILE *fp)
 {
-    fwrite(self->text, 1, self->leng, fp);
+    /* width = 0 - output all of the word
+    **       > 0 - use 'width' as count, 
+    **		   blank fill if 'width' < length
+    */
+    size_t l = (width == 0) ? self->leng : min(width, self->leng);
+    fwrite(self->text, 1, l, fp);
+    if (l < width)
+	(void) fprintf(fp, "%*s", width - l," ");
 }

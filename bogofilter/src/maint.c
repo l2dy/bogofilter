@@ -164,7 +164,7 @@ static int maintain_hook(word_t *key, word_t *data,
 
 	if (DEBUG_DATABASE(0)) {
 	    fputs("deleting ", dbgout);
-	    word_puts(x, dbgout);
+	    word_puts(x, 0, dbgout);
 	    fputc('\n', dbgout);
 	}
     }

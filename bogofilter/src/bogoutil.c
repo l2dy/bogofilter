@@ -65,7 +65,7 @@ static int db_dump_hook(word_t *key, word_t *data,
 	return 0;
     if (replace_nonascii_characters)
 	do_replace_nonascii_characters(key->text, key->leng);
-    word_puts(key, stdout);
+    word_puts(key, 0, stdout);
     putchar(' ');
     printf("%lu", (unsigned long)val.count);
     if (val.date) {
@@ -85,7 +85,7 @@ static int count_hook(word_t *key, word_t *data,
 
     if (verbose > 3) {
 	fputs("count: ", dbgout);
-	word_puts(key, dbgout);
+	word_puts(key, 0, dbgout);
 	fputc('\n', dbgout);
     }
 
@@ -143,7 +143,7 @@ static int robx_hook(word_t *key, word_t *data,
 		"  sp: %3lu,  gd: %3lu,  p: %9.6f,  t: ", 
 	       (unsigned long)*rd->count, *rd->sum, *rd->sum / *rd->count,
 	       (unsigned long)spamness, (unsigned long)goodness, prob);
-	word_puts(x, stdout);
+	word_puts(x, 0, stdout);
 	fputc( '\n', stdout);
     }
     return 0;
@@ -313,7 +313,7 @@ static int words_from_list(const char *db_file, int argc, char **argv)
 	while (get_token(buff, stdin) == 0) {
 	    word_t *token = &buff->t;
 	    uint32_t count = db_getvalue(dbh, token);
-	    word_puts(token, stdout);
+	    word_puts(token, 0, stdout);
 	    printf(" %lu\n", (unsigned long) count);
 	}
 	buff_free(buff);
@@ -324,7 +324,7 @@ static int words_from_list(const char *db_file, int argc, char **argv)
 	    char *word = *argv++;
 	    word_t *token = word_new(word, strlen(word));
 	    uint32_t count = db_getvalue(dbh, token);
-	    word_puts(token, stdout);
+	    word_puts(token, 0, stdout);
 	    printf(" %lu\n", (unsigned long) count);
 	    word_free(token);
 	}

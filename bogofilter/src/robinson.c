@@ -246,7 +246,7 @@ double rob_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 	if (DEBUG_WORDLIST(3)) {
 	    fprintf(dbgout, "%3lu %3lu %f ",
 		(unsigned long)robn, (unsigned long)count, prob);
-	    word_puts(token, dbgout);
+	    word_puts(token, 0, dbgout);
 	    fputc('\n', dbgout);
 	}
     }

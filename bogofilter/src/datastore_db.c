@@ -211,7 +211,7 @@ uint32_t db_getvalue(void *vhandle, const word_t *word){
     if (DEBUG_DATABASE(2)) {
       fprintf(dbgout, "[%lu] db_getvalue (%s): [",
 	      (unsigned long) handle->pid, handle->name);
-      word_puts(word, dbgout);
+      word_puts(word, 0, dbgout);
       fprintf(dbgout, "] has value %lu\n",
 	      (unsigned long)value);
     }
@@ -277,7 +277,7 @@ static int db_get_dbvalue(void *vhandle, const word_t *word, /*@out@*/ dbv_t *va
   case DB_NOTFOUND:
     if (DEBUG_DATABASE(2)) {
       fprintf(dbgout, "[%lu] db_getvalue (%s): [", (unsigned long) handle->pid, handle->name);
-      word_puts(word, dbgout);
+      word_puts(word, 0, dbgout);
       fputs("] not found\n", dbgout);
     }
     break;
@@ -336,7 +336,7 @@ static void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val){
     if (DEBUG_DATABASE(2)) {
       fprintf(dbgout, "db_set_dbvalue (%s): [",
 	      handle->name);
-      word_puts(word, dbgout);
+      word_puts(word, 0, dbgout);
       fprintf(dbgout, "] has value %lu\n",
 	      (unsigned long)val->count);
     }

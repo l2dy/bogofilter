@@ -59,7 +59,7 @@ void collect_words(/*@out@*/ wordhash_t **wh,
 	    w_count++;
 	    if (DEBUG_WORDLIST(3)) { 
 		fprintf(dbgout, "%3ld ", w_count);
-		word_puts(yylval, dbgout);
+		word_puts(yylval, 0, dbgout);
 		fputc('\n', dbgout);
 	    }
 	    continue;
