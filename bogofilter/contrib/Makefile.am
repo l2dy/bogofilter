@@ -12,6 +12,7 @@ EXTRA_DIST= \
 	bogo.R \
 	bogofilter-milter.pl \
 	bogofilter-qfe \
+	bogominitrain.pl \
 	dot-qmail-bogofilter-default \
 	mailfilter.example \
 	mime.get.rfc822 \
