@@ -144,8 +144,8 @@ token towards robx.</para>
 calculation.  Only tokens farther away from 0.5 than this value are
 used.</para>
 
-<para>spam_cutoff: messages with scores bigger than this will be
-marked as spam.</para>
+<para>spam_cutoff: messages with scores greater than or equal to will
+be marked as spam.</para>
 
 <para>ham_cutoff: If zero, all messages with values below spam_cutoff
 are marked as ham.  If bigger than zero, values less than or equal to
