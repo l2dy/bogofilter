@@ -117,9 +117,9 @@ MSG_COUNT	^\"\.MSG_COUNT\"
 
 TOKENFRONT	[^[:blank:][:cntrl:][:digit:][:punct:]]
 TOKENMID	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*,[:cntrl:]\[\]]+
-BOGOLEX_TOKEN	[^[:blank:]<>;    &%$ @ |/\\{}^\"  \*,[:cntrl:]\[\]]+
+BOGOLEX_TOKEN	[^[:blank:]<>;    &%  @ |/\\{}^\"  \*,[:cntrl:]\[\]]+
 TOKENBACK_OLD	[^[:blank:][:punct:][:cntrl:]]
-TOKENBACK	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*\._\-\+,[:cntrl:]]
+TOKENBACK	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*\._\-\+,\[\][:cntrl:]]
 
 TOKEN 		{TOKENFRONT}{TOKENMID}{TOKENBACK}{1,70}
 
