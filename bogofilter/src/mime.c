@@ -114,6 +114,22 @@ const char *mime_type_name(enum mimetype type)
 }
 #endif
 
+static void mime_stack_dump(void)
+{
+    int i;
+    fprintf(dbgout, "**** MIME stack is:\n");
+    if (stackp < 0)
+	fprintf(dbgout, "**** empty\n");
+    else
+	for (i = 0; i <= stackp; i++) 
+	    fprintf(dbgout, "**** %3d type %d enc %d bnd %s chr %s\n",
+		    i,
+		    msg_stack[i].mime_type,
+		    msg_stack[i].mime_encoding,
+		    msg_stack[i].boundary ? msg_stack[i].boundary : "NIL",
+		    msg_stack[i].charset);
+}
+
 static void mime_init(mime_t * parent)
 {
     msg_state->mime_type = MIME_TEXT;
@@ -171,6 +187,8 @@ static void mime_push(mime_t * parent)
     } else {
 	fprintf(stderr, "Attempt to overflow mime stack\n");
     }
+    if (DEBUG_MIME(2))
+	mime_stack_dump();
 }
 
 static void mime_pop(void)
@@ -191,7 +209,8 @@ static void mime_pop(void)
     } else {
 	fprintf(stderr, "Attempt to underflow mime stack\n");
     }
-
+    if (DEBUG_MIME(2))
+	mime_stack_dump();
 }
 
 static int is_mime_container(mime_t * m)
