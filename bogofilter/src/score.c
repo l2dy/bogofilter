@@ -184,10 +184,10 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     FLOAT Q = {1.0, 0};		/* Robinson's Q */
 
     double spamicity;
+    int    err = 0;
     size_t robn = 0;
     size_t count = 0;
-    bool need_stats = Rtable || verbose || passthrough;
-    int err = 0;
+    bool need_stats = (Rtable || passthrough || (verbose > 0)) && !fBogotune;
 
     (void) fp; 	/* quench compiler warning */
 
