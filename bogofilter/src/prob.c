@@ -28,9 +28,11 @@ double calc_prob_pure(uint good, uint bad,
      * a word we don't have enough info about will be spam */
     /* n is the number of messages that contain the word w */
 
-    if (n == 0)
+    if (n == 0 || badmsgs == 0 || goodmsgs == 0) {
+	/* in these cases, pw would be undefined and return NaN
+	 * we substitute "we don't know", the x parameter */
 	fw = robx;
-    else {
+    } else {
 	/* The original version of this code has four divisions.
 	pw = ((bad / badmsgs) / (bad / badmsgs + good / goodmsgs));
 	*/
