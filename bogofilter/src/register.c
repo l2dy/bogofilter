@@ -54,10 +54,10 @@ void register_words(run_t _run_type, wordhash_t *h,
 
   set_list_active_status(false);
 
-  if (run_type & REG_GOOD) incr_list = good_list;
-  if (run_type & REG_SPAM) incr_list = spam_list;
-  if (run_type & UNREG_GOOD) decr_list = good_list;
-  if (run_type & UNREG_SPAM) decr_list = spam_list;
+  if (_run_type & REG_GOOD) incr_list = good_list;
+  if (_run_type & REG_SPAM) incr_list = spam_list;
+  if (_run_type & UNREG_GOOD) decr_list = good_list;
+  if (_run_type & UNREG_SPAM) decr_list = spam_list;
 
   if (DEBUG_REGISTER(2))
       fprintf(dbgout, "%s%s -- incr: %08X, decr: %08X\n", r, u, (int)incr_list, (int)decr_list);

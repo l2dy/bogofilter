@@ -71,7 +71,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     init_charset_table(charset_default, true);
 
     /* open all wordlists */
-    open_wordlists((run_type & (RUN_NORMAL | RUN_UPDATE)) ? DB_READ : DB_WRITE);
+    open_wordlists((run_type == RUN_NORMAL) ? DB_READ : DB_WRITE);
 
     if (*outfname && passthrough) {
 	if ((out = fopen(outfname,"wt"))==NULL)
