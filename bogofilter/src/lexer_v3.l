@@ -121,16 +121,15 @@ static word_t *yy_text(void)
 
 UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
 IPADDR		{UINT8}\.{UINT8}\.{UINT8}\.{UINT8}
-BCHARSNOSPC	[0-9a-zA-Z'()+_,-./:=?#]
-BCHARS		[0-9a-zA-Z'()+_,-./:=?# ]
+BCHARSNOSPC	[[:alnum:]'()+_,-./:=?#]
+BCHARS		[[:alnum:]'()+_,-./:=?# ]
 MIME_BOUNDARY	{BCHARS}*{BCHARSNOSPC}
 
-ID		<?[0-9a-zA-Z-]*>?
-CHARSET		[0-9a-zA-Z-]+
-MTYPE		[ \t]*[0-9a-zA-Z/-]*
-TTYPE		[ \t]*[\.0-9a-zA-Z/-]*
+ID		<?[[:alnum:]-]*>?
+CHARSET		[[:alnum:]-]+
+MTYPE		[ \t]*[[:alnum:]/-]*
 
-NUM		[0-9]+
+NUM		[[:digit:]]+
 NUM_NUM		\ {NUM}\ {NUM}
 MSG_COUNT	^\".MSG_COUNT\"
 
@@ -167,14 +166,14 @@ QP		[!->@-~]+
   old: ENCODED_WORD =\?{CHARSET}\?(b\?{BASE64}|q\?{QP})\?\=
 */
 
-ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^\?]*\?\=
+ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^\?]*\?=
 ENCODED_TOKEN	({TOKENFRONT}{TOKENMID})?({ENCODED_WORD}[ \t\n]+)*{ENCODED_WORD}
 
 WHITESPACE	[ \t\n]
 NOTWHITESPACE	[^ \t\n]
 
 HTML_ENCODING		"&#"x?[[:xdigit:]]+";"
-URL_ENCODING		"\%"[[:xdigit:]][[:xdigit:]]
+URL_ENCODING		"%"[[:xdigit:]][[:xdigit:]]
 
 HTML_WI_COMMENTS	"<"[^\>]*">"
 HTML_WO_COMMENTS	"<"[^!][^\>]*">"|"<>"
