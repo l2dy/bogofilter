@@ -18,6 +18,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <unistd.h>
 #include <sys/resource.h>
 
 #ifdef NEEDTRIO
