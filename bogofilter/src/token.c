@@ -193,10 +193,16 @@ token_t get_token(void)
     return(class);
 }
 
-void got_from(void)
+void token_init(void)
 {
+    msg_header = true;
     mime_reset(); 
     reset_html_level();
+}
+
+void got_from(void)
+{
+    token_init();
 }
 
 void got_newline()
