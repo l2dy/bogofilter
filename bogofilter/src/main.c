@@ -339,7 +339,7 @@ static void write_message(FILE *fp, rc_t status)
 	    if (status == RC_SPAM &&
 		rd >= subjlen && 
 		spam_subject_tag != NULL &&
-		strncasecmp(out, subjstr, subjlen)) {
+		strncasecmp(out, subjstr, subjlen) == 0) {
 		(void) fprintf(fp, "%.*s %s", subjlen, out, spam_subject_tag);
 		if (out[subjlen] != ' ')
 		    fputc(' ', fp);
