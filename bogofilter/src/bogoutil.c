@@ -556,13 +556,16 @@ static int process_arglist(int argc, char **argv)
 	    break;
 
 	case 'y':		/* date as YYYYMMDD */
+	{
+	    YYYYMMDD date = string_to_date((char *)optarg);
 	    maintain = true;
-	    today = string_to_date((char *)optarg);
-	    if (date < 19990000) {
+	    if (date != 0 && date < 19990000) {
 		fprintf(stderr, "Date format for '-y' option is YYYYMMDD\n");
 		exit(EX_ERROR);
 	    }
+	    set_date( date );
 	    break;
+	}
 
 	case 'I':
 	    fpin = fopen( optarg, "r" );

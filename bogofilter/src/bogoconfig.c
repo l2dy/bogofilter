@@ -574,9 +574,16 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'y':		/* date as YYYYMMDD */
-	set_date( string_to_date(val) );
+    {
+	YYYYMMDD date = string_to_date((char *)optarg);
+	if (date != 0 && date < 19990000) {
+	    fprintf(stderr, "Date format for '-y' option is YYYYMMDD\n");
+	    exit(EX_ERROR);
+	}
+	set_date( date );
 	break;
-
+    }
+	
     case ':':
 	fprintf(stderr, "Option -%c requires an argument.\n", optopt);
 	exit(EX_ERROR);
