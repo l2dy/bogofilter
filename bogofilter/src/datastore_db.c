@@ -286,7 +286,7 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 
 	handle->dbp = dbp;
 
-	/* set cache size, but only unless we're using an environment */
+	/* set cache size, but not when we're using an environment */
 	if (dbe == NULL && db_cachesize != 0 &&
 	    (ret = dbp->set_cachesize(dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
 	    print_error(__FILE__, __LINE__, "(db) DB(%s)->set_cachesize(%u,%u,%u), err: %d, %s",
