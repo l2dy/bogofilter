@@ -87,7 +87,6 @@
 
 static word_t yyt;
 static int lineno;
-static bool have_pgp = false;
 
 /* Function Prototypes */
 
@@ -250,10 +249,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>\n					{ set_tag("Header"); lineno += 1; }
 <INITIAL>{VERP} 				{ skip_to('='); return VERP; }
 
-^-----BEGIN\ PGP\ SIGNED\ MESSAGE-----$		{ have_pgp = true;     
-						  yy_unput((byte *)yytext, yyleng); }
-^-----BEGIN\ PGP\ SIGNATURE-----$		{ if (have_pgp)
-						      BEGIN PGP_HEAD;
+^-----BEGIN\ PGP\ SIGNATURE-----$		{ BEGIN PGP_HEAD;
 						  yy_unput((byte *)yytext, yyleng);
 						}
 <PGP_HEAD>^\n					{ BEGIN PGP_BODY; }
@@ -424,7 +420,6 @@ void yy_set_state_initial(void)
     BEGIN INITIAL;
     msg_header = true;
     set_tag("Header");
-    have_pgp = false;
 
     if (DEBUG_LEXER(1))
 	fprintf(dbgout, "BEGIN INITIAL\n");
