@@ -14,6 +14,10 @@ AUTHOR:
 #define ERROR_H
 
 #define PRINT_ERROR(fmt...)	print_error(__FILE__, __LINE__, fmt)
-extern void print_error( const char *file, int line, const char *format, ... );
+extern void print_error( const char *file, int line, const char *format, ... )
+#ifdef __GNUC__
+    __attribute__ ((format(printf,3,4)))
+#endif
+    ;
 
 #endif
