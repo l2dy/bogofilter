@@ -27,7 +27,6 @@ AUTHOR:
 #endif
 #include "directories.h"
 #include "find_home.h"
-#include "globals.h"
 #include "method.h"
 #ifdef	ENABLE_GRAHAM_METHOD
 #include "graham.h"
