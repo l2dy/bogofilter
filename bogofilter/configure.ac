@@ -6,9 +6,9 @@ AC_CONFIG_SRCDIR([src])
 AC_CANONICAL_TARGET
 
 dnl foreign: don't insist on ChangeLog
-dnl 1.6: minimum version of automake/aclocal
+dnl 1.7: minimum version of automake/aclocal
 dnl dist-bzip2: make dist emits bogofilter-$VERSION.tar.bz2
-AM_INIT_AUTOMAKE([foreign 1.6 dist-bzip2])
+AM_INIT_AUTOMAKE([foreign 1.7 dist-bzip2])
 
 AM_CONFIG_HEADER(src/config.h:config.in)
 AC_PROG_AWK
@@ -504,7 +504,7 @@ PATH=/bin:/usr/bin:$PATH
 export PATH
 
 need_my_gsl=1
-AC_ARG_WITH(included-gsl, AS_HELP_STRING([--with-included-gsl],[force use of shipped GSL rather than system GSL]),
+AC_ARG_WITH(included-gsl, AC_HELP_STRING([--with-included-gsl],[force use of shipped GSL rather than system GSL]),
 if test "x$WITHVAL" != "xyes" ; then need_my_gsl=2 ; fi)
 
 if test "$need_my_gsl" = 1 ; then
@@ -571,6 +571,5 @@ AC_MSG_NOTICE([CPPFLAGS=$CPPFLAGS])
 AC_MSG_NOTICE([  CFLAGS=$CFLAGS])
 AC_MSG_NOTICE([ LDFLAGS=$LDFLAGS])
 AC_MSG_NOTICE([    LIBS=$LIBS])
-AC_MSG_NOTICE([  DB_LIB=$LIBDB])
+AC_MSG_NOTICE([   LIBDB=$LIBDB])
 AC_MSG_NOTICE([GSL_LIBS=$GSL_LIBS])
-
