@@ -1,4 +1,4 @@
-X-Bogosity: No, tests=bogofilter, spamicity=0.535319
+X-Bogosity: Ham, tests=bogofilter, spamicity=0.535319
    int  cnt   prob  spamicity histogram
   0.00   33 0.002044 0.000432 #############
   0.10    0 0.000000 0.000432 

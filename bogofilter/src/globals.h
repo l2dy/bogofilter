@@ -79,7 +79,7 @@ extern bool onlyprint;
 #define	SP_ESF		1.0
 #define	NS_ESF		1.0
 
-#define HAM_CUTOFF	0.00	/* 0.00 for two-state, 0.45 for three-state */
+#define HAM_CUTOFF	0.45	/* 0.45 for three-state, 0.00 for two-state  */
 #define SPAM_CUTOFF	0.99
 
 #define ROBX_W		".ROBX"

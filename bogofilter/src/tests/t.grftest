@@ -26,7 +26,7 @@ robx=0.415
 min_dev=0.1
 ham_cutoff=0.1
 terse_format = %1.1c %d
-spamicity_tags = S,h,u
+spamicity_tags = s,h,u
 spamicity_formats = %0.6f %0.6f %0.6f
 EOF
 
@@ -87,7 +87,7 @@ OUT="grftest.out"
 printf "%2s     %-10s   %-10s\n" id fisher tristate > ${TMPDIR}/tests/$OUT
 for out in ${TMPDIR}/tests/msg.?.t.$V ; do
     id=`echo $out | sed s@${TMPDIR}/tests/msg.@@ | sed s@.t.$V@@`
-    f=`head -1 ${TMPDIR}/tests/msg.$id.f.$V | tr "NY" "hS"`
+    f=`head -1 ${TMPDIR}/tests/msg.$id.f.$V | tr "HS" "hs"`
     t=`head -1 ${TMPDIR}/tests/msg.$id.t.$V`
     printf "%2s   %c %s   %c %s\n" $id $f $t >> ${TMPDIR}/tests/$OUT
 done

@@ -1,4 +1,4 @@
-X-Bogosity: No, tests=bogofilter, spamicity=0.547550
+X-Bogosity: Ham, tests=bogofilter, spamicity=0.547550
                                      n    pgood     pbad      fw     U
 "which"                             10  0.208333  0.000000  0.000415 +
 "working"                            6  0.125000  0.000000  0.000691 +

@@ -1,4 +1,4 @@
-X-Bogosity: Yes, tests=bogofilter, spamicity=0.990000
+X-Bogosity: Spam, tests=bogofilter, spamicity=0.990000
   0.010000  0.010000  How
   0.010000  0.000102  Online
   0.010000  0.000001  Only

@@ -85,7 +85,7 @@ static FIELD spamicity_tags_ynu[RC_COUNT] = { "Yes",   "No",    "Unsure" };
 static FIELD spamicity_tags_shu[RC_COUNT] = { "Spam",  "Ham",   "Unsure" };
 static FIELD spamicity_format_d[RC_COUNT] = { "%0.6f", "%0.6f", "%0.6f" };
 
-FIELD  *spamicity_tags    = spamicity_tags_ynu;
+FIELD  *spamicity_tags    = spamicity_tags_shu;
 FIELD  *spamicity_formats = spamicity_format_d;
 
 /* Descriptors for config file */

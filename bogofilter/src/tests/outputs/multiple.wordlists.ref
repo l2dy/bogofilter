@@ -1,14 +1,14 @@
 #### 1: score message using each wordlist ####
 
-ignore:     X-Bogosity: No, tests=bogofilter, spamicity=0.520000
-system:     X-Bogosity: No, tests=bogofilter, spamicity=0.213252
-user:       X-Bogosity: No, tests=bogofilter, spamicity=0.227632
-wordlist:   X-Bogosity: No, tests=bogofilter, spamicity=0.246543
+ignore:     X-Bogosity: Unsure, tests=bogofilter, spamicity=0.520000
+system:     X-Bogosity: Ham, tests=bogofilter, spamicity=0.213252
+user:       X-Bogosity: Ham, tests=bogofilter, spamicity=0.227632
+wordlist:   X-Bogosity: Ham, tests=bogofilter, spamicity=0.246543
 
 #### 1: score message using each config file ####
 
 Using default.cf:
-X-Bogosity: No, tests=bogofilter, spamicity=0.246543
+X-Bogosity: Ham, tests=bogofilter, spamicity=0.246543
                                       n    pgood     pbad      fw     U
 "common"                              9  7.000000  2.000000  0.222810 +
 "ignore"                              9  7.000000  2.000000  0.222810 +
@@ -23,7 +23,7 @@ N_P_Q_S_s_x_md                        4  0.807830  0.300917  0.246543
                                          0.017800  0.520000  0.100000
 
 Using ign_reg.cf:
-X-Bogosity: No, tests=bogofilter, spamicity=0.346753
+X-Bogosity: Ham, tests=bogofilter, spamicity=0.346753
                                       n    pgood     pbad      fw     U
 "common"                              9  7.000000  2.000000  0.222810 +
 "word_low"                            9  7.000000  2.000000  0.222810 +
@@ -38,7 +38,7 @@ N_P_Q_S_s_x_md                        3  0.675071  0.368576  0.346753
                                          0.017800  0.520000  0.100000
 
 Using ign_usr_sys.cf:
-X-Bogosity: No, tests=bogofilter, spamicity=0.317310
+X-Bogosity: Ham, tests=bogofilter, spamicity=0.317310
                                       n    pgood     pbad      fw     U
 "system_low"                         11  0.818182  0.181818  0.182365 +
 "common"                             21  1.545455  0.363636  0.190755 +
@@ -53,7 +53,7 @@ N_P_Q_S_s_x_md                        3  0.671278  0.305897  0.317310
                                          0.017800  0.520000  0.100000
 
 Using mrg_usr_sys.cf:
-X-Bogosity: No, tests=bogofilter, spamicity=0.267356
+X-Bogosity: Ham, tests=bogofilter, spamicity=0.267356
                                       n    pgood     pbad      fw     U
 "system_low"                         11  0.818182  0.181818  0.182365 +
 "common"                             21  1.545455  0.363636  0.190755 +
@@ -72,15 +72,15 @@ N_P_Q_S_s_x_md                        6  0.760046  0.294759  0.267356
 
 #### 2: score message using each wordlist ####
 
-ignore:     X-Bogosity: No, tests=bogofilter, spamicity=0.520000
-system:     X-Bogosity: No, tests=bogofilter, spamicity=0.213252
-user:       X-Bogosity: No, tests=bogofilter, spamicity=0.165188
-wordlist:   X-Bogosity: No, tests=bogofilter, spamicity=0.246543
+ignore:     X-Bogosity: Unsure, tests=bogofilter, spamicity=0.520000
+system:     X-Bogosity: Ham, tests=bogofilter, spamicity=0.213252
+user:       X-Bogosity: Ham, tests=bogofilter, spamicity=0.165188
+wordlist:   X-Bogosity: Ham, tests=bogofilter, spamicity=0.246543
 
 #### 2: score message using each config file ####
 
 Using default.cf:
-X-Bogosity: No, tests=bogofilter, spamicity=0.246543
+X-Bogosity: Ham, tests=bogofilter, spamicity=0.246543
                                       n    pgood     pbad      fw     U
 "common"                              9  7.000000  2.000000  0.222810 +
 "ignore"                              9  7.000000  2.000000  0.222810 +
@@ -95,7 +95,7 @@ N_P_Q_S_s_x_md                        4  0.807830  0.300917  0.246543
                                          0.017800  0.520000  0.100000
 
 Using ign_reg.cf:
-X-Bogosity: No, tests=bogofilter, spamicity=0.346753
+X-Bogosity: Ham, tests=bogofilter, spamicity=0.346753
                                       n    pgood     pbad      fw     U
 "common"                              9  7.000000  2.000000  0.222810 +
 "word_low"                            9  7.000000  2.000000  0.222810 +
@@ -110,7 +110,7 @@ N_P_Q_S_s_x_md                        3  0.675071  0.368576  0.346753
                                          0.017800  0.520000  0.100000
 
 Using ign_usr_sys.cf:
-X-Bogosity: No, tests=bogofilter, spamicity=0.101546
+X-Bogosity: Ham, tests=bogofilter, spamicity=0.101546
                                       n    pgood     pbad      fw     U
 "message"                             1  0.083333  0.000000  0.009094 +
 "common"                             22  1.500000  0.363636  0.195385 +
@@ -125,7 +125,7 @@ N_P_Q_S_s_x_md                        4  0.834638  0.037730  0.101546
                                          0.017800  0.520000  0.100000
 
 Using mrg_usr_sys.cf:
-X-Bogosity: No, tests=bogofilter, spamicity=0.105029
+X-Bogosity: Ham, tests=bogofilter, spamicity=0.105029
                                       n    pgood     pbad      fw     U
 "message"                             1  0.083333  0.000000  0.009094 +
 "common"                             22  1.500000  0.363636  0.195385 +

@@ -28,7 +28,7 @@ Header: body and empty line
 Another-Header: head3
  
 after non-empty blank -- X-Bogosity should be next
-X-Bogosity: No, tests=bogofilter, spamicity=0.520000
+X-Bogosity: Unsure, tests=bogofilter, spamicity=0.520000
 
 after empty line
 EOF
@@ -37,7 +37,7 @@ cat >${TMPDIR}/reference.3 <<EOF
 Header: no body
  head2
 Another-Header: head3 -- X-Bogosity should be next
-X-Bogosity: No, tests=bogofilter, spamicity=0.520000
+X-Bogosity: Unsure, tests=bogofilter, spamicity=0.520000
 
 after non-empty blank
  
@@ -48,7 +48,7 @@ cat <<EOF |tr "^" "\r" >${TMPDIR}/reference.4
 Header: no body^
  head2^
 Another-Header: head4 -- X-Bogosity should be next^
-X-Bogosity: No, tests=bogofilter, spamicity=0.520000^
+X-Bogosity: Unsure, tests=bogofilter, spamicity=0.520000^
 ^
 after non-empty blank^
  ^

@@ -43,16 +43,16 @@ map_rc()
 
 # Expected spamicity values (11/17/02 13:13):
 #
-#	1 g v		X-Bogosity: No,  spamicity=0.000000
-#	1 r v		X-Bogosity: No,  spamicity=0.402296
-#	2a g vv		X-Bogosity: Yes, spamicity=1.000000
-#	2a r vv		X-Bogosity: No,  spamicity=0.527095
-#	2b g vv		X-Bogosity: Yes, spamicity=1.000000
-#	2b g vvv	X-Bogosity: Yes, spamicity=1.000000
-#	2b r vv		X-Bogosity: Yes, spamicity=0.540124
-#	2b r vvv	X-Bogosity: Yes, spamicity=0.540124
-#	3 g vvv		X-Bogosity: Yes, spamicity=1.000000
-#	3 r vvv		X-Bogosity: Yes, spamicity=0.540316
+#	1 g v		X-Bogosity: Ham,  spamicity=0.000000
+#	1 r v		X-Bogosity: Ham,  spamicity=0.402296
+#	2a g vv		X-Bogosity: Spam, spamicity=1.000000
+#	2a r vv		X-Bogosity: Ham,  spamicity=0.527095
+#	2b g vv		X-Bogosity: Spam, spamicity=1.000000
+#	2b g vvv	X-Bogosity: Spam, spamicity=1.000000
+#	2b r vv		X-Bogosity: Spam, spamicity=0.540124
+#	2b r vvv	X-Bogosity: Spam, spamicity=0.540124
+#	3 g vvv		X-Bogosity: Spam, spamicity=1.000000
+#	3 r vvv		X-Bogosity: Spam, spamicity=0.540316
 
 alg="f"
 
