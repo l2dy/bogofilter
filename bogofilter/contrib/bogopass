@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # $Id$
 
 # bogopass -- emulate bogofilter -p with base64 decoder
@@ -40,6 +40,7 @@
 require 5.004;
 use strict;
 use File::Temp qw(tempfile unlink0);
+use IO::Handle;
 
 sub my_die($ );
 sub parsewait($ );
@@ -47,24 +48,40 @@ sub parsewait($ );
 my $PROG = 'bogopass';
 $ENV{PATH} = '/bin:/usr/bin:/usr/local/bin';
 
+sub werr($ ) {
+    my ($f) = shift;
+    my_die("Error writing to temporary file $f: $!");
+}
+
 ### Begin Main ###
 
 my ($fh, $fn) = tempfile("/tmp/$PROG.XXXXXXXXXX");
 while (<STDIN>) {
-    print $fh $_ or my_die("Error writing to temporary file $fn: $!");
+    print $fh $_ or werr($fn);
 }
+defined $fh->flush or werr($fn);
+
+my ($h2, $n2) = tempfile("/tmp/$PROG.XXXXXXXXXX");
+my $r;
+($r = (system "unbase64 <\"$fn\" >>\"$n2\"")) == 0 or
+    my_die("Error executing unbase64: " . parsewait($r));
+
+unlink0 ($fh,$fn) or
+    my_die "cannot unlink temporary file $fn: $!";
 close $fh or my_die("Error closing temporary file $fn: $!");
 
 my $options = join ' ', @ARGV;
-my $bogo_header = `unbase64 <"$fn" | bogofilter -v $options`;
+my $bogo_header = `bogofilter -v $options`;
+my_die "unbase64 or bogofilter failed" unless defined $bogo_header;
 chomp $bogo_header;
 $bogo_header =~ /^X-Bogosity:/ or
     my_die "bogofilter returned invalid output (\"$bogo_header\")";
 
-system("formail -I \"$bogo_header\" < \"$fn\"") == 0 or
-    my_die "formail failed ($?)";
-unlink0 ($fh,$fn) or
-    my_die "cannot unlink temporary file $fn: $!";
+system("formail -I \"$bogo_header\" < \"$n2\"") == 0 or
+    my_die "formail failed (" . parsewait($?) . ")";
+unlink0 ($h2,$n2) or
+    my_die "cannot unlink temporary file $n2: $!";
+close $h2 or my_die("Error closing temporary file $fn: $!");
 exit 0;
 
 ### End Main ###
