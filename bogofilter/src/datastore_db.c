@@ -259,37 +259,6 @@ void *dbe_init(const char *directory)
 	exit(EX_ERROR);
     }
 
-    if (NULL == realpath(directory, norm_dir)) {
-	    print_error(__FILE__, __LINE__,
-		    "error: cannot normalize path \"%s\": %s",
-		    directory, strerror(errno));
-	    exit(EX_ERROR);
-    }
-
-    if (NULL == realpath(bogohome, norm_home)) {
-	    print_error(__FILE__, __LINE__,
-		    "error: cannot normalize path \"%s\": %s",
-		    bogohome, strerror(errno));
-	    exit(EX_ERROR);
-    }
-
-    if (0 != strcmp(norm_dir, norm_home))
-    {
-	fprintf(stderr,
-		"ERROR: only one database _environment_ (directory) can be used at a time.\n"
-		"You CAN use multiple wordlists that are in the same directory.\n\n");
-	fprintf(stderr,
-		"If you need multiple wordlists in different directories,\n"
-		"you cannot use the transactional interface, but you must configure\n"
-		"the non-transactional interface, i. e. ./configure --disable-transactions\n"
-		"then type make clean, after that rebuild and install as usual.\n"
-		"Note that the data base will no longer be crash-proof in that case.\n"
-		"Please accept our apologies for the inconvenience.\n");
-	fprintf(stderr,
-		"\nAborting program\n");
-	exit(EX_ERROR);
-    }
-
     assert(directory);
 
     dsm_init();
