@@ -1,11 +1,8 @@
 /* $Id$ */
 
-/*****************************************************************************
-
-NAME:
-   paths.c -- routines for working with file paths.
-
-******************************************************************************/
+/**
+ * \file paths.c -- routines for working with file paths.
+ */
 
 #include "common.h"
 
@@ -51,12 +48,6 @@ char *build_progtype(const char *name, const char *db_type)
     return type;
 }
 
-/* build an path to a file given a directory and file name,
- * concatenating dir and file, adding a slash if necessary
- *
- * returns: true for success
- *	    false for error (esp. overflow)
- */
 bool build_path(char* dest, size_t size, const char* path, const char* file)
 {
     size_t pathlen = strlen(path);
@@ -92,11 +83,6 @@ bool build_path(char* dest, size_t size, const char* path, const char* file)
     return true;
 }
 
-/* if the given environment variable 'var' exists, create a path from it and
-   tack on the optional 'subdir' value.
-   return value: buffer address if successful
-                 NULL if failure
- */
 char *create_path_from_env(const char *var,
 		/*@null@*/ const char *subdir)
 {
@@ -121,9 +107,6 @@ char *create_path_from_env(const char *var,
     return buff;
 }
 
-/* check that our directory exists and try to create it if it doesn't
-   return -1 on failure, 0 otherwise.
- */
 bool check_directory(const char* path) /*@globals errno,stderr@*/
 {
     int rc;
@@ -138,7 +121,7 @@ bool check_directory(const char* path) /*@globals errno,stderr@*/
 	    if (bf_mkdir(path, S_IRUSR|S_IWUSR|S_IXUSR)) {
 		fprintf(stderr, "Error creating directory '%s': %s\n",
 			path, strerror(errno));
-		return -1;
+		return false;
 	    } else if (verbose > 0) {
 		fprintf(dbgout, "Created directory %s .\n", path);
 	    }
@@ -151,13 +134,12 @@ bool check_directory(const char* path) /*@globals errno,stderr@*/
     } else {
 	if (! S_ISDIR(sb.st_mode)) {
 	    fprintf(stderr, "Error: %s is not a directory.\n", path);
+	    return false;
 	}
     }
     return true;
 }
 
-/* check whether the path is a file or a directory.
- */
 bool is_file(const char* path) /*@globals errno,stderr@*/
 {
     int rc;
@@ -207,4 +189,3 @@ char *get_directory_from_path(const char *path)
 	return dir;
     }
 }
-
