@@ -74,8 +74,8 @@ $BOGOUTIL -a 20021010 -d $DATA $sort > ${TMPDIR}/tst.out.6
 ( diff -u ${TMPDIR}/tst.out.5 ${TMPDIR}/tst.out.6 ; echo "" ) | $GREP | tee ${TMPDIR}/diff.5.6 >> $OUT
 
 cd ${TMPDIR}
-wc -l -w ../$BASE.*p* tst.out.? > $SUM
-wc -l -w diff.?.? >> $SUM
+wc -l -c ../$BASE.*p* tst.out.? > $SUM
+wc -l -c diff.?.? >> $SUM
 cd ..
 
 if  [ $verbose -eq 0 ]; then
