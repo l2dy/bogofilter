@@ -24,7 +24,6 @@ Most of the ideas in here are stolen from Mutt's snprintf implementation.
 #include "bogoconfig.h"
 #include "bogofilter.h"
 #include "method.h"
-#include "xmalloc.h"
 #include "xstrdup.h"
 
 /* Function Prototypes */

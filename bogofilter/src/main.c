@@ -40,7 +40,6 @@ CONTRIBUTORS:
 #include "register.h"
 #include "textblock.h"
 #include "wordlists.h"
-#include "xmalloc.h"
 #include "mime.h"
 
 #define	NL	"\n"

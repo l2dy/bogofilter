@@ -21,7 +21,6 @@ NAME:
 #include "robinson.h"
 #include "rstats.h"
 #include "wordhash.h"
-#include "xmalloc.h"
 
 #define ROBINSON_MIN_DEV	0.0	/* if nonzero, use characteristic words */
 #define ROBINSON_SPAM_CUTOFF	0.54	/* if it's spammier than this... */

@@ -20,7 +20,6 @@ AUTHOR:
 
 #include "method.h"
 #include "wordlists.h"
-#include "xmalloc.h"
 
 #include "bogoconfig.h"
 

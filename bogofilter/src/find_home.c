@@ -24,7 +24,6 @@
 #include <sys/types.h>
 
 #include "find_home.h"
-#include "xmalloc.h"
 
 /* This function will try to figure out the home directory of the user.
  * 
