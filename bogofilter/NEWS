@@ -6,8 +6,8 @@ $Id$
 
 0.11.2	2003-04-13
 
-	* Added 'terse option to bogofilter.cf for selecting format of
-          X-Bogosity line. 
+	* Added 'terse' option to bogofilter.cf for selecting format of
+          X-Bogosity line.
 
 	2003-04-11
 
