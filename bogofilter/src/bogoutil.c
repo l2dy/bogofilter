@@ -286,18 +286,19 @@ static int get_token(buff_t *buff, FILE *fp)
 	    rv = 1;
 	}
     } else {
-	char *p;
 	buff->t.leng = strlen((const char *)buff->t.text);
-	p = (char *)(buff->t.text + buff->t.leng - 1);
-
-	if (*p != '\n') {
+	if (buff->t.text[buff->t.leng - 1] == '\n' ) {
+	    buff->t.leng -= 1;
+	    buff->t.text[buff->t.leng] = '\0';
+	}
+	else
+	{
 	    fprintf(stderr,
 		    "%s: Unexpected input [%s]. Does not end with newline "
 		    "or line too long.\n",
 		    PROGNAME, buff->t.text);
 	    rv = 1;
 	}
-	*p = '\0';
     }
     return rv;
 }
