@@ -84,6 +84,13 @@
     </group>
     </cmdsynopsis>
 
+  <para><option>parsing options</option> are:</para>
+    <cmdsynopsis>
+    <arg choice='opt'>-Pi/-PI</arg>
+    <arg choice='opt'>-Ph/-PH</arg>
+    <arg choice='opt'>-Pt/-PT</arg>
+    </cmdsynopsis>
+
   <para><option>parameter options</option> are:</para>
     <cmdsynopsis>
     <arg choice='opt'>-m <replaceable><optional>value</optional>
@@ -334,6 +341,29 @@ modifications to the calculation method.</para>
 <option>--disable-robinson-fisher</option> so that
 <application>bogofilter</application> can be built to support a subset
 of the available methods.</para>
+
+<para>PARSING OPTIONS</para>
+
+<para><application>Bogofilter</application> has three special parsing options which can be enabled (or disabled) at the user's discretion.
+The options ar of form <option>-Px</option> and <option>-PX</option> where <option>x</option> designates an option letter.
+For the parsing options, a lower case letter enables the option and an upper case letter disables it.</para>
+
+<para>Options <option>-Ph</option> and <option>-PH</option> are for header line markup, i.e. whether to create special tags for header lines.
+When enable, tokens in "To:", "From:", "Return-Path:", and "Subject:" lines will be given special prefixes.
+Enabling this option increases <application>bogofilter's</application> accuracy.</para>
+
+<para>Options <option>-Pi</option> and <option>-PI</option> are for ignoring case, i.e. whether to map upper case to lower case (or not).
+Disabling this option increases <application>bogofilter's</application> accuracy.
+</para>
+
+<para>Options <option>-Ph</option> and <option>-PH</option> are for header line markup, i.e. whether to create special tags for header lines.
+When enable, tokens in "To:", "From:", "Return-Path:", and "Subject:" lines will be given special prefixes.
+This option increases <application>bogofilter's</application> accuracy.</para>
+
+<para>Options <option>-Pt</option> and  <option>-PT</option> are for tokenizing the innards of 3 html tags, i.e. 
+&gt;a&lt;, &gt;img&lt;, and &gt;font&lt;.
+Tokenizing these tags adds urls and font names to the message's tokens.
+Enabling this option increases <application>bogofilter's</application> accuracy.</para>
 
 <para>PARAMETER OPTIONS</para>
 
