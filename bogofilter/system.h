@@ -1,9 +1,12 @@
-/* from autoconf.info */
+/* parts were taken from autoconf.info */
+
+/*
+ * this file shall define the bool and uint32_t types.
+ * it shall include inttypes.h and stdbool.h if present
+ */
 
 #ifndef SYSTEM_H
 #define SYSTEM_H
-
-#include <string.h>
 
 #include "config.h"
 
@@ -58,4 +61,25 @@ size_t strlcat(char *dst, const char *src, size_t size);
 # endif
 #endif
 
+/* obtain uint32_t */
+#ifdef HAVE_INTTYPES_H
+#include <inttypes.h>
+#elif HAVE_STDINT_H
+#include <stdint.h>
 #endif
+
+#ifndef HAVE_UINT32_T
+#ifdef HAVE_U_INT32_T
+typedef u_int32_t uint32_t;
+#elif SIZEOF_UNSIGNED_LONG == 4
+typedef unsigned long uint32_t;
+#elif SIZEOF_UNSIGNED_INT == 4
+typedef unsigned int uint32_t;
+#elif SIZEOF_UNSIGNED_SHORT == 4
+typedef unsigned short uint32_t;
+#else
+choke me because we do not know how to define uint32_t
+#endif
+#endif /* HAVE_UINT32_T */
+
+#endif /* SYSTEM_H */

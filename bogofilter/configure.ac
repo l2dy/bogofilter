@@ -185,6 +185,7 @@ AC_HEADER_STDBOOL
 AC_HEADER_TIME
 AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h stdlib.h string.h sys/socket.h])
 AC_CHECK_HEADERS([unistd.h sys/file.h stddef.h sys/time.h sys/select.h])
+AC_CHECK_HEADERS([inttypes.h stdint.h])
 AC_CHECK_HEADERS([limits.h float.h],,[AC_CHECK_HEADERS(values.h)])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -194,6 +195,10 @@ AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 AC_TYPE_SIGNAL
 AC_FUNC_SELECT_ARGTYPES
+AC_CHECK_TYPES([uint32_t, u_int32_t])
+AC_CHECK_SIZEOF(unsigned short)
+AC_CHECK_SIZEOF(unsigned int)
+AC_CHECK_SIZEOF(unsigned long)
 
 # Checks for library functions.
 dnl AC_FUNC_MALLOC
