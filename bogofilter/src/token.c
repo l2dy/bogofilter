@@ -100,6 +100,15 @@ token_t get_token(void)
 	case BOUNDARY:	/* don't return boundary tokens to the user */
 	    continue;
 
+	case HEADKEY:
+	{
+	    const char *delim = index((const char *)yylval->text, ':');
+	    yylval->leng = delim - (const char *)yylval->text;
+	    Z(yylval->text[yylval->leng]);
+	}
+
+	/*@fallthrough@*/
+
 	case TOKEN:	/* ignore anything when not reading text MIME types */
 	    if (token_prefix != NULL) {
 		word_t *w = word_concat(token_prefix, yylval);

@@ -119,7 +119,7 @@ BCHARSNOSPC	[0-9a-zA-Z'()+_,-./:=?#]
 BCHARS		[0-9a-zA-Z'()+_,-./:=?# ]
 MIME_BOUNDARY	{BCHARS}{0,69}{BCHARSNOSPC}
 
-ID		[0-9a-zA-Z-]*
+ID		<?[0-9a-zA-Z-]*>?
 CHARSET		[0-9a-zA-Z-]+
 MTYPE		[ \t]*[0-9a-zA-Z/-]*
 TTYPE		[ \t]*[\.0-9a-zA-Z/-]*
@@ -215,17 +215,19 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
 <INITIAL>^(To|From|Return-Path|Subject):	{ if (header_line_markup) set_tag(yy_text()); }
 <INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); return TOKEN; }
-<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); 	skip_to(':'); return TOKEN; }
+<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); skip_to(':'); return TOKEN; }
 
-<INITIAL>^Message-ID:.*				;
-<INITIAL>^(Delivery-)?Date:.*			;
+<INITIAL>^(Delivery-)?Date:.*			/* ignore */
+<INITIAL>^(Resent-)?Message-ID:.*		/* ignore */
+
+<INITIAL>^(In-Reply-To|References):.* 		{ return HEADKEY; }
 
 <INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
-<INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); 		skip_to('='); return TOKEN; }
+<INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); skip_to('='); return TOKEN; }
 
-<INITIAL>(file)?name=\"?			
-<INITIAL>(ESMTP|SMTP)+[ \t\n]+id\ {ID}		;
-<INITIAL>[:blank:]*id\ {ID}			;
+<INITIAL>(file)?name=\"?			/* ignore */
+<INITIAL>(ESMTP|SMTP)+[ \t\n]+id\ {ID}		/* ignore */
+<INITIAL>[:blank:]*id\ {ID}			/* ignore */
 
 <INITIAL>\n[ \t]				{ lineno += 1; }
 <INITIAL>\n\n					{ if (get_content_type() == MIME_TEXT_HTML)
@@ -274,7 +276,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 
 \${DOLLARS}(\.{CENTS})?				{ return TOKEN;}
 
-.						;			/* ignore character */
+.						/* ignore character */
 \n						{ lineno += 1; clr_tag(); }
 %%
 
