@@ -30,7 +30,7 @@ static void print_wordlist (wordhash_t *h)
     hashnode_t *n;
 
     for(n=wordhash_first(h);n;n = wordhash_next(h)) {
-	printf("%ld %s\n", ((wordprop_t *)(n->buf))->freq, n->key);
+	printf("%d %s\n", ((wordprop_t *)(n->buf))->freq, n->key);
     }
 }
 
