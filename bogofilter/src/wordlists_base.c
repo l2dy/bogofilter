@@ -30,28 +30,33 @@ void init_wordlist(const char* name, const char* path,
     n->filepath=xstrdup(path);
     n->index   =++listcount;
     n->type    =type;
+    n->next    =NULL;
     n->override=override;
 
     list_ptr=word_lists;
 
-    while(1) {
-	if (list_ptr == NULL ||
-	    list_ptr->override > override) {
-	    word_lists=n;
-	    n->next=list_ptr;
-	    break;
-	}
-
-	if (list_ptr->next == NULL) {
-	    /* end of list */
-	    list_ptr->next=n;
-	    n->next=NULL;
-	    break;
-	}
-	list_ptr=list_ptr->next;
+    if (list_ptr == NULL ||
+	list_ptr->override > override) {
+	n->next=word_lists;
+	word_lists=n;
+	return;
     }
 
-    return;
+    while(1) {
+        if (list_ptr->next == NULL) {
+	    /* end of list */
+	    list_ptr->next=n;
+	    return;
+	}
+
+	if (list_ptr->next->override > override) {
+	    n->next=list_ptr->next;
+	    list_ptr->next=n;
+	    return;
+        }
+
+	list_ptr=list_ptr->next;
+    }
 }
 
 /* Set default wordlist for registering messages, finding robx, etc */
