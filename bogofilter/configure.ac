@@ -236,7 +236,7 @@ if test "$ICC" = no ; then
 # Skip the test on ICC.
 AC_FUNC_SETVBUF_REVERSED
 fi
-AC_CHECK_TYPES([uint, ulong, uint32_t, u_int32_t, int32_t, int16_t, u_int16_t, uint16_t, u_int8_t])
+AC_CHECK_TYPES([uint, ulong, uint32_t, u_int32_t, int32_t, int16_t, u_int16_t, uint16_t, u_int8_t, ssize_t])
 AC_CHECK_TYPE(u_long, unsigned long)
 AC_CACHE_SAVE
 AC_CHECK_SIZEOF(short)

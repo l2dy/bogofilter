@@ -109,6 +109,11 @@ typedef unsigned long ulong;
 typedef unsigned int uint;
 #endif
 
+/* SunOS 4.1.X needs this */
+#ifndef HAVE_SSIZE_T
+typedef int ssize_t;
+#endif
+
 /* prevent db.h from redefining the types above */
 #undef	__BIT_TYPES_DEFINED__
 #define	__BIT_TYPES_DEFINED__ 1
