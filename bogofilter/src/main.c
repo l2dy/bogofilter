@@ -89,14 +89,14 @@ static void initialize(FILE *fp)
 static int classify(int argc, char **argv, FILE *out)
 {
     int  exitcode = 0;
-    bool done = false;
     bool error = false;
-    double spamicity;
-    rc_t   status;
-    char *filename = NULL;
-    char buff[PATH_LEN+1];
+    bool done = false;
 
     while (!done) {
+	rc_t status = RC_MORE;
+	char *filename = NULL;
+	char buff[PATH_LEN+1];
+
 	switch (bulk_mode) {
 	case B_NORMAL:
 	    break;
@@ -132,20 +132,22 @@ static int classify(int argc, char **argv, FILE *out)
 		fprintf(stderr, "Can't read file '%s'\n", filename);
 		continue;
 	    }
+	    initialize(fpin);
 	    fprintf(out, "%s ", filename ); 
 	}
 
 	passthrough_setup();
 	do {
 	    init_msg_counts();
-	    mime_reset();
+	    token_init();
 	    init_charset_table(charset_default, true);
 
-	    status = bogofilter(&spamicity);
+	    status = bogofilter(NULL);
 	    write_message(out, status);
 
 	    rstats_cleanup();
 	} while (status == RC_MORE);
+
 	passthrough_cleanup();
 
 	if (bulk_mode == B_NORMAL && status != RC_MORE) {
