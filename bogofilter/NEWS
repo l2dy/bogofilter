@@ -24,6 +24,11 @@ Briefly:
 
 0.93.3	2004-12-XX
 
+	2004-12-17
+
+	* lexer_v3 HTML parser fix for urlencoded characters, by Krzysztof
+	  Foltman. Speeds up a particular case of malformatted mail.
+
 	2004-12-14
 
 	* bogoutil -C file  now checks if the database file file is intact.
