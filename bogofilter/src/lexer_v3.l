@@ -136,6 +136,16 @@ T1		{TOKENFRONT}
 <INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
 <INITIAL>name=\"?				;
 <INITIAL>filename=\"?				;
+<INITIAL>^\n					{ got_emptyline(); 
+						  lineno += 1;
+						  switch (get_content_type()) 
+						  {
+						    case MIME_TEXT_PLAIN: BEGIN(TEXT); break;
+						    case MIME_TEXT_HTML:  BEGIN(HTML); break;
+						    default:              BEGIN(TEXT); break;
+						  }
+						  return(EMPTY);
+						}
 
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
 						      BEGIN(INITIAL); 
@@ -154,16 +164,6 @@ T1		{TOKENFRONT}
 <HTML>\>					{ html_tag(0); }
 
 .						;
-^\n						{ got_emptyline(); 
-						  lineno += 1;
-						  switch (get_content_type()) 
-						  {
-						    case MIME_TEXT_PLAIN: BEGIN(TEXT); break;
-						    case MIME_TEXT_HTML:  BEGIN(HTML); break;
-						    default:              BEGIN(TEXT); break;
-						  }
-						  return(EMPTY);
-						}
 \n						{ got_newline(); 
 						  lineno += 1;
 						}
