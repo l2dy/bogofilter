@@ -105,9 +105,7 @@ static int kill_html_comment(buff_t *buff, size_t comment_offset)
 	if (need > avail) {
 	    int new;
 	    int used = tmp - buf_beg + comment_offset;
-	    buff->read += buff->t.leng;
 	    new = buff_fill(buff, used, need);
-	    buff->read -= buff->t.leng;
 	    if (new == 0 || new == EOF)
 		break;
 	    continue;

@@ -160,9 +160,6 @@ static int get_decoded_line(buff_t *buff)
     size_t used = buff->t.leng;
     byte *buf;
 
-    /* specify location for reading the next line */
-    buff->read = used;			
-
     if (yysave == NULL)
 	count = yy_get_new_line(buff);
     else

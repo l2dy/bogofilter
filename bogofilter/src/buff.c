@@ -26,7 +26,6 @@ buff_t *buff_new(byte *buff, size_t used, size_t size)
     buff_t *self = xmalloc(sizeof(buff_t));
     self->t.text = buff;
     self->t.leng = used;
-    self->pos  = 0;
     self->read = 0;
     self->size = size;
     return self;
@@ -47,10 +46,12 @@ buff_t *buff_dup(const buff_t *self)
 
 int buff_fgetsl(buff_t *self, FILE *in)
 {
-    int s = xfgetsl((char *)self->t.text+self->read, self->size-self->read, in, 1);
-    if (s >= 0)
-	self->t.leng += s;
-    return s;
+    int readpos = self->t.leng;
+    int readcnt = xfgetsl((char *)self->t.text+readpos, self->size-readpos, in, 1);
+    self->read = readpos;
+    if (readcnt >= 0)
+	self->t.leng += readcnt;
+    return readcnt;
 }
 
 void buff_puts(const buff_t *self, size_t width, FILE *fp)
