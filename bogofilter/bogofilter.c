@@ -475,7 +475,8 @@ static double compute_probability(const char *token)
 
     case AL_ROBINSON:
 	prob=wordprob_result(&wordstats);
-	if (Rtable || verbose)
+	if ((Rtable || verbose) &&
+	    (fabs(EVEN_ODDS - prob) >= min_dev))
 	    rstats_add(token, wordstats.good, wordstats.bad, prob);
 	break;
 
