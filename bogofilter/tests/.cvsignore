@@ -2,3 +2,6 @@ Makefile
 Makefile.in
 dehex
 .deps
+README
+dumbhead
+spam_header_name
