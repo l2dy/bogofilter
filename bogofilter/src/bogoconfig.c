@@ -365,6 +365,7 @@ static void help(void)
 		  "\t  -d path - specify directory for wordlists.\n"
 		  "\t  -k size - set BerkeleyDB cache size (MB).\n"
 		  "\t  -W      - use combined wordlist.db for spam and ham tokens.\n"
+		  "\t  -WW     - use separate wordlists for spam and ham tokens.\n"
 		  "\t  -l      - write messages to syslog.\n"
 		  "\t  -L tag  - specify the tag value for log messages.\n"
 		  "\t  -I file - read message from 'file' instead of stdin.\n"
@@ -609,7 +610,13 @@ void process_args_1(int argc, char **argv)
 	    exit(0);
 
 	case 'W':
-	    wordlists ^= W_COMBINED ^ W_SEPARATE;
+	    switch (wordlists) {
+	    case W_UNKNOWN:  wordlists = W_COMBINED; break;
+	    case W_COMBINED: wordlists = W_SEPARATE; break;
+	    case W_SEPARATE: 
+		fprintf(stderr, "Invalid -W option.\n");
+		exit(2);
+	    }
 	    break;
 
 	case 'x':

@@ -385,6 +385,9 @@ static int words_from_path(const char *dir, int argc, char **argv, bool show_pro
 	if (build_path(filepath2, sizeof(filepath2), dir, GOODFILE) < 0)
 	    return 2;
 	break;
+    default:
+	fprintf(stderr, "Invalid wordlist mode.\n");
+	exit(2);
     }
 
     /* XXX FIXME: deadlock possible */
@@ -534,6 +537,9 @@ static int compute_robinson_x(char *path)
 	    ok = (build_path(filepath1, sizeof(filepath1), path, SPAMFILE) == 0 &&
 		  build_path(filepath2, sizeof(filepath2), path, GOODFILE) == 0 );
 	    break;
+	case W_UNKNOWN:
+	    fprintf(stderr, "Invalid wordlist mode.\n");
+	    exit(2);
 	}
 
 	if (!ok)
@@ -580,7 +586,6 @@ static void help(void)
     fprintf(stderr,
 	    "\n"
 	    "\t-d file\tDump data from file to stdout.\n"
-	    "\t-k size\tset BerkeleyDB cache size (MB).\n"
 	    "\t-l file\tLoad data from stdin into file.\n"
 	    "\t-w directory\tDisplay counts for words from stdin.\n"
 	    "\t-p directory\tDisplay word counts and probabilities.\n"
@@ -589,6 +594,10 @@ static void help(void)
 	    "\t-v\tOutput debug messages.\n"
 	    "\t-r\tCompute Robinson's X for specified directory.\n"
 	    "\t-R\tCompute Robinson's X and save it in the spam list.\n");
+    fprintf(stderr,
+	    "\t-k size\tset BerkeleyDB cache size (MB).\n"
+	    "\t  -W\tUse combined wordlist.db for spam and ham tokens.\n"
+	    "\t  -WW\tUse separate wordlists for spam and ham tokens.\n");
     fprintf(stderr,
 	    "\t-a age\tExclude tokens with older ages.\n"
 	    "\t-c count\tExclude tokens with lower counts.\n"
@@ -684,7 +693,13 @@ static int process_args(int argc, char **argv)
 	    exit(0);
 
 	case 'W':
-	    wordlists ^= W_COMBINED ^ W_SEPARATE;
+	    switch (wordlists) {
+	    case W_UNKNOWN:  wordlists = W_COMBINED; break;
+	    case W_COMBINED: wordlists = W_SEPARATE; break;
+	    case W_SEPARATE: 
+		fprintf(stderr, "Invalid -W option.\n");
+		exit(2);
+	    }
 	    break;
 
 	case 'x':
