@@ -791,7 +791,7 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
     <p>Vraisemblablement les codes de retour ont été réécrits par
     waitpid(2). En C utilisez WEXITSTATUS(status) dans sys/wait.h, ou
     une macro comparable pour obtenir la valeur correcte. En Perl
-    utilisez 'system("bogofilter $input")/256'.</p>
+    utilisez 'system("bogofilter $input")%256'.</p>
 
     <hr>
 

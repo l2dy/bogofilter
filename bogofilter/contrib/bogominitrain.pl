@@ -100,7 +100,7 @@ do { # Start force loop
         open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
         print TEMP $mail;
         close (TEMP);
-        unless (system("$bogofilter <$temp")/256==1) {
+        unless (system("$bogofilter <$temp")%256==1) {
           system("$bogofilter -n <$temp");
           $hamadd++;
           print "Training ham message $hamcount.\n" if ($verbose);
@@ -127,7 +127,7 @@ do { # Start force loop
         open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
         print TEMP $mail;
         close (TEMP);
-        unless (system("$bogofilter <$temp")/256==0) {
+        unless (system("$bogofilter <$temp")%256==0) {
           system("$bogofilter -s <$temp");
           $spamadd++;
           print "Training spam message $spamcount.\n" if ($verbose);

@@ -802,7 +802,7 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1
     <p>Likely the return codes are being reformatted by waitpid(2).
     In C use WEXITSTATUS(status) in sys/wait.h, or comparable macro,
     to get the correct value.  In Perl you can just use
-    'system("bogofilter $input")/256'.</p>
+    'system("bogofilter $input")%256'.</p>
 
     <hr>
 
