@@ -85,12 +85,8 @@ static FIELD spamicity_format_d[RC_COUNT] = { "%0.6f", "%0.6f", "%0.6f" };
 FIELD  *spamicity_tags    = spamicity_tags_ynu;
 FIELD  *spamicity_formats = spamicity_format_d;
 
-bool set_spamicity_tags(const char *val);
-bool set_spamicity_formats(const char *val);
-bool set_spamicity_fields(FIELD *strings, const char *val);
-
 /* Descriptors for config file */
- 
+
 const parm_desc format_parms[] =
 {
     { "spam_header_name",  CP_STRING,	{ &spam_header_name } },
