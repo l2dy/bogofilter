@@ -22,7 +22,7 @@ to "spam-unreadable"
 
 #### bogofilter passthrough-update ####
 
-xfilter 'bogofilter -f -p -u -l -e -v'
+xfilter 'bogofilter -p -u -l -e -v'
 
 # if spam, file this into the "spam-bogofilter" folder and exit
 # processing
