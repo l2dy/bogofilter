@@ -19,7 +19,7 @@ NAME:
 
 #define	MASK_BIT(uc)	( 1 << (uc - 'A'))
 
-#define BIT_NAMES	"abcdghilmrstw"
+#define BIT_NAMES	"abcdghilmrstwy"
 #define BIT_ALGORITHM	MASK_BIT('A')
 #define BIT_READER	MASK_BIT('B')
 #define BIT_CONFIG	MASK_BIT('C')
@@ -33,6 +33,7 @@ NAME:
 #define BIT_SPAMICITY	MASK_BIT('S')
 #define BIT_TEXT	MASK_BIT('T')
 #define BIT_WORDLIST	MASK_BIT('W')
+#define BIT_MEMORY	MASK_BIT('Y')
 
 extern FILE	 *dbgout;
 extern u_int32_t  debug_mask;
@@ -45,6 +46,7 @@ extern u_int32_t  debug_mask;
 #define DEBUG_HTML(level)	0
 #define DEBUG_ICONV(level)	0
 #define DEBUG_LEXER(level)	0
+#define DEBUG_MEMORY(level)	0
 #define DEBUG_MIME(level)	0
 #define DEBUG_READER(level)	0
 #define DEBUG_REGISTER(level)	0
@@ -59,6 +61,7 @@ extern u_int32_t  debug_mask;
 #define DEBUG_HTML(level)	((debug_mask & BIT_HTML)      && (verbose > level))
 #define DEBUG_ICONV(level)	((debug_mask & BIT_ICONV)     && (verbose > level))
 #define DEBUG_LEXER(level)	((debug_mask & BIT_LEXER)     && (verbose > level))
+#define DEBUG_MEMORY(level)	((debug_mask & BIT_MEMORY)    && (verbose > level))
 #define DEBUG_MIME(level)	((debug_mask & BIT_MIME)      && (verbose > level))
 #define DEBUG_READER(level)	((debug_mask & BIT_READER)    && (verbose > level))
 #define DEBUG_REGISTER(level)	((debug_mask & BIT_REGISTER)  && (verbose > level))
