@@ -92,9 +92,11 @@ as well as to correct misclassification.
 
 	# /var/qmail/bin/maildirmake /home/bogofilter/Maildir
 
-  and append this to /var/qmail/alias/.qmail-bogofilter-default:
+  and to /var/qmail/alias/.qmail-bogofilter-default, append the line:
+  
+	/home/bogofilter/Maildir/
 
-	/home/bogofilter/Maildir
+  The trailing slash is important. Thanks to John Crawford for reminding me.
 
 - Make sure the script is executable
 	
