@@ -499,11 +499,9 @@ static void distribute(int mode)
 	}
 	/* scoring set  */
 	else {
-	    wh = wordhash_convert_to_countlist(wh, train);
 	    msglist_add(ns_or_sp->u.sets[MOD(score_count,3)], wh);
 	    score_count += 1;
 	}
-	wordhash_free(item->wh);
 	item->wh = NULL;
     }
 
