@@ -96,30 +96,35 @@ T1		{TOKENFRONT}
 
 %%
 
-^From\ 						{ if (msg_header && is_from(yy_text())) { BEGIN(INITIAL); return FROM; } else { return TOKEN; } }
+^From\ 						{ if (msg_header && is_from(yy_text())) { 
+						      BEGIN(INITIAL); return FROM;
+						  } else { 
+						      return TOKEN;
+						  }
+						}
 
 <INITIAL>charset=\"?{ID}\"?			{ got_charset(yytext); yyredo(yy_text(), '='); }
-<INITIAL>^MIME-Version:.*				{ mime_version(yy_text()); yyless(strlen("MIME-Version:")); return(TOKEN); }
+<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); yyless(strlen("MIME-Version:")); return(TOKEN); }
 <INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); yyless(strlen("Content-Transfer-Encoding:")); return(TOKEN); }
-<INITIAL>^Content-Type:{MTYPE};?			{ mime_type(yy_text()); yyredo(yy_text(), ':'); }
+<INITIAL>^Content-Type:{MTYPE};?		{ mime_type(yy_text()); yyredo(yy_text(), ':'); }
 <INITIAL>^Content-Disposition:{MTYPE}		{ mime_disposition(yy_text()); yyredo(yy_text(), ':'); }
 <INITIAL>^Subject:.* 				{ set_tag("subj:");  yyredo(yy_text(), ':'); }
-<INITIAL>^Date:.*|Delivery-Date:.*			;
+<INITIAL>^Date:.*|Delivery-Date:.*		;
 <INITIAL>^Message-ID:.*				;
 <INITIAL>^\tid\ {ID}				;
 
-<INITIAL>E?SMTP\ id\ {ID}				;
+<INITIAL>E?SMTP\ id\ {ID}			;
 <INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
-<INITIAL>name=\"?					;
+<INITIAL>name=\"?				;
 <INITIAL>filename=\"?				;
 
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
-						     BEGIN(INITIAL); 
-						     return BOUNDARY; 
-						   }
-						   else { 
-						     return TOKEN;
-						   }
+						      BEGIN(INITIAL); 
+						      return BOUNDARY; 
+						  }
+						  else { 
+						      return TOKEN;
+						  }
 						}
 {IPADDR}					{ return(IPADDR);}
 {TOKEN}						{ return(TOKEN);}
