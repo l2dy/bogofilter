@@ -25,6 +25,8 @@ Briefly:
 
 	2004-12-01
 
+	* Allow environment to be group writable, reported by Fletcher Mattox.
+
 	* Accuracy fix: no longer pretend that we had seen an empty message
 	  registered when there was no registration. Use ROBX for spamicity.
 	  This changes the output format of bogofilter -vvv mode when no spam

@@ -932,7 +932,7 @@ static int db_try_glock(const char *directory, short locktype, int lockcmd) {
 
     /* All we are interested in is that this file exists, we'll close it
      * right away as plock down will open it again */
-    ret = open(t, O_RDWR|O_CREAT|O_EXCL, (mode_t)0644);
+    ret = open(t, O_RDWR|O_CREAT|O_EXCL, (mode_t)0664);
     if (ret < 0 && errno != EEXIST) {
 	print_error(__FILE__, __LINE__, "open(%s): %s",
 		t, strerror(errno));
@@ -1031,7 +1031,7 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 	fprintf(dbgout, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT)\n");
 
     ret = env->dbe->open(env->dbe, directory,
-	    dbenv_defflags | DB_CREATE | flags, /* mode */ 0644);
+	    dbenv_defflags | DB_CREATE | flags, /* mode */ 0664);
     if (ret != 0) {
 	env->dbe->close(env->dbe, 0);
 	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %s", db_strerror(ret));
@@ -1221,12 +1221,12 @@ int dbe_remove(const char *directory) {
      * environment in heap memory, so we don't need to remove it.
      */
 
-    e = env->open(env, directory, dbenv_defflags | DB_PRIVATE | DB_CREATE | DB_RECOVER, 0644);
+    e = env->open(env, directory, dbenv_defflags | DB_PRIVATE | DB_CREATE | DB_RECOVER, 0664);
     if (e == DB_RUNRECOVERY) {
 	/* that didn't work, try harder */
 	if (DEBUG_DATABASE(0))
 	    fprintf(dbgout, "running catastrophic data base recovery\n");
-	e = env->open(env, directory, dbenv_defflags | DB_PRIVATE | DB_CREATE | DB_RECOVER_FATAL, 0644);
+	e = env->open(env, directory, dbenv_defflags | DB_PRIVATE | DB_CREATE | DB_RECOVER_FATAL, 0664);
     }
     if (e) {
 	print_error(__FILE__, __LINE__, "Cannot recover environment \"%s\": %s",
