@@ -22,9 +22,10 @@ and     MAJOR CHANGES IN BOGOFILTER 0.93
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
-	2005-03-24
+0.94.2	2005-03-24
 
-	* When using SQLite3, retry opening the table when it is locked.
+	* Fix SQLite3 open problem, trying again when the table it is
+          locked.
 
 	2005-03-23
 
