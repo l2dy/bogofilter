@@ -274,12 +274,17 @@ static int probe_txn(const char *directory, const char *file)
 	dbe->close(dbe, 0);
 
 	w = stat(t, &st);
-	if (w == 0)
+	if (w == 0) {
+	    free(t);
 	    return 0;
-	if (errno == ENOENT)
+	}
+	if (errno == ENOENT) {
+	    free(t);
 	    return 2;
-	print_error(__FILE__, __LINE__, "cannot stat %s" DIRSEP_S "%s: %s",
-		directory, file, db_strerror(r));
+	}
+	print_error(__FILE__, __LINE__, "cannot stat %s: %s",
+		t, db_strerror(r));
+	free(t);
 	return -1;
     }
     if (r != 0) {
