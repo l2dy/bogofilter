@@ -32,6 +32,8 @@
   <arg choice='opt'>-x <replaceable>flags</replaceable></arg>
   <arg choice='opt'>-c <replaceable>filename</replaceable></arg>
   <arg choice='opt'>-C</arg>
+  <arg choice='opt'>-q</arg>
+  <arg choice='opt'>-f</arg>
 </cmdsynopsis>
 
 </refsynopsisdiv>
@@ -195,6 +197,12 @@ tells <application>bogofilter</application> to read the config file named.
 
 <para>The <option>-C</option> option prevents bogofilter from reading
     configuration files.</para>
+</refsect1>
+
+<para>The <option>-q</option> (quiet) suppresses warning messages.</para>
+</refsect1>
+
+<para>The <option>-f</option> (force) ignores threshold values when printing spamicity statistics.</para>
 </refsect1>
 
 <refsect1 id='environment'><title>ENVIRONMENT</title>
