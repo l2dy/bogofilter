@@ -528,11 +528,11 @@ struct option long_options[] = {
     { "replace_nonascii_characters",	R, 0, 'n' },
     { "timestamp-date",			N, 0, 'y' },
 
-    { "db-cachesize",			N, 0, 'k' },
-    { "db-prune",                       N, 0, O_DB_PRUNE },
-    { "db-recover",                     N, 0, O_DB_RECOVER },
-    { "db-recover-harder",              N, 0, O_DB_RECOVER_HARDER },
-    { "db-verify",                      N, 0, O_DB_VERIFY },
+    { "db-cachesize",			R, 0, 'k' },
+    { "db-prune",                       R, 0, O_DB_PRUNE },
+    { "db-recover",                     R, 0, O_DB_RECOVER },
+    { "db-recover-harder",              R, 0, O_DB_RECOVER_HARDER },
+    { "db-verify",                      R, 0, O_DB_VERIFY },
 #ifdef	HAVE_DECL_DB_CREATE
     { "db_lk_max_locks",		R, 0, O_DB_MAX_LOCKS },
     { "db_lk_max_objects",		R, 0, O_DB_MAX_OBJECTS },
