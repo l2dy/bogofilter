@@ -21,7 +21,6 @@ wordlist_t* word_lists=NULL;
 
 void *open_wordlist( const char *name, const char *filepath )
 {
-    int	rc;
     void *dbh;			// database handle 
 
     dbmode_t open_mode = (run_type==RUN_NORMAL) ? DB_READ : DB_WRITE;
