@@ -13,7 +13,7 @@
 	font-size: 110%;
       }
       p {
-	margin-top : 0.5em;
+	margin-top: 0.5em;
 	margin-bottom: 0.5em;
       }
       ul {
@@ -717,9 +717,7 @@
 
     <p>To tell how many tokens are in your wordlists pipe the output
     of bogoutil's dump command to command "wc", i.e. use "bogoutil -d
-    $BOGOFILTER_DIR/wordlist.db | wc -l " to display the count.  (If
-    you've got spamlist.db and goodlist.db, run the command for each
-    of them).</p>
+    $BOGOFILTER_DIR/wordlist.db | wc -l " to display the count.</p>
 
     <hr>
 
@@ -754,21 +752,16 @@
     BerkeleyDB thinks by running:</p>
     <pre>	db_verify wordlist.db</pre>
 
-    <p>If there is a problem, you may be able to fix it with:</p>
-    <pre>	db_recover wordlist.db</pre>
-
-    <p>Alternatively may be able to recover some (or
+    <p>Alternatively you may be able to recover some (or
     all) of the tokens and their counts with the following
     commands:</p>
     <pre>	bogoutil -d wordlist.db | bogoutil -l wordlist.db.new</pre>
-    <p>or with</p>
+    <p>or - if there has been more damage to the token list - with</p>
     <pre>	db_dump -r wordlist.db | db_load wordlist.new</pre>
 
     <p>You can also use a text file instead of a pipe, as in:</p>
     <pre>	bogoutil -d wordlist.db &gt; wordlist.txt
 	bogoutil -l wordlist.db.new &lt; wordlist.txt</pre>
-
-    <p>If you've got two wordlists (spamlist.db and goodlist.db), run the above commands for each of them.</p>
 
     <hr>
 
@@ -866,7 +859,8 @@
 
     <p>If you don't already have a v3.0+ version of
     <a href="http://www.sleepycat.com">BerkeleyDB</a>, then
-    <a href="http://www.sleepycat.com/download.html">download it</a>,
+    <a href="http://www.sleepycat.com/download.html">download it (take
+	one of the 4.2.X versions)</a>,
     unpack it, and do these commands in the db directory:</p>
     <pre>	$ cd build_unix
 	$ sh ../dist/configure
@@ -880,14 +874,14 @@
     <h3>On Solaris</h3>
 
     <p>Unpack it, and then do:</p>
-    <pre>	$ ./configure --with-db=/usr/local/BerkeleyDB.4.1
+    <pre>	$ ./configure --with-db=/usr/local/BerkeleyDB.4.2
 	$ make
 	# make install-strip</pre>
 
     <p>You will either want to put a symlink to libdb.so in
     /usr/lib, or use a modified LD_LIBRARY_PATH environment
     variable before you start bogofilter.</p>
-    <pre>	$ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1</pre>
+    <pre>	$ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.2</pre>
 
     <p>Note that some make versions shipped with Solaris break when
     you try to build bogofilter outside of its source directory.
