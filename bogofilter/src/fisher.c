@@ -39,18 +39,9 @@ static rc_t	fis_status(void);
 
 double ham_cutoff = FISHER_HAM_CUTOFF;
 
-static const parm_desc fis_parm_table[] =
-{
-    { "robx",		  CP_DOUBLE,	{ (void *) &robx } },
-    { "robs",		  CP_DOUBLE,	{ (void *) &robs } },
-    { "ham_cutoff",	  CP_DOUBLE,	{ (void *) &ham_cutoff } },
-    { NULL,		  CP_NONE,	{ (void *) NULL } },
-};
-
 rf_method_t rf_fisher_method = {	/* used by config.c */
     {
 	"fisher",			/* const char		  *name;		*/
-	fis_parm_table,	 		/* m_parm_table		  *parm_table		*/
 	fis_initialize_constants,	/* m_initialize_constants *initialize_constants	*/
 	rob_compute_spamicity, 		/* m_compute_spamicity	  *compute_spamicity	*/
 	mth_spamicity,			/* m_spamicity		  *spamicity		*/

@@ -58,8 +58,6 @@ bool	stats_in_header = true;
 
 /*---------------------------------------------------------------------------*/
 
-const parm_desc *usr_parms = NULL;
-
 /*  remove trailing comment from the line.
  */
 void remove_comment(const char *line)

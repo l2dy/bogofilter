@@ -87,21 +87,6 @@ FIELD  *spamicity_formats = spamicity_format_d;
 
 /* Descriptors for config file */
 
-const parm_desc format_parms[] =
-{
-    { "spam_header_name",  CP_STRING,	{ &spam_header_name } },
-    { "spam_subject_tag",  CP_STRING,	{ &spam_subject_tag } },
-    { "unsure_subject_tag",CP_STRING,	{ &unsure_subject_tag } },
-    { "header_format",	   CP_STRING,	{ &header_format } },
-    { "terse_format",	   CP_STRING,	{ &terse_format } },
-    { "log_header_format", CP_STRING,	{ &log_header_format } },
-    { "log_update_format", CP_STRING,	{ &log_update_format } },
-    { "spamicity_tags",    CP_FUNCTION,	{ (void *)&set_spamicity_tags } },
-    { "spamicity_formats", CP_FUNCTION,	{ (void *)&set_spamicity_formats } },
-
-    { NULL,                CP_NONE,	{ (void *) NULL } },
-};
-
 /* enums */
 
 enum states {

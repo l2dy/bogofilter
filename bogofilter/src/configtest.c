@@ -30,7 +30,7 @@ double ham_cutoff;
 
 /* Dummy struct definitions to support config.c */
 rf_method_t rf_fisher_method = {
-    {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, NULL, NULL
+    {NULL, NULL, NULL, NULL, NULL, NULL, NULL}, NULL, NULL
 } ;
 
 #ifdef COMPILE_DEAD_CODE

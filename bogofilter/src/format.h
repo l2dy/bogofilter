@@ -22,7 +22,6 @@ extern const char *log_header_format;
 extern FIELD *spamicity_tags;
 extern FIELD *spamicity_formats;
 
-extern const parm_desc format_parms[];
 extern void set_terse_mode_format(int mode);
 
 extern bool set_spamicity_tags(const char *val);

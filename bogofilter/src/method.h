@@ -30,7 +30,6 @@ typedef	rc_t	m_status(void);
 
 typedef struct method_s {
     const char		*name;
-    const parm_desc	*config_parms;
 #if	1
     void	(*initialize)(void);
     double	(*compute_spamicity)(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/;

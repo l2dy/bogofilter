@@ -197,7 +197,6 @@ void process_parameters(int argc, char **argv, bool warn_on_error)
     set_today();		/* compute current date for token age */
 
     method = (method_t *) &rf_fisher_method;
-    usr_parms = method->config_parms;
 
     process_arglist(argc, argv, PR_COMMAND, PASS_1_CLI);
     process_config_files(warn_on_error);
