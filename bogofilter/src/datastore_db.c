@@ -14,11 +14,11 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #define DONT_TYPEDEF_SSIZE_T 1
 #include "common.h"
 
+#include <unistd.h>		/* for SEEK_SET for SunOS 4.1.x */
 #include <db.h>
+#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include <errno.h>
-#include <unistd.h>
 #include <sys/resource.h>
 
 #ifdef NEEDTRIO

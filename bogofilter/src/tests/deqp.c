@@ -1,10 +1,10 @@
 /* $Id$ */
 
-#include <stdio.h>
+#include "common.h"
+
 #include <stdlib.h>
 #include <string.h>
-
-#include "common.h"
+#include <unistd.h>		/* for SEEK_*** for SunOS 4.1.x */
 
 #include "qp.h"
 
