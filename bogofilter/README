@@ -33,9 +33,8 @@ quickly should they arise later.
 1. What is Bogofilter?
 ----------------------
 
-Bogofilter is a fast Bayesian spam filter which implements a fast
-Bayesian spam filter along the lines suggested by Paul Graham in his
-article "A Plan For Spam":
+Bogofilter is a fast Bayesian spam filter along the lines suggested by
+Paul Graham in his article "A Plan For Spam":
 
   http://www.paulgraham.com/spam.html
 
