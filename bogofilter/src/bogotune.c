@@ -581,14 +581,12 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 	wordhash_t *whc = wordhash_new();
 
 	collect_words(whc);
-	
-	/* FIXME: consideration necessary for msgs_* == 0 comparations
-	   as these variables are now of type "double". */
-	if (ds_path != NULL && msgs_good == 0 && msgs_bad == 0) {
+
+	if (ds_path != NULL && (int)(msgs_good + msgs_bad) == 0) {
 	    wordprop_t *msg_count = wordhash_insert(whc, w_msg_count, sizeof(wordprop_t), NULL);
 	    if (msg_count->cnts.good == 0 || msg_count->cnts.bad == 0)
 		load_wordlist(load_hook, train);
-	    if (msgs_good == 0 && msgs_bad == 0) {
+	    if (msg_count->cnts.good == 0 && msg_count->cnts.bad == 0) {
 		fprintf(stderr, "Can't find '.MSG_COUNT'.\n");
 		exit(EX_ERROR);
 	    }
@@ -754,7 +752,7 @@ static void write_msgcount_file(wordhash_t *wh)
     hashnode_t *hn;
     wordhash_t *train = ns_and_sp->train;
 
-    print_msgcount_entry(".MSG_COUNT", msgs_bad, msgs_good);
+    print_msgcount_entry(".MSG_COUNT", (int) msgs_bad, (int) msgs_good);
 
     wordhash_sort(wh);
 
@@ -1267,7 +1265,7 @@ static bool check_msg_counts(void)
 	fprintf(stderr,
 		"The wordlist has a ratio of spam to non-spam of %0.1f to 1.0.\n"
 		"Bogotune requires the ratio be in the range of 0.2 to 5.\n",
-		msgs_bad * 1.0 / msgs_good);
+		msgs_bad / msgs_good);
 	ok = false;
     }
 
