@@ -105,14 +105,24 @@ double	thresh_stats = 0.0f;
 
 /*---------------------------------------------------------------------------*/
 
+/* Notes:
+**
+**	For options specific to algorithms, the algorithm files contain
+**		a parm_desc struct giving their particulars.
+**
+**	The addr field is NULL for options processed by special functions
+**		and on dummy entries for options private to algorithms
+**		so config.c won't generate an error message.
+*/
+
 static const parm_desc sys_parms[] =
 {
     { "stats_in_header",  CP_BOOLEAN,	{ (void *) &stats_in_header } },
     { "spam_header_name", CP_STRING,	{ (void *) &spam_header_name } },
     { "user_config_file", CP_STRING,	{ (void *) &user_config_file } },
-    { "wordlist",	  CP_WORDLIST,	{ (void *) NULL } },
-
-    { "algorithm",  	  CP_ALGORITHM,	{ (void *) NULL } },
+    { "wordlist",	  CP_WORDLIST,	{ (void *) NULL } },	/* Processed by configure_wordlist() */
+    
+    { "algorithm",  	  CP_ALGORITHM,	{ (void *) NULL } },	/* Processed by select_method() */
 
     { "min_dev",	  CP_DOUBLE,	{ (void *) &min_dev } },
     { "spam_cutoff",	  CP_DOUBLE,	{ (void *) &spam_cutoff } },
@@ -537,7 +547,7 @@ int process_args(int argc, char **argv)
 
 	default:
 	    fprintf( stderr, "Unknown option '%c' (%02X)\n", option,
-		    (unsigned int)option);
+		     (unsigned int)option);
 	    exit(2);
 	}
     }
