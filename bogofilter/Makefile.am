@@ -19,7 +19,7 @@ EXTRA_DIST = autogen.sh \
 	     METHODS UPGRADE Doxyfile \
 	     README.cvs RELEASE.NOTES-0.11  RELEASE.NOTES-0.12 \
 	     bogofilter.spec bogofilter.spec.in
-#
+
 .PHONY: rpm cvs-check
 
 rpm:	dist
