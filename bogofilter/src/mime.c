@@ -260,7 +260,7 @@ bool get_boundary_props(const word_t *boundary, boundary_t *b)
 
   b->is_valid = false;
 
-  if (blen > 2 && buf[0] == '-' && buf[1] == '-'){
+  if (blen > 2 && buf[0] == '-' && buf[1] == '-') {
 
     while (buf[blen - 1] == '\r' ||
            buf[blen - 1] == '\n')
@@ -272,17 +272,17 @@ bool get_boundary_props(const word_t *boundary, boundary_t *b)
 
     /* skip and note ending --, if any */
     if (buf[blen-1] == '-' &&
-	buf[blen-2] == '-'){
+	buf[blen-2] == '-') {
       b->is_final = true;
       blen -= 2;
     } else {
       b->is_final = false;
     }
 
-    for (i = stackp; i > -1; i--){
+    for (i = stackp; i > -1; i--) {
       if (is_mime_container (&msg_stack[i]) &&
           msg_stack[i].boundary &&
-          (memcmp (msg_stack[i].boundary, buf, blen) == 0)){
+          (memcmp (msg_stack[i].boundary, buf, blen) == 0)) {
 	 b->depth = i;
 	 b->is_valid = true;
 	 break;
@@ -294,14 +294,15 @@ bool get_boundary_props(const word_t *boundary, boundary_t *b)
 }
 
 bool
-mime_is_boundary(word_t *boundary){
+mime_is_boundary(word_t *boundary)
+{
     boundary_t b;
     get_boundary_props(boundary, &b);
     return b.is_valid;
 }
 
 bool
-got_mime_boundary (word_t *boundary)
+got_mime_boundary(word_t *boundary)
 {
   mime_t *parent;
   boundary_t b;
