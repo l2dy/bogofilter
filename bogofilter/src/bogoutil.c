@@ -211,7 +211,7 @@ static int load_wordlist(const char *ds_file)
 	    case DST_FAILURE:
 	    case DST_TEMPFAIL:
 		fprintf(stderr, "commit failed\n");
-		exit(EXIT_FAILURE);
+		exit(EX_ERROR);
 	    case DST_OK:
 		break;
 	}

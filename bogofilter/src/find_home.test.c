@@ -69,5 +69,5 @@ int main(int argc, char **argv)
     if (tofree)
 	free(tofree);
 
-    exit(h ? EXIT_SUCCESS : EXIT_FAILURE);
+    exit(h ? EXIT_SUCCESS : EX_ERROR);
 }

@@ -896,7 +896,7 @@ static int db_try_glock(short locktype, int lockcmd) {
     if (ret && errno != EEXIST) {
 	print_error(__FILE__, __LINE__, "mkdir(%s): %s",
 		bogohome, strerror(errno));
-	exit(EXIT_FAILURE);
+	exit(EX_ERROR);
     }
 
     t = mxcat(bogohome, tackon, NULL);
@@ -907,7 +907,7 @@ static int db_try_glock(short locktype, int lockcmd) {
     if (ret < 0 && errno != EEXIST) {
 	print_error(__FILE__, __LINE__, "open(%s): %s",
 		t, strerror(errno));
-	exit(EXIT_FAILURE);
+	exit(EX_ERROR);
     }
 
     if (ret >= 0)
@@ -917,7 +917,7 @@ static int db_try_glock(short locktype, int lockcmd) {
     if (lockfd < 0 && errno != EAGAIN && errno != EACCES) {
 	print_error(__FILE__, __LINE__, "lock(%s): %s",
 		t, strerror(errno));
-	exit(EXIT_FAILURE);
+	exit(EX_ERROR);
     }
 
     free(t);
@@ -952,7 +952,7 @@ static int db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
 	(ret = dbe->set_cachesize(dbe, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
       print_error(__FILE__, __LINE__, "DB_ENV->set_cachesize(%u), err: %d, %s",
 		  db_cachesize, ret, db_strerror(ret));
-      exit(EXIT_FAILURE);
+      exit(EX_ERROR);
     }
 
     if (DEBUG_DATABASE(1))
@@ -967,7 +967,7 @@ static int db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
     {
 	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_max_locks(%p, %lu), err: %s", (void *)dbe,
 		(unsigned long)numlocks, db_strerror(ret));
-	exit(EXIT_FAILURE);
+	exit(EX_ERROR);
     }
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB_ENV->set_lk_max_locks(%p, %lu)\n", (void *)dbe, (unsigned long)numlocks);
@@ -977,7 +977,7 @@ static int db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
     if ((ret = dbe->set_lk_max_objects(dbe, numobjs)) != 0) {
 	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_max_objects(%p, %lu), err: %s", (void *)dbe,
 		(unsigned long)numobjs, db_strerror(ret));
-	exit(EXIT_FAILURE);
+	exit(EX_ERROR);
     }
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB_ENV->set_lk_max_objects(%p, %lu)\n", (void *)dbe, (unsigned long)numlocks);
@@ -986,7 +986,7 @@ static int db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
     /* configure automatic deadlock detector */
     if ((ret = dbe->set_lk_detect(dbe, DB_LOCK_DEFAULT)) != 0) {
 	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT), err: %s", db_strerror(ret));
-	exit(EXIT_FAILURE);
+	exit(EX_ERROR);
     }
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT)\n");
@@ -1004,7 +1004,7 @@ static int db_xinit(u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
 	    fprintf(stderr, "To recover, run: bogoutil -v -f \"%s\"\n",
 		    bogohome);
 	}
-	exit(EXIT_FAILURE);
+	exit(EX_ERROR);
     }
 
     if (DEBUG_DATABASE(1))

@@ -53,20 +53,20 @@ int main(int argc, char *argv[])
 		"  If <backup> is given, <database> is backed up to <backup> and\n"
 		"  upgraded in place, via <tempfile>.\n",
 		argv[0], argv[0]);
-	exit(EXIT_FAILURE);
+	exit(EX_ERROR);
     }
 
     dho = dpopen(argv[1], DP_OREADER, 0);
     if (!dho) {
 	fprintf(stderr, "Couldn't open database '%s': %s\n", argv[1],
 		dperrmsg(dpecode));
-	exit(EXIT_FAILURE);
+	exit(EX_ERROR);
     }
 
     if (dpgetflags(dho) & 1) {
 	fprintf(stderr, "Database '%s' is already in B+ tree format.\n", argv[1]);
 	dpclose(dho);
-	exit(EXIT_FAILURE);
+	exit(EX_ERROR);
     }
 
     if (argc >= 3) {
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     if (!new_name) {
 	fprintf(stderr, "Couldn't allocate memory.\n");
 	dpclose(dho);
-	exit(EXIT_FAILURE);
+	exit(EX_ERROR);
     }
 
     if (strcmp(new_name, argv[1]) == 0) {
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 		argc >= 4 ? "tempfile" : "new database");
 	dpclose(dho);
 	free(new_name);
-	exit(EXIT_FAILURE);
+	exit(EX_ERROR);
     }
 
     remove(new_name); /* start with a fresh data base */
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 	dpclose(dho);
 	remove(new_name);
 	free(new_name);
-	exit(EXIT_FAILURE);
+	exit(EX_ERROR);
     }
 
     ret = dpiterinit(dho);
@@ -160,14 +160,14 @@ int main(int argc, char *argv[])
 	    fprintf(stderr, "Error: cannot link %s to %s: %s\n",
 		    argv[1], argv[3], strerror(errno));
 	    free(new_name);
-	    exit(EXIT_FAILURE);
+	    exit(EX_ERROR);
 	}
 
 	if (rename(new_name, argv[1])) {
 	    fprintf(stderr, "Error: cannot rename %s to %s: %s\n",
 		    new_name, argv[1], strerror(errno));
 	    free(new_name);
-	    exit(EXIT_FAILURE);
+	    exit(EX_ERROR);
 	}
     }
 
@@ -179,5 +179,5 @@ barf:
     remove(new_name);
     free(new_name);
     dpclose(dho);
-    exit(EXIT_FAILURE);
+    exit(EX_ERROR);
 }
