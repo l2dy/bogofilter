@@ -48,11 +48,10 @@ const char	*update_dir;
 const char	*stats_prefix;
 
 /* for lexer_v3.l */
-bool	fold_case = true;		/* -Pf */
-bool	tag_header_lines = false;	/* -Ph */
-bool	tokenize_html_tags = false;	/* -Pt */
+bool	fold_case = false;		/* -Pf */
+bool	tag_header_lines = true;	/* -PH */
+bool	tokenize_html_tags = true;	/* -PT */
 bool	tokenize_html_script = false;	/* -Ps - not yet in use */
-bool	tokenize_html_comments = false;	/* -Pc - Not yet in use */
 
 /* dual definition options */
 char	*directory;			/* '-d' */
