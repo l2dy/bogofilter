@@ -23,6 +23,13 @@ Briefly:
 
 0.93.1	2004-11-??
 
+	2004-11-08
+
+	* Berkeley DB mode: do not create data base in read mode (properly map
+	  open_mode to DB_RDONLY flag, store open_mode).
+
+	* Berkeley DB mode: exit with error code if lock file cannot be created.
+
 	2004-11-07
 
 	* Fixed negative buffer index in mime.c

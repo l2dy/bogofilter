@@ -322,7 +322,7 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
     char *t;
 
     dbh_t *handle = NULL;
-    uint32_t opt_flags = 0;
+    uint32_t opt_flags = (open_mode == DS_READ) ? DB_RDONLY : 0;
 
     assert(init);
 
@@ -351,6 +351,8 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 	    t++;
 	else
 	    t = handle->name;
+
+	handle->open_mode = open_mode;
 
 retry_db_open:
 	handle->created = false;
@@ -988,28 +990,37 @@ int db_init(void) {
     const u_int32_t numlocks = 16384;
     const u_int32_t numobjs = 16384;
 
+    /* open lock file, needed to detect previous crashes */
     if (init_dbl(bogohome))
+	exit(EX_ERROR);
 
-    if (needs_recovery()) {
-	db_recover(0, 0);
-    }
+    /* run recovery if needed */
+    if (needs_recovery())
+	db_recover(0, 0); /* DO NOT set force flag here, may cause
+			     multiple recovery! */
 
+    /* set (or demote to) shared/read lock for regular operation */
     db_try_glock(F_RDLCK, F_SETLKW);
 
+    /* set our cell lock in the crash detector */
     if (set_lock()) {
 	exit(EX_ERROR);
     }
 
+    /* initialize */
     return db_xinit(numlocks, numobjs, /* flags */ 0);
 }
 
 int db_recover(int catastrophic, int force) {
     int ret;
 
+    /* set exclusive/write lock for recovery */
     while((force || needs_recovery())
 	    && (db_try_glock(F_WRLCK, F_SETLKW) <= 0))
 	rand_sleep(10000,1000000);
 
+    /* ok, when we have the lock, a concurrent process may have
+     * proceeded with recovery */
     if (!(force || needs_recovery()))
 	return 0;
 
