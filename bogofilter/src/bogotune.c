@@ -1207,7 +1207,6 @@ static rc_t bogotune(void)
 
 		    spam_cutoff = 0.01;
 		    score_ns(ns_scores);	/* scores in ascending order */
-		    qsort(ns_scores, ns_cnt, sizeof(double), compare_double);
 		    
 		    /* Determine spam_cutoff and false_pos */
 		    for (fp = target; fp < ns_cnt; fp += 1) {
