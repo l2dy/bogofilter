@@ -40,6 +40,29 @@ YYYYMMDD today;			/* date as YYYYMMDD */
 
 dsm_t *dsm = NULL;
 
+/* OO function list */
+
+dsm_t dsm_dummies = {
+    /* public -- used in datastore.c */
+    NULL,
+    NULL,
+    NULL,
+
+    /* private -- used in datastore_db_*.c */
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
+
 /* Function definitions */
 
 static
@@ -275,7 +298,7 @@ int ds_delete(void *vhandle, const word_t *word)
 
 int ds_txn_begin(void *vhandle) {
     dsh_t *dsh = vhandle;
-    if (dsm == NULL)
+    if (dsm->dsm_begin == NULL)
 	return 0;
     else
 	return dsm->dsm_begin(dsh->dbh);
@@ -283,7 +306,7 @@ int ds_txn_begin(void *vhandle) {
 
 int ds_txn_abort(void *vhandle) {
     dsh_t *dsh = vhandle;
-    if (dsm == NULL)
+    if (dsm->dsm_abort == NULL)
 	return 0;
     else
 	return dsm->dsm_abort(dsh->dbh);
@@ -291,7 +314,7 @@ int ds_txn_abort(void *vhandle) {
 
 int ds_txn_commit(void *vhandle) {
     dsh_t *dsh = vhandle;
-    if (dsm == NULL)
+    if (dsm->dsm_commit == NULL)
 	return 0;
     else
 	return dsm->dsm_commit(dsh->dbh);
@@ -380,6 +403,8 @@ void *ds_init(const char *directory, const char *filename)
     dir.dirname = directory;
     file.filename = filename;
     dbe = dbe_init(&dir, &file);
+    if (dsm == NULL)
+	dsm = &dsm_dummies;
 
     if (msg_count_tok == NULL) {
 	msg_count_tok = word_news(MSG_COUNT);
@@ -393,7 +418,7 @@ void *ds_init(const char *directory, const char *filename)
 /* Cleanup storage allocation */
 void ds_cleanup(void *dbe)
 {
-    if (dsm != NULL && dsm->dsm_cleanup)
+    if (dsm->dsm_cleanup != NULL)
 	dsm->dsm_cleanup(dbe);
     xfree(msg_count_tok);
     xfree(wordlist_version_tok);
