@@ -28,7 +28,7 @@ PARSING_TESTS = \
 
 WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest $(SEPARATE_WORDLIST)
 
-SCORING_TESTS =  t.score1 t.score2 t.systest t.grftest
+SCORING_TESTS =  t.score1 t.score2 t.systest t.grftest t.bogoutil-hist
 
 BULKMODE_TESTS = t.bulkmode t.MH t.maildir
 
