@@ -46,10 +46,10 @@ AM_CPPFLAGS = -I$(top_srcdir)/trio -I$(top_srcdir) @GSL_CFLAGS@
 AM_CFLAGS = -DBOGOFILTER
 
 # what to build
-bin_PROGRAMS = bogofilter bogoutil bogolexer
+bin_PROGRAMS = bogofilter bogoutil bogolexer bogotune
 bin_SCRIPTS = bogoupgrade
 if ENABLE_STATIC
-bin_PROGRAMS += bogofilter_static bogoutil_static bogolexer_static
+bin_PROGRAMS += bogofilter_static bogoutil_static bogolexer_static bogotune_static
 endif
 
 check_PROGRAMS = debugtest configtest wordhash find_home.test \
@@ -143,6 +143,18 @@ bogolexer_static_LDFLAGS = $(STATICLDFLAGS)
 
 bogoutil_static_SOURCES = bogoutil.c
 bogoutil_static_LDFLAGS = $(STATICLDFLAGS)
+
+bogotune_SOURCES = bogotune.c bogotune.h \
+		   tunelist.c tunelist.h \
+		   method.c $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
+		   common.h method.h
+bogotune_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
+
+bogotune_static_SOURCES = bogotune.c bogotune.h \
+		   tunelist.c tunelist.h \
+		   method.c $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
+		   common.h method.h
+bogotune_static_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
 
 debugtest_SOURCES = debug.main.c
 
