@@ -28,8 +28,19 @@
 #include "memdebug.h"
 #include "xmalloc.h"
 
-bool memdebug=true;	/* false */
-int  memtrace=  0	/* M_MALLOC+M_FREE */ ;
+int  memtrace= 0 * (M_MALLOC+M_FREE);
+
+uint32_t dbg_index     = 0;
+uint32_t dbg_size      = 0;
+uint32_t dbg_index_min = 0;
+uint32_t dbg_index_max = 0;
+uint32_t dbg_size_trap = 0;	/* 100000 */
+
+#define	MB 1000000
+#define	GB 1000*MB
+uint32_t dbg_too_much  = 0;	/* GB */
+
+const uint32_t md_tag = 0xABCD55AA;
 
 uint32_t cnt_malloc = 0;
 uint32_t cnt_free   = 0;
@@ -38,18 +49,6 @@ uint32_t cnt_calloc = 0;
 uint32_t cur_malloc = 0;
 uint32_t max_malloc = 0;
 uint32_t tot_malloc = 0;
-
-uint32_t dbg_index  = 0;
-uint32_t dbg_size   = 0;
-uint32_t dbg_index_min = 0;
-uint32_t dbg_index_max = 0;
-uint32_t dbg_size_trap = 0 ;	/* 100000 */
-
-#define	MB 1000000
-#define	GB 1000*MB
-uint32_t dbg_too_much = 0;	/* GB */
-
-const uint32_t md_tag = 0xABCD55AA;
 
 void debugtrap(const char *why);
 void debugtrap(const char *why) { (void)why; }
@@ -138,17 +137,23 @@ md_free(void *ptr)
     free(ptr);
 }
 
-void memdisplay(void)
+void memdisplay(const char *file, int lineno)
 {
+    const char *pfx  = "";
 
-    fprintf(stdout, "malloc:  cur = %lu, max = %lu, tot = %lu\n", 
+    if (file != NULL) {
+	pfx = "\t";
+	fprintf(stdout, "%s:%d:\n", file, lineno);
+    }
+
+    fprintf(stdout, "%smalloc:  cur = %lu, max = %lu, tot = %lu\n", pfx,
 	    (ulong) cur_malloc, (ulong) max_malloc, (ulong) tot_malloc );
-    fprintf(stdout, "counts:  malloc: %lu, calloc: %lu, realloc: %lu, free: %lu\n", 
+    fprintf(stdout, "%scounts:  malloc: %lu, calloc: %lu, realloc: %lu, free: %lu\n", pfx,
 	    (ulong) cnt_malloc, (ulong) cnt_realloc, (ulong) cnt_calloc, (ulong) cnt_free);
     if (cnt_malloc == cnt_free)
-	fprintf(stdout, "         none active.\n");
+	fprintf(stdout, "%s         none active.\n", pfx);
     else
-	fprintf(stdout, "         active: %lu, average: %lu\n", 
+	fprintf(stdout, "%s         active: %lu, average: %lu\n", pfx, 
 		(ulong) cnt_malloc - cnt_free, (ulong) cur_malloc/(cnt_malloc - cnt_free));
 }
 
