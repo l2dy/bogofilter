@@ -499,7 +499,7 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
     db_data.flags = DB_DBT_USERMEM;	/* saves the memcpy */
 
     /* DB_RMW can avoid deadlocks */
-    ret = dbp->get(dbp, handle->txn, &db_key, &db_data, handle->open_mode == DS_READ ? 0 : DB_RMW);
+    ret = dbp->get(dbp, handle->txn, &db_key, &db_data, 0);
 
     if (DEBUG_DATABASE(3))
 	fprintf(dbgout, "DB->get(%.*s): %s\n",
