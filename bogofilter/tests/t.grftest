@@ -42,15 +42,12 @@ run_test()
     out="$2"
     ver="$3"
     OUT="tests/msg.$out.$alg.$ver"
-    wd=`pwd`
     $BOGOFILTER -$alg -t -$ver -c cfg.$alg < inputs/msg.$id.txt 2> /dev/null > tests-$alg
     sed s/,.version=.*// < tests-$alg > $OUT
 }
 
 [   -d tests ] && rm -f tests/*
 [ ! -d tests ] && mkdir tests
-
-pwd
 
 for alg in r f g ; do
     BOGOFILTER_DIR="tests.$alg"
@@ -82,7 +79,7 @@ for out in tests/msg.?.r.v ; do
     printf "%2s   %c %s   %c %s   %c %s\n" $id $g $r $f >> tests/$OUT
 done
 
-if test x$SUPPRESS_DELETE != x ; then rm -rf t.systest.d/cfg.?; fi"
+if test x$SUPPRESS_DELETE != x ; then rm -rf t.systest.d/cfg.?; fi
 
 if  [ "$verbose" == "1" ]; then
     diff -u -s outputs/$OUT tests/$OUT
