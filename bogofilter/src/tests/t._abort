@@ -1,6 +1,0 @@
-#! /bin/sh
-
-NODB=1 . ${srcdir:=.}/t.frame
-
-set +e
-(./abortme)
