@@ -424,14 +424,14 @@ static double compute_robx(dsh_t *dsh)
     double robx;
 
     dsv_t val;
-    uint32_t msg_good, msg_spam;
+    uint32_t good_cnt, spam_cnt;
     struct robhook_data rh;
 
     ds_get_msgcounts(dsh, &val);
-    msg_spam = val.spamcount;
-    msg_good = val.goodcount;
+    spam_cnt = val.spamcount;
+    good_cnt = val.goodcount;
 
-    rh.scalefactor = (double)msg_spam/msg_good;
+    rh.scalefactor = (double)spam_cnt/(double)good_cnt;
     rh.dsh = dsh;
     rh.sum = 0.0;
     rh.count = 0;
@@ -452,9 +452,10 @@ static double compute_robx(dsh_t *dsh)
     if (verbose)
 	printf("%s: %lu, %lu, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
 	       MSG_COUNT,
-	       (unsigned long)msg_spam, (unsigned long)msg_good, rh.scalefactor,
-	       rh.sum, (int)rh.count, robx);
+	       (unsigned long)spam_cnt, (unsigned long)good_cnt,
+	       rh.scalefactor, rh.sum, (int)rh.count, robx);
     else if (onlyprint) printf("%f\n", robx);
+
     return robx;
 }
 
@@ -541,7 +542,7 @@ static void help(void)
 	    "\t-h\tPrint this message.\n"
 	    "\t-v\tOutput debug messages.\n"
 	    "\t-r dir\tCompute Robinson's X for specified directory.\n"
-	    "\t-R dir\tCompute Robinson's X and save it in the spam list.\n");
+	    "\t-R dir\tCompute Robinson's X and save it in the wordlist.\n");
     fprintf(stderr,
 	    "\t-k size\tset BerkeleyDB cache size (MB).\n"
 	    "\t-W\tUse combined wordlist%s for spam and ham tokens.\n"
