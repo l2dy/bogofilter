@@ -6,16 +6,8 @@ rm -f $TMPDIR/*
 filelist="${srcdir}/inputs/????.mbx ${srcdir}/inputs/msg.?.txt"
 cat $filelist >$TMPDIR/inp
 
-CONFIG=$TMPDIR/test.cf
-
-cat <<EOF > ${CONFIG}
-robx=0.415
-min_dev=1.0
-replace_nonascii_characters=Y
-EOF
-
 grind() {
-    $BOGOFILTER -n -d $TMPDIR -c $CONFIG <$TMPDIR/inp 2>> $TMPDIR/log && a=0 || a=$?
+    $BOGOFILTER -n -d $TMPDIR -C <$TMPDIR/inp 2>> $TMPDIR/log && a=0 || a=$?
     echo >>$TMPDIR/res $a
 }
 
