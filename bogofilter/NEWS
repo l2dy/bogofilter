@@ -4,6 +4,12 @@
 
 $Id$
 
+0.13.2.1 2003-05-24
+
+	 * In bulkmode, output filenames to stdout.
+
+	 * Further fixes for static-build system.
+
 0.13.2	2003-05-24
 
 	* Autoconfiguration of BerkeleyDB library has been improved.
