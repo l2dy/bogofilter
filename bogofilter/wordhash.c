@@ -24,6 +24,10 @@ THEORY:
 
 #include <stdlib.h>
 #include <string.h>
+
+/* for offsetof */
+#include <stddef.h>
+
 #include "xmalloc.h"
 #include "wordhash.h"
 
@@ -33,13 +37,26 @@ THEORY:
 #define N_CHUNK 2000
 #define S_CHUNK 20000
 
+#undef offsetof
+
+#ifndef offsetof
+#define offsetof(type, member) ( (int) & ((type*)0) -> member )
+#endif
+
 wordhash_t *
 wordhash_init (void)
 {
   int i;
-  wordhash_t *h = xmalloc (sizeof (wordhash_t));
-  h->bin = xmalloc (NHASH * sizeof (hashnode_t **));
 
+  /*used to determine alignment requirements */
+  struct dummy { char *c; int  i; };
+  
+  wordhash_t *h = xmalloc (sizeof (wordhash_t));
+
+  h->bin = xmalloc (NHASH * sizeof (hashnode_t **));
+  
+  h->alignment = offsetof(struct dummy, i);
+  
   for (i = 0; i < NHASH; i++)
     h->bin[i] = NULL;
 
@@ -107,7 +124,7 @@ smalloc (wordhash_t * h, size_t n)
   char *t;
 
   /* Force alignment on architecture's natural boundary.*/
-  n += __alignof__ ( char * ) - ( n % __alignof__ ( char * ));
+  n += h->alignment - ( n % h->alignment);
    
   if (x == NULL || x->avail < n)
     {
