@@ -25,11 +25,13 @@ void wordprop_init(void *vwordprop)
  */
 void collect_words(wordhash_t *wh)
 {
-    wordprop_t *w;
+    if (setjmp(lexer_abort_jmp_buf) == 0)
+	return;
 
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### collect_words() begins\n");
 
     for (;;){
+	wordprop_t *w;
 	word_t *token;
 	token_t class = get_token();
 

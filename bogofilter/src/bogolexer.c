@@ -240,10 +240,11 @@ static void process_args_2(int argc, char **argv)
     return;
 }
 
+int count=0;
+
 int main(int argc, char **argv)
 {
     token_t t;
-    int count=0;
 
     mbox_mode = true;		/* to allow multiple messages */
 
@@ -265,6 +266,10 @@ int main(int argc, char **argv)
 
     while (reader_more()) {
 	initialize();
+
+	if (setjmp(lexer_abort_jmp_buf) != 0)
+	    continue;
+
 	while ((t = get_token()) != NONE)
 	{
 	    count += 1;

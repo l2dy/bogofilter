@@ -69,6 +69,10 @@ extern	const char *const system_config_file;
 /* from html.h */
 extern	bool strict_check;
 
+/* Define longjmp environment for use by YY_FATAL_ERROR in lexer_v3.l */
+#include <setjmp.h>
+extern jmp_buf lexer_abort_jmp_buf;
+
 /* other */
 
 enum passmode { PASS_MEM, PASS_SEEK };
