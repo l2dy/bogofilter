@@ -7,38 +7,48 @@
 #Test 4 -- Same as 2 except that BDB file has a  .MSG_COUNT token.
 #          Technically already upgraded.
 
-set -e
+set -ex
 
 for num in `seq 1 4`;do
 echo "Running test $num"
 (
-	inputfile="tests/bogoutil/input-${num}"
+	inputfile="input-${num}"
 	for ext in txt count; do
 	  t="${inputfile}.$ext" 
- 	  if [ -f $t ]; then
+	  if [ -f $srcdir/$t ]; then
 	     inputfile=$t
 	   break
 	  fi
 	done
 
-	if ! [ -e "$inputfile" ]; then
-	  break;
+	if [ ! -f "$srcdir/$inputfile" ]; then
+	  exit 2;
 	fi
 
-	test -f tests/bogoutil/output-${num}.db && rm -f tests/bogoutil/output-${num}.db
-
-	datafile="tests/bogoutil/input-${num}-data.txt"
-	inputdb="tests/bogoutil/input-${num}.db"
+	killinput=0
+	if [ "$srcdir" != "." ] ; then
+	    cp -f $srcdir/$inputfile x$inputfile
+	    inputfile=x$inputfile
+	    killinput=1
+	fi
+	
+	datafile="${srcdir}/input-${num}-data.txt"
+	inputdb="input-${num}.db"
 
 	if [ -f "$datafile" ]; then
 		rm -f $inputdb
-		./bogoutil -l $inputdb <  $datafile
+		../../bogoutil -l $inputdb <  $datafile
 	fi
 
-	outputdb="tests/bogoutil/output-${num}.db"
+	outputdb="output-${num}.db"
+	rm -f $outputdb
 
-	perl bogoupgrade.pl -b ./bogoutil -i $inputfile -o $outputdb && \
-	./bogoutil -d $outputdb |sort|diff -u - tests/bogoutil/output-${num}.txt
+	perl ${srcdir}/../../bogoupgrade.pl -b ../../bogoutil -i $inputfile -o $outputdb && \
+	../../bogoutil -d $outputdb |LC_COLLATE=C sort\
+	|diff -u - ${srcdir}/output-${num}.txt
+	rm -f $outputdb
+	rm -f $inputdb
+	[ $killinput -eq 0 ] || rm -f $inputfile
 ) || { echo "failed test $num" ; exit 1 ; }
 done
 
