@@ -24,10 +24,12 @@
 #include "word.h"
 #include "xmalloc.h"
 
-/* Local Variables */
+/* Global Variables */
 
 int yylineno;
 bool msg_header = true;
+
+/* Local Variables */
 
 static buff_t *yysave = NULL;
 
@@ -158,7 +160,7 @@ static int get_decoded_line(buff_t *buff)
 {
     int count;
     size_t used = buff->t.leng;
-    byte *buf;
+    byte *buf = buff->t.text + used;
 
     if (yysave == NULL)
 	count = yy_get_new_line(buff);
@@ -174,16 +176,15 @@ static int get_decoded_line(buff_t *buff)
 	int c = fgetc(fpin);
 	if (c == EOF)
 	    break;
-	if ((isspace(c))) {
+	if ((c == ' ') || (c == '\t')) {
 	    int add;
 	    /* continuation line */
 	    ungetc(c,fpin);
-	    if (buf[count - 1] == '\n') count --;
-	    add = lgetsl(buf + count, max_size - count);
+	    add = lgetsl(buff);
 	    if (add == EOF) break;
-	    if (passthrough)
-		textblock_add(textblocks, buf+count, add);
-	    count += add;
+	    if (passthrough && passmode == PASS_MEM && buff->t.leng > 0)
+		textblock_add(textblocks, buff->t.text+buff->read, buff->t.leng);
+	    count += buff->t.leng;
 	} else {
 	    ungetc(c,fpin);
 	    break;
@@ -205,8 +206,6 @@ static int get_decoded_line(buff_t *buff)
 	buff_puts(buff, 0, dbgout);
 	fprintf(dbgout, "\n");
     }
-    
-    buf = buff->t.text + used;
 
     if (count >= 5
 	&& memcmp("From ", buf, 5) != 0
