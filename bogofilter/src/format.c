@@ -275,8 +275,8 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
     int prec = 0;
     int flags = 0;
 
-    rc_t status = method->status();
-    double spamicity = method->spamicity();
+    rc_t status = (*method->status)();
+    double spamicity = (*method->spamicity)();
 
     memset(buff, '\0', size);		/* for debugging */
     memset(temp, '\0', sizeof(temp));	/* for debugging */

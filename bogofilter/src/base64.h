@@ -12,7 +12,7 @@ NAME:
 
 #include "word.h"
 
-size_t base64_decode(word_t *word);
-bool   base64_validate(word_t *word);
+uint	base64_decode(word_t *word);
+bool	base64_validate(word_t *word);
 
 #endif	/* HAVE_BASE64_H */

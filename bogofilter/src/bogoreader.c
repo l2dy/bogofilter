@@ -82,7 +82,7 @@ typedef enum { MBOX, MC, RMAIL, ANT } mbox_t;
 
 typedef struct {
     const char	*sep;
-    size_t	len;
+    uint	len;
     mbox_t	type;
     reader_line_t *fcn;
 } sep_2_box_t;
@@ -94,7 +94,7 @@ sep_2_box_t sep_2_box[] = {
     { "MAIL FROM:", 	10, ANT,   ant_getline     }	/* RISC-OS only */
 };
 
-ssize_t     seplen = 0;
+uint        seplen = 0;
 const char *separator = NULL;
 
 static void dir_init(const char *name);
@@ -105,7 +105,7 @@ typedef enum st_e { IS_DIR, IS_FILE, IS_ERR } st_t;
 /* Function Definitions */
 
 static reader_line_t *get_reader_line(FILE *fp) {
-    size_t i;
+    uint i;
     int c;
     reader_line_t *fcn = mailbox_getline;
     
@@ -196,7 +196,7 @@ static bool reader__next_mail(void)
     for (;;) {
 	/* check mailstore-specific method */
 	if (mailstore_next_mail) {
-	    if (mailstore_next_mail()) /* more mails in the mailstore */
+	    if ((*mailstore_next_mail)()) /* more mails in the mailstore */
 		return true;
 	    mailstore_next_mail = NULL;
 	}
@@ -204,7 +204,7 @@ static bool reader__next_mail(void)
 	/* ok, that one has been exhausted, try the next mailstore */
 
 	/* mailstore_next_store opens the mailstore */
-	if (!mailstore_next_store())
+	if (!(*mailstore_next_store)())
 	    return false;
 
 	/* ok, we have more mailstores, so check if the current mailstore has
@@ -405,7 +405,7 @@ static bool dir_next_mail(void)
 /* reads from a mailbox, paying attention to ^From lines */
 static int mailbox_getline(buff_t *buff)
 {
-    size_t used = buff->t.leng;
+    uint used = buff->t.leng;
     byte *buf = buff->t.text + used;
     int count;
     static word_t *saved = NULL;
@@ -427,7 +427,7 @@ static int mailbox_getline(buff_t *buff)
     /* DR 08/25/03 - NO!!! */
 
     if ((firstline || emptyline) &&
-	seplen != 0 && count >= seplen && memcmp(separator, buf, seplen) == 0)
+	seplen != 0 && count >= (int) seplen && memcmp(separator, buf, seplen) == 0)
     {
 	if (firstline) {
 	    firstline = false;
@@ -452,7 +452,7 @@ static int mailbox_getline(buff_t *buff)
 static int rmail_getline(buff_t *buff)
 {
     int count;
-    size_t used = buff->t.leng;
+    uint used = buff->t.leng;
     byte *buf = buff->t.text + used;
     static word_t *saved = NULL;
     static unsigned long bytesleft = 0;
@@ -474,11 +474,11 @@ static int rmail_getline(buff_t *buff)
     count = buff_fgetsl(buff, fpin);
     have_message = false;
 
-    if (count >= seplen && memcmp(separator, buf, seplen) == 0)
+    if (count >= (int) seplen && memcmp(separator, buf, seplen) == 0)
     {
-	int i;
+	uint i;
 	bytesleft = 0;
-	for (i = seplen; i < count; i++) {
+	for (i = seplen; i < (uint) count; i++) {
 	    if (isspace(buf[i])) continue;
 	    if (!isdigit(buf[i])) break;
 	    bytesleft = bytesleft * 10 + (buf[i] - '0');
@@ -505,7 +505,7 @@ static int rmail_getline(buff_t *buff)
 static int ant_getline(buff_t *buff)
 {
     int count;
-    size_t used = buff->t.leng;
+    uint used = buff->t.leng;
     byte *buf = buff->t.text + used;
     static word_t *saved = NULL;
     static bool dot_found = true;
@@ -521,7 +521,7 @@ static int ant_getline(buff_t *buff)
     count = buff_fgetsl(buff, fpin);
     have_message = false;
 
-    if (dot_found && count >= seplen && memcmp(separator, buf, seplen) == 0)
+    if (dot_found && count >= (int) seplen && memcmp(separator, buf, seplen) == 0)
     {
 	dot_found = false;		/* ignore until dot */
 	if (firstline) {

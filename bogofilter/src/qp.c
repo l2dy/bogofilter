@@ -42,9 +42,9 @@ static int hex_to_bin(byte c) {
 
 /* Function Definitions  */
 
-size_t qp_decode(word_t *word)
+uint qp_decode(word_t *word)
 {
-    size_t size = word->leng;
+    uint size = word->leng;
     byte *s = word->text;	/* src */
     byte *d = word->text;	/* dst */
     byte *e = s + size;		/* end */
@@ -95,7 +95,7 @@ static void qp_init(void)
 
 bool qp_validate(word_t *word)
 {
-    size_t i;
+    uint i;
 
     qp_init();
 

@@ -12,7 +12,7 @@ NAME:
 
 #include "word.h"
 
-size_t qp_decode(word_t *word);
-bool   qp_validate(word_t *word);
+uint	qp_decode(word_t *word);
+bool	qp_validate(word_t *word);
 
 #endif	/* HAVE_QP_H */

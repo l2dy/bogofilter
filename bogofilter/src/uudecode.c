@@ -14,10 +14,10 @@ AUTHOR:
 
 #include "uudecode.h"
 
-size_t uudecode(word_t *word)
+uint uudecode(word_t *word)
 {
-    size_t size = word->leng;
-    size_t count = 0;
+    uint size = word->leng;
+    uint count = 0;
     byte *b = word->text;		/* beg */
     byte *s = b;			/* src */
     byte *d = b;			/* dst */
@@ -42,7 +42,7 @@ size_t uudecode(word_t *word)
 	    v = v << 6 | ((c - 0x20) & 0x3F);
 	}
 	for (i = 2; i >= 0; i -= 1) {
-	    byte c = v & 0xFF;
+	    byte c = (byte) (v & 0xFF);
 	    d[i] = c;
 	    v = v >> 8;
 	}

@@ -62,12 +62,12 @@ THEORY:
 void print_stats(FILE *fp)
 {
     if (Rtable || verbose>=2)
-	method->print_stats(fp);
+	(*method->print_stats)(fp);
 }
 
 rc_t bogofilter(int argc, char **argv)
 {
-    int msgcount = 0;
+    uint msgcount = 0;
     rc_t status = RC_OK;
     bool register_opt = (run_type & (REG_SPAM | UNREG_SPAM | REG_GOOD | UNREG_GOOD)) != 0;
     bool register_bef = register_opt && passthrough;
@@ -79,7 +79,7 @@ rc_t bogofilter(int argc, char **argv)
 
     atexit(bf_exit);
 
-    method->initialize();	/* initialize constants */
+    (*method->initialize)();	/* initialize constants */
 
     if (query || classify_msg || write_msg) {
 	set_list_active_status(true);
@@ -90,7 +90,7 @@ rc_t bogofilter(int argc, char **argv)
 
     bogoreader_init(argc, argv);
 
-    while (reader_more()) {
+    while ((*reader_more)()) {
 	double spamicity;
 	wordhash_t *w = wordhash_new();
 
@@ -107,8 +107,8 @@ rc_t bogofilter(int argc, char **argv)
 	    wordhash_add(words, w, &wordprop_init);
 
 	if (classify_msg || write_msg) {
-	    spamicity = method->compute_spamicity(w, NULL);
-	    status = method->status();
+	    spamicity = (*method->compute_spamicity)(w, NULL);
+	    status = (*method->status)();
 	    if (run_type & RUN_UPDATE)		/* Note: don't register if RC_UNSURE */
 	    {
 		if (status == RC_SPAM)
@@ -118,7 +118,7 @@ rc_t bogofilter(int argc, char **argv)
 	    }
 
 	    if (verbose && !passthrough && !quiet) {
-		const char *filename = reader_filename();
+		const char *filename = (*reader_filename)();
 		if (filename)
 		    fprintf(fpo, "%s ", filename); 
 	    }

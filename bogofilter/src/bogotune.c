@@ -249,7 +249,7 @@ static void score_ns(double *results)
 	mlitem_t *item;
 	for (item = list->head; item != NULL; item = item->next) {
 	    wordhash_t *wh = item->wh;
-	    double score = method->compute_spamicity(wh, NULL);
+	    double score = (*method->compute_spamicity)(wh, NULL);
 	    results[count++] = score;
 	}
     }
@@ -269,7 +269,7 @@ static void score_sp(double *results)
 	mlitem_t *item;
 	for (item = list->head; item != NULL; item = item->next) {
 	    wordhash_t *wh = item->wh;
-	    double score = method->compute_spamicity(wh, NULL);
+	    double score = (*method->compute_spamicity)(wh, NULL);
 	    results[count++] = score;
 	}
     }
@@ -341,7 +341,7 @@ static uint read_mailbox(char *arg)
 
     mbox_mode = true;
     bogoreader_init(1, &arg);
-    while (reader_more()) {
+    while ((*reader_more)()) {
 	wordhash_t *wh = wordhash_new();
 
 	collect_words(wh);

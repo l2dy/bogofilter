@@ -85,11 +85,11 @@ void rob_print_stats(FILE *fp)
     if (force || Rtable || verbose>=3 ||
 	rob_stats.s.spamicity > thresh_stats || 
 	rob_stats.s.spamicity > thresh_rtable || 
-	method->status() == RC_UNSURE )
+	(*method->status)() == RC_UNSURE )
 	rstats_print();
 }
 
-static void wordprob_add(wordprop_t* wordstats, int count, int bad)
+static void wordprob_add(wordprop_t* wordstats, uint count, uint bad)
 {
     if (bad)
 	wordstats->bad += count;
@@ -213,8 +213,8 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 
     (void) fp; 	/* quench compiler warning */
 
-    bad_cnt  = max(1, msgs_bad);
-    good_cnt = max(1, msgs_good);
+    bad_cnt  = (double) max(1, msgs_bad);
+    good_cnt = (double) max(1, msgs_good);
 
     if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() begins\n");
 

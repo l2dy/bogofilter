@@ -84,7 +84,7 @@ static bool not_long_token(byte *buf, size_t count)
 
 static int yy_get_new_line(buff_t *buff)
 {
-    int count = reader_getline(buff);
+    int count = (*reader_getline)(buff);
     const byte *buf = buff->t.text;
 
     static size_t hdrlen = 0;
@@ -130,7 +130,7 @@ static int yy_get_new_line(buff_t *buff)
      * than one of these. */
 
     if (passthrough && passmode == PASS_MEM && count > 0)
-	textblock_add(buff->t.text+buff->read, count);
+	textblock_add(buff->t.text+buff->read, (size_t) count);
 
     return count;
 }
@@ -140,7 +140,7 @@ static int skip_spam_header(buff_t *buff)
     while (true) {
 	int count;
 	buff->t.leng = 0;		/* discard X-Bogosity line */
-	count = reader_getline(buff);
+	count = (*reader_getline)(buff);
 	if (count <= 1 || !isspace(buff->t.text[0])) 
 	    return count;
     }
@@ -172,14 +172,14 @@ static int get_decoded_line(buff_t *buff)
     if ( ! msg_header && msg_state->mime_type != MIME_TYPE_UNKNOWN)
     {
 	word_t line;
-	int decoded_count;
+	uint decoded_count;
 
-        line.leng = buff->t.leng - used;
+        line.leng = (uint) (buff->t.leng - used);
 	line.text = buff->t.text + used;
 	decoded_count = mime_decode(&line);
 	/*change buffer size only if the decoding worked */
-	if (decoded_count != 0 && decoded_count < count) {
-	    buff->t.leng -= count - decoded_count;
+	if (decoded_count != 0 && decoded_count < (uint) count) {
+	    buff->t.leng -= (uint) (count - decoded_count);
 	    count = decoded_count;
 	    if (DEBUG_LEXER(1)) 
 		lexer_display_buffer(buff);

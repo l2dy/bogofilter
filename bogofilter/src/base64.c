@@ -42,10 +42,10 @@ static void base64_init(void)
     return;
 }
 
-size_t base64_decode(word_t *word)
+uint base64_decode(word_t *word)
 {
-    size_t count = 0;
-    size_t size = word->leng;
+    uint count = 0;
+    uint size = word->leng;
     byte *s = word->text;		/* src */
     byte *d = word->text;		/* dst */
 
@@ -62,7 +62,7 @@ size_t base64_decode(word_t *word)
 	}
 	if (size < 4)
 	    break;
-	for (i = 0; i < 4 && (size_t)i < size; i += 1) {
+	for (i = 0; i < 4 && (uint)i < size; i += 1) {
 	    byte c = *s++;
 	    byte t = base64_xlate[c];
 	    if (t == base64_invalid) {
@@ -76,14 +76,14 @@ size_t base64_decode(word_t *word)
 	}
 	size -= i;
 	for (i = 2 - shorten; i >= 0; i -= 1) {
-	    byte c = v & 0xFF;
+	    byte c = (byte) v & 0xFF;
 	    d[i] = c;
 	    v = v >> 8;
 	}
 	d += 3 - shorten;
 	count += 3 - shorten;
     }
-    *d = '\0';
+    *d = (byte) '\0';
     return count;
 }
 
@@ -92,7 +92,7 @@ size_t base64_decode(word_t *word)
 
 bool base64_validate(word_t *word)
 {
-    size_t i;
+    uint i;
 
     base64_init();
 

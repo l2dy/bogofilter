@@ -384,7 +384,7 @@ getword (const byte *t, const byte *e)
   l = t - ts;
   n = (byte *)xmalloc(l + 1);
   memcpy(n, ts, l);
-  n[l] = '\0';
+  n[l] = (byte) '\0';
   return n;
 }
 
@@ -578,10 +578,10 @@ mime_boundary_set (word_t *text)
   return;
 }
 
-size_t
+uint
 mime_decode (word_t *text)
 {
-  size_t count = text->leng;
+  uint count = text->leng;
 
   /* early out for the uninteresting cases */
   if (msg_state->mime_encoding ==  MIME_7BIT ||
