@@ -5,7 +5,7 @@
 0.14.xx 2003-07-xx
  
 * Implemented named exitcodes, with Unsure having its own value (2)
-  and 3 for error.
+  and changing the value for error from 2 to 3.
 * Revised lexer pattern to better recognize encoded tokens.
  
 0.14.0.1 2003-07-23
