@@ -8,6 +8,15 @@ $Id$
 
 	* Manual pages now contain the proper path to bogofilter.cf.
 
+0.10.3.2 2003-XX-XX
+
+	* Bogofilter's -l option was changed. It no longer takes an optional
+	  argument, which is non-portable, it is now complemented by an -L
+	  option with mandatory argument.
+
+	  This means: if your scripts use -l, that's fine, if your scripts use
+	  -l yourtag, change them to -L yourtag.
+
 0.10.2   2003-02-01
 
 	* Stable release of 0.10.1.5
