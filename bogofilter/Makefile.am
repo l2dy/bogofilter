@@ -7,7 +7,7 @@ AUTOMAKE_OPTIONS = foreign 1.6
 # what to build
 bin_PROGRAMS = bogofilter bogoutil
 bin_SCRIPTS = bogoupgrade.pl
-noinst_PROGRAMS = lexertest
+check_PROGRAMS = lexertest
 man1_MANS = bogofilter.1
 
 # what to build that from
