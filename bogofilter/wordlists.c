@@ -1,6 +1,10 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.7  2002/10/05 22:13:11  relson
+ * If environment variables BOGODIR or HOME is defined, use its value for bogofilters
+ * wordlist directory.  If neither is defined, use the current directory.
+ *
  * Revision 1.6  2002/10/04 11:58:46  relson
  * Removed obsolete "file" field from wordlist_t.
  * Cleaned up list name, directory, and filename code in open_wordlist().
@@ -35,12 +39,39 @@
 #include "xmalloc.h"
 #include "xstrdup.h"
 
+#define BOGODIR		"/.bogofilter/"
 #define GOODFILE	"goodlist.db"
 #define SPAMFILE	"spamlist.db"
 
 wordlist_t good_list;
 wordlist_t spam_list;
 wordlist_t* word_lists=NULL;
+
+// get_bogodir()
+//	given a list of environment variables,
+//	find the first match and build a directory name
+
+char *get_bogodir(char **dirnames)
+{
+    char *env = NULL, *dir, *var;
+    for (var=*dirnames; var != NULL; var=*++dirnames)
+    {
+	env = getenv(var);
+	if (env != NULL)
+	    break;
+    }
+
+    if (env == NULL)
+	dir = xstrdup(".");
+    else
+    {
+	dir = xmalloc( strlen(env) + strlen(BOGODIR) + 1 );
+	strcpy(dir, env );
+	if ( strstr(env, "bogofilter") == NULL )
+	    strcat(dir, BOGODIR);
+    }
+    return dir;
+}
 
 void *open_wordlist( const char *name, const char *directory, const char *filename )
 {

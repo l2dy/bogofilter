@@ -1,6 +1,10 @@
 /* $Id$ */
 /* 
  * $Log$
+ * Revision 1.8  2002/10/05 22:13:12  relson
+ * If environment variables BOGODIR or HOME is defined, use its value for bogofilters
+ * wordlist directory.  If neither is defined, use the current directory.
+ *
  * Revision 1.7  2002/10/04 11:58:46  relson
  * Removed obsolete "file" field from wordlist_t.
  * Cleaned up list name, directory, and filename code in open_wordlist().
@@ -50,8 +54,10 @@ struct wordlist_s
 extern wordlist_t *word_lists;
 extern wordlist_t good_list, spam_list;
 
+char *get_bogodir(char **dirnames);
+
 int setup_lists(const char *directory);
-void close_lists(void);
 void *open_wordlist( const char *name, const char *directory, const char *filename );
+void close_lists(void);
 
 #endif	/* HAVE_WORDLISTS_H */

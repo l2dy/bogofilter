@@ -1,6 +1,10 @@
 /* $Id$ */
 /*
  * $Log$
+ * Revision 1.23  2002/10/05 22:13:11  relson
+ * If environment variables BOGODIR or HOME is defined, use its value for bogofilters
+ * wordlist directory.  If neither is defined, use the current directory.
+ *
  * Revision 1.22  2002/10/04 18:40:17  relson
  * If the HOME path already contains 'bogofilter', use it without tacking on BOGODIR.
  *
@@ -124,12 +128,11 @@ AUTHOR:
 #endif
 #include "bogofilter.h"
 #include "xmalloc.h"
-#include "xstrdup.h"
 #include "datastore.h"
 
-#define BOGODIR		"/.bogofilter/"
-
 int verbose, passthrough, update;
+
+char *dirnames[] = { "BOGODIR", "HOME", NULL };
 
 int main(int argc, char **argv)
 {
@@ -207,17 +210,9 @@ int main(int argc, char **argv)
 
     if ( directory == NULL )
     {
-	char *tmp = getenv("HOME");
-	if ( tmp == NULL ) {
-	    setup_lists(BOGODIR);
-	} else {
-	    directory = xmalloc( strlen(tmp) + strlen(BOGODIR) + 1 );
-	    strcpy(directory, tmp );
-	    if ( strstr(tmp, "bogofilter") == NULL )
-		strcat(directory, BOGODIR);
-	    setup_lists(directory);
-	    xfree(directory);
-	}
+	directory = get_bogodir(dirnames);
+	setup_lists(directory);
+	xfree(directory);
     }
 
     if (register_type == REG_NONE)
