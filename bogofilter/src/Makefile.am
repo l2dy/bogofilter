@@ -1,4 +1,4 @@
-# $Id$ 
+# $Id$
 
 # foreign: don't insist on ChangeLog
 # 1.6: minimum version of automake/aclocal
@@ -115,13 +115,13 @@ bogofilter_SOURCES = bogofilter.c bogofilter.h main.c \
 		     common.h method.h
 bogofilter_static_SOURCES = $(bogofilter_SOURCES)
 bogofilter_static_LDFLAGS = $(STATICLDFLAGS)
+bogofilter_static_LDADD = $(LDADD) $(GSL_LIBS)
 
 bogolexer_static_SOURCES = bogolexer.c
 bogolexer_static_LDFLAGS = $(STATICLDFLAGS)
 
 bogoutil_static_SOURCES = bogoutil.c
 bogoutil_static_LDFLAGS = $(STATICLDFLAGS)
-bogoutil_static_LDADD = $(LDADD) $(GSL_LIBS)
 
 debugtest_SOURCES = debug.main.c
 
