@@ -47,6 +47,7 @@ libbogofilter_a_SOURCES= \
 	debug.h debug.c \
 	error.h error.c \
 	fgetsl.h fgetsl.c \
+	buff_fgetsl.h buff_fgetsl.c \
 	find_home.h find_home.c find_home_user.c find_home_tildeexpand.c \
 	format.h format.c \
 	html.h html.c \

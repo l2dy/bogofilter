@@ -1,9 +1,9 @@
-/* $Id$ */
-
 /**
- * \file fgetsl.c
- * fgets() reimplementation that returns the count of octets read,
- * optionally adding a NUL terminator to the buffer.
+ * \file fgetsl.h Implementation file for NUL-proof fgets() replacement.
+ * Also usable as standalone test code when compiled with -DMAIN.
+ * \author Matthias Andree
+ * \date 2002
+ * \date 2003
  */
 
 #include <stdio.h>
@@ -11,37 +11,20 @@
 
 #include "common.h"
 #include "fgetsl.h"
-#include "word.h"
 
-/** This function reads a line from the input stream \a s into the
- * buffer \a buff and NUL-terminates it. It aborts when the buffer capacity is below 2.
- * \returns the count of bytes read, 0 (once directly before EOF) or EOF. */
-int fgetsl(buff_t *buff, FILE *s)
+/* calls exit(2) on read error or when max_size < 2 */
+int fgetsl(char *buf, int max_size, FILE *s)
 {
-    return xfgetsl(buff, s, 0);
+    return xfgetsl(buf, max_size, s, 0);
 }
 
-/** This function reads a line from the input stream \a s into the
- * buffer \a buff and NUL-terminates it unless \a no_nul_terminate is
- * set. It aborts when the buffer capacity is insufficient. The buffer
- * capacity is insufficient if it is below 1 when \a no_nul_terminate is
- * set and if it is below 2 when \a no_nul_terminate is unset.  \returns
- * the count of bytes read, 0 (once directly before EOF) or EOF. */
-int xfgetsl(buff_t *buff, FILE *s, int no_nul_terminate /** if positive, the buffer is assumed to be a raw string, without NUL termination */)
+int xfgetsl(char *buf, int max_size, FILE *s, int no_nul_terminate)
 {
     int c = 0;
-    size_t size = buff->size;
-    size_t min_size = no_nul_terminate ? 1 : 2;
+    char *cp = buf;
+    int moreroom = no_nul_terminate ? 1 : 0;
 
-    byte *cp = buff->t.text;
-
-    if (getenv("BOGOFILTER_ABORT_WHEN_CLOBBER"))
-	if (buff->t.leng) {
-	    fprintf(stderr, "Nonempty buffer, exiting.\n");
-	    abort();
-	}
-
-    if (buff->size < min_size) {
+    if (max_size < 2 - moreroom) {
 	fprintf(stderr, "Invalid buffer size, exiting.\n");
 	abort();
 	exit(2);
@@ -50,9 +33,9 @@ int xfgetsl(buff_t *buff, FILE *s, int no_nul_terminate /** if positive, the buf
     if (feof(s))
 	return(EOF);
 
-    while (size >= min_size && ((c = getc(s)) != EOF)) {
+    while (((--max_size > 0) || (no_nul_terminate && max_size == 0))
+	    && ((c = getc(s)) != EOF)) {
 	*cp++ = c;
-	size -= 1;
 	if (c == '\n')
 	    break;
     }
@@ -63,9 +46,9 @@ int xfgetsl(buff_t *buff, FILE *s, int no_nul_terminate /** if positive, the buf
     }
 
     if (!no_nul_terminate)
-	*cp = '\0'; 		/* DO NOT ADD ++ HERE! */
-    buff->t.leng = cp - buff->t.text;
-    return buff->t.leng;
+	*cp = '\0'; /* DO NOT ADD ++ HERE! */
+    if (cp == buf && feof(s)) return EOF;
+    return(cp - buf);
 }
 
 #ifdef MAIN
@@ -75,31 +58,29 @@ int xfgetsl(buff_t *buff, FILE *s, int no_nul_terminate /** if positive, the buf
 #include <xmalloc.h>
 
 int main(int argc, char **argv) {
-    int size, count;
-    buff_t *buff;
-    int non_nul_terminate;
+    char *buf;
+    int size, count, non_nul_terminate;
 
     if (argc != 3) {
 	fprintf(stderr, "%s <size> <non_nul_terminate>\n", argv[0]);
 	exit(2);
     }
-    
-    size = atoi(argv[1]);
+
     non_nul_terminate = atoi(argv[2]);
-    buff = buff_new(NULL, 0, size);
-    buff->t.text = xmalloc(size);
+    size = atoi(argv[1]);
+    buf = xmalloc(size);
     while(1) {
-	count = xfgetsl(buff, stdin, non_nul_terminate);
+	count = xfgetsl(buf, size, stdin, non_nul_terminate);
 	if (count == EOF) break;
 	printf("%d ", count);
-	if (count > 0) fwrite(buff->t.text, 1, buff->t.leng, stdout);
-	if (count > 0 && !non_nul_terminate && buff->t.text[count] != '\0') {
-	    printf("(NUL terminator missing)");
+	if (count > 0) fwrite(buf, 1, count, stdout);
+	if (count > 0 && !non_nul_terminate && buf[count] != '\0') {
+	                printf(" (NUL terminator missing)");
 	}
+
 	putchar('\n');
     }
-    xfree(buff->t.text);
-    buff_free(buff);
+    xfree(buf);
     exit(0);
 }
 #endif
