@@ -6,8 +6,9 @@ NAME:
 datastore_qdbm.c -- implements the datastore, using qdbm.
 
 AUTHORS:
-Gyepi Sam <gyepi@praxis-sw.com>    2003
+Gyepi Sam <gyepi@praxis-sw.com>          2003
 Matthias Andree <matthias.andree@gmx.de> 2003
+Stefan Bellon <sbellon@sbellon.de>       2003
 
 ******************************************************************************/
 
@@ -15,9 +16,6 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 #include <depot.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 #include <unistd.h>
 #include <errno.h>
@@ -29,6 +27,10 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include "paths.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
+
+#define DB_INITBNUM  1913
+#define DB_ALIGNSIZE   16
+#define DB_MAXLOAD   1.25
 
 typedef struct {
     char *path;
@@ -120,10 +122,17 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 
     for (i = 0; i < handle->count; i += 1) {
 
-      dbp = handle->dbp[i] = dpopen(handle->name[i], flags, 0);
+      dbp = handle->dbp[i] = dpopen(handle->name[i], flags, DB_INITBNUM);
 
       if (dbp == NULL)
 	  goto open_err;
+
+      if (flags & DP_OWRITER) {
+          if (!dpsetalign(dbp, DB_ALIGNSIZE)){
+              dpclose(dbp);
+              goto open_err;
+          }
+      }
 
       if (DEBUG_DATABASE(1)) {
 	  dbh_print_names(dsh->dbh, "(qdbm) dpopen( ");
@@ -194,6 +203,7 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
 int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
 {
     int ret;
+    int bnum, rnum;
 
     dbh_t *handle = dsh->dbh;
     DEPOT *dbp = handle->dbp[dsh->index];
@@ -204,6 +214,14 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
 	print_error(__FILE__, __LINE__, "(qdbm) db_set_dbvalue( '%*s' ), err: %d",
 		    token->size, (char *)token->data, dpecode);
 	exit(EX_ERROR);
+    }
+
+    /* re-organize DB when fill ratio > DB_MAXLOAD */
+    bnum = dpbnum(dbp);
+    rnum = dprnum(dbp);
+    if (bnum > 0 && rnum > 0 && ((double)rnum / (double)bnum > DB_MAXLOAD)) {
+        if (!dpoptimize(dbp, -1))
+            return -1;
     }
 
     return 0;
