@@ -107,6 +107,9 @@ static reader_line_t *get_reader_line(FILE *fp) {
     int c;
     reader_line_t *fcn = mailbox_getline;
 
+    if (fp == NULL)
+	return NULL;
+
     c = fgetc(fp);
     ungetc(c, fp);
 
@@ -271,6 +274,10 @@ static bool stdin_next_mailstore(void)
     bool val = mailstore_first;
 
     reader_getline = get_reader_line(fpin);
+
+    if (reader_getline == NULL)
+	return false;
+
     mailstore_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
     mailstore_first = false;
     return val;
