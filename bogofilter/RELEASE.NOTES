@@ -22,6 +22,13 @@ these changes. You should consult them.
 
 ########################################################################
 
+INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
+=======================================
+
+Support for Berkeley DB 3.1 is removed as a side effect of automatically
+detecting transactional mode at run-time, BDB 3.1 lacks DB_JOINENV.
+
+
 NEW CAPABILITIES IN BOGOFILTER 0.94
 ===================================
 
@@ -102,7 +109,7 @@ compiled with Berkeley DB as the data base engine (the default).
 This means the Berkeley DB directory can no longer reside on a networked
 or otherwise shared file system (such as NFS, AFS, Coda).
 
-When using BerkeleyDB 4.1 or 4.2, it is recommended that you dump and
+When using BerkeleyDB 4.1 - 4.3, it is recommended that you dump and
 load the data bases to add checksums, for enhanced reliablity. See
 section 2.2 in doc/README.db for details.
 

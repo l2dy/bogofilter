@@ -28,7 +28,6 @@ These versions are supported (with all SleepyCat-posted patches applied
 - if using a pre-packaged Berkeley DB version, the packager should have
 applied the patches, check your vendor's update site regularly):
 
-  Sleepycat Software: Berkeley DB 3.1.17: (July 31, 2000)
   Sleepycat Software: Berkeley DB 3.2.9: (January 24, 2001)
   Sleepycat Software: Berkeley DB 3.3.11: (July 12, 2001)
   Sleepycat Software: Berkeley DB 4.0.14: (November 18, 2001)
@@ -409,7 +408,7 @@ leading spaces and hyphen:
 SIZING OPTIONS:
 
  - set_cachesize      G B C
-   (valid in Berkeley DB 3.1 - 4.3, requires recovery to change)
+   (valid in Berkeley DB 3.2 - 4.3, requires recovery to change)
 
    sets the cache size to G gigabytes plus B bytes which are spread out
    in C equally sized caches (all figures are natural numbers). You
@@ -431,7 +430,7 @@ SIZING OPTIONS:
    choosing them too low may cause bogofilter applications to abort.
 
  - set_lg_max         250000
-   (valid in Berkeley DB 3.1 - 4.3, takes effect immediately)
+   (valid in Berkeley DB 3.2 - 4.3, takes effect immediately)
 
    this option configures the maximum log file size, in bytes, before
    Berkeley DB starts a new log file. The default is 1 MB.
@@ -473,13 +472,13 @@ SAFE OPTIONS:
    some out-of-space conditions later on.
 
  - set_verbose DB_VERB_CHKPOINT
-   (valid in Berkeley DB 3.1 - 4.2, takes effect immediately)
+   (valid in Berkeley DB 3.2 - 4.2, takes effect immediately)
  - set_verbose DB_VERB_DEADLOCK
-   (valid in Berkeley DB 3.1 - 4.3, takes effect immediately)
+   (valid in Berkeley DB 3.2 - 4.3, takes effect immediately)
  - set_verbose DB_VERB_RECOVERY
-   (valid in Berkeley DB 3.1 - 4.3, takes effect immediately)
+   (valid in Berkeley DB 3.2 - 4.3, takes effect immediately)
  - set_verbose DB_VERB_WAITSFOR
-   (valid in Berkeley DB 3.1 - 4.3, takes effect immediately)
+   (valid in Berkeley DB 3.2 - 4.3, takes effect immediately)
 
    these verbose flags cause extended output for long-lasting
    operations, ...CHKPOINT prints location information when searching
