@@ -30,6 +30,9 @@ const bool TRUE = true;
 
 typedef enum dbmode_e { DB_READ = 0, DB_WRITE = 1 } dbmode_t;
 
+typedef enum run_e { RUN_NORMAL=0, RUN_UPDATE, REG_SPAM, REG_GOOD, REG_SPAM_TO_GOOD, REG_GOOD_TO_SPAM } run_t;
+extern run_t run_type;
+
 void build_path(char* dest, int size, const char* dir, const char* file);
 
 #endif
