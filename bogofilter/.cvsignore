@@ -40,3 +40,5 @@ stamp-h1
 version.c
 wordhash
 ylwrap
+ChangeLog
+.rsyncs
