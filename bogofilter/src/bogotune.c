@@ -563,7 +563,7 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 
 	collect_words(whc);
 	
-	if (msgs_good == 0 && msgs_bad == 0) {
+	if (ds_path != NULL && msgs_good == 0 && msgs_bad == 0) {
 	    wordprop_t *msg_count = wordhash_insert(whc, w_msg_count, sizeof(wordprop_t), NULL);
 	    if (msg_count->cnts.good == 0 || msg_count->cnts.bad == 0)
 		load_wordlist(load_hook, train);
@@ -1300,7 +1300,7 @@ static rc_t bogotune(void)
     sp_cnt = count_messages(sp_msglists);
     cnt = ns_cnt + sp_cnt;
 
-    if (!check_msg_counts())
+    if (ds_file && !check_msg_counts())
 	exit(EX_ERROR);
 
     fflush(stdout);
