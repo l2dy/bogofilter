@@ -135,7 +135,7 @@ double user_robx = 0.0;		/* from '-r' option */
 /* Function Prototypes */
 
 static void bt_exit(void);
-static int ds_read_hook(word_t *key, dsv_t *data, void *userdata);
+static int load_hook(word_t *key, dsv_t *data, void *userdata);
 static void show_elapsed_time(int beg, int end, uint cnt, double val, 
 			      const char *lbl1, const char *lbl2);
 
@@ -735,7 +735,7 @@ static void load_wordlist(char *file)
 	fflush(stdout);
     }
 
-    ds_oper(path, DB_READ, ds_read_hook, ns_and_sp->train);
+    ds_oper(path, DB_READ, load_hook, ns_and_sp->train);
     db_cachesize = ceil(sb.st_size / 3.0 / 1024.0 / 1024.0);
 
     if (path != ds_file)
@@ -744,7 +744,7 @@ static void load_wordlist(char *file)
     return;
 }
 
-static int ds_read_hook(word_t *key, dsv_t *data, void *userdata)
+static int load_hook(word_t *key, dsv_t *data, void *userdata)
 /* returns 0 if ok, 1 if not ok */
 {
     wordhash_t *train = userdata;
