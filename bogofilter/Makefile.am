@@ -39,6 +39,7 @@ libbogofilter_a_SOURCES= \
 	xstrlcat.h xstrlcat.c \
 	xstrlcpy.h xstrlcpy.c \
 	debug.h debug.c \
+	base64.h base64.c \
 	bogoconfig.h config.c \
 	find_home.h find_home.c find_home_user.c \
 	    find_home_tildeexpand.c \
@@ -49,11 +50,14 @@ libbogofilter_a_SOURCES= \
 	format.h format.c \
 	lexer.h lexer.l \
 	maint.h maint.c \
+	mime.h mime.c \
 	paths.h paths.c \
+	qp.h qp.c \
 	register.h register.c \
 	rstats.h rstats.c \
 	textblock.h textblock.c \
 	token.h token.c \
+	uudecode.h uudecode.c \
 	wordhash.h wordhash.c wordlists.h wordlists.c \
 	globals.h system.h \
 	version.c directories.c \
