@@ -56,7 +56,7 @@ map_rc()
 #	3 g vvv		X-Bogosity: Yes, spamicity=1.000000
 #	3 r vvv		X-Bogosity: Yes, spamicity=0.540316
 
-for alg in r g ; do
+for alg in f r g ; do
     BOGOFILTER_DIR="${TMPDIR}/words.$alg"
     export BOGOFILTER_DIR
     rm -rf $BOGOFILTER_DIR
