@@ -67,5 +67,6 @@ size_t qp_decode(byte *buff, size_t size)
 	}
 	*d++ = ch;
     }
+    *d = '\0';
     return d - buff;
 }
