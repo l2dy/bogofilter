@@ -12,6 +12,8 @@ Note:
 
 * Corrected typos in doc/bogofilter.xml (the man page) 
   and in contrib/mailfilter.example
+* Added experimental code for BerkeleyDB environments code
+  for improved locking and caching.
 
 0.17.1	2004-02-09
 
