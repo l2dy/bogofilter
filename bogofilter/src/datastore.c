@@ -346,14 +346,15 @@ int ds_oper(void *env, const char *path, dbmode_t open_mode,
 static word_t  *msg_count_tok;
 static word_t  *wordlist_version_tok;
 
-void *ds_init(void)
+void *ds_init(const char *directory)
 {
-    void *dbe = dbe_init();
+    void *dbe = dbe_init(directory);
     if (msg_count_tok == NULL) {
 	msg_count_tok = word_new((const byte *)MSG_COUNT, strlen(MSG_COUNT));
     }
     if (wordlist_version_tok == NULL) {
-	wordlist_version_tok = word_new((const byte *)WORDLIST_VERSION, strlen(WORDLIST_VERSION));
+	wordlist_version_tok = word_new((const byte *)WORDLIST_VERSION,
+		strlen(WORDLIST_VERSION));
     }
     return dbe;
 }

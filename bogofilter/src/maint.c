@@ -15,6 +15,9 @@ AUTHOR:
 #include <assert.h>
 #include <stdlib.h>
 
+/* this should go away some day: */
+#include "bogohome.h"
+
 #include "datastore.h"
 #include "error.h"
 #include "maint.h"
@@ -283,7 +286,7 @@ int maintain_wordlist_file(const char *db_file)
     dsh_t *dsh;
     void *dbe;
 
-    dbe = ds_init();
+    dbe = ds_init(bogohome);
     dsh = ds_open(dbe, CURDIR_S, db_file, DS_WRITE);
 
     if (dsh == NULL)

@@ -116,8 +116,10 @@ extern void  ds_close(/*@only@*/ void *vhandle);
 /** Flush pending writes to disk */
 extern void ds_flush(void *vhandle);
 
-/** Global initialization of datastore layer. */
-extern void *ds_init(void);
+/** Global initialization of datastore layer. The directory holds the
+ * database environment (only for BerkeleyDB TXN store, otherwise
+ * ignored), you can - for now - pass bogohome. */
+extern void *ds_init(const char *directory);
 
 /** Cleanup storage allocation of datastore layer. After calling this,
  * datastore access is no longer permitted. */

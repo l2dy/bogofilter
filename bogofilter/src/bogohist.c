@@ -18,6 +18,9 @@ AUTHOR:
 #include <errno.h>
 #include <sys/stat.h>
 
+/* this should go away some day: */
+#include "bogohome.h"
+
 #include "bogohist.h"
 #include "prob.h"
 #include "datastore.h"
@@ -138,7 +141,7 @@ int histogram(const char *path)
 
     build_wordlist_path(filepath, sizeof(filepath), path);
 
-    dbe = ds_init();
+    dbe = ds_init(bogohome);
     if (dbe == NULL)
 	return EX_ERROR;
 
