@@ -60,9 +60,7 @@
         <ul>
           <li><a href="#what-is-bogofilter">What is
           bogofilter?</a></li>
-
           <li><a href="#bogo-what">Bogo what?</a></li>
-
           <li><a href="#lists">Bogofilter Mailing Lists</a></li>
         </ul>
       </li>
@@ -73,18 +71,12 @@
         <ul>
           <li><a href="#train-on-error">What are "training on error" and
           "training to exhaustion"?</a></li>
-
           <li><a href="#training">How do I start my bogofilter training?</a></li>
-
           <li><a href="#production">How can I keep the scoring accuracy high?</a></li>
-
           <li><a href="#spamassassin">How can I use SpamAssassin to train Bogofilter?</a></li>
 	  <li><a href="#mboxformats">What mailbox (file) formats does bogofilter understand?</a></li>
-
           <li><a href="#vvv">What does bogofilter's verbose output mean?</a></li>
-
-          <li><a href="#asian-spam">What can I do about asian spam?</a></li>
-
+          <li><a href="#asian-spam">What can I do about Asian spam?</a></li>
         </ul>
       </li>
 
@@ -94,13 +86,10 @@
         <ul>
           <li><a href="#query-database">How do I manually query the
           database</a></li>
-
           <li><a href="#rescue">How can I tell if my wordlists are
           corrupted?</a></li>
-
 	  <li><a href="#update">How do I upgrade from separate word
 	  databases to the new combined wordlist format?</a></li>
-
         </ul>
       </li>
 
@@ -110,24 +99,18 @@
         <ul>
           <li><a href="#nfs">Can I share wordlists over
           NFS?</a></li>
-
           <li><a href="#return-codes">Why does bogofilter give
           return codes like 0 and 256 when it's run from inside a
           program?</a></li>
-
           <li><a href="#changed-options">Now that I've upgraded to
           0.11 why are my scripts broken?</a></li>
-
           <li><a href="#changed-exitcodes">Now that I've upgraded to
           0.14 why are my scripts broken?</a></li>
-
           <li><a href="#changed-tagging">Now that I've upgraded to
           0.15 why is bogofilter working less well?</a></li>
-
           <li><a href="#remove-spam-or-nonspam">Having a combined
           wordlist, how can I delete all the spam (or non-spam)
           tokens?</a></li>
-
         </ul>
       </li>
 
@@ -137,10 +120,8 @@
         <ul>
           <li><a href="#port-notes">How do I get Bogofilter working
           on Solaris, BSD, etc.?</a></li>
-
           <li><a href="#make-notes">Can I use the make command on my
           operating system?</a></li>
-
         </ul>
       </li>
     </ul>
@@ -154,8 +135,9 @@
     in his article <a href="http://www.paulgraham.com/spam.html">A
     Plan For Spam</a>.  Bogofilter uses
     <a href="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">Gary
-    Robinson</a>'s geometric-mean algorithm with the Fisher's
-    method modification to classify email as spam or non-spam.</p>
+    Robinson</a>'s geometric-mean algorithm with the
+    <a href="http://www.linuxjournal.com/article.php?sid=6467">Fisher's
+    method modification</a> to classify email as spam or non-spam.</p>
 
     <p>The bogofilter
     <a href="http://bogofilter.sourceforge.net">home page</a> at
@@ -175,10 +157,12 @@
     <h2 id="bogo-what">Bogo-what?</h2>
 
     <p>Bogofilter is some kind of a
-<a href="http://www.catb.org/~esr/jargon/html/B/bogometer.html">bogometer</a> or
-<a href="http://www.catb.org/~esr/jargon/html/B/bogon-filter.html">bogon filter</a>, i.e., it tries to identify
-<a href="http://www.catb.org/~esr/jargon/html/B/bogus.html">bogus</a> mail by measuring the
-<a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">bogosity</a>.</p>
+    <a href="http://www.catb.org/~esr/jargon/html/B/bogometer.html">bogometer</a> or
+    <a href="http://www.catb.org/~esr/jargon/html/B/bogon-filter.html">bogon filter</a>,
+    i.e., it tries to identify
+    <a href="http://www.catb.org/~esr/jargon/html/B/bogus.html">bogus</a>
+    mail by measuring the
+    <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">bogosity</a>.</p>
 
     <hr>
 
@@ -189,49 +173,38 @@
     <table border="1" width="100%">
       <tr>
         <th>List Address</th>
-
         <th>Links</th>
-
         <th>Description</th>
       </tr>
 
       <tr>
         <td>bogofilter-announce@aotto.com</td>
-
-        <td><a href=
-        "mailto:bogofilter-announce-subscribe@aotto.com">[subscribe]</a>
+        <td><a href="mailto:bogofilter-announce-subscribe@aotto.com">[subscribe]</a>
         <a href="http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.announce">[archive]</a></td>
-
         <td>An announcement-only list where new versions are
         announced.</td>
       </tr>
 
       <tr>
         <td>bogofilter@aotto.com</td>
-
         <td><a href="mailto:bogofilter-subscribe@aotto.com">[subscribe]</a>
         <a href="http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.general">[archive]</a></td>
-
         <td>A discussion list where any conversation about
         bogofilter may take place.</td>
       </tr>
 
       <tr>
         <td>bogofilter-dev@aotto.com</td>
-
         <td><a href="mailto:bogofilter-dev-subscribe@aotto.com">[subscribe]</a>
         <a href="http://news.gmane.org/thread.php?group=gmane.mail.bogofilter.devel">[archive]</a></td>
-
         <td>A list for sharing patches, development, and technical
         discussions.</td>
       </tr>
 
       <tr>
         <td>bogofilter-cvs@lists.sourceforge.net</td>
-
         <td><a href="http://lists.sourceforge.net/mailman/listinfo/bogofilter-cvs">[subscribe]</a>
         <a href="http://sourceforge.net/mailarchive/forum.php?forum=bogofilter-cvs">[archive]</a></td>
-
         <td>Mailing list for announcing code changes to the CVS
         archive.</td>
       </tr>
@@ -251,25 +224,34 @@
     <p>This method can be enhanced by using a "security margin".  By
     increasing the spam cutoff value and decreasing the ham cutoff
     value, messages which are close to a cutoff will be used for
-    training. Using security margins was shown to improve results when
-    training on error.</p>
+    training.  Using security margins was shown to improve results when
+    training on error.  In general, greater margins help more up to
+    some limit.  As a rule of thumb spam cutoff +/- 0.3 gives good
+    results; for tristate mode, you might try the middle of the unsure
+    interval +/- 0.3 for training.</p>
+
+    <p>Repeating training on error on the same message corpus
+    also improves accuracy.  The idea is that messages which were
+    rated correctly in the first place might after some more training
+    be rated wrongly which will then be corrected.</p>
 
     <p>"Training to exhaustion" is repeating training on error, with
-    the same message corpus, until no errors remain.</p>
+    the same message corpus, until no errors remain.  Also this method
+    can be improved with security margins.</p>
 
-    <p>A basic assumption of bayes' theory is that the messages used
+    <p>A basic assumption of Bayes' theory is that the messages used
     for training are a randomly chosen sample of the messages received.
     This is violated when choosing messages by analyzing them first.
     Though theoretically wrong, in practice "training on error" seems
     to work.</p>
 
     <p>Registering messages different numbers of times (as can happen
-    with training to exhaustion) changes the
-    distribution of token scores in the training database so that it's
-    different from the distribution in the input messages. This
-    violates a basic assumption of Bayesian classification, and may
-    lead to unpredictable results. Though theoretically wrong, in
-    practice "training to exhaustion" seems to work.</p>
+    with repeated training) changes the distribution of token scores
+    in the training database so that it's different from the
+    distribution in the input messages.  This violates a basic
+    assumption of Bayesian classification, and may lead to
+    unpredictable results.  Though theoretically wrong, in practice
+    repeated training seems to work.</p>
 
     <p>Note: <code>bogominitrain.pl</code> has a <code>-f</code> option
     to do "training to exhaustion".  If you choose to use it, you need
@@ -324,9 +306,9 @@
     precision), it works very well. You can use <code>-o</code> to
     create a security margin around your spam_cutoff. Assuming
     spam_cutoff=0.6 you might want to score all ham in your
-    collection below 0.3 and all spam above 0.8. Our example is:</p>
+    collection below 0.3 and all spam above 0.9. Our example is:</p>
 
-    <pre>	bogominitrain.pl -fnv ~/.bogofilter ham.mbox spam.mbox '-o 0.8,0.3'</pre></li>
+    <pre>	bogominitrain.pl -fnv ~/.bogofilter ham.mbox spam.mbox '-o 0.9,0.3'</pre></li>
 
     <li><p>Method 3) Use the script randomtrain (in the contrib
     directory). The script generates a list of all the messages in the
@@ -387,8 +369,8 @@
     limitations), use methods 2 or 3.</p>
 
     <p>Full training with method 1 is fastest. Training on error (as
-    in methods 2, 3 and 4) is effective, but learning is pretty
-    slow.</p>
+    in methods 2, 3 and 4) is effective, but the initial training takes
+    longer.</p>
 
     <hr>
 
@@ -413,16 +395,16 @@
     train with it as ham.  Use switch <code>-s</code> to train with a
     spam message.</p>
 
-    <p>Bogofilter has a <code>-u</code> switch that automagically
+    <p>Bogofilter has a <code>-u</code> switch that automatically
     updates the wordlists after scoring each message.  As bogofilter
     sometimes misclassifies a message, monitoring is necessary to
     correct any mistakes. Corrections can be done using
     <code>-Sn</code> to change a message's classification from spam to
     non-spam and <code>-Ns</code> to change it from non-spam to spam.</p>
 
-    <p>Correcting a misclassfied message may affect classification for
+    <p>Correcting a misclassified message may affect classification for
     other message.  The smaller your database is, the higher is the
-    likelihood that a training error will casue a misclassification.</p>
+    likelihood that a training error will cause a misclassification.</p>
 
     <p>Using a method like #2 or #3 (above) can compensate for this
     effect.  Repeat the training with your complete training
@@ -630,9 +612,9 @@
 
     <hr>
 
-    <h2 id="asian-spam">What can I do about asian spam?</h2>
+    <h2 id="asian-spam">What can I do about Asian spam?</h2>
 
-    <p>Many people get unsolicited email using asian language
+    <p>Many people get unsolicited email using Asian language
     charsets. Since they don't know the languages and don't know
     people there, they assume it's spam.</p>
 
@@ -643,18 +625,18 @@
     <ul>
       <li>
         <p>You can simply let bogofilter handle it. Just train
-        bogofilter with the asian language messages identified as
+        bogofilter with the Asian language messages identified as
         spam. Bogofilter will parse the messages as best it can and
         will add tokens to the spam wordlist. The wordlist will
         contain many tokens which don't make sense to you (since
         the charset cannot be displayed), but bogofilter can work
-        with them and successfully identify asian spam.</p>
+        with them and successfully identify Asian spam.</p>
 
         <p>A second method is to use the
         "replace_nonascii_characters" config file option. This will
         replace high-bit characters, i.e. those between 0x80 and
         0xFF, with question marks, '?'. This keeps the database
-        much smaller. Unfortunately this conflicts with european
+        much smaller. Unfortunately this conflicts with European
         language which have many accented vowels and consonant in
         the high-bit range.</p>
       </li>
@@ -666,8 +648,8 @@
         an MDA script.</p>
 
         <p>Here's a procmail recipe that will sideline messages
-        written with asian charsets:</p>
-        <pre>	## Silently drop all asian language mail
+        written with Asian charsets:</p>
+        <pre>	## Silently drop all Asian language mail
 	UNREADABLE='[^?"]*big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987'
 	:0:
 	* 1^0 $ ^Subject:.*=\?($UNREADABLE)
@@ -870,17 +852,15 @@
 
     <p>The following commands will delete the tokens from spam messages:</p>
 
-<pre>    bogoutil -d wordlist.db | \
+    <pre>    bogoutil -d wordlist.db | \
     awk '{print $1 " " $2 " 0"}' | grep -v " 0 0" | \
-    bogoutil -l wordlist.new.db
-</pre>
+    bogoutil -l wordlist.new.db</pre>
 
     <p>The following commands will delete the tokens from non-spam messages:</p>
 
-<pre>    bogoutil -d wordlist.db | \
+    <pre>    bogoutil -d wordlist.db | \
     awk '{print $1 " 0 " $3}' | grep -v " 0 0" | \
-    bogoutil -l wordlist.new.db
-</pre>
+    bogoutil -l wordlist.new.db</pre>
 
     <hr>
 
