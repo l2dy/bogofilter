@@ -46,18 +46,18 @@ struct rhistogram_s {
 typedef struct header_s header_t;
 struct header_s {
     rstats_t *list;
-    size_t    robn;
+    size_t    count;		/* words in list */
+    size_t    robn;		/* words in score */
     FLOAT     p;		/* Robinson's P */
     FLOAT     q;		/* Robinson's Q */
     double    spamicity;
 };
 
-static size_t	 count;
 static header_t  header;
 static rstats_t *current = NULL;
 
-void rstats_print_histogram(size_t robn, rstats_t **rstats_array);
-void rstats_print_rtable(size_t robn, rstats_t **rstats_array);
+void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count);
+void rstats_print_rtable(rstats_t **rstats_array, size_t count);
 void rstats_print_rtable_summary(void);
 
 void rstats_init(void)
@@ -71,7 +71,7 @@ void rstats_add( const char *token,
 		 double bad,
 		 double prob)
 {
-    count += 1;
+    header.count += 1;
     current->next  = NULL;
     current->token = xstrdup(token);
     current->good  = good;
@@ -105,22 +105,23 @@ void rstats_fini(size_t robn, FLOAT P, FLOAT Q, double spamicity)
 void rstats_print(void)
 {
     size_t r;
-    size_t robn = header.robn;
+    size_t robn  = header.robn;
+    size_t count = header.count;
     rstats_t *cur;
-    rstats_t **rstats_array = (rstats_t **) xcalloc( robn, sizeof(rstats_t *));
+    rstats_t **rstats_array = (rstats_t **) xcalloc( count, sizeof(rstats_t *));
 
-    for (r= 0, cur = header.list; r<robn; r+=1, cur=cur->next)
+    for (r= 0, cur = header.list; r<count; r+=1, cur=cur->next)
 	rstats_array[r] = cur;
 
-    qsort(rstats_array, robn, sizeof(rstats_t *), compare_rstats_t);
+    qsort(rstats_array, count, sizeof(rstats_t *), compare_rstats_t);
 
     if (Rtable || verbose>=3)
-	rstats_print_rtable(robn, rstats_array);
+	rstats_print_rtable(rstats_array, count);
     else
 	if (verbose==2)
-	    rstats_print_histogram(robn, rstats_array);
+	    rstats_print_histogram(robn, rstats_array, count);
 
-    for (r= 0; r<robn; r+=1)
+    for (r= 0; r<count; r+=1)
     {
 	cur = rstats_array[r];
 	xfree(cur->token);
@@ -130,7 +131,7 @@ void rstats_print(void)
     xfree(rstats_array);
 }
 
-void rstats_print_histogram(size_t robn, rstats_t **rstats_array)
+void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
 {
     size_t i, r;
     rhistogram_t hist[INTERVALS];
@@ -147,7 +148,7 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array)
 	size_t cnt = 0;
 	h->prob = 0.0;
 	h->spamicity=0.0;
-	while ( r<robn)
+	while ( r<count)
 	{
 	    double prob = rstats_array[r]->prob;
 	    double invn, invproduct, product, spamicity;
@@ -198,7 +199,7 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array)
     }
 }
 
-void rstats_print_rtable(size_t robn, rstats_t **rstats_array)
+void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 {
     size_t r;
 
@@ -207,7 +208,7 @@ void rstats_print_rtable(size_t robn, rstats_t **rstats_array)
 		  "","pgood","pbad","fw","invfwlog","fwlog");
 
     /* Print 1 line per token */
-    for (r= 0; r<robn; r+=1)
+    for (r= 0; r<count; r+=1)
     {
 	rstats_t *cur = rstats_array[r];
 	double prob = cur->prob;
