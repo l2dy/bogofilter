@@ -59,7 +59,7 @@ static int lgetsl(byte *buf, size_t size)
        If found, handle it immediately.
     */
 
-    if (count == 5 && memcmp(buf, "From ", 5) == 0) {
+    if (count >= 5 && memcmp(buf, "From ", 5) == 0) {
 	if (DEBUG_LEXER(1)) {
 	    fprintf(dbgout, "*** %d %d ", yylineno, count);
 	    fwrite(buf, 1, count, dbgout);
