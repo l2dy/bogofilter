@@ -43,7 +43,7 @@ static int skip_spam_header(byte *buf, size_t max_size);
 /* Function Definitions */
 static int yy_getline(byte *buf, size_t size)
 {
-    size_t count = fgetsl(buf, size, fpin);
+    size_t count = fgetsl((char *)buf, size, fpin);
     yylineno += 1;
     if (DEBUG_LEXER(0)) fprintf(dbgout, "*** %2d %d %s\n", yylineno, msg_header, buf);
     return count;
@@ -53,7 +53,7 @@ static int yy_use_redo_text(byte *buf, size_t max_size)
 {
     size_t count;
 
-    count = strlcpy(buf, yysave, max_size-2);
+    count = strlcpy((char *)buf, yysave, max_size-2);
     buf[count++] = '\n';
     buf[count] = '\0';
     xfree(yysave);
@@ -83,7 +83,7 @@ static int yy_get_new_line(byte *buf, size_t max_size)
      * than one of these. */
 
     if (passthrough)
-	textblock_add(textblocks, buf, count);
+	textblock_add(textblocks, (const char *)buf, count);
 
     return count;
 }
@@ -110,7 +110,7 @@ int buff_fill(size_t need, byte *buf, size_t used, size_t size)
 	int add = yy_getline(buf+used, size-used);
 	if (add == EOF) return EOF;
 	if (passthrough)
-	    textblock_add(textblocks, buf+used, add);
+	    textblock_add(textblocks, (const char *)(buf+used), add);
 	cnt += add;
 	used += add;
     }
@@ -142,7 +142,7 @@ int yygetline(byte *buf, size_t max_size)
 	    add = yy_getline(buf + count, max_size - count);
 	    if (add == EOF) break;
 	    if (passthrough)
-		textblock_add(textblocks, buf+count, add);
+		textblock_add(textblocks, (const char *)(buf+count), add);
 	    count += add;
 	} else {
 	    ungetc(c,fpin);
@@ -166,7 +166,7 @@ int yygetline(byte *buf, size_t max_size)
     }
 
     /* \r\n -> \n */
-    if (count >= 2 && 0 == strcmp(buf + count - 2, "\r\n")) {
+    if (count >= 2 && 0 == strcmp((const char *)(buf + count - 2), "\r\n")) {
 	count --;
 	*(buf + count - 1) = '\n';
     }
@@ -201,16 +201,16 @@ int yyinput(byte *buf, size_t max_size)
 
 int yyredo(const byte *text, char del)
 {
-    byte *tmp;
+    char *tmp;
 
     if (DEBUG_LEXER(1)) fprintf(dbgout, "yyredo:  %p %s\n", yysave, text );
 
     /* if already processing saved text, concatenate new after old */
     if (yysave == NULL) {
-	tmp = strdup(text);
+	tmp = xstrdup((const char *)text);
     }
     else {
-	size_t t = strlen(text);
+	size_t t = strlen((const char *)text);
 	size_t s = strlen(yysave);
 	tmp = xmalloc(s + t + 1);
 	memcpy(tmp, yysave, s+1);

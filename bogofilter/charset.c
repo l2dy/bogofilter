@@ -380,9 +380,9 @@ void init_charset_table(const char *charset_name, bool use_default)
 }
 
 
-void got_charset( const char *charset )
+void got_charset(const char *charset)
 {
-    char *t = strchr( charset, '=' ) + 1;
+    char *t = strchr(charset, '=') + 1;
     bool q = *t == '"';
     char *s, *d;
     t = xstrdup( t + q);

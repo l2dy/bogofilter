@@ -37,7 +37,7 @@ TOKEN		[^[:blank:][:cntrl:][:digit:][:punct:]][^][:blank:]<>;=():&%$#@!+|/\\{}^\
 \>						{ html_tag(0); }
 
 ^From\ 						{ return got_from(yytext); }
-^--{MIME_BOUNDARY}(--)?$			{ got_mime_boundary(yytext, yyleng); return (BOUNDARY); }
+^--{MIME_BOUNDARY}(--)?$			{ got_mime_boundary((byte *)yytext, yyleng); return (BOUNDARY); }
 
 {IPADDR}					{ return(IPADDR);}
 {TOKEN}						{ return(TOKEN); }

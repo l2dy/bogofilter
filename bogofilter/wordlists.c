@@ -232,12 +232,12 @@ bool configure_wordlist(const char *val)
     bool override = false;
     bool ignore = false;
 
-    unsigned char *tmp = (unsigned char *) xstrdup(val);
-	
+    char *tmp = xstrdup(val);
+
     type=tmp;
     tmp += strcspn(tmp, ", \t");
     *tmp++ = '\0';
-    while (isspace(*tmp)) tmp += 1;
+    while (isspace((unsigned char)*tmp)) tmp += 1;
 
     switch (type[0])
     {
