@@ -94,9 +94,17 @@ AC_ARG_WITH(db,
 
 dnl If we're using gcc, enable some warnings
 dnl missing: -Wunreachable-code
+if test "$GCC" = yes ; then
+    AC_MSG_CHECKING([if gcc is really Intel C++])
+    case "`$CC -V 2>&1`" in
+	[[iI][nN][tT][eE][lL]]*)	ICC=yes ;;
+	*)			ICC=no ;;
+    esac
+    AC_MSG_RESULT($ICC)
+fi
 AC_CACHE_CHECK(for additional compiler options, ac_cv_prog_gcc_flags, [
 ac_cv_prog_gcc_flags=""
-if test "$GCC" = yes
+if test "$GCC" = yes && test "$ICC" = no
 then
   echo "void dummy(void);" >configure-dummy.c
   echo "void dummy(void) {}" >>configure-dummy.c
@@ -222,7 +230,12 @@ AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 AC_TYPE_SIGNAL
 AC_FUNC_SELECT_ARGTYPES
+if test "$ICC" = no ; then
+# AC_FUNC_SETVBUF_REVERSED for some reason reports a bogus "yes"
+# with Intel C++ that leads to SIGSEGV at run time.
+# Skip the test on ICC.
 AC_FUNC_SETVBUF_REVERSED
+fi
 AC_CHECK_TYPES([uint, ulong, uint32_t, u_int32_t, int32_t, int16_t, u_int16_t, uint16_t, u_int8_t])
 AC_CHECK_TYPE(u_long, unsigned long)
 AC_CACHE_SAVE
@@ -452,7 +465,7 @@ fi
 dnl END EMBEDDED GSL
 
 AH_BOTTOM([
-#if HAVE_EXTENDED_PRECISION_REGISTERS
+#ifdef HAVE_EXTENDED_PRECISION_REGISTERS
 #define GSL_COERCE_DBL(x) (gsl_coerce_double(x))
 #else
 #define GSL_COERCE_DBL(x) (x)
