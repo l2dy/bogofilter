@@ -12,9 +12,9 @@
 #include <stdio.h>
 
 #include "debug.h"
-#include "system.h" /* defines bool, uint32_t */
+#include "system.h"	/* defines bool, uint32_t */
 
-/* length of *yylval will not exceed this... */
+/* length of token will not exceed this... */
 #define MAXTOKENLEN	30
 
 #define GOODFILE	"goodlist.db"
