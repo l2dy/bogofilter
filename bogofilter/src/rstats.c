@@ -148,8 +148,10 @@ void rstats_print(void)
 void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
 {
     size_t i, r;
-    rhistogram_t hist[INTERVALS];
     size_t maxcnt=0;
+    rhistogram_t hist[INTERVALS];
+
+    double invn = (double) robn;
 
     double invlogsum = 0.0;	/* Robinson's P */
     double logsum = 0.0;	/* Robinson's Q */
@@ -188,13 +190,15 @@ void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t count)
 	}
 	else
 	{
-	    double invn, invproduct, product;
-	    assert(robn > 0);
-	    invn = (double)robn;
-	    invproduct = 1.0 - exp(invlogsum / invn);
-	    product = 1.0 - exp(logsum / invn);
-	    h->spamicity =
-		(1.0 + (invproduct - product) / (invproduct + product)) / 2.0;
+	    if (logsum < EPS && invlogsum < EPS)
+		h->spamicity = 0.0;
+	    else {
+		double invproduct, product;
+		invproduct = 1.0 - exp(invlogsum / invn);
+		product = 1.0 - exp(logsum / invn);
+		h->spamicity =
+		    (1.0 + (invproduct - product) / (invproduct + product)) / 2.0;
+	    }
 	}
 	h->count=cnt;
 	maxcnt = max(maxcnt, cnt);
