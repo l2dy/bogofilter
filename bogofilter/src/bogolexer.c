@@ -111,7 +111,7 @@ static void print_version(void)
 		  progname, version, PACKAGE);
 }
 
-#define	OPTIONS	":c:CDhHI:npP:qvVx:X:"
+#define	OPTIONS	":c:CDhHI:npP:qvVx:X:m"
 
 /** These functions process command line arguments.
  **
@@ -286,6 +286,8 @@ int main(int argc, char **argv)
 	printf( "%d tokens read.\n", count );
 
     textblock_free();
+
+    MEMDISPLAY;
 
     return 0;
 }
