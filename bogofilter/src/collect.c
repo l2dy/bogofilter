@@ -53,17 +53,8 @@ void collect_words(wordhash_t *wh)
 
 	if (cls == BOGO_LEX_LINE)
 	{
-	    /* format:
-	     * "token" 123 543
-	     * that is a string and two unsigned integers */
-	    char *s = (char *)(yylval->text+1); /* skip leading quote mark */
+	    char *s = (char *)(yylval->text+1);	    /* skip leading quote mark */
 	    char *f = memchr(s, '"', yylval->leng - 1);
-	    if (!f) {
-		/* malformatted, print a warning and skip */
-		if (DEBUG_WORDLIST(1))
-		    fprintf(dbgout, "--- bogus BOGO_LEX_LINE received, no closing double quote found.\n");
-		continue;
-	    }
 	    token->text = (unsigned char *) s;
 	    token->leng = f - s;
 	}
