@@ -51,9 +51,9 @@ bool	header_line_markup = true;	/* -H */
 /* for  bogotune */
 bool fBogotune = false;
 
-/* for  robinson.c, bogoutil.c, and bogohist.c */
-double	robx = 0.0;			/* used in fisher.c and rstats.c */
-double	robs = 0.0;			/* used in fisher.c and rstats.c */
+/* for  bogoconfig.c, prob.c, rstats.c and score.c */
+double	robx = 0.0;
+double	robs = 0.0;
 
 /* other */
 FILE	*fpo;

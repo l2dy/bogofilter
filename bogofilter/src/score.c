@@ -3,7 +3,7 @@
 /*****************************************************************************
 
 NAME:
-   fisher.c -- implements Fisher variant on Robinson algorithm.
+   score.c -- implements Fisher variant on Robinson algorithm.
 
 ******************************************************************************/
 
