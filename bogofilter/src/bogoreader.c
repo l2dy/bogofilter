@@ -125,11 +125,11 @@ static st_t ismaildir(const char *dir) {
 	strlcpy(x + l, *y, maxlen + 1);
 	r = isdir(x);
 	if (r != IS_DIR) {
-	    free(x);
+	    xfree(x);
 	    return r;
 	}
     }
-    free(x);
+    xfree(x);
     return IS_DIR;
 }
 
@@ -306,7 +306,7 @@ static bool dir_next_mail(void)
 			strerror(errno));
 	    }
 	    if (x != dirname)
-		free(x);
+		xfree(x);
 	}
 
 	while ((dirent = readdir(reader_dir)) != NULL) {
