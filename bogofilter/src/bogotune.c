@@ -673,16 +673,15 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
 	/* training set */
 	if (divvy && train_count / ratio < score_count + 1) {
 	    static wordprop_t *msg_count = NULL;
-	    if (msg_count == NULL)
-		/* Update .MSG_COUNT */
-		msg_count = wordhash_insert(train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
-
 	    wordhash_set_counts(wh, good, bad);
 	    wordhash_add(train, wh, &wordprop_init);
 	    train_count += 1;
-	    msg_count->cnts.good += good;
-	    msg_count->cnts.bad  += bad;
 	    wordhash_free(wh);
+
+	    if (msg_count == NULL)	/* Update .MSG_COUNT */
+		msg_count = wordhash_insert(train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
+	    msgs_good = msg_count->cnts.good += good;
+	    msgs_bad  = msg_count->cnts.bad  += bad;
 	}
 	/* scoring set  */
 	else {
@@ -1343,9 +1342,6 @@ static rc_t bogotune(void)
 
     ns_scores = xcalloc(ns_cnt, sizeof(double));
     sp_scores = xcalloc(sp_cnt, sizeof(double));
-
-    msgs_good = ns_cnt;
-    msgs_bad  = sp_cnt;
 
     robs = DEFAULT_ROBS;
     robx = DEFAULT_ROBX;
