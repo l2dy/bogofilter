@@ -4,6 +4,8 @@
 
 $Id$
      
+0.10.0  2003-01-19
+
 	2003-01-19
 	* Reworked database code to correct locking and
 	  database corruption issues
