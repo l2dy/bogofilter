@@ -11,6 +11,18 @@ AUTHORS: (C) Copyright 2003 by
 
 ******************************************************************************/
 
+/*
+** Formats supported:
+**
+**	mbox
+**	Maildir
+**	MH folder
+**	rmail
+**	ANT		RISC-OS only
+**
+**	msg-count	special for bogofilter
+*/
+
 #include "common.h"
 
 #include <ctype.h>
