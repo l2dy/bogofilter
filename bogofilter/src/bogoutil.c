@@ -464,6 +464,7 @@ static const char *help_text[] = {
     "  -l, --load=file             - load data from stdin into file.\n",
     "  -u, --upgrade=file          - upgrade wordlist version.\n",
     "\n",
+
     "info options:\n",
     "  -w dir                      - display counts for words from stdin.\n",
     "  -p dir                      - display word counts and probabilities.\n",
