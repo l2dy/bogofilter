@@ -1,8 +1,12 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.4  2002/09/18 20:56:43  m-a
- * Let automake deal with the lexer.
+ * Revision 1.5  2002/09/18 22:30:22  relson
+ * Created lexer.h with the definitions needed by lexer_l.l from bogofilter.h.
+ * This removes the compile-time dependency between the two files.
  *
+/* Revision 1.4  2002/09/18 20:56:43  m-a
+/* Let automake deal with the lexer.
+/*
 /* Revision 1.3  2002/09/16 18:58:14  m-a
 /* Fix 'last line occasionally emitted twice' bug, cleaning up our yyinput().
 /*
@@ -30,7 +34,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include "bogofilter.h"
+#include "lexer.h"
 
 // Our lexical analysis is different from Paul Graham's rules: 
 //
