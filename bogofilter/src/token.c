@@ -90,9 +90,7 @@ token_t get_token(void)
 	case EMPTY:	/* empty line -- check for bogus end of header */
 	    got_emptyline(); 
 	    msg_header = false;
-	    if (yylval->leng == 1) 
-		continue;
-	    else
+	    if (yylval->leng != 1)
 		yylval = word_dup(nonblank_line);
 	    break;
 
