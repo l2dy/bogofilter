@@ -24,15 +24,25 @@ int main(int argc, char **argv)
 {
     const char *h;
     int read_env = 0;
+    int by_user = 0;
 
-    if (argc >= 2)
-	read_env = atoi(argv[1]);
+    if (argc >= 2) {
+	if (!isdigit((unsigned char)argv[1][0])) 
+	    by_user = 1;
+	else
+	    read_env = atoi(argv[1]);
+    }
 
-    h = find_home(read_env);
+    if (by_user)
+	h = find_home_user(argv[1]);
+    else
+	h = find_home(read_env);
+
     if (h != NULL) {
 	(void)puts(h);
 	exit(EXIT_SUCCESS);
     } else {
+	perror(NULL);
 	exit(EXIT_FAILURE);
     }
 }

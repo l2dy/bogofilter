@@ -13,7 +13,7 @@ man1_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
 
 # what to build that from
 MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h debug.h \
-    debug.c find_home.h find_home.c bogoconfig.h
+    debug.c find_home.h find_home.c find_home_user.c bogoconfig.h
 
 BUILT_SOURCES = version.h
 

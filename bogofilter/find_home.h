@@ -21,5 +21,9 @@
 /*@null@*/ /*@observer@*/
 const char *
 find_home(int read_env) /*@globals errno@*/;
+/*@null@*/ /*@observer@*/
+
+const char *
+find_home_user(const char *username) /*@globals errno@*/;
 
 #endif
