@@ -287,7 +287,7 @@ VERP		{TOKEN}-{NUM}-{TOKEN}={TOKEN}@{TOKEN}
 {TOKEN}						{ return TOKEN;}
 
 <HTML>{TOKEN_12}?{HTML_ENCODING}		{ html_char(); }	/* process escaped chars, eg '&#101;' is 'a' */
-<HTML>{TOKEN_12}?{URL_ENCODING}+		{ url_char(); }		/* process escaped chars, eg '%61'    is 'a' */
+<HTOKEN>"/"[^/[:blank:]]*{URL_ENCODING}+	{ url_char(); }		/* process escaped chars, eg '%61'    is 'a' */
 
 \${NUM}(\.{NUM})?				{ return TOKEN;}	/* Dollars and cents */
 
