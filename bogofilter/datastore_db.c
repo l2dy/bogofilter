@@ -189,8 +189,7 @@ void db_setvalue(void *vhandle, const char * word, long value){
   Increment count associated with WORD, by VALUE.
  */
 void db_increment(void *vhandle, const char *word, long value){
-  value += db_getvalue(vhandle, word);
-
+  value = db_getvalue(vhandle, word) + value;
   db_setvalue(vhandle, word, value < 0 ? 0 : value);
 }
 
@@ -201,7 +200,6 @@ void db_increment(void *vhandle, const char *word, long value){
 */
 void db_decrement(void *vhandle, const char *word, long value){
   value = db_getvalue(vhandle, word) - value;
-
   db_setvalue(vhandle, word, value < 0 ? 0 : value);
 }
 
