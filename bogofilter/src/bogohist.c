@@ -1,0 +1,175 @@
+/* $Id$ */
+
+/*****************************************************************************
+
+NAME:
+   bogoutil.c -- dumps and loads bogofilter text files from/to Berkeley DB format.
+
+AUTHOR:
+   Gyepi Sam <gyepi@praxis-sw.com>
+   
+******************************************************************************/
+
+#include "common.h"
+
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <errno.h>
+#include <sys/stat.h>
+
+#include "bogohist.h"
+#include "prob.h"
+#include "datastore.h"
+#include "word.h"
+#include "wordlists.h"
+
+uint msgs_good, msgs_bad;
+uint ham_only,  ham_hapax;
+uint spam_only, spam_hapax;
+uint token_count;
+
+#define	INTERVALS	20
+#define PCT(n)		100.0 * n / token_count
+
+typedef struct rhistogram_s rhistogram_t;
+struct rhistogram_s {
+    uint32_t count[INTERVALS];
+};
+
+/* Function Prototypes */
+
+/* Function Definitions */
+
+static int ds_histogram_hook(/*@unused@*/ word_t *key, dsv_t *data,
+			     void *userdata)
+/* returns 0 if ok, 1 if not ok */
+{
+    rhistogram_t *hist = userdata;
+
+    double fw = calc_prob(data->goodcount, data->spamcount);
+    uint idx = min(fw * INTERVALS, INTERVALS-1);
+
+    (void)key;
+
+    hist->count[idx] += 1;
+
+    if (data->spamcount == 0) {
+	ham_only += 1;
+	if (data->goodcount == 1)
+	    ham_hapax += 1;
+    }
+
+    if (data->goodcount == 0) {
+	spam_only += 1;
+	if (data->spamcount == 1)
+	    spam_hapax += 1;
+    }
+
+    return 0;
+}
+
+static int print_histogram(rhistogram_t *hist)
+{
+    uint i, r;
+    uint maxcnt = 0;
+
+    (void)printf(" %3s %8s  %3s  %s\n", "sco", "count", "pct", "histogram");
+
+    for (i=0; i<INTERVALS; i+=1)
+    {
+	uint32_t cnt = hist->count[i];
+	if (cnt > maxcnt) 
+	    maxcnt = cnt;
+	token_count += cnt;
+    }
+
+    /* Print histogram */
+    for (i=0; i<INTERVALS; i+=1)
+    {
+	uint32_t cnt = hist->count[i];
+	double beg = 1.0 * i / INTERVALS;
+	double pct = PCT(cnt);
+
+	/* print interval, count, probability, percent, and spamicity */
+	(void)printf("%3.2f %8u %5.2f ", beg, cnt, pct);
+
+	/* scale histogram to 48 characters */
+	if (maxcnt>48) cnt = (cnt * 48 + maxcnt - 1) / maxcnt;
+
+	/* display histogram */
+	for (r=0; r<cnt; r+=1)
+	    (void)fputc( '#', stdout);
+	(void)fputc( '\n', stdout);
+    }
+
+    (void)printf("tot  %8u\n", token_count);
+
+    return 0;
+}
+
+int histogram(const char *path)
+{
+    int rc;
+    uint count;
+    void *dsh;
+    dsv_t val;
+
+    rhistogram_t hist;
+
+    char filepath1[PATH_LEN];
+    char filepath2[PATH_LEN];
+    char *filepaths[IX_SIZE];
+    filepaths[0] = filepath1;
+    filepaths[1] = filepath2;
+
+    memset(&hist, 0, sizeof(hist));
+
+#ifdef	ENABLE_DEPRECATED_CODE
+    set_wordlist_mode(path);
+#endif
+
+    count = build_wordlist_paths(filepaths, path);
+
+    dsh = ds_open(CURDIR_S, count, (const char **)filepaths, DB_READ);
+    if (dsh == NULL)
+	return EX_ERROR;
+
+    ds_get_msgcounts(dsh, &val);
+    msgs_bad  = val.spamcount;
+    msgs_good = val.goodcount;
+    
+    ds_close(dsh, false);
+
+    rc = ds_oper(filepaths[0], DB_READ, ds_histogram_hook, &hist);
+
+    print_histogram(&hist);
+
+    printf("hapaxes:  ham %7d (%5.2f%%), spam %7d (%5.2f%%)\n", ham_hapax, PCT(ham_hapax), spam_hapax, PCT(spam_hapax));
+    printf("   pure:  ham %7d (%5.2f%%), spam %7d (%5.2f%%)\n", ham_only,  PCT(ham_only),  spam_only,  PCT(spam_only));
+
+    return rc;
+}
+
+/* for a standalone program:
+**
+**	cc -o bogohist.prog.o -DMAIN -c bogohist.c
+**	cc -o bogohist bogohist.prog.o libbogofilter.a strlcpy.o strlcat.o -ldb  -lm
+*/
+
+#ifdef	MAIN
+const char *progname = "bogohist";
+
+int main(int argc, char *argv[])
+{
+    if (argc < 2) {
+	fprintf(stderr, "usage: %s BOGOFILTER_DIR\n", progname);
+	exit(1);
+    }
+    else {
+	const char *path = argv[1];
+	int rc = histogram(path);
+	exit(rc);
+    }
+}
+#endif

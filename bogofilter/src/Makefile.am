@@ -151,7 +151,8 @@ bogofilter_static_LDADD = $(LDADD) $(STATIC_DB) $(GSL_LIBS)
 bogolexer_static_SOURCES = bogolexer.c
 bogolexer_static_LDFLAGS = $(STATICLDFLAGS)
 
-bogoutil_static_SOURCES = bogoutil.c
+bogoutil_SOURCES = bogoutil.c bogohist.c
+bogoutil_static_SOURCES = bogoutil.c bogohist.c
 bogoutil_static_LDFLAGS = $(STATICLDFLAGS)
 bogoutil_static_LDADD = $(LDADD) $(STATIC_DB)
 

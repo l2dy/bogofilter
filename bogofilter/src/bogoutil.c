@@ -19,6 +19,7 @@ AUTHOR:
 #include <sys/stat.h>
 
 #include "bogofilter.h"
+#include "bogohist.h"
 #include "buff.h"
 #include "datastore.h"
 #include "error.h"
@@ -405,13 +406,14 @@ static void help(void)
     usage();
     fprintf(stderr,
 	    "\n"
+	    "\t-h\tPrint this message.\n"
 	    "\t-d file\tDump data from file to stdout.\n"
 	    "\t-l file\tLoad data from stdin into file.\n"
 	    "\t-w dir\tDisplay counts for words from stdin.\n"
 	    "\t-p dir\tDisplay word counts and probabilities.\n"
 	    "\t-m\tEnable maintenance works (expiring tokens).\n"
-	    "\t-h\tPrint this message.\n"
 	    "\t-v\tOutput debug messages.\n"
+	    "\t-H dir\tDisplay histogram and statistics for the wordlist.\n"
 	    "\t-r dir\tCompute Robinson's X for specified directory.\n"
 	    "\t-R dir\tCompute Robinson's X and save it in the wordlist.\n");
     fprintf(stderr,
@@ -439,13 +441,13 @@ static void help(void)
 char *ds_file = NULL;
 bool  prob = false;
 
-typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX } cmd_t;
+typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST } cmd_t;
 cmd_t flag = M_NONE;
 
 #ifndef	ENABLE_DEPRECATED_CODE
-#define	OPTIONS	":a:c:d:DhI:k:l:m:np:r:R:s:vVw:x:y:"
+#define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:vVw:x:y:"
 #else
-#define	OPTIONS	":a:c:d:DhI:k:l:m:np:r:R:s:vVw:Wx:y:"
+#define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:vVw:Wx:y:"
 #endif
 
 static int process_args(int argc, char **argv)
@@ -513,6 +515,12 @@ static int process_args(int argc, char **argv)
 	case 'h':
 	    help();
 	    exit(EX_OK);
+
+	case 'H':
+	    flag = M_HIST;
+	    count += 1;
+	    ds_file = (char *) optarg;
+	    break;
 
 	case 'V':
 	    print_version();
@@ -626,6 +634,8 @@ int main(int argc, char *argv[])
 	    argc -= optind;
 	    argv += optind;
 	    return display_words(ds_file, argc, argv, prob);
+	case M_HIST:
+	    return histogram(ds_file);
 	case M_ROBX:
 	    return get_robx(ds_file);
 	case M_NONE:
