@@ -1,7 +1,7 @@
 # $Id$
 dnl vim: set noai tw=0:
 AC_INIT(bogofilter, 0.16.1.cvs)
-AC_PREREQ(2.53)
+AC_PREREQ(2.54)
 AC_CONFIG_SRCDIR([src])
 AC_CANONICAL_TARGET
 
@@ -101,9 +101,9 @@ then
       *) addopts="$addopts -Wpointer-arith -ggdb" ;;
   esac
   for i in $addopts \
-dnl the -ieee options are for Alpha and VAX, Clint Adams' recommendation
+dnl the -ieee option is for Alpha, Clint Adams' recommendation
 dnl See http://thread.gmane.org/gmane.mail.bogofilter.general/6352
-      -mieee -ieee_with_no_inexact \
+      -mieee \
       -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wshadow \
       -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings \
       -Waggregate-return -Wmissing-declarations \
