@@ -46,6 +46,9 @@ void register_words(run_t _run_type, wordhash_t *h,
   if (_run_type & UNREG_SPAM) u = "S";
   if (_run_type & UNREG_GOOD) u = "N";
 
+  if (wordcount == 0)
+      msgcount = 0;
+
   format_log_update(msg_register, msg_register_size, u, r, wordcount, msgcount);
 
   if (verbose)
