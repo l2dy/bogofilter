@@ -8,6 +8,10 @@
 	margin-top: 1em;
 	font-size: 125%;
       }
+      p {
+        margin-top : 0.5em;
+        margin-bottom: 0.5em;
+      }
       ul {
 	margin-top: 1.5em;
 	margin-bottom: 0.5em;
@@ -18,7 +22,7 @@
       }
       li {
 	margin-top: 0;
-	margin-bottom: 0.5em;
+	margin-bottom: 1em;
       }
       li li {
 	margin-bottom: 0.25em;
@@ -125,9 +129,9 @@
     <h2 id="what-is-bogofilter">What is bogofilter?</h2>
 
     <p>Bogofilter is a fast Bayesian spam filter along the lines
-    suggested by Paul Graham in his article <a href=
-    "http://www.paulgraham.com/spam.html">A Plan For Spam</a>.
-    Bogofilter uses
+    suggested by <a href="http://www.paulgraham.com/">Paul Graham</a>
+    in his article <a href="http://www.paulgraham.com/spam.html">A
+    Plan For Spam</a>.  Bogofilter uses
     <a href="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">Gary
     Robinson</a>'s geometric-mean algorithm with the Fisher's
     method modification to classify email as spam or non-spam.</p>
@@ -137,9 +141,10 @@
     SourceForge is the central clearinghouse for bogofilter
     resources.</p>
 
-    <p>Bogofilter was started by Eric S. Raymond on August 19,
-    2002. It gained popularity in September 2002, and a number of
-    other authors have started to contribute to the project.</p>
+    <p>Bogofilter was started by <a href="http://catb.org/~esr/">Eric
+    S. Raymond</a> on August 19, 2002. It gained popularity in
+    September 2002, and a number of other authors have started to
+    contribute to the project.</p>
 
     <p>The <a href="http://bogofilter.sourceforge.net/NEWS">NEWS
     file</a> describes bogofilter's version history.</p>
@@ -270,8 +275,7 @@
     <li><p>Method 1) Full training. Train bogofilter with all your messages. In
     our example:</p>
 
-    <pre>
-	bogofilter -s &lt; spam.mbx
+    <pre>	bogofilter -s &lt; spam.mbx
 	bogofilter -n &lt; ham.mbx</pre></li>
     </ul>
 
@@ -297,18 +301,15 @@
     spam_cutoff=0.6 and an interval of 0.1 is wanted, our example
     is:</p>
 
-    <pre>
-	bogominitrain.pl -fnv ~/.bogofilter ham.mbx spam.mbx '-o 0.7,0.5'
-    </pre></li>
+    <pre>	bogominitrain.pl -fnv ~/.bogofilter ham.mbx spam.mbx '-o 0.7,0.5'</pre></li>
 
     <li><p>Method 3) Use the script randomtrain (in the contrib
     directory). The script generates a list of all the messages in the
     mailboxes, randomly shuffles the list, and then scores each
     message, with training as needed. In our example:</p>
 
-    <pre>
-	randomtrain -s spam.mbx -n ham.mbx</pre>
-    
+    <pre>	randomtrain -s spam.mbx -n ham.mbx</pre>
+
     <p>As with method 4, it works better if you start with full
     training using several thousand messages.  This will give a
     database that is more comprehensive and significantly
@@ -322,8 +323,7 @@
     incorrectly, and train with those. Here are two little scripts you
     can use to classify the train-on-error messages:</p>
 
-    <pre>
-	#! /bin/sh
+    <pre>	#! /bin/sh
 	#  class3 -- classify one message as bad, good or unsure
 	cat &gt;msg.$$
 	bogofilter $* &lt;msg.$$
@@ -335,9 +335,9 @@
 	elif [ $res = 2 ]; then
 	    cat msg.$$ &gt;&gt;corpus.unsure
 	fi
-	rm msg.$$
+	rm msg.$$</pre>
 
-	#! /bin/sh
+    <pre>	#! /bin/sh
 	# classify -- put all messages in mbox through class3
 	src=$1;
 	shift
@@ -345,8 +345,7 @@
 
     <p>In our example (after the initial full training):</p>
 
-    <pre>
-	classify spam.mbx [bogofilter options]
+    <pre>	classify spam.mbx [bogofilter options]
         bogofilter -s &lt; corpus.good
         rm -f corpus.*
         classify ham.mbx [bogofilter options]
@@ -409,8 +408,7 @@
 
     <p>Note that you should periodically run:</p>
 
-    <pre>
-	bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
+    <pre>	bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
 	mv wordlist.db wordlist.db.prv
 	mv wordlist.db.new wordlist.db</pre>
 
@@ -430,30 +428,29 @@
     bogofilter to register the message as spam (or non-spam). The
     sample procmail recipe below shows one way to do this:</p>
 
-<pre>
-  BOGOFILTER     = "/usr/bin/bogofilter"
-  BOGOFILTER_DIR = "training"
-  SPAMASSASSIN  = "/usr/bin/spamassassin"
+    <pre>	BOGOFILTER     = "/usr/bin/bogofilter"
+	BOGOFILTER_DIR = "training"
+	SPAMASSASSIN  = "/usr/bin/spamassassin"
 
-  :0 HBc
-  * ? $SPAMASSASSIN -e
-  #spam yields non-zero
-  #non-spam yields zero
-  | $BOGOFILTER -n -d $BOGOFILTER_DIR
-  #else (E)
-  :0Ec
-  | $BOGOFILTER -s -d $BOGOFILTER_DIR
+	:0 HBc
+	* ? $SPAMASSASSIN -e
+	#spam yields non-zero
+	#non-spam yields zero
+	| $BOGOFILTER -n -d $BOGOFILTER_DIR
+	#else (E)
+	:0Ec
+	| $BOGOFILTER -s -d $BOGOFILTER_DIR
 
-  :0fw
-  | $BOGOFILTER -p -e
+	:0fw
+	| $BOGOFILTER -p -e
 
-  :0:
-  * ^X-Bogosity:.Yes
-  spam
+	:0:
+	* ^X-Bogosity:.Yes
+	spam
 
-  :0:
-  * ^X-Bogosity:.No
-  non-spam</pre>
+	:0:
+	* ^X-Bogosity:.No
+	non-spam</pre>
 
     <hr>
 
@@ -467,25 +464,22 @@
       <li>
         Using "-v" causes bogofilter to generate the "X-Bogosity:"
         header line, i.e.
-<pre>
-  X-Bogosity: No, tests=bogofilter, spamicity=0.500000</pre></li>
+        <pre>	X-Bogosity: No, tests=bogofilter, spamicity=0.500000</pre></li>
 
       <li>
         Using "-vv" causes bogofilter to generate a histogram, i.e.
-
-<pre>
-  X-Bogosity: No, tests=bogofilter, spamicity=0.500000
-          int  cnt    prob   spamicity  histogram
-         0.00   29  0.000209  0.000052  #############################
-         0.10    2  0.179065  0.003425  ##
-         0.20    2  0.276880  0.008870  ##
-         0.30   18  0.363295  0.069245  ##################
-         0.40    0  0.000000  0.069245
-         0.50    0  0.000000  0.069245
-         0.60   37  0.667823  0.257307  #####################################
-         0.70    5  0.767436  0.278892  #####
-         0.80   13  0.836789  0.334980  #############
-         0.90   32  0.984903  0.499835  ################################</pre>
+        <pre>	X-Bogosity: No, tests=bogofilter, spamicity=0.500000
+	        int  cnt    prob   spamicity  histogram
+	       0.00   29  0.000209  0.000052  #############################
+	       0.10    2  0.179065  0.003425  ##
+	       0.20    2  0.276880  0.008870  ##
+	       0.30   18  0.363295  0.069245  ##################
+	       0.40    0  0.000000  0.069245
+	       0.50    0  0.000000  0.069245
+	       0.60   37  0.667823  0.257307  #####################################
+	       0.70    5  0.767436  0.278892  #####
+	       0.80   13  0.836789  0.334980  #############
+	       0.90   32  0.984903  0.499835  ################################</pre>
 
         <p>Each row shows an interval, the count of tokens with
         scores in that interval, the average spam probability for
@@ -501,18 +495,17 @@
       <li>
         Using "-vvv" produces a list of <em>all</em> the tokens in
         the messages with information on each one, i.e.
-<pre>
-  X-Bogosity: No, tests=bogofilter, spamicity=0.500000
-                        n    pgood     pbad      fw     U
-  "which"              10  0.208333  0.000000  0.000041 +
-  "own"                 7  0.145833  0.000000  0.000059 +
-  "having"              6  0.125000  0.000000  0.000069 +
-  ...
-  "unsubscribe.asp"     2  0.000000  0.095238  0.999708 +
-  "million"             4  0.000000  0.190476  0.999854 +
-  "copy"                5  0.000000  0.238095  0.999883 +
-  N_P_Q_S_s_x_md      138  0.00e+00  0.00e+00  5.00e-01
-                           1.00e-03  4.15e-01  0.100</pre>
+        <pre>	X-Bogosity: No, tests=bogofilter, spamicity=0.500000
+	                      n    pgood     pbad      fw     U
+	"which"              10  0.208333  0.000000  0.000041 +
+	"own"                 7  0.145833  0.000000  0.000059 +
+	"having"              6  0.125000  0.000000  0.000069 +
+	...
+	"unsubscribe.asp"     2  0.000000  0.095238  0.999708 +
+	"million"             4  0.000000  0.190476  0.999854 +
+	"copy"                5  0.000000  0.238095  0.999883 +
+	N_P_Q_S_s_x_md      138  0.00e+00  0.00e+00  5.00e-01
+	                         1.00e-03  4.15e-01  0.100</pre>
         The columns printed contain the following information:
 
         <dl>
@@ -551,7 +544,7 @@
 
         <p>The final lines show:</p>
 
-        <ul>
+        <ul style="margin-top:0;margin-bottom:1em;">
           <li>The cumulative results of the columns</li>
 
           <li>The values of Robinson's <b>s</b> and <b>x</b>
@@ -619,18 +612,17 @@
 
         <p>Here's a procmail recipe that will sideline messages
         written with asian charsets:</p>
-<pre>
-## Silently drop all asian language mail
-UNREADABLE='[^?"]*big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987'
-:0:
-* 1^0 $ ^Subject:.*=\?($UNREADABLE)
-* 1^0 $ ^Content-Type:.*charset="?($UNREADABLE)
-spam-unreadable
-
-:0:
-* ^Content-Type:.*multipart
-* B ?? $ ^Content-Type:.*^?.*charset="?($UNREADABLE)
-spam-unreadable</pre>
+        <pre>	## Silently drop all asian language mail
+	UNREADABLE='[^?"]*big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987'
+	:0:
+	* 1^0 $ ^Subject:.*=\?($UNREADABLE)
+	* 1^0 $ ^Content-Type:.*charset="?($UNREADABLE)
+	spam-unreadable
+	
+	:0:
+	* ^Content-Type:.*multipart
+	* B ?? $ ^Content-Type:.*^?.*charset="?($UNREADABLE)
+	spam-unreadable</pre>
 
         <p>With the above recipe, bogofilter will <em>never</em>
         see the message.</p>
@@ -670,18 +662,15 @@ spam-unreadable</pre>
 
     <p>If you think your word lists are hosed, you can see what
     BerkeleyDB thinks by running:</p>
-<pre>
-  db_verify wordlist.db</pre>
+    <pre>	db_verify wordlist.db</pre>
 
     <p>If there is a problem, you may be able to recover some (or
     all) of the tokens and their counts with the following
     commands:</p>
-<pre>
-  bogoutil -d wordlist.db | bogoutil -l wordlist.db.new</pre>
+    <pre>	bogoutil -d wordlist.db | bogoutil -l wordlist.db.new</pre>
     <p>or with</p>
-<pre>
-  db_dump -r wordlist.db &gt; wordlist.txt
-  db_load wordlist.new &lt; wordlist.txt</pre>
+    <pre>	db_dump -r wordlist.db &gt; wordlist.txt
+	db_load wordlist.new &lt; wordlist.txt</pre>
 
     <p>If you've got two wordlists (spamlist.db and goodlist.db), run the above commands for each of them.</p>
 
@@ -694,11 +683,10 @@ spam-unreadable</pre>
     "http://www.sleepycat.com">BerkeleyDB</a>, then <a href=
     "http://www.sleepycat.com/download.html">download it</a>,
     unpack it, and do these commands in the db directory:</p>
-<pre>
-$ cd build_unix
-$ sh ../dist/configure
-$ make
-# make install</pre>
+    <pre>	$ cd build_unix
+	$ sh ../dist/configure
+	$ make
+	# make install</pre>
 
     <p>Next, download a <a href=
     "http://sourceforge.net/project/showfiles.php?group_id=62265">portable
@@ -707,16 +695,14 @@ $ make
     <p class="subheading">On Solaris</p>
 
     <p>Unpack it, and then do:</p>
-<pre>
-$ ./configure --with-db=/usr/local/BerkeleyDB.4.1
-$ make
-# make install-strip</pre>
+    <pre>	$ ./configure --with-db=/usr/local/BerkeleyDB.4.1
+	$ make
+	# make install-strip</pre>
 
     <p>You will either want to put a symlink to libdb.so in
     /usr/lib, or use a modified LD_LIBRARY_PATH environment
     variable before you start bogofilter.</p>
-<pre>
-$ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1</pre>
+    <pre>	$ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1</pre>
 
     <p>Note that some make versions shipped with Solaris break when
     you try to build bogofilter outside of its source directory.
@@ -729,19 +715,18 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.1</pre>
     bogofilter. This approach uses the highly recommended
     portupgrade and cvsup software packages. To install these two
     fine pieces, type (you need to do this only once):</p>
-<pre>
-# pkg_add -r portupgrade cvsup</pre>
+    <pre>	# pkg_add -r portupgrade cvsup</pre>
 
-    <p>To install or upgrade bogofilter, just <a href=
-    "http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html">
-    upgrade your portstree using cvsup</a>, then type:</p>
-<pre>
-# portupgrade -N bogofilter</pre>
+    <p>To install or upgrade bogofilter, just
+    <a href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html">upgrade
+    your portstree using cvsup</a>, then type:</p>
+    <pre>	# portupgrade -N bogofilter</pre>
 
     <p class="subheading">On HP-UX</p>
 
-    <p>See the file doc/programmer/README.hp-ux in the source
-    distribution.</p>
+    <p>See the file
+    <a href="http://cvs.sourceforge.net/viewcvs.py/*checkout*/bogofilter/bogofilter/doc/programmer/README.hp-ux?rev=HEAD&amp;content-type=text/plain">doc/programmer/README.hp-ux</a>
+    in the source distribution.</p>
 
     <hr>
 
