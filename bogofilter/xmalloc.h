@@ -1,7 +1,7 @@
 /* $Id$ */
 
-#ifndef XMALLOC_H_GUARD
-#define XMALLOC_H_GUARD
+#ifndef XMALLOC_H
+#define XMALLOC_H
 #include <stdlib.h>
 
 /*@noreturn@*/

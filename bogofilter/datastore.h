@@ -12,8 +12,8 @@
 */
 
 
-#ifndef DATASTORE_H_GUARD
-#define DATASTORE_H_GUARD
+#ifndef DATASTORE_H
+#define DATASTORE_H
 
 #include "wordlists.h"
 

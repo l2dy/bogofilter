@@ -1,7 +1,7 @@
 /* $Id$ */
 
-#ifndef COMMON_H_GUARD
-#define COMMON_H_GUARD
+#ifndef COMMON_H
+#define COMMON_H
 
 #if defined(HAVE_LIMITS_H)
 #include <limits.h>

@@ -5,8 +5,8 @@
 ** the methods needed by an object for spamicity computing.
 */
 
-#ifndef	HAVE_METHOD_H
-#define	HAVE_METHOD_H
+#ifndef	METHOD_H
+#define	METHOD_H
 
 #include "bogoconfig.h"
 #include "bogofilter.h"
@@ -55,4 +55,4 @@ extern void mth_initialize(void *s, int _max_repeats, double _min_dev, double _s
 extern double mth_spamicity(void);
 extern rc_t mth_status(void);
 
-#endif	/* HAVE_METHOD_H */
+#endif	/* METHOD_H */

@@ -2,8 +2,8 @@
 
 /*  constants and declarations for wordlists */
 
-#ifndef	HAVE_WORDLISTS_H
-#define	HAVE_WORDLISTS_H
+#ifndef	WORDLISTS_H
+#define	WORDLISTS_H
 
 typedef struct wordlist_s wordlist_t;
 struct wordlist_s
@@ -30,4 +30,4 @@ void close_lists(void);
 
 void set_good_weight(double weight);
 
-#endif	/* HAVE_WORDLISTS_H */
+#endif	/* WORDLISTS_H */

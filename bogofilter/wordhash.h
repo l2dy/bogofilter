@@ -1,7 +1,7 @@
 /* $Id$ */
 
-#ifndef WORDHASH_H_GUARD
-#define WORDHASH_H_GUARD
+#ifndef WORDHASH_H
+#define WORDHASH_H
 
 /* Hash entry. */
 typedef struct hashnode_t {

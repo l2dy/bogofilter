@@ -1,8 +1,8 @@
 /* $Id$ */
 /*  constants and declarations for robinson method */
 
-#ifndef	HAVE_ROBINSON_H
-#define	HAVE_ROBINSON_H
+#ifndef	ROBINSON_H
+#define	ROBINSON_H
 
 #include <method.h>
 
@@ -52,4 +52,4 @@ extern	const	parm_desc rob_parm_table[];
 extern	void    rob_initialize_with_parameters(rob_stats_t *stats, double _min_dev, double _spam_cutoff);
 #endif
 
-#endif	/* HAVE_ROBINSON_H */
+#endif	/* ROBINSON_H */

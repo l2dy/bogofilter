@@ -1,7 +1,7 @@
 /* $Id$ */
 
-#ifndef DATASTORE_DB3_H_GUARD
-#define DATASTORE_DB3_H_GUARD
+#ifndef DATASTORE_H
+#define DATASTORE_H
 
 #define MSG_COUNT_TOK ".MSG_COUNT"
 
@@ -14,4 +14,4 @@ typedef struct {
   int  is_swapped;
 } dbh_t;
 
-#endif
+#endif	/* DATASTORE_H */

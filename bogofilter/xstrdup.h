@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef XSTRDUP_H_GUARD
-#define XSTRDUP_H_GUARD
+#ifndef XSTRDUP_H
+#define XSTRDUP_H
 
 char *xstrdup(const char *s);
 

@@ -10,8 +10,8 @@ AUTHOR:
 
 ******************************************************************************/
 
-#ifndef HAVE_RSTATS_H
-#define HAVE_RSTATS_H
+#ifndef RSTATS_H
+#define RSTATS_H
 
 void rstats_init(void);
 
@@ -27,4 +27,4 @@ void rstats_fini(size_t robn,
 
 void rstats_print(void);
 
-#endif	/* HAVE_RSTATS_H */
+#endif	/* RSTATS_H */

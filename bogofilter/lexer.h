@@ -1,7 +1,7 @@
 /* $Id$ */
 
-#ifndef	HAVE_LEXER_H
-#define	HAVE_LEXER_H
+#ifndef	LEXER_H
+#define	LEXER_H
 
 /* length of *yylval will not exceed this... */
 #define MAXTOKENLEN	30
@@ -33,4 +33,4 @@ extern int lexer_fgets(char *buf, int max_size, FILE *s);
 extern token_t get_token(void);
 extern token_t yylex(void);
 
-#endif	/* HAVE_LEXER_H */
+#endif	/* LEXER_H */

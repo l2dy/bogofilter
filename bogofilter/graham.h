@@ -1,8 +1,8 @@
 /* $Id$ */
 /*  constants and declarations for graham */
 
-#ifndef	HAVE_GRAHAM_H
-#define	HAVE_GRAHAM_H
+#ifndef	GRAHAM_H
+#define	GRAHAM_H
 
 #include <method.h>
 
@@ -12,4 +12,4 @@
 
 extern	method_t graham_method;
 
-#endif	/* HAVE_GRAHAM_H */
+#endif	/* GRAHAM_H */
