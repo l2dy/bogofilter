@@ -74,7 +74,7 @@ int main( int argc, char **argv)
 	if (strcmp(arg, "-v") == 0)
 	    verbose = 1;
     }
-    process_config_files();
-    /* read_config_file("./bogofilter.cf", false, false); */
+    process_config_files(true);
+    /* read_config_file("./bogofilter.cf", true, false); */
     return 0;
 }

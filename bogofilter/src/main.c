@@ -70,7 +70,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     if (exitcode != 0)
 	exit(exitcode);
 
-    process_config_files();
+    process_config_files(false);
 
     /* directories from command line and config file are already handled */
     if (directory == NULL)
