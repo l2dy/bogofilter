@@ -34,6 +34,12 @@
  * statistical trigger.  
  *
  * The list of HTML keywords and attributes to be ignored is from the 4.0 DTD.
+ *
+ * LEXED_TOKENS, which are found in "msg-count" files need a special pattern
+ * because they can be:
+ *	1 - normal bogofilter tokens
+ *	2 - url:xxx and subj: tokens
+ *	3 - mime boundaries
  */
 
 #include <ctype.h>
@@ -80,7 +86,9 @@ MIME_BOUNDARY	[0-9a-zA-Z\'()+_,-./:=?#]{1,70}
 ID		[0-9a-zA-Z-]*
 MTYPE		[ \t]*[0-9a-zA-Z/-]*
 
-NUM		[0-9]+
+NUM_NUM		\ [0-9]+\ [0-9]+
+MSG_COUNT	^\"\.MSG_COUNT\"
+
 TOKEN_ESR	[A-Za-z$][A-Za-z0-9$\'.-]+[A-Za-z0-9$]
 
 TOKENMID_CA_075	[^][:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:][]+
@@ -89,13 +97,10 @@ TOKENMID_NJS_DR	[^[:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[\]]+
 
 TOKENFRONT	[^[:blank:][:cntrl:][:digit:][:punct:]]
 TOKENMID	[^[:blank:]<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[\]]+
+BOGOLEX_TOKEN	[^[:blank:]<>;    &%$ @! |/\\{}^\"  \*,[:cntrl:]\[\]]+
 TOKENBACK	[^[:blank:][:punct:][:cntrl:]]
 
 TOKEN 		{TOKENFRONT}{TOKENMID_NJS_DR}{TOKENBACK}
-
-MSG_COUNT	^\"\.MSG_COUNT\"\ {NUM}\ {NUM}$
-BOGOLEX_MID	[^[:blank:]<>;=()&%$#@!+|/\\{}^\"\*,[:cntrl:]\[\]]+
-BOGOLEX_TOKEN	{BOGOLEX_MID}
 
 T2		{TOKENFRONT}<>;=():&%$#@!+|/\\{}^\"\?\*,[:cntrl:]\[]+
 T1		{TOKENFRONT}
@@ -111,10 +116,10 @@ T1		{TOKENFRONT}
 						  }
 						}
 
-<INITIAL,BOGO_LEX>{MSG_COUNT}			{ if (lineno == 0) { BEGIN(BOGO_LEX); } 
+<INITIAL,BOGO_LEX>{MSG_COUNT}{NUM_NUM}		{ if (lineno == 0) { BEGIN(BOGO_LEX); } 
 						  return MSG_COUNT_LINE;
 						}
-<BOGO_LEX>^\"{BOGOLEX_TOKEN}\"\ {NUM}\ {NUM}	{ return BOGO_LEX_LINE; }
+<BOGO_LEX>^\"{BOGOLEX_TOKEN}\"{NUM_NUM}		{ return BOGO_LEX_LINE; }
 <BOGO_LEX>\n					{ lineno += 1; }
 
 <INITIAL>charset=\"?{ID}\"?			{ got_charset(yytext); yyredo(yy_text(), '='); }
