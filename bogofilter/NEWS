@@ -26,6 +26,7 @@ Briefly:
 	2004-11-14
 
 	* Added utility scripts bf_copy and bf_compact.
+	* Added BerkeleyDB warning for binary rpm users.
 
 	2004-11-12
 

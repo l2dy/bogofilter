@@ -113,12 +113,18 @@ strip contrib-static/bogogrep_static
 )
 %endif
 
+%post
+
+cat %{_defaultdocdir}/%{name}-%{version}/rpm.notes.BerkeleyDB
+
 %post static
 for file in bogofilter bogolexer bogoutil bogotune ; do
     if [ $1 -lt 2 ] ; then
         ln -s %{_bindir}/${file}_static %{_bindir}/${file} 
     fi
 done
+
+cat %{_defaultdocdir}/%{name}-%{version}/rpm.notes.BerkeleyDB
 
 %postun static
 for file in bogofilter bogolexer bogoutil bogotune ; do
@@ -138,7 +144,7 @@ done
 %doc doc/bogofilter-SA-2002-01
 %doc doc/integrating*
 %doc doc/programmer
-%doc doc/README.*db
+%doc doc/README.*db doc/rpm.notes.BerkeleyDB
 %doc .inst/html .inst/xml
 
 %{_sysconfdir}/bogofilter.cf.example
@@ -149,6 +155,8 @@ done
 %{_bindir}/bogotune
 %{_bindir}/bogoutil
 %{_bindir}/bogoupgrade
+%{_bindir}/bf_copy
+%{_bindir}/bf_compact
 
 %{_mandir}/man1/bogofilter.1*
 %{_mandir}/man1/bogolexer.1*
@@ -169,7 +177,7 @@ done
 %doc doc/bogofilter-SA-2002-01
 %doc doc/integrating*
 %doc doc/programmer
-%doc doc/README.*db
+%doc doc/README.*db doc/rpm.notes.BerkeleyDB
 %doc .inst/html .inst/xml
 
 %{_sysconfdir}/bogofilter.cf.example
@@ -180,6 +188,8 @@ done
 %{_bindir}/bogotune_static
 %{_bindir}/bogoutil_static
 %{_bindir}/bogoupgrade
+%{_bindir}/bf_copy
+%{_bindir}/bf_compact
 
 %{_mandir}/man1/bogofilter.1*
 %{_mandir}/man1/bogolexer.1*
