@@ -21,7 +21,6 @@ NAME:
 #include "passthrough.h"
 #include "bogofilter.h"
 #include "fgetsl.h"
-#include "lexer.h"
 #include "format.h"
 #include "textblock.h"
 #include "xmalloc.h"
