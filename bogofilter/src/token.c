@@ -31,9 +31,6 @@ word_t *yylval = NULL;
 static token_t save_class = NONE;
 static word_t *ipsave = NULL;
 
-static int html_tag_level = 0;
-static int html_comment_level = 0;
-
 /* Global Variables */
 
 bool block_on_subnets = false;
@@ -41,30 +38,7 @@ bool block_on_subnets = false;
 static word_t *token_prefix = NULL;
 static word_t *token_prefix_next = NULL;
 
-/* Function Prototypes */
-
-static void reset_html_level(void);
-
 /* Function Definitions */
-
-static
-void reset_html_level(void)
-{
-    html_tag_level = 0;
-    html_comment_level = 0;
-}
-
-void html_tag(int level)
-{
-    html_tag_level = level;
-}
-
-void html_comment(int level)
-{
-    html_comment_level += level;
-    if (html_comment_level < 0)
-	html_comment_level = 0;
-}
 
 token_t get_token(void)
 {
@@ -108,9 +82,6 @@ token_t get_token(void)
 		continue;
 
 	case TOKEN:	/* ignore anything when not reading text MIME types */
-	      if (html_tag_level > 0 || html_comment_level > 0)
-		continue;
-	      
 	    if (msg_header)
 	    {
 		if (token_prefix != NULL) {
@@ -204,7 +175,6 @@ void token_init(void)
     msg_header = true;
     yyinit();
     mime_reset(); 
-    reset_html_level();
 }
 
 void got_from(void)
