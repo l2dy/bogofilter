@@ -9,13 +9,15 @@
 
 #include "bogofilter.h"
 #include "datastore.h"
-#include "register.h"
 #include "collect.h"
+#include "format.h"
+#include "register.h"
 #include "wordhash.h"
 
 #define PLURAL(count) ((count == 1) ? "" : "s")
 
 extern char msg_register[];
+extern size_t msg_register_size;
 
 /*
  * tokenize text on stdin and register it to a specified list
@@ -41,8 +43,7 @@ void register_words(run_t _run_type, wordhash_t *h,
     default:			abort(); 
   }
 
-  (void)sprintf(msg_register, "register-%c, %d words, %d messages\n", ch,
-		wordcount, msgcount);
+  format_log_update(msg_register, msg_register_size, ch, wordcount, msgcount);
 
   if (verbose)
     (void)fprintf(stderr, "# %d word%s, %d message%s\n", 

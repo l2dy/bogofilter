@@ -32,6 +32,7 @@ AUTHOR:
 #include "bogoconfig.h"
 #include "register.h"
 #include "wordlists.h"
+#include "format.h"
 
 #define BOGODIR ".bogofilter"
 
@@ -40,8 +41,9 @@ AUTHOR:
 
 extern int Rtable;
 
-char msg_register[1024];
-char msg_bogofilter[1024];
+char msg_register[80];
+char msg_bogofilter[80];
+size_t msg_register_size = sizeof(msg_register);
 
 const char *progname = "bogofilter";
 
@@ -155,19 +157,13 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
 		if (passthrough || verbose)
 		{
-		    if ( terse )
-		    {
-			(void)printf("%c %f\n", (status==RC_SPAM) ? 'Y' : 'N', spamicity);
-		    }
-		    else
-		    {
-			/* print spam-status at the end of the header
-			 * then mark the beginning of the message body */
-			(void)printf("%s: %s, tests=bogofilter, spamicity=%0.6f, version=%s\n", 
-				     spam_header_name, 
-				     (status==RC_SPAM) ? "Yes" : "No", 
-				     spamicity, version);
-		    }
+		    typedef char *formatter(char *buff, size_t size);
+		    formatter *fcn = terse ? format_terse : format_header;
+		    char buff[80];
+		    /* print spam-status at the end of the header
+		     * then mark the beginning of the message body */
+		    fcn(buff, sizeof(buff));
+		    puts (buff);
 		}
 
 		if (verbose || passthrough || Rtable)
@@ -200,10 +196,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 		exitcode = status;
 		if (nonspam_exits_zero && passthrough && exitcode == 1)
 		    exitcode = 0;
-
-		(void)sprintf(msg_bogofilter, "%s: %s, spamicity=%0.6f, version=%s",
-			spam_header_name, (status==RC_SPAM) ? "Yes" : "No",
-			spamicity, version);
+		format_log_header(msg_bogofilter, sizeof(msg_bogofilter));
 	    }
 	    break;
 	default:
