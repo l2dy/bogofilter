@@ -37,7 +37,7 @@ if [ "$1" = "-v" ]; then
 fi
 
 for f in good spam ; do
-    cat inputs/$f.mbx | formail -s $0 save $TMPDIR $f 
+    cat ${srcdir}/inputs/$f.mbx | formail -s $0 save $TMPDIR $f 
 done
 
 $BOGOFILTER -C -D -n -B $TMPDIR/good $v
