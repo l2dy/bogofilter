@@ -54,24 +54,3 @@ const char *find_home(int read_env) {
     }
     return NULL;
 }
-
-char *resolve_home_directory(const char *filename)
-{
-    char *tmp;
-    const char *home = find_home(1);
-
-    if (filename[0] == '/') /* absolute */
-	return xstrdup(filename);
-
-    if (home == NULL)
-    {
-	fprintf(stderr, "Can't find home directory.\n");
-	exit(2);
-    }
-    tmp = xmalloc(strlen(home) + strlen(filename) + 2);
-    strcpy(tmp, home);
-    if (tmp[strlen(tmp)-1] != '/')
-	strcat(tmp, "/");
-    strcat(tmp, filename);
-    return tmp;
-}
