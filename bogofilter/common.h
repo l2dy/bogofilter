@@ -36,6 +36,10 @@
 #define	GRAHAM_AND_ROBINSON
 #endif
 
+#if	defined(ENABLE_GRAHAM_METHOD) || defined(ENABLE_ROBINSON_METHOD)
+#define	GRAHAM_OR_ROBINSON
+#endif
+
 #define max(x, y)	(((x) > (y)) ? (x) : (y))
 #define min(x, y)	(((x) < (y)) ? (x) : (y))
 

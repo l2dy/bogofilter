@@ -537,21 +537,24 @@ int process_args(int argc, char **argv)
 	    break;
 #endif
 
-#ifdef	ENABLE_ROBINSON_METHOD
-	case 'R':
-	    Rtable = 1;
 #ifdef	ENABLE_GRAHAM_METHOD
-	/*@fallthrough@*/
-	/* fall through to force Robinson calculations */
 	case 'r':
 	    select_algorithm(AL_ROBINSON, true);
-#endif
 	    break;
 #endif
 
 #ifdef ENABLE_ROBINSON_FISHER
 	case 'f':
 	    select_algorithm(AL_FISHER, true);
+	    break;
+#endif
+
+#ifdef	GRAHAM_OR_ROBINSON
+	case 'R':
+	    Rtable = 1;
+	    if (algorithm != AL_ROBINSON && algorithm != AL_FISHER)
+		if (AL_DEFAULT == AL_ROBINSON || AL_DEFAULT == AL_FISHER)
+		    algorithm = AL_DEFAULT;
 	    break;
 #endif
 
