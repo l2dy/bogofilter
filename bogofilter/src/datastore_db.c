@@ -1026,7 +1026,7 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %s", db_strerror(ret));
 	switch (ret) {
 	    case DB_RUNRECOVERY:
-		fprintf(stderr, "To recover, run: bogoutil -v -f \"%s\"\n",
+		fprintf(stderr, "To recover, run: bogoutil -v --db-recover \"%s\"\n",
 			directory);
 		break;
 	    case EINVAL:
