@@ -1,4 +1,4 @@
-From LICIA_KABILA@SPINFINDER.COM  Sat Nov  2 18:37:13 2002
+From 
 Return-Path: <LICIA_KABILA@SPINFINDER.COM>
 Delivered-To: relson@example.com
 Received: from 79.37.21.02 (node-c-0913.a2000.nl [62.194.9.19])

@@ -1,4 +1,4 @@
-From 22-8643-418714@bounce.azogle.com  Sat Nov  2 12:30:53 2002
+From 
 Return-Path: <22-8643-418714@bounce.azogle.com>
 Delivered-To: linda@example.com
 Received: from transport2.azogle.com (transport2.azogle.com [66.46.150.6])

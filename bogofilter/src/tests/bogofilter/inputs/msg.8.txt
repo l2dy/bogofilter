@@ -1,4 +1,4 @@
-From mailer@mail7.transcentives.net  Fri Oct 11 07:51:01 2002
+From 
 Return-Path: <mailer@mail7.transcentives.net>
 Delivered-To: mark@osagesoftware.com
 Received: from mail7.transcentives.net (mail7.transcentives.net [216.23.198.157])

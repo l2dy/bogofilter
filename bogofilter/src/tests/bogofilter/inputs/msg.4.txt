@@ -1,4 +1,4 @@
-From NOLIST-645178564-6082-LINDA**EXAMPLE*COM@OC31.YOURMAILSOURCE.COM  Sat Nov  2 04:30:00 2002
+From 
 Return-Path: <NOLIST-645178564-6082-LINDA**EXAMPLE*COM@OC31.YOURMAILSOURCE.COM>
 Delivered-To: linda@example.com
 Received: from om40.yourmailsource.com (unknown [216.177.60.45])

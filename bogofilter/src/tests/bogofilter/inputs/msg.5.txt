@@ -1,4 +1,4 @@
-From NOLIST-645178564-5711-LINDA**OSAGESOFTWARE*COM@OC31.YOURMAILSOURCE.COM  Mon Oct 21 13:29:21 2002
+From 
 Return-Path: <NOLIST-645178564-5711-LINDA**OSAGESOFTWARE*COM@OC31.YOURMAILSOURCE.COM>
 Delivered-To: linda@osagesoftware.com
 Received: from oc31.yourmailsource.com (unknown [216.109.73.35])

@@ -1,4 +1,4 @@
-From nobody@bounce.247mail.com  Sat Oct 19 10:19:24 2002
+From 
 Return-Path: <nobody@bounce.247mail.com>
 Delivered-To: eric@osagesoftware.com
 Received: from mtsopt28.naviantnetwork.net (unknown [66.115.47.135])

@@ -1,4 +1,4 @@
-From 22-7635-418714@bounce.azogle.com  Wed Oct 16 12:41:08 2002
+From 
 Return-Path: <22-7635-418714@bounce.azogle.com>
 Delivered-To: linda@osagesoftware.com
 Received: from transport19.azogle.com (transport19.azogle.com [66.46.150.23])
