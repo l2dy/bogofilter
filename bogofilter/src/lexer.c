@@ -79,6 +79,8 @@ static void lexer_display_buffer(buff_t *buff)
  * Check for lines wholly composed of printable characters as they can
  * cause a scanner abort "input buffer overflow, can't enlarge buffer
  * because scanner uses REJECT"
+ *
+ * \bug this function must go, we need to fix the lexer
  */
 static bool long_token(byte *buf, uint count)
 {
@@ -229,14 +231,15 @@ static int skip_folded_line(buff_t *buff)
 	buff->t.leng = 0;
 	count = reader_getline(buff);
 	yylineno += 1;
-	if (!isspace(buff->t.text[0]))
+	/* only check for LWSP-char (RFC-822) aka. WSP (RFC-2822),
+	 * these only include SP and HTAB */
+	if (buff->t.text[0] != ' '
+		&& buff->t.text[0] != '\t')
 	    return count;
 	/* Check for empty line which terminates message header */
 	if (is_eol((char *)buff->t.text, count))
 	    return count;
     }
-
-/*    return EOF; */
 }
 
 int buff_fill(buff_t *buff, size_t used, size_t need)
@@ -395,7 +398,7 @@ size_t text_decode(word_t *w)
 	if (adjacent) {
 	    tmp = txt;
 	    while (adjacent && tmp < end) {
-		if (isspace(*tmp))
+		if (*tmp && strchr(" \t\r\n", *tmp))
 		    tmp += 1;
 		else
 		    adjacent = false;
