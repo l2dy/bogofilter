@@ -39,11 +39,7 @@ char *build_progtype(const char *name, const char *db_type)
 int build_path(char* dest, size_t size, const char* dir, const char* file)
 {
     /* If absolute path ... */
-#ifndef __riscos__
-    if (*file == DIRSEP_C)
-#else
-    if (strchr(file, ':') || strchr(file, '$'))
-#endif
+    if (bf_abspath(file))
     {
 	if (strlcpy(dest, file, size) >= size) 
 	    return -1;

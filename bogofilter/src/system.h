@@ -192,6 +192,7 @@ typedef uint8_t u_int8_t;
 
 /* system.c - function prototypes */
 
-extern int bf_mkdir(const char *path, mode_t mode);
+extern bool bf_abspath(const char *path);
+extern int  bf_mkdir(const char *path, mode_t mode);
 
 #endif /* SYSTEM_H */

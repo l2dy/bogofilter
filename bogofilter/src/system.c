@@ -14,6 +14,22 @@ NAME:
 #include "direct.h"
 #endif
 
+#ifdef __riscos__
+/* static symbols that trigger UnixLib behaviour */
+#include <unixlib/local.h> /* __RISCOSIFY_NO_PROCESS */
+int __riscosify_control = __RISCOSIFY_NO_PROCESS;
+int __feature_imagefs_is_file = 1;
+#endif
+
+bool bf_abspath(const char *path)
+{
+#ifndef __riscos__
+    return (*path == DIRSEP_C);
+#else
+    return (strchr(path, ':') || strchr(path, '$'));
+#endif
+}
+
 int bf_mkdir(const char *path, mode_t mode)
 {
     int rc;
@@ -24,10 +40,3 @@ int bf_mkdir(const char *path, mode_t mode)
 #endif
     return rc;
 }
-
-#ifdef __riscos__
-/* static symbols that trigger UnixLib behaviour */
-#include <unixlib/local.h> /* __RISCOSIFY_NO_PROCESS */
-int __riscosify_control = __RISCOSIFY_NO_PROCESS;
-int __feature_imagefs_is_file = 1;
-#endif
