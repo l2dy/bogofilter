@@ -29,8 +29,6 @@ extern int Rtable;
 
 double	thresh_rtable = 0.0;		/* used in fisher.c */
 
-#define ROBX_S ".ROBX"
-
 static bool	need_stats = false;
 static rob_stats_t  rob_stats;
 
