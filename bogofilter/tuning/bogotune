@@ -166,6 +166,8 @@ if($scount < 500 || $ncount < 500) { yuk(4,
     "At least 500 spam and 500 nonspam required for testing\n",
     $scount, " and ", $ncount, " were found."); }
 print("Verification completed successfully.\n");
+
+### 3.  Convert input files to message-count format.
 if($msgformat ne "msgcount") {
     print("Creating message-count files...\n");
     my $spwork = $workfn . ".sp"; my $nswork = $workfn . ".ns";
@@ -204,7 +206,7 @@ if($msgformat ne "msgcount") {
     print("Message-count files ", $workfn, ".{sp,ns} created\n");
 }
 
-### 3.  Calculate cache size
+### 4.  Calculate cache size
 # Calculate the cache size that should be used.
 
 my $cmd = "ls -l " . $dbname . " |";
@@ -221,7 +223,7 @@ if($twolist) {
 my $cachesize = POSIX::ceil($dbsize / (1024*1024*3));
 print("Recommended cache size is ", $cachesize, " Mbytes.\n");
 
-### 4.  Calculate fp target
+### 5.  Calculate fp target
 # The fp target will be derived thus: score nonspams with s and md as
 # shipped, and determine the count that will result from a spam cutoff
 # of 0.95; if that is < 0.25%, try 0.9375 etc.
@@ -267,7 +269,7 @@ while($target < POSIX::ceil(scalar @nsscores * 0.0025)) {
 }
 print("False-positive target is ", $target, " (cutoff ", $thresh, ")\n");
 
-### 5.  Calculate x
+### 6.  Calculate x
 # Calculate x with bogoutil's -r option (a new addition).
 # Bound the calculated value within [0.4, 0.6] and set the range to be
 # investigated to [x-0.1, x+0.1].
@@ -462,7 +464,7 @@ foreach my $scantype ("coarse", "fine") {
 	$robs, $md, $robx, "                           ");
 }
 
-### 8.  Suggest possible spam and nonspam cutoff values
+### 9.  Suggest possible spam and nonspam cutoff values
 # With the final x, md and s values, score the spams and nonspams and
 # sort the nonspam scores decreasing and the spam scores increasing;
 # then, traverse the nonspam list until the 0.2% point; report cutoffs
