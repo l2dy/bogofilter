@@ -5,6 +5,19 @@
 NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+	2004-09-25
+
+	* Fixed minor formatting defects in bogotune.
+	* Fixed bogotune man page error for "-d" option.
+
+	2004-09-23
+
+	* Fixed help messages for bogofilter's "-m" and "-o" options.
+
+	2004-09-10
+
+	* bogofilter-tuning.HOWTO revised and converted to html.
+
 0.92.6	2004-08-22
 
 	* Revise "-QQ" output so it can be used (unchanged) in a

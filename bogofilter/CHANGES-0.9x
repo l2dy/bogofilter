@@ -3,11 +3,27 @@
 			       =================
 
 
+	2004-09-25
+
+	* Fixed minor formatting defects in bogotune.
+	* Fixed bogotune man page error for "-d" option.
+
+	2004-09-23
+
+	* Fixed help messages for bogofilter's "-m" and "-o" options.
+
+	2004-09-10
+
+	* bogofilter-tuning.HOWTO revised and converted to html.
+
 	2004-09-05
 
-	* Ensure that robx computation used a regular wordlist (rather
+	* Ensure that robx computation uses a regular wordlist (rather
           than an ignore list) to avoid a seg fault in bogotune.
 	  
+	2004-08-30
+	* Remove bogus 'P' in bogolexer's allowed option list.
+
 0.92.6	2004-08-22
 
 	* Revise "-QQ" output so it can be used (unchanged) in a
