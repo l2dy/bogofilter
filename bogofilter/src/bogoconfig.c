@@ -103,7 +103,8 @@ static bool select_algorithm(const unsigned char ch, bool cmdline);
 
 static void process_args_1(int argc, char **argv);
 static void process_args_2(int argc, char **argv);
-static void comma_parse(char opt, const char *arg, double *parm1, double *parm2);
+static bool get_parsed_value(char **arg, double *parm);
+static void comma_parse(char opt, const char *arg, double *parm1, double *parm2, double *parm3);
 
 /* externs for query_config() */
 
@@ -195,23 +196,33 @@ void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
     return;
 }
 
-void comma_parse(char opt, const char *arg, double *parm1, double *parm2)
+static bool get_parsed_value(char **arg, double *parm)
+{
+    char *str = *arg;
+    bool ok = true;
+    if (parm && str && *str) {
+	if (*str == ',')
+	    str += 1;
+	else {
+	    ok = xatof(parm, str);
+	    str = strchr(str+1, ',');
+	    if (str)
+		str += 1;
+	}
+	*arg = str;
+    }
+    return ok;
+}
+
+void comma_parse(char opt, const char *arg, double *parm1, double *parm2, double *parm3)
 {
     char *parse = xstrdup(arg);
-    char *p1, *p2;
-    bool ok = true;
-    if (parse[0] == ',') {
-	p1 = NULL;
-	p2 = &parse[1];
-    } else {
-	p1 = strtok(parse, ",");
-	p2 = strtok(NULL, "");
-    }
-    if (p1) ok = ok && xatof(parm1, p1);
-    if (p2) ok = ok && xatof(parm2, p2);
-    if (!ok) {
+    char *copy = parse;
+    bool ok = ( get_parsed_value(&copy, parm1) &&
+		get_parsed_value(&copy, parm2) &&
+		get_parsed_value(&copy, parm3) );
+    if (!ok)
 	fprintf(stderr, "Cannot parse -%c option argument '%s'.\n", opt, arg);
-    }
     xfree(parse);
 }
 
@@ -665,11 +676,15 @@ void process_args_2(int argc, char **argv)
 	    break;
 
 	case 'm':
-	    comma_parse(option, optarg, &min_dev, &robs);
+	    comma_parse(option, optarg, &min_dev, &robs, &robx);
+	    if (DEBUG_CONFIG(1))
+		printf("md %6.4f, rs %6.4f, rx %6.4f\n", min_dev, robs, robx);
 	    break;
 
 	case 'o':
-	    comma_parse(option, optarg, &spam_cutoff, &ham_cutoff);
+	    comma_parse(option, optarg, &spam_cutoff, &ham_cutoff, NULL);
+	    if (DEBUG_CONFIG(1))
+		printf("sc %6.4f, hc %6.4f\n", spam_cutoff, ham_cutoff);
 	    break;
 
 	case 'P':
