@@ -21,7 +21,9 @@
 #include "system.h"
 #include "collect.h"
 
+const char *progname = "bogowordfreq.c";
 const char *spam_header_name = "X-Bogosity:"; /* unused */
+bool logflag;		/* unused */
 int passthrough = 0;	/* unused */
 bool quiet = 0;		/* unused */
 int verbose = 0;	/* unused */
