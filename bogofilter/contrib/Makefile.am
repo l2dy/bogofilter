@@ -10,6 +10,7 @@ endif
 EXTRA_DIST= \
 	README.randomtrain \
 	bogo.R \
+	bogofilter-milter.pl \
 	bogofilter-qfe \
 	dot-qmail-bogofilter-default \
 	mailfilter.example \
