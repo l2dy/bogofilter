@@ -30,7 +30,7 @@ cat $TMPDIR/input | $VAL ${relpath}/bogofilter -p -e -C >$TMPDIR/output2
 count1=`grep $shn $TMPDIR/output1 | wc -l`
 count2=`grep $shn $TMPDIR/output2 | wc -l`
 
-if [ "$count1" = "1" ] && [ "$count2" = "1" ] ; then
+if [ $count1 = "1" ] && [ $count2 = "1" ] ; then
     exit 0
 else
     echo count1: $count1, count2: $count2
