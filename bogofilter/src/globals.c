@@ -17,23 +17,23 @@ AUTHOR:
 /* exports */
 
 /* command line options */
+
 bool	twostate;			/* '-2' */
 bool	threestate;			/* '-3' */
-bool	nonspam_exits_zero;		/* '-e' */
+bulk_t	bulk_mode = B_NORMAL;		/* '-b, -B' */
 bool	suppress_config_file;		/* '-C' */
+bool	nonspam_exits_zero;		/* '-e' */
 bool	force;				/* '-F' */
+FILE	*fpin = NULL;			/* '-I' */
 bool	fisher;				/* '-f' */
 bool	logflag;			/* '-l' */
 bool	replace_nonascii_characters;	/* '-n' */
 bool	passthrough;			/* '-p' */
 bool	quiet;				/* '-q' */
-bool	terse;				/* '-t' */
-int	verbose;			/* '-v' */
-bulk_t	bulk_mode = B_NORMAL;		/* '-b, -B' */
-
-FILE	*fpin = NULL;			/* '-I' */
 int	Rtable = 0;			/* '-R' */
+bool	terse;				/* '-t' */
 int	test = 0;			/* '-T' */
+int	verbose;			/* '-v' */
 
 /* config file options */
 int	max_repeats;

@@ -16,23 +16,21 @@
 /* command line options */
 extern	bool	twostate;		/* '-2' */
 extern	bool	threestate;		/* '-3' */
+extern	bulk_t	bulk_mode;		/* '-B' */
 extern	bool	suppress_config_file;	/* '-C' */
+extern	char	*directory;		/* '-d' */
 extern	bool	nonspam_exits_zero;	/* '-e' */
 extern	bool	fisher;			/* '-f' */
 extern	bool	force;			/* '-F' */
-extern	bool	logflag;		/* '-l' */
-extern	bool	terse;			/* '-t' */
-extern	bool	quiet;			/* '-q' */
-extern	bool	passthrough;		/* '-p' */
-extern	bulk_t	bulk_mode;		/* '-B' */
-extern	int	verbose;		/* '-v' */
 extern	FILE	*fpin;			/* '-I' */
-
-extern	int	Rtable;			/* '-R' */
-extern	int	test;			/* '-T' */
-
-extern	char	*directory;		/* '-d' */
+extern	bool	logflag;		/* '-l' */
 extern	char	outfname[PATH_LEN];	/* '-O' */
+extern	bool	passthrough;		/* '-p' */
+extern	bool	quiet;			/* '-q' */
+extern	int	Rtable;			/* '-R' */
+extern	bool	terse;			/* '-t' */
+extern	int	test;			/* '-T' */
+extern	int	verbose;		/* '-v' */
 
 /* config file options */
 extern	int	max_repeats;

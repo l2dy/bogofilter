@@ -407,7 +407,7 @@ void process_args(int argc, char **argv, int pass)
 #if HAVE_DECL_OPTRESET
     optreset = 1;
 #endif
-    while ((option = getopt(argc, argv, ":23d:eFhlL:m:o:snSNvVpuc:CgrRfqtI:O:y:x:BbDT" G R F)) != -1)
+    while ((option = getopt(argc, argv, ":23bBc:Cd:DefFghI:lL:m:nNo:O:pqRrsStTuvVx:y:" G R F)) != -1)
     {
 #if 0
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
@@ -424,119 +424,13 @@ void process_args(int argc, char **argv, int pass)
 	    threestate = option == '3';
 	    break;
 
-	case 'd':
-	    xfree(directory);
-	    directory = xstrdup(optarg);
-	    if (pass == 2 && setup_wordlists(directory, PR_COMMAND) != 0)
-		exit(2);
+	case 'b':
+	    bulk_mode = B_STDIN;
+	    fpin = NULL;	/* Ensure that input file isn't stdin */
 	    break;
 
-	case 'e':
-	    nonspam_exits_zero = true;
-	    break;
-
-	case 's':
-	    run_type = (run_type | REG_SPAM) & ~REG_GOOD & ~UNREG_SPAM;
-	    break;
-
-	case 'n':
-	    run_type = (run_type | REG_GOOD) & ~REG_SPAM & ~UNREG_GOOD;
-	    break;
-
-	case 'S':
-	    run_type = (run_type | UNREG_SPAM) & ~REG_SPAM & ~UNREG_GOOD;
-	    break;
-
-	case 'N':
-	    run_type = (run_type | UNREG_GOOD) & ~REG_GOOD & ~UNREG_SPAM;
-	    break;
-
-	case 'v':
-	    verbose++;
-	    break;
-
-	case ':':
-	    fprintf(stderr, "Option -%c requires an argument.\n", optopt);
-	    exit(2);
-
-	case '?':
-	    fprintf(stderr, "Unknown option -%c.\n", optopt);
-	    exit(2);
-
-	case 'h':
-	    help();
-            exit(0);
-
-        case 'V':
-	    print_version();
-	    exit(0);
-
-	case 'I':
-	    if (pass == 2) {
-		fpin = fopen( optarg, "r" );
-		if (fpin == NULL) {
-		    fprintf(stderr, "Can't read file '%s'\n", optarg);
-		    exit(2);
-		}
-	    }
-	    break;
-
-        case 'O':
-	    xstrlcpy(outfname, optarg, sizeof(outfname));
-	    break;
-
-	case 'p':
-	    passthrough = true;
-	    break;
-
-	case 'u':
-	    run_type = RUN_UPDATE;
-	    break;
-
-	case 'L':
-	    logtag = optarg;
-	    /*@fallthrough@*/
-	case 'l':
-	    logflag = true;
-	    break;
-
-#ifdef	GRAHAM_AND_ROBINSON
-	case 'g':
-	    select_algorithm(AL_GRAHAM, true);
-	    break;
-#endif
-
-#if	defined(ENABLE_ROBINSON_METHOD) && (defined(ENABLE_GRAHAM_METHOD) || defined(ENABLE_ROBINSON_FISHER))
-	case 'r':
-	    select_algorithm(AL_ROBINSON, true);
-	    break;
-#endif
-
-#if	defined(ENABLE_ROBINSON_FISHER) && (defined(ENABLE_GRAHAM_METHOD) || defined(ENABLE_ROBINSON_METHOD))
-	case 'f':
-	    select_algorithm(AL_FISHER, true);
-	    break;
-#endif
-
-#ifdef	ROBINSON_OR_FISHER
-	case 'R':
-	    Rtable = 1;
-	    if (algorithm != AL_ROBINSON && algorithm != AL_FISHER)
-		if (AL_DEFAULT == AL_ROBINSON || AL_DEFAULT == AL_FISHER)
-		    algorithm = AL_DEFAULT;
-	    break;
-#endif
-
-	case 'x':
-	    set_debug_mask( optarg );
-	    break;
-
-	case 'q':
-	    quiet = true;
-	    break;
-
-	case 'F':
-	    force = true;
+	case 'B':
+	    bulk_mode = B_CMDLINE;
 	    break;
 
 	case 'c':
@@ -553,38 +447,145 @@ void process_args(int argc, char **argv, int pass)
 	    suppress_config_file = true;
 	    break;
 
-	case 'm':
-	    comma_parse(option, optarg, &min_dev, &robs);
-	    break;
-
-	case 'o':
-	    comma_parse(option, optarg, &spam_cutoff, &ham_cutoff);
-	    break;
-
-	case 't':
-	    terse = true;
-	    break;
-
-	case 'y':		/* date as YYYYMMDD */
-	    today = string_to_date((char *)optarg);
-	    break;
-
-	case 'B':
-	    bulk_mode = B_CMDLINE;
-	    break;
-
-	case 'b':
-	    bulk_mode = B_STDIN;
-	    fpin = NULL;	/* Ensure that input file isn't stdin */
+	case 'd':
+	    xfree(directory);
+	    directory = xstrdup(optarg);
+	    if (pass == 2 && setup_wordlists(directory, PR_COMMAND) != 0)
+		exit(2);
 	    break;
 
 	case 'D':
 	    dbgout = stdout;
 	    break;
 
+	case 'e':
+	    nonspam_exits_zero = true;
+	    break;
+
+#if	defined(ENABLE_ROBINSON_FISHER) && (defined(ENABLE_GRAHAM_METHOD) || defined(ENABLE_ROBINSON_METHOD))
+	case 'f':
+	    select_algorithm(AL_FISHER, true);
+	    break;
+#endif
+
+	case 'F':
+	    force = true;
+	    break;
+
+#ifdef	GRAHAM_AND_ROBINSON
+	case 'g':
+	    select_algorithm(AL_GRAHAM, true);
+	    break;
+#endif
+
+	case 'h':
+	    help();
+            exit(0);
+
+	case 'I':
+	    if (pass == 2) {
+		fpin = fopen( optarg, "r" );
+		if (fpin == NULL) {
+		    fprintf(stderr, "Can't read file '%s'\n", optarg);
+		    exit(2);
+		}
+	    }
+	    break;
+
+	case 'L':
+	    logtag = optarg;
+	    /*@fallthrough@*/
+
+	case 'l':
+	    logflag = true;
+	    break;
+
+	case 'm':
+	    comma_parse(option, optarg, &min_dev, &robs);
+	    break;
+
+	case 'n':
+	    run_type = (run_type | REG_GOOD) & ~REG_SPAM & ~UNREG_GOOD;
+	    break;
+
+	case 'N':
+	    run_type = (run_type | UNREG_GOOD) & ~REG_GOOD & ~UNREG_SPAM;
+	    break;
+
+	case 'o':
+	    comma_parse(option, optarg, &spam_cutoff, &ham_cutoff);
+	    break;
+
+        case 'O':
+	    xstrlcpy(outfname, optarg, sizeof(outfname));
+	    break;
+
+	case 'p':
+	    passthrough = true;
+	    break;
+
+#if	defined(ENABLE_ROBINSON_METHOD) && (defined(ENABLE_GRAHAM_METHOD) || defined(ENABLE_ROBINSON_FISHER))
+	case 'r':
+	    select_algorithm(AL_ROBINSON, true);
+	    break;
+#endif
+
+	case 'q':
+	    quiet = true;
+	    break;
+
+#ifdef	ROBINSON_OR_FISHER
+	case 'R':
+	    Rtable = 1;
+	    if (algorithm != AL_ROBINSON && algorithm != AL_FISHER)
+		if (AL_DEFAULT == AL_ROBINSON || AL_DEFAULT == AL_FISHER)
+		    algorithm = AL_DEFAULT;
+	    break;
+#endif
+
+	case 's':
+	    run_type = (run_type | REG_SPAM) & ~REG_GOOD & ~UNREG_SPAM;
+	    break;
+
+	case 'S':
+	    run_type = (run_type | UNREG_SPAM) & ~REG_SPAM & ~UNREG_GOOD;
+	    break;
+
+	case 't':
+	    terse = true;
+	    break;
+
 	case 'T':
 	    test += 1;
 	    break;
+
+	case 'u':
+	    run_type = RUN_UPDATE;
+	    break;
+
+	case 'v':
+	    verbose++;
+	    break;
+
+        case 'V':
+	    print_version();
+	    exit(0);
+
+	case 'x':
+	    set_debug_mask( optarg );
+	    break;
+
+	case 'y':		/* date as YYYYMMDD */
+	    today = string_to_date((char *)optarg);
+	    break;
+
+	case ':':
+	    fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+	    exit(2);
+
+	case '?':
+	    fprintf(stderr, "Unknown option -%c.\n", optopt);
+	    exit(2);
 
 	default:
 	    /* Mismatch between switch() construct and optstring */
