@@ -31,6 +31,9 @@ there's a general notion of tagged categories (spam being one) with
 cluster analysis being applied to categorize which categories a
 message belongs to at above 0.9 confidence level.
 
+**** Design Enhancement: Cascade lexers. Have one to analyze the
+structure and a selection of lexers to analyze the tokens.
+
 **** Design Enhancement: Improve evaluation accuracy by treating words common
 in both wordlists as neutral by excluding them from the probability
 calculation when their significance to the total probability falls below a
