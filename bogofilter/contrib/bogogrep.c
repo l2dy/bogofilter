@@ -17,8 +17,12 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#ifdef __DGUX__
+#if defined(__DGUX__) || !defined(MAP_FAILED)
 #define MAP_FAILED (-1)
+#endif
+
+#if !defined(__GNUC__)
+#define __attribute__(a)
 #endif
 
 #define ALPHABET 256
@@ -46,6 +50,7 @@ static const unsigned char *search(const unsigned char *text,
 	return (NULL);
 }
 
+static void usage(int rc, const char *tag) __attribute__((noreturn)) ;
 static void usage(int rc, const char *tag) {
     fprintf(stderr, "Usage: %s searchstring regular_file [...]\n"
 	    "This program searches all lines in regular_file that start with searchstring.\n"
