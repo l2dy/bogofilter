@@ -5,7 +5,6 @@
 if [ ! -z $BF_TESTDIR ] ; then
     NAME=`basename $0 | sed s@^t\.@@`
     DATE=`date +"%Y%m%d"`
-    TMPDIR="${BF_TESTDIR}/$NAME.$DATE"
     if [ -d  $NAME.$DATE ] ; then
 	rm -rf $NAME.$DATE
     fi
