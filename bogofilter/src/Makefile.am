@@ -73,6 +73,7 @@ version_sources= \
 	bf_exit.c \
 	bogoconfig.h bogoconfig.c \
 	bogohome.h bogohome.c \
+	bogomain.h bogomain.c \
 	bogoreader.h bogoreader.c \
 	bool.h bool.c \
 	buff.h buff.c \
