@@ -429,9 +429,9 @@ static void print_version(void)
 #endif
 
 #ifndef	ENABLE_DEPRECATED_CODE
-#define	OPTIONS	":bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pqQRrsStTu::UvVx:X:y:"
+#define	OPTIONS	":bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pqQRrsStTuUvVx:X:y:"
 #else
-#define	OPTIONS	":23bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pP:qQRrsStTu::UvWVx:X:y:" G R F
+#define	OPTIONS	":23bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pP:qQRrsStTuUvWVx:X:y:" G R F
 #endif
 
 /** These functions process command line arguments.
@@ -572,18 +572,9 @@ void process_args_1(int argc, char **argv)
 	    break;
 
 	case 'u':
-	{
 	    run_type |= RUN_UPDATE;
-	    if (optarg == NULL)
-		thresh_update = 0.0;
-	    else {
-		bool ok = xatof(&thresh_update, optarg);
-		if (!ok)
-		    fprintf(stderr, "Cannot parse -%c option argument '%s'.\n", option, optarg);
-	    }
 	    break;
-	}
-
+	
 	case 'U':
 	    unsure_stats = true;
 	    break;
