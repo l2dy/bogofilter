@@ -119,6 +119,7 @@ enum flags {
 
 /* Function Definitions */
 
+/* any fields omitted will retain their original value */
 static bool set_spamicity_fields(FIELD *strings, const char *val)
 {
     size_t i;
@@ -126,17 +127,9 @@ static bool set_spamicity_fields(FIELD *strings, const char *val)
     char *tmp = xstrdup(val);
     for (i = 0; i < RC_COUNT; i += 1)
     {
-	/* skip delimiters */
-	while (*tmp == ',' || *tmp == ' ')
-	    tmp += 1;
-	strings[i] = tmp;
-	if (*tmp == '\0')
-	    continue;
-	/* find delimiter */
-	while (*tmp != ',' && *tmp != ' ' && *tmp != '\0')
-	    tmp += 1;
-	if (*tmp != '\0')
-	    *tmp++ = '\0';
+	char *tok = strtok(i ? NULL : tmp, " ,");
+	if (tok == NULL) break;
+	strings[i] = tok;
     }
     return true;
 }
