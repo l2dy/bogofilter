@@ -1,8 +1,14 @@
 # $Id$
 
-%define	name	@PACKAGE@
-%define	version	@VERSION@
-%define	release	1
+# this .spec file will not build the static package by default
+# to do this, run either of the next rpm[build] commands:
+# rpm --define 'bogostatic 1' --sign -bb bogofilter.spec       # RPM 3
+# rpmbuild --define 'bogostatic 1' --sign -bb bogofilter.spec  # RPM 4
+
+%define	name		@PACKAGE@
+%define	version		@VERSION@
+%define	release		1
+%{!?bogostatic: %{expand: %%define bogostatic 0}}
 
 Summary:	Fast anti-spam filtering by Bayesian statistical analysis
 Name:		%{name}
@@ -36,14 +42,16 @@ Conflicts:	bogofilter
 Statically linked bogofilter, bogolexer, bogoutil, and bogotune
 
 %prep
-%setup
+%setup -q
 CFLAGS="$RPM_OPT_FLAGS" \
 ./configure \
   --prefix=%{_prefix} \
   --mandir=%{_mandir} \
   --sysconfdir=%{_sysconfdir} \
-  --with-included-gsl \
-  --enable-static
+%if %{?bogostatic}
+  --enable-static \
+%endif
+  --with-included-gsl
 
 %build
 make
@@ -78,12 +86,14 @@ for d in contrib ; do
   done
 done
 
+%if %{bogostatic}
 (
 cd %{buildroot}%{_datadir}/%{name}
 cp -p -r contrib contrib-static
 rm contrib/bogogrep_static
 rm contrib-static/bogogrep
 )
+%endif
 
 for README in randomtrain ; do
   ln -s ../contrib/README.$README doc/README.$README
@@ -132,6 +142,7 @@ done
 
 %{_datadir}/%{name}/contrib/*
 
+%if %{bogostatic}
 %files static
 %defattr(-,root,root)
 
@@ -159,5 +170,6 @@ done
 %{_mandir}/man1/bogoupgrade.1*
 
 %{_datadir}/%{name}/contrib-static/*
+%endif
 
 %changelog
