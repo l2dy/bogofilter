@@ -10,6 +10,29 @@ line tests.  Use options, config files, and wordlists from your
 production environment.  This will help ensure that the new version of
 bogofilter is working properly.
 
+0.92.8	2004-10-19
+
+* Ignore 'X-Bogosity' lines in mime attachments.
+* Revise lexer variables for flex-2.5.31 compatibility.
+
+* Bogotune now warns when using '-E' to suppress ESF checking
+  and non 1.0 esf values are read from the config file.
+* Limit bogotune's scanning to rx values between 0.4 and 0.6.
+
+* Fix a potential crash on malformatted input (writing a NUL byte to
+  the wrong place) in the RFC-2047 decoder. Reported by Clint Adams.
+
+* bogofilter will now properly exit with code 3 when encountering write
+  errors in pass-through mode. It would use the wrong code, 2, since
+  the introduction of the "unsure" exit code.
+
+* Properly flush existing data before changing I/O buffer size. Fixes
+  t.bogodir failure seen, for instance, on Solaris, particularly with
+  -D and redirected output.
+
+* OS/2 compatibility fixes for configure, bogofilter, and
+  bogoutil (thanks to Yuri Dario).
+
 0.92.7	2004-10-02
 
 * Additional portability fix for SunOS 4.1.X

@@ -3,7 +3,18 @@
 			       =================
 
 
-0.92.8	2004-10-??
+0.92.8	2004-10-19
+
+	* Bogotune now warns when using '-E' to suppress ESF checking
+          and non 1.0 esf values are read from the config file.
+
+	* bogofilter will now properly exit with code 3 when encountering write
+	  errors in pass-through mode. It would use the wrong code, 2, since
+	  the introduction of the "unsure" exit code.
+
+	* Properly flush existing data before changing I/O buffer size. Fixes
+	  t.bogodir failure seen, for instance, on Solaris, particularly with
+	  -D and redirected output.
 
 	2004-10-15
 
