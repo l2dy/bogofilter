@@ -85,7 +85,7 @@ static int yy_get_new_line(byte *buf, size_t max_size)
      * One very long physical line could break up into more
      * than one of these. */
 
-    if (passthrough)
+    if (passthrough && count > 0)
 	textblock_add(textblocks, (const char *)buf, count);
 
     return count;
