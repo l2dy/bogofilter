@@ -228,6 +228,9 @@ static int load_file(const char *ds_file)
 	p = spanword(buf);
 	len = strlen((const char *)buf);
 
+	if (len > MAXTOKENLEN)
+	    continue;		/* too long - discard */
+
 	spamcount = (uint) atoi((const char *)p);
 	if ((int) spamcount < 0)
 	    spamcount = 0;
@@ -265,18 +268,13 @@ static int load_file(const char *ds_file)
 
 	/* Slower, but allows multiple lists to be concatenated */
 	set_date(date);
-	if (len <= MAXTOKENLEN) {
-	    token = word_new(buf, len);
-	    ds_read(dsh, token, &data);
-	    data.spamcount += spamcount;
-	    data.goodcount += goodcount;
-	    ds_write(dsh, token, &data);
-	    word_free(token);
-	} else {
-	    /* ignore token */
-	    int x;
-	    (void)x;
-	}
+
+	token = word_new(buf, len);
+	ds_read(dsh, token, &data);
+	data.spamcount += spamcount;
+	data.goodcount += goodcount;
+	ds_write(dsh, token, &data);
+	word_free(token);
     }
     ds_close(dsh, false);
 

@@ -75,6 +75,14 @@ AUTHOR:
 #define	SPAM_CUTOFF	0.95
 #define FP_CUTOFF	0.999
 
+#define	MD_MIN_C	0.05	/* smallest min_dev to test */
+#define	MD_MAX_C	0.45	/* largest  min_dev to test */
+#define	MD_DLT_C	0.05	/* increment		    */
+
+#define	MD_MIN_F	0.02
+#define	MD_MAX_F	MD_MAX_C+MD_DLT_F
+#define	MD_DLT_F	0.015
+
 enum e_verbosity {
     SUMMARY	   = 1,	/* summarize main loop iterations */
     PARMS	   = 2,	/* print parameter sets (rs, md, rx) */
@@ -133,18 +141,7 @@ static void show_elapsed_time(int beg, int end, uint cnt, double val,
 
 /* Function Definitions */
 
-static data_t *seq_by_cnt(double fst, double lst, int cnt)
-{
-    int i;
-    data_t *val = xcalloc(1, sizeof(data_t));
-
-    val->cnt = cnt;
-    val->data = xcalloc(cnt, sizeof(double));
-    for (i=0; i < cnt; i += 1)
-	val->data[i] = fst + i * (lst - fst) / (cnt - 1);
-
-    return val;
-}
+static void bt_trap(void) {} 
 
 static int get_cnt(double fst, double lst, double amt)
 {
@@ -206,7 +203,7 @@ static void init_coarse(double _rx)
 {
     rxval = seq_canonical(_rx, 0.05);
     rsval = seq_by_pow(0.0, -2.0, -0.5);
-    mdval = seq_by_cnt(0.05, 0.45, 9);
+    mdval = seq_by_amt(MD_MIN_C, MD_MAX_C, MD_DLT_C);
 }
 
 static void init_fine(double _rs, double _md, double _rx)
@@ -222,10 +219,10 @@ static void init_fine(double _rs, double _md, double _rx)
 
     s0 = _md - 0.075;
     s1 = _md + 0.075;
-    if (s0 < 0.02 ) s0 = 0.02;
-    if (s1 > 0.465) s1 = 0.465;
+    if (s0 < MD_MIN_F) s0 = MD_MIN_F;
+    if (s1 > MD_MAX_F) s1 = MD_MAX_F;
 
-    mdval = seq_by_amt(s0, s1, 0.015);
+    mdval = seq_by_amt(s0, s1, MD_DLT_F);
     rxval = seq_canonical(_rx, 0.02);
 }
 
@@ -475,13 +472,16 @@ static uint read_mailbox(char *arg)
 
 	collect_words(whc);
 
+	if (whc->wordcount == 0)
+	    bt_trap();
+
 	if (whc->wordcount != 0) {
 	    count += 1;
 	    whp = convert_wordhash_to_propslist(whc, train);
 	    msglist_add(msgs, whp);
 	}
 
-	if (whc != whp)
+	if (whc != whp || whc->wordcount == 0)
 	    wordhash_free(whc);
 
 	if (verbose && (count % 100) == 0) {
