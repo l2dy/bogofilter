@@ -12,7 +12,7 @@ my $commandlineoptions=($ARGV[0]=~/^-(?=[^f]*f?[^f]*$)(?=[^n]*n?[^n]*$)(?=[^s]*s
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.37
+bogominitrain.pl version 1.4
   requires bogofilter 0.14.5 or later
 
 Usage:
@@ -72,13 +72,13 @@ my $vverbose=1 if ($commandlineoptions && $ARGV[0] eq "-v");
 shift (@ARGV) if ($commandlineoptions);
 my ($dir,$ham,$spam,$options) = @ARGV;
 $bogofilter.=" $options -d $dir";
-my $temp; srand; do {$temp="/tmp/".rand();} until (!-e $temp);
 die ("$dir is not a directory or not accessible.\n") unless (-d $dir && -r $dir && -w $dir && -x $dir);
 `$bogofilter -n < /dev/null` unless (-s "$dir/goodlist.db" || -s "$dir/wordlist.db");
 my $ham_total=`cat $ham|grep -c "^From "`;
 my $spam_total=`cat $spam|grep -c "^From "`;
 my ($fp,$fn,$hamadd,$spamadd,%trainedham,%trainedspam);
 my $runs=0;
+my @status=("S","H","U","E");
 
 print "\nStarting with this database:\n";
 print `$bogoutil -w $dir .MSG_COUNT`,"\n";
@@ -103,15 +103,18 @@ do { # Start force loop
       }
       if ($mail) {
         $hamcount++;
-        open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
+        open (TEMP, "| $bogofilter") || die "Cannot pipe to bogofilter: $!";
         print TEMP $mail;
         close (TEMP);
-        unless ((my $sh=sprintf("%s %8.6f",split(/\s/,`$bogofilter -T <$temp`)))=~/^H/) {
+        my$status=$status[$?>>8];
+        unless ($status eq "H") {
           unless ($norepetitions && $trainedham{$hamcount}) {
-            system("$bogofilter -n <$temp");
+            open (TEMP, "| $bogofilter -n") || die "Cannot pipe to bogofilter: $!";
+            print TEMP $mail;
+            close (TEMP);
             $hamadd++;
             $trainedham{$hamcount}++;
-            print "$sh -- Training ham message $hamcount",
+            print "$status -- Training ham message $hamcount",
                   $trainedham{$hamcount}>1&&" ($trainedham{$hamcount})",
                   ".\n" if ($verbose);
             if ($safe) {
@@ -119,9 +122,8 @@ do { # Start force loop
               print TEMP $mail;
               close (TEMP);
             }
-          } else {print "$sh -- Skipping ham message $hamcount.\n" if ($verbose);}
-        } else {print "$sh -- Not training ham message $hamcount.\n" if ($vverbose);}
-        unlink ($temp);
+          } else {print "$status -- Skipping ham message $hamcount.\n" if ($verbose);}
+        } else {print "$status -- Not training ham message $hamcount.\n" if ($vverbose);}
       }
     }
 
@@ -135,15 +137,18 @@ do { # Start force loop
       }
       if ($mail) {
         $spamcount++;
-        open (TEMP, ">$temp") || die "Cannot write to temp file: $!";
+        open (TEMP, "| $bogofilter") || die "Cannot pipe to bogofilter: $!";
         print TEMP $mail;
         close (TEMP);
-        unless ((my $sh=sprintf("%s %8.6f",split(/\s/,`$bogofilter -T <$temp`)))=~/^S/) {
+        my$status=$status[$?>>8];
+        unless ($status eq "S") {
           unless ($norepetitions && $trainedspam{$spamcount}) {
-            system("$bogofilter -s <$temp");
+            open (TEMP, "| $bogofilter -s") || die "Cannot pipe to bogofilter: $!";
+            print TEMP $mail;
+            close (TEMP);
             $spamadd++;
             $trainedspam{$spamcount}++;
-            print "$sh -- Training spam message $spamcount",
+            print "$status -- Training spam message $spamcount",
                   $trainedspam{$spamcount}>1&&" ($trainedspam{$spamcount})",
                   ".\n" if ($verbose);
             if ($safe) {
@@ -151,9 +156,8 @@ do { # Start force loop
               print TEMP $mail;
               close (TEMP);
             }
-          } else {print "$sh -- Skipping spam message $spamcount.\n" if ($verbose);}
-        } else {print "$sh -- Not training spam message $spamcount.\n" if ($vverbose);}
-        unlink ($temp);
+          } else {print "$status -- Skipping spam message $spamcount.\n" if ($verbose);}
+        } else {print "$status -- Not training spam message $spamcount.\n" if ($vverbose);}
       }
     }
 
@@ -162,7 +166,7 @@ do { # Start force loop
   close (SPAM);
 
   print "\nEnd of run #$runs:\n";
-  print "Read $hamcount ham mails and $spamcount spam mails.\n";
+  print "Read $hamcount ham mail",$hamcount!=1&&"s"," and $spamcount spam mail",$spamcount!=1&&"s",".\n";
   print "Added $hamadd ham mail",$hamadd!=1&&"s"," and $spamadd spam mail",$spamadd!=1&&"s"," to the database.\n";
   print `$bogoutil -w $dir .MSG_COUNT`;
   unless ($runs>1 && $hamadd+$spamadd==0) {
