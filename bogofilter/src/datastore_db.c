@@ -291,7 +291,9 @@ void *db_open(const char *db_file, size_t count, const char **names, dbmode_t op
 		return NULL;
 	    }
 	    pagesize = dbstat->bt_pagesize;
+#ifndef	ENABLE_MEMDEBUG
 	    free(dbstat);
+#endif
 #else
 	    /* The old, pre-3.3 API will not fill in the page size with
 	     * DB_CACHED_COUNTS, and without DB_CACHED_COUNTS,
