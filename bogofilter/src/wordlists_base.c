@@ -95,7 +95,7 @@ int setup_wordlists(const char* d, priority_t precedence)
 
     dir = (d != NULL) ? xstrdup(d) : get_directory(precedence);
     if (dir == NULL)
-	return rc;
+	return -1;
 
     if (DEBUG_WORDLIST(2))
 	fprintf(dbgout, "d: %s\n", dir);

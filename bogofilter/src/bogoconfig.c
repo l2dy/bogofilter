@@ -183,9 +183,8 @@ void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
 
     /* directories from command line and config file are already handled */
 
-    if (setup_wordlists(NULL, PR_ENV_BOGO) != 0)
-	exit(EX_ERROR);
-    if (setup_wordlists(NULL, PR_ENV_HOME) != 0)
+    if (setup_wordlists(NULL, PR_ENV_BOGO) != 0 &&
+	setup_wordlists(NULL, PR_ENV_HOME) != 0)
 	exit(EX_ERROR);
 
     stats_prefix= stats_in_header ? "  " : "# ";
