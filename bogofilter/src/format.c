@@ -418,9 +418,6 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 
     *buff = '\0';
 
-    if (DEBUG_FORMAT(0))
-	fprintf(dbgout, "%s\n", beg);
-
     return beg;
 }
 

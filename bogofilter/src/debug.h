@@ -19,7 +19,6 @@ NAME:
 #define BIT_READER	MASK_BIT('B')
 #define BIT_CONFIG	MASK_BIT('C')
 #define BIT_DATABASE	MASK_BIT('D')
-#define BIT_FORMAT	MASK_BIT('F')
 #define BIT_GENERAL	MASK_BIT('G')
 #define BIT_HTML	MASK_BIT('H')
 #define BIT_LEXER	MASK_BIT('L')
@@ -38,7 +37,6 @@ extern u_int32_t  debug_mask;
 #define	DEBUG_GENERAL(level)	0
 #define DEBUG_CONFIG(level)	0
 #define DEBUG_DATABASE(level)	0
-#define DEBUG_FORMAT(level)	0
 #define DEBUG_HTML(level)	0
 #define DEBUG_LEXER(level)	0
 #define DEBUG_MIME(level)	0
@@ -51,7 +49,6 @@ extern u_int32_t  debug_mask;
 #define	DEBUG_GENERAL(level)	((debug_mask & BIT_GENERAL)   && (verbose > level))
 #define DEBUG_CONFIG(level)	((debug_mask & BIT_CONFIG)    && (verbose > level))
 #define DEBUG_DATABASE(level)	((debug_mask & BIT_DATABASE)  && (verbose > level))
-#define DEBUG_FORMAT(level)	((debug_mask & BIT_FORMAT)    && (verbose > level))
 #define DEBUG_HTML(level)	((debug_mask & BIT_HTML)      && (verbose > level))
 #define DEBUG_LEXER(level)	((debug_mask & BIT_LEXER)     && (verbose > level))
 #define DEBUG_MIME(level)	((debug_mask & BIT_MIME)      && (verbose > level))
