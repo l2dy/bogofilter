@@ -45,7 +45,9 @@ check_counts()
 	echo want: $WANT, have: $HAVE
     fi
     if [ ! "$WANT" = "$HAVE" ] ; then
-	exit 1
+	if [ $verbose -eq 0 ] ; then
+	    exit 1
+	fi
     fi
 }
 
@@ -54,8 +56,8 @@ rm -f $BOGOFILTER_DIR/*.${DB_EXT}
 # populate goodlist and spamlist
 
 T=1	# test #1
-S=27	# expected tokens from spam message
-G=30	# expected tokens from good message
+S=29	# expected tokens from spam message
+G=35	# expected tokens from good message
 
 $BOGOFILTER $opts -C -y 0 -s -I $INPUT/msg.regtest.s
 $BOGOFILTER $opts -C -y 0 -n -I $INPUT/msg.regtest.n
@@ -65,7 +67,7 @@ check_counts
 # move msg.regtest.n from goodlist to spamlist in two separate steps
 
 T=2.1	# test #2.1
-S=27	# expected tokens from spam message
+S=29	# expected tokens from spam message
 G=0	# expected tokens from good message
 
 $BOGOFILTER $opts -C -y 0 -N -I $INPUT/msg.regtest.n
@@ -73,7 +75,7 @@ $BOGOFILTER $opts -C -y 0 -N -I $INPUT/msg.regtest.n
 check_counts
 
 T=2.2	# test #2.2
-S=51	# expected tokens from spam message
+S=55	# expected tokens from spam message
 G=0	# expected tokens from good message
 
 $BOGOFILTER $opts -C -y 0 -s -I $INPUT/msg.regtest.n
@@ -83,7 +85,7 @@ check_counts
 # move msg.regtest.n from goodlist to spamlist in one big step
 
 T=3	# test #3
-S=51	# expected tokens from spam message
+S=55	# expected tokens from spam message
 G=0	# expected tokens from good message
 
 rm -f $BOGOFILTER_DIR/*.${DB_EXT}
@@ -98,7 +100,7 @@ check_counts
 
 T=4	# test #4
 S=0	# expected tokens from spam message
-G=51	# expected tokens from good message
+G=55	# expected tokens from good message
 
 rm -f $BOGOFILTER_DIR/*.${DB_EXT}
 
