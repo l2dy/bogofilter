@@ -1,6 +1,8 @@
 # $Id$
-Eric S. Raymond (Initial Version)
-Gyepi Sam (Support for BerkelyDB format wordlist files)
-Adrian Otto (Portability code, file locking)
-David Relson (Bug Fixes)
-Paul Tomblin (Bug Fixes)
+Eric S. Raymond	(Initial Version)
+Adrian Otto	(portability code, file locking)
+Paul Tomblin	(bug fixes)
+David Relson	(new features, release coordinator, bug fixes)
+Matthias Andree	(bug fixes, improvements, auto tools build environment)
+Gyepi Sam	(support for berkelydb format wordlist files)
+Allyn Fratkin	(bug fixes, bug database maintainer)
