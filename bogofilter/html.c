@@ -42,7 +42,7 @@ int process_html_comments(byte *buf, size_t used, size_t size)
 	byte *comment_start = tmp;
 	/* ensure buffer has sufficient characters for test */
 	if (COMMENT_START_LEN > (size_t) (buf_used - tmp)) {
-	    int new = buff_fill(COMMENT_START_LEN, tmp, buf_used - comment_start, buf_end - comment_start);
+	    int new = buff_fill(COMMENT_START_LEN, tmp, buf_used - tmp, buf_end - tmp);
 	    if (new == EOF)
 		break;
 	    buf_used += new;
@@ -64,17 +64,16 @@ int process_html_comments(byte *buf, size_t used, size_t size)
 int kill_html_comment(byte *comment_start, byte *buf_used, byte *buf_end)
 {
     byte c;
-    int level = 0;
+    int level = 1;
     byte *tmp = comment_start;
-    level += 1;
     for (c = *tmp; c != '\0'; c = *++tmp) {
 	if (c == '<') {
 	    /* ensure buffer has sufficient characters for test */
-	    if (COMMENT_START_LEN > (size_t) (buf_used - comment_start)) {
-		int new = buff_fill(COMMENT_START_LEN, tmp, buf_used - comment_start, buf_end - comment_start);
+	    if (COMMENT_START_LEN > (size_t) (buf_used - tmp)) {
+		int new = buff_fill(COMMENT_START_LEN, tmp, buf_used - tmp, buf_end - tmp);
 		if (new == EOF)
 		    break;
-		buf_end += new;
+		buf_used += new;
 	    }
 	    /* check for comment delimiter */
 	    if (memcmp(tmp, COMMENT_START, COMMENT_START_LEN) == 0) {
