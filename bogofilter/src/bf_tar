@@ -1,0 +1,48 @@
+#! /bin/sh
+
+# This file dumps a bogofilter to standard output in POSIX-tar format.
+#
+# Requires: pax
+#
+# (C) 2004 by Matthias Andree
+# GNU GPL v2.
+set -e
+
+removebef=0
+removeaft=0
+while [ "$1" ] ; do
+    case "$1" in
+	-r) removeaft=1 ;;
+	-R) removebef=1 ;;
+	-*) echo >&2 "`basename $0`: unknown option $1" ; exit 1 ;;
+	*) break;
+    esac
+    shift
+done
+
+if [ $# -ne 1 ] ; then
+    echo >&2 "Usage: `basename $0` [options] bogodir > outfile.tar"
+    echo >&2 "   or: `basename $0` [options] bogodir | gzip -c >outfile.tar.gz"
+    echo >&2 'Options are:'
+    echo >&2 ' -r - remove log files after archiving'
+    echo >&2 ' -R - remove log files before archiving (unsafe!)'
+    exit 1
+fi
+
+bogohome="$1"
+
+nukelogs() {
+    rm -f `db_archive -a -h "$bogohome"`
+}
+
+# remove if requested
+if [ $removebef -eq 1 ] ; then nukelogs ; fi
+
+# database first, if it's newer than the log, it's not recoverable!
+# pax options: -w: write archive, -v: verbosely, -x ustar: choose tar
+# format.
+( db_archive -a -s -h "$bogohome" ; db_archive -a -l -h "$bogohome" ) \
+| pax -w -v -x ustar
+
+# remove if requested
+if [ $removeafafaft 1 ] ; then nukelogs ; fi
