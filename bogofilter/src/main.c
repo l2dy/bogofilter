@@ -112,7 +112,7 @@ int classify(int argc, char **argv, FILE *out)
 	    break;
 	}
 	default:		/* command line mode */
-	    if (bulk_mode < argc && !error) {
+	    if ((int)bulk_mode < argc && !error) {
 		filename = argv[bulk_mode++];
 	    }
 	    else {

@@ -29,7 +29,7 @@ bool	passthrough;			/* '-p' */
 bool	quiet;				/* '-q' */
 bool	terse;				/* '-t' */
 int	verbose;			/* '-v' */
-int	bulk_mode = B_NORMAL;		/* '-b, -B' */
+bulk_t	bulk_mode = B_NORMAL;		/* '-b, -B' */
 
 FILE	*fpin = NULL;			/* '-I' */
 int	Rtable = 0;			/* '-R' */
@@ -47,7 +47,7 @@ const char	*update_dir;
 const char	*stats_prefix;
 
 /* dual definition options */
-char	*directory;		/* '-d' */
+char	*directory;			/* '-d' */
 method_t *method = NULL;
 
 /* other */
