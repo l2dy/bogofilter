@@ -302,7 +302,7 @@ tells <application>bogofilter</application> to read the config file named.
     sets the cache size for the BerkeleyDB subsystem.  Properly sizing
     the cache improves <application>bogofilter</application>'s
     performance.  Run the <application>bogotune</application> 
-    script to determine the recommended size.
+    script to determine the recommended size.</para>
 
 <para>The <option>-l</option> option writes an informational line
     to the system log each time <application>bogofilter</application>
