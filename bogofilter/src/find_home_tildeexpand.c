@@ -48,9 +48,9 @@ char *tildeexpand(const char *name) {
     if (l > 0) {
 	/* got a parameter to the tilde */
 	tmp = xmalloc(l + 1);
-	strlcpy(tmp, &name[1], l+1);
-	/* robustness: we only want the first l characters, so truncate
-	 * here just in case */
+	memcpy(tmp, &name[1], l);
+	/* we want exactly the first l characters but as C string,
+	 * so stuff the NUL byte */
 	tmp[l] = '\0';
 
 	home = find_home_user(tmp);
