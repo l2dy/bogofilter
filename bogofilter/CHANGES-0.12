@@ -1,0 +1,19 @@
+			       =================
+				BOGOFILTER NEWS
+			       =================
+
+$Id$
+     
+	2003-04-19
+	* Added bogofilter-tuning.HOWTO as replacement for README.Robinson
+
+	2003-04-18
+	* Added support for .bl formatted files
+
+	2003-04-17
+	* Added bulk mode procesing for Maildirs
+
+	2003-04-16
+	* Miscellaneous refactoring in main.c
+
+0.11.2	2003-04-13
