@@ -388,7 +388,7 @@ static void wordprob_add(wordprob_t* wordstats, double newprob, int bad)
 
 static double wordprob_result(wordprob_t* wordstats)
 {
-    double prob;
+    double prob = 0.0;
     double count = wordstats->good + wordstats->bad;
 
 #ifdef	ENABLE_GRAHAM_METHOD
@@ -401,7 +401,7 @@ static double wordprob_result(wordprob_t* wordstats)
 #ifdef	ENABLE_ROBINSON_METHOD
     if (algorithm == AL_ROBINSON)
     {
-	prob = ((robs * robx + wordstats->bad) / (robs + count));
+	prob = ((ROBS * ROBX + wordstats->bad) / (ROBS + count));
     }
 #endif
 
@@ -590,6 +590,8 @@ static double compute_robinson_spamicity(wordhash_t *wordhash) /*@globals errno@
     double logsum = 0.0;	/* Robinson's Q */
     double spamicity;
     int robn = 0;
+
+    Rtable |= verbose > 3;
 
     if (fabs(robx) < EPS)
     {
