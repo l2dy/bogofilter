@@ -2,10 +2,11 @@
 				BOGOFILTER NEWS
 			       =================
  
-0.14.xx 2003-07-xx
+0.14.1	2003-07-31
  
 * Implemented named exitcodes, with Unsure having its own value (2)
   and changing the value for error from 2 to 3.
+* Initial release of token generation code.
 * Revised lexer pattern to better recognize encoded tokens.
  
 0.14.0.1 2003-07-23

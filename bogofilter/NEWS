@@ -4,7 +4,11 @@
 
 $Id$
 
-0.14.xx	2003-07-xx
+0.14.1	2003-07-31
+
+	2003-07-29
+
+	* Initial release of token generation code.
 
 	2003-07-25
 
