@@ -191,11 +191,11 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
     if (data == NULL)
 	return DS_NOTFOUND;
 
-    if (val->size < (unsigned)dsiz) {
+    if (val->leng < (unsigned)dsiz) {
 	print_error(__FILE__, __LINE__,
 		    "(qdbm) db_get_dbvalue( '%.*s' ), size error %lu: %lu",
 		    CLAMP_INT_MAX(token->leng),
-		    (char *)token->data, (unsigned long)val->size,
+		    (char *)token->data, (unsigned long)val->leng,
 		    (unsigned long)dsiz);
 	exit(EX_ERROR);
     }
@@ -318,7 +318,6 @@ int db_foreach(dsh_t *dsh, db_foreach_t hook, void *userdata)
 
 		dbv_data.data = data;
 		dbv_data.leng = dsiz;		/* read count */
-		dbv_data.size = dsiz;
 
 		/* call user function */
 		ret = hook(&dbv_key, &dbv_data, userdata);

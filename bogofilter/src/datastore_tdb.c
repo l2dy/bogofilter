@@ -179,17 +179,17 @@ int db_get_dbvalue(dsh_t *dsh, const dbv_t *token, /*@out@*/ dbv_t *val)
     TDB_CONTEXT *dbp = handle->dbp[dsh->index];
 
     db_key.dptr = token->data;
-    db_key.dsize = token->size;
+    db_key.dsize = token->leng;
 
     db_data = tdb_fetch(dbp, db_key);
 
     if (db_data.dptr == NULL)
 	return DS_NOTFOUND;
 
-    if (val->size < db_data.dsize) {
+    if (val->leng < db_data.dsize) {
 	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%.*s' ), size error %lu::%lu",
 		    CLAMP_INT_MAX(token->leng), (char *)token->data,
-		    (unsigned long)val->size,
+		    (unsigned long)val->leng,
 		    (unsigned long)db_data.dsize);
 	exit(EX_ERROR);
     }
@@ -291,7 +291,6 @@ static int tdb_traversor(/*@unused@*/ __attribute__ ((unused)) TDB_CONTEXT * tdb
 
     dbv_data.data = data.dptr;
     dbv_data.leng = data.dsize;		/* read count */
-    dbv_data.size = data.dsize;
 
     /* call user function */
     rc = hookdata->hook(&dbv_key, &dbv_data, hookdata->userdata);
