@@ -1,0 +1,19 @@
+NOTE: Please also see the CHANGES-0.14 document for a detailed summary.
+
+With release 0.14, bogofilter's use of BerkelyDB has changed.  First,
+TrivialDB (tdb) can be used.  Second, instead of separate wordlists
+for spam and ham tokens, bogofilter can now use a single combined,
+wordlist that stores both all tokens.  In the combined wordlist each
+token contains two counts - for spam and ham.  The name of the new
+file is wordlist.db.
+
+Bogofilter will check in $BOGOFILTER_DIR and use the wordlist(s) that
+are there.  If wordlist.db is present, bogofilter will use the
+combined mode.  If wordlist.db is not present, but both spamlist.db
+and goodlist.db are present, bogofilter will use the separate wordlist
+mode.  If no wordlists are present, bogofilter will create wordlist.db
+and use it.
+
+Command line switches '-W' and '-WW' can be used to tell bogofilter
+the mode you want.  Also config file options "wordlist_mode=combined"
+and "wordlist_mode=separate" can be used.
