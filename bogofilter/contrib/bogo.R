@@ -17,16 +17,18 @@ l <- length(fw)
 bogoS <- fw[l]
 s <- invfwlog[l]
 x <- fwlog[l]
+md <- as.real(levels(U[l])[3])
 
 # now truncate bogo and reset l to match
 detach(bogo)
-bogo[bogo$U=="+",] -> bogo
+bogo[abs(0.5 - bogo$fw) >= md,] -> bogo
 attach(bogo)
 l <- length(fw)
 
 # next recalculate the fw values from the counts in the table
 attach(bogo)
 pw2 <- pbad / (pbad + pgood)
+pw2[pbad + pgood == 0] <- 0
 fw2 <- (s * x + n * pw2) / (s + n)
 
 # display fw (calculated by bogofilter) and fw2 and compare
