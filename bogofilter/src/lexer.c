@@ -33,6 +33,9 @@ lexer_t *lexer = NULL;
 
 /* Local Variables */
 
+#define	NL	"\n"
+#define	CRLF	"\r\n"
+
 extern char *spam_header_name;
 
 lexer_t v3_lexer = {
@@ -143,36 +146,68 @@ static int skip_spam_header(buff_t *buff)
     return EOF;
 }
 
+static int get_unfolded_line(buff_t *buff)
+{
+    int count = 0;
+    while (1) {
+	int c = fgetc(fpin);
+	if (c == EOF)
+	    break;
+	ungetc(c,fpin);
+	if ((c != ' ') && (c != '\t')) 
+	    break;
+	else {
+	    /* whitespace -- possible continuation line */
+	    int add = reader_getline(buff);
+	    char *text = (char *) buff->t.text + buff->read;
+	    int cnt;
+	    if (add == EOF) break;
+	    cnt = strspn(text, " \t");
+
+	    if ((add - cnt == 1 && memcmp(text + cnt, NL, 1) == 0) ||
+		(add - cnt == 2 && memcmp(text + cnt, CRLF, 2) == 0)) {
+		/* reject empty line */
+		buff->read -= add;
+		buff->t.leng -= add;
+		while (add > 0) {
+		    ungetc( text[add], fpin );
+		    add -= 1;
+		}
+		break;
+	    }
+	    else {
+		if (count > 0)
+		    yylineno += 1;
+		if (count >= 0 && DEBUG_LEXER(0))
+		    lexer_display_buffer(buff);
+    
+		/* accept non-empty line */
+		if (passthrough && passmode == PASS_MEM && buff->t.leng > 0)
+		    textblock_add(text, add);
+		count += add;
+
+		/* Convert multiple lines to single line */
+		if (memcmp(text-2, CRLF, 2) == 0)
+		    memset(text-2, ' ',  2);
+		if (memcmp(text-1, NL,   1) == 0)
+		    memset(text-1, ' ',  1);
+	    }
+	}
+    }
+    return count;
+}
+
 static int get_decoded_line(buff_t *buff)
 {
     size_t used = buff->t.leng;
     byte *buf = buff->t.text + used;
     int count = yy_get_new_line(buff);
 
-/* unfolding:
-** 	causes "^\tid" to be treated as continuation of previous line
-** 	hence doesn't match lexer pattern which specifies beginning of line
-*/
-#if 0
-    while (0 && msg_header) {
-	int c = fgetc(fpin);
-	if (c == EOF)
-	    break;
-	if ((c == ' ') || (c == '\t')) {
-	    int add;
-	    /* continuation line */
-	    ungetc(c,fpin);
-	    add = reader_getline(buff);
-	    if (add == EOF) break;
-	    if (passthrough && passmode == PASS_MEM && buff->t.leng > 0)
-		textblock_add(buff->t.text+buff->read, buff->t.leng);
-	    count += buff->t.leng;
-	} else {
-	    ungetc(c,fpin);
-	    break;
-	}
+    if (msg_header) {
+	int add = get_unfolded_line(buff);
+	if (add != EOF)
+	    count += add;
     }
-#endif
 
     if (count == EOF) {
 	if (ferror(fpin)) {
@@ -206,8 +241,8 @@ static int get_decoded_line(buff_t *buff)
 	}
     }
 
-    /* \r\n -> \n */
-    if (count >= 2 && 0 == memcmp((const char *)(buf + count - 2), "\r\n", 2)) {
+    /* CRLF -> NL */
+    if (count >= 2 && memcmp((char *) buf + count - 2, CRLF, 2) == 0) {
 	count --;
 	*(buf + count - 1) = '\n';
     }
@@ -247,26 +282,20 @@ void yyinit(void)
 int yyinput(byte *buf, size_t max_size)
 /* input getter for the scanner */
 {
-    int i, count = 0;
+    int i, cnt;
+    int count = 0;
     buff_t buff;
 
     buff_init(&buff, buf, 0, max_size);
 
     /* After reading a line of text, check if it has special characters.
-     * If not, trim some, but leave enough to match a max  length token.
+     * If not, trim some, but leave enough to match a max length token.
      * Then read more text.  This will ensure that a really long sequence
      * of alphanumerics, which bogofilter will ignore anyway, doesn't crash
      * the flex lexer.
      */
 
-    while (1) {
-	int cnt;
-
-	cnt = get_decoded_line(&buff);
-
-	if (cnt == 0)
-	    break;
-
+    while ((cnt = get_decoded_line(&buff)) != 0) {
 	count += cnt;
 	if ((count <= (MAXTOKENLEN * 1.5)) || not_long_token(buff.t.text, count))
 	    break;

@@ -148,7 +148,7 @@ QP		[!->@-~]+
 */
 
 ENCODED_WORD	=\?{CHARSET}\?(b\?{BASE64}|q\?{QP})\?\=
-ENCODED_TOKEN	{BOGOLEX_TOKEN}?({ENCODED_WORD}\ )*{ENCODED_WORD}
+ENCODED_TOKEN	{BOGOLEX_TOKEN}?({ENCODED_WORD}[ \t])*{ENCODED_WORD}
 
 DOLLARS		[0-9]+
 CENTS		[0-9]+
@@ -214,8 +214,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <INITIAL>^Subject/:.*				{ if (header_line_markup) set_tag("subj:"); else return TOKEN; }
 <INITIAL>^Date:.*|Delivery-Date:.*		;
 <INITIAL>^Message-ID:.*				;
-<INITIAL>^\tid\ {ID}				;
-
+<INITIAL>\tid\ {ID}				;
 <INITIAL>E?SMTP\ id\ {ID}			;
 <INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
 <INITIAL>name=\"?				;

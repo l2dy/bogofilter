@@ -58,6 +58,8 @@ WANT="1723.3931"
 WANT="1722.3929"
 # v0.15 - removed html.c - process_html_comments()
 WANT="1720.3925"
+# v0.15.1 - unfolding header lines ...
+WANT="1720.3927"
 
 if [ "$RESULT" != "$WANT" -o $verbose -ne 0 ] ; then
     echo want: $WANT, have: $RESULT | tee $TMPDIR/$OUT
