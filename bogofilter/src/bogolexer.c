@@ -63,10 +63,9 @@ static void help(void)
 {
     usage();
     fprintf(stderr,
-	    "\t-p\tprint the tokens from stdin.\n"
-	    "\t-q\tquiet mode, no tokens are printed.\n"
-	    "\t-h\thelp, this output.\n"
-	    "\t-k y/n\t- kill html comments (yes or no).\n"
+	    "\t-p\t- print the tokens from stdin.\n"
+	    "\t-q\t- quiet mode, no tokens are printed.\n"
+	    "\t-h\t- help, this output.\n"
 	    "\t-n\t- map non-ascii characters to '?'.\n"
 	    "\t-v\t- set debug verbosity level.\n"
 	    "\t-c file\t- read specified config file.\n"
@@ -88,8 +87,12 @@ static int process_args(int argc, char **argv)
     {
 	switch (option)
 	{
+	case ':':
+	    fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+	    exit(2);
+
 	case '?':
-	    help();
+	    fprintf(stderr, "Unknown option -%c.\n", optopt);
 	    exit(2);
 
 	case 'h':
@@ -142,9 +145,14 @@ static int process_args(int argc, char **argv)
 	    break;
 
 	default:
-	    usage();
-	    exit(0);
+	    abort();
+	    exit(2);
 	}
+    }
+    if (optind < argc) {
+	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n",
+		argv[optind]);
+	exit(2);
     }
     return 0;
 }

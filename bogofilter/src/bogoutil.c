@@ -613,8 +613,12 @@ static int process_args(int argc, char **argv)
 	    verbose++;
 	    break;
 
+	case ':':
+	    fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+	    exit(2);
+
 	case '?':
-	    help();
+	    fprintf(stderr, "Unknown option -%c.\n", optopt);
 	    exit(2);
 
 	case 'h':
@@ -672,16 +676,20 @@ static int process_args(int argc, char **argv)
 	    break;
 
 	default:
-	    fprintf(stderr, "Unknown option: '%c'\n", option);
-	    usage();
+	    abort();
 	    exit(1);
 	}
 
     if (count != 1)
     {
-      fprintf(stderr, "%s: Exactly one of the -d, -l, or -w flags "
+      fprintf(stderr, "%s: Exactly one of the -d, -l, -R or -w flags "
 	      "must be present.\n", PROGNAME);
       exit(1);
+    }
+
+    if (optind < argc && flag != WORD) {
+	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
+	exit(1);
     }
 
     return count;

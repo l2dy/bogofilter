@@ -352,6 +352,7 @@ void process_args(int argc, char **argv, int pass)
 {
     int option;
     int exitcode;
+    int errflag = 0;
 
     test = 0;
     verbose = 0;
@@ -361,8 +362,12 @@ void process_args(int argc, char **argv, int pass)
     set_today();		/* compute current date for token age */
     select_algorithm(algorithm, false);	/* select default algorithm */
 
-    optind = 0;
-    while ((option = getopt(argc, argv, ":23d:eFhlL:m:o:snSNvVpuc:CgrRfqtI:O:y:x:DT" G R F)) != EOF)
+    optind = opterr = 1;
+    /* don't use #ifdef here: */
+#if HAVE_DECL_OPTRESET
+    optreset = 1;
+#endif
+    while ((option = getopt(argc, argv, ":23d:eFhlL:m:o:snSNvVpuc:CgrRfqtI:O:y:x:DT" G R F)) != -1)
     {
 #if 0
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
@@ -411,11 +416,11 @@ void process_args(int argc, char **argv, int pass)
 	    break;
 
 	case ':':
-	    fprintf(stderr, "One of the options lacked the mandatory argument.\n");
+	    fprintf(stderr, "Option -%c requires an argument.\n", optopt);
 	    exit(2);
 
 	case '?':
-	    help();
+	    fprintf(stderr, "Unknown option -%c.\n", optopt);
 	    exit(2);
 
 	case 'h':
@@ -543,11 +548,15 @@ void process_args(int argc, char **argv, int pass)
 	    break;
 
 	default:
+	    /* Mismatch between switch() construct and optstring */
 	    print_error(__FILE__, __LINE__, "Internal error: unhandled option '%c' "
 			"(%02X)\n", isprint((unsigned char)option) ? option : '_', (unsigned int)option);
 	    exit(2);
 	}
     }
+
+    if (errflag)
+	exit(2);
 
     if (run_type == RUN_UNKNOWN)
 	run_type = RUN_NORMAL;
@@ -557,7 +566,7 @@ void process_args(int argc, char **argv, int pass)
 	exit (exitcode);
 
     if (optind < argc) {
-	fprintf(stderr, "Extra arguments given. Aborting.\n");
+	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
 	exit(2);
     }
 
