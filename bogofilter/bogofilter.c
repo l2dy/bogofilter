@@ -1,10 +1,15 @@
 /* $Id$ */
 /* $Log$
- * Revision 1.4  2002/09/15 17:41:20  relson
- * The printing of tokens used for computing the spamicity has been changed.  They are now printed in increasing order (by probability and alphabet).  The cumulative spamicity is also printed.
+ * Revision 1.5  2002/09/15 18:29:04  relson
+ * bogofilter.c:
  *
- * The spamicity element of the bogostat_t struct has become a local variable in bogofilter() as it didn't need to be in the struct.
+ * Use a Judy array to provide a set of (unique) tokens to speed up the filling of the stat.extrema array.
  *
+/* Revision 1.4  2002/09/15 17:41:20  relson
+/* The printing of tokens used for computing the spamicity has been changed.  They are now printed in increasing order (by probability and alphabet).  The cumulative spamicity is also printed.
+/*
+/* The spamicity element of the bogostat_t struct has become a local variable in bogofilter() as it didn't need to be in the struct.
+/*
 /* Revision 1.3  2002/09/15 16:37:27  relson
 /* Implement Eric Seppanen's fix so that bogofilter() properly populates the stats.extrema array.
 /* A new word goes into the first empty slot of the array.  If there are no empty slots, it replaces
@@ -420,6 +425,13 @@ int compare_stats(discrim_t *d1, discrim_t *d2)
 int bogofilter(int fd)
 /* evaluate text for spamicity */
 {
+    void	**PPValue;			// associated with Index.
+    void	*PArray = (Pvoid_t) NULL;	// JudySL array.
+    JError_t	JError;				// Judy error structure
+
+    void	**loc;
+    char	tokenbuffer[BUFSIZ];
+
     double prob, product, invproduct;
     double hamness, spamness, slotdev, hitdev;    
     int tok;
@@ -441,9 +453,21 @@ int bogofilter(int fd)
     yyin = fdopen(fd, "r");
     while ((tok = get_token()) != 0)
     {
+	// Ordinary word, stash in private per-message array.
+	strlwr(yytext);
+	if ((PPValue = JudySLIns(&PArray, yytext, &JError)) == PPJERR)
+	    break;
+	(*((PWord_t) PPValue))++;
+    }
+
+    tokenbuffer[0]='\0';
+    for (loc  = JudySLFirst(PArray, tokenbuffer, 0);
+	 loc != (void *) NULL;
+	 loc  = JudySLNext(PArray, tokenbuffer, 0))
+    {
 	double dev;
 
-	strlwr(yytext);
+	yytext = tokenbuffer;
 	hamness = getcount(yytext, &ham_list);
 	spamness  = getcount(yytext, &spam_list);
 
@@ -487,20 +511,11 @@ int bogofilter(int fd)
         hitdev=1;
 	for (pp = stats.extrema; pp < stats.extrema+sizeof(stats.extrema)/sizeof(*stats.extrema); pp++)
         {
-	    // don't allow duplicate tokens in the stats.extrema
-	    if (pp->key && strcmp(pp->key, yytext)==0)
-            {
-                hit=NULL;
-		break;
-            }
-	    else 
+	    slotdev=DEVIATION(pp->prob);
+	    if (dev>slotdev && hitdev>slotdev)
 	    {
-                slotdev=DEVIATION(pp->prob);
-		if (dev>slotdev && hitdev>slotdev)
-                {
-                    hit=pp;
-		    hitdev=slotdev;
-                }
+		hit=pp;
+		hitdev=slotdev;
             }
         }
         if (hit) 
