@@ -131,6 +131,12 @@ double *ns_scores;
 double *sp_scores;
 double user_robx = 0.0;		/* from '-r' option */
 
+#undef	TEST
+
+#ifdef	TEST
+uint test = 0;
+#endif
+
 /* Function Prototypes */
 
 static void bt_exit(void);
@@ -390,6 +396,38 @@ static void scoring_error(void)
     for (i = 0; i < 10 && sp_scores[i] < HAM_CUTOFF; i += 1) 
 	printf("      %2d %8.6f\n", i+1, sp_scores[i]);
 }
+
+#ifdef	TEST
+static char flag(uint idx, uint cnt, uint dlt)
+{
+    if (dlt == 0)
+	return ' ';
+    if (idx < cnt)
+	return '+';
+    else
+	return '-';
+}
+#endif
+
+#ifdef	TEST
+static void print_ns_scores(uint beg, uint cnt, uint dlt)
+{
+    uint i;
+    printf("ns:\n");
+    for (i=beg; i < cnt + dlt; i += 1)
+	printf("    %3d %0.16f %c\n", i+1, ns_scores[i], flag(i, cnt, dlt));
+}
+#endif
+
+#ifdef	TEST
+static void print_sp_scores(uint beg, uint cnt, uint dlt)
+{
+    uint i;
+    printf("sp:\n");
+    for (i=beg; i < cnt + dlt; i += 1)
+	printf("    %3d %0.16f %c\n", i+1, sp_scores[i], flag(i, cnt, dlt));
+}
+#endif
 
 static double scale(uint cnt, uint lo, uint hi, double beg, double end)
 {
@@ -685,6 +723,11 @@ static int process_args(int argc, char **argv)
 		case 'v':
 		    verbose += 1;
 		    break;
+#ifdef	TEST
+		case 't':
+		    test += 1;
+		    break;
+#endif
 		default:
 		    help();
 		    exit(EX_ERROR);
