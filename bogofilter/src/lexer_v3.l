@@ -126,7 +126,7 @@ TOKENBACK	[^[:blank:]<>;=():&%$#@+|/\\{}^\"\?\*\._\-\+,\[\][:cntrl:]]
 TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}{1,70}
 
 B64_OR_QP	[0-9a-zA-Z\-\+\/\=]+
-ENCODED_TOKEN	{TOKENFRONT}{TOKENMID}{0,60}=\?{ID}\?[bq]\?{B64_OR_QP}\?\=
+ENCODED_TOKEN	{ID}{0,60}=\?{ID}\?[bq]\?{B64_OR_QP}\?\=
 
 DOLLARS		[0-9]+
 CENTS		[0-9]+
