@@ -12,7 +12,8 @@
 #include "xstrdup.h"
 
 char *xstrdup(const char *s) {
-    char *t = xmalloc(strlen(s) + 1);
-    strcpy(t, s); /* RATS: ignore */
+    size_t l = strlen(s) + 1;
+    char *t = xmalloc(l);
+    memcpy(t, s, l); /* RATS: ignore */
     return t;
 }
