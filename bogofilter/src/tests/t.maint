@@ -10,7 +10,9 @@ OUT="$TMPDIR/maint.out"
 $BOGOFILTER -C -l -s < ${SYSTEST}/inputs/spam.mbx >> $TMPDIR/tmp
 $BOGOFILTER -C -l -n < ${SYSTEST}/inputs/good.mbx >> $TMPDIR/tmp
 
-cat >>$TMPDIR/result <<EOF
+CORRECT="$TMPDIR/result"
+
+cat >> $CORRECT <<EOF
 initial: 5063
 count 0 -> 5063
 count 1 -> 1753
@@ -25,4 +27,8 @@ for cnt in 0 1 2 3 ; do
     echo "count $cnt ->" `$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.db | wc -l` >> $OUT
 done
 
-cmp $OUT ${TMPDIR}/result
+if  [ $verbose -eq 0 ]; then
+    cmp $CORRECT $OUT
+else
+    diff $DIFF_BRIEF $CORRECT $OUT
+fi
