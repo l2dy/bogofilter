@@ -41,19 +41,19 @@ $BOGOUTIL -l $DATA -y 20021215 < ${srcdir}/$BASE.upd
 $BOGOUTIL -d $DATA > ${TMPDIR}/output-dl-2.txt
 
 #confirm that updated words have different counts and dates
-( diff -u ${TMPDIR}/output-dl-1.txt ${TMPDIR}/output-dl-2.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.1.2.txt >> $OUT
+( diff ${TMPDIR}/output-dl-1.txt ${TMPDIR}/output-dl-2.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.1.2.txt >> $OUT
 
 #dump wordlist, excluding oldest entries
 $BOGOUTIL -a 20020815 -d $DATA > ${TMPDIR}/output-dl-3.txt
 
 #confirm exclusion of oldest entries
-( diff -u ${TMPDIR}/output-dl-2.txt ${TMPDIR}/output-dl-3.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.2.3.txt >> $OUT
+( diff ${TMPDIR}/output-dl-2.txt ${TMPDIR}/output-dl-3.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.2.3.txt >> $OUT
 
 #dump wordlist, excluding oldest, shortest, and longest entries
 $BOGOUTIL -a 20020815 -s4,30 -d $DATA > ${TMPDIR}/output-dl-4.txt
 
 #confirm exclusion of oldest, shortest(<, and longest entries
-( diff -u ${TMPDIR}/output-dl-3.txt ${TMPDIR}/output-dl-4.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.3.4.txt >> $OUT
+( diff ${TMPDIR}/output-dl-3.txt ${TMPDIR}/output-dl-4.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.3.4.txt >> $OUT
 
 rm -f $DATA
 
@@ -63,7 +63,7 @@ $BOGOUTIL -s5,30 -l $DATA < ${TMPDIR}/output-dl-4.txt
 $BOGOUTIL -n -d $DATA > ${TMPDIR}/output-dl-5.txt
 
 #confirm effect of non-ascii option
-( diff -u ${TMPDIR}/output-dl-4.txt ${TMPDIR}/output-dl-5.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.4.5.txt >> $OUT
+( diff ${TMPDIR}/output-dl-4.txt ${TMPDIR}/output-dl-5.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.4.5.txt >> $OUT
 
 rm -f $DATA
 
@@ -72,13 +72,16 @@ $BOGOUTIL -a 20021010 -l $DATA < ${TMPDIR}/output-dl-5.txt
 $BOGOUTIL -a 20021010 -d $DATA > ${TMPDIR}/output-dl-6.txt
 
 #confirm token merging
-( diff -u ${TMPDIR}/output-dl-5.txt ${TMPDIR}/output-dl-6.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.5.6.txt >> $OUT
+( diff ${TMPDIR}/output-dl-5.txt ${TMPDIR}/output-dl-6.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.5.6.txt >> $OUT
+
+[ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
 
 for i in ${TMPDIR}/output-dl-?.txt ; do
     j=$srcdir/`basename $i`
     if  [ $verbose -eq 0 ]; then
 	cmp $i $j
     else
-	diff -u -s --brief $i $j
+	[ `uname -s` = "Linux" ] && OPTS="-u -s --brief"
+	diff $OPTS $i $j
     fi
 done
