@@ -575,7 +575,7 @@ case "${target}" in
         ;;
     i?86-emx-os2 | i?86-*-os2*emx )
         # OS/2 with the EMX environment
-        have_dosish_system=yes
+        have_dosish_system=no
         ;;
     i?86-*-msdosdjgpp*)
         # DOS with the DJGPP environment
