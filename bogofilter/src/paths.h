@@ -23,7 +23,6 @@ NAME:
 #define WORDLIST	"wordlist" DB_EXT
 #define GOODFILE	"goodlist" DB_EXT
 #define SPAMFILE	"spamlist" DB_EXT
-#define IGNOREFILE	"ignorelist" DB_EXT
 
 /* Function Prototypes */
 
