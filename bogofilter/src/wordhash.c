@@ -69,16 +69,36 @@ wordhash_init (void)
 }
 
 static void
-wordhash_free_nodes (wordhash_t *wh)
+wordhash_free_alloc_nodes (wordhash_t *wh)
 {
-    wh_alloc_node *np, *nq;
-    for (np = wh->nodes; np; np = nq)
+    wh_alloc_node *node, *next;
+
+    /* iteration pointers are inside buf,
+    ** so freeing buf requires clearing them.
+    */
+    wh->iter_head = wh->iter_tail = NULL;
+
+    for (node = wh->nodes; node; node = next)
     {
-	nq = np->next;
-	xfree (np->buf);
-	xfree (np);
+	next = node->next;
+	xfree (node->buf);
+	xfree (node);
     }
     wh->nodes = NULL;
+}
+
+static void
+wordhash_free_hash_nodes (wordhash_t *wh)
+{
+    hashnode_t *item, *next;
+
+    for (item = wh->iter_head; item != NULL ; item = next)
+    {
+	next = item->iter_next;
+	word_free( item->key );
+	item->key = NULL;
+    }
+    wh->iter_head = NULL;
 }
 
 static void
@@ -98,29 +118,17 @@ wordhash_free_strings (wordhash_t *wh)
 void
 wordhash_free (wordhash_t *wh)
 {
-    hashnode_t *p, *q;
-
     if (wh == NULL)
 	return;
 
-    for (p = wh->iter_head; p != NULL ; p = q)
-    {
-	q = p->iter_next;
-	word_free( p->key );
-    }
-
-    wordhash_free_nodes(wh);
+    wordhash_free_hash_nodes(wh);
+    wordhash_free_alloc_nodes(wh);
     wordhash_free_strings(wh);
 
     xfree (wh->order);
     xfree (wh->props);
     xfree (wh->bin);
     xfree (wh);
-}
-
-void wordhash_print(const char *lbl, wordhash_t *wh)
-{
-    printf("%s %5d\n", lbl, wh->wordcount);
 }
 
 static hashnode_t *
@@ -369,28 +377,31 @@ void
 wordhash_convert_to_proplist(wordhash_t *wh, wordhash_t *db)
 {
     hashnode_t *node;
-    hashnode_t *nodes;
+    hashnode_t *props;
     hashnode_t **order;
     size_t count = wh->count;
 
     if (count == 0 || wh->order != NULL)
 	return;
 
-    nodes = (hashnode_t *)  xcalloc(count, sizeof(hashnode_t));
+    props = (hashnode_t *)  xcalloc(count, sizeof(hashnode_t));
     order = (hashnode_t **) xcalloc(count, sizeof(hashnode_t *));
 
     count = 0;
     for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh)) {
 	wordprop_t *wp = wordhash_insert(db, node->key, 0, NULL);
-	nodes[count].buf = wp;
-	order[count] = &nodes[count];
+	props[count].buf = wp;
+	order[count] = &props[count];
 	count += 1;
+	word_free(node->key);
+	node->key = NULL;
     }
 
-    wordhash_free_nodes (wh);
-    wordhash_free_strings (wh);
+    wh->props = props;
     wh->order = order;
-    wh->props = nodes;
+
+    wordhash_free_alloc_nodes (wh);
+    wordhash_free_strings (wh);
     xfree(wh->bin);
     wh->bin = NULL;
 

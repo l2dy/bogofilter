@@ -51,7 +51,6 @@ void wordhash_free(/*@only@*/ wordhash_t *);
 size_t wordhash_count(wordhash_t * h);
 void wordhash_sort(wordhash_t * h);
 void wordhash_add(wordhash_t *dst, wordhash_t *src, void (*initializer)(void *));
-void wordhash_print(const char *lbl, wordhash_t *wh);
 void wordhash_set_counts(wordhash_t *wh, int good, int bad);
 
 void * wordhash_search (wordhash_t *wh, word_t *t, unsigned int hash);
