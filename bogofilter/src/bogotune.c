@@ -38,6 +38,8 @@ AUTHOR:
 #define	LIST_COUNT	2000
 #define	TEST_COUNT	500
 
+#define	HAM_CUTOFF	0.10
+#define	SPAM_CUTOFF	0.95
 #define FP_CUTOFF	0.999
 
 enum e_verbosity {
@@ -264,6 +266,18 @@ static void score_ns(double *results)
     return;
 }
 
+static bool check_for_high_ns_scores(void)
+{
+    score_ns(ns_scores);	/* scores in ascending order */
+    qsort(ns_scores, ns_cnt, sizeof(double), compare_double);
+    if (ns_scores[ns_cnt-1] < SPAM_CUTOFF)
+	return false;
+    else {
+	fprintf(stderr, "Error - high scoring non-spam.\n");
+	return true;
+    }
+}
+
 /* Score all spam to determine false negative counts */
 
 static void score_sp(double *results)
@@ -301,6 +315,31 @@ static uint get_fn_count(uint count, double *results)
     }
 
     return fn;
+}
+
+static bool check_for_low_sp_scores(void)
+{
+    score_sp(sp_scores);	/* scores in ascending order */
+    qsort(sp_scores, sp_cnt, sizeof(double), compare_double);
+    if (sp_scores[0] > HAM_CUTOFF)
+	return false;
+    else {
+	fprintf(stderr, "Error - low scoring spam.\n");
+	return true;
+    }
+}
+
+static void scoring_error(void)
+{
+    int i;
+
+    printf("high ham scores:\n");
+    for (i = 0; i < 10 && ns_scores[ns_cnt-i-1] > SPAM_CUTOFF; i += 1) 
+	printf("  %2d %8.6f\n", i+1, ns_scores[ns_cnt-i-1]);
+
+    printf("low spam scores:\n");
+    for (i = 0; i < 10 && sp_scores[i] < HAM_CUTOFF; i += 1) 
+	printf("  %2d %8.6f\n", i+1, sp_scores[i]);
 }
 
 /* compute scores and get fp target and spam cutoff value */
@@ -824,11 +863,17 @@ static void final_recommendations(void)
 		continue;
 	}
 	else {
-	    cutoff = FP_CUTOFF;
+	    cutoff = SPAM_CUTOFF;
 	    if (printed)
 		break;
 	    for (i = 0; i < ns_cnt && ns_scores[i] < cutoff; i += 1)
 		fp = i;
+	    if (fp == 0) {
+		fprintf(stderr, 
+			"too few low scoring spam.\n");
+		exit(EX_ERROR);
+	    }
+	    fp -= 1;
 	    cutoff = ns_scores[fp];
 	    fp = ns_cnt - fp;
 	}
@@ -841,8 +886,8 @@ static void final_recommendations(void)
 	}
 
 	printf("%sspam_cutoff=%5.3f\t# for %4.2f%% false positives; expect %4.2f%% false neg.\n",
-	       comment, cutoff, 
-	       (mn != 1) ? 100.0 / mn : 100.0 * fp / ns_cnt, 
+	       comment, cutoff,
+	       (mn != 1) ? 100.0 / mn : 100.0 * fp / ns_cnt,
 	       100.0 * fn / sp_cnt);
 
 	if (verbose >= PARMS)
@@ -965,10 +1010,21 @@ static rc_t bogotune(void)
 	exit(EX_ERROR);
     }
 
+    fflush(stdout);
+
     ns_scores = xcalloc(ns_cnt, sizeof(double));
     sp_scores = xcalloc(sp_cnt, sizeof(double));
 
     method = (method_t *) &rf_fisher_method;
+
+    robs = ROBS;
+    robx = ROBX;
+    min_dev = FISHER_MIN_DEV;
+
+    if (check_for_high_ns_scores() | check_for_low_sp_scores()) {
+	scoring_error();
+	exit(EX_ERROR);
+    }
 
     /*
     ** 5.  Calculate fp target
@@ -978,9 +1034,7 @@ static rc_t bogotune(void)
     */
     
     min_dev = 0.02;
-    robs = ROBS;
-    robx = ROBX;
-
+    
     target = get_thresh(ns_cnt, ns_scores);
     printf("False-positive target is %d (cutoff %8.6f)\n", target, spam_cutoff);
 
@@ -1081,7 +1135,7 @@ static rc_t bogotune(void)
 		    if (verbose >= SUMMARY) {
 			if (verbose > SUMMARY)
 			    printf( "%3d  %d %d %d  ", cnt, rsi, mdi, rxi);
-			printf( "%6.4f %5.3f %5.3f %8.6f %3d %3d\n", robs, min_dev, robx, spam_cutoff, fp, fn);
+			printf( "%6.4f %5.3f %5.3f %8.6f %2d %3d\n", robs, min_dev, robx, spam_cutoff, fp, fn);
 			fflush(stdout);
 		    }
 		    else {
@@ -1122,7 +1176,7 @@ static rc_t bogotune(void)
 	min_dev = mdval->data[r->mdi];
 
 	printf("Minimum found at s %6.4f, md %5.3f, x %5.3f\n", robs, min_dev, robx);
-	printf( "        fp %d (%6.4f%%), fn %d (%6.4f%%)\n",
+	printf("        fp %d (%6.4f%%), fn %d (%6.4f%%)\n",
 		r->fp, r->fp*100.0/ns_cnt, 
 		r->fn, r->fn*100.0/sp_cnt);
 	printf("\n");
