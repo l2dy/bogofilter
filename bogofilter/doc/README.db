@@ -45,12 +45,19 @@ you dump and reload the data base to add checksums.
 The dump/load cycle is necessary only the first time you upgrade from a
 non-transactional to a transactional release.  Use these commands:
 
-cd .bogofilter
+cd ~/.bogofilter
 bogoutil -d wordlist.db >wordlist.txt
 mv wordlist.db wordlist.db.old
 bogoutil -l wordlist.db <wordlist.txt
 
 And if all commands succeeded: rm wordlist.txt
+
+NOTE: transactional databases require large lock tables, the exact
+size depends on the size of the database. If the lock table isn't
+large enough, you may get errors and need to increase the lock table
+size, see section 3.2 and perhaps 4.2 when you see this problem.
+"bogoutil -d wordlist.db >/dev/null" can be used to check if the lock
+table size is sufficient, as it will access the whole data base.
 
 2.3 Recoverability
 
