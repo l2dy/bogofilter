@@ -248,8 +248,6 @@ filename=\"?					;
 
 %%
 
-bool block_on_subnets = false;
-
 /* returns -1 for EOF or max_size < 2, characters read otherwise */
 int lexer_fgets(char *buf, int max_size, FILE *s)
 {

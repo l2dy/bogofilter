@@ -64,8 +64,7 @@ bool terse;		/* '-t' */
 int passthrough;	/* '-p' */
 int verbose;		/* '-v' */
 int Rtable = 0;		/* '-R' */
-
-static bool suppress_config_file = false;
+bool block_on_subnets = false;
 
 char directory[PATH_LEN + 100] = "";
 const char *user_config_file   = "~/.bogofilter.cf";
@@ -97,12 +96,15 @@ enum algorithm_e {
 #define AL_DEFAULT AL_GRAHAM
 #endif
 
-static enum algorithm_e algorithm = AL_DEFAULT;
-
 double	spam_cutoff = 0.0;	/* set during method initialization */
 double	min_dev = 0.0f;
 
 double	thresh_stats = 0.0f;
+
+/* Local variables and declarations */
+
+static bool suppress_config_file = false;
+static enum algorithm_e algorithm = AL_DEFAULT;
 
 static bool select_algorithm(const unsigned char *s);
 

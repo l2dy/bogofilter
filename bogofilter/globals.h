@@ -18,6 +18,7 @@ extern bool terse;		/* '-t' */
 extern bool quiet;		/* '-q' */
 extern int passthrough;		/* '-p' */
 extern int verbose;		/* '-v' */
+extern bool block_on_subnets;
 
 extern bool stats_in_header;
 
