@@ -148,29 +148,15 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
     return;
 }
 
-static double msg_lookup_and_score(const word_t *token, wordcnts_t *cnts)
+inline static double compute_probability(const word_t *token, wordcnts_t *cnts)
 {
     double prob;
 
-    if (cnts->bad == 0 && cnts->good == 0)
+    if (!msg_count_file)
 	lookup(token, cnts);
 
     prob = calc_prob_pure(cnts->good, cnts->bad,
 			  cnts->msgs_good, cnts->msgs_bad, robs, robx);
-
-    return prob;
-}
-
-static double compute_probability(const word_t *token, wordcnts_t *cnts)
-{
-    double prob;
-
-    if (cnts->bad != 0 || cnts->good != 0 || msg_count_file)
-	/* A msg-count file already has the values needed */
-	prob = calc_prob_pure(cnts->good, cnts->bad, cnts->msgs_good, cnts->msgs_bad, robs, robx);
-    else
-	/* Otherwise lookup the word and get its score */
-	prob = msg_lookup_and_score(token, cnts);
 
     return prob;
 }
