@@ -122,15 +122,15 @@ double lookup_and_score(const word_t *token, wordprop_t *wordstats)
     {
 	size_t i;
 	dbv_t val;
-	if (override > list->override)
-	    break;
-	db_getvalues(list->dbh, token, &val);
 
-	if (val.count[0] == 0 && val.count[1] == 0)
-	    continue;
 	if (list->ignore)
 	    return EVEN_ODDS;
+
+	if (override > list->override)
+	    break;
 	override=list->override;
+
+	db_getvalues(list->dbh, token, &val);
 
 	for (i=0; i<COUNTOF(val.count); i++) {
 	    /* Protect against negatives */
@@ -141,9 +141,6 @@ double lookup_and_score(const word_t *token, wordprop_t *wordstats)
 
 	    if (val.count[i] == 0)
 		continue;
-	    if (list->ignore)
-		return EVEN_ODDS;
-	    override=list->override;
 
 	    wordprob_add(wordstats, val.count[i], list->bad[i]);
 	    if (DEBUG_ROBINSON(1)) {
