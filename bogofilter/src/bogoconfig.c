@@ -605,6 +605,7 @@ void query_config(void)
     fprintf(stdout, "%-11s = %0.6f (%8.2e)\n", "spam_cutoff", spam_cutoff, spam_cutoff);
     fprintf(stdout, "\n");
     fprintf(stdout, "%-10s = %s\n", "block_on_subnets", YN(block_on_subnets));
+    fprintf(stdout, "%-10s = %s\n", "strict_check", YN(strict_check));
     fprintf(stdout, "%-10s = %s\n", "tag_header_lines", YN(tag_header_lines));
     fprintf(stdout, "%-10s = %s\n", "replace_nonascii_characters", YN(replace_nonascii_characters));
     fprintf(stdout, "\n");
