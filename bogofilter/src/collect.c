@@ -73,21 +73,19 @@ void collect_words(wordhash_t *wh)
 #ifdef	CP866
 /* mime charset hack */
 	{
-	    static bool hascharset=false;
-	    if (hascharset)  /* prev token == charset */
+	    static bool hasCharset=false;
+	    if (hasCharset)  /* prev token == charset */
 	    {
-		if(token->leng > 5) {
-		    if(!strncmp(token->text, "mime:", 5)) {
-			set_charset(token->text+5);
-		    }
-		}
+		if (token->leng > 5 &&
+		    !strncmp(token->text, "mime:", 5))
+		    set_charset(token->text+5);
 	    }
-	    hascharset = 0;
+	    hasCharset = 0;
 	    if (token->leng == 5+7)
 	    {
 		if (!strncmp(token->text, "mime:", 5) &&
 		    !strncasecmp(token->text+5, "charset", 7))
-		    hascharset = true;
+		    hasCharset = true;
 	    }
 	}
 #endif
