@@ -243,14 +243,22 @@ ham_cutoff is non-zero.</para>
 printed for each message.</para>
 
 <para>The <option>-b</option> (streaming bulk mode) option tells
-<application>bogofilter</application> to classify multiple messages whose names 
+<application>bogofilter</application> to classify multiple objects whose names 
 are read from stdin.
 If the <option>-v</option> or <option>-t</option> option is also given, 
 <application>bogofilter</application> will print a line giving file name and classification information for each file.</para>
 
+<para>An object in this context shall be a Maildir (autodetected), or if
+    it's not a maildir, a single mail unless <option>-M</option> is
+    given - in that case it's processed as a mbox. (The Content-Length:
+    parameter is not taken into account currently.)</para>
+
+<para>When reading mbox format, bogofilter relies on the empty line
+    after a mail.</para>
+
 <para>The <option>-B</option><replaceable>filename</replaceable> (bulk mode) 
 option tells <application>bogofilter</application> to classify multiple 
-messages named as files on the command line.
+objects (see the previous paragraph) named as files on the command line.  
 If the <option>-v</option> or <option>-t</option> option is also given, 
 <application>bogofilter</application> will print a line giving file name and 
 classification information for each file.</para>
