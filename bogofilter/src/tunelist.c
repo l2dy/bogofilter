@@ -114,6 +114,7 @@ wordlist_t *wordlist_new(const char *label)
 
     list->name = label;
     list->train = wordhash_new();
+    list->msgs   = msglist_new("msgs");
     list->u.r.r0 = msglist_new("r0");
     list->u.r.r1 = msglist_new("r1");
     list->u.r.r2 = msglist_new("r2");
@@ -138,6 +139,7 @@ void wordlist_free(wordlist_t *list)
 	return;
 
     wordhash_free(list->train);		/* training */
+//    msglist_free(list->msgs);
     msglist_free(list->u.r.r0);		/* run sets */
     msglist_free(list->u.r.r1);
     msglist_free(list->u.r.r2);

@@ -44,7 +44,6 @@ extern	void msglist_free(mlhead_t *list);
 
 /***** filelist *****/
 
-
 typedef struct flitem_s flitem_t;
 typedef struct flhead_s flhead_t;
 
@@ -72,6 +71,7 @@ struct wordlist_s {
     const char *name;
     uint	count;
     wordhash_t *train;	/* training */
+    mlhead_t   *msgs;
     union {
 	mlhead_t *sets[3];
 	struct runs {

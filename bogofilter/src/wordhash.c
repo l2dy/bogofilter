@@ -219,7 +219,10 @@ void wordhash_add(wordhash_t *dest, wordhash_t *src, void (*initializer)(void *)
 
     for (s = wordhash_first(src); s != NULL; s = wordhash_next(src)) {
 	wordprop_t *p = (wordprop_t *)s->buf;
-	d = wordhash_insert(dest, s->key, sizeof(wordprop_t), initializer);
+	word_t *key = s->key;
+	if (key == NULL)
+	    continue;
+	d = wordhash_insert(dest, key, sizeof(wordprop_t), initializer);
 	d->freq += p->freq;
 	d->good += p->good;
 	d->bad  += p->bad;

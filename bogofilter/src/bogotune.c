@@ -42,8 +42,10 @@ AUTHOR:
 #define	PARMS	2	/* print parameter sets (rs, md, rx) */
 #define	SCORES	6	/* verbosity level for printing scores */
 
+#define	MOD(n,m)	((n) - ((int)((n)/(m)))*(m))
+
 #define	MIN(n)		((n)/60)
-#define	SEC(n)		((n) - MIN(n)*60)
+#define SEC(n)		((n) - MIN(n)*60)
 
 #define	ROUND(f)	floor(f+0.5)
 
@@ -328,10 +330,8 @@ static uint get_thresh(uint count, double *scores)
 
 static uint read_mailbox(char *arg)
 {
-    int good = run_type == REG_GOOD;
-    int bad  = 1 - good;
     uint count = 0;
-    wordlist_t *ns_or_sp = good ? ns_msglists : sp_msglists;
+    wordlist_t *ns_or_sp = (run_type == REG_GOOD) ? ns_msglists : sp_msglists;
     wordhash_t *train = ns_and_sp->train;
 
     if (verbose) {
@@ -342,31 +342,13 @@ static uint read_mailbox(char *arg)
     mbox_mode = true;
     bogoreader_init(1, &arg);
     while (reader_more()) {
-	int idx = count % 6;
 	wordhash_t *wh = wordhash_new();
 
 	collect_words(wh);
 
-	if (ds_file || (user_robx > 0.0)) {	/* have wordlist? */
-	    wordhash_convert_to_proplist(wh, train);
-	    msglist_add(ns_or_sp->u.r.r0, wh);
-	}
-	else {
-	    if ((idx & 1) == 0) {	/* training set */
-		wordprop_t *p = wordhash_insert(train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
-		p->good += good;
-		p->bad += bad;
-		wordhash_set_counts(wh, good, bad);
-		wordhash_add(train, wh, &wordprop_init);
-		wordhash_free(wh);
-	    }
-	    else {			/* scoring set  */
-		wordhash_convert_to_proplist(wh, train);
-		msglist_add(ns_or_sp->u.sets[idx/2], wh);
-	    }
-	}
+	wordhash_convert_to_proplist(wh, train);
+	msglist_add(ns_or_sp->msgs, wh);
 
-	count += 1;
 	if (verbose && (count % 100) == 0) {
 	    if ((count % 1000) != 0)
 		putchar('.');
@@ -374,6 +356,8 @@ static uint read_mailbox(char *arg)
 		printf("\r              \r%d ", count/1000 );
 	    fflush(stdout);
 	}
+
+	count += 1;
 
 	if (max_messages_per_mailbox != 0 &&
 	    count > max_messages_per_mailbox)
@@ -401,6 +385,73 @@ static uint filelist_read(int mode, flhead_t *list)
 	count += read_mailbox(item->name);
     }
     return count;
+}
+
+/* distribute()
+**
+**	Proportionally distribute messages between training and scoring sets.
+**
+**   Method:
+**	If only 2500 messages, use 2000 for training and 500 for scoring.
+**	If over 4000 messages, use equal numbers for training and scoring.
+**	In between 2500 and 4000, do a proportional distribution.
+*/
+
+static void distribute(int mode)
+{
+    int good = mode == REG_GOOD;
+    int bad  = 1 - good;
+    wordlist_t *ns_or_sp = good ? ns_msglists : sp_msglists;
+    wordhash_t *train = ns_and_sp->train;
+    mlhead_t *list = ns_or_sp->msgs;
+    mlitem_t *item;
+    wordprop_t *msg_count;
+
+    int score_count = 0;
+    int train_count = 0;
+
+    double ratio;
+
+    if (ds_file != NULL)
+	ratio = 0.0;
+    else {
+	int count = list->count;
+	const double small_count = LIST_COUNT + TEST_COUNT;
+	const double large_count = LIST_COUNT + LIST_COUNT;
+	const double small_ratio = LIST_COUNT / TEST_COUNT;
+	const double large_ratio = LIST_COUNT / LIST_COUNT;
+	if (count > large_count)
+	    count = large_count;
+	if (count < small_count)
+	    count = small_count;
+	ratio = small_ratio + (large_ratio - small_ratio) * (count - small_count) / (large_count - small_count);
+    }
+    
+    /* Update .MSG_COUNT */
+    msg_count = wordhash_insert(train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
+
+    for (item = list->head; item != NULL; item = item->next) {
+	wordhash_t *wh = item->wh;
+
+	/* training set */
+	if ((ds_file == NULL) && (train_count / ratio < score_count + 1)) {
+	    wordhash_set_counts(wh, good, bad);
+	    wordhash_add(train, wh, &wordprop_init);
+	    wordhash_free(wh);
+	    train_count += 1;
+	    msg_count->good += good;
+	    msg_count->bad  += bad;
+	}
+	/* scoring set  */
+	else {
+	    wordhash_convert_to_proplist(wh, train);
+	    msglist_add(ns_or_sp->u.sets[MOD(score_count,3)], wh);
+	    score_count += 1;
+	}
+	item->wh = NULL;
+    }
+
+    return;
 }
 
 static void usage(void)
@@ -790,7 +841,7 @@ static void bogotune_init(void)
 {
     const char *msg_count = MSG_COUNT;
     w_msg_count = word_new((const byte *)msg_count, strlen(msg_count));
-    ns_and_sp = wordlist_new("ns");		/* training wordlist */
+    ns_and_sp = wordlist_new("tr");		/* training wordlist */
     ns_msglists = wordlist_new("ns");		/* non-spam scoring wordlist */
     sp_msglists = wordlist_new("sp");		/* spam scoring wordlist */
 
@@ -821,7 +872,6 @@ static rc_t bogotune(void)
 {
     uint scan;
     uint beg, end, cnt;
-    uint min_cnt = (ds_file != NULL) ? TEST_COUNT : LIST_COUNT + TEST_COUNT;
     rc_t status = RC_OK;
 
     wordprop_t *props;
@@ -840,6 +890,9 @@ static rc_t bogotune(void)
     ns_cnt = filelist_read(REG_GOOD, ham_files);
     sp_cnt = filelist_read(REG_SPAM, spam_files);
 
+    distribute(REG_GOOD);
+    distribute(REG_SPAM);
+
     end = time(NULL);
 
     if (verbose) {
@@ -854,7 +907,7 @@ static rc_t bogotune(void)
 	msgs_bad  = props->bad;
 	if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
 	    fprintf(stderr, 
-		    "The wordlist contains %uld non-spam and %uld spam messages.\n"
+		    "The wordlist contains %u non-spam and %u spam messages.\n"
 		    "Bogotune must be run with at least %d of each.\n",
 		    msgs_good, msgs_bad, LIST_COUNT);
 	    exit(EX_ERROR);
@@ -878,11 +931,11 @@ static rc_t bogotune(void)
     ns_cnt = count_messages(ns_msglists);
     sp_cnt = count_messages(sp_msglists);
 
-    if (ns_cnt < min_cnt || sp_cnt < min_cnt) {
+    if (ns_cnt < TEST_COUNT || sp_cnt < TEST_COUNT) {
 	fprintf(stderr, 
-		"The messages sets contain %uld non-spam and %uld spam.  Bogotune "
+		"The messages sets contain %u non-spam and %u spam.  Bogotune "
 		"requires at least %d non-spam and %d spam messages to run.\n",
-		msgs_good, msgs_bad, min_cnt, min_cnt);
+		ns_cnt, sp_cnt, TEST_COUNT, TEST_COUNT);
 	exit(EX_ERROR);
     }
 
