@@ -61,27 +61,24 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     FILE  *out;
     char *t;
 
-    t = create_path_from_env("HOME", BOGODIR);
-    if (t) ok = 1, directory = t;
-    t = create_path_from_env("BOGOFILTER_DIR", NULL);
-    if (t) ok = 1, directory = t;
-
-    if (!ok) {
-	fprintf(stderr, "Neither of HOME or BOGOFILTER_DIR is defined.\n");
-	exit(2);
-    }
-
     exitcode = process_args(argc, argv);
     if (exitcode != 0)
 	exit(exitcode);
+
+    process_config_files();
+
+    if (directory == NULL)
+	directory = create_path_from_env("BOGOFILTER_DIR", NULL);
+    if (directory == NULL)
+	directory = create_path_from_env("BOGODIR", NULL);
+    if (directory == NULL)
+	directory = create_path_from_env("HOME", BOGODIR);
 
     if (check_directory(directory))
 	exit(2);
 
     if (setup_lists(directory, 1.0, 1.0))
 	exit(2);
-
-    process_config_files();
 
     if (*outfname && passthrough) {
 	if ((out = fopen(outfname,"wt"))==NULL)
