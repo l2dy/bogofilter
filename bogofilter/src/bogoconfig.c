@@ -385,8 +385,8 @@ static void help(void)
 	);
     (void)fprintf(stderr,
 		  "\tparameter options:\n"
-		  "\t  -m val [,val] - set user defined min_dev and robs values.\n"
-		  "\t  -o val [,val] - set user defined spam and non-spam cutoff values.\n"
+		  "\t  -m v1[,v2[,v3]] - set user defined min_dev, robs, and robx values.\n"
+		  "\t  -o v1[,v2] - set user defined spam and non-spam cutoff values.\n"
 	);
     (void)fprintf(stderr,
 		  "\tinfo options:\n"
