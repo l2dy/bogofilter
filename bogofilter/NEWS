@@ -5,6 +5,16 @@
 NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
+0.92.8	2004-10-??
+
+	2004-10-13
+
+	* Ignore 'X-Bogosity' lines in mime attachments.
+
+	2004-10-12
+
+	* Revise lexer variables for flex-2.5.31 compatibility.
+
 	2004-10-10
 
 	* OS/2 compatibility fixes for configure, bogofilter, and
@@ -42,6 +52,14 @@ is in the RELEASE.NOTES files.  Read them!!
 	2004-09-10
 
 	* bogofilter-tuning.HOWTO revised and converted to html.
+
+	2004-09-05
+
+	* Ensure that robx computation uses a regular wordlist (rather
+          than an ignore list) to avoid a seg fault in bogotune.
+	  
+	2004-08-30
+	* Remove bogus 'P' in bogolexer's allowed option list.
 
 0.92.6	2004-08-22
 
