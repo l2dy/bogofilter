@@ -702,7 +702,7 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
     int good = mode == REG_GOOD;
     int bad  = 1 - good;
 
-    bool divvy = ds_file == NULL && user_robx < EPS && !msg_count_file;
+    bool divvy = ds_flag == DS_RAM && user_robx < EPS && !msg_count_file;
 
     wordhash_t *train = ns_and_sp->train;
     mlhead_t *msgs = ns_or_sp->msgs;
@@ -934,6 +934,9 @@ static int process_arglist(int argc, char **argv)
 	else
 	    filelist_add( (run_type == REG_GOOD) ? ham_files : spam_files, arg);
     }
+
+    if (ds_flag == DS_NONE)	/* default is "wordlist on disk" */
+	ds_flag = DS_DSK;
 
     if (ds_flag == DS_ERR) {
 	fprintf(stderr, "Only one '-d dir' or '-D' option is allowed.\n");
@@ -1308,7 +1311,7 @@ static bool check_msgcount_parms(void)
 {
     bool ok = true;
 
-    if (ds_file == NULL) {
+    if (ds_flag == DS_RAM) {
 	fprintf(stderr, "A wordlist directory must be specified for converting messages to the message count format.\n");
 	ok = false;
     }
@@ -1423,7 +1426,7 @@ static rc_t bogotune(void)
     sp_cnt = count_messages(sp_msglists);
     cnt = ns_cnt + sp_cnt;
 
-    if (ds_file && !check_msg_counts())
+    if (ds_flag == DS_DSK && !check_msg_counts())
 	exit(EX_ERROR);
 
     fflush(stdout);
@@ -1450,7 +1453,7 @@ static rc_t bogotune(void)
 
     if (user_robx > EPS)
 	robx = user_robx;
-    else if (ds_file != NULL)
+    else if (ds_flag == DS_DSK)
 	robx = get_robx();
 
     /*
@@ -1686,27 +1689,26 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     ham_files  = filelist_new("ham");
     spam_files = filelist_new("spam");
 
-    /* directories from command line and config file are already handled */
-
-    ds_file = get_directory(PR_ENV_BOGO);
-    if (ds_file == NULL)
-	ds_file = get_directory(PR_ENV_HOME);
-
     /* process args and read mailboxes */
     process_arglist(argc, argv);
 
-    if (ds_file) {
+    /* directories from command line and config file are already handled */
+    if (ds_flag == DS_DSK) {
+	if (ds_file == NULL)
+	    ds_file = get_directory(PR_ENV_BOGO);
+	if (ds_file == NULL)
+	    ds_file = get_directory(PR_ENV_HOME);
 	set_bogohome(ds_file);
 	check_wordlist_path();
+	ds_init();
     }
-
-    ds_init();
 
     bogotune();
 
     bogotune_free();
 
-    ds_cleanup();
+    if (ds_flag == DS_DSK)
+	ds_cleanup();
 
     exit(exitcode);
 }
