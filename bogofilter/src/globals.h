@@ -29,6 +29,7 @@ extern	int	Rtable;			/* '-R' */
 extern	bool	terse;			/* '-t' */
 extern	int	bogotest;		/* '-X', env("BOGOTEST") */
 extern	int	verbose;		/* '-v' */
+extern bool	replace_nonascii_characters;	/* '-n' */
 
 /* config file options */
 extern	int	max_repeats;
@@ -55,6 +56,13 @@ extern	const char *const system_config_file;
 /* for msgcounts.c */
 extern	u_int32_t	 msgs_good;
 extern	u_int32_t	 msgs_bad;
+
+/* for passthrough.c */
+extern size_t msg_register_size;
+extern char msg_register[256];
+
+extern bool maintain;
+extern bool onlyprint;
 
 /* from robinson.h */
 #define ROBS		0.010	/* Robinson's s */

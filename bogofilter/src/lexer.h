@@ -60,11 +60,16 @@ extern int	lexer_v3_leng;
 extern char   * lexer_v3_text;
 extern void	lexer_v3_init(FILE *fp);
 
+
 /* in lexer_v4.l */
 extern token_t	lexer_v4_lex(void);
 extern int	lexer_v4_leng;
 extern char   * lexer_v4_text;
 extern void	lexer_v4_init(FILE *fp);
+
+/* in lexer_v?.c */
+extern char yy_get_state(void);
+extern void yy_set_state_initial(void);
 
 /* in lexer.c */
 extern void	yyinit(void);

@@ -13,6 +13,7 @@
 #include <stdlib.h>
 
 #include "base64.h"
+#include "bogoconfig.h"
 #include "bogoreader.h"
 #include "charset.h"
 #include "error.h"
@@ -34,9 +35,7 @@ lexer_t *lexer = NULL;
 
 /* Local Variables */
 
-extern char *spam_header_name;
-
-lexer_t v3_lexer = {
+static lexer_t v3_lexer = {
     lexer_v3_lex,
     &lexer_v3_text,
     &lexer_v3_leng
@@ -54,9 +53,6 @@ static int get_decoded_line(buff_t *buff);
 static int skip_folded_line(buff_t *buff);
 
 /* Function Definitions */
- 
-extern char yy_get_state(void);
-extern void yy_set_state_initial(void);
 
 static void lexer_display_buffer(buff_t *buff)
 {
@@ -149,11 +145,12 @@ static int get_decoded_line(buff_t *buff)
 	}
     }
 
-    if (0) { /* debug */
-	fprintf(dbgout, "%d: ", count);
-	buff_puts(buff, 0, dbgout);
-	fprintf(dbgout, "\n");
-    }
+#if 0
+    /* debug */
+    fprintf(dbgout, "%d: ", count);
+    buff_puts(buff, 0, dbgout);
+    fprintf(dbgout, "\n");
+#endif
 
     if ( !msg_header && msg_state->mime_type != MIME_TYPE_UNKNOWN)
     {
@@ -186,7 +183,7 @@ static int get_decoded_line(buff_t *buff)
 
 static int skip_folded_line(buff_t *buff)
 {
-    while (true) {
+    for(;;) {
 	int count;
 	buff->t.leng = 0;
 	count = reader_getline(buff);
@@ -195,9 +192,9 @@ static int skip_folded_line(buff_t *buff)
   	    return count;
     }
 
-    return EOF;
+/*    return EOF; */
 }
-  
+
 int buff_fill(buff_t *buff, size_t used, size_t need)
 {
     int cnt = 0;

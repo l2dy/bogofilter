@@ -24,23 +24,15 @@ NAME:
 #include "wordhash.h"
 #include "wordlists.h"
 
-extern int Rtable;
-
-static rob_stats_t  rob_stats;
-
-/* Function Prototypes */
-
-/* Static Variables */
-
 /* Function Definitions */
 
 void rob_print_stats(FILE *fp)
 {
     bool unsure = unsure_stats && ((*method->status)() == RC_UNSURE) && verbose;
 
-    fp = NULL; 	/* quench compiler warning */
-    if (Rtable || unsure || verbose >= 2
-	)
+    (void)fp;
+
+    if (Rtable || unsure || verbose >= 2)
 	rstats_print(unsure);
 }
 
@@ -225,8 +217,6 @@ double rob_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 	rstats_fini(robn, P, Q, spamicity );
 
     if (DEBUG_ROBINSON(2)) fprintf(dbgout, "### rob_compute_spamicity() ends\n");
-
-    rob_stats.s.spamicity = spamicity;
 
     return (spamicity);
 }

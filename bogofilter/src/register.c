@@ -16,9 +16,6 @@
 
 #define PLURAL(count) ((count == 1) ? "" : "s")
 
-extern char msg_register[];
-extern size_t msg_register_size;
-
 /*
  * tokenize text on stdin and register it to a specified list
  * and possibly out of another list

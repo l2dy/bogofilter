@@ -18,8 +18,6 @@ AUTHOR:
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-extern char *optarg;
-extern int optind, opterr, optopt;
 
 #include "bogoconfig.h"
 #include "bogoreader.h"
@@ -30,6 +28,7 @@ extern int optind, opterr, optopt;
 #include "mime.h"
 #include "textblock.h"
 #include "token.h"
+#include "format.h"
 #include "xstrdup.h"
 
 const char *progname = "bogolexer";
@@ -38,17 +37,19 @@ const char *progname = "bogolexer";
 
 const char *spam_header_name = SPAM_HEADER_NAME;
 
-/* Function Prototypes */
-
-static void process_args(int argc, char **argv);
-
-void initialize(void);
-
 /* Function Definitions */
 
 static void usage(void)
 {
     fprintf(stderr, "Usage: %s [ -p | -q | -n | -h ]\n", progname);
+}
+
+static void initialize(void)
+{
+    init_charset_table(charset_default, true);
+    mime_reset();
+    token_init();
+    lexer_v3_init(NULL);
 }
 
 static void help(void)
@@ -268,7 +269,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     }
 }
 
-int count=0;
+static int count=0;
 
 int main(int argc, char **argv)
 {
@@ -315,10 +316,3 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void initialize()
-{
-    init_charset_table(charset_default, true);
-    mime_reset();
-    token_init();
-    lexer_v3_init(NULL);
-}

@@ -98,15 +98,15 @@ typedef struct {
     reader_line_t *fcn;
 } sep_2_box_t;
 
-sep_2_box_t sep_2_box[] = {
+static sep_2_box_t sep_2_box[] = {
     { "From ",      	 5, MBOX,  mailbox_getline },
     { "\".MSG_COUNT\"", 12, MC,    mailbox_getline },	/* msg-count */
     { "#! rmail",   	 8, RMAIL, rmail_getline   },
     { "MAIL FROM:", 	10, ANT,   ant_getline     }	/* RISC-OS only */
 };
 
-uint        seplen = 0;
-const char *separator = NULL;
+static uint        seplen = 0;
+static const char *separator = NULL;
 
 static void dir_init(const char *name);
 static void dir_fini(void);
@@ -261,7 +261,8 @@ static bool open_mailstore(const char *name)
 	    mailstore_next_mail = mbox_mode ? mailbox_next_mail : mail_next_mail;
 	    return true;
 	}
-	break; /* not reached */
+	/*NOTREACHED*/
+	break;
     case IS_DIR:
 	if (ismaildir(filename) == IS_DIR) {
 	    /* MAILDIR */
@@ -278,7 +279,8 @@ static bool open_mailstore(const char *name)
 	    mailstore_next_mail = dir_next_mail;
 	    return true;
 	}
-	break; /* notreached */
+	/*NOTREACHED*/
+	break;
     case IS_ERR:
     default:
 	fprintf(stderr, "Can't identify type of mailstore '%s'\n", filename);
@@ -359,7 +361,7 @@ static bool dir_next_mail(void)
     struct dirent *dirent;
     struct stat st;
 
-    while(true) {
+    for(;;) {
 	if (reader_dir == NULL) {
 	    char *x = dir_name;
 	    /* open next directory */

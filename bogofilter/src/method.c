@@ -33,8 +33,6 @@ NAME:
 
 stats_t  *mth_stats;
 
-extern double min_dev;
-
 void mth_initialize(void *s, int _max_repeats, double _min_dev, double _spam_cutoff, double _good_weight)
 {
     mth_stats = (stats_t *) s;

@@ -24,12 +24,6 @@ AUTHOR:
 #include "rstats.h"
 #include "xmalloc.h"
 
-extern int Rtable;
-extern double min_dev;
-
-extern	double	robx;		/* from robinson.c */
-extern	double	robs;		/* from robinson.c */
-
 typedef struct rstats_s rstats_t;
 struct rstats_s {
     rstats_t *next;

@@ -10,15 +10,6 @@ typedef struct
 }
 wh_elt_t;
 
-/* dummy function to satisfy reference in wordhash_degen() */
-void degen(word_t *token, wordcnts_t *cnts);
-void degen(word_t *token, wordcnts_t *cnts)
-{
-    token = NULL;	/* quiet compiler */
-    cnts  = NULL;	/* quiet compiler */
-    return;
-}
-
 /* function definitions */
 
 static void word_init(void *vw){
@@ -26,9 +17,7 @@ static void word_init(void *vw){
      w->count = 0;   
 }
 
-void dump_hash (wordhash_t *);
-
-void
+static void
 dump_hash (wordhash_t * h)
 {
   hashnode_t *p;

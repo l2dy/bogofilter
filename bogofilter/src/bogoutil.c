@@ -18,8 +18,6 @@ AUTHOR:
 #include <errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
-extern char *optarg;
-extern int optind, opterr, optopt;
 
 #include "bogofilter.h"
 #include "bogohist.h"
@@ -406,11 +404,11 @@ static void help(void)
 	    progname, version);
 }
 
-char *ds_file = NULL;
-bool  prob = false;
+static char *ds_file = NULL;
+static bool  prob = false;
 
 typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST } cmd_t;
-cmd_t flag = M_NONE;
+static cmd_t flag = M_NONE;
 
 #define	OPTIONS	":a:c:d:DhH:I:k:l:m:np:r:R:s:vVw:x:X:y:"
 
@@ -568,13 +566,11 @@ static int process_args(int argc, char **argv)
 
 int main(int argc, char *argv[])
 {
-    int count;
-
     progtype = build_progtype(progname, DB_TYPE);
 
     set_today();			/* compute current date for token age */
-    
-    count = process_args(argc, argv);
+
+    (void)process_args(argc, argv);
 
     /* Extra or missing parameters */
     if (flag != M_WORD && argc != optind) {
