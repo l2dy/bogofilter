@@ -65,7 +65,7 @@ static bool check_alphanum(byte *buf, size_t count)
     size_t i;
     for (i=0; i < count; i += 1) {
 	unsigned char c = (unsigned char)buf[i];
-	if (!isalnum(c) && c != '_')
+	if (iscntrl(c) || isspace(c) || ispunct(c))
 	    return false;
     }
     return true;
@@ -245,20 +245,22 @@ int yyinput(byte *buf, size_t max_size)
 
     buff_init(&buff, buf, 0, max_size);
 
-    /* After reading a line of text, check if it starts with lots of 
-     * alphanumerics.  If so, trim some, but leave enough to match a max 
-     * length token.  Then read more text.  
-     * This will ensure that a really long sequence of alphanumerics,
-     * which bogofilter will ignore anyway, doesn't crash the flex lexer.
+    /* After reading a line of text, check if it has special characters.
+     * If not, trim some, but leave enough to match a max  length token.
+     * Then read more text.  This will ensure that a really long sequence
+     * of alphanumerics, which bogofilter will ignore anyway, doesn't crash
+     * the flex lexer.
      */
 
     while (!done) {
 	done = true;
 	count += get_decoded_line(&buff);
 
-	while (count > 2 * MAXTOKENLEN && check_alphanum(buff.t.text, count)) {
+	while (count > (MAXTOKENLEN * 1.5)  && check_alphanum(buff.t.text, count)) {
 	    done = false;
-	    if (count > 2 * MAXTOKENLEN) {
+	    if (count < 2 * MAXTOKENLEN) 
+		break;
+	    else {
 		size_t shift = count - MAXTOKENLEN;
 		memcpy(buff.t.text, buff.t.text + shift, MAXTOKENLEN+D);
 		count = MAXTOKENLEN;
