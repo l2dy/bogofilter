@@ -4,7 +4,7 @@ Bogofilter has been tested and is used on OS-X.
 
 There are two prerequisites for compiling Bogofilter on OS-X.
 1. Berkeley DB
-2. xlc or gcc
+2. xlc or gcc (automatically detected if in the search path)
 
 Berkeley DB is available from Sleepycat Software, at
 <http://www.sleepycat.com/>. Users of the fink package manager can
@@ -18,8 +18,9 @@ For example, users with the HP Gnome Desktop would use 'configure
 --with-libdb-prefix=/opt/gnome'. Fink users would use 'configure
 --with-libdb-prefix-db=/sw/include/db4'.
 
-Bogofilter can be built with either gcc or xlc.  If using xlc, put
-"CC=xlc" at the beginning of the configure command.
+Bogofilter can be built with either gcc or xlc.  The configure script
+checks gcc first, then for xlc, then for cc, and uses the first that is
+found. To override, you can add CC=gcc34 to the configure command line.
 
 Read the INSTALL file for more information and additional options for
 the 'configure' script.
