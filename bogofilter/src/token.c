@@ -174,14 +174,28 @@ token_t get_token(void)
 	    }
 	    break;
 
+	case MESSAGE_ID:
+	    /* special token;  saved for formatted output, but not returned to bogofilter */
+	{
+	    size_t skip = 0;
+	    while (!isspace(yylval->text[skip]))
+		skip += 1;
+	    while (isspace(yylval->text[skip]))
+		skip += 1;
+	    memmove(yylval->text, yylval->text+skip, yylval->leng-skip+D);
+	    yylval->leng -= skip;
+	    word_free(msg_id);
+	    msg_id = word_dup(yylval);
+	}
+	continue;
+
 	case QUEUE_ID:
 	    /* special token;  saved for formatted output, but not returned to bogofilter */
 	    if (queue_id == NULL) {
-		const char *tmp = (const char *)yylval->text;
 		size_t skip = 0;
 		while (isspace(yylval->text[skip]))
 		    skip += 1;
-		if (memcmp(tmp+skip, "id", 2) == 0)
+		if (memcmp(yylval->text+skip, "id", 2) == 0)
 		    skip += 2;
 		while (isspace(yylval->text[skip]))
 		    skip += 1;
@@ -192,7 +206,7 @@ token_t get_token(void)
 	    }
 	    continue;
 
-	case MSGADDR:
+	case MESSAGE_ADDR:
 	{
 	    /* trim brackets */
 	    yylval->leng -= 2;

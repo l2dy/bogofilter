@@ -296,7 +296,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 "<"\!DOCTYPE\ HTML\ PUBLIC\ .*">" 		{ BEGIN HTML; }
 
 {IPADDR}					{ return IPADDR;}
-"\["({IPADDR})"\]"				{ return MSGADDR;}
+"\["({IPADDR})"\]"				{ return MESSAGE_ADDR;}
 
 
 {TOKEN}						{ return TOKEN;}
