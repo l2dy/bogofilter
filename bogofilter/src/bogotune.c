@@ -377,7 +377,7 @@ static bool check_for_high_ns_scores(void)
 
     score_ns(ns_scores);	/* scores in descending order */
 
-    /* want at least 1 high scoring spam for FP determination */
+    /* want at least 1 high scoring non-spam for FP determination */
     if (ns_scores[t-1] < SPAM_CUTOFF)
 	return false;
 
@@ -438,9 +438,9 @@ static bool check_for_low_sp_scores(void)
 {
     uint t = ceil(sp_cnt * check_percent);
 
-    score_sp(sp_scores);			/* get scores */
+    score_sp(sp_scores);	/* get scores */
 
-    /* want at least 1 low scoring ham for FN determination */
+    /* low scoring spam may cause problems ... */
     if (sp_scores[t-1] > HAM_CUTOFF)
 	return false;
 
@@ -534,7 +534,7 @@ static void set_thresh(uint count, double *scores)
     uint   ftarget = 0;
     double cutoff, lgc;
 
-    score_ns(scores);				/* get scores */
+    score_ns(scores);		/* get scores */
 
 /*
 **	Use parabolic curve to fit data
@@ -1161,10 +1161,10 @@ static void final_recommendations(bool skip)
     printf("Performing final scoring:\n");
 
     printf("Spam...  ");
-    score_sp(sp_scores);		/* get scores (in ascending order) */
+    score_sp(sp_scores);	/* get scores (in ascending order) */
 
     printf("Non-Spam...\n");
-    score_ns(ns_scores);		/* get scores (in descending order) */
+    score_ns(ns_scores);	/* get scores (in descending order) */
 
     for(m=0; m<10; ++m) printf("%8.6f %8.6f\n", sp_scores[m], ns_scores[m]);
 
