@@ -17,7 +17,11 @@ if test "x$target_cpu" = "xs390" && test "x$GCC" = "xyes" ; then
     case ${CFLAGS} in
     *-O*)
 	OCFLAGS="$CFLAGS"
-	CFLAGS="`echo \"$CFLAGS\" | sed 's/-O[[s0-9]]\+/-O1/'`"
+	dnl override -Os and -O2 and higher to -O1.
+	dnl this is imperfect, as you can fool it by saying -O04
+	dnl however, you can as well say -O4 -O4 and it will
+	dnl be -O1 and -O4 -- the last one takes precedence in gcc.
+	CFLAGS="`echo \"$CFLAGS\" | sed 's/-O[[s1-9][0-9]]*/-O1/'`"
 	export CFLAGS
 	AC_MSG_NOTICE([GCC for s390: Overriding CFLAGS "$OCFLAGS" to "$CFLAGS".])
     esac
