@@ -1201,7 +1201,8 @@ void *db_get_env(void *vhandle) {
     return handle->dbenv;
 }
 
-int dbe_remove(const char *directory) {
+static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags) {
+    const uint32_t local_flags = flags | DB_CREATE;
     DB_ENV *env;
     int e;
 
@@ -1221,21 +1222,37 @@ int dbe_remove(const char *directory) {
      * environment in heap memory, so we don't need to remove it.
      */
 
-    e = env->open(env, directory, dbenv_defflags | DB_PRIVATE | DB_CREATE | DB_RECOVER, 0664);
+    e = env->open(env, directory,
+	    dbenv_defflags | local_flags | DB_RECOVER, 0664);
     if (e == DB_RUNRECOVERY) {
 	/* that didn't work, try harder */
 	if (DEBUG_DATABASE(0))
 	    fprintf(dbgout, "running catastrophic data base recovery\n");
-	e = env->open(env, directory, dbenv_defflags | DB_PRIVATE | DB_CREATE | DB_RECOVER_FATAL, 0664);
+	e = env->open(env, directory,
+		dbenv_defflags | local_flags | DB_RECOVER_FATAL, 0664);
     }
     if (e) {
 	print_error(__FILE__, __LINE__, "Cannot recover environment \"%s\": %s",
 		directory, db_strerror(e));
 	exit(EX_ERROR);
     }
-    (void)env->close(env, 0); /* FIXME: is ignoring errors right? */
 
-    /* no env->close() here, env->remove() does that for us */
+    return env;
+}
+
+int dbe_remove(const char *directory) {
+    DB_ENV *env = dbe_recover_open(directory, DB_PRIVATE);
+    int e;
+
+    if (!env)
+	exit(EX_ERROR);
+    
+    e = env->close(env, 0);
+    if (e != 0) {
+	print_error(__FILE__, __LINE__, "Error closing environment \"%s\": %s",
+		directory, db_strerror(e));
+	exit(EX_ERROR);
+    }
 
     db_try_glock(directory, F_UNLCK, F_SETLKW); /* release lock */
     return EX_OK;
