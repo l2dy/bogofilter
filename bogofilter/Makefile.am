@@ -4,27 +4,32 @@
 # 1.6: minimum version
 AUTOMAKE_OPTIONS = foreign 1.6
 SUBDIRS = . tests doc contrib
+SYSCONFDIR = @sysconfdir@
 
 # what to build
 bin_PROGRAMS = bogofilter bogoutil bogolexer
 bin_SCRIPTS = bogoupgrade
 check_PROGRAMS = debugtest configtest wordhash find_home.test
 man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1
+sysconf_DATA = bogofilter.cf.example
 
 # what to build that from
 MYCOMMON= xmalloc.h xmalloc.c xstrdup.h xstrdup.c globals.h debug.h \
 	debug.c find_home.h find_home.c find_home_user.c \
 	find_home_tildeexpand.c bogoconfig.h
 
-BUILT_SOURCES = version.h
+BUILT_SOURCES = version.h directories.h
 
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c \
-		     config.c register.c register.h \
+		     config.c directories.h register.c register.h \
 		     graham.c graham.h robinson.c robinson.h \
 		     rstats.h rstats.c \
                      wordhash.h wordhash.c wordlists.h wordlists.c \
 		     $(MYCOMMON) common.h method.h version.h
+
+directories.h: Makefile
+	echo >$@ '#define SYSCONFDIR "$(SYSCONFDIR)"' || rm -f $@
 
 bogolexer_SOURCES = bogolexer.c lexer.l lexer.h $(MYCOMMON)
 
@@ -34,7 +39,8 @@ bogoutil_SOURCES = bogoutil.c \
 		   datastore.h datastore_db.h datastore_db.c wordlists.h wordlists.c \
 		   $(MYCOMMON)
 
-configtest_SOURCES = configtest.c config.c wordlists.c datastore_db.c $(MYCOMMON)
+configtest_SOURCES = configtest.c config.c directories.h wordlists.c \
+		     datastore_db.c $(MYCOMMON)
 
 wordhash_SOURCES = wordhash.c wordhash.h wordhash.main.c $(MYCOMMON)
 
@@ -42,12 +48,17 @@ find_home_test_SOURCES = find_home.test.c $(MYCOMMON)
 
 # what to distribute
 EXTRA_DIST = $(man_MANS) \
-	     bogofilter.cf bogofilter-faq.html \
+	     bogofilter.cf.example bogofilter-faq.html \
 	     README.hp-ux UPGRADE \
-	     bogofilter.xml bogoutil.xml bogoupgrade.xml bogolexer.xml \
+	     bogofilter.xml.in bogoutil.xml bogoupgrade.xml bogolexer.xml \
 	     bogofilter.spec bogofilter.spec.in \
 	     bogoupgrade bogo.R \
-	     version.sh
+	     version.sh \
+	     README.cvs README.freebsd
+#
+bogofilter.xml: bogofilter.xml.in Makefile
+	sed 's}@sysconfdir\@}$(SYSCONFDIR)}g' $< >$@
+CLEANFILES=bogofilter.xml
 #
 VERSION_FROM=main.c bogofilter.c bogoutil.c lexer.l
 $(srcdir)/version.h:	version.sh $(VERSION_FROM)
