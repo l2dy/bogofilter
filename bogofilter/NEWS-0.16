@@ -9,12 +9,9 @@ Note:
 
   Be sure to read RELEASE.NOTES-0.16 !
 
-0.16.5	2004-01-??
+0.16.4	2004-01-31
 
-* Correct processing order as '-V' doesn't need to read the config
-  file.
-* Correct SIGSEGV causes by missing environment variables.
-* Extracted basic typedefs from system.h into bftypes.h.
+* Promoted to "stable".
 
 0.16.4	2004-01-22
 
@@ -27,7 +24,7 @@ Note:
 
 * Removed optional argument from "-u" flag.
 * Config file options can be put on the command line by using
-  "--option=value" syntax.
+  "--key=value" syntax.
 
 0.16.2	2004-01-16
 

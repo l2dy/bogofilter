@@ -1,0 +1,25 @@
+			       =================
+				BOGOFILTER NEWS
+			       =================
+
+Note: 
+
+  Release 0.17.0 is the "Code Clean-up Release - Phase 2".
+
+  Be sure to read RELEASE.NOTES-0.17 !
+
+0.17.0	2004-01-??
+
+* Removed DEPRECATED CODE.
+* Bogoutil now 'and's the maintenance operations together.
+* Bogofilter and bogolexer now use standard long option
+  parsing.
+
+* Extracted basic typedefs from system.h into bftypes.h.
+
+* Correct processing order as '-V' doesn't need to read the
+  config file.
+* Correct SIGSEGV causes by missing environment variables.
+
+0.16.4	2004-01-22 - Released
+	2004-01-31 - Promoted to Stable Version
