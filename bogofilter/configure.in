@@ -1,5 +1,8 @@
 # $Id$
 # $Log$
+# Revision 1.3  2002/09/17 01:51:53  adrian_otto
+# Prepared this snapshot for 0.7.4 release
+#
 # Revision 1.2  2002/09/17 01:30:21  adrian_otto
 # Improved configure script for locking functions, and improved the error
 # messag when the configure script can't find a suitable BerkeleyDB version
@@ -9,7 +12,7 @@
 # 0.7.3 Base Source
 #
 AC_INIT(bogofilter.c)
-AM_INIT_AUTOMAKE(poke, 0.7.3)
+AM_INIT_AUTOMAKE(bogofilter, 0.7.4)
 AM_CONFIG_HEADER(config.h:config.in)
 AC_PROG_CC
 AM_PROG_LEX

@@ -79,7 +79,10 @@ install_sh = @install_sh@
 
 # $Id$ 
 # $Log$
-# Revision 1.6  2002/09/17 01:47:51  adrian_otto
+# Revision 1.7  2002/09/17 01:51:53  adrian_otto
+# Prepared this snapshot for 0.7.4 release
+#
+# Revision 1.5  2002/09/17 01:47:51  adrian_otto
 # Fixed the Makefile configuration so that it knows how to build the man
 # page properly. Updated the man page to reflect the Sourceforge web site,
 # which contains references to ESR's site.
