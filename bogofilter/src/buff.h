@@ -38,8 +38,19 @@ extern void 	buff_free(buff_t *self);
  * room if necessary */
 extern int	buff_add(buff_t *self, word_t *in);
 
+/** read up to a line feed or exhaustion of the buffer capacity,
+ * whichever comes first, from the stdio stream \a in into the buff_t \a
+ * self. */
 #define buff_fgetsl(self, in) buff_fgetsln(self, in, UINT_MAX)
-extern int	buff_fgetsln(buff_t *self, FILE *, uint);
-extern void 	buff_puts(const buff_t *self, uint width, FILE *fp);
+/** read up to \a maxlen characters, a line feed or exhaustion of the
+ * buffer capacity, whichever comes first, from the stdio stream \a in
+ * into the buff_t \a self. */
+extern int	buff_fgetsln(buff_t *self, FILE *in, uint maxlen);
+
+/** print the unread part of the buff_t \a self to the stdio stream fp
+ * by means of word_puts(), which see for meaning of \a width.  */
+extern void 	buff_puts(const buff_t *self,
+	uint width, /**< passed verbatim to word_puts() */
+	FILE *fp);
 
 #endif	/* BUFF_H */
