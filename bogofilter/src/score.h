@@ -1,5 +1,5 @@
 /* $Id$ */
-/*  constants and declarations for robinson method */
+/*  constants and declarations for robinson-fisher method */
 
 #ifndef	FISHER_H
 #define	FISHER_H
