@@ -154,7 +154,7 @@ user_config_file=~/.bogofilter.cf
 
 #wordlist i,ignore,.ignorelist.db,1,0,0
 
-### New Message Formatting Options - 12/01/2002
+### New Message Formatting Options - 2002-12-01
 #
 #	formatting characters:
 #
