@@ -61,8 +61,7 @@ spamicity_tags=1, 0, ?
 spamicity_formats=%6.2e, %6.2e, %0.6f 
 EOF
 
-cnt=`ls $BOGOFILTER_DIR/goodlist.db $BOGOFILTER_DIR/spamlist.db | wc -l | tr -d " "`
-if [ "$cnt" != "2" ] ; then
+if [ ! -f $BOGOFILTER_DIR/goodlist.db -o ! -f $BOGOFILTER_DIR/spamlist.db ] ; then
     echo Distributing messages and making dir $BOGOFILTER_DIR ...
     [ -d $BOGOFILTER_DIR ] || mkdir $BOGOFILTER_DIR
     mkdb 
@@ -126,6 +125,6 @@ done
 # get 10 best results (lowest false negative count)
 (echo "" ; \
 echo "Top 10 results" ; \
-grep fpos < $RESULTS | sort +14n | head -10 ) | tee -a $RESULTS
+grep fpos < $RESULTS | sed "s@\.\.\.@.. @g" | sort -g --key=15 | head -10 ) | tee -a $RESULTS
 
 date "+%m/%d %H:%M:%S"
