@@ -175,7 +175,7 @@
     assumptions of Bayes' theory. Two short answers are: "No, they are
     not satisfied" and "We don't care as long as it works". A longer
     answer will mention that the basic assumption that "an e-mail is a
-    random collection of words, each independent of the others" isn't
+    random collection of words, each independent of the others" is
     violated.  There are other ways that practice doesn't follow
     theory.  Some are always present, and some which will depend on
     the way you use Bogofilter:</p>
@@ -185,13 +185,13 @@
     the opposite is true.</li>
     <li>The words used are not random, though some spammers include random
     words.</li>
-    <li>Simply choosing messages to use for training violates the
-    assumption that the messages used for training are a random sample
-    of the messages received.  Full training or using a random sample,
-    follows Bayes' principles.  This applies to <a
-    href="#train-on-error">training on error</a> or using Bogofilter's
-    auto-update function with the thresh_update parameter or anything
-    similar to those approaches.</li>
+    <li>Full training or using a random sample, follows Bayes'
+    principles. Simply choosing messages to use for training violates
+    the assumption that the training messages are a random sample of
+    the messages received.  This principle is also violated by
+    bogofilter's auto-update function (with the thresh_update
+    parameter), <a href="#train-on-error">training on error</a>, or
+    anything similar to these approaches .</li>
     <li>The same applies if you train with the same message more than once.</li>
     <li>Other problems arise if you modify your database by removing tokens
     (like using bogoutil with -a or -c).</li>
@@ -272,8 +272,8 @@
     value, messages which are close to a cutoff will be used for
     training.  Using security margins improves results when training
     on error.  In general, greater margins help more (although too
-    much is bad).  As a rule of thumb spam cutoff +/- 0.3 gives good
-    results; for tristate mode. You might try the middle of the unsure
+    much isn't optimal).  As a rule of thumb spam cutoff +/- 0.3 gives good
+    results.  For tristate mode, you might try the middle of the unsure
     interval +/- 0.3 for training.</p>
 
     <p>Repeating training on error on the same message corpus can
