@@ -56,9 +56,22 @@ bool is_from(word_t *w)
     return (w->leng >= 5 && memcmp(w->text, "From ", 5) == 0);
 }
 
+static bool check_alphanum(byte *buf, size_t count)
+{
+    size_t i;
+    for (i=0; i < count; i += 1) {
+	unsigned char c = (unsigned char)buf[i];
+	if (!isalnum(c) && c != '_')
+	    return false;
+    }
+    return true;
+}
+
 static int lgetsl(buff_t *buff)
 {
-    int count = buff_fgetsl(buff, fpin);
+    int count = 0;
+
+    count += buff_fgetsl(buff, fpin);
     yylineno += 1;
 
     /* Special check for message separator.
@@ -221,10 +234,34 @@ void yyinit(void)
 int yyinput(byte *buf, size_t max_size)
 /* input getter for the scanner */
 {
-    int i, count;
+    int i, count = 0;
     buff_t buff;
+
+    bool done = false;
+
     buff_init(&buff, buf, 0, max_size);
-    count = get_decoded_line(&buff);
+
+    /* After reading a line of text, check if it starts with lots of 
+     * alphanumerics.  If so, trim some, but leave enough to match a max 
+     * length token.  Then read more text.  
+     * This will ensure that a really long sequence of alphanumerics,
+     * which bogofilter will ignore anyway, doesn't crash the flex lexer.
+     */
+
+    while (!done) {
+	done = true;
+	count += get_decoded_line(&buff);
+
+	while (count > 2 * MAXTOKENLEN && check_alphanum(buff.t.text, count)) {
+	    done = false;
+	    if (count > 2 * MAXTOKENLEN) {
+		size_t shift = count - MAXTOKENLEN;
+		memcpy(buff.t.text, buff.t.text + shift, MAXTOKENLEN+D);
+		count = MAXTOKENLEN;
+		buff.t.leng = MAXTOKENLEN;
+	    }	
+	}
+    }
 
     /* do nothing if in header */
 
