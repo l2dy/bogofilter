@@ -19,7 +19,7 @@ NAME:
 
 #define	MASK_BIT(uc)	( 1 << (uc - 'A'))
 
-#define BIT_NAMES	"abcdfghlmstw"
+#define BIT_NAMES	"abcdghlmrstw"
 #define BIT_ALGORITHM	MASK_BIT('A')
 #define BIT_READER	MASK_BIT('B')
 #define BIT_CONFIG	MASK_BIT('C')
