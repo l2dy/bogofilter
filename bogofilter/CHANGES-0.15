@@ -4,9 +4,12 @@
 
 $Id$
 
+0.15.2	2003-09-07
+
 	2003-09-06
 
 	* Header line unfolding now handled by flex rules.
+	  Special thanks to Michael O'Reilly for his help!
 	* Initial release of RISC-OS support, including qdbm and tdb.
 	* QDBM is now supported.
 	* The data base configuration has changed. --with-tdb is gone,
@@ -17,7 +20,7 @@ $Id$
 
 	* Update bogowordfreq to work with bogoreader.
 	* Fatal flex errors are now caught and bogofilter exits
-          gracefully.
+          gracefully after closing its database(s).
 
 0.15.1	2003-09-03
 

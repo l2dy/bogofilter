@@ -2,19 +2,20 @@
 				BOGOFILTER NEWS
 			       =================
 
-2003-09-06
+0.15.2	2003-09-07
 
 * Header line unfolding now handled by flex rules.
+  Special thanks to Michael O'Reilly for his help!
+* Fatal flex errors are now caught and bogofilter exits
+  gracefully after closing its database(s).
+
 * Initial release of RISC-OS support, including qdbm and tdb.
 * QDBM is now supported.
 * The data base configuration has changed. --with-tdb is gone,
   use --with-database=db, --with-database=tdb or
   --with-database=qdbm instead.
 
-2003-09-05
-
-* Update bogowordfreq to work with bogoreader.
-* Fatal flex errors are now caught and bogofilter exits gracefully.
+* Updated bogowordfreq to work with bogoreader.
 
 0.15.1	2003-09-03
 
