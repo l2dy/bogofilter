@@ -4,6 +4,19 @@
 
 $Id$
 
+0.11.1.2
+
+	2003-03-06
+	* Fixed bogoutil's broken maintenance mode.
+	* Update bogofilter documentation and FAQ.
+	* Explicitly check linking against libdb early to avoid unspecific
+	  error messages as "cannot determine size of unsigned short".
+	* Retry locking without mmap() on systems that return the old-fashioned
+	  EACCES rather than EAGAIN for locking failures such as AIX 4.3.3.
+	* Fix potential division by zero in histogram generator, it caused
+	  program abort after not handling floating point exceptions on some
+	  architectures such as Alpha. The division by zero is now avoided.
+
 0.11.1.1 2003-03-05
 
 	* Fixed flaw that caused user config file to be ignored.
