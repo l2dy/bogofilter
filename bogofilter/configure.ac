@@ -334,6 +334,13 @@ AC_HEADER_TIME
 AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h stdlib.h string.h sys/socket.h unistd.h sys/file.h stddef.h sys/time.h sys/select.h inttypes.h stdint.h])
 AC_CHECK_HEADERS([limits.h float.h],,[AC_CHECK_HEADERS(values.h)])
 
+AC_C_INLINE
+if test "$ac_cv_c_inline" != no ; then
+    AC_DEFINE(HAVE_INLINE,1,[Define to 1 if your compiler supports inline])
+    AC_SUBST(HAVE_INLINE)
+fi
+
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_PID_T
@@ -439,6 +446,8 @@ if test "$sysconfdir" = "\${prefix}/etc" \
     AC_MSG_NOTICE([use --sysconfdir to override.])
     )
 fi
+
+AM_PATH_GSL(1.4, AC_DEFINE(HAVE_GSL_14,,[Define if you have GNU Scientific Library 1.4 or newer]))
 
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 AC_CONFIG_FILES([Makefile \

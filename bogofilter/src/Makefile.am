@@ -50,6 +50,7 @@ regression_SOURCES= ../trio/regression.c
 endif
 
 LDADD = libbogofilter.a @LIBOBJS@
+bogofilter_LDADD = $(LDADD) $(GSL_LIBS)
 
 # what to build that from
 libbogofilter_a_SOURCES= \
