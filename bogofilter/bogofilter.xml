@@ -30,7 +30,7 @@
   <arg choice='opt'>-v</arg>
   <arg choice='opt'>-V</arg>
   <arg choice='opt'>-x <replaceable>flags</replaceable></arg>
-
+  <arg choice='opt'>-q</arg>
 </cmdsynopsis>
 
 </refsynopsisdiv>
@@ -187,6 +187,9 @@ exits.</para>
 
 <para>The <option>-x</option> option allows setting of debug classes for 
 printing debug messages.</para>
+
+<para>The <option>-q</option> option prevents bogofilter from reading
+    configuration files.</para>
 </refsect1>
 
 <refsect1 id='environment'><title>ENVIRONMENT</title>

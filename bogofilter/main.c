@@ -144,12 +144,14 @@ int validate_args(/*@unused@*/ int argc, /*@unused@*/ char **argv)
     return 0;
 }
 
+static int quell_config_read = 0;
+
 int process_args(int argc, char **argv)
 {
     int option;
     int exitcode;
 
-    while ((option = getopt(argc, argv, "d:ehlsnSNvVpugR:rx:")) != EOF)
+    while ((option = getopt(argc, argv, "d:ehlsnSNvVpugqR:rx:")) != EOF)
     {
 	switch(option)
 	{
@@ -184,7 +186,7 @@ int process_args(int argc, char **argv)
 	case 'h':
 	    (void)printf( "\n" );
 	    (void)printf( "Usage: bogofilter [options] < message\n" );
-	    (void)printf( "\t-h\t- print this help message.\n" );
+	    (void)printf( "\t-h\t- print this help message and exit.\n" );
 	    (void)printf( "\t-d path\t- specify directory for wordlists.\n" );
 	    (void)printf( "\t-p\t- passthrough.\n" );
 	    (void)printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
@@ -192,8 +194,10 @@ int process_args(int argc, char **argv)
 	    (void)printf( "\t-n\t- register message as non-spam.\n" );
 	    (void)printf( "\t-S\t- move message's words from non-spam list to spam list.\n" );
 	    (void)printf( "\t-N\t- move message's words from spam list to spam non-list.\n" );
-	    (void)printf( "\t-v\t- set debug verbosity level.\n" );
-	    (void)printf( "\t-V\t- print version info.\n" );
+	    (void)printf( "\t-v\t- set verbosity level.\n" );
+	    (void)printf( "\t-x LIST\t- set debug flags.\n" );
+	    (void)printf( "\t-V\t- print version information and exit.\n" );
+	    (void)printf( "\t-q\t- prevent reading configuration files.\n" );
 	    (void)printf( "\n" );
 	    (void)printf( "bogofilter is a tool for classifying email as spam or non-spam.\n" );
 	    (void)printf( "\n" );
@@ -246,6 +250,10 @@ int process_args(int argc, char **argv)
 	case 'x':
 	    set_debug_mask( optarg );
 	    break;
+
+	case 'q':
+	    quell_config_read = 1;
+	    break;
 	}
     }
 
@@ -271,8 +279,10 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     if (setup_lists(directory, GOOD_BIAS, 1.0))
 	exit(2);
 
-    read_config_file( system_config_file );
-    read_config_file( user_config_file );
+    if (!quell_config_read) {
+	read_config_file( system_config_file );
+	read_config_file( user_config_file );
+    }
 
     switch(run_type) {
 	case RUN_NORMAL:
