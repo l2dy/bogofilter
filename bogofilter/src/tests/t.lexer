@@ -5,4 +5,4 @@
 cat ${srcdir}/inputs/lexer.inp | $BOGOLEXER -p -C \
 | tee ${TMPDIR}/lexer.tmp | sort | uniq > ${TMPDIR}/lexer.out
 
-cmp ${srcdir}/outputs/lexer.out ${TMPDIR}/lexer.out
+cmp ${OUTPUTS}/lexer.out ${TMPDIR}/lexer.out

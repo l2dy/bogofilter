@@ -12,6 +12,7 @@
 #		tests   - directory containing individual output files
 
 NODB=1 . ${srcdir=.}/t.frame
+OUTPUTS=${SYSTEST}/outputs
 
 MSG="${SYSTEST}/inputs/msg.parsing.txt"
 flaglist="IhT-2"
@@ -30,11 +31,12 @@ if  [ $verbose -ne 0 ]; then
     wc -l ${TMPDIR}/parsing.sor
 fi
 
-OUT="${srcdir}/outputs/parsing.out"
+OUT="${OUTPUTS}/parsing.out"
+
 if  [ $verbose -eq 0 ]; then
-    cmp $OUT ${TMPDIR}/`basename $OUT`
+    cmp $OUT ${TMPDIR}/parsing.out
 else
-    diff $DIFF_BRIEF $OUT ${TMPDIR}/`basename $OUT`
+    diff $DIFF_BRIEF $OUT ${TMPDIR}/parsing.out
 fi
 
 map_rc()
