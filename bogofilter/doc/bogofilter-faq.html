@@ -8,6 +8,10 @@
 	margin-top: 1em;
 	font-size: 125%;
       }
+      h3 {
+	margin-top: 1em;
+	font-size: 110%;
+      }
       p {
         margin-top : 0.5em;
         margin-bottom: 0.5em;
@@ -30,9 +34,6 @@
       dt {
 	margin-top: 0.5em;
 	margin-bottom: 0;
-      }
-      p.subheading {
-	font-weight: bold
       }
       hr {
 	margin-top: 1em;
@@ -227,6 +228,12 @@
     is an effective way to train; if you train bogofilter on the hard
     messages, it learns to handle obvious spam and non-spam too.</p>
 
+    <p>This method can be enhanced by using a "security margin".  By
+    increasing the spam cutoff value and decreasing the ham cutoff
+    value, messages which are close to a cutoff will be used for
+    training. Using security margins was shown to improve results when
+    training on error.</p>
+
     <p>"Training to exhaustion" is repeating training on error, with
     the same message corpus, until no errors remain.</p>
 
@@ -246,7 +253,8 @@
 
     <p>Note: <code>bogominitrain.pl</code> has a <code>-f</code> option
     to do "training to exhaustion".  If you choose to use it, you need
-    to be aware of its possible effects.</p>
+    to be aware of its possible effects. Using <code>-fn</code> avoids
+    repeated training for each message.</p>
 
     <hr>
 
@@ -267,9 +275,6 @@
     smaller your training collection is, the higher the number of
     errors bogofilter will make in production. Let's assume your
     collection is two mbox files:  ham.mbx and spam.mbx.</p>
-
-    <p>If your database size needs to be small, for example due to
-    quota limitations), use methods 2 or 3.</p>
 
     <ul>
     <li><p>Method 1) Full training. Train bogofilter with all your messages. In
@@ -297,11 +302,12 @@
     certainty). Since the script makes sure the database understands
     your training collection &quot;exactly&quot; (with your chosen
     precision), it works very well. You can use <code>-o</code> to
-    create an interval around your spam_cutoff. Assuming
-    spam_cutoff=0.6 and an interval of 0.1 is wanted, our example
-    is:</p>
+    create a security margin around your spam_cutoff. Assuming
+    spam_cutoff=0.6 you might want to score all ham in your
+    collection below 0.3 and all spam above 0.8. Our example is:</p>
 
-    <pre>	bogominitrain.pl -fnv ~/.bogofilter ham.mbx spam.mbx '-o 0.7,0.5'</pre></li>
+    <pre>	bogominitrain.pl -fnv ~/.bogofilter ham.mbx spam.mbx '-o 0.8,0.3'</pre></li>and an interval of 0.1 is wanted, our example
+    is:</p>
 
     <li><p>Method 3) Use the script randomtrain (in the contrib
     directory). The script generates a list of all the messages in the
@@ -353,6 +359,18 @@
         rm -f corpus.*</pre></li>
     </ul>
 
+    <h3>Comparing these methods</h3>
+
+    <p>It is important to understand the consequences of the methods
+    just described. Doing full training as in methods 1 and 4 produces
+    a larger database than does training with methods 2 or 3.  If your
+    database size needs to be small (for example due to quota
+    limitations), use methods 2 or 3.</p>
+
+    <p>Full training with method 1 is fastest. Training on error (as
+    in methods 2, 3 and 4) is effective, but learning is pretty
+    slow.</p>
+
     <hr>
 
     <h2 id="production">How can I keep the scoring accuracy high?</h2>
@@ -402,9 +420,7 @@
     training database, train with the good, the bad, and the separated
     errors and unsures; thereafter, train with only the separated and
     unsures, discarding the messages that bogofilter already
-    classifies correctly.  This method is likely to give a
-    near-optimal discrimination power with the minimum number of
-    messages processed.</p>
+    classifies correctly.</p>
 
     <p>Note that you should periodically run:</p>
 
@@ -692,7 +708,7 @@
     "http://sourceforge.net/project/showfiles.php?group_id=62265">portable
     version</a> of bogofilter.</p>
 
-    <p class="subheading">On Solaris</p>
+    <h3>On Solaris</h3>
 
     <p>Unpack it, and then do:</p>
     <pre>	$ ./configure --with-db=/usr/local/BerkeleyDB.4.1
@@ -709,7 +725,7 @@
     Either build in the source directory (as suggested above) or
     use GNU make (gmake).</p>
 
-    <p class="subheading">On FreeBSD</p>
+    <h3>On FreeBSD</h3>
 
     <p>The FreeBSD ports and packages carry very recent versions of
     bogofilter. This approach uses the highly recommended
@@ -722,7 +738,7 @@
     your portstree using cvsup</a>, then type:</p>
     <pre>	# portupgrade -N bogofilter</pre>
 
-    <p class="subheading">On HP-UX</p>
+    <h3>On HP-UX</h3>
 
     <p>See the file
     <a href="http://cvs.sourceforge.net/viewcvs.py/*checkout*/bogofilter/bogofilter/doc/programmer/README.hp-ux?rev=HEAD&amp;content-type=text/plain">doc/programmer/README.hp-ux</a>
