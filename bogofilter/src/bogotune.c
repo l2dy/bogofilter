@@ -770,8 +770,14 @@ static void usage(void)
 static void print_version(void)
 {
     (void)fprintf(stderr,
-		  "%s version %s\n", 
-		  progname, version);
+		  "%s version %s\n"
+		  "    Database: %s\n"
+		  "Copyright (C) 2002-2004 Greg Louis, David Relson\n\n"
+		  "%s comes with ABSOLUTELY NO WARRANTY.\n"
+		  "This is free software, and you are welcome to redistribute\n"
+		  "it under the General Public License.\n"
+		  "See the COPYING file with the source distribution for details.\n\n",
+		  progtype, version);
 }
 
 static void help(void)
