@@ -65,8 +65,6 @@ AUTHOR:
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-#define PROGNAME "bogotune"
-
 #define	MSG_COUNT	".MSG_COUNT"
 
 #define	TEST_COUNT	500	/* minimum allowable message count */

@@ -42,14 +42,60 @@ typedef struct {
     } addr;
 } parm_desc;
 
+typedef enum arg_pass_e {
+    PASS_1 = 1,		/* argc,argv pass - first  pass */
+    PASS_2 = 2,		/* argc,argv pass - second pass */
+    PASS_F = 4		/* config file options ...      */
+} arg_pass_t;
+
+typedef enum arg_source_e {
+    CFG_FILE,
+    CMD_LINE
+} arg_source_t;
+
+enum field_e {
+    N,		/* no_argument		(or 0) if the option does not take an argument, */
+    R,		/* required_argument	(or 1) if the option requires an argument, */
+    O		/* optional_argument 	(or 2) if the option takes an optional argument. */
+};
+
+typedef enum longopts_e {
+    O_IGNORE = 1000,
+    O_BLOCK_ON_SUBNETS,
+    O_BOGOFILTER_DIR,
+    O_CHARSET_DEFAULT,
+    O_HAM_CUTOFF,
+    O_HEADER_FORMAT,
+    O_LOG_HEADER_FORMAT,
+    O_LOG_UPDATE_FORMAT,
+    O_MIN_DEV,
+    O_REPLACE_NONASCII_CHARACTERS,
+    O_ROBS,
+    O_ROBX,
+    O_SPAM_CUTOFF,
+    O_SPAM_HEADER_NAME,
+    O_SPAM_SUBJECT_TAG,
+    O_SPAMICITY_FORMATS,
+    O_SPAMICITY_TAGS,
+    O_STATS_IN_HEADER,
+    O_TERSE,
+    O_TERSE_FORMAT,
+    O_THRESH_UPDATE,
+    O_TIMESTAMP,
+    O_UNSURE_SUBJECT_TAG,
+    O_USER_CONFIG_FILE
+} longopts_t;
+
 /* Global variables */
 
 extern const parm_desc sys_parms[];
 extern const parm_desc *usr_parms;
 
-void remove_comment(const char *line);
-bool process_config_files(bool warn_on_error);
-bool process_config_option(char *arg, bool warn_on_error, priority_t precedence);
-bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, priority_t precedence);
+extern void remove_comment(const char *line);
+extern bool process_config_files(bool warn_on_error);
+extern bool process_config_option(const char *arg, bool warn_on_error, priority_t precedence);
+extern bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, priority_t precedence);
+extern bool process_config_option_and_val(const char *name, const char *val, bool warn_on_error, priority_t precedence);
+extern bool process_config_option_as_arg(const char *arg, const char *val, priority_t precedence);
 
 #endif

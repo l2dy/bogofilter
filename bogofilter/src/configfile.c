@@ -26,6 +26,7 @@ AUTHOR:
 #include "error.h"
 #include "find_home.h"
 #include "format.h"
+#include "getopt.h"
 #include "lexer.h"
 #include "maint.h"
 #include "wordlists.h"
@@ -72,127 +73,52 @@ void remove_comment(const char *line)
     return;
 }
 
-static bool process_config_parameter(const parm_desc *arg, char *val, priority_t precedence)
-/* returns true if ok, false if error */
+bool process_config_option(const char *arg, bool warn_on_error, priority_t precedence)
 {
+    uint pos;
     bool ok = true;
-    if (arg->addr.v == NULL)
-	return ok;
-    switch (arg->type)
-    {
-	case CP_BOOLEAN:
-	    {
-		*arg->addr.b = str_to_bool(val);
-		if (DEBUG_CONFIG(2))
-		    fprintf(dbgout, "%s -> %s\n", arg->name,
-			    *arg->addr.b ? "Yes" : "No");
-		break;
-	    }
-	case CP_INTEGER:
-	    {
-		remove_comment(val);
-		if (!xatoi(arg->addr.i, val))
-		    return false;
-		if (DEBUG_CONFIG(2))
-		    fprintf(dbgout, "%s -> %d\n", arg->name, *arg->addr.i);
-		break;
-	    }
-	case CP_DOUBLE:
-	    {
-		remove_comment(val);
-		if (!xatof(arg->addr.d, val))
-		    return false;
-		if (DEBUG_CONFIG(2))
-		    fprintf(dbgout, "%s -> %f\n", arg->name, *arg->addr.d);
-		break;
-	    }
-	case CP_STRING:
-	    {
-		*arg->addr.s = xstrdup(val);
-		if (DEBUG_CONFIG(2))
-		    fprintf(dbgout, "%s -> '%s'\n", arg->name, *arg->addr.s);
-		break;
-	    }
-	case CP_DIRECTORY:
-	    {
-		char *dir = tildeexpand(val, true);
-		if (DEBUG_CONFIG(2))
-		    fprintf(dbgout, "%s -> '%s'\n", arg->name, dir);
-		if (setup_wordlists(dir, precedence) != 0)
-		    exit(EX_ERROR);
-		xfree(dir);
-		break;
-	    }
-	case CP_FUNCTION:
-	{
-	    ok = (*arg->addr.f)((unsigned char *)val);
-	    if (DEBUG_CONFIG(2))
-		fprintf(dbgout, "%s -> '%s'\n", arg->name, val);
-	    break;
-	}
-	default:
-	{
-	    ok = false;
-	    break;
-	}
-    }
-    return ok;
-}
 
-static bool process_config_line(char *line,
-				char *val,
-				const parm_desc *parms, 
-				priority_t precedence )
-/* returns true if parm is processed, false if not */
-{
-    const parm_desc *arg;
-
-    if (parms == NULL)
-	return false;
-
-    for ( arg = parms; arg->name != NULL; arg += 1 )
-    {
-	if (DEBUG_CONFIG(2))
-	    fprintf(dbgout, "Testing:  %s\n", arg->name);
-	if (strcmp(arg->name, line) == 0)
-	{
-	    bool ok = process_config_parameter(arg, val, precedence);
-	    if (ok && DEBUG_CONFIG(1))
-		fprintf(dbgout, "%s\n", "   Found it!");
-	    return ok;
-	}
-    }
-    return false;
-}
-
-bool process_config_option(char *arg, bool warn_on_error, priority_t precedence)
-/* returns true if ok, false if error */
-{
-    const char delim[] = " \t=";
     char *val = NULL;
-    bool ok = true;
+    char *opt = xstrdup(arg);
+    const char delim[] = " \t=";
 
-    if (strcspn(arg, delim) < strlen(arg)) { /* if delimiter present */
-	val = arg + strcspn(arg, delim);
+    pos = strcspn(arg, delim);
+    if (pos < strlen(arg)) { 		/* if delimiter present */
+	val = opt + pos;
 	*val++ = '\0';
 	val += strspn(val, delim);
     }
 
-    if (val == NULL ||
-	(! process_config_line(arg, val, usr_parms, precedence ) &&
-	 ! process_config_line(arg, val, sys_parms, precedence ) &&
-	 ! process_config_line(arg, val, format_parms, precedence )))
-    {
+    if (val == NULL || 
+	!process_config_option_as_arg(opt, val, precedence)) {
 	ok = false;
- 	if (warn_on_error)
+	if (warn_on_error)
 	    fprintf(stderr, "Error - bad parameter '%s'\n", arg);
     }
 
+    xfree(opt);
     return ok;
 }
 
+bool process_config_option_as_arg(const char *opt, const char *val, priority_t precedence)
+{
+    int idx = 0;
+    size_t len = strlen(opt);
+
+    for (idx = 0; ; idx += 1) {
+	const char *s = long_options[idx].name;
+	if (s == NULL)
+	    break;
+	if (strlen(s) != len || strncasecmp(s, opt, len) != 0)
+	    continue;
+	process_arg(long_options[idx].val, s, val, precedence, PASS_F, CFG_FILE);
+	return true;
+    }
+
+    return false;
+}
+
 bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, priority_t precedence)
-/* returns true if ok, false if error */
 {
     bool ok = true;
     int lineno = 0;
@@ -218,9 +144,9 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
     {
 	size_t len;
 	char buff[MAXBUFFLEN];
-
+	
 	memset(buff, '\0', sizeof(buff));		/* for debugging */
-
+	
 	lineno += 1;
 	if (fgets(buff, sizeof(buff), fp) == NULL)
 	    break;
@@ -239,7 +165,7 @@ bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, 
 
     if (ferror(fp)) {
 	fprintf(stderr, "Error reading file \"%s\"\n.", filename);
-	    ok = false;
+	ok = false;
     }
 
     (void)fclose(fp); /* we're just reading, so fclose should succeed */

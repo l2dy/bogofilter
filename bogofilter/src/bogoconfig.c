@@ -18,6 +18,7 @@ CONTRIBUTORS:
 #include "common.h"
 
 #include <ctype.h>
+#include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -31,6 +32,7 @@ extern int optind, opterr, optopt;
 #include "bogoreader.h"
 #include "bool.h"
 #include "charset.h"
+#include "configfile.h"
 #include "datastore.h"
 #include "error.h"
 #include "find_home.h"
@@ -67,63 +69,129 @@ const char *logtag = NULL;
 
 /* Local variables and declarations */
 
+static int inv_terse_mode = 0;
+
 static void display_tag_array(const char *label, FIELD *array);
 
-static void process_args_1(int argc, char **argv);
-static void process_args_2(int argc, char **argv);
+static void process_args(int argc, char **argv, priority_t precedence, int pass);
 static bool get_parsed_value(char **arg, double *parm);
 static void comma_parse(char opt, const char *arg, double *parm1, double *parm2, double *parm3);
 
-/* externs for query_config() */
-
-extern double robx, robs;
+static void help(void);
+static void print_version(void);
 
 /*---------------------------------------------------------------------------*/
 
-/* Notes:
-**
-**	For options specific to algorithms, the algorithm files contain
-**		a parm_desc struct giving their particulars.
-**
-**	The addr field is NULL for options processed by special functions
-**		and on dummy entries for options private to algorithms
-**		so config.c won't generate an error message.
-*/
-
-static char *directory;
-
-const parm_desc sys_parms[] =
-{
-    { "stats_in_header",  CP_BOOLEAN,	{ (void *) &stats_in_header } },
-    { "user_config_file", CP_STRING,	{ &user_config_file } },
-
-    { "bogofilter_dir",	  CP_DIRECTORY,	{ &directory } },
-    { "wordlist",	  CP_FUNCTION,	{ (void *) &configure_wordlist } },
-    { "update_dir",	  CP_STRING,	{ &update_dir } },
-
-    { "min_dev",	  CP_DOUBLE,	{ (void *) &min_dev } },
-    { "spam_cutoff",	  CP_DOUBLE,	{ (void *) &spam_cutoff } },
-    { "thresh_update",	  CP_DOUBLE,	{ (void *) &thresh_update } },
-    { "robx",		  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
-    { "robs",		  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
-    { "ham_cutoff",	  CP_FUNCTION,	{ (void *) NULL } },	/* Robinson-Fisher */
-
-    { "block_on_subnets", 	     CP_BOOLEAN, { (void *) &block_on_subnets } },
-    { "charset_default",  	     CP_STRING,  { &charset_default } },
-    { "timestamp",		     CP_BOOLEAN, { (void *) &timestamp_tokens } },
-    { "replace_nonascii_characters", CP_BOOLEAN, { (void *) &replace_nonascii_characters } },
-
-    { "db_cachesize",	  	     CP_INTEGER, { (void *) &db_cachesize } },
-    { "terse",	 	  	     CP_BOOLEAN, { (void *) &terse } },
-
-    { NULL,		  	     CP_NONE,	 { (void *) NULL } },
+struct option long_options[] = {
+    { "classify-files",			N, 0, 'B' },
+    { "syslog-tag",			N, 0, 'L' },
+    { "classify-mbox",			N, 0, 'M' },
+    { "unregister-nonspam",		N, 0, 'N' },
+    { "dataframe",			N, 0, 'R' },
+    { "unregister-spam",		N, 0, 'S' },
+    { "fixed-terse-format",		N, 0, 'T' },
+    { "report-unsure",			N, 0, 'U' },
+    { "version",			N, 0, 'V' },
+    { "classify-stdin",			N, 0, 'b' },
+    { "bogofilter_dir",			N, 0, 'd' },
+    { "ham",				N, 0, 'e' },
+    { "help",				N, 0, 'h' },
+    { "db_cachesize",			N, 0, 'k' },
+    { "use-syslog",			N, 0, 'l' },
+    { "register-ham",			N, 0, 'n' },
+    { "passthrough",			N, 0, 'p' },
+    { "register-spam",			N, 0, 's' },
+    { "terse",				N, 0, 't' },
+    { "update-as-classed",		N, 0, 'u' },
+    { "timestamp-date",			N, 0, 'y' },
+    { "config-file",			R, 0, 'c' },
+    { "no-config-file",			N, 0, 'C' },
+    { "debug-flags",			R, 0, 'x' },
+    { "debug-to-stdout",		N, 0, 'D' },
+    { "no-header-tags",			N, 0, 'H' },
+    { "input-file",			N, 0, 'I' },
+    { "output-file",			N, 0, 'O' },
+    { "query",				N, 0, 'Q' },
+    { "verbosity",			N, 0, 'v' },
+    { "block_on_subnets",		R, 0, O_BLOCK_ON_SUBNETS },
+    { "bogofilter_dir",			R, 0, O_BOGOFILTER_DIR },
+    { "charset_default",		R, 0, O_CHARSET_DEFAULT },
+    { "ham_cutoff",			R, 0, O_HAM_CUTOFF },
+    { "header_format",			R, 0, O_HEADER_FORMAT },
+    { "log_header_format",		R, 0, O_LOG_HEADER_FORMAT },
+    { "log_update_format",		R, 0, O_LOG_UPDATE_FORMAT },
+    { "min_dev",			R, 0, O_MIN_DEV },
+    { "replace_nonascii_characters",	R, 0, O_REPLACE_NONASCII_CHARACTERS },
+    { "robs",				R, 0, O_ROBS },
+    { "robx",				R, 0, O_ROBX },
+    { "spam_cutoff",			R, 0, O_SPAM_CUTOFF },
+    { "spam_header_name",		R, 0, O_SPAM_HEADER_NAME },
+    { "spam_subject_tag",		R, 0, O_SPAM_SUBJECT_TAG },
+    { "spamicity_formats",		R, 0, O_SPAMICITY_FORMATS },
+    { "spamicity_tags",			R, 0, O_SPAMICITY_TAGS },
+    { "stats_in_header",		R, 0, O_STATS_IN_HEADER },
+    { "terse",				R, 0, O_TERSE },
+    { "terse_format",			R, 0, O_TERSE_FORMAT },
+    { "thresh_update",			R, 0, O_THRESH_UPDATE },
+    { "timestamp",			R, 0, O_TIMESTAMP },
+    { "unsure_subject_tag",		R, 0, O_UNSURE_SUBJECT_TAG },
+    { "user_config_file",		R, 0, O_USER_CONFIG_FILE },
+    { NULL,				0, 0, 0 }
 };
+
+static bool get_bool(const char *name, const char *arg)
+{
+    bool b = str_to_bool(arg);
+    if (DEBUG_CONFIG(2))
+	fprintf(dbgout, "%s -> %s\n", name,
+		b ? "Yes" : "No");
+    return b;
+}
+
+static bool get_double(const char *name, const char *arg, double *d)
+{
+    remove_comment(arg);
+    if (!xatof(d, arg))
+	return false;
+    if (DEBUG_CONFIG(2))
+	fprintf(dbgout, "%s -> %f\n", name, *d);
+    return true;
+}
+
+static char *get_string(const char *name, const char *arg)
+{
+    char *s = xstrdup(arg);
+    if (DEBUG_CONFIG(2))
+	fprintf(dbgout, "%s -> '%s'\n", name, s);
+    return s;
+}
+
+static void set_bogofilter_dir(const char *name, const char *arg, int precedence)
+{
+    char *dir = tildeexpand(arg, true);
+    if (DEBUG_CONFIG(2))
+	fprintf(dbgout, "%s -> '%s'\n", name, dir);
+    if (setup_wordlists(dir, precedence) != 0)
+	exit(EX_ERROR);
+    xfree(dir);
+    return;
+}
 
 void process_args_and_config_file(int argc, char **argv, bool warn_on_error)
 {
-    process_args_1(argc, argv);
+    bogotest = 0;
+    verbose = 0;
+    run_type = RUN_UNKNOWN;
+    fpin = stdin;
+    dbgout = stderr;
+    set_today();		/* compute current date for token age */
+
+    method = (method_t *) &rf_fisher_method;
+    usr_parms = method->config_parms;
+
+    process_args(argc, argv, PR_COMMAND, PASS_1);
     process_config_files(warn_on_error);
-    process_args_2(argc, argv);
+    process_args(argc, argv, PR_COMMAND, PASS_2);
 
     /* directories from command line and config file are already handled */
 
@@ -202,95 +270,163 @@ static int validate_args(void)
     return EX_OK;
 }
 
+typedef struct {
+    const char *shortname;
+    const char *longname;
+    parm_t	type;
+    union
+    {
+	void	*v;
+	func	*f;
+	bool	*b;
+	int	*i;
+	double	*d;
+	char	*c;
+	char   **s;
+    } addr;
+} option_names_t;
+
+/*
+option_names_t option_names[] = {
+    { "-h",  "--help",					  CP_FUNCTION,	{ (void *) &help } },
+    { "-V",  "--version",				  CP_FUNCTION,	{ (void *) &print_version } },
+    { "-Q",  "--query",					  CP_FUNCTION,	{ (void *) &query } },
+    { "-p",  "--passthrough",				  CP_TRUE,	{ (void *) &passthrough } },
+    { "-e",  "--ham-true",				  CP_TRUE,	{ (void *) &nonspam_exits_zero } },
+    { "-u",  "--update-as-classed",			  CP_FUNCTION,	{ (void *) &run_update } },
+    { "-M",  "--classify-mbox",				  CP_TRUE,	{ (void *) &mbox_mode } },
+    { "-b",  "--classify-stdin",			  CP_FUNCTION,	{ (void *) &set_stdin } },
+    { "-B",  "--classify-files=nCme1,name2,...",	  CP_FUNCTION,	{ (void *) &set_filenames } },
+    { "-R",  "--dataframe",				  CP_FUNCTION,	{ (void *) &set_dataframe } },
+    { "-s",  "--register-spam",				  CP_FUNCTION,	{ (void *) &reg_spam } },
+    { "-n",  "--register-ham",				  CP_FUNCTION,	{ (void *) &reg_good } },
+    { "-S",  "--unregister-spam",			  CP_FUNCTION,	{ (void *) &unreg_spam } },
+    { "-N",  "--unregister-nonspam",			  CP_FUNCTION,	{ (void *) &unreg_good } },
+    { "-c",  "--config-file=file",			  CP_FUNCTION,	{ (void *) &set_configfile } },
+    { "-C",  "--no-config-file",			  CP_FUNCTION,	{ (void *) &set_no_configfile } },
+    { "-d",  "--bogofilter_dir=path",			  CP_STRING,	{ (void *) &path } },
+    { "-H",  "--no-header-tags",			  CP_FALSE,	{ (void *) &header_line_markup } },
+    { "-k",  "--db_cachesize=size",			  CP_INTEGER,	{ (void *) &size } },
+    { "-l",  "--use-syslog",				  CP_TRUE,	{ (void *) &syslog } },
+    { "-L",  "--syslog-tag=tag",			  CP_STRING,	{ (void *) &tag } },
+    { "-I",  "--input-file=file",			  CP_FUNCTION,	{ (void *) &bogoreader_name } },
+    { "-O",  "--output-file=file",			  CP_FUNCTION,	{ (void *) &set_outfname } },
+    { "-m v1[,v2[,v3]]"," --min_dev=v1, --robs=v2, --robx=v3", CP_NONE,	{ (void *) NULL } },
+    { "-o v1[,v2]",     "--spam_cutoff=v1, --ham_cutoff=v2",   CP_NONE,	{ (void *) NULL } },
+    { "-t",  "--terse",					  CP_IMMD_FUNC,	{ (void *) &set_terse } },
+    { "-T",  "--fixed-terse-format",			  CP_IMMD_FUNC,	{ (void *) &set_inv_terse_mode } },
+    { "-U",  "--report-unsure=bool",			  CP_BOOLEAN,	{ (void *) &unsure_stats } },
+    { "-v",  "--verbosity",				  CP_IMMD_FUNC,	{ (void *) &increment_verbosity } },
+    { "-y",  "--timestamp-date",			  CP_IMMD_FUNC,	{ (void *) &set_string_date } },
+    { "-D",  "--debug-to-stdout",			  CP_FUNCTION,	{ (void *) &set_dbgout } },
+    { "-x list",  "--debug-flags=list",			  CP_IMMD_FUNC,	{ (void *) &set_debug_mask } }
+};
+*/
+
+static const char *help_text[] = {
+    "help options:\n",
+    "  -h,                       - print this help message.\n",
+    "  -V, --version             - print version information and exit.\n",
+    "  -Q, --query               - query (display) bogofilter configuration.\n",
+    "classification options:\n",
+    "  -p, --passthrough         - passthrough.\n",
+    "  -e, --ham-true            - in -p mode, exit with code 0 when the mail is not spam.\n",
+    "  -u, --update-as-classified- classify message as spam or non-spam and register accordingly.\n",
+    "  -M, --clasify-mbox        - set mailbox mode.  Classify multiple messages in an mbox formatted file.\n",
+    "  -b, --clasify-stdin       - set streaming bulk mode. Process multiple messages whose filenames are read from STDIN.\n",
+    "  -B, --classify-files=list - set bulk mode. Process multiple messages named as files on the command line.\n",
+    "  -R, --dataframe           - print an R data frame.\n",
+    "registration options:\n",
+    "  -s, --register-spam       - register message(s) as spam.\n",
+    "  -n, --register-ham        - register message(s) as non-spam.\n",
+    "  -S, --unregister-spam     - unregister message(s) from spam list.\n",
+    "  -N, --unregister-nonspam  - unregister message(s) from non-spam list.\n",
+    "general options:\n",
+    "  -c, --config-file=file    - read specified config file.\n",
+    "  -C, --no-config-file      - don't read standard config files.\n",
+    "  -d, --bogofilter_dir=path - specify directory for wordlists.\n",
+    "  -H, --no-header-tags      - disables header line tagging.\n",
+    "  -k, --db_cachesize=size   - set BerkeleyDB cache size (MB).\n",
+    "  -l, --use-syslog          - write messages to syslog.\n",
+    "  -L, --syslog-tag=tag      - specify the tag value for log messages.\n",
+    "  -I, --input-file=file     - read message from 'file' instead of stdin.\n",
+    "  -O, --output-file=file    - save message to 'file' in passthrough mode.\n",
+    "parameter options:\n",
+    "  -m,  --min_dev=v1, --robs=2, --robx=v3v1[,v2[,v3]]\n",
+    "                            - set user defined min_dev, robs, and robx values.\n",
+    "  -o, --spam_cutoff=v1, --ha_cutoff=v2v1[,v2]\n",
+    "                           - set user defined spam and non-spam cutoff values.\n",
+    "info options:\n",
+    "  -t, --terse               - set terse output mode.\n",
+    "  -T, --fixed-terse-format  - set invariant terse output mode.\n",
+    "  -U, --report-unsure       - print statistics if spamicity is 'unsure'.\n",
+    "  -v, --verbosity           - set debug verbosity level.\n",
+    "  -y, --timestamp-date      - set date for token timestamps.\n",
+    "  -D, --debug-to-stdout     - direct debug output to stdout.\n",
+    "  -x, --debug-flags=list    - set flags to display debug information.\n",
+    "config file options:\n",
+    "  --option=value - can be used to set the value of a config file option.\n",
+    "                   see bogofilter.cf.example for more info.\n",
+    "  --block_on_subnets                return class addr tokens\n",
+    "  --bogofilter_dir                  directory for wordlists\n",
+    "  --charset_default                 default character set\n",
+    "  --db_cachesize                    Berkeley db cache in Mb\n",
+    "  --degen_enabled                   if no match, simplify\n",
+    "  --first_match                     if degen use first match\n",
+    "  --ham_cutoff                      nonspam if score below\n",
+    "  --header_format                   spam header format\n",
+    "  --log_header_format               header written to log\n",
+    "  --log_update_format               logged on update\n",
+    "  --min_dev                         ignore if score near\n",
+    "  --replace_nonascii_characters     substitute '?' if bit8 is 1\n",
+    "  --robs                            Robinson's s parameter\n",
+    "  --robx                            Robinson's x\n",
+    "  --spam_cutoff                     spam if score above this\n",
+    "  --spam_header_name                passthrough adds/replaces\n",
+    "  --spam_subject_tag                passthrough prepends Subject\n",
+    "  --spamicity_formats               spamicity output format\n",
+    "  --spamicity_tags                  spamicity tag format\n",
+    "  --stats_in_header                 use header not body\n",
+    "  --terse                           report in short form\n",
+    "  --terse_format                    short form\n",
+    "  --thresh_update                   no update if near 0 or 1\n",
+    "  --timestamp                       apply token timestamps\n",
+    "  --unsure_subject_tag              like spam_subject_tag\n",
+    "  --user_config_file                configuration file\n",
+    "\n",
+    "bogofilter is a tool for classifying email as spam or non-spam.\n",
+    "\n",
+    "For updates and additional information, see\n",
+    "URL: http://bogofilter.sourceforge.net\n",
+    NULL
+};
+
 static void help(void)
 {
+    uint i;
     (void)fprintf(stderr,
-		  "%s version %s\n"
-		  "\n"
-		  "Usage:  %s [options] < message\n",
-		  progtype, version, PACKAGE
-    );
-    (void)fprintf(stderr,
-		  "\thelp options:\n"
-		  "\t  -h      - print this help message.\n"
-		  "\t  -V      - print version information and exit.\n"
-		  "\t  -Q      - query (display) bogofilter configuration.\n"
+                  "%s version %s\n"
+                  "\n"
+                  "Usage:  %s [options] < message\n",
+                  progtype, version, PACKAGE
 	);
-    (void)fprintf(stderr,
-		  "\tclassification options:\n"
-		  "\t  -p      - passthrough.\n"
-		  "\t  -e      - in -p mode, exit with code 0 when the mail is not spam.\n"
-		  "\t  -u      - classify message as spam or non-spam and register accordingly.\n"
-	);
-    (void)fprintf(stderr, "%s",
-		  "\t  -M      - set mailbox mode.  Classify multiple messages in an mbox formatted file.\n"
-		  "\t  -b      - set streaming bulk mode. Process multiple messages whose filenames are read from STDIN.\n"
-		  "\t  -B name1 name2 ... - set bulk mode. Process multiple messages named as files on the command line.\n"
-		  "\t  -R      - print an R data frame.\n"
-	);
-    (void)fprintf(stderr, "%s",
-		  "\tregistration options:\n"
-		  "\t  -s      - register message(s) as spam.\n"
-		  "\t  -n      - register message(s) as non-spam.\n"
-		  "\t  -S      - unregister message(s) from spam list.\n"
-		  "\t  -N      - unregister message(s) from non-spam list.\n"
-	);
-    (void)fprintf(stderr,
-		  "\tgeneral options:\n"
-		  "\t  -c file - read specified config file.\n"
-		  "\t  -C      - don't read standard config files.\n"
-		  "\t  -d path - specify directory for wordlists.\n"
-		  "\t  -k size - set BerkeleyDB cache size (MB).\n"
-		  "\t  -l      - write messages to syslog.\n"
-		  "\t  -L tag  - specify the tag value for log messages.\n"
-		  "\t  -I file - read message from 'file' instead of stdin.\n"
-		  "\t  -O file - save message to 'file' in passthrough mode.\n"
-		  );
-    (void)fprintf(stderr, "%s",
-		  "\tparameter options:\n"
-		  "\t  -m v1[,v2[,v3]] - set user defined min_dev, robs, and robx values.\n"
-		  "\t  -o v1[,v2] - set user defined spam and non-spam cutoff values.\n"
-	);
-    (void)fprintf(stderr, "%s",
-		  "\tinfo options:\n"
-		  "\t  -t      - set terse output mode.\n"
-		  "\t  -T      - set invariant terse output mode.\n"
-		  "\t  -U      - print statistics if spamicity is 'unsure'.\n"
-		  "\t  -v      - set debug verbosity level.\n"
-		  "\t  -y      - set date for token timestamps.\n"
-		  "\t  -D      - direct debug output to stdout.\n"
-		  "\t  -x list - set flags to display debug information.\n"
-	);
-    (void)fprintf(stderr, "%s",
-		  "\tconfig file options:\n"
-		  "\t  --option=value - can be used to set the value of a config file option.\n"
-		  "\t                   see bogofilter.cf.example for more info.\n"
-	);
-    (void)fprintf(stderr, "%s",
-		  "\n"
-		  "bogofilter is a tool for classifying email as spam or non-spam.\n"
-		  "\n"
-		  "For updates and additional information, see\n"
-		  "URL: http://bogofilter.sourceforge.net\n");
+    for (i=0; help_text[i] != NULL; i++)
+	(void)fprintf(stderr, "%s", help_text[i]);
 }
 
 static void print_version(void)
 {
     (void)fprintf(stderr,
 		  "%s version %s\n"
-		  "    Database: %s\n",
-		  progtype, version, ds_version_str());
-
-    (void)fprintf(stderr,
+		  "    Database: %s\n"
 		  "Copyright (C) 2002-2004 Eric S. Raymond,\n"
 		  "David Relson, Matthias Andree, Greg Louis\n\n"
 		  "%s comes with ABSOLUTELY NO WARRANTY.  "
 		  "This is free software, and\nyou are welcome to "
 		  "redistribute it under the General Public License.  "
 		  "See\nthe COPYING file with the source distribution for "
-		  "details.\n"
-		  "\n",
-		  PACKAGE);
+		  "\n", 
+		  progtype, version, ds_version_str(), PACKAGE);
 }
 
 #define	OPTIONS	":-:bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pqQRrsStTuUvVx:X:y:"
@@ -304,22 +440,33 @@ static void print_version(void)
  ** there are leftover command line arguments.
  */
 
-void process_args_1(int argc, char **argv)
+static void process_args(int argc, char **argv, priority_t precedence, int pass)
 {
     int option;
     ex_t exitcode;
 
-    bogotest = 0;
-    verbose = 0;
-    run_type = RUN_UNKNOWN;
-    fpin = stdin;
-    dbgout = stderr;
-    set_today();		/* compute current date for token age */
-    method = (method_t *) &rf_fisher_method;
-    usr_parms = method->config_parms;
+    if (pass != PASS_1) {
+	optind = opterr = 1;
+	/* don't use #ifdef here: */
+#if HAVE_DECL_OPTRESET
+	optreset = 1;
+#endif
+    }
 
-    while ((option = getopt(argc, argv, OPTIONS)) != -1)
+    while (1) 
     {
+	int option_index = 0;
+	int this_option_optind = optind ? optind : 1;
+	const char *name;
+
+	option = getopt_long(argc, argv, OPTIONS,
+			     long_options, &option_index);
+
+	if (option == -1)
+	    break;
+
+	name = (option_index == 0) ? argv[this_option_optind] : long_options[option_index].name;
+
 #if 0
 	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
 	    fprintf(stderr, "config: option=%c (%d), optind=%d, opterr=%d, optarg=%s\n", 
@@ -327,226 +474,252 @@ void process_args_1(int argc, char **argv)
 		    optind, opterr, optarg ? optarg : "(null)");
 	}
 #endif
-	switch(option)
-	{
 
-	case 'b':
-	    bulk_mode = B_STDIN;
-	    fpin = NULL;	/* Ensure that input file isn't stdin */
-	    break;
-
-	case 'B':
-	    bulk_mode = B_CMDLINE;
-	    break;
-
-	case 'c':
-	    read_config_file(optarg, false, !quiet, PR_CFG_USER);
-
-	/*@fallthrough@*/
-	/* fall through to suppress reading config files */
-
-	case 'C':
-	    suppress_config_file = true;
-	    break;
-
-	case 'D':
-	    dbgout = stdout;
-	    break;
-
-	case 'e':
-	    nonspam_exits_zero = true;
-	    break;
-
-	case 'h':
-	    help();
-            exit(EX_OK);
-
-	case 'I':
-	    bogoreader_name(optarg);
-	    break;
-
-	case 'L':
-	    logtag = optarg;
-	    /*@fallthrough@*/
-
-	case 'l':
-	    logflag = true;
-	    break;
-
-	case 'M':
-	    mbox_mode = true;
-	    break;
-
-	case 'n':
-	    run_type = check_run_type(REG_GOOD, REG_SPAM | UNREG_GOOD);
-	    break;
-
-	case 'N':
-	    run_type = check_run_type(UNREG_GOOD, REG_GOOD | UNREG_SPAM);
-	    break;
-
-        case 'O':
-	    xstrlcpy(outfname, optarg, sizeof(outfname));
-	    break;
-
-	case 'p':
-	    passthrough = true;
-	    break;
-
-	case 'Q':
-	    query = true;
-	    break;
-
-	case 'R':
-	    Rtable = 1;
-	    break;
-
-	case 's':
-	    run_type = check_run_type(REG_SPAM, REG_GOOD | UNREG_SPAM);
-	    break;
-
-	case 'S':
-	    run_type = check_run_type(UNREG_SPAM, REG_SPAM | UNREG_GOOD);
-	    break;
-
-	case 'u':
-	    run_type |= RUN_UPDATE;
-	    break;
-	
-	case 'U':
-	    unsure_stats = true;
-	    break;
-
-	case 'v':
-	    verbose++;
-	    break;
-
-        case 'V':
-	    print_version();
-	    exit(EX_OK);
-
-	case 'x':
-	    set_debug_mask( optarg );
-	    break;
-
-        case 'X':
-	    /* 'L' - enable lexer_v3 debug output  */
-	    set_bogotest( optarg );
-	    break;
-
-	case 'y':		/* date as YYYYMMDD */
-	    set_date( string_to_date((char *)optarg) );
-	    break;
-
-	case ':':
-	    fprintf(stderr, "Option -%c requires an argument.\n", optopt);
-	    exit(EX_ERROR);
-
-	case '?':
-	    fprintf(stderr, "Unknown option -%c.\n", optopt);
-	    exit(EX_ERROR);
-	}
+	process_arg(option, name, optarg, precedence, pass, CMD_LINE);
     }
 
-    if (run_type == RUN_UNKNOWN)
-	run_type = RUN_NORMAL;
+    if (pass == PASS_1) {
+	if (run_type == RUN_UNKNOWN)
+	    run_type = RUN_NORMAL;
+    }
 
-    exitcode = validate_args();
-    if (exitcode) 
-	exit(exitcode);
+    if (pass == PASS_2) {
+	exitcode = validate_args();
+	if (exitcode) 
+	    exit(exitcode);
 
-    if (bulk_mode == B_NORMAL && optind < argc) {
-	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
-	exit(EX_ERROR);
+	if (bulk_mode == B_NORMAL && optind < argc) {
+	    fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
+	    exit(EX_ERROR);
+	}
+
+	if (inv_terse_mode) {
+	    verbose = max(1, verbose); 	/* force printing */
+	    set_terse_mode_format(inv_terse_mode);
+	}
     }
 
     return;
 }
 
-void process_args_2(int argc, char **argv)
+void process_arg(int option, const char *name, const char *val, priority_t precedence, arg_pass_t pass, arg_source_t src)
 {
-    int option;
-    ex_t exitcode;
-    int inv_terse_mode = 0;
-
-    optind = opterr = 1;
-    /* don't use #ifdef here: */
-#if HAVE_DECL_OPTRESET
-    optreset = 1;
-#endif
-
-    while ((option = getopt(argc, argv, OPTIONS)) != -1)
+    switch (option)
     {
-#if 0
-	if (getenv("BOGOFILTER_DEBUG_OPTIONS")) {
-	    fprintf(stderr, "config: option=%c (%d), optind=%d, opterr=%d, optarg=%s\n", 
-		    isprint((unsigned char)option) ? option : '_', option, 
-		    optind, opterr, optarg ? optarg : "(null)");
-	}
-#endif
-	switch(option)
-	{
-	case '-':
-	    process_config_option(optarg, true, PR_COMMAND);
-	    break;
+    case 'b':
+	bulk_mode = B_STDIN;
+	fpin = NULL;	/* Ensure that input file isn't stdin */
+	break;
 
-	case 'd':
-	{
-	    char *dir = optarg;
-	    if (setup_wordlists(dir, PR_COMMAND) != 0)
-		exit(EX_ERROR);
-	    break;
-	}
+    case 'B':
+	bulk_mode = B_CMDLINE;
+	break;
 
-	case 'H':
-	    header_line_markup = false;
-	    break;
+    case 'c':
+	if (pass == PASS_1)
+	    read_config_file(val, false, !quiet, PR_CFG_USER);
 
-	case 'k':
-	    db_cachesize=atoi(optarg);
-	    break;
+	/*@fallthrough@*/
+	/* fall through to suppress reading config files */
 
-	case 'm':
-	    comma_parse(option, optarg, &min_dev, &robs, &robx);
+    case 'C':
+	if (pass == PASS_1)
+	    suppress_config_file = true;
+	break;
+
+    case O_USER_CONFIG_FILE:
+	user_config_file = get_string(name, val);
+	break;
+
+    case 'D':
+	dbgout = stdout;
+	break;
+
+    case 'e':
+	nonspam_exits_zero = true;
+	break;
+
+    case 'h':
+	help();
+	exit(EX_OK);
+
+    case 'I':
+	if (pass == PASS_1)
+	    bogoreader_name(val);
+	break;
+
+    case 'L':
+	logtag = val;
+	/*@fallthrough@*/
+
+    case 'l':
+	logflag = true;
+	break;
+
+    case 'M':
+	mbox_mode = true;
+	break;
+
+    case 'n':
+	run_type = check_run_type(REG_GOOD, REG_SPAM | UNREG_GOOD);
+	break;
+
+    case 'N':
+	run_type = check_run_type(UNREG_GOOD, REG_GOOD | UNREG_SPAM);
+	break;
+
+    case 'O':
+	if (pass == PASS_1)
+	    xstrlcpy(outfname, val, sizeof(outfname));
+	break;
+
+    case 'p':
+	passthrough = true;
+	break;
+
+    case 'Q':
+	query = true;
+	break;
+
+    case 'R':
+	Rtable = 1;
+	break;
+
+    case 's':
+	run_type = check_run_type(REG_SPAM, REG_GOOD | UNREG_SPAM);
+	break;
+
+    case 'S':
+	run_type = check_run_type(UNREG_SPAM, REG_SPAM | UNREG_GOOD);
+	break;
+
+    case 'u':
+	run_type |= RUN_UPDATE;
+	break;
+	
+    case 'U':
+	unsure_stats = true;
+	break;
+
+    case 'v':
+	if (pass == PASS_1)
+	    verbose++;
+	break;
+
+    case 'x':
+	set_debug_mask( val );
+	break;
+
+    case 'X':
+	set_bogotest( val );
+	break;
+
+    case 'y':		/* date as YYYYMMDD */
+	set_date( string_to_date(val) );
+	break;
+
+    case ':':
+	fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+	exit(EX_ERROR);
+
+    case '?':
+	fprintf(stderr, "Unknown option '%s'.\n", name);
+	exit(EX_ERROR);
+
+    case '-':
+	if (pass == PASS_2)
+	    process_config_option(val, true, precedence);
+	break;
+
+    case O_BOGOFILTER_DIR:
+	set_bogofilter_dir(name, val, precedence);
+	break;
+
+    case 'd':
+	if (setup_wordlists(val, precedence) != 0)
+	    exit(EX_ERROR);
+	break;
+
+    case 'H':
+	header_line_markup = false;
+	break;
+
+    case 'k':
+	db_cachesize=atoi(val);
+	break;
+
+    case 'm':
+	if (pass != PASS_1) {
+	    comma_parse(option, val, &min_dev, &robs, &robx);
 	    if (DEBUG_CONFIG(1))
 		printf("md %6.4f, rs %6.4f, rx %6.4f\n", min_dev, robs, robx);
-	    break;
+	}
+	break;
 
-	case 'o':
-	    comma_parse(option, optarg, &spam_cutoff, &ham_cutoff, NULL);
+    case O_MIN_DEV:
+	if (pass != PASS_1)
+	    get_double(name, val, &min_dev);
+	break;
+
+    case O_ROBS:
+	if (pass != PASS_1)
+	    get_double(name, val, &robs);
+	break;
+
+    case O_ROBX:
+	if (pass != PASS_1)
+	    get_double(name, val, &robx);
+	break;
+
+    case 'o':
+	if (pass != PASS_1) {
+	    comma_parse(option, val, &spam_cutoff, &ham_cutoff, NULL);
 	    if (DEBUG_CONFIG(1))
 		printf("sc %6.4f, hc %6.4f\n", spam_cutoff, ham_cutoff);
-	    break;
-
-	case 't':
-	    terse = true;
-	    break;
-
-	case 'T':			/* invariant terse mode */
-	    terse = true;
-	    inv_terse_mode += 1;
-	    break;
 	}
+	break;
+
+    case O_SPAM_CUTOFF:
+	if (pass != PASS_1)
+	    get_double(name, val, &spam_cutoff);
+	break;
+
+    case O_HAM_CUTOFF:
+	if (pass != PASS_1)
+	    get_double(name, val, &ham_cutoff);
+	break;
+
+    case 't':
+	terse = true;
+	break;
+
+    case 'T':			/* invariant terse mode */
+	terse = true;
+	if (pass == PASS_1)
+	    inv_terse_mode += 1;
+	break;
+
+    case 'V':
+	print_version();
+	exit(EX_OK);
+	
+    case O_BLOCK_ON_SUBNETS:		block_on_subnets = get_bool(name, val);			break;
+    case O_CHARSET_DEFAULT:		charset_default = get_string(name, val);		break;
+    case O_HEADER_FORMAT:		header_format = get_string(name, val);			break;
+    case O_LOG_HEADER_FORMAT:		log_header_format = get_string(name, val);		break;
+    case O_LOG_UPDATE_FORMAT:		log_update_format = get_string(name, val);		break;
+    case O_REPLACE_NONASCII_CHARACTERS:	replace_nonascii_characters = get_bool(name, val);	break;
+    case O_SPAMICITY_FORMATS:		set_spamicity_formats(val);				break;
+    case O_SPAMICITY_TAGS:		set_spamicity_tags(val);				break;
+    case O_SPAM_HEADER_NAME:		spam_header_name = get_string(name, val);		break;
+    case O_SPAM_SUBJECT_TAG:		spam_subject_tag = get_string(name, val);		break;
+    case O_STATS_IN_HEADER:		stats_in_header = get_bool(name, val);			break;
+    case O_TERSE:			terse = get_bool(name, val);				break;	
+    case O_TERSE_FORMAT:		terse_format = get_string(name, val);			break;
+    case O_THRESH_UPDATE:		get_double(name, val, &thresh_update);			break;
+    case O_TIMESTAMP:			timestamp_tokens = get_bool(name, val);			break;
+    case O_UNSURE_SUBJECT_TAG:		unsure_subject_tag = get_string(name, val);		break;
     }
-
-    if (run_type == RUN_UNKNOWN)
-	run_type = RUN_NORMAL;
-
-    exitcode = validate_args();
-    if (exitcode) 
-	exit(exitcode);
-
-    if (bulk_mode == B_NORMAL && optind < argc) {
-	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
-	exit(EX_ERROR);
-    }
-
-    if (inv_terse_mode) {
-	verbose = max(1, verbose); 	/* force printing */
-	set_terse_mode_format(inv_terse_mode);
-    }
-
-    return;
 }
 
 #define YN(b) (b ? "yes" : "no")

@@ -14,6 +14,7 @@ AUTHOR:
 #include "common.h"
 
 #include <ctype.h>
+#include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -26,9 +27,10 @@ extern int optind, opterr, optopt;
 #include "charset.h"
 #include "configfile.h"
 #include "lexer.h"
+#include "mime.h"
 #include "textblock.h"
 #include "token.h"
-#include "mime.h"
+#include "xstrdup.h"
 
 const char *progname = "bogolexer";
 
@@ -36,22 +38,9 @@ const char *progname = "bogolexer";
 
 const char *spam_header_name = SPAM_HEADER_NAME;
 
-const parm_desc sys_parms[] =
-{
-    { "stats_in_header",		CP_BOOLEAN,	{ (void *) &stats_in_header } },
-    { "user_config_file",		CP_STRING,	{ &user_config_file } },
-    { "block_on_subnets",		CP_BOOLEAN,	{ (void *) &block_on_subnets } },
-    { "charset_default",		CP_STRING,	{ &charset_default } },
-    { "replace_nonascii_characters",	CP_BOOLEAN,	{ (void *) &replace_nonascii_characters } },
-    { NULL,				CP_NONE,	{ (void *) NULL } },
-};
-
-const parm_desc format_parms[] =
-{
-    { NULL, CP_NONE, { (void *) NULL } },
-};
-
 /* Function Prototypes */
+
+static void process_args(int argc, char **argv);
 
 void initialize(void);
 
@@ -74,6 +63,7 @@ static void help(void)
 	    "\t-v\t- set verbosity level.\n"
 	    "\t-c file\t- read specified config file.\n"
 	    "\t-C\t- don't read standard config files.\n"
+	    "\t-H\t- disables header line tagging.\n"
 	    "\t-I file\t- read message from file instead of stdin.\n"
 	    "\t-x list\t- set debug flags.\n"
 	    "\t-D\t- direct debug output to stdout.\n");
@@ -93,8 +83,61 @@ static void print_version(void)
 		  "redistribute it under the General Public License.  "
 		  "See\nthe COPYING file with the source distribution for "
 		  "details.\n"
-		  "\n",
+		  "\n", 
 		  progname, version, PACKAGE);
+}
+
+struct option long_options[] = {
+    { "config-file",			N, 0, 'c' },
+    { "no-config-file",			N, 0, 'C' },
+    { "debug-flags",			R, 0, 'x' },
+    { "debug-to-stdout",		N, 0, 'D' },
+    { "no-header-tags",			N, 0, 'H' },
+    { "input-file",			N, 0, 'I' },
+    { "output-file",			N, 0, 'O' },
+    { "query",				N, 0, 'Q' },
+    { "verbosity",			N, 0, 'v' },
+    { "block_on_subnets",		R, 0, O_IGNORE },
+    { "bogofilter_dir",			R, 0, O_IGNORE },
+    { "charset_default",		R, 0, O_IGNORE },
+    { "ham_cutoff",			R, 0, O_IGNORE },
+    { "header_format",			R, 0, O_IGNORE },
+    { "log_header_format",		R, 0, O_IGNORE },
+    { "log_update_format",		R, 0, O_IGNORE },
+    { "min_dev",			R, 0, O_IGNORE },
+    { "replace_nonascii_characters",	R, 0, O_REPLACE_NONASCII_CHARACTERS },
+    { "robs",				R, 0, O_IGNORE },
+    { "robx",				R, 0, O_IGNORE },
+    { "spam_cutoff",			R, 0, O_IGNORE },
+    { "spam_header_name",		R, 0, O_IGNORE },
+    { "spam_subject_tag",		R, 0, O_IGNORE },
+    { "spamicity_formats",		R, 0, O_IGNORE },
+    { "spamicity_tags",			R, 0, O_IGNORE },
+    { "stats_in_header",		R, 0, O_IGNORE },
+    { "terse",				R, 0, O_IGNORE },
+    { "terse_format",			R, 0, O_IGNORE },
+    { "thresh_update",			R, 0, O_IGNORE },
+    { "timestamp",			R, 0, O_IGNORE },
+    { "unsure_subject_tag",		R, 0, O_IGNORE },
+    { "user_config_file",		R, 0, O_USER_CONFIG_FILE },
+    { NULL,				0, 0, 0 }
+};
+
+static bool get_bool(const char *name, const char *arg)
+{
+    bool b = str_to_bool(arg);
+    if (DEBUG_CONFIG(2))
+	fprintf(dbgout, "%s -> %s\n", name,
+		b ? "Yes" : "No");
+    return b;
+}
+
+static char *get_string(const char *name, const char *arg)
+{
+    char *s = xstrdup(arg);
+    if (DEBUG_CONFIG(2))
+	fprintf(dbgout, "%s -> '%s'\n", name, s);
+    return s;
 }
 
 #define	OPTIONS	":c:CDhHI:npP:qvVx:X:m"
@@ -115,78 +158,113 @@ static void process_args(int argc, char **argv)
     fpin = stdin;
     dbgout = stderr;
 
-    while ((option = getopt(argc, argv, OPTIONS)) != -1)
+    while (1)
     {
-	switch (option)
-	{
-	case ':':
-	    fprintf(stderr, "Option -%c requires an argument.\n", optopt);
-	    exit(EX_ERROR);
+	int option_index = 0;
+	int this_option_optind = optind ? optind : 1;
+	const char *name;
 
-	case '?':
-	    fprintf(stderr, "Unknown option -%c.\n", optopt);
-	    exit(EX_ERROR);
+	option = getopt_long(argc, argv, OPTIONS,
+			     long_options, &option_index);
 
-	case 'c':
-	    read_config_file(optarg, false, false, PR_COMMAND);
-	    /*@fallthrough@*/
-	    /* fall through to suppress reading config files */
-
-	case 'C':
-	    suppress_config_file = true;
+	if (option == -1)
 	    break;
 
-	case 'D':
-	    dbgout = stdout;
-	    break;
-
-	case 'h':
-	    help();
-	    exit(EX_OK);
-
-	case 'H':
-	    header_line_markup = false;
-	    break;
-
-	case 'I':
-	    bogoreader_name(optarg);
-	    break;
-
-	case 'n':
-	    replace_nonascii_characters = true;
-	    break;
-
-	case 'p':
-	    passthrough = true;
-	    break;
-
-	case 'q':
-	    quiet = true;
-	    break;
-
-	case 'v':
-	    verbose += 1;
-	    break;
-
-        case 'V':
-	    print_version();
-	    exit(EX_OK);
-
-	case 'x':
-	    set_debug_mask( optarg );
-	    break;
-
-	case 'X':
-	    /* 'L' - enable lexer_v3 debug output  */
-	    set_bogotest( optarg );
-	    break;
-	}
+	name = (option_index == 0) ? argv[this_option_optind] : long_options[option_index].name;
+	process_arg(option, name, optarg, PR_COMMAND, PASS_1, CMD_LINE);
     }
 
     if (optind < argc) {
 	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n",
 		argv[optind]);
 	exit(EX_ERROR);
+    }
+}
+
+void process_arg(int option, const char *name, const char *val, priority_t precedence, arg_pass_t pass, arg_source_t src)
+{
+    pass = PASS_1;	/* suppress compiler warning */
+
+    switch (option)
+    {
+    case ':':
+	fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+	exit(EX_ERROR);
+
+    case '?':
+	fprintf(stderr, "Unknown option '%s'.\n", name);
+	exit(EX_ERROR);
+
+    case 'c':
+	read_config_file(val, false, false, precedence);
+	/*@fallthrough@*/
+	/* fall through to suppress reading config files */
+
+    case 'C':
+	suppress_config_file = true;
+	break;
+
+    case O_USER_CONFIG_FILE:
+	user_config_file = get_string(name, val);
+	break;
+
+    case 'D':
+	dbgout = stdout;
+	break;
+
+    case 'h':
+	help();
+	exit(EX_OK);
+
+    case 'H':
+	header_line_markup = false;
+	break;
+
+    case 'I':
+	bogoreader_name(val);
+	break;
+
+    case 'n':
+	replace_nonascii_characters = true;
+	break;
+
+    case O_REPLACE_NONASCII_CHARACTERS:
+	replace_nonascii_characters = get_bool(name, val);	
+	break;
+
+    case 'p':
+	passthrough = true;
+	break;
+
+    case 'q':
+	quiet = true;
+	break;
+
+    case 'v':
+	verbose += 1;
+	break;
+
+    case 'V':
+	print_version();
+	exit(EX_OK);
+
+    case 'x':
+	set_debug_mask(val);
+	break;
+
+    case 'X':
+	set_bogotest(val);
+	break;
+	
+    default:
+	/* config file options:
+	**  ok    - if from config file
+	**  error - if on command line
+	*/
+	if (src == CMD_LINE) {
+	    fprintf(stderr, "Invalid option '%s'.\n", name);
+	    exit(EX_ERROR);
+	}
     }
 }
 
