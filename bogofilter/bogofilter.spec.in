@@ -29,7 +29,8 @@ CFLAGS="$RPM_OPT_FLAGS" \
   --sysconfdir=%{_sysconfdir}
 
 %build
-make all check
+make
+make check
 
 %install
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
@@ -53,7 +54,7 @@ done
 files=`find contrib -maxdepth 1 -type f | grep -v Makefile`
 for i in $files ; do
   case $i in
-    *.o|*.obj) continue ;;
+    *.c|*.o|*.obj) continue ;;
   esac
   install -m644 $i .inst/contrib
 done
@@ -74,8 +75,9 @@ done
 %{_bindir}/bogoupgrade
 %{_sysconfdir}/bogofilter.cf.example
 %config(noreplace) %{_sysconfdir}/bogofilter.cf
-%doc AUTHORS COPYING METHODS NEWS README TODO UPGRADE
-%doc doc/README.Robinson
+%doc AUTHORS CHANGES-0.10 COPYING INSTALL METHODS NEWS README
+%doc README.cvs TODO UPGRADE
+%doc doc/README.Robinson doc/integrating-with-qmail
 %doc doc/programmer
 %doc .inst/contrib .inst/html .inst/xml
 
