@@ -141,7 +141,7 @@ int setup_wordlists(const char* d, priority_t precedence)
     if (DEBUG_WORDLIST(2))
 	fprintf(dbgout, "d: %s\n", dir);
 
-    if (saved_precedence < precedence && word_lists != NULL) {
+    if (saved_precedence != precedence && word_lists != NULL) {
 	wordlist_t *list, *next;
 	for (list = word_lists; list != NULL; list = next) {
 	    xfree(list->filename);
