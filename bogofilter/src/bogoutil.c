@@ -498,7 +498,6 @@ struct option long_options[] = {
     { "db_txn_durable",			R, 0, O_DB_TXN_DURABLE },
 #endif
 #endif
-#ifdef	VERSION_0932
     { "debug-flags",			R, 0, 'x' },
     { "debug-to-stdout",		N, 0, 'D' },
     { "verbosity",			N, 0, 'v' },
@@ -534,7 +533,6 @@ struct option long_options[] = {
     { "timestamp",			R, 0, O_IGNORE },
     { "unsure_subject_tag",		R, 0, O_IGNORE },
     { "user_config_file",		R, 0, O_IGNORE },
-#endif
     { NULL,				0, 0, 0 }
 };
 
