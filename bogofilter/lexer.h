@@ -29,8 +29,6 @@ struct textblock
 extern bool block_on_subnets;
 extern struct textblock textblocks, *textend;
 
-extern int lexer_fgets(char *buf, int max_size, FILE *s);
-extern token_t get_token(void);
 extern token_t yylex(void);
 
 #endif	/* LEXER_H */

@@ -18,6 +18,7 @@ NAME:
 
 #include "charset.h"
 #include "lexer.h"
+#include "token.h"
 
 /* exports */
 bool logflag;		/* '-l' */

@@ -10,7 +10,7 @@
 
 #include "bogofilter.h"
 #include "wordhash.h"
-#include "lexer.h"
+#include "token.h"
 
 #include "collect.h"
 

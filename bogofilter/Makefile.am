@@ -48,6 +48,7 @@ libbogofilter_a_SOURCES= \
 	lexer.h lexer.l \
 	register.h register.c \
 	rstats.h rstats.c \
+	token.h token.c \
 	wordhash.h wordhash.c wordlists.h wordlists.c \
 	globals.h system.h \
 	version.c directories.c \

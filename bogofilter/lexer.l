@@ -50,7 +50,6 @@
 
 extern char *spam_header_name;
 
-bool block_on_subnets = false;
 struct textblock textblocks;
 /*@dependent@*/ struct textblock *textend = &textblocks;
 
@@ -61,9 +60,6 @@ struct textblock textblocks;
 char *yylval;
 static int past_header;
 static int yyinput(char *buf, int max_size);
-
-static token_t save_class = NONE;
-static char save_text[256];
 
 %}
 
@@ -314,72 +310,6 @@ static int yyinput(char *buf, int max_size)
     }
 
     return(returned == -1 ? YY_NULL : returned);
-}
-
-token_t get_token(void)
-{
-    token_t class;
-    unsigned char *cp, *t;
-
-    /* If saved IPADDR, truncate last octet */
-    if ( block_on_subnets && save_class == IPADDR )
-    {
-	t = strrchr(save_text, '.');
-	if (t == NULL)
-	    save_class = NONE;
-	else
-	{
-	    *t = '\0';	
-	    yylval = save_text;
-	    yyleng = strlen(save_text);
-	    return save_class;
-	}
-    }
-
-    while ((class = yylex()) > 0) {
-	/* when we have a boundary line, eliminate the distinction between
-	 * start and end boundary, chopping of the distinct trailing -- of
-	 * the end boundary. */
-
-	if (class == BOUNDARY && yyleng >= 4) {
-	    if ((t = strstr(yytext+yyleng-2, "--"))) {
-		strcpy(t, "");
-	    }
-	    break;
-	}
-
-	if (class == IPADDR && block_on_subnets)
-	{
-	    const char *prefix="url:";
-	    size_t len = strlen(prefix);
-	    size_t avl = sizeof(save_text);
-	    yylval = save_text;
-	    save_class = IPADDR;
-	    avl -= strlcpy( yylval, "url:", avl);
-	    yyleng = strlcpy( yylval+len, yytext, avl);
-	    return (class);
-	}
-
-	if (class == CHARSET)
-	{
-	    /* Charset name is next token.
-	       Get the name, call got_charset(), and return the name.
-	     */
-	    get_token();
-	    got_charset(yytext);
-	}
-
-	/* eat all long words */
-	if (yyleng <= MAXTOKENLEN)
-	    break;
-    }
-
-    /* Need separate loop so lexer can see "From", "Date", etc */
-    for (cp = yytext; *cp; cp++)
-	*cp = casefold_table[*cp];
-
-    yylval = yytext;
-    return(class);
 }
 
 /*
