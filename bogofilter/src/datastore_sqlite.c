@@ -117,7 +117,7 @@ static void db_trace(void *userdata /** unused */,
 
 /** Callback function that increates the int variable that \a userdata
  * points to, for db_loop. */
-static int db_count(dbv_t *d1, dbv_t *d2, void *userdata) {
+static ex_t db_count(dbv_t *d1, dbv_t *d2, void *userdata) {
     int *counter = userdata;
     ++ *counter;
     (void)d1;
@@ -364,7 +364,7 @@ int db_get_dbvalue(void *vhandle, const dbv_t* key, /*@out@*/ dbv_t *val) {
     return rc;
 }
 
-int db_foreach(void *vhandle, db_foreach_t hook, void *userdata) {
+ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata) {
     dbh_t *dbh = vhandle;
     const char *cmd = "SELECT key, value FROM bogofilter;";
     return db_loop(dbh->db, cmd, hook, userdata);
