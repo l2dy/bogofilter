@@ -136,6 +136,7 @@ data_t *rxval;
 data_t *mdval;
 
 bool warn;
+bool force;
 uint target;
 uint ns_cnt, sp_cnt;
 
