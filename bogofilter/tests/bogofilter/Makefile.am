@@ -12,3 +12,4 @@ distclean-local:
 
 dist-hook:
 	cd $(distdir) && for i in inputs outputs ; do find $$i -name CVS -type d -prune -exec rm -r '{}' ';' ; done
+	cd $(distdir) && for i in inputs outputs ; do find $$i -name '.#*' -type f -exec rm '{}' ';' ; done
