@@ -757,6 +757,13 @@ static void usage(void)
 		  progname);
 }
 
+static void print_version(void)
+{
+    (void)fprintf(stderr,
+		  "%s version %s\n", 
+		  progname, version);
+}
+
 static void help(void)
 {
     usage();
@@ -833,6 +840,10 @@ static int process_args(int argc, char **argv)
 		    test += 1;
 		    break;
 #endif
+		case 'V':
+		    print_version();
+		    exit(EX_OK);
+
 		default:
 		    help();
 		    exit(EX_ERROR);
@@ -942,8 +953,7 @@ static void top_ten(result_t *sorted)
 
     if (verbose)
 	printf("    ");
-    printf("   rs     md    rx    co     fp  fn    fpc    fnc\n" );
-
+    printf("   rs     md    rx    co     fp  fn      pcts\n");
     for (i = 0; i < 10; i += 1) {
 	result_t *r = &sorted[i];
 	printf("%3d  %6.4f %5.3f %5.3f %6.4f  %3d %3d  %6.4f %5.3f\n",
@@ -1282,7 +1292,7 @@ static rc_t bogotune(void)
 
     create_countlists(ns_msglists);
     create_countlists(sp_msglists);
-
+    
     if (verbose >= TIME && time(NULL) - end > 2) {
 	end = time(NULL);
 	show_elapsed_time(beg, end, ns_cnt + sp_cnt, (double)cnt/(end-beg), "messages", "msg/sec");
@@ -1423,7 +1433,7 @@ static rc_t bogotune(void)
 		    r->rsi = rsi; r->rs = robs;
 		    r->rxi = rxi; r->rx = robx;
 		    r->mdi = mdi; r->md = min_dev;
-		    
+
 		    if (verbose >= SUMMARY) {
 			if (verbose >= SUMMARY+1)
 			    printf("%3d ", cnt);
