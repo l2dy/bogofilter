@@ -4,6 +4,11 @@
 #
 #    a script for studying the effects of varying s and mindev
 
+# mailboxes for testing:
+
+[ -z "$SPAM_FILES" ] && SPAM_FILES="spam.mbx"
+[ -z "$GOOD_FILES" ] && GOOD_FILES="good.mbx"
+
 # range of values for testing
 
 svals="1 3.2e-1 1e-1 3.2e-2 1e-2"
@@ -12,17 +17,13 @@ mvals=`seq 0.025 0.025 0.47501`		# wide value range
 
 # approx 0.1%-0.3% of nonspam corpus size for selecting spam_cutoff value
 
-target=6	
-
-# path for bogofilter executables
-
-path="."
+target=24
 
 # file names
 
 DATE=`date "+%m%d.%H%M"`
 
-CFG="smindev.cf"
+CFG="tuning.cf"
 PARM_TBL="parms.$DATE.tbl"
 RESULTS="results.$DATE.txt"
 
@@ -31,35 +32,36 @@ RESULTS="results.$DATE.txt"
 # validate program paths
 
 error="n"
-for prog in bogofilter bogolexer bogoutil ; do
-if [ ! -x $path/$prog ] ; then
-   echo "$path/$prog is not an executable program"
-   error="y"
-fi
+for prog in bogofilter bogolexer bogoutil bogolex.sh ; do
+    path=`which $prog`
+    if [ -z "$path" ] ; then
+	echo "Can't find $prog"
+	error="y"
+    fi
 done
 
 if [ "$error" = "y" ] ; then
     exit
 fi
 
-export BOGOFILTER="$path/bogofilter"
-export BOGOLEXER="$path/bogolexer"
-export BOGOUTIL="$path/bogoutil"
-export BOGOFILTER_DIR="test.d"
+BOGOFILTER_DIR="."
 
-export CFG
+export BOGOFILTER BOGOLEXER BOGOUTIL BOGOFILTER_DIR
+export CFG GOOD_FILES SPAM_FILES
 
-cat >$CFG <<EOF
+cat <<EOF >$CFG
 algorithm=fisher
 strict_check=no
-block_on_subnets=yes
-tag_header_lines=yes
+ignore_case=no
+block_on_subnets=no
+header_line_markup=yes
+tokenize_html_tags=yes
 terse_format=%1.1c %8.2d
 spamicity_tags=1, 0, ?
 spamicity_formats=%6.2e, %6.2e, %0.6f 
 EOF
 
-cnt=`ls $BOGOFILTER_DIR/goodlist.db $BOGOFILTER_DIR/spamlist.db 2>&1 | wc -l | tr -d " "`
+cnt=`ls $BOGOFILTER_DIR/goodlist.db $BOGOFILTER_DIR/spamlist.db | wc -l | tr -d " "`
 if [ "$cnt" != "2" ] ; then
     echo Distributing messages and making dir $BOGOFILTER_DIR ...
     [ -d $BOGOFILTER_DIR ] || mkdir $BOGOFILTER_DIR
@@ -67,12 +69,10 @@ if [ "$cnt" != "2" ] ; then
     echo Done - distributing messages and making $BOGOFILTER_DIR.
 fi
 
-export target
-
 function getco () {
     opts="-m$1 -o$2"
     shift ; shift ; shift
-    res=`cat $* | $BOGOFILTER -t -c $CFG $opts -v 2>&1 | \
+    res=`cat $* | bogofilter -t -c $CFG $opts -v 2>&1 | \
     perl -e ' $target = $ENV{"target"}; while (<>) { ' \
 	 -e ' ($i, $d) = split; push @diffs, $d unless $i != 1; }' \
 	 -e ' die "dainbramage" unless scalar @diffs > 15;' \
@@ -85,48 +85,47 @@ function wrapper () {
     v="-v"
     opts="-m$1 -o$2"
     shift ; shift ; shift
-    res=`cat $1 | $BOGOFILTER -t -c $CFG $opts -v | grep -c $v '^1'`
+    res=`cat $1 | bogofilter -t -c $CFG $opts -v | grep -c $v '^1'`
 }
 
 function doit () {
-    s=$1 ; shift
+    rs=$1 ; shift
     md=$1 ; shift
     date=`date "+%m/%d %H:%M:%S"`
     echo -n $date "  "
-    printf "%-6s %5.3f fpos..." $s $md
-    getco $md 0.10 $s r0.ns.mc r1.ns.mc r2.ns.mc
+    printf "%-7s %5.3f fpos..." $rs $md
+    getco $md 0.10 $rs r0.ns.mc r1.ns.mc r2.ns.mc
     fpos=${res##* }; co=${res%% *}; let fpos=$fpos/3
     printf "%d at cutoff %8.6f, run0..." $fpos $co
-    run=0; wrapper $md $co $s r0.sp.mc; fneg1=$res
-    echo "$s $md $co $run $fpos $fneg1" >> $PARM_TBL
+    run=0; wrapper $md $co $rs r0.sp.mc; fneg1=$res
+    echo "$rs $md $co $run $fpos $fneg1" >> $PARM_TBL
     printf "%3d  run1..." $fneg1
-    run=1; wrapper $md $co $s r1.sp.mc; fneg2=$res
-    echo "$s $md $co $run $fpos $fneg2" >> $PARM_TBL
+    run=1; wrapper $md $co $rs r1.sp.mc; fneg2=$res
+    echo "$rs $md $co $run $fpos $fneg2" >> $PARM_TBL
     printf "%3d  run2..." $fneg2
-    run=2; wrapper $md $co $s r2.sp.mc; fneg3=$res
-    echo "$s $md $co $run $fpos $fneg3" >> $PARM_TBL
+    run=2; wrapper $md $co $rs r2.sp.mc; fneg3=$res
+    echo "$rs $md $co $run $fpos $fneg3" >> $PARM_TBL
     printf "%3d"  $fneg3
     let fneg="$fneg1+$fneg2+$fneg3"
     printf " %4d\n"  $fneg
-    printf "%s %s %-5s %5.3f fpos...%d at cutoff %8.6f, run0...%3d  run1...%3d  run2...%3d %4d\n" \
-	$date $s $md  $fpos $co $fneg1 $fneg2 $fneg3 $fneg >> $RESULTS
+    printf "%s %s %-6s %5.3f fpos...%d at cutoff %8.6f, run0...%3d  run1...%3d  run2...%3d %4d\n" \
+	$date $rs $md  $fpos $co $fneg1 $fneg2 $fneg3 $fneg >> $RESULTS
 }
 
 ./sizes | tee $RESULTS
 ./sizes | grep mc > $PARM_TBL
 
-for s in $svals; do
-  echo robs=$s >> $CFG
+for rs in $svals; do
   echo "" | tee -a $RESULTS
-  $BOGOFILTER -t -c $CFG -o$s -Q | grep 00 | tee -a $RESULTS
+  bogofilter -t -c $CFG -m,$rs -Q | grep 00 | grep -v off | tee -a $RESULTS
   for md in $mvals; do
-      doit $s $md
+      doit $rs $md
   done
 done
 
-# get 10 best results (lowest false positive count)
+# get 10 best results (lowest false negative count)
 (echo "" ; \
 echo "Top 10 results" ; \
-grep fpos < $RESULTS | sort +11n | head -10 ) | tee -a $RESULTS
+grep fpos < $RESULTS | sort +14n | head -10 ) | tee -a $RESULTS
 
 date "+%m/%d %H:%M:%S"

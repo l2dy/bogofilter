@@ -8,27 +8,32 @@
 #    by changing 'cat' command to 'zcat' can be used with compresed mboxes
 #
 
-spam_files="spam.mbx"
-good_files="good.mbx"
+[ -z "$SPAM_FILES" ] && SPAM_FILES="spam.mbx"
+[ -z "$GOOD_FILES" ] && GOOD_FILES="good.mbx"
+if [ -z "$CFG" ] ; then
+    echo CFG is not set
+    exit
+fi
 
 cnt=`ls t.ns t.sp r[0-2].ns r[0-2].sp 2>&1 | wc -l | tr -d " "`
 if [ "$cnt" != "8" ] ; then
     echo `date +%m%d.%H%M` " distributing spam... "
-    FILENO=0 cat $spam_files | formail -s sh -x ./distrib sp
+    cat $SPAM_FILES | FILENO=100 formail -s ./distrib sp
     echo done
     
     echo `date +%m%d.%H%M` " distributing nonspam... "
-    FILENO=0 $good_files | formail -s sh -x ./distrib ns
+    cat $GOOD_FILES | FILENO=100 formail -s ./distrib ns
     echo done
 fi
 
-cnt=`ls $BOGOFILTER_DIR/goodlist.db $BOGOFILTER_DIR/spamlist.db 2>&1 | wc -l | tr -d " "`
+cnt=`ls $BOGOFILTER_DIR/goodlist.db $BOGOFILTER_DIR/spamlist.db | wc -l | tr -d " "`
 if [ "$cnt" != "2" ] ; then
     echo `date +%m%d.%H%M` " Building the wordlists... "
-    $BOGOFILTER -v -s -c $CFG < t.sp
-    $BOGOFILTER -v -n -c $CFG < t.ns
-    
-    $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT
+
+    bogofilter -v -s -c $CFG < t.sp
+    bogofilter -v -n -c $CFG < t.ns
+
+    bogoutil -w $BOGOFILTER_DIR .MSG_COUNT
     echo ""
 fi
 

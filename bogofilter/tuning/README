@@ -22,8 +22,46 @@ run.  Since bogofilter doesn't have to use BerkeleyDB during scoring,
 it can process msg-count files approx 10 to 20 times faster than
 regular files.
 
-The scripts are functional, but not very user friendly.  If you're
-interested, the starting point is script smindev.sh.  Take a look at
-it.  Set appropriate file names.  Run it. 
+The best way to run a tuning test is to copy scripts smindev.sh, mkdb,
+and sizes into a new directory.  Also copy good.mbx and spam.mbx to
+that directory.  Then switch to the new directory and run "smindev.sh".
+
+The first step smindev.sh takes is to run script "mkdb" to set up test
+files.  Mailboxes good.mbx and spam.mbx are split up into training
+data files (named t.ns and t.sp) and 3 test data sets (with files
+named r0.ns, r0.sp, r1.ns, r1.sp, r2.ns, and r2.sp).  The training
+data will be used to build wordlists (goodlist.db and spamlist.db).
+To speed up the testing, the messages r in the test data sets will be
+converted to msg-count format (in files r?.??.mc).
+
+After setting up the test files, smindev.sh will cycle through ranges
+of values for robs and min_dev and print a line of output for each
+combination.  This can be slow.  Depending on processor speed and the
+amount of test data, each line may take a few seconds or a few minutes
+or longer to complete.  The last number of each line is measure of how
+well bogofilter did with the parameter combination being tested.  A
+smaller value is better.  At the end of the whole test, the "Top 10
+Results" are printed.
+
+The computation of each results line involved scoring many messages.
+First the non-spam messages in r0.ns.mc, r1.ns.mc, and r2.ns.mc are
+scored.  Using these results and the value of "$target" (in
+tuning.sh), a spam_cutoff is selected.  Then the spam messages in
+r0.sp.mc, r1.sp.mc, and r2.sp.mc are scored.  For each of these files,
+the number of false negatives is printed.  The last number of the line
+is the total number of false negatives.
+
+The results from each run are left in files results.MMDD.HHMM.txt and
+parms.MMDD.HHMM.tbl.  This allows multiple sets of test results to be
+saved, but may necessitate some house keeping from time to time.
+(Note: If you have the R mathematical package installed, the
+parms.MMDD.HHMM.tbl file can be used as input to script tuning.R to
+generate a graph).
+
+When you rerun the test with different test data, it's necessary to
+delete the old training and test files, i.e. t.ns, t.sp,
+r[0-2].ns/sp.*, and goodlist.db/spamlist.db.  If you're testing
+different value ranges of robs and min_dev, the training and test
+files can be used without problem.
 
 Enjoy!
