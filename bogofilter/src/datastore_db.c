@@ -89,10 +89,27 @@ static int DB_OPEN(DB *db, const char *db_path,
 	const char *db_file, DBTYPE type, u_int32_t flags, int mode)
 {
     int ret;
+    const char *ps;
 
 #if DB_AT_LEAST(4,1)
     flags |= dsm->dsm_auto_commit_flags();
 #endif
+
+    if ((ps = getenv("BF_PAGESIZE"))) {
+	u_int32_t s = atoi(ps);
+	if (((s - 1) ^ s) != (s * 2 - 1)) {
+	    fprintf(stderr, "BF_PAGESIZE must be a power of 2, ignoring\n");
+	} else if (s < 512 || s > 65536) {
+	    fprintf(stderr, "BF_PAGESIZE must be 512 ... 65536, ignoring\n");
+	} else {
+	    int r;
+
+	    if ((r = db->set_pagesize(db, s))) {
+		fprintf(stderr, "setting pagesize to %d failed: %s\n",
+			s, db_strerror(r));
+	    }
+	}
+    }
 
     ret = db->open(db,
 #if DB_AT_LEAST(4,1)
