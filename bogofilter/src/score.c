@@ -265,6 +265,8 @@ void score_initialize(void)
 {
     word_t *word_robx = word_new((const byte *)ROBX_W, strlen(ROBX_W));
 
+    wordlist_t *list = default_wordlist();
+
     if (fabs(min_dev) < EPS)
 	min_dev = MIN_DEV;
     if (spam_cutoff < EPS)
@@ -280,13 +282,13 @@ void score_initialize(void)
     if (fabs(robs) < EPS)
 	robs = ROBS;
 
-    if (fabs(robx) < EPS && word_list->dsh != NULL)
+    if (fabs(robx) < EPS && list->dsh != NULL)
     {
 	int ret;
 	dsv_t val;
 
 	/* Note: .ROBX is scaled by 1000000 in the wordlist */
-	ret = ds_read(word_list->dsh, word_robx, &val);
+	ret = ds_read(list->dsh, word_robx, &val);
 	if (ret != 0)
 	    robx = ROBX;
 	else {

@@ -15,7 +15,6 @@ bool	config_setup = false;
 /* Default wordlist mode is now wordlist.db -
    a single wordlist containing ham and spam tokens */
 
-wordlist_t *word_list;
 /*@null@*/ wordlist_t* word_lists=NULL;
 
 /* returns -1 for error, 0 for success */
@@ -59,14 +58,15 @@ int init_wordlist(/*@out@*/ wordlist_t **list,
 
 /* Set default wordlist for registering messages, finding robx, etc */
 
-void set_default_wordlist(void)
+wordlist_t *default_wordlist(void)
 {
     wordlist_t *list;
     for ( list = word_lists; list != NULL; list = list->next )
     {
- 	if (word_list == NULL && list->type != 'I')
- 	    word_list = list;
+ 	if (list->type != 'I')
+ 	    return list;
     }
+    return NULL;
 }
 
 /* setup_wordlists()

@@ -29,16 +29,13 @@ struct wordlist_s
     int		override;
 };
 
-/*@null@*/ 
-extern wordlist_t *word_list;
-
 int init_wordlist(/*@out@*/ wordlist_t **list, 
 		  const char* name, const char* path,
 		  int override, WL_TYPE type);
 
 void free_wordlists(void);
 
-void set_default_wordlist(void);
+wordlist_t * default_wordlist(void);
 int  set_wordlist_dir(const char* dir, priority_t precedence);
   
 #endif	/* WORDLISTS_CORE_H */

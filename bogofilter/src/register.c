@@ -32,7 +32,7 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
     u_int32_t wordcount = h->count;	/* use number of unique tokens */
 
     dsv_t val;
-    wordlist_t *list = word_list;	/* use default wordlist for registration */
+    wordlist_t *list = default_wordlist();	/* use default wordlist */
 
     sh_t incr = IX_UNDF, decr = IX_UNDF;
 
