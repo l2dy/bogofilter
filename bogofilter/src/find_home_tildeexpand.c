@@ -68,8 +68,6 @@ char *tildeexpand(const char *name)
     } else {
 	/* plain tilde */
 	home = find_home(false);
-	if (home == NULL)
-	    return xstrdup(name);
     }
 
     if (home == NULL) {
@@ -79,7 +77,10 @@ char *tildeexpand(const char *name)
     tl = strlen(name) + strlen(home) - l + 1;
     tmp = xmalloc(tl);
     (void)strlcpy(tmp, home, tl);
+
     /* no need to insert a slash here, name[l] contains one */
-    if (strlcat(tmp, name + l + 1, tl) >= tl) internal_error;
+    if (strlcat(tmp, name + l + 1, tl) >= tl) 
+	internal_error;
+
     return tmp;
 }
