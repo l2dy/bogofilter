@@ -171,7 +171,7 @@ static int create_lockfile(const char *fn, int modes) {
 	snprintf(buf, sizeof(buf), ".%ld.%d", (long)getpid(), count++);
 	if (tmp) free(tmp);
 	tmp = mxcat(fn, buf, NULL);
-	lockfd = open(tmp, modes|O_CREAT|O_EXCL, 0664); /* umask will decide about group writability */
+	lockfd = open(tmp, modes|O_CREAT|O_EXCL, DS_MODE); /* umask will decide about group writability */
     } while (lockfd < 0 && errno == EEXIST);
 
     if (lockfd >= 0) {

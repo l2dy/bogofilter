@@ -112,10 +112,10 @@ void *db_open(void *dummy, const char *path, const char *name, dbmode_t open_mod
 
     if (handle == NULL) return NULL;
 
-    dbp = handle->dbp = tdb_open(handle->name, 0, tdb_flags, open_flags, 0664);
+    dbp = handle->dbp = tdb_open(handle->name, 0, tdb_flags, open_flags, DS_MODE);
 
     if ((dbp == NULL) && (open_mode & DS_WRITE)) {
-	dbp = handle->dbp = tdb_open(handle->name, 0, tdb_flags, open_flags | O_CREAT, 0664);
+	dbp = handle->dbp = tdb_open(handle->name, 0, tdb_flags, open_flags | O_CREAT, DS_MODE);
 	if (dbp != NULL)
 	    handle->created = true;
     }

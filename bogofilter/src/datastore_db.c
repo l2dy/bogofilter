@@ -392,7 +392,7 @@ void *db_open(void *vhandle, const char *path,
 retry_db_open:
 	handle->created = false;
 
-	ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags, 0664);
+	ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags, DS_MODE);
 
 	if (ret != 0 && ( ret != ENOENT || opt_flags == DB_RDONLY ||
 		((handle->created = true),
@@ -402,7 +402,7 @@ retry_db_open:
 #if DB_AT_LEAST(4,2)
 		 (ret = DB_SET_FLAGS(dbp, DB_CHKSUM)) != 0 ||
 #endif
-		(ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL, 0664)) != 0)))
+		(ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL, DS_MODE)) != 0)))
 	{
 	    if (open_mode != DB_RDONLY && ret == EEXIST && --retries) {
 		/* sleep for 4 to 100 ms - this is just to give up the CPU
@@ -926,7 +926,7 @@ static int db_try_glock(const char *directory, short locktype, int lockcmd) {
     assert(directory);
 
     /* lock */
-    ret = mkdir(directory, (mode_t)0755);
+    ret = mkdir(directory, DIR_MODE);
     if (ret && errno != EEXIST) {
 	print_error(__FILE__, __LINE__, "mkdir(%s): %s",
 		directory, strerror(errno));
@@ -937,7 +937,7 @@ static int db_try_glock(const char *directory, short locktype, int lockcmd) {
 
     /* All we are interested in is that this file exists, we'll close it
      * right away as plock down will open it again */
-    ret = open(t, O_RDWR|O_CREAT|O_EXCL, (mode_t)0664);
+    ret = open(t, O_RDWR|O_CREAT|O_EXCL, DS_MODE);
     if (ret < 0 && errno != EEXIST) {
 	print_error(__FILE__, __LINE__, "open(%s): %s",
 		t, strerror(errno));
@@ -1050,7 +1050,7 @@ static dbe_t *dbe_xinit(const char *directory, u_int32_t numlocks, u_int32_t num
 	fprintf(dbgout, "DB_ENV->set_lg_max(%lu)\n", (unsigned long)logsize);
 
     ret = env->dbe->open(env->dbe, directory,
-	    dbenv_defflags | DB_CREATE | flags, /* mode */ 0664);
+	    dbenv_defflags | DB_CREATE | flags, DS_MODE);
     if (ret != 0) {
 	env->dbe->close(env->dbe, 0);
 	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %s", db_strerror(ret));
@@ -1259,13 +1259,13 @@ static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags) {
      */
 
     e = env->open(env, directory,
-	    dbenv_defflags | local_flags | DB_RECOVER, 0664);
+	    dbenv_defflags | local_flags | DB_RECOVER, DS_MODE);
     if (e == DB_RUNRECOVERY) {
 	/* that didn't work, try harder */
 	if (DEBUG_DATABASE(0))
 	    fprintf(dbgout, "running catastrophic data base recovery\n");
 	e = env->open(env, directory,
-		dbenv_defflags | local_flags | DB_RECOVER_FATAL, 0664);
+		dbenv_defflags | local_flags | DB_RECOVER_FATAL, DS_MODE);
     }
     if (e) {
 	print_error(__FILE__, __LINE__, "Cannot recover environment \"%s\": %s",

@@ -329,12 +329,12 @@ void *db_open(void *dummy, const char *path, const char *name, dbmode_t open_mod
 
 retry_db_open:
 	handle->created = false;
-	ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | retryflag, 0664);
+	ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | retryflag, DS_MODE);
 
 	if (ret != 0) {
 	    err = (ret != ENOENT) || (opt_flags == DB_RDONLY);
 	    if (!err) {
-		ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664);
+		ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL | retryflag, DS_MODE);
 		if (ret != 0)
 		    err = true;
 		else

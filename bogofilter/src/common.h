@@ -70,6 +70,12 @@ typedef enum sh_e { IX_SPAM = 0, 	/* index for SPAM */
 #define PATH_LEN 1024
 #endif
 
+/** Default database file mode */
+#define	DS_MODE 	(mode_t) 0664
+
+/** Default directory */
+#define	DIR_MODE	(mode_t) 0755
+
 #define COUNTOF(array)	(uint) (sizeof(array)/sizeof(array[0]))
 
 typedef unsigned char byte;
