@@ -22,6 +22,7 @@ AUTHOR:
 extern FILE *Rfp;
 
 extern int verbose;
+extern int Rtable;
 extern double min_dev;
 
 typedef struct rstats_s rstats_t;
@@ -115,8 +116,11 @@ void rstats_print(void)
     if (Rfp == NULL)
 	Rfp = stdout;
 
-    if (verbose==2) rstats_print_histogram(robn, rstats_array);
-    if (verbose>=3) rstats_print_rtable(robn, rstats_array);
+    if (Rtable || verbose>=3)
+	rstats_print_rtable(robn, rstats_array);
+    else
+	if (verbose==2)
+	    rstats_print_histogram(robn, rstats_array);
 
     for (r= 0; r<robn; r+=1)
     {
@@ -172,7 +176,7 @@ void rstats_print_histogram(int robn, rstats_t **rstats_array)
 	maxcnt = max(maxcnt, cnt);
     }
 
-    fprintf(Rfp, "# %5s %4s %9s %9s  %s\n", "int", "cnt", "prob", "spamicity", "histogram" );
+    fprintf(Rfp, "# %5s %4s %7s   %9s  %s\n", "int", "cnt", "prob", "spamicity", "histogram" );
 
     // Print histogram
     for (i=0; i<INTERVALS; i+=1)

@@ -22,6 +22,7 @@ AUTHOR:
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
 #endif
+
 #include "version.h"
 #include "common.h"
 #include "bogofilter.h"
@@ -42,8 +43,6 @@ char msg_bogofilter[80];
 const char *progname = "bogofilter";
 
 run_t run_type = RUN_NORMAL; 
-
-static char  *Rfn = NULL;
 
 /* if the given environment variable 'var' exists, copy it to 'dest' and
    tack on the optional 'subdir' value.
@@ -127,10 +126,8 @@ int process_args(int argc, char **argv)
 {
     int option;
     int exitcode;
-    int optind_save;
 
-    optind_save=1;
-    while ((option = getopt(argc, argv, "d:ehlsnSNvVpugR::rx:")) != EOF)
+    while ((option = getopt(argc, argv, "d:ehlsnSNvVpugR:rx:")) != EOF)
     {
 	switch(option)
 	{
@@ -211,18 +208,14 @@ int process_args(int argc, char **argv)
 
 	case 'R':
 	{
-	    char *tmp;
 	    Rtable = 1;
-	    tmp = (optind_save == optind) ? argv[optind] : optarg;
-	    Rfn = tmp ? strdup(tmp) : NULL;
-	    if (Rfn != NULL) {
-	        if(!(Rfp = fopen(Rfn, "w"))) {
-	            fprintf(stderr, "Error: can't write %s\n", Rfn);
-	            Rtable = 0;
-	        }
-	    } else Rfp = stdout;
+	    Rfp = fopen(optarg, "w");
+	    if(Rfp == NULL) {
+		fprintf(stderr, "Error: can't write %s\n", optarg);
+		Rtable = 0;
+	    }
 	}
-	    // fall through to force Robinson calculations
+	// fall through to force Robinson calculations
 	case 'r':
 	    algorithm = AL_ROBINSON;
 	    break;
@@ -231,7 +224,6 @@ int process_args(int argc, char **argv)
 	    set_debug_mask( argv[optind] );
 	    break;
 	}
-	optind_save = optind+1;
     }
 
     exitcode = validate_args(argc, argv);
@@ -286,13 +278,14 @@ int main(int argc, char **argv)
 			    SPAM_HEADER_NAME, 
 			    (status==RC_SPAM) ? "Yes" : "No", 
 			    spamicity, VERSION);
-		    if (passthrough+verbose > 1)
-		    {
-			(void)fputs("\n", stdout);
-			verbose += passthrough;
-			print_bogostats( stdout );
-			verbose -= passthrough;
-		    }
+		}
+
+		if (verbose || passthrough || Rtable)
+		{
+		    (void)fputs("\n", stdout);
+		    verbose += passthrough;
+		    print_bogostats( stdout );
+		    verbose -= passthrough;
 		}
 
 		if (passthrough)
@@ -326,8 +319,8 @@ int main(int argc, char **argv)
 	    break;
     }
     
-    if(Rtable && Rfp != stdout && fclose(Rfp) != 0)
-	fprintf(stderr, "Error: couldn't close %s\n", Rfn);
+    if(Rtable && Rfp != NULL && fclose(Rfp) != 0)
+	fprintf(stderr, "Error: couldn't close Rtable file\n");
 
     close_lists();
 
