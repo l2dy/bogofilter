@@ -582,9 +582,10 @@ $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.1
     distribution des sources.</p>
     <hr>
 
-    <h2 id="nfs">Puis-je partager une liste de mot par NFS?</h2>
+    <h2 id="nfs">Puis-je partager une liste de mots par NFS?</h2>
 
-    <p>Oui, si vous fournissez la bonne options de verrouillage
+    <p>Si vous ne faites que les lire, il n'y a pas de problème.
+    Si vous les mettez à jour, vous devrez fournir les bonnes options de verrouillage
     pour éviter la corruption des données. Quand vous compilerez
     Bogofilter, vous aurez besoin de vérifier que le script
     configure a positionné "#define HAVE_FCNTL 1" dans votre
