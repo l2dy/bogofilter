@@ -222,11 +222,18 @@ int words_from_list(char *db_file, int argc, char **argv)
     return rv;
 }
 
-int words_from_path(char *directory, int argc, char **argv)
+int words_from_path(char *directory, int argc, char **argv, bool show_probability)
 {
     dbh_t *dbh_good;
     dbh_t *dbh_spam;
     char filepath[PATH_LEN];
+    char buf[BUFSIZE];
+    char *token = buf;
+    int spam_count, spam_msg_count; 
+    int good_count, good_msg_count;
+
+    char *head_format = !show_probability ? "%-20s %6s %6s\n"   : "%-20s %6s %6s %6s\n";
+    char *data_format = !show_probability ? "%-20s %6ld %6ld\n" : "%-20s %6ld %6ld %f\n";
 
     build_path(filepath, PATH_LEN, directory, GOODFILE);
     if ((dbh_good = db_open_and_lock_file(filepath, GOODFILE, DB_READ)) == NULL)
@@ -236,20 +243,38 @@ int words_from_path(char *directory, int argc, char **argv)
     if ((dbh_spam = db_open_and_lock_file(filepath, SPAMFILE, DB_READ)) == NULL)
 	return 2;
 
-    printf("%-20s %6s %6s\n", "", "spam", "good");
-    if ( argc == 0)
+    if (show_probability)
     {
-	char buf[BUFSIZE];
-	while (get_token(buf, BUFSIZE, stdin) == 0) {
-	    printf("%-20s %6ld %6ld\n", buf, db_getvalue(dbh_spam, buf), db_getvalue(dbh_good, buf));
-	}
+	spam_msg_count = db_getvalue(dbh_spam, ".MSG_COUNT"); 
+	good_msg_count = db_getvalue(dbh_good, ".MSG_COUNT");
     }
-    else
+
+    printf(head_format, "", "spam", "good", "prob");
+    while (1)
     {
-	while (argc-- > 0) {
-	    char *token = *argv++;
-	    printf("%-20s %6ld %6ld\n", token, db_getvalue(dbh_spam, token), db_getvalue(dbh_good, token));
+	double spamness, goodness, prob;
+
+	if ( argc == 0)
+	{
+	    if (get_token(buf, BUFSIZE, stdin) != 0)
+		break;
 	}
+	else 
+	{
+	    if (argc-- > 0)
+		token = *argv++;
+	    else
+		break;
+	}
+	spam_count = db_getvalue(dbh_spam, token);
+	good_count =  db_getvalue(dbh_good, token);
+	if (show_probability)
+	{
+	    spamness = (double) spam_count / (double) spam_msg_count;
+	    goodness = (double) good_count / (double) good_msg_count;
+	    prob = spamness / (spamness+goodness);
+	}
+	printf(data_format, token, spam_count, good_count, prob);
     }
 
     db_close(dbh_good);
@@ -258,7 +283,7 @@ int words_from_path(char *directory, int argc, char **argv)
     return 0;
 }
 
-int display_words(char *path, int argc, char **argv)
+int display_words(char *path, int argc, char **argv, bool prob)
 {
     struct stat sb;
     int rc = stat(path, &sb);
@@ -266,7 +291,7 @@ int display_words(char *path, int argc, char **argv)
     if (rc >= 0) 
     {
 	if ( S_ISDIR(sb.st_mode))
-	    words_from_path(path, argc, argv);
+	    words_from_path(path, argc, argv, prob);
 	else
     	    words_from_list(path, argc, argv);
     }
@@ -450,8 +475,9 @@ int main(int argc, char *argv[])
     int option;
     char *db_file = NULL;
     cmd_t flag = NONE;
+    bool  prob = FALSE;
 
-    while ((option = getopt(argc, argv, "d:l:w:R:hvVx:")) != -1)
+    while ((option = getopt(argc, argv, "d:l:w:R:phvVx:")) != -1)
 	switch (option) {
 	case 'd':
 	    flag = DUMP;
@@ -475,6 +501,10 @@ int main(int argc, char *argv[])
 	    flag = ROBX;
 	    count += 1;
 	    db_file = (char *) optarg;
+	    break;
+
+	case 'p':
+	    prob = TRUE;
 	    break;
 
 	case 'v':
@@ -519,7 +549,7 @@ int main(int argc, char *argv[])
 	case WORD:
 	    argc -= optind;
 	    argv += optind;
-	    return display_words(db_file, argc, argv);
+	    return display_words(db_file, argc, argv, prob);
 	case ROBX:
 	    return compute_robinson_x(db_file);
 	case NONE:
