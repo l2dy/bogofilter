@@ -74,12 +74,15 @@ extern bool onlyprint;
 
 #define ROBS		0.0178	/* Robinson's s */
 #define ROBX		0.52	/* Robinson's x */
-
-#define ROBX_W		".ROBX"
-
 #define MIN_DEV		0.375
+
+#define	SP_ESF		1.0
+#define	NS_ESF		1.0
+
 #define HAM_CUTOFF	0.00	/* 0.00 for two-state, 0.45 for three-state */
 #define SPAM_CUTOFF	0.99
+
+#define ROBX_W		".ROBX"
 
 extern	double robs;
 extern	double robx;
