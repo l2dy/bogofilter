@@ -1,8 +1,8 @@
 # $Id$ 
 
 # foreign: don't insist on ChangeLog
-# 1.6: minimum version
-AUTOMAKE_OPTIONS = foreign 1.6
+# 1.5: minimum version
+AUTOMAKE_OPTIONS = foreign 1.5
 SUBDIRS = . tests doc contrib
 SYSCONFDIR = @sysconfdir@
 
