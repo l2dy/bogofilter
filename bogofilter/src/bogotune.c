@@ -475,8 +475,11 @@ static uint read_mailbox(char *arg)
 
 	collect_words(whc);
 
-	whp = convert_wordhash_to_propslist(whc, train);
-	msglist_add(msgs, whp);
+	if (whc->wordcount != 0) {
+	    count += 1;
+	    whp = convert_wordhash_to_propslist(whc, train);
+	    msglist_add(msgs, whp);
+	}
 
 	if (whc != whp)
 	    wordhash_free(whc);
@@ -488,8 +491,6 @@ static uint read_mailbox(char *arg)
 		printf("\r              \r%d ", count/1000 );
 	    fflush(stdout);
 	}
-
-	count += 1;
 
 	if (max_messages_per_mailbox != 0 &&
 	    count > max_messages_per_mailbox)
