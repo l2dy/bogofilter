@@ -45,7 +45,7 @@ AUTHOR:
 #define	MIN(n)		((n)/60)
 #define	SEC(n)		((n) - MIN(n)*60)
 
-#define	ROUND(f)	((double)(int)(f+0.5))
+#define	ROUND(f)	floor(f+0.5)
 
 /* Global Variables */
 
