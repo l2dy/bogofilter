@@ -16,8 +16,7 @@ AUTHOR:
 
 /* Local Variables */
 
-/* rfc2047 - BASE64    [0-9a-zA-Z/+=]+
-*/
+/* rfc2047 - BASE64    [0-9a-zA-Z/+=]+ */
 
 static byte base64_charset[] = {
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" };
@@ -26,6 +25,7 @@ static const byte base64_invalid = 0x7F;
 
 /* Function Definitions  */
 
+/** decode base64 in situ */
 uint base64_decode(word_t *word)
 {
     uint count = 0;
@@ -68,7 +68,9 @@ uint base64_decode(word_t *word)
 	d += 3 - shorten;
 	count += 3 - shorten;
     }
-    *d = (byte) '\0';
+    /* XXX do we need this NUL byte? */
+    if (word->leng)
+	*d = (byte) '\0'; /* safe, base64 is always longer than original */
     return count;
 }
 
@@ -91,7 +93,7 @@ static void base64_init(void)
     return;
 }
 
-bool base64_validate(word_t *word)
+bool base64_validate(const word_t *word)
 {
     uint i;
 
