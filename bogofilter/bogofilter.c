@@ -69,6 +69,8 @@ int    max_repeats;
 extern char msg_register[];
 static double scalefactor;
 
+void initialize_constants();
+
 static void wordprop_init(void *vwordprop){
 	wordprop_t *wordprop = vwordprop;
 
@@ -226,6 +228,7 @@ void register_messages(int fdin, run_t run_type)
 {
   wordhash_t *h;
   int	wordcount, msgcount;
+  initialize_constants();
   h = collect_words(fdin, &msgcount, &wordcount);
   register_words(run_type, h, msgcount, wordcount);
   wordhash_free(h);
