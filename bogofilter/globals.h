@@ -18,7 +18,6 @@ extern int verbose;		/* '-v' */
 
 extern bool stats_in_header;
 
-extern int thresh_index;
 extern int max_repeats;
 extern double spam_cutoff;
 extern double thresh_stats;

@@ -35,6 +35,7 @@ extern double min_dev;
 extern int Rtable;
 static double scalefactor;
 
+static double	thresh_rtable = 0.0f;
 static double	robx = 0.0f;
 static double	robs = 0.0f;
 

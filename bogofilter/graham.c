@@ -46,6 +46,8 @@ MOD: (Greg Louis <glouis@dynamicro.on.ca>) This version implements Gary
 
 extern double min_dev;
 
+int	thresh_index = 0;
+
 static const parm_desc gra_parm_table[] =
 {
     { "thresh_index",	  CP_INTEGER,	{ (void *) &thresh_index } },

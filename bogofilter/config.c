@@ -94,9 +94,7 @@ static enum algorithm_e algorithm = AL_DEFAULT;
 double	spam_cutoff;
 double	min_dev = 0.0f;
 
-int	thresh_index = 0;
 double	thresh_stats = 0.0f;
-double	thresh_rtable = 0.0f;
 
 /*---------------------------------------------------------------------------*/
 
