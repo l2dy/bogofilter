@@ -324,8 +324,12 @@ size_t decode_text(word_t *w)
 	memmove(beg+size, n.text, len+1);
 	size += len;
 	txt = end + 2;
-	while (isspace((unsigned char)*txt))
+	while (txt < fin && *txt != '=') {
+	    unsigned char ch = (unsigned char)*txt;
+	    if (!isspace(ch))
+		beg[size++] = ch;
 	    txt += 1;
+	}
     }
 
     return size;
