@@ -97,7 +97,7 @@ enum algorithm_e {
 static enum algorithm_e algorithm = AL_DEFAULT;
 static bool cmd_algorithm = false;		/* true if specified on command line */
 
-static void display_tag_array(const char *label, const char **array);
+static void display_tag_array(const char *label, FIELD *array);
 
 static bool config_algorithm(const unsigned char *s);
 static bool select_algorithm(const unsigned char ch, bool cmdline);
@@ -110,12 +110,6 @@ static void comma_parse(char opt, const char *arg, double *parm1, double *parm2,
 /* externs for query_config() */
 
 extern double robx, robs;
-extern const char *header_format;
-extern const char *terse_format;
-extern const char *log_update_format;
-extern const char *log_header_format;
-extern const char *spamicity_tags;
-extern const char *spamicity_formats;
 extern wl_t wl_default;
 
 /*---------------------------------------------------------------------------*/
@@ -788,12 +782,12 @@ void query_config(void)
     fprintf(stdout, "%-17s = '%s'\n", "terse_format", terse_format);
     fprintf(stdout, "%-17s = '%s'\n", "log_header_format", log_header_format);
     fprintf(stdout, "%-17s = '%s'\n", "log_update_format", log_update_format);
-    display_tag_array("spamicity_tags   ", &spamicity_tags);
-    display_tag_array("spamicity_formats", &spamicity_formats);
+    display_tag_array("spamicity_tags   ", spamicity_tags);
+    display_tag_array("spamicity_formats", spamicity_formats);
     exit(EX_OK);
 }
 
-static void display_tag_array(const char *label, const char **array)
+static void display_tag_array(const char *label, FIELD *array)
 {
     size_t i;
     size_t count = twostate ? 2 : 3;

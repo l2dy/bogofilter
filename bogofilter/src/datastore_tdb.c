@@ -77,7 +77,7 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 }
 
 
-static void dbh_print_names(dbh_t *dbh, const char *msg)
+static void dbh_print_names(dbh_t *handle, const char *msg)
 {
     if (handle->count == 1)
 	fprintf(dbgout, "%s (%s)", msg, handle->name[0]);

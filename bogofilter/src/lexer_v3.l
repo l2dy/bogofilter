@@ -55,6 +55,13 @@
  *    For example. `foo' in the Subject line becomes `subj:foo'.
 */
 
+/* DR 08/29/2003:
+**
+** With flex-2.5.31 and '%option never-interactive noreject', file
+** msg.dr.0118.base64 (in tests/bogofilter/inputs/split.d) parses
+** incorrectly because line 24 isn't base64 decoded.
+*/
+
 #include "common.h"
 
 #include <ctype.h>
@@ -100,7 +107,7 @@ static word_t *yy_text(void)
 
 %option debug nodebug
 %option align caseless 8bit
-%option never-interactive noreject
+%option noreject
 %option noyywrap
 %option prefix="lexer_v3_"
 
@@ -112,6 +119,7 @@ MIME_BOUNDARY	{BCHARS}{0,69}{BCHARSNOSPC}
 
 ID		[0-9a-zA-Z-]*
 MTYPE		[ \t]*[0-9a-zA-Z/-]*
+TTYPE		[ \t]*[\.0-9a-zA-Z/-]*
 
 NUM_NUM		\ [0-9]+\ [0-9]+
 MSG_COUNT	^\"\.MSG_COUNT\"
@@ -166,7 +174,8 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 %%
 
 ^From\ 						{ if (msg_header && is_from((const unsigned char *)yytext, yyleng)) { 
-						      BEGIN(INITIAL); 
+						      BEGIN INITIAL;
+						      msg_header = true;
 						      return FROM;
 						  } else { 
 						      return TOKEN;
@@ -174,7 +183,7 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						}
 
 <INITIAL,BOGO_LEX>{MSG_COUNT}{NUM_NUM}		{ if (lineno == 0) { 
-						      BEGIN(BOGO_LEX); 
+						      BEGIN BOGO_LEX; 
 						      set_msg_counts(strchr(yytext, ' ') + 1); 
 						  }
 						  return MSG_COUNT_LINE;
@@ -189,9 +198,9 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						}
 
 <INITIAL>charset=\"?{ID}\"?			{ got_charset(yytext); yyless(strlen("charset")); return TOKEN; }
-<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); yyless(strlen("MIME-Version:")); return(TOKEN); }
-<INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); yyless(strlen("Content-Transfer-Encoding:")); return(TOKEN); }
-<INITIAL>^Content-Type:{MTYPE};?		{ mime_type(yy_text()); yyless(strlen("Content-Type:")); return TOKEN; }
+<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); yyless(strlen("MIME-Version:")); return TOKEN; }
+<INITIAL>^Content-Transfer-Encoding:{MTYPE}	{ mime_encoding(yy_text()); yyless(strlen("Content-Transfer-Encoding:")); return TOKEN; }
+<INITIAL>^Content-Type:{TTYPE};?		{ mime_type(yy_text()); yyless(strlen("Content-Type:")); return TOKEN; }
 <INITIAL>^Content-Disposition:{MTYPE}		{ mime_disposition(yy_text()); yyless(strlen("Content-Disposition:")); return TOKEN; }
 <INITIAL>^To/:.*				{ if (header_line_markup) set_tag("to:"); }
 <INITIAL>^From/:.*				{ if (header_line_markup) set_tag("from:"); else return TOKEN; }
@@ -207,13 +216,15 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <INITIAL>filename=\"?				;
 <INITIAL>^[ \b\t]*\n				{ lineno += 1;
 						  if (get_content_type() == MIME_TEXT_HTML)
-						      BEGIN(HTML);
+						      BEGIN HTML;
 						  else
-						      BEGIN(TEXT); 
-						  return(EMPTY);
+						      BEGIN TEXT; 
+						  msg_header = false;
+						  return EMPTY;
 						}
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
-						      BEGIN(INITIAL);
+						      BEGIN INITIAL;
+						      msg_header = true;
 						      return BOUNDARY;
 						  } else {
 						      yyless(2);
@@ -244,9 +255,10 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 <HDISCARD>{TOKEN}				{ /* discard innards of html tags     */ }
 <LCOMMENT>{TOKEN}				{ /* discard innards of html comments */ }
 <HSCRIPT>{TOKEN}				{ if (tokenize_html_script)   return TOKEN; }
+<SCOMMENT>{TOKEN}				;			/* discard innards of html comments */ 
 
 <HTOKEN,HDISCARD>">"				{ BEGIN HTML; }		/* end of tag; return to normal html processing */
-<SCOMMENT>{TOKEN}				;			/* discard innards of html comments */ 
+<LCOMMENT>">"					{ BEGIN HTML; }		/* end of loose  comment; return to normal html processing */
 <SCOMMENT>"-->"					{ BEGIN HTML; }		/* end of strict comment; return to normal html processing */
 
 {IPADDR}					{ return IPADDR;}
@@ -264,7 +276,8 @@ ${DOLLARS}\.{CENTS}				{ return TOKEN;}
 void lexer_v3_init(FILE *fp)
 {
     lineno = 0;
-    BEGIN(INITIAL);
+    BEGIN INITIAL;
+    msg_header = true;
     yyrestart(fp);
 }
 
@@ -282,6 +295,27 @@ static void reorder_html(void)
     for(tmp = yycopy+yyleng-1 ; tmp >= yycopy; tmp--) 
 	yyunput(*tmp, yytext);
     xfree(yycopy);
+}
+
+char yy_get_state(void);
+void yy_set_state_initial(void);
+
+char yy_get_state()
+{
+    switch (YYSTATE) {
+    case INITIAL:  return 'i';
+    case TEXT:     return 't';
+    case HTML:
+    case HTOKEN:   return 'h';
+    case SCOMMENT: return 's';
+    case LCOMMENT: return 'l';
+    default:       return 'o';
+    }
+}
+
+void yy_set_state_initial()
+{
+    BEGIN INITIAL;
 }
 
 /*
