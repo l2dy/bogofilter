@@ -43,8 +43,6 @@ extern	bool	stats_in_header;
 
 extern	bool	header_line_markup;	/* -Ph,-PH */
 
-extern	uint	db_cachesize;
-
 extern	const char	*update_dir;
 extern	const char	*progname;
 extern	const char	*progtype;
@@ -87,6 +85,10 @@ extern	double robx;
 
 /* for  bogotune */
 extern	bool fBogotune;
+
+/* for  BerkeleyDB */
+#define	DB_CACHESIZE	4	/* in MB */
+extern	uint	db_cachesize;
 
 /* other */
 

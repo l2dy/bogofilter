@@ -36,8 +36,6 @@ void open_wordlists(dbmode_t mode)
 
 	retry = 0;
 	for (list = word_lists; list != NULL; list = list->next) {
-	    if (db_cachesize < 4)
-		db_cachesize = 4;
 	    list->dsh = ds_open(list->filepath, WORDLIST, mode);
 	    if (list->dsh == NULL) {
 		int err = errno;

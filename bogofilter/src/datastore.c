@@ -120,7 +120,10 @@ void dsh_free(void *vhandle)
 
 void *ds_open(const char *db_file, const char *name, dbmode_t open_mode)
 {
-    void *v = db_open(db_file, name, open_mode);
+    void *v;
+    if (db_cachesize < DB_CACHESIZE)
+	db_cachesize = DB_CACHESIZE;
+    v = db_open(db_file, name, open_mode);
     return v;
 }
 
