@@ -26,7 +26,7 @@ void wordprop_init(void *vwordprop)
 void collect_words(wordhash_t *wh)
 {
     if (setjmp(lexer_abort_jmp_buf) != 0)
-	return;
+	bf_abort();
 
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### collect_words() begins\n");
 

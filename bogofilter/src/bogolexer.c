@@ -267,8 +267,9 @@ int main(int argc, char **argv)
     while (reader_more()) {
 	initialize();
 
-	if (setjmp(lexer_abort_jmp_buf) != 0)
-	    continue;
+	if (setjmp(lexer_abort_jmp_buf) != 0) {
+	    bf_abort();
+	}
 
 	while ((t = get_token()) != NONE)
 	{

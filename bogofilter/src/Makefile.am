@@ -57,6 +57,7 @@ libbogofilter_a_SOURCES= \
 	globals.h globals.c \
 	directories.c version.c \
 	base64.h base64.c \
+	bf_abort.c \
 	bogoconfig.h bogoconfig.c \
 	bogoreader.h bogoreader.c \
 	bool.h bool.c \

@@ -139,6 +139,8 @@ typedef struct {
     double prob;
 } wordprop_t;
 
+extern void bf_abort(void);
+
 extern int build_path(char* dest, size_t size, const char* dir, const char* file);
 
 #define internal_error do { fprintf(stderr, "Internal error in %s:%u\n", __FILE__, __LINE__); abort(); } while(0)
