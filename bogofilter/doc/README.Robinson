@@ -6,9 +6,12 @@ proposed by Gary Robinson, which uses Fisher's method of combining
 probabilities; for bogofilter, Greg Louis has implemented this one too.
 
 Both of Gary Robinson's proposed classification methods work better
-than the original; however, they require some tuning.  If the user does
-not take the time to do the tuning, the results may be _worse_ than
-those obtained with Paul Graham's original method.
+than the original.  For optimal results, they (and the original)
+require some tuning.  As distributed, bogofilter includes good
+starting values for the tunable parameters.  Since the optimum values
+depend on the size and content of the wordlists at _your_ installation, 
+the best results can only be determined by some experimentation using 
+_your_ wordlists.
 
 With Robinson's changes as implemented in bogofilter, there are four
 things to tune:
