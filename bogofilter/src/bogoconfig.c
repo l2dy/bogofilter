@@ -363,6 +363,7 @@ static void help(void)
 		  "\t  -c file - read specified config file.\n"
 		  "\t  -C      - don't read standard config files.\n"
 		  "\t  -d path - specify directory for wordlists.\n"
+		  "\t  -k size - set BerkeleyDB cache size (MB).\n"
 		  "\t  -l      - write messages to syslog.\n"
 		  "\t  -L tag  - specify the tag value for log messages.\n"
 		  "\t  -I file - read message from 'file' instead of stdin.\n"
@@ -666,6 +667,10 @@ void process_args_2(int argc, char **argv)
 	    directory = xstrdup(optarg);
 	    if (setup_wordlists(directory, PR_COMMAND) != 0)
 		exit(2);
+	    break;
+
+	case 'k':
+	    db_cachesize=atoi(optarg);
 	    break;
 
 	case 'm':

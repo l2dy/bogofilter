@@ -575,6 +575,7 @@ static void help(void)
     fprintf(stderr,
 	    "\n"
 	    "\t-d file\tDump data from file to stdout.\n"
+	    "\t-k size\tset BerkeleyDB cache size (MB).\n"
 	    "\t-l file\tLoad data from stdin into file.\n"
 	    "\t-w directory\tDisplay counts for words from stdin.\n"
 	    "\t-p directory\tDisplay word counts and probabilities.\n"
@@ -619,6 +620,10 @@ static int process_args(int argc, char **argv)
 	    flag = DUMP;
 	    count += 1;
 	    db_file = (char *) optarg;
+	    break;
+
+	case 'k':
+	    db_cachesize=atoi(optarg);
 	    break;
 
 	case 'l':
