@@ -40,7 +40,7 @@ int	thresh_index = 0;
 ** Define a struct so stats can be saved for printing.
 */
 
-stats_t stats;
+stats_t gra_stats;
 
 static const parm_desc gra_parm_table[] =
 {
@@ -319,17 +319,17 @@ double gra_compute_spamicity(bogostat_t *bs, FILE *fp) /*@globals errno@*/
 
 void gra_initialize_constants(void)
 {
-    mth_initialize( &stats, GRAHAM_MAX_REPEATS, GRAHAM_MIN_DEV, GRAHAM_SPAM_CUTOFF, GRAHAM_GOOD_BIAS );
+    mth_initialize( &gra_stats, GRAHAM_MAX_REPEATS, GRAHAM_MIN_DEV, GRAHAM_SPAM_CUTOFF, GRAHAM_GOOD_BIAS );
 }
 
 double gra_spamicity(void)
 {
-    return stats.spamicity;
+    return gra_stats.spamicity;
 }
 
 rc_t gra_status(void)
 {
-    rc_t status = ( stats.spamicity >= spam_cutoff ) ? RC_SPAM : RC_HAM;
+    rc_t status = ( gra_stats.spamicity >= spam_cutoff ) ? RC_SPAM : RC_HAM;
     return status;
 }
 
@@ -337,9 +337,9 @@ double gra_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 {
     bogostat_t	*bs = select_indicators(wordhash);    /* select the best spam/nonspam indicators. */
 
-    stats.spamicity = gra_compute_spamicity(bs, fp);
+    gra_stats.spamicity = gra_compute_spamicity(bs, fp);
 
-    return stats.spamicity;
+    return gra_stats.spamicity;
 }
 
 void gra_cleanup(void)

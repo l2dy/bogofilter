@@ -44,7 +44,7 @@ double	thresh_rtable = 0.0f;		/* used in fis_parms in fisher.c */
 double	robx = 0.0f;			/* used in fis_parms in fisher.c */
 double	robs = 0.0f;			/* used in fis_parms in fisher.c */
 
-static rob_stats_t  stats;
+static rob_stats_t  rob_stats;
 
 const parm_desc rob_parm_table[] =	/* needed by fisher.c */
 {
@@ -244,29 +244,29 @@ double rob_get_spamicity(size_t robn, FLOAT P, FLOAT Q)
     double r = 1.0 / (double)robn;
     double ln10 = 2.302585093;			/* log(10) - 2.3025850929940459  */
 
-    stats.robn = robn;
+    rob_stats.robn = robn;
 
-    stats.p_ln = log(P.mant) + P.exp * ln10;	/* invlogsum */
-    stats.q_ln = log(Q.mant) + Q.exp * ln10;	/* logsum    */
+    rob_stats.p_ln = log(P.mant) + P.exp * ln10;	/* invlogsum */
+    rob_stats.q_ln = log(Q.mant) + Q.exp * ln10;	/* logsum    */
 
-    stats.p_pr = 1.0 - pow(P.mant, r) * pow(10.0, P.exp * r);	/* Robinson's P */
-    stats.q_pr = 1.0 - pow(Q.mant, r) * pow(10.0, Q.exp * r);	/* Robinson's Q */
+    rob_stats.p_pr = 1.0 - pow(P.mant, r) * pow(10.0, P.exp * r);	/* Robinson's P */
+    rob_stats.q_pr = 1.0 - pow(Q.mant, r) * pow(10.0, Q.exp * r);	/* Robinson's Q */
 
-    stats.s.spamicity = (1.0 + (stats.p_pr - stats.q_pr) / (stats.p_pr + stats.q_pr)) / 2.0;
+    rob_stats.s.spamicity = (1.0 + (rob_stats.p_pr - rob_stats.q_pr) / (rob_stats.p_pr + rob_stats.q_pr)) / 2.0;
 
-    return stats.s.spamicity;
+    return rob_stats.s.spamicity;
 }
 
 void rob_print_summary(void)
 {
     (void)fprintf(stdout, "%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
-		  stats.robn+1, "P_Q_S_invsum_logsum", 
-		  stats.p_pr, stats.q_pr, stats.s.spamicity, stats.p_ln, stats.q_ln);
+		  rob_stats.robn+1, "P_Q_S_invsum_logsum", 
+		  rob_stats.p_pr, rob_stats.q_pr, rob_stats.s.spamicity, rob_stats.p_ln, rob_stats.q_ln);
 }
 
 void rob_initialize_with_parameters(double _min_dev, double _spam_cutoff)
 {
-    mth_initialize( &stats, ROBINSON_MAX_REPEATS, _min_dev, _spam_cutoff, ROBINSON_GOOD_BIAS );
+    mth_initialize( &rob_stats, ROBINSON_MAX_REPEATS, _min_dev, _spam_cutoff, ROBINSON_GOOD_BIAS );
     scalefactor = compute_scale();
     if (fabs(robs) < EPS)
 	robs = ROBS;
@@ -279,8 +279,8 @@ void rob_initialize_constants(void)
 
 double rob_bogofilter(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/
 {
-    stats.s.spamicity = rob_compute_spamicity(wordhash, fp);
-    return stats.s.spamicity;
+    rob_stats.s.spamicity = rob_compute_spamicity(wordhash, fp);
+    return rob_stats.s.spamicity;
 }
 
 void rob_cleanup(void)

@@ -64,7 +64,7 @@ rf_method_t rf_fisher_method = {	/* used by config.c */
     fis_print_summary			/* rf_print_summary	  *print_summary	*/
 };
 
-static rob_stats_t stats;
+static rob_stats_t fis_stats;
 
 /* Function Definitions */
 
@@ -74,6 +74,7 @@ double prbf(double x, double df)
     double p, q;
     int status;
     double bound;
+
     cdfchi(&which, &p, &q, &x, &df, &status, &bound);
 
     return(status==0 ? q : 1.0);
@@ -84,22 +85,22 @@ double fis_get_spamicity(size_t robn, FLOAT P, FLOAT Q )
     double df = 2.0 * robn;
     double ln10 = 2.302585093;		 	/* log(10) - 2.3025850929940459  */
 
-    stats.robn = robn;
-    stats.p_ln = log(P.mant) + P.exp * ln10;	/* convert to natural logs */
-    stats.q_ln = log(Q.mant) + Q.exp * ln10;	/* convert to natural logs */
-    stats.p_pr = prbf(-2.0 * stats.p_ln, df);	/* compute P */
-    stats.q_pr = prbf(-2.0 * stats.q_ln, df);	/* compute Q */
+    fis_stats.robn = robn;
+    fis_stats.p_ln = log(P.mant) + P.exp * ln10;	/* convert to natural logs */
+    fis_stats.q_ln = log(Q.mant) + Q.exp * ln10;	/* convert to natural logs */
+    fis_stats.p_pr = prbf(-2.0 * fis_stats.p_ln, df);	/* compute P */
+    fis_stats.q_pr = prbf(-2.0 * fis_stats.q_ln, df);	/* compute Q */
 
-    stats.s.spamicity = (1.0 + stats.q_pr - stats.p_pr) / 2.0;
+    fis_stats.s.spamicity = (1.0 + fis_stats.q_pr - fis_stats.p_pr) / 2.0;
 
-    return stats.s.spamicity;
+    return fis_stats.s.spamicity;
 }
 
 void fis_print_summary(void)
 {
     (void)fprintf(stdout, "%3d  %-20s  %8.5f  %8.5f  %8.6f  %8.3f  %8.3f\n",
-		  stats.robn+1, "P_Q_S_invsum_logsum", 
-		  stats.p_pr, stats.q_pr, stats.s.spamicity, stats.p_ln, stats.q_ln);
+		  fis_stats.robn+1, "P_Q_S_invsum_logsum", 
+		  fis_stats.p_pr, fis_stats.q_pr, fis_stats.s.spamicity, fis_stats.p_ln, fis_stats.q_ln);
 }
 
 void fis_initialize_constants(void)
@@ -109,10 +110,10 @@ void fis_initialize_constants(void)
 
 rc_t fis_status(void)
 {
-    if ( stats.s.spamicity >= spam_cutoff ) 
+    if ( fis_stats.s.spamicity >= spam_cutoff ) 
 	return RC_SPAM;
 
-    if (ham_cutoff < EPS || (stats.s.spamicity - ham_cutoff < EPS))
+    if (ham_cutoff < EPS || (fis_stats.s.spamicity - ham_cutoff < EPS))
 	return RC_HAM;
 
     return RC_UNSURE;
