@@ -9,6 +9,7 @@ License: GPL
 Group: Applications/Internet
 Summary: fast anti-spam filtering by Bayesian statistical analysis
 Buildroot: %{_tmppath}/%{name}-%{version}-root
+BuildRequires:	gsl >= 1.4
 Conflicts: bogofilter-static
 %define mydocdir %{_docdir}/%{name}
 
