@@ -1,0 +1,152 @@
+#!/bin/sh
+
+. ${srcdir=.}/t.frame
+
+OUT=${TMPDIR}/test.out
+CORRECT=${SYSTEST}/outputs/multiple.wordlists.ref
+
+CF_DEFAULT=default.cf
+CF_IGN_REG=ign_reg.cf
+CF_IGN_USR_SYS=ign_usr_sys.cf
+CF_MRG_USR_SYS=mrg_usr_sys.cf
+
+# single wordlist
+cat <<EOF > ${TMPDIR}/$CF_DEFAULT
+bogofilter_dir=${TMPDIR}
+EOF
+
+# ignore list, single wordlist
+cat <<EOF > ${TMPDIR}/$CF_IGN_REG
+bogofilter_dir=${TMPDIR}
+wordlist i,ignore,ignore.db,1
+wordlist r,wordlist,wordlist.db,2
+EOF
+
+# ignore list, user & system wordlists
+cat <<EOF > ${TMPDIR}/$CF_IGN_USR_SYS
+bogofilter_dir=${TMPDIR}
+wordlist i,ignore,ignore.db,4
+wordlist r,wordlist,user.db,5
+wordlist r,wordlist,system.db,6
+EOF
+
+# merged user & system wordlists
+cat <<EOF > ${TMPDIR}/$CF_MRG_USR_SYS
+bogofilter_dir=${TMPDIR}
+wordlist r,wordlist,user.db,7
+wordlist r,wordlist,system.db,7
+EOF
+
+# files for building databases
+cat <<EOF > ${TMPDIR}/ignore.txt
+ignore
+user_low
+system_hi
+EOF
+
+cat <<EOF > ${TMPDIR}/wordlist.txt
+.MSG_COUNT 1 1
+.WORDLIST_VERSION 20040500 0
+ignore 2 7
+common 2 7
+word_low 2 7
+word_hi 7 2
+EOF
+
+cat <<EOF > ${TMPDIR}/user.txt
+.MSG_COUNT 1 1
+.WORDLIST_VERSION 20040500 0
+ignore 2 8
+common 2 8
+user_low 2 8
+user_hi 8 2
+EOF
+
+cat <<EOF > ${TMPDIR}/system.txt
+.MSG_COUNT 10 10
+.WORDLIST_VERSION 20040500 0
+ignore 2 9
+common 2 9
+system_low 2 9
+system_hi 9 2
+EOF
+
+cat <<EOF > ${TMPDIR}/test.ref
+.MSG_COUNT 1 1
+.WORDLIST_VERSION 20040500 0
+system
+EOF
+
+# test message
+cat <<EOF > ${TMPDIR}/message
+ignore
+common
+user_low
+system_hi
+word_low
+word_hi
+user_low
+user_hi
+system_low
+system_hi
+message
+EOF
+
+# suppress timestamps & version info in output
+BUOPTS="-y 0"
+BFOPTS='--header_format=%h: %c, tests=bogofilter, spamicity=%p'
+PAT="s/[,]\? version.*//"
+
+# build wordlists
+$BOGOUTIL $OPTS -l ${TMPDIR}/ignore.db   < ${TMPDIR}/ignore.txt
+$BOGOUTIL $OPTS -l ${TMPDIR}/wordlist.db < ${TMPDIR}/wordlist.txt
+$BOGOUTIL $OPTS -l ${TMPDIR}/user.db     < ${TMPDIR}/user.txt
+$BOGOUTIL $OPTS -l ${TMPDIR}/system.db   < ${TMPDIR}/system.txt
+
+(echo "#### 1: score message using each wordlist ####"; echo) >> $OUT
+
+for DB in ${TMPDIR}/*.db ; do
+    printf "%-12s" `basename $DB`: >> $OUT
+    $BOGOFILTER "$BFOPTS" -C -D -H -e --wordlist=r,wordlist,`basename $DB`,1 -m0.1 -v -I ${TMPDIR}/message | sed "$PAT" >> $OUT
+done
+echo >> $OUT
+
+(echo "#### 1: score message using each config file ####"; echo) >> $OUT
+
+for CFG in ${TMPDIR}/*.cf ; do
+    echo Using `basename $CFG`: >> $OUT
+    $BOGOFILTER "$BFOPTS" -D -H -e -c $CFG -m0.1 -vvv -I ${TMPDIR}/message | sed "$PAT" >> $OUT
+    echo >> $OUT
+done
+
+(echo "#### Update user.db using $CF_IGN_USR_SYS ####"; echo) >> $OUT
+
+# Add message to user.db (first regular wordlist in CF_IGN_USR_SYS)
+
+echo >> $OUT
+echo common message ignore | $BOGOFILTER "$BFOPTS" -D -H -n -c ${TMPDIR}/$CF_IGN_USR_SYS -y 0
+
+(echo "#### 2: score message using each wordlist ####"; echo) >> $OUT
+
+for DB in ${TMPDIR}/*.db ; do
+    printf "%-12s" `basename $DB`: >> $OUT
+    $BOGOFILTER "$BFOPTS" -C -D -H -e --wordlist=r,wordlist,`basename $DB`,1 -m0.1 -v -I ${TMPDIR}/message | sed "$PAT" >> $OUT
+done
+echo >> $OUT
+
+(echo "#### 2: score message using each config file ####"; echo) >> $OUT
+
+for CFG in ${TMPDIR}/*.cf ; do
+    echo Using `basename $CFG`: >> $OUT
+    $BOGOFILTER "$BFOPTS" -D -H -e -c $CFG -m0.1 -vvv -I ${TMPDIR}/message | sed "$PAT" >> $OUT
+    echo >> $OUT
+done
+
+# compare test output to reference output
+
+if  [ $verbose -eq 0 ]; then
+    diff $CORRECT $OUT
+    cmp $CORRECT $OUT
+else
+    diff $DIFF_BRIEF $CORRECT $OUT
+fi

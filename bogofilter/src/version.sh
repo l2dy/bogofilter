@@ -44,7 +44,7 @@ if [ ! -z "$SUFFIX" ]; then
     if [ "x$FILES" = "x" ] || [ "x$DATE" = "x" ] ; then
        DATE=$(env TZ=GMT date "+build_date_%Y%m%d_%Hh")
     fi
-    VERSION="$VERSION.$DATE"
+#   VERSION="$VERSION.$DATE"
 fi
 
 echo "#include \"globals.h\""

@@ -17,10 +17,6 @@ extern FILE *yyin;
 
 extern	bool	block_on_subnets;
 
-extern	bool	kill_html_comments;
-extern	int	count_html_comments;
-extern	bool	score_html_comments;
-
 #define YY_NULL 0
 
 /* lexer interface */
@@ -55,9 +51,9 @@ extern lexer_t *lexer;
 extern lexer_t	msg_count_lexer;
 
 /* in lexer_v3.l */
-extern token_t	lexer_v3_lex(void);
-extern int	lexer_v3_leng;
-extern char   * lexer_v3_text;
+extern token_t	yylex(void);
+extern int	yyleng;
+extern char   * yytext;
 extern void	lexer_v3_init(FILE *fp);
 
 /* in lexer_v?.c */

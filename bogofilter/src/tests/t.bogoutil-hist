@@ -1,7 +1,5 @@
 #! /bin/sh
 
-set -e
-
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
 #	 bogoutil-hist.YYYYMMDD.  This is useful when something is different.
@@ -23,7 +21,6 @@ $BOGOFILTER $OPTS -r -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER $OPTS -r -n < ${SYSTEST}/inputs/good.mbx
 
 OUT="bogoutil-hist.out"
-OUTPUTS=${SYSTEST}/outputs
 
 $BOGOUTIL -H $BOGOFILTER_DIR >${TMPDIR}/$OUT
 

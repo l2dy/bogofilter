@@ -41,7 +41,6 @@ const char *db_version_str(void)
 
 static dbh_t *dbh_init(const char *path, const char *name)
 {
-    size_t c;
     dbh_t *handle;
     size_t len = strlen(path) + strlen(name) + 2;
 
@@ -83,7 +82,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     int open_flags;
     TDB_CONTEXT *dbp;
 
-    if (open_mode == DB_WRITE) {
+    if (open_mode == DS_WRITE) {
 	open_flags = O_RDWR | O_CREAT;
     }
     else {
@@ -105,7 +104,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "(db) tdb_open( %s ), %d )\n", handle->name, open_mode);
       
-    if (open_mode == DB_WRITE) {
+    if (open_mode == DS_WRITE) {
 	if (tdb_lockall(dbp) == 0) {
 	    handle->locked = 1;
 	}
@@ -332,3 +331,7 @@ const char *db_str_err(int j)
 static bool init = false;
 int db_init(void) { init = true; return 0; }
 void db_cleanup(void) { init = false; }
+
+int db_txn_begin(dsh_t *d) { (void)d; return 0; }
+int db_txn_abort(dsh_t *d) { (void)d; return 0; }
+int db_txn_commit(dsh_t *d) { (void)d; return 0; }

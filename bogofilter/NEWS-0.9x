@@ -1,0 +1,53 @@
+			       =================
+				BOGOFILTER NEWS
+			       =================
+
+0.91.1	2004-06-04
+
+* Use named constants for wordlist 'type' attribute to
+  distinguish open modes of READ, WRITE, and CREATE so
+  bogofilter will include .WORDLIST_VERSION in new database.
+* Add DS_LOAD flag so bogoutil won't add .WORDLIST_VERSION
+* Modify regression tests to use bogoutil to create empty
+  wordlists (as needed).
+
+* Fixed registration.  When multiple wordlists are specified,
+  registration is to first regular wordlist.
+* Added regresstion test for multiple wordlists.
+
+* Modify contrib scripts so they're sh compatible.
+* Fix problem when bogofilter's home is a symlink.
+* Fix problems with not expanding tildes.
+
+0.91.0	2004-05-22
+
+* Add ignore list capability.
+* Revive and revise multiple wordlist code.
+* Increase width of 'count' column for -vvv output.
+* Cleanup variable names in database open() code.
+
+0.90.0	2004-05-09
+
+* Lower output precision for regression tests, by using %f
+  rather than %e, to mask differences between GSL versions.
+* Updated TODO list and procmailrc.example
+
+* Added code for Robinson's Effective Size Factor (ESF) 
+  to score.c, bogotune.c, bogofilter.cf.example, etc.
+* Added '-E' options to bogotune to suppress ESF scan.
+* Revised bogotune's parameter ranges.
+
+* Remove unreferenced enum wl_e.
+* Add .WORDLIST_VERSION meta symbol.
+* Change subnet prefix from url: to ip:
+* Add -u switch to bogoutil to do wordlist upgrade.
+* Add regression test t.upgrade.subnet.prefix
+
+* Added code for Robinson's Effective Size Factor (ESF) 
+  to score.c, bogotune.c, bogofilter.cf.example, etc.
+* Added '-E' options to bogotune to suppress ESF scan.
+* Revised parameter ranges for coarse scan.
+
+* Changed list address in FAQ to bogofilter.org
+
+0.17.5	2004-04-01 - previous stable release

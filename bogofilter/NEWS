@@ -2,17 +2,135 @@
 				BOGOFILTER NEWS
 			       =================
 
-NOTE: More information on important changes for bogofilters updaters
+NOTE: More information on important changes for bogofilter updaters
 is in the RELEASE.NOTES files.  Read them!!
 
-0.17.?	2004-03-??
+0.91.1	2004-06-04
+
+	2004-06-04
+
+	* Fix problem with not expanding tildes.
+	* Add DS_LOAD flag to distinguish between database creation by
+	  bogofilter and bogoutil so .WORDLIST_VERSION is only added
+	  by bogofilter.
+	* Modify regression tests to use bogoutil to create empty
+	  wordlists (as needed).
+
+	2004-05-30
+
+	* Fixed registration.  When multiple wordlists are specified,
+          registration is to first regular wordlist.
+	* Added regresstion test for multiple wordlists.
+
+	2004-05-29
+
+	* Distinguish open modes of READ, WRITE, and CREATE so
+	* bogofilter will include .WORDLIST_VERSION in new database.
+
+	2004-05-28
+
+	* Modify contrib scripts so they're sh compatible.
+	* Fix problem with not expanding tildes.
+
+	2004-05-23
+
+	* Use named constants for wordlist 'type' attribute.
+
+	2004-05-22
+
+	* Fix problem when bogofilter's home is a symlink.
+
+0.91.0	2004-05-22
+
+	* Miscellaneous cleanups for multiple wordlist code.
+	* Cleanup variable names in database open() code.
+	* Increase width of 'count' column for -vvv output.
+
+	2004-05-17
+
+	* Add ignore list capability.
+	* Revive and revise multiple wordlist code.
+
+0.90.0	2004-05-09
+
+	* Revised bogotune's parameter ranges for coarse scan.
+
+	2004-05-08
+
+	* Changed list address in FAQ to bogofilter.org
+
+	2004-05-05
+
+	* Added code for Robinson's Effective Size Factor (ESF) 
+	  to score.c, bogotune.c, bogofilter.cf.example, etc.
+	* Added '-E' options to bogotune to suppress ESF scan.
+
+	2004-05-02
+
+	* Remove unreferenced enum wl_e.
+	* Add .WORDLIST_VERSION meta symbol.
+	* Change subnet prefix from url: to ip:
+	* Add -u switch to bogoutil to do wordlist upgrade.
+	* Add regression test t.upgrade.subnet.prefix
+
+	2004-04-22
+
+	* Fixed configure's --enable-memdebug option.
+
+	2004-04-12
+
+	* Updated TODO list and procmailrc.example
+
+	2004-04-02
+
+	* Lower output precision for regression tests, by using %f
+          rather than %e, to mask differences between GSL versions.
+
+0.17.5	2004-04-01
+	2004-04-08 - New Stable Release
+
+	2004-03-31
+
+	* Change default parameters to the results of Greg's 300k ham
+	  and 300k spam bogotune run:
+
+		     robs     robx    min_dev  spam_co
+	      old  0.010000 0.415000 0.100000 0.950000
+	      new  0.017800 0.520000 0.375000 0.990000
+
+	2004-03-22
+
+	* Fix check for PGP signatures.
+
+0.17.4	2004-03-20
+
+	* Ignore data portion of PGP signatures.
+	* Use "mime:" (rather than "head:") to tag mime part headers.
+
+	2004-03-19
+
+	* Fix "Can't find '.MSG_COUNT'" problem in bogotune.
+	* Fix defect that continues decoding base64/qp after invalid chars.
+
+	2004-03-18
+
+	* Fix message reporting lack of config file.
+
+0.17.3	2004-03-17
+
+	2004-03-15
+	
+	* Warn if user specified config file doesn't exist.
+
+	2004-03-09
+
+	* Fix tagging of IPAddrs in header lines.
 
 	2004-03-04
 
-	* Switched from Berkeley DB Data Store to Berkeley DB
-	  Concurrent Data Store, which uses a "DB_ENV" BerkeleyDB
-	  environment and the BerkeleyDB Lock Manager.  This is
-	  documented in file doc/README.db.
+	* Added code to use Berkeley DB Concurrent Data Store, which
+	  uses a "DB_ENV" BerkeleyDB environment and the BerkeleyDB
+	  Lock Manager.  This is documented in file doc/README.db.
 
 	2004-03-03
 

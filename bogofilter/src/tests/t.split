@@ -1,7 +1,5 @@
 #! /bin/sh
 
-set -e
-
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
 #	 split.YYYYMMDD.  This is useful when something is different.
@@ -42,8 +40,6 @@ for msg in $files ; do
 done
 
 [ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
-
-OUTPUTS=${SYSTEST}/outputs
 
 if  [ $verbose -eq 0 ]; then
     cmp ${OUTPUTS}/$OUT ${TMPDIR}/$OUT

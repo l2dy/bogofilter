@@ -1,7 +1,5 @@
 #! /bin/sh
 
-set -e
-
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
 #	 maildir.YYYYMMDD.  This is useful when something is different.
@@ -28,9 +26,9 @@ done
 
 $BOGOFILTER -C -D -n -B $TMPDIR/good
 $BOGOFILTER -C -D -s -B $TMPDIR/spam
-wordlist=".MSG_COUNT Lotus Magazine Min Service connection more most set that unsubscribe"
+words=".MSG_COUNT Lotus Magazine Min Service connection more most set that unsubscribe"
 
-$BOGOUTIL -w $TMPDIR/wordlist.$DB_EXT $wordlist >$OUT || rm -f $OUT
+$BOGOUTIL -w $WORDLIST $words >$OUT || rm -f $OUT
 
 if  [ $verbose -eq 0 ]; then
     cmp $CORRECT $OUT

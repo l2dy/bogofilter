@@ -137,18 +137,30 @@ int histogram(const char *path)
     build_wordlist_path(filepath, sizeof(filepath), path);
 
     ds_init();
-    dsh = ds_open(CURDIR_S, filepath, DB_READ);
+    dsh = ds_open(CURDIR_S, filepath, DS_READ);
     if (dsh == NULL)
 	return EX_ERROR;
 
+    if (DST_OK != ds_txn_begin(dsh)) {
+	ds_close(dsh, false);
+	fprintf(stderr, "cannot begin transaction!\n");
+	return EX_ERROR;
+    }
+
     ds_get_msgcounts(dsh, &val);
     set_msg_counts(val.goodcount, val.spamcount);
+
+    if (DST_OK != ds_txn_commit(dsh)) {
+	ds_close(dsh, false);
+	fprintf(stderr, "cannot commit transaction!\n");
+	return EX_ERROR;
+    }
 
     ds_close(dsh, false);
     ds_cleanup();
 
     memset(&hist, 0, sizeof(hist));
-    rc = ds_oper(filepath, DB_READ, ds_histogram_hook, &hist);
+    rc = ds_oper(filepath, DS_READ, ds_histogram_hook, &hist);
 
     count = print_histogram(&hist);
 

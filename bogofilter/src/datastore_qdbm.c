@@ -95,7 +95,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
     int flags;
     DEPOT *dbp;
 
-    if (open_mode == DB_WRITE)
+    if (open_mode == DS_WRITE)
 	flags = DP_OWRITER | DP_OCREAT;
     else
 	flags = DP_OREADER;
@@ -210,8 +210,9 @@ int db_set_dbvalue(dsh_t *dsh, const dbv_t *token, dbv_t *val)
 
     if (ret == 0) {
 	print_error(__FILE__, __LINE__,
-		    "(qdbm) db_set_dbvalue( '%.*s' ), err: %d",
-		    CLAMP_INT_MAX(token->leng), (char *)token->data, dpecode);
+		    "(qdbm) db_set_dbvalue( '%.*s' ) failed: %s",
+		    CLAMP_INT_MAX(token->leng), (char *)token->data,
+		    dperrmsg(dpecode));
 	exit(EX_ERROR);
     }
 
@@ -317,3 +318,7 @@ const char *db_str_err(int e) {
 static bool init = false;
 int db_init(void) { init = true; return 0; }
 void db_cleanup(void) { init = false; }
+
+int db_txn_begin(dsh_t *d) { (void)d; return 0; }
+int db_txn_abort(dsh_t *d) { (void)d; return 0; }
+int db_txn_commit(dsh_t *d) { (void)d; return 0; }

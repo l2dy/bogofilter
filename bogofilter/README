@@ -11,6 +11,17 @@ as recognition features rather than broken up. Various kinds of MTA
 cruft such as dates and message-IDs are discarded so as not to bloat
 the word lists.
 
+*** IMPORTANT ***
+
+If you are using bogofilter with the Berkeley DB data base library
+(which is the default, received most testing, is the most powerful of
+the data base engines that bogofilter supports and hence recommended),
+do read the doc/README.db file, it contains important information.
+
+The doc/README.db file contains troubleshooting informations and
+requirements that should be read ahead of time so you can fix troubles
+quickly should they arise later.
+
 
 *** DOCUMENTATION ***
 

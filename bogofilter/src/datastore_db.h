@@ -30,7 +30,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 /*@only@*/ /*@null@*/
 void *db_open(const char *path	/** path to database file */, 
 	      const char *name	/** name(s) of data base(s) */,
-	      dbmode_t mode	/** open mode, DB_READ or DB_WRITE */);
+	      dbmode_t mode	/** open mode, DS_READ or DS_WRITE */);
 
 /** Close file and clean up. */
 void  db_close(/*@only@*/ void *vhandle, bool nosync  /** Normally false, if true, do not synchronize data. This should not be used in regular operation but only to ease the disk I/O load when the lock operation failed. */);
@@ -81,6 +81,11 @@ const char *db_str_err(int);
 
 /* Returns version string */
 const char *db_version_str(void);
+
+/* */
+int db_txn_begin(dsh_t *dsh);
+int db_txn_abort(dsh_t *dsh);
+int db_txn_commit(dsh_t *dsh);
 
 /* This is not currently used ...
  * 

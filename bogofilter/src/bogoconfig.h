@@ -16,6 +16,7 @@ AUTHOR:
 #include "system.h"
 
 #include "configfile.h"
+#include "getopt.h"
 
 /* Global variables */
 

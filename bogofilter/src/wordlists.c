@@ -8,8 +8,8 @@
 #include <stdlib.h>
 
 #include "bogofilter.h"
+#include "bogohome.h"
 #include "datastore.h"
-#include "find_home.h"
 #include "msgcounts.h"
 #include "paths.h"
 #include "rand_sleep.h"
@@ -31,14 +31,15 @@ void open_wordlists(dbmode_t mode)
     wordlist_t *list;
     int retry;
 
+    if (word_lists == NULL)
+	init_wordlist(&word_lists, "word", WORDLIST, 0, WL_REGULAR);
+
     do {
 	ds_init();
 
 	retry = 0;
 	for (list = word_lists; list != NULL; list = list->next) {
-	    if (db_cachesize < 4)
-		db_cachesize = 4;
-	    list->dsh = ds_open(list->filepath, WORDLIST, mode);
+	    list->dsh = ds_open(bogohome, list->filepath, mode);
 	    if (list->dsh == NULL) {
 		int err = errno;
 		close_wordlists(true); /* unlock and close */
@@ -54,7 +55,7 @@ void open_wordlists(dbmode_t mode)
 			    return;
 			fprintf(stderr,
 				"Can't open file '%s' in directory '%s'.\n",
-				WORDLIST, list->filepath);
+				list->filepath, bogohome);
 			if (err != 0)
 			    fprintf(stderr,
 				    "error #%d - %s.\n", err, strerror(err));
@@ -73,9 +74,15 @@ void open_wordlists(dbmode_t mode)
 		} /* switch */
 	    } else { /* ds_open */
 		dsv_t val;
+		ds_txn_begin(list->dsh);
 		ds_get_msgcounts(list->dsh, &val);
 		list->msgcount[IX_GOOD] = val.goodcount;
 		list->msgcount[IX_SPAM] = val.spamcount;
+		if (wordlist_version == 0 &&
+		    ds_get_wordlist_version(list->dsh, &val))
+		    wordlist_version = val.count[0];
+
+		ds_txn_commit(list->dsh);
 	    } /* ds_open */
 	} /* for */
     } while(retry);
@@ -147,4 +154,68 @@ void compute_msg_counts(void)
 	g += list->msgcount[IX_GOOD];
     }
     set_msg_counts(g, s);
+}
+
+static char *spanword(char *p)
+{
+    const char *delim = ", \t";
+    p += strcspn(p, delim);		/* skip to end of word */
+    *p++ = '\0';
+    while (isspace((unsigned char)*p)) 	/* skip trailing whitespace */
+	p += 1;
+    return p;
+}
+
+/* type - 'n', or 'i' (normal or ignore)
+ * name - 'user', 'system', 'ignore', etc
+ * path - 'wordlist.db', 'ignorelist.db', etc
+ * override - 1,2,...
+ */
+
+/* returns true for success, false for error */
+bool configure_wordlist(const char *val)
+{
+    bool ok;
+    int rc;
+    wordlist_t* wl = xcalloc(1, sizeof(wordlist_t));
+    char  ch;
+    WL_TYPE type;
+    char* listname;
+    char* filename;
+    int  precedence;
+
+    char *tmp = xstrdup(val);
+    
+    ch= tmp[0];		/* save wordlist type (good/spam) */
+    tmp = spanword(tmp);
+    
+    switch (toupper(ch))
+    {
+    case 'R':
+	type = WL_REGULAR;
+	break;
+    case 'I':
+	type = WL_IGNORE;
+	break;
+    default:
+	fprintf( stderr, "Unknown wordlist type - '%c'\n", ch);
+	return (false);
+    }
+    
+    listname=tmp;		/* name of wordlist */
+    tmp = spanword(tmp);
+    
+    filename=tmp;		/* path to wordlist */
+    tmp = spanword(tmp);
+    
+    precedence=atoi(tmp);
+    tmp = spanword(tmp);
+    
+    rc = init_wordlist(&wl, listname, filename, precedence, type);
+    ok = rc == 0;
+
+    if (ok)
+	config_setup = true;
+
+    return ok;
 }

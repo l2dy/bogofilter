@@ -29,6 +29,7 @@ THEORY:
 
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "bogofilter.h"
 #include "bogoconfig.h"
@@ -81,6 +82,8 @@ rc_t bogofilter(int argc, char **argv)
 
     atexit(bf_exit);
 
+    set_default_wordlist();
+
     score_initialize();	/* initialize constants */
 
     if (query)
@@ -109,6 +112,7 @@ rc_t bogofilter(int argc, char **argv)
 
 	if (classify_msg || write_msg) {
 	    spamicity = msg_compute_spamicity(w, NULL);
+	    assert(spamicity >= 0 && spamicity <= 1);
 	    status = msg_status();
 	    if (run_type & RUN_UPDATE)		/* Note: don't register if RC_UNSURE */
 	    {
@@ -124,7 +128,7 @@ rc_t bogofilter(int argc, char **argv)
 		    fprintf(fpo, "%s ", filename); 
 	    }
 
-	    write_message(status);
+	    write_message(status);		/* passthrough */
 	    if (logflag && !register_opt) {
 		write_log_message(status);
 		msgcount = 0;
