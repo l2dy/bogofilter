@@ -36,13 +36,15 @@ int main(int argc, char **argv)
     enum mode mode = current;
 
     if (argc >= 2) {
-	if (!isdigit((unsigned char)argv[1][0]))
-	    if (argv[1][0] == '~')
+	if (!isdigit((unsigned char)argv[1][0])) {
+	    if (argv[1][0] == '~') {
 		mode = tilde;
-	    else
+	    } else {
 		mode = by_user;
-	else
+	    }
+	} else {
 	    read_env = atoi(argv[1]);
+	}
     }
 
     switch (mode) {
