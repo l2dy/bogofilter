@@ -1,22 +1,22 @@
 #! /usr/bin/perl
 # bogotune - a bogofilter tuning tool
-# 20030619, version 0.2.1
+# 20030619, version 0.2.2
 # Copyright (c) 2003 Gregory Louis; distributed wiithout warranty of
 # any kind under the GNU General Public License (GPL).
 
 ### 0.  Initialize and process arguments
 use POSIX;
 # edit this line to change bogotune's working directory
-$workdir = "/proj/Rwork"; chdir($workdir) or die "Can't access $workdir";
+$workdir = "./work"
+chdir($workdir) or die "Can't access $workdir";
 
 # choose apclass (0) or bogofilter (1) for scanning; apclass is twice
 # as fast, if you have it, but it's not yet freely available.
 $usebogofilter = 1;
 
-# provide full paths to bogofilter and bogoutil; this is normally
-# not needed, but handy for testing.
-# $bogop = "";
-$bogop = "/store/src/bogo/bogofilter-0.13.6.3/src/";
+# $bogop may be an absolute path to bogofilter and bogoutil, eg
+# $bogop = "/newversion/"; # for testing
+$bogop = "";
 $bogof = $bogop . "bogofilter"; $bogou = $bogop . "bogoutil";
 
 # besides being human-readable, this help text is formatted for automatic

@@ -1,4 +1,4 @@
-README for bogotune version 0.2.1 (perl)
+README for bogotune version 0.2.2
 (How to tune bogofilter with minimum effort)
 
 This document describes a script called bogotune that will completely
@@ -49,7 +49,12 @@ Installation:
 	your execution path.  The bogol script is used by formail to
 	create message-count files.
 
-    2. If you wish, copy the man pages to the appropriate location
+    2. The bogotune script needs to use a working directory; it
+	defaults to "./work", but you can configure to suit your
+	working environment by changing the definition of $workdir
+	as described in the next section.
+
+    3. If you wish, copy the man pages to the appropriate location
 	(typically /usr/man/man1 or /usr/share/man/man1).
 
 Tuning:
@@ -75,10 +80,10 @@ The message files may be in either mbox or msg-count format, but they
 must all be one or the other; don't mix them.  If they're in mbox
 format, you'll need enough free disk space so bogotune can create
 msg-count files to use in the scans.  There will need to be a writable
-directory called /proj/Rwork for bogotune to use; this name can be
-changed by editing the value of workdir in bogotune's line 10.  To use
-$TMPDIR, for example, you could change
-    $workdir = "/proj/Rwork";
+directory called work for bogotune to use; this defaults to "./work",
+but may be set by editing the value of workdir in bogotune's line 10.
+To use $TMPDIR, for example, you could change
+    $workdir = "./work";
 to
     $workdir = $ENV{"TMPDIR"};
 or you might keep all the bogofilter-related files together with
