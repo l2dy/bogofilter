@@ -88,7 +88,7 @@ int kill_html_comment(byte *buf_start, byte *buf_used, byte *buf_end)
 	    break;
 	tmp += 1;
 	/* When killing html comments, there's no need to keep it in memory */
-	if (kill_html_comments && tmp - buf_start > 4000) {
+	if (kill_html_comments && buf_end - buf_used < COMMENT_END_LEN) {
 	    /* Leave enough to recognize the end of comment string. */
 	    byte *buf_temp = buf_used - COMMENT_END_LEN;
 	    size_t count = buf_temp - buf_start;
