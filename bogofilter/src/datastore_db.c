@@ -348,6 +348,10 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode)
  open_err:
     dbh_free(handle);
 
+    if (ret >= 0)
+	errno = ret;
+    else
+	errno = EINVAL;
     return NULL;
 }
 
