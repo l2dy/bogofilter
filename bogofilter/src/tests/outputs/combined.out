@@ -1,13 +1,13 @@
 wordlist.db
-                       spam   good
-.MSG_COUNT               21     48
-subj:Earn                 1      0
-subj:Your                 5      1
-subj:College              1      0
+                                 spam   good
+.MSG_COUNT                         21     48
+subj:Earn                           1      0
+subj:Your                           5      1
+subj:College                        1      0
 # 5 words, 1 message
 S 0.999999
-                       spam   good
-.MSG_COUNT               22     48
-subj:Earn                 2      0
-subj:Your                 6      1
-subj:College              2      0
+                                 spam   good
+.MSG_COUNT                         22     48
+subj:Earn                           2      0
+subj:Your                           6      1
+subj:College                        2      0
