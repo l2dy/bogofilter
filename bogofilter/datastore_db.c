@@ -29,7 +29,7 @@ AUTHOR:
 
 #define DBT_init(dbt) do { memset(&dbt, 0, sizeof(DBT)); } while(0)
 
-#if DB_VERSION_MAJOR <= 3 || DB_VERSION_MINOR == 0
+#if DB_VERSION_MAJOR <= 3 || (DB_VERSION_MAJOR == 4 && DB_VERSION_MINOR == 0)
 #define	DB_OPEN(db, file, database, dbtype, flags, mode) db->open(db, file, database, dbtype, flags, mode)
 #else
 #define	DB_OPEN(db, file, database, dbtype, flags, mode) db->open(db, NULL /*txnid*/, file, database, dbtype, flags, mode)
