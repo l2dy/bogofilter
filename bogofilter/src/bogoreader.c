@@ -76,6 +76,8 @@ static reader_line_t ant_getline;	/* minds   /^MAIL TO:/ */
 
 static reader_file_t get_filename;
 
+static void bogoreader_close(void);
+
 typedef enum { MBOX, RMAIL, ANT } mbox_t;
 
 typedef struct {
@@ -219,10 +221,7 @@ static bool reader__next_mail(void)
 static bool open_mailstore(const char *name)
 {
     filename = name;
-    if (fpin) {
-	fclose(fpin);
-	fpin = NULL;
-    }
+    bogoreader_close();
     firstline = true;
     switch (isdir(filename)) {
     case IS_FILE:
@@ -378,8 +377,7 @@ static bool dir_next_mail(void)
 		 (mailstore_type == MS_MH) ? "" : *(maildir_sub-1),
 		 DIRSEP_C, dirent->d_name);
 
-	if (fpin)
-	    fclose(fpin);
+	bogoreader_close();
 	fpin = fopen( filename, "r" );
 	if (fpin == NULL) {
 	    fprintf(stderr, "Warning: can't open file '%s': %s\n", filename,
@@ -643,7 +641,13 @@ void bogoreader_name(const char *name)
 /* global cleanup, exported */
 void bogoreader_fini(void)
 {
+    bogoreader_close();
+    fini();
+}
+
+static void bogoreader_close(void)
+{
     if (fpin && fpin != stdin)
 	fclose(fpin);
-    fini();
+    fpin = NULL;
 }
