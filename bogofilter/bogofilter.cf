@@ -1,6 +1,9 @@
 #### Sample bogofilter configuration file
+#
+#	bogofilter config files should be located in:
+#	    HOME as ~/.bogofilter.cf; and/or
+#	    /etc as /etc/bogofilter.cf
 
-#	file should be in /etc/bogofilter.cf and/or ~/.bogofilter.cf
 
 #### SPAM_HEADER_NAME
 #
@@ -8,6 +11,16 @@
 #	in removing already existing headers
 
 #spam_header_name=X-Bogosity
+
+
+#### USER_CONFIG_FILE
+#
+#	name/location of user config file
+
+#user_config_file=~/.bogofilter.cf
+#user_config_file=~/.bogofilterrc
+#user_config_file=~/.bogofilter/config
+
 
 #### wordlist: define a word list
 #
@@ -18,6 +31,7 @@
 #	int override - skip lower valued lists
 
 #wordlist i,ignore,~/.ignorelist.db,1,0,0
+
 
 ##### threshold values
 #

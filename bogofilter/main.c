@@ -41,6 +41,9 @@ char msg_register[80];
 char msg_bogofilter[80];
 
 const char *progname = "bogofilter";
+const char *system_config_file = "/etc/bogofilter.cf";
+const char *user_config_file   = "~/.bogofilter.cf";
+
 char *spam_header_name = SPAM_HEADER_NAME;
 
 run_t run_type = RUN_NORMAL; 
@@ -261,8 +264,8 @@ int main(int argc, char **argv)
 
     setup_lists(directory);
 
-    read_config_file( "/etc/bogofilter.cf" );
-    read_config_file( "~/.bogofilter.cf" );
+    read_config_file( system_config_file );
+    read_config_file( user_config_file );
 
     switch(run_type) {
 	case RUN_NORMAL:

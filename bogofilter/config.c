@@ -35,6 +35,7 @@ extern int thresh_index;
 extern double thresh_stats;
 extern double thresh_rtable;
 extern char *spam_header_name;
+extern char *user_config_file;
 
 /*---------------------------------------------------------------------------*/
 
@@ -60,11 +61,12 @@ typedef struct {
 
 ArgDefinition ArgDefList[] =
 {
-    { "thresh_index",	CP_INTEGER,	{ (void *) &thresh_index } },
-    { "thresh_rtable",	CP_DOUBLE,	{ (void *) &thresh_rtable } },
-    { "thresh_stats",	CP_DOUBLE,	{ (void *) &thresh_stats } },
-    { "spam_header_name",CP_STRING,	{ (void *) &spam_header_name } },
-    { "wordlist",	CP_WORDLIST,	{ (void *) NULL } },
+    { "thresh_index",	  CP_INTEGER,	{ (void *) &thresh_index } },
+    { "thresh_rtable",	  CP_DOUBLE,	{ (void *) &thresh_rtable } },
+    { "thresh_stats",	  CP_DOUBLE,	{ (void *) &thresh_stats } },
+    { "spam_header_name", CP_STRING,	{ (void *) &spam_header_name } },
+    { "user_config_file", CP_STRING,	{ (void *) &user_config_file } },
+    { "wordlist",	  CP_WORDLIST,	{ (void *) NULL } },
 };
 
 int	ArgDefListSize = sizeof(ArgDefList)/sizeof(ArgDefList[0]);
