@@ -92,8 +92,7 @@ static void init_bogostats(/*@out@*/ bogostat_t *bs)
 }
 
 static void populate_bogostats(/*@out@*/ bogostat_t *bs,
-	const char *text, double prob,
-	/*@unused@*/ int count)
+	const char *text, double prob)
 /* if  the new word,prob pair is a better indicator.
  * add them to the bogostats structure */
 {
@@ -241,7 +240,7 @@ static bogostat_t *select_indicators(wordhash_t *wordhash)
 	double prob = compute_probability( token );
 
 	w_count += 1;
-	populate_bogostats( &bogostats, token, prob, 1 );
+	populate_bogostats( &bogostats, token, prob );
     }
 
     return (&bogostats);
