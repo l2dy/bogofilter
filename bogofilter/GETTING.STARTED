@@ -1,18 +1,21 @@
 			   GETTING STARTED
 
-- Installing Bogofilter
-- Preparing for use
-  - Configuring bogofilter
-  - Training bogofilter
-- Setting up the mail transfer and delivery agents
-- Use with mail user agent
-- Ongoing training
-- Tuning bogofilter
-- The bogoutil program
-- Other useful commands
-- Additional information
+Summary:
 
---- Installing Bogofilter ---
+  1. Installing Bogofilter
+  2. Preparing for use
+     a. Configuring bogofilter
+     b. Training bogofilter
+  3. Setting up the mail transfer and delivery agents
+  4. Use with mail user agent
+  5. Ongoing training
+  6. Tuning bogofilter
+  7. The bogoutil program
+  8. Other useful commands
+  9. Additional information
+
+1. Installing Bogofilter
+------------------------
 
     Bogofilter can be installed from source or from a binary package.
     Releases are made available on SourceForge.net.
@@ -36,13 +39,15 @@
 
     See the INSTALL file for more info.
 
---- Preparing for use ---
+2. Preparing for use
+--------------------
 
     Once bogofilter has been installed, it needs to be configured and
     trained, i.e. given messages that you classify as spam and
     non-spam (also called "ham").
 
---- Configuring bogofilter ---
+    2a. Configuring bogofilter
+    --------------------------
 
     Bogofilter's default configuration is conservative, i.e. only
     messages that score very high on the ham/spam scale are classified
@@ -55,8 +60,9 @@
     ~/.bogofilter/bogofilter.cf.  The configuration options are
     described in file bogofilter.cf.example.
 
---- Training bogofilter ---
-
+    2b. Training bogofilter
+    -----------------------
+  
     Bogofilter uses a database for storing its tokens and their ham
     and spam counts.  The file is commonly called "the wordlist" and
     its standard location is ~/.bogofilter/wordlist.db.
@@ -100,7 +106,8 @@
        bogofilter -vsM <spam.message.mbox
        bogofilter -vsMB spam.maildir
 
---- Setting up the mail transfer and delivery agents ---
+3. Setting up the mail transfer and delivery agents
+---------------------------------------------------
 
     Bogofilter works with many mail transfer agents (such as postfix,
     sendmail, and qmail) and many mail delivery agents (for example
@@ -132,7 +139,8 @@
     Alternatively, bogofilter's return codes can be used by procmail
     (or maildrop) rules to put spam in one mailbox and ham in another.
 
---- Use with mail user agent ---
+4. Use with mail user agent
+---------------------------
 
     Bogofilter is compatible with all mail user agents.  MUAs with
     filtering abilities can check the headers for "X-Bogosity: Spam"
@@ -151,7 +159,8 @@
 
     train bogofilter.
 
---- Ongoing training ---
+5. Ongoing training
+-------------------
     
     Bogofilter can only do a good job if it has accurate and
     comprehensive information in its wordlist.
@@ -171,8 +180,8 @@
     gives a good set of messages for training (using bogofilter's "-s"
     and "-n" flags).
 
-
---- Tuning bogofilter ---
+6. Tuning bogofilter
+--------------------
 
     Once you've use bogofilter for a while, you may wish to optimize
     its classification parameters.  The bogotune utility uses your
@@ -181,7 +190,8 @@
     for your environment.  For more info, read the bogotune man page
     and file bogofilter-tuning.HOWTO.html.
 
---- The bogoutil program ---
+7. The bogoutil program
+-----------------------
 
     Bogoutil is a program that allows dumping the wordlist (as a text
     file), loading the wordlist (from a text file), displaying
@@ -195,7 +205,8 @@
     To display the message counts for a word:
        bogoutil -w ~/.bogofilter .MSG_COUNT
 
---- Other useful commands ---
+8. Other useful commands
+------------------------
 
     To test scoring of individual words:
 
@@ -207,7 +218,8 @@
 
       bogofilter -vvv < message
 
---- Additional information ---
+9. Additional information
+-------------------------
 
     Bogofilter's distribution includes a number of files containing
     more information.  You'll find them in /usr/share/doc (or
