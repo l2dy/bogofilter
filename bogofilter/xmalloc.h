@@ -11,6 +11,13 @@ void xmem_error(const char *)
 #endif
    ;
 
+/*@noreturn@*/
+void xmem_toolong(const char *)
+#ifdef __GNUC__
+ __attribute__((noreturn))
+#endif
+   ;
+
 /*@only@*/ /*@out@*/ /*@notnull@*/
 void *xmalloc(size_t size);
 

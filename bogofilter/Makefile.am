@@ -36,6 +36,8 @@ LDADD = libbogofilter.a @LIBOBJS@
 libbogofilter_a_SOURCES= \
 	xmalloc.h xcalloc.c xmem_error.c xrealloc.c \
 	    xmalloc.c xstrdup.h xstrdup.c \
+	xstrlcat.h xstrlcat.c \
+	xstrlcpy.h xstrlcpy.c \
 	debug.h debug.c \
 	bogoconfig.h config.c \
 	find_home.h find_home.c find_home_user.c \
