@@ -14,13 +14,18 @@ NAME:
 
 /* Global Variables */
 
-textblock_t *textblocks = NULL;
+static textblock_t *textblocks = NULL;
 
 size_t cur_mem, max_mem, tot_mem;
 
 /* Function Definitions */
 
-textblock_t *textblock_init(void)
+textdata_t *textblock_head(void)
+{
+    return textblocks->head;
+}
+
+void textblock_init(void)
 {
     textblock_t *t = (textblock_t *) xcalloc(1, sizeof(*t));
     size_t mem = sizeof(*t)+sizeof(textdata_t);
@@ -34,11 +39,12 @@ textblock_t *textblock_init(void)
 		(void *)t, (void *)t->head,
 		(unsigned long)mem, (unsigned long)cur_mem,
 		(unsigned long)max_mem, (unsigned long)tot_mem);
-    return t;
+    textblocks = t;
 }
 
-void textblock_add(textblock_t *t, const byte *text, size_t size)
+void textblock_add(const byte *text, size_t size)
 {
+    textblock_t *t = textblocks;
     size_t mem = size+sizeof(textdata_t);
     textdata_t *cur = t->tail;
 
@@ -64,10 +70,12 @@ void textblock_add(textblock_t *t, const byte *text, size_t size)
     t->tail = cur;
 }
 
-void textblock_free(textblock_t *t)
+void textblock_free(void)
 {
     size_t mem;
     textdata_t *cur, *nxt;
+    textblock_t *t = textblocks;
+
     for (cur = t->head; (nxt = cur->next) != NULL; cur = nxt) {
 	mem = cur->size + sizeof(*cur);
 	cur_mem -= mem;

@@ -21,10 +21,10 @@ typedef struct textblock_s {
     textdata_t *tail;
 }  textblock_t;
 
-extern textblock_t *textblocks;
+textdata_t *textblock_head(void);
+void textblock_init(void);
+void textblock_free(void);
 
-textblock_t *textblock_init(void);
-void textblock_add(textblock_t *textblock, const byte *text, size_t size);
-void textblock_free(textblock_t *textblock);
+void textblock_add(const byte *text, size_t size);
 
 #endif	/* HAVE_TEXTBLOCK_H */

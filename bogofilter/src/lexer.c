@@ -128,7 +128,7 @@ static int yy_get_new_line(buff_t *buff)
      * than one of these. */
 
     if (passthrough && passmode == PASS_MEM && count > 0)
-	textblock_add(textblocks, buff->t.text+buff->read, count);
+	textblock_add(buff->t.text+buff->read, count);
 
     return count;
 }
@@ -168,7 +168,7 @@ static int get_decoded_line(buff_t *buff)
 	    add = lgetsl(buff);
 	    if (add == EOF) break;
 	    if (passthrough && passmode == PASS_MEM && buff->t.leng > 0)
-		textblock_add(textblocks, buff->t.text+buff->read, buff->t.leng);
+		textblock_add(buff->t.text+buff->read, buff->t.leng);
 	    count += buff->t.leng;
 	} else {
 	    ungetc(c,fpin);

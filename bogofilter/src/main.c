@@ -290,8 +290,8 @@ static rc_t classify()
 
 void write_message(rc_t status)
 {
-    ssize_t rd = 0;	/* assignment to quench warning */
-    readfunc_t rf = 0;	/* assignment to quench warning */
+    ssize_t rd;
+    readfunc_t rf;
     void *rfarg = 0;	/* assignment to quench warning */
     char *out;
     textdata_t *text;
@@ -306,7 +306,7 @@ void write_message(rc_t status)
 	switch (passmode) {
 	    case PASS_MEM:
 		rf = read_mem;
-		text = textblocks->head;
+		text = textblock_head();
 		rfarg = &text;
 		break;
 	    case PASS_SEEK:
@@ -466,7 +466,7 @@ static void passthrough_setup()
     }
 
     if (passmode == PASS_MEM)
-	textblocks = textblock_init();
+	textblock_init();
 
     if (DEBUG_GENERAL(2)) {
 	const char *m;
@@ -486,7 +486,7 @@ static void passthrough_cleanup()
 
     switch(passmode) {
     case PASS_MEM:
-	textblock_free(textblocks);
+	textblock_free();
 	break;
     case PASS_SEEK: default:
 	break;

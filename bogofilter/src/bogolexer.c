@@ -250,7 +250,7 @@ int main(int argc, char **argv)
     process_config_files(false);
     process_args_2(argc, argv);
 
-    textblocks = textblock_init();
+    textblock_init();
 
     if (!passthrough)
     {
@@ -280,7 +280,7 @@ int main(int argc, char **argv)
     if ( !passthrough )
 	printf( "%d tokens read.\n", count );
 
-    textblock_free(textblocks);
+    textblock_free();
 
     return 0;
 }
