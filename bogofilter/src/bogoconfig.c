@@ -478,18 +478,18 @@ int process_args(int argc, char **argv)
 
 	case 'm':
 	    if (!xatof(&c_min_dev, optarg))
-		fprintf(stderr, "cannot parse argument '%s' to -m\n", optarg);
+		fprintf(stderr, "Cannot parse -%c option argument '%s'.\n", option, optarg);
 	    break;
 
 	case 'o':
 	{
 	    char *del = strtok(optarg, ",");
 	    bool ok = true;
-	    ok = ok && xatof(&c_spam_cutoff, del);
+	    ok = ok && xatof(&c_spam_cutoff, optarg);
 	    if ((del = strtok(NULL, ",")))
 		ok = ok && xatof(&c_ham_cutoff, del);
 	    if (!ok) {
-		fprintf(stderr, "Cannot parse argument of -o option.\n");
+		fprintf(stderr, "Cannot parse -%c option argument '%s'.\n", option, optarg);
 	    }
 	    break;
 	}
