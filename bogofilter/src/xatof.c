@@ -23,6 +23,9 @@ int xatof(double *d, const char *in) {
     val = strtod(in, &end);
     if (in == end || errno == EINVAL || errno == ERANGE) return 0;
 
+    if (*end == 'f')		/* allow terminal 'f' */
+	end += 1;
+
     while (isspace(*end))
 	end += 1;
 
