@@ -25,7 +25,7 @@ typedef struct {
     const char *s;	/* sub dir    */
 } pri_2_env_t;
 
-pri_2_env_t pri_2_env[] = {
+static pri_2_env_t pri_2_env[] = {
 #ifndef __riscos__
     { PR_ENV_BOGO, "BOGOFILTER_DIR", NULL },
     { PR_ENV_BOGO, "BOGODIR",	     NULL },

@@ -27,8 +27,8 @@ NAME:
 FILE  *fpo;
 
 char msg_register[256];
-char msg_bogofilter[256];
-char msg_spam_header[256];
+static char msg_bogofilter[256];
+static char msg_spam_header[256];
 size_t msg_register_size = sizeof(msg_register);
 
 /* Function Definitions */

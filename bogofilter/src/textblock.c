@@ -16,7 +16,7 @@ NAME:
 
 static textblock_t *textblocks = NULL;
 
-size_t cur_mem, max_mem, tot_mem;
+static size_t cur_mem, max_mem, tot_mem;
 
 /* Function Definitions */
 

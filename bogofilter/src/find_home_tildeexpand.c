@@ -25,9 +25,9 @@
 #include "xstrdup.h"
 
 #ifndef __riscos__
-bool tilde_expand =  true;
+static bool tilde_expand =  true;
 #else
-bool tilde_expand =  false;
+static bool tilde_expand =  false;
 #endif
 
 /*

@@ -24,8 +24,8 @@ AUTHOR:
 #include "word.h"
 #include "wordlists.h"
 
-uint ham_only,  ham_hapax;
-uint spam_only, spam_hapax;
+static uint ham_only,  ham_hapax;
+static uint spam_only, spam_hapax;
 
 #define	INTERVALS	20
 #define PCT(n)		100.0 * n / count

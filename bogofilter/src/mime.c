@@ -37,13 +37,13 @@ AUTHOR:
 
 /* Global Variables */
 
-int stackp = -1;
+static int stackp = -1;
 
-mime_t msg_stack[MIME_STACK_MAX];
+static mime_t msg_stack[MIME_STACK_MAX];
 mime_t *msg_state = msg_stack;
 mime_t *msg_top = msg_stack;
 
-struct type_s
+static struct type_s
 {
   enum mimetype type;
   const char *name;
@@ -60,7 +60,7 @@ mime_type_table[] =
   { MIME_MULTIPART, 	"multipart/", 	10, } ,
 };
 
-struct encoding_s
+static struct encoding_s
 {
   enum mimeencoding encoding;
   const char *name;
@@ -75,7 +75,7 @@ mime_encoding_table[] =
   { MIME_UUENCODE, "X-UUENCODE", 	} ,
 };
 
-struct disposition_s
+static struct disposition_s
 {
   enum mimedisposition disposition;
   const char *name;

@@ -39,7 +39,7 @@ static rc_t	fis_status(void);
 
 double ham_cutoff = FISHER_HAM_CUTOFF;
 
-const parm_desc fis_parm_table[] =
+static const parm_desc fis_parm_table[] =
 {
     { "robx",		  CP_DOUBLE,	{ (void *) &robx } },
     { "robs",		  CP_DOUBLE,	{ (void *) &robs } },

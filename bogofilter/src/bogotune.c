@@ -116,40 +116,37 @@ enum e_verbosity {
 /* Global Variables */
 
 const char *progname = "bogotune";
-char *ds_file;
-char *ds_path;
-
-extern double robx, robs;
+static char *ds_file;
+static char *ds_path;
 
 bool	bogolex = false;	/* true if convert input to msg-count format */
-char   *bogolex_file = NULL;
-word_t *w_msg_count;
-wordhash_t *t_ns, *t_sp;
+static char   *bogolex_file = NULL;
+static word_t *w_msg_count;
 
-tunelist_t *ns_and_sp;
-tunelist_t *ns_msglists, *sp_msglists;
+static tunelist_t *ns_and_sp;
+static tunelist_t *ns_msglists, *sp_msglists;
 
-flhead_t *spam_files, *ham_files;
+static flhead_t *spam_files, *ham_files;
 
 typedef struct {
     uint cnt;
     double *data;
 } data_t;
 
-data_t *rsval;
-data_t *rxval;
-data_t *mdval;
+static data_t *rsval;
+static data_t *rxval;
+static data_t *mdval;
 
-uint target;
-uint ns_cnt, sp_cnt;
+static uint target;
+static uint ns_cnt, sp_cnt;
 
-double check_percent;		/* initial check for excessively high/low scores */
-double *ns_scores;
-double *sp_scores;
-double user_robx = 0.0;		/* from option '-r value' */
-uint   coerced_target = 0;	/* user supplied with '-T value' */
+static double check_percent;		/* initial check for excessively high/low scores */
+static double *ns_scores;
+static double *sp_scores;
+static double user_robx = 0.0;		/* from option '-r value' */
+static uint   coerced_target = 0;	/* user supplied with '-T value' */
 
-uint   ncnt, nsum;		/* neighbor count and sum - for gfn() averaging */
+static uint   ncnt, nsum;		/* neighbor count and sum - for gfn() averaging */
 
 #undef	TEST
 

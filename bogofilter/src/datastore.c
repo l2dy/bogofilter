@@ -33,8 +33,7 @@ YYYYMMDD today;			/* date as YYYYMMDD */
 
 /* Function prototypes */
 
-void ds_init(void);
-void ds_cleanup(void);
+static void ds_init(void);
 
 /* Function definitions */
 
@@ -309,9 +308,9 @@ int ds_oper(const char *path, dbmode_t open_mode,
     return ret;
 }
 
-word_t  *msg_count_tok;
+static word_t  *msg_count_tok;
 
-void ds_init()
+static void ds_init()
 {
     if (msg_count_tok == NULL) {
 	msg_count_tok = word_new((const byte *)MSG_COUNT, strlen(MSG_COUNT));

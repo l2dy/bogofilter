@@ -16,7 +16,7 @@ Most of the ideas in here are stolen from Mutt's snprintf implementation.
 #include <stdlib.h>
 #include <string.h>
 
-#if NEEDTRIO
+#ifdef NEEDTRIO
 #include <trio.h>
 #endif
 
@@ -37,10 +37,10 @@ static char *convert_format_to_string(char *buff, size_t size, const char *forma
 
 /* uninitialized static variables */
 
-const char *reg = "";
-const char *unreg = "";
-uint wrdcount = 0;
-uint msgcount = 0;
+static const char *reg = "";
+static const char *unreg = "";
+static uint wrdcount = 0;
+static uint msgcount = 0;
 
 /* initialized static variables */
 

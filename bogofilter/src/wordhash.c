@@ -54,12 +54,11 @@ THEORY:
 /* global variables */
 
 /* for  bogotune */
-wordhash_t *memory_db;
+static wordhash_t *memory_db;
 
 /* function prototypes */
 
-void wh_trap(void);
-void wh_trap(void) {}
+static void wh_trap(void) {}
 
 /* function definitions */
 
