@@ -34,14 +34,16 @@ AUTHOR:
 #include "xmalloc.h"
 #include "xstrdup.h"
 
+#define	MIN_COUNT	2000
 #define	MSG_COUNT	".MSG_COUNT"
 
-#define	PARMS	2	/* print parameter sets (rs, md, rx) */
 #define	SUMMARY	1	/* summarize main loop iterations */
+#define	PARMS	2	/* print parameter sets (rs, md, rx) */
 #define	SCORES	6	/* verbosity level for printing scores */
 
-#define	MIN(n)	((n)/60)
-#define SEC(n)	((n)-MIN(n)*60)
+#define MOD(a,b)	((a)-((int)((a)/(b)))*(b))
+#define	MIN(n)		((n)/60)
+#define SEC(n)		MOD(n,60)
 
 #define	ROUND(f)	((double)(int)(f+0.5))
 
@@ -817,8 +819,9 @@ static void bogotune_free(void)
 
 static rc_t bogotune(void)
 {
+    uint scan;
     uint beg, end, cnt;
-    int scan;
+    uint min_cnt = (ds_file != NULL) ? MIN_COUNT : 2 * MIN_COUNT;
     rc_t status = RC_OK;
 
     wordprop_t *props;
@@ -849,18 +852,22 @@ static rc_t bogotune(void)
 	props = wordhash_insert(ns_and_sp->train, w_msg_count, sizeof(wordprop_t), &wordprop_init);
 	msgs_good = props->good;
 	msgs_bad  = props->bad;
-	if (msgs_good < 1000 || msgs_bad < 1000)
+	if (msgs_good < min_cnt || msgs_bad < min_cnt) {
 	    fprintf(stderr, 
-		    "The wordlist contains %ld ham and %ld spam messages.  It is recommended\n"
+		    "The wordlist contains %uld ham and %uld spam messages.  It is recommended\n"
 		    "that bogotune be run with at least 1,000 of each.  A wordlist this small\n"
 		    "may produce poor results.\n",
 		    msgs_good, msgs_bad);
+	    exit(EX_ERROR);
+	}
 	if (msgs_bad < msgs_good / 5 ||
-	    msgs_bad > msgs_good * 5)
+	    msgs_bad > msgs_good * 5) {
 	    fprintf(stderr,
 		    "The wordlist has a ratio of spam to ham of %0.1f to 1.0.  It\n"
 		    "is recommended that the ratio be in the range of 0.2 to 5.\n",
 		    msgs_bad * 1.0 / msgs_good);
+	    exit(EX_ERROR);
+	}
     }
 
     if (verbose > 3) {
@@ -872,13 +879,13 @@ static rc_t bogotune(void)
     ns_cnt = count_messages(ns_msglists);
     sp_cnt = count_messages(sp_msglists);
 
-    if (ns_cnt < 1000 || sp_cnt < 1000 ||
-	(ds_file == NULL && (ns_cnt < 2000 || sp_cnt < 2000))) {
+    if (ns_cnt < min_cnt || sp_cnt < min_cnt) {
 	fprintf(stderr, 
-		"The messages sets contain %ld ham and %ld spam.  It is recommended that\n"
-		"bogotune be run with at least %d,000 of each.  Messages sets this small\n"
+		"The messages sets contain %uld ham and %uld spam.  It is recommended that\n"
+		"bogotune be run with at least %d,%03d of each.  Messages sets this small\n"
 		"may produce poor results.\n",
-		msgs_good, msgs_bad, (ds_file != NULL) ? 1 : 2);
+		msgs_good, msgs_bad, min_cnt/1000, MOD(min_cnt,1000) );
+	exit(EX_ERROR);
     }
 
     ns_scores = xcalloc(ns_cnt, sizeof(double));
