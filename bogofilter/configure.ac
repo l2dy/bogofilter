@@ -1,6 +1,6 @@
 # $Id$
 dnl vim: set noai tw=0:
-AC_INIT(bogofilter, 0.15.8.cvs)
+AC_INIT(bogofilter, 0.15.9)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR([src])
 AC_CANONICAL_TARGET
@@ -289,6 +289,25 @@ esac
 
 AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xtdb")
 AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
+
+dnl Deprecated code dependent stuff
+AC_ARG_ENABLE(deprecated-code,
+	AC_HELP_STRING([--enable-deprecated-code],
+	[Enable deprecated code]),
+	if test "$enableval" = no; then
+		[USE_DEPRECATED_CODE=NO]
+	else
+		[USE_DEPRECATED_CODE=YES]
+	fi
+    AC_DEFINE(HAVE_INLINE,1,[Define to 1 if your compiler supports inline])
+)
+
+dnl Enable building with deprecated code.
+if test x$USE_DEPRECATED_CODE = xYES ; then
+	AC_DEFINE(ENABLE_DEPRECATED_CODE,1,
+	[Enable deprecated code])
+fi
+AM_CONDITIONAL(ENABLE_DEPRECATED_CODE, test x$USE_DEPRECATED_CODE != xNO)
 
 # Checks for header files.
 AC_HEADER_STDC

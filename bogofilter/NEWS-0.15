@@ -5,11 +5,14 @@
 Be sure to read RELEASE.NOTES-0.15, with attention to the section
 about retraining and the '-H' flag...
 
+0.15.9	2003-11-23
+
 * Configure now finds a POSIX compliant shell for running version.sh
 * Remove --disable-* options for algorithms. Has never been supported
   well and serves no useful purpose, the algorithm code is irrelevant
   compared to lexer or other stuff.
 * Fixed a memory leak in bogoutil.
+* Cleaned up help message in bogoutil.
 * Bogotune now checks for incorrectly classified messages in the test
   data and exits if so.
 * Bogotune's memory needs lessened.

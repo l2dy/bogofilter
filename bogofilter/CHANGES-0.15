@@ -4,6 +4,12 @@
 
 $Id$
      
+0.15.9	2003-11-23
+
+	* Minor revisions to the FAQ.
+	* Miscellaneous cleanups to bogotune.c
+	* Cleanup bogoutil's help message.
+
 	2003-11-20
 
 	* Fixed a defect in lexer.c that was discarding X-Bogosity
