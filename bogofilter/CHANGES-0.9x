@@ -2,6 +2,17 @@
 				BOGOFILTER NEWS
 			       =================
 
+0.92.1	2004-06-??
+
+	2004-06-29
+
+	* French version of FAQ updated.
+
+	2004-06-27
+
+	* Fixed db_init/db_cleanup problems encountered with multiple
+	wordlists and concurrent data stores.
+
 0.92.0	2004-06-26
 
 	* Added ESF options to bogofilter's man page.
