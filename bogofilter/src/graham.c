@@ -141,14 +141,13 @@ static void populate_bogostats(/*@out@*/ bogostat_t *bs,
 	{
 	    int i = (hit - bs->extrema);
 	    const word_t *key = hit->key;
-	    FILE *fp = stderr;	/* dbgout */
-	    (void) fprintf(fp,
+	    (void) fprintf(dbgout,
 			   "#  %2d"
 			   "  %f  %f  ", i,
 			   DEVIATION(prob),  prob);
 	    /* print token (max width=20) */
 	    (void) word_puts(word, 20, fp);
-	    (void) fprintf(fp, "   %f  %f  ",
+	    (void) fprintf(dbgout, "   %f  %f  ",
 			   DEVIATION(hit->prob), hit->prob);
 	    /* print token (max width=20) */
 	    (void) word_puts(key, min(20,key->leng), fp);
