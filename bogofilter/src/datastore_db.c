@@ -62,7 +62,6 @@ typedef struct {
 #endif
 
 int db_cachesize = 0;	/* in MB */
-#define	DB_CACHE(db, gb, bytes, chunks) db->set_cachesize(db, 0, db_cachesize*1024*1024, chunks)
 
 /* Function prototypes */
 
@@ -144,7 +143,7 @@ void *db_open(const char *db_file, const char *name, dbmode_t open_mode,
 	}
 
 	if (db_cachesize != 0 &&
-		(ret = DB_CACHE(handle->dbp, 0, db_cachesize, 1)) != 0) {
+		(ret = handle->dbp->set_cachesize(handle->dbp, db_cachesize/1024, (db_cachesize % 1024) * 1024*1024, 1)) != 0) {
 	    print_error(__FILE__, __LINE__, "(db) setcache( %s ), err: %d, %s",
 		    db_file, ret, db_strerror(ret));
 	    goto open_err; 
