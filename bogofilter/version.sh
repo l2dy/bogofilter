@@ -15,12 +15,12 @@
 
 VERSION=`grep define.VERSION config.h | awk '{print $3}' | tr -d '"'`
 
-echo $VERSION | egrep "[a-z][a-z][a-z]$" >/dev/null
+SUFFIX=`echo $VERSION | egrep "[a-z][a-z][a-z]$"`
 
 srcdir=$1
 shift
 
-if [ $? = 0 ]; then
+if [ ! -z "$SUFFIX" ]; then
    DATE="00000000"
    for file in $* ; do
        HEAD=`head -1 $srcdir/$file | awk '{print $5}' | tr -d "/"`
