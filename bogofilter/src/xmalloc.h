@@ -3,6 +3,8 @@
 #ifndef XMALLOC_H
 #define XMALLOC_H
 
+#include <stddef.h>
+
 #ifdef	BF_MALLOC
 /* special defines for xmalloc., xcalloc.c, etc */
 #ifndef	ENABLE_MEMDEBUG
