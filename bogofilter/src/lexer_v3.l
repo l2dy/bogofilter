@@ -79,7 +79,7 @@
 #define YY_DECL token_t yylex(void)
     YY_DECL;			/* declare function */
 
-#define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, max_size)
+#define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, result, max_size)
 #define YY_EXIT_FAILURE EX_ERROR
 
 #undef	stderr
@@ -118,7 +118,6 @@ static word_t *yy_text(void)
 %option align caseless 8bit
 %option never-interactive
 %option noreject noyywrap
-%option prefix="lexer_v3_"
 
 UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
 IPADDR		{UINT8}\.{UINT8}\.{UINT8}\.{UINT8}
@@ -202,7 +201,8 @@ BREAKHTML	"<"({HBREAK}({WHITESPACE}[^>]*|""))">"
 VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 
 %s TEXT HTML BOGO_LEX
-%s HTOKEN HDISCARD SCOMMENT LCOMMENT HSCRIPT
+%s HTOKEN HDISCARD SCOMMENT LCOMMENT
+%s PGP_HEAD PGP_BODY
 
 %%
 
@@ -222,7 +222,6 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>^(To|CC|From|Return-Path|Subject|Received):	{ set_tag(yytext); }
 <INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); return TOKEN; }
 
-<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); return HEADKEY; }
 <INITIAL>^(Delivery-)?Date:.*			{ return HEADKEY; }
 <INITIAL>^(Resent-)?Message-ID:.*		{ return HEADKEY; }
 <INITIAL>^(In-Reply-To|References):.* 		{ return HEADKEY; }
@@ -249,6 +248,14 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>\n					{ set_tag("Header"); lineno += 1; }
 <INITIAL>{VERP} 				{ skip_to('='); return VERP; }
 
+^-----BEGIN\ PGP\ SIGNATURE-----$		{ BEGIN PGP_HEAD;
+						  yy_unput((byte *)yytext, yyleng);
+						}
+<PGP_HEAD>^\n					{ BEGIN PGP_BODY; }
+<PGP_BODY>{TOKEN}				{ /* ignore */ }
+^-----END\ PGP\ SIGNATURE-----$ 		{ BEGIN TEXT;
+						  yy_unput((byte *)yytext, yyleng);
+						}
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
 						      yy_set_state_initial();
 						      return BOUNDARY;
@@ -274,7 +281,6 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <HTML>"<"					{ BEGIN HDISCARD; }	/* unknown tag */
 
 <HTOKEN>{TOKEN}					{ return TOKEN; }
-<HSCRIPT>{TOKEN}				{ return TOKEN; }
 <HDISCARD,LCOMMENT,SCOMMENT>{TOKEN}		{ /* discard innards of html tokens and comments */ }
 
 <HTOKEN,HDISCARD,LCOMMENT>">"			{ BEGIN HTML; }	/* end of tag, loose comment; return to normal html processing */
@@ -328,9 +334,9 @@ static int xtoi(char *in, size_t len)
     while (isxdigit((byte) *in) && (len-- > 0)) {
 	char c = *in++;
 	val <<= 4;
-	val += isdigit((unsigned char)c)
+	val += isdigit((byte)c)
 	    ? (c - '0')
-	    : (tolower((unsigned char)c) - 'a' + 10);
+	    : (tolower((byte)c) - 'a' + 10);
     }
     return val;
 }

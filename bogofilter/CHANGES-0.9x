@@ -1,0 +1,143 @@
+			       =================
+				BOGOFILTER NEWS
+			       =================
+
+0.92.0	2004-06-26
+
+	* Added ESF options to bogofilter's man page.
+	* Revised man pages' description of multi-parameter options.
+
+	2004-06-25
+
+	* Fixed problem recognizing empty line ending of header in
+          files with CRLFs and X-Bogosity line as last header line.
+
+	2004-06-24
+
+	* Added ESF options to bogofilter's help message.
+
+	2004-06-22
+
+	* t.lock3 regression modified for solaris shell compatibility.
+
+0.91.4	2004-06-20
+
+	2004-06-19
+
+	* Fix abort during db_open (ds_open wasn't first calling
+          ds_init).
+	* Added regression test t.lock3 for this fix.
+	* Revise datastore and database levels so that each level
+          calls its own init() and cleanup() routines.
+
+0.91.3	2004-06-15
+
+	2004-06-14
+
+	* Added format specification '%I' to allow logging of the IP
+	  address from which an email was received.
+
+	2004-06-13
+
+	* Avoid "Invalid buffer size, exiting." problems by discarding
+	  text from an excessively long html tag.
+
+0.91.2	2004-06-11
+
+	* Bogofilter's creation of new wordlists now includes
+	  .WORDLIST_VERSION token.
+	* Fix erroneous double opening of wordlists specified on
+	  command line.
+	* Corrected tests so that "make check" passes with qdbm and
+	  tdb.
+
+	2004-06-10
+
+	* Fix included GSL compile for compilers that do not support
+	  "extern inline", such as Compaq C V6.3.
+	* FAQ updated with info on multiple wordlists and ignore
+	  lists.
+	* FAQ updated with info on building as non-root user.
+
+0.91.1	2004-06-04
+
+	2004-06-04
+
+	* Fix problem with not expanding tildes.
+	* Add DS_LOAD flag to distinguish between database creation by
+	  bogofilter and bogoutil so .WORDLIST_VERSION is only added
+	  by bogofilter.
+	* Modify regression tests to use bogoutil to create empty
+	  wordlists (as needed).
+
+	2004-05-30
+
+	* Fixed registration.  When multiple wordlists are specified,
+	  registration is to first regular wordlist.
+	* Added regresstion test for multiple wordlists.
+
+	2004-05-29
+
+	* Distinguish open modes of READ, WRITE, and CREATE so
+	* bogofilter will include .WORDLIST_VERSION in new database.
+
+	2004-05-28
+
+	* Modify contrib scripts so they're sh compatible.
+	* Fix problem with not expanding tildes.
+
+	2004-05-23
+
+	* Use named constants for wordlist 'type' attribute.
+
+	2004-05-22
+
+	* Fix problem when bogofilter's home is a symlink.
+
+0.91.0	2004-05-22
+
+	* Miscellaneous cleanups for multiple wordlist code.
+	* Cleanup variable names in database open() code.
+	* Increase width of 'count' column for -vvv output.
+
+	2004-05-17
+
+	* Add ignore list capability.
+	* Revive and revise multiple wordlist code.
+
+0.90.0	2004-05-09
+
+	* Revised bogotune's parameter ranges for coarse scan.
+
+	2004-05-08
+
+	* Changed list address in FAQ to bogofilter.org
+
+	2004-05-05
+
+	* Added code for Robinson's Effective Size Factor (ESF) 
+	  to score.c, bogotune.c, bogofilter.cf.example, etc.
+	* Added '-E' options to bogotune to suppress ESF scan.
+
+	2004-05-02
+
+	* Remove unreferenced enum wl_e.
+	* Add .WORDLIST_VERSION meta symbol.
+	* Change subnet prefix from url: to ip:
+	* Add -u switch to bogoutil to do wordlist upgrade.
+	* Add regression test t.upgrade.subnet.prefix
+
+	2004-04-22
+
+	* Fixed configure's --enable-memdebug option.
+
+	2004-04-12
+
+	* Updated TODO list and procmailrc.example
+
+	2004-04-02
+
+	* Lower output precision for regression tests, by using %f
+	  rather than %e, to mask differences between GSL versions.
+
+0.17.5	2004-04-01 - previous stable release

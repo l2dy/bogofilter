@@ -25,13 +25,13 @@ PARSING_TESTS = \
 	t.lexer t.lexer.mbx \
 	t.folded_rfc2047
 
-WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest
+WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest t.upgrade.subnet.prefix t.multiple.wordlists
 
-SCORING_TESTS =  t.score1 t.score2 t.systest t.grftest t.bogoutil-hist
+SCORING_TESTS =  t.score1 t.score2 t.systest t.grftest t.wordhist
 
 BULKMODE_TESTS = t.bulkmode t.MH t.maildir
 
-INTEGRITY_TESTS = t.lock1 t.valgrind
+INTEGRITY_TESTS = t.lock1 t.lock3 t.valgrind
 # INTEGRITY_TESTS += t.lock2
 
 TESTSCRIPTS = ${ENVIRON_TESTS} ${PARSING_TESTS} ${WORDLIST_TESTS} ${SCORING_TESTS} ${BULKMODE_TESTS} ${INTEGRITY_TESTS}

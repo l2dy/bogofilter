@@ -24,7 +24,8 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 		CHANGES-0.14 RELEASE.NOTES-0.14 \
 		CHANGES-0.15 RELEASE.NOTES-0.15 \
 		CHANGES-0.16 RELEASE.NOTES-0.16 \
-		CHANGES-0.17 RELEASE.NOTES-0.17
+		CHANGES-0.17 RELEASE.NOTES-0.17 \
+		CHANGES-0.9x
 
 .PHONY:	rpm cvs-check
 
@@ -42,7 +43,7 @@ cvs-check:
 # it will call rsync from its source directory to the destination for
 # each of them, running them in parallel
 rsync:	distdir .rsyncs
-	@( cat $(srcdir)/.rsyncs | sed -e 's}^}rsync -av --delete $(PACKAGE)-$(VERSION)/ }; s/\($$\)/ \&/;' ; echo "wait" ) | $(SHELL) -x
+	@( cat $(srcdir)/.rsyncs | sed -e 's}^}rsync -av -e ssh --delete $(PACKAGE)-$(VERSION)/ }; s/\($$\)/ \&/;' ; echo "wait" ) | $(SHELL) -x
 
 dist-hook:
 	cd $(distdir) && find doc gnugetopt gsl -name CVS -type d -prune -exec rm -r '{}' ';'

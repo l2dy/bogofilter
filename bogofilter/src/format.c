@@ -26,6 +26,7 @@ Most of the ideas in here are stolen from Mutt's snprintf implementation.
 #include "bogofilter.h"
 #include "format.h"
 #include "score.h"
+#include "token.h"
 #include "xstrdup.h"
 
 /* Function Prototypes */
@@ -354,6 +355,9 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 		break;
 	    case 'h':		/* h - spam_header_name, e.g. "X-Bogosity" */
 		buff += format_string(buff, spam_header_name, 0, prec, flags, end);
+		break;
+	    case 'I':		/* I - received IP address */
+		buff += format_string(buff, ipaddr ? (const char *)ipaddr->text : "UNKNOWN", 0, prec, flags, end);
 		break;
 	    case 'l':		/* l - logging tag */
 		buff += format_string(buff, logtag, 0, prec, flags, end);

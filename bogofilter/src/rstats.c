@@ -224,10 +224,10 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 
     /* print header */
     if (!Rtable)
-	(void)fprintf(fpo, "%*s%6s    %-6s    %-6s    %-6s %s\n",
+	(void)fprintf(fpo, "%*s %6s    %-6s    %-6s    %-6s %s\n",
 		      MAXTOKENLEN+2,"","n", "pgood", "pbad", "fw", "U");
     else
-	(void)fprintf(fpo, "%*s%6s    %-6s    %-6s    %-6s  %-6s    %-6s %s\n",
+	(void)fprintf(fpo, "%*s %6s    %-6s    %-6s    %-6s  %-6s    %-6s %s\n",
 		      MAXTOKENLEN+2,"","n", "pgood", "pbad", "fw","invfwlog", "fwlog", "U");
 
     /* Print 1 line per token */
@@ -241,7 +241,7 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 	(void)fputc( '"', fpo);
 	(void)word_puts(cur->token, 0, fpo);
 
-	(void)fprintf(fpo, "\"%*s %5lu  %8.6f  %8.6f  %8.6f",
+	(void)fprintf(fpo, "\"%*s %6lu  %8.6f  %8.6f  %8.6f",
 		      len, " ", (unsigned long)(cur->good + cur->bad),
 		      cur->good / msgs_good,
 		      cur->bad  / msgs_bad,

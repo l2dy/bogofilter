@@ -3,14 +3,33 @@
 		bogofilter -- fast Bayesian spam filtering
 
 This package implements a fast Bayesian spam filter along the lines suggested 
-by Paul Graham in his article "A Plan For Spam".
+by Paul Graham in his article "A Plan For Spam":
 
-This version substantially improves on Paul's proposal by doing smarter
-lexical analysis.  In particular, hostames and IP addresses are retained
-as recognition features rather than broken up. Various kinds of MTA 
-cruft such as dates and message-IDs are discarded so as not to bloat
-the word lists.
+  http://www.paulgraham.com/spam.html
 
+with algorithmic changes suggested by Gary Robinson in
+
+  http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html
+
+and in "A Statistical Approach to the Spam Problem"
+
+  http://www.linuxjournal.com/article.php?sid=6467
+
+This version improves on the papers by doing smarter lexical analysis.
+In particular, hostames and IP addresses are retained as recognition
+features rather than broken up. Various kinds of MTA cruft such as
+dates and message-IDs are discarded so as not to bloat the word lists.
+
+*** IMPORTANT ***
+
+If you are using bogofilter with the Berkeley DB data base library
+(which is the default, received most testing, is the most powerful of
+the data base engines that bogofilter supports and hence recommended),
+do read the doc/README.db file, it contains important information.
+
+The doc/README.db file contains troubleshooting informations and
+requirements that should be read ahead of time so you can fix troubles
+quickly should they arise later.
 
 *** DOCUMENTATION ***
 
@@ -74,7 +93,3 @@ For the most recent version of this software, see:
 
 The latest stable version can be downloaded.  The development source
 is in a CVS repository on SourceForge and can also be downloaded.
-
-
-							Eric S. Raymond
-							August 2002
