@@ -43,7 +43,7 @@ static int  argc;
 static char **argv;
 static const char *filename;
 static char namebuff[PATH_LEN+1];
-static char dirname[PATH_LEN+1];
+static char dir_name[PATH_LEN+1];
 
 static FILE *yy_file;
 
@@ -162,11 +162,11 @@ static st_t isdir(const char *name)
 static void save_dirname(const char *name)
 {
     size_t l = strlen(name);
-    l = min(l, sizeof(dirname)-2);
-    memcpy(dirname, name, l);
-    if (dirname[l-1] == DIRSEP_C)
+    l = min(l, sizeof(dir_name)-2);
+    memcpy(dir_name, name, l);
+    if (dir_name[l-1] == DIRSEP_C)
 	l -= 1;
-    dirname[l] = '\0';
+    dir_name[l] = '\0';
 }
 
 static const char* const maildir_subs[]={ DIRSEP_S "new", DIRSEP_S "cur", NULL };
@@ -361,16 +361,16 @@ static bool dir_next_mail(void)
 
     while(true) {
 	if (reader_dir == NULL) {
-	    char *x = dirname;
+	    char *x = dir_name;
 	    /* open next directory */
 	    if (mailstore_type == MS_MAILDIR) {
 		size_t siz;
 		
 		if (*maildir_sub == NULL)
 		    return false; /* IMPORTANT for termination */
-		siz = strlen(dirname) + 4 + 1;
+		siz = strlen(dir_name) + 4 + 1;
 		x = xmalloc(siz);
-		strlcpy(x, dirname, siz);
+		strlcpy(x, dir_name, siz);
 		strlcat(x, *(maildir_sub++), siz);
 	    }
 	    reader_dir = opendir(x);
@@ -378,7 +378,7 @@ static bool dir_next_mail(void)
 		fprintf(stderr, "cannot open directory '%s': %s", x,
 			strerror(errno));
 	    }
-	    if (x != dirname)
+	    if (x != dir_name)
 		xfree(x);
 	}
 
@@ -400,7 +400,7 @@ static bool dir_next_mail(void)
 	}
 
 	filename = namebuff;
-	snprintf(namebuff, sizeof(namebuff), "%s%s%c%s", dirname, 
+	snprintf(namebuff, sizeof(namebuff), "%s%s%c%s", dir_name, 
 		 (mailstore_type == MS_MH) ? "" : *(maildir_sub-1),
 		 DIRSEP_C, dirent->d_name);
 
