@@ -227,30 +227,22 @@ BREAKHTML	"<"({HBREAK}([ \n\t][^>]*|""))">"
 						    unput(w->text[size]);
 						}
 
-<INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); 		skip_to('='); return TOKEN; }
-<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); 	skip_to(':'); return TOKEN; }
+<INITIAL>^(To|From|Return-Path|Subject):	{ if (header_line_markup) set_tag(yy_text()); }
 <INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); return TOKEN; }
-<INITIAL>^To:					{ if (header_line_markup) set_tag(yy_text()); }
-<INITIAL>^From:					{ if (header_line_markup) set_tag(yy_text()); }
-<INITIAL>^Return-Path:				{ if (header_line_markup) set_tag(yy_text()); }
-<INITIAL>^Subject:				{ if (header_line_markup) set_tag(yy_text()); }
-<INITIAL>^(Delivery-)?Date:.*			{ }
-<INITIAL>^Message-ID:.*				{ }
+<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); 	skip_to(':'); return TOKEN; }
+
+<INITIAL>^Message-ID:.*				;
+<INITIAL>^(Delivery-)?Date:.*			;
+
+<INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
+<INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); 		skip_to('='); return TOKEN; }
+
+<INITIAL>(file)?name=\"?			
 <INITIAL>(ESMTP|SMTP)+[ \t\n]+id\ {ID}		;
 <INITIAL>[:blank:]*id\ {ID}			;
-<INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
-<INITIAL>name=\"?				;
-<INITIAL>filename=\"?				;
+
 <INITIAL>\n[ \t]				{ lineno += 1; }
 <INITIAL>\n\n					{ if (get_content_type() == MIME_TEXT_HTML)
-						      BEGIN HTML;
-						  else
-						      BEGIN TEXT; 
-						  msg_header = false;
-						  clr_tag();
-						  /* return EOH; */
-						}
-<INITIAL>^\n					{ if (get_content_type() == MIME_TEXT_HTML)
 						      BEGIN HTML;
 						  else
 						      BEGIN TEXT; 
