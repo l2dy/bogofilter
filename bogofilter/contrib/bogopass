@@ -51,9 +51,9 @@ $ENV{PATH} = '/bin:/usr/bin:/usr/local/bin';
 
 my ($fh, $fn) = tempfile("/tmp/$PROG.XXXXXXXXXX");
 while (<STDIN>) {
-    print $fh $_ or my_die("Error writing to temporary file $fn: " . parsewait($?));
+    print $fh $_ or my_die("Error writing to temporary file $fn: $!");
 }
-close $fh or my_die("Error closing temporary file $fn: " . parsewait($?));
+close $fh or my_die("Error closing temporary file $fn: $!");
 
 my $options = join ' ', @ARGV;
 my $bogo_header = `unbase64 <"$fn" | bogofilter -v $options`;
@@ -64,7 +64,7 @@ $bogo_header =~ /^X-Bogosity:/ or
 system("formail -I \"$bogo_header\" < \"$fn\"") == 0 or
     my_die "formail failed ($?)";
 unlink0 ($fh,$fn) or
-    my_die "cannot unlink temporary file $fn: $?";
+    my_die "cannot unlink temporary file $fn: $!";
 exit 0;
 
 ### End Main ###
