@@ -5,12 +5,14 @@
 
 #undef	HAVE_CHARSET
 
-#include "system.h" /* defines bool */
+/*#include "system.h" * defines bool */
+
 #include <float.h> /* has DBL_EPSILON */
 #define EPS		(100.0 * DBL_EPSILON) /* equality cutoff */
 
 extern int nonspam_exits_zero;	/* '-e' */
-extern bool force;		/* '-f' */
+extern bool fisher;		/* '-f' */
+extern bool force;		/* '-F' */
 extern bool logflag;		/* '-l' */
 extern bool terse;		/* '-t' */
 extern bool quiet;		/* '-q' */
@@ -22,7 +24,6 @@ extern bool stats_in_header;
 extern int max_repeats;
 extern double spam_cutoff;
 extern double thresh_stats;
-extern double thresh_rtable;
 
 extern const char *progname;
 /*@observer@*/

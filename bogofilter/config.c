@@ -85,7 +85,7 @@ enum algorithm_e {
     AL_ROBINSON='r',
 #endif
 #ifdef ENABLE_ROBINSON_FISHER
-    AL_FISHER='f',
+    AL_FISHER='f'
 #endif
 };
 
@@ -513,7 +513,6 @@ int process_args(int argc, char **argv)
 	case 'F':
 	    force = 1;
 	    break;
-
 
 	case 'c':
 	    read_config_file(optarg, false);
