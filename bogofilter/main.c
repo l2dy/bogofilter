@@ -178,6 +178,9 @@ static int process_args(int argc, char **argv)
 	    (void)printf( "Usage: bogofilter [options] < message\n" );
 	    (void)printf( "\t-h\t- print this help message and exit.\n" );
 	    (void)printf( "\t-d path\t- specify directory for wordlists.\n" );
+	    (void)printf( "\t-g\t- select Graham spam calulation method (default).\n" );
+	    (void)printf( "\t-r\t- select Robinson spam calulation method.\n" );
+	    (void)printf( "\t-R\t- write R data frame for Robinson calculation.\n" );
 	    (void)printf( "\t-p\t- passthrough.\n" );
 	    (void)printf( "\t-e\t- in -p mode, exit with code 0 when the mail is not spam.\n");
 	    (void)printf( "\t-s\t- register message as spam.\n" );
