@@ -10,7 +10,7 @@ line tests.  Use options, config files, and wordlists from your
 production environment.  This will help ensure that the new version of
 bogofilter is working properly.
 
-0.92.5	2004-08-??
+0.92.5	2004-08-20
 
 * Improve documentation of '-B' and '-y' options.
 * Validate dates used with '-y'.
@@ -28,6 +28,9 @@ bogofilter is working properly.
   option --with-libdb-prefix rather than obsolete --with-db.
 * Added "--wordlist" to bogofilter's help output.
 * Minor clean-ups for bogofilter's help output.
+
+* Merged files RELEASE.NOTES-0.1? into cumulative RELEASE.NOTES file.
+* Removed files CHANGES-0.1? as they duplicate info in NEWS.
 
 0.92.4	2004-07-29
 

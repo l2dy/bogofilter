@@ -2,11 +2,14 @@
 				BOGOFILTER NEWS
 			       =================
 
-0.92.5	2004-08-??
+0.92.5	2004-08-20
 
 	2004-08-17
 
 	* Expanded discussion of long options in bogofilter's man page.
+	* Merged files RELEASE.NOTES-0.1? into cumulative
+	  RELEASE.NOTES file.
+	* Removed files CHANGES-0.1? as they duplicate info in NEWS.
 
 	2004-08-16
 
