@@ -1,6 +1,10 @@
 #!/bin/sh
 
-#	db_compact source_dir [wordlist_name]
+#  db_compact source_dir [wordlist_name]
+#
+#    use to compact wordlist.db
+#    replaces original directory with new one
+#    renames original directory with '.old' extension
 
 set -e # die on errors
 
