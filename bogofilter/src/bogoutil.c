@@ -798,6 +798,7 @@ int main(int argc, char *argv[])
     }
 
     set_bogohome(ds_file);
+    ds_init(bogohome, ds_file);
 
     switch(flag) {
 	case M_RECOVER:
@@ -817,7 +818,6 @@ int main(int argc, char *argv[])
 		rc = ds_purgelogs(ds_file);
 	    break;
 	case M_REMOVEENV:
-	    ds_init(bogohome, ds_file);
 	    if (fTransaction)
 		rc = ds_remove(ds_file);
 	    break;
