@@ -470,8 +470,12 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'c':
-	if (pass == PASS_1_CLI)
-	    read_config_file(val, false, !quiet, PR_CFG_USER);
+	if (pass == PASS_1_CLI) {
+	    if (!read_config_file(val, false, !quiet, PR_CFG_USER)) {
+		fprintf(stderr, "Cannot open %s: %s\n", val, strerror(errno));
+		exit(EX_ERROR);
+	    }
+	}
 
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
