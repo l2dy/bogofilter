@@ -27,7 +27,7 @@ V="v"	# verbosity level
 BOGOFILTER="$VAL ${relpath}/bogofilter"
 BOGOLEXER="$VAL ${relpath}/bogolexer"
 BOGOUTIL="$VAL ${relpath}/bogoutil"
-BOGOLEX_SH="$VAL ${relpath}/../tuning/bogolex.sh"
+BOGOLEX_SH="$VAL ${relpath}/bogolex.sh"
 SYSTEST="${srcdir}"
 
 export BOGOFILTER
