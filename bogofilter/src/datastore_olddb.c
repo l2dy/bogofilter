@@ -73,7 +73,7 @@ typedef struct {
 /* Function definitions */
 
 /** translate BerkeleyDB \a flags bitfield back to symbols */
-static const char *resolveflags(u_int32_t flags) {
+static const char *resolveopenflags(u_int32_t flags) {
     static char buf[160];
     char b2[80];
     strlcpy(buf, "", sizeof(buf));
@@ -104,7 +104,7 @@ static int DB_OPEN(DB *db, const char *file,
 		"type=%x, flags=%#lx=%s, mode=%#o) -> %d %s\n",
 		(unsigned long)getpid(), (void *)db, file,
 		database ? database : "NIL", type, (unsigned long)flags,
-		resolveflags(flags), mode, ret, db_strerror(ret));
+		resolveopenflags(flags), mode, ret, db_strerror(ret));
 
     return ret;
 }
@@ -131,7 +131,7 @@ static dbh_t *dbh_init(const char *path, const char *name)
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
 
-    handle->fd   = -1; /* for lock */
+    handle->fd   = -1;			/* for lock */
 
     handle->path = xstrdup(path);
     handle->name = xmalloc(len);
@@ -183,6 +183,9 @@ static void check_db_version(void)
     if (!version_ok) {
 	version_ok = 1;
 	(void)db_version(&maj, &min, NULL);
+	if (DEBUG_DATABASE(1))
+	    fprintf(dbgout, "db_version: Header version %d.%d, library version %d.%d\n",
+		    DB_VERSION_MAJOR, DB_VERSION_MINOR, maj, min);
 	if (!(maj == DB_VERSION_MAJOR && min == DB_VERSION_MINOR)) {
 	    fprintf(stderr, "The DB versions do not match.\n"
 		    "This program was compiled for DB version %d.%d,\n"
@@ -240,10 +243,12 @@ static uint32_t get_psize(DB *dbp)
 
     ret = dbp->stat(dbp, &dbstat, DB_FAST_STAT);
     if (ret) {
-	dbp->err (dbp, ret, "%s (db) DB->stat", progname);
+	print_error(__FILE__, __LINE__, "(db) DB->stat");
 	return 0xffffffff;
     }
     pagesize = dbstat->bt_pagesize;
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "DB->stat success, pagesize: %lu\n", (unsigned long)pagesize);
     free(dbstat);
     return pagesize;
 }
@@ -272,7 +277,8 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
     char *t;
 
     dbh_t *handle = NULL;
-    uint32_t open_flags = 0;
+    uint32_t opt_flags = (open_mode & DS_READ) ? DB_RDONLY : 0;
+
     /*
      * If locking fails with EAGAIN, then try without MMAP, fcntl()
      * locking may be forbidden on mmapped files, or mmap may not be
@@ -286,20 +292,18 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 
     check_db_version();
 
-    if (open_mode & DS_READ )
-	open_flags = DB_RDONLY;
-
     /* retry when locking failed */
     for (idx = 0; idx < COUNTOF(retryflags); idx += 1)
     {
 	DB *dbp;
 	bool err = false;
-	uint32_t retryflag = retryflags[idx], pagesize;
+	uint32_t pagesize;
+	uint32_t retryflag = retryflags[idx];
 
 	handle = dbh_init(path, name);
 
 	if (handle == NULL)
-	    break;
+	    return NULL;
 
 	/* create DB handle */
 	if ((ret = db_create (&dbp, NULL, 0)) != 0) {
@@ -323,12 +327,12 @@ void *db_open(const char *path, const char *name, dbmode_t open_mode)
 
 retry_db_open:
 
-	ret = DB_OPEN(dbp, t, NULL, dbtype, open_flags | retryflag, 0664);
+	ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | retryflag, 0664);
 
 	if (ret != 0) {
-	    err = (ret != ENOENT) || (open_flags & DB_RDONLY);
+	    err = (ret != ENOENT) || (opt_flags & DB_RDONLY);
 	    if (!err) {
-		ret = DB_OPEN(dbp, t, NULL, dbtype, open_flags | DB_CREATE | DB_EXCL | retryflag, 0664);
+		ret = DB_OPEN(dbp, t, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL | retryflag, 0664);
 		if (ret != 0)
 		    err = true;
 		else
@@ -337,7 +341,7 @@ retry_db_open:
 	}
 
 	if (ret != 0) {
-	    if (ret == ENOENT && open_flags != DB_RDONLY)
+	    if (ret == ENOENT && opt_flags != DB_RDONLY)
 		return NULL;
 	    else
 		err = true;
@@ -345,7 +349,7 @@ retry_db_open:
 
 	if (err)
 	{
-	    if (open_flags != DB_RDONLY && ret == EEXIST && --retries) {
+	    if (opt_flags != DB_RDONLY && ret == EEXIST && --retries) {
 		/* sleep for 4 to 100 ms - this is just to give up the CPU
 		 * to another process and let it create the data base
 		 * file in peace */
@@ -371,19 +375,25 @@ retry_db_open:
 	handle->is_swapped = is_swapped ? true : false;
 
 	if (ret != 0) {
-	    dbp->err (dbp, ret, "%s (db) DB->get_byteswapped: %s",
-		      progname, handle->name);
+	    print_error(__FILE__, __LINE__, "(db) DB->get_byteswapped: %s",
+		      db_strerror(ret));
 	    db_close(handle);
 	    return NULL;		/* handle already freed, ok to return */
 	}
 
+	if (DEBUG_DATABASE(1))
+	    fprintf(dbgout, "DB->get_byteswapped: %s\n", is_swapped ? "true" : "false");
+
 	ret = dbp->fd(dbp, &handle->fd);
 	if (ret != 0) {
-	    dbp->err (dbp, ret, "%s (db) DB->fd: %s",
-		      progname, handle->name);
+	    print_error(__FILE__, __LINE__, "(db) DB->fd: %s",
+		      db_strerror(ret));
 	    db_close(handle);
 	    return NULL;		/* handle already freed, ok to return */
 	}
+
+	if (DEBUG_DATABASE(1))
+	    fprintf(dbgout, "DB->fd: %d\n", handle->fd);
 
 	/* query page size */
 	pagesize = get_psize(dbp);
@@ -420,11 +430,9 @@ retry_db_open:
 	handle->locked = true;
 	if (handle->fd < 0)
 	    handle->locked=false;
-
-	return handle;
     }
 
-    return NULL;
+    return handle;
 
  open_err:
     dbh_free(handle);
@@ -452,12 +460,15 @@ int db_delete(void *vhandle, const dbv_t *token)
     ret = dbp->del(dbp, NULL, &db_key, 0);
 
     if (ret != 0 && ret != DB_NOTFOUND) {
-	print_error(__FILE__, __LINE__, "(db) db_delete('%.*s'), err: %d, %s",
+	print_error(__FILE__, __LINE__, "(db) DB->del('%.*s'), err: %d, %s",
 		    CLAMP_INT_MAX(db_key.size),
 		    (const char *) db_key.data,
     		    ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
+
+    if (DEBUG_DATABASE(3))
+	fprintf(dbgout, "DB->del(%.*s)\n", CLAMP_INT_MAX(db_key.size), (const char *) db_key.data);
 
     return ret;		/* 0 if ok */
 }
@@ -485,6 +496,10 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 
     ret = dbp->get(dbp, NULL, &db_key, &db_data, 0);
 
+    if (DEBUG_DATABASE(3))
+	fprintf(dbgout, "DB->get(%.*s): %s\n",
+		CLAMP_INT_MAX(token->leng), (char *) token->data, db_strerror(ret));
+
     val->leng = db_data.size;		/* read count */
 
     switch (ret) {
@@ -492,13 +507,9 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 	break;
     case DB_NOTFOUND:
 	ret = DS_NOTFOUND;
-	if (DEBUG_DATABASE(3)) {
-	    fprintf(dbgout, "db_get_dbvalue: [%.*s] not found\n",
-		    CLAMP_INT_MAX(token->leng), (char *) token->data);
-	}
 	break;
     default:
-	print_error(__FILE__, __LINE__, "(db) db_get_dbvalue( '%.*s' ), err: %d, %s",
+	print_error(__FILE__, __LINE__, "(db) DB->get('%.*s' ), err: %d, %s",
 		    CLAMP_INT_MAX(token->leng), (char *) token->data, ret, db_strerror(ret));
 	exit(EX_ERROR);
     }
@@ -534,6 +545,10 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
 	exit(EX_ERROR);
     }
 
+    if (DEBUG_DATABASE(3))
+	fprintf(dbgout, "DB->put(%.*s): %s\n",
+		CLAMP_INT_MAX(token->leng), (char *) token->data, db_strerror(ret));
+
     return 0;
 }
 
@@ -546,7 +561,7 @@ void db_close(void *vhandle)
     DB *dbp = handle->dbp;
 
     if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "db_close (%s)\n",
+    	fprintf(dbgout, "DB->close(%s)\n",
 		handle->name);
 
     ret = dbp->close(dbp, 0);
@@ -556,7 +571,8 @@ void db_close(void *vhandle)
 	ret = 0;
 #endif
     if (ret)
-	print_error(__FILE__, __LINE__, "(db) db_close err: %d, %s", ret, db_strerror(ret));
+	print_error(__FILE__, __LINE__, "DB->close error: %s",
+		db_strerror(ret));
 
     dbh_free(handle);
 }
@@ -570,6 +586,9 @@ void db_flush(void *vhandle)
     int ret;
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
+
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "db_flush(%s)\n", handle->name);
 
     ret = dbp->sync(dbp, 0);
 #if DB_AT_LEAST(3,2) && DB_AT_MOST(4,0)
@@ -587,7 +606,7 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
 
-    int ret = 0;
+    int ret = 0, eflag = 0;
 
     DBC dbc;
     DBC *dbcp = &dbc;
@@ -599,7 +618,7 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 
     ret = dbp->cursor(dbp, NULL, &dbcp, 0);
     if (ret) {
-	dbp->err(dbp, ret, "(cursor): %s", handle->path);
+	print_error(__FILE__, __LINE__, "(cursor): %s", handle->path);
 	return -1;
     }
 
@@ -636,15 +655,17 @@ int db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 	ret = 0;
 	break;
     default:
-	dbp->err(dbp, ret, "(c_get)");
-	ret = -1;
-    }
-    if (dbcp->c_close(dbcp)) {
-	dbp->err(dbp, ret, "(c_close)");
-	ret = -1;
+	print_error(__FILE__, __LINE__, "(c_get): %s", db_strerror(ret));
+	eflag = 1;
+	break;
     }
 
-    return ret;		/* 0 if ok */
+    if ((ret = dbcp->c_close(dbcp))) {
+	print_error(__FILE__, __LINE__, "(c_close): %s", db_strerror(ret));
+	eflag = -1;
+    }
+
+    return eflag ? -1 : ret;		/* 0 if ok */
 }
 
 const char *db_str_err(int e) {

@@ -181,7 +181,7 @@ static dbh_t *dbh_init(const char *path, const char *name)
     handle = xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
 
-    handle->fd   = -1;
+    handle->fd   = -1;			/* for lock */
 
     handle->path = xstrdup(path);
     handle->name = xmalloc(len);
@@ -628,6 +628,8 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 	fprintf(dbgout, "DB->get(%.*s): %s\n",
 		CLAMP_INT_MAX(token->leng), (char *) token->data, db_strerror(ret));
 
+    val->leng = db_data.size;		/* read count */
+
     switch (ret) {
     case 0:
 	break;
@@ -644,8 +646,6 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 	dbe_txn_abort(handle);
 	exit(EX_ERROR);
     }
-
-    val->leng = db_data.size;		/* read count */
 
     return ret;
 }
