@@ -127,7 +127,13 @@ paths whenever possible.
         degen_enabled
         first_match
 
-    Note:  Bogofilter will print an warning message if it sees any of
+   The following configuration options (which don't correspond to
+   switches) are deprecated:
+
+	thresh_stats
+	thresh_rtable
+
+    Note:  Bogofilter will print a warning message if it sees any of
     these options, but will run fine anyhow.
 
 6) Miscellany:
