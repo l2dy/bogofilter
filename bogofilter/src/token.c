@@ -213,8 +213,8 @@ size_t decode_text(word_t *w)
     char *enc = strchr(beg+2,  '?');
     word_t n;
     n.text = (char *) enc + 3;
-    size -= enc + 3 - text + 2;
-    n.leng = size;
+    n.leng = size - (enc+3 - text + 2);
+    n.text[n.leng] = '\0';
 
     switch (tolower(enc[1])) {
     case 'b':
