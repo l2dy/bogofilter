@@ -383,7 +383,8 @@ static void print_version(void)
 		  "This is free software, and\nyou are welcome to "
 		  "redistribute it under the General Public License.  "
 		  "See\nthe COPYING file with the source distribution for "
-		  "\n", 
+		  "details.\n"
+		  "\n",
 		  progtype, version, ds_version_str(), PACKAGE);
 }
 
