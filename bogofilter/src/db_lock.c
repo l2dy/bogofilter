@@ -22,6 +22,12 @@
  *     http://article.gmane.org/gmane.mail.bogofilter.devel/3270
  */
 
+#include <errno.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 #include "db_lock.h"
 #include "debug.h"
 #include "error.h"
@@ -30,12 +36,6 @@
 #include "system.h"
 #include "xmalloc.h"
 #include "xstrdup.h"
-
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <signal.h>
-#include <stdlib.h>
 
 /** figure out which flag we pass to open() to enforce synchronous data
  * I/O completion */
