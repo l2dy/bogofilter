@@ -57,7 +57,7 @@ for n in xml html ; do
   install -m644 doc/*.$n .inst/$n
 done
 
-for d in contrib tuning ; do
+for d in contrib ; do
   install -d $RPM_BUILD_ROOT%{_datadir}/%{name}/$d
   files=`find $d -maxdepth 1 -type f`
   for f in $files ; do
@@ -124,7 +124,6 @@ done
 %doc .inst/html .inst/xml
 
 %{_datadir}/%{name}/contrib/*
-%{_datadir}/%{name}/tuning/*
 
 %files static
 %defattr(-,root,root)
