@@ -250,10 +250,10 @@ int words_from_path(char *directory, int argc, char **argv, bool show_probabilit
     }
 
     printf(head_format, "", "spam", "good", "prob");
-    while (1)
+    while (argc >= 0)
     {
 	double spamness, goodness, prob;
-
+	
 	if ( argc == 0)
 	{
 	    if (get_token(buf, BUFSIZE, stdin) != 0)
@@ -261,10 +261,9 @@ int words_from_path(char *directory, int argc, char **argv, bool show_probabilit
 	}
 	else 
 	{
-	    if (argc-- > 0)
-		token = *argv++;
-	    else
-		break;
+	    token = *argv++;
+	    if (--argc == 0)
+		argc = -1;
 	}
 	spam_count = db_getvalue(dbh_spam, token);
 	good_count =  db_getvalue(dbh_good, token);
