@@ -20,7 +20,6 @@ EXTRA_DIST = bogofilter.1in bogoutil.1in bogoupgrade.1in \
 	     bogofilter.xml bogoutil.xml bogoupgrade.xml bogolexer.xml \
 	     bogofilter-SA-2002-01 \
 	     integrating-with-qmail \
-	     README.Robinson \
 	     programmer/README.freebsd programmer/README.hp-ux \
 	     programmer/README.dcdflib
 

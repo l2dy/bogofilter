@@ -290,5 +290,6 @@ AC_CONFIG_FILES([Makefile \
 		contrib/Makefile doc/Makefile \
 		src/Makefile src/dcdflib/Makefile src/dcdflib/src/Makefile \
 		src/tests/Makefile src/tests/bogoutil/Makefile src/tests/bogofilter/Makefile \
+		tuning/Makefile \
 		])
 AC_OUTPUT

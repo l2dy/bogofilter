@@ -3,7 +3,7 @@
 # foreign: don't insist on ChangeLog
 # 1.6: minimum version of automake/aclocal
 AUTOMAKE_OPTIONS = foreign 1.6
-SUBDIRS = src . doc contrib
+SUBDIRS = src . doc contrib tuning
 SYSCONFDIR = @sysconfdir@
 DISTCHECK_CONFIGURE_FLAGS= @DISTCHECK_CONFIGURE_FLAGS@
 
