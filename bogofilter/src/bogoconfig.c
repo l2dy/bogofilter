@@ -615,6 +615,7 @@ void process_args_1(int argc, char **argv)
 
         case 'X':
 	    bogotest = 1;
+	    break;
 
 	case 'y':		/* date as YYYYMMDD */
 	    today = string_to_date((char *)optarg);
