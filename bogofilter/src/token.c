@@ -175,7 +175,7 @@ token_t get_token(void)
 	case MSGADDR:
 	    /* trim brackets */
 	    yylval->leng -= 2;
-	    memcpy(yylval->text, yylval->text+1, yylval->leng);
+	    memmove(yylval->text, yylval->text+1, yylval->leng);
 	    Z(yylval->text[yylval->leng]);	/* for easier debugging - removable */
 	    /* if top level, no address, not localhost, .... */
 	    if (token_prefix == w_recv &&
