@@ -17,12 +17,12 @@ word_t *word_new(const byte *text, uint leng)
 {
     /* to lessen malloc/free calls, allocate struct and data in one block */
     uint len   = (leng || !text) ? leng : (uint) strlen((const char *) text);
-    word_t *self = xmalloc(sizeof(word_t)+len+D);
+    word_t *self = xmalloc(sizeof(word_t)+len+1);
     self->leng = len;
     self->text = (byte *)((char *)self+sizeof(word_t));
     if (text) {
 	memcpy(self->text, text, len);
-	Z(self->text[len]);			/* for easier debugging - removable */
+	self->text[len] = '\0';			/* ensure nul termination */
     }
     return self;
 }
@@ -34,12 +34,12 @@ void word_free(word_t *self)
 
 word_t *word_dup(const word_t *word)
 {
-    word_t *self = xmalloc(sizeof(word_t)+word->leng+D);
+    word_t *self = xmalloc(sizeof(word_t)+word->leng+1);
     self->leng = word->leng;
     self->text = (byte *)((char *)self+sizeof(word_t));
     if (word->text) {
 	memcpy(self->text, word->text, self->leng);
-	Z(self->text[self->leng]);		/* for easier debugging - removable */
+	self->text[self->leng] = '\0';		/* ensure nul termination */ 
     }
     return self;
 }

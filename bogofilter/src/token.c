@@ -72,8 +72,8 @@ static word_t nonblank_line = { sizeof(NONBLANK)-1, NONBLANK};
 static void token_set( word_t *token, byte *text, uint leng )
 {
     token->leng = leng;
-    memcpy(token->text, text, leng + D);
-    Z(token->text[leng]);
+    memcpy(token->text, text, leng + 1);	/* include nul terminator */
+    token->text[leng] = '\0';			/* ensure nul termination */
 }
 
 static inline void token_copy( word_t *dst, word_t *src )
@@ -84,15 +84,15 @@ static inline void token_copy( word_t *dst, word_t *src )
 static void build_prefixed_token( word_t *token, word_t *prefix, byte *text, uint32_t leng )
 {
     if (token_prefix != NULL) {
-	token->leng = leng + prefix->leng;
-	memcpy(token->text, prefix->text, prefix->leng + D);
-	memcpy(token->text + prefix->leng, text, leng + D);
-	Z(token->text[token->leng]);
+	token->leng = leng +prefix->leng;
+	memcpy(token->text, prefix->text, prefix->leng);
+	memcpy(token->text +prefix->leng, text, leng + 1);	/* include nul terminator */
+	token->text[token->leng] = '\0';			/* ensure nul termination */
     }
     else {
 	token->leng = leng;
-	memcpy(token->text, text, leng + D);
-	Z(token->text[token->leng]);
+	memcpy(token->text, text, leng + 1);	/* include nul terminator */
+	token->text[token->leng] = '\0';	/* ensure nul termination */
     }
 }
 
@@ -125,12 +125,12 @@ token_t get_token(word_t **token)
 	
 	leng = (uint)   *lexer->yyleng;
 	text = (byte *) *lexer->yytext;
-
+	
 	if (DEBUG_TEXT(2)) {
 	    word_puts(&yylval, 0, dbgout);
 	    fputc('\n', dbgout);
 	}
-
+ 
 	if (cls == NONE) /* End of message */
 	    break;
 
@@ -175,6 +175,7 @@ token_t get_token(word_t **token)
 		    *ot = *in;
 		leng = (uint) (ot - st);
 	    }
+	    text[leng] = '\0';		/* ensure nul termination */
 	    build_prefixed_token( &yylval, token_prefix, text, leng );
 	}
 	break;
@@ -219,14 +220,17 @@ token_t get_token(word_t **token)
 	    /** \bug: the parser MUST be aligned with lexer_v3.l! */
 	    if (leng < sizeof(msg_id_text))
 	    {
-		size_t skip = 0;
-		while (!isspace(yylval.text[skip]))
-		    skip += 1;
-		while (isspace(yylval.text[skip]))
-		    skip += 1;
-		yylval.leng -= skip;
-		memmove(yylval.text, yylval.text+skip, yylval.leng);
-		Z(yylval.text[yylval.leng]);
+		while (!isspace(text[0])) {
+		    text += 1;
+		    leng -= 1;
+		}
+		while (isspace(text[0])) {
+		    text += 1;
+		    leng -= 1;
+		}
+		text[leng] = '\0';		/* ensure nul termination */
+
+		token_set( &yylval, text, leng);
 		token_copy( &msg_id, &yylval );
 	    }
 	continue;
@@ -237,14 +241,20 @@ token_t get_token(word_t **token)
 	    if (queue_id.leng == 0 &&
 		leng < sizeof(msg_id_text) )
 	    {
-		size_t skip = 0;
-		while (isspace(text[skip]))
-		    skip += 1;
-		if (memcmp(text+skip, "id", 2) == 0)
-		    skip += 2;
-		while (isspace(text[skip]))
-		    skip += 1;
-		token_set( &yylval, text+skip, leng-skip);
+		while (isspace(text[0])) {
+		    text += 1;
+		    leng -= 1;
+		}
+		if (memcmp(text, "id", 2) == 0) {
+		    text += 2;
+		    leng -= 2;
+		}
+		while (isspace(text[0])) {
+		    text += 1;
+		    leng -= 1;
+		}
+		text[leng] = '\0';		/* ensure nul termination */
+		token_set( &yylval, text, leng);
 		token_copy( &queue_id, &yylval );
 	    }
 	    continue;
@@ -252,9 +262,9 @@ token_t get_token(word_t **token)
 	case MESSAGE_ADDR:
 	{
 	    /* trim brackets */
-
-	    leng -= 2;
 	    text += 1;
+	    leng -= 2;
+	    text[leng] = '\0';		/* ensure nul termination */
 	    token_set( &yylval, text, leng);
 	    /* if top level, no address, not localhost, .... */
 	    if (token_prefix == &w_recv &&
@@ -334,7 +344,7 @@ token_t get_token(word_t **token)
 	    done = true;
     }
 
-    if (!msg_count_file) {
+   if (!msg_count_file) {
 	/* Remove trailing blanks */
 	/* From "From ", for example */
 	while (yylval.leng > 1 && yylval.text[yylval.leng-1] == ' ') {

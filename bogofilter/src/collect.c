@@ -58,8 +58,8 @@ void collect_words(wordhash_t *wh)
 	    char *end = strchr(beg, '"');
 	    assert(end);
 	    token->leng = end - beg;
-	    memmove(token->text, token->text + 1, token->leng + D);
-	    Z(token->text[token->leng]);	/* replace terminal quote by NUL */
+	    memmove(token->text, token->text + 1, token->leng + 1);
+	    token->text[token->leng] = '\0';	/* ensure nul termination */
 	}
 
 	wp = wordhash_insert(wh, token, sizeof(wordprop_t), &wordprop_init);
