@@ -44,10 +44,13 @@ AC_CHECK_LIB([m],  [cos])
 
 AH_TEMPLATE([HAVE_DB_H], [Have suitable db.h header])
 
+WITH_DB=
+
 AC_ARG_WITH(db,
         [  --with-db=PATH     Specify path to BerkelyDB install directory ],
         [
                 if test "x$withval" != "xno" ; then
+		        WITH_DB=$withval
                         if test -d "$withval/lib"; then
                                 if test -n "${need_dash_r}"; then
                                         LDFLAGS="-R${withval}/lib ${LDFLAGS}"
@@ -65,7 +68,11 @@ AC_ARG_WITH(db,
                                 CPPFLAGS="-I${withval} ${CPPFLAGS}"
                         fi
                 fi
-	])
+    ]
+)
+if test "x$WITH_DB" != "x" ; then
+    DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --with-db=$WITH_DB"
+fi
 
 AC_EGREP_HEADER(db_create, [db.h], AC_DEFINE(HAVE_DB_H),
 		AC_MSG_ERROR([Can not locate a suitable BerkeleyDB db.h header file.
@@ -208,6 +215,7 @@ if test "$sysconfdir" = "\${prefix}/etc" \
     )
 fi
 
+AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 AC_CONFIG_FILES([Makefile tests/Makefile tests/bogoutil/Makefile bogofilter.spec
 		 dcdflib/Makefile dcdflib/src/Makefile])
 AC_OUTPUT
