@@ -21,7 +21,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 #include <sys/resource.h>
 
 #ifdef NEEDTRIO
-#include <trio.h>
+#include "trio.h"
 #endif
 
 #include "datastore.h"
