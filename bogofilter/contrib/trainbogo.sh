@@ -92,7 +92,7 @@ normal()
 
 normaln()
 {
-    [ -z "${quiet}" ] && echo -n $@
+    [ -z "${quiet}" ] && printf "%s" "$*"
 }
 
 cleanup()
@@ -181,7 +181,7 @@ if [ ! -f "${list}" ] || [ -n "${dofilelist}" ]; then
     for i in "${hamdir}"/* "${spamdir}"/*
       do
       [ ! -f "${i}" ] && continue
-      md5=$(echo -n "${rndseed}${i}" | md5sum | sed "s/  -//")
+      md5=$(printf "%s" "${rndseed}${i}" | md5sum | sed "s/  -//")
       echo "${md5}  ${i}" >> "${list}"
     done
 
