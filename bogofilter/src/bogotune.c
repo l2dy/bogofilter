@@ -1509,7 +1509,7 @@ static rc_t bogotune(void)
 	    if (verbose >= SUMMARY+1)
 		printf("%3s ", "cnt");
 	    if (verbose >= SUMMARY+2)
-		printf(" %s %s %s  ", "s", "m", "x");
+		printf(" %s %s %s      ", "s", "m", "x");
 	    printf(" %4s %5s   %4s %8s %8s %7s %3s %3s\n",
 		   "rs", "md", "rx", "spesf", "nsesf", "cutoff", "fp", "fn");
 	}
