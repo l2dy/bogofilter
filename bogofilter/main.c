@@ -34,6 +34,9 @@ AUTHOR:
 
 #define BOGODIR ".bogofilter"
 
+#define	NL	"\n"
+#define	CRLF	"\r\n"
+
 extern int Rtable;
 
 char msg_register[1024];
@@ -137,8 +140,10 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 		    /* print headers */
 		    for (textend=&textblocks; textend->block; textend=textend->next)
 		    {
-			if (textend->len == 1
-			       && memcmp(textend->block, "\n", 1) == 0)
+			if ((textend->len == 1
+			     && memcmp(textend->block, NL, 1) == 0)
+			    || (textend->len == 2
+				&& memcmp(textend->block, CRLF, 2) == 0))
 			    break;
 
 			(void) fwrite(textend->block, 1, textend->len, stdout);
