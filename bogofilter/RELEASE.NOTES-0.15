@@ -1,5 +1,8 @@
 *** GOOD NEWS ... BAD NEWS ***
 
+Since release 0.15.9, bogofilter no longer allows to disable algorithms,
+which has never been supported well.
+
 With release 0.15.4, all header line tokens are now tagged as:
 
     Subject:      subj:

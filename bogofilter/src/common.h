@@ -67,16 +67,6 @@ typedef enum sh_e { IX_SPAM = 0, 	/* index for SPAM */
 #define PATH_LEN 1024
 #endif
 
-/* Default build includes Graham, Robinson, and Robinson-Fisher methods */
-
-#if	defined(ENABLE_ROBINSON_METHOD) || defined(ENABLE_ROBINSON_FISHER)
-#define	ROBINSON_OR_FISHER
-#endif
-
-#if	defined(ENABLE_GRAHAM_METHOD) && defined(ROBINSON_OR_FISHER)
-#define	GRAHAM_AND_ROBINSON
-#endif
-
 #define COUNTOF(array)	(uint) (sizeof(array)/sizeof(array[0]))
 
 typedef unsigned char byte;

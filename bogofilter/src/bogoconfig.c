@@ -45,15 +45,9 @@ CONTRIBUTORS:
 
 /* includes for scoring algorithms */
 #include "method.h"
-#ifdef	ENABLE_GRAHAM_METHOD
 #include "graham.h"
-#endif
-#ifdef	ENABLE_ROBINSON_METHOD
 #include "robinson.h"
-#endif
-#ifdef	ENABLE_ROBINSON_FISHER
 #include "fisher.h"
-#endif
 
 #ifndef	DEBUG_CONFIG
 #define DEBUG_CONFIG(level)	(verbose > level)
@@ -71,15 +65,7 @@ bool  run_register = false;
 const char *logtag = NULL;
 
 /* define default */
-#if defined (ENABLE_ROBINSON_FISHER)
 #define AL_DEFAULT AL_FISHER
-#elif defined (ENABLE_ROBINSON_METHOD)
-#define AL_DEFAULT AL_ROBINSON
-#elif defined (ENABLE_GRAHAM_METHOD)
-#define AL_DEFAULT AL_GRAHAM
-#else
-#error No algorithms compiled in. See configure --help.
-#endif
 
 enum algorithm_e {
     AL_GRAHAM='g',
@@ -134,17 +120,11 @@ const parm_desc sys_parms[] =
     { "min_dev",	  CP_DOUBLE,	{ (void *) &min_dev } },
     { "spam_cutoff",	  CP_DOUBLE,	{ (void *) &spam_cutoff } },
     { "thresh_stats",	  CP_DOUBLE,	{ (void *) &thresh_stats } },
-#ifdef ENABLE_GRAHAM_METHOD
     { "thresh_index",	  CP_INTEGER,	{ (void *) NULL } },	/* Graham */
-#endif
-#ifdef ENABLE_ROBINSON_METHOD
     { "thresh_rtable",	  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
     { "robx",		  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
     { "robs",		  CP_DOUBLE,	{ (void *) NULL } },	/* Robinson */
-#endif
-#ifdef ENABLE_ROBINSON_FISHER
     { "ham_cutoff",	  CP_FUNCTION,	{ (void *) NULL } },	/* Robinson-Fisher */
-#endif
 
     { "block_on_subnets", 	     CP_BOOLEAN, { (void *) &block_on_subnets } },
     { "charset_default",  	     CP_STRING,  { &charset_default } },
@@ -247,21 +227,15 @@ static bool select_algorithm(const unsigned char ch, bool cmdline)
 
     switch (al)
     {
-#ifdef ENABLE_GRAHAM_METHOD
     case AL_GRAHAM:
 	method = (method_t *) &graham_method;
 	break;
-#endif
-#ifdef ENABLE_ROBINSON_METHOD
     case AL_ROBINSON:
 	method = (method_t *) &rf_robinson_method;
 	break;
-#endif
-#ifdef ENABLE_ROBINSON_FISHER
     case AL_FISHER:
 	method = (method_t *) &rf_fisher_method;
 	break;
-#endif
     default:
 	print_error(__FILE__, __LINE__, "Algorithm '%c' not supported.\n", al);
 	return false;
@@ -366,17 +340,9 @@ static void help(void)
 		  DB_EXT);
     (void)fprintf(stderr,
 		  "\talgorithm options:\n"
-#ifdef	GRAHAM_AND_ROBINSON
-#ifdef	ENABLE_GRAHAM_METHOD
 		  "\t  -g      - select Graham spam calculation method.\n"
-#endif
-#ifdef	ENABLE_ROBINSON_METHOD
 		  "\t  -r      - select Robinson spam calculation method.\n"
-#endif
-#ifdef	ENABLE_ROBINSON_FISHER
 		  "\t  -f      - select Fisher spam calculation method (default).\n"
-#endif
-#endif
 	);
     (void)fprintf(stderr,
 		  "\tparameter options:\n"
@@ -407,15 +373,9 @@ static void print_version(void)
 		  "%s version %s\n"
 
 		  "    Algorithms:"
-#ifdef	ENABLE_ROBINSON_FISHER
 		  " Fisher"
-#endif
-#ifdef	ENABLE_GRAHAM_METHOD
 		  " Graham"
-#endif
-#ifdef	ENABLE_ROBINSON_METHOD
 		  " Robinson"
-#endif
 		  "\n"
 		  "    Database: %s, %s\n",
 		  progtype, version, ds_version_str(),
@@ -432,23 +392,9 @@ static void print_version(void)
 		  PACKAGE);
 }
 
-#ifndef	ENABLE_GRAHAM_METHOD
-#define	G ""
-#else
 #define	G "g"
-#endif
-
-#ifndef	ENABLE_ROBINSON_METHOD
-#define	R ""
-#else
 #define	R "r"
-#endif
-
-#ifndef	ENABLE_ROBINSON_FISHER
-#define	F ""
-#else
 #define	F "f"
-#endif
 
 #define	OPTIONS	":23bBc:Cd:DefFghHI:k:lL:m:MnNo:O:pP:qQRrsStTuvWVx:X:y:" G R F
 
@@ -518,21 +464,17 @@ void process_args_1(int argc, char **argv)
 	    nonspam_exits_zero = true;
 	    break;
 
-#if	defined(ENABLE_ROBINSON_FISHER) && (defined(ENABLE_GRAHAM_METHOD) || defined(ENABLE_ROBINSON_METHOD))
 	case 'f':
 	    select_algorithm(AL_FISHER, true);
 	    break;
-#endif
 
 	case 'F':
 	    force = true;
 	    break;
 
-#ifdef	GRAHAM_AND_ROBINSON
 	case 'g':
 	    select_algorithm(AL_GRAHAM, true);
 	    break;
-#endif
 
 	case 'h':
 	    help();
@@ -570,11 +512,9 @@ void process_args_1(int argc, char **argv)
 	    passthrough = true;
 	    break;
 
-#if	defined(ENABLE_ROBINSON_METHOD) && (defined(ENABLE_GRAHAM_METHOD) || defined(ENABLE_ROBINSON_FISHER))
 	case 'r':
 	    select_algorithm(AL_ROBINSON, true);
 	    break;
-#endif
 
 	case 'q':
 	    quiet = true;
@@ -584,14 +524,12 @@ void process_args_1(int argc, char **argv)
 	    query = true;
 	    break;
 
-#ifdef	ROBINSON_OR_FISHER
 	case 'R':
 	    Rtable = 1;
 	    if (algorithm != AL_ROBINSON && algorithm != AL_FISHER)
 		if (AL_DEFAULT == AL_ROBINSON || AL_DEFAULT == AL_FISHER)
 		    algorithm = AL_DEFAULT;
 	    break;
-#endif
 
 	case 's':
 	    run_type = check_run_type(REG_SPAM, REG_GOOD | UNREG_SPAM);

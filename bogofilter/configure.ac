@@ -230,76 +230,14 @@ AC_ARG_ENABLE(memdebug,
 	fi
 )
 
-# Allow the user to disable Graham methods
-
-AC_ARG_ENABLE(graham-method,
-	AC_HELP_STRING([--disable-graham-method],
-	[Disable Graham calculation method]),
-	if test "$enableval" = no; then
-		[USE_GRAHAM=NO]
-	else
-		[USE_GRAHAM=YES]
-	fi
-)
-
-# Allow the user to disable Robinson methods
-
-if test x$USE_ROBINSON != xYES ; then
-AC_ARG_ENABLE(robinson-method,
-	AC_HELP_STRING([--disable-robinson-method],
-	[Disable Robinson calculation method]),
-	if test "$enableval" = no; then
-		[USE_ROBINSON=NO]
-	else
-		[USE_ROBINSON=YES]
-	fi
-)
-fi
-
-# Allow the user to disable Robinson-Fisher methods
-
-AC_ARG_ENABLE(robinson-fisher,
-	AC_HELP_STRING([--disable-robinson-fisher],
-	[Disable Fisher's method of combining probabilities]),
-	if test "$enableval" = no; then
-		[USE_FISHER=NO]
-	else
-		[USE_FISHER=YES]
- 		AC_DEFINE(ENABLE_ROBINSON_FISHER,1,
-		[Enable Fisher's method of combining probabilities])
-	fi
-)
-
-if test x$USE_GRAHAM != xNO ; then
-	AC_DEFINE(ENABLE_GRAHAM_METHOD,1,
-	[Enable Graham calculation method])
-fi
-
-if test x$USE_ROBINSON != xNO ; then
-	AC_DEFINE(ENABLE_ROBINSON_METHOD,1,
-	[Enable Robinson calculation method])
-fi
-
-if test x$USE_FISHER != xNO ; then
-	AC_DEFINE(ENABLE_ROBINSON_FISHER,1,
-	[Enable Fisher's method of combining P])
-	[USE_ROBINSON=YES]
-fi
-
-# Enable building with Graham/Robinson/Fisher files.
-AM_CONDITIONAL(ENABLE_GRAHAM_METHOD, test x$USE_GRAHAM != xNO)
-AM_CONDITIONAL(ENABLE_ROBINSON_METHOD, test x$USE_ROBINSON != xNO)
-AM_CONDITIONAL(ENABLE_ROBINSON_FISHER, test x$USE_FISHER != xNO)
-
-# Enable building with memory usage debugging files.
-
+dnl Enable building with memory usage debugging files.
 if test x$USE_MEMDEBUG = xYES ; then
 	AC_DEFINE(ENABLE_MEMDEBUG,1,
 	[Enable memory usage debugging])
 fi
-
 AM_CONDITIONAL(ENABLE_MEMDEBUG, test x$MEM_DEBUG != xNO)
 
+dnl Data base engine dependent stuff
 case "x$WITH_DB_ENGINE" in
     xtdb)
     AC_DEFINE(ENABLE_TDB_DATASTORE,1, [Enable tdb datastore])

@@ -8,18 +8,9 @@ DISTCHECK_CONFIGURE_FLAGS= @DISTCHECK_CONFIGURE_FLAGS@
 
 PERL = @PERL@
 
-if ENABLE_GRAHAM_METHOD
 GRAHAM_SRC = graham.c graham.h
-endif
-
-if ENABLE_ROBINSON_FISHER
 FISHER_SRC = fisher.c fisher.h
 ROBINSON_SRC = robinson.c robinson.h
-else
-if ENABLE_ROBINSON_METHOD
-ROBINSON_SRC = robinson.c robinson.h
-endif
-endif
 
 if ENABLE_MEMDEBUG
 MEMDEBUG_SRC = memdebug.c memdebug.h
