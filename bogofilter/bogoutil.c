@@ -21,53 +21,55 @@ AUTHOR:
 #include "datastore_db.h"
 
 #define PROGNAME "bogoutil"
-#define VERSION "0.1"
+#define VERSION "0.2"
 
 int verbose = 0;
 
-int dump_file(char *file)
+int dump_file(char *db_file)
 {
-    int ret;
-    DB db;
-    DB *dbp;
+    dbh_t *dbh;
+
     DBC dbc;
     DBC *dbcp;
     DBT key, data;
 
-    dbp = &db;
+    int ret;
+    int rv = 0;
+
     dbcp = &dbc;
-
-    if ((ret = db_create(&dbp, NULL, 0)) != 0) {
-	fprintf(stderr, PROGNAME " (db_create): %s\n", db_strerror(ret));
-	return 2;
-    }
-
-    if ((ret = dbp->open(dbp, file, NULL, DB_BTREE, 0, 0)) != 0) {
-	dbp->err(dbp, ret, PROGNAME " (open): %s", file);
-	return 2;
-    }
-
-    if ((ret = dbp->cursor(dbp, NULL, &dbcp, 0) != 0)) {
-	dbp->err(dbp, ret, PROGNAME " (cursor): %s", file);
-	return 2;
-    }
 
     memset(&key, 0, sizeof(DBT));
     memset(&data, 0, sizeof(DBT));
 
-    for (;;) {
-	ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT);
-	if (ret == 0) {
-	    printf("%.*s %lu\n", key.size, (char *) key.data,
-		   *(unsigned long *) data.data);
-	} else if (ret == DB_NOTFOUND) {
-	    break;
-	} else {
-	    dbp->err(dbp, ret, PROGNAME " (c_get)");
-	    break;
+    if ((dbh = db_open(db_file, db_file, DB_READ)) == NULL) {
+	rv = 2;
+    }
+    else {
+	db_lock_reader(dbh);
+
+	if ((ret = dbh->dbp->cursor(dbh->dbp, NULL, &dbcp, 0) != 0)) {
+	    dbh->dbp->err(dbh->dbp, ret, PROGNAME " (cursor): %s", db_file);
+	    rv = 2;
+	}
+	else {
+	    for (;;) {
+		ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT);
+		if (ret == 0) {
+		    printf("%.*s %lu\n", key.size, (char *) key.data, *(unsigned long *) data.data);
+		}
+		else if (ret == DB_NOTFOUND) {
+		    break;
+		}
+		else {
+		    dbh->dbp->err(dbh->dbp, ret, PROGNAME " (c_get)");
+		    rv = 2;
+		    break;
+		}
+	    }
 	}
     }
-    return 0;
+    db_lock_release(dbh);
+    return rv;
 }
 
 #define BUFSIZE 512
@@ -87,6 +89,8 @@ int load_file(char *db_file)
 	return 2;
 
     memset(buf, '\0', BUFSIZE);
+
+    db_lock_writer(dbh);
 
     for (;;) {
 
@@ -139,7 +143,7 @@ int load_file(char *db_file)
 	/* Slower, but allows multiple lists to be concatenated */
 	db_increment(dbh, buf, count);
     }
-
+    db_lock_release(dbh);
     db_close(dbh);
     return rv;
 }
@@ -157,7 +161,7 @@ void version(void)
 
 void usage(void)
 {
-    fprintf(stderr, "Usage: %s { -d | -l } [ -v ] file.db | [ -h | -V ]\n",PROGNAME);
+    fprintf(stderr, "Usage: %s { -d | -l } [ -v ] file.db | [ -h | -V ]\n", PROGNAME);
 }
 
 void help(void)
@@ -175,8 +179,7 @@ void help(void)
 void ensure_uniq_flag(int flag)
 {
     if (flag != 0) {
-	fprintf(stderr,
-		PROGNAME ": Flags -d and -l are mutually exclusive.\n");
+	fprintf(stderr, PROGNAME ": Flags -d and -l are mutually exclusive.\n");
     }
 }
 
@@ -219,8 +222,8 @@ int main(int argc, char *argv[])
 
     /* Extra or missing parameters */
     if ((argc - optind) != 1) {
-      usage();
-      exit(1);
+	usage();
+	exit(1);
     }
 
     db_file = argv[optind++];
