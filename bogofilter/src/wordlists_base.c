@@ -120,10 +120,7 @@ int setup_wordlists(const char* d, priority_t precedence)
 	rc = -1;
 
     xfree(bogohome);
-    if (dir)
-	bogohome = xstrdup(dir);
-
-    xfree(dir);
+    bogohome = dir;
 
     return rc;
 }
