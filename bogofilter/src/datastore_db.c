@@ -333,6 +333,26 @@ void db_setvalue(void *vhandle, const word_t *word, uint32_t count){
 }
 
 
+/*
+Update the VALUE in database, using WORD as database key.
+Adds COUNT to existing count.
+Sets date to newer of TODAY and date in database.
+*/
+void db_updvalue(void *vhandle, const word_t *word, uint32_t count){
+  dbv_t val;
+  int ret = db_get_dbvalue(vhandle, word, &val);
+  if (ret != 0) {
+      val.count = count;
+      val.date  = today;		/* date in form YYYYMMDD */
+  }
+  else {
+      val.count += count;
+      val.date  = max(val.date, today);	/* date in form YYYYMMDD */
+  }
+  db_set_dbvalue(vhandle, word, &val);
+}
+
+
 static void db_set_dbvalue(void *vhandle, const word_t *word, dbv_t *val){
   int ret;
   DBT db_key;

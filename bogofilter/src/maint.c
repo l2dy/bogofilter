@@ -158,7 +158,7 @@ static int maintain_hook(word_t *key, word_t *data,
     memcpy(&val, data->text, data->leng);
 
     if (!keep_count(val.count) || !keep_date(val.date) || !keep_size(key->leng)) {
-
+	db_delete(userdata, key);
 	if (DEBUG_DATABASE(0)) {
 	    fputs("deleting ", dbgout);
 	    word_puts(&w, 0, dbgout);
@@ -169,15 +169,13 @@ static int maintain_hook(word_t *key, word_t *data,
 	if (replace_nonascii_characters)
 	{
 	    byte *tmp = xstrdup(key->text);
-	    unsigned long count = val.count;
 	    if (do_replace_nonascii_characters(tmp, key->leng))
 	    {
 		db_delete(userdata, key);
 		w.text = tmp;
 		w.leng = key->leng;
-		count += db_getvalue(userdata, &w);
 		set_date(val.date);
-		db_setvalue(userdata, &w, count);
+		db_updvalue(userdata, &w, val.count);
 	    }
 	    xfree(tmp);
 	}
