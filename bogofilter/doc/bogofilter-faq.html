@@ -73,6 +73,8 @@
           "training to exhaustion"?</a></li>
           <li><a href="#training">How do I start my bogofilter training?</a></li>
           <li><a href="#production">How can I keep the scoring accuracy high?</a></li>
+          <li><a href="#unsure">What is <i>Unsure</i> mode?</a></li>
+          <li><a href="#autoupdate">What does the '-u' (autoupdate) switch do?</a></li>
           <li><a href="#spamassassin">How can I use SpamAssassin to train Bogofilter?</a></li>
           <li><a href="#mboxformats">What mailbox (file) formats does bogofilter understand?</a></li>
           <li><a href="#vvv">What does bogofilter's verbose output mean?</a></li>
@@ -471,6 +473,87 @@
     <p>or, for spamlist.db and goodlist.db (if using bogofilter with
     separate spam and ham wordlists).  This will compact the database
     so it occupies the minimum of disk space.</p>
+
+    <hr>
+
+    <h2 id="unsure">What is <i>Unsure</i> mode?</h2>
+
+    <p>Bogofilter's default configuration will classify a message as
+    spam or non-spam.  The SPAM_CUTOFF parameter is used for this.
+    Messages with scores greater than or equal to SPAM_CUTOFF are
+    classified as spam.  Other messages are classified as ham.</p>
+
+    <p>There is also a HAM_CUTOFF parameter.  When used, messages must
+    have scores less than or equal to HAM_CUTOFF to be classified as
+    ham.  Messages with scores between HAM_CUTOFF and SPAM_CUTOFF are
+    classified as unsure.  If you look in bogofilter.cf, you will see
+    the following lines:</p>
+
+    <pre>	#### CUTOFF Values
+	#
+	#	both ham_cutoff and spam_cutoff are allowed.
+	#	setting ham_cutoff to a non-zero value will
+	#	enable tristate results (Yes/No/Unsure).
+	#
+	#ham_cutoff  = 0.00
+	#spam_cutoff = 0.99
+	#
+	## with Yes/No/Unsure output:
+	## ham_cutoff = 0.45
+	## spam_cutoff= 0.99</pre>
+
+    <p>To turn on Yes/No/Unsure classification, remove the #'s from the last
+    two lines.</p>
+
+    <p>Alternatively, if you'd rather use labels Spam/Ham/Unsure
+    instead of Yes/No/Unsure, remove the #'s from the following
+    bogofilter.cf line:
+
+    <pre>	## spamicity_tags = Spam, Ham, Unsure</pre>
+
+    <p>Once that's done, you may want to set the filtering rules for your mail
+    program to include rules like:</p>
+
+    <pre>	if header contains "X-Bogosity: Spam", put in Spam folder
+	if header contains "X-Bogosity: Unsure", put in Unsure folder</pre>
+
+    <p>Alternatively, bogofilter.cf has directives for modifying the
+    Subject: line, i.e.</p>
+
+    <pre>	#### SPAM_SUBJECT_TAG
+	#
+	#	tag added to "Subject: " line for identifying spam or unsure
+	#	default is to add nothing.
+	#
+	##spam_subject_tag=***SPAM***
+	##unsure_subject_tag=???UNSURE???<pre>
+
+    <p>With these subject tags, the filtering rules would look like:
+
+    <pre>	if subject contains "***SPAM***", put in Spam folder
+	if subject contains "???UNSURE???", put in Unsure folder</pre>
+
+    <hr>
+
+    <h2 id="autoupdate">What does the '-u' (autoupdate) switch do?</h2>
+
+    <p>The "-u" switch (autoupdate) is used to automatically expand the
+    wordlist.  When this switch is used and bogofilter classifies a message
+    as Spam or Ham, the message's tokens are added to the wordlist with a
+    ham/spam tag (as appropriate).</p>
+
+    <p>As an example, suppose a new "Refinance now - best Mortgage rates"
+    message comes in.  It will have some words that bogofilter has seen and
+    (probably) some new ones as well.  Using '-u' the new words will be
+    added to the wordlist so that bogofilter can better recognize the next,
+    related message.</p>
+
+    <p>If/when you use to use '-u', you need to be on the lookout for
+    classification errors and retrain bogofilter with any messages that have
+    been classified incorrectly.  An incorrectly classified message that is
+    auto-updated _may_ cause bogofilter to make additional classification
+    errors in the future.   This is the same problem as when you (the sys
+    admin) incorrectly register a ham message as spam (or vice versa).</p>
 
     <hr>
 
