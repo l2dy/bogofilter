@@ -1,8 +1,8 @@
 # $Id$
-AC_INIT
+AC_INIT(bogofilter, 0.9.0.4)
 AC_PREREQ(2.55)
 AC_CONFIG_SRCDIR([bogofilter.c])
-AM_INIT_AUTOMAKE(bogofilter, 0.9.0.4)
+AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h:config.in)
 AC_PROG_CC
 AC_PROG_RANLIB
