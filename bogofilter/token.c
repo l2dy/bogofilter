@@ -55,6 +55,7 @@ static const char *state_name(lexer_state_t new);
 
 /* Function Definitions */
 
+static
 const char *state_name(lexer_state_t state)
 {
     switch(state) {
@@ -65,6 +66,7 @@ const char *state_name(lexer_state_t state)
     return "unknown";
 }
 
+static
 void change_lexer_state(lexer_state_t new)
 {
     /* if change of state, show new state */
@@ -74,6 +76,7 @@ void change_lexer_state(lexer_state_t new)
     return;
 }
 
+static
 void reset_html_level(void)
 {
     html_tag_level = 0;
