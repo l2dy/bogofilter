@@ -275,8 +275,7 @@ static bool mail_next_mail(void)
  * subsequent runs return true when a From line was encountered */
 static bool mailbox_next_mail(void)
 {
-    bool val = have_message;
-    val = val || mail_first;
+    bool val = mail_first || have_message;
     mail_first = false;
     return val;
 }
