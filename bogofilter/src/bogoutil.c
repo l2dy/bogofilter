@@ -80,8 +80,8 @@ int ds_dump_hook(word_t *key, dsv_t *data,
 }
 
 typedef struct robhook_data {
-    double   *sum;
-    uint32_t *count;
+    double   sum;
+    uint32_t count;
     dsh_t    *dsh;
     double   scalefactor;
 } rhd_t;
@@ -96,15 +96,15 @@ static void robx_accum(rhd_t *rh,
     bool doit = goodness + spamness >= 10;
 
     if (doit) {
-	*rh->sum += prob;
-	*rh->count += 1;
+	rh->sum += prob;
+	rh->count += 1;
     }
 
     /* print if -vv and token in both word lists, or -vvv */
     if ((verbose > 1 && doit) || verbose > 2) {
 	fprintf(dbgout, "cnt: %4lu,  sum: %11.6f,  ratio: %9.6f,"
 		"  sp: %3lu,  gd: %3lu,  p: %9.6f,  t: %*s\n", 
-		(unsigned long)*rh->count, *rh->sum, *rh->sum / *rh->count,
+		(unsigned long)rh->count, rh->sum, rh->sum / rh->count,
 		(unsigned long)spamness, (unsigned long)goodness, prob,
 		(int)min(INT_MAX,key->leng), key->text);
     }
@@ -431,8 +431,6 @@ static int display_words(const char *path, int argc, char **argv, bool show_prob
 
 static double compute_robx(dsh_t *dsh)
 {
-    uint32_t tok_cnt = 0;
-    double sum = 0.0;
     double robx;
 
     dsv_t val;
@@ -445,8 +443,8 @@ static double compute_robx(dsh_t *dsh)
 
     rh.scalefactor = (double)msg_spam/msg_good;
     rh.dsh = dsh;
-    rh.sum = &sum;
-    rh.count = &tok_cnt;
+    rh.sum = 0.0;
+    rh.count = 0;
 
     if (dsh->count == 1) {
 	dsh->index = 0;
@@ -460,12 +458,12 @@ static double compute_robx(dsh_t *dsh)
 	ds_foreach(dsh, robx_hook, &rh);
     }
 
-    robx = sum/tok_cnt;
+    robx = rh.sum/rh.count;
     if (verbose)
 	printf("%s: %lu, %lu, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
 	       MSG_COUNT,
 	       (unsigned long)msg_spam, (unsigned long)msg_good, rh.scalefactor,
-	       sum, (int)tok_cnt, robx);
+	       rh.sum, (int)rh.count, robx);
     else if (onlyprint) printf("%f\n", robx);
     return robx;
 }
