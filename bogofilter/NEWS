@@ -4,8 +4,17 @@
 
 $Id$
 
+0.13.3	2003-05-28
+
+	* Minor code tweaks to quiet gcc-3.3 warnings.
+
+	2003-05-26
+
+	* Added doc/programmer/README.osx to distribution.
+
 	2003-05-24
 
+	* Added -V (version) option to bogolexer.
 	* Tweaked long line check used to prevent scanner buffer overflow.
 
 0.13.2.1 2003-05-24
