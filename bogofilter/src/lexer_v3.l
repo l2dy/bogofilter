@@ -282,6 +282,7 @@ VERP		{TOKEN}-{NUM}-{TOKEN}={TOKEN}@{TOKEN}
 
 <HTOKEN,HDISCARD,LCOMMENT>">"			{ BEGIN HTML; }	/* end of tag, loose comment; return to normal html processing */
 <SCOMMENT>"-->"					{ BEGIN HTML; }	/* end of strict comment; return to normal html processing */
+"<"\!DOCTYPE\ HTML\ PUBLIC\ .*">" 		{ BEGIN HTML; }
 
 {IPADDR}					{ return IPADDR;}
 {TOKEN}						{ return TOKEN;}
