@@ -11,6 +11,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 ******************************************************************************/
 
+#include "system.h"
 #include <db.h>
 #include <fcntl.h>
 #include <string.h>
