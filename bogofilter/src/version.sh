@@ -28,7 +28,7 @@ shift
 set -e
 
 if [ ! -z "$SUFFIX" ]; then
-    FILES=$(find $srcdir -name CVS -type d | while read a ; do find "$a" -name Entries -type f ; done)
+    FILES=$(find $srcdir -name CVS -type d -print | while read a ; do find "$a" -name Entries -type f -print ; done)
     set +e
     DATE=CVStime_`perl -MHTTP::Date -e '
     $max = 0;
