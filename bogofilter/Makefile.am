@@ -7,15 +7,15 @@ SUBDIRS =  dcdflib . tests doc contrib
 SYSCONFDIR = @sysconfdir@
 
 if ENABLE_GRAHAM_METHOD
-GRAHAM_FILES = graham.c graham.h
+GRAHAM_SRC = graham.c graham.h
 endif
 
 if ENABLE_ROBINSON_METHOD
-ROBINSON_FILES = robinson.c robinson.h
+ROBINSON_SRC = robinson.c robinson.h
 endif
 
 if ENABLE_ROBINSON_FISHER
-FISHER_FILES = fisher.c fisher.h
+FISHER_SRC = fisher.c fisher.h
 AM_CPPFLAGS = -I$(srcdir)/dcdflib/doc
 LDADD = dcdflib/src/libdcdf.a
 endif
@@ -39,7 +39,7 @@ CLEANFILES=directories.h
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c lexer.l lexer.h \
 		     datastore.h datastore_db.h datastore_db.c \
 		     config.c directories.h register.c register.h \
-		     $(GRAHAM_FILES) $(ROBINSON_FILES) $(FISHER_FILES) \
+		     $(GRAHAM_SRC) $(ROBINSON_SRC) $(FISHER_SRC) \
 		     rstats.h rstats.c \
                      wordhash.h wordhash.c wordlists.h wordlists.c \
 		     $(MYCOMMON) common.h method.h version.h

@@ -160,7 +160,7 @@ if test x$USE_FISHER != xNO ; then
 	[Enable Fisher's method of combining P])
 fi
 
-AM_CONDITIONAL(ENABLE_ROBINSON_FISHER, test x$USE_FISHER = xYES)
+AM_CONDITIONAL(ENABLE_ROBINSON_FISHER, test x$USE_FISHER != xNO)
 
 # Checks for header files.
 AC_HEADER_STDC
