@@ -17,7 +17,7 @@
       <command>bogotune</command> 
 	 <arg>-c <replaceable>config</replaceable></arg>
 	 <arg>-C</arg>
-	 <arg>-d <replaceable>file.db</replaceable></arg>
+	 <arg>-d <replaceable>dir</replaceable></arg>
 	 <arg>-D</arg>
 	 <arg>-r <replaceable>value</replaceable></arg>
 	 <arg>-T <replaceable>value</replaceable></arg>
@@ -77,7 +77,7 @@
 
     <para>The <option>-D</option> option tells
     <application>bogotune</application> to build a wordlist in memory
-    using the input messages.w  The messages are read and divided into
+    using the input messages.  The messages are read and divided into
     two groups.  The first group is used to build a wordlist (in ram)
     and the second is used for tuning.  To meet the minimum
     requirements of 2000 messages in the wordlist and 500 messages for
@@ -140,4 +140,9 @@
        the bogofilter project page</ulink>.
     </para>
   </refsect1>
+
+<refsect1 id="also">
+    <title>SEE ALSO </title>
+    <para>bogofilter(1), bogolexer(1), bogoupgrade(1), bogoutil(1)</para>
+</refsect1>
 </refentry>

@@ -127,7 +127,7 @@ double gsl_max (double a, double b);
 double gsl_min (double a, double b);
 
 /* inline-friendly strongly typed versions */
-#if HAVE_INLINE
+#if HAVE_EXTERN_INLINE
 
 extern inline int GSL_MAX_INT (int a, int b);
 extern inline int GSL_MIN_INT (int a, int b);
@@ -178,7 +178,7 @@ GSL_MIN_LDBL (long double a, long double b)
 #define GSL_MIN_DBL(a,b)   GSL_MIN(a,b)
 #define GSL_MAX_LDBL(a,b)  GSL_MAX(a,b)
 #define GSL_MIN_LDBL(a,b)  GSL_MIN(a,b)
-#endif /* HAVE_INLINE */
+#endif /* HAVE_EXTERN_INLINE */
 
 /* Definition of an arbitrary function with parameters */
 

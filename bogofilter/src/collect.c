@@ -13,14 +13,6 @@
 
 #include "collect.h"
 
-static void initialize(void)
-{
-    mime_reset();
-    token_init();
-    lexer_v3_init(NULL);
-    init_charset_table(charset_default, true);
-}
-
 void wordprop_init(void *vwordprop)
 {
     wordprop_t *wp = vwordprop;
@@ -47,7 +39,7 @@ void collect_words(wordhash_t *wh)
 {
     if (DEBUG_WORDLIST(2)) fprintf(dbgout, "### collect_words() begins\n");
 
-    initialize();
+    lexer_init();
 
     for (;;){
 	wordprop_t *wp;

@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 # Note:  When run via "make check", test output files are automatically deleted.
 #	 When run from the command line, outputs files are left in directory
 #	 bulkmode.YYYYMMDD.  This is useful when something is different.
@@ -28,14 +26,10 @@ map_rc()
     )
 }
 
-mth="f"
-
-CFG="-c ${TMPDIR}/cfg.$mth -y 0"
-
 if [   -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
 mkdir -p $BOGOFILTER_DIR
-$BOGOFILTER -$mth $CFG -s < ${SYSTEST}/inputs/spam.mbx
-$BOGOFILTER -$mth $CFG -n < ${SYSTEST}/inputs/good.mbx
+$BOGOFILTER -C -s < ${SYSTEST}/inputs/spam.mbx
+$BOGOFILTER -C -n < ${SYSTEST}/inputs/good.mbx
 #for f in $BOGOFILTER_DIR/*.${DB_EXT} ; do
 #    o=`echo $f | sed s@.${DB_EXT}@.txt@`
 #    $BOGOUTIL -d $f > $o
@@ -126,11 +120,9 @@ for f in $pattern ; do
     map_rc "$BOGOLEX_SH -c $CFG -I $f >> ${TMPDIR}/test.bl"
 done
 
-map_rc $BOGOFILTER < ${TMPDIR}/test.bl > ${TMPDIR}/$NAME.out
+map_rc $BOGOFILTER -M < ${TMPDIR}/test.bl > ${TMPDIR}/$NAME.out
 
 [ ! -z "$BF_SAVEDIR" ] && . ${srcdir}/../t.save
-
-OUTPUTS=${SYSTEST}/outputs
 
 CORRECT="${OUTPUTS}/bulkmode.out"
 

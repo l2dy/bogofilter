@@ -73,6 +73,7 @@ version_sources= \
 	bf_exit.c \
 	bogoconfig.h bogoconfig.c \
 	bogohome.h bogohome.c \
+	bogomain.h bogomain.c \
 	bogoreader.h bogoreader.c \
 	bool.h bool.c \
 	buff.h buff.c \
@@ -80,16 +81,18 @@ version_sources= \
 	collect.h collect.c \
 	configfile.h configfile.c \
 	datastore.h datastore.c db_handle_props.h \
+	db_lock.h db_lock.c \
 	debug.h debug.c \
-	$(DEGEN) \
 	error.h error.c \
 	fgetsl.h fgetsl.c \
 	find_home.h find_home.c find_home_user.c find_home_tildeexpand.c \
 	format.h format.c \
 	lexer.h lexer.c lexer_v3.l \
 	maint.h maint.c \
+	memstr.h memstr.c \
 	mime.h mime.c \
 	msgcounts.h msgcounts.c \
+	mxcat.h mxcat.c \
 	passthrough.h passthrough.c \
 	paths.h paths.c \
 	prob.h prob.c \
@@ -208,11 +211,6 @@ directories.c: ../config.status
 	echo "const char *const system_config_file = \"$(SYSCONFDIR)/bogofilter.cf\";" ) >"$@" \
 	    || { rm -f "$@" ; false ; }
 #
-.l.c:
-	flex -o$@.new $< && \
-	sed 's/yy_rule_linenum\[yy_act\]/(long int)yy_rule_linenum[yy_act]/; s/accepting rule at line %d/accepting rule at line %ld/' <$@.new >$@ && rm -f $@.new || \
-	rm -f $@ $@.new
-#
 $(datastore_OBJECT): Makefile $(datastore_SOURCE)
 #
 bogoupgrade: bogoupgrade.in Makefile
@@ -221,12 +219,12 @@ bogoupgrade: bogoupgrade.in Makefile
 	chmod a=rx bogoupgrade
 
 #splint - weak
-splint.check:
-	splint -weak `	ls \
+splint.check: $(version_sources) $(bogofilter_SOURCES) $(bogolexer_SOURCES) $(bogoutil_SOURCES) $(bogotune_SOURCES)
+	splint -I. -f $(srcdir)/.lclintrc -weak `for i in \
 	$(version_sources)	\
 	$(bogofilter_SOURCES)	\
 	$(bogolexer_SOURCES)	\
 	$(bogoutil_SOURCES)	\
-	$(bogotune_SOURCES) | sort -u | egrep -v "(lexer_v3.l|db_handle_props.h)"` > splint.tmp 
+	$(bogotune_SOURCES) ; do echo $(srcdir)/$$i ; done | sort -u | egrep -v "(lexer_v3.l|db_handle_props.h)"` > splint.tmp || :
 	grep ^F splint.tmp
 	wc -l splint.tmp

@@ -28,6 +28,8 @@
 	<cmdsynopsis>
 	    <command>bogoutil</command>
 	    <group choice="req">
+		<arg choice="plain">-f</arg>
+		<arg choice="plain">-F</arg>
 		<arg choice="plain">-r</arg>
 		<arg choice="plain">-R</arg>
 	    </group>
@@ -114,6 +116,16 @@
 	    Option <option>-p</option> takes the same arguments as
 	    option <option>-w</option> .
 	</para>
+	<para>The <option>-f <replaceable>dir</replaceable></option>
+	    option runs a regular data base recovery in the data base directory
+	    dir. If that fails, it will retry with a (usually slower)
+	    catastrophic data base recovery. If that fails, too, your
+	    data base cannot be repaired and must be rebuilt from
+	    scratch.</para>
+	<para>The <option>-F <replaceable>dir</replaceable></option>
+	    option runs a catastrophic data base recovery in the data base directory
+	    dir. If that fails, your data base cannot be repaired and
+	    must be rebuilt from scratch.</para>
 	<para>The <option>-r</option> option tells
 	    <application>bogoutil</application> to recalculate the ROBX
 	    value and print it as a six-digit fraction.
@@ -154,7 +166,8 @@
 	    All tokens shorter than <option>min</option> or longer than <option>max</option> will be discarded.
 	</para>
 	<para>
-	    Option <option>-y date</option> is specifies the date to give to tokens that don't have dates.
+	    Option <option>-y date</option> is specifies the date to
+	give to tokens that don't have dates.  The format is YYYYMMDD.
 	</para>
 	<para>The <option>-h</option> option prints the help message and exits.</para>
 	<para>The <option>-V</option> option prints the version number and exits.</para>
@@ -184,9 +197,15 @@
     <para>Gyepi Sam <email>gyepi@praxis-sw.com</email>.</para>
     <para>Matthias Andree <email>matthias.andree@gmx.de</email>.</para>
     <para>David Relson <email>relson@osagesoftware.com</email>.</para>
+
   <para>
       For updates, see <ulink url="http://bogofilter.sourceforge.net/">
 	  the bogofilter project page</ulink>.
   </para>
   </refsect1>
+
+<refsect1 id="also">
+    <title>SEE ALSO </title>
+    <para>bogofilter(1), bogolexer(1), bogotune(1), bogoupgrade(1)</para>
+</refsect1>
 </refentry>

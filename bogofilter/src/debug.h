@@ -10,11 +10,15 @@ NAME:
 #ifndef _DEBUG_H
 #define _DEBUG_H
 
+/* define FILE type */
+#include <stdio.h>
+/* define other types */
+#include "bftypes.h"
+
 #define	DEBUG_NONE	0
 
 #define	MASK_BIT(uc)	( 1 << (uc - 'A'))
 
-#ifndef	NODEBUG
 #define BIT_NAMES	"abcdfghlmstw"
 #define BIT_ALGORITHM	MASK_BIT('A')
 #define BIT_READER	MASK_BIT('B')
@@ -28,7 +32,6 @@ NAME:
 #define BIT_SPAMICITY	MASK_BIT('S')
 #define BIT_TEXT	MASK_BIT('T')
 #define BIT_WORDLIST	MASK_BIT('W')
-#endif
 
 extern FILE	 *dbgout;
 extern u_int32_t  debug_mask;
@@ -41,6 +44,7 @@ extern u_int32_t  debug_mask;
 #define DEBUG_HTML(level)	0
 #define DEBUG_LEXER(level)	0
 #define DEBUG_MIME(level)	0
+#define DEBUG_READER(level)	0
 #define DEBUG_REGISTER(level)	0
 #define DEBUG_SPAMICITY(level)	0
 #define DEBUG_TEXT(level)	0

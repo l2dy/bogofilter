@@ -1,18 +1,61 @@
+		Bogofilter -- fast Bayesian spam filtering
+
 # $Id$
 
-		bogofilter -- fast Bayesian spam filtering
+Summary:
 
-This package implements a fast Bayesian spam filter along the lines suggested 
-by Paul Graham in his article "A Plan For Spam".
+0. Important
+1. What is Bogofilter?
+2. Documentation
+3. Installing Bogofilter
+4. How to contribute
+5. How to request features
+6. Building & Installing Bogofilter from Source Tarball or CVS
+  a. Downloading
+  b. Building & Installing
+  c. Configuring
+  d. Changing Bogofilter
 
-This version substantially improves on Paul's proposal by doing smarter
-lexical analysis.  In particular, hostames and IP addresses are retained
-as recognition features rather than broken up. Various kinds of MTA 
-cruft such as dates and message-IDs are discarded so as not to bloat
-the word lists.
+
+0. IMPORTANT
+------------
+
+If you are using bogofilter with the Berkeley DB data base library
+(which is the default, received most testing, is the most powerful of
+the data base engines that bogofilter supports and hence recommended),
+do read the doc/README.db file, it contains important information.
+
+The doc/README.db file contains troubleshooting information and
+requirements that should be read ahead of time so you can fix problems
+quickly should they arise later.
 
 
-*** DOCUMENTATION ***
+1. What is Bogofilter?
+----------------------
+
+Bogofilter is a fast Bayesian spam filtering, which implements a fast
+Bayesian spam filter along the lines suggested by Paul Graham in his
+article "A Plan For Spam":
+
+  http://www.paulgraham.com/spam.html
+
+with algorithmic changes suggested by Gary Robinson in
+
+  http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html
+
+and in "A Statistical Approach to the Spam Problem"
+
+  http://www.linuxjournal.com/article.php?sid=6467
+
+This version improves on the papers by doing smarter lexical analysis.
+In particular, hostames and IP addresses are retained as recognition
+features rather than broken up. Various kinds of MTA cruft such as
+dates and message-IDs are discarded so as not to bloat the word lists.
+
+
+
+2. Documentation
+----------------
 
 It is recommended, although not necessary, that you install the GNU
 Scientific Library (GSL) version 1.4 or newer before configuring
@@ -22,7 +65,7 @@ conserving memory and disk space.
 
 When installed, there are man pages for bogofilter, bogoutil,
 bogolexer, and bogoupgrade.  Additional documentation is in
-/usr/src/bogofilter-1.2.3/doc or comparable directory (depending on
+/usr/share/doc/bogofilter-x.y.z or comparable directory (depending on
 your operating system).
 
 If you've installed the source code, the  doc directory and its
@@ -35,7 +78,9 @@ If you use mutt, see the bogofilter(1) manual page for helpful macros
 you can add to your .muttrc.
 
 
-*** BUILDING BOGOFILTER ***
+
+3. Installing Bogofilter
+----------------------
 
 When updating, check the RELEASE.NOTES files.
 
@@ -47,34 +92,99 @@ warning: unused parameter ...
 warning: format not a string literal, argument types not checked
 
 
-*** CONFIGURATION ***
 
-The default location for the configuration files is /etc on Linux and
-/usr/local/etc on all other systems, unless you override with
---sysconfdir=/etc.  A sample config file, bogofilter.cf.example is
-included with the distribution.
+4. How to contribute
+--------------------
+
+The best way to contribute to bogofilter is through the bogofilter
+mailing list, bogofilter@bogofilter.org.  You can subscribe to it by
+sending a message to bogofilter-subscribe@bogofilter.org and
+responding to the confirmation message it sends to you.  More
+information is available on the bogofilter home page at
+http://bogofilter.sourceforge.net 
+
+Bugs can be reported via the bogfilter mailing list or through
+http://sourceforge.net/tracker/?atid=499997&group_id=62265&func=browse
+
+If you have code to contribute, please post it on the bogofilter
+mailing list or mail it to David Relson (relson@users.sourceforge.net)
 
 
-*** CHANGING BOGOFILTER ***
 
-If you make modifications to bogofilter, you may need to have a recent
-DocBook XML tool chain, the xmlto program, PassiveTeX and XMLTeX, a
-recent automake (1.7) and autoconf (2.5X) and Perl 5.6 or newer
-installed to be able to rebuild bogofilter.
+5. How to request features
+--------------------------
 
-These requirements do not apply if you are building an unmodified
-tarball.
+Ask around in the bogofilter mailing list.  The idea may have been
+already suggested, considered, accepted, rejected, ...  You won't know
+until you ask!
+
+Alternatively, you might want to hack at the code and develop the
+feature on your own, which would be great!  You can then send a patch
+to the list.
 
 
-*** NEWEST SOFTWARE ***
 
-For the most recent version of this software, see: 
+6. Building & Installing Bogofilter from Source Tarball or CVS
+--------------------------------------------------------------
+
+  a. Downloading
+  --------------
+
+  The most recent version of this software is available at: 
 
 	http://sourceforge.net/projects/bogofilter/
 
-The latest stable version can be downloaded.  The development source
-is in a CVS repository on SourceForge and can also be downloaded.
+  The latest stable version can be downloaded.  The development source
+  is in a CVS repository on SourceForge.  To download the latest cvs
+  source, cd to the directory to which you wish to download and type
+  the following commands:
+
+  cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/bogofilter login
+
+  When prompted for a password press the RETURN key.
+  After anonymously logging in:
+
+  cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/bogofilter co bogofilter
+
+  b. Building & Installing
+  ------------------------
+
+  To compile and install the standard configuration, use the following
+  commands:
+
+  cd bogofilter		[change to project directory]
+  ./autogen.sh		[add configure options as required]
+  make
+  make install		[as root]
+
+  You will need a full set of development tools installed to be able
+  to run autogen.sh, including recent automake (1.7) and autoconf
+  (2.5X).
+
+  c. Configuring
+  --------------
+
+  After using ./autogen.sh, which builds the standard configuration
+  and runs "make check" to ensure it works in your environment and on
+  your hardware, you might wish to further customize bogofilter for
+  your use.
+
+  Running "./configure --help" will list all the configuration
+  options.  The most notable ones are:
+
+  --prefix=PREFIX         install architecture-independent files in PREFIX
+			  [default: /usr/local]
+  --with-database=ENGINE  Choose database engine {db|tdb|qdbm} 
+  			  [default: db]
+  --with-libdb-prefix[=DIR]  search for libdb in DIR/include and DIR/lib
 
 
-							Eric S. Raymond
-							August 2002
+  d. Changing Bogofilter
+  ----------------------
+
+  If you make modifications to bogofilter, you may need to have a
+  recent DocBook XML tool chain, the xmlto program, PassiveTeX and
+  XMLTeX, recent versions of automake (1.7) and autoconf (2.5X).
+
+  These requirements do not apply if you are building an unmodified
+  tarball.

@@ -7,6 +7,8 @@
 
 #include "xatox.h"
 
+#include <math.h>	/* for strtod() for SunOS 4.1.X */
+
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>

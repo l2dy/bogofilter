@@ -79,14 +79,25 @@
 #define YY_DECL token_t yylex(void)
     YY_DECL;			/* declare function */
 
-#define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, max_size)
+#define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, result, max_size)
 #define YY_EXIT_FAILURE EX_ERROR
 
 #undef	stderr
 #define	stderr	dbgout		/* for debug & -D options */
 
-static word_t yyt;
 static int lineno;
+
+#define	FLEX_VER(MAJ, MIN, SUB) ( MAJ * 1000 + MIN * 100 + SUB)
+
+#ifndef	YY_FLEX_SUBMINOR_VERSION
+#define	FLEX_VERSION_BF FLEX_VER(YY_FLEX_MAJOR_VERSION, YY_FLEX_MINOR_VERSION, 0)
+#else
+#define	FLEX_VERSION_BF FLEX_VER(YY_FLEX_MAJOR_VERSION, YY_FLEX_MINOR_VERSION, YY_FLEX_SUBMINOR_VERSION)
+#endif
+
+#if	FLEX_VERSION_BF != 2531
+int yylineno;
+#endif
 
 /* Function Prototypes */
 
@@ -106,6 +117,7 @@ void yy_set_state_initial(void);
 
 static word_t *yy_text(void)
 {
+    static word_t yyt;
     yyt.text = (byte *)yytext;
     yyt.leng = yyleng;
     return &yyt;
@@ -118,7 +130,6 @@ static word_t *yy_text(void)
 %option align caseless 8bit
 %option never-interactive
 %option noreject noyywrap
-%option prefix="lexer_v3_"
 
 UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
 IPADDR		{UINT8}\.{UINT8}\.{UINT8}\.{UINT8}
@@ -202,7 +213,8 @@ BREAKHTML	"<"({HBREAK}({WHITESPACE}[^>]*|""))">"
 VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 
 %s TEXT HTML BOGO_LEX
-%s HTOKEN HDISCARD SCOMMENT LCOMMENT HSCRIPT
+%s HTOKEN HDISCARD SCOMMENT LCOMMENT
+%s PGP_HEAD PGP_BODY
 
 %%
 
@@ -222,16 +234,23 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>^(To|CC|From|Return-Path|Subject|Received):	{ set_tag(yytext); }
 <INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); return TOKEN; }
 
-<INITIAL>^MIME-Version:.*			{ mime_version(yy_text()); return HEADKEY; }
 <INITIAL>^(Delivery-)?Date:.*			{ return HEADKEY; }
-<INITIAL>^(Resent-)?Message-ID:.*		{ return HEADKEY; }
+<INITIAL>^Resent-Message-ID:.*			{ return HEADKEY; }
+<INITIAL>^Message-ID:.*				{ /* save token for logging */
+						  int off = 11;
+						  while(isspace((unsigned char)yytext[off]) && off < yyleng)
+						      off++;
+						  word_free(msg_id);
+						  msg_id = word_new((unsigned char *)(yytext+off), yyleng-off);
+						  return HEADKEY;
+						}
 <INITIAL>^(In-Reply-To|References):.* 		{ return HEADKEY; }
 
 <INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
 <INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); skip_to('='); return TOKEN; }
 
 <INITIAL>(file)?name=\"?			/* ignore */
-<INITIAL>\n?[[:blank:]]id\ {ID}			/* ignore */
+<INITIAL>\n?[[:blank:]]id\ {ID}			{ return QUEUE_ID; }
 
 <INITIAL>\n[[:blank:]]				{ lineno += 1; }
 <INITIAL>\n\n					{ enum mimetype type = get_content_type();
@@ -249,6 +268,14 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>\n					{ set_tag("Header"); lineno += 1; }
 <INITIAL>{VERP} 				{ skip_to('='); return VERP; }
 
+^-----BEGIN\ PGP\ SIGNATURE-----$		{ BEGIN PGP_HEAD;
+						  yy_unput((byte *)yytext, yyleng);
+						}
+<PGP_HEAD>^\n					{ BEGIN PGP_BODY; }
+<PGP_BODY>{TOKEN}				{ /* ignore */ }
+^-----END\ PGP\ SIGNATURE-----$ 		{ BEGIN TEXT;
+						  yy_unput((byte *)yytext, yyleng);
+						}
 ^--{MIME_BOUNDARY}(--)?$			{ if (got_mime_boundary(yy_text())) {
 						      yy_set_state_initial();
 						      return BOUNDARY;
@@ -274,7 +301,6 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <HTML>"<"					{ BEGIN HDISCARD; }	/* unknown tag */
 
 <HTOKEN>{TOKEN}					{ return TOKEN; }
-<HSCRIPT>{TOKEN}				{ return TOKEN; }
 <HDISCARD,LCOMMENT,SCOMMENT>{TOKEN}		{ /* discard innards of html tokens and comments */ }
 
 <HTOKEN,HDISCARD,LCOMMENT>">"			{ BEGIN HTML; }	/* end of tag, loose comment; return to normal html processing */
@@ -282,6 +308,9 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 "<"\!DOCTYPE\ HTML\ PUBLIC\ .*">" 		{ BEGIN HTML; }
 
 {IPADDR}					{ return IPADDR;}
+"\["({IPADDR})"\]"				{ return MESSAGE_ADDR;}
+
+
 {TOKEN}						{ return TOKEN;}
 
 <HTML>{TOKEN_12}?{HTML_ENCODING}		{ html_char(); }	/* process escaped chars, eg '&#101;' is 'a' */
@@ -328,9 +357,9 @@ static int xtoi(char *in, size_t len)
     while (isxdigit((byte) *in) && (len-- > 0)) {
 	char c = *in++;
 	val <<= 4;
-	val += isdigit((unsigned char)c)
+	val += isdigit((byte)c)
 	    ? (c - '0')
-	    : (tolower((unsigned char)c) - 'a' + 10);
+	    : (tolower((byte)c) - 'a' + 10);
     }
     return val;
 }
@@ -392,7 +421,7 @@ static void url_char(void)
 static void yy_unput(const byte *txt, uint len)
 {
     while (len-- > 0)
-	unput(txt[len]);
+	yyunput(txt[len], yytext);
 }
 
 char yy_get_state()
