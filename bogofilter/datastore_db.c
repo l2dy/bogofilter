@@ -34,6 +34,9 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 #define MSG_COUNT_TOK ".MSG_COUNT"
 
+#undef UINT32_MAX
+#define UINT32_MAX 4294967295lu /* 2 ^ 32 - 1 */
+
 typedef struct {
   char *filename;
   char *name;
@@ -330,7 +333,8 @@ static void db_set_dbvalue(void *vhandle, const char * word, dbv_t *val){
   Increment count associated with WORD, by VALUE.
  */
 void db_increment(void *vhandle, const char *word, uint32_t value){
-    value += db_getvalue(vhandle, word);
+    uint32_t dv = db_getvalue(vhandle, word);
+    value = UINT32_MAX - dv < value ? UINT32_MAX : dv + value;
     db_setvalue(vhandle, word, value);
 }
 
