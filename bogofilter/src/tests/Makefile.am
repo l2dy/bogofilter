@@ -15,8 +15,7 @@ t.config: Makefile
 	  echo >>$@  'DB_EXT="@DB_EXT@"' ; \
 	  echo >>$@ 'DB_TYPE="@DB_TYPE@"' ) || rm -f $@
 
-ENVIRON_TESTX = t.abort
-ENVIRON_TESTS = t.env t.ctype t.bogodir t.leakfind t.u_fpe
+ENVIRON_TESTS = t.abort t.env t.ctype t.bogodir t.leakfind t.u_fpe
 
 PARSING_TESTS = \
 	t.longoptions \
