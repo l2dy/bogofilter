@@ -12,6 +12,17 @@ AM_PROG_LEX
 # Check for extension
 AC_EXEEXT
 
+dnl crutch for b0rked S/390 gcc:
+if test "x$target_cpu" = "xs390" && test "x$GCC" = "xyes" ; then
+    case ${CFLAGS} in
+    *-O*)
+	OCFLAGS="$CFLAGS"
+	CFLAGS="`echo \"$CFLAGS\" | sed 's/-O[[s0-9]]\+/-O1/'`"
+	export CFLAGS
+	AC_MSG_NOTICE([GCC for s390: Overriding CFLAGS "$OCFLAGS" to "$CFLAGS".])
+    esac
+fi
+
 dnl If we're using gcc, enable some warnings
 dnl missing: -Wunreachable-code
 AC_CACHE_CHECK(for additional compiler options, ac_cv_prog_gcc_flags, [
