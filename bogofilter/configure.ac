@@ -17,18 +17,9 @@ AC_PATH_PROGS(PERL, perl perl5, $PATH:/usr/local/bin:/usr/bin)
 AC_PATH_PROGS(NSGMLS,onsgmls nsgmls,nsgmls)
 AM_PROG_LEX
 
-dnl Check compiler capabilities
-AC_C_CONST
-AC_C_INLINE
-AC_C_VOLATILE
-if test "$ac_cv_c_inline" != no ; then
-    AC_DEFINE(HAVE_INLINE,1,[Define to 1 if your compiler supports inline])
-    AC_SUBST(HAVE_INLINE)
-fi
-
 dnl Check for "extern inline", using a modified version
 dnl of the test for AC_C_INLINE from acspecific.mt.
-dnl
+dnl Run this before AC_C_INLINE to avoid skewing the results?
 dnl Imported from the GSL 1.4 documentation (section "Autoconf Macros")
 dnl and modified to define HAVE_EXTERN_INLINE.
 AC_CACHE_CHECK([for extern inline], ac_cv_c_extern_inline,
@@ -44,6 +35,11 @@ if test "$ac_cv_c_extern_inline" != no ; then
     AC_DEFINE(HAVE_EXTERN_INLINE,1,Define to 1 if your compiler supports extern inline storage class.)
     AC_SUBST(HAVE_EXTERN_INLINE)
 fi
+
+dnl Check compiler capabilities
+AC_C_CONST
+AC_C_INLINE
+AC_C_VOLATILE
 
 dnl Check for extension
 AC_EXEEXT
