@@ -6,6 +6,10 @@ $Id$
      
 0.11.X  2003-03-??
 
+	2003-03-03
+	* Added config file option "spam_subject_tag" to provide
+	  modifier for Subject: line of a spam message.
+
 	2003-03-02
 	* Discarding of html comments is the standard action.  Removed
 	  options to control that action.

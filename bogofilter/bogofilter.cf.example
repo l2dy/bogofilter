@@ -43,6 +43,13 @@ user_config_file=~/.bogofilter.cf
 spam_header_name=X-Bogosity
 
 
+#### SPAM_SUBJECT_TAG
+#
+#	tag added to "Subject: " line for identifying spam
+
+#spam_subject_tag=***SPAM***
+
+
 ##### STATS_IN_HEADER
 #
 #	non-zero (default):  put spamicity info in message header

@@ -200,15 +200,16 @@ typedef int (*readfunc_t)(char **, void *);
 
 static void write_message(FILE *fp)
 {
-    ssize_t rd = 0; /* assignment to quench warning */
-    readfunc_t rf = 0; /* dito */
-    void *rfarg = 0; /* dito */
+    ssize_t rd = 0;	/* assignment to quench warning */
+    readfunc_t rf = 0;	/* assignment to quench warning */
+    void *rfarg = 0;	/* assignment to quench warning */
     char *out;
     textdata_t *text;
 
     if (passthrough) {
 	int hadlf = 1;
-	int hdrlen;
+	int bogolen = strlen(spam_header_name);
+	int subjlen = strlen("Subject:");
 	/* initialize */
 	switch (passmode) {
 	    case PASS_MEM:
@@ -225,19 +226,29 @@ static void write_message(FILE *fp)
 		abort();
 	}
 
-	hdrlen = strlen(spam_header_name);
 	/* print headers */
 	while ((rd = rf(&out, rfarg)) > 0)
 	{
 	    /* detect end of headers */
 	    if ((rd == 1 && memcmp(out, NL, 1) == 0) ||
-		    (rd == 2 && memcmp(out, CRLF, 2) == 0)) {
+		(rd == 2 && memcmp(out, CRLF, 2) == 0)) {
 		break;
 	    }
 
 	    /* skip over spam_header ("X-Bogosity:") lines */
-	    if (rd >= hdrlen && 0 == memcmp(out, spam_header_name, hdrlen))
+	    if (rd >= bogolen && memcmp(out, spam_header_name, bogolen) == 0)
 		continue;
+
+	    /* rewrite "Subject: " line */
+	    if (rd >= subjlen && 
+		spam_subject_tag != NULL &&
+		memcmp(out, "Subject:", subjlen) == 0) {
+		(void) fprintf(fp, "Subject: %s", spam_subject_tag);
+		if (out[subjlen] != ' ')
+		    fputc(' ', fp);
+		(void) fwrite(out + subjlen, 1, rd - subjlen, fp);
+		continue;
+	    }
 
 	    hadlf = (out[rd-1] == '\n');
 	    (void) fwrite(out, 1, rd, fp);

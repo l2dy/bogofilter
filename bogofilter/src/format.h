@@ -8,6 +8,8 @@
 /* Global variables */
 
 extern const char *spam_header_name;
+extern const char *spam_subject_tag;
+
 /*
 ** extern const char *header_format;
 ** extern const char *terse_format;

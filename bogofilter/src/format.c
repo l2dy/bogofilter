@@ -44,6 +44,7 @@ int msgcount = 0;
 /* initialized static variables */
 
 const char *spam_header_name = SPAM_HEADER_NAME;	/* used by lexer */
+const char *spam_subject_tag = NULL;			/* used in passthrough mode */
 
 /*
 **	formatting characters:
@@ -88,6 +89,7 @@ static bool set_spamicity_fields(FIELD *strings, const char *val);
 const parm_desc format_parms[] =
 {
     { "spam_header_name",  CP_STRING,	{ &spam_header_name } },
+    { "spam_subject_tag",  CP_STRING,	{ &spam_subject_tag } },
     { "header_format",	   CP_STRING,	{ &header_format } },
     { "terse_format",	   CP_STRING,	{ &terse_format } },
     { "log_header_format", CP_STRING,	{ &log_header_format } },
