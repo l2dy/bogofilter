@@ -85,7 +85,7 @@ static const char *resolveopenflags(u_int32_t flags) {
     return buf;
 }
 
-static void dsm_init(const char *directory, const char *file);
+static void dsm_init(bfdir *directory, bffile *file);
 
 /** wrapper for Berkeley DB's DB->open() method which has changed API and
  * semantics -- this should deal with 3.2, 3.3, 4.0, 4.1 and 4.2. */
@@ -183,19 +183,19 @@ int db_lock(int fd, int cmd, short int type)
     return (fcntl(fd, cmd, &lock));
 }
 
-static void dsm_init(const char *directory, const char *file)
+static void dsm_init(bfdir *directory, bffile *file)
 {
     probe_txn_t txn;
 
     if (DEBUG_DATABASE(2))
 	fprintf(dbgout, "probing \"%s\" and \"%s\" for environment...\n",
-		directory, file);
+		directory->dirname, file->filename);
 
     txn = probe_txn(directory, file);
 
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "probing \"%s\" and \"%s\" result %d\n",
-		directory, file, txn);
+		directory->dirname, file->filename, txn);
 
     if (txn == P_DISABLE)
 	fTransaction = false;
@@ -232,8 +232,8 @@ static dbh_t *handle_init(const char *db_path, const char *db_name)
     handle->magic= MAGIC_DBH;		/* poor man's type checking */
     handle->fd   = -1;			/* for lock */
 
-    handle->path = xstrdup(db_path);
-    handle->name = build_path(db_path, db_name);
+    handle->path.dirname = xstrdup(db_path);
+    handle->name.filename = build_path(db_path, db_name);
 
     handle->locked     = false;
     handle->is_swapped = false;
@@ -247,8 +247,8 @@ static dbh_t *handle_init(const char *db_path, const char *db_name)
 static void handle_free(/*@only@*/ dbh_t *handle)
 {
     if (handle != NULL) {
-	xfree(handle->name);
-	xfree(handle->path);
+	xfree((char *)handle->name.filename);
+	xfree((char *)handle->path.dirname);
 	xfree(handle);
     }
     return;
@@ -259,17 +259,17 @@ static void handle_free(/*@only@*/ dbh_t *handle)
  * and lock the file to tell other parts we're initialized and
  * do not want recovery to stomp over us.
  */
-void *dbe_init(const char *directory, const char *file)
+void *dbe_init(bfdir *directory, bffile *file)
 {
     char norm_dir[PATH_MAX+1]; /* check normalized directory names */
     char norm_home[PATH_MAX+1];/* see man realpath(3) for details */
 
     dbe_t *env;
 
-    if (realpath(directory, norm_dir) == NULL) {
+    if (realpath(directory->dirname, norm_dir) == NULL) {
 	    print_error(__FILE__, __LINE__,
 		    "error: cannot normalize path \"%s\": %s",
-		    directory, strerror(errno));
+		    directory->dirname, strerror(errno));
 	    exit(EX_ERROR);
     }
 
@@ -502,7 +502,7 @@ void *db_open(void *vhandle,
 	handle->dbenv = env;
 
 	handle->open_mode = open_mode;
-	db_file = dsm->dsm_database_name(handle->name);
+	db_file = dsm->dsm_database_name(handle->name.filename);
 
 retry_db_open:
 	handle->created = false;
@@ -548,7 +548,7 @@ retry_db_open:
 	    /* close again and bail out without further tries */
 	    if (DEBUG_DATABASE(0))
 		print_error(__FILE__, __LINE__, "DB->open(%s) - actually %s, directory %s, err %s",
-			    handle->name, db_file, env->directory, db_strerror(ret));
+			    handle->name.filename, db_file, env->directory, db_strerror(ret));
 
 	    dbp->close(dbp, 0);
 	    goto open_err;
@@ -795,7 +795,7 @@ void db_close(void *vhandle)
 
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB->close(%s, %s)\n",
-		handle->name, flag & DB_NOSYNC ? "DB_NOSYNC" : "0");
+		handle->name.filename, flag & DB_NOSYNC ? "DB_NOSYNC" : "0");
 
     if (handle->txn) {
 	print_error(__FILE__, __LINE__, "db_close called with transaction still open, program fault!");
@@ -831,7 +831,7 @@ void db_flush(void *vhandle)
     assert(handle->magic == MAGIC_DBH);
 
     if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "db_flush(%s)\n", handle->name);
+	fprintf(dbgout, "db_flush(%s)\n", handle->name.filename);
 
     ret = dbp->sync(dbp, 0);
 #if DB_AT_LEAST(3,2) && DB_AT_MOST(4,0)
@@ -873,7 +873,7 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 
     ret = dbp->cursor(dbp, handle->txn, &dbcp, 0);
     if (ret) {
-	print_error(__FILE__, __LINE__, "(cursor): %s", handle->path);
+	print_error(__FILE__, __LINE__, "(cursor): %s", handle->path.dirname);
 	return EX_ERROR;
     }
 
@@ -927,14 +927,14 @@ const char *db_str_err(int e) {
     return db_strerror(e);
 }
 
-ex_t db_verify(const char *directory, const char *db_file)
+ex_t db_verify(bfdir *directory, bffile *db_file)
 {
     DB_ENV *dbe = NULL;
     DB *db;
     int e;
 
-    if (!is_file(db_file)) {
-	print_error(__FILE__, __LINE__, "\"%s\" is not a file.", db_file);
+    if (!is_file(db_file->filename)) {
+	print_error(__FILE__, __LINE__, "\"%s\" is not a file.", db_file->filename);
 	return EX_ERROR;
     }
 
@@ -955,17 +955,17 @@ ex_t db_verify(const char *directory, const char *db_file)
 	exit(EX_ERROR);
     }
 
-    e = db->verify(db, db_file, NULL, NULL, 0);
+    e = db->verify(db, db_file->filename, NULL, NULL, 0);
     if (e) {
 	print_error(__FILE__, __LINE__, "database %s does not verify: %s",
-		db_file, db_strerror(e));
+		db_file->filename, db_strerror(e));
 	exit(EX_ERROR);
     }
 
     e = dsm->dsm_common_close(dbe, directory);
 
     if (e == 0 && verbose)
-	printf("%s OK.\n", db_file);
+	printf("%s OK.\n", db_file->filename);
 
     return e;
 }

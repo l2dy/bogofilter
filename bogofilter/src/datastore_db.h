@@ -47,7 +47,7 @@ void db_flush(void *handle);
 
 /** Do global initializations. \return pointer to environment for success, NULL for
  * error. */
-void *dbe_init(const char *directory, const char *file);
+void *dbe_init(bfdir *directory, bffile *file);
 
 /** Cleanup storage allocation */
 void dbe_cleanup(void *);
@@ -93,16 +93,16 @@ int db_txn_abort(void *vhandle);
 int db_txn_commit(void *vhandle);
 
 /** Recover the environment given in \a directory. */
-ex_t dbe_recover(const char *directory, bool catastrophic, bool force);
+ex_t dbe_recover(bfdir *directory, bool catastrophic, bool force);
 
 /** Remove the environment given in \a directory. */
-ex_t dbe_remove(const char *directory);
+ex_t dbe_remove(bfdir *directory);
 
 /** Mark inactive and remove older write-ahead log files. */
-ex_t dbe_purgelogs(const char *directory);
+ex_t dbe_purgelogs(bfdir *directory);
 
 /** Check if \a databasefile is a valid database. */
-ex_t db_verify(const char *directory, const char *databasefile);
+ex_t db_verify(bfdir *directory, bffile *databasefile);
 
 /** Returns true if the database is byteswapped. */
 bool db_is_swapped(void *vhandle);

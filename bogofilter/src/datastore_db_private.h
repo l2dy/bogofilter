@@ -44,9 +44,9 @@ typedef void	dsm_v_pbe	(dbe_t *env);
 typedef void	dsm_v_pnv	(DB_ENV *dbe);
 typedef void	dsm_v_pvuiui	(void *vhandle, u_int32_t numlocks, u_int32_t numobjs);
 typedef const char *dsm_pc_pc	(const char *db_file);
-typedef ex_t	dsm_x_pnvpc	(DB_ENV *dbe, const char *db_file);
-typedef dbe_t  *dsm_pbe_pc	(const char *directory);
-typedef DB_ENV *dsm_pnv_pcpc	(const char *directory, const char *db_file);
+typedef ex_t	dsm_x_pnvpd	(DB_ENV *dbe, bfdir *directory);
+typedef dbe_t  *dsm_pbe_pd	(bfdir *directory);
+typedef DB_ENV *dsm_pnv_pdpf	(bfdir *directory, bffile *db_file);
 typedef DB_ENV *dsm_pnv_pbe	(dbe_t *env);
 
 typedef struct {
@@ -55,16 +55,16 @@ typedef struct {
     dsm_i_pv	 *dsm_abort;
     dsm_i_pv	 *dsm_commit;
     /* private -- used in datastore_db_*.c */
-    dsm_pbe_pc	 *dsm_env_init;
+    dsm_pbe_pd	 *dsm_env_init;
     dsm_v_pbe	 *dsm_cleanup;
     dsm_v_pbe	 *dsm_cleanup_lite;
     dsm_pnv_pbe	 *dsm_get_env_dbe;
     dsm_pc_pc	 *dsm_database_name;
-    dsm_pnv_pcpc *dsm_recover_open;
+    dsm_pnv_pdpf *dsm_recover_open;
     dsm_i_v	 *dsm_auto_commit_flags;
     dsm_i_i	 *dsm_get_rmw_flag;
     dsm_i_pvi	 *dsm_lock;
-    dsm_x_pnvpc	 *dsm_common_close;
+    dsm_x_pnvpd	 *dsm_common_close;
     dsm_i_pnvi	 *dsm_sync;
     dsm_v_pnv	 *dsm_log_flush;
 } dsm_t;
@@ -73,8 +73,8 @@ typedef struct {
  * we have opened. */
 typedef struct {
     int		magic;
-    char	*path;
-    char	*name;
+    bfdir	path;
+    bffile	name;
     int		fd;		/* file descriptor of data base file */
     dbmode_t	open_mode;	/* datastore open mode, DS_READ/DS_WRITE */
 #ifdef	ENABLE_DB_DATASTORE	/* if Berkeley DB */
@@ -100,6 +100,6 @@ typedef	enum {
     P_DONT_KNOW		/*  2 for don't know */
 } probe_txn_t;
 
-probe_txn_t probe_txn(const char *directory, const char *file);
+probe_txn_t probe_txn(bfdir *directory, bffile *file);
 
 #endif

@@ -57,9 +57,9 @@ dsm_t dsm_transactional = {
 };
 
 #if	!defined(DISABLE_TRANSACTIONS) && !defined(ENABLE_TRANSACTIONS)
-void *dbe_init(const char *unused, const char *unused2) {
-    (void)unused;
-    (void)unused2;
+void *dbe_init(bfdir *d, bffile *f) {
+    (void)d;
+    (void)f;
     return (void *)~0;
 }
 #endif
@@ -68,7 +68,7 @@ int db_txn_begin(void *vhandle) { (void)vhandle; return 0; }
 int db_txn_abort(void *vhandle) { (void)vhandle; return 0; }
 int db_txn_commit(void *vhandle) { (void)vhandle; return 0; }
 
-ex_t dbe_recover(const char *directory, bool catastrophic, bool force)
+ex_t dbe_recover(bfdir *directory, bool catastrophic, bool force)
 {
     (void) directory;
     (void) catastrophic;
@@ -89,13 +89,13 @@ void *db_get_env(void *vhandle) {
 }
 #endif
 
-ex_t dbe_purgelogs(const char *directory)
+ex_t dbe_purgelogs(bfdir *directory)
 {
     (void) directory;
     return EX_OK;
 }
 
-ex_t dbe_remove(const char *directory)
+ex_t dbe_remove(bfdir *directory)
 {
     (void) directory;
     return EX_OK;
@@ -104,7 +104,7 @@ ex_t dbe_remove(const char *directory)
 /** probe if the directory contains an environment, and if so,
  * if it has transactions
  */
-probe_txn_t probe_txn(const char *directory, const char *file)
+probe_txn_t probe_txn(bfdir *directory, bffile *file)
 {
     (void) directory;
     (void) file;

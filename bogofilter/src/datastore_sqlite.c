@@ -36,14 +36,15 @@ static const char *ENDIAN32 = ".ENDIAN32";
 /* dummy functions */
 #define DUMMYVVP(name)  void name(void *dummy) { (void)dummy; }
 #define DUMMYVPVP(name) void *name(void *dummy) { (void)dummy; return NULL; }
-#define DUMMYICP(name)  ex_t name(const char *dummy) { (void)dummy; return EX_OK; }
+#define DUMMYICP(name)  ex_t name(bfdir *dummy) { (void)dummy; return EX_OK; }
 DUMMYVVP(dbe_cleanup)
 DUMMYVVP(db_flush)
 DUMMYVPVP(db_get_env)
 DUMMYICP(dbe_purgelogs)
 DUMMYICP(dbe_remove)
-void *dbe_init(const char *d1, const char *d2) { (void)d1; (void)d2; return (void *)~0; }
-ex_t db_verify(const char *d1, const char *d2) { (void)d1; (void)d2; return EX_OK; }
+void *dbe_init(bfdir *d, bffile *f) { (void)d; (void)f; return (void *)~0; }
+ex_t db_verify(bfdir *d, bffile *f) { (void)d; (void)f; return EX_OK; }
+
 /** dummy function, Sqlite recovers automatically. */
 ex_t dbe_recover(const char *d1, bool d2, bool d3) { (void)d1; d2=d3; return EX_ERROR; }
 

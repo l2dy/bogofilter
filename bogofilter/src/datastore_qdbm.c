@@ -324,8 +324,9 @@ const char *db_str_err(int e)
     return dperrmsg(e);
 }
 
-ex_t db_verify(const char *d, const char *f) {
-    (void)f;
+ex_t db_verify(bfdir *d, bffile *f)
+{
     (void)d;
+    (void)f;
     return EX_OK;
 }

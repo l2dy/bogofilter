@@ -33,6 +33,18 @@ extern YYYYMMDD today;		/* date as YYYYMMDD */
  */
 #define MSG_COUNT ".MSG_COUNT"
 
+struct bfdir {
+    const char *dirname;
+};
+
+typedef struct bfdir bfdir;
+
+struct bffile {
+    const char *filename;
+};
+
+typedef struct bffile bffile;
+
 /** Datastore handle type
 ** - used to communicate between datastore layer and database layer
 ** - known to program layer as a void*

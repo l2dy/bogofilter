@@ -60,14 +60,14 @@ static int  	   dbx_commit		(void *vhandle);
 /* private -- used in datastore_db_*.c */
 static DB_ENV	  *dbx_get_env_dbe	(dbe_t *env);
 static const char *dbx_database_name	(const char *db_file);
-static DB_ENV	  *dbx_recover_open	(const char *directory, const char *db_file);
+static DB_ENV	  *dbx_recover_open	(bfdir *directory, bffile *db_file);
 static int	   dbx_auto_commit_flags(void);
 static int	   dbx_get_rmw_flag	(int open_mode);
 static int	   dbx_lock		(void *handle, int open_mode);
-static ex_t	   dbx_common_close	(DB_ENV *dbe, const char *directory);
+static ex_t	   dbx_common_close	(DB_ENV *dbe, bfdir *directory);
 static int	   dbx_sync		(DB_ENV *dbe, int ret);
 static void	   dbx_log_flush	(DB_ENV *dbe);
-static dbe_t 	  *dbx_init		(const char *dir);
+static dbe_t 	  *dbx_init		(bfdir *dir);
 static void 	   dbx_cleanup		(dbe_t *env);
 static void 	   dbx_cleanup_lite	(dbe_t *env);
 static ex_t	   dbe_env_purgelogs	(DB_ENV *dbe);
@@ -98,11 +98,11 @@ dsm_t dsm_transactional = {
 /* non-OO static function prototypes */
 
 static int plock(const char *path, short locktype, int mode);
-static int db_try_glock(const char *directory, short locktype, int lockcmd);
+static int db_try_glock(bfdir *directory, short locktype, int lockcmd);
 static int bf_dbenv_create(DB_ENV **dbe);
 static void dbe_config(void *vhandle, u_int32_t numlocks, u_int32_t numobjs);
-static dbe_t *dbe_xinit(dbe_t *env, const char *directory, u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags);
-static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags);
+static dbe_t *dbe_xinit(dbe_t *env, bfdir *directory, u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags);
+static DB_ENV *dbe_recover_open(bfdir *directory, uint32_t flags);
 
 /* support functions */
 
@@ -166,7 +166,7 @@ int dbx_get_rmw_flag(int open_mode)
  * failed. */
 static void diag_dbeopen(
 	/** DB_ENV->open() flags value  */ u_int32_t flags,
-	/** env directory tried to open */ const char *directory)
+	/** env directory tried to open */ bfdir *directory)
 {
     if (flags & DB_RECOVER) {
 	fprintf(stderr,
@@ -183,16 +183,16 @@ static void diag_dbeopen(
 		"\n"
 		"Please check the README.db file that came with bogofilter for hints,\n"
 		"section 3.3, or remove all __db.*, log.* and *.db files in \"%s\"\n"
-		"and start from scratch.\n", directory);
+		"and start from scratch.\n", directory->dirname);
 	/* catastrophic recovery failed */
     } else {
 	fprintf(stderr, "To recover, run: bogoutil -v --db-recover \"%s\"\n",
-		directory);
+		directory->dirname);
     }
 }
 
 /** run recovery, open environment and keep the exclusive lock */
-static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags)
+static DB_ENV *dbe_recover_open(bfdir *directory, uint32_t flags)
 {
     const uint32_t local_flags = flags | DB_CREATE;
     DB_ENV *dbe;
@@ -217,11 +217,11 @@ static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags)
      * environment in heap memory, so we don't need to remove it.
      */
 
-    e = dbe->open(dbe, directory,
+    e = dbe->open(dbe, directory->dirname,
 		  dbenv_defflags | local_flags | DB_RECOVER, DS_MODE);
     if (e) {
 	print_error(__FILE__, __LINE__, "Cannot recover environment \"%s\": %s",
-		directory, db_strerror(e));
+		directory->dirname, db_strerror(e));
 	if (e == DB_RUNRECOVERY)
 	    diag_dbeopen(flags, directory);
 	exit(EX_ERROR);
@@ -230,7 +230,7 @@ static DB_ENV *dbe_recover_open(const char *directory, uint32_t flags)
     return dbe;
 }
 
-static DB_ENV *dbx_recover_open(const char *directory, const char *db_file)
+static DB_ENV *dbx_recover_open(bfdir *directory, bffile *db_file)
 {
     (void) db_file;		/* quiet compiler warning */
     return dbe_recover_open(directory, 0);
@@ -364,7 +364,7 @@ static int plock(const char *path, short locktype, int mode)
     return fd;
 }
 
-static int db_try_glock(const char *directory, short locktype, int lockcmd)
+static int db_try_glock(bfdir *directory, short locktype, int lockcmd)
 {
     int ret;
     char *t;
@@ -373,14 +373,14 @@ static int db_try_glock(const char *directory, short locktype, int lockcmd)
     assert(directory);
 
     /* lock */
-    ret = mkdir(directory, DIR_MODE);
+    ret = mkdir(directory->dirname, DIR_MODE);
     if (ret && errno != EEXIST) {
 	print_error(__FILE__, __LINE__, "mkdir(%s): %s",
-		directory, strerror(errno));
+		directory->dirname, strerror(errno));
 	exit(EX_ERROR);
     }
 
-    t = mxcat(directory, tackon, NULL);
+    t = mxcat(directory->dirname, tackon, NULL);
 
     /* All we are interested in is that this file exists, we'll close it
      * right away as plock down will open it again */
@@ -478,16 +478,16 @@ static void dbe_config(void *vhandle, u_int32_t numlocks, u_int32_t numobjs)
 	fprintf(dbgout, "DB_ENV->set_lg_max(%lu)\n", (unsigned long)logsize);
 }
 
-static dbe_t *dbx_init(const char *directory)
+static dbe_t *dbx_init(bfdir *directory)
 {
     u_int32_t flags = 0;
     dbe_t *env = xcalloc(1, sizeof(dbe_t));
 
     env->magic = MAGIC_DBE;	    /* poor man's type checking */
-    env->directory = xstrdup(directory);
+    env->directory = xstrdup(directory->dirname);
 
     /* open lock file, needed to detect previous crashes */
-    if (init_dbl(directory))
+    if (init_dbl(directory->dirname))
 	exit(EX_ERROR);
 
     /* run recovery if needed */
@@ -518,7 +518,7 @@ static dbe_t *dbx_init(const char *directory)
 
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
-static dbe_t *dbe_xinit(dbe_t *env, const char *directory,
+static dbe_t *dbe_xinit(dbe_t *env, bfdir *directory,
 	u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
 {
     int ret;
@@ -543,7 +543,7 @@ static dbe_t *dbe_xinit(dbe_t *env, const char *directory,
 
     flags |= DB_CREATE | dbenv_defflags;
 
-    ret = env->dbe->open(env->dbe, directory, flags, DS_MODE);
+    ret = env->dbe->open(env->dbe, directory->dirname, flags, DS_MODE);
     if (ret != 0) {
 	env->dbe->close(env->dbe, 0);
 	print_error(__FILE__, __LINE__, "DB_ENV->open, err: %s", db_strerror(ret));
@@ -569,7 +569,7 @@ static dbe_t *dbe_xinit(dbe_t *env, const char *directory,
     }
 
     if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "DB_ENV->open(home=%s)\n", directory);
+	fprintf(dbgout, "DB_ENV->open(home=%s)\n", directory->dirname);
 
     return env;
 }
@@ -627,7 +627,7 @@ static int dbx_sync(DB_ENV *dbe, int ret)
     return ret;
 }
 
-ex_t dbe_recover(const char *directory, bool catastrophic, bool force)
+ex_t dbe_recover(bfdir *directory, bool catastrophic, bool force)
 {
     dbe_t *env = xcalloc(1, sizeof(dbe_t));
 
@@ -657,7 +657,7 @@ ex_t dbe_recover(const char *directory, bool catastrophic, bool force)
     return EX_OK;
 }
 
-static ex_t dbx_common_close(DB_ENV *dbe, const char *directory)
+static ex_t dbx_common_close(DB_ENV *dbe, bfdir *directory)
 {
     int e;
 
@@ -670,7 +670,7 @@ static ex_t dbx_common_close(DB_ENV *dbe, const char *directory)
     e = dbe->close(dbe, 0);
     if (e != 0) {
 	print_error(__FILE__, __LINE__, "Error closing environment \"%s\": %s",
-		directory, db_strerror(e));
+		directory->dirname, db_strerror(e));
 	exit(EX_ERROR);
     }
 
@@ -708,7 +708,7 @@ static ex_t dbe_env_purgelogs(DB_ENV *dbe)
     return EX_OK;
 }
 
-ex_t dbe_purgelogs(const char *directory)
+ex_t dbe_purgelogs(bfdir *directory)
 {
     int e;
     DB_ENV *dbe = dbe_recover_open(directory, 0);
@@ -736,7 +736,7 @@ ex_t dbe_purgelogs(const char *directory)
     return dbx_common_close(dbe, directory);
 }
 
-ex_t dbe_remove(const char *directory)
+ex_t dbe_remove(bfdir *directory)
 {
     DB_ENV *dbe = dbe_recover_open(directory, DB_PRIVATE);
 
@@ -873,7 +873,7 @@ void dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_f
 /** probe if the directory contains an environment, and if so,
  * if it has transactions
  */
-probe_txn_t probe_txn(const char *directory, const char *file)
+probe_txn_t probe_txn(bfdir *directory, bffile *file)
 {
     DB_ENV *dbe;
     int r;
@@ -889,14 +889,14 @@ probe_txn_t probe_txn(const char *directory, const char *file)
     }
 
 #if DB_AT_LEAST(3,2)
-    r = dbe->open(dbe, directory, DB_JOINENV, DS_MODE);
+    r = dbe->open(dbe, directory->dirname, DB_JOINENV, DS_MODE);
 #else
     r = ENOENT;
 #endif
     if (r == ENOENT) {
 	struct stat st;
 	int w;
-	char *t = build_path(directory, file);
+	char *t = build_path(directory->dirname, file->filename);
 	struct dirent *de;
 	DIR *d;
 
@@ -906,7 +906,7 @@ probe_txn_t probe_txn(const char *directory, const char *file)
 	/* retry, looking for log\.[0-9]{10} files - needed for instance
 	 * after bogoutil --db-remove DIR or when DB_JOINENV is
 	 * unsupported */
-	d = opendir(directory);
+	d = opendir(directory->dirname);
 	if (!d) {
 	    print_error(__FILE__, __LINE__, "cannot open directory %s: %s",
 		    t, strerror(r));

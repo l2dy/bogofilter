@@ -371,9 +371,16 @@ ex_t ds_oper(void *env, const char *path, dbmode_t open_mode,
 static word_t  *msg_count_tok;
 static word_t  *wordlist_version_tok;
 
-void *ds_init(const char *directory, const char *db_file)
+void *ds_init(const char *directory, const char *filename)
 {
-    void *dbe = dbe_init(directory, db_file);
+    bfdir dir;
+    bffile file;
+    void *dbe;
+
+    dir.dirname = directory;
+    file.filename = filename;
+    dbe = dbe_init(&dir, &file);
+
     if (msg_count_tok == NULL) {
 	msg_count_tok = word_new((const byte *)MSG_COUNT, strlen(MSG_COUNT));
     }
@@ -460,17 +467,27 @@ const char *ds_version_str(void)
 
 int ds_recover(const char *directory, bool catastrophic)
 {
-    return dbe_recover(directory, catastrophic, true);
+    bfdir dir;
+    dir.dirname = directory;
+    return dbe_recover(&dir, catastrophic, true);
 }
 
 int ds_remove(const char *directory) {
-    return dbe_remove(directory);
+    bfdir dir;
+    dir.dirname = directory;
+    return dbe_remove(&dir);
 }
 
 int ds_purgelogs(const char *directory) {
-    return dbe_purgelogs(directory);
+    bfdir dir;
+    dir.dirname = directory;
+    return dbe_purgelogs(&dir);
 }
 
-int ds_verify(const char *directory, const char *file) {
-    return db_verify(directory, file);
+int ds_verify(const char *directory, const char *filename) {
+    bfdir dir;
+    bffile file;
+    dir.dirname = directory;
+    file.filename = filename;
+    return db_verify(&dir, &file);
 }
