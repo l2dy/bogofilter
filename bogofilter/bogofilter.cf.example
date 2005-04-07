@@ -84,6 +84,14 @@
 #db_cachesize=0
 ##db_cachesize=16
 
+#### DB_LOG_AUTOREMOVE
+#
+#	boolean indicating whether auto-removing of
+#	logs should be enabled (yes) or disabled (no)
+#
+#db_log_autoremove=no
+###db_log_autoremove=yes
+
 #### DB_LK_MAX_LOCKS, DB_LK_MAX_OBJECTS
 #
 #	BerkeleyDB uses these values for creating its lock tables.

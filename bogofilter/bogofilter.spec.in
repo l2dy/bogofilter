@@ -115,16 +115,12 @@ strip contrib-static/bogogrep_static
 
 %post
 
-cat %{_defaultdocdir}/%{name}-%{version}/rpm.notes.BerkeleyDB
-
 %post static
 for file in bogofilter bogolexer bogoutil bogotune ; do
     if [ $1 -lt 2 ] ; then
         ln -s %{_bindir}/${file}_static %{_bindir}/${file} 
     fi
 done
-
-cat %{_defaultdocdir}/%{name}_static-%{version}/rpm.notes.BerkeleyDB
 
 %postun static
 for file in bogofilter bogolexer bogoutil bogotune ; do

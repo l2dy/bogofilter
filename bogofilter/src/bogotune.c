@@ -182,6 +182,9 @@ static uint   ncnt, nsum;		/* neighbor count and sum - for gfn() averaging */
 uint test = 0;
 #endif
 
+bool fMakeCheck = false;	/* allows quick & dirty regression testing */
+uint cMakeCheck =    50;	/* ... for 50 cycles */
+
 /* Function Definitions */
 
 static void bt_trap(void) {}
@@ -604,7 +607,9 @@ static void init_count(void)
 static void print_final_count(void)
 {
     if (verbose) {
-	printf("\r              \r%u messages\n", message_count);
+	if (!fMakeCheck)
+	    printf("\r              \r");
+	printf("%u messages\n", message_count);
 	fflush(stdout);
     }
 }
@@ -613,7 +618,7 @@ static int update_count(void)
 {
     message_count += 1;
 
-    if (verbose && (message_count % 100) == 0) {
+    if (verbose && (message_count % 100) == 0 && !fMakeCheck) {
 	if ((message_count % 1000) != 0)
 	    putchar('.');
 	else
@@ -984,7 +989,10 @@ static int process_arglist(int argc, char **argv)
 	    print_version();
 	    exit(EX_OK);
 	case 'x':
-	    set_debug_mask( optarg );
+	    if (strcmp(optarg, "MakeCheck") == 0)
+		fMakeCheck = true;
+	    else
+		set_debug_mask( optarg );
 	    break;
 	default:
 	    help();
@@ -1115,6 +1123,7 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
 	r = &sorted[i];
 	if (r->fp != target) continue;
 	if (j == 0) j = i+1;
+	if (fMakeCheck && j >= cMakeCheck) break;
 	rsi = r->rsi; mdi = r->mdi; rxi = r->rxi; spi = r->spi; nsi = r->nsi;
 	ncnt = nsum = 0;
 	if (((rsi == 0   ||
@@ -1377,8 +1386,9 @@ static void show_elapsed_time(int beg, int end, uint cnt, double val,
 			      const char *lbl1, const char *lbl2)
 {
     int tm = end - beg;
-    printf("    %dm:%02ds for %u %s.  avg: %.1f %s\n",
-	   MIN(tm), SECONDS(tm), cnt, lbl1, val, lbl2);
+    if (!fMakeCheck)
+	printf("    %dm:%02ds for %u %s.  avg: %.1f %s\n",
+	       MIN(tm), SECONDS(tm), cnt, lbl1, val, lbl2);
 }
 
 static rc_t bogotune(void)
@@ -1624,11 +1634,21 @@ static rc_t bogotune(void)
 			print_sp_scores(fn-10, fn, 10);
 		    }
 #endif
+		    if (fMakeCheck && cnt >= cMakeCheck)
+			break;
 		}
+		if (fMakeCheck && cnt >= cMakeCheck)
+		    break;
 	      }
+	      if (fMakeCheck && cnt >= cMakeCheck)
+		  break;
 	    }
+	    if (fMakeCheck && cnt >= cMakeCheck)
+		break;
 	  }
 	  fflush(stdout);
+	  if (fMakeCheck && cnt >= cMakeCheck)
+	      break;
 	}
 
 	if (verbose >= TIME) {

@@ -41,18 +41,25 @@ run_test()
     OT="${TMPDIR}/msg.$tst.$mth"
     if [ -n "$V" ] ; then OT="$OT.$V" ; fi
     OPTS="-e -t $V $CFG"
+    OPTS="-e -t $V $CFG -D -x bcdghilmrstwy -vv"
+#echo "######## run_test - $mth ########"
+#echo OT: $OT
     eval $VALGRIND $BOGOFILTER $OPTS < $IN > $OT
     if test -s $TMPDIR/vg.out ; then cat $TMPDIR/vg.out ; exit 2 ; fi
+#echo "######## ########"
 }
 
 for mth in f t ; do
     BOGOFILTER_DIR="${TMPDIR}/words.$mth"
-    CFG="-c ${TMPDIR}/cfg.$mth -y 0"
+    CFG="-c ${TMPDIR}/cfg.$mth -y 0 -v"
     export BOGOFILTER_DIR
     if [   -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
     mkdir -p $BOGOFILTER_DIR
-    $BOGOFILTER $CFG -s < ${SYSTEST}/inputs/spam.mbx
-    $BOGOFILTER $CFG -n < ${SYSTEST}/inputs/good.mbx
+#    $BOGOFILTER $CFG -s < ${SYSTEST}/inputs/spam.mbx
+#    $BOGOFILTER $CFG -n < ${SYSTEST}/inputs/good.mbx
+    $BOGOFILTER -c ${TMPDIR}/cfg.$mth -y 0 -v -s < ${SYSTEST}/inputs/spam.mbx
+    $BOGOFILTER -c ${TMPDIR}/cfg.$mth -y 0 -v -n < ${SYSTEST}/inputs/good.mbx
+
 #   if [ $verbose -gt 0 ] ; then $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT ; fi
 
     for tst in 3 ; do
