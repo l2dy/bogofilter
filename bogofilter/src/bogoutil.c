@@ -599,11 +599,6 @@ static int process_arglist(int argc, char **argv)
 	exit(EX_ERROR);
     }
 
-    if (optind < argc && flag != M_WORD) {
-	fprintf(stderr, "Extra arguments given, first: %s. Aborting.\n", argv[optind]);
-	exit(EX_ERROR);
-    }
-
     return count;
 }
 
@@ -830,6 +825,7 @@ int main(int argc, char *argv[])
 
     /* Extra or missing parameters */
     if (flag != M_WORD && argc != optind) {
+	fprintf(stderr, "Missing or extraneous argument.\n");
 	usage();
 	exit(EX_ERROR);
     }
