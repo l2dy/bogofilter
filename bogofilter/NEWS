@@ -15,6 +15,10 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
+	2005-04-07
+
+	* Enable --db-log-autoremove by default to match documentation.
+
 	2005-04-03
 
 	* File handling code rewritten to use bfpath structure for

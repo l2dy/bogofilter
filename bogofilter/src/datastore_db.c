@@ -17,9 +17,6 @@ Matthias Andree <matthias.andree@gmx.de> 2003 - 2004
 **	3. Bogofilter's header files
 */
 
-/* This code has been tested with BerkeleyDB 3.1 3.2, 3.3, 4.0,
- * 4.1 and 4.2.  -- Matthias Andree, 2004-11-29 */
-
 /* TODO:
  * - implement proper retry when our transaction is aborted after a
  *   deadlock
@@ -73,7 +70,7 @@ dsm_t *dsm = &dsm_transactional;
 u_int32_t db_max_locks = 16384;		/* set_lk_max_locks    32768 */
 u_int32_t db_max_objects = 16384;	/* set_lk_max_objects  32768 */
 
-bool	  db_log_autoremove = false;	/* DB_LOG_AUTOREMOVE */
+bool	  db_log_autoremove = true;	/* DB_LOG_AUTOREMOVE */
 
 #ifdef	FUTURE_DB_OPTIONS
 bool	  db_txn_durable = true;	/* not DB_TXN_NOT_DURABLE */
