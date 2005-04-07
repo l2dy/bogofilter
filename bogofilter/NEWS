@@ -15,9 +15,26 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
-	2005-04-07
+0.94.4	2005-04-07
 
-	* Enable --db-log-autoremove by default to match documentation.
+	* The RELEASE.NOTES file has been reformatted for readability.
+
+	* When using transactions, the db_log_autoremove option is now
+	  enabled by default (to match the documentation).
+
+	* Option db_log_autoremove has been added to bogofilter.cf.example
+
+	2005-04-05
+
+	* Fix segfault in VERP processing.
+
+	2005-04-04
+
+	* The code for handling file and directory names has been
+          rewritten for clarity and maintainability.  Some options for
+          bogoutil which used to take a directory argument now take a filename,
+          for example -H, -r, and -R which all operate on a database,
+          not on a database environment.
 
 	2005-04-03
 

@@ -1,11 +1,12 @@
 This file documents changes in bogofilter since version 0.11.  In
-particular it describes (1) significant changes (noteworthy and
-compatible) and (2) incompatible changes (that require further action
-upon update).
+particular it describes: (1) Features, which are significant changes
+(noteworthy and compatible) and (2) Incompatibilities, which are
+changes that require action upon update.
 
 Caution: If upgrading from an old version and skipping several
 intervening versions of bogofilter, be smart and check all the
-"incompatible changes" sections of the versions you skipped!
+changes of the versions you skipped!  In particular, read the sections
+labeled "Incompat".
 
 Also, if you upgrade to a new minor version (that is, the first or
 second number in bogofilter's version have been changed), you MUST
@@ -20,22 +21,14 @@ is working properly.
 NOTE: the NEWS and CHANGES documents have greater detail on some of
 these changes. You should consult them.
 
-########################################################################
+------------------------------
 
-INCOMPATIBLE CHANGES IN BOGOFILTER 0.94
-=======================================
-
-As bogofilter 0.93 has not been released as stable version, please
-DO REFER to the bogofilter 0.93 section below for incompatible changes.
-
-Bogofilter 0.94.0 and 0.94.1 SQLite3 support is broken and was repaired
-in 0.94.2; aborting a larger registration could break databases
+[Feature 0.94.2] SQLite3 support has been repared.  In versions 0.94.0
+and 0.94.1. aborting a larger registration could break databases
 consistency (permanent database corruption). SQLite3 must be at least
 version 3.2.0.
 
-
-NEW CAPABILITIES IN BOGOFILTER 0.94
-===================================
+[Features 0.94.0]
 
 Bogofilter and bogoutil now support both build-time and run-time
 choosing whether to operate with (or without) transaction support.
@@ -78,13 +71,9 @@ that only run transactionally or non-transactionallly.  Use
 "./configure --disable-transactions" to disable them.  These programs
 will be _slightly_ smaller than the default build.
 
-########################################################################
+------------------------------
 
-INCOMPATIBLE CHANGES IN BOGOFILTER 0.93
-=======================================
-
-Summary for the hasty
----------------------
+[Incompat 0.93] Summary for the hasty
 
 YOU MUST ADJUST YOUR SCRIPTS IF YOU ARE EVALUATING "X-Bogosity" HEADERS!
 
@@ -192,49 +181,39 @@ prefix for the mailbox.
 Example: bogotune -n good1 good2 -s bad1 bad2 ...
 will be: bogotune -n good1 -n good2 -s bad1 -s bad2
 
+------------------------------
 
-MAJOR CHANGES IN BOGOFILTER 0.93
-================================
+[Feature 0.93.3 ] SQLite 3.0.8 (and newer) is now supported. It isn't
+nearly as fast as Berkeley DB but uses only one permanent and one
+transient file (hence less maintenance work) and is supposed to be
+proof against application and system crashes.
 
-Bogofilter 0.93.3 and newer add support for SQLite 3.0.8 (older versions
-do not work). It isn't nearly as fast as Berkeley DB but uses only one
-permanent and one transient file (hence less maintenance work) and is
-supposed to be proof against application and system crashes.
+[Feature 0.93.1 ] Berkeley DB 4.3 is now supported.
 
-Bogofilter 0.93.1 and newer add support for Berkeley DB 4.3.
+------------------------------
 
-########################################################################
-
-INCOMPATIBLE CHANGES IN BOGOFILTER 0.92
-=======================================
-
-NOTE: the formatting parameters have changed,
+[Incompat 0.92] The formatting parameters have changed:
       '%A' is now the message's IP address.
       '%I' is now the Message-ID.
       '%Q' is now the Queue-ID.
 
-########################################################################
-
-INCOMPATIBLE CHANGES IN BOGOFILTER 0.17
-=======================================
+------------------------------
 
-Support for --enable-deprecated-code (see the 0.16 release notes)
-has been removed. If you've run 0.16.X without that switch, nothing
-changes for you.
+[Incompat 0.17] Support for --enable-deprecated-code (see the 0.16
+release notes) has been removed. If you've run 0.16.X without that
+switch, nothing changes for you.
 
 Support for Berkeley DB 3.0 was removed in bogofilter 0.17.3
 as a side effect of adding Concurrent Database support.
 
-########################################################################
-
-INCOMPATIBLE CHANGES IN BOGOFILTER 0.16
-=======================================
+------------------------------
 
-With the 0.16.0 release, a number of features have been deprecated.  The
+[Incompat 0.16] A number of features have been deprecated.  The
 relevant code is bracketed by "#ifdef ENABLE_DEPRECATED_CODE" and
-"#endif" statements.  The default build will not include the deprecated
-features.  For those who still need these features, configure option
-"--enable-deprecated-code" exists to allow them to be turned on.
+"#endif" statements.  The default build will not include the
+deprecated features.  For those who still need these features,
+configure option "--enable-deprecated-code" exists to allow them to be
+turned on.
 
 THIS MAY REQUIRE MAJOR CHANGES TO YOUR CONFIGURATION OR SCRIPTS!
 
@@ -351,15 +330,12 @@ The user formatted SPAM_HEADER will no longer support format
 specification "%a" (for algorithm) since bogofilter now has only one
 algorithm.
 
-########################################################################
-
-INCOMPATIBLE CHANGES IN BOGOFILTER 0.15
-=======================================
+------------------------------
 
-Since release 0.15.9, bogofilter no longer allows to disable algorithms,
-which has never been supported well.
+[Incompatible 0.15.9] Bogofilter no longer allows disabling of
+algorithms, a feature which has never been well supported.
 
-Since release 0.15.4, all header line tokens are now tagged as:
+[Incompatible 0.15.4] All header line tokens are now tagged as:
 
 	Subject:      subj:
 	To:           to:
@@ -393,31 +369,25 @@ the newly added "head:xyz" tokens.
 This will create "header:xyz" tokens and allow the new, more effective
 header tagging to be used to fullest advantage.
 
+------------------------------
 
-MAJOR CHANGES IN BOGOFILTER 0.15
-================================
+[Feature 0.15] The code for processing multiple messages has been
+rewritten.  In addition to understanding mbox format files, bogofilter
+now understands maildirs and MH folders.
 
-With release 0.15, bogofilter's code for processing multiple messages
-has been rewritten.  In addition to understanding mbox format files,
-bogofilter now understands maildirs and MH folders.
+------------------------------
 
-########################################################################
-
-INCOMPATIBLE CHANGES IN BOGOFILTER 0.14
-=======================================
-
-The exit codes returned by bogofilter have been expanded.  They are:
+[Incompatible 0.14]  The exit codes returned by bogofilter have been
+expanded.  They are:
 
 	Spam   = 0 -- unchanged
 	Ham    = 1 -- unchanged
 	Unsure = 2 -- *NEW*
 	Error  = 3 -- *CHANGED*
 
+------------------------------
 
-MAJOR CHANGES IN BOGOFILTER 0.14
-================================
-
-Bogofilter 0.14 now supports TDB (Trivial Data base).
+[Feature 0.14] Bogofilter now supports TDB (Trivial Data base).
 
 Instead of separate wordlists for spam and ham tokens, bogofilter can
 now use a single combined, wordlist that stores both all tokens.
@@ -448,14 +418,11 @@ included with bogofilter and performs the task.  Use command
 running it, your BOGOFILTER_DIR will contain all 3 database files.  When
 started, bogofilter checks for wordlist.db and will use it.
 
-########################################################################
-
-INCOMPATIBLE CHANGES IN BOGOFILTER 0.13
-=======================================
+------------------------------
 
-With release 0.13, bogofilter's parsing has changed.  As background,
-Paul Graham has done work to improve the results of his bayesian filter
-and has published them in "Better Bayesian Filtering" at
+[Incompat 0.13] Parsing has changed.  As background, Paul Graham has
+done work to improve the results of his bayesian filter and has
+published them in "Better Bayesian Filtering" at
 http://www.paulgraham.com/better.html.  He found the following
 definition of a token to be beneficial:
 
@@ -506,14 +473,11 @@ these tokens won't be recognized, so bogofilter won't use them to score
 the message.  After being trained, bogofilter will have these additional
 tokens to aid in the classification process.
 
-########################################################################
-
-MAJOR CHANGES IN BOGOFILTER 0.12
-================================
+------------------------------
 
-Directory bogofilter/tuning has been added and contains scripts for
-running tuning experiments as described in the new HOWTO. See file
-bogofilter/tuning/README for more information.
+[Major 0.12] Directory bogofilter/tuning has been added and contains
+scripts for running tuning experiments as described in the new
+HOWTO. See file bogofilter/tuning/README for more information.
 
 Bogofilter's man page and help message describe the many command line
 switches.  They have been divided into groups (help, classification,
@@ -545,13 +509,9 @@ contains the information needed by bogofilter to score the email.  Its
 use speeds up the message scoring done by the tuning scripts.  The
 script is described in more detail in bogofilter/tuning/README.
 
-########################################################################
-
-INCOMPATIBLE CHANGES IN BOGOFILTER 0.11
-=======================================
+------------------------------
 
-Command line flags
-------------------
+[Incompatible 0.11] Command line flags:
 
 The meaning of command line flags '-S' and '-N' was changed in version
 0.11.0.  Previously '-S' meant to unregister a message from the spam
@@ -572,7 +532,6 @@ duplicate the effect of the old '-N' option, use '-S -n'.  The order of
 the options doesn't matter and they can be concatenated, as in '-Sn' and
 '-sN'.
 
-
 Config file processing
 ----------------------
 
@@ -581,16 +540,11 @@ It complains when it detects something wrong.  In particular, double
 precision values are no longer allowed to have a terminal 'f'.  For
 example "spam_cutoff=0.95f" will generate a messages.
 
+------------------------------
 
-MAJOR CHANGES IN BOGOFILTER 0.11
-================================
-
-New parameter query option
---------------------------
+[Feature 0.11] New parameter query option:
 
 Using options "-q -v" in a bogofilter command line will run the
 query_config() function and will display bogofilter's various parameter
 values.  This can be very useful in finding the reason for an unexpected
 message classification.
-
-########################################################################
