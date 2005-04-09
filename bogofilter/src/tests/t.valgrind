@@ -32,6 +32,18 @@ spamicity_tags = S,h,u
 spamicity_formats = %6.2e %6.2e %0.6f
 EOF
 
+# suppress valgrind complaints about glibc::strchr.S
+
+VG_SUPP=${TMPDIR}/vg.supp
+
+cat <<EOF > ${VG_SUPP}
+{
+   ignore strchr problem
+   Memcheck:Cond
+   fun:strchr
+}
+EOF
+
 #V="-v"	# verbosity level
 
 run_test()
@@ -41,7 +53,7 @@ run_test()
     OT="${TMPDIR}/msg.$tst.$mth"
     if [ -n "$V" ] ; then OT="$OT.$V" ; fi
     OPTS="-e -t $V $CFG"
-    eval $VALGRIND $BOGOFILTER $OPTS < $IN > $OT
+    eval $VALGRIND --suppressions=${VG_SUPP} $BOGOFILTER $OPTS < $IN > $OT
     if test -s $TMPDIR/vg.out ; then cat $TMPDIR/vg.out ; exit 2 ; fi
 }
 
