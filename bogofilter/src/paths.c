@@ -127,11 +127,33 @@ bfpath *bfpath_create(const char *path)
     return bfp;
 }
 
-bool bfpath_check_mode(bfpath *bfp, bfpath_mode m)
+static void check_for_file(bfpath *bfp)
 {
     int rc;
-    bool ok = true;
     struct stat sb;
+
+    rc = stat(bfp->filepath, &sb);
+    if (rc == 0) {
+	bfp->exists = true;
+	xfree(bfp->dirname);
+	xfree(bfp->filename);
+	if (S_ISDIR(sb.st_mode)) {
+	    bfp->isdir = true;
+	    bfp->dirname  = xstrdup(bfp->filepath);
+	    bfp->filename = NULL;
+	}
+	if (!S_ISDIR(sb.st_mode)) {
+	    bfp->isfile = true;
+	    bfp->dirname  = get_directory_from_path(bfp->filepath);
+	    bfp->filename = get_file_from_path(bfp->filepath);
+	}
+    }
+    return;
+}
+
+bool bfpath_check_mode(bfpath *bfp, bfpath_mode m)
+{
+    bool ok = true;
 
     bfp->checked = true;
 
@@ -146,19 +168,7 @@ bool bfpath_check_mode(bfpath *bfp, bfpath_mode m)
 	}
     }
 
-    rc = stat(bfp->filepath, &sb);
-    if (rc == 0) {
-	bfp->exists = true;
-	if (S_ISDIR(sb.st_mode)) {
-	    bfp->isdir = true;
-	    bfp->dirname = xstrdup(bfp->filepath);
-	}
-	if (!S_ISDIR(sb.st_mode)) {
-	    bfp->isfile = true;
-	    bfp->filename = get_file_from_path(bfp->filepath);
-	    bfp->dirname = get_directory_from_path(bfp->filepath);
-	}
-    }
+    check_for_file(bfp);
 
     switch (m)
     {
