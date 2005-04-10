@@ -1007,11 +1007,13 @@
     <p>How to do this is fully documented in file doc/README.db section
     2.2.1.  We suggest you read the whole section.</p>
 
-    <p>For BerkeleyDB 4.1 and newer, use these commands:
+    <p>In brief, use these commands:
     <pre>	cd ~/.bogofilter
 	bogoutil -d wordlist.db &gt; wordlist.txt
 	mv wordlist.db wordlist.db.old
 	bogoutil --db-transaction=yes -l wordlist.db &lt; wordlist.txt</pre>
+    <p>If everything went well, you can remove the backup files:</p>
+    <pre>	rm wordlist.db.old wordlist.txt</pre>
     <hr>
 
     <h2 id="disable-transactions">How can I switch from transaction to
