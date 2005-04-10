@@ -98,3 +98,7 @@ dist-hook:
 	@echo 1>&2
 	@exit 1
 endif
+
+check:
+	if echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><HTML><HEAD><TITLE></TITLE></HEAD><BODY><P></P></BODY></HTML>' | nsgmls -s ; then \
+	for i in $(HTML_DOCS) ; do nsgmls -s $(srcdir)/$$i ; done ; fi
