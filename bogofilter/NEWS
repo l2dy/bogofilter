@@ -18,7 +18,8 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 	2005-04-10
 
 	* Repair bf_copy script that lost log.* files, possibly corrupting
-	  database if they had been transactional.
+	  database if they had been transactional.  The defect was introduced
+	  into bogofilter 0.94.2.
 
 	2005-04-09
 
