@@ -15,6 +15,11 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
+	2005-04-10
+
+	* Repair bf_copy script that lost log.* files, possibly corrupting
+	  database if they had been transactional.
+
 	2005-04-09
 
 	* Suppress valgrind reports of errors in glibc::strchr.

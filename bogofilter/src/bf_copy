@@ -45,7 +45,7 @@ else
 fi
 
 # XXX FIXME - use Berkeley DB environment probing here
-LOGS=`ls "$SRC"/log.* 2&>/dev/null | grep -v -F -f $TMP || :`
+LOGS=`ls "$SRC"/log.* 2>/dev/null | grep -v -F -f $TMP || :`
 if test "$LOGS" ; then cp -p $LOGS "$DST" ; fi
 if test -f "$SRC"/DB_CONFIG ; then cp -p "$SRC"/DB_CONFIG "$DST" ; fi
 
