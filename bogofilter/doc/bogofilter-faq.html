@@ -1004,22 +1004,28 @@
     <h2 id="enable-transactions">How can I switch from non-transaction
     to transaction mode?</h2>
 
-    <p>This can be done by config file option or by command line
-    option.  Just add a "db_transaction=yes" line to bogofilter.cf or
-    use "--db-transaction=yes" when you run bogofilter.</p>
+    <p>How to do this is fully documented in file doc/README.db section
+    2.2.1.  We suggest you read the whole section.</p>
 
+    <p>For BerkeleyDB 4.1 and newer, use these commands:
+    <pre>	cd ~/.bogofilter
+	bogoutil -d wordlist.db > wordlist.txt
+	mv wordlist.db wordlist.db.old
+	bogoutil --db-transaction=yes -l wordlist.db < wordlist.txt</pre>
     <hr>
 
     <h2 id="disable-transactions">How can I switch from transaction to
     non-transaction mode?</h2>
 
-    <p>Run script <em>bf_copy</em>.  The created directory has a database, but
-    doesn't have log files.  You can use this new directory.</p>
+    <p>How to do this is fully documented in file doc/README.db section
+    2.2.2.  We suggest you read the whole section.</p>
 
-    <p>The following command series can be used as a model:</p>
-    <pre>	bf_copy bogodir bogotmp
-	mv bogodir bogodir.old
-	mv bogotmp bogodir</pre>
+    <p>In brief, you can use bogoutil to dump/load the wordlist, for example:
+    <pre>	cd ~/.bogofilter
+	bogoutil -d wordlist.db > wordlist.txt
+	mv wordlist.db wordlist.db.old
+	rm -f log.?????????? __db.???
+	bogoutil --db-transaction=no -l wordlist.db < wordlist.txt</pre>
 
     <hr>
 
