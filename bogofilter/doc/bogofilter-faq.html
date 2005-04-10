@@ -91,6 +91,19 @@
           <li><a href="#rescue">How can I tell if my wordlists are corrupted?</a></li>
           <li><a href="#multiple">Can I use multiple wordlists?</a></li>
           <li><a href="#ignore">Can I tell bogofilter to ignore certain tokens?</a></li>
+          <li><a href="#update">How do I upgrade from separate word
+          databases to the new combined wordlist format?</a></li>
+        </ul>
+      </li>
+
+      <li>
+        Berkeley DB Questions
+
+        <ul>
+          <li><a href="#enable-transactions">How can I switch from
+          non-transaction to transaction mode?</a></li>
+          <li><a href="#disable-transactions">How can I switch from
+          transaction to non-transaction mode?</a></li>
 	  <li><a href="#locksize">Why does bogofilter die after printing<br>
 	      "Lock table is out of available locks" or<br>
 	      "Lock table is out of available object entries"?</a></li>
@@ -100,8 +113,6 @@
 	      environments&quot; or<br>
 	      &quot;Berkeley DB library configured to support only
 	      private environments&quot;?</a>
-          <li><a href="#update">How do I upgrade from separate word
-          databases to the new combined wordlist format?</a></li>
         </ul>
       </li>
 
@@ -979,6 +990,39 @@
 
     <pre>  echo ignore.me | bogoutil -l ~/ignorelist.db</pre>
 
+    <hr>
+
+    <h2 id="update">How do I upgrade from separate word databases to
+    the new combined wordlist format?</h2>
+
+    <p>Run script bogoupgrade.  For more info, run "bogoupgrade -h" to
+    see its help message or run "man bogoupgrade" and read its man
+    page.</p>
+
+    <hr>
+
+    <h2 id="enable-transactions">How can I switch from non-transaction
+    to transaction mode?</h2>
+
+    <p>This can be done by config file option or by command line
+    option.  Just add a "db_transaction=yes" line to bogofilter.cf or
+    use "--db-transaction=yes" when you run bogofilter.</p>
+
+    <hr>
+
+    <h2 id="disable-transactions">How can I switch from transaction to
+    non-transaction mode?</h2>
+
+    <p>Run script <em>bf_copy</em>.  The created directory has a database, but
+    doesn't have log files.  You can use this new directory.</p>
+
+    <p>The following command series can be used as a model:</p>
+    <pre>	bf_copy bogodir bogotmp
+	mv bogodir bogodir.old
+	mv bogotmp bogodir</pre>
+
+    <hr>
+
     <h2 id="locksize">Why does bogofilter die after printing
 	"Lock table is out of available locks" or
 	"Lock table is out of available object entries"</h2>
@@ -1058,16 +1102,6 @@
 		      premium, use <kbd>make install-strip)</kbd></em></li>
 	      </ol>
 	  </ol>
-
-    <hr>
-    <h2 id="update">How do I upgrade from separate word databases to
-    the new combined wordlist format?</h2>
-
-    <p>Run script bogoupgrade.  For more info, run "bogoupgrade -h" to
-    see its help message or run "man bogoupgrade" and read its man
-    page.</p>
-
-    <hr>
 
     <h2 id="multi-user">Can bogofilter be used in a multi-user environment?</h2>
 
