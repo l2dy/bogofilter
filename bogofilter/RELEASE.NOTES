@@ -45,7 +45,7 @@ environment variables.
 Command line option "--db-transaction=yes" enables transactions and
 "--db-transaction=no" disables them.
 
-Config file options "db_transactions=yes" and "db_transactions=no"
+Config file options "db_transaction=yes" and "db_transaction=no"
 have the same effect.
 
 Auto-detection:
