@@ -45,6 +45,7 @@
 	<cmdsynopsis>
 	    <command>bogoutil</command>
 	    <group choice="req">
+		<arg choice="plain">--db-print-pagesize <replaceable>file</replaceable></arg>
 		<arg choice="plain">--db-verify <replaceable>file</replaceable></arg>
 		<arg choice="plain">--db-checkpoint
 		    <replaceable>directory</replaceable><arg
@@ -234,6 +235,12 @@
 	    this <emphasis>before</emphasis> upgrading to a new Berkeley
 	    DB version if the new version to be installed requires a log
 	    file format update.</para>
+	<para>The <option>--db-print-pagesize
+		<replaceable>file</replaceable></option> option prints
+	    the size of a database page in
+	    <replaceable>file</replaceable> as a decimal number, or
+	    UNKNOWN for databases with variable page size or databases
+	    that do not allow a query of the database page size.</para>
 	<para>
 	    The <option>--db-verify <replaceable>file</replaceable></option>
 	    option requests that bogofilter verifies the database file.
