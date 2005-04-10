@@ -12,7 +12,8 @@ To edit,
 3. commit the changes
 
 4. log into the sourceforge net shell,
-   type: cd /home/groups/b/bo/bogofilter/htdocs/web && ./updateweb
+   type: ssh $user@shell.sourceforge.net
+   then type: cd /home/groups/b/bo/bogofilter/web && ./updateweb
 
 NOTE: you must also to #4 above if the FAQ or NEWS files have been
 updated - we no longer use viewcvs to obtain these, it's all too slow.
