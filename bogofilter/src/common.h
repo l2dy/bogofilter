@@ -159,6 +159,7 @@ typedef enum e_wordlist_version {
 /* for bogoutil.c and datastore_db_trans.c */
 
 typedef enum { M_NONE, M_DUMP, M_LOAD, M_WORD, M_MAINTAIN, M_ROBX, M_HIST,
+    M_LIST_LOGFILES,
     M_RECOVER, M_CRECOVER, M_PURGELOGS, M_VERIFY, M_REMOVEENV, M_CHECKPOINT,
     M_PAGESIZE }
     cmd_t;

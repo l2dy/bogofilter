@@ -31,6 +31,7 @@ typedef enum longopts_e {
     O_DB_MAX_OBJECTS,
     O_DB_MAX_LOCKS,
     O_DB_CHECKPOINT,
+    O_DB_LIST_LOGFILES,
     O_DB_PRINT_PAGESIZE,
     O_DB_PRUNE,
     O_DB_RECOVER,

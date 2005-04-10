@@ -129,7 +129,7 @@ void free_wordlists()
 	list = free_wordlistnode(list);
     }
 
-    bfpath_cleanup();
+    bogohome_cleanup();
 }
 
 void display_wordlists(wordlist_t *list, const char *fmt)

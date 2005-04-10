@@ -469,6 +469,8 @@ static void usage(void)
 #if	defined(ENABLE_DB_DATASTORE) && !defined(DISABLE_TRANSACTIONS)
     fprintf(stderr, "   or: %s [OPTIONS] {--db-checkpoint} directory\n",
 	    progname);
+    fprintf(stderr, "   or: %s [OPTIONS] {--db-list-logfiles} directory [list options]\n",
+	    progname);
     fprintf(stderr, "   or: %s [OPTIONS] {--db-prune|--db-remove-environment} directory\n",
 	    progname);
     fprintf(stderr, "   or: %s [OPTIONS] {--db-recover|--db-recover-harder} directory\n",
@@ -551,6 +553,7 @@ static struct option longopts_bogoutil[] = {
     /* bogoutil specific options */
     { "db-prune",                       R, 0, O_DB_PRUNE },
     { "db-checkpoint",                  R, 0, O_DB_CHECKPOINT },
+    { "db-list-logfiles",               R, 0, O_DB_LIST_LOGFILES },
     { "db-print-pagesize",		R, 0, O_DB_PRINT_PAGESIZE },
     { "db-recover",                     R, 0, O_DB_RECOVER },
     { "db-recover-harder",              R, 0, O_DB_RECOVER_HARDER },
@@ -789,14 +792,13 @@ static bfpath_mode get_mode(cmd_t cmd)
     case M_ROBX:
     case M_VERIFY:
     case M_WORD:
-	mode = BFP_MUST_EXIST;
-	break;
     case M_CHECKPOINT:	/* database transaction/integrity operations */
     case M_CRECOVER:
     case M_PAGESIZE:
     case M_PURGELOGS:
     case M_RECOVER:
     case M_REMOVEENV:
+    case M_LIST_LOGFILES:
 	mode = BFP_MUST_EXIST;
 	break;
     case M_NONE:
@@ -824,7 +826,7 @@ int main(int argc, char *argv[])
     process_config_files(false, longopts_bogoutil);	/* need to read lock sizes */
 
     /* Extra or missing parameters */
-    if (flag != M_WORD && argc != optind) {
+    if (flag != M_WORD && flag != M_LIST_LOGFILES && argc != optind) {
 	fprintf(stderr, "Missing or extraneous argument.\n");
 	usage();
 	exit(EX_ERROR);
@@ -855,6 +857,12 @@ int main(int argc, char *argv[])
 	{
 	    ds_init(bfp);
 	    rc = ds_checkpoint(bfp);
+	    break;
+	}
+	case M_LIST_LOGFILES:
+	{
+	    dsm_init(bfp);
+	    rc = ds_list_logfiles(bfp, argc - optind, argv + optind);
 	    break;
 	}
 	case M_PURGELOGS:
@@ -915,6 +923,8 @@ int main(int argc, char *argv[])
 	    abort();
 	    break;
     }
+
+    bfpath_free(bfp);
 
     return rc;
 }

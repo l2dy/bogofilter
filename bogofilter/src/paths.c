@@ -44,18 +44,16 @@ bfpath_mode mode;
 
 void set_bogohome(const char *path)
 {
+    xfree(bogohome);
     if (path) {
-	xfree(bogohome);
 	bogohome = xstrdup(path);
     }
-    return;
 }
 
-void bfpath_cleanup(void)
+void bogohome_cleanup(void)
 {
     xfree(bogohome);
     bogohome = NULL;
-    return;
 }
 
 void bfpath_set_bogohome_using_priority(priority_t p)

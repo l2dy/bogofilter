@@ -73,7 +73,8 @@ dsm_t dsm_sqlite = {
     NULL,	/* dsm_checkpoint       */
     NULL,	/* dsm_recover          */
     NULL,	/* dsm_remove           */
-    NULL	/* dsm_verify           */
+    NULL,	/* dsm_verify           */
+    NULL	/* dsm_list_logfiles    */
 };
 
 dsm_t *dsm = &dsm_sqlite;

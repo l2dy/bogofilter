@@ -46,6 +46,10 @@
 	    <command>bogoutil</command>
 	    <group choice="req">
 		<arg choice="plain">--db-verify <replaceable>file</replaceable></arg>
+		<arg choice="plain">--db-checkpoint
+		    <replaceable>directory</replaceable><arg
+			choice="opt" rep="repeat">flag</arg></arg>
+		<arg choice="plain">--db-list-logfiles <replaceable>directory</replaceable></arg>
 		<arg choice="plain">--db-prune <replaceable>directory</replaceable></arg>
 		<arg choice="plain">--db-recover <replaceable>directory</replaceable></arg>
 		<arg choice="plain">--db-recover-harder <replaceable>directory</replaceable></arg>
@@ -189,6 +193,20 @@
 
     <refsect1 id="environment_maintenance">
 	<title>ENVIRONMENT MAINTENANCE</title>
+	<para>The <option>--db-checkpoint <replaceable>dir</replaceable></option>
+	    option causes bogoutil to flush the buffer caches and
+	    checkpoint the database environment.</para>
+	<para>The <option>--db-list-logfiles
+		<replaceable>dir</replaceable></option>
+	    option causes bogoutil to list the log files in the
+	    environment. Zero or more keywords can be added or combined
+	    (separated by whitespace) to modify the behaviork of this
+	    mode. The default behavior is to list only inactive log
+	    files with relative paths. You can add <option>all</option>
+	    to list all log files (inactive and active). You can add
+	    <option>absolute</option> to switch the listing to absolute
+	    paths.
+	</para>
 	<para>The <option>--db-prune <replaceable>dir</replaceable></option>
 	    option causes bogoutil to checkpoint the database
 	    environment and remove inactive log files.</para>

@@ -47,16 +47,16 @@ typedef struct bfpath {
 bfpath *bfpath_create(const char *path);
 bfpath *bfpath_initialize(bfpath *bfp, bfpath_mode mode);
 void	bfpath_update(bfpath *bfp);
-void    bfpath_set_mode(bfpath_mode mode);
-void    bfpath_set_bogohome_using_priority(priority_t p);
-void	bfpath_cleanup(void);
+void	bfpath_set_mode(bfpath_mode mode);
+void	bfpath_set_bogohome_using_priority(priority_t p);
 bool	bfpath_check_mode(bfpath *bfp, bfpath_mode mode);
 bfpath *bfpath_fixup(bfpath *path);
 bfpath *bfpath_free(bfpath *path);
-bool    paths_equal(bfpath *p1, bfpath *p2);
+bool	paths_equal(bfpath *p1, bfpath *p2);
 
 void	set_bogohome(const char *dirname);
 void	set_bogohome_using_dirname(const char *dirname);
+void	bogohome_cleanup(void);
 int	set_wordlist_dir(const char* dir, priority_t precedence);
 
 enum bfpath_e { BFP_NORMAL = 1 };

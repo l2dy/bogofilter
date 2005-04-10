@@ -52,18 +52,19 @@ static dsm_t dsm_dummies = {
     NULL,	/* dsm_get_env_dbe      */
     NULL,	/* dsm_database_name    */
     NULL,	/* dsm_recover_open     */
-    NULL,	/* dsm_auto_commit_flags*/                    
+    NULL,	/* dsm_auto_commit_flags*/
     NULL,	/* dsm_get_rmw_flag     */
     NULL,	/* dsm_lock             */
     NULL,	/* dsm_common_close     */
     NULL,	/* dsm_sync             */
     NULL,	/* dsm_log_flush        */
-    NULL,	/* dsm_recover          */
-    NULL,	/* dsm_remove           */
+    NULL,	/* dsm_pagesize         */
     NULL,	/* dsm_checkpoint       */
     NULL,	/* dsm_purgelogs        */
+    NULL,	/* dsm_recover          */
+    NULL,	/* dsm_remove           */
     NULL,	/* dsm_verify           */
-    NULL	/* dsm_pagesize         */
+    NULL	/* dsm_list_logfiles    */
 };
 
 /* Function definitions */
@@ -536,4 +537,12 @@ u_int32_t ds_pagesize(bfpath *bfp)
 	return 0;
     else
 	return dsm->dsm_pagesize(bfp);
+}
+
+ex_t ds_list_logfiles(bfpath *bfp, int argc, char **argv)
+{
+    if (dsm->dsm_list_logfiles == NULL)
+	return 0;
+    else
+	return dsm->dsm_list_logfiles(bfp, argc, argv);
 }

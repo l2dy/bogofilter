@@ -1067,4 +1067,3 @@ ex_t db_verify(bfpath *bfp)
 
     return e;
 }
-

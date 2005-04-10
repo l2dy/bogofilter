@@ -17,6 +17,9 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 	2005-04-10
 
+	* Add --db-list-logfiles mode to bogoutil. Can list inactive or all
+	  logfiles in relative or absolute paths.
+
 	* Repair bf_copy script that lost log.* files, possibly corrupting
 	  database if they had been transactional.  The defect was introduced
 	  into bogofilter 0.94.2.

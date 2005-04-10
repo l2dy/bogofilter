@@ -67,6 +67,8 @@ static ex_t	   dbx_purgelogs	(bfpath *bfp);
 static ex_t	   dbx_recover		(bfpath *bfp, bool catastrophic, bool force);
 static ex_t	   dbx_remove		(bfpath *bfp);
 
+static ex_t	   dbx_list_logfiles	(bfpath *bfp, int argc, char **argv);
+
 /* OO function lists */
 
 dsm_t dsm_transactional = {
@@ -93,7 +95,8 @@ dsm_t dsm_transactional = {
     &dbx_purgelogs,
     &dbx_recover,
     &dbx_remove,
-    &db_verify
+    &db_verify,
+    &dbx_list_logfiles
 };
 
 /* non-OO static function prototypes */
@@ -802,6 +805,8 @@ const char **dsm_help_bogoutil(void)
 	"                                (only effective at creation time)\n",
 	"      --db-verify=file        - verify data file.\n",
 	"      --db-checkpoint=dir     - flush buffer cache and checkpoint database\n",
+	"      --db-list-logfiles=dir [FLAGS]\n"
+	"                              - list logfiles in environment\n",
 	"      --db-prune=dir          - remove inactive log files in dir.\n",
 	"      --db-recover=dir        - run recovery on database in dir.\n",
 	"      --db-recover-harder=dir - run catastrophic recovery on database.\n",
@@ -859,6 +864,12 @@ bool dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_f
 
 	case O_DB_CHECKPOINT:
 	    *flag = M_CHECKPOINT;
+	    *count += 1;
+	    *ds_file = val;
+	    return true;
+
+	case O_DB_LIST_LOGFILES:
+	    *flag = M_LIST_LOGFILES;
 	    *count += 1;
 	    *ds_file = val;
 	    return true;
@@ -992,4 +1003,43 @@ probe_txn_t probe_txn(bfpath *bfp)
     dbe->close(dbe, 0);
 #endif
     return P_ENABLE;
+}
+
+static ex_t dbx_list_logfiles(bfpath *bfp, int argc, char **argv)
+{
+    ex_t e;
+    char **list, **i;
+    int j;
+    u_int32_t flags = 0;
+    DB_ENV *dbe = dbe_recover_open(bfp, 0);
+
+    if (dbe == NULL)
+	exit(EX_ERROR);
+
+    for (j = 0; j < argc; j++) {
+	if (strcasecmp(argv[j], "all") == 0)
+	    flags |= DB_ARCH_LOG;
+	if (strcasecmp(argv[j], "absolute") == 0)
+	    flags |= DB_ARCH_ABS;
+    }
+
+    e = BF_LOG_ARCHIVE(dbe, &list, flags);
+    if (e != 0) {
+	print_error(__FILE__, __LINE__,
+		"DB_ENV->log_archive failed: %s",
+		db_strerror(e));
+	exit(EX_ERROR);
+    }
+
+    if (list)
+	for (i = list; *i; i++) {
+	    puts(*i);
+	}
+
+    xfree(list);
+    fflush(stdout);
+    e = ferror(stdout) ? EX_ERROR : EX_OK;
+
+    if (dbx_common_close(dbe, bfp)) e = EX_ERROR;
+    return e;
 }

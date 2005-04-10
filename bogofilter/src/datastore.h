@@ -113,6 +113,7 @@ typedef ex_t	dsm_x_pp	(bfpath *bfp);
 typedef u_int32_t dsm_u_pp	(bfpath *bfp);
 typedef DB_ENV *dsm_pnv_pp	(bfpath *bfp);
 typedef DB_ENV *dsm_pnv_pbe	(dbe_t *env);
+typedef ex_t	dsm_x_ppsi	(bfpath *bfp, int argc, char **argv);
 
 /** Datastore methods type, used by datastore/database layers to switch
  * implementations after detection of database type. */
@@ -140,6 +141,7 @@ typedef struct {
     dsm_x_ppbb	 *dsm_recover;
     dsm_x_pp	 *dsm_remove;
     dsm_x_pp	 *dsm_verify;
+    dsm_x_ppsi	 *dsm_list_logfiles;
 } dsm_t;
 
 extern dsm_t *dsm;
@@ -323,5 +325,8 @@ extern ex_t ds_checkpoint(bfpath *bfp);
 
 /** datastore backends must provide this initializing function */
 extern void dsm_init(bfpath *bfp);
+
+/** list log files, remaining arguments are backend specific */
+extern ex_t ds_list_logfiles(bfpath *bfp, int argc, char **argv);
 
 #endif
