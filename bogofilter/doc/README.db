@@ -144,9 +144,9 @@ production quality at the same time.
 The transactional data store is no good if the disk drive has become
 inaccessible (which happens after some months or years with every
 drive), so you _must_ back up your data base regularly (see the
-db_archive utility for additional documentation of a "hot" backup),
-bogofilter cannot, of course, guess data that got lost through a hard
-drive fault.
+db_archive utility manual for additional documentation of a "hot"
+backup), bogofilter cannot, of course, guess data that got lost through
+a hard drive fault.
 
 When copying or archiving directory contents, be sure to copy or archive
 the *.db files FIRST, BEFORE archiving/copying the log.* files, this
@@ -388,8 +388,10 @@ arrives.
 
 If you need to copy the *.db files, DO NOT USE cp, BUT DO USE dd instead
 and give it a block size that matches the data base's block size, which
-can be found by running db_stat with -d option as shown in section 4.1
-below. Example: dd if=~/.bogofilter/wordlist.db bs=4096 of=/tmp/copy.db
+can be found by running bogoutil --db-print-pagesize as shown in section
+4.1 below. Example:
+
+dd if=~/.bogofilter/wordlist.db bs=4096 of=/tmp/copy.db
 
 The reason is that some operating systems let their cp command use
 mmap() for efficiency without guaranteeing consistency of mmap() versus
@@ -403,8 +405,13 @@ A bf_copy script is provided for your convenience.
 
 Berkeley DB keeps some additional statistics about the database itself,
 and in transactional databases also about locking, caching, logging,
-transactions and their efficiency. These can be obtained by running the
-db_stat utility:
+transactions and their efficiency.
+
+The page size of the database file can be queried by bogoutil:
+
+bogoutil --db-print-pagesize ~/.bogofilter/wordlist.db
+
+Further statistics can be obtained by running the db_stat utility:
 
 db_stat -h ~/.bogofilter -d wordlist.db # data base statistics
 
@@ -449,7 +456,7 @@ a. Determine the data base size:
 
 b. Determine the data base page size:
 
-  db_stat -h ~/.bogofilter/ -d wordlist.db
+  bogoutil --db-print-pagesize ~/.bogofilter/wordlist.db
 
 The relevant line has "database page size"
 
