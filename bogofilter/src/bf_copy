@@ -39,7 +39,7 @@ rm -f $TMP
 trap "rm -rf $TMP \"$DST\"" 0
 if test $COMPACT -eq 1 ; then
   # don't copy unneeded logs
-  db_archive -h "$SRC" >$TMP
+  bogoutil --db-list-logfiles="$SRC" >$TMP
 else
   : >$TMP
 fi

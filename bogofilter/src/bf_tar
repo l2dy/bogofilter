@@ -54,8 +54,10 @@ fi
 # database first, if it's newer than the log, it's not recoverable!
 # pax options: -w: write archive, -v: verbosely, -x ustar: choose tar
 # format.
-( db_archive -a -s -h "$BOGOHOME" ; db_archive -a -l -h "$BOGOHOME" ) \
-| pax -w -v -x ustar
+(
+  db_archive -a -s -h "$BOGOHOME"
+  bogoutil --db-list-logfiles="$BOGOHOME" all absolute
+) | pax -w -v -x ustar
 
 # remove if requested
 if [ $REMOVEAFT -eq 1 ] ; then nukelogs ; fi

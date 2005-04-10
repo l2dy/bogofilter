@@ -17,6 +17,8 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 	2005-04-10
 
+	* Use bogoutil --db-list-logfiles in bf_copy and bf_tar.
+
 	* Add --db-list-logfiles mode to bogoutil. Can list inactive or all
 	  logfiles in relative or absolute paths.
 
