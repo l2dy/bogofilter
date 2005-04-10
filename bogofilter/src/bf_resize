@@ -14,7 +14,6 @@
 # effective.
 
 # environment overrides:
-#   DB_ARCHIVE	- path to db_archive to use
 #   AWK		- path to awk to use
 
 set -e
@@ -26,11 +25,10 @@ if [ ! -d $BOGOHOME ] ; then
     exit
 fi
 
-: ${DB_ARCHIVE:=db_archive}
 : ${AWK:=awk}
 
 a=0
-dbs=$(db_archive -s -a -h "$BOGOHOME")
+dbs=$(bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist' | cut -f3 -d,)
 if [ ! "$dbs" ] ; then
     echo >&2 "No database files in \"$BOGOHOME\" found"
     exit 1

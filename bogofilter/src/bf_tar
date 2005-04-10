@@ -55,7 +55,7 @@ fi
 # pax options: -w: write archive, -v: verbosely, -x ustar: choose tar
 # format.
 (
-  db_archive -a -s -h "$BOGOHOME"
+  bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist ' | cut -f3 -d,
   bogoutil --db-list-logfiles="$BOGOHOME" all absolute
 ) | pax -w -v -x ustar
 
