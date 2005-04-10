@@ -1009,9 +1009,9 @@
 
     <p>For BerkeleyDB 4.1 and newer, use these commands:
     <pre>	cd ~/.bogofilter
-	bogoutil -d wordlist.db > wordlist.txt
+	bogoutil -d wordlist.db &gt; wordlist.txt
 	mv wordlist.db wordlist.db.old
-	bogoutil --db-transaction=yes -l wordlist.db < wordlist.txt</pre>
+	bogoutil --db-transaction=yes -l wordlist.db &lt; wordlist.txt</pre>
     <hr>
 
     <h2 id="disable-transactions">How can I switch from transaction to
@@ -1022,10 +1022,10 @@
 
     <p>In brief, you can use bogoutil to dump/load the wordlist, for example:
     <pre>	cd ~/.bogofilter
-	bogoutil -d wordlist.db > wordlist.txt
+	bogoutil -d wordlist.db &gt; wordlist.txt
 	mv wordlist.db wordlist.db.old
 	rm -f log.?????????? __db.???
-	bogoutil --db-transaction=no -l wordlist.db < wordlist.txt</pre>
+	bogoutil --db-transaction=no -l wordlist.db &lt; wordlist.txt</pre>
 
     <hr>
 
@@ -1383,7 +1383,7 @@
     and an action to perform if it's spam </p>
 
     <pre>    condition:
-    * test "bogofilter < %F"
+    * test "bogofilter &lt; %F"
     action:
     * move "#mh/YOUR_SPAM_BOX"</pre>
 
@@ -1438,25 +1438,25 @@
     actions below will handle these cases:</p>
 
     <pre>    Register Spam:
-        bogofilter -s < "%f"
+        bogofilter -s &lt; "%f"
 
     Register Ham:
-        bogofilter -n < "%f"
+        bogofilter -n &lt; "%f"
 
     Unregister Spam:
-        bogofilter -S < "%f"
+        bogofilter -S &lt; "%f"
 
     Unregister Ham:
-        bogofilter -N < "%f"</pre>
+        bogofilter -N &lt; "%f"</pre>
 
     <p>To look inside the bogofilter scoring mechanism, the following
     diagnostic are useful:</p>
 
     <pre>    BogoTest -vv:
-        bogofilter -vv < "%f"
+        bogofilter -vv &lt; "%f"
 
     BogoTest -vvv:
-        bogofilter -vvv < "%f"</pre>
+        bogofilter -vvv &lt; "%f"</pre>
 
     <p>Additional information on this approach is available <a
     href="http://www.bogofilter.org/pipermail/bogofilter/2005-March/007815.html">here</a>.</p>
