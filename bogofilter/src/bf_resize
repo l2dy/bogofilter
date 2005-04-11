@@ -35,8 +35,7 @@ if [ ! "$dbs" ] ; then
 fi
 
 for i in $dbs ; do
-    pages=$(db_stat -h "$BOGOHOME" -d "$i" \
-	    | awk '/Number of tree leaf pages/ {print $1;}')
+    pages=$(bogoutil --db-print-leafpage-count "$i")
     a=$(( $a + $pages ))
 done
 
