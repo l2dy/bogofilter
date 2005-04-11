@@ -46,6 +46,7 @@ dsm_t dsm_dummies = {
     NULL,	/* dsm_remove           */
     NULL,	/* dsm_verify           */
     NULL,	/* dsm_list_logfiles    */
+    NULL	/* dsm_leafpages        */
 };
 
 dsm_t *dsm = &dsm_dummies;

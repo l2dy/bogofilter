@@ -74,7 +74,8 @@ dsm_t dsm_traditional = {
     NULL,		/* dsm_recover          */
     NULL,		/* dsm_remove           */
     NULL,		/* dsm_verify           */
-    NULL		/* dsm_list_logfiles    */
+    NULL,		/* dsm_list_logfiles    */
+    &db_leafpages	/* dsm_leafpages        */
 };
 
 DB_ENV *bft_get_env_dbe	(dbe_t *env)

@@ -96,7 +96,8 @@ dsm_t dsm_transactional = {
     &dbx_recover,
     &dbx_remove,
     &db_verify,
-    &dbx_list_logfiles
+    &dbx_list_logfiles,
+    &db_leafpages
 };
 
 /* non-OO static function prototypes */

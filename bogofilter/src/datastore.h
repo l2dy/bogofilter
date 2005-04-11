@@ -142,6 +142,7 @@ typedef struct {
     dsm_x_pp	 *dsm_remove;
     dsm_x_pp	 *dsm_verify;
     dsm_x_ppsi	 *dsm_list_logfiles;
+    dsm_u_pp	 *dsm_leafpages;
 } dsm_t;
 
 extern dsm_t *dsm;
@@ -312,6 +313,10 @@ extern ex_t ds_remove(bfpath *bfp);
 
 /** Verify given database */
 extern ex_t ds_verify(bfpath *bfp);
+
+/** Return leaf page count of given database, \return 0xffffffff for error,
+ * 0 if unknown. */
+extern u_int32_t ds_leafpages(bfpath *bfp);
 
 /** Return page size of given database, \return 0xffffffff for error, 0 for
  * variable sized pages or unpaged datastores. */

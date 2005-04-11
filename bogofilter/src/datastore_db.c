@@ -979,7 +979,11 @@ bool is_file_or_missing(const char* path) /*@globals errno,stderr@*/
     return false;
 }
 
-u_int32_t db_pagesize(bfpath *bfp)
+static u_int32_t db_do_getpsize(DB *db) {
+    return get_psize(db, true);
+}
+
+static u_int32_t db_dofile(bfpath *bfp, u_int32_t (*func)(DB *))
 {
     DB_ENV *dbe = NULL;
     DB *db;
@@ -1007,7 +1011,7 @@ u_int32_t db_pagesize(bfpath *bfp)
 		bfp->filename, db_strerror(e));
 	exit(EX_ERROR);
     }
-    s = get_psize(db, true);
+    s = func(db);
 
     e = db->close(db, 0);
     if (e != 0) {
@@ -1025,6 +1029,29 @@ u_int32_t db_pagesize(bfpath *bfp)
     }
 
     return s;
+}
+
+u_int32_t db_pagesize(bfpath *bfp) {
+    return db_dofile(bfp, db_do_getpsize);
+}
+
+static u_int32_t db_do_leafpages(DB *dbp) {
+    int ret;
+    u_int32_t c;
+    DB_BTREE_STAT *dbstat = NULL;
+
+    ret = BF_DB_STAT(dbp, NULL, &dbstat, 0);
+    if (ret) {
+	print_error(__FILE__, __LINE__, "DB->stat");
+	return 0xffffffff;
+    }
+    c = dbstat->bt_leaf_pg;
+    free(dbstat);
+    return c;
+}
+
+u_int32_t db_leafpages(bfpath *bfp) {
+    return db_dofile(bfp, db_do_leafpages);
 }
 
 ex_t db_verify(bfpath *bfp)

@@ -62,7 +62,7 @@ dsm_t dsm_sqlite = {
     NULL,	/* dsm_get_env_dbe      */
     NULL,	/* dsm_database_name    */
     NULL,	/* dsm_recover_open     */
-    NULL,	/* dsm_auto_commit_flags*/                    
+    NULL,	/* dsm_auto_commit_flags*/
     NULL,	/* dsm_get_rmw_flag     */
     NULL,	/* dsm_lock             */
     NULL,	/* dsm_common_close     */
@@ -74,7 +74,8 @@ dsm_t dsm_sqlite = {
     NULL,	/* dsm_recover          */
     NULL,	/* dsm_remove           */
     NULL,	/* dsm_verify           */
-    NULL	/* dsm_list_logfiles    */
+    NULL,	/* dsm_list_logfiles    */
+    NULL	/* dsm_leafpages        */
 };
 
 dsm_t *dsm = &dsm_sqlite;

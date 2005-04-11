@@ -17,6 +17,8 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 	2005-04-10
 
+	* Add --db-print-leafpage-count mode to bogoutil.
+
 	* Use bogofilter -QQ in bf_resize and bf_tar.
 
 	* Use bogoutil --db-list-logfiles in bf_copy and bf_tar.

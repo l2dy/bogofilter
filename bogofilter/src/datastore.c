@@ -64,7 +64,8 @@ static dsm_t dsm_dummies = {
     NULL,	/* dsm_recover          */
     NULL,	/* dsm_remove           */
     NULL,	/* dsm_verify           */
-    NULL	/* dsm_list_logfiles    */
+    NULL,	/* dsm_list_logfiles    */
+    NULL	/* dsm_leafpages        */
 };
 
 /* Function definitions */
@@ -529,6 +530,14 @@ ex_t ds_verify(bfpath *bfp)
 	return EX_OK;
     else
 	return dsm->dsm_verify(bfp);
+}
+
+u_int32_t ds_leafpages(bfpath *bfp)
+{
+    if (dsm->dsm_leafpages == NULL)
+	return 0;
+    else
+	return dsm->dsm_leafpages(bfp);
 }
 
 u_int32_t ds_pagesize(bfpath *bfp)

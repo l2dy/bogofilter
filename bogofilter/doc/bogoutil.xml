@@ -45,6 +45,7 @@
 	<cmdsynopsis>
 	    <command>bogoutil</command>
 	    <group choice="req">
+		<arg choice="plain">--db-print-leafpage-count <replaceable>file</replaceable></arg>
 		<arg choice="plain">--db-print-pagesize <replaceable>file</replaceable></arg>
 		<arg choice="plain">--db-verify <replaceable>file</replaceable></arg>
 		<arg choice="plain">--db-checkpoint
@@ -235,6 +236,12 @@
 	    this <emphasis>before</emphasis> upgrading to a new Berkeley
 	    DB version if the new version to be installed requires a log
 	    file format update.</para>
+	<para>The <option>--db-print-leafpage-count
+		<replaceable>file</replaceable></option> option prints
+	    the number of leaf pages in the database file 
+	    <replaceable>file</replaceable> as a decimal number, or
+	    UNKNOWN if the database does not support querying this
+	    figure.</para>
 	<para>The <option>--db-print-pagesize
 		<replaceable>file</replaceable></option> option prints
 	    the size of a database page in

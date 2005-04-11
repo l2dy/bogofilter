@@ -103,9 +103,13 @@ ex_t dbe_recover(bfpath *bfp, bool catastrophic, bool force);
 /** Remove the environment from \a directory. */
 ex_t dbe_remove(bfpath *bfp);
 
-/** Return page size of if \a databasefile, 0xffffffff for error, 0 for
+/** Return page size of \a databasefile, 0xffffffff for error, 0 for
  * unknown. */
 u_int32_t db_pagesize(bfpath *bfp);
+
+/** Return leaf page count of \a databasefile, 0xffffffff for error, 0 for
+ * unknown. */
+u_int32_t db_leafpages(bfpath *bfp);
 
 /** Check if \a databasefile is a valid database. */
 ex_t db_verify(bfpath *bfp);

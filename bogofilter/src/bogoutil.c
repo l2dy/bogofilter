@@ -463,6 +463,8 @@ static void usage(void)
 	    progname, DB_EXT);
     fprintf(stderr, "   or: %s [OPTIONS] {-H|-r|-R} file\n", progname);
 #if defined (ENABLE_DB_DATASTORE) || defined (ENABLE_SQLITE_DATASTORE)
+    fprintf(stderr, "   or: %s [OPTIONS] {--db-print-leafpage-count} file%s\n",
+	    progname, DB_EXT);
     fprintf(stderr, "   or: %s [OPTIONS] {--db-print-pagesize} file%s\n",
 	    progname, DB_EXT);
 #endif
@@ -554,6 +556,7 @@ static struct option longopts_bogoutil[] = {
     { "db-prune",                       R, 0, O_DB_PRUNE },
     { "db-checkpoint",                  R, 0, O_DB_CHECKPOINT },
     { "db-list-logfiles",               R, 0, O_DB_LIST_LOGFILES },
+    { "db-print-leafpage-count",	R, 0, O_DB_PRINT_LEAFPAGE_COUNT },
     { "db-print-pagesize",		R, 0, O_DB_PRINT_PAGESIZE },
     { "db-recover",                     R, 0, O_DB_RECOVER },
     { "db-recover-harder",              R, 0, O_DB_RECOVER_HARDER },
@@ -651,6 +654,12 @@ static int process_arg(int option, const char *name, const char *val)
 
     case 'w':
 	flag = M_WORD;
+	count += 1;
+	ds_file = val;
+	break;
+
+    case O_DB_PRINT_LEAFPAGE_COUNT:
+	flag = M_LEAFPAGES;
 	count += 1;
 	ds_file = val;
 	break;
@@ -794,6 +803,7 @@ static bfpath_mode get_mode(cmd_t cmd)
     case M_WORD:
     case M_CHECKPOINT:	/* database transaction/integrity operations */
     case M_CRECOVER:
+    case M_LEAFPAGES:
     case M_PAGESIZE:
     case M_PURGELOGS:
     case M_RECOVER:
@@ -842,60 +852,64 @@ int main(int argc, char *argv[])
 
     switch(flag) {
 	case M_RECOVER:
-	{
 	    ds_init(bfp);
 	    rc = ds_recover(bfp, false);
 	    break;
-	}
 	case M_CRECOVER:
-	{
 	    ds_init(bfp);
 	    rc = ds_recover(bfp, true);
 	    break;
-	}
 	case M_CHECKPOINT:
-	{
 	    ds_init(bfp);
 	    rc = ds_checkpoint(bfp);
 	    break;
-	}
 	case M_LIST_LOGFILES:
-	{
 	    dsm_init(bfp);
 	    rc = ds_list_logfiles(bfp, argc - optind, argv + optind);
 	    break;
-	}
 	case M_PURGELOGS:
-	{
 	    ds_init(bfp);
 	    rc = ds_purgelogs(bfp);
 	    break;
-	}
 	case M_REMOVEENV:
-	{
 	    dsm_init(bfp);
 	    rc = ds_remove(bfp);
 	    break;
-	}
 	case M_VERIFY:
-	{
 	    dsm_init(bfp);
 	    rc = ds_verify(bfp);
 	    break;
-	}
-	case M_PAGESIZE:
-	{
-	    u_int32_t s;
-	    dsm_init(bfp);
-	    s = ds_pagesize(bfp);
-	    if (s == 0xffffffff)
-		fprintf(stderr, "%s: error getting page size.\n", ds_file);
-	    else if (s == 0)
-		printf("UNKNOWN\n");
-	    else
-		printf("%lu\n", (unsigned long)s);
+	case M_LEAFPAGES:
+	    {
+		u_int32_t c;
+
+		dsm_init(bfp);
+		c = ds_leafpages(bfp);
+		if (c == 0xffffffff) {
+		    fprintf(stderr, "%s: error getting leaf page count.\n", ds_file);
+		    rc = EX_ERROR;
+		} else if (c == 0) {
+		    puts("UNKNOWN");
+		} else {
+		    printf("%lu\n", (unsigned long)c);
+		}
+	    }
 	    break;
-	}
+	case M_PAGESIZE:
+	    {
+		u_int32_t s;
+
+		dsm_init(bfp);
+		s = ds_pagesize(bfp);
+		if (s == 0xffffffff) {
+		    fprintf(stderr, "%s: error getting page size.\n", ds_file);
+		} else if (s == 0) {
+		    puts("UNKNOWN");
+		} else {
+		    printf("%lu\n", (unsigned long)s);
+		}
+	    }
+	    break;
 	case M_DUMP:
 	    rc = dump_wordlist(bfp);
 	    break;
