@@ -13,12 +13,14 @@ echo bacon on toast | $BOGOFILTER -C -d ${TMPDIR} -n $addarg
 echo foul eggs      | $BOGOFILTER -C -d ${TMPDIR} -s $addarg
 
 # see that these do not crash
-$BOGOUTIL -v -V 2>/dev/null
-$BOGOUTIL -h 2>/dev/null
+$BOGOUTIL -C -v -V 2>/dev/null
+$BOGOUTIL -C -h 2>/dev/null
 
 # check if bogoutil can count ;-)
-echo >${TMPDIR}/ref "6 tokens dumped"
-$BOGOUTIL -C -v -d ${TMPDIR}/wordlist.$DB_EXT 2>&1 >/dev/null \
+cat <<_EOF >${TMPDIR}/ref
+6 tokens dumped
+_EOF
+$BOGOUTIL -C -v -d ${TMPDIR}/wordlist.$DB_EXT -D | tail -1 \
 | cmp -s - ${TMPDIR}/ref
 
 # ROBX calculation cannot work, insufficient data
@@ -52,18 +54,22 @@ fi
 
 if [ $DB_TYPE = db ] ; then
     $BOGOUTIL -C --db-verify ${TMPDIR}/wordlist.$DB_EXT
+    pc=`$BOGOUTIL -C --db-print-leafpage-count ${TMPDIR}/wordlist.$DB_EXT`
+    test "$pc" != ""
+    test "$pc" != "UNKNOWN"
+    test "$pc" != "0"
 
     if [ $DB_TXN = true ] ; then
-	$BOGOUTIL --db-recover ${TMPDIR}/
-	$BOGOUTIL --db-checkpoint ${TMPDIR}/
+	$BOGOUTIL -C --db-recover ${TMPDIR}/
+	$BOGOUTIL -C --db-checkpoint ${TMPDIR}/
 	if ls "${TMPDIR}/log."* >/dev/null 2>&1 ; then
-	    $BOGOUTIL --db-prune ${TMPDIR}/
+	    $BOGOUTIL -C --db-prune ${TMPDIR}/
 	    ( cd ${TMPDIR} ; ls log.* >logs.1 )
-	    $BOGOUTIL --db-list-logfiles "${TMPDIR}" all >"${TMPDIR}/logs.2"
+	    $BOGOUTIL -C --db-list-logfiles "${TMPDIR}" all >"${TMPDIR}/logs.2"
 	    cmp ${TMPDIR}/logs.{1,2}
 	fi
 	if ls "${TMPDIR}/__db."* >/dev/null 2>&1 ; then
-	    $BOGOUTIL --db-remove-environment ${TMPDIR}/
+	    $BOGOUTIL -C --db-remove-environment ${TMPDIR}/
 	    if ls "${TMPDIR}/__db."* >/dev/null 2>&1 ; then
 		false
 	    fi
