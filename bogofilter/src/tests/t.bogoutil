@@ -2,7 +2,9 @@
 
 . ${srcdir:=.}/t.frame
 
+#
 # test common bogoutil functions
+#
 
 # initialize
 rm ${TMPDIR}/* # reset TXN detection
@@ -10,6 +12,7 @@ if [ $DB_TXN = true ] ; then addarg=--db-transaction=yes ; else addarg= ; fi
 echo bacon on toast | $BOGOFILTER -C -d ${TMPDIR} -n $addarg
 echo foul eggs      | $BOGOFILTER -C -d ${TMPDIR} -s $addarg
 
+# see that these do not crash
 $BOGOUTIL -v -V 2>/dev/null
 $BOGOUTIL -h 2>/dev/null
 
@@ -55,6 +58,9 @@ if [ $DB_TYPE = db ] ; then
 	$BOGOUTIL --db-checkpoint ${TMPDIR}/
 	if ls "${TMPDIR}/log."* >/dev/null 2>&1 ; then
 	    $BOGOUTIL --db-prune ${TMPDIR}/
+	    ( cd ${TMPDIR} ; ls log.* >logs.1 )
+	    $BOGOUTIL --db-list-logfiles "${TMPDIR}" all >"${TMPDIR}/logs.2"
+	    cmp ${TMPDIR}/logs.{1,2}
 	fi
 	if ls "${TMPDIR}/__db."* >/dev/null 2>&1 ; then
 	    $BOGOUTIL --db-remove-environment ${TMPDIR}/
