@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#  bf_compact source_dir [wordlist_name]
+#  bf_compact source_dir [wordlist_name...]
 #
 #    use to compact wordlist.db
 #    replaces original directory with new one
@@ -11,11 +11,12 @@
 set -e # die on errors
 
 if [ -z "$1" ] ; then
-    echo usage: bf_compact source_dir [wordlist_name]
+    echo usage: bf_compact source_dir [wordlist_name...]
     exit 1
 fi
 
 BOGOHOME="$1"
+shift
 
 if [ ! -d $BOGOHOME ] ; then
     echo "$BOGOHOME must be a directory. Abort."
@@ -29,10 +30,10 @@ while true; do
     esac
 done
 
-if [ -z "$2" ] ; then
-    FILE="wordlist.db"
+if [ -z "$1" ] ; then
+    FILE=$(bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist' | cut -f3 -d,)
 else
-    FILE="$2"
+    FILE="$@"
 fi
 
 TEMP="bf_compact.$$"
@@ -45,7 +46,9 @@ fi
 if test -f "$BOGOHOME"/DB_CONFIG ; then
     cp -p "$BOGOHOME"/DB_CONFIG "$TEMP"/
 fi
-bogoutil -d "$BOGOHOME"/"$FILE" | bogoutil -l $TEMP/"$FILE"
+for i in $FILE ; do
+    bogoutil -d "$BOGOHOME"/"$i" | bogoutil -l $TEMP/"$i"
+done
 
 #checkpoint and remove unneeded log files
 bogoutil --db-prune=$TEMP
