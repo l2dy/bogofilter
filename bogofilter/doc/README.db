@@ -5,7 +5,14 @@ $Id$
 
 This document does not apply when you are installing a bogofilter
 version that has been configured to use the QDBM, SQLite3 or TDB
-database libraries.
+database libraries. Common entry points are these
+
+QUICK LINKS:
+------------
+Lock table exhaustion                         section 3.2
+Upgrade of Berkeley DB or operating system    section 2.6
+Switching on or off transactions              section 2.2.1 or 2.2.2
+Recover broken database                       section 3.3 or 3.4
 
 0. Definitions ---------------------------------------------------------
 
@@ -180,19 +187,24 @@ If you need a log file upgrade, the upgrade procedure is:
 (NOTE: DO NOT UPGRADE BERKELEY DB OR BOGOFILTER UNTIL STEP 4!)
 
   1. shut down your mail system,
-  2. run 'bogoutil --db-remove-environment ~/.bogofilter' (for each user)
-     (this implies running forced recovery first)
-  3. archive the database for catastrophic recovery (take a backup)
+  2. run 'bogoutil --db-remove-environment ~/.bogofilter' (for each user!)
+     (this will automatically recover the environment)
+  3. archive the database for catastrophic recovery (make a backup)
   4. install the new Berkeley DB version, recompile bogofilter (unless
      using a binary package), install the new bogofilter
-  5. restart your mail system.
+  5. start your mail system.
 
 If you've been using Berkeley DB 3.0 (only supported with bogofilter
 versions 0.17.2 and older) and are about to update to any newer 3.X or
 4.X version, you need a database format upgrade. You can either:
-- dump the wordlists to a text file, then update Berkeley DB
-  and bogofilter, then load the wordlists again;
+
+- dump the wordlists to a text file, then update Berkeley
+  DB and bogofilter, remove the wordlists and load them from the dump.
+  The procedure is the same as in section 2.2.1 or 2.2.2 (depending on
+  whether you want to use transactions or not).
+
 or
+
 - use the db_upgrade utility to upgrade the databases in place
   (this is dangerous and must not be interrupted, backup first!)
 
