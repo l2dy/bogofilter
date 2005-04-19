@@ -56,13 +56,6 @@ void bogohome_cleanup(void)
     bogohome = NULL;
 }
 
-void bfpath_set_bogohome_using_priority(priority_t p)
-{
-    const char *h = get_directory(p);
-    set_bogohome(h);
-    return;
-}
-
 int set_wordlist_dir(const char* d, priority_t precedence)
 {
     int rc = 0;
@@ -292,24 +285,6 @@ bool check_directory(const char* path) /*@globals errno,stderr@*/
     }
     return true;
 }
-
-#if	0
-bool is_file(const char* path) /*@globals errno,stderr@*/
-{
-    bool ok;
-
-    if (path == NULL || *path == '\0')
-	ok = false;
-    else {
-	struct stat sb;
-	int rc = stat(path, &sb);
-
-	ok = (rc == 0) && !S_ISDIR(sb.st_mode);
-    }
-
-    return ok;
-}
-#endif
 
 /** returns malloc()ed copy of the file name part of \a path.
  */

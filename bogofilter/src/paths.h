@@ -48,7 +48,6 @@ bfpath *bfpath_create(const char *path);
 bfpath *bfpath_initialize(bfpath *bfp, bfpath_mode mode);
 void	bfpath_update(bfpath *bfp);
 void	bfpath_set_mode(bfpath_mode mode);
-void	bfpath_set_bogohome_using_priority(priority_t p);
 bool	bfpath_check_mode(bfpath *bfp, bfpath_mode mode);
 bfpath *bfpath_fixup(bfpath *path);
 bfpath *bfpath_free(bfpath *path);
