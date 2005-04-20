@@ -15,6 +15,12 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
+	2005-04-20
+
+	* Allow file names relative to current directory without leading ./
+	  avoiding bogus "cannot normalize path "(null)": Invalid argument"
+	  errors or crashes.
+
 	2005-04-10
 
 	* Use bogoutil --db-print-leafpage-count in bf_resize.
