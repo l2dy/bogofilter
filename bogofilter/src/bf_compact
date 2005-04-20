@@ -15,6 +15,7 @@ if [ -z "$1" ] ; then
     exit 1
 fi
 
+# extract home directory
 BOGOHOME="$1"
 shift
 
@@ -23,6 +24,7 @@ if [ ! -d $BOGOHOME ] ; then
     exit 1
 fi
 
+# strip trailing slashes
 while true; do
     case $BOGOHOME in
 	*/) BOGOHOME=${BOGOHOME%/} ;;
@@ -30,6 +32,7 @@ while true; do
     esac
 done
 
+# find wordlist default
 if [ -z "$1" ] ; then
     FILE=$(bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist' | cut -f3 -d,)
 else
@@ -43,15 +46,28 @@ if ! mkdir "$TEMP" ; then
     exit 1
 fi
 
+# copy Berkeley DB configuration if present
 if test -f "$BOGOHOME"/DB_CONFIG ; then
     cp -p "$BOGOHOME"/DB_CONFIG "$TEMP"/
 fi
-for i in $FILE ; do
-    bogoutil -d "$BOGOHOME"/"$i" | bogoutil -l $TEMP/"$i"
+
+# determine transactions
+trans=no
+if test "$(find "$BOGOHOME/" -name "log.??????????" -print)" != "" ; then
+    trans=yes
+fi
+
+# reload files
+for j in $FILE ; do
+    i=$(basename "$j")
+    bogoutil -d "$BOGOHOME"/"$i" | bogoutil --db-transaction=$trans -l $TEMP/"$i"
 done
 
 #checkpoint and remove unneeded log files
 bogoutil --db-prune=$TEMP
 
+# remove $BOGOHOME.old so we don't move the new backup *into* it
+# rather than renaming the backup to it.
+rm -rf "$BOGOHOME.old"
 mv "$BOGOHOME" "$BOGOHOME.old"
 mv  $TEMP      "$BOGOHOME"

@@ -17,6 +17,12 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 	2005-04-20
 
+	* bf_compact now removes the $BOGOHOME.old directory before renaming
+	  the backup to this name, to avoid nested backup directories.
+
+	* Let bf_compact maintain current state of transactions vs.
+	  non-transactions. (Bug report: Bill McClain)
+
 	* Allow file names relative to current directory without leading ./
 	  avoiding bogus "cannot normalize path "(null)": Invalid argument"
 	  errors or crashes.
