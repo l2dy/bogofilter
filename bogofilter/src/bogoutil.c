@@ -850,6 +850,9 @@ int main(int argc, char *argv[])
 	exit(EX_ERROR);
     }
 
+    if (bfp->dirname == NULL)
+	bfp->dirname = xstrdup(CURDIR_S);
+
     switch(flag) {
 	case M_RECOVER:
 	    ds_init(bfp);

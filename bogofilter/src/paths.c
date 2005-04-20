@@ -150,10 +150,9 @@ bool bfpath_check_mode(bfpath *bfp, bfpath_mode m)
 
     if (bfp->filepath != NULL && bfp->dirname == NULL && bfp->filename == NULL) {
 	char *t = strrchr(bfp->filepath, DIRSEP_C);
-	if (t == NULL) {
+	if (t == NULL) 
 	    bfp->filename = xstrdup(bfp->filepath);
-	    bfp->dirname = xstrdup(CURDIR_S);
-	} else {
+	else {
 	    bfp->dirname = xstrdup(bfp->filepath);
 	    bfp->dirname[t - bfp->filepath] = '\0';
 	    bfp->filename = xstrdup(t+1);
@@ -307,7 +306,7 @@ char *get_directory_from_path(const char *path)
     char *last = strrchr(dir, DIRSEP_C);
     if (last == NULL) {
 	xfree(dir);
-	return xstrdup(CURDIR_S);
+	return NULL;
     }
     else {
 	*last = '\0';

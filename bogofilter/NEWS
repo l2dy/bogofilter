@@ -23,10 +23,6 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 	* Let bf_compact maintain current state of transactions vs.
 	  non-transactions. (Bug report: Bill McClain)
 
-	* Allow file names relative to current directory without leading ./
-	  avoiding bogus "cannot normalize path "(null)": Invalid argument"
-	  errors or crashes.
-
 	2005-04-10
 
 	* Use bogoutil --db-print-leafpage-count in bf_resize.
