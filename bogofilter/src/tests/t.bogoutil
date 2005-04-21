@@ -46,6 +46,13 @@ $BOGOUTIL -C -p ${WORDLIST} .ROBX | egrep '^\.ROBX' >/dev/null
 echo "head:toast" | $BOGOUTIL -C -p ${WORDLIST} \
 | egrep '^head:toast' >/dev/null
 
+#test with wordlist in current directory
+(cd ${TMPDIR} ; \
+    pwd ; \
+    ../${relpath}/bogoutil$EXE_EXT -C -w wordlist.${DB_EXT} .MSG_COUNT ; \
+    ../${relpath}/bogoutil$EXE_EXT -C -p wordlist.${DB_EXT} .MSG_COUNT ; \
+)
+
 if [ $DB_TYPE = db ] || [ $DB_TYPE = sqlite ] ; then
     ps=`$BOGOUTIL -C --db-print-pagesize ${WORDLIST}`
     test -n "$ps"
