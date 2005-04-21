@@ -283,6 +283,14 @@ static bool check_path(bfpath *bfp)
     char norm_dir[PATH_MAX+1]; /* check normalized directory names */
     static char norm_home[PATH_MAX+1];/* see man realpath(3) for details */
 
+    /* Only bogofilter (with transactions) has to worry about multiple environments */
+    if (!fBogofilter || !fTransaction)
+	return true;
+
+    /* If bogohome not yet set, skip check */
+    if (bfp->dirname == NULL || bogohome == NULL)
+	return true;
+
     if (realpath(t = bfp->dirname, norm_dir) == NULL ||
 	realpath(t = bogohome, norm_home) == NULL) {
 	print_error(__FILE__, __LINE__,

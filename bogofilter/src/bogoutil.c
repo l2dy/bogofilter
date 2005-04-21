@@ -847,13 +847,17 @@ int main(int argc, char *argv[])
     bfp = bfpath_create(ds_file);
     mode = get_mode(flag);
 
+    if (!check_bogohome()) {
+	fprintf(stderr, "Can't find HOME or BOGOFILTER_DIR in environment.\n");
+	exit(EX_ERROR);
+    }
+
+    bfpath_update(bfp);
+
     if (!bfpath_check_mode(bfp, mode)) {
 	fprintf(stderr, "Can't open wordlist '%s'\n", bfp->filepath);
 	exit(EX_ERROR);
     }
-
-    if (bfp->dirname == NULL)
-	bfp->dirname = xstrdup(CURDIR_S);
 
     switch(flag) {
 	case M_RECOVER:
