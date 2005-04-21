@@ -276,36 +276,24 @@ static void handle_free(/*@only@*/ dbh_t *handle)
     return;
 }
 
-static bool checkpath(const char *path, char *norm)
+/* Ensure that only a single database environment is specified */
+static bool check_path(bfpath *bfp)
 {
-    if (realpath(path, norm) != NULL)
-	return true;
-    else {
+    const char *t;
+    char norm_dir[PATH_MAX+1]; /* check normalized directory names */
+    static char norm_home[PATH_MAX+1];/* see man realpath(3) for details */
+
+    if (realpath(t = bfp->dirname, norm_dir) == NULL ||
+	realpath(t = bogohome, norm_home) == NULL) {
 	print_error(__FILE__, __LINE__,
 		    "error: cannot normalize path \"%s\": %s",
-		    path, strerror(errno));
-	return false;
+		    t, strerror(errno));
+	return true;
     }
-}
 
-/** Initialize data base, configure some lock table sizes
- * (which can be overridden in the DB_CONFIG file)
- * and lock the file to tell other parts we're initialized and
- * do not want recovery to stomp over us.
- */
-void *dbe_init(bfpath *bfp)
-{
-    char norm_dir[PATH_MAX+1]; /* check normalized directory names */
-    char norm_home[PATH_MAX+1];/* see man realpath(3) for details */
-
-    dbe_t *env;
-
-    if ( !checkpath(bfp->dirname, norm_dir) ||
-	 !checkpath(bogohome, norm_home))
-	exit(EX_ERROR);
-
-    if (strcmp(norm_dir, norm_home) != 0)
-    {
+    if (strcmp(norm_dir, norm_home) == 0)
+	return true;
+    else {
 	fprintf(stderr,
 		"ERROR: only one database _environment_ (directory) can be used at a time.\n"
 		"You CAN use multiple wordlists that are in the same directory.\n\n");
@@ -318,8 +306,21 @@ void *dbe_init(bfpath *bfp)
 		"Please accept our apologies for the inconvenience.\n");
 	fprintf(stderr,
 		"\nAborting program\n");
-	exit(EX_ERROR);
+	return false;
     }
+}
+
+/** Initialize data base, configure some lock table sizes
+ * (which can be overridden in the DB_CONFIG file)
+ * and lock the file to tell other parts we're initialized and
+ * do not want recovery to stomp over us.
+ */
+void *dbe_init(bfpath *bfp)
+{
+    dbe_t *env;
+
+    if (!check_path(bfp))
+	exit(EX_ERROR);
 
     dsm_init(bfp);
     
