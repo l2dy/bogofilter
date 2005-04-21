@@ -193,8 +193,7 @@ void process_parameters(int argc, char **argv, bool warn_on_error)
 
     /* directories from command line and config file are already handled */
 
-    if (set_wordlist_dir(NULL, PR_ENV_BOGO) != 0 &&
-	set_wordlist_dir(NULL, PR_ENV_HOME) != 0) {
+    if (!check_bogohome()) {
 	fprintf(stderr, "Can't find HOME or BOGOFILTER_DIR in environment.\n");
 	exit(EX_ERROR);
     }

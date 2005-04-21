@@ -50,6 +50,12 @@ void set_bogohome(const char *path)
     }
 }
 
+bool check_bogohome(void)
+{
+    return (set_wordlist_dir(NULL, PR_ENV_BOGO) == 0 ||
+	    set_wordlist_dir(NULL, PR_ENV_HOME) == 0);
+}
+
 void bogohome_cleanup(void)
 {
     xfree(bogohome);
