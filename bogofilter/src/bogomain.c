@@ -42,6 +42,8 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     ex_t exitcode = EX_OK;
     bfpath_mode mode;
 
+    fBogofilter = true;
+
     dbgout = stderr;
 
     progtype = build_progtype(progname, DB_TYPE);

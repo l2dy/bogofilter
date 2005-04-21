@@ -826,6 +826,8 @@ int main(int argc, char *argv[])
     bfpath *bfp;
     bfpath_mode mode;
 
+    fBogoutil = true;
+
     signal_setup();			/* setup to catch signals */
 
     progtype = build_progtype(progname, DB_TYPE);
