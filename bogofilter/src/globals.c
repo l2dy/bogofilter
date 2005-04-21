@@ -16,6 +16,10 @@ AUTHOR:
 
 /* exports */
 
+bool 	fBogofilter = false;
+bool 	fBogotune   = false;
+bool 	fBogoutil   = false;
+
 /* command line options */
 
 bulk_t	bulk_mode = B_NORMAL;		/* '-b, -B' */
@@ -52,9 +56,6 @@ bool fTransaction = false;
 #else
 bool fTransaction = true;
 #endif
-
-/* for  bogotune */
-bool 	fBogotune = false;
 
 /* for  bogoconfig.c, prob.c, rstats.c and score.c */
 double	robx = 0.0;

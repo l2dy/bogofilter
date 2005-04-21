@@ -13,6 +13,13 @@
 typedef int  bool;
 #endif
 
+extern	bool	fBogotune;
+extern	bool	fBogoutil;
+extern	bool	fBogofilter;
+
+/* for  transactions */
+extern	bool	fTransaction;
+
 /* command line options */
 extern	bulk_t	bulk_mode;		/* '-B' */
 extern	bool	suppress_config_file;	/* '-C' */
@@ -88,15 +95,9 @@ extern	double robx;
 extern	double sp_esf;
 extern	double ns_esf;
 
-/* for  bogotune */
-extern	bool fBogotune;
-
 /* for  BerkeleyDB */
 #define	DB_CACHESIZE	4	/* in MB */
 extern	uint	db_cachesize;
-
-/* for  transactions */
-extern	bool	fTransaction;
 
 /* other */
 
