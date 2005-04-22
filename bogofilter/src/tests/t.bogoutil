@@ -92,4 +92,4 @@ cd ${TMPDIR}
 $BOGOUTIL -C -w $WORDLIST .MSG_COUNT >/dev/null
 $BOGOUTIL -C -p $WORDLIST .MSG_COUNT >/dev/null
 PRINTCORE=$OPC
-cd -
+cd - >/dev/null
