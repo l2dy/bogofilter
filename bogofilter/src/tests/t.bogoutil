@@ -78,13 +78,18 @@ if [ $DB_TYPE = db ] ; then
 fi
 
 #test with wordlist in current directory
-BOGOUTIL="$VAL ../${relpath}/bogoutil$EXE_EXT"
+BOGOUTIL="$VAL `pwd`/${relpath}/bogoutil$EXE_EXT"
 WORDLIST="wordlist.${DB_EXT}"
-PRINTCORE=${srcdir}/$INSERT/printcore
+OPC=$PRINTCORE
+case $srcdir in
+    /*)	PRINTCORE=${srcdir}/$INSERT/printcore ;;
+    *)	PRINTCORE=`pwd`/$srcdir/$INSERT/printcore ;;
+esac
 
 unset BOGOFILTER_DIR
 
 cd ${TMPDIR}
 $BOGOUTIL -C -w $WORDLIST .MSG_COUNT >/dev/null
 $BOGOUTIL -C -p $WORDLIST .MSG_COUNT >/dev/null
-cd ..
+PRINTCORE=$OPC
+cd -
