@@ -276,12 +276,21 @@ static void handle_free(/*@only@*/ dbh_t *handle)
     return;
 }
 
-/* Ensure that only a single database environment is specified */
+static bool xstat(const char *path, struct stat *st)
+{
+    int e = stat(path, st);
+    if (e) {
+	fprintf(stderr, "Cannot stat \"%s\": %s\n",
+		path, strerror(errno));
+    }
+    return e;
+}
+
+/** Ensure that only a single database environment is specified,
+ * \return true for success */
 static bool check_path(bfpath *bfp)
 {
-    const char *t;
-    char norm_dir[PATH_MAX+1]; /* check normalized directory names */
-    static char norm_home[PATH_MAX+1];/* see man realpath(3) for details */
+    struct stat stdn, stbh;
 
     /* Only bogofilter (with transactions) has to worry about multiple environments */
     if (!fBogofilter || !fTransaction)
@@ -291,15 +300,14 @@ static bool check_path(bfpath *bfp)
     if (bfp->dirname == NULL || bogohome == NULL)
 	return true;
 
-    if (realpath(t = bfp->dirname, norm_dir) == NULL ||
-	realpath(t = bogohome, norm_home) == NULL) {
-	print_error(__FILE__, __LINE__,
-		    "error: cannot normalize path \"%s\": %s",
-		    t, strerror(errno));
-	return true;
-    }
+    /* XXX FIXME: If we cannot stat, skip check for now.
+     * We should probably handle this condition but then again when
+     * bootstrapping a setup a missing environment is probably OK */
+    if (xstat(bfp->dirname, &stdn)) return true;
+    if (xstat(bogohome, &stbh)) return true;
 
-    if (strcmp(norm_dir, norm_home) == 0)
+    if (stdn.st_dev == stbh.st_dev
+	    && stdn.st_ino == stbh.st_ino)
 	return true;
     else {
 	fprintf(stderr,
