@@ -15,6 +15,10 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
+0.94.5	2005-04-23
+
+	* Fixed database open bug in bogoutil.
+
 	2005-04-20
 
 	* bf_compact now removes the $BOGOHOME.old directory before renaming
