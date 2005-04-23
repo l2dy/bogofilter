@@ -834,6 +834,8 @@ int main(int argc, char *argv[])
 
     set_today();			/* compute current date for token age */
 
+    set_bogohome( "." );		/* set default */
+
     process_arglist(argc, argv);
     process_config_files(false, longopts_bogoutil);	/* need to read lock sizes */
 
@@ -846,11 +848,6 @@ int main(int argc, char *argv[])
 
     bfp = bfpath_create(ds_file);
     mode = get_mode(flag);
-
-    if (!check_bogohome()) {
-	fprintf(stderr, "Can't find HOME or BOGOFILTER_DIR in environment.\n");
-	exit(EX_ERROR);
-    }
 
     bfpath_update(bfp);
 
