@@ -33,6 +33,7 @@ AUTHORS:
 #include "longoptions.h"
 #include "maint.h"
 #include "msgcounts.h"
+#include "mxcat.h"
 #include "paths.h"
 #include "prob.h"
 #include "robx.h"
@@ -847,13 +848,20 @@ int main(int argc, char *argv[])
     }
 
     bfp = bfpath_create(ds_file);
-    mode = get_mode(flag);
-
     bfpath_update(bfp);
 
+    mode = get_mode(flag);
     if (!bfpath_check_mode(bfp, mode)) {
 	fprintf(stderr, "Can't open wordlist '%s'\n", bfp->filepath);
 	exit(EX_ERROR);
+    }
+
+    if (bfp->isdir &&
+	(bfp->filename == NULL || strcmp(bfp->filename, ".") == 0)) {
+	const char *filename = mxcat(bfp->dirname, DIRSEP_S, WORDLIST, NULL);
+	bfpath_free(bfp);
+	bfp = bfpath_create(filename);
+	bfpath_update(bfp);
     }
 
     switch(flag) {
