@@ -18,6 +18,7 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 	2005-04-24
 
 	* Added db-3.2.9 compatibility macro for db->stat().
+	* Updated bogominitrain.pl to v1.6
 
 0.94.5	2005-04-23
 

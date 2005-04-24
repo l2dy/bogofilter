@@ -6,6 +6,7 @@
 # Program locations
 my $bogofilter="bogofilter";
 my $bogoutil="bogoutil";
+my $bf_compact="bf_compact";
 my $catcommand="bzcat -f";
 
 # Not correct number of parameters
@@ -13,8 +14,8 @@ my $commandlineoptions=($ARGV[0]=~/^-(?=[^c]*c?[^c]*$)(?=[^f]*f?[^f]*$)(?=[^n]*n
 unless (scalar(@ARGV)-$commandlineoptions==3 || scalar(@ARGV)-$commandlineoptions==4) {
   print <<END;
 
-bogominitrain.pl version 1.5.2
-  requires bogofilter 0.17 or later
+bogominitrain.pl version 1.6
+  requires bogofilter 0.94.4 or later
 
 Usage:
   bogominitrain.pl [-[f][v[v]][s]] <database-directory> <ham-mboxes>\\
@@ -83,7 +84,7 @@ my $runs=0;
 my @status=("S","H","U","E");
 
 print "\nStarting with this database:\n";
-print `$bogoutil -w $dir .MSG_COUNT`,"\n";
+print `$bogoutil -w $dir/wordlist.db .MSG_COUNT`,"\n";
 
 do { # Start force loop
   my $starttime=time;
@@ -173,18 +174,19 @@ do { # Start force loop
   print "Added $hamadd ham mail",$hamadd!=1&&"s",$skipham>0&&" (skipping $skipham)",
         " and $spamadd spam mail",$spamadd!=1&&"s",$skipspam>0&&" (skipping $skipspam)",
         " to the database.\n";
-  print `$bogoutil -w $dir .MSG_COUNT`;
-  unless ($runs>1 && $hamadd+$spamadd==0) {
+  print `$bogoutil -w $dir/wordlist.db .MSG_COUNT`;
+  unless ($hamadd+$spamadd==0) {
+    $starttime=time;
     $fn=$spamcount>0 && `$catcommand $spam | $bogofilter -TM | grep -cv ^S` || "0\n";
     print "\nFalse negatives: $fn";
     $fp=$hamcount>0 && `$catcommand $ham | $bogofilter -TM | grep -cv ^H` || "0\n";
     print "False positives: $fp\n";
+    print "Verification done in ",time-$starttime,"s.\n\n";
   }
 } until ($fn+$fp==0 || $hamadd+$spamadd==0 || !$force);
 print "\n$runs run",$runs>1&&"s"," needed to close off.\n" if ($force);
 if ($compact) {
   print "Compacting database ...\n";
-  system("$bogoutil -d $dir/wordlist.db | $bogoutil -l $dir/bogominitrain.db");
-  rename("$dir/bogominitrain.db","$dir/wordlist.db");
+  system("$bf_compact $dir && rm -rf $dir.old");
 }
 
