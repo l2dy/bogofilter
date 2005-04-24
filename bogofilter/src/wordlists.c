@@ -162,7 +162,7 @@ static void check_wordlist_path(wordlist_t *list)
 	mode = BFP_MAY_CREATE;
 
     bfpath_check_mode(bfp, mode);
-    bfpath_update(bfp);
+    bfpath_set_bogohome(bfp);
 }
 
 /* set bogohome using first wordlist's directory

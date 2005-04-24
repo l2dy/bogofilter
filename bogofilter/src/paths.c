@@ -115,17 +115,35 @@ char *get_directory(priority_t which)
     return dir;
 }
 
+static bfpath *bfpath_split(bfpath *bfp, const char *home)
+{
+    /* precondition:  bfp->dirname and bfp->filename free'd if need be */
+    char *t = strrchr(bfp->filepath, DIRSEP_C);
+    if (t != NULL) {
+	/* if directory separator present .... */
+	*t = '\0';
+	bfp->dirname = xstrdup(bfp->filepath);
+	*t = DIRSEP_C;
+	bfp->filename = xstrdup(t+1);
+    }
+    else if (home != NULL){
+	bfp->dirname = xstrdup(home);
+	bfp->filename = bfp->filepath;
+	bfp->filepath = mxcat(bfp->dirname, DIRSEP_S, bfp->filename, NULL);
+    }
+    else {
+	bfp->dirname = NULL;
+	bfp->filename = xstrdup(bfp->filepath);
+    }
+
+    return bfp;
+}
+
 bfpath *bfpath_create(const char *path)
 {
     bfpath *bfp = xcalloc(1, sizeof(bfpath));
     bfp->filepath = xstrdup(path);
-    return bfp;
-}
-
-bfpath *bfpath_create_update(const char *path)
-{
-    bfpath *bfp = bfpath_create(path);
-    bfpath_update(bfp);
+    bfpath_split(bfp, bogohome);
     return bfp;
 }
 
@@ -191,26 +209,12 @@ bool bfpath_check_mode(bfpath *bfp, bfpath_mode m)
     return ok;
 }
 
-void bfpath_update(bfpath *bfp)
+void bfpath_set_bogohome(bfpath *bfp)
 {
-    char *t = strrchr(bfp->filepath, DIRSEP_C);
-
     xfree(bfp->dirname);
     xfree(bfp->filename);
-
-    if (t != NULL) {
-	/* if directory separator present .... */
-	*t = '\0';
-	bfp->dirname = xstrdup(bfp->filepath);
-	*t = DIRSEP_C;
-	bfp->filename = xstrdup(t+1);
-    }
-    else {
-	/* if directory separator not present, use bogohome */
-	bfp->dirname = xstrdup(bogohome);
-	bfp->filename = bfp->filepath;
-	bfp->filepath = mxcat(bfp->dirname, DIRSEP_S, bfp->filename, NULL);
-    }
+    
+    bfpath_split(bfp, bogohome);
 }
 
 bfpath *bfpath_free(bfpath *bfp)
