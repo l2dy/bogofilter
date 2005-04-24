@@ -35,10 +35,16 @@
 #endif
 #endif
 
-/* DB->stat interface changed in 4.3 */
+/* DB->stat interface changed in 3.3 and in 4.3 */
+#if DB_AT_MOST(3,2)
+#define BF_DB_STAT(d, t, s, f) ((d)->stat((d), (s), NULL, (f)))
+#endif
+
 #if DB_AT_LEAST(4,3)
 #define BF_DB_STAT(d, t, s, f) ((d)->stat((d), (t), (s), (f)))
-#else
+#endif
+
+#ifndef BF_DB_STAT
 #define BF_DB_STAT(d, t, s, f) ((d)->stat((d), (s), (f)))
 #endif
 

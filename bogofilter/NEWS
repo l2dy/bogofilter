@@ -15,6 +15,10 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
+	2005-04-24
+
+	* Added db-3.2.9 compatibility macro for db->stat().
+
 0.94.5	2005-04-23
 
 	* Fixed database open bug in bogoutil.
