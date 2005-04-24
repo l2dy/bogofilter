@@ -24,11 +24,11 @@
 	    <arg choice="opt">options</arg>
 	    <group choice="req">
 		<arg choice="plain">-d <replaceable>file</replaceable></arg>
-		<arg choice="plain">-H</arg>
+		<arg choice="plain">-H <replaceable>file</replaceable></arg>
 		<arg choice="plain">-l <replaceable>file</replaceable></arg>
 		<arg choice="plain">-m</arg>
-		<arg choice="plain">-w <replaceable>file_or_dir</replaceable></arg>
-		<arg choice="plain">-p <replaceable>file_or_dir</replaceable></arg>
+		<arg choice="plain">-w <replaceable>file</replaceable></arg>
+		<arg choice="plain">-p <replaceable>file</replaceable></arg>
 	    </group>
 	    <arg choice="plain"><replaceable>file.db</replaceable></arg>
 	</cmdsynopsis>
@@ -91,9 +91,9 @@
 	    the contents of the database file to <option>stdout</option>.
 	</para>
 	<para>
-	    The <option>-H <replaceable>file_or_dir</replaceable></option>
+	    The <option>-H <replaceable>file</replaceable></option>
 	    option tells <application>bogoutil</application> to print
-	    a histogram of the specified database file to
+	    a histogram of the database file to
 	    <option>stdout</option>.  The output is similar to
 	    <application>bogofilter -vv</application>. Finally,
 	    hapaxes (tokens which were only seen once) and pure tokens
@@ -113,9 +113,9 @@
 	    that are too long or too short.
 	</para>
 	<para>
-	    The <option>-w <replaceable>file_or_dir</replaceable></option> 
+	    The <option>-w <replaceable>file</replaceable></option> 
 	    option tells <application>bogoutil</application> to
-	    display token information from the database.  The option
+	    display token information from the database file.  The option
 	    takes an argument, which is either the name of the
 	    wordlist (usually wordlist.db) or the name of the directory
 	    containing it.  Tokens can be listed on the command line
@@ -127,7 +127,7 @@
 	    <option>stdin</option>.
 	</para>
 	<para>
-	    The <option>-p <replaceable>file_or_dir</replaceable></option> 
+	    The <option>-p <replaceable>file</replaceable></option> 
 	    option tells <application>bogoutil</application> to
 	    display the database information for one or more tokens.
 	    The display includes a probability column with the

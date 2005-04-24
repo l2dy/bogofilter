@@ -33,7 +33,6 @@ AUTHORS:
 #include "longoptions.h"
 #include "maint.h"
 #include "msgcounts.h"
-#include "mxcat.h"
 #include "paths.h"
 #include "prob.h"
 #include "robx.h"
@@ -504,15 +503,14 @@ static const char *help_text[] = {
     "\n",
 
     "info options:\n",
-    "  -w file_or_dir              - display counts for words from stdin.\n",
-    "  -p file_or_dir              - display word counts and probabilities.\n",
+    "  -w file                     - display counts for words from stdin.\n",
+    "  -p file                     - display word counts and probabilities.\n",
     "  -I, --input-file=file       - read 'file' instead of standard input.\n",
-    "  -H dir                      - display histogram and statistics for wordlist.\n",
+    "  -H file                     - display histogram and statistics for wordlist.\n",
     "                                - use with -v  to exclude hapaxes.\n",
     "                                - use with -vv to exclude pure spam/ham.\n",
     "  -r file                     - compute Robinson's X for the specified file.\n",
     "  -R file                     - compute Robinson's X and save it in wordlist.\n",
-
     "\n",
 
     "database maintenance, the \"-m file\" option is required in this group:\n",
@@ -854,14 +852,6 @@ int main(int argc, char *argv[])
     if (!bfpath_check_mode(bfp, mode)) {
 	fprintf(stderr, "Can't open wordlist '%s'\n", bfp->filepath);
 	exit(EX_ERROR);
-    }
-
-    if (bfp->isdir &&
-	(bfp->filename == NULL || strcmp(bfp->filename, ".") == 0)) {
-	const char *filename = mxcat(bfp->dirname, DIRSEP_S, WORDLIST, NULL);
-	bfpath_free(bfp);
-	bfp = bfpath_create(filename);
-	bfpath_update(bfp);
     }
 
     switch(flag) {
