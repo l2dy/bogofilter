@@ -40,8 +40,6 @@ static map_pri_env pri_2_env[] = {
 
 char *bogohome = NULL;
 
-bfpath_mode mode;
-
 void set_bogohome(const char *path)
 {
     xfree(bogohome);
@@ -184,11 +182,6 @@ bool bfpath_check_mode(bfpath *bfp, bfpath_mode m)
 	set_bogohome(bfp->dirname);
 
     return ok;
-}
-
-void bfpath_set_mode(bfpath_mode m)
-{
-    mode = m;
 }
 
 void bfpath_update(bfpath *bfp)
