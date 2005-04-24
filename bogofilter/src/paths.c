@@ -122,6 +122,13 @@ bfpath *bfpath_create(const char *path)
     return bfp;
 }
 
+bfpath *bfpath_create_update(const char *path)
+{
+    bfpath *bfp = bfpath_create(path);
+    bfpath_update(bfp);
+    return bfp;
+}
+
 static void check_for_file(bfpath *bfp)
 {
     int rc;

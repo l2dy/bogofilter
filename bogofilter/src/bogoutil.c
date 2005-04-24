@@ -845,8 +845,7 @@ int main(int argc, char *argv[])
 	exit(EX_ERROR);
     }
 
-    bfp = bfpath_create(ds_file);
-    bfpath_update(bfp);
+    bfp = bfpath_create_update(ds_file);
 
     mode = get_mode(flag);
     if (!bfpath_check_mode(bfp, mode)) {

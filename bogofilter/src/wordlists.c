@@ -153,7 +153,15 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 static void check_wordlist_path(wordlist_t *list)
 {
     bfpath *bfp = list->bfp;
-    bfpath_check_mode(bfp, BFP_MAY_CREATE);
+    bfpath_mode mode;
+
+    if (((run_type & UNREG_SPAM) != 0) ||
+	((run_type & UNREG_GOOD) != 0))
+	mode = BFP_MUST_EXIST;
+    else
+	mode = BFP_MAY_CREATE;
+
+    bfpath_check_mode(bfp, mode);
     bfpath_update(bfp);
 }
 
@@ -162,6 +170,7 @@ static void check_wordlist_path(wordlist_t *list)
 void set_wordlist_directory(void)
 {
     wordlist_t *list = word_lists;	/* get first wordlist */
+
     if (list != NULL) {
 	bfpath *bfp = list->bfp;
 	const char *dir = get_directory_from_path(bfp->filepath);
