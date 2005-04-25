@@ -102,5 +102,6 @@ endif
 .PHONY: check
 check:
 	@if echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><HTML><HEAD><TITLE></TITLE></HEAD><BODY><P></P></BODY></HTML>' | nsgmls -s 2>/dev/null; then \
-	set -e ; for i in $(HTML_DOCS) ; do if nsgmls -s $(srcdir)/$$i ; then case "$(MAKEFLAGS)" in *s*) ;; *) echo PASS: $$i ;; esac ; else echo FAIL: $$i: ; false ; fi ; done ; \
-	else echo >&2 "*** Not validating HTML, nsgmls/HTML DTDs improperly installed ***" ; fi
+	set +e ; fail=0 ; for i in $(HTML_DOCS) ; do if nsgmls -s $(srcdir)/$$i ; then echo PASS: $$i ; else echo FAIL: $$i: ; fail=1 ; fi ; done ; \
+	else echo >&2 "*** Not validating HTML, nsgmls/HTML DTDs improperly installed ***" ; fi ; \
+	if test $$fail = 1 ; then echo >&2 "*** HTML document invalid ***" ; false ; fi
