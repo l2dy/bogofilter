@@ -99,6 +99,8 @@ dist-hook:
 	@exit 1
 endif
 
+.PHONY: check
 check:
-	if echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><HTML><HEAD><TITLE></TITLE></HEAD><BODY><P></P></BODY></HTML>' | nsgmls -s ; then \
-	for i in $(HTML_DOCS) ; do nsgmls -s $(srcdir)/$$i ; done ; fi
+	@if echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><HTML><HEAD><TITLE></TITLE></HEAD><BODY><P></P></BODY></HTML>' | nsgmls -s 2>/dev/null; then \
+	set -e ; for i in $(HTML_DOCS) ; do if nsgmls -s $(srcdir)/$$i ; then case "$(MAKEFLAGS)" in *s*) ;; *) echo PASS: $$i ;; esac ; else echo FAIL: $$i: ; false ; fi ; done ; \
+	else echo >&2 "*** Not validating HTML, nsgmls/HTML DTDs improperly installed ***" ; fi
