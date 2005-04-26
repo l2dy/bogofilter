@@ -15,8 +15,14 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
+0.94.6	2005-04-26
+
 	2005-04-24
 
+	* Fixed bogoutil help and documentation to show that -d, -l,
+	  -w, -p, and -H options expect a filename, not a directory.
+	* Refactored bfpath creation to clean up open modes and lessen
+	  number of external calls into paths.c
 	* Added db-3.2.9 compatibility macro for db->stat().
 	* Updated bogominitrain.pl to v1.6
 
