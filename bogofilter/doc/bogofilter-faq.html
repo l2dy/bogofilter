@@ -856,18 +856,18 @@
 
     <p>To find the spam and ham counts for a token (word) use
     bogoutil's '-w' option. For example, "bogoutil -w
-    $BOGOFILTER_DIR example.com" gives the good and bad counts for
-    "example.com".</p>
+    $BOGOFILTER_DIR/wordlist.db example.com" gives the good and bad
+    counts for "example.com".</p>
 
     <p>If you want the spam score in addition to the spam and ham
-    counts for a token (word) use bogoutil's '-p' option. For
-    example, "bogoutil -p $BOGOFILTER_DIR example.com" gives the
+    counts for a token (word) use bogoutil's '-p' option. For example,
+    "bogoutil -p $BOGOFILTER_DIR/wordlist.db example.com" gives the
     good and bad counts for "example.com".</p>
 
-    <p>To find out how many messages are in your wordlists query
-    the special token .MSG_COUNT, i.e., run command "bogoutil -w
-    $BOGOFILTER_DIR .MSG_COUNT" to see the counts for the spam and
-    ham wordlists.</p>
+    <p>To find out how many messages are in your wordlists query the
+    special token .MSG_COUNT, i.e., run command "bogoutil -w
+    $BOGOFILTER_DIR/wordlist.db .MSG_COUNT" to see the counts for the
+    spam and ham wordlists.</p>
 
     <p>To tell how many tokens are in your wordlists pipe the output
     of bogoutil's dump command to command "wc", i.e. use "bogoutil -d

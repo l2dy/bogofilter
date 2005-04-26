@@ -758,25 +758,25 @@
 
     <p>Pour trouver le nombre de spam et ham pour un token (mot),
     utiliser l'option '-w' de bogoutil. Par exemple, "bogoutil -w
-    $BOGOFILTER_DIR example.com" fournit le nombre de ham et spam
-    pour "example.com".</p>
+    $BOGOFILTER_DIR/wordlist.db example.com" fournit le nombre de ham
+    et spam pour "example.com".</p>
 
-    <p>Si vous voulez le score de spamicité en plus du nombre de
-    ham et spam pour un token, utilisez l'option '-p' de bogoutil.
-    Par exemple, "bogoutil -p $BOGOFILTER_DIR example.com" fournit
-    en plus des nombres ham et spam, le score du mot.</p>
+    <p>Si vous voulez le score de spamicité en plus du nombre de ham
+    et spam pour un token, utilisez l'option '-p' de bogoutil.  Par
+    exemple, "bogoutil -p $BOGOFILTER_DIR/wordlist.db example.com"
+    fournit en plus des nombres ham et spam, le score du mot.</p>
 
-    <p>Pour trouver combien de messages sont dans votre liste de
-    mots, faites une requête sur le pseudo-token ".MSG_COUNT" (avec
-    le point devant NdT). Par exemple, lancez la commande "bogoutil
-    -w $BOGOFILTER_DIR .MSG_COUNT".</p>
+    <p>Pour trouver combien de messages sont dans votre liste de mots,
+    faites une requête sur le pseudo-token ".MSG_COUNT" (avec le point
+    devant NdT). Par exemple, lancez la commande "bogoutil -w
+    $BOGOFILTER_DIR/wordlist.db .MSG_COUNT".</p>
 
-    <p>Pour dire combien de tokens sont présents dans votre liste
-    de mots, envoyez la sortie de la commande dump de bogoutil vers
-    la commande "wc". Par exemple utilisez "bogoutil -d
-    $BOGOFILTER_DIR/wordlist.db | wc -l " pour afficher le nombre d'apparitions
-    des tokens (Si vous utilisez spamlist.db et goodlist.db, lancez la commande pour
-    chacun d'eux).</p>
+    <p>Pour dire combien de tokens sont présents dans votre liste de
+    mots, envoyez la sortie de la commande dump de bogoutil vers la
+    commande "wc". Par exemple utilisez "bogoutil -d
+    $BOGOFILTER_DIR/wordlist.db/wordlist.db | wc -l " pour afficher le
+    nombre d'apparitions des tokens (Si vous utilisez spamlist.db et
+    goodlist.db, lancez la commande pour chacun d'eux).</p>
 
     <hr>
 
