@@ -13,7 +13,7 @@
 
 %define	name		@PACKAGE@
 %define	version		@VERSION@
-%define	release		1
+%define	release		2
 
 %{!?bogostatic: %{expand: %%define bogostatic 0}}
 %{!?with_tdb:%define with_tdb 0}
