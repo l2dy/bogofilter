@@ -215,12 +215,11 @@ i.e. registration parameters, parsing options, bogofilter directory, etc.</para>
 
 <para>CLASSIFICATION OPTIONS</para>
 
-<para>The <option>-p</option> (passthrough) option writes a copy of
-the input mail to the output with an X-Bogosity header inserted.  If
-the input is from a pipe or a socket, bogofilter will keep a copy of
-the entire message in memory.  If the input is a file that can be
-rewound, bogofilter will read it a second time.  In normal operation,
-the message is piped to bogofilter, hence a copy is kept in memory.</para>
+<para>The <option>-p</option> (passthrough) option outputs the message
+with an X-Bogosity line at the end of the message header.  This
+requires keeping the entire message in memory when it's read from
+stdin (or from a pipe or socket).  If the message is read from a file
+that can be rewound, bogofilter will read it a second time.</para>
 
 <para>The <option>-e</option> (embed) option tells
 <application>bogofilter</application> to exit with code 0 unless there
