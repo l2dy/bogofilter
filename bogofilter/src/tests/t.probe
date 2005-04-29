@@ -1,0 +1,70 @@
+#!/bin/sh -x
+
+# verify that --db-transaction option is given 
+# precedence over probing for a database environment
+
+. ${srcdir=.}/t.frame
+
+OUT=${TMPDIR}/test.out
+MSG=${TMPDIR}/test.msg
+LOG=${BOGOFILTER_DIR}/log.0000000001
+
+NO="--db-transaction=no"
+YES="--db-transaction=yes"
+
+cat <<EOF > $MSG
+this is a test message
+EOF
+
+# transactions=no;  no log file
+
+$BOGOFILTER -C $NO  -H -n -I $MSG
+
+if [ -f $LOG ] ; then
+    echo "Failed test 't=n'" >> $OUT
+    exit 1
+fi
+
+# probe=yes, no environment;  no log file
+
+$BOGOFILTER -C  -H -n -I $MSG
+
+if [ -f $LOG ] ; then
+    echo "Failed test 'p=y, e=n'" >> $OUT
+    exit 1
+fi
+
+# transactions=yes;  log file should appear
+
+$BOGOFILTER -C $YES  -H -s -I $MSG
+
+if [ ! -f $LOG ] ; then
+    echo "Failed test 't=y'" >> $OUT
+    exit 1
+fi
+
+# probe=yes;  log file should change
+
+BEF=`sum $LOG`
+$BOGOFILTER -C  -H -n -I $MSG
+AFT=`sum $LOG`
+
+if [ "$BEF" = "$AFT" ] ; then
+    echo "Failed test 'p=y, e=y'" >> $OUT
+    echo BEF: $BEF >> $OUT
+    echo AFT: $AFT >> $OUT
+    exit 1
+fi
+
+# probe=yes, transactions=no;  log file should not change
+
+BEF=`sum $LOG`
+$BOGOFILTER -C $NO  -H -s -I $MSG
+AFT=`sum $LOG`
+
+if [ "$BEF" != "$AFT" ] ; then
+    echo "Failed test 'p=y, t=n'" >> $OUT
+    echo BEF: $BEF >> $OUT
+    echo AFT: $AFT >> $OUT
+    exit 1
+fi
