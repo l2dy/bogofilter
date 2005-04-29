@@ -120,6 +120,16 @@ static bool get_bool(const char *name, const char *arg)
     return b;
 }
 
+static e_txn get_txn(const char *name, const char *arg)
+{
+    e_txn t = get_bool(name, arg) ? T_ENABLED : T_DISABLED;
+    if (DEBUG_CONFIG(2))
+	fprintf(dbgout, "%s -> %s\n", name,
+		t ? "enabled" : "disabled");
+    return t;
+}
+
+
 /* non-OO static functions */
 
 DB_ENV *dbx_get_env_dbe(dbe_t *env)
@@ -830,7 +840,8 @@ const char **dsm_help_bogoutil(void)
 bool dsm_options_bogofilter(int option, const char *name, const char *val)
 {
     switch (option) {
-	case O_DB_TRANSACTION:		fTransaction		= get_bool(name, val);			return true;
+	case O_DB_TRANSACTION:		
+	    eTransaction = get_txn(name, val);								return true;
 
 #ifdef	HAVE_DECL_DB_CREATE
 	case O_DB_MAX_OBJECTS:		db_max_objects		= atoi(val);				return true;
@@ -848,7 +859,7 @@ bool dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_f
 {
     switch (option) {
 	case O_DB_TRANSACTION:
-	    fTransaction = get_bool(name, val);
+	    eTransaction = get_txn(name, val);
 	    return true;
 
 	case O_DB_RECOVER:
@@ -912,7 +923,7 @@ bool dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_f
 /** probe if the directory contains an environment, and if so,
  * if it has transactions
  */
-probe_txn_t probe_txn(bfpath *bfp)
+e_txn probe_txn(bfpath *bfp)
 {
     DB_ENV *dbe;
     int r;
@@ -924,7 +935,7 @@ probe_txn_t probe_txn(bfpath *bfp)
     if (r) {
 	print_error(__FILE__, __LINE__, "cannot create environment handle: %s",
 		db_strerror(r));
-	return P_ERROR;
+	return T_ERROR;
     }
 
 #if DB_AT_LEAST(3,2)
@@ -937,7 +948,7 @@ probe_txn_t probe_txn(bfpath *bfp)
 	int w;
 	char *t = bfp->filepath;
 	struct dirent *de;
-	probe_txn_t rc = P_DONT_KNOW;
+	e_txn rc = T_DONT_KNOW;
 	DIR *d;
 
 	/* no environment found by JOINENV, but clean up handle */
@@ -950,27 +961,27 @@ probe_txn_t probe_txn(bfpath *bfp)
 	if (d == NULL) {
 	    print_error(__FILE__, __LINE__, "cannot open directory %s: %s",
 		    t, strerror(r));
-	    rc = P_ERROR;
+	    rc = T_ERROR;
 	} else {
 	    while ((errno = 0, de = readdir(d))) {
 		if (strlen(de->d_name) == 14
 		    && strncmp(de->d_name, "log.", 4) == 0
 		    && strspn(de->d_name + 4, "0123456789") == 10)
 		{
-		    rc = P_ENABLE;
+		    rc = T_ENABLED;
 		    break;
 		}
 	    }
 	    if (errno)
-		rc = P_ERROR;
+		rc = T_ERROR;
 	    closedir(d);
 
-	    if (rc != P_ERROR && rc != P_ENABLE) {
+	    if (rc != T_ERROR && rc != T_ENABLED) {
 		w = stat(t, &st);
 		if (w == 0) {
-		    rc = P_DISABLE;
+		    rc = T_DISABLED;
 		} else if (errno != ENOENT) {
-		    rc = P_ERROR;
+		    rc = T_ERROR;
 		    print_error(__FILE__, __LINE__, "cannot stat %s: %s",
 			    t, db_strerror(r));
 		}
@@ -982,7 +993,7 @@ probe_txn_t probe_txn(bfpath *bfp)
     if (r != 0) {
 	print_error(__FILE__, __LINE__, "cannot join environment: %s",
 		db_strerror(r));
-	return P_ERROR;
+	return T_ERROR;
     }
 
     /* environment found, validate if it has transactions */
@@ -991,19 +1002,19 @@ probe_txn_t probe_txn(bfpath *bfp)
     if (r) {
 	print_error(__FILE__, __LINE__, "cannot query flags: %s",
 		db_strerror(r));
-	return P_ERROR;
+	return T_ERROR;
     }
 
     dbe->close(dbe, 0);
     if ((flags & DB_INIT_TXN) == 0) {
 	print_error(__FILE__, __LINE__,
 		"environment found but does not support transactions.");
-	return P_ERROR;
+	return T_ERROR;
     }
 #else
     dbe->close(dbe, 0);
 #endif
-    return P_ENABLE;
+    return T_ENABLED;
 }
 
 static ex_t dbx_list_logfiles(bfpath *bfp, int argc, char **argv)

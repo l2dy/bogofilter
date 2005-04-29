@@ -18,7 +18,7 @@ extern	bool	fBogoutil;
 extern	bool	fBogofilter;
 
 /* for  transactions */
-extern	bool	fTransaction;
+extern	e_txn	eTransaction;
 
 /* command line options */
 extern	bulk_t	bulk_mode;		/* '-B' */

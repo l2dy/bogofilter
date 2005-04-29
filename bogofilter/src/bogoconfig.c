@@ -174,6 +174,15 @@ static char *get_string(const char *name, const char *arg)
     return s;
 }
 
+static e_txn get_txn(const char *name, const char *arg)
+{
+    e_txn t = get_bool(name, arg) ? T_ENABLED : T_DISABLED;
+    if (DEBUG_CONFIG(2))
+	fprintf(dbgout, "%s -> %s\n", name,
+		t ? "enabled" : "disabled");
+    return t;
+}
+
 void process_parameters(int argc, char **argv, bool warn_on_error)
 {
     bogotest = 0;
@@ -697,7 +706,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case O_UNSURE_SUBJECT_TAG:		unsure_subject_tag = get_string(name, val);		break;
     case O_WORDLIST:			configure_wordlist(val);				break;
 
-    case O_DB_TRANSACTION:		fTransaction = get_bool(name, val);			break;
+    case O_DB_TRANSACTION:		eTransaction = get_txn(name, val);			break;
 
     default:
 	if (!dsm_options_bogofilter(option, name, val))

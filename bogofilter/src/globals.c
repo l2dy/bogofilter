@@ -52,9 +52,9 @@ bool	header_line_markup = true;	/* -H */
 
 /* for  transactions */
 #ifndef	ENABLE_TRANSACTIONS
-bool fTransaction = false;
+e_txn	eTransaction = T_DEFAULT_OFF;
 #else
-bool fTransaction = true;
+e_txn	eTransaction = T_DEFAULT_ON;
 #endif
 
 /* for  bogoconfig.c, prob.c, rstats.c and score.c */

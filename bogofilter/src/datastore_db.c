@@ -128,7 +128,7 @@ static int DB_OPEN(DB *db, bfpath *bfp, const char *database, DBTYPE type, u_int
 	flags |= dsm->dsm_auto_commit_flags();
 #endif
 
-    if (!fTransaction)
+    if (eTransaction == T_DISABLED)
 	file = bfp->filepath;
     else
 	file = bfp->filename;
@@ -210,7 +210,7 @@ void dsm_init(bfpath *bfp)
      * forced. */
 #if !defined(ENABLE_TRANSACTIONS) && !defined(DISABLE_TRANSACTIONS)
     /* we neither force nor forbid transactions, so add probe code */
-    probe_txn_t txn;
+    e_txn txn;
 
     if (DEBUG_DATABASE(2))
 	fprintf(dbgout, "probing \"%s\" and \"%s\" for environment...\n",
@@ -222,18 +222,18 @@ void dsm_init(bfpath *bfp)
 	fprintf(dbgout, "probing \"%s\" and \"%s\" result %d\n",
 		bfp->dirname, bfp->filename, txn);
 
-    if (txn == P_DISABLE)
-	fTransaction = false;
-    if (txn == P_ENABLE)
-	fTransaction = true;
+    if (txn == T_DISABLED )
+	eTransaction =  T_DISABLED;
+    if (txn == T_ENABLED )
+	eTransaction =  T_ENABLED;
 
     /* overrides for test suite etc. */
     if (getenv("BF_FORCE_NON_TRANSACTIONAL"))
-	fTransaction = false;
+	eTransaction = T_DISABLED;
     if (getenv("BF_FORCE_TRANSACTIONAL"))
-	fTransaction = true;
+	eTransaction = T_ENABLED;
 
-    if (!fTransaction)
+    if (eTransaction == T_DISABLED)
 	dsm = &dsm_traditional;
     else
 	dsm = &dsm_transactional;
@@ -293,7 +293,7 @@ static bool check_path(bfpath *bfp)
     struct stat stdn, stbh;
 
     /* Only bogofilter (with transactions) has to worry about multiple environments */
-    if (!fBogofilter || !fTransaction)
+    if (!fBogofilter || eTransaction == T_DISABLED)
 	return true;
 
     /* If bogohome not yet set, skip check */
@@ -475,7 +475,7 @@ const char *db_version_str(void)
 #if	!defined(ENABLE_TRANSACTIONS) && !defined(DISABLE_TRANSACTIONS)
     strcat(v, " AUTO-XA");
 #else
-    if (fTransaction)
+    if (eTransaction == P_ENABLED)
 	strcat(v, " TRANSACTIONAL");
     else
 	strcat(v, " NON-TRANSACTIONAL");
@@ -546,7 +546,7 @@ void *db_open(void *vhandle,
 	db_file = dsm->dsm_database_name(handle->name);
 
 #ifdef	ENABLE_MEMDEBUG	
-	if (!fTransaction)
+	if (eTransaction == T_DISABLED)
 	    dbp->set_alloc(dbp, md_malloc, md_realloc, md_free);
 	else
 	    dbe->set_alloc(dbe, md_malloc, md_realloc, md_free);
@@ -678,7 +678,7 @@ int db_delete(void *vhandle, const dbv_t *token)
     DBT_init(db_key);
 
     assert(handle->magic == MAGIC_DBH);
-    assert((fTransaction == false) == (handle->txn == NULL));
+    assert((eTransaction == T_DISABLED) == (handle->txn == NULL));
 
     db_key.data = token->data;
     db_key.size = token->leng;
@@ -712,7 +712,7 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 
     assert(handle);
     assert(handle->magic == MAGIC_DBH);
-    assert((fTransaction == false) == (handle->txn == NULL));
+    assert((eTransaction == T_DISABLED) == (handle->txn == NULL));
 
     DBT_init(db_key);
     DBT_init(db_data);
@@ -768,7 +768,7 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *val)
     DB *dbp = handle->dbp;
 
     assert(handle->magic == MAGIC_DBH);
-    assert((fTransaction == false) == (handle->txn == NULL));
+    assert((eTransaction == T_DISABLED) == (handle->txn == NULL));
 
     DBT_init(db_key);
     DBT_init(db_data);
@@ -827,7 +827,7 @@ void db_close(void *vhandle)
     dbh_t *handle = vhandle;
     DB *dbp = handle->dbp;
     /* This is _ONLY_ safe as long as we're logging TXNs */
-    uint32_t flag = fTransaction ? DB_NOSYNC : 0;
+    uint32_t flag = (eTransaction == T_ENABLED) ? DB_NOSYNC : 0;
 
     assert(handle->magic == MAGIC_DBH);
 
@@ -915,7 +915,7 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     dbv_t dbv_key, dbv_data;
 
     assert(handle->magic == MAGIC_DBH);
-    assert((fTransaction == false) == (handle->txn == NULL));
+    assert((eTransaction == T_DISABLED) == (handle->txn == NULL));
 
     memset(&key, 0, sizeof(key));
     memset(&data, 0, sizeof(data));
