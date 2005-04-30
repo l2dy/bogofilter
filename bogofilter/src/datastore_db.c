@@ -95,6 +95,43 @@ static const char *resolveopenflags(u_int32_t flags) {
     return buf;
 }
 
+#if !defined(ENABLE_TRANSACTIONS) && !defined(DISABLE_TRANSACTIONS)
+static e_txn get_txn_state(bfpath *bfp)
+{
+    e_txn txn = eTransaction;
+
+    if (DEBUG_DATABASE(2))
+	fprintf(dbgout, "probing \"%s\" and \"%s\" for environment...\n",
+		bfp->dirname, bfp->filename);
+
+    /* check for overrides (for test suite, etc.) */
+    if (getenv("BF_FORCE_NON_TRANSACTIONAL"))
+	txn = T_DISABLED;
+    if (getenv("BF_FORCE_TRANSACTIONAL"))
+	txn = T_ENABLED;
+
+    if (txn != T_DISABLED && txn != T_ENABLED) {
+	/* if not set, probe for database environment */
+	e_txn probe = probe_txn(bfp);
+
+	if (DEBUG_DATABASE(1))
+	    fprintf(dbgout, "probing \"%s\" and \"%s\" result %d\n",
+		    bfp->dirname, bfp->filename, txn);
+
+	if (probe == T_DISABLED || probe == T_ENABLED)
+	    txn =  probe;
+    }
+
+    /* else use default txnue */
+    if (txn == T_DEFAULT_OFF )
+	txn =  T_DISABLED;
+    if (txn == T_DEFAULT_ON )
+	txn =  T_ENABLED;
+
+    return txn;
+}
+#endif
+
 static void check_env_pagesize(DB *db)
 {
     const char *ps = getenv("BF_PAGESIZE");
@@ -209,35 +246,8 @@ void dsm_init(bfpath *bfp)
      * this properly, dsm_init is empty if transactions are disabled or
      * forced. */
 #if !defined(ENABLE_TRANSACTIONS) && !defined(DISABLE_TRANSACTIONS)
-    /* we neither force nor forbid transactions, so add probe code */
-    if (DEBUG_DATABASE(2))
-	fprintf(dbgout, "probing \"%s\" and \"%s\" for environment...\n",
-		bfp->dirname, bfp->filename);
 
-    /* check for overrides (for test suite, etc.) */
-    if (getenv("BF_FORCE_NON_TRANSACTIONAL"))
-	eTransaction = T_DISABLED;
-    if (getenv("BF_FORCE_TRANSACTIONAL"))
-	eTransaction = T_ENABLED;
-
-    if (eTransaction != T_DISABLED && eTransaction != T_ENABLED) {
-	/* if not set, probe for database environment */
-	e_txn txn = probe_txn(bfp);
-
-	if (DEBUG_DATABASE(1))
-	    fprintf(dbgout, "probing \"%s\" and \"%s\" result %d\n",
-		    bfp->dirname, bfp->filename, txn);
-	if (txn == T_DISABLED )
-	    eTransaction =  T_DISABLED;
-	if (txn == T_ENABLED )
-	    eTransaction =  T_ENABLED;
-    }
-
-    /* else use default value */
-    if (eTransaction == T_DEFAULT_OFF )
-	eTransaction =  T_DISABLED;
-    if (eTransaction == T_DEFAULT_ON )
-	eTransaction =  T_ENABLED;
+    eTransaction = get_txn_state(bfp);
 
     if (eTransaction == T_DISABLED)
 	dsm = &dsm_traditional;
