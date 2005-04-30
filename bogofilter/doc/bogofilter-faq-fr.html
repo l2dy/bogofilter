@@ -566,8 +566,8 @@
     <p>Pour activer la classification Yes/No/Unsure, enlevez les dièses devant les
     deux dernières lignes.</p>
 
-    <p>Alternativement, si vous préférez utiliser les labels Spam/Ham/Unsure
-    au lieu de Yes/No/Unsure, enlevez les dièses devant la ligne :
+    <p>Alternativement, si vous préférez utiliser les labels Yes/No/Unsure
+    au lieu de Spam/Ham/Unsure, enlevez les dièses devant la ligne :
 
     <pre>	## spamicity_tags = Yes, No, Unsure</pre>
 
@@ -683,11 +683,11 @@
 	| $BOGOFILTER -p -e
 
 	:0:
-	* ^X-Bogosity:.Yes
+	* ^X-Bogosity:.Spam
 	spam
 
 	:0:
-	* ^X-Bogosity:.No
+	* ^X-Bogosity:.Ham
 	non-spam</pre>
   
     <hr>

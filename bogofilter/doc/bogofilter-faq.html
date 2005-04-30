@@ -502,11 +502,11 @@
       <li>
         Using "-v" causes bogofilter to generate the "X-Bogosity:"
         header line, i.e.
-        <pre>	X-Bogosity: No, tests=bogofilter, spamicity=0.500000</pre></li>
+        <pre>	X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000</pre></li>
 
       <li>
         Using "-vv" causes bogofilter to generate a histogram, i.e.
-        <pre>	X-Bogosity: No, tests=bogofilter, spamicity=0.500000
+        <pre>	X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
 	        int  cnt    prob   spamicity  histogram
 	       0.00   29  0.000209  0.000052  #############################
 	       0.10    2  0.179065  0.003425  ##
@@ -533,7 +533,7 @@
       <li>
         Using "-vvv" produces a list of <em>all</em> the tokens in
         the messages with information on each one, i.e.
-        <pre>	X-Bogosity: No, tests=bogofilter, spamicity=0.500000
+        <pre>	X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
 	                      n    pgood     pbad      fw     U
 	"which"              10  0.208333  0.000000  0.000041 +
 	"own"                 7  0.145833  0.000000  0.000059 +
