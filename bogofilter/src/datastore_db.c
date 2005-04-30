@@ -96,12 +96,28 @@ static const char *resolveopenflags(u_int32_t flags) {
 }
 
 #if !defined(ENABLE_TRANSACTIONS) && !defined(DISABLE_TRANSACTIONS)
+static const char *txn2str(e_txn txn)
+{
+    const char *v = "unknown";
+    switch (txn) {
+    case T_ERROR: 	v = "T_ERROR";		break;
+    case T_DISABLED: 	v = "T_DISABLED";	break;
+    case T_ENABLED: 	v = "T_ENABLED";	break;
+    case T_DEFAULT_OFF:	v = "T_DEFAULT_OFF";	break;
+    case T_DEFAULT_ON: 	v = "T_DEFAULT_ON";	break;
+    case T_DONT_KNOW:	v = "T_DONT_KNOW";	break;
+    }
+    return v;
+}
+#endif
+
+#if !defined(ENABLE_TRANSACTIONS) && !defined(DISABLE_TRANSACTIONS)
 static e_txn get_txn_state(bfpath *bfp)
 {
     e_txn txn = eTransaction;
 
-    if (DEBUG_DATABASE(2))
-	fprintf(dbgout, "probing \"%s\" and \"%s\" for environment...\n",
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "probing \"%s\" and \"%s\" for environment...",
 		bfp->dirname, bfp->filename);
 
     /* check for overrides (for test suite, etc.) */
@@ -114,19 +130,21 @@ static e_txn get_txn_state(bfpath *bfp)
 	/* if not set, probe for database environment */
 	e_txn probe = probe_txn(bfp);
 
-	if (DEBUG_DATABASE(1))
-	    fprintf(dbgout, "probing \"%s\" and \"%s\" result %d\n",
-		    bfp->dirname, bfp->filename, txn);
-
 	if (probe == T_DISABLED || probe == T_ENABLED)
-	    txn =  probe;
+	    txn = probe;
+
+	if (DEBUG_DATABASE(1))
+	    fprintf(dbgout, "%s\n", txn2str(probe));
     }
 
     /* else use default txnue */
-    if (txn == T_DEFAULT_OFF )
+    if (txn == T_DEFAULT_OFF)
 	txn =  T_DISABLED;
-    if (txn == T_DEFAULT_ON )
+    if (txn == T_DEFAULT_ON)
 	txn =  T_ENABLED;
+
+    if (DEBUG_DATABASE(1))
+	fprintf(dbgout, "\n");
 
     return txn;
 }
