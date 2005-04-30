@@ -15,6 +15,8 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
+0.94.7	2005-04-30
+
 	2005-04-29
 
 	* Fix transaction enabling/disabling so that command line
