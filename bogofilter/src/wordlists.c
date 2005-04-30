@@ -177,6 +177,7 @@ void set_wordlist_directory(void)
 	if (dir != NULL) {
 	    check_wordlist_path(list);
 	    set_bogohome(dir);
+	    free(dir);
 	}
     }
 }
