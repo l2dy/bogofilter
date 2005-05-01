@@ -222,9 +222,11 @@ stdin (or from a pipe or socket).  If the message is read from a file
 that can be rewound, bogofilter will read it a second time.</para>
 
 <para>The <option>-e</option> (embed) option tells
-<application>bogofilter</application> to exit with code 0 unless there
-was an error (even if the mail is not spam or classified as unsure).
-This simplifies using bogofilter from procmail or maildrop.</para>
+<application>bogofilter</application> to exit with code 0 if the
+message can be classified, i.e. if there is not an error.  Normally
+bogofilter uses different codes for spam, ham, and unsure
+classifications, but this simplifies using bogofilter with procmail or
+maildrop.</para>
 
 <para>The <option>-t</option> (terse) option tells
 <application>bogofilter</application> to print an abbreviated
