@@ -3,7 +3,25 @@
 # verify that --db-transaction option is given 
 # precedence over probing for a database environment
 
+# to create a wordlist without transaction files:
+#
+#	bogofilter -d dir -n < /dev/null
+#
+# or:
+#
+#	bogofilter -d dir -n --db-transaction=no < /dev/null
+#
+# to create a wordlist with transaction files, or 
+# to convert to a wordlist with transaction files
+#
+#	bogofilter -d dir -n --db-transaction=yes < /dev/null
+
 . ${srcdir=.}/t.frame
+
+AUTO_XA=`$BOGOFILTER -C -V 2>&1 | sed -n '2p;' | grep AUTO-XA || :`
+if [ -z "$AUTO_XA" ]; then
+    exit 77
+fi
 
 OUT=${TMPDIR}/test.out
 MSG=${TMPDIR}/test.msg
