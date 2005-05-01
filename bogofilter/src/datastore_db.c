@@ -95,6 +95,14 @@ static const char *resolveopenflags(u_int32_t flags) {
     return buf;
 }
 
+static void set_txn_mode(void)
+{
+    if (eTransaction == T_DEFAULT_OFF)
+	eTransaction =  T_DISABLED;
+    if (eTransaction == T_DEFAULT_ON)
+	eTransaction =  T_ENABLED;
+}
+
 #if !defined(ENABLE_TRANSACTIONS) && !defined(DISABLE_TRANSACTIONS)
 static const char *txn2str(e_txn txn)
 {
@@ -138,11 +146,6 @@ static e_txn get_txn_state(bfpath *bfp)
     }
 
     /* else use default txnue */
-    if (txn == T_DEFAULT_OFF)
-	txn =  T_DISABLED;
-    if (txn == T_DEFAULT_ON)
-	txn =  T_ENABLED;
-
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "\n");
 
@@ -267,6 +270,8 @@ void dsm_init(bfpath *bfp)
 
     eTransaction = get_txn_state(bfp);
 
+    set_txn_mode();
+
     if (eTransaction == T_DISABLED)
 	dsm = &dsm_traditional;
     else
@@ -274,10 +279,7 @@ void dsm_init(bfpath *bfp)
 #else
     (void)bfp;
 
-    if (eTransaction == T_DEFAULT_OFF)
-	eTransaction =  T_DISABLED;
-    if (eTransaction == T_DEFAULT_ON)
-	eTransaction =  T_ENABLED;
+    set_txn_mode();
 #endif
 }
 
@@ -514,6 +516,7 @@ const char *db_version_str(void)
 #if	!defined(ENABLE_TRANSACTIONS) && !defined(DISABLE_TRANSACTIONS)
     strcat(v, " AUTO-XA");
 #else
+    set_txn_mode();
     if (eTransaction == T_ENABLED)
 	strcat(v, " TRANSACTIONAL");
     else
