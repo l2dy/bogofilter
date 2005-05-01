@@ -509,7 +509,7 @@ const char *db_version_str(void)
 #if	!defined(ENABLE_TRANSACTIONS) && !defined(DISABLE_TRANSACTIONS)
     strcat(v, " AUTO-XA");
 #else
-    if (eTransaction == P_ENABLED)
+    if (eTransaction == T_ENABLED)
 	strcat(v, " TRANSACTIONAL");
     else
 	strcat(v, " NON-TRANSACTIONAL");
