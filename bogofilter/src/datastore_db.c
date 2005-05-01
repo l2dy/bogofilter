@@ -273,6 +273,11 @@ void dsm_init(bfpath *bfp)
 	dsm = &dsm_transactional;
 #else
     (void)bfp;
+
+    if (eTransaction == T_DEFAULT_OFF)
+	eTransaction =  T_DISABLED;
+    if (eTransaction == T_DEFAULT_ON)
+	eTransaction =  T_ENABLED;
 #endif
 }
 
