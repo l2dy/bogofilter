@@ -173,7 +173,7 @@ void set_wordlist_directory(void)
 
     if (list != NULL) {
 	bfpath *bfp = list->bfp;
-	const char *dir = get_directory_from_path(bfp->filepath);
+	char *dir = get_directory_from_path(bfp->filepath);
 	if (dir != NULL) {
 	    check_wordlist_path(list);
 	    set_bogohome(dir);
