@@ -15,17 +15,22 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
-0.94.7	2005-04-30
+0.94.8	2005-05-03
 
-	2005-04-29
+	* Revised manpage's description of -p (passthrough) option.
+
+	* When configured with --enable-transactions or --disable-transactions
+	  - Fixed compilation problem
+	  - Fixed bogofilter -Q reporting
+	  - Skip t.probe during "make check"
+
+0.94.7	2005-04-30
 
 	* Fix transaction enabling/disabling so that command line
 	  options, i.e. --db-transactions=yes/no, are primary and
 	  probing is secondary.
 
 0.94.6	2005-04-26
-
-	2005-04-24
 
 	* Fixed bogoutil help and documentation to show that -d, -l,
 	  -w, -p, and -H options expect a filename, not a directory.
