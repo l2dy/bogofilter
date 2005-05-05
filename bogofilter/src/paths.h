@@ -54,7 +54,6 @@ bool	paths_equal(bfpath *p1, bfpath *p2);
 
 void	set_bogohome(const char *dirname);
 void	set_bogohome_using_dirname(const char *dirname);
-bool	check_bogohome(void);
 void	bogohome_cleanup(void);
 int	set_wordlist_dir(const char* dir, priority_t precedence);
 

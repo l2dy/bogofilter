@@ -48,7 +48,7 @@ void set_bogohome(const char *path)
     }
 }
 
-bool check_bogohome(void)
+static bool check_bogohome(void)
 {
     return (set_wordlist_dir(NULL, PR_ENV_BOGO) == 0 ||
 	    set_wordlist_dir(NULL, PR_ENV_HOME) == 0);
@@ -215,6 +215,13 @@ bool bfpath_check_mode(bfpath *bfp, bfpath_mode m)
 
 void bfpath_set_bogohome(bfpath *bfp)
 {
+    /* bogohome should be set by now */
+
+    if (!check_bogohome()) {
+	fprintf(stderr, "Can't find HOME or BOGOFILTER_DIR in environment.\n");
+	exit(EX_ERROR);
+    }
+
     bfpath_split(bfp, bogohome);
 }
 

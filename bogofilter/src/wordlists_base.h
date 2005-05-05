@@ -33,6 +33,8 @@ struct wordlist_s
     int		override;		/**< priority in queue */
 };
 
+void wordlists_set_bogohome(void);
+
 /** Initialize a wordlist node and insert into the right place of the
  * priority queue, \return -1 for error, 0 for success */
 void init_wordlist(const char* name, 

@@ -50,6 +50,19 @@ static wordlist_t *free_wordlistnode(wordlist_t *node)
     return next;
 }
 
+void wordlists_set_bogohome(void)
+{
+    wordlist_t *list;
+    
+    if (!config_setup) {
+	/* set up default wordlist */
+	init_wordlist("word", WORDLIST, 0, WL_REGULAR);
+    }
+
+    for (list = word_lists; list != NULL; list = list->next)
+	bfpath_set_bogohome(list->bfp);
+}
+
 void init_wordlist(const char* name, 
 		   const char *path,
 		   int override, WL_TYPE type)
