@@ -147,7 +147,7 @@ bfpath *bfpath_create(const char *path)
 {
     bfpath *bfp = xcalloc(1, sizeof(bfpath));
     bfp->filepath = xstrdup(path);
-    bfpath_split(bfp, bogohome);
+
     return bfp;
 }
 
@@ -207,7 +207,7 @@ bool bfpath_check_mode(bfpath *bfp, bfpath_mode m)
 	abort();
     }
 
-    if (bfp->dirname != NULL)
+    if (bfp->dirname != NULL && bogohome == NULL)
 	set_bogohome(bfp->dirname);
 
     return ok;
