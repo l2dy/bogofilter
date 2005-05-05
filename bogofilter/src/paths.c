@@ -119,6 +119,10 @@ static bfpath *bfpath_split(bfpath *bfp, const char *home)
 {
     /* precondition:  bfp->dirname and bfp->filename free'd if need be */
     char *t = strrchr(bfp->filepath, DIRSEP_C);
+
+    xfree(bfp->dirname);
+    xfree(bfp->filename);
+    
     if (t != NULL) {
 	/* if directory separator present .... */
 	*t = '\0';
@@ -211,9 +215,6 @@ bool bfpath_check_mode(bfpath *bfp, bfpath_mode m)
 
 void bfpath_set_bogohome(bfpath *bfp)
 {
-    xfree(bfp->dirname);
-    xfree(bfp->filename);
-    
     bfpath_split(bfp, bogohome);
 }
 
