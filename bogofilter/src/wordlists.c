@@ -315,7 +315,5 @@ bool configure_wordlist(const char *val)
     
     init_wordlist(listname, filename, precedence, type);
 
-    config_setup = true;
-
     return true;
 }

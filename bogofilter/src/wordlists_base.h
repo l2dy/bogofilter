@@ -11,9 +11,6 @@ typedef void *dsh_t;
 
 #include "paths.h"
 
-/** true when at least one wordlist has been configured */
-extern	bool	config_setup;
-
 typedef enum e_WL_TYPE {
     WL_REGULAR =	'R',	/**< list contains regular tokens */
     WL_IGNORE  =	'I'	/**< list contains tokens that are skipped */

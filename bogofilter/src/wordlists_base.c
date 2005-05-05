@@ -10,8 +10,6 @@
 #include "xmalloc.h"
 #include "xstrdup.h"
 
-bool	config_setup = false;
-
 /** priority queue of wordlists, ordered by their "override" parameter */
 /*@null@*/ wordlist_t* word_lists=NULL;
 
@@ -53,10 +51,9 @@ void wordlists_set_bogohome(void)
 {
     wordlist_t *list;
     
-    if (!config_setup) {
-	/* set up default wordlist */
+    /* set up default wordlist, if not yet done */
+    if (word_lists == NULL)
 	init_wordlist("word", WORDLIST, 0, WL_REGULAR);
-    }
 
     for (list = word_lists; list != NULL; list = list->next)
 	bfpath_set_bogohome(list->bfp);
