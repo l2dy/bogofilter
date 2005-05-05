@@ -43,9 +43,9 @@ char *bogohome = NULL;
 void set_bogohome(const char *path)
 {
     xfree(bogohome);
-    if (path) {
+    bogohome = NULL;
+    if (path)
 	bogohome = xstrdup(path);
-    }
 }
 
 static bool check_bogohome(void)
