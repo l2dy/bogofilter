@@ -169,7 +169,13 @@ static void check_wordlist_path(wordlist_t *list)
 */
 void set_wordlist_directory(void)
 {
-    wordlist_t *list = word_lists;	/* get first wordlist */
+    wordlist_t *list;
+
+    /* return if bogohome already set */
+    if (bogohome != NULL)
+	return;
+ 
+    list = word_lists;		/* get first wordlist */
 
     if (list != NULL) {
 	bfpath *bfp = list->bfp;
