@@ -2,7 +2,6 @@
 
 #include "common.h"
 
-/* #include "bogohome.h" */
 #include "find_home.h"
 #include "mxcat.h"
 #include "paths.h"
