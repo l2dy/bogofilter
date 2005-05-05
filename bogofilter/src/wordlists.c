@@ -190,15 +190,23 @@ void set_wordlist_directory(void)
 
 void open_wordlists(dbmode_t mode)
 {
+    wordlist_t *list;
     bool retry = true;
+
+    /* set default wordlist if none specified */
+    if (word_lists == NULL)
+	init_wordlist("word", WORDLIST, 0, WL_REGULAR);
 
     /* set bogohome using first wordlist's directory */
     set_wordlist_directory();
 
+    /* add bogohome value to path structs */
+    for (list = word_lists; list != NULL; list = list->next)
+	bfpath_set_bogohome(list->bfp);
+
     LIST_INIT(&envs);
 
     while (retry) {
-	wordlist_t *list;
 	retry = false;
 	for (list = word_lists; list != NULL ; list = list->next) {
 	    check_wordlist_path(list);
