@@ -846,6 +846,7 @@ int main(int argc, char *argv[])
     }
 
     bfp = bfpath_create(ds_file);
+    bfpath_set_bogohome(bfp);
 
     mode = get_mode(flag);
     if (!bfpath_check_mode(bfp, mode)) {
