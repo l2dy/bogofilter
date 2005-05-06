@@ -35,8 +35,8 @@
 	<cmdsynopsis>
 	    <command>bogoutil</command>
 	    <group choice="req">
-		<arg choice="plain">-r <replaceable>file</replaceable</arg>
-		<arg choice="plain">-R <replaceable>file</replaceable</arg>
+		<arg choice="plain">-r <replaceable>file</replaceable></arg>
+		<arg choice="plain">-R <replaceable>file</replaceable></arg>
 	    </group>
 	</cmdsynopsis>
 
