@@ -46,9 +46,7 @@ typedef struct bfpath {
 
 bfpath *bfpath_create(const char *path);
 void	bfpath_set_bogohome(bfpath *bfp);
-bfpath *bfpath_initialize(bfpath *bfp, bfpath_mode mode);
 bool	bfpath_check_mode(bfpath *bfp, bfpath_mode mode);
-bfpath *bfpath_fixup(bfpath *path);
 bfpath *bfpath_free(bfpath *path);
 bool	paths_equal(bfpath *p1, bfpath *p2);
 
