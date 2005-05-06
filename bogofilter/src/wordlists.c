@@ -109,7 +109,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 		fprintf(stderr,
 			"error #%d - %s.\n", err, strerror(err));
 	    if (err == ENOENT)
-		fprintf(stderr, 
+		fprintf(stderr,
 			"\n"
 			"Remember to register some spam and ham messages before you\n"
 			"use bogofilter to evaluate mail for its probable spam status!\n");
@@ -174,7 +174,7 @@ void set_wordlist_directory(void)
     /* return if bogohome already set */
     if (bogohome != NULL)
 	return;
- 
+
     list = word_lists;		/* get first wordlist */
 
     if (list != NULL) {
@@ -301,10 +301,10 @@ bool configure_wordlist(const char *val)
     int  precedence;
 
     char *tmp = xstrdup(val);
-    
+
     ch= tmp[0];		/* save wordlist type (good/spam) */
     tmp = spanword(tmp);
-    
+
     switch (toupper(ch))
     {
     case 'R':
@@ -317,16 +317,16 @@ bool configure_wordlist(const char *val)
 	fprintf( stderr, "Unknown wordlist type - '%c'\n", ch);
 	return (false);
     }
-    
+
     listname=tmp;		/* name of wordlist */
     tmp = spanword(tmp);
-    
+
     filename=tmp;		/* path to wordlist */
     tmp = spanword(tmp);
-    
+
     precedence=atoi(tmp);
     tmp = spanword(tmp);
-    
+
     init_wordlist(listname, filename, precedence, type);
 
     return true;

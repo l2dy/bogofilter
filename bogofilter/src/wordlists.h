@@ -15,7 +15,7 @@ extern size_t	   cSeparate;
 
 typedef	char FILEPATH[PATH_LEN];
 
-/*@null@*/ 
+/*@null@*/
 extern wordlist_t *word_lists;
 
 void incr_wordlist_mode(void);

@@ -24,7 +24,7 @@
 
 extern char *bogohome;
 
-typedef enum bfmode_e { 
+typedef enum bfmode_e {
     BFP_ERROR,
     BFP_MUST_EXIST,
     BFP_MAY_CREATE

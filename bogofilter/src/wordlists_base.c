@@ -50,7 +50,7 @@ static wordlist_t *free_wordlistnode(wordlist_t *node)
 void wordlists_set_bogohome(void)
 {
     wordlist_t *list;
-    
+
     /* set up default wordlist, if not yet done */
     if (word_lists == NULL)
 	init_wordlist("word", WORDLIST, 0, WL_REGULAR);
@@ -59,7 +59,7 @@ void wordlists_set_bogohome(void)
 	bfpath_set_bogohome(list->bfp);
 }
 
-void init_wordlist(const char* name, 
+void init_wordlist(const char* name,
 		   const char *path,
 		   int override, WL_TYPE type)
 {
@@ -91,7 +91,7 @@ void init_wordlist(const char* name,
 	}
 
 	/* append to list */
-	if (list_ptr->next == NULL || 
+	if (list_ptr->next == NULL ||
 	    list_ptr->next->override > override) {
 	    n->next=list_ptr->next;
 	    list_ptr->next=n;
@@ -128,6 +128,7 @@ wordlist_t *get_default_wordlist(wordlist_t *list)
 void free_wordlists()
 {
     wordlist_t *list = word_lists;
+
     while (list)
     {
 	list = free_wordlistnode(list);

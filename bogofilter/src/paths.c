@@ -122,7 +122,7 @@ static bfpath *bfpath_split(bfpath *bfp, const char *home)
 
     xfree(bfp->dirname);
     xfree(bfp->filename);
-    
+
     if (t != NULL) {
 	/* if directory separator present .... */
 	*t = '\0';
@@ -183,7 +183,7 @@ bool bfpath_check_mode(bfpath *bfp, bfpath_mode m)
 
     if (bfp->filepath != NULL && bfp->dirname == NULL && bfp->filename == NULL) {
 	char *t = strrchr(bfp->filepath, DIRSEP_C);
-	if (t == NULL) 
+	if (t == NULL)
 	    bfp->filename = xstrdup(bfp->filepath);
 	else {
 	    bfp->dirname = xstrdup(bfp->filepath);
@@ -234,7 +234,7 @@ bfpath *bfpath_free(bfpath *bfp)
     return NULL;
 }
 
-char *build_progtype(const char *name, const char *db_type) 
+char *build_progtype(const char *name, const char *db_type)
 {
     char *type;
     if (strcmp(db_type, "db") == 0)
