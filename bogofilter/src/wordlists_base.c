@@ -91,13 +91,8 @@ void init_wordlist(const char* name,
 	}
 
 	/* append to list */
-	if (list_ptr->next == NULL) {
-	    list_ptr->next=n;
-	    return;
-	}
-
-	/* insert into middle of list */
-	if (list_ptr->next->override > override) {
+	if (list_ptr->next == NULL || 
+	    list_ptr->next->override > override) {
 	    n->next=list_ptr->next;
 	    list_ptr->next=n;
 	    return;
