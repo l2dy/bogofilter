@@ -23,6 +23,9 @@ if [ -z "$AUTO_XA" ]; then
     exit 77
 fi
 
+unset BF_FORCE_NON_TRANSACTIONAL
+unset BF_FORCE_TRANSACTIONAL
+
 OUT=${TMPDIR}/test.out
 MSG=${TMPDIR}/test.msg
 LOG=${BOGOFILTER_DIR}/log.0000000001
