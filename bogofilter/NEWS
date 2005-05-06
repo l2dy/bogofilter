@@ -15,7 +15,7 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
-	2005-05-05
+0.94.9	2005-05-06
 
 	* Fixed pathing regression which caused 'bogofilter_dir=dir' option
           to supercede '-d dir' option.
