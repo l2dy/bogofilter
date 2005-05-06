@@ -15,6 +15,11 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
+	2005-05-05
+
+	* Fixed pathing regression which caused 'bogofilter_dir=dir' option
+          to supercede '-d dir' option.
+
 0.94.8	2005-05-03
 
 	* Revised manpage's description of -p (passthrough) option.
