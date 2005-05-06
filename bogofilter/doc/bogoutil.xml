@@ -26,20 +26,18 @@
 		<arg choice="plain">-d <replaceable>file</replaceable></arg>
 		<arg choice="plain">-H <replaceable>file</replaceable></arg>
 		<arg choice="plain">-l <replaceable>file</replaceable></arg>
-		<arg choice="plain">-m</arg>
+		<arg choice="plain">-m <replaceable>file</replaceable></arg>
 		<arg choice="plain">-w <replaceable>file</replaceable></arg>
 		<arg choice="plain">-p <replaceable>file</replaceable></arg>
 	    </group>
-	    <arg choice="plain"><replaceable>file.db</replaceable></arg>
 	</cmdsynopsis>
 
 	<cmdsynopsis>
 	    <command>bogoutil</command>
 	    <group choice="req">
-		<arg choice="plain">-r</arg>
-		<arg choice="plain">-R</arg>
+		<arg choice="plain">-r <replaceable>file</replaceable</arg>
+		<arg choice="plain">-R <replaceable>file</replaceable</arg>
 	    </group>
-	    <arg choice="plain"><replaceable>directory</replaceable></arg>
 	</cmdsynopsis>
 
 	<cmdsynopsis>
