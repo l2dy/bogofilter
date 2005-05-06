@@ -833,8 +833,6 @@ int main(int argc, char *argv[])
 
     set_today();			/* compute current date for token age */
 
-    set_bogohome( "." );		/* set default */
-
     process_arglist(argc, argv);
     process_config_files(false, longopts_bogoutil);	/* need to read lock sizes */
 
@@ -846,6 +844,9 @@ int main(int argc, char *argv[])
     }
 
     bfp = bfpath_create(ds_file);
+    if (bogohome == NULL)
+	set_bogohome( "." );		/* set default */
+
     bfpath_set_bogohome(bfp);
 
     mode = get_mode(flag);
