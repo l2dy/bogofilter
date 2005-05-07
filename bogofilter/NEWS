@@ -15,6 +15,12 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
+	2005-05-07
+
+	* Fixed pathing problem in bogoutil.  Default directory should be "."
+	* Revised utility scripts (bf_copy, bf_compact, bf_tar,
+          bf_resize) for consistency and Solaris 9 compatibility.
+
 0.94.9	2005-05-06
 
 	* Fixed pathing regression which caused 'bogofilter_dir=dir' option
