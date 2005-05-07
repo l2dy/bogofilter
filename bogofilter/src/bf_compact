@@ -36,7 +36,7 @@ done
 if [ -n "$1" ] ; then
     FILES="$@"
 else
-    FILESS=`ls "$BOGOHOME" | grep .db$`
+    FILES=`ls "$BOGOHOME" | grep .db$`
 fi
 
 TEMP="bf_compact.$$"
@@ -52,18 +52,19 @@ if test -f "$BOGOHOME"/DB_CONFIG ; then
 fi
 
 # determine transactions
-trans=no
 if test "`find "$BOGOHOME/" -name "log.??????????" -print`" != "" ; then
-    trans=yes
+    TXN=yes
 fi
 
 # reload files
 for FILE in $FILES ; do
-    bogoutil -d "$BOGOHOME"/"$FILE" | bogoutil --db-transaction=$trans -l $TEMP/"$FILE"
+    bogoutil -d "$BOGOHOME"/"$FILE" | bogoutil --db-transaction=no -l $TEMP/"$FILE"
 done
 
-#checkpoint and remove unneeded log files
-bogoutil --db-prune=$TEMP
+if [ -n "$TXN" ] ; then
+    #create database environment files
+    bogofilter -e -C -d $TEMP --db-transactions=yes < /dev/null
+fi
 
 # remove $BOGOHOME.old so we don't move the new backup *into* it
 # rather than renaming the backup to it.
