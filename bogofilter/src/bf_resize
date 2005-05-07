@@ -32,7 +32,7 @@ fi
 
 # count pages in database files
 for i in $dbs ; do
-    pages=$(bogoutil --db-print-leafpage-count "$i")
+    pages=$(bogoutil --db-print-leafpage-count="$i")
     a=$(( $a + $pages ))
 done
 

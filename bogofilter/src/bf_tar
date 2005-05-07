@@ -48,7 +48,7 @@ nukelogs() {
 if [ $REMOVEBEF -eq 1 ] ; then
     nukelogs
 else
-    bogoutil --db-checkpoint "$BOGOHOME"
+    bogoutil --db-checkpoint="$BOGOHOME"
 fi
 
 # database first, if it's newer than the log, it's not recoverable!
