@@ -32,11 +32,11 @@ while true; do
     esac
 done
 
-# find wordlist default
-if [ -z "$1" ] ; then
-    FILE=`bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist' | cut -f3 -d,`
+# find wordlists
+if [ -n "$1" ] ; then
+    FILES="$@"
 else
-    FILE="$@"
+    FILESS=`ls "$BOGOHOME" | grep .db$`
 fi
 
 TEMP="bf_compact.$$"
@@ -58,9 +58,8 @@ if test "`find "$BOGOHOME/" -name "log.??????????" -print`" != "" ; then
 fi
 
 # reload files
-for j in $FILE ; do
-    i=`basename "$j"`
-    bogoutil -d "$BOGOHOME"/"$i" | bogoutil --db-transaction=$trans -l $TEMP/"$i"
+for FILE in $FILES ; do
+    bogoutil -d "$BOGOHOME"/"$FILE" | bogoutil --db-transaction=$trans -l $TEMP/"$FILE"
 done
 
 #checkpoint and remove unneeded log files
