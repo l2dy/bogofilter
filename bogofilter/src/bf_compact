@@ -63,7 +63,7 @@ done
 
 if [ -n "$TXN" ] ; then
     #create database environment files
-    bogofilter -e -C -d $TEMP --db-transactions=yes < /dev/null
+    bogofilter -e -C -d $TEMP --db-transaction=yes < /dev/null
 fi
 
 # remove $BOGOHOME.old so we don't move the new backup *into* it
