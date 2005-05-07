@@ -34,7 +34,7 @@ done
 
 # find wordlist default
 if [ -z "$1" ] ; then
-    FILE=$(bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist' | cut -f3 -d,)
+    FILE=`bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist' | cut -f3 -d,`
 else
     FILE="$@"
 fi
@@ -53,13 +53,13 @@ fi
 
 # determine transactions
 trans=no
-if test "$(find "$BOGOHOME/" -name "log.??????????" -print)" != "" ; then
+if test "`find "$BOGOHOME/" -name "log.??????????" -print`" != "" ; then
     trans=yes
 fi
 
 # reload files
 for j in $FILE ; do
-    i=$(basename "$j")
+    i=`basename "$j"`
     bogoutil -d "$BOGOHOME"/"$i" | bogoutil --db-transaction=$trans -l $TEMP/"$i"
 done
 
