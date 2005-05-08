@@ -13,7 +13,7 @@ AC_PROG_CC(gcc xlc cc)
 dnl AC_GNU_SOURCE
 AC_CHECK_TOOL(AR, ar)
 AC_PROG_RANLIB
-AC_PATH_PROGS(PERL, perl perl5, $PATH:/usr/local/bin:/usr/bin)
+AC_PATH_PROGS(PERL, perl perl5,,$PATH:/usr/local/bin:/usr/bin)
 AC_PATH_PROGS(NSGMLS,onsgmls nsgmls,nsgmls)
 AM_PROG_LEX
 
@@ -46,8 +46,8 @@ AC_EXEEXT
 
 dnl check for b0rked Solaris (and other shells) and find one that works
 AC_MSG_CHECKING(for a working shell...)
-for i in /bin/sh /usr/xpg4/bin/sh /bin/ksh /bin/bash /usr/local/bin/bash ; do
-    $i -c 'echo $(echo ok)' >config.$$ 2>/dev/null
+for i in /usr/xpg6/bin/sh /usr/xpg4/bin/sh /usr/ccs/bin/sh /bin/sh /usr/bin/sh /bin/ksh /bin/bash /usr/local/bin/bash ; do
+    $i -c 'if ! false ; then echo $(echo ok) ; fi' >config.$$ 2>/dev/null
     j=`cat config.$$`
     rm -f config.$$
     if test "x$j" = "xok" ; then
@@ -58,7 +58,7 @@ for i in /bin/sh /usr/xpg4/bin/sh /bin/ksh /bin/bash /usr/local/bin/bash ; do
 done
 AC_MSG_RESULT($SHELL)
 if test "x$SHELL" = "x" ; then
-    AC_MSG_ERROR(no sufficiently POSIX/SUS compliant shell found)
+    AC_MSG_ERROR(no SUS compliant shell found - on Solaris, install SUNWxcu4)
 fi
 
 dnl crutch for b0rked S/390 gcc:
@@ -744,6 +744,7 @@ AC_CONFIG_FILES([Makefile \
 		contrib/Makefile doc/Makefile \
 		src/Makefile \
 		src/tests/Makefile \
+		src/bf_compact src/bf_copy src/bf_resize src/bf_tar \
 		])
 AC_OUTPUT
 

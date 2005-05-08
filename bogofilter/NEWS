@@ -15,9 +15,20 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
+0.94.10
+
+	2005-05-08
+
+	* Substitute path to SUSv2 compliant shell in bf_* script "magic
+	  shebang" lines, so they use /usr/xpg4/bin/sh on Solaris 7+
+	  and don't fail any more.
+
+	* Repaired t.abort and t.probe tests to work with ancient shells.
+
 	2005-05-07
 
 	* Fixed pathing problem in bogoutil.  Default directory should be "."
+
 	* Revised utility scripts (bf_copy, bf_compact, bf_tar,
           bf_resize) for consistency and Solaris 9 compatibility.
 
