@@ -23,21 +23,21 @@ if [ ! -d $BOGOHOME ] ; then
 fi
 
 # obtain list of database files
-a=0
-dbs=`bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist' | cut -f3 -d,`
+PAGES=0
+DATABASES=`bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist' | cut -f3 -d,`
 if [ ! "$dbs" ] ; then
     echo >&2 "No database files in \"$BOGOHOME\" found"
     exit 1
 fi
 
 # count pages in database files
-for i in $dbs ; do
-    pages=`bogoutil --db-print-leafpage-count="$i"`
-    let a="$a + $pages"
+for DB in $DATABASES ; do
+    COUNT=`bogoutil --db-print-leafpage-count="$DB"`
+    let PAGES="$PAGES + $COUNT"
 done
 
 # be generous, double count
-let a="$a + $a"
+let PAGES="$PAGES + $PAGES"
 
 # and update or create DB_CONFIG
 : >> "$BOGOHOME"/DB_CONFIG
@@ -46,8 +46,8 @@ let a="$a + $a"
   egrep -v '^set_lk_max_(locks|objects)' "$BOGOHOME"/DB_CONFIG >"$BOGOHOME"/DB_CONFIG.new
 )
 if [ $? -ge 2 ] ; then exit 1 ; fi
-echo >>"$BOGOHOME"/DB_CONFIG.new set_lk_max_locks $a
-echo >>"$BOGOHOME"/DB_CONFIG.new set_lk_max_objects $a
+echo >>"$BOGOHOME"/DB_CONFIG.new set_lk_max_locks $PAGES
+echo >>"$BOGOHOME"/DB_CONFIG.new set_lk_max_objects $PAGES
 mv "$BOGOHOME"/DB_CONFIG.new "$BOGOHOME"/DB_CONFIG
 
 # make change effective by recreating the environment
