@@ -19,6 +19,10 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 	2005-05-08
 
+	* Substitute path to the same awk program that configure found
+	  into bf_compact so it works on systems that have only nawk or gawk
+	  but not awk.
+
 	* Substitute path to SUSv2 compliant shell in bf_* script "magic
 	  shebang" lines, so they use /usr/xpg4/bin/sh on Solaris 7+
 	  and don't fail any more.

@@ -36,7 +36,7 @@ done
 if [ -n "$1" ] ; then
     FILES="$@"
 else
-    DIR=`bogofilter -QQ | grep ^bogofilter_dir | awk '{print $3}'`
+    DIR=`bogofilter -QQ | grep ^bogofilter_dir | @AWK@ '{print $3}'`
     if [ "$BOGOHOME" != "$DIR" ] ; then
 	FILES=`ls "$BOGOHOME"/*.db`
     else
