@@ -24,7 +24,7 @@ fi
 
 # obtain list of database files
 a=0
-dbs=$(bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist' | cut -f3 -d,)
+dbs=`bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist' | cut -f3 -d,`
 if [ ! "$dbs" ] ; then
     echo >&2 "No database files in \"$BOGOHOME\" found"
     exit 1
@@ -33,11 +33,11 @@ fi
 # count pages in database files
 for i in $dbs ; do
     pages=`bogoutil --db-print-leafpage-count="$i"`
-    a=$(( $a + $pages ))
+    let a="$a + $pages"
 done
 
 # be generous, double count
-a=$(( $a + $a ))
+let a="$a + $a"
 
 # and update or create DB_CONFIG
 : >> "$BOGOHOME"/DB_CONFIG
