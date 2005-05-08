@@ -15,9 +15,7 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
-0.94.10
-
-	2005-05-08
+0.94.10	2005-05-08
 
 	* Substitute path to the same awk program that configure found
 	  into bf_compact so it works on systems that have only nawk or gawk
