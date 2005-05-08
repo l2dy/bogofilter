@@ -36,7 +36,12 @@ done
 if [ -n "$1" ] ; then
     FILES="$@"
 else
-    FILES=`ls "$BOGOHOME" | grep .db$`
+    DIR=`bogofilter -QQ | grep ^bogofilter_dir | awk '{print $3}'`
+    if [ "$BOGOHOME" != "$DIR" ] ; then
+	FILES=`ls "$BOGOHOME"/*.db`
+    else
+	FILES=`bogofilter -QQ | grep ^wordlist | cut -f3 -d,`
+    fi
 fi
 
 TEMP="bf_compact.$$"
@@ -58,7 +63,8 @@ fi
 
 # reload files
 for FILE in $FILES ; do
-    bogoutil -d "$BOGOHOME"/"$FILE" | bogoutil --db-transaction=no -l $TEMP/"$FILE"
+    NAME=`basename $FILE`
+    bogoutil -d $FILE | bogoutil --db-transaction=no -l $TEMP/$NAME
 done
 
 if [ -n "$TXN" ] ; then
