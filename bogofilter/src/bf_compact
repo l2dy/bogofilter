@@ -20,7 +20,7 @@ BOGOHOME="$1"
 shift
 
 if [ ! -d "$BOGOHOME" ] ; then
-    echo $BOGOHOME must be a directory. Abort.
+    echo $BOGOHOME must be a directory, not a file
     exit 1
 fi
 
