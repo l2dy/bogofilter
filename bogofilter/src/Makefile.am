@@ -252,7 +252,7 @@ $(datastore_OBJECT): Makefile $(datastore_SOURCE)
 bogoupgrade: bogoupgrade.in Makefile
 	rm -f $@
 	sed 's}[@]PERL@}$(PERL)}' <$(srcdir)/bogoupgrade.in >$@ || rm -f $@
-	chmod a=rx bogoupgrade
+	chmod +x bogoupgrade
 
 #splint - weak
 splint.check: $(version_sources) $(bogofilter_SOURCES) $(bogolexer_SOURCES) $(bogoutil_SOURCES) $(bogotune_SOURCES)
