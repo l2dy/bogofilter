@@ -33,7 +33,7 @@ if [ $# -ne 1 ] ; then
     exit 1
 fi
 
-BOGOHOME="$1"
+BOGOHOME=${1:-.}
 
 if [ ! -d "$BOGOHOME" ] ; then
     echo $BOGOHOME must be a directory, not a file
