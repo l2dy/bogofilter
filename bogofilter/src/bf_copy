@@ -51,7 +51,7 @@ if test -f "$SRC"/DB_CONFIG ; then cp -p "$SRC"/DB_CONFIG "$DST" ; fi
 
 for FILE in "$SRC"/*.db ; do
     SIZE=`bogoutil --db-print-pagesize=$FILE`
-    dd bs=$SIZE if="$FILE" of="$DST/"`basename "$FILE"`
+    dd bs=$SIZE if=$FILE of="$DST/"`basename $FILE`
 done
 
 if test "$LOGS" ; then bogoutil --db-recover="$DST" ; fi

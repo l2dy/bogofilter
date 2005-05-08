@@ -17,8 +17,8 @@ set -e
 
 BOGOHOME=${1:-.}
 
-if [ ! -d $BOGOHOME ] ; then
-    echo "$BOGOHOME" must be a directory, not a file
+if [ ! -d "$BOGOHOME" ] ; then
+    echo $BOGOHOME must be a directory, not a file
     exit
 fi
 

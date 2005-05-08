@@ -19,14 +19,14 @@ fi
 BOGOHOME="$1"
 shift
 
-if [ ! -d $BOGOHOME ] ; then
-    echo "$BOGOHOME must be a directory. Abort."
+if [ ! -d "$BOGOHOME" ] ; then
+    echo $BOGOHOME must be a directory. Abort.
     exit 1
 fi
 
 # strip trailing slashes
 while true; do
-    case $BOGOHOME in
+    case "$BOGOHOME" in
 	*/) BOGOHOME=${BOGOHOME%/} ;;
 	*)  break ;;
     esac
