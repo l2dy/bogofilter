@@ -11,7 +11,7 @@
 set -e # die on errors
 
 if [ -z "$1" ] ; then
-    echo usage: bf_compact source_dir [wordlist_name...]
+    echo usage: bf_compact source_dir \[wordlist_name...\]
     exit 1
 fi
 

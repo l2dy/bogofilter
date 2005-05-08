@@ -21,7 +21,7 @@ while test "$1" ; do
 done
 
 if [ $# -ne 2 ] ; then
-    echo usage: bf_copy [-c] source_dir dest_dir
+    echo usage: bf_copy \[-c\] source_dir dest_dir
     echo "   use -c to copy active logs, not all"
     exit 1
 fi
