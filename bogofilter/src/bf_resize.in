@@ -13,6 +13,8 @@
 # size and writes it to DB_CONFIG, then runs recovery to make the change
 # effective.
 
+# $Id$
+
 set -e
 
 BOGOHOME=${1:-.}
@@ -25,7 +27,7 @@ fi
 # obtain list of database files
 PAGES=0
 DATABASES=`bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist' | cut -f3 -d,`
-if [ ! "$dbs" ] ; then
+if [ -z "$DATABASES" ] ; then
     echo >&2 "No database files in \"$BOGOHOME\" found"
     exit 1
 fi
