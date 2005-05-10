@@ -15,6 +15,10 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
+0.94.11	2005-05-10
+
+	* Correct variable name in bf_resize.
+
 0.94.10	2005-05-08
 
 	* Substitute path to the same awk program that configure found
