@@ -40,13 +40,12 @@ these changes. You should consult them.
 
 ------------------------------
 
-[Feature 0.94.2] SQLite3 support has been repared.  In versions 0.94.0
-and 0.94.1. aborting a larger registration could break databases
+[Feature 0.94.2] SQLite3 support has been repaired.  In versions 0.94.0
+and 0.94.1, aborting a larger registration could break database
 consistency (permanent database corruption). SQLite3 must be at least
 version 3.2.0.
 
 [Features 0.94.0]
-
 Bogofilter and bogoutil now support both build-time and run-time
 choosing whether to operate with (or without) transaction support.
 They can also auto-detect whether you've been using transactions or
@@ -200,12 +199,12 @@ will be: bogotune -n good1 -n good2 -s bad1 -s bad2
 
 ------------------------------
 
-[Feature 0.93.3 ] SQLite 3.0.8 (and newer) is now supported. It isn't
+[Feature 0.93.3] SQLite 3.0.8 (and newer) is now supported. It isn't
 nearly as fast as Berkeley DB but uses only one permanent and one
 transient file (hence less maintenance work) and is supposed to be
 proof against application and system crashes.
 
-[Feature 0.93.1 ] Berkeley DB 4.3 is now supported.
+[Feature 0.93.1] Berkeley DB 4.3 is now supported.
 
 ------------------------------
 
