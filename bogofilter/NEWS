@@ -15,6 +15,11 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 -------------------------------------------------------------------------------
 
+	2005-05-12
+
+	* bogofilter-milter.pl update by Jonathan Kamens.  Use Spam/Ham 
+	  rather than Yes/No, fixes to syslog calls, efficiency improvements.
+
 0.94.11	2005-05-10
 
 	* Correct variable name in bf_resize.

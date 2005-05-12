@@ -5,9 +5,9 @@
 # bogofilter-milter.pl - a Sendmail::Milter Perl script for filtering
 # mail using individual users' bogofilter databases.
 
-# Copyright 2003 Jonathan Kamens <jik@kamens.brookline.ma.us>.  Please
-# send me bug reports, suggestions, criticisms, compliments, or any
-# other feedback you have about this script!
+# Copyright 2003, 2005 Jonathan Kamens <jik@kamens.brookline.ma.us>.
+# Please send me bug reports, suggestions, criticisms, compliments, or
+# any other feedback you have about this script!
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,13 +20,13 @@
 # General Public License for more details. 
 
 # You will need the following non-standard Perl modules installed to
-# use this script: Sendmail::Milter, Mail::Alias, Proc::Daemon.
-# Before using this script, search for CONFIGURABLE SETTINGS and
-# configure them appropriately for your site.
+# use this script: Sendmail::Milter, Mail::Alias, Proc::Daemon,
+# IO::Stringy.  Before using this script, search for CONFIGURABLE
+# SETTINGS and configure them appropriately for your site.
 #
 # Inserts "X-Bogosity: Spam, tests=bogofilter" into messages that
 # appear to be spam (or "Ham" into ones that don't).  If the message is
-# rejected, you usually won't see the "Yes", but see below about
+# rejected, you usually won't see the "Spam", but see below about
 # training mode.
 #
 # Save this script somewhere, launch it as root (by running it in the
@@ -55,6 +55,10 @@
 # If this string appears in the Subject of a message (case
 # insensitive), the message won't be filtered.
 my $magic_string = '[no-bogofilter]';
+
+# The largest message to keep in memory rather than writing to a
+# temporary file.
+my $MAX_INCORE_MSG_LENGTH = 1000000;
 
 my $pid_file = '/var/run/bogofilter-milter.pid';
 
@@ -107,6 +111,7 @@ use strict;
 use warnings;
 use Sendmail::Milter;
 use File::Basename;
+use File::Temp qw(tempfile);
 use Fcntl qw(:flock :seek);
 use Mail::Alias;
 use User::pwent;
@@ -114,6 +119,7 @@ use Sys::Syslog qw(:DEFAULT setlogsock);
 use English '-no_match_vars';
 use Proc::Daemon;
 use Getopt::Long;
+use IO::Scalar;
 
 # Used to cache the results of alias expansions and checks for
 # filtered recipients.
@@ -136,7 +142,6 @@ my %my_milter_callbacks =
 dia $usage if (! GetOptions('daemon' => \$run_as_daemon,
 			    'debug' => \$debug,
 			    'help|h|?' => \$get_help));
-
 if ($get_help) {
     print $usage;
     exit;
@@ -177,17 +182,18 @@ Sendmail::Milter::main($milter_interpreters);
 
 sub my_rcpt_callback {
     my $ctx = shift;
-    my $msg = $ctx->getpriv();
+    my $hash = $ctx->getpriv();
 
-    if ($msg) {
+    if ($hash->{'rcpt'}) {
 	# We've already encountered a recipient who is filtering this message.
-	$ctx->setpriv($msg);
+	$ctx->setpriv($hash);
 	return SMFIS_CONTINUE;
     }
     my $rcpt = $ctx->getsymval('{rcpt_addr}');
 
     if (&filtered_dir($rcpt)) {
-	$ctx->setpriv("$rcpt\n");
+	$hash->{'rcpt'} = $rcpt;
+	$ctx->setpriv($hash);
 	return SMFIS_CONTINUE;
     }
     else {
@@ -198,55 +204,101 @@ sub my_rcpt_callback {
 
 sub my_header_callback {
     my($ctx, $field, $value) = @_;
-    my($msg) = $ctx->getpriv();
+    my($hash) = $ctx->getpriv();
 
-    return SMFIS_ACCEPT if (! $msg);
+    return SMFIS_ACCEPT if (! $hash);
 
     if (($field =~ /^subject$/i) && ($value =~ /$magic_string_re/oi)) {
 	$ctx->setpriv(undef);
 	return SMFIS_ACCEPT;
     }
 
-    $msg .= "$field: $value\n";
-    $ctx->setpriv($msg);
+    $hash = &add_to_message($hash, "$field: $value\n");
+
+    $ctx->setpriv($hash);
 
     return SMFIS_CONTINUE;
 }
 
 sub my_eoh_callback {
     my($ctx) = @_;
-    my($msg) = $ctx->getpriv();
+    my($hash) = $ctx->getpriv();
 
-    $msg .= "\n";
-    $ctx->setpriv($msg);
+    $hash = &add_to_message($hash, "\n");
+
+    $ctx->setpriv($hash);
 
     return SMFIS_CONTINUE;
 }
 
 sub my_body_callback {
     my($ctx, $body, $len) = @_;
-    my($msg) = $ctx->getpriv();
+    my($hash) = $ctx->getpriv();
 
-    $msg .= $body;
-    $ctx->setpriv($msg);
+    $hash = &add_to_message($hash, $body);
+
+    $ctx->setpriv($hash);
 
     return SMFIS_CONTINUE;
 }
 
-sub my_eom_callback {
-    my $ctx = shift;
-    my $msg = $ctx->getpriv();
+sub add_to_message {
+    my($hash, $text) = @_;
+    return $hash if (! $text);
 
-    $msg =~ s/^(.*)\n//;
-    my $rcpt = $1;
+    if (! $hash->{'fh'}) {
+	$hash->{'msg'} = '' if (! $hash->{'msg'});
+	$hash->{'msg'} .= $text;
 
-    my $dir = &filtered_dir($rcpt);
+	if (length($hash->{'msg'}) <= $MAX_INCORE_MSG_LENGTH) {
+	    return $hash;
+	}
 
-    if (! $dir) {
-	&die("my_eom_callback called for non-filtered recipient $rcpt\n");
+	($hash->{'fh'}, $hash->{'fn'}) = tempfile();
+
+	if (! $hash->{'fn'}) {
+	    &die("error creating temporary file");
+	}
+
+	syslog('debug', '%s', "switching to temporary file " . $hash->{'fn'});
+
+	$text = $hash->{'msg'};
+	delete $hash->{'msg'};
     }
 
-    $msg =~ s/\r\n/\n/g;
+    if (! print({$hash->{'fh'} } $text)) {
+	&die("error writing to temporary file " . $hash->{'fn'});
+    }
+
+    return $hash;
+}
+
+sub message_read_handle {
+    my($hash) = @_;
+
+    if ($hash->{'fn'}) {
+	if (! seek($hash->{'fh'}, 0, SEEK_SET)) {
+	    &die("couldn't seek in " . $hash->{'fn'} . ": $!");
+	}
+	return $hash->{'fh'};
+    }
+    else {
+	return new IO::Scalar \$hash->{'msg'};
+    }
+}
+
+    
+sub my_eom_callback {
+    my $ctx = shift;
+    my $hash = $ctx->getpriv();
+    my $fh;
+    local($_);
+
+    my $dir = &filtered_dir($hash->{'rcpt'});
+
+    if (! $dir) {
+	&die("my_eom_callback called for non-filtered recipient " . $hash->{'rcpt'} . "\n");
+    }
 
     my $pid = open(BOGOFILTER, '|-');
     if (! defined($pid)) {
@@ -254,17 +306,32 @@ sub my_eom_callback {
     }
     elsif (! $pid) {
 	&die("couldn't restrict permissions") if
-	    (! &restrict_permissions($rcpt));
+	    (! &restrict_permissions($hash->{'rcpt'}, 1));;
 	exec('bogofilter', '-u', '-d', $dir) ||
 	    &die("exec(bogofilter): $!\n");
-	&unrestrict_permissions;
+	# &die had better not return!
     }
 
-    print(BOGOFILTER $msg) || &die("writing to bogofilter: $!\n");
+    $fh = &message_read_handle($hash);
+    if ($hash->{'fn'}) {
+	# This is safe to do on Unix, since on Unix you can unlink an
+	# open file and it'll stay around until the last open file
+	# handle to it goes away.  If this script were to be used on
+	# non-Unix operating systems, which is a big "if" that I'm not
+	# sure could ever happen, then this unlink might be a problem
+	# and would need to happen later.
+	unlink $hash->{'fn'};
+    }
+
+    while (<$fh>) {
+	s/\r\n$/\n/;
+	print(BOGOFILTER $_) || &die("writing to bogofilter: $!\n");
+    }
+
     if (close(BOGOFILTER)) {
 	my($training);
 	if ($training_file) {
-	    if (&restrict_permissions($rcpt)) {
+	    if (&restrict_permissions($hash->{'rcpt'})) {
 		$training = (-f "$dir/$training_file");
 		&unrestrict_permissions;
 	    }
@@ -274,15 +341,15 @@ sub my_eom_callback {
 		$training = 1;
 	    }
 	}
-	$ctx->addheader('X-Bogosity', 'Yes, tests=bogofilter');
+	$ctx->addheader('X-Bogosity', 'Spam, tests=bogofilter');
 	my $from = $ctx->getsymval('{mail_addr}');
 	syslog('info', '%s', ($training ? "would reject" : "rejecting") . 
-	       " likely spam from $from to $rcpt based on $dir");
+	       " likely spam from $from to " . $hash->{'rcpt'} . " based on $dir");
 	if (! $training) {
 	    my $archive;
 
 	    $archive = ($archive_mbox &&
-			&restrict_permissions($rcpt) &&
+			&restrict_permissions($hash->{'rcpt'}) &&
 			(lstat($archive = "$dir/$archive_mbox"))) ?
 			$archive : undef;
 
@@ -312,17 +379,38 @@ sub my_eom_callback {
 			   "seek($archive, 0, SEEK_END): $!");
 		    goto close_archive;
 		}
-		# Mbox format requires a blank line at the end
-		$msg .= "\n" if ($msg !~ /\n$/);
-		$msg .= "\n" if ($msg !~ /\n\n$/);
+		if (! seek($fh, 0, SEEK_SET)) {
+		    &die("error rewinding message handle: $!");
+		}
 
 		if (! print(MBOX "From " . ($from || 'MAILER-DAEMON') .
-			    "  " . localtime() . "\n", $msg)) {
+			    "  " . localtime() . "\n")) {
 		    syslog('warning', '%s', "write($archive): $!");
+		    goto close_archive;
 		}
+
+		my($last_blank, $last_nl);
+
+		while (<$fh>) {
+		    s/\r\n/\n/;
+		    if (! print(MBOX $_)) {
+			syslog('warning', '%s', "write($archive): $!");
+			goto close_archive;
+		    }
+
+		    $last_nl = ($_ =~ /\n/);
+		    $last_blank = ($_ eq "\n");
+		}
+
+		# Mbox format requires a blank line at the end
+		if (! ($last_blank || print(MBOX ($last_nl ? "\n" : "\n\n")))) {
+		    syslog('warning', '%s', "write($archive): $!");
+		    goto close_archive;
+		}
+
 	      close_archive:
 		if (! close(MBOX)) {
-		    syslog('warning', "close($archive): $!");
+		    syslog('warning', '%s', "close($archive): $!");
 		}
 	    }
 	  no_archive_open:
@@ -335,7 +423,7 @@ sub my_eom_callback {
 	}
     }
     else {
-	$ctx->addheader('X-Bogosity', 'No, tests=bogofilter');
+	$ctx->addheader('X-Bogosity', 'Ham, tests=bogofilter');
     }
 
     $ctx->setpriv(undef);
@@ -344,6 +432,11 @@ sub my_eom_callback {
 
 sub my_abort_callback {
     my($ctx) = shift;
+    my $hash = $ctx->getpriv();
+
+    if ($hash->{'fn'}) {
+	unlink $hash->{'fn'};
+    }
 
     $ctx->setpriv(undef);
     return SMFIS_CONTINUE;
@@ -355,15 +448,25 @@ sub filtered_dir {
 }
 
 sub restrict_permissions {
-    my($rcpt) = $_[0];
+    my($rcpt) = shift;
+    my($no_going_back) = shift;
+
     my($uid, $gid, $dir) = &expand_recipient($rcpt);
     if (! (defined($uid) && defined($gid))) {
-	syslog('err', "internal error: couldn't determine UID and GID " .
+	syslog('err', '%s', "internal error: couldn't determine UID and GID " .
 	       "for $rcpt");
 	return undef;
     }
     $EUID = $uid;
     $EGID = $gid;
+    if ($no_going_back) {
+	# When we're ready to exec an external program, i.e.,
+	# bogofilter, we want to set the real UID and GID so that,
+	# e.g., bogofilter will look in the correct home directory for
+	# .bogofilter.cf.
+	$UID = $uid;
+	$GID = $gid;
+    }
     1;
 }
 
@@ -420,4 +523,5 @@ sub die {
     my(@msg) = @_;
 
     syslog('err', '%s', "@msg");
+    exit(1);
 }
