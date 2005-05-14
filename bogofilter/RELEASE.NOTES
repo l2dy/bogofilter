@@ -36,6 +36,83 @@ is working properly.
 NOTE: the NEWS and CHANGES documents have greater detail on some of
 these changes. You should consult them.
 
+******** [Summary 0.94.12] ********
+
+Bogofilter has undergone many changes since its last stable release in
+October 2004.
+
+The biggest change in bogofilter is support for Berkeley DB's
+transaction capability.
+
+Lesser changes include a change in classification defaults (from
+bi-state to tri-state classification), documentation updates (esp man
+page and FAQ), internal code cleanups (including how long options are
+processed).
+
+---- Classification Change ----
+
+Bogofilter's classification default has changed from two-state (Yes/No)
+to tri-state (Spam/Ham/Unsure).  This shows up as a change to the
+X-Bogosity line.  Spam and ham now appear as:
+
+    X-Bogosity: Ham, tests=bogofilter, spamicity=0.011004, ...
+    X-Bogosity: Spam, tests=bogofilter, spamicity=0.922911, ...
+
+Previously the words "Yes" and "No" were used to identify ham and
+spam.  Classification "Unsure" is used for messages scoring between
+0.45 and 0.99).
+
+---- Changed Options ----
+
+Some options have been added or modified.  If you use any of the
+changed options, you will probably need to modify your scripts,
+procmail recipes, etc.  As an example, some bogoutil options which
+used to allow either filenames or directory names are now restricted
+to filenames.  See the man pages and help messages if you have
+questions.
+
+---- Transaction Information ----
+
+Prior to version 0.93.0, bogofilter used Berkeley DB only in its
+non-transactional mode.  With 0.93.0, the use of Berkeley DB's
+transactional mode was added.  Why transactions?  Because transactions
+offer ACID, which stands for Atomicity, Consistency, Isolation, and
+Durability, which are key to transaction processing in databases and
+ensuring the integrity of a database.  For more on the subject, see
+Wikipedia, i.e.  http://en.wikipedia.org/wiki/ACID.  
+
+What transactions offer is additional protection against database
+corruption.  They also include record level locking which makes it
+possible for multiples copies of bogofilter (and bogoutil) to be 
+reading and writing the wordlist at the same time.  To make this
+happen, Berkeley DB uses additional files, specifically lockfiles and
+log files.  The presence of these files means that copying a wordlist
+can no longer be done using the "cp" command.  Bogofilter now includes
+utility scripts bf_compact, bf_copy, bf_resize, and bf_tar for
+handling 4 common chores relating to databases.
+
+Bogofilter's default build makes use of transactions optional.  If
+you've never used transactions and haven't told bogofilter to use
+them, it won't use them.  This simplifies administering bogofilter,
+though the risk of a corrupted database is higher.  See file
+doc/README.db for more detailed technical information on bogofilter's
+handling of transactions and how to setup your machine to best support
+transactions.
+
+When bogofilter starts, it'll check the bogofilter directory (which
+contains the wordlist file) to see if transactions have been used.  If
+so, it will use transactions; if not, it won't use them.
+
+This auto-probing can be overridden when running bogofilter and
+bogoutil.  All that is needed is the proper a command line option (
+"--db-transaction=yes" or "-db--transaction=no" ) or the proper config
+file option ("db_transaction=yes" or "db_transaction=no").
+
+Alternatively, when building from source, ./configure can be given
+option "--enable-transactions" or "--disable-transactions" to build
+executables that will only operate in one mode (and that are a slight
+bit smaller).
+
 ------------------------------
 
 [Feature 0.94.2] SQLite3 support has been repaired.  In versions 0.94.0
