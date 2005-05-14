@@ -4,7 +4,7 @@ POTENTIAL FOR DATA CORRUPTION DURING UPDATES
 
 If you plan to upgrade your database library, if only as a side effect
 of an operating system upgrade, DO HEED the relevant documentation, for
-instance, the doc/README.db file - you may need to prepare the upgrade
+instance, the doc/README.db file.  You may need to prepare the upgrade
 with the old version of the software.
 
 Otherwise, you may cause irrecoverable damage to your databases.
@@ -12,8 +12,6 @@ Otherwise, you may cause irrecoverable damage to your databases.
 Do backup your databases before making the upgrade.
 ------------------------------------------------------------------------
 WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
-
-
 
 This file documents changes in bogofilter since version 0.11.  In
 particular it describes: (1) Features, which are significant changes
