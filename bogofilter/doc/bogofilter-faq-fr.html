@@ -62,7 +62,7 @@
         <ul>
           <li><a href="#what-is-bogofilter">Qu'est ce que Bogofilter?</a></li>
           <li><a href="#bogo-what">Bogo-quoi?</a></li>
-          <li><a href="#bogo-how">Comment fonctionne Bogofilter?</a></li>	  
+          <li><a href="#bogo-how">Comment fonctionne Bogofilter?</a></li>
           <li><a href="#lists">Listes de diffusion Bogofilter</a></li>
         </ul>
       </li>
@@ -124,12 +124,12 @@
       <li>
         Problèmes techniques
 	<ul>
-	  <li><a href="#multi-user">Bogofilter peut-il être utilisé dans un environnement multi-utilisateurs?</a></li>  
+	  <li><a href="#multi-user">Bogofilter peut-il être utilisé dans un environnement multi-utilisateurs?</a></li>
           <li><a href="#nfs">Puis-je partager une liste de mots par NFS?</a></li>
           <li><a href="#return-codes">Pourquoi Bogofilter retourne les codes erreurs tels que 0 et
 	  256 quand il est appelé par un programme?</a></li>
           <li><a href="#changed-options">Pourquoi, depuis que j'ai mis à jour, mes scripts ne fonctionnent plus?</a></li>
-          <li><a href="#changed-tagging">Pourquoi, depuis que j'ai mis à jour, Bogofilter fonctionne-t-il moins bien?</a></li>	  
+          <li><a href="#changed-tagging">Pourquoi, depuis que j'ai mis à jour, Bogofilter fonctionne-t-il moins bien?</a></li>
 	  <li><a href="#remove-spam-or-nonspam"> Comment puis-je détruire tous les tokens spam?</a></li>
         </ul>
 
@@ -148,7 +148,7 @@
 	  <li><a href="#relativepath">datastore_db.c ne se compile pas!</a></li>
         </ul>
       </li>
-      
+
       <li>
         Utiliser Bogofilter avec différents programmes de messagerie
 
@@ -192,14 +192,14 @@
 
     <h2 id="bogo-what">Bogo-quoi?</h2>
 
-    <p>Bogofilter est une sorte de bogomètre 
+    <p>Bogofilter est une sorte de bogomètre
     <a href="http://www.catb.org/~esr/jargon/html/B/bogometer.html">(bogometer)</a>
-    ou filtre à bogues 
+    ou filtre à bogues
     <a href="http://www.catb.org/~esr/jargon/html/B/bogon-filter.html">(bogon-filter)</a>,
-    c'est à dire qu'il essaie d'identifier des mails bogués 
+    c'est à dire qu'il essaie d'identifier des mails bogués
     <a href="http://www.catb.org/~esr/jargon/html/B/bogus.html">(bogus)</a>
 
-    en mesurant leur bogosité 
+    en mesurant leur bogosité
     <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosity)</a>.</p>
 
     <hr>
@@ -214,7 +214,7 @@
     (Une approche statistique du problème du Spam).</p>
 
     <p>Après avoir lu tout ceci, vous vous posez probablement quelques questions.
-    La première pourrait être "Bogofilter est-il réellement un filtre anti-spam bayésien?" 
+    La première pourrait être "Bogofilter est-il réellement un filtre anti-spam bayésien?"
     Bogofilter est basé sur le théorème de Bayes et l'utilise dans les premières parties
     du calcul, puis d'autres méthodes statistiques par la suite. On peut donc affirmer sans risque
     qu'il s'agit d'un filtre anti-spam statistique avec un parfum bayésien.
@@ -329,7 +329,7 @@
     Bogofilter à tirer de mauvaises conclusions après tout, votre but est de lui
     faire comprendre <em>votre</em> courrier.</p>
 
-    
+
     <p>Une fois que vous avez vos corpus de spam et de ham, vous avez quatre
     choix possibles. Dans tous les cas, cela fonctionnera mieux si votre base
     d'apprentissage (les corpus ci-dessus) est conséquente. Plus un corpus est
@@ -359,18 +359,18 @@
     que la base de données
     connaît "tout" votre corpus d'entrainement (avec la précision de votre choix), cela
     fonctionne très bien. Vous pouvez utiliser <code>-o</code> pour créer une marge de
-    sécurité autour de "spam_cutoff" 
+    sécurité autour de "spam_cutoff"
     Avec spam_cutoff=0.6 vous voudrez peut-être évaluer tous les hams
     dans votre corpus en dessous de 0.3 et tous les spams au delà de 0.9. Notre exemple devient:</p>
 
-    <pre>    bogominitrain.pl -fnv ~/.bogofilter ham.mbx spam.mbx '-o 0.9,0.3'</pre></li> 
+    <pre>    bogominitrain.pl -fnv ~/.bogofilter ham.mbx spam.mbx '-o 0.9,0.3'</pre></li>
 
     <li><p>Méthode 3) Utilisez le script randomtrain (dans le répertoire contrib).
     Le script génère une liste de tous les messages dans les mailbox, mélange la liste, puis
     évalue chaque message, suiv d'un entrainement si nécessaire. Dans notre exemple:</p>
 
     <pre>     randomtrain -s spam.mbx -n ham.mbx </pre>
-    
+
     <p>Comme pour la méthode 4, cela fonctionne mieux si vous commencer avec un corpus
     d'entrainement de plusieurs milliers de messages. Ceci vous donnera une base de données
     plus complète et significativement plus grande.</p></li>
@@ -424,17 +424,17 @@
     l'apprentissage est plutôt lent.</p>
 
     <hr>
- 
+
     <h2 id="production">Comment puis-je conserver une bonne acuité?</h2>
     <p>Bogofilter fera des erreurs de temps en temps. C'est pourquoi un
     apprentissage régulier est important. Il existe principalement deux méthodes pour le faire.
     Premièrement, vous pouvez l'entraîner avec chaque nouveau message (en utilisant l'option
     -u). Deuxièmement, vous pouvez ne l'entraîner que sur des erreurs.</p>
-    
+
     <p>De plus, vous pouvez reconstruire votre base à certains moments,
     par exemple quand une nouvelle fonctionnalité importante est ajoutée à Bogofilter.
     Il peut être alors fort utile de mettre à jour régulièrement votre corpus d'apprentissage.</p>
-    
+
     <p>Bogofilter fait toujours de son mieux avec les informations
     disponibles. Cependant, il fera des erreurs, tel que classer des ham en spam
     (faux positifs) ou spam en ham (faux négatifs). Pour réduire la probabilité d'un réapparition
@@ -448,11 +448,11 @@
     besoin de la regarder et la corriger fréquemment.
     La correction peut être faite en utilisant <code>-Sn</code> pour changer la classification du message
     de spam en ham et <code>-Ns</code> pour changer de ham en spam.
-    
+
     </p><p>Corriger un message incorrectement classé peut affecter la classification d'autres
     messages. Plus votre base de données sera petite, plus grande sera la probabilité qu'une
     erreur d'apprentissage créee des classifications incorrectes.</p>
-    
+
     <p>L'utilisation de la méthode 2 ou 3 (ci-dessus) peut compenser cet effet.
     Repéter l'entrainement avec le corpus complet (y compris les messages de corrections ajoutés
     depuis le précédent apprentissage). Ceci ajoutera des messages dans la base de données afin
@@ -514,7 +514,7 @@
 
       <li>
         En utilisant "-vv" Bogofilter génère un histogramme, par
-        exemple 
+        exemple
 <pre>  X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
           int  cnt    prob   spamicity  histogram
          0.00   29  0.000209  0.000052  #############################
@@ -545,7 +545,7 @@
         En utilisant "-vvv" on produit la liste de <em>tous</em>
 
         les tokens dans le message, avec de l'information pour
-        chacun d'un. Par exemple: 
+        chacun d'un. Par exemple:
 <pre>  X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
                         n    pgood     pbad      fw     U
   "which"              10  0.208333  0.000000  0.000041 +
@@ -669,18 +669,18 @@
     cette marge de sécurité a montré son efficacité à améliorer les
     résultats dans l'entrainement sur erreur. En général, des marges plus larges sont
     une aide supplémentaire (malgré le fait que des marges trop grandes ne soient
-    pas optimales). Pour un mode à triple état, vous pouvez utiliser le milieu de 
+    pas optimales). Pour un mode à triple état, vous pouvez utiliser le milieu de
     l'état unsure avec un intervalle de +/- 0.3 pour l'entrainement</p>
 
     <p>Répéter l'entrainement sur erreur sur le même corpus de message peut améliorer
     la précision. L'idée est que les messages qui ont été bien classés une première fois
     peuvent, à la suite de l'entrainement, être mal classés. Fait qui sera compensé par
     cette répétition.</p>
-    
+
     <p>"L'entrainement sur épuisement" est la répétition de l'entrainement sur erreur, avec le même corpus
     de messages, jusqu'à ce que plus aucune erreur ne subsiste. Cette méthode peut
     aussi être améliorée grâce aux marges de sécurité. Voir pour cela
-    
+
     <a href="http://www.garyrobinson.net/2004/02/spam_filtering_.html">L'article de Gary Robinson</a>
     pour plus de détail.</p>
 
@@ -711,7 +711,7 @@
     _peut_ amplifier les futures mauvaises classifications de Bogofilter. C'est
     le même problème que si vous, administrateur système, vous enregistriez mal
     un message : ham en spam ou vice versa.</p>
-    
+
     <hr>
 
     <hr>
@@ -731,7 +731,7 @@
 	SPAMASSASSIN  = "/usr/bin/spamassassin"
 
 	:0 HBc
-	*? $SPAMASSASSIN -e
+	* ? $SPAMASSASSIN -e
 	#spam yields non-zero
 	#non-spam yields zero
 	| $BOGOFILTER -n -d $BOGOFILTER_DIR
@@ -749,7 +749,7 @@
 	:0:
 	* ^X-Bogosity:.Ham
 	non-spam</pre>
-  
+
     <hr>
 
     <h2 id="asian-spam">Comment traiter les spams asiatiques?</h2>
@@ -804,7 +804,7 @@
 
 	:0:
 	* ^Content-Type:.*multipart
-	* B?? $ ^Content-Type:.*^?.*charset="?($UNREADABLE)
+	* B ?? $ ^Content-Type:.*^?.*charset="?($UNREADABLE)
 	spam-unreadable</pre>
 
         <p>Avec un tel programme, Bogofilter ne verra <i>jamais</i>
@@ -813,7 +813,7 @@
     </ul>
 
     <hr>
-    
+
     <h2 id="compact-database">Comment compacter les bases?</h2>
 
     <p>Vous pouvez périodiquement compacter les bases afin d'occuper un minimum
@@ -835,8 +835,8 @@
     et ~/.bogofilter contiendra le nouvel environnement.</p>
 
     <p>Pour les anciennes versions de Bogofilter qui n'utilisent pas le
-    principe des transactions, la base de données est un simple fichier (wordlist.db) 
-    et ne nécessite pas d'utiliser le script. Les commandes ci-dessus 
+    principe des transactions, la base de données est un simple fichier (wordlist.db)
+    et ne nécessite pas d'utiliser le script. Les commandes ci-dessus
     créent une nouvelle base de données plus compacte et renomment le fichier
     original en wordlist.db.prv</p>
 
@@ -870,7 +870,7 @@
     goodlist.db, lancez la commande pour chacun d'eux).</p>
 
     <hr>
-    
+
     <h2 id="rescue">Comment faire si ma liste de mots est
     corrompue?</h2>
 
@@ -917,7 +917,7 @@
       ou '~') le nom est utilisé, sinon Bogofilter ajoute le contenu des variables de
       chemin dans l'ordre suivant : $BOGOFILTER_DIR, $BOGODIR, $HOME.</li>
 
-      <li>Précédence: c'est un entier tel que 1, 2, 3, ...  On recherche le token dans 
+      <li>Précédence: c'est un entier tel que 1, 2, 3, ...  On recherche le token dans
       les listes de mots dans le sens ascendant de la précédence. Si le
       token est trouvé, les listes de même précédence sont utilisées pour faire
       la somme des comptes. Les listes avec une précédence supérieure, ne
@@ -977,7 +977,7 @@
     <pre>  echo ignorez.moi | bogoutil -l ~/ignorelist.db</pre>
 
     <hr>
-    
+
     <h2 id="update">Comment puis-je faire pour transformer la base des
     mots séparé dans le nouveau format combiné?</h2>
 
@@ -990,7 +990,7 @@
     mode transactionnel?</h2>
 
     <p>La procédure est complètement documentée dans le fichier
-    doc/README.db section 2.2.1. 
+    doc/README.db section 2.2.1.
     Nous vous suggérons de lire complètement le paragraphe.</p>
 
     <p>En résumé, utilisez ces commandes:
@@ -1007,7 +1007,7 @@
     non transactionnel?</h2>
 
     <p>La procédure est complètement documentée dans le fichier
-    doc/README.db section 2.2.1. 
+    doc/README.db section 2.2.1.
     Nous vous suggérons de lire complètement le paragraphe.</p>
 
     <p>En résumé, vous pouvez utiliser bogoutil pour copier et recharger la base de mots,
@@ -1073,7 +1073,7 @@
 	      private environments&quot;?</h2>
 
 	  <p>Certaines distributions (par exemple le projet Fedora) propose
-	  BerkeleyDB avec le support des threads POSIX, et par conséquent les 
+	  BerkeleyDB avec le support des threads POSIX, et par conséquent les
 	  mutexes POSIX, alors que votre système ne supporte pas ces mutexes.
 	  (ceci dépend de votre version de noyau et du type exact de processeur).
 	</p>
@@ -1115,7 +1115,7 @@
         <li>Que chaque utilisateur maintienne sa propre base.</li>
     </ul>
 
-    <p>Le compromis courant : l'administrateur Bogofilter maintient la base de mots globale 
+    <p>Le compromis courant : l'administrateur Bogofilter maintient la base de mots globale
     et chaque utilisateur est autorisé à utiliser la liste globale ou sa liste privée.
     Un MDA, tel que procmail, peut-être programé pour appliquer d'abord la
     liste global (avec un seuil spam très strict) puis, si nécessaire, appliquer
@@ -1154,7 +1154,7 @@
     <p>Vraisemblablement les codes de retour ont été réécrits par
     waitpid(2). En C utilisez WEXITSTATUS(status) dans sys/wait.h, ou
     une macro comparable pour obtenir la valeur correcte. En Perl
-    utilisez 'system("bogofilter $input")&gt;&gt; 8'. 
+    utilisez 'system("bogofilter $input")&gt;&gt; 8'.
     Si vous voulez plus d'information, lancez la commande
     <code>"man waitpid"</code>.</p>
 
@@ -1174,9 +1174,9 @@
       <p>Le lexer, la partie qui extrait les tokens des messages, évolue. Ceci
       occasionne une modification de la génération de la liste des tokens, qui, par contrecoups
       va rendre des anciens tokens inutilisés.</p>
-      
+
       <p>Si vous rencontrez ce problème, vous êtes vivement encouragés à reconstruire votre
-      base. Si cela n'est pas possible, vous pouvez utiliser la version 
+      base. Si cela n'est pas possible, vous pouvez utiliser la version
       <a href="http://sourceforge.net/project/showfiles.php?group_id=62265&amp;package_id=59357">0.15.13</a>
       et lire la documentation qui va avec pour voir comment migrer.</p>
 
@@ -1188,7 +1188,7 @@
       une nouvelle wordlist. Avec l'aide d'outils tels que awk et grep, les nombres peuvent
       être mis à zéros et les tokens dont les comptes seraient à
       zéro pour les spams et les hams pourraient être détruits.</p>
-   
+
       <p>Les commandes suivantes vont détruire les tokens des messages
       spams:</p>
 
@@ -1209,8 +1209,8 @@
     <h2 id="port-notes">Comment faire fonctionner Bogofilter sur
     Solaris, BSD, etc.?</h2>
 
-    <p>Si vous n'avez pas déjà la version 3.0 ou plus de la 
-    <a href="http://www.sleepycat.com/">BerkeleyDB</a>, alors 
+    <p>Si vous n'avez pas déjà la version 3.0 ou plus de la
+    <a href="http://www.sleepycat.com/">BerkeleyDB</a>, alors
     <a href="http://www.sleepycat.com/download/db/">téléchargez la
 	(prenez une des 4.2.X)</a>,
     décompactez la, et lancez les commandes suivantes dans le
@@ -1259,7 +1259,7 @@
     <pre>	# portupgrade -N bogofilter</pre>
 
     <p><em>Note: Ceci suppose que vous soyez root.</em> Sinon, lisez
-    le mémento sur la section FreeBSC, et regardez comment 
+    le mémento sur la section FreeBSC, et regardez comment
     <a href="#build">compiler</a> si vous n'avez pas les privilèges requis..</p>
 
     <p>Suivant votre système, vous pourrez avoir à positionner certaines variables
@@ -1286,7 +1286,7 @@
 
     <p>GNU make est recommandé pour compiler Bogofilter car nous savons qu'il fonctionne.
     Nous ne pouvons maintenir des commandes make moins performantes. Si votre make
-    non-GNU fonctionne, magnifique!. Si vous rencontrez des problèmes, la chose à faire est 
+    non-GNU fonctionne, magnifique!. Si vous rencontrez des problèmes, la chose à faire est
     d'installer la commande GNU make. Si votre make non-GNU ne peut compiler Bogofilter,
     nous sommes désolés, mais c'est votre problème. Si cela ne nécessite qu'un petit
     patch propre pour le rendre compatible, nous pouvons éventuellement l'intégrer.</p>
@@ -1349,7 +1349,7 @@
 
     <p>Bogofilter est réputé pour fonctionner avec kmail, mozilla-mail, mutt,
     pine, sylpheed-claws, thunderbird.  Une recherche Googole vous aidera
-    à obtenir d'autres informations pour utiliser Bogofilter avec votre 
+    à obtenir d'autres informations pour utiliser Bogofilter avec votre
     programme de messagerie habituel.</p>
 
     <hr>
@@ -1413,7 +1413,7 @@
     <hr>
 
     <p>Une autre approche est de lancer Bogofilter
-    depuis  procmail, maildrop,etc. 
+    depuis  procmail, maildrop,etc.
     et de faire vérifier par Claws l'en-tête X-Bogosity et de filtrer les messages
     dans les dossiesr Spams et Unsure. Par exemple:</p>
 
@@ -1464,18 +1464,18 @@
     vous avez installé SpamAssassin et Bogofilter, et que vous souhaitiez utiliser
     Bogofilter, vous devrez modifier cette option pour
     'Bogofilter'.</p>
- 
+
     <p>La commande 'J b' ('mh-junk-blacklist') Entrainer le programme de spam en cours
     avec le contenu sélectionné, puis traite le(s) message(s) comme spécifié dans l'option
-    'mh-junk-disposition'. Par défaut, cette option est positionné sur 'Delete Spam' 
+    'mh-junk-disposition'. Par défaut, cette option est positionné sur 'Delete Spam'
     Mais vous pouvez aussi spécifier le nom d'un répertoire, ce qui sera utile pour
     construire un corpus de spam pour l'entrainement.</p>
- 
+
     <p>Au contraire, la commande 'J w' ('mh-junk-whitelist') reclassifie les messages
     sélectionnés comme Ham s'ils étaient incorrectement classés comme spam. Elle déplace
     alors les messages dans le dossier '+inbox'.</p>
 
- 
+
     <p> Pour plus d'information lire la page <a
     href="http://mh-e.sourceforge.net/">MH-E</a>
 
