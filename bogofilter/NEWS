@@ -15,6 +15,12 @@
 
 0.94.12	2005-05-15 - Stable Release
 
+	* bf_tar now includes the DB_CONFIG file in the output if present.
+
+	* bf_tar now prints a warning if the input path is relative, because
+	  this causes an inconsistent mix of absolute paths (log files) and
+	  relative paths (database and DB_CONFIG files) in the tarball.
+
 	* RELEASE notes now has a brief summary of the changes since
           the last stable release (0.92.8) in October 2004.
 
