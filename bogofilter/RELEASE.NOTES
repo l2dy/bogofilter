@@ -96,7 +96,7 @@ you've never used transactions and haven't told bogofilter to use
 them, it won't use them.  This simplifies administering bogofilter,
 though the risk of a corrupted database is higher.  See file
 doc/README.db for more detailed technical information on bogofilter's
-handling of transactions and how to setup your machine to best support
+handling of transactions and how to set up your machine to best support
 transactions.
 
 When bogofilter starts, it'll check the bogofilter directory (which
