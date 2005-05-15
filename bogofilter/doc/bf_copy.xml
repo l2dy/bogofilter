@@ -33,8 +33,8 @@
 	    well, and nonzero if it encountered trouble.</para>
     </refsect1>
     <refsect1 id='bugs'><title>BUGS</title>
-	<para>This script will assume all *.db files in
-	    the source directory are relevant and copy them. This may
+	<para>This script assumes all *.db files in
+	    the source directory are relevant and copies them. This may
 	    not match your actual configuration.</para>
     </refsect1>
     <refsect1 id='notes'><title>NOTES</title>
