@@ -4,12 +4,10 @@
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
-	The sections
-
-        INCOMPATIBLE CHANGES IN BOGOFILTER (version)
-and     MAJOR CHANGES IN BOGOFILTER (version)
-
-	are particularly important.
+	Sections headed '[Incompat <version>]' and '[Major <version>]'
+	are particularly important.  They describe changes that are
+	incompatible with earlier releases or are significantly
+	different.
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
