@@ -13,9 +13,14 @@
 
 -------------------------------------------------------------------------------
 
+0.94.12	2005-05-15 - Stable Release
+
+	* RELEASE notes now has a brief summary of the changes since
+          the last stable release (0.92.8) in October 2004.
+
 	2005-05-13
 
-	* Update of French FAQ (bogofilter-faq-fr.html) by Fabrice Prigent
+	* French FAQ updated by Fabrice Prigent.
 
 	2005-05-12
 
