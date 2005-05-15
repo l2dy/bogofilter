@@ -2451,7 +2451,7 @@ and     MAJOR CHANGES IN BOGOFILTER (version)
 
 	Adrian Otto:
 	* Added portable file locking support for files and databases
-	David Relson
+	David Relson:
 	* Bug fix for negative counts in word registration
 	* Bug fix for SEGV in $HOME path code
 	* Bug fix for trailing slash in -d option
