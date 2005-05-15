@@ -8,8 +8,7 @@
     </refmeta>
     <refnamediv id='name'>
 	<refname>bf_compact</refname>
-	<refpurpose>shell script to compact a bogofilter
-	    directory</refpurpose>
+	<refpurpose>shell script to compact a bogofilter directory</refpurpose>
     </refnamediv>
     <refsynopsisdiv id='synopsis'>
 	<cmdsynopsis>
@@ -20,7 +19,7 @@
     </refsynopsisdiv>
 
     <refsect1 id='description'><title>Description</title>
-	<para><application>bf_compact</application> creates a more
+	<para><command>bf_compact</command> creates a more
 	    compact bogofilter working directory with a dump/load cycle
 	    and renames the previous
 	    <replaceable>bogofilter_directory</replaceable> to
@@ -29,10 +28,11 @@
 	    subdirectories thereof.
     </para>
     <para>If no <replaceable>wordlist_file</replaceable> arguments are
-	given, then bogofilter will use the configured set of wordlists,
-	if the given <replaceable>bogofilter_directory</replaceable> is
-the same as the configured, or use all *.db files if it is a different
-directory.</para></refsect1>
+	given, then <command>bf_compact</command> will use the
+	configured set of wordlists, if the given
+	<replaceable>bogofilter_directory</replaceable> is the same as
+	the configured, or use all *.db files if it is a different
+	directory.</para></refsect1>
     <refsect1 id='exitstatus'><title>Exit Status</title>
 	<para>The script exits with status code 0 if everything went
 	    well, and nonzero if it encountered trouble.</para>
