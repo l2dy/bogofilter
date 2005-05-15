@@ -9,9 +9,9 @@ SUFFIXES= .1 .1in .htmlin .html
 #   nsgmls (opensp)
 
 # what to build
-man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1 bogotune.1 bf_copy.1
+man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1 bogotune.1 bf_copy.1 bf_tar.1
 
-html_MANS = bogofilter.html bogoutil.html bogoupgrade.html bogolexer.html bogotune.html bf_copy.html
+html_MANS = bogofilter.html bogoutil.html bogoupgrade.html bogolexer.html bogotune.html bf_copy.html bf_tar.html
 
 all: $(man_MANS) $(html_MANS)
 
@@ -27,6 +27,7 @@ EXTRA_DIST = \
 	     bogoupgrade.xml bogoupgrade.1in bogoupgrade.htmlin \
 	     bogoutil.xml bogoutil.1in bogoutil.htmlin \
 	     bf_copy.xml bf_copy.1in bf_copy.htmlin \
+	     bf_tar.xml bf_tar.1in bf_tar.htmlin \
 	     $(HTML_DOCS) \
 	     bogofilter-tuning.HOWTO.html \
 	     bogofilter-SA-2002-01 bogofilter-SA-2004-01 \
