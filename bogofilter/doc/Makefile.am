@@ -9,9 +9,11 @@ SUFFIXES= .1 .1in .htmlin .html
 #   nsgmls (opensp)
 
 # what to build
-man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1 bogotune.1 bf_copy.1 bf_tar.1
+man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1 bogotune.1 \
+	bf_copy.1 bf_tar.1
 
-html_MANS = bogofilter.html bogoutil.html bogoupgrade.html bogolexer.html bogotune.html bf_copy.html bf_tar.html
+html_MANS = bogofilter.html bogoutil.html bogoupgrade.html bogolexer.html bogotune.html \
+	bf_copy.html bf_tar.html
 
 all: $(man_MANS) $(html_MANS)
 
