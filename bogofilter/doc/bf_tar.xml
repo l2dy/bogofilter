@@ -60,6 +60,8 @@
     <refsect1 id='notes'><title>NOTES</title>
 	<para>This script is meant for use with Berkeley DB based
 	    bogofilter versions.</para>
+	<para>This script requires a SUSv2 compliant
+	    <command>pax</command> utility.</para>
 	<para>This script expects a SUSv2 compliant shell.  Solaris
 	   systems should have the SUNWxcu4 package installed (when
 	   bogofilter is configured) so that /usr/xpg4/bin/sh can
