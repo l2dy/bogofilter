@@ -18,6 +18,9 @@
 	* RELEASE notes now has a brief summary of the changes since
           the last stable release (0.92.8) in October 2004.
 
+	* Man pages added for the utility scripts bf_compact,
+	  bf_copy, and bf_tar.
+
 	2005-05-13
 
 	* French FAQ updated by Fabrice Prigent.
