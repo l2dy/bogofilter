@@ -20,7 +20,7 @@
     </refsynopsisdiv>
 
     <refsect1 id='description'><title>Description</title>
-	<para><application>bf_copy</application> copies a bogofilter
+	<para><command>bf_copy</command> copies a bogofilter
 	    working directory with the *.db and related files
 	    to another directory.  Currently it copies only the log.*
 	    files and DB_CONFIG (if present).</para></refsect1>
