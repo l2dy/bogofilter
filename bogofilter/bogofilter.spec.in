@@ -161,6 +161,10 @@ done
 %{_mandir}/man1/bogotune.1*
 %{_mandir}/man1/bogoutil.1*
 %{_mandir}/man1/bogoupgrade.1*
+%{_mandir}/man1/bf_compact.1*
+%{_mandir}/man1/bf_copy.1*
+%{_mandir}/man1/bf_resize.1*
+%{_mandir}/man1/bf_tar.1*
 
 %{_datadir}/%{name}/contrib/*
 
@@ -196,6 +200,10 @@ done
 %{_mandir}/man1/bogotune.1*
 %{_mandir}/man1/bogoutil.1*
 %{_mandir}/man1/bogoupgrade.1*
+%{_mandir}/man1/bf_compact.1*
+%{_mandir}/man1/bf_copy.1*
+%{_mandir}/man1/bf_resize.1*
+%{_mandir}/man1/bf_tar.1*
 
 %{_datadir}/%{name}/contrib-static/*
 %endif
