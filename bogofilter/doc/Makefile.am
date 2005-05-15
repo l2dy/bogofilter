@@ -26,6 +26,7 @@ EXTRA_DIST = \
 	     bogotune.xml bogotune.1in bogotune.htmlin \
 	     bogoupgrade.xml bogoupgrade.1in bogoupgrade.htmlin \
 	     bogoutil.xml bogoutil.1in bogoutil.htmlin \
+	     bf_copy.xml bf_copy.1in bf_copy.htmlin \
 	     $(HTML_DOCS) \
 	     bogofilter-tuning.HOWTO.html \
 	     bogofilter-SA-2002-01 bogofilter-SA-2004-01 \
@@ -49,7 +50,7 @@ EXTRA_DIST = \
 		-e "s|[@]bindir@|$(bindir)|g" <$< >$@ \
 	|| { rm -f $@ ; exit 1 ; }
 
-# same as .1in.1: above, but POSIX doesn't allow two on one line.
+# same as .1in.1: above, but POSIX doesn't allow two targets on one line.
 .htmlin.html:
 	sed -e "s|[@]sysconfdir@|$(sysconfdir)|g" \
 		-e "s|[@]bindir@|$(bindir)|g" <$< >$@ \
