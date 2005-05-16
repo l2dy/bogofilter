@@ -42,22 +42,29 @@
 	    well, and nonzero if it encountered trouble.</para>
     </refsect1>
     <refsect1 id='examples'><title>Examples</title>
-	<itemizedlist><listitem>
+	<itemizedlist>
+	    <listitem>
 		<para><userinput>bf_tar ~/.bogofilter &gt; outfile.tar</userinput></para>
 		<para>Writes a standard .tar file containing the essential files
-	    from <filename>~/.bogofilter</filename> to
-	    <filename>outfile.tar</filename>.</para></listitem>
-    <listitem><para><userinput>bf_tar ~/.bogofilter | gzip -9 -c &gt;
+		from <filename>~/.bogofilter</filename> to
+		<filename>outfile.tar</filename>.</para>
+	    </listitem>
+	    <listitem>
+		<para><userinput>bf_tar ~/.bogofilter | gzip -9 -c &gt;
 		outfile.tar.gz</userinput></para>
-	<para>Writes a gzipped .tar.gz file containing the essential files
-	    from <filename>~/.bogofilter</filename> to
-	    <filename>outfile.tar.gz</filename>.</para></listitem>
-    <listitem><para><userinput>bf_tar `pwd`/mydirectory
+		<para>Writes a gzipped .tar.gz file containing the essential files
+		from <filename>~/.bogofilter</filename> to
+		<filename>outfile.tar.gz</filename>.</para>
+	    </listitem>
+	    <listitem>
+		<para><userinput>bf_tar `pwd`/mydirectory
 		>someotheroutfile.tar</userinput></para>
-	<para>Prepend <userinput>$(pwd)/</userinput> or
-	    <userinput>`pwd`/</userinput> if you want to specify an
-	absolute path instead of a relative path.</para></listitem>
-</itemizedlist></refsect1>
+		<para>Prepend <userinput>$(pwd)/</userinput> or
+		<userinput>`pwd`/</userinput> if you want to specify an
+		absolute path instead of a relative path.</para>
+	    </listitem>
+	</itemizedlist>
+    </refsect1>
     <refsect1 id='notes'><title>Notes</title>
 	<para>This script is meant for use with Berkeley DB based
 	    bogofilter versions.</para>
