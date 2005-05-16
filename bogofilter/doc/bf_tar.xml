@@ -55,17 +55,9 @@
     <listitem><para><userinput>bf_tar `pwd`/mydirectory
 		>someotheroutfile.tar</userinput></para>
 	<para>Prepend <userinput>$(pwd)/</userinput> or
-	    <userinput>`pwd`/</userinput> to specify an absolute path when
-	    you have the relative path only and want consistent file names
-	    in the tarball (see <link linkend="bugs">Bugs</link> below).</para></listitem>
+	    <userinput>`pwd`/</userinput> if you want to specify an
+	absolute path instead of a relative path.</para></listitem>
 </itemizedlist></refsect1>
-<refsect1 id='bugs'><title>Bugs</title>
-	<para>This script emits a tar file with absolute paths for the
-	    log files, always. The database files may have absolute or
-	    relative paths, the latter will cause a warning though. This
-	    bug may be fixed in a future release. For a workaround, see
-	    <link linkend='examples'>Examples</link> above.</para>
-    </refsect1>
     <refsect1 id='notes'><title>Notes</title>
 	<para>This script is meant for use with Berkeley DB based
 	    bogofilter versions.</para>
