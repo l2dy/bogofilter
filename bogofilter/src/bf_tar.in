@@ -62,9 +62,7 @@ fi
   c="${BOGOHOME}/DB_CONFIG"
   if [ -f "$c" ] ; then echo "$c" ; fi
   bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist ' | cut -f3 -d,
-  for LOGFILE in `bogoutil --db-list-logfiles="$BOGOHOME" all` ; do
-    echo ${BOGOHOME}/${LOGFILE}
-  done
+  bogoutil --db-list-logfiles="$BOGOHOME" all
 ) | pax -w -v -x ustar
 
 # remove if requested
