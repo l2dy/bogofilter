@@ -82,7 +82,7 @@ ensuring the integrity of a database.  For more on the subject, see
 Wikipedia, i.e.  http://en.wikipedia.org/wiki/ACID.  
 
 What transactions offer is additional protection against database
-corruption.  They also include record level locking which makes it
+corruption.  They also include page level locking which makes it
 possible for multiples copies of bogofilter (and bogoutil) to be 
 reading and writing the wordlist at the same time.  To make this
 happen, Berkeley DB uses additional files, specifically lockfiles and
