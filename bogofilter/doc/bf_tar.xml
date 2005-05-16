@@ -58,7 +58,7 @@
 	    </listitem>
 	    <listitem>
 		<para><userinput>bf_tar `pwd`/mydirectory
-		>someotheroutfile.tar</userinput></para>
+		&gt; outfile.tar</userinput></para>
 		<para>Prepend <userinput>$(pwd)/</userinput> or
 		<userinput>`pwd`/</userinput> if you want to specify an
 		absolute path instead of a relative path.</para>
