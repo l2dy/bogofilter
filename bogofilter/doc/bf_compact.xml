@@ -24,9 +24,8 @@
 	    and renames the previous
 	    <replaceable>bogofilter_directory</replaceable> to
 	    <replaceable>bogofilter_directory</replaceable><filename>.old</filename>.</para>
-	<para>This evidently cannot work for the current working directory or
-	    subdirectories thereof.
-    </para>
+	<para>Note:  bf_compact cannot be used to process the current
+	    working directory, ".", because of directory renaming issues.</para>
     <para>If no <replaceable>wordlist_file</replaceable> arguments are
 	given, then <command>bf_compact</command> will use the
 	configured set of wordlists, if the given

@@ -20,10 +20,11 @@
     </refsynopsisdiv>
 
     <refsect1 id='description'><title>Description</title>
-	<para><command>bf_copy</command> copies a bogofilter
-	    working directory with the *.db and related files
-	    to another directory.  Currently it copies only the log.*
-	    files and DB_CONFIG (if present).</para></refsect1>
+	<para><command>bf_copy</command> copies a bogofilter working
+	    directory to another directory.  Currently it copies the
+	    database files (*.db), related files (log.*), and
+	    DB_CONFIG (if present).</para>
+    </refsect1>
     <refsect1 id='options'><title>Options</title>
 	<para>The <option>-c</option> option causes only active log files to
 	    be copied, not all. The default is to copy all log files.</para>

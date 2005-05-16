@@ -22,15 +22,13 @@
 
     <refsect1 id='description'><title>Description</title>
 	<para><command>bf_tar</command> bundles a bogofilter
-	    working directory in tar format and copies it to the
+	    working directory in tar format and copies it to
 	    standard output (your console, or where you redirect it, see
-	    <link linkend='examples'>EXAMPLES</link> below). It is
-	    recommended that you give an absolute
-	    path.</para></refsect1>
+	    <link linkend='examples'>EXAMPLES</link> below).</para></refsect1>
     <refsect1 id='options'><title>Options</title>
 	<para>The <option>-r</option> option causes <command>bf_tar</command> to remove
 	    inactive log files after the archive has been written
-	    successfully. The default is not to remove log files.</para>
+	    successfully. The default is to not remove log files.</para>
 	<para>The <option>-R</option> option causes <command>bf_tar</command> to remove
 	    inactive log files before the archive is written. This may
 	    reduce chances that the resulting archive is recoverable
