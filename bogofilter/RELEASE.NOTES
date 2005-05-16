@@ -113,6 +113,13 @@ option "--enable-transactions" or "--disable-transactions" to build
 executables that will only operate in one mode (and that are a slight
 bit smaller).
 
+---- SQLite3 Backend ----
+
+SQLite3 is also supported. It is an alternative, easy-to-handle
+datastore that also exhibits ACID properties.  It has the same
+guarantees as Berkeley DB Transactional Data Store, without the
+headaches of lock files and log files.  Version 3.2.0 is required.
+
 ------------------------------
 
 [Feature 0.94.2] SQLite3 support has been repaired.  In versions 0.94.0
