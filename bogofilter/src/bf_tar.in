@@ -42,11 +42,6 @@ if [ ! -d "$BOGOHOME" ] ; then
     exit 1
 fi
 
-case "$BOGOHOME" in
-/*) ;;
- *) echo >&2 "WARNING: specify an absolute path to get consistent paths in the tarball." ;;
-esac
-
 nukelogs() {
     bogoutil --db-prune="$BOGOHOME"
 }
@@ -67,7 +62,9 @@ fi
   c="${BOGOHOME}/DB_CONFIG"
   if [ -f "$c" ] ; then echo "$c" ; fi
   bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist ' | cut -f3 -d,
-  bogoutil --db-list-logfiles="$BOGOHOME" all absolute
+  for LOGFILE in `bogoutil --db-list-logfiles="$BOGOHOME" all` ; do
+    echo ${BOGOHOME}/${LOGFILE}
+  done
 ) | pax -w -v -x ustar
 
 # remove if requested
