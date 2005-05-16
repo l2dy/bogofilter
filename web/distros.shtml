@@ -17,15 +17,15 @@
     <tr>
       <td bgcolor="#F8F7F6"><br>
         <table class="central_table" width="90%" border="0" align="center" cellpadding="10" cellspacing="0">
-          <tr> 
-            <td width="100%" valign="top" bgcolor="#FFFFFF"> 
+          <tr>
+            <td width="100%" valign="top" bgcolor="#FFFFFF">
               <h1 align="center">Bogofilter On Distribution Media (Linux, Unix)</h1>
 		<p>We will gradually phase out information for older
 		distribution media that have reached their respective vendor's
 		end of support life.</p>
 
               <table class="inside_table" border="1" width="90%" align="center" cellpadding="2" cellspacing="0">
-                <tr align="center" valign="middle"> 
+                <tr align="center" valign="middle">
                   <td class="top_text_table"> Distribution</td>
                   <td class="top_text_table"> Bogofilter<br>
                     Version</td>
@@ -33,108 +33,122 @@
                     Variants</td>
                 </tr>
 		<tr><td colspan="3"><a href="http://www.debian.org/" target="_blank"><strong>Debian GNU/Linux</strong></a></td></tr>
-                <tr> 
+                <tr>
                   <td>Debian testing ("sarge")</td>
                   <td>See <a href="http://packages.debian.org/testing/mail/bogofilter" target="_blank">packages.debian.org</a></td>
-                  <td> 
+                  <td>
                     <div align="center">BerkeleyDB</div>
                   </td>
                 </tr>
-                <tr> 
+                <tr>
                   <td>Debian unstable ("sid")</td>
                   <td>See <a href="http://packages.debian.org/unstable/mail/bogofilter" target="_blank">packages.debian.org</a></td>
-                  <td> 
+                  <td>
                     <div align="center">BerkeleyDB</div>
                   </td>
                 </tr>
 		<tr><td colspan="3"><a href="http://www.freebsd.org/" target="_blank"><strong>FreeBSD</strong></a></td></tr>
-                <tr> 
-                  <td>FreeBSD 4.8-RELEASE</td>
-                  <td>0.11.1.3</td>
-                  <td> 
-                    <div align="center">BerkeleyDB</div>
-                  </td>
-                </tr>
-                <tr> 
+                <tr>
                   <td>FreeBSD 4.10-RELEASE</td>
                   <td>use the port</td>
                   <td>
                     <div align="center">BerkeleyDB</div>
                   </td>
                 </tr>
-                <tr> 
-                  <td>FreeBSD 5.2.1-RELEASE</td>
-                  <td>0.15.7</td>
-                  <td> 
-                    <div align="center">BerkeleyDB</div>
+                <tr>
+                  <td>FreeBSD 4.11-RELEASE</td>
+                  <td>0.92.8</td>
+                  <td>
+                    <div align="center">BerkeleyDB, QDBM, TDB</div>
                   </td>
                 </tr>
-                <tr> 
+                <tr>
                   <td>FreeBSD 5.3-RELEASE</td>
                   <td>use the port</td>
-                  <td> 
+                  <td>
                     <div align="center">BerkeleyDB</div>
                   </td>
                 </tr>
-                <tr> 
+                <tr>
+                  <td>FreeBSD 5.4-RELEASE</td>
+                  <td>0.92.8</td>
+                  <td>
+                    <div align="center">BerkeleyDB, QDBM, TDB</div>
+                  </td>
+                </tr>
+                <tr>
                   <td>FreeBSD ports</td>
                   <td>See <a href=
         "http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td>
-                  <td> 
+                  <td>
                     <div align="center">BerkeleyDB, QDBM, TDB</div>
                   </td>
                 </tr>
 		<tr><td colspan="3"><a href="http://www.mandrakesoft.com/" target="_blank"><strong>Mandrake</strong></a></td></tr>
-                <tr> 
+                <tr>
                   <td>Contrib</td>
                   <td>See <a href="http://www.eslrahc.com/" target="_blank">www.eslrahc.com</a></td>
-                  <td> 
+                  <td>
                     <div align="center">BerkeleyDB, QDBM, TDB</div>
                   </td>
                 </tr>
 
 		<tr><td colspan="3"><a href="http://www.netbsd.org/" target="_blank"><strong>NetBSD</strong></a></td></tr>
-                <tr> 
+                <tr>
                   <td>NetBSD 1.6.2</td>
                   <td>0.14.5.4</td>
-                  <td> 
+                  <td>
                     <div align="center">BerkeleyDB</div>
                   </td>
                 </tr>
-                <tr> 
+                <tr>
+                  <td>NetBSD 2.0</td>
+                  <td>0.92.8</td>
+                  <td>
+                    <div align="center">BerkeleyDB</div>
+                  </td>
+                </tr>
+                <tr>
                   <td>NetBSD pkgsrc</td>
                   <td>0.16.4</td>
-                  <td> 
+                  <td>
                     <div align="center">BerkeleyDB</div>
                   </td>
                 </tr>
 		<tr><td colspan="3"><a href="http://www.suse.com/" target="_blank"><strong>SuSE Linux</strong></a></td></tr>
-                <tr> 
+                <tr>
                   <td>SuSE Linux 8.2 FTP</td>
                   <td>0.10.3.1</td>
-                  <td> 
+                  <td>
                     <div align="center">BerkeleyDB</div>
                   </td>
                 </tr>
-                <tr> 
+                <tr>
                   <td>SuSE Linux 9.0 FTP</td>
                   <td>0.14.4</td>
-                  <td> 
+                  <td>
                     <div align="center">BerkeleyDB</div>
                   </td>
                 </tr>
-                <tr> 
+                <tr>
                   <td>SuSE Linux 9.1</td>
                   <td>0.16.4</td>
-                  <td> 
+                  <td>
                     <div align="center">BerkeleyDB</div>
                   </td>
                 </tr>
-                 <tr> 
+                 <tr>
                   <td>SUSE Linux 9.2</td>
                   <td>0.92.8 (via YaST Online Update)</td>
-                  <td> 
-                    <div align="center">BerkeleyDB</div>
+                  <td>
+                    <div align="center">BerkeleyDB 4.2</div>
+                  </td>
+                </tr>
+                 <tr>
+                  <td>SUSE Linux 9.3</td>
+                  <td>0.93.2</td>
+                  <td>
+                    <div align="center">BerkeleyDB 4.3</div>
                   </td>
                 </tr>
               </table>
