@@ -64,7 +64,7 @@ if [ $DB_TYPE = db ] ; then
 	$BOGOUTIL -C --db-checkpoint ${TMPDIR}/
 	if ls "${TMPDIR}/log."* >/dev/null 2>&1 ; then
 	    $BOGOUTIL -C --db-prune ${TMPDIR}/
-	    ( cd ${TMPDIR} ; ls log.* >logs.1 )
+	    ( ls ${TMPDIR}/log.* >${TMPDIR}/logs.1 )
 	    $BOGOUTIL -C --db-list-logfiles "${TMPDIR}" all >"${TMPDIR}/logs.2"
 	    cmp ${TMPDIR}/logs.1 ${TMPDIR}/logs.2
 	fi
