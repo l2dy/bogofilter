@@ -79,4 +79,4 @@ bogofilter_dir=bogus
 wordlist r,word,wordlist.${DB_EXT},1
 EOF
 
-map_rc $BOGOFILTER -c ${TMPDIR}/bogodir.cf -d ${TMPDIR}/command.d -v < /dev/null
+map_rc $BOGOFILTER $OPTS -c ${TMPDIR}/bogodir.cf -d ${TMPDIR}/command.d -v < /dev/null
