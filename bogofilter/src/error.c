@@ -15,6 +15,7 @@ AUTHOR:
 #include <stdarg.h>
 #include <ctype.h>
 #include <syslog.h>
+#include <unistd.h>
 
 #include "error.h"
 
@@ -44,7 +45,7 @@ void print_error( const char *file, unsigned long line, const char *format, ... 
 #if 0
     fprintf(stderr, "%s:%lu:", file, line);
 #endif
-    fprintf(stderr, "%s: %s\n", progname, message);
+    fprintf(stderr, "%s[%ld]: %s\n", progname, (long)getpid(), message);
 #ifdef HAVE_SYSLOG_H
     if (logflag)
 	syslog(LOG_INFO, "%s:%lu: %s", file, line, message );
