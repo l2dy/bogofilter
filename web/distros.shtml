@@ -146,7 +146,7 @@
                 </tr>
                  <tr>
                   <td>SUSE Linux 9.3</td>
-                  <td>0.93.2</td>
+                  <td>0.94.12 (via YaST Online Update)</td>
                   <td>
                     <div align="center">BerkeleyDB 4.3</div>
                   </td>
