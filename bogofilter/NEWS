@@ -15,7 +15,18 @@
 
 	2005-05-19
 
-	* Fix abort/retry logic with transactional interfaces
+	* Efficiency: The SQLite adaptor now precompiles the common SQL
+	  statements with variables, which avoids the need to parse/compile
+	  them for every single token we acces, and which avoids the need to
+	  hex encode/decode tokens (suggested by D. Richard Hipp, SQLite
+	  maintainer).
+
+	* Efficiency: save one malloc() in db_get_dbvalue().
+
+	* Cleanup: The SQLite adaptor now uses a single central busy handler,
+	  which simplifies the code.
+
+	* Bugfix: Fix abort/retry logic with transactional interfaces
 	  (Berkeley DB and SQLite) so that retries actually work.
 
 0.94.12	2005-05-15 - Stable Release

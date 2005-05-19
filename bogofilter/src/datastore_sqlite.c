@@ -27,6 +27,9 @@ struct dbhsqlite_t {
     char *path;	   /**< directory to hold database */
     char *name;	   /**< database file name */
     sqlite3 *db;   /**< pointer to SQLite3 handle */
+    sqlite3_stmt *select; /**< prepared SELECT statement for DB retrieval */
+    sqlite3_stmt *insert; /**< prepared INSERT OR REPLACE for DB update */
+    sqlite3_stmt *delete; /**< prepared DELETE */
     bool created;  /**< gets set by db_open if it created the database new */
     bool swapped;  /**< if endian swapped on disk vs. current host */
 };
@@ -111,23 +114,14 @@ static void free_dbh(dbh_t *dbh) {
 }
 
 /** Executes the SQL statement \a cmd on the database \a db and returns
- * the sqlite3_exec return code, except SQLITE_BUSY which is handled
- * internally by sleeping and retrying. If the return code is nonzero, this
+ * the sqlite3_exec return code. If the return code is nonzero, this
  * routine will have printed an error message.
  */
 static int sqlexec(sqlite3 *db, const char *cmd) {
     char *e = NULL;
     int rc;
-    while(1) {
-	rc = sqlite3_exec(db, cmd, NULL, NULL, &e);
-	if (rc == SQLITE_BUSY) {
-	    if (DEBUG_DATABASE(2))
-		fprintf(dbgout, "database busy, sleeping and retrying...\n");
-	    rand_sleep(1000, 100000);
-	} else {
-	    break;
-	}
-    }
+
+    rc = sqlite3_exec(db, cmd, NULL, NULL, &e);
     if (rc) {
 	print_error(__FILE__, __LINE__,
 		"Error executing \"%s\": %s (#%d)\n",
@@ -146,44 +140,22 @@ static void db_trace(void *userdata /** unused */,
     fprintf(dbgout, "SQLite[%ld]: %s\n", (long)getpid(), log);
 }
 
-/** Callback function that increates the int variable that \a userdata
- * points to, for db_loop. */
-static ex_t db_count(dbv_t *d1, dbv_t *d2, void *userdata) {
-    int *counter = userdata;
-    ++ *counter;
-    (void)d1;
-    (void)d2;
-    return 0;
-}
-
-/** Dual-mode get/foreach function, if \a hook is NULL, we do a get and
- * treat \a userdata as a dbv_t, if \a hook is non-NULL, we call it for
+/** Foreach function, we call \a hook for
  * each (key, value) tuple in the database.
  */
 static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
 	const char *cmd,	/**< SQL command to obtain data */
 	db_foreach_t hook,	/**< if non-NULL, called for each value */
-	void *userdata		/**  if \a hook is NULL, this is our output dbv_t pointer,
-				 *   if \a hook is non-NULL, this is
-				 *   passed to the \a hook
-				 */
+	void *userdata		/**  this is passed to the \a hook */
 	) {
     const char *tail;
     sqlite3_stmt *stmt;
     int rc;
-    bool loop, found;
-    found = false;
+    bool loop, found = false;
+    dbv_t key, val;
+
     /* sqlite3_exec doesn't allow us to retrieve BLOBs */
-    do {
-	rc = sqlite3_prepare(db, cmd, strlen(cmd), &stmt, &tail);
-	if (rc == SQLITE_BUSY) {
-	    if (stmt)
-		sqlite3_finalize(stmt);
-	    if (DEBUG_DATABASE(2))
-		fprintf(dbgout, "database busy, sleeping and retrying...\n");
-	    rand_sleep(1000, 100000);
-	}
-    } while (rc == SQLITE_BUSY);
+    rc = sqlite3_prepare(db, cmd, strlen(cmd), &stmt, &tail);
     if (rc) {
 	print_error(__FILE__, __LINE__,
 		"Error preparing \"%s\": %s (#%d)\n",
@@ -196,28 +168,22 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
 	switch(sqlite3_step(stmt)) {
 	    case SQLITE_ROW:
 		found = true;
-		if (hook == NULL) {
-		    /* get mode - read value from first row, then return */
-		    dbv_t *val = userdata;
-
-		    loop = false;
-		    val->leng = sqlite3_column_bytes(stmt, /* column */ 0);
-		    val->data = xmalloc(val->leng);
-		    memcpy(val->data, sqlite3_column_blob(stmt, 0), val->leng);
-		} else {
-		    /* foreach mode - call hook for each (key, value)
-		     * tuple */
-		    dbv_t key, val;
+		if (hook != NULL)
+		{
 
 		    key.leng = sqlite3_column_bytes(stmt, /* column */ 0);
-		    val.leng = sqlite3_column_bytes(stmt, /* column */ 1);
 		    key.data = xmalloc(key.leng);
-		    val.data = xmalloc(val.leng);
 		    memcpy(key.data, sqlite3_column_blob(stmt, 0), key.leng);
+
+		    val.leng = sqlite3_column_bytes(stmt, /* column */ 1);
+		    val.data = xmalloc(val.leng);
 		    memcpy(val.data, sqlite3_column_blob(stmt, 1), val.leng);
+
+		    /* skip ENDIAN32 token */
 		    if (key.leng != strlen(ENDIAN32)
 			    || memcmp(key.data, ENDIAN32, key.leng) != 0)
 			rc = hook(&key, &val, userdata);
+
 		    xfree(val.data);
 		    xfree(key.data);
 		    if (rc) {
@@ -228,11 +194,6 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
 		break;
 	    case SQLITE_DONE:
 		loop = false;
-		break;
-	    case SQLITE_BUSY:
-		if (DEBUG_DATABASE(2))
-		    fprintf(dbgout, "database busy, sleeping and retrying...\n");
-		rand_sleep(1000, 100000);
 		break;
 	    default:
 		print_error(__FILE__, __LINE__, "Error executing \"%s\": %s (#%d)\n",
@@ -246,18 +207,30 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
     return found ? 0 : DS_NOTFOUND;
 }
 
+/** This busy handler just sleeps a while and retries */
+static int busyhandler(void *dummy, int count)
+{
+    (void)dummy;
+    (void)count;
+    rand_sleep(1000, 1000000);
+    return 1;
+}
+
 void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
 {
     int rc;
     dbh_t *dbh;
     dbv_t k, v;
-    int count = 0;
 
     (void)dummyenv;
 
     dbh = dbh_init(bfp);
-    if (DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB"))
+
+    /* open database file */
+    if (DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB")) {
 	fprintf(dbgout, "SQLite: db_open(%s)\n", dbh->name);
+	fflush(dbgout);
+    }
     rc = sqlite3_open(dbh->name, &dbh->db);
     if (rc) {
 	print_error(__FILE__, __LINE__, "Can't open database %s: %s\n",
@@ -265,9 +238,18 @@ void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
 	goto barf;
     }
 
+    /* set trace mode */
     if (DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB"))
 	sqlite3_trace(dbh->db, db_trace, NULL);
 
+    /* set busy handler */
+    if (sqlite3_busy_handler(dbh->db, busyhandler, NULL)) {
+	print_error(__FILE__, __LINE__, "Can't set busy handler: %s\n",
+		sqlite3_errmsg(dbh->db));
+	goto barf;
+    }
+
+    /* check/set endianness marker and create table if needed */
     if (mode != DS_READ) {
 	/* using IMMEDIATE or DEFERRED here locks up in t.lock3
 	 * or t.bulkmode */
@@ -283,7 +265,7 @@ void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
 	 */
 	rc = db_loop(dbh->db, "SELECT name FROM sqlite_master "
 		"WHERE type='table' AND name='bogofilter';",
-		db_count, &count);
+		NULL, NULL);
 	switch(rc) {
 	    case 0:
 		if (sqlexec(dbh->db, "COMMIT;")) goto barf;
@@ -291,16 +273,19 @@ void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
 	    case DS_NOTFOUND:
 		{
 		    u_int32_t p[2] = { 0x01020304, 0x01020304 };
-		    int rc2;
+
+		    if (sqlexec(dbh->db, LAYOUT)) goto barf;
+
+		    /* set endianness marker */
 		    k.data = xstrdup(ENDIAN32);
 		    k.leng = strlen(k.data);
 		    v.data = p;
 		    v.leng = sizeof(p);
-		    if (sqlexec(dbh->db, LAYOUT)) goto barf;
-		    rc2 = db_set_dbvalue(dbh, &k, &v);
+		    rc = db_set_dbvalue(dbh, &k, &v);
 		    xfree(k.data);
-		    if (rc2)
+		    if (rc)
 			goto barf;
+
 		    if (sqlexec(dbh->db, "COMMIT;")) goto barf;
 		    dbh->created = true;
 		}
@@ -310,12 +295,33 @@ void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
 	}
     }
 
+    /*
+     * initialize common statements
+     * dbh->insert is not here as it's needed earlier,
+     * so it sets itself up lazily
+     */
+#define PREP(cmd, ptr) \
+{ const char *tail; /* dummy */ \
+    if (sqlite3_prepare(dbh->db, cmd, strlen(cmd), ptr, &tail) != SQLITE_OK) { \
+	print_error(__FILE__, __LINE__, "cannot compile %s: %s\n", cmd, sqlite3_errmsg(dbh->db)); \
+	exit(EX_ERROR); \
+    } \
+}
+
+    if (!dbh->select)
+	PREP("SELECT value FROM bogofilter WHERE key=? LIMIT 1;", &dbh->select);
+    if (!dbh->delete)
+	PREP("DELETE FROM bogofilter WHERE(key = ?);", &dbh->delete);
+
     /* check if byteswapped */
     {
-	u_int32_t t;
+	u_int32_t t, b[2];
 	int ee;
+
 	k.data = xstrdup(ENDIAN32);
 	k.leng = strlen(k.data);
+	v.data = b;
+	v.leng = sizeof(b);
 
 	ee = db_get_dbvalue(dbh, &k, &v);
 	xfree(k.data);
@@ -324,7 +330,6 @@ void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
 		if (v.leng < 4)
 		    goto barf;
 		t = ((u_int32_t *)v.data)[0];
-		xfree(v.data);
 		switch (t) {
 		    case 0x01020304: /* same endian, "UNIX" */
 			dbh->swapped = false;
@@ -352,14 +357,16 @@ barf:
     print_error(__FILE__, __LINE__, "Error on database %s: %s\n",
 	    dbh->name, sqlite3_errmsg(dbh->db));
 barf2:
-    sqlite3_close(dbh->db);
-    free_dbh(dbh);
+    db_close(dbh);
     return NULL;
 }
 
 void db_close(void *handle) {
     int rc;
     dbh_t *dbh = handle;
+    if (dbh->delete) sqlite3_finalize(dbh->delete);
+    if (dbh->insert) sqlite3_finalize(dbh->insert);
+    if (dbh->select) sqlite3_finalize(dbh->select);
     rc = sqlite3_close(dbh->db);
     if (rc) {
 	print_error(__FILE__, __LINE__, "Can't close database %s: %d",
@@ -377,25 +384,6 @@ const char *db_version_str(void) {
     return buf;
 }
 
-static int sqlfexec(sqlite3 *db, const char *cmd, ...)
-    __attribute__ ((format(printf,2,3)));
-/** Formats \a cmd and following arguments with sqlite3_vmprintf (hence
- * supporting %%q for SQL-quoted strings) and executes it using sqlexec.
- */
-static int sqlfexec(sqlite3 *db, const char *cmd, ...)
-{
-    char *buf;
-    va_list ap;
-    int rc;
-
-    va_start(ap, cmd);
-    buf = sqlite3_vmprintf(cmd, ap);
-    va_end(ap);
-    rc = sqlexec(db, buf);
-    free(buf);
-    return rc;
-}
-
 static int sql_txn_begin(void *vhandle) {
     dbh_t *dbh = vhandle;
     return sqlexec(dbh->db,  BEGIN );
@@ -411,58 +399,76 @@ static int sql_txn_commit(void *vhandle) {
     return sqlexec(dbh->db, "COMMIT;");
 }
 
-/** Converts \a len unsigned characters starting at \a input into the
- * SQL X'b1a4' notation, returns malloc'd string that the caller must
- * free. */
-static char *binenc(const void *input, size_t len) {
-    const unsigned char *in = input;
-    const char hexdig[] = "0123456789ABCDEF";
-    char *out = xmalloc(4 + len * 2);
-    char *t = out;
-    size_t i;
+/** common code for db_delete, db_(get|set)_dbvalue.
+ * This works by setting variables in precompiled statements (see PREP,
+ * sqlite3_prepare, sqlite3_bind_*, sqlite3_reset) and avoids encoding
+ * binary data into SQL's hex representation as well as compiling the
+ * same SQL statement over and over again. */
+static int sql_fastpath(
+	dbh_t *dbh,		/**< database handle */
+	const char *func,	/**< function name to report in errors */
+	sqlite3_stmt *stmt,	/**< SQLite3 statement to execute/reset */
+	int retnotfound,	/**< return value if no rows found */
+	dbv_t *val		/**  OUT value from first row, NULL ok */
+	)
+{
+    int rc;
+    bool found = false;
 
-    *t++ = 'X';
-    *t++ = '\'';
-    for(i = 0; i < len; i++) {
-	*t++ = hexdig[in[i] >> 4];
-	*t++ = hexdig[in[i] & 0xf];
+    while(1) {
+	rc = sqlite3_step(stmt);
+	switch(rc) {
+	    case SQLITE_ROW:	/* this is the only branch that loops */
+		if (val) {
+		    int len = min(INT_MAX, val->leng);
+		    val->leng = min(len, sqlite3_column_bytes(stmt, 0));
+		    memcpy(val->data, sqlite3_column_blob(stmt, 0), val->leng);
+		}
+		found = 1;
+		break;
+		/* all other branches below return control to the caller */
+	    case SQLITE_BUSY:
+		sqlite3_reset(stmt);
+		sql_txn_abort(dbh);
+		return DS_ABORT_RETRY;
+
+	    case SQLITE_DONE:
+		sqlite3_reset(stmt);
+		return found ? 0 : retnotfound;
+
+	    default:
+		print_error(__FILE__, __LINE__,
+			"%s: error executing statement on %s: %s (%d)\n",
+			func, dbh->name, sqlite3_errmsg(dbh->db), rc);
+		sqlite3_reset(stmt);
+		return rc;
+	}
     }
-
-    *t++ = '\'';
-    *t++ = '\0';
-    return out;
 }
 
 int db_delete(void *vhandle, const dbv_t *key) {
     dbh_t *dbh = vhandle;
-    int rc;
-    char *e = binenc(key->data, key->leng);
-    rc = sqlfexec(dbh->db, "DELETE FROM bogofilter WHERE(key = %s);", e);
-    xfree(e);
-    return rc;
+
+    sqlite3_bind_blob(dbh->delete, 1, key->data, key->leng, SQLITE_STATIC);
+    return sql_fastpath(dbh, "db_delete", dbh->delete, 0, NULL);
 }
 
 int db_set_dbvalue(void *vhandle, const dbv_t *key, const dbv_t *val) {
     dbh_t *dbh = vhandle;
-    int rc;
-    char *k = binenc(key->data, key->leng);
-    char *v = binenc(val->data, val->leng);
-    rc = sqlfexec(dbh->db, "INSERT OR REPLACE INTO bogofilter "
-	    "VALUES(%s,%s);", k, v);
-    xfree(k);
-    xfree(v);
-    return rc;
+
+    if (!dbh->insert)
+	PREP("INSERT OR REPLACE INTO bogofilter VALUES(?,?);",    &dbh->insert);
+
+    sqlite3_bind_blob(dbh->insert, 1, key->data, key->leng, SQLITE_STATIC);
+    sqlite3_bind_blob(dbh->insert, 2, val->data, val->leng, SQLITE_STATIC);
+    return sql_fastpath(dbh, "db_set_dbvalue", dbh->insert, 0, NULL);
 }
 
 int db_get_dbvalue(void *vhandle, const dbv_t* key, /*@out@*/ dbv_t *val) {
     dbh_t *dbh = vhandle;
-    char *k = binenc(key->data, key->leng);
-    char *cmd = sqlite3_mprintf("SELECT value FROM bogofilter "
-				"WHERE(key = %s) LIMIT 1;", k);
-    int rc = db_loop(dbh->db, cmd, NULL, val);
-    sqlite3_free(cmd);
-    xfree(k);
-    return rc;
+
+    sqlite3_bind_blob(dbh->select, 1, key->data, key->leng, SQLITE_STATIC);
+    return sql_fastpath(dbh, "db_get_dbvalue", dbh->select, DS_NOTFOUND, val);
 }
 
 ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata) {
@@ -506,10 +512,7 @@ static u_int32_t sql_pagesize(bfpath *bfp)
     dbh = db_open(NULL, bfp, DS_READ);
     if (!dbh)
 	return 0xffffffff;
-    do {
-	rc = sqlite3_exec(dbh->db, "PRAGMA page_size;", pagesize_cb, &size, NULL);
-	if  (rc == SQLITE_BUSY) rand_sleep(1000, 100000);
-    } while (rc == SQLITE_BUSY);
+    rc = sqlite3_exec(dbh->db, "PRAGMA page_size;", pagesize_cb, &size, NULL);
     if (rc != SQLITE_OK) {
 	return 0xffffffff;
     }
