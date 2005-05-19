@@ -22,6 +22,12 @@ void incr_wordlist_mode(void);
 void set_wordlist_mode(const char *filepath);
 bool configure_wordlist(const char *val);
 
+/**
+ * initialize wordlist the same way as open_wordlists does, like
+ * beginning a transaction and reading message counts
+ */
+void begin_wordlist(wordlist_t *list);
+
 void open_wordlists(dbmode_t mode);
 bool close_wordlists(bool commit);
 bool query_wordlists_closed(void);

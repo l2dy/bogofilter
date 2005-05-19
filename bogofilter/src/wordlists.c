@@ -68,6 +68,30 @@ static void *list_searchinsert(bfpath *bfp)
     return n->dbe;
 }
 
+void begin_wordlist(wordlist_t *list)
+{
+    dsv_t val;
+
+    while(1) {
+	if (ds_txn_begin(list->dsh)) {
+	    rand_sleep(1000,1000000);
+	    continue;
+	}
+	switch (ds_get_msgcounts(list->dsh, &val)) {
+	    case 0:
+	    case 1:
+		list->msgcount[IX_GOOD] = val.goodcount;
+		list->msgcount[IX_SPAM] = val.spamcount;
+		if (wordlist_version == 0 &&
+			ds_get_wordlist_version(list->dsh, &val) == 0)
+		    wordlist_version = val.count[0];
+		return;
+	    case DS_ABORT_RETRY:
+		continue;
+	}
+    }
+}
+
 static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 {
     bool retry = false;
@@ -84,7 +108,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
     if (dbe == NULL)
 	exit(EX_ERROR);
 
-    list->dsh = ds_open(dbe, bfp, mode); /* FIXME */
+    list->dsh = ds_open(dbe, bfp, mode); /* FIXME -- euh, what is here to fix? */
 
     if (list->dsh == NULL) {
 	int err = errno;
@@ -95,7 +119,6 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 #ifdef __EMX__
 	case EACCES:
 #endif
-	    /* case EACCES: */
 	    rand_sleep(MIN_SLEEP, MAX_SLEEP);
 	    retry = true;
 	    break;
@@ -116,29 +139,12 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 	    if (err == EINVAL)
 		fprintf(stderr,
 			"\n"
-			"Make sure that the BerkeleyDB version this program is linked against\n"
-			"can handle the format of the data base file (after updates in particular)\n"
-			"and that your NFS locking, if applicable, works.\n");
+			"Make sure that the database version this program is linked against\n"
+			"can handle the format of the data base file (after updates in particular).\n");
 	    exit(EX_ERROR);
 	} /* switch */
     } else { /* ds_open */
-	dsv_t val;
-
-	if (ds_txn_begin(list->dsh))
-	    exit(EX_ERROR); /* XXX FIXME: do we want to retry here? */
-	switch (ds_get_msgcounts(list->dsh, &val)) {
-	    case 0:
-	    case 1:
-		list->msgcount[IX_GOOD] = val.goodcount;
-		list->msgcount[IX_SPAM] = val.spamcount;
-		if (wordlist_version == 0 &&
-			ds_get_wordlist_version(list->dsh, &val) == 0)
-		    wordlist_version = val.count[0];
-		break;
-	    case DS_ABORT_RETRY:
-		retry = true;
-		break;
-	}
+	begin_wordlist(list);
     }
 
     /* xfree(dbe); */
@@ -165,8 +171,7 @@ static void check_wordlist_path(wordlist_t *list)
     bfpath_set_bogohome(bfp);
 }
 
-/* set bogohome using first wordlist's directory
-*/
+/* set bogohome using first wordlist's directory */
 void set_wordlist_directory(void)
 {
     wordlist_t *list;
