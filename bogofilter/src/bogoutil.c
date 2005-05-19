@@ -35,6 +35,7 @@ AUTHORS:
 #include "msgcounts.h"
 #include "paths.h"
 #include "prob.h"
+#include "rand_sleep.h"
 #include "robx.h"
 #include "sighandler.h"
 #include "swap.h"
@@ -430,7 +431,14 @@ static ex_t get_robx(bfpath *bfp)
 
 	val.goodcount = 0;
 	val.spamcount = (uint32_t) (rx * 1000000);
-	ret = ds_write(word_lists->dsh, word_robx, &val);
+	do {
+	    ret = ds_write(word_lists->dsh, word_robx, &val);
+	    if (ret == DS_ABORT_RETRY) {
+		rand_sleep(1000, 1000000);
+		begin_wordlist(word_lists);
+	    }
+	} while (ret == DS_ABORT_RETRY);
+	    
 
 	close_wordlists(true);
 	free_wordlists();

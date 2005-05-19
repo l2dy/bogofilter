@@ -32,6 +32,7 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
     int retrycount = 5;			/* we'll retry an aborted
 					   registration five times
 					   before giving up. */
+    bool first;
 
     u_int32_t wordcount = h->count;	/* use number of unique tokens */
 
@@ -67,7 +68,16 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
     run_type |= _run_type;
 
+    first = true;
+
 retry:
+    if (first)
+	first = false;
+    else {
+	fprintf(stderr, "retrying registration after deadlock avoidance...\n");
+	begin_wordlist(list);
+    }
+
     if (retrycount-- == 0) {
 	fprintf(stderr, "retry count exceeded, giving up.\n");
 	exit(EX_ERROR);
@@ -138,7 +148,6 @@ retry:
 	case 0:
 	    break;
 	case DS_ABORT_RETRY:
-	    fprintf(stderr, "cannot set message count values, retrying\n");
 	    rand_sleep(4 * 1000, 1000 * 1000);
 	    goto retry;
 	default:

@@ -14,6 +14,7 @@ AUTHOR:
 #include "common.h"
 
 #include "datastore.h"
+#include "rand_sleep.h"
 #include "robx.h"
 #include "wordlists.h"
 
@@ -90,7 +91,13 @@ double compute_robinson_x(void)
     rh.sum = 0.0;
     rh.count = 0;
 
-    ret = ds_foreach(dsh, robx_hook, &rh);
+    do {
+	ret = ds_foreach(dsh, robx_hook, &rh);
+	if (ret == DS_ABORT_RETRY) {
+	    rand_sleep(1000, 1000000);
+	    begin_wordlist(wordlist);
+	}
+    } while (ret == DS_ABORT_RETRY);
 
     rx = rh.sum/rh.count;
     if (rh.count == 0)

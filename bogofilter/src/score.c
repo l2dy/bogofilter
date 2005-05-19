@@ -80,7 +80,7 @@ void msg_print_stats(FILE *fp)
 /** search token in all lists according to precedence, summing up the
  * counts (all lists at same precedence are used); if found, set cnts
  * accordingly. */
-static void lookup(const word_t *token, wordcnts_t *cnts)
+static int lookup(const word_t *token, wordcnts_t *cnts)
 {
     int override=0;
     wordlist_t* list;
@@ -91,7 +91,7 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 	    cnts->good = wp->cnts.good;
 	    cnts->bad  = wp->cnts.bad;
 	}
-	return;
+	return 0;
     }
 
     cnts->msgs_bad = cnts->msgs_good = 0;
@@ -109,15 +109,20 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 	/* check if we have the token */
 	switch (ret) {
 	    case 0:
-		/* token found, pass */
+		/* token found, pass on */
 		break;
 	    case 1:
 		/* token not found, clear counts */
 		val.count[IX_GOOD] = 0;
 		val.count[IX_SPAM] = 0;
 		break;
+	    case DS_ABORT_RETRY:
+		/* sleep, reinitialize and start over */
+		rand_sleep(1000,1000000);
+		begin_wordlist(list);
+		/* FALLTHROUGH */
 	    default:
-		abort();
+		return ret;
 	}
 
 	if (ret == 0 && list->type == WL_IGNORE) {	/* if found on ignore list */
@@ -148,7 +153,7 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
 	fputc('\n', dbgout);
     }
 
-    return;
+    return 0;
 }
 
 
@@ -156,17 +161,23 @@ static void lookup(const word_t *token, wordcnts_t *cnts)
  */
 void lookup_words(wordhash_t *wh)
 {
+    int ret;
     hashnode_t *node;
 
     if (msg_count_file)	/* if mc file, already done */
 	return;
 
+retry:
     for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
 	word_t *token     = node->key;
 	wordprop_t *props = (wordprop_t *) node->buf;
 	wordcnts_t *cnts  = &props->cnts;
-	lookup(token, cnts);
+	ret = lookup(token, cnts);
+	if (ret == DS_ABORT_RETRY)
+	    /* start all over, the message counts may have changed
+	     * lookup handles reinitializing the wordlist */
+	    goto retry;
     }
 
     return;

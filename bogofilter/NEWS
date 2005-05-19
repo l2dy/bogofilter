@@ -13,6 +13,11 @@
 
 -------------------------------------------------------------------------------
 
+	2005-05-19
+
+	* Fix abort/retry logic with transactional interfaces
+	  (Berkeley DB and SQLite) so that retries actually work.
+
 0.94.12	2005-05-15 - Stable Release
 
 	* RELEASE notes now has a brief summary of the changes since
