@@ -29,7 +29,7 @@ struct dbhsqlite_t {
     sqlite3 *db;   /**< pointer to SQLite3 handle */
     sqlite3_stmt *select; /**< prepared SELECT statement for DB retrieval */
     sqlite3_stmt *insert; /**< prepared INSERT OR REPLACE for DB update */
-    sqlite3_stmt *delete; /**< prepared DELETE */
+    sqlite3_stmt *delete; /**< prepared DELETE statement */
     bool created;  /**< gets set by db_open if it created the database new */
     bool swapped;  /**< if endian swapped on disk vs. current host */
 };
@@ -46,11 +46,31 @@ static int sql_txn_abort(void *vhandle);
 static int sql_txn_commit(void *vhandle);
 static u_int32_t sql_pagesize(bfpath *bfp);
 
-/** The layout of the bogofilter table, formatted as SQL statement. */
+/** The layout of the bogofilter table, formatted as SQL statement.
+ *
+ * The additional index, although making writes a bit slower, speeds up
+ * queries noticably as it improves locality of referenced data and
+ * reduces complexity of the retrieval of the value column.
+ */
 #define LAYOUT \
 	"CREATE TABLE bogofilter (" \
-	"   key   BLOB PRIMARY KEY, "\
-	"   value BLOB);"
+	"   key   BLOB PRIMARY KEY," \
+	"   value BLOB);" \
+	"CREATE INDEX bfidx ON bogofilter(key,value);"
+/*
+ * another experimental layout is as follows,
+ * but does not appear to make a lot of difference
+ * performance-wise (evaluation in other environments
+ * is required though):
+ *
+#define LAYOUT \
+    "CREATE TABLE bogofilter (key BLOB, value BLOB); " \
+    "CREATE INDEX bfidx ON bogofilter(key,value);" \
+    "CREATE TRIGGER bfuniquekey BEFORE INSERT ON bogofilter " \
+    " FOR EACH ROW WHEN EXISTS(SELECT key FROM bogofilter WHERE (key=NEW.key) LIMIT 1) " \
+    " BEGIN UPDATE bogofilter SET value=NEW.value WHERE (key=NEW.key); SELECT RAISE(IGNORE); END;"
+#endif
+ */
 
 dsm_t dsm_sqlite = {
     /* public -- used in datastore.c */
@@ -301,17 +321,15 @@ void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
      * so it sets itself up lazily
      */
 #define PREP(cmd, ptr) \
-{ const char *tail; /* dummy */ \
-    if (sqlite3_prepare(dbh->db, cmd, strlen(cmd), ptr, &tail) != SQLITE_OK) { \
-	print_error(__FILE__, __LINE__, "cannot compile %s: %s\n", cmd, sqlite3_errmsg(dbh->db)); \
-	exit(EX_ERROR); \
-    } \
-}
+    { const char *tail; /* dummy */ \
+	if (sqlite3_prepare(dbh->db, cmd, strlen(cmd), ptr, &tail) != SQLITE_OK) { \
+	    print_error(__FILE__, __LINE__, "cannot compile %s: %s\n", cmd, sqlite3_errmsg(dbh->db)); \
+	    exit(EX_ERROR); \
+	} \
+    }
 
-    if (!dbh->select)
-	PREP("SELECT value FROM bogofilter WHERE key=? LIMIT 1;", &dbh->select);
-    if (!dbh->delete)
-	PREP("DELETE FROM bogofilter WHERE(key = ?);", &dbh->delete);
+    PREP("SELECT value FROM bogofilter WHERE key=? LIMIT 1;", &dbh->select);
+    PREP("DELETE FROM bogofilter WHERE(key = ?);", &dbh->delete);
 
     /* check if byteswapped */
     {
