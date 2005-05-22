@@ -1031,6 +1031,8 @@ static ex_t dbx_list_logfiles(bfpath *bfp, int argc, char **argv)
     for (j = 0; j < argc; j++) {
 	if (strcasecmp(argv[j], "all") == 0)
 	    flags |= DB_ARCH_LOG;
+	if (strcasecmp(argv[j], "absolute") == 0)
+	    flags |= DB_ARCH_ABS;
     }
 
     e = BF_LOG_ARCHIVE(dbe, &list, flags);
@@ -1043,7 +1045,10 @@ static ex_t dbx_list_logfiles(bfpath *bfp, int argc, char **argv)
 
     if (list) {
 	for (i = list; *i; i++) {
-	    printf("%s/%s\n", bfp->dirname, *i);
+	    if (flags & DB_ARCH_ABS)
+		puts(*i);
+	    else
+		printf("%s%s%s\n", bfp->dirname, DIRSEP_S, *i);
 	}
     }
 
