@@ -29,8 +29,8 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
     hashnode_t *node;
     wordprop_t *wordprop;
     run_t save_run_type = run_type;
-    int retrycount = 5;			/* we'll retry an aborted
-					   registration five times
+    int retrycount = 12;		/* we'll retry an aborted
+					   registration a dozen times
 					   before giving up. */
     bool first;
 
