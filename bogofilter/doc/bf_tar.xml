@@ -28,12 +28,12 @@
     <refsect1 id='options'><title>Options</title>
 	<para>The <option>-r</option> option causes <command>bf_tar</command> to remove
 	    inactive log files after the archive has been written
-	    successfully. The default is to not remove log files.</para>
+	    successfully. The default is to leave log files.</para>
 	<para>The <option>-R</option> option causes <command>bf_tar</command> to remove
 	    inactive log files before the archive is written. This may
 	    reduce chances that the resulting archive is recoverable
 	    should it become damaged. The archive may be smaller
-	    though. The default is not to remove log files.</para>
+	    though. The default is to leave log files.</para>
     </refsect1>
     <refsect1 id='exitstatus'><title>Exit Status</title>
 	<para>The script exits with status code 0 if everything went
