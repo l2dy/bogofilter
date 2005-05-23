@@ -538,9 +538,11 @@ void set_charset(const char *charset)
 #ifdef	CP866
 int  decode_and_htmlUNICODE_to_cp866(byte *buf, int len)
 {
-    int i,j, j1, l, is=0;
-    char  *pbuf, str[40];
-    int l1, code;
+    int i,j, j1, l;
+    bool is = false;
+    byte code = 0;
+    byte  *pbuf, str[40];
+    int l1;
     const int max_seq_length = 8; /* &#1234; &yacute; */
     l1 = 0;
     pbuf = buf;
@@ -552,7 +554,7 @@ int  decode_and_htmlUNICODE_to_cp866(byte *buf, int len)
 	    continue;
 	if (buf[i+1] != '#')	/*  "&nbsp;" ? */
 	{
-	    is = 0;
+	    is = false;
 	    for (j=0, l=1; i+l<len; l++,j++)
 	    {
 		if (l > max_seq_length) break;
@@ -564,7 +566,7 @@ int  decode_and_htmlUNICODE_to_cp866(byte *buf, int len)
 		    {
 			if (!strncasecmp(str, html_code[j1].sht, strlen(html_code[j1].sht)))
 			{
-			    is=1;
+			    is = true;
 			    code = html_code[j1].cht;
 			}
 		    }
@@ -585,7 +587,7 @@ int  decode_and_htmlUNICODE_to_cp866(byte *buf, int len)
 	    str[j] = buf[l+i];
 	    if (buf[l+i] == ';' )
 	    {
-		is=1;
+		is = true;
 		str[j] = 0;
 		code = atoi(str);
 		break;
@@ -593,13 +595,13 @@ int  decode_and_htmlUNICODE_to_cp866(byte *buf, int len)
 	}
 	if (is)
 	{
-	    is = 0;
+	    is = false;
 
 	    for (j1 = 0; j1 < 256; j1++)
 	    {
 		if (code == UnicodeTable[j1])
 		{ 
-		    is = 1;
+		    is = true;
 		    code = j1;
 		    break;
 		}
