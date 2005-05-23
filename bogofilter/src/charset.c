@@ -277,9 +277,9 @@ static void map_unicode(void)
     /* Not yet implemented */
 }
 
+#ifndef	CP866
 static void map_windows_1251_to_koi8r(void)
 {
-#ifdef	CP866
     /* Map:  windows-1251 -> KOI8-R (Cyrillic) */
     /* Contributed by: Yar Tikhiy (yarq@users.sourceforge.net) */
     static char xlate_1251[] = {
@@ -295,8 +295,8 @@ static void map_windows_1251_to_koi8r(void)
 	0xD8, 0xFB,  0xD9, 0xFD,  0xDA, 0xFF,  0xDB, 0xF9,  0xDC, 0xF8,  0xDD, 0xFC,  0xDE, 0xE0,  0xDF, 0xF1,
     };
     map_xlate_characters( xlate_1251, COUNTOF(xlate_1251) );
-#endif
 }
+#endif
 
 #ifdef	CP866
 static void map_windows_1251_to_cp866(void)
