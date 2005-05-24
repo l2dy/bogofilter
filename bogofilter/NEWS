@@ -13,6 +13,12 @@
 
 -------------------------------------------------------------------------------
 
+	2005-05-24
+
+	* Fixed compilation problems with --enable-iconv and
+          --enable-russian.  Thanks to Lev Butyrev and Yar Tikhiy for
+	  reporting them.
+
 	2005-05-21
 
 	* Efficiency: The SQLite adaptor now creates new databases with an
