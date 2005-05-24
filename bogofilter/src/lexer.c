@@ -326,10 +326,10 @@ int yyinput(byte *buf, size_t used, size_t size)
     }
 
 /* EK -  decoding things like &#1084 and charset_table */
+#ifndef ENABLE_ICONV
 #ifdef	CP866
     count = decode_and_htmlUNICODE_to_cp866(buf, count);
 #else
-#ifndef ENABLE_ICONV
     for (i = 0; i < count; i++ )
     {
 	byte ch = buf[i];
