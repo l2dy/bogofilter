@@ -248,7 +248,6 @@ AC_ARG_ENABLE(russian,
 		[USE_CP866=NO]
 	else
 		[USE_CP866=YES]
-		[DEFAULT_CHARSET="KOI8-R"]
 	fi
 )
 
@@ -256,6 +255,7 @@ dnl Enable building with Russian language support.
 if test x$USE_CP866 = xYES ; then
 	AC_DEFINE(CP866,1,
 	[Enable Russian language support])
+	[DEFAULT_CHARSET="CP866"]
 fi
 
 dnl Allow the user to specify a default charset
