@@ -7,13 +7,18 @@ AM_CPPFLAGS = -I$(srcdir)/..
 AM_LDFLAGS = -L..
 LDADD = -lbogofilter
 
-BUILT_SOURCES = t.config
+BUILT_SOURCES = t.config t.query.config
 CLEANFILES= $(BUILT_SOURCES)
 
 t.config: Makefile
 	( echo  >$@ 'EXE_EXT="@EXE_EXT@"' ; \
 	  echo >>$@  'DB_EXT="@DB_EXT@"' ; \
 	  echo >>$@ 'DB_TYPE="@DB_TYPE@"' ) || rm -f $@
+
+t.query.config: t.query.config.in Makefile
+	rm -f $@
+	sed 's/[@]DEFAULT_CHARSET[@]/@DEFAULT_CHARSET@/' <$(srcdir)/t.query.config.in >$@ || rm -f $@
+	chmod +x t.query.config
 
 ENVIRON_TESTS = t.abort t.env t.ctype t.bogodir t.leakfind t.u_fpe
 
@@ -46,6 +51,7 @@ TESTS_ENVIRONMENT=RUN_FROM_MAKE=1 AWK=$(AWK) srcdir=$(srcdir) SHELL=$(SHELL) $(S
 
 EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel \
 	printcore t._abort unsort.pl \
+	t.query.config.in \
 	run.sh \
 	inputs/dump.load.inp \
 	inputs/dump.load.upd \
