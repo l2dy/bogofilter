@@ -217,6 +217,8 @@ AC_ARG_ENABLE(spam-header-name,
 	[Use specified header name instead of X-Bogosity])
 )
 
+[DEFAULT_CHARSET="us-ascii"]
+
 dnl Allow the user to enable/disable use of iconv for converting character sets files.
 
 AC_ARG_ENABLE(iconv,
@@ -226,6 +228,7 @@ AC_ARG_ENABLE(iconv,
 		[USE_ICONV=NO]
 	else
 		[USE_ICONV=YES]
+		[DEFAULT_CHARSET="UTF-8"]
 	fi
 )
 
@@ -245,6 +248,7 @@ AC_ARG_ENABLE(russian,
 		[USE_CP866=NO]
 	else
 		[USE_CP866=YES]
+		[DEFAULT_CHARSET="KOI8-R"]
 	fi
 )
 
@@ -262,6 +266,13 @@ AC_ARG_WITH(charset,
 	    ["$withval"], 
 	    [Use specified charset instead of us-ascii])
 )
+
+if test "$DEFAULT_CHARSET" != "us-ascii"; then
+	AC_SUBST(DEFAULT_CHARSET)
+	AC_DEFINE_UNQUOTED(DEFAULT_CHARSET,
+	["$DEFAULT_CHARSET"],
+	[Use specified charset])
+fi
 
 dnl Allow the user to enable memory usage debugging methods
 
