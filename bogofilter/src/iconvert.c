@@ -39,7 +39,9 @@ extern	iconv_t cd;
 
 void iconvert(buff_t *src, buff_t *dst)
 {
-    while (src->read < src->t.leng) {
+    bool done = false;
+
+    while (!done) {
 	char *inbuf;
 	size_t inbytesleft;
 
@@ -142,6 +144,7 @@ void iconvert(buff_t *src, buff_t *dst)
 		break;
 
 	    case E2BIG:			/* output buffer has no more room */
+		done = true;
 		break;
 
 	    default:
@@ -150,6 +153,9 @@ void iconvert(buff_t *src, buff_t *dst)
 	}
 	src->read = src->t.leng - inbytesleft;
 	dst->t.leng = dst->size - dst->read - outbytesleft;
+
+	if (src->read >= src->t.leng)
+	    done = true;
     }
 
     if (src->t.leng != src->read)
