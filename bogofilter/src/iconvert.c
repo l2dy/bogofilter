@@ -37,6 +37,27 @@ AUTHOR:
 
 extern	iconv_t cd;
 
+static void iconv_print_error(int err, buff_t *src)
+{
+    if (DEBUG_ICONV(1)) {
+	const char *msg = NULL;
+	switch (err) {
+	case EILSEQ:		/* invalid multibyte sequence */
+	    msg = "EILSEQ";
+	    break;
+	case EINVAL:		/* incomplete multibyte sequence */
+	    msg = "EINVAL";
+	    break;
+	case E2BIG:		/* output buffer has no more room */
+	    msg = "E2BIG";
+	    break;
+	}
+	if (msg != NULL)
+	    fprintf(dbgout, "e: %d, %s - t: %p, r: %d, l: %d, s: %d\n", 
+		    err, msg, src->t.text, src->read, src->t.leng, src->size);
+    }
+}
+
 void iconvert(buff_t *src, buff_t *dst)
 {
     bool done = false;
@@ -110,23 +131,8 @@ void iconvert(buff_t *src, buff_t *dst)
 	if (count == (size_t)(-1)) {
 
 	    int err = errno;
-	    
-	    if (DEBUG_ICONV(1)) {
-		const char *msg = NULL;
-		switch (err) {
-		case EILSEQ:		/* invalid multibyte sequence */
-		    msg = "EILSEQ";
-		    break;
-		case EINVAL:		/* incomplete multibyte sequence */
-		    msg = "EINVAL";
-		    break;
-		case E2BIG:		/* output buffer has no more room */
-		    msg = "E2BIG";
-		    break;
-		}
-		if (msg != NULL)
-		    fprintf(dbgout, "%s - t: %p, r: %d, l: %d, s: %d\n", msg, src->t.text, src->read, src->t.leng, src->size);
-	    }
+
+	    iconv_print_error(err, src);
 
 	    switch (err) {
 	    case EILSEQ:		/* invalid multibyte sequence */
@@ -145,6 +151,8 @@ void iconvert(buff_t *src, buff_t *dst)
 
 	    case E2BIG:			/* output buffer has no more room */
 		done = true;
+		if (DEBUG_ICONV(1)	/* TODO:  Provide proper handling of E2BIG */
+		    fprintf(dbgout, "E2BIG\n");
 		break;
 
 	    default:
@@ -158,6 +166,9 @@ void iconvert(buff_t *src, buff_t *dst)
 	    done = true;
     }
 
-    if (src->t.leng != src->read)
-	fprintf(stderr, "t: %p, r: %d, l: %d, s: %d\n", src->t.text, src->read, src->t.leng, src->size);
+    /* TODO:  Provide proper handling of incompletely converted buffer */
+    if (DEBUG_ICONV(1) &&
+	src->t.leng != src->read)
+	fprintf(dbgout, "t: %p, r: %d, l: %d, s: %d\n", 
+		src->t.text, src->read, src->t.leng, src->size);
 }
