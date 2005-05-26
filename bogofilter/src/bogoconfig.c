@@ -310,6 +310,7 @@ static const char *help_text[] = {
     "info options:\n",
     "  -t, --terse               - set terse output mode.\n",
     "  -T, --fixed-terse-format  - set invariant terse output mode.\n",
+    "  -q, --quiet               - suppress token statistics.\n",
     "  -U, --report-unsure       - print statistics if spamicity is 'unsure'.\n",
     "  -v, --verbosity           - set debug verbosity level.\n",
     "  -y, --timestamp-date      - set date for token timestamps.\n",
@@ -541,6 +542,10 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 
     case 'p':
 	passthrough = true;
+	break;
+
+    case 'q':
+	quiet = true;
 	break;
 
     case 'Q':

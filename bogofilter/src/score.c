@@ -73,6 +73,9 @@ void msg_print_stats(FILE *fp)
 
     (void)fp;
 
+    if (quiet)
+	return;
+
     if (Rtable || unsure || verbose >= 2)
 	rstats_print(unsure);
 }
