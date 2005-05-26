@@ -151,7 +151,7 @@ void iconvert(buff_t *src, buff_t *dst)
 
 	    case E2BIG:			/* output buffer has no more room */
 		done = true;
-		if (DEBUG_ICONV(1)	/* TODO:  Provide proper handling of E2BIG */
+		if (DEBUG_ICONV(1))	/* TODO:  Provide proper handling of E2BIG */
 		    fprintf(dbgout, "E2BIG\n");
 		break;
 
