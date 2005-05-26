@@ -327,9 +327,9 @@ int yyinput(byte *buf, size_t used, size_t size)
 	return (count == EOF ? 0 : count);   /* not decode at all */
     }
 
-/* EK -  decoding things like &#1084 and charset_table */
 #ifndef ENABLE_ICONV
 #ifdef	CP866
+    /* EK -  decoding things like &#1084 and charset_table */
     count = decode_and_htmlUNICODE_to_cp866(buf, count);
 #else
     for (i = 0; i < count; i++ )
@@ -339,6 +339,7 @@ int yyinput(byte *buf, size_t used, size_t size)
     }
 #endif
 #endif
+
     return (count == EOF ? 0 : count);
 }
 
