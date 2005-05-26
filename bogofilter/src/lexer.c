@@ -153,11 +153,13 @@ static int get_decoded_line(buff_t *buff)
 #else
     if (temp == NULL)
 	temp = (buff_t *) calloc(sizeof(buff_t), 1);
-    /* UTF-8 uses up to six octets per character, make output buffer
-     * large enough */
-    if (temp->size < buff->size * 6) {
+
+    /* UTF-8 uses up to six octets per character.  Make input buffer
+     * sufficiently small that the UTF-8 text can fit in the output
+     * buffer */
+    if (temp->size < buff->size / 6) {
 	xfree(temp->t.text);
-	temp->size = buff->size * 6;
+	temp->size = buff->size / 6;
 	temp->t.text = (byte *) xmalloc(temp->size + D);
     }
 
