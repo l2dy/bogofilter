@@ -65,7 +65,7 @@
 0.94.12	2005-05-15 - Stable Release
 
 	* RELEASE notes now has a brief summary of the changes since
-          the last stable release (0.92.8) in October 2004.
+	  the last stable release (0.92.8) in October 2004.
 
 	* Man pages added for the utility scripts bf_compact, bf_copy,
 	  bf_resize, and bf_tar.
@@ -102,12 +102,12 @@
 	* Fixed pathing problem in bogoutil.  Default directory should be "."
 
 	* Revised utility scripts (bf_copy, bf_compact, bf_tar,
-          bf_resize) for consistency and Solaris 9 compatibility.
+	  bf_resize) for consistency and Solaris 9 compatibility.
 
 0.94.9	2005-05-06
 
 	* Fixed pathing regression which caused 'bogofilter_dir=dir' option
-          to supercede '-d dir' option.
+	  to supercede '-d dir' option.
 
 0.94.8	2005-05-03
 
@@ -182,18 +182,18 @@
 	2005-04-04
 
 	* The code for handling file and directory names has been
-          rewritten for clarity and maintainability.  Some options for
-          bogoutil which used to take a directory argument now take a filename,
-          for example -H, -r, and -R which all operate on a database,
-          not on a database environment.
+	  rewritten for clarity and maintainability.  Some options for
+	  bogoutil which used to take a directory argument now take a filename,
+	  for example -H, -r, and -R which all operate on a database,
+	  not on a database environment.
 
 	2005-04-03
 
 	* File handling code rewritten to use bfpath structure for
-          holding all info and with a 3 step use of the info.  1 -
-          create bfpaths during command line and config file
-          processing; 2 - validate directories and file names; and 3 -
-          use files for processing.
+	  holding all info and with a 3 step use of the info.  1 -
+	  create bfpaths during command line and config file
+	  processing; 2 - validate directories and file names; and 3 -
+	  use files for processing.
 
 0.94.3	2005-03-29
 
@@ -226,7 +226,7 @@
 0.94.2	2005-03-24
 
 	* Fix SQLite3 open problem, trying again when the table it is
-          locked.
+	  locked.
 
 	2005-03-23
 
@@ -259,7 +259,7 @@
 	2005-03-13
 
 	* Modified get_token() to use static storage in order to
-          lessen malloc/free overhead.
+	  lessen malloc/free overhead.
 
 	2005-03-09
 
@@ -292,7 +292,7 @@
 	  the environment, to conserve disk space.
 
 	* Added signal handler to catch SIGINT, SIGKILL, and SIGTERM
-          and exit cleanly.
+	  and exit cleanly.
 
 	* Support for Berkeley DB 3.1 has been removed as a side
 	  effect of automatically detecting transactional mode at
@@ -313,29 +313,29 @@
 	2005-02-18
 
 	* Added code to auto-detect when a transaction environment
-          exists and act accordingly (if none of the enable/disable
-          options are specified in the config file or on the command
-          line).
+	  exists and act accordingly (if none of the enable/disable
+	  options are specified in the config file or on the command
+	  line).
 
 	2005-02-10
 
 	* Fixed problem causing SIGSEGV when using options "-p" and
-          "-s" with multiple wordlists.
+	  "-s" with multiple wordlists.
 
 	2005-02-06
 
 	* Code to enable/disable Berkeley DB transactions now uses an
 	  OO paradigm (implemented via struct of method addresses).
 	* Enabling/disabling transactions is now run-time selectable
-          using "--enable-transactions=yes/no" on the command line and
-          "enable_transactions=yes/no" in the config file.
+	  using "--enable-transactions=yes/no" on the command line and
+	  "enable_transactions=yes/no" in the config file.
 	* Use "./configure --enable/disable-transactions" for build
-          time specification.
+	  time specification.
 
 	2005-01-28
 
 	* Add option "--db-transaction=yes/no" for run-time
-          enabling/disabling of transactions.
+	  enabling/disabling of transactions.
 
 	2005-01-25
 
@@ -350,12 +350,12 @@
 	2005-01-21
 
 	* Revised t.systest to remove vestiges of different scoring
-          algorithms. 
+	  algorithms. 
 
 	2005-01-17
 
 	* bogotune's '-M' option for converting a message to msg-count
-          format now requires a filename option.
+	  format now requires a filename option.
 
 	2005-01-15
 
@@ -365,7 +365,7 @@
 	2005-01-12
 	
 	* Fixed an array overrun in bogotune that caused problems when
-          using msg-count files.
+	  using msg-count files.
 
 	* Include saving of Unsures in procmail example in man page.
 
@@ -374,7 +374,7 @@
 	2005-01-09
 	
 	* bf_util scripts now use name 'BOGOHOME' for their directory
-          parameter and check that it really is a directory.
+	  parameter and check that it really is a directory.
 
 0.93.4	2005-01-09
 
@@ -408,12 +408,12 @@
 	2005-01-02
 
 	* Initial support for Russian character sets (thanks to Evgeny
-          Kotsuba).
+	  Kotsuba).
 
 	2004-12-30
 
 	* Bogolexer man page:  replaced incorrect references to
-          'bogofilter' with 'bogolexer'.
+	  'bogofilter' with 'bogolexer'.
 
 	* Added '-O file' to specify bogolexer output file.
 
@@ -423,12 +423,12 @@
 
 	* Fixed several memory leaks.
 
-	* Refactored long option code.  All definitions are now in one
-	  file (longoptions.c).  Programs bogolexer and bogoutil
+	* Refactored long option code.	All definitions are now in one
+	  file (longoptions.c).	 Programs bogolexer and bogoutil
 	  ignore options that don't apply to them, rather than abort.
 
 	* Long options used in the config file use underscores in
-	  their names.  Used on the command line, they have hyphens.
+	  their names.	Used on the command line, they have hyphens.
 	  This fixes a problem where some options had hyphens and some
 	  had underscores.
 
@@ -439,9 +439,9 @@
 0.93.3	2004-12-24
 
 	* Bogoutil's options for maintaining the database environment
-          are all long options with a "db-" prefix.
+	  are all long options with a "db-" prefix.
 	* Bogoutil's help message and man page include the new long
-          options.
+	  options.
 
 	2004-12-21
 
@@ -474,7 +474,7 @@
 	  results instead, calling rm in turn for each file. -d is not
 	  supported by older Berkeley DB versions such as 4.0.
 
-	* bogoutil -P directory  now checkpoints the database and removes
+	* bogoutil -P directory	 now checkpoints the database and removes
 	  inactive log files. Note you must save the database and remaining log
 	  files, in that order, if you want to be able to recover from
 	  corrupted files.
@@ -491,7 +491,7 @@
 	2004-12-05
 
 	* New directory doc/programmer/OS2 contains configure.os2
-          script contributed by Yuri Dario
+	  script contributed by Yuri Dario
 
 0.93.2	2004-12-03
 
@@ -592,7 +592,7 @@
 	      db_lk_max_objects=N
 
 	* Bogofilter and bogoutil now allow these options on the
-          command line, as:
+	  command line, as:
 	      --db_lk_max_locks=N
 	      --db_lk_max_objects=N
 
@@ -675,7 +675,7 @@
 	2004-10-30
 
 	* Converted QDBM from hash files (DEPOT API) to B+ trees
-          (Villa API) for better speed (Stefan Bellon).
+	  (Villa API) for better speed (Stefan Bellon).
 
 	2004-10-29
 
@@ -696,7 +696,7 @@
 
 	* Changed default mode from two-state to three-state
 	  - with ham_cutoff=0.45 and spam_cutoff=0.99
-            The ham_cutoff value is new and spam_cutoff is unchanged.
+	    The ham_cutoff value is new and spam_cutoff is unchanged.
 	  - changed the "Yes/No" tags used in the "X-Bogosity:" line
 	    to "Spam/Ham/Unsure"
 
@@ -756,7 +756,7 @@
 	2004-10-25 - Promoted to Stable Release
 
 	* Bogotune now warns when using '-E' to suppress ESF checking
-          and non 1.0 esf values are read from the config file.
+	  and non 1.0 esf values are read from the config file.
 
 	* bogofilter will now properly exit with code 3 when encountering write
 	  errors in pass-through mode. It would use the wrong code, 2, since
@@ -781,7 +781,7 @@
 	2004-10-10
 
 	* OS/2 compatibility fixes for configure, bogofilter, and
-          bogoutil (thanks to Yuri Dario).
+	  bogoutil (thanks to Yuri Dario).
 
 	2004-10-09
 
@@ -820,7 +820,7 @@
 	2004-09-05
 
 	* Ensure that robx computation uses a regular wordlist (rather
-          than an ignore list) to avoid a seg fault in bogotune.
+	  than an ignore list) to avoid a seg fault in bogotune.
 
 	2004-08-30
 
@@ -829,7 +829,7 @@
 0.92.6	2004-08-22
 
 	* Revise "-QQ" output so it can be used (unchanged) in a
-          config file.
+	  config file.
 	* Remove obsolete "--with-db" option from configure.ac
 
 0.92.5	2004-08-20
@@ -844,11 +844,11 @@
 	2004-08-16
 
 	* Added "-QQ" option to bogofilter to display extended
-          parameter list.
+	  parameter list.
 
 	2004-08-15
 
-	* Documentation update.  Sample configure commands now use
+	* Documentation update.	 Sample configure commands now use
 	  option --with-libdb-prefix rather than obsolete --with-db.
 	* Added "--wordlist" to bogofilter's help output.
 	* Minor clean-ups for bogofilter's help output.
@@ -864,7 +864,7 @@
 	* Cross reference man pages to one another.
 	* OS/2 compatibility changes (contributed by Yuri Dario).
 	* Removed obsolete test output files - degen.out,
-          combined.out, and separate.out
+	  combined.out, and separate.out
 
 0.92.4	2004-07-29 - Stable Release
 
@@ -954,7 +954,7 @@
 	2004-06-25
 
 	* Fixed problem recognizing empty line ending of header in
-          files with CRLFs and X-Bogosity line as last header line.
+	  files with CRLFs and X-Bogosity line as last header line.
 
 	2004-06-24
 
@@ -969,10 +969,10 @@
 	2004-06-19
 
 	* Fix abort during db_open (ds_open wasn't first calling
-          ds_init).
+	  ds_init).
 	* Added regression test t.lock3 for this fix.
 	* Revise datastore and database levels so that each level
-          calls its own init() and cleanup() routines.
+	  calls its own init() and cleanup() routines.
 
 0.91.3	2004-06-15
 
@@ -989,18 +989,18 @@
 0.91.2	2004-06-11
 
 	* Bogofilter's creation of new wordlists now includes
-          .WORDLIST_VERSION token.
+	  .WORDLIST_VERSION token.
 	* Fix erroneous double opening of wordlists specified on
-          command line.
+	  command line.
 	* Corrected tests so that "make check" passes with qdbm and
-          tdb.
+	  tdb.
 
 	2004-06-10
 
 	* Fix included GSL compile for compilers that do not support
 	  "extern inline", such as Compaq C V6.3.
 	* FAQ updated with info on multiple wordlists and ignore
-          lists.
+	  lists.
 	* FAQ updated with info on building as non-root user.
 
 0.91.1	2004-06-04
@@ -1017,7 +1017,7 @@
 	2004-05-30
 
 	* Fixed registration.  When multiple wordlists are specified,
-          registration is to first regular wordlist.
+	  registration is to first regular wordlist.
 	* Added regresstion test for multiple wordlists.
 
 	2004-05-29
@@ -1082,7 +1082,7 @@
 	2004-04-02
 
 	* Lower output precision for regression tests, by using %f
-          rather than %e, to mask differences between GSL versions.
+	  rather than %e, to mask differences between GSL versions.
 
 0.17.5	2004-04-01
 	2004-04-08 - Promoted to Stable Release
@@ -1128,12 +1128,12 @@
 
 	* Added code to use Berkeley DB Concurrent Data Store, which
 	  uses a "DB_ENV" BerkeleyDB environment and the BerkeleyDB
-	  Lock Manager.  This is documented in file doc/README.db.
+	  Lock Manager.	 This is documented in file doc/README.db.
 
 	2004-03-03
 
 	* "bogofilter -Q" output now includes all config file options
-          and is formatted to be read in as a config file.
+	  and is formatted to be read in as a config file.
 
 	2004-02-27
 
@@ -1156,7 +1156,7 @@
 0.17.2	2004-02-22
 
 	* Algorithm code cleanup -- created file score.[ch] from
-          files method.[ch], robinson.[ch], and fisher.[ch]
+	  files method.[ch], robinson.[ch], and fisher.[ch]
 
 	2004-02-21
 	
@@ -1209,7 +1209,7 @@
 	2004-01-23
 
 	* Correct processing order as '-V' doesn't need to read the
-          config file.
+	  config file.
 	* Correct SIGSEGV causes by missing environment variables.
 
 0.16.4	2004-01-23 - Released
@@ -1284,10 +1284,10 @@
 0.16.0	2004-01-01
 
 	* Added "#ifdef ENABLE_DEPRECATED_CODE" statements as
-          appropriate.
+	  appropriate.
 	* Corrected configure.ac defect for "--enable-memdebug".
 	* Corrected lexer defect that created unnecessary
-          "rcvd:Received" tokens.
+	  "rcvd:Received" tokens.
 	* Fixed header file problem that causes sigsegv with qdbm.
 	* Expanded VERP pattern to reduce hapax count.
 
@@ -1300,7 +1300,7 @@
 0.15.13	2003-12-26
 
 	* Fix problem with separate wordlists that causes
-          "db_get_dbvalue( '...' ), err: 12, out of memory".
+	  "db_get_dbvalue( '...' ), err: 12, out of memory".
 
 	2003-12-25
 
@@ -1312,7 +1312,7 @@
 0.15.12	2003-12-24
 
 	* Distinguish between pipe and stdin as input sources.
-          (contributed by Henning Makholm)
+	  (contributed by Henning Makholm)
 
 	2003-12-23
 
@@ -1345,7 +1345,7 @@
 	2003-12-14
 
 	* bogotune now understands degeneration options and can use
-          them when creating message-count files.
+	  them when creating message-count files.
 
 	2003-12-12
 
@@ -1379,22 +1379,22 @@
 	2003-12-07
 
 	* Fixed "configure --enable-static" for building statically
-          linked executables.
+	  linked executables.
 	* "make check" now uses static executables when "configure
-          --enable-static" was used.
+	  --enable-static" was used.
 	* Revised msg-count.sh so that formail isn't needed.
 
 	2003-12-03
 
 	* Script msg-count.sh has been added to create message count
-          files from mailboxes and mail directories.
+	  files from mailboxes and mail directories.
 
 	2003-12-01
 
 	* Fixed bug in header degeneration.
 	* Added degeneration options to config file.
 	* Added subject line tagging for Unsures.  (Contributed by
-          Burkhard Kaas).
+	  Burkhard Kaas).
 
 	2003-11-30
 
@@ -1421,10 +1421,10 @@
 	2003-11-20
 
 	* Fixed a defect in lexer.c that was discarding X-Bogosity
-          lines in rfc822 attachments.  Thanks to Martin Gagern for
-          reporting the problem and supplying a patch.
+	  lines in rfc822 attachments.	Thanks to Martin Gagern for
+	  reporting the problem and supplying a patch.
 	* Fixed a memory leak in bogoutil.  Thanks to Dan Deward for
-          reporting the problem.
+	  reporting the problem.
 	* Refactored passthrough.c.
 	* Test suite bugfixes for TDB/QDBM.
 
@@ -1449,7 +1449,7 @@
 	2003-11-15
 
 	* "<!DOCTYPE HTML PUBLIC...>" is now recognized as starting
-          html text.
+	  html text.
 
 	2003-11-14
 
@@ -1472,7 +1472,7 @@
 
 	* Fixed timestamp config option.
 	* Removed repetition counts in lexer for TOKEN and MIME_BOUNDARY
-          patterns to reduce executable size.
+	  patterns to reduce executable size.
 
 	2003-11-01
 
@@ -1489,7 +1489,7 @@
 	2003-10-27
 
 	* Change bogoupgrade back to using 2 arg open for perl-5.6
-          compatibility.
+	  compatibility.
 
 	2003-10-26
 
@@ -1518,12 +1518,12 @@
 
 	* Fix build problem in doc directory.
 	* Refactored source code so bogolexer will build without
-          datastore code.
+	  datastore code.
 
 	2003-10-14
 
 	* Fix initialization problem that prevents reading more than
-          one msg-count file.
+	  one msg-count file.
 	* Initialize wordhash storage.
 
 0.15.7	2003-10-13
@@ -1547,7 +1547,7 @@
 
 	* Fixed problem in bogoupgrade.
 	* Revised configure.ac to remove GLIBC-2.3 dependency and
-          include info for DOS-ish file in config.h.
+	  include info for DOS-ish file in config.h.
 
 	2003-10-01
 
@@ -1562,7 +1562,7 @@
 0.15.5.2 2003-10-01
 
 	 * Rebuild of i586.rpm with GSL-1.4 dynamically linked.
-           Source rpms and bogofilter-static rpm not affected.
+	   Source rpms and bogofilter-static rpm not affected.
 
 0.15.5.1 2003-09-30
 
@@ -1588,11 +1588,11 @@
 	2003-09-26
 
 	* VERPs (Variable Envelope Return Paths) now have their
-          sequence numbers replaced by a '#' for scoring.
+	  sequence numbers replaced by a '#' for scoring.
 	* Fixed problem that caused auto-update ("-u") to not update
-          separate wordlists.
+	  separate wordlists.
 	* End-of-header code revised to ensure that passthrough ("-p")
-          properly places the X-Bogosity line.
+	  properly places the X-Bogosity line.
 
 	2003-09-25
 
@@ -1602,7 +1602,7 @@
 	  version is present, bogofilter will statically link against GSL 1.4
 	  excerpts from the gsl/ directory.
 
- 	  While we believe we have been allowed to include DCDFLIB with
+	  While we believe we have been allowed to include DCDFLIB with
 	  bogofilter, some people had expressed concerns. GSL is subject
 	  to the GNU General Public License v2, so we are DEFINITELY
 	  allowed to include it.
@@ -1645,7 +1645,7 @@
 	2003-09-12
 
 	* Revise parsing pattern for "encoded text" and regression
-          test for folded text.
+	  test for folded text.
 
 	2003-09-11
 
@@ -1658,13 +1658,13 @@
 	* Fixed maintenance mode (broken during database API rewrite).
 	* Added regression test for maintenance mode.
 	* Re-organized test framework to put all scripts in src/tests,
-          all input files in src/tests/inputs, and reference outputs
-          in src/tests/outputs.
+	  all input files in src/tests/inputs, and reference outputs
+	  in src/tests/outputs.
 
 	2003-09-08
 
 	* Revised parsing to ignore additional headers, i.e.
-          Resent-Message-ID, In-Reply-To, and References.
+	  Resent-Message-ID, In-Reply-To, and References.
 
 	2003-09-07
 	
@@ -1687,7 +1687,7 @@
 
 	* Update bogowordfreq to work with bogoreader.
 	* Fatal flex errors are now caught and bogofilter exits
-          gracefully after closing its database(s).
+	  gracefully after closing its database(s).
 
 0.15.1	2003-09-03
 
