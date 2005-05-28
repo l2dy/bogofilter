@@ -25,8 +25,6 @@ AUTHOR:
  **
 ******************************************************************************/
 
-/* imports */
-
 #include "common.h"
 
 #include <ctype.h>
@@ -132,7 +130,7 @@ void init_charset_table(const char *charset_name)
 	iconv_close(cd);
 
 /*  iconv_t iconv_open(const char *tocode, const char *fromcode); */
-    cd    = iconv_open( DEFAULT_CHARSET, charset_name );
+    cd = iconv_open( DEFAULT_CHARSET, charset_name );
     if (cd == (iconv_t)(-1)) {
 	int err = errno;
 	if (err != EINVAL)
