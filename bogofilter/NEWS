@@ -13,11 +13,29 @@
 
 -------------------------------------------------------------------------------
 
+0.94.13	2005-05-28
+
+	* Minor cleanups to iconv code.
+
+	2005-05-26
+
+	* Fixed buffer sizing problem affecting unicode encoding of
+	  long lines.
+
+	* Added '-q' (quiet) option for bogofilter to suppress
+	  printing of statistics.
+
+	* Added return code to lookup function to support error
+	  retries.
+
 	2005-05-24
 
 	* Fixed compilation problems with --enable-iconv and
-          --enable-russian.  Thanks to Lev Butyrev and Yar Tikhiy for
+	  --enable-russian.  Thanks to Lev Butyrev and Yar Tikhiy for
 	  reporting them.
+
+	* Modified configure.ac and added t.query.config.in so
+	  t.query.con regression test works with --enable-iconv.
 
 	2005-05-21
 
