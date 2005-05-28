@@ -279,7 +279,7 @@ void yyinit(void)
 int yyinput(byte *buf, size_t used, size_t size)
 /* input getter for the scanner */
 {
-    int i, cnt;
+    int cnt;
     int count = 0;
     buff_t buff;
 
@@ -327,18 +327,20 @@ int yyinput(byte *buf, size_t used, size_t size)
 	return (count == EOF ? 0 : count);   /* not decode at all */
     }
 
-#ifndef ENABLE_ICONV
-#ifdef	CP866
+#if	defined(CP866) && !defined(ENABLE_ICONV)
     /* EK -  decoding things like &#1084 and charset_table */
     count = decode_and_htmlUNICODE_to_cp866(buf, count);
-#else
-    for (i = 0; i < count; i++ )
-    {
-	byte ch = buf[i];
-	buf[i] = charset_table[ch];
+#endif
+
+    if (replace_nonascii_characters) {
+	/* do non-ascii replacement */
+	int i;
+	for (i = 0; i < count; i++ )
+	{
+	    byte ch = buf[i];
+	    buf[i] = charset_table[ch];
+	}
     }
-#endif
-#endif
 
     return (count == EOF ? 0 : count);
 }
