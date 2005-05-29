@@ -205,6 +205,13 @@
 #
 #replace_nonascii_characters=N
 
+#### UNICODE handling
+#
+#	enable/disable unicode
+#
+#unicode=no
+##unicode=yes
+
 
 ########### Classification Constants Settings #######################
 #
