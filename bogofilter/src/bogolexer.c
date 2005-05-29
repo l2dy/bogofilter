@@ -212,6 +212,10 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	charset_default = get_string(name, val);
 	break;
 
+    case O_UNICODE:
+	unicode = get_bool(name, val);
+	break;
+
     case O_REPLACE_NONASCII_CHARACTERS:
 	replace_nonascii_characters = get_bool(name, val);
 	break;

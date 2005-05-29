@@ -217,27 +217,41 @@ AC_ARG_ENABLE(spam-header-name,
 	[Use specified header name instead of X-Bogosity])
 )
 
-[DEFAULT_CHARSET="us-ascii"]
+dnl Allow the user to enable/disable use of unicode
 
-dnl Allow the user to enable/disable use of iconv for converting character sets files.
-
-AC_ARG_ENABLE(iconv,
-	AC_HELP_STRING([--enable-iconv],
-	[Enable iconv for converting character sets]),
+AC_ARG_ENABLE(unicode,
+	AC_HELP_STRING([--enable-unicode],
+	[Enable unicode for converting character sets to unicode (UTF-8)]),
 	if test "$enableval" = no; then
-		[USE_ICONV=NO]
-	else
-		[USE_ICONV=YES]
-		[DEFAULT_CHARSET="UTF-8"]
+		[USE_UNICODE=NO]
+	fi
+	if test "$enableval" = yes; then
+		[USE_UNICODE=YES]
 	fi
 )
 
-dnl Enable building with iconv for converting character sets files.
-if test x$USE_ICONV = xYES ; then
-	AC_DEFINE(ENABLE_ICONV,1,
-	[Enable iconv for converting character sets])
+AM_CONDITIONAL(DISABLE_UNICODE, test x$USE_UNICODE = xNO)
+AM_CONDITIONAL(ENABLE_UNICODE, test x$USE_UNICODE = xYES)
+
+if test x$USE_UNICODE = xNO ; then
+	AC_DEFINE(DISABLE_UNICODE,1,
+	[Disable unicode for converting character sets to unicode])
 fi
-AM_CONDITIONAL(ENABLE_ICONV, test x$USE_ICONV = xYES)
+
+if test x$USE_UNICODE = xYES ; then
+	AC_DEFINE(ENABLE_UNICODE,1,
+	[Enable unicode for converting character sets to unicode])
+	[DEFAULT_CHARSET="UTF-8"]
+else
+	[DEFAULT_CHARSET="us-ascii"]
+fi
+
+dnl Enable building with unicode for normalizing tokens.
+if test x$USE_UNICODE = xYES ; then
+	AC_DEFINE(ENABLE_UNICODE,1,
+	[Enable unicode for converting character sets])
+fi
+AM_CONDITIONAL(ENABLE_UNICODE, test x$USE_UNICODE = xYES)
 
 dnl Allow the user to enable Russian language support
 
@@ -510,6 +524,7 @@ You can download Berkeley DB 4.3.x from http://www.sleepycat.com/]]),
 #endif
 #include <db.h>]]
 	)
+    if test "$USE_TRANSACTIONS" != "NO" ; then
 	AC_MSG_CHECKING(if Berkeley DB supports shared environments)
 	if test "x$enable_dbshared_test" != xno ; then
 	AC_RUN_IFELSE(
@@ -548,6 +563,7 @@ shared environments, you can use --disable-dbshared-test.])],)
 	AC_MSG_RESULT(yes)
     else
 	AC_MSG_RESULT(skipped)
+    fi
     fi
 
 	AC_DEFINE(ENABLE_DB_DATASTORE,1, [Enable Berkeley DB datastore])

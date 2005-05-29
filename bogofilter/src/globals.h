@@ -35,6 +35,7 @@ extern	int	query;			/* '-Q' */
 extern	bool	Rtable;			/* '-R' */
 extern	bool	terse;			/* '-t' */
 extern	int	bogotest;		/* '-X', env("BOGOTEST") */
+extern	bool	unicode;
 extern	int	verbose;		/* '-v' */
 extern	bool	replace_nonascii_characters;	/* '-n' */
 

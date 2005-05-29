@@ -66,10 +66,16 @@ regression_SOURCES= ../trio/regression.c
 LDADD += libtrio.a
 endif
 
-if !ENABLE_ICONV
-CHARSET_SOURCES = charset.h charset.c chUnicodeTo866.h
+if ENABLE_UNICODE
+CHARSET_SOURCES = charset.c charset.h convert_unicode.c iconvert.h iconvert.c
 else
-CHARSET_SOURCES = charset.h charset_iconv.c iconvert.h iconvert.c
+if DISABLE_UNICODE
+CHARSET_SOURCES = charset.c charset.h convert_charset.c chUnicodeTo866.h
+else
+CHARSET_SOURCES = charset.c charset.h \
+		  convert_charset.c convert_charset.h chUnicodeTo866.h \
+		  convert_unicode.c convert_unicode.h iconvert.c iconvert.h
+endif
 endif
 
 # what to build that from
@@ -136,7 +142,8 @@ libbogofilter_a_SOURCES = \
 	$(version_sources)
 
 nodist_libbogofilter_a_SOURCES = \
-	directories.c
+	directories.c \
+	unicode_runtime_selection unicode_enabled unicode_disabled
 
 if NEED_GETOPT
 noinst_LIBRARIES	+= libgnugetopt.a
@@ -189,6 +196,10 @@ EXTRA_libbogofilter_a_SOURCES = datastore_db.c datastore_db_trad.c \
 				datastore_qdbm.h datastore_qdbm.c \
 				datastore_tdb.c \
 				datastore_sqlite.c
+				charset.h convert_charset.h convert_unicode.h \
+		  		charset.c \
+		  		convert_charset.c chUnicodeTo866.h \
+		  		convert_unicode.c iconvert.c iconvert.h
 
 CLEANFILES=version.c directories.c bogoupgrade
 

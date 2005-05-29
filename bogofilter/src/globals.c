@@ -57,6 +57,13 @@ e_txn	eTransaction = T_DEFAULT_OFF;
 e_txn	eTransaction = T_DEFAULT_ON;
 #endif
 
+/* for  transactions */
+#ifndef	ENABLE_UNICODE
+bool	unicode = false; 	/* T_DEFAULT_OFF */
+#else
+bool	unicode = true;		/* T_DEFAULT_ON  */
+#endif
+
 /* for  bogoconfig.c, prob.c, rstats.c and score.c */
 double	robx = 0.0;
 double	robs = 0.0;

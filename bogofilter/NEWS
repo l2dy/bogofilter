@@ -13,6 +13,21 @@
 
 -------------------------------------------------------------------------------
 
+	2005-05-29
+
+	* Refactor charset and unicode functions into charset.[ch],
+          convert_charset.[ch], and conver_unicode.[ch]
+
+	* Add configure and runtime options to select charset and/or
+	  unicode character conversion:
+
+	  ./configure                   - runtime selection
+	  ./configure --enable-unicode  - unicode only
+	  ./configure --disable-unicode - charset only
+
+	  bogofilter --unicode=yes      - use unicode conversion
+	  bogofilter --unicode=no       - use charset conversion
+
 0.94.13	2005-05-28
 
 	* Minor cleanups to iconv code.

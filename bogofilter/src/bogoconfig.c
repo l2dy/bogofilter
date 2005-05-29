@@ -701,6 +701,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case O_THRESH_UPDATE:		get_double(name, val, &thresh_update);			break;
     case O_TIMESTAMP:			timestamp_tokens = get_bool(name, val);			break;
     case O_UNSURE_SUBJECT_TAG:		unsure_subject_tag = get_string(name, val);		break;
+    case O_UNICODE:			unicode = get_bool(name, val);				break;
     case O_WORDLIST:			configure_wordlist(val);				break;
 
     case O_DB_TRANSACTION:		eTransaction = get_txn(name, val);			break;

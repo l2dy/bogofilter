@@ -148,22 +148,25 @@ static int get_decoded_line(buff_t *buff)
     uint used = buff->t.leng;
     byte *buf = buff->t.text + used;
 
-#ifndef	ENABLE_ICONV
-    temp = buff;
-#else
-    if (temp == NULL)
-	temp = (buff_t *) calloc(sizeof(buff_t), 1);
-
-    /* UTF-8 uses up to six octets per character.  Make input buffer
-     * sufficiently small that the UTF-8 text can fit in the output
-     * buffer */
-    if (temp->size < buff->size / 6) {
-	xfree(temp->t.text);
-	temp->size = buff->size / 6;
-	temp->t.text = (byte *) xmalloc(temp->size + D);
+    if (!unicode) {
+	temp = buff;
     }
+#ifndef	DISABLE_UNICODE
+    else {
+	if (temp == NULL)
+	    temp = (buff_t *) calloc(sizeof(buff_t), 1);
 
-    temp->t.leng = temp->read = 0;
+	/* UTF-8 uses up to six octets per character.  Make input buffer
+	 * sufficiently small that the UTF-8 text can fit in the output
+	 * buffer */
+	if (temp->size < buff->size / 6) {
+	    xfree(temp->t.text);
+	    temp->size = buff->size / 6;
+	    temp->t.text = (byte *) xmalloc(temp->size + D);
+	}
+
+	temp->t.leng = temp->read = 0;
+    }
 #endif
 
     count = yy_get_new_line(temp);
@@ -176,14 +179,16 @@ static int get_decoded_line(buff_t *buff)
     if (passthrough && passmode == PASS_MEM && count > 0)
 	textblock_add(temp->t.text+temp->read, (size_t) count);
 
-#ifdef	ENABLE_ICONV
-    iconvert(temp, buff);
-    /*
-     * iconvert, treating multi-byte sequences, can shrink or enlarge
-     * the output compared to its input.  Correct count.
-     */
-    if (count > 0)
-	count = buff->t.leng;
+#ifndef	DISABLE_UNICODE
+    if (unicode) {
+	iconvert(temp, buff);
+	/*
+	 * iconvert, treating multi-byte sequences, can shrink or enlarge
+	 * the output compared to its input.  Correct count.
+	 */
+	if (count > 0)
+	    count = buff->t.leng;
+    }
 #endif
 
     if (count == EOF) {
