@@ -31,15 +31,15 @@
 #	boolean indicating whether transactions
 #	should be enabled (yes) or disabled (no)
 #
-#db_transaction=no
-##db_transaction=yes
+#db_transaction=no		# default
+##db_transaction=yes		# (alternate)
 
 #### WORDLIST: define additional word lists
 #
 #	char type: 'r' (regular) or 'i' (ignore)
 #	char *name: name of list, e.g. "system", "user", "ignore"
 #	char *path: absolute path to file or
-#	            file name (relative to bogofilter_dir)
+#		    file name (relative to bogofilter_dir)
 #	int  order - once found, skip higher numbered lists
 #
 ##wordlist i,ignore,~/ignorelist.db,1
@@ -66,12 +66,13 @@
 #	zero:  put spamicity info in message body
 #	can use "bool" values of True, False, Yes, No, 1, or 0
 #
-#stats_in_header=Yes
+#stats_in_header=Yes		# default
+##stats_in_header=No		# (alternate)
 
 #### DB_CACHESIZE
 #
 #	non-zero: set this as DB cache size (in Mbytes)
-#	zero:	  use DB default cache size (.25 Mbyte in 4.0.14)
+#	zero:     use DB default cache size (.25 Mbyte in 4.0.14)
 #
 #	note that Berkeley DB increases any buffer size below 500 MB
 #	by 25%!
@@ -81,16 +82,16 @@
 #	applications such as scoring.
 #	WARNING: If you set this too large, bogofilter will fail.
 #
-#db_cachesize=0
-##db_cachesize=16
+#db_cachesize=0			# default
+##db_cachesize=16		# (alternate)
 
 #### DB_LOG_AUTOREMOVE
 #
 #	boolean indicating whether auto-removing of
 #	logs should be enabled (yes) or disabled (no)
 #
-#db_log_autoremove=no
-###db_log_autoremove=yes
+#db_log_autoremove=no		# default
+###db_log_autoremove=yes	# (alternate)
 
 #### DB_LK_MAX_LOCKS, DB_LK_MAX_OBJECTS
 #
@@ -99,8 +100,8 @@
 #	If you run out of locks, see file README.db, 
 #	section "3.2 LOCK TABLE EXHAUSTION"
 #
-#db_lk_max_locks=16384
-#db_lk_max_objects=16384
+#db_lk_max_locks=16384		# default
+#db_lk_max_objects=16384	# default
 
 #### TIMESTAMP
 #
@@ -178,7 +179,8 @@
 #
 #	if enabled, format the X-Bogosity using the 'terse_format' specificaton.
 #
-#terse=no
+#terse=no			# default
+##terse=yes			# (alternate)
 
 
 ########### Tokenizer Settings ######################################
@@ -195,22 +197,23 @@
 #
 #	specify default charset
 #
-#charset_default=us-ascii
-##charset_default=iso-8859-1
-##charset_default=cp866		# for Russian
+#charset_default=us-ascii		# default
+##charset_default=iso-8859-1		# (alternate)
+##charset_default=cp866			# for Russian
 
 #### REPLACE_NONASCII_CHARACTERS
 #
 #	replace non-7bit chars with '?'
 #
-#replace_nonascii_characters=N
+#replace_nonascii_characters=N		# default
+##replace_nonascii_characters=Y		# (alternate)
 
 #### UNICODE handling
 #
 #	enable/disable unicode
 #
-#unicode=no
-##unicode=yes
+#unicode=no				# default
+##unicode=yes				# (alternate)
 
 
 ########### Classification Constants Settings #######################
@@ -223,15 +226,15 @@
 #	than MIN_DEV, don't use the word in the
 #	spamicity calculation
 #
-#min_dev=0.375
+#min_dev=0.375				# default
 
 #### Robinson Constants
 #
 #	floating point values for
 #	Robinson S and X coefficients.
 #
-#robs=0.0178
-#robx=0.52
+#robs=0.0178				# default
+#robx=0.52				# default
 
 #### CUTOFF Values
 #
@@ -239,22 +242,22 @@
 #	setting ham_cutoff to a non-zero value will
 #	enable tri-state results (Spam/Ham/Unsure).
 #
-#ham_cutoff = 0.45
-#spam_cutoff= 0.99
+#ham_cutoff = 0.45			# default
+#spam_cutoff= 0.99			# default
 #
 #	for two-state classification:
 #
-##ham_cutoff  = 0.00
-##spam_cutoff = 0.99
+##ham_cutoff  = 0.00			# default
+##spam_cutoff = 0.99			# default
 
 #### Effective Size Factor Values
 #
-#ns_esf = 1.000
-#sp_esf = 1.000
+#ns_esf = 1.000				# default
+#sp_esf = 1.000				# default
 
 #### Auto-update threshold
 #
 #	Skip autoupdating if the spamicity is within this value
 #	of 0.000000 (surely ham) or 1.000000 (surely spam).
 #
-## thresh_update=0.01
+## thresh_update=0.01			# (optional)
