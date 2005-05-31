@@ -13,6 +13,10 @@
 
 -------------------------------------------------------------------------------
 
+	2005-05-31
+
+	* Split up acinclude.m4 into separate files under m4/.
+
 	2005-05-29
 
 	* Refactor charset and unicode functions into charset.[ch],
