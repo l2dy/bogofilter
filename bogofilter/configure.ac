@@ -152,6 +152,7 @@ AC_SUBST(CFLAGS)
 
 dnl Checks for libraries.
 AC_CHECK_LIB([m],  [cos])
+AM_ICONV
 
 dnl fdatasync can be faster than fsync but may be in librt on some systems
 dnl such as Solaris. The code is currently stubbed out in db_lock.c
@@ -245,13 +246,6 @@ if test x$USE_UNICODE = xYES ; then
 else
 	[DEFAULT_CHARSET="us-ascii"]
 fi
-
-dnl Enable building with unicode for normalizing tokens.
-if test x$USE_UNICODE = xYES ; then
-	AC_DEFINE(ENABLE_UNICODE,1,
-	[Enable unicode for converting character sets])
-fi
-AM_CONDITIONAL(ENABLE_UNICODE, test x$USE_UNICODE = xYES)
 
 dnl Allow the user to enable Russian language support
 
@@ -774,9 +768,11 @@ AC_CONFIG_FILES([Makefile \
 AC_OUTPUT
 
 AC_MSG_NOTICE([Using these settings:])
+AC_MSG_NOTICE([---------------------])
 AC_MSG_NOTICE([CPPFLAGS=$CPPFLAGS])
 AC_MSG_NOTICE([  CFLAGS=$CFLAGS])
 AC_MSG_NOTICE([ LDFLAGS=$LDFLAGS])
 AC_MSG_NOTICE([    LIBS=$LIBS])
 AC_MSG_NOTICE([   LIBDB=$LIBDB])
 AC_MSG_NOTICE([GSL_LIBS=$GSL_LIBS])
+AC_MSG_NOTICE([LIBICONV=$LIBICONV])

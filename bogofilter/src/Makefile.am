@@ -66,6 +66,10 @@ regression_SOURCES= ../trio/regression.c
 LDADD += libtrio.a
 endif
 
+if !DISABLE_UNICODE
+LDADD += @LIBICONV@
+endif
+
 if ENABLE_UNICODE
 CHARSET_SOURCES = charset.c charset.h convert_unicode.c iconvert.h iconvert.c
 else
