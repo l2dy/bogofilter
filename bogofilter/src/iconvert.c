@@ -69,10 +69,11 @@ void iconvert(buff_t *src, buff_t *dst)
 	char *outbuf;
 	size_t outbytesleft;
 	size_t count;
-	inbuf = src->t.text + src->read;
+
+	inbuf = (char *)src->t.text + src->read;
 	inbytesleft = src->t.leng - src->read;
 
-	outbuf = dst->t.text + dst->t.leng;
+	outbuf = (char *)dst->t.text + dst->t.leng;
 	outbytesleft = dst->size - dst->read - dst->t.leng;
 
 	/*
