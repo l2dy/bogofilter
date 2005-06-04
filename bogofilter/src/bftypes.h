@@ -117,8 +117,7 @@ typedef unsigned long ulong;
 typedef unsigned int uint;
 #endif
 
-/** signed object size type (SunOS 4.1.X needs this here) */
-#if !defined(HAVE_SSIZE_T) && !defined(DONT_TYPEDEF_SSIZE_T)
+#if !defined(HAVE_SSIZE_T)
 typedef int ssize_t;
 #endif
 

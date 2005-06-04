@@ -32,7 +32,6 @@ Matthias Andree <matthias.andree@gmx.de> 2003 - 2004
  * in the many different BerkeleyDB versions.
  */
 
-#define DONT_TYPEDEF_SSIZE_T 1
 #include "common.h"
 
 #include <errno.h>
