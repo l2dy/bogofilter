@@ -48,7 +48,9 @@ Note: bogolexer also uses configfile.c.
 #include "charset.h"
 #include "configfile.h"
 #include "datastore.h"
+#ifdef	ENABLE_DB_DATASTORE
 #include "datastore_db.h"
+#endif
 #include "error.h"
 #include "find_home.h"
 #include "format.h"
@@ -764,12 +766,14 @@ rc_t query_config(void)
 
     Q2 fprintf(stdout, "%-18s = %d\n", "db-cachesize",        	db_cachesize);
 
+#ifdef	ENABLE_TRANSACTIONS
 #ifdef	HAVE_DECL_DB_CREATE
     Q2 fprintf(stdout, "%-18s = %d\n", "db-lk-max-locks",   	db_max_locks);
     Q2 fprintf(stdout, "%-18s = %d\n", "db-lk-max-objects", 	db_max_objects);
     Q2 fprintf(stdout, "%-18s = %s\n", "db-log-autoremove",     YN(db_log_autoremove));
 #ifdef	FUTURE_DB_OPTIONS
     Q2 fprintf(stdout, "%-18s = %s\n", "db-log-txn-durable",	YN(db_txn_durable));
+#endif
 #endif
 #endif
 
