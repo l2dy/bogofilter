@@ -303,6 +303,7 @@ static void check_lock(int unused) {
 /** Initialize signal handler and start the timer. \return 0 for
  * success, -1 for error */
 static int init_sig(void) {
+#ifdef	SA_RESTART
     struct sigaction sa;
     sigset_t ss;
 
@@ -314,6 +315,7 @@ static int init_sig(void) {
     if (sigaction(SIGALRM, &sa, &oldact)) return -1;
 
     alarm(chk_intval);
+#endif
     return 0;
 }
 

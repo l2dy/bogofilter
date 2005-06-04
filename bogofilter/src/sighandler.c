@@ -27,6 +27,7 @@ bool fDie = false;
 /* Function Definitions */
 
 static void mysignal(int sig, void (*hdl)(int)) {
+#ifdef	SA_RESTART
     struct sigaction sa;
 
     memset( &sa, 0, sizeof(sa));
@@ -38,6 +39,7 @@ static void mysignal(int sig, void (*hdl)(int)) {
 		sig, hdl, strerror(errno));
 	exit(EX_ERROR);
     }
+#endif
 }
 
 static void mysigdie(int sig)
