@@ -634,7 +634,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	if (pass != PASS_1_CLI) {
 	    comma_parse(option, val, &min_dev, &robs, &robx);
 	    if (DEBUG_CONFIG(1))
-		printf("md %6.4f, rs %6.4f, rx %6.4f\n", min_dev, robs, robx);
+		fprintf(dbgout, "md %6.4f, rs %6.4f, rx %6.4f\n", min_dev, robs, robx);
 	}
 	break;
 
@@ -657,7 +657,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	if (pass != PASS_1_CLI) {
 	    comma_parse(option, val, &spam_cutoff, &ham_cutoff, NULL);
 	    if (DEBUG_CONFIG(1))
-		printf("sc %6.4f, hc %6.4f\n", spam_cutoff, ham_cutoff);
+		fprintf(dbgout, "sc %6.4f, hc %6.4f\n", spam_cutoff, ham_cutoff);
 	}
 	break;
 
