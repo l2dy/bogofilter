@@ -873,7 +873,7 @@ static void print_version(void)
     (void)fprintf(stderr,
 		  "%s version %s\n"
 		  "    Database: %s\n"
-		  "Copyright (C) 2002-2004 Greg Louis, David Relson\n\n"
+		  "Copyright (C) 2002-2005 Greg Louis, David Relson\n\n"
 		  "%s comes with ABSOLUTELY NO WARRANTY.  "
 		  "This is free software, and\nyou are welcome to "
 		  "redistribute it under the General Public License.  "
