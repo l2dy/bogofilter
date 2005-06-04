@@ -24,7 +24,7 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 #include <stdlib.h>
 
-#ifdef	ENABLE_DB_DATASTORE	/* if not Berkeley DB */
+#ifdef	ENABLE_DB_DATASTORE	/* if Berkeley DB */
 #include <db.h>
 #endif
 
