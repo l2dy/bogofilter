@@ -22,11 +22,15 @@
  *     http://article.gmane.org/gmane.mail.bogofilter.devel/3270
  */
 
+#include "common.h"	/* for SunOS - egcs-2.91.57 */
+
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+#include <db.h>		/* for SunOS */
 
 #include "db_lock.h"
 #include "debug.h"
