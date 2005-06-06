@@ -334,4 +334,12 @@ extern void dsm_init(bfpath *bfp);
 /** list log files, remaining arguments are backend specific */
 extern ex_t ds_list_logfiles(bfpath *bfp, int argc, char **argv);
 
+/** parse bogofilter option
+ * \return true if an option was recognized, false otherwise */
+bool dsm_options_bogofilter(int option, const char *name, const char *val);
+
+/** parse bogoutil option
+ * \return true if an option was recognized, false otherwise */
+bool dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_file, const char *name, const char *val);
+
 #endif

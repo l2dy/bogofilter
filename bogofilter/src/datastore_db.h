@@ -88,14 +88,6 @@ const char *db_version_str(void);
 const char **dsm_help_bogofilter(void);
 const char **dsm_help_bogoutil(void);
 
-/** parse bogofilter option
- * \return true if an option was recognized, false otherwise */
-bool dsm_options_bogofilter(int option, const char *name, const char *val);
-
-/** parse bogoutil option
- * \return true if an option was recognized, false otherwise */
-bool dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_file, const char *name, const char *val);
-
 /** Begin new transaction. */
 int db_txn_begin(void *vhandle);
 
