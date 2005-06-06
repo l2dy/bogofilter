@@ -52,7 +52,9 @@ static int ds_histogram_hook(/*@unused@*/ word_t *key, dsv_t *data,
     double fw = calc_prob(data->goodcount, data->spamcount, mgood, mbad);
     uint idx = min(fw * INTERVALS, INTERVALS-1);
 
-    (void)key;
+    /* ignore meta-tokens */
+    if (*key->text == (byte) '.')
+	return 0;
 
     hist->count[idx] += 1;
 
