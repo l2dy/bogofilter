@@ -18,9 +18,9 @@ echo  	41 A4 BA B5 B5 20 31     20  30 20  32 30 30 33 30 33 30 33 0A \
 | ./dehex >${TMPDIR}/input
 
 $BOGOUTIL -C -l ${WORDLIST} < ${TMPDIR}/input
-$BOGOUTIL -C -d ${WORDLIST} | grep -v MSG_COUNT > ${TMPDIR}/output.1
+$BOGOUTIL -C -d ${WORDLIST} | egrep -v "^(\.MSG_COUNT|\.ENCODING)" > ${TMPDIR}/output.1
 $BOGOUTIL -C -n -m ${WORDLIST}
-$BOGOUTIL -C -d ${WORDLIST} | grep -v MSG_COUNT > ${TMPDIR}/output.2
+$BOGOUTIL -C -d ${WORDLIST} | egrep -v "^(\.MSG_COUNT|\.ENCODING)" > ${TMPDIR}/output.2
 
 LEN1=`wc -l ${TMPDIR}/output.1 | $AWK '{print $1}'`
 LEN2=`wc -l ${TMPDIR}/output.2 | $AWK '{print $1}'`

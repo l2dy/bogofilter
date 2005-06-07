@@ -55,13 +55,13 @@ create_empty_wordlist
 OPTS="-C -D -y 0"
 
 $BOGOUTIL $OPTS -l ${WORDLIST} < ${TMPDIR}/t.before.ref
-$BOGOUTIL $OPTS -d ${WORDLIST} | sort > ${TMPDIR}/t.before.out
+$BOGOUTIL $OPTS -d ${WORDLIST} | grep -v "^.ENCODING" | sort > ${TMPDIR}/t.before.out
 
-$BOGOUTIL $OPTS -u ${WORDLIST} >  ${TMPDIR}/t.after.out
-$BOGOUTIL $OPTS -d ${WORDLIST} | sort >> ${TMPDIR}/t.after.out
+$BOGOUTIL $OPTS -u ${WORDLIST} > ${TMPDIR}/t.after.out
+$BOGOUTIL $OPTS -d ${WORDLIST} | grep -v "^.ENCODING" | sort >> ${TMPDIR}/t.after.out
 
-$BOGOUTIL $OPTS -u ${WORDLIST} >  ${TMPDIR}/t.already.out
-$BOGOUTIL $OPTS -d ${WORDLIST} | sort >> ${TMPDIR}/t.already.out
+$BOGOUTIL $OPTS -u ${WORDLIST} > ${TMPDIR}/t.already.out
+$BOGOUTIL $OPTS -d ${WORDLIST} | grep -v "^.ENCODING" | sort >> ${TMPDIR}/t.already.out
 
 for i in ${TMPDIR}/*.ref ; do
     j=`basename $i .ref`

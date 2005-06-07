@@ -17,7 +17,9 @@ t.config: Makefile
 
 t.query.config: t.query.config.in Makefile
 	rm -f $@
-	sed 's/[@]DEFAULT_CHARSET[@]/@DEFAULT_CHARSET@/' <$(srcdir)/t.query.config.in >$@ || rm -f $@
+	cat $(srcdir)/t.query.config.in | \
+	sed 's/[@]ENCODING[@]/@ENCODING@/' | \
+	sed 's/[@]DEFAULT_CHARSET[@]/@DEFAULT_CHARSET@/' > $@ || rm -f $@
 	chmod +x t.query.config
 
 ENVIRON_TESTS = t.abort t.env t.ctype t.bogodir t.leakfind t.u_fpe

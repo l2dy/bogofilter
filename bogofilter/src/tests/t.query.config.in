@@ -14,6 +14,7 @@ ns_esf      = 1.000000  # (1.00e+00)
 sp_esf      = 1.000000  # (1.00e+00)
 
 block-on-subnets  = No
+encoding          = @ENCODING@
 charset-default   = @DEFAULT_CHARSET@
 replace-nonascii-characters = No
 stats-in-header   = Yes

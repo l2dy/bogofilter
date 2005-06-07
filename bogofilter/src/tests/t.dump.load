@@ -29,13 +29,13 @@ $BOGOUTIL -C -d $DATA -y 20020815 | $SORT > ${TMPDIR}/dump.load-1.txt
 #update some words, including some old dates
 $BOGOUTIL -C -l $DATA -y 20021215 < ${srcdir}/inputs/$BASE.upd
 #dump database
-$BOGOUTIL -C -d $DATA | $SORT > ${TMPDIR}/dump.load-2.txt
+$BOGOUTIL -C -d $DATA | grep -v "^.ENCODING" | $SORT > ${TMPDIR}/dump.load-2.txt
 
 #confirm that updated words have different counts and dates
 ( diff ${TMPDIR}/dump.load-1.txt ${TMPDIR}/dump.load-2.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.1.2.txt >> $OUT
 
 #dump wordlist, excluding oldest entries
-$BOGOUTIL -C -a 20020815 -d $DATA | $SORT > ${TMPDIR}/dump.load-3.txt
+$BOGOUTIL -C -a 20020815 -d $DATA | grep -v "^.ENCODING" | $SORT > ${TMPDIR}/dump.load-3.txt
 
 #confirm exclusion of oldest entries
 ( diff ${TMPDIR}/dump.load-2.txt ${TMPDIR}/dump.load-3.txt ; echo "" ) | $GREP | tee ${TMPDIR}/diff.2.3.txt >> $OUT

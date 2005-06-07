@@ -13,6 +13,7 @@ $BOGOFILTER -C -y 0 -n < ${SYSTEST}/inputs/good.mbx
 
 CORRECT="$TMPDIR/result"
 
+# 0.95.0 - unicode
 cat >> $CORRECT <<EOF
 initial: 5304
 count 0 -> 5304

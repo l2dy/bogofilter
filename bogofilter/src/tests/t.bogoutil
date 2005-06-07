@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/sh -x
 
 . ${srcdir:=.}/t.frame
 
@@ -18,10 +18,10 @@ $BOGOUTIL -C -h 2>/dev/null
 
 # check if bogoutil can count ;-)
 cat <<_EOF >${TMPDIR}/ref
-6 tokens dumped
+7 tokens dumped
 _EOF
-$BOGOUTIL -C -v -d ${WORDLIST} -D | tail -1 \
-| cmp -s - ${TMPDIR}/ref
+$BOGOUTIL -C -v -d ${WORDLIST} -D | tail -1 > ${TMPDIR}/out
+cmp -s ${TMPDIR}/out ${TMPDIR}/ref
 
 # ROBX calculation cannot work, insufficient data
 if $BOGOUTIL -C -r ${WORDLIST} ; then false ; fi
