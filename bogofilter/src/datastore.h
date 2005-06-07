@@ -293,6 +293,12 @@ extern int ds_get_wordlist_version(void *vhandle, dsv_t *val);
 /** set the database version */
 extern int ds_set_wordlist_version(void *vhandle, dsv_t *val);
 
+/** Get the database encoding */
+extern int ds_get_wordlist_encoding(void *vhandle);
+
+/** set the database encoding */
+extern int ds_set_wordlist_encoding(void *vhandle, int enc);
+
 /** Get the current process ID. */
 extern unsigned long ds_handle_pid(void *vhandle);
 
