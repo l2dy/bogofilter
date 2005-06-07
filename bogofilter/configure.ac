@@ -234,17 +234,16 @@ AC_ARG_ENABLE(unicode,
 AM_CONDITIONAL(DISABLE_UNICODE, test x$USE_UNICODE = xNO)
 AM_CONDITIONAL(ENABLE_UNICODE, test x$USE_UNICODE = xYES)
 
-if test x$USE_UNICODE = xNO ; then
+if test x$USE_UNICODE != xYES ; then
 	AC_DEFINE(DISABLE_UNICODE,1,
 	[Disable unicode for converting character sets to unicode])
-fi
-
-if test x$USE_UNICODE = xYES ; then
+	[ENCODING="raw"]
+	[DEFAULT_CHARSET="us-ascii"]
+else
 	AC_DEFINE(ENABLE_UNICODE,1,
 	[Enable unicode for converting character sets to unicode])
+	[ENCODING="utf-8"]
 	[DEFAULT_CHARSET="UTF-8"]
-else
-	[DEFAULT_CHARSET="us-ascii"]
 fi
 
 dnl Allow the user to enable Russian language support
@@ -275,6 +274,7 @@ AC_ARG_WITH(charset,
 	    [Use specified charset instead of us-ascii])
 )
 
+AC_SUBST(ENCODING)
 if test "$DEFAULT_CHARSET" != "us-ascii"; then
 	AC_SUBST(DEFAULT_CHARSET)
 	AC_DEFINE_UNQUOTED(DEFAULT_CHARSET,
