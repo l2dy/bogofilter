@@ -19,10 +19,6 @@ David Relson <relson@osagesoftware.com>  2003
 #include <stdlib.h>
 #include <limits.h>
 
-#ifdef ENABLE_DB_DATASTORE
-#include <db.h>
-#endif
-
 #include "datastore.h"
 #include "datastore_db.h"
 #include "datastore_db_private.h"
