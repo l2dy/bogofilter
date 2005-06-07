@@ -5,10 +5,6 @@
 
 #include <stdlib.h>
 
-#ifndef	RAND_MAX			/* SunOS 4.1.X needs this */
-#define	RAND_MAX	2147483647	/* May not work on SysV   */
-#endif
-
 void rand_sleep(double min, double max)
 {
     static bool need_init = true;
