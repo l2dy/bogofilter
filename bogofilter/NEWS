@@ -13,6 +13,17 @@
 
 -------------------------------------------------------------------------------
 
+	2005-06-07
+
+	* Additional unicode support:
+	   Added global variable encoding { E_RAW, E_UNICODE }
+	   Added --unicode=yes/no options for bogolexer and bogoutil.
+	   Added meta-token .ENCODING { 1=raw, 2=unicode }
+
+	2005-06-06
+
+	* Removed extra SunOS 4.1.x support code.
+
 	2005-05-31
 
 	* Support systems with GNU iconv or separate libiconv.
