@@ -165,9 +165,11 @@ void *ds_open(void *dbe, bfpath *bfp, dbmode_t open_mode)
 	if (DST_OK != ds_txn_begin(dsh))
 	    exit(EX_ERROR);
 	ds_set_wordlist_version(dsh, NULL);
-	if (ds_txn_commit(dsh))
+	ds_set_wordlist_encoding(dsh, (int) encoding);
+	if (DST_OK != ds_txn_commit(dsh))
 	    exit(EX_ERROR);
     }
+
     return dsh;
 }
 
@@ -394,6 +396,7 @@ ex_t ds_oper(void *env, bfpath *bfp, dbmode_t open_mode,
 
 static word_t  *msg_count_tok;
 static word_t  *wordlist_version_tok;
+static word_t  *wordlist_encoding_tok;
 
 void *ds_init(bfpath *bfp)
 {
@@ -407,8 +410,13 @@ void *ds_init(bfpath *bfp)
     if (msg_count_tok == NULL) {
 	msg_count_tok = word_news(MSG_COUNT);
     }
+
     if (wordlist_version_tok == NULL) {
 	wordlist_version_tok = word_news(WORDLIST_VERSION);
+    }
+
+    if (wordlist_encoding_tok == NULL) {
+	wordlist_encoding_tok = word_news(WORDLIST_ENCODING);
     }
 
     return dbe;
@@ -451,6 +459,35 @@ void *ds_get_dbenv(void *vhandle)
 {
     dsh_t *dsh = vhandle;
     return db_get_env(dsh->dbh);
+}
+
+/*
+  Get the wordlist encoding associated with database.
+*/
+int ds_get_wordlist_encoding(void *vhandle)
+{
+    dsh_t *dsh = vhandle;
+    dsv_t  val;
+    int ret = ds_read(dsh, wordlist_encoding_tok, &val);
+    if (ret != 0)
+	return 0;		/* indicate error */
+    else
+	return val.count[0];
+}
+
+/*
+ Set the wordlist encoding associated with database.
+*/
+int ds_set_wordlist_encoding(void *vhandle, int enc)
+{
+    dsh_t *dsh = vhandle;
+    dsv_t  val;
+
+    val.count[0] = enc;
+    val.count[1] = 0;
+    val.date = today;
+
+    return ds_write(dsh, wordlist_encoding_tok, &val);
 }
 
 /*

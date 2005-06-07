@@ -753,6 +753,12 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
 
     assert(handle);
     assert(handle->magic == MAGIC_DBH);
+
+    if ((eTransaction == T_DISABLED) != (handle->txn == NULL)) {
+	fprintf(stderr, "token = %*s\n", token->leng, (char *)token->data);
+	fprintf(stderr, "eTransaction = %d, T_DISABLED = %d, handle->txn = %p, NULL = %p\n",
+		eTransaction, T_DISABLED, handle->txn, NULL);
+    }
     assert((eTransaction == T_DISABLED) == (handle->txn == NULL));
 
     DBT_init(db_key);
