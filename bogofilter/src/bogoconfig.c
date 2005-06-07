@@ -48,9 +48,7 @@ Note: bogolexer also uses configfile.c.
 #include "charset.h"
 #include "configfile.h"
 #include "datastore.h"
-#ifdef	ENABLE_DB_DATASTORE
 #include "datastore_db.h"
-#endif
 #include "error.h"
 #include "find_home.h"
 #include "format.h"
@@ -703,13 +701,15 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case O_THRESH_UPDATE:		get_double(name, val, &thresh_update);			break;
     case O_TIMESTAMP:			timestamp_tokens = get_bool(name, val);			break;
     case O_UNSURE_SUBJECT_TAG:		unsure_subject_tag = get_string(name, val);		break;
-    case O_UNICODE:			unicode = get_bool(name, val);				break;
+    case O_UNICODE:			encoding = get_bool(name, val) ? E_UNICODE : E_RAW;	break;
     case O_WORDLIST:			configure_wordlist(val);				break;
 
     case O_DB_TRANSACTION:		eTransaction = get_txn(name, val);			break;
 
     default:
+#ifndef	DISABLE_TRANSACTIONS
 	if (!dsm_options_bogofilter(option, name, val))
+#endif
 	    abort();
     }
 }
@@ -733,6 +733,7 @@ rc_t query_config(void)
     Q1 fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "sp_esf", sp_esf, sp_esf);
     Q1 fprintf(stdout, "\n");
     Q1 fprintf(stdout, "%-17s = %s\n",    "block-on-subnets",    YN(block_on_subnets));
+    Q1 fprintf(stdout, "%-17s = %s\n",    "encoding",		 (encoding != E_UNICODE) ? "raw" : "unicode");
     Q1 fprintf(stdout, "%-17s = %s\n",    "charset-default",     charset_default);
     Q1 fprintf(stdout, "%-17s = %s\n",    "replace-nonascii-characters", YN(replace_nonascii_characters));
     Q2 fprintf(stdout, "%-17s = %s\n",    "no-header-tags",      YN(header_line_markup));
@@ -764,6 +765,7 @@ rc_t query_config(void)
     Q2 display_wordlists(word_lists, "%-18s   ");
     Q2 fprintf(stdout, "\n");
 
+#ifndef	DISABLE_TRANSACTIONS
     Q2 fprintf(stdout, "%-18s = %d\n", "db-cachesize",        	db_cachesize);
 
 #ifdef	ENABLE_TRANSACTIONS
@@ -773,6 +775,7 @@ rc_t query_config(void)
     Q2 fprintf(stdout, "%-18s = %s\n", "db-log-autoremove",     YN(db_log_autoremove));
 #ifdef	FUTURE_DB_OPTIONS
     Q2 fprintf(stdout, "%-18s = %s\n", "db-log-txn-durable",	YN(db_txn_durable));
+#endif
 #endif
 #endif
 #endif

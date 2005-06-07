@@ -102,6 +102,8 @@ static struct option longopts_bogolexer[] = {
     LONGOPTIONS_COMMON
     /* longoptions.h - options for bogofilter and bogolexer */
     LONGOPTIONS_LEX
+    /* longoptions.h - options for bogolexer and bogoutil */
+    LONGOPTIONS_LEX_UTIL
     /* end of list */
     { NULL,				0, 0, 0 }
 };
@@ -213,7 +215,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case O_UNICODE:
-	unicode = get_bool(name, val);
+	encoding = get_bool(name, val) ? E_UNICODE : E_RAW;
 	break;
 
     case O_REPLACE_NONASCII_CHARACTERS:

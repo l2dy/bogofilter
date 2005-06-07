@@ -559,6 +559,9 @@ static struct option longopts_bogoutil[] = {
     LONGOPTIONS_COMMON
     /* longoptions.h - options for bogofilter and bogoutil */
     LONGOPTIONS_DB
+    /* longoptions.h - options for bogolexer and bogoutil */
+    LONGOPTIONS_LEX_UTIL
+
     /* bogoutil specific options */
     { "db-prune",                       R, 0, O_DB_PRUNE },
     { "db-checkpoint",                  R, 0, O_DB_CHECKPOINT },
@@ -782,6 +785,10 @@ static int process_arg(int option, const char *name, const char *val)
 	flag = M_VERIFY;
 	count += 1;
 	ds_file = val;
+	break;
+
+    case O_UNICODE:
+	encoding = str_to_bool(val) ? E_UNICODE : E_RAW;
 	break;
 
     default:
