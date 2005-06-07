@@ -148,7 +148,7 @@ static int get_decoded_line(buff_t *buff)
     uint used = buff->t.leng;
     byte *buf = buff->t.text + used;
 
-    if (!unicode) {
+    if (encoding == E_RAW) {
 	temp = buff;
     }
 #ifndef	DISABLE_UNICODE
@@ -180,7 +180,7 @@ static int get_decoded_line(buff_t *buff)
 	textblock_add(temp->t.text+temp->read, (size_t) count);
 
 #ifndef	DISABLE_UNICODE
-    if (unicode) {
+    if (encoding == E_UNICODE) {
 	iconvert(temp, buff);
 	/*
 	 * iconvert, treating multi-byte sequences, can shrink or enlarge

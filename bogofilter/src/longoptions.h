@@ -81,10 +81,13 @@ typedef enum longopts_e {
 #define LONGOPTIONS_LEX \
     { "block-on-subnets",		R, 0, O_BLOCK_ON_SUBNETS }, \
     { "charset-default",		R, 0, O_CHARSET_DEFAULT }, \
-    { "unicode",			R, 0, O_UNICODE }, \
     { "output-file",			N, 0, 'O' }, \
     { "user-config-file",		R, 0, O_USER_CONFIG_FILE }, \
     { "replace-nonascii-characters",	R, 0, O_REPLACE_NONASCII_CHARACTERS },
+
+/* options for bogolexer and bogoutil */
+#define LONGOPTIONS_LEX_UTIL \
+    { "unicode",			R, 0, O_UNICODE },
 
 /* options for bogofilter and bogoutil - some preprocessor workarounds here */
 #define lo1

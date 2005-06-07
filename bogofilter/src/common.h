@@ -143,6 +143,13 @@ typedef	enum {
     T_DONT_KNOW		/*  4 for don't know */
 } e_txn;
 
+/* for encoding (unicode) flag */
+
+typedef	enum {
+    E_RAW    = 1,	/* 1 for raw text */
+    E_UNICODE		/* 2 for unicode */
+} e_enc;
+
 #include "globals.h"
 
 /* Represents the secondary data for a word key */
@@ -163,7 +170,7 @@ typedef struct {
 
 typedef enum e_wordlist_version {
     ORIGINAL_VERSION = 0,
-    IP_PREFIX = 20040500
+    IP_PREFIX = 20040500	/* when IP prefixes were added */
 } t_wordlist_version;
 
 #define	CURRENT_VERSION	IP_PREFIX

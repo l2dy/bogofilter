@@ -35,7 +35,6 @@ extern	int	query;			/* '-Q' */
 extern	bool	Rtable;			/* '-R' */
 extern	bool	terse;			/* '-t' */
 extern	int	bogotest;		/* '-X', env("BOGOTEST") */
-extern	bool	unicode;
 extern	int	verbose;		/* '-v' */
 extern	bool	replace_nonascii_characters;	/* '-n' */
 
@@ -112,6 +111,9 @@ extern	bool	unsure_stats;	/* true if print stats for unsures */
 
 #define	WORDLIST_VERSION	".WORDLIST_VERSION"
 extern	uint	wordlist_version;
+
+#define	WORDLIST_ENCODING	".ENCODING"
+extern	e_enc	encoding;
 
 extern	bool	fDie;		/* true if SIGINT or SIGTERM received */
 

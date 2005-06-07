@@ -59,9 +59,9 @@ e_txn	eTransaction = T_DEFAULT_ON;
 
 /* for  transactions */
 #ifndef	ENABLE_UNICODE
-bool	unicode = false; 	/* T_DEFAULT_OFF */
+e_enc	encoding = E_RAW;
 #else
-bool	unicode = true;		/* T_DEFAULT_ON  */
+e_enc	encoding = E_UNICODE;
 #endif
 
 /* for  bogoconfig.c, prob.c, rstats.c and score.c */
