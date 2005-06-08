@@ -37,6 +37,7 @@ Note: bogolexer also uses configfile.c.
 
 #include <ctype.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -741,7 +742,7 @@ rc_t query_config(void)
     Q2 fprintf(stdout, "%-17s = %s\n",    "report-unsure",       YN(unsure_stats));
     Q1 fprintf(stdout, "%-17s = %0.6f\n", "thresh-update",       thresh_update);
     Q1 fprintf(stdout, "%-17s = %s\n",    "timestamp",           YN(timestamp_tokens));
-    Q2 fprintf(stdout, "%-17s = %d\n",    "timestamp-date",      today);
+    Q2 fprintf(stdout, "%-17s = %ld\n",   "timestamp-date",      (long int)today);
     Q1 fprintf(stdout, "\n");
     Q1 fprintf(stdout, "%-17s = %s\n", "spam-header-name",    spam_header_name);
     Q1 fprintf(stdout, "%-17s = %s\n", "spam-subject-tag",    NB(spam_subject_tag));
@@ -761,18 +762,18 @@ rc_t query_config(void)
     Q2 fprintf(stdout, "%-18s = %s\n", "user-config-file", NB(user_config_file));
     Q2 fprintf(stdout, "\n");
 
-    Q2 fprintf(stdout, "%-18s = %s\n", "bogofilter-dir", 	bogohome);
+    Q2 fprintf(stdout, "%-18s = %s\n", "bogofilter-dir",	bogohome);
     Q2 display_wordlists(word_lists, "%-18s   ");
     Q2 fprintf(stdout, "\n");
 
 #ifndef	DISABLE_TRANSACTIONS
-    Q2 fprintf(stdout, "%-18s = %d\n", "db-cachesize",        	db_cachesize);
+    Q2 fprintf(stdout, "%-18s = %lu\n", "db-cachesize",		(unsigned long)db_cachesize);
 
 #ifdef	ENABLE_TRANSACTIONS
 #ifdef	HAVE_DECL_DB_CREATE
-    Q2 fprintf(stdout, "%-18s = %d\n", "db-lk-max-locks",   	db_max_locks);
-    Q2 fprintf(stdout, "%-18s = %d\n", "db-lk-max-objects", 	db_max_objects);
-    Q2 fprintf(stdout, "%-18s = %s\n", "db-log-autoremove",     YN(db_log_autoremove));
+    Q2 fprintf(stdout, "%-18s = %lu\n", "db-lk-max-locks",	(unsigned long)db_max_locks);
+    Q2 fprintf(stdout, "%-18s = %lu\n", "db-lk-max-objects",	(unsigned long)db_max_objects);
+    Q2 fprintf(stdout, "%-18s = %s\n", "db-log-autoremove",	YN(db_log_autoremove));
 #ifdef	FUTURE_DB_OPTIONS
     Q2 fprintf(stdout, "%-18s = %s\n", "db-log-txn-durable",	YN(db_txn_durable));
 #endif
