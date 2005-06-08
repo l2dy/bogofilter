@@ -55,6 +55,10 @@ bogofilter_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
 bogoutil_LDADD = $(LDADD) $(LIBDB)
 configtest_LDADD = $(LDADD) $(LIBDB)
 
+EXTRA_PROGRAMS=panicenv
+panicenv_SOURCES=panicenv.c
+panicenv_LDADD=$(LIBDB)
+
 if NEEDTRIO
 noinst_LIBRARIES += libtrio.a
 libtrio_a_SOURCES= ../trio/triostr.c ../trio/trio.c ../trio/trionan.c \
