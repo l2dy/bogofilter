@@ -13,6 +13,12 @@
 
 -------------------------------------------------------------------------------
 
+	2005-06-08
+
+	* Fix bug in transactional auto-detection that caused recovery to
+	  fail if the environment was in PANIC state.
+	  (Reported by Andrey Chernov.)
+
 	2005-06-07
 
 	* Additional unicode support:

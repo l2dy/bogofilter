@@ -942,6 +942,9 @@ e_txn probe_txn(bfpath *bfp)
 #else
     r = ENOENT;
 #endif
+    if (r == DB_RUNRECOVERY)
+	return T_ENABLED;
+
     if (r == ENOENT) {
 	struct stat st;
 	int w;
