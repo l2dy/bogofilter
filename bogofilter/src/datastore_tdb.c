@@ -315,8 +315,8 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
  * Samba database functions
  * Copyright (C) Andrew Tridgell              1999-2000
  * Copyright (C) Luke Kenneth Casson Leighton      2000
- * Copyright (C) Paul 'Rusty' Russell		   2000
- * Copyright (C) Jeremy Allison			   2000
+ * Copyright (C) Paul 'Rusty' Russell              2000
+ * Copyright (C) Jeremy Allison                    2000
  *
  * This code was licensed under conditions of the GPL v2 or later.
  */
