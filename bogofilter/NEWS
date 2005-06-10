@@ -13,6 +13,12 @@
 
 -------------------------------------------------------------------------------
 
+        2005-06-10
+
+	* TDB driver now copies TDB returned data in the traversor to align
+	  data at proper boundaries, to avoid SIGBUS on some architectures and
+	  performance loss on others.
+
 	2005-06-08
 
 	* Fix bug in transactional auto-detection that caused recovery to
