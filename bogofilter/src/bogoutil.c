@@ -451,7 +451,7 @@ static ex_t get_robx(bfpath *bfp)
 
 static void print_version(void)
 {
-    (void)fprintf(stderr,
+    (void)fprintf(stdout,
 		  "%s version %s\n"
 		  "    Database: %s\n"
 		  "Copyright (C) 2002-2005 Gyepi Sam, David Relson, Matthias Andree\n\n"
@@ -464,26 +464,26 @@ static void print_version(void)
 		  progname, version, ds_version_str(), PACKAGE);
 }
 
-static void usage(void)
+static void usage(FILE *fp)
 {
-    fprintf(stderr, "Usage: %s {-h|-V}\n", progname);
-    fprintf(stderr, "   or: %s [OPTIONS] {-d|-l|-u|-m|-w|-p|--db-verify} file%s\n",
+    fprintf(fp, "Usage: %s {-h|-V}\n", progname);
+    fprintf(fp, "   or: %s [OPTIONS] {-d|-l|-u|-m|-w|-p|--db-verify} file%s\n",
 	    progname, DB_EXT);
-    fprintf(stderr, "   or: %s [OPTIONS] {-H|-r|-R} file\n", progname);
+    fprintf(fp, "   or: %s [OPTIONS] {-H|-r|-R} file\n", progname);
 #if defined (ENABLE_DB_DATASTORE) || defined (ENABLE_SQLITE_DATASTORE)
-    fprintf(stderr, "   or: %s [OPTIONS] {--db-print-leafpage-count} file%s\n",
+    fprintf(fp, "   or: %s [OPTIONS] {--db-print-leafpage-count} file%s\n",
 	    progname, DB_EXT);
-    fprintf(stderr, "   or: %s [OPTIONS] {--db-print-pagesize} file%s\n",
+    fprintf(fp, "   or: %s [OPTIONS] {--db-print-pagesize} file%s\n",
 	    progname, DB_EXT);
 #endif
 #if	defined(ENABLE_DB_DATASTORE) && !defined(DISABLE_TRANSACTIONS)
-    fprintf(stderr, "   or: %s [OPTIONS] {--db-checkpoint} directory\n",
+    fprintf(fp, "   or: %s [OPTIONS] {--db-checkpoint} directory\n",
 	    progname);
-    fprintf(stderr, "   or: %s [OPTIONS] {--db-list-logfiles} directory [list options]\n",
+    fprintf(fp, "   or: %s [OPTIONS] {--db-list-logfiles} directory [list options]\n",
 	    progname);
-    fprintf(stderr, "   or: %s [OPTIONS] {--db-prune|--db-remove-environment} directory\n",
+    fprintf(fp, "   or: %s [OPTIONS] {--db-prune|--db-remove-environment} directory\n",
 	    progname);
-    fprintf(stderr, "   or: %s [OPTIONS] {--db-recover|--db-recover-harder} directory\n",
+    fprintf(fp, "   or: %s [OPTIONS] {--db-recover|--db-recover-harder} directory\n",
 	    progname);
 #endif
 }
@@ -532,18 +532,18 @@ static const char *help_text[] = {
     NULL
     };
 
-static void help(void)
+static void help(FILE *fp)
 {
     uint i;
     const char **messages;
-    usage();
+    usage(fp);
     messages = help_text;
     for (i=0; messages[i] != NULL; i++)
-	(void)fprintf(stderr, "%s", messages[i]);
+	(void)fprintf(fp, "%s", messages[i]);
     messages = dsm_help_bogoutil();
     for (i=0; messages[i] != NULL; i++)
-	(void)fprintf(stderr, "%s", messages[i]);
-    (void)fprintf(stderr,
+	(void)fprintf(fp, "%s", messages[i]);
+    (void)fprintf(fp,
 		  "%s (version %s) is part of the bogofilter package.\n",
                   progname, version
 	);
@@ -610,7 +610,7 @@ static int process_arglist(int argc, char **argv)
 
     if (count != 1)
     {
-	usage();
+	usage(stderr);
 	fprintf(stderr, "%s: Exactly one of the file or directory commands must be present.\n", progname);
 	exit(EX_ERROR);
     }
@@ -704,7 +704,7 @@ static int process_arg(int option, const char *name, const char *val)
 	exit(EX_ERROR);
 
     case 'h':
-	help();
+	help(stdout);
 	exit(EX_OK);
 
     case 'H':
@@ -826,7 +826,7 @@ static bfpath_mode get_mode(cmd_t cmd)
 	mode = BFP_MUST_EXIST;
 	break;
     case M_NONE:
-	usage();
+	usage(stderr);
 	exit(EX_ERROR);
     }
 
@@ -854,7 +854,7 @@ int main(int argc, char *argv[])
     /* Extra or missing parameters */
     if (flag != M_WORD && flag != M_LIST_LOGFILES && argc != optind) {
 	fprintf(stderr, "Missing or extraneous argument.\n");
-	usage();
+	usage(stderr);
 	exit(EX_ERROR);
     }
 

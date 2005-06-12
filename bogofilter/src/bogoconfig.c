@@ -355,22 +355,23 @@ static const char *help_text[] = {
     NULL
 };
 
-static void help(void)
+static void help(FILE *fp)
 {
     uint i;
-    (void)fprintf(stderr,
+    (void)fprintf(fp,
                   "%s version %s\n"
                   "\n"
-                  "Usage:  %s [options] < message\n",
+                  "Usage:  %s [options] < message\n"
+                  "\n",
                   progtype, version, PACKAGE
 	);
     for (i=0; help_text[i] != NULL; i++)
-	(void)fprintf(stderr, "%s", help_text[i]);
+	(void)fprintf(fp, "%s", help_text[i]);
 }
 
 static void print_version(void)
 {
-    (void)fprintf(stderr,
+    (void)fprintf(stdout,
 		  "%s version %s\n"
 		  "    Database: %s\n"
 		  "Copyright (C) 2002-2005 Eric S. Raymond,\n"
@@ -508,7 +509,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'h':
-	help();
+	help(stdout);
 	exit(EX_OK);
 
     case 'I':

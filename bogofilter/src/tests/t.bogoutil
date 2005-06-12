@@ -13,8 +13,8 @@ echo bacon on toast | $BOGOFILTER -C -d ${TMPDIR} -n $addarg
 echo foul eggs      | $BOGOFILTER -C -d ${TMPDIR} -s $addarg
 
 # see that these do not crash
-$BOGOUTIL -C -v -V 2>/dev/null
-$BOGOUTIL -C -h 2>/dev/null
+$BOGOUTIL -C -v -V > /dev/null
+$BOGOUTIL -C -h    > /dev/null
 
 # check if bogoutil can count ;-)
 cat <<_EOF >${TMPDIR}/ref

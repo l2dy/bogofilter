@@ -40,13 +40,13 @@ const char *spam_header_name = SPAM_HEADER_NAME;
 
 static void usage(void)
 {
-    fprintf(stderr, "Usage: %s [ -p | -q | -n | -h ]\n", progname);
+    fprintf(stdout, "Usage: %s [ -p | -q | -n | -h ]\n", progname);
 }
 
 static void help(void)
 {
     usage();
-    fprintf(stderr,
+    fprintf(stdout,
 	    "\n"
 	    "\t-p\t- print the tokens from stdin.\n"
 	    "\t-q\t- quiet mode, no tokens are printed.\n"
@@ -60,7 +60,7 @@ static void help(void)
 	    "\t-O file\t- write to file instead of stdout.\n"
 	    "\t-x list\t- set debug flags.\n"
 	    "\t-D\t- direct debug output to stdout.\n");
-    fprintf(stderr,
+    fprintf(stdout,
 	    "\n"
 	    "%s (version %s) is part of the bogofilter package.\n", 
 	    progname, version);
@@ -68,7 +68,7 @@ static void help(void)
 
 static void print_version(void)
 {
-    (void)fprintf(stderr,
+    (void)fprintf(stdout,
 		  "%s version %s\n"
 		  "Copyright (C) 2002-2005 David Relson\n\n"
 		  "%s comes with ABSOLUTELY NO WARRANTY.  "

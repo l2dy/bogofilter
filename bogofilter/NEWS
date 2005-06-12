@@ -13,6 +13,11 @@
 
 -------------------------------------------------------------------------------
 
+        2005-06-11
+
+	* Output --help messages to stdout (rather than stderr) so
+	  more can be used for paging.
+
         2005-06-10
 
 	* TDB driver now copies TDB returned data in the traversor to align
