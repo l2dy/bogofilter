@@ -269,16 +269,6 @@ static ex_t maintain_wordlist(void *database)
     return ret;
 }
 
-void maintain_wordlists(void)
-{
-    wordlist_t *list;
-
-    for (list = word_lists; list != NULL; list = list->next) {
-	maintain_wordlist(list->dsh);
-	list = list->next;
-    }
-}
-
 ex_t maintain_wordlist_file(bfpath *bfp)
 {
     ex_t rc;
