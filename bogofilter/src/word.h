@@ -40,7 +40,7 @@ extern int 	word_cmp(const word_t *w1, const word_t *w2);
 /** create a new word_t that is the concatenation of \a w1 and \a w2 */
 extern word_t  *word_concat(const word_t *w1, const word_t *w2);
 
-/** output \a self onto the stdio stream \a fp, formatted to \a width
+/** output \a self onto the stream \a fp, formatted to \a width
  * characters. */
 extern void 	word_puts(const word_t *self,
 	uint width, /**< if 0, use actual width, if > 0 then either
