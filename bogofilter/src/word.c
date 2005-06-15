@@ -61,14 +61,14 @@ word_t *word_concat(const word_t *w1, const word_t *w2)
     return ans;
 }
 
-void word_puts(const word_t *self, uint width, FILE *fp)
+void word_puts(const word_t *word, uint width, FILE *fp)
 {
     /* width = 0 - output all of the word
     **       > 0 - use 'width' as count, 
     **		   blank fill if 'width' < length
     */
-    uint l = (width == 0) ? self->leng : min(width, self->leng);
-    (void)fwrite(self->text, 1, l, fp);
+    uint l = (width == 0) ? word->leng : min(width, word->leng);
+    (void)fwrite(word->text, 1, l, fp);
     if (l < width)
 	(void) fprintf(fp, "%*s", (int)(width - l), " ");
 }
