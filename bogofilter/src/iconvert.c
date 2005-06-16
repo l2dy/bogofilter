@@ -33,6 +33,7 @@ AUTHOR:
 #include <errno.h>
 
 #include <iconv.h>
+#include "buff.h"
 #include "iconvert.h"
 
 extern	iconv_t cd;
