@@ -275,6 +275,9 @@ int main(int argc, char **argv)
     process_arglist(argc, argv);
     process_config_files(false, longopts_bogolexer);
 
+    if (encoding == E_UNKNOWN)
+	encoding = E_DEFAULT;
+
     textblock_init();
 
     if (!passthrough)

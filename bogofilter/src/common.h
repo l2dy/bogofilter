@@ -146,8 +146,14 @@ typedef	enum {
 /* for encoding (unicode) flag */
 
 typedef	enum {
-    E_RAW    = 1,	/* 1 for raw text */
-    E_UNICODE		/* 2 for unicode */
+    E_UNKNOWN = 0,	/* 0 for not set  */
+    E_RAW     = 1,	/* 1 for raw text */
+    E_UNICODE,		/* 2 for unicode  */
+#ifndef	ENABLE_UNICODE
+    E_DEFAULT = E_RAW
+#else
+    E_DEFAULT = E_UNICODE
+#endif
 } e_enc;
 
 #include "globals.h"

@@ -57,12 +57,8 @@ e_txn	eTransaction = T_DEFAULT_OFF;
 e_txn	eTransaction = T_DEFAULT_ON;
 #endif
 
-/* for  transactions */
-#ifndef	ENABLE_UNICODE
-e_enc	encoding = E_RAW;
-#else
-e_enc	encoding = E_UNICODE;
-#endif
+/* for  encodings */
+e_enc	encoding = E_UNKNOWN;
 
 /* for  bogoconfig.c, prob.c, rstats.c and score.c */
 double	robx = 0.0;

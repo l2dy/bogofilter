@@ -1718,6 +1718,9 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     /* process args and read mailboxes */
     process_arglist(argc, argv);
 
+    if (encoding == E_UNKNOWN)
+	encoding = E_DEFAULT;
+
     /* directories from command line and config file are already handled */
     if (ds_flag == DS_DSK) {
 

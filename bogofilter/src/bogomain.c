@@ -59,6 +59,9 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     /* open all wordlists */
     open_wordlists((run_type == RUN_NORMAL) ? DS_READ : DS_WRITE);
 
+    if (encoding == E_UNKNOWN)
+	encoding = E_DEFAULT;
+
     status = bogofilter(argc - optind, argv + optind);
 
     switch (status) {
