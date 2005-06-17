@@ -735,7 +735,7 @@ rc_t query_config(void)
     Q1 fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "sp_esf", sp_esf, sp_esf);
     Q1 fprintf(stdout, "\n");
     Q1 fprintf(stdout, "%-17s = %s\n",    "block-on-subnets",    YN(block_on_subnets));
-    Q1 fprintf(stdout, "%-17s = %s\n",    "encoding",		 (encoding != E_UNICODE) ? "raw" : "unicode");
+    Q1 fprintf(stdout, "%-17s = %s\n",    "encoding",		 (encoding != E_UNICODE) ? "raw" : "utf-8");
     Q1 fprintf(stdout, "%-17s = %s\n",    "charset-default",     charset_default);
     Q1 fprintf(stdout, "%-17s = %s\n",    "replace-nonascii-characters", YN(replace_nonascii_characters));
     Q2 fprintf(stdout, "%-17s = %s\n",    "no-header-tags",      YN(header_line_markup));
