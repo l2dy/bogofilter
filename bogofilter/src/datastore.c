@@ -464,15 +464,11 @@ void *ds_get_dbenv(void *vhandle)
 /*
   Get the wordlist encoding associated with database.
 */
-int ds_get_wordlist_encoding(void *vhandle)
+int ds_get_wordlist_encoding(void *vhandle, dsv_t *val)
 {
     dsh_t *dsh = vhandle;
-    dsv_t  val;
-    int ret = ds_read(dsh, wordlist_encoding_tok, &val);
-    if (ret != 0)
-	return 0;		/* indicate error */
-    else
-	return val.count[0];
+
+    return ds_read(dsh, wordlist_encoding_tok, val);
 }
 
 /*

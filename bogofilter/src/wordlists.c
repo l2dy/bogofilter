@@ -81,10 +81,19 @@ void begin_wordlist(wordlist_t *list)
 		if (wordlist_version == 0 &&
 			ds_get_wordlist_version(list->dsh, &val) == 0)
 		    wordlist_version = val.count[0];
-		return;
+		break;
 	    case DS_ABORT_RETRY:
 		continue;
 	}
+	switch (ds_get_wordlist_encoding(list->dsh, &val)) {
+	    case 0:
+	    case 1:
+		list->encoding = val.spamcount;
+		break;
+	    case DS_ABORT_RETRY:
+		continue;
+	}
+	break;
     }
 }
 
@@ -142,6 +151,15 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
     } else { /* ds_open */
 	begin_wordlist(list);
     }
+
+#ifdef	ENCODING_0613
+    if (encoding == E_UNKNOWN)
+	encoding = list->dsh->db_encoding;
+    if (encoding != list->dsh->db_encoding) {
+	fprintf(stderr, "Can't mix database encodings, i.e. utf-8 and any other.\n");
+	exit(EX_ERROR);
+    }
+#endif
 
     /* xfree(dbe); */
 
@@ -212,6 +230,12 @@ void open_wordlists(dbmode_t mode)
 	for (list = word_lists; list != NULL ; list = list->next) {
 	    check_wordlist_path(list);
 	    retry |= open_wordlist(list, list->type == WL_IGNORE ? DS_READ : mode);
+	    if (list == word_lists)
+		encoding = list->encoding;
+	    if (encoding != list->encoding) {
+		fprintf(stderr, "Can't mix database encodings\n");
+		exit(EX_ERROR);
+	    }
 	}
     }
 }

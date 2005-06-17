@@ -294,7 +294,7 @@ extern int ds_get_wordlist_version(void *vhandle, dsv_t *val);
 extern int ds_set_wordlist_version(void *vhandle, dsv_t *val);
 
 /** Get the database encoding */
-extern int ds_get_wordlist_encoding(void *vhandle);
+extern int ds_get_wordlist_encoding(void *vhandle, dsv_t *val);
 
 /** set the database encoding */
 extern int ds_set_wordlist_encoding(void *vhandle, int enc);

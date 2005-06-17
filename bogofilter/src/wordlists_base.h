@@ -28,6 +28,7 @@ struct wordlist_s
     u_int32_t	msgcount[IX_SIZE];	/**< count of messages in wordlist. */
     WL_TYPE	type;			/**< datastore type */
     int		override;		/**< priority in queue */
+    e_enc	encoding;		/**< encoding */
 };
 
 void wordlists_set_bogohome(void);
