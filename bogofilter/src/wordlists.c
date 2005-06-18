@@ -152,14 +152,12 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 	begin_wordlist(list);
     }
 
-#ifdef	ENCODING_0613
     if (encoding == E_UNKNOWN)
-	encoding = list->dsh->db_encoding;
-    if (encoding != list->dsh->db_encoding) {
+	encoding = list->encoding;
+    if (encoding != list->encoding) {
 	fprintf(stderr, "Can't mix database encodings, i.e. utf-8 and any other.\n");
 	exit(EX_ERROR);
     }
-#endif
 
     /* xfree(dbe); */
 
