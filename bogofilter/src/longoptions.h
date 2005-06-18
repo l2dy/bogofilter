@@ -86,6 +86,9 @@ typedef enum longopts_e {
     { "user-config-file",		R, 0, O_USER_CONFIG_FILE }, \
     { "replace-nonascii-characters",	R, 0, O_REPLACE_NONASCII_CHARACTERS },
 
+/* options for bogolexer and bogoutil */
+#define LONGOPTIONS_LEX_UTIL
+
 /* options for bogofilter and bogoutil - some preprocessor workarounds here */
 #define lo1
 #define lo2
