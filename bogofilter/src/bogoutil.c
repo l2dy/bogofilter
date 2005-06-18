@@ -141,6 +141,7 @@ static byte *spanword(byte *t)
 static bool is_count(const char *in)
 {
     static const char *const msgc = MSG_COUNT;
+    static const char *const enco = WORDLIST_ENCODING;
 
     /* anything that doesn't start with a . is a count */
     if (in[0] != '.')
@@ -148,6 +149,10 @@ static bool is_count(const char *in)
     /* .MSG_COUNT is also a count */
     if (strcmp(in, msgc) == 0)
 	return true;
+    /* .ENCODING is also a count */
+    if (strcmp(in, enco) == 0)
+	return true;
+
     return false;
 }
 
