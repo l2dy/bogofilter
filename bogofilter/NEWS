@@ -24,18 +24,18 @@
 	  data at proper boundaries, to avoid SIGBUS on some architectures and
 	  performance loss on others.
 
-	2005-06-08
-
-	* Fix bug in transactional auto-detection that caused recovery to
-	  fail if the environment was in PANIC state.
-	  (Reported by Andrey Chernov.)
-
 	2005-06-07
 
 	* Additional unicode support:
 	   Added global variable encoding { E_RAW, E_UNICODE }
 	   Added --unicode=yes/no options for bogolexer and bogoutil.
 	   Added meta-token .ENCODING { 1=raw, 2=unicode }
+
+0.94.14	2005-06-08
+
+	* Fix bug in transactional auto-detection that caused recovery to
+	  fail if the environment was in PANIC state.
+	  (Reported by Andrey Chernov.)
 
 	2005-06-06
 
