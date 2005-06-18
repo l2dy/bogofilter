@@ -165,6 +165,11 @@ void *ds_open(void *dbe, bfpath *bfp, dbmode_t open_mode)
 	if (DST_OK != ds_txn_begin(dsh))
 	    exit(EX_ERROR);
 	ds_set_wordlist_version(dsh, NULL);
+
+	/* enforce use of default value */
+	if (encoding == E_UNKNOWN)
+	    encoding = E_DEFAULT;
+
 	ds_set_wordlist_encoding(dsh, (int) encoding);
 	if (DST_OK != ds_txn_commit(dsh))
 	    exit(EX_ERROR);
