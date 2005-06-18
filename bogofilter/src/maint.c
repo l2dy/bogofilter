@@ -335,7 +335,8 @@ ex_t maintain_wordlist_file(bfpath *bfp)
 	enco.text = (byte *) WORDLIST_ENCODING;
 	enco.leng = strlen(  WORDLIST_ENCODING );
 	val.count[0] = new_encoding;
-	val.count[0] = new_encoding;
+	val.count[1] = 0;
+	val.date     = 0;
 
 	ds_write(dsh, &enco, &val);
     }
