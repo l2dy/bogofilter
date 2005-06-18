@@ -281,8 +281,9 @@ static ex_t maintain_wordlist(void *database)
 	old_encoding = val.spamcount;
 	new_encoding = encoding;
 	if (old_encoding != new_encoding) {
-	    const char *charset = (new_encoding == E_RAW) ? "iso-8859-1" : "utf-8";
-	    init_charset_table_iconv(charset);
+	    const char *from_charset = (old_encoding == E_RAW) ? "iso-8859-1" : "utf-8";
+	    const char *to_charset   = (new_encoding == E_RAW) ? "iso-8859-1" : "utf-8";
+	    init_charset_table_iconv(from_charset, to_charset);
 	}
 	ret = ds_foreach(database, maintain_hook, &userdata);
     } else
