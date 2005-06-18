@@ -128,9 +128,11 @@ void init_charset_table_iconv(const char *to_charset)
     cd = iconv_open( to_charset, from_charset );
     if (cd == (iconv_t)(-1)) {
 	int err = errno;
-	if (err != EINVAL)
-	    fprintf( stderr, "Invalid charset '%s'\n", to_charset );
-	cd = iconv_open( from_charset, from_charset );
+	if (err == EINVAL) {
+	    /* error - use identity mapping */
+	    fprintf( stderr, "Conversion from '%s' to '%s' is not supported.\n", from_charset, to_charset );
+	    cd = iconv_open( "iso-8859-1", "iso-8859-1" );
+	}
     }
 
     for (idx = 0; idx < COUNTOF(charsets); idx += 1)
