@@ -13,12 +13,12 @@
 
 -------------------------------------------------------------------------------
 
-        2005-06-11
+	2005-06-11
 
 	* Output --help messages to stdout (rather than stderr) so
 	  more can be used for paging.
 
-        2005-06-10
+	2005-06-10
 
 	* TDB driver now copies TDB returned data in the traversor to align
 	  data at proper boundaries, to avoid SIGBUS on some architectures and
@@ -50,7 +50,7 @@
 	2005-05-29
 
 	* Refactor charset and unicode functions into charset.[ch],
-          convert_charset.[ch], and conver_unicode.[ch]
+	  convert_charset.[ch], and conver_unicode.[ch]
 
 	* Add configure and runtime options to select charset and/or
 	  unicode character conversion:
