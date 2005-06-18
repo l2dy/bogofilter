@@ -122,9 +122,9 @@ void init_charset_table_iconv(const char *to_charset)
     if (cd != NULL)
 	iconv_close(cd);
 
-/*  iconv_t iconv_open(const char *tocode, const char *fromcode); */
     if (DEBUG_ICONV(1))
 	fprintf(dbgout, "converting %s to %s\n", from_charset, to_charset);
+
     cd = iconv_open( to_charset, from_charset );
     if (cd == (iconv_t)(-1)) {
 	int err = errno;
