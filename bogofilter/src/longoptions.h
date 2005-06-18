@@ -74,6 +74,7 @@ typedef enum longopts_e {
     { "no-config-file",			N, 0, 'C' }, \
     { "help",				N, 0, 'h' }, \
     { "input-file",			N, 0, 'I' }, \
+    { "unicode",			R, 0, O_UNICODE }, \
     { "version",			N, 0, 'V' }, \
     { "verbosity",			N, 0, 'v' },
 
@@ -84,10 +85,6 @@ typedef enum longopts_e {
     { "output-file",			N, 0, 'O' }, \
     { "user-config-file",		R, 0, O_USER_CONFIG_FILE }, \
     { "replace-nonascii-characters",	R, 0, O_REPLACE_NONASCII_CHARACTERS },
-
-/* options for bogolexer and bogoutil */
-#define LONGOPTIONS_LEX_UTIL \
-    { "unicode",			R, 0, O_UNICODE },
 
 /* options for bogofilter and bogoutil - some preprocessor workarounds here */
 #define lo1
