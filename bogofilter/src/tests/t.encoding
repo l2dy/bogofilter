@@ -1,0 +1,103 @@
+#! /bin/sh
+
+. ${srcdir:=.}/t.frame
+
+#
+# test common bogoutil functions
+#
+
+# initialize
+rm ${TMPDIR}/* # reset TXN detection
+if [ $DB_TXN = true ] ; then TXN=--db-transaction=yes ; else TXN= ; fi
+
+MSG="msg.accents"
+
+cat <<_EOF >${TMPDIR}/$MSG.txt
+Subject: UTF-8 testing
+Content-Type: text/html; charset=iso-8859-1
+
+Accented characters:
+    â château
+    é Cédric
+    í Cecília
+    ó escribió
+    ü Düsseldorf
+
+Special Characters:
+    0x92-’-windows-apostrophe
+    0x93-“-windows-left-quote
+    0x94-”-windows-right-quote
+    0xA0- -no-break-space
+    0xA1-¡-inverted-exclamation-mark
+    0xA2-¢-cent-sign
+    0xA3-£-pound-sign
+    0xA4-¤-yen-sign
+    0xA7-§-section-sign
+    0xA9-©-copyright-sign
+    0xAA-ª-feminine-ordinal-indicator
+    0xAB-«-left-pointing-double-angle-quotation-mark
+    0xAC-¬-not-sign
+    0xAD-­-soft-hyphen
+    0xAE-®-registered-sign
+    0xAF-¯-macron
+    0xB0-°-degree-sign
+    0xB1-±-plus-minus-sign
+    0xB2-²-superscript-two
+    0xB3-³-superscript-three
+    0xB5-µ-micro-sign
+    0xB6-¶-pilcrow-sign
+    0xB7-·-middle-dot
+    0xB9-¹-superscript-one
+    0xBA-º-masculine-ordinal-indicator
+    0xBB-»-right-pointing-double-angle-quotation-mark
+    0xBC-¼-inverted-question-mark
+    0xD7-×-multiplication-sign
+    0xF7-÷-division-sign
+_EOF
+
+DATE=`date +%Y%m%d`
+BOGODIR="${TMPDIR}/wordlist"
+WORDLIST="${TMPDIR}/wordlist/wordlist.$DB_EXT"
+
+[ ! -d $BOGODIR ] && mkdir $BOGODIR
+
+# create and dump wordlists with/without unicode
+#   without uses iso-8859-1
+#   with    uses utf-8
+for YN in yes no ; do
+    rm -f ${BOGODIR}/*
+    $BOGOFILTER -C -y 0 -n -d ${BOGODIR}  --unicode=$YN < ${TMPDIR}/$MSG.txt
+    $BOGOUTIL   -C -y 0    -d ${WORDLIST}  > ${TMPDIR}/wordlist.$YN.txt
+done
+
+$BOGOUTIL   -C -y 0 -d ${WORDLIST} > ${TMPDIR}/wordlist.raw.txt
+
+iconv -f iso-8859-1 -t utf-8 < ${TMPDIR}/wordlist.raw.txt | \
+sed "s/.ENCODING 1/.ENCODING 2/" > ${TMPDIR}/wordlist.iconv.txt
+
+# convert from iso-8859-1 to unicode
+$BOGOUTIL -C -y 0 -m ${WORDLIST} --unicode=yes
+$BOGOUTIL -C -y 0 -d ${WORDLIST} > ${TMPDIR}/wordlist.new.txt
+
+# convert from unicode to iso-8859-1
+$BOGOUTIL -C -y 0 -m ${WORDLIST} --unicode=no
+$BOGOUTIL -C -y 0 -d ${WORDLIST} > ${TMPDIR}/wordlist.old.txt
+
+cat <<EOF | sed "s/ $DATE//" > ${TMPDIR}/md5sum.ref
+4ff193bff18e44bd6af0992497565df2 -   wordlist.iconv.txt
+4ff193bff18e44bd6af0992497565df2 -   wordlist.new.txt
+a36783e5753e6254167ffe32835e96d0 -   wordlist.no.txt
+a36783e5753e6254167ffe32835e96d0 -   wordlist.old.txt
+a36783e5753e6254167ffe32835e96d0 -   wordlist.raw.txt
+4ff193bff18e44bd6af0992497565df2 -   wordlist.yes.txt
+EOF
+
+for FILE in ${TMPDIR}/wordlist.*.txt ; do
+    ( echo `md5sum < $FILE` " " `basename $FILE` ) >>  ${TMPDIR}/md5sum.out
+done
+
+if [ $verbose -eq 0 ] ; then 
+    cmp ${TMPDIR}/md5sum.ref ${TMPDIR}/md5sum.out
+else
+    diff ${TMPDIR}/md5sum.ref ${TMPDIR}/md5sum.out
+fi
