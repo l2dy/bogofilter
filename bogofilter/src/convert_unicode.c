@@ -114,10 +114,9 @@ static charset_def_t charsets[] = {
     { "csgb2312",	T },
 };
 
-void init_charset_table_iconv(const char *to_charset)
+void init_charset_table_iconv(const char *from_charset, const char *to_charset)
 {
     uint idx;
-    const char *from_charset = charset_default;
 
     if (cd != NULL)
 	iconv_close(cd);

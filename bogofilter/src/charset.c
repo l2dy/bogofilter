@@ -87,12 +87,12 @@ void init_charset_table(const char *charset_name)
     init_charset_table_orig(charset_name);
 #else
 #ifdef	ENABLE_UNICODE
-    init_charset_table_iconv(charset_name);
+    init_charset_table_iconv(charset_name, charset_default);
 #else
     if (encoding != E_UNICODE)
 	init_charset_table_orig(charset_name);
     else
-	init_charset_table_iconv(charset_name);
+	init_charset_table_iconv(charset_name, charset_default);
 #endif
 #endif
     return;
