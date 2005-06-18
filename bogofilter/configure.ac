@@ -232,9 +232,9 @@ AC_ARG_ENABLE(unicode,
 )
 
 AM_CONDITIONAL(DISABLE_UNICODE, test x$USE_UNICODE = xNO)
-AM_CONDITIONAL(ENABLE_UNICODE, test x$USE_UNICODE = xYES)
+AM_CONDITIONAL(ENABLE_UNICODE, test x$USE_UNICODE != xNO)
 
-if test x$USE_UNICODE != xYES ; then
+if test x$USE_UNICODE = xNO ; then
 	AC_DEFINE(DISABLE_UNICODE,1,
 	[Disable unicode for converting character sets to unicode])
 	[ENCODING="raw"]

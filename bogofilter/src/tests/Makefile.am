@@ -24,6 +24,10 @@ t.query.config: t.query.config.in Makefile
 
 ENVIRON_TESTS = t.abort t.env t.ctype t.bogodir t.leakfind t.u_fpe
 
+if ENABLE_UNICODE
+ENCODING_TESTS=t.encoding
+endif
+
 PARSING_TESTS = \
 	t.longoptions \
 	t.ignore_spam_header \
@@ -33,7 +37,7 @@ PARSING_TESTS = \
 	t.escaped.html t.escaped.url \
 	t.split t.parsing \
 	t.lexer t.lexer.mbx \
-	t.encoding \
+	$(ENCODING_TESTS) \
 	t.rfc2047_broken t.rfc2047_folded \
 	t.message_addr t.message_id t.queue_id
 

@@ -68,13 +68,20 @@ typedef enum longopts_e {
     O_WORDLIST
 } longopts_t;
 
+#ifndef	DISABLE_UNICODE
+#define	UNICODE_OPTION	\
+    { "unicode",			R, 0, O_UNICODE },
+#else
+#define	UNICODE_OPTION
+#endif
+
 /* common options */
 #define LONGOPTIONS_COMMON \
     { "config-file",			R, 0, O_CONFIG_FILE }, \
     { "no-config-file",			N, 0, 'C' }, \
     { "help",				N, 0, 'h' }, \
     { "input-file",			N, 0, 'I' }, \
-    { "unicode",			R, 0, O_UNICODE }, \
+       UNICODE_OPTION \
     { "version",			N, 0, 'V' }, \
     { "verbosity",			N, 0, 'v' },
 
