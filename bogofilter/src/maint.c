@@ -15,8 +15,11 @@ AUTHOR:
 #include <assert.h>
 #include <stdlib.h>
 
+#include "buff.h"
 #include "datastore.h"
 #include "error.h"
+#include "convert_unicode.h"
+#include "iconvert.h"
 #include "maint.h"
 #include "transaction.h"
 #include "wordlists.h"
@@ -29,6 +32,9 @@ size_t	 size_min = 0;
 size_t	 size_max = 0;
 bool     timestamp_tokens = true;
 bool	 upgrade_wordlist_version = false;
+
+e_enc	 old_encoding;
+e_enc	 new_encoding;
 
 /* Function Prototypes */
 
@@ -182,6 +188,36 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 	xfree(new_token.text);
     }
 
+    if (old_encoding != new_encoding)
+    {
+	buff_t new_buff;
+	buff_t old_buff;
+
+	old_buff.read = 0;
+	old_buff.size = token.leng;
+	old_buff.t.text = token.text;
+	old_buff.t.leng = token.leng;
+
+	new_buff.read = 0;
+	new_buff.size = token.leng * 6;
+	new_buff.t.leng = 0;
+	new_buff.t.text = (byte *)xmalloc(new_buff.size);
+
+	iconvert(&old_buff, &new_buff);
+
+	if (old_buff.t.leng != new_buff.t.leng ||
+	    memcmp(old_buff.t.text, new_buff.t.text, new_buff.t.leng) != 0) {
+	    if (DEBUG_ICONV(2)) {
+		fputs("***  ", dbgout); word_puts(&old_buff.t, 0, dbgout); fputs( "\n", dbgout);
+		fputs("***  ", dbgout); word_puts(&new_buff.t, 0, dbgout); fputs( "\n", dbgout);
+
+	    }
+	    merge_tokens(&old_buff.t, &new_buff.t, in_val, transaction, vhandle);
+	}
+
+	xfree(new_buff.t.text);
+    }
+
     if (upgrade_wordlist_version)
     {
 	switch (wordlist_version)
@@ -240,6 +276,14 @@ static ex_t maintain_wordlist(void *database)
     userdata.transaction = transaction;
 
     if (DST_OK == ds_txn_begin(database)) {
+	dsv_t val;
+	ds_get_wordlist_encoding(database, &val);
+	old_encoding = val.spamcount;
+	new_encoding = encoding;
+	if (old_encoding != new_encoding) {
+	    const char *charset = (new_encoding == E_RAW) ? "iso-8859-1" : "utf-8";
+	    init_charset_table_iconv(charset);
+	}
 	ret = ds_foreach(database, maintain_hook, &userdata);
     } else
 	ret = EX_ERROR;
