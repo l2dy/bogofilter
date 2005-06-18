@@ -114,28 +114,29 @@ static charset_def_t charsets[] = {
     { "csgb2312",	T },
 };
 
-void init_charset_table_iconv(const char *charset_name)
+void init_charset_table_iconv(const char *to_charset)
 {
     uint idx;
+    const char *from_charset = charset_default;
 
     if (cd != NULL)
 	iconv_close(cd);
 
 /*  iconv_t iconv_open(const char *tocode, const char *fromcode); */
     if (DEBUG_ICONV(1))
-	fprintf(dbgout, "converting %s to %s\n", charset_default, charset_name);
-    cd = iconv_open( charset_name, charset_default );
+	fprintf(dbgout, "converting %s to %s\n", from_charset, to_charset);
+    cd = iconv_open( to_charset, from_charset );
     if (cd == (iconv_t)(-1)) {
 	int err = errno;
 	if (err != EINVAL)
-	    fprintf( stderr, "Invalid charset '%s'\n", charset_name );
-	cd = iconv_open( charset_default, charset_default );
+	    fprintf( stderr, "Invalid charset '%s'\n", to_charset );
+	cd = iconv_open( from_charset, from_charset );
     }
 
     for (idx = 0; idx < COUNTOF(charsets); idx += 1)
     {
 	charset_def_t *charset = &charsets[idx];
-	if (strcasecmp(charset->name, charset_name) == 0)
+	if (strcasecmp(charset->name, to_charset) == 0)
 	{
 	    map_default();	/* Setup the table defaults. */
 	    if (replace_nonascii_characters)
