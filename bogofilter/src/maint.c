@@ -328,6 +328,18 @@ ex_t maintain_wordlist_file(bfpath *bfp)
 
     rc = maintain_wordlist(dsh);
 
+    if (old_encoding != new_encoding) {
+	dsv_t val;
+	word_t enco;
+
+	enco.text = (byte *) WORDLIST_ENCODING;
+	enco.leng = strlen(  WORDLIST_ENCODING );
+	val.count[0] = new_encoding;
+	val.count[0] = new_encoding;
+
+	ds_write(dsh, &enco, &val);
+    }
+
     ds_close(dsh);
     ds_cleanup(dbe);
 
