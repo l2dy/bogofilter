@@ -168,6 +168,8 @@ void iconvert(buff_t *src, buff_t *dst)
 	    done = true;
     }
 
+    Z(dst->t.text[dst->t.leng]);	/* for easier debugging - removable */
+
     /* TODO:  Provide proper handling of incompletely converted buffer */
     if (DEBUG_ICONV(1) &&
 	src->t.leng != src->read)
