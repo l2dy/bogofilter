@@ -150,6 +150,7 @@
         <ul>
           <li><a href="#which-muas">With which mail programs does bogofilter work?</a></li>
           <li><a href="#with-mutt">How do I use bogofilter with mutt?</a></li>
+          <li><a href="#with-qmail">How do I use bogofilter with qmail?</a></li>
           <li><a href="#with-sc">How do I use bogofilter with Sylpheed Claws?</a></li>
           <li><a href="#with-mh-e">How do I use bogofilter with MH-E (the Emacs interface to the MH mail system)?</a></li>
         </ul>
@@ -336,8 +337,8 @@
     <li><p>Method 1) Full training. Train bogofilter with all your messages. In
     our example:</p>
 
-    <pre>	bogofilter -s &lt; spam.mbox
-	bogofilter -n &lt; ham.mbox</pre></li>
+    <pre>    bogofilter -s &lt; spam.mbox
+    bogofilter -n &lt; ham.mbox</pre></li>
     </ul>
 
     <p>Note: Bogofilter's contrib directory includes two scripts that
@@ -362,14 +363,14 @@
     spam_cutoff=0.6 you might want to score all ham in your
     collection below 0.3 and all spam above 0.9. Our example is:</p>
 
-    <pre>	bogominitrain.pl -fnv ~/.bogofilter ham.mbox spam.mbox '-o 0.9,0.3'</pre></li>
+    <pre>    bogominitrain.pl -fnv ~/.bogofilter ham.mbox spam.mbox '-o 0.9,0.3'</pre></li>
 
     <li><p>Method 3) Use the script randomtrain (in the contrib
     directory). The script generates a list of all the messages in the
     mailboxes, randomly shuffles the list, and then scores each
     message, with training as needed. In our example:</p>
 
-    <pre>	randomtrain -s spam.mbox -n ham.mbox</pre>
+    <pre>    randomtrain -s spam.mbox -n ham.mbox</pre>
 
     <p>As with method 4, it works better if you start with full
     training using several thousand messages.  This will give a
@@ -384,34 +385,34 @@
     incorrectly, and train with those. Here are two little scripts you
     can use to classify the train-on-error messages:</p>
 
-    <pre>	#! /bin/sh
-	#  class3 -- classify one message as bad, good or unsure
-	cat &gt;msg.$$
-	bogofilter $* &lt;msg.$$
-	res=$?
-	if [ $res = 0 ]; then
-	    cat msg.$$ &gt;&gt;corpus.bad
-	elif [ $res = 1 ]; then
-	    cat msg.$$ &gt;&gt;corpus.good
-	elif [ $res = 2 ]; then
-	    cat msg.$$ &gt;&gt;corpus.unsure
-	fi
-	rm msg.$$</pre>
+    <pre>    #! /bin/sh
+    #  class3 -- classify one message as bad, good or unsure
+    cat &gt;msg.$$
+    bogofilter $* &lt;msg.$$
+    res=$?
+    if [ $res = 0 ]; then
+        cat msg.$$ &gt;&gt;corpus.bad
+    elif [ $res = 1 ]; then
+        cat msg.$$ &gt;&gt;corpus.good
+    elif [ $res = 2 ]; then
+        cat msg.$$ &gt;&gt;corpus.unsure
+    fi
+    rm msg.$$</pre>
 
-    <pre>	#! /bin/sh
-	# classify -- put all messages in mbox through class3
-	src=$1;
-	shift
-	formail -s class3 $* &lt;$src</pre>
+    <pre>    #! /bin/sh
+    # classify -- put all messages in mbox through class3
+    src=$1;
+    shift
+    formail -s class3 $* &lt;$src</pre>
 
     <p>In our example (after the initial full training):</p>
 
-    <pre>	classify spam.mbox [bogofilter options]
-	bogofilter -s &lt; corpus.good
-	rm -f corpus.*
-	classify ham.mbox [bogofilter options]
-	bogofilter -n &lt; corpus.bad
-	rm -f corpus.*</pre></li>
+    <pre>    classify spam.mbox [bogofilter options]
+    bogofilter -s &lt; corpus.good
+    rm -f corpus.*
+    classify ham.mbox [bogofilter options]
+    bogofilter -n &lt; corpus.bad
+    rm -f corpus.*</pre></li>
     </ul>
 
     <h3>Comparing these methods</h3>
@@ -508,22 +509,22 @@
       <li>
         Using "-v" causes bogofilter to generate the "X-Bogosity:"
         header line, i.e.
-        <pre>	X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000</pre></li>
+        <pre>    X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000</pre></li>
 
       <li>
         Using "-vv" causes bogofilter to generate a histogram, i.e.
-        <pre>	X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
-	        int  cnt    prob   spamicity  histogram
-	       0.00   29  0.000209  0.000052  #############################
-	       0.10    2  0.179065  0.003425  ##
-	       0.20    2  0.276880  0.008870  ##
-	       0.30   18  0.363295  0.069245  ##################
-	       0.40    0  0.000000  0.069245
-	       0.50    0  0.000000  0.069245
-	       0.60   37  0.667823  0.257307  #####################################
-	       0.70    5  0.767436  0.278892  #####
-	       0.80   13  0.836789  0.334980  #############
-	       0.90   32  0.984903  0.499835  ################################</pre>
+        <pre>    X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
+            int  cnt    prob   spamicity  histogram
+           0.00   29  0.000209  0.000052  #############################
+           0.10    2  0.179065  0.003425  ##
+           0.20    2  0.276880  0.008870  ##
+           0.30   18  0.363295  0.069245  ##################
+           0.40    0  0.000000  0.069245
+           0.50    0  0.000000  0.069245
+           0.60   37  0.667823  0.257307  #####################################
+           0.70    5  0.767436  0.278892  #####
+           0.80   13  0.836789  0.334980  #############
+           0.90   32  0.984903  0.499835  ################################</pre>
 
         <p>Each row shows an interval, the count of tokens with
         scores in that interval, the average spam probability for
@@ -539,17 +540,17 @@
       <li>
         Using "-vvv" produces a list of <em>all</em> the tokens in
         the messages with information on each one, i.e.
-        <pre>	X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
-	                      n    pgood     pbad      fw     U
-	"which"              10  0.208333  0.000000  0.000041 +
-	"own"                 7  0.145833  0.000000  0.000059 +
-	"having"              6  0.125000  0.000000  0.000069 +
-	...
-	"unsubscribe.asp"     2  0.000000  0.095238  0.999708 +
-	"million"             4  0.000000  0.190476  0.999854 +
-	"copy"                5  0.000000  0.238095  0.999883 +
-	N_P_Q_S_s_x_md      138  0.00e+00  0.00e+00  5.00e-01
-	                         1.00e-03  4.15e-01  0.100</pre>
+        <pre>    X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
+                          n    pgood     pbad      fw     U
+    "which"              10  0.208333  0.000000  0.000041 +
+    "own"                 7  0.145833  0.000000  0.000059 +
+    "having"              6  0.125000  0.000000  0.000069 +
+    ...
+    "unsubscribe.asp"     2  0.000000  0.095238  0.999708 +
+    "million"             4  0.000000  0.190476  0.999854 +
+    "copy"                5  0.000000  0.238095  0.999883 +
+    N_P_Q_S_s_x_md      138  0.00e+00  0.00e+00  5.00e-01
+                             1.00e-03  4.15e-01  0.100</pre>
         The columns printed contain the following information:
 
         <dl>
@@ -632,19 +633,19 @@
     classified as unsure.  If you look in bogofilter.cf, you will see
     the following lines:</p>
 
-    <pre>	#### CUTOFF Values
-	#
-	#	both ham_cutoff and spam_cutoff are allowed.
-	#	setting ham_cutoff to a non-zero value will
-	#	enable tri-state results (Spam/Ham/Unsure).
-	#
-	#ham_cutoff  = 0.45
-	#spam_cutoff = 0.99
-	#
-	#	for two-state classification:
-	#
-	## ham_cutoff = 0.00
-	## spam_cutoff= 0.99</pre>
+    <pre>    #### CUTOFF Values
+    #
+    #    both ham_cutoff and spam_cutoff are allowed.
+    #    setting ham_cutoff to a non-zero value will
+    #    enable tri-state results (Spam/Ham/Unsure).
+    #
+    #ham_cutoff  = 0.45
+    #spam_cutoff = 0.99
+    #
+    #    for two-state classification:
+    #
+    ## ham_cutoff = 0.00
+    ## spam_cutoff= 0.99</pre>
 
     <p>To turn on Yes/No/Unsure classification, remove the #'s from the last
     two lines.</p>
@@ -653,29 +654,29 @@
     instead of Spam/Ham/Unsure, remove the #'s from the following
     bogofilter.cf line:
 
-    <pre>	## spamicity_tags = Yes, No, Unsure</pre>
+    <pre>    ## spamicity_tags = Yes, No, Unsure</pre>
 
     <p>Once that's done, you may want to set the filtering rules for your mail
     program to include rules like:</p>
 
-    <pre>	if header contains "X-Bogosity: Spam", put in Spam folder
-	if header contains "X-Bogosity: Unsure", put in Unsure folder</pre>
+    <pre>    if header contains "X-Bogosity: Spam", put in Spam folder
+    if header contains "X-Bogosity: Unsure", put in Unsure folder</pre>
 
     <p>Alternatively, bogofilter.cf has directives for modifying the
     Subject: line, i.e.</p>
 
-    <pre>	#### SPAM_SUBJECT_TAG
-	#
-	#	tag added to "Subject: " line for identifying spam or unsure
-	#	default is to add nothing.
-	#
-	##spam_subject_tag=***SPAM***
-	##unsure_subject_tag=???UNSURE???</pre>
+    <pre>    #### SPAM_SUBJECT_TAG
+    #
+    #    tag added to "Subject: " line for identifying spam or unsure
+    #    default is to add nothing.
+    #
+    ##spam_subject_tag=***SPAM***
+    ##unsure_subject_tag=???UNSURE???</pre>
 
     <p>With these subject tags, the filtering rules would look like:</p>
 
-    <pre>	if subject contains "***SPAM***", put in Spam folder
-	if subject contains "???UNSURE???", put in Unsure folder</pre>
+    <pre>    if subject contains "***SPAM***", put in Spam folder
+    if subject contains "???UNSURE???", put in Unsure folder</pre>
 
     <hr>
 
@@ -745,29 +746,29 @@
     bogofilter to register the message as spam (or non-spam). The
     sample procmail recipe below shows one way to do this:</p>
 
-    <pre>	BOGOFILTER     = "/usr/bin/bogofilter"
-	BOGOFILTER_DIR = "training"
-	SPAMASSASSIN  = "/usr/bin/spamassassin"
+    <pre>    BOGOFILTER     = "/usr/bin/bogofilter"
+    BOGOFILTER_DIR = "training"
+    SPAMASSASSIN  = "/usr/bin/spamassassin"
 
-	:0 HBc
-	* ? $SPAMASSASSIN -e
-	#spam yields non-zero
-	#non-spam yields zero
-	| $BOGOFILTER -n -d $BOGOFILTER_DIR
-	#else (E)
-	:0Ec
-	| $BOGOFILTER -s -d $BOGOFILTER_DIR
+    :0 HBc
+    * ? $SPAMASSASSIN -e
+    #spam yields non-zero
+    #non-spam yields zero
+    | $BOGOFILTER -n -d $BOGOFILTER_DIR
+    #else (E)
+    :0Ec
+    | $BOGOFILTER -s -d $BOGOFILTER_DIR
 
-	:0fw
-	| $BOGOFILTER -p -e
+    :0fw
+    | $BOGOFILTER -p -e
 
-	:0:
-	* ^X-Bogosity:.Spam
-	spam
+    :0:
+    * ^X-Bogosity:.Spam
+    spam
 
-	:0:
-	* ^X-Bogosity:.Ham
-	non-spam</pre>
+    :0:
+    * ^X-Bogosity:.Ham
+    non-spam</pre>
 
     <hr>
 
@@ -808,17 +809,17 @@
 
         <p>Here's a procmail recipe that will sideline messages
         written with Asian charsets:</p>
-        <pre>	## Silently drop all Asian language mail
-	UNREADABLE='[^?"]*big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987'
-	:0:
-	* 1^0 $ ^Subject:.*=\?($UNREADABLE)
-	* 1^0 $ ^Content-Type:.*charset="?($UNREADABLE)
-	spam-unreadable
+        <pre>    ## Silently drop all Asian language mail
+    UNREADABLE='[^?"]*big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987'
+    :0:
+    * 1^0 $ ^Subject:.*=\?($UNREADABLE)
+    * 1^0 $ ^Content-Type:.*charset="?($UNREADABLE)
+    spam-unreadable
 
-	:0:
-	* ^Content-Type:.*multipart
-	* B ?? $ ^Content-Type:.*^?.*charset="?($UNREADABLE)
-	spam-unreadable</pre>
+    :0:
+    * ^Content-Type:.*multipart
+    * B ?? $ ^Content-Type:.*^?.*charset="?($UNREADABLE)
+    spam-unreadable</pre>
 
         <p>With the above recipe, bogofilter will <em>never</em>
         see the message.</p>
@@ -833,14 +834,14 @@
     minimum of disk space.  Assuming your wordlist is in directory
     ~/.bogofilter, for bogofilter 0.93.0 (or newer) use:</p>
 
-    <pre>	bf_compact ~/.bogofilter wordlist.db</pre>
+    <pre>    bf_compact ~/.bogofilter wordlist.db</pre>
 
     <p>For bogofilter older than 0.93.0, use:</p>
 
-    <pre>	cd ~/.bogofilter
-	bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
-	mv wordlist.db wordlist.db.prv
-	mv wordlist.db.new wordlist.db</pre>
+    <pre>    cd ~/.bogofilter
+    bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
+    mv wordlist.db wordlist.db.prv
+    mv wordlist.db.new wordlist.db</pre>
 
     <p>The script is needed to duplicate your database environment (in
     order to support BerkeleyDB transaction processing).  Your
@@ -890,18 +891,18 @@
 
     <p>If you think your wordlists are hosed, you can see what
     BerkeleyDB thinks by running:</p>
-    <pre>	db_verify wordlist.db</pre>
+    <pre>    db_verify wordlist.db</pre>
 
     <p>Alternatively you may be able to recover some (or
     all) of the tokens and their counts with the following
     commands:</p>
-    <pre>	bogoutil -d wordlist.db | bogoutil -l wordlist.db.new</pre>
+    <pre>    bogoutil -d wordlist.db | bogoutil -l wordlist.db.new</pre>
     <p>or - if there has been more damage to the token list - with</p>
-    <pre>	db_dump -r wordlist.db | db_load wordlist.new</pre>
+    <pre>    db_dump -r wordlist.db | db_load wordlist.new</pre>
 
     <p>You can also use a text file instead of a pipe, as in:</p>
-    <pre>	bogoutil -d wordlist.db &gt; wordlist.txt
-	bogoutil -l wordlist.db.new &lt; wordlist.txt</pre>
+    <pre>    bogoutil -d wordlist.db &gt; wordlist.txt
+    bogoutil -l wordlist.db.new &lt; wordlist.txt</pre>
 
     <hr>
 
@@ -1014,12 +1015,12 @@
     2.2.1.  We suggest you read the whole section.</p>
 
     <p>In brief, use these commands:
-    <pre>	cd ~/.bogofilter
-	bogoutil -d wordlist.db &gt; wordlist.txt
-	mv wordlist.db wordlist.db.old
-	bogoutil --db-transaction=yes -l wordlist.db &lt; wordlist.txt</pre>
+    <pre>    cd ~/.bogofilter
+    bogoutil -d wordlist.db &gt; wordlist.txt
+    mv wordlist.db wordlist.db.old
+    bogoutil --db-transaction=yes -l wordlist.db &lt; wordlist.txt</pre>
     <p>If everything went well, you can remove the backup files:</p>
-    <pre>	rm wordlist.db.old wordlist.txt</pre>
+    <pre>    rm wordlist.db.old wordlist.txt</pre>
     <hr>
 
     <h2 id="disable-transactions">How can I switch from transaction to
@@ -1029,17 +1030,17 @@
     2.2.2.  We suggest you read the whole section.</p>
 
     <p>In brief, you can use bogoutil to dump/load the wordlist, for example:
-    <pre>	cd ~/.bogofilter
-	bogoutil -d wordlist.db &gt; wordlist.txt
-	mv wordlist.db wordlist.db.old
-	rm -f log.?????????? __db.???
-	bogoutil --db-transaction=no -l wordlist.db &lt; wordlist.txt</pre>
+    <pre>    cd ~/.bogofilter
+    bogoutil -d wordlist.db &gt; wordlist.txt
+    mv wordlist.db wordlist.db.old
+    rm -f log.?????????? __db.???
+    bogoutil --db-transaction=no -l wordlist.db &lt; wordlist.txt</pre>
 
     <hr>
 
     <h2 id="locksize">Why does bogofilter die after printing
-	"Lock table is out of available locks" or
-	"Lock table is out of available object entries"</h2>
+    "Lock table is out of available locks" or
+    "Lock table is out of available object entries"</h2>
 
     <p>The transactional and concurrent modes of BerkeleyDB require a
     lock table that corresponds to the data base in size. See the
@@ -1068,13 +1069,13 @@
     problems will occur.
 
     <p>To show the database size use:</p>
-    <pre>	ls -lh $BOGOFILTER_DIR/wordlist.db</pre>
+    <pre>    ls -lh $BOGOFILTER_DIR/wordlist.db</pre>
 
     <p>To show the postfix setting:</p>
-    <pre>	postconf | grep mailbox_size_limit</pre>
+    <pre>    postconf | grep mailbox_size_limit</pre>
 
     <p>To set the limit to 73MB (or whatever size is right for you):</p>
-    <pre>	postconf -e mailbox_size_limit=73000000</pre>
+    <pre>    postconf -e mailbox_size_limit=73000000</pre>
 
     <p>If you think your database may be corrupt, read
     <a href="#rescue">How can I tell if my wordlists are corrupted?</a>
@@ -1082,40 +1083,40 @@
 
     <hr>
 
-	  <h2 id="db-private">Why am I getting &quot;Berkeley DB
-	      library configured to support only DB_PRIVATE
-	      environments&quot; or<br>
-	      &quot;Berkeley DB library configured to support only
-	      private environments&quot;?</h2>
+      <h2 id="db-private">Why am I getting &quot;Berkeley DB
+          library configured to support only DB_PRIVATE
+          environments&quot; or<br>
+          &quot;Berkeley DB library configured to support only
+          private environments&quot;?</h2>
 
-	  <p>Some distributors (for instance the Fedora Project) package
-	  Berkeley DB with support for POSIX threading and hence POSIX
-	  mutexes, but your system does not support POSIX mutexes
-	  (whether it
-	  does, depends on the kernel version and exact processor
-	  type).</p>
+      <p>Some distributors (for instance the Fedora Project) package
+      Berkeley DB with support for POSIX threading and hence POSIX
+      mutexes, but your system does not support POSIX mutexes
+      (whether it
+      does, depends on the kernel version and exact processor
+      type).</p>
 
-	  <p>To work around this problem:
-	  <ol>
-	      <li>download, compile and install <a
-		  href="http://www.sleepycat.com/products/db.shtml">Berkeley
-		  DB</a> on your own and the reconfigure bogofilter:
-	      <ol>
-		  <li><kbd>cd build_unix</kbd></li>
-		  <li><kbd>../dist/configure --enable-cxx</kbd></li>
-		  <li><kbd>make</kbd></li>
-		  <li><kbd>make install</kbd></li>
-	      </ol>
-	      <li>recompile and install bogofilter:
-	      <ol>
-		  <li><kbd>./configure
-		      --with-libdb-prefix=/usr/local/BerkeleyDB.4.3</kbd>
-		  <em>(replace your Berkeley DB version number)</em></li>
-		  <li><kbd>make &amp;&amp; make check</kbd></li>
-		  <li><kbd>make install</kbd> <em>(if space is a
-		      premium, use <kbd>make install-strip)</kbd></em></li>
-	      </ol>
-	  </ol>
+      <p>To work around this problem:
+      <ol>
+          <li>download, compile and install <a
+          href="http://www.sleepycat.com/products/db.shtml">Berkeley
+          DB</a> on your own and the reconfigure bogofilter:
+          <ol>
+          <li><kbd>cd build_unix</kbd></li>
+          <li><kbd>../dist/configure --enable-cxx</kbd></li>
+          <li><kbd>make</kbd></li>
+          <li><kbd>make install</kbd></li>
+          </ol>
+          <li>recompile and install bogofilter:
+          <ol>
+          <li><kbd>./configure
+              --with-libdb-prefix=/usr/local/BerkeleyDB.4.3</kbd>
+          <em>(replace your Berkeley DB version number)</em></li>
+          <li><kbd>make &amp;&amp; make check</kbd></li>
+          <li><kbd>make install</kbd> <em>(if space is a
+              premium, use <kbd>make install-strip)</kbd></em></li>
+          </ol>
+      </ol>
 
     <h2 id="multi-user">Can bogofilter be used in a multi-user environment?</h2>
 
@@ -1210,15 +1211,15 @@
 
     <p>The following commands will delete the tokens from spam messages:</p>
 
-    <pre>	bogoutil -d wordlist.db | \
-	awk '{print $1 " " $2 " 0"}' | grep -v " 0 0" | \
-	bogoutil -l wordlist.new.db</pre>
+    <pre>    bogoutil -d wordlist.db | \
+    awk '{print $1 " " $2 " 0"}' | grep -v " 0 0" | \
+    bogoutil -l wordlist.new.db</pre>
 
     <p>The following commands will delete the tokens from non-spam messages:</p>
 
-    <pre>	bogoutil -d wordlist.db | \
-	awk '{print $1 " 0 " $3}' | grep -v " 0 0" | \
-	bogoutil -l wordlist.new.db</pre>
+    <pre>    bogoutil -d wordlist.db | \
+    awk '{print $1 " 0 " $3}' | grep -v " 0 0" | \
+    bogoutil -l wordlist.new.db</pre>
 
     <hr>
 
@@ -1229,10 +1230,10 @@
     <a href="http://www.sleepycat.com/download/db/">download it (take
 	one of the 4.2.X versions)</a>,
     unpack it, and do these commands in the db directory:</p>
-    <pre>	$ cd build_unix
-	$ sh ../dist/configure
-	$ make
-	# make install</pre>
+    <pre>    $ cd build_unix
+    $ sh ../dist/configure
+    $ make
+    # make install</pre>
 
     <p>Next, download a
     <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">portable version</a>
@@ -1241,17 +1242,17 @@
     <h3>On Solaris</h3>
 
     <p>Unpack it, and then do:</p>
-    <pre>	$ ./configure --with-libdb-prefix=/usr/local/BerkeleyDB.4.2
-	$ make
-	# make install-strip</pre>
+    <pre>    $ ./configure --with-libdb-prefix=/usr/local/BerkeleyDB.4.2
+    $ make
+    # make install-strip</pre>
 
     <p>You will either want to put a symlink to libdb.so in
     /usr/lib, or use a modified LD_LIBRARY_PATH environment
     variable before you start bogofilter. On newer systems, the most
     convenient way is probably to use the crle(1) tool to set the path
     permanently so BerkeleyDB is available to all applications.</p>
-    <pre>	$ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.2
-	$ export LD_LIBRARY_PATH</pre>
+    <pre>    $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.2
+    $ export LD_LIBRARY_PATH</pre>
 
     <p>Note that some "make" versions shipped with Solaris break when
     you try to build bogofilter outside of its source directory.
@@ -1264,12 +1265,12 @@
     bogofilter. This approach uses the highly recommended
     portupgrade and cvsup software packages. To install these two
     fine pieces, type (you need to do this only once):</p>
-    <pre>	# pkg_add -r portupgrade cvsup</pre>
+    <pre>    # pkg_add -r portupgrade cvsup</pre>
 
     <p>To install or upgrade bogofilter, just
     <a href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html">upgrade your portstree using cvsup</a>,
     then type:</p>
-    <pre>	# portupgrade -N bogofilter</pre>
+    <pre>    # portupgrade -N bogofilter</pre>
 
     <p><em>Note: This assumes you are root.</em> If not, read through
     the remainder of this FreeBSD section and then see how you can
@@ -1278,7 +1279,7 @@
     <p>Depending on your system you may have to set some environment
     variables for the <code>./configure</code> command. Example:</p>
 
-    <pre>	# env CPPFLAGS=-I/usr/local/include/db3 LIBS=-ldb3 LDFLAGS=-L/usr/local/lib ./configure</pre>
+    <pre>    # env CPPFLAGS=-I/usr/local/include/db3 LIBS=-ldb3 LDFLAGS=-L/usr/local/lib ./configure</pre>
 
     <p>The actual paths you use here depend on your system and
     the database versions you have installed. Check and replace
@@ -1374,14 +1375,34 @@
     into different folders based on bogofilter's return code and set
     mutt key bindings to train bogofilter on errors:</p>
 
-<pre>        macro index S "|bogofilter -s\ns=junkmail"  "Learn as spam and save to junk"
-        macro pager S "|bogofilter -s\ns=junkmail"  "Learn as spam and save to junk"
-        macro index H "|bogofilter -n\ns="          "Learn as ham and save"
-        macro pager H "|bogofilter -n\ns="          "Learn as ham and save"</pre>
+<pre>    macro index S "|bogofilter -s\ns=junkmail"  "Learn as spam and save to junk"
+    macro pager S "|bogofilter -s\ns=junkmail"  "Learn as spam and save to junk"
+    macro index H "|bogofilter -n\ns="          "Learn as ham and save"
+    macro pager H "|bogofilter -n\ns="          "Learn as ham and save"</pre>
 
     <p>These will pipe the selected message through bogofilter,
     training a false-ham as spam or vice versa, then offer to save the
     message to a different folder.</p>
+
+    <hr>
+
+    <h2 id="with-qmail">How do I use bogofilter with qmail?</h2>
+
+    <p>If you're using qmail, run the following commands to add
+    bogofilter to your tool chain:</p>
+
+<pre>    su -m qmailq
+    cd
+    mkdir .bogofilter
+    cd bin
+    cp -p qmail-queue qmail-queue.orig
+    cat > qmail-queue
+    #!/bin/sh
+    HOME=/var/qmail
+    export HOME
+    /usr/local/bin/bogofilter -p -u -e | /var/qmail/bin/qmail-queue.orig
+    ^D
+    chmod 4711 qmail-queue</pre>
 
     <hr>
 
@@ -1395,29 +1416,28 @@
     action:
     * move "#mh/YOUR_SPAM_BOX"</pre>
 
-    <p>Note: this assumes that bogofilter is in your
-    path!</p>
+    <p>Note: this assumes that bogofilter is in your path!</p>
 
     <p> Create two Claws actions - one for marking messages as spam
     and one for marking messages as ham.  Use the "Mark As Spam"
     action for messages incorrectly classified as ham and use the "Mark As Ham"
     action for messages incorrectly classified as spam.</p>
 
-    <pre>    Mark as ham / spam:
+<pre>    Mark as ham / spam:
     * bogofilter -n -v -B "%f" (mark ham)
     * bogofilter -s -v -B "%f" (mark spam)</pre>
 
     <p>Another approach is to save incorrectly classified messages in
     a folder (or folders) and run a script like:</p>
 
-<pre>        #!/bin/sh
-        CONFIGDIR=~/.bogofilter
-        SPAMDIRS="$CONFIGDIR/spamdirs"
-        MARKFILE="$CONFIGDIR/lastbogorun"
-        for D in `cat "$SPAMDIRS"`; do
-          find "$D" -type f -newer "$MARKFILE" -not -name ".sylpheed*"
-        done|bogofilter -bNsv
-        touch "$MARKFILE"</pre>
+<pre>    #!/bin/sh
+    CONFIGDIR=~/.bogofilter
+    SPAMDIRS="$CONFIGDIR/spamdirs"
+    MARKFILE="$CONFIGDIR/lastbogorun"
+    for D in `cat "$SPAMDIRS"`; do
+        find "$D" -type f -newer "$MARKFILE" -not -name ".sylpheed*"
+    done|bogofilter -bNsv
+    touch "$MARKFILE"</pre>
 
     <p>This script can be used as an action and/or made into a toolbar
     button.  It will register as spam the messages in ${SPAMDIRS} that

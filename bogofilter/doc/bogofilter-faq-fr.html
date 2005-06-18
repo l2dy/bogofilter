@@ -369,7 +369,7 @@
     Le script génère une liste de tous les messages dans les mailbox, mélange la liste, puis
     évalue chaque message, suiv d'un entrainement si nécessaire. Dans notre exemple:</p>
 
-    <pre>     randomtrain -s spam.mbx -n ham.mbx </pre>
+    <pre>    randomtrain -s spam.mbx -n ham.mbx </pre>
 
     <p>Comme pour la méthode 4, cela fonctionne mieux si vous commencer avec un corpus
     d'entrainement de plusieurs milliers de messages. Ceci vous donnera une base de données
@@ -382,34 +382,34 @@
     donne la meilleure méthode possible de discrimination. Voici deux petits scripts qui peuvent
     être utilisés pour classifier les messages "mauvais élèves".</p>
 
-    <pre> 	#! /bin/sh
-	#  class3 -- classe un message en mauvais, bon ou incertain
-	cat &gt;msg.$$
-	bogofilter $* &lt;msg.$$
-	res=$?
-	if [ $res = 0 ]; then
-	    cat msg.$$ &gt;&gt;corpus.bad
-	elif [ $res = 1 ]; then
-	    cat msg.$$ &gt;&gt;corpus.good
-	elif [ $res = 2 ]; then
-	    cat msg.$$ &gt;&gt;corpus.unsure
-	fi
-	rm msg.$$</pre>
+    <pre>    #! /bin/sh
+    #  class3 -- classe un message en mauvais, bon ou incertain
+    cat &gt;msg.$$
+    bogofilter $* &lt;msg.$$
+    res=$?
+    if [ $res = 0 ]; then
+        cat msg.$$ &gt;&gt;corpus.bad
+    elif [ $res = 1 ]; then
+        cat msg.$$ &gt;&gt;corpus.good
+    elif [ $res = 2 ]; then
+        cat msg.$$ &gt;&gt;corpus.unsure
+    fi
+    rm msg.$$</pre>
 
-     <pre>	#! /bin/sh
-	# classify -- Place tous les messages dans un fichier mbox à l'aide de class3
-	src=$1;
-	shift
-	formail -s class3 $* &lt;$src</pre>
+     <pre>    #! /bin/sh
+    # classify -- Place tous les messages dans un fichier mbox à l'aide de class3
+    src=$1;
+    shift
+    formail -s class3 $* &lt;$src</pre>
 
     <p>Dans notre exemple (après l'entrainement initial):</p>
 
-    <pre>	classify spam.mbx [bogofilter options]
+    <pre>    classify spam.mbx [bogofilter options]
         bogofilter -s &lt; corpus.good
         rm -f corpus.*
         classify ham.mbx [bogofilter options]
         bogofilter -n &lt; corpus.bad
-	rm -f corpus.*</pre></li>
+    rm -f corpus.*</pre></li>
     </ul>
     <h3>Comparaison de ces méthodes</h3>
     <p>Il est important de comprendre les conséquences des méthodes que
@@ -480,7 +480,7 @@
     <hr>
 
     <h2 id="mboxformats">Quels formats de fichier Bogofilter
-	comprend-il?</h2>
+    comprend-il?</h2>
 
     <p>Bogofilter comprend les formats mbox traditionnel, Maildir et MH.
     Bogofilter ne soutient pas des sous-répertoires, vous devrez
@@ -609,19 +609,19 @@
     SPAM_CUTOFF sont étiquetés "unsure". Si vous regardez le fichier bogofilter.cf,
     vous verrez les lignes suivantes :</p>
 
-    <pre>	#### CUTOFF Values
-	#
-	#	both ham_cutoff and spam_cutoff are allowed.
-	#	setting ham_cutoff to a non-zero value will
-	#	enable tri-state results (Spam/Ham/Unsure).
-	#
-	#ham_cutoff  = 0.45
-	#spam_cutoff = 0.99
-	#
-	#	for two-state classification:
-	#
-	## ham_cutoff = 0.00
-	## spam_cutoff= 0.99</pre>
+    <pre>    #### CUTOFF Values
+    #
+    #    both ham_cutoff and spam_cutoff are allowed.
+    #    setting ham_cutoff to a non-zero value will
+    #    enable tri-state results (Spam/Ham/Unsure).
+    #
+    #ham_cutoff  = 0.45
+    #spam_cutoff = 0.99
+    #
+    #    for two-state classification:
+    #
+    ## ham_cutoff = 0.00
+    ## spam_cutoff= 0.99</pre>
 
     <p>Pour activer la classification Yes/No/Unsure, enlevez les dièses devant les
     deux dernières lignes.</p>
@@ -629,29 +629,29 @@
     <p>Alternativement, si vous préférez utiliser les labels Yes/No/Unsure
     au lieu de Spam/Ham/Unsure, enlevez les dièses devant la ligne :
 
-    <pre>	## spamicity_tags = Yes, No, Unsure</pre>
+    <pre>    ## spamicity_tags = Yes, No, Unsure</pre>
 
     <p>Une fois que cela est fait, vous pourrez inclure les règles de filtrage
     suivantes pour votre outil de messagerie:</p>
 
-    <pre>	if header contains "X-Bogosity: Spam", put in Spam folder
-	if header contains "X-Bogosity: Unsure", put in Unsure folder</pre>
+    <pre>    if header contains "X-Bogosity: Spam", put in Spam folder
+    if header contains "X-Bogosity: Unsure", put in Unsure folder</pre>
 
     <p>De plus, bogofilter.cf possède des directives pour modifier
     la ligne Sujet:, par exemple.</p>
 
-    <pre>	#### SPAM_SUBJECT_TAG
-	#
-	#	tag added to "Subject: " line for identifying spam or unsure
-	#	default is to add nothing.
-	#
-	##spam_subject_tag=***SPAM***
-	##unsure_subject_tag=???UNSURE???</pre>
+    <pre>    #### SPAM_SUBJECT_TAG
+    #
+    #	tag added to "Subject: " line for identifying spam or unsure
+    #    default is to add nothing.
+    #
+    ##spam_subject_tag=***SPAM***
+    ##unsure_subject_tag=???UNSURE???</pre>
 
     <p>Avec de tels marqueurs, les règles de filtrage ressembleraient à ceci:</p>
 
-    <pre>	if subject contains "***SPAM***", put in Spam folder
-	if subject contains "???UNSURE???", put in Unsure folder</pre>
+    <pre>    if subject contains "***SPAM***", put in Spam folder
+    if subject contains "???UNSURE???", put in Unsure folder</pre>
 
     <hr>
 
@@ -726,29 +726,29 @@
     tester l'état du code de retour spam/ham, et lancer Bogofilter
     pour valider le message. Le script procmail ci-dessous est un
     moyen de le faire:</p>
-    <pre>	BOGOFILTER     = "/usr/bin/bogofilter"
-	BOGOFILTER_DIR = "training"
-	SPAMASSASSIN  = "/usr/bin/spamassassin"
+    <pre>    BOGOFILTER     = "/usr/bin/bogofilter"
+    BOGOFILTER_DIR = "training"
+    SPAMASSASSIN  = "/usr/bin/spamassassin"
 
-	:0 HBc
-	* ? $SPAMASSASSIN -e
-	#spam yields non-zero
-	#non-spam yields zero
-	| $BOGOFILTER -n -d $BOGOFILTER_DIR
-	#else (E)
-	:0Ec
-	| $BOGOFILTER -s -d $BOGOFILTER_DIR
+    :0 HBc
+    * ? $SPAMASSASSIN -e
+    #spam yields non-zero
+    #non-spam yields zero
+    | $BOGOFILTER -n -d $BOGOFILTER_DIR
+    #else (E)
+    :0Ec
+    | $BOGOFILTER -s -d $BOGOFILTER_DIR
 
-	:0fw
-	| $BOGOFILTER -p -e
+    :0fw
+    | $BOGOFILTER -p -e
 
-	:0:
-	* ^X-Bogosity:.Spam
-	spam
+    :0:
+    * ^X-Bogosity:.Spam
+    spam
 
-	:0:
-	* ^X-Bogosity:.Ham
-	non-spam</pre>
+    :0:
+    * ^X-Bogosity:.Ham
+    non-spam</pre>
 
     <hr>
 
@@ -796,16 +796,16 @@
 
       <li>
 	<pre>## Efface silencieusement tous les mails en langue asiatique
-	UNREADABLE='[^?"]*big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987'
-	:0:
-	* 1^0 $ ^Subject:.*=\?($UNREADABLE)
-	* 1^0 $ ^Content-Type:.*charset="?($UNREADABLE)
-	spam-unreadable
+    UNREADABLE='[^?"]*big5|iso-2022-jp|ISO-2022-KR|euc-kr|gb2312|ks_c_5601-1987'
+    :0:
+    * 1^0 $ ^Subject:.*=\?($UNREADABLE)
+    * 1^0 $ ^Content-Type:.*charset="?($UNREADABLE)
+    spam-unreadable
 
-	:0:
-	* ^Content-Type:.*multipart
-	* B ?? $ ^Content-Type:.*^?.*charset="?($UNREADABLE)
-	spam-unreadable</pre>
+    :0:
+    * ^Content-Type:.*multipart
+    * B ?? $ ^Content-Type:.*^?.*charset="?($UNREADABLE)
+    spam-unreadable</pre>
 
         <p>Avec un tel programme, Bogofilter ne verra <i>jamais</i>
         le message.</p>
@@ -820,14 +820,14 @@
     d'estpace disque. En supposant que votre base de mots se trouve dans le répertoire
     ~/.bogofilter, pour bogofilter 0.93.0 (ou plus récent) tapez :</p>
 
-    <pre>	bf_compact ~/.bogofilter wordlist.db</pre>
+    <pre>    bf_compact ~/.bogofilter wordlist.db</pre>
 
     <p>Pour un bogofilter antérieur à 0.93.0, tapez:</p>
 
-    <pre>	cd ~/.bogofilter
-	bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
-	mv wordlist.db wordlist.db.prv
-	mv wordlist.db.new wordlist.db</pre>
+    <pre>    cd ~/.bogofilter
+    bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
+    mv wordlist.db wordlist.db.prv
+    mv wordlist.db.new wordlist.db</pre>
 
     <p>Ce script est nécessaire pour dupliquer votre environnement de
     base de données (afin de supporter le traitement des transactions en
@@ -876,15 +876,15 @@
 
     <p>Si vous pensez que vos listes de mots ont été dégradées,
     vous pouvez regarder ce qu'en dit BerkeleyDB en lançant:</p>
-    <pre>	db_verify wordlist.db</pre>
+    <pre>    db_verify wordlist.db</pre>
 
     <p>S'il y a un problème, vous pouvez récupérer tout ou partie
     des tokens et leur nombre avec la commande suivante:</p>
-    <pre>	bogoutil -d wordlist.db | bogoutil -l wordlist.db.new</pre>
+    <pre>    bogoutil -d wordlist.db | bogoutil -l wordlist.db.new</pre>
 
     <p>ou - si la liste ne pourrait pas être récupérée par la
     commande précédente - avec:</p>
-    <pre>	db_dump -r wordlist.db &gt; wordlist.txt
+    <pre>    db_dump -r wordlist.db &gt; wordlist.txt
     db_load wordlist.new &lt; wordlist.txt</pre>
 
     <hr>
@@ -994,13 +994,13 @@
     Nous vous suggérons de lire complètement le paragraphe.</p>
 
     <p>En résumé, utilisez ces commandes:
-    <pre>	cd ~/.bogofilter
-	bogoutil -d wordlist.db &gt; wordlist.txt
-	mv wordlist.db wordlist.db.old
-	bogoutil --db-transaction=yes -l wordlist.db &lt; wordlist.txt</pre>
+    <pre>    cd ~/.bogofilter
+    bogoutil -d wordlist.db &gt; wordlist.txt
+    mv wordlist.db wordlist.db.old
+    bogoutil --db-transaction=yes -l wordlist.db &lt; wordlist.txt</pre>
 
     <p>Si tout ce passe bien, vous pouvez enlever les fichiers de sauvegarde:</p>
-    <pre>	rm wordlist.db.old wordlist.txt</pre>
+    <pre>    rm wordlist.db.old wordlist.txt</pre>
     <hr>
 
     <h2 id="disable-transactions">Comment passer du mode transactionnel au mode
@@ -1012,11 +1012,11 @@
 
     <p>En résumé, vous pouvez utiliser bogoutil pour copier et recharger la base de mots,
     par exemple :
-    <pre>	cd ~/.bogofilter
-	bogoutil -d wordlist.db &gt; wordlist.txt
-	mv wordlist.db wordlist.db.old
-	rm -f log.?????????? __db.???
-	bogoutil --db-transaction=no -l wordlist.db &lt; wordlist.txt</pre>
+    <pre>    cd ~/.bogofilter
+    bogoutil -d wordlist.db &gt; wordlist.txt
+    mv wordlist.db wordlist.db.old
+    rm -f log.?????????? __db.???
+    bogoutil --db-transaction=no -l wordlist.db &lt; wordlist.txt</pre>
 
     <hr>
 
@@ -1052,13 +1052,13 @@
     apparaissent.</p>
 
     <p>Pour voir la taille utilisée par la base de données:</p>
-    <pre>	ls -lh $BOGOFILTER_DIR/wordlist.db</pre>
+    <pre>    ls -lh $BOGOFILTER_DIR/wordlist.db</pre>
 
     <p>Pour voir la taille limite avec postfix:</p>
-    <pre>	postconf | grep mailbox_size_limit</pre>
+    <pre>    postconf | grep mailbox_size_limit</pre>
 
     <p>Pour positionner la taille limite à 73MB (ou n'importe quelle taille appropriée):</p>
-    <pre>	postconf -e mailbox_size_limit=73000000</pre>
+    <pre>    postconf -e mailbox_size_limit=73000000</pre>
 
     <p>Si vous pensez que votre base de données est corrompue, lisez le point
     <a href="#rescue">Comment faire si ma liste de mots est corroumpue?</a>
@@ -1199,9 +1199,9 @@
 
        <p>Les commandes suivantes vont détruire les tokens provenant des
        messages hams.</p>
-   <pre>	bogoutil -d wordlist.db | \
-	awk '{print $1 " 0 " $3}' | grep -v " 0 0" | \
-	bogoutil -l wordlist.new.db
+   <pre>    bogoutil -d wordlist.db | \
+    awk '{print $1 " 0 " $3}' | grep -v " 0 0" | \
+    bogoutil -l wordlist.new.db
    </pre>
 
     <hr>
@@ -1215,10 +1215,10 @@
 	(prenez une des 4.2.X)</a>,
     décompactez la, et lancez les commandes suivantes dans le
     répertoire 'dist':</p>
-<pre>	$ cd build_unix
-	$ sh ../dist/configure
-	$ make
-	# make install</pre>
+<pre>    $ cd build_unix
+    $ sh ../dist/configure
+    $ make
+    # make install</pre>
 
     <p>Puis, téléchargez la <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">version
     portable</a> de Bogofilter.</p>
@@ -1226,16 +1226,16 @@
     <h3>Sur Solaris</h3>
 
     <p>Décompactez la, puis faites:</p>
-    <pre>	$ ./configure --with-libdb-prefix=/usr/local/BerkeleyDB-4.2
-	$ make
-	# make install-strip</pre>
+    <pre>    $ ./configure --with-libdb-prefix=/usr/local/BerkeleyDB-4.2
+    $ make
+    # make install-strip</pre>
 
     <p>Vous pourrez alors, soit mettre un lien symbolique sur
     libdb.so dans /usr/lib, ou utiliser une version modifiée de la
     variable d'environnement LD_LIBRARY_PATH avant de lancer
     Bogofilter.</p>
-    <pre>	$ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.2
-    	$ export LD_LIBRARY_PATH</pre>
+    <pre>    $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.2
+        $ export LD_LIBRARY_PATH</pre>
 
     <p>Notez que que certaines versions de make livrées avec
     Solaris bugguent quand vous essayez de compiler Bogofilter hors
@@ -1250,13 +1250,13 @@
     recommandés portupgrade et cvsup. Pour installer ces deux
     magnifiques outils (vous n'avez besoin de le faire qu'une seule
     fois):</p>
-    <pre>	# pkg_add -r portupgrade cvsup</pre>
+    <pre>    # pkg_add -r portupgrade cvsup</pre>
 
     <p>Pour installer ou mettre à jour Bogofilter, il suffit de
     mettre à jour <a href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html">
     l'arbre de conversion (ports tree) avec cvsup</a> puis de
     taper</p>
-    <pre>	# portupgrade -N bogofilter</pre>
+    <pre>    # portupgrade -N bogofilter</pre>
 
     <p><em>Note: Ceci suppose que vous soyez root.</em> Sinon, lisez
     le mémento sur la section FreeBSC, et regardez comment
@@ -1265,7 +1265,7 @@
     <p>Suivant votre système, vous pourrez avoir à positionner certaines variables
     d'environnement pour la commande <code>./configure</code>. Exemple:</p>
 
-    <pre>	# env CPPFLAGS=-I/usr/local/include/db3 LIBS=-ldb3 LDFLAGS=-L/usr/local/lib ./configure</pre>
+    <pre>    # env CPPFLAGS=-I/usr/local/include/db3 LIBS=-ldb3 LDFLAGS=-L/usr/local/lib ./configure</pre>
 
     <p>Les chemins dépendent de votre système et des versions
     de bases de données que vous avez installées. Vérifiez et remplacez en conséquence.</p>
@@ -1354,16 +1354,16 @@
 
     <hr>
 
-    <h2 id="with-mutt">Comment utiliser Bogofilter avec mutt?</h2>
+    <h2 id="with-mutt">Comment utiliser Bogofilter avec Mutt?</h2>
 
     <p>Utilisez a filtre mail (procmail, maildrop, etc.) pour aiguiller le mail
     dans différents dossiers suivant le code de retour de Bogofilter, et associez
     les touches pour entrainer Bogofilter sur les erreurs :</p>
 
-<pre>        macro index S "|bogofilter -s\ns=junkmail"  "Apprendre comme spam et sauvegarder dans junk"
-        macro pager S "|bogofilter -s\ns=junkmail"  "Apprendre comme spam et sauvegarder dans junk"
-        macro index H "|bogofilter -n\ns="          "Apprendre comme spam et sauvegarder"
-        macro pager H "|bogofilter -n\ns="          "Apprendre comme spam et sauvegarder"</pre>
+    <pre>    macro index S "|bogofilter -s\ns=junkmail"  "Apprendre comme spam et sauvegarder dans junk"
+    macro pager S "|bogofilter -s\ns=junkmail"  "Apprendre comme spam et sauvegarder dans junk"
+    macro index H "|bogofilter -n\ns="          "Apprendre comme spam et sauvegarder"
+    macro pager H "|bogofilter -n\ns="          "Apprendre comme spam et sauvegarder"</pre>
 
     <p>Ceci enverra les messages sélectionnés dans Bogofilter, enseignant les faux-ham en
     spam et vice-versa, puis proposera la sauvegarde dans un dossier différent.</p>
@@ -1394,14 +1394,14 @@
     <p>Une autre approche est de sauvegarder les messages incorrectement classés
     dans un dossier (ou plusieurs) et de lancer un script tel que:</p>
 
-<pre>        #!/bin/sh
-        CONFIGDIR=~/.bogofilter
-        SPAMDIRS="$CONFIGDIR/spamdirs"
-        MARKFILE="$CONFIGDIR/lastbogorun"
-        for D in `cat "$SPAMDIRS"`; do
-          find "$D" -type f -newer "$MARKFILE" -not -name ".sylpheed*"
-        done|bogofilter -bNsv
-        touch "$MARKFILE"</pre>
+    <pre>    #!/bin/sh
+    CONFIGDIR=~/.bogofilter
+    SPAMDIRS="$CONFIGDIR/spamdirs"
+    MARKFILE="$CONFIGDIR/lastbogorun"
+    for D in `cat "$SPAMDIRS"`; do
+        find "$D" -type f -newer "$MARKFILE" -not -name ".sylpheed*"
+    done|bogofilter -bNsv
+    touch "$MARKFILE"</pre>
 
     <p>Ce script peut-être utilisez comme une action ou transformé comme un bouton.
     Ceci enregistrera comme spam, les messages dans ${SPAMDIRS} qui sont plus récents que
