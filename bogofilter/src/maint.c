@@ -188,6 +188,7 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 	xfree(new_token.text);
     }
 
+#ifndef	DISABLE_UNICODE
     if (old_encoding != new_encoding)
     {
 	buff_t new_buff;
@@ -217,6 +218,7 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 
 	xfree(new_buff.t.text);
     }
+#endif
 
     if (upgrade_wordlist_version)
     {
@@ -276,6 +278,7 @@ static ex_t maintain_wordlist(void *database)
     userdata.transaction = transaction;
 
     if (DST_OK == ds_txn_begin(database)) {
+#ifndef	DISABLE_UNICODE
 	dsv_t val;
 	ds_get_wordlist_encoding(database, &val);
 	old_encoding = val.spamcount;
@@ -285,6 +288,7 @@ static ex_t maintain_wordlist(void *database)
 	    const char *to_charset   = (new_encoding == E_RAW) ? "iso-8859-1" : "utf-8";
 	    init_charset_table_iconv(from_charset, to_charset);
 	}
+#endif
 	ret = ds_foreach(database, maintain_hook, &userdata);
     } else
 	ret = EX_ERROR;
@@ -329,6 +333,7 @@ ex_t maintain_wordlist_file(bfpath *bfp)
 
     rc = maintain_wordlist(dsh);
 
+#ifndef	DISABLE_UNICODE
     if (old_encoding != new_encoding) {
 	dsv_t val;
 	word_t enco;
@@ -341,6 +346,7 @@ ex_t maintain_wordlist_file(bfpath *bfp)
 
 	ds_write(dsh, &enco, &val);
     }
+#endif
 
     ds_close(dsh);
     ds_cleanup(dbe);
