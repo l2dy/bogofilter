@@ -204,6 +204,7 @@
     <a href="http://www.catb.org/~esr/jargon/html/B/bogosity.html">(bogosity)</a>.</p>
 
     <hr>
+
     <h2 id="bogo-how">Comment fonctionne Bogofilter?</h2>
 
     <p>Jetez d'abord un oeil sur la section
@@ -320,7 +321,9 @@
     </table>
 
     <hr>
+
     <h2 id="training">Comment débuter l'apprentissage de Bogofilter?</h2>
+
     <p>Pour classifier les messages comme ham ou spam, Bogofilter
     a besoin d'apprendre votre courrier. Pour commencer, le mieux est d'avoir
     un corpus (aussi large que possible) de messages dont vous êtes sûr de
@@ -335,23 +338,24 @@
     choix possibles. Dans tous les cas, cela fonctionnera mieux si votre base
     d'apprentissage (les corpus ci-dessus) est conséquente. Plus un corpus est
     petit, plus grand sera le nombre d'erreurs que fera Bogofilter en production. Supposons
-    que vos corpus se trouvent dans deux fichiers mbox: ham.mbx et spam.mbx.</p>
+    que vos corpus se trouvent dans deux fichiers mbox: ham.mbox et spam.mbox.</p>
 
     <ul>
     <li><p>Méthode 1) Entrainement complet: Entraînez Bogofilter avec tous vos messages. Dans notre
     example:</p>
-    <pre>    bogofilter -s &lt; spam.mbx
-    bogofilter -n &lt; ham.mbx</pre></li>
 
+    <pre>    bogofilter -s &lt; spam.mbox
+    bogofilter -n &lt; ham.mbox</pre></li>
     </ul>
+
     <p>Note: Le répertoire contrib de Bogofilter contient deux scripts qui tous les deux utilisent une
     technique d'entrainement sur erreur. Cette technique évalue chaque message et n'ajoute à la
     base de données que les messages qui ont été mal évalués (messages marqués comme incertains, ham
     évalués en tant que spam ou inversement). Le but est de créer une base de données des mots réellement
     <em>nécessaires</em> pour classer correctement les messages. La base de données résultante est plus
     petite que celle de l'entrainement complet.</p>
-    <ul>
 
+    <ul>
     <li><p>Méthode 2) Utilisez le script  bogominitrain.pl (dans le répertoire contrib).
     Il évalue les messages le même ordre que vos fichiers mailbox. Vous devriez utiliser
     l'option -f qui va demander au script de répéter le travail, jusqu'à ce que tous
@@ -364,13 +368,13 @@
     Avec spam_cutoff=0.6 vous voudrez peut-être évaluer tous les hams
     dans votre corpus en dessous de 0.3 et tous les spams au delà de 0.9. Notre exemple devient:</p>
 
-    <pre>    bogominitrain.pl -fnv ~/.bogofilter ham.mbx spam.mbx '-o 0.9,0.3'</pre></li>
+    <pre>    bogominitrain.pl -fnv ~/.bogofilter ham.mbox spam.mbox '-o 0.9,0.3'</pre></li>
 
     <li><p>Méthode 3) Utilisez le script randomtrain (dans le répertoire contrib).
     Le script génère une liste de tous les messages dans les mailbox, mélange la liste, puis
     évalue chaque message, suiv d'un entrainement si nécessaire. Dans notre exemple:</p>
 
-    <pre>    randomtrain -s spam.mbx -n ham.mbx </pre>
+    <pre>    randomtrain -s spam.mbox -n ham.mbox</pre>
 
     <p>Comme pour la méthode 4, cela fonctionne mieux si vous commencer avec un corpus
     d'entrainement de plusieurs milliers de messages. Ceci vous donnera une base de données
@@ -397,7 +401,7 @@
     fi
     rm msg.$$</pre>
 
-     <pre>    #! /bin/sh
+    <pre>    #! /bin/sh
     # classify -- Place tous les messages dans un fichier mbox à l'aide de class3
     src=$1;
     shift
@@ -405,14 +409,16 @@
 
     <p>Dans notre exemple (après l'entrainement initial):</p>
 
-    <pre>    classify spam.mbx [bogofilter options]
-        bogofilter -s &lt; corpus.good
-        rm -f corpus.*
-        classify ham.mbx [bogofilter options]
-        bogofilter -n &lt; corpus.bad
+    <pre>    classify spam.mbox [bogofilter options]
+    bogofilter -s &lt; corpus.good
+    rm -f corpus.*
+    classify ham.mbox [bogofilter options]
+    bogofilter -n &lt; corpus.bad
     rm -f corpus.*</pre></li>
     </ul>
+
     <h3>Comparaison de ces méthodes</h3>
+
     <p>Il est important de comprendre les conséquences des méthodes que
     nous venons de décrire. Faire un entrainement complet, tel que dans les
     méthodes 1 et 4 produit une base de données plus grande que ne le
@@ -427,6 +433,7 @@
     <hr>
 
     <h2 id="production">Comment puis-je conserver une bonne acuité?</h2>
+
     <p>Bogofilter fera des erreurs de temps en temps. C'est pourquoi un
     apprentissage régulier est important. Il existe principalement deux méthodes pour le faire.
     Premièrement, vous pouvez l'entraîner avec chaque nouveau message (en utilisant l'option
@@ -448,9 +455,9 @@
     l'inconvénient de dégrader la base d'entrainement avec des entrées erronées. Vous aurez alors
     besoin de la regarder et la corriger fréquemment.
     La correction peut être faite en utilisant <code>-Sn</code> pour changer la classification du message
-    de spam en ham et <code>-Ns</code> pour changer de ham en spam.
+    de spam en ham et <code>-Ns</code> pour changer de ham en spam.</p>
 
-    </p><p>Corriger un message incorrectement classé peut affecter la classification d'autres
+    <p>Corriger un message incorrectement classé peut affecter la classification d'autres
     messages. Plus votre base de données sera petite, plus grande sera la probabilité qu'une
     erreur d'apprentissage créee des classifications incorrectes.</p>
 
@@ -465,18 +472,18 @@
     les erreurs, puis séparer les incertains en hams et spam. Jusqu'à ce que vous ayez 10000 spams et 10000 hams
     dans votre base d'apprentissage, entraînez avec les hams, les spams, puis les erreurs et enfin les incertains.
     Plus tard, vous n'entrainerez qu'avec les erreurs et les incertains, en ignorant les messagess que Bogofilter
-    a correctement classé.
-    </p>
+    a correctement classé.</p>
 
     <p>Notez que vous devrez régulièrement lancer:</p>
 
     <pre>    bogoutil -d wordlist.db | bogoutil -l wordlist.db.new
     mv wordlist.db wordlist.db.prv
     mv wordlist.db.new wordlist.db</pre>
-    <p>ou pour les fichiers spamlist.db et goodlist.db (si vous utilisez Bogofilter avec
-    les listes de mots séparés). Ceci compressera les bases de données pour n'occuper que le
-    minimum d'espace disque nécessaire.
-    </p>
+
+    <p>ou pour les fichiers spamlist.db et goodlist.db (si vous
+    utilisez Bogofilter avec les listes de mots séparés). Ceci
+    compressera les bases de données pour n'occuper que le minimum
+    d'espace disque nécessaire.</p>
 
     <hr>
 
@@ -495,7 +502,7 @@
 
     <p>La liste suivante pourrait vous aider:</p>
 
-    <dl><dt>format UW-IMAP/PINE mbx</dt><dd>convertir en mbox: <kbd>mailtool copy /full/path/to/mail.mbx
+    <dl><dt>format UW-IMAP/PINE mbx</dt><dd>convertir en mbox: <kbd>mailtool copy /full/path/to/mail.mbox
 	    '#driver.unix//full/path/to/mbox'</kbd></dd></dl>
 
     <hr>
@@ -516,18 +523,18 @@
       <li>
         En utilisant "-vv" Bogofilter génère un histogramme, par
         exemple
-<pre>  X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
-          int  cnt    prob   spamicity  histogram
-         0.00   29  0.000209  0.000052  #############################
-         0.10    2  0.179065  0.003425  ##
-         0.20    2  0.276880  0.008870  ##
-         0.30   18  0.363295  0.069245  ##################
-         0.40    0  0.000000  0.069245
-         0.50    0  0.000000  0.069245
-         0.60   37  0.667823  0.257307  #####################################
-         0.70    5  0.767436  0.278892  #####
-         0.80   13  0.836789  0.334980  #############
-         0.90   32  0.984903  0.499835  ################################</pre>
+<pre>    X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
+      int  cnt    prob   spamicity  histogram
+     0.00   29  0.000209  0.000052  #############################
+     0.10    2  0.179065  0.003425  ##
+     0.20    2  0.276880  0.008870  ##
+     0.30   18  0.363295  0.069245  ##################
+     0.40    0  0.000000  0.069245
+     0.50    0  0.000000  0.069245
+     0.60   37  0.667823  0.257307  #####################################
+     0.70    5  0.767436  0.278892  #####
+     0.80   13  0.836789  0.334980  #############
+     0.90   32  0.984903  0.499835  ################################</pre>
 
         <p>Chaque ligne présente un intervalle, le nombre de tokens
         (N.D.T. élément minimal pour le traitement, généralement un
@@ -845,6 +852,7 @@
     de Bogofilter.</p>
 
     <hr>
+
     <h2 id="query-database">Comment faire une requête manuelle sur
     la base?</h2>
 
@@ -980,6 +988,7 @@
     <hr>
 
     <h2 id="update">Comment puis-je faire pour transformer la base des
+
     mots séparé dans le nouveau format combiné?</h2>
 
     <p>Lancez le script bogoupgrade. Pour plus d'informations
@@ -987,7 +996,9 @@
     et lisez la page manuel.</p>
 
     <hr>
+
     <h2 id="enable-transactions">Comment passer du mode non-transactionnel au
+
     mode transactionnel?</h2>
 
     <p>La procédure est complètement documentée dans le fichier
@@ -1005,6 +1016,7 @@
     <hr>
 
     <h2 id="disable-transactions">Comment passer du mode transactionnel au mode
+
     non transactionnel?</h2>
 
     <p>La procédure est complètement documentée dans le fichier
@@ -1042,6 +1054,7 @@
     <p>pour reconstruire la table de verrouillage.</p>
 
     <hr>
+
     <h2 id="page-notfound">Comment se fait-il que j'obtienne des messages DB_PAGE_NOTFOUND?</h2>
 
     <p>Vous avez certainement un problème avec votre base de données BerkeleyDB. Il y
@@ -1066,7 +1079,9 @@
     de la FAQ.</p>
 
     <hr>
+
     <h2 id="db-private">Pourquoi obtient-on &quot;Berkeley DB
+
 	      library configured to support only DB_PRIVATE
 	      environments&quot; ou<br>
 
@@ -1105,6 +1120,7 @@
 	  </ol>
 
 	<hr>
+
     <h2 id="multi-user">Bogofilter peut-il fonctionner en environnement multi-utilisateurs?</h2>
 
     <p>Oui, il peut. Il existe de multiples stratégies pour le faire. les deux extrêmes sont:</p>
@@ -1123,6 +1139,7 @@
     la liste des mots privée.</p>
 
     <hr>
+
     <h2 id="nfs">Puis-je partager une liste de mots par NFS?</h2>
 
     <p>Si vous ne faites que les lire, il n'y a pas de problème.
@@ -1172,6 +1189,7 @@
 
       <h2 id="changed-tagging">Pourquoi, depuis que j'ai changé de version,
        Bogofilter fonctionne-t-il moins bien?</h2>
+
       <p>Le lexer, la partie qui extrait les tokens des messages, évolue. Ceci
       occasionne une modification de la génération de la liste des tokens, qui, par contrecoups
       va rendre des anciens tokens inutilisés.</p>
@@ -1182,6 +1200,7 @@
       et lire la documentation qui va avec pour voir comment migrer.</p>
 
       <hr>
+
       <h2 id="remove-spam-or-nonspam"> Avec une wordlist combinée, comment
           puis-je détruire tous les tokens spams (ou les non-spams)?</h2>
 
@@ -1300,9 +1319,9 @@
     <p>Pour installer Bogofilter dans un répertoire non standard (en tant qu'utilisateur
     non-root vous n'avez pas les permissions pour les répertoires normaux), vous
     aurez besoin de préciser le préfixe d'installation quand vous lancerez
-     <code>./configure</code>.
+    <code>./configure</code>.</p>
 
-    </p><p> Après avoir télécharger et décompacter <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">
+    <p> Après avoir télécharger et décompacter <a href="http://sourceforge.net/project/showfiles.php?group_id=62265">
     le code source</a>, lancez <code>./configure --prefix=PATH</code> où
     PATH est le préfixe d'installation pour les fichiers générés (binaires, manuel, etc.)
     Puis lancez les commandes habituelles &#8212;
@@ -1322,9 +1341,9 @@
     où
     PATH est le préfixe d'installation pour les fichiers générés (binaires, manuel, etc.)
     Puis, après avoir appliqué les correctifs, lancez les commandes habituelles &#8212;
-    <code>make &amp;&amp; make install</code>.
+    <code>make &amp;&amp; make install</code>.</p>
 
-    </p><hr>
+    <hr>
 
     <h2 id="smaller">Comment rendre les exécutables plus petits?</h2>
 
@@ -1335,6 +1354,7 @@
     ne soient fournies aux développeurs.</p>
 
     <hr>
+
     <h2 id="relativepath">datastore_db.c ne se compile pas!</h2>
 
     <p>Si vous configurez le chemin de la base de données avec, par exemple,
@@ -1373,7 +1393,7 @@
 
     <h2 id="with-qmail">Comment utiliser Bogofilter avec Qmail?</h2>
 
-    <p>Si vou utiliser ici une méthode:</p>
+    <p>Si vou utiliser qmail, ici une méthode:</p>
 
 <pre>    su -m qmailq
     cd

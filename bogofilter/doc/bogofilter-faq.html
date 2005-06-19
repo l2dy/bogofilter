@@ -494,7 +494,7 @@
     <p>The following list may be able help you:</p>
     <dl>
       <dt>UW-IMAP/PINE mbx format</dt><dd>To convert to mbox:
-      <kbd>mailtool copy /full/path/to/mail.mbx '#driver.unix//full/path/to/mbox'</kbd></dd>
+      <kbd>mailtool copy /full/path/to/mail.mbox '#driver.unix//full/path/to/mbox'</kbd></dd>
     </dl>
 
     <hr>
@@ -513,18 +513,18 @@
 
       <li>
         Using "-vv" causes bogofilter to generate a histogram, i.e.
-        <pre>    X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
-            int  cnt    prob   spamicity  histogram
-           0.00   29  0.000209  0.000052  #############################
-           0.10    2  0.179065  0.003425  ##
-           0.20    2  0.276880  0.008870  ##
-           0.30   18  0.363295  0.069245  ##################
-           0.40    0  0.000000  0.069245
-           0.50    0  0.000000  0.069245
-           0.60   37  0.667823  0.257307  #####################################
-           0.70    5  0.767436  0.278892  #####
-           0.80   13  0.836789  0.334980  #############
-           0.90   32  0.984903  0.499835  ################################</pre>
+<pre>    X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
+      int  cnt    prob   spamicity  histogram
+     0.00   29  0.000209  0.000052  #############################
+     0.10    2  0.179065  0.003425  ##
+     0.20    2  0.276880  0.008870  ##
+     0.30   18  0.363295  0.069245  ##################
+     0.40    0  0.000000  0.069245
+     0.50    0  0.000000  0.069245
+     0.60   37  0.667823  0.257307  #####################################
+     0.70    5  0.767436  0.278892  #####
+     0.80   13  0.836789  0.334980  #############
+     0.90   32  0.984903  0.499835  ################################</pre>
 
         <p>Each row shows an interval, the count of tokens with
         scores in that interval, the average spam probability for
