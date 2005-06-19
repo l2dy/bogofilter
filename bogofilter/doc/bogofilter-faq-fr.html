@@ -155,6 +155,7 @@
         <ul>
           <li><a href="#which-muas">Avec quel programme de messagerie, Bogofilter fonctionne?</a></li>
           <li><a href="#with-mutt">Comment utiliser Bogofilter avec Mutt?</a></li>
+          <li><a href="#with-qmail">Comment utiliser Bogofilter avec Qmail?</a></li>
           <li><a href="#with-sc">Comment utiliser Bogofilter avec Sylpheed Claws?</a></li>
 
           <li><a href="#with-mh-e">Comment utiliser Bogofilter avec MH-E (l'interface Emacs interface au système de
@@ -1367,6 +1368,25 @@
 
     <p>Ceci enverra les messages sélectionnés dans Bogofilter, enseignant les faux-ham en
     spam et vice-versa, puis proposera la sauvegarde dans un dossier différent.</p>
+
+    <hr>
+
+    <h2 id="with-qmail">Comment utiliser Bogofilter avec Qmail?</h2>
+
+    <p>Si vou utiliser ici une méthode:</p>
+
+<pre>    su -m qmailq
+    cd
+    mkdir .bogofilter
+    cd bin
+    cp -p qmail-queue qmail-queue.orig
+    cat > qmail-queue
+    #!/bin/sh
+    HOME=/var/qmail
+    export HOME
+    /usr/local/bin/bogofilter -p -u -e | /var/qmail/bin/qmail-queue.orig
+    ^D
+    chmod 4711 qmail-queue</pre>
 
     <hr>
 
