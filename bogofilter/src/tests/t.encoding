@@ -67,21 +67,21 @@ WORDLIST="${TMPDIR}/wordlist/wordlist.$DB_EXT"
 for YN in yes no ; do
     rm -f ${BOGODIR}/*
     $BOGOFILTER -C -y 0 -n -d ${BOGODIR}  --unicode=$YN < ${TMPDIR}/$MSG.txt
-    $BOGOUTIL   -C -y 0    -d ${WORDLIST}  > ${TMPDIR}/wordlist.$YN.txt
+    $BOGOUTIL   -C -y 0    -d ${WORDLIST} | sort > ${TMPDIR}/wordlist.$YN.txt
 done
 
-$BOGOUTIL   -C -y 0 -d ${WORDLIST} > ${TMPDIR}/wordlist.raw.txt
+$BOGOUTIL   -C -y 0 -d ${WORDLIST} | sort > ${TMPDIR}/wordlist.raw.txt
 
 iconv -f iso-8859-1 -t utf-8 < ${TMPDIR}/wordlist.raw.txt | \
-sed "s/.ENCODING 1/.ENCODING 2/" > ${TMPDIR}/wordlist.iconv.txt
+sed "s/.ENCODING 1/.ENCODING 2/" | sort > ${TMPDIR}/wordlist.iconv.txt
 
 # convert from iso-8859-1 to unicode
 $BOGOUTIL -C -y 0 -m ${WORDLIST} --unicode=yes
-$BOGOUTIL -C -y 0 -d ${WORDLIST} > ${TMPDIR}/wordlist.new.txt
+$BOGOUTIL -C -y 0 -d ${WORDLIST} | sort > ${TMPDIR}/wordlist.new.txt
 
 # convert from unicode to iso-8859-1
 $BOGOUTIL -C -y 0 -m ${WORDLIST} --unicode=no
-$BOGOUTIL -C -y 0 -d ${WORDLIST} > ${TMPDIR}/wordlist.old.txt
+$BOGOUTIL -C -y 0 -d ${WORDLIST} | sort > ${TMPDIR}/wordlist.old.txt
 
 cat <<EOF | sed "s/ $DATE//" > ${TMPDIR}/md5sum.ref
 4ff193bff18e44bd6af0992497565df2 -   wordlist.iconv.txt
