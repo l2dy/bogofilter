@@ -893,14 +893,18 @@
     BerkeleyDB thinks by running:</p>
     <pre>    db_verify wordlist.db</pre>
 
-    <p>Alternatively you may be able to recover some (or
-    all) of the tokens and their counts with the following
-    commands:</p>
-    <pre>    bogoutil -d wordlist.db | bogoutil -l wordlist.db.new</pre>
+    <p>You may be able to recover some (or all) of the tokens and
+    their counts with the following commands:</p>
+
+    <pre>    bogoutil -d wordlist.db | bogoutil -l wordlist.new.db</pre>
+
     <p>or - if there has been more damage to the token list - with</p>
-    <pre>    db_dump -r wordlist.db | db_load wordlist.new</pre>
+
+    <pre>    db_dump -r wordlist.db &gt; wordlist.txt
+    db_load wordlist.new.db &lt; wordlist.txt</pre>
 
     <p>You can also use a text file instead of a pipe, as in:</p>
+
     <pre>    bogoutil -d wordlist.db &gt; wordlist.txt
     bogoutil -l wordlist.db.new &lt; wordlist.txt</pre>
 

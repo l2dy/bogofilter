@@ -889,12 +889,14 @@
 
     <p>S'il y a un problème, vous pouvez récupérer tout ou partie
     des tokens et leur nombre avec la commande suivante:</p>
-    <pre>    bogoutil -d wordlist.db | bogoutil -l wordlist.db.new</pre>
+
+    <pre>    bogoutil -d wordlist.db | bogoutil -l wordlist.new.db</pre>
 
     <p>ou - si la liste ne pourrait pas être récupérée par la
     commande précédente - avec:</p>
+
     <pre>    db_dump -r wordlist.db &gt; wordlist.txt
-    db_load wordlist.new &lt; wordlist.txt</pre>
+    db_load wordlist.new.db &lt; wordlist.txt</pre>
 
     <hr>
 
