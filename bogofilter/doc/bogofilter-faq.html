@@ -88,11 +88,11 @@
         <ul>
           <li><a href="#compact-database">How can I compact my database?</a></li>
           <li><a href="#query-database">How do I manually query the database?</a></li>
-          <li><a href="#rescue">How can I tell if my wordlists are corrupted?</a></li>
           <li><a href="#multiple">Can I use multiple wordlists?</a></li>
           <li><a href="#ignore">Can I tell bogofilter to ignore certain tokens?</a></li>
           <li><a href="#update">How do I upgrade from separate word
           databases to the combined wordlist format?</a></li>
+          <li><a href="#rescue">How can I tell if my wordlists are corrupted?</a></li>
         </ul>
       </li>
 
@@ -882,34 +882,6 @@
 
     <hr>
 
-    <h2 id="rescue">How can I tell if my wordlists are corrupted?</h2>
-
-    <p><strong>NOTE:</strong> some distributors rename all the db_
-    utilities given below by inserting or appending the version number,
-    with or without dot, for instance db4.1_verify or db_verify-4.2.
-    There is no standard on the renaming of these utilities.</p>
-
-    <p>If you think your wordlists are hosed, you can see what
-    BerkeleyDB thinks by running:</p>
-    <pre>    db_verify wordlist.db</pre>
-
-    <p>You may be able to recover some (or all) of the tokens and
-    their counts with the following commands:</p>
-
-    <pre>    bogoutil -d wordlist.db | bogoutil -l wordlist.new.db</pre>
-
-    <p>or - if there has been more damage to the token list - with</p>
-
-    <pre>    db_dump -r wordlist.db &gt; wordlist.txt
-    db_load wordlist.new.db &lt; wordlist.txt</pre>
-
-    <p>You can also use a text file instead of a pipe, as in:</p>
-
-    <pre>    bogoutil -d wordlist.db &gt; wordlist.txt
-    bogoutil -l wordlist.db.new &lt; wordlist.txt</pre>
-
-    <hr>
-
     <h2 id="multiple">Can I use multiple wordlists?</h2>
 
     <p>Yes.  Bogofilter can be run with multiple wordlists.  For
@@ -1009,6 +981,34 @@
     <p>Run script bogoupgrade.  For more info, run "bogoupgrade -h" to
     see its help message or run "man bogoupgrade" and read its man
     page.</p>
+
+    <hr>
+
+    <h2 id="rescue">How can I tell if my wordlists are corrupted?</h2>
+
+    <p><strong>NOTE:</strong> some distributors rename all the db_
+    utilities given below by inserting or appending the version number,
+    with or without dot, for instance db4.1_verify or db_verify-4.2.
+    There is no standard on the renaming of these utilities.</p>
+
+    <p>If you think your wordlists are hosed, you can see what
+    BerkeleyDB thinks by running:</p>
+    <pre>    db_verify wordlist.db</pre>
+
+    <p>You may be able to recover some (or all) of the tokens and
+    their counts with the following commands:</p>
+
+    <pre>    bogoutil -d wordlist.db | bogoutil -l wordlist.new.db</pre>
+
+    <p>or - if there has been more damage to the token list - with</p>
+
+    <pre>    db_dump -r wordlist.db &gt; wordlist.txt
+    db_load wordlist.new.db &lt; wordlist.txt</pre>
+
+    <p>You can also use a text file instead of a pipe, as in:</p>
+
+    <pre>    bogoutil -d wordlist.db &gt; wordlist.txt
+    bogoutil -l wordlist.db.new &lt; wordlist.txt</pre>
 
     <hr>
 

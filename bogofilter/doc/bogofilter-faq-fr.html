@@ -90,11 +90,11 @@
         <ul>
 	  <li><a href="#compact-database">Comment compacter les bases?</a></li>
           <li><a href="#query-database">Comment faire une requête manuelle sur la base de données?</a></li>
-          <li><a href="#rescue">Comment faire si ma base de mots est corrompue?</a></li>
           <li><a href="#multiple">Puis-je utiliser plusieurs bases de mots?</a></li>
           <li><a href="#ignore">Puis-je dire à Bogofilter d'ignorer certains tokens?</a></li>
           <li><a href="#update">Comment puis-je transformer les bases de mots dans le
 	  format combiné?</a></li>
+          <li><a href="#rescue">Comment faire si ma base de mots est corrompue?</a></li>
 	  </ul>
       </li>
 
@@ -880,26 +880,6 @@
 
     <hr>
 
-    <h2 id="rescue">Comment faire si ma liste de mots est
-    corrompue?</h2>
-
-    <p>Si vous pensez que vos listes de mots ont été dégradées,
-    vous pouvez regarder ce qu'en dit BerkeleyDB en lançant:</p>
-    <pre>    db_verify wordlist.db</pre>
-
-    <p>S'il y a un problème, vous pouvez récupérer tout ou partie
-    des tokens et leur nombre avec la commande suivante:</p>
-
-    <pre>    bogoutil -d wordlist.db | bogoutil -l wordlist.new.db</pre>
-
-    <p>ou - si la liste ne pourrait pas être récupérée par la
-    commande précédente - avec:</p>
-
-    <pre>    db_dump -r wordlist.db &gt; wordlist.txt
-    db_load wordlist.new.db &lt; wordlist.txt</pre>
-
-    <hr>
-
     <h2 id="multiple">Puis-je utiliser plusieurs listes de mots?</h2>
 
     <p>Oui. Bogofilter peut travailler avec plusieurs listes de mots. Par exemple,
@@ -995,6 +975,26 @@
     <p>Lancez le script bogoupgrade. Pour plus d'informations
     lancez "bogoupgrade -h" pour voir le message d'aide ou "man bogoupgrade"
     et lisez la page manuel.</p>
+
+    <hr>
+
+    <h2 id="rescue">Comment faire si ma liste de mots est
+    corrompue?</h2>
+
+    <p>Si vous pensez que vos listes de mots ont été dégradées,
+    vous pouvez regarder ce qu'en dit BerkeleyDB en lançant:</p>
+    <pre>    db_verify wordlist.db</pre>
+
+    <p>S'il y a un problème, vous pouvez récupérer tout ou partie
+    des tokens et leur nombre avec la commande suivante:</p>
+
+    <pre>    bogoutil -d wordlist.db | bogoutil -l wordlist.new.db</pre>
+
+    <p>ou - si la liste ne pourrait pas être récupérée par la
+    commande précédente - avec:</p>
+
+    <pre>    db_dump -r wordlist.db &gt; wordlist.txt
+    db_load wordlist.new.db &lt; wordlist.txt</pre>
 
     <hr>
 
