@@ -9,7 +9,7 @@ with the old version of the software.
 
 Otherwise, you may cause irrecoverable damage to your databases.
 
-Do backup your databases before making the upgrade.
+DO backup your databases before making the upgrade.
 ------------------------------------------------------------------------
 WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
 
@@ -35,6 +35,56 @@ is working properly.
 
 NOTE: the NEWS and CHANGES documents have greater detail on some of
 these changes. You should consult them.
+
+******** [Summary 0.95.0] ********
+
+This release supports unicode (utf-8).  A new meta-token .ENCODING has
+been added to the wordlist so that bogofilter can determine if it's
+using unicode or not.  A value of 1 indicates raw storage and 2
+indicates utf-8 encoded tokens.  Bogofilter checks for this meta-token
+and converts incoming text to utf-8 as appropriate.  
+
+Command line options "--unicode=yes" and "--unicode=no" can be used.
+
+    ° With bogofilter, they control encoding of newly created
+      databases.
+
+    ° With bogoutil, during wordlist maintenance they change wordlist
+      to/from unicode.
+
+    ° For bogolexer, they viewing parser results in new and
+      old modes
+
+./configure options allow bogofilter customization.
+
+    ° "./configure --unicode=yes" will _always_ operate in unicode mode
+
+    ° "./configure --unicode=no"  will _never_ operate in unicode mode
+
+Wordlists can be converted from raw storage to unicode using:
+
+    bogoutil -d wordlist.db > wordlist.raw.txt
+    iconv -f iso-8859-1 -t utf-8 < wordlist.raw.txt > wordlist.utf8.txt
+    bogoutil -l wordlist.db.new < wordlist.utf8.txt
+
+or:
+
+    bogoutil --unicode=yes -m wordlist.db
+
+Wordlists can be converted from unicode to raw storage using:
+
+    bogoutil -d wordlist.db > wordlist.utf8.txt
+    iconv -f utf-8  -t iso-8859-1 < wordlist.utf8.txt > wordlist.raw.txt
+    bogoutil -l wordlist.db.new < wordlist.raw.txt
+
+or:
+
+    bogoutil --unicode=no -m wordlist.db
+
+Note:  If your wordlist contains tokens from multiple languages,
+particularly non-european languages, the conversion methods described
+above may not work well for you.  Building a new wordlist will likely
+work better as it will be fully unicode based.
 
 ******** [Summary 0.94.12] ********
 
