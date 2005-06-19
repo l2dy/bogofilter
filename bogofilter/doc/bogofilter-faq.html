@@ -73,7 +73,7 @@
           <li><a href="#production">How can I keep the scoring accuracy high?</a></li>
           <li><a href="#mboxformats">What mailbox (file) formats does bogofilter understand?</a></li>
           <li><a href="#vvv">What does bogofilter's verbose output mean?</a></li>
-          <li><a href="#unsure">What is <i>Unsure</i> mode?</a></li>
+          <li><a href="#unisure">What is <i>Unsure</i> mode?</a></li>
           <li><a href="#train-on-error">What are "training on error" and
           "training to exhaustion"?</a></li>
           <li><a href="#autoupdate">What does the '-u' (autoupdate) switch do?</a></li>
@@ -92,6 +92,7 @@
           <li><a href="#ignore">Can I tell bogofilter to ignore certain tokens?</a></li>
           <li><a href="#update">How do I upgrade from separate word
           databases to the combined wordlist format?</a></li>
+          <li><a href="#unicode">How can I convert my wordlist to/from unicode?</a></li>
           <li><a href="#rescue">How can I tell if my wordlists are corrupted?</a></li>
         </ul>
       </li>
@@ -1009,6 +1010,30 @@
 
     <pre>    bogoutil -d wordlist.db &gt; wordlist.txt
     bogoutil -l wordlist.db.new &lt; wordlist.txt</pre>
+
+    <hr>
+
+    <h2 id="unicode">How can I convert my wordlist to/from unicode?</h2>
+
+    <p>Wordlists can be converted from raw storage to unicode using:</p>
+
+    <pre>    bogoutil -d wordlist.db &gt; wordlist.raw.txt
+    iconv -f iso-8859-1 -t utf-8 &lt; wordlist.raw.txt &gt; wordlist.utf8.txt
+    bogoutil -l wordlist.db.new &lt; wordlist.utf8.txt</pre>
+
+    <p>or:</p>
+
+    <pre>    bogoutil --unicode=yes -m wordlist.db</pre>
+
+    <p>Wordlists can be converted from unicode to raw storage using:</p>
+
+    <pre>    bogoutil -d wordlist.db &gt; wordlist.utf8.txt
+    iconv -f utf-8  -t iso-8859-1 &lt; wordlist.utf8.txt &gt; wordlist.raw.txt
+    bogoutil -l wordlist.db.new &lt; wordlist.raw.txt</pre>
+
+    <p>or:</p>
+
+    <pre>    bogoutil --unicode=no -m wordlist.db</pre>
 
     <hr>
 

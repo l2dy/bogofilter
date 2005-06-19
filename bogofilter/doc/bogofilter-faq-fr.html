@@ -94,6 +94,7 @@
           <li><a href="#ignore">Puis-je dire à Bogofilter d'ignorer certains tokens?</a></li>
           <li><a href="#update">Comment puis-je transformer les bases de mots dans le
 	  format combiné?</a></li>
+          <li><a href="#unicode">Comment puis-je convertir ma base de mots de/vers l'unicode?</a></li>
           <li><a href="#rescue">Comment faire si ma base de mots est corrompue?</a></li>
 	  </ul>
       </li>
@@ -995,6 +996,30 @@
 
     <pre>    db_dump -r wordlist.db &gt; wordlist.txt
     db_load wordlist.new.db &lt; wordlist.txt</pre>
+
+    <hr>
+ 
+    <h2 id="unicode">Comment puis-je convertir ma base de mots de/vers l'unicode?</h2>
+
+    <p>La base de mots peut être convertie du format brut vers l'unicode en utilisant les commandes suivantes :</p>
+
+    <pre>    bogoutil -d wordlist.db > wordlist.raw.txt
+    iconv -f iso-8859-1 -t utf-8 < wordlist.raw.txt > wordlist.utf8.txt
+    bogoutil -l wordlist.db.new < wordlist.utf8.txt</pre>
+
+    <p>ou alors :</p>
+
+    <pre>    bogoutil --unicode=yes -m wordlist.db</pre>
+
+    <p>La base de mots peut-être convertie de l'unicode vers le format brut en tapant ceci :</p>
+
+    <pre>    bogoutil -d wordlist.db > wordlist.utf8.txt
+    iconv -f utf-8  -t iso-8859-1 < wordlist.utf8.txt > wordlist.raw.txt
+    bogoutil -l wordlist.db.new < wordlist.raw.txt</pre>
+
+    <p>ou encore:</p>
+
+    <pre>    bogoutil --unicode=no -m wordlist.db</pre>
 
     <hr>
 
