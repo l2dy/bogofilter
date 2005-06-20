@@ -59,7 +59,7 @@ static void iconv_print_error(int err, buff_t *src)
     }
 }
 
-void iconvert(buff_t *src, buff_t *dst)
+static void convert(buff_t *src, buff_t *dst)
 {
     bool done = false;
 
@@ -170,9 +170,24 @@ void iconvert(buff_t *src, buff_t *dst)
 
     Z(dst->t.text[dst->t.leng]);	/* for easier debugging - removable */
 
-    /* TODO:  Provide proper handling of incompletely converted buffer */
     if (DEBUG_ICONV(1) &&
 	src->t.leng != src->read)
 	fprintf(dbgout, "t: %p, r: %d, l: %d, s: %d\n", 
 		src->t.text, src->read, src->t.leng, src->size);
 }
+
+static void copy(buff_t *src, buff_t *dst)
+{
+    /* if conversion not available, use memcpy */
+    dst->t.leng = min(dst->size, src->t.leng);
+    memcpy(dst->t.text, src->t.text, dst->t.leng+D);
+}
+
+void iconvert(buff_t *src, buff_t *dst)
+{
+    if (cd == NULL)
+	copy(src, dst);
+    else
+	convert(src, dst);
+}
+

@@ -43,8 +43,6 @@ AUTHOR:
 #include <iconv.h>
 iconv_t cd;
 
-static void map_nonascii_characters(void);
-
 static void map_nonascii_characters(void)
 {
     uint ch;
@@ -130,7 +128,7 @@ void init_charset_table_iconv(const char *from_charset, const char *to_charset)
 	if (err == EINVAL) {
 	    /* error - use identity mapping */
 	    fprintf( stderr, "Conversion from '%s' to '%s' is not supported.\n", from_charset, to_charset );
-	    cd = iconv_open( "iso-8859-1", "iso-8859-1" );
+	    cd = NULL;
 	}
     }
 
