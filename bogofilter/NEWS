@@ -13,6 +13,12 @@
 
 -------------------------------------------------------------------------------
 
+	2005-06-20
+
+	* Fix bf_resize bash-isms (let BLAH...) and use POSIX-sh arithmetic
+	  expansion $((...)) instead, to fix bf_resize on FreeBSD.
+	  Reported by Andrey Chernov.
+
 	2005-06-19
 
 	* New unicode capabilities!
