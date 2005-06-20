@@ -151,7 +151,6 @@
         <ul>
           <li><a href="#which-muas">With which mail programs does bogofilter work?</a></li>
           <li><a href="#with-mutt">How do I use bogofilter with mutt?</a></li>
-          <li><a href="#with-qmail">How do I use bogofilter with qmail?</a></li>
           <li><a href="#with-sc">How do I use bogofilter with Sylpheed Claws?</a></li>
           <li><a href="#with-mh-e">How do I use bogofilter with MH-E (the Emacs interface to the MH mail system)?</a></li>
         </ul>
@@ -1412,26 +1411,6 @@
     <p>These will pipe the selected message through bogofilter,
     training a false-ham as spam or vice versa, then offer to save the
     message to a different folder.</p>
-
-    <hr>
-
-    <h2 id="with-qmail">How do I use bogofilter with qmail?</h2>
-
-    <p>If you're using qmail, run the following commands to add
-    bogofilter to your tool chain:</p>
-
-<pre>    su -m qmailq
-    cd
-    mkdir .bogofilter
-    cd bin
-    cp -p qmail-queue qmail-queue.orig
-    cat > qmail-queue
-    #!/bin/sh
-    HOME=/var/qmail
-    export HOME
-    /usr/local/bin/bogofilter -p -u -e | /var/qmail/bin/qmail-queue.orig
-    ^D
-    chmod 4711 qmail-queue</pre>
 
     <hr>
 
