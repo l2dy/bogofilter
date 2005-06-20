@@ -533,6 +533,9 @@ static const char *help_text[] = {
     "  -c cnt                      - exclude tokens with lower counts.\n",
     "  -s l,h                      - exclude tokens with lengths between 'l' and 'h'\n"
     "                                (low and high).\n",
+#ifndef	DISABLE_UNICODE
+    "  --unicode=yes/no            - convert wordlist to/from unicode\n",
+#endif
     "\n",
     NULL
     };

@@ -344,6 +344,9 @@ static const char *help_text[] = {
     "  --terse-format                    short form\n",
     "  --thresh-update                   no update if near 0 or 1\n",
     "  --timestamp                       apply token timestamps\n",
+#ifndef	DISABLE_UNICODE
+    "  --unicode=yes/no                  enable/disable unicode based wordlist\n",
+#endif
     "  --unsure-subject-tag              like spam-subject-tag\n",
     "  --user-config-file                configuration file\n",
     "  --wordlist                        specify wordlist parameters\n",

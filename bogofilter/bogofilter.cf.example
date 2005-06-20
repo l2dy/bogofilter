@@ -210,11 +210,11 @@
 
 #### UNICODE handling
 #
-#	enable/disable unicode
+#	boolean indicating whether raw storage (no) or unicode (yes)
+#	is the default encoding for the wordlist
 #
-#unicode=no				# default
-##unicode=yes				# (alternate)
-
+#unicode=yes				# default
+##unicode=no				# (alternate)
 
 ########### Classification Constants Settings #######################
 #
