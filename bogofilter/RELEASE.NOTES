@@ -81,10 +81,13 @@ or:
 
     bogoutil --unicode=no -m wordlist.db
 
-Note:  If your wordlist contains tokens from multiple languages,
-particularly non-european languages, the conversion methods described
-above may not work well for you.  Building a new wordlist will likely
-work better as it will be fully unicode based.
+For a wordlist based on a different charset, for example CP866 or
+KOI8-R, use that charset in dump/convert/load command sequences above.
+
+For a wordlist containing tokens from multiple languages, particularly
+non-european languages, the conversion methods described above may not
+work well for you.  Building a new wordlist will likely work better as
+the new wordlist will be based solely on unicode.
 
 ******** [Summary 0.94.12] ********
 
