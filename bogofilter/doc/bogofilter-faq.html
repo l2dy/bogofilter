@@ -1034,6 +1034,17 @@
 
     <pre>    bogoutil --unicode=no -m wordlist.db</pre>
 
+    <p>The above methods work best when the wordlist is based on the
+    iso-8859-1 charset.  If your wordlist is based on a different
+    charset, for example CP866 or KOI8-R, use that charset in the
+    above commands.</p>
+
+    <p>For a wordlist containing tokens from multiple languages,
+    particularly non-european languages, the conversion methods
+    described above may not work well.  Building a new wordlist (from
+    scratch) will likely work better as the new wordlist will be based
+    solely on unicode.</p>
+
     <hr>
 
     <h2 id="enable-transactions">How can I switch from non-transaction
