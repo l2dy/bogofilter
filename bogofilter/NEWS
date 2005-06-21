@@ -24,9 +24,11 @@
 	* New unicode capabilities!
 
 	  ° default configuration:
-	    ° bogofilter auto-detects whether database is using unicode (utf-8) or not.
+	    ° bogofilter auto-detects whether database is using
+	      unicode (utf-8) or not.
 	    ° bogofilter uses unicode when creating new databases.
-	    ° bogoutil preserves unicode/non-unicode stat during dump/load.
+	    ° bogoutil preserves unicode/non-unicode stat during
+	      dump/load.
 	    ° bogofilter, bogolexer, and bogoutil have "--unicode=yes/no"
 	      options which permit user selectable modes for experimenting, 
 	      testing, and wordlist conversion.
@@ -50,9 +52,15 @@
 
 	2005-06-10
 
-	* TDB driver now copies TDB returned data in the traversor to align
-	  data at proper boundaries, to avoid SIGBUS on some architectures and
-	  performance loss on others.
+	* TDB driver now copies TDB returned data in the traversor to
+	  align data at proper boundaries, to avoid SIGBUS on some
+	  architectures and performance loss on others.
+
+	2005-06-09
+
+	* Close environment after probing if it has transactions, to
+	  conform to Berkeley DB documentation and not leak a file
+	  descriptor.
 
 	2005-06-07
 
@@ -64,8 +72,8 @@
 0.94.14	2005-06-08
 	2005-06-18 - Promoted to Stable Release
 
-	* Fix bug in transactional auto-detection that caused recovery to
-	  fail if the environment was in PANIC state.
+	* Fix bug in transactional auto-detection that caused recovery
+	  to fail if the environment was in PANIC state.  
 	  (Reported by Andrey Chernov.)
 
 	2005-06-06
