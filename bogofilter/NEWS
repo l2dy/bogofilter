@@ -13,7 +13,7 @@
 
 -------------------------------------------------------------------------------
 
-	2005-06-20
+0.95.0	2005-06-20
 
 	* Fix bf_resize bash-isms (let BLAH...) and use POSIX-sh arithmetic
 	  expansion $((...)) instead, to fix bf_resize on FreeBSD.
