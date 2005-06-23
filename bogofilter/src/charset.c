@@ -36,6 +36,7 @@ AUTHOR:
 #endif
 
 const char *charset_default = DEFAULT_CHARSET;
+const char *charset_unicode = "UTF-8";
 
 byte charset_table[256];
 byte casefold_table[256];
@@ -81,12 +82,12 @@ void init_charset_table(const char *charset_name)
     init_charset_table_orig(charset_name);
 #else
 #ifdef	ENABLE_UNICODE
-    init_charset_table_iconv(charset_name, charset_default);
+    init_charset_table_iconv(charset_name, charset_unicode);
 #else
     if (encoding != E_UNICODE)
 	init_charset_table_orig(charset_name);
     else
-	init_charset_table_iconv(charset_name, charset_default);
+	init_charset_table_iconv(charset_name, charset_unicode);
 #endif
 #endif
     return;
