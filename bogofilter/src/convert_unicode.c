@@ -114,6 +114,9 @@ void init_charset_table_iconv(const char *from_charset, const char *to_charset)
     if (DEBUG_ICONV(1))
 	fprintf(dbgout, "converting %s to %s\n", from_charset, to_charset);
 
+    if (strcasecmp( from_charset, "default" ) == 0)
+	from_charset = charset_default;
+
     cd = iconv_open( to_charset, from_charset );
     if (cd == (iconv_t)(-1)) {
 	int err = errno;
