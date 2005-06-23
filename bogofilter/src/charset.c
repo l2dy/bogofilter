@@ -31,14 +31,8 @@ AUTHOR:
 
 #define	SP	' '
 
-#ifndef	ENABLE_UNICODE
-  #ifndef	DEFAULT_CHARSET
-    #define	DEFAULT_CHARSET	"us-ascii"
-  #endif
-#else
-  #ifndef	DEFAULT_CHARSET
-    #define	DEFAULT_CHARSET	"UTF-8"
-  #endif
+#ifndef	DEFAULT_CHARSET
+#define	DEFAULT_CHARSET	"us-ascii"
 #endif
 
 const char *charset_default = DEFAULT_CHARSET;
