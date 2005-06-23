@@ -118,8 +118,9 @@ void init_charset_table_iconv(const char *from_charset, const char *to_charset)
     if (cd == (iconv_t)(-1)) {
 	int err = errno;
 	if (err == EINVAL) {
-	    /* error - use identity mapping */
-	    fprintf( stderr, "Conversion from '%s' to '%s' is not supported.\n", from_charset, to_charset );
+	    if (DEBUG_ICONV(1))
+		/* error - use identity mapping */
+		fprintf(dbgout, "Conversion from '%s' to '%s' is not supported.\n", from_charset, to_charset );
 	    cd = NULL;
 	}
     }
