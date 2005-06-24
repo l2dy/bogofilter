@@ -434,6 +434,10 @@ size_t text_decode(word_t *w)
 		beg[size++] = *txt++;
     }
 
+    w->leng = size;
+
+    Z(beg[size]);	/* for easier debugging - removable */
+
     return size;
 }
 
