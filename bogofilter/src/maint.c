@@ -18,6 +18,7 @@ AUTHOR:
 #include "buff.h"
 #include "datastore.h"
 #include "error.h"
+#include "charset.h"
 #include "convert_unicode.h"
 #include "iconvert.h"
 #include "maint.h"
@@ -33,8 +34,11 @@ size_t	 size_max = 0;
 bool     timestamp_tokens = true;
 bool	 upgrade_wordlist_version = false;
 
+#ifndef	DISABLE_UNICODE
 e_enc	 old_encoding;
 e_enc	 new_encoding;
+#define DEFAULT_OR_UNICODE(enc) (enc == E_RAW) ? charset_default : charset_unicode
+#endif
 
 /* Function Prototypes */
 
@@ -284,8 +288,8 @@ static ex_t maintain_wordlist(void *database)
 	old_encoding = val.spamcount;
 	new_encoding = encoding;
 	if (old_encoding != new_encoding) {
-	    const char *from_charset = (old_encoding == E_RAW) ? "iso-8859-1" : "utf-8";
-	    const char *to_charset   = (new_encoding == E_RAW) ? "iso-8859-1" : "utf-8";
+	    const char *from_charset = DEFAULT_OR_UNICODE(old_encoding);
+	    const char *to_charset   = DEFAULT_OR_UNICODE(new_encoding);
 	    init_charset_table_iconv(from_charset, to_charset);
 	}
 #endif
