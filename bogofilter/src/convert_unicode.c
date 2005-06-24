@@ -122,9 +122,10 @@ void init_charset_table_iconv(const char *from_charset, const char *to_charset)
 	int err = errno;
 	if (err == EINVAL) {
 	    if (DEBUG_ICONV(1))
-		/* error - use identity mapping */
-		fprintf(dbgout, "Conversion from '%s' to '%s' is not supported.\n", from_charset, to_charset );
-	    cd = NULL;
+		fprintf(dbgout, "Conversion from '%s' to '%s' is not supported.\n", 
+			from_charset, to_charset );
+	    /* error - map default charset to unicode */
+	    cd = iconv_open( charset_unicode, charset_default );
 	}
     }
 

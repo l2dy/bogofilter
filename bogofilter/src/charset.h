@@ -14,6 +14,7 @@ AUTHOR:
 #define	CHARSET_H
 
 extern const char *charset_default;
+extern const char *charset_unicode;
 extern bool replace_nonascii_characters;
 
 extern byte charset_table[256];
