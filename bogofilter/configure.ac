@@ -238,16 +238,17 @@ if test x$USE_UNICODE = xNO ; then
 	AC_DEFINE(DISABLE_UNICODE,1,
 	[Disable unicode for converting character sets to unicode])
 	[ENCODING="raw"]
-	[DEFAULT_CHARSET="us-ascii"]
+
 else
 	AC_DEFINE(ENABLE_UNICODE,1,
 	[Enable unicode for converting character sets to unicode])
 	[ENCODING="utf-8"]
-	[DEFAULT_CHARSET="UTF-8"]
 fi
+[DEFAULT_CHARSET="iso-8859-1"]
 
 dnl Allow the user to enable Russian language support
 
+if test x$USE_UNICODE != xYES ; then
 AC_ARG_ENABLE(russian,
 	AC_HELP_STRING([--enable-russian],
 	[Enable Russian language support]),
@@ -264,23 +265,22 @@ if test x$USE_CP866 = xYES ; then
 	[Enable Russian language support])
 	[DEFAULT_CHARSET="CP866"]
 fi
+fi
 
 dnl Allow the user to specify a default charset
 AC_ARG_WITH(charset, 
 	    AC_HELP_STRING([--with-charset=name], 
-	    [Use specified charset instead of us-ascii]), 
+	    [Use specified charset instead of iso-8859-1]), 
 	    AC_DEFINE_UNQUOTED(DEFAULT_CHARSET, 
 	    ["$withval"], 
-	    [Use specified charset instead of us-ascii])
+	    [Use specified charset instead of iso-8859-1])
 )
 
 AC_SUBST(ENCODING)
-if test "$DEFAULT_CHARSET" != "us-ascii"; then
-	AC_SUBST(DEFAULT_CHARSET)
-	AC_DEFINE_UNQUOTED(DEFAULT_CHARSET,
+AC_SUBST(DEFAULT_CHARSET)
+AC_DEFINE_UNQUOTED(DEFAULT_CHARSET,
 	["$DEFAULT_CHARSET"],
 	[Use specified charset])
-fi
 
 dnl Allow the user to enable memory usage debugging methods
 
