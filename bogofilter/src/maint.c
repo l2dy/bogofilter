@@ -284,9 +284,12 @@ static ex_t maintain_wordlist(void *database)
     if (DST_OK == ds_txn_begin(database)) {
 #ifndef	DISABLE_UNICODE
 	dsv_t val;
-	ds_get_wordlist_encoding(database, &val);
-	old_encoding = val.spamcount;
+	int rc = ds_get_wordlist_encoding(database, &val);
 	new_encoding = encoding;
+	if (rc == 0)
+	    old_encoding = val.spamcount;	/* found */
+	else
+	    old_encoding = E_RAW;		/* not found */
 	if (old_encoding != new_encoding) {
 	    const char *from_charset = DEFAULT_OR_UNICODE(old_encoding);
 	    const char *to_charset   = DEFAULT_OR_UNICODE(new_encoding);
