@@ -350,8 +350,9 @@ int yyinput(byte *buf, size_t used, size_t size)
     return (count == EOF ? 0 : count);
 }
 
-size_t text_decode(word_t *w)
+word_t *text_decode(word_t *w)
 {
+    word_t *r = w;
     byte *const beg = w->text;		/* base pointer, fixed */
     byte *const fin = beg + w->leng;	/* end+1 position */
 
@@ -359,7 +360,7 @@ size_t text_decode(word_t *w)
     uint size = (uint) (txt - beg);				/* output offset */
 
     if (txt == NULL)
-	return w->leng;
+	return r;
 
     while (txt < fin) {
 	word_t n;
@@ -438,7 +439,7 @@ size_t text_decode(word_t *w)
 
     Z(beg[size]);	/* for easier debugging - removable */
 
-    return size;
+    return r;
 }
 
 /*

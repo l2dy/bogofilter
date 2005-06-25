@@ -70,7 +70,7 @@ extern int	yyinput(byte *buf, size_t used, size_t size);
 
 extern int	buff_fill(buff_t *buff, size_t used, size_t need);
 
-extern size_t	text_decode(word_t *w);
+extern word_t  *text_decode(word_t *w);
 extern size_t	html_decode(word_t *w);
 
 #endif	/* LEXER_H */
