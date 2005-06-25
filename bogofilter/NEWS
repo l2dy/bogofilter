@@ -13,6 +13,14 @@
 
 -------------------------------------------------------------------------------
 
+	2005-06-25
+
+	* Fixed multiple decoding of encoded tokens.
+
+	2005-06-24
+
+	* Use iso-8859-1 for default charset, rather than us-ascii.
+
 0.95.0	2005-06-20
 
 	* Fix bf_resize bash-isms (let BLAH...) and use POSIX-sh arithmetic
