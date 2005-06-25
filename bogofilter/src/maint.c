@@ -284,12 +284,9 @@ static ex_t maintain_wordlist(void *database)
     if (DST_OK == ds_txn_begin(database)) {
 #ifndef	DISABLE_UNICODE
 	dsv_t val;
-	int rc = ds_get_wordlist_encoding(database, &val);
+	ds_get_wordlist_encoding(database, &val);
+	old_encoding = val.spamcount;
 	new_encoding = encoding;
-	if (rc == 0)
-	    old_encoding = val.spamcount;	/* found */
-	else
-	    old_encoding = E_RAW;		/* not found */
 	if (old_encoding != new_encoding) {
 	    const char *from_charset = DEFAULT_OR_UNICODE(old_encoding);
 	    const char *to_charset   = DEFAULT_OR_UNICODE(new_encoding);
@@ -316,6 +313,22 @@ static ex_t maintain_wordlist(void *database)
 	ds_set_wordlist_version(database, &val);
     }
 
+#ifndef	DISABLE_UNICODE
+    if (old_encoding != new_encoding) {
+	dsv_t val;
+	word_t enco;
+
+	enco.text = xstrdup(WORDLIST_ENCODING);
+	enco.leng = strlen(WORDLIST_ENCODING);
+	val.count[0] = new_encoding;
+	val.count[1] = 0;
+	val.date     = 0;
+
+	ds_write(database, &enco, &val);
+	xfree(enco.text);
+    }
+#endif
+
     if (ta_commit(transaction) != TA_OK)
 	ret = EX_ERROR;
 
@@ -339,21 +352,6 @@ ex_t maintain_wordlist_file(bfpath *bfp)
 	return EX_ERROR;
 
     rc = maintain_wordlist(dsh);
-
-#ifndef	DISABLE_UNICODE
-    if (old_encoding != new_encoding) {
-	dsv_t val;
-	word_t enco;
-
-	enco.text = (byte *) WORDLIST_ENCODING;
-	enco.leng = strlen(  WORDLIST_ENCODING );
-	val.count[0] = new_encoding;
-	val.count[1] = 0;
-	val.date     = 0;
-
-	ds_write(dsh, &enco, &val);
-    }
-#endif
 
     ds_close(dsh);
     ds_cleanup(dbe);
