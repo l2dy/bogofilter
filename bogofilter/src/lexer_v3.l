@@ -227,11 +227,11 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <BOGO_LEX>^\"{BOGOLEX_TOKEN}\"{NUM_NUM}$	{ return BOGO_LEX_LINE; }
 <BOGO_LEX>\n					{ lineno += 1; }
 
-<INITIAL>{ENCODED_TOKEN}			{ static int processed = 0;
-						  if (processed == lineno) {
+<INITIAL>{ENCODED_TOKEN}			{ static int processed = -1;
+						  if (processed != lineno) {
 						      word_t *raw = yy_text();
-						      word_t *dec = text_decode(raw);
-						      yy_unput(dec->text, dec->leng);
+						      word_t *txt = text_decode(raw);
+						      yy_unput(txt->text, txt->leng);
 						      processed = lineno;
 						  }
 						}
