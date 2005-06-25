@@ -221,8 +221,8 @@ AC_ARG_ENABLE(spam-header-name,
 dnl Allow the user to enable/disable use of unicode
 
 AC_ARG_ENABLE(unicode,
-	AC_HELP_STRING([--enable-unicode],
-	[Enable unicode for converting character sets to unicode (UTF-8)]),
+	AC_HELP_STRING([--disable-unicode],
+	[Disables conversion of character sets to unicode (UTF-8)]),
 	if test "$enableval" = no; then
 		[USE_UNICODE=NO]
 	fi
