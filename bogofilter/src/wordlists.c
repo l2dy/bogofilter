@@ -103,6 +103,9 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
     void *dbe;
     bfpath *bfp = list->bfp;
 
+    if (list->dsh != NULL)		/* Only need to open the list once. */
+	return retry;
+
     if (list->type == WL_IGNORE) 	/* open ignore list in read-only mode */
 	mode = DS_READ;
 
