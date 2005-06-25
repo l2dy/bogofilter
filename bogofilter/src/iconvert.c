@@ -32,7 +32,6 @@ AUTHOR:
 #include <stdlib.h>
 #include <errno.h>
 
-#include <iconv.h>
 #include "buff.h"
 #include "iconvert.h"
 
@@ -59,7 +58,7 @@ static void iconv_print_error(int err, buff_t *src)
     }
 }
 
-static void convert(buff_t *src, buff_t *dst)
+static void convert(iconv_t xd, buff_t *src, buff_t *dst)
 {
     bool done = false;
 
@@ -86,7 +85,7 @@ static void convert(buff_t *src, buff_t *dst)
 	 * conversion can stop for four reasons:
 	 */
 
-	count = iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
+	count = iconv(xd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
 
 	/*
 	 * 1. An invalid multibyte sequence is encountered
@@ -188,6 +187,13 @@ void iconvert(buff_t *src, buff_t *dst)
     if (cd == NULL)
 	copy(src, dst);
     else
-	convert(src, dst);
+	convert(cd, src, dst);
 }
 
+void iconvert_cd(iconv_t xd, buff_t *src, buff_t *dst)
+{
+    if (xd == NULL)
+	copy(src, dst);
+    else
+	convert(xd, src, dst);
+}
