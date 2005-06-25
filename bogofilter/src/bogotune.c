@@ -1718,9 +1718,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     /* process args and read mailboxes */
     process_arglist(argc, argv);
 
-    if (encoding == E_UNKNOWN)
-	encoding = E_DEFAULT;
-
     /* directories from command line and config file are already handled */
     if (ds_flag == DS_DSK) {
 
@@ -1752,7 +1749,12 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	env = ds_init(bfp);
 	
 	init_wordlist("word", ds_path, 0, WL_REGULAR);
+
+	open_wordlists(DS_READ);
     }
+
+    if (encoding == E_UNKNOWN)
+	encoding = E_DEFAULT;
 
     bogotune();
 
