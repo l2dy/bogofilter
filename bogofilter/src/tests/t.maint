@@ -16,9 +16,9 @@ CORRECT="$TMPDIR/result"
 # 0.95.0 - unicode
 cat >> $CORRECT <<EOF
 initial: 5304
-count 0 -> 5304
+count 0 -> 5305
 count 1 -> 1847
-count 2 -> 949
+count 2 -> 950
 count 3 -> 610
 EOF
 
