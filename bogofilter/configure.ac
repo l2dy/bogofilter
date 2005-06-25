@@ -238,7 +238,6 @@ if test x$USE_UNICODE = xNO ; then
 	AC_DEFINE(DISABLE_UNICODE,1,
 	[Disable unicode for converting character sets to unicode])
 	[ENCODING="raw"]
-
 else
 	AC_DEFINE(ENABLE_UNICODE,1,
 	[Enable unicode for converting character sets to unicode])
