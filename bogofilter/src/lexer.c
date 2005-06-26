@@ -435,7 +435,7 @@ word_t *text_decode(word_t *w)
 	    fputs("\n", dbgout);
 	}
 
-	switch (tolower(typ[1])) {		/* ... encoding type */
+	switch (tolower(*typ)) {		/* ... encoding type */
 	case 'b':
 	    if (base64_validate(w))
 		len = base64_decode(w);		/* decode base64 */
