@@ -427,9 +427,11 @@ word_t *text_decode(word_t *w)
 	}
 
 	/* move decoded word to where the encoded used to be */
-	memmove(beg+size, w->text, len);
-	size += len;	/* bump output pointer */
-	Z(beg[size]);			/* for easier debugging - removable */
+	if (encoding == E_RAW) {
+	    memmove(beg+size, w->text, len);
+	    size += len;		/* bump output pointer */
+	    Z(beg[size]);		/* for easier debugging - removable */
+	}
 
 	txt = end + 2;	/* skip ?= trailer */
 	if (txt >= fin)
@@ -458,12 +460,16 @@ word_t *text_decode(word_t *w)
 	    txt = end;
 	else
 	    /* copy everything that was between the encoded words */
-	    while (txt < end)
-		beg[size++] = *txt++;
+	    while (txt < end) {
+		if (encoding == E_RAW)
+		    beg[size++] = *txt++;
+	    }
     }
 
-    r->text = beg;
-    r->leng = size;
+    if (encoding == E_RAW) {
+	r->text = beg;
+	r->leng = size;
+    }
 
     return r;
 }
