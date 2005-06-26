@@ -455,8 +455,8 @@ word_t *text_decode(word_t *w)
 	/* move decoded word to where the encoded used to be */
 	if (encoding == E_RAW) {
 	    memmove(beg+size, w->text, len);
-	    size += len;		/* bump output pointer */
-	    Z(beg[size]);		/* for easier debugging - removable */
+	    size += len;			/* bump output pointer */
+	    Z(beg[size]);			/* for easier debugging - removable */
 
 	    if (DEBUG_LEXER(3))
 		fprintf(dbgout, "**3**  %s\n", beg);
