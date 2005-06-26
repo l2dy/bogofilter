@@ -104,6 +104,23 @@ static charset_def_t charsets[] = {
     { "csgb2312",	T },
 };
 
+iconv_t *bf_iconv_open( const char *to_charset, const char *from_charset )
+{
+    iconv_t *xd = iconv_open( to_charset, from_charset );
+    if (xd == (iconv_t)(-1)) {
+	int err = errno;
+	if (err == EINVAL) {
+	    if (DEBUG_ICONV(1))
+		fprintf(dbgout, "Conversion from '%s' to '%s' is not supported.\n", 
+			from_charset, to_charset );
+	    /* error - map default charset to unicode */
+	    xd = iconv_open( charset_unicode, charset_default );
+	}
+    }
+
+    return xd;
+}
+
 void init_charset_table_iconv(const char *from_charset, const char *to_charset)
 {
     uint idx;
@@ -117,17 +134,7 @@ void init_charset_table_iconv(const char *from_charset, const char *to_charset)
     if (strcasecmp( from_charset, "default" ) == 0)
 	from_charset = charset_default;
 
-    cd = iconv_open( to_charset, from_charset );
-    if (cd == (iconv_t)(-1)) {
-	int err = errno;
-	if (err == EINVAL) {
-	    if (DEBUG_ICONV(1))
-		fprintf(dbgout, "Conversion from '%s' to '%s' is not supported.\n", 
-			from_charset, to_charset );
-	    /* error - map default charset to unicode */
-	    cd = iconv_open( charset_unicode, charset_default );
-	}
-    }
+    cd = bf_iconv_open( to_charset, from_charset );
 
     for (idx = 0; idx < COUNTOF(charsets); idx += 1)
     {
