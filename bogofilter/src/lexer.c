@@ -383,7 +383,6 @@ word_t *text_decode(word_t *w)
 	return r;
 
     while (txt < fin) {
-	word_t n;
 	byte *typ, *tmp, *end;
 	uint len;
 	bool adjacent;
@@ -396,41 +395,42 @@ word_t *text_decode(word_t *w)
 
 	charset = charset_as_string(txt, typ - txt - 1);
 
-	tmp = typ + 3;						/* start of encoded word */
+	tmp = typ + 2;						/* start of encoded word */
 	end = (byte *) memstr((char *)tmp, fin-tmp, "?=");	/* last byte of encoded word  */
 	len = end - tmp;
 
-	n.text = tmp;				/* Start of encoded word */
-	n.leng = len;				/* Length of encoded word */
+	w->text = tmp;				/* Start of encoded word */
+	w->leng = len;				/* Length of encoded word */
+	Z(w->text[w->leng]);			/* for easier debugging - removable */
 
 	if (DEBUG_LEXER(2)) {
 	    fputs("***  ", dbgout);
-	    word_puts(&n, 0, dbgout);
+	    word_puts(w, 0, dbgout);
 	    fputs("\n", dbgout);
 	}
 
 	switch (tolower(typ[1])) {		/* ... encoding type */
 	case 'b':
-	    if (base64_validate(&n))
-		len = base64_decode(&n);		/* decode base64 */
+	    if (base64_validate(w))
+		len = base64_decode(w);		/* decode base64 */
 	    break;
 	case 'q':
-	    if (qp_validate(&n, RFC2047))
-		len = qp_decode(&n, RFC2047);	/* decode quoted-printable */
+	    if (qp_validate(w, RFC2047))
+		len = qp_decode(w, RFC2047);	/* decode quoted-printable */
 	    break;
 	}
 
-	n.leng = len;
-
 	if (DEBUG_LEXER(3)) {
 	    fputs("***  ", dbgout);
-	    word_puts(&n, 0, dbgout);
+	    word_puts(w, 0, dbgout);
 	    fputs("\n", dbgout);
 	}
 
 	/* move decoded word to where the encoded used to be */
-	memmove(beg+size, n.text, len+1);
+	memmove(beg+size, w->text, len);
 	size += len;	/* bump output pointer */
+	Z(beg[size]);			/* for easier debugging - removable */
+
 	txt = end + 2;	/* skip ?= trailer */
 	if (txt >= fin)
 	    break;
@@ -462,9 +462,8 @@ word_t *text_decode(word_t *w)
 		beg[size++] = *txt++;
     }
 
-    w->leng = size;
-
-    Z(beg[size]);	/* for easier debugging - removable */
+    r->text = beg;
+    r->leng = size;
 
     return r;
 }
