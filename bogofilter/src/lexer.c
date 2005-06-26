@@ -350,6 +350,26 @@ int yyinput(byte *buf, size_t used, size_t size)
     return (count == EOF ? 0 : count);
 }
 
+static char *charset_as_string(const byte *txt, const size_t len)
+{
+    static char *charset_text = NULL;
+    static ushort charset_leng = 0;
+
+    if (charset_text == NULL)
+	charset_text = xmalloc(len+D);
+    else {
+	if (charset_leng < len) {
+	    charset_leng = len;
+	    charset_text = xrealloc(charset_text, charset_leng);
+	}
+    }
+
+    memcpy(charset_text, txt, len);
+    Z(charset_text[len]);			/* for easier debugging - removable */
+
+    return charset_text;
+}
+
 word_t *text_decode(word_t *w)
 {
     word_t *r = w;
@@ -368,7 +388,14 @@ word_t *text_decode(word_t *w)
 	uint len;
 	bool adjacent;
 
-	typ = (byte *) memchr((char *)txt+2, '?', fin-(txt+2));	/* Encoding type - 'B' or 'Q' */
+	char *charset;
+
+	txt += 2;
+	typ = (byte *) memchr((char *)txt+1, '?', fin-txt);	/* Encoding type - 'B' or 'Q' */
+	*typ++ = '\0';						/* nul terminate */
+
+	charset = charset_as_string(txt, typ - txt - 1);
+
 	tmp = typ + 3;						/* start of encoded word */
 	end = (byte *) memstr((char *)tmp, fin-tmp, "?=");	/* last byte of encoded word  */
 	len = end - tmp;
