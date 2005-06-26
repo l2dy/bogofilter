@@ -517,8 +517,10 @@ word_t *text_decode(word_t *w)
 	    while (txt < end) {
 		if (encoding == E_RAW)
 		    beg[size++] = *txt++;
+#ifndef	DISABLE_UNICODE
 		if (encoding == E_UNICODE)
 		    buf->t.text[buf->t.leng++] = *txt++;
+#endif
 	    }
     }
 
