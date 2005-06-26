@@ -23,7 +23,7 @@ header: =?iso-8859-1?q?bo?=
     =?iso-8859-1?q?dy?=
 _EOF
 
-cat >${TMPDIR}/reference <<_EOF
+cat >${TMPDIR}/reference.raw <<_EOF
 subj:okay
 subj:another
 subj:merge
@@ -47,6 +47,35 @@ iso-8859-1
 iso-8859-1
 _EOF
 
-$BOGOLEXER -p -C <${TMPDIR}/input >${TMPDIR}/output
-cmp ${TMPDIR}/reference ${TMPDIR}/output \
-|| diff ${TMPDIR}/reference ${TMPDIR}/output
+cat >${TMPDIR}/reference.utf8 <<_EOF
+subj:okay
+subj:another
+subj:merge
+subj:worked
+head:Reply-To
+head:join
+head:Reply-To
+head:join
+rcvd:john
+rcvd:doe
+rcvd:john_q_public
+head:X-Subject
+head:Zurückbehaltungsrecht
+head:Dateien
+head:für
+head:iso-8859-1
+head:Website
+torso
+header
+iso-8859-1
+iso-8859-1
+_EOF
+
+$BOGOLEXER -p -C --unicode=no  <${TMPDIR}/input >${TMPDIR}/output.raw
+$BOGOLEXER -p -C --unicode=yes <${TMPDIR}/input >${TMPDIR}/output.utf8
+
+cmp ${TMPDIR}/reference.raw ${TMPDIR}/output.raw \
+|| diff ${TMPDIR}/reference.raw ${TMPDIR}/output.raw
+
+cmp ${TMPDIR}/reference.utf8 ${TMPDIR}/output.utf8 \
+|| diff ${TMPDIR}/reference.utf8 ${TMPDIR}/output.utf8
