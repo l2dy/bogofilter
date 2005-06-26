@@ -228,7 +228,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <BOGO_LEX>\n					{ lineno += 1; }
 
 <INITIAL>{ENCODED_TOKEN}			{ static int processed = -1;
-						  if (processed != lineno) {
+						  if (true || processed != lineno) {
 						      word_t *raw = yy_text();
 						      word_t *txt = text_decode(raw);
 						      yy_unput(txt->text, txt->leng);
