@@ -15,7 +15,7 @@
 
 	2005-06-25
 
-	* Fixed multiple decoding of encoded tokens.
+	* Added unicode processing of encoded tokens.
 
 	2005-06-24
 
