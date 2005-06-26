@@ -408,6 +408,12 @@ word_t *text_decode(word_t *w)
     }
 #endif
 
+    if (DEBUG_LEXER(2)) {
+	fputs("**1**  ", dbgout);
+	word_puts(w, 0, dbgout);
+	fputs("\n", dbgout);
+    }
+
     while (txt < fin) {
 	byte *typ, *tmp, *end;
 	uint len;
@@ -430,7 +436,7 @@ word_t *text_decode(word_t *w)
 	Z(w->text[w->leng]);			/* for easier debugging - removable */
 
 	if (DEBUG_LEXER(2)) {
-	    fputs("***  ", dbgout);
+	    fputs("**2**  ", dbgout);
 	    word_puts(w, 0, dbgout);
 	    fputs("\n", dbgout);
 	}
@@ -446,17 +452,14 @@ word_t *text_decode(word_t *w)
 	    break;
 	}
 
-	if (DEBUG_LEXER(3)) {
-	    fputs("***  ", dbgout);
-	    word_puts(w, 0, dbgout);
-	    fputs("\n", dbgout);
-	}
-
 	/* move decoded word to where the encoded used to be */
 	if (encoding == E_RAW) {
 	    memmove(beg+size, w->text, len);
 	    size += len;		/* bump output pointer */
 	    Z(beg[size]);		/* for easier debugging - removable */
+
+	    if (DEBUG_LEXER(3))
+		fprintf(dbgout, "**3**  %s\n", beg);
 	}
 
 #ifndef	DISABLE_UNICODE
@@ -475,6 +478,12 @@ word_t *text_decode(word_t *w)
 	    cd = bf_iconv_open( charset_unicode, charset );
 	    iconvert_cd(cd, &src, buf);
 	    iconv_close(cd);
+
+	    if (DEBUG_LEXER(3)) {
+		fputs("**4**  ", dbgout);
+		word_puts(&buf->t, 0, dbgout);
+		fputs("\n", dbgout);
+	    }
 	}
 #endif
 
