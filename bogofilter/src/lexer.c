@@ -17,7 +17,10 @@
 #include "bogoreader.h"
 #include "charset.h"
 #include "error.h"
+#ifndef	DISABLE_UNICODE
+#include "convert_unicode.h"
 #include "iconvert.h"
+#endif
 #include "lexer.h"
 #include "memstr.h"
 #include "mime.h"
@@ -379,8 +382,31 @@ word_t *text_decode(word_t *w)
     byte *txt = (byte *) memstr(w->text, w->leng, "=?");	/* input position */
     uint size = (uint) (txt - beg);				/* output offset */
 
+#ifndef	DISABLE_UNICODE
+    size_t max = w->leng * 4;
+    static buff_t * buf = NULL;
+#endif
+
     if (txt == NULL)
 	return r;
+
+#ifndef	DISABLE_UNICODE
+    if (encoding == E_UNICODE) {
+	if (buf == NULL)
+	    buf = buff_new(xmalloc(max), 0, max);
+	r = &buf->t;				/* Use buf to return unicode result */
+
+	buf->t.leng = 0;
+	if (buf->size < max) {
+	    buf->size = max;
+	    buf->t.text = xrealloc(buf->t.text, buf->size);
+	}
+
+	buf->t.leng = size;
+	memcpy(buf->t.text, beg, size );
+	Z(buf->t.text[buf->t.leng]);		/* for easier debugging - removable */
+    }
+#endif
 
     while (txt < fin) {
 	byte *typ, *tmp, *end;
@@ -433,6 +459,25 @@ word_t *text_decode(word_t *w)
 	    Z(beg[size]);		/* for easier debugging - removable */
 	}
 
+#ifndef	DISABLE_UNICODE
+	if (encoding == E_UNICODE) {
+	    iconv_t cd;
+	    buff_t  src;
+
+	    /* convert 'word_t *w' to 'buff_t src' because
+	    ** iconvert_cd() needs buff_t pointers
+	    */
+	    src.t.text = w->text;
+	    src.t.leng = len;
+	    src.read   = 0;
+	    src.size   = len;
+
+	    cd = bf_iconv_open( charset_unicode, charset );
+	    iconvert_cd(cd, &src, buf);
+	    iconv_close(cd);
+	}
+#endif
+
 	txt = end + 2;	/* skip ?= trailer */
 	if (txt >= fin)
 	    break;
@@ -463,6 +508,8 @@ word_t *text_decode(word_t *w)
 	    while (txt < end) {
 		if (encoding == E_RAW)
 		    beg[size++] = *txt++;
+		if (encoding == E_UNICODE)
+		    buf->t.text[buf->t.leng++] = *txt++;
 	    }
     }
 
