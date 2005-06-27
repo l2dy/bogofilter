@@ -86,9 +86,10 @@ void begin_wordlist(wordlist_t *list)
 		continue;
 	}
 	switch (ds_get_wordlist_encoding(list->dsh, &val)) {
-	    case 0:
-	    case 1:
+	    case 0:		/* found */
 		list->encoding = val.spamcount;
+		break;
+	    case 1:		/* not found */
 		break;
 	    case DS_ABORT_RETRY:
 		continue;
