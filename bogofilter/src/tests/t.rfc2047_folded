@@ -7,6 +7,10 @@
 #
 # test below
 # remember to use ${srcdir}
+
+# Note: requires a configuration that allows both --unicode=yes and --unicode=no
+#	Using --enable-unicode or --disable-unicode with configure breaks this test.
+
 cat >${TMPDIR}/input <<_EOF
 Subject: =?iso-8859-1?q?ok?=
     =?iso-8859-1?q?ay?=

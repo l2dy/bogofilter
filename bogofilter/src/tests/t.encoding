@@ -3,8 +3,12 @@
 . ${srcdir:=.}/t.frame
 
 #
-# test common bogoutil functions
+# test common encoding related capabilities, e.g. 
+# registering messages and database maintenance
 #
+
+# Note: requires a configuration that allows both --unicode=yes and --unicode=no
+#	Using --enable-unicode or --disable-unicode with configure breaks this test.
 
 # initialize
 rm ${TMPDIR}/* # reset TXN detection
