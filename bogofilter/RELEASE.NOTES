@@ -36,6 +36,13 @@ is working properly.
 NOTE: the NEWS and CHANGES documents have greater detail on some of
 these changes. You should consult them.
 
+******** [Summary 0.95.1] ********
+
+Some of the 'make check' scripts depend on options '--unicode=no' and
+'--unicode=yes' options.  These scripts will fail if bogofilter is
+configured in a non-default manner, i.e. if --disable-unicode or
+--enable-unicode is specified.
+
 ******** [Summary 0.95.0] ********
 
 This release supports unicode (utf-8).  A new meta-token .ENCODING has

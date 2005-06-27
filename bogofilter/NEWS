@@ -13,6 +13,11 @@
 
 -------------------------------------------------------------------------------
 
+0.95.1	2005-06-26
+
+	* Fixed some wordlist open conflicts in bogotune.
+	* Document unicode requirements for 'make check'
+
 	2005-06-25
 
 	* Added unicode processing of encoded tokens.
