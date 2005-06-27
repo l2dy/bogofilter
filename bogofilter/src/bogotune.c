@@ -1751,6 +1751,11 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	init_wordlist("word", ds_path, 0, WL_REGULAR);
 
 	open_wordlists(DS_READ);	/* open to get .ENCODING value */
+
+	/* if encoding not set, 'tis an old (raw) wordlist */
+	if (encoding == E_UNKNOWN)
+	    encoding = E_RAW;
+
 #ifdef	ENABLE_TDB_DATASTORE
 	/* for TrivialDB, a double open fails, so the wordlist must be closed */
 	/* with Berkeley DB 4.2 with transactions, closing the wordlist causes a PANIC */
@@ -1758,6 +1763,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 #endif
     }
 
+    /* if encoding not yet set, use default value */
     if (encoding == E_UNKNOWN)
 	encoding = E_DEFAULT;
 
