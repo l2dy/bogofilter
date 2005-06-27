@@ -29,8 +29,6 @@ unset BF_FORCE_TRANSACTIONAL || :
 OUT=${TMPDIR}/test.out
 MSG=${TMPDIR}/test.msg
 LOG=${BOGOFILTER_DIR}/log.0000000001
-# cksum is POSIX compliant ($HASHTOOL isn't)
-HASHTOOL=cksum
 
 NO="--db-transaction=no"
 YES="--db-transaction=yes"
@@ -38,11 +36,6 @@ YES="--db-transaction=yes"
 cat <<EOF > $MSG
 this is a test message
 EOF
-
-# clean up - t.frame may have created everything for us
-rm -f	${BOGOFILTER_DIR}/log.?????????? \
-	${BOGOFILTER_DIR}/__db.??? \
-	${BOGOFILTER_DIR}/lockfile-?
 
 # transactions=no;  no log file
 
@@ -73,9 +66,9 @@ fi
 
 # probe=yes;  log file should change
 
-BEF=`$HASHTOOL $LOG`
+BEF=`sum $LOG`
 $BOGOFILTER -C  -H -n -I $MSG
-AFT=`$HASHTOOL $LOG`
+AFT=`sum $LOG`
 
 if [ "$BEF" = "$AFT" ] ; then
     echo "Failed test 'p=y, e=y'" >> $OUT
@@ -86,9 +79,9 @@ fi
 
 # probe=yes, transactions=no;  log file should not change
 
-BEF=`$HASHTOOL $LOG`
+BEF=`sum $LOG`
 $BOGOFILTER -C $NO  -H -s -I $MSG
-AFT=`$HASHTOOL $LOG`
+AFT=`sum $LOG`
 
 if [ "$BEF" != "$AFT" ] ; then
     echo "Failed test 'p=y, t=n'" >> $OUT
