@@ -148,6 +148,7 @@ static word_t *w_msg_count;
 
 static uint message_count;
 
+static wordhash_t *train;
 static tunelist_t *ns_and_sp;
 static tunelist_t *ns_msglists, *sp_msglists;
 
@@ -652,9 +653,8 @@ static void load_wordlist(ds_foreach_t *hook, void *userdata)
 static int load_hook(word_t *key, dsv_t *data, void *userdata)
 /* returns 0 if ok, 1 if not ok */
 {
-    wordhash_t *train = userdata;
-
     wordprop_t *tokenprop = wordhash_insert(train, key, sizeof(wordprop_t), &wordprop_init);
+
     tokenprop->cnts.bad = data->spamcount;
     tokenprop->cnts.good = data->goodcount;
 
@@ -664,12 +664,12 @@ static int load_hook(word_t *key, dsv_t *data, void *userdata)
     return 0;
 }
 
-static void set_train_msg_counts(wordhash_t *train, wordhash_t *wh)
+static void set_train_msg_counts(wordhash_t *tr, wordhash_t *wh)
 {
     wordprop_t *count;
     count = wordhash_insert(wh, w_msg_count, sizeof(wordprop_t), NULL);
     if (count->cnts.good == 0 || count->cnts.bad == 0)
-	load_wordlist(load_hook, train);
+	load_wordlist(load_hook, tr);
     if (msgs_good == 0 && msgs_bad == 0) {
 	fprintf(stderr, "Can't find '.MSG_COUNT'.\n");
 	exit(EX_ERROR);
@@ -689,7 +689,6 @@ static void print_msgcount_entry(const char *token, uint bad, uint good)
 static void write_msgcount_file(wordhash_t *wh)
 {
     hashnode_t *hn;
-    wordhash_t *train = ns_and_sp->train;
 
     print_msgcount_entry(".MSG_COUNT", msgs_bad, msgs_good);
 
@@ -714,8 +713,6 @@ static void write_msgcount_file(wordhash_t *wh)
 
 static uint read_mailbox(char *arg, mlhead_t *msgs)
 {
-    wordhash_t *train = ns_and_sp->train;
-
     if (verbose) {
 	printf("Reading %s\n", arg);
 	fflush(stdout);
@@ -799,7 +796,6 @@ static void distribute(int mode, tunelist_t *ns_or_sp)
 
     mlitem_t *item;
     mlhead_t *msgs = ns_or_sp->msgs;
-    wordhash_t *train = ns_and_sp->train;
 
     int score_count = 0;
     int train_count = 0;
@@ -1299,6 +1295,7 @@ static void bogotune_init(void)
 {
     const char *msg_count = MSG_COUNT;
     w_msg_count = word_news(msg_count);
+    train       = wordhash_new();
     ns_and_sp   = tunelist_new("tr");		/* training lists */
     ns_msglists = tunelist_new("ns");		/* non-spam scoring lists */
     sp_msglists = tunelist_new("sp");		/* spam     scoring lists */
@@ -1405,7 +1402,7 @@ static rc_t bogotune(void)
     if (bogolex_file != NULL) {
 	if (!check_msgcount_parms())
 	    exit(EX_ERROR);
-	load_wordlist(load_hook, ns_and_sp->train);
+	load_wordlist(load_hook, train);
 	read_mailbox(bogolex_file, NULL);
 	return status;
     }
@@ -1510,8 +1507,8 @@ static rc_t bogotune(void)
 	fprintf(stderr, "Warning:  Using ESF values (sp=%8.6f, ns=%8.6f) from config file.\n", sp_esf, ns_esf);
 
     /* No longer needed */
-    wordhash_free(ns_and_sp->train);
-    ns_and_sp->train = NULL;
+    wordhash_free(train);
+    train = NULL;
 
     for (scan=0; scan <= 1 && !skip; scan ++) {
 	uint r_count;

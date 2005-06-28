@@ -120,7 +120,6 @@ tunelist_t *tunelist_new(const char *label)
     tunelist_t *list = xcalloc( 1, sizeof(tunelist_t));
 
     list->name = label;
-    list->train = wordhash_new();
     list->msgs   = msglist_new("msgs");
     list->u.r.r0 = msglist_new("r0");
     list->u.r.r1 = msglist_new("r1");
