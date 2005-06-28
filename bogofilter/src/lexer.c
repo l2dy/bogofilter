@@ -363,7 +363,7 @@ static char *charset_as_string(const byte *txt, const size_t len)
     else {
 	if (charset_leng < len) {
 	    charset_leng = len;
-	    charset_text = xrealloc(charset_text, charset_leng);
+	    charset_text = xrealloc(charset_text, charset_leng+D);
 	}
     }
 
@@ -393,13 +393,13 @@ word_t *text_decode(word_t *w)
 #ifndef	DISABLE_UNICODE
     if (encoding == E_UNICODE) {
 	if (buf == NULL)
-	    buf = buff_new(xmalloc(max), 0, max);
+	    buf = buff_new(xmalloc(max+D), 0, max+D);
 	r = &buf->t;				/* Use buf to return unicode result */
 
 	buf->t.leng = 0;
 	if (buf->size < max) {
 	    buf->size = max;
-	    buf->t.text = xrealloc(buf->t.text, buf->size);
+	    buf->t.text = xrealloc(buf->t.text, buf->size+D);
 	}
 
 	buf->t.leng = size;
