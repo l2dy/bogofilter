@@ -1390,6 +1390,19 @@ static void show_elapsed_time(int beg, int end, uint cnt, double val,
 	       MIN(tm), SECONDS(tm), cnt, lbl1, val, lbl2);
 }
 
+static rc_t bogolex(void)
+{
+    rc_t status = RC_OK;
+
+    if (!check_msgcount_parms())
+	exit(EX_ERROR);
+
+    load_wordlist(load_hook, train);
+    read_mailbox(bogolex_file, NULL);
+
+    return status;
+}
+
 static rc_t bogotune(void)
 {
     bool skip;
@@ -1398,16 +1411,6 @@ static rc_t bogotune(void)
     int beg, end;
     uint cnt, scan;
     rc_t status = RC_OK;
-
-    bogotune_init();
-
-    if (bogolex_file != NULL) {
-	if (!check_msgcount_parms())
-	    exit(EX_ERROR);
-	load_wordlist(load_hook, train);
-	read_mailbox(bogolex_file, NULL);
-	return status;
-    }
 
     beg = time(NULL);
 
@@ -1766,7 +1769,12 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     if (encoding == E_UNKNOWN)
 	encoding = E_DEFAULT;
 
-    bogotune();
+    bogotune_init();
+
+    if (bogolex_file != NULL)
+	bogolex();
+    else
+	bogotune();
 
     bogotune_free();
 
