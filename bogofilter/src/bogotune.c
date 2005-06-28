@@ -655,6 +655,8 @@ static int load_hook(word_t *key, dsv_t *data, void *userdata)
 {
     wordprop_t *tokenprop = wordhash_insert(train, key, sizeof(wordprop_t), &wordprop_init);
 
+    (void) userdata;	/* quiet compiler complaint */
+
     tokenprop->cnts.bad = data->spamcount;
     tokenprop->cnts.good = data->goodcount;
 
@@ -664,12 +666,12 @@ static int load_hook(word_t *key, dsv_t *data, void *userdata)
     return 0;
 }
 
-static void set_train_msg_counts(wordhash_t *tr, wordhash_t *wh)
+static void set_train_msg_counts(wordhash_t *wh)
 {
     wordprop_t *count;
     count = wordhash_insert(wh, w_msg_count, sizeof(wordprop_t), NULL);
     if (count->cnts.good == 0 || count->cnts.bad == 0)
-	load_wordlist(load_hook, tr);
+	load_wordlist(load_hook, train);
     if (msgs_good == 0 && msgs_bad == 0) {
 	fprintf(stderr, "Can't find '.MSG_COUNT'.\n");
 	exit(EX_ERROR);
@@ -728,7 +730,7 @@ static uint read_mailbox(char *arg, mlhead_t *msgs)
 	collect_words(whc);
 
 	if (ds_path != NULL && (msgs_good + msgs_bad) == 0)
-	    set_train_msg_counts(train, whc);
+	    set_train_msg_counts(whc);
 
 	if (whc->count == 0 && !quiet) {
 	    printf("msg #%u, count is %u\n", message_count, whc->count);
