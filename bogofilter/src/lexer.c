@@ -165,7 +165,7 @@ static int get_decoded_line(buff_t *buff)
 	if (temp->size < buff->size / 6) {
 	    xfree(temp->t.text);
 	    temp->size = buff->size / 6;
-	    temp->t.text = (byte *) xmalloc(temp->size + D);
+	    temp->t.text = (byte *) xmalloc(temp->size+D);
 	}
 
 	temp->t.leng = temp->read = 0;
@@ -393,13 +393,13 @@ word_t *text_decode(word_t *w)
 #ifndef	DISABLE_UNICODE
     if (encoding == E_UNICODE) {
 	if (buf == NULL)
-	    buf = buff_new(xmalloc(max+D), 0, max+D);
+	    buf = buff_new(xmalloc(max+D), 0, max);
 	r = &buf->t;				/* Use buf to return unicode result */
 
 	buf->t.leng = 0;
 	if (buf->size < max) {
 	    buf->size = max;
-	    buf->t.text = xrealloc(buf->t.text, buf->size+D);
+	    buf->t.text = (byte *) xrealloc(buf->t.text, buf->size+D);
 	}
 
 	buf->t.leng = size;
