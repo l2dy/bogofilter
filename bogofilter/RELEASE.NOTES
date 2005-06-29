@@ -36,6 +36,16 @@ is working properly.
 NOTE: the NEWS and CHANGES documents have greater detail on some of
 these changes. You should consult them.
 
+******** [Major 0.95.2] ********
+
+This release gives up on locking the databases at page granularity and
+locks whole environments, to overcome lock sizing requirements which are
+a major maintenance headache in unattended setups.
+
+This however means that a writer (token registration) will lock out
+readers (message scoring) and readers will prevent new writers from
+starting.
+
 ******** [Summary 0.95.1] ********
 
 Some of the 'make check' scripts depend on options '--unicode=no' and

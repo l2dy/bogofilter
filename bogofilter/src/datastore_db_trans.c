@@ -39,13 +39,13 @@ David Relson	<relson@osagesoftware.com> 2005
 static int lockfd = -1;	/* fd of lock file to prevent concurrent recovery */
 
 /** Default flags for DB_ENV->open() */
-static const u_int32_t dbenv_defflags = DB_INIT_MPOOL | DB_INIT_LOCK
+static const u_int32_t dbenv_defflags = DB_INIT_MPOOL
 					| DB_INIT_LOG | DB_INIT_TXN;
 
 /* public -- used in datastore.c */
 static int	   dbx_begin		(void *vhandle);
-static int  	   dbx_abort		(void *vhandle);
-static int  	   dbx_commit		(void *vhandle);
+static int	   dbx_abort		(void *vhandle);
+static int	   dbx_commit		(void *vhandle);
 /* private -- used in datastore_db_*.c */
 static DB_ENV	  *dbx_get_env_dbe	(dbe_t *env);
 static const char *dbx_database_name	(const char *db_file);
@@ -56,9 +56,9 @@ static int	   dbx_lock		(void *handle, int open_mode);
 static ex_t	   dbx_common_close	(DB_ENV *dbe, bfpath *bfp);
 static int	   dbx_sync		(DB_ENV *dbe, int ret);
 static void	   dbx_log_flush	(DB_ENV *dbe);
-static dbe_t 	  *dbx_init		(bfpath *bfp);
-static void 	   dbx_cleanup		(dbe_t *env);
-static void 	   dbx_cleanup_lite	(dbe_t *env);
+static dbe_t	  *dbx_init		(bfpath *bfp);
+static void	   dbx_cleanup		(dbe_t *env);
+static void	   dbx_cleanup_lite	(dbe_t *env);
 static ex_t	   dbe_env_purgelogs	(DB_ENV *dbe);
 
 static ex_t	   dbx_checkpoint	(bfpath *bfp);
@@ -104,9 +104,9 @@ dsm_t dsm_transactional = {
 static int plock(const char *path, short locktype, int mode);
 static int db_try_glock(bfpath *bfp, short locktype, int lockcmd);
 static int bf_dbenv_create(DB_ENV **dbe);
-static void dbe_config(void *vhandle, u_int32_t numlocks, u_int32_t numobjs);
-static dbe_t *dbe_xinit(dbe_t *env, bfpath *bfp, u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags);
-static DB_ENV *dbe_recover_open(bfpath *bfp, uint32_t flags);
+static void dbe_config(void *vhandle);
+static dbe_t *dbe_xinit(dbe_t *env, bfpath *bfp, u_int32_t flags);
+static DB_ENV *dbe_recover_open(bfpath *bfp, u_int32_t flags);
 
 /* support functions */
 
@@ -158,22 +158,31 @@ int  dbx_auto_commit_flags(void)
 
 int dbx_lock(void *vhandle, int open_mode)
 {
-    (void) vhandle;
-    (void) open_mode;
+    int e = 0;
+    dbh_t *handle = vhandle;
 
-    return 0;
+    /* try fcntl lock */
+    handle->locked = false;
+    if (db_lock(handle->fd, F_SETLK,
+		(short int)(open_mode == DS_READ ? F_RDLCK : F_WRLCK)))
+    {
+	e = errno;
+	db_close(handle);
+	errno = e;
+	if (errno == EACCES)
+	    e = errno = EAGAIN;
+    } else {
+	/* have lock */
+	if (handle->fd > 0)
+	    handle->locked = true;
+    }
+    return e;
 }
 
 int dbx_get_rmw_flag(int open_mode)
 {
-    int flag;
-
-    if (open_mode == DS_READ)
-	flag = 0;
-    else
-	flag = DB_RMW;
-
-    return flag;
+    (void)open_mode;
+    return 0;
 }
 
 /** print user-readable diagnostics and instructions after DB_ENV->open
@@ -206,9 +215,9 @@ static void diag_dbeopen(
 }
 
 /** run recovery, open environment and keep the exclusive lock */
-static DB_ENV *dbe_recover_open(bfpath *bfp, uint32_t flags)
+static DB_ENV *dbe_recover_open(bfpath *bfp, u_int32_t flags)
 {
-    const uint32_t local_flags = flags | DB_CREATE;
+    const u_int32_t local_flags = flags | DB_CREATE;
     DB_ENV *dbe;
     int e;
 
@@ -433,49 +442,11 @@ static int bf_dbenv_create(DB_ENV **env)
     return ret;
 }
 
-static void dbe_config(void *vhandle, u_int32_t numlocks, u_int32_t numobjs)
+static void dbe_config(void *vhandle)
 {
     dbe_t *env = vhandle;
     int ret = 0;
     u_int32_t logsize = 1048576;    /* 1 MByte (default in BDB 10 MByte) */
-
-    /* configure lock system size - locks */
-#if DB_AT_LEAST(3,2)
-    if ((ret = env->dbe->set_lk_max_locks(env->dbe, numlocks)) != 0)
-#else
-    if ((ret = env->dbe->set_lk_max(env->dbe, numlocks)) != 0)
-#endif
-    {
-	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_max_locks(%p, %lu), err: %d, %s", (void *)env->dbe,
-		(unsigned long)numlocks, ret, db_strerror(ret));
-	exit(EX_ERROR);
-    }
-
-    if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "DB_ENV->set_lk_max_locks(%p, %lu)\n", (void *)env->dbe, (unsigned long)numlocks);
-
-#if DB_AT_LEAST(3,2)
-    /* configure lock system size - objects */
-    if ((ret = env->dbe->set_lk_max_objects(env->dbe, numobjs)) != 0) {
-	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_max_objects(%p, %lu), err#%d: %s", (void *)env->dbe,
-		(unsigned long)numobjs, ret, db_strerror(ret));
-	exit(EX_ERROR);
-    }
-    if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "DB_ENV->set_lk_max_objects(%p, %lu)\n", (void *)env->dbe, (unsigned long)numlocks);
-#else
-    /* suppress compiler warning for unused variable */
-    (void)numobjs;
-#endif
-
-    /* configure automatic deadlock detector */
-    if ((ret = env->dbe->set_lk_detect(env->dbe, DB_LOCK_DEFAULT)) != 0) {
-	print_error(__FILE__, __LINE__, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT), err: %d, %s", ret, db_strerror(ret));
-	exit(EX_ERROR);
-    }
-
-    if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "DB_ENV->set_lk_detect(DB_LOCK_DEFAULT)\n");
 
     /* configure log file size */
     ret = env->dbe->set_lg_max(env->dbe, logsize);
@@ -527,15 +498,14 @@ static dbe_t *dbx_init(bfpath *bfp)
 #endif
 #endif
 
-    dbe_xinit(env, bfp, db_max_locks, db_max_objects, flags);
+    dbe_xinit(env, bfp, flags);
 
     return env;
 }
 
 /* dummy infrastructure, to be expanded by environment
  * or transactional initialization/shutdown */
-static dbe_t *dbe_xinit(dbe_t *env, bfpath *bfp,
-	u_int32_t numlocks, u_int32_t numobjs, u_int32_t flags)
+static dbe_t *dbe_xinit(dbe_t *env, bfpath *bfp, u_int32_t flags)
 {
     int ret;
 
@@ -553,7 +523,7 @@ static dbe_t *dbe_xinit(dbe_t *env, bfpath *bfp,
     if (DEBUG_DATABASE(1))
 	fprintf(dbgout, "DB_ENV->set_cachesize(%u)\n", db_cachesize);
 
-    dbe_config(env, numlocks, numobjs);
+    dbe_config(env);
 
     flags |= DB_CREATE | dbenv_defflags;
 
@@ -658,8 +628,7 @@ ex_t dbx_recover(bfpath *bfp, bool catastrophic, bool force)
     if (DEBUG_DATABASE(0))
         fprintf(dbgout, "running %s data base recovery\n",
 	    catastrophic ? "catastrophic" : "regular");
-    env = dbe_xinit(env, bfp, 
-		    db_max_locks, db_max_objects,
+    env = dbe_xinit(env, bfp,
 		    catastrophic ? DB_RECOVER_FATAL : DB_RECOVER);
     if (env == NULL) {
 	exit(EX_ERROR);
@@ -843,8 +812,6 @@ bool dsm_options_bogofilter(int option, const char *name, const char *val)
 	    eTransaction = get_txn(name, val);								return true;
 
 #ifdef	HAVE_DECL_DB_CREATE
-	case O_DB_MAX_OBJECTS:		db_max_objects		= atoi(val);				return true;
-	case O_DB_MAX_LOCKS:		db_max_locks		= atoi(val);				return true;
 	case O_DB_LOG_AUTOREMOVE:	db_log_autoremove	= get_bool(name, val);			return true;
 #ifdef	FUTURE_DB_OPTIONS
 	case O_DB_TXN_DURABLE:		db_txn_durable		= get_bool(name, val);			return true;
@@ -897,21 +864,10 @@ bool dsm_options_bogoutil(int option, cmd_t *flag, int *count, const char **ds_f
 	    *count += 1;
 	    return true;
 
-#ifdef	HAVE_DECL_DB_CREATE
-	case O_DB_MAX_OBJECTS:	
-	    db_max_objects = atoi(val);
-	    return true;
-	case O_DB_MAX_LOCKS:
-	    db_max_locks   = atoi(val);
-	    return true;
-	case O_DB_LOG_AUTOREMOVE:
-	    db_log_autoremove = get_bool(name, val);
-	    return true;
 #ifdef	FUTURE_DB_OPTIONS
 	case O_DB_TXN_DURABLE:
 	    db_txn_durable    = get_bool(name, val);
 	    return true;
-#endif
 #endif
 
 	default:

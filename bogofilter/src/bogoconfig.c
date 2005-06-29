@@ -775,8 +775,6 @@ rc_t query_config(void)
 
 #ifdef	ENABLE_TRANSACTIONS
 #ifdef	HAVE_DECL_DB_CREATE
-    Q2 fprintf(stdout, "%-18s = %lu\n", "db-lk-max-locks",      (unsigned long)db_max_locks);
-    Q2 fprintf(stdout, "%-18s = %lu\n", "db-lk-max-objects",    (unsigned long)db_max_objects);
     Q2 fprintf(stdout, "%-18s = %s\n", "db-log-autoremove",     YN(db_log_autoremove));
 #ifdef	FUTURE_DB_OPTIONS
     Q2 fprintf(stdout, "%-18s = %s\n", "db-log-txn-durable",    YN(db_txn_durable));

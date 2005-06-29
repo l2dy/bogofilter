@@ -66,9 +66,6 @@ dsm_t *dsm = &dsm_transactional;
 
 /** Default flags for DB_ENV->open() */
 
-u_int32_t db_max_locks = 16384;		/* set_lk_max_locks    32768 */
-u_int32_t db_max_objects = 16384;	/* set_lk_max_objects  32768 */
-
 bool	  db_log_autoremove = true;	/* DB_LOG_AUTOREMOVE */
 
 #ifdef	FUTURE_DB_OPTIONS

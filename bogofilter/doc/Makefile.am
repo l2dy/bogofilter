@@ -10,11 +10,11 @@ SUFFIXES= .1 .1in .htmlin .html
 
 # what to build
 man_MANS = bogofilter.1 bogoutil.1 bogoupgrade.1 bogolexer.1 bogotune.1 \
-	   bf_copy.1 bf_tar.1 bf_compact.1 bf_resize.1
+	   bf_copy.1 bf_tar.1 bf_compact.1
 
 html_MANS = bogofilter.html bogoutil.html bogoupgrade.html \
 	    bogolexer.html bogotune.html \
-	    bf_copy.html bf_tar.html bf_compact.html bf_resize.html
+	    bf_copy.html bf_tar.html bf_compact.html
 
 all: $(man_MANS) $(html_MANS)
 
@@ -31,7 +31,6 @@ EXTRA_DIST = \
 	     bogoutil.xml bogoutil.1in bogoutil.htmlin \
 	     bf_compact.xml bf_compact.1in bf_compact.htmlin \
 	     bf_copy.xml bf_copy.1in bf_copy.htmlin \
-	     bf_resize.xml bf_resize.1in bf_resize.htmlin \
 	     bf_tar.xml bf_tar.1in bf_tar.htmlin \
 	     $(HTML_DOCS) \
 	     bogofilter-tuning.HOWTO.html \

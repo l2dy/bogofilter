@@ -22,9 +22,6 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 #include "datastore.h"
 
-extern	u_int32_t db_max_locks;		/* set_lk_max_locks   */
-extern	u_int32_t db_max_objects;	/* set_lk_max_objects */
-
 extern	bool	  db_log_autoremove;	/* DB_LOG_AUTOREMOVE  */
 extern	bool	  db_txn_durable;	/* not DB_TXN_NOT_DURABLE */
 

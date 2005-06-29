@@ -93,16 +93,6 @@
 #db_log_autoremove=no		# default
 ###db_log_autoremove=yes	# (alternate)
 
-#### DB_LK_MAX_LOCKS, DB_LK_MAX_OBJECTS
-#
-#	BerkeleyDB uses these values for creating its lock tables.
-#
-#	If you run out of locks, see file README.db, 
-#	section "3.2 LOCK TABLE EXHAUSTION"
-#
-#db_lk_max_locks=16384		# default
-#db_lk_max_objects=16384	# default
-
 #### TIMESTAMP
 #
 #	enables or disables token timestamps

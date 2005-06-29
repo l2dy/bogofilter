@@ -9,7 +9,6 @@ database libraries. Common entry points are these
 
 QUICK LINKS:
 ------------
-Lock table exhaustion                         section 3.2
 Upgrade of Berkeley DB or operating system    section 2.6
 Switching on or off transactions              section 2.2.1 or 2.2.2
 Recover broken database                       section 3.3 or 3.4
@@ -88,13 +87,6 @@ versions 4.0 or older.  For 4.1 and newer, use these commands:
   bogoutil --db-transaction=yes -l wordlist.db < wordlist.txt
 
 And if all commands succeeded: rm wordlist.txt wordlist.db.old
-
-NOTE: transactional databases require large lock tables, the exact
-size depends on the size of the database. If the lock table isn't
-large enough, you may get errors and need to increase the lock table
-size, see section 3.2 and perhaps 4.2 when you see this problem.
-"bogoutil -d wordlist.db > /dev/null" can be used to check if the lock
-table size is sufficient, as it will access the whole data base.
 
 2.2.2 Downgrading to non-transactional database
 
@@ -239,31 +231,8 @@ for several backup strategies.
 
 3.2 LOCK TABLE EXHAUSTION
 
-This section only applies to transactional databases.
-
-Operations that affect large parts of the data base or the data base as
-a whole (bogoutil usually) may require many locks and exhaust the
-maximum number of locks or the maximum number of locked objects that the
-Berkeley DB environments support.
-
-Exhaustion of the lock table can cause operations to abort with "out of
-memory" although the machine has plenty of memory. The cause can be
-natural database growth.
-
-This problem is recoverable, by simply resizing the lock tables. Just
-run "bf_resize ~/.bogofilter" and that's it.
-A future version of bogofilter may automate this process.
-
-This script will modify the ~/.bogofilter/DB_CONFIG file and run
-recovery to perform the resize.  It'll resize the lock and object tables
-to twice of what is currently in use.
-
-You may need to adjust these figures before applying larger training
-sets. You will need up to one lock per data base page and a bit of
-headroom for future training -- see section 4.2 below to determine the
-size of the data base and data base page. After changing these
-set_lk_max* lines in DB_CONFIG, run 'bogoutil --db-recover
-~/.bogofilter' to make the change effective.
+(the content of this section was removed, because it was obsolete, but
+its number was kept to maintain section numbering)
 
 3.3 RECOVERY AND FAILED RECOVERY, FOR TRANSACTIONAL DATABASES ONLY
 
@@ -416,7 +385,7 @@ A bf_copy script is provided for your convenience.
 4.1 GENERAL INFORMATION
 
 Berkeley DB keeps some additional statistics about the database itself,
-and in transactional databases also about locking, caching, logging,
+and in transactional databases also about caching, logging,
 transactions and their efficiency.
 
 The page size of the database file can be queried by bogoutil:
@@ -430,7 +399,6 @@ db_stat -h ~/.bogofilter -d wordlist.db # data base statistics
 The following are only available in transactional mode:
 
 db_stat -h ~/.bogofilter -e # environment statistics
-db_stat -h ~/.bogofilter -c # lock statistics - needed for lock resizing
 db_stat -h ~/.bogofilter -m # buffer pool statistics
 db_stat -h ~/.bogofilter -l # log statistics
 db_stat -h ~/.bogofilter -t # transaction statistics
@@ -459,49 +427,8 @@ removal, see section 3.1.
 
 4.2 SPECIFIC INFORMATION ON RESIZING THE LOCK TABLES
 
-In all the commands shown below, replace the ~/.bogofilter path by the
-name of the directory holding your wordlist.db file.
-
-a. Determine the data base size:
-
-  ls -l ~/.bogofilter/wordlist.db
-
-b. Determine the data base page size:
-
-  bogoutil --db-print-pagesize ~/.bogofilter/wordlist.db
-
-The relevant line has "database page size"
-
-c. The number of locks and lock objects needed is the data base size
-divided by the data base page size, rounded up generously, for example:
-
-(output from step a)
--rw-r--r--    1 joe      users    15360000 2004-05-11 12:25 wordlist.db
-
-(output from step b)
-53162   Btree magic number.
-8       Btree version number.
-Flags:
-2       Minimum keys per-page.
-4096    Underlying database page size.
-3       Number of levels in the tree.
-...
-
-Hence: 15360000 / 4096 = 3750
-
-d. Round up, 4096 may be adequate if you train seldomly, use
-higher values if you train often or in preparation of training on a
-large mailbox. Higher values make your lock region, usually __db.004,
-larger, but allow for larger data bases. Lower values save disk space
-but may require you to to resize the lock region more often.
-
-e. Use this rounded-up figure for both of the the two DB_CONFIG file
-   lines mentioned in section 3.1
-
-f. run 'bogoutil --db-recover ~/.bogofilter'
-
-Bogofilter will re-create the lock tables automatically
-the next time it is run.
+(the contents of this section were obsolete and have been removed,
+the section number was left in place to maintain section numbering)
 
 4.3 INTERESTING CONFIGURATION PARAMETERS FOR DB_CONFIG
 
@@ -529,14 +456,6 @@ SIZING OPTIONS:
 
    Example: set_cachesize 0 60000000 6
    will create six caches sized 12500000 bytes (12.5 MB, +25% applied)
-
- - set_lk_max_locks   12345
- - set_lk_max_objects 12346
-   (valid in Berkeley DB 3.2 - 4.3, requires recovery to change)
-
-   see sections 3.2 and 4.2 of this document for how to set the numbers.
-   Choosing these figures too high wastes disk space,
-   choosing them too low may cause bogofilter applications to abort.
 
  - set_lg_max         250000
    (valid in Berkeley DB 3.1 - 4.3, takes effect immediately)

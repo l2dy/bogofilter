@@ -2,6 +2,11 @@
 
 			bogofilter TODO list
 
+**** Add a "reservation lock" (fcntl style on separate file) so that a
+     writer can prevent new readers from starting, so that busy scoring
+     systems don't starve registration processes. (Figure out the
+     details to avoid deadlock.)
+
 **** Rewrite MIME header parser to fail more gracefully on
      http://bugs.gentoo.org/show_bug.cgi?id=69893 - this revealed bugs
      in the stack implementation.

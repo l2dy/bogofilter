@@ -762,7 +762,7 @@ AC_CONFIG_FILES([Makefile \
 		contrib/Makefile doc/Makefile \
 		src/Makefile \
 		src/tests/Makefile \
-		src/bf_compact src/bf_copy src/bf_resize src/bf_tar \
+		src/bf_compact src/bf_copy src/bf_tar \
 		])
 AC_OUTPUT
 

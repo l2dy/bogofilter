@@ -133,9 +133,7 @@ if test "x$BF_TESTVERBOSE" != "x" ; then
 fi
 
 if test "x$SUPPRESS_DELETE" = "x" ; then
-v v v v v v v
     trap '$SHELL $PRINTCORE ; rm -r -f core ${TMPDIR}' 0
-^ ^ ^ ^ ^ ^ ^
 else
     echo "Results are in ${TMPDIR}.  Remove it after testing."
 fi

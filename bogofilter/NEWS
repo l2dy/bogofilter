@@ -20,6 +20,16 @@
 	* Fixed wordlist access problems causing bogotune to
 	  incorrectly complain of mixed database encodings.
 
+	2005-06-21
+
+	* Bogofilter programs now use their own locking for transactional
+	  databases, to evade the problems with overflowing lock tables,
+	  resizing. The database is locked globally, which no longer allows
+	  registrations to happen concurrently with read access.
+
+	  The db-lk-max-locks and db-lk-max-objects options and the bf_resize
+	  scripts and pages have been removed.
+
 0.95.1	2005-06-26
 
 	* Fixed some wordlist open conflicts in bogotune.
