@@ -53,23 +53,23 @@
 
 	* New unicode capabilities!
 
-	  ° default configuration:
-	    ° bogofilter auto-detects whether database is using
+	  - default configuration:
+	    . bogofilter auto-detects whether database is using
 	      unicode (utf-8) or not.
-	    ° bogofilter uses unicode when creating new databases.
-	    ° bogoutil preserves unicode/non-unicode stat during
+	    . bogofilter uses unicode when creating new databases.
+	    . bogoutil preserves unicode/non-unicode stat during
 	      dump/load.
-	    ° bogofilter, bogolexer, and bogoutil have "--unicode=yes/no"
+	    . bogofilter, bogolexer, and bogoutil have "--unicode=yes/no"
 	      options which permit user selectable modes for experimenting, 
 	      testing, and wordlist conversion.
 
-	  ° configure with "--enable-unicode" or "--disable--unicode" 
+	  - configure with "--enable-unicode" or "--disable--unicode" 
 	    builds bogofilter and bogolexer restricted to a single mode.
 
-	  ° bogoutil uses "--unicode=yes/no" when creating a new wordlists.
-	  ° bogoutil uses "--unicode=yes/no" in maintenance mode to
+	  - bogoutil uses "--unicode=yes/no" when creating a new wordlists.
+	  - bogoutil uses "--unicode=yes/no" in maintenance mode to
 	    convert a wordlist to/from unicode.
-	  ° bogolexer uses "--unicode=yes/no" to control parsing
+	  - bogolexer uses "--unicode=yes/no" to control parsing
 
 	2005-06-18
 
