@@ -75,8 +75,9 @@ map_rc $BOGOFILTER $OPTS -c ${TMPDIR}/bogodir.cf -d ${TMPDIR}/command.d < /dev/n
 
 # test whether command line supercedes bogus config file entry
 cat <<EOF > ${TMPDIR}/bogodir.cf
-bogofilter_dir=bogus
+bogofilter_dir=${TMPDIR}/bogus
 wordlist r,word,wordlist.${DB_EXT},1
 EOF
 
 map_rc $BOGOFILTER $OPTS -c ${TMPDIR}/bogodir.cf -d ${TMPDIR}/command.d -v < /dev/null
+test ! -d ${TMPDIR}/bogus
