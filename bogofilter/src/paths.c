@@ -46,6 +46,21 @@ void set_bogohome(const char *path)
     bogohome = xstrdup(path);
 }
 
+void chk_bogohome(void)
+{
+    if (!check_directory(bogohome)) {
+	(void)fprintf(stderr, "%s: cannot find bogofilter directory.\n"
+		      "You must specify a directory on the command line, in the config file,\n"
+#ifndef __riscos__
+		      "or by using the BOGOFILTER_DIR or HOME environment variables.\n"
+#else
+		      "or by ensuring that <Bogofilter$Dir> is set correctly.\n"
+#endif
+		      "Program aborting.\n", progname);
+	exit(EX_ERROR);
+    }
+}
+
 static bool cant_find_bogohome(void)
 {
     if (bogohome != NULL)
@@ -86,19 +101,8 @@ int set_wordlist_dir(const char* d, priority_t precedence)
 
     saved_precedence = precedence;
 
-    if (!check_directory(dir)) {
-	(void)fprintf(stderr, "%s: cannot find bogofilter directory.\n"
-		      "You must specify a directory on the command line, in the config file,\n"
-#ifndef __riscos__
-		      "or by using the BOGOFILTER_DIR or HOME environment variables.\n"
-#else
-		      "or by ensuring that <Bogofilter$Dir> is set correctly.\n"
-#endif
-		      "Program aborting.\n", progname);
-	rc = -1;
-    }
-
     set_bogohome(dir);
+
     xfree(dir);
 
     return rc;

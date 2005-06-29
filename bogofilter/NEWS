@@ -13,6 +13,10 @@
 
 -------------------------------------------------------------------------------
 
+	2005-06-29
+
+	* Fix incorrect directory creation revealed by t.bogodir.
+
 	2005-06-28
 
 	* Fixed buffer allocation error causing problem processing

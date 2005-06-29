@@ -224,6 +224,8 @@ void open_wordlists(dbmode_t mode)
     /* set bogohome using first wordlist's directory */
     set_wordlist_directory();
 
+    chk_bogohome();
+
     /* add bogohome value to path structs */
     for (list = word_lists; list != NULL; list = list->next)
 	bfpath_set_bogohome(list->bfp);
