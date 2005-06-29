@@ -10,7 +10,7 @@ database libraries. Common entry points are these
 QUICK LINKS:
 ------------
 Upgrade of Berkeley DB or operating system    section 2.6
-Switching on or off transactions              section 2.2.1 or 2.2.2
+Switching transactions on or off              section 2.2.1 or 2.2.2
 Recover broken database                       section 3.2 or 3.3
 
 0. Definitions ---------------------------------------------------------
