@@ -663,6 +663,9 @@ static int load_hook(word_t *key, dsv_t *data, void *userdata)
     if (word_cmps(key, ".MSG_COUNT") == 0)
 	set_msg_counts(data->goodcount, data->spamcount);
 
+    if (word_cmps(key, ".ENCODING") == 0)
+	encoding = data->spamcount;
+
     return 0;
 }
 
