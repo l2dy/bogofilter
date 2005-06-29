@@ -13,6 +13,13 @@
 
 -------------------------------------------------------------------------------
 
+	2005-06-28
+
+	* Fixed buffer allocation error causing problem processing
+	  RFC2047 encoded words.
+	* Fixed wordlist access problems causing bogotune to
+	  incorrectly complain of mixed database encodings.
+
 0.95.1	2005-06-26
 
 	* Fixed some wordlist open conflicts in bogotune.
