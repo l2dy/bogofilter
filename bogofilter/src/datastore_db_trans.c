@@ -368,7 +368,7 @@ static int db_try_glock(bfpath *bfp, short locktype, int lockcmd)
     char *t;
 
     /* lock */
-    ret = mkdir(bfp->dirname, DIR_MODE);
+    ret = bf_mkdir(bfp->dirname, DIR_MODE);
     if (ret && errno != EEXIST) {
 	print_error(__FILE__, __LINE__, "mkdir(%s): %s",
 		bfp->dirname, strerror(errno));
