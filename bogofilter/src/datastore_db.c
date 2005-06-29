@@ -120,10 +120,6 @@ static e_txn get_txn_state(bfpath *bfp)
 {
     e_txn txn = eTransaction;
 
-    if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "probing \"%s\" and \"%s\" for environment...",
-		bfp->dirname, bfp->filename);
-
     /* check for overrides (for test suite, etc.) */
     if (getenv("BF_FORCE_NON_TRANSACTIONAL"))
 	txn = T_DISABLED;
@@ -132,18 +128,20 @@ static e_txn get_txn_state(bfpath *bfp)
 
     if (txn != T_DISABLED && txn != T_ENABLED) {
 	/* if not set, probe for database environment */
-	e_txn probe = probe_txn(bfp);
+	e_txn probe;
+
+	if (DEBUG_DATABASE(1))
+	    fprintf(dbgout, "probing \"%s\" and \"%s\" for environment...",
+		    bfp->dirname, bfp->filename);
+
+	probe = probe_txn(bfp);
 
 	if (probe == T_DISABLED || probe == T_ENABLED)
 	    txn = probe;
 
 	if (DEBUG_DATABASE(1))
 	    fprintf(dbgout, "%s\n", txn2str(probe));
-    }
-
-    /* else use default txnue */
-    if (DEBUG_DATABASE(1))
-	fprintf(dbgout, "\n");
+    } /* else just use the default */
 
     return txn;
 }
