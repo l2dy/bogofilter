@@ -13,6 +13,8 @@ DO backup your databases before making the upgrade.
 ------------------------------------------------------------------------
 WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
 
+
+
 This file documents changes in bogofilter since version 0.11.  In
 particular it describes: (1) Features, which are significant changes
 (noteworthy and compatible) and (2) Incompatibilities, which are
@@ -21,118 +23,56 @@ changes that require action upon update.
 Caution: If upgrading from an old version and skipping several
 intervening versions of bogofilter, be smart and check all the
 changes of the versions you skipped!  In particular, read the sections
-labeled "Incompat".
+labeled "Incompat" and "Major".
 
-Also, if you upgrade to a new minor version (that is, the first or
-second number in bogofilter's version have been changed), you MUST
-verify that the new version is working for you BEFORE putting it into
-production.
+NOTE: the NEWS document has greater detail on some of these changes.
 
-Bogofilter's developers recommend that you run a few manual command line
-tests.  Use options, config files, and wordlists from your production
-environment.  This will help ensure that the new version of bogofilter
-is working properly.
-
-NOTE: the NEWS and CHANGES documents have greater detail on some of
-these changes. You should consult them.
-
-******** [Major 0.95.2] ********
+------------------------------------------------------------------------
+[Incompat 0.95.2] Applies to Berkeley DB Transactional ONLY:
 
 This release gives up on locking the databases at page granularity and
 locks whole environments, to overcome lock sizing requirements which are
-a major maintenance headache in unattended setups.
+a major issue in unattended setups.
 
 This however means that a writer (token registration) will lock out
 readers (message scoring) and readers will prevent new writers from
-starting.
+starting. This may be fixed in a future version.
 
-******** [Summary 0.95.1] ********
+------------------------------------------------------------------------
+[Major 0.95.0] Unicode in UTF-8
 
-Some of the 'make check' scripts depend on options '--unicode=no' and
-'--unicode=yes' options.  These scripts will fail if bogofilter is
-configured in a non-default manner, i.e. if --disable-unicode or
---enable-unicode is specified.
-
-******** [Summary 0.95.0] ********
-
-This release supports unicode (utf-8).  A new meta-token .ENCODING has
+This release supports Unicode (UTF-8).  A new meta-token .ENCODING has
 been added to the wordlist so that bogofilter can determine if it's
-using unicode or not.  A value of 1 indicates raw storage and 2
-indicates utf-8 encoded tokens.  Bogofilter checks for this meta-token
-and converts incoming text to utf-8 as appropriate.  
+using Unicode or not.  A value of 1 indicates raw storage and 2
+indicates UTF-8 encoded tokens.  Bogofilter checks for this meta-token
+and converts incoming text to UTF-8 as appropriate.  
 
 Command line options "--unicode=yes" and "--unicode=no" can be used.
 
-    ° With bogofilter, they control encoding of newly created
-      databases.
+ - With bogofilter, they control encoding of newly created databases.
+ - With bogoutil, --unicode=yes converts the wordlist to Unicode.
+ - For bogolexer, they print parser results in new and old modes.
 
-    ° With bogoutil, during wordlist maintenance they change wordlist
-      to/from unicode.
+./configure options allow bogofilter customization:
 
-    ° For bogolexer, they viewing parser results in new and
-      old modes
+ - "./configure --unicode=yes" will _always_ operate in Unicode mode
+ - "./configure --unicode=no"  will _never_ operate in Unicode mode
 
-./configure options allow bogofilter customization.
-
-    ° "./configure --unicode=yes" will _always_ operate in unicode mode
-
-    ° "./configure --unicode=no"  will _never_ operate in unicode mode
-
-Wordlists can be converted from raw storage to unicode using:
+Wordlists can be converted from raw storage to Unicode using:
+NOTE: Replace iso-8859-1 by the character set and encoding of the
+dominant input token character set!
 
     bogoutil -d wordlist.db > wordlist.raw.txt
-    iconv -f iso-8859-1 -t utf-8 < wordlist.raw.txt > wordlist.utf8.txt
-    bogoutil -l wordlist.db.new < wordlist.utf8.txt
-
-or:
-
-    bogoutil --unicode=yes -m wordlist.db
-
-Wordlists can be converted from unicode to raw storage using:
-
-    bogoutil -d wordlist.db > wordlist.utf8.txt
-    iconv -f utf-8  -t iso-8859-1 < wordlist.utf8.txt > wordlist.raw.txt
-    bogoutil -l wordlist.db.new < wordlist.raw.txt
-
-or:
-
-    bogoutil --unicode=no -m wordlist.db
-
-For a wordlist based on a different charset, for example CP866 or
-KOI8-R, use that charset in dump/convert/load command sequences above.
+    iconv -f iso-8859-1 -t UTF-8 < wordlist.raw.txt > wordlist.UTF-8.txt
+    bogoutil -l wordlist.db.new < wordlist.UTF-8.txt
 
 For a wordlist containing tokens from multiple languages, particularly
-non-european languages, the conversion methods described above may not
-work well for you.  Building a new wordlist (from scratch )will likely
-work better as the new wordlist will be based solely on unicode.
+non-European languages, the conversion methods described above may not
+work well for you.  Building a new wordlist (from scratch) will likely
+work better as the new wordlist will be based solely on Unicode.
 
-******** [Summary 0.94.12] ********
-
-Bogofilter has undergone many changes since its last stable release in
-October 2004.
-
-The biggest change in bogofilter is support for Berkeley DB's
-transaction capability.
-
-Lesser changes include a change in classification defaults (from
-bi-state to tri-state classification), documentation updates (esp man
-page and FAQ), internal code cleanups (including how long options are
-processed).
-
----- Classification Change ----
-
-Bogofilter's classification default has changed from two-state (Yes/No)
-to tri-state (Spam/Ham/Unsure).  This shows up as a change to the
-X-Bogosity line.  Spam and ham now appear as:
-
-    X-Bogosity: Ham, tests=bogofilter, spamicity=0.011004, ...
-    X-Bogosity: Spam, tests=bogofilter, spamicity=0.922911, ...
-
-Previously the words "Yes" and "No" were used to identify ham and
-spam.  Classification "Unsure" is used for messages scoring between
-0.45 and 0.99).
-
----- Changed Options ----
+------------------------------------------------------------------------
+[Incompat 0.94.12] Changed Options
 
 Some options have been added or modified.  If you use any of the
 changed options, you will probably need to modify your scripts,
@@ -141,74 +81,20 @@ used to allow either filenames or directory names are now restricted
 to filenames.  See the man pages and help messages if you have
 questions.
 
----- Transaction Information ----
+------------------------------------------------------------------------
+[Incompat 0.94.0] Transactions
 
-Prior to version 0.93.0, bogofilter used Berkeley DB only in its
-non-transactional mode.  With 0.93.0, the use of Berkeley DB's
-transactional mode was added.  Why transactions?  Because transactions
-offer ACID, which stands for Atomicity, Consistency, Isolation, and
-Durability, which are key to transaction processing in databases and
-ensuring the integrity of a database.  For more on the subject, see
-Wikipedia, i.e.  http://en.wikipedia.org/wiki/ACID.  
+The transactional mode now defaults to off because the lock table sizing
+issue is unresolved.
 
-What transactions offer is additional protection against database
-corruption.  They also include page level locking which makes it
-possible for multiples copies of bogofilter (and bogoutil) to be 
-reading and writing the wordlist at the same time.  To make this
-happen, Berkeley DB uses additional files, specifically lockfiles and
-log files.  The presence of these files means that copying a wordlist
-can no longer be done using the "cp" command.  Bogofilter now includes
-utility scripts bf_compact, bf_copy, bf_resize, and bf_tar for
-handling 4 common chores relating to databases.
-
-Bogofilter's default build makes use of transactions optional.  If
-you've never used transactions and haven't told bogofilter to use
-them, it won't use them.  This simplifies administering bogofilter,
-though the risk of a corrupted database is higher.  See file
-doc/README.db for more detailed technical information on bogofilter's
-handling of transactions and how to set up your machine to best support
-transactions.
-
-When bogofilter starts, it'll check the bogofilter directory (which
-contains the wordlist file) to see if transactions have been used.  If
-so, it will use transactions; if not, it won't use them.
-
-This auto-probing can be overridden when running bogofilter and
-bogoutil.  All that is needed is the proper a command line option (
-"--db-transaction=yes" or "-db--transaction=no" ) or the proper config
-file option ("db_transaction=yes" or "db_transaction=no").
-
-Alternatively, when building from source, ./configure can be given
-option "--enable-transactions" or "--disable-transactions" to build
-executables that will only operate in one mode (and that are a slight
-bit smaller).
-
----- SQLite3 Backend ----
-
-SQLite3 is also supported. It is an alternative, easy-to-handle
-datastore that also exhibits ACID properties.  It has the same
-guarantees as Berkeley DB Transactional Data Store, without the
-headaches of lock files and log files.  Version 3.2.0 is required.
-
-------------------------------
-
-[Feature 0.94.2] SQLite3 support has been repaired.  In versions 0.94.0
-and 0.94.1, aborting a larger registration could break database
-consistency (permanent database corruption). SQLite3 must be at least
-version 3.2.0.
-
-[Features 0.94.0]
 Bogofilter and bogoutil now support both build-time and run-time
 choosing whether to operate with (or without) transaction support.
-They can also auto-detect whether you've been using transactions or
-not.
+They can also auto-detect whether you've been using transactions or not.
 
 Run-time Selection:
--------------------
 
 For bogofilter and bogoutil, transactions can be enabled or disabled
-in 3 ways -- by command line options, config file options, or
-environment variables.
+in 2 ways -- by command line options or config file options.
 
 Command line option "--db-transaction=yes" enables transactions and
 "--db-transaction=no" disables them.
@@ -217,19 +103,13 @@ Config file options "db_transaction=yes" and "db_transaction=no"
 have the same effect.
 
 Auto-detection:
----------------
 
 If none of the above methods are used to enable/disable transactions,
 bogofilter and bogoutil will query Berkeley DB to see if a transaction
 environment already exists.  If so, transactions will be enabled.  If
 not, they will be disabled.
 
-Note: bogofilter 0.94.0 did not support Berkeley DB 3.1 as a side effect
-of automatically detecting transactional mode at run-time, support for
-Berkeley DB 3.1 has been reinstated in bogofilter 0.94.1.
-
 Compile-time selection:
------------------------
 
 A default build includes the run-time and auto-detect capabilities.
 If you wish to minimize program size, ./configure can be used to
@@ -239,20 +119,18 @@ that only run transactionally or non-transactionallly.  Use
 "./configure --disable-transactions" to disable them.  These programs
 will be _slightly_ smaller than the default build.
 
-------------------------------
-
+-----------------------------------------------------------------------
 [Incompat 0.93] Summary for the hasty
 
-YOU MUST ADJUST YOUR SCRIPTS IF YOU ARE EVALUATING "X-Bogosity" HEADERS!
+YOU MUST ADJUST YOUR SCRIPTS EVALUATING "X-Bogosity" HEADERS!
 
-YOU MAY NEED TO ADJUST YOUR SCRIPTS IF YOU ARE PARSING 'bogofilter -V' OUTPUT!
+YOU MAY NEED TO ADJUST YOUR SCRIPTS THAT PARSE 'bogofilter -V'!
 
 WHEN USING BERKELEY DB (DEFAULT), NFS NO LONGER WORKS AND
 YOU   M U S T   READ doc/README.db AND POSSIBLY CONFIGURE THE DATABASE!
 
-
-Defaults changed
-----------------
+-----------------------------------------------------------------------
+[Incompat 0.93] Defaults changed
 
 Bogofilter's defaults have been changed.  It now operates in tri-state
 mode and will classify messages as Spam, Ham, or Unsure.
@@ -265,9 +143,8 @@ mailbox) will give you an excellent set of messages for training, as
 "Unsure" messages are messages that bogofilter has too little
 information to classify (with certainty) as spam or ham.
 
-
-Berkeley DB switched to Transactional Data Store
-------------------------------------------------
+-----------------------------------------------------------------------
+[Incompat 0.93] Berkeley DB switched to Transactional Data Store
 
 Bogofilter will now use the Berkeley DB Transactional Data Store when
 compiled with Berkeley DB as the data base engine (the default).
@@ -308,9 +185,8 @@ recover from application or system crashes.
 These benefits are not available when bogofilter is compiled to use the
 TDB or QDBM data bases.
 
-
-Berkeley DB version strings changed
------------------------------------
+-----------------------------------------------------------------------
+[Incompat 0.93] Berkeley DB version strings changed
 
 Bogofilter will now return the BerkeleyDB's actual DB_VERSION_STRING
 in the output of 'bogofilter -V'. The OLD format was:
@@ -323,9 +199,8 @@ The NEW format is:
 
 You may need to adjust your scripts.
 
-
-QDBM database format changed to B+ trees
-----------------------------------------
+-----------------------------------------------------------------------
+[Incompat 0.93] QDBM database format changed to B+ trees
 
 The QDBM database format has been changed from hash tables to B+
 trees, i.e. from the Depot API to the Villa API.  This results in
@@ -340,8 +215,8 @@ has left your old data base in wordlist.qdbm.old.
 
 NOTE: bogoQDBMupgrade needs qdbm-1.7.23 or newer to build.
 
-Bogotune option parsing changes
--------------------------------
+-----------------------------------------------------------------------
+[Incompat 0.93] Bogotune option parsing changes
 
 In bogotune 0.93.2 and newer, you must repeat the -n or -s option as
 prefix for the mailbox.
@@ -349,24 +224,21 @@ prefix for the mailbox.
 Example: bogotune -n good1 good2 -s bad1 bad2 ...
 will be: bogotune -n good1 -n good2 -s bad1 -s bad2
 
-------------------------------
-
-[Feature 0.93.3] SQLite 3.0.8 (and newer) is now supported. It isn't
+-----------------------------------------------------------------------
+[Major 0.93.3] SQLite 3.0.8 (and newer) is now supported. It isn't
 nearly as fast as Berkeley DB but uses only one permanent and one
 transient file (hence less maintenance work) and is supposed to be
 proof against application and system crashes.
 
-[Feature 0.93.1] Berkeley DB 4.3 is now supported.
+-----------------------------------------------------------------------
+[Incompat 0.92]
 
-------------------------------
-
-[Incompat 0.92] The formatting parameters have changed:
+The formatting parameters have changed:
       '%A' is now the message's IP address.
       '%I' is now the Message-ID.
       '%Q' is now the Queue-ID.
 
-------------------------------
-
+-----------------------------------------------------------------------
 [Incompat 0.17] Support for --enable-deprecated-code (see the 0.16
 release notes) has been removed. If you've run 0.16.X without that
 switch, nothing changes for you.
@@ -374,8 +246,7 @@ switch, nothing changes for you.
 Support for Berkeley DB 3.0 was removed in bogofilter 0.17.3
 as a side effect of adding Concurrent Database support.
 
-------------------------------
-
+-----------------------------------------------------------------------
 [Incompat 0.16] A number of features have been deprecated.  The
 relevant code is bracketed by "#ifdef ENABLE_DEPRECATED_CODE" and
 "#endif" statements.  The default build will not include the
@@ -389,7 +260,6 @@ The following list is supposed to be complete.  Let us know if we've
 omitted anything. We shall try to provide workarounds and migration
 paths whenever possible.
 
-
 1) Scoring algorithms
 ---------------------
 
@@ -397,7 +267,6 @@ Bogofilter will support only the Robinson-Fisher algorithm, commonly
 called the "Fisher algorithm".  The Graham algorithm and Robinson
 geometric-mean algorithm, a.k.a. Robinson algorithm, have been
 deprecated.
-
 
 2) Wordlist support
 -------------------
@@ -413,7 +282,6 @@ databases for you.  Type "bogoupgrade -d /you/wordlist/directory/".
 Ignore lists, i.e. ignorelist.db, are also being deprecated.  The ignore
 list feature has never been thoroughly tested and is not used (as far as
 we know).
-
 
 3) Command line switches
 ------------------------
@@ -462,7 +330,6 @@ If used, bogofilter will print an error message and exit.
 
     There will be no change in the default values.
 
-
 4) Configuration options
 ------------------------
 
@@ -490,7 +357,6 @@ switches) are deprecated:
 Note:  Bogofilter will print a warning message if it sees any of
 these options, but will run fine anyhow.
 
-
 5) Miscellany
 -------------
 
@@ -498,12 +364,16 @@ The user formatted SPAM_HEADER will no longer support format
 specification "%a" (for algorithm) since bogofilter now has only one
 algorithm.
 
-------------------------------
+-----------------------------------------------------------------------
+[Incompat 0.15.9]
 
-[Incompatible 0.15.9] Bogofilter no longer allows disabling of
-algorithms, a feature which has never been well supported.
+Bogofilter no longer allows disabling of algorithms, a feature which has
+never been well supported.
 
-[Incompatible 0.15.4] All header line tokens are now tagged as:
+-----------------------------------------------------------------------
+[Incompat 0.15.4]
+
+All header line tokens are now tagged as:
 
 	Subject:      subj:
 	To:           to:
@@ -537,25 +407,25 @@ the newly added "head:xyz" tokens.
 This will create "header:xyz" tokens and allow the new, more effective
 header tagging to be used to fullest advantage.
 
-------------------------------
+-----------------------------------------------------------------------
+[Major 0.15]
 
-[Feature 0.15] The code for processing multiple messages has been
-rewritten.  In addition to understanding mbox format files, bogofilter
-now understands maildirs and MH folders.
+The code for processing multiple messages has been rewritten.  In
+addition to understanding mbox format files, bogofilter now understands
+maildirs and MH folders.
 
-------------------------------
+-----------------------------------------------------------------------
+[Incompat 0.14]
 
-[Incompatible 0.14]  The exit codes returned by bogofilter have been
-expanded.  They are:
+The exit codes returned by bogofilter have been expanded.  They are:
 
 	Spam   = 0 -- unchanged
 	Ham    = 1 -- unchanged
 	Unsure = 2 -- *NEW*
 	Error  = 3 -- *CHANGED*
 
-------------------------------
-
-[Feature 0.14] Bogofilter now supports TDB (Trivial Data base).
+-----------------------------------------------------------------------
+[Major 0.14] Bogofilter now supports TDB (Trivial Data base).
 
 Instead of separate wordlists for spam and ham tokens, bogofilter can
 now use a single combined, wordlist that stores both all tokens.
@@ -586,13 +456,13 @@ included with bogofilter and performs the task.  Use command
 running it, your BOGOFILTER_DIR will contain all 3 database files.  When
 started, bogofilter checks for wordlist.db and will use it.
 
-------------------------------
+-----------------------------------------------------------------------
+[Incompat 0.13]
 
-[Incompat 0.13] Parsing has changed.  As background, Paul Graham has
-done work to improve the results of his bayesian filter and has
-published them in "Better Bayesian Filtering" at
-http://www.paulgraham.com/better.html.  He found the following
-definition of a token to be beneficial:
+Parsing has changed.  As background, Paul Graham has done work to
+improve the results of his bayesian filter and has published them in
+"Better Bayesian Filtering" at http://www.paulgraham.com/better.html.
+He found the following definition of a token to be beneficial:
 
        1. Case is preserved.
 
@@ -641,9 +511,10 @@ these tokens won't be recognized, so bogofilter won't use them to score
 the message.  After being trained, bogofilter will have these additional
 tokens to aid in the classification process.
 
-------------------------------
+-----------------------------------------------------------------------
+[Major 0.12]
 
-[Major 0.12] Directory bogofilter/tuning has been added and contains
+Directory bogofilter/tuning has been added and contains
 scripts for running tuning experiments as described in the new
 HOWTO. See file bogofilter/tuning/README for more information.
 
@@ -677,9 +548,10 @@ contains the information needed by bogofilter to score the email.  Its
 use speeds up the message scoring done by the tuning scripts.  The
 script is described in more detail in bogofilter/tuning/README.
 
-------------------------------
+-----------------------------------------------------------------------
+[Incompat 0.11]
 
-[Incompatible 0.11] Command line flags:
+Command line flags:
 
 The meaning of command line flags '-S' and '-N' was changed in version
 0.11.0.  Previously '-S' meant to unregister a message from the spam
@@ -708,11 +580,15 @@ It complains when it detects something wrong.  In particular, double
 precision values are no longer allowed to have a terminal 'f'.  For
 example "spam_cutoff=0.95f" will generate a messages.
 
-------------------------------
+-----------------------------------------------------------------------
+[Major 0.11]
 
-[Feature 0.11] New parameter query option:
+New parameter query option:
 
 Using options "-q -v" in a bogofilter command line will run the
 query_config() function and will display bogofilter's various parameter
 values.  This can be very useful in finding the reason for an unexpected
 message classification.
+
+-----------------------------------------------------------------------
+End of RELEASE.NOTES
