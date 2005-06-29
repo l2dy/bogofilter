@@ -156,11 +156,13 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 	begin_wordlist(list);
     }
 
-    if (encoding == E_UNKNOWN)
-	encoding = list->encoding;
-    if (encoding != list->encoding) {
-	fprintf(stderr, "Can't mix database encodings, i.e. utf-8 and any other.\n");
-	exit(EX_ERROR);
+    if (list->encoding != E_UNKNOWN) {
+	if (encoding == E_UNKNOWN)
+	    encoding = list->encoding;
+	if (encoding != list->encoding) {
+	    fprintf(stderr, "Can't mix database encodings, i.e. utf-8 and any other.\n");
+	    exit(EX_ERROR);
+	}
     }
 
     /* xfree(dbe); */
