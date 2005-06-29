@@ -663,8 +663,17 @@ static int load_hook(word_t *key, dsv_t *data, void *userdata)
     if (word_cmps(key, ".MSG_COUNT") == 0)
 	set_msg_counts(data->goodcount, data->spamcount);
 
-    if (word_cmps(key, ".ENCODING") == 0)
-	encoding = data->spamcount;
+    if (word_cmps(key, ".ENCODING") == 0) {
+	if (encoding == E_UNKNOWN)
+	    encoding = data->spamcount;
+	if (encoding == E_UNKNOWN)
+	    encoding = E_RAW;
+	if (data->spamcount != E_UNKNOWN &&
+	    data->spamcount != encoding) {
+	    fprintf(stderr, "Can't mix database encodings, i.e. utf-8 and any other.\n");
+	    exit(EX_ERROR);
+	}
+    }
 
     return 0;
 }
