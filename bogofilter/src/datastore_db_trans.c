@@ -893,6 +893,10 @@ e_txn probe_txn(bfpath *bfp)
 	return T_ERROR;
     }
 
+    /* we might call dbe->set_flags here to set DB_NOPANIC, but this is
+     * only supported from 4.1 onwards and probably not worth the
+     * effort, we'll just check for DB_RUNRECOVERY */
+
 #if DB_AT_LEAST(3,2)
     r = dbe->open(dbe, bfp->dirname, DB_JOINENV, DS_MODE);
 #else
