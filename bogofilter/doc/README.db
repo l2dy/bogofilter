@@ -420,12 +420,7 @@ log.* files are removed automatically in the default configuration, the
 remaining ones must remain in place. For further information and on safe
 removal, see section 3.1.
 
-4.2 SPECIFIC INFORMATION ON RESIZING THE LOCK TABLES
-
-(the contents of this section were obsolete and have been removed,
-the section number was left in place to maintain section numbering)
-
-4.3 INTERESTING CONFIGURATION PARAMETERS FOR DB_CONFIG
+4.2 INTERESTING CONFIGURATION PARAMETERS FOR DB_CONFIG
 
 A "DB_CONFIG" file that is in your bogofilter home directory, usually
 ~/.bogofilter, can be used to configure the data base behavior of
@@ -545,7 +540,7 @@ DANGEROUS OPTIONS - these can improve performance, but should be avoided
    After a crash, verify the data base (see below) and if it is corrupt,
    restore from backup or rebuild from scratch.
 
-4.4 VERIFYING DATABASES TO CHECK FOR CORRUPTION
+4.3 VERIFYING DATABASES TO CHECK FOR CORRUPTION
 
 To verify that the database is intact, type:
 
