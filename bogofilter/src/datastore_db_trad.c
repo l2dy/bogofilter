@@ -40,7 +40,6 @@ static DB_ENV	  *bft_get_env_dbe	(dbe_t *env);
 static const char *bft_database_name	(const char *db_file);
 static DB_ENV	  *bft_recover_open	(bfpath *bfp);
 static int	   bft_get_rmw_flag	(int open_mode);
-static int	   bft_lock		(void *handle, int open_mode);
 static void	   bft_log_flush	(DB_ENV *dbe);
 static dbe_t	  *bft_init		(bfpath *bfp);
 static void 	   bft_cleanup		(dbe_t *env);
@@ -63,7 +62,7 @@ dsm_t dsm_traditional = {
     &bft_recover_open,
     NULL,		/* bft_auto_commit_flags*/
     &bft_get_rmw_flag,
-    &bft_lock,
+    &db_lock,
     NULL,		/* &bft_common_close    */
     NULL,		/* &bft_sync            */
     &bft_log_flush,
@@ -88,29 +87,6 @@ const char *bft_database_name(const char *db_file)
     return db_file;
 }
 
-int bft_lock(void *vhandle, int open_mode)
-{
-    int e = 0;
-    dbh_t *handle = vhandle;
-
-    /* try fcntl lock */
-    handle->locked = false;
-    if (db_lock(handle->fd, F_SETLK,
-		(short int)(open_mode == DS_READ ? F_RDLCK : F_WRLCK)))
-    {
-	e = errno;
-	db_close(handle);
-	errno = e;
-	if (errno == EACCES)
-	    e = errno = EAGAIN;
-    } else {
-	/* have lock */
-	if (handle->fd > 0)
-	    handle->locked = true;
-    }
-    return e;
-}
-
 int bft_get_rmw_flag(int open_mode)
 {
     (void) open_mode;
@@ -128,7 +104,7 @@ DB_ENV *bft_recover_open(bfpath *bfp)
 	exit(EX_ERROR);
     }
 
-    if (db_lock(fd, F_SETLKW, (short int)F_WRLCK)) {
+    if (subr_db_lock(fd, F_SETLKW, (short int)F_WRLCK)) {
 	print_error(__FILE__, __LINE__,
 		    "bft_recover_open: cannot lock %s for exclusive use: %s", bfp->filepath,
 		    strerror(errno));

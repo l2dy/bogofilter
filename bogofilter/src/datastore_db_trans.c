@@ -52,7 +52,6 @@ static const char *dbx_database_name	(const char *db_file);
 static DB_ENV	  *dbx_recover_open	(bfpath *bfp);
 static int	   dbx_auto_commit_flags(void);
 static int	   dbx_get_rmw_flag	(int open_mode);
-static int	   dbx_lock		(void *handle, int open_mode);
 static ex_t	   dbx_common_close	(DB_ENV *dbe, bfpath *bfp);
 static int	   dbx_sync		(DB_ENV *dbe, int ret);
 static void	   dbx_log_flush	(DB_ENV *dbe);
@@ -85,7 +84,7 @@ dsm_t dsm_transactional = {
     &dbx_recover_open,
     &dbx_auto_commit_flags,
     &dbx_get_rmw_flag,
-    &dbx_lock,
+    &db_lock,
     &dbx_common_close,
     &dbx_sync,
     &dbx_log_flush,
@@ -154,29 +153,6 @@ int  dbx_auto_commit_flags(void)
 #else
     return 0;
 #endif
-}
-
-int dbx_lock(void *vhandle, int open_mode)
-{
-    int e = 0;
-    dbh_t *handle = vhandle;
-
-    /* try fcntl lock */
-    handle->locked = false;
-    if (db_lock(handle->fd, F_SETLK,
-		(short int)(open_mode == DS_READ ? F_RDLCK : F_WRLCK)))
-    {
-	e = errno;
-	db_close(handle);
-	errno = e;
-	if (errno == EACCES)
-	    e = errno = EAGAIN;
-    } else {
-	/* have lock */
-	if (handle->fd > 0)
-	    handle->locked = true;
-    }
-    return e;
 }
 
 int dbx_get_rmw_flag(int open_mode)

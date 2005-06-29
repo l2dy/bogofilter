@@ -120,7 +120,11 @@ bool db_created(void *vhandle);
 /** Returns parent environment handle. */
 void *db_get_env(void *vhandle);
 
-int db_lock(int fd, int cmd, short int type);
+/** Subroutine to place file lock */
+int subr_db_lock(int fd, int cmd, short int type);
+
+/** Lock database \a vhandle for \a open_mode */
+int db_lock(void *vhandle, int open_mode);
 
 /** Check if \a file is a regular file or missing */
 bool is_file_or_missing(const char *file);

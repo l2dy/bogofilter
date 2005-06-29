@@ -244,7 +244,7 @@ void *db_get_env(void *vhandle)
 }
 
 /* implements locking. */
-int db_lock(int fd, int cmd, short int type)
+int subr_db_lock(int fd, int cmd, short int type)
 {
     struct flock lock;
 
@@ -253,6 +253,29 @@ int db_lock(int fd, int cmd, short int type)
     lock.l_whence = (short int)SEEK_SET;
     lock.l_len = 0;
     return (fcntl(fd, cmd, &lock));
+}
+
+int db_lock(void *vhandle, int open_mode)
+{
+    int e = 0;
+    dbh_t *handle = vhandle;
+
+    /* try fcntl lock */
+    handle->locked = false;
+    if (subr_db_lock(handle->fd, F_SETLK,
+		(short int)(open_mode == DS_READ ? F_RDLCK : F_WRLCK)))
+    {
+	e = errno;
+	db_close(handle);
+	errno = e;
+	if (errno == EACCES)
+	    e = errno = EAGAIN;
+    } else {
+	/* have lock */
+	if (handle->fd > 0)
+	    handle->locked = true;
+    }
+    return e;
 }
 
 void dsm_init(bfpath *bfp)
