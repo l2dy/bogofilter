@@ -670,8 +670,7 @@ static void set_train_msg_counts(wordhash_t *wh)
 {
     wordprop_t *count;
     count = wordhash_insert(wh, w_msg_count, sizeof(wordprop_t), NULL);
-    if (count->cnts.good == 0 || count->cnts.bad == 0)
-	load_wordlist(load_hook, train);
+
     if (msgs_good == 0 && msgs_bad == 0) {
 	fprintf(stderr, "Can't find '.MSG_COUNT'.\n");
 	exit(EX_ERROR);
@@ -1397,7 +1396,6 @@ static rc_t bogolex(void)
     if (!check_msgcount_parms())
 	exit(EX_ERROR);
 
-    load_wordlist(load_hook, train);
     read_mailbox(bogolex_file, NULL);
 
     return status;
@@ -1770,6 +1768,9 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	encoding = E_DEFAULT;
 
     bogotune_init();
+
+    if (ds_flag == DS_DSK)
+	load_wordlist(load_hook, train);
 
     if (bogolex_file != NULL)
 	bogolex();
