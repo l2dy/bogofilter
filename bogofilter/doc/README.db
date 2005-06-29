@@ -11,7 +11,7 @@ QUICK LINKS:
 ------------
 Upgrade of Berkeley DB or operating system    section 2.6
 Switching on or off transactions              section 2.2.1 or 2.2.2
-Recover broken database                       section 3.3 or 3.4
+Recover broken database                       section 3.2 or 3.3
 
 0. Definitions ---------------------------------------------------------
 
@@ -229,20 +229,15 @@ section 2.5 for details.
 Referral: Berkeley DB's db_archive documentation contains suggestions
 for several backup strategies.
 
-3.2 LOCK TABLE EXHAUSTION
-
-(the content of this section was removed, because it was obsolete, but
-its number was kept to maintain section numbering)
-
-3.3 RECOVERY AND FAILED RECOVERY, FOR TRANSACTIONAL DATABASES ONLY
+3.2 RECOVERY AND FAILED RECOVERY, FOR TRANSACTIONAL DATABASES ONLY
 
 The recovery procedures should be tried in the order shown in this
 section. If you aren't willing to experiment much, but have kept
 sufficient spam and ham that you can easily and quickly retrain
-bogofilter from scratch, read only sections 3.3.1 and 3.3.5, skipping
-subsections 3.3.2 to 3.3.4.
+bogofilter from scratch, read only sections 3.2.1 and 3.2.5, skipping
+subsections 3.2.2 to 3.2.4.
 
-3.3.1 Regular recovery
+3.2.1 Regular recovery
 
 Bogofilter and related bogo* utilities will automatically detect when
 regular recovery is needed and run it. This process is transparent,
@@ -259,7 +254,7 @@ If this fails, remove the __db.*, *.db and log.* files,
 restore from the latest snapshot backup (see section 2.5) and force
 recovery as shown in the previous paragraph.
 
-3.3.2 Catastrophic recovery
+3.2.2 Catastrophic recovery
 
 If regular recovery fails after severe damage to hardware, filesystem,
 database files, you can attempt to run catastrophic recovery. If log
@@ -274,7 +269,7 @@ bogoutil --db-recover-harder ~/.bogofilter
 
 If this fails, read on.
 
-3.3.3 Last-resort recovery method #1: nuke the environment
+3.2.3 Last-resort recovery method #1: nuke the environment
 
 This recovery methods do not guarantee you are getting all of your
 database, you may already have lost part or all of your data when this
@@ -290,7 +285,7 @@ To use this method:
       the standards you are used to.
   3b. if verify failed, read the next section.
 
-3.3.4 Last-resort recovery method #2: salvage the raw .db file
+3.2.4 Last-resort recovery method #2: salvage the raw .db file
 
 This recovery methods do not guarantee you are getting all of your
 database, you may already have lost part or all of your data when this
@@ -310,7 +305,7 @@ To try this method:
   bogoutil --db-transaction=yes -l ~/.bogofilter/wordlist.db \
     < ~/.bogofilter/wordlist.saved
 
-3.3.5 No recovery possible?
+3.2.5 No recovery possible?
 
 We're sorry. This should happen really rarely. There's nothing left to
 try, so you need to retrain from scratch.
@@ -322,12 +317,12 @@ First, remove the database and environment, type:
 Then retrain from scratch with the usual bogofilter -n and bogofilter -s
 commands.
 
-3.4 RECOVERY OF TRADITIONAL (NON-TRANSACTIONAL) DATABASES
+3.3 RECOVERY OF TRADITIONAL (NON-TRANSACTIONAL) DATABASES
 
 Non-transactional databases do not store data that could help with
 recovering data, so the recovery options are:
 
-3.4.1 Salvage raw data
+3.3.1 Salvage raw data
 
 Note that your database may already have lost data, so this procedure
 may not recover everything that used to be in the database before the
@@ -342,19 +337,19 @@ commands:
 
 and resume mail delivery.
 
-3.4.2 Restore from backup
+3.3.2 Restore from backup
 
 If the previous procedure has provided you with incomplete data, simply
 replace your wordlist.db file by the latest good copy that you have.
 
-3.4.3 Retrain from scratch
+3.3.3 Retrain from scratch
 
-If you don't have good backups and the procedure from 3.4.1 also failed,
+If you don't have good backups and the procedure from 3.3.1 also failed,
 you have no other choice than to remove the wordlist.db file and redo
 the whole training process with the usual bogofilter -s and bogofilter
 -n commands.
 
-3.5 COPYING DATABASES
+3.4 COPYING DATABASES
 
 If you intend to copy a transactional database, you MUST copy the *.db
 file(s) first and then the log.* files. Note that the database should
@@ -557,7 +552,7 @@ To verify that the database is intact, type:
     bogoutil --db-verify ~/.bogofilter/wordlist.db
 
 There should be no output. If there are errors, you must recover your
-database, see section 3.3 for methods.
+database, see section 3.2 for methods.
 
 A. Switching the disk drive's write cache off and on -------------------
 
