@@ -110,7 +110,7 @@ done
 # test scoring of mbox batch of msg-count messages
 
 NAME="bogolex-mbox"
-cat $pattern >> ${TMPDIR}/test.fr
+cat $pattern > ${TMPDIR}/test.fr
 
 map_rc $BOGOFILTER -M < ${TMPDIR}/test.fr > ${TMPDIR}/$NAME.out
 
