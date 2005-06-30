@@ -9,9 +9,9 @@
 # test below
 # remember to use ${srcdir}
 
-# Skip test if non-default configuration
+# check for non-default configuration
 if [ -z "$USE_UNICODE" ] ; then
-    exit 77
+UNICODE_NO="--unicode=no"
 fi
 
 echo  	41 A4 BA B5 B5 20 31     20  30 20  32 30 30 33 30 33 30 33 0A \
@@ -25,7 +25,7 @@ echo  	41 A4 BA B5 B5 20 31     20  30 20  32 30 30 33 30 33 30 33 0A \
 
 $BOGOUTIL -C -l ${WORDLIST} < ${TMPDIR}/input
 $BOGOUTIL -C -d ${WORDLIST} | egrep -v "^(\.MSG_COUNT|\.ENCODING)" > ${TMPDIR}/output.1
-$BOGOUTIL -C -n -m ${WORDLIST} --unicode=no
+$BOGOUTIL -C -n -m ${WORDLIST} $UNICODE_NO
 $BOGOUTIL -C -d ${WORDLIST} | egrep -v "^(\.MSG_COUNT|\.ENCODING)" > ${TMPDIR}/output.2
 
 LEN1=`wc -l ${TMPDIR}/output.1 | $AWK '{print $1}'`

@@ -7,11 +7,6 @@
 # registering messages and database maintenance
 #
 
-# Skip test if non-default configuration
-if [ -n "$USE_UNICODE" ] ; then
-    exit 77
-fi
-
 # initialize
 rm ${TMPDIR}/* # reset TXN detection
 if [ $DB_TXN = true ] ; then TXN=--db-transaction=yes ; else TXN= ; fi

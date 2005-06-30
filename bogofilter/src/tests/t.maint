@@ -5,6 +5,11 @@
 
 NODB=1 . ${srcdir=.}/t.frame
 
+# Skip test if non-default configuration
+if [ -n "$USE_UNICODE" ] ; then
+    exit 77
+fi
+
 OUT="$TMPDIR/maint.out"
 
 create_empty_wordlist
