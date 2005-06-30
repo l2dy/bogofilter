@@ -154,7 +154,6 @@ done
 %{_bindir}/bf_copy
 %{_bindir}/bf_compact
 %{_bindir}/bf_tar
-%{_bindir}/bf_resize
 
 %{_mandir}/man1/bogofilter.1*
 %{_mandir}/man1/bogolexer.1*
@@ -163,7 +162,6 @@ done
 %{_mandir}/man1/bogoupgrade.1*
 %{_mandir}/man1/bf_compact.1*
 %{_mandir}/man1/bf_copy.1*
-%{_mandir}/man1/bf_resize.1*
 %{_mandir}/man1/bf_tar.1*
 
 %{_datadir}/%{name}/contrib/*
@@ -193,7 +191,6 @@ done
 %{_bindir}/bf_copy
 %{_bindir}/bf_compact
 %{_bindir}/bf_tar
-%{_bindir}/bf_resize
 
 %{_mandir}/man1/bogofilter.1*
 %{_mandir}/man1/bogolexer.1*
@@ -202,7 +199,6 @@ done
 %{_mandir}/man1/bogoupgrade.1*
 %{_mandir}/man1/bf_compact.1*
 %{_mandir}/man1/bf_copy.1*
-%{_mandir}/man1/bf_resize.1*
 %{_mandir}/man1/bf_tar.1*
 
 %{_datadir}/%{name}/contrib-static/*
