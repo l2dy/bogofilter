@@ -74,14 +74,17 @@ _EOF
 
 if [ -z "$USE_UNICODE" ] ; then
     UNICODE_NO="--unicode=no"
+    UNICODE_YES="--unicode=yes"
 fi
 
-$BOGOLEXER -p -C $UNICODE_NO  <${TMPDIR}/input >${TMPDIR}/output.raw
-cmp ${TMPDIR}/reference.raw ${TMPDIR}/output.raw \
-|| diff ${TMPDIR}/reference.raw ${TMPDIR}/output.raw
+if [ -z "$USE_UNICODE" -o "$USE_UNICODE" = "no" ] ; then
+    $BOGOLEXER -p -C $UNICODE_NO  <${TMPDIR}/input >${TMPDIR}/output.raw
+    cmp ${TMPDIR}/reference.raw ${TMPDIR}/output.raw \
+	|| diff ${TMPDIR}/reference.raw ${TMPDIR}/output.raw
+fi
 
-if [ -z "$USE_UNICODE" ] ; then
-    $BOGOLEXER -p -C --unicode=yes <${TMPDIR}/input >${TMPDIR}/output.utf8
+if [ -z "$USE_UNICODE" -o "$USE_UNICODE" = "yes" ] ; then
+    $BOGOLEXER -p -C $UNICODE_YES  <${TMPDIR}/input >${TMPDIR}/output.raw
     cmp ${TMPDIR}/reference.utf8 ${TMPDIR}/output.utf8 \
 	|| diff ${TMPDIR}/reference.utf8 ${TMPDIR}/output.utf8
 fi

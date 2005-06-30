@@ -10,8 +10,12 @@
 # remember to use ${srcdir}
 
 # check for non-default configuration
+if [ "$USE_UNICODE" != "yes" ] ; then
+    exit 77
+fi
+
 if [ -z "$USE_UNICODE" ] ; then
-UNICODE_NO="--unicode=no"
+    UNICODE_NO="--unicode=no"
 fi
 
 echo  	41 A4 BA B5 B5 20 31     20  30 20  32 30 30 33 30 33 30 33 0A \
