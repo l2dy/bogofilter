@@ -84,7 +84,7 @@ if [ -z "$USE_UNICODE" -o "$USE_UNICODE" = "no" ] ; then
 fi
 
 if [ -z "$USE_UNICODE" -o "$USE_UNICODE" = "yes" ] ; then
-    $BOGOLEXER -p -C $UNICODE_YES  <${TMPDIR}/input >${TMPDIR}/output.raw
+    $BOGOLEXER -p -C $UNICODE_YES  <${TMPDIR}/input >${TMPDIR}/output.utf8
     cmp ${TMPDIR}/reference.utf8 ${TMPDIR}/output.utf8 \
 	|| diff ${TMPDIR}/reference.utf8 ${TMPDIR}/output.utf8
 fi
