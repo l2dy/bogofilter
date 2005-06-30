@@ -10,7 +10,7 @@
 # remember to use ${srcdir}
 
 # check for non-default configuration
-if [ "$USE_UNICODE" != "yes" ] ; then
+if [ -n "$USE_UNICODE" -a "$USE_UNICODE" != "yes" ] ; then
     exit 77
 fi
 
