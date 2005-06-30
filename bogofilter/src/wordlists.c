@@ -159,10 +159,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
     if (list->encoding != E_UNKNOWN) {
 	if (encoding == E_UNKNOWN)
 	    encoding = list->encoding;
-	if (encoding == E_UNKNOWN)
-	    encoding = E_RAW;
-	if (list->encoding != E_UNKNOWN &&
-	    list->encoding != encoding) {
+	if (encoding != list->encoding) {
 	    fprintf(stderr, "Can't mix database encodings, i.e. utf-8 and any other.\n");
 	    exit(EX_ERROR);
 	}
