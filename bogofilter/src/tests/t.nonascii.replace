@@ -9,8 +9,10 @@
 # test below
 # remember to use ${srcdir}
 
-# Note: requires a configuration that allows both --unicode=no
-#	Using --enable-unicode or --disable-unicode with configure breaks this test.
+# Skip test if non-default configuration
+if [ -z "$USE_UNICODE" ] ; then
+    exit 77
+fi
 
 echo  	41 A4 BA B5 B5 20 31     20  30 20  32 30 30 33 30 33 30 33 0A \
 	41 C1 BA B8 B5 20 32     20  30 20  32 30 30 32 31 32 30 32 0A \

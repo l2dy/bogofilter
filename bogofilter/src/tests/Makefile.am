@@ -13,7 +13,9 @@ CLEANFILES= $(BUILT_SOURCES)
 t.config: Makefile
 	( echo  >$@ 'EXE_EXT="@EXE_EXT@"' ; \
 	  echo >>$@  'DB_EXT="@DB_EXT@"' ; \
-	  echo >>$@ 'DB_TYPE="@DB_TYPE@"' ) || rm -f $@
+	  echo >>$@ 'DB_TYPE="@DB_TYPE@"'; \
+	  echo >>$@ 'USE_TRANSACTIONS="@USE_TRANSACTIONS@"' ; \
+	  echo >>$@ 'USE_UNICODE="@USE_UNICODE@"' ) || rm -f $@
 
 t.query.config: t.query.config.in Makefile
 	rm -f $@

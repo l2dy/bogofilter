@@ -18,6 +18,11 @@
 
 . ${srcdir=.}/t.frame
 
+# Skip test if non-default configuration
+if [ -n "$USE_TRANSACTIONS" ] ; then
+    exit 77
+fi
+
 AUTO_XA=`$BOGOFILTER -C -V 2>&1 | sed -n '2p;' | grep AUTO-XA || :`
 if [ -z "$AUTO_XA" ]; then
     exit 77

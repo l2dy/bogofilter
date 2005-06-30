@@ -8,9 +8,6 @@
 # test below
 # remember to use ${srcdir}
 
-# Note: requires a configuration that allows both --unicode=yes and --unicode=no
-#	Using --enable-unicode or --disable-unicode with configure breaks this test.
-
 cat >${TMPDIR}/input <<_EOF
 Subject: =?iso-8859-1?q?ok?=
     =?iso-8859-1?q?ay?=
@@ -75,11 +72,16 @@ iso-8859-1
 iso-8859-1
 _EOF
 
-$BOGOLEXER -p -C --unicode=no  <${TMPDIR}/input >${TMPDIR}/output.raw
-$BOGOLEXER -p -C --unicode=yes <${TMPDIR}/input >${TMPDIR}/output.utf8
+if [ -z "$USE_UNICODE" ] ; then
+    UNICODE_NO="--unicode=no"
+fi
 
+$BOGOLEXER -p -C $UNICODE_NO  <${TMPDIR}/input >${TMPDIR}/output.raw
 cmp ${TMPDIR}/reference.raw ${TMPDIR}/output.raw \
 || diff ${TMPDIR}/reference.raw ${TMPDIR}/output.raw
 
-cmp ${TMPDIR}/reference.utf8 ${TMPDIR}/output.utf8 \
-|| diff ${TMPDIR}/reference.utf8 ${TMPDIR}/output.utf8
+if [ -z "$USE_UNICODE" ] ; then
+    $BOGOLEXER -p -C --unicode=yes <${TMPDIR}/input >${TMPDIR}/output.utf8
+    cmp ${TMPDIR}/reference.utf8 ${TMPDIR}/output.utf8 \
+	|| diff ${TMPDIR}/reference.utf8 ${TMPDIR}/output.utf8
+fi

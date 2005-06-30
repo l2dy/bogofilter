@@ -229,6 +229,10 @@ AC_ARG_ENABLE(unicode,
 	if test "$enableval" = yes; then
 		[USE_UNICODE=YES]
 	fi
+	if test x$USE_UNICODE != x ; then
+		AC_DEFINE_UNQUOTED(USE_UNICODE, "$USE_UNICODE", [unicode enabled/disabled flag])
+	    	AC_SUBST(USE_UNICODE)
+	fi
 )
 
 AM_CONDITIONAL(DISABLE_UNICODE, test x$USE_UNICODE = xNO)
@@ -359,6 +363,10 @@ AC_ARG_ENABLE(transactions,
 	fi
 	if test "$enableval" = yes; then
 		[USE_TRANSACTIONS=YES]
+	fi
+	if test x$USE_TRANSACTIONS != x ; then
+		AC_DEFINE_UNQUOTED(USE_TRANSACTIONS, "$USE_TRANSACTIONS", [transactions enabled/disabled flag])
+		AC_SUBST(USE_TRANSACTIONS)
 	fi
 )
 

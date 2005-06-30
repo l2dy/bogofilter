@@ -16,6 +16,8 @@
 	2005-06-29
 
 	* Fix incorrect directory creation revealed by t.bogodir.
+	* Use unicode & transaction enable/disable flags to limit
+	  'make check' tests being run.
 
 	2005-06-28
 

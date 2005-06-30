@@ -2,6 +2,10 @@
 
 NODB=1 . ${srcdir:=.}/t.frame
 
+if [ -n "$USE_TRANSACTIONS" ] ; then
+    exit 77
+fi
+
 while [ -n "$1" ] ; do
     case $1 in
 	t*)
