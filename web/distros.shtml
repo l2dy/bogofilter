@@ -32,9 +32,16 @@
                   <td class="top_text_table"> Database <br>
                     Variants</td>
                 </tr>
-		<tr><td colspan="3"><a href="http://www.debian.org/" target="_blank"><strong>Debian GNU/Linux</strong></a></td></tr>
+		<tr><td colspan="3"><a href="http://www.debian.org/" target="_blank"><strong>Debian</strong></a></td></tr>
                 <tr>
-                  <td>Debian testing ("sarge")</td>
+                  <td>Debian stable ("sarge")</td>
+                  <td>See <a href="http://packages.debian.org/stable/mail/bogofilter" target="_blank">packages.debian.org</a></td>
+                  <td>
+                    <div align="center">BerkeleyDB</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Debian testing ("etch")</td>
                   <td>See <a href="http://packages.debian.org/testing/mail/bogofilter" target="_blank">packages.debian.org</a></td>
                   <td>
                     <div align="center">BerkeleyDB</div>
@@ -44,7 +51,7 @@
                   <td>Debian unstable ("sid")</td>
                   <td>See <a href="http://packages.debian.org/unstable/mail/bogofilter" target="_blank">packages.debian.org</a></td>
                   <td>
-                    <div align="center">BerkeleyDB</div>
+                    <div align="center">BerkeleyDB, QDBM, TDB, SQLite</div>
                   </td>
                 </tr>
 		<tr><td colspan="3"><a href="http://www.freebsd.org/" target="_blank"><strong>FreeBSD</strong></a></td></tr>
