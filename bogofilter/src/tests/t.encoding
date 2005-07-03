@@ -11,13 +11,6 @@
 rm ${TMPDIR}/* # reset TXN detection
 if [ $DB_TXN = true ] ; then TXN=--db-transaction=yes ; else TXN= ; fi
 
-# Linux has md5sum; BSD has md5
-
-MD5SUM=`which md5sum 2>/dev/null` || :
-test -x "$MD5SUM" || MD5SUM=`which md5 2>/dev/null`
-test -x "$MD5SUM" || { echo >&2 'Cannot find md5sum!' ; exit 1 ; }
-export MD5SUM
-
 MSG="msg.accents"
 
 cat <<_EOF >${TMPDIR}/$MSG.txt
@@ -91,23 +84,34 @@ $BOGOUTIL -C -y 0 -d ${WORDLIST} | sort > ${TMPDIR}/wordlist.new.txt
 $BOGOUTIL -C -y 0 -m ${WORDLIST} --unicode=no
 $BOGOUTIL -C -y 0 -d ${WORDLIST} | sort > ${TMPDIR}/wordlist.old.txt
 
-cat <<EOF | sed "s/ $DATE//" > ${TMPDIR}/md5sum.ref
-4ff193bff18e44bd6af0992497565df2   wordlist.iconv.txt
-4ff193bff18e44bd6af0992497565df2   wordlist.new.txt
-a36783e5753e6254167ffe32835e96d0   wordlist.no.txt
-a36783e5753e6254167ffe32835e96d0   wordlist.old.txt
-a36783e5753e6254167ffe32835e96d0   wordlist.raw.txt
-4ff193bff18e44bd6af0992497565df2   wordlist.yes.txt
+echo "This is a test." >${TMPDIR}/empty.txt
+if ! cksum >${TMPDIR}/empty.sum ${TMPDIR}/empty.txt ; then
+    echo >&2 'cksum utility not found'
+    exit 77
+fi
+cut -d " " -f 1-2 ${TMPDIR}/empty.sum >${TMPDIR}/empty.sumonly
+if ! echo "2711662207 16" | cmp -s - ${TMPDIR}/empty.sumonly
+then
+    echo >&2 'cksum utility not POSIX compliant!'
+    exit 1
+fi
+
+cat <<EOF | sed "s/ $DATE//" > ${TMPDIR}/cksum.ref
+1059676362 909 wordlist.iconv.txt
+1059676362 909 wordlist.new.txt
+3303802408 880 wordlist.no.txt
+3303802408 880 wordlist.old.txt
+3303802408 880 wordlist.raw.txt
+1059676362 909 wordlist.yes.txt
 EOF
 
 for FILE in ${TMPDIR}/wordlist.*.txt ; do
-    SUM=`$MD5SUM < $FILE | $AWK '{print $1}'`
-    NAM=`basename $FILE`
-    echo $SUM " " $NAM >> ${TMPDIR}/md5sum.out
+    cksum "$FILE" | $AWK '{ printf "%s %s ", $1, $2 }' >>${TMPDIR}/cksum.out
+    basename "$FILE" >>${TMPDIR}/cksum.out
 done
 
 if [ $verbose -eq 0 ] ; then 
-    cmp ${TMPDIR}/md5sum.ref ${TMPDIR}/md5sum.out
+    cmp ${TMPDIR}/cksum.ref ${TMPDIR}/cksum.out
 else
-    diff -s ${TMPDIR}/md5sum.ref ${TMPDIR}/md5sum.out
+    diff -s ${TMPDIR}/cksum.ref ${TMPDIR}/cksum.out
 fi

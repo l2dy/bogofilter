@@ -13,9 +13,10 @@
 
 -------------------------------------------------------------------------------
 
-	2005-07-02
+	2005-07-03
 
-	* Fixed portability problem for tests/t.encoding on BSD.
+	* Switched t.encoding test to use the POSIX utility cksum,
+	  rather than OS-specific utilities such as md5sum or md5.
 
 0.95.2	2005-06-30
 
