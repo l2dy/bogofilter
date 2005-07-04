@@ -152,6 +152,16 @@ static int sqlexec(sqlite3 *db, const char *cmd) {
     return rc;
 }
 
+static sqlite3_stmt *sqlprep(dbh_t *dbh, const char *cmd) {
+    const char *tail; /* dummy */
+    sqlite3_stmt *ptr;
+    if (sqlite3_prepare(dbh->db, cmd, strlen(cmd), &ptr, &tail) != SQLITE_OK) {
+	print_error(__FILE__, __LINE__, "cannot compile %s: %s\n", cmd, sqlite3_errmsg(dbh->db)); 
+	exit(EX_ERROR); 
+    }
+    return ptr;
+}
+
 /** Short trace handler function, passed to SQLite if debugging is
  * enabled. */
 static void db_trace(void *userdata /** unused */,
@@ -320,16 +330,8 @@ void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
      * dbh->insert is not here as it's needed earlier,
      * so it sets itself up lazily
      */
-#define PREP(cmd, ptr) \
-    { const char *tail; /* dummy */ \
-	if (sqlite3_prepare(dbh->db, cmd, strlen(cmd), ptr, &tail) != SQLITE_OK) { \
-	    print_error(__FILE__, __LINE__, "cannot compile %s: %s\n", cmd, sqlite3_errmsg(dbh->db)); \
-	    exit(EX_ERROR); \
-	} \
-    }
-
-    PREP("SELECT value FROM bogofilter WHERE key=? LIMIT 1;", &dbh->select);
-    PREP("DELETE FROM bogofilter WHERE(key = ?);", &dbh->delete);
+    dbh->select = sqlprep(dbh, "SELECT value FROM bogofilter WHERE key=? LIMIT 1;");
+    dbh->delete = sqlprep(dbh, "DELETE FROM bogofilter WHERE(key = ?);");
 
     /* check if byteswapped */
     {
@@ -475,7 +477,7 @@ int db_set_dbvalue(void *vhandle, const dbv_t *key, const dbv_t *val) {
     dbh_t *dbh = vhandle;
 
     if (!dbh->insert)
-	PREP("INSERT OR REPLACE INTO bogofilter VALUES(?,?);",    &dbh->insert);
+	dbh->insert = sqlprep(dbh, "INSERT OR REPLACE INTO bogofilter VALUES(?,?);");
 
     sqlite3_bind_blob(dbh->insert, 1, key->data, key->leng, SQLITE_STATIC);
     sqlite3_bind_blob(dbh->insert, 2, val->data, val->leng, SQLITE_STATIC);
