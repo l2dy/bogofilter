@@ -13,6 +13,10 @@
 
 -------------------------------------------------------------------------------
 
+	2005-07-04
+
+	* Updated history of stable releases (file RELEASES).
+
 	2005-07-03
 
 	* Switched t.encoding test to use the POSIX utility cksum,
