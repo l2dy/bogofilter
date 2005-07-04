@@ -25,7 +25,9 @@ AUTHOR:
 
 #include "charset.h"
 #include "convert_charset.h"
+#ifndef	DISABLE_UNICODE
 #include "convert_unicode.h"
+#endif
 #include "xmalloc.h"
 #include "xstrdup.h"
 

@@ -19,8 +19,10 @@ AUTHOR:
 #include "datastore.h"
 #include "error.h"
 #include "charset.h"
+#ifndef	DISABLE_UNICODE
 #include "convert_unicode.h"
 #include "iconvert.h"
+#endif
 #include "maint.h"
 #include "transaction.h"
 #include "wordlists.h"
