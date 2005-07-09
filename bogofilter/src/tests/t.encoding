@@ -89,7 +89,7 @@ if ! cksum >${TMPDIR}/empty.sum ${TMPDIR}/empty.txt ; then
     echo >&2 'cksum utility not found'
     exit 77
 fi
-cut -d " " -f 1-2 ${TMPDIR}/empty.sum >${TMPDIR}/empty.sumonly
+tr '	' ' ' <${TMPDIR}/empty.sum|cut -d " " -f 1-2 >${TMPDIR}/empty.sumonly
 if ! echo "2711662207 16" | cmp -s - ${TMPDIR}/empty.sumonly
 then
     echo >&2 'cksum utility not POSIX compliant!'
