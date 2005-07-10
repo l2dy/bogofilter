@@ -246,6 +246,31 @@ static int busyhandler(void *dummy, int count)
     return 1;
 }
 
+static void check_sqlite_version(void)
+{
+#if SIZEOF_LONG > 4
+    unsigned int vmaj, vmin, vpl;
+    int count;
+    static int complained;
+    const char *v;
+
+    if (complained)
+	return;
+    complained = 1;
+    v = sqlite3_libversion();
+    sscanf(v, "%u.%u.%u", &vmaj, &vmin, &vpl);
+    if (vmaj > 3) return;
+    if (vmaj == 3 && vmin > 2) return;
+    if (vmaj == 3 && vmin == 2 && vpl >= 2) return;
+    fprintf(stderr,
+	    "\n"
+	    "WARNING: sqlite %s is not supported on %u-bit machines!\n"
+	    "WARNING: If you see bus errors, update sqlite to 3.2.2 or newer.\n"
+	    "\n",
+	    v, SIZEOF_LONG * 8);
+#endif
+}
+
 void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
 {
     int rc;
@@ -253,6 +278,8 @@ void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
     dbv_t k, v;
 
     (void)dummyenv;
+
+    check_sqlite_version();
 
     dbh = dbh_init(bfp);
 
@@ -400,7 +427,7 @@ const char *db_version_str(void) {
     static char buf[80];
 
     if (!buf[0])
-	snprintf(buf, sizeof(buf), "SQLite %s", sqlite3_version);
+	snprintf(buf, sizeof(buf), "SQLite %s", sqlite3_libversion());
     return buf;
 }
 
@@ -428,8 +455,8 @@ static int sql_fastpath(
 	dbh_t *dbh,		/**< database handle */
 	const char *func,	/**< function name to report in errors */
 	sqlite3_stmt *stmt,	/**< SQLite3 statement to execute/reset */
-	int retnotfound,	/**< return value if no rows found */
-	dbv_t *val		/**  OUT value from first row, NULL ok */
+	dbv_t *val,		/**< OUT value from first row, NULL ok */
+	int retnotfound		/**  return value if no rows found */
 	)
 {
     int rc;
@@ -470,7 +497,7 @@ int db_delete(void *vhandle, const dbv_t *key) {
     dbh_t *dbh = vhandle;
 
     sqlite3_bind_blob(dbh->delete, 1, key->data, key->leng, SQLITE_STATIC);
-    return sql_fastpath(dbh, "db_delete", dbh->delete, 0, NULL);
+    return sql_fastpath(dbh, "db_delete", dbh->delete, NULL, 0);
 }
 
 int db_set_dbvalue(void *vhandle, const dbv_t *key, const dbv_t *val) {
@@ -481,14 +508,14 @@ int db_set_dbvalue(void *vhandle, const dbv_t *key, const dbv_t *val) {
 
     sqlite3_bind_blob(dbh->insert, 1, key->data, key->leng, SQLITE_STATIC);
     sqlite3_bind_blob(dbh->insert, 2, val->data, val->leng, SQLITE_STATIC);
-    return sql_fastpath(dbh, "db_set_dbvalue", dbh->insert, 0, NULL);
+    return sql_fastpath(dbh, "db_set_dbvalue", dbh->insert, NULL, 0);
 }
 
 int db_get_dbvalue(void *vhandle, const dbv_t* key, /*@out@*/ dbv_t *val) {
     dbh_t *dbh = vhandle;
 
     sqlite3_bind_blob(dbh->select, 1, key->data, key->leng, SQLITE_STATIC);
-    return sql_fastpath(dbh, "db_get_dbvalue", dbh->select, DS_NOTFOUND, val);
+    return sql_fastpath(dbh, "db_get_dbvalue", dbh->select, val, DS_NOTFOUND);
 }
 
 ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata) {

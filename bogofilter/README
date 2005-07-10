@@ -168,7 +168,7 @@ to the list.
 
   --prefix=PREFIX         install architecture-independent files in PREFIX
 			  [default: /usr/local]
-  --with-database=ENGINE  Choose database engine {db|tdb|qdbm} 
+  --with-database=ENGINE  Choose database engine {db|tdb|qdbm|sqlite3} 
   			  [default: db]
   --with-libdb-prefix[=DIR]  search for libdb in DIR/include and DIR/lib
 

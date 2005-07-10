@@ -14,7 +14,7 @@ this writing in alphabetical order
 1a.Berkeley DB (3.1 - 4.3) with transactions	http://sleepycat.com/
 1b.Berkeley DB (3.1 - 4.3) without transactions	http://sleepycat.com/
 2. QDBM (1.7.23 or newer)			http://qdbm.sf.net/
-3. SQLite (3.0.8 or newer)			http://sqlite.org/
+3. SQLite (3.2.2 or newer)			http://sqlite.org/
 4. TDB (1.0)					http://tdb.sf.net/
 
 You can use --with-database=ARG (pick from db, tdb, qdbm, sqlite) to

@@ -391,13 +391,13 @@ AC_CACHE_SAVE
 WITH_DB_ENGINE=db
 AC_ARG_WITH(database,
 	    AC_HELP_STRING([--with-database=ENGINE],
-	    [Choose database engine {db|tdb|qdbm|sqlite} [[ENGINE=db]]]),
+	    [Choose database engine {db|tdb|qdbm|sqlite3} [[ENGINE=db]]]),
 	    [ WITH_DB_ENGINE=$withval ]
 )
 
 case "x$WITH_DB_ENGINE" in
-    xsqlite)
-	AC_DEFINE(ENABLE_SQLITE_DATASTORE,1, [Enable sqlite datastore])
+    xsqlite|xsqlite3)
+	AC_DEFINE(ENABLE_SQLITE_DATASTORE,1, [Enable sqlite3 datastore])
 	DB_TYPE=sqlite
 	DB_EXT=.db
 	AC_CHECK_HEADERS([sqlite3.h],,AC_MSG_ERROR(Cannot find sqlite3.h header file))

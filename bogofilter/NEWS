@@ -13,6 +13,13 @@
 
 -------------------------------------------------------------------------------
 
+	2005-07-10
+
+	* Bogofilter now complains if sqlite 3.2.1 or older is used on a
+	  machine with a word width greater than 32 bits, but tries to proceed.
+	  It may however crash with SIGBUS as sqlite 3.2.1 performs unaligned
+	  64-bit accesses.  sqlite 3.2.2 or newer is strongly recommended.
+
 	2005-07-04
 
 	* Updated history of stable releases (file RELEASES).
