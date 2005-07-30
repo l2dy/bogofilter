@@ -2335,18 +2335,16 @@
 	* Additional portability changes made to the regression tests.
 	* Enhanced '-m' option allows specifying robs value.
 
-0.11.1.8
+0.11.1.8 2003-04-07
 
-	2003-04-07
 	* Include 'strict_check' in '-qv' output.
 	* Correct outdated acinclude.m4, as it causes the configure
 	  script to be invalid.
 	* Revised UPGRADE document.
 	* Added contrib/bogotrain.sh
 
-0.11.1.7
+0.11.1.7 2003-04-07
 
-	2003-04-07
 	* Change bogoutil's '-p' option to require a database.
 	* Fix OS X segfault caused by using DB handle after closing database.
 
@@ -2355,9 +2353,8 @@
 	* Simplify configure check for BerkeleyDB.
 	* Extend configure's compiler checks for AIX.
 
-0.11.1.6
+0.11.1.6 2003-04-01
 
-	2003-04-01
 	* Changed default value of 'strict_check' to 'no' (disabled).
 
 	2003-03-30
@@ -2365,34 +2362,30 @@
 	  html comments.  Enabled means to use "<!--" and "-->" to
 	  delimit comments.  Disabled uses "<!" and ">".
 
-0.11.1.5
+0.11.1.5 2003-03-28
 
-	2003-03-28
 	* Bogofilter now frees _all_ memory that it allocates.
 	* FAQ reorganized and info added on asian spam, the format of
 	  verbose output, and using SpamAssassin to train bogofilter.
 	* Fixed processing of '-o' option.
 
-0.11.1.4
+0.11.1.4 2003-03-25
 
-	2003-03-25
 	* Cleaned up help messages and added version info.
 	* Expanded bogofilter-faq.html
 	* Fixed precedence for directory specifications.
 	* Fixed processing of folded X-Bogosity line.
 	* Fixed processing of spam_subject_tag.
 
-0.11.1.3 - stable release
+0.11.1.3 2003-03-10 - stable release
 
-	2003-03-10
 	* Expanded regression tests.
 	* Cleaned up fprintf() arguments.
 	* Cleaned up message and mime header checks.
 	* Additional improvements to maintenance code.
 
-0.11.1.2
+0.11.1.2 2003-03-06
 
-	2003-03-06
 	* Fixed bogoutil's broken maintenance mode.
 	* Update bogofilter documentation and FAQ.
 	* Explicitly check linking against libdb early to avoid unspecific
