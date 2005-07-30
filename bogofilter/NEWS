@@ -1905,7 +1905,7 @@
 
 0.14.5.4 2003-08-30
 
-* _Really_ fix defective printing in 'bogofilter -Q' output.
+	* _Really_ fix defective printing in 'bogofilter -Q' output.
 
 0.14.5.3 2003-08-29
 
@@ -2403,13 +2403,12 @@
 	* Fixed broken '-u' (update) code.
 	* Updated documentation of bogolexer and bogoutil.
 
+0.11.1	2003-03-04
 
-0.11.1 2003-03-04
+	* Using standard html comment delimiters when ignoring comments.
+	* Fixed charset initialization flaw.
 
-	 * Using standard html comment delimiters when ignoring comments.
-	 * Fixed charset initialization flaw.
-
-0.11.0	 2003-03-03
+0.11.0	2003-03-03
 
 	* The Robinson-Fisher algorithm is now the default algorithm.
 	* The configuration file parser is stricter and more correct.
