@@ -155,12 +155,6 @@
 	  bogofilter --unicode=yes      - use unicode conversion
 	  bogofilter --unicode=no       - use charset conversion
 
-0.94.14	2005-06-08
-
-	* Fix bug in transactional auto-detection that caused recovery to
-	  fail if the environment was in PANIC state.
-	  (Reported by Andrey Chernov.)
-
 	2005-05-29
 
 	* Consistency: Skip test if Berkeley DB supports shared environments
