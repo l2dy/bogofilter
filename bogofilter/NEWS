@@ -13,6 +13,10 @@
 
 -------------------------------------------------------------------------------
 
+	2005-08-03
+
+	* bogotune - Restored code for recommending db_cachesize value..
+
 	2005-07-10
 
 	* Bogofilter now complains if sqlite 3.2.1 or older is used on a

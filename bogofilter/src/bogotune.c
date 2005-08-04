@@ -46,6 +46,7 @@ AUTHORS:
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -627,6 +628,18 @@ static int update_count(void)
 	fflush(stdout);
     }
     return message_count;
+}
+
+static unsigned int calc_db_cachesize(void)
+{
+    struct stat fst;
+    if (!stat(ds_path, &fst)) {
+	int dbc = ceil((double)fst.st_size / (3 * 1024 * 1024));
+        return ((unsigned int)dbc);
+    } else {
+        fprintf(stderr, "Unable to stat %s\n", ds_path);
+        exit (EX_ERROR);
+    }
 }
 
 static void load_wordlist(ds_foreach_t *hook, void *userdata)
@@ -1477,13 +1490,15 @@ static rc_t bogotune(void)
 	scoring_error();
 
     /*
-    ** 5.  Calculate x
+    ** 5.  Calculate x and cache size
     ** Calculate x with bogoutil's -r option (a new addition).
     ** Bound the calculated value within [0.4, 0.6] and set the range to be
     ** investigated to [x-0.1, x+0.1].
     */
 
     robx = get_robx();
+    db_cachesize = calc_db_cachesize();
+    printf("Recommended db cache size is %u MB\n", db_cachesize);
 
     /*
     ** 6.  Calculate fp target
