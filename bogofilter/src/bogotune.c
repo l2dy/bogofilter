@@ -138,7 +138,6 @@ typedef enum e_ds_loc {
 
 const char *progname = "bogotune";
 static char *ds_path;			/* directory */
-static char *ds_file;			/* directory/file */
 static ds_loc ds_flag = DS_NONE;
 static void *env = NULL;
 
@@ -1344,7 +1343,6 @@ static void bogotune_free(void)
     mime_cleanup();
 
     xfree(ds_path);
-    xfree(ds_file);
 
     return;
 }
