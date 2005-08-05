@@ -13,9 +13,14 @@
 
 -------------------------------------------------------------------------------
 
+	2005-08-05
+
+	* configure.ac: MIPS doesn't have extended FP precisiopn. Patch by
+	  Daichi Kawahata.
+
 	2005-08-03
 
-	* bogotune - Restored code for recommending db_cachesize value..
+	* bogotune - Restored code for recommending db_cachesize value.
 
 	2005-07-10
 

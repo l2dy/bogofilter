@@ -5,13 +5,16 @@ Adrian Otto	(portability code, file locking)
 Paul Tomblin	(bug fixes)
 David Relson	(new features, release coordinator, bug fixes, cleanups)
 Matthias Andree	(bug fixes, improvements, auto tools build environment,
-		 cleanups, portability, RPM packaging)
-Gyepi Sam	(database abstraction, berkeleydb support, wordhash,
-		 bogoupgrade, bogoutil, documentation, bug fixes, tdb support)
+		 cleanups, portability, RPM packaging, sqlite3 and
+		 Berkeley DB Transactional support)
+Gyepi Sam	(database abstraction, initial BerkeleyDB support, wordhash,
+		 bogoupgrade, bogoutil, documentation, bug fixes, TDB support)
 Allyn Fratkin	(bug fixes, bug database maintainer)
 Clint Adams	(bug fixes, portability, debian packaging)
 Greg Louis	(spamicity calculation methods, tuning)
 Boris Piwinger	(bogominitrain.pl, documentation)
+Stefan Bellon	(SDBM/QDBM drivers (the former has been abandoned),
+		 RISC OS port)
 
 Contributors:
 
@@ -37,3 +40,4 @@ Bill McClain
 Alfons Hoogervorst
 Ciprian Popovici
 Yar Tikhiy
+Daichi Kawahata

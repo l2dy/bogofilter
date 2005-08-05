@@ -653,6 +653,7 @@ AC_CACHE_CHECK([for extended floating point registers],ac_cv_c_extended_fp,
 	       [case "$host" in
 		*sparc*-*-*) ac_cv_c_extended_fp=no ;;     
 		*powerpc*-*-*) ac_cv_c_extended_fp=no ;;      
+		*mips*-*-*) ac_cv_c_extended_fp=no ;;
 		*hppa*-*-*) ac_cv_c_extended_fp=no ;;      
 		*alpha*-*-*) ac_cv_c_extended_fp=no ;;      
 		*68k*-*-*) ac_cv_c_extended_fp=yes ;;      
