@@ -50,13 +50,13 @@ static const int syncflag = O_FSYNC;
 #endif
 
 /** Type we use for a lock cell. */
-typedef char cell_t;
+typedef char bf_cell_t;
 
 /** Periodic check interval in seconds, for set_lock(). */
 static const int chk_intval = 30;
 /** String to append to base directory, for process table file. */
 static const char aprt[] = DIRSEP_S "lockfile-p";
-/** Size of a cell, must match sizeof(cell_t). */
+/** Size of a cell, must match sizeof(bf_cell_t). */
 static const off_t cellsize = 1;
 /** Offset of our lock cell inside the lock file. */
 static off_t lockpos;
@@ -73,9 +73,9 @@ static int locked;
 static int lockfd = -1;
 
 /** Constant cell content for cells that are in use. */
-static const cell_t cell_inuse = '1';
+static const bf_cell_t cell_inuse = '1';
 /** Constant cell content for cells that are \b not in use. */
-static const cell_t cell_free = '0';
+static const bf_cell_t cell_free = '0';
 
 /** Save area for previous SIGALRM signal handler. */
 static struct sigaction oldact;
@@ -259,7 +259,7 @@ static int close_lockfile(void) {
 static int check_zombies(void) {
     ssize_t r;
     off_t pos, savepos;
-    cell_t cell;
+    bf_cell_t cell;
 
     savepos = lseek(lockfd, 0, SEEK_CUR);
     if (savepos < 0)
@@ -325,7 +325,7 @@ static int shut_sig(void) {
 }
 
 int set_lock(void) {
-    cell_t cell;
+    bf_cell_t cell;
     ssize_t r;
 
     if (lseek(lockfd, 0, SEEK_SET) < 0)

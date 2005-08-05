@@ -15,6 +15,9 @@
 
 	2005-08-05
 
+	* db_lock.c: rename "cell_t" to "bf_cell_t" to avoid clashing with
+	  IRIX's cell_t. Reported by Daichi Kawahata.
+
 	* configure.ac: MIPS doesn't have extended FP precisiopn. Patch by
 	  Daichi Kawahata.
 
