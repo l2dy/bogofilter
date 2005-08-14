@@ -13,6 +13,11 @@
 
 -------------------------------------------------------------------------------
 
+	2005-08-14
+
+	* When directory name is argument for bogoutil's dump/load
+	  option, use "wordlist.db" to avoid a sigsegv.
+
 	2005-08-05
 
 	* db_lock.c: rename "cell_t" to "bf_cell_t" to avoid clashing with

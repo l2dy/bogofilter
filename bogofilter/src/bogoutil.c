@@ -68,8 +68,17 @@ static void ds_open_failure(bfpath *bfp, void *dbe)
     fprintf(stderr, "Error accessing file or directory '%s'.\n", bfp->filepath);
     if (errno != 0)
 	fprintf(stderr, "error #%d - %s.\n", errno, strerror(errno));
-    ds_cleanup(dbe);
+    if (dbe != NULL)
+	ds_cleanup(dbe);
     exit(EX_ERROR);
+}
+
+static void check_for_wordlist(bfpath *bfp, bfpath_mode mode)
+{
+    if (!bfpath_check_mode(bfp, mode)) {
+	fprintf(stderr, "Can't open wordlist '%s'\n", bfp->filepath);
+	exit(EX_ERROR);
+    }
 }
 
 static int ds_dump_hook(word_t *key, dsv_t *data,
@@ -873,10 +882,14 @@ int main(int argc, char *argv[])
     bfpath_set_bogohome(bfp);
 
     mode = get_mode(flag);
-    if (!bfpath_check_mode(bfp, mode)) {
-	fprintf(stderr, "Can't open wordlist '%s'\n", bfp->filepath);
-	exit(EX_ERROR);
+    check_for_wordlist(bfp, mode);
+
+    if ((flag == M_DUMP || flag == M_LOAD) && bfp->isdir) {
+	bfpath_set_filename(bfp, WORDLIST);
+	check_for_wordlist(bfp, mode);
     }
+
+    errno = 0;		/* clear error status */
 
     switch(flag) {
 	case M_RECOVER:

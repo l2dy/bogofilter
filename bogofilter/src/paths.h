@@ -49,6 +49,7 @@ void	bfpath_set_bogohome(bfpath *bfp);
 bool	bfpath_check_mode(bfpath *bfp, bfpath_mode mode);
 bfpath *bfpath_free(bfpath *path);
 bool	paths_equal(bfpath *p1, bfpath *p2);
+void	bfpath_set_filename(bfpath *bfp, const char *filename);
 
 void	set_bogohome(const char *dirname);
 void	chk_bogohome(void);

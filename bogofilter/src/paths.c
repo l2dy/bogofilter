@@ -165,6 +165,8 @@ static void check_for_file(bfpath *bfp)
     int rc;
     struct stat sb;
 
+    bfp->isdir = bfp->isfile = false;
+
     rc = stat(bfp->filepath, &sb);
     if (rc == 0) {
 	bfp->exists = true;
@@ -231,6 +233,16 @@ void bfpath_set_bogohome(bfpath *bfp)
     }
 
     bfpath_split(bfp, bogohome);
+}
+
+void bfpath_set_filename(bfpath *bfp, const char *filename)
+{
+    xfree(bfp->filename);
+    bfp->filename = xstrdup(filename);
+    xfree(bfp->filepath);
+    bfp->filepath = mxcat(bfp->dirname, DIRSEP_S, bfp->filename, NULL);
+    check_for_file(bfp);
+    return;
 }
 
 bfpath *bfpath_free(bfpath *bfp)
