@@ -163,10 +163,6 @@ endif
 # AC_REPLACE objects, for instance, trio may need strtoul:
 LDADD += @LIBOBJS@
 
-if ENABLE_TDB_DATASTORE
-datastore_SOURCE = datastore_tdb.c datastore_dummies.c \
-		   datastore_txn_dummies.c datastore_opthelp_dummies.c
-else
 if ENABLE_QDBM_DATASTORE
 datastore_SOURCE = datastore_qdbm.c datastore_qdbm_cmpkey.c \
 		   datastore_txn_dummies.c datastore_opthelp_dummies.c \
@@ -192,7 +188,6 @@ endif
 endif
 endif
 endif
-endif
 
 datastore_OBJECT = $(datastore_SOURCE:.c=.o)
 
@@ -202,7 +197,6 @@ EXTRA_libbogofilter_a_SOURCES = datastore_db.c datastore_db_trad.c \
 				datastore_opthelp_dummies.c \
 				datastore_txn_dummies.c \
 				datastore_qdbm.h datastore_qdbm.c \
-				datastore_tdb.c \
 				datastore_sqlite.c
 				charset.h convert_charset.h convert_unicode.h \
 		  		charset.c \

@@ -201,7 +201,7 @@ Options:
  -o <output file>
 
     Output database file.  Use the appropriate file extension for your version
-    of bogofilter, i.e. '.db' for Berkeley DB or '.tdb' for Trivial DB.
+    of bogofilter, i.e. '.db' for Berkeley DB or '.sql' for SQLite3.
 
  -b <path to bogoutil program>
 

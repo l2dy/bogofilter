@@ -6,17 +6,17 @@
 # rpm --define 'bogostatic 1' --sign -bb bogofilter.spec
 # rpmbuild --define 'bogostatic 1' --sign -bb bogofilter.spec
 #
-# To build with tdb, use:
+# To build with SQLite3, use:
 #
-# rpmbuild --define 'with_tdb 1' -bb bogofilter.spec
-# rpmbuild --define 'with_tdb 1' --sign -bb bogofilter.spec
+# rpmbuild --define 'with_sql 1' -bb bogofilter.spec
+# rpmbuild --define 'with_sql 1' --sign -bb bogofilter.spec
 
 %define	name		@PACKAGE@
 %define	version		@VERSION@
 %define	release		1
 
 %{!?bogostatic: %{expand: %%define bogostatic 0}}
-%{!?with_tdb:%define with_tdb 0}
+%{!?with_sql:%define with_sql 0}
 
 Summary:	Fast anti-spam filtering by Bayesian statistical analysis
 Name:		%{name}
@@ -41,8 +41,8 @@ Bogofilter is designed with fast algorithms (including Berkeley DB system),
 coded directly in C, and tuned for speed, so it can be used for production
 by sites that process a lot of mail.
 
-%if %{with_tdb}
-This version was built with tdb support.
+%if %{with_sql}
+This version was built with sql support.
 %else
 This version was built with Berkeley DB support.
 %endif
@@ -65,8 +65,8 @@ CFLAGS="$RPM_OPT_FLAGS" \
 %if %{?bogostatic}
   --enable-static \
 %endif
-%if %{with_tdb}
-  --with-database=tdb \
+%if %{with_sql}
+  --with-database=sql \
 %endif
   --with-included-gsl
 

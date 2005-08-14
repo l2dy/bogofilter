@@ -217,7 +217,7 @@
 	    that fails, too, your database cannot be repaired and must
 	    be rebuilt from scratch.
 	    This is only supported when compiled with Berkeley DB
-	    support with transactions enabled. Trying recovery with QDBM or TDB support will
+	    support with transactions enabled. Trying recovery with QDBM or SQLite3 support will
 	    result in an error.</para>
 	<para>The <option>--db-recover-harder <replaceable>dir</replaceable></option>
 	    option runs a catastrophic data
@@ -225,7 +225,7 @@
 	    your database cannot be repaired and must be rebuilt from
 	    scratch.
 	    This is only supported when compiled with Berkeley DB
-	    support with transactions enabled. Trying recovery with QDBM or TDB support will
+	    support with transactions enabled. Trying recovery with QDBM or SQLite3 support will
 	    result in an error.</para>
 	<para>The <option>--db-remove-environment
 		<replaceable>directory</replaceable></option> option has

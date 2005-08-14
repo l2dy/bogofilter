@@ -391,7 +391,7 @@ AC_CACHE_SAVE
 WITH_DB_ENGINE=db
 AC_ARG_WITH(database,
 	    AC_HELP_STRING([--with-database=ENGINE],
-	    [Choose database engine {db|tdb|qdbm|sqlite3} [[ENGINE=db]]]),
+	    [Choose database engine {db|qdbm|sqlite3} [[ENGINE=db]]]),
 	    [ WITH_DB_ENGINE=$withval ]
 )
 
@@ -404,22 +404,6 @@ case "x$WITH_DB_ENGINE" in
 	AC_LIB_LINKFLAGS([sqlite3])
 	LIBDB="$LIBSQLITE3"
 	;;
-    xtdb)
-	AC_DEFINE(ENABLE_TDB_DATASTORE,1, [Enable tdb datastore])
-	DB_TYPE=tdb
-	DB_EXT=.tdb
-	AC_LIB_LINKFLAGS([tdb])
-	LIBDB="$LIBTDB"
-	saveLIBS="$LIBS"
-	LIBS="$LIBS $LIBDB"
-	AC_LINK_IFELSE([AC_LANG_PROGRAM([
-#include <sys/types.h>
-#include <tdb.h>
-	], [
-	    TDB_CONTEXT *t = tdb_open("", 0, 0, 0, 0);
-	])],,AC_MSG_ERROR(Cannot link to tdb library.))
-	LIBS="$saveLIBS"
-    ;;
     xqdbm)
 	AC_DEFINE(ENABLE_QDBM_DATASTORE,1, [Enable qdbm datastore])
 	DB_TYPE=qdbm
@@ -569,7 +553,7 @@ shared environments, you can use --disable-dbshared-test.])],)
 	LIBS="$saveLIBS"
     ;;
     *)
-	AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, tdb, qdbm, sqlite.])
+	AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, qdbm, sqlite.])
     ;;
 esac
 
@@ -587,7 +571,6 @@ AC_SUBST(DB_EXT)
 AC_SUBST(DB_TYPE)
 AC_SUBST(STATIC_DB)
 
-AM_CONDITIONAL(ENABLE_TDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xtdb")
 AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
 AM_CONDITIONAL(ENABLE_SQLITE_DATASTORE, test "x$WITH_DB_ENGINE" = "xsqlite")
 

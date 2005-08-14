@@ -44,7 +44,7 @@ EXTRA_DIST = \
 	     programmer/RISC-OS/src/Makefile \
 	     programmer/RISC-OS/gsl/Makefile \
 	     rpm.notes.BerkeleyDB \
-	     README.db README.sqlite README.tdb \
+	     README.db README.sqlite \
 	     README.validation
 
 #	     bogofilter.cf.example 
