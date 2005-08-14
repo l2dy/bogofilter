@@ -73,14 +73,6 @@ static void ds_open_failure(bfpath *bfp, void *dbe)
     exit(EX_ERROR);
 }
 
-static void check_for_wordlist(bfpath *bfp, bfpath_mode mode)
-{
-    if (!bfpath_check_mode(bfp, mode)) {
-	fprintf(stderr, "Can't open wordlist '%s'\n", bfp->filepath);
-	exit(EX_ERROR);
-    }
-}
-
 static int ds_dump_hook(word_t *key, dsv_t *data,
 			/*@unused@*/ void *userdata)
 /* returns 0 if ok, 1 if not ok */
@@ -882,11 +874,14 @@ int main(int argc, char *argv[])
     bfpath_set_bogohome(bfp);
 
     mode = get_mode(flag);
-    check_for_wordlist(bfp, mode);
+    if (bfpath_check_mode(bfp, mode)) {
+	if (bfp->isdir)
+	    bfpath_set_filename(bfp, WORDLIST);
+    }
 
-    if ((flag == M_DUMP || flag == M_LOAD) && bfp->isdir) {
-	bfpath_set_filename(bfp, WORDLIST);
-	check_for_wordlist(bfp, mode);
+    if (!bfpath_check_mode(bfp, mode)) {
+	fprintf(stderr, "Can't open wordlist '%s'\n", bfp->filepath);
+	exit(EX_ERROR);
     }
 
     errno = 0;		/* clear error status */
