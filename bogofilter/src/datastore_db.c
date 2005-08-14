@@ -396,6 +396,9 @@ void *dbe_init(bfpath *bfp)
     if (!check_path(bfp))
 	exit(EX_ERROR);
 
+    if (bfp->isdir)
+	return NULL;
+
     dsm_init(bfp);
     
     env = dsm->dsm_env_init(bfp);
