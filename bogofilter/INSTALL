@@ -16,15 +16,14 @@ this writing in alphabetical order
 2. QDBM (1.7.23 or newer)			http://qdbm.sf.net/
 3. SQLite (3.2.2 or newer)			http://sqlite.org/
 
-You can use --with-database=ARG (pick from db, qdbm, sqlite) to pick the
-database backend (you must have installed the database and the
-corresponding developer package). db is the default.
+You can use --with-database=ARG (choose from db (for Berkeley DB), qdbm,
+sqlite) to pick the database backend (you must have installed the
+database and the corresponding developer package). db is the default.
 
-If you are using "db", you can use --disable-transactions to switch back
-to an unsafe Berkeley DB mode that drops fewer files in your directory
-and that does not use transactions and can hence corrupt data bases in
-application crashes.
-
+If you are using "db", you can use --disable-transactions or
+--enable-transactions to force the use of 1a or 1b. The default is to
+compile both modes into bogofilter and find out automatically at run
+time. See doc/README.db for details.
 
 REMEMBER to read the doc/programmer/README.* file for your operating
 systems in case of trouble.
