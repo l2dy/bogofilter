@@ -28,6 +28,11 @@ labeled "Incompat" and "Major".
 NOTE: the NEWS document has greater detail on some of these changes.
 
 ------------------------------------------------------------------------
+[Incompat 0.96.0] TDB removed
+
+Support for the TDB database library has been removed.
+
+------------------------------------------------------------------------
 [Incompat 0.95.2] Applies to Berkeley DB Transactional ONLY:
 
 This release gives up on locking the databases at page granularity and

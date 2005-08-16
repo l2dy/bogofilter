@@ -4,7 +4,7 @@ BERKELEY DB ENVIRONMENT CODE
 $Id$
 
 This document does not apply when you are installing a bogofilter
-version that has been configured to use the QDBM, SQLite3 or TDB
+version that has been configured to use the QDBM or SQLite3
 database libraries. Common entry points are these
 
 QUICK LINKS:

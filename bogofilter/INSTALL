@@ -15,13 +15,12 @@ this writing in alphabetical order
 1b.Berkeley DB (3.1 - 4.3) without transactions	http://sleepycat.com/
 2. QDBM (1.7.23 or newer)			http://qdbm.sf.net/
 3. SQLite (3.2.2 or newer)			http://sqlite.org/
-4. TDB (1.0)					http://tdb.sf.net/
 
-You can use --with-database=ARG (pick from db, tdb, qdbm, sqlite) to
-pick the database backend (you must have installed the database and the
+You can use --with-database=ARG (pick from db, qdbm, sqlite) to pick the
+database backend (you must have installed the database and the
 corresponding developer package). db is the default.
 
-If you are using db, you can use --disable-transactions to switch back
+If you are using "db", you can use --disable-transactions to switch back
 to an unsafe Berkeley DB mode that drops fewer files in your directory
 and that does not use transactions and can hence corrupt data bases in
 application crashes.
