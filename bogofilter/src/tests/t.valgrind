@@ -7,6 +7,11 @@
 
 NODB=1 . ${srcdir=.}/t.frame
 
+if test "x$BF_RUN_VALGRIND" = x ; then
+    echo >&2 "----> the following test is skipped, set BF_RUN_VALGRIND=1 to run it"
+    exit 77
+fi
+
 if test "x$EXE_EXT" = "x_static"; then
     exit 77
 fi
