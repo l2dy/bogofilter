@@ -197,11 +197,11 @@ EXTRA_libbogofilter_a_SOURCES = datastore_db.c datastore_db_trad.c \
 				datastore_opthelp_dummies.c \
 				datastore_txn_dummies.c \
 				datastore_qdbm.h datastore_qdbm.c \
-				datastore_sqlite.c
+				datastore_sqlite.c \
 				charset.h convert_charset.h convert_unicode.h \
-		  		charset.c \
-		  		convert_charset.c chUnicodeTo866.h \
-		  		convert_unicode.c iconvert.c iconvert.h
+				charset.c \
+				convert_charset.c chUnicodeTo866.h \
+				convert_unicode.c iconvert.c iconvert.h
 
 CLEANFILES=version.c directories.c bogoupgrade
 
