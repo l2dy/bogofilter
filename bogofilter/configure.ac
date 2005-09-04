@@ -152,7 +152,6 @@ AC_SUBST(CFLAGS)
 
 dnl Checks for libraries.
 AC_CHECK_LIB([m],  [cos])
-AM_ICONV
 
 dnl fdatasync can be faster than fsync but may be in librt on some systems
 dnl such as Solaris. The code is currently stubbed out in db_lock.c
@@ -243,6 +242,7 @@ if test x$USE_UNICODE = xNO ; then
 	[Disable unicode for converting character sets to unicode])
 	[ENCODING="raw"]
 else
+	AM_ICONV
 	AC_DEFINE(ENABLE_UNICODE,1,
 	[Enable unicode for converting character sets to unicode])
 	[ENCODING="utf-8"]
