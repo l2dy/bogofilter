@@ -5,25 +5,31 @@
 
 NODB=1 . ${srcdir=.}/t.frame
 
-# Skip test if non-default configuration
-if [ -n "$USE_UNICODE" ] ; then
-    exit 77
-fi
-
 OUT="$TMPDIR/maint.out"
 
 create_empty_wordlist
 $BOGOFILTER -C -y 0 -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER -C -y 0 -n < ${SYSTEST}/inputs/good.mbx
 
-CORRECT="$TMPDIR/result"
+if [ -z "$USE_UNICODE" -o "$USE_UNICODE" == "YES" ] ; then
+    CORRECT="$TMPDIR/ref.unicode.enabled"
+else
+    CORRECT="$TMPDIR/ref.unicode.disabled"
+fi
 
-# 0.95.0 - unicode
-cat >> $CORRECT <<EOF
+cat >> $TMPDIR/ref.unicode.enabled <<EOF
 initial: 5304
 count 0 -> 5305
 count 1 -> 1847
 count 2 -> 950
+count 3 -> 610
+EOF
+
+cat >> $TMPDIR/ref.unicode.disabled <<EOF
+initial: 5304
+count 0 -> 5304
+count 1 -> 1847
+count 2 -> 949
 count 3 -> 610
 EOF
 
