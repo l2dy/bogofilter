@@ -486,7 +486,7 @@ wordhash_sort (wordhash_t *wh)
     wh->order = (hashnode_t **) xcalloc(wh->size, sizeof(hashnode_t *));
 
     wh->count = 0;
-    for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
+    for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
 	wh->order[wh->count++] = node;
 
     qsort(wh->order, wh->count, sizeof(hashnode_t *), compare_hashnode_t);
@@ -519,7 +519,7 @@ convert_propslist_to_countlist(wordhash_t *whi)
 
     who = wordhash_init(WH_CNTS, whi->size);
 
-    for(node = wordhash_first(whi); node != NULL; node = wordhash_next(whi)) {
+    for (node = wordhash_first(whi); node != NULL; node = wordhash_next(whi)) {
 	wordcnts_t *ci = wordhash_get_counts(whi, node);
 	wordcnts_t *co = &who->cnts[who->count++];
 
@@ -548,7 +548,7 @@ convert_wordhash_to_propslist(wordhash_t *whi, wordhash_t *db)
 
 	who->count = 0;
 
-	for(node = wordhash_first(whi); node != NULL; node = wordhash_next(whi)) {
+	for (node = wordhash_first(whi); node != NULL; node = wordhash_next(whi)) {
 	    wordprop_t *wp;
 	    if (!msg_count_file && node->key != NULL) {
 		who->freeable = false;

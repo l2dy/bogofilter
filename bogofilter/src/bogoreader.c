@@ -359,7 +359,7 @@ static bool dir_next_mail(void)
     struct dirent *dirent;
     struct stat st;
 
-    for(;;) {
+    for (;;) {
 	if (reader_dir == NULL) {
 	    char *x = dir_name;
 	    /* open next directory */

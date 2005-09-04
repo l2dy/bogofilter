@@ -144,7 +144,7 @@ bool do_replace_nonascii_characters(register byte *str, register size_t len)
 {
     bool change = false;
     assert(str != NULL);
-    while(len--) {
+    while (len--) {
 	if (*str & 0x80) {
 	    *str = '?';
 	    change = true;

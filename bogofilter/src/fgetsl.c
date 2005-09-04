@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
     non_nul_terminate = atoi(argv[2]);
     size = atoi(argv[1]);
     buf = xmalloc(size);
-    for(;;) {
+    for (;;) {
 	count = xfgetsl(buf, size, stdin, non_nul_terminate);
 	if (count == EOF) break;
 	printf("%d ", count);

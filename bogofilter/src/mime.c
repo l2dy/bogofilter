@@ -129,7 +129,7 @@ static const char *str_mime_type(enum mimetype m) {
 }
 
 static const char *str_mime_enc(enum mimeencoding e) {
-    switch(e) {
+    switch (e) {
 	case MIME_ENCODING_UNKNOWN:
 	    return "unknown";
 	case MIME_7BIT:

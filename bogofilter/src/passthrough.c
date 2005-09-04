@@ -392,7 +392,7 @@ void passthrough_cleanup(void)
     if (!passthrough)
 	return;
 
-    switch(passmode) {
+    switch (passmode) {
     case PASS_MEM:
 	textblock_free();
 	break;

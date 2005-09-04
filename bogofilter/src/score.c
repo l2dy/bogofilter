@@ -171,7 +171,7 @@ void lookup_words(wordhash_t *wh)
 	return;
 
 retry:
-    for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
+    for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
 	word_t *token     = node->key;
 	wordprop_t *props = (wordprop_t *) node->buf;
@@ -209,7 +209,7 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
 				    min_dev, robs, robx);
 
-    for(node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
+    for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
 	double prob;
 	word_t *token;
@@ -228,7 +228,7 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 	count += 1;
 
 	prob = calc_prob(cnts->good, cnts->bad,
-		cnts->msgs_good, cnts->msgs_bad);
+			 cnts->msgs_good, cnts->msgs_bad);
 
 	if (need_stats)
 	    rstats_add(token, prob, cnts);

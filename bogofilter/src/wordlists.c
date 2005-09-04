@@ -68,7 +68,7 @@ void begin_wordlist(wordlist_t *list)
 {
     dsv_t val;
 
-    while(1) {
+    while (1) {
 	if (ds_txn_begin(list->dsh)) {
 	    rand_sleep(1000,1000000);
 	    continue;
@@ -122,7 +122,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
     if (list->dsh == NULL) {
 	int err = errno;
 	close_wordlists(false);	/* unlock and close */
-	switch(err) {
+	switch (err) {
 	    /* F_SETLK can't obtain lock */
 	case EAGAIN:
 #ifdef __EMX__
@@ -284,7 +284,7 @@ static void sanitycheck_lists(void)
     wordlist_t* list=word_lists;
     int listcount=0;
 
-    while(1) {
+    while (1) {
 	if (list == NULL) break;
 	if (list->name == NULL) {
 	    fprintf(stderr, "A list has no name.\n");

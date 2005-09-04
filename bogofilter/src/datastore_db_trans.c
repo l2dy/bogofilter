@@ -592,7 +592,7 @@ ex_t dbx_recover(bfpath *bfp, bool catastrophic, bool force)
     dbe_t *env = xcalloc(1, sizeof(dbe_t));
 
     /* set exclusive/write lock for recovery */
-    while((force || needs_recovery())
+    while ((force || needs_recovery())
 	    && (db_try_glock(bfp, F_WRLCK, F_SETLKW) <= 0))
 	rand_sleep(10000,1000000);
 

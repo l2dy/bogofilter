@@ -280,7 +280,7 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 	case S_FLAGS:
 	    if ('1' <= *format && *format <= '9')
 		format++;
-	    else if(*format == '-')
+	    else if (*format == '-')
 		format++;
 	    else
 	    switch (*format) {

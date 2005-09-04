@@ -98,7 +98,7 @@ rc_t bogofilter(int argc, char **argv)
 	wordhash_sort(w);
 	msgcount += 1;
 
-        if( !passthrough_keepopen() )
+        if (!passthrough_keepopen())
             bogoreader_close_ifeof();
         
 	if (register_opt && DEBUG_REGISTER(1))

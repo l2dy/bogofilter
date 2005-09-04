@@ -194,8 +194,8 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
 	return rc;
     }
     loop = true;
-    while(loop) {
-	switch(sqlite3_step(stmt)) {
+    while (loop) {
+	switch (sqlite3_step(stmt)) {
 	    case SQLITE_ROW:
 		found = true;
 		if (hook != NULL)
@@ -323,7 +323,7 @@ void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
 	rc = db_loop(dbh->db, "SELECT name FROM sqlite_master "
 		"WHERE type='table' AND name='bogofilter';",
 		NULL, NULL);
-	switch(rc) {
+	switch (rc) {
 	    case 0:
 		if (sqlexec(dbh->db, "COMMIT;")) goto barf;
 		break;
@@ -372,7 +372,7 @@ void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
 
 	ee = db_get_dbvalue(dbh, &k, &v);
 	xfree(k.data);
-	switch(ee) {
+	switch (ee) {
 	    case 0: /* found endian marker token, read it */
 		if (v.leng < 4)
 		    goto barf;
@@ -462,9 +462,9 @@ static int sql_fastpath(
     int rc;
     bool found = false;
 
-    while(1) {
+    while (1) {
 	rc = sqlite3_step(stmt);
-	switch(rc) {
+	switch (rc) {
 	    case SQLITE_ROW:	/* this is the only branch that loops */
 		if (val) {
 		    int len = min(INT_MAX, val->leng);

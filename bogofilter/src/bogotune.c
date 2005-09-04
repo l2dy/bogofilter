@@ -1078,7 +1078,7 @@ static void top_ten(result_t *sorted, uint n)
     printf("Top ten parameter sets from this scan:\n");
 
     printf("        rs     md    rx    spesf    nsesf    co     fp  fn   fppc   fnpc\n");
-    for(f = false; !f; f = true) {
+    for (f = false; !f; f = true) {
       for (i = j = 0; i < 10 && j < n;) {
  	result_t *r = &sorted[j++];
  	if (!f && r->fp != target) continue;
@@ -1228,7 +1228,7 @@ static void final_recommendations(bool skip)
     printf("Non-Spam...\n");
     score_ns(ns_scores);	/* get scores (in descending order) */
 
-    for(m=0; m<10; ++m) printf("%8.6f %8.6f\n", sp_scores[m], ns_scores[m]);
+    for (m=0; m<10; ++m) printf("%8.6f %8.6f\n", sp_scores[m], ns_scores[m]);
 
     if (verbose >= PARMS)
 	printf("# ns_cnt %u, sp_cnt %u\n", ns_cnt, sp_cnt);

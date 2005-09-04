@@ -242,7 +242,7 @@ static int get_decoded_line(buff_t *buff)
 
 static int skip_folded_line(buff_t *buff)
 {
-    for(;;) {
+    for (;;) {
 	int count;
 	buff->t.leng = 0;
 	count = reader_getline(buff);

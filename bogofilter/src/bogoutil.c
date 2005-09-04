@@ -814,7 +814,7 @@ static bfpath_mode get_mode(cmd_t cmd)
 {
     bfpath_mode mode = BFP_ERROR;
 
-    switch(cmd) {
+    switch (cmd) {
     case M_LOAD:
 	mode = BFP_MAY_CREATE;
 	break;
@@ -886,7 +886,7 @@ int main(int argc, char *argv[])
 
     errno = 0;		/* clear error status */
 
-    switch(flag) {
+    switch (flag) {
 	case M_RECOVER:
 	    ds_init(bfp);
 	    rc = ds_recover(bfp, false);

@@ -20,7 +20,7 @@ static byte qp_xlate2045[256];
 static byte qp_xlate2047[256];
 
 static int hex_to_bin(byte c) {
-    switch(c) {
+    switch (c) {
 	case '0': return 0;
 	case '1': return 1;
 	case '2': return 2;
@@ -118,7 +118,7 @@ bool qp_validate(const word_t *word, qp_mode mode)
 	byte b = word->text[i];
 	byte v = qp_xlate[b];
 	if (v == 0)
-	    switch(b) {
+	    switch (b) {
 		case '=': /* allowed in encoded words,
 			     but must be encoded */
 		    break;
