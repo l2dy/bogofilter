@@ -376,9 +376,6 @@ void token_init(void)
 {
     yyinit();
 
-    if (!msg_count_file)
-	mime_reset();
-
     token_clear();
 
     if (w_to == NULL) {
