@@ -10,8 +10,6 @@
 #include "buff.h"
 #include "word.h"
 
-#define MIME_STACK_MAX 100
-
 enum mimetype {
     MIME_TYPE_UNKNOWN,
     MIME_MULTIPART,
@@ -43,6 +41,7 @@ typedef struct mime_t mime_t;
 
 /** data element of the MIME stack */
 struct mime_t {
+    int depth;
     char *charset;
     char *boundary;	/**< only valid if mime_type is
 			  MIME_MULTIPART or MIME_MESSAGE */

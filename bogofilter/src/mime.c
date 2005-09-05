@@ -18,6 +18,7 @@
 
 #include "common.h"
 
+#include <assert.h>
 #include <ctype.h>
 #include <stdlib.h>
 
@@ -31,12 +32,9 @@
 
 /* Global Variables */
 
-static int stackp = -1;
-static bool overflow_error = false;
-
-static mime_t msg_stack[MIME_STACK_MAX];
-mime_t *msg_state = msg_stack;
-mime_t *msg_top = msg_stack;
+mime_t *msg_state = NULL;
+mime_t *msg_top = NULL;
+mime_t *msg_bot = NULL;
 
 /** MIME media types (or prefixes thereof) that we detect. */
 static struct type_s {
@@ -152,17 +150,20 @@ static const char *str_mime_enc(enum mimeencoding e) {
 static void mime_stack_dump(void)
 {
     int i;
+    mime_t *ptr;
     fprintf(dbgout, "**** MIME stack is:\n");
-    if (stackp < 0)
-	fprintf(dbgout, "**** empty\n");
-    else
-	for (i = 0; i <= stackp; i++)
-	    fprintf(dbgout, "**** %3d type %s enc %s bnd %s chr %s\n",
-		    i,
-		    str_mime_type(msg_stack[i].mime_type),
-		    str_mime_enc(msg_stack[i].mime_encoding),
-		    msg_stack[i].boundary ? msg_stack[i].boundary : "NIL",
-		    msg_stack[i].charset);
+
+    for (ptr = msg_bot; ptr != NULL; ptr = ptr->parent)
+    {
+	fprintf(dbgout, "**** %3d type %s enc %s bnd %s chr %s\n",
+		i,
+		str_mime_type(ptr->mime_type),
+		str_mime_enc(ptr->mime_encoding),
+		ptr->boundary ? ptr->boundary : "NIL",
+		ptr->charset);
+	if (ptr == ptr->parent)
+	    break;
+    }
 }
 
 static void mime_init(mime_t * parent)
@@ -173,12 +174,17 @@ static void mime_init(mime_t * parent)
     msg_state->boundary_len = 0;
     msg_state->parent = parent;
     msg_state->charset = xstrdup("US-ASCII");
+    msg_state->depth = (msg_state->parent == msg_state) ? 0 : msg_state->parent->depth + 1;
+    return;
 }
 
 static void mime_free(mime_t * t)
 {
     if (t == NULL)
 	return;
+
+    if (msg_bot == t)
+	msg_bot = t->parent;
 
     if (t->boundary) {
 	xfree(t->boundary);
@@ -191,40 +197,40 @@ static void mime_free(mime_t * t)
     }
 
     t->parent = NULL;
+
+    xfree(t);
 }
 
 void mime_cleanup()
 {
-    while (stackp > -1)
+    if (msg_state == NULL)
+	return;
+
+    if (msg_state->parent != msg_state)
 	mime_pop();
-    overflow_error = false;
+    mime_pop();
+    msg_state = NULL;
+
+    msg_top = NULL;
+    msg_bot = NULL;
 }
 
 static void mime_push(mime_t * parent)
 {
-    if (stackp < MIME_STACK_MAX) {
-	if (parent == NULL) {
-	    if (stackp == -1)
-		parent = &msg_stack[0];
-	    else {
-		fprintf(stderr,
-			"**mime_push: expecting non-null parent\n");
-		exit(EX_ERROR);
-	    }
-	}
+    msg_state = (mime_t *) xmalloc(sizeof(mime_t));
 
-	msg_state = &msg_stack[++stackp];
-
-	mime_init(parent);
-
-	if (DEBUG_MIME(1))
-	    fprintf(dbgout, "*** mime_push. stackp: %d\n", stackp);
-    } else {
-	if (! overflow_error) {
-	    overflow_error = true;
-	    fprintf(stderr, "Attempt to overflow mime stack\n");
-	}
+    if (parent == NULL) {
+	parent = msg_state;
+	msg_top = msg_state;
     }
+
+    msg_bot = msg_state;
+
+    mime_init(parent);
+
+    if (DEBUG_MIME(1))
+	fprintf(dbgout, "*** mime_push. stackp: %d\n", msg_state->depth);
+
     if (DEBUG_MIME(2))
 	mime_stack_dump();
 }
@@ -232,21 +238,19 @@ static void mime_push(mime_t * parent)
 static void mime_pop(void)
 {
     if (DEBUG_MIME(1))
-	fprintf(dbgout, "*** mime_pop. stackp: %d\n", stackp);
+	fprintf(dbgout, "*** mime_pop. stackp: %d\n", msg_state->depth);
 
-    if (stackp > -1) {
-	mime_t *parent = msg_state->parent;
-
-	if (parent == msg_state)
-	    parent = NULL;
+    if (msg_state)
+    {
+	mime_t *parent = (msg_state->parent == msg_state) ? NULL : msg_state->parent;
 
 	mime_free(msg_state);
-	stackp--;
 
-	msg_state = stackp == -1 ? NULL : &msg_stack[stackp];
+	msg_state = parent;
     } else {
 	fprintf(stderr, "Attempt to underflow mime stack\n");
     }
+
     if (DEBUG_MIME(2))
 	mime_stack_dump();
 }
@@ -267,8 +271,9 @@ void mime_reset(void)
     if (DEBUG_MIME(0))
 	fprintf(dbgout, "*** mime_reset\n");
 
-    while (stackp > -1)
-	mime_pop();
+    mime_cleanup();
+//    while (stackp > -1)
+//	mime_pop();
 
     mime_push(NULL);
 }
@@ -286,7 +291,7 @@ void mime_add_child(mime_t * parent)
 static bool get_boundary_props(const word_t * boundary, /**< input line */
 	boundary_t * b /*@out@*/ /**< output properties, must be pre-allocated by caller */)
 {
-    int i;
+    mime_t *ptr;
     const byte *buf = boundary->text;
     size_t blen = boundary->leng;
 
@@ -313,16 +318,19 @@ static bool get_boundary_props(const word_t * boundary, /**< input line */
 	}
 
 	/* search stack for matching boundary, in reverse order */
-	for (i = stackp; i > -1; i--) {
-	    if (is_mime_container(&msg_stack[i])
-		&& msg_stack[i].boundary != NULL
-		&& msg_stack[i].boundary_len == blen
-		&& (memcmp(msg_stack[i].boundary, buf, blen) == 0))
+	for (ptr = msg_bot; ptr != NULL; ptr = ptr->parent)
+	{
+	    if (is_mime_container(ptr)
+		&& ptr->boundary != NULL
+		&& ptr->boundary_len == blen
+		&& (memcmp(ptr->boundary, buf, blen) == 0))
 	    {
-		b->depth = i;
+		b->depth = ptr->depth;
 		b->is_valid = true;
 		break;
 	    }
+	    if (ptr == ptr->parent)
+		break;
 	}
     }
 
@@ -348,12 +356,13 @@ bool got_mime_boundary(word_t * boundary)
     if (DEBUG_MIME(0))
 	fprintf(dbgout,
 		"*** got_mime_boundary:  stackp: %d, boundary: '%s'\n",
-		stackp, boundary->text);
+		msg_top->depth, boundary->text);
 
-    if (stackp > 0) {
+    if (msg_state != NULL)
+    {
 	/* This handles explicit and implicit boundaries - pop stack
 	 * until we reach the boundary level on the stack */
-	while (stackp > 0 && stackp > b.depth)
+	while (msg_state->depth > b.depth)
 	    mime_pop();
 
 	/* explicit end boundary */
@@ -592,7 +601,7 @@ void mime_boundary_set(word_t * text)
 	if (blen > INT_MAX)
 	    len = INT_MAX;
 	fprintf(dbgout, "*** --> mime_boundary_set: %d '%-.*s'\n",
-		stackp, len, boundary);
+		msg_state->depth, len, boundary);
     }
 
     boundary = getword(boundary + strlen("boundary="), boundary + blen);
@@ -602,7 +611,7 @@ void mime_boundary_set(word_t * text)
 
     if (DEBUG_MIME(1))
 	fprintf(dbgout, "*** <-- mime_boundary_set: %d '%s'\n",
-		stackp, boundary);
+		msg_state->depth, boundary);
 
     return;
 }
