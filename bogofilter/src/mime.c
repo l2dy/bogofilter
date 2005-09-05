@@ -161,8 +161,6 @@ static void mime_stack_dump(void)
 		str_mime_enc(ptr->mime_encoding),
 		ptr->boundary ? ptr->boundary : "NIL",
 		ptr->charset);
-	if (ptr == ptr->parent)
-	    break;
     }
 }
 
@@ -174,7 +172,7 @@ static void mime_init(mime_t * parent)
     msg_state->boundary_len = 0;
     msg_state->parent = parent;
     msg_state->charset = xstrdup("US-ASCII");
-    msg_state->depth = (msg_state->parent == msg_state) ? 0 : msg_state->parent->depth + 1;
+    msg_state->depth = (parent == NULL) ? 0 : msg_state->parent->depth + 1;
     return;
 }
 
@@ -206,7 +204,7 @@ void mime_cleanup()
     if (msg_state == NULL)
 	return;
 
-    if (msg_state->parent != msg_state)
+    while (msg_top->parent)
 	mime_pop();
     mime_pop();
     msg_state = NULL;
@@ -220,7 +218,6 @@ static void mime_push(mime_t * parent)
     msg_state = (mime_t *) xmalloc(sizeof(mime_t));
 
     if (parent == NULL) {
-	parent = msg_state;
 	msg_top = msg_state;
     }
 
@@ -242,7 +239,7 @@ static void mime_pop(void)
 
     if (msg_state)
     {
-	mime_t *parent = (msg_state->parent == msg_state) ? NULL : msg_state->parent;
+	mime_t *parent = msg_state->parent;
 
 	mime_free(msg_state);
 
@@ -272,8 +269,6 @@ void mime_reset(void)
 	fprintf(dbgout, "*** mime_reset\n");
 
     mime_cleanup();
-//    while (stackp > -1)
-//	mime_pop();
 
     mime_push(NULL);
 }
@@ -329,8 +324,6 @@ static bool get_boundary_props(const word_t * boundary, /**< input line */
 		b->is_valid = true;
 		break;
 	    }
-	    if (ptr == ptr->parent)
-		break;
 	}
     }
 
@@ -371,7 +364,10 @@ bool got_mime_boundary(word_t * boundary)
     }
 
     parent = is_mime_container(msg_state) ? msg_state : msg_state->parent;
-    mime_push(parent); /* push for the next part */
+    if (parent != NULL)
+	mime_push(parent); /* push for the next part */
+    else
+	mime_push(msg_state); /* push for the next part */
     return true;
 }
 

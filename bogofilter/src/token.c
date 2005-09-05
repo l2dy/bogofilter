@@ -270,7 +270,7 @@ token_t get_token(word_t **token)
 	    token_set( &yylval, text, leng);
 	    /* if top level, no address, not localhost, .... */
 	    if (token_prefix == w_recv &&
-		msg_state == msg_state->parent && 
+		msg_state->parent == NULL && 
 		msg_addr.leng == 0 &&
 		strcmp((char *)text, "127.0.0.1") != 0) {
 		/* Not guaranteed to be the originating address of the message. */
@@ -406,7 +406,7 @@ void set_tag(const char *text)
     if (!header_line_markup)
 	return;
 
-    if (msg_state != msg_state->parent &&
+    if (msg_state->parent != NULL &&
 	msg_state->parent->mime_type == MIME_MESSAGE) {
 	clr_tag();			/* don't tag if inside message/rfc822 */
 	return;
@@ -421,7 +421,7 @@ void set_tag(const char *text)
 	token_prefix = w_from;		/* From: */
 	break;
     case 'h':
-	if (msg_state == msg_state->parent)
+	if (msg_state->parent == NULL)
 	    token_prefix = w_head;	/* Header: */
 	else
 	    token_prefix = w_mime;	/* Mime:   */
