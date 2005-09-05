@@ -82,13 +82,11 @@ ex_t bogomain(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     if (DEBUG_MEMORY(1))
 	MEMDISPLAY;
 
-    free_wordlists();
-
-    output_cleanup();
-
     /* cleanup storage */
-    mime_cleanup();
     token_cleanup();
+    mime_cleanup();
+    output_cleanup();
+    free_wordlists();
 
 #ifdef	HAVE_SYSLOG_H
     if (logflag)
