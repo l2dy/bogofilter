@@ -403,6 +403,7 @@ case "x$WITH_DB_ENGINE" in
 	AC_CHECK_HEADERS([sqlite3.h],,AC_MSG_ERROR(Cannot find sqlite3.h header file))
 	AC_LIB_LINKFLAGS([sqlite3])
 	LIBDB="$LIBSQLITE3"
+	WITH_DB_ENGINE="sqlite"
 	;;
     xqdbm)
 	AC_DEFINE(ENABLE_QDBM_DATASTORE,1, [Enable qdbm datastore])
