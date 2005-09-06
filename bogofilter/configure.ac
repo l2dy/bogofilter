@@ -150,6 +150,17 @@ rm -f configure-dummy.c configure-dummy.o
 CFLAGS="$CFLAGS $ac_cv_prog_gcc_flags"
 AC_SUBST(CFLAGS)
 
+dnl Check if we're running GCC 4.0.0 or higher, if so, switch
+dnl to the new -iquote scheme rather than using -I- -I.
+gcc4=no
+if test "$GCC" = yes && test "$ICC" = no ; then
+    case `$CC -dumpversion 2>/dev/null` in
+	""|2.*|3.*) ;;
+	4.*) gcc4=yes ;;
+    esac
+fi
+AM_CONDITIONAL(USE_GCC4, test $gcc4 = yes)
+
 dnl Checks for libraries.
 AC_CHECK_LIB([m],  [cos])
 

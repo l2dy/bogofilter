@@ -28,8 +28,13 @@ noinst_LIBRARIES += libbf_gsl.a
 libbf_gsl_a_CPPFLAGS= -I$(top_srcdir)
 endif
 
+if USE_GCC4
+AM_CPPFLAGS = -iquote$(top_srcdir)/gnugetopt -iquote$(top_srcdir)/trio \
+	      -I$(srcdir) @GSL_CFLAGS@ -I$(top_srcdir)/gsl/specfunc -I$(top_srcdir)
+else
 AM_CPPFLAGS = -I$(top_srcdir)/gnugetopt -I$(top_srcdir)/trio -I- -I. \
 	      -I$(srcdir) @GSL_CFLAGS@ -I$(top_srcdir)/gsl/specfunc -I$(top_srcdir)
+endif
 
 AM_CFLAGS = -DBOGOFILTER
 

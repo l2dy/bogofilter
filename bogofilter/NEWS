@@ -13,6 +13,12 @@
 
 -------------------------------------------------------------------------------
 
+	2005-09-06
+
+	* Avoid "obsolete option -I- used, please use -iquote instead" nagging
+	  from GCC version 4. (Heck, autoconf has even reached include lines
+	  that worked for ages.)
+
 	2005-09-05
 
 	* Replace mime stack by linked list (to correct gentoo bug #69893).
