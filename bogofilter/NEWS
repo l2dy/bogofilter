@@ -15,6 +15,9 @@
 
 	2005-09-06
 
+	* (sqlite3 based builds only) Print reminder to register tokens before
+	  scoring if preparing the SELECT statement fails.
+
 	* Avoid "obsolete option -I- used, please use -iquote instead" nagging
 	  from GCC version 4. (Heck, autoconf has even reached include lines
 	  that worked for ages.)
