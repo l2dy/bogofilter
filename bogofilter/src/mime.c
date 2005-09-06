@@ -33,8 +33,8 @@
 /* Global Variables */
 
 mime_t *msg_state = NULL;
-mime_t *msg_top = NULL;
-mime_t *msg_bot = NULL;
+static mime_t *mime_stack_top = NULL;
+static mime_t *mime_stack_bot = NULL;
 
 /** MIME media types (or prefixes thereof) that we detect. */
 static struct type_s {
@@ -152,7 +152,7 @@ static void mime_stack_dump(void)
     mime_t *ptr;
     fprintf(dbgout, "**** MIME stack is:\n");
 
-    for (ptr = msg_top; ptr != NULL; ptr = ptr->child)
+    for (ptr = mime_stack_top; ptr != NULL; ptr = ptr->child)
     {
 	fprintf(dbgout, "**** %3d type %s enc %s bnd %s chr %s\n",
 		ptr->depth,
@@ -183,8 +183,8 @@ static void mime_free(mime_t * t)
     if (t == NULL)
 	return;
 
-    if (msg_bot == t)
-	msg_bot = t->parent;
+    if (mime_stack_bot == t)
+	mime_stack_bot = t->parent;
 
     if (t->boundary) {
 	xfree(t->boundary);
@@ -206,13 +206,13 @@ void mime_cleanup()
     if (msg_state == NULL)
 	return;
 
-    while (msg_top->parent)
+    while (mime_stack_top->parent)
 	mime_pop();
     mime_pop();
     msg_state = NULL;
 
-    msg_top = NULL;
-    msg_bot = NULL;
+    mime_stack_top = NULL;
+    mime_stack_bot = NULL;
 }
 
 static void mime_push(mime_t * parent)
@@ -220,10 +220,10 @@ static void mime_push(mime_t * parent)
     msg_state = (mime_t *) xmalloc(sizeof(mime_t));
 
     if (parent == NULL) {
-	msg_top = msg_state;
+	mime_stack_top = msg_state;
     }
 
-    msg_bot = msg_state;
+    mime_stack_bot = msg_state;
 
     mime_init(parent);
 
@@ -317,7 +317,7 @@ static bool get_boundary_props(const word_t * boundary, /**< input line */
 	}
 
 	/* search stack for matching boundary, in reverse order */
-	for (ptr = msg_bot; ptr != NULL; ptr = ptr->parent)
+	for (ptr = mime_stack_bot; ptr != NULL; ptr = ptr->parent)
 	{
 	    if (is_mime_container(ptr)
 		&& ptr->boundary != NULL
@@ -353,7 +353,7 @@ bool got_mime_boundary(word_t * boundary)
     if (DEBUG_MIME(0))
 	fprintf(dbgout,
 		"*** got_mime_boundary:  stackp: %d, boundary: '%s'\n",
-		msg_top->depth, boundary->text);
+		mime_stack_top->depth, boundary->text);
 
     if (msg_state != NULL)
     {
