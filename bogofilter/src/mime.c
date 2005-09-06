@@ -147,6 +147,7 @@ static const char *str_mime_enc(enum mimeencoding e) {
 }
 
 /** Dump the current MIME boundary stack. For debugging. */
+#ifndef	NODEBUG
 static void mime_stack_dump(void)
 {
     mime_t *ptr;
@@ -162,6 +163,7 @@ static void mime_stack_dump(void)
 		ptr->charset);
     }
 }
+#endif
 
 static void mime_init(mime_t * parent)
 {
