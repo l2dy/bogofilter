@@ -149,14 +149,13 @@ static const char *str_mime_enc(enum mimeencoding e) {
 /** Dump the current MIME boundary stack. For debugging. */
 static void mime_stack_dump(void)
 {
-    int i;
     mime_t *ptr;
     fprintf(dbgout, "**** MIME stack is:\n");
 
-    for (ptr = msg_bot; ptr != NULL; ptr = ptr->parent)
+    for (ptr = msg_top; ptr != NULL; ptr = ptr->child)
     {
 	fprintf(dbgout, "**** %3d type %s enc %s bnd %s chr %s\n",
-		i,
+		ptr->depth,
 		str_mime_type(ptr->mime_type),
 		str_mime_enc(ptr->mime_encoding),
 		ptr->boundary ? ptr->boundary : "NIL",
@@ -173,6 +172,9 @@ static void mime_init(mime_t * parent)
     msg_state->parent = parent;
     msg_state->charset = xstrdup("US-ASCII");
     msg_state->depth = (parent == NULL) ? 0 : msg_state->parent->depth + 1;
+    msg_state->child  = NULL;
+    if (parent)
+	parent->child = msg_state;
     return;
 }
 
@@ -244,6 +246,8 @@ static void mime_pop(void)
 	mime_free(msg_state);
 
 	msg_state = parent;
+	if (msg_state)
+	    msg_state->child = NULL;
     } else {
 	fprintf(stderr, "Attempt to underflow mime stack\n");
     }

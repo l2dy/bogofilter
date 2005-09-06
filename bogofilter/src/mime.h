@@ -50,6 +50,7 @@ struct mime_t {
     enum mimeencoding mime_encoding;
     enum mimedisposition mime_disposition;
     mime_t *parent;
+    mime_t *child;	/* for mime_stack_dump() */
 };
 
 extern mime_t *msg_state;
