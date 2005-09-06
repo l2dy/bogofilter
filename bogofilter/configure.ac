@@ -696,11 +696,11 @@ export PATH
 
 need_my_gsl=1
 AC_ARG_WITH(included-gsl, AC_HELP_STRING([--with-included-gsl],[force use of shipped GSL rather than system GSL]),
-if test "x$WITHVAL" != "xyes" ; then need_my_gsl=2 ; fi)
+    if test "x$withval" = "xyes" ; then need_my_gsl=2 ; fi)
 
 if test "$need_my_gsl" = 1 ; then
   AM_PATH_GSL(1.4,
-	        AC_DEFINE(HAVE_GSL_14,,[Define if you have GNU Scientific Library 1.4 or newer])
+		AC_DEFINE(HAVE_GSL_14,,[Define if you have GNU Scientific Library 1.4 or newer])
 		need_my_gsl=0)
   AM_PATH_GSL(1.0,
 		AC_DEFINE(HAVE_GSL_10,,[Define if you have GNU Scientific Library 1.0 or newer])

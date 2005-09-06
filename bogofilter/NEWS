@@ -13,6 +13,12 @@
 
 -------------------------------------------------------------------------------
 
+	2005-09-05
+
+	* Replace mime stack by linked list (to correct gentoo bug #69893).
+	* Fix configure's --with-included-gsl option.  (Thanks to
+          Torsten Veller for the patch)
+
 0.96.1	2005-09-05
 
 	2005-08-24
@@ -589,8 +595,8 @@
 
 	2005-01-02
 
-	* Initial support for Russian character sets (thanks to Evgeny
-	  Kotsuba).
+	* Initial support for Russian character sets.  (Thanks to Evgeny
+	  Kotsuba)
 
 	2004-12-30
 
@@ -963,7 +969,7 @@
 	2004-10-10
 
 	* OS/2 compatibility fixes for configure, bogofilter, and
-	  bogoutil (thanks to Yuri Dario).
+	  bogoutil.  (Thanks to Yuri Dario)
 
 	2004-10-09
 
