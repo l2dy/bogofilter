@@ -174,6 +174,15 @@ static int get_decoded_line(buff_t *buff)
 
     count = yy_get_new_line(temp);
 
+    if (count == EOF) {
+	if ( !ferror(fpin))
+	    return YY_NULL;
+	else {
+	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
+	    exit(EX_ERROR);
+	}
+    }
+
     /* Save the text on a linked list of lines.
      * Note that we store fixed-length blocks here, not lines.
      * One very long physical line could break up into more
@@ -193,15 +202,6 @@ static int get_decoded_line(buff_t *buff)
 	    count = buff->t.leng;
     }
 #endif
-
-    if (count == EOF) {
-	if ( !ferror(fpin))
-	    return YY_NULL;
-	else {
-	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
-	    exit(EX_ERROR);
-	}
-    }
 
 #ifdef EXCESSIVE_DEBUG
     /* debug */
