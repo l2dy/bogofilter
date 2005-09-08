@@ -13,6 +13,11 @@
 
 -------------------------------------------------------------------------------
 
+	2005-09-07
+
+	* Perform unicode conversion after base64 and quoted-printable
+	  decoding.  (Thanks to Mikhael Zabaluev for the patch)
+
 	2005-09-06
 
 	* (sqlite3 based builds only) Print reminder to register tokens before

@@ -191,6 +191,24 @@ static int get_decoded_line(buff_t *buff)
     if (passthrough && passmode == PASS_MEM && count > 0)
 	textblock_add(temp->t.text+temp->read, (size_t) count);
 
+    if ( !msg_header && msg_state->mime_type != MIME_TYPE_UNKNOWN)
+    {
+	word_t line;
+	uint decoded_count;
+
+	line.leng = (uint) count;
+	line.text = temp->t.text+temp->read;
+
+	decoded_count = mime_decode(&line);
+	/*change buffer size only if the decoding worked */
+	if (decoded_count != 0 && decoded_count < (uint) count) {
+	    temp->t.leng -= (uint) (count - decoded_count);
+	    count = (int) decoded_count;
+	    if (DEBUG_LEXER(1))
+		lexer_display_buffer(temp);
+	}
+    }
+
 #ifndef	DISABLE_UNICODE
     if (encoding == E_UNICODE) {
 	iconvert(temp, buff);
@@ -209,24 +227,6 @@ static int get_decoded_line(buff_t *buff)
     buff_puts(buff, 0, dbgout);
     fprintf(dbgout, "\n");
 #endif
-
-    if ( !msg_header && msg_state->mime_type != MIME_TYPE_UNKNOWN)
-    {
-	word_t line;
-	uint decoded_count;
-
-	line.leng = (uint) (buff->t.leng - used);
-	line.text = buff->t.text + used;
-
-	decoded_count = mime_decode(&line);
-	/*change buffer size only if the decoding worked */
-	if (decoded_count != 0 && decoded_count < (uint) count) {
-	    buff->t.leng -= (uint) (count - decoded_count);
-	    count = (int) decoded_count;
-	    if (DEBUG_LEXER(1))
-		lexer_display_buffer(buff);
-	}
-    }
 
     /* CRLF -> NL */
     if (count >= 2 && memcmp(buf + count - 2, CRLF, 2) == 0) {
