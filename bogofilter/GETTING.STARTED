@@ -125,7 +125,7 @@ Summary:
     Bogofilter works with many mail transfer agents (such as postfix,
     sendmail, and qmail) and many mail delivery agents (for example
     procmail and maildrop).  Each of these has its own configuration
-    file and methods for invoking spam filters like bogofilter.  The
+    file and methods for invoking spam filters.  Bogofilter's
     documentation includes files "integrating-with-postfix" and
     "integrating-with-qmail".  Read them for ideas on how to set up
     bogofilter for your environment.
