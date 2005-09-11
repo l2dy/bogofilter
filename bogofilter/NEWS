@@ -13,6 +13,11 @@
 
 -------------------------------------------------------------------------------
 
+	2005-09-11
+
+	* Resurrected atexit() code to ensure databases have been
+          closed (needed for rare cases on RISC OS).
+
 	2005-09-07
 
 	* Perform unicode conversion after base64 and quoted-printable

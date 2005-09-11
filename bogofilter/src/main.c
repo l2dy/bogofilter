@@ -26,6 +26,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
     ex_t exitcode;
 
     signal_setup();		/* setup to catch signals */
+    atexit(bf_exit);
 
     exitcode = bogomain(argc, argv);
 

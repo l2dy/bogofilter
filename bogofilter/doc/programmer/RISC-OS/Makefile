@@ -63,6 +63,7 @@ endif
 LIBGSL = ^.gsl.libgsl
 
 COMMON_OBJS = o.base64 \
+	o.bf_exit \
 	o.bogoconfig \
 	o.bogofilter \
 	o.bogohist \
@@ -151,7 +152,7 @@ endif
 endif
 
 BOGOFILTER_OBJS = o.main
-	
+
 BOGOLEXER_OBJS = o.bogolexer
 
 BOGOTUNE_OBJS = o.bogotune

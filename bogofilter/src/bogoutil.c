@@ -433,6 +433,10 @@ static ex_t get_robx(bfpath *bfp)
 	dsv_t val;
 	word_t *word_robx = word_news(ROBX_W);
 
+	/* since compute_robinson_x() closes the wordlists, 
+	   init_wordlist() must be called again */
+	init_wordlist("word", bfp->filepath, 0, WL_REGULAR);
+
 	open_wordlists(DS_WRITE);
 
 	val.goodcount = 0;
@@ -444,7 +448,6 @@ static ex_t get_robx(bfpath *bfp)
 		begin_wordlist(word_lists);
 	    }
 	} while (ret == DS_ABORT_RETRY);
-	    
 
 	close_wordlists(true);
 	free_wordlists();
@@ -852,6 +855,7 @@ int main(int argc, char *argv[])
     fBogoutil = true;
 
     signal_setup();			/* setup to catch signals */
+    atexit(bf_exit);
 
     progtype = build_progtype(progname, DB_TYPE);
 

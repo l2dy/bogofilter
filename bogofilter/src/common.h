@@ -172,6 +172,8 @@ typedef struct {
     int freq;
 } wordprop_t;
 
+extern void bf_exit(void);
+
 #define internal_error do { fprintf(stderr, "Internal error in %s:%lu\n", __FILE__, (unsigned long)__LINE__); abort(); } while(0)
 
 typedef enum e_wordlist_version {
