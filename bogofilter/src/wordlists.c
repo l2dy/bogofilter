@@ -254,15 +254,16 @@ bool close_wordlists(bool commit /** if unset, abort */)
     struct envnode *i;
 
     for (list = word_lists; list != NULL ; list = list->next) {
-	if (list->dsh) {
+	void *vhandle = list->dsh;
+	list->dsh = NULL;
+	if (vhandle) {
 	    if (commit) {
-		if (ds_txn_commit(list->dsh))
+		if (ds_txn_commit(vhandle))
 		    err = true;
 	    } else {
-		(void)ds_txn_abort(list->dsh);
+		(void)ds_txn_abort(vhandle);
 	    }
-	    ds_close(list->dsh);
-	    list->dsh = NULL;
+	    ds_close(vhandle);
 	}
     }
 
