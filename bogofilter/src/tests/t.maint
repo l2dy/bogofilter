@@ -11,7 +11,7 @@ create_empty_wordlist
 $BOGOFILTER -C -y 0 -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER -C -y 0 -n < ${SYSTEST}/inputs/good.mbx
 
-if [ -z "$USE_UNICODE" -o "$USE_UNICODE" == "YES" ] ; then
+if [ -z "$USE_UNICODE" -o "$USE_UNICODE" = "YES" ] ; then
     CORRECT="$TMPDIR/ref.unicode.enabled"
 else
     CORRECT="$TMPDIR/ref.unicode.disabled"

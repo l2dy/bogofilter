@@ -13,6 +13,11 @@
 
 -------------------------------------------------------------------------------
 
+	2005-09-16
+
+	* Fix bogus t.maint failures on some systems that don't use bash for
+	  /bin/sh (for instance, FreeBSD).
+
 	2005-09-11
 
 	* Resurrected atexit() code to ensure databases have been
