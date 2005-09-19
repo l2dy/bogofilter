@@ -13,6 +13,13 @@
 
 -------------------------------------------------------------------------------
 
+	2005-09-19
+
+	* Require sqlite 3.2.6 and print warning if older version installed, to
+	  avoid people running into critical bugs in older sqlite3 versions.
+	  The test can be defeated by setting the environment variable
+	  BF_USE_OLD_SQLITE to any value.  Also warn on 32-bit machines.
+
 	2005-09-16
 
 	* Fix bogus t.maint failures on some systems that don't use bash for

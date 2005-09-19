@@ -14,7 +14,7 @@ this writing in alphabetical order
 1a.Berkeley DB (3.1 - 4.3) with transactions	http://sleepycat.com/
 1b.Berkeley DB (3.1 - 4.3) without transactions	http://sleepycat.com/
 2. QDBM (1.7.23 or newer)			http://qdbm.sf.net/
-3. SQLite (3.2.2 or newer)			http://sqlite.org/
+3. SQLite (3.2.6 or newer)			http://sqlite.org/
 
 You can use --with-database=ARG (choose from db (for Berkeley DB), qdbm,
 sqlite) to pick the database backend (you must have installed the

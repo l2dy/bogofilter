@@ -250,9 +250,7 @@ static int busyhandler(void *dummy, int count)
 
 static void check_sqlite_version(void)
 {
-#if SIZEOF_LONG > 4
     unsigned int vmaj, vmin, vpl;
-    int count;
     static int complained;
     const char *v;
 
@@ -263,14 +261,12 @@ static void check_sqlite_version(void)
     sscanf(v, "%u.%u.%u", &vmaj, &vmin, &vpl);
     if (vmaj > 3) return;
     if (vmaj == 3 && vmin > 2) return;
-    if (vmaj == 3 && vmin == 2 && vpl >= 2) return;
-    fprintf(stderr,
-	    "\n"
-	    "WARNING: sqlite %s is not supported on %u-bit machines!\n"
-	    "WARNING: If you see bus errors, update sqlite to 3.2.2 or newer.\n"
-	    "\n",
-	    v, SIZEOF_LONG * 8);
-#endif
+    if (vmaj == 3 && vmin == 2 && vpl >= 6) return;
+    if (!getenv("BF_USE_OLD_SQLITE"))
+	fprintf(stderr,
+		"\n"
+		"WARNING: please update sqlite to 3.2.6 or newer.\n"
+		"\n");
 }
 
 void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
