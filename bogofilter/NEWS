@@ -13,6 +13,11 @@
 
 -------------------------------------------------------------------------------
 
+	2005-09-25
+
+	* SQLite3 - no longer using EXCLUSIVE in BEGIN TRANSACTION as
+	  it seems unnecessary and it causes trouble on MAC OSX
+
 	2005-09-19
 
 	* Require sqlite 3.2.6 and print warning if older version installed, to

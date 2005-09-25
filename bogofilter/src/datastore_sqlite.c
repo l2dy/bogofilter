@@ -307,8 +307,10 @@ void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
     /* check/set endianness marker and create table if needed */
     if (mode != DS_READ) {
 	/* using IMMEDIATE or DEFERRED here locks up in t.lock3
-	 * or t.bulkmode */
-	if (sqlexec(dbh->db, "BEGIN EXCLUSIVE TRANSACTION;")) goto barf;
+	 * or t.bulkmode
+	 * using EXCLUSIVE locks up in t.lock3 on MAC OSX
+	 */
+	if (sqlexec(dbh->db, BEGIN)) goto barf;
 	/*
 	 * trick: the sqlite_master table (see SQLite FAQ) is read-only
 	 * and lists all table, indexes etc. so we use it to check if
