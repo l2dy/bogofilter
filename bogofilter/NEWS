@@ -13,6 +13,8 @@
 
 -------------------------------------------------------------------------------
 
+0.96.2	2005-09-25 (a.k.a. 1.0.0-rc2)
+
 	2005-09-25
 
 	* SQLite3 - no longer using EXCLUSIVE in BEGIN TRANSACTION as
@@ -55,7 +57,7 @@
 	* Fix configure's --with-included-gsl option.  (Thanks to
           Torsten Veller for the patch)
 
-0.96.1	2005-09-05
+0.96.1	2005-09-05 (a.k.a. 1.0.0-rc1)
 
 	2005-08-24
 
