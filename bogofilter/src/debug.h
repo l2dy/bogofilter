@@ -19,7 +19,7 @@ NAME:
 
 #define	MASK_BIT(uc)	( 1 << (uc - 'A'))
 
-#define BIT_NAMES	"abcdghilmrstwy"
+#define BIT_NAMES	"abcdghilmrstwyz"
 #define BIT_ALGORITHM	MASK_BIT('A')
 #define BIT_READER	MASK_BIT('B')
 #define BIT_CONFIG	MASK_BIT('C')
@@ -34,6 +34,7 @@ NAME:
 #define BIT_TEXT	MASK_BIT('T')
 #define BIT_WORDLIST	MASK_BIT('W')
 #define BIT_MEMORY	MASK_BIT('Y')
+#define BIT_TEST	MASK_BIT('Z')
 
 extern FILE	 *dbgout;
 extern u_int32_t  debug_mask;
@@ -53,6 +54,7 @@ extern u_int32_t  debug_mask;
 #define DEBUG_SPAMICITY(level)	0
 #define DEBUG_TEXT(level)	0
 #define DEBUG_WORDLIST(level)	0
+#define DEBUG_TEST(level)	0
 #else
 #define	DEBUG_GENERAL(level)	((debug_mask & BIT_GENERAL)   && (verbose > level))
 #define DEBUG_CONFIG(level)	((debug_mask & BIT_CONFIG)    && (verbose > level))
@@ -68,6 +70,7 @@ extern u_int32_t  debug_mask;
 #define DEBUG_SPAMICITY(level)	((debug_mask & BIT_SPAMICITY) && (verbose > level))
 #define DEBUG_TEXT(level)	((debug_mask & BIT_TEXT)      && (verbose > level))
 #define DEBUG_WORDLIST(level)	((debug_mask & BIT_WORDLIST)  && (verbose > level))
+#define DEBUG_TEST(level)	((debug_mask & BIT_TEST)      && (verbose > level))
 #endif
 
 #define	BOGOTEST(uc)		((bogotest & MASK_BIT(uc)) != 0)
