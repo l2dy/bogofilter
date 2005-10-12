@@ -13,6 +13,16 @@
 
 -------------------------------------------------------------------------------
 
+	2005-10-12
+
+	* Fixed sqlite build option in bogofilter.spec.in 
+	  (contributed by Tobias Roppelt)
+
+	2005-10-07
+
+	* Added contrib scripts bfproxy, spamitarium, and stripsearch
+	  (contributed by Tom Anderson)
+
 0.96.2	2005-10-06 - Promoted to Stable Release
         2005-09-25 (a.k.a. 1.0.0-rc2)
 
