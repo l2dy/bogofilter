@@ -13,7 +13,8 @@
 
 -------------------------------------------------------------------------------
 
-0.96.2	2005-09-25 (a.k.a. 1.0.0-rc2)
+0.96.2	2005-10-06 - Promoted to Stable Release
+        2005-09-25 (a.k.a. 1.0.0-rc2)
 
 	2005-09-25
 
@@ -105,8 +106,8 @@
 	* Switched t.encoding test to use the POSIX utility cksum,
 	  rather than OS-specific utilities such as md5sum or md5.
 
-0.95.2	2005-06-30
-	2005-07-08 - Promoted to Stable Release
+0.95.2	2005-07-08 - Promoted to Stable Release
+	2005-06-30
 
 	2005-06-29
 
@@ -200,8 +201,8 @@
 	   Added --unicode=yes/no options for bogolexer and bogoutil.
 	   Added meta-token .ENCODING { 1=raw, 2=unicode }
 
-0.94.14	2005-06-08
-	2005-06-18 - Promoted to Stable Release
+0.94.14	2005-06-18 - Promoted to Stable Release
+	2005-06-08
 
 	* Fix bug in transactional auto-detection that caused recovery
 	  to fail if the environment was in PANIC state.  
@@ -978,8 +979,8 @@
 	  don't collide and no two processes try running recovery at the same
 	  time.
 
-0.92.8	2004-10-19
-	2004-10-25 - Promoted to Stable Release
+0.92.8	2004-10-25 - Promoted to Stable Release
+	2004-10-19
 
 	* Bogotune now warns when using '-E' to suppress ESF checking
 	  and non 1.0 esf values are read from the config file.
@@ -1310,8 +1311,8 @@
 	* Lower output precision for regression tests, by using %f
 	  rather than %e, to mask differences between GSL versions.
 
-0.17.5	2004-04-01
-	2004-04-08 - Promoted to Stable Release
+0.17.5	2004-04-08 - Promoted to Stable Release
+	2004-04-01
 
 	2004-03-31
 
@@ -1438,8 +1439,8 @@
 	  config file.
 	* Correct SIGSEGV causes by missing environment variables.
 
-0.16.4	2004-01-23 - Released
-	2004-01-31 - Promoted to Stable Version
+0.16.4	2004-01-31 - Promoted to Stable Version
+	2004-01-23 - Released
 
 	2004-01-20
 
