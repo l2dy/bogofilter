@@ -66,7 +66,7 @@ CFLAGS="$RPM_OPT_FLAGS" \
   --enable-static \
 %endif
 %if %{with_sql}
-  --with-database=sql \
+  --with-database=sqlite \
 %endif
   --with-included-gsl
 
