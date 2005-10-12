@@ -11,6 +11,7 @@ EXTRA_DIST= \
 	README.contrib \
 	README.randomtrain \
 	bogo.R \
+	bfproxy \
 	bogofilter-milter.pl \
 	bogofilter-qfe \
 	bogominitrain.pl \
@@ -22,4 +23,6 @@ EXTRA_DIST= \
 	procmailrc.example \
 	randomtrain \
 	scramble \
+	spamitarium \
+	stripsearch \
 	trainbogo.sh
