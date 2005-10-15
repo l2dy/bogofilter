@@ -13,6 +13,11 @@
 
 -------------------------------------------------------------------------------
 
+	2005-10-15
+
+	* Fix program abort when bad options are used.
+	* Remove unused Berkeley DB locking options.
+
 	2005-10-12
 
 	* Fixed sqlite build option in bogofilter.spec.in 
