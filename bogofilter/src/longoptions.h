@@ -28,8 +28,6 @@ typedef enum longopts_e {
     O_BLOCK_ON_SUBNETS = 1000,
     O_CHARSET_DEFAULT,
     O_CONFIG_FILE,
-    O_DB_MAX_OBJECTS,
-    O_DB_MAX_LOCKS,
     O_DB_CHECKPOINT,
     O_DB_LIST_LOGFILES,
     O_DB_PRINT_LEAFPAGE_COUNT,
@@ -102,8 +100,6 @@ typedef enum longopts_e {
 #ifdef	HAVE_DECL_DB_CREATE
  #undef lo1
  #define lo1 \
-    { "db-lk-max-locks",		R, 0, O_DB_MAX_LOCKS }, \
-    { "db-lk-max-objects",		R, 0, O_DB_MAX_OBJECTS }, \
     { "db-log-autoremove",		R, 0, O_DB_LOG_AUTOREMOVE },
  #ifdef	FUTURE_DB_OPTIONS
   #undef lo2
