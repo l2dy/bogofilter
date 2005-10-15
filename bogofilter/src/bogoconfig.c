@@ -715,7 +715,10 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 #ifndef	DISABLE_TRANSACTIONS
 	if (!dsm_options_bogofilter(option, name, val))
 #endif
-	    abort();
+	{
+	    fprintf(stderr, "Invalid option '%s'.\n", name);
+	    exit(EX_ERROR);
+	}
     }
 }
 
