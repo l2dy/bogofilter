@@ -80,24 +80,29 @@ bool process_config_option(const char *arg, bool warn_on_error, priority_t prece
     bool ok = true;
 
     char *val = NULL;
-    char *opt = xstrdup(arg);
+    const char *opt = arg;
+    char *dup;
     const char delim[] = " \t=";
 
-    pos = strcspn(arg, delim);
-    if (pos < strlen(arg)) { 		/* if delimiter present */
-	val = opt + pos;
+    while (isspace(*opt))		/* ignore leadign whitespace */
+	opt += 1;
+
+    dup = xstrdup(opt);
+    pos = strcspn(dup, delim);
+    if (pos < strlen(dup)) { 		/* if delimiter present */
+	val = dup + pos;
 	*val++ = '\0';
 	val += strspn(val, delim);
     }
 
     if (val == NULL ||
-	!process_config_option_as_arg(opt, val, precedence, longopts)) {
+	!process_config_option_as_arg(dup, val, precedence, longopts)) {
 	ok = false;
 	if (warn_on_error)
 	    fprintf(stderr, "Error - bad parameter '%s'\n", arg);
     }
 
-    xfree(opt);
+    xfree(dup);
     return ok;
 }
 
