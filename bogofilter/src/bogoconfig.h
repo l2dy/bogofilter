@@ -14,7 +14,6 @@ AUTHOR:
 #define BOGOCONFIG_H
 
 #include "configfile.h"
-#include "getopt.h"		/* for struct option */
 
 /* Global variables */
 

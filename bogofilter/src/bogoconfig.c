@@ -47,7 +47,6 @@ Note: bogolexer also uses configfile.c.
 #include "bogoreader.h"
 #include "bool.h"
 #include "charset.h"
-#include "configfile.h"
 #include "datastore.h"
 #include "datastore_db.h"
 #include "error.h"
