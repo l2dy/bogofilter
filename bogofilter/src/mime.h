@@ -47,6 +47,7 @@ struct mime_t {
 			  MIME_MULTIPART or MIME_MESSAGE */
     size_t boundary_len;
     enum mimetype mime_type;
+    bool mime_dont_decode;
     enum mimeencoding mime_encoding;
     enum mimedisposition mime_disposition;
     mime_t *parent;

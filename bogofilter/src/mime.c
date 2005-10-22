@@ -177,6 +177,7 @@ static void mime_init(mime_t * parent)
     msg_state->charset = xstrdup("US-ASCII");
     msg_state->depth = (parent == NULL) ? 0 : msg_state->parent->depth + 1;
     msg_state->child  = NULL;
+    msg_state->mime_dont_decode = false;
 
     if (parent)
 	parent->child = msg_state;
@@ -583,7 +584,6 @@ void mime_type2(word_t * text)
     if (DEBUG_MIME(0) && msg_state->mime_type == MIME_TYPE_UNKNOWN)
 	fprintf(stderr, "Unknown mime type - '%s'\n", w);
 
-#if	0
     switch (msg_state->mime_type) {
     case MIME_TEXT:
     case MIME_TEXT_HTML:
@@ -599,12 +599,13 @@ void mime_type2(word_t * text)
 	return;
     case MIME_APPLICATION:
 	/* XXX: read boundary */
+	msg_state->mime_dont_decode = true;
 	return;
     case MIME_IMAGE:
 	/* XXX: read boundary */
+	msg_state->mime_dont_decode = true;
 	return;
     }
-#endif
 
     return;
 }

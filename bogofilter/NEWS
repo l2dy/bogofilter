@@ -13,9 +13,14 @@
 
 -------------------------------------------------------------------------------
 
+	2005-10-22
+
+	* Don't decode mime-image and mime-application attachments.
+ 
 	2005-10-21
 
 	* Avoid pointer use after freeing its memory.
+	* Avoid buffer overflow during conversion to unicode.
 
 	2005-10-15
 

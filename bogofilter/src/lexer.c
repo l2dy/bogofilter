@@ -151,7 +151,8 @@ static int get_decoded_line(buff_t *buff)
     uint used = buff->t.leng;
     byte *buf = buff->t.text + used;
 
-    if (encoding == E_RAW) {
+    if (encoding == E_RAW ||
+	msg_state->mime_dont_decode ) {
 	temp = buff;
     }
 #ifndef	DISABLE_UNICODE
@@ -191,7 +192,9 @@ static int get_decoded_line(buff_t *buff)
     if (passthrough && passmode == PASS_MEM && count > 0)
 	textblock_add(temp->t.text+temp->read, (size_t) count);
 
-    if ( !msg_header && msg_state->mime_type != MIME_TYPE_UNKNOWN)
+    if ( !msg_header && 
+	 !msg_state->mime_dont_decode &&
+	 msg_state->mime_type != MIME_TYPE_UNKNOWN)
     {
 	word_t line;
 	uint decoded_count;
@@ -210,7 +213,9 @@ static int get_decoded_line(buff_t *buff)
     }
 
 #ifndef	DISABLE_UNICODE
-    if (encoding == E_UNICODE) {
+    if (encoding == E_UNICODE &&
+	!msg_state->mime_dont_decode)
+    {
 	iconvert(temp, buff);
 	/*
 	 * iconvert, treating multi-byte sequences, can shrink or enlarge
@@ -329,9 +334,8 @@ int yyinput(byte *buf, size_t used, size_t size)
     }
 
     if (msg_state &&
-	msg_state->mime_disposition &&
-	(msg_state->mime_type == MIME_APPLICATION ||  
-	 msg_state->mime_type == MIME_IMAGE)) {
+	msg_state->mime_dont_decode &&
+	(msg_state->mime_disposition != MIME_DISPOSITION_UNKNOWN)) {
 	return (count == EOF ? 0 : count);   /* not decode at all */
     }
 
