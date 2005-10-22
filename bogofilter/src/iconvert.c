@@ -165,6 +165,9 @@ static void convert(iconv_t xd, buff_t *src, buff_t *dst)
 
 	if (src->read >= src->t.leng)
 	    done = true;
+
+	if (outbytesleft == 0)
+	    done = true;
     }
 
     Z(dst->t.text[dst->t.leng]);	/* for easier debugging - removable */
