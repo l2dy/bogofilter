@@ -13,6 +13,10 @@
 
 -------------------------------------------------------------------------------
 
+	2005-10-21
+
+	* Avoid pointer use after freeing its memory.
+
 	2005-10-15
 
 	* Fix program abort when bad options are used.
