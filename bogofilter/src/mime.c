@@ -188,6 +188,9 @@ static void mime_free(mime_t * t)
     if (mime_stack_bot == t)
 	mime_stack_bot = t->parent;
 
+    if (mime_stack_top == t)
+	mime_stack_top = NULL;
+
     if (t->boundary) {
 	xfree(t->boundary);
 	t->boundary = NULL;
