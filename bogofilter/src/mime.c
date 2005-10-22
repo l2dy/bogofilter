@@ -104,7 +104,8 @@ const char *mime_type_name(enum mimetype type)
 }
 #endif
 
-static const char *str_mime_type(enum mimetype m) {
+static const char *str_mime_type(enum mimetype m)
+{
     switch (m) {
 	case MIME_TYPE_UNKNOWN:
 	    return "unknown";
@@ -126,7 +127,8 @@ static const char *str_mime_type(enum mimetype m) {
     return "INTERNAL_ERROR";
 }
 
-static const char *str_mime_enc(enum mimeencoding e) {
+static const char *str_mime_enc(enum mimeencoding e)
+{
     switch (e) {
 	case MIME_ENCODING_UNKNOWN:
 	    return "unknown";
@@ -175,8 +177,10 @@ static void mime_init(mime_t * parent)
     msg_state->charset = xstrdup("US-ASCII");
     msg_state->depth = (parent == NULL) ? 0 : msg_state->parent->depth + 1;
     msg_state->child  = NULL;
+
     if (parent)
 	parent->child = msg_state;
+
     return;
 }
 
@@ -224,9 +228,8 @@ static void mime_push(mime_t * parent)
 {
     msg_state = (mime_t *) xmalloc(sizeof(mime_t));
 
-    if (parent == NULL) {
+    if (parent == NULL)
 	mime_stack_top = msg_state;
-    }
 
     mime_stack_bot = msg_state;
 
@@ -461,10 +464,13 @@ static void mime_disposition(word_t * text)
 	    break;
 	}
     }
+
     if (DEBUG_MIME(0)
 	&& msg_state->mime_disposition == MIME_DISPOSITION_UNKNOWN)
 	fprintf(stderr, "Unknown mime disposition - '%s'\n", w);
+
     xfree(w);
+
     return;
 }
 
@@ -499,10 +505,13 @@ static void mime_encoding(word_t * text)
 	    break;
 	}
     }
+
     if (DEBUG_MIME(0)
 	&& msg_state->mime_encoding == MIME_ENCODING_UNKNOWN)
 	fprintf(stderr, "Unknown mime encoding - '%s'\n", w);
+
     xfree(w);
+
     return;
 }
 
@@ -547,6 +556,7 @@ static void mime_type(word_t * text)
     case MIME_IMAGE:
 	return;
     }
+
     return;
 }
 
@@ -569,8 +579,10 @@ void mime_type2(word_t * text)
 	    break;
 	}
     }
+
     if (DEBUG_MIME(0) && msg_state->mime_type == MIME_TYPE_UNKNOWN)
 	fprintf(stderr, "Unknown mime type - '%s'\n", w);
+
 #if	0
     switch (msg_state->mime_type) {
     case MIME_TEXT:
@@ -593,6 +605,7 @@ void mime_type2(word_t * text)
 	return;
     }
 #endif
+
     return;
 }
 
