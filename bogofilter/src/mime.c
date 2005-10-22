@@ -155,12 +155,12 @@ static void mime_stack_dump(void)
 
     for (ptr = mime_stack_top; ptr != NULL; ptr = ptr->child)
     {
-	fprintf(dbgout, "**** %3d type %s enc %s bnd %s chr %s\n",
+	fprintf(dbgout, "**** %3d type: %-16s enc: %-16s chr: %-8.8s bnd: %s\n",
 		ptr->depth,
 		str_mime_type(ptr->mime_type),
 		str_mime_enc(ptr->mime_encoding),
-		ptr->boundary ? ptr->boundary : "NIL",
-		ptr->charset);
+		ptr->charset,
+		ptr->boundary ? ptr->boundary : "NIL");
     }
 }
 #endif
