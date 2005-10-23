@@ -53,8 +53,8 @@ static void iconv_print_error(int err, buff_t *src)
 	    break;
 	}
 	if (msg != NULL)
-	    fprintf(dbgout, "e: %d, %s - t: %p, r: %d, l: %d, s: %d\n", 
-		    err, msg, src->t.text, src->read, src->t.leng, src->size);
+	    fprintf(dbgout, "err: %s (%d), tx: %p, rd: %d, ln: %d, sz: %d\n",
+		    msg, err, src->t.text, src->read, src->t.leng, src->size);
     }
 }
 
@@ -173,7 +173,7 @@ static void convert(iconv_t xd, buff_t *src, buff_t *dst)
 
     if (DEBUG_ICONV(1) &&
 	src->t.leng != src->read)
-	fprintf(dbgout, "t: %p, r: %d, l: %d, s: %d\n", 
+	fprintf(dbgout, "tx: %p, rd: %d, ln: %d, sz: %d\n",
 		src->t.text, src->read, src->t.leng, src->size);
 }
 
