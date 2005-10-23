@@ -151,9 +151,8 @@ static void convert(iconv_t xd, buff_t *src, buff_t *dst)
 		break;
 
 	    case E2BIG:			/* output buffer has no more room */
+					/* TODO:  Provide proper handling of E2BIG */
 		done = true;
-		if (DEBUG_ICONV(1))	/* TODO:  Provide proper handling of E2BIG */
-		    fprintf(dbgout, "E2BIG\n");
 		break;
 
 	    default:
