@@ -90,6 +90,11 @@ static bool long_token(byte *buf, uint count)
     uint i;
     for (i=0; i < count; i += 1) {
 	byte c = buf[i];
+	/* 10/23/05 - fix SIGSEGV with msg.1023.6479.txt
+	** evidently caused by 09/07/05 patch for 0.96.2
+	*/
+	if (c == '\0')
+	    break;
 	if ((iscntrl(c) || isspace(c) || ispunct(c)) && (c != '_'))
 	    return false;
     }
