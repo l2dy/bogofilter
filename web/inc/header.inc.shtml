@@ -8,7 +8,7 @@
       <img src="images/header.inc_r2.gif" alt="Bogofilter Logo">
     </td>
     <td style="background-image:url(images/header.inc_r2_c2.gif)" valign=top>
-      <span class="header_version"><font size="+1">&nbsp;V<!--#include virtual="version.inc.txt" --> </font></span>
+      <span class="header_version"><font size="+1">&nbsp;<!--#include virtual="version.inc.txt" --> </font></span>
       </td>
     <td style="background-image:url(images/header.inc_r2_c2.gif)">
       <img src="images/header.inc_r2_c3.gif" alt="SourceForge Logo">
