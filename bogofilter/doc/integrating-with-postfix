@@ -45,7 +45,7 @@ Filtering:
 
 	FILTER=/usr/bin/bogofilter
 	FILTER_DIR=/var/spool/filter
-	POSTFIX=/usr/sbin/sendmail
+	POSTFIX="/usr/sbin/sendmail -i"
 	export BOGOFILTER_DIR=/home/bogofilter
 
 	# Exit codes from <sysexits.h>
