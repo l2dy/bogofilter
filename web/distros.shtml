@@ -51,7 +51,7 @@
                   <td>Debian unstable ("sid")</td>
                   <td>See <a href="http://packages.debian.org/unstable/mail/bogofilter" target="_blank">packages.debian.org</a></td>
                   <td>
-                    <div align="center">BerkeleyDB, QDBM, TDB, SQLite</div>
+                    <div align="center">BerkeleyDB, QDBM, SQLite</div>
                   </td>
                 </tr>
 		<tr><td colspan="3"><a href="http://www.freebsd.org/" target="_blank"><strong>FreeBSD</strong></a></td></tr>
@@ -66,7 +66,7 @@
                   <td>FreeBSD 4.11-RELEASE</td>
                   <td>0.92.8</td>
                   <td>
-                    <div align="center">BerkeleyDB, QDBM, TDB</div>
+                    <div align="center">BerkeleyDB, QDBM</div>
                   </td>
                 </tr>
                 <tr>
@@ -80,7 +80,7 @@
                   <td>FreeBSD 5.4-RELEASE</td>
                   <td>0.92.8</td>
                   <td>
-                    <div align="center">BerkeleyDB, QDBM, TDB</div>
+                    <div align="center">BerkeleyDB, QDBM</div>
                   </td>
                 </tr>
                 <tr>
@@ -88,15 +88,15 @@
                   <td>See <a href=
         "http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td>
                   <td>
-                    <div align="center">BerkeleyDB, QDBM, TDB</div>
+                    <div align="center">BerkeleyDB, QDBM</div>
                   </td>
                 </tr>
 		<tr><td colspan="3"><a href="http://www.mandrakesoft.com/" target="_blank"><strong>Mandrake</strong></a></td></tr>
                 <tr>
                   <td>Contrib</td>
-                  <td>See <a href="http://www.eslrahc.com/" target="_blank">www.eslrahc.com</a></td>
+                  <td>0.94.4</td>
                   <td>
-                    <div align="center">BerkeleyDB, QDBM, TDB</div>
+                    <div align="center">BerkeleyDB, QDBM</div>
                   </td>
                 </tr>
 
