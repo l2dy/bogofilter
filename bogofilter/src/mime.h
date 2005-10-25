@@ -18,7 +18,9 @@ enum mimetype {
     MIME_TEXT_PLAIN,
     MIME_TEXT_HTML,
     MIME_APPLICATION,
-    MIME_IMAGE
+    MIME_IMAGE,
+    MIME_AUDIO,
+    MIME_VIDEO
 };
 
 enum mimeencoding {

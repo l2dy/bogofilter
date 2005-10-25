@@ -47,6 +47,8 @@ static struct type_s {
     { MIME_TEXT, "text", 4 },	/* NON-COMPLIANT; should be "text/" */
     { MIME_APPLICATION, "application/", 12 },
     { MIME_IMAGE, "image/", 6 },
+    { MIME_AUDIO, "audio/", 6 },
+    { MIME_VIDEO, "video/", 6 },
     { MIME_MESSAGE, "message/", 8 },
     { MIME_MULTIPART, "multipart/", 10 },
 };
@@ -123,6 +125,10 @@ static const char *str_mime_type(enum mimetype m)
 	    return "application/*";
 	case MIME_IMAGE:
 	    return "image/*";
+    	case MIME_AUDIO:
+	    return "audio/";
+    	case MIME_VIDEO:
+	    return "video/";
     }
     return "INTERNAL_ERROR";
 }
@@ -556,6 +562,10 @@ static void mime_type(word_t * text)
 	return;
     case MIME_IMAGE:
 	return;
+    case MIME_AUDIO:
+	return;
+    case MIME_VIDEO:
+	return;
     }
 
     return;
@@ -603,6 +613,12 @@ void mime_type2(word_t * text)
 	return;
     case MIME_IMAGE:
 	/* XXX: read boundary */
+	msg_state->mime_dont_decode = true;
+	return;
+    case MIME_AUDIO:
+	msg_state->mime_dont_decode = true;
+	return;
+    case MIME_VIDEO:
 	msg_state->mime_dont_decode = true;
 	return;
     }

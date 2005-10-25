@@ -13,6 +13,10 @@
 
 -------------------------------------------------------------------------------
 
+	2005-10-25
+
+	* Don't decode mime-audio and mime-video attachments.
+
 	2005-10-23
 
 	* Fix possible SIGSEGV with long html comments.
