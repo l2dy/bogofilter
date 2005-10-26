@@ -535,10 +535,10 @@ static void mime_type(word_t * text)
     case MIME_TYPE_UNKNOWN:	return;
     case MIME_MULTIPART:	return;	/* XXX: read boundary */
     case MIME_MESSAGE:		return;
-    case MIME_APPLICATION:	return;
-    case MIME_IMAGE:		return;
-    case MIME_AUDIO:		return;
-    case MIME_VIDEO:		return;
+    case MIME_APPLICATION:
+    case MIME_IMAGE:
+    case MIME_AUDIO:
+    case MIME_VIDEO:		msg_state->mime_dont_decode = true;	return;
     }
 
     return;
