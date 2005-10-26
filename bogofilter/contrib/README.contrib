@@ -1,8 +1,6 @@
 Files in this directory
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Makefile* - Don't worry about these.
-
 README.contrib - you are just reading this.
 
 QDBM-transactions.patch - a patch to teach QDBM to use transactions,
