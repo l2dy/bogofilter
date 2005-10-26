@@ -37,24 +37,23 @@ static mime_t *mime_stack_top = NULL;
 static mime_t *mime_stack_bot = NULL;
 
 /** MIME media types (or prefixes thereof) that we detect. */
-static struct type_s {
+static const struct type_s {
     enum mimetype type;	/**< internal representation of MIME type */
     const char *name;	/**< prefix of MIME type to match */
-    size_t len;		/**< length of \a name */
 } mime_type_table[] = {
-    { MIME_TEXT_HTML,	 "text/html",	  9 },
-    { MIME_TEXT_PLAIN,	 "text/plain",	 10 },
-    { MIME_TEXT,	 "text",	  4 },	/* NON-COMPLIANT; should be "text/" */
-    { MIME_APPLICATION,	 "application/", 12 },
-    { MIME_MESSAGE,	 "message/",	  8 },
-    { MIME_MULTIPART,	 "multipart/",	 10 },
-    { MIME_IMAGE,	 "image/",	  6 },
-    { MIME_AUDIO,	 "audio/",	  6 },
-    { MIME_VIDEO,	 "video/",	  6 },
+    { MIME_TEXT_HTML,	"text/html"	},
+    { MIME_TEXT_PLAIN,	"text/plain"	},
+    { MIME_TEXT,	"text"		}, /* NON-COMPLIANT; should be "text/"*/
+    { MIME_APPLICATION,	"application/"	},
+    { MIME_MESSAGE,	"message/"	},
+    { MIME_MULTIPART,	"multipart/"	},
+    { MIME_IMAGE,	"image/"	},
+    { MIME_AUDIO,	"audio/"	},
+    { MIME_VIDEO,	"video/"	},
 };
 
 /** MIME encodings that we detect. */
-static struct encoding_s {
+static const struct encoding_s {
     enum mimeencoding encoding;	/**< internal representation of encoding */
     const char *name;		/**< encoding name to match */
 } mime_encoding_table[] = {
@@ -67,7 +66,7 @@ static struct encoding_s {
 };
 
 /** MIME content dispositions that we detect. */
-static struct disposition_s {
+static const struct disposition_s {
     enum mimedisposition disposition;	/**< internal representation of disposition */
     const char *name;			/**< disposition name to match */
 } mime_disposition_table[] = {
@@ -446,7 +445,7 @@ static void mime_disposition(word_t * text)
 
     msg_state->mime_disposition = MIME_DISPOSITION_UNKNOWN;
     for (i = 0; i < COUNTOF(mime_disposition_table); i += 1) {
-	struct disposition_s *dis = mime_disposition_table + i;
+	const struct disposition_s *dis = mime_disposition_table + i;
 	if (strcasecmp((const char *)w, dis->name) == 0) {
 	    msg_state->mime_disposition = dis->disposition;
 	    if (DEBUG_MIME(1))
@@ -487,7 +486,7 @@ static void mime_encoding(word_t * text)
 
     msg_state->mime_encoding = MIME_ENCODING_UNKNOWN;
     for (i = 0; i < COUNTOF(mime_encoding_table); i += 1) {
-	struct encoding_s *enc = mime_encoding_table + i;
+	const struct encoding_s *enc = mime_encoding_table + i;
 	if (strcasecmp((const char *)w, enc->name) == 0) {
 	    msg_state->mime_encoding = enc->encoding;
 	    if (DEBUG_MIME(1))
@@ -507,7 +506,7 @@ static void mime_encoding(word_t * text)
 
 static void mime_type(word_t * text)
 {
-    struct type_s *typ;
+    const struct type_s *typ;
     const size_t l = sizeof("Content-Type:") - 1;
     byte *w = getword(text->text + l, text->text + text->leng);
 
@@ -517,7 +516,7 @@ static void mime_type(word_t * text)
     msg_state->mime_type = MIME_TYPE_UNKNOWN;
     for (typ = mime_type_table;
 	 typ < mime_type_table + COUNTOF(mime_type_table); typ += 1) {
-	if (strncasecmp((const char *)w, typ->name, typ->len) == 0) {
+	if (strncasecmp((const char *)w, typ->name, strlen(typ->name)) == 0) {
 	    msg_state->mime_type = typ->type;
 	    if (DEBUG_MIME(1) || DEBUG_LEXER(1))
 		fprintf(dbgout, "*** mime_type: %s\n", text->text);
