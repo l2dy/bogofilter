@@ -16,6 +16,7 @@
 	2005-10-25
 
 	* Don't decode mime-audio and mime-video attachments.
+	* Remove unused CP866 code.
 
 	2005-10-23
 

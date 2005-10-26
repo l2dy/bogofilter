@@ -544,49 +544,6 @@ static void mime_type(word_t * text)
     return;
 }
 
-/* to be removed. Used only by bogus hacks in collect.c::collect_words */
-void mime_type2(word_t * text)
-{
-    byte *w = text->text;
-    struct type_s *typ;
-
-    if (!w)
-	return;
-
-    msg_state->mime_type = MIME_TYPE_UNKNOWN;
-    for (typ = mime_type_table;
-	 typ < mime_type_table + COUNTOF(mime_type_table); typ += 1) {
-	if (strncasecmp((const char *)w, typ->name, typ->len) == 0) {
-	    msg_state->mime_type = typ->type;
-	    if (DEBUG_MIME(1) || DEBUG_LEXER(1))
-		fprintf(dbgout, "*** mime_type: %s\n", text->text);
-	    break;
-	}
-    }
-
-    if (DEBUG_MIME(0) && msg_state->mime_type == MIME_TYPE_UNKNOWN)
-	fprintf(stderr, "Unknown mime type - '%s'\n", w);
-
-    /* XXX: read boundary */
-    switch (msg_state->mime_type) {
-    case MIME_TEXT:
-    case MIME_TEXT_HTML:
-    case MIME_TEXT_PLAIN:
-    case MIME_TYPE_UNKNOWN:
-    case MIME_MESSAGE:
-    case MIME_MULTIPART:
-		return;
-    case MIME_APPLICATION:
-    case MIME_IMAGE:
-    case MIME_AUDIO:
-    case MIME_VIDEO:
-	msg_state->mime_dont_decode = true;
-	return;
-    }
-
-    return;
-}
-
 void mime_boundary_set(word_t * text)
 {
     byte *boundary = text->text;

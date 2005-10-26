@@ -14,8 +14,6 @@
 
 #include "collect.h"
 
-void mime_type2(word_t * text);
-
 void wordprop_init(void *vwordprop)
 {
     wordprop_t *wp = vwordprop;
@@ -85,29 +83,6 @@ void collect_words(wordhash_t *wh)
 		    !strncasecmp(token->text+5, "charset", 7))
 		    hasCharset = true;
 	    }
-	}
-#endif
-
-#ifdef	CP866_XXX
-/* breaks "make check", specifically t.grftest and t.bulkmode -- DR 01/02/05 */
-/* EK binary problem hack */
-	if (token->leng > 8)
-	{ 
-	    char str[80];
-	    static int binflag=0;
-	    int l;
-	    l = token->leng;
-	    if (l > 40) l = 40;
-	    strncpy(str,token->text,l);
-	    str[l] = 0;
-	    if (!strncasecmp(str, "Content-Type", 12))
-	    {  
-		binflag++;
-	    } else if (binflag == 1) {
-		mime_type2(token);
-		binflag++;
-	    } else
-		binflag = 0;
 	}
 #endif
 
