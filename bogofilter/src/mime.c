@@ -42,15 +42,15 @@ static struct type_s {
     const char *name;	/**< prefix of MIME type to match */
     size_t len;		/**< length of \a name */
 } mime_type_table[] = {
-    { MIME_TEXT_HTML, "text/html", 9 },
-    { MIME_TEXT_PLAIN, "text/plain", 10 },
-    { MIME_TEXT, "text", 4 },	/* NON-COMPLIANT; should be "text/" */
-    { MIME_APPLICATION, "application/", 12 },
-    { MIME_IMAGE, "image/", 6 },
-    { MIME_AUDIO, "audio/", 6 },
-    { MIME_VIDEO, "video/", 6 },
-    { MIME_MESSAGE, "message/", 8 },
-    { MIME_MULTIPART, "multipart/", 10 },
+    { MIME_TEXT_HTML,	 "text/html",	  9 },
+    { MIME_TEXT_PLAIN,	 "text/plain",	 10 },
+    { MIME_TEXT,	 "text",	  4 },	/* NON-COMPLIANT; should be "text/" */
+    { MIME_APPLICATION,	 "application/", 12 },
+    { MIME_MESSAGE,	 "message/",	  8 },
+    { MIME_MULTIPART,	 "multipart/",	 10 },
+    { MIME_IMAGE,	 "image/bmp",	  9 },
+    { MIME_AUDIO,	 "audio/",	  6 },
+    { MIME_VIDEO,	 "video/",	  6 },
 };
 
 /** MIME encodings that we detect. */
@@ -58,12 +58,12 @@ static struct encoding_s {
     enum mimeencoding encoding;	/**< internal representation of encoding */
     const char *name;		/**< encoding name to match */
 } mime_encoding_table[] = {
-    { MIME_7BIT, "7BIT" },
-    { MIME_8BIT, "8BIT" },
-    { MIME_BINARY, "BINARY" },
-    { MIME_QP, "QUOTED-PRINTABLE" },
-    { MIME_BASE64, "BASE64" },
-    { MIME_UUENCODE, "X-UUENCODE" },
+    { MIME_7BIT,	"7BIT" },
+    { MIME_8BIT,	"8BIT" },
+    { MIME_BINARY,	"BINARY" },
+    { MIME_QP,		"QUOTED-PRINTABLE" },
+    { MIME_BASE64,	"BASE64" },
+    { MIME_UUENCODE,	"X-UUENCODE" },
 };
 
 /** MIME content dispositions that we detect. */
@@ -71,8 +71,8 @@ static struct disposition_s {
     enum mimedisposition disposition;	/**< internal representation of disposition */
     const char *name;			/**< disposition name to match */
 } mime_disposition_table[] = {
-    { MIME_INLINE, "inline" },
-    { MIME_ATTACHMENT, "attachment" },
+    { MIME_INLINE,	"inline" },
+    { MIME_ATTACHMENT,	"attachment" },
 };
 
 /** properties of a MIME boundary */
@@ -109,47 +109,30 @@ const char *mime_type_name(enum mimetype type)
 static const char *str_mime_type(enum mimetype m)
 {
     switch (m) {
-	case MIME_TYPE_UNKNOWN:
-	    return "unknown";
-	case MIME_MULTIPART:
-	    return "multipart/*";
-	case MIME_MESSAGE:
-	    return "message/*";
-	case MIME_TEXT:
-	    return "text/*";
-	case MIME_TEXT_PLAIN:
-	    return "text/plain";
-	case MIME_TEXT_HTML:
-	    return "text/html";
-	case MIME_APPLICATION:
-	    return "application/*";
-	case MIME_IMAGE:
-	    return "image/*";
-    	case MIME_AUDIO:
-	    return "audio/";
-    	case MIME_VIDEO:
-	    return "video/";
-    }
+	case MIME_TYPE_UNKNOWN:	return "unknown";
+	case MIME_MULTIPART:	return "multipart/*";
+	case MIME_MESSAGE:	return "message/*";
+	case MIME_TEXT:		return "text/*";
+	case MIME_TEXT_PLAIN:	return "text/plain";
+	case MIME_TEXT_HTML:	return "text/html";
+	case MIME_APPLICATION:	return "application/*";
+	case MIME_IMAGE:	return "image/*";
+	case MIME_AUDIO:	return "audio/*";
+	case MIME_VIDEO:	return "video/*";
+}
     return "INTERNAL_ERROR";
 }
 
 static const char *str_mime_enc(enum mimeencoding e)
 {
     switch (e) {
-	case MIME_ENCODING_UNKNOWN:
-	    return "unknown";
-	case MIME_7BIT:
-	    return "7bit";
-	case MIME_8BIT:
-	    return "8bit";
-	case MIME_BINARY:
-	    return "binary";
-	case MIME_QP:
-	    return "quoted-printable";
-	case MIME_BASE64:
-	    return "base64";
-	case MIME_UUENCODE:
-	    return "x-uuencode";
+	case MIME_ENCODING_UNKNOWN:	return "unknown";
+	case MIME_7BIT:			return "7bit";
+	case MIME_8BIT:			return "8bit";
+	case MIME_BINARY:		return "binary";
+	case MIME_QP:			return "quoted-printable";
+	case MIME_BASE64:		return "base64";
+	case MIME_UUENCODE:		return "x-uuencode";
     }
     return "INTERNAL_ERROR";
 }
@@ -546,26 +529,16 @@ static void mime_type(word_t * text)
     xfree(w);
 
     switch (msg_state->mime_type) {
-    case MIME_TEXT:
-    case MIME_TEXT_PLAIN:
-	/* XXX: read charset */
-    case MIME_TEXT_HTML:
-	return;
-    case MIME_TYPE_UNKNOWN:
-	return;
-    case MIME_MULTIPART:
-	/* XXX: read boundary */
-	return;
-    case MIME_MESSAGE:
-	return;
-    case MIME_APPLICATION:
-	return;
-    case MIME_IMAGE:
-	return;
-    case MIME_AUDIO:
-	return;
-    case MIME_VIDEO:
-	return;
+    case MIME_TEXT:		return;	/* XXX: read charset */
+    case MIME_TEXT_PLAIN:	return;	/* XXX: read charset */
+    case MIME_TEXT_HTML:	return;
+    case MIME_TYPE_UNKNOWN:	return;
+    case MIME_MULTIPART:	return;	/* XXX: read boundary */
+    case MIME_MESSAGE:		return;
+    case MIME_APPLICATION:	return;
+    case MIME_IMAGE:		return;
+    case MIME_AUDIO:		return;
+    case MIME_VIDEO:		return;
     }
 
     return;
@@ -594,30 +567,18 @@ void mime_type2(word_t * text)
     if (DEBUG_MIME(0) && msg_state->mime_type == MIME_TYPE_UNKNOWN)
 	fprintf(stderr, "Unknown mime type - '%s'\n", w);
 
+    /* XXX: read boundary */
     switch (msg_state->mime_type) {
     case MIME_TEXT:
     case MIME_TEXT_HTML:
     case MIME_TEXT_PLAIN:
-	/* XXX: read charset */
-	return;
     case MIME_TYPE_UNKNOWN:
-	return;
-    case MIME_MULTIPART:
-	return;
     case MIME_MESSAGE:
-	/* XXX: read boundary */
-	return;
+    case MIME_MULTIPART:
+		return;
     case MIME_APPLICATION:
-	/* XXX: read boundary */
-	msg_state->mime_dont_decode = true;
-	return;
     case MIME_IMAGE:
-	/* XXX: read boundary */
-	msg_state->mime_dont_decode = true;
-	return;
     case MIME_AUDIO:
-	msg_state->mime_dont_decode = true;
-	return;
     case MIME_VIDEO:
 	msg_state->mime_dont_decode = true;
 	return;
