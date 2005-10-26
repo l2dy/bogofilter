@@ -77,8 +77,8 @@ EXTRA_DIST+= \
 	contrib/parmtest.sh \
 	contrib/printmaildir.pl \
 	contrib/procmailrc.example \
-	contrib/randomtrain.bash \
-	contrib/scramble.bash \
+	contrib/randomtrain.sh \
+	contrib/scramble.sh \
 	contrib/spamitarium.pl \
 	contrib/stripsearch.pl \
 	contrib/trainbogo.sh

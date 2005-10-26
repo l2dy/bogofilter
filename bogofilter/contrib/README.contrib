@@ -1,7 +1,7 @@
 Files in this directory
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-README.contrib - you are just reading this.
+README.contrib - the file you are now reading.
 
 QDBM-transactions.patch - a patch to teach QDBM to use transactions,
     to show how QDBM transaction enhancements might look like.
@@ -34,9 +34,9 @@ printmaildir.pl - Converts a Maildir to mbox format.
 
 procmailrc.example - Sample .procmailrc file.
 
-randomtrain.bash - Script to train on error with random order from mbox,
-    see FAQ. Comes with...
-scramble.bash - Script needed by randomtrain.
+randomtrain.sh - Script to train on error with random order from mbox,
+    see FAQ. Comes with (and uses) ...
+scramble.sh - Script needed by randomtrain.
 
 spamitarium.pl - helps to remove unnecessary noise from email headers
     and to highlight just the portions which contribute positively to
