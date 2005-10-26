@@ -763,7 +763,7 @@ fi
 AC_CONFIG_FILES([Makefile \
 		bogofilter.spec \
 		trio/Makefile \
-		contrib/Makefile doc/Makefile \
+		doc/Makefile \
 		src/Makefile \
 		src/tests/Makefile \
 		src/bf_compact src/bf_copy src/bf_tar \

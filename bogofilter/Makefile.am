@@ -3,7 +3,7 @@
 # search path for m4 macros
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = trio src . doc contrib
+SUBDIRS = trio src . doc
 SYSCONFDIR = @sysconfdir@
 
 # what to build
@@ -51,3 +51,35 @@ dist-hook:
 	cd $(distdir) && find doc gnugetopt gsl -name CVS -type d -prune -exec rm -r '{}' ';'
 	cd $(distdir) && find doc gnugetopt gsl -name '.#*' -type f -exec rm '{}' ';'
 	rm -f $(distdir)/doc/.cvsignore $(distdir)/ChangeLog
+
+# ---------------------------------------------------------------------
+# This section deals with the contrib/ directory
+#
+noinst_PROGRAMS=bogogrep
+bogogrep_SOURCES=contrib/bogogrep.c
+if ENABLE_STATIC
+noinst_PROGRAMS+=bogogrep_static
+bogogrep_static_SOURCES=contrib/bogogrep.c
+bogogrep_static_LDFLAGS=$(STATICLDFLAGS)
+endif
+
+EXTRA_DIST+= \
+	contrib/README.contrib \
+	contrib/README.randomtrain \
+	contrib/bogo.R \
+	contrib/bfproxy.pl \
+	contrib/bogofilter-milter.pl \
+	contrib/bogofilter-qfe.sh \
+	contrib/bogominitrain.pl \
+	contrib/dot-qmail-bogofilter-default \
+	contrib/mailfilter.example \
+	contrib/mime.get.rfc822.pl \
+	contrib/parmtest.sh \
+	contrib/printmaildir.pl \
+	contrib/procmailrc.example \
+	contrib/randomtrain.bash \
+	contrib/scramble.bash \
+	contrib/spamitarium.pl \
+	contrib/stripsearch.pl \
+	contrib/trainbogo.sh
+# ---------------------------------------------------------------------

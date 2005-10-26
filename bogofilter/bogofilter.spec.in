@@ -103,6 +103,8 @@ for d in contrib ; do
   done
 done
 
+mv bogogrep* contrib
+
 %if %{bogostatic}
 (
 cd %{buildroot}%{_datadir}/%{name}

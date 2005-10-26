@@ -15,6 +15,10 @@
 
 0.96.4	XXX
 
+	* The contrib/ directory is now managed by the top-level Makefile.am,
+	  which removes one "make" recursion. This implies that "bogogrep" is
+	  now built on the top level rather than in contrib/.
+
 	* Renamed all contrib/ scripts to that their suffix gives a hint what
 	  kind of script it is (.pl, .sh, .bash).
 
