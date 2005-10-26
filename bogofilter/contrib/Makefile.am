@@ -11,18 +11,18 @@ EXTRA_DIST= \
 	README.contrib \
 	README.randomtrain \
 	bogo.R \
-	bfproxy \
+	bfproxy.pl \
 	bogofilter-milter.pl \
-	bogofilter-qfe \
+	bogofilter-qfe.sh \
 	bogominitrain.pl \
 	dot-qmail-bogofilter-default \
 	mailfilter.example \
-	mime.get.rfc822 \
+	mime.get.rfc822.pl \
 	parmtest.sh \
 	printmaildir.pl \
 	procmailrc.example \
-	randomtrain \
-	scramble \
-	spamitarium \
-	stripsearch \
+	randomtrain.bash \
+	scramble.bash \
+	spamitarium.pl \
+	stripsearch.pl \
 	trainbogo.sh

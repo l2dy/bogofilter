@@ -15,6 +15,9 @@
 
 0.96.4	XXX
 
+	* Renamed all contrib/ scripts to that their suffix gives a hint what
+	  kind of script it is (.pl, .sh, .bash).
+
 	* Recognize all image/ types as opaque data that we do not parse,
 	  rather than just image/bmp.
 
