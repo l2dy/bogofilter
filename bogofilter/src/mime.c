@@ -48,7 +48,7 @@ static struct type_s {
     { MIME_APPLICATION,	 "application/", 12 },
     { MIME_MESSAGE,	 "message/",	  8 },
     { MIME_MULTIPART,	 "multipart/",	 10 },
-    { MIME_IMAGE,	 "image/",	  9 },
+    { MIME_IMAGE,	 "image/",	  6 },
     { MIME_AUDIO,	 "audio/",	  6 },
     { MIME_VIDEO,	 "video/",	  6 },
 };
