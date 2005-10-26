@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 #
 # $Id$ #
 #
@@ -151,9 +151,9 @@ test $n -eq 0 || usage
 # create a shuffled list, with lengths
 if [ ! -f scram.$pid ] ; then
     if [ "$mode" = "$mbox" ] ; then	# mbox
-	scramble "^From " -l $cmd > scram.$pid
+	scramble.sh "^From " -l $cmd > scram.$pid
     else				# maildir
-	scramble -d -l $cmd > scram.$pid
+	scramble.sh -d -l $cmd > scram.$pid
     fi
 fi
 
