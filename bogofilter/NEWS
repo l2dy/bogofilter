@@ -13,7 +13,7 @@
 
 -------------------------------------------------------------------------------
 
-	2005-10-25
+0.96.3	2005-10-25 (a.k.a. 1.0.0-rc3)
 
 	* Don't decode mime-audio and mime-video attachments.
 	* Remove unused CP866 code.
