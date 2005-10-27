@@ -9,10 +9,12 @@ bogofilter again with the -s or -n option, as appropriate.
 
 That's all very well, except that it's not an easy process to execute
 with just a couple of shell commands.  I've now written a bash script
-that does the job; you give it the directory in which to build the
-bogofilter database, and a list of files flagged with either -s or -n
-to indicate spam or nonspam, and it performs training-on-error using
-all the messages in all the files in random order.
+that does the job [Matthias Andree: this has been changed so it may now
+work on a regular POSIX compliant sh, too, feedback is welcome]; you
+give it the directory in which to build the bogofilter database, and a
+list of files flagged with either -s or -n to indicate spam or nonspam,
+and it performs training-on-error using all the messages in all the
+files in random order.
 
 My production version of bogofilter returns the following exit codes:
 0 for spam
