@@ -16,7 +16,17 @@ if test "x$EXE_EXT" = "x_static"; then
     exit 77
 fi
 
-VALGRIND="$VALGRIND 3>${TMPDIR}/vg.out --logfile-fd=3"
+case `valgrind --version` in
+    valgrind-3*)
+	VALGRIND="$VALGRIND 3>${TMPDIR}/vg.out --log-fd=3"
+	;;
+    valgrind-2*)
+	VALGRIND="$VALGRIND 3>${TMPDIR}/vg.out --logfile-fd=3"
+	;;
+    *)
+	exit 77
+esac
+
 ( eval $VALGRIND true  ) 2>/dev/null || exit 77
 if ( eval $VALGRIND false ) 2>/dev/null ; then exit 77 ; fi
 
