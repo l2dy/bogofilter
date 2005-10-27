@@ -8,9 +8,11 @@
 #              produce, on stdout, a random list of entries and
 #                their locations and classes, or a stream of
 #                entries in random order, with classifiers if given
-#  needs:    bash basename rm grep awk wc perl dd
+#  needs:    POSIX compliant sh, basename rm grep awk wc perl dd
 #  usage:    see function usage() starting on line 14 of this file
 #  version:  0.12 (Greg Louis <glouis@dynamicro.on.ca>)
+
+# Note: on Solaris, use /usr/xpg4/bin/sh -- /bin/sh will not work.
 
 pid=$$
 
