@@ -15,12 +15,16 @@
 
 0.96.4	XXX
 
+	* The bash-dependent contrib/* scripts were changed so they may now
+	  work on regular POSIX compliant sh (NOTE: Solaris has a POSIX sh in
+	  /usr/xpg4/bin/sh, the one in /bin/sh is junk!)
+
 	* The contrib/ directory is now managed by the top-level Makefile.am,
 	  which removes one "make" recursion. This implies that "bogogrep" is
 	  now built on the top level rather than in contrib/.
 
 	* Renamed all contrib/ scripts to that their suffix gives a hint what
-	  kind of script it is (.pl, .sh, .bash).
+	  kind of script it is (.pl, .sh).
 
 	* Recognize all image/ types as opaque data that we do not parse,
 	  rather than just image/bmp.
