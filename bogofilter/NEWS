@@ -1063,7 +1063,7 @@
 
 	* Fix a potential crash on malformatted input (writing a NUL byte to
 	  the wrong place) in the RFC-2047 decoder. Reported by Clint Adams.
-	  This fixes CVE id: CAN-2004-1007
+	  This fixes CVE id: CVE-2004-1007
 
 0.92.7	2004-10-02
 

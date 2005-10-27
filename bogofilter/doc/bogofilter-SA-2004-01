@@ -5,7 +5,7 @@ Topic:		vulnerability in bogofilter/bogolexer
 Announcement:	bogofilter-SA-2004-01
 Writer:		Matthias Andree
 Version:	1.01
-CVE id:		CAN-2004-1007
+CVE id:		CVE-2004-1007
 Announced:	2004-10-30
 Category:	vulnerability
 Type:		segmentation fault through malformed input
@@ -31,7 +31,6 @@ Corrected:	2004-10-08 23:50:04 UTC (CVS) - committed corrected version
 References:	Debian Bug #275373
 		FreeBSD VuXML ID f4428842-a583-4a4c-89b7-297c3459a1c3
 		FreeBSD Problem Report #73144
-		CAN-2004-1007
 
 0. Release history
 
