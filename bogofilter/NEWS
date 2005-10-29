@@ -15,6 +15,13 @@
 
 0.96.4	XXX
 
+	2005-10-29
+
+	* Removed the BUGS section from the bogofilter man page as
+          it's now obsolete.
+
+	2005-10-26
+
 	* The bash-dependent contrib/* scripts were changed so they may now
 	  work on regular POSIX compliant sh (NOTE: Solaris has a POSIX sh in
 	  /usr/xpg4/bin/sh, the one in /bin/sh is junk!)

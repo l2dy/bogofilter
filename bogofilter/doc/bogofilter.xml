@@ -667,12 +667,6 @@ bogofilter[6244]: register-s, 1273 words, 4 messages
 </variablelist>
 </refsect1>
 
-<refsect1 id='bugs'><title>BUGS</title>
-<para><application>Bogofilter</application> does not convert the
-    incoming message to a standard character set, such as unicode.  This
-    sacrifices some accuracy.</para>
-</refsect1>
-
 <refsect1 id='author'><title>AUTHOR</title>
     <literallayout>
 Eric S. Raymond <email>esr@thyrsus.com</email>.
