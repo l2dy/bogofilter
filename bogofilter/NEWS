@@ -24,7 +24,7 @@
 
 	* The bash-dependent contrib/* scripts were changed so they may now
 	  work on regular POSIX compliant sh (NOTE: Solaris has a POSIX sh in
-	  /usr/xpg4/bin/sh, the one in /bin/sh is unsuitable for bogofilter!)
+	  /usr/xpg4/bin/sh, Solaris's /bin/sh is unsuitable for bogofilter!)
 
 	* The contrib/ directory is now managed by the top-level Makefile.am,
 	  which removes one "make" recursion. This implies that "bogogrep" is
