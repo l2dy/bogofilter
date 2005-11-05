@@ -92,6 +92,23 @@ static bool get_bool(const char *name, const char *arg)
 static char *get_string(const char *name, const char *arg)
 {
     char *s = xstrdup(arg);
+
+    /* scan option to delete comment (after '#') and preceding whitespace */
+    char *t = s;
+    bool quote = false;
+    for (t = s; *t != '\0' ; t += 1)
+    {
+	char c = *t;
+	if (c == '"')
+	    quote ^= true;
+	if (!quote && c == '#') {
+	    *t-- = '\0';
+	    while (isspace(*t))
+		*t-- = '\0';
+	    break;
+	}
+    }
+
     if (DEBUG_CONFIG(2))
 	fprintf(dbgout, "%s -> '%s'\n", name, s);
     return s;
