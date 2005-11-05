@@ -117,6 +117,9 @@ iconv_t *bf_iconv_open( const char *to_charset, const char *from_charset )
 	    xd = iconv_open( charset_unicode, charset_default );
 	}
     }
+  
+    if (xd == (iconv_t)(-1))
+	xd = NULL;
 
     return xd;
 }
@@ -135,8 +138,6 @@ void init_charset_table_iconv(const char *from_charset, const char *to_charset)
 	from_charset = charset_default;
 
     cd = bf_iconv_open( to_charset, from_charset );
-    if (cd == (iconv_t) -1)
-	cd = NULL;
 
     for (idx = 0; idx < COUNTOF(charsets); idx += 1)
     {
