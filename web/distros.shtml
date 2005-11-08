@@ -84,11 +84,18 @@
                   </td>
                 </tr>
                 <tr>
+                  <td>FreeBSD 6.0-RELEASE</td>
+                  <td>0.95.2</td>
+                  <td>
+                    <div align="center">BerkeleyDB, QDBM, SQLite3</div>
+                  </td>
+                </tr>
+                <tr>
                   <td>FreeBSD ports</td>
                   <td>See <a href=
         "http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td>
                   <td>
-                    <div align="center">BerkeleyDB, QDBM</div>
+		      <div align="center">BerkeleyDB, QDBM, SQLite3</div>
                   </td>
                 </tr>
 		<tr><td colspan="3"><a href="http://www.mandrakesoft.com/" target="_blank"><strong>Mandrake</strong></a></td></tr>
