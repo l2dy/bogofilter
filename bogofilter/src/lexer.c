@@ -151,34 +151,37 @@ static int yy_get_new_line(buff_t *buff)
 static int get_decoded_line(buff_t *buff)
 {
     int count;
-    static buff_t *temp = NULL;
+    buff_t *linebuff;
 
     uint used = buff->t.leng;
     byte *buf = buff->t.text + used;
 
     if (encoding == E_RAW ||
 	msg_state->mime_dont_decode ) {
-	temp = buff;
+	linebuff = buff;
     }
 #ifndef	DISABLE_UNICODE
     else {
-	if (temp == NULL)
-	    temp = (buff_t *) calloc(sizeof(buff_t), 1);
+	static buff_t *tempbuff = NULL;
+
+	if (tempbuff == NULL)
+	    tempbuff = (buff_t *) calloc(sizeof(buff_t), 1);
 
 	/* UTF-8 uses up to six octets per character.  Make input buffer
 	 * sufficiently small that the UTF-8 text can fit in the output
 	 * buffer */
-	if (temp->size < buff->size / 6) {
-	    xfree(temp->t.text);
-	    temp->size = buff->size / 6;
-	    temp->t.text = (byte *) xmalloc(temp->size+D);
+	if (tempbuff->size < buff->size / 6) {
+	    xfree(tempbuff->t.text);
+	    tempbuff->size = buff->size / 6;
+	    tempbuff->t.text = (byte *) xmalloc(tempbuff->size+D);
 	}
 
-	temp->t.leng = temp->read = 0;
+	tempbuff->t.leng = tempbuff->read = 0;
+	linebuff = tempbuff;
     }
 #endif
 
-    count = yy_get_new_line(temp);
+    count = yy_get_new_line(linebuff);
 
     if (count == EOF) {
 	if ( !ferror(fpin))
@@ -195,25 +198,25 @@ static int get_decoded_line(buff_t *buff)
      * than one of these. */
 
     if (passthrough && passmode == PASS_MEM && count > 0)
-	textblock_add(temp->t.text+temp->read, (size_t) count);
+	textblock_add(linebuff->t.text+linebuff->read, (size_t) count);
 
     if ( !msg_header && 
 	 !msg_state->mime_dont_decode &&
 	 msg_state->mime_type != MIME_TYPE_UNKNOWN)
     {
-	word_t line;
+	word_t temp;
 	uint decoded_count;
 
-	line.leng = (uint) count;
-	line.text = temp->t.text+temp->read;
+	temp.leng = (uint) count;
+	temp.text = linebuff->t.text+linebuff->read;
 
-	decoded_count = mime_decode(&line);
+	decoded_count = mime_decode(&temp);
 	/*change buffer size only if the decoding worked */
 	if (decoded_count != 0 && decoded_count < (uint) count) {
-	    temp->t.leng -= (uint) (count - decoded_count);
+	    linebuff->t.leng -= (uint) (count - decoded_count);
 	    count = (int) decoded_count;
 	    if (DEBUG_LEXER(1))
-		lexer_display_buffer(temp);
+		lexer_display_buffer(linebuff);
 	}
     }
 
@@ -221,7 +224,7 @@ static int get_decoded_line(buff_t *buff)
     if (encoding == E_UNICODE &&
 	!msg_state->mime_dont_decode)
     {
-	iconvert(temp, buff);
+	iconvert(linebuff, buff);
 	/*
 	 * iconvert, treating multi-byte sequences, can shrink or enlarge
 	 * the output compared to its input.  Correct count.

@@ -13,10 +13,13 @@
 
 -------------------------------------------------------------------------------
 
+	2005-11-11
+
+	* Fix parsing error after binary attachment.
+
 	2005-11-10
 
 	* Correct charset_default value in bogofilter.cf.example
-
 
 0.96.5	2005-11-07
 
