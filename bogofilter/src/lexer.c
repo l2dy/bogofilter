@@ -259,8 +259,8 @@ static int skip_folded_line(buff_t *buff)
 	yylineno += 1;
 	/* only check for LWSP-char (RFC-822) aka. WSP (RFC-2822),
 	 * these only include SP and HTAB */
-	if (buff->t.text[0] != ' '
-		&& buff->t.text[0] != '\t')
+	if (buff->t.text[0] != ' ' &&
+	    buff->t.text[0] != '\t')
 	    return count;
 	/* Check for empty line which terminates message header */
 	if (is_eol((char *)buff->t.text, count))

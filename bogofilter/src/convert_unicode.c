@@ -107,6 +107,7 @@ static charset_def_t charsets[] = {
 iconv_t *bf_iconv_open( const char *to_charset, const char *from_charset )
 {
     iconv_t *xd = iconv_open( to_charset, from_charset );
+
     if (xd == (iconv_t)(-1)) {
 	int err = errno;
 	if (err == EINVAL) {
