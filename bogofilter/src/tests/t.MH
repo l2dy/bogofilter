@@ -24,7 +24,7 @@ $BOGOFILTER -C -D -n $v -B $TMPDIR/good
 $BOGOFILTER -C -D -s $v -B $TMPDIR/spam
 wordlist=".MSG_COUNT Lotus Magazine Min Service connection more most set that unsubscribe"
 
-$BOGOUTIL -w $WORDLIST $wordlist >$OUT || rm -f $OUT
+$BOGOUTIL -C -w $WORDLIST $wordlist >$OUT || rm -f $OUT
 
 if  [ $verbose -eq 0 ]; then
     cmp $CORRECT $OUT

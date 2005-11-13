@@ -30,10 +30,10 @@ check_counts()
     fi
 
     if [ -f  $BOGOFILTER_DIR/goodlist.${DB_EXT} ] ; then
-	g=`$BOGOUTIL -d $BOGOFILTER_DIR/goodlist.${DB_EXT} | grep -v " 0 " | tee $TMPDIR/good.$T.out | wc -l`
-	s=`$BOGOUTIL -d $BOGOFILTER_DIR/spamlist.${DB_EXT} | grep -v " 0 " | tee $TMPDIR/spam.$T.out | wc -l`
+	g=`$BOGOUTIL -C -d $BOGOFILTER_DIR/goodlist.${DB_EXT} | grep -v " 0 " | tee $TMPDIR/good.$T.out | wc -l`
+	s=`$BOGOUTIL -C -d $BOGOFILTER_DIR/spamlist.${DB_EXT} | grep -v " 0 " | tee $TMPDIR/spam.$T.out | wc -l`
     else
-	$BOGOUTIL -d $BOGOFILTER_DIR/wordlist.${DB_EXT} > $TMPDIR/word.$T.out
+	$BOGOUTIL -C -d $BOGOFILTER_DIR/wordlist.${DB_EXT} > $TMPDIR/word.$T.out
 	g=`grep -v " 0$" < $TMPDIR/word.$T.out | tee $TMPDIR/good.$T.out | wc -l`
 	s=`grep -v " 0 " < $TMPDIR/word.$T.out | tee $TMPDIR/spam.$T.out | wc -l`
     fi

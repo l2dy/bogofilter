@@ -36,10 +36,10 @@ EOF
 echo initial: `$BOGOUTIL -d $WORDLIST | wc -l` > $OUT
 
 for cnt in 0 1 2 3 ; do
-    $BOGOUTIL -c $cnt -m $WORDLIST
-    echo "count $cnt ->" `$BOGOUTIL -d $WORDLIST | wc -l` >> $OUT
+    $BOGOUTIL -C -c $cnt -m $WORDLIST
+    echo "count $cnt ->" `$BOGOUTIL -C -d $WORDLIST | wc -l` >> $OUT
     if  [ $verbose -ne 0 ]; then
-	$BOGOUTIL -d $WORDLIST > $OUT.$cnt
+	$BOGOUTIL -C -d $WORDLIST > $OUT.$cnt
     fi
 done
 
