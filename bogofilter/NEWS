@@ -13,6 +13,11 @@
 
 -------------------------------------------------------------------------------
 
+	2005-11-19
+
+	* bogofilter supports BerkeleyDB 4.4.16. doc/README.db and INSTALL have
+	  been updated accordingly.
+
 0.96.6	2005-11-11
 
 	* Fix parsing error after binary attachment.

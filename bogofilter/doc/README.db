@@ -57,7 +57,8 @@ applied the patches, check your vendor's update site regularly):
   Sleepycat Software: Berkeley DB 4.0.14: (November 18, 2001)
   Sleepycat Software: Berkeley DB 4.1.25: (December 19, 2002)
   Sleepycat Software: Berkeley DB 4.2.52: (December  3, 2003)
-  Sleepycat Software: Berkeley DB 4.3.27: (December 22, 2004)
+  Sleepycat Software: Berkeley DB 4.3.29: (September 6, 2005)
+  Sleepycat Software: Berkeley DB 4.4.16: (November 12, 2005)
 
 Other versions of Berkeley DB between the first and last listed above
 may or may not work but usually they will.
@@ -66,7 +67,7 @@ Berkeley DB versions 4.1 and newer are recommended over the previous
 versions, because the newer can detect data corruptions more reliably
 (through the use of checksums that detect partially written data base
 pages); Berkeley DB 4.2 and 4.3 appear a bit faster under load than 4.1
-and older versions.
+and older versions, 4.4 has not yet been evaluated.
 
 2.2.1 Upgrading to transactional databases, also from older bogofilter versions
 
@@ -166,11 +167,12 @@ can change, generally speaking: the database format (we use the Btree
 access method), the log file format, or both.
 
 You need a "log file upgrade" for your transactional databases if at
-least one of these conditions is true:
+least one of these conditions is true ("-->" means "to")
 
-- you upgraded Berkeley DB from a 3.X version to a 4.Y version
-- you upgraded Berkeley DB from 4.0 or 4.1 to 4.2 or 4.3
-- you upgraded Berkeley DB from 4.2 to 4.3.
+- you upgraded Berkeley DB from a 3.X version --> a 4.Y version
+- you upgraded Berkeley DB from 4.0 or 4.1 --> 4.2, 4.3 or 4.4
+- you upgraded Berkeley DB from 4.2 --> 4.3 or 4.4
+- you upgraded Berkeley DB from 4.3 --> 4.4
 
 Non-transactional databases do not need log file format upgrades as they
 do not use log files.
@@ -434,7 +436,7 @@ leading spaces and hyphen:
 SIZING OPTIONS:
 
  - set_cachesize      G B C
-   (valid in Berkeley DB 3.1 - 4.3, requires recovery to change)
+   (valid in Berkeley DB 3.1 - 4.4, requires recovery to change)
 
    sets the cache size to G gigabytes plus B bytes which are spread out
    in C equally sized caches (all figures are natural numbers). You
@@ -448,7 +450,7 @@ SIZING OPTIONS:
    will create six caches sized 12500000 bytes (12.5 MB, +25% applied)
 
  - set_lg_max         250000
-   (valid in Berkeley DB 3.1 - 4.3, takes effect immediately)
+   (valid in Berkeley DB 3.1 - 4.4, takes effect immediately)
 
    this option configures the maximum log file size, in bytes, before
    Berkeley DB starts a new log file. The default is 1 MB.
@@ -456,32 +458,32 @@ SIZING OPTIONS:
 SAFE OPTIONS:
 
  - set_flags DB_DIRECT_DB
-   (valid in Berkeley DB 4.1 - 4.3, takes effect immediately)
+   (valid in Berkeley DB 4.1 - 4.4, takes effect immediately)
 
    this option turns off system buffering of *database* files, to avoid
    double caching of data. NOT SUPPORTED ON ALL PLATFORMS!
 
  - set_flags DB_DIRECT_LOG
-   (valid in Berkeley DB 4.1 - 4.3, takes effect immediately)
+   (valid in Berkeley DB 4.1 - 4.4, takes effect immediately)
 
    this option turns off system buffering of *log* files, to avoid
    double caching of data. NOT SUPPORTED ON ALL PLATFORMS!
 
  - set_flags DB_DSYNC_LOG
-   (valid in Berkeley DB 4.3, takes effect immediately)
+   (valid in Berkeley DB 4.3 - 4.4, takes effect immediately)
 
    this option can increase performance on some systems (and decrease on
    other systems), by using the O_DSYNC POSIX flag rather than a
    separate function to flush the logs.
 
  - set_flags DB_NOMMAP
-   (valid in Berkeley DB 3.2 - 4.3, takes effect immediately)
+   (valid in Berkeley DB 3.2 - 4.4, takes effect immediately)
 
    this option can reduce memory consumption at run time, particularly
    with large databases, at some cost of performance
 
  - set_flags DB_REGION_INIT
-   (valid in Berkeley DB 3.2 - 4.3, takes effect immediately)
+   (valid in Berkeley DB 3.2 - 4.4, takes effect immediately)
 
    this option causes all shared memory regions to be "page faulted"
    into core memory at application start and written at data base
@@ -492,11 +494,11 @@ SAFE OPTIONS:
  - set_verbose DB_VERB_CHKPOINT
    (valid in Berkeley DB 3.1 - 4.2, takes effect immediately)
  - set_verbose DB_VERB_DEADLOCK
-   (valid in Berkeley DB 3.1 - 4.3, takes effect immediately)
+   (valid in Berkeley DB 3.1 - 4.4, takes effect immediately)
  - set_verbose DB_VERB_RECOVERY
-   (valid in Berkeley DB 3.1 - 4.3, takes effect immediately)
+   (valid in Berkeley DB 3.1 - 4.4, takes effect immediately)
  - set_verbose DB_VERB_WAITSFOR
-   (valid in Berkeley DB 3.1 - 4.3, takes effect immediately)
+   (valid in Berkeley DB 3.1 - 4.4, takes effect immediately)
 
    these verbose flags cause extended output for long-lasting
    operations, ...CHKPOINT prints location information when searching
@@ -507,14 +509,14 @@ SAFE OPTIONS:
 UNSAFE OPTIONS - these may impair robustness/recoverability of the data base
 
  - set_flags DB_TXN_NOSYNC
-   (valid in Berkeley DB 3.3 - 4.3, takes effect immediately)
+   (valid in Berkeley DB 3.3 - 4.4, takes effect immediately)
 
    if set, the log is not written or synchronously flushed at commit
    time. In case of an application or system crash, the last few
    registrations can be lost.
 
  - set_flags DB_TXN_WRITE_NOSYNC
-   (valid in Berkeley DB 4.1 - 4.3, takes effect immediately)
+   (valid in Berkeley DB 4.1 - 4.4, takes effect immediately)
 
    if set, the log is written, but not synchronously flushed at commit
    time. In case of a system crash, the last few registrations can be
@@ -523,15 +525,15 @@ UNSAFE OPTIONS - these may impair robustness/recoverability of the data base
 DANGEROUS OPTIONS - these can improve performance, but should be avoided
 
  - set_flags DB_TXN_NOT_DURABLE
-   (valid in Berkeley DB 4.2, takes effect at next application start,
-    replaced by DB_LOG_INMEMORY for version 4.3)
+   (valid in Berkeley DB 4.2 - 4.4, takes effect at next application start,
+    replaced by DB_LOG_INMEMORY for version 4.3 - 4.4)
 
    this option prevents writing into log files. In case of application
    or system crashes, the data base can become corrupt, and large
    registrations can exhaust the log buffer space and then fail.
 
  - set_flags DB_LOG_INMEMORY
-   (valid in Berkeley DB 4.3, takes effect at next application start)
+   (valid in Berkeley DB 4.3 - 4.4, takes effect at next application start)
 
    this option prevents the writing of any log files to disk. In case of
    application or system crashes, the data base can become corrupt, and
