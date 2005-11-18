@@ -81,28 +81,28 @@ bool process_config_option(const char *arg, bool warn_on_error, priority_t prece
 
     char *val = NULL;
     const char *opt = arg;
-    char *dup;
+    char *dupl;
     const char delim[] = " \t=";
 
     while (isspace(*opt))		/* ignore leadign whitespace */
 	opt += 1;
 
-    dup = xstrdup(opt);
-    pos = strcspn(dup, delim);
-    if (pos < strlen(dup)) { 		/* if delimiter present */
-	val = dup + pos;
+    dupl = xstrdup(opt);
+    pos = strcspn(dupl, delim);
+    if (pos < strlen(dupl)) { 		/* if delimiter present */
+	val = dupl + pos;
 	*val++ = '\0';
 	val += strspn(val, delim);
     }
 
     if (val == NULL ||
-	!process_config_option_as_arg(dup, val, precedence, longopts)) {
+	!process_config_option_as_arg(dupl, val, precedence, longopts)) {
 	ok = false;
 	if (warn_on_error)
 	    fprintf(stderr, "Error - bad parameter '%s'\n", arg);
     }
 
-    xfree(dup);
+    xfree(dupl);
     return ok;
 }
 
