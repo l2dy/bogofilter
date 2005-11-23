@@ -7,7 +7,7 @@ datastore_db.c -- implements the datastore, using Berkeley DB
 
 AUTHORS:
 Gyepi Sam <gyepi@praxis-sw.com>   2002 - 2003
-Matthias Andree <matthias.andree@gmx.de> 2003 - 2004
+Matthias Andree <matthias.andree@gmx.de> 2003 - 2005
 
 ******************************************************************************/
 
@@ -22,9 +22,6 @@ Matthias Andree <matthias.andree@gmx.de> 2003 - 2004
  *   deadlock
  * - document code changes
  * - conduct massive tests
- * - check if we really need the log files for "catastrophic recovery"
- *   or if we can remove them (see db_archive documentation)
- *   as the log files are *HUGE* even compared with the data base
  */
 
 /*
