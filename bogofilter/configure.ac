@@ -11,7 +11,10 @@ AM_CONFIG_HEADER(src/config.h:config.in)
 AC_PROG_AWK
 AC_PROG_CC(gcc xlc cc)
 dnl AC_GNU_SOURCE
-AC_CHECK_TOOL(AR, ar)
+AC_CHECK_TOOL(AR, ar, no)
+if test "$AR" = no ; then
+  AC_MSG_ERROR([Please make sure that "ar" is in your PATH.])
+fi
 AC_PROG_RANLIB
 AC_PATH_PROGS(PERL, perl perl5,,$PATH:/usr/local/bin:/usr/bin)
 AC_PATH_PROGS(NSGMLS,onsgmls nsgmls,nsgmls)
