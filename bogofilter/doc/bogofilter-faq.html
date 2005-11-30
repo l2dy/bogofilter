@@ -53,6 +53,17 @@
     <p>This document is intended to answer frequently asked
     questions about bogofilter.</p>
 
+    <h2>Typographic conventions</h2>
+    <ul><li>If we show example commands that start with a
+    dollar sign ($), this means that these commands should be executed
+    by an unprivileged user, NOT the root user.</li>
+    <li>If we show example commands that start with a hash mark (#),
+    this means that these commands need to be executed by the root
+    user.</li>
+    </ul>
+
+    <h1>Frequently asked questions and their answers</h1>
+
     <ul>
       <li>
         General Information
@@ -73,7 +84,7 @@
           <li><a href="#production">How can I keep the scoring accuracy high?</a></li>
           <li><a href="#mboxformats">What mailbox (file) formats does bogofilter understand?</a></li>
           <li><a href="#vvv">What does bogofilter's verbose output mean?</a></li>
-          <li><a href="#unisure">What is <i>Unsure</i> mode?</a></li>
+          <li><a href="#unsure">What is <i>Unsure</i> mode?</a></li>
           <li><a href="#train-on-error">What are "training on error" and
           "training to exhaustion"?</a></li>
           <li><a href="#autoupdate">What does the '-u' (autoupdate) switch do?</a></li>
@@ -1267,7 +1278,7 @@
     <p>If you don't already have a v3.0+ version of
     <a href="http://www.sleepycat.com/">BerkeleyDB</a>, then
     <a href="http://www.sleepycat.com/download/db/">download it (take
-	one of the 4.2.X versions)</a>,
+	one of the 4.4.X, 4.3.X or 4.2.X versions)</a>,
     unpack it, and do these commands in the db directory:</p>
     <pre>    $ cd build_unix
     $ sh ../dist/configure
@@ -1280,8 +1291,13 @@
 
     <h3>On Solaris</h3>
 
+    <p>Be sure that your PATH environment variable begins with
+    /usr/xpg6/bin:/usr/xpg4/bin:/usr/ccs/bin (/usr/xpg6/bin is only
+    present on Solaris 10 and can be omitted on Solaris 9 and older
+    versions). That is required for POSIX compliance.</p>
+
     <p>Unpack it, and then do:</p>
-    <pre>    $ ./configure --with-libdb-prefix=/usr/local/BerkeleyDB.4.2
+    <pre>    $ ./configure --with-libdb-prefix=/usr/local/BerkeleyDB.4.4
     $ make
     # make install-strip</pre>
 
@@ -1290,25 +1306,37 @@
     variable before you start bogofilter. On newer systems, the most
     convenient way is probably to use the crle(1) tool to set the path
     permanently so BerkeleyDB is available to all applications.</p>
-    <pre>    $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.2
+    <pre>    $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB.4.4
     $ export LD_LIBRARY_PATH</pre>
 
-    <p>Note that some "make" versions shipped with Solaris break when
-    you try to build bogofilter outside of its source directory.
-    Either build in the source directory (as suggested above) or
-    use GNU make (gmake).</p>
+    <p>Note that some "make" versions shipped with older Solaris version
+    break when you try to build bogofilter outside of its source
+    directory.  Either build in the source directory (as suggested
+    above) or use GNU make (gmake).</p>
+
+    <p>If your Solaris GCC complains with "ld: fatal: file values-Xa.o:
+    open failed: No such file or directory", install the SUNWarc
+    package.</p>
 
     <h3>On FreeBSD</h3>
 
-    <p>The FreeBSD ports and packages carry the latest stable versions of
+    <p>The FreeBSD ports collection carries the latest stable versions of
     bogofilter. This approach uses the highly recommended
-    portupgrade and cvsup software packages. To install these two
-    fine pieces, type (you need to do this only once):</p>
-    <pre>    # pkg_add -r portupgrade cvsup</pre>
+    portupgrade and portsnap software packages. To install portupgrade,
+    type (you need to do this only once), as root:</p>
+    <pre>    # pkg_add -r portupgrade</pre>
+
+    <p>On newer FreeBSD releases, portsnap is in the base system. If
+    typing <kbd>portsnap help</kbd> does not print portsnap's help, you
+    need to install portsnap from ports. To achieve that, type (you need
+    to do this only once), as root:</p>
+    <pre>    # pkg_add -r portsnap</pre>
 
     <p>To install or upgrade bogofilter, just
-    <a href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html">upgrade your portstree using cvsup</a>,
-    then type:</p>
+    <a
+	href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/portsnap.html">upgrade
+	your portstree using portsnap</a>,
+    then type, as root:</p>
     <pre>    # portupgrade -N bogofilter</pre>
 
     <p><em>Note: This assumes you are root.</em> If not, read through
@@ -1318,11 +1346,18 @@
     <p>Depending on your system you may have to set some environment
     variables for the <code>./configure</code> command. Example:</p>
 
-    <pre>    # env CPPFLAGS=-I/usr/local/include/db3 LIBS=-ldb3 LDFLAGS=-L/usr/local/lib ./configure</pre>
+    <pre>    $ env CPPFLAGS=-I/usr/local/include/db3 LIBS=-ldb3 LDFLAGS=-L/usr/local/lib ./configure</pre>
 
     <p>The actual paths you use here depend on your system and
     the database versions you have installed. Check and replace
     accordingly.</p>
+
+    <h3>On NetBSD and other systems that use "pkgsrc"</h3>
+
+    <p>pkgsrc should be offering a reasonably recent stable bogofilter
+    release. See <a
+	href="http://www.pkgsrc.org/">http://www.pkgsrc.org/</a> for
+    information on pkgsrc.</p>
 
     <h3>On HP-UX</h3>
 

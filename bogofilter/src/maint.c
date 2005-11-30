@@ -323,7 +323,7 @@ static ex_t maintain_wordlist(void *database)
 	dsv_t val;
 	word_t enco;
 
-	enco.text = xstrdup(WORDLIST_ENCODING);
+	enco.text = (byte *)xstrdup(WORDLIST_ENCODING);
 	enco.leng = strlen(WORDLIST_ENCODING);
 	val.count[0] = new_encoding;
 	val.count[1] = 0;
