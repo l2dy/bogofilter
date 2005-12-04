@@ -1,9 +1,16 @@
+"Stable" releases of bogofilter
+===============================
+with release or promotion date, sorted by age
+
+1.0.0     (2005-12-01) this is the version everyone should use
+
+
 "Stable" releases of bogofilter throughout the development
 ==========================================================
 with release or promotion date, sorted by age
 
-Sources: "bogofilter-stable" file releases on bogofilter
-         "bogofilter-announce" posts
+WARNING:  these versions are no longer supported and may
+========  have critical or security relevant bugs.
 
 0.96.6    (2005-11-19)
 0.96.2    (2005-10-06) do not install this - security bugs
