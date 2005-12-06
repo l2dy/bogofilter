@@ -90,8 +90,8 @@
 #	boolean indicating whether auto-removing of
 #	logs should be enabled (yes) or disabled (no)
 #
-#db_log_autoremove=no		# default
-###db_log_autoremove=yes	# (alternate)
+#db_log_autoremove=yes		# default
+##db_log_autoremove=no		# (alternate)
 
 #### TIMESTAMP
 #
