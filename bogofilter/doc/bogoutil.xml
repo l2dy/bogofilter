@@ -7,7 +7,8 @@
     </refmeta>
     <refnamediv id="name">
 	<refname>bogoutil</refname>
-	<refpurpose>Dumps, loads, and maintains bogofilter database files</refpurpose>
+	<refpurpose>Dumps, loads, and maintains
+	<application>bogofilter</application> database files</refpurpose>
     </refnamediv>
     <refsynopsisdiv id="synopsis">
 
@@ -76,10 +77,11 @@
     </refsynopsisdiv>
     <refsect1 id="description">
 	<title>DESCRIPTION</title>
-	<para><application>Bogoutil</application> is part of the bogofilter Bayesian spam filter package.</para>
-	<para>It is used to dump and load bogofilter's Berkeley DB databases to and 
-	    from text files, perform database maintenance functions, and to display the 
-	    values for specific words.</para>
+	<para><application>Bogoutil</application> is part of the
+	    <application>bogofilter</application> Bayesian spam filter package.</para>
+	<para>It is used to dump and load <application>bogofilter</application>'s
+	    Berkeley DB databases to and from text files, perform database maintenance
+	    functions, and to display the values for specific words.</para>
     </refsect1>
     <refsect1 id="options">
 	<title>OPTIONS</title>
@@ -154,11 +156,11 @@
 	    This option is primarily useful for debugging.
 	</para>
 	<para>The <option>-C</option> inhibits reading configuration
-	    files and lets bogoutil go with the defaults.</para>
+	    files and lets <application>bogoutil</application> go with the defaults.</para>
 	<para>The <option>--config-file
 		<replaceable>file</replaceable></option> option tells
-	    bogoutil to read <replaceable>file</replaceable> instead of
-	the standard configuration file.</para>
+	    <application>bogoutil</application> to read <replaceable>file</replaceable>
+	    instead of the standard configuration file.</para>
 	<para>The <option>-D</option> redirects debug output to stdout (it
 	    usually goes to stderr).</para>
 	<para>The <option>-x <replaceable>flags</replaceable></option>
@@ -166,9 +168,10 @@
 	<para>
 	    Option <option>-n</option> stands for "replace non-ascii characters".  
 	    It will replace characters with the high bit (0x80) by question marks.  
-	    This can be useful if a word list has lots of unreadable tokens, for example from asian spam.
-	    The "bad" characters will be converted to question marks and matching tokens will be combined
-	    when used with '-m' or '-l', but not with '-d'.
+	    This can be useful if a word list has lots of unreadable tokens, for
+	    example from Asian spam.  The "bad" characters will be converted to
+	    question marks and matching tokens will be combined when used with
+	    <option>-m</option> or <option>-l</option>, but not with <option>-d</option>.
 	</para>
 	<para>
 	    Option <option>-a age</option> indicates an acceptable token age, with older ones being discarded.  
@@ -194,13 +197,13 @@
     <refsect1 id="environment_maintenance">
 	<title>ENVIRONMENT MAINTENANCE</title>
 	<para>The <option>--db-checkpoint <replaceable>dir</replaceable></option>
-	    option causes bogoutil to flush the buffer caches and
-	    checkpoint the database environment.</para>
+	    option causes <application>bogoutil</application> to flush the buffer
+	    caches and checkpoint the database environment.</para>
 	<para>The <option>--db-list-logfiles
 		<replaceable>dir</replaceable></option>
-	    option causes bogoutil to list the log files in the
-	    environment. Zero or more keywords can be added or combined
-	    (separated by whitespace) to modify the behaviork of this
+	    option causes <application>bogoutil</application> to list the log
+	    files in the environment.  Zero or more keywords can be added or
+	    combined (separated by whitespace) to modify the behavior of this
 	    mode. The default behavior is to list only inactive log
 	    files with relative paths. You can add <option>all</option>
 	    to list all log files (inactive and active). You can add
@@ -208,8 +211,8 @@
 	    paths.
 	</para>
 	<para>The <option>--db-prune <replaceable>dir</replaceable></option>
-	    option causes bogoutil to checkpoint the database
-	    environment and remove inactive log files.</para>
+	    option causes <application>bogoutil</application> to checkpoint
+	    the database environment and remove inactive log files.</para>
 	<para>The <option>--db-recover <replaceable>dir</replaceable></option>
 	    option runs a regular database recovery
 	    in the specified database directory. If that fails, it will retry
@@ -248,8 +251,8 @@
 	    that do not allow a query of the database page size.</para>
 	<para>
 	    The <option>--db-verify <replaceable>file</replaceable></option>
-	    option requests that bogofilter verifies the database file.
-	    It prints only errors, unless in verbose mode.
+	    option requests that <application>bogofilter</application> verifies
+	    the database file.  It prints only errors, unless in verbose mode.
 	</para>
     </refsect1>
 

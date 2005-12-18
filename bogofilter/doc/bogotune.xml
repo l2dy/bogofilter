@@ -121,12 +121,13 @@
 
 <refsect1 id='environment'><title>ENVIRONMENT</title>
 
-    <para>Bogofilter uses a database directory, which can be set in
-    the config file.  If not set there, bogofilter will use the value
-    of <envar>BOGOFILTER_DIR</envar>.  Both can be overridden by the
+    <para><application>Bogofilter</application> uses a database directory,
+    which can be set in the config file.  If not set there,
+    <application>bogofilter</application> will use the value of
+    <envar>BOGOFILTER_DIR</envar>.  Both can be overridden by the
     <option>-d<replaceable>dir</replaceable></option> option.  If none
-    of that is available, bogofilter will use directory
-    <filename>$HOME/.bogofilter</filename>.</para>
+    of that is available, <application>bogofilter</application> will use
+    directory <filename>$HOME/.bogofilter</filename>.</para>
 
 </refsect1>
 
@@ -138,7 +139,7 @@
 
   <refsect1 id="author">
     <title>AUTHOR</title>
-    <para>The bogofilter developer team.</para>
+    <para>The <application>bogofilter</application> developer team.</para>
     <para>
        For updates, see <ulink url="http://bogofilter.sourceforge.net/">
        the bogofilter project page</ulink>.

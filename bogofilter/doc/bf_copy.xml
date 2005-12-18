@@ -8,7 +8,8 @@
     </refmeta>
     <refnamediv id='name'>
 	<refname>bf_copy</refname>
-	<refpurpose>shell script to copy a bogofilter working directory</refpurpose>
+	<refpurpose>shell script to copy a <application>bogofilter</application>
+	    working directory</refpurpose>
     </refnamediv>
     <refsynopsisdiv id='synopsis'>
 	<cmdsynopsis>
@@ -20,10 +21,10 @@
     </refsynopsisdiv>
 
     <refsect1 id='description'><title>Description</title>
-	<para><command>bf_copy</command> copies a bogofilter working
-	    directory to another directory.  Currently it copies the
-	    database files (*.db), related files (log.*), and
-	    DB_CONFIG (if present).</para>
+	<para><command>bf_copy</command> copies a
+	    <application>bogofilter</application> working directory to another
+	    directory.  Currently it copies the database files (*.db), related
+	    files (log.*), and DB_CONFIG (if present).</para>
     </refsect1>
     <refsect1 id='options'><title>Options</title>
 	<para>The <option>-c</option> option causes only active log files to
@@ -40,11 +41,10 @@
     </refsect1>
     <refsect1 id='notes'><title>Notes</title>
 	<para>This script is meant for use with Berkeley DB and SQLite based
-	    bogofilter versions.</para>
+	    <application>bogofilter</application> versions.</para>
 	<para>This script expects a SUSv2 compliant shell.  Solaris
-	    systems should have the <systemitem>SUNWxcu4</systemitem> package installed (when
-	    bogofilter is configured) so that
-	    <filename>/usr/xpg4/bin/sh</filename> can
-	   be used.</para>
+	    systems should have the <systemitem>SUNWxcu4</systemitem> package
+	    installed (when <application>bogofilter</application> is configured)
+	    so that <filename>/usr/xpg4/bin/sh</filename> can be used.</para>
     </refsect1>
 </refentry>

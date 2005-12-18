@@ -8,7 +8,8 @@
 </refmeta>
 <refnamediv id='name'>
 <refname>bogoupgrade</refname>
-<refpurpose>upgrades bogofilter database to current version</refpurpose>
+<refpurpose>upgrades <application>bogofilter</application> database to
+current version</refpurpose>
 </refnamediv>
 <refsynopsisdiv id='synopsis'>
 
@@ -57,10 +58,11 @@ it.</para>
 <application>bogofilter</application>'s databases to the latest version.</para>
 
 <orderedlist>
-<listitem><para>Stop all instances of bogofilter. While the upgrade tools lock
-the database files, the upgrade may take a long time if you have a busy site.
-Don't forget to stop cron jobs or daemons that fetch and process mail and could
-fire off bogofilter.</para></listitem>
+<listitem><para>Stop all instances of <application>bogofilter</application>.
+While the upgrade tools lock the database files, the upgrade may take a long
+time if you have a busy site.  Don't forget to stop cron jobs or daemons that
+fetch and process mail and could fire off
+<application>bogofilter</application>.</para></listitem>
 
 <listitem><para>Backup your data. Let's assume that you said:</para>
 <screen>
@@ -68,12 +70,14 @@ fire off bogofilter.</para></listitem>
 <prompt>$</prompt> <userinput>mkdir ~/.bogofilter</userinput>
 </screen></listitem>
 
-<listitem><para>If your bogofilter version is less than 0.7, say:</para>
+<listitem><para>If your <application>bogofilter</application> version is less
+than 0.7, say:</para>
 <screen>
 <prompt>$</prompt> <userinput>bogoupgrade -i ~/.bogofilter.safe/goodlist -o ~/.bogofilter/goodlist.db</userinput>
 <prompt>$</prompt> <userinput>bogoupgrade -i ~/.bogofilter.safe/badlist -o ~/.bogofilter/spamlist.db</userinput>
 </screen>
-<para>If your bogofilter version is 0.7 or greater, say:</para>
+<para>If your <application>bogofilter</application> version is 0.7 or greater,
+say:</para>
 <screen>
 <prompt>$</prompt> <userinput>bogoupgrade -i ~/.bogofilter.safe/hamlist.count -o ~/.bogofilter/goodlist.db</userinput>
 <prompt>$</prompt> <userinput>bogoupgrade -i ~/.bogofilter.safe/spamlist.count -o ~/.bogofilter/spamlist.db</userinput>

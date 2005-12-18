@@ -13,6 +13,10 @@
 
 -------------------------------------------------------------------------------
 
+	2005-12-17
+	
+	* XML documentation cleanups (thanks to Nicholas Kaiser)
+
 	2005-12-06
 
 	* bogofilter.cf.example was updated to reflect the proper default of

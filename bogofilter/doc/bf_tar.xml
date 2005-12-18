@@ -8,8 +8,8 @@
     </refmeta>
     <refnamediv id='name'>
 	<refname>bf_tar</refname>
-	<refpurpose>shell script to write a tar file of a bogofilter
-	    directory to stdout</refpurpose>
+	<refpurpose>shell script to write a tar file of a
+	    <application>bogofilter</application> directory to stdout</refpurpose>
     </refnamediv>
     <refsynopsisdiv id='synopsis'>
 	<cmdsynopsis>
@@ -21,7 +21,7 @@
     </refsynopsisdiv>
 
     <refsect1 id='description'><title>Description</title>
-	<para><command>bf_tar</command> bundles a bogofilter
+	<para><command>bf_tar</command> bundles a <application>bogofilter</application>
 	    working directory in tar format and copies it to
 	    standard output (your console, or where you redirect it, see
 	    <link linkend='examples'>EXAMPLES</link> below).</para></refsect1>
@@ -65,13 +65,12 @@
     </refsect1>
     <refsect1 id='notes'><title>Notes</title>
 	<para>This script is meant for use with Berkeley DB based
-	    bogofilter versions.</para>
+	    <application>bogofilter</application> versions.</para>
 	<para>This script requires a SUSv2 compliant
 	    <command>pax</command> utility.</para>
 	<para>This script expects a SUSv2 compliant shell.  Solaris
-	    systems should have the <systemitem>SUNWxcu4</systemitem> package installed (when
-	   bogofilter is configured) so that
-	   <filename>/usr/xpg4/bin/sh</filename> can
-	   be used.</para>
+	    systems should have the <systemitem>SUNWxcu4</systemitem> package
+	    installed (when <application>bogofilter</application> is configured)
+	    so that <filename>/usr/xpg4/bin/sh</filename> can be used.</para>
     </refsect1>
 </refentry>
