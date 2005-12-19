@@ -13,6 +13,10 @@
 
 -------------------------------------------------------------------------------
 
+	2005-12-18
+	
+	* Fix bad return code in db_loop() in datastore_sqlite.c
+
 	2005-12-17
 	
 	* XML documentation cleanups (thanks to Nicholas Kaiser)

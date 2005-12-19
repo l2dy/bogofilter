@@ -197,7 +197,8 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
     }
     loop = true;
     while (loop) {
-	switch (sqlite3_step(stmt)) {
+	rc = sqlite3_step(stmt);
+	switch (rc) {
 	    case SQLITE_ROW:
 		found = true;
 		if (hook != NULL)
