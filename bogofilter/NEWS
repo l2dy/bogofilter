@@ -13,11 +13,6 @@
 
 -------------------------------------------------------------------------------
 
-	2005-12-22
-	
-	* Remove incorrect info from integrating-with-postfix
-	  (reported by Tom Allison).
-
 	2005-12-18
 	
 	* Fix bad return code in db_loop() in datastore_sqlite.c

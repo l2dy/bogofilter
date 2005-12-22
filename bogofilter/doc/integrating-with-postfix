@@ -62,6 +62,11 @@ Filtering:
 	rm -f msg.$$ || exit $EX_TEMPFAIL
 	$FILTER -p -u -e > msg.$$ || exit $EX_TEMPFAIL
 
+	exec <msg.$$ || exit $EX_TEMPFAIL
+	rm -f msg.$$ # safe, we hold the file descriptor
+	exec $POSTFIX "$@"
+	exit $EX_TEMPFAIL
+
    Make sure the script is executable!
 
    Given a good initial corpus, it is better to have bogofilter update
