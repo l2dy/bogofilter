@@ -19,7 +19,11 @@ sqlite3.
 
 2.1 Compatibility - supported SQLite versions
 
-At this time, only SQLite 3.2.6 and newer are supported.
+At this time, only SQLite 3.2.6 and newer are supported. Older versions
+back to 3.0.8 may work, but you are advised to carefully review the
+sqlite3 ChangeLog, because there have been several important bug fixes
+between 3.0.8 and 3.2.8. Bogofilter prints a warning (but continues to
+run) when used with SQLite versions older than 3.2.6.
 
 2.2 Installation
 
@@ -44,7 +48,7 @@ to remove unused pages from the database file and reduce the file size.
 
 A. Miscellaneous ------------------------------------------------------
 
-A.1 Why BLOB?
+A.1 Why does bogofilter use BLOB for both columns?
 
 bogofilter has traditionally managed its own data structure inside key
 and value, BLOB allows the verbatim retrieval of such data without
