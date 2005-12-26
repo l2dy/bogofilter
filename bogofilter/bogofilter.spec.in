@@ -8,15 +8,16 @@
 #
 # To build with SQLite3, use:
 #
-# rpmbuild --define 'with_sql 1' -bb bogofilter.spec
-# rpmbuild --define 'with_sql 1' --sign -bb bogofilter.spec
+# rpmbuild --define 'with_sqlite 1' -bb bogofilter.spec
+# rpmbuild --define 'with_sqlite 1' --sign -bb bogofilter.spec
 
 %define	Name		@PACKAGE@
 %define	Version		@VERSION@
 %define	Release		1
 
+%{?with_sqlite: %{expand: %%define with_sqlite 1}}
 %{!?bogostatic: %{expand: %%define bogostatic 0}}
-%{!?with_sql:%define with_sql 0}
+%{!?with_sqlite: %{expand: %%define with_sqlite 0}}
 
 Summary:	Fast anti-spam filtering by Bayesian statistical analysis
 Name:		%{Name}
@@ -41,8 +42,8 @@ Bogofilter is designed with fast algorithms (including Berkeley DB system),
 coded directly in C, and tuned for speed, so it can be used for production
 by sites that process a lot of mail.
 
-%if %{with_sql}
-This version was built with sql support.
+%if %{with_sqlite}
+This version was built with SQLite3 support.
 %else
 This version was built with Berkeley DB support.
 %endif
@@ -53,7 +54,7 @@ Group:		Networking/Mail
 Conflicts:	bogofilter
 
 %description static
-Statically linked bogofilter, bogolexer, bogoutil, and bogotune
+Statically linked bogofilter, bogolexer, bogoutil, and bogotune.
 
 %prep
 %setup -q
@@ -65,8 +66,8 @@ CFLAGS="$RPM_OPT_FLAGS" \
 %if %{?bogostatic}
   --enable-static \
 %endif
-%if %{with_sql}
-  --with-database=sqlite \
+%if %{with_sqlite}
+  --with-database=sqlite3 \
 %endif
   --with-included-gsl
 
