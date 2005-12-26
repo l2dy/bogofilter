@@ -417,7 +417,7 @@ case "x$WITH_DB_ENGINE" in
 	AC_CHECK_HEADERS([sqlite3.h],,AC_MSG_ERROR(Cannot find sqlite3.h header file))
 	AC_LIB_LINKFLAGS([sqlite3])
 	LIBDB="$LIBSQLITE3"
-	WITH_DB_ENGINE="sqlite"
+	WITH_DB_ENGINE="sqlite3"
 	;;
     xqdbm)
 	AC_DEFINE(ENABLE_QDBM_DATASTORE,1, [Enable qdbm datastore])
@@ -568,7 +568,7 @@ shared environments, you can use --disable-dbshared-test.])],)
 	LIBS="$saveLIBS"
     ;;
     *)
-	AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, qdbm, sqlite.])
+	AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, qdbm, sqlite3.])
     ;;
 esac
 
@@ -587,7 +587,7 @@ AC_SUBST(DB_TYPE)
 AC_SUBST(STATIC_DB)
 
 AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
-AM_CONDITIONAL(ENABLE_SQLITE_DATASTORE, test "x$WITH_DB_ENGINE" = "xsqlite")
+AM_CONDITIONAL(ENABLE_SQLITE_DATASTORE, test "x$WITH_DB_ENGINE" = "xsqlite3")
 
 dnl Use TRIO to replace missing snprintf/vsnprintf.
 needtrio=0
