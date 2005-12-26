@@ -35,9 +35,10 @@ make command
 ============
 
 Should your installed "make" command cause difficulties, try "gmake"
-or install GNU make and retry before reporting trouble.  We are unlikely
-to fix "make" incompatibilities unless the problem is obvious and we are
-sent a patch.
+(assuming GNU make is installed as gmake) and retry before reporting
+trouble.  Some UNIX "make" commands (for instance, on Solaris 2.6) are
+known to break in certain configurations, particularly with 'VPATH'
+builds mentioned below.
 
 ========================================================================
 Installation Instructions
