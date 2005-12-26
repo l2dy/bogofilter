@@ -11,25 +11,25 @@
 # rpmbuild --define 'with_sql 1' -bb bogofilter.spec
 # rpmbuild --define 'with_sql 1' --sign -bb bogofilter.spec
 
-%define	name		@PACKAGE@
-%define	version		@VERSION@
-%define	release		1
+%define	Name		@PACKAGE@
+%define	Version		@VERSION@
+%define	Release		1
 
 %{!?bogostatic: %{expand: %%define bogostatic 0}}
 %{!?with_sql:%define with_sql 0}
 
 Summary:	Fast anti-spam filtering by Bayesian statistical analysis
-Name:		%{name}
-Version:	%{version}
-Release:	%{release}
+Name:		%{Name}
+Version:	%{Version}
+Release:	%{Release}
 License:	GPL
 Group:		Networking/Mail
 URL:		http://bogofilter.sourceforge.net
-Source0:	%{name}-%{version}.tar.gz
+Source0:	%{Name}-%{Version}.tar.gz
 
 %define _requires_exceptions perl
 
-Buildroot:	%{_tmppath}/%{name}-%{version}-root
+Buildroot:	%{_tmppath}/%{Name}-%{Version}-root
 Conflicts:	bogofilter-static
 
 %description

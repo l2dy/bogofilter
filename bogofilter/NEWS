@@ -13,6 +13,10 @@
 
 -------------------------------------------------------------------------------
 
+	2005-12-25
+
+	* Capitalize variables in bogofilter.spec.in to please RH9's rpm 4.2 implementation.
+
 	2005-12-18
 	
 	* Fix bad return code in db_loop() in datastore_sqlite.c
