@@ -20,7 +20,11 @@
 %{!?with_sqlite: %{expand: %%define with_sqlite 0}}
 
 Summary:	Fast anti-spam filtering by Bayesian statistical analysis
+%if %{with_sqlite}
+Name:		%{Name}-sqlite
+%else
 Name:		%{Name}
+%endif
 Version:	%{Version}
 Release:	%{Release}
 License:	GPL
@@ -57,7 +61,7 @@ Conflicts:	bogofilter
 Statically linked bogofilter, bogolexer, bogoutil, and bogotune.
 
 %prep
-%setup -q
+%setup -q -n %{Name}-%{Version}
 CFLAGS="$RPM_OPT_FLAGS" \
 ./configure \
   --prefix=%{_prefix} \
