@@ -216,6 +216,8 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
 		    if (key.leng != strlen(ENDIAN32)
 			    || memcmp(key.data, ENDIAN32, key.leng) != 0)
 			rc = hook(&key, &val, userdata);
+		    else
+			rc = 0;
 
 		    xfree(val.data);
 		    xfree(key.data);
