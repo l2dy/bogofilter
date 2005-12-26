@@ -28,14 +28,16 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 
 if ENABLE_SQLITE_DATASTORE
 adddef=--define 'with_sqlite 1'
+buildopt=-tb
 else
 adddef=--define 'bogostatic 1'
+buildopt=-ta
 endif
 
 rpm:	dist
 	case `rpm --version` in \
-	  "Version 3*")	rpm $(adddef) --sign -ta $(distdir).tar.gz ;; \
-	  *)		rpmbuild $(adddef) --sign -ta $(distdir).tar.gz ;; \
+	  "Version 3*")	rpm $(adddef) --sign $(buildopt) $(distdir).tar.gz ;; \
+	  *)		rpmbuild $(adddef) --sign $(buildopt) $(distdir).tar.gz ;; \
 	esac
 
 cvs-check:
