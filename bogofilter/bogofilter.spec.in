@@ -15,9 +15,11 @@
 %define	Version		@VERSION@
 %define	Release		1
 
-%{?with_sqlite: %{expand: %%define with_sqlite 1}}
-%{!?bogostatic: %{expand: %%define bogostatic 0}}
-%{!?with_sqlite: %{expand: %%define with_sqlite 0}}
+%{?bogostatic:  %define bogostatic 1}
+%{!?bogostatic: %define bogostatic 0}
+
+%{?with_sqlite:  %define with_sqlite 1}
+%{!?with_sqlite: %define with_sqlite 0}
 
 Summary:	Fast anti-spam filtering by Bayesian statistical analysis
 %if %{with_sqlite}
@@ -70,7 +72,7 @@ CFLAGS="$RPM_OPT_FLAGS" \
 %if %{?bogostatic}
   --enable-static \
 %endif
-%if %{with_sqlite}
+%if %{?with_sqlite}
   --with-database=sqlite3 \
 %endif
   --with-included-gsl
