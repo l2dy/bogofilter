@@ -21,6 +21,7 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 		bogofilter.spec bogofilter.spec.in \
 		Doxyfile gnugetopt \
 		GETTING.STARTED \
+		NEWS.0 \
 		README.cvs \
 		RELEASE.NOTES
 
