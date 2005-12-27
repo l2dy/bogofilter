@@ -28,12 +28,9 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 .PHONY:	check
 
 rpm:	dist
-	case `rpm --version` in \
-	  "Version 3*")	rpm --define 'bogostatic 1' --sign -ta $(distdir).tar.gz ; \
-			rpm --define 'with_sqlite 1' --sign -ta $(distdir).tar.gz ;; \
-	  *)		rpmbuild --define 'bogostatic 1' --sign -ta $(distdir).tar.gz ; \
-			rpmbuild --define 'with_sqlite 1' --sign -ta $(distdir).tar.gz ;; \
-	esac
+	@echo "This target requires that Berkeley DB and SQLite3 are installed."
+	$(RPMBUILD) --define 'bogostatic 1' --sign -ta $(distdir).tar.gz
+	$(RPMBUILD) --define 'with_sqlite 1' --sign -tb $(distdir).tar.gz
 
 cvs-check:
 	rm -rf $(PACKAGE)-$(VERSION)-export

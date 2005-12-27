@@ -18,6 +18,7 @@ fi
 AC_PROG_RANLIB
 AC_PATH_PROGS(PERL, perl perl5,,$PATH:/usr/local/bin:/usr/bin)
 AC_PATH_PROGS(NSGMLS,onsgmls nsgmls,nsgmls)
+AC_PATH_PROGS(RPMBUILD,rpmbuild rpm,rpmbuild)
 AM_PROG_LEX
 
 dnl Check for "extern inline", using a modified version
