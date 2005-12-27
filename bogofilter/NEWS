@@ -13,6 +13,16 @@
 
 -------------------------------------------------------------------------------
 
+	2005-12-7
+
+	* Add '-O' option to direct bogoutil output to a file.
+	* Fix building of binary rpms with SQLite support.
+
+	2005-12-26
+
+	* Split NEWS file into files NEWS and NEWS.0 for new (version
+	  1.0 and after) and old (version 0.x.y) info
+
 	2005-12-25
 
 	* Capitalize variables in bogofilter.spec.in to please RH9's

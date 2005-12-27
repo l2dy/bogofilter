@@ -90,13 +90,13 @@ static int ds_dump_hook(word_t *key, dsv_t *data,
     if (replace_nonascii_characters)
 	do_replace_nonascii_characters(key->text, key->leng);
 
-    printf( "%.*s %lu %lu",
+    fprintf( fpo, "%.*s %lu %lu",
 	    CLAMP_INT_MAX(key->leng), key->text,
 	    (unsigned long)data->spamcount,
 	    (unsigned long)data->goodcount);
     if (data->date)
-	printf(" %lu", (unsigned long)data->date);
-    putchar('\n');
+	fprintf( fpo, " %lu", (unsigned long)data->date);
+    fprintf( fpo, "\n");
 
     fflush(stdout); /* solicit ferror flag if output is shorter than buffer */
     return ferror(stdout) ? 1 : 0;
@@ -355,7 +355,7 @@ static ex_t display_words(bfpath *bfp, int argc, char **argv, bool show_probabil
 	robx = ROBX;
     }
 
-    printf(head_format, "", "spam", "good", "  Fisher");
+    fprintf(fpo, head_format, "", "spam", "good", "  Fisher");
     while (argc >= 0)
     {
 	dsv_t val;
@@ -385,11 +385,11 @@ static ex_t display_words(bfpath *bfp, int argc, char **argv, bool show_probabil
 		good_count = val.goodcount;
 
 		if (!show_probability)
-		    printf(data_format, token->text, spam_count, good_count);
+		    fprintf(fpo, data_format, token->text, spam_count, good_count);
 		else
 		{
 		    rob_prob = calc_prob(good_count, spam_count, msgcnts.goodcount, msgcnts.spamcount);
-		    printf(data_format, token->text, spam_count, good_count, rob_prob);
+		    fprintf(fpo, data_format, token->text, spam_count, good_count, rob_prob);
 		}
 		break;
 	    case 1:
@@ -589,7 +589,7 @@ static struct option longopts_bogoutil[] = {
     { NULL,				0, 0, 0 }
 };
 
-#define	OPTIONS	":a:c:Cd:DhH:I:k:l:m:np:r:R:s:u:vVw:x:X:y:"
+#define	OPTIONS	":a:c:Cd:DhH:I:k:l:m:nO:p:r:R:s:u:vVw:x:X:y:"
 
 static int process_arglist(int argc, char **argv)
 {
@@ -597,6 +597,7 @@ static int process_arglist(int argc, char **argv)
     int count = 0;
 
     fpin = stdin;
+    fpo  = stdout;
     dbgout = stderr;
 
 #ifdef __EMX__
@@ -785,6 +786,14 @@ static int process_arg(int option, const char *name, const char *val)
 	fpin = fopen( val, "r" );
 	if (fpin == NULL) {
 	    fprintf(stderr, "Can't read file '%s'\n", val);
+	    exit(EX_ERROR);
+	}
+	break;
+
+    case 'O':
+	fpo = fopen(val, "wt");
+	if (fpo == NULL) {
+	    fprintf(stderr, "Can't write file '%s'\n", val);
 	    exit(EX_ERROR);
 	}
 	break;

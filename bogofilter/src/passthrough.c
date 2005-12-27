@@ -329,7 +329,7 @@ void output_setup(void)
 	fpo_mayclose = false;
     }
 
-    if (!fpo) {
+    if (fpo == NULL) {
 	if (*outfname)
 	    fprintf(stderr, "Cannot open %s: %s\n",
 		    outfname, strerror(errno));

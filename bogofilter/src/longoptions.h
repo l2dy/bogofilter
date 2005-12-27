@@ -79,6 +79,7 @@ typedef enum longopts_e {
     { "no-config-file",			N, 0, 'C' }, \
     { "help",				N, 0, 'h' }, \
     { "input-file",			N, 0, 'I' }, \
+    { "output-file",			N, 0, 'O' }, \
        UNICODE_OPTION \
     { "version",			N, 0, 'V' }, \
     { "verbosity",			N, 0, 'v' },
@@ -87,7 +88,6 @@ typedef enum longopts_e {
 #define LONGOPTIONS_LEX \
     { "block-on-subnets",		R, 0, O_BLOCK_ON_SUBNETS }, \
     { "charset-default",		R, 0, O_CHARSET_DEFAULT }, \
-    { "output-file",			N, 0, 'O' }, \
     { "user-config-file",		R, 0, O_USER_CONFIG_FILE }, \
     { "replace-nonascii-characters",	R, 0, O_REPLACE_NONASCII_CHARACTERS },
 

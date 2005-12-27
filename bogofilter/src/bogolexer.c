@@ -206,6 +206,10 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 
     case 'O':
 	fpo = fopen(val, "wt");
+	if (fpo == NULL) {
+	    fprintf(stderr, "Can't write file '%s'\n", val);
+	    exit(EX_ERROR);
+	}
 	break;
 
     case 'n':

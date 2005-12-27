@@ -70,6 +70,7 @@
 	    <arg choice="opt">-s <replaceable>min,max</replaceable></arg>
 	    <arg choice="opt">-y <replaceable>date</replaceable></arg>
 	    <arg choice="opt">-I <replaceable>file</replaceable></arg>
+	    <arg choice="opt">-O <replaceable>file</replaceable></arg>
 	    <arg choice="opt">-x <replaceable>flags</replaceable></arg>
 	    <arg choice="opt">--config-file <replaceable>file</replaceable></arg>
 	</cmdsynopsis>
@@ -151,6 +152,11 @@
 	    <application>bogoutil</application> to read its input from
 	    <replaceable>file</replaceable> rather than stdin.
 	</para>
+	<para>The <option>-O <replaceable>file</replaceable></option> option tells
+	    <application>bogoutil</application> to write its output to
+	    <replaceable>file</replaceable> rather than stdout.
+	</para>
+
 	<para>
 	    The <option>-v</option> option produces verbose output on <option>stderr</option>.
 	    This option is primarily useful for debugging.
