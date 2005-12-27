@@ -17,6 +17,7 @@
 
 	* Add '-O' option to direct bogoutil output to a file.
 	* Fix building of binary rpms with SQLite support.
+	* Include SQLite binary rpm as standard part of "make rpm"
 
 	2005-12-26
 

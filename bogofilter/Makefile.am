@@ -27,18 +27,12 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 
 .PHONY:	check
 
-if ENABLE_SQLITE_DATASTORE
-adddef=--define 'with_sqlite 1'
-buildopt=-tb
-else
-adddef=--define 'bogostatic 1'
-buildopt=-ta
-endif
-
 rpm:	dist
 	case `rpm --version` in \
-	  "Version 3*")	rpm $(adddef) --sign $(buildopt) $(distdir).tar.gz ;; \
-	  *)		rpmbuild $(adddef) --sign $(buildopt) $(distdir).tar.gz ;; \
+	  "Version 3*")	rpm --define 'bogostatic 1' --sign -ta $(distdir).tar.gz ; \
+			rpm --define 'with_sqlite 1' --sign -ta $(distdir).tar.gz ;; \
+	  *)		rpmbuild --define 'bogostatic 1' --sign -ta $(distdir).tar.gz ; \
+			rpmbuild --define 'with_sqlite 1' --sign -ta $(distdir).tar.gz ;; \
 	esac
 
 cvs-check:
