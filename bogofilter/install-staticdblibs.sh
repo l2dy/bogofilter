@@ -71,7 +71,7 @@ want() {
 
 set -e
 
-cd ${TMPDIR-/var/tmp}
+cd ${TMPDIR:=/var/tmp}
 
 dbdir=db-4.2.52
 dbpfx=/opt/db-4.2-lean
@@ -117,7 +117,6 @@ sudo chmod -R a-w $dbpfx
 sudo ln -f $dbpfx/lib/libdb-4.2.a $dbpfx/lib/libdb.a
 echo "$dbdir was installed into $dbpfx"
 cd - >/dev/null
-du $TMPDIR
 rm -rf $dbdir
 fi
 
@@ -140,7 +139,6 @@ sudo chown -R 0:0 $sqpfx
 sudo chmod -R a-w $sqpfx
 echo "$sqdir was installed into $sqpfx"
 cd - >/dev/null
-du $TMPDIR
 rm -rf build-$sqdir $sqdir
 fi
 
