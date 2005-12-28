@@ -191,7 +191,8 @@ dnl Enable building statically linked executables
 AC_ARG_ENABLE(static,
       AC_HELP_STRING([--enable-static], [Build static versions as well.]))
 
-if test a$enable_static = ayes ; then
+case a$enable_static in
+ayes)
     EXE_EXT="_static"
     AC_MSG_CHECKING([option to link statically])
     LDEFLAGS="$LDFLAGS"
@@ -212,7 +213,14 @@ if test a$enable_static = ayes ; then
 	STATICLDFLAGS=
 	enable_static=no
     fi
-fi
+    ;;
+ano|a)
+    ;;
+*)
+    STATICLDFLAGS="$enable_static"
+    enable_static=yes
+    ;;
+esac
 
 export STATICLDFLAGS
 AC_SUBST(STATICLDFLAGS)
