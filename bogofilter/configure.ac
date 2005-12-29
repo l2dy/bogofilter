@@ -589,6 +589,11 @@ if test "a$STATIC_DB" = a ; then
     fi
 fi
 
+if test "x$BF_ZAP_LIBDB" = "xzap" ; then
+    LIBDB=
+    export LIBDB
+fi
+
 AC_DEFINE_UNQUOTED(DB_EXT, "$DB_EXT", [database file extension])
 AC_DEFINE_UNQUOTED(DB_TYPE, "$DB_TYPE", [database type])
 AC_SUBST(DB_EXT)
