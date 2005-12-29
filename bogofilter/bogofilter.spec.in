@@ -3,12 +3,10 @@
 # This .spec file will not build the static package by default.
 # To do this, run either of the next rpm[build] commands:
 #
-# rpm --define 'bogostatic 1' --sign -bb bogofilter.spec
 # rpmbuild --define 'bogostatic 1' --sign -bb bogofilter.spec
 #
 # To build with SQLite3, use:
 #
-# rpmbuild --define 'with_sqlite 1' -bb bogofilter.spec
 # rpmbuild --define 'with_sqlite 1' --sign -bb bogofilter.spec
 
 %define	Name		@PACKAGE@
