@@ -79,21 +79,31 @@ sqdir=sqlite-3.2.8
 sqpfx=/opt/sqlite-3-lean
 
 ### download SleepyCat DB 4.2.52 and patches
+build_db=0
 if test ! -f $dbpfx/lib/libdb.a ; then
 want http://downloads.sleepycat.com/db-4.2.52.tar.gz       cbc77517c9278cdb47613ce8cb55779f
 want http://www.sleepycat.com/update/4.2.52/patch.4.2.52.1 1227f5f9ff43d48b5b1759e113a1c2d7
 want http://www.sleepycat.com/update/4.2.52/patch.4.2.52.2 3da7efd8d29919a9113e2f6f5166f5b7
 want http://www.sleepycat.com/update/4.2.52/patch.4.2.52.3 0bf9ebbe852652bed433e522928d40ec
 want http://www.sleepycat.com/update/4.2.52/patch.4.2.52.4 9cfeff4dce0c11372c0b04b134f8faef
+build_db=1
 fi
 
 ### download SQLite 3.2.8
-if test ! -f $sqpfx/lib/libsqlite3.a ; then
+# the objdump test fixes up the effects of a bug
+# in an earlier version of this script,
+# that built a sqlite 3.2.8 version that depended
+# on GLIBC_2.3
+build_sqlite=0
+if test ! -f $sqpfx/lib/libsqlite3.a || \
+    objdump -t /opt/sqlite-3-lean/lib/libsqlite3.a \
+	| grep -q __ctype_b_loc ; then
 want http://www.sqlite.org/sqlite-3.2.8.tar.gz             9f2c014aaa46565b8163e047166a5686
+build_sqlite=1
 fi
 
 # build DB 4.2
-if test ! -f $dbpfx/lib/libdb.a ; then
+if test $build_db = 1 ; then
 rm -rf $dbdir
 gunzip -c -d $dbdir.tar.gz | tar xf -
 patch -s -d $dbdir -p0 <patch.4.2.52.1
@@ -121,14 +131,14 @@ rm -rf $dbdir
 fi
 
 # build SQLite 3
-if test ! -f $sqpfx/lib/libsqlite3.a ; then
+if test $build_sqlite = 1 ; then
 rm -rf build-$sqdir $sqdir
 gunzip -cd $sqdir.tar.gz | tar xf -
 set -e
 echo "installing $sqdir"
 mkdir -p build-$sqdir
 cd build-$sqdir
-env CPPFLAGS=-D__NO_CTYPE ../$sqdir/configure \
+env CFLAGS="-O2 -D__NO_CTYPE" ../$sqdir/configure \
   --prefix=$sqpfx --silent \
   --disable-shared --disable-tcl \
   --disable-threadsafe
