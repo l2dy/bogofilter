@@ -28,12 +28,25 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 
 .PHONY:	check
 
+DBPFX=/opt/db-4.2-lean
+SQPFX=/opt/sqlite-3-lean
+DBLIB=$(DBPFX)/lib/libdb.a
+SQLIB=$(SQPFX)/lib/libsqlite3.a
+DEF_SQLITE=--define 'with_sqlite 1'
+DEF_STATIC=--define 'bogostatic 1'
+
 # BF_ZAP_LIBDB is a magic variable we check from configure.ac
 rpm:	dist
-	@if test ! -f /opt/db-4.2-lean/lib/libdb.a || test ! -f /opt/sqlite-3-lean/lib/libsqlite3.a || objdump -t /opt/sqlite-3-lean/lib/libsqlite3.a | grep -q __ctype_b_loc ; then \
+	if test ! -f $(DBLIB) || test ! -f $(SQLIB) || objdump -t $(SQLIB) | grep -q __ctype_b_loc ; then \
 	  echo >&2 "Please run the install-staticdblibs.sh script first." ; exit 1 ; fi
-	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I/opt/sqlite-3-lean/include" LIBS="/opt/sqlite-3-lean/lib/libsqlite3.a" $(RPMBUILD) --define 'with_sqlite 1' --sign -tb $(distdir).tar.gz
-	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I/opt/db-4.2-lean/include" LIBS="/opt/db-4.2-lean/lib/libdb.a" $(RPMBUILD) --sign -ta $(distdir).tar.gz
+	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(DBPFX)/include" LIBS=$(DBLIB) $(RPMBUILD) --sign -ta $(distdir).tar.gz
+	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(SQPFX)/include" LIBS=$(SQLIB) $(RPMBUILD) $(DEF_SQLITE) --sign -tb $(distdir).tar.gz
+
+rpm-static:	dist
+	if test ! -f $(DBLIB) || test ! -f $(SQLIB) || objdump -t $(SQLIB) | grep -q __ctype_b_loc ; then \
+	  echo >&2 "Please run the install-staticdblibs.sh script first." ; exit 1 ; fi
+	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(DBPFX)/include" LIBS=$(DBLIB) $(RPMBUILD) $(DEF_STATIC) --sign -ta $(distdir).tar.gz
+	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(SQPFX)/include" LIBS=$(SQLIB) $(RPMBUILD) $(DEF_STATIC) $(DEF_SQLITE) --sign -ta $(distdir).tar.gz
 
 cvs-check:
 	rm -rf $(PACKAGE)-$(VERSION)-export
