@@ -23,14 +23,17 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 		GETTING.STARTED \
 		NEWS.0 \
 		README.cvs \
-		RELEASE.NOTES
+		RELEASE.NOTES \
+		install-staticdblibs.sh
 
 .PHONY:	check
 
+# BF_ZAP_LIBDB is a magic variable we check from configure.ac
 rpm:	dist
-	@echo "This target requires that Berkeley DB and SQLite3 are installed."
-	$(RPMBUILD) --define 'bogostatic 1' --sign -ta $(distdir).tar.gz
-	$(RPMBUILD) --define 'with_sqlite 1' --sign -tb $(distdir).tar.gz
+	@if test ! -f /opt/db-4.2-lean/lib/libdb.a || test ! -f /opt/sqlite-3-lean/lib/libsqlite3.a || objdump -t /opt/sqlite-3-lean/lib/libsqlite3.a | grep -q __ctype_b_loc ; then \
+	  echo >&2 "Please run the install-staticdblibs.sh script first." ; exit 1 ; fi
+	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I/opt/sqlite-3-lean/include" LIBS="/opt/sqlite-3-lean/lib/libsqlite3.a" $(RPMBUILD) --define 'with_sqlite 1' --sign -tb $(distdir).tar.gz
+	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I/opt/db-4.2-lean/include" LIBS="/opt/db-4.2-lean/lib/libdb.a" $(RPMBUILD) --sign -ta $(distdir).tar.gz
 
 cvs-check:
 	rm -rf $(PACKAGE)-$(VERSION)-export

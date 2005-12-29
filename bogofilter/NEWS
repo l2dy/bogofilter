@@ -13,6 +13,18 @@
 
 -------------------------------------------------------------------------------
 
+1.0.1	XXX not yet released XXX
+
+	2005-12-29
+
+	* For maintainers: Add install-staticdblibs.sh, a script to
+	  fetch and build static & lean BerkeleyDB 4.2.52.4 and SQLite
+	  3.2.8 libraries. Modify some parts of the RPM building so that
+	  the binary RPMs are built without external dependencies beyond
+	  glibc 2.2. This may render "make rpm" unusable on non-Linux
+	  platforms, but you should still be able to "rpmbuild -tb" from
+	  the source .tar.gz file.
+
 	2005-12-27
 
 	* Add '-O' option to direct bogoutil output to a file.
