@@ -123,11 +123,18 @@
                   </td>
                 </tr>
                 <tr>
-                  <td><a
-			  href="http://www.netbsd.org/Documentation/software/packages.html">NetBSD pkgsrc</a></td>
-                  <td>0.92.8</td>
+		    <td>NetBSD 3.0</td>
+                  <td>0.96.6</td>
                   <td>
                     <div align="center">BerkeleyDB</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><a
+			  href="http://www.netbsd.org/Documentation/software/packages.html">NetBSD pkgsrc</a></td>
+		  <td>0.96.6</td>
+                  <td>
+                    <div align="center">BerkeleyDB, SQLite</div>
                   </td>
                 </tr>
 		<tr><td colspan="3"><a href="http://www.suse.com/" target="_blank"><strong>SuSE Linux</strong></a></td></tr>
