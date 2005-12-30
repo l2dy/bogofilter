@@ -16,6 +16,9 @@
 %{?bogostatic:  %define bogostatic 1}
 %{!?bogostatic: %define bogostatic 0}
 
+%{?with_db42:   %define with_db42 1}
+%{!?with_db42:  %define with_db42 0}
+
 %{?with_sqlite:  %define with_sqlite 1}
 %{!?with_sqlite: %define with_sqlite 0}
 
@@ -23,7 +26,11 @@ Summary:	Fast anti-spam filtering by Bayesian statistical analysis
 %if %{with_sqlite}
 Name:		%{Name}-sqlite
 %else
+%if %{with_db42}
+Name:		%{Name}-db42
+%else
 Name:		%{Name}
+%endif
 %endif
 Version:	%{Version}
 Release:	%{Release}
@@ -35,7 +42,6 @@ Source0:	%{Name}-%{Version}.tar.gz
 %define _requires_exceptions perl
 
 Buildroot:	%{_tmppath}/%{Name}-%{Version}-root
-Conflicts:	bogofilter-static
 
 %description
 Bogofilter is a Bayesian spam filter.  In its normal mode of
@@ -55,7 +61,6 @@ This version was built with Berkeley DB support.
 %package static
 Summary:	Statically linked
 Group:		Networking/Mail
-Conflicts:	bogofilter
 
 %description static
 Statically linked bogofilter, bogolexer, bogoutil, and bogotune.
