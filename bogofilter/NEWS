@@ -46,11 +46,6 @@
 	* Capitalize variables in bogofilter.spec.in to please RH9's
           RPM 4.2 implementation.
 
-	2005-12-22
-	
-	* Remove incorrect info from integrating-with-postfix.
-	  (Thanks to Tom Allison)
-
 	2005-12-18
 	
 	* Fix bad return code in db_loop() in datastore_sqlite.c
