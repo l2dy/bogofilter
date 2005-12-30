@@ -22,15 +22,23 @@
 %{?with_sqlite:  %define with_sqlite 1}
 %{!?with_sqlite: %define with_sqlite 0}
 
-Summary:	Fast anti-spam filtering by Bayesian statistical analysis
-%if %{with_sqlite}
-Name:		%{Name}-sqlite
-%else
 %if %{with_db42}
-Name:		%{Name}-db42
-%else
-Name:		%{Name}
+%define DBFlag 1
+%define DBName -db42
 %endif
+
+%if %{with_sqlite}
+%define DBFlag 1
+%define DBName -sqlite
+%endif
+
+%{!?DBFlag: %define DBFlag 0}
+
+Summary:	Fast anti-spam filtering by Bayesian statistical analysis
+%if ! %{DBFlag}
+Name:		%{Name}
+%else
+Name:		%{Name}%{DBName}
 %endif
 Version:	%{Version}
 Release:	%{Release}
@@ -42,6 +50,7 @@ Source0:	%{Name}-%{Version}.tar.gz
 %define _requires_exceptions perl
 
 Buildroot:	%{_tmppath}/%{Name}-%{Version}-root
+Conflicts:	%{Name}%{DBName}-static
 
 %description
 Bogofilter is a Bayesian spam filter.  In its normal mode of
@@ -61,6 +70,7 @@ This version was built with Berkeley DB support.
 %package static
 Summary:	Statically linked
 Group:		Networking/Mail
+Conflicts:	%{Name}%{DBName}
 
 %description static
 Statically linked bogofilter, bogolexer, bogoutil, and bogotune.
@@ -74,6 +84,9 @@ CFLAGS="$RPM_OPT_FLAGS" \
   --sysconfdir=%{_sysconfdir} \
 %if %{?bogostatic}
   --enable-static \
+%endif
+%if %{?with_db42}
+  --with-database=db \
 %endif
 %if %{?with_sqlite}
   --with-database=sqlite3 \
