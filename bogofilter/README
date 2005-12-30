@@ -143,17 +143,24 @@ to the list.
   b. Building & Installing
   ------------------------
 
-  To compile and install the standard configuration, use the following
-  commands:
+  To compile and install the standard configuration from a tarball, use
+  the following commands:
+
+  cd bogofilter-1.0.1	[change to project directory]
+  ./configure		[add configure options as required]
+  make all check
+  make install		[as root]
+
+  To compile and install the standard configuration from CVS, use
+  the following commands:
 
   cd bogofilter		[change to project directory]
   ./autogen.sh		[add configure options as required]
-  make
   make install		[as root]
 
   You will need a full set of development tools installed to be able
-  to run autogen.sh, including recent automake (1.7) and autoconf
-  (2.5X).
+  to run autogen.sh, including recent automake (1.8) and autoconf
+  (2.59). configure does not have these requirements.
 
   c. Configuring
   --------------
@@ -178,7 +185,7 @@ to the list.
 
   If you make modifications to bogofilter, you may need to have a
   recent DocBook XML tool chain, the xmlto program, PassiveTeX and
-  XMLTeX, recent versions of automake (1.7) and autoconf (2.5X).
+  XMLTeX, recent versions of automake (1.8) and autoconf (2.59).
 
   These requirements do not apply if you are building an unmodified
   tarball.
