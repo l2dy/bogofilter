@@ -1,13 +1,23 @@
 # $Id$
 dnl vim: set noai tw=0:
-AC_INIT(bogofilter, 1.0.0.cvs)
-AC_PREREQ(2.54)
+dnl
+AC_INIT([bogofilter],[1.0.0.cvs])
+dnl
+dnl autoconf-2.59 was more than two years old when the
+dnl requirement was bumped from 2.54 to 2.59:
+dnl (2.59 is needed for bugfixes and to support
+dnl  AS_HELP_STRING):
+AC_PREREQ(2.59)
 AC_CONFIG_SRCDIR([src/bogofilter.c])
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE([foreign 1.7 dist-bzip2])
+dnl automake 1.7 appears to work, but then breaks
+dnl at "make distcheck" since it does not package
+dnl m4/gsl.m4 for instance, which it should do.
+dnl we use 1.8 or newer.
+AM_INIT_AUTOMAKE([foreign 1.8 dist-bzip2 no-installinfo])
 
-AM_CONFIG_HEADER(src/config.h:config.in)
+AC_CONFIG_HEADERS([src/config.h:config.in])
 AC_PROG_AWK
 AC_PROG_CC(gcc xlc cc)
 dnl AC_GNU_SOURCE
@@ -21,29 +31,32 @@ AC_PATH_PROGS(NSGMLS,onsgmls nsgmls,nsgmls)
 AC_PATH_PROGS(RPMBUILD,rpmbuild rpm,rpmbuild)
 AM_PROG_LEX
 
+dnl Check compiler capabilities
+AC_C_CONST
+AC_C_INLINE
+AC_C_VOLATILE
+
+if test "$ac_cv_c_inline" != no ; then
+    AC_DEFINE(HAVE_INLINE,1, [define to 1 if 'inline' is supported])
+    AC_SUBST(HAVE_INLINE)
+fi
+
 dnl Check for "extern inline", using a modified version
 dnl of the test for AC_C_INLINE from acspecific.mt.
 dnl Run this before AC_C_INLINE to avoid skewing the results?
 dnl Imported from the GSL 1.4 documentation (section "Autoconf Macros")
 dnl and modified to define HAVE_EXTERN_INLINE.
 AC_CACHE_CHECK([for extern inline], ac_cv_c_extern_inline,
-	       [ac_cv_c_extern_inline=no
-		AC_TRY_COMPILE([extern $ac_cv_c_inline double foo(double x);
-				extern $ac_cv_c_inline double foo(double x) { return x+1.0; };
-				double foo (double x) { return x + 1.0; };],
-				[  foo(1.0)  ],
-				[ac_cv_c_extern_inline="yes"])
-		])
+[ac_cv_c_extern_inline=no
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern $ac_cv_c_inline double foo(double x);
+extern $ac_cv_c_inline double foo(double x) { return x+1.0; };
+double foo (double x) { return x + 1.0; };]], [[  foo(1.0)  ]])],[ac_cv_c_extern_inline="yes"],[])
+])
 
 if test "$ac_cv_c_extern_inline" != no ; then
     AC_DEFINE(HAVE_EXTERN_INLINE,1,Define to 1 if your compiler supports extern inline storage class.)
     AC_SUBST(HAVE_EXTERN_INLINE)
 fi
-
-dnl Check compiler capabilities
-AC_C_CONST
-AC_C_INLINE
-AC_C_VOLATILE
 
 dnl Check for extension
 AC_EXEEXT
@@ -617,42 +630,47 @@ if test "x$ac_cv_func_vsnprintf" != "xyes" ; then
     AC_DEFINE(vsnprintf, trio_vsnprintf, [Define to trio_vsnprintf if your system lacks vsnprintf])
     needtrio=1
 fi
+
 if test $needtrio -gt 0
 then
-dnl BEGIN TRIO
-dnl Alpha floating-point compiler option.
-dnl
+    dnl BEGIN TRIO
+    dnl Alpha floating-point compiler option.
+    dnl
+    AC_MSG_CHECKING(for IEEE compilation options)
+    AC_CACHE_VAL(ac_cv_ieee_option, [
+        ac_cv_ieee_option="none"
 
-AC_MSG_CHECKING(for IEEE compilation options)
-AC_CACHE_VAL(ac_cv_ieee_option, [
-AC_TRY_COMPILE(,[
-#if !(defined(__alpha) && (defined(__DECC) || defined(__DECCXX) || (defined(__osf__) && defined(__LANGUAGE_C__))) && (defined(VMS) || defined(__VMS)))
-# error "Option needed"
-#endif
-],ac_cv_ieee_option="/IEEE_MODE=UNDERFLOW_TO_ZERO/FLOAT=IEEE",
-AC_TRY_COMPILE(,[
-#if !(defined(__alpha) && (defined(__DECC) || defined(__DECCXX) || (defined(__osf__) && defined(__LANGUAGE_C__))) && !(defined(VMS) || defined(__VMS)) && !defined(_CFE))
-# error "Option needed"
-#endif
-],ac_cv_ieee_option="-ieee",
-AC_TRY_COMPILE(,[
-#if !(defined(__alpha) && (defined(__GNUC__) && (defined(__osf__) || defined(__linux__))))
-# error "Option needed"
-#endif
-],ac_cv_ieee_option="-mieee",
-ac_cv_ieee_option="none"
-)
-)
-)
-])
-AC_MSG_RESULT($ac_cv_ieee_option)
-if test $ac_cv_ieee_option != none; then
-  CFLAGS="${CFLAGS} ${ac_cv_ieee_option}"
-fi
-dnl END TRIO
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
+        #if !(defined(__alpha) && (defined(__DECC) || defined(__DECCXX) || (defined(__osf__) && defined(__LANGUAGE_C__))) && (defined(VMS) || defined(__VMS)))
+        # error "Option needed"
+        #endif
+        ]])],[ac_cv_ieee_option="/IEEE_MODE=UNDERFLOW_TO_ZERO/FLOAT=IEEE"],[])
+
+        if test $ac_cv_ieee_option = none ; then
+            AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
+            #if !(defined(__alpha) && (defined(__DECC) || defined(__DECCXX) || (defined(__osf__) && defined(__LANGUAGE_C__))) && !(defined(VMS) || defined(__VMS)) && !defined(_CFE))
+            # error "Option needed"
+            #endif
+            ]])],[ac_cv_ieee_option="-ieee"],[])
+        fi
+
+        if test $ac_cv_ieee_option = none ; then
+            AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
+            #if !(defined(__alpha) && (defined(__GNUC__) && (defined(__osf__) || defined(__linux__))))
+            # error "Option needed"
+            #endif
+        ]])],[ac_cv_ieee_option="-mieee"],[])
+        fi
+    ]) dnl end AC_CACHE_VAL
+    AC_MSG_RESULT($ac_cv_ieee_option)
+    if test $ac_cv_ieee_option != none; then
+        CFLAGS="${CFLAGS} ${ac_cv_ieee_option}"
+    fi
+    dnl END TRIO
 
     AC_DEFINE(NEEDTRIO, 1, [Define to 1 if trio is to be included.])
 fi
+
 AM_CONDITIONAL(NEEDTRIO, test "$needtrio" = "1")
 
 dnl check if XMLTO is somewhere
