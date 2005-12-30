@@ -4,10 +4,93 @@ CHANGES -- trio
 The changes listed without a name attributed to them were most likely done by
 Bjorn Reese and/or Daniel Stenberg.
 
+
+Bogofilter-local change - 2005-12-30
+------------------------------------
+* Matthias Andree
+  Fix triodef.h to work on systems were empty macros don't default to 0
+  in numeric evaluations, such as Sun Workshop 6.
+
+
+Version 1.11 - 2005/12/26
+-------------------------
+* Fixed accuracy for denormalized numbers (bug item #758327).
+
+* Glen Davidson
+  Fixed scanning of floating-point numbers without a decimal-point (bug item
+  #1370427).
+
+* David Byron
+  Fixed more compiler warnings.
+
+* Fixed compilation of trio_to_long_double and TRIO_FEATURE_FLOAT (reported by
+  David Byron).
+
+* Fixed precision of large floating-point numbers (bug item #1314524).
+
+* Karl Bochert
+  Fixed trio_fpclassify_and_signbit to only restore the floating-point
+  precision.
+
+* Fixed detection of need for ieee option on FreeBSD/Alpha.
+
+* Added TRIO_SNPRINTF_ONLY compilation.
+
+* Fixed trio_to_double by not using strtod() on Tru64/DECC because it does not
+  support hex-floats.
+
+* Fixed crash on 64 bits machines related to a previous workaround in version
+  1.9 for uninitialized va_list (reported by Nicolai Tufar, suggestion by
+  Douglas Gwyn).
+
+* Patrick Jessee
+  Fixed width calculation for %g.
+
+* Added macros for internal features.
+
+* Jon Foster
+  Added macros for conditional compilation of many features. Documented all
+  the features.
+
+* Karl Bochert
+  Fixed problem with Borland C++, which changes the floating-point precision
+  for certain math functions (log10() and _fpclass()).
+
+* Karl Bochert
+  Fixed compilation warnings on Borland C++.
+
+* Removed any occurrence of #elif because Borland C++ reports wrong line
+  numbers when they are present (reported by Karl Bochert).
+
+* David Byron
+  Added trio_asprintfv.
+
+* Brian Chapman
+  Fixed Mac OS X compilation.
+
+* David Byron
+  Fixed several compiler warnings.
+
+* Fixed printing of out-of-range arguments for %hhd and %hd. These arguments
+  can be out of range because of default integer promotion.
+
+* Bob Friesenhahn
+  Fixed installation of header files.
+
+* Joe Orton
+  Added SHELL to Makefile.in to avoid problems with CShells.
+
+* Shaun Tancheff
+  Fixed regresion tests for MSVC.
+
+* Craig Berry
+  Fixed the VMS C99 workaround.
+
+
 Version 1.10 - 2003/03/06
 -------------------------
 * Rearranged some include files to accommodate large file support (reported by
-  Albert Chin-A-Young)
+  Albert Chin-A-Young).
 
 * Added support for SunOS 4.1.x lack of strerror, tolower, and toupper
   (reported by Peter McCluskey).

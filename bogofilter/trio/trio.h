@@ -1,6 +1,6 @@
 /*************************************************************************
  *
- * $Id: trio.h,v 1.1 2003/08/04 23:30:47 m-a Exp $
+ * $Id: trio.h,v 1.17 2005/05/29 11:58:14 breese Exp $
  *
  * Copyright (C) 1998 Bjorn Reese and Daniel Stenberg.
  *
@@ -8,7 +8,7 @@
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE AUTHORS AND
  * CONTRIBUTORS ACCEPT NO RESPONSIBILITY IN ANY CONCEIVABLE MANNER.
@@ -115,6 +115,7 @@ char *trio_vaprintf TRIO_PROTO((TRIO_CONST char *format, va_list args));
 
 int trio_asprintf TRIO_PROTO((char **ret, TRIO_CONST char *format, ...));
 int trio_vasprintf TRIO_PROTO((char **ret, TRIO_CONST char *format, va_list args));
+int trio_asprintfv TRIO_PROTO((char **result, TRIO_CONST char *format, trio_pointer_t * args));
 
 /*************************************************************************
  * Scan Functions
