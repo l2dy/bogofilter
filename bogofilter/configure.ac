@@ -1,6 +1,18 @@
 # $Id$
 dnl vim: set noai tw=0:
 dnl
+dnl ********************************************************
+dnl "Magic" environment variables for this script are:
+dnl
+dnl BF_ZAP_LIBDB -  LIBDB turns out empty, so that
+dnl set to "zap"    the database library can be taken from
+dnl                 libs (for static linking).
+dnl
+dnl BF_FORCE_TRIO - Unconditionally compile and link against
+dnl set to "yes"    the "Trio" [v]snprintf library (which is
+dnl                 part of the bogofilter source).
+dnl ********************************************************
+dnl
 AC_INIT([bogofilter],[1.0.0.cvs])
 dnl
 dnl autoconf-2.59 was more than two years old when the
@@ -621,7 +633,7 @@ AM_CONDITIONAL(ENABLE_SQLITE_DATASTORE, test "x$WITH_DB_ENGINE" = "xsqlite3")
 
 dnl Use TRIO to replace missing snprintf/vsnprintf.
 needtrio=0
-dnl if test "$FORCE_TRIO" = "yes" ; then needtrio=1 ; ac_cv_func_vsnprintf=no ; ac_cv_func_snprintf=no ; fi
+if test "$BF_FORCE_TRIO" = "yes" ; then needtrio=1 ; ac_cv_func_vsnprintf=no ; ac_cv_func_snprintf=no ; fi
 if test "x$ac_cv_func_snprintf" != "xyes" ; then
     AC_DEFINE(snprintf, trio_snprintf, [Define to trio_snprintf if your system lacks snprintf])
     needtrio=1
