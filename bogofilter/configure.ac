@@ -189,7 +189,7 @@ AC_DEFINE(__NO_CTYPE,1,[Define __NO_CTYPE to 1 to avoid GLIBC_2.3-specific ctype
 dnl Enable building statically linked executables
 
 AC_ARG_ENABLE(static,
-      AC_HELP_STRING([--enable-static], [Build static versions as well.]))
+      AS_HELP_STRING([--enable-static], [build static versions as well (unsupported).]))
 
 case a$enable_static in
 ayes)
@@ -230,21 +230,20 @@ AC_SUBST(EXE_EXT)
 dnl Allow the user to specify a header name to use to indicate whether a given
 dnl message is SPAM or not.
 AC_ARG_ENABLE(spam-header-name, 
-	AC_HELP_STRING([--enable-spam-header-name=name], 
-	[Use specified header name instead of X-Bogosity]), 
-	AC_DEFINE_UNQUOTED(SPAM_HEADER_NAME, 
+	AS_HELP_STRING([--enable-spam-header-name=name],
+	[use specified header name instead of "X-Bogosity"]),
+	AC_DEFINE_UNQUOTED(SPAM_HEADER_NAME,
 	["$enableval"], 
-	[Use specified header name instead of X-Bogosity]),
-	AC_DEFINE_UNQUOTED(SPAM_HEADER_NAME, 
-	["X-Bogosity"], 
-	[Use specified header name instead of X-Bogosity])
+	[Use specified header name instead of "X-Bogosity"]),
+	AC_DEFINE_UNQUOTED(SPAM_HEADER_NAME,
+	["X-Bogosity"])
 )
 
-dnl Allow the user to enable/disable use of unicode
+dnl Allow the user to enable/disable use of Unicode
 
 AC_ARG_ENABLE(unicode,
-	AC_HELP_STRING([--disable-unicode],
-	[Disables conversion of character sets to unicode (UTF-8)]),
+	AS_HELP_STRING([--disable-unicode],
+	[disables Unicode/UTF-8 conversion of character sets]),
 	if test "$enableval" = no; then
 		[USE_UNICODE=NO]
 	fi
@@ -252,7 +251,7 @@ AC_ARG_ENABLE(unicode,
 		[USE_UNICODE=YES]
 	fi
 	if test x$USE_UNICODE != x ; then
-		AC_DEFINE_UNQUOTED(USE_UNICODE, "$USE_UNICODE", [unicode enabled/disabled flag])
+		AC_DEFINE_UNQUOTED(USE_UNICODE, "$USE_UNICODE", [Unicode enabled/disabled flag])
 	    	AC_SUBST(USE_UNICODE)
 	fi
 )
@@ -262,22 +261,22 @@ AM_CONDITIONAL(ENABLE_UNICODE, test x$USE_UNICODE != xNO)
 
 if test x$USE_UNICODE = xNO ; then
 	AC_DEFINE(DISABLE_UNICODE,1,
-	[Disable unicode for converting character sets to unicode])
+	[Disable converting character sets to Unicode])
 	[ENCODING="raw"]
 else
 	AM_ICONV
 	AC_DEFINE(ENABLE_UNICODE,1,
-	[Enable unicode for converting character sets to unicode])
+	[Enable converting character sets to Unicode])
 	[ENCODING="utf-8"]
 fi
 [DEFAULT_CHARSET="iso-8859-1"]
 
-dnl Allow the user to enable Russian language support
+dnl Allow the user to enable Russian character set support
 
 if test x$USE_UNICODE != xYES ; then
 AC_ARG_ENABLE(russian,
-	AC_HELP_STRING([--enable-russian],
-	[Enable Russian language support]),
+	AS_HELP_STRING([--enable-russian],
+	[switch default character set to CP866 [[iso-8859-1]]]),
 	if test "$enableval" = no; then
 		[USE_CP866=NO]
 	else
@@ -285,21 +284,21 @@ AC_ARG_ENABLE(russian,
 	fi
 )
 
-dnl Enable building with Russian language support.
+dnl Enable building with Russian character set support.
 if test x$USE_CP866 = xYES ; then
 	AC_DEFINE(CP866,1,
-	[Enable Russian language support])
+	[Default charset is CP866 rather than iso-8859-1])
 	[DEFAULT_CHARSET="CP866"]
 fi
 fi
 
 dnl Allow the user to specify a default charset
 AC_ARG_WITH(charset, 
-	    AC_HELP_STRING([--with-charset=name], 
-	    [Use specified charset instead of iso-8859-1]), 
+	    AS_HELP_STRING([--with-charset=name], 
+	    [use specified charset (overrides --enable-russian) [[iso-8859-1]]]), 
 	    AC_DEFINE_UNQUOTED(DEFAULT_CHARSET, 
 	    ["$withval"], 
-	    [Use specified charset instead of iso-8859-1])
+	    [Use specified default charset instead of iso-8859-1])
 )
 
 AC_SUBST(ENCODING)
@@ -311,8 +310,8 @@ AC_DEFINE_UNQUOTED(DEFAULT_CHARSET,
 dnl Allow the user to enable memory usage debugging methods
 
 AC_ARG_ENABLE(memdebug,
-	AC_HELP_STRING([--enable-memdebug],
-	[Enable memory usage debugging]),
+	AS_HELP_STRING([--enable-memdebug],
+	[enable memory usage debugging]),
 	if test "$enableval" = no; then
 		[USE_MEMDEBUG=NO]
 	else
@@ -379,8 +378,8 @@ AC_LIB_RPATH
 dnl Allow the user to enable/disable use of database transactions
 
 AC_ARG_ENABLE(transactions,
-	AC_HELP_STRING([--enable-transactions],
-	[Enable transactions in Berkeley DB]),
+	AS_HELP_STRING([--enable-transactions],
+	[force transactional mode (disable traditional) in Berkeley DB @<:@compile both modes and select at run-time@:>@]),
 	if test "$enableval" = no; then
 		[USE_TRANSACTIONS=NO]
 	fi
@@ -392,29 +391,33 @@ AC_ARG_ENABLE(transactions,
 		AC_SUBST(USE_TRANSACTIONS)
 	fi
 )
+dnl dummy ARG_ENABLE to produce the help string
+AC_ARG_ENABLE(dummy,
+	AS_HELP_STRING([--disable-transactions],
+	[disable transactional mode (force traditional) in Berkeley DB @<:@compile both modes and select at run-time@:>@]),,)
 
 AM_CONDITIONAL(DISABLE_TRANSACTIONS, test x$USE_TRANSACTIONS = xNO)
 AM_CONDITIONAL(ENABLE_TRANSACTIONS, test x$USE_TRANSACTIONS = xYES)
 
 if test x$USE_TRANSACTIONS = xNO ; then
 	AC_DEFINE(DISABLE_TRANSACTIONS,1,
-	[Disable transactions in Berkeley DB])
+	[Disable transactional mode in Berkeley DB])
 fi
 
 if test x$USE_TRANSACTIONS = xYES ; then
 	AC_DEFINE(ENABLE_TRANSACTIONS,1,
-	[Enable transactions in Berkeley DB])
+	[Force transactional mode in Berkeley DB])
 fi
 
 AC_ARG_ENABLE(dbshared-test,
-	      AS_HELP_STRING([--disable-dbshared-test], [Defeat test for shared environment (unsafe)]))
+	      AS_HELP_STRING([--disable-dbshared-test], [defeat test for shared environment (unsafe)]))
 
 AC_CACHE_SAVE
 
 WITH_DB_ENGINE=db
 AC_ARG_WITH(database,
-	    AC_HELP_STRING([--with-database=ENGINE],
-	    [Choose database engine {db|qdbm|sqlite3} [[ENGINE=db]]]),
+	    AS_HELP_STRING([--with-database=ENGINE],
+	    [choose database engine {db|qdbm|sqlite3} [[db]]]),
 	    [ WITH_DB_ENGINE=$withval ]
 )
 
@@ -723,7 +726,7 @@ PATH=/bin:/usr/bin:$PATH
 export PATH
 
 need_my_gsl=1
-AC_ARG_WITH(included-gsl, AC_HELP_STRING([--with-included-gsl],[force use of shipped GSL rather than system GSL]),
+AC_ARG_WITH(included-gsl, AS_HELP_STRING([--with-included-gsl],[force use of shipped GSL rather than system GSL]),
     if test "x$withval" = "xyes" ; then need_my_gsl=2 ; fi)
 
 if test "$need_my_gsl" = 1 ; then
