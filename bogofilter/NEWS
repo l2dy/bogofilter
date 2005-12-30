@@ -13,7 +13,12 @@
 
 -------------------------------------------------------------------------------
 
-1.0.1	XXX not yet released XXX
+	2005-12-30
+
+	* The configure help texts have been revised, the IEEE checks
+	  for trio have been simplified (they are no longer nested) and
+	  configure.ac has been updated to quiet autoconf -Wobsolete
+	  warnings. The README file now reflects the new requirements.
 
 	2005-12-29
 
