@@ -76,6 +76,9 @@ static void convert(iconv_t xd, buff_t *src, buff_t *dst)
 	outbuf = (char *)dst->t.text + dst->t.leng;
 	outbytesleft = dst->size - dst->read - dst->t.leng;
 
+	if (outbytesleft == 0)
+	    done = true;
+
 	/*
 	 * The iconv function converts one multibyte character at a time, and for
 	 * each character conversion it increments *inbuf and decrements
@@ -163,9 +166,6 @@ static void convert(iconv_t xd, buff_t *src, buff_t *dst)
 	dst->t.leng = dst->size - dst->read - outbytesleft;
 
 	if (src->read >= src->t.leng)
-	    done = true;
-
-	if (outbytesleft == 0)
 	    done = true;
     }
 
