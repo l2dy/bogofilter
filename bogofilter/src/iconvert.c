@@ -77,7 +77,7 @@ static void convert(iconv_t xd, buff_t *src, buff_t *dst)
 	outbytesleft = dst->size - dst->read - dst->t.leng;
 
 	if (outbytesleft == 0)
-	    done = true;
+	    break;
 
 	/*
 	 * The iconv function converts one multibyte character at a time, and for
