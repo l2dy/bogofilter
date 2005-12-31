@@ -29,16 +29,17 @@
 
 %if %{with_sqlite}
 %define DBFlag 1
-%define DBName -sqlite
+%define DBName -sqlite3
 %endif
 
 %{!?DBFlag: %define DBFlag 0}
+%{!?bf_nameext: %define bf_nameext %{nil}}
 
 Summary:	Fast anti-spam filtering by Bayesian statistical analysis
 %if ! %{DBFlag}
-Name:		%{Name}
+Name:		%{Name}%{bf_nameext}
 %else
-Name:		%{Name}%{DBName}
+Name:		%{Name}%{DBName}%{bf_nameext}
 %endif
 Version:	%{Version}
 Release:	%{Release}

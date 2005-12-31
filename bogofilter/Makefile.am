@@ -34,15 +34,18 @@ DBLIB=$(DBPFX)/lib/libdb.a
 SQLIB=$(SQPFX)/lib/libsqlite3.a
 DEF_DB42=--define 'with_db42 1'
 DEF_SQLITE=--define 'with_sqlite 1'
-DEF_STATIC=--define 'bogostatic 1'
+DEF_STATIC=--define 'bf_nameext -static'
+SIGN=--sign
 
 # BF_ZAP_LIBDB is a magic variable we check from configure.ac
 rpm:	dist
-	$(RPMBUILD) --sign -ts $(distdir).tar.gz
+	$(RPMBUILD) $(SIGN) -ts $(distdir).tar.gz
 	if test ! -f $(DBLIB) || test ! -f $(SQLIB) || objdump -t $(SQLIB) | grep -q __ctype_b_loc ; then \
 	  echo >&2 "Please run the install-staticdblibs.sh script first." ; exit 1 ; fi
-	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(DBPFX)/include" LIBS=$(DBLIB) $(RPMBUILD) $(DEF_STATIC) $(DEF_DB42) --sign -tb $(distdir).tar.gz
-	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(SQPFX)/include" LIBS=$(SQLIB) $(RPMBUILD) $(DEF_STATIC) $(DEF_SQLITE) --sign -tb $(distdir).tar.gz
+	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(DBPFX)/include" LIBS=$(DBLIB) $(RPMBUILD) $(DEF_STATIC) $(DEF_DB42) $(SIGN) -tb $(distdir).tar.gz
+	                 CPPFLAGS="-D__NO_CTYPE -I/usr/include/db42" LIBS=-ldb-4.2 $(RPMBUILD)               $(DEF_DB42) $(SIGN) -tb $(distdir).tar.gz
+	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(SQPFX)/include" LIBS=$(SQLIB) $(RPMBUILD) $(DEF_STATIC) $(DEF_SQLITE) $(SIGN) -tb $(distdir).tar.gz
+	                 CPPFLAGS="-D__NO_CTYPE                   "               $(RPMBUILD)               $(DEF_SQLITE) $(SIGN) -tb $(distdir).tar.gz
 
 cvs-check:
 	rm -rf $(PACKAGE)-$(VERSION)-export
