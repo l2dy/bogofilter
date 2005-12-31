@@ -1,16 +1,16 @@
 bogofilter-SA-2005-01
 
-Topic:		vulnerability in bogofilter/bogolexer
+Topic:		two vulnerabilities in bogofilter and bogolexer < 0.96.2
 
 Announcement:	bogofilter-SA-2005-01
 Writer:		Matthias Andree
 Version:	1.00
-CVE id:		XXX
+CVE ID:		XXX
 Announced:	XXX
 Category:	vulnerability
 Type:		segmentation fault through malformed input
 Impact:		denial of service, heap corruption
-Credits:	David Relson
+Credits:	David Relson, Clint Adams
 Danger:		medium
 URL:		http://bogofilter.sourceforge.net/security/bogofilter-SA-2005-01
 
@@ -36,11 +36,23 @@ non-spam.  It uses a data base to store words and must be trained
 which mail are spam and non-spam. It uses the probabilities of
 individual words for classifying the message.
 
+The bugs were found in development "stable" releases before 1.0.0, so
+it was not researched when the bugs have been introduced, all users
+should migrate to bogofilter 1.0.0 or newer.
+
 2. Problem description
 ======================
 
-In some circumstances, bogofilter has overrun a malloc()'d buffer while
-converting character sets with untrusted data.
+Two security relevant bugs were found in bogofilter 0.96.2 and fixed in
+0.96.3:
+
+i.   In some circumstances, bogofilter has overrun a malloc()'d buffer
+     while converting character sets with untrusted data. The only
+     observed problem so far was a crash, but we cannot rule out that
+     code injection was possible.
+
+ii.  In some circumstances, bogofilter would read past the end of a
+     buffer, causing a program crash.
 
 3. Impact
 =========
