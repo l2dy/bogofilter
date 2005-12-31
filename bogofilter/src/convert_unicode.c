@@ -76,7 +76,9 @@ static charset_def_t charsets[] = {
     { "us-ascii",	T },
     { "utf-8",		T },
     { "iso8859-1",	T },		/* ISOIEC 8859-1:1998 Latin Alphabet No. 1	*/
-    /* tests/t.systest.d/inputs/spam.mbx is iso-8859-1 and contains 8-bit characters - " “Your Account” " */
+    /* tests/t.systest.d/inputs/spam.mbx is iso-8859-1 and contains
+     * 8-bit characters - " “Your Account” "---a typical case of a
+     * message that should have declared windows-1252 instead */
     { "iso8859-2",	F },		/* ISOIEC 8859-2:1999 Latin Alphabet No. 2	*/
     { "iso8859-3",	F },		/* ISOIEC 8859-3:1999 Latin Alphabet No. 3	*/
     { "iso8859-4",	F },		/* ISOIEC 8859-4:1998 Latin Alphabet No. 4	*/
