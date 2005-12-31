@@ -26,8 +26,31 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 		RELEASE.NOTES \
 		install-staticdblibs.sh
 
-.PHONY:	check
+.PHONY:	check rpm cvs-check
 
+#
+# RPM building - there are some cheats here
+#
+# BF_ZAP_LIBDB is a magic variable we check from configure.ac,
+# which zaps LIBDB and allows us to override the library choice
+# through LIBS=...
+#
+# Passing -ldb-4.2 (for the second -tb line) will fail on systems that
+# don't have libdb-4.2.* in the default library path that "ld" uses.
+# Install your system's db42 and db42-devel packages and retry.
+# Using -ldb-4.2 is indispensable as systems with db 4.3 or 4.4 would
+# otherwise pick the newer one as their default, but we must match
+# the library between shared and static RPM so that users can switch
+# forth and back without difficulties such as dumping and reloading
+# the database.
+#
+# CPPFLAGS=-D__NO_CTYPE tells glibc to use the older glibc 2.2.X
+# ctype implementation (functions). Else glibc would use a newer
+# 2.3.X ctype implementation, and as this is the only module that
+# requires 2.3.X in our code, we just use the 2.2.X version instead.
+# This works up to and including 2.3.5, the newest glibc version
+# available at the time this code was written.
+#
 DBPFX=/opt/db-4.2-lean
 SQPFX=/opt/sqlite-3-lean
 DBLIB=$(DBPFX)/lib/libdb.a
@@ -36,9 +59,11 @@ DEF_DB42=--define 'with_db42 1'
 DEF_SQLITE=--define 'with_sqlite 1'
 DEF_STATIC=--define 'bf_nameext -static'
 SIGN=--sign
-
-# BF_ZAP_LIBDB is a magic variable we check from configure.ac
+#
 rpm:	dist
+	@echo
+	@echo "Note: if 'make rpm' fails, check the top-level Makefile.am for documentation."
+	@echo
 	$(RPMBUILD) $(SIGN) -ts $(distdir).tar.gz
 	if test ! -f $(DBLIB) || test ! -f $(SQLIB) || objdump -t $(SQLIB) | grep -q __ctype_b_loc ; then \
 	  echo >&2 "Please run the install-staticdblibs.sh script first." ; exit 1 ; fi
