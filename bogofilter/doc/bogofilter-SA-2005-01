@@ -4,12 +4,12 @@ Topic:		vulnerability in bogofilter/bogolexer
 
 Announcement:	bogofilter-SA-2005-01
 Writer:		Matthias Andree
-Version:	XXX
+Version:	1.00
 CVE id:		XXX
 Announced:	XXX
 Category:	vulnerability
 Type:		segmentation fault through malformed input
-Impact:		denial of service, code injection
+Impact:		denial of service, heap corruption
 Credits:	David Relson
 Danger:		medium
 URL:		http://bogofilter.sourceforge.net/security/bogofilter-SA-2005-01
@@ -17,19 +17,16 @@ URL:		http://bogofilter.sourceforge.net/security/bogofilter-SA-2005-01
 Affected:	bogofilter (stable)  0.96.2 and older
 
 Not affected:	bogofilter 0.96.3 and newer
+		bogofilter 0.96.6
+		bogofilter 1.0.*
 
-Introduced:	XXX
-		XXX
-
-Corrected:	2005-10-XXX         committed corrected version
-		2005-10-XXX         bogofilter 0.96.3 released as current
+Corrected:	2005-10-22  committed corrected version to CVS repo
+		2005-10-26  bogofilter 0.96.3 released as "current"
+		2005-11-19  bogofilter 0.96.6 declared    "stable"
+		2005-12-01  bogofilter 1.0.0  released
 
 References:	
 
-0. Release history
-==================
-
-2005-10-26	0.01 initial draft for internal review
 
 1. Background
 =============
@@ -42,8 +39,13 @@ individual words for classifying the message.
 2. Problem description
 ======================
 
+In some circumstances, bogofilter has overrun a malloc()'d buffer while
+converting character sets with untrusted data.
+
 3. Impact
 =========
+
+Bogofilter crashed or corrupted its heap.
 
 4. Workaround
 =============
@@ -53,15 +55,11 @@ No reasonable workaround is known at this time.
 5. Solution
 ===========
 
-Upgrade your bogofilter to version 0.96.3 (or a newer release).
+Upgrade your bogofilter to version 1.0.0 (or a newer release).
 
-bogofilter 0.96.3 is available from sourceforge:
+bogofilter is available from SourceForge:
 
-https://sourceforge.net/project/showfiles.php?group_id=62265&release_id=118794
-
-Note that a broken-out bugfix patch is not available at this time,
-users and distributors are advised to the most current release, which is
-a candidate to be released as 1.0.
+https://sourceforge.net/project/showfiles.php?group_id=62265
 
 A. Copyright, License and Warranty
 ==================================
