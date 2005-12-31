@@ -242,6 +242,7 @@ static int get_decoded_line(buff_t *buff)
 #endif
 
     /* CRLF -> NL */
+    buf = buff->t.text;
     if (count >= 2 && memcmp(buf + count - 2, CRLF, 2) == 0) {
 	count --;
 	*(buf + count - 1) = (byte) '\n';
