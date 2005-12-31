@@ -44,25 +44,37 @@ should migrate to bogofilter 1.0.0 or newer.
 ======================
 
 Two security relevant bugs were found in bogofilter 0.96.2 and fixed in
-0.96.3:
+0.96.3, and apply to the "bogofilter" and "bogolexer" programs:
 
-i.   In some circumstances, bogofilter has overrun a malloc()'d buffer
-     while converting character sets with untrusted data. The only
-     observed problem so far was a crash, but we cannot rule out that
-     code injection was possible.
+i.  When encountering invalid input sequences, bogofilter could overrun
+    a malloc()'d buffer, corrupting the heap, while converting character
+    sets with untrusted data.  The only observed problem so far was a
+    crash, but we cannot rule out that code injection was possible.
 
-ii.  In some circumstances, bogofilter would read past the end of a
-     buffer, causing a program crash.
+    This problem was aggravated by an unrelated bug that made bogofilter
+    decode attachments and attempt charset conversion on them. This way,
+    all octets in the range 0x80...0xff (which lie outside the MIME
+    default character set, US-ASCII) were considered an invalid input
+    sequence and could trigger the heap corruption.
+
+    (The bug that made bogofilter decode attachments slowed down
+    bogofilter, too, and was fixed in bogofilter 0.96.4.)
+
+ii. When encountering HTML comments that were longer than the lexer
+    input buffer, bogofilter would overrun a buffer end and crash.
+
+It is not known if either of these bugs can be exploited to inject code.
 
 3. Impact
 =========
 
-Bogofilter crashed or corrupted its heap.
+Bogofilter corrupted its heap and crashed. In common configurations,
+messages would then remain in the queue and pile up.
 
 4. Workaround
 =============
 
-No reasonable workaround is known at this time.
+No reasonable workaround is known.
 
 5. Solution
 ===========
@@ -87,6 +99,5 @@ Stanford, California 94305; USA.
 
 THIS WORK IS PROVIDED FREE OF CHARGE AND WITHOUT ANY WARRANTIES.
 Use the information herein at your own risk.
-
 
 END of bogofilter-SA-2005-01
