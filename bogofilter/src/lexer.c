@@ -153,9 +153,6 @@ static int get_decoded_line(buff_t *buff)
     int count;
     buff_t *linebuff;
 
-    uint used = buff->t.leng;
-    byte *buf = buff->t.text + used;
-
     if (encoding == E_RAW ||
 	msg_state->mime_dont_decode ) {
 	linebuff = buff;
@@ -242,10 +239,12 @@ static int get_decoded_line(buff_t *buff)
 #endif
 
     /* CRLF -> NL */
-    buf = buff->t.text;
-    if (count >= 2 && memcmp(buf + count - 2, CRLF, 2) == 0) {
-	count --;
-	*(buf + count - 1) = (byte) '\n';
+    if (count >= 2) {
+	byte *buf = buff->t.text;
+	if (memcmp(buf + count - 2, CRLF, 2) == 0) {
+	    count --;
+	    *(buf + count - 1) = (byte) '\n';
+	}
     }
 
     if (buff->t.leng < buff->size)     /* for easier debugging - removable */
