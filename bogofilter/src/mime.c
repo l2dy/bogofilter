@@ -166,6 +166,7 @@ static void mime_init(mime_t * parent)
     msg_state->depth = (parent == NULL) ? 0 : msg_state->parent->depth + 1;
     msg_state->child  = NULL;
     msg_state->mime_dont_decode = false;
+    msg_state->mime_disposition = MIME_DISPOSITION_UNKNOWN;
 
     if (parent)
 	parent->child = msg_state;
