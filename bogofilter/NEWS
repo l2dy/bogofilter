@@ -13,6 +13,11 @@
 
 -------------------------------------------------------------------------------
 
+	2006-01-01
+
+	* Added CVE-2005 identifiers for defects described in
+          doc/bogofilter-SA-2005-01
+
 1.0.1	2006-01-01
 
 	* New names for binary rpms:

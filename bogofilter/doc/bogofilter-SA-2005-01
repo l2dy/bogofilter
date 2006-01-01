@@ -5,8 +5,8 @@ Topic:		two vulnerabilities in bogofilter and bogolexer < 0.96.2
 Announcement:	bogofilter-SA-2005-01
 Writer:		Matthias Andree
 Version:	1.00
-CVE ID:		XXX
-Announced:	XXX
+CVE ID:		CVE-2005-4591 & CVE-2005-4592
+Announced:	2005-10-26
 Category:	vulnerability
 Type:		segmentation fault through malformed input
 Impact:		denial of service, heap corruption
@@ -46,24 +46,27 @@ should migrate to bogofilter 1.0.0 or newer.
 Two security relevant bugs were found in bogofilter 0.96.2 and fixed in
 0.96.3, and apply to the "bogofilter" and "bogolexer" programs:
 
-i.  When encountering invalid input sequences, bogofilter could overrun
-    a malloc()'d buffer, corrupting the heap, while converting character
-    sets with untrusted data.  The only observed problem so far was a
-    crash, but we cannot rule out that code injection was possible.
+    CVE-2005-4591
 
-    This problem was aggravated by an unrelated bug that made bogofilter
-    decode attachments and attempt charset conversion on them. This way,
-    all octets in the range 0x80...0xff (which lie outside the MIME
-    default character set, US-ASCII) were considered an invalid input
-    sequence and could trigger the heap corruption.
+	 In some circumstances, bogofilter has overrun a malloc()'d
+	 buffer while converting character sets with untrusted
+	 data. The only observed problem so far was a crash, but we
+	 cannot rule out that code injection was possible.
 
-    (The bug that made bogofilter decode attachments slowed down
-    bogofilter, too, and was fixed in bogofilter 0.96.4.)
+	 In some circumstances, bogofilter would read past the end of
+	 a buffer, causing a program crash.
 
-ii. When encountering HTML comments that were longer than the lexer
-    input buffer, bogofilter would overrun a buffer end and crash.
+	 (The bug that made bogofilter decode attachments slowed down
+	 bogofilter, too, and was fixed in bogofilter 0.96.4.)
 
-It is not known if either of these bugs can be exploited to inject code.
+    CVE-2005-4592
+
+	When encountering HTML comments that were longer than the
+	lexer input buffer, bogofilter would overrun a buffer end and
+	crash.
+
+It is not known if either of these bugs can be exploited to inject
+code.
 
 3. Impact
 =========
