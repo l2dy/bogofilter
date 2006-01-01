@@ -13,6 +13,15 @@
 
 -------------------------------------------------------------------------------
 
+1.0.1	2006-01-01
+
+	* New names for binary rpms:
+
+	  bogofilter-db42 - requires shared library for DB-4.2.52
+	  bogofilter-db42-static - statically linked with DB-4.2.52
+	  bogofilter-sqlite3 - requires shared library for sqlite3-3.2.8
+	  bogofilter-sqlite3-static - statically linked with sqlite3-3.2.8
+
 	2005-12-30
 
 	* The configure help texts have been revised, the IEEE checks
