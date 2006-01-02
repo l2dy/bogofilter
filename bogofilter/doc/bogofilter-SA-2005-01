@@ -30,10 +30,10 @@ Not affected:	bogofilter 0.96.3 "current" (released 2005-10-26)
 1. Background
 =============
 
-Bogofilter is a software package to classify a mail as spam or non-spam.
-It uses a data base to store words and must be trained which mail are
-spam and non-spam. It uses the probabilities of individual words for
-classifying the message.
+Bogofilter is a software package for classifying a message as spam or
+non-spam.  It uses a data base to store words and must be trained
+which messages are spam and non-spam. It uses the probabilities of
+individual words for classifying the message.
 
 Note that the bogofilter project is issuing security announcements only
 for current "stable" releases, and not necessarily for past "stable"
