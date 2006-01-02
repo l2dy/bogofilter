@@ -78,8 +78,8 @@ typedef enum longopts_e {
     { "config-file",			R, 0, O_CONFIG_FILE }, \
     { "no-config-file",			N, 0, 'C' }, \
     { "help",				N, 0, 'h' }, \
-    { "input-file",			N, 0, 'I' }, \
-    { "output-file",			N, 0, 'O' }, \
+    { "input-file",			R, 0, 'I' }, \
+    { "output-file",			R, 0, 'O' }, \
        UNICODE_OPTION \
     { "version",			N, 0, 'V' }, \
     { "verbosity",			N, 0, 'v' },
