@@ -60,6 +60,11 @@
             <td width="397">Please see our <a href="http://sourceforge.net/projects/bogofilter/">Sourceforge project page</a>.</td>
           </tr>
           <tr bgcolor="#FFFFFF">
+	      <td width="169">Security Announcements</td>
+            <td width="397">Check out the bogofilter <a
+		    href="security/">security announcements</a>.</td>
+          </tr>
+          <tr bgcolor="#FFFFFF">
             <td width="169">Man Page</td>
             <td width="397">Check out the bogofilter <a
 		    href="man_page.shtml">man page</a>.</td>
