@@ -47,11 +47,11 @@ h6 {
 }
 a {
 	color : #ff3300;
-	border-bottom : 1px dashed inherit;
+	border-bottom : inherit ;
 }
 a:hover {
 	color : #cccc33;
-	border-bottom : 1px dashed inherit;
+	border-bottom : inherit ;
 }
 .blink {
 	color : #645e4f;
