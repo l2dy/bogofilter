@@ -83,7 +83,6 @@ Conflicts:	%{Name}%{DBName}
 %description static
 Statically linked bogofilter, bogolexer, bogoutil, and bogotune.
 
-# define another variable if we have an actually working debug_package:
 # use the debug_package macro if applicable:
 %{?debugrpm:%debug_package}
 %prep
