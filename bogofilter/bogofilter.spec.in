@@ -9,6 +9,13 @@
 #
 # rpmbuild --define 'with_sqlite 1' --sign -bb bogofilter.spec
 
+# To build -debuginfo RPMs on systems with RPM 4.2 or newer and recent
+# elfutils, add
+#
+# --define 'debugrpm 1'
+#
+# or place   %debugrpm 1   into your ~/.rpmmacros file.
+
 %define	Name		@PACKAGE@
 %define	Version		@VERSION@
 %define	Release		1
@@ -76,6 +83,9 @@ Conflicts:	%{Name}%{DBName}
 %description static
 Statically linked bogofilter, bogolexer, bogoutil, and bogotune.
 
+# define another variable if we have an actually working debug_package:
+# use the debug_package macro if applicable:
+%{?debugrpm:%debug_package}
 %prep
 %setup -q -n %{Name}-%{Version}
 CFLAGS="$RPM_OPT_FLAGS" \
@@ -103,7 +113,7 @@ make DESTDIR="%{buildroot}" check
 
 %install
 [ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
-make DESTDIR=%{buildroot} install-strip
+make DESTDIR=%{buildroot} install
 
 cp %{buildroot}%{_sysconfdir}/bogofilter.cf.example \
    %{buildroot}%{_sysconfdir}/bogofilter.cf
