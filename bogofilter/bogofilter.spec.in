@@ -85,6 +85,7 @@ Statically linked bogofilter, bogolexer, bogoutil, and bogotune.
 
 # use the debug_package macro if applicable:
 %{?debugrpm:%debug_package}
+
 %prep
 %setup -q -n %{Name}-%{Version}
 CFLAGS="$RPM_OPT_FLAGS" \
@@ -120,6 +121,10 @@ cp %{buildroot}%{_sysconfdir}/bogofilter.cf.example \
 for n in xml html ; do
   install -d .inst/$n
   install -m644 doc/*.$n .inst/$n
+done
+
+for n in `find %{buildroot}%{_datadir}/%{name} -type d` ; do
+  chmod o-w $n
 done
 
 for d in contrib ; do
