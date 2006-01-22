@@ -13,6 +13,10 @@
 
 -------------------------------------------------------------------------------
 
+	2006-01-21
+
+	* 1.0.1 Promoted to "Stable" status
+
 	2006-01-02
 
 	* Fixed --input-file and --output-file command line options.
