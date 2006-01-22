@@ -108,7 +108,7 @@ dsm_t *dsm = &dsm_sqlite;
 	"BEGIN TRANSACTION;"
 
 /* real functions */
-/** Initialize database handle and return it. 
+/** Initialize database handle and return it.
  * \returns non-NULL, as it exits with EX_ERROR in case of trouble. */
 static dbh_t *dbh_init(bfpath *bfp)
 {
@@ -156,7 +156,7 @@ static sqlite3_stmt *sqlprep(dbh_t *dbh, const char *cmd, bool bailout /** exit 
     const char *tail; /* dummy */
     sqlite3_stmt *ptr;
     if (sqlite3_prepare(dbh->db, cmd, strlen(cmd), &ptr, &tail) != SQLITE_OK) {
-	print_error(__FILE__, __LINE__, "cannot compile %s: %s\n", cmd, sqlite3_errmsg(dbh->db)); 
+	print_error(__FILE__, __LINE__, "cannot compile %s: %s\n", cmd, sqlite3_errmsg(dbh->db));
 	if (bailout)
 	    exit(EX_ERROR);
 	return NULL;
@@ -203,7 +203,6 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
 		found = true;
 		if (hook != NULL)
 		{
-
 		    key.leng = sqlite3_column_bytes(stmt, /* column */ 0);
 		    key.data = xmalloc(key.leng);
 		    memcpy(key.data, sqlite3_column_blob(stmt, 0), key.leng);
