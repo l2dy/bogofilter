@@ -459,9 +459,16 @@ static void check_db_version(void)
  * limit. errors from the system are ignored, no warning then.
  */
 static void check_fsize_limit(int fd, uint32_t pagesize) {
+
+    static bool fPrinted = false;
+
 #ifndef __EMX__
     struct stat st;
     struct rlimit rl;
+
+    // Only print this message once per run
+    if (fPrinted)
+	return;
 
     if (fstat(fd, &st)) return; /* ignore error */
     if (getrlimit(RLIMIT_FSIZE, &rl)) return; /* ignore error */
@@ -479,6 +486,7 @@ static void check_fsize_limit(int fd, uint32_t pagesize) {
 	    exit(EX_ERROR);
 	}
 	if ((off_t)(rl.rlim_cur >> 20) - (st.st_size >> 20) < 2) {
+	    fPrinted = true;
 	    print_error(__FILE__, __LINE__, "warning: data base file size approaches resource limit.");
 	    print_error(__FILE__, __LINE__, "         write errors (bumping into the limit) can cause");
 	    print_error(__FILE__, __LINE__, "         data base corruption.");

@@ -13,6 +13,10 @@
 
 -------------------------------------------------------------------------------
 
+	2006-01-28
+
+	* Only print Berkely DB file size message once per run.
+
 	2006-01-21
 
 	* 1.0.1 Promoted to "Stable" status
