@@ -577,7 +577,7 @@ You can download Berkeley DB 4.3.x from http://www.sleepycat.com/]]),
     DB_ENV *e;
     int r;
     if ((r = db_env_create(&e, 0))) barf("db_env_create", r);
-    if ((r = e->open(e, TESTDIR, DB_INIT_LOCK|DB_INIT_MPOOL|DB_CREATE, 0664)))
+    if ((r = e->open(e, TESTDIR, DB_INIT_LOG|DB_INIT_TXN|DB_INIT_MPOOL|DB_CREATE, 0664)))
 	barf("DB_ENV->open", r);
     if ((r = e->close(e, 0)))
         barf("DB_ENV->close", r);

@@ -13,6 +13,12 @@
 
 -------------------------------------------------------------------------------
 
+	2006-01-29
+
+	* The configure script, when checking Berkeley DB capabilities,
+	  now checks for logging and transactional subsystems rather
+	  than the locking subsystem that we abandoned before 1.0.0.
+
 	2006-01-28
 
 	* Only print Berkely DB file size message once per run.
