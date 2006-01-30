@@ -21,7 +21,9 @@
 
 	* The configure script, when checking Berkeley DB capabilities,
 	  now checks for logging and transactional subsystems rather
-	  than the locking subsystem that we abandoned before 1.0.0.
+	  than the locking subsystem that was abandoned before 1.0.0.
+	  This appears a suitable workaround for configure lockups on
+	  OpenBSD 3.7 macppc with db 4.2 or 4.3.
 
 	2006-01-28
 
