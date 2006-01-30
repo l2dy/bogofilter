@@ -65,11 +65,12 @@ fi
 #
 # run tests for msg.1.txt, msg.2.txt, and msg.3.txt
 #
-for tst in 1.1.v 2.2a.vv 2.2a.vvv 3.3.vvv ; do
+for tst in 1.1.v.yes 2.2a.vv.yes 2.2a.vvv.no 3.3.vvv.no ; do
     in=`echo $tst | tr "." " " | $AWK '{print $1}'`
     out=`echo $tst | tr "." " " | $AWK '{print $2}'`
     ver=`echo $tst | tr "." " " | $AWK '{print $3}'`
-    map_rc $BOGOFILTER $OPTS -$ver 2>/dev/null \
+    sih=`echo $tst | tr "." " " | $AWK '{print $4}'`
+    map_rc $BOGOFILTER $OPTS --stats-in-header=$sih -$ver 2>/dev/null \
     < ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/out || :
     sed s/,.version=.*// < ${TMPDIR}/out > ${TMPDIR}/msg.$out.$ver
 done
@@ -78,11 +79,12 @@ done
 #    (expect different results from first run)
 #
 $BOGOFILTER $OPTS -s < ${SYSTEST}/inputs/msg.3.txt
-for tst in 2.2b.vv 2.2b.vvv ; do
+for tst in 2.2b.vv.yes 2.2b.vvv.no ; do
     in=`echo $tst | tr "." " " | $AWK '{print $1}'`
     out=`echo $tst | tr "." " " | $AWK '{print $2}'`
     ver=`echo $tst | tr "." " " | $AWK '{print $3}'`
-    map_rc $BOGOFILTER $OPTS -$ver 2>/dev/null \
+    sih=`echo $tst | tr "." " " | $AWK '{print $4}'`
+    map_rc $BOGOFILTER $OPTS --stats-in-header=$sih -$ver 2>/dev/null \
     < ${SYSTEST}/inputs/msg.$in.txt > ${TMPDIR}/out
     sed s/,.version=.*// < ${TMPDIR}/out > ${TMPDIR}/msg.$out.$ver
 done

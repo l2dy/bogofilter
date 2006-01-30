@@ -93,7 +93,7 @@ message
 EOF
 
 # suppress version info in output
-BFOPTS="-D -H -e -m0.1 -y 0"
+BFOPTS="-D -H -e -m0.1 -y 0 --stats-in-header=no"
 BFHEAD='--header-format=%h: %c, tests=bogofilter, spamicity=%p'
 
 # build wordlists

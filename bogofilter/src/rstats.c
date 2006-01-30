@@ -268,7 +268,7 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 	if (Rtable)
 	    (void)fprintf(fpo, "%s%10.5f%10.5f",
 			  pfx, log(1.0 - fw), log(fw));
-	(void)fprintf(fpo, "%s %c\n", pfx, flag);
+	(void)fprintf(fpo, " %c\n", flag);
     }
 
     /* print trailer */
