@@ -228,14 +228,16 @@ static void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t 
 static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 {
     size_t r;
+    const char *pfx = !stats_in_header ? "" : "  ";
+
 
     /* print header */
     if (!Rtable)
-	(void)fprintf(fpo, "%*s %6s    %-6s    %-6s    %-6s %s\n",
-		      MAXTOKENLEN+2,"","n", "pgood", "pbad", "fw", "U");
+	(void)fprintf(fpo, "%s%*s %6s    %-6s    %-6s    %-6s %s\n",
+		      pfx, MAXTOKENLEN+2,"","n", "pgood", "pbad", "fw", "U");
     else
-	(void)fprintf(fpo, "%*s %6s    %-6s    %-6s    %-6s  %-6s    %-6s %s\n",
-		      MAXTOKENLEN+2,"","n", "pgood", "pbad", "fw","invfwlog", "fwlog", "U");
+	(void)fprintf(fpo, "%s%*s %6s    %-6s    %-6s    %-6s  %-6s    %-6s %s\n",
+		      pfx, MAXTOKENLEN+2,"","n", "pgood", "pbad", "fw","invfwlog", "fwlog", "U");
 
     /* Print 1 line per token */
     for (r= 0; r<count; r+=1)
@@ -245,7 +247,7 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 	double fw = calc_prob(cur->good, cur->bad, cur->msgs_good, cur->msgs_bad);
 	char flag = (fabs(fw-EVEN_ODDS) - min_dev >= EPS) ? '+' : '-';
 
-	(void)fputc( '"', fpo);
+	(void)fprintf(fpo, "%s\"", pfx);
 	(void)word_puts(cur->token, 0, fpo);
 
 	if (cur->msgs_good == 0 && cur->msgs_bad == 0)
@@ -264,11 +266,11 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 			  fw);
 
 	if (Rtable)
-	    (void)fprintf(fpo, "%10.5f%10.5f",
-			  log(1.0 - fw), log(fw));
-	(void)fprintf(fpo, " %c\n", flag);
+	    (void)fprintf(fpo, "%s%10.5f%10.5f",
+			  pfx, log(1.0 - fw), log(fw));
+	(void)fprintf(fpo, "%s %c\n", pfx, flag);
     }
 
     /* print trailer */
-    msg_print_summary();
+    msg_print_summary(pfx);
 }

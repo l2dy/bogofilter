@@ -13,6 +13,10 @@
 
 -------------------------------------------------------------------------------
 
+	2006-01-30
+
+	* Fix formatting of Rtable output when in the message header.
+
 	2006-01-29
 
 	* The configure script, when checking Berkeley DB capabilities,
