@@ -15,7 +15,8 @@
 
 	2006-01-30
 
-	* Fix formatting of Rtable output when in the message header.
+	* Fix formatting of Rtable output when in the message header,
+	  this keeps verbose passthrough modes RFC-822/2822 compliant.
 
 	2006-01-29
 
