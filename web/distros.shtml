@@ -139,13 +139,6 @@
                 </tr>
 		<tr><td colspan="3"><a href="http://www.suse.com/" target="_blank"><strong>SuSE Linux</strong></a></td></tr>
                 <tr>
-		    <td>SuSE Linux 9.0 (until 2005-12-15)</td>
-                  <td>0.14.4</td>
-                  <td>
-                    <div align="center">BerkeleyDB</div>
-                  </td>
-                </tr>
-                <tr>
                   <td>SuSE Linux 9.1</td>
                   <td>0.16.4</td>
                   <td>
