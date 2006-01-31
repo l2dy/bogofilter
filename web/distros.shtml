@@ -161,14 +161,14 @@
                 </tr>
                  <tr>
                   <td>SUSE Linux 9.3</td>
-                  <td>0.94.12 (via YaST Online Update)</td>
+                  <td>0.94.12-2.3 (via YaST Online Update)</td>
                   <td>
                     <div align="center">BerkeleyDB 4.3</div>
                   </td>
                 </tr>
 		<tr>
 		    <td>SUSE Linux 10.0</td>
-		    <td>0.95.2</td>
+		    <td>0.95.2-2.2 (via YaST Online Update)</td>
 		    <td><div align="center">BerkeleyDB 4.3</div></td>
 		</tr>
               </table>
