@@ -13,6 +13,10 @@
 
 -------------------------------------------------------------------------------
 
+	2006-02-06
+
+	* Flush output after writing spam header line and/or message body.
+
 	2006-01-30
 
 	* Fix formatting of Rtable output when in the message header,

@@ -215,9 +215,6 @@ static void write_body(readfunc_t rf, void *rfarg)
     }
 
     if (!hadlf) (void) fputs(eol, fpo);
-
-    if (fflush(fpo) || ferror(fpo))
-	cleanup_exit(EX_ERROR, 1);
 }
 
 static void build_spam_header(void)
@@ -282,6 +279,13 @@ void write_message(rc_t status)
 
     if (passthrough) 
 	write_body(rf, rfarg);
+
+    if (passthrough || verbose || Rtable) {
+	if (fflush(fpo) || ferror(fpo))
+	    cleanup_exit(EX_ERROR, 1);
+    }
+
+    return;
 }
 
 void write_log_message(rc_t status)
