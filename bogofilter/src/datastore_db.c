@@ -458,8 +458,9 @@ static void check_db_version(void)
  * current resource limit and warn if file size is "close" (2 MB) to the
  * limit. errors from the system are ignored, no warning then.
  */
-static void check_fsize_limit(int fd, uint32_t pagesize) {
+static bool check_fsize_limit(int fd, uint32_t pagesize) {
 
+    bool ok = true;
     static bool fPrinted = false;
 
 #ifndef __EMX__
@@ -468,10 +469,10 @@ static void check_fsize_limit(int fd, uint32_t pagesize) {
 
     // Only print this message once per run
     if (fPrinted)
-	return;
+	return ok;
 
-    if (fstat(fd, &st)) return; /* ignore error */
-    if (getrlimit(RLIMIT_FSIZE, &rl)) return; /* ignore error */
+    if (fstat(fd, &st)) return ok; /* ignore error */
+    if (getrlimit(RLIMIT_FSIZE, &rl)) return ok; /* ignore error */
     if (rl.rlim_cur != (rlim_t)RLIM_INFINITY) {
 	/* WARNING: Be extremely careful that in these comparisons there
 	 * is no unsigned term, it will spoil everything as C will
@@ -480,11 +481,12 @@ static void check_fsize_limit(int fd, uint32_t pagesize) {
 	 * work when pagesize doesn't fit into signed long. ("requires"
 	 * 2**31 for file size and 32-bit integers to fail) */
 	if ((off_t)(rl.rlim_cur/pagesize) - st.st_size/(long)pagesize < 16) {
-	    print_error(__FILE__, __LINE__, "error: the data base file size is only 16 pages");
-	    print_error(__FILE__, __LINE__, "       below the resource limit. Cowardly refusing");
-	    print_error(__FILE__, __LINE__, "       to continue to avoid data base corruption.");
-	    exit(EX_ERROR);
+	    print_error(__FILE__, __LINE__, "error: the data base file size is within 16 pages");
+	    print_error(__FILE__, __LINE__, "       of the resource limit. Cowardly refusing");
+	    print_error(__FILE__, __LINE__, "       to write to avoid data base corruption.");
+	    ok = false;
 	}
+	else
 	if ((off_t)(rl.rlim_cur >> 20) - (st.st_size >> 20) < 2) {
 	    fPrinted = true;
 	    print_error(__FILE__, __LINE__, "warning: data base file size approaches resource limit.");
@@ -493,6 +495,7 @@ static void check_fsize_limit(int fd, uint32_t pagesize) {
 	}
     }
 #endif
+    return ok;
 }
 
 /* The old, pre-3.3 API will not fill in the page size with
@@ -710,7 +713,11 @@ retry_db_open:
 	    pagesize = 16384;
 
 	/* check file size limit */
-	check_fsize_limit(handle->fd, pagesize);
+	if (open_mode != DS_READ) {
+	    if (!check_fsize_limit(handle->fd, pagesize)) {
+		open_mode = DS_READ;
+	    }
+	}
 
 	/* Begin complex change ... */
 	e = dsm->dsm_lock(handle, open_mode);

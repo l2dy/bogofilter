@@ -16,6 +16,8 @@
 	2006-02-06
 
 	* Flush output after writing spam header line and/or message body.
+	* When database is near to maximum allowed size, allow reading
+	  it and disallow writing to it.
 
 	2006-01-30
 
