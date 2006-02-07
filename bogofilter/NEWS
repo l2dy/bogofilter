@@ -34,7 +34,7 @@
 
 	2006-01-28
 
-	* Only print Berkely DB file size message once per run.
+	* Only print Berkeley DB file size message once per run.
 
 	2006-01-21
 
