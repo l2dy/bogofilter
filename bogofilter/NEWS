@@ -13,6 +13,14 @@
 
 -------------------------------------------------------------------------------
 
+	2006-02-14
+
+	* SleepyCat has been acquired by Oracle, who are now providing
+	  Berkeley DB. Since most of the references are to actual
+	  strings in the programs or addresses that remain unchanged,
+	  this will only gradually show in the bogofilter sources and
+	  documentation.
+
 	2006-02-06
 
 	* Flush output after writing spam header line and/or message body.
