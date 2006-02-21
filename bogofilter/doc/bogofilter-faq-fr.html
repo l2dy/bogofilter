@@ -154,12 +154,22 @@
         Utiliser Bogofilter avec différents programmes de messagerie
 
         <ul>
-          <li><a href="#which-muas">Avec quel programme de messagerie, Bogofilter fonctionne?</a></li>
-          <li><a href="#with-mutt">Comment utiliser Bogofilter avec Mutt?</a></li>
-          <li><a href="#with-sc">Comment utiliser Bogofilter avec Sylpheed Claws?</a></li>
+          <li><a href="#which-muas">Avec quel programme de messagerie,
+          Bogofilter fonctionne?</a></li>
 
-          <li><a href="#with-mh-e">Comment utiliser Bogofilter avec MH-E (l'interface Emacs interface au système de
-	  messagerie MH)?</a></li>
+          <li><a href="#with-mutt">Comment utiliser Bogofilter avec
+          Mutt?</a></li>
+
+          <li><a href="#with-sc">Comment utiliser Bogofilter avec
+          Sylpheed Claws?</a></li>
+
+          <li><a href="#with-vm">Comment utiliser Bogofilter avec VM
+	  (un logiciel de messagerie sous Emacs)?</a></li>
+
+          <li><a href="#with-mh-e">Comment utiliser Bogofilter avec
+	  MH-E (l'interface Emacs interface au système de messagerie
+	  MH)?</a></li>
+
         </ul>
       </li>
     </ul>
@@ -1497,6 +1507,38 @@
 
     <p>D'autres informations sur cette approche sont disponibles <a
     href="http://www.bogofilter.org/pipermail/bogofilter/2005-March/007815.html">ici</a>.</p>
+
+    <hr>
+
+    <h2 id="with-vm">Comment utiliser Bogofilter avec VM (un logiciel de messagerie sous Emacs)?</h2>
+
+    <p>Vous devez inclure le fichier vm-bogofilter.el (que vous pouvez
+    avec la distributione bogofilter ou télécharger à
+    http://www.cis.upenn.edu/~bjornk/bogofilter/vm-bogofilter.el) dans
+    le chemin des bibliothèques de votre Emacs.</p>
+
+    <p>Il ne vous reste plus qu'à mettre dans votre fichier de
+    configuration ~/.vm :</p>
+
+<pre>;; Lutte contre les pourriels (via bogofilter)
+;;
+(require 'vm-bogofilter)
+
+;; Raccourcis-clavier pour bogofilter
+;; C (shift-c) : pourriel
+;; K (shift-k) : message correct
+(define-key vm-mode-map "K" 'vm-bogofilter-is-spam)
+(define-key vm-mode-map "C" 'vm-bogofilter-is-clean)
+</pre>
+
+    <p>Tous les messages sont filtrés par bogofilter à chaque fois que
+    vous vérifiez vos nouveaux messages. Quand vous changez l'état
+    d'un message, les en-têtes du message sont changées (en-tête
+    X-Bogosity:).</p>
+
+    <p>Il y a toutefois une limite : vous ne pouvez changer l'état
+    d'un ensemble de messages sélectionnés : vous devez le faire
+    message après message...</p>
 
     <hr>
 

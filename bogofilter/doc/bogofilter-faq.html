@@ -160,10 +160,21 @@
         Using Bogofilter with different mail programs
 
         <ul>
-          <li><a href="#which-muas">With which mail programs does bogofilter work?</a></li>
-          <li><a href="#with-mutt">How do I use bogofilter with mutt?</a></li>
-          <li><a href="#with-sc">How do I use bogofilter with Sylpheed Claws?</a></li>
-          <li><a href="#with-mh-e">How do I use bogofilter with MH-E (the Emacs interface to the MH mail system)?</a></li>
+          <li><a href="#which-muas">With which mail programs does
+          bogofilter work?</a></li>
+
+          <li><a href="#with-mutt">How do I use bogofilter with
+          mutt?</a></li>
+
+          <li><a href="#with-sc">How do I use bogofilter with Sylpheed
+          Claws?</a></li>
+
+          <li><a href="#with-vm">How do I use bogofilter with VM (an
+          Emacs Mail tool)?</a></li>
+
+          <li><a href="#with-mh-e">How do I use bogofilter with MH-E
+          (the Emacs interface to the MH mail system)?</a></li>
+
         </ul>
       </li>
     </ul>
@@ -1542,6 +1553,37 @@
 
     <p>Additional information on this approach is available <a
     href="http://www.bogofilter.org/pipermail/bogofilter/2005-March/007815.html">here</a>.</p>
+
+    <hr>
+
+    <h2 id="with-vm">How do I use bogofilter with VM (an Emacs Mail
+    tool)?</h2>
+
+    <p>You need to include the separate file vm-bogofilter.el
+    (included in bogofilter's contrib directory).  The latest version
+    of the file is at
+    http://www.cis.upenn.edu/~bjornk/bogofilter/vm-bogofilter.el) in
+    your emacs path.</p>
+
+    <p>Then, just add in your ~/.vm configuration file:</p>
+
+<pre>;; load bogofilter capabilities (spam)
+;;
+(require 'vm-bogofilter)
+
+;; short-key for bogofilter
+;; C (shift-c) means spam message
+;; K (shift-k) means ham message
+(define-key vm-mode-map "K" 'vm-bogofilter-is-spam)
+(define-key vm-mode-map "C" 'vm-bogofilter-is-clean)
+</pre>
+
+    <p>All the messages are filtered by bogofilter each time you check
+    newly arrived e-mail.  When you change the status of an e-mail,
+    the bogofilter header is changed (X-Bogosity: header).</p>
+
+    <p>There is a limit: you cannot change multiple message headers at
+    one time in VM; you have to do it message by message.</p>
 
     <hr>
 

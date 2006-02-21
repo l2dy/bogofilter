@@ -121,5 +121,6 @@ EXTRA_DIST+= \
 	contrib/scramble.sh \
 	contrib/spamitarium.pl \
 	contrib/stripsearch.pl \
-	contrib/trainbogo.sh
+	contrib/trainbogo.sh \
+	contrib/vm-bogofilter.el
 # ---------------------------------------------------------------------

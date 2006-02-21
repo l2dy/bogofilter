@@ -13,6 +13,13 @@
 
 -------------------------------------------------------------------------------
 
+	2006-02-19
+
+	* Added vm-bogofilter.el for using bogofilter with VM, an
+          Emacs mail tool (thanks to Bjorn Knutsson).
+	* Added FAQ question "How do I use bogofilter with VM (an
+          Emacs mail tool)?" (thanks to Pimpon)
+
 	2006-02-14
 
 	* SleepyCat has been acquired by Oracle, who are now providing
@@ -106,7 +113,7 @@
 
 	2005-12-17
 	
-	* XML documentation cleanups (thanks to Nicholas Kaiser)
+	* XML documentation cleanups (thanks to Nicholas Kaiser).
 
 	2005-12-06
 
