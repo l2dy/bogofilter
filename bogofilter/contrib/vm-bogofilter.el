@@ -2,7 +2,9 @@
 ;;
 ;; An interface between the VM mail reader and the bogofilter spam filter.
 ;;
-;; Copyright (C) 2003-2006 by Bjorn Knutsson
+;; This file is in Unicode charset, with UTF-8 encoding.
+;;
+;; Copyright (C) 2003-2006 by Björn Knutsson
 ;;
 ;; Home page: http://www.cis.upenn.edu/~bjornk/
 ;;

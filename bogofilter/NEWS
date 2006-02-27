@@ -4,6 +4,8 @@
 
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
+	This file is in Unicode charset, with UTF-8 encoding.
+
 	Sections headed '[Incompat <version>]' and '[Major <version>]'
 	are particularly important.  They describe changes that are
 	incompatible with earlier releases or are significantly
@@ -16,7 +18,7 @@
 	2006-02-19
 
 	* Added vm-bogofilter.el for using bogofilter with VM, an
-          Emacs mail tool (thanks to Bjorn Knutsson).
+          Emacs mail tool (thanks to Björn Knutsson).
 	* Added FAQ question "How do I use bogofilter with VM (an
           Emacs mail tool)?" (thanks to Pimpon)
 

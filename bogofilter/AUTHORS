@@ -1,5 +1,7 @@
 # $Id$
 
+This file is in Unicode charset, with UTF-8 encoding.
+
 Eric S. Raymond	(Initial Version)
 Adrian Otto	(portability code, file locking)
 Paul Tomblin	(bug fixes)
@@ -47,5 +49,5 @@ Tom Anderson
 Tobias Roppelt
 Elmar Hoffmann
 Nicolas Kaiser
-Bjorn Knutsson
+Björn Knutsson
 Pimpon
