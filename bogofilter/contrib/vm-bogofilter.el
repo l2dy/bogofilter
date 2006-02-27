@@ -1,8 +1,8 @@
-;;; vm-bogofilter.el version 1.1.3
+;;; vm-bogofilter.el version 1.1.4
 ;;
 ;; An interface between the VM mail reader and the bogofilter spam filter.
 ;;
-;; Copyright (C) 2003-2005 by Bjorn Knutsson
+;; Copyright (C) 2003-2006 by Bjorn Knutsson
 ;;
 ;; Home page: http://www.cis.upenn.edu/~bjornk/
 ;;
@@ -27,7 +27,9 @@
 ;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ;;
 ;;; Version history:
-;;
+;; v 1.1.4: Change in the way bogofilter is called
+;;        * No longer uses formail to process mails
+;;        * Slightly improved error handling
 ;; v 1.1.3: Minor edits
 ;;        * Documentation updates
 ;;        * Error checking for bogofilter calls.
@@ -202,6 +204,12 @@ mis-classification."
   :group 'vm-bogofilter
   :type 'string)
 
+(defcustom vm-bogofilter-program-mbox "-M"
+  "*Options for the bogofilter program. This flags tells bogofilter
+how to process mailboxes, i.e., multiple messages."
+  :group 'vm-bogofilter
+  :type 'string)
+
 (defcustom vm-bogofilter-program-options-unspam "-Sn"
   "*Options for the bogofilter program when declaring a spam-marked
 message as clean. The default, '-Sn', assumes that bogofilter already
@@ -272,16 +280,14 @@ vm-retrieved-spooled-mail-hook."
        (let ((res (call-process-region (point) (point-max)
 				       (or shell-file-name "sh")
 				       t t nil shell-command-switch
-				       (concat vm-bogofilter-formail-program " "
-					       vm-bogofilter-formail-program-options " "
-					       vm-bogofilter-program " "
-					       vm-bogofilter-program-options))))
+				       (concat vm-bogofilter-program " "
+					       vm-bogofilter-program-options " "
+					       vm-bogofilter-program-mbox))))
 
 	 (if (and res (not (and (integerp res) (zerop res))))
 	     (error "Something went wrong filtering new messages (exit %s)"
-		    res))
-	 
-	 (delete-region (point) (point-max)))
+		    res)
+	   (delete-region (point) (point-max))))
        (message "Filtering new messages... done.")
        )
      )
