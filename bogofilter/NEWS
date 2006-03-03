@@ -15,12 +15,14 @@
 
 -------------------------------------------------------------------------------
 
+1.0.2	2006-03-03
+
 	2006-02-19
 
 	* Added vm-bogofilter.el for using bogofilter with VM, an
           Emacs mail tool (thanks to Björn Knutsson).
 	* Added FAQ question "How do I use bogofilter with VM (an
-          Emacs mail tool)?" (thanks to Pimpon)
+          Emacs mail tool)?" (thanks to Pimpon).
 
 	2006-02-14
 
