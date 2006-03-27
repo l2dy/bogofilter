@@ -15,6 +15,7 @@ Summary:
   b. Building & Installing
   c. Configuring
   d. Changing Bogofilter
+7. License
 
 
 0. IMPORTANT
@@ -189,3 +190,10 @@ to the list.
 
   These requirements do not apply if you are building an unmodified
   tarball.
+
+
+7. License
+----------
+
+Bogofilter is offered under the GNU general public license v2,
+see the COPYING file for details.
