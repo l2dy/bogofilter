@@ -948,9 +948,6 @@ static int process_arglist(int argc, char **argv)
 
 #define	OPTIONS	":c:Cd:DeEM:n:qr:s:tT:vVx:"
 
-    /* this function uses a few gotos below, to avoid code duplication
-     * that may lead to inconsistencies if one edit is forgotten. */
-
     while (1)
     {
 	int option;
@@ -962,6 +959,19 @@ static int process_arglist(int argc, char **argv)
 
 	if (option == -1)
  	    break;
+
+	if (option == 1) {
+	    /* If getopt's RETURN_IN_ORDER behavior */
+	    switch (lastmode) {
+	    case 'n':
+	    case 's':
+		option = lastmode;
+		break;
+	    default:
+		fprintf(stderr,
+			"File names may only be given after -n or -s options.\n");
+	    }
+	}
 
 	switch (option) {
 	case 'c':
@@ -988,7 +998,6 @@ static int process_arglist(int argc, char **argv)
 	    break;
 	case 'n':
 	    lastmode = 'n';
-hamarg:	    /* <-  case 1 jumps to this label */
 	    filelist_add(ham_files, optarg);
 	    break;
 	case 'q':
@@ -999,22 +1008,7 @@ hamarg:	    /* <-  case 1 jumps to this label */
 	    break;
 	case 's':
 	    lastmode = 's';
-spamarg:    /* <-  case 1 jumps to this label */
 	    filelist_add(spam_files, optarg);
-	    break;
-	case 1:
-	    /* GNU getopt RETURN_IN_ORDER special
-	     * (requires '-' as first character in optstring)
-	     */
-	    switch (lastmode) {
-		case 'n':
-		    goto hamarg;
-		case 's':
-		    goto spamarg;
-	    }
-	    fprintf(stderr,
-		    "File names may only be given after -n or -s options.\n");
-	    goto usage;
 	    break;
 #ifdef	TEST
 	case 't':
@@ -1037,7 +1031,6 @@ spamarg:    /* <-  case 1 jumps to this label */
 		set_debug_mask( optarg );
 	    break;
 	default:
-usage:	    /* <- case 1 jumps to this label */
 	    help();
 	    exit(EX_ERROR);
 	}
