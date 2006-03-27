@@ -57,7 +57,9 @@ if test -f "$BOGOHOME"/DB_CONFIG ; then
 fi
 
 # determine transactions
-if test "`find "$BOGOHOME/" -name "log.??????????" -print`" != "" ; then
+if test "`find "$BOGOHOME/" -name "log.??????????" -print`" = "" ; then
+    TXN=no
+else
     TXN=yes
 fi
 
