@@ -15,6 +15,17 @@
 
 -------------------------------------------------------------------------------
 
+	2006-03-26
+
+	* Corrected problem with bogotune's -D option (thanks to Jason
+          Smith).
+
+	* Corrected man page descriptio of bogotune's -n and -s options.
+
+	2006-03-17
+
+	* Fixed bf_compact's test for transactional environment.
+
 	2006-03-12
 
 	* 1.0.2 Promoted to "Stable" status

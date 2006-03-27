@@ -1495,8 +1495,10 @@ static rc_t bogotune(void)
     */
 
     robx = get_robx();
-    db_cachesize = calc_db_cachesize();
-    printf("Recommended db cache size is %u MB\n", db_cachesize);
+    if (ds_flag == DS_DSK) {
+	db_cachesize = calc_db_cachesize();
+	printf("Recommended db cache size is %u MB\n", db_cachesize);
+    }
 
     /*
     ** 6.  Calculate fp target

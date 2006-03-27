@@ -90,13 +90,13 @@
     proportionately.</para>
 
     <para>The <option>-n</option> option tells
-    <application>bogotune</application> that the following arguments
-    are files (or folders) containing non-spam. It can be repeated as
+    <application>bogotune</application> that the following argument
+    is a file (or folder) containing non-spam. It can be repeated as
     often as necessary.</para>
 
     <para>The <option>-s</option> option tells
-    <application>bogotune</application> that the following arguments
-    are files (or folders) containing spam. It can be repeated as often
+    <application>bogotune</application> that the following argument
+    is a file (or folder) containing spam. It can be repeated as often
     as necessary.</para>
 
     <para>The <option>-r <replaceable>value</replaceable></option>
