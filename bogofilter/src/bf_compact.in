@@ -44,16 +44,16 @@ else
     fi
 fi
 
-TEMP="bf_compact.$$"
+BOGOTEMP="bf_compact.$$"
 
-mkdir "$TEMP" || {
-    echo "Cannot create directory $TEMP. Abort."
+mkdir "$BOGOTEMP" || {
+    echo "Cannot create directory $BOGOTEMP. Abort."
     exit 1
 }
 
 # copy Berkeley DB configuration if present
 if test -f "$BOGOHOME"/DB_CONFIG ; then
-    cp -p "$BOGOHOME"/DB_CONFIG "$TEMP"/
+    cp -p "$BOGOHOME"/DB_CONFIG "$BOGOTEMP"/
 fi
 
 # determine transactions
@@ -64,16 +64,16 @@ fi
 # reload files
 for FILE in $FILES ; do
     NAME=`basename $FILE`
-    bogoutil -d $FILE | bogoutil --db-transaction=no -l $TEMP/$NAME
+    bogoutil -d $FILE | bogoutil --db-transaction=no -l $BOGOTEMP/$NAME
 done
 
-if [ -n "$TXN" ] ; then
+if [ $TXN = "yes" ] ; then
     #create database environment files
-    bogofilter -e -C -d $TEMP --db-transaction=yes < /dev/null
+    bogofilter -e -C -d $BOGOTEMP --db-transaction=yes < /dev/null
 fi
 
 # remove $BOGOHOME.old so we don't move the new backup *into* it
 # rather than renaming the backup to it.
 rm -rf "$BOGOHOME.old"
 mv "$BOGOHOME" "$BOGOHOME.old"
-mv  $TEMP      "$BOGOHOME"
+mv  $BOGOTEMP  "$BOGOHOME"
