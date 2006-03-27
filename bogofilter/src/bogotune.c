@@ -8,6 +8,7 @@ NAME:
 AUTHORS:
    Greg Louis - perl version
    David Relson - C version
+   Matthias Andree - options parser usability
 
 ******************************************************************************/
 
@@ -936,6 +937,7 @@ static struct option longopts_bogotune[] = {
 static int process_arglist(int argc, char **argv)
 {
     int  count = 1;
+    int  lastmode = -1;
 
     bulk_mode = B_CMDLINE;
 
@@ -946,11 +948,17 @@ static int process_arglist(int argc, char **argv)
 
 #define	OPTIONS	":c:Cd:DeEM:n:qr:s:tT:vVx:"
 
+    /* this function uses a few gotos below, to avoid code duplication
+     * that may lead to inconsistencies if one edit is forgotten. */
+
     while (1)
     {
 	int option;
-	
-	option = getopt(argc, argv, OPTIONS);
+
+	option = getopt(argc, argv, "-" OPTIONS);
+	/* the "-" is a GNU getopt special to enable RETURN_IN_ORDER
+	 * behavior, i. e. nonoption arguments are returned as
+	 * option == 1 here. */
 
 	if (option == -1)
  	    break;
@@ -979,8 +987,9 @@ static int process_arglist(int argc, char **argv)
 	    bogolex_file = optarg;
 	    break;
 	case 'n':
-	    run_type = REG_GOOD;
-	    filelist_add( ham_files, optarg );
+	    lastmode = 'n';
+hamarg:	    /* <-  case 1 jumps to this label */
+	    filelist_add(ham_files, optarg);
 	    break;
 	case 'q':
 	    quiet = true;
@@ -989,8 +998,23 @@ static int process_arglist(int argc, char **argv)
 	    user_robx = atof(optarg);
 	    break;
 	case 's':
-	    run_type = REG_SPAM;
-	    filelist_add( spam_files, optarg );
+	    lastmode = 's';
+spamarg:    /* <-  case 1 jumps to this label */
+	    filelist_add(spam_files, optarg);
+	    break;
+	case 1:
+	    /* GNU getopt RETURN_IN_ORDER special
+	     * (requires '-' as first character in optstring)
+	     */
+	    switch (lastmode) {
+		case 'n':
+		    goto hamarg;
+		case 's':
+		    goto spamarg;
+	    }
+	    fprintf(stderr,
+		    "File names may only be given after -n or -s options.\n");
+	    goto usage;
 	    break;
 #ifdef	TEST
 	case 't':
@@ -1013,6 +1037,7 @@ static int process_arglist(int argc, char **argv)
 		set_debug_mask( optarg );
 	    break;
 	default:
+usage:	    /* <- case 1 jumps to this label */
 	    help();
 	    exit(EX_ERROR);
 	}

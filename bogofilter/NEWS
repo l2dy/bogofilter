@@ -15,12 +15,16 @@
 
 -------------------------------------------------------------------------------
 
+	2006-03-27
+
+	* Corrected option parsing in bogotune to support -n ham1 ham2
+	  -s spam1 spam2 as suggested by bogotune -h; broken since 0.93.2.
+
 	2006-03-26
 
-	* Corrected problem with bogotune's -D option (thanks to Jason
-          Smith).
+	* Corrected problem with bogotune's -D option (thanks to Jason Smith).
 
-	* Corrected man page descriptio of bogotune's -n and -s options.
+	* Corrected man page description of bogotune's -n and -s options.
 
 	2006-03-17
 
