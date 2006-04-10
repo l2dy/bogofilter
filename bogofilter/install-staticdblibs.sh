@@ -1,10 +1,10 @@
 #! /bin/sh
 
-# install-statics.sh -- shell script to fetch, build and install
-#                       the static libraries bogofilter links against,
-#                       to ease building of portable RPMs.
+# install-staticdblibs.sh -- shell script to fetch, build and install
+#                            the static libraries bogofilter links against,
+#                            to ease building of portable RPMs.
 
-# (C) Copyright 2005 Matthias Andree, <matthias.andree@gmx.de>
+# (C) Copyright 2005,2006  Matthias Andree <matthias.andree@gmx.de>
 # All rights reserved.
 #
 # This script can be redistributed solely under the terms of the
@@ -77,7 +77,7 @@ cd ${TMPDIR:=/var/tmp}
 
 dbdir=db-4.2.52
 dbpfx=/opt/db-4.2-lean
-sqdir=sqlite-3.2.8
+sqdir=sqlite-3.3.5
 sqpfx=/opt/sqlite-3-lean
 
 ### download SleepyCat DB 4.2.52 and patches
@@ -91,16 +91,15 @@ if test ! -f $dbpfx/lib/libdb.a ; then
     build_db=1
 fi
 
-### download SQLite 3.2.8
-# the objdump test fixes up the effects of a bug
-# in an earlier version of this script,
-# that built a sqlite 3.2.8 version that depended
-# on GLIBC_2.3
+### download SQLite 3.3.5
+# Info: the objdump test fixes up the effects of a bug
+# in an earlier version of this script, which built
+# a sqlite 3.2.8 version that required GLIBC_2.3.
 build_sqlite=0
 if test ! -f $sqpfx/lib/libsqlite3.a || \
     objdump -t /opt/sqlite-3-lean/lib/libsqlite3.a \
 	| grep -q __ctype_b_loc ; then
-    want http://www.sqlite.org/sqlite-3.2.8.tar.gz             9f2c014aaa46565b8163e047166a5686
+    want http://www.sqlite.org/sqlite-3.3.5.tar.gz             dd2a7b6f2a07a4403a0b5e17e8ed5b88
     build_sqlite=1
 fi
 
