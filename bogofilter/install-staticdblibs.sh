@@ -62,13 +62,20 @@ _md5_file() {
 
 # fetch file and check MD5 sum
 want() {
-    if test ! -f ${1##*/} || test "$(_md5_file ${1##*/})" != "$2"
-    then
-	rm -f ${1##*/}
-	echo "fetching $1 -> ${1##*/}"
+    f=${1##*/}
+    if test ! -f ${f} || test "$(_md5_file ${f})" != "$2" ; then
+	rm -f ${f}
+	echo "fetching $1 -> ${f}"
 	fetch "$1"
+    else
+	echo "${f} was already downloaded, reusing it"
     fi
-    test "$(_md5_file ${1##*/})" = "$2"
+    if test "$(_md5_file ${1##*/})" = "$2" ; then
+	echo "${f} MD5 checksum OK"
+    else
+	echo "${f} MD5 checksum FAIL, aborting." >&2
+	exit 1
+    fi
 }
 
 set -e
@@ -82,13 +89,16 @@ sqpfx=/opt/sqlite-3-lean
 
 ### download SleepyCat DB 4.2.52 and patches
 build_db=0
-if test ! -f $dbpfx/lib/libdb.a ; then
-    want http://downloads.sleepycat.com/db-4.2.52.tar.gz       cbc77517c9278cdb47613ce8cb55779f
+checklib=$dbpfx/lib/libdb.a
+if test ! -f $checklib ; then
+    want http://downloads.sleepycat.com/db-4.2.52.tar.gz       8b5cff6eb83972afdd8e0b821703c33c
     want http://www.sleepycat.com/update/4.2.52/patch.4.2.52.1 1227f5f9ff43d48b5b1759e113a1c2d7
     want http://www.sleepycat.com/update/4.2.52/patch.4.2.52.2 3da7efd8d29919a9113e2f6f5166f5b7
     want http://www.sleepycat.com/update/4.2.52/patch.4.2.52.3 0bf9ebbe852652bed433e522928d40ec
     want http://www.sleepycat.com/update/4.2.52/patch.4.2.52.4 9cfeff4dce0c11372c0b04b134f8faef
     build_db=1
+else
+    echo "$checklib already exists, not building Berkeley DB."
 fi
 
 ### download SQLite 3.3.5
@@ -96,11 +106,14 @@ fi
 # in an earlier version of this script, which built
 # a sqlite 3.2.8 version that required GLIBC_2.3.
 build_sqlite=0
-if test ! -f $sqpfx/lib/libsqlite3.a || \
+checklib=$sqpfx/lib/libsqlite3.a
+if test ! -f $checklib || \
     objdump -t /opt/sqlite-3-lean/lib/libsqlite3.a \
 	| grep -q __ctype_b_loc ; then
     want http://www.sqlite.org/sqlite-3.3.5.tar.gz             dd2a7b6f2a07a4403a0b5e17e8ed5b88
     build_sqlite=1
+else
+    echo "$checklib already exists, not building SQLite3."
 fi
 
 # build DB 4.2
