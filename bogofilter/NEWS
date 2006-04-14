@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2006-04-13
+
+	* Included additional config file options in bogofilter's
+	  --help message.
+
 	2006-03-27
 
 	* Corrected option parsing in bogotune to support -n ham1 ham2

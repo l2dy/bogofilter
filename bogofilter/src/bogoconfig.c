@@ -325,6 +325,13 @@ static const char *help_text[] = {
     "  --bogofilter-dir                  directory for wordlists\n",
     "  --charset-default                 default character set\n",
     "  --db-cachesize                    Berkeley db cache in Mb\n",
+#ifdef	HAVE_DECL_DB_CREATE
+    "  --db-log-autoremove               enable/disable autoremoval of log files\n",
+    "  --db-transaction                  enable/disable transactions\n",
+ #ifdef	FUTURE_DB_OPTIONS
+    "  --db-txn-durable                                 \n",
+ #endif
+#endif
     "  --ham-cutoff                      nonspam if score below this\n",
     "  --header-format                   spam header format\n",
     "  --log-header-format               header written to log\n",
@@ -344,9 +351,9 @@ static const char *help_text[] = {
     "  --terse                           report in short form\n",
     "  --terse-format                    short form\n",
     "  --thresh-update                   no update if near 0 or 1\n",
-    "  --timestamp                       apply token timestamps\n",
+    "  --timestamp                       enable/disable token timestamps\n",
 #ifndef	DISABLE_UNICODE
-    "  --unicode=yes/no                  enable/disable unicode based wordlist\n",
+    "  --unicode                         enable/disable unicode based wordlist\n",
 #endif
     "  --unsure-subject-tag              like spam-subject-tag\n",
     "  --user-config-file                configuration file\n",
