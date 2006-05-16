@@ -11,7 +11,7 @@ umask 02
 
 cd /home/groups/b/bo/bogofilter/web
 
-CMDPFX="cvs -d :pserver:anonymous@bogofilter.cvs.sourceforge.net:/cvsroot/bogofilter"
+CMDPFX="cvs -q -d :pserver:anonymous@bogofilter.cvs.sourceforge.net:/cvsroot/bogofilter"
 
 # check out
 $CMDPFX update -d -P
@@ -28,10 +28,11 @@ else
 
   # copy without cruft and internal files
   rsync -av --delete ./ ../htdocs/ --delete-excluded \
-      --exclude CVS \
+      --exclude CVS --exclude '.#*' \
       --exclude README_BEFORE_EDITING \
       --exclude .nfs* \
       --exclude updateweb \
+      --exclude '*~' \
       # do not remove this comment - it is for the preceding backslash
 
 fi
