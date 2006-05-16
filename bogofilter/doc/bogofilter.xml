@@ -142,7 +142,7 @@ url="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html">Spa
 Detection</ulink>.</para>
 
 <para>Since then, Robinson (see his Linux Journal article <ulink
-url="http://www.linuxjournal.com/article.php?sid=6467">A Statistical
+url="http://www.linuxjournal.com/article/6467">A Statistical
 Approach to the Spam Problem</ulink>) and others have realized that
 the calculation can be further optimized using Fisher's method.
 <ulink url="http://www.garyrobinson.net/2004/04/improved_chi.html">Another
