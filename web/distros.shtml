@@ -138,13 +138,6 @@
                   </td>
                 </tr>
 		<tr><td colspan="3"><a href="http://www.suse.com/" target="_blank"><strong>SuSE Linux</strong></a></td></tr>
-                <tr>
-                  <td>SuSE Linux 9.1</td>
-                  <td>0.16.4</td>
-                  <td>
-                    <div align="center">BerkeleyDB</div>
-                  </td>
-                </tr>
                  <tr>
                   <td>SUSE Linux 9.2</td>
                   <td>0.92.8 (via YaST Online Update)</td>
@@ -163,6 +156,11 @@
 		    <td>SUSE Linux 10.0</td>
 		    <td>0.95.2-2.2 (via YaST Online Update)</td>
 		    <td><div align="center">BerkeleyDB 4.3</div></td>
+		</tr>
+		<tr>
+		    <td>SUSE Linux 10.1 (OpenSUSE)</td>
+		    <td>1.0.1</td>
+		    <td><div align="center">BerkeleyDB</div></td>
 		</tr>
               </table>
               <p class="date">Last update: $Date$</p>
