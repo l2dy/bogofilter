@@ -160,7 +160,7 @@
 		<tr>
 		    <td>SUSE Linux 10.1 (OpenSUSE)</td>
 		    <td>1.0.1</td>
-		    <td><div align="center">BerkeleyDB</div></td>
+		    <td><div align="center">BerkeleyDB 4.3</div></td>
 		</tr>
               </table>
               <p class="date">Last update: $Date$</p>
