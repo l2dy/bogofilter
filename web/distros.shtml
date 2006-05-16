@@ -98,7 +98,9 @@
 		      <div align="center">BerkeleyDB, QDBM, SQLite3</div>
                   </td>
                 </tr>
-		<tr><td colspan="3"><a href="http://www.mandrakesoft.com/" target="_blank"><strong>Mandrake</strong></a></td></tr>
+		<tr><td colspan="3"><a
+			    href="http://www.mandriva.com/en/"
+			    target="_blank"><strong>Mandriva</strong></a></td></tr>
                 <tr>
                   <td>Contrib</td>
                   <td>0.94.4</td>
@@ -137,7 +139,12 @@
                     <div align="center">BerkeleyDB, SQLite</div>
                   </td>
                 </tr>
-		<tr><td colspan="3"><a href="http://www.suse.com/" target="_blank"><strong>SuSE Linux</strong></a></td></tr>
+		<tr><td colspan="3"><a
+			    href="http://www.novell.com/linux/"
+			    target="_blank"><strong>SuSE
+				Linux</strong></a> and <a
+			    href="http://www.opensuse.org/"
+			    target="_blank"><strong>OpenSUSE.org</strong></a></td></tr>
                  <tr>
                   <td>SUSE Linux 9.2</td>
                   <td>0.92.8 (via YaST Online Update)</td>
