@@ -14,7 +14,7 @@ cd /home/groups/b/bo/bogofilter/web
 CMDPFX="cvs -d :pserver:anonymous@bogofilter.cvs.sourceforge.net:/cvsroot/bogofilter"
 
 # check out
-$CMDPFX update
+$CMDPFX update -d -P
 
 # start ourselves anew
 if [ "x$NORECURSE" = x ] ; then
