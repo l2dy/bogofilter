@@ -9,6 +9,7 @@
 set -e
 umask 02
 
+echo "### CHECKING OUT WEB ###"
 cd /home/groups/b/bo/bogofilter/web
 
 CMDPFX="cvs -q -d :pserver:anonymous@bogofilter.cvs.sourceforge.net:/cvsroot/bogofilter"
@@ -18,16 +19,19 @@ $CMDPFX update -d -P
 
 # start ourselves anew
 if [ "x$NORECURSE" = x ] ; then
+    echo "### RESTARTING $0 ###"
     env NORECURSE=1 $0
 else
 
+  echo "### CHECKING OUT FAQ and NEWS ###"
   for FILE in bogofilter-faq.html bogofilter-faq-fr.html ; do
     $CMDPFX checkout -p -Dtomorrow bogofilter/doc/$FILE > $FILE
   done
   $CMDPFX checkout -p -Dtomorrow bogofilter/NEWS >NEWS
 
+  echo "### COPYING STAGING AREA TO htdocs/ ###"
   # copy without cruft and internal files
-  rsync -av --delete ./ ../htdocs/ --delete-excluded \
+  rsync -aH --delete ./ ../htdocs/ --delete-excluded \
       --exclude CVS --exclude '.#*' \
       --exclude README_BEFORE_EDITING \
       --exclude .nfs* \
@@ -35,4 +39,5 @@ else
       --exclude '*~' \
       # do not remove this comment - it is for the preceding backslash
 
+  echo "### DONE ###"
 fi
