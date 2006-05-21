@@ -45,6 +45,10 @@ Filtering:
 
 	FILTER=/usr/bin/bogofilter
 	FILTER_DIR=/var/spool/filter
+	# WARNING! The -i is crucial, else you may see
+	# messages truncated at the first period that is alone on a line
+	# (which can happen with several kinds of messages, particularly
+	# quoted-printable)
 	POSTFIX="/usr/sbin/sendmail -i"
 	export BOGOFILTER_DIR=/home/bogofilter
 
