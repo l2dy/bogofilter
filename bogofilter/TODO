@@ -2,6 +2,10 @@
 
 			bogofilter TODO list
 
+**** If insufficient data is present and the default "undecided"
+     bogosity is added in -p mode, add also a comment stating that
+     bogofilter needs more training first
+
 **** Add a "reservation lock" (fcntl style on separate file) so that a
      writer can prevent new readers from starting, so that busy scoring
      systems don't starve registration processes. (Figure out the
