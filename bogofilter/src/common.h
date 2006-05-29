@@ -10,25 +10,12 @@ NAME:
 #ifndef COMMON_H
 #define COMMON_H
 
-#ifndef	CONFIG_H
-# define  CONFIG_H
-# include "config.h"
-#endif
-
-#ifndef BFTYPES_H
-#  include "bftypes.h"
-#endif
+#include "system.h"
 
 #ifdef HAVE_STDARG_H
 #include <stdarg.h>
 #endif
 #include <stdio.h>
-
-#if defined(HAVE_LIMITS_H)
-#include <limits.h>
-#elif defined(HAVE_SYS_PARAM_H)
-#include <sys/param.h>
-#endif
 
 #include "debug.h"
 
