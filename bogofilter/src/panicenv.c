@@ -5,7 +5,6 @@
  * GNU General Public License v2 */
 
 #include <db.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

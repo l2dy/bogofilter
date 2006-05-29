@@ -24,7 +24,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <unistd.h>
 
 #include <depot.h>
 #include <cabin.h>

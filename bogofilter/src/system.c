@@ -30,8 +30,6 @@ const char *const system_config_file = "<Bogofilter$Dir>.bogofilter/cf";
 #ifdef HAVE_SYS_SELECT_H
 #include <sys/select.h>
 #endif
-/* some broken systems define it in unistd.h instead */
-#include <unistd.h>
 
 /** Checks if \a path is absolute. */
 bool bf_abspath(const char *path /** path to check for absoluteness */)

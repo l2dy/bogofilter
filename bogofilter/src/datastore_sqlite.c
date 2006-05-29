@@ -12,7 +12,6 @@
 #include "common.h"
 
 #include <errno.h>
-#include <unistd.h>		/* for getpid() */
 #include <sqlite3.h>
 
 #include "datastore_db.h"

@@ -18,13 +18,11 @@
 #include "system.h"
 
 #include <pwd.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>		/* for geteuid() */
 #endif
 
 #include "find_home.h"

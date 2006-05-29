@@ -17,7 +17,6 @@ David Relson	<relson@osagesoftware.com> 2003 - 2005
 #include "common.h"
 
 #include <errno.h>
-#include <unistd.h>
 
 #include <db.h>
 

@@ -19,7 +19,6 @@ David Relson	<relson@osagesoftware.com> 2005
 #include <assert.h>
 #include <error.h>
 #include <errno.h>
-#include <unistd.h>
 
 #include <db.h>
 

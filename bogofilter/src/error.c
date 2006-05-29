@@ -15,7 +15,6 @@ AUTHOR:
 #include <stdarg.h>
 #include <ctype.h>
 #include <syslog.h>
-#include <unistd.h>
 
 #include "error.h"
 

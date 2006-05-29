@@ -28,7 +28,6 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include "db_lock.h"
 #include "debug.h"

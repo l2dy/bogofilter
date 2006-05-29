@@ -16,7 +16,6 @@ Most of the ideas in here are stolen from Mutt's snprintf implementation.
 #include <stdlib.h>
 #include <string.h>
 #include <pwd.h>
-#include <unistd.h>
 
 #ifdef NEEDTRIO
 #include "trio.h"

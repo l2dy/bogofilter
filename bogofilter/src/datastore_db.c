@@ -34,7 +34,6 @@ Matthias Andree <matthias.andree@gmx.de> 2003 - 2005
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h>		/* for SEEK_SET for SunOS 4.1.x */
 #include <sys/resource.h>
 #include <assert.h>
 

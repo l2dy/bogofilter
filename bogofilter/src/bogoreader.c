@@ -28,7 +28,6 @@ AUTHORS: (C) Copyright 2003 by
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #include "bogoreader.h"
 #include "error.h"
