@@ -15,6 +15,10 @@
 
 -------------------------------------------------------------------------------
 
+	2006-05-29
+
+	* #include cleanups in common.h, system.h and C files.
+
 	2006-04-28
 
 	* Updated copyright dates.
