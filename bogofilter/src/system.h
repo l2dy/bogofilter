@@ -21,6 +21,10 @@ NAME:
 # include "bftypes.h"
 #endif
 
+#if defined(HAVE_UNISTD_H)
+# include <unistd.h>
+#endif
+
 #if defined(HAVE_LIMITS_H)
 # include <limits.h>
 #elif defined(HAVE_SYS_PARAM_H)
