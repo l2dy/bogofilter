@@ -22,9 +22,6 @@
 #include <string.h>
 #include <sys/types.h>
 
-#ifdef HAVE_UNISTD_H
-#endif
-
 #include "find_home.h"
 
 /* This function will try to figure out the home directory of the user.
