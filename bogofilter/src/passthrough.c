@@ -13,9 +13,8 @@ NAME:
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
+#ifdef HAVE_SYSLOG_H
 #include <syslog.h>
-
-#ifdef HAVE_UNISTD_H
 #endif
 
 #include "passthrough.h"
