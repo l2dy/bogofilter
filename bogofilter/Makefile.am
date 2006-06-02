@@ -51,6 +51,24 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 # This works up to and including 2.3.5, the newest glibc version
 # available at the time this code was written.
 #
+# RPM and GPG-AGENT
+# =================
+# Using the GnuPG agent requires some fiddling, as RPM has no native
+# support.
+#
+# 1. add these lines to your ~/.rpmmacros:
+#
+# %__gpg_check_password_cmd   %{__gpg} gpg --batch --no-verbose \
+#    --use-agent -u "%{_gpg_name}" -so -
+# %__gpg_sign_cmd             %{__gpg} gpg --batch --no-verbose \
+#    --no-armor --use-agent --no-secmem-warning -u "%{_gpg_name}" \
+#    -sbo %{__signature_filename} %{__plaintext_filename}
+#
+# 2. launch the GnuPG agent, unless already running:
+#    eval $(gpg-agent --sh --daemon)
+#
+# 3. run "setsid make rpm </dev/null >/dev/null"
+#
 DBPFX=/opt/db-4.2-lean
 SQPFX=/opt/sqlite-3-lean
 DBLIB=$(DBPFX)/lib/libdb.a
@@ -64,13 +82,27 @@ rpm:	dist
 	@echo
 	@echo "Note: if 'make rpm' fails, check the top-level Makefile.am for documentation."
 	@echo
+	@echo "Note: see Makefile.am comments for information on how to use the GnuPG agent."
+	@echo
+	@sleep 5
 	$(RPMBUILD) $(SIGN) -ts $(distdir).tar.gz
 	if test ! -f $(DBLIB) || test ! -f $(SQLIB) || objdump -t $(SQLIB) | grep -q __ctype_b_loc ; then \
 	  echo >&2 "Please run the install-staticdblibs.sh script first." ; exit 1 ; fi
-	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(DBPFX)/include" LIBS=$(DBLIB) $(RPMBUILD) $(DEF_STATIC) $(DEF_DB42) $(SIGN) -tb $(distdir).tar.gz
-	                 CPPFLAGS="-D__NO_CTYPE -I/usr/include/db42" LIBS=-ldb-4.2 $(RPMBUILD)               $(DEF_DB42) $(SIGN) -tb $(distdir).tar.gz
-	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(SQPFX)/include" LIBS=$(SQLIB) $(RPMBUILD) $(DEF_STATIC) $(DEF_SQLITE) $(SIGN) -tb $(distdir).tar.gz
-	                 CPPFLAGS="-D__NO_CTYPE                   "               $(RPMBUILD)               $(DEF_SQLITE) $(SIGN) -tb $(distdir).tar.gz
+	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(DBPFX)/include" LIBS=$(DBLIB) \
+		     $(RPMBUILD) $(DEF_STATIC) $(DEF_DB42)   $(SIGN) -tb $(distdir).tar.gz
+	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(SQPFX)/include" LIBS=$(SQLIB) \
+		     $(RPMBUILD) $(DEF_STATIC) $(DEF_SQLITE) $(SIGN) -tb $(distdir).tar.gz
+	@echo
+	@echo "Now building the shared database library RPMs - this may fail"
+	@echo "if system-wide library installs of BerkeleyDB 4.2 or SQLite 3"
+	@echo "are missing from your system. The static RPMs that have just"
+	@echo "been built are ready to go however."
+	@echo
+	@sleep 5
+	-                CPPFLAGS="-D__NO_CTYPE -I/usr/include/db42" LIBS=-ldb-4.2 \
+			$(RPMBUILD)              $(DEF_DB42)   $(SIGN) -tb $(distdir).tar.gz
+	-                CPPFLAGS="-D__NO_CTYPE                   "                \
+			$(RPMBUILD)              $(DEF_SQLITE) $(SIGN) -tb $(distdir).tar.gz
 
 cvs-check:
 	rm -rf $(PACKAGE)-$(VERSION)-export

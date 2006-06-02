@@ -15,6 +15,12 @@
 
 -------------------------------------------------------------------------------
 
+	2006-06-02
+
+	* "make rpm" changes:
+	  - document use with gpg-agent (see Makefile.am)
+	  - build static RPMs (these won't fail) before shared RPMs
+
 	2006-05-29
 
 	* #include cleanups in common.h, system.h and C files.
