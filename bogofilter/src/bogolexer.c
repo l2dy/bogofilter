@@ -256,6 +256,10 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	block_on_subnets = get_bool(name, val);
 	break;
 
+    case O_MAX_TOKEN_LEN:
+	max_token_len = atoi(val);
+	break;
+
     default:
 	/* config file options:
 	**  ok    - if from config file

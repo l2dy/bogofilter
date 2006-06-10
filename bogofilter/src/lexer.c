@@ -333,7 +333,7 @@ int yyinput(byte *buf, size_t used, size_t size)
 	if (count >= MAXTOKENLEN * 2 && 
 	    long_token(buff.t.text, (uint) count)) {
 	    uint start = buff.t.leng - count;
-	    uint length = count - MAXTOKENLEN;
+	    uint length = count - max_token_len;
 	    buff_shift(&buff, start, length);
 	    count = buff.t.leng;
 	}

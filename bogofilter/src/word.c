@@ -8,6 +8,8 @@
 
 #include "common.h"
 
+#include <stdarg.h>
+
 #include "word.h"
 #include "xmalloc.h"
 
@@ -59,6 +61,35 @@ word_t *word_concat(const word_t *w1, const word_t *w2)
     memcpy(ans->text+w1->leng, w2->text, w2->leng);
     Z(ans->text[ans->leng]);		/* for easier debugging - removable */
     return ans;
+}
+
+word_t  *word_multicat(const word_t *arg, ...)
+{
+    uint n;
+    va_list ap;
+    word_t *val;
+    const word_t *t;
+
+    for (n = 0, va_start(ap, arg); 
+	 (t = *(const word_t **) (ap - sizeof(arg))) != NULL;
+	 ap += sizeof(arg)) {
+	n += t->leng;
+    }
+
+    val = word_new(NULL, n);
+
+    for (n = 0, va_start(ap, arg); 
+	 (t = *(const word_t **) (ap - sizeof(arg))) != NULL;
+	 ap += sizeof(arg)) {
+	memcpy(val->text+n, t->text, t->leng);
+	n += t->leng;
+    }
+
+    Z(val->text[n]);
+
+    va_end(ap);
+
+    return val;
 }
 
 void word_puts(const word_t *word, uint width, FILE *fp)

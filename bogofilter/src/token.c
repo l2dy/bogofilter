@@ -32,20 +32,16 @@ AUTHOR:
 
 /* Local Variables */
 
-byte	msg_addr_text[MAXTOKENLEN + D];
-byte	msg_id_text  [MAXTOKENLEN * 3 + D];
-byte	queue_id_text[MAXTOKENLEN + D];
-byte	ipsave_text[MAXTOKENLEN + D];
-
-word_t	msg_addr = { 0, msg_addr_text};	/* First IP Address in Received: statement */
-word_t	msg_id   = { 0, msg_id_text};	/* Message ID */
-word_t	queue_id = { 0, queue_id_text};	/* Message's first queue ID */
+word_t	*msg_addr;	/* First IP Address in Received: statement */
+word_t	*msg_id;	/* Message ID */
+word_t	*queue_id;	/* Message's first queue ID */
 
 static token_t save_class = NONE;
-static word_t ipsave = { 0, ipsave_text};
+static word_t *ipsave;
 
-byte yylval_text[MAXTOKENLEN + MAX_PREFIX_LEN + MSG_COUNT_PADDING + D];
-static word_t yylval = { 0, yylval_text };
+static byte  *yylval_text;
+static size_t yylval_text_size;
+static word_t yylval;
 
 static word_t *w_to   = NULL;	/* To:          */
 static word_t *w_from = NULL;	/* From:        */
@@ -65,7 +61,7 @@ static uint32_t token_prefix_len;
 #define NONBLANK "spc:invalid_end_of_header"
 static word_t *nonblank_line = NULL;
 
-/* Function Prototypes */
+typedef enum state_e state_t;
 
 void token_clear(void);
 
@@ -112,13 +108,13 @@ token_t get_token(word_t **token)
     /* If saved IPADDR, truncate last octet */
     if ( block_on_subnets && save_class == IPADDR )
     {
-	byte *t = xmemrchr(ipsave.text, '.', ipsave.leng);
+	byte *t = xmemrchr(ipsave->text, '.', ipsave->leng);
 	if (t == NULL)
 	    save_class = NONE;
 	else
 	{
-	    ipsave.leng = (uint) (t - ipsave.text);
-	    token_set( &yylval, ipsave.text, ipsave.leng);
+	    ipsave->leng = (uint) (t - ipsave->text);
+	    token_set( &yylval, ipsave->text, ipsave->leng);
 	    cls = save_class;
 	    done = true;
 	}
@@ -143,7 +139,7 @@ token_t get_token(word_t **token)
 	switch (cls) {
 
 	case EOH:	/* end of header - bogus if not empty */
-	    if (leng > MAXTOKENLEN)
+	    if (leng > max_token_len)
 		continue;
 
 	    if (msg_state->mime_type == MIME_MESSAGE)
@@ -182,18 +178,18 @@ token_t get_token(word_t **token)
 		leng = (uint) (ot - st);
 	    }
 	    text[leng] = '\0';		/* ensure nul termination */
-	    build_prefixed_token(&yylval, sizeof(yylval_text), token_prefix, text, leng);
+	    build_prefixed_token(&yylval, yylval_text_size, token_prefix, text, leng);
 	}
 	break;
 
 	case HEADKEY:
 	{
-	    if (!header_line_markup)
+	    if (!header_line_markup || *text == '\0')
 		continue;
 	    else {
 		const char *delim = strchr((const char *)text, ':');
 		leng = (uint) (delim - (const char *)text);
-		if (leng > MAXTOKENLEN)
+		if (leng > max_token_len)
 		    continue;
 		token_set( &yylval, text, leng);
 	    }
@@ -202,9 +198,9 @@ token_t get_token(word_t **token)
 	/*@fallthrough@*/
 
 	case TOKEN:	/* ignore anything when not reading text MIME types */
-	    if (leng > MAXTOKENLEN)
+	    if (leng > max_token_len)
 		continue;
-	    build_prefixed_token(&yylval, sizeof(yylval_text), token_prefix, text, leng);
+	    build_prefixed_token(&yylval, yylval_text_size, token_prefix, text, leng);
 	    if (token_prefix == NULL) {
 		switch (msg_state->mime_type) {
 		case MIME_TEXT:
@@ -224,7 +220,7 @@ token_t get_token(word_t **token)
 	case MESSAGE_ID:
 	    /* special token;  saved for formatted output, but not returned to bogofilter */
 	    /** \bug: the parser MUST be aligned with lexer_v3.l! */
-	    if (leng < sizeof(msg_id_text))
+	    if (leng < max_token_len)
 	    {
 		while (!isspace(text[0])) {
 		    text += 1;
@@ -234,16 +230,15 @@ token_t get_token(word_t **token)
 		    text += 1;
 		    leng -= 1;
 		}
-		token_set( &yylval, text, leng);
-		token_copy( &msg_id, &yylval );
+		token_set( msg_id, text, leng);
 	    }
-	continue;
+	    continue;
 
 	case QUEUE_ID:
 	    /* special token;  saved for formatted output, but not returned to bogofilter */
 	    /** \bug: the parser MUST be aligned with lexer_v3.l! */
-	    if (queue_id.leng == 0 &&
-		leng < sizeof(queue_id_text) )
+	    if (*queue_id->text == '\0' &&
+		leng < max_token_len )
 	    {
 		while (isspace(text[0])) {
 		    text += 1;
@@ -257,8 +252,8 @@ token_t get_token(word_t **token)
 		    text += 1;
 		    leng -= 1;
 		}
-		token_set( &yylval, text, leng);
-		token_copy( &queue_id, &yylval );
+		memcpy( queue_id->text, text, min(queue_id->leng, leng)+D );
+		Z(queue_id->text[queue_id->leng]);
 	    }
 	    continue;
 
@@ -271,10 +266,12 @@ token_t get_token(word_t **token)
 	    /* if top level, no address, not localhost, .... */
 	    if (token_prefix == w_recv &&
 		msg_state->parent == NULL && 
-		msg_addr.leng == 0 &&
-		strcmp((char *)text, "127.0.0.1") != 0) {
+		*msg_addr->text == '\0' &&
+		strcmp((char *)text, "127.0.0.1") != 0)
+	    {
 		/* Not guaranteed to be the originating address of the message. */
-		token_copy( &msg_addr, &yylval );
+		memcpy( msg_addr->text, yylval.text, min(msg_addr->leng, yylval.leng)+D );
+		Z(msg_addr->text[yylval.leng]);
 	    }
 	}
 
@@ -304,15 +301,15 @@ token_t get_token(word_t **token)
 			    q1 & 0xff, q2 & 0xff, q3 & 0xff, q4 & 0xff);
 		leng = strlen((const char *)text);
 
-		build_prefixed_token(&ipsave, sizeof(ipsave_text), prefix, text, leng);
-		token_copy( &yylval, &ipsave );
+		build_prefixed_token(ipsave, max_token_len, prefix, text, leng);
+		token_copy( &yylval, ipsave );
 		word_free(prefix);
 
 		save_class = IPADDR;
 		*token = &yylval;
 		return (cls);
 	    }
-	    build_prefixed_token(&yylval, sizeof(yylval_text), token_prefix, text, leng);
+	    build_prefixed_token(&yylval, yylval_text_size, token_prefix, text, leng);
 	    break;
 
 	case NONE:		/* nothing to do */
@@ -342,7 +339,7 @@ token_t get_token(word_t **token)
 	}
 
 	/* eat all long words */
-	if (yylval.leng <= MAXTOKENLEN)
+	if (yylval.leng <= max_token_len)
 	    done = true;
     }
 
@@ -374,11 +371,32 @@ token_t get_token(word_t **token)
 
 void token_init(void)
 {
+    static bool fTokenInit = false;
+
     yyinit();
 
-    token_clear();
+    if ( fTokenInit) {
+	token_clear();
+    }
+    else {
+	fTokenInit = true;
+	yylval_text_size = max_token_len + MAX_PREFIX_LEN + MSG_COUNT_PADDING + D;
 
-    if (w_to == NULL) {
+	yylval_text = (byte *) malloc( yylval_text_size );
+	yylval.leng   = 0;
+	yylval.text   = yylval_text;
+
+	/* First IP Address in Received: statement */
+	msg_addr = word_new( NULL, max_token_len );
+
+	/* Message ID */
+	msg_id = word_new( NULL, max_token_len * 3 );
+
+	/* Message's first queue ID */
+	queue_id = word_new( NULL, max_token_len );
+
+	ipsave = word_new( NULL, max_token_len );
+
 	/* word_new() used to avoid compiler complaints */
 	w_to   = word_news("to:");	/* To:          */
 	w_from = word_news("from:");	/* From:        */
@@ -448,14 +466,14 @@ void set_tag(const char *text)
 	    word_puts(token_prefix, 0, dbgout);
 	fputc('\n', dbgout);
     }
+
     return;
 }
 
 void set_msg_id(byte *text, uint leng)
 {
-    if (leng >= sizeof(msg_id_text))	/* Limit length */
-	leng  = sizeof(msg_id_text) - 1;
-    token_set( &msg_id, text, leng );
+    (void) leng;		/* suppress compiler warning */
+    token_set( msg_id, text, msg_id->leng );
 }
 
 #define WFREE(n)	word_free(n); n = NULL
@@ -477,7 +495,10 @@ void token_cleanup()
 
 void token_clear()
 {
-    msg_addr.leng = 0;
-    msg_id.leng   = 0;
-    queue_id.leng = 0;
+    if (msg_addr != NULL)
+    {
+	*msg_addr->text = '\0';
+	*msg_id->text   = '\0';
+	*queue_id->text = '\0';
+    }
 }

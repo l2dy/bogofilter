@@ -30,6 +30,7 @@ bool	logflag;			/* '-l' */
 bool	mbox_mode;			/* '-M' */
 bool	replace_nonascii_characters;	/* '-n' */
 bool	passthrough;			/* '-p' */
+bool	pairs = false;			/* '-P' */
 bool	quiet;				/* '-q' */
 int	query;				/* '-Q' */
 bool	Rtable;				/* '-R' */
@@ -38,6 +39,7 @@ int	bogotest;			/* '-X', env("BOGOTEST") */
 int	verbose;			/* '-v' */
 
 /* config file options */
+uint	max_token_len = MAXTOKENLEN;
 double	min_dev;
 double	ham_cutoff = HAM_CUTOFF;
 double	spam_cutoff;

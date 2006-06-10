@@ -412,15 +412,17 @@ void msg_print_summary(const char *pfx)
 {
     if (!Rtable) {
 	(void)fprintf(fpo, "%s%-*s %6lu %9.6f %9.6f %9.6f\n",
-		      pfx, MAXTOKENLEN+2, "N_P_Q_S_s_x_md", (unsigned long)score.robn, 
+		      pfx, max_token_len+2, "N_P_Q_S_s_x_md", (unsigned long)score.robn, 
 		      score.p_pr, score.q_pr, score.spamicity);
 	(void)fprintf(fpo, "%s%-*s  %9.6f %9.6f %9.6f\n",
-		      pfx, MAXTOKENLEN+2+6, " ", robs, robx, min_dev);
+		      pfx, max_token_len+2+6, " ", robs, robx, min_dev);
     }
-    else
-	(void)fprintf(fpo, "%s%-*s %6lu %9.2e %9.2e %9.2e %9.2e %9.2e %5.3f\n",
-		      pfx, MAXTOKENLEN+2, "N_P_Q_S_s_x_md", (unsigned long)score.robn, 
+    else {
+	/* Trim token to 22 characters to accomodate R's default line length of 80 */
+	(void)fprintf(fpo, "%s%-24s %6lu %9.2e %9.2e %9.2e %9.2e %9.2e %5.3f\n",
+		      pfx, "N_P_Q_S_s_x_md", (unsigned long)score.robn,
 		      score.p_pr, score.q_pr, score.spamicity, robs, robx, min_dev);
+     }
 }
 
 /* Done */

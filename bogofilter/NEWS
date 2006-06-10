@@ -15,6 +15,10 @@
 
 -------------------------------------------------------------------------------
 
+	2006-06-09
+
+	* Initial implementation of option for setting maximum token length.
+
 	2006-06-02
 
 	* "make rpm" changes:

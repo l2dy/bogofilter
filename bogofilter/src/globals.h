@@ -27,9 +27,11 @@ extern	bool	nonspam_exits_zero;	/* '-e' */
 extern	bool	fisher;			/* '-f' */
 extern	FILE	*fpin;			/* '-I' */
 extern	bool	logflag;		/* '-l' */
+extern	uint	max_token_len;
 extern	bool	mbox_mode;		/* '-M' */
 extern	char	outfname[PATH_LEN];	/* '-O' */
 extern	bool	passthrough;		/* '-p' */
+extern	bool	pairs;			/* '-P' */
 extern	bool	quiet;			/* '-q' */
 extern	int	query;			/* '-Q' */
 extern	bool	Rtable;			/* '-R' */

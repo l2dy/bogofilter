@@ -46,6 +46,7 @@ typedef enum longopts_e {
     O_HEADER_FORMAT,
     O_LOG_HEADER_FORMAT,
     O_LOG_UPDATE_FORMAT,
+    O_MAX_TOKEN_LEN,
     O_MIN_DEV,
     O_REPLACE_NONASCII_CHARACTERS,
     O_ROBS,
@@ -80,6 +81,7 @@ typedef enum longopts_e {
     { "help",				N, 0, 'h' }, \
     { "input-file",			R, 0, 'I' }, \
     { "output-file",			R, 0, 'O' }, \
+    { "max-token-len",			R, 0, O_MAX_TOKEN_LEN }, \
        UNICODE_OPTION \
     { "version",			N, 0, 'V' }, \
     { "verbosity",			N, 0, 'v' },

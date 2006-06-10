@@ -334,6 +334,7 @@ static const char *help_text[] = {
     "  --header-format                   spam header format\n",
     "  --log-header-format               header written to log\n",
     "  --log-update-format               logged on update\n",
+    "  --max-token-len                   maximum token length\n",
     "  --min-dev                         ignore if score near\n",
     "  --ns-esf                          effective size factor for ham\n",
     "  --replace-nonascii-characters     substitute '?' if bit8 is 1\n",
@@ -701,6 +702,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case O_HEADER_FORMAT:		header_format = get_string(name, val);			break;
     case O_LOG_HEADER_FORMAT:		log_header_format = get_string(name, val);		break;
     case O_LOG_UPDATE_FORMAT:		log_update_format = get_string(name, val);		break;
+    case O_MAX_TOKEN_LEN:		max_token_len=atoi(val);				break;
     case O_REPLACE_NONASCII_CHARACTERS:	replace_nonascii_characters = get_bool(name, val);	break;
     case O_SPAMICITY_FORMATS:		set_spamicity_formats(val);				break;
     case O_SPAMICITY_TAGS:		set_spamicity_tags(val);				break;

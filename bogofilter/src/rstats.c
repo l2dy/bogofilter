@@ -234,16 +234,17 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
     /* print header */
     if (!Rtable)
 	(void)fprintf(fpo, "%s%*s %6s    %-6s    %-6s    %-6s %s\n",
-		      pfx, MAXTOKENLEN+2,"","n", "pgood", "pbad", "fw", "U");
+		      pfx, max_token_len+2,"","n", "pgood", "pbad", "fw", "U");
     else
 	(void)fprintf(fpo, "%s%*s %6s    %-6s    %-6s    %-6s  %-6s    %-6s %s\n",
-		      pfx, MAXTOKENLEN+2,"","n", "pgood", "pbad", "fw","invfwlog", "fwlog", "U");
+		      pfx, max_token_len+2,"","n", "pgood", "pbad", "fw","invfwlog", "fwlog", "U");
 
     /* Print 1 line per token */
     for (r= 0; r<count; r+=1)
     {
 	rstats_t *cur = rstats_array[r];
-	int len = max(0, MAXTOKENLEN-(int)cur->token->leng);
+//	int len = max(0, max_token_len-(int)cur->token->leng);
+	int len = (cur->token->leng >= max_token_len) ? 0 : (max_token_len - cur->token->leng);
 	double fw = calc_prob(cur->good, cur->bad, cur->msgs_good, cur->msgs_bad);
 	char flag = (fabs(fw-EVEN_ODDS) - min_dev >= EPS) ? '+' : '-';
 

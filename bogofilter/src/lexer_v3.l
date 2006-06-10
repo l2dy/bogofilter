@@ -153,8 +153,9 @@ TOKENBACK	[^[:blank:][:cntrl:]<>;=():&%$#@+|/\\{}^\"?*,\[\]._~\'\`\-]
 
 TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}
 
+T1		[[:alpha:]]
 T12		[[:alpha:]][[:alnum:]]?
-TOKEN_12 	({TOKEN}|{T12})
+TOKEN_12 	({TOKEN}|{T12}|{T1})
 
 /*  RFC2047.2
     encoded-word = "=?" charset "?" encoding "?" encoded-text "?="
