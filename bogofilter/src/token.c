@@ -99,7 +99,7 @@ static void build_prefixed_token( word_t *token, uint32_t token_size,
     token->text[token->leng] = '\0';		/* ensure nul termination */
 }
 
-token_t get_token(word_t **token)
+token_t get_token(word_t *token)
 {
     token_t cls = NONE;
     unsigned char *cp;
@@ -306,7 +306,8 @@ token_t get_token(word_t **token)
 		word_free(prefix);
 
 		save_class = IPADDR;
-		*token = &yylval;
+		token->leng = yylval.leng;
+		token->text = yylval.text;
 		return (cls);
 	    }
 	    build_prefixed_token(&yylval, yylval_text_size, token_prefix, text, leng);
@@ -343,7 +344,7 @@ token_t get_token(word_t **token)
 	    done = true;
     }
 
-   if (!msg_count_file) {
+    if (!msg_count_file) {
 	/* Remove trailing blanks */
 	/* From "From ", for example */
 	while (yylval.leng > 1 && yylval.text[yylval.leng-1] == ' ') {
@@ -364,7 +365,9 @@ token_t get_token(word_t **token)
 	}
     }
 
-    *token = &yylval;
+    token->leng = yylval.leng;
+    token->text = yylval.text;
+    // *token = &yylval;
 
     return(cls);
 }

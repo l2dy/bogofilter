@@ -44,7 +44,7 @@ void collect_words(wordhash_t *wh)
 
     for (;;){
 	wordprop_t *wp;
-	word_t *token;
+	word_t token;
 	token_t cls = get_token( &token );
 
 	if (cls == NONE)
@@ -52,15 +52,15 @@ void collect_words(wordhash_t *wh)
 
 	if (cls == BOGO_LEX_LINE)
 	{
-	    char *beg = (char *)token->text+1;	/* skip leading quote mark */
+	    char *beg = (char *)token.text+1;	/* skip leading quote mark */
 	    char *end = strchr(beg, '"');
 	    assert(end);
-	    token->leng = end - beg;
-	    memmove(token->text, token->text + 1, token->leng + 1);
-	    token->text[token->leng] = '\0';	/* ensure nul termination */
+	    token.leng = end - beg;
+	    memmove(token.text, token.text + 1, token.leng + 1);
+	    token.text[token.leng] = '\0';	/* ensure nul termination */
 	}
 
-	wp = wordhash_insert(wh, token, sizeof(wordprop_t), &wordprop_init);
+	wp = wordhash_insert(wh, &token, sizeof(wordprop_t), &wordprop_init);
 	if (wh->type != WH_CNTS)
 	    wp->freq = 1;
 
@@ -72,15 +72,15 @@ void collect_words(wordhash_t *wh)
 	    static bool hasCharset=false;
 	    if (hasCharset)  /* prev token == charset */
 	    {
-		if (token->leng > 5 &&
-		    !strncmp(token->text, "mime:", 5))
-		    set_charset(token->text+5);
+		if (token.leng > 5 &&
+		    !strncmp(token.text, "mime:", 5))
+		    set_charset(token.text+5);
 	    }
 	    hasCharset = 0;
-	    if (token->leng == 5+7)
+	    if (token.leng == 5+7)
 	    {
-		if (!strncmp(token->text, "mime:", 5) &&
-		    !strncasecmp(token->text+5, "charset", 7))
+		if (!strncmp(token.text, "mime:", 5) &&
+		    !strncasecmp(token.text+5, "charset", 7))
 		    hasCharset = true;
 	    }
 	}
@@ -90,14 +90,14 @@ void collect_words(wordhash_t *wh)
 
 	if (DEBUG_WORDLIST(3)) {
 	    fprintf(dbgout, "%3d ", (int) wh->count);
-	    word_puts(token, 0, dbgout);
+	    word_puts(&token, 0, dbgout);
 	    fputc('\n', dbgout);
 	}
 
 	if (cls == BOGO_LEX_LINE)
 	{
-	    char *s = (char *)token->text;
-	    s += token->leng + 2;
+	    char *s = (char *)token.text;
+	    s += token.leng + 2;
 	    wp->cnts.bad = atoi(s);
 	    s = strchr(s+1, ' ') + 1;
 	    wp->cnts.good = atoi(s);
