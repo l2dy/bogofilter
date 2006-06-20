@@ -39,11 +39,15 @@ int	bogotest;			/* '-X', env("BOGOTEST") */
 int	verbose;			/* '-v' */
 
 /* config file options */
-uint	max_token_len = MAXTOKENLEN;
 double	min_dev;
 double	ham_cutoff = HAM_CUTOFF;
 double	spam_cutoff;
 double	thresh_update;
+
+uint	min_token_len       = MIN_TOKEN_LEN;
+uint	max_token_len       = MAX_TOKEN_LEN;
+uint	max_multi_token_len = MAX_MULTI_TOKEN_LEN;
+uint	multi_token_count   = MUL_TOKEN_CNT;
 
 const char	*update_dir;
 /*@observer@*/

@@ -260,6 +260,18 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	max_token_len = atoi(val);
 	break;
 
+    case O_MIN_TOKEN_LEN:
+	min_token_len = atoi(val);
+	break;
+
+    case O_MAX_MULTI_TOKEN_LEN:
+	max_multi_token_len=atoi(val);
+	break;
+
+    case O_MULTI_TOKEN_COUNT:
+	multi_token_count=atoi(val);
+	break;
+
     default:
 	/* config file options:
 	**  ok    - if from config file

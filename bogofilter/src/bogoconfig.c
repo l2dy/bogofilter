@@ -334,7 +334,6 @@ static const char *help_text[] = {
     "  --header-format                   spam header format\n",
     "  --log-header-format               header written to log\n",
     "  --log-update-format               logged on update\n",
-    "  --max-token-len                   maximum token length\n",
     "  --min-dev                         ignore if score near\n",
     "  --ns-esf                          effective size factor for ham\n",
     "  --replace-nonascii-characters     substitute '?' if bit8 is 1\n",
@@ -395,7 +394,7 @@ static void print_version(void)
 		  progtype, version, ds_version_str(), PACKAGE);
 }
 
-#define	OPTIONS	":-:bBc:Cd:DehHI:k:lL:m:MnNo:O:pqQRsStTuUvVx:X:y:"
+#define	OPTIONS	":-:bBc:Cd:DehHI:k:lL:m:MnNo:O:pPqQRsStTuUvVx:X:y:"
 
 /** These functions process command line arguments.
  **
@@ -703,6 +702,9 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case O_LOG_HEADER_FORMAT:		log_header_format = get_string(name, val);		break;
     case O_LOG_UPDATE_FORMAT:		log_update_format = get_string(name, val);		break;
     case O_MAX_TOKEN_LEN:		max_token_len=atoi(val);				break;
+    case O_MIN_TOKEN_LEN:		min_token_len=atoi(val);				break;
+    case O_MAX_MULTI_TOKEN_LEN:		max_multi_token_len=atoi(val);				break;
+    case O_MULTI_TOKEN_COUNT:		multi_token_count=atoi(val);				break;
     case O_REPLACE_NONASCII_CHARACTERS:	replace_nonascii_characters = get_bool(name, val);	break;
     case O_SPAMICITY_FORMATS:		set_spamicity_formats(val);				break;
     case O_SPAMICITY_TAGS:		set_spamicity_tags(val);				break;

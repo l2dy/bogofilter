@@ -330,7 +330,7 @@ int yyinput(byte *buf, size_t used, size_t size)
 	if (used < 1000 || used < size * 10)
 	    break;
 
-	if (count >= MAXTOKENLEN * 2 && 
+	if (count >= MAX_TOKEN_LEN * 2 && 
 	    long_token(buff.t.text, (uint) count)) {
 	    uint start = buff.t.leng - count;
 	    uint length = count - max_token_len;

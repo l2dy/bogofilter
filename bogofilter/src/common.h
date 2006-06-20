@@ -34,8 +34,11 @@ NAME:
 #define	Z(n) n=(byte)'\0' /* mark end of string */
 #endif
 
-/* length of token will not exceed this... */
-#define MAXTOKENLEN	30
+/* length of token between these values */
+#define MIN_TOKEN_LEN		 3	/* default value of min-token-len       */
+#define MAX_TOKEN_LEN		30	/* default value of max-token-len       */
+#define MAX_MULTI_TOKEN_LEN	30	/* default value of max-multi-token-len */
+#define	MUL_TOKEN_CNT		 1	/* default value of multi-token-count   */
 
 typedef enum sh_e { IX_SPAM = 0, 	/* index for SPAM */
 		    IX_GOOD = 1, 	/* index for GOOD */

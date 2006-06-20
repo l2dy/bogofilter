@@ -202,7 +202,7 @@ static ex_t load_wordlist(bfpath *bfp)
 	p = spanword(buf);
 	len = strlen((const char *)buf);
 
-	if (len > MAXTOKENLEN)
+	if (len > MAX_TOKEN_LEN)
 	    continue;		/* too long - discard */
 
 	spamcount = (uint) atoi((const char *)p);
