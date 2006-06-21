@@ -32,6 +32,25 @@ AUTHOR:
 
 #define	MULTI_WORD_TOKENS	1
 
+#if	1
+#warning	Incomplete implementation.
+#warning	Preview code.
+#warning	Not ready for prime time.
+#warning
+#warning	token.c is building and returning multi-word tokens in 
+#warning	the proper sequence for a simple message, like:
+#warning
+#warning		aaa bbb ccc ddd eee fff
+#warning
+#warning	See new test script tests/t.multiple.tokens for sample
+#warning	output using bogolexer.
+#warning
+#warning	Bogofilter _is_ bombing because of compatibility problems.
+#warning	Memory allocated in get_multi_token() is _not_ being freed.
+#warning
+#warning	Toggle the "#if" statement (above) to suppress this warning.
+#endif
+
 /* Local Variables */
 
 word_t	*msg_addr;	/* First IP Address in Received: statement */
