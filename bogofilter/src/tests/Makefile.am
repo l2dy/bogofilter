@@ -39,6 +39,7 @@ PARSING_TESTS = \
 	t.escaped.html t.escaped.url \
 	t.split t.parsing \
 	t.lexer t.lexer.mbx \
+	t.multiple.tokens \
 	$(ENCODING_TESTS) \
 	t.rfc2047_broken t.rfc2047_folded \
 	t.message_addr t.message_id t.queue_id
