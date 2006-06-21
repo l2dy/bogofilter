@@ -15,9 +15,12 @@
 
 -------------------------------------------------------------------------------
 
-	2006-06-09
+	2006-06-20
 
-	* Initial implementation of option for setting maximum token length.
+	* Add options for min/max token length, multi-token count, and
+          max multi-token length.
+
+	* Modify get_token() to return multi-word tokens.
 
 	2006-06-02
 

@@ -30,6 +30,8 @@ AUTHOR:
 #define	MAX_PREFIX_LEN 	  5		/* maximum length of prefix     */
 #define	MSG_COUNT_PADDING 2 * 10	/* space for 2 10-digit numbers */
 
+#define	MULTI_WORD_TOKENS	1
+
 /* Local Variables */
 
 word_t	*msg_addr;	/* First IP Address in Received: statement */
@@ -61,7 +63,38 @@ static uint32_t token_prefix_len;
 #define NONBLANK "spc:invalid_end_of_header"
 static word_t *nonblank_line = NULL;
 
+static word_t **w_token_array = NULL;
+
 typedef enum state_e state_t;
+enum state_e { GET_NEW_TOKEN, RETURN_MULTI_WORD };
+  
+static void init_token_array(void)
+{
+    if (w_token_array == NULL) {
+	uint i;
+	w_token_array = calloc(multi_token_count, sizeof(*w_token_array));
+
+	byte   *text  = calloc(max_token_len+1+1, multi_token_count);
+	word_t *words = calloc(max_token_len+1,   sizeof(word_t));
+
+	for (i = 0; i < multi_token_count; i += 1) {
+	    words->leng = 0;
+	    words->text = text;
+	    w_token_array[i] = words;
+	    words += 1;
+	    text += max_token_len+1+1;
+	}
+    }
+}
+
+static void free_token_array(void)
+{
+    uint i;
+    for (i = 0; i < multi_token_count; i += 1) {
+	word_free((char *)w_token_array[i]);
+	w_token_array[i] = NULL;
+    }
+}
 
 void token_clear(void);
 
@@ -99,11 +132,107 @@ static void build_prefixed_token( word_t *token, uint32_t token_size,
     token->text[token->leng] = '\0';		/* ensure nul termination */
 }
 
+token_t get_token_old(word_t *token);
+
+token_t get_token_old(word_t *token)
+{
+    token_t cls = (*lexer->yylex)();
+	
+    token->leng = (uint)   *lexer->yyleng;
+    token->text = (byte *) *lexer->yytext;
+
+    return cls;
+}
+
+token_t get_multi_token(word_t *token);
+
+#define WRAP(n)	((n) % multi_token_count)
+
+token_t get_multi_token(word_t *token)
+{
+    token_t cls;
+
+    static uint first = 1;
+    static uint wordcount = 0;
+
+    if (wordcount < 2 || 
+	wordcount <= first ||
+	multi_token_count <= first) {
+
+	cls = (*lexer->yylex)();
+	token->leng = (uint)   *lexer->yyleng;
+	token->text = (byte *) *lexer->yytext;
+	Z(token->text[token->leng]);	/* for easier debugging - removable */
+
+	if (multi_token_count > 1) {
+	    // save token in token array
+	    word_t *w = w_token_array[WRAP(wordcount)];
+
+	    w->leng = token->leng;
+	    memcpy(w->text, token->text, w->leng);
+	    Z(w->text[w->leng]);	/* for easier debugging - removable */
+
+	    if (DEBUG_MULTI(1))
+		fprintf(stderr, "%s:%d  %2s  %2d %2d %p %s\n", __FILE__, __LINE__,
+			"", wordcount, w->leng, w->text, w->text);
+
+	    wordcount += 1;
+	    first = 1;
+	}
+
+    }
+    else {
+	int tok;
+
+	const char *sep = "";
+	uint  leng;
+	byte *dest;
+
+	leng = first;
+	for ( tok = first; tok >= 0; tok -= 1 ) {
+	    uint idx = wordcount - 1 - tok;
+	    leng += strlen((char *) w_token_array[WRAP(idx)]->text);
+	}
+
+	token->leng = leng;
+	/* Note:  must free this memory */
+	token->text = dest = malloc(leng+D);
+
+	for ( tok = first; tok >= 0; tok -= 1 ) {
+	    uint  idx = wordcount - 1 - tok;
+	    uint  len = w_token_array[WRAP(idx)]->leng;
+	    byte *str = w_token_array[WRAP(idx)]->text;
+
+	    if (DEBUG_MULTI(1))
+		fprintf(stderr, "%s:%d  %2d  %2d %2d %p %s\n", __FILE__, __LINE__,
+			idx, wordcount, len, str, str);
+
+	    len = strlen(sep);
+	    memcpy(dest, sep, len);
+	    dest += len;
+
+	    len = strlen((char *)str);
+	    memcpy(dest, str, len);
+	    dest += len;
+
+	    sep = "*";
+	}
+
+	dest = token->text;
+	Z(dest[leng]);		/* for easier debugging - removable */
+	first += 1;		/* progress to next multi-token */
+    }
+
+    return cls;
+}
+
 token_t get_token(word_t *token)
 {
     token_t cls = NONE;
     unsigned char *cp;
     bool done = false;
+
+    init_token_array();
 
     /* If saved IPADDR, truncate last octet */
     if ( block_on_subnets && save_class == IPADDR )
@@ -123,13 +252,21 @@ token_t get_token(word_t *token)
     while (!done) {
 	uint leng;
 	byte *text;
-	cls = (*lexer->yylex)();
-	
-	leng = (uint)   *lexer->yyleng;
-	text = (byte *) *lexer->yytext;
-	
+
+	if (multi_token_count < 2) {
+	    cls = get_token_old(token);
+	    leng = token->leng;
+	    text = token->text;
+	}
+	else {
+	    cls = get_multi_token(token);
+	    leng = token->leng;
+	    text = token->text;
+	}
+
 	if (DEBUG_TEXT(2)) {
-	    word_puts(&yylval, 0, dbgout);
+	    word_puts(token, 0, dbgout);
+//	    word_puts(&yylval, 0, dbgout);
 	    fputc('\n', dbgout);
 	}
  
@@ -272,6 +409,8 @@ token_t get_token(word_t *token)
 		/* Not guaranteed to be the originating address of the message. */
 		memcpy( msg_addr->text, yylval.text, min(msg_addr->leng, yylval.leng)+D );
 		Z(msg_addr->text[yylval.leng]);
+//		memcpy( msg_addr->text, token->text, min(msg_addr->leng, token->leng)+D );
+//		Z(msg_addr->text[token->leng]);
 	    }
 	}
 
@@ -340,11 +479,17 @@ token_t get_token(word_t *token)
 	}
 
 	/* eat all long words */
+#if	!MULTI_WORD_TOKENS
 	if (yylval.leng <= max_token_len)
 	    done = true;
+#else
+	if (token->leng <= max_token_len)
+	    done = true;
+#endif
     }
 
-    if (!msg_count_file) {
+#if	!MULTI_WORD_TOKENS
+   if (!msg_count_file) {
 	/* Remove trailing blanks */
 	/* From "From ", for example */
 	while (yylval.leng > 1 && yylval.text[yylval.leng-1] == ' ') {
@@ -365,9 +510,29 @@ token_t get_token(word_t *token)
 	}
     }
 
-    token->leng = yylval.leng;
-    token->text = yylval.text;
-    // *token = &yylval;
+    *token = &yylval;
+#else
+   if (!msg_count_file) {
+	/* Remove trailing blanks */
+	/* From "From ", for example */
+	while (token->leng > 1 && token->text[token->leng-1] == ' ') {
+	    token->leng -= 1;
+	    token->text[token->leng] = (byte) '\0';
+	}
+
+	/* Remove trailing colon */
+	if (token->leng > 1 && token->text[token->leng-1] == ':') {
+	    token->leng -= 1;
+	    token->text[token->leng] = (byte) '\0';
+	}
+
+	if (replace_nonascii_characters) {
+	    /* replace nonascii characters by '?'s */
+	    for (cp = token->text; cp < token->text+token->leng; cp += 1)
+		*cp = casefold_table[*cp];
+	}
+    }
+#endif
 
     return(cls);
 }
@@ -421,6 +586,8 @@ void clr_tag(void)
 
 void set_tag(const char *text)
 {
+    word_t *new_prefix;
+
     if (!header_line_markup)
 	return;
 
@@ -469,6 +636,10 @@ void set_tag(const char *text)
 	    word_puts(token_prefix, 0, dbgout);
 	fputc('\n', dbgout);
     }
+
+    if (new_prefix != token_prefix)
+	free_token_array();
+    token_prefix = new_prefix;
 
     return;
 }
