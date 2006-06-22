@@ -30,9 +30,7 @@ AUTHOR:
 #define	MAX_PREFIX_LEN 	  5		/* maximum length of prefix     */
 #define	MSG_COUNT_PADDING 2 * 10	/* space for 2 10-digit numbers */
 
-#define	MULTI_WORD_TOKENS	1
-
-#if	1
+#if	0
 #warning	Incomplete implementation.
 #warning	Preview code.
 #warning	Not ready for prime time.
@@ -86,9 +84,6 @@ static word_t *nonblank_line = NULL;
 
 static word_t **w_token_array = NULL;
 
-typedef enum state_e state_t;
-enum state_e { GET_NEW_TOKEN, RETURN_MULTI_WORD };
-  
 /* Function Prototypes */
 
 void token_clear(void);
@@ -196,7 +191,7 @@ token_t get_multi_token(word_t *token)
 	Z(token->text[token->leng]);	/* for easier debugging - removable */
 
 	if (multi_token_count > 1) {
-	    // save token in token array
+	    /* save token in token array */
 	    word_t *w = w_token_array[WRAP(wordcount)];
 
 	    w->leng = token->leng;
@@ -296,7 +291,6 @@ token_t get_token(word_t *token)
 
 	if (DEBUG_TEXT(2)) {
 	    word_puts(token, 0, dbgout);
-//	    word_puts(&yylval, 0, dbgout);
 	    fputc('\n', dbgout);
 	}
  
@@ -446,8 +440,6 @@ token_t get_token(word_t *token)
 		/* Not guaranteed to be the originating address of the message. */
 		memcpy( msg_addr->text, yylval.text, min(msg_addr->leng, yylval.leng)+D );
 		Z(msg_addr->text[yylval.leng]);
-//		memcpy( msg_addr->text, token->text, min(msg_addr->leng, token->leng)+D );
-//		Z(msg_addr->text[token->leng]);
 	    }
 	}
 
@@ -522,39 +514,10 @@ token_t get_token(word_t *token)
 	}
 
 	/* eat all long words */
-#if	!MULTI_WORD_TOKENS
-	if (yylval.leng <= max_token_len)
-	    done = true;
-#else
 	if (token->leng <= max_token_len)
 	    done = true;
-#endif
     }
 
-#if	!MULTI_WORD_TOKENS
-   if (!msg_count_file) {
-	/* Remove trailing blanks */
-	/* From "From ", for example */
-	while (yylval.leng > 1 && yylval.text[yylval.leng-1] == ' ') {
-	    yylval.leng -= 1;
-	    yylval.text[yylval.leng] = (byte) '\0';
-	}
-
-	/* Remove trailing colon */
-	if (yylval.leng > 1 && yylval.text[yylval.leng-1] == ':') {
-	    yylval.leng -= 1;
-	    yylval.text[yylval.leng] = (byte) '\0';
-	}
-
-	if (replace_nonascii_characters) {
-	    /* replace nonascii characters by '?'s */
-	    for (cp = yylval.text; cp < yylval.text+yylval.leng; cp += 1)
-		*cp = casefold_table[*cp];
-	}
-    }
-
-    *token = &yylval;
-#else
    if (!msg_count_file) {
 	/* Remove trailing blanks */
 	/* From "From ", for example */
@@ -575,7 +538,6 @@ token_t get_token(word_t *token)
 		*cp = casefold_table[*cp];
 	}
     }
-#endif
 
     return(cls);
 }
