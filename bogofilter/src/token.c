@@ -30,7 +30,7 @@ AUTHOR:
 #define	MAX_PREFIX_LEN 	  5		/* maximum length of prefix     */
 #define	MSG_COUNT_PADDING 2 * 10	/* space for 2 10-digit numbers */
 
-#if	1
+#if	0
 #warning	Incomplete implementation.
 #warning	Preview code.
 #warning	Not ready for prime time.
@@ -43,12 +43,15 @@ AUTHOR:
 #warning	See new test script tests/t.multiple.tokens for sample
 #warning	output using bogolexer.
 #warning
-#warning	Memory allocated in get_multi_token() is _not_ being freed.
-#warning
-#warning	no longer crashing bogofilter
-#warning	'make check' - 3 of 45 tests failed
+#warning	'make check' - All 45 tests pass
 #warning
 #warning	Toggle the "#if" statement (above) to suppress this warning.
+/*
+**		TODO:
+**
+**			pi's lexer
+** 			implement min and max length checks
+*/
 #endif
 
 /* Local Variables */
@@ -64,6 +67,7 @@ static byte  *yylval_text;
 static size_t yylval_text_size;
 static word_t yylval;
 
+#define	MAX_PREFIX_LEN	5
 static word_t *w_to   = NULL;	/* To:          */
 static word_t *w_from = NULL;	/* From:        */
 static word_t *w_rtrn = NULL;	/* Return-Path: */
@@ -82,7 +86,11 @@ static uint32_t token_prefix_len;
 #define NONBLANK "spc:invalid_end_of_header"
 static word_t *nonblank_line = NULL;
 
-static uint wordcount = 0;
+static bool fMultiWordAlloc   = false;
+static uint wordcount         = 0;
+static word_t *p_multi_words  = NULL;
+static byte   *p_multi_buff   = NULL;
+static byte   *p_multi_text   = NULL;
 static word_t **w_token_array = NULL;
 
 /* Function Prototypes */
@@ -93,12 +101,18 @@ void token_clear(void);
 
 static void init_token_array(void)
 {
-    if (w_token_array == NULL) {
+    if (!fMultiWordAlloc) {
 	uint i;
+	byte *text;
+	word_t *words;
 	w_token_array = calloc(multi_token_count, sizeof(*w_token_array));
 
-	byte   *text  = calloc(max_token_len+1+1, multi_token_count);
-	word_t *words = calloc(max_token_len+1,   sizeof(word_t));
+	p_multi_words = calloc( max_token_len+D,   sizeof(word_t));
+	p_multi_text  = calloc( max_token_len+D,   multi_token_count);
+	p_multi_buff  = malloc((max_token_len+D) * multi_token_count + MAX_PREFIX_LEN);
+
+	text = p_multi_text;
+	words = p_multi_words;
 
 	for (i = 0; i < multi_token_count; i += 1) {
 	    words->leng = 0;
@@ -107,19 +121,22 @@ static void init_token_array(void)
 	    words += 1;
 	    text += max_token_len+1+1;
 	}
+	fMultiWordAlloc = true;
     }
 }
 
 static void free_token_array(void)
 {
+    assert((wordcount == 0) == (p_multi_words == NULL));
     assert((wordcount == 0) == (w_token_array == NULL));
 
     wordcount = 0;
 
-    if (w_token_array != NULL) {
-	free(w_token_array[0]->text);
+    if (fMultiWordAlloc) {
+	fMultiWordAlloc = false;
+	free(p_multi_words);
+	free(p_multi_text );
 	free(w_token_array);
-	w_token_array = NULL;
     }
 }
 
@@ -189,9 +206,7 @@ token_t get_multi_token(word_t *token)
 	if (multi_token_count > 1) {
 	    /* save token in token array */
 	    word_t *w;
-
-	    init_token_array();
-
+	    
 	    w  = w_token_array[WRAP(wordcount)];
 
 	    w->leng = token->leng;
@@ -221,7 +236,7 @@ token_t get_multi_token(word_t *token)
 
 	token->leng = leng;
 	/* Note:  must free this memory */
-	token->text = dest = malloc(leng+D);
+	token->text = dest = p_multi_buff;
 
 	for ( tok = first; tok >= 0; tok -= 1 ) {
 	    uint  idx = wordcount - 1 - tok;
@@ -577,6 +592,9 @@ void token_init(void)
 	w_head = word_news("head:");	/* Header:      */
 	w_mime = word_news("mime:");	/* Mime:        */
 	nonblank_line = word_news(NONBLANK);
+
+	/* do multi-word token initializations */
+	init_token_array();
     }
 
     return;
@@ -640,8 +658,9 @@ void set_tag(const char *text)
 	fputc('\n', dbgout);
     }
 
+    /* discard tokens when prefix changes */
     if (old_prefix != NULL && old_prefix != token_prefix)
-	free_token_array();
+	wordcount = 0;
 
     return;
 }
@@ -667,6 +686,9 @@ void token_cleanup()
     WFREE(nonblank_line);
 
     token_clear();
+
+    /* do multi-word token cleanup */
+//    free_token_array();
 }
 
 void token_clear()
