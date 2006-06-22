@@ -345,7 +345,10 @@ token_t get_token(word_t *token)
 		leng = (uint) (ot - st);
 	    }
 	    text[leng] = '\0';		/* ensure nul termination */
+
 	    build_prefixed_token(&yylval, yylval_text_size, token_prefix, text, leng);
+	    token->leng = yylval.leng;
+	    token->text = yylval.text;
 	}
 	break;
 
