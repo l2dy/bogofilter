@@ -45,8 +45,10 @@ AUTHOR:
 #warning	See new test script tests/t.multiple.tokens for sample
 #warning	output using bogolexer.
 #warning
-#warning	Bogofilter _is_ bombing because of compatibility problems.
 #warning	Memory allocated in get_multi_token() is _not_ being freed.
+#warning
+#warning	no longer crashing bogofilter
+#warning	'make check' - 3 of 45 tests failed
 #warning
 #warning	Toggle the "#if" statement (above) to suppress this warning.
 #endif
@@ -87,6 +89,12 @@ static word_t **w_token_array = NULL;
 typedef enum state_e state_t;
 enum state_e { GET_NEW_TOKEN, RETURN_MULTI_WORD };
   
+/* Function Prototypes */
+
+void token_clear(void);
+
+/* Function Definitions */
+
 static void init_token_array(void)
 {
     if (w_token_array == NULL) {
@@ -109,15 +117,19 @@ static void init_token_array(void)
 static void free_token_array(void)
 {
     uint i;
+
+    if (w_token_array == NULL)
+	return;
+
     for (i = 0; i < multi_token_count; i += 1) {
-	word_free((char *)w_token_array[i]);
-	w_token_array[i] = NULL;
+	if (w_token_array[i] != NULL){
+	    word_free(w_token_array[i]);
+	    w_token_array[i] = NULL;
+	}
     }
+
+    w_token_array = NULL;
 }
-
-void token_clear(void);
-
-/* Function Definitions */
 
 static void token_set( word_t *token, byte *text, uint leng )
 {
@@ -198,7 +210,6 @@ token_t get_multi_token(word_t *token)
 	    wordcount += 1;
 	    first = 1;
 	}
-
     }
     else {
 	int tok;
@@ -356,7 +367,11 @@ token_t get_token(word_t *token)
 	case TOKEN:	/* ignore anything when not reading text MIME types */
 	    if (leng > max_token_len)
 		continue;
+
 	    build_prefixed_token(&yylval, yylval_text_size, token_prefix, text, leng);
+	    token->leng = yylval.leng;
+	    token->text = yylval.text;
+
 	    if (token_prefix == NULL) {
 		switch (msg_state->mime_type) {
 		case MIME_TEXT:
@@ -460,15 +475,21 @@ token_t get_token(word_t *token)
 		leng = strlen((const char *)text);
 
 		build_prefixed_token(ipsave, max_token_len, prefix, text, leng);
-		token_copy( &yylval, ipsave );
-		word_free(prefix);
 
-		save_class = IPADDR;
+		token_copy( &yylval, ipsave );
 		token->leng = yylval.leng;
 		token->text = yylval.text;
+
+		word_free(prefix);
+		save_class = IPADDR;
+
 		return (cls);
 	    }
+
 	    build_prefixed_token(&yylval, yylval_text_size, token_prefix, text, leng);
+	    token->leng = yylval.leng;
+	    token->text = yylval.text;
+
 	    break;
 
 	case NONE:		/* nothing to do */
@@ -605,7 +626,7 @@ void clr_tag(void)
 
 void set_tag(const char *text)
 {
-    word_t *new_prefix;
+    word_t *old_prefix = token_prefix;
 
     if (!header_line_markup)
 	return;
@@ -656,9 +677,8 @@ void set_tag(const char *text)
 	fputc('\n', dbgout);
     }
 
-    if (new_prefix != token_prefix)
+    if (old_prefix != NULL && old_prefix != token_prefix)
 	free_token_array();
-    token_prefix = new_prefix;
 
     return;
 }
