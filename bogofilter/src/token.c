@@ -30,7 +30,7 @@ AUTHOR:
 #define	MAX_PREFIX_LEN 	  5		/* maximum length of prefix     */
 #define	MSG_COUNT_PADDING 2 * 10	/* space for 2 10-digit numbers */
 
-#if	0
+#if	1
 #warning	Incomplete implementation.
 #warning	Preview code.
 #warning	Not ready for prime time.
@@ -82,6 +82,7 @@ static uint32_t token_prefix_len;
 #define NONBLANK "spc:invalid_end_of_header"
 static word_t *nonblank_line = NULL;
 
+static uint wordcount = 0;
 static word_t **w_token_array = NULL;
 
 /* Function Prototypes */
@@ -111,19 +112,15 @@ static void init_token_array(void)
 
 static void free_token_array(void)
 {
-    uint i;
+    assert((wordcount == 0) == (w_token_array == NULL));
 
-    if (w_token_array == NULL)
-	return;
+    wordcount = 0;
 
-    for (i = 0; i < multi_token_count; i += 1) {
-	if (w_token_array[i] != NULL){
-	    word_free(w_token_array[i]);
-	    w_token_array[i] = NULL;
-	}
+    if (w_token_array != NULL) {
+	free(w_token_array[0]->text);
+	free(w_token_array);
+	w_token_array = NULL;
     }
-
-    w_token_array = NULL;
 }
 
 static void token_set( word_t *token, byte *text, uint leng )
@@ -163,7 +160,7 @@ token_t get_token_old(word_t *token);
 token_t get_token_old(word_t *token)
 {
     token_t cls = (*lexer->yylex)();
-	
+
     token->leng = (uint)   *lexer->yyleng;
     token->text = (byte *) *lexer->yytext;
 
@@ -179,9 +176,8 @@ token_t get_multi_token(word_t *token)
     token_t cls;
 
     static uint first = 1;
-    static uint wordcount = 0;
 
-    if (wordcount < 2 || 
+    if (wordcount < 2 ||
 	wordcount <= first ||
 	multi_token_count <= first) {
 
@@ -192,7 +188,11 @@ token_t get_multi_token(word_t *token)
 
 	if (multi_token_count > 1) {
 	    /* save token in token array */
-	    word_t *w = w_token_array[WRAP(wordcount)];
+	    word_t *w;
+
+	    init_token_array();
+
+	    w  = w_token_array[WRAP(wordcount)];
 
 	    w->leng = token->leng;
 	    memcpy(w->text, token->text, w->leng);
@@ -256,8 +256,6 @@ token_t get_token(word_t *token)
     token_t cls = NONE;
     unsigned char *cp;
     bool done = false;
-
-    init_token_array();
 
     /* If saved IPADDR, truncate last octet */
     if ( block_on_subnets && save_class == IPADDR )
