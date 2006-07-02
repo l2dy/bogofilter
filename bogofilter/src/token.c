@@ -62,9 +62,8 @@ static uint32_t token_prefix_len;
 #define NONBLANK "spc:invalid_end_of_header"
 static word_t *nonblank_line = NULL;
 
-static bool fMultiWordAlloc   = false;
 static uint tok_count         = 0;
-static uint init_token         = 1;
+static uint init_token        = 1;
 static word_t *p_multi_words  = NULL;
 static byte   *p_multi_buff   = NULL;
 static byte   *p_multi_text   = NULL;
@@ -80,43 +79,32 @@ static token_t get_multi_token(word_t *token);
 
 static void init_token_array(void)
 {
-    if (!fMultiWordAlloc) {
-	uint i;
-	byte *text;
-	word_t *words;
-	w_token_array = calloc(multi_token_count, sizeof(*w_token_array));
+    uint i;
+    byte *text;
+    word_t *words;
+    w_token_array = calloc(multi_token_count, sizeof(*w_token_array));
 
-	p_multi_words = calloc( max_token_len+D,   sizeof(word_t));
-	p_multi_text  = calloc( max_token_len+D,   multi_token_count);
-	p_multi_buff  = malloc((max_token_len+D) * multi_token_count + MAX_PREFIX_LEN);
+    p_multi_words = calloc( max_token_len+D,   sizeof(word_t));
+    p_multi_text  = calloc( max_token_len+D,   multi_token_count);
+    p_multi_buff  = malloc((max_token_len+D) * multi_token_count + MAX_PREFIX_LEN);
 
-	text = p_multi_text;
-	words = p_multi_words;
+    text = p_multi_text;
+    words = p_multi_words;
 
-	for (i = 0; i < multi_token_count; i += 1) {
-	    words->leng = 0;
-	    words->text = text;
-	    w_token_array[i] = words;
-	    words += 1;
-	    text += max_token_len+1+1;
-	}
-	fMultiWordAlloc = true;
+    for (i = 0; i < multi_token_count; i += 1) {
+	words->leng = 0;
+	words->text = text;
+	w_token_array[i] = words;
+	words += 1;
+	text += max_token_len+1+1;
     }
 }
 
 static void free_token_array(void)
 {
-    assert((tok_count == 0) == (p_multi_words == NULL));
-    assert((tok_count == 0) == (w_token_array == NULL));
-
-    tok_count = 0;
-
-    if (fMultiWordAlloc) {
-	fMultiWordAlloc = false;
-	free(p_multi_words);
-	free(p_multi_text );
-	free(w_token_array);
-    }
+    free(p_multi_words);
+    free(p_multi_text );
+    free(w_token_array);
 }
 
 static void token_set( word_t *token, byte *text, uint leng )
