@@ -206,6 +206,20 @@
 #unicode=yes				# default
 ##unicode=no				# (alternate)
 
+#### lexer parameters
+#
+#	minimum and maximum lengths for single tokens
+#
+#min-token-len=3			# default
+#max-token-len=30			# default
+#
+#	count and length for multi-word tokens
+#	Note: if length not specified, defaults to
+#	      multi-token-count * max-token-len (approx)
+#
+#multi-token-count=1			# default
+#max-multi-token-len=00			# default
+
 ########### Classification Constants Settings #######################
 #
 # See man page for a more detailled description of the parameters.
