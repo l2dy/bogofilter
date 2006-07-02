@@ -317,7 +317,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <HTML>{TOKEN_12}?{HTML_ENCODING}		{ html_char(); }	/* process escaped chars, eg '&#101;' is 'a' */
 <HTOKEN>"/"[^/[:blank:]\n%]*{URL_ENCODING}+	{ url_char(); }		/* process escaped chars, eg '%61'    is 'a' */
 
-\${NUM}(\.{NUM})?				{ return TOKEN;}	/* Dollars and cents */
+\${NUM}(\.{NUM})?				{ return MONEY;}	/* Dollars and cents */
 
 .						/* ignore character */
 \n						{ lineno += 1; clr_tag(); }

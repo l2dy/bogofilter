@@ -23,6 +23,7 @@ extern	bool	block_on_subnets;
 typedef enum {
     NONE,
     TOKEN,	/* regular token */
+    MONEY,	/* dollars & cents */
     HEADKEY,	/* header keyword */
     EOH,	/* end-of-header (empty line) */
     BOUNDARY,	/* MIME multipart boundary line */

@@ -15,6 +15,19 @@
 
 -------------------------------------------------------------------------------
 
+	2006-07-02
+
+	* Add min-token-len check (with exemption for 2 character
+          money amounts which bogofilter has long accepted).
+
+	2006-07-01
+
+	* Refactor get_token.  Function get_single_token is the original
+          get_token function.  Function get_multi_token calls
+          get_single_token when another token must be parsed, else it
+          constructs multi-part tokens using w_token_array (an array
+          of word_t structs).
+
 	2006-06-20
 
 	* Add options for min/max token length, multi-token count, and

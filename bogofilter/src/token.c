@@ -371,6 +371,9 @@ token_t get_single_token(word_t *token)
 	/*@fallthrough@*/
 
 	case TOKEN:	/* ignore anything when not reading text MIME types */
+	    if (leng < min_token_len)
+		continue;
+	case MONEY:	/* 2 character money is OK */
 	    if (leng > max_token_len)
 		continue;
 
