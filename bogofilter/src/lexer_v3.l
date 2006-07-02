@@ -174,7 +174,7 @@ TOKEN_12 	({TOKEN}|{T12}|{T1})
   Using "[^?]" in the pattern and validating the charset in 'C'
   reduces executable size by approx 290k.
   new: ENCODED_WORD =\?{CHARSET}\?[bq]\?[^?]*\?=
-  old: ENCODED_WORD =\?{CHARSET}\?(b\?{BASE64}|q\?{QP})\?=
+  old: ENCODED_WORD =\?{CHARSET}\?(b\?{BASE64}\|q\?{QP})\?=
 
   BASE64	[0-9a-zA-Z/+=]+
   QP		[!->@-~]+
@@ -191,7 +191,7 @@ ENCODED_TOKEN	({TOKENFRONT}{TOKENMID})?({ENCODED_WORD}{WHITESPACE}+)*{ENCODED_WO
 
 /*
 HTML_WI_COMMENTS	"<"[^>]*">"
-HTML_WO_COMMENTS	"<"[^!][^>]*">"|"<>"
+HTML_WO_COMMENTS	"<"[^!][^>]*">"\|"<>"
 */
 
 HTMLTOKEN		"<"[^>]*">"
