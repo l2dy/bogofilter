@@ -181,6 +181,8 @@ token_t get_multi_token(word_t *token)
 	uint  leng;
 	byte *dest;
 
+	cls = TOKEN;
+
 	leng = init_token;
 	for ( tok = init_token; tok >= 0; tok -= 1 ) {
 	    uint idx = tok_count - 1 - tok;
