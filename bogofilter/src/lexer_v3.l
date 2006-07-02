@@ -152,6 +152,7 @@ BOGOLEX_TOKEN	[^[:blank:][:cntrl:]<>;    &%  @ |/\\{}^\" *,\[\]]+
 TOKENBACK	[^[:blank:][:cntrl:]<>;=():&%$#@+|/\\{}^\"?*,\[\]._~\'\`\-]
 
 TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}
+SHORT_TOKEN	{TOKENFRONT}{TOKENBACK}?
 
 T1		[[:alpha:]]
 T12		[[:alpha:]][[:alnum:]]?
@@ -301,7 +302,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <HTML>"<"(a|img|font){WHITESPACE}		{ BEGIN HTOKEN; }
 <HTML>"<"					{ BEGIN HDISCARD; }	/* unknown tag */
 
-<HTOKEN>{TOKEN}					{ return TOKEN; }
+<HTOKEN>({TOKEN}|{SHORT_TOKEN})			{ return TOKEN; }
 <HDISCARD,LCOMMENT,SCOMMENT>{TOKEN}		{ /* discard innards of html tokens and comments */ }
 
 <HTOKEN,HDISCARD,LCOMMENT>">"			{ BEGIN HTML; }	/* end of tag, loose comment; return to normal html processing */
@@ -311,8 +312,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 {IPADDR}					{ return IPADDR;}
 "\["({IPADDR})"\]"				{ return MESSAGE_ADDR;}
 
-
-{TOKEN}						{ return TOKEN;}
+({TOKEN}|{SHORT_TOKEN})				{ return TOKEN;}
 
 <HTML>{TOKEN_12}?{HTML_ENCODING}		{ html_char(); }	/* process escaped chars, eg '&#101;' is 'a' */
 <HTOKEN>"/"[^/[:blank:]\n%]*{URL_ENCODING}+	{ url_char(); }		/* process escaped chars, eg '%61'    is 'a' */

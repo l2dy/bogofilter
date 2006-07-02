@@ -19,6 +19,7 @@
 
 	* Add min-token-len check (with exemption for 2 character
           money amounts which bogofilter has long accepted).
+	* Add "short token" pattern to lexer
 
 	2006-07-01
 
