@@ -30,30 +30,6 @@ AUTHOR:
 #define	MAX_PREFIX_LEN 	  5		/* maximum length of prefix     */
 #define	MSG_COUNT_PADDING 2 * 10	/* space for 2 10-digit numbers */
 
-#if	0
-#warning	Incomplete implementation.
-#warning	Preview code.
-#warning	Not ready for prime time.
-#warning
-#warning	token.c is building and returning multi-word tokens in 
-#warning	the proper sequence for a simple message, like:
-#warning
-#warning		aaa bbb ccc ddd eee fff
-#warning
-#warning	See new test script tests/t.multiple.tokens for sample
-#warning	output using bogolexer.
-#warning
-#warning	'make check' - All 45 tests pass
-#warning
-#warning	Toggle the "#if" statement (above) to suppress this warning.
-/*
-**		TODO:
-**
-**			pi's lexer
-** 			implement min and max length checks
-*/
-#endif
-
 /* Local Variables */
 
 word_t	*msg_addr;	/* First IP Address in Received: statement */
