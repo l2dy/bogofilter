@@ -330,6 +330,9 @@ int main(int argc, char **argv)
     if ( !passthrough )
 	fprintf(fpo, "%d tokens read.\n", count);
 
+    /* cleanup storage */
+    token_cleanup();
+    mime_cleanup();
     textblock_free();
 
     MEMDISPLAY;

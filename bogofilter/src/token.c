@@ -654,7 +654,7 @@ void token_cleanup()
     token_clear();
 
     /* do multi-word token cleanup */
-//    free_token_array();
+    free_token_array();
 }
 
 void token_clear()
