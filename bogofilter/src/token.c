@@ -87,7 +87,8 @@ static uint32_t token_prefix_len;
 static word_t *nonblank_line = NULL;
 
 static bool fMultiWordAlloc   = false;
-static uint wordcount         = 0;
+static uint tok_count         = 0;
+static uint init_token         = 1;
 static word_t *p_multi_words  = NULL;
 static byte   *p_multi_buff   = NULL;
 static byte   *p_multi_text   = NULL;
@@ -95,7 +96,9 @@ static word_t **w_token_array = NULL;
 
 /* Function Prototypes */
 
-void token_clear(void);
+static void token_clear(void);
+static token_t get_single_token(word_t *token);
+static token_t get_multi_token(word_t *token);
 
 /* Function Definitions */
 
@@ -127,10 +130,10 @@ static void init_token_array(void)
 
 static void free_token_array(void)
 {
-    assert((wordcount == 0) == (p_multi_words == NULL));
-    assert((wordcount == 0) == (w_token_array == NULL));
+    assert((tok_count == 0) == (p_multi_words == NULL));
+    assert((tok_count == 0) == (w_token_array == NULL));
 
-    wordcount = 0;
+    tok_count = 0;
 
     if (fMultiWordAlloc) {
 	fMultiWordAlloc = false;
@@ -172,19 +175,9 @@ static void build_prefixed_token( word_t *token, uint32_t token_size,
     token->text[token->leng] = '\0';		/* ensure nul termination */
 }
 
-token_t get_single_token(word_t *token);
-token_t get_multi_token(word_t *token);
-
 token_t get_token(word_t *token)
 {
-    token_t cls;
-
-    if (multi_token_count < 2)
-	cls = get_single_token(token);
-    else
-	cls = get_multi_token(token);
-
-    return cls;
+    return get_multi_token(token);
 }
 
 #define WRAP(n)	((n) % multi_token_count)
@@ -193,11 +186,9 @@ token_t get_multi_token(word_t *token)
 {
     token_t cls;
 
-    static uint first = 1;
-
-    if (wordcount < 2 ||
-	wordcount <= first ||
-	multi_token_count <= first) {
+    if (tok_count < 2 ||
+	tok_count <= init_token ||
+	multi_token_count <= init_token) {
 
 	cls = get_single_token(token);
 
@@ -205,7 +196,7 @@ token_t get_multi_token(word_t *token)
 	    /* save token in token array */
 	    word_t *w;
 	    
-	    w  = w_token_array[WRAP(wordcount)];
+	    w  = w_token_array[WRAP(tok_count)];
 
 	    w->leng = token->leng;
 	    memcpy(w->text, token->text, w->leng);
@@ -213,10 +204,10 @@ token_t get_multi_token(word_t *token)
 
 	    if (DEBUG_MULTI(1))
 		fprintf(stderr, "%s:%d  %2s  %2d %2d %p %s\n", __FILE__, __LINE__,
-			"", wordcount, w->leng, w->text, w->text);
+			"", tok_count, w->leng, w->text, w->text);
 
-	    wordcount += 1;
-	    first = 1;
+	    tok_count += 1;
+	    init_token = 1;
 	}
     }
     else {
@@ -226,9 +217,9 @@ token_t get_multi_token(word_t *token)
 	uint  leng;
 	byte *dest;
 
-	leng = first;
-	for ( tok = first; tok >= 0; tok -= 1 ) {
-	    uint idx = wordcount - 1 - tok;
+	leng = init_token;
+	for ( tok = init_token; tok >= 0; tok -= 1 ) {
+	    uint idx = tok_count - 1 - tok;
 	    leng += strlen((char *) w_token_array[WRAP(idx)]->text);
 	}
 
@@ -236,14 +227,14 @@ token_t get_multi_token(word_t *token)
 	/* Note:  must free this memory */
 	token->text = dest = p_multi_buff;
 
-	for ( tok = first; tok >= 0; tok -= 1 ) {
-	    uint  idx = wordcount - 1 - tok;
+	for ( tok = init_token; tok >= 0; tok -= 1 ) {
+	    uint  idx = tok_count - 1 - tok;
 	    uint  len = w_token_array[WRAP(idx)]->leng;
 	    byte *str = w_token_array[WRAP(idx)]->text;
 
 	    if (DEBUG_MULTI(1))
 		fprintf(stderr, "%s:%d  %2d  %2d %2d %p %s\n", __FILE__, __LINE__,
-			idx, wordcount, len, str, str);
+			idx, tok_count, len, str, str);
 
 	    len = strlen(sep);
 	    memcpy(dest, sep, len);
@@ -258,7 +249,7 @@ token_t get_multi_token(word_t *token)
 
 	dest = token->text;
 	Z(dest[leng]);		/* for easier debugging - removable */
-	first += 1;		/* progress to next multi-token */
+	init_token += 1;	/* progress to next multi-token */
     }
 
     return cls;
@@ -659,7 +650,7 @@ void set_tag(const char *text)
 
     /* discard tokens when prefix changes */
     if (old_prefix != NULL && old_prefix != token_prefix)
-	wordcount = 0;
+	tok_count = 0;
 
     return;
 }
