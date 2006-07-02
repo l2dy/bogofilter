@@ -172,19 +172,20 @@ static void build_prefixed_token( word_t *token, uint32_t token_size,
     token->text[token->leng] = '\0';		/* ensure nul termination */
 }
 
-token_t get_token_old(word_t *token);
+token_t get_single_token(word_t *token);
+token_t get_multi_token(word_t *token);
 
-token_t get_token_old(word_t *token)
+token_t get_token(word_t *token)
 {
-    token_t cls = (*lexer->yylex)();
+    token_t cls;
 
-    token->leng = (uint)   *lexer->yyleng;
-    token->text = (byte *) *lexer->yytext;
+    if (multi_token_count < 2)
+	cls = get_single_token(token);
+    else
+	cls = get_multi_token(token);
 
     return cls;
 }
-
-token_t get_multi_token(word_t *token);
 
 #define WRAP(n)	((n) % multi_token_count)
 
@@ -198,10 +199,7 @@ token_t get_multi_token(word_t *token)
 	wordcount <= first ||
 	multi_token_count <= first) {
 
-	cls = (*lexer->yylex)();
-	token->leng = (uint)   *lexer->yyleng;
-	token->text = (byte *) *lexer->yytext;
-	Z(token->text[token->leng]);	/* for easier debugging - removable */
+	cls = get_single_token(token);
 
 	if (multi_token_count > 1) {
 	    /* save token in token array */
@@ -266,7 +264,7 @@ token_t get_multi_token(word_t *token)
     return cls;
 }
 
-token_t get_token(word_t *token)
+token_t get_single_token(word_t *token)
 {
     token_t cls = NONE;
     unsigned char *cp;
@@ -291,16 +289,14 @@ token_t get_token(word_t *token)
 	uint leng;
 	byte *text;
 
-	if (multi_token_count < 2) {
-	    cls = get_token_old(token);
-	    leng = token->leng;
-	    text = token->text;
-	}
-	else {
-	    cls = get_multi_token(token);
-	    leng = token->leng;
-	    text = token->text;
-	}
+	cls = (*lexer->yylex)();
+
+	token->leng = (uint)   *lexer->yyleng;
+	token->text = (byte *) *lexer->yytext;
+	Z(token->text[token->leng]);	/* for easier debugging - removable */
+
+	leng = token->leng;
+	text = token->text;
 
 	if (DEBUG_TEXT(2)) {
 	    word_puts(token, 0, dbgout);
