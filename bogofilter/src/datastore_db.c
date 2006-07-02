@@ -466,7 +466,7 @@ static bool check_fsize_limit(int fd, uint32_t pagesize) {
     struct stat st;
     struct rlimit rl;
 
-    // Only print this message once per run
+    /* Only print this message once per run */
     if (fPrinted)
 	return ok;
 
