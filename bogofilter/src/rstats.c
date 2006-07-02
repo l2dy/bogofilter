@@ -230,7 +230,6 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
     size_t r;
     const char *pfx = !stats_in_header ? "" : "  ";
 
-
     /* print header */
     if (!Rtable)
 	(void)fprintf(fpo, "%s%*s %6s    %-6s    %-6s    %-6s %s\n",
@@ -243,7 +242,6 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
     for (r= 0; r<count; r+=1)
     {
 	rstats_t *cur = rstats_array[r];
-//	int len = max(0, max_token_len-(int)cur->token->leng);
 	int len = (cur->token->leng >= max_token_len) ? 0 : (max_token_len - cur->token->leng);
 	double fw = calc_prob(cur->good, cur->bad, cur->msgs_good, cur->msgs_bad);
 	char flag = (fabs(fw-EVEN_ODDS) - min_dev >= EPS) ? '+' : '-';
