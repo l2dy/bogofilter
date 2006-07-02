@@ -71,9 +71,11 @@ static word_t **w_token_array = NULL;
 
 /* Function Prototypes */
 
-static void token_clear(void);
+static void    token_clear(void);
 static token_t get_single_token(word_t *token);
 static token_t get_multi_token(word_t *token);
+static void    add_token_to_array(word_t *token);
+static void    build_token_from_array(word_t *token);
 
 /* Function Definitions */
 
@@ -157,65 +159,12 @@ token_t get_multi_token(word_t *token)
 	cls = get_single_token(token);
 
 	if (multi_token_count > 1) {
-	    /* save token in token array */
-	    word_t *w;
-	    
-	    w  = w_token_array[WRAP(tok_count)];
-
-	    w->leng = token->leng;
-	    memcpy(w->text, token->text, w->leng);
-	    Z(w->text[w->leng]);	/* for easier debugging - removable */
-
-	    if (DEBUG_MULTI(1))
-		fprintf(stderr, "%s:%d  %2s  %2d %2d %p %s\n", __FILE__, __LINE__,
-			"", tok_count, w->leng, w->text, w->text);
-
-	    tok_count += 1;
-	    init_token = 1;
+	    add_token_to_array(token);
 	}
     }
     else {
-	int tok;
-
-	const char *sep = "";
-	uint  leng;
-	byte *dest;
-
 	cls = TOKEN;
-
-	leng = init_token;
-	for ( tok = init_token; tok >= 0; tok -= 1 ) {
-	    uint idx = tok_count - 1 - tok;
-	    leng += strlen((char *) w_token_array[WRAP(idx)]->text);
-	}
-
-	token->leng = leng;
-	/* Note:  must free this memory */
-	token->text = dest = p_multi_buff;
-
-	for ( tok = init_token; tok >= 0; tok -= 1 ) {
-	    uint  idx = tok_count - 1 - tok;
-	    uint  len = w_token_array[WRAP(idx)]->leng;
-	    byte *str = w_token_array[WRAP(idx)]->text;
-
-	    if (DEBUG_MULTI(1))
-		fprintf(stderr, "%s:%d  %2d  %2d %2d %p %s\n", __FILE__, __LINE__,
-			idx, tok_count, len, str, str);
-
-	    len = strlen(sep);
-	    memcpy(dest, sep, len);
-	    dest += len;
-
-	    len = strlen((char *)str);
-	    memcpy(dest, str, len);
-	    dest += len;
-
-	    sep = "*";
-	}
-
-	dest = token->text;
-	Z(dest[leng]);		/* for easier debugging - removable */
-	init_token += 1;	/* progress to next multi-token */
+	build_token_from_array(token);
     }
 
     return cls;
@@ -509,6 +458,71 @@ token_t get_single_token(word_t *token)
     }
 
     return(cls);
+}
+
+/* save token in token array */
+
+static void add_token_to_array(word_t *token)
+{
+    word_t *w = w_token_array[WRAP(tok_count)];
+
+    w->leng = token->leng;
+    memcpy(w->text, token->text, w->leng);
+    Z(w->text[w->leng]);	/* for easier debugging - removable */
+
+    if (DEBUG_MULTI(1))
+	fprintf(stderr, "%s:%d  %2s  %2d %2d %p %s\n", __FILE__, __LINE__,
+		"", tok_count, w->leng, w->text, w->text);
+
+    tok_count += 1;
+    init_token = 1;
+
+    return;
+}
+
+static void build_token_from_array(word_t *token)
+{
+    int tok;
+
+    const char *sep = "";
+    uint  leng;
+    byte *dest;
+
+    leng = init_token;
+    for ( tok = init_token; tok >= 0; tok -= 1 ) {
+	uint idx = tok_count - 1 - tok;
+	leng += strlen((char *) w_token_array[WRAP(idx)]->text);
+    }
+
+    token->leng = leng;
+    /* Note:  must free this memory */
+    token->text = dest = p_multi_buff;
+
+    for ( tok = init_token; tok >= 0; tok -= 1 ) {
+	uint  idx = tok_count - 1 - tok;
+	uint  len = w_token_array[WRAP(idx)]->leng;
+	byte *str = w_token_array[WRAP(idx)]->text;
+
+	if (DEBUG_MULTI(1))
+	    fprintf(stderr, "%s:%d  %2d  %2d %2d %p %s\n", __FILE__, __LINE__,
+		    idx, tok_count, len, str, str);
+
+	len = strlen(sep);
+	memcpy(dest, sep, len);
+	dest += len;
+
+	len = strlen((char *)str);
+	memcpy(dest, str, len);
+	dest += len;
+
+	sep = "*";
+    }
+
+    dest = token->text;
+    Z(dest[leng]);		/* for easier debugging - removable */
+    init_token += 1;	/* progress to next multi-token */
+
+    return;
 }
 
 void token_init(void)
