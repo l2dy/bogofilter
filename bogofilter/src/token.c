@@ -43,7 +43,6 @@ static byte  *yylval_text;
 static size_t yylval_text_size;
 static word_t yylval;
 
-#define	MAX_PREFIX_LEN	5
 static word_t *w_to   = NULL;	/* To:          */
 static word_t *w_from = NULL;	/* From:        */
 static word_t *w_rtrn = NULL;	/* Return-Path: */
@@ -126,29 +125,38 @@ static inline void token_copy( word_t *dst, word_t *src )
     token_set(dst, src->text, src->leng);
 }
 
-static void build_prefixed_token( word_t *token, uint32_t token_size,
-				  word_t *prefix, 
-				  byte *text, uint32_t leng )
+static void build_prefixed_token( word_t *token, word_t *prefix, word_t *temp, uint32_t temp_size)
 {
-    uint p = (prefix == NULL) ? 0 : prefix->leng;
-    uint l = leng + p;
+    uint pfx_len = (prefix == NULL) ? 0 : prefix->leng;
+    uint len = token->leng + pfx_len;
 
-    if (l >= token_size)
-	l = token_size - p - 1;
+    if (len >= temp_size)
+	len = temp_size - pfx_len - 1;
 
-    token->leng = l;
+    temp->leng = len;
 
     /* copy prefix, if there is one */
     if (prefix != NULL)
-	memcpy(token->text, prefix->text, p);
+	memcpy(temp->text, prefix->text, pfx_len);
 
-    memcpy(token->text + p, text, l-p);		/* include nul terminator */
-    token->text[token->leng] = '\0';		/* ensure nul termination */
+    memcpy(temp->text + pfx_len, token->text, len-pfx_len);
+    Z(temp->text[temp->leng]);
+
+    token->leng = temp->leng;
+    token->text = temp->text;
 }
 
 token_t get_token(word_t *token)
 {
-    return get_multi_token(token);
+    token_t cls = get_multi_token(token);
+
+//    if (token_prefix != NULL) {
+//	build_prefixed_token(&yylval, yylval_text_size, token_prefix, token->text, token->leng);
+//	token->leng = yylval.leng;
+//	token->text = yylval.text;
+//    }
+
+    return cls;
 }
 
 #define WRAP(n)	((n) % multi_token_count)
@@ -250,19 +258,18 @@ token_t get_single_token(word_t *token)
 		    lst = in;
 		}
 	    }
+
 	    if (fst != NULL && lst != NULL && lst - fst  > 3) {
 		byte *ot = fst;
 		*ot++ = '-';
 		*ot++ = '#';
 		for (in = lst; *in != '\0'; in += 1, ot += 1)
 		    *ot = *in;
-		leng = (uint) (ot - st);
+		token->leng = leng = (uint) (ot - st);
 	    }
-	    text[leng] = '\0';		/* ensure nul termination */
+	    Z(token->text[token->leng]);	/* for easier debugging - removable */
 
-	    build_prefixed_token(&yylval, yylval_text_size, token_prefix, text, leng);
-	    token->leng = yylval.leng;
-	    token->text = yylval.text;
+	    build_prefixed_token(token, token_prefix, &yylval, yylval_text_size);
 	}
 	break;
 
@@ -288,9 +295,10 @@ token_t get_single_token(word_t *token)
 	    if (leng > max_token_len)
 		continue;
 
-	    build_prefixed_token(&yylval, yylval_text_size, token_prefix, text, leng);
-	    token->leng = yylval.leng;
-	    token->text = yylval.text;
+	    token->text = text;
+	    token->leng = leng;
+
+	    build_prefixed_token(token, token_prefix, &yylval, yylval_text_size);
 
 	    if (token_prefix == NULL) {
 		switch (msg_state->mime_type) {
@@ -302,6 +310,7 @@ token_t get_single_token(word_t *token)
 		case MIME_MESSAGE:
 		case MIME_APPLICATION:
 		case MIME_IMAGE:
+		    continue;
 		default:
 		    continue;
 		}
@@ -343,7 +352,7 @@ token_t get_single_token(word_t *token)
 		    text += 1;
 		    leng -= 1;
 		}
-		memcpy( queue_id->text, text, min(queue_id->leng, leng)+D );
+		memcpy( queue_id->text, text, min(queue_id->leng, leng) );
 		Z(queue_id->text[queue_id->leng]);
 	    }
 	    continue;
@@ -353,6 +362,7 @@ token_t get_single_token(word_t *token)
 	    /* trim brackets */
 	    text += 1;
 	    leng -= 2;
+	    Z(text[leng]);	/* for easier debugging - removable */
 	    token_set( &yylval, text, leng);
 	    /* if top level, no address, not localhost, .... */
 	    if (token_prefix == w_recv &&
@@ -392,11 +402,11 @@ token_t get_single_token(word_t *token)
 			    q1 & 0xff, q2 & 0xff, q3 & 0xff, q4 & 0xff);
 		leng = strlen((const char *)text);
 
-		build_prefixed_token(ipsave, max_token_len, prefix, text, leng);
+		token->text = text;
+		token->leng = leng;
+		build_prefixed_token(token, prefix, ipsave, max_token_len);
 
 		token_copy( &yylval, ipsave );
-		token->leng = yylval.leng;
-		token->text = yylval.text;
 
 		word_free(prefix);
 		save_class = IPADDR;
@@ -404,9 +414,10 @@ token_t get_single_token(word_t *token)
 		return (cls);
 	    }
 
-	    build_prefixed_token(&yylval, yylval_text_size, token_prefix, text, leng);
-	    token->leng = yylval.leng;
-	    token->text = yylval.text;
+	    token->text = text;
+	    token->leng = leng;
+
+	    build_prefixed_token(token, token_prefix, &yylval, yylval_text_size);
 
 	    break;
 
