@@ -50,6 +50,8 @@ static word_t *w_subj = NULL;	/* Subject:     */
 static word_t *w_recv = NULL;	/* Received:    */
 static word_t *w_head = NULL;	/* Header:      */
 static word_t *w_mime = NULL;	/* Mime:        */
+static word_t *w_ip   = NULL;	/* ip:          */
+static word_t *w_url  = NULL;	/* url:         */
 
 /* Global Variables */
 
@@ -381,8 +383,7 @@ token_t get_single_token(word_t *token)
 	case IPADDR:
 	    if (block_on_subnets)
 	    {
-		const char *ptext = (wordlist_version >= IP_PREFIX) ? "ip:" : "url:";
-		word_t *prefix = word_news(ptext);
+		word_t *prefix = (wordlist_version >= IP_PREFIX) ? w_ip : w_url;
 		int q1, q2, q3, q4;
 		/*
 		 * Trick collected by ESR in real time during John
@@ -408,7 +409,6 @@ token_t get_single_token(word_t *token)
 
 		token_copy( &yylval, ipsave );
 
-		word_free(prefix);
 		save_class = IPADDR;
 
 		return (cls);
@@ -588,6 +588,8 @@ void token_init(void)
 	w_recv = word_news("rcvd:");	/* Received:    */
 	w_head = word_news("head:");	/* Header:      */
 	w_mime = word_news("mime:");	/* Mime:        */
+	w_ip   = word_news("ip");	/* ip:          */
+	w_url  = word_news("url");	/* url:         */
 	nonblank_line = word_news(NONBLANK);
 
 	/* do multi-word token initializations */
@@ -680,6 +682,8 @@ void token_cleanup()
     WFREE(w_recv);
     WFREE(w_head);
     WFREE(w_mime);
+    WFREE(w_ip);
+    WFREE(w_url);
     WFREE(nonblank_line);
 
     token_clear();
