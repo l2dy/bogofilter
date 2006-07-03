@@ -53,7 +53,7 @@ static void mysigdie(int sig)
 
 void signal_setup(void)
 {
-    mysignal(SIGINT,  mysigdie);
-    mysignal(SIGPIPE, SIG_IGN);
-    mysignal(SIGTERM, mysigdie);
+    mysignal(SIGINT,  mysigdie);	/*  2 */
+    mysignal(SIGPIPE, SIG_IGN);		/*  1 */
+    mysignal(SIGTERM, mysigdie);	/* 15 */
 }
