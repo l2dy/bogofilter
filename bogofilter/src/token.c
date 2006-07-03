@@ -76,6 +76,7 @@ static token_t get_single_token(word_t *token);
 static token_t get_multi_token(word_t *token);
 static void    add_token_to_array(word_t *token);
 static void    build_token_from_array(word_t *token);
+static uint    token_copy_leng(const char *str, uint leng, byte *dest);
 
 /* Function Definitions */
 
@@ -86,9 +87,13 @@ static void init_token_array(void)
     word_t *words;
     w_token_array = calloc(multi_token_count, sizeof(*w_token_array));
 
-    p_multi_words = calloc( max_token_len+D,   sizeof(word_t));
-    p_multi_text  = calloc( max_token_len+D,   multi_token_count);
-    p_multi_buff  = malloc((max_token_len+D) * multi_token_count + MAX_PREFIX_LEN);
+    p_multi_words = calloc( max_token_len+D,  sizeof(word_t));
+    p_multi_text  = calloc( max_token_len+D,  multi_token_count);
+
+    if (max_multi_token_len == 0)
+	max_multi_token_len = (max_token_len+1) * multi_token_count + MAX_PREFIX_LEN;
+
+    p_multi_buff = malloc(max_multi_token_len);
 
     text = p_multi_text;
     words = p_multi_words;
@@ -494,8 +499,10 @@ static void build_token_from_array(word_t *token)
 	leng += strlen((char *) w_token_array[WRAP(idx)]->text);
     }
 
+    if (leng > max_multi_token_len)
+	leng = max_multi_token_len;
+
     token->leng = leng;
-    /* Note:  must free this memory */
     token->text = dest = p_multi_buff;
 
     for ( tok = init_token; tok >= 0; tok -= 1 ) {
@@ -506,23 +513,32 @@ static void build_token_from_array(word_t *token)
 	if (DEBUG_MULTI(1))
 	    fprintf(stderr, "%s:%d  %2d  %2d %2d %p %s\n", __FILE__, __LINE__,
 		    idx, tok_count, len, str, str);
-
-	len = strlen(sep);
-	memcpy(dest, sep, len);
+	
+	len = token_copy_leng((const char *)sep, leng, dest);
+	leng -= len;
 	dest += len;
 
-	len = strlen((char *)str);
-	memcpy(dest, str, len);
+	len = token_copy_leng((const char *)str, leng, dest);
+	leng -= len;
 	dest += len;
 
 	sep = "*";
     }
 
-    dest = token->text;
-    Z(dest[leng]);		/* for easier debugging - removable */
-    init_token += 1;	/* progress to next multi-token */
+    Z(token->text[token->leng]);	/* for easier debugging - removable */
+    init_token += 1;			/* progress to next multi-token */
 
     return;
+}
+
+static uint token_copy_leng(const char *str, uint leng, byte *dest)
+{
+    uint len = strlen(str);
+    if (leng < len)
+	len  = leng;
+    if (len != 0)
+	memcpy(dest, str, len);
+    return (uint) len;
 }
 
 void token_init(void)

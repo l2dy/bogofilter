@@ -46,7 +46,7 @@ double	thresh_update;
 
 uint	min_token_len       = MIN_TOKEN_LEN;
 uint	max_token_len       = MAX_TOKEN_LEN;
-uint	max_multi_token_len = MAX_MULTI_TOKEN_LEN;
+uint	max_multi_token_len = 0;
 uint	multi_token_count   = MUL_TOKEN_CNT;
 
 const char	*update_dir;
