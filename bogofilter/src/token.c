@@ -122,7 +122,8 @@ static inline void token_copy( word_t *dst, word_t *src )
     token_set(dst, src->text, src->leng);
 }
 
-static void build_prefixed_token( word_t *token, word_t *prefix, word_t *temp, uint32_t temp_size)
+static void build_prefixed_token( word_t *token, word_t *prefix, 
+				  word_t *temp, uint32_t temp_size )
 {
     uint pfx_len = (prefix == NULL) ? 0 : prefix->leng;
     uint len = token->leng + pfx_len;
