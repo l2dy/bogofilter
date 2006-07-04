@@ -620,8 +620,12 @@ static int process_arglist(int argc, char **argv)
 	count += process_arg(option, name, optarg);
     }
 
-    if (max_multi_token_len == 0)
-	max_token_len = max_multi_token_len = (max_token_len+1) * multi_token_count + MAX_PREFIX_LEN;
+    if (max_multi_token_len == 0) {
+	if (multi_token_count == 1)
+	    max_multi_token_len = max_token_len + MAX_PREFIX_LEN;
+	else
+	    max_multi_token_len = max_token_len = (max_token_len+1) * multi_token_count + MAX_PREFIX_LEN;
+    }
 
     if (count != 1)
     {
