@@ -15,6 +15,14 @@
 
 -------------------------------------------------------------------------------
 
+	2006-07-03
+
+	* Clean up token prefixing.
+	* Add max-multi-token-len checks.
+	* Revised function names.  get_token() uses parse_new_token(),
+          add_token_to_array(), build_token_from_array(), and
+          build_prefixed_token(). 
+
 	2006-07-02
 
 	* Add min-token-len check (with exemption for 2 character
