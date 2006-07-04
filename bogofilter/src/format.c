@@ -195,11 +195,11 @@ static size_t format_float(char *dest, double src,
     else
 	p = (flags & (F_FP_F|F_FP_G)) ? 6 : 2;
     if (flags & F_FP_F)
-	fmt = flags & F_ZERO ? "%0*.*f" : "%*.*f";
+	fmt = (flags & F_ZERO) ? "%0*.*f" : "%*.*f";
     else
-	fmt = flags & F_ZERO ? "%0*.*e" : "%*.*e";
+	fmt = (flags & F_ZERO) ? "%0*.*e" : "%*.*e";
     if (flags & F_FP_G)
-	fmt = flags & F_ZERO ? "%0*.*g" : "%*.*g";
+	fmt = (flags & F_ZERO) ? "%0*.*g" : "%*.*g";
     snprintf (buf, SIZ, fmt, min, p, s);
     return format_string (dest, buf, 0, 0, 0, destend);
 }
