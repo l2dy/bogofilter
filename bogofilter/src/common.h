@@ -38,6 +38,7 @@ NAME:
 #define MIN_TOKEN_LEN		 3	/* default value of min-token-len       */
 #define MAX_TOKEN_LEN		30	/* default value of max-token-len       */
 #define MAX_MULTI_TOKEN_LEN	30	/* default value of max-multi-token-len */
+#define	MAX_PREFIX_LEN	 	 5	/* maximum length of prefix		*/
 #define	MUL_TOKEN_CNT		 1	/* default value of multi-token-count   */
 
 typedef enum sh_e { IX_SPAM = 0, 	/* index for SPAM */

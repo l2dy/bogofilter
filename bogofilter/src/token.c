@@ -27,7 +27,6 @@ AUTHOR:
 #include "token.h"
 #include "xmemrchr.h"
 
-#define	MAX_PREFIX_LEN 	  5		/* maximum length of prefix     */
 #define	MSG_COUNT_PADDING 2 * 10	/* space for 2 10-digit numbers */
 
 /* Local Variables */
