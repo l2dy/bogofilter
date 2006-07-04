@@ -85,15 +85,11 @@ static void init_token_array(void)
     uint i;
     byte *text;
     word_t *words;
-    w_token_array = calloc(multi_token_count, sizeof(*w_token_array));
 
-    p_multi_words = calloc( max_token_len+D,  sizeof(word_t));
-    p_multi_text  = calloc( max_token_len+D,  multi_token_count);
-
-    if (max_multi_token_len == 0)
-	max_multi_token_len = (max_token_len+1) * multi_token_count + MAX_PREFIX_LEN;
-
-    p_multi_buff = malloc(max_multi_token_len);
+    p_multi_words = calloc( max_token_len, sizeof(word_t) );
+    p_multi_buff  = malloc( max_multi_token_len+D );
+    p_multi_text  = calloc( max_token_len+1+D, multi_token_count );
+    w_token_array = calloc( multi_token_count, sizeof(*w_token_array) );
 
     text = p_multi_text;
     words = p_multi_words;
@@ -103,7 +99,7 @@ static void init_token_array(void)
 	words->text = text;
 	w_token_array[i] = words;
 	words += 1;
-	text += max_token_len+1+1;
+	text += max_token_len+1+D;
     }
 }
 
@@ -557,9 +553,13 @@ void token_init(void)
     }
     else {
 	fTokenInit = true;
-	yylval_text_size = max_token_len + MAX_PREFIX_LEN + MSG_COUNT_PADDING + D;
 
-	yylval_text = (byte *) malloc( yylval_text_size );
+	if (max_multi_token_len == 0)
+	    max_multi_token_len = (max_token_len+1) * multi_token_count + MAX_PREFIX_LEN;
+
+	yylval_text_size = max_multi_token_len + MSG_COUNT_PADDING;
+
+	yylval_text = (byte *) malloc( yylval_text_size+D );
 	yylval.leng   = 0;
 	yylval.text   = yylval_text;
 
