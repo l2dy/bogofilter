@@ -195,3 +195,9 @@
 
 	Release history prior to 1.0.0 is in file NEWS.0
 
+$Id$
+
+ vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:
+
+ LocalWords:  bogofilter bogolexer bogoutil Spamicity spamicity
+ LocalWords:  procmail maildrop

@@ -2879,6 +2879,5 @@ $Id$
 
  vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:
 
- LocalWords:  BOGOFILTER Exp procmail contrib Spamicity config spamicity
- LocalWords:  bogoutil datestamp MAXTOKENLEN charset stderr syslog gcc malloc
- LocalWords:  calloc Bogosity
+ LocalWords:  bogofilter bogolexer bogoutil Spamicity spamicity
+ LocalWords:  procmail maildrop
