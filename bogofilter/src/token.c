@@ -131,7 +131,7 @@ static void build_prefixed_token( word_t *token, word_t *prefix, word_t *temp, u
 {
     uint pfx_len = (prefix == NULL) ? 0 : prefix->leng;
     uint len = token->leng + pfx_len;
-
+    
     if (len >= temp_size)
 	len = temp_size - pfx_len - 1;
 
@@ -150,13 +150,9 @@ static void build_prefixed_token( word_t *token, word_t *prefix, word_t *temp, u
 
 token_t get_token(word_t *token)
 {
-    token_t cls = get_multi_token(token);
-
-//    if (token_prefix != NULL) {
-//	build_prefixed_token(&yylval, yylval_text_size, token_prefix, token->text, token->leng);
-//	token->leng = yylval.leng;
-//	token->text = yylval.text;
-//    }
+    token_t cls;
+    
+    cls = get_multi_token(token);
 
     return cls;
 }
@@ -166,11 +162,12 @@ token_t get_token(word_t *token)
 token_t get_multi_token(word_t *token)
 {
     token_t cls;
+    
+    bool fSingle = (tok_count < 2 ||
+		    tok_count <= init_token ||
+		    multi_token_count <= init_token);
 
-    if (tok_count < 2 ||
-	tok_count <= init_token ||
-	multi_token_count <= init_token) {
-
+    if (fSingle) {
 	cls = get_single_token(token);
 
 	if (multi_token_count > 1) {
@@ -180,6 +177,22 @@ token_t get_multi_token(word_t *token)
     else {
 	cls = TOKEN;
 	build_token_from_array(token);
+    }
+
+    if (token_prefix != NULL) {
+	/* IP addresses get special prefix */
+	if (save_class != IPADDR) {
+	    build_prefixed_token(token, token_prefix, &yylval, yylval_text_size);
+	}
+	else {
+
+	    word_t *prefix = (wordlist_version >= IP_PREFIX) ? w_ip : w_url;
+	    build_prefixed_token(token, prefix, ipsave, max_token_len);
+	}
+
+	/* test for excessive length caused by prefix */
+	if (fSingle && token->leng > max_token_len)
+	    cls = get_multi_token(token);
     }
 
     return cls;
@@ -270,8 +283,6 @@ token_t get_single_token(word_t *token)
 		token->leng = leng = (uint) (ot - st);
 	    }
 	    Z(token->text[token->leng]);	/* for easier debugging - removable */
-
-	    build_prefixed_token(token, token_prefix, &yylval, yylval_text_size);
 	}
 	break;
 
@@ -299,8 +310,6 @@ token_t get_single_token(word_t *token)
 
 	    token->text = text;
 	    token->leng = leng;
-
-	    build_prefixed_token(token, token_prefix, &yylval, yylval_text_size);
 
 	    if (token_prefix == NULL) {
 		switch (msg_state->mime_type) {
@@ -383,7 +392,6 @@ token_t get_single_token(word_t *token)
 	case IPADDR:
 	    if (block_on_subnets)
 	    {
-		word_t *prefix = (wordlist_version >= IP_PREFIX) ? w_ip : w_url;
 		int q1, q2, q3, q4;
 		/*
 		 * Trick collected by ESR in real time during John
@@ -405,9 +413,8 @@ token_t get_single_token(word_t *token)
 
 		token->text = text;
 		token->leng = leng;
-		build_prefixed_token(token, prefix, ipsave, max_token_len);
 
-		token_copy( &yylval, ipsave );
+		token_copy( ipsave, token );
 
 		save_class = IPADDR;
 
@@ -416,8 +423,6 @@ token_t get_single_token(word_t *token)
 
 	    token->text = text;
 	    token->leng = leng;
-
-	    build_prefixed_token(token, token_prefix, &yylval, yylval_text_size);
 
 	    break;
 
