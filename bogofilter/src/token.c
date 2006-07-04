@@ -73,8 +73,7 @@ static word_t **w_token_array = NULL;
 /* Function Prototypes */
 
 static void    token_clear(void);
-static token_t get_single_token(word_t *token);
-static token_t get_multi_token(word_t *token);
+static token_t parse_new_token(word_t *token);
 static void    add_token_to_array(word_t *token);
 static void    build_token_from_array(word_t *token);
 static uint    token_copy_leng(const char *str, uint leng, byte *dest);
@@ -148,18 +147,9 @@ static void build_prefixed_token( word_t *token, word_t *prefix, word_t *temp, u
     token->text = temp->text;
 }
 
-token_t get_token(word_t *token)
-{
-    token_t cls;
-    
-    cls = get_multi_token(token);
-
-    return cls;
-}
-
 #define WRAP(n)	((n) % multi_token_count)
 
-token_t get_multi_token(word_t *token)
+token_t get_token(word_t *token)
 {
     token_t cls;
     
@@ -168,11 +158,10 @@ token_t get_multi_token(word_t *token)
 		    multi_token_count <= init_token);
 
     if (fSingle) {
-	cls = get_single_token(token);
+	cls = parse_new_token(token);
 
-	if (multi_token_count > 1) {
+	if (multi_token_count > 1)
 	    add_token_to_array(token);
-	}
     }
     else {
 	cls = TOKEN;
@@ -190,15 +179,15 @@ token_t get_multi_token(word_t *token)
 	    build_prefixed_token(token, prefix, ipsave, max_token_len);
 	}
 
-	/* test for excessive length caused by prefix */
+	/* if excessive length caused by prefix, get another token */
 	if (fSingle && token->leng > max_token_len)
-	    cls = get_multi_token(token);
+	    cls = get_token(token);
     }
 
     return cls;
 }
 
-token_t get_single_token(word_t *token)
+token_t parse_new_token(word_t *token)
 {
     token_t cls = NONE;
     unsigned char *cp;
