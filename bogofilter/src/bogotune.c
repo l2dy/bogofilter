@@ -187,6 +187,10 @@ uint test = 0;
 bool fMakeCheck = false;	/* allows quick & dirty regression testing */
 uint cMakeCheck =    50;	/* ... for 50 cycles */
 
+/* Function Declarations */
+
+static void process_bogotune_arg(int option);
+
 /* Function Definitions */
 
 static void bt_trap(void) {}
@@ -941,7 +945,6 @@ static struct option longopts_bogotune[] = {
 static int process_arglist(int argc, char **argv)
 {
     int  count = 1;
-    int  lastmode = -1;
 
     bulk_mode = B_CMDLINE;
 
@@ -956,6 +959,8 @@ static int process_arglist(int argc, char **argv)
     {
 	int option;
 	int option_index = 0;
+	int this_option_optind = optind ? optind : 1;
+	const char *name;
 
 	option = getopt_long(argc, argv, OPTIONS,
 			     longopts_bogotune, &option_index);
@@ -963,97 +968,9 @@ static int process_arglist(int argc, char **argv)
 	if (option == -1)
  	    break;
 
-	if (option == 1) {
-	    /* If getopt's RETURN_IN_ORDER behavior */
-	    switch (lastmode) {
-	    case 'n':
-	    case 's':
-		option = lastmode;
-		break;
-	    default:
-		fprintf(stderr,
-			"File names may only be given after -n or -s options.\n");
-	    }
-	}
+	name = (option_index == 0) ? argv[this_option_optind] : longopts_bogotune[option_index].name;
 
-	switch (option) {
-	case 'c':
-	    read_config_file(optarg, false, false, PR_CFG_USER, longopts_bogotune);
-	    /* FALLTHROUGH */
-	case 'C':
-	    suppress_config_file = true;
-	    break;
-	case 'd':
-	    ds_path = xstrdup(optarg);
-	    ds_flag = (ds_flag == DS_NONE) ? DS_DSK : DS_ERR;
-	    break;
-	case 'D':
-	    ds_flag = (ds_flag == DS_NONE) ? DS_RAM : DS_ERR;
-	    break;
-	case 'e':
-	    exit_zero = true;
-	    break;
-	case 'E':
-	    esf_flag ^= true;
-	    break;
-	case 'M':
-	    bogolex_file = optarg;
-	    break;
-	case 'n':
-	    lastmode = 'n';
-	    filelist_add(ham_files, optarg);
-	    break;
-	case 'q':
-	    quiet = true;
-	    break;
-	case 'r':
-	    user_robx = atof(optarg);
-	    break;
-	case 's':
-	    lastmode = 's';
-	    filelist_add(spam_files, optarg);
-	    break;
-#ifdef	TEST
-	case 't':
-	    test += 1;
-	    break;
-#endif
-	case 'T':
-	    coerced_target = atoi(optarg);
-	    break;
-	case 'v':
-	    verbose += 1;
-	    break;
-	case 'V':
-	    print_version();
-	    exit(EX_OK);
-	case 'x':
-	    if (strcmp(optarg, "MakeCheck") == 0)
-		fMakeCheck = true;
-	    else
-		set_debug_mask( optarg );
-	    break;
-
-	case O_MAX_TOKEN_LEN:
-	    max_token_len = atoi(optarg);
-	    break;
-
-	case O_MIN_TOKEN_LEN:
-	    min_token_len = atoi(optarg);
-	    break;
-
-	case O_MAX_MULTI_TOKEN_LEN:
-	    max_multi_token_len=atoi(optarg);
-	    break;
-
-	case O_MULTI_TOKEN_COUNT:
-	    multi_token_count=atoi(optarg);
-	    break;
-
-	default:
-	    help();
-	    exit(EX_ERROR);
-	}
+	process_bogotune_arg(option);
     }
 
     if (ds_flag == DS_NONE)	/* default is "wordlist on disk" */
@@ -1075,6 +992,103 @@ static int process_arglist(int argc, char **argv)
 	process_config_files(false, longopts_bogotune);
 
     return count;
+}
+
+static void process_bogotune_arg(int option)
+{
+    static int lastmode = -1;
+
+    if (option == 1) {
+	/* If getopt's RETURN_IN_ORDER behavior */
+	switch (lastmode) {
+	case 'n':
+	case 's':
+	    option = lastmode;
+	    break;
+	default:
+	    fprintf(stderr,
+		    "File names may only be given after -n or -s options.\n");
+	}
+    }
+
+    switch (option) {
+    case 'c':
+	read_config_file(optarg, false, false, PR_CFG_USER, longopts_bogotune);
+	/* FALLTHROUGH */
+    case 'C':
+	suppress_config_file = true;
+	break;
+    case 'd':
+	ds_path = xstrdup(optarg);
+	ds_flag = (ds_flag == DS_NONE) ? DS_DSK : DS_ERR;
+	break;
+    case 'D':
+	ds_flag = (ds_flag == DS_NONE) ? DS_RAM : DS_ERR;
+	break;
+    case 'e':
+	exit_zero = true;
+	break;
+    case 'E':
+	esf_flag ^= true;
+	break;
+    case 'M':
+	bogolex_file = optarg;
+	break;
+    case 'n':
+	lastmode = 'n';
+	filelist_add(ham_files, optarg);
+	break;
+    case 'q':
+	quiet = true;
+	break;
+    case 'r':
+	user_robx = atof(optarg);
+	break;
+    case 's':
+	lastmode = 's';
+	filelist_add(spam_files, optarg);
+	break;
+#ifdef	TEST
+    case 't':
+	test += 1;
+	break;
+#endif
+    case 'T':
+	coerced_target = atoi(optarg);
+	break;
+    case 'v':
+	verbose += 1;
+	break;
+    case 'V':
+	print_version();
+	exit(EX_OK);
+    case 'x':
+	if (strcmp(optarg, "MakeCheck") == 0)
+	    fMakeCheck = true;
+	else
+	    set_debug_mask( optarg );
+	break;
+
+    case O_MAX_TOKEN_LEN:
+	max_token_len = atoi(optarg);
+	break;
+
+    case O_MIN_TOKEN_LEN:
+	min_token_len = atoi(optarg);
+	break;
+
+    case O_MAX_MULTI_TOKEN_LEN:
+	max_multi_token_len=atoi(optarg);
+	break;
+
+    case O_MULTI_TOKEN_COUNT:
+	multi_token_count=atoi(optarg);
+	break;
+
+    default:
+	help();
+	exit(EX_ERROR);
+    }
 }
 
 static double get_robx(void)
