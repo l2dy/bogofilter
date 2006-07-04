@@ -202,7 +202,7 @@ static ex_t load_wordlist(bfpath *bfp)
 	p = spanword(buf);
 	len = strlen((const char *)buf);
 
-	if (len > MAX_TOKEN_LEN)
+	if (len > max_token_len)
 	    continue;		/* too long - discard */
 
 	spamcount = (uint) atoi((const char *)p);
@@ -620,6 +620,9 @@ static int process_arglist(int argc, char **argv)
 	count += process_arg(option, name, optarg);
     }
 
+    if (max_multi_token_len == 0)
+	max_token_len = max_multi_token_len = (max_token_len+1) * multi_token_count + MAX_PREFIX_LEN;
+
     if (count != 1)
     {
 	usage(stderr);
@@ -809,6 +812,22 @@ static int process_arg(int option, const char *name, const char *val)
 
     case O_UNICODE:
 	encoding = str_to_bool(val) ? E_UNICODE : E_RAW;
+	break;
+
+    case O_MAX_TOKEN_LEN:
+	max_token_len = atoi(optarg);
+	break;
+
+    case O_MIN_TOKEN_LEN:
+	min_token_len = atoi(optarg);
+	break;
+
+    case O_MAX_MULTI_TOKEN_LEN:
+	max_multi_token_len=atoi(optarg);
+	break;
+
+    case O_MULTI_TOKEN_COUNT:
+	multi_token_count=atoi(optarg);
 	break;
 
     default:
