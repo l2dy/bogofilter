@@ -85,7 +85,7 @@ static void init_token_array(void)
     uint i;
     byte *text;
     word_t *words;
-
+		    
     p_multi_words = calloc( max_token_len, sizeof(word_t) );
     p_multi_buff  = malloc( max_multi_token_len+D );
     p_multi_text  = calloc( max_token_len+1+D, multi_token_count );
@@ -425,6 +425,7 @@ token_t parse_new_token(word_t *token)
 
 	case MSG_COUNT_LINE:
 	    msg_count_file = true;
+	    multi_token_count = 1;
 	    header_line_markup = false;
 	    token_prefix = NULL;
 	    lexer = &msg_count_lexer;
