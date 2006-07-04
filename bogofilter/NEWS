@@ -18,6 +18,7 @@
 	2006-07-03
 
 	* Clean up token prefixing.
+	* Clean up queue-id processing.
 	* Add max-multi-token-len checks.
 	* Revised function names.  get_token() uses parse_new_token(),
           add_token_to_array(), build_token_from_array(), and

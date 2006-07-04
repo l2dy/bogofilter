@@ -348,8 +348,16 @@ token_t parse_new_token(word_t *token)
 		    text += 1;
 		    leng -= 1;
 		}
-		memcpy( queue_id->text, text, min(queue_id->leng, leng) );
-		Z(queue_id->text[queue_id->leng]);
+		if (text[0] == '<') {
+		    text += 1;
+		    leng -= 1;
+		}
+		if (text[leng-1] == '>') {
+		    leng -= 1;
+		}
+		leng = min(queue_id->leng, leng);
+		memcpy( queue_id->text, text, leng );
+		Z(queue_id->text[leng]);
 	    }
 	    continue;
 
