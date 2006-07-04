@@ -541,6 +541,14 @@ static const char *help_text[] = {
     "  --unicode=yes/no            - convert wordlist to/from unicode\n",
 #endif
     "\n",
+
+    "token parsing options:\n",
+    "  --min-token-len N           - min len for single tokens\n",
+    "  --max-token-len N           - max len for single tokens\n",
+    "  --max-multi-token-len N     - max len for multi-word tokens\n",
+    "  --multi-token-count N       - number of tokens per multi-word token\n",
+    "\n",
+
     NULL
     };
 
