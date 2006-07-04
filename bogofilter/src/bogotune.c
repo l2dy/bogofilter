@@ -56,6 +56,7 @@ AUTHORS:
 #include "bogoreader.h"
 #include "collect.h"
 #include "datastore.h"
+#include "longoptions.h"
 #include "msgcounts.h"
 #include "mime.h"
 #include "mxcat.h"
@@ -929,6 +930,10 @@ static void help(void)
 }
 
 static struct option longopts_bogotune[] = {
+    /* longoptions.h - common options */
+    LONGOPTIONS_COMMON
+    /* longoptions.h - bogofilter/-lexer options */
+    LONGOPTIONS_LEX
     /* end of list */
     { NULL,				0, 0, 0 }
 };
@@ -945,16 +950,15 @@ static int process_arglist(int argc, char **argv)
     _wildcard (&argc, &argv);	/* expand wildcards (*.*) */
 #endif
 
-#define	OPTIONS	":c:Cd:DeEM:n:qr:s:tT:vVx:"
+#define	OPTIONS	":-:c:Cd:DeEM:n:qr:s:tT:vVx:"
 
     while (1)
     {
 	int option;
+	int option_index = 0;
 
-	option = getopt(argc, argv, "-" OPTIONS);
-	/* the "-" is a GNU getopt special to enable RETURN_IN_ORDER
-	 * behavior, i. e. nonoption arguments are returned as
-	 * option == 1 here. */
+	option = getopt_long(argc, argv, OPTIONS,
+			     longopts_bogotune, &option_index);
 
 	if (option == -1)
  	    break;
@@ -1029,6 +1033,23 @@ static int process_arglist(int argc, char **argv)
 	    else
 		set_debug_mask( optarg );
 	    break;
+
+	case O_MAX_TOKEN_LEN:
+	    max_token_len = atoi(optarg);
+	    break;
+
+	case O_MIN_TOKEN_LEN:
+	    min_token_len = atoi(optarg);
+	    break;
+
+	case O_MAX_MULTI_TOKEN_LEN:
+	    max_multi_token_len=atoi(optarg);
+	    break;
+
+	case O_MULTI_TOKEN_COUNT:
+	    multi_token_count=atoi(optarg);
+	    break;
+
 	default:
 	    help();
 	    exit(EX_ERROR);

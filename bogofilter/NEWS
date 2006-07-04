@@ -15,6 +15,10 @@
 
 -------------------------------------------------------------------------------
 
+	2006-07-04
+
+	* Add multi-word token support to bogotune.
+
 	2006-07-03
 
 	* Clean up token prefixing.
