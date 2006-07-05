@@ -340,7 +340,7 @@ static const char *help_text[] = {
     "  --max-multi-token-len N           max len for multi-word tokens\n",
     "  --multi-token-count N             number of tokens per multi-word token\n",
     "  --ns-esf                          effective size factor for ham\n",
-    "  --replace-nonascii-characters     substitute '?' if bit8 is 1\n",
+    "  --replace-nonascii-characters     substitute '?' if bit 8 is 1\n",
     "  --robs                            Robinson's s parameter\n",
     "  --robx                            Robinson's x parameter\n",
     "  --sp-esf                          effective size factor for spam\n",
