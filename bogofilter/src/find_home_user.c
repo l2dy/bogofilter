@@ -1,6 +1,7 @@
-/* find_home_user.c -- library function to figure out the home dir of given user */
+/** \file find_home_user.c figure out the home dir of given user */
 
-/* (C) 2002 by Matthias Andree <matthias.andree@gmx.de>
+/* (C) 2002,2003,2006 by Matthias Andree <matthias.andree@gmx.de>
+ * (C) 2003 by David Relson <relson@osagesoftware.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of version 2 of the GNU General Public License as
@@ -15,15 +16,15 @@
 
 /* $Id$ */
 
-#include <stdlib.h>
-
 #include "system.h"
+
+#include <stdlib.h>
 #include <pwd.h>
 #include <sys/types.h>
 
 #include "find_home.h"
 
-/* This function will try to figure out the home directory of the user
+/** This function will try to figure out the home directory of the user
  * whose name is given as argument.
  *
  * This function returns NULL in case of failure.
