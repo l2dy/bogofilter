@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#include <stdio.h>
 #include "config.h"
+#include <stdio.h>
 
 int main(void) {
     puts(SPAM_HEADER_NAME);

@@ -282,3 +282,9 @@ splint.check: $(version_sources) $(bogofilter_SOURCES) $(bogolexer_SOURCES) $(bo
 	$(bogotune_SOURCES) ; do echo $(srcdir)/$$i ; done | sort -u | egrep -v "(lexer_v3.l|db_handle_props.h)"` > splint.tmp || :
 	grep ^F splint.tmp
 	wc -l splint.tmp
+
+lexer_v3.c: $(srcdir)/lexer_v3.l $(srcdir)/Makefile.in
+	$(LEX) $(srcdir)/lexer_v3.l
+	(echo '/* Include config.h early to avoid _FILE_OFFSET_BITS redefinition on Solaris */'; echo '#include "config.h"' ; sed '/^#/ s|lex.yy\.c|$@|; s/\(accepting rule at line\) %d/\\1 %ld/' lex.yy.c) >$@
+	rm -f lex.yy.c
+

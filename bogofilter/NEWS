@@ -15,6 +15,13 @@
 
 -------------------------------------------------------------------------------
 
+	2006-07-08
+
+	* Add large file support for 32-bit systems.
+	  (_FILE_OFFSET_BITS/_LARGE_FILE).
+	* Fix lexer_v3.l format string mismatch that broke debugging code on
+	  64-bit systems.
+
 	2006-07-04
 
 	* Add multi-word token support to bogoutil & bogotune.

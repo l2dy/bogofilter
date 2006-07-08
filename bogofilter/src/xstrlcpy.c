@@ -1,3 +1,4 @@
+#include "config.h"
 #include "xstrlcpy.h"
 #include "xmalloc.h"
 #include "system.h"

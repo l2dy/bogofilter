@@ -1,5 +1,9 @@
-# $Id$
 dnl vim: set noai tw=0:
+dnl $Id$
+dnl
+dnl configure.ac for bogofilter
+dnl (C) Copyright 2003 Clint Adams, Gyepi Sam, David Relson, Matthias Andree
+dnl (C) Copyright 2004,2005,2006 David Relson, Matthias Andree
 dnl
 dnl ********************************************************
 dnl "Magic" environment variables for this script are:
@@ -13,23 +17,14 @@ dnl set to "yes"    the "Trio" [v]snprintf library (which is
 dnl                 part of the bogofilter source).
 dnl ********************************************************
 dnl
-AC_INIT([bogofilter],[1.0.2.cvs])
+AC_INIT([bogofilter],[1.1.0.cvs])
 dnl
-dnl autoconf-2.59 was more than two years old when the
-dnl requirement was bumped from 2.54 to 2.59:
-dnl (2.59 is needed for bugfixes and to support
-dnl  AS_HELP_STRING):
 AC_PREREQ(2.59)
 AC_CONFIG_SRCDIR([src/bogofilter.c])
 AC_CANONICAL_TARGET
-
-dnl automake 1.7 appears to work, but then breaks
-dnl at "make distcheck" since it does not package
-dnl m4/gsl.m4 for instance, which it should do.
-dnl we use 1.8 or newer.
 AM_INIT_AUTOMAKE([foreign 1.8 dist-bzip2 no-installinfo])
-
 AC_CONFIG_HEADERS([src/config.h:config.in])
+
 AC_PROG_AWK
 AC_PROG_CC(gcc xlc cc)
 dnl AC_GNU_SOURCE
@@ -189,6 +184,10 @@ if test "$GCC" = yes && test "$ICC" = no ; then
     esac
 fi
 AM_CONDITIONAL(USE_GCC4, test $gcc4 = yes)
+
+dnl large file support (LFS)
+AC_SYS_LARGEFILE
+dnl AC_FUNC_FSEEKO
 
 dnl Checks for libraries.
 AC_CHECK_LIB([m],  [cos])

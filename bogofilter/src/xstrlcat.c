@@ -1,3 +1,4 @@
+#include "config.h"
 #include "xstrlcat.h"
 #include "xmalloc.h"
 #include "system.h"
