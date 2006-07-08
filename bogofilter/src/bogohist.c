@@ -3,11 +3,11 @@
 /*****************************************************************************
 
 NAME:
-   bogoutil.c -- dumps and loads bogofilter text files from/to Berkeley DB format.
+   bogohist.c -- print bogofilter histogram
 
 AUTHOR:
    Gyepi Sam <gyepi@praxis-sw.com>
-   
+
 ******************************************************************************/
 
 #include "common.h"

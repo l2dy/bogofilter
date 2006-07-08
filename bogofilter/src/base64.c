@@ -4,6 +4,7 @@
  * decode base64 encoded text
  * \author David Relson <relson@osagesoftware.com>
  * \author Matthias Andree <matthias.andree@gmx.de>
+ * \date 2003-2005
  */
 
 #include "common.h"

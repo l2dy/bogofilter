@@ -5,7 +5,7 @@
 NAME:
    bogoreader.c -- process input files
 
-AUTHORS: (C) Copyright 2003 by
+AUTHORS: (C) Copyright 2003-2005 by
    David Relson <relson@osagesoftware.com>
    Matthias Andree <matthias.andree@gmx.de>
 
