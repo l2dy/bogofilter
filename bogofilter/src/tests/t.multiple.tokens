@@ -91,7 +91,7 @@ ccc*ddd*eee*fff
 bbb*ccc*ddd*eee*fff
 EOF
 
-for COUNT in `seq 1 5` ; do
+for COUNT in 1 2 3 4 5 ; do
     echo "::: $COUNT :::" >> $OUT
     $BOGOLEXER -C -H -p --multi-token-count $COUNT < $INP >> $OUT
 done
