@@ -40,8 +40,10 @@ extern int 	word_cmp(const word_t *w1, const word_t *w2);
 /** create a new word_t that is the concatenation of \a w1 and \a w2 */
 extern word_t  *word_concat(const word_t *w1, const word_t *w2);
 
+#if 0
 /** create a new word_t that is the concatenation of \a w1, \a w2, \a etc */
 extern word_t  *word_multicat(const word_t *w, ...);
+#endif
 
 /** output \a self onto the stream \a fp, formatted to \a width
  * characters. */
