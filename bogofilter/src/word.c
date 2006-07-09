@@ -63,32 +63,6 @@ word_t *word_concat(const word_t *w1, const word_t *w2)
     return ans;
 }
 
-#if 0
-word_t  *word_multicat(const word_t *arg, ...)
-{
-    uint n;
-    va_list ap;
-    word_t *val;
-    const word_t *t;
-
-    n = 0;
-    va_start(ap, arg);
-    while ((t = va_arg(ap, word_t *)) != NULL)
-	    n += t->leng;
-    va_end(ap);
-
-    val = word_new(NULL, n);
-
-    va_start(ap, arg);
-    while ((t = va_arg(ap, word_t *)) != NULL)
-	memcpy(val->text+n, t->text, t->leng);
-    va_end(ap);
-    Z(val->text[n]);
-
-    return val;
-}
-#endif
-
 void word_puts(const word_t *word, uint width, FILE *fp)
 {
     /* width = 0 - output all of the word
