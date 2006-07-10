@@ -15,6 +15,17 @@
 
 -------------------------------------------------------------------------------
 
+1.0.3	2006-07-10
+
+	* Released 1.0.3 to provide the bogotune bugfixes to a wider
+	  audience.
+
+	2006-07-09
+
+	* Work around GNU make 3.81 incompatibility in doc/Makefile*
+	  (it does not work properly with "}\" at the line ends, but
+	   wants "} \" instead).
+
 	2006-06-02
 
 	* "make rpm" changes:

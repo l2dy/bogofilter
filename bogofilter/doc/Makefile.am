@@ -79,7 +79,7 @@ dist-hook:
 	if test -f $(srcdir)/$@ && test $(srcdir)/$@ -nt $< ; then \
 	    cp $(srcdir)/$@ . ; else \
 	  if xmlto html-nochunks $< ; then f=$@ ; mv $${f%%in} $@ ; else rm -f $@ ; exit 1 ; fi ; \
-	  perl -pl -e "s|\xA0|&nbsp;|g" -i $@ || { rm -f $@ ; exit 1 ; }\
+	  perl -pl -e "s|\xA0|&nbsp;|g" -i $@ || { rm -f $@ ; exit 1 ; } \
 	fi
 
 .xml.1in:
@@ -87,7 +87,7 @@ dist-hook:
 	if test -f $(srcdir)/$@ && test $(srcdir)/$@ -nt $< ; then \
 	    cp $(srcdir)/$@ . ; else \
 	if xmlto man $< ; then f=$@ ; mv $${f%in} $@ ; else rm -f $@ ; exit 1 ; fi ; \
-	perl -pl -e "s|\xA0|\\ |g" -i $@ || { rm -f $@ ; exit 1 ; }\
+	perl -pl -e "s|\xA0|\\ |g" -i $@ || { rm -f $@ ; exit 1 ; } \
 	fi
 else
 dist-hook:

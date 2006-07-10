@@ -13,7 +13,7 @@ dnl set to "yes"    the "Trio" [v]snprintf library (which is
 dnl                 part of the bogofilter source).
 dnl ********************************************************
 dnl
-AC_INIT([bogofilter],[1.0.2.cvs])
+AC_INIT([bogofilter],[1.0.3])
 dnl
 dnl autoconf-2.59 was more than two years old when the
 dnl requirement was bumped from 2.54 to 2.59:
