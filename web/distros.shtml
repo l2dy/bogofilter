@@ -54,14 +54,11 @@
                     <div align="center">BerkeleyDB, QDBM, SQLite</div>
                   </td>
                 </tr>
-		<tr><td colspan="3"><a href="http://www.freebsd.org/" target="_blank"><strong>FreeBSD</strong></a></td></tr>
-                <tr>
-                  <td>FreeBSD 4.10-RELEASE</td>
-                  <td>use the port</td>
-                  <td>
-                    <div align="center">BerkeleyDB</div>
-                  </td>
-                </tr>
+		<tr><td colspan="3"><a href="http://www.freebsd.org/"
+			    target="_blank"><strong>FreeBSD</strong></a>
+			| 
+			<a href=" http://www.freebsd.org/security/#adv"
+			    target="_blank">FreeBSD support periods</a></td></tr>
                 <tr>
                   <td>FreeBSD 4.11-RELEASE</td>
                   <td>0.92.8</td>
@@ -71,9 +68,9 @@
                 </tr>
                 <tr>
                   <td>FreeBSD 5.3-RELEASE</td>
-                  <td>use the port</td>
+                  <td>install from port</td>
                   <td>
-                    <div align="center">BerkeleyDB</div>
+                    <div align="center">BerkeleyDB, QDBM, SQLite3</div>
                   </td>
                 </tr>
                 <tr>
@@ -84,8 +81,22 @@
                   </td>
                 </tr>
                 <tr>
+                  <td>FreeBSD 5.5-RELEASE</td>
+                  <td>1.0.1</td>
+                  <td>
+                    <div align="center">BerkeleyDB, QDBM, SQLite3</div>
+                  </td>
+                </tr>
+                <tr>
                   <td>FreeBSD 6.0-RELEASE</td>
                   <td>0.95.2</td>
+                  <td>
+                    <div align="center">BerkeleyDB, QDBM, SQLite3</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>FreeBSD 6.1-RELEASE</td>
+                  <td>1.0.1</td>
                   <td>
                     <div align="center">BerkeleyDB, QDBM, SQLite3</div>
                   </td>
@@ -134,7 +145,8 @@
                 <tr>
                   <td><a
 			  href="http://www.netbsd.org/Documentation/software/packages.html">NetBSD pkgsrc</a></td>
-		  <td>0.96.6</td>
+		  <td><a
+			  href="ftp://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/mail/bogofilter/README.html">0.96.6</a></td>
                   <td>
                     <div align="center">BerkeleyDB, SQLite</div>
                   </td>
