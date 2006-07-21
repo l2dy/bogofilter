@@ -512,8 +512,11 @@
 
     <p>La liste suivante pourrait vous aider:</p>
 
-    <dl><dt>format UW-IMAP/PINE mbx</dt><dd>convertir en mbox: <kbd>mailtool copy /full/path/to/mail.mbox
-	    '#driver.unix//full/path/to/mbox'</kbd></dd></dl>
+    <dl><dt>format UW-IMAP/PINE mbx</dt>
+      <dd>convertir en mbox:
+      <kbd>for MSG in /full/path/to/maildir/* ; do formail -I Status: < "$MSG" >> /full/path/to/mbox; done</kbd>
+      </dd>
+    </dl>
 
     <hr>
 
