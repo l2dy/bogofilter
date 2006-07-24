@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2006-07-24
+
+	* Forward port GNU make compatibility fix for doc/Makefile* from
+	  1.0 branch.
+
 	2006-07-08
 
 	* Add large file support for 32-bit systems.
