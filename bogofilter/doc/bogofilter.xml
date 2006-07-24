@@ -259,7 +259,7 @@ appropriate.  Caution is urged in the use of this capability, as any
 classification errors <application>bogofilter</application> may make
 will be preserved and will accumulate until manually corrected with
 the <option>-Sn</option> and <option>-Ns</option> option
-combinations.  Note this option cause the database to be opened for
+combinations.  Note this option causes the database to be opened for
 write access, which can entail massive slowdowns through
 lock contention and synchronous I/O operations.</para>
 
