@@ -543,10 +543,10 @@ static const char *help_text[] = {
     "\n",
 
     "token parsing options:\n",
-    "  --min-token-len N           - min len for single tokens\n",
-    "  --max-token-len N           - max len for single tokens\n",
-    "  --max-multi-token-len N     - max len for multi-word tokens\n",
-    "  --multi-token-count N       - number of tokens per multi-word token\n",
+    "  --min-token-len             - min len for single tokens\n",
+    "  --max-token-len             - max len for single tokens\n",
+    "  --max-multi-token-len       - max len for multi-word tokens\n",
+    "  --multi-token-count         - number of tokens per multi-word token\n",
     "\n",
 
     NULL
