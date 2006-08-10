@@ -513,12 +513,13 @@
     a format bogofilter understands. Mbox is often convenient because it can
     be piped into bogofilter.</p>
 
-    <p>The following list may be able help you:</p>
     <dl>
-      <dt>UW-IMAP/PINE mbx format</dt>
-      <dd>To convert to mbox:
-      <kbd>for MSG in /full/path/to/maildir/* ; do formail -I Status: < "$MSG" >> /full/path/to/mbox; done</kbd>
-      </dd>
+      <dt>For example, to convert UW-IMAP/PINE mbx format to mbox:</dt>
+      <pre>    mailtool copy /full/path/to/mail.mbox '#driver.unix//full/path/to/mbox'</pre>
+      or
+      <pre>    for MSG in /full/path/to/maildir/* ; do 
+        formail -I Status: < "$MSG" >> /full/path/to/mbox
+    done</pre>
     </dl>
 
     <hr>
