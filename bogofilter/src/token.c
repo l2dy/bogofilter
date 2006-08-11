@@ -605,6 +605,7 @@ void token_init(void)
 void clr_tag(void)
 {
     token_prefix = NULL;
+    tok_count = 0;
 }
 
 void set_tag(const char *text)
