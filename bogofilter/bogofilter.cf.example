@@ -218,7 +218,7 @@
 #	      multi-token-count * max-token-len (approx)
 #
 #multi-token-count=1			# default
-#max-multi-token-len=00			# default
+#max-multi-token-len=0			# default
 
 ########### Classification Constants Settings #######################
 #
