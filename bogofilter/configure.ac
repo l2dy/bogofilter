@@ -495,11 +495,13 @@ case "x$WITH_DB_ENGINE" in
 	if test $havelib = 0 ; then
 	    AC_MSG_RESULT(error)
 	    AC_MSG_ERROR([[
-====================================================================
-Cannot link against libdb? Try 'rm config.cache', then re-configure.
-If the problem persists, report it to the bogofilter mailing list.
-Remember to include your config.log.
-====================================================================
+=====================================================================
+Cannot link against libdb? Try these steps to solve the problem:
+1. Be sure that the Berkeley DB developer package is installed.
+2. Type:  rm -f config.cache    then re-run configure.
+3. If the problem persists, report it to the bogofilter mailing list.
+   Remember to include your config.log.
+=====================================================================
 	    ]])
 	fi
 	AC_MSG_RESULT($LIBDB)
