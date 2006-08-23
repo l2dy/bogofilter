@@ -15,10 +15,16 @@
 
 -------------------------------------------------------------------------------
 
+1.1.1	2006-08-23
+
 	2006-08-22
 
 	* Added bogofilter-faq-it.html, an Italian translation of the
           FAQ  (thanks to Marco Bozzolan).
+
+	2006-08-10
+
+	* Fixed minor header/body multi-word token defect.
 
 1.1.0	2006-08-09
 
