@@ -20,7 +20,7 @@ all: $(man_MANS) $(html_MANS)
 
 CLEANFILES = $(man_MANS) $(html_MANS)
 
-HTML_DOCS = bogofilter-faq.html bogofilter-faq-fr.html bogotune-faq.html
+HTML_DOCS = bogofilter-faq.html bogofilter-faq-fr.html bogofilter-faq-it.html bogotune-faq.html
 
 # what to distribute
 EXTRA_DIST = \
