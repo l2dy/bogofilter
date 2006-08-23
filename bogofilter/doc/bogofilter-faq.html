@@ -47,7 +47,7 @@
 
     <p>Official Versions: In
     <a href="http://bogofilter.sourceforge.net/faq.shtml">English</a> or
-    <a href="http://bogofilter.sourceforge.net/faq_fr.shtml">French</a><br>
+    <a href="http://bogofilter.sourceforge.net/faq_fr.shtml">French</a> or
     <a href="http://bogofilter.sourceforge.net/faq_it.shtml">Italian</a><br>
     Maintainer: David Relson &lt;relson@osagesoftware.com&gt;</p>
 
@@ -68,7 +68,6 @@
     <ul>
       <li>
         General Information
-
         <ul>
           <li><a href="#what-is-bogofilter">What is bogofilter?</a></li>
           <li><a href="#bogo-what">Bogo what?</a></li>
@@ -79,7 +78,6 @@
 
       <li>
         Operational Questions
-
         <ul>
           <li><a href="#training">How do I start my bogofilter training?</a></li>
           <li><a href="#production">How can I keep the scoring accuracy high?</a></li>
@@ -96,7 +94,6 @@
 
       <li>
         Database Questions
-
         <ul>
           <li><a href="#compact-database">How can I compact my database?</a></li>
           <li><a href="#query-database">How do I manually query the database?</a></li>
@@ -111,7 +108,6 @@
 
       <li>
         Berkeley DB Questions
-
         <ul>
           <li><a href="#enable-transactions">How can I switch from
           non-transaction to transaction mode?</a></li>
@@ -131,7 +127,6 @@
 
       <li>
         Technical problems
-
         <ul>
 	  <li><a href="#multi-user">Can bogofilter be used in a multi-user environment?</a></li>
           <li><a href="#nfs">Can I share wordlists over NFS?</a></li>
@@ -145,7 +140,6 @@
 
       <li>
         Build and Portability Problems
-
         <ul>
           <li><a href="#port-notes">How do I get bogofilter working on Solaris, BSD, etc.?</a></li>
           <li><a href="#make-notes">Can I use the make command on my operating system?</a></li>
@@ -159,7 +153,6 @@
 
       <li>
         Using Bogofilter with different mail programs
-
         <ul>
           <li><a href="#which-muas">With which mail programs does
           bogofilter work?</a></li>
@@ -515,10 +508,12 @@
     be piped into bogofilter.</p>
 
     <p>For example, to convert UW-IMAP/PINE mbx format to mbox:
-    <pre>
-    mailtool copy /full/path/to/mail.mbox '#driver.unix//full/path/to/mbox'
-or:
-    for MSG in /full/path/to/maildir/* ; do 
+
+    <pre>    mailtool copy /full/path/to/mail.mbox '#driver.unix//full/path/to/mbox'</pre>
+
+    <p>or:</p>
+
+    <pre>    for MSG in /full/path/to/maildir/* ; do 
         formail -I Status: < "$MSG" >> /full/path/to/mbox
     done</pre>
 
@@ -947,18 +942,18 @@ or:
 
     <p>Example 1 - merge user and system lists:</p>
 
-    <pre>  wordlist R,user,~/wordlist.db,1
-  wordlist R,system,/var/spool/bogofilter/wordlist.db,1</pre>
+    <pre>    wordlist R,user,~/wordlist.db,1
+    wordlist R,system,/var/spool/bogofilter/wordlist.db,1</pre>
 
     <p>Example 2 - prefer user to system list:</p>
 
-    <pre>  wordlist R,user,~/wordlist.db,2
-  wordlist R,system,/var/spool/bogofilter/wordlist.db,3</pre>
+    <pre>    wordlist R,user,~/wordlist.db,2
+    wordlist R,system,/var/spool/bogofilter/wordlist.db,3</pre>
 
     <p>Example 3 - prefer system to user list:</p>
 
-    <pre>  wordlist R,user,~/wordlist.db,5
-  wordlist R,system,/var/spool/bogofilter/wordlist.db,4</pre>
+    <pre>    wordlist R,user,~/wordlist.db,5
+    wordlist R,system,/var/spool/bogofilter/wordlist.db,4</pre>
 
     <p>Note 1: bogofilter's registration flags ('-s', '-n', '-u',
     '-S', '-N' ) will apply to the lowest numbered list.</p>
@@ -976,8 +971,8 @@ or:
 
     <p>Example:</p>
 
-    <pre>  wordlist I,ignore,~/ignorelist.db,7
-  wordlist R,system,/var/spool/bogofilter/wordlist.db,8</pre>
+    <pre>    wordlist I,ignore,~/ignorelist.db,7
+    wordlist R,system,/var/spool/bogofilter/wordlist.db,8</pre>
 
     <p>Because <code>ignorelist.db</code> has a lower index (7), than
     <code>wordlist.db</code> (8), bogofilter will stop looking when
@@ -1181,6 +1176,8 @@ or:
               premium, use <kbd>make install-strip)</kbd></em></li>
           </ol>
       </ol>
+
+    <hr>
 
     <h2 id="multi-user">Can bogofilter be used in a multi-user environment?</h2>
 

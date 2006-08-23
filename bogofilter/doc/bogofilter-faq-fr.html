@@ -47,7 +47,7 @@
 
      <p>Versions Officielles: en
      <a href="http://bogofilter.sourceforge.net/faq.shtml">Anglais</a> or
-     <a href="http://bogofilter.sourceforge.net/faq_fr.shtml">Français</a><br>
+     <a href="http://bogofilter.sourceforge.net/faq_fr.shtml">Français</a> or
      <a href="http://bogofilter.sourceforge.net/faq_it.shtml">Italien</a><br>
 
      Mainteneur: David Relson &lt;relson@osagesoftware.com&gt;<br>
@@ -58,7 +58,6 @@
 
     <ul>
       <li>
-
         Information générale
         <ul>
           <li><a href="#what-is-bogofilter">Qu'est ce que Bogofilter?</a></li>
@@ -272,6 +271,8 @@
 
     <p>Maintenant que vous avez été prévenus, amusez vous et utilisez Bogofilter
     au mieux de vos besoins.</p>
+
+    <hr>
 
     <h2 id="lists">Listes de diffusion</h2>
 
@@ -512,10 +513,12 @@
     qu'il peut être enovyé directement à bogofilter.</p>
 
     <p>Par exemple, pour convertir format UW-IMAP/PINE mbx en mbox:
-    <pre>
-    mailtool copy /full/path/to/mail.mbox '#driver.unix//full/path/to/mbox'
-ou:
-    for MSG in /full/path/to/maildir/* ; do 
+
+    <pre>    mailtool copy /full/path/to/mail.mbox '#driver.unix//full/path/to/mbox'</pre>
+
+    <p>ou:</p>
+
+    <pre>    for MSG in /full/path/to/maildir/* ; do 
         formail -I Status: < "$MSG" >> /full/path/to/mbox
     done</pre>
 
@@ -532,12 +535,11 @@ ou:
       <li>
         En utilisant "-v", Bogofilter génère la ligne d'entête
         "X-Bogosity:", par exemple
-	<pre>  X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000</pre></li>
-
+	<pre>  X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000</pre>
+      </li>
       <li>
-        En utilisant "-vv" Bogofilter génère un histogramme, par
-        exemple
-<pre>    X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
+        En utilisant "-vv" Bogofilter génère un histogramme, par exemple
+    <pre>    X-Bogosity: Ham, tests=bogofilter, spamicity=0.500000
       int  cnt    prob   spamicity  histogram
      0.00   29  0.000209  0.000052  #############################
      0.10    2  0.179065  0.003425  ##
@@ -736,8 +738,6 @@ ou:
 
     <hr>
 
-    <hr>
-
     <h2 id="spamassassin">Comment puis-je utiliser SpamAssassin
     pour l'apprentissage de Bogofilter?</h2>
 
@@ -932,18 +932,18 @@ ou:
 
     <p>Exemple 1 - mixage des listes systeme et utilisateur:</p>
 
-    <pre>  wordlist R,utilisateur,~/wordlist.db,1
-  wordlist R,systeme,/var/spool/bogofilter/wordlist.db,1</pre>
+    <pre>    wordlist R,utilisateur,~/wordlist.db,1
+    wordlist R,systeme,/var/spool/bogofilter/wordlist.db,1</pre>
 
     <p>Exemple 2 - priorité à la liste utilisateur:</p>
 
-    <pre>  wordlist R,utilisateur,~/wordlist.db,2
-  wordlist R,systeme,/var/spool/bogofilter/wordlist.db,3</pre>
+    <pre>    wordlist R,utilisateur,~/wordlist.db,2
+    wordlist R,systeme,/var/spool/bogofilter/wordlist.db,3</pre>
 
     <p>Exemple 3 - priorité à la liste systeme:</p>
 
-    <pre>  wordlist R,utilisateur,~/wordlist.db,5
-  wordlist R,systeme,/var/spool/bogofilter/wordlist.db,4</pre>
+    <pre>    wordlist R,utilisateur,~/wordlist.db,5
+    wordlist R,systeme,/var/spool/bogofilter/wordlist.db,4</pre>
 
     <p>Note 1: les options d'enregristrement de Bogofilter ('-s', '-n', '-u',
     '-S', '-N' ) ne s'appliqueront qu'aux listes les plus basses en précédence.</p>
@@ -960,8 +960,8 @@ ou:
 
     <p>Exemple:</p>
 
-    <pre>  wordlist I,ignore,~/ignorelist.db,7
-  wordlist R,systeme,/var/spool/bogofilter/wordlist.db,8</pre>
+    <pre>    wordlist I,ignore,~/ignorelist.db,7
+    wordlist R,systeme,/var/spool/bogofilter/wordlist.db,8</pre>
 
     <p>Puisque <code>ignorelist.db</code> a un index inférieur (7), à celui de
     <code>wordlist.db</code> (8), Bogofilter ne regardera pas les tokens
@@ -1051,6 +1051,7 @@ ou:
 
     <p>Si tout ce passe bien, vous pouvez enlever les fichiers de sauvegarde:</p>
     <pre>    rm wordlist.db.old wordlist.txt</pre>
+
     <hr>
 
     <h2 id="disable-transactions">Comment passer du mode transactionnel au mode
@@ -1157,7 +1158,7 @@ ou:
 	      </ol>
 	  </ol>
 
-	<hr>
+    <hr>
 
     <h2 id="multi-user">Bogofilter peut-il fonctionner en environnement multi-utilisateurs?</h2>
 
@@ -1225,42 +1226,41 @@ ou:
 
    <hr>
 
-      <h2 id="changed-tagging">Pourquoi, depuis que j'ai changé de version,
+   <h2 id="changed-tagging">Pourquoi, depuis que j'ai changé de version,
        Bogofilter fonctionne-t-il moins bien?</h2>
 
-      <p>Le lexer, la partie qui extrait les tokens des messages, évolue. Ceci
-      occasionne une modification de la génération de la liste des tokens, qui, par contrecoups
-      va rendre des anciens tokens inutilisés.</p>
+    <p>Le lexer, la partie qui extrait les tokens des messages, évolue. Ceci
+    occasionne une modification de la génération de la liste des tokens, qui, par contrecoups
+    va rendre des anciens tokens inutilisés.</p>
 
-      <p>Si vous rencontrez ce problème, vous êtes vivement encouragés à reconstruire votre
-      base. Si cela n'est pas possible, vous pouvez utiliser la version
-      <a href="http://sourceforge.net/project/showfiles.php?group_id=62265&amp;package_id=59357">0.15.13</a>
-      et lire la documentation qui va avec pour voir comment migrer.</p>
+    <p>Si vous rencontrez ce problème, vous êtes vivement encouragés à reconstruire votre
+    base. Si cela n'est pas possible, vous pouvez utiliser la version
+    <a href="http://sourceforge.net/project/showfiles.php?group_id=62265&amp;package_id=59357">0.15.13</a>
+    et lire la documentation qui va avec pour voir comment migrer.</p>
 
-      <hr>
+    <hr>
 
-      <h2 id="remove-spam-or-nonspam"> Avec une wordlist combinée, comment
-          puis-je détruire tous les tokens spams (ou les non-spams)?</h2>
+    <h2 id="remove-spam-or-nonspam"> Avec une wordlist combinée, comment
+	puis-je détruire tous les tokens spams (ou les non-spams)?</h2>
 
-      <p>Bogoutil vous permet de lister (dump) une wordlist et de charger les tokens dans
-      une nouvelle wordlist. Avec l'aide d'outils tels que awk et grep, les nombres peuvent
-      être mis à zéros et les tokens dont les comptes seraient à
-      zéro pour les spams et les hams pourraient être détruits.</p>
+    <p>Bogoutil vous permet de lister (dump) une wordlist et de charger les tokens dans
+    une nouvelle wordlist. Avec l'aide d'outils tels que awk et grep, les nombres peuvent
+    être mis à zéros et les tokens dont les comptes seraient à
+    zéro pour les spams et les hams pourraient être détruits.</p>
 
-      <p>Les commandes suivantes vont détruire les tokens des messages
-      spams:</p>
+    <p>Les commandes suivantes vont détruire les tokens des messages
+    spams:</p>
 
-      <pre>    bogoutil -d wordlist.db | \
-       awk '{print $1 " " $2 " 0"}' | grep -v " 0 0" | \
-       bogoutil -l wordlist.new.db
-      </pre>
+    <pre>    bogoutil -d wordlist.db | \
+    awk '{print $1 " " $2 " 0"}' | grep -v " 0 0" | \
+    bogoutil -l wordlist.new.db</pre>
 
-       <p>Les commandes suivantes vont détruire les tokens provenant des
-       messages hams.</p>
-   <pre>    bogoutil -d wordlist.db | \
+    <p>Les commandes suivantes vont détruire les tokens provenant des
+    messages hams.</p>
+
+    <pre>    bogoutil -d wordlist.db | \
     awk '{print $1 " 0 " $3}' | grep -v " 0 0" | \
-    bogoutil -l wordlist.new.db
-   </pre>
+    bogoutil -l wordlist.new.db</pre>
 
     <hr>
 
@@ -1273,7 +1273,8 @@ ou:
 	(prenez une des 4.2.X)</a>,
     décompactez la, et lancez les commandes suivantes dans le
     répertoire 'dist':</p>
-<pre>    $ cd build_unix
+
+    <pre>    $ cd build_unix
     $ sh ../dist/configure
     $ make
     # make install</pre>
@@ -1284,6 +1285,7 @@ ou:
     <h3>Sur Solaris</h3>
 
     <p>Décompactez la, puis faites:</p>
+
     <pre>    $ ./configure --with-libdb-prefix=/usr/local/BerkeleyDB-4.2
     $ make
     # make install-strip</pre>
@@ -1292,6 +1294,7 @@ ou:
     libdb.so dans /usr/lib, ou utiliser une version modifiée de la
     variable d'environnement LD_LIBRARY_PATH avant de lancer
     Bogofilter.</p>
+
     <pre>    $ LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/local/BerkeleyDB-4.2
         $ export LD_LIBRARY_PATH</pre>
 
@@ -1314,6 +1317,7 @@ ou:
     mettre à jour <a href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html">
     l'arbre de conversion (ports tree) avec cvsup</a> puis de
     taper</p>
+
     <pre>    # portupgrade -N bogofilter</pre>
 
     <p><em>Note: Ceci suppose que vous soyez root.</em> Sinon, lisez
