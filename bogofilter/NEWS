@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2006-08-22
+
+	* Added bogofilter-faq-it.html, an Italian translation of the
+          FAQ  (thanks to Marco Bozzolan).
+
 1.1.0	2006-08-09
 
 	* Revised FAQ's mailbox conversion example.
