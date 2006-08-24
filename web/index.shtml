@@ -73,10 +73,10 @@
             <td width="169">FAQ</td>
             <td width="397">Check out the bogofilter 
 		<a href="faq.shtml">FAQ</a>. 
-		Available in
-		<a href="faq_fr.shtml">French</a></td>
+		<br>Available in
+		<a href="faq_fr.shtml">French</a>
 		and
-		<a href="faq_it.shtml">Italian</a></td>
+		<a href="faq_it.shtml">Italian</a></td>.
           </tr>
           <tr bgcolor="#FFFFFF">
             <td width="169">History</td>
