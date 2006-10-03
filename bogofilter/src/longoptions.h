@@ -43,6 +43,7 @@ typedef enum longopts_e {
     O_NS_ESF,
     O_SP_ESF,
     O_HAM_CUTOFF,
+    O_HAM_TRUE,
     O_HEADER_FORMAT,
     O_LOG_HEADER_FORMAT,
     O_LOG_UPDATE_FORMAT,
@@ -91,6 +92,10 @@ typedef enum longopts_e {
        UNICODE_OPTION \
     { "version",			N, 0, 'V' }, \
     { "verbosity",			N, 0, 'v' },
+
+/* options for bogofilter */
+#define LONGOPTIONS_MAIN \
+    { "ham-true"	,		N, 0, O_HAM_TRUE },
 
 /* options for bogofilter and bogolexer */
 #define LONGOPTIONS_LEX \

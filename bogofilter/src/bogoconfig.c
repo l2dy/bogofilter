@@ -92,7 +92,9 @@ static void comma_parse(char opt, const char *arg, double *parm1, double *parm2,
 static struct option longopts_bogofilter[] = {
     /* longoptions.h - common options */
     LONGOPTIONS_COMMON
-    /* longoptions.h - bogofilter/-lexer options */
+    /* longoptions.h - bogofilter */
+    LONGOPTIONS_MAIN
+    /* longoptions.h - bogofilter/bogolexer options */
     LONGOPTIONS_LEX
     /* longoptions.h - bogofilter/bogoutil options */
     LONGOPTIONS_DB
@@ -518,6 +520,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	break;
 
     case 'e':
+    case O_HAM_TRUE:
 	nonspam_exits_zero = true;
 	break;
 
