@@ -137,7 +137,7 @@ BCHARSNOSPC	[[:alnum:]()+_,-./:=?#\']
 BCHARS		[[:alnum:]()+_,-./:=?#\' ]
 MIME_BOUNDARY	{BCHARS}*{BCHARSNOSPC}
 
-ID		<?[[:alnum:]\-\.]*>?
+ID		<?[[:alnum:]\-\.]+>?
 CHARSET		[[:alnum:]-]+
 VERPID		[[:alnum:]#-]+[[:digit:]]+[[:alnum:]#-]+
 MTYPE		[[:blank:]]*[[:alnum:]/-]*
