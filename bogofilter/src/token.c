@@ -352,6 +352,8 @@ token_t parse_new_token(word_t *token)
 		    text += 1;
 		    leng -= 1;
 		}
+		if (leng == 0)
+		    fprintf(stderr, "QUEUE_ID error\n");
 		if (text[leng-1] == '>') {
 		    leng -= 1;
 		}
@@ -591,8 +593,8 @@ void token_init(void)
 	w_recv = word_news("rcvd:");	/* Received:    */
 	w_head = word_news("head:");	/* Header:      */
 	w_mime = word_news("mime:");	/* Mime:        */
-	w_ip   = word_news("ip");	/* ip:          */
-	w_url  = word_news("url");	/* url:         */
+	w_ip   = word_news("ip:");	/* ip:          */
+	w_url  = word_news("url:");	/* url:         */
 	nonblank_line = word_news(NONBLANK);
 
 	/* do multi-word token initializations */
