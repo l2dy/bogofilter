@@ -15,15 +15,22 @@
 
 -------------------------------------------------------------------------------
 
+	2006-11-21
+
+	* Fix processing of "--unicode=no" option.
+
 	2006-11-18
 
-	* Fix prefixes for ip addresses and urls.  Restore colon that
-          was dropped from token.c in July 2006.
+	* Fix prefixes for ip address and url tokens.  Restore colon
+          that was dropped in token.c edit for bogofilter-1.1.0.
+
+	* Fix SegFault caused by iconv_t handle left open. 
+	  (reported by Michael Gerdau)
 
 	2006-11-04
 
 	* Fixed problem parsing message ids.
-	  (reported by Torsten Veller).
+	  (reported by Torsten Veller)
 
 	2006-10-03
 

@@ -234,7 +234,7 @@ void open_wordlists(dbmode_t mode)
 	for (list = word_lists; list != NULL ; list = list->next) {
 	    check_wordlist_path(list);
 	    retry |= open_wordlist(list, list->type == WL_IGNORE ? DS_READ : mode);
-	    if (list == word_lists)
+	    if (list == word_lists && encoding == E_UNKNOWN)
 		encoding = list->encoding;
 	    if (list->encoding != E_UNKNOWN &&
 		list->encoding != encoding) {
