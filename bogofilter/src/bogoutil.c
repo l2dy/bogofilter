@@ -463,7 +463,8 @@ static void print_version(void)
     (void)fprintf(stdout,
 		  "%s version %s\n"
 		  "    Database: %s\n"
-		  "Copyright (C) 2002-2006 Gyepi Sam, David Relson, Matthias Andree\n\n"
+		  "Copyright (C) 2002-2006 David Relson, Matthias Andree\n"
+		  "Copyright (C) 2002-2003 Gyepi Sam.\n\n"
 		  "%s comes with ABSOLUTELY NO WARRANTY.  "
 		  "This is free software, and\nyou are welcome to "
 		  "redistribute it under the General Public License.  "
