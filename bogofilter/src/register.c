@@ -74,7 +74,8 @@ retry:
     if (first)
 	first = false;
     else {
-	fprintf(stderr, "retrying registration after avoided deadlock...\n");
+	if (verbose)
+	    fprintf(stderr, "retrying registration after avoided deadlock...\n");
 	begin_wordlist(list);
     }
 
