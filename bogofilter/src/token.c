@@ -352,8 +352,6 @@ token_t parse_new_token(word_t *token)
 		    text += 1;
 		    leng -= 1;
 		}
-		if (leng == 0)
-		    fprintf(stderr, "QUEUE_ID error\n");
 		if (text[leng-1] == '>') {
 		    leng -= 1;
 		}
