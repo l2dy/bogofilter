@@ -185,6 +185,18 @@ if test "$GCC" = yes && test "$ICC" = no ; then
 fi
 AM_CONDITIONAL(USE_GCC4, test $gcc4 = yes)
 
+dnl Check whether flex needs patching
+flex=no
+if test -n "$LEX"; then
+    case `$LEX --version | awk '{print $2}'` in
+	2.5.4) flex=yes ;;
+	2.5.31) flex=yes ;;
+	2.5.33) flex=yes ;;
+    esac
+fi
+dnl flex=yes
+AM_CONDITIONAL(PATCH_FLEX, test $flex = yes)
+
 dnl large file support (LFS)
 AC_SYS_LARGEFILE
 dnl AC_FUNC_FSEEKO

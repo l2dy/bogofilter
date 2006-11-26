@@ -249,7 +249,8 @@ fgetsl_test_CFLAGS= -DMAIN
 EXTRA_DIST = $(bin_SCRIPTS) \
 	     bogoupgrade.in \
 	     version.sh \
-	     strlcat.3 strlcpy.3
+	     strlcat.3 strlcpy.3 \
+	     patch.lexer.25x.txt
 #
 version.c: version.sh ../configure.ac Makefile.am	\
 	$(version_sources)				\
@@ -286,5 +287,8 @@ splint.check: $(version_sources) $(bogofilter_SOURCES) $(bogolexer_SOURCES) $(bo
 lexer_v3.c: $(srcdir)/lexer_v3.l $(srcdir)/Makefile.in
 	$(LEX) $(srcdir)/lexer_v3.l
 	(echo '/* Include config.h early to avoid _FILE_OFFSET_BITS redefinition on Solaris */'; echo '#include "config.h"' ; sed '/^#/ s|lex.yy\.c|$@|; s/\(accepting rule at line\) %d/\\1 %ld/' lex.yy.c) >$@
+if PATCH_FLEX
+	patch $@ < patch.lexer.25x.txt
+endif
 	rm -f lex.yy.c
 
