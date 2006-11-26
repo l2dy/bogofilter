@@ -220,7 +220,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 						  }
 						  return MSG_COUNT_LINE;
 						}
-<BOGO_LEX>^\"{BOGOLEX_CHAR}*\"{NUM_NUM}$	{ return BOGO_LEX_LINE; }
+<BOGO_LEX>^\"{BOGOLEX_CHAR}+\"{NUM_NUM}$	{ return BOGO_LEX_LINE; }
 <BOGO_LEX>\n					{ lineno += 1; }
 
 <INITIAL>{ENCODED_TOKEN}			{ word_t *raw = yy_text();
