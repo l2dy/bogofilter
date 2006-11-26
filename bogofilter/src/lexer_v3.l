@@ -145,12 +145,12 @@ NUM		[[:digit:]]+
 NUM_NUM		\ {NUM}\ {NUM}
 MSG_COUNT	^\".MSG_COUNT\"
 
-TOKENFRONT	[^[:blank:][:cntrl:][:digit:][:punct:]]
-TOKENMID	[^[:blank:][:cntrl:]:$*<>;=()&%#@+|/\\{}^\"?,\[\]]*
-BOGOLEX_TOKEN	[^[:blank:][:cntrl:]   <>;=()&%#@+|/\\{}^\"?,\[\]]*
-TOKENBACK	[^[:blank:][:cntrl:]:$*<>;=()&%#@+|/\\{}^\"?,\[\]._~\'\`\-]
+FRONT_CHAR	[^[:blank:][:cntrl:][:digit:][:punct:]]
+MID_CHAR	[^[:blank:][:cntrl:]:$*<>;=()&%#@+|/\\{}^\"?,\[\]]
+BOGOLEX_CHAR	[^[:blank:][:cntrl:]   <>;=()&%#@+|/\\{}^\"?,\[\]]
+BACK_CHAR	[^[:blank:][:cntrl:]:$*<>;=()&%#@+|/\\{}^\"?,\[\]._~\'\`\-]
 
-TOKEN		{TOKENFRONT}({TOKENMID}{TOKENBACK})?
+TOKEN		{FRONT_CHAR}({MID_CHAR}*{BACK_CHAR})?
 
 /*  RFC2047.2
     encoded-word = "=?" charset "?" encoding "?" encoded-text "?="
@@ -182,7 +182,7 @@ HTML_ENCODING	"&#"x?[[:xdigit:]]+";"
 URL_ENCODING	"%"[[:xdigit:]][[:xdigit:]]
 
 ENCODED_WORD	=\?{CHARSET}\?[bq]\?[^?\n]*\?=
-ENCODED_TOKEN	({TOKENFRONT}{TOKENMID})?({ENCODED_WORD}{WHITESPACE}+)*{ENCODED_WORD}
+ENCODED_TOKEN	({FRONT_CHAR}{MID_CHAR}*)?({ENCODED_WORD}{WHITESPACE}+)*{ENCODED_WORD}
 
 /*
 HTML_WI_COMMENTS	"<"[^>]*">"
@@ -220,7 +220,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 						  }
 						  return MSG_COUNT_LINE;
 						}
-<BOGO_LEX>^\"{BOGOLEX_TOKEN}\"{NUM_NUM}$	{ return BOGO_LEX_LINE; }
+<BOGO_LEX>^\"{BOGOLEX_CHAR}*\"{NUM_NUM}$	{ return BOGO_LEX_LINE; }
 <BOGO_LEX>\n					{ lineno += 1; }
 
 <INITIAL>{ENCODED_TOKEN}			{ word_t *raw = yy_text();
