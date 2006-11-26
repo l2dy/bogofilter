@@ -282,21 +282,21 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 
   /* This has to match just as much or more than the below rules, so as to be the 
      controlling rule. */
-<HTML>{TOKEN}({HTMLTOKEN}*{BREAKHTML}+{HTMLTOKEN}*.?|({HTMLTOKEN})+{WHITESPACE})		{ 
+<HTML>{TOKEN}({HTMLTOKEN}*{BREAKHTML}+{HTMLTOKEN}*.?|{HTMLTOKEN}+{WHITESPACE})		{ 
     			char *chr = memchr(yytext, '<', yyleng);	/* find start of html tag */
 			size_t len = chr - yytext;
 			yyless(len);
 			return TOKEN;
 			}
 
-<HTML>{TOKEN}({HTMLTOKEN})+/{NOTWHITESPACE}	{ html_reorder(); }
+<HTML>{TOKEN}{HTMLTOKEN}+/{NOTWHITESPACE}	{ html_reorder(); }
 
 <HTML>"<!--"					{ BEGIN SCOMMENT; }
 <HTML>"<!"					{ BEGIN LCOMMENT; }
 <HTML>"<"(a|img|font){WHITESPACE}		{ BEGIN HTOKEN; }
 <HTML>"<"					{ BEGIN HDISCARD; }	/* unknown tag */
 
-<HTOKEN>({TOKEN})				{ return TOKEN; }
+<HTOKEN>{TOKEN}					{ return TOKEN; }
 <HDISCARD,LCOMMENT,SCOMMENT>{TOKEN}		{ /* discard innards of html tokens and comments */ }
 
 <HTOKEN,HDISCARD,LCOMMENT>">"			{ BEGIN HTML; }	/* end of tag, loose comment; return to normal html processing */
@@ -306,7 +306,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 {IPADDR}					{ return IPADDR;}
 "\["({IPADDR})"\]"				{ return MESSAGE_ADDR;}
 
-({TOKEN})					{ return TOKEN;}
+{TOKEN}						{ return TOKEN;}
 
 <HTML>{TOKEN}?{HTML_ENCODING}			{ html_char(); }	/* process escaped chars, eg '&#101;' is 'a' */
 <HTOKEN>"/"[^/[:blank:]\n%]*{URL_ENCODING}+	{ url_char(); }		/* process escaped chars, eg '%61'    is 'a' */
