@@ -17,8 +17,8 @@
 
 	2006-11-26
 
-	* Removed unneeded T1 rule from lexer_v3.l and updated file comment.
-	* Removed unneeded SHORT_TOKEN rule from lexer_v3.l.
+	* Updated file comment for lexer_v3.l and removed unneeded
+	  rules T1, T12, SHORT_TOKEN, and TOKEN_12.
 
 	2006-11-21
 

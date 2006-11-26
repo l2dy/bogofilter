@@ -152,9 +152,6 @@ TOKENBACK	[^[:blank:][:cntrl:]<>;=():&%$#@+|/\\{}^\"?*,\[\]._~\'\`\-]
 
 TOKEN		{TOKENFRONT}({TOKENMID}{TOKENBACK})?
 
-T12		[[:alpha:]][[:alnum:]]?
-TOKEN_12 	({TOKEN}|{T12})
-
 /*  RFC2047.2
     encoded-word = "=?" charset "?" encoding "?" encoded-text "?="
     charset = token    ; see section 3
@@ -292,7 +289,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 			return TOKEN;
 			}
 
-<HTML>{TOKEN_12}({HTMLTOKEN})+/{NOTWHITESPACE}	{ html_reorder(); }
+<HTML>{TOKEN}({HTMLTOKEN})+/{NOTWHITESPACE}	{ html_reorder(); }
 
 <HTML>"<!--"					{ BEGIN SCOMMENT; }
 <HTML>"<!"					{ BEGIN LCOMMENT; }
@@ -311,7 +308,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 
 ({TOKEN})					{ return TOKEN;}
 
-<HTML>{TOKEN_12}?{HTML_ENCODING}		{ html_char(); }	/* process escaped chars, eg '&#101;' is 'a' */
+<HTML>{TOKEN}?{HTML_ENCODING}			{ html_char(); }	/* process escaped chars, eg '&#101;' is 'a' */
 <HTOKEN>"/"[^/[:blank:]\n%]*{URL_ENCODING}+	{ url_char(); }		/* process escaped chars, eg '%61'    is 'a' */
 
 \${NUM}(\.{NUM})?				{ return MONEY;}	/* Dollars and cents */
