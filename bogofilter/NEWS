@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2006-11-26
+
+	* Removed unneeded T1 rule from lexer_v3.l and updated file comment.
+	* Removed unneeded SHORT_TOKEN rule from lexer_v3.l.
+
 	2006-11-21
 
 	* Fix processing of "--unicode=no" option.

@@ -15,7 +15,6 @@
  * We throw away headers that are readily identifiable as dates.
  * We throw away all digit strings that don't look like IP address parts.
  * We thow away lines beginning with <tab>id<space> -- mailer UDs.
- * We throw away *all* tokens of length 1 or 2.
  *
  * These are optimizations to keep the token lists from bloating.
  * The big win is recognizing machine-generated unique IDs that
@@ -147,16 +146,14 @@ NUM_NUM		\ {NUM}\ {NUM}
 MSG_COUNT	^\".MSG_COUNT\"
 
 TOKENFRONT	[^[:blank:][:cntrl:][:digit:][:punct:]]
-TOKENMID	[^[:blank:][:cntrl:]<>;=():&%$#@+|/\\{}^\"?*,\[\]]+
+TOKENMID	[^[:blank:][:cntrl:]<>;=():&%$#@+|/\\{}^\"?*,\[\]]*
 BOGOLEX_TOKEN	[^[:blank:][:cntrl:]<>;    &%  @ |/\\{}^\" *,\[\]]+
 TOKENBACK	[^[:blank:][:cntrl:]<>;=():&%$#@+|/\\{}^\"?*,\[\]._~\'\`\-]
 
-TOKEN		{TOKENFRONT}{TOKENMID}{TOKENBACK}
-SHORT_TOKEN	{TOKENFRONT}{TOKENBACK}?
+TOKEN		{TOKENFRONT}({TOKENMID}{TOKENBACK})?
 
-T1		[[:alpha:]]
 T12		[[:alpha:]][[:alnum:]]?
-TOKEN_12 	({TOKEN}|{T12}|{T1})
+TOKEN_12 	({TOKEN}|{T12})
 
 /*  RFC2047.2
     encoded-word = "=?" charset "?" encoding "?" encoded-text "?="
@@ -302,7 +299,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <HTML>"<"(a|img|font){WHITESPACE}		{ BEGIN HTOKEN; }
 <HTML>"<"					{ BEGIN HDISCARD; }	/* unknown tag */
 
-<HTOKEN>({TOKEN}|{SHORT_TOKEN})			{ return TOKEN; }
+<HTOKEN>({TOKEN})				{ return TOKEN; }
 <HDISCARD,LCOMMENT,SCOMMENT>{TOKEN}		{ /* discard innards of html tokens and comments */ }
 
 <HTOKEN,HDISCARD,LCOMMENT>">"			{ BEGIN HTML; }	/* end of tag, loose comment; return to normal html processing */
@@ -312,7 +309,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 {IPADDR}					{ return IPADDR;}
 "\["({IPADDR})"\]"				{ return MESSAGE_ADDR;}
 
-({TOKEN}|{SHORT_TOKEN})				{ return TOKEN;}
+({TOKEN})					{ return TOKEN;}
 
 <HTML>{TOKEN_12}?{HTML_ENCODING}		{ html_char(); }	/* process escaped chars, eg '&#101;' is 'a' */
 <HTOKEN>"/"[^/[:blank:]\n%]*{URL_ENCODING}+	{ url_char(); }		/* process escaped chars, eg '%61'    is 'a' */
