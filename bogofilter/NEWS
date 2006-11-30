@@ -15,6 +15,10 @@
 
 -------------------------------------------------------------------------------
 
+	2006-11-29
+
+	* Provide separate flex patches for 2.5.4 and 2.5.3x
+
 	2006-11-26
 
 	* Updated file comment for lexer_v3.l and removed unneeded
