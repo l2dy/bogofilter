@@ -20,7 +20,7 @@
 	* Updated file comment for lexer_v3.l and removed unneeded
 	  rules T1, T12, SHORT_TOKEN, and TOKEN_12.
 	* Miscellaneous minor cleanups of lexer_v3.l classes and rules.
-	* Patch buffer overflow condition in flex skeleton.
+	* Patch buffer overflow problem in flex's skeleton code.
 
 	2006-11-21
 

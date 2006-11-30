@@ -188,14 +188,15 @@ AM_CONDITIONAL(USE_GCC4, test $gcc4 = yes)
 dnl Check whether flex needs patching
 flex=no
 if test -n "$LEX"; then
-    case `$LEX --version | awk '{print $3}'` in
-	2.5.4) flex=yes ;;
-	2.5.31) flex=yes ;;
-	2.5.33) flex=yes ;;
+    case `$LEX --version'` in
+	*2.5.4) flex=254 ;;
+	*2.5.31) flex=253x ;;
+	*2.5.33) flex=253x ;;
     esac
 fi
 dnl flex=yes
-AM_CONDITIONAL(PATCH_FLEX, test $flex = yes)
+AM_CONDITIONAL(PATCH_FLEX_254, test $flex = 254)
+AM_CONDITIONAL(PATCH_FLEX_253X, test $flex = 253x)
 
 dnl large file support (LFS)
 AC_SYS_LARGEFILE
