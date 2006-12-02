@@ -103,20 +103,28 @@
                 </tr>
                 <tr>
                   <td>FreeBSD ports</td>
-                  <td>See <a href=
-        "http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td>
+                  <td>See <a
+		    href="http://www.freshports.org/mail/bogofilter/"
+		    target="_blank">FreshPorts</a></td> 
                   <td>
 		      <div align="center">BerkeleyDB, QDBM, SQLite3</div>
                   </td>
                 </tr>
 		<tr><td colspan="3"><a
-			    href="http://www.mandriva.com/en/"
-			    target="_blank"><strong>Mandriva</strong></a></td></tr>
+		    href="http://www.mandriva.com/en/"
+		    target="_blank"><strong>Mandriva</strong></a></td></tr>
                 <tr>
-                  <td>Contrib</td>
-                  <td>0.94.4</td>
+                  <td>Official - Contrib</td>
+                  <td>0.95.2</td>
                   <td>
-                    <div align="center">BerkeleyDB, QDBM</div>
+                    <div align="center">BerkeleyDB, QDBM, SQLite3</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Cooker - Contrib</td>
+                  <td>1.0.0</td>
+                  <td>
+                    <div align="center">BerkeleyDB, QDBM, SQLite3</div>
                   </td>
                 </tr>
 
