@@ -15,6 +15,8 @@
 
 -------------------------------------------------------------------------------
 
+1.1.1	2006-12-02 (released)
+
 	2006-12-01
 
 	* Revise install-staticlibs.sh's links for retrieving database
@@ -30,7 +32,8 @@
 	* Updated file comment for lexer_v3.l and removed unneeded
 	  rules T1, T12, SHORT_TOKEN, and TOKEN_12.
 	* Miscellaneous minor cleanups of lexer_v3.l classes and rules.
-	* Patch buffer overflow problem in flex's skeleton code.
+	* Patch flex skeleton code problem which can cause a seg-fault.
+	  (reported by Michael Gerdau)
 
 	2006-11-21
 
@@ -41,12 +44,10 @@
 	* Fix prefixes for ip address and url tokens.  Restore colon
           that was dropped in token.c edit for bogofilter-1.1.0.
 
-	* Fix SegFault caused by iconv_t handle left open. 
-	  (reported by Michael Gerdau)
-
 	2006-11-04
 
-	* Fixed problem parsing message ids.
+	* Fixed problem parsing message ids, which can cause a
+	  seg-fault on an x86_64.
 	  (reported by Torsten Veller)
 
 	2006-10-03
