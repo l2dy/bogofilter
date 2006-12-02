@@ -88,14 +88,26 @@ sqdir=sqlite-3.3.5
 sqpfx=/opt/sqlite-3-lean
 
 ### download SleepyCat DB 4.2.52 and patches
+source=bogofilter.org
 build_db=0
 checklib=$dbpfx/lib/libdb.a
 if test ! -f $checklib ; then
-    want http://downloads.sleepycat.com/db-4.2.52.tar.gz       8b5cff6eb83972afdd8e0b821703c33c
-    want http://www.sleepycat.com/update/4.2.52/patch.4.2.52.1 1227f5f9ff43d48b5b1759e113a1c2d7
-    want http://www.sleepycat.com/update/4.2.52/patch.4.2.52.2 3da7efd8d29919a9113e2f6f5166f5b7
-    want http://www.sleepycat.com/update/4.2.52/patch.4.2.52.3 0bf9ebbe852652bed433e522928d40ec
-    want http://www.sleepycat.com/update/4.2.52/patch.4.2.52.4 9cfeff4dce0c11372c0b04b134f8faef
+    case $source in
+	sleepycat.com)
+	URL=http://www.sleepycat.com
+	want $URL/db-4.2.52.tar.gz             8b5cff6eb83972afdd8e0b821703c33c
+	want $URL/update/4.2.52/patch.4.2.52.1 1227f5f9ff43d48b5b1759e113a1c2d7
+	want $URL/update/4.2.52/patch.4.2.52.2 3da7efd8d29919a9113e2f6f5166f5b7
+	want $URL/update/4.2.52/patch.4.2.52.3 0bf9ebbe852652bed433e522928d40ec
+	want $URL/update/4.2.52/patch.4.2.52.4 9cfeff4dce0c11372c0b04b134f8faef
+	;;
+    bogofilter.org)
+	URL=ftp://ftp.bogofilter.org/pub/outgoing/tools/BerkeleyDB
+	want $URL/db-4.2.52.tar.gz 8b5cff6eb83972afdd8e0b821703c33c
+	want $URL/patch.4.2.52.1   1227f5f9ff43d48b5b1759e113a1c2d7
+	want $URL/patch.4.2.52.2   3da7efd8d29919a9113e2f6f5166f5b7
+	;;
+    esac
     build_db=1
 else
     echo "$checklib already exists, not building Berkeley DB."
@@ -106,11 +118,21 @@ fi
 # in an earlier version of this script, which built
 # a sqlite 3.2.8 version that required GLIBC_2.3.
 build_sqlite=0
+source=sqlite.org
 checklib=$sqpfx/lib/libsqlite3.a
 if test ! -f $checklib || \
     objdump -t /opt/sqlite-3-lean/lib/libsqlite3.a \
 	| grep -q __ctype_b_loc ; then
-    want http://www.sqlite.org/sqlite-3.3.5.tar.gz             dd2a7b6f2a07a4403a0b5e17e8ed5b88
+    case $source in
+    sqlite.org)
+	URL=http://www.sqlite.org
+	want $URL/sqlite-3.3.5.tar.gz dd2a7b6f2a07a4403a0b5e17e8ed5b88
+	;;
+    bogofilter.org)
+	URL=ftp://ftp.bogofilter.org/pub/outgoing/tools/SQLite
+	want $URL/sqlite-3.3.5.tar.gz dd2a7b6f2a07a4403a0b5e17e8ed5b88
+	;;
+    esac
     build_sqlite=1
 else
     echo "$checklib already exists, not building SQLite3."
@@ -120,10 +142,11 @@ fi
 if test $build_db = 1 ; then
     rm -rf $dbdir
     gunzip -c -d $dbdir.tar.gz | tar xf -
-    patch -s -d $dbdir -p0 <patch.4.2.52.1
-    patch -s -d $dbdir -p0 <patch.4.2.52.2
-    patch -s -d $dbdir -p0 <patch.4.2.52.3
-    patch -s -d $dbdir -p0 <patch.4.2.52.4
+    for N in 1 2 3 4 ; do
+	if [ -f patch.4.2.52.$N ] ; then
+	    patch -s -d $dbdir -p0 <patch.4.2.52.$N
+	fi
+    done
     echo "installing $dbdir into $dbpfx"
     cd $dbdir/build_unix
     env CPPFLAGS=-D__NO_CTYPE ../dist/configure \

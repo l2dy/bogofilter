@@ -15,6 +15,12 @@
 
 -------------------------------------------------------------------------------
 
+	2006-12-01
+
+	* Revise install-staticlibs.sh's links for retrieving database
+	  tarball and patches.
+	* Revise make rules for generating statically linked RPM.
+
 	2006-11-29
 
 	* Provide separate flex patches for 2.5.4 and 2.5.3x

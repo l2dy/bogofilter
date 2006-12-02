@@ -99,9 +99,9 @@ rpm:	dist
 	@echo "been built are ready to go however."
 	@echo
 	@sleep 5
-	-                CPPFLAGS="-D__NO_CTYPE -I/usr/include/db42" LIBS=-ldb-4.2 \
+	-                CPPFLAGS="-D__NO_CTYPE -I$(DBPFX)" LIBS=-ldb-4.2 \
 			$(RPMBUILD)              $(DEF_DB42)   $(SIGN) -tb $(distdir).tar.gz
-	-                CPPFLAGS="-D__NO_CTYPE                   "                \
+	-                CPPFLAGS="-D__NO_CTYPE -I$(SQPFX)"               \
 			$(RPMBUILD)              $(DEF_SQLITE) $(SIGN) -tb $(distdir).tar.gz
 
 cvs-check:
