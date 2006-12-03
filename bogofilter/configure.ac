@@ -188,7 +188,7 @@ AM_CONDITIONAL(USE_GCC4, test $gcc4 = yes)
 dnl Check whether flex needs patching
 flex=no
 if test -n "$LEX"; then
-    case `$LEX --version'` in
+    case `$LEX --version` in
 	*2.5.4) flex=254 ;;
 	*2.5.31) flex=253x ;;
 	*2.5.33) flex=253x ;;
