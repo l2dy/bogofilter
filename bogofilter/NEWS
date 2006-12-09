@@ -15,6 +15,12 @@
 
 -------------------------------------------------------------------------------
 
+	2006-12-08
+
+	* Add GSL dependency to bogofilter target to support parallel
+	  makes.
+	  (reported by Martin von Gagern)
+
 	2006-12-05
 
 	* Fixed problem in flex-2.5.4 patch.

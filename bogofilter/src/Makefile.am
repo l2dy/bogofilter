@@ -12,22 +12,6 @@ endif
 
 noinst_LIBRARIES = libbogofilter.a
 
-if NEED_GSL
-libbf_gsl_a_CFLAGS=$(AM_CFLAGS) -DRENAMEFILES
-libbf_gsl_a_SOURCES= \
-../gsl/cdf/chisq.c ../gsl/cdf/gamma.c \
-../gsl/specfunc/gamma_inc.c ../gsl/err/error.c \
-../gsl/sys/infnan.c ../gsl/sys/fdiv.c \
-../gsl/specfunc/exp.c ../gsl/specfunc/trig.c \
-../gsl/specfunc/log.c ../gsl/specfunc/psi.c \
-../gsl/specfunc/zeta.c ../gsl/specfunc/elementary.c \
-../gsl/err/stream.c ../gsl/specfunc/expint.c \
-../gsl/specfunc/erfc.c ../gsl/sys/coerce.c \
-../gsl/sys/pow_int.c ../gsl/sys/minmax.c
-noinst_LIBRARIES += libbf_gsl.a
-libbf_gsl_a_CPPFLAGS= -I$(top_srcdir)
-endif
-
 if USE_GCC4
 AM_CPPFLAGS = -iquote$(top_srcdir)/gnugetopt -iquote$(top_srcdir)/trio \
 	      -I$(srcdir) @GSL_CFLAGS@ -I$(top_srcdir)/gsl/specfunc -I$(top_srcdir)
@@ -59,8 +43,27 @@ LDADD = libbogofilter.a
 bogofilter_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
 bogoutil_LDADD = $(LDADD) $(LIBDB)
 configtest_LDADD = $(LDADD) $(LIBDB)
+bogofilter_DEPENDENCIES = $(LDADD)
+
+if NEED_GSL
+libbf_gsl_a_CFLAGS=$(AM_CFLAGS) -DRENAMEFILES
+libbf_gsl_a_SOURCES= \
+../gsl/cdf/chisq.c ../gsl/cdf/gamma.c \
+../gsl/specfunc/gamma_inc.c ../gsl/err/error.c \
+../gsl/sys/infnan.c ../gsl/sys/fdiv.c \
+../gsl/specfunc/exp.c ../gsl/specfunc/trig.c \
+../gsl/specfunc/log.c ../gsl/specfunc/psi.c \
+../gsl/specfunc/zeta.c ../gsl/specfunc/elementary.c \
+../gsl/err/stream.c ../gsl/specfunc/expint.c \
+../gsl/specfunc/erfc.c ../gsl/sys/coerce.c \
+../gsl/sys/pow_int.c ../gsl/sys/minmax.c
+noinst_LIBRARIES += libbf_gsl.a
+libbf_gsl_a_CPPFLAGS= -I$(top_srcdir)
+bogofilter_DEPENDENCIES += libbf_gsl.a
+endif
 
 EXTRA_PROGRAMS=panicenv
+
 panicenv_SOURCES=panicenv.c
 panicenv_LDADD=$(LIBDB)
 
