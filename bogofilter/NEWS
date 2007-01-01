@@ -15,6 +15,12 @@
 
 -------------------------------------------------------------------------------
 
+1.1.4	2007-01-01 (released)
+
+	2007-01-01
+
+	* Update copyright notices.
+
 	2006-12-08
 
 	* Add GSL dependency to bogofilter target to support parallel
