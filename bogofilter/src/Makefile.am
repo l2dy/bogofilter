@@ -43,7 +43,8 @@ LDADD = libbogofilter.a
 bogofilter_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
 bogoutil_LDADD = $(LDADD) $(LIBDB)
 configtest_LDADD = $(LDADD) $(LIBDB)
-bogofilter_DEPENDENCIES = $(LDADD)
+
+bogofilter_DEPENDENCIES = libbogofilter.a
 
 if NEED_GSL
 libbf_gsl_a_CFLAGS=$(AM_CFLAGS) -DRENAMEFILES
