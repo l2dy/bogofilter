@@ -39,6 +39,7 @@ PARSING_TESTS = \
 	t.escaped.html t.escaped.url \
 	t.split t.parsing \
 	t.lexer t.lexer.mbx \
+	t.block.on.subnets \
 	t.multiple.tokens.head t.multiple.tokens.body t.token.min.mul \
 	$(ENCODING_TESTS) \
 	t.rfc2047_broken t.rfc2047_folded \
