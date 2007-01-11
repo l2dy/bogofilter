@@ -251,7 +251,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case 'X':
 	set_bogotest(val);
 	break;
-	
+
     case O_BLOCK_ON_SUBNETS:
 	block_on_subnets = get_bool(name, val);
 	break;
