@@ -121,7 +121,7 @@ static inline void token_copy( word_t *dst, word_t *src )
     token_set(dst, src->text, src->leng);
 }
 
-static void build_prefixed_token( word_t *token, word_t *prefix, 
+static void build_prefixed_token( word_t *prefix, word_t *token,
 				  word_t *temp, uint32_t temp_size )
 {
     uint len = token->leng + prefix->leng;
@@ -162,11 +162,11 @@ token_t get_token(word_t *token)
     if (token_prefix != NULL) {
 	/* IP addresses get special prefix */
 	if (save_class != IPADDR) {
-	    build_prefixed_token(token, token_prefix, &yylval, yylval_text_size);
+	    build_prefixed_token(token_prefix, token, &yylval, yylval_text_size);
 	}
 	else {
 	    word_t *prefix = (wordlist_version >= IP_PREFIX) ? w_ip : w_url;
-	    build_prefixed_token(token, prefix, &yylval, yylval_text_size);
+	    build_prefixed_token(prefix, token, &yylval, yylval_text_size);
 	}
 
 	/* if excessive length caused by prefix, get another token */
