@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2007-01-11
+
+	* Fixed block-on-subnets problem.
+	  (thanks to Jack Bailey)
+
 	2007-01-09
 
 	* Fixed Makefile dependency problem.
