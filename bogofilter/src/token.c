@@ -124,19 +124,14 @@ static inline void token_copy( word_t *dst, word_t *src )
 static void build_prefixed_token( word_t *token, word_t *prefix, 
 				  word_t *temp, uint32_t temp_size )
 {
-    uint pfx_len = (prefix == NULL) ? 0 : prefix->leng;
-    uint len = token->leng + pfx_len;
+    uint len = token->leng + prefix->leng;
     
     if (len >= temp_size)
-	len = temp_size - pfx_len - 1;
+	len = temp_size - prefix->leng - 1;
 
     temp->leng = len;
-
-    /* copy prefix, if there is one */
-    if (prefix != NULL)
-	memcpy(temp->text, prefix->text, pfx_len);
-
-    memcpy(temp->text + pfx_len, token->text, len-pfx_len);
+    memmove(temp->text+prefix->leng, token->text, len-prefix->leng);
+    memcpy(temp->text, prefix->text, prefix->leng);
     Z(temp->text[temp->leng]);
 
     token->leng = temp->leng;
@@ -170,9 +165,8 @@ token_t get_token(word_t *token)
 	    build_prefixed_token(token, token_prefix, &yylval, yylval_text_size);
 	}
 	else {
-
 	    word_t *prefix = (wordlist_version >= IP_PREFIX) ? w_ip : w_url;
-	    build_prefixed_token(token, prefix, ipsave, max_token_len);
+	    build_prefixed_token(token, prefix, &yylval, yylval_text_size);
 	}
 
 	/* if excessive length caused by prefix, get another token */
@@ -198,7 +192,7 @@ token_t parse_new_token(word_t *token)
 	else
 	{
 	    ipsave->leng = (uint) (t - ipsave->text);
-	    token_set( &yylval, ipsave->text, ipsave->leng);
+	    token_set( token, ipsave->text, ipsave->leng);
 	    cls = save_class;
 	    done = true;
 	}
