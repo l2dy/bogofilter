@@ -15,15 +15,16 @@
 
 -------------------------------------------------------------------------------
 
+	2007-01-14
+
+	* Fixed Makefile dependency problem.
+	  (reported by Andras Salamon)
+	  This took several iterations to get right.
+
 	2007-01-11
 
 	* Fixed block-on-subnets problem.
 	  (thanks to Jack Bailey)
-
-	2007-01-09
-
-	* Fixed Makefile dependency problem.
-	  (reported by Andras Salamon)
 
 1.1.4	2007-01-01 (released)
 
