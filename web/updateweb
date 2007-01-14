@@ -24,7 +24,8 @@ if [ "x$NORECURSE" = x ] ; then
 else
 
   echo "### CHECKING OUT FAQ and NEWS ###"
-  for FILE in bogofilter-faq.html bogofilter-faq-fr.html ; do
+  FILES="bogofilter-faq.html bogofilter-faq-fr.html bogofilter-faq-it.html"
+  for FILE in $FILES ; do
     $CMDPFX checkout -p -Dtomorrow bogofilter/doc/$FILE > $FILE
   done
   $CMDPFX checkout -p -Dtomorrow bogofilter/NEWS >NEWS
