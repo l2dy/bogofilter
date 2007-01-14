@@ -26,6 +26,8 @@ if ENABLE_MEMDEBUG
 AM_CFLAGS += -DENABLE_MEMDEBUG
 endif
 
+BUILT_SOURCES=	version.c directories.c
+
 # what to build
 bin_PROGRAMS = bogofilter bogoutil bogolexer bogotune
 bin_SCRIPTS = bogoupgrade
@@ -44,8 +46,6 @@ bogofilter_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
 bogoutil_LDADD = $(LDADD) $(LIBDB)
 configtest_LDADD = $(LDADD) $(LIBDB)
 
-bogofilter_DEPENDENCIES = libbogofilter.a
-
 if NEED_GSL
 libbf_gsl_a_CFLAGS=$(AM_CFLAGS) -DRENAMEFILES
 libbf_gsl_a_SOURCES= \
@@ -60,7 +60,7 @@ libbf_gsl_a_SOURCES= \
 ../gsl/sys/pow_int.c ../gsl/sys/minmax.c
 noinst_LIBRARIES += libbf_gsl.a
 libbf_gsl_a_CPPFLAGS= -I$(top_srcdir)
-bogofilter_DEPENDENCIES += libbf_gsl.a
+BUILT_SOURCES += libbf_gsl.a
 endif
 
 EXTRA_PROGRAMS=panicenv
@@ -152,8 +152,6 @@ version_sources= \
 	xatox.h xatof.c xatoi.c \
 	datastore_db.h \
 	mysetvbuf.c mysetvbuf.h
-
-BUILT_SOURCES=	version.c directories.c
 
 libbogofilter_a_SOURCES = \
 	version.c \
