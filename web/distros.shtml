@@ -166,13 +166,6 @@
 			    href="http://www.opensuse.org/"
 			    target="_blank"><strong>OpenSUSE.org</strong></a></td></tr>
                  <tr>
-                  <td>SUSE Linux 9.2</td>
-                  <td>0.92.8 (via YaST Online Update)</td>
-                  <td>
-                    <div align="center">BerkeleyDB 4.2</div>
-                  </td>
-                </tr>
-                 <tr>
                   <td>SUSE Linux 9.3</td>
                   <td>0.94.12-2.3 (via YaST Online Update)</td>
                   <td>
@@ -189,7 +182,12 @@
 		    <td>1.0.1</td>
 		    <td><div align="center">BerkeleyDB 4.3</div></td>
 		</tr>
-              </table>
+		<tr>
+                   <td>openSUSE 10.2</td>
+                   <td>1.1.1</td>
+                   <td><div align="center">BerkeleyDB 4.4</div></td>
+               </tr>
+       </table>
               <p class="date">Last update: $Date$</p>
             </td>
           </tr>
