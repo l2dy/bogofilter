@@ -15,7 +15,7 @@
 
 -------------------------------------------------------------------------------
 
-	2007-01-14
+1.1.5	2007-01-14 (released)
 
 	* Fixed Makefile dependency problem.
 	  (reported by Andras Salamon)
@@ -25,6 +25,9 @@
 
 	* Fixed block-on-subnets problem.
 	  (thanks to Jack Bailey)
+
+	2007-01-10
+	* Added block-on-subnets regression test.
 
 1.1.4	2007-01-01 (released)
 
