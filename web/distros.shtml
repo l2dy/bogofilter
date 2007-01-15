@@ -74,6 +74,13 @@
                   </td>
                 </tr>
                 <tr>
+                  <td>FreeBSD 6.2-RELEASE</td>
+                  <td>1.0.3</td>
+                  <td>
+                    <div align="center">BerkeleyDB, QDBM, SQLite3</div>
+                  </td>
+                </tr>
+                 <tr>
                   <td>FreeBSD ports</td>
                   <td>See <a
 		    href="http://www.freshports.org/mail/bogofilter/"
