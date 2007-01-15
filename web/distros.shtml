@@ -60,36 +60,8 @@
 			<a href=" http://www.freebsd.org/security/#adv"
 			    target="_blank">FreeBSD support periods</a></td></tr>
                 <tr>
-                  <td>FreeBSD 4.11-RELEASE</td>
-                  <td>0.92.8</td>
-                  <td>
-                    <div align="center">BerkeleyDB, QDBM</div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>FreeBSD 5.3-RELEASE</td>
-                  <td>install from port</td>
-                  <td>
-                    <div align="center">BerkeleyDB, QDBM, SQLite3</div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>FreeBSD 5.4-RELEASE</td>
-                  <td>0.92.8</td>
-                  <td>
-                    <div align="center">BerkeleyDB, QDBM</div>
-                  </td>
-                </tr>
-                <tr>
                   <td>FreeBSD 5.5-RELEASE</td>
                   <td>1.0.1</td>
-                  <td>
-                    <div align="center">BerkeleyDB, QDBM, SQLite3</div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>FreeBSD 6.0-RELEASE</td>
-                  <td>0.95.2</td>
                   <td>
                     <div align="center">BerkeleyDB, QDBM, SQLite3</div>
                   </td>
