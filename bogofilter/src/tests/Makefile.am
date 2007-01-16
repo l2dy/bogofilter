@@ -11,7 +11,7 @@ BUILT_SOURCES = t.config t.query.config
 CLEANFILES= $(BUILT_SOURCES)
 
 t.config: Makefile
-	( echo  >$@ 'EXE_EXT="@EXE_EXT@"' ; \
+	( echo  >$@ 'EXE_EXT="@EXEEXT@"' ; \
 	  echo >>$@  'DB_EXT="@DB_EXT@"' ; \
 	  echo >>$@ 'DB_TYPE="@DB_TYPE@"'; \
 	  echo >>$@ 'USE_TRANSACTIONS="@USE_TRANSACTIONS@"' ; \
