@@ -30,10 +30,10 @@ check_counts()
     fi
 
     if [ -f  $BOGOFILTER_DIR/goodlist.${DB_EXT} ] ; then
-	g=`$BOGOUTIL -C -d $BOGOFILTER_DIR/goodlist.${DB_EXT} | grep -v " 0 " | tee $TMPDIR/good.$T.out | wc -l`
-	s=`$BOGOUTIL -C -d $BOGOFILTER_DIR/spamlist.${DB_EXT} | grep -v " 0 " | tee $TMPDIR/spam.$T.out | wc -l`
+	g=$("$BOGOUTIL" -C -d $BOGOFILTER_DIR/goodlist.${DB_EXT} | grep -v " 0 " | tee $TMPDIR/good.$T.out | wc -l)
+	s=$("$BOGOUTIL" -C -d $BOGOFILTER_DIR/spamlist.${DB_EXT} | grep -v " 0 " | tee $TMPDIR/spam.$T.out | wc -l)
     else
-	$BOGOUTIL -C -d $BOGOFILTER_DIR/wordlist.${DB_EXT} > $TMPDIR/word.$T.out
+	"$BOGOUTIL" -C -d $BOGOFILTER_DIR/wordlist.${DB_EXT} > $TMPDIR/word.$T.out
 	g=`grep -v " 0$" < $TMPDIR/word.$T.out | tee $TMPDIR/good.$T.out | wc -l`
 	s=`grep -v " 0 " < $TMPDIR/word.$T.out | tee $TMPDIR/spam.$T.out | wc -l`
     fi
@@ -58,8 +58,8 @@ T=1	# test #1
 S=32	# expected tokens from spam message
 G=36	# expected tokens from good message
 
-$BOGOFILTER $OPTS -s -I $INPUT/msg.regtest.s
-$BOGOFILTER $OPTS -n -I $INPUT/msg.regtest.n
+"$BOGOFILTER" $OPTS -s -I $INPUT/msg.regtest.s
+"$BOGOFILTER" $OPTS -n -I $INPUT/msg.regtest.n
 
 check_counts
 
@@ -69,7 +69,7 @@ T=2.1	# test #2.1
 S=32	# expected tokens from spam message
 G=0	# expected tokens from good message
 
-$BOGOFILTER $OPTS -N -I $INPUT/msg.regtest.n
+"$BOGOFILTER" $OPTS -N -I $INPUT/msg.regtest.n
 
 check_counts
 
@@ -77,7 +77,7 @@ T=2.2	# test #2.2
 S=60	# expected tokens from spam message
 G=0	# expected tokens from good message
 
-$BOGOFILTER $OPTS -s -I $INPUT/msg.regtest.n
+"$BOGOFILTER" $OPTS -s -I $INPUT/msg.regtest.n
 
 check_counts
 
@@ -89,9 +89,9 @@ G=0	# expected tokens from good message
 
 create_empty_wordlist
 
-$BOGOFILTER $OPTS -s -I $INPUT/msg.regtest.s
-$BOGOFILTER $OPTS -n -I $INPUT/msg.regtest.n
-$BOGOFILTER $OPTS -Ns -I $INPUT/msg.regtest.n
+"$BOGOFILTER" $OPTS -s -I $INPUT/msg.regtest.s
+"$BOGOFILTER" $OPTS -n -I $INPUT/msg.regtest.n
+"$BOGOFILTER" $OPTS -Ns -I $INPUT/msg.regtest.n
 
 check_counts
 
@@ -103,8 +103,8 @@ G=60	# expected tokens from good message
 
 create_empty_wordlist
 
-$BOGOFILTER $OPTS -s -I $INPUT/msg.regtest.s
-$BOGOFILTER $OPTS -n -I $INPUT/msg.regtest.n
-$BOGOFILTER $OPTS -Sn -I $INPUT/msg.regtest.s
+"$BOGOFILTER" $OPTS -s -I $INPUT/msg.regtest.s
+"$BOGOFILTER" $OPTS -n -I $INPUT/msg.regtest.n
+"$BOGOFILTER" $OPTS -Sn -I $INPUT/msg.regtest.s
 
 check_counts

@@ -36,7 +36,7 @@ _POSIX2_VERSION=199209
 export _POSIX2_VERSION
 
 # Obtain data base file suffix
-DB_NAME=`$BOGOFILTER -C -V 2>&1 | sed -n '2p;'`
+DB_NAME=$("$BOGOFILTER" -C -V 2>&1 | sed -n '2p;')
 case $DB_NAME in
     *BerkeleyDB*|*"Berkeley DB"*)
 	case $DB_NAME in
@@ -142,7 +142,7 @@ create_empty_wordlist()
 {
     rm -f $BOGOFILTER_DIR/*.${DB_EXT}
     rm -f $BOGOFILTER_DIR/__db.* $BOGOFILTER_DIR/log.*
-    $BOGOUTIL -l $BOGOFILTER_DIR/wordlist.${DB_EXT} < /dev/null
+    "$BOGOUTIL" -l $BOGOFILTER_DIR/wordlist.${DB_EXT} < /dev/null
 }
 
 if [ -z "$NODB" ]; then
