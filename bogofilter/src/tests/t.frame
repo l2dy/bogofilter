@@ -22,10 +22,10 @@ export DB_TYPE
 DB_EXT=${DB_EXT#.}
 export DB_EXT
 
-BOGOFILTER="$VAL ${relpath}/bogofilter$EXE_EXT"
-BOGOLEXER="$VAL ${relpath}/bogolexer$EXE_EXT"
-BOGOTUNE="$VAL ${relpath}/bogotune$EXE_EXT"
-BOGOUTIL="$VAL ${relpath}/bogoutil$EXE_EXT"
+BOGOFILTER="$VAL${relpath}/bogofilter$EXE_EXT"
+BOGOLEXER="$VAL${relpath}/bogolexer$EXE_EXT"
+BOGOTUNE="$VAL${relpath}/bogotune$EXE_EXT"
+BOGOUTIL="$VAL${relpath}/bogoutil$EXE_EXT"
 
 export BOGOFILTER
 export BOGOLEXER
@@ -96,7 +96,7 @@ OUTPUTS=${SYSTEST}/outputs
 if [ -z "$RUN_FROM_MAKE" ] || [ "$SUPPRESS_DELETE" = YES ] ; then
 # standalone, from shell directly
 # THIS IS PRONE TO RACES
-   NAME=`basename $0 | sed -e 's/^t\.//'`
+   NAME=`basename "$0" | sed -e 's/^t\.//'`
    DATE=`date +"%Y%m%d"`
    TMPDIR="${BF_TESTDIR}/$NAME.$DATE"
    SUPPRESS_DELETE="NO"
@@ -173,7 +173,7 @@ boehm-gc)
     # only supported on Linux:
     for p in /usr/local/lib /usr/lib /lib ; do
 	if test -f $p/libgc.so ; then
-	    VAL="env LD_PRELOAD=$p/libgc.so GC_FIND_LEAK=1"
+	    VAL="env LD_PRELOAD=$p/libgc.so GC_FIND_LEAK=1 "
 	    export VAL
 	    break
 	fi
@@ -182,7 +182,7 @@ boehm-gc)
 valgrind)
     # use valgrind
     if test "x$VALGRIND" != x ; then
-	VAL="$VALGRIND --leak-check=yes"
+	VAL="$VALGRIND --leak-check=yes "
 	export VAL
     else
 	echo >&2 "WARNING: valgrind not found or unsupported version, ignored."
@@ -190,7 +190,7 @@ valgrind)
     ;;
 efence)
     # use Electric Fence
-    VAL="env LD_PRELOAD=libefence.so.0.0"
+    VAL="env LD_PRELOAD=libefence.so.0.0 "
     EF_PROTECT_FREE=1
     EF_FILL=85
     EF_ALLOW_MALLOC_0=1
