@@ -324,10 +324,10 @@ void output_setup(void)
     assert(fpo == NULL);
 
     if (*outfname && passthrough) {
-	fpo = fopen(outfname,"wt");
+	fpo = fopen(outfname,"w");
 	fpo_mayclose = true;
     } else {
-	fpo = fdopen(STDOUT_FILENO, "wt");
+	fpo = fdopen(STDOUT_FILENO, "w");
 	fpo_mayclose = false;
     }
 
