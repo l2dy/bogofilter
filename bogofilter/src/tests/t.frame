@@ -103,16 +103,16 @@ if [ -z "$RUN_FROM_MAKE" ] || [ "$SUPPRESS_DELETE" = YES ] ; then
 else
 # automated, from make
     while : ; do
-	TMPDIR=${BF_TESTDIR}/checks.$$.`date +"%Y%m%dT%H%M%S"`
-	if test x$SUPPRESS_DELETE = xNO ; then TMPDIR=${BF_TESTDIR}/outputs.`date +"%m%d"` ; fi
-        mkdir $TMPDIR && break || :
+	TMPDIR="${BF_TESTDIR}/checks.$$.$(date +"%Y%m%dT%H%M%S")"
+	if test x$SUPPRESS_DELETE = xNO ; then TMPDIR="${BF_TESTDIR}/outputs.$(date +"%m%d")" ; fi
+        mkdir "$TMPDIR" && break || :
 	sleep 1
     done
 fi
-rm -rf $TMPDIR
-mkdir $TMPDIR
+rm -rf "$TMPDIR"
+mkdir "$TMPDIR"
 
-BOGOFILTER_DIR=$TMPDIR
+BOGOFILTER_DIR="$TMPDIR"
 export BOGOFILTER_DIR
 
 WORDLIST="${TMPDIR}/wordlist.${DB_EXT}"
@@ -140,9 +140,9 @@ fi
 
 create_empty_wordlist()
 {
-    rm -f $BOGOFILTER_DIR/*.${DB_EXT}
-    rm -f $BOGOFILTER_DIR/__db.* $BOGOFILTER_DIR/log.*
-    "$BOGOUTIL" -l $BOGOFILTER_DIR/wordlist.${DB_EXT} < /dev/null
+    rm -f "$BOGOFILTER_DIR"/*.${DB_EXT}
+    rm -f "$BOGOFILTER_DIR"/__db.* "$BOGOFILTER_DIR"/log.*
+    "$BOGOUTIL" -l "$BOGOFILTER_DIR/wordlist.${DB_EXT}" < /dev/null
 }
 
 if [ -z "$NODB" ]; then
