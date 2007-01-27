@@ -1,15 +1,14 @@
 /* $Id$ */
 
 /**
- * \file mime.c
- * lexer MIME processing
+ * \file mime.c - lexer MIME processing
  *
  * NOTES:
  *
- * - RFC2045:
-     *Header fields occur in at least two contexts:
-     *-# As part of a regular RFC 822 message header.
-     *-# In a MIME body part header within a multipart construct.
+ * RFC2045:
+ * Header fields occur in at least two contexts:
+ *-# As part of a regular RFC 822 message header.
+ *-# In a MIME body part header within a multipart construct.
  *
  * \author Matthias Andree <matthias.andree@gmx.de>
  * \author David Relson <relson@osagesoftware.com>
