@@ -2,7 +2,7 @@
 
 . ${srcdir:=.}/t.frame
 
-cat >${TMPDIR}/input <<_EOF
+cat >"${TMPDIR}/input" <<_EOF
 From 
 Subject: test url encoding
 MIME-Version: 1.0
@@ -21,7 +21,7 @@ Content-Type: text/html; charset="iso-8859-1"
 </html>
 _EOF
 
-cat >${TMPDIR}/reference <<_EOF
+cat >"${TMPDIR}/reference" <<_EOF
 href
 http
 21.232.160.105
@@ -45,6 +45,6 @@ http
 done1.html
 _EOF
 
-$BOGOLEXER -p -C <${TMPDIR}/input | grep -v ":" > ${TMPDIR}/output
-cmp ${TMPDIR}/reference ${TMPDIR}/output \
-|| diff ${TMPDIR}/reference ${TMPDIR}/output
+$BOGOLEXER -p -C <"${TMPDIR}/input" | grep -v ":" >"${TMPDIR}/output"
+cmp "${TMPDIR}/reference" "${TMPDIR}/output" \
+|| diff "${TMPDIR}/reference" "${TMPDIR}/output"

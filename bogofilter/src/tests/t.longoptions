@@ -15,7 +15,7 @@ NODB=1 . ${srcdir:=.}/t.frame
 CFG="${TMPDIR}/test.cf"
 MSG="${TMPDIR}/test.msg"
 
-cat >$CFG <<EOF
+cat >"$CFG" <<EOF
 block_on_subnets  = No
 charset_default   = us-ascii
 replace_nonascii_characters = No
@@ -27,12 +27,12 @@ timestamp         = Yes
 timestamp-date    = 20040822
 EOF
 
-cat >$MSG <<EOF
+cat >"$MSG" <<EOF
 From test
 Subject: subject
 
 this is a test
 EOF
 
-$BOGOLEXER  -D -c $CFG -p -I $MSG    > ${TMPDIR}/bogolexer.out
-$BOGOFILTER -D -c $CFG -v -n -I $MSG > ${TMPDIR}/bogofilter.out
+$BOGOLEXER  -D -c "$CFG" -p -I "$MSG"    > "${TMPDIR}/bogolexer.out"
+$BOGOFILTER -D -c "$CFG" -v -n -I "$MSG" > "${TMPDIR}/bogofilter.out"

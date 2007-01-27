@@ -4,7 +4,7 @@
 
 # test upgrading subnet tokens from "url:" to "ip:" prefix
 
-cat <<EOF > ${TMPDIR}/t.before.ref
+cat <<EOF > "${TMPDIR}"/t.before.ref
 .MSG_COUNT 0 1
 test 0 1
 this 0 1
@@ -18,7 +18,7 @@ url:192.168.3 0 1
 url:192.168.3.4 0 1
 EOF
 
-cat <<EOF > ${TMPDIR}/t.after.ref
+cat <<EOF > "${TMPDIR}"/t.after.ref
 Upgrading wordlist.
 .MSG_COUNT 0 1
 .WORDLIST_VERSION 20040500 0
@@ -34,7 +34,7 @@ test 0 1
 this 0 1
 EOF
 
-cat <<EOF > ${TMPDIR}/t.already.ref
+cat <<EOF > "${TMPDIR}"/t.already.ref
 Wordlist has already been upgraded.
 .MSG_COUNT 0 1
 .WORDLIST_VERSION 20040500 0
@@ -54,20 +54,20 @@ create_empty_wordlist
 
 OPTS="-C -D -y 0"
 
-$BOGOUTIL $OPTS -l ${WORDLIST} < ${TMPDIR}/t.before.ref
-$BOGOUTIL $OPTS -d ${WORDLIST} | grep -v "^.ENCODING" | sort > ${TMPDIR}/t.before.out
+$BOGOUTIL $OPTS -l "${WORDLIST}" < "${TMPDIR}"/t.before.ref
+$BOGOUTIL $OPTS -d "${WORDLIST}" | grep -v "^.ENCODING" | sort > "${TMPDIR}"/t.before.out
 
-$BOGOUTIL $OPTS -u ${WORDLIST} > ${TMPDIR}/t.after.out
-$BOGOUTIL $OPTS -d ${WORDLIST} | grep -v "^.ENCODING" | sort >> ${TMPDIR}/t.after.out
+$BOGOUTIL $OPTS -u "${WORDLIST}" > "${TMPDIR}"/t.after.out
+$BOGOUTIL $OPTS -d "${WORDLIST}" | grep -v "^.ENCODING" | sort >> "${TMPDIR}"/t.after.out
 
-$BOGOUTIL $OPTS -u ${WORDLIST} > ${TMPDIR}/t.already.out
-$BOGOUTIL $OPTS -d ${WORDLIST} | grep -v "^.ENCODING" | sort >> ${TMPDIR}/t.already.out
+$BOGOUTIL $OPTS -u "${WORDLIST}" > "${TMPDIR}"/t.already.out
+$BOGOUTIL $OPTS -d "${WORDLIST}" | grep -v "^.ENCODING" | sort >> "${TMPDIR}"/t.already.out
 
-for i in ${TMPDIR}/*.ref ; do
-    j=`basename $i .ref`
+for i in "${TMPDIR}"/*.ref ; do
+    j=`basename "$i" .ref`
     if  [ $verbose -eq 0 ]; then
-	cmp $i ${TMPDIR}/$j.out
+	cmp "$i" "${TMPDIR}"/$j.out
     else
-	diff $DIFF_BRIEF $i ${TMPDIR}/$j.out
+	diff $DIFF_BRIEF "$i" "${TMPDIR}"/$j.out
     fi
 done

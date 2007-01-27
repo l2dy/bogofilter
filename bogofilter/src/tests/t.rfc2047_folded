@@ -8,7 +8,7 @@
 # test below
 # remember to use ${srcdir}
 
-cat >${TMPDIR}/input <<_EOF
+cat >"${TMPDIR}/input" <<_EOF
 Subject: =?iso-8859-1?q?ok?=
     =?iso-8859-1?q?ay?=
 	another
@@ -24,7 +24,7 @@ header: =?iso-8859-1?q?bo?=
     =?iso-8859-1?q?dy?=
 _EOF
 
-cat >${TMPDIR}/reference.raw <<_EOF
+cat >"${TMPDIR}/reference.raw" <<_EOF
 subj:okay
 subj:another
 subj:merge
@@ -48,7 +48,7 @@ iso-8859-1
 iso-8859-1
 _EOF
 
-cat >${TMPDIR}/reference.utf8 <<_EOF
+cat >"${TMPDIR}/reference.utf8" <<_EOF
 subj:okay
 subj:another
 subj:merge
@@ -78,13 +78,13 @@ if [ -z "$USE_UNICODE" ] ; then
 fi
 
 if [ -z "$USE_UNICODE" -o "$USE_UNICODE" = "no" ] ; then
-    $BOGOLEXER -p -C $UNICODE_NO  <${TMPDIR}/input >${TMPDIR}/output.raw
-    cmp ${TMPDIR}/reference.raw ${TMPDIR}/output.raw \
-	|| diff ${TMPDIR}/reference.raw ${TMPDIR}/output.raw
+    $BOGOLEXER -p -C $UNICODE_NO  <"${TMPDIR}/input" >"${TMPDIR}/output.raw"
+    cmp "${TMPDIR}/reference.raw" "${TMPDIR}/output.raw" \
+	|| diff "${TMPDIR}/reference.raw" "${TMPDIR}/output.raw"
 fi
 
 if [ -z "$USE_UNICODE" -o "$USE_UNICODE" = "yes" ] ; then
-    $BOGOLEXER -p -C $UNICODE_YES  <${TMPDIR}/input >${TMPDIR}/output.utf8
-    cmp ${TMPDIR}/reference.utf8 ${TMPDIR}/output.utf8 \
-	|| diff ${TMPDIR}/reference.utf8 ${TMPDIR}/output.utf8
+    $BOGOLEXER -p -C $UNICODE_YES  <"${TMPDIR}/input" >"${TMPDIR}/output.utf8"
+    cmp "${TMPDIR}/reference.utf8" "${TMPDIR}/output.utf8" \
+	|| diff "${TMPDIR}/reference.utf8" "${TMPDIR}/output.utf8"
 fi

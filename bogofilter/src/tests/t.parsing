@@ -31,18 +31,18 @@ flaglist="IhT-2"
 for flags in $flaglist ; do
     opts=`echo $flags | tr -d "01234567-"`
     ( echo "****** " $opts " ******" ; \
-    $BOGOLEXER -C -D -p -v < $MSG ) | tee -a ${TMPDIR}/parsing.out > ${TMPDIR}/tmp
+    $BOGOLEXER -C -D -p -v <"$MSG" ) | tee -a "${TMPDIR}/parsing.out" >"${TMPDIR}/tmp"
     if  [ $verbose -ne 0 ]; then
-	sort -u < ${TMPDIR}/tmp >>  ${TMPDIR}/parsing.sor
+	sort -u <"${TMPDIR}/tmp" >>"${TMPDIR}/parsing.sor"
     fi
 done
 
 if  [ $verbose -ne 0 ]; then
-    wc -l ${TMPDIR}/parsing.out
-    wc -l ${TMPDIR}/parsing.sor
+    wc -l "${TMPDIR}/parsing.out"
+    wc -l "${TMPDIR}/parsing.sor"
 fi
 
 OUT="${OUTPUTS}/parsing.out"
 
-test  $verbose -eq 0 && cmp $OUT ${TMPDIR}/parsing.out \
-|| diff $DIFF_BRIEF $OUT ${TMPDIR}/parsing.out
+test  $verbose -eq 0 && cmp "$OUT" "${TMPDIR}/parsing.out" \
+|| diff $DIFF_BRIEF "$OUT" "${TMPDIR}/parsing.out"

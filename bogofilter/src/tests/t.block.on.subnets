@@ -23,13 +23,13 @@ MSG="$TMPDIR/block.on.subnets.msg"
 REF="$TMPDIR/block.on.subnets.ref"
 OUT="$TMPDIR/block.on.subnets.out"
 
-cat >> $MSG <<EOF
+cat >>"$MSG" <<EOF
 test: 192.168.1.2
 
 body 172.12.13.14
 EOF
 
-cat >> $REF <<EOF
+cat >>"$REF" <<EOF
 head:test
 url:192.168.1.2
 url:192.168.1
@@ -42,11 +42,11 @@ body
 172
 EOF
 
-$BOGOLEXER -C -p --block-on-subnets=yes -I $MSG > $OUT
+$BOGOLEXER -C -p --block-on-subnets=yes -I "$MSG" >"$OUT"
 
 if  [ $verbose -eq 0 ]; then
-    cmp $REF $OUT \
-    ||  diff $DIFF_BRIEF $REF $OUT
+    cmp "$REF" "$OUT" \
+    ||  diff $DIFF_BRIEF "$REF" "$OUT"
 else
-    diff $DIFF_BRIEF $REF $OUT
+    diff $DIFF_BRIEF "$REF" "$OUT"
 fi

@@ -2,7 +2,7 @@
 
 . ${srcdir=.}/t.frame
 
-cat <<EOF > $TMPDIR/reference
+cat <<EOF > "${TMPDIR}"/reference
 # bogofilter version ...
 
 robx        = 0.520000  # (5.20e-01)
@@ -32,14 +32,14 @@ spamicity-tags    = Spam, Ham, Unsure
 spamicity-formats = %0.6f, %0.6f, %0.6f
 EOF
 
-$BOGOFILTER -C -Q | sed "s/# bogofilter version .*/# bogofilter version .../" > ${TMPDIR}/output
+$BOGOFILTER -C -Q | sed "s/# bogofilter version .*/# bogofilter version .../" > "${TMPDIR}"/output
 
 CORRECT="${TMPDIR}/reference"
 
-for OUT in ${TMPDIR}/output ; do
+for OUT in "${TMPDIR}"/output ; do
     if  [ $verbose -eq 0 ]; then
-	cmp $CORRECT $OUT
+	cmp "$CORRECT" "$OUT"
     else
-	diff $DIFF_BRIEF $CORRECT $OUT
+	diff $DIFF_BRIEF "$CORRECT" "$OUT"
     fi
 done

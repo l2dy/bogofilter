@@ -12,13 +12,13 @@
 
 NODB=1 . ${srcdir=.}/t.frame
 
-[ -d ${TMPDIR}/tests ] && rm -rf ${TMPDIR}/tests
-mkdir -p ${TMPDIR}/tests
+[ -d "${TMPDIR}"/tests ] && rm -rf "${TMPDIR}"/tests
+mkdir -p "${TMPDIR}"/tests
 
 OUT="${TMPDIR}/wordhist.out"
 REF="${TMPDIR}/wordhist.ref"
 
-cat <<EOF >$REF
+cat <<EOF >"${REF}"
 Histogram
 score   count  pct  histogram
 0.00     3516 66.30 ################################################
@@ -51,11 +51,11 @@ OPTS="-C -y 0"
 $BOGOFILTER $OPTS -s < ${SYSTEST}/inputs/spam.mbx
 $BOGOFILTER $OPTS -n < ${SYSTEST}/inputs/good.mbx
 
-$BOGOUTIL -C -H $BOGOFILTER_DIR/wordlist.$DB_EXT >$OUT
-$BOGOUTIL -C -d $BOGOFILTER_DIR/wordlist.$DB_EXT >${TMPDIR}/wordlist.txt
+$BOGOUTIL -C -H $BOGOFILTER_DIR/wordlist.$DB_EXT >"$OUT"
+$BOGOUTIL -C -d $BOGOFILTER_DIR/wordlist.$DB_EXT >"${TMPDIR}"/wordlist.txt
 
 if  [ $verbose -eq 0 ]; then
-    cmp $REF $OUT
+    cmp "${REF}" "$OUT"
 else
-    diff $DIFF_BRIEF $REF $OUT
+    diff $DIFF_BRIEF "${REF}" "$OUT"
 fi
