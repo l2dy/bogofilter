@@ -17,7 +17,10 @@ set +e
 # stage 1: find core file - we'll guess, not knowing all possible
 #          core file name generators. Most tend to contain pid + "core"
 #          or program name + "core".
-corefile="$(find . "${TMPDIR}" -name '*core*' -print | grep -w core | head -n1)"
+corefile="$(find . -name '*core*' -print | grep -w core | head -n1)"
+if [ -d "${TMPDIR}" ] ; then
+    corefile="$corefile$(find "${TMPDIR}" -name '*core*' -print | grep -w core | head -n1)"
+fi
 if [ -z "$corefile" ] ; then
     if [ $orc -gt 0 ] ; then echo >&2 "No core file found" ; fi
     exit 0
