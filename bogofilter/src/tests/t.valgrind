@@ -31,14 +31,14 @@ esac
 if ( eval $VALGRIND false ) 2>/dev/null ; then exit 77 ; fi
 
 # Fisher config
-cat <<EOF > ${TMPDIR}/cfg.f
+cat <<EOF > "${TMPDIR}"/cfg.f
 robx=0.415
 min_dev=0.1
 ham_cutoff=0.0
 EOF
 
 # Fisher tristate
-cat <<EOF > ${TMPDIR}/cfg.t
+cat <<EOF > "${TMPDIR}"/cfg.t
 robx=0.415
 min_dev=0.1
 ham_cutoff=0.1
@@ -74,9 +74,9 @@ run_test()
 
 for mth in f t ; do
     BOGOFILTER_DIR="${TMPDIR}/words.$mth"
-    CFG="-c ${TMPDIR}/cfg.$mth -y 0"
+    CFG="-c \"${TMPDIR}\"/cfg.$mth -y 0"
     export BOGOFILTER_DIR
-    if [   -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
+    if [ -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
     mkdir -p $BOGOFILTER_DIR
     $BOGOFILTER $CFG -s < ${SYSTEST}/inputs/spam.mbx
     $BOGOFILTER $CFG -n < ${SYSTEST}/inputs/good.mbx
