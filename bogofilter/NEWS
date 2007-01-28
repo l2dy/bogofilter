@@ -15,8 +15,8 @@
 
 -------------------------------------------------------------------------------
 
-	* Fix test suite (except lock.*) for situations where there are blanks
-	  in the working directory's name.
+	* Fix test suite for situations where there are blanks in the test or
+	  working directories' names.
 
 	* Repair passthrough defect on systems whose standard system library
 	  makes a distinction between text and binary mode in stdio stuff.
