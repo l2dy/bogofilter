@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 # only run this when valgrind is in the path, skip otherwise
 # ("exit 77" = skip)
@@ -18,27 +18,27 @@ fi
 
 case `valgrind --version` in
     valgrind-3*)
-	VALGRIND="$VALGRIND 3>${TMPDIR}/vg.out --log-fd=3"
+	VALGRIND="$VALGRIND 3>$TMPDIR"/vg.out --log-fd=3
 	;;
     valgrind-2*)
-	VALGRIND="$VALGRIND 3>${TMPDIR}/vg.out --logfile-fd=3"
+	VALGRIND="$VALGRIND 3>$TMPDIR/vg.out --logfile-fd=3"
 	;;
     *)
 	exit 77
 esac
 
-( eval $VALGRIND true  ) 2>/dev/null || exit 77
-if ( eval $VALGRIND false ) 2>/dev/null ; then exit 77 ; fi
+( eval "$VALGRIND true"  ) 2> /dev/null || exit 77
+if ( eval "$VALGRIND false" ) 2> /dev/null ; then exit 77 ; fi
 
 # Fisher config
-cat <<EOF > "${TMPDIR}"/cfg.f
+cat <<EOF > "$TMPDIR"/cfg.f
 robx=0.415
 min_dev=0.1
 ham_cutoff=0.0
 EOF
 
 # Fisher tristate
-cat <<EOF > "${TMPDIR}"/cfg.t
+cat <<EOF > "$TMPDIR"/cfg.t
 robx=0.415
 min_dev=0.1
 ham_cutoff=0.1
@@ -49,9 +49,9 @@ EOF
 
 # suppress valgrind complaints about glibc::strchr.S
 
-VG_SUPP=${TMPDIR}/vg.supp
+VG_SUPP="$TMPDIR"/vg.supp
 
-cat <<EOF > ${VG_SUPP}
+cat <<EOF > "$VG_SUPP"
 {
    ignore strchr problem
    Memcheck:Cond
@@ -64,22 +64,22 @@ EOF
 run_test()
 {
     tst="$1"
-    IN="${SYSTEST}/inputs/msg.$tst.txt"
-    OT="${TMPDIR}/msg.$tst.$mth"
+    IN="$SYSTEST/inputs/msg.$tst.txt"
+    OT="$TMPDIR/msg.$tst.$mth"
     if [ -n "$V" ] ; then OT="$OT.$V" ; fi
     OPTS="-e -t $V $CFG"
     eval $VALGRIND --suppressions=${VG_SUPP} $BOGOFILTER $OPTS < $IN > $OT
-    if test -s $TMPDIR/vg.out ; then cat $TMPDIR/vg.out ; exit 2 ; fi
+    if test -s $TMPDIR"/vg.out ; then cat $TMPDIR/vg.out ; exit 2 ; fi
 }
 
 for mth in f t ; do
-    BOGOFILTER_DIR="${TMPDIR}/words.$mth"
-    CFG="-c \"${TMPDIR}\"/cfg.$mth -y 0"
+    BOGOFILTER_DIR=$TMPDIR/words.$mth"
+    CFG="-y 0"
     export BOGOFILTER_DIR
     if [ -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
     mkdir -p $BOGOFILTER_DIR
-    $BOGOFILTER $CFG -s < ${SYSTEST}/inputs/spam.mbx
-    $BOGOFILTER $CFG -n < ${SYSTEST}/inputs/good.mbx
+    $BOGOFILTER "$CFG" -c "$TMPDIR"/cfg.$mth -s < "$SYSTEST"/inputs/spam.mbx
+    $BOGOFILTER "$CFG" -c "$TMPDIR"/cfg.$mth -n < "$SYSTEST"/inputs/good.mbx
 #   if [ $verbose -gt 0 ] ; then $BOGOUTIL -w $BOGOFILTER_DIR .MSG_COUNT ; fi
 
     for tst in 3 ; do

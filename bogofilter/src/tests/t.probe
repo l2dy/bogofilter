@@ -31,55 +31,55 @@ fi
 unset BF_FORCE_NON_TRANSACTIONAL || :
 unset BF_FORCE_TRANSACTIONAL || :
 
-OUT="${TMPDIR}/test.out"
-MSG="${TMPDIR}/test.msg"
-LOG="${BOGOFILTER_DIR}/log.0000000001"
+OUT="$TMPDIR/test.out"
+MSG="$TMPDIR"/test.msg
+LOG="$BOGOFILTER_DIR/log.0000000001"
 # cksum is POSIX compliant ($HASHTOOL isn't)
 HASHTOOL=cksum
 
 NO="--db-transaction=no"
 YES="--db-transaction=yes"
 
-cat <<EOF >"$MSG"
+cat <<EOF > "$MSG"
 this is a test message
 EOF
 
 # clean up - t.frame may have created everything for us
-rm -f	"${BOGOFILTER_DIR}"/log.?????????? \
-	"${BOGOFILTER_DIR}"/__db.??? \
-	"${BOGOFILTER_DIR}"/lockfile-?
+rm -f	"$BOGOFILTER_DIR"/log.?????????? \
+	"$BOGOFILTER_DIR"/__db.??? \
+	"$BOGOFILTER_DIR"/lockfile-?
 
 # transactions=no;  no log file
 
-$BOGOFILTER -C $NO  -H -n -I "$MSG"
+$BOGOFILTER -C $NO -H -n -I "$MSG"
 
 if [ -f "$LOG" ] ; then
-    echo "Failed test 't=n'" >>"$OUT"
+    echo "Failed test 't=n'" >> "$OUT"
     exit 1
 fi
 
 # probe=yes, no environment;  no log file
 
-$BOGOFILTER -C  -H -n -I "$MSG"
+$BOGOFILTER -C -H -n -I "$MSG"
 
 if [ -f "$LOG" ] ; then
-    echo "Failed test 'p=y, e=n'" >>"$OUT"
+    echo "Failed test 'p=y, e=n'" >> "$OUT"
     exit 1
 fi
 
 # transactions=yes;  log file should appear
 
-$BOGOFILTER -C $YES  -H -s -I "$MSG"
+$BOGOFILTER -C $YES -H -s -I "$MSG"
 
 if [ ! -f "$LOG" ] ; then
-    echo "Failed test 't=y'" >>"$OUT"
+    echo "Failed test 't=y'" >> "$OUT"
     exit 1
 fi
 
 # probe=yes;  log file should change
 
 BEF=`$HASHTOOL "$LOG"`
-$BOGOFILTER -C  -H -n -I "$MSG"
+$BOGOFILTER -C -H -n -I "$MSG"
 AFT=`$HASHTOOL "$LOG"`
 
 if [ "$BEF" = "$AFT" ] ; then
@@ -92,12 +92,12 @@ fi
 # probe=yes, transactions=no;  log file should not change
 
 BEF=`$HASHTOOL "$LOG"`
-$BOGOFILTER -C $NO  -H -s -I "$MSG"
+$BOGOFILTER -C $NO -H -s -I "$MSG"
 AFT=`$HASHTOOL "$LOG"`
 
 if [ "$BEF" != "$AFT" ] ; then
-    echo "Failed test 'p=y, t=n'" >>"$OUT"
-    echo BEF: $BEF >>"$OUT"
-    echo AFT: $AFT >>"$OUT"
+    echo "Failed test 'p=y, t=n'" >> "$OUT"
+    echo BEF: $BEF >> "$OUT"
+    echo AFT: $AFT >> "$OUT"
     exit 1
 fi

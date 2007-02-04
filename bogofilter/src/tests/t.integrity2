@@ -5,8 +5,8 @@
 # test description here
 #
 # test below
-# remember to use ${srcdir}
-./dehex >"${TMPDIR}/input" <<'_EOF'
+# remember to use "$srcdir"
+./dehex > "$TMPDIR/input" <<'_EOF'
 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 
 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 
 20 21 22 23 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 
@@ -26,8 +26,8 @@ F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 FA FB FC FD FE FF
 0A
 _EOF
 # check seekable input
-$VAL $BOGOFILTER -e -p -C <"${TMPDIR}/input" >"${TMPDIR}/output"
-./dumbhead -2 <"${TMPDIR}/output" | cmp - "${TMPDIR}/input"
+$VAL $BOGOFILTER -e -p -C < "$TMPDIR"/input > "$TMPDIR/output"
+./dumbhead -2 < "$TMPDIR/output" | cmp - "$TMPDIR/input"
 # check non-seekable input
-cat "${TMPDIR}/input" | $VAL $BOGOFILTER -e -p -C >"${TMPDIR}/output"
-./dumbhead -2 <"${TMPDIR}/output" | cmp - "${TMPDIR}/input"
+cat "$TMPDIR"/input | $VAL $BOGOFILTER -e -p -C > "$TMPDIR/output"
+./dumbhead -2 < "$TMPDIR/output" | cmp - "$TMPDIR/input"

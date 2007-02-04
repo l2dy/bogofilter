@@ -6,5 +6,5 @@
 #
 # test below
 # remember to use ${srcdir}
-( echo ; echo 'blah' ) | $VAL $BOGOFILTER -p -v -e -C >"$TMPDIR/out"
-if egrep '\(null\)' "$TMPDIR/out" ; then exit 1 ; fi
+( echo ; echo 'blah' ) | $VAL $BOGOFILTER -p -v -e -C > "$TMPDIR/out"
+if egrep '\(null\)' "$TMPDIR"/out ; then exit 1 ; fi

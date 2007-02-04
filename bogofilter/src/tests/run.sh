@@ -11,7 +11,7 @@ set -e
 
 yday="-y 0"
 
-( setopt SH_WORD_SPLIT 2>/dev/null ) && setopt SH_WORD_SPLIT
+( setopt SH_WORD_SPLIT 2> /dev/null ) && setopt SH_WORD_SPLIT
 
 while : ; do
     tdir=${BF_TESTDIR=.}/checks.$$.`date +"%Y%m%dT%H%M%S"`
@@ -36,7 +36,7 @@ fi
 
 cp -f $srcdir/$inputfile $tdir/
 
-datafile="${srcdir}/input-${num}-data.txt"
+datafile="$srcdir/input-${num}-data.txt"
 inputdb="input-${num}.db"
 
 if [ -f "$datafile" ]; then

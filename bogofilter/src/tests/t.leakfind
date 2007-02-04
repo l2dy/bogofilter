@@ -9,4 +9,4 @@
 
 . ${srcdir:=.}/t.frame
 
-$VAL ./leakmem 2>&1 | egrep -v '^got |^ *(Electric Fence.*)?$' >$TMPDIR/out || exit 77
+$VAL ./leakmem 2>&1 | egrep -v '^got |^ *(Electric Fence.*)?$' > "$TMPDIR"/out || exit 77

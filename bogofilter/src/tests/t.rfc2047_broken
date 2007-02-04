@@ -16,7 +16,7 @@
 # ones, so we can tell broken mailers from intact.
 
 ##### Test #1 - improper folding #####
-cat >"${TMPDIR}/input.1" <<_EOF
+cat > "$TMPDIR/input.1" <<_EOF
 Subject: [Broken] =?ISO-8859-1?Q?Re=3A_=5BBroken=5D_=3D=3FISO-8859-1=3FQ=3F=3D5B?=
  =?ISO-8859-1?Q?Broken=3D5DBlah=3D20Foo=3DE4=3D20Bar=3D20Blah
  _?= =?ISO-8859-1?Q?Foo=3D3D28=3D5F=3F=3D_Bar=5F=5F=3F=3D_t=E4Blah?=
@@ -25,13 +25,13 @@ Subject: [Broken] =?ISO-8859-1?Q?Re=3A_=5BBroken=5D_=3D=3FISO-8859-1=3FQ=3F=3D5B
 Hello.
 _EOF
 
-$BOGOLEXER -p -C <"${TMPDIR}/input.1" >"${TMPDIR}/output.1"
+$BOGOLEXER -p -C < "$TMPDIR"/input.1 > "$TMPDIR/output.1"
 
 exit $?
 
 ##### Test #2a - improperly terminated encoded word #####
 
-cat >"${TMPDIR}/input.2a" <<_EOF
+cat > "$TMPDIR/input.2a" <<_EOF
 Return-Path: <pro@blabla.com>
 Content-Type: multipart/mixed; boundary="--ek-1129"
 
@@ -48,11 +48,11 @@ UEsDBBQAAgAIADyWpzC0Mjdx9ksFAADEBQBJAAAAZ29vLTAwMWQwMDAwLTAxLYegrKXnoK2o
 
 _EOF
 
-$BOGOLEXER -p -C <"${TMPDIR}/input.2a" >"${TMPDIR}/output.2a"
+$BOGOLEXER -p -C < "$TMPDIR"/input.2a > "$TMPDIR/output.2a"
 
 ##### Test #2b - properly terminated encoded word #####
 
-cat >"${TMPDIR}/input.2b" <<_EOF
+cat > "$TMPDIR/input.2b" <<_EOF
 Return-Path: <pro@blabla.com>
 Content-Type: multipart/mixed; boundary="--ek-1129"
 
@@ -69,6 +69,6 @@ UEsDBBQAAgAIADyWpzC0Mjdx9ksFAADEBQBJAAAAZ29vLTAwMWQwMDAwLTAxLYegrKXnoK2o
 
 _EOF
 
-$BOGOLEXER -p -C <"${TMPDIR}/input.2b" >"${TMPDIR}/output.2b"
+$BOGOLEXER -p -C < "$TMPDIR"/input.2b > "$TMPDIR/output.2b"
 
-diff "${TMPDIR}/output.2a" "${TMPDIR}/output.2b"
+diff "$TMPDIR/output.2a" "$TMPDIR/output.2b"

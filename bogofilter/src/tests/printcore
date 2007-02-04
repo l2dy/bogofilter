@@ -18,8 +18,8 @@ set +e
 #          core file name generators. Most tend to contain pid + "core"
 #          or program name + "core".
 corefile="$(find . -name '*core*' -print | grep -w core | head -n1)"
-if [ -d "${TMPDIR}" ] ; then
-    corefile="$corefile$(find "${TMPDIR}" -name '*core*' -print | grep -w core | head -n1)"
+if [ -d "$TMPDIR" ] ; then
+    corefile="$corefile$(find "$TMPDIR" -name '*core*' -print | grep -w core | head -n1)"
 fi
 if [ -z "$corefile" ] ; then
     if [ $orc -gt 0 ] ; then echo >&2 "No core file found" ; fi
@@ -34,7 +34,7 @@ LANG=C
 LC_MESSAGES=C
 export LANG LC_MESSAGES
 rm -f exit.$$
-execfile="`( $GDB -nw -batch -nx -silent -c "$corefile" </dev/null)`"
+execfile="`( $GDB -nw -batch -nx -silent -c "$corefile" < /dev/null)`"
 if [ $? -gt 0 ]
 then
     echo >&2 "Problem with GDB program \"$GDB\""
@@ -51,7 +51,7 @@ echo >&2 ">>> Using exec file \"$execfile\"."
 # stage 3: obtain backtrace
 gdbfile="script.gdb.$$"
 rm -f "$gdbfile"
-cat <<_EOF >"$gdbfile"
+cat <<_EOF > "$gdbfile"
 set height 0
 set width 0
 echo <<< SIMPLE BACKTRACE <<<\n
@@ -61,7 +61,7 @@ backtrace full
 quit
 _EOF
 
-cmd="gdb -nw -r -batch -nx -x "$gdbfile" -silent "$execfile" "$corefile" </dev/null"
+cmd="gdb -nw -r -batch -nx -x "$gdbfile" -silent "$execfile" "$corefile" < /dev/null"
 echo >&2 ">>> Running command: $cmd"
 eval "$cmd"
 rm -f "$gdbfile"

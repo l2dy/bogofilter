@@ -2,19 +2,19 @@
 
 . ${srcdir=.}/t.frame
 
-INP="${TMPDIR}/test.inp"
-REF="${TMPDIR}/test.ref"
-OUT="${TMPDIR}/test.out"
-CORRECT="${SYSTEST}/outputs/multiple.wordlists.ref"
+INP="$TMPDIR"/test.inp
+REF="$TMPDIR/test.ref"
+OUT="$TMPDIR"/test.out
+CORRECT="$SYSTEST/outputs/multiple.wordlists.ref"
 
-cat <<EOF >"$INP"
+cat <<EOF > "$INP"
 From somebody@bogofilter.org
 To:  somebody-else@bogofilter.org
 
 This is a test
 EOF
 
-cat <<EOF >"$REF"
+cat <<EOF > "$REF"
 ::: 1 :::
 head:From
 head:somebody
@@ -90,7 +90,7 @@ EOF
 
 for COUNT in 1 2 3 4 5 ; do
     echo "::: $COUNT :::" >> $OUT
-    $BOGOLEXER -C -p --min-token-len 2 --multi-token-count $COUNT <"$INP" >>"$OUT"
+    $BOGOLEXER -C -p --min-token-len 2 --multi-token-count $COUNT < "$INP" >> "$OUT"
 done
 
 if  [ $verbose -eq 0 ]; then

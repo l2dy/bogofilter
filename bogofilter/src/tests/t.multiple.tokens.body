@@ -2,18 +2,18 @@
 
 . ${srcdir=.}/t.frame
 
-INP="${TMPDIR}/test.inp"
-REF="${TMPDIR}/test.ref"
-OUT="${TMPDIR}/test.out"
-CORRECT="${SYSTEST}/outputs/multiple.wordlists.ref"
+INP="$TMPDIR/test.inp"
+REF="$TMPDIR"/test.ref
+OUT="$TMPDIR/test.out"
+CORRECT="$SYSTEST/outputs/multiple.wordlists.ref"
 
-cat <<EOF >"$INP"
+cat <<EOF > "$INP"
 aaa 
 bbb ccc
 ddd eee fff
 EOF
 
-cat <<EOF >"$REF"
+cat <<EOF > "$REF"
 ::: 1 :::
 aaa
 bbb
@@ -93,7 +93,7 @@ EOF
 
 for COUNT in 1 2 3 4 5 ; do
     echo "::: $COUNT :::" >> $OUT
-    $BOGOLEXER -C -H -p --multi-token-count $COUNT <"$INP" >>"$OUT"
+    $BOGOLEXER -C -H -p --multi-token-count $COUNT < "$INP" >> "$OUT"
 done
 
 if  [ $verbose -eq 0 ]; then

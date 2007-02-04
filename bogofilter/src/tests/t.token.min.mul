@@ -2,17 +2,17 @@
 
 . ${srcdir=.}/t.frame
 
-INP="${TMPDIR}/test.inp"
-REF="${TMPDIR}/test.ref"
-OUT="${TMPDIR}/test.out"
-CORRECT="${SYSTEST}/outputs/multiple.wordlists.ref"
+INP="$TMPDIR/test.inp"
+REF="$TMPDIR"/test.ref
+OUT="$TMPDIR/test.out"
+CORRECT="$SYSTEST/outputs/multiple.wordlists.ref"
 
-cat <<EOF >"$INP"
+cat <<EOF > "$INP"
 a b2 cc3
 aa3 bbb4 cc3 ddd4 ee3 fff4
 EOF
 
-cat <<EOF >"$REF"
+cat <<EOF > "$REF"
 ::: 1 2 :::
 a
 b2
@@ -98,8 +98,8 @@ EOF
 
 for MIN in 1 2 ; do
     for MUL in 2 3 ; do
-	echo "::: $MIN $MUL :::" >>"$OUT"
-	$BOGOLEXER -C -H -p --min-token-len $MIN --multi-token-count $MUL <"$INP" >>"$OUT"
+	echo "::: $MIN $MUL :::" >> "$OUT"
+	$BOGOLEXER -C -H -p --min-token-len $MIN --multi-token-count $MUL < "$INP" >> "$OUT"
     done
 done
 
