@@ -262,11 +262,11 @@ static void check_sqlite_version(void)
     sscanf(v, "%u.%u.%u", &vmaj, &vmin, &vpl);
     if (vmaj > 3) return;
     if (vmaj == 3 && vmin > 2) return;
-    if (vmaj == 3 && vmin == 2 && vpl >= 6) return;
+    if (vmaj == 3 && vmin == 2 && vpl >= 8) return;
     if (!getenv("BF_USE_OLD_SQLITE"))
 	fprintf(stderr,
 		"\n"
-		"WARNING: please update sqlite to 3.2.6 or newer.\n"
+		"WARNING: please update sqlite to 3.2.8 or newer.\n"
 		"\n");
 }
 
