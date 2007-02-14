@@ -16,7 +16,7 @@
 -------------------------------------------------------------------------------
 
 	* Fix defect where the database verification method would not be called
-	  for traditional Berkeley DB databases.
+	  for traditional Berkeley DB databases. Reported by Eric Wood.
 
 	* Fix test suite for situations where there are blanks in the test or
 	  working directories' names.
