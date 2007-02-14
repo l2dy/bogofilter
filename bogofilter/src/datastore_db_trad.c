@@ -70,7 +70,7 @@ dsm_t dsm_traditional = {
     NULL,		/* dsm_purgelogs        */
     NULL,		/* dsm_recover          */
     NULL,		/* dsm_remove           */
-    NULL,		/* dsm_verify           */
+    &db_verify,		/* dsm_verify           */
     NULL,		/* dsm_list_logfiles    */
     &db_leafpages	/* dsm_leafpages        */
 };
