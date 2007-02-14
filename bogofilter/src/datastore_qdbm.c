@@ -205,7 +205,7 @@ static inline void db_optimize(VILLA *dbp, char *name)
        Depot API because Villa uses B+ trees and Depot uses hash tables.
        Database size may grow larger and could get compacted with
        vloptimize() however as the database size with Villa is smaller
-       anyway, I don't think it is worth it. */
+       anyway, I don't think it is worth it. -- David Relson */
 }
 
 
