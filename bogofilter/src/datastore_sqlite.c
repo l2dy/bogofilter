@@ -44,6 +44,7 @@ static int sql_txn_begin(void *vhandle);
 static int sql_txn_abort(void *vhandle);
 static int sql_txn_commit(void *vhandle);
 static u_int32_t sql_pagesize(bfpath *bfp);
+static ex_t sql_verify(bfpath *bfp);
 
 /** The layout of the bogofilter table, formatted as SQL statement.
  *
@@ -95,7 +96,7 @@ dsm_t dsm_sqlite = {
     NULL,	/* dsm_checkpoint       */
     NULL,	/* dsm_recover          */
     NULL,	/* dsm_remove           */
-    NULL,	/* dsm_verify           */
+    &sql_verify,/* dsm_verify           */
     NULL,	/* dsm_list_logfiles    */
     NULL	/* dsm_leafpages        */
 };
@@ -574,4 +575,68 @@ static u_int32_t sql_pagesize(bfpath *bfp)
     }
     db_close(dbh);
     return size;
+}
+
+static int cb_first;
+
+/** callback function for sql_verify,
+ * \returns 0 to exhaust the full list of error messages. */
+static int cb_verify(void *errflag, int columns,
+	char * * values, char * * names)
+{
+    int *e = errflag;
+
+    if (columns != 1) {
+	fprintf(stderr, "Strange: got row with more or less than one column.\n"
+		"Aborting verification.\n");
+	return 1;
+    }
+
+    if (cb_first != 1 || 0 != strcmp(values[0], "ok")) {
+	*e = 1; /* If we get any output other than a single row with the
+		   "ok" text, there's something wrong with the database ->
+		   set error flag and print the error. */
+	fprintf(stderr, "%s\n", values[0]);
+    }
+
+    (void)names;
+    cb_first = 0;
+    return 0;
+}
+
+/** Run database verification PRAGMA. Prints all error messages
+ * and returns EX_OK if none were delivered by sqlite3 or EX_ERROR in
+ * case of trouble. */
+static ex_t sql_verify(bfpath *bfp)
+{
+    dbh_t *dbh;
+    int rc;
+    int faulty = 0;
+    char *errmsg = NULL;
+    const char stmt[] = "PRAGMA integrity_check;";
+
+    if (DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB")) {
+	fprintf(dbgout, "SQLite: sql_verify(%s)\n", bfp->filename);
+	fflush(dbgout);
+    }
+    dbh = db_open(NULL, bfp, DS_READ);
+    if (!dbh)
+	return EX_ERROR;
+    cb_first = 1;
+    rc = sqlite3_exec(dbh->db, stmt, cb_verify, &faulty, &errmsg);
+    if (rc != SQLITE_OK) {
+	print_error(__FILE__, __LINE__, "Error while evaluating \"%s\": %s", stmt,
+		errmsg ? errmsg : "(unknown)");
+	if (errmsg) sqlite3_free(errmsg);
+	return EX_ERROR;
+    }
+    db_close(dbh);
+    if (faulty == 0) {
+	/* success */
+	if (verbose) printf("%s: OK\n", bfp->filename);
+    } else {
+	/* database faulty */
+	fprintf(stderr, "%s: Database integrity check failed.\n", bfp->filename);
+    }
+    return faulty ? EX_ERROR : EX_OK;
 }
