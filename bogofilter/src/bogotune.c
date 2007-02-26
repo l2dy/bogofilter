@@ -187,6 +187,8 @@ uint test = 0;
 bool fMakeCheck = false;	/* allows quick & dirty regression testing */
 uint cMakeCheck =    50;	/* ... for 50 cycles */
 
+const char *spam_header_place = "";
+
 /* Function Declarations */
 
 static void process_bogotune_arg(int option);

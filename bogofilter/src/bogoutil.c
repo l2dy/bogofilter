@@ -52,6 +52,8 @@ static int token_count = 0;
 bool  maintain = false;
 bool  onlyprint = false;
 
+const char *spam_header_place = "";
+
 /* Function Prototypes */
 
 static int process_arg(int option, const char *name, const char *arg);

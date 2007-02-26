@@ -28,10 +28,11 @@ NAME:
 
 #include "lexer.h" /* need have_body */
 
-static const char *eol = NULL;
+static const char *eol;
 char msg_register[256];
 static char msg_bogofilter[256];
 static char msg_spam_header[256];
+const char *spam_header_place = "";
 size_t msg_register_size = sizeof(msg_register);
 
 /* Function Definitions */
@@ -123,6 +124,23 @@ static int read_seek(char **out, void *in) {
 
 typedef int (*readfunc_t)(char **, void *);
 
+static void write_spam_info(void)
+{
+    if (eol == NULL)	/* special treatment of empty input */
+	eol = NL;
+
+    /* print spam-status at the end of the header
+     * then mark the beginning of the message body */
+    if (passthrough || verbose || terse)
+	fprintf(fpo, "%s%s", msg_spam_header, eol);
+
+    if (passthrough || verbose || Rtable) {
+	verbose += passthrough;
+	print_stats( fpo );
+	verbose -= passthrough;
+    }
+}
+
 static bool write_header(rc_t status, readfunc_t rf, void *rfarg)
 {
     ssize_t rd;
@@ -131,9 +149,13 @@ static bool write_header(rc_t status, readfunc_t rf, void *rfarg)
     bool hadlf = true;
     bool seen_subj = false;
 
+    bool seen_place_header = false;
+
     int bogolen = strlen(spam_header_name);
     const char *subjstr = "Subject:";
     int subjlen = strlen(subjstr);
+
+    eol = NULL;
 
     /* print headers */
     while ((rd = rf(&out, rfarg)) > 0)
@@ -151,6 +173,15 @@ static bool write_header(rc_t status, readfunc_t rf, void *rfarg)
 	    while (((rd = rf(&out, rfarg)) > 0) && 
 		   (out[0] == ' ' || out[0] == '\t') )
 		/* empty loop */ ;
+	}
+
+	/* detect spam_header_place line */
+	if ( !seen_place_header &&
+	     *spam_header_place != '\0' &&
+	    memcmp(out, spam_header_place, strlen(spam_header_place)) == 0)
+	{
+	    seen_place_header = true;
+	    write_spam_info();
 	}
 
 	/* detect end of headers */
@@ -184,11 +215,11 @@ static bool write_header(rc_t status, readfunc_t rf, void *rfarg)
 	if (ferror(fpo)) cleanup_exit(EX_ERROR, 1);
     }
 
-    if (eol == NULL)	/* special treatment of empty input */
-	eol = NL;
+    if (!seen_place_header)
+	write_spam_info();
 
     if (!hadlf)
-	(void)fputs(eol, fpo);
+	(void) fputs(eol, fpo);
 
     return seen_subj;
 }
@@ -202,7 +233,7 @@ static void write_body(readfunc_t rf, void *rfarg)
     /* If the message terminated early (without body or blank
      * line between header and body), enforce a blank line to
      * prevent anything past us from choking. */
-    (void)fputs(eol, fpo);
+    (void) fputs(eol, fpo);
 
     /* print body */
     while ((rd = rf(&out, rfarg)) > 0)
@@ -234,7 +265,9 @@ void write_message(rc_t status)
     build_spam_header();
 
     if (!passthrough)
-	eol = NL;
+    {
+	write_spam_info();
+    }
     else
     {
 	eol = NULL;
@@ -255,32 +288,20 @@ void write_message(rc_t status)
 	}
 
 	seen_subj = write_header(status, rf, rfarg);
-    }
 
-    /* print spam-status at the end of the header
-     * then mark the beginning of the message body */
-    if (passthrough || verbose || terse)
-	fprintf(fpo, "%s%s", msg_spam_header, eol);
+	if (!seen_subj) {
+	    if (status == RC_SPAM && spam_subject_tag != NULL)
+		(void) fprintf(fpo, "Subject: %s%s", spam_subject_tag, eol);
+	    if (status == RC_UNSURE && unsure_subject_tag != NULL)
+		(void) fprintf(fpo, "Subject: %s%s", unsure_subject_tag, eol);
+	}
 
-    if (passthrough || verbose || Rtable) {
-	verbose += passthrough;
-	print_stats( fpo );
-	verbose -= passthrough;
-    }
-
-    if (passthrough && !seen_subj) {
-	if (status == RC_SPAM && spam_subject_tag != NULL)
-	    (void) fprintf(fpo, "Subject: %s%s", spam_subject_tag, eol);
-	if (status == RC_UNSURE && unsure_subject_tag != NULL)
-	    (void) fprintf(fpo, "Subject: %s%s", unsure_subject_tag, eol);
-    }
-
-    if (passthrough) 
 	write_body(rf, rfarg);
 
-    if (passthrough || verbose || Rtable) {
-	if (fflush(fpo) || ferror(fpo))
-	    cleanup_exit(EX_ERROR, 1);
+	if (verbose || Rtable) {
+	    if (fflush(fpo) || ferror(fpo))
+		cleanup_exit(EX_ERROR, 1);
+	}
     }
 
     return;

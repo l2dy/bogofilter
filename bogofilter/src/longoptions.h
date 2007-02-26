@@ -57,6 +57,7 @@ typedef enum longopts_e {
     O_ROBX,
     O_SPAM_CUTOFF,
     O_SPAM_HEADER_NAME,
+    O_SPAM_HEADER_PLACE,
     O_SPAM_SUBJECT_TAG,
     O_SPAMICITY_FORMATS,
     O_SPAMICITY_TAGS,

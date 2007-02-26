@@ -52,6 +52,12 @@
 #
 #spam_header_name=X-Bogosity
 
+#### SPAM_HEADER_PLACE
+#
+#	used in placing the SPAM_HEADER_NAME line
+#
+#spam_header_place=DomainKey-Signature
+
 #### SPAM_SUBJECT_TAG
 #
 #	tag added to "Subject: " line for identifying spam or unsure

@@ -131,6 +131,7 @@ static struct option longopts_bogofilter[] = {
     { "robx",				R, 0, O_ROBX },
     { "spam-cutoff",			R, 0, O_SPAM_CUTOFF },
     { "spam-header-name",		R, 0, O_SPAM_HEADER_NAME },
+    { "spam-header-place",		R, 0, O_SPAM_HEADER_PLACE },
     { "spam-subject-tag",		R, 0, O_SPAM_SUBJECT_TAG },
     { "spamicity-formats",		R, 0, O_SPAMICITY_FORMATS },
     { "spamicity-tags",			R, 0, O_SPAMICITY_TAGS },
@@ -717,6 +718,7 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
     case O_SPAMICITY_FORMATS:		set_spamicity_formats(val);				break;
     case O_SPAMICITY_TAGS:		set_spamicity_tags(val);				break;
     case O_SPAM_HEADER_NAME:		spam_header_name = get_string(name, val);		break;
+    case O_SPAM_HEADER_PLACE:		spam_header_place = get_string(name, val);		break;
     case O_SPAM_SUBJECT_TAG:		spam_subject_tag = get_string(name, val);		break;
     case O_STATS_IN_HEADER:		stats_in_header = get_bool(name, val);			break;
     case O_TERSE:			terse = get_bool(name, val);				break;
@@ -770,6 +772,7 @@ rc_t query_config(void)
     Q2 fprintf(stdout, "%-17s = %ld\n",   "timestamp-date",      (long int)today);
     Q1 fprintf(stdout, "\n");
     Q1 fprintf(stdout, "%-17s = %s\n", "spam-header-name",    spam_header_name);
+    Q1 fprintf(stdout, "%-17s = %s\n", "spam-header-place",   NB(spam_header_place));
     Q1 fprintf(stdout, "%-17s = %s\n", "spam-subject-tag",    NB(spam_subject_tag));
     Q1 fprintf(stdout, "%-17s = %s\n", "unsure-subject-tag",  NB(unsure_subject_tag));
     Q2 fprintf(stdout, "%-18s = %s\n", "syslog-tag",          NB(logtag));

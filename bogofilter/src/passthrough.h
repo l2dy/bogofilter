@@ -13,6 +13,8 @@ NAME:
 /* in main.c */
 extern FILE *fpo;
 
+extern const char *spam_header_place;
+
 extern void passthrough_setup(void);
 extern void passthrough_cleanup(void);
 
