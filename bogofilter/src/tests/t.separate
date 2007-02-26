@@ -18,8 +18,8 @@ WORDS="subj:Earn subj:Your subj:College"
 
 rm -f $BOGOFILTER_DIR/????list.$DB_EXT
 
-$BOGOFILTER -C -W -s < ${SYSTEST}/inputs/spam.mbx
-$BOGOFILTER -C -W -n < ${SYSTEST}/inputs/good.mbx
+$BOGOFILTER -C -W -s < "$SYSTEST"/inputs/spam.mbx
+$BOGOFILTER -C -W -n < "$SYSTEST"/inputs/good.mbx
 
 OUT="$TMPDIR/combined.out"
 for f in $BOGOFILTER_DIR/????list.$DB_EXT ; do
@@ -35,10 +35,10 @@ COM=`$BOGOUTIL -W -w $BOGOFILTER_DIR .MSG_COUNT | tail -1 | $AWK '{printf "%s %s
 
 rm -f $BOGOFILTER_DIR/????list.$DB_EXT
 
-$BOGOFILTER -C -WW -s < ${SYSTEST}/inputs/spam.mbx
-$BOGOFILTER -C -WW -n < ${SYSTEST}/inputs/good.mbx
+$BOGOFILTER -C -WW -s < "$SYSTEST"/inputs/spam.mbx
+$BOGOFILTER -C -WW -n < "$SYSTEST"/inputs/good.mbx
 
-OUT="$TMPDIR/separate.out"
+OUT="$TMPDIR"/separate.out
 for f in $BOGOFILTER_DIR/????list.$DB_EXT ; do
     basename $f .$DB_EXT >> $OUT
 done

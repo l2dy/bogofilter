@@ -4,26 +4,26 @@
 
 . ${srcdir:=.}/t.frame
 
-unsort=${srcdir}/unsort.pl
-( perl -e 'exit 0;' ) 2>/dev/null || {
+unsort="$srcdir"/unsort.pl
+( perl -e 'exit 0;' ) 2> /dev/null || {
 echo >&2 "Note: the t.lock2 test may run faster when Perl is installed."
 unsort="cat -"
 }
 
 rm -f $TMPDIR/*
-filelist="${srcdir}/inputs/????.mbx ${srcdir}/inputs/msg.?.txt"
+filelist="$srcdir/inputs/????.mbx "$srcdir"/inputs/msg.?.txt"
 filelist="`ls -1 $filelist`"
 
 BFOPTS="-k2 -M -n -d $TMPDIR -C"
 
 grind() {
-    $BOGOFILTER $BFOPTS -B `echo $filelist | $unsort` 2>> $TMPDIR/log && a=0 || a=$?
+    $BOGOFILTER $BFOPTS -B `echo $filelist | $unsort` 2>> $TMPDIR"/log && a=0 || a=$?
     echo >>$TMPDIR/res $a
 }
 
 explode() {
 (   a=
-    trap "kill 0" 1 2 3 15
+    trap kill 0" 1 2 3 15
     for i in 1 2 3 4 ; do
 	grind &
         a="$a $!"
@@ -33,7 +33,7 @@ explode() {
 }
 
 # create data base first
-$BOGOFILTER $BFOPTS </dev/null
+$BOGOFILTER $BFOPTS < /dev/null
 
 # now grind it
 trap "" 2
@@ -46,11 +46,11 @@ trap "kill 0" 2
 wait $wtpid
 trap - 2
 
-[ -n "$BF_SAVEDIR" ] && . ${srcdir}/t.save
+[ -n "$BF_SAVEDIR" ] && . "$srcdir"/t.save
 
 # check exit codes
 ok=0
-$AWK <$TMPDIR/res \
+$AWK < "$TMPDIR"/res \
 '{
     if ($0 ~ /^[0|1]$/) {
 	ok=1;
