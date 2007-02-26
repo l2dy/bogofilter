@@ -23,6 +23,7 @@ thresh-update     = 0.000000
 timestamp         = Yes
 
 spam-header-name  = X-Bogosity
+spam-header-place = ''
 spam-subject-tag  = ''
 unsure-subject-tag = ''
 header-format     = %h: %c, tests=bogofilter, spamicity=%p, version=%v
