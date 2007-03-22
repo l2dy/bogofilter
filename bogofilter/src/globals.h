@@ -122,6 +122,7 @@ extern	uint	wordlist_version;
 #define	WORDLIST_ENCODING	".ENCODING"
 extern	e_enc	encoding;
 
-extern	bool	fDie;		/* true if SIGINT or SIGTERM received */
+extern	sig_atomic_t	fDie;	/* true if a terminating signal (such as
+				   SIGINT or SIGTERM) has been received */
 
 #endif

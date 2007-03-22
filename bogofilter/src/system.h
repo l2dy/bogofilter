@@ -35,6 +35,8 @@ NAME:
 # include <sys/stat.h>
 #endif
 
+#include <signal.h>
+
 #if HAVE_STRING_H
 # if !STDC_HEADERS && HAVE_MEMORY_H
 #  include <memory.h>

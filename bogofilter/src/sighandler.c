@@ -21,7 +21,7 @@ AUTHOR:
 
 /* Global Definitions */
 
-bool fDie = false;
+sig_atomic_t fDie = false;
 
 /* Function Definitions */
 
@@ -49,6 +49,10 @@ static void mysigdie(int sig)
 	fDie = true;
     else
 	exit(EX_ERROR);
+    /* XXX FIXME: Need something that is async-signal-safe here!
+
+       Note that _exit bypasses atexit, so we may see database
+       corruption! */
 }
 
 void signal_setup(void)
