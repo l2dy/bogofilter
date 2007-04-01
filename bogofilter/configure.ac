@@ -387,7 +387,9 @@ AC_CHECK_TYPES([uint, ulong, uint32_t, u_int32_t, int32_t, int16_t, u_int16_t, u
 AC_CHECK_TYPE(u_long, unsigned long)
 dnl XXX FIXME - this is a crude hack and not necessarily working,
 dnl but it might be good enough if we don't see asynchronous signals
-AC_CHECK_TYPE(sig_atomic_t, volatile int,, [#include <signal.h>])
+AC_CHECK_TYPES([sig_atomic_t],,,[
+#include <signal.h>
+])
 dnl FreeBSD needs sys/types.h and sys/time.h for sys/resource.h
 AC_CHECK_TYPES([rlim_t],,,[
 #ifdef HAVE_SYS_TYPES_H

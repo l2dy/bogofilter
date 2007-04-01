@@ -122,6 +122,10 @@ extern	uint	wordlist_version;
 #define	WORDLIST_ENCODING	".ENCODING"
 extern	e_enc	encoding;
 
+#ifndef HAVE_SIG_ATOMIC_T
+typedef volatile int sig_atomic_t;
+#endif
+
 extern	sig_atomic_t	fDie;	/* true if a terminating signal (such as
 				   SIGINT or SIGTERM) has been received */
 
