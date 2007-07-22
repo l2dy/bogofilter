@@ -4,11 +4,11 @@
 #                            the static libraries bogofilter links against,
 #                            to ease building of portable RPMs.
 
-# (C) Copyright 2005,2006  Matthias Andree <matthias.andree@gmx.de>
+# (C) Copyright 2005,2006,2007  Matthias Andree <matthias.andree@gmx.de>
 # All rights reserved.
 #
 # This script can be redistributed solely under the terms of the
-# GNU General Public License v2.
+# GNU General Public License v3.
 
 # this script requires these in the PATH:
 # ---------------------------------------
@@ -84,28 +84,25 @@ cd ${TMPDIR:=/var/tmp}
 
 dbdir=db-4.2.52
 dbpfx=/opt/db-4.2-lean
-sqdir=sqlite-3.3.5
+sqdir=sqlite-3.4.1
 sqpfx=/opt/sqlite-3-lean
 
 ### download SleepyCat DB 4.2.52 and patches
-source=bogofilter.org
+source=oracle.com
 build_db=0
+dbpatches="1 2 3 4 5"
 checklib=$dbpfx/lib/libdb.a
 if test ! -f $checklib ; then
     case $source in
-	sleepycat.com)
-	URL=http://www.sleepycat.com
-	want $URL/db-4.2.52.tar.gz             8b5cff6eb83972afdd8e0b821703c33c
-	want $URL/update/4.2.52/patch.4.2.52.1 1227f5f9ff43d48b5b1759e113a1c2d7
-	want $URL/update/4.2.52/patch.4.2.52.2 3da7efd8d29919a9113e2f6f5166f5b7
-	want $URL/update/4.2.52/patch.4.2.52.3 0bf9ebbe852652bed433e522928d40ec
-	want $URL/update/4.2.52/patch.4.2.52.4 9cfeff4dce0c11372c0b04b134f8faef
-	;;
-    bogofilter.org)
-	URL=ftp://ftp.bogofilter.org/pub/outgoing/tools/BerkeleyDB
-	want $URL/db-4.2.52.tar.gz 8b5cff6eb83972afdd8e0b821703c33c
-	want $URL/patch.4.2.52.1   1227f5f9ff43d48b5b1759e113a1c2d7
-	want $URL/patch.4.2.52.2   3da7efd8d29919a9113e2f6f5166f5b7
+	oracle.com)
+	URL1=http://download.oracle.com/berkeley-db
+	URL2=http://www.oracle.com/technology/products/berkeley-db/db/
+	want $URL1/db-4.2.52.tar.gz             8b5cff6eb83972afdd8e0b821703c33c
+	want $URL2/update/4.2.52/patch.4.2.52.1 1227f5f9ff43d48b5b1759e113a1c2d7
+	want $URL2/update/4.2.52/patch.4.2.52.2 3da7efd8d29919a9113e2f6f5166f5b7
+	want $URL2/update/4.2.52/patch.4.2.52.3 0bf9ebbe852652bed433e522928d40ec
+	want $URL2/update/4.2.52/patch.4.2.52.4 9cfeff4dce0c11372c0b04b134f8faef
+	want $URL2/update/4.2.52/patch.4.2.52.5 99836f962361da8936219cc193edc7ed
 	;;
     esac
     build_db=1
@@ -117,22 +114,19 @@ fi
 # Info: the objdump test fixes up the effects of a bug
 # in an earlier version of this script, which built
 # a sqlite 3.2.8 version that required GLIBC_2.3.
-build_sqlite=0
 source=sqlite.org
+build_sqlite=0
 checklib=$sqpfx/lib/libsqlite3.a
 if test ! -f $checklib || \
     objdump -t /opt/sqlite-3-lean/lib/libsqlite3.a \
 	| grep -q __ctype_b_loc ; then
     case $source in
     sqlite.org)
-	URL=http://www.sqlite.org
-	want $URL/sqlite-3.3.5.tar.gz dd2a7b6f2a07a4403a0b5e17e8ed5b88
-	;;
+	URL=http://www.sqlite.org ;;
     bogofilter.org)
-	URL=ftp://ftp.bogofilter.org/pub/outgoing/tools/SQLite
-	want $URL/sqlite-3.3.5.tar.gz dd2a7b6f2a07a4403a0b5e17e8ed5b88
-	;;
+	URL=ftp://ftp.bogofilter.org/pub/outgoing/tools/SQLite ;;
     esac
+    want $URL/sqlite-3.4.1.tar.gz 0f06955b18da295fecb62d4bf9ded3c6
     build_sqlite=1
 else
     echo "$checklib already exists, not building SQLite3."
@@ -142,7 +136,7 @@ fi
 if test $build_db = 1 ; then
     rm -rf $dbdir
     gunzip -c -d $dbdir.tar.gz | tar xf -
-    for N in 1 2 3 4 ; do
+    for N in $dbpatches ; do
 	if [ -f patch.4.2.52.$N ] ; then
 	    patch -s -d $dbdir -p0 <patch.4.2.52.$N
 	fi

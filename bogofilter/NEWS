@@ -17,6 +17,12 @@
 
 	2007-07-22
 
+	* The install-staticdblibs.sh script was relicensed under GNU GPL v3,
+	  adjusted to download Berkeley DB 4.2 from oracle.com, adds patch #5,
+	  and updated to build SQLite 3.4.1. In order to for a rebuild of the
+	  updated library, do: rm -rf /opt/db-4.2-lean /opt/sqlite-3-lean
+	  and re-run the script.
+
 	* The recommended minimum sqlite3 version is now 3.4.0, bogofilter will
 	  warn if used with older versions. Bugs that could cause database
 	  corruption in rare circumstances have been fixed in sqlite3.
