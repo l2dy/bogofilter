@@ -27,6 +27,9 @@
 	  warn if used with older versions. Bugs that could cause database
 	  corruption in rare circumstances have been fixed in sqlite3.
 
+	* Updated sendmail milter contrib/bogofilter-milter.pl to v1.27
+	  (thanks to Jonathan Kamens)
+
 	2007-02-25
 
 	* Add '--spam-header-place={header}' to specify header line

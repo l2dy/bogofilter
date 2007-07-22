@@ -5,9 +5,10 @@
 # bogofilter-milter.pl - a Sendmail::Milter Perl script for filtering
 # mail using individual users' bogofilter databases.
 
-# Copyright 2003, 2005 Jonathan Kamens <jik@kamens.brookline.ma.us>.
-# Please send me bug reports, suggestions, criticisms, compliments, or
-# any other feedback you have about this script!
+# Copyright 2003, 2005, 2007 Jonathan Kamens
+# <jik@kamens.brookline.ma.us>.  Please send me bug reports,
+# suggestions, criticisms, compliments, or any other feedback you have
+# about this script!
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +37,7 @@
 # in your sendmail.mc file).  Running this script as root should be
 # safe because it changes its effective UID and GID whenever
 # performing operations on individual users' files (if you find a
-# security problem, please let me know!)
+# security problem, please let me know!).
 #
 # For additional information about libmilter and integrating this or
 # any other libmilter filter into your sendmail installation, see the
@@ -83,6 +84,15 @@ my $training_file = 'training';
 # message archiving, set $archive_mbox to undef.
 my $archive_mbox = 'archive';
 
+# If $cyrus_deliver is set to an existing executable, then it is
+# assumed to be a Cyrus IMAP "deliver" program.  If the $archive_mbox
+# for a particular user is a symlink pointing at a nonexistent file
+# whose name starts with "cyrus:", then everything after the "cyrus:"
+# is assumed to be the name of a Cyrus IMAP folder within the user's
+# mailbox to which to deliver the spam message instead of saving it
+# into an mbox format file.
+my $cyrus_deliver = '/usr/lib/cyrus-imapd/deliver';
+
 # Mail::Alias is used to expand SMTP recipient addresses into local
 # mailboxes to determine if any of them have bogofilter databases.  If
 # someone sends E-mail to a mailing list or alias whose expansion
@@ -97,6 +107,33 @@ my $archive_mbox = 'archive';
 # person's bogofilter database can cause a message to be filtered for
 # everyone on a local mailing list.
 my $aliases_file = '/etc/aliases';
+
+# If you want the milter to ask sendmail to canonicalize recipient
+# addresses before trying to alias-expand them, then set
+# $sendmail_canon to true and $sendmail_prog to the path of the
+# sendmail binary to invoke.  This is necessary, e.g., if you use a
+# virtual user table for some recipients that do sendmail filtering.
+# You may also wish to examine the sendmail_canon subroutine below,
+# because it may not be right for your particular sendmail
+# configuration.  Search for CHECKTHIS in the function.
+my $sendmail_canon = 1;
+my $sendmail_prog = '/usr/sbin/sendmail';
+
+# You can configure how long addresses will stay in the cache of
+# addresses that have been been expanded against the virtual user
+# table (if $sendmail_canon is set above), then expanded against the
+# aliases file (if $aliases_file is set above), then checked to see if
+# they represent users who are doing filtering.  You would want cache
+# entries to time out if you get a lot of spam dictionary attacks
+# against your mail server, when the spammers try tons of invalid
+# addresses on the off chance that one of them might be valid, because
+# in that case your cache will grow without bound and the bogofilter
+# milter process will get really large.  Set this to 0 to disable
+# cache expiration, or to the number of seconds after which cache
+# entries should expire.
+my $recipient_cache_expire = 24 * 60 * 60; # one day
+# How often to expire entries from the cache.
+my $recipient_cache_check_interval = 60 * 60; # one hour
 
 # You may wish to remove this restriction, by setting this variable to
 # 0, if your site gets a lot of mail, but I haven't tested the script
@@ -120,6 +157,7 @@ use English '-no_match_vars';
 use Proc::Daemon;
 use Getopt::Long;
 use IO::Scalar;
+use IPC::Open2;
 
 # Used to cache the results of alias expansions and checks for
 # filtered recipients.
@@ -346,13 +384,45 @@ sub my_eom_callback {
 	syslog('info', '%s', ($training ? "would reject" : "rejecting") . 
 	       " likely spam from $from to " . $hash->{'rcpt'} . " based on $dir");
 	if (! $training) {
-	    my $archive;
+	    my($archive, $link);
 
 	    $archive = ($archive_mbox &&
 			&restrict_permissions($hash->{'rcpt'}) &&
 			(lstat($archive = "$dir/$archive_mbox"))) ?
 			$archive : undef;
 
+	    if ($cyrus_deliver && -f $cyrus_deliver && -X $cyrus_deliver &&
+		-l $archive && ($link = readlink($archive)) &&
+		$link =~ s/^cyrus:// && (! -f $archive)) {
+		&unrestrict_permissions;
+		my $user = &filtered_user($hash->{'rcpt'});
+		if (! $user) {
+		    &die("Couldn't determine username for IMAP delivery");
+		}
+		if (! seek($fh, 0, SEEK_SET)) {
+		    &die("error rewinding message handle: $!");
+		}
+		my $pid = open(DELIVER, "|-");
+		if (! defined($pid)) {
+		    &die("Error forking to execute $cyrus_deliver: $!");
+		}
+		elsif (! $pid) {
+		    exec($cyrus_deliver, '-a', $user, '-m',
+			 "user.$user.$link") ||
+			     &die("exec($cyrus_deliver): $!");
+		}
+		else {
+		    local($/) = undef;
+		    my $ret = 1;
+		    $ret = $ret && print(DELIVER <$fh>);
+		    $ret = $ret && close(DELIVER);
+		    if (! $ret) {
+			syslog('warning', '%s',
+			       "$cyrus_deliver failed for user.$user.$link");
+		    }
+		    goto permissions_already_unrestricted;
+		}
+	    }
 	    if ($archive) {
 		# There is an annoying race condition here.  Suppose two spam
 		# messages are delivered at the same time to a user whose
@@ -415,6 +485,7 @@ sub my_eom_callback {
 	    }
 	  no_archive_open:
 	    &unrestrict_permissions;
+	  permissions_already_unrestricted:
 	    $ctx->setreply(550, "5.7.1", "Your message looks like spam.\n" .
 			   "If it isn't, resend it with $magic_string " .
 			   "in the Subject line.");
@@ -447,6 +518,11 @@ sub filtered_dir {
     $dir;
 }
 
+sub filtered_user {
+    my($uid, $gid, $dir, $stamp, $user) = &expand_recipient($_[0]);
+    $user;
+}
+
 sub restrict_permissions {
     my($rcpt) = shift;
     my($no_going_back) = shift;
@@ -475,15 +551,39 @@ sub unrestrict_permissions {
     $EGID = $GID;
 }
 
+my $recipient_cache_last_checked;
+
 sub expand_recipient {
     my($rcpt) = @_;
-    my(@expanded);
+    my($orig, @expanded);
+    my $now = time;
+
+    if ($recipient_cache_expire) {
+	if (! defined($recipient_cache_last_checked)) {
+	    $recipient_cache_last_checked = $now;
+	}
+	if ($now - $recipient_cache_last_checked >
+	    $recipient_cache_check_interval) {
+	    my $old = $now - $recipient_cache_expire;
+	    my(@keys) = keys %cached_recipients;
+	    my(@expired) = grep($cached_recipients{$_}->[3] <= $old,
+				keys %cached_recipients);
+	    syslog('debug', 'expiring %d entries (out of %d) ' .
+		   'from the recipient cache',
+		   scalar @expired, scalar @keys);
+	    map(delete $cached_recipients{$_}, @expired);
+	    $recipient_cache_last_checked = $now;
+	}
+    }
 
     if (defined($cached_recipients{$rcpt})) {
 	return(@{$cached_recipients{$rcpt}});
     }
+
+    $rcpt = &sendmail_canon($orig = $rcpt);
+
     if ($rcpt =~ /\@/) {
-	return(@{$cached_recipients{$rcpt}} = ());
+	return(@{$cached_recipients{$orig}} = (undef, undef, undef, $now, undef));
     }
 
     if ($aliases_file) {
@@ -500,22 +600,54 @@ sub expand_recipient {
 
 	$stripped =~ s/\+.*//;
 	$pw = getpwnam($stripped);
-	@{$cached_recipients{$rcpt}} = $pw ? ($pw->uid, $pw->gid, undef) : ();
-	if ($pw && $pw->dir && &restrict_permissions($rcpt) &&
+	@{$cached_recipients{$orig}} =
+	    $pw ? ($pw->uid, $pw->gid, undef, $now, $stripped) :
+	    (undef, undef, undef, $now, undef);
+	if ($pw && $pw->dir && &restrict_permissions($orig) &&
 	    -d ($dir = $pw->dir . "/.bogofilter")) {
-	    $cached_recipients{$rcpt}->[2] = $dir;
+	    $cached_recipients{$orig}->[2] = $dir;
 	}
 	&unrestrict_permissions;
-	return(@{$cached_recipients{$rcpt}});
+	return(@{$cached_recipients{$orig}});
     }
     else {
 	foreach my $addr (@expanded) {
 	    my(@sub);
 	    if (@sub = &expand_recipient($addr)) {
-		return(@{$cached_recipients{$rcpt}} = @sub);
+		return(@{$cached_recipients{$orig}} = @sub);
 	    }
 	}
-	return(@{$cached_recipients{$rcpt}} = ());
+	return(@{$cached_recipients{$orig}} = (undef, undef, undef, $now, undef));
+    }
+}
+
+sub sendmail_canon {
+    return $_[0] if (! $sendmail_canon);
+
+    my($pid, $sendmail_reader, $sendmail_writer, $last);
+    local($_);
+
+    $pid = open2($sendmail_reader, $sendmail_writer, $sendmail_prog, '-bt') or &die("open2 for sendmail failed");
+    print($sendmail_writer "3,0 $_[0]\n");
+    close($sendmail_writer);
+    while (<$sendmail_reader>) {
+	# CHECKTHIS You should run "sendmail -bt" as root, give it the
+	# input "3,0 addr" where "addr" is one of the addresses in
+	# your virtual user table, and confirm that the last
+	# "returns:" line that it returns matches the regexp here for
+	# local addresses.
+	if (/\s+returns: \$\# local \$\:\s+(.+)/) {
+	    $last = $1;
+	}
+    }
+    close($sendmail_reader);
+    waitpid $pid, 0;
+
+    if ($last) {
+	return $last;
+    }
+    else {
+	return $_[0];
     }
 }
 
