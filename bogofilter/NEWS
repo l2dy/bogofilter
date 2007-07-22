@@ -15,6 +15,12 @@
 
 -------------------------------------------------------------------------------
 
+	2007-07-22
+
+	* The recommended minimum sqlite3 version is now 3.4.0, bogofilter will
+	  warn if used with older versions. Bugs that could cause database
+	  corruption in rare circumstances have been fixed in sqlite3.
+
 	2007-02-25
 
 	* Add '--spam-header-place={header}' to specify header line

@@ -252,7 +252,8 @@ static int busyhandler(void *dummy, int count)
 
 static void check_sqlite_version(void)
 {
-    unsigned int vmaj, vmin, vpl;
+    const wmaj = 3, wmin = 4, wpl = 0;	/* desired version of sqlite3 library */
+    unsigned int vmaj, vmin, vpl;	/* actual version of sqlite3 library */
     static int complained;
     const char *v;
 
@@ -261,14 +262,14 @@ static void check_sqlite_version(void)
     complained = 1;
     v = sqlite3_libversion();
     sscanf(v, "%u.%u.%u", &vmaj, &vmin, &vpl);
-    if (vmaj > 3) return;
-    if (vmaj == 3 && vmin > 2) return;
-    if (vmaj == 3 && vmin == 2 && vpl >= 8) return;
+    if (vmaj > wmaj) return;
+    if (vmaj == wmaj && vmin > wmin) return;
+    if (vmaj == wmaj && vmin == wmin && vpl >= wpl) return;
     if (!getenv("BF_USE_OLD_SQLITE"))
 	fprintf(stderr,
 		"\n"
-		"WARNING: please update sqlite to 3.2.8 or newer.\n"
-		"\n");
+		"WARNING: please update sqlite to %d.%d.%d or newer.\n"
+		"\n", wmaj, wmin, wpl);
 }
 
 void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
