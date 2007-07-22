@@ -195,5 +195,6 @@ to the list.
 7. License
 ----------
 
-Bogofilter is offered under the GNU general public license v2,
-see the COPYING file for details.
+Bogofilter is offered under the GNU General Public License,
+see the COPYING file for details. Note that some parts, especially in
+the contrib/ section or scripts, may be under a different license.
