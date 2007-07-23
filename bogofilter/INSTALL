@@ -28,8 +28,8 @@ time. See doc/README.db for details.
 REMEMBER to read the doc/programmer/README.* file for your operating
 systems in case of trouble.
 
-NOTE: If you are about to build from code checked out via CVS, then
-please read the README.cvs file first before you proceed with this file!
+NOTE: If you are about to build from code checked out via SVN, then
+please read the README.svn file first before you proceed with this file!
 
 make command
 ============

@@ -10,7 +10,7 @@ Summary:
 3. Installing Bogofilter
 4. How to contribute
 5. How to request features
-6. Building & Installing Bogofilter from Source Tarball or CVS
+6. Building & Installing Bogofilter from Source Tarball or SVN
   a. Downloading
   b. Building & Installing
   c. Configuring
@@ -119,7 +119,7 @@ feature on your own, which would be great!  You can then send a patch
 to the list.
 
 
-6. Building & Installing Bogofilter from Source Tarball or CVS
+6. Building & Installing Bogofilter from Source Tarball or SVN
 --------------------------------------------------------------
 
   a. Downloading
@@ -130,16 +130,11 @@ to the list.
 	http://sourceforge.net/projects/bogofilter/
 
   The latest stable version can be downloaded.  The development source
-  is in a CVS repository on SourceForge.  To download the latest cvs
+  is in a Subversion repository on SourceForge.  To download the latest SVN
   source, cd to the directory to which you wish to download and type
-  the following commands:
+  the following command:
 
-  cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/bogofilter login
-
-  When prompted for a password press the RETURN key.
-  After anonymously logging in:
-
-  cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/bogofilter co bogofilter
+  svn co https://bogofilter.svn.sourceforge.net/svnroot/bogofilter/trunk/bogofilter/ bogofilter
 
   b. Building & Installing
   ------------------------
@@ -152,12 +147,14 @@ to the list.
   make all check
   make install		[as root]
 
-  To compile and install the standard configuration from CVS, use
+  To compile and install the standard configuration from SVN, use
   the following commands:
 
   cd bogofilter		[change to project directory]
   ./autogen.sh		[add configure options as required]
   make install		[as root]
+
+  Be sure to read README.svn for additional preparations required.
 
   You will need a full set of development tools installed to be able
   to run autogen.sh, including recent automake (1.8) and autoconf

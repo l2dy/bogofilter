@@ -15,6 +15,12 @@
 
 -------------------------------------------------------------------------------
 
+	2007-07-23
+
+	* The upstream repository was migrated to SVN.
+	  In order to check the code out, use this command (one line):
+	  svn co https://bogofilter.svn.sourceforge.net/svnroot/bogofilter/trunk/bogofilter/ bogofilter
+
 	2007-07-22
 
 	* The install-staticdblibs.sh script was relicensed under GNU GPL v3,

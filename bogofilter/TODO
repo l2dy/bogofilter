@@ -2,6 +2,10 @@
 
 			bogofilter TODO list
 
+**** CVS -> SVN migration:
+	Makefile.am cvs-check target
+	version.sh  adjust to derive proper date
+
 **** If insufficient data is present and the default "undecided"
      bogosity is added in -p mode, add also a comment stating that
      bogofilter needs more training first

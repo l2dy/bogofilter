@@ -1,12 +1,12 @@
-README.cvs -- How to build bogofilter from CVS
+README.svn -- How to build bogofilter from Subversion (SVN)
 $Id$
 
-(C) 2002 by Matthias Andree. Freely distributable according to the terms
-of the GNU Free Documentation License 1.0. No front- or back-matter
+(C) 2002,2007 by Matthias Andree. Freely distributable according to the 
+terms of the GNU Free Documentation License 1.0. No front- or back-matter
 parts, no invariant parts.
-------------------------------------------------------------------------
+-------------------------------------------------------------------------
 
-After you have checked out bogofilter from CVS, some files are missing,
+After you have checked out bogofilter from SVN, some files are missing,
 for example, configure, ylwrap and others.
 
 These files can be created automatically with recent autoconf and
@@ -22,5 +22,5 @@ and so on.
 For less verbose output: ./configure --quiet && make -s && make -s check
 
 Have fun!
-------------------------------------------------------------------------
-end of README.cvs
+-------------------------------------------------------------------------
+end of README.svn
