@@ -999,9 +999,15 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 	return EX_ERROR;
     }
 
+#if DB_AT_LEAST(4,6)
+    for (ret =  dbcp->get(dbcp, &key, &data, DB_FIRST);
+	 ret == 0;
+	 ret =  dbcp->get(dbcp, &key, &data, DB_NEXT))
+#else
     for (ret =  dbcp->c_get(dbcp, &key, &data, DB_FIRST);
 	 ret == 0;
 	 ret =  dbcp->c_get(dbcp, &key, &data, DB_NEXT))
+#endif
     {
 	int rc;
 
@@ -1037,7 +1043,12 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 	break;
     }
 
-    if ((ret = dbcp->c_close(dbcp))) {
+#if DB_AT_LEAST(4,6)
+    if ((ret = dbcp->close(dbcp)))
+#else
+    if ((ret = dbcp->c_close(dbcp)))
+#endif
+    {
 	print_error(__FILE__, __LINE__, "(c_close): %s", db_strerror(ret));
 	eflag = true;
     }
