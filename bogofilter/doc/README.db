@@ -59,6 +59,8 @@ applied the patches, check your vendor's update site regularly):
   Sleepycat Software: Berkeley DB 4.2.52: (December  3, 2003)
   Sleepycat Software: Berkeley DB 4.3.29: (September 6, 2005)
   Sleepycat Software: Berkeley DB 4.4.20: (January  10, 2006)
+  Berkeley DB 4.5.20: (September 20, 2006)
+  Berkeley DB 4.6.18: (July 17, 2007)
 
 Other versions of Berkeley DB between the first and last listed above
 may or may not work but usually they will.
@@ -67,7 +69,7 @@ Berkeley DB versions 4.1 and newer are recommended over the previous
 versions, because the newer can detect data corruptions more reliably
 (through the use of checksums that detect partially written data base
 pages); Berkeley DB 4.2 and 4.3 appear a bit faster under load than 4.1
-and older versions, 4.4 has not yet been evaluated.
+and older versions, 4.4 and newer have not yet been evaluated for speed.
 
 2.2.1 Upgrading to transactional databases, also from older bogofilter versions
 
