@@ -4,6 +4,8 @@
 #
 # bogofilter-milter.pl - a Sendmail::Milter Perl script for filtering
 # mail using individual users' bogofilter databases.
+#
+# (additional information below the coypright statement)
 
 # Copyright 2003, 2005, 2007 Jonathan Kamens
 # <jik@kamens.brookline.ma.us>.  Please send me bug reports,
@@ -39,6 +41,13 @@
 # performing operations on individual users' files (if you find a
 # security problem, please let me know!).
 #
+# NOTE: You will want to take steps to ensure that this script is
+# started before sendmail whenever your machine boots, e.g., by
+# creating an appropriate script in /etc/rc.d/init.d with appropriate
+# links to it in /etc/rc.d/rc?.d, because once you configure sendmail
+# to talk to a particular milter, it may refuse to deliver email if
+# that milter isn't running when the email comes in.
+#
 # For additional information about libmilter and integrating this or
 # any other libmilter filter into your sendmail installation, see the
 # file README.libmilter that ships with sendmail and/or the section
@@ -56,6 +65,15 @@
 # If this string appears in the Subject of a message (case
 # insensitive), the message won't be filtered.
 my $magic_string = '[no-bogofilter]';
+
+# These settings control exactly what error sendmail sends back to the
+# sender if a message is rejected.  You can leave them as-is, or
+# customize them as desired.
+my $rcode = 550; # three-digit RFC 821 SMTP reply
+my $xcode = "5.7.1"; # extended RFC 2034 reply code
+my $reject_message = "Your message looks like spam.\n" .
+    "If it isn't, resend it with $magic_string " .
+    "in the Subject line.";
 
 # The largest message to keep in memory rather than writing to a
 # temporary file.
@@ -152,12 +170,15 @@ use File::Temp qw(tempfile);
 use Fcntl qw(:flock :seek);
 use Mail::Alias;
 use User::pwent;
-use Sys::Syslog qw(:DEFAULT setlogsock);
+use Sys::Syslog qw(:DEFAULT :macros setlogsock);
 use English '-no_match_vars';
 use Proc::Daemon;
 use Getopt::Long;
 use IO::Scalar;
 use IPC::Open2;
+use Data::Dumper;
+
+$Data::Dumper::Indent = 0;
 
 # Used to cache the results of alias expansions and checks for
 # filtered recipients.
@@ -194,7 +215,10 @@ $magic_string_re =~ s/(\W)/\\$1/g;
 
 setlogsock('unix');
 openlog($whoami, 'pid', 'mail');
-
+if (! $debug) {
+    setlogmask(&LOG_UPTO(LOG_INFO));
+}
+    
 if (! (open(PIDFILE, '+<', $pid_file) ||
        open(PIDFILE, '+>', $pid_file))) {
     &die("open($pid_file): $!\n");
@@ -222,20 +246,27 @@ sub my_rcpt_callback {
     my $ctx = shift;
     my $hash = $ctx->getpriv();
 
+    &debuglog("my_rcpt_callback: entering with " . Data::Dumper->Dump([$hash], [qw(hash)]));
+
     if ($hash->{'rcpt'}) {
 	# We've already encountered a recipient who is filtering this message.
 	$ctx->setpriv($hash);
+	&debuglog("my_rcpt_callback: return CONTINUE with old hash");
 	return SMFIS_CONTINUE;
     }
     my $rcpt = $ctx->getsymval('{rcpt_addr}');
 
+    &debuglog("my_rcpt_callback: rcpt_addr: $rcpt");
+
     if (&filtered_dir($rcpt)) {
 	$hash->{'rcpt'} = $rcpt;
 	$ctx->setpriv($hash);
+	&debuglog("my_rcpt_callback: return CONTINUE with hash");
 	return SMFIS_CONTINUE;
     }
     else {
 	$ctx->setpriv(undef);
+	&debuglog("my_rcpt_callback: return CONTINUE with undef");
 	return SMFIS_CONTINUE;
     }
 }
@@ -244,10 +275,16 @@ sub my_header_callback {
     my($ctx, $field, $value) = @_;
     my($hash) = $ctx->getpriv();
 
-    return SMFIS_ACCEPT if (! $hash);
+    &debuglog("my_header_callback: entering with " . Data::Dumper->Dump([$hash, $field, $value], [qw(hash field value)]));
+
+    if (! $hash) {
+	&debuglog("my_header_callback: return ACCEPT with no hash");
+	return SMFIS_ACCEPT;
+    }
 
     if (($field =~ /^subject$/i) && ($value =~ /$magic_string_re/oi)) {
 	$ctx->setpriv(undef);
+	&debuglog("my_header_callback: returning ACCEPT for magic subject");
 	return SMFIS_ACCEPT;
     }
 
@@ -255,6 +292,7 @@ sub my_header_callback {
 
     $ctx->setpriv($hash);
 
+    &debuglog("my_header_callback: returning CONTINUE with hash");
     return SMFIS_CONTINUE;
 }
 
@@ -262,10 +300,25 @@ sub my_eoh_callback {
     my($ctx) = @_;
     my($hash) = $ctx->getpriv();
 
+    # If $hash is undefined here, it means that the sender sent no
+    # message header at all, so the block of code in
+    # my_header_callback for checking if $hash is undefined never got
+    # called.  This means the message is almost certainly spam, but
+    # it's not our job to determine that if none of the recipients are
+    # using bogofilter.
+    if (! $hash) {
+	&debuglog("my_eoh_callback: return ACCEPT with no hash (message had empty header)");
+	return SMFIS_ACCEPT;
+    }
+
+
+    &debuglog("my_eoh_callback: entering with " . Data::Dumper->Dump([$hash], [qw(hash)]));
+
     $hash = &add_to_message($hash, "\n");
 
     $ctx->setpriv($hash);
 
+    &debuglog("my_eoh_callback: returning CONTINUE with hash");
     return SMFIS_CONTINUE;
 }
 
@@ -273,10 +326,13 @@ sub my_body_callback {
     my($ctx, $body, $len) = @_;
     my($hash) = $ctx->getpriv();
 
+    &debuglog("my_body_callback: entering with " . Data::Dumper->Dump([$hash, $len], [qw(hash len)]));
+
     $hash = &add_to_message($hash, $body);
 
     $ctx->setpriv($hash);
 
+    &debuglog("my_body_callback: returning CONTINUE with hash");
     return SMFIS_CONTINUE;
 }
 
@@ -298,7 +354,7 @@ sub add_to_message {
 	    &die("error creating temporary file");
 	}
 
-	syslog('debug', '%s', "switching to temporary file " . $hash->{'fn'});
+	&debuglog("switching to temporary file " . $hash->{'fn'});
 
 	$text = $hash->{'msg'};
 	delete $hash->{'msg'};
@@ -332,10 +388,15 @@ sub my_eom_callback {
     my $fh;
     local($_);
 
+    &debuglog("my_eom_callback: entering with " . Data::Dumper->Dump([$hash], [qw(hash)]));
+
     my $dir = &filtered_dir($hash->{'rcpt'});
 
     if (! $dir) {
-	&die("my_eom_callback called for non-filtered recipient " . $hash->{'rcpt'} . "\n");
+	syslog('err', '%s', "my_eom_callback called for non-filtered recipient; " . Data::Dumper->Dump([$hash], [qw(hash)]));
+	$ctx->setpriv(undef);
+	&debuglog("my_eom_callback: returning ACCEPT with undef");
+	return SMFIS_ACCEPT;
     }
 
     my $pid = open(BOGOFILTER, '|-');
@@ -374,8 +435,8 @@ sub my_eom_callback {
 		&unrestrict_permissions;
 	    }
 	    else {
-		&syslog('warning', 'assuming training mode because ' .
-			'permissions could not be restricted');
+		syslog('warning', 'assuming training mode because ' .
+		       'permissions could not be restricted');
 		$training = 1;
 	    }
 	}
@@ -486,9 +547,7 @@ sub my_eom_callback {
 	  no_archive_open:
 	    &unrestrict_permissions;
 	  permissions_already_unrestricted:
-	    $ctx->setreply(550, "5.7.1", "Your message looks like spam.\n" .
-			   "If it isn't, resend it with $magic_string " .
-			   "in the Subject line.");
+	    $ctx->setreply($rcode, $xcode, $reject_message);
 	    $ctx->setpriv(undef);
 	    return SMFIS_REJECT;
 	}
@@ -505,11 +564,14 @@ sub my_abort_callback {
     my($ctx) = shift;
     my $hash = $ctx->getpriv();
 
+    &debuglog("my_abort_callback: entering with " . Data::Dumper->Dump([$hash], [qw(hash)]));
+
     if ($hash->{'fn'}) {
 	unlink $hash->{'fn'};
     }
 
     $ctx->setpriv(undef);
+    &debuglog("my_abort_callback: returning CONTINUE with undef");
     return SMFIS_CONTINUE;
 }
 
@@ -568,9 +630,9 @@ sub expand_recipient {
 	    my(@keys) = keys %cached_recipients;
 	    my(@expired) = grep($cached_recipients{$_}->[3] <= $old,
 				keys %cached_recipients);
-	    syslog('debug', 'expiring %d entries (out of %d) ' .
-		   'from the recipient cache',
-		   scalar @expired, scalar @keys);
+	    &debuglog('expiring %d entries (out of %d) ' .
+		      'from the recipient cache',
+		      scalar @expired, scalar @keys);
 	    map(delete $cached_recipients{$_}, @expired);
 	    $recipient_cache_last_checked = $now;
 	}
@@ -656,4 +718,8 @@ sub die {
 
     syslog('err', '%s', "@msg");
     exit(1);
+}
+
+sub debuglog {
+    syslog('debug', "DEBUG: " . join("", @_));
 }
