@@ -36,6 +36,7 @@
 	* The recommended minimum sqlite3 version is now 3.4.0, bogofilter will
 	  warn if used with older versions. Bugs that could cause database
 	  corruption in rare circumstances have been fixed in sqlite3.
+	  See doc/README.sqlite for details.
 
 	* Updated sendmail milter contrib/bogofilter-milter.pl to v1.27
 	  (thanks to Jonathan Kamens)
