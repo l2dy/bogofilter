@@ -20,7 +20,7 @@
 
 VERSION=$(grep define.VERSION config.h | awk '{print $3}' | tr -d '"')
 
-SUFFIX=$(echo $VERSION | egrep "\.cvs$")
+SUFFIX=$(echo $VERSION | egrep "\.svn$")
 
 srcdir=$1
 shift
@@ -28,23 +28,17 @@ shift
 set -e
 
 if [ ! -z "$SUFFIX" ]; then
-    FILES=$(find $srcdir -name CVS -type d -print | while read a ; do find "$a" -name Entries -type f -print ; done)
     set +e
-    DATE=CVStime_`perl -MHTTP::Date -e '
-    $max = 0;
-    while (<>) {
-	split m(/);
-	$a=str2time($_[3], "GMT");
-	$max=$a if $a and $a > $max;
-    }
-    $date=HTTP::Date::time2isoz($max);
+    DATE=$(svn info --xml "$srcdir" | grep date | sed 's,</\?date>,,g' | perl -MHTTP::Date -e '
+    $date = str2time(<>);
+    $date=HTTP::Date::time2isoz($date);
     $date=~tr/ :Z-/_/d;
     print $date, "\n";
-    ' </dev/null $FILES` || DATE=
-    if [ "x$FILES" = "x" ] || [ "x$DATE" = "x" ] ; then
+    ') || DATE=
+    if [ "x$DATE" = "x" ] ; then
        DATE=$(env TZ=GMT date "+build_date_%Y%m%d_%Hh")
     fi
-#   VERSION="$VERSION.$DATE"
+    VERSION="$VERSION.$DATE"
 fi
 
 echo "#include \"globals.h\""
