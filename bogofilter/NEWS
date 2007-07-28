@@ -15,6 +15,10 @@
 
 -------------------------------------------------------------------------------
 
+	2007-07-28
+
+	* doc/README.db was updated to BerkeleyDB 4.6
+
 	2007-07-23
 
 	* The upstream repository was migrated to SVN.

@@ -172,9 +172,8 @@ You need a "log file upgrade" for your transactional databases if at
 least one of these conditions is true ("-->" means "to")
 
 - you upgraded Berkeley DB from a 3.X version --> a 4.Y version
-- you upgraded Berkeley DB from 4.0 or 4.1 --> 4.2, 4.3 or 4.4
-- you upgraded Berkeley DB from 4.2 --> 4.3 or 4.4
-- you upgraded Berkeley DB from 4.3 --> 4.4
+- you upgraded Berkeley DB from a 4.X version --> a newer 4.Y version
+  that means Y > X; EXCEPT if you upgraded from 4.0 to 4.1
 
 Non-transactional databases do not need log file format upgrades as they
 do not use log files.
