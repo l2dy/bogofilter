@@ -11,6 +11,7 @@
 
 set -e
 umask 02
+LC_ALL=C ; export LC_ALL
 
 echo "### CHECKING OUT WEB ###"
 cd /home/groups/b/bo/bogofilter/web
@@ -19,7 +20,7 @@ URL=https://bogofilter.svn.sourceforge.net/svnroot/bogofilter/trunk/
 CMDPFX="svn"
 
 # check out
-$CMDPFX update
+$CMDPFX update | egrep -v "^(At revision|Revision)"
 
 # start ourselves anew
 if [ "x$NORECURSE" = x ] ; then
