@@ -26,7 +26,7 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 		RELEASE.NOTES \
 		install-staticdblibs.sh
 
-.PHONY:	check rpm cvs-check
+.PHONY:	check rpm svn-check
 
 #
 # RPM building - there are some cheats here
@@ -104,10 +104,10 @@ rpm:	dist
 	-                CPPFLAGS="-D__NO_CTYPE -I$(SQPFX)"               \
 			$(RPMBUILD)              $(DEF_SQLITE) $(SIGN) -tb $(distdir).tar.gz
 
-cvs-check:
+svn-check:
 	rm -rf $(PACKAGE)-$(VERSION)-export
-	cvs -d "`cat $(srcdir)/CVS/Root`" export -rHEAD -d $(PACKAGE)-$(VERSION)-export $(PACKAGE)
-	cd $(PACKAGE)-$(VERSION)-export && autoreconf -i -f -s \
+	svn export -rBASE $(srcdir) $(PACKAGE)-$(VERSION)-export
+	cd $(PACKAGE)-$(VERSION)-export && autoreconf -i -f -s -v \
 	&& ./configure && make distcheck
 
 # this target expects a .rsyncs file with lines of this format:
