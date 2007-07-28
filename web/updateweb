@@ -15,28 +15,28 @@ umask 02
 echo "### CHECKING OUT WEB ###"
 cd /home/groups/b/bo/bogofilter/web
 
-CMDPFX="cvs -q -d :pserver:anonymous@bogofilter.cvs.sourceforge.net:/cvsroot/bogofilter"
+URL=https://bogofilter.svn.sourceforge.net/svnroot/bogofilter/trunk/
+CMDPFX="svn"
 
 # check out
-$CMDPFX update -d -P
+$CMDPFX update
 
 # start ourselves anew
 if [ "x$NORECURSE" = x ] ; then
     echo "### RESTARTING $0 ###"
     env NORECURSE=1 $0
 else
-
   echo "### CHECKING OUT FAQ and NEWS ###"
   FILES="bogofilter-faq.html bogofilter-faq-fr.html bogofilter-faq-it.html"
   for FILE in $FILES ; do
-    $CMDPFX checkout -p -Dtomorrow bogofilter/doc/$FILE > $FILE
+    $CMDPFX cat $URL/bogofilter/doc/$FILE >$FILE
   done
-  $CMDPFX checkout -p -Dtomorrow bogofilter/NEWS >NEWS
+  $CMDPFX cat $URL/bogofilter/NEWS >NEWS
 
   echo "### COPYING STAGING AREA TO htdocs/ ###"
   # copy without cruft and internal files
   rsync -aH --delete ./ ../htdocs/ --delete-excluded \
-      --exclude CVS --exclude '.#*' \
+      --exclude .svn --exclude '.#*' \
       --exclude README_BEFORE_EDITING \
       --exclude .nfs* \
       --exclude updateweb \
