@@ -378,6 +378,14 @@ simultaneous write().
 
 A bf_copy script is provided for your convenience.
 
+3.5 OTHER TROUBLESHOOTING
+
+3.5.1 "Logging region out of memory; you may need to increase its size"
+
+This happens only for transactional databases. Use the DB_CONFIG file to 
+set the log region size (set_lg_regionmax) higher and after that, run 
+database recovery - see section 4.2 for details.
+
 4. Other Information of Interest ---------------------------------------
 
 4.1 GENERAL INFORMATION
@@ -431,13 +439,13 @@ transactional databases. Some options take effect immediately, some need
 'bogoutil --db-recover' to become effective. All options are ignored if
 the database in the same directory as DB_CONFIG is non-transactional.
 
-Here is a list of interesting settings, put one at a line, omitting the
+Here is a list of interesting settings. Use one per line, and omit the
 leading spaces and hyphen:
 
 SIZING OPTIONS:
 
  - set_cachesize      G B C
-   (valid in Berkeley DB 3.1 - 4.4, requires recovery to change)
+   (valid in Berkeley DB 3.1 - 4.6, requires recovery to change)
 
    sets the cache size to G gigabytes plus B bytes which are spread out
    in C equally sized caches (all figures are natural numbers). You
@@ -451,40 +459,46 @@ SIZING OPTIONS:
    will create six caches sized 12500000 bytes (12.5 MB, +25% applied)
 
  - set_lg_max         250000
-   (valid in Berkeley DB 3.1 - 4.4, takes effect immediately)
+   (valid in Berkeley DB 3.1 - 4.6, takes effect immediately)
 
    this option configures the maximum log file size, in bytes, before
    Berkeley DB starts a new log file. The default is 1 MB.
 
+ - set_lg_regionmax   262144
+   (valid in Berkeley DB 3.3 - 4.6, requires recovery to take effect)
+
+   this option configures the log region size, in bytes, and may 
+   sometimes need to be increased. The default is around 60 kB.
+
 SAFE OPTIONS:
 
  - set_flags DB_DIRECT_DB
-   (valid in Berkeley DB 4.1 - 4.4, takes effect immediately)
+   (valid in Berkeley DB 4.1 - 4.6, takes effect immediately)
 
    this option turns off system buffering of *database* files, to avoid
    double caching of data. NOT SUPPORTED ON ALL PLATFORMS!
 
  - set_flags DB_DIRECT_LOG
-   (valid in Berkeley DB 4.1 - 4.4, takes effect immediately)
+   (valid in Berkeley DB 4.1 - 4.6, takes effect immediately)
 
    this option turns off system buffering of *log* files, to avoid
    double caching of data. NOT SUPPORTED ON ALL PLATFORMS!
 
  - set_flags DB_DSYNC_LOG
-   (valid in Berkeley DB 4.3 - 4.4, takes effect immediately)
+   (valid in Berkeley DB 4.3 - 4.6, takes effect immediately)
 
    this option can increase performance on some systems (and decrease on
    other systems), by using the O_DSYNC POSIX flag rather than a
    separate function to flush the logs.
 
  - set_flags DB_NOMMAP
-   (valid in Berkeley DB 3.2 - 4.4, takes effect immediately)
+   (valid in Berkeley DB 3.2 - 4.6, takes effect immediately)
 
    this option can reduce memory consumption at run time, particularly
    with large databases, at some cost of performance
 
  - set_flags DB_REGION_INIT
-   (valid in Berkeley DB 3.2 - 4.4, takes effect immediately)
+   (valid in Berkeley DB 3.2 - 4.6, takes effect immediately)
 
    this option causes all shared memory regions to be "page faulted"
    into core memory at application start and written at data base
@@ -495,11 +509,11 @@ SAFE OPTIONS:
  - set_verbose DB_VERB_CHKPOINT
    (valid in Berkeley DB 3.1 - 4.2, takes effect immediately)
  - set_verbose DB_VERB_DEADLOCK
-   (valid in Berkeley DB 3.1 - 4.4, takes effect immediately)
+   (valid in Berkeley DB 3.1 - 4.6, takes effect immediately)
  - set_verbose DB_VERB_RECOVERY
-   (valid in Berkeley DB 3.1 - 4.4, takes effect immediately)
+   (valid in Berkeley DB 3.1 - 4.6, takes effect immediately)
  - set_verbose DB_VERB_WAITSFOR
-   (valid in Berkeley DB 3.1 - 4.4, takes effect immediately)
+   (valid in Berkeley DB 3.1 - 4.6, takes effect immediately)
 
    these verbose flags cause extended output for long-lasting
    operations, ...CHKPOINT prints location information when searching

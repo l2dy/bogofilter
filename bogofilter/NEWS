@@ -15,9 +15,12 @@
 
 -------------------------------------------------------------------------------
 
-	2007-07-28
+	2007-08-14
 
 	* doc/README.db was updated to BerkeleyDB 4.6
+	* doc/README.db: section 3.5 was added, with information on how to 
+	  resolve "Logging region out of memory; you may need to increase its 
+	  size", section 4.2 now documents set_lg_regionmax.
 
 	2007-07-23
 
