@@ -60,7 +60,7 @@ applied the patches, check your vendor's update site regularly):
   Sleepycat Software: Berkeley DB 4.3.29: (September 6, 2005)
   Sleepycat Software: Berkeley DB 4.4.20: (January  10, 2006)
   Berkeley DB 4.5.20: (September 20, 2006)
-  Berkeley DB 4.6.18: (July 17, 2007)
+  Berkeley DB 4.6.19: (August 10, 2007)
 
 Other versions of Berkeley DB between the first and last listed above
 may or may not work but usually they will.
