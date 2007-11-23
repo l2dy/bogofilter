@@ -459,7 +459,7 @@ AC_CACHE_SAVE
 WITH_DB_ENGINE=db
 AC_ARG_WITH(database,
 	    AS_HELP_STRING([--with-database=ENGINE],
-	    [choose database engine {db|qdbm|sqlite3} [[db]]]),
+	    [choose database engine {db|qdbm|tokyocabinet|sqlite3} [[db]]]),
 	    [ WITH_DB_ENGINE=$withval ]
 )
 
@@ -473,6 +473,27 @@ case "x$WITH_DB_ENGINE" in
 	LIBDB="$LIBSQLITE3"
 	WITH_DB_ENGINE="sqlite3"
 	;;
+    xtokyocabinet)
+	AC_DEFINE(ENABLE_TOKYOCABINET_DATASTORE,1, [Enable tokyocabinet datastore])
+	DB_TYPE=tokyocabinet
+	DB_EXT=.tc
+	AC_LIB_LINKFLAGS([tokyocabinet])
+	LIBDB="$LIBTOKYOCABINET"
+	saveLIBS="$LIBS"
+	LIBS="$LIBS $LIBDB"
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([
+#include <tcutil.h>
+#include <tchdb.h>
+#include <tcbdb.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdbool.h>
+#include <stdint.h>
+	], [
+	    TCBDB *d = tcbdbnew();
+	])],,AC_MSG_ERROR(Cannot link to tokyocabinet library.))
+	LIBS="$saveLIBS"
+        ;;
     xqdbm)
 	AC_DEFINE(ENABLE_QDBM_DATASTORE,1, [Enable qdbm datastore])
 	DB_TYPE=qdbm
@@ -624,7 +645,7 @@ shared environments, you can use --disable-dbshared-test.])],)
 	LIBS="$saveLIBS"
     ;;
     *)
-	AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, qdbm, sqlite3.])
+	AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, qdbm, tokyocabinet, sqlite3.])
     ;;
 esac
 
@@ -648,6 +669,7 @@ AC_SUBST(DB_TYPE)
 AC_SUBST(STATIC_DB)
 
 AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
+AM_CONDITIONAL(ENABLE_TOKYOCABINET_DATASTORE, test "x$WITH_DB_ENGINE" = "xtokyocabinet")
 AM_CONDITIONAL(ENABLE_SQLITE_DATASTORE, test "x$WITH_DB_ENGINE" = "xsqlite3")
 
 dnl Use TRIO to replace missing snprintf/vsnprintf.
