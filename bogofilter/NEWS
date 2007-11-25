@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2007-11-25
+
+	* Bump required sqlite version to 3.4.2, also fixing related compiler
+	  warnings. Bogofilter will complain when used with older versions.
+
 1.1.6	2007-11-25 (released)
 
 	* Transaction support added for TokyoCabinet datastore.

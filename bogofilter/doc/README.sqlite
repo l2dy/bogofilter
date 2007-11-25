@@ -20,13 +20,13 @@ SQLite3 ships with a command-line client for the shell, named sqlite3.
 
 2.1 Compatibility - supported SQLite versions
 
-At this time, only SQLite 3.4.0 and newer are supported. Older versions
+At this time, only SQLite 3.4.2 and newer are supported. Older versions
 back to 3.0.8 may work, but you are advised to carefully review the
 sqlite3 ChangeLog, because there have been several important bug fixes
 since 3.0.8, including fixes for bugs that can corrupt the database.
 
 Bogofilter prints a warning (but continues to run) when used with SQLite
-versions older than 3.4.0. This warning can be suppressed by defining
+versions older than 3.4.2. This warning can be suppressed by defining
 the environment variable BF_USE_OLD_SQLITE to any value, including the
 empty value.
 
