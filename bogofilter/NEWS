@@ -15,11 +15,14 @@
 
 -------------------------------------------------------------------------------
 
-1.1.6	2007-11-24 (released)
+1.1.6	2007-11-25 (released)
+
+	* Transaction support added for TokyoCabinet datastore.
+	  (thanks to Pierre Habouzit)
 
 	2007-11-22
 
-	* Support for tokyocabinet datastore added.
+	* Support for TokyoCabinet datastore added.
 	  (thanks to Pierre Habouzit)
 
 	2007-08-14

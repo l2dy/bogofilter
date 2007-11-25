@@ -40,6 +40,68 @@ typedef struct {
     TCBDB *dbp;
 } dbh_t;
 
+/* transaction stuff */
+
+static int tc_txn_begin(void *vhandle) {
+    dbh_t *dbh = vhandle;
+    if (!dbh->dbp->wmode || tcbdbtranbegin(dbh->dbp))
+        return DST_OK;
+    print_error(__FILE__, __LINE__, "tc_txn_begin(%p), err: %d, %s", dbh->dbp,
+                tcbdbecode(dbh->dbp), tcbdberrmsg(tcbdbecode(dbh->dbp)));
+    return DST_FAILURE;
+}
+
+static int tc_txn_abort(void *vhandle) {
+    dbh_t *dbh = vhandle;
+    if (!dbh->dbp->wmode || tcbdbtranabort(dbh->dbp))
+        return DST_OK;
+    print_error(__FILE__, __LINE__, "tc_txn_abort(%p), err: %d, %s", dbh->dbp,
+                tcbdbecode(dbh->dbp), tcbdberrmsg(tcbdbecode(dbh->dbp)));
+    return DST_FAILURE;
+}
+
+static int tc_txn_commit(void *vhandle) {
+    dbh_t *dbh = vhandle;
+    if (!dbh->dbp->wmode || tcbdbtrancommit(dbh->dbp))
+        return DST_OK;
+    print_error(__FILE__, __LINE__, "tc_txn_commit(%p), err: %d, %s",
+                dbh->dbp, tcbdbecode(dbh->dbp),
+                tcbdberrmsg(tcbdbecode(dbh->dbp)));
+    return DST_FAILURE;
+}
+
+static dsm_t dsm_tc = {
+    /* public -- used in datastore.c */
+    &tc_txn_begin,
+    &tc_txn_abort,
+    &tc_txn_commit,
+
+    /* private -- used in datastore_db_*.c */
+    NULL,	/* dsm_env_init         */
+    NULL,	/* dsm_cleanup          */
+    NULL,	/* dsm_cleanup_lite     */
+    NULL,	/* dsm_get_env_dbe      */
+    NULL,	/* dsm_database_name    */
+    NULL,	/* dsm_recover_open     */
+    NULL,	/* dsm_auto_commit_flags*/
+    NULL,	/* dsm_get_rmw_flag     */
+    NULL,	/* dsm_lock             */
+    NULL,	/* dsm_common_close     */
+    NULL,	/* dsm_sync             */
+    NULL,	/* dsm_log_flush        */
+    NULL,	/* dsm_pagesize         */
+    NULL,	/* dsm_purgelogs        */
+    NULL,	/* dsm_checkpoint       */
+    NULL,	/* dsm_recover          */
+    NULL,	/* dsm_remove           */
+    NULL,	/* dsm_verify           */
+    NULL,	/* dsm_list_logfiles    */
+    NULL	/* dsm_leafpages        */
+};
+
+dsm_t *dsm = &dsm_tc;
+
+
 /* Function definitions */
 
 const char *db_version_str(void)

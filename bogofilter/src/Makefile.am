@@ -186,7 +186,7 @@ datastore_SOURCE = datastore_sqlite.c datastore_opthelp_dummies.c \
 else
 if ENABLE_TOKYOCABINET_DATASTORE
 datastore_SOURCE = datastore_tc.c \
-		   datastore_txn_dummies.c datastore_opthelp_dummies.c \
+		   datastore_opthelp_dummies.c \
 		   datastore_dummies.c
 else
 if ENABLE_TRANSACTIONS
