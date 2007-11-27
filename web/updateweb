@@ -20,7 +20,8 @@ URL=https://bogofilter.svn.sourceforge.net/svnroot/bogofilter/trunk/
 CMDPFX="svn"
 
 # check out
-$CMDPFX update | egrep -v "^(At revision|Revision)"
+a="$($CMDPFX update 2>&1)"
+echo "$a" | egrep -v "^(At revision|Revision)" || :
 
 # start ourselves anew
 if [ "x$NORECURSE" = x ] ; then
