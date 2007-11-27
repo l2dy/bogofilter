@@ -150,7 +150,7 @@
                   <td><a
 			  href="http://www.netbsd.org/Documentation/software/packages.html">NetBSD pkgsrc</a></td>
 		  <td><a
-			  href="ftp://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/mail/bogofilter/README.html">0.96.6</a></td>
+			  href="ftp://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/mail/bogofilter/README.html">1.0.3</a></td>
                   <td>
                     <div align="center">BerkeleyDB, SQLite</div>
                   </td>
@@ -175,6 +175,11 @@
                    <td>openSUSE 10.2</td>
                    <td>1.1.1</td>
                    <td><div align="center">BerkeleyDB 4.4</div></td>
+               </tr>
+		<tr>
+                   <td>openSUSE 10.3</td>
+                   <td>1.1.1</td>
+                   <td><div align="center">BerkeleyDB 4.5</div></td>
                </tr>
        </table>
               <p class="date">Last update: $Date$</p>
