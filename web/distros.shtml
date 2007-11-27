@@ -37,7 +37,7 @@
                   <td>Debian stable ("etch")</td>
                   <td>See <a href="http://packages.debian.org/stable/mail/bogofilter" target="_blank">packages.debian.org</a></td>
                   <td>
-                    <div align="center">BerkeleyDB, QDBM, SQLite, TokyoCabinet</div>
+                    <div align="center">BerkeleyDB, QDBM, SQLite</div>
                   </td>
                 </tr>
                 <tr>
