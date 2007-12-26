@@ -80,6 +80,9 @@
                     <div align="center">BerkeleyDB, QDBM, SQLite3</div>
                   </td>
                 </tr>
+                <tr> <td>FreeBSD 6.3-RELEASE (upcoming)</td> <td>1.1.5</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td>
+                <tr> <td>FreeBSD 7.0-RELEASE (upcoming)</td> <td>1.1.5</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td>
+                </tr>
                  <tr>
                   <td>FreeBSD ports</td>
                   <td>See <a
@@ -139,20 +142,15 @@
                     <div align="center">BerkeleyDB</div>
                   </td>
                 </tr>
-                <tr>
-		    <td>NetBSD 3.0</td>
-                  <td>0.96.6</td>
-                  <td>
-                    <div align="center">BerkeleyDB</div>
-                  </td>
-                </tr>
+                <tr> <td>NetBSD 3.0</td> <td>0.96.6</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
+                <tr> <td>NetBSD 4.0</td> <td>1.0.3</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
                 <tr>
                   <td><a
 			  href="http://www.netbsd.org/Documentation/software/packages.html">NetBSD pkgsrc</a></td>
 		  <td><a
 			  href="ftp://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/mail/bogofilter/README.html">1.0.3</a></td>
                   <td>
-                    <div align="center">BerkeleyDB, SQLite</div>
+                    <div align="center">BerkeleyDB, QDBM, SQLite</div>
                   </td>
                 </tr>
 		<tr><td colspan="3"><a
