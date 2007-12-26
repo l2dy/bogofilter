@@ -23,6 +23,18 @@
               by a statistical analysis of the message's header and content (body).
               The program is able to learn from the user's classifications and
               corrections.
+              <p>Bogofilter is or can be integrated into graphical mailers,
+	      such as KDE's <a href="http://kontact.kde.org/kmail/">KMail</a>,
+	      GNOME's <a href="http://www.gnome.org/projects/evolution/">Evolution</a>
+	      or <a href="http://www.claws-mail.org/">Claws Mail
+		  (formerly known as Sylpheed-Claws)</a>, or it is run
+	      by a mail delivery agent (maildrop, procmail) script to
+	      classify an incoming message as spam or ham (using
+	      wordlists stored by BerkeleyDB). Bogofilter provides
+	      processing for plain text and HTML. It supports multi-part
+	      MIME messages with decoding of base64, quoted-printable,
+	      and uuencoded text and ignores attachments, such as
+	      images.</p>
               <p>The
                 statistical technique is known as the Bayesian technique and its
                 use for spam was described by Paul Graham in his article <a href="http://www.paulgraham.com/spam.html" target="_blank">A
@@ -34,12 +46,6 @@
                 he describes. Paul Graham's new article <a href="http://www.paulgraham.com/better.html" target="_blank">Better
                 Bayesian Filtering</a> (January 2003) suggests some useful parsing
                 improvements.</p>
-              <p>Bogofilter
-                is run by an MDA script to classify an incoming message as spam
-                or ham (using wordlists stored by BerkeleyDB). Bogofilter provides
-                processing for plain text and html. It supports multi-part mime
-                message with decoding of base64, quoted-printable, and uuencoded
-                text and ignores attachments, such as images.</p>
               <p>Bogofilter
                 is written in C. Supported platforms: Linux, FreeBSD, Solaris,
                 OS X, HP-UX, AIX, RISC OS, SunOS, OS/2 &#8230;</p>
