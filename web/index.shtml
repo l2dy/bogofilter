@@ -23,7 +23,7 @@
               by a statistical analysis of the message's header and content (body).
               The program is able to learn from the user's classifications and
               corrections.
-              <p>Bogofilter is or can be integrated into graphical mailers,
+              <p>Bogofilter is or can be integrated with graphical mailers,
 	      such as KDE's <a href="http://kontact.kde.org/kmail/">KMail</a>,
 	      GNOME's <a href="http://www.gnome.org/projects/evolution/">Evolution</a>
 	      or <a href="http://www.claws-mail.org/">Claws Mail
