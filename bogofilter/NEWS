@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2008-02-08
+
+	* Bump required sqlite version to 3.5.4, earlier versions could
+	  sometimes corrupt the database. Update install-staticdblibs.sh.
+	  Bogofilter will complain when used with older versions.
 
 	2008-01-05
 

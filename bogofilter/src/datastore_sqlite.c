@@ -252,7 +252,7 @@ static int busyhandler(void *dummy, int count)
 
 static void check_sqlite_version(void)
 {
-    const unsigned int wmaj = 3, wmin = 4, wpl = 2;	/* desired version of sqlite3 library */
+    const unsigned int wmaj = 3, wmin = 5, wpl = 4;	/* desired version of sqlite3 library */
     unsigned int vmaj, vmin, vpl;			/* actual version of sqlite3 library */
     static int complained;
     const char *v;
