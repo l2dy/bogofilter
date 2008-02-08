@@ -62,7 +62,7 @@
                 <tr> <td>FreeBSD 5.5-RELEASE</td> <td>1.0.1</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 6.1-RELEASE</td> <td>1.0.1</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 6.2-RELEASE</td> <td>1.0.3</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 6.3-RELEASE (upcoming)</td> <td>1.1.5</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td>
+                <tr> <td>FreeBSD 6.3-RELEASE</td> <td>1.1.5</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td>
                 <tr> <td>FreeBSD 7.0-RELEASE (upcoming)</td> <td>1.1.5</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
                  <tr> <td>FreeBSD ports</td> <td>See <a href="http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
 		<tr><td colspan="3"><a
