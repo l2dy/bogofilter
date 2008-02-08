@@ -4,7 +4,7 @@
 #                            the static libraries bogofilter links against,
 #                            to ease building of portable RPMs.
 
-# (C) Copyright 2005,2006,2007  Matthias Andree <matthias.andree@gmx.de>
+# (C) Copyright 2005 - 2008  Matthias Andree <matthias.andree@gmx.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ cd ${TMPDIR:=/var/tmp}
 
 dbdir=db-4.2.52
 dbpfx=/opt/db-4.2-lean
-sqdir=sqlite-3.4.1
+sqdir=sqlite-3.5.6
 sqpfx=/opt/sqlite-3-lean
 
 ### download SleepyCat DB 4.2.52 and patches
@@ -130,7 +130,7 @@ else
     echo "$checklib already exists, not building Berkeley DB."
 fi
 
-### download SQLite 3.3.5
+### download SQLite 3.5.6
 # Info: the objdump test fixes up the effects of a bug
 # in an earlier version of this script, which built
 # a sqlite 3.2.8 version that required GLIBC_2.3.
@@ -146,7 +146,7 @@ if test ! -f $checklib || \
     bogofilter.org)
 	URL=ftp://ftp.bogofilter.org/pub/outgoing/tools/SQLite ;;
     esac
-    want $URL/sqlite-3.4.1.tar.gz 0f06955b18da295fecb62d4bf9ded3c6
+    want $URL/sqlite-3.5.6.tar.gz 903c9e935c538af392364a9172a3d98d
     build_sqlite=1
 else
     echo "$checklib already exists, not building SQLite3."
