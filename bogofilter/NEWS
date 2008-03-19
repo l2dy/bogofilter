@@ -17,9 +17,12 @@
 
 	2008-03-19
 
+	* bf_compact now verifies databases before dumping them, to avoid
+	  getting into an unterminated loop and wasting all diskspace.
+
 	* Bogoupgrade now verifies databases before dumping them, to avoid
-	  getting into unterminated loop and burning all memory when the
-	  database is corrupt.
+	  getting into an unterminated loop and burning all memory or disk
+	  space when the database is corrupt.
 	  This should fix Debian Bug#226643 and Debian Bug#226646.
 
 	* Bogoupgrade now uses Pod::Usage to print usage/help/manpage, prints

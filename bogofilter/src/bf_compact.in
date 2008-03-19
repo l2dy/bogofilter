@@ -20,7 +20,7 @@ BOGOHOME="$1"
 shift
 
 if [ ! -d "$BOGOHOME" ] ; then
-    echo $BOGOHOME must be a directory, not a file
+    echo "$BOGOHOME must be a directory, not a file"
     exit 1
 fi
 
@@ -32,15 +32,17 @@ while true; do
     esac
 done
 
+export BOGOHOME
+
 # find wordlists
 if [ -n "$1" ] ; then
     FILES="$@"
 else
-    DIR=`bogofilter -QQ | grep ^bogofilter_dir | @AWK@ '{print $3}'`
+    DIR=$(bogofilter -QQ | grep ^bogofilter_dir | @AWK@ '{print $3}')
     if [ "$BOGOHOME" != "$DIR" ] ; then
-	FILES=`ls "$BOGOHOME"/*.db`
+	FILES=$(ls "$BOGOHOME"/*.db)
     else
-	FILES=`bogofilter -QQ | grep ^wordlist | cut -f3 -d,`
+	FILES=$(bogofilter -QQ | grep ^wordlist | cut -f3 -d,)
     fi
 fi
 
@@ -57,7 +59,7 @@ if test -f "$BOGOHOME"/DB_CONFIG ; then
 fi
 
 # determine transactions
-if test "`find "$BOGOHOME/" -name "log.??????????" -print`" = "" ; then
+if test "$(find "$BOGOHOME/" -name "log.??????????" -print)" = "" ; then
     TXN=no
 else
     TXN=yes
@@ -65,17 +67,18 @@ fi
 
 # reload files
 for FILE in $FILES ; do
-    NAME=`basename $FILE`
-    bogoutil -d "$BOGOHOME"/$FILE | bogoutil --db-transaction=no -l $BOGOTEMP/$NAME
+    NAME="$(basename $FILE)"
+    bogoutil --db-verify "$FILE" || { echo "Aborting." ; rm -r "$BOGOTEMP" ; exit 1 ; }
+    bogoutil -d "$FILE" | bogoutil --db-transaction=no -l "$BOGOTEMP/$NAME"
 done
 
 if [ $TXN = "yes" ] ; then
     #create database environment files
-    bogofilter -e -C -d $BOGOTEMP --db-transaction=yes < /dev/null
+    bogofilter -e -C -d "$BOGOTEMP" --db-transaction=yes < /dev/null
 fi
 
 # remove $BOGOHOME.old so we don't move the new backup *into* it
 # rather than renaming the backup to it.
 rm -rf "$BOGOHOME.old"
 mv "$BOGOHOME" "$BOGOHOME.old"
-mv  $BOGOTEMP  "$BOGOHOME"
+mv "$BOGOTEMP" "$BOGOHOME"
