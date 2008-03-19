@@ -1,13 +1,10 @@
-#! @PERL@
+#! @PERL@ -w
 
 =pod
 
-Name:
-bogoupgrade -- upgrade a bogofilter database to current version.
+=head1 NAME
 
-Author:
-Gyepi Sam <gyepi@praxis-sw.com>
-David Relson <relson@osagesoftware.com>
+bogoupgrade -- upgrade a bogofilter database to current version.
 
 =cut
 
@@ -33,14 +30,17 @@ David Relson <relson@osagesoftware.com>
 
 require 5.005_03;
 use strict;
+use filetest 'access';
+use Pod::Usage;
 
 sub convert_double_to_single();
 sub convert_format_A();
 sub convert_format_B();
+sub db_verify($);
 
-my $VERSION = '0.4.2';
+my $VERSION = '0.5.0';
 
-my ($in, $out, $help, $dir, $yday, $msg_count_token);
+my ($in, $out, $dir, $yday, $msg_count_token);
 
 my $bogoutil = 'bogoutil';
 
@@ -58,25 +58,28 @@ for (my $i = 0; $i < @ARGV; $i++){
   } elsif ($arg eq '-y'){
     $yday = "-y $ARGV[++$i]";
   } elsif ($arg eq '-h' or $arg eq '--help'){
-    help();
-    exit(0);
+    pod2usage(-verbose => 1, -exitstatus => 0);
+  } elsif ($arg eq '--man') {
+    pod2usage(-verbose => 2, -exitstatus => 0);
   } else {
-    usage();
-    exit(1);
+    pod2usage(-verbose => 0, -exitstatus => 1);
   }
 }
 
 my $db_ext = $ENV{DB_EXT} ||  'db';
 
-if ( $dir ) {
+if ($dir) {
+    if ($in || $out) {
+    	pod2usage("Cannot use -d at the same time as -i or -o!");
+    }
     convert_double_to_single();
 } else {
-    die "Missing input filename\n" unless $in;
-    die "Missing output filename\n" unless $out;
+    pod2usage("Missing input filename.\nAborting") unless $in;
+    pod2usage("Missing output filename.\nAborting") unless $out;
 
     my $msg_count_token = '.MSG_COUNT';
 
-    open(F, "< $in") or die "Cannot open input file [$in]. $!.\n";
+    open(F, "< $in") or die "Cannot open input file [$in]. $!.\nAborting";
     my $sig = <F>;
     chomp($sig);
     if ($sig =~ m/^\# bogofilter wordlist \(format version A\):\s(\d+)$/){ 
@@ -92,15 +95,24 @@ if ( $dir ) {
     }
 }
 
+sub db_verify($) {
+    my ($f) = shift;
+    if (!-r $f) {
+	    die "Database $f is not readable: $!\nAborting";
+    }
+    my $ret = system ($bogoutil, '--db-verify', $f);
+    die "Database $f is corrupt.\nAborting" if $ret;
+}
+
 sub convert_format_A() {  
   my $msg_count = $1;
   my $cmd = "$bogoutil $yday -l $out";
-  open(OUT, "| $cmd") or die "Cannot run command \"$cmd\": $!\n";
+  open(OUT, "| $cmd") or die "Cannot run command \"$cmd\": $!\nAborting";
   while(<F>){
     print OUT $_;
   }
   print OUT "$msg_count_token $msg_count\n";
-  close(OUT) or die "Error executing command \"$cmd\": $!\n";
+  close(OUT) or die "Error executing command \"$cmd\": $!\nAborting";
   close(F);
 }
 
@@ -116,11 +128,12 @@ sub convert_format_B() {
   }
 
   my $cmd = "$bogoutil $yday -l $out";
-  open(OUT, "| $cmd") or die "Cannot run command \"$cmd\": $!\n";
+  open(OUT, "| $cmd") or die "Cannot run command \"$cmd\": $!\nAborting";
 
   close(F);
+  db_verify($in_db);
   $cmd = "$bogoutil $yday -d $in_db";
-  open(F, "$cmd |") or die "Cannot run command \"$cmd\": $!\n";
+  open(F, "$cmd |") or die "Cannot run command \"$cmd\": $!\nAborting";
 
   while(<F>){
     if (m/^\.count\s+(\d+)$/){
@@ -147,15 +160,16 @@ sub cvt2to1_get($$) {
     my @tmp;
     my $cmd;
 
-    die "need array context in cvs2to1_get" unless wantarray;
+    die "need array context in cvs2to1_get.\nAborting" unless wantarray;
+    db_verify($filename);
     $cmd = "$bogoutil -d $filename";
-    open(I, "$cmd |") or die "cannot run \"$cmd\": $!";
+    open(I, "$cmd |") or die "cannot run \"$cmd\": $!\nAborting";
     while (<I>) {
 	chomp;
 	my @a = split;
 	push @tmp, sprintf($format, $a[0], $a[1], $a[2]);
     }
-    close I or die "error running \"$cmd\": $!";
+    close I or die "error running \"$cmd\": $!\nAborting";
     return @tmp;
 }
 
@@ -166,52 +180,77 @@ sub convert_double_to_single() {
     my $spam = "$dir/spamlist.$db_ext";
     my $good = "$dir/goodlist.$db_ext";
 
-    if (-e $word) { die "$word already exists."; }
+    if (-e $word) { die "$word already exists.\nAborting"; }
 
     push @tmp, cvt2to1_get($spam, "%s %d 0 %d");
     push @tmp, cvt2to1_get($good, "%s 0 %d %d");
     my $cmd = "$bogoutil -l $word";
-    open(O, "| $cmd") or die "cannot run \"$cmd\": $!";
+    open(O, "| $cmd") or die "cannot run \"$cmd\": $!\nAborting";
     print O join("\n", sort @tmp), "\n";
-    close O or die "error executing \"$cmd\": $!";
+    close O or die "error executing \"$cmd\": $!\nAborting";
 }
 
 exit(0);
 
-sub usage {
-  warn "usage: $0 [ -d <bogofilter directory> ]\n  [ -i <input text file> -o <output db file> [ -b <path to bogoutil>] ]\n  [ -h ]\n";
-}
+__END__
+=pod
 
-sub help {
-  print <<EOF;
-$0 -- upgrades bogofilter database to current version.
-Options:
-  -d <directory>
+=head1 SYNOPSIS
 
-    Name of directory containing database files.  Old files will be read and new
-    files will be written.
+ bogoupgrade [options] -d <bogofilter directory>
+ bogoupgrade [options] -i <input text file> -o <output db file>
+ bogoupgrade {-h|--help}
+ bogoupgrade {--man}
 
-  -i <input file>
+ Options:
+	-b <path to bogoutil>
 
-    Text file containing message count, and possibly wordlist data records.  If
-    the file only contains a message count but no word list records, there must
-    be a database file, in the same directory as the text file, which contains
-    the word list data.
+=head1 DESCRIPTION
 
- -o <output file>
+B<bogoupgrade> updates bogofilter databases from older formats to the current
+format.
 
-    Output database file.  Use the appropriate file extension for your version
-    of bogofilter, i.e. '.db' for Berkeley DB or '.sql' for SQLite3.
+=head1 OPTIONS
 
- -b <path to bogoutil program>
+=over 8
 
-    Defaults to 'bogoutil', in the hopes that your shell will find it.
+=item B<-d <directory>>
 
- -h     help
+Name of directory containing database files.  Old files will be read and new
+files will be written.
 
-    You are reading it.
-EOF
-	exit(0);
-}
+=item B<-i <input file>>
+
+Text file containing message count, and possibly wordlist data records.  If the
+file only contains a message count but no word list records, there must be a
+database file, in the same directory as the text file, which contains the word
+list data.
+
+=item B<-o <output file>>
+
+Output database file.  Use the appropriate file extension for your version of
+bogofilter, i.e. '.db' for Berkeley DB and SQLite3, or '.qdbm' for QDBM.
+
+=item B<-b <path to bogoutil program>>
+
+Defaults to 'bogoutil', in the hopes that your shell will find it.
+
+=item B<-h> | B<--help>
+
+Print the help - you are currently reading it.
+
+=item B<--man>
+
+Print the full manual page.
+
+=back
+
+=head1 AUTHORS
+
+ Gyepi Sam <gyepi@praxis-sw.com>
+ David Relson <relson@osagesoftware.com>
+ Matthias Andree <matthias.andree@gmx.de>
+
+=cut
 
 # vim: set filetype=perl ai:

@@ -2,10 +2,6 @@
 
 			bogofilter TODO list
 
-**** Make bogoupgrade check databases before attempting upgrades,
-     <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=226643>
-     <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=226646> (merged)
-
 **** If insufficient data is present and the default "undecided"
      bogosity is added in -p mode, add also a comment stating that
      bogofilter needs more training first

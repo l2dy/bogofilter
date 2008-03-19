@@ -15,6 +15,17 @@
 
 -------------------------------------------------------------------------------
 
+	2008-03-19
+
+	* Bogoupgrade now verifies databases before dumping them, to avoid
+	  getting into unterminated loop and burning all memory when the
+	  database is corrupt.
+	  This should fix Debian Bug#226643 and Debian Bug#226646.
+
+	* Bogoupgrade now uses Pod::Usage to print usage/help/manpage, prints
+	  error messages that are a bit more concise and validates arguments a
+	  bit stricter.
+
 	2008-02-08
 
 	* Bump required sqlite version to 3.5.4, earlier versions could
