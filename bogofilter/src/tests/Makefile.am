@@ -46,7 +46,7 @@ PARSING_TESTS = \
 	t.rfc2047_broken t.rfc2047_folded \
 	t.message_addr t.message_id t.queue_id
 
-WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest t.upgrade.subnet.prefix t.multiple.wordlists t.probe
+WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest t.upgrade.subnet.prefix t.multiple.wordlists t.probe t.bf_compact
 
 SCORING_TESTS = t.query.config t.score1 t.score2 t.systest t.grftest t.wordhist
 

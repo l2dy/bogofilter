@@ -10,6 +10,9 @@
 
 set -e # die on errors
 
+: ${BOGOFILTER:=bogofilter}
+: ${BOGOUTIL:=bogoutil}
+
 if [ -z "$1" ] ; then
     echo 'usage: bf_compact source_dir [wordlist_name...]'
     exit 1
@@ -38,11 +41,11 @@ export BOGOHOME
 if [ -n "$1" ] ; then
     FILES="$@"
 else
-    DIR=$(bogofilter -QQ | grep ^bogofilter_dir | @AWK@ '{print $3}')
+    DIR=$($BOGOFILTER -QQ | grep ^bogofilter_dir | @AWK@ '{print $3}')
     if [ "$BOGOHOME" != "$DIR" ] ; then
-	FILES=$(ls "$BOGOHOME"/*.db)
+	FILES=$(ls "$BOGOHOME"/*@DB_EXT@)
     else
-	FILES=$(bogofilter -QQ | grep ^wordlist | cut -f3 -d,)
+	FILES=$($BOGOFILTER -QQ | grep ^wordlist | cut -f3 -d,)
     fi
 fi
 
@@ -58,23 +61,34 @@ if test -f "$BOGOHOME"/DB_CONFIG ; then
     cp -p "$BOGOHOME"/DB_CONFIG "$BOGOTEMP"/
 fi
 
-# determine transactions
-if test "$(find "$BOGOHOME/" -name "log.??????????" -print)" = "" ; then
-    TXN=no
-else
-    TXN=yes
-fi
+case "$($BOGOFILTER -V | grep Database:)" in
+    *"Berkeley DB"*)
+    # determine transactions
+	if test "$(find "$BOGOHOME/" -name "log.??????????" -print)" = "" ; then
+	    TXN=no
+	else
+	    TXN=yes
+	fi
+    ;;
+    *)
+	TXN=noarg
+    ;;
+esac
 
 # reload files
 for FILE in $FILES ; do
     NAME="$(basename $FILE)"
-    bogoutil --db-verify "$FILE" || { echo "Aborting." ; rm -r "$BOGOTEMP" ; exit 1 ; }
-    bogoutil -d "$FILE" | bogoutil --db-transaction=no -l "$BOGOTEMP/$NAME"
+    $BOGOUTIL --db-verify "$FILE" \
+	|| { echo "$FILE corrupted, aborting." ; rm -r "$BOGOTEMP" ; exit 1 ; }
+    $BOGOUTIL -d "$FILE" | case $TXN in 
+	no|yes) $BOGOUTIL --db-transaction=no -l "$BOGOTEMP/$NAME" ;;
+	noarg)  $BOGOUTIL                     -l "$BOGOTEMP/$NAME" ;;
+    esac
 done
 
 if [ $TXN = "yes" ] ; then
     #create database environment files
-    bogofilter -e -C -d "$BOGOTEMP" --db-transaction=yes < /dev/null
+    $BOGOFILTER -e -C -d "$BOGOTEMP" --db-transaction=yes < /dev/null
 fi
 
 # remove $BOGOHOME.old so we don't move the new backup *into* it

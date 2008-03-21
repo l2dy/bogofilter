@@ -26,10 +26,13 @@ BOGOFILTER="$VAL${relpath}/bogofilter$EXE_EXT"
 BOGOLEXER="$VAL${relpath}/bogolexer$EXE_EXT"
 BOGOTUNE="$VAL${relpath}/bogotune$EXE_EXT"
 BOGOUTIL="$VAL${relpath}/bogoutil$EXE_EXT"
+BF_COMPACT="${relpath}/bf_compact"
 
 export BOGOFILTER
 export BOGOLEXER
+export BOGOTUNE
 export BOGOUTIL
+export BF_COMPACT
 
 # Cater for GNU coreutils "compatibility"
 _POSIX2_VERSION=199209

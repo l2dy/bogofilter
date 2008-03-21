@@ -14,6 +14,10 @@
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
 -------------------------------------------------------------------------------
+	2008-03-21
+
+	* bf_compact now supports compacting databases that use QDBM, Tokyo
+	  Cabinet or SQLite3 and is covered by the test suite.
 
 	2008-03-19
 
@@ -25,9 +29,9 @@
 	  space when the database is corrupt.
 	  This should fix Debian Bug#226643 and Debian Bug#226646.
 
-	* Bogoupgrade now uses Pod::Usage to print usage/help/manpage, prints
-	  error messages that are a bit more concise and validates arguments a
-	  bit stricter.
+	* Bogoupgrade now uses Pod::Usage to print usage/help, prints error
+	  messages that are a bit more concise and validates arguments a bit
+	  stricter.
 
 	2008-02-08
 
