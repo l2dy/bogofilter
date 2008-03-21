@@ -59,8 +59,6 @@ for (my $i = 0; $i < @ARGV; $i++){
     $yday = "-y $ARGV[++$i]";
   } elsif ($arg eq '-h' or $arg eq '--help'){
     pod2usage(-verbose => 1, -exitstatus => 0);
-  } elsif ($arg eq '--man') {
-    pod2usage(-verbose => 2, -exitstatus => 0);
   } else {
     pod2usage(-verbose => 0, -exitstatus => 1);
   }
@@ -200,7 +198,6 @@ __END__
  bogoupgrade [options] -d <bogofilter directory>
  bogoupgrade [options] -i <input text file> -o <output db file>
  bogoupgrade {-h|--help}
- bogoupgrade {--man}
 
  Options:
 	-b <path to bogoutil>
@@ -238,10 +235,6 @@ Defaults to 'bogoutil', in the hopes that your shell will find it.
 =item B<-h> | B<--help>
 
 Print the help - you are currently reading it.
-
-=item B<--man>
-
-Print the full manual page.
 
 =back
 
