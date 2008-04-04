@@ -15,6 +15,7 @@
   <refsynopsisdiv id="synopsis">
     <cmdsynopsis>
       <command>bogotune</command> 
+	 <arg>-v</arg>
 	 <arg>-c <replaceable>config</replaceable></arg>
 	 <arg>-C</arg>
 	 <arg>-d <replaceable>dir</replaceable></arg>
