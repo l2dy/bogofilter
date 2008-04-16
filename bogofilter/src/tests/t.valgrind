@@ -18,9 +18,11 @@ fi
 
 case `valgrind --version` in
     valgrind-3*)
-	VALGRIND="$VALGRIND 3>$TMPDIR"/vg.out --log-fd=3
+	VG_SUPP="$TMPDIR"/.valgrind.suppress
+	VALGRIND="$VALGRIND 3>$TMPDIR/vg.out --log-fd=3"
 	;;
     valgrind-2*)
+	VG_SUPP="$TMPDIR"/vg.supp
 	VALGRIND="$VALGRIND 3>$TMPDIR/vg.out --logfile-fd=3"
 	;;
     *)
@@ -49,8 +51,6 @@ EOF
 
 # suppress valgrind complaints about glibc::strchr.S
 
-VG_SUPP="$TMPDIR"/vg.supp
-
 cat <<EOF > "$VG_SUPP"
 {
    ignore strchr problem
@@ -69,11 +69,11 @@ run_test()
     if [ -n "$V" ] ; then OT="$OT.$V" ; fi
     OPTS="-e -t $V $CFG"
     eval $VALGRIND --suppressions=${VG_SUPP} $BOGOFILTER $OPTS < $IN > $OT
-    if test -s $TMPDIR"/vg.out ; then cat $TMPDIR/vg.out ; exit 2 ; fi
+    if test -s "$TMPDIR"/vg.out ; then cat "$TMPDIR"/vg.out ; exit 2 ; fi
 }
 
 for mth in f t ; do
-    BOGOFILTER_DIR=$TMPDIR/words.$mth"
+    BOGOFILTER_DIR="$TMPDIR"/words.$mth
     CFG="-y 0"
     export BOGOFILTER_DIR
     if [ -d $BOGOFILTER_DIR ] ; then rm -f $BOGOFILTER_DIR/* ; else : ; fi
