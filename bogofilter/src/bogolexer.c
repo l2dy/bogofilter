@@ -161,7 +161,7 @@ static void process_arglist(int argc, char **argv)
     }
 }
 
-void process_arg(int option, const char *name, const char *val, priority_t precedence, arg_pass_t pass)
+int process_arg(int option, const char *name, const char *val, priority_t precedence, arg_pass_t pass)
 {
     pass = 0;		/* suppress compiler warning */
 
@@ -283,6 +283,8 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	    exit(EX_ERROR);
 	}
     }
+
+    return 0;
 }
 
 static int count=0;

@@ -14,6 +14,21 @@
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
 -------------------------------------------------------------------------------
+	2008-04-18
+
+	* Function process_arg now has the same prototype for
+	  bogofilter, bogolexer, bogoutil, and bogotune.  The proper
+	  version is called by function read_config_file for all
+	  programs.  Problem reported by Roman Trunov.
+
+	2008-04-17
+
+	* Update Doxyfile for doxygen v1.5.5
+
+	2008-04-16
+
+	* Fixed syntax errors in t.valgrind test
+
 	2008-03-21
 
 	* bf_compact now supports compacting databases that use QDBM, Tokyo

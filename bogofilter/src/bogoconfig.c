@@ -230,7 +230,7 @@ static bool get_parsed_value(char **arg, double *parm)
     return ok;
 }
 
-void comma_parse(char opt, const char *arg, double *parm1, double *parm2, double *parm3)
+static void comma_parse(char opt, const char *arg, double *parm1, double *parm2, double *parm3)
 {
     char *parse = xstrdup(arg);
     char *copy = parse;
@@ -478,7 +478,7 @@ static void process_arglist(int argc, char **argv, priority_t precedence, int pa
     return;
 }
 
-void process_arg(int option, const char *name, const char *val, priority_t precedence, arg_pass_t pass)
+int process_arg(int option, const char *name, const char *val, priority_t precedence, arg_pass_t pass)
 {
     switch (option)
     {
@@ -740,6 +740,8 @@ void process_arg(int option, const char *name, const char *val, priority_t prece
 	    exit(EX_ERROR);
 	}
     }
+
+    return 0;
 }
 
 #define	Q1	if (query >= 1)

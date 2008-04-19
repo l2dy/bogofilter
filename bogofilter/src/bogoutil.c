@@ -21,6 +21,7 @@ AUTHORS:
  
 #include "getopt.h"
 
+#include "bogoconfig.h"
 #include "bogofilter.h"
 #include "bogohist.h"
 #include "bool.h"
@@ -53,10 +54,6 @@ bool  maintain = false;
 bool  onlyprint = false;
 
 const char *spam_header_place = "";
-
-/* Function Prototypes */
-
-static int process_arg(int option, const char *name, const char *arg);
 
 /* Function Definitions */
 
@@ -632,7 +629,7 @@ static int process_arglist(int argc, char **argv)
  	    break;
 
 	name = (option_index == 0) ? argv[this_option_optind] : longopts_bogoutil[option_index].name;
-	count += process_arg(option, name, optarg);
+	count += process_arg(option, name, optarg, PR_NONE, PASS_1_CLI);
     }
 
     if (max_token_len != 0 && max_multi_token_len == 0) {
@@ -653,9 +650,12 @@ static int process_arglist(int argc, char **argv)
     return count;
 }
 
-static int process_arg(int option, const char *name, const char *val)
+int process_arg(int option, const char *name, const char *val, priority_t precedence, arg_pass_t pass)
 {
     int count = 0;
+
+    (void) precedence;		/* suppress compiler warning */
+    (void) pass;		/* suppress compiler warning */
 
     switch (option) {
     case '?':

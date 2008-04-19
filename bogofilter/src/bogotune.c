@@ -54,6 +54,7 @@ AUTHORS:
 
 #include "bogoconfig.h"
 #include "bogoreader.h"
+#include "bool.h"
 #include "collect.h"
 #include "datastore.h"
 #include "longoptions.h"
@@ -187,15 +188,23 @@ uint test = 0;
 bool fMakeCheck = false;	/* allows quick & dirty regression testing */
 uint cMakeCheck =    50;	/* ... for 50 cycles */
 
+const char *logtag = NULL;
 const char *spam_header_place = "";
 
 /* Function Declarations */
 
-static void process_bogotune_arg(int option);
-
 /* Function Definitions */
 
 static void bt_trap(void) {}
+
+static bool get_bool(const char *name, const char *arg)
+{
+    bool b = str_to_bool(arg);
+    if (DEBUG_CONFIG(2))
+	fprintf(dbgout, "%s -> %s\n", name,
+		b ? "Yes" : "No");
+    return b;
+}
 
 static int get_cnt(double fst, double lst, double amt)
 {
@@ -972,7 +981,7 @@ static int process_arglist(int argc, char **argv)
 
 	name = (option_index == 0) ? argv[this_option_optind] : longopts_bogotune[option_index].name;
 
-	process_bogotune_arg(option);
+	process_arg(option, NULL, NULL, PR_NONE, PASS_1_CLI);
     }
 
     if (ds_flag == DS_NONE)	/* default is "wordlist on disk" */
@@ -996,9 +1005,14 @@ static int process_arglist(int argc, char **argv)
     return count;
 }
 
-static void process_bogotune_arg(int option)
+int process_arg(int option, const char *name, const char *val, priority_t precedence, arg_pass_t pass)
 {
     static int lastmode = -1;
+
+    (void) name;	/* suppress compiler warning */
+    (void) val; 	/* suppress compiler warning */
+    (void) precedence; 	/* suppress compiler warning */
+    (void) pass; 	/* suppress compiler warning */
 
     if (option == 1) {
 	/* If getopt's RETURN_IN_ORDER behavior */
@@ -1015,41 +1029,54 @@ static void process_bogotune_arg(int option)
 
     switch (option) {
     case 'c':
+    case O_CONFIG_FILE:
 	read_config_file(optarg, false, false, PR_CFG_USER, longopts_bogotune);
-	/* FALLTHROUGH */
+	/*@fallthrough@*/
+	/* fall through to suppress reading config files */
+
     case 'C':
 	suppress_config_file = true;
 	break;
+
     case 'd':
 	ds_path = xstrdup(optarg);
 	ds_flag = (ds_flag == DS_NONE) ? DS_DSK : DS_ERR;
 	break;
+
     case 'D':
 	ds_flag = (ds_flag == DS_NONE) ? DS_RAM : DS_ERR;
 	break;
+
     case 'e':
 	exit_zero = true;
 	break;
+
     case 'E':
 	esf_flag ^= true;
 	break;
+
     case 'M':
 	bogolex_file = optarg;
 	break;
+
     case 'n':
 	lastmode = 'n';
 	filelist_add(ham_files, optarg);
 	break;
+
     case 'q':
 	quiet = true;
 	break;
+
     case 'r':
 	user_robx = atof(optarg);
 	break;
+
     case 's':
 	lastmode = 's';
 	filelist_add(spam_files, optarg);
 	break;
+
 #ifdef	TEST
     case 't':
 	test += 1;
@@ -1058,12 +1085,15 @@ static void process_bogotune_arg(int option)
     case 'T':
 	coerced_target = atoi(optarg);
 	break;
+
     case 'v':
 	verbose += 1;
 	break;
+
     case 'V':
 	print_version();
 	exit(EX_OK);
+
     case 'x':
 	if (strcmp(optarg, "MakeCheck") == 0)
 	    fMakeCheck = true;
@@ -1087,10 +1117,20 @@ static void process_bogotune_arg(int option)
 	multi_token_count=atoi(optarg);
 	break;
 
+    case O_BLOCK_ON_SUBNETS:
+	block_on_subnets = get_bool(name, val);
+	break;
+
+    case O_REPLACE_NONASCII_CHARACTERS:
+	replace_nonascii_characters = get_bool(name, val);
+	break;
+
     default:
 	help();
 	exit(EX_ERROR);
     }
+
+    return 0;
 }
 
 static double get_robx(void)
