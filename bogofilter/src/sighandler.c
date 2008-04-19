@@ -43,7 +43,7 @@ static void mysignal(int sig, void (*hdl)(int)) {
 
 static void mysigdie(int sig)
 {
-    (void) sig;		/* quiet compiler warning */
+    (void) sig;		/* suppress compiler warning */
 
     if (!fDie)
 	fDie = true;

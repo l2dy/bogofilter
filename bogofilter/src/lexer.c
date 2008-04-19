@@ -54,6 +54,7 @@ lexer_t msg_count_lexer = {
 };
 
 /* Function Prototypes */
+
 static int yy_get_new_line(buff_t *buff);
 static int get_decoded_line(buff_t *buff);
 static int skip_folded_line(buff_t *buff);

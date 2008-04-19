@@ -84,7 +84,7 @@ bool process_config_option(const char *arg, bool warn_on_error, priority_t prece
     char *dupl;
     const char delim[] = " \t=";
 
-    while (isspace(*opt))		/* ignore leadign whitespace */
+    while (isspace(*opt))		/* ignore leading whitespace */
 	opt += 1;
 
     dupl = xstrdup(opt);
@@ -142,8 +142,7 @@ bool process_config_option_as_arg(const char *opt, const char *val, priority_t p
     return false;
 }
 
-bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, priority_t precedence,
-	struct option *longopts)
+bool read_config_file(const char *fname, bool tilde_expand, bool warn_on_error, priority_t precedence, struct option *longopts)
 {
     bool ok = true;
     int lineno = 0;

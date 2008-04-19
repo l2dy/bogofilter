@@ -202,7 +202,7 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     size_t count = 0;
     bool need_stats = (Rtable || passthrough || (verbose > 0)) && !fBogotune;
 
-    (void) fp; 	/* quench compiler warning */
+    (void) fp;			/* suppress compiler warning */
 
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "### msg_compute_spamicity() begins\n");
 
