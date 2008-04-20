@@ -145,7 +145,7 @@ static void *env = NULL;
 
 static bool    esf_flag = true;		/* test ESF factors if true */
 static bool    exit_zero = false;	/* non-error exits zero */
-static char   *bogolex_file = NULL;	/* non-NULL if creating msg-count output */
+static const char *bogolex_file = NULL;	/* non-NULL if creating msg-count output */
 static word_t *w_msg_count;
 
 static uint message_count;
@@ -749,7 +749,7 @@ static void write_msgcount_file(wordhash_t *wh)
     return;
 }
 
-static uint read_mailbox(char *arg, mlhead_t *msgs)
+static uint read_mailbox(const char *arg, mlhead_t *msgs)
 {
     if (verbose) {
 	printf("Reading %s\n", arg);
@@ -972,6 +972,7 @@ static int process_arglist(int argc, char **argv)
 	int option_index = 0;
 	int this_option_optind = optind ? optind : 1;
 	const char *name;
+	const char *val;
 
 	option = getopt_long(argc, argv, OPTIONS,
 			     longopts_bogotune, &option_index);
@@ -981,7 +982,8 @@ static int process_arglist(int argc, char **argv)
 
 	name = (option_index == 0) ? argv[this_option_optind] : longopts_bogotune[option_index].name;
 
-	process_arg(option, NULL, NULL, PR_NONE, PASS_1_CLI);
+	val = optarg;
+	process_arg(option, NULL, val, PR_NONE, PASS_1_CLI);
     }
 
     if (ds_flag == DS_NONE)	/* default is "wordlist on disk" */
@@ -1010,7 +1012,6 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
     static int lastmode = -1;
 
     (void) name;	/* suppress compiler warning */
-    (void) val; 	/* suppress compiler warning */
     (void) precedence; 	/* suppress compiler warning */
     (void) pass; 	/* suppress compiler warning */
 
@@ -1029,7 +1030,6 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 
     switch (option) {
     case 'c':
-    case O_CONFIG_FILE:
 	read_config_file(optarg, false, false, PR_CFG_USER, longopts_bogotune);
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
@@ -1039,7 +1039,7 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 	break;
 
     case 'd':
-	ds_path = xstrdup(optarg);
+	ds_path = xstrdup(val);
 	ds_flag = (ds_flag == DS_NONE) ? DS_DSK : DS_ERR;
 	break;
 
@@ -1056,12 +1056,12 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 	break;
 
     case 'M':
-	bogolex_file = optarg;
+	bogolex_file = val;
 	break;
 
     case 'n':
 	lastmode = 'n';
-	filelist_add(ham_files, optarg);
+	filelist_add(ham_files, val);
 	break;
 
     case 'q':
@@ -1069,12 +1069,12 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 	break;
 
     case 'r':
-	user_robx = atof(optarg);
+	user_robx = atof(val);
 	break;
 
     case 's':
 	lastmode = 's';
-	filelist_add(spam_files, optarg);
+	filelist_add(spam_files, val);
 	break;
 
 #ifdef	TEST
@@ -1083,7 +1083,7 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 	break;
 #endif
     case 'T':
-	coerced_target = atoi(optarg);
+	coerced_target = atoi(val);
 	break;
 
     case 'v':
@@ -1095,26 +1095,26 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 	exit(EX_OK);
 
     case 'x':
-	if (strcmp(optarg, "MakeCheck") == 0)
+	if (strcmp(val, "MakeCheck") == 0)
 	    fMakeCheck = true;
 	else
-	    set_debug_mask(optarg);
+	    set_debug_mask(val);
 	break;
 
     case O_MAX_TOKEN_LEN:
-	max_token_len = atoi(optarg);
+	max_token_len = atoi(val);
 	break;
 
     case O_MIN_TOKEN_LEN:
-	min_token_len = atoi(optarg);
+	min_token_len = atoi(val);
 	break;
 
     case O_MAX_MULTI_TOKEN_LEN:
-	max_multi_token_len=atoi(optarg);
+	max_multi_token_len=atoi(val);
 	break;
 
     case O_MULTI_TOKEN_COUNT:
-	multi_token_count=atoi(optarg);
+	multi_token_count=atoi(val);
 	break;
 
     case O_BLOCK_ON_SUBNETS:
