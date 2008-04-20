@@ -721,7 +721,7 @@ static void set_train_msg_counts(wordhash_t *wh)
 
 static void print_msgcount_entry(const char *token, uint bad, uint good)
 {
-    printf( "\"%s\" %u %u\n", token, bad, good);
+    printf("\"%s\" %u %u\n", token, bad, good);
 }
 
 static void write_msgcount_file(wordhash_t *wh)
@@ -1098,7 +1098,7 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 	if (strcmp(optarg, "MakeCheck") == 0)
 	    fMakeCheck = true;
 	else
-	    set_debug_mask( optarg );
+	    set_debug_mask(optarg);
 	break;
 
     case O_MAX_TOKEN_LEN:

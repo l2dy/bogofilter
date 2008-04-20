@@ -88,13 +88,13 @@ static int ds_dump_hook(word_t *key, dsv_t *data,
     if (replace_nonascii_characters)
 	do_replace_nonascii_characters(key->text, key->leng);
 
-    fprintf( fpo, "%.*s %lu %lu",
+    fprintf(fpo, "%.*s %lu %lu",
 	    CLAMP_INT_MAX(key->leng), key->text,
 	    (unsigned long)data->spamcount,
 	    (unsigned long)data->goodcount);
     if (data->date)
-	fprintf( fpo, " %lu", (unsigned long)data->date);
-    fprintf( fpo, "\n");
+	fprintf(fpo, " %lu", (unsigned long)data->date);
+    fprintf(fpo, "\n");
 
     fflush(stdout); /* solicit ferror flag if output is shorter than buffer */
     return ferror(stdout) ? 1 : 0;
@@ -805,7 +805,7 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
     }
 
     case 'I':
-	fpin = fopen( val, "r" );
+	fpin = fopen(val, "r");
 	if (fpin == NULL) {
 	    fprintf(stderr, "Can't read file '%s'\n", val);
 	    exit(EX_ERROR);
