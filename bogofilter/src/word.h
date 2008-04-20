@@ -18,7 +18,10 @@
  * are allocated in one chunk. */
 typedef struct {
     uint leng;		/** length of string in \a text */
-    byte *text;		/** pointer to the string */
+    union {
+	byte *text;	/** pointer to the string */
+	const char *ctext;
+    };
 } word_t;
 
 /** create a new word_t from the \a leng bytes at address \a text */

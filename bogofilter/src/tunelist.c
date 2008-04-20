@@ -22,7 +22,7 @@ flhead_t *filelist_new(const char *name)
     return list;
 }
 
-void filelist_add(flhead_t *list, char *name)
+void filelist_add(flhead_t *list, const char *name)
 {
     flitem_t *item = xcalloc(1, sizeof(flitem_t));
     item->name = xstrdup(name);

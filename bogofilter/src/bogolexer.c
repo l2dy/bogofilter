@@ -313,7 +313,7 @@ int main(int argc, char **argv)
 	    fprintf(fpo, "normal mode.\n");
     }
 
-    bogoreader_init(argc, argv);
+    bogoreader_init(argc, (const char * const *) argv);
 
     while ((*reader_more)()) {
 	word_t token;

@@ -39,7 +39,7 @@ AUTHORS: (C) Copyright 2003-2005 by
 
 static void (*fini)(void);
 static int  argc;
-static char **argv;
+static const char * const *argv;
 static const char *filename;
 static char namebuff[PATH_LEN+1];
 static char dir_name[PATH_LEN+1];
@@ -617,7 +617,7 @@ static const char *get_filename(void)
 }
 
 /* global reader initialization, exported */
-void bogoreader_init(int _argc, char **_argv)
+void bogoreader_init(int _argc, const char * const *_argv)
 {
     mailstore_first = mail_first = true;
     reader_more = reader__next_mail;
@@ -634,7 +634,7 @@ void bogoreader_init(int _argc, char **_argv)
 	break;
     case B_CMDLINE:		 /* '-B' - command line mode */
 	argc = _argc;
-	argv = _argv;
+	argv = (const char * const *) _argv;
 	mailstore_next_store = b_args_next_mailstore;
 	mailstore_next_mail  = NULL;
 	break;

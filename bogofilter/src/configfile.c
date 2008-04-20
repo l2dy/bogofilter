@@ -135,7 +135,7 @@ bool process_config_option_as_arg(const char *opt, const char *val, priority_t p
 	    continue;
 	if (strcmp(val, "''") == 0)
 	    val = "";
-	process_arg(option->val, opt, val, precedence, PASS_2_CFG);
+	process_arg(option->val, option->name, val, precedence, PASS_2_CFG);
 	return true;
     }
 

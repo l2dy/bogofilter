@@ -13,7 +13,7 @@
 
 /* Function Prototypes */
 
-extern void bogoreader_init(int argc, char **argv);
+extern void bogoreader_init(int argc, const char * const *argv);
 extern void bogoreader_close_ifeof(void);
 extern void bogoreader_fini(void);
 void bogoreader_name(const char *name);

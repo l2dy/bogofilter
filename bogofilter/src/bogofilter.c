@@ -85,7 +85,7 @@ rc_t bogofilter(int argc, char **argv)
 
     words = register_aft ? wordhash_new() : NULL;
 
-    bogoreader_init(argc, argv);
+    bogoreader_init(argc, (const char * const *) argv);
 
     while ((*reader_more)()) {
 	double spamicity;

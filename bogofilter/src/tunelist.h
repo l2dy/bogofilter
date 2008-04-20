@@ -60,7 +60,7 @@ struct flitem_s {		/* file list item */
 };
 
 extern	flhead_t *filelist_new(const char *name);
-extern	void filelist_add(flhead_t *list, char *name);
+extern	void filelist_add(flhead_t *list, const char *name);
 extern	void filelist_free(flhead_t *list);
 
 /***** tunelist *****/
