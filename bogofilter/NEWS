@@ -14,6 +14,12 @@
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
 -------------------------------------------------------------------------------
+
+	2008-04-20
+
+	* In function process_arg use the val parameter rather than optarg.
+	  Patch provided by Roman Trunov.
+
 	2008-04-18
 
 	* Function process_arg now has the same prototype for
