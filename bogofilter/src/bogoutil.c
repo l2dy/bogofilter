@@ -835,19 +835,19 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 	break;
 
     case O_MAX_TOKEN_LEN:
-	max_token_len = atoi(optarg);
+	max_token_len = atoi(val);
 	break;
 
     case O_MIN_TOKEN_LEN:
-	min_token_len = atoi(optarg);
+	min_token_len = atoi(val);
 	break;
 
     case O_MAX_MULTI_TOKEN_LEN:
-	max_multi_token_len=atoi(optarg);
+	max_multi_token_len=atoi(val);
 	break;
 
     case O_MULTI_TOKEN_COUNT:
-	multi_token_count=atoi(optarg);
+	multi_token_count=atoi(val);
 	break;
 
     default:

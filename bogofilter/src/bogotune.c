@@ -1030,7 +1030,7 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 
     switch (option) {
     case 'c':
-	read_config_file(optarg, false, false, PR_CFG_USER, longopts_bogotune);
+	read_config_file(val, false, false, PR_CFG_USER, longopts_bogotune);
 	/*@fallthrough@*/
 	/* fall through to suppress reading config files */
 
