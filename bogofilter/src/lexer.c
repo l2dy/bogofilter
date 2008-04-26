@@ -154,11 +154,13 @@ static int get_decoded_line(buff_t *buff)
     int count;
     buff_t *linebuff;
 
+#ifdef	DISABLE_UNICODE
+    linebuff = buff;
+#else
     if (encoding == E_RAW ||
 	msg_state->mime_dont_decode ) {
 	linebuff = buff;
     }
-#ifndef	DISABLE_UNICODE
     else {
 	static buff_t *tempbuff = NULL;
 
@@ -369,7 +371,7 @@ int yyinput(byte *buf, size_t used, size_t size)
 static char *charset_as_string(const byte *txt, const size_t len)
 {
     static char *charset_text = NULL;
-    static ushort charset_leng = 0;
+    static unsigned short charset_leng = 0;
 
     if (charset_text == NULL)
 	charset_text = xmalloc(len+D);
