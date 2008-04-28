@@ -80,6 +80,7 @@
         Operational Questions
         <ul>
           <li><a href="#training">How do I start my bogofilter training?</a></li>
+          <li><a href="#training_maildirs">How do I train using maildirs?</a></li>
           <li><a href="#production">How can I keep the scoring accuracy high?</a></li>
           <li><a href="#mboxformats">What mailbox (file) formats does bogofilter understand?</a></li>
           <li><a href="#vvv">What does bogofilter's verbose output mean?</a></li>
@@ -443,6 +444,30 @@
     <p>Full training with method 1 is fastest. Training on error (as
     in methods 2, 3 and 4) is effective, but the initial training takes
     longer.</p>
+
+    <hr>
+
+    <h2 id="training_maildirs">How do I train using maildirs?</a></li>
+
+    <h3>Initial training from mbox:</h3>
+
+<pre>    bogofilter -M -s -I ~/mail/Spam
+    bogofilter -M -n -I ~/mail/NonSpam</pre>
+
+    <h3>Initial training from maildir:</h3>
+
+<pre>    bogofilter -s -B ~/Maildir/.Spam
+    bogofilter -n -B ~/Maildir/.NonSpam</pre>
+
+    <h3>Corrective training from mbox:</h3>
+
+<pre>    bogofilter -M -Ns -I ~/mail/Missed_Spam
+    bogofilter -M -Sn -I ~/mail/False_Spam</pre>
+
+    <h3>Corrective training from maildir:</h3>
+
+<pre>    bogofilter -s -B ~/Maildir/.Missed_Spam
+    bogofilter -n -B ~/Maildir/.False_Spam</pre>
 
     <hr>
 

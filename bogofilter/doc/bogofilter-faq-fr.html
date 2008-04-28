@@ -71,6 +71,7 @@
         Questions opérationnelles
         <ul>
           <li><a href="#training">Comment débuter l'apprentissage de Bogofilter?</a></li>
+          <li><a href="#training_maildirs">Comment lancer l'entrainement avec des formats mbox et maildir?</a></li>
           <li><a href="#production">Comment conserver une bonne d'acuité?</a></li>
 	  <li><a href="#mboxformats">Quels formats de boites aux lettres (fichier) Bogofilter comprend-il?</a></li>
           <li><a href="#vvv">Que signifie la sortie verbeuse de Bogofilter?</a></li>
@@ -441,6 +442,30 @@
     <p>L'entrainement avec la méthode 1 est le plus rapide. L'entrainement sur erreur
     (tel que décrit dans les méthodes 2,3 et 4) est efficace, mais
     l'apprentissage est plutôt lent.</p>
+
+    <hr>
+
+    <h2 id="training_maildirs">Comment lancer l'entrainement avec des formats mbox et maildir?</a></li>
+
+    <h3>Entrainement initial avec un format mbox:</h3>
+
+<pre>    bogofilter -M -s -I ~/mail/Spam
+    bogofilter -M -n -I ~/mail/NonSpam</pre>
+
+    <h3>Entrainement initial avec un format maildir:</h3>
+
+<pre>    bogofilter -s -B ~/Maildir/.Spam
+    bogofilter -n -B ~/Maildir/.NonSpam</pre>
+
+    <h3>Entrainement sur erreur avec un format mbox:</h3>
+
+<pre>    bogofilter -M -Ns -I ~/mail/Missed_Spam
+    bogofilter -M -Sn -I ~/mail/False_Spam</pre>
+
+    <h3>Entrainement sur erreur avec un format maildir:</h3>
+
+<pre>    bogofilter -s -B ~/Maildir/.Missed_Spam
+    bogofilter -n -B ~/Maildir/.False_Spam</pre>
 
     <hr>
 

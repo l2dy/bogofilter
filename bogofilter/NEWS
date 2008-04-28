@@ -15,9 +15,19 @@
 
 -------------------------------------------------------------------------------
 
+	2008-04-28
+
+	* Added maildir training info to English and French FAQs.
+	  Thanks to Karl Schmidt and to Mouss.
+
+	2008-04-26
+
+	* Fix uninitialized variable in lexer.c when unicode is disabled.
+	  Patch provided by Roman Trunov.
+
 	2008-04-20
 
-	* In function process_arg use the val parameter rather than optarg.
+	* In process_arg functions use the val parameter rather than optarg.
 	  Patch provided by Roman Trunov.
 
 	2008-04-18
