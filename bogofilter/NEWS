@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2008-04-30
+
+	* Updated sendmail milter contrib/bogofilter-milter.pl to v1.45
+	  (thanks to Jonathan Kamens)
+
 	2008-04-28
 
 	* Added maildir training info to English and French FAQs.

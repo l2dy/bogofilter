@@ -24,8 +24,9 @@
 
 # You will need the following non-standard Perl modules installed to
 # use this script: Sendmail::Milter, Mail::Alias, Proc::Daemon,
-# IO::Stringy.  Before using this script, search for CONFIGURABLE
-# SETTINGS and configure them appropriately for your site.
+# IO::Stringy, Socket, Net::CIDR.  Before using this script, search
+# for CONFIGURABLE SETTINGS and configure them appropriately for your
+# site.
 #
 # Inserts "X-Bogosity: Spam, tests=bogofilter" into messages that
 # appear to be spam (or "Ham" into ones that don't).  If the message is
@@ -60,11 +61,18 @@
 # This script logs various informational, warning and error messages
 # to the "mail" facility.
 
+# Thanks to Tom Anderson <neo+bogofilter-milter@orderamidchaos.com>
+# for the IP whitelisting changes and for several other useful
+# suggestions and bug fixes.
+
 # BEGIN CONFIGURABLE SETTINGS
 
 # If this string appears in the Subject of a message (case
 # insensitive), the message won't be filtered.
 my $magic_string = '[no-bogofilter]';
+
+# Set the syslog facility you wish to log messages to.
+my $log_facility = 'LOG_MAIL';
 
 # These settings control exactly what error sendmail sends back to the
 # sender if a message is rejected.  You can leave them as-is, or
@@ -74,6 +82,18 @@ my $xcode = "5.7.1"; # extended RFC 2034 reply code
 my $reject_message = "Your message looks like spam.\n" .
     "If it isn't, resend it with $magic_string " .
     "in the Subject line.";
+
+# Whitelist any IP addresses or ranges from this filter.
+# For example:
+#my(@whitelist) = ("127.0.0.1", "10.127.0.1-10.127.0.9", "192.168.0.0/16");
+my(@ip_whitelist) = ();
+
+# If you want to whitelist any addresses which have authenticated
+# via poprelayd (i.e. remote workstations of users on your server)
+# set $dbfile to your popip.db location, else set it to undef.
+# For example:
+#my $ip_whitelist_db = "/etc/mail/popip.db";
+my $ip_whitelist_db = undef;
 
 # The largest message to keep in memory rather than writing to a
 # temporary file.
@@ -85,6 +105,23 @@ my $pid_file = '/var/run/bogofilter-milter.pid';
 # specified in the sendmail.cf file (with "local:" in front of it
 # there, but not here).
 my $socket = '/var/run/bogofilter-milter.sock';
+
+# The following two settings give more granular control over whether
+# bogofilter is used for any particular user and what configuration
+# settings are used when it is.
+# - If $bogofilter_cf is set, then the script will look for a file
+# with that name in the user's home directory.  If it finds it, then
+# bogofilter will be called with "-c $HOME/$bogofilter_cf" so that the
+# specified configuration file is used rather than the default,
+# .bogofilter.cf.
+# - If $require_cf is true, then the specified configuration file
+# *must* exist for bogofilter to be used for this user.  In other
+# words, rather than only looking for the .bogofilter subdirectory of
+# the user's home directory, the script will look for both the
+# .bogofilter subdirectory *and* the config file.
+# - Note that $require_cf is ignored if $bogofilter_cf is unset.
+my $bogofilter_cf = undef;
+my $require_cf = undef;
 
 # If a file with this name exists in the user's .bogofilter directory,
 # then that user's mail will be filtered in training mode.  This means
@@ -111,6 +148,21 @@ my $archive_mbox = 'archive';
 # into an mbox format file.
 my $cyrus_deliver = '/usr/lib/cyrus-imapd/deliver';
 
+# If you would like to use a shared bogofilter database for everyone,
+# rather than separate per-user databases, then create a user on your
+# system to be used as a home for the shared database, and set
+# $database_user to that user's username.
+# 
+# If you set $database_user, then all the logic described above for
+# deciding whether to run bogofilter, whether to run in training mode
+# or real mode, and whether to archive spam still applies, so make
+# sure you configure $database_user's account properly.
+# 
+# If you set $database_user, then $aliases_file, $sendmail_canon,
+# $sendmail_prog, $recipient_cache_expire, and
+# $recipient_cache_check_interval do NOT apply and are ignored.
+my $database_user = undef;
+
 # Mail::Alias is used to expand SMTP recipient addresses into local
 # mailboxes to determine if any of them have bogofilter databases.  If
 # someone sends E-mail to a mailing list or alias whose expansion
@@ -136,6 +188,35 @@ my $aliases_file = '/etc/aliases';
 # configuration.  Search for CHECKTHIS in the function.
 my $sendmail_canon = 1;
 my $sendmail_prog = '/usr/sbin/sendmail';
+
+# @discard_control is an array of anonymous arrays.  Each sub-array
+# contains a pair of entries, a control pattern and an action, either
+# "discard" or "reject".  The action corresponding to the first
+# matching control pattern determines what happens to the messages.
+# If @discard_control is empty or none of its control patterns match,
+# the default action is "reject".  The following control patterns are
+# valid:
+
+# "addr:a.b.c.d"       matches if the sending host has the indicated IP address
+# "netblock:a.b.c.d/e" matches if the sending host is in the indicated netblock
+# "host:fqdn"          matches if the IP address of the sending host resolves
+#                      to the indicated host name
+# "domain:fqdn"        matches if the IP address of the sending host resolves
+#                      to a host name in the indicated domain
+# "mx"                 matches if one of the MX servers for the recipient's
+#                      domain resolves to the IP address of the sending host
+# "*"                  always matches
+
+# The default @discard_control setting discards messages from MX
+# servers to prevent this script from contributing to spam "blowback",
+# which occurs when a spammer forges someone's real email address as
+# the return address on spam, and then that person has to deal with
+# tons of bounce messages from sites that reject the spam.
+my(@discard_control) =
+    (
+     ["mx" => "discard"],
+     ["*"  => "reject"],
+     );
 
 # You can configure how long addresses will stay in the cache of
 # addresses that have been been expanded against the virtual user
@@ -164,19 +245,24 @@ require 5.008_000; # for User::pwent
 
 use strict;
 use warnings;
-use Sendmail::Milter;
+use DB_File;
+use Data::Dumper;
+use English '-no_match_vars';
+use Fcntl qw(:flock :seek);
 use File::Basename;
 use File::Temp qw(tempfile);
-use Fcntl qw(:flock :seek);
-use Mail::Alias;
-use User::pwent;
-use Sys::Syslog qw(:DEFAULT :macros setlogsock);
-use English '-no_match_vars';
-use Proc::Daemon;
 use Getopt::Long;
 use IO::Scalar;
 use IPC::Open2;
-use Data::Dumper;
+use Mail::Alias;
+use Net::CIDR;
+use Net::DNS;
+use POSIX;
+use Proc::Daemon;
+use Sendmail::Milter;
+use Socket;
+use Sys::Syslog qw(:DEFAULT :macros setlogsock);
+use User::pwent;
 
 $Data::Dumper::Indent = 0;
 
@@ -196,7 +282,11 @@ my %my_milter_callbacks =
  'body'    => \&my_body_callback,
  'eom'     => \&my_eom_callback,
  'abort'   => \&my_abort_callback,
+ 'close'   => \&my_close_callback,
  );
+
+$my_milter_callbacks{'connect'} = \&my_connect_callback
+    if (@ip_whitelist || $ip_whitelist_db || @discard_control);
 
 dia $usage if (! GetOptions('daemon' => \$run_as_daemon,
 			    'debug' => \$debug,
@@ -213,12 +303,45 @@ if ($run_as_daemon) {
 my $magic_string_re = $magic_string;
 $magic_string_re =~ s/(\W)/\\$1/g;
 
+# convert whitelist into CIDR notation
+{
+    my(@whitelist_cidr);
+
+    foreach my $IP (@ip_whitelist) {
+	if (not eval {@whitelist_cidr = 
+			  Net::CIDR::cidradd($IP, @whitelist_cidr)}) {
+	    &die("Error processing whitelist: \"$IP\" is not a valid IP ",
+		 "address or range.");
+	}
+    }
+    @ip_whitelist = @whitelist_cidr;
+}
+
+# open popip database for reading
+my %ip_whitelist_db;
+
+&opendb_read if ($ip_whitelist_db);
+
 setlogsock('unix');
-openlog($whoami, 'pid', 'mail');
+openlog($whoami, 'pid', $log_facility);
 if (! $debug) {
-    setlogmask(&LOG_UPTO(LOG_INFO));
+    # I'd really like to to this, but it doesn't work wit Sys::Syslog
+    # 0.13 in Perl 5.8.8.
+    # setlogmask(&LOG_UPTO(LOG_INFO));
+    eval "
+	no warnings 'redefine';
+	sub debuglog {
+	}
+    ";
 }
     
+if ($database_user) {
+    $aliases_file = $sendmail_canon = $sendmail_prog =
+	$recipient_cache_expire = $recipient_cache_check_interval = undef;
+    syslog("info", "Using shared bogofilter database under %s's account",
+	   $database_user);
+}
+
 if (! (open(PIDFILE, '+<', $pid_file) ||
        open(PIDFILE, '+>', $pid_file))) {
     &die("open($pid_file): $!\n");
@@ -242,8 +365,57 @@ Sendmail::Milter::register("bogofilter-milter",
 
 Sendmail::Milter::main($milter_interpreters);
 
+&closedb;
+
+sub my_connect_callback {
+    my $ctx = shift;		# milter context object
+    my $hostname = shift;       # The connection's host name.
+    my $sockaddr_in = shift;    # AF_INET portion of the host address,
+				# from getpeername(2) syscall
+    my $hash = $ctx->getpriv();
+
+    my ($port, $ipaddr) = Socket::unpack_sockaddr_in($sockaddr_in) or
+	&die("Could not unpack socket address: $!");
+    $ipaddr = Socket::inet_ntoa($ipaddr); # translates into standard IPv4 addr
+
+    &debuglog("my_connect_callback: entering with hostname=$hostname, ",
+	      "ipaddr=$ipaddr, port=$port");
+
+    # check if the connecting server is listed in the whitelist
+    if (@ip_whitelist) {
+        if (eval {Net::CIDR::cidrlookup($ipaddr, @ip_whitelist)}) {
+          syslog('info', '%s', "$ipaddr is whitelisted, so this email is " .
+		 "being accepted unfiltered.");
+          $ctx -> setpriv(undef);
+          return SMFIS_ACCEPT;
+        }
+        else {
+	    &debuglog("$ipaddr is not in the whitelist");
+	}
+    }
+
+    # check if connecting server is listed in the popip database
+    if ($ip_whitelist_db) {
+	if ($ip_whitelist_db{$ipaddr}) {
+	    syslog('info', '%s', "$ipaddr is authenticated via poprelayd, " .
+		   "so this email is being accepted unfiltered.");
+	    $ctx -> setpriv(undef);
+	    return SMFIS_ACCEPT;
+	}
+	else {
+	    &debuglog("$ipaddr is not in the popip database");
+	}
+    }
+
+    $hash->{'ipaddr'} = $ipaddr;
+    $ctx->setpriv($hash);
+    &debuglog("my_connect_callback: return CONTINUE with hash");
+    return SMFIS_CONTINUE;
+}
+
 sub my_rcpt_callback {
     my $ctx = shift;
+    my $envrcpt = shift;
     my $hash = $ctx->getpriv();
 
     &debuglog("my_rcpt_callback: entering with " . Data::Dumper->Dump([$hash], [qw(hash)]));
@@ -260,6 +432,7 @@ sub my_rcpt_callback {
 
     if (&filtered_dir($rcpt)) {
 	$hash->{'rcpt'} = $rcpt;
+	$hash->{'envrcpt'} = $envrcpt;
 	$ctx->setpriv($hash);
 	&debuglog("my_rcpt_callback: return CONTINUE with hash");
 	return SMFIS_CONTINUE;
@@ -406,8 +579,11 @@ sub my_eom_callback {
     elsif (! $pid) {
 	&die("couldn't restrict permissions") if
 	    (! &restrict_permissions($hash->{'rcpt'}, 1));;
-	exec('bogofilter', '-u', '-d', $dir) ||
-	    &die("exec(bogofilter): $!\n");
+	my(@cmd) = ('bogofilter', '-u', '-d', $dir);
+	if ($bogofilter_cf && -f "$dir/$bogofilter_cf") {
+	    push(@cmd, '-c', "$dir/$bogofilter_cf");
+	}
+	exec(@cmd) || &die("exec(bogofilter): $!\n");
 	# &die had better not return!
     }
 
@@ -442,7 +618,9 @@ sub my_eom_callback {
 	}
 	$ctx->addheader('X-Bogosity', 'Spam, tests=bogofilter');
 	my $from = $ctx->getsymval('{mail_addr}');
-	syslog('info', '%s', ($training ? "would reject" : "rejecting") . 
+	my $which = &reject_or_discard($hash);
+	my($verb) = ($which == SMFIS_REJECT) ? "reject" : "discard";
+	syslog('info', '%s', ($training ? "would $verb" : "${verb}ing") . 
 	       " likely spam from $from to " . $hash->{'rcpt'} . " based on $dir");
 	if (! $training) {
 	    my($archive, $link);
@@ -524,6 +702,7 @@ sub my_eom_callback {
 
 		while (<$fh>) {
 		    s/\r\n/\n/;
+		    s/^From />From /;
 		    if (! print(MBOX $_)) {
 			syslog('warning', '%s', "write($archive): $!");
 			goto close_archive;
@@ -549,7 +728,7 @@ sub my_eom_callback {
 	  permissions_already_unrestricted:
 	    $ctx->setreply($rcode, $xcode, $reject_message);
 	    $ctx->setpriv(undef);
-	    return SMFIS_REJECT;
+	    return $which;
 	}
     }
     else {
@@ -572,6 +751,23 @@ sub my_abort_callback {
 
     $ctx->setpriv(undef);
     &debuglog("my_abort_callback: returning CONTINUE with undef");
+    return SMFIS_CONTINUE;
+}
+
+sub my_close_callback {
+    my($ctx) = shift;
+    my $hash = $ctx->getpriv();
+
+    &debuglog("my_close_callback: entering with " . Data::Dumper->Dump([$hash], [qw(hash)]));
+
+    if ($hash) {
+	if ($hash->{'fn'}) {
+	    unlink $hash->{'fn'};
+	}
+    }
+
+    $ctx->setpriv(undef);
+    &debuglog("my_close_callback: returning CONTINUE with undef");
     return SMFIS_CONTINUE;
 }
 
@@ -638,6 +834,10 @@ sub expand_recipient {
 	}
     }
 
+    if ($database_user) {
+	$rcpt = $database_user;
+    }
+
     if (defined($cached_recipients{$rcpt})) {
 	return(@{$cached_recipients{$rcpt}});
     }
@@ -666,8 +866,13 @@ sub expand_recipient {
 	    $pw ? ($pw->uid, $pw->gid, undef, $now, $stripped) :
 	    (undef, undef, undef, $now, undef);
 	if ($pw && $pw->dir && &restrict_permissions($orig) &&
-	    -d ($dir = $pw->dir . "/.bogofilter")) {
+	    -d ($dir = $pw->dir . "/.bogofilter") &&
+	    ! ($bogofilter_cf && $require_cf && ! -f "$dir/$bogofilter_cf")) {
 	    $cached_recipients{$orig}->[2] = $dir;
+	}
+	elsif ($database_user) {
+	    syslog("warning", "Shared database user %s is not configured " .
+		   "properly for bogofilter", $database_user);
 	}
 	&unrestrict_permissions;
 	return(@{$cached_recipients{$orig}});
@@ -713,13 +918,132 @@ sub sendmail_canon {
     }
 }
 
+sub opendb_read {
+    tie(%ip_whitelist_db, "DB_File", $ip_whitelist_db, O_RDONLY, 0, $DB_HASH) or &die("Can't open $ip_whitelist_db: $!");
+}
+
+sub closedb {
+    untie %ip_whitelist_db;
+}
+
 sub die {
     my(@msg) = @_;
 
+    &closedb;
     syslog('err', '%s', "@msg");
     exit(1);
 }
 
 sub debuglog {
     syslog('debug', "DEBUG: " . join("", @_));
+}
+
+my(%mx_cache);
+
+sub reject_or_discard {
+    my($hash) = @_;
+    my $hostname;
+
+    foreach my $i (0..@discard_control-1) {
+	my($pattern, $action) = @{$discard_control[$i]};
+	my $ret;
+	if ($action =~ /^reject$/i) {
+	    $ret = SMFIS_REJECT;
+	}
+	elsif ($action =~ /^discard$/i) {
+	    $ret = SMFIS_DISCARD;
+	}
+	else {
+	    &die("Invalid action $action ",
+		 "for discard control pttern $pattern\n");
+	}
+	if ($pattern =~ /^addr:(.*)$/i) {
+	    my $addr = $1;
+	    &die("Invalid IP address in discard control pattern $pattern\n")
+		if ($addr !~ /^\d+\.\d+\.\d+\.\d+$/);
+	    if ($hash->{'ipaddr'} eq $addr) {
+		&debuglog("reject_or_discard: addr match $addr: $action");
+		return $ret;
+	    }
+	}
+	elsif ($pattern =~ /^netblock:(.*)$/i) {
+	    my $netblock = $1;
+	    &die("Invalid netblock in discard control pattern $pattern\n")
+		if ($netblock !~ /^\d+\.\d+\.\d+\.\d+\/\d+$/);
+	    if (Net::CIDR::cidrlookup($hash->{'ipaddr'}, $netblock)) {
+		&debuglog("reject_or_discard: netblock match ",
+			  "$hash->{ipaddr} in $netblock: $action");
+		return $ret;
+	    }
+	}
+	elsif ($pattern =~ /^host:(.*)$/i) {
+	    my $match_host = lc $1;
+	    $hostname = lc gethostbyaddr(inet_aton($hash->{ipaddr}), AF_INET)
+		if (! $hostname);
+	    if ($match_host eq $hostname) {
+		&debuglog("reject_or_discard: ",
+			  "host match $hostname for $hash->{ipaddr}: ",
+			  "$action and cache");
+		splice(@discard_control, $i, 0,
+		       [ "addr:$hash->{ipaddr}", $action ]);
+		return $ret;
+	    }
+	}
+	elsif ($pattern =~ /^domain:(.*)$/i) {
+	    my $match_domain = lc $1;
+	    $hostname = lc gethostbyaddr(inet_aton($hash->{ipaddr}), AF_INET)
+		if (! $hostname);
+	    if ($match_domain eq $hostname or
+		(substr($hostname, -1-length($match_domain)) eq
+		 ".$match_domain")) {
+		&debuglog("reject_or_discard: domain match ",
+			  "$hostname for $hash->{ipaddr} in $match_domain: ",
+			  "$action and cache");
+		splice(@discard_control, $i, 0,
+		       [ "addr:$hash->{ipaddr}", $action ]);
+		return $ret;
+	    }
+	}
+	elsif ($pattern =~ /^mx$/i) {
+	    my $mx_domain = lc $hash->{'envrcpt'};
+	    if (! $mx_domain) {
+		&debuglog("reject_or_discard: no envrcpt\n");
+		next;
+	    }
+	    $mx_domain =~ s/.*\@(.*[^\>])\>?/$1/;
+	    my %mx_ips;
+	    if ($mx_cache{$mx_domain} and
+		# refetch MX records once per hour
+		time - $mx_cache{$mx_domain}->[0] < 60 * 60) {
+		%mx_ips = %{$mx_cache{$mx_domain}->[1]};
+	    }
+	    else {
+		my %mx_ips;
+		foreach my $mx (mx($mx_domain)) {
+		    my($name, $aliases, $addrtype, $length, @addrs) =
+			gethostbyname($mx->exchange);
+		    foreach my $addr (@addrs) {
+			$mx_ips{inet_ntoa($addr)} = 1;
+		    }
+		}
+		$mx_cache{$mx_domain} = [time, \%mx_ips];
+		&debuglog("reject_or_discard: cached MX IPs ",
+			  join(" ", sort keys %mx_ips),
+			  " for domain $mx_domain");
+	    }
+	    if ($mx_ips{$hash->{'ipaddr'}}) {
+		&debuglog("reject_or_discard: MX addr match ",
+			  "$hash->{ipaddr} for domain $mx_domain: $action");
+		return $ret;
+	    }
+	}
+	elsif ($pattern eq "*") {
+	    return $ret;
+	}
+	else {
+	    &die("Unrecognized discard control pattern: $pattern");
+	}
+    }
+	
+    return SMFIS_REJECT;
 }
