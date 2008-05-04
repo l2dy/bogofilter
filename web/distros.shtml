@@ -32,6 +32,9 @@
                   <td class="top_text_table"> Database <br>
                     Variants</td>
                 </tr>
+		<tr><td colspan="3"><a href="http://www.centos.org/" target="_blank"><strong>Centos</strong></a></td></tr>
+                <tr> <td>Centos 5.1</td> <td>1.1.6</td> <td> <div align="center">BerkeleyDB</div> </td>
+                </tr>
 		<tr><td colspan="3"><a href="http://www.debian.org/" target="_blank"><strong>Debian</strong></a></td></tr>
                 <tr>
                   <td>Debian stable ("etch")</td>
@@ -54,9 +57,14 @@
                     <div align="center">BerkeleyDB, QDBM, SQLite, TokyoCabinet</div>
                   </td>
                 </tr>
+		<tr><td colspan="3"><a
+		    href="http://www.febora.org/"
+		    target="_blank"><strong>Febora</strong></a></td></tr>
+                <tr> <td>Febora 8</td> <td>1.1.6-1.fc8</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
+                <tr> <td>Febora 9 (preview)</td> <td>1.1.6-2.fc9</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
 		<tr><td colspan="3"><a href="http://www.freebsd.org/"
 			    target="_blank"><strong>FreeBSD</strong></a>
-			| 
+			| xxx
 			<a href="http://www.freebsd.org/security/#adv"
 			    target="_blank">FreeBSD support periods</a></td></tr>
                 <tr> <td>FreeBSD 5.5-RELEASE</td> <td>1.0.1</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
@@ -68,8 +76,7 @@
 		<tr><td colspan="3"><a
 		    href="http://www.gentoo.org/"
 		    target="_blank"><strong>Gentoo</strong></a></td></tr>
-                <tr> <td>Stable</td> <td>1.1.1</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
-                <tr> <td>Experimental</td> <td>1.1.4</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
+                <tr> <td>Stable</td> <td>1.1.6</td> <td> <div align="center">BerkeleyDB, SQLite3</div> </td> </tr>
 		<tr><td colspan="3"><a
 		    href="http://www.mandriva.com/en/"
 		    target="_blank"><strong>Mandriva</strong></a></td></tr>
