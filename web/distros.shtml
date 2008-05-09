@@ -58,10 +58,10 @@
                   </td>
                 </tr>
 		<tr><td colspan="3"><a
-		    href="http://www.febora.org/"
-		    target="_blank"><strong>Febora</strong></a></td></tr>
-                <tr> <td>Febora 8</td> <td>1.1.6-1.fc8</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
-                <tr> <td>Febora 9 (preview)</td> <td>1.1.6-2.fc9</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
+		    href="http://www.fedora.org/"
+		    target="_blank"><strong>Fedora</strong></a></td></tr>
+                <tr> <td>Fedora 8</td> <td>1.1.6-1.fc8</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
+                <tr> <td>Fedora 9 (preview)</td> <td>1.1.6-2.fc9</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
 		<tr><td colspan="3"><a href="http://www.freebsd.org/"
 			    target="_blank"><strong>FreeBSD</strong></a>
 			| xxx
