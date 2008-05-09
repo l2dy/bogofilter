@@ -139,11 +139,11 @@ typedef	enum {
 typedef	enum {
     E_UNKNOWN = 0,	/* 0 for not set  */
     E_RAW     = 1,	/* 1 for raw text */
-    E_UNICODE,		/* 2 for unicode  */
-#ifndef	ENABLE_UNICODE
-    E_DEFAULT = E_RAW
-#else
+    E_UNICODE = 2,	/* 2 for unicode  */
+#ifdef	ENABLE_UNICODE
     E_DEFAULT = E_UNICODE
+#else
+    E_DEFAULT = E_RAW
 #endif
 } e_enc;
 
