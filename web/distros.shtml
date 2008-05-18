@@ -64,14 +64,13 @@
                 <tr> <td>Fedora 9 (preview)</td> <td>1.1.6-2.fc9</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
 		<tr><td colspan="3"><a href="http://www.freebsd.org/"
 			    target="_blank"><strong>FreeBSD</strong></a>
-			| xxx
-			<a href="http://www.freebsd.org/security/#adv"
+			| <a href="http://www.freebsd.org/security/#adv"
 			    target="_blank">FreeBSD support periods</a></td></tr>
                 <tr> <td>FreeBSD 5.5-RELEASE</td> <td>1.0.1</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 6.1-RELEASE</td> <td>1.0.1</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 6.2-RELEASE</td> <td>1.0.3</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 6.3-RELEASE</td> <td>1.1.5</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td>
-                <tr> <td>FreeBSD 7.0-RELEASE (upcoming)</td> <td>1.1.5</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
+                <tr> <td>FreeBSD 6.3-RELEASE</td> <td>1.1.5</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
+                <tr> <td>FreeBSD 7.0-RELEASE</td> <td>1.1.5</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
                  <tr> <td>FreeBSD ports</td> <td>See <a href="http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
 		<tr><td colspan="3"><a
 		    href="http://www.gentoo.org/"
