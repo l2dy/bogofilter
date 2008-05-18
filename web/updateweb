@@ -36,7 +36,7 @@ else
   $CMDPFX cat $URL/bogofilter/NEWS >NEWS
 
   echo "### ADJUSTING PERMISSIONS ###"
-  find . -type d -exec chgrp -R bogofilter '{}' '&&' chmod ug=rwX '{}' ';'
+  find . -type d -exec sh -c 'chgrp -R bogofilter "{}" && chmod ug=rwX "{}"' ';'
 
   echo "### COPYING STAGING AREA TO htdocs/ ###"
   # copy without cruft and internal files
