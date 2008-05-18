@@ -35,6 +35,10 @@ else
   done
   $CMDPFX cat $URL/bogofilter/NEWS >NEWS
 
+  echo "### ADJUSTING PERMISSIONS ###"
+  chgrp -R bogofilter . \
+  && chmod -R ug=rwX .
+
   echo "### COPYING STAGING AREA TO htdocs/ ###"
   # copy without cruft and internal files
   rsync -aH --delete ./ ../htdocs/ --delete-excluded \
