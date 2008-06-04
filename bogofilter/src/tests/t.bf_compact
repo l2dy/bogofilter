@@ -17,6 +17,7 @@ $BOGOFILTER $OPTS -s < "$SYSTEST/inputs/spam.mbx"
 $BOGOFILTER $OPTS -n < "$SYSTEST/inputs/good.mbx"
 
 (
+set -e
 $SHELL $BF_COMPACT $BOGOFILTER_DIR
 
 $BOGOUTIL -d "$WORDLIST" >$BOGOFILTER_DIR/cpc
