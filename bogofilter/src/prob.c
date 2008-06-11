@@ -16,7 +16,7 @@ AUTHORS:
 
 double calc_prob(uint good, uint bad, uint goodmsgs, uint badmsgs)
 {
-    int n = good + bad;
+    uint n = good + bad;
     double fw, pw;
 
     /* http://www.linuxjournal.com/article.php?sid=6467 */
