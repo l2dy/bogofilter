@@ -95,7 +95,6 @@ COMMON_OBJS = o.base64 \
 	o.mime \
 	o.msgcounts \
 	o.mxcat \
-	o.mysetvbuf \
 	o.passthrough \
 	o.paths \
 	o.prob \

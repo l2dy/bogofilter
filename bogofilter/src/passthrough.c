@@ -24,7 +24,6 @@ NAME:
 #include "format.h"
 #include "textblock.h"
 #include "xmalloc.h"
-#include "mysetvbuf.h"
 
 #include "lexer.h" /* need have_body */
 
@@ -365,7 +364,7 @@ void output_setup(void)
     /* if we're not in passthrough mode, set line buffered mode just in
      * case some program that calls uses waits for our output in -T mode */
     if (!passthrough) {
-	mysetvbuf(fpo, NULL, _IOLBF, BUFSIZ);
+	setvbuf(fpo, NULL, _IOLBF, BUFSIZ);
     }
 }
 
