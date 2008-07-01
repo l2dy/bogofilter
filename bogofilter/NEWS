@@ -15,6 +15,12 @@
 
 -------------------------------------------------------------------------------
 
+	* Update doc/integrating-with-postfix: the script now suggests sendmail
+	  -G -i (where -G will be ignored by Postfix before 2.3) to tell
+	  Postfix it's a gateway submission, not an original injection; the
+	  filter pipe(8) magic for master.cf now suggests flags=Rq (was
+	  flags=R), as per Postfix's FILTER_README.
+
 	* Drop support for systems that reverse setvbuf arguments. The last
 	  systems to do that are reported to be shipped in 1987 by the autoconf
 	  manual, so ditch them.

@@ -49,7 +49,12 @@ Filtering:
 	# messages truncated at the first period that is alone on a line
 	# (which can happen with several kinds of messages, particularly
 	# quoted-printable)
-	POSTFIX="/usr/sbin/sendmail -i"
+	# -G is ignored before Postfix 2.3 and tells it that the message
+	# does not originate on the local system (Gateway submission),
+	# so Postfix avoids some of the local expansions that can leave
+	# misleading traces in headers, such as local address
+	# canonicalizations.
+	POSTFIX="/usr/sbin/sendmail -G -i"
 	export BOGOFILTER_DIR=/home/bogofilter
 
 	# Exit codes from <sysexits.h>
@@ -88,7 +93,7 @@ Filtering:
     At the end of the file, add the following two lines:
 
 	filter	  unix	-	n	n	-	-	pipe
-	    flags=R user=filter argv=/home/bogofilter/postfix-filter.sh -f ${sender} -- ${recipient}
+	    flags=Rq user=filter argv=/home/bogofilter/postfix-filter.sh -f ${sender} -- ${recipient}
 
 - Now, every incoming message will have the header line
 
