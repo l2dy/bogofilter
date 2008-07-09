@@ -20,6 +20,7 @@ dnl
 AC_INIT([bogofilter],[1.1.7])
 dnl
 AC_PREREQ(2.59)
+dnl AC_PREREQ(2.60) dnl if AC_USE_SYSTEM_EXTENSIONS is desired
 AC_CONFIG_SRCDIR([src/bogofilter.c])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([foreign 1.8 dist-bzip2 no-installinfo])
@@ -27,7 +28,8 @@ AC_CONFIG_HEADERS([src/config.h:config.in])
 
 AC_PROG_AWK
 AC_PROG_CC(gcc xlc cc)
-dnl AC_GNU_SOURCE
+dnl this requires autoconf 2.60:
+dnl AC_USE_SYSTEM_EXTENSIONS
 AC_CHECK_TOOL(AR, ar, no)
 if test "$AR" = no ; then
   AC_MSG_ERROR([Please make sure that "ar" is in your PATH.])
@@ -377,12 +379,6 @@ AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 AC_TYPE_SIGNAL
 AC_FUNC_SELECT_ARGTYPES
-if test "$ICC" = no ; then
-# AC_FUNC_SETVBUF_REVERSED for some reason reports a bogus "yes"
-# with Intel C++ that leads to SIGSEGV at run time.
-# Skip the test on ICC.
-AC_FUNC_SETVBUF_REVERSED
-fi
 AC_CHECK_TYPES([uint, ulong, uint32_t, u_int32_t, int32_t, int16_t, u_int16_t, uint16_t, u_int8_t, ssize_t])
 AC_CHECK_TYPE(u_long, unsigned long)
 dnl XXX FIXME - this is a crude hack and not necessarily working,
