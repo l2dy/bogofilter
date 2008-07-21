@@ -62,7 +62,8 @@ Filtering:
    Given a good initial corpus, it is better to have bogofilter update its 
    lists based on the message classification, since it is quite likely to get 
    it right.
-   Misclassifications will be corrected later.
+   NOTE: Misclassifications MUST be corrected later, else the corpus will 
+   degrade and misclassifications can get worse over time.
 
 - Setup an /etc/tcpcontrol/qmail.rules entry to trigger the  filtering.
   Ideally, you want to filter incoming mail, but not outgoing.
