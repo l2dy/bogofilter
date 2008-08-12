@@ -16,7 +16,7 @@ LC_ALL=C ; export LC_ALL
 echo "### CHECKING OUT WEB ###"
 cd /home/groups/b/bo/bogofilter/web
 
-URL=https://bogofilter.svn.sourceforge.net/svnroot/bogofilter/trunk/
+URL=http://bogofilter.svn.sourceforge.net/svnroot/bogofilter/trunk/
 CMDPFX="svn"
 
 # check out
