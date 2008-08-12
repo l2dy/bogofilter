@@ -13,6 +13,8 @@ set -e
 umask 02
 LC_ALL=C ; export LC_ALL
 
+trap 'echo "### FAILED ### >&2 ; exit 1' 0
+
 echo "### CHECKING OUT WEB ###"
 cd /home/groups/b/bo/bogofilter/web
 
@@ -49,4 +51,5 @@ else
       # do not remove this comment - it is for the preceding backslash
 
   echo "### DONE ###"
+  trap 0
 fi
