@@ -13,7 +13,7 @@ set -e
 umask 02
 LC_ALL=C ; export LC_ALL
 
-trap 'echo "### FAILED ### >&2 ; exit 1' 0
+trap 'echo "### FAILED ###" >&2 ; exit 1' 0
 
 echo "### CHECKING OUT WEB ###"
 cd /home/groups/b/bo/bogofilter/web
@@ -28,7 +28,7 @@ echo "$a" | egrep -v "^(At revision|Revision)" || :
 # start ourselves anew
 if [ "x$NORECURSE" = x ] ; then
     echo "### RESTARTING $0 ###"
-    env NORECURSE=1 $0
+    exec env NORECURSE=1 $0
 else
   echo "### CHECKING OUT FAQ and NEWS ###"
   FILES="bogofilter-faq.html bogofilter-faq-fr.html bogofilter-faq-it.html"
