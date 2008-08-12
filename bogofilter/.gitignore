@@ -1,13 +1,16 @@
 /.deps
+/.rsyncs
 /Makefile
 /Makefile.in
 /aclocal.m4
+/autogen.log
 /autom4te.cache
 /bogofilter-*.tar.gz
 /bogofilter.pdf
 /bogofilter.spec
 /bogolexer.pdf
 /bogoutil.pdf
+/build*
 /compile
 /config.cache
 /config.guess
@@ -25,5 +28,3 @@
 /mkinstalldirs
 /ylwrap
 /ChangeLog
-/.rsyncs
-/build*
