@@ -838,6 +838,12 @@ case "${target}" in
        ;;
 esac
 
+bogofilter_transform=`echo "${program_transform_name}" | sed -e 's,\\\\\\\\,\\\\,g;s,\\\$\\\$,\$,g'`
+transformed_bogofilter=`echo bogofilter | sed -e "$bogofilter_transform"`
+transformed_bogoutil=`echo bogoutil | sed -e "$bogofilter_transform"`
+AC_SUBST(transformed_bogofilter)
+AC_SUBST(transformed_bogoutil)
+
 # Note the \\\\ for backslashes.  Autoconf eats one layer, leaving \\
 
 AC_DEFINE(CURDIR_S, ".", [Define name of current directory (C string)])

@@ -10,8 +10,8 @@
 
 set -e # die on errors
 
-: ${BOGOFILTER:=bogofilter}
-: ${BOGOUTIL:=bogoutil}
+: ${BOGOFILTER:=@transformed_bogofilter@}
+: ${BOGOUTIL:=@transformed_bogoutil@}
 
 if [ -z "$1" ] ; then
     echo 'usage: bf_compact source_dir [wordlist_name...]'
