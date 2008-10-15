@@ -316,7 +316,7 @@ void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
 	if (sqlexec(dbh->db, BEGIN)) goto barf;
 	/*
 	 * trick: the sqlite_master table (see SQLite FAQ) is read-only
-	 * and lists all table, indexes etc. so we use it to check if
+	 * and lists all tables, indexes etc. so we use it to check if
 	 * the bogofilter table is already there, the error codes are
 	 * too vague either way, for "no such table" and "table already
 	 * exists" we always get SQLITE_ERROR, which we'll also get for
