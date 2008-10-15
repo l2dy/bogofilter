@@ -9,6 +9,8 @@
 
 set -e # die on errors
 
+: ${BOGOUTIL:=@transformed_bogoutil@}
+
 COMPACT=0
 while test "$1" ; do
     case "$1" in
@@ -30,7 +32,7 @@ SRC="$1"
 DST="$2"
 
 # flush mempools
-bogoutil --db-checkpoint="$SRC" || :
+$BOGOUTIL --db-checkpoint="$SRC" || :
 
 mkdir "$DST"
 
@@ -39,7 +41,7 @@ rm -f $TMP
 trap "rm -rf $TMP \"$DST\"" 0
 if test $COMPACT -eq 1 ; then
   # don't copy unneeded logs
-  bogoutil --db-list-logfiles="$SRC" >$TMP
+  $BOGOUTIL --db-list-logfiles="$SRC" >$TMP
 else
   : >$TMP
 fi
@@ -50,10 +52,10 @@ if test "$LOGS" ; then cp -p $LOGS "$DST" ; fi
 if test -f "$SRC"/DB_CONFIG ; then cp -p "$SRC"/DB_CONFIG "$DST" ; fi
 
 for FILE in "$SRC"/*.db ; do
-    SIZE=`bogoutil --db-print-pagesize="$FILE"`
+    SIZE=`$BOGOUTIL --db-print-pagesize="$FILE"`
     dd bs=$SIZE if=$FILE of="$DST/"`basename "$FILE"`
 done
 
-if test "$LOGS" ; then bogoutil --db-recover="$DST" ; fi
+if test "$LOGS" ; then $BOGOUTIL --db-recover="$DST" ; fi
 rm -f $TMP
 trap - 0

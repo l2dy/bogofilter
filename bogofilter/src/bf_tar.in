@@ -11,6 +11,9 @@
 
 set -e
 
+: ${BOGOFILTER:=@transformed_bogofilter@}
+: ${BOGOUTIL:=@transformed_bogoutil@}
+
 REMOVEBEF=0
 REMOVEAFT=0
 while [ "$1" ] ; do
@@ -43,14 +46,14 @@ if [ ! -d "$BOGOHOME" ] ; then
 fi
 
 nukelogs() {
-    bogoutil --db-prune="$BOGOHOME"
+    $BOGOUTIL --db-prune="$BOGOHOME"
 }
 
 # remove if requested
 if [ $REMOVEBEF -eq 1 ] ; then
     nukelogs
 else
-    bogoutil --db-checkpoint="$BOGOHOME"
+    $BOGOUTIL --db-checkpoint="$BOGOHOME"
 fi
 
 # database first, then the logs.
@@ -61,8 +64,8 @@ fi
 (
   c="${BOGOHOME}/DB_CONFIG"
   if [ -f "$c" ] ; then echo "$c" ; fi
-  bogofilter -QQ -d "$BOGOHOME" | grep '^wordlist ' | cut -f3 -d,
-  bogoutil --db-list-logfiles="$BOGOHOME" all
+  $BOGOFILTER -QQ -d "$BOGOHOME" | grep '^wordlist ' | cut -f3 -d,
+  $BOGOUTIL --db-list-logfiles="$BOGOHOME" all
 ) | pax -w -v -x ustar
 
 # remove if requested
