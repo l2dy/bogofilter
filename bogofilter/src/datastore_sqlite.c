@@ -296,6 +296,9 @@ void *db_open(void *dummyenv, bfpath *bfp, dbmode_t mode)
 	goto barf;
     }
 
+    /* request extended result codes for improved error reporting */
+    (void)sqlite3_extended_result_codes(dbh->db, true);
+
     /* set trace mode */
     if (DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB"))
 	sqlite3_trace(dbh->db, db_trace, NULL);

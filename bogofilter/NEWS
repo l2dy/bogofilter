@@ -20,7 +20,8 @@
 	* Update sqlite3 adaptor to take advantage of sqlite3_prepare_v2()
 	  API function that appeared in SQLite 3.3.9. The new _v2 interface
 	  allows for more specific error messages when executing SQL
-	  statements.
+	  statements.  Also enable extended result codes for more precise error
+	  reporting.
 
 	2008-07-21
 
