@@ -47,7 +47,7 @@
                   <td>Debian testing ("lenny")</td>
                   <td>See <a href="http://packages.debian.org/testing/mail/bogofilter" target="_blank">packages.debian.org</a></td>
                   <td>
-                    <div align="center">BerkeleyDB, QDBM, SQLite</div>
+                    <div align="center">BerkeleyDB, QDBM, SQLite, TokyoCabinet</div>
                   </td>
                 </tr>
                 <tr>
