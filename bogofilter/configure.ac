@@ -468,6 +468,10 @@ case "x$WITH_DB_ENGINE" in
 	AC_LIB_LINKFLAGS([sqlite3])
 	LIBDB="$LIBSQLITE3"
 	WITH_DB_ENGINE="sqlite3"
+	saveLIBS="$LIBS"
+	LIBS="$LIBDB $LIBS"
+	AC_CHECK_FUNC([sqlite3_prepare_v2],,AC_DEFINE(sqlite3_prepare_v2,sqlite3_prepare,[Define to sqlite3_prepare if new interface missing (for sqlite < 3.3.9)]))
+	LIBS="$saveLIBS"
 	;;
     xtokyocabinet)
 	AC_DEFINE(ENABLE_TOKYOCABINET_DATASTORE,1, [Enable tokyocabinet datastore])

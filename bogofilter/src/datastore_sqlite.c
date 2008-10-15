@@ -155,7 +155,7 @@ static int sqlexec(sqlite3 *db, const char *cmd) {
 static sqlite3_stmt *sqlprep(dbh_t *dbh, const char *cmd, bool bailout /** exit on error? */) {
     const char *tail; /* dummy */
     sqlite3_stmt *ptr;
-    if (sqlite3_prepare(dbh->db, cmd, strlen(cmd), &ptr, &tail) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(dbh->db, cmd, strlen(cmd), &ptr, &tail) != SQLITE_OK) {
 	print_error(__FILE__, __LINE__, "cannot compile %s: %s\n", cmd, sqlite3_errmsg(dbh->db));
 	if (bailout)
 	    exit(EX_ERROR);
@@ -187,7 +187,7 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
     dbv_t key, val;
 
     /* sqlite3_exec doesn't allow us to retrieve BLOBs */
-    rc = sqlite3_prepare(db, cmd, strlen(cmd), &stmt, &tail);
+    rc = sqlite3_prepare_v2(db, cmd, strlen(cmd), &stmt, &tail);
     if (rc) {
 	print_error(__FILE__, __LINE__,
 		"Error preparing \"%s\": %s (#%d)\n",

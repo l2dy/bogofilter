@@ -15,11 +15,22 @@
 
 -------------------------------------------------------------------------------
 
+	2008-10-15
+
+	* Update sqlite3 adaptor to take advantage of sqlite3_prepare_v2()
+	  API function that appeared in SQLite 3.3.9. The new _v2 interface
+	  allows for more specific error messages when executing SQL
+	  statements.
+
+	2008-07-21
+
 	* Update doc/integrating-with-postfix: the script now suggests sendmail
 	  -G -i (where -G will be ignored by Postfix before 2.3) to tell
 	  Postfix it's a gateway submission, not an original injection; the
 	  filter pipe(8) magic for master.cf now suggests flags=Rq (was
 	  flags=R), as per Postfix's FILTER_README.
+
+	2008-07-09
 
 	* Drop support for systems that reverse setvbuf arguments. The last
 	  systems to do that are reported to be shipped in 1987 by the autoconf
