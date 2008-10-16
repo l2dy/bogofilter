@@ -17,6 +17,9 @@
 
 	2008-10-15
 
+	* bf_compact, bf_copy and bf_tar now support transformed program names
+	  (fixes Debian Bug#501947).
+
 	* Update sqlite3 adaptor to take advantage of sqlite3_prepare_v2()
 	  API function that appeared in SQLite 3.3.9. The new _v2 interface
 	  allows for more specific error messages when executing SQL
