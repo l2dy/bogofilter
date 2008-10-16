@@ -104,7 +104,8 @@ cd ${TMPDIR:=/var/tmp}
 
 dbdir=db-4.2.52
 dbpfx=/opt/db-4.2-lean
-sqdir=sqlite-3.5.6
+sqfil=sqlite-amalgamation-3.6.3.tar.gz
+sqdir=sqlite-3.6.3
 sqpfx=/opt/sqlite-3-lean
 
 ### download SleepyCat DB 4.2.52 and patches
@@ -130,7 +131,7 @@ else
     echo "$checklib already exists, not building Berkeley DB."
 fi
 
-### download SQLite 3.5.6
+### download SQLite 3.6.3
 # Info: the objdump test fixes up the effects of a bug
 # in an earlier version of this script, which built
 # a sqlite 3.2.8 version that required GLIBC_2.3.
@@ -146,7 +147,7 @@ if test ! -f $checklib || \
     bogofilter.org)
 	URL=ftp://ftp.bogofilter.org/pub/outgoing/tools/SQLite ;;
     esac
-    want $URL/sqlite-3.5.6.tar.gz 903c9e935c538af392364a9172a3d98d
+    want $URL/sqlite-amalgamation-3.6.3.tar.gz d6e2df754e2619c4b5a06c66ae20632c
     build_sqlite=1
 else
     echo "$checklib already exists, not building SQLite3."
@@ -184,7 +185,7 @@ fi
 # build SQLite 3
 if test $build_sqlite = 1 ; then
     rm -rf build-$sqdir $sqdir
-    gunzip -cd $sqdir.tar.gz | tar xf -
+    gunzip -cd $sqfil | tar xf -
     set -e
     echo "installing $sqdir"
     mkdir -p build-$sqdir

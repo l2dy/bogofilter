@@ -90,7 +90,7 @@ rpm:	dist
 	  echo >&2 "Please run the install-staticdblibs.sh script first." ; exit 1 ; fi
 	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(DBPFX)/include" LIBS=$(DBLIB) \
 		     $(RPMBUILD) $(DEF_STATIC) $(DEF_DB42)   $(SIGN) -tb $(distdir).tar.gz
-	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(SQPFX)/include" LIBS=$(SQLIB) \
+	BF_ZAP_LIBDB=zap CPPFLAGS="-D__NO_CTYPE -I$(SQPFX)/include" LIBS="$(SQLIB) -ldl" \
 		     $(RPMBUILD) $(DEF_STATIC) $(DEF_SQLITE) $(SIGN) -tb $(distdir).tar.gz
 	@echo
 	@echo "Now building the shared database library RPMs - this may fail"
@@ -99,7 +99,7 @@ rpm:	dist
 	@echo "been built are ready to go however."
 	@echo
 	@sleep 5
-	-                CPPFLAGS="-D__NO_CTYPE -I$(DBPFX)" LIBS=-ldb-4.2 \
+	-                CPPFLAGS="-D__NO_CTYPE -I$(DBPFX)" LIBS="-ldb-4.2 -pthread" \
 			$(RPMBUILD)              $(DEF_DB42)   $(SIGN) -tb $(distdir).tar.gz
 	-                CPPFLAGS="-D__NO_CTYPE -I$(SQPFX)"               \
 			$(RPMBUILD)              $(DEF_SQLITE) $(SIGN) -tb $(distdir).tar.gz
