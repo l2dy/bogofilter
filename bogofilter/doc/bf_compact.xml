@@ -25,7 +25,8 @@
 	    <replaceable>bogofilter_directory</replaceable> to
 	    <replaceable>bogofilter_directory</replaceable><filename>.old</filename>.</para>
 	<para>Note:  <command>bf_compact</command> cannot be used to process the
-	    current working directory, ".", because of directory renaming issues.</para>
+	    current working directory, ".", because that cannot be
+	    renamed.</para>
     <para>If no <replaceable>wordlist_file</replaceable> arguments are
 	given, then <command>bf_compact</command> will use the
 	configured set of wordlists, if the given
@@ -40,8 +41,6 @@
 	<para>This script will delete
 		<replaceable>bogofilter_directory</replaceable><filename>.old</filename>
 	and all of its contents!</para>
-	<para>This script is meant for use with Berkeley DB based
-	    <application>bogofilter</application> versions.</para>
 	<para>This script expects a SUSv2 compliant shell.  Solaris
 	    systems should have the <systemitem>SUNWxcu4</systemitem> package installed (when
 	    <application>bogofilter</application> is configured) so that

@@ -15,6 +15,12 @@
 
 -------------------------------------------------------------------------------
 
+	2008-10-20
+
+	* update bf_compact documentation by removing explicit Berkeley DB
+	  references, as it has been fixed to work with other database drivers
+	  in March 2008.
+
 	2008-10-15
 
 	* bf_compact, bf_copy and bf_tar now support transformed program names
