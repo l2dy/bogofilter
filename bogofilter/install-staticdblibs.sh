@@ -147,7 +147,7 @@ if test ! -f $checklib || \
     bogofilter.org)
 	URL=ftp://ftp.bogofilter.org/pub/outgoing/tools/SQLite ;;
     esac
-    want $URL/sqlite-amalgamation-3.6.3.tar.gz d6e2df754e2619c4b5a06c66ae20632c
+    want $URL/$sqfil d6e2df754e2619c4b5a06c66ae20632c
     build_sqlite=1
 else
     echo "$checklib already exists, not building SQLite3."
