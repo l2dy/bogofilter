@@ -104,6 +104,8 @@ cd ${TMPDIR:=/var/tmp}
 
 dbdir=db-4.2.52
 dbpfx=/opt/db-4.2-lean
+# DO NOT USE 3.6.4 to 3.6.6, there is a data corruption bug to be fixed
+# in 3.6.7. It was uncovered by internal SQLite tests.
 sqfil=sqlite-amalgamation-3.6.3.tar.gz
 sqdir=sqlite-3.6.3
 sqpfx=/opt/sqlite-3-lean
