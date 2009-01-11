@@ -48,11 +48,9 @@
                   <td>Debian unstable ("sid")</td>
                   <td>See <a href="http://packages.debian.org/unstable/mail/bogofilter" target="_blank">packages.debian.org</a></td>
                   <td> <div align="center">BerkeleyDB, QDBM, SQLite, TokyoCabinet</div> </td> </tr>
-		<tr><td colspan="3"><a
-		    href="http://www.fedora.org/"
-		    target="_blank"><strong>Fedora</strong></a></td></tr>
-                <tr> <td>Fedora 8</td> <td>1.1.6-1.fc8</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
-                <tr> <td>Fedora 9 (preview)</td> <td>1.1.6-2.fc9</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
+		<tr><td colspan="3"><a href="http://fedoraproject.org/" target="_blank"><strong>Fedora</strong></a></td></tr>
+                <tr><td>Fedora 10 (Cambridge)</td> <td>1.1.7</td> <td><div align="center">BerkeleyDB 4.7</div></td></tr>
+                <tr><td>Fedora 9 (Sulphur)</td>    <td>1.1.6</td> <td><div align="center">BerkeleyDB 4.6</div></td></tr>
 		<tr><td colspan="3"><a href="http://www.freebsd.org/"
 			    target="_blank"><strong>FreeBSD</strong></a>
 			| <a href="http://www.freebsd.org/security/#adv"
@@ -84,6 +82,10 @@
 		<tr><td>openSUSE 11.1</td> <td>1.1.1</td> <td><div align="center">BerkeleyDB 4.5</div></td></tr>
 		<tr><td>openSUSE 11.0</td> <td>1.1.1</td> <td><div align="center">BerkeleyDB 4.5</div></td></tr>
 		<tr><td>openSUSE 10.3</td> <td>1.1.1</td> <td><div align="center">BerkeleyDB 4.5</div></td></tr>
+		<tr><td colspan="3"><a href="http://www.ubuntu.com/" target="_blank"><strong>Ubuntu Linux</strong></a></td></tr>
+		<tr><td>Ubuntu 7.10 (Gutsy Gibbon)</td>    <td>1.1.5</td> <td><div align="center">BerkeleyDB 4.5, in universe: SQLite3</div></td></tr>
+		<tr><td>Ubuntu 8.04 LTS (Hardy Heron)</td> <td>1.1.5</td> <td><div align="center">BerkeleyDB 4.6, in universe: SQLite3</div></td></tr>
+		<tr><td>Ubuntu 8.10 (Intrepid Ibex)</td>   <td>1.1.7</td> <td><div align="center">BerkeleyDB 4.7, in universe: SQLite3</div></td></tr>
        </table>
               <p class="date">Last update: $Date$</p>
             </td>
