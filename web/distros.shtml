@@ -39,24 +39,15 @@
                 <tr>
                   <td>Debian stable ("etch")</td>
                   <td>See <a href="http://packages.debian.org/stable/mail/bogofilter" target="_blank">packages.debian.org</a></td>
-                  <td>
-                    <div align="center">BerkeleyDB, QDBM, SQLite</div>
-                  </td>
-                </tr>
+                  <td> <div align="center">BerkeleyDB, QDBM, SQLite</div> </td> </tr>
                 <tr>
                   <td>Debian testing ("lenny")</td>
                   <td>See <a href="http://packages.debian.org/testing/mail/bogofilter" target="_blank">packages.debian.org</a></td>
-                  <td>
-                    <div align="center">BerkeleyDB, QDBM, SQLite, TokyoCabinet</div>
-                  </td>
-                </tr>
+                  <td> <div align="center">BerkeleyDB, QDBM, SQLite, TokyoCabinet</div> </td> </tr>
                 <tr>
                   <td>Debian unstable ("sid")</td>
                   <td>See <a href="http://packages.debian.org/unstable/mail/bogofilter" target="_blank">packages.debian.org</a></td>
-                  <td>
-                    <div align="center">BerkeleyDB, QDBM, SQLite, TokyoCabinet</div>
-                  </td>
-                </tr>
+                  <td> <div align="center">BerkeleyDB, QDBM, SQLite, TokyoCabinet</div> </td> </tr>
 		<tr><td colspan="3"><a
 		    href="http://www.fedora.org/"
 		    target="_blank"><strong>Fedora</strong></a></td></tr>
@@ -66,12 +57,11 @@
 			    target="_blank"><strong>FreeBSD</strong></a>
 			| <a href="http://www.freebsd.org/security/#adv"
 			    target="_blank">FreeBSD support periods</a></td></tr>
-                <tr> <td>FreeBSD 5.5-RELEASE</td> <td>1.0.1</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 6.1-RELEASE</td> <td>1.0.1</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 6.2-RELEASE</td> <td>1.0.3</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 6.3-RELEASE</td> <td>1.1.5</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
+                <tr> <td>FreeBSD 7.1-RELEASE</td> <td>1.1.7</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 7.0-RELEASE</td> <td>1.1.5</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
-                 <tr> <td>FreeBSD ports</td> <td>See <a href="http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
+                <tr> <td>FreeBSD 6.4-RELEASE</td> <td>1.1.7</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
+                <tr> <td>FreeBSD 6.3-RELEASE</td> <td>1.1.5</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
+                <tr> <td>FreeBSD ports</td> <td>See <a href="http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td> <td> <div align="center">BerkeleyDB, QDBM, TokyoCabinet, SQLite3</div> </td> </tr>
 		<tr><td colspan="3"><a
 		    href="http://www.gentoo.org/"
 		    target="_blank"><strong>Gentoo</strong></a></td></tr>
@@ -83,22 +73,17 @@
                 <tr> <td>Cooker - Contrib</td> <td>1.1.4</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
 
 		<tr><td colspan="3"><a href="http://www.netbsd.org/" target="_blank"><strong>NetBSD</strong></a></td></tr>
-                <tr> <td>NetBSD 3.1</td> <td>1.0.3</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
                 <tr> <td>NetBSD 4.0</td> <td>1.0.3</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
+                <tr> <td>NetBSD 3.1</td> <td>1.0.3</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
                 <tr>
                   <td><a href="http://www.netbsd.org/Documentation/software/packages.html">NetBSD pkgsrc</a></td>
-		  <td><a href="ftp://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/mail/bogofilter/README.html">1.0.3</a></td>
-                  <td> <div align="center">BerkeleyDB, QDBM, SQLite</div> </td>
+		  <td><a href="ftp://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/mail/bogofilter/README.html">1.1.7</a></td>
+                  <td><div align="center">BerkeleyDB, QDBM, SQLite3</div> </td>
                 </tr>
-		<tr><td colspan="3"><a
-			    href="http://www.novell.com/linux/"
-			    target="_blank"><strong>SuSE
-				Linux</strong></a> and <a
-			    href="http://www.opensuse.org/"
-			    target="_blank"><strong>OpenSUSE.org</strong></a></td></tr>
-		<tr> <td>SUSE Linux 10.1 (OpenSUSE)</td> <td>1.0.1</td> <td><div align="center">BerkeleyDB 4.3</div></td> </tr>
-		<tr> <td>openSUSE 10.2</td> <td>1.1.1</td> <td><div align="center">BerkeleyDB 4.4</div></td> </tr>
-		<tr> <td>openSUSE 10.3</td> <td>1.1.1</td> <td><div align="center">BerkeleyDB 4.5</div></td> </tr>
+		<tr><td colspan="3"><a href="http://www.openSUSE.org/" target="_blank"><strong>openSUSE.org</strong></a></td></tr>
+		<tr><td>openSUSE 11.1</td> <td>1.1.1</td> <td><div align="center">BerkeleyDB 4.5</div></td></tr>
+		<tr><td>openSUSE 11.0</td> <td>1.1.1</td> <td><div align="center">BerkeleyDB 4.5</div></td></tr>
+		<tr><td>openSUSE 10.3</td> <td>1.1.1</td> <td><div align="center">BerkeleyDB 4.5</div></td></tr>
        </table>
               <p class="date">Last update: $Date$</p>
             </td>
