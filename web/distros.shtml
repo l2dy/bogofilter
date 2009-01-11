@@ -83,9 +83,9 @@
 		<tr><td>openSUSE 11.0</td> <td>1.1.1</td> <td><div align="center">BerkeleyDB 4.5</div></td></tr>
 		<tr><td>openSUSE 10.3</td> <td>1.1.1</td> <td><div align="center">BerkeleyDB 4.5</div></td></tr>
 		<tr><td colspan="3"><a href="http://www.ubuntu.com/" target="_blank"><strong>Ubuntu Linux</strong></a></td></tr>
-		<tr><td>Ubuntu 7.10 (Gutsy Gibbon)</td>    <td>1.1.5</td> <td><div align="center">BerkeleyDB 4.5, in universe: SQLite3</div></td></tr>
-		<tr><td>Ubuntu 8.04 LTS (Hardy Heron)</td> <td>1.1.5</td> <td><div align="center">BerkeleyDB 4.6, in universe: SQLite3</div></td></tr>
 		<tr><td>Ubuntu 8.10 (Intrepid Ibex)</td>   <td>1.1.7</td> <td><div align="center">BerkeleyDB 4.7, in universe: SQLite3</div></td></tr>
+		<tr><td>Ubuntu 8.04 LTS (Hardy Heron)</td> <td>1.1.5</td> <td><div align="center">BerkeleyDB 4.6, in universe: SQLite3</div></td></tr>
+		<tr><td>Ubuntu 7.10 (Gutsy Gibbon)</td>    <td>1.1.5</td> <td><div align="center">BerkeleyDB 4.5, in universe: SQLite3</div></td></tr>
        </table>
               <p class="date">Last update: $Date$</p>
             </td>
