@@ -24,8 +24,6 @@ if test "x$SF_USER" = x ; then
 	exit 1
 fi
 
-mkdir -p docstmp
-
 echo "==> CHECKING OUT WEB, FAQ AND NEWS"
 URL=http://bogofilter.svn.sourceforge.net/svnroot/bogofilter/trunk/
 CMDPFX="svn --non-interactive"
@@ -57,7 +55,6 @@ rsync -aiH \
 	--exclude .nfs* \
 	--exclude .svn \
 	--exclude README_BEFORE_EDITING \
-	--exclude docstmp \
 	--exclude updateweb \
 	--exclude '*~' --exclude '*.bak' \
 	--exclude '.*.swp' --exclude '#*#' \
