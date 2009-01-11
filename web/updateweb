@@ -48,7 +48,7 @@ fi
 
 echo "==> UPLOADING TO web.sourceforge.net:htdocs/"
 # copy without cruft and internal files
-rsync -aciH \
+rsync -acvH \
 	--chmod=ug=rwX,o=rX \
 	--delete \
 	--delete-excluded \
