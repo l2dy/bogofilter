@@ -63,14 +63,14 @@ static void convert(iconv_t xd, buff_t *src, buff_t *dst)
     bool done = false;
 
     while (!done) {
-	char *inbuf;
+	const char *inbuf;
 	size_t inbytesleft;
 
 	char *outbuf;
 	size_t outbytesleft;
 	size_t count;
 
-	inbuf = (char *)src->t.u.text + src->read;
+	inbuf = (const char *)src->t.u.text + src->read;
 	inbytesleft = src->t.leng - src->read;
 
 	outbuf = (char *)dst->t.u.text + dst->t.leng;
