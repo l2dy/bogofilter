@@ -4,7 +4,7 @@
 #                            the static libraries bogofilter links against,
 #                            to ease building of portable RPMs.
 
-# (C) Copyright 2005 - 2008  Matthias Andree <matthias.andree@gmx.de>
+# (C) Copyright 2005 - 2009  Matthias Andree <matthias.andree@gmx.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ set -e
 
 cat <<'_EOF'
 ---------------------------------------------------------------------
-install-staticdblibs.sh  Copyright (C) 2005,2006,2007 Matthias Andree
+install-staticdblibs.sh  Copyright (C) 2005 - 2009 Matthias Andree
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome to redistribute it under
 certain conditions.
@@ -104,10 +104,8 @@ cd ${TMPDIR:=/var/tmp}
 
 dbdir=db-4.2.52
 dbpfx=/opt/db-4.2-lean
-# DO NOT USE 3.6.4 to 3.6.6, there is a data corruption bug to be fixed
-# in 3.6.7. It was uncovered by internal SQLite tests.
-sqfil=sqlite-amalgamation-3.6.3.tar.gz
-sqdir=sqlite-3.6.3
+sqfil=sqlite-amalgamation-3.6.7.tar.gz
+sqdir=sqlite-3.6.7
 sqpfx=/opt/sqlite-3-lean
 
 ### download SleepyCat DB 4.2.52 and patches
@@ -133,7 +131,7 @@ else
     echo "$checklib already exists, not building Berkeley DB."
 fi
 
-### download SQLite 3.6.3
+### download SQLite 3.6.7
 # Info: the objdump test fixes up the effects of a bug
 # in an earlier version of this script, which built
 # a sqlite 3.2.8 version that required GLIBC_2.3.
@@ -149,7 +147,7 @@ if test ! -f $checklib || \
     bogofilter.org)
 	URL=ftp://ftp.bogofilter.org/pub/outgoing/tools/SQLite ;;
     esac
-    want $URL/$sqfil d6e2df754e2619c4b5a06c66ae20632c
+    want $URL/$sqfil a2f569b0b100e70e9e043e0158f11861
     build_sqlite=1
 else
     echo "$checklib already exists, not building SQLite3."
@@ -194,7 +192,7 @@ if test $build_sqlite = 1 ; then
     cd build-$sqdir
     env CFLAGS="-O2 -D__NO_CTYPE" ../$sqdir/configure \
 	--prefix=$sqpfx --silent \
-	--disable-shared --disable-tcl \
+	--disable-shared \
 	--disable-threadsafe
     make -s
     sudo make -s install
