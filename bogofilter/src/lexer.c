@@ -75,7 +75,7 @@ static void lexer_display_buffer(buff_t *buff)
 	    yylineno-1, msg_header ? 'h' : 'b', yy_get_state(),
 	    (long)(buff->t.leng - buff->read));
     buff_puts(buff, 0, dbgout);
-    if (buff->t.leng > 0 && buff->t.text[buff->t.leng-1] != '\n')
+    if (buff->t.leng > 0 && buff->t.u.text[buff->t.leng-1] != '\n')
 	fputc('\n', dbgout);
 }
 
@@ -105,7 +105,7 @@ static bool long_token(byte *buf, uint count)
 static int yy_get_new_line(buff_t *buff)
 {
     int count = (*reader_getline)(buff);
-    const byte *buf = buff->t.text;
+    const byte *buf = buff->t.u.text;
 
     static size_t hdrlen = 0;
     if (hdrlen==0)
@@ -142,7 +142,7 @@ static int yy_get_new_line(buff_t *buff)
 	   && count != EOF
 /* don't skip if inside message/rfc822 */
 	   && msg_state->parent == NULL
-	   && memcmp(buff->t.text,spam_header_name,hdrlen) == 0) {
+	   && memcmp(buff->t.u.text,spam_header_name,hdrlen) == 0) {
 	count = skip_folded_line(buff);
     }
 
@@ -171,9 +171,9 @@ static int get_decoded_line(buff_t *buff)
 	 * sufficiently small that the UTF-8 text can fit in the output
 	 * buffer */
 	if (tempbuff->size < buff->size / 6) {
-	    xfree(tempbuff->t.text);
+	    xfree(tempbuff->t.u.text);
 	    tempbuff->size = buff->size / 6;
-	    tempbuff->t.text = (byte *) xmalloc(tempbuff->size+D);
+	    tempbuff->t.u.text = (byte *) xmalloc(tempbuff->size+D);
 	}
 
 	tempbuff->t.leng = tempbuff->read = 0;
@@ -198,7 +198,7 @@ static int get_decoded_line(buff_t *buff)
      * than one of these. */
 
     if (passthrough && passmode == PASS_MEM && count > 0)
-	textblock_add(linebuff->t.text+linebuff->read, (size_t) count);
+	textblock_add(linebuff->t.u.text+linebuff->read, (size_t) count);
 
     if ( !msg_header && 
 	 !msg_state->mime_dont_decode &&
@@ -208,7 +208,7 @@ static int get_decoded_line(buff_t *buff)
 	uint decoded_count;
 
 	temp.leng = (uint) count;
-	temp.text = linebuff->t.text+linebuff->read;
+	temp.u.text = linebuff->t.u.text+linebuff->read;
 
 	decoded_count = mime_decode(&temp);
 	/*change buffer size only if the decoding worked */
@@ -243,7 +243,7 @@ static int get_decoded_line(buff_t *buff)
 
     /* CRLF -> NL */
     if (count >= 2) {
-	byte *buf = buff->t.text;
+	byte *buf = buff->t.u.text;
 	if (memcmp(buf + count - 2, CRLF, 2) == 0) {
 	    count --;
 	    *(buf + count - 1) = (byte) '\n';
@@ -251,7 +251,7 @@ static int get_decoded_line(buff_t *buff)
     }
 
     if (buff->t.leng < buff->size)     /* for easier debugging - removable */
-	Z(buff->t.text[buff->t.leng]);  /* for easier debugging - removable */
+	Z(buff->t.u.text[buff->t.leng]);  /* for easier debugging - removable */
 
     return count;
 }
@@ -265,11 +265,11 @@ static int skip_folded_line(buff_t *buff)
 	yylineno += 1;
 	/* only check for LWSP-char (RFC-822) aka. WSP (RFC-2822),
 	 * these only include SP and HTAB */
-	if (buff->t.text[0] != ' ' &&
-	    buff->t.text[0] != '\t')
+	if (buff->t.u.text[0] != ' ' &&
+	    buff->t.u.text[0] != '\t')
 	    return count;
 	/* Check for empty line which terminates message header */
-	if (is_eol((char *)buff->t.text, count))
+	if (is_eol((char *)buff->t.u.text, count))
 	    return count;
     }
 }
@@ -334,7 +334,7 @@ int yyinput(byte *buf, size_t used, size_t size)
 	    break;
 
 	if (count >= MAX_TOKEN_LEN * 2 && 
-	    long_token(buff.t.text, (uint) count)) {
+	    long_token(buff.t.u.text, (uint) count)) {
 	    uint start = buff.t.leng - count;
 	    uint length = count - max_token_len;
 	    buff_shift(&buff, start, length);
@@ -391,10 +391,10 @@ static char *charset_as_string(const byte *txt, const size_t len)
 word_t *text_decode(word_t *w)
 {
     word_t *r = w;
-    byte *const beg = w->text;		/* base pointer, fixed */
+    byte *const beg = w->u.text;		/* base pointer, fixed */
     byte *const fin = beg + w->leng;	/* end+1 position */
 
-    byte *txt = (byte *) memstr(w->text, w->leng, "=?");	/* input position */
+    byte *txt = (byte *) memstr(w->u.text, w->leng, "=?");	/* input position */
     uint size = (uint) (txt - beg);				/* output offset */
 
 #ifndef	DISABLE_UNICODE
@@ -414,12 +414,12 @@ word_t *text_decode(word_t *w)
 	buf->t.leng = 0;
 	if (buf->size < max) {
 	    buf->size = max;
-	    buf->t.text = (byte *) xrealloc(buf->t.text, buf->size+D);
+	    buf->t.u.text = (byte *) xrealloc(buf->t.u.text, buf->size+D);
 	}
 
 	buf->t.leng = size;
-	memcpy(buf->t.text, beg, size );
-	Z(buf->t.text[buf->t.leng]);		/* for easier debugging - removable */
+	memcpy(buf->t.u.text, beg, size );
+	Z(buf->t.u.text[buf->t.leng]);		/* for easier debugging - removable */
     }
 #endif
 
@@ -446,9 +446,9 @@ word_t *text_decode(word_t *w)
 	end = (byte *) memstr((char *)tmp, fin-tmp, "?=");	/* last byte of encoded word  */
 	len = end - tmp;
 
-	w->text = tmp;				/* Start of encoded word */
+	w->u.text = tmp;				/* Start of encoded word */
 	w->leng = len;				/* Length of encoded word */
-	Z(w->text[w->leng]);			/* for easier debugging - removable */
+	Z(w->u.text[w->leng]);			/* for easier debugging - removable */
 
 	if (DEBUG_LEXER(2)) {
 	    fputs("**2**  ", dbgout);
@@ -469,7 +469,7 @@ word_t *text_decode(word_t *w)
 
 	/* move decoded word to where the encoded used to be */
 	if (encoding == E_RAW) {
-	    memmove(beg+size, w->text, len);
+	    memmove(beg+size, w->u.text, len);
 	    size += len;			/* bump output pointer */
 	    Z(beg[size]);			/* for easier debugging - removable */
 
@@ -485,7 +485,7 @@ word_t *text_decode(word_t *w)
 	    /* convert 'word_t *w' to 'buff_t src' because
 	    ** iconvert_cd() needs buff_t pointers
 	    */
-	    src.t.text = w->text;
+	    src.t.u.text = w->u.text;
 	    src.t.leng = len;
 	    src.read   = 0;
 	    src.size   = len;
@@ -534,13 +534,13 @@ word_t *text_decode(word_t *w)
 		    beg[size++] = *txt++;
 #ifndef	DISABLE_UNICODE
 		if (encoding == E_UNICODE)
-		    buf->t.text[buf->t.leng++] = *txt++;
+		    buf->t.u.text[buf->t.leng++] = *txt++;
 #endif
 	    }
     }
 
     if (encoding == E_RAW) {
-	r->text = beg;
+	r->u.text = beg;
 	r->leng = size;
     }
 

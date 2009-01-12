@@ -21,7 +21,7 @@ typedef struct {
     union {
 	byte *text;	/** pointer to the string */
 	const char *ctext;
-    };
+    } u;
 } word_t;
 
 /** create a new word_t from the \a leng bytes at address \a text */
@@ -35,7 +35,7 @@ extern word_t  *word_news(const char *cstring);
 #define word_free(self) xfree((self))
 
 /** create a newly word_t to form a deep copy of \a self */
-#define word_dup(self)  word_new((self)->text, (self)->leng)
+#define word_dup(self)  word_new((self)->u.text, (self)->leng)
 
 /** compare \a w1 and \a w2 with memcmp() */
 extern int 	word_cmp(const word_t *w1, const word_t *w2);

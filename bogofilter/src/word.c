@@ -25,12 +25,12 @@ word_t *word_new(const byte *text, uint len)
     /* to lessen malloc/free calls, allocate struct and data in one block */
     word_t *self = xmalloc(sizeof(word_t)+len+1);
     self->leng = len;
-    self->text = (byte *)((char *)self+sizeof(word_t));
+    self->u.text = (byte *)((char *)self+sizeof(word_t));
     if (text != NULL) {
-	memcpy(self->text, text, len);
-	self->text[len] = '\0';			/* ensure nul termination */
+	memcpy(self->u.text, text, len);
+	self->u.text[len] = '\0';			/* ensure nul termination */
     } else {
-	self->text[0] = '\0';			/* ditto for text == NULL */
+	self->u.text[0] = '\0';			/* ditto for text == NULL */
     }
     return self;
 }
@@ -38,7 +38,7 @@ word_t *word_new(const byte *text, uint len)
 int word_cmp(const word_t *w1, const word_t *w2)
 {
     uint l = min(w1->leng, w2->leng);
-    int r = memcmp((const char *)w1->text, (const char *)w2->text, l);
+    int r = memcmp((const char *)w1->u.text, (const char *)w2->u.text, l);
     if (r) return r;
     if (w1->leng > w2->leng) return 1;
     if (w1->leng < w2->leng) return -1;
@@ -49,7 +49,7 @@ int word_cmps(const word_t *w, const char *s)
 {
     word_t w2;
     w2.leng = strlen(s);
-    w2.ctext = s;
+    w2.u.ctext = s;
     return word_cmp(w, &w2);
 }
 
@@ -57,9 +57,9 @@ word_t *word_concat(const word_t *w1, const word_t *w2)
 {
     uint len = w1->leng + w2->leng;
     word_t *ans = word_new(NULL, len);
-    memcpy(ans->text, w1->text, w1->leng);
-    memcpy(ans->text+w1->leng, w2->text, w2->leng);
-    Z(ans->text[ans->leng]);		/* for easier debugging - removable */
+    memcpy(ans->u.text, w1->u.text, w1->leng);
+    memcpy(ans->u.text+w1->leng, w2->u.text, w2->leng);
+    Z(ans->u.text[ans->leng]);		/* for easier debugging - removable */
     return ans;
 }
 
@@ -70,7 +70,7 @@ void word_puts(const word_t *word, uint width, FILE *fp)
     **		   blank fill if 'width' < length
     */
     uint l = (width == 0) ? word->leng : min(width, word->leng);
-    (void)fwrite(word->text, 1, l, fp);
+    (void)fwrite(word->u.text, 1, l, fp);
     if (l < width)
 	(void) fprintf(fp, "%*s", (int)(width - l), " ");
 }

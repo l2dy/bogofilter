@@ -53,7 +53,7 @@ static int ds_histogram_hook(/*@unused@*/ word_t *key, dsv_t *data,
     uint idx = min(fw * INTERVALS, INTERVALS-1);
 
     /* ignore meta-tokens */
-    if (*key->text == (byte) '.')
+    if (*key->u.text == (byte) '.')
 	return 0;
 
     hist->count[idx] += 1;

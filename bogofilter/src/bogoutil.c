@@ -86,10 +86,10 @@ static int ds_dump_hook(word_t *key, dsv_t *data,
 	return 0;
 
     if (replace_nonascii_characters)
-	do_replace_nonascii_characters(key->text, key->leng);
+	do_replace_nonascii_characters(key->u.text, key->leng);
 
     fprintf(fpo, "%.*s %lu %lu",
-	    CLAMP_INT_MAX(key->leng), key->text,
+	    CLAMP_INT_MAX(key->leng), key->u.text,
 	    (unsigned long)data->spamcount,
 	    (unsigned long)data->goodcount);
     if (data->date)
@@ -285,7 +285,7 @@ static int get_token(buff_t *buff, FILE *fp)
 {
     int rv = 0;
 
-    if (fgets((char *)buff->t.text, buff->size, fp) == NULL) {
+    if (fgets((char *)buff->t.u.text, buff->size, fp) == NULL) {
 	if (ferror(fp)) {
 	    perror(progname);
 	    rv = 2;
@@ -293,17 +293,17 @@ static int get_token(buff_t *buff, FILE *fp)
 	    rv = 1;
 	}
     } else {
-	buff->t.leng = (uint) strlen((const char *)buff->t.text);
-	if (buff->t.text[buff->t.leng - 1] == '\n' ) {
+	buff->t.leng = (uint) strlen((const char *)buff->t.u.text);
+	if (buff->t.u.text[buff->t.leng - 1] == '\n' ) {
 	    buff->t.leng -= 1;
-	    buff->t.text[buff->t.leng] = (byte) '\0';
+	    buff->t.u.text[buff->t.leng] = (byte) '\0';
 	}
 	else
 	{
 	    fprintf(stderr,
 		    "%s: Unexpected input [%s]. Does not end with newline "
 		    "or line too long.\n",
-		    progname, buff->t.text);
+		    progname, buff->t.u.text);
 	    rv = 1;
 	}
     }
@@ -384,11 +384,11 @@ static ex_t display_words(bfpath *bfp, int argc, char **argv, bool show_probabil
 		good_count = val.goodcount;
 
 		if (!show_probability)
-		    fprintf(fpo, data_format, token->text, spam_count, good_count);
+		    fprintf(fpo, data_format, token->u.text, spam_count, good_count);
 		else
 		{
 		    rob_prob = calc_prob(good_count, spam_count, msgcnts.goodcount, msgcnts.spamcount);
-		    fprintf(fpo, data_format, token->text, spam_count, good_count, rob_prob);
+		    fprintf(fpo, data_format, token->u.text, spam_count, good_count, rob_prob);
 		}
 		break;
 	    case 1:

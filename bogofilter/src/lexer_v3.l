@@ -117,7 +117,7 @@ void yy_set_state_initial(void);
 static word_t *yy_text(void)
 {
     static word_t yyt;
-    yyt.text = (byte *)yytext;
+    yyt.u.text = (byte *)yytext;
     yyt.leng = yyleng;
     return &yyt;
 }
@@ -225,7 +225,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 
 <INITIAL>{ENCODED_TOKEN}			{ word_t *raw = yy_text();
 						  word_t *txt = text_decode(raw);
-						  yy_unput(txt->text, txt->leng);
+						  yy_unput(txt->u.text, txt->leng);
 						}
 
 <INITIAL>^(To|CC|From|Return-Path|Subject|Received):	{ set_tag(yytext); }

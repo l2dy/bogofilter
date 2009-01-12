@@ -22,9 +22,9 @@ int main(void) {
     size = ftell(stdin);
     if (fseek(stdin, 0, SEEK_SET)) die();
     w = word_new(NULL, size);
-    if (fread(w->text, 1, w->leng, stdin) != w->leng) die();
+    if (fread(w->u.text, 1, w->leng, stdin) != w->leng) die();
     size = base64_decode(w);
-    if (fwrite(w->text, 1, size, stdout) != size) die();
+    if (fwrite(w->u.text, 1, size, stdout) != size) die();
     word_free(w);
     if (fflush(stdout)) die();
     if (fclose(stdout)) die();

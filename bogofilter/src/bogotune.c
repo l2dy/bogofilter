@@ -743,7 +743,7 @@ static void write_msgcount_file(wordhash_t *wh)
 	    }
 	}
 
-	print_msgcount_entry((char *)token->text, cnts->bad, cnts->good);
+	print_msgcount_entry((char *)token->u.text, cnts->bad, cnts->good);
     }
 
     return;

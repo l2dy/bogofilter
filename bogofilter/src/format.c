@@ -325,7 +325,7 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 		*buff++ = '%';
 		break;
 	    case 'A':		/* A - Message Address */
-		buff += format_string(buff, (*msg_addr->text != '\0') ? (const char *)msg_addr->text : "UNKNOWN", 0, prec, flags, end);
+		buff += format_string(buff, (*msg_addr->u.text != '\0') ? (const char *)msg_addr->u.text : "UNKNOWN", 0, prec, flags, end);
 		break;
 	    case 'c':		/* c - classification, e.g. Yes/No, Spam/Ham/Unsure, or YN, SHU, +-? */
 	    {
@@ -347,10 +347,10 @@ char *convert_format_to_string(char *buff, size_t size, const char *format)
 		break;
 	    }
 	    case 'I':		/* M - Message ID */
-		buff += format_string(buff, (*msg_id->text != '\0') ? (const char *)msg_id->text : "UNKNOWN", 0, prec, flags, end);
+		buff += format_string(buff, (*msg_id->u.text != '\0') ? (const char *)msg_id->u.text : "UNKNOWN", 0, prec, flags, end);
 		break;
 	    case 'Q':		/* Q - Queue ID */
-		buff += format_string(buff, (*queue_id->text != '\0') ? (const char *)queue_id->text : "UNKNOWN", 0, prec, flags, end);
+		buff += format_string(buff, (*queue_id->u.text != '\0') ? (const char *)queue_id->u.text : "UNKNOWN", 0, prec, flags, end);
 		break;
 	    case 'p':		/* p - spamicity as a probability */
 	    {

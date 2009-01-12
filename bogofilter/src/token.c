@@ -95,7 +95,7 @@ static void init_token_array(void)
 
     for (i = 0; i < multi_token_count; i += 1) {
 	words->leng = 0;
-	words->text = text;
+	words->u.text = text;
 	w_token_array[i] = words;
 	words += 1;
 	text += max_token_len+1+D;
@@ -112,13 +112,13 @@ static void free_token_array(void)
 static void token_set( word_t *token, byte *text, uint leng )
 {
     token->leng = leng;
-    memcpy(token->text, text, leng);		/* include nul terminator */
-    token->text[leng] = '\0';			/* ensure nul termination */
+    memcpy(token->u.text, text, leng);		/* include nul terminator */
+    token->u.text[leng] = '\0';			/* ensure nul termination */
 }
 
 static inline void token_copy( word_t *dst, word_t *src )
 {
-    token_set(dst, src->text, src->leng);
+    token_set(dst, src->u.text, src->leng);
 }
 
 static void build_prefixed_token( word_t *prefix, word_t *token,
@@ -130,12 +130,12 @@ static void build_prefixed_token( word_t *prefix, word_t *token,
 	len = temp_size - prefix->leng - 1;
 
     temp->leng = len;
-    memmove(temp->text+prefix->leng, token->text, len-prefix->leng);
-    memcpy(temp->text, prefix->text, prefix->leng);
-    Z(temp->text[temp->leng]);
+    memmove(temp->u.text+prefix->leng, token->u.text, len-prefix->leng);
+    memcpy(temp->u.text, prefix->u.text, prefix->leng);
+    Z(temp->u.text[temp->leng]);
 
     token->leng = temp->leng;
-    token->text = temp->text;
+    token->u.text = temp->u.text;
 }
 
 #define WRAP(n)	((n) % multi_token_count)
@@ -186,13 +186,13 @@ token_t parse_new_token(word_t *token)
     /* If saved IPADDR, truncate last octet */
     if ( block_on_subnets && save_class == IPADDR )
     {
-	byte *t = xmemrchr(ipsave->text, '.', ipsave->leng);
+	byte *t = xmemrchr(ipsave->u.text, '.', ipsave->leng);
 	if (t == NULL)
 	    save_class = NONE;
 	else
 	{
-	    ipsave->leng = (uint) (t - ipsave->text);
-	    token_set( token, ipsave->text, ipsave->leng);
+	    ipsave->leng = (uint) (t - ipsave->u.text);
+	    token_set( token, ipsave->u.text, ipsave->leng);
 	    cls = save_class;
 	    done = true;
 	}
@@ -205,11 +205,11 @@ token_t parse_new_token(word_t *token)
 	cls = (*lexer->yylex)();
 
 	token->leng = (uint)   *lexer->yyleng;
-	token->text = (byte *) *lexer->yytext;
-	Z(token->text[token->leng]);	/* for easier debugging - removable */
+	token->u.text = (byte *) *lexer->yytext;
+	Z(token->u.text[token->leng]);	/* for easier debugging - removable */
 
 	leng = token->leng;
-	text = token->text;
+	text = token->u.text;
 
 	if (DEBUG_TEXT(2)) {
 	    word_puts(token, 0, dbgout);
@@ -261,7 +261,7 @@ token_t parse_new_token(word_t *token)
 		    *ot = *in;
 		token->leng = leng = (uint) (ot - st);
 	    }
-	    Z(token->text[token->leng]);	/* for easier debugging - removable */
+	    Z(token->u.text[token->leng]);	/* for easier debugging - removable */
 	}
 	break;
 
@@ -287,7 +287,7 @@ token_t parse_new_token(word_t *token)
 	    if (leng > max_token_len)
 		continue;
 
-	    token->text = text;
+	    token->u.text = text;
 	    token->leng = leng;
 
 	    if (token_prefix == NULL) {
@@ -327,7 +327,7 @@ token_t parse_new_token(word_t *token)
 	case QUEUE_ID:
 	    /* special token;  saved for formatted output, but not returned to bogofilter */
 	    /** \bug: the parser MUST be aligned with lexer_v3.l! */
-	    if (*queue_id->text == '\0' &&
+	    if (*queue_id->u.text == '\0' &&
 		leng < max_token_len )
 	    {
 		while (isspace(text[0])) {
@@ -350,8 +350,8 @@ token_t parse_new_token(word_t *token)
 		    leng -= 1;
 		}
 		leng = min(queue_id->leng, leng);
-		memcpy( queue_id->text, text, leng );
-		Z(queue_id->text[leng]);
+		memcpy( queue_id->u.text, text, leng );
+		Z(queue_id->u.text[leng]);
 	    }
 	    continue;
 
@@ -365,12 +365,12 @@ token_t parse_new_token(word_t *token)
 	    /* if top level, no address, not localhost, .... */
 	    if (token_prefix == w_recv &&
 		msg_state->parent == NULL && 
-		*msg_addr->text == '\0' &&
+		*msg_addr->u.text == '\0' &&
 		strcmp((char *)text, "127.0.0.1") != 0)
 	    {
 		/* Not guaranteed to be the originating address of the message. */
-		memcpy( msg_addr->text, yylval.text, min(msg_addr->leng, yylval.leng)+D );
-		Z(msg_addr->text[yylval.leng]);
+		memcpy( msg_addr->u.text, yylval.u.text, min(msg_addr->leng, yylval.leng)+D );
+		Z(msg_addr->u.text[yylval.leng]);
 	    }
 	}
 
@@ -398,7 +398,7 @@ token_t parse_new_token(word_t *token)
 			    q1 & 0xff, q2 & 0xff, q3 & 0xff, q4 & 0xff);
 		leng = strlen((const char *)text);
 
-		token->text = text;
+		token->u.text = text;
 		token->leng = leng;
 
 		token_copy( ipsave, token );
@@ -408,7 +408,7 @@ token_t parse_new_token(word_t *token)
 		return (cls);
 	    }
 
-	    token->text = text;
+	    token->u.text = text;
 	    token->leng = leng;
 
 	    break;
@@ -448,20 +448,20 @@ token_t parse_new_token(word_t *token)
    if (!msg_count_file) {
 	/* Remove trailing blanks */
 	/* From "From ", for example */
-	while (token->leng > 1 && token->text[token->leng-1] == ' ') {
+	while (token->leng > 1 && token->u.text[token->leng-1] == ' ') {
 	    token->leng -= 1;
-	    token->text[token->leng] = (byte) '\0';
+	    token->u.text[token->leng] = (byte) '\0';
 	}
 
 	/* Remove trailing colon */
-	if (token->leng > 1 && token->text[token->leng-1] == ':') {
+	if (token->leng > 1 && token->u.text[token->leng-1] == ':') {
 	    token->leng -= 1;
-	    token->text[token->leng] = (byte) '\0';
+	    token->u.text[token->leng] = (byte) '\0';
 	}
 
 	if (replace_nonascii_characters) {
 	    /* replace nonascii characters by '?'s */
-	    for (cp = token->text; cp < token->text+token->leng; cp += 1)
+	    for (cp = token->u.text; cp < token->u.text+token->leng; cp += 1)
 		*cp = casefold_table[*cp];
 	}
     }
@@ -476,12 +476,12 @@ static void add_token_to_array(word_t *token)
     word_t *w = w_token_array[WRAP(tok_count)];
 
     w->leng = token->leng;
-    memcpy(w->text, token->text, w->leng);
-    Z(w->text[w->leng]);	/* for easier debugging - removable */
+    memcpy(w->u.text, token->u.text, w->leng);
+    Z(w->u.text[w->leng]);	/* for easier debugging - removable */
 
     if (DEBUG_MULTI(1))
 	fprintf(stderr, "%s:%d  %2s  %2d %2d %p %s\n", __FILE__, __LINE__,
-		"", tok_count, w->leng, w->text, w->text);
+		"", tok_count, w->leng, w->u.text, w->u.text);
 
     tok_count += 1;
     init_token = 1;
@@ -500,19 +500,19 @@ static void build_token_from_array(word_t *token)
     leng = init_token;
     for ( tok = init_token; tok >= 0; tok -= 1 ) {
 	uint idx = tok_count - 1 - tok;
-	leng += strlen((char *) w_token_array[WRAP(idx)]->text);
+	leng += strlen((char *) w_token_array[WRAP(idx)]->u.text);
     }
 
     if (leng > max_multi_token_len)
 	leng = max_multi_token_len;
 
     token->leng = leng;
-    token->text = dest = p_multi_buff;
+    token->u.text = dest = p_multi_buff;
 
     for ( tok = init_token; tok >= 0; tok -= 1 ) {
 	uint  idx = tok_count - 1 - tok;
 	uint  len = w_token_array[WRAP(idx)]->leng;
-	byte *str = w_token_array[WRAP(idx)]->text;
+	byte *str = w_token_array[WRAP(idx)]->u.text;
 
 	if (DEBUG_MULTI(1))
 	    fprintf(stderr, "%s:%d  %2d  %2d %2d %p %s\n", __FILE__, __LINE__,
@@ -529,7 +529,7 @@ static void build_token_from_array(word_t *token)
 	sep = "*";
     }
 
-    Z(token->text[token->leng]);	/* for easier debugging - removable */
+    Z(token->u.text[token->leng]);	/* for easier debugging - removable */
     init_token += 1;			/* progress to next multi-token */
 
     return;
@@ -564,7 +564,7 @@ void token_init(void)
 
 	yylval_text = (byte *) malloc( yylval_text_size+D );
 	yylval.leng   = 0;
-	yylval.text   = yylval_text;
+	yylval.u.text   = yylval_text;
 
 	/* First IP Address in Received: statement */
 	msg_addr = word_new( NULL, max_token_len );
@@ -694,8 +694,8 @@ void token_clear()
 {
     if (msg_addr != NULL)
     {
-	*msg_addr->text = '\0';
-	*msg_id->text   = '\0';
-	*queue_id->text = '\0';
+	*msg_addr->u.text = '\0';
+	*msg_id->u.text   = '\0';
+	*queue_id->u.text = '\0';
     }
 }

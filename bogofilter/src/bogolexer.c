@@ -323,10 +323,10 @@ int main(int argc, char **argv)
 	{
 	    count += 1;
 	    if (passthrough) {
-		fprintf(fpo, "%s\n", token.text);
+		fprintf(fpo, "%s\n", token.u.text);
 	    }
 	    else if (!quiet)
-		fprintf(fpo, "get_token: %d \"%s\"\n", (int)t, token.text);
+		fprintf(fpo, "get_token: %d \"%s\"\n", (int)t, token.u.text);
 	}
     }
 

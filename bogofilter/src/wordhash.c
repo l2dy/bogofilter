@@ -235,7 +235,7 @@ hash (const word_t *t)
     unsigned int h = 0;
     size_t l;
     for (l=0; l<t->leng; l++)
-	h = MULT * h + t->text[l];
+	h = MULT * h + t->u.text[l];
     return h % NHASH;
 }
 
@@ -243,7 +243,7 @@ static void display_node(hashnode_t *n, const char *str)
 {
     wordprop_t *p = (wordprop_t *)n->buf;
     if (verbose > 2)
-	printf( "%20.20s %5u %5u%s", n->key->text, p->cnts.bad, p->cnts.good, str);
+	printf( "%20.20s %5u %5u%s", n->key->u.text, p->cnts.bad, p->cnts.good, str);
 }
 
 /* this function accumulates the word frequencies from the src hash to
@@ -311,7 +311,7 @@ wordhash_search (const wordhash_t *wh, const word_t *t, unsigned int idx)
 
     for (hn = wh->bin[idx]; hn != NULL; hn = hn->next) {
 	word_t *key = hn->key;
-	if (key->leng == t->leng && memcmp (t->text, key->text, t->leng) == 0) {
+	if (key->leng == t->leng && memcmp (t->u.text, key->u.text, t->leng) == 0) {
 	    wordprop_t *p = (wordprop_t *)hn->buf;
 	    return p;
 	}

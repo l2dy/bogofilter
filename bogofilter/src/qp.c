@@ -46,8 +46,8 @@ static int hex_to_bin(byte c) {
 uint qp_decode(word_t *word, qp_mode mode)
 {
     uint size = word->leng;
-    byte *s = word->text;	/* src */
-    byte *d = word->text;	/* dst */
+    byte *s = word->u.text;	/* src */
+    byte *d = word->u.text;	/* dst */
     byte *e = s + size;		/* end */
 
     while (s < e)
@@ -77,7 +77,7 @@ uint qp_decode(word_t *word, qp_mode mode)
     }
     /* do not stuff NUL byte here:
      * if there was one, it has been copied! */
-    return d - word->text;
+    return d - word->u.text;
 }
 
 /* rfc2047 - QP    [!->@-~]+
@@ -115,7 +115,7 @@ bool qp_validate(const word_t *word, qp_mode mode)
     qp_init();
 
     for (i = 0; i < word->leng; i += 1) {
-	byte b = word->text[i];
+	byte b = word->u.text[i];
 	byte v = qp_xlate[b];
 	if (v == 0)
 	    switch (b) {

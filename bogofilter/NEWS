@@ -15,6 +15,12 @@
 
 -------------------------------------------------------------------------------
 
+	2009-01-11
+
+	* For compatibility with Sun's Sun Studio 12 compiler, provide
+          a name for the anonymous union in typedef word_t.
+	  Patch provided by Jack Bailey.
+
 	2008-10-20
 
 	* update bf_compact documentation by removing explicit Berkeley DB

@@ -117,10 +117,10 @@ bool discard_token(word_t *token, dsv_t *in_val)
 {
     bool discard;
 
-    if (token->text[0] == '.') {	/* keep .MSG_COUNT and .ROBX */
-	if (strcmp((const char *)token->text, MSG_COUNT) == 0)
+    if (token->u.text[0] == '.') {	/* keep .MSG_COUNT and .ROBX */
+	if (strcmp((const char *)token->u.text, MSG_COUNT) == 0)
 	    return false;
-	if (strcmp((const char *)token->text, ROBX_W) == 0)
+	if (strcmp((const char *)token->u.text, ROBX_W) == 0)
 	    return false;
     }
 
@@ -167,31 +167,31 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
     void *vhandle = ((struct userdata_t *) userdata)->vhandle;
     ta_t *transaction = ((struct userdata_t *) userdata)->transaction;
 
-    token.text = w_key->text;
+    token.u.text = w_key->u.text;
     token.leng = w_key->leng;
 
     len = strlen(MSG_COUNT);
     if (len == token.leng && 
-	    strncmp((char *)token.text, MSG_COUNT, token.leng) == 0)
+	    strncmp((char *)token.u.text, MSG_COUNT, token.leng) == 0)
 	return EX_OK;
 
     if (discard_token(&token, in_val)) {
 	int ret = ta_delete(transaction, vhandle, &token);
 	if (DEBUG_DATABASE(0))
-	    fprintf(dbgout, "deleting '%.*s'\n", (int)min(INT_MAX, token.leng), (char *)token.text);
+	    fprintf(dbgout, "deleting '%.*s'\n", (int)min(INT_MAX, token.leng), (char *)token.u.text);
 	return ret;
     }
 
     if (replace_nonascii_characters)
     {
 	word_t new_token;
-	new_token.text = (byte *)xmalloc(token.leng + 1);
-	memcpy(new_token.text, token.text, token.leng);
+	new_token.u.text = (byte *)xmalloc(token.leng + 1);
+	memcpy(new_token.u.text, token.u.text, token.leng);
 	new_token.leng = token.leng;
-	new_token.text[new_token.leng] = '\0';
-	if (do_replace_nonascii_characters(new_token.text, new_token.leng))
+	new_token.u.text[new_token.leng] = '\0';
+	if (do_replace_nonascii_characters(new_token.u.text, new_token.leng))
 	    merge_tokens(&token, &new_token, in_val, transaction, vhandle);
-	xfree(new_token.text);
+	xfree(new_token.u.text);
     }
 
 #ifndef	DISABLE_UNICODE
@@ -202,18 +202,18 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 
 	old_buff.read = 0;
 	old_buff.size = token.leng;
-	old_buff.t.text = token.text;
+	old_buff.t.u.text = token.u.text;
 	old_buff.t.leng = token.leng;
 
 	new_buff.read = 0;
 	new_buff.size = token.leng * 6;
 	new_buff.t.leng = 0;
-	new_buff.t.text = (byte *)xmalloc(new_buff.size);
+	new_buff.t.u.text = (byte *)xmalloc(new_buff.size);
 
 	iconvert(&old_buff, &new_buff);
 
 	if (old_buff.t.leng != new_buff.t.leng ||
-	    memcmp(old_buff.t.text, new_buff.t.text, new_buff.t.leng) != 0) {
+	    memcmp(old_buff.t.u.text, new_buff.t.u.text, new_buff.t.leng) != 0) {
 	    if (DEBUG_ICONV(2)) {
 		fputs("***  ", dbgout); word_puts(&old_buff.t, 0, dbgout); fputs( "\n", dbgout);
 		fputs("***  ", dbgout); word_puts(&new_buff.t, 0, dbgout); fputs( "\n", dbgout);
@@ -222,7 +222,7 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 	    merge_tokens(&old_buff.t, &new_buff.t, in_val, transaction, vhandle);
 	}
 
-	xfree(new_buff.t.text);
+	xfree(new_buff.t.u.text);
     }
 #endif
 
@@ -244,16 +244,16 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 		    const char  *ip_hdr  = "ip:";
 		    size_t       ip_len  = strlen(ip_hdr);
 
-		    if (token.leng > url_len && memcmp(token.text, url_hdr, url_len) == 0)
+		    if (token.leng > url_len && memcmp(token.u.text, url_hdr, url_len) == 0)
 		    {
 			word_t new_token;
 			new_token.leng = token.leng + ip_len -  url_len;
-			new_token.text = (byte *)xmalloc(new_token.leng + 1);
-			memcpy(new_token.text, ip_hdr, ip_len);
-			memcpy(new_token.text+ip_len, token.text+url_len, token.leng - url_len);
-			new_token.text[new_token.leng] = '\0';
+			new_token.u.text = (byte *)xmalloc(new_token.leng + 1);
+			memcpy(new_token.u.text, ip_hdr, ip_len);
+			memcpy(new_token.u.text+ip_len, token.u.text+url_len, token.leng - url_len);
+			new_token.u.text[new_token.leng] = '\0';
 			replace_token(&token, &new_token, in_val, transaction, vhandle);
-			xfree(new_token.text);
+			xfree(new_token.u.text);
 		    }
 		    break;
 		}
@@ -323,14 +323,14 @@ static ex_t maintain_wordlist(void *database)
 	dsv_t val;
 	word_t enco;
 
-	enco.text = (byte *)xstrdup(WORDLIST_ENCODING);
+	enco.u.text = (byte *)xstrdup(WORDLIST_ENCODING);
 	enco.leng = strlen(WORDLIST_ENCODING);
 	val.count[0] = new_encoding;
 	val.count[1] = 0;
 	val.date     = 0;
 
 	ds_write(database, &enco, &val);
-	xfree(enco.text);
+	xfree(enco.u.text);
     }
 #endif
 

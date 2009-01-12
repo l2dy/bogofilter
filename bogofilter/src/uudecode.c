@@ -18,7 +18,7 @@ uint uudecode(word_t *word)
 {
     uint size = word->leng;
     uint count = 0;
-    byte *b = word->text;		/* beg */
+    byte *b = word->u.text;		/* beg */
     byte *s = b;			/* src */
     byte *d = b;			/* dst */
     byte *e = b+size;			/* end */

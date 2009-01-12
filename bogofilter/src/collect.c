@@ -52,12 +52,12 @@ void collect_words(wordhash_t *wh)
 
 	if (cls == BOGO_LEX_LINE)
 	{
-	    char *beg = (char *)token.text+1;	/* skip leading quote mark */
+	    char *beg = (char *)token.u.text+1;	/* skip leading quote mark */
 	    char *end = strchr(beg, '"');
 	    assert(end);
 	    token.leng = end - beg;
-	    memmove(token.text, token.text + 1, token.leng + 1);
-	    token.text[token.leng] = '\0';	/* ensure nul termination */
+	    memmove(token.u.text, token.u.text + 1, token.leng + 1);
+	    token.u.text[token.leng] = '\0';	/* ensure nul termination */
 	}
 
 	wp = wordhash_insert(wh, &token, sizeof(wordprop_t), &wordprop_init);
@@ -96,7 +96,7 @@ void collect_words(wordhash_t *wh)
 
 	if (cls == BOGO_LEX_LINE)
 	{
-	    char *s = (char *)token.text;
+	    char *s = (char *)token.u.text;
 	    s += token.leng + 2;
 	    wp->cnts.bad = atoi(s);
 	    s = strchr(s+1, ' ') + 1;

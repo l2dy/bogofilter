@@ -26,8 +26,8 @@ uint base64_decode(word_t *word)
 {
     uint count = 0;
     uint size = word->leng;
-    byte *s = word->text;		/* src */
-    byte *d = word->text;		/* dst */
+    byte *s = word->u.text;		/* src */
+    byte *d = word->u.text;		/* dst */
 
     if (!base64_validate(word))
 	return size;
@@ -96,7 +96,7 @@ bool base64_validate(const word_t *word)
     base64_init();
 
     for (i = 0; i < word->leng; i += 1) {
-	byte b = word->text[i];
+	byte b = word->u.text[i];
 	byte v = base64_xlate[b];
 	if (v == 0 && b != 'A' && b != '\n' && b != '\r')
 	    return false;

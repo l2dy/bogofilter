@@ -54,7 +54,7 @@ static void iconv_print_error(int err, buff_t *src)
 	}
 	if (msg != NULL)
 	    fprintf(dbgout, "err: %s (%d), tx: %p, rd: %d, ln: %d, sz: %d\n",
-		    msg, err, src->t.text, src->read, src->t.leng, src->size);
+		    msg, err, src->t.u.text, src->read, src->t.leng, src->size);
     }
 }
 
@@ -70,10 +70,10 @@ static void convert(iconv_t xd, buff_t *src, buff_t *dst)
 	size_t outbytesleft;
 	size_t count;
 
-	inbuf = (char *)src->t.text + src->read;
+	inbuf = (char *)src->t.u.text + src->read;
 	inbytesleft = src->t.leng - src->read;
 
-	outbuf = (char *)dst->t.text + dst->t.leng;
+	outbuf = (char *)dst->t.u.text + dst->t.leng;
 	outbytesleft = dst->size - dst->read - dst->t.leng;
 
 	if (outbytesleft == 0)
@@ -169,19 +169,19 @@ static void convert(iconv_t xd, buff_t *src, buff_t *dst)
 	    done = true;
     }
 
-    Z(dst->t.text[dst->t.leng]);	/* for easier debugging - removable */
+    Z(dst->t.u.text[dst->t.leng]);	/* for easier debugging - removable */
 
     if (DEBUG_ICONV(1) &&
 	src->t.leng != src->read)
 	fprintf(dbgout, "tx: %p, rd: %d, ln: %d, sz: %d\n",
-		src->t.text, src->read, src->t.leng, src->size);
+		src->t.u.text, src->read, src->t.leng, src->size);
 }
 
 static void copy(buff_t *src, buff_t *dst)
 {
     /* if conversion not available, use memcpy */
     dst->t.leng = min(dst->size, src->t.leng);
-    memcpy(dst->t.text, src->t.text, dst->t.leng+D);
+    memcpy(dst->t.u.text, src->t.u.text, dst->t.leng+D);
 }
 
 void iconvert(buff_t *src, buff_t *dst)

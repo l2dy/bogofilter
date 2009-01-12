@@ -437,7 +437,7 @@ static bool dir_next_mail(void)
 static int mailbox_getline(buff_t *buff)
 {
     uint used = buff->t.leng;
-    byte *buf = buff->t.text + used;
+    byte *buf = buff->t.u.text + used;
     int count;
     static word_t *saved = NULL;
     static bool emptyline = false;		/* for mailbox /^From / match */
@@ -472,7 +472,7 @@ static int mailbox_getline(buff_t *buff)
     }
     else {
 	if (buff->t.leng < buff->size)		/* for easier debugging - removable */
-	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
+	    Z(buff->t.u.text[buff->t.leng]);	/* for easier debugging - removable */
     }
 
     emptyline = is_eol((char *)buf, count);
@@ -485,7 +485,7 @@ static int rmail_getline(buff_t *buff)
 {
     int count;
     uint used = buff->t.leng;
-    byte *buf = buff->t.text + used;
+    byte *buf = buff->t.u.text + used;
     static word_t *saved = NULL;
     static unsigned long bytesleft = 0;
 
@@ -525,7 +525,7 @@ static int rmail_getline(buff_t *buff)
 	}
     } else {
 	if (buff->t.leng < buff->size)		/* for easier debugging - removable */
-	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
+	    Z(buff->t.u.text[buff->t.leng]);	/* for easier debugging - removable */
     }
 
     return count;
@@ -536,7 +536,7 @@ static int ant_getline(buff_t *buff)
 {
     int count;
     uint used = buff->t.leng;
-    byte *buf = buff->t.text + used;
+    byte *buf = buff->t.u.text + used;
     static word_t *saved = NULL;
     static bool dot_found = true;
 
@@ -568,7 +568,7 @@ static int ant_getline(buff_t *buff)
 	    (buf[1] == '\r' || buf[1] == '\n'))
             dot_found = true;			/* dot found.  look for separator */
 	if (buff->t.leng < buff->size)		/* for easier debugging - removable */
-	    Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
+	    Z(buff->t.u.text[buff->t.leng]);	/* for easier debugging - removable */
     }
 
     return count;
@@ -580,7 +580,7 @@ static int simple_getline(buff_t *buff)
     int count = buff_fgetsl(buff, fpin);
 
     if (buff->t.leng < buff->size)	/* for easier debugging - removable */
-	Z(buff->t.text[buff->t.leng]);	/* for easier debugging - removable */
+	Z(buff->t.u.text[buff->t.leng]);/* for easier debugging - removable */
 
     return count;
 }

@@ -203,7 +203,7 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
     struct_init(ex_key);
     struct_init(ex_data);
 
-    ex_key.data = word->text;
+    ex_key.data = word->u.text;
     ex_key.leng = word->leng;
 
     memset(val, 0, sizeof(*val));
@@ -224,7 +224,7 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 
 	if (DEBUG_DATABASE(3)) {
 	    fprintf(dbgout, "ds_read: [%.*s] -- %lu,%lu\n",
-		    CLAMP_INT_MAX(word->leng), (const char *)word->text,
+		    CLAMP_INT_MAX(word->leng), (const char *)word->u.text,
 		    (unsigned long)val->spamcount,
 		    (unsigned long)val->goodcount);
 	}
@@ -233,21 +233,21 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
     case DS_NOTFOUND:
 	if (DEBUG_DATABASE(3)) {
 	    fprintf(dbgout, "ds_read: [%.*s] not found\n", 
-		    CLAMP_INT_MAX(word->leng), (char *) word->text);
+		    CLAMP_INT_MAX(word->leng), (char *) word->u.text);
 	}
 	return 1;
 
     case DS_ABORT_RETRY:
 	if (DEBUG_DATABASE(1)) {
 	    print_error(__FILE__, __LINE__, "ds_read('%.*s') was aborted to recover from a deadlock.",
-		    CLAMP_INT_MAX(word->leng), (char *) word->text);
+		    CLAMP_INT_MAX(word->leng), (char *) word->u.text);
 	}
 	break;
 
     default:
 	fprintf(dbgout, "ret=%d, DS_NOTFOUND=%d\n", ret, DS_NOTFOUND);
 	print_error(__FILE__, __LINE__, "ds_read( '%.*s' ), err: %d, %s", 
-		    CLAMP_INT_MAX(word->leng), (char *) word->text, ret, db_str_err(ret));
+		    CLAMP_INT_MAX(word->leng), (char *) word->u.text, ret, db_str_err(ret));
 	exit(EX_ERROR);
     }
 
@@ -265,7 +265,7 @@ int ds_write(void *vhandle, const word_t *word, dsv_t *val)
     struct_init(ex_key);
     struct_init(ex_data);
 
-    ex_key.data = word->text;
+    ex_key.data = word->u.text;
     ex_key.leng = word->leng;
 
     ex_data.data = cv;
@@ -280,7 +280,7 @@ int ds_write(void *vhandle, const word_t *word, dsv_t *val)
 
     if (DEBUG_DATABASE(3)) {
 	fprintf(dbgout, "ds_write: [%.*s] -- %lu,%lu,%lu\n",
-		CLAMP_INT_MAX(word->leng), (const char *)word->text,
+		CLAMP_INT_MAX(word->leng), (const char *)word->u.text,
 		(unsigned long)val->spamcount,
 		(unsigned long)val->goodcount,
 		(unsigned long)val->date);
@@ -296,7 +296,7 @@ int ds_delete(void *vhandle, const word_t *word)
     dbv_t ex_key;
 
     struct_init(ex_key);
-    ex_key.data = word->text;
+    ex_key.data = word->u.text;
     ex_key.leng = word->leng;
 
     ret = db_delete(dsh->dbh, &ex_key);
@@ -344,7 +344,7 @@ static ex_t ds_hook(dbv_t *ex_key,
     ds_userdata_t *ds_data = userdata;
     dsh_t *dsh = ds_data->dsh;
 
-    w_key.text = ex_key->data;
+    w_key.u.text = ex_key->data;
     w_key.leng = ex_key->leng;
 
     memset(&in_data, 0, sizeof(in_data));

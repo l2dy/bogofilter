@@ -288,7 +288,7 @@ static bool get_boundary_props(const word_t * boundary, /**< input line */
 	boundary_t * b /*@out@*/ /**< output properties, must be pre-allocated by caller */)
 {
     mime_t *ptr;
-    const byte *buf = boundary->text;
+    const byte *buf = boundary->u.text;
     size_t blen = boundary->leng;
 
     b->is_valid = false;
@@ -350,7 +350,7 @@ bool got_mime_boundary(word_t * boundary)
     if (DEBUG_MIME(0))
 	fprintf(dbgout,
 		"*** got_mime_boundary:  stackp: %d, boundary: '%s'\n",
-		mime_stack_top->depth, boundary->text);
+		mime_stack_top->depth, boundary->u.text);
 
     if (msg_state != NULL)
     {
@@ -420,7 +420,7 @@ static byte *getword(
 
 void mime_content(word_t * text)
 {
-    char *key = (char *) text->text;
+    char *key = (char *) text->u.text;
     switch (tolower(key[9])) {
     case 'r':			/*  Content-Transfer-Encoding: */
 	mime_encoding(text);
@@ -438,7 +438,7 @@ static void mime_disposition(word_t * text)
 {
     size_t i;
     const size_t l = sizeof("Content-Disposition:") - 1;
-    byte *w = getword(text->text + l, text->text + text->leng);
+    byte *w = getword(text->u.text + l, text->u.text + text->leng);
 
     if (!w)
 	return;
@@ -449,7 +449,7 @@ static void mime_disposition(word_t * text)
 	if (strcasecmp((const char *)w, dis->name) == 0) {
 	    msg_state->mime_disposition = dis->disposition;
 	    if (DEBUG_MIME(1))
-		fprintf(dbgout, "*** mime_disposition: %s\n", text->text);
+		fprintf(dbgout, "*** mime_disposition: %s\n", text->u.text);
 	    break;
 	}
     }
@@ -479,7 +479,7 @@ static void mime_encoding(word_t * text)
 {
     size_t i;
     const size_t l =  sizeof("Content-Transfer-Encoding:") - 1;
-    byte *w = getword(text->text + l, text->text + text->leng);
+    byte *w = getword(text->u.text + l, text->u.text + text->leng);
 
     if (!w)
 	return;
@@ -490,7 +490,7 @@ static void mime_encoding(word_t * text)
 	if (strcasecmp((const char *)w, enc->name) == 0) {
 	    msg_state->mime_encoding = enc->encoding;
 	    if (DEBUG_MIME(1))
-		fprintf(dbgout, "*** mime_encoding: %s\n", text->text);
+		fprintf(dbgout, "*** mime_encoding: %s\n", text->u.text);
 	    break;
 	}
     }
@@ -508,7 +508,7 @@ static void mime_type(word_t * text)
 {
     const struct type_s *typ;
     const size_t l = sizeof("Content-Type:") - 1;
-    byte *w = getword(text->text + l, text->text + text->leng);
+    byte *w = getword(text->u.text + l, text->u.text + text->leng);
 
     if (!w)
 	return;
@@ -519,7 +519,7 @@ static void mime_type(word_t * text)
 	if (strncasecmp((const char *)w, typ->name, strlen(typ->name)) == 0) {
 	    msg_state->mime_type = typ->type;
 	    if (DEBUG_MIME(1) || DEBUG_LEXER(1))
-		fprintf(dbgout, "*** mime_type: %s\n", text->text);
+		fprintf(dbgout, "*** mime_type: %s\n", text->u.text);
 	    break;
 	}
     }
@@ -545,7 +545,7 @@ static void mime_type(word_t * text)
 
 void mime_boundary_set(word_t * text)
 {
-    byte *boundary = text->text;
+    byte *boundary = text->u.text;
     size_t blen = text->leng;
 
     if (DEBUG_MIME(1)) {
@@ -582,7 +582,7 @@ uint mime_decode(word_t * text)
     if (DEBUG_MIME(3))
 	fprintf(dbgout, "*** mime_decode %lu \"%-.*s\"\n",
 		(unsigned long) count,
-		count > INT_MAX ? INT_MAX : (int) (count - 1), text->text);
+		count > INT_MAX ? INT_MAX : (int) (count - 1), text->u.text);
 
     /* Do not decode "real" boundary lines */
     if (mime_is_boundary(text) == true)

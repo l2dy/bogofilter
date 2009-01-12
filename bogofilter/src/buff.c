@@ -21,7 +21,7 @@
 /* Function Definitions */
 buff_t *buff_init(buff_t *self, byte *buff, uint used, uint size)
 {
-    self->t.text = buff;
+    self->t.u.text = buff;
     self->t.leng = used;
     self->read = 0;
     self->size = size;
@@ -43,7 +43,7 @@ void buff_free(buff_t *self)
 int buff_fgetsln(buff_t *self, FILE *in, uint maxlen)
 {
     uint readpos = self->t.leng;
-    int readcnt = xfgetsl((char *)self->t.text + readpos,
+    int readcnt = xfgetsl((char *)self->t.u.text + readpos,
 	    min(self->size - readpos, maxlen), in, true);
     /* WARNING: do not add NUL termination, the size must be exact! */
     self->read = readpos;
@@ -58,13 +58,13 @@ int buff_add(buff_t *self, word_t *in)
     int readcnt = in->leng;
     uint new_size = self->t.leng + in->leng;
     if (new_size > self->size) {
-	self->t.text = xrealloc(self->t.text, new_size);
+	self->t.u.text = xrealloc(self->t.u.text, new_size);
 	self->size = new_size;
     }
     self->read = readpos;
     self->t.leng += readcnt;
-    memcpy(self->t.text + readpos, in->text, readcnt);
-    Z(self->t.text[self->t.leng]);		/* for easier debugging - removable */
+    memcpy(self->t.u.text + readpos, in->u.text, readcnt);
+    Z(self->t.u.text[self->t.leng]);		/* for easier debugging - removable */
 
     return readcnt;
 }
@@ -73,7 +73,7 @@ void buff_puts(const buff_t *self, uint width, FILE *fp)
 {
     word_t word;
     word.leng = self->t.leng - self->read;
-    word.text = self->t.text + self->read;
+    word.u.text = self->t.u.text + self->read;
     word_puts(&word, width, fp);
 }
 
@@ -85,8 +85,8 @@ void buff_shift(buff_t *self, uint start, uint length)
     BOGO_ASSERT(start + length <= self->t.leng,
 		"Invalid buff_shift() parameters.");
 
-    memmove(self->t.text + start, self->t.text + start + length, self->t.leng - length);
+    memmove(self->t.u.text + start, self->t.u.text + start + length, self->t.leng - length);
     self->t.leng -= length;
-    Z(self->t.text[self->t.leng]);		/* for easier debugging - removable */
+    Z(self->t.u.text[self->t.leng]);		/* for easier debugging - removable */
     return;
 }
