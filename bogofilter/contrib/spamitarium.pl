@@ -4,11 +4,11 @@ use strict;
 
 =head1 NAME
 
-Spamitarium - where the spam's head gets fixed...
+Spamitarium - evaluates and repairs the sanity of email headers...
 
 =cut
 
-my $version = "0.2.1";
+my $version = "0.3.0";
 
 ################################################
 ############### Copyleft Notice ################
@@ -50,22 +50,21 @@ B<spamitarium> [I<options>] [I<permitted_headers>] < [I<rfc822_email>]
 
 =head2 Procmail usage (recommended):
 
-Add to ~/.procmailrc the following recipe, where I<$HOME> 
-is your home directory, if not set in the environment:
+Add to your .procmailrc the following recipe:
 
   :0
   {
-	:0 fhw
-	| $HOME/.bogofilter/spamitarium -sread
+        :0 fhw
+        | spamitarium -sreadx
   
-	# filter through bogofilter, tagging as spam 
+        # filter through bogofilter, tagging as spam 
 	# or not and updating the word lists
-	:0 fw
-	| bogofilter -uep
+        :0 fw
+        | bogofilter -uep
 
-	# add back the "From" header for proper delivery
-	:0 fhw
-	| formail -I "From " -a "From "
+        # add back the "From" header for proper delivery
+        :0 fhw
+        | formail -I "From " -a "From "
   }
 
 =head2 Command line options:
@@ -102,6 +101,13 @@ force rDNS lookups even when provided already by the MTA
 
 perform ASN lookups and include in received lines
 
+=item B<x>
+
+include custom x-headers for additional header validations:
+
+- validate that the date header is within close proxmity to the 
+received date (see $date_limit global variable to configure)
+
 =item B<w>
 
 parse and display the body of the email in addition to the headers
@@ -123,7 +129,7 @@ the end of your command line.  For example, if you wanted the
 I<list-id> and I<encrypted> fields passed through, you would change
 your procmail recipe as follows:
 
-  | $HOME/.bogofilter/spamitarium -sread list-id,encrypted
+  | spamitarium -sreadx list-id,encrypted
 
 
 =head1 REQUIRES
@@ -133,6 +139,7 @@ your procmail recipe as follows:
 =item *
 
 Perl 5.6.1
+Net::DNS::Resolver
 
 =back
 
@@ -165,12 +172,19 @@ is therefore desireable to remove these elements, specifically
 X-headers, prior to filtering.  Spamitarium removes all invisible,
 non-functional header lines.
 
-Finally, spamitarium looks up any IP addresses or rDNS addresses
+Spamitarium also looks up any IP addresses or rDNS addresses
 which are not provided in order to provide the maximum tokens on
 which to filter.  Moreover, it looks up the ASN (autonomous system
 number) associated with each "from" address in order to provide
 a small set of tokens representing the various major subnets of the
 internet.
+
+Finally, Spamitarium assesses the headers for missing required
+header lines, inserting keyable tokens or supplying the missing
+information.  And it compares the date fields to determine if the
+email has been pre- or post-dated by a large margin in order to
+influence where it appears in your mail client and inserts an
+x-header with keyable range tokens to compensate for this.
 
 Together, all of these techniques help to remove the noise which
 accompanies, either incidentally or maliciously, most email messages.
@@ -247,6 +261,58 @@ our $timeout = 3;
 # server to use for ASN lookups
 our $asn_server = "asn.routeviews.org";
 
+# distance in seconds from right now to consider a reasonable (non-spam) range to date an email
+our $date_limit = 60*60*24*2;  # 2 days
+
+# EMAIL HEADER FIELDS
+#
+# See RFC 2076 / "Common Internet Message Header Fields" for a synopsis of common mail headers
+
+	# SPECIFIED FIELDS -- all of the fields specified in RFC 822/2822, case-insensitive, in the suggested order
+	our $spec_fields = "return-path,received,resent-date,resent-from,resent-sender,resent-reply-to,".
+	 		   "resent-to,resent-cc,resent-bcc,resent-message-id,date,from,sender,reply-to,".
+			   "to,cc,bcc,message-id,in-reply-to,references,subject,comments,keywords,encrypted";
+
+	# MIME header fields (RFC 1049/1341/1521/2183)
+	$spec_fields .= ",mime-version,content-type,content-transfer-encoding,content-id,content-description,content-disposition";
+
+	# security/checksum (RFC 1864)
+	$spec_fields .= ",content-md5";
+
+	# mailing list headers (RFC 2369/2919) may be added if you like, but for now I'm choosing to leave them out
+	#$spec_fields .= ",list-id,list-help,list-unsubscribe,list-subscribe,list-post,list-owner,list-archive";
+
+	# MASKED FIELDS -- unnecessary fields often used for spam will be expunged from the spec fields list
+	# (if you know of a valid, necessary use for these, let me know)
+	our $masked_fields = "keywords,comments,encrypted,content-id,content-description";
+
+	# controversial and not strictly necessary:
+	#$masked_fields .=  ",reply-to";
+
+	# message-id fields are only machine-readable and not visible to nor readable by the recipient
+	# however, they can be useful if your client produces discussion threading
+	# uncomment this line if you don't care about threading:
+	#$masked_fields .=  ",message-id,resent-message-id,in-reply-to,references";
+	
+	# resent fields are strictly informational (and not generally user-visible), therefore allowing them through is optional:
+	# MIME specifies a different way of resending messages with the "Message" content-type, so these may be considered deprecated:
+	$masked_fields .= ",resent-date,resent-from,resent-sender,resent-reply-to,resent-to,resent-cc,resent-bcc,resent-message-id";
+
+	# USER FIELDS -- User fields are those that are neither specified nor masked that you want permitted. 
+	# These may include special fields for your particular mail server, filter, or mail user agent.
+	our $user_fields = "";
+
+	# NEW FIELDS -- New custom x-headers added by Spamitarium (it is recommend that you don't change these).  
+	# These are disabled unless you pass the 'x' option.
+	our $new_fields = "x-date-check";
+
+	# REQUIRED FIELDS -- Any fields that should show up in an email even if they are not sent -- i.e. if the lack of
+	# these fields may be useful for the filter, a no-req-field tag will be added.  The only *required* fields according to 
+	# RFC 2822 are "from", "sender", "reply-to", and "date", others are just suggested.  However, "sender" and "reply-to" are 
+	# commonly not supplied, and so should probably not be in this list.  On the other hand, "subject" and a few others may 
+	# be desired in this list.
+	our $req_fields = "received,from,to,date,subject";
+
 # of course, modify the first line of this file,
 # the shebang, to point to your perl interpreter
 
@@ -258,6 +324,8 @@ our $asn_server = "asn.routeviews.org";
 #################################################
 
 use Benchmark;
+use Time::Local;
+use Net::DNS::Resolver;
 
 #################################################
 ############## Default Globals ##################
@@ -269,15 +337,12 @@ $) = $(; # set effective group ID to real GID
 # Make %ENV safer
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH SHELL)};
 
-# Set the environment explicitely
+# Set the environment explicitly
 $ENV{PATH} = $path;
 $ENV{SHELL} = $shell;
 
 # options flags
 our $options = "";
-
-# list of allowed headers
-our $user_fields = "";
 
 # define the control-linefeed syntax for this system
 our $CRLF = 
@@ -286,12 +351,20 @@ our $CRLF =
 #("\t" ne "\011")? 	"\r\n": 	# EBCDIC
 #			"\015\012"; 	# others 
 
+# DNS query options
+our $res = Net::DNS::Resolver->new(
+	nameservers     => [qw(127.0.0.1)],
+	udp_timeout     => 2,
+	retry           => 1,
+	#debug          => 1
+);
+
 ################################################
 ##################### Main #####################
 ################################################
 
 # process options
-if (!defined @ARGV || $ARGV[0] !~ /[^\s]/ || $ARGV[0] =~ /h/) 
+if (!defined @ARGV || @ARGV == 0 || $ARGV[0] !~ /\w/ || $ARGV[0] =~ /h/) 
 {
 	my $spamitarium = $1 if $0 =~ /^([\w\/.\-~]*)$/;
 	system("perldoc $spamitarium"); exit(0);
@@ -304,12 +377,14 @@ if ($ARGV[0] =~ /s/) { $options .= "s"; }	# standard fields only (strip others)
 if ($ARGV[0] =~ /e/) { $options .= "e"; }	# include the helo received field in output
 if ($ARGV[0] =~ /b/) { $options .= "b"; }	# output benchmarking info
 if ($ARGV[0] =~ /w/) { $options .= "w"; }	# process whole email (including body)
+if ($ARGV[0] =~ /x/) { $options .= "x"; }	# insert custom x-header fields
 
 # get the permitted headers
 if ($options =~ /s/ && $ARGV[1]) { $user_fields = $ARGV[1]; }
 
 # start timing the process
 my $start_time = new Benchmark if $options =~ /b/;
+my ($start_parse, $end_parse, $start_rcvd, $end_rcvd, $start_set, $end_set);
 
 # get STDIN and process the email
 eval 
@@ -319,18 +394,39 @@ eval
 	alarm $timeout;
 
 	# parse the header
-	my $header = parse_header();
-	
+	$start_parse = new Benchmark if $options =~ /b/;
+	my ($header,$parse_benchmark) = parse_header();
+	$end_parse = new Benchmark if $options =~ /b/;
+
 	# cancel timeout if we got this far
 	alarm 0;
+
+	# default date if none provided
+	unless (defined $header->{'date'})
+	{
+		$header->{'date'}->[0]->{'name'} = "Date";
+		$header->{'date'}->[0]->{'value'} = gmtime time;
+	}
 	
 	# process the received lines
-	$header->{'received'} = process_rcvd($header->{'received'},$header->{'date'}->[0]->{'string'}) if $options =~ /r/;
+	if ($options =~ /r/)
+	{
+		$start_rcvd = new Benchmark if $options =~ /b/;
+		$header->{'received'} = process_rcvd($header->{'received'});
+		$end_rcvd = new Benchmark if $options =~ /b/;
+	}
 
-	#print "received: " . $header->{'received'} . ": " . $header->{'received'}->[0] . ": " . $header->{'received'}->[0]->{'sane'} . "\n";
-
+	# add new custom header fields
+	if ($options =~ /x/) 
+	{
+		$header->{'x-date-check'}->[0]->{'name'} = "X-Date-Check"; 
+		$header->{'x-date-check'}->[0]->{'value'} = date_check($header->{'date'}->[0]->{'value'},$header->{'received'}->[0]->{'date'});
+	}
+	
 	# output the new header containing the changes
+	$start_set = new Benchmark if $options =~ /b/;
 	print set_header($header);
+	$end_set = new Benchmark if $options =~ /b/;
 
 	# add the body if desired
 	print parse_body() if $options =~ /w/;
@@ -350,6 +446,24 @@ if ($options =~ /b/)
 	my $usr = $td->[1]+$td->[3]; my $sys = $td->[2]+$td->[4];
 	my $cpu = $usr+$sys; my $wall = $td->[0];
 	print "Total running time was $wall wallclock secs; $usr usr + $sys sys = $cpu CPU secs.$CRLF";
+
+	$td = timediff($end_parse, $start_parse);
+	$usr = $td->[1]+$td->[3]; $sys = $td->[2]+$td->[4];
+	$cpu = $usr+$sys; $wall = $td->[0];
+	print "Input parsing time was $wall wallclock secs; $usr usr + $sys sys = $cpu CPU secs.$CRLF";
+
+	if ($options =~ /r/)
+	{
+		$td = timediff($end_rcvd, $start_rcvd);
+		$usr = $td->[1]+$td->[3]; $sys = $td->[2]+$td->[4];
+		$cpu = $usr+$sys; $wall = $td->[0];
+		print "Received line processing time was $wall wallclock secs; $usr usr + $sys sys = $cpu CPU secs.$CRLF";
+	}
+
+	$td = timediff($end_set, $start_set);
+	$usr = $td->[1]+$td->[3]; $sys = $td->[2]+$td->[4];
+	$cpu = $usr+$sys; $wall = $td->[0];
+	print "Rebuilding email time was $wall wallclock secs; $usr usr + $sys sys = $cpu CPU secs.$CRLF";
 }
 
 exit(0);
@@ -360,43 +474,96 @@ exit(0);
 
 sub parse_header
 {
-	my %header;
+	my $header = {};
 	my $name = "";
 
-	while (<STDIN>)
-	{
+        while (<STDIN>)
+        {
 		alarm 0; 
 
 		my $line = $_;
+		chomp($line);
 
 		# we're done with the header when we've found a blank line
-		last if (!defined $line || $line !~ /[^\s]/);
+		# and the required headers have been found already
+		last if (!defined $line || $line !~ /\S/); 
+			 #&& (
+			 #(defined $header->{'received'} && $header->{'received'}->[0]->{'value'} =~ /\w/) &&
+			 #(defined $header->{'subject'} && $header->{'subject'}->[0]->{'value'} =~ /\w/) &&
+			 #(defined $header->{'to'} && $header->{'to'}->[0]->{'value'} =~ /\w/) &&
+			 #(defined $header->{'from'} && $header->{'from'}->[0]->{'value'} =~ /\w/)));
 
-		# start matching header lines
-		if ($line =~ /^((?:\w|-)+?): (.*?)$/)
+		# match header lines
+		if ($line =~ /^(\S+?):\s*?(\S.+?)$/)
 		{
 			my $head = $1; my $value = $2;
 			$name = $head;
 			
 			$name =~ tr/A-Z/a-z/;	# header names are case insensitive
-			$value =~ s/\s+?/ /gis;	# unfold header lines by removing CRLF
+			chomp($name);
+
+			$value =~ s/\s+?/ /gis;	# nix extra spaces & unfold header lines by removing CRLF
 			$value =~ s/(\S)$/$1 /;
+			chomp($value);
 			
 			# if this header name has already been found, append to the end of the array
-			my $count = ((defined $header{$name}) && (ref($header{$name}) eq "ARRAY"))? scalar @{$header{$name}} : 0;
+			my $count = ((defined $header->{$name}) && (ref($header->{$name}) eq "ARRAY"))? scalar @{$header->{$name}} : 0;
 			
 			# record this header line
-			$header{$name}[$count]{'string'} = $value;
-			$header{$name}[$count]{'name'} = $head; # just for consistency
+			$header->{$name}->[$count]->{'value'} = $value;
+			$header->{$name}->[$count]->{'name'} = $head; # just for consistency (i.e. pre transforms)
 			
-			#print "$name [$count] = $value$CRLF";
+			#print "found $head [$count] = $value$CRLF";
 		}
 		
 		# if this line doesn't start with "header:", append to last line found (if exists)
-		elsif ($name) { $line =~ s/\s+?/ /gis; $line =~ s/^\s//; $header{$name}[(scalar @{$header{$name}} - 1)]{'string'} .= $line if ((defined $header{$name}) && (ref($header{$name}) eq "ARRAY")); }
+		elsif ($name && $line =~ /\w/ && $line !~ /^:/) { $line =~ s/\s+?/ /gis; $line =~ s/^\s//; $header->{$name}->[(scalar @{$header->{$name}} - 1)]->{'value'} .= $line if ((defined $header->{$name}) && (ref($header->{$name}) eq "ARRAY")); }
 	}
+
+	return $header;
+}
+
+sub date_check
+{
+	my ($date,$rcvd) = shift;
+	my ($dow, $day, $mon, $year, $hour, $min, $sec, $rmdr) = "?";
+
+	if ($date =~ /\s*?(\w{1,9}),?\s+?(\d+?)\s+?(\w{3})\s+?(\d{4})\s+?(\d{1,2}):(\d{2}):(\d{2})(.*?)/i) 
+	{ 
+		$dow=$1; $day=$2; $mon=$3; $year=$4; $hour=$5; $min=$6; $sec=$7; $rmdr=$8;
+		$mon = $mon=~/Dec/i?11:$mon=~/Nov/i?10:$mon=~/Oct/i?9:$mon=~/Sep/i?8:$mon=~/Aug/i?7:$mon=~/Jul/i?6:$mon=~/Jun/i?5:$mon=~/May/i?4:$mon=~/Apr/i?3:$mon=~/Mar/i?2:$mon=~/Feb/i?1:0;
 	
-	return \%header;
+		$date = timegm($sec,$min,$hour,$day,$mon,$year);
+
+		# adjust for local time
+		if ($rmdr =~ /\+\d(\d)\d\d/) { $date -= $1 * 60 * 60; }
+		if ($rmdr =~ /\-\d(\d)\d\d/) { $date += $1 * 60 * 60; }
+	}
+	else { return "date-format-unknown"; }
+
+        if ($rcvd && $rcvd =~ /\s*?(\w{1,9}),?\s+?(\d+?)\s+?(\w{3})\s+?(\d{4})\s+?(\d{1,2}):(\d{2}):(\d{2})(.*?)/i)
+        {
+                $dow=$1; $day=$2; $mon=$3; $year=$4; $hour=$5; $min=$6; $sec=$7; $rmdr=$8;
+		$mon = $mon=~/Dec/i?11:$mon=~/Nov/i?10:$mon=~/Oct/i?9:$mon=~/Sep/i?8:$mon=~/Aug/i?7:$mon=~/Jul/i?6:$mon=~/Jun/i?5:$mon=~/May/i?4:$mon=~/Apr/i?3:$mon=~/Mar/i?2:$mon=~/Feb/i?1:0;
+
+                $rcvd = timegm($sec,$min,$hour,$day,$mon,$year);
+
+                # adjust for local time
+                if ($rmdr =~ /\+\d(\d)\d\d/) { $rcvd -= $1 * 60 * 60; }
+                if ($rmdr =~ /\-\d(\d)\d\d/) { $rcvd += $1 * 60 * 60; }
+        }
+        else { $rcvd = time; }
+
+	# check for range +/-
+	my $diff = $rcvd - $date; my $diff_days = round($diff/(60*60*24));
+	if (($diff < $date_limit) and ($diff > $date_limit * -1)) { return "date-in-range ($diff_days days)"; }
+	else { return "date-out-of-range ($diff_days days)"; }
+}
+
+sub round 
+{
+    my $num = shift;
+    return int(($num*100)+0.5)/100;
 }
 
 ################################################
@@ -411,7 +578,7 @@ sub parse_body
 	# we'll just process the header
 
 	my $body = "";
-	while (<STDIN>) { $body .= $_; }
+        while (<STDIN>) { $body .= $_; }
 	return $body;
 }		
 
@@ -422,11 +589,10 @@ sub parse_body
 sub process_rcvd
 {
 	my $rcvd = shift;
-	my $date = shift;
 	
 	# heuristics
 	my $LUSER	= qr~(?:\w|-|\.)+?~;
-	my $DOMAIN	= qr~(?:\w|-|\.)+\.\w{2,4}~;
+	my $DOMAIN	= qr~(?:\w|-|\.)+?\.\w{2,4}~;
 	my $IP		= qr~(?:\d{1,3}\.){3}\d{1,3}~;
 	my $EMAIL 	= qr~$LUSER\@$DOMAIN~;
 	my $HELO	= qr~[^\s\0\/\\\#]+?~;
@@ -436,68 +602,73 @@ sub process_rcvd
 	my $untrusted = 0;
 
 	# check if we were passed a valid array of received lines
-	unless ((defined $rcvd) && (ref($rcvd) eq "ARRAY") && $rcvd->[0]->{'string'})
+	unless ((defined $rcvd) && (ref($rcvd) eq "ARRAY") && $rcvd->[0]->{'value'})
 	{
 		no strict 'refs';
-		my %rcvd_hash = ('string'=>"from localhost; $date", 'name'=>"Received");
+		my %rcvd_hash = ('value' => "from localhost; " . gmtime time, 'name' => "Received");
 		my @rcvd_array; $rcvd_array[0] = \%rcvd_hash;  $rcvd = \@rcvd_array;
 	}
+	else {
 
 	# iterate through each received header, parsing and validating the info
 	for (my $x = 0; $x < scalar @$rcvd; $x++)
 	{
 		# skip processing if we already lost confidence in this trail of received lines
-		if ($untrusted) { $rcvd->[$x]->{'sane'} = "untrusted"; next; }
+		#if ($untrusted) { $rcvd->[$x]->{'sane'} = "untrusted"; next; }
 	
 		my $helo=""; my $ipad=""; my $rdns=""; my $idnt=""; my $from=""; 
 		my $mtan=""; my $mtai=""; my $mtav=""; my $fore=""; my $with=""; my $date="";
 		
 		# try to take into account all known MTA formats
 		
-		if    ($rcvd->[$x]->{'string'} =~ s/\(envelope-(?:sender|from) <($EMAIL)>\)//gis) 			{ $from=$1; 					}#print "X-$x-matched-01: from=$from$CRLF"; }
-		if    ($rcvd->[$x]->{'string'} =~ s/;\s+?(\w{3}, \d{1,2} \w{3} \d{2,4}.*?)$//gis)			{ $date=$1; 					}#print "X-$x-matched-02: date=$date$CRLF"; }
-		if    ($rcvd->[$x]->{'string'} =~ s/for\s+?<?($EMAIL)>?(?: \(single-drop\))?//gis) 			{ $fore=$1; 					}#print "X-$x-matched-03: fore=$fore$CRLF"; }
-		if    ($rcvd->[$x]->{'string'} =~ s/by\s+?(\S+?) \(($IP)\) \((.*?)\)//gis) 				{ $mtan=$1; $mtai=$2; $mtav=$3; 		}#print "X-$x-matched-04: mtan=$mtan, mtai=$mtai, mtav=$mtav$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/by\s+?(\S+?) \[($IP)\]//gis) 					{ $mtan=$1; $mtai=$2; 				}#print "X-$x-matched-05: mtan=$mtan, mtai=$mtai$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/by\s+?(\S+?) \((.+?)\)//gis) 					{ $mtan=$1; $mtav=$2; 				}#print "X-$x-matched-06: mtan=$mtan, mtav=$mtav$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/by\s+?($IP)(?=\W|;|$)//gis) 					{ $mtai=$1; 					}#print "X-$x-matched-07: mtai=$mtai$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/by\s+?($DOMAIN)(?=\W|;|$)//gis) 					{ $mtan=$1; 					}#print "X-$x-matched-08: mtan=$mtan$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/by\s+?(\S+?)(?=\W|;|$)//gis) 					{ $mtan=$1; 					}#print "X-$x-matched-09: mtan=$mtan$CRLF"; }
-		if    ($rcvd->[$x]->{'string'} =~ s/(?:with)\s+?(\S+?) \((.*?)\)//gis) 					{ $with=$1; $mtav=$2 if !$mtav; 		}#print "X-$x-matched-10: with=$with, mtav=$mtav$CRLF";}
-		elsif ($rcvd->[$x]->{'string'} =~ s/(?:with)\s+?(\S+?)(?=\W|;|$)//gis) 					{ $with=$1; 					}#print "X-$x-matched-11: with=$with$CRLF"; }
-		if    ($rcvd->[$x]->{'string'} =~ s/^from\s+?($RDNS) \(HELO ($HELO)\) \(($LUSER)\@\[?($IP)\]?//gis) 	{ $rdns=$1; $helo=$2; $idnt=$3; $ipad=$4; 	}#print "X-$x-matched-12: rdns=$rdns, helo=$helo, idnt=$idnt, ipad=$ipad$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?($RDNS) \(HELO ($HELO)\) \(\[?($IP)\]?//gis) 		{ $rdns=$1; $helo=$2; $ipad=$3; 		}#print "X-$x-matched-13: rdns=$rdns, helo=$helo, ipad=$ipad$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?($RDNS) \(\[($IP)\] helo=($HELO)\)//gis) 			{ $rdns=$1; $ipad=$2; $helo=$3; 		}#print "X-$x-matched-14: rdns=$rdns, ipad=$ipad, helo=$helo$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?($RDNS) \(($LUSER)\@\[?($IP)\]?\)//gis) 			{ $rdns=$1; $idnt=$2; $ipad=$3; 		}#print "X-$x-matched-15: rdns=$rdns, idnt=$idnt, ipad=$ipad$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?($RDNS)\(($IP)\)//gis) 					{ $rdns=$1; $ipad=$2; 				}#print "X-$x-matched-16: rdns=$rdns, ipad=$ipad$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?\[($IP)\] \(helo=($HELO) ident=($LUSER)\)//gis) 		{ $ipad=$1; $helo=$2; $idnt=$3; 		}#print "X-$x-matched-17: ipad=$ipad, helo=$helo, idnt=$idnt$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?\[($IP)\] \(account ($LUSER) HELO ($HELO)\)//gis) 		{ $ipad=$1; $idnt=$2; $helo=$3; 		}#print "X-$x-matched-18: ipad=$ipad, idnt=$idnt, helo=$helo$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?\[($IP)\] \(helo=($HELO)\)//gis) 				{ $ipad=$1; $helo=$2; 				}#print "X-$x-matched-19: ipad=$ipad, helo=$helo$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?\[?($IP)\]?:?\d*? \(HELO ($HELO)\)//gis) 			{ $ipad=$1; $helo=$2; 				}#print "X-$x-matched-20: ipad=$ipad, helo=$helo$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?($HELO) \(IDENT:($LUSER)\@($RDNS) \[($IP)\]//gis) 		{ $helo=$1; $idnt=$2; $rdns=$3; $ipad=$4; 	}#print "X-$x-matched-21: helo=$helo, idnt=$idnt, rdns=$rdns, ipad=$ipad$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?($HELO) \(<?($RDNS)>?\s?\[($IP)\]//gis) 			{ $helo=$1; $rdns=$2; $ipad=$3; 		}#print "X-$x-matched-22: helo=$helo, rdns=$rdns, ipad=$ipad$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?($HELO) \(\[($IP)\] ident=($LUSER)\)//gis) 		{ $helo=$1; $ipad=$2; $idnt=$3; 		}#print "X-$x-matched-23: helo=$helo, ipad=$ipad, idnt=$idnt$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?($HELO) \(proxying for ($IP)\) \(.*? user ($LUSER)\)//gis)	{ $helo=$1; $ipad=$2; $idnt=$3; 		}#print "X-$x-matched-24: helo=$helo, ipad=$ipad, idnt=$idnt$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?($HELO) \(account ($LUSER) \[($IP)\] verified\)//gis) 	{ $helo=$1; $idnt=$2; $ipad=$3; 		}#print "X-$x-matched-25: helo=$helo, idnt=$idnt, ipad=$ipad$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?\(?($HELO) \(?\[?($IP)\]?\)?//gis) 			{ $helo=$1; $ipad=$2; 				}#print "X-$x-matched-26: helo=$helo, ipad=$ipad$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?($HELO) \(localhost \[.*?:($IP)\]\)//gis) 			{ $helo=$1; $ipad=$2; 				}#print "X-$x-matched-27: helo=$helo, ipad=$ipad$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?($HELO) \(($LUSER)\@($RDNS)\)//gis) 			{ $helo=$1; $idnt=$2; $rdns=$3; 		}#print "X-$x-matched-28: helo=$helo, idnt=$idnt, rdns=$rdns$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?($HELO) \(($RDNS)\)//gis) 					{ $helo=$1; $rdns=$2; 				}#print "X-$x-matched-29: helo=$helo, rdns=$rdns$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/\(from\s+?($LUSER)\@($RDNS)\)//gis)					{ $idnt=$1; $rdns=$2; 				}#print "X-$x-matched-30: idnt=$idnt, rdns=$rdns$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/\(from\s+?($LUSER)\@($HELO)\)//gis)					{ $idnt=$1; $helo=$2; 				}#print "X-$x-matched-31: idnt=$idnt, helo=$helo$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?\(?\[?($IP)\]?\)?//gis) 					{ $ipad=$1; 					}#print "X-$x-matched-32: ipad=$ipad$CRLF"; }
-		elsif ($rcvd->[$x]->{'string'} =~ s/^from\s+?($HELO)(?=\W|;|$)//gis) 					{ $helo=$1; 					}#print "X-$x-matched-33: helo=$helo$CRLF"; }
+		if    ($rcvd->[$x]->{'value'} =~ s/\(envelope-(?:sender|from) <($EMAIL)>\)//gis) 			{ $from=$1; 					}# print "X-$x-matched-01: from=$from, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		if    ($rcvd->[$x]->{'value'} =~ s/;\s+?(\w{3}, \d{1,2} \w{3} \d{2,4}.*?)$//gis)			{ $date=$1; 					}# print "X-$x-matched-02: date=$date, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		if    ($rcvd->[$x]->{'value'} =~ s/for\s+?<?($EMAIL)>?(?: \(single-drop\))?//gis) 			{ $fore=$1; 					}# print "X-$x-matched-03: fore=$fore, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		if    ($rcvd->[$x]->{'value'} =~ s/by\s+?(\S+?) \(($IP)\) \((.*?)\)//gis) 				{ $mtan=$1; $mtai=$2; $mtav=$3; 		}# print "X-$x-matched-04: mtan=$mtan, mtai=$mtai, mtav=$mtav, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/by\s+?(\S+?) \[($IP)\]//gis) 					{ $mtan=$1; $mtai=$2; 				}# print "X-$x-matched-05: mtan=$mtan, mtai=$mtai, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/by\s+?(\S+?) \((.+?)\)//gis) 					{ $mtan=$1; $mtav=$2; 				}# print "X-$x-matched-06: mtan=$mtan, mtav=$mtav, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/by\s+?($IP)(?=\W|;|$)//gis) 						{ $mtai=$1; 					}# print "X-$x-matched-07: mtai=$mtai, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/by\s+?($DOMAIN)(?=\W|;|$)//gis) 					{ $mtan=$1; 					}# print "X-$x-matched-08: mtan=$mtan, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/by\s+?(\S+?)(?=\W|;|$)//gis) 					{ $mtan=$1; 					}# print "X-$x-matched-09: mtan=$mtan, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		if    ($rcvd->[$x]->{'value'} =~ s/(?:with)\s+?(\S+?) \((.*?)\)//gis) 					{ $with=$1; $mtav=$2 if !$mtav; 		}# print "X-$x-matched-10: with=$with, mtav=$mtav, remaining=$rcvd->[$x]->{'value'} $CRLF";}
+		elsif ($rcvd->[$x]->{'value'} =~ s/(?:with)\s+?(\S+?)(?=\W|;|$)//gis) 					{ $with=$1; 					}# print "X-$x-matched-11: with=$with, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		if    ($rcvd->[$x]->{'value'} =~ s/^from\s+?($RDNS) \(HELO ($HELO)\) \(($LUSER)\@\[?($IP)\]?//gis) 	{ $rdns=$1; $helo=$2; $idnt=$3; $ipad=$4; 	}# print "X-$x-matched-12: rdns=$rdns, helo=$helo, idnt=$idnt, ipad=$ipad, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?($RDNS) \(HELO ($HELO)\) \(\[?($IP)\]?//gis) 		{ $rdns=$1; $helo=$2; $ipad=$3; 		}# print "X-$x-matched-13: rdns=$rdns, helo=$helo, ipad=$ipad, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?($RDNS) \(\[($IP)\] helo=($HELO)\)//gis) 			{ $rdns=$1; $ipad=$2; $helo=$3; 		}# print "X-$x-matched-14: rdns=$rdns, ipad=$ipad, helo=$helo, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?($RDNS) \(($LUSER)\@\[?($IP)\]?\)//gis) 			{ $rdns=$1; $idnt=$2; $ipad=$3; 		}# print "X-$x-matched-15: rdns=$rdns, idnt=$idnt, ipad=$ipad, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?($RDNS)\(($IP)\)//gis) 					{ $rdns=$1; $ipad=$2; 				}# print "X-$x-matched-16: rdns=$rdns, ipad=$ipad, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?\[($IP)\] \(helo=($HELO) ident=($LUSER)\)//gis) 		{ $ipad=$1; $helo=$2; $idnt=$3; 		}# print "X-$x-matched-17: ipad=$ipad, helo=$helo, idnt=$idnt, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?\[($IP)\] \(account ($LUSER) HELO ($HELO)\)//gis) 		{ $ipad=$1; $idnt=$2; $helo=$3; 		}# print "X-$x-matched-18: ipad=$ipad, idnt=$idnt, helo=$helo, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?\[($IP)\] \(helo=($HELO)\)//gis) 				{ $ipad=$1; $helo=$2; 				}# print "X-$x-matched-19: ipad=$ipad, helo=$helo, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?\[?($IP)\]?:?\d*? \(HELO ($HELO)\)//gis) 			{ $ipad=$1; $helo=$2; 				}# print "X-$x-matched-20: ipad=$ipad, helo=$helo, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?($HELO) \(IDENT:($LUSER)\@($RDNS) \[($IP)\]//gis) 		{ $helo=$1; $idnt=$2; $rdns=$3; $ipad=$4; 	}# print "X-$x-matched-21: helo=$helo, idnt=$idnt, rdns=$rdns, ipad=$ipad, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?($HELO) \(<?($RDNS)>?\s?\[($IP)\]//gis) 			{ $helo=$1; $rdns=$2; $ipad=$3; 		}# print "X-$x-matched-22: helo=$helo, rdns=$rdns, ipad=$ipad, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?($HELO) \(\[($IP)\] ident=($LUSER)\)//gis) 			{ $helo=$1; $ipad=$2; $idnt=$3; 		}# print "X-$x-matched-23: helo=$helo, ipad=$ipad, idnt=$idnt, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?($HELO) \(proxying for ($IP)\) \(.*? user ($LUSER)\)//gis)	{ $helo=$1; $ipad=$2; $idnt=$3; 		}# print "X-$x-matched-24: helo=$helo, ipad=$ipad, idnt=$idnt, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?($HELO) \(account ($LUSER) \[($IP)\] verified\)//gis) 	{ $helo=$1; $idnt=$2; $ipad=$3; 		}# print "X-$x-matched-25: helo=$helo, idnt=$idnt, ipad=$ipad, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?\(?($HELO) \(?\[?($IP)\]?\)?//gis) 				{ $helo=$1; $ipad=$2; 				}# print "X-$x-matched-26: helo=$helo, ipad=$ipad, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?($HELO) \(localhost \[.*?:($IP)\]\)//gis) 			{ $helo=$1; $ipad=$2; 				}# print "X-$x-matched-27: helo=$helo, ipad=$ipad, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?($HELO) \(($LUSER)\@($RDNS)\)//gis) 			{ $helo=$1; $idnt=$2; $rdns=$3; 		}# print "X-$x-matched-28: helo=$helo, idnt=$idnt, rdns=$rdns, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?($HELO) \(($RDNS)\)//gis) 					{ $helo=$1; $rdns=$2; 				}# print "X-$x-matched-29: helo=$helo, rdns=$rdns, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/\(from\s+?($LUSER)\@($RDNS)\)//gis)					{ $idnt=$1; $rdns=$2; 				}# print "X-$x-matched-30: idnt=$idnt, rdns=$rdns, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/\(from\s+?($LUSER)\@($HELO)\)//gis)					{ $idnt=$1; $helo=$2; 				}# print "X-$x-matched-31: idnt=$idnt, helo=$helo, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?\(?\[?($IP)\]?\)?//gis) 					{ $ipad=$1; 					}# print "X-$x-matched-32: ipad=$ipad, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
+		elsif ($rcvd->[$x]->{'value'} =~ s/^from\s+?($HELO)(?=\W|;|$)//gis) 					{ $helo=$1; 					}# print "X-$x-matched-33: helo=$helo, remaining=$rcvd->[$x]->{'value'} $CRLF"; }
 
 		# lookup IP if not provided
 		$ipad = host($rdns) if !$ipad && $rdns && $options =~ /d/;
 		$ipad = host($helo) if !$ipad && !$rdns && $helo && $helo =~ /$DOMAIN/ && $options =~ /d/;
 
 		# exclude lines with no IP
-		next if !$ipad && ((scalar @$rcvd) > 1);
+		#next if !$ipad && ((scalar @$rcvd) > 1);
+
+		# ensure the local received line has a date stamp
+		$date = gmtime time unless $date || $x;
 
 		# save "from" info for comparison in next iteration
 		$rcvd->[$x]->{'rdns'}	= $rdns;		
 		$rcvd->[$x]->{'ipad'}	= $ipad;
+		$rcvd->[$x]->{'date'}	= $date;
 
 		# exclude lines from local, private (RFC 1918), and invalid IP address ranges
 		my $reserved = qr~^((?:127\.)|(?:10\.)|(?:172\.(?:1[6-9]|2[0-9]|31)\.)|(?:192\.168\.)|(?:169\.254\.))~;
@@ -523,18 +694,32 @@ sub process_rcvd
 		# we implicitely trust the received line set "by" our own server as valid (first untrusted "from")
 		if (!$edge_ip) { $edge_ip = $mtai; $rcvd->[$x]->{'sane'} = set_rcvd($helo,$ipad,$idnt,$rdns,$from,$mtan,$mtai,$mtav,$fore,$with,$date,$asn); }
 
-		# now we'll try to establish the validity of each nonlocal received line by
-		# checking for continuity and rejecting lines that don't fit the "from/by" chain
+		# now we'll try to establish the validity of each received line by checking 
+		# for continuity and rejecting lines that don't fit the "from/by" chain
 		else
 		{
 			#print " by " . $mtan . " / prev from " . $rcvd->[$x-1]->{'rdns'} . "$CRLF";
 			#print " by " . $mtai . " / prev from " . $rcvd->[$x-1]->{'ipad'} . "$CRLF";
-			if ((($mtan && $rcvd->[$x-1]->{'rdns'} && $mtan =~ /$rcvd->[$x-1]->{'rdns'}/) || 
-			     ($mtai && $rcvd->[$x-1]->{'ipad'} && $mtai =~ /$rcvd->[$x-1]->{'ipad'}/)) && (!$untrusted)) 
+			if (
+				(
+					($mtan && $rcvd->[$x-1]->{'rdns'} && $mtan =~ /$rcvd->[$x-1]->{'rdns'}/) || 
+			     		($mtai && $rcvd->[$x-1]->{'ipad'} && $mtai =~ /$rcvd->[$x-1]->{'ipad'}/)
+				) && 	(!$untrusted)
+			   ) 
 			     { $rcvd->[$x]->{'sane'} = set_rcvd($helo,$ipad,$idnt,$rdns,$from,$mtan,$mtai,$mtav,$fore,$with,$date,$asn); }
-			else { $rcvd->[$x]->{'sane'} = "untrusted"; $untrusted = 1; }
+			else 
+			{ 
+				$helo = "untrusted-".$helo if $helo; $ipad = "untrusted-".$ipad if $ipad;
+				$idnt = "untrusted-".$idnt if $idnt; $rdns = "untrusted-".$rdns if $rdns;
+				$from = "untrusted-".$from if $from; $mtan = "untrusted-".$mtan if $mtan;
+				$mtai = "untrusted-".$mtai if $mtai; $mtav = "untrusted-".$mtav if $mtav;
+				$fore = "untrusted-".$fore if $fore; $with = "untrusted-".$with if $with;
+				$date = ""; $asn = "";
+				$rcvd->[$x]->{'sane'} = set_rcvd($helo,$ipad,$idnt,$rdns,$from,$mtan,$mtai,$mtav,$fore,$with,$date,$asn); 
+				$untrusted = 1; 
+			}
 		}
-	}
+	}}
 	
 	return $rcvd;
 }
@@ -553,11 +738,19 @@ sub asn
 	my $target = shift;
 	my $output = "";
 
+        my $IP          = qr~(?:\d{1,3}\.){3}\d{1,3}~;
+        my $DOMAIN      = qr~(?:\w|-|\.)+?\.\w{2,4}~;
+
 	if ( $target =~ s/(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/$4.$3.$2.$1.$asn_server/ )
 	{
-		open (HOST, "host -t txt $target 2>/dev/null |") or error("warn", "Host lookup failed: $!");
-		while (<HOST>) { $output = $1 if /\Q$target\E(?: descriptive)? text "(\d*?)".*/; }
-		close HOST;
+		# uncomment this code if you do not want to use Net::DNS::Resolver and you have 'host' on your system
+		#open (HOST, "host -t txt $target 2>/dev/null |") or error("warn","Host lookup failed: $!");
+		#while (<HOST>) { $output = $1 if /\Q$target\E(?: descriptive)? text "(\d*?)".*/; }
+		#close HOST;
+
+                # find ASN info via Net::DNS::Resolver
+	        if (my $query = $res->send($target,"TXT")) { foreach ($query->answer) { $output = $1 if $_->string =~ /$DOMAIN\.\s+?\d+?\s+?IN\s+?TXT\s+?"(\d+?)"\s+?"$IP"\s+?"\d+?"/; }}
+                #else { error("warn","ASN lookup failed: " . $res->errorstring); }
 	} 
 
 	return $output;
@@ -569,13 +762,18 @@ sub host
 	my $output = "";
 	
 	my $IP		= qr~(?:\d{1,3}\.){3}\d{1,3}~;	
-	my $DOMAIN	= qr~[\w|-|\.]+\.\w{2,4}~;
+	my $DOMAIN	= qr~(?:\w|-|\.)+?\.\w{2,4}~;
 
 	if ($target =~ s/($IP|$DOMAIN)/$1/)
 	{
-		open (HOST, "host $target 2>/dev/null |") or error("warn", "Host lookup failed: $!");
-		while (<HOST>) { $output = $1 if /$DOMAIN (?:domain name pointer|has address) ($IP|$DOMAIN)\.?/; }
-		close HOST;
+		# uncomment this code if you do not want to use Net::DNS::Resolver and you have 'host' on your system
+		#open (HOST, "host $target 2>/dev/null |") or error("warn","Host lookup failed: $!");
+		#while (<HOST>) { $output = $1 if /$DOMAIN (?:domain name pointer|has address) ($IP|$DOMAIN)\.?/; }
+		#close HOST;
+
+		# find DNS info via Net::DNS::Resolver
+	        if (my $query = $res->send($target)) { foreach ($query->answer) { $output = $1 if $_->string =~ /$DOMAIN\.\s+?\d+?\s+?IN\s+?(?:PTR|A)\s+?($IP|$DOMAIN)\.?/; }}
+        	#else { error("warn","DNS lookup failed: " . $res->errorstring); }
 	}
 	
 	return $output;
@@ -597,6 +795,9 @@ sub set_rcvd
 	$output .= ($fore)? 		" $CRLF\t  for" : "";
 	$output .= ($fore)? 		" <$fore>" 	: "";		# envelope to address
 	$output .= ($date)? 		"; $date" 	: "";		# received date/time
+
+	#print "outputting received: $output" . $CRLF;
+	return $output;
 }
 
 ################################################
@@ -607,51 +808,23 @@ sub set_header
 {
 	my $header = shift;
 	my $output = "";
+	my $name = "";
 	
-	# these are all of the fields specified in RFC 822/2822, case-insensitive, in the suggested order
-	# the only *required* fields according to RFC 2822 are "from", "sender", "reply-to", and "date", others are just suggested
-	my $spec_fields = "return-path,received,resent-date,resent-from,resent-sender,resent-reply-to,".
-			  "resent-to,resent-cc,resent-bcc,resent-message-id,date,from,sender,reply-to,".
-			  "to,cc,bcc,message-id,in-reply-to,references,subject,comments,keywords,encrypted";
-
-	# MIME header fields (RFC 1049/1341/1521/2183)
-	$spec_fields .=	  ",mime-version,content-type,content-transfer-encoding,content-id,content-description,content-disposition";
-
-	# security/checksum (RFC 1864)
-	$spec_fields .=   ",content-md5";
-
-	# mailing list headers (RFC 2369/2919) may be added if you like, but for now I'm choosing to leave them out
-	#$spec_fields .=   ",list-id,list-help,list-unsubscribe,list-subscribe,list-post,list-owner,list-archive";
-
-	# let's exclude unnecessary fields (if you know of a valid, necessary use for these, let me know)
-	my $masked_fields = "keywords,comments,encrypted,content-id,content-description";
-
-	# controversial and not strictly necessary:
-	$masked_fields .= ",reply-to";
-
-	# message-id fields are only machine-readable and not visible to nor readable by the recipient
-	# however, they can be useful if your client produces discussion threading
-	# uncomment this line if you don't care about threading:
-	# $masked_fields .= ",message-id,resent-message-id,in-reply-to,references";
-	
-	# resent fields are strictly informational (and not generally user-visible), therefore allowing them through is optional:
-	# MIME specifies a different way of resending messages with the "Message" content-type, so these may be considered deprecated:
-	$masked_fields .= ",resent-date,resent-from,resent-sender,resent-reply-to,resent-to,resent-cc,resent-bcc,resent-message-id";
-
-	# see RFC 2076 / "Common Internet Message Header Fields" for a synopsis of common mail headers
-
 	# exclude the "masked fields" from display
-	foreach my $name (split(/,/,$masked_fields)) { $spec_fields =~ s/(?<=,)$name,?//; }
+	foreach $name (split(/,/,$masked_fields)) { $spec_fields =~ s/(?<=,)$name,?//; }
 
-	# output the fields in the order specified by RFC 2822
-	foreach my $name (split(/,/,$spec_fields)) { $output .= set_field($header,$name); delete $header->{$name}; }
+	# output the fields in the order specified by RFC 2822 - minus the masked fields
+	foreach $name (split(/,/,$spec_fields)) { $output .= set_field($header,$name); delete $header->{$name}; }
 
 	# set any user-specified fields
-	foreach my $name (split(/,/,$user_fields)) { $output .= set_field($header,$name); delete $header->{$name}; }
+	foreach $name (split(/,/,$user_fields)) { $output .= set_field($header,$name); delete $header->{$name}; }
+
+	# set new custom x-header fields
+	if ($options =~ /x/) { foreach $name (split(/,/,$new_fields)) { $output .= set_field($header,$name); delete $header->{$name}; } }
 
 	# then set any remaining fields (if allowed to set non-standard fields)
-	if ($options !~ /s/) { foreach my $name (keys %{$header}) { $output .= set_field($header,$name); } }
-	
+	if ($options !~ /s/) { foreach $name (keys %{$header}) { $output .= set_field($header,$name); } }
+
 	$output .= $CRLF;
 	
 	return $output;
@@ -662,19 +835,32 @@ sub set_field
 	my $header = shift;
 	my $name = shift;
 	my $output = "";
-	
+
 	if ((defined $header->{$name}) && (ref($header->{$name}) eq "ARRAY"))
 	{
 		for (my $x = 0; $x < scalar @{$header->{$name}}; $x++)
 		{
 			if (($name eq "received") && ($options =~ /r/))
 			{
-				#if (defined $header->{$name}->[$x]->{'sane'}) {	$output .= ucfirst($name) . ": " . $header->{$name}->[$x]->{'sane'} . $CRLF; }
-				if (defined $header->{$name}->[$x]->{'sane'}) {	$output .= $header->{$name}->[$x]->{'name'} . ": " . $header->{$name}->[$x]->{'sane'} . $CRLF; }
+				if (defined $header->{$name}->[$x]->{'sane'} && $header->{$name}->[$x]->{'sane'} =~ /\w/) 
+				{	
+					$output .= $header->{$name}->[$x]->{'name'} . ": " . $header->{$name}->[$x]->{'sane'} . $CRLF; 
+				}
+				#else {	$output .= $header->{$name}->[$x]->{'name'} . ": sanity check failed" . $CRLF; }
 			}
-			#else { $output .= ucfirst($name) . ": " . $header->{$name}->[$x]->{'string'} . $CRLF; }
-			else { $output .= $header->{$name}->[$x]->{'name'} . ": " . $header->{$name}->[$x]->{'string'} . $CRLF; }
+			elsif ($header->{$name}->[$x]->{'value'} =~ /\w/)
+			{  
+				$output .= $header->{$name}->[$x]->{'name'} . ": " . $header->{$name}->[$x]->{'value'} . $CRLF; 
+			}
 		}
+	}
+	elsif (defined $header->{$name})
+	{
+		$output .= ucfirst($name) . ": " . $header->{$name} . $CRLF; 	
+	}
+	elsif ($req_fields =~ /(?:^|,)$name(?:,|$)/)
+	{  
+		$output .= ucfirst($name) . ": [no-$name] " . $CRLF; 
 	}
 	
 	return $output;
@@ -700,12 +886,12 @@ sub sig_trap
 
 	sig: 
 	{
-		$action = "die",  last sig if $sig =~ /ALRM/;
-		$action = "warn", last sig if $sig =~ /PIPE/;
-		$action = "warn", last sig if $sig =~ /CHLD/;
-		$action = "die" , last sig if $sig =~ /INT/;
-		$action = "die" , last sig if $sig =~ /HUP/;
-		$action = "warn";
+        	$action = "die",  last sig if $sig =~ /ALRM/;
+	        $action = "warn", last sig if $sig =~ /PIPE/;
+	        $action = "warn", last sig if $sig =~ /CHLD/;
+        	$action = "die" , last sig if $sig =~ /INT/;
+	        $action = "die" , last sig if $sig =~ /HUP/;
+        	$action = "warn";
 	}
 	
 	my $waitedpid = wait;
@@ -713,7 +899,7 @@ sub sig_trap
 
 	$SIG{$sig} = \&sig_trap;
 
-	error ($action, "Trapped signal SIG$sig$more");
+	error ($action,"Trapped signal SIG$sig$more");
 }
 
 ################################################

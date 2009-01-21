@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2009-01-21
+
+	* spamitarium.pl updated to version 0.3.0
+	  (thanks to Tom Anderson)
+
 	2009-01-11
 
 	* For compatibility with Sun's Sun Studio 12 compiler, provide
@@ -62,7 +67,7 @@
 	2008-04-28
 
 	* Added maildir training info to English and French FAQs.
-	  Thanks to Karl Schmidt and to Mouss.
+	  (thanks to Karl Schmidt and to Mouss)
 
 	2008-04-26
 
