@@ -197,7 +197,6 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     FLOAT Q = {1.0, 0};		/* Robinson's Q */
 
     double spamicity;
-    int    err = 0;
     size_t robn = 0;
     size_t count = 0;
     bool need_stats = (Rtable || passthrough || (verbose > 0)) && !fBogotune;
@@ -274,7 +273,7 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
 
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "### msg_compute_spamicity() ends\n");
 
-    return err ? -1.0 : spamicity;
+    return spamicity;
 }
 
 void score_initialize(void)
