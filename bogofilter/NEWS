@@ -15,6 +15,10 @@
 
 -------------------------------------------------------------------------------
 
+	2009-01-31
+	* Added token-count=n, token-count-min=n, and token-count-max=n options.
+	* Minor code cleanups.
+
 	2009-01-21
 
 	* spamitarium.pl updated to version 0.3.0

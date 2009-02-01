@@ -65,6 +65,9 @@ typedef enum longopts_e {
     O_TERSE,
     O_TERSE_FORMAT,
     O_THRESH_UPDATE,
+    O_TOKEN_COUNT_FIX,
+    O_TOKEN_COUNT_MIN,
+    O_TOKEN_COUNT_MAX,
     O_TIMESTAMP,
     O_UNICODE,
     O_UNSURE_SUBJECT_TAG,
@@ -96,7 +99,10 @@ typedef enum longopts_e {
 
 /* options for bogofilter */
 #define LONGOPTIONS_MAIN \
-    { "ham-true"	,		N, 0, O_HAM_TRUE },
+    { "ham-true"	,		N, 0, O_HAM_TRUE }, \
+    { "token-count"     ,               R, 0, O_TOKEN_COUNT_FIX }, \
+    { "token-count-min" ,               R, 0, O_TOKEN_COUNT_MIN }, \
+    { "token-count-max" ,               R, 0, O_TOKEN_COUNT_MAX },
 
 /* options for bogofilter and bogolexer */
 #define LONGOPTIONS_LEX \

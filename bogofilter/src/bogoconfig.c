@@ -357,6 +357,9 @@ static const char *help_text[] = {
     "  --terse-format                    short form\n",
     "  --thresh-update                   no update if near 0 or 1\n",
     "  --timestamp                       enable/disable token timestamps\n",
+    "  --token-count                     fixed token count for scoring\n",
+    "  --token-count-min                 min token count for scoring\n",
+    "  --token-count-max                 min token count for scoring\n",
 #ifndef	DISABLE_UNICODE
     "  --unicode                         enable/disable unicode based wordlist\n",
 #endif
@@ -725,6 +728,9 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
     case O_TERSE_FORMAT:		terse_format = get_string(name, val);			break;
     case O_THRESH_UPDATE:		get_double(name, val, &thresh_update);			break;
     case O_TIMESTAMP:			timestamp_tokens = get_bool(name, val);			break;
+    case O_TOKEN_COUNT_FIX:             token_count_fix = atoi(val);                            break;
+    case O_TOKEN_COUNT_MIN:             token_count_min = atoi(val);                            break;
+    case O_TOKEN_COUNT_MAX:             token_count_max = atoi(val);                            break;
     case O_UNSURE_SUBJECT_TAG:		unsure_subject_tag = get_string(name, val);		break;
     case O_UNICODE:			encoding = get_bool(name, val) ? E_UNICODE : E_RAW;	break;
     case O_WORDLIST:			configure_wordlist(val);				break;
@@ -746,6 +752,7 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 
 #define	Q1	if (query >= 1)
 #define	Q2	if (query >= 2)
+#define	Q3	if (query >= 3)
 
 #define YN(b) (b ? "Yes" : "No")
 #define NB(b) ((b != NULL && *b != '\0') ? b : "''")
@@ -762,6 +769,10 @@ rc_t query_config(void)
     Q1 fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "ns_esf", ns_esf, ns_esf);
     Q1 fprintf(stdout, "%-11s = %0.6f  # (%8.2e)\n", "sp_esf", sp_esf, sp_esf);
     Q1 fprintf(stdout, "\n");
+    Q3 fprintf(stdout, "%-17s = %d\n",    "token-count",         token_count_fix);
+    Q3 fprintf(stdout, "%-17s = %d\n",    "token-count-min",     token_count_min);
+    Q3 fprintf(stdout, "%-17s = %d\n",    "token-count-max",     token_count_max);
+    Q3 fprintf(stdout, "\n");
     Q1 fprintf(stdout, "%-17s = %s\n",    "block-on-subnets",    YN(block_on_subnets));
     Q1 fprintf(stdout, "%-17s = %s\n",    "encoding",		 (encoding != E_UNICODE) ? "raw" : "utf-8");
     Q1 fprintf(stdout, "%-17s = %s\n",    "charset-default",     charset_default);

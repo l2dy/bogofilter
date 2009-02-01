@@ -49,6 +49,10 @@ uint	max_token_len       = MAX_TOKEN_LEN;
 uint	max_multi_token_len = 0;
 uint	multi_token_count   = MUL_TOKEN_CNT;
 
+uint	token_count_fix = 0;
+uint	token_count_min = 0;
+uint	token_count_max = 0;
+
 const char	*update_dir;
 /*@observer@*/
 const char	*stats_prefix;

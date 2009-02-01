@@ -42,6 +42,11 @@ NAME:
 
 /* Structure Definitions */
 
+typedef struct probnode_t {
+    hashnode_t * node;
+    double prob;
+} probnode_t;
+
 /* struct for saving stats for printing. */
 typedef struct score_s {
     double min_dev;
@@ -56,6 +61,8 @@ typedef struct score_s {
 /* Function Prototypes */
 
 static	double	get_spamicity(size_t robn, FLOAT P, FLOAT Q);
+static	double	recompute_min_dev(wordhash_t *wh);
+static	void	compute_spamicity(wordhash_t *wh, FLOAT *P, FLOAT *Q, size_t *robn, bool need_stats);
 
 /* Static Variables */
 
@@ -199,19 +206,16 @@ retry:
     return;
 }
 
-
 /** selects the best spam/non-spam indicators and calculates Robinson's S,
  * \return -1.0 for error, S otherwise */
 double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
 {
-    hashnode_t *node;
-
     FLOAT P = {1.0, 0};		/* Robinson's P */
     FLOAT Q = {1.0, 0};		/* Robinson's Q */
 
     double spamicity;
     size_t robn = 0;
-    size_t count = 0;
+
     bool need_stats = (Rtable || passthrough || (verbose > 0)) && !fBogotune;
 
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "### msg_compute_spamicity() begins\n");
@@ -219,8 +223,46 @@ double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
 				    min_dev, robs, robx);
 
+    if (token_count_min + token_count_max + token_count_fix == 0)
+    {
+	score.min_dev = min_dev;
+    }
+    else
+    {
+	score.min_dev = recompute_min_dev(wh);
+    }
+
+    compute_spamicity(wh, &P, &Q, &robn, need_stats);
+
+    /* Robinson's P, Q and S
+    ** S = (P - Q) / (P + Q)                        [combined indicator]
+    */
+
+    spamicity = get_spamicity(robn, P, Q);
+
+    if (need_stats && robn != 0)
+	rstats_fini(robn, P, Q, spamicity);
+
+    if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "### msg_compute_spamicity() ends\n");
+
+    return spamicity;
+}
+
+/*
+** compute_spamicity()
+**	compute the spamicity from the linked list of tokens using
+**	min_dev to select tokens
+*/
+void compute_spamicity(wordhash_t *wh, 
+		       FLOAT *P, FLOAT *Q, size_t *robn, 
+		       bool need_stats)
+{
+    hashnode_t *node;
+
+    size_t count = 0;
     for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
+	bool useflag;
 	double prob;
 	word_t *token;
 	wordcnts_t *cnts;
@@ -239,52 +281,110 @@ double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
 
 	prob = calc_prob(cnts->good, cnts->bad,
 			 cnts->msgs_good, cnts->msgs_bad);
+	useflag = fabs(EVEN_ODDS - prob) >= score.min_dev;
 
 	if (need_stats)
-	    rstats_add(token, prob, cnts);
+	    rstats_add(token, prob, useflag, cnts);
 
 	/* Robinson's P and Q; accumulation step */
 	/*
 	 * P = 1 - ((1-p1)*(1-p2)*...*(1-pn))^(1/n)     [spamminess]
 	 * Q = 1 - (p1*p2*...*pn)^(1/n)                 [non-spamminess]
 	 */
-	if (fabs(EVEN_ODDS - prob) - min_dev >= EPS) {
+	if (useflag ) {
 	    int e;
 
-	    P.mant *= 1-prob;
-	    if (P.mant < 1.0e-200) {
-		P.mant = frexp(P.mant, &e);
-		P.exp += e;
+	    P->mant *= 1-prob;
+	    if (P->mant < 1.0e-200) {
+		P->mant = frexp(P->mant, &e);
+		P->exp += e;
 	    }
 
-	    Q.mant *= prob;
-	    if (Q.mant < 1.0e-200) {
-		Q.mant = frexp(Q.mant, &e);
-		Q.exp += e;
+	    Q->mant *= prob;
+	    if (Q->mant < 1.0e-200) {
+		Q->mant = frexp(Q->mant, &e);
+		Q->exp += e;
 	    }
-	    robn ++;
+	    *robn += 1;
 	}
 
 	if (DEBUG_ALGORITHM(3)) {
 	    (void)fprintf(dbgout, "%3lu %3lu %f ",
-			  (unsigned long)robn, (unsigned long)count, prob);
+			  (unsigned long)*robn, (unsigned long)count, prob);
 	    (void)word_puts(token, 0, dbgout);
 	    (void)fputc('\n', dbgout);
 	}
     }
+}
 
-    /* Robinson's P, Q and S
-    ** S = (P - Q) / (P + Q)                        [combined indicator]
-    */
+double recompute_min_dev(wordhash_t *wh)
+{
+    size_t node_index = 0;
+    size_t prob_index;
+    size_t node_count = max(token_count_fix, max(token_count_min, token_count_max));
 
-    spamicity = get_spamicity(robn, P, Q);
+    double min_prob = (token_count_max == 0.0) ? min_dev : 1.0;
 
-    if (need_stats && robn != 0)
-	rstats_fini(robn, P, Q, spamicity);
+    hashnode_t *node;
+    probnode_t *node_array = calloc(node_count, sizeof(probnode_t));
 
-    if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "### msg_compute_spamicity() ends\n");
+    for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
+    {
+	double prob;
+	word_t *token;
+	wordcnts_t *cnts;
+	wordprop_t *props;
 
-    return spamicity;
+	if (!fBogotune) {
+	    props = (wordprop_t *) node->buf;
+	    cnts  = &props->cnts;
+	    token = node->key;
+	} else {
+	    cnts = (wordcnts_t *) node;
+	    token = NULL;
+	}
+
+	prob = calc_prob(cnts->good, cnts->bad,
+			 cnts->msgs_good, cnts->msgs_bad);
+	prob = fabs(prob - EVEN_ODDS);
+
+	if (node_index < node_count)
+	{
+	    node_array[node_index].node = node;
+	    node_array[node_index].prob = prob;
+	    if (prob < min_prob)
+		min_prob = prob;
+	    node_index += 1;
+	    continue;
+	}
+
+	if (prob > min_prob)
+	{
+	    for (prob_index = 0; prob_index < node_count; prob_index += 1)
+	    {
+		/* replace element with minimum deviation */
+		if (node_array[prob_index].prob == min_prob)
+		{
+		    node_array[prob_index].node = node;
+		    node_array[prob_index].prob = prob;
+		    break;
+		}
+	    }
+	    min_prob = 1.0;
+	    /* find element with minimum deviation */
+	    for (prob_index = 0; prob_index < node_count; prob_index += 1)
+	    {
+		if (node_array[prob_index].prob < min_prob)
+		{
+		    min_prob = node_array[ prob_index ].prob;
+		}
+	    }
+	}
+    }
+
+    free(node_array);
+
+    return min_prob;
 }
 
 void score_initialize(void)
@@ -292,8 +392,6 @@ void score_initialize(void)
     word_t *word_robx = word_news(ROBX_W);
 
     wordlist_t *list = get_default_wordlist(word_lists);
-
-    rstats_init();
 
     if (fabs(min_dev) < EPS)
 	min_dev = MIN_DEV;
@@ -343,7 +441,7 @@ void score_initialize(void)
 
 void score_cleanup(void)
 {
-    rstats_cleanup();
+//    rstats_cleanup();
 }
 
 #ifdef GSL_INTEGRATE_PDF
@@ -411,7 +509,7 @@ double get_spamicity(size_t robn, FLOAT P, FLOAT Q)
         } else if (score.q_pr < DBL_EPSILON && score.p_pr < DBL_EPSILON) {
             score.spamicity = 0.5;
         } else {
-            score.spamicity = score.q_pr / ( score.q_pr + score.p_pr);
+            score.spamicity = score.q_pr / (score.q_pr + score.p_pr);
         }
     }
 
@@ -425,13 +523,13 @@ void msg_print_summary(const char *pfx)
 		      pfx, max_token_len+2, "N_P_Q_S_s_x_md", (unsigned long)score.robn, 
 		      score.p_pr, score.q_pr, score.spamicity);
 	(void)fprintf(fpo, "%s%-*s  %9.6f %9.6f %9.6f\n",
-		      pfx, max_token_len+2+6, " ", robs, robx, min_dev);
+		      pfx, max_token_len+2+6, " ", robs, robx, score.min_dev);
     }
     else {
 	/* Trim token to 22 characters to accomodate R's default line length of 80 */
 	(void)fprintf(fpo, "%s%-24s %6lu %9.2e %9.2e %9.2e %9.2e %9.2e %5.3f\n",
 		      pfx, "N_P_Q_S_s_x_md", (unsigned long)score.robn,
-		      score.p_pr, score.q_pr, score.spamicity, robs, robx, min_dev);
+		      score.p_pr, score.q_pr, score.spamicity, robs, robx, score.min_dev);
      }
 }
 

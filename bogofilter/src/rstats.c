@@ -32,6 +32,7 @@ struct rstats_s {
     u_int32_t	bad;
     u_int32_t	msgs_good;
     u_int32_t	msgs_bad;
+    bool   used;
     double prob;
 };
 
@@ -49,6 +50,7 @@ struct header_s {
     uint      robn;		/* words in score */
     FLOAT     p;		/* Robinson's P */
     FLOAT     q;		/* Robinson's Q */
+    double    min_dev;
     double    spamicity;
 };
 
@@ -85,7 +87,7 @@ void rstats_cleanup(void)
     stats_tail = NULL;
 }
 
-void rstats_add(const word_t *token, double prob, wordcnts_t *cnts)
+void rstats_add(const word_t *token, double prob, bool used, wordcnts_t *cnts)
 {
     if (token == NULL)
 	return;
@@ -97,6 +99,7 @@ void rstats_add(const word_t *token, double prob, wordcnts_t *cnts)
     */
     stats_tail->token = token;
     stats_tail->prob  = prob;
+    stats_tail->used  = used;
     stats_tail->good  = cnts->good;
     stats_tail->bad   = cnts->bad;
     stats_tail->msgs_good = cnts->msgs_good;
@@ -172,11 +175,12 @@ static void rstats_print_histogram(size_t robn, rstats_t **rstats_array, size_t 
 	h->spamicity=0.0;
 	while (r < count)
 	{
-	    double prob = rstats_array[r]->prob;
+	    rstats_t *cur = rstats_array[r];
+	    double prob = cur->prob;
 	    if (prob >= fin)
 		break;
 
-	    if (fabs(EVEN_ODDS - prob) - min_dev >= EPS)
+	    if (cur->used)
 	    {
 		cnt += 1;
 		h->prob += prob;
@@ -233,10 +237,10 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
     /* print header */
     if (!Rtable)
 	(void)fprintf(fpo, "%s%*s %6s    %-6s    %-6s    %-6s %s\n",
-		      pfx, max_token_len+2,"","n", "pgood", "pbad", "fw", "U");
+		      pfx, max_token_len+2, "", "n", "pgood", "pbad", "fw", "U");
     else
 	(void)fprintf(fpo, "%s%*s %6s    %-6s    %-6s    %-6s  %-6s    %-6s %s\n",
-		      pfx, max_token_len+2,"","n", "pgood", "pbad", "fw","invfwlog", "fwlog", "U");
+		      pfx, max_token_len+2, "", "n", "pgood", "pbad", "fw", "invfwlog", "fwlog", "U");
 
     /* Print 1 line per token */
     for (r= 0; r<count; r+=1)
@@ -244,7 +248,7 @@ static void rstats_print_rtable(rstats_t **rstats_array, size_t count)
 	rstats_t *cur = rstats_array[r];
 	int len = (cur->token->leng >= max_token_len) ? 0 : (max_token_len - cur->token->leng);
 	double fw = calc_prob(cur->good, cur->bad, cur->msgs_good, cur->msgs_bad);
-	char flag = (fabs(fw-EVEN_ODDS) - min_dev >= EPS) ? '+' : '-';
+	char flag = cur->used ? '+' : '-';
 
 	(void)fprintf(fpo, "%s\"", pfx);
 	(void)word_puts(cur->token, 0, fpo);

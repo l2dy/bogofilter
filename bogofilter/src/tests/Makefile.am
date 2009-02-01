@@ -41,7 +41,8 @@ PARSING_TESTS = \
 	t.lexer t.lexer.mbx \
 	t.spam.header.place \
 	t.block.on.subnets \
-	t.multiple.tokens.head t.multiple.tokens.body t.token.min.mul \
+	t.token.count \
+	t.multiple.tokens.head t.multiple.tokens.body t.multiple.tokens.min.mul \
 	$(ENCODING_TESTS) \
 	t.rfc2047_broken t.rfc2047_folded \
 	t.message_addr t.message_id t.queue_id

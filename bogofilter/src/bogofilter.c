@@ -154,6 +154,8 @@ rc_t bogofilter(int argc, char **argv)
 	register_words(run_type, words, msgcount);
     }
 
+    score_cleanup();
+
     if (logflag && register_opt)
 	write_log_message(status);
 

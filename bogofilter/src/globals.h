@@ -51,6 +51,10 @@ extern	double	ham_cutoff;
 extern	double	spam_cutoff;
 extern	double	thresh_update;
 
+extern	uint	token_count_fix;
+extern	uint	token_count_min;
+extern	uint	token_count_max;
+
 extern	int	abort_on_error;
 extern	bool	stats_in_header;
 

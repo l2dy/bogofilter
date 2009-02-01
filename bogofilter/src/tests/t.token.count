@@ -1,0 +1,87 @@
+#!/bin/sh +x
+
+. ${srcdir=.}/t.frame
+
+map_rc()
+{
+    (
+	set +e
+	eval "$@"
+	a=$?
+	[ $a -eq 0 ] && exit 0
+	[ $a -eq 1 ] && exit 0
+	[ $a -eq 2 ] && exit 0
+	exit $a
+    )
+}
+
+INP="$TMPDIR"/token.count.msg
+OUT="$TMPDIR"/token.count.txt
+REF="$OUTPUTS"/token.count.ref
+
+$BOGOFILTER -C -y 0 -s -M -I "$SYSTEST/inputs/spam.mbx"
+$BOGOFILTER -C -y 0 -n -M -I "$SYSTEST/inputs/good.mbx"
+
+cat > $INP <<EOF
+there         0.000660 4 8 20
+its           0.172558   8 20
+all           0.194216   8 20
+web           0.203096   8 20
+too           0.222810   9
+more          0.260471   9 20
+file          0.314336     20
+also          0.337138     20
+about         0.345518     20
+little        0.364191     20
+any           0.432510     20
+would         0.453979     20
+visit         0.533255
+does          0.533307
+for           0.548377
+how           0.559390
+name          0.578184     20
+new           0.620007     20
+this          0.625473     20
+home          0.646215     20
+over          0.695340     20
+way           0.732481     20
+visiting      0.991605 4 8 20
+dealer        0.995766 4 8 20
+agree         0.997169 4 8 20
+EOF
+
+CFG="$TMPDIR/test.cf"
+
+cat <<EOF > "$CFG"
+header_format = %h: %c, tests=bogofilter, spamicity=%p
+EOF
+
+# 2 tokens scored, increased to 4 by --token-count-min
+MIN1="--min-dev=0.496"
+MIN2="--min-dev=0.496 --token-count-min=4"
+
+# 18 tokens scored, decreased to 8 by --token-count-max
+MAX1="--min-dev=0.100"
+MAX2="--min-dev=0.100 --token-count-max=8"
+
+# 18 tokens scored, increased to 20 by --token-count
+CNT2="--min-dev=0.100 --token-count=20"
+
+cat /dev/null > $OUT
+
+for OPT in "$MIN1" "$MIN2" "$MAX1" "$MAX2" "$CNT2" ; do
+    echo "#### $OPT ####" >> $OUT
+    map_rc $BOGOFILTER $OPT -c $CFG -vvv -H -I $INP >> $OUT
+done
+
+for OPT in "$MIN1" "$MIN2" "$MAX1" "$MAX2" "$CNT2" ; do
+    SCORE=$( map_rc $BOGOFILTER $OPT -c $CFG -v -tt -H -I $INP )
+    echo "#### $SCORE $OPT " >> $OUT
+done
+
+if  [ $verbose -eq 0 ]; then
+    diff "$REF" "$OUT"
+    cmp  "$REF" "$OUT"
+else
+    diff $DIFF_BRIEF "$REF" "$OUT"
+fi

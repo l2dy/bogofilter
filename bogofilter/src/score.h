@@ -19,6 +19,6 @@ extern	rc_t	msg_status(void);
 extern	void	msg_print_stats(FILE *fp);
 extern	void	msg_print_summary(const char *pfx);
 
-extern	 void	print_summary(void);
+extern	void	print_summary(void);
 
 #endif
