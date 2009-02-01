@@ -56,25 +56,30 @@ cat <<EOF > "$CFG"
 header_format = %h: %c, tests=bogofilter, spamicity=%p
 EOF
 
-# 2 tokens scored, increased to 4 by --token-count-min
-MIN1="--min-dev=0.496"
-MIN2="--min-dev=0.496 --token-count-min=4"
+# 2 tokens scored
+TST1="--min-dev=0.496"
+#                  min 4 -- score more
+MIN1="--min-dev=0.496 --token-count-min=4"
+#                  max 8 -- OK - 2 less than 8
+MAX1="--min-dev=0.496 --token-count-max=8"
 
-# 18 tokens scored, decreased to 8 by --token-count-max
-MAX1="--min-dev=0.100"
+# 18 tokens scored
+TST2="--min-dev=0.100"
+#                  min 4 -- OK - 4 less than 18
+MIN2="--min-dev=0.100 --token-count-min=4"
+#                  max 8 -- score fewer
 MAX2="--min-dev=0.100 --token-count-max=8"
-
-# 18 tokens scored, increased to 20 by --token-count
-CNT2="--min-dev=0.100 --token-count=20"
+#                  fix 20 -- score more
+FIX2="--min-dev=0.100 --token-count=20"
 
 cat /dev/null > $OUT
 
-for OPT in "$MIN1" "$MIN2" "$MAX1" "$MAX2" "$CNT2" ; do
+for OPT in "$TST1" "$MIN1" "$MAX1" "$TST2" "$MIN2" "$MAX2" "$FIX2" ; do
     echo "#### $OPT ####" >> $OUT
     map_rc $BOGOFILTER $OPT -c $CFG -vvv -H -I $INP >> $OUT
 done
 
-for OPT in "$MIN1" "$MIN2" "$MAX1" "$MAX2" "$CNT2" ; do
+for OPT in "$TST1" "$MIN1" "$MAX1" "$TST2" "$MIN2" "$MAX2" "$FIX2" ; do
     SCORE=$( map_rc $BOGOFILTER $OPT -c $CFG -v -tt -H -I $INP )
     echo "#### $SCORE $OPT " >> $OUT
 done
