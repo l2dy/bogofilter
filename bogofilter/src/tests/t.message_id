@@ -4,7 +4,7 @@
 
 CFG="$TMPDIR"/test.cf
 OUT="$TMPDIR"/test.out
-CORRECT="$SYSTEST"/outputs/message_id.ref
+CORRECT="$OUTPUTS"/message_id.ref
 
 cat <<EOF > "$CFG"
 # include message ID

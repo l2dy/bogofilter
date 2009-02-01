@@ -3,7 +3,7 @@
 . ${srcdir=.}/t.frame
 
 OUT="$TMPDIR"/test.out
-CORRECT="$SYSTEST"/outputs/multiple.wordlists.ref
+CORRECT="$OUTPUTS"/multiple.wordlists.ref
 
 CF_DEFAULT=default.cf
 CF_IGN_REG=ign_reg.cf

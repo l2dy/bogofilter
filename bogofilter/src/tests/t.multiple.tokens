@@ -5,7 +5,7 @@
 INP="$TMPDIR"/test.inp
 REF="$TMPDIR"/test.ref
 OUT="$TMPDIR"/test.out
-CORRECT="$SYSTEST"/outputs/multiple.wordlists.ref
+CORRECT="$OUTPUTS"/multiple.wordlists.ref
 
 cat <<EOF > "$INP"
 aaa 
