@@ -61,7 +61,7 @@ typedef struct score_s {
 /* Function Prototypes */
 
 static	double	get_spamicity(size_t robn, FLOAT P, FLOAT Q);
-static	double	recompute_min_dev(wordhash_t *wh);
+static	double	find_scoring_boundary(wordhash_t *wh);
 static	void	compute_spamicity(wordhash_t *wh, FLOAT *P, FLOAT *Q, size_t *robn, bool need_stats);
 
 /* Static Variables */
@@ -229,7 +229,7 @@ double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
     }
     else
     {
-	score.min_dev = recompute_min_dev(wh);
+	score.min_dev = find_scoring_boundary(wh);
     }
 
     compute_spamicity(wh, &P, &Q, &robn, need_stats);
@@ -317,7 +317,11 @@ void compute_spamicity(wordhash_t *wh,
     }
 }
 
-double recompute_min_dev(wordhash_t *wh)
+/* find_scoring_boundary( )
+**	determine the token score that gives the desired token count
+**	for scoring the message.
+*/
+double find_scoring_boundary(wordhash_t *wh)
 {
     size_t node_index = 0;
     size_t prob_index;
@@ -350,19 +354,21 @@ double recompute_min_dev(wordhash_t *wh)
 
 	if (node_index < node_count)
 	{
+	    // first "n" tokens go into array
 	    node_array[node_index].node = node;
 	    node_array[node_index].prob = prob;
 	    if (prob < min_prob)
 		min_prob = prob;
 	    node_index += 1;
-	    continue;
 	}
-
-	if (prob > min_prob)
+	else if (prob > min_prob)
 	{
+	    /* after the first "n" tokens, a token goes into array if
+	    ** it has a higher score than a token already in the
+	    ** array */
 	    for (prob_index = 0; prob_index < node_count; prob_index += 1)
 	    {
-		/* replace element with minimum deviation */
+		/* replace element with minimum score */
 		if (node_array[prob_index].prob == min_prob)
 		{
 		    node_array[prob_index].node = node;
@@ -370,8 +376,8 @@ double recompute_min_dev(wordhash_t *wh)
 		    break;
 		}
 	    }
+	    /* find current minimum score */
 	    min_prob = 1.0;
-	    /* find element with minimum deviation */
 	    for (prob_index = 0; prob_index < node_count; prob_index += 1)
 	    {
 		if (node_array[prob_index].prob < min_prob)
