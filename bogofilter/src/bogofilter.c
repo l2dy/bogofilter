@@ -110,7 +110,7 @@ rc_t bogofilter(int argc, char **argv)
 
 	if (classify_msg || write_msg) {
 	    lookup_words(w);			/* This reads the database */
-	    spamicity = msg_compute_spamicity(w, NULL);
+	    spamicity = msg_compute_spamicity(w);
 	    status = msg_status();
 	    if (run_type & RUN_UPDATE)		/* Note: don't register if RC_UNSURE */
 	    {

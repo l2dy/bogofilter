@@ -202,7 +202,7 @@ retry:
 
 /** selects the best spam/non-spam indicators and calculates Robinson's S,
  * \return -1.0 for error, S otherwise */
-double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
+double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
 {
     hashnode_t *node;
 
@@ -213,8 +213,6 @@ double msg_compute_spamicity(wordhash_t *wh, FILE *fp) /*@globals errno@*/
     size_t robn = 0;
     size_t count = 0;
     bool need_stats = (Rtable || passthrough || (verbose > 0)) && !fBogotune;
-
-    (void) fp;			/* suppress compiler warning */
 
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "### msg_compute_spamicity() begins\n");
 

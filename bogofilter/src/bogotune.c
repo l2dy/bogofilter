@@ -385,7 +385,7 @@ static void score_ns(double *results)
 	mlitem_t *item;
 	for (item = list->head; item != NULL; item = item->next) {
 	    wordhash_t *wh = item->wh;
-	    double score = msg_compute_spamicity(wh, NULL);
+	    double score = msg_compute_spamicity(wh);
 	    results[count++] = score;
 	    if ( -verbose == SCORE_DETAIL ||
 		(-verbose >= SCORE_DETAIL && EPS < score && score < 1 - EPS))
@@ -435,7 +435,7 @@ static void score_sp(double *results)
 	mlitem_t *item;
 	for (item = list->head; item != NULL; item = item->next) {
 	    wordhash_t *wh = item->wh;
-	    double score = msg_compute_spamicity(wh, NULL);
+	    double score = msg_compute_spamicity(wh);
 	    results[count++] = score;
 	    if ( -verbose == SCORE_DETAIL ||
 		(-verbose >= SCORE_DETAIL && EPS < score && score < 1 - EPS))

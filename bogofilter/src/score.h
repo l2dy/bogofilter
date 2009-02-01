@@ -13,7 +13,7 @@ extern	void	lookup_words(wordhash_t *wh);
 extern	void	score_initialize(void);
 extern	void	score_cleanup(void);
 
-extern	double	msg_compute_spamicity(wordhash_t *wordhash, FILE *fp) /*@globals errno@*/;
+extern	double	msg_compute_spamicity(wordhash_t *wordhash) /*@globals errno@*/;
 extern	double	msg_spamicity(void);
 extern	rc_t	msg_status(void);
 extern	void	msg_print_stats(FILE *fp);
