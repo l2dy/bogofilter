@@ -112,4 +112,5 @@ EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel \
 	outputs/multiple.wordlists.ref \
 	outputs/parsing.out \
 	outputs/queue_id.ref \
-	outputs/split.out
+	outputs/split.out \
+	outputs/token.count.ref
