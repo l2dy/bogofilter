@@ -61,6 +61,7 @@ typedef struct score_s {
 /* Function Prototypes */
 
 static	double	get_spamicity(size_t robn, FLOAT P, FLOAT Q);
+static	bool	need_scoring_boundary(wordhash_t *wh);
 static	double	find_scoring_boundary(wordhash_t *wh);
 static	void	compute_spamicity(wordhash_t *wh, FLOAT *P, FLOAT *Q, size_t *robn, bool need_stats);
 
@@ -223,14 +224,7 @@ double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
 				    min_dev, robs, robx);
 
-    if (token_count_min + token_count_max + token_count_fix == 0)
-    {
-	score.min_dev = min_dev;
-    }
-    else
-    {
-	score.min_dev = find_scoring_boundary(wh);
-    }
+    score.min_dev = !need_scoring_boundary(wh) ? min_dev : find_scoring_boundary(wh);
 
     compute_spamicity(wh, &P, &Q, &robn, need_stats);
 
@@ -315,6 +309,55 @@ void compute_spamicity(wordhash_t *wh,
 	    (void)fputc('\n', dbgout);
 	}
     }
+}
+
+/* need_scoring_boundary( )
+**	determine if min_dev gives a count fitting the token count limits
+**	return True if so; False if not
+*/
+bool need_scoring_boundary(wordhash_t *wh)
+{
+    size_t count = 0;
+
+    hashnode_t *node;
+
+    // Early out if no token count limits are set
+    if (token_count_min == 0 && token_count_max == 0 && token_count_fix == 0)
+	return false;
+
+    // Count scorable tokens
+    for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
+    {
+	double prob;
+	wordcnts_t *cnts;
+	wordprop_t *props;
+
+	if (!fBogotune) {
+	    props = (wordprop_t *) node->buf;
+	    cnts  = &props->cnts;
+	} else {
+	    cnts = (wordcnts_t *) node;
+	}
+
+	prob = calc_prob(cnts->good, cnts->bad,
+			 cnts->msgs_good, cnts->msgs_bad);
+
+	if (fabs(prob - EVEN_ODDS) >= min_dev)
+	{
+	    count += 1;
+	}
+    }
+
+    // Compare count to limits
+    if (token_count_min != 0 && count < token_count_min)
+	return true;
+    if (token_count_max != 0 && count > token_count_max)
+	return true;
+    if (token_count_fix != 0 && token_count_fix != count)
+	return true;
+
+    // Count outside of limits -- change min_dev
+    return false;
 }
 
 /* find_scoring_boundary( )
