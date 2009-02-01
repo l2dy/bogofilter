@@ -29,7 +29,7 @@ case `valgrind --version` in
 	exit 77
 esac
 
-( eval "$VALGRIND true"  ) 2> /dev/null || exit 77
+( eval "$VALGRIND true" ) 2> /dev/null || exit 77
 if ( eval "$VALGRIND false" ) 2> /dev/null ; then exit 77 ; fi
 
 # Fisher config
@@ -87,3 +87,5 @@ for mth in f t ; do
     done
 
 done
+
+rm $VG_SUPP
