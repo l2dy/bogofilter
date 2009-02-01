@@ -12,9 +12,9 @@
 /** find the C string \a needle in the \a n bytes starting with \a hay,
  * \return 0 if no match found, the pointer to the first byte otherwise.
  */
-void *memstr(const void *hay, size_t n, const char *needle)
+void *memstr(void *hay, size_t n, const char *needle)
 {
-    unsigned const char *haystack = hay;
+    unsigned char *haystack = hay;
     size_t l = strlen(needle);
 
     while (n >= l) {
