@@ -40,6 +40,19 @@ NAME:
 #include "gsl/gsl_cdf.h"
 #endif
 
+/* Structure Definitions */
+
+/* struct for saving stats for printing. */
+typedef struct score_s {
+    double min_dev;
+    double spamicity;
+    u_int32_t robn;
+    double p_ln;	/* Robinson P, as a log*/
+    double q_ln;	/* Robinson Q, as a log*/
+    double p_pr;	/* Robinson P */
+    double q_pr;	/* Robinson Q */
+} score_t;
+
 /* Function Prototypes */
 
 static	double	get_spamicity(size_t robn, FLOAT P, FLOAT Q);
