@@ -44,7 +44,8 @@ NAME:
 
 typedef struct probnode_t {
     hashnode_t * node;
-    double dev;
+    double 	 prob;
+    double 	 dev;
 } probnode_t;
 
 /* struct for saving stats for printing. */
@@ -403,7 +404,8 @@ double find_scoring_boundary(wordhash_t *wh)
 	dev = fabs(prob - EVEN_ODDS);
 
 	node_array[node_index].node = node;
-	node_array[node_index].dev = dev;
+	node_array[node_index].prob = prob;
+	node_array[node_index].dev  = dev;
 	node_index += 1;
     }
 
@@ -414,6 +416,20 @@ double find_scoring_boundary(wordhash_t *wh)
 
     if (DEBUG_SPAMICITY(1)) {
 	printf( "%d %8.6f\n", (int)node_index, min_prob );
+    }
+
+    if (DEBUG_SPAMICITY(2)) {
+	unsigned int ni;
+	for (ni = 0; ni <= node_index; ni += 1)
+	{
+	    t_DOUBLE_QUAD dq;
+	    probnode_t *pn = &node_array[ni];
+	    hashnode_t *hn = pn->node ;
+
+	    dq.d = pn->dev;
+	    printf( "%2d %-16s %8.6f %8.6f %16qX\n", 
+		    ni, hn->key->u.text, pn->prob, pn->dev, dq.q);
+	}
     }
 
     free(node_array);
