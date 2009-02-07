@@ -427,7 +427,7 @@ double find_scoring_boundary(wordhash_t *wh)
 	    hashnode_t *hn = pn->node ;
 
 	    dq.d = pn->dev;
-	    printf( "%2d %-16s %8.6f %8.6f %16qX\n", 
+	    printf( "%2d %-16s %8.6f %8.6f %16llX\n", 
 		    ni, hn->key->u.text, pn->prob, pn->dev, dq.q);
 	}
     }
@@ -596,7 +596,7 @@ void msg_print_summary(const char *pfx)
     if (DEBUG_SPAMICITY(1)) {
 	t_DOUBLE_QUAD dq;
 	dq.d = score.min_dev;
-	fprintf(dbgout, "md: %10.8f 0x%016qX\n",
+	fprintf(dbgout, "md: %10.8f 0x%016llX\n",
 		score.min_dev, dq.q);
     }
 }
