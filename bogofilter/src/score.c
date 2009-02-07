@@ -44,7 +44,7 @@ NAME:
 
 typedef struct probnode_t {
     hashnode_t * node;
-    double prob;
+    double dev;
 } probnode_t;
 
 /* struct for saving stats for printing. */
@@ -58,12 +58,20 @@ typedef struct score_s {
     double q_pr;	/* Robinson Q */
 } score_t;
 
+/* struct for printing doubles as hex. */
+typedef union
+{
+    double d;
+    long long q;
+} t_DOUBLE_QUAD;
+
 /* Function Prototypes */
 
 static	double	get_spamicity(size_t robn, FLOAT P, FLOAT Q);
 static	bool	need_scoring_boundary(wordhash_t *wh);
 static	double	find_scoring_boundary(wordhash_t *wh);
 static	void	compute_spamicity(wordhash_t *wh, FLOAT *P, FLOAT *Q, size_t *robn, bool need_stats);
+static	int	compare_probnode_t(const void *const ipn1, const void *const ipn2);
 
 /* Static Variables */
 
@@ -275,7 +283,7 @@ void compute_spamicity(wordhash_t *wh,
 
 	prob = calc_prob(cnts->good, cnts->bad,
 			 cnts->msgs_good, cnts->msgs_bad);
-	useflag = fabs(EVEN_ODDS - prob) >= score.min_dev;
+	useflag = fabs(prob - EVEN_ODDS) > score.min_dev;
 
 	if (need_stats)
 	    rstats_add(token, prob, useflag, cnts);
@@ -367,8 +375,7 @@ bool need_scoring_boundary(wordhash_t *wh)
 double find_scoring_boundary(wordhash_t *wh)
 {
     size_t node_index = 0;
-    size_t prob_index;
-    size_t node_count = max(token_count_fix, max(token_count_min, token_count_max));
+    size_t node_count = wh->count;
 
     double min_prob = (token_count_max == 0.0) ? min_dev : 1.0;
 
@@ -377,7 +384,7 @@ double find_scoring_boundary(wordhash_t *wh)
 
     for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
-	double prob;
+	double prob, dev;
 	word_t *token;
 	wordcnts_t *cnts;
 	wordprop_t *props;
@@ -393,47 +400,37 @@ double find_scoring_boundary(wordhash_t *wh)
 
 	prob = calc_prob(cnts->good, cnts->bad,
 			 cnts->msgs_good, cnts->msgs_bad);
-	prob = fabs(prob - EVEN_ODDS);
+	dev = fabs(prob - EVEN_ODDS);
 
-	if (node_index < node_count)
-	{
-	    // first "n" tokens go into array
-	    node_array[node_index].node = node;
-	    node_array[node_index].prob = prob;
-	    if (prob < min_prob)
-		min_prob = prob;
-	    node_index += 1;
-	}
-	else if (prob > min_prob)
-	{
-	    /* after the first "n" tokens, a token goes into array if
-	    ** it has a higher score than a token already in the
-	    ** array */
-	    for (prob_index = 0; prob_index < node_count; prob_index += 1)
-	    {
-		/* replace element with minimum score */
-		if (node_array[prob_index].prob == min_prob)
-		{
-		    node_array[prob_index].node = node;
-		    node_array[prob_index].prob = prob;
-		    break;
-		}
-	    }
-	    /* find current minimum score */
-	    min_prob = 1.0;
-	    for (prob_index = 0; prob_index < node_count; prob_index += 1)
-	    {
-		if (node_array[prob_index].prob < min_prob)
-		{
-		    min_prob = node_array[ prob_index ].prob;
-		}
-	    }
-	}
+	node_array[node_index].node = node;
+	node_array[node_index].dev = dev;
+	node_index += 1;
+    }
+
+    qsort(node_array, node_count, sizeof(probnode_t), compare_probnode_t);
+
+    node_index = max(token_count_fix, max(token_count_min, token_count_max));
+    min_prob = node_array[ node_index ].dev;
+
+    if (DEBUG_SPAMICITY(1)) {
+	printf( "%d %8.6f\n", (int)node_index, min_prob );
     }
 
     free(node_array);
 
     return min_prob;
+}
+
+static int compare_probnode_t(const void *const ipn1, const void *const ipn2)
+{
+    const probnode_t *pn1 = (const probnode_t const *)ipn1;
+    const probnode_t *pn2 = (const probnode_t const *)ipn2;
+
+    if (pn1->dev < pn2->dev)
+	return +1;
+    if (pn1->dev > pn2->dev)
+	return -1;
+    return 0;
 }
 
 void score_initialize(void)
@@ -580,6 +577,12 @@ void msg_print_summary(const char *pfx)
 		      pfx, "N_P_Q_S_s_x_md", (unsigned long)score.robn,
 		      score.p_pr, score.q_pr, score.spamicity, robs, robx, score.min_dev);
      }
+    if (DEBUG_SPAMICITY(1)) {
+	t_DOUBLE_QUAD dq;
+	dq.d = score.min_dev;
+	fprintf(dbgout, "md: %10.8f 0x%016qX\n",
+		score.min_dev, dq.q);
+    }
 }
 
 /* Done */

@@ -74,9 +74,16 @@ FIX2="--min-dev=0.100 --token-count=20"
 
 cat /dev/null > $OUT
 
+#TOK="-x s -D"
+
 for OPT in "$TST1" "$MIN1" "$MAX1" "$TST2" "$MIN2" "$MAX2" "$FIX2" ; do
     echo "#### $OPT ####" >> $OUT
-    map_rc $BOGOFILTER $OPT -c $CFG -vvv -H -I $INP >> $OUT
+    map_rc $BOGOFILTER $OPT -c $CFG -vvv -H $TOK -I $INP >> $OUT
+    if [ -n "$TOK" ] ; then
+	echo >> $OUT
+	echo >> $OUT
+	echo >> $OUT
+    fi
 done
 
 for OPT in "$TST1" "$MIN1" "$MAX1" "$TST2" "$MIN2" "$MAX2" "$FIX2" ; do
