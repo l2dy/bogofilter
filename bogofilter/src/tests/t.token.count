@@ -56,29 +56,29 @@ cat <<EOF > "$CFG"
 header_format = %h: %c, tests=bogofilter, spamicity=%p
 EOF
 
-# 2 tokens scored
-TST1="--min-dev=0.496"
+# large min_dev - few tokens scored
+TST_L="--min-dev=0.496"
 #                  min 4 -- score more
-MIN1="--min-dev=0.496 --token-count-min=4"
+MIN_L4="--min-dev=0.496 --token-count-min=4"
 #                  max 8 -- OK - 2 less than 8
-MAX1="--min-dev=0.496 --token-count-max=8"
+MAX_L8="--min-dev=0.496 --token-count-max=8"
 
-# 18 tokens scored
-TST2="--min-dev=0.100"
+# small min_dev - many tokens scored
+TST_S="--min-dev=0.100"
 #                  min 4 -- OK - 4 less than 18
-MIN2="--min-dev=0.100 --token-count-min=4"
+MIN_S4="--min-dev=0.100 --token-count-min=4"
 #                  max 8 -- score fewer
-MAX2="--min-dev=0.100 --token-count-max=8"
+MAX_S8="--min-dev=0.100 --token-count-max=8"
 #                  fix 20 -- score more
-FIX2="--min-dev=0.100 --token-count=20"
+FIX_S20="--min-dev=0.100 --token-count=20"
 
 cat /dev/null > $OUT
 
 #TOK="-x s -D"
 
-for OPT in "$TST1" "$MIN1" "$MAX1" "$TST2" "$MIN2" "$MAX2" "$FIX2" ; do
+for OPT in "$TST_L" "$MIN_L4" "$MAX_L8" "$TST_S" "$MIN_S4" "$MAX_S8" "$FIX_S20" ; do
     echo "#### $OPT ####" >> $OUT
-    map_rc $BOGOFILTER $OPT -c $CFG -vvv -H $TOK -I $INP >> $OUT
+    map_rc $BOGOFILTER $OPT $TOK -c $CFG -vvv -H -I $INP >> $OUT
     if [ -n "$TOK" ] ; then
 	echo >> $OUT
 	echo >> $OUT
@@ -86,8 +86,8 @@ for OPT in "$TST1" "$MIN1" "$MAX1" "$TST2" "$MIN2" "$MAX2" "$FIX2" ; do
     fi
 done
 
-for OPT in "$TST1" "$MIN1" "$MAX1" "$TST2" "$MIN2" "$MAX2" "$FIX2" ; do
-    SCORE=$( map_rc $BOGOFILTER $OPT -c $CFG -v -tt -H -I $INP )
+for OPT in "$TST_L" "$MIN_L4" "$MAX_L8" "$TST_S" "$MIN_S4" "$MAX_S8" "$FIX_S20" ; do
+    SCORE=$( map_rc $BOGOFILTER $OPT $TOK -c $CFG -v -tt -H -I $INP )
     echo "#### $SCORE $OPT " >> $OUT
 done
 
@@ -97,3 +97,4 @@ if  [ $verbose -eq 0 ]; then
 else
     diff $DIFF_BRIEF "$REF" "$OUT"
 fi
+

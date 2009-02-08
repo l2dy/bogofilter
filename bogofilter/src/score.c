@@ -267,6 +267,7 @@ void compute_spamicity(wordhash_t *wh,
     {
 	bool useflag;
 	double prob;
+	double diff;
 	word_t *token;
 	wordcnts_t *cnts;
 	wordprop_t *props;
@@ -280,11 +281,56 @@ void compute_spamicity(wordhash_t *wh,
 	    token = NULL;
 	}
 
-	count += 1;
-
 	prob = calc_prob(cnts->good, cnts->bad,
 			 cnts->msgs_good, cnts->msgs_bad);
+
+	/* Regression test 'tests/t.token.count' tests bogofilter's
+	** '--token-count...' options
+	**
+	** A 'min_dev' value is found that provides an exact cutoff
+	** for selecting scorable tokens.  For each token, a
+	** comparison of 'prob', 'EVEN_ODDS', and 'min_dev' then
+	** determines whether to score the token.  How the comparison
+	** expression is written is important since some ways of
+	** writing the comparison can produce different answers on
+	** 32-bit and 64-bit architectures.
+	**
+	** tested on: 
+	**     64-bits: AMD64x2
+	**     32-bits: AMD Geode & Intel PIII
+	*/
+
+#if	0
+	// unsafe on 32-bits
 	useflag = fabs(prob - EVEN_ODDS) > score.min_dev;
+#else
+	// safe on 32-bits and 64-bits
+	diff = fabs(prob - EVEN_ODDS);
+	useflag = diff > score.min_dev;
+#endif
+
+	if (DEBUG_SPAMICITY(1)) {
+	    // display difference of 'useflag' computations
+	    double d1 = fabs(prob - EVEN_ODDS);
+	    double d2 = fabs(d1 - score.min_dev);
+	    double d3 = fabs(fabs(prob - EVEN_ODDS) - score.min_dev);
+
+	    if ( d2 <= 0.001 ) {
+		t_DOUBLE_QUAD dq;
+
+		dq.d = prob;
+		fprintf(dbgout, "md2-pf:   %15.10f %16llX %s %-16s\n", prob, dq.q, useflag ? "+" : "-", token->u.text);
+
+		dq.d = d1;
+		fprintf(dbgout, "md2-d1:   %15.10f %16llX\n", d1, dq.q );
+
+		dq.d = d2;
+		fprintf(dbgout, "md2-d2:   %15.10f %16llX %16.6g\n", d2, dq.q, d2 );
+
+		dq.d = d3;
+		fprintf(dbgout, "md2-d3:   %15.10f %16llX %16.6g\n", d3, dq.q, d3 );
+	    }
+	}
 
 	if (need_stats)
 	    rstats_add(token, prob, useflag, cnts);
@@ -312,6 +358,7 @@ void compute_spamicity(wordhash_t *wh,
 	}
 
 	if (DEBUG_ALGORITHM(3)) {
+	    count += 1;
 	    (void)fprintf(dbgout, "%3lu %3lu %f ",
 			  (unsigned long)*robn, (unsigned long)count, prob);
 	    (void)word_puts(token, 0, dbgout);
@@ -383,6 +430,7 @@ double find_scoring_boundary(wordhash_t *wh)
     hashnode_t *node;
     probnode_t *node_array = calloc(node_count, sizeof(probnode_t));
 
+    /* create array from linked list to allow sorting */
     for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
 	double prob, dev;
@@ -413,24 +461,6 @@ double find_scoring_boundary(wordhash_t *wh)
 
     node_index = max(token_count_fix, max(token_count_min, token_count_max));
     min_prob = node_array[ node_index ].dev;
-
-    if (DEBUG_SPAMICITY(1)) {
-	printf( "%d %8.6f\n", (int)node_index, min_prob );
-    }
-
-    if (DEBUG_SPAMICITY(2)) {
-	unsigned int ni;
-	for (ni = 0; ni <= node_index; ni += 1)
-	{
-	    t_DOUBLE_QUAD dq;
-	    probnode_t *pn = &node_array[ni];
-	    hashnode_t *hn = pn->node ;
-
-	    dq.d = pn->dev;
-	    printf( "%2d %-16s %8.6f %8.6f %16llX\n", 
-		    ni, hn->key->u.text, pn->prob, pn->dev, dq.q);
-	}
-    }
 
     free(node_array);
 
@@ -592,12 +622,6 @@ void msg_print_summary(const char *pfx)
 	(void)fprintf(fpo, "%s%-24s %6lu %9.2e %9.2e %9.2e %9.2e %9.2e %5.3f\n",
 		      pfx, "N_P_Q_S_s_x_md", (unsigned long)score.robn,
 		      score.p_pr, score.q_pr, score.spamicity, robs, robx, score.min_dev);
-     }
-    if (DEBUG_SPAMICITY(1)) {
-	t_DOUBLE_QUAD dq;
-	dq.d = score.min_dev;
-	fprintf(dbgout, "md: %10.8f 0x%016llX\n",
-		score.min_dev, dq.q);
     }
 }
 
