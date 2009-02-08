@@ -24,11 +24,11 @@ $BOGOFILTER -C -y 0 -n -M -I "$SYSTEST/inputs/good.mbx"
 
 cat > $INP <<EOF
 there         0.000660 4 8 20
-its           0.172558   8 20
+zip           0.009094   8 20
 all           0.194216   8 20
 web           0.203096   8 20
-too           0.222810   9
-more          0.260471   9 20
+too           0.222810   8 20
+been          0.246762     20
 file          0.314336     20
 also          0.337138     20
 about         0.345518     20
@@ -81,8 +81,6 @@ for OPT in "$TST_L" "$MIN_L4" "$MAX_L8" "$TST_S" "$MIN_S4" "$MAX_S8" "$FIX_S20" 
     map_rc $BOGOFILTER $OPT $TOK -c $CFG -vvv -H -I $INP >> $OUT
     if [ -n "$TOK" ] ; then
 	echo >> $OUT
-	echo >> $OUT
-	echo >> $OUT
     fi
 done
 
@@ -97,4 +95,3 @@ if  [ $verbose -eq 0 ]; then
 else
     diff $DIFF_BRIEF "$REF" "$OUT"
 fi
-

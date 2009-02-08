@@ -267,7 +267,6 @@ void compute_spamicity(wordhash_t *wh,
     {
 	bool useflag;
 	double prob;
-	double diff;
 	word_t *token;
 	wordcnts_t *cnts;
 	wordprop_t *props;
@@ -284,53 +283,7 @@ void compute_spamicity(wordhash_t *wh,
 	prob = calc_prob(cnts->good, cnts->bad,
 			 cnts->msgs_good, cnts->msgs_bad);
 
-	/* Regression test 'tests/t.token.count' tests bogofilter's
-	** '--token-count...' options
-	**
-	** A 'min_dev' value is found that provides an exact cutoff
-	** for selecting scorable tokens.  For each token, a
-	** comparison of 'prob', 'EVEN_ODDS', and 'min_dev' then
-	** determines whether to score the token.  How the comparison
-	** expression is written is important since some ways of
-	** writing the comparison can produce different answers on
-	** 32-bit and 64-bit architectures.
-	**
-	** tested on: 
-	**     64-bits: AMD64x2
-	**     32-bits: AMD Geode & Intel PIII
-	*/
-
-#if	0
-	// unsafe on 32-bits
 	useflag = fabs(prob - EVEN_ODDS) > score.min_dev;
-#else
-	// safe on 32-bits and 64-bits
-	diff = fabs(prob - EVEN_ODDS);
-	useflag = diff > score.min_dev;
-#endif
-
-	if (DEBUG_SPAMICITY(1)) {
-	    // display difference of 'useflag' computations
-	    double d1 = fabs(prob - EVEN_ODDS);
-	    double d2 = fabs(d1 - score.min_dev);
-	    double d3 = fabs(fabs(prob - EVEN_ODDS) - score.min_dev);
-
-	    if ( d2 <= 0.001 ) {
-		t_DOUBLE_QUAD dq;
-
-		dq.d = prob;
-		fprintf(dbgout, "md2-pf:   %15.10f %16llX %s %-16s\n", prob, dq.q, useflag ? "+" : "-", token->u.text);
-
-		dq.d = d1;
-		fprintf(dbgout, "md2-d1:   %15.10f %16llX\n", d1, dq.q );
-
-		dq.d = d2;
-		fprintf(dbgout, "md2-d2:   %15.10f %16llX %16.6g\n", d2, dq.q, d2 );
-
-		dq.d = d3;
-		fprintf(dbgout, "md2-d3:   %15.10f %16llX %16.6g\n", d3, dq.q, d3 );
-	    }
-	}
 
 	if (need_stats)
 	    rstats_add(token, prob, useflag, cnts);
