@@ -120,7 +120,7 @@ rsynconly: .rsyncs
 	@( cat $(srcdir)/.rsyncs | sed -e 's}^}rsync -av -e ssh --delete $(PACKAGE)-$(VERSION)/ }; s/\($$\)/ \&/;' ; echo "wait" ) | $(SHELL) -x
 
 dist-hook:
-	cd $(distdir) && find doc gnugetopt gsl -name CVS -type d -prune -exec rm -r '{}' ';'
+	cd $(distdir) && find doc gnugetopt gsl '(' -name .svn -o -name CVS ')' -type d -prune -exec rm -rf '{}' +
 	cd $(distdir) && find doc gnugetopt gsl -name '.#*' -type f -exec rm '{}' ';'
 	rm -f $(distdir)/doc/.cvsignore $(distdir)/ChangeLog
 
