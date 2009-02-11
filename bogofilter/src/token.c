@@ -106,6 +106,7 @@ static void free_token_array(void)
 {
     free(p_multi_words);
     free(p_multi_text );
+    free(p_multi_buff );
     free(w_token_array);
 }
 
@@ -283,6 +284,9 @@ token_t parse_new_token(word_t *token)
 	case TOKEN:	/* ignore anything when not reading text MIME types */
 	    if (leng < min_token_len)
 		continue;
+
+	/*@fallthrough@*/
+
 	case MONEY:	/* 2 character money is OK */
 	    if (leng > max_token_len)
 		continue;
