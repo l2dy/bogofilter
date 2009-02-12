@@ -57,7 +57,8 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
     if (wordcount == 0)
 	msgcount = 0;
 
-    format_log_update(msg_register, msg_register_size, u, r, wordcount, msgcount);
+    format_set_counts(wordcount, msgcount);
+    format_log_update(msg_register, msg_register_size, u, r);
 
     if (verbose)
 	(void)fprintf(dbgout, "# %u word%s, %u message%s\n", 

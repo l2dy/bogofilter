@@ -36,5 +36,6 @@ extern bool set_spamicity_fields(FIELD *strings, const char *val);
 extern char *format_header(char *buff, size_t size);
 extern char *format_terse(char *buff, size_t size);
 extern char *format_log_header(char *buff, size_t size);
-extern char *format_log_update(char *buff, size_t size, const char *reg, const char *unreg, uint wordcount, uint msgcount);
+extern void  format_set_counts(uint _wrd, uint _msg);
+extern char *format_log_update(char *buff, size_t size, const char *reg, const char *unreg);
 #endif

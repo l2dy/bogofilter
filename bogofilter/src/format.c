@@ -434,12 +434,16 @@ char *format_terse(char *buff, size_t size)
     return convert_format_to_string( buff, size, terse_format );
 }
 
-char *format_log_update(char *buff, size_t size, const char *_reg, const char *_unreg, uint _wrd, uint _msg)
+void format_set_counts(uint _wrd, uint _msg)
+{
+    wrdcount = _wrd;
+    msgcount = _msg;
+}
+
+char *format_log_update(char *buff, size_t size, const char *_reg, const char *_unreg)
 {
     reg = _reg;
     unreg = _unreg;
-    wrdcount = _wrd;
-    msgcount = _msg;
     return convert_format_to_string( buff, size, log_update_format );
 }
 

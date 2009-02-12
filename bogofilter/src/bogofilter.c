@@ -34,6 +34,7 @@ THEORY:
 #include "bogoconfig.h"
 #include "bogoreader.h"
 #include "collect.h"
+#include "format.h"
 #include "passthrough.h"
 #include "register.h"
 #include "rstats.h"
@@ -97,6 +98,8 @@ rc_t bogofilter(int argc, char **argv)
 	collect_words(w);
 	wordhash_sort(w);
 	msgcount += 1;
+
+	format_set_counts(w->count, msgcount);
 
         if (!passthrough_keepopen())
             bogoreader_close_ifeof();
