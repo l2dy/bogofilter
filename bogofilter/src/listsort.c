@@ -39,18 +39,30 @@
  * SOFTWARE.
  */
 
-#define FALSE 0
-#define TRUE 1
+#include "listsort.h"
+typedef unsigned char byte;
+#include "word.h"
 
-typedef struct element element;
-struct element {
-    element *next, *prev;
-    int i;
+typedef struct rstats_s rstats_t;
+struct rstats_s {
+    rstats_t *next;
+    const word_t *token;
+    u_int32_t	good;
+    u_int32_t	bad;
+    u_int32_t	msgs_good;
+    u_int32_t	msgs_bad;
+    bool   used;
+    double prob;
 };
 
-int cmp(element *a, element *b) {
+#ifdef	TEST
+
+static int cmp(const element *a, const element *b);
+
+static int cmp(const element *a, const element *b) {
     return a->i - b->i;
 }
+#endif
 
 /*
  * This is the actual sort function. Notice that it returns the new
@@ -64,7 +76,18 @@ int cmp(element *a, element *b) {
  * 
  *     list = listsort(mylist);
  */
-element *listsort(element *list, int is_circular, int is_double) {
+#if	1
+#define TRACE(n,p)
+#else
+#define TRACE(n,p) 	\
+		{	\
+		    const rstats_t *r = (const rstats_t *)p;	\
+		    printf("%s:%d  %s: %p %-16s %8.6f\n", __FILE__, __LINE__, 	\
+			   n, r, r->token->u.text, r->prob);		\
+		}
+#endif
+
+element *listsort(element *list, fcn_compare *compare, bool is_circular, bool is_double) {
     element *p, *q, *e, *tail, *oldhead;
     int insize, nmerges, psize, qsize, i;
 
@@ -78,6 +101,7 @@ element *listsort(element *list, int is_circular, int is_double) {
     insize = 1;
 
     while (1) {
+//	printf("%s:%d %d\n", __FILE__, __LINE__, insize);
         p = list;
 	oldhead = list;		       /* only used for circular linkage */
         list = NULL;
@@ -114,7 +138,7 @@ element *listsort(element *list, int is_circular, int is_double) {
 		    /* q is empty; e must come from p. */
 		    e = p; p = p->next; psize--;
 		    if (is_circular && p == oldhead) p = NULL;
-		} else if (cmp(p,q) <= 0) {
+		} else if (compare(p,q) <= 0) {
 		    /* First element of p is lower (or same);
 		     * e must come from p. */
 		    e = p; p = p->next; psize--;
@@ -163,25 +187,26 @@ element *listsort(element *list, int is_circular, int is_double) {
  * the end and some will not.
  */
 
+#ifdef	TEST
 int main(void) {
     #define n 13
     element k[n], *head, *p;
-    int is_circular, is_double;
+    bool is_circular, is_double;
 
     int order[][n] = {
         { 0,1,2,3,4,5,6,7,8,9,10,11,12 },
         { 6,2,8,4,11,1,12,7,3,9,5,0,10 },
         { 12,11,10,9,8,7,6,5,4,3,2,1,0 },
     };
-    int i, j;
+    unsigned int i, j;
 
     for (j = 0; j < n; j++)
         k[j].i = j;
 
-    listsort(NULL, 0, 0);
+    listsort(NULL, cmp, 0, 0);
 
-    for (is_circular = 0; is_circular < 2; is_circular++) {
-	for (is_double = 0; is_double < 2; is_double++) {
+    for (is_circular = false; is_circular <= true; is_circular++) {
+	for (is_double = false; is_double < true; is_double++) {
 	    for (i = 0; i < sizeof(order)/sizeof(*order); i++) {
 		int *ord = order[i];
 		head = &k[ord[0]];
@@ -200,6 +225,8 @@ int main(void) {
 		    }
 		}
 
+		printf("%s %s  ", is_circular ? "cir" : "   ", is_double ? "dbl" : "   ");
+
 		printf("before:");
 		p = head;
 		do {
@@ -210,8 +237,8 @@ int main(void) {
 		    }
 		    p = p->next;
 		} while (is_circular ? (p != head) : (p != NULL));
-		printf("\n");
-		head = listsort(head, is_circular, is_double);
+		printf("\t");
+		head = listsort(head, cmp, is_circular, is_double);
 		printf(" after:");
 		p = head;
 		do {
@@ -224,7 +251,9 @@ int main(void) {
 		} while (is_circular ? (p != head) : (p != NULL));
 		printf("\n");
 	    }
+	    printf("\n");
 	}
     }
     return 0;
 }
+#endif
