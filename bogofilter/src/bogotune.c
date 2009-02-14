@@ -639,7 +639,7 @@ static int update_count(void)
 	if ((message_count % 1000) != 0)
 	    putchar('.');
 	else
-	    printf("\r              \r%u ", message_count/1000 );
+	    printf("\r              \r%u ", message_count );
 	fflush(stdout);
     }
     return message_count;
@@ -732,7 +732,7 @@ static void write_msgcount_file(wordhash_t *wh)
 
     for (hn = wordhash_first(wh); hn != NULL; hn = wordhash_next(wh)) {
 	word_t *token = hn->key;
-	wordprop_t *wp = (wordprop_t *) hn->buf;
+	wordprop_t *wp = (wordprop_t *) hn->data;
 	wordcnts_t *cnts = &wp->cnts;
 
 	if (cnts->good == 0 && cnts->bad == 0) {
@@ -1462,6 +1462,7 @@ static bool check_msgcount_parms(void)
 static bool check_msg_counts(void)
 {
     bool ok = true;
+    double ratio;
 
     if (msgs_good < LIST_COUNT || msgs_bad < LIST_COUNT) {
 	if (!quiet)
@@ -1472,13 +1473,13 @@ static bool check_msg_counts(void)
 	ok = false;
     }
 
-    if (msgs_bad * 5.0 < msgs_good ||
-	msgs_bad > msgs_good * 5.0) {
-	if (!quiet)
+    ratio =  (double)msgs_good / (double)msgs_bad;
+    fprintf(stderr, "wordlist's ham to spam ratio is %0.1f to 1.0\n", ratio );
+    if ( ratio < 0.1 || ratio > 10.0) {
+	if (!quiet) {
 	    fprintf(stderr,
-		    "The wordlist has a ratio of spam to non-spam of %0.1f to 1.0.\n"
-		    "Bogotune requires the ratio be in the range of 0.2 to 5.\n",
-		    (double)msgs_bad / msgs_good);
+		    "Bogotune requires the ratio be in the range of 0.1 to 10.\n");
+	}
 	ok = false;
     }
 
