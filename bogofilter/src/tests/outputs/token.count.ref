@@ -57,7 +57,7 @@ X-Bogosity: Unsure, tests=bogofilter, spamicity=0.532831
   "dealer"                              2  0.000000  0.095238  0.995766 +
   "agree"                               3  0.000000  0.142857  0.997169 +
   N_P_Q_S_s_x_md                        4  0.000085  0.065746  0.532831
-                                           0.017800  0.520000  0.490906
+                                           0.017800  0.520000  0.491605
 #### --min-dev=0.496 --token-count-max=8 ####
 X-Bogosity: Unsure, tests=bogofilter, spamicity=0.493025
                                         n    pgood     pbad      fw     U
@@ -177,7 +177,7 @@ X-Bogosity: Unsure, tests=bogofilter, spamicity=0.500083
   "dealer"                              2  0.000000  0.095238  0.995766 +
   "agree"                               3  0.000000  0.142857  0.997169 +
   N_P_Q_S_s_x_md                        8  0.006086  0.006252  0.500083
-                                           0.017800  0.520000  0.253238
+                                           0.017800  0.520000  0.277190
 #### --min-dev=0.100 --token-count=20 ####
 X-Bogosity: Unsure, tests=bogofilter, spamicity=0.495886
                                         n    pgood     pbad      fw     U
@@ -207,7 +207,7 @@ X-Bogosity: Unsure, tests=bogofilter, spamicity=0.495886
   "dealer"                              2  0.000000  0.095238  0.995766 +
   "agree"                               3  0.000000  0.142857  0.997169 +
   N_P_Q_S_s_x_md                       20  0.107193  0.098964  0.495886
-                                           0.017800  0.520000  0.059390
+                                           0.017800  0.520000  0.067490
 #### U 0.493025 --min-dev=0.496 
 #### U 0.532831 --min-dev=0.496 --token-count-min=4 
 #### U 0.493025 --min-dev=0.496 --token-count-max=8 

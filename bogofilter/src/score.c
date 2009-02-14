@@ -17,6 +17,7 @@ NAME:
 #include "bogofilter.h"
 #include "collect.h"
 #include "datastore.h"
+#include "listsort.h"
 #include "msgcounts.h"
 #include "prob.h"
 #include "rand_sleep.h"
@@ -71,8 +72,9 @@ typedef union
 static	double	get_spamicity(size_t robn, FLOAT P, FLOAT Q);
 static	bool	need_scoring_boundary(wordhash_t *wh);
 static	double	find_scoring_boundary(wordhash_t *wh);
+static	void	compute_scores(wordhash_t *wh);
 static	void	compute_spamicity(wordhash_t *wh, FLOAT *P, FLOAT *Q, size_t *robn, bool need_stats);
-static	int	compare_probnode_t(const void *const ipn1, const void *const ipn2);
+static	int	compare_hashnode_t(const void *const pv1, const void *const pv2);
 
 /* Static Variables */
 
@@ -233,6 +235,8 @@ double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
 				    min_dev, robs, robx);
 
+    compute_scores(wh);
+
     score.min_dev = !need_scoring_boundary(wh) ? min_dev : find_scoring_boundary(wh);
 
     compute_spamicity(wh, &P, &Q, &robn, need_stats);
@@ -252,6 +256,37 @@ double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
 }
 
 /*
+** compute_scores()
+**	compute the token probabilities from the linked list of tokens
+*/
+void compute_scores(wordhash_t *wh)
+{
+    hashnode_t *node;
+
+    for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
+    {
+	wordcnts_t *cnts;
+	wordprop_t *props;
+
+	if (!fBogotune) {
+	    props = (wordprop_t *) node->buf;
+	    cnts  = &props->cnts;
+	    props->prob = calc_prob(cnts->good, cnts->bad,
+				    cnts->msgs_good, cnts->msgs_bad);
+	    props->used = fabs(props->prob - EVEN_ODDS) > min_dev;
+	} else {
+	    /* unneeded - remove */
+	    double prob;
+	    bool   useflag;
+	    cnts = (wordcnts_t *) node;
+	    prob = calc_prob(cnts->good, cnts->bad,
+			     cnts->msgs_good, cnts->msgs_bad);
+	    useflag = fabs(prob - EVEN_ODDS) > score.min_dev;
+	}
+    }
+}
+
+/*
 ** compute_spamicity()
 **	compute the spamicity from the linked list of tokens using
 **	min_dev to select tokens
@@ -263,6 +298,7 @@ void compute_spamicity(wordhash_t *wh,
     hashnode_t *node;
 
     size_t count = 0;
+
     for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
 	bool useflag;
@@ -272,18 +308,18 @@ void compute_spamicity(wordhash_t *wh,
 	wordprop_t *props;
 
 	if (!fBogotune) {
+	    token = node->key;
 	    props = (wordprop_t *) node->buf;
 	    cnts  = &props->cnts;
-	    token = node->key;
+	    prob = props->prob;
+	    useflag = props->used;
 	} else {
-	    cnts = (wordcnts_t *) node;
 	    token = NULL;
+	    cnts = (wordcnts_t *) node;
+	    prob = calc_prob(cnts->good, cnts->bad,
+			     cnts->msgs_good, cnts->msgs_bad);
+	    useflag = fabs(prob - EVEN_ODDS) > score.min_dev;
 	}
-
-	prob = calc_prob(cnts->good, cnts->bad,
-			 cnts->msgs_good, cnts->msgs_bad);
-
-	useflag = fabs(prob - EVEN_ODDS) > score.min_dev;
 
 	if (need_stats)
 	    rstats_add(token, prob, useflag, cnts);
@@ -337,23 +373,16 @@ bool need_scoring_boundary(wordhash_t *wh)
     // Count scorable tokens
     for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
-	double prob;
-	wordcnts_t *cnts;
-	wordprop_t *props;
-
 	if (!fBogotune) {
-	    props = (wordprop_t *) node->buf;
-	    cnts  = &props->cnts;
+	    wordprop_t *props = (wordprop_t *) node->buf;
+	    if (props->used)
+		count += 1;
 	} else {
-	    cnts = (wordcnts_t *) node;
-	}
-
-	prob = calc_prob(cnts->good, cnts->bad,
-			 cnts->msgs_good, cnts->msgs_bad);
-
-	if (fabs(prob - EVEN_ODDS) >= min_dev)
-	{
-	    count += 1;
+	    wordcnts_t *cnts = (wordcnts_t *) node;
+	    double prob = calc_prob(cnts->good, cnts->bad,
+				    cnts->msgs_good, cnts->msgs_bad);
+	    if (fabs(prob - EVEN_ODDS) >= min_dev)
+		count += 1;
 	}
     }
 
@@ -375,60 +404,80 @@ bool need_scoring_boundary(wordhash_t *wh)
 */
 double find_scoring_boundary(wordhash_t *wh)
 {
-    size_t node_index = 0;
-    size_t node_count = wh->count;
+    size_t count = 0;
 
     double min_prob = (token_count_max == 0.0) ? min_dev : 1.0;
 
     hashnode_t *node;
-    probnode_t *node_array = calloc(node_count, sizeof(probnode_t));
 
-    /* create array from linked list to allow sorting */
-    for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
-    {
-	double prob, dev;
-	word_t *token;
+    /* sort by ascending score difference (from 0.5) */
+    wh->iter_head = listsort(wh->iter_head, &compare_hashnode_t, false, false);
+
+    count = max(token_count_fix, max(token_count_min, token_count_max));
+
+    for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh)) {
 	wordcnts_t *cnts;
 	wordprop_t *props;
+	double prob;
+	double dev;
 
 	if (!fBogotune) {
 	    props = (wordprop_t *) node->buf;
 	    cnts  = &props->cnts;
-	    token = node->key;
 	} else {
 	    cnts = (wordcnts_t *) node;
-	    token = NULL;
 	}
-
 	prob = calc_prob(cnts->good, cnts->bad,
 			 cnts->msgs_good, cnts->msgs_bad);
 	dev = fabs(prob - EVEN_ODDS);
 
-	node_array[node_index].node = node;
-	node_array[node_index].prob = prob;
-	node_array[node_index].dev  = dev;
-	node_index += 1;
+	if (count > 0) {
+	    count -= 1;
+	    props->used = true;
+	    min_prob = dev;
+	}
+	else if (dev >= min_prob) {
+	    props->used = true;
+	}
+	else {
+	    props->used = false;
+	}
     }
-
-    qsort(node_array, node_count, sizeof(probnode_t), compare_probnode_t);
-
-    node_index = max(token_count_fix, max(token_count_min, token_count_max));
-    min_prob = node_array[ node_index ].dev;
-
-    free(node_array);
 
     return min_prob;
 }
 
-static int compare_probnode_t(const void *const ipn1, const void *const ipn2)
-{
-    const probnode_t *pn1 = (const probnode_t const *)ipn1;
-    const probnode_t *pn2 = (const probnode_t const *)ipn2;
+/* compare_hashnode_t - sort by ascending score difference (from 0.5) */
 
-    if (pn1->dev < pn2->dev)
+static int compare_hashnode_t(const void *const pv1, const void *const pv2)
+{
+    double d1;
+    double d2;
+
+    if (!fBogotune) {
+	const hashnode_t *hn1 = (const hashnode_t const *)pv1;
+	const hashnode_t *hn2 = (const hashnode_t const *)pv2;
+	d1 = fabs(((wordprop_t *) hn1->buf)->prob - EVEN_ODDS);
+	d2 = fabs(((wordprop_t *) hn2->buf)->prob - EVEN_ODDS);
+    } else {
+	const wordcnts_t *cnts;
+	double prob;
+	cnts = (const wordcnts_t *) pv1;
+	prob = calc_prob(cnts->good, cnts->bad,
+			 cnts->msgs_good, cnts->msgs_bad);
+	d1 = fabs(prob - EVEN_ODDS);
+
+	cnts = (const wordcnts_t *) pv2;
+	prob = calc_prob(cnts->good, cnts->bad,
+			 cnts->msgs_good, cnts->msgs_bad);
+	d2 = fabs(prob - EVEN_ODDS);
+    }
+
+    if (d1 < d2)
 	return +1;
-    if (pn1->dev > pn2->dev)
+    if (d1 > d2)
 	return -1;
+
     return 0;
 }
 

@@ -25,19 +25,6 @@ AUTHOR:
 #include "score.h"
 #include "xmalloc.h"
 
-#if	1
-#define TRACE(n,p)
-#else
-#define TRACE(n,p) 	\
-		{	\
-		    const rstats_t *r = (const rstats_t *)p;	\
-		    printf("%s:%d    %s: %p %-16s %8.6f\n", __FILE__, __LINE__, 	\
-			   n, r, 					\
-			   r ? (char *)r->token->u.text : "nil", 	\
-			   r ? r->prob : 0.0);				\
-		}
-#endif
-
 typedef struct rstats_s rstats_t;
 struct rstats_s {
     rstats_t *next;
@@ -82,8 +69,8 @@ void rstats_init(void)
 {
     if (stats_head == NULL) {
 	stats_head = xcalloc(1, sizeof(header_t));
-	stats_tail = NULL;
-	stats_head->list = NULL;
+	stats_tail = (rstats_t *)xcalloc(1, sizeof(rstats_t));
+	stats_head->list = stats_tail;
     }
 }
 
@@ -103,24 +90,11 @@ void rstats_cleanup(void)
 
 void rstats_add(const word_t *token, double prob, bool used, wordcnts_t *cnts)
 {
-    rstats_t *stats_new;
-
     if (token == NULL)
 	return;
 
-//    fprintf(dbgout, "%s:%d    %-16s %8.6f\n", __FILE__, __LINE__, 
-//	    token->u.text, prob);
-
-    stats_new = (rstats_t *)xcalloc(1, sizeof(rstats_t));
-
-    if (stats_head->count == 0) {
-	stats_head->list = stats_new;
-    }
-    if (stats_tail != NULL)
-	stats_tail->next = stats_new;
-    stats_tail = stats_new;
-
     stats_head->count += 1;
+    stats_tail->next  = NULL;
 
     /* Using externally controlled data;
        token must not be freed before calling rstats_cleanup()
@@ -132,15 +106,17 @@ void rstats_add(const word_t *token, double prob, bool used, wordcnts_t *cnts)
     stats_tail->bad   = cnts->bad;
     stats_tail->msgs_good = cnts->msgs_good;
     stats_tail->msgs_bad = cnts->msgs_bad;
-    stats_tail = stats_new;
 
-//    fprintf(dbgout, "%s:%d %2d %p %8.6f  %-16s\n", __FILE__, __LINE__, stats_head->count, stats_new, stats_new->prob, stats_new->token->u.text);
+    stats_tail->next = (rstats_t *)xcalloc(1, sizeof(rstats_t));
+    stats_tail = stats_tail->next;
 }
 
-static int compare_rstats_t(const void *const ir1, const void *const ir2)
+/* compare_rstats_t - sort by ascending spamicity */
+
+static int compare_rstats_t(const void *const pv1, const void *const pv2)
 {
-    const rstats_t *r1 = (const rstats_t *)ir1;
-    const rstats_t *r2 = (const rstats_t *)ir2;
+    const rstats_t *r1 = (const rstats_t *)pv1;
+    const rstats_t *r2 = (const rstats_t *)pv2;
 
     if (r1->prob > r2->prob) return 1;
     if (r2->prob > r1->prob) return -1;
@@ -161,9 +137,9 @@ void rstats_fini(size_t robn, FLOAT P, FLOAT Q, double spamicity)
 void rstats_print(bool unsure)
 {
     size_t robn  = stats_head->robn;
-    size_t count = stats_head->count;
 
-    stats_head->list = (rstats_t *)listsort((element *)stats_head->list, (fcn_compare *)&compare_rstats_t, false, false);
+    /* sort by ascending spamicity */
+    stats_head->list = listsort(stats_head->list, &compare_rstats_t, false, false);
 
     if (Rtable || verbose>=3)
 	rstats_print_rtable(stats_head->list);
@@ -215,13 +191,13 @@ static void rstats_print_histogram(size_t robn, rstats_t *rstats_head)
 
 	if (robn == 0)
 	    h->spamicity = robx;
-	else 
+	else
 	{
 	    double invproduct, product;
 	    invproduct = 1.0 - exp(invlogsum / invn);
 	    product = 1.0 - exp(logsum / invn);
-	    h->spamicity = (invproduct + product < EPS) 
-		? 0.0 
+	    h->spamicity = (invproduct + product < EPS)
+		? 0.0
 		: (1.0 + (invproduct - product) / (invproduct + product)) / 2.0;
 	}
 	h->count=cnt;
@@ -266,7 +242,7 @@ static void rstats_print_rtable(rstats_t *rstats_head)
 		      pfx, max_token_len+2, "", "n", "pgood", "pbad", "fw", "invfwlog", "fwlog", "U");
 
     /* Print 1 line per token */
-    for (cur=rstats_head; cur != NULL; cur=cur->next)
+    for (cur=rstats_head->next; cur != NULL; cur=cur->next)
     {
 	int len = (cur->token->leng >= max_token_len) ? 0 : (max_token_len - cur->token->leng);
 	double fw = calc_prob(cur->good, cur->bad, cur->msgs_good, cur->msgs_bad);

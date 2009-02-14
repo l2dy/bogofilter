@@ -160,7 +160,8 @@ typedef struct {
 typedef struct {
     wordcnts_t  cnts;
     double 	prob;
-    int freq;
+    int		freq;
+    bool	used;
 } wordprop_t;
 
 extern void bf_exit(void);
