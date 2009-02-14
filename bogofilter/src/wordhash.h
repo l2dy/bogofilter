@@ -41,20 +41,19 @@ typedef struct wordhash_s {
   /*@null@*/  /*@dependent@*/ uint size;		/* size of array */
 
   hashnode_pt *bin;
-  /*@null@*/ /*@owned@*/ wh_alloc_node *nodes;		/*list of node buffers */
+  /*@null@*/ /*@owned@*/ wh_alloc_node *nodes;		/* list of node buffers */
   /*@null@*/  		 wh_alloc_str  *strings;	/* list of string buffers */
 
   /*@null@*/  /*@dependent@*/ hashnode_t *iter_ptr;
   /*@null@*/  /*@dependent@*/ hashnode_t *iter_head;
   /*@null@*/  /*@dependent@*/ hashnode_t *iter_tail;
 
-  /*@null@*/  /*@dependent@*/ hashnode_t **order;	/* array of nodes */
-  /*@null@*/  /*@dependent@*/ hashnode_t  *props;	/* array of nodes */
-  /*@null@*/  /*@dependent@*/ wordcnts_t  *cnts;	/* array of counts */
+  /*@null@*/  /*@dependent@*/ hashnode_t *props;	/* array of nodes */
+  /*@null@*/  /*@dependent@*/ wordcnts_t *cnts;		/* array of counts */
 } wordhash_t;
 
 /*@only@*/ wordhash_t *wordhash_new(void);
-/*@only@*/ wordhash_t *wordhash_init(wh_t t, uint c);
+/*@only@*/ wordhash_t *wordhash_init(wh_t type, uint count);
 
 void wordhash_free(/*@only@*/ wordhash_t *);
 size_t wordhash_count(wordhash_t * h);

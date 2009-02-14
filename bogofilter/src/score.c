@@ -46,7 +46,6 @@ NAME:
 typedef struct probnode_t {
     hashnode_t * node;
     double 	 prob;
-    double 	 dev;
 } probnode_t;
 
 /* struct for saving stats for printing. */
@@ -59,13 +58,6 @@ typedef struct score_s {
     double p_pr;	/* Robinson P */
     double q_pr;	/* Robinson Q */
 } score_t;
-
-/* struct for printing doubles as hex. */
-typedef union
-{
-    double d;
-    long long q;
-} t_DOUBLE_QUAD;
 
 /* Function Prototypes */
 
@@ -235,16 +227,18 @@ double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "min_dev: %f, robs: %f, robx: %f\n", 
 				    min_dev, robs, robx);
 
+    /* compute scores for the wordhash's tokens */
     compute_scores(wh);
 
+    /* recalculate min_dev if necessary to satisfy token_count settings */
     score.min_dev = !need_scoring_boundary(wh) ? min_dev : find_scoring_boundary(wh);
 
+    /* compute message spamicity from the wordhash's scores */
     compute_spamicity(wh, &P, &Q, &robn, need_stats);
 
     /* Robinson's P, Q and S
     ** S = (P - Q) / (P + Q)                        [combined indicator]
     */
-
     spamicity = get_spamicity(robn, P, Q);
 
     if (need_stats && robn != 0)

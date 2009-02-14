@@ -166,8 +166,6 @@ wordhash_free (wordhash_t *wh)
     wordhash_free_alloc_nodes(wh);
     wordhash_free_strings(wh);
 
-    xfree (wh->order);
-
     switch (wh->type)
     {
     case WH_NORMAL:
