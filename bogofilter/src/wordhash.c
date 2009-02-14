@@ -76,23 +76,26 @@ static void wh_trap(void) {}
 */
 
 wordhash_t *
-wordhash_init (wh_t t, uint c)
+wordhash_init (wh_t type, uint count)
 {
     wordhash_t *wh = xcalloc (1, sizeof (wordhash_t));
 
-    wh->type = t;
+    wh->type = type;
     wh->count = 0;
-    wh->size = (t == WH_NORMAL) ? 0 : ((c == 0) ? WH_INIT : c);
+    wh->size = (type == WH_NORMAL) ? 0 : ((count == 0) ? WH_INIT : count);
 
-    if (t == WH_NORMAL)
+    switch (type)
+    {
+    case WH_NORMAL:
 	wh->bin = xcalloc (NHASH, sizeof (hashnode_t **));
-
-    if (t == WH_CNTS)
+	break;
+    case WH_CNTS:	// used for bogotune with msg_count files
 	wh->cnts = (wordcnts_t *) xcalloc(wh->size, sizeof(wordcnts_t));
-
-    if (t == WH_PROPS) {
+	break;
+    case WH_PROPS:
 	wh->freeable = true;
 	wh->props = (hashnode_t *) xcalloc(wh->size, sizeof(hashnode_t));
+	break;
     }
 
     return wh;
@@ -101,8 +104,8 @@ wordhash_init (wh_t t, uint c)
 wordhash_t *
 wordhash_new (void)
 {
-    wh_t t = (!fBogotune || !msg_count_file) ? WH_NORMAL : WH_CNTS;
-    wordhash_t *wh = wordhash_init(t, 0);
+    wh_t type = (!fBogotune || !msg_count_file) ? WH_NORMAL : WH_CNTS;
+    wordhash_t *wh = wordhash_init(type, 0);
     return wh;
 }
 
@@ -164,16 +167,24 @@ wordhash_free (wordhash_t *wh)
     wordhash_free_strings(wh);
 
     xfree (wh->order);
-    if (wh->type == WH_CNTS)
+
+    switch (wh->type)
+    {
+    case WH_NORMAL:
+	break;
+    case WH_CNTS:
 	xfree (wh->cnts);
-    if (wh->type == WH_PROPS) {
+	break;
+    case WH_PROPS:
 	if (wh->freeable) {
 	    uint i;
 	    for (i=0; i<wh->size; i++)
 		xfree(wh->props[i].data);
 	}
 	xfree (wh->props);
+	break;
     }
+
     xfree (wh->bin);
     xfree (wh);
 }
@@ -397,13 +408,13 @@ wordhash_first (wordhash_t *wh)
     case WH_NORMAL:
 	val = wh->iter_ptr = wh->iter_head;
 	break;
-    case WH_PROPS:
-	wh->index = 0;
-	val = &wh->props[wh->index];
-	break;
     case WH_CNTS:
 	wh->index = 0;
 	val = &wh->cnts[wh->index];
+	break;
+    case WH_PROPS:
+	wh->index = 0;
+	val = &wh->props[wh->index];
 	break;
     }
 
@@ -420,13 +431,13 @@ wordhash_next (wordhash_t *wh)
 	if (wh->iter_ptr != NULL)
 	    val = wh->iter_ptr = wh->iter_ptr->iter_next;
 	break;
-    case WH_PROPS:
-	if (++wh->index < wh->count)
-	    val = &wh->props[wh->index];
-	break;
     case WH_CNTS:
 	if (++wh->index < wh->count)
 	    val = &wh->cnts[wh->index];
+	break;
+    case WH_PROPS:
+	if (++wh->index < wh->count)
+	    val = &wh->props[wh->index];
 	break;
     }
 
