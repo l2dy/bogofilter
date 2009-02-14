@@ -397,10 +397,6 @@ wordhash_first (wordhash_t *wh)
     case WH_NORMAL:
 	val = wh->iter_ptr = wh->iter_head;
 	break;
-    case WH_ORDERED:
-	wh->index = 0;
-	val = wh->order[wh->index];
-	break;
     case WH_PROPS:
 	wh->index = 0;
 	val = &wh->props[wh->index];
@@ -423,10 +419,6 @@ wordhash_next (wordhash_t *wh)
     case WH_NORMAL:
 	if (wh->iter_ptr != NULL)
 	    val = wh->iter_ptr = wh->iter_ptr->iter_next;
-	break;
-    case WH_ORDERED:
-	if (++wh->index < wh->count)
-	    val = wh->order[wh->index];
 	break;
     case WH_PROPS:
 	if (++wh->index < wh->count)

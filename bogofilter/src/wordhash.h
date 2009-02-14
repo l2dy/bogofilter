@@ -29,7 +29,9 @@ typedef struct wh_alloc_str {
 
 typedef /*@null@*/ hashnode_t *hashnode_pt;
 
-typedef enum wh_e { WH_NORMAL, WH_ORDERED, WH_PROPS, WH_CNTS } wh_t;
+typedef enum wh_e { WH_NORMAL,
+		    WH_PROPS,
+		    WH_CNTS } wh_t;
 
 typedef struct wordhash_s {
   /*@null@*/  /*@dependent@*/ wh_t type;		/* normal, ordered, props, or cnts */
