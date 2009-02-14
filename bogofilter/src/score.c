@@ -206,7 +206,7 @@ retry:
     for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
 	word_t *token     = node->key;
-	wordprop_t *props = (wordprop_t *) node->buf;
+	wordprop_t *props = (wordprop_t *) node->data;
 	wordcnts_t *cnts  = &props->cnts;
 	ret = lookup(token, cnts);
 	if (ret == DS_ABORT_RETRY)
@@ -269,7 +269,7 @@ void compute_scores(wordhash_t *wh)
 	wordprop_t *props;
 
 	if (!fBogotune) {
-	    props = (wordprop_t *) node->buf;
+	    props = (wordprop_t *) node->data;
 	    cnts  = &props->cnts;
 	    props->prob = calc_prob(cnts->good, cnts->bad,
 				    cnts->msgs_good, cnts->msgs_bad);
@@ -309,7 +309,7 @@ void compute_spamicity(wordhash_t *wh,
 
 	if (!fBogotune) {
 	    token = node->key;
-	    props = (wordprop_t *) node->buf;
+	    props = (wordprop_t *) node->data;
 	    cnts  = &props->cnts;
 	    prob = props->prob;
 	    useflag = props->used;
@@ -374,7 +374,7 @@ bool need_scoring_boundary(wordhash_t *wh)
     for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
 	if (!fBogotune) {
-	    wordprop_t *props = (wordprop_t *) node->buf;
+	    wordprop_t *props = (wordprop_t *) node->data;
 	    if (props->used)
 		count += 1;
 	} else {
@@ -422,7 +422,7 @@ double find_scoring_boundary(wordhash_t *wh)
 	double dev;
 
 	if (!fBogotune) {
-	    props = (wordprop_t *) node->buf;
+	    props = (wordprop_t *) node->data;
 	    cnts  = &props->cnts;
 	} else {
 	    cnts = (wordcnts_t *) node;
@@ -457,8 +457,8 @@ static int compare_hashnode_t(const void *const pv1, const void *const pv2)
     if (!fBogotune) {
 	const hashnode_t *hn1 = (const hashnode_t const *)pv1;
 	const hashnode_t *hn2 = (const hashnode_t const *)pv2;
-	d1 = fabs(((wordprop_t *) hn1->buf)->prob - EVEN_ODDS);
-	d2 = fabs(((wordprop_t *) hn2->buf)->prob - EVEN_ODDS);
+	d1 = fabs(((wordprop_t *) hn1->data)->prob - EVEN_ODDS);
+	d2 = fabs(((wordprop_t *) hn2->data)->prob - EVEN_ODDS);
     } else {
 	const wordcnts_t *cnts;
 	double prob;

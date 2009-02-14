@@ -25,7 +25,7 @@ dump_hash (wordhash_t * h)
     {
       word_t *key = p->key;
       (void)word_puts(key, 0, stdout);
-      (void)printf (" %d\n", ((wh_elt_t *) p->buf)->count);
+      (void)printf (" %d\n", ((wh_elt_t *) p->data)->count);
     }
 }
 

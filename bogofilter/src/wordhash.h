@@ -10,7 +10,7 @@ typedef struct hashnode_t {
   /*@dependent@*/ struct hashnode_t *iter_next;	/* Next item added to hash. For fast traversal */
   struct hashnode_t *next;			/* Next item in linked list of items with same hash */ 
   word_t *key;					/* word key */
-  void   *buf;					/* Associated buffer. To be used by caller. */
+  void   *data;					/* Associated data. To be used by caller. */
 } hashnode_t;
 
 typedef struct wh_alloc_node {

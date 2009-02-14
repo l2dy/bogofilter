@@ -87,7 +87,7 @@ retry:
 
     for (node = wordhash_first(h); node != NULL; node = wordhash_next(h))
     {
-	wordprop = node->buf;
+	wordprop = node->data;
 	switch (ds_read(list->dsh, node->key, &val)) {
 	    case DS_ABORT_RETRY:
 		rand_sleep(4*1000,1000*1000);

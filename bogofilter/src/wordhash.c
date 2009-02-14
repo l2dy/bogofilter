@@ -170,7 +170,7 @@ wordhash_free (wordhash_t *wh)
 	if (wh->freeable) {
 	    uint i;
 	    for (i=0; i<wh->size; i++)
-		xfree(wh->props[i].buf);
+		xfree(wh->props[i].data);
 	}
 	xfree (wh->props);
     }
@@ -242,7 +242,7 @@ hash (const word_t *t)
 
 static void display_node(hashnode_t *n, const char *str)
 {
-    wordprop_t *p = (wordprop_t *)n->buf;
+    wordprop_t *p = (wordprop_t *)n->data;
     if (verbose > 2)
 	printf( "%20.20s %5u %5u%s", n->key->u.text, p->cnts.bad, p->cnts.good, str);
 }
@@ -264,7 +264,7 @@ void wordhash_add(wordhash_t *dest, wordhash_t *src, void (*initializer)(void *)
     }
 
     for (s = wordhash_first(src); s != NULL; s = wordhash_next(src)) {
-	wordprop_t *p = (wordprop_t *)s->buf;
+	wordprop_t *p = (wordprop_t *)s->data;
 	word_t *key = s->key;
 	wordprop_t *d;
 	if (key == NULL)
@@ -287,7 +287,7 @@ wordhash_foreach (wordhash_t *wh, wh_foreach_t *hook, void *userdata)
     hashnode_t *hn;
 
     for (hn = wordhash_first(wh); hn != NULL; hn = wordhash_next(wh)) {
-	(*hook)(hn->key, hn->buf, userdata);
+	(*hook)(hn->key, hn->data, userdata);
     }
 
     return;
@@ -313,7 +313,7 @@ wordhash_search (const wordhash_t *wh, const word_t *t, unsigned int idx)
     for (hn = wh->bin[idx]; hn != NULL; hn = hn->next) {
 	word_t *key = hn->key;
 	if (key->leng == t->leng && memcmp (t->u.text, key->u.text, t->leng) == 0) {
-	    wordprop_t *p = (wordprop_t *)hn->buf;
+	    wordprop_t *p = (wordprop_t *)hn->data;
 	    return p;
 	}
     }
@@ -331,11 +331,11 @@ wordhash_standard_insert (wordhash_t *wh, word_t *t, size_t n, void (*initialize
 	return buf;
 
     hn = nmalloc (wh);
-    hn->buf = smalloc (wh, n);
+    hn->data = smalloc (wh, n);
     if (initializer)
-	initializer(hn->buf);
+	initializer(hn->data);
     else
-	memset(hn->buf, '\0', n);
+	memset(hn->data, '\0', n);
 
     hn->key = word_dup(t);
 
@@ -355,7 +355,7 @@ wordhash_standard_insert (wordhash_t *wh, word_t *t, size_t n, void (*initialize
     wh->count += 1;
     wh->size  += 1;
 
-    return hn->buf;
+    return hn->data;
 }
 
 static void *
@@ -445,7 +445,7 @@ static int compare_hashnode_t(const void *const pv1, const void *const pv2)
 static wordcnts_t *wordhash_get_counts(wordhash_t *wh, hashnode_t *n)
 {
     if (wh->cnts == NULL) {
-	wordprop_t *p = (wordprop_t *)n->buf;
+	wordprop_t *p = (wordprop_t *)n->data;
 	wordcnts_t *c = &p->cnts;
 	return c;
     }
@@ -537,11 +537,11 @@ convert_wordhash_to_propslist(wordhash_t *whi, wordhash_t *db)
 	    }
 	    else {
 		wp = xcalloc(1, sizeof(wordprop_t));
-		memcpy(wp, node->buf, sizeof(wordprop_t));
+		memcpy(wp, node->data, sizeof(wordprop_t));
 		if (!who->freeable)
 		    wh_trap();
 	    }
-	    who->props[who->count].buf = wp;
+	    who->props[who->count].data = wp;
 	    xfree(node->key);
 	    node->key = NULL;
 	    who->count += 1;
