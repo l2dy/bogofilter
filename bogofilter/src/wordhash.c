@@ -29,6 +29,7 @@ THEORY:
 #include <string.h>
 #include <stddef.h>	/* for offsetof */
 
+#include "listsort.h"
 #include "wordhash.h"
 #include "xmalloc.h"
 
@@ -440,12 +441,13 @@ wordhash_next (wordhash_t *wh)
     return val;
 }
 
-static int compare_hashnode_t(const void *const ihn1, const void *const ihn2)
+/* compare_hashnode_t - sort by ascending token text */
+
+static int compare_hashnode_t(const void *const pv1, const void *const pv2)
 {
-    const hashnode_t *hn1 = *(const hashnode_t *const *)ihn1;
-    const hashnode_t *hn2 = *(const hashnode_t *const *)ihn2;
-    int   cmp = word_cmp(hn1->key, hn2->key);
-    return cmp;
+    const hashnode_t *hn1 = (const hashnode_t *)pv1;
+    const hashnode_t *hn2 = (const hashnode_t *)pv2;
+    return word_cmp(hn1->key, hn2->key);
 }
 
 static wordcnts_t *wordhash_get_counts(wordhash_t *wh, hashnode_t *n)
@@ -473,25 +475,12 @@ wordhash_set_counts(wordhash_t *wh, int good, int bad)
     }
 }
 
+/* wordhash_sort - sort by ascending token text */
+
 void
 wordhash_sort (wordhash_t *wh)
 {
-    hashnode_t *node;
-
-    if (wh->size == 0
-	|| wh->type != WH_NORMAL
-	|| msg_count_file)
-	return;
-
-    wh->order = (hashnode_t **) xcalloc(wh->size, sizeof(hashnode_t *));
-
-    wh->count = 0;
-    for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
-	wh->order[wh->count++] = node;
-
-    qsort(wh->order, wh->count, sizeof(hashnode_t *), compare_hashnode_t);
-
-    wh->type = WH_ORDERED;
+    wh->iter_head = listsort(wh->iter_head, &compare_hashnode_t, false, false);
 
     return;
 }
