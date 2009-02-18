@@ -253,7 +253,7 @@ double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
 ** compute_scores()
 **	compute the token probabilities from the linked list of tokens
 */
-void compute_scores(wordhash_t *wh)
+static void compute_scores(wordhash_t *wh)
 {
     hashnode_t *node;
 
@@ -285,9 +285,9 @@ void compute_scores(wordhash_t *wh)
 **	compute the spamicity from the linked list of tokens using
 **	min_dev to select tokens
 */
-void compute_spamicity(wordhash_t *wh, 
-		       FLOAT *P, FLOAT *Q, size_t *robn, 
-		       bool need_stats)
+static void compute_spamicity(wordhash_t *wh, 
+			      FLOAT *P, FLOAT *Q, size_t *robn, 
+			      bool need_stats)
 {
     hashnode_t *node;
 
@@ -354,7 +354,7 @@ void compute_spamicity(wordhash_t *wh,
 **	determine if min_dev gives a count fitting the token count limits
 **	return True if so; False if not
 */
-bool need_scoring_boundary(wordhash_t *wh)
+static bool need_scoring_boundary(wordhash_t *wh)
 {
     size_t count = 0;
 
@@ -396,7 +396,7 @@ bool need_scoring_boundary(wordhash_t *wh)
 **	determine the token score that gives the desired token count
 **	for scoring the message.
 */
-double find_scoring_boundary(wordhash_t *wh)
+static double find_scoring_boundary(wordhash_t *wh)
 {
     size_t count = 0;
 
@@ -571,7 +571,7 @@ inline static double prbf(double x, double df)
 }
 #endif
 
-double get_spamicity(size_t robn, FLOAT P, FLOAT Q)
+static double get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 {
     if (robn == 0)
     {
