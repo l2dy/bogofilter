@@ -220,7 +220,7 @@ double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
     double spamicity;
     size_t robn = 0;
 
-    bool need_stats = (Rtable || passthrough || (verbose > 0)) && !fBogotune;
+    bool need_stats = !fBogotune && (Rtable || passthrough || (verbose > 0));
 
     if (DEBUG_ALGORITHM(2)) fprintf(dbgout, "### msg_compute_spamicity() begins\n");
 
@@ -231,7 +231,10 @@ double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
     compute_scores(wh);
 
     /* recalculate min_dev if necessary to satisfy token_count settings */
-    score.min_dev = !need_scoring_boundary(wh) ? min_dev : find_scoring_boundary(wh);
+    if (!need_scoring_boundary(wh))
+	score.min_dev = min_dev;
+    else
+	score.min_dev = find_scoring_boundary(wh);
 
     /* compute message spamicity from the wordhash's scores */
     compute_spamicity(wh, &P, &Q, &robn, need_stats);
@@ -289,9 +292,8 @@ static void compute_spamicity(wordhash_t *wh,
 			      FLOAT *P, FLOAT *Q, size_t *robn, 
 			      bool need_stats)
 {
-    hashnode_t *node;
-
     size_t count = 0;
+    hashnode_t *node;
 
     for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
