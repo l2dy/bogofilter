@@ -94,6 +94,7 @@ static struct option longopts_bogofilter[] = {
     LONGOPTIONS_COMMON
     /* longoptions.h - bogofilter */
     LONGOPTIONS_MAIN
+    LONGOPTIONS_MAIN_TUNE
     /* longoptions.h - bogofilter/bogolexer options */
     LONGOPTIONS_LEX
     /* longoptions.h - bogofilter/bogoutil options */

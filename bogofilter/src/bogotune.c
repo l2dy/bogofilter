@@ -947,6 +947,7 @@ static void help(void)
 static struct option longopts_bogotune[] = {
     /* longoptions.h - common options */
     LONGOPTIONS_COMMON
+    LONGOPTIONS_MAIN_TUNE
     /* longoptions.h - bogofilter/-lexer options */
     LONGOPTIONS_LEX
     /* end of list */
@@ -1123,6 +1124,18 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 
     case O_REPLACE_NONASCII_CHARACTERS:
 	replace_nonascii_characters = get_bool(name, val);
+	break;
+
+    case O_TOKEN_COUNT_FIX:
+	token_count_fix = atoi(val);
+	break;
+
+    case O_TOKEN_COUNT_MIN:
+	token_count_min = atoi(val);
+	break;
+
+    case O_TOKEN_COUNT_MAX:
+	token_count_max = atoi(val);
 	break;
 
     default:

@@ -99,7 +99,10 @@ typedef enum longopts_e {
 
 /* options for bogofilter */
 #define LONGOPTIONS_MAIN \
-    { "ham-true"	,		N, 0, O_HAM_TRUE }, \
+    { "ham-true"	,		N, 0, O_HAM_TRUE },
+
+/* options for bogofilter */
+#define LONGOPTIONS_MAIN_TUNE \
     { "token-count"     ,               R, 0, O_TOKEN_COUNT_FIX }, \
     { "token-count-min" ,               R, 0, O_TOKEN_COUNT_MIN }, \
     { "token-count-max" ,               R, 0, O_TOKEN_COUNT_MAX },
