@@ -62,10 +62,10 @@ typedef struct score_s {
 /* Function Prototypes */
 
 static	double	get_spamicity(size_t robn, FLOAT P, FLOAT Q);
-static	bool	need_scoring_boundary(wordhash_t *wh);
+static	bool	need_scoring_boundary(size_t count);
 static	double	find_scoring_boundary(wordhash_t *wh);
-static	void	compute_scores(wordhash_t *wh);
-static	void	compute_spamicity(wordhash_t *wh, FLOAT *P, FLOAT *Q, size_t *robn, bool need_stats);
+static	size_t	compute_count_and_scores(wordhash_t *wh);
+static	size_t	compute_count_and_spamicity(wordhash_t *wh, FLOAT *P, FLOAT *Q, bool need_stats);
 static	int	compare_hashnode_t(const void *const pv1, const void *const pv2);
 
 /* Static Variables */
@@ -228,16 +228,16 @@ double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
 				    min_dev, robs, robx);
 
     /* compute scores for the wordhash's tokens */
-    compute_scores(wh);
+    robn = compute_count_and_scores(wh);
 
     /* recalculate min_dev if necessary to satisfy token_count settings */
-    if (!need_scoring_boundary(wh))
+    if (!need_scoring_boundary(robn))
 	score.min_dev = min_dev;
     else
 	score.min_dev = find_scoring_boundary(wh);
 
     /* compute message spamicity from the wordhash's scores */
-    compute_spamicity(wh, &P, &Q, &robn, need_stats);
+    robn = compute_count_and_spamicity(wh, &P, &Q, need_stats);
 
     /* Robinson's P, Q and S
     ** S = (P - Q) / (P + Q)                        [combined indicator]
@@ -253,11 +253,12 @@ double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
 }
 
 /*
-** compute_scores()
+** compute_count_and_scores()
 **	compute the token probabilities from the linked list of tokens
 */
-static void compute_scores(wordhash_t *wh)
+static size_t compute_count_and_scores(wordhash_t *wh)
 {
+    size_t count = 0;
     hashnode_t *node;
 
     for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
@@ -271,6 +272,8 @@ static void compute_scores(wordhash_t *wh)
 	    props->prob = calc_prob(cnts->good, cnts->bad,
 				    cnts->msgs_good, cnts->msgs_bad);
 	    props->used = fabs(props->prob - EVEN_ODDS) > min_dev;
+	    if (props->used)
+		count += 1;
 	} else {
 	    /* unneeded - remove */
 	    double prob;
@@ -281,18 +284,21 @@ static void compute_scores(wordhash_t *wh)
 	    useflag = fabs(prob - EVEN_ODDS) > score.min_dev;
 	}
     }
+
+    return count;
 }
 
 /*
-** compute_spamicity()
+** compute_count_and_score()
 **	compute the spamicity from the linked list of tokens using
 **	min_dev to select tokens
 */
-static void compute_spamicity(wordhash_t *wh, 
-			      FLOAT *P, FLOAT *Q, size_t *robn, 
-			      bool need_stats)
+static size_t compute_count_and_spamicity(wordhash_t *wh, 
+					  FLOAT *P, FLOAT *Q,
+					  bool need_stats)
 {
     size_t count = 0;
+
     hashnode_t *node;
 
     for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
@@ -339,59 +345,33 @@ static void compute_spamicity(wordhash_t *wh,
 		Q->mant = frexp(Q->mant, &e);
 		Q->exp += e;
 	    }
-	    *robn += 1;
+	    count += 1;
 	}
 
 	if (DEBUG_ALGORITHM(3)) {
-	    count += 1;
 	    (void)fprintf(dbgout, "%3lu %3lu %f ",
-			  (unsigned long)*robn, (unsigned long)count, prob);
+			  (unsigned long)count, (unsigned long)count, prob);
 	    (void)word_puts(token, 0, dbgout);
 	    (void)fputc('\n', dbgout);
 	}
     }
+
+    return count;
 }
 
 /* need_scoring_boundary( )
 **	determine if min_dev gives a count fitting the token count limits
 **	return True if so; False if not
 */
-static bool need_scoring_boundary(wordhash_t *wh)
+static bool need_scoring_boundary(size_t count)
 {
-    size_t count = 0;
-
-    hashnode_t *node;
-
     // Early out if no token count limits are set
-    if (token_count_min == 0 && token_count_max == 0 && token_count_fix == 0)
+    if (((token_count_min == 0) || (token_count_min <= count)) &&
+	((token_count_max == 0) || (token_count_max >= count)) &&
+	((token_count_fix == 0) || (token_count_fix == count)))
 	return false;
-
-    // Count scorable tokens
-    for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
-    {
-	if (!fBogotune) {
-	    wordprop_t *props = (wordprop_t *) node->data;
-	    if (props->used)
-		count += 1;
-	} else {
-	    wordcnts_t *cnts = (wordcnts_t *) node;
-	    double prob = calc_prob(cnts->good, cnts->bad,
-				    cnts->msgs_good, cnts->msgs_bad);
-	    if (fabs(prob - EVEN_ODDS) >= min_dev)
-		count += 1;
-	}
-    }
-
-    // Compare count to limits
-    if (token_count_min != 0 && count < token_count_min)
+    else
 	return true;
-    if (token_count_max != 0 && count > token_count_max)
-	return true;
-    if (token_count_fix != 0 && token_count_fix != count)
-	return true;
-
-    // Count outside of limits -- change min_dev
-    return false;
 }
 
 /* find_scoring_boundary( )
