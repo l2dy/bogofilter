@@ -45,7 +45,7 @@ NAME:
 
 typedef struct probnode_t {
     hashnode_t * node;
-    double 	 prob;
+    double	 prob;
 } probnode_t;
 
 /* struct for saving stats for printing. */
@@ -70,7 +70,7 @@ static	int	compare_hashnode_t(const void *const pv1, const void *const pv2);
 
 /* Static Variables */
 
-static score_t  score;
+static score_t	score;
 
 /* Function Definitions */
 
@@ -240,7 +240,7 @@ double msg_compute_spamicity(wordhash_t *wh) /*@globals errno@*/
     robn = compute_count_and_spamicity(wh, &P, &Q, need_stats);
 
     /* Robinson's P, Q and S
-    ** S = (P - Q) / (P + Q)                        [combined indicator]
+    ** S = (P - Q) / (P + Q)			    [combined indicator]
     */
     spamicity = get_spamicity(robn, P, Q);
 
@@ -321,8 +321,8 @@ static size_t compute_count_and_spamicity(wordhash_t *wh,
 
 	/* Robinson's P and Q; accumulation step */
 	/*
-	 * P = 1 - ((1-p1)*(1-p2)*...*(1-pn))^(1/n)     [spamminess]
-	 * Q = 1 - (p1*p2*...*pn)^(1/n)                 [non-spamminess]
+	 * P = 1 - ((1-p1)*(1-p2)*...*(1-pn))^(1/n)	[spamminess]
+	 * Q = 1 - (p1*p2*...*pn)^(1/n)			[non-spamminess]
 	 */
 	if (useflag ) {
 	    int e;
@@ -557,8 +557,8 @@ static double get_spamicity(size_t robn, FLOAT P, FLOAT Q)
     }
     else
     {
-        double sp_df = 2.0 * robn * sp_esf;
-        double ns_df = 2.0 * robn * ns_esf;
+	double sp_df = 2.0 * robn * sp_esf;
+	double ns_df = 2.0 * robn * ns_esf;
 	double ln2 = log(2.0);					/* ln(2) */
 
 	score.robn = robn;
@@ -570,13 +570,13 @@ static double get_spamicity(size_t robn, FLOAT P, FLOAT Q)
 	score.p_pr = prbf(-2.0 * score.p_ln, sp_df);		/* compute P */
 	score.q_pr = prbf(-2.0 * score.q_ln, ns_df);		/* compute Q */
   
-        if (!fBogotune && sp_esf >= 1.0 && ns_esf >= 1.0) {
-            score.spamicity = (1.0 + score.q_pr - score.p_pr) / 2.0;
-        } else if (score.q_pr < DBL_EPSILON && score.p_pr < DBL_EPSILON) {
-            score.spamicity = 0.5;
-        } else {
-            score.spamicity = score.q_pr / (score.q_pr + score.p_pr);
-        }
+	if (!fBogotune && sp_esf >= 1.0 && ns_esf >= 1.0) {
+	    score.spamicity = (1.0 + score.q_pr - score.p_pr) / 2.0;
+	} else if (score.q_pr < DBL_EPSILON && score.p_pr < DBL_EPSILON) {
+	    score.spamicity = 0.5;
+	} else {
+	    score.spamicity = score.q_pr / (score.q_pr + score.p_pr);
+	}
     }
 
     return score.spamicity;
