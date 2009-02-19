@@ -261,28 +261,21 @@ static size_t compute_count_and_scores(wordhash_t *wh)
     size_t count = 0;
     hashnode_t *node;
 
+    if (fBogotune)
+	return count;
+
     for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh))
     {
 	wordcnts_t *cnts;
 	wordprop_t *props;
 
-	if (!fBogotune) {
-	    props = (wordprop_t *) node->data;
-	    cnts  = &props->cnts;
-	    props->prob = calc_prob(cnts->good, cnts->bad,
-				    cnts->msgs_good, cnts->msgs_bad);
-	    props->used = fabs(props->prob - EVEN_ODDS) > min_dev;
-	    if (props->used)
-		count += 1;
-	} else {
-	    /* unneeded - remove */
-	    double prob;
-	    bool   useflag;
-	    cnts = (wordcnts_t *) node;
-	    prob = calc_prob(cnts->good, cnts->bad,
-			     cnts->msgs_good, cnts->msgs_bad);
-	    useflag = fabs(prob - EVEN_ODDS) > score.min_dev;
-	}
+	props = (wordprop_t *) node->data;
+	cnts  = &props->cnts;
+	props->prob = calc_prob(cnts->good, cnts->bad,
+				cnts->msgs_good, cnts->msgs_bad);
+	props->used = fabs(props->prob - EVEN_ODDS) > min_dev;
+	if (props->used)
+	    count += 1;
     }
 
     return count;
@@ -409,14 +402,17 @@ static double find_scoring_boundary(wordhash_t *wh)
 
 	if (count > 0) {
 	    count -= 1;
-	    props->used = true;
+	    if (!fBogotune)
+		props->used = true;
 	    min_prob = dev;
 	}
 	else if (dev >= min_prob) {
-	    props->used = true;
+	    if (!fBogotune)
+		props->used = true;
 	}
 	else {
-	    props->used = false;
+	    if (!fBogotune)
+		props->used = false;
 	}
     }
 
