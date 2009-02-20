@@ -194,6 +194,7 @@ if test -n "$LEX"; then
 	*2.5.4) flex=254 ;;
 	*2.5.31) flex=253x ;;
 	*2.5.33) flex=253x ;;
+	*2.5.35) flex=O.K. ;;
     esac
 fi
 dnl flex=yes
