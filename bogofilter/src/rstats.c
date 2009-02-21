@@ -139,7 +139,7 @@ void rstats_print(bool unsure)
     size_t robn  = stats_head->robn;
 
     /* sort by ascending spamicity */
-    stats_head->list = listsort(stats_head->list, &compare_rstats_t);
+    stats_head->list = (rstats_t *)listsort((element *)stats_head->list, (fcn_compare *)&compare_rstats_t);
 
     if (Rtable || verbose>=3)
 	rstats_print_rtable(stats_head->list);

@@ -5,8 +5,14 @@
 
 #include "bftypes.h"
 
-typedef int fcn_compare(const void *a, const void *b);
+typedef struct element element;
+struct element {
+    element *next, *prev;
+    int i;
+};
 
-extern void *listsort(void *list, fcn_compare *compare);
+typedef int fcn_compare(const element *a, const element *b);
+
+extern element *listsort(element *list, fcn_compare *compare);
 
 #endif

@@ -43,12 +43,6 @@
 typedef unsigned char byte;
 #include "word.h"
 
-typedef struct element element;
-struct element {
-    element *next, *prev;
-    int i;
-};
-
 #ifdef	TEST
 
 static int cmp(const element *a, const element *b);
@@ -71,7 +65,7 @@ static int cmp(const element *a, const element *b) {
  *     list = listsort(mylist);
  */
 
-void *listsort(void *list, fcn_compare *compare) {
+element *listsort(element *list, fcn_compare *compare) {
     element *p, *q, *e, *tail, *oldhead;
     int insize, nmerges, psize, qsize, i;
 
