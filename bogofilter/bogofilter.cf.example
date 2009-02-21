@@ -271,3 +271,12 @@
 #	of 0.000000 (surely ham) or 1.000000 (surely spam).
 #
 ## thresh_update=0.01			# (optional)
+
+#### token count parameters
+#
+#	coerce the number of tokens used to score a message
+#	Note: zero means no coercing
+#
+##token_count=0				# default
+##token_count_min=0			# default
+##token_count_max=0			# default

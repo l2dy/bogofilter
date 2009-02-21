@@ -86,6 +86,7 @@ static void display_tag_array(const char *label, FIELD *array);
 static void process_arglist(int argc, char **argv, priority_t precedence, int pass);
 static bool get_parsed_value(char **arg, double *parm);
 static void comma_parse(char opt, const char *arg, double *parm1, double *parm2, double *parm3);
+static bool token_count_conflict(void);
 
 /*---------------------------------------------------------------------------*/
 
@@ -360,7 +361,7 @@ static const char *help_text[] = {
     "  --timestamp                       enable/disable token timestamps\n",
     "  --token-count                     fixed token count for scoring\n",
     "  --token-count-min                 min token count for scoring\n",
-    "  --token-count-max                 min token count for scoring\n",
+    "  --token-count-max                 max token count for scoring\n",
 #ifndef	DISABLE_UNICODE
     "  --unicode                         enable/disable unicode based wordlist\n",
 #endif
@@ -476,6 +477,11 @@ static void process_arglist(int argc, char **argv, priority_t precedence, int pa
 	if (inv_terse_mode) {
 	    verbose = max(1, verbose); 	/* force printing */
 	    set_terse_mode_format(inv_terse_mode);
+	}
+	
+	if (token_count_conflict()) {
+	    fprintf(stderr, "Conflicting token count arguments given.\n");
+	    exit(EX_ERROR);
 	}
     }
 
@@ -833,4 +839,21 @@ static void display_tag_array(const char *label, FIELD *array)
     for (i = 0; i < count; i += 1)
 	fprintf(stdout, "%s %s", (i == 0) ? "" : ",", array[i]);
     fprintf(stdout, "\n");
+}
+
+static bool token_count_conflict(void)
+{
+    if (token_count_fix != 0) {
+	if (token_count_fix < token_count_min)
+	    return true;
+    }
+
+    if (token_count_max != 0) {
+	if (token_count_max < token_count_min)
+	    return true;
+	if (token_count_max < token_count_fix)
+	    return true;
+    }
+
+    return false;
 }
