@@ -481,7 +481,7 @@ wordhash_set_counts(wordhash_t *wh, int good, int bad)
 void
 wordhash_sort (wordhash_t *wh)
 {
-    wh->iter_head = listsort(wh->iter_head, &compare_hashnode_t, false, false);
+    wh->iter_head = listsort(wh->iter_head, &compare_hashnode_t);
 
     return;
 }

@@ -380,7 +380,7 @@ static double find_scoring_boundary(wordhash_t *wh)
     hashnode_t *node;
 
     /* sort by ascending score difference (from 0.5) */
-    wh->iter_head = listsort(wh->iter_head, &compare_hashnode_t, false, false);
+    wh->iter_head = listsort(wh->iter_head, &compare_hashnode_t);
 
     count = max(token_count_fix, max(token_count_min, token_count_max));
 

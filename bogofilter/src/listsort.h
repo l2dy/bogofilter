@@ -7,6 +7,6 @@
 
 typedef int fcn_compare(const void *a, const void *b);
 
-extern void *listsort(void *list, fcn_compare *compare, bool is_circular, bool is_double);
+extern void *listsort(void *list, fcn_compare *compare);
 
 #endif
