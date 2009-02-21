@@ -386,7 +386,7 @@ static double find_scoring_boundary(wordhash_t *wh)
 
     for (node = wordhash_first(wh); node != NULL; node = wordhash_next(wh)) {
 	wordcnts_t *cnts;
-	wordprop_t *props;
+	wordprop_t *props = NULL;
 	double prob;
 	double dev;
 
