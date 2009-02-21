@@ -18,6 +18,9 @@
 	2009-02-20
 	* Flex-2.5.35 has fix for allocation problem in 2.5.4, 2.5.31, and 2.5.33.
 
+	2009-02-12
+	* Bogofilter now uses listsort in place of qsort.
+
 	2009-01-31
 	* Added token-count=n, token-count-min=n, and token-count-max=n options.
 	* Minor code cleanups.
