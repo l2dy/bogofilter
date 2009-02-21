@@ -171,35 +171,34 @@ int main(void) {
 
     listsort(NULL, cmp, 0, 0);
 
-	    for (i = 0; i < sizeof(order)/sizeof(*order); i++) {
-		int *ord = order[i];
-		head = &k[ord[0]];
-		for (j = 0; j < n; j++) {
-		    if (j == n-1)
-			k[ord[j]].next = NULL;
-		    else
-			k[ord[j]].next = &k[ord[j+1]];
-		}
-
-		printf("before:");
-		p = head;
-		do {
-		    printf(" %d", p->i);
-		    p = p->next;
-		} while (p != NULL);
-		printf("\t");
-		head = listsort(head, cmp);
-		printf(" after:");
-		p = head;
-		do {
-		    printf(" %d", p->i);
-		    p = p->next;
-		} while (p != NULL);
-		printf("\n");
-	    }
-	    printf("\n");
+    for (i = 0; i < sizeof(order)/sizeof(*order); i++) {
+	int *ord = order[i];
+	head = &k[ord[0]];
+	for (j = 0; j < n; j++) {
+	    if (j == n-1)
+		k[ord[j]].next = NULL;
+	    else
+		k[ord[j]].next = &k[ord[j+1]];
 	}
+
+	printf("before:");
+	p = head;
+	do {
+	    printf(" %d", p->i);
+	    p = p->next;
+	} while (p != NULL);
+	printf("\t");
+	head = listsort(head, cmp);
+	printf(" after:");
+	p = head;
+	do {
+	    printf(" %d", p->i);
+	    p = p->next;
+	} while (p != NULL);
+	printf("\n");
     }
+    printf("\n");
+
     return 0;
 }
 #endif
