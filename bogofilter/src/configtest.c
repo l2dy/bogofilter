@@ -21,7 +21,6 @@ AUTHOR:
 #include "wordlists.h"
 
 const char *progname = "configtest";
-const char *spam_header_place = "";
 
 #ifndef	DEBUG_CONFIG
 #define DEBUG_CONFIG(level)	(verbose > level)

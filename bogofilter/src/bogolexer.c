@@ -32,11 +32,6 @@ AUTHOR:
 
 const char *progname = "bogolexer";
 
-/* prevent larger inclusions */
-
-const char *spam_header_name = SPAM_HEADER_NAME;
-const char *spam_header_place = "";
-
 /* Function Definitions */
 
 static void usage(void)

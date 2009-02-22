@@ -46,7 +46,6 @@ static uint msgcount = 0;
 
 /* initialized static variables */
 
-const char *spam_header_name = SPAM_HEADER_NAME;	/* used by lexer */
 const char *spam_subject_tag = NULL;			/* used in passthrough mode */
 const char *unsure_subject_tag = NULL;			/* used in passthrough mode */
 

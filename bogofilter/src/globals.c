@@ -57,6 +57,9 @@ const char	*update_dir;
 /*@observer@*/
 const char	*stats_prefix;
 
+const char *spam_header_name = SPAM_HEADER_NAME;
+const char *spam_header_place = "";
+
 /* for lexer_v3.l */
 bool	header_line_markup = true;	/* -H */
 

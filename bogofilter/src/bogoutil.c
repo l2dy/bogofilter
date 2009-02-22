@@ -53,8 +53,6 @@ static int token_count = 0;
 bool  maintain = false;
 bool  onlyprint = false;
 
-const char *spam_header_place = "";
-
 /* Function Definitions */
 
 /* dummies to avoid score.o */

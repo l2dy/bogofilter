@@ -31,7 +31,6 @@ static const char *eol;
 char msg_register[256];
 static char msg_bogofilter[256];
 static char msg_spam_header[256];
-const char *spam_header_place = "";
 size_t msg_register_size = sizeof(msg_register);
 
 /* Function Definitions */
