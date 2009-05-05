@@ -86,6 +86,7 @@
 		<tr><td>Ubuntu 9.04 (Jaunty Jackalope)</td>   <td>1.1.7</td> <td><div align="center">BerkeleyDB 4.7, in universe: SQLite3</div></td></tr>
 		<tr><td>Ubuntu 8.10 (Intrepid Ibex)</td>   <td>1.1.7</td> <td><div align="center">BerkeleyDB 4.7, in universe: SQLite3</div></td></tr>
 		<tr><td>Ubuntu 8.04 LTS (Hardy Heron)</td> <td>1.1.5</td> <td><div align="center">BerkeleyDB 4.6, in universe: SQLite3</div></td></tr>
+		<tr><td>Ubuntu 6.06 LTS (Dapper Drake)</td> <td>1.0.1</td> <td><div align="center">BerkeleyDB 4.3, in universe: SQLite3</div></td></tr>
        </table>
               <p class="date">Last update: $Date$</p>
             </td>
