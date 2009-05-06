@@ -39,7 +39,7 @@ _POSIX2_VERSION=199209
 export _POSIX2_VERSION
 
 # Obtain data base file suffix
-DB_NAME=$("$BOGOFILTER" -C -V 2>&1 | sed -n '/Database:/ { p;q }')
+DB_NAME=$("$BOGOFILTER" -C -V 2>&1 | sed -n '/Database:/ {p;q;}')
 case $DB_NAME in
     *BerkeleyDB*|*"Berkeley DB"*)
 	case $DB_NAME in
