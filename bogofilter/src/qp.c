@@ -41,6 +41,10 @@ static int hex_to_bin(byte c) {
     }
 }
 
+/* Function Prototypes  */
+
+static int qp_eol_check( byte *s, byte *e );
+
 /* Function Definitions  */
 
 uint qp_decode(word_t *word, qp_mode mode)
@@ -56,10 +60,13 @@ uint qp_decode(word_t *word, qp_mode mode)
 	int x, y;
 	switch (ch) {
 	    case '=':
-		if (mode == RFC2045 && s + 1 <= e && s[0] == '\n') {
-		    /* continuation line, trailing = */
-		    s++;
-		    continue;
+		if (mode == RFC2045) {
+		    int c = qp_eol_check( s, e );
+		    if (c != 0) {
+			/* continuation line, trailing = */
+			s += c;
+			continue;
+		    }
 		}
 		if (s + 2 <= e && 
 			(y = hex_to_bin(s[0])) >= 0 && (x = hex_to_bin(s[1])) >= 0) {
@@ -128,4 +135,27 @@ bool qp_validate(const word_t *word, qp_mode mode)
     }
 
     return true;
+}
+
+static int qp_eol_check( byte *s, byte *e )
+{
+    /* test for LF */
+    if (s + 1 <= e && s[0] == '\n')
+    {
+	/* only LF */
+	return 1;
+    }
+
+    /* test for CR */
+    if (s + 1 <= e && s[0] == '\r')
+    { 
+	if (s + 2 <= e && s[1] == '\n')
+	    /* CR LF */
+	    return 2;
+	else
+	    /* only CR */
+	    return 1;
+    }
+
+    return 0;
 }
