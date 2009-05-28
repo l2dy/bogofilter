@@ -16,7 +16,8 @@
 -------------------------------------------------------------------------------
 
 	2009-05-25
-	* Fixed eol problem in quoted_printable text. Problem reported by Stephen Davies.
+	* Fixed eol problem in quoted_printable text. Problem reported by
+	  Stephen Davies.
 
 1.2.0	2009-02-21 (released)
 
