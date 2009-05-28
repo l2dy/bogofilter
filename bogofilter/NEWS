@@ -16,14 +16,17 @@
 -------------------------------------------------------------------------------
 
 	2009-05-28
-	* Remove two scripts supposed to be rebuilt from distro.
-	* Added test case for Stephen Davies's Q-P EOL problem (see -05-25).
+	* Removed two scripts that are auto-built.
+	* Added test case for Stephen Davies' Q-P EOL problem (see 05-25).
 
 	2009-05-25
 	* Fixed EOL problem in quoted_printable text. Problem reported by
 	  Stephen Davies and identified by Pavel Kankovsky.
 
-1.2.0	2009-02-21 (released)
+	2009-03-28
+	* Promoted to "stable"
+
+1.2.0	2009-02-21 (released) 
 
 	2009-02-20
 	* Flex-2.5.35 has fix for memory allocation problem in 2.5.4,
@@ -78,7 +81,10 @@
 	  systems to do that are reported to be shipped in 1987 by the autoconf
 	  manual, so ditch them.
 
-1.1.7	2008-05-04 (released)
+	2008-05-18
+	* Promoted to "stable"
+
+1.1.7	2008-05-04 (released) 
 
 	2008-04-30
 
