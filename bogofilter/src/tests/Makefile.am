@@ -49,16 +49,19 @@ PARSING_TESTS = \
 
 WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest t.upgrade.subnet.prefix t.multiple.wordlists t.probe t.bf_compact
 
-SCORING_TESTS = t.query.config t.score1 t.score2 t.systest t.grftest t.wordhist
+SCORING_TESTS = t.score1 t.score2 t.systest t.grftest t.wordhist
 
 BULKMODE_TESTS = t.bulkmode t.MH t.maildir t.bogoutil
 
 INTEGRITY_TESTS = t.lock1 t.lock3 t.valgrind
 # INTEGRITY_TESTS += t.lock2
 
+# these tests are built, but must not be shipped:
+BUILT_TESTS = t.query.config
+
 TESTSCRIPTS = ${ENVIRON_TESTS} ${PARSING_TESTS} ${WORDLIST_TESTS} ${SCORING_TESTS} ${BULKMODE_TESTS} ${INTEGRITY_TESTS}
 
-TESTS=$(TESTSCRIPTS)
+TESTS=$(BUILT_TESTS) $(TESTSCRIPTS)
 
 TESTS_ENVIRONMENT=RUN_FROM_MAKE=1 AWK=$(AWK) srcdir=$(srcdir) SHELL="$(SHELL)" $(SHELL) $(VERBOSE)
 

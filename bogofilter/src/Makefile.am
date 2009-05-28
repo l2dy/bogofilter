@@ -254,8 +254,7 @@ fgetsl_test_SOURCES = fgetsl.c
 fgetsl_test_CFLAGS= -DMAIN
 
 # what to distribute
-EXTRA_DIST = $(bin_SCRIPTS) \
-	     bogoupgrade.in \
+EXTRA_DIST = bogoupgrade.in \
 	     version.sh \
 	     strlcat.3 strlcpy.3 \
 	     patch.lexer.254.txt patch.lexer.253x.txt
