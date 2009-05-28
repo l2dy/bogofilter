@@ -4,8 +4,8 @@
 #
 #	create version.c to define BOGOFILTER_VERSION
 #
-#	if VERSION in config.h does not contain 'cvs', use its value.
-#	if it does contain 'cvs', append a date to it.
+#	if VERSION in config.h does not contain 'svn', use its value.
+#	if it does contain 'svn', append a date to it.
 #
 #	We'll first try to find CVS/Entries files and use the most
 #	current date from the files. To parse, we need Perl 5 and
