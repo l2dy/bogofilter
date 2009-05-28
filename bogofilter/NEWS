@@ -15,9 +15,12 @@
 
 -------------------------------------------------------------------------------
 
+	2009-05-28
+	* Added test case for Stephen Davies's Q-P EOL problem (see -05-25).
+
 	2009-05-25
-	* Fixed eol problem in quoted_printable text. Problem reported by
-	  Stephen Davies.
+	* Fixed EOL problem in quoted_printable text. Problem reported by
+	  Stephen Davies and identified by Pavel Kankovsky.
 
 1.2.0	2009-02-21 (released)
 
