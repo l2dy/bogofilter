@@ -38,7 +38,7 @@ PARSING_TESTS = \
 	t.passthrough-hb \
 	t.escaped.html t.escaped.url \
 	t.split t.parsing \
-	t.lexer t.lexer.mbx \
+	t.lexer t.lexer.mbx t.lexer.qpcr \
 	t.spam.header.place \
 	t.block.on.subnets \
 	t.token.count \
@@ -73,6 +73,7 @@ EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel \
 	inputs/lexer.inp \
 	inputs/lexer.mbx \
 	inputs/lexer.out \
+	inputs/mime-qp-cont-with-cr.txt \
 	inputs/msg.1.txt \
 	inputs/msg.2.txt \
 	inputs/msg.3.txt \
@@ -103,6 +104,7 @@ EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel \
 	outputs/maildir.out \
 	outputs/message_addr.ref \
 	outputs/message_id.ref \
+	outputs/mime-qp-cont-with-cr.exp \
 	outputs/msg.1.v \
 	outputs/msg.2a.vv \
 	outputs/msg.2a.vvv \
