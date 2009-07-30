@@ -258,6 +258,8 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 						  case MIME_MESSAGE:	yy_set_state_initial(); break;
 						  default:		BEGIN TEXT; 
 						  }
+						  if (DEBUG_LEXER(1))
+						      fprintf(dbgout, "*** end of header\n");
 						  return EOH;
 						}
 
