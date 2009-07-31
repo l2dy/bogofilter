@@ -8,7 +8,7 @@
 
 # This message contains one body word "SPAM". Check if it's present
 # after scanning.
-cat <<_EOF | $BOGOLEXER -p -C | grep SPAM
+cat <<_EOF | $BOGOLEXER -p -C | grep SPAM >/dev/null
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
