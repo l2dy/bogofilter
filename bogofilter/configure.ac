@@ -17,7 +17,7 @@ dnl set to "yes"    the "Trio" [v]snprintf library (which is
 dnl                 part of the bogofilter source).
 dnl ********************************************************
 dnl
-AC_INIT([bogofilter],[1.2.0])
+AC_INIT([bogofilter],[1.2.1])
 dnl
 AC_PREREQ(2.59)
 dnl AC_PREREQ(2.60) dnl if AC_USE_SYSTEM_EXTENSIONS is desired
