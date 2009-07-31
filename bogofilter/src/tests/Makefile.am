@@ -38,7 +38,7 @@ PARSING_TESTS = \
 	t.passthrough-hb \
 	t.escaped.html t.escaped.url \
 	t.split t.parsing \
-	t.lexer t.lexer.mbx t.lexer.qpcr \
+	t.lexer t.lexer.mbx t.lexer.qpcr t.lexer.eoh \
 	t.spam.header.place \
 	t.block.on.subnets \
 	t.token.count \
@@ -58,6 +58,9 @@ INTEGRITY_TESTS = t.lock1 t.lock3 t.valgrind
 
 # these tests are built, but must not be shipped:
 BUILT_TESTS = t.query.config
+
+# test scripts expected to fail
+XFAIL_TESTS = t.lexer.eoh
 
 TESTSCRIPTS = ${ENVIRON_TESTS} ${PARSING_TESTS} ${WORDLIST_TESTS} ${SCORING_TESTS} ${BULKMODE_TESTS} ${INTEGRITY_TESTS}
 
