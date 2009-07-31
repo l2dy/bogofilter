@@ -60,7 +60,7 @@ INTEGRITY_TESTS = t.lock1 t.lock3 t.valgrind
 BUILT_TESTS = t.query.config
 
 # test scripts expected to fail
-XFAIL_TESTS = t.lexer.eoh
+XFAIL_TESTS =
 
 TESTSCRIPTS = ${ENVIRON_TESTS} ${PARSING_TESTS} ${WORDLIST_TESTS} ${SCORING_TESTS} ${BULKMODE_TESTS} ${INTEGRITY_TESTS}
 

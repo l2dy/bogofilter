@@ -98,7 +98,7 @@ static int lineno;
 int yylineno;
 #endif
 
-/* Function Prototypes */
+/* Function Prototypes/Forward Declarations */
 
 static word_t *yy_text(void);
 static void html_char(void);
@@ -111,6 +111,8 @@ static void yy_unput(const byte *txt, uint len);
 
 char yy_get_state(void);
 void yy_set_state_initial(void);
+
+static void header(void);
 
 /* Function Definitions */
 
@@ -127,7 +129,12 @@ static word_t *yy_text(void)
 %option warn
 %option nodebug debug
 %option align caseless 8bit
-%option never-interactive
+/***********************************************************************
+ WARNING: The scanner must be interactive so as not to look ahead past
+ \n = EOH and other header/body delimiters, else it will fail when MIME
+ decoding, because part of the body has already been read ahead.
+ ***********************************************************************/
+%option interactive always-interactive
 %option noreject noyywrap
 
 UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
@@ -229,27 +236,34 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 						}
 
 <INITIAL>^(To|CC|From|Return-Path|Subject|Received):	{ set_tag(yytext); }
-<INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); return TOKEN; }
+<INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); header(); return TOKEN; }
 
-<INITIAL>^(Delivery-)?Date:.*			{ return HEADKEY; }
-<INITIAL>^Resent-Message-ID:.*			{ return HEADKEY; }
 <INITIAL>^Message-ID:.*				{ /* save token for logging */
 						  int off = 11;
 						  while(isspace((unsigned char)yytext[off]) && off < yyleng)
 						      off++;
 						  set_msg_id((unsigned char *)(yytext+off), yyleng-off);
+						  header();
 						  return HEADKEY;
 						}
-<INITIAL>^(In-Reply-To|References):.* 		{ return HEADKEY; }
+<INITIAL>^(Delivery-)?Date:.*			|
+<INITIAL>^Resent-Message-ID:.*			|
+<INITIAL>^(In-Reply-To|References):.* 		{ header(); return HEADKEY; }
 
 <INITIAL>boundary=[ ]*\"?{MIME_BOUNDARY}\"?	{ mime_boundary_set(yy_text()); }
-<INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); skip_to('='); return TOKEN; }
+<INITIAL>charset=\"?{CHARSET}\"?		{ got_charset(yytext); skip_to('='); header(); return TOKEN; }
 
 <INITIAL>(file)?name=\"?			/* ignore */
-<INITIAL>\n?[[:blank:]]id{WHITESPACE}+{ID}	{ return QUEUE_ID; }
+<INITIAL>[[:blank:]]id{WHITESPACE}+{ID}		{ return QUEUE_ID; }
 
-<INITIAL>\n[[:blank:]]				{ lineno += 1; }
-<INITIAL>\n\n					{ enum mimetype type = get_content_type();
+/**********************************************************************
+ WARNING: Do NOT add header (<INITIAL>) rules that require characters
+ beyond a LF character (\n) - doing so will make the parser read ahead
+ parts of the body in the wrong MIME decoding mode and goof up
+ seriously.
+ **********************************************************************/
+
+<INITIAL>^\n					{ enum mimetype type = get_content_type();
 						  have_body = true;
 						  msg_header = false;
 						  clr_tag();
@@ -262,8 +276,9 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 						      fprintf(dbgout, "*** end of header\n");
 						  return EOH;
 						}
+<INITIAL>^{TOKEN}				{ header(); return TOKEN; }
+<INITIAL>\n					{ lineno += 1; }
 
-<INITIAL>\n					{ set_tag("Header"); lineno += 1; }
 <INITIAL>{VERP} 				{ skip_to('='); return VERP; }
 
 ^-----BEGIN\ PGP\ SIGNATURE-----$		{ BEGIN PGP_HEAD;
@@ -319,6 +334,11 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 \n						{ lineno += 1; clr_tag(); }
 <<EOF>>						{ return NONE; }
 %%
+
+static void header(void)
+{
+    set_tag("Header");
+}
 
 void lexer_v3_init(FILE *fp)
 {
@@ -438,7 +458,7 @@ void yy_set_state_initial(void)
 {
     BEGIN INITIAL;
     msg_header = true;
-    set_tag("Header");
+    header();
 
     if (DEBUG_LEXER(1))
 	fprintf(dbgout, "BEGIN INITIAL\n");

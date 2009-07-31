@@ -228,7 +228,7 @@ token_t parse_new_token(word_t *token)
 
 	    if (msg_state->mime_type == MIME_MESSAGE)
 		mime_add_child(msg_state);
-	    if (leng == 2)
+	    if (leng == 1)
 		continue;
 	    else {	/* "spc:invalid_end_of_header" */
 		token_copy( &yylval, nonblank_line);

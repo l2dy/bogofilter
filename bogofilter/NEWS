@@ -16,9 +16,14 @@
 -------------------------------------------------------------------------------
 
 	2009-07-31
-	* Added a minimal test case for Christian Frommeyer's MIME decoding bug,
-	  Ubuntu/Launchpad Bug #320829, as expected failure (XFAIL_TESTS).
+	* Fix Christian Frommeyer's MIME decoding bug, Ubuntu/Launchpad Bug
+	  #320829. As a side effect, also fixes misattribution of MIME bodies
+	  as MIME headers with mime: tag.  Original bug report:
 	  https://bugs.launchpad.net/ubuntu/+source/bogofilter/+bug/320829
+
+	  Before this fix, bogofilter did not properly MIME-decode the first
+	  line in a body. This was especially bad with Christian's samples
+	  where the whole body was only one long base64 line.
 
 	2009-05-28
 	* Removed two scripts that are auto-built.
