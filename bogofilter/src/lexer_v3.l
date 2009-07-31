@@ -256,7 +256,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>(file)?name=\"?			/* ignore */
 <INITIAL>[[:blank:]]id{WHITESPACE}+{ID}		{ return QUEUE_ID; }
 
-/**********************************************************************
+ /**********************************************************************
  WARNING: Do NOT add header (<INITIAL>) rules that require characters
  beyond a LF character (\n) - doing so will make the parser read ahead
  parts of the body in the wrong MIME decoding mode and goof up
