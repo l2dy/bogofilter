@@ -365,6 +365,9 @@ int yyinput(byte *buf, size_t used, size_t size)
 	}
     }
 
+    if (DEBUG_LEXER(2))
+	fprintf(dbgout, "*** yyinput(\"%-.*s\", %lu, %lu) = %d\n", count, buf, (unsigned long)used, (unsigned long)size, count);
+
     return (count == EOF ? 0 : count);
 }
 
