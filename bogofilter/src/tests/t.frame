@@ -54,7 +54,7 @@ case $DB_NAME in
 		    exit 1 ;;
 esac
 export DB_EXT DB_TXN
-if [ "x$BF_TESTVERBOSE" != x ] ; then
+if [ "$BF_TESTVERBOSE" -ge 3 ] ; then
     echo "detected database type \"$DB_TYPE\", extension: \"$DB_EXT\", transactions: $DB_TXN"
 fi
 
