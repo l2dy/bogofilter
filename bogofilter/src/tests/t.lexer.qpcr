@@ -13,4 +13,4 @@ efn=mime-qp-cont-with-cr.exp
 cat "$srcdir/inputs/$ifn" \
 | $BOGOLEXER -p -C > "$TMPDIR/$ofn"
 
-exec diff $DIFF_BRIEF "$OUTPUTS/$efn" "$TMPDIR/$ofn"
+diff $DIFF_BRIEF "$OUTPUTS/$efn" "$TMPDIR/$ofn"
