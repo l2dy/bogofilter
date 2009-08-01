@@ -3,7 +3,8 @@ dnl $Id$
 dnl
 dnl configure.ac for bogofilter
 dnl (C) Copyright 2003 Clint Adams, Gyepi Sam, David Relson, Matthias Andree
-dnl (C) Copyright 2004,2005,2006 David Relson, Matthias Andree
+dnl (C) Copyright 2008 Clint Adams, David Relson, Matthias Andree
+dnl (C) Copyright 2004-2007, 2009 David Relson, Matthias Andree
 dnl
 dnl ********************************************************
 dnl "Magic" environment variables for this script are:
@@ -19,11 +20,11 @@ dnl ********************************************************
 dnl
 AC_INIT([bogofilter],[1.2.1])
 dnl
-AC_PREREQ(2.59)
-dnl AC_PREREQ(2.60) dnl if AC_USE_SYSTEM_EXTENSIONS is desired
+AC_PREREQ(2.60)
+AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_SRCDIR([src/bogofilter.c])
-AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE([foreign 1.8 dist-bzip2 no-installinfo])
+AC_CANONICAL_HOST
+AM_INIT_AUTOMAKE([foreign 1.9 dist-bzip2 no-installinfo])
 AC_CONFIG_HEADERS([src/config.h:config.in])
 
 AC_PROG_AWK
@@ -88,7 +89,7 @@ if test "x$SHELL" = "x" ; then
 fi
 
 dnl crutch for b0rked S/390 gcc:
-if test "x$target_cpu" = "xs390" && test "x$GCC" = "xyes" ; then
+if test "x$host_cpu" = "xs390" && test "x$GCC" = "xyes" ; then
     case ${CFLAGS} in
     *-O*)
 	OCFLAGS="$CFLAGS"
@@ -105,7 +106,7 @@ fi
 dnl crutch for b0rked dgux gcc 2.7 (-g gives unresolved symbols in GSL),
 dnl gcc 2.8.1 is fine according to Message-ID: <199805061718.NAA01272@monty>
 dnl see http://list-archive.xemacs.org/xemacs-beta/199805/msg00291.html
-case "$target_os" in
+case "$host_os" in
 dgux*)
     if test "$GCC" = yes ; then
         case "`$CC --version`" in
@@ -378,7 +379,6 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_TYPE_UID_T
-AC_TYPE_SIGNAL
 AC_FUNC_SELECT_ARGTYPES
 AC_CHECK_TYPES([uint, ulong, uint32_t, u_int32_t, int32_t, int16_t, u_int16_t, uint16_t, u_int8_t, ssize_t])
 AC_CHECK_TYPE(u_long, unsigned long)
@@ -822,7 +822,7 @@ AM_CONDITIONAL(NEED_GSL,test $need_my_gsl != 0)
 AM_CONDITIONAL(NEED_GETOPT,test $ac_cv_func_getopt_long != yes)
 
 have_dosish_system=no
-case "${target}" in
+case "${host}" in
     *-*-mingw32*)
         # special stuff for Windoze NT
         have_dosish_system=yes

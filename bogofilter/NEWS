@@ -15,7 +15,13 @@
 
 -------------------------------------------------------------------------------
 
-1.2.1	2009-08-01 (released) 
+1.2.1	2009-08-01 (released)
+
+	2009-08-01
+	* Update configure to use "host" rather than "target", to match the
+	  newer autotools cross-build semantics. Untested.
+	  Developers changing the build system and users who build from SVN
+	  will now need automake 1.9 and autoconf 2.60.
 
 	2009-07-31
 	* Fix Christian Frommeyer's MIME decoding bug, Ubuntu/Launchpad Bug

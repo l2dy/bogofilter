@@ -1,16 +1,16 @@
 README.svn -- How to build bogofilter from Subversion (SVN)
 $Id$
 
-(C) 2002,2007 by Matthias Andree. Freely distributable according to the 
-terms of the GNU Free Documentation License 1.0. No front- or back-matter
-parts, no invariant parts.
+(C) 2002,2007,2009 by Matthias Andree. Freely distributable according to
+the terms of the GNU Free Documentation License 1.0. No front- or
+back-matter parts, no invariant parts.
 -------------------------------------------------------------------------
 
 After you have checked out bogofilter from SVN, some files are missing,
 for example, configure, ylwrap and others.
 
 These files can be created automatically with recent autoconf and
-automake versions.  You will need autoconf 2.53 and automake 1.6 or
+automake versions.  You will need autoconf 2.60 and automake 1.9 or
 newer.
 
 To recreate these files, run: autoreconf -i -s -f
