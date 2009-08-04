@@ -55,8 +55,7 @@
         <br>
         <table width="90%" border=0 align="center" cellpadding=10 class="central_table">
           <tr bgcolor="#FFFFFF">
-            <td width="169">Download
-              bogofilter</td>
+            <td width="169">Download bogofilter</td>
             <td width="397">From
               <a href="http://sourceforge.net/project/showfiles.php?group_id=62265" target="_blank">Sourceforge Mirrors</a>.<br>
               Some <a href="distros.shtml">distributors</a> ship bogofilter.</td>
@@ -103,7 +102,6 @@
               Louis, and a group of open source volunteers.</td>
           </tr>
         </table>
-        <br>
         <br>
       </td>
     </tr>
