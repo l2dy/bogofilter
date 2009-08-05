@@ -117,10 +117,12 @@ bool discard_token(word_t *token, dsv_t *in_val)
 {
     bool discard;
 
-    if (token->u.text[0] == '.') {	/* keep .MSG_COUNT and .ROBX */
+    if (token->u.text[0] == '.') {	/* keep .ENCODING, .MSG_COUNT, and .ROBX */
 	if (strcmp((const char *)token->u.text, MSG_COUNT) == 0)
 	    return false;
 	if (strcmp((const char *)token->u.text, ROBX_W) == 0)
+	    return false;
+	if (strcmp((const char *)token->u.text, WORDLIST_ENCODING) == 0)
 	    return false;
     }
 

@@ -15,6 +15,13 @@
 
 -------------------------------------------------------------------------------
 
+	2009-08-05
+
+	* Merged an updated version of Ted Phelps's "Patch to prevent .ENCODING
+	  from being discarded by bogoutil -m" (SourceForge Patch #1743984).
+	  Thanks to Ted for debugging the issue and providing the patch (which
+	  was for bogofilter v1.1.5).
+
 1.2.1	2009-08-01 (released)
 
 	2009-08-01
