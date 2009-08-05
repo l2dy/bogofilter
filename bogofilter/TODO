@@ -2,6 +2,12 @@
 
 			bogofilter TODO list
 
+**** Documentation: Berkeley DB 4.7, check options (versions for
+     existing ones, new options).
+
+**** Database (Berkeley DB): Use auto-recover features of Berkeley DB
+     4.4+ and give up on our own recovery locking and crash detection.
+
 **** If insufficient data is present and the default "undecided"
      bogosity is added in -p mode, add also a comment stating that
      bogofilter needs more training first
@@ -15,11 +21,12 @@
      Where it is a character limit, count characters, not octets, to
      support UTF-8.
 
-**** Implement Concurrent Data store, quite similar to Transactional.
+**** Database (Berkeley DB): Implement Concurrent Data store, quite
+     similar to Transactional.
 
-**** Make sure that RFC-2047 decoder runs only once, not recursively.
+**** MIME: Make sure that RFC-2047 decoder runs only once, not recursively.
 
-**** Implement RFC-2046 section 5.2.2 (message/partial reassembly rules,
+**** MIME: Implement RFC-2046 section 5.2.2 (message/partial reassembly rules,
      Take most headers from enclosing message except Content-*, Subject,
      Message-ID, Encrypted, MIME-Version, which are taken from the
      enclosed message).
@@ -34,42 +41,42 @@
      has never been in bogoreader.c.
 
 **** New Feature: Token aging. Support for struct data in the wordlists is
-already present.
+     already present.
 
 **** New feature: Token merging, based on delta tokens (Andras Salamon,
      andras@dns.net on bogofilter-dev, 2005-01-25)
 
 **** Two deletes for kmail?  This wouldn't be a patch for bogofilter
-itself, but a change to give kmail delete-as-spam and delete-as-
-nonspam buttons.  Similarly for other MUAs.
+     itself, but a change to give kmail delete-as-spam and delete-as-
+     nonspam buttons.  Similarly for other MUAs.
 
 **** New Feature: Make it a milter?
 
 **** New Feature: Multiple list file support with weights and rules. Wordlist verfification.
-Eric Seppanen:
-> Allow use of a variable number of list files, each with their
-> own weights and rules.
-> Possible uses:
-> - hand-maintained "whitelist" or "blacklist" files, with massive 
-> weighting to override everything else.
-> - allow users to use system-wide list files and their own files.
-> 
-Shared-database version based on the autodaemon code,
-In the shared-database version (which doesn't yet exist) worldlist
-verification to avoid attacks on posters (thanks, Barry!).
-Emulate the Vipul's Razor reputation scheme for people reporting tokens?
-http://razor.sourceforge.net/
+     Eric Seppanen:
+     > Allow use of a variable number of list files, each with their
+     > own weights and rules.
+     > Possible uses:
+     > - hand-maintained "whitelist" or "blacklist" files, with massive 
+     > weighting to override everything else.
+     > - allow users to use system-wide list files and their own files.
+     > 
+     Shared-database version based on the autodaemon code,
+     In the shared-database version (which doesn't yet exist) worldlist
+     verification to avoid attacks on posters (thanks, Barry!).
+     Emulate the Vipul's Razor reputation scheme for people reporting tokens?
+     http://razor.sourceforge.net/
 
 **** What this software is probably heading towards is a scheme in which
-there's a general notion of tagged categories (spam being one) with
-cluster analysis being applied to categorize which categories a
-message belongs to at above 0.9 confidence level.
+     there's a general notion of tagged categories (spam being one) with
+     cluster analysis being applied to categorize which categories a
+     message belongs to at above 0.9 confidence level.
 
 **** New Feature: Web based tool for wordlist management. Allow message
-registration and whitelist management. HTML Templatized for easy integration
-with existing web mail systems.
+     registration and whitelist management. HTML Templatized for easy
+     integration with existing web mail systems.
 
 **** New Feature: Add support for a user configurable list of headers that 
-should be used to ignore (single or multi-line) headers that appear in the 
-list. The list should be used to ignore headers both during the message 
-registration and evaluation procedures.
+     should be used to ignore (single or multi-line) headers that appear
+     in the list. The list should be used to ignore headers both during
+     the message registration and evaluation procedures.
