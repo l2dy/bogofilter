@@ -20,9 +20,9 @@ fi
 cat >> "$TMPDIR"/ref.unicode.enabled <<EOF
 initial: 5303
 count 0 -> 5304
-count 1 -> 1847
+count 1 -> 1848
 count 2 -> 950
-count 3 -> 610
+count 3 -> 611
 EOF
 
 cat >> "$TMPDIR"/ref.unicode.disabled <<EOF
