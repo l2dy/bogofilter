@@ -18,12 +18,14 @@
 1.2.1	2009-08-01 (released)
 
 	2009-08-01
+
 	* Update configure to use "host" rather than "target", to match the
 	  newer autotools cross-build semantics. Untested.
 	  Developers changing the build system and users who build from SVN
 	  will now need automake 1.9 and autoconf 2.60.
 
 	2009-07-31
+
 	* Fix Christian Frommeyer's MIME decoding bug, Ubuntu/Launchpad Bug
 	  #320829. As a side effect, also fixes misattribution of MIME bodies
 	  as MIME headers with mime: tag.  Original bug report:
@@ -34,10 +36,13 @@
 	  where the whole body was only one long base64 line.
 
 	2009-05-28
+
 	* Removed two scripts that are auto-built.
+
 	* Added test case for Stephen Davies' Q-P EOL problem (see below).
 
 	2009-05-25
+
 	* Fixed EOL problem in quoted_printable text. Problem reported by
 	  Stephen Davies and identified by Pavel Kankovsky.
 
@@ -51,10 +56,13 @@
           2.5.31, and 2.5.33, making bogofilter's flex patch obsolete.
 
 	2009-02-12
+
 	* Bogofilter now uses listsort in place of qsort.
 
 	2009-01-31
+
 	* Added token-count=n, token-count-min=n, and token-count-max=n options.
+
 	* Minor code cleanups.
 
 	2009-01-21
@@ -100,6 +108,7 @@
 	  manual, so ditch them.
 
 	2008-05-18
+
 	* Promoted to "stable"
 
 1.1.7	2008-05-04 (released) 
