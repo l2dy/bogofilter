@@ -8,7 +8,7 @@ Spamitarium - evaluates and repairs the sanity of email headers...
 
 =cut
 
-my $version = "0.3.0";
+my $version = "0.4.0";
 
 ################################################
 ############### Copyleft Notice ################
@@ -55,7 +55,7 @@ Add to your .procmailrc the following recipe:
   :0
   {
         :0 fhw
-        | spamitarium -sreadx
+        | spamitarium -sreadxtp
   
         # filter through bogofilter, tagging as spam 
 	# or not and updating the word lists
@@ -101,11 +101,17 @@ force rDNS lookups even when provided already by the MTA
 
 perform ASN lookups and include in received lines
 
+=item B<p>
+
+perform SPF lookups and include in received lines
+
 =item B<x>
 
 include custom x-headers for additional header validations:
 
-- validate that the date header is within close proxmity to the 
+=item B<t>
+
+validate that the date header is within close proxmity to the 
 received date (see $date_limit global variable to configure)
 
 =item B<w>
@@ -129,7 +135,7 @@ the end of your command line.  For example, if you wanted the
 I<list-id> and I<encrypted> fields passed through, you would change
 your procmail recipe as follows:
 
-  | spamitarium -sreadx list-id,encrypted
+  | spamitarium -sreadxtp list-id,encrypted
 
 
 =head1 REQUIRES
@@ -140,6 +146,10 @@ your procmail recipe as follows:
 
 Perl 5.6.1
 Net::DNS::Resolver
+Mail::SPF::Query
+Net::CIDR
+DB_File
+POSIX
 
 =back
 
@@ -174,10 +184,12 @@ non-functional header lines.
 
 Spamitarium also looks up any IP addresses or rDNS addresses
 which are not provided in order to provide the maximum tokens on
-which to filter.  Moreover, it looks up the ASN (autonomous system
-number) associated with each "from" address in order to provide
+which to filter.  Moreover, it looks up the autonomous system number
+(ASN) associated with each "from" address in order to provide
 a small set of tokens representing the various major subnets of the
-internet.
+internet.  And it checks the Sender Policy Framework (SPF) records of
+the sender to ensure that the given MX has permission to send on
+their behalf.
 
 Finally, Spamitarium assesses the headers for missing required
 header lines, inserting keyable tokens or supplying the missing
@@ -206,10 +218,10 @@ Ye may receive an answer here if it is asked frequently
 
 =item *
 
-Please report any.
+timegm($sec,$min,$hour,$day,$mon,$year) aborts if Perl's time_t is 32 
+bits large and the year is too high (>2038).
 
 =back
-
 
 =head1 TODO
 
@@ -220,7 +232,6 @@ Please report any.
 Suggestions welcome.
 
 =back
-
 
 =head1 SEE ALSO
 
@@ -260,6 +271,15 @@ our $timeout = 3;
 
 # server to use for ASN lookups
 our $asn_server = "asn.routeviews.org";
+
+# Whitelist any IP addresses or ranges from SPF lookups
+our @whitelist = ("127.0.0.1","192.168.0.1-192.168.0.255");
+
+# If you want to whitelist any addresses which have authenticated
+# via poprelayd (i.e. remote workstations of users on your server)
+# set $dbfile to your popip.db location, else set it to undef
+#our $dbfile = "/etc/mail/popip.db";
+our $dbfile = undef;
 
 # distance in seconds from right now to consider a reasonable (non-spam) range to date an email
 our $date_limit = 60*60*24*2;  # 2 days
@@ -304,7 +324,7 @@ our $date_limit = 60*60*24*2;  # 2 days
 
 	# NEW FIELDS -- New custom x-headers added by Spamitarium (it is recommend that you don't change these).  
 	# These are disabled unless you pass the 'x' option.
-	our $new_fields = "x-date-check";
+	our $new_fields = "x-date-check,x-spf";
 
 	# REQUIRED FIELDS -- Any fields that should show up in an email even if they are not sent -- i.e. if the lack of
 	# these fields may be useful for the filter, a no-req-field tag will be added.  The only *required* fields according to 
@@ -326,6 +346,10 @@ our $date_limit = 60*60*24*2;  # 2 days
 use Benchmark;
 use Time::Local;
 use Net::DNS::Resolver;
+use Mail::SPF::Query;
+use Net::CIDR;
+use DB_File;
+use POSIX;
 
 #################################################
 ############## Default Globals ##################
@@ -359,6 +383,14 @@ our $res = Net::DNS::Resolver->new(
 	#debug          => 1
 );
 
+# convert whitelist into CIDR notation
+our @cidr_list = ();
+foreach my $IP (@whitelist) {
+  if (not eval {@cidr_list = Net::CIDR::cidradd ($IP, @cidr_list)}) {
+    error("warn","Error processing whitelist: \"$IP\" is not a valid IP address or range.");
+  }
+}
+
 ################################################
 ##################### Main #####################
 ################################################
@@ -378,9 +410,15 @@ if ($ARGV[0] =~ /e/) { $options .= "e"; }	# include the helo received field in o
 if ($ARGV[0] =~ /b/) { $options .= "b"; }	# output benchmarking info
 if ($ARGV[0] =~ /w/) { $options .= "w"; }	# process whole email (including body)
 if ($ARGV[0] =~ /x/) { $options .= "x"; }	# insert custom x-header fields
+if ($ARGV[0] =~ /t/) { $options .= "t"; }	# perform date range checks
+if ($ARGV[0] =~ /p/) { $options .= "p"; }	# perform SPF lookups
 
 # get the permitted headers
 if ($options =~ /s/ && $ARGV[1]) { $user_fields = $ARGV[1]; }
+
+# open popip database for reading
+our %db;
+&opendb_read if $dbfile;
 
 # start timing the process
 my $start_time = new Benchmark if $options =~ /b/;
@@ -412,17 +450,32 @@ eval
 	if ($options =~ /r/)
 	{
 		$start_rcvd = new Benchmark if $options =~ /b/;
-		$header->{'received'} = process_rcvd($header->{'received'});
+		$header->{'received'} = process_rcvd($header->{'received'},$header->{'return-path'}->[0]->{'value'});
 		$end_rcvd = new Benchmark if $options =~ /b/;
 	}
 
 	# add new custom header fields
 	if ($options =~ /x/) 
 	{
-		$header->{'x-date-check'}->[0]->{'name'} = "X-Date-Check"; 
-		$header->{'x-date-check'}->[0]->{'value'} = date_check($header->{'date'}->[0]->{'value'},$header->{'received'}->[0]->{'date'});
+		if ($options =~ /t/)
+		{
+			$header->{'x-date-check'}->[0]->{'name'} = "X-Date-Check"; 
+			$header->{'x-date-check'}->[0]->{'value'} = date_check($header->{'date'}->[0]->{'value'},$header->{'received'}->[0]->{'date'});
+		}
+
+		if ($options =~ /p/)
+		{
+	                for (my $x = 0; $x < scalar @{$header->{'received'}}; $x++)
+	                {
+                       	        if (defined $header->{'received'}->[$x]->{'spf'} && $header->{'received'}->[$x]->{'spf'} =~ /\w/)
+                               	{
+			                $header->{'x-spf'}->[$x]->{'name'} = "X-SPF";
+			                $header->{'x-spf'}->[$x]->{'value'} = $header->{'received'}->[$x]->{'spf'};
+                                }
+	                }			
+		}
 	}
-	
+
 	# output the new header containing the changes
 	$start_set = new Benchmark if $options =~ /b/;
 	print set_header($header);
@@ -466,6 +519,9 @@ if ($options =~ /b/)
 	print "Rebuilding email time was $wall wallclock secs; $usr usr + $sys sys = $cpu CPU secs.$CRLF";
 }
 
+# close popip database
+&closedb if $dbfile;
+
 exit(0);
 
 ################################################
@@ -494,7 +550,7 @@ sub parse_header
 			 #(defined $header->{'from'} && $header->{'from'}->[0]->{'value'} =~ /\w/)));
 
 		# match header lines
-		if ($line =~ /^(\S+?):\s*?(\S.+?)$/)
+		if ($line =~ /^(\S+?):\s*?(\S.*?)$/)
 		{
 			my $head = $1; my $value = $2;
 			$name = $head;
@@ -589,6 +645,7 @@ sub parse_body
 sub process_rcvd
 {
 	my $rcvd = shift;
+	my $rtrn = shift;
 	
 	# heuristics
 	my $LUSER	= qr~(?:\w|-|\.)+?~;
@@ -689,10 +746,49 @@ sub process_rcvd
 		$rdns = host($ipad) if $ipad && $options =~ /f/;
 		
 		# perform ASN lookup (RFC 1930/2270)
-		my $asn = asn($ipad) if $ipad && $options =~ /a/;
+		my $asn = "";
+		$asn = asn($ipad) if $ipad && $options =~ /a/;
+
+		# perform SPF lookup
+		my $result = ""; my $smtp_comment = ""; my $header_comment = ""; my $spf_record = ""; 
+		if ($options =~ /p/)
+		{
+			&retie if $dbfile && !tied %db;
+
+			if (scalar @cidr_list && eval{Net::CIDR::cidrlookup($ipad, @cidr_list)})
+			{
+				$result = "pass";
+				$header_comment = "$ipad is locally whitelisted";
+			}	
+			elsif ($dbfile && $db{$ipad})
+			{
+				$result = "pass";
+				$header_comment = "$ipad is authenticated via poprelayd";
+			}
+			elsif ($rtrn && $ipad)
+			{
+				my $srvr = $rdns?$rdns:($helo?$helo:$ipad);
+				my $query = new Mail::SPF::Query (ip=>$ipad, sender=>$rtrn, helo=>$srvr, trusted=>0, guess=>0) or error("warn","SPF lookup failed: $!");
+				($result,           # pass | fail | softfail | neutral | none | error | unknown [mechanism]
+				 $smtp_comment,     # "please see http://www.openspf.org/why.html?..."  when rejecting, return this string to the SMTP client
+				 $header_comment,   # prepend_header("Received-SPF" => "$result ($header_comment)")
+				 $spf_record,       # "v=spf1 ..." original SPF record for the domain
+				) = $query->result();
+			}
+			else
+			{
+				$result = "error";
+				$header_comment = "unable to determine sender info";
+			}
+		}
 
 		# we implicitely trust the received line set "by" our own server as valid (first untrusted "from")
-		if (!$edge_ip) { $edge_ip = $mtai; $rcvd->[$x]->{'sane'} = set_rcvd($helo,$ipad,$idnt,$rdns,$from,$mtan,$mtai,$mtav,$fore,$with,$date,$asn); }
+		if (!$edge_ip) 
+		{ 
+			$edge_ip = $mtai; 
+			$rcvd->[$x]->{'sane'} = set_rcvd($helo,$ipad,$idnt,$rdns,$from,$mtan,$mtai,$mtav,$fore,$with,$date,$asn,$result); 
+			$rcvd->[$x]->{'spf'} = "$result ($header_comment)" if $options =~ /p/;
+		}
 
 		# now we'll try to establish the validity of each received line by checking 
 		# for continuity and rejecting lines that don't fit the "from/by" chain
@@ -706,7 +802,10 @@ sub process_rcvd
 			     		($mtai && $rcvd->[$x-1]->{'ipad'} && $mtai =~ /$rcvd->[$x-1]->{'ipad'}/)
 				) && 	(!$untrusted)
 			   ) 
-			     { $rcvd->[$x]->{'sane'} = set_rcvd($helo,$ipad,$idnt,$rdns,$from,$mtan,$mtai,$mtav,$fore,$with,$date,$asn); }
+			     { 
+				$rcvd->[$x]->{'sane'} = set_rcvd($helo,$ipad,$idnt,$rdns,$from,$mtan,$mtai,$mtav,$fore,$with,$date,$asn,$result); 
+				$rcvd->[$x]->{'spf'} = "$result ($header_comment)" if $options =~ /p/;
+			     }
 			else 
 			{ 
 				$helo = "untrusted-".$helo if $helo; $ipad = "untrusted-".$ipad if $ipad;
@@ -714,8 +813,8 @@ sub process_rcvd
 				$from = "untrusted-".$from if $from; $mtan = "untrusted-".$mtan if $mtan;
 				$mtai = "untrusted-".$mtai if $mtai; $mtav = "untrusted-".$mtav if $mtav;
 				$fore = "untrusted-".$fore if $fore; $with = "untrusted-".$with if $with;
-				$date = ""; $asn = "";
-				$rcvd->[$x]->{'sane'} = set_rcvd($helo,$ipad,$idnt,$rdns,$from,$mtan,$mtai,$mtav,$fore,$with,$date,$asn); 
+				$date = ""; $asn = ""; $result = "";
+				$rcvd->[$x]->{'sane'} = set_rcvd($helo,$ipad,$idnt,$rdns,$from,$mtan,$mtai,$mtav,$fore,$with,$date,$asn,$result); 
 				$untrusted = 1; 
 			}
 		}
@@ -781,13 +880,14 @@ sub host
 
 sub set_rcvd
 {
-	my ($helo,$ipad,$idnt,$rdns,$from,$mtan,$mtai,$mtav,$fore,$with,$date,$asn) = @_;
+	my ($helo,$ipad,$idnt,$rdns,$from,$mtan,$mtai,$mtav,$fore,$with,$date,$asn,$spf) = @_;
 
 	my $output = "from";
 	if ($options =~ /e/) {
 	$output .= ($helo)? 		" helo-$helo" 	: "";} 		# sender's salutation
 	$output .= ($rdns)? 		" $rdns" 	: "";		# sender's name
 	$output .= ($ipad)? 		" $ipad" 	: "";		# sender's IP
+	$output .= ($spf)?		" spf-$spf"	: "";		# sender's policy result
 	$output .= ($asn)?  		" as$asn" 	: "";		# sender's ASN
 	$output .= ($mtan||$mtai)? 	" $CRLF\t  by"	: "";
 	$output .= ($mtan)? 		" $mtan" 	: "";		# receiving MTA's name
@@ -798,6 +898,23 @@ sub set_rcvd
 
 	#print "outputting received: $output" . $CRLF;
 	return $output;
+}
+
+sub opendb_read 
+{
+    tie(%db, "DB_File", $dbfile, O_RDONLY, 0, $DB_HASH) or error("warn","Can't open $dbfile: $!");
+}
+
+sub closedb 
+{
+    untie %db;
+    undef %db;
+}
+
+sub retie 
+{
+    &closedb;
+    &opendb_read;
 }
 
 ################################################
