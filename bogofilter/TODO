@@ -3,10 +3,13 @@
 			bogofilter TODO list
 
 **** Documentation: Berkeley DB 4.7, check options (versions for
-     existing ones, new options).
+     existing ones, new options), use a list of versions that require a log
+     format upgrade (or DB format or whatever) for simplicity
 
 **** Database (Berkeley DB): Use auto-recover features of Berkeley DB
      4.4+ and give up on our own recovery locking and crash detection.
+
+**** Database (Berkeley DB): Can we use the bulk load feature to our advantage?
 
 **** If insufficient data is present and the default "undecided"
      bogosity is added in -p mode, add also a comment stating that
