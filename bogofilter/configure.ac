@@ -24,7 +24,7 @@ AC_PREREQ(2.60)
 AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_SRCDIR([src/bogofilter.c])
 AC_CANONICAL_HOST
-AM_INIT_AUTOMAKE([foreign 1.9 dist-bzip2 no-installinfo])
+AM_INIT_AUTOMAKE([foreign 1.11 dist-bzip2 no-installinfo parallel-tests])
 AC_CONFIG_HEADERS([src/config.h:config.in])
 
 AC_PROG_AWK
