@@ -32,9 +32,11 @@
                   <td class="top_text_table"> Database <br>
                     Variants</td>
                 </tr>
+		<!--
 		<tr><td colspan="3"><a href="http://www.centos.org/" target="_blank"><strong>Centos</strong></a></td></tr>
                 <tr> <td>Centos 5.1</td> <td>1.1.6</td> <td> <div align="center">BerkeleyDB</div> </td>
                 </tr>
+		-->
 		<tr><td colspan="3"><a href="http://www.debian.org/" target="_blank"><strong>Debian</strong></a></td></tr>
                 <tr>
                   <td>Debian stable ("lenny")</td> <td>1.1.7</td>
@@ -47,9 +49,13 @@
                   <td>Debian unstable ("sid")</td>
                   <td>See <a href="http://packages.debian.org/unstable/mail/bogofilter" target="_blank">packages.debian.org</a></td>
                   <td> <div align="center">BerkeleyDB, QDBM, SQLite, TokyoCabinet</div> </td> </tr>
-		<tr><td colspan="3"><a href="http://fedoraproject.org/" target="_blank"><strong>Fedora</strong></a></td></tr>
-                <tr><td>Fedora 10 (Cambridge)</td> <td>1.1.7</td> <td><div align="center">BerkeleyDB 4.7</div></td></tr>
-                <tr><td>Fedora 9 (Sulphur)</td>    <td>1.1.6</td> <td><div align="center">BerkeleyDB 4.6</div></td></tr>
+		<tr><td colspan="3"><a href="http://fedoraproject.org/"
+			    target="_blank"><strong>Fedora</strong></a>
+		| <a
+		    href="http://fedoraproject.org/wiki/Releases#Current_Supported_Releases">Supported
+		    Releases</a></td></tr>
+                <tr><td>Fedora 12 (Constantine)</td> <td>1.2.0</td> <td><div align="center">BerkeleyDB 4.7</div></td></tr>
+                <tr><td>Fedora 11 (Leonidas)</td>    <td>1.2.0</td> <td><div align="center">BerkeleyDB 4.7</div></td></tr>
 		<tr><td colspan="3"><a href="http://www.freebsd.org/"
 			    target="_blank"><strong>FreeBSD</strong></a>
 			| <a href="http://www.freebsd.org/security/#adv"
