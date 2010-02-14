@@ -11,6 +11,8 @@ AUTHOR:
    
 ******************************************************************************/
 
+#include <errno.h>
+
 #include "common.h"
 
 #include "datastore.h"
@@ -83,8 +85,12 @@ double compute_robinson_x(void)
 
     dsh = wordlist->dsh;
 
-    rh.spam_cnt = max(wordlist->msgcount[IX_SPAM],1);
-    rh.good_cnt = max(wordlist->msgcount[IX_GOOD],1);
+    rh.spam_cnt = wordlist->msgcount[IX_SPAM];
+    rh.good_cnt = wordlist->msgcount[IX_GOOD];
+
+    if (rh.spam_cnt == 0 || rh.good_cnt == 0)
+	wordlist_error(ENOENT);
+    
     rh.scalefactor = (double)rh.spam_cnt/(double)rh.good_cnt;
 
     rh.dsh = dsh;

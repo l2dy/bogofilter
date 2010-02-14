@@ -15,9 +15,13 @@
 
 -------------------------------------------------------------------------------
 
+	2010-02-14
+
+	* Split error messages for ENOENT and EINVAL into new function.
+
 	2010-01-23
 
-	* corrected divide by zero problem in bogoutil's robx computation.
+	* Corrected divide by zero problem in bogoutil's robx computation.
 
 	2009-08-13
 

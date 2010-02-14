@@ -140,17 +140,9 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 	    if (err != 0)
 		fprintf(stderr,
 			"error #%d - %s.\n", err, strerror(err));
-	    if (err == ENOENT)
-		fprintf(stderr,
-			"\n"
-			"Remember to register some spam and ham messages before you\n"
-			"use bogofilter to evaluate mail for its probable spam status!\n");
-	    if (err == EINVAL)
-		fprintf(stderr,
-			"\n"
-			"Make sure that the database version this program is linked against\n"
-			"can handle the format of the data base file (after updates in particular).\n");
-	    exit(EX_ERROR);
+
+	    // print error and exit
+	    wordlist_error(err);
 	} /* switch */
     } else { /* ds_open */
 	begin_wordlist(list);
@@ -365,4 +357,23 @@ bool configure_wordlist(const char *val)
     init_wordlist(listname, filename, precedence, type);
 
     return true;
+}
+
+// print error and exit
+
+void wordlist_error(int err)
+{
+    if (err == ENOENT)
+	fprintf(stderr,
+		"\n"
+		"Remember to register some spam and ham messages before you\n"
+		"use bogofilter to evaluate mail for its probable spam status!\n");
+
+    if (err == EINVAL)
+	fprintf(stderr,
+		"\n"
+		"Make sure that the database version this program is linked against\n"
+		"can handle the format of the data base file (after updates in particular).\n");
+
+    exit(EX_ERROR);
 }

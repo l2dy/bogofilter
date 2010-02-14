@@ -35,4 +35,6 @@ bool query_wordlists_closed(void);
 void set_list_active_status(bool status);
 void set_wordlist_directory(void);
 
+void wordlist_error(int err);
+
 #endif	/* WORDLISTS_H */
