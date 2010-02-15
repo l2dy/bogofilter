@@ -15,6 +15,15 @@
 
 -------------------------------------------------------------------------------
 
+	2010-02-15
+
+	* Fix several compiler warnings "array subscript has type 'char'", by
+	  casting the arguments to unsigned char.
+	     A security audit was conducted and showed that all affected
+	  functions either received the relevant input from the user running
+	  bogofilter, or the input had already been pre-validated by the token
+	  lexer.
+
 	2010-02-14
 
 	* Split error messages for ENOENT and EINVAL into new function.

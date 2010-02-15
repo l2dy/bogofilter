@@ -332,7 +332,7 @@ bool configure_wordlist(const char *val)
     ch= tmp[0];		/* save wordlist type (good/spam) */
     tmp = spanword(tmp);
 
-    switch (toupper(ch))
+    switch (toupper((unsigned char)ch))
     {
     case 'R':
 	type = WL_REGULAR;

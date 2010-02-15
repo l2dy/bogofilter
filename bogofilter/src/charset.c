@@ -110,7 +110,7 @@ void set_charset(const char *charset)
 
     for (s = d = t; *s != '\0'; s++)
     {
-	char c = tolower(*s);	/* map upper case to lower */
+	char c = tolower((unsigned char)*s);	/* map upper case to lower */
 	if (c == '_')		/* map underscore to dash */
 	    c = '-';
 	if (c == '-' &&		/* map "iso-" to "iso"     */

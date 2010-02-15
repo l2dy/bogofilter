@@ -421,7 +421,7 @@ static byte *getword(
 void mime_content(word_t * text)
 {
     char *key = (char *) text->u.text;
-    switch (tolower(key[9])) {
+    switch (tolower((unsigned char)key[9])) {
     case 'r':			/*  Content-Transfer-Encoding: */
 	mime_encoding(text);
 	break;

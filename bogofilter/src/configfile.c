@@ -84,7 +84,7 @@ bool process_config_option(const char *arg, bool warn_on_error, priority_t prece
     char *dupl;
     const char delim[] = " \t=";
 
-    while (isspace(*opt))		/* ignore leading whitespace */
+    while (isspace((unsigned char)*opt))		/* ignore leading whitespace */
 	opt += 1;
 
     dupl = xstrdup(opt);
@@ -118,7 +118,7 @@ static bool option_compare(const char *opt, const char *name)
     if (strlen(opt) != strlen(name))
 	return false;
     while (((co = *opt++) != '\0') && ((cn = *name++) != '\0')) {
-	if ((co == cn) || (tolower(co) == tolower(cn)))
+	if ((co == cn) || (tolower((unsigned char)co) == tolower((unsigned char)cn)))
 	    continue;
 	if (co != '_' || cn != '-')
 	    return false;

@@ -619,7 +619,7 @@ void set_tag(const char *text)
 	return;
     }
 
-    switch (tolower(*text)) {
+    switch (tolower((unsigned char)*text)) {
     case 'c':				/* CC: */
     case 't':
 	token_prefix = w_to;		/* To: */
@@ -634,7 +634,7 @@ void set_tag(const char *text)
 	    token_prefix = w_mime;	/* Mime:   */
 	break;
     case 'r':
-	if (tolower(text[2]) == 't')
+	if (tolower((unsigned char)text[2]) == 't')
 	    token_prefix = w_rtrn;	/* Return-Path: */
 	else
 	    token_prefix = w_recv;	/* Received: */
