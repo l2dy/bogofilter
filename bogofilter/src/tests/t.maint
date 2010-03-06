@@ -11,21 +11,10 @@ create_empty_wordlist
 $BOGOFILTER -C -y 0 -s < "$SYSTEST"/inputs/spam.mbx
 $BOGOFILTER -C -y 0 -n < "$SYSTEST"/inputs/good.mbx
 
-if [ -z "$USE_UNICODE" -o "$USE_UNICODE" = "YES" ] ; then
-    CORRECT="$TMPDIR"/ref.unicode.enabled
-else
-    CORRECT="$TMPDIR/ref.unicode.disabled"
-fi
+filter="egrep -v ^\\.ENCODING"
 
-cat >> "$TMPDIR"/ref.unicode.enabled <<EOF
-initial: 5303
-count 0 -> 5304
-count 1 -> 1848
-count 2 -> 950
-count 3 -> 611
-EOF
-
-cat >> "$TMPDIR"/ref.unicode.disabled <<EOF
+CORRECT="$TMPDIR"/ref.txt
+cat >> "$CORRECT" <<EOF
 initial: 5303
 count 0 -> 5303
 count 1 -> 1847
@@ -33,11 +22,11 @@ count 2 -> 949
 count 3 -> 610
 EOF
 
-echo initial: `$BOGOUTIL -d "$WORDLIST" | wc -l` > "$OUT"
+echo "initial: $($BOGOUTIL -d "$WORDLIST" | $filter | wc -l)" > "$OUT"
 
 for cnt in 0 1 2 3 ; do
     $BOGOUTIL -C -c $cnt -m "$WORDLIST"
-    echo "count $cnt ->" `$BOGOUTIL -C -d "$WORDLIST" | wc -l` >> "$OUT"
+    echo "count $cnt -> $($BOGOUTIL -C -d "$WORDLIST" | $filter | wc -l)" >> "$OUT"
     if  [ $verbose -ne 0 ]; then
 	$BOGOUTIL -C -d "$WORDLIST" > "$OUT".$cnt
     fi

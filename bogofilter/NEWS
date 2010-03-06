@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2010-03-06
+
+	* Make t.maint more robust; ignore .ENCODING token. To fix test
+	  failures on, for instance, FreeBSD with unicode enabled.
+
 	2010-02-15
 
 	* Fix several compiler warnings "array subscript has type 'char'", by
