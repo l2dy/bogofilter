@@ -22,11 +22,11 @@ count 2 -> 949
 count 3 -> 610
 EOF
 
-echo "initial: $($BOGOUTIL -d "$WORDLIST" | $filter | wc -l)" > "$OUT"
+echo "initial:" $($BOGOUTIL -d "$WORDLIST" | $filter | wc -l) > "$OUT"
 
 for cnt in 0 1 2 3 ; do
     $BOGOUTIL -C -c $cnt -m "$WORDLIST"
-    echo "count $cnt -> $($BOGOUTIL -C -d "$WORDLIST" | $filter | wc -l)" >> "$OUT"
+    echo "count $cnt ->" $($BOGOUTIL -C -d "$WORDLIST" | $filter | wc -l) >> "$OUT"
     if  [ $verbose -ne 0 ]; then
 	$BOGOUTIL -C -d "$WORDLIST" > "$OUT".$cnt
     fi
