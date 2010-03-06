@@ -145,7 +145,7 @@ Detection</ulink>.</para>
 url="http://www.linuxjournal.com/article/6467">A Statistical
 Approach to the Spam Problem</ulink>) and others have realized that
 the calculation can be further optimized using Fisher's method.
-<ulink url="http://www.garyrobinson.net/2004/04/improved_chi.html">Another
+<ulink url="http://www.garyrobinson.net/2004/04/improved%5fchi.html">Another
 improvement</ulink> compensates for token redundancy by applying separate
 effective size factors (ESF) to spam and nonspam probability calculations.
 </para>
