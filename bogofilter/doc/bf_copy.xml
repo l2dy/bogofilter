@@ -5,6 +5,8 @@
     <refmeta>
 	<refentrytitle>bf_copy</refentrytitle>
 	<manvolnum>1</manvolnum>
+	<refmiscinfo class="manual">Bogofilter Reference Manual</refmiscinfo>
+	<refmiscinfo class="source">Bogofilter</refmiscinfo>
     </refmeta>
     <refnamediv id='name'>
 	<refname>bf_copy</refname>
@@ -46,5 +48,8 @@
 	    systems should have the <systemitem>SUNWxcu4</systemitem> package
 	    installed (when <application>bogofilter</application> is configured)
 	    so that <filename>/usr/xpg4/bin/sh</filename> can be used.</para>
+    </refsect1>
+    <refsect1 id="authors"><title>Authors</title>
+	<para><author><firstname>Matthias</firstname><surname>Andree</surname></author></para>
     </refsect1>
 </refentry>

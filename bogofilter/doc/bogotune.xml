@@ -3,7 +3,9 @@
 <refentry id="bogotune.1">
 <refmeta>
 <refentrytitle>bogotune</refentrytitle>
-    <manvolnum>1</manvolnum>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="manual">Bogofilter Reference Manual</refmiscinfo>
+<refmiscinfo class="source">Bogofilter</refmiscinfo>
 </refmeta>
 
   <refnamediv id="name">

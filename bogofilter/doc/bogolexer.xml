@@ -4,6 +4,8 @@
   <refmeta>
     <refentrytitle>bogolexer</refentrytitle>
     <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">Bogofilter Reference Manual</refmiscinfo>
+    <refmiscinfo class="source">Bogofilter</refmiscinfo>
   </refmeta>
   <refnamediv id="name">
     <refname>bogolexer</refname>
