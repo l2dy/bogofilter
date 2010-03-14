@@ -2,6 +2,12 @@
 
 			bogofilter TODO list
 
+**** Solaris: /opt/csw - fix system iconv vs. csw iconv. This fails if for
+     instance libsqlite3 is taken from /opt/csw --with-libsqlite3-prefix,
+     because iconv isn't taken from there.
+     This needs a *general* cleanup of prefixes, because those don't
+     apply to includes (which probably causes these issues).
+
 **** Documentation: Berkeley DB 4.7, check options (versions for
      existing ones, new options), use a list of versions that require a log
      format upgrade (or DB format or whatever) for simplicity
