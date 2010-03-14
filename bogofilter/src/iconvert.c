@@ -58,15 +58,15 @@ static void iconv_print_error(int err, buff_t *src)
     }
 }
 
-static void convert(iconv_t xd, buff_t *src, buff_t *dst)
+static void convert(iconv_t xd, buff_t *restrict src, buff_t *restrict dst)
 {
     bool done = false;
 
     while (!done) {
-	char *inbuf;
+	char * inbuf;
 	size_t inbytesleft;
 
-	char *outbuf;
+	char * outbuf;
 	size_t outbytesleft;
 	size_t count;
 

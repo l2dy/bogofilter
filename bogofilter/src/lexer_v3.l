@@ -61,6 +61,8 @@
 ** incorrectly because line 24 isn't base64 decoded.
 */
 
+#define YY_NO_INPUT
+
 #include "common.h"
 
 #include <ctype.h>

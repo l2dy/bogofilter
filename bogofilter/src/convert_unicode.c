@@ -106,11 +106,11 @@ static charset_def_t charsets[] = {
     { "csgb2312",	T },
 };
 
-iconv_t *bf_iconv_open( const char *to_charset, const char *from_charset )
+iconv_t bf_iconv_open( const char *to_charset, const char *from_charset )
 {
-    iconv_t *xd = iconv_open( to_charset, from_charset );
+    iconv_t xd = iconv_open( to_charset, from_charset );
 
-    if (xd == (iconv_t)(-1)) {
+    if (xd == (iconv_t)-1) {
 	int err = errno;
 	if (err == EINVAL) {
 	    if (DEBUG_ICONV(1))
@@ -120,9 +120,6 @@ iconv_t *bf_iconv_open( const char *to_charset, const char *from_charset )
 	    xd = iconv_open( charset_unicode, charset_default );
 	}
     }
-  
-    if (xd == (iconv_t)(-1))
-	xd = NULL;
 
     return xd;
 }

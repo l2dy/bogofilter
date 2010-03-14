@@ -18,7 +18,7 @@ AUTHOR:
 extern void init_charset_table_iconv(const char *from_charset, 
 				     const char *to_charset);
 
-extern iconv_t *bf_iconv_open( const char *to_charset, 
+extern iconv_t bf_iconv_open( const char *to_charset, 
 			       const char *from_charset );
 
 #if	defined(CP866) && !defined(ENABLE_UNICODE) && !defined(DISABLE_UNICODE)
