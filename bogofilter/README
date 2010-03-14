@@ -175,8 +175,9 @@ to the list.
 			  [default: /usr/local]
   --with-database=ENGINE  Choose database engine {db|qdbm|sqlite3} 
   			  [default: db]
-  --with-libdb-prefix[=DIR]  search for libdb in DIR/include and DIR/lib
-
+  CPPFLAGS=-I/opt/csw/include
+			  Choose additional include file path /opt/csw/include
+  LDFLAGS=-L/opt/csw/lib  Ditto, for library files
 
   d. Changing Bogofilter
   ----------------------
