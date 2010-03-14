@@ -186,6 +186,9 @@ if test "$GCC" = yes && test "$ICC" = no ; then
 	""|2.*|3.*) ;;
 	4.*) gcc4=yes ;;
     esac
+    case "$CC" in
+	*clang) gcc4=yes ;;
+    esac
 fi
 AM_CONDITIONAL(USE_GCC4, test $gcc4 = yes)
 
