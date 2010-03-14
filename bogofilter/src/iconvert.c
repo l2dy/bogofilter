@@ -177,14 +177,14 @@ static void convert(iconv_t xd, buff_t *restrict src, buff_t *restrict dst)
 		src->t.u.text, src->read, src->t.leng, src->size);
 }
 
-static void copy(buff_t *src, buff_t *dst)
+static void copy(buff_t *restrict src, buff_t *restrict dst)
 {
     /* if conversion not available, use memcpy */
     dst->t.leng = min(dst->size, src->t.leng);
     memcpy(dst->t.u.text, src->t.u.text, dst->t.leng+D);
 }
 
-void iconvert(buff_t *src, buff_t *dst)
+void iconvert(buff_t *restrict src, buff_t *restrict dst)
 {
     if (cd == NULL)
 	copy(src, dst);
@@ -192,9 +192,9 @@ void iconvert(buff_t *src, buff_t *dst)
 	convert(cd, src, dst);
 }
 
-void iconvert_cd(iconv_t xd, buff_t *src, buff_t *dst)
+void iconvert_cd(iconv_t xd, buff_t *restrict src, buff_t *restrict dst)
 {
-    if (xd == NULL)
+    if (xd == (iconv_t)-1)
 	copy(src, dst);
     else
 	convert(xd, src, dst);

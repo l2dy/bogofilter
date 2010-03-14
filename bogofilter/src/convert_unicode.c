@@ -33,7 +33,7 @@ AUTHOR:
 #define	SP	' '
 
 #include <iconv.h>
-iconv_t cd = NULL;
+iconv_t cd = (iconv_t)-1;
 
 static void map_nonascii_characters(void)
 {
@@ -128,7 +128,7 @@ void init_charset_table_iconv(const char *from_charset, const char *to_charset)
 {
     uint idx;
 
-    if (cd != NULL)
+    if (cd != (iconv_t)-1)
 	iconv_close(cd);
 
     if (DEBUG_ICONV(1))
