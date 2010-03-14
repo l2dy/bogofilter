@@ -88,7 +88,7 @@ static void convert(iconv_t xd, buff_t *restrict src, buff_t *restrict dst)
 	 * conversion can stop for four reasons:
 	 */
 
-	count = iconv(xd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
+	count = iconv(xd, (ICONV_CONST char **)&inbuf, &inbytesleft, &outbuf, &outbytesleft);
 
 	/*
 	 * 1. An invalid multibyte sequence is encountered
