@@ -45,6 +45,7 @@ dnl Check compiler capabilities
 AC_C_CONST
 AC_C_INLINE
 AC_C_VOLATILE
+AC_C_RESTRICT
 
 if test "$ac_cv_c_inline" != no ; then
     AC_DEFINE(HAVE_INLINE,1, [define to 1 if 'inline' is supported])
