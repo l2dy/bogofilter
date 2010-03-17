@@ -141,7 +141,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
 		fprintf(stderr,
 			"error #%d - %s.\n", err, strerror(err));
 
-	    // print error and exit
+	    /* print error and exit */
 	    wordlist_error(err);
 	} /* switch */
     } else { /* ds_open */
@@ -359,7 +359,7 @@ bool configure_wordlist(const char *val)
     return true;
 }
 
-// print error and exit
+/* print error and exit */
 
 void wordlist_error(int err)
 {

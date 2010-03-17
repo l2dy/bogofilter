@@ -89,7 +89,7 @@ wordhash_init (wh_t type, uint count)
     case WH_NORMAL:
 	wh->bin = xcalloc (NHASH, sizeof (hashnode_t **));
 	break;
-    case WH_CNTS:	// used for bogotune with msg_count files
+    case WH_CNTS:	/* used for bogotune with msg_count files */
 	wh->cnts = (wordcnts_t *) xcalloc(wh->size, sizeof(wordcnts_t));
 	break;
     case WH_PROPS:

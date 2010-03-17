@@ -358,7 +358,7 @@ static size_t compute_count_and_spamicity(wordhash_t *wh,
 */
 static bool need_scoring_boundary(size_t count)
 {
-    // Early out if no token count limits are set
+    /* Early out if no token count limits are set */
     if (((token_count_min == 0) || (token_count_min <= count)) &&
 	((token_count_max == 0) || (token_count_max >= count)) &&
 	((token_count_fix == 0) || (token_count_fix == count)))
@@ -427,8 +427,8 @@ static int compare_hashnode_t(const void *const pv1, const void *const pv2)
     double d2;
 
     if (!fBogotune) {
-	const hashnode_t *hn1 = (const hashnode_t const *)pv1;
-	const hashnode_t *hn2 = (const hashnode_t const *)pv2;
+	const hashnode_t *hn1 = (const hashnode_t *const)pv1;
+	const hashnode_t *hn2 = (const hashnode_t *const)pv2;
 	d1 = fabs(((wordprop_t *) hn1->data)->prob - EVEN_ODDS);
 	d2 = fabs(((wordprop_t *) hn2->data)->prob - EVEN_ODDS);
     } else {
@@ -507,7 +507,7 @@ void score_initialize(void)
 
 void score_cleanup(void)
 {
-//    rstats_cleanup();
+/*    rstats_cleanup(); */
 }
 
 #ifdef GSL_INTEGRATE_PDF
