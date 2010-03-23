@@ -176,9 +176,9 @@ extern ex_t ds_oper(void *dbenv,	/**< parent environment */
  * passed as the first parameter in all subsequent database function calls. 
  */
 /*@only@*/ /*@null@*/
-extern void *ds_open(void *dbev,	/**< parent environment */
+extern void *ds_open(void *dbe,		/**< parent environment */
 		     bfpath *bfp,	/**< path to database file */
-		     dbmode_t mode	/**< open mode, DS_READ or DS_WRITE */);
+		     dbmode_t open_mode	/**< open mode, DS_READ or DS_WRITE */);
 
 /** Close file and clean up. */
 extern void  ds_close(/*@only@*/ void *vhandle);

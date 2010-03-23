@@ -13,9 +13,9 @@
 #include "fgetsl.h"
 
 /* calls exit(EX_ERROR) on read error or when max_size < 2 */
-int fgetsl(char *buf, int max_size, /*@null@*/ FILE *in)
+int fgetsl(char *buf, int siz, /*@null@*/ FILE *in)
 {
-    return xfgetsl(buf, max_size, in, 0);
+    return xfgetsl(buf, siz, in, 0);
 }
 
 int xfgetsl(char *buf, int max_size, FILE *in, bool no_nul_terminate)

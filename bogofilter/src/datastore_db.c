@@ -503,7 +503,7 @@ static bool check_fsize_limit(int fd, uint32_t pagesize) {
  * guess a page size.  As this is a safety margin for the file size,
  * we'll return 0 and let the caller guess some size instead. */
 /* return page size, of 0xffffffff for trouble */
-static uint32_t get_psize(DB *dbp,
+static uint32_t get_psize(DB *dbp, /**< Berkeley DB pointer */
 	bool wanted /** if set, try harder to get the page size, even if
 		     * it requires to read the whole database */)
 {

@@ -43,9 +43,9 @@ extern int 	word_cmp(const word_t *w1, const word_t *w2);
 /** create a new word_t that is the concatenation of \a w1 and \a w2 */
 extern word_t  *word_concat(const word_t *w1, const word_t *w2);
 
-/** output \a self onto the stream \a fp, formatted to \a width
+/** output \a word onto the stream \a fp, formatted to \a width
  * characters. */
-extern void 	word_puts(const word_t *self, /**< word structure to print */
+extern void 	word_puts(const word_t *word, /**< word structure to print */
 	uint width, /**< if 0, use actual width, if > 0 then either
 		     *   truncate the string or fill it with blanks to print
 		     *   exactly \a width characters */

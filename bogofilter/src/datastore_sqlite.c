@@ -152,7 +152,11 @@ static int sqlexec(sqlite3 *db, const char *cmd) {
     return rc;
 }
 
-static sqlite3_stmt *sqlprep(dbh_t *dbh, const char *cmd, bool bailout /** exit on error? */) {
+/** Compile SQL statement \a cmd for database handle \a dbh, exiting on
+ * failure if \a bailout is true.  */
+static sqlite3_stmt *sqlprep(dbh_t *dbh /** data base handle */,
+	const char *cmd /** sqlite command to compile */,
+	bool bailout /** exit on error? */) {
     const char *tail; /* dummy */
     sqlite3_stmt *ptr;
     if (sqlite3_prepare_v2(dbh->db, cmd, strlen(cmd), &ptr, &tail) != SQLITE_OK) {
@@ -525,10 +529,10 @@ int db_set_dbvalue(void *vhandle, const dbv_t *key, const dbv_t *val) {
     return sql_fastpath(dbh, "db_set_dbvalue", dbh->insert, NULL, 0);
 }
 
-int db_get_dbvalue(void *vhandle, const dbv_t* key, /*@out@*/ dbv_t *val) {
+int db_get_dbvalue(void *vhandle, const dbv_t* token, /*@out@*/ dbv_t *val) {
     dbh_t *dbh = vhandle;
 
-    sqlite3_bind_blob(dbh->select, 1, key->data, key->leng, SQLITE_STATIC);
+    sqlite3_bind_blob(dbh->select, 1, token->data, token->leng, SQLITE_STATIC);
     return sql_fastpath(dbh, "db_get_dbvalue", dbh->select, val, DS_NOTFOUND);
 }
 

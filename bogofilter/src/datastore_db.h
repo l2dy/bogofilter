@@ -52,8 +52,8 @@ void dbe_cleanup(void *);
  * \return zero if the word does not exist in the database.
  */
 int db_get_dbvalue(
-	void *handle,		/**< database handle */
-	const dbv_t *token,	/**< key to look for */
+	void *vhandle,		/**< database handle */
+	const dbv_t *token,	/**< key (token) to look for */
 	/*@out@*/ dbv_t *val	/**  output, note: this must be
 				 * pre-allocated and val->leng must
 				 * specify how many bytes val->data can
