@@ -49,9 +49,9 @@ extern int	buff_fgetsln(buff_t *self, FILE *in, uint maxlen);
 
 /** print the unread part of the buff_t \a self to the stdio stream fp
  * by means of word_puts(), which see for meaning of \a width.  */
-extern void 	buff_puts(const buff_t *self,
+extern void 	buff_puts(const buff_t *self, /**< buff struct to print */
 	uint width, /**< passed verbatim to word_puts() */
-	FILE *fp);
+	FILE *fp /**< stdio.h stream to print to */);
 
 extern void	buff_shift(buff_t *self, uint start, uint length);
 

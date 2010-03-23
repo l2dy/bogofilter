@@ -26,7 +26,7 @@ typedef struct {
 
 /** create a new word_t from the \a leng bytes at address \a text */
 extern word_t  *word_new(const byte *text, /**< may be NULL, to create a blank word_t */
-	uint leng);
+	uint leng /**< length of input string */);
 
 /** create a new word_t from the NUL-terminated \a cstring */
 extern word_t  *word_news(const char *cstring);
@@ -45,11 +45,11 @@ extern word_t  *word_concat(const word_t *w1, const word_t *w2);
 
 /** output \a self onto the stream \a fp, formatted to \a width
  * characters. */
-extern void 	word_puts(const word_t *self,
+extern void 	word_puts(const word_t *self, /**< word structure to print */
 	uint width, /**< if 0, use actual width, if > 0 then either
 		     *   truncate the string or fill it with blanks to print
 		     *   exactly \a width characters */
-	FILE *fp);
+	FILE *fp /**< stdio stream to print word to */);
 
 /** Compare word \a w to string \a s. */
 extern int	word_cmps(const word_t *w, const char *s);
