@@ -19,6 +19,11 @@
 
 	* Mark BerkeleyDB 4.8.26 and 5.0.21 supported.
 
+	  Note that Berkeley DB 5.0's SQLite3 compatibility API is NOT
+	  supported, it causes shifts in scores and write failures under
+	  contention.  Bogofilter can use Berkeley DB 5.0's native interface, 
+	  and using that is more efficient than the added SQL shim layer.
+
 	2010-03-06
 
 	* Make t.maint more robust; ignore .ENCODING token. To fix test
