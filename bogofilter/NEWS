@@ -15,6 +15,10 @@
 
 -------------------------------------------------------------------------------
 
+	2010-04-01
+
+	* Mark BerkeleyDB 4.8.26 and 5.0.21 supported.
+
 	2010-03-06
 
 	* Make t.maint more robust; ignore .ENCODING token. To fix test
