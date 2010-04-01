@@ -20,18 +20,25 @@ SQLite3 ships with a command-line client for the shell, named sqlite3.
 
 2.1 Compatibility - supported SQLite versions
 
-At this time, only SQLite v3.5.6 and newer are supported. Older versions
-back to 3.0.8 may work, but you are advised to carefully review the
-sqlite3 ChangeLog, because there have been several important bug fixes
-since 3.0.8, including fixes for bugs that can corrupt the database.
-Note that sqlite v3.3.9 and newer sometimes generate error messages that
-are clearer when executing SQL statements (that bogofilter generates
-internally).
+At this time, only SQLite v3.6.13, and v3.6.22 and newer are supported.
+Please check the SQLite website <http://sqlite.org/> for upgrade
+recommendations.
+  Older versions back to 3.0.8 may work, but you are advised to
+carefully review the sqlite3 ChangeLog, because there have been several
+important bug fixes since 3.0.8, including fixes for bugs that can
+corrupt the database.  Note that sqlite v3.3.9 and newer sometimes
+generate error messages that are clearer when executing SQL statements
+(that bogofilter generates internally).
 
 Bogofilter prints a warning (but continues to run) when used with SQLite
-versions older than v3.5.4. This warning can be suppressed by defining
+versions older than v3.6.12. This warning can be suppressed by defining
 the environment variable BF_USE_OLD_SQLITE to any value, including the
 empty value.
+
+The Oracle Berkeley DB SQLite3 API that is available since Berkeley DB
+5.0.21 is unsupported.  Use Berkeley DB's native API instead, see
+README.db for details.
+
 
 2.2 Installation
 
@@ -60,4 +67,7 @@ A.1 Why does bogofilter use BLOB for both columns?
 
 bogofilter has traditionally managed its own data structure inside key
 and value, BLOB allows the verbatim retrieval of such data without
-stumbling across embedded NUL characters.
+stumbling across embedded NUL characters and without adding even more
+translations between data formats.
+
+END--------------------------------------------------------------------

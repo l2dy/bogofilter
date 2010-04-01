@@ -17,6 +17,9 @@
 
 	2010-04-01
 
+	* Bump supported/minimum SQLite3 versions and warning threshold.
+	  See doc/README.sqlite for details.
+
 	* Mark BerkeleyDB 4.8.26 and 5.0.21 supported.
 
 	  Note that Berkeley DB 5.0's SQLite3 compatibility API is NOT
