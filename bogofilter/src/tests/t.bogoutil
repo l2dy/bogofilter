@@ -7,7 +7,7 @@
 #
 
 # initialize
-rm "$TMPDIR"/* # reset TXN detection
+rm -r "$TMPDIR"/* # reset TXN detection
 if [ $DB_TXN = true ] ; then addarg=--db-transaction=yes ; else addarg= ; fi
 echo bacon on toast | $BOGOFILTER -C -d "$TMPDIR" -n $addarg
 echo foul eggs      | $BOGOFILTER -C -d "$TMPDIR" -s $addarg
