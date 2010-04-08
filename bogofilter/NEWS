@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2010-04-07
+
+	* Updated sendmail milter contrib/bogofilter-milter.pl to v1.??????
+	  (thanks to Jonathan Kamens)
+
 	2010-04-01
 
 	* Bump supported/minimum SQLite3 versions and warning threshold.

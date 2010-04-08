@@ -7,10 +7,14 @@
 #
 # (additional information below the coypright statement)
 
-# Copyright 2003, 2005, 2007 Jonathan Kamens
+# Copyright 2003, 2005, 2007, 2008, 2010 Jonathan Kamens
 # <jik@kamens.brookline.ma.us>.  Please send me bug reports,
 # suggestions, criticisms, compliments, or any other feedback you have
 # about this script!
+#
+# The current version of this script and extensive additional
+# documentation are available from
+# <http://stuff.mit.edu/~jik/software/bogofilter/>.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,9 +33,9 @@
 # site.
 #
 # Inserts "X-Bogosity: Spam, tests=bogofilter" into messages that
-# appear to be spam (or "Ham" into ones that don't).  If the message is
-# rejected, you usually won't see the "Spam", but see below about
-# training mode.
+# appear to be spam (or "Ham" or "Unsure" into ones that don't).  If
+# the message is rejected, you usually won't see the "Spam", but see
+# below about training mode.
 #
 # Save this script somewhere, launch it as root (by running it in the
 # background or invoking it with "--daemon" in which case it will
@@ -123,6 +127,53 @@ my $socket = '/var/run/bogofilter-milter.sock';
 my $bogofilter_cf = undef;
 my $require_cf = undef;
 
+# If you would like the milter to add a unique ID to the X-Bogosity
+# line, then set this variable to true.  ", milter_id=..." will be
+# added to the end of the X-Bogosity line.
+my $add_unique_id = 1;
+
+# If a file with this name exists in the user's .bogofilter directory,
+# then it is assumed to contain regular expressions, one per line, to
+# match against Subject lines in incoming messages (lines containing
+# only whitespace and lines starting with "#" are ignored).  Any
+# message whose Subject line matches one of the regular expressions
+# will not be filtered, just as if $magic_string (see above) had
+# appeared in its Subject line.
+my $subject_filter_file = 'milter-subject-filters';
+
+# If an executable file or link with this name exists in the user's
+# .bogofilter directory, and it is owned by the user or root (for
+# security reasons), then it will be used as a filter, i.e., the
+# message will be fed into it and replaced with its output, before
+# bogofilter is run on it, if it returns a zero exit status.
+# Furthermore, the filtered message is what will be put into the
+# $archive_mbox and $ham_archive_mbox files.  However, the actual
+# message delivered by the MTA if the milter accepts it will be the
+# unfiltered version, not the filtered version.  You could use this,
+# e.g., to reformat incoming email with a script that calls
+# spamitariuim.pl (in bogofilter contrib directory) before filtering
+# it.
+#
+# The following environment variables are available to the script when
+# it is executed:
+#
+# MILTER_REMOTE_IP	IP address of remote SMTP server
+# MILTER_REMOTE_NAME	Host name of remote SMTP server as per a
+#			reverse DNS lookup on its IP address
+# MILTER_LOCAL_IP	IP address of SMTP server receiving the
+#			message
+# MILTER_LOCAL_NAME	Host name of SMTP server receiving the message
+# MILTER_HELOHOST	Host name specified by the remote server in
+#			its HELO or EHLO command
+# MILTER_ENVFROM	The envelope address of the sender of the
+#			message, a.k.a., the Return-Path
+# MILTER_ENVRCPT	The envelope address of the recipient of the
+#			message for whom bogofilter is being invoked.
+#
+# If you want to disable this functionality, set the variable to
+# undef.
+my $filter_script = 'milter-filter-script';
+
 # If a file with this name exists in the user's .bogofilter directory,
 # then that user's mail will be filtered in training mode.  This means
 # that the message will be filtered and registered as spam or non-spam
@@ -139,13 +190,19 @@ my $training_file = 'training';
 # message archiving, set $archive_mbox to undef.
 my $archive_mbox = 'archive';
 
+# If a file or link with this name exists in the user's .bogofilter
+# directory, then copies of accepted messages (Ham or Unsure) will be
+# saved in this file in mbox format, using flock locking.  To disable
+# accepted message archiving, set $ham_archive_mbox to undef.
+my $ham_archive_mbox = 'ham_archive';
+
 # If $cyrus_deliver is set to an existing executable, then it is
 # assumed to be a Cyrus IMAP "deliver" program.  If the $archive_mbox
-# for a particular user is a symlink pointing at a nonexistent file
-# whose name starts with "cyrus:", then everything after the "cyrus:"
-# is assumed to be the name of a Cyrus IMAP folder within the user's
-# mailbox to which to deliver the spam message instead of saving it
-# into an mbox format file.
+# or $ham_archive_mbox for a particular user is a symlink pointing at
+# a nonexistent file whose name starts with "cyrus:", then everything
+# after the "cyrus:" is assumed to be the name of a Cyrus IMAP folder
+# within the user's mailbox to which to deliver the spam message
+# instead of saving it into an mbox format file.
 my $cyrus_deliver = '/usr/lib/cyrus-imapd/deliver';
 
 # If you would like to use a shared bogofilter database for everyone,
@@ -230,6 +287,13 @@ my(@discard_control) =
 # milter process will get really large.  Set this to 0 to disable
 # cache expiration, or to the number of seconds after which cache
 # entries should expire.
+# 
+# Configuration changes in the user's bogofilter directory, e.g.,
+# changes to $subject_filter_file, aren't detected until the cache
+# entry for the user expires, so if you're allowing users to make
+# changes like that, you should probably reduce this timeout to
+# something smaller so that their changes will take affect somewhat
+# promptly.
 my $recipient_cache_expire = 24 * 60 * 60; # one day
 # How often to expire entries from the cache.
 my $recipient_cache_check_interval = 60 * 60; # one hour
@@ -271,11 +335,13 @@ $Data::Dumper::Indent = 0;
 my %cached_recipients;
 
 my $whoami = basename $0;
-my $usage = "Usage: $whoami [--daemon] [--debug]\n";
-my($run_as_daemon, $get_help, $debug);
+my $usage = "Usage: $whoami [--daemon] [--debug] [--restart]\n";
+my($run_as_daemon, $get_help, $debug, $restart);
 
 my %my_milter_callbacks =
 (
+ 'helo'    => \&my_helo_callback,
+ 'envfrom' => \&my_envfrom_callback,
  'envrcpt' => \&my_rcpt_callback,
  'header'  => \&my_header_callback,
  'eoh'     => \&my_eoh_callback,
@@ -288,9 +354,11 @@ my %my_milter_callbacks =
 $my_milter_callbacks{'connect'} = \&my_connect_callback
     if (@ip_whitelist || $ip_whitelist_db || @discard_control);
 
-dia $usage if (! GetOptions('daemon' => \$run_as_daemon,
+die $usage if (! GetOptions('daemon' => \$run_as_daemon,
 			    'debug' => \$debug,
+			    'restart' => \$restart,
 			    'help|h|?' => \$get_help));
+
 if ($get_help) {
     print $usage;
     exit;
@@ -298,6 +366,55 @@ if ($get_help) {
 
 if ($run_as_daemon) {
     Proc::Daemon::Init;
+}
+
+if (! (open(PIDFILE, '+<', $pid_file) ||
+       open(PIDFILE, '+>', $pid_file))) {
+    &die("open($pid_file): $!\n");
+}
+
+seek(PIDFILE, 0, SEEK_SET);
+
+if (! flock(PIDFILE, LOCK_EX|LOCK_NB)) {
+    &die("flock($pid_file): $!\n");
+}
+if (! (print(PIDFILE "$$\n"))) {
+    &die("writing to $pid_file: $!\n");
+}
+# Flush the PID
+seek(PIDFILE, 0, SEEK_SET);
+
+setlogsock('unix');
+openlog($whoami, 'pid', $log_facility);
+if (! $debug) {
+    # I'd really like to to this, but it doesn't work with Sys::Syslog
+    # 0.13 in Perl 5.8.8.
+    # setlogmask(&LOG_UPTO(LOG_INFO));
+    eval "
+	no warnings 'redefine';
+	sub debuglog {
+	}
+    ";
+}
+    
+while ($restart) {
+    my $pid = fork();
+    if (! defined($pid)) {
+	&die("fork: $!");
+    }
+    elsif ($pid) {
+	$SIG{'TERM'} = sub {
+	    &syslog('info', "got SIGTERM, shutting down");
+	    kill 'TERM', $pid;
+	    exit;
+	};
+	waitpid $pid, 0;
+	my $status = $? >> 8;
+	&syslog('warning', "child process $pid exited (status word $?, exit status $status)");
+    }
+    else {
+	last;
+    }
 }
 
 my $magic_string_re = $magic_string;
@@ -322,41 +439,12 @@ my %ip_whitelist_db;
 
 &opendb_read if ($ip_whitelist_db);
 
-setlogsock('unix');
-openlog($whoami, 'pid', $log_facility);
-if (! $debug) {
-    # I'd really like to to this, but it doesn't work wit Sys::Syslog
-    # 0.13 in Perl 5.8.8.
-    # setlogmask(&LOG_UPTO(LOG_INFO));
-    eval "
-	no warnings 'redefine';
-	sub debuglog {
-	}
-    ";
-}
-    
 if ($database_user) {
     $aliases_file = $sendmail_canon = $sendmail_prog =
 	$recipient_cache_expire = $recipient_cache_check_interval = undef;
     syslog("info", "Using shared bogofilter database under %s's account",
 	   $database_user);
 }
-
-if (! (open(PIDFILE, '+<', $pid_file) ||
-       open(PIDFILE, '+>', $pid_file))) {
-    &die("open($pid_file): $!\n");
-}
-
-seek(PIDFILE, 0, SEEK_SET);
-
-if (! flock(PIDFILE, LOCK_EX|LOCK_NB)) {
-    &die("flock($pid_file): $!\n");
-}
-if (! (print(PIDFILE "$$\n"))) {
-    &die("writing to $pid_file: $!\n");
-}
-# Flush the PID
-seek(PIDFILE, 0, SEEK_SET);
 
 unlink($socket);
 Sendmail::Milter::setconn("local:$socket");
@@ -367,16 +455,41 @@ Sendmail::Milter::main($milter_interpreters);
 
 &closedb;
 
+sub my_helo_callback {
+    my $ctx = shift;
+    my $helo = shift;
+
+    my $hash = &getpriv($ctx);
+    $hash->{'helo'} = $helo;
+    &setpriv($ctx, $hash);
+    return SMFIS_CONTINUE;
+}
+
+sub my_envfrom_callback {
+    my $ctx = shift;
+    my $envfrom = shift;
+
+    my $hash = &getpriv($ctx);
+    $hash->{'envfrom'} = $envfrom;
+    &setpriv($ctx, $hash);
+    return SMFIS_CONTINUE;
+}
+
 sub my_connect_callback {
     my $ctx = shift;		# milter context object
     my $hostname = shift;       # The connection's host name.
     my $sockaddr_in = shift;    # AF_INET portion of the host address,
 				# from getpeername(2) syscall
-    my $hash = $ctx->getpriv();
+    my $hash = &getpriv($ctx);
 
     my ($port, $ipaddr) = Socket::unpack_sockaddr_in($sockaddr_in) or
 	&die("Could not unpack socket address: $!");
     $ipaddr = Socket::inet_ntoa($ipaddr); # translates into standard IPv4 addr
+
+    $hash->{'remotename'} = $hostname;
+    $hash->{'remoteip'} = $ipaddr;
+    $hash->{'localname'} = $ctx->getsymval('j');
+    $hash->{'localip'} = $ctx->getsymval('{if_addr}');
 
     &debuglog("my_connect_callback: entering with hostname=$hostname, ",
 	      "ipaddr=$ipaddr, port=$port");
@@ -386,7 +499,7 @@ sub my_connect_callback {
         if (eval {Net::CIDR::cidrlookup($ipaddr, @ip_whitelist)}) {
           syslog('info', '%s', "$ipaddr is whitelisted, so this email is " .
 		 "being accepted unfiltered.");
-          $ctx -> setpriv(undef);
+          &setpriv($ctx, undef);
           return SMFIS_ACCEPT;
         }
         else {
@@ -399,7 +512,7 @@ sub my_connect_callback {
 	if ($ip_whitelist_db{$ipaddr}) {
 	    syslog('info', '%s', "$ipaddr is authenticated via poprelayd, " .
 		   "so this email is being accepted unfiltered.");
-	    $ctx -> setpriv(undef);
+	    &setpriv($ctx, undef);
 	    return SMFIS_ACCEPT;
 	}
 	else {
@@ -408,7 +521,7 @@ sub my_connect_callback {
     }
 
     $hash->{'ipaddr'} = $ipaddr;
-    $ctx->setpriv($hash);
+    &setpriv($ctx, $hash);
     &debuglog("my_connect_callback: return CONTINUE with hash");
     return SMFIS_CONTINUE;
 }
@@ -416,13 +529,13 @@ sub my_connect_callback {
 sub my_rcpt_callback {
     my $ctx = shift;
     my $envrcpt = shift;
-    my $hash = $ctx->getpriv();
+    my $hash = &getpriv($ctx);
 
-    &debuglog("my_rcpt_callback: entering with " . Data::Dumper->Dump([$hash], [qw(hash)]));
+    &debuglog("my_rcpt_callback: entering with " . Data::Dumper->Dump([&small_hash($hash)], [qw(hash)]));
 
     if ($hash->{'rcpt'}) {
 	# We've already encountered a recipient who is filtering this message.
-	$ctx->setpriv($hash);
+	&setpriv($ctx, $hash);
 	&debuglog("my_rcpt_callback: return CONTINUE with old hash");
 	return SMFIS_CONTINUE;
     }
@@ -433,12 +546,12 @@ sub my_rcpt_callback {
     if (&filtered_dir($rcpt)) {
 	$hash->{'rcpt'} = $rcpt;
 	$hash->{'envrcpt'} = $envrcpt;
-	$ctx->setpriv($hash);
+	&setpriv($ctx, $hash);
 	&debuglog("my_rcpt_callback: return CONTINUE with hash");
 	return SMFIS_CONTINUE;
     }
     else {
-	$ctx->setpriv(undef);
+	&setpriv($ctx, undef);
 	&debuglog("my_rcpt_callback: return CONTINUE with undef");
 	return SMFIS_CONTINUE;
     }
@@ -446,24 +559,50 @@ sub my_rcpt_callback {
 
 sub my_header_callback {
     my($ctx, $field, $value) = @_;
-    my($hash) = $ctx->getpriv();
+    my($hash) = &getpriv($ctx);
 
-    &debuglog("my_header_callback: entering with " . Data::Dumper->Dump([$hash, $field, $value], [qw(hash field value)]));
+    &debuglog("my_header_callback: entering with " . Data::Dumper->Dump([&small_hash($hash), $field, $value], [qw(hash field value)]));
 
     if (! $hash) {
 	&debuglog("my_header_callback: return ACCEPT with no hash");
 	return SMFIS_ACCEPT;
     }
 
-    if (($field =~ /^subject$/i) && ($value =~ /$magic_string_re/oi)) {
-	$ctx->setpriv(undef);
-	&debuglog("my_header_callback: returning ACCEPT for magic subject");
-	return SMFIS_ACCEPT;
+    if (lc $field eq 'subject') {
+	if ($value =~ /$magic_string_re/oi) {
+	    &setpriv($ctx, undef);
+	    &debuglog("my_header_callback: returning ACCEPT for magic subject");
+	    return SMFIS_ACCEPT;
+	}
+
+	if ($hash->{'rcpt'}) {
+	    my(@subject_filters) = &user_subject_filters($hash->{'rcpt'});
+
+	    foreach my $filter (@subject_filters) {
+		if ($value =~ /$filter/) {
+		    &setpriv($ctx, undef);
+		    &debuglog(sprintf("my_header_callback: returning ACCEPT for subject filter %s for recipient %s",
+			      $filter, $hash->{'rcpt'}));
+		    return SMFIS_ACCEPT;
+		}
+	    }
+	}
+    }
+
+    if (lc $field eq 'x-bogosity') {
+	&debuglog("Found $field: $value");
+	my $index = $hash->{x_bogosity_index} || 1;
+	if ($value =~ /tests=bogofilter/) {
+	    unshift(@{$hash->{x_bogosity}}, $index);
+	    &debuglog("my_header_callback: stashing $field: $value ",
+		      "at index $index");
+	}
+	$hash->{x_bogosity_index} = $index + 1;
     }
 
     $hash = &add_to_message($hash, "$field: $value\n");
 
-    $ctx->setpriv($hash);
+    &setpriv($ctx, $hash);
 
     &debuglog("my_header_callback: returning CONTINUE with hash");
     return SMFIS_CONTINUE;
@@ -471,7 +610,7 @@ sub my_header_callback {
 
 sub my_eoh_callback {
     my($ctx) = @_;
-    my($hash) = $ctx->getpriv();
+    my($hash) = &getpriv($ctx);
 
     # If $hash is undefined here, it means that the sender sent no
     # message header at all, so the block of code in
@@ -485,11 +624,11 @@ sub my_eoh_callback {
     }
 
 
-    &debuglog("my_eoh_callback: entering with " . Data::Dumper->Dump([$hash], [qw(hash)]));
+    &debuglog("my_eoh_callback: entering with " . Data::Dumper->Dump([&small_hash($hash)], [qw(hash)]));
 
     $hash = &add_to_message($hash, "\n");
 
-    $ctx->setpriv($hash);
+    &setpriv($ctx, $hash);
 
     &debuglog("my_eoh_callback: returning CONTINUE with hash");
     return SMFIS_CONTINUE;
@@ -497,13 +636,13 @@ sub my_eoh_callback {
 
 sub my_body_callback {
     my($ctx, $body, $len) = @_;
-    my($hash) = $ctx->getpriv();
+    my($hash) = &getpriv($ctx);
 
-    &debuglog("my_body_callback: entering with " . Data::Dumper->Dump([$hash, $len], [qw(hash len)]));
+    &debuglog("my_body_callback: entering with " . Data::Dumper->Dump([&small_hash($hash), $len], [qw(hash len)]));
 
     $hash = &add_to_message($hash, $body);
 
-    $ctx->setpriv($hash);
+    &setpriv($ctx, $hash);
 
     &debuglog("my_body_callback: returning CONTINUE with hash");
     return SMFIS_CONTINUE;
@@ -557,29 +696,138 @@ sub message_read_handle {
     
 sub my_eom_callback {
     my $ctx = shift;
-    my $hash = $ctx->getpriv();
+    my $hash = &getpriv($ctx);
     my $fh;
     local($_);
 
-    &debuglog("my_eom_callback: entering with " . Data::Dumper->Dump([$hash], [qw(hash)]));
+    &debuglog("my_eom_callback: entering with " . Data::Dumper->Dump([&small_hash($hash)], [qw(hash)]));
 
     my $dir = &filtered_dir($hash->{'rcpt'});
 
     if (! $dir) {
-	syslog('err', '%s', "my_eom_callback called for non-filtered recipient; " . Data::Dumper->Dump([$hash], [qw(hash)]));
-	$ctx->setpriv(undef);
+	# This can happen if the MTA loses the input channel from the sender,
+	# so it isn't an error condition.
+	&debuglog("my_eom_callback: called for non-filtered recipient; " . Data::Dumper->Dump([&small_hash($hash)], [qw(hash)]));
+	&setpriv($ctx, undef);
 	&debuglog("my_eom_callback: returning ACCEPT with undef");
 	return SMFIS_ACCEPT;
     }
 
-    my $pid = open(BOGOFILTER, '|-');
+    if (defined($filter_script) and &restrict_permissions($hash->{'rcpt'}) and
+	-x "$dir/$filter_script" and (-o _ or ! (stat(_))[4])) {
+	my $s = "$dir/$filter_script";
+
+	&unrestrict_permissions;
+
+	syslog('debug', 'filtering with %s', $s);
+
+	my($filter_fh, $filter_fn) = tempfile();
+	my $stderr_fh = tempfile();
+
+	if (! $filter_fn) {
+	    &die("error creating temporary file");
+	}
+	$^F = fileno($filter_fh);
+
+	pipe(FROMPARENT, FILTER) or &die("pipe: $!\n");
+	my $pid = fork;
+	&die("fork: $!\n") if (! defined($pid));
+	if (! $pid) {
+	    close(FILTER);
+	    if (! open(STDOUT, ">&", $filter_fh)) {
+		syslog('err', "reopen filter STDOUT to $filter_fn failed: %m");
+		exit(1);
+	    }
+	    open(STDERR, ">&", $stderr_fh);
+	    if (! open(STDIN, "<&FROMPARENT")) {
+		syslog('err', "reopen filter STDIN from parent failed: %m");
+		exit(1);
+	    }
+	    &die("couldn't restrict permissions") if
+		(! &restrict_permissions($hash->{'rcpt'}, 1));;
+	    $ENV{'MILTER_REMOTE_IP'} = $hash->{'remoteip'} || '';
+	    $ENV{'MILTER_REMOTE_NAME'} = $hash->{'remotename'} || '';
+	    $ENV{'MILTER_HELOHOST'} = $hash->{'helo'} || '';
+	    $ENV{'MILTER_ENVFROM'} = $hash->{'envfrom'} || '';
+	    $ENV{'MILTER_ENVRCPT'} = $hash->{'envrcpt'} || '';
+	    $ENV{'MILTER_LOCAL_IP'} = $hash->{'localip'} || '';
+	    $ENV{'MILTER_LOCAL_NAME'} = $hash->{'localname'} || '';
+
+	    if (! exec("$s")) {
+		syslog('err', 'exec(%s) failed: %m', $s);
+		exit(1);
+	    }
+	}
+	close(FROMPARENT);
+	my $fh = &message_read_handle($hash);
+	my $good_filter = 1;
+	while (<$fh>) {
+	    s/\r\n$/\n/;
+	    if (! print(FILTER $_)) {
+		syslog('info', 'writing to filter %s: %m', $s);
+		$good_filter = undef;
+		last;
+	    }
+	}
+	my @failed;
+	if (! close(FILTER)) {
+	    push(@failed, "close(FILTER): $!");
+	}
+	if (! waitpid($pid, 0)) {
+	    push(@failed, "waitpid($pid): $!");
+	}
+	if ($? >> 8) {
+	    push(@failed, "\$?>>8 == " . ($?>>8));
+	}
+	if (@failed and $good_filter) {
+	    syslog('warning', 'filter %s failed: %s', $s, join(", ", @failed));
+	    $good_filter = undef;
+	}
+	if (seek($stderr_fh, 0, SEEK_SET) and -s $stderr_fh) {
+	    while (my $error = <$stderr_fh>) {
+		$error =~ s/^\s+//;
+		$error =~ s/\s+$//;
+		syslog('warning', 'stderr output from %s: %s', $s, $error);
+	    }
+	    close($stderr_fh);
+	}
+	if ($good_filter) {
+	    delete $hash->{'msg'};
+	    unlink $hash->{'fn'} if ($hash->{'fn'});
+	    $hash->{'fh'} = $filter_fh;
+	    $hash->{'fn'} = $filter_fn;
+	    $hash->{'nocr'} = 1;
+	    syslog('debug', 'successfully filtered with %s', $s);
+	}
+	else {
+	    unlink $filter_fn;
+	    close($filter_fh);
+	}	    
+    }
+
+    if (! pipe(FROMBOGO, TOPARENT)) {
+	&die("pipe: $!\n");
+    }
+
+    if (! pipe(FROMPARENT, BOGOFILTER)) {
+	&die("pipe: $!\n");
+    }
+
+    my $pid = fork;
     if (! defined($pid)) {
-	&die("opening bogofilter: $!\n");
+	&die("fork: $!\n");
     }
     elsif (! $pid) {
+	close(FROMBOGO);
+	close(BOGOFILTER);
+	open(STDOUT, ">&TOPARENT") or 
+	    syslog('warning', "reopen STDOUT to parent failed: $!");
+	open(STDIN, "<&FROMPARENT");
+	close(TOPARENT);
+	close(FROMPARENT);
 	&die("couldn't restrict permissions") if
 	    (! &restrict_permissions($hash->{'rcpt'}, 1));;
-	my(@cmd) = ('bogofilter', '-u', '-d', $dir);
+	my(@cmd) = ('bogofilter', '-v', '-u', '-d', $dir);
 	if ($bogofilter_cf && -f "$dir/$bogofilter_cf") {
 	    push(@cmd, '-c', "$dir/$bogofilter_cf");
 	}
@@ -587,6 +835,8 @@ sub my_eom_callback {
 	# &die had better not return!
     }
 
+    close(TOPARENT);
+    close(FROMPARENT);
     $fh = &message_read_handle($hash);
     if ($hash->{'fn'}) {
 	# This is safe to do on Unix, since on Unix you can unlink an
@@ -599,11 +849,41 @@ sub my_eom_callback {
     }
 
     while (<$fh>) {
-	s/\r\n$/\n/;
+	s/\r\n$/\n/ if (! $hash->{'nocr'});
 	print(BOGOFILTER $_) || &die("writing to bogofilter: $!\n");
     }
 
-    if (close(BOGOFILTER)) {
+    close(BOGOFILTER);
+    my $bogosity_line = <FROMBOGO>;
+    close(FROMBOGO);
+
+    waitpid $pid, 0;
+    my $exit_status = $? >> 8;
+    
+    if ($bogosity_line =~ s/^X-Bogosity:\s*//i) {
+	chomp $bogosity_line;
+    }
+    elsif (! $exit_status) {
+	$bogosity_line = "Spam, tests=bogofilter";
+    }
+    elsif ($exit_status == 1) {
+	$bogosity_line = "Ham, tests=bogofilter";
+    }
+    elsif ($exit_status == 2) {
+	$bogosity_line = "Unsure, tests=bogofilter";
+    }
+
+    if ($add_unique_id) {
+	$bogosity_line .= 
+	    # I wish we could make this a real UUID, but that would
+	    # require depending on one of the CPAN UUID modules, and I
+	    # don't want to add that dependency just for this feature.
+	    ", milter_id=" . sprintf("%lx.%lx.%lx", $$, time(),
+				     int(rand(1000000000)));
+    }
+
+    my $from = $ctx->getsymval('{mail_addr}');
+    if (! $exit_status) {
 	my($training);
 	if ($training_file) {
 	    if (&restrict_permissions($hash->{'rcpt'})) {
@@ -616,149 +896,197 @@ sub my_eom_callback {
 		$training = 1;
 	    }
 	}
-	$ctx->addheader('X-Bogosity', 'Spam, tests=bogofilter');
-	my $from = $ctx->getsymval('{mail_addr}');
+	foreach my $index (@{$hash->{x_bogosity}}) {
+	    &debuglog("Removing old X-Bogosity header");
+	    $ctx->chgheader('X-Bogosity', $index, "");
+	}
+	$ctx->addheader('X-Bogosity', $bogosity_line);
 	my $which = &reject_or_discard($hash);
 	my($verb) = ($which == SMFIS_REJECT) ? "reject" : "discard";
 	syslog('info', '%s', ($training ? "would $verb" : "${verb}ing") . 
 	       " likely spam from $from to " . $hash->{'rcpt'} . " based on $dir");
+	&save_copy($fh, $from, $hash->{'rcpt'}, $dir, $archive_mbox,
+		   $bogosity_line, $hash->{'nocr'});
 	if (! $training) {
-	    my($archive, $link);
-
-	    $archive = ($archive_mbox &&
-			&restrict_permissions($hash->{'rcpt'}) &&
-			(lstat($archive = "$dir/$archive_mbox"))) ?
-			$archive : undef;
-
-	    if ($cyrus_deliver && -f $cyrus_deliver && -X $cyrus_deliver &&
-		-l $archive && ($link = readlink($archive)) &&
-		$link =~ s/^cyrus:// && (! -f $archive)) {
-		&unrestrict_permissions;
-		my $user = &filtered_user($hash->{'rcpt'});
-		if (! $user) {
-		    &die("Couldn't determine username for IMAP delivery");
-		}
-		if (! seek($fh, 0, SEEK_SET)) {
-		    &die("error rewinding message handle: $!");
-		}
-		my $pid = open(DELIVER, "|-");
-		if (! defined($pid)) {
-		    &die("Error forking to execute $cyrus_deliver: $!");
-		}
-		elsif (! $pid) {
-		    exec($cyrus_deliver, '-a', $user, '-m',
-			 "user.$user.$link") ||
-			     &die("exec($cyrus_deliver): $!");
-		}
-		else {
-		    local($/) = undef;
-		    my $ret = 1;
-		    $ret = $ret && print(DELIVER <$fh>);
-		    $ret = $ret && close(DELIVER);
-		    if (! $ret) {
-			syslog('warning', '%s',
-			       "$cyrus_deliver failed for user.$user.$link");
-		    }
-		    goto permissions_already_unrestricted;
-		}
-	    }
-	    if ($archive) {
-		# There is an annoying race condition here.  Suppose two spam
-		# messages are delivered at the same time to a user whose
-		# archive file is a symlink pointing at a nonexistent (yet)
-		# file.  Milter process A tries to open with +< and fails.  IN
-		# the meantime, process B also tries to open with +< and fails.
-		# Then A opens witn +>, locks the file and starts writing to
-		# it, and *then* B opens with +>, thus truncating whatever data
-		# was written thus far by A.  I'm not sure what the best way is
-		# to fix this race condition reliably, and it seems rare enough
-		# that it isn't worth the effort.
-		if (! (open(MBOX, '+<', $archive) ||
-		       open(MBOX, '+>', $archive))) {
-		    syslog('warning', '%s', "opening $archive for " .
-			   "write: $!");
-		    goto no_archive_open;
-		}
-		if (! flock(MBOX, LOCK_EX)) {
-		    syslog('warning', '%s', "locking $archive: $!");
-		    goto close_archive;
-		}
-		if (! seek(MBOX, 0, SEEK_END)) {
-		    syslog('warning', '%s', 
-			   "seek($archive, 0, SEEK_END): $!");
-		    goto close_archive;
-		}
-		if (! seek($fh, 0, SEEK_SET)) {
-		    &die("error rewinding message handle: $!");
-		}
-
-		if (! print(MBOX "From " . ($from || 'MAILER-DAEMON') .
-			    "  " . localtime() . "\n")) {
-		    syslog('warning', '%s', "write($archive): $!");
-		    goto close_archive;
-		}
-
-		my($last_blank, $last_nl);
-
-		while (<$fh>) {
-		    s/\r\n/\n/;
-		    s/^From />From /;
-		    if (! print(MBOX $_)) {
-			syslog('warning', '%s', "write($archive): $!");
-			goto close_archive;
-		    }
-
-		    $last_nl = ($_ =~ /\n/);
-		    $last_blank = ($_ eq "\n");
-		}
-
-		# Mbox format requires a blank line at the end
-		if (! ($last_blank || print(MBOX ($last_nl ? "\n" : "\n\n")))) {
-		    syslog('warning', '%s', "write($archive): $!");
-		    goto close_archive;
-		}
-
-	      close_archive:
-		if (! close(MBOX)) {
-		    syslog('warning', '%s', "close($archive): $!");
-		}
-	    }
-	  no_archive_open:
-	    &unrestrict_permissions;
-	  permissions_already_unrestricted:
 	    $ctx->setreply($rcode, $xcode, $reject_message);
-	    $ctx->setpriv(undef);
+	    &setpriv($ctx, undef);
 	    return $which;
 	}
     }
     else {
-	$ctx->addheader('X-Bogosity', 'Ham, tests=bogofilter');
+	&save_copy($fh, $from, $hash->{'rcpt'}, $dir, $ham_archive_mbox,
+		   $bogosity_line, $hash->{'nocr'});
+	my $bogosity;
+	if ($exit_status == 1) {
+	    $bogosity = "Ham";
+	}
+	elsif ($exit_status == 2) {
+	    $bogosity = "Unsure";
+	}
+	if ($bogosity_line || $bogosity) {
+	    foreach my $index (@{$hash->{x_bogosity}}) {
+		&debuglog("Removing old X-Bogosity header");
+		$ctx->chgheader('X-Bogosity', $index, "");
+	    }
+	    $ctx->addheader('X-Bogosity', $bogosity_line);
+	}
     }
 
-    $ctx->setpriv(undef);
+    &setpriv($ctx, undef);
     return SMFIS_CONTINUE;
+}
+
+sub save_copy {
+    my($fh, $from, $rcpt, $dir, $archive_mbox, $bogosity, $nocr) = @_;
+    local($_);
+
+    my($archive, $link);
+
+    $archive = ($archive_mbox &&
+		&restrict_permissions($rcpt) &&
+		(lstat($archive = "$dir/$archive_mbox"))) ?
+		$archive : undef;
+
+    if ($cyrus_deliver && -f $cyrus_deliver && -X $cyrus_deliver &&
+	-l $archive && ($link = readlink($archive)) &&
+	$link =~ s/^cyrus:// && (! -f $archive)) {
+	&unrestrict_permissions;
+	my $user = &filtered_user($rcpt);
+	if (! $user) {
+	    &die("Couldn't determine username for IMAP delivery");
+	}
+	if (! seek($fh, 0, SEEK_SET)) {
+	    &die("error rewinding message handle: $!");
+	}
+	my $pid = open(DELIVER, "|-");
+	if (! defined($pid)) {
+	    &die("Error forking to execute $cyrus_deliver: $!");
+	}
+	elsif (! $pid) {
+	    exec($cyrus_deliver, '-a', $user, '-m',
+		 "user.$user.$link") ||
+		     &die("exec($cyrus_deliver): $!");
+	}
+	else {
+	    my ($in_header) = 1;
+	    my $ret = 1;
+	    while ($ret && <$fh>) {
+		s/\r\n/\n/ if (! $nocr);
+		if ($in_header) {
+		    next if (/^x-bogosity:.*tests=bogofilter/i);
+		    if (/^$/) {
+			if ($bogosity) {
+			    $ret = $ret && 
+				print(DELIVER "X-Bogosity: $bogosity\n");
+			}
+			$in_header = 0;
+		    }
+		}
+		$ret = $ret && print(DELIVER $_);
+	    }
+	    $ret = $ret && close(DELIVER);
+	    if (! $ret) {
+		syslog('warning', '%s',
+		       "$cyrus_deliver failed for user.$user.$link");
+	    }
+	    return;
+	}
+    }
+    if ($archive) {
+	# There is an annoying race condition here.  Suppose two spam
+	# messages are delivered at the same time to a user whose
+	# archive file is a symlink pointing at a nonexistent (yet)
+	# file.  Milter process A tries to open with +< and fails.  IN
+	# the meantime, process B also tries to open with +< and fails.
+	# Then A opens witn +>, locks the file and starts writing to
+	# it, and *then* B opens with +>, thus truncating whatever data
+	# was written thus far by A.  I'm not sure what the best way is
+	# to fix this race condition reliably, and it seems rare enough
+	# that it isn't worth the effort.
+	if (! (open(MBOX, '+<', $archive) ||
+	       open(MBOX, '+>', $archive))) {
+	    syslog('warning', '%s', "opening $archive for " .
+		   "write: $!");
+	    goto no_archive_open;
+	}
+	if (! flock(MBOX, LOCK_EX)) {
+	    syslog('warning', '%s', "locking $archive: $!");
+	    goto close_archive;
+	}
+	if (! seek(MBOX, 0, SEEK_END)) {
+	    syslog('warning', '%s', 
+		   "seek($archive, 0, SEEK_END): $!");
+	    goto close_archive;
+	}
+	if (! seek($fh, 0, SEEK_SET)) {
+	    &die("error rewinding message handle: $!");
+	}
+
+	if (! print(MBOX "From " . ($from || 'MAILER-DAEMON') .
+		    "  " . localtime() . "\n")) {
+	    syslog('warning', '%s', "write($archive): $!");
+	    goto close_archive;
+	}
+
+	my($last_blank, $last_nl);
+	my($in_header) = 1;
+	while (<$fh>) {
+	    s/\r\n/\n/ if (! $nocr);
+	    $last_nl = ($_ =~ /\n/);
+	    $last_blank = ($_ eq "\n");
+	    if ($in_header) {
+		next if (/^x-bogosity:.*tests=bogofilter/i);
+		if (/^$/) {
+		    if ($bogosity) {
+			$_ = "X-Bogosity: $bogosity\n" . $_;
+		    }
+		    $in_header = 0;
+		}
+	    }
+	    else {
+		s/^From />From /;
+	    }
+	    if (! print(MBOX $_)) {
+		syslog('warning', '%s', "write($archive): $!");
+		goto close_archive;
+	    }
+	}
+
+	# Mbox format requires a blank line at the end
+	if (! ($last_blank || print(MBOX ($last_nl ? "\n" : "\n\n")))) {
+	    syslog('warning', '%s', "write($archive): $!");
+	    goto close_archive;
+	}
+
+      close_archive:
+	if (! close(MBOX)) {
+	    syslog('warning', '%s', "close($archive): $!");
+	}
+    }
+  no_archive_open:
+    &unrestrict_permissions;
 }
 
 sub my_abort_callback {
     my($ctx) = shift;
-    my $hash = $ctx->getpriv();
+    my $hash = &getpriv($ctx);
 
-    &debuglog("my_abort_callback: entering with " . Data::Dumper->Dump([$hash], [qw(hash)]));
+    &debuglog("my_abort_callback: entering with " . Data::Dumper->Dump([&small_hash($hash)], [qw(hash)]));
 
     if ($hash->{'fn'}) {
 	unlink $hash->{'fn'};
     }
 
-    $ctx->setpriv(undef);
+    &setpriv($ctx, undef);
     &debuglog("my_abort_callback: returning CONTINUE with undef");
     return SMFIS_CONTINUE;
 }
 
 sub my_close_callback {
     my($ctx) = shift;
-    my $hash = $ctx->getpriv();
+    my $hash = &getpriv($ctx);
 
-    &debuglog("my_close_callback: entering with " . Data::Dumper->Dump([$hash], [qw(hash)]));
+    &debuglog("my_close_callback: entering with " . Data::Dumper->Dump([&small_hash($hash)], [qw(hash)]));
 
     if ($hash) {
 	if ($hash->{'fn'}) {
@@ -766,7 +1094,7 @@ sub my_close_callback {
 	}
     }
 
-    $ctx->setpriv(undef);
+    &setpriv($ctx, undef);
     &debuglog("my_close_callback: returning CONTINUE with undef");
     return SMFIS_CONTINUE;
 }
@@ -779,6 +1107,11 @@ sub filtered_dir {
 sub filtered_user {
     my($uid, $gid, $dir, $stamp, $user) = &expand_recipient($_[0]);
     $user;
+}
+
+sub user_subject_filters {
+    my($uid, $gid, $dir, $stamp, $user, $filters) = &expand_recipient($_[0]);
+    $filters ? @{$filters} : ();
 }
 
 sub restrict_permissions {
@@ -811,6 +1144,7 @@ sub unrestrict_permissions {
 
 my $recipient_cache_last_checked;
 
+# $uid, $gid, $dir, $timestamp, $username, \@subject_filters
 sub expand_recipient {
     my($rcpt) = @_;
     my($orig, @expanded);
@@ -869,6 +1203,32 @@ sub expand_recipient {
 	    -d ($dir = $pw->dir . "/.bogofilter") &&
 	    ! ($bogofilter_cf && $require_cf && ! -f "$dir/$bogofilter_cf")) {
 	    $cached_recipients{$orig}->[2] = $dir;
+	    if ($subject_filter_file) {
+		my $sff = $dir . "/" . $subject_filter_file;
+		my @subject_filters;
+		if (open(SFF, "<", $sff)) {
+		    while (<SFF>) {
+			s/^\s+//;
+			s/\s+$//;
+			next if (/^\#/);
+			next if (/^$/);
+			my $re;
+			eval '$re = qr/$_/;';
+			if (! $re) {
+			    syslog("warning", "bad subject filter for %s: %s",
+				   $stripped, $_);
+			    next;
+			}
+			push(@subject_filters, $re);
+			&debuglog(sprintf('subject filter for %s: %s',
+					  $stripped, $_));
+		    }
+		}
+		close(SFF);
+		if (@subject_filters) {
+		    $cached_recipients{$orig}->[5] = \@subject_filters;
+		}
+	    }
 	}
 	elsif ($database_user) {
 	    syslog("warning", "Shared database user %s is not configured " .
@@ -905,6 +1265,7 @@ sub sendmail_canon {
 	# local addresses.
 	if (/\s+returns: \$\# local \$\:\s+(.+)/) {
 	    $last = $1;
+	    $last =~ s/ \+ .*//;
 	}
     }
     close($sendmail_reader);
@@ -935,7 +1296,7 @@ sub die {
 }
 
 sub debuglog {
-    syslog('debug', "DEBUG: " . join("", @_));
+    syslog('debug', "%s", "DEBUG: " . join("", @_));
 }
 
 my(%mx_cache);
@@ -1046,4 +1407,37 @@ sub reject_or_discard {
     }
 	
     return SMFIS_REJECT;
+}
+
+sub getpriv {
+    my($ctx) = @_;
+
+    my $d = $ctx->getpriv();
+    my $VAR1;
+    if ($d) {
+	eval $d;
+    }
+    else {
+	undef;
+    }
+}
+
+sub setpriv {
+    my($ctx, $value) = @_;
+
+    if (defined $value) {
+	my $d = Dumper($value);
+	$ctx->setpriv($d);
+    }
+    else {
+	$ctx->setpriv(undef);
+    }
+}
+
+sub small_hash {
+    my($hash) = @_;
+    return undef if (! $hash);
+    my(%hash2) = %{$hash};
+    $hash2{'msg'} = "..." if ($hash2{'msg'} and length($hash2{'msg'}) > 100);
+    \%hash2;
 }
