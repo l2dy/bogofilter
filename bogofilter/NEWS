@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2010-07-03
+
+	* Fix a heap corruption in base64 decoder on invalid input.
+	  Analysis and patch by Julius Plenz <plenz@cis.fu-berlin.de>.
+
 	2010-04-07
 
 	* Updated sendmail milter contrib/bogofilter-milter.pl to v1.??????
