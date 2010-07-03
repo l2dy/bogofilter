@@ -37,7 +37,7 @@ PARSING_TESTS = \
 	t.integrity t.integrity2 t.integrity3 \
 	t.passthrough-hb \
 	t.escaped.html t.escaped.url \
-	t.split t.parsing \
+	t.base64 t.split t.parsing \
 	t.lexer t.lexer.mbx t.lexer.qpcr t.lexer.eoh \
 	t.spam.header.place \
 	t.block.on.subnets \
