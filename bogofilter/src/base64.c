@@ -61,8 +61,10 @@ uint base64_decode(word_t *word)
 	    d[i] = c;
 	    v = v >> 8;
 	}
-	d += 3 - shorten;
-	count += 3 - shorten;
+    if(shorten != 4) {
+        d += 3 - shorten;
+        count += 3 - shorten;
+    }
     }
     /* XXX do we need this NUL byte? */
     if (word->leng)
@@ -95,10 +97,15 @@ bool base64_validate(const word_t *word)
 
     base64_init();
 
+    if (word->leng < 4)
+	    return false;
+
     for (i = 0; i < word->leng; i += 1) {
 	byte b = word->u.text[i];
 	byte v = base64_xlate[b];
 	if (v == 0 && b != 'A' && b != '\n' && b != '\r')
+	    return false;
+	if (b == '=' && i < word->leng - 2)
 	    return false;
     }
 
