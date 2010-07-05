@@ -339,7 +339,7 @@ bool mime_is_boundary(word_t * boundary)
 
 bool got_mime_boundary(word_t * boundary)
 {
-    mime_t *parent;
+    mime_t *parent = NULL;
     boundary_t b;
 
     get_boundary_props(boundary, &b);
