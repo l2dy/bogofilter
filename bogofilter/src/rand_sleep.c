@@ -14,8 +14,8 @@ void rand_sleep(double min, double max)
 	struct timeval timeval;
 	need_init = false;
 	gettimeofday(&timeval, NULL);
-	srand((uint)timeval.tv_usec); /* RATS: ignore - this is safe enough */
+	srand48(timeval.tv_usec ^ timeval.tv_sec);
     }
-    delay = (int)(min + ((max-min)*rand()/(RAND_MAX+1.0)));
+    delay = (int)(min + ((max-min)*drand48()));
     bf_sleep(delay);
 }
