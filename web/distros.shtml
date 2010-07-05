@@ -62,7 +62,6 @@
 			    target="_blank">FreeBSD support periods</a></td></tr>
                 <tr> <td>FreeBSD 7.3-RELEASE</td> <td>1.2.1</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 8.0-RELEASE</td> <td>1.2.0</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 7.2-RELEASE</td> <td>1.1.7</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, QDBM, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 7.1-RELEASE</td> <td>1.1.7</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 6.4-RELEASE</td> <td>1.1.7</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD ports</td> <td>See <a href="http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
