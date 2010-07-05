@@ -7,8 +7,11 @@
 
 void rand_sleep(double min, double max)
 {
-    static bool need_init = true;
     long delay;
+#ifdef HAVE_ARC4RANDOM
+    delay = (int)(min + (max-min)*arc4random()/0xFFFFFFFFu);
+#else
+    static bool need_init = true;
 
     if (need_init) {
 	struct timeval timeval;
@@ -17,5 +20,6 @@ void rand_sleep(double min, double max)
 	srand48(timeval.tv_usec ^ timeval.tv_sec);
     }
     delay = (int)(min + ((max-min)*drand48()));
+#endif
     bf_sleep(delay);
 }
