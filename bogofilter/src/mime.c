@@ -362,9 +362,10 @@ bool got_mime_boundary(word_t * boundary)
 	/* explicit end boundary */
 	if (b.is_final)
 	    return true;
+
+	parent = is_mime_container(msg_state) ? msg_state : msg_state->parent;
     }
 
-    parent = is_mime_container(msg_state) ? msg_state : msg_state->parent;
     if (parent != NULL)
 	mime_push(parent); /* push for the next part */
     else
