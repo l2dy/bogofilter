@@ -1270,7 +1270,7 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
 	      (fn = gfn(unsorted, rsi, mdi, rxi, spi, nsi-1)) < med)) &&
 	    ((nsi == nsc ||
 	      (fn = gfn(unsorted, rsi, mdi, rxi, spi, nsi+1)) < med)) &&
-	    (nsum / ncnt <  q33))
+	    (ncnt != 0 && nsum / ncnt <  q33))
 	{
 	    f = true;
 	    break;
