@@ -704,8 +704,7 @@ static int load_hook(word_t *key, dsv_t *data, void *userdata)
 
 static void set_train_msg_counts(wordhash_t *wh)
 {
-    wordprop_t *count;
-    count = wordhash_insert(wh, w_msg_count, sizeof(wordprop_t), NULL);
+    (void)wordhash_insert(wh, w_msg_count, sizeof(wordprop_t), NULL);
 
     if (msgs_good == 0 && msgs_bad == 0) {
 	fprintf(stderr, "Can't find '.MSG_COUNT'.\n");
@@ -970,8 +969,6 @@ static int process_arglist(int argc, char **argv)
     {
 	int option;
 	int option_index = 0;
-	int this_option_optind = optind ? optind : 1;
-	const char *name;
 	const char *val;
 
 	option = getopt_long(argc, argv, OPTIONS,
@@ -979,8 +976,6 @@ static int process_arglist(int argc, char **argv)
 
 	if (option == -1)
  	    break;
-
-	name = (option_index == 0) ? argv[this_option_optind] : longopts_bogotune[option_index].name;
 
 	val = optarg;
 	process_arg(option, NULL, val, PR_NONE, PASS_1_CLI);
@@ -1208,16 +1203,16 @@ static void top_ten(result_t *sorted, uint n)
 
 /* get false negative */
 
-static int gfn(result_t *results,
+static uint gfn(result_t *results,
 	       uint rsi, uint mdi, uint rxi,
 	       uint spi, uint nsi)
 {
     uint i = (((rsi * mdval->cnt + mdi) * rxval->cnt + rxi) * spexp->cnt + spi) * nsexp->cnt + nsi;
     result_t *r = &results[i];
-    int fn = r->fn;
+    uint fn = r->fn;
     if (r->fp != target) return INT_MAX;
     if (verbose > 100)
-	printf("   %2u, %2u, %2u, %2u, %2u, %2d\n",
+	printf("   %2u, %2u, %2u, %2u, %2u, %2u\n",
 	       rsi, mdi, rxi, spi, nsi, fn);
     ncnt += 1;
     nsum += fn;
@@ -1228,7 +1223,6 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
 {
     bool f = false;
     uint i, j = 0, o = 0;
-    uint fn;
     uint rsi, mdi, rxi, spi, nsi;
     uint rsc = rsval->cnt - 1;
     uint rxc = rxval->cnt - 1;
@@ -1251,25 +1245,25 @@ static result_t *count_outliers(uint r_count, result_t *sorted, result_t *unsort
 	rsi = r->rsi; mdi = r->mdi; rxi = r->rxi; spi = r->spi; nsi = r->nsi;
 	ncnt = nsum = 0;
 	if (((rsi == 0   ||
-	      (fn = gfn(unsorted, rsi-1, mdi, rxi, spi, nsi)) < med)) &&
+	      (gfn(unsorted, rsi-1, mdi, rxi, spi, nsi)) < med)) &&
 	    ((rsi == rsc ||
-	      (fn = gfn(unsorted, rsi+1, mdi, rxi, spi, nsi)) < med)) &&
+	      (gfn(unsorted, rsi+1, mdi, rxi, spi, nsi)) < med)) &&
 	    ((mdi == 0   ||
-	      (fn = gfn(unsorted, rsi, mdi-1, rxi, spi, nsi)) < med)) &&
+	      (gfn(unsorted, rsi, mdi-1, rxi, spi, nsi)) < med)) &&
 	    ((mdi == mdc ||
-	      (fn = gfn(unsorted, rsi, mdi+1, rxi, spi, nsi)) < med)) &&
+	      (gfn(unsorted, rsi, mdi+1, rxi, spi, nsi)) < med)) &&
 	    ((rxi == 0   ||
-	      (fn = gfn(unsorted, rsi, mdi, rxi-1, spi, nsi)) < med)) &&
+	      (gfn(unsorted, rsi, mdi, rxi-1, spi, nsi)) < med)) &&
 	    ((rxi == rxc ||
-	      (fn = gfn(unsorted, rsi, mdi, rxi+1, spi, nsi)) < med)) &&
+	      (gfn(unsorted, rsi, mdi, rxi+1, spi, nsi)) < med)) &&
 	    ((spi == 0   ||
-	      (fn = gfn(unsorted, rsi, mdi, rxi, spi-1, nsi)) < med)) &&
+	      (gfn(unsorted, rsi, mdi, rxi, spi-1, nsi)) < med)) &&
 	    ((spi == spc ||
-	      (fn = gfn(unsorted, rsi, mdi, rxi, spi+1, nsi)) < med)) &&
+	      (gfn(unsorted, rsi, mdi, rxi, spi+1, nsi)) < med)) &&
 	    ((nsi == 0   ||
-	      (fn = gfn(unsorted, rsi, mdi, rxi, spi, nsi-1)) < med)) &&
+	      (gfn(unsorted, rsi, mdi, rxi, spi, nsi-1)) < med)) &&
 	    ((nsi == nsc ||
-	      (fn = gfn(unsorted, rsi, mdi, rxi, spi, nsi+1)) < med)) &&
+	      (gfn(unsorted, rsi, mdi, rxi, spi, nsi+1)) < med)) &&
 	    (ncnt != 0 && nsum / ncnt <  q33))
 	{
 	    f = true;
@@ -1574,7 +1568,6 @@ static rc_t bogotune(void)
 
     ns_cnt = count_messages(ns_msglists);
     sp_cnt = count_messages(sp_msglists);
-    cnt = ns_cnt + sp_cnt;
 
     if (ds_flag == DS_DSK && !check_msg_counts())
 	exit(exit_zero ? EX_OK : EX_ERROR);

@@ -109,7 +109,7 @@ static void convert_external_to_internal(dsh_t *dsh, dbv_t *ex_data, dsv_t *in_d
     if (ex_data->leng <= i * sizeof(uint32_t))
 	in_data->date = 0;
     else
-	in_data->date = !dsh->is_swapped ? cv[i++] : swap_32bit(cv[i++]);
+	in_data->date = !dsh->is_swapped ? cv[i] : swap_32bit(cv[i]);
 
     return;
 }
@@ -194,7 +194,6 @@ void ds_flush(void *vhandle)
 int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 {
     int ret;
-    bool found = false;
     dsh_t *dsh = vhandle;
     dbv_t ex_key;
     dbv_t ex_data;
@@ -218,8 +217,6 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 
     switch (ret) {
     case 0:
-	found = true;
-
 	convert_external_to_internal(dsh, &ex_data, val);
 
 	if (DEBUG_DATABASE(3)) {

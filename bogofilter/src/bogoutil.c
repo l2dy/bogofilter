@@ -312,7 +312,7 @@ static ex_t display_words(bfpath *bfp, int argc, char **argv, bool show_probabil
 {
     byte buf[BUFSIZE];
     buff_t *buff = buff_new(buf, 0, BUFSIZE);
-    const byte *word = buf;
+    const byte *word;
 
     const char *path = bfp->filepath;
 

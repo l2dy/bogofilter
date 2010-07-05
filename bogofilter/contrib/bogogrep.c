@@ -1,4 +1,5 @@
-/*
+/** \file bogogrep.c
+ *
  * This file emulates GNU grep -ab with a plain text pattern anchored to
  * the left. The Horspool search was taken from a publicly available
  * version on the Internet.
@@ -96,6 +97,7 @@ int main(int argc, char **argv) {
 			(unsigned char *)argv[1],
 			base - i + st.st_size))) {
 	    if (i == base || *(i-1) == '\n') {
+		/** \bug FIXME: dead assignments here */
 		int l = strcspn((const char *)i, "\n");
 
 		if (l > base - i + st.st_size) l = base - i + st.st_size;

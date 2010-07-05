@@ -68,7 +68,7 @@ static int cmp(const element *a, const element *b) {
  */
 
 element *listsort(element *list, fcn_compare *compare) {
-    element *p, *q, *e, *tail, *oldhead;
+    element *p, *q, *e, *tail;
     int insize, nmerges, psize, qsize, i;
 
     /*
@@ -82,7 +82,6 @@ element *listsort(element *list, fcn_compare *compare) {
 
     while (1) {
         p = list;
-	oldhead = list;		       /* only used for circular linkage */
         list = NULL;
         tail = NULL;
 

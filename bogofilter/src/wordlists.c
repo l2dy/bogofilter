@@ -303,6 +303,9 @@ static void sanitycheck_lists(void)
 }
 #endif
 
+/** skips to the end of a work (comma, blank, tab separated), replaces
+ * the delimiter by 0, skips over whitespace, and returns a pointer to
+ * the next character. */
 static char *spanword(char *p)
 {
     const char *delim = ", \t";
@@ -352,7 +355,7 @@ bool configure_wordlist(const char *val)
     tmp = spanword(tmp);
 
     precedence=atoi(tmp);
-    tmp = spanword(tmp);
+    (void)spanword(tmp);
 
     init_wordlist(listname, filename, precedence, type);
 

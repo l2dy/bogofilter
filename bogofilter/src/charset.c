@@ -121,7 +121,7 @@ void set_charset(const char *charset)
 	    break;
 	*d++ = c;
     }
-    *d++ = '\0';
+    *d = '\0';
     if (DEBUG_CONFIG(0))
        fprintf(dbgout, "got_charset( '%s' )\n", t);
     init_charset_table( t );
