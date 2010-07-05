@@ -15,6 +15,17 @@
 
 -------------------------------------------------------------------------------
 
+	2010-07-05
+	* Use a better PRNG for random sleeps. That is arc4random() where
+	  available, and drand48() elsewhere.
+
+	* Assorted fixes for issues found with clang analyzer:
+	  + Fix a potential NULL deference
+	  + Fix a potential division by zero
+	  + Remove dead assignments and increments
+
+	* Update Doxyfile and source contrib/bogogrep.c for docs, too.
+
 	2010-07-03
 
 	* Fix a heap corruption in base64 decoder on invalid input.
