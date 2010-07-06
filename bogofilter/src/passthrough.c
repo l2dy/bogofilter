@@ -82,44 +82,6 @@ static int read_mem(char **out, void *in) {
     return 0;
 }
 
-static int read_seek(char **out, void *in) {
-    static char buf[4096];
-    FILE *inf = in;
-    static int carry[2] = { -1, -1 }; /* carry over bytes */
-    int s, i;
-    char *b = buf;
-    int cap = sizeof(buf);
-
-    for (i = 0; i < (int)sizeof(carry) && carry[i] != -1 ; i++) {
-	buf[i] = carry[i];
-	carry[i] = -1;
-    }
-    b += i;
-    cap -= i;
-
-    s = xfgetsl(b, cap, inf, true);
-    if (s == EOF) {
-       if (i) s = i;
-    } else {
-	s += i;
-    }
-
-    /* we must take care that on overlong lines, the \n doesn't appear
-     * at the beginning of the buffer, so we pull two characters out and 
-     * store them in the carry array */
-    if (s && buf[s-1] != '\n') {
-	int c = 2;
-	if (c > s) c = s;
-	s -= c;
-	for (i = 0; i < c ; i++) {
-	    carry[i] = (unsigned char)buf[s+i];
-	}
-    }
-
-    *out = buf;
-    return s;
-}
-
 typedef int (*readfunc_t)(char **, void *);
 
 static void write_spam_info(void)
