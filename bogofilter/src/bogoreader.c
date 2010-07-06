@@ -487,7 +487,7 @@ static int rmail_getline(buff_t *buff)
     uint used = buff->t.leng;
     byte *buf = buff->t.u.text + used;
     static word_t *saved = NULL;
-    static unsigned long bytesleft = 0;
+    static uint bytesleft = 0;
 
     if (saved != NULL) {
 	count = saved->leng;
@@ -499,7 +499,8 @@ static int rmail_getline(buff_t *buff)
 
     if (bytesleft) {
 	count = buff_fgetsln(buff, fpin, bytesleft);
-	bytesleft -= count;
+	if (count > 0)
+	    bytesleft -= count;
 	return count;
     }
 
