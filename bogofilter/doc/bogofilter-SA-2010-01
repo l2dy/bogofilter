@@ -4,9 +4,9 @@ Topic:		heap corruption overrun in bogofilter/bogolexer
 
 Announcement:	bogofilter-SA-2010-01
 Writer:		Matthias Andree
-Version:	0.2
-CVE ID:		
-Announced:	
+Version:	0.3
+CVE ID:		CVE-2010-2494
+Announced:
 Category:	vulnerability
 Type:		array index underflow/out of bounds write through invalid input
 Impact:		heap corruption, application crash

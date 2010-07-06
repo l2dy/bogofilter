@@ -28,8 +28,10 @@
 
 	2010-07-03
 
-	* Fix a heap corruption in base64 decoder on invalid input.
+	* Security bugfix, CVE-2010-2494:
+	  Fix a heap corruption in base64 decoder on invalid input.
 	  Analysis and patch by Julius Plenz <plenz@cis.fu-berlin.de>.
+	  Please see doc/bogofilter-SA-2010-01 for details.
 
 	2010-04-07
 
