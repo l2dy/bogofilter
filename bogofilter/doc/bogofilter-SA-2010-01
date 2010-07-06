@@ -4,7 +4,7 @@ Topic:		heap corruption overrun in bogofilter/bogolexer
 
 Announcement:	bogofilter-SA-2010-01
 Writer:		Matthias Andree
-Version:	0.1
+Version:	0.2
 CVE ID:		
 Announced:	
 Category:	vulnerability
@@ -51,8 +51,32 @@ layout and operating system features.
 Upgrade your bogofilter to version 1.2.2 (or a newer release).
 
 bogofilter is available from SourceForge:
-
 <https://sourceforge.net/project/showfiles.php?group_id=62265>
+
+
+Alternatively, this patch to 1.2.1 would fix the issue:
+(Note that if you see "- -" at the beginnings of these lines,
+you need to run this file through gnupg or pgp to strip the signature
+and the "-"-escaping, or manually replace such line beginnings with
+"-"). This is an SVN diff of base64.c between revisions 6766 and 6906
+and comprises two change sets: 6904 and 6906.
+
+--- ./src/base64.c	2009/01/12 04:27:36	6766
++++ ./src/base64.c	2010/07/03 08:39:44	6906
+@@ -61,8 +61,10 @@
+ 	    d[i] = c;
+ 	    v = v >> 8;
+ 	}
+-	d += 3 - shorten;
+-	count += 3 - shorten;
++    if(shorten != 4) {
++        d += 3 - shorten;
++        count += 3 - shorten;
++    }
+     }
+     /* XXX do we need this NUL byte? */
+     if (word->leng)
+
 
 A. Copyright, License and Warranty
 ==================================
