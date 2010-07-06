@@ -82,7 +82,6 @@ double	ns_esf = NS_ESF;
 /* other */
 FILE	*fpo;
 uint	db_cachesize = DB_CACHESIZE;	/* in MB */
-enum	passmode passmode;		/* internal */
 bool	msg_count_file = false;
 char	*progtype = NULL;
 bool	unsure_stats = false;		/* true if print stats for unsures */

@@ -114,9 +114,6 @@ extern	uint	db_cachesize;
 
 extern FILE  *fpo;
 
-enum passmode { PASS_MEM, PASS_SEEK };
-extern enum passmode passmode;
-
 extern	bool	msg_count_file;
 extern	bool	unsure_stats;	/* true if print stats for unsures */
 

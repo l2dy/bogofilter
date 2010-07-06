@@ -270,20 +270,9 @@ void write_message(rc_t status)
     {
 	eol = NULL;
 	/* initialize */
-	switch (passmode) {
-	    case PASS_MEM:
-		rf = read_mem;
-		text = textblock_head();
-		rfarg = &text;
-		break;
-	    case PASS_SEEK:
-		rf = read_seek;
-		rfarg = fpin;
-		rewind(rfarg);
-		break;
-	    default:
-		abort();
-	}
+	rf = read_mem;
+	text = textblock_head();
+	rfarg = &text;
 
 	seen_subj = write_header(status, rf, rfarg);
 
@@ -380,32 +369,15 @@ void output_cleanup(void) {
 
 void passthrough_setup(void)
 {
-    /* check if the input is seekable, if it is, we don't need to buffer
-     * things in memory => configure passmode accordingly
-     */
-
     if (!passthrough)
 	return;
 
-    passmode = PASS_MEM;
-
-    if (passmode == PASS_MEM)
-	textblock_init();
-
-    if (DEBUG_GENERAL(2)) {
-	const char *m;
-	switch (passmode) {
-	case PASS_MEM:  m = "cache in memory"; break;
-	case PASS_SEEK: m = "rewind and reread file"; break;
-	default:        m = "unknown"; break;
-	}
-	fprintf(dbgout, "passthrough mode: %s\n", m);
-    }
+    textblock_init();
 }
 
 int passthrough_keepopen(void)
 {
-    return passthrough && passmode == PASS_SEEK ;
+    return false;
 }
 
 void passthrough_cleanup(void)
@@ -413,13 +385,7 @@ void passthrough_cleanup(void)
     if (!passthrough)
 	return;
 
-    switch (passmode) {
-    case PASS_MEM:
-	textblock_free();
-	break;
-    case PASS_SEEK: default:
-	break;
-    }
+    textblock_free();
 }
 
 /* End */

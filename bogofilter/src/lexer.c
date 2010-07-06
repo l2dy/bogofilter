@@ -197,7 +197,7 @@ static int get_decoded_line(buff_t *buff)
      * One very long physical line could break up into more
      * than one of these. */
 
-    if (passthrough && passmode == PASS_MEM && count > 0)
+    if (passthrough && count > 0)
 	textblock_add(linebuff->t.u.text+linebuff->read, (size_t) count);
 
     if ( !msg_header && 
