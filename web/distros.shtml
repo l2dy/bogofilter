@@ -54,12 +54,14 @@
 		| <a
 		    href="http://fedoraproject.org/wiki/Releases#Current_Supported_Releases">Supported
 		    Releases</a></td></tr>
+                <tr><td>Fedora 13 (Goddard)</td>    <td>1.2.0</td> <td><div align="center">BerkeleyDB 4.7</div></td></tr>
                 <tr><td>Fedora 12 (Constantine)</td> <td>1.2.0</td> <td><div align="center">BerkeleyDB 4.7</div></td></tr>
-                <tr><td>Fedora 11 (Leonidas)</td>    <td>1.2.0</td> <td><div align="center">BerkeleyDB 4.7</div></td></tr>
 		<tr><td colspan="3"><a href="http://www.freebsd.org/"
 			    target="_blank"><strong>FreeBSD</strong></a>
 			| <a href="http://www.freebsd.org/security/#adv"
 			    target="_blank">FreeBSD support periods</a></td></tr>
+                <tr> <td>FreeBSD 8.1-RELEASE</td> <td>1.2.1 +
+			CVE-2010-2494 fix</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 7.3-RELEASE</td> <td>1.2.1</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 8.0-RELEASE</td> <td>1.2.0</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 7.1-RELEASE</td> <td>1.1.7</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
