@@ -15,7 +15,7 @@
 
 -------------------------------------------------------------------------------
 
-1.2.2	2010-10-08 (released)
+1.2.2	2010-07-08 (released)
 
 	2010-07-05
 	* Use a better PRNG for random sleeps. That is arc4random() where
