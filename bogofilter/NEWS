@@ -15,6 +15,8 @@
 
 -------------------------------------------------------------------------------
 
+1.2.2	2010-10-08 (released)
+
 	2010-07-05
 	* Use a better PRNG for random sleeps. That is arc4random() where
 	  available, and drand48() elsewhere.
@@ -82,6 +84,9 @@
 	  Thanks to Ted for debugging the issue and providing the patch (which
 	  was for bogofilter v1.1.5).
 
+	2009-09-15
+	* Promoted to "stable"
+
 1.2.1	2009-08-01 (released)
 
 	2009-08-01
@@ -112,6 +117,9 @@
 
 	* Fixed EOL problem in quoted_printable text. Problem reported by
 	  Stephen Davies and identified by Pavel Kankovsky.
+
+	2009-03-28
+	* Promoted to "stable"
 
 1.2.0	2009-02-21 (released) 2009-03-28 (declared stable)
 
