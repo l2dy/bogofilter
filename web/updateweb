@@ -15,6 +15,8 @@
 set -e
 umask 02
 
+cd "$(dirname "$0")"
+
 trap 'echo "### FAILED ###" >&2 ; exit 1' 0
 
 if test "x$SF_USER" = x ; then
