@@ -54,8 +54,8 @@
 		| <a
 		    href="http://fedoraproject.org/wiki/Releases#Current_Supported_Releases">Supported
 		    Releases</a></td></tr>
-	<!--
-                <tr><td>Fedora 14 (Laughlin)</td>   <td>FIXME</td> <td><div align="center">BerkeleyDB FIXME</div></td></tr> -->
+                <tr><td>Fedora 14 (Laughlin)</td>   <td>1.2.2</td>
+		    <td><div align="center">BerkeleyDB 4.8</div></td></tr>
                 <tr><td>Fedora 13 (Goddard)</td>    <td>1.2.0</td> <td><div align="center">BerkeleyDB 4.7</div></td></tr>
                 <tr><td>Fedora 12 (Constantine)</td> <td>1.2.0</td> <td><div align="center">BerkeleyDB 4.7</div></td></tr>
 		<tr><td colspan="3"><a href="http://www.freebsd.org/"
