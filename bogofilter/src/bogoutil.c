@@ -50,8 +50,8 @@ const char *progname = "bogoutil";
 
 static int token_count = 0;
 
-bool  maintain = false;
-bool  onlyprint = false;
+static bool maintain = false;
+static bool onlyprint = false;
 
 /* Function Definitions */
 

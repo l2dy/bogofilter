@@ -77,9 +77,6 @@ extern	uint		 msgs_bad;
 extern size_t msg_register_size;
 extern char msg_register[256];
 
-extern bool maintain;
-extern bool onlyprint;
-
 /*		    old     new
 **  robs            0.010   0.0178
 **  robx            0.415   0.52
