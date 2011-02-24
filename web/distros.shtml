@@ -39,16 +39,19 @@
 		-->
 		<tr><td colspan="3"><a href="http://www.debian.org/" target="_blank"><strong>Debian</strong></a></td></tr>
                 <tr>
-                  <td>Debian stable ("lenny")</td> <td>1.1.7</td>
-                  <td> <div align="center">BerkeleyDB, QDBM, SQLite, TokyoCabinet</div> </td> </tr>
-                <tr>
-                  <td>Debian testing ("squeeze")</td>
-                  <td>See <a href="http://packages.debian.org/testing/mail/bogofilter" target="_blank">packages.debian.org</a></td>
-                  <td> <div align="center">BerkeleyDB, QDBM, SQLite, TokyoCabinet</div> </td> </tr>
-                <tr>
                   <td>Debian unstable ("sid")</td>
-                  <td>See <a href="http://packages.debian.org/unstable/mail/bogofilter" target="_blank">packages.debian.org</a></td>
-                  <td> <div align="center">BerkeleyDB, QDBM, SQLite, TokyoCabinet</div> </td> </tr>
+                  <td>See <a href="http://packages.debian.org/source/unstable/bogofilter" target="_blank">packages.debian.org</a></td>
+                  <td> <div align="center">BerkeleyDB, SQLite3, TokyoCabinet</div> </td> </tr>
+                <tr>
+                  <td>Debian testing ("wheezy")</td>
+                  <td>See <a href="http://packages.debian.org/source/testing//bogofilter" target="_blank">packages.debian.org</a></td>
+                  <td> <div align="center">BerkeleyDB, SQLite3, TokyoCabinet</div> </td> </tr>
+                <tr>
+                  <td>Debian 6.0 stable ("squeeze")</td> <td>1.2.2</td>
+                  <td> <div align="center">BerkeleyDB v4.8, SQLite3, TokyoCabinet</div> </td> </tr>
+                <tr>
+                  <td>Debian 5.0 oldstable ("lenny")</td> <td>1.1.7</td>
+                  <td> <div align="center">BerkeleyDB v4.6, QDBM, SQLite3</div> </td> </tr>
 		<tr><td colspan="3"><a href="http://fedoraproject.org/"
 			    target="_blank"><strong>Fedora</strong></a>
 		| <a
@@ -61,35 +64,42 @@
 			    target="_blank"><strong>FreeBSD</strong></a>
 			| <a href="http://www.freebsd.org/security/#adv"
 			    target="_blank">FreeBSD support periods</a></td></tr>
+                <tr> <td>FreeBSD ports</td> <td>See <a href="http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 8.2-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
+                <tr> <td>FreeBSD 7.4-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 8.1-RELEASE</td> <td>1.2.1 +
 			CVE-2010-2494 fix</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 7.4-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 7.3-RELEASE</td> <td>1.2.1</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD ports</td> <td>See <a href="http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
 		<tr><td colspan="3"><a
 		    href="http://www.gentoo.org/"
 		    target="_blank"><strong>Gentoo</strong></a></td></tr>
-                <tr> <td>Stable</td> <td>1.2.1</td> <td> <div align="center">BerkeleyDB, SQLite3</div> </td> </tr>
+                <tr> <td><a target="_blank"
+			    href="http://packages.gentoo.org/package/mail-filter/bogofilter">Gentoo
+			    bogofilter package</a></td> <td>1.2.2</td> <td> <div
+			    align="center">BerkeleyDB, SQLite3,
+			    TokyoCabinet</div> </td> </tr>
 		<tr><td colspan="3"><a
 		    href="http://www.mandriva.com/en/"
 		    target="_blank"><strong>Mandriva</strong></a></td></tr>
-                <tr> <td>Official - Contrib</td> <td>1.1.1</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
-                <tr> <td>Cooker - Contrib</td> <td>1.1.4</td> <td> <div align="center">BerkeleyDB, QDBM, SQLite3</div> </td> </tr>
+                <tr> <td>Cooker - Contrib</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
+                <tr> <td>Official - Contrib</td> <td>1.2.1</td> <td>
+			<div align="center">BerkeleyDB 4.8</div> </td> </tr>
 
 		<tr><td colspan="3"><a href="http://www.netbsd.org/" target="_blank"><strong>NetBSD</strong></a></td></tr>
-                <tr> <td>NetBSD 5.0</td> <td>1.1.7</td> <td> <div align="center">BerkeleyDB, QDDM, SQLite3</div> </td> </tr>
-                <tr> <td>NetBSD 4.0</td> <td>1.0.3</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
                 <tr>
                   <td><a href="http://www.netbsd.org/Documentation/software/packages.html">NetBSD pkgsrc</a></td>
 		  <td><a href="ftp://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/mail/bogofilter/README.html">see pkgsrc</a>
 		      or <a href="http://pkgsrc.se/mail/bogofilter">web frontend</a></td>
-                  <td><div align="center">BerkeleyDB, QDBM, SQLite3</div> </td>
+                  <td><div align="center">BerkeleyDB, QDBM, SQLite3,
+			  TokyoCabinet</div> </td>
                 </tr>
-		<tr><td colspan="3"><a href="http://www.openSUSE.org/" target="_blank"><strong>openSUSE.org</strong></a></td></tr>
+		<tr><td colspan="3"><a href="http://www.openSUSE.org/"
+			    target="_blank"><strong>openSUSE.org</strong></a>
+		| <a target="_blank"
+		    href="http://en.opensuse.org/Lifetime">Lifetime</a></td></tr>
 		<tr><td>openSUSE 11.3</td> <td>1.2.1</td> <td><div align="center">BerkeleyDB 4.5</div></td></tr>
 		<tr><td>openSUSE 11.2</td> <td>1.2.0</td> <td><div align="center">BerkeleyDB 4.5</div></td></tr>
-		<tr><td>openSUSE 11.1</td> <td>1.1.1</td> <td><div align="center">BerkeleyDB 4.5</div></td></tr>
+
 		<tr><td colspan="3"><a href="http://www.ubuntu.com/" target="_blank"><strong>Ubuntu Linux</strong></a></td></tr>
 		<tr><td>Ubuntu 10.10 (Maverick Meerkat)</td>   <td>1.2.2</td> <td><div align="center">BerkeleyDB 4.8, in universe: SQLite3</div></td></tr>
 		<tr><td>Ubuntu 10.04.X LTS (Lucid Lynx)</td>   <td>1.2.1</td> <td><div align="center">BerkeleyDB 4.7, in universe: SQLite3</div></td></tr>
