@@ -62,7 +62,7 @@
                 <tr><td>Fedora 13 (Goddard)</td>    <td>1.2.0</td> <td><div align="center">BerkeleyDB 4.7</div></td></tr>
 		<tr><td colspan="3"><a href="http://www.freebsd.org/"
 			    target="_blank"><strong>FreeBSD</strong></a>
-			| <a href="http://www.freebsd.org/security/#adv"
+			| <a href="http://www.freebsd.org/security/#sup"
 			    target="_blank">FreeBSD support periods</a></td></tr>
                 <tr> <td>FreeBSD ports</td> <td>See <a href="http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 8.2-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
