@@ -15,7 +15,13 @@
 
 -------------------------------------------------------------------------------
 
+	2011-01-02
+	* Added bogofilter-faq-bg.html, a Bulgarian translation of the FAQ.
+	  (thanks to Albert Ward)
+
+	2010-10-29
 	* Mark "Berkeley DB 5.1.19: (August 27, 2010)" supported.
+
 
 1.2.2	2010-07-08 (released)
 
