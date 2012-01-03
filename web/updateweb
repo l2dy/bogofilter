@@ -62,6 +62,7 @@ fi
 
 echo "==> UPLOADING TO web.sourceforge.net:htdocs/"
 # copy without cruft and internal files
+cd $DIR
 rsync -acvH \
 	--chmod=ug=rwX,o=rX \
 	--delete \
