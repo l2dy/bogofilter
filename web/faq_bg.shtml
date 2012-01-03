@@ -3,7 +3,7 @@
 <html>
 <head>
 <title>Bogofilter Home Page</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="inc/styles.css" rel="stylesheet" type="text/css">
 </head>
 <body bgcolor="#d4d0c8">
@@ -19,8 +19,8 @@
         <table class="central_table" width="90%" border="0" align="center" cellpadding="10" cellspacing="0">
           <tr>
             <td width="100%" valign="top" bgcolor="#FFFFFF">
-              <div class="refentry" lang="fr" align="left">
-		<!--#include virtual="bogofilter-faq-fr.html" -->
+              <div class="refentry" lang="bg" align="left">
+		<!--#include virtual="bogofilter-faq-bg.html" -->
               </div>
               </td>
           </tr>

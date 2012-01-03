@@ -15,11 +15,11 @@
       </td>
     </tr>
     <tr>
-      <td bgcolor="#F8F7F6"><br>
+      <td align="center" bgcolor="#F8F7F6"><br>
         <table class="central_table" width="90%" border="0" align="center" cellpadding="10" cellspacing="0">
           <tr> 
             <td width="100%" valign="top" bgcolor="#FFFFFF"> 
-              <div class="refentry" lang="en"> 
+              <div class="refentry" lang="en" align="left"> 
 		  <!--#include virtual="bogofilter-faq.html" -->
               </div>
             </td>

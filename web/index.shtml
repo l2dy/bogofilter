@@ -15,10 +15,10 @@
       </td>
     </tr>
     <tr>
-      <td bgcolor="#F8F7F6"><br>
+      <td align="center" bgcolor="#F8F7F6"><br>
         <table class="central_table" width="90%" border="0" align="center" cellpadding="10" cellspacing="0">
           <tr>
-            <td width="100%" valign="top" bgcolor="#FFFFFF">Bogofilter
+            <td width="100%" valign="top" align="left" bgcolor="#FFFFFF">Bogofilter
               is a mail filter that classifies mail as spam or ham (non-spam)
               by a statistical analysis of the message's header and content (body).
               The program is able to learn from the user's classifications and
@@ -53,49 +53,51 @@
           </tr>
         </table>
         <br>
-        <table width="90%" border=0 align="center" cellpadding=10 class="central_table">
+        <table width="90%" border=0 align="center" align="left" cellpadding=10 class="central_table">
           <tr bgcolor="#FFFFFF">
-            <td width="169">Download bogofilter</td>
-            <td width="397">From
+            <td align="left" width="169">Download bogofilter</td>
+            <td align="left" width="397">From
               <a href="http://sourceforge.net/project/showfiles.php?group_id=62265" target="_blank">Sourceforge Mirrors</a>.<br>
               Some <a href="distros.shtml">distributors</a> ship bogofilter.</td>
           </tr>
           <tr bgcolor="#FFFFFF">
-            <td width="169">Project Page</td>
-            <td width="397">Please see our <a href="http://sourceforge.net/projects/bogofilter/">Sourceforge project page</a>.</td>
+            <td align="left" width="169">Project Page</td>
+            <td align="left" width="397">Please see our <a href="http://sourceforge.net/projects/bogofilter/">Sourceforge project page</a>.</td>
           </tr>
           <tr bgcolor="#FFFFFF">
-	      <td width="169">Security Announcements</td>
-            <td width="397">Check out the bogofilter <a
+	      <td align="left" width="169">Security Announcements</td>
+            <td align="left" width="397">Check out the bogofilter <a
 		    href="security/">security announcements</a>.</td>
           </tr>
           <tr bgcolor="#FFFFFF">
-            <td width="169">Man Page</td>
-            <td width="397">Check out the bogofilter <a
+            <td align="left" width="169">Man Page</td>
+            <td align="left" width="397">Check out the bogofilter <a
 		    href="man_page.shtml">man page</a>.</td>
           </tr>
           <tr bgcolor="#FFFFFF">
-            <td width="169">FAQ</td>
-            <td width="397">Check out the bogofilter 
+            <td align="left" width="169">FAQ</td>
+            <td align="left" width="397">Check out the bogofilter 
 		<a href="faq.shtml">FAQ (English)</a>. 
 		<br>Also available in
 		<a href="faq_fr.shtml">French</a>
 		and
-		<a href="faq_it.shtml">Italian</a></td>.
+		<a href="faq_it.shtml">Italian</a>
+		and
+		<a href="faq_bg.shtml">Bulgarian</a>.</td>
           </tr>
           <tr bgcolor="#FFFFFF">
-            <td width="169">History</td>
-            <td width="397">Check out bogofilter's <a href="http://bogofilter.sourceforge.net/NEWS" target="_blank">
+            <td align="left" width="169">History</td>
+            <td align="left" width="397">Check out bogofilter's <a href="http://bogofilter.sourceforge.net/NEWS" target="_blank">
               release history</a>. 
           </tr>
           <tr bgcolor="#FFFFFF">
-            <td width="169">Mailing Lists</td>
-            <td width="397">Check here for bogofilter's <a
+            <td align="left" width="169">Mailing Lists</td>
+            <td align="left" width="397">Check here for bogofilter's <a
 		    href="faq.shtml#lists">mailing lists</a>.</td>
           </tr>
           <tr bgcolor="#FFFFFF">
-            <td width="169">Author</td>
-            <td width="397"><a href="http://www.catb.org/%7Eesr/"
+            <td align="left" width="169">Author</td>
+            <td align="left" width="397"><a href="http://www.catb.org/%7Eesr/"
               target="_blank" >Eric S. Raymond</a> wrote the initial
               version of bogofilter.  Since 2002 it has been brought
               to maturity by David Relson, Matthias Andree, Greg
