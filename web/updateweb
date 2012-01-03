@@ -29,27 +29,19 @@ fi
 echo "==> CHECKING OUT WEB, FAQ, AND NEWS"
 URL="http://bogofilter.svn.sourceforge.net/svnroot/bogofilter/trunk/"
 SVN="svn --non-interactive"
-DIR="$HOME/tmp/bogofilter_web"
-[ ! -d $DIR ] && mkdir $DIR
 
 # update directory
-cd ../svn/doc
-$SVN up -q
+$SVN update -q
 
-FILES="bogofilter-faq.html bogofilter-faq-??.html"
+FILES=$( cd ../svn/doc ; ls bogofilter-faq.html bogofilter-faq-??.html )
+echo $FILES
 for FILE in $FILES ; do
-	$SVN cat $URL/bogofilter/doc/$FILE > $DIR/$FILE &
+	$SVN cat $URL/bogofilter/doc/$FILE > $FILE &
 done
-$SVN cat $URL/bogofilter/NEWS > $DIR/NEWS &
+wait
 
-# update directory
-cd ../../web
-$SVN up -q
+$SVN cat $URL/bogofilter/NEWS > NEWS &
 
-FILES="*.shtml"
-for FILE in $FILES ; do
-	$SVN cat $URL/bogofilter/web/$FILE > $DIR/$FILE &
-done
 wait
 
 # check if no uncommitted files are there
@@ -62,7 +54,6 @@ fi
 
 echo "==> UPLOADING TO web.sourceforge.net:htdocs/"
 # copy without cruft and internal files
-cd $DIR
 rsync -acvH \
 	--chmod=ug=rwX,o=rX \
 	--delete \
