@@ -33,7 +33,7 @@ CMDPFX="svn --non-interactive"
 # check out
 $CMDPFX up -q &
 
-FILES="bogofilter-faq.html bogofilter-faq-fr.html bogofilter-faq-it.html"
+FILES="bogofilter-faq.html bogofilter-faq-??.html"
 for FILE in $FILES ; do
 	$CMDPFX cat $URL/bogofilter/doc/$FILE >$FILE &
 done
