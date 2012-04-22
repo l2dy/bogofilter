@@ -28,24 +28,22 @@ fi
 
 echo "==> CHECKING OUT WEB, FAQ, AND NEWS"
 URL="http://bogofilter.svn.sourceforge.net/svnroot/bogofilter/trunk/"
-SVN="svn --non-interactive"
+CMD="svn --non-interactive"
 
-# update directory
-$SVN update -q
+# check out
+$CMD update -q &
 
 FILES=$( cd ../svn/doc ; ls bogofilter-faq.html bogofilter-faq-??.html )
-echo $FILES
 for FILE in $FILES ; do
-	$SVN cat $URL/bogofilter/doc/$FILE > $FILE &
+	$CMD cat $URL/bogofilter/doc/$FILE >$FILE &
 done
-wait
 
-$SVN cat $URL/bogofilter/NEWS > NEWS &
+$CMD cat $URL/bogofilter/NEWS > NEWS &
 
 wait
 
 # check if no uncommitted files are there
-a=$($SVN status -q)
+a=$($CMD status -q)
 if test "x$a" != x ; then
 	echo >&2 "### UNCOMMITTED FILES PERSIST IN LOCAL DIRECTORY - COMMIT FIRST ###"
 	echo >&2 "$a"
