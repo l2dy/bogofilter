@@ -39,7 +39,7 @@
                 statistical technique is known as the Bayesian technique and its
                 use for spam was described by Paul Graham in his article <a href="http://www.paulgraham.com/spam.html" target="_blank">A
                 Plan For Spam</a> in August 2002. Gary Robinson, in his weblog
-                <a href="http://radio.weblogs.com/0101454/stories/2002/09/16/spamDetection.html" target="_blank">Rants</a>
+                <a href="http://radio-weblogs.com/0101454/stories/2002/09/16/spamDetection.html" target="_blank">Rants</a>
                 (September 2002), suggested some refinements for improved discrimination
                 between spam and ham. Bogofilter's primary algorithm uses the
                 f(w) parameter and the Fisher inverse chi-square technique that
@@ -57,7 +57,7 @@
           <tr bgcolor="#FFFFFF">
             <td align="left" width="169">Download bogofilter</td>
             <td align="left" width="397">From
-              <a href="http://sourceforge.net/project/showfiles.php?group_id=62265" target="_blank">Sourceforge Mirrors</a>.<br>
+              <a href="http://sourceforge.net/projects/bogofilter/files/" target="_blank">Sourceforge Mirrors</a>.<br>
               Some <a href="distros.shtml">distributors</a> ship bogofilter.</td>
           </tr>
           <tr bgcolor="#FFFFFF">
