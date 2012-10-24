@@ -20,7 +20,7 @@ dnl ********************************************************
 dnl
 AC_INIT([bogofilter],[1.2.2])
 dnl
-AC_PREREQ(2.60)
+AC_PREREQ([2.68])
 AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_SRCDIR([src/bogofilter.c])
 AC_CANONICAL_HOST
@@ -46,6 +46,9 @@ AC_C_CONST
 AC_C_INLINE
 AC_C_VOLATILE
 AC_C_RESTRICT
+
+dnl define our test programs are C
+AC_LANG([C])
 
 if test "$ac_cv_c_inline" != no ; then
     AC_DEFINE(HAVE_INLINE,1, [define to 1 if 'inline' is supported])
@@ -558,18 +561,17 @@ Cannot link against libdb? Try these steps to solve the problem:
 	saveLIBS="$LIBS"
 	LIBS="$LIBS $LIBDB"
 	AC_MSG_CHECKING(if a program can be linked against Berkeley DB and run)
-	AC_RUN_IFELSE(
-	AC_LANG_PROGRAM([[
+	AC_RUN_IFELSE([AC_LANG_PROGRAM([[
 #ifdef HAVE_INTTYPES_H
 #include <inttypes.h>
 #endif
 #include <db.h>
 		   ]], [[
 return 0;
-		   ]]),,
+		   ]])],,
 		   [AC_MSG_RESULT(no)
 	AC_MSG_ERROR([Cannot run a program linked against libdb.
-Did you adjust your library search path to include your libdb?])],)
+Did you adjust your library search path to include your libdb?])],true)
 	AC_MSG_RESULT(yes)
 
 	dnl check if header and library of DB library match
@@ -577,7 +579,7 @@ Did you adjust your library search path to include your libdb?])],)
 	AC_MSG_CHECKING(if Berkeley DB header and library versions match)
 	rm -r -f bfadtestdir
 	mkdir bfadtestdir
-	AC_RUN_IFELSE(
+	AC_RUN_IFELSE([
 	AC_LANG_PROGRAM([[
 		   #include <stdlib.h>
 		   #include <stdio.h>
@@ -593,9 +595,9 @@ Did you adjust your library search path to include your libdb?])],)
 			if (maj != DB_VERSION_MAJOR) exit(1);
 			if (min != DB_VERSION_MINOR) exit(1);
 			exit(0);
-		   ]]),,
+		   ]])],,
 		   [AC_MSG_RESULT(no)
-		   AC_MSG_ERROR(db.h header file and db library version do not match.)],)
+		   AC_MSG_ERROR(db.h header file and db library version do not match.)],true)
 	AC_MSG_RESULT(yes)
 	AC_CHECK_DECLS(db_create,,
 	       AC_MSG_ERROR([[Can not locate a suitable Berkeley DB db.h header file.
@@ -608,7 +610,7 @@ You can download Berkeley DB 4.3.x from http://www.sleepycat.com/]]),
 	)
 	AC_MSG_CHECKING(if Berkeley DB supports shared environments)
 	if test "x$enable_dbshared_test" != xno && test "x$USE_TRANSACTIONS" != xNO ; then
-	AC_RUN_IFELSE(
+	AC_RUN_IFELSE([
 	AC_LANG_PROGRAM([[
 #ifdef HAVE_INTTYPES_H
 #include <inttypes.h>
@@ -629,7 +631,7 @@ You can download Berkeley DB 4.3.x from http://www.sleepycat.com/]]),
     if ((r = db_env_create(&e, 0))) barf("db_env_create", r);
     if ((r = e->remove(e, TESTDIR, 0))) barf("DB_ENV->remove", r);
     return 0;
-		   ]]),,
+		   ]])],,
 		   [AC_MSG_RESULT(no)
 	rm -r -f bfadtestdir
 	AC_MSG_ERROR([
@@ -639,7 +641,7 @@ on Fedora Core Linux. Build your own Berkeley DB installation and use
 use the unsafe non-transactional database by configuring with
 --disable-transactions.
 Packagers, if you are absolutely sure that the target system supports
-shared environments, you can use --disable-dbshared-test.])],)
+shared environments, you can use --disable-dbshared-test.])],true)
 	rm -r -f bfadtestdir
 	AC_MSG_RESULT(yes)
     else

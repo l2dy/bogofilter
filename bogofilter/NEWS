@@ -15,6 +15,13 @@
 
 -------------------------------------------------------------------------------
 
+	2012-10-24
+	* Update configure.ac to avoid autoconf 2.68 warnings, by 
+	  (a) quoting the first AC_RUN_IFELSE argument, an
+	      AC_LANG_PROGRAM(), with [ ], and
+	  (b) providing an explicit "true" assumption for Berkeley DB
+	      capabilities to avoid cross-compilation warnings.
+
 	2011-01-02
 	* Added bogofilter-faq-bg.html, a Bulgarian translation of the FAQ.
 	  (thanks to Albert Ward)
