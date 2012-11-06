@@ -1,0 +1,21 @@
+#! /bin/sh
+
+. ${srcdir:=.}/t.frame
+
+# make sure that we do not crash on excessively long tokens
+# Test program by Julius Plenz, TU Berlin.
+perl -e '
+print <<EOF
+Content-Type: multipart/mixed;boundary="----=_20121014031204_57463"
+
+------=_20121014031204_57463
+Content-Type: text/plain; charset="utf-8"
+
+------=_20121014031204_57463
+Content-Transfer-Encoding: base64
+
+EOF
+;
+print(("vfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvfvf\n")x600);
+print "------=_20121014031204_57463--";' \
+| $VAL $BOGOFILTER -p -e -C > /dev/null

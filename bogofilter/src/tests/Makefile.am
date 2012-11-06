@@ -45,6 +45,7 @@ PARSING_TESTS = \
 	t.multiple.tokens.head t.multiple.tokens.body t.multiple.tokens.min.mul \
 	$(ENCODING_TESTS) \
 	t.rfc2047_broken t.rfc2047_folded \
+	t.crash-invalid-base64 \
 	t.message_addr t.message_id t.queue_id
 
 WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest t.upgrade.subnet.prefix t.multiple.wordlists t.probe t.bf_compact
