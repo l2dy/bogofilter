@@ -15,12 +15,19 @@
 
 -------------------------------------------------------------------------------
 
+1.2.3	2012-12-02 (released)
+
 	2012-10-24
 	* Update configure.ac to avoid autoconf 2.68 warnings, by 
 	  (a) quoting the first AC_RUN_IFELSE argument, an
 	      AC_LANG_PROGRAM(), with [ ], and
 	  (b) providing an explicit "true" assumption for Berkeley DB
 	      capabilities to avoid cross-compilation warnings.
+
+	2012-10-22
+	* Security bugfix,
+	  Fix a heap corruption in base64 decoder on invalid input.
+	  Analysis and patch by Julius Plenz <plenz@cis.fu-berlin.de>.
 
 	2011-01-02
 	* Added bogofilter-faq-bg.html, a Bulgarian translation of the FAQ.
