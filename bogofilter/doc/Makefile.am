@@ -39,6 +39,7 @@ EXTRA_DIST = \
 	     bogofilter-SA-2002-01 bogofilter-SA-2004-01 \
 	     bogofilter-SA-2005-01 bogofilter-SA-2005-02 \
 	     bogofilter-SA-2010-01 \
+	     bogofilter-SA-2012-01 \
 	     integrating-with-postfix \
 	     integrating-with-qmail \
 	     programmer/OS2/configure.os2 \
