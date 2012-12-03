@@ -21,6 +21,7 @@ all: $(man_MANS) $(html_MANS)
 CLEANFILES = $(man_MANS) $(html_MANS)
 
 HTML_DOCS = bogofilter-faq.html bogofilter-faq-fr.html bogofilter-faq-it.html bogotune-faq.html
+XHTML_DOCS= bogofilter-faq-bg.xhtml
 
 # what to distribute
 EXTRA_DIST = \
@@ -33,6 +34,7 @@ EXTRA_DIST = \
 	     bf_copy.xml bf_copy.1in bf_copy.htmlin \
 	     bf_tar.xml bf_tar.1in bf_tar.htmlin \
 	     $(HTML_DOCS) \
+	     $(XHTML_DOCS) \
 	     bogofilter-tuning.HOWTO.html \
 	     bogofilter-SA-2002-01 bogofilter-SA-2004-01 \
 	     bogofilter-SA-2005-01 bogofilter-SA-2005-02 \
@@ -76,7 +78,7 @@ dist-hook:
 # sheets emit instead of "\ " for roff or "&nbsp;" for HTML,
 # respectively.
 .xml.htmlin:
-	xmllint --noout --postvalid $<
+	$(XMLLINT) --noout --postvalid $<
 	if test -f $(srcdir)/$@ && test $(srcdir)/$@ -nt $< ; then \
 	    cp $(srcdir)/$@ . ; else \
 	  if xmlto html-nochunks $< ; then f=$@ ; mv $${f%%in} $@ ; else rm -f $@ ; exit 1 ; fi ; \
@@ -84,7 +86,7 @@ dist-hook:
 	fi
 
 .xml.1in:
-	xmllint --noout --postvalid $<
+	$(XMLLINT) --noout --postvalid $<
 	if test -f $(srcdir)/$@ && test $(srcdir)/$@ -nt $< ; then \
 	    cp $(srcdir)/$@ . ; else \
 	if xmlto man $< ; then f=$@ ; mv $${f%in} $@ ; else rm -f $@ ; exit 1 ; fi ; \
@@ -107,8 +109,12 @@ dist-hook:
 	@exit 1
 endif
 
-.PHONY: check
-check:
+.PHONY: check checkx
+checkx:
+	set +e ; fail=0 ; for i in $(XHTML_DOCS) ; do if $(XMLLINT) --noout --postvalid $(srcdir)/$$i ; then echo PASS: $$i ; else echo FAIL: $$i: ; fail=1 ; fi ; done ; \
+	if test "$$fail" = 1 ; then echo >&2 "*** XHTML document invalid ***" ; false ; fi
+
+check: checkx
 	@if echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><HTML><HEAD><TITLE></TITLE></HEAD><BODY><P></P></BODY></HTML>' | $(NSGMLS) -s 2>/dev/null; then \
 	set +e ; fail=0 ; for i in $(HTML_DOCS) ; do if $(NSGMLS) -s $(srcdir)/$$i ; then echo PASS: $$i ; else echo FAIL: $$i: ; fail=1 ; fi ; done ; \
 	else echo >&2 "*** Not validating HTML, nsgmls/HTML DTDs improperly installed ***" ; fi ; \

@@ -39,6 +39,7 @@ AC_PROG_RANLIB
 AC_PATH_PROGS(PERL, perl perl5,,$PATH:/usr/local/bin:/usr/bin)
 AC_PATH_PROGS(NSGMLS,onsgmls nsgmls,nsgmls)
 AC_PATH_PROGS(RPMBUILD,rpmbuild rpm,rpmbuild)
+AC_PATH_PROGS(XMLLINT,xmllint,xmllint)
 AM_PROG_LEX
 
 dnl Check compiler capabilities

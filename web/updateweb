@@ -33,7 +33,7 @@ CMD="svn --non-interactive"
 # check out
 $CMD update -q &
 
-FILES=$( cd ../svn/doc ; ls bogofilter-faq.html bogofilter-faq-??.html bogofilter-faq-??.xhtml)
+FILES=$( cd ../bogofilter/doc ; ls bogofilter-faq.html bogofilter-faq-??.html bogofilter-faq-??.xhtml)
 for FILE in $FILES ; do
 	$CMD cat $URL/bogofilter/doc/$FILE >$FILE &
 done

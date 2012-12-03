@@ -16,7 +16,8 @@
 -------------------------------------------------------------------------------
 
 	2012-12-03
-
+	* Fix XML form of Bulgarian FAQ so that it validates;
+	  and validate XHTML at build time.
 	* Mark Berkeley DB 5.2.42 and 5.3.21 supported.
 
 1.2.3	2012-12-02 (released)
