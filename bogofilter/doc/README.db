@@ -66,6 +66,8 @@ applied the patches, check your vendor's update site regularly):
   Berkeley DB 4.8.26: (December 18, 2009)
   Berkeley DB 5.0.21: (March 30, 2010)
   Berkeley DB 5.1.19: (August 27, 2010)
+  Berkeley DB 5.2.42: (February 29, 2012)
+  Berkeley DB 5.3.21: (May 11, 2012)
 
 Other versions of Berkeley DB between the first and last listed above
 may or may not work but usually they will.
