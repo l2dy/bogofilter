@@ -112,8 +112,10 @@ endif
 
 .PHONY: check checkx
 checkx:
+	@if echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US"> <head><title /> </head><body /> </html>' | $(XMLLINT) --noout --nonet --postvalid - 2>/dev/null ; then \
 	set +e ; fail=0 ; for i in $(XHTML_DOCS) ; do if $(XMLLINT) --noout --postvalid $(srcdir)/$$i ; then echo PASS: $$i ; else echo FAIL: $$i: ; fail=1 ; fi ; done ; \
-	if test "$$fail" = 1 ; then echo >&2 "*** XHTML document invalid ***" ; false ; fi
+	if test "$$fail" = 1 ; then echo >&2 "*** XHTML document invalid ***" ; false ; fi ; \
+	else echo >&2 "*** Not validating XHTML, XHTML 1.1 DTD not or improperly installed ***" ; fi
 
 check: checkx
 	@if echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><HTML><HEAD><TITLE></TITLE></HEAD><BODY><P></P></BODY></HTML>' | $(NSGMLS) -s 2>/dev/null; then \
