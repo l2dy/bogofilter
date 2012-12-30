@@ -15,6 +15,16 @@
 
 -------------------------------------------------------------------------------
 
+	2012-12-30
+	* The bogofilter project was updated to the new SourceForge.net
+	  platform. This has caused the URLs to change. Use one of these
+	  commands for a read-only checkout:
+	  svn checkout svn://svn.code.sf.net/p/bogofilter/code/trunk bogofilter
+	  svn checkout http://svn.code.sf.net/p/bogofilter/code/trunk bogofilter
+
+	  And developers would use, replacing joe by their sf.net login:
+	  svn checkout --username=joe svn+ssh://m-a@svn.code.sf.net/p/bogofilter/code/trunk bogofilter
+
 	2012-12-03
 	* Add bogofilter-SA-2012-01 (CVE-2012-5468).
 	* Fix XML form of Bulgarian FAQ so that it validates;
@@ -297,7 +307,8 @@
 
 	* The upstream repository was migrated to SVN.
 	  In order to check the code out, use this command (one line):
-	  svn co https://bogofilter.svn.sourceforge.net/svnroot/bogofilter/trunk/bogofilter/ bogofilter
+	  (OBSOLETE) svn co https://bogofilter.svn.sourceforge.net/svnroot/bogofilter/trunk/bogofilter/ bogofilter
+	  (see entry for 2012-12-30 for updated URL)
 
 	2007-07-22
 

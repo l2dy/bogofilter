@@ -27,7 +27,7 @@ if test "x$SF_USER" = x ; then
 fi
 
 echo "==> CHECKING OUT WEB, FAQ, AND NEWS"
-URL="http://bogofilter.svn.sourceforge.net/svnroot/bogofilter/trunk/"
+URL="http://svn.code.sf.net/p/bogofilter/code/trunk/"
 CMD="svn --non-interactive"
 
 # check out

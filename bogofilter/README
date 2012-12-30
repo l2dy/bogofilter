@@ -134,7 +134,7 @@ to the list.
   source, cd to the directory to which you wish to download and type
   the following command:
 
-  svn co https://bogofilter.svn.sourceforge.net/svnroot/bogofilter/trunk/bogofilter/ bogofilter
+  svn checkout http://svn.code.sf.net/p/bogofilter/code/trunk bogofilter
 
   b. Building & Installing
   ------------------------
