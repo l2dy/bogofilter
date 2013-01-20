@@ -241,7 +241,7 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); header(); return TOKEN; }
 
 <INITIAL>^Message-ID:.*				{ /* save token for logging */
-						  int off = 11;
+						  unsigned long off = 11;
 						  while(isspace((unsigned char)yytext[off]) && off < yyleng)
 						      off++;
 						  set_msg_id((unsigned char *)(yytext+off), yyleng-off);
@@ -468,6 +468,12 @@ void yy_set_state_initial(void)
 #ifdef	FLEX_DEBUG
     yy_flex_debug = BOGOTEST('L');
 #endif
+}
+
+long lexer_v3_get_token(byte **output)
+{
+	*output = (byte *)yytext;
+	return yyleng;
 }
 
 /*

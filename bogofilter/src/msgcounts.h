@@ -30,4 +30,6 @@ void init_msg_counts(void);
 void set_msg_counts(u_int32_t good, u_int32_t spam);
 void set_msg_counts_from_str(char  *str);
 
+long msg_count_get_token(byte **output);
+
 #endif	/* MSGCOUNTS_H */
