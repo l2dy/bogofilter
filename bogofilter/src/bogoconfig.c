@@ -102,7 +102,7 @@ static struct option longopts_bogofilter[] = {
     LONGOPTIONS_DB
     /* bogofilter specific options */
     { "classify-files",			N, 0, 'B' },
-    { "syslog-tag",			N, 0, 'L' },
+    { "syslog-tag",			R, 0, 'L' },
     { "classify-mbox",			N, 0, 'M' },
     { "unregister-nonspam",		N, 0, 'N' },
     { "dataframe",			N, 0, 'R' },
