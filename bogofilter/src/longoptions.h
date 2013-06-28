@@ -133,7 +133,7 @@ typedef enum longopts_e {
 
 #define LONGOPTIONS_DB \
     { "db-transaction",			R, 0, O_DB_TRANSACTION }, \
-    { "timestamp-date",			N, 0, 'y' }, \
+    { "timestamp-date",			R, 0, 'y' }, \
     lo1 lo2
 
 #endif
