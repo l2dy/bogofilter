@@ -620,7 +620,7 @@ static int process_arglist(int argc, char **argv)
 	int this_option_optind = optind ? optind : 1;
 	const char *name;
 
-	option = getopt_long(argc, argv, OPTIONS,
+	option = getopt_long_chk(argc, argv, OPTIONS,
 			     longopts_bogoutil, &option_index);
 
 	if (option == -1)

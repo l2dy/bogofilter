@@ -139,7 +139,7 @@ static void process_arglist(int argc, char **argv)
 	if (optind == 1) optind = 0;
 #endif
 
-	option = getopt_long(argc, argv, OPTIONS,
+	option = getopt_long_chk(argc, argv, OPTIONS,
 			     longopts_bogolexer, &option_index);
 
 	if (option == -1)

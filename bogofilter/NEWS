@@ -22,6 +22,15 @@
 	  bogotune -M<file> cannot derive the bogofilter directory.
 	  Reported by Alexandre Rebert, found with Mayhem tool.
 
+	* Add getopt_long_chk(), a getopt_long variant that checks if the
+	  overlapping short and long options agree on whether their argument
+	  is not required, mandatory, or optional.  If they disagree, the
+	  program aborts.
+
+	* Fix a crash in command line parser that causes a NULL pointer
+	  dereference when --db-cachesize is used without argument.
+	  Found with getopt_long_chk().
+
 	2013-01-20
 	* Change lexer API/ABI a bit so as to work with flex 2.5.36 generated
 	  lexers (for instance, on Fedora 18 "Spherical Cow") that flip the

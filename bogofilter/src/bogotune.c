@@ -971,7 +971,7 @@ static int process_arglist(int argc, char **argv)
 	int option_index = 0;
 	const char *val;
 
-	option = getopt_long(argc, argv, OPTIONS,
+	option = getopt_long_chk(argc, argv, OPTIONS,
 			     longopts_bogotune, &option_index);
 
 	if (option == -1)

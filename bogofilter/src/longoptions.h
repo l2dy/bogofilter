@@ -136,4 +136,7 @@ typedef enum longopts_e {
     { "timestamp-date",			R, 0, 'y' }, \
     lo1 lo2
 
+extern int getopt_long_chk(int argc, char * const argv[], char const
+	*optstring, const struct option *longopts, int *longindex);
+
 #endif

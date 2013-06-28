@@ -121,7 +121,7 @@ static struct option longopts_bogofilter[] = {
     { "debug-to-stdout",		N, 0, 'D' },
     { "no-header-tags",			N, 0, 'H' },
     { "query",				N, 0, 'Q' },
-    { "db-cachesize",			N, 0, 'k' },
+    { "db-cachesize",			R, 0, 'k' },
     { "ns-esf",				R, 0, O_NS_ESF },
     { "sp-esf",				R, 0, O_SP_ESF },
     { "ham-cutoff",			R, 0, O_HAM_CUTOFF },
@@ -440,7 +440,7 @@ static void process_arglist(int argc, char **argv, priority_t precedence, int pa
 	int this_option_optind = optind ? optind : 1;
 	const char *name;
 
-	option = getopt_long(argc, argv, OPTIONS,
+	option = getopt_long_chk(argc, argv, OPTIONS,
 			     longopts_bogofilter, &option_index);
 
 	if (option == -1)

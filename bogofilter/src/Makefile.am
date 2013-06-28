@@ -151,6 +151,7 @@ version_sources= \
 	xstrlcpy.h xstrlcpy.c \
 	$(MEMDEBUG_SRC) \
 	xatox.h xatof.c xatoi.c \
+	getopt_long_chk.c \
 	datastore_db.h
 
 libbogofilter_a_SOURCES = \
