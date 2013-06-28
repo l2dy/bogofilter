@@ -15,6 +15,13 @@
 
 -------------------------------------------------------------------------------
 
+	2013-06-28
+	* Fix three crashes in command line and environment variable parsers
+	  that caused NULL pointer dereferences with long option variants
+	  of bogofilter --syslog-tag, or bogoutil --timestamp-date, or when
+	  bogotune -M<file> cannot derive the bogofilter directory.
+	  Reported by Alexandre Rebert, found with Mayhem tool.
+
 	2013-01-20
 	* Change lexer API/ABI a bit so as to work with flex 2.5.36 generated
 	  lexers (for instance, on Fedora 18 "Spherical Cow") that flip the
