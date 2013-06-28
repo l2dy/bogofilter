@@ -1852,6 +1852,11 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	if (ds_path == NULL)
 	    ds_path = get_directory(PR_ENV_HOME);
 
+	if (ds_path == NULL) {
+	    fprintf(stderr, "Cannot derive bogofilter directory from environment, aborting.\n");
+	    exit(EX_ERROR);
+	}
+
 	set_bogohome(ds_path);
 	bfp = bfpath_create(ds_path);
 
