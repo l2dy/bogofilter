@@ -43,49 +43,48 @@
                   <td>See <a href="http://packages.debian.org/source/unstable/bogofilter" target="_blank">packages.debian.org</a></td>
                   <td> <div align="center">BerkeleyDB, SQLite3, TokyoCabinet</div> </td> </tr>
                 <tr>
-                  <td>Debian testing ("wheezy")</td>
+                  <td>Debian testing ("jessie")</td>
                   <td>See <a href="http://packages.debian.org/source/testing//bogofilter" target="_blank">packages.debian.org</a></td>
                   <td> <div align="center">BerkeleyDB, SQLite3, TokyoCabinet</div> </td> </tr>
                 <tr>
-                  <td>Debian 6.0 stable ("squeeze")</td> <td>1.2.2</td>
+                  <td>Debian 7.x stable ("wheezy")</td> <td>1.2.2</td>
                   <td> <div align="center">BerkeleyDB v4.8, SQLite3, TokyoCabinet</div> </td> </tr>
                 <tr>
-                  <td>Debian 5.0 oldstable ("lenny")</td> <td>1.1.7</td>
-                  <td> <div align="center">BerkeleyDB v4.6, QDBM, SQLite3</div> </td> </tr>
+                  <td>Debian 6.x oldstable ("squeeze")</td> <td>1.2.2</td>
+                  <td> <div align="center">BerkeleyDB v4.8, SQLite3, TokyoCabinet</div> </td> </tr>
 		<tr><td colspan="3"><a href="http://fedoraproject.org/"
 			    target="_blank"><strong>Fedora</strong></a>
 		| <a
 		    href="http://fedoraproject.org/wiki/Releases#Current_Supported_Releases">Supported
 		    Releases</a></td></tr>
-                <tr><td>Fedora 16 (Verne)</td>   <td>1.2.2</td>
+                <tr><td>Fedora 19 (Schr&ouml;dinger's&nbsp;Cat)</td>   <td>1.2.3</td>
 		    <td><div align="center">BerkeleyDB 4.8</div></td></tr>
-                <tr><td>Fedora 15 (Lovelock)</td>   <td>1.2.2</td>
+                <tr><td>Fedora 18 (Spherical&nbsp;Cow)</td>   <td>1.2.3</td>
 		    <td><div align="center">BerkeleyDB 4.8</div></td></tr>
 		<tr><td colspan="3"><a href="http://www.freebsd.org/"
 			    target="_blank"><strong>FreeBSD</strong></a>
 			| <a href="http://www.freebsd.org/security/#sup"
 			    target="_blank">FreeBSD support periods</a></td></tr>
                 <tr> <td>FreeBSD ports</td> <td>See <a href="http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
+                <tr> <td>FreeBSD 9.1-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
+                <tr> <td>FreeBSD 8.4-RELEASE</td> <td>1.2.3</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 8.3-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 9.0-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 8.2-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 7.4-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 8.1-RELEASE</td> <td>1.2.1 +
-			CVE-2010-2494 fix</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
 		<tr><td colspan="3"><a
 		    href="http://www.gentoo.org/"
 		    target="_blank"><strong>Gentoo</strong></a></td></tr>
                 <tr> <td><a target="_blank"
 			    href="http://packages.gentoo.org/package/mail-filter/bogofilter">Gentoo
-			    bogofilter package</a></td> <td>1.2.2</td> <td> <div
+			    bogofilter package</a></td> <td>1.2.3</td> <td> <div
 			    align="center">BerkeleyDB, SQLite3,
 			    TokyoCabinet</div> </td> </tr>
+		<!--
 		<tr><td colspan="3"><a
 		    href="http://www.mandriva.com/en/"
 		    target="_blank"><strong>Mandriva</strong></a></td></tr>
                 <tr> <td>Cooker - Contrib</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
                 <tr> <td>Official - Contrib</td> <td>1.2.1</td> <td>
 			<div align="center">BerkeleyDB 4.8</div> </td> </tr>
+		-->
 
 		<tr><td colspan="3"><a href="http://www.netbsd.org/" target="_blank"><strong>NetBSD</strong></a></td></tr>
                 <tr>
@@ -99,14 +98,14 @@
 			    target="_blank"><strong>openSUSE.org</strong></a>
 		| <a target="_blank"
 		    href="http://en.opensuse.org/Lifetime">Lifetime</a></td></tr>
-		<tr><td>openSUSE 12.1</td> <td>1.2.1</td> <td><div align="center">BerkeleyDB 4.8</div></td></tr>
-		<tr><td>openSUSE 11.4</td> <td>1.2.1</td> <td><div align="center">BerkeleyDB 4.8</div></td></tr>
+		<tr><td>openSUSE 12.3</td> <td>1.2.3</td> <td><div align="center">BerkeleyDB 4.8</div></td></tr>
+		<tr><td>openSUSE 12.2</td> <td>1.2.3</td> <td><div align="center">BerkeleyDB 4.8</div></td></tr>
 
 		<tr><td colspan="3"><a href="http://www.ubuntu.com/" target="_blank"><strong>Ubuntu Linux</strong></a></td></tr>
-		<tr><td>Ubuntu 11.10 (Oneiric Ocelot)</td>   <td>1.2.2</td> <td><div align="center">BerkeleyDB 4.8, in universe: SQLite3</div></td></tr>
-		<tr><td>Ubuntu 11.04 (Natty Narwhal)</td>   <td>1.2.2</td> <td><div align="center">BerkeleyDB 4.8, in universe: SQLite3</div></td></tr>
-		<tr><td>Ubuntu 10.04.X LTS (Lucid Lynx)</td>   <td>1.2.1</td> <td><div align="center">BerkeleyDB 4.7, in universe: SQLite3</div></td></tr>
-		<tr><td>Ubuntu 8.04.X LTS (Hardy Heron)</td> <td>1.1.5</td> <td><div align="center">BerkeleyDB 4.6, in universe: SQLite3</div></td></tr>
+		<tr><td>Ubuntu 13.04 (Raring Ringtail)</td>   <td>1.2.2</td> <td><div align="center">BerkeleyDB 4.8, in universe: SQLite3</div></td></tr>
+		<tr><td>Ubuntu 12.10 (Quantal Quetzal)</td>   <td>1.2.2</td> <td><div align="center">BerkeleyDB 4.8, in universe: SQLite3</div></td></tr>
+		<tr><td>Ubuntu 12.04 LTS (Precise Pangolin)</td>   <td>1.2.2</td> <td><div align="center">BerkeleyDB 4.8, in universe: SQLite3</div></td></tr>
+		<tr><td>Ubuntu 10.04 LTS (Lucid Lynx)</td>   <td>1.2.1</td> <td><div align="center">BerkeleyDB 4.7, in universe: SQLite3</div></td></tr>
        </table>
               <p class="date">Last update: $Date$</p>
             </td>
