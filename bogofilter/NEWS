@@ -46,7 +46,8 @@
 	  svn checkout http://svn.code.sf.net/p/bogofilter/code/trunk bogofilter
 
 	  And developers would use, replacing joe by their sf.net login:
-	  svn checkout --username=joe svn+ssh://m-a@svn.code.sf.net/p/bogofilter/code/trunk bogofilter
+	  svn checkout --username=joe \
+	    svn+ssh://svn.code.sf.net/p/bogofilter/code/trunk bogofilter
 
 	2012-12-03
 	* Add bogofilter-SA-2012-01 (CVE-2012-5468).
