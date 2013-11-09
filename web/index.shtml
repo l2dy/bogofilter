@@ -54,12 +54,14 @@
         </table>
         <br>
         <table width="90%" border=0 align="center" cellpadding=10 class="central_table">
-	    <tr bgcolor="#FFFF00"><strong>Note that the
-		    www.bogofilter.org and mailing lists are currently
-		    down.  bogofilter.sourceforge.net continues to
-		    function, please bear with us while we are working
-		    to bring the bogofilter.org-hosted services back
-		    on line.</tr>
+            <tr bgcolor="#FFFF00"><td width="100%" valign="top" align="left">
+		    <strong>Note that the http://[www.]bogofilter.org/
+			web site and the mailing lists hosted under
+			@bogofilter.org are currently down.</strong>
+		    bogofilter.sourceforge.net continues to function,
+		    please bear with us while we are working to bring
+		    the bogofilter.org-hosted services back on
+		    line.</td></tr>
 	    </table>
         <br>
         <table width="90%" border=0 align="center" cellpadding=10 class="central_table">
