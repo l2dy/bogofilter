@@ -39,6 +39,7 @@ for FILE in $FILES ; do
 done
 
 $CMD cat $URL/bogofilter/NEWS > NEWS &
+$CMD cat $URL/bogofilter/NEWS.0 > NEWS.0 &
 
 wait
 
