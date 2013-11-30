@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2013-11-30
+
+	* Updated autoconf/automake stuff so that tests work properly with
+	  automake versions that default to running parallel-tests.
+
 	2013-07-06
 
 	* Relicensed all security announcements under a dual-license, at the
