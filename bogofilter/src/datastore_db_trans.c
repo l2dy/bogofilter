@@ -884,7 +884,6 @@ e_txn probe_txn(bfpath *bfp)
 
     if (r == ENOENT) {
 	struct stat st;
-	int w;
 	char *t = bfp->filepath;
 	struct dirent *de;
 	e_txn rc = T_DONT_KNOW;
@@ -916,6 +915,7 @@ e_txn probe_txn(bfpath *bfp)
 	    closedir(d);
 
 	    if (rc != T_ERROR && rc != T_ENABLED) {
+		int w;
 		w = stat(t, &st);
 		if (w == 0) {
 		    rc = T_DISABLED;
