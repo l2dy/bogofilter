@@ -3,6 +3,7 @@
 /Makefile
 /Makefile.in
 /aclocal.m4
+/ar-lib
 /autogen.log
 /autom4te.cache
 /bogofilter-*.tar.gz

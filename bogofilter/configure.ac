@@ -29,6 +29,7 @@ AC_CONFIG_HEADERS([src/config.h:config.in])
 
 AC_PROG_AWK
 AC_PROG_CC(gcc xlc cc)
+AM_PROG_AR
 AM_PROG_CC_C_O
 AC_USE_SYSTEM_EXTENSIONS
 AC_CHECK_TOOL(AR, ar, no)
