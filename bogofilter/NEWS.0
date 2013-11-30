@@ -2,7 +2,7 @@
 
 	2005-11-28
 
-	* Minor FAQ updates and correctons.
+	* Minor FAQ updates and corrections.
 	* Abort if ar(1) is not available during build.
 
 	2005-11-19
