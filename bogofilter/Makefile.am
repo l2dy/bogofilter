@@ -1,4 +1,7 @@
-# $Id$ 
+# $Id$
+
+# automake options
+AUTOMAKE_OPTIONS = 
 
 # search path for m4 macros
 ACLOCAL_AMFLAGS = -I m4

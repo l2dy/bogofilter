@@ -24,13 +24,13 @@ AC_PREREQ([2.68])
 AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_SRCDIR([src/bogofilter.c])
 AC_CANONICAL_HOST
-AM_INIT_AUTOMAKE([foreign 1.10 dist-bzip2 no-installinfo])
+AM_INIT_AUTOMAKE([1.11 foreign tar-ustar parallel-tests dist-bzip2 dist-xz no-installinfo -Wall])
 AC_CONFIG_HEADERS([src/config.h:config.in])
 
 AC_PROG_AWK
 AC_PROG_CC(gcc xlc cc)
-dnl this requires autoconf 2.60:
-dnl AC_USE_SYSTEM_EXTENSIONS
+AM_PROG_CC_C_O
+AC_USE_SYSTEM_EXTENSIONS
 AC_CHECK_TOOL(AR, ar, no)
 if test "$AR" = no ; then
   AC_MSG_ERROR([Please make sure that "ar" is in your PATH.])
