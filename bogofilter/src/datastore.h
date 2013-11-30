@@ -148,7 +148,7 @@ typedef struct {
 extern dsm_t *dsm;
 
 /** Type of the callback function that ds_foreach calls. */
-typedef int ds_foreach_t(
+typedef ex_t ds_foreach_t(
 	/** current token that ds_foreach is looking at */
 	word_t *token,
 	/** data store value */

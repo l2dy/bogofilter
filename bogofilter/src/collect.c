@@ -16,13 +16,13 @@
 
 void wordprop_init(void *vwordprop)
 {
-    wordprop_t *wp = vwordprop;
+    wordprop_t *wp = (wordprop_t *)vwordprop;
     memset(wp, 0, sizeof(*wp));
 }
 
 void wordcnts_init(void *vwordcnts)
 {
-    wordcnts_t *wc = vwordcnts;
+    wordcnts_t *wc = (wordcnts_t *)vwordcnts;
     memset(wc, 0, sizeof(*wc));
 }
 
@@ -60,7 +60,7 @@ void collect_words(wordhash_t *wh)
 	    token.u.text[token.leng] = '\0';	/* ensure nul termination */
 	}
 
-	wp = wordhash_insert(wh, &token, sizeof(wordprop_t), &wordprop_init);
+	wp = (wordprop_t *)wordhash_insert(wh, &token, sizeof(wordprop_t), &wordprop_init);
 	if (wh->type != WH_CNTS)
 	    wp->freq = 1;
 

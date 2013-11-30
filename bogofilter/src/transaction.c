@@ -43,7 +43,7 @@ struct ta_type {
 /* open a transaction and return pointer to transaction anchor */
 ta_t *ta_init(void)
 {
-    ta_t *ta = xmalloc(sizeof(*ta));
+    ta_t *ta = (ta_t *)xmalloc(sizeof(*ta));
     ta->head = NULL;
     ta->last = NULL;
     return ta;
@@ -108,11 +108,11 @@ static void ta_add(ta_t *ta, ta_kind_t ta_kind, void *vhandle,
         ta_word = word_dup(word);
     
     if (dsvval) {
-        ta_dsvval = xmalloc(sizeof(*ta_dsvval));
+        ta_dsvval = (dsv_t *)xmalloc(sizeof(*ta_dsvval));
 	memcpy(ta_dsvval, dsvval, sizeof(*ta_dsvval));
     }
     
-    item = xmalloc(sizeof(*item));
+    item = (ta_iter_t *)xmalloc(sizeof(*item));
     item->kind = ta_kind;
     item->vhandle = ta_vhandle;
     item->word = ta_word;

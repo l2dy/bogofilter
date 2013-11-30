@@ -375,11 +375,11 @@ static char *charset_as_string(const byte *txt, const size_t len)
     static unsigned short charset_leng = 0;
 
     if (charset_text == NULL)
-	charset_text = xmalloc(len+D);
+	charset_text = (char *)xmalloc(len+D);
     else {
 	if (charset_leng < len) {
 	    charset_leng = len;
-	    charset_text = xrealloc(charset_text, charset_leng+D);
+	    charset_text = (char *)xrealloc(charset_text, charset_leng+D);
 	}
     }
 
@@ -409,7 +409,7 @@ word_t *text_decode(word_t *w)
 #ifndef	DISABLE_UNICODE
     if (encoding == E_UNICODE) {
 	if (buf == NULL)
-	    buf = buff_new(xmalloc(max+D), 0, max);
+	    buf = buff_new((byte *)xmalloc(max+D), 0, max);
 	r = &buf->t;				/* Use buf to return unicode result */
 
 	buf->t.leng = 0;

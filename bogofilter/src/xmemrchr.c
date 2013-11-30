@@ -10,7 +10,7 @@
 #include "xmemrchr.h"
 
 void *xmemrchr(void *v, byte b, size_t len) {
-    byte *s = v;
+    byte *s = (byte *)v;
     byte *e = s + len;
     byte *a = NULL;
     while (s < e) {

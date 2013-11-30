@@ -83,7 +83,7 @@ static int inv_terse_mode = 0;
 
 static void display_tag_array(const char *label, FIELD *array);
 
-static void process_arglist(int argc, char **argv, priority_t precedence, int pass);
+static void process_arglist(int argc, char **argv, priority_t precedence, enum arg_pass_e pass);
 static bool get_parsed_value(char **arg, double *parm);
 static void comma_parse(char opt, const char *arg, double *parm1, double *parm2, double *parm3);
 static bool token_count_conflict(void);
@@ -161,8 +161,9 @@ static bool get_bool(const char *name, const char *arg)
 
 static bool get_double(const char *name, const char *arg, double *d)
 {
-    remove_comment(arg);
-    if (!xatof(d, arg))
+    char *s = xstrdup(arg);
+    remove_comment(s);
+    if (!xatof(d, s))
 	return false;
     if (DEBUG_CONFIG(2))
 	fprintf(dbgout, "%s -> %f\n", name, *d);
@@ -250,10 +251,10 @@ static run_t check_run_type(run_t add_type, run_t conflict)
 	(void)fprintf(stderr, "Error:  Invalid combination of options.\n");
 	exit(EX_ERROR);
     }
-    return (run_type | add_type);
+    return (run_t)(run_type | add_type);
 }
 
-static int validate_args(void)
+static ex_t validate_args(void)
 {
 /*  flags '-s', '-n', '-S', and '-N' are mutually exclusive with
     flags '-p', '-u', '-e', and '-R'. */
@@ -418,7 +419,7 @@ static void print_version(void)
  ** there are leftover command line arguments.
  */
 
-static void process_arglist(int argc, char **argv, priority_t precedence, int pass)
+static void process_arglist(int argc, char **argv, priority_t precedence, enum arg_pass_e pass)
 {
     ex_t exitcode;
 
@@ -558,11 +559,11 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 	break;
 
     case 'n':
-	run_type = check_run_type(REG_GOOD, REG_SPAM | UNREG_GOOD);
+	run_type = check_run_type(REG_GOOD, (run_t)(REG_SPAM | UNREG_GOOD));
 	break;
 
     case 'N':
-	run_type = check_run_type(UNREG_GOOD, REG_GOOD | UNREG_SPAM);
+	run_type = check_run_type(UNREG_GOOD, (run_t)(REG_GOOD | UNREG_SPAM));
 	break;
 
     case 'O':
@@ -588,15 +589,15 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 	break;
 
     case 's':
-	run_type = check_run_type(REG_SPAM, REG_GOOD | UNREG_SPAM);
+	run_type = check_run_type(REG_SPAM, (run_t)(REG_GOOD | UNREG_SPAM));
 	break;
 
     case 'S':
-	run_type = check_run_type(UNREG_SPAM, REG_SPAM | UNREG_GOOD);
+	run_type = check_run_type(UNREG_SPAM, (run_t)(REG_SPAM | UNREG_GOOD));
 	break;
 
     case 'u':
-	run_type |= RUN_UPDATE;
+	run_type = (run_t)(run_type | RUN_UPDATE);
 	break;
 	
     case 'U':

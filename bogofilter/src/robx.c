@@ -57,16 +57,16 @@ static void robx_accum(rhd_t *rh,
     }
 }
 
-static int robx_hook(word_t *key, dsv_t *data, 
+static ex_t robx_hook(word_t *key, dsv_t *data, 
 		     void *userdata)
 {
-    struct robhook_data *rh = userdata;
+    struct robhook_data *rh = (struct robhook_data *)userdata;
 
     /* ignore system meta-data */
     if (*key->u.text != '.')
 	robx_accum(rh, key, data);
 
-    return 0;
+    return EX_OK;
 }
 
 /** returns negative for failure.

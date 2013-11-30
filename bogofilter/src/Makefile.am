@@ -269,9 +269,10 @@ version.c: version.sh ../configure.ac Makefile.am	\
 	$(SHELL) $(srcdir)/version.sh $(top_srcdir) >"$@.new" && mv -f "$@.new" "$@" \
 	    || { rm -f "$@" ; false ; }
 #
-directories.c: ../config.status
+directories.c: ../config.status Makefile
 	rm -f $@
-	echo "const char *const system_config_file = \"$(SYSCONFDIR)/bogofilter.cf\";" >"$@" \
+	echo "#include \"globals.h\"" >"$@" && \
+	echo "const char *const system_config_file = \"$(SYSCONFDIR)/bogofilter.cf\";" >>"$@" \
 	    || { rm -f "$@" ; false ; }
 #
 $(datastore_OBJECT): Makefile $(datastore_SOURCE)

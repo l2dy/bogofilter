@@ -214,10 +214,10 @@ static int get_cnt(double fst, double lst, double amt)
 static data_t *seq_by_amt(double fst, double lst, double amt)
 {
     uint i;
-    data_t *val = xcalloc(1, sizeof(data_t));
+    data_t *val = (data_t *)xcalloc(1, sizeof(data_t));
 
     val->cnt = get_cnt(fst, lst, amt);
-    val->data = xcalloc(val->cnt, sizeof(double));
+    val->data = (double *)xcalloc(val->cnt, sizeof(double));
 
     for (i = 0; i < val->cnt; i += 1)
 	val->data[i] = fst + i * amt;
@@ -230,9 +230,9 @@ static data_t *seq_canonical(double fst, double amt)
     uint c;
     float v;
     uint i = 0;
-    data_t *val = xcalloc(1, sizeof(data_t));
+    data_t *val = (data_t *)xcalloc(1, sizeof(data_t));
 
-    val->data = xcalloc(5, sizeof(double));
+    val->data = (double *)xcalloc(5, sizeof(double));
 
     fst = max(fst, RX_MIN);
     fst = min(fst, RX_MAX);
@@ -249,10 +249,10 @@ static data_t *seq_canonical(double fst, double amt)
 static data_t *seq_by_pow(double fst, double lst, double amt)
 {
     uint i;
-    data_t *val = xcalloc(1, sizeof(data_t));
+    data_t *val = (data_t *)xcalloc(1, sizeof(data_t));
 
     val->cnt = get_cnt(fst, lst, amt);
-    val->data = xcalloc(val->cnt, sizeof(double));
+    val->data = (double *)xcalloc(val->cnt, sizeof(double));
 
     for (i = 0; i < val->cnt; i += 1)
 	val->data[i] = pow(10, fst + i * amt);
@@ -677,10 +677,9 @@ static void load_wordlist(ds_foreach_t *hook, void *userdata)
     return;
 }
 
-static int load_hook(word_t *key, dsv_t *data, void *userdata)
-/* returns 0 if ok, 1 if not ok */
+static ex_t load_hook(word_t *key, dsv_t *data, void *userdata)
 {
-    wordprop_t *tokenprop = wordhash_insert(train, key, sizeof(wordprop_t), &wordprop_init);
+    wordprop_t *tokenprop = (wordprop_t *)wordhash_insert(train, key, sizeof(wordprop_t), &wordprop_init);
 
     (void) userdata;	/* quiet compiler complaint */
 
@@ -692,14 +691,14 @@ static int load_hook(word_t *key, dsv_t *data, void *userdata)
 
     if (word_cmps(key, ".ENCODING") == 0) {
 	if (encoding == E_UNKNOWN)
-	    encoding = data->spamcount;
+	    encoding = (e_enc)data->spamcount; /* FIXME: is this cast correct? */
 	if (encoding != data->spamcount) {
 	    fprintf(stderr, "Can't mix database encodings, i.e. utf-8 and any other.\n");
 	    exit(EX_ERROR);
 	}
     }
 
-    return 0;
+    return EX_OK;
 }
 
 static void set_train_msg_counts(wordhash_t *wh)
@@ -728,13 +727,13 @@ static void write_msgcount_file(wordhash_t *wh)
 
     print_msgcount_entry(".MSG_COUNT", msgs_bad, msgs_good);
 
-    for (hn = wordhash_first(wh); hn != NULL; hn = wordhash_next(wh)) {
+    for (hn = (hashnode_t *)wordhash_first(wh); hn != NULL; hn = (hashnode_t *)wordhash_next(wh)) {
 	word_t *token = hn->key;
 	wordprop_t *wp = (wordprop_t *) hn->data;
 	wordcnts_t *cnts = &wp->cnts;
 
 	if (cnts->good == 0 && cnts->bad == 0) {
-	    wp = wordhash_search(train, token, 0);
+	    wp = (wordprop_t *)wordhash_search(train, token, 0);
 	    if (wp) {
 		cnts->good = wp->cnts.good;
 		cnts->bad  = wp->cnts.bad;
@@ -803,7 +802,7 @@ static uint filelist_read(int mode, flhead_t *list)
     uint count = 0;
     flitem_t *item;
     mlhead_t *msgs = (mode == REG_GOOD) ? ns_msglists->msgs : sp_msglists->msgs;
-    run_type = mode;
+    run_type = (run_t)mode;
 
     for (item = list->head; item != NULL; item = item->next) {
 	lexer = NULL;
@@ -1165,7 +1164,7 @@ static double get_robx(void)
 
 static result_t *results_sort(uint r_count, result_t *results)
 {
-    result_t *ans = xcalloc(r_count, sizeof(result_t));
+    result_t *ans = (result_t *)xcalloc(r_count, sizeof(result_t));
     memcpy(ans, results, r_count * sizeof(result_t));
     qsort(ans, r_count, sizeof(result_t), compare_results);
     return ans;
@@ -1577,8 +1576,8 @@ static rc_t bogotune(void)
     check_percent = CHECK_PCT;	/* for checking low scoring spam
 				** and high scoring non-spam */
 
-    ns_scores = xcalloc(ns_cnt, sizeof(double));
-    sp_scores = xcalloc(sp_cnt, sizeof(double));
+    ns_scores = (double *)xcalloc(ns_cnt, sizeof(double));
+    sp_scores = (double *)xcalloc(sp_cnt, sizeof(double));
 
     robs = DEFAULT_ROBS;
     robx = DEFAULT_ROBX;

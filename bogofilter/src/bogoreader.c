@@ -185,7 +185,7 @@ static st_t ismaildir(const char *dir) {
 
     r = isdir(dir);
     if (r != IS_DIR) return r;
-    x = xmalloc((l = strlen(dir)) + maxlen /* append */ + 1 /* NUL */);
+    x = (char *)xmalloc((l = strlen(dir)) + maxlen /* append */ + 1 /* NUL */);
     memcpy(x, dir, l);
     for (y = maildir_subs; *y; y++) {
 	strlcpy(x + l, *y, maxlen + 1);
@@ -368,7 +368,7 @@ static bool dir_next_mail(void)
 		if (*maildir_sub == NULL)
 		    return false; /* IMPORTANT for termination */
 		siz = strlen(dir_name) + 4 + 1;
-		x = xmalloc(siz);
+		x = (char *)xmalloc(siz);
 		strlcpy(x, dir_name, siz);
 		strlcat(x, *(maildir_sub++), siz);
 	    }

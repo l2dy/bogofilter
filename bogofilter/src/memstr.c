@@ -14,7 +14,7 @@
  */
 void *memstr(void *hay, size_t n, const char *needle)
 {
-    unsigned char *haystack = hay;
+    unsigned char *haystack = (unsigned char *)hay;
     size_t l = strlen(needle);
 
     while (n >= l) {

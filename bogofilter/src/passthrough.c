@@ -72,7 +72,7 @@ static bool is_hb_delim(const char *line, size_t len, bool strict_body)
 }
 
 static int read_mem(char **out, void *in) {
-    textdata_t **text = in;
+    textdata_t **text = (textdata_t **)in;
     if ((*text)->next) {
 	int s = (*text)->size;
 	*out = (char *)(*text)->data;

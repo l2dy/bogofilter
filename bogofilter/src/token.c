@@ -85,10 +85,10 @@ static void init_token_array(void)
     byte *text;
     word_t *words;
 		    
-    p_multi_words = calloc( max_token_len, sizeof(word_t) );
-    p_multi_buff  = malloc( max_multi_token_len+D );
-    p_multi_text  = calloc( max_token_len+1+D, multi_token_count );
-    w_token_array = calloc( multi_token_count, sizeof(*w_token_array) );
+    p_multi_words = (word_t *)calloc( max_token_len, sizeof(word_t) );
+    p_multi_buff  = (byte *)malloc( max_multi_token_len+D );
+    p_multi_text  = (byte *)calloc( max_token_len+1+D, multi_token_count );
+    w_token_array = (word_t **)calloc( multi_token_count, sizeof(*w_token_array) );
 
     text = p_multi_text;
     words = p_multi_words;
@@ -187,7 +187,7 @@ token_t parse_new_token(word_t *token)
     /* If saved IPADDR, truncate last octet */
     if ( block_on_subnets && save_class == IPADDR )
     {
-	byte *t = xmemrchr(ipsave->u.text, '.', ipsave->leng);
+	byte *t = (byte *)xmemrchr(ipsave->u.text, '.', ipsave->leng);
 	if (t == NULL)
 	    save_class = NONE;
 	else

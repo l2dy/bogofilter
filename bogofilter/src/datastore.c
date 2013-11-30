@@ -97,7 +97,7 @@ void set_today(void)
 static void convert_external_to_internal(dsh_t *dsh, dbv_t *ex_data, dsv_t *in_data)
 {
     size_t i = 0;
-    uint32_t *cv = ex_data->data;
+    uint32_t *cv = (uint32_t *)ex_data->data;
 
     in_data->spamcount = !dsh->is_swapped ? cv[i++] : swap_32bit(cv[i++]);
 
@@ -117,7 +117,7 @@ static void convert_external_to_internal(dsh_t *dsh, dbv_t *ex_data, dsv_t *in_d
 static void convert_internal_to_external(dsh_t *dsh, dsv_t *in_data, dbv_t *ex_data)
 {
     size_t i = 0;
-    uint32_t *cv = ex_data->data;
+    uint32_t *cv = (uint32_t *)ex_data->data;
 
     /* Writing requires extra magic since the counts may need to be
     ** separated for output to different wordlists.
@@ -136,7 +136,7 @@ static void convert_internal_to_external(dsh_t *dsh, dsv_t *in_data, dbv_t *ex_d
 
 dsh_t *dsh_init(void *dbh)		/* database handle from db_open() */
 {
-    dsh_t *val = xmalloc(sizeof(*val));
+    dsh_t *val = (dsh_t *)xmalloc(sizeof(*val));
     val->dbh = dbh;
     val->is_swapped = db_is_swapped(dbh);
     return val;
@@ -144,7 +144,7 @@ dsh_t *dsh_init(void *dbh)		/* database handle from db_open() */
 
 void dsh_free(void *vhandle)
 {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
     xfree(dsh);
     return;
 }
@@ -180,21 +180,21 @@ void *ds_open(void *dbe, bfpath *bfp, dbmode_t open_mode)
 
 void ds_close(/*@only@*/ void *vhandle)
 {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
     db_close(dsh->dbh);
     xfree(dsh);
 }
 
 void ds_flush(void *vhandle)
 {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
     db_flush(dsh->dbh);
 }
 
 int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 {
     int ret;
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
     dbv_t ex_key;
     dbv_t ex_data;
     uint32_t cv[3];
@@ -254,7 +254,7 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 int ds_write(void *vhandle, const word_t *word, dsv_t *val)
 {
     int ret = 0;
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
     dbv_t ex_key;
     dbv_t ex_data;
     uint32_t cv[3];
@@ -288,7 +288,7 @@ int ds_write(void *vhandle, const word_t *word, dsv_t *val)
 
 int ds_delete(void *vhandle, const word_t *word)
 {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
     int ret;
     dbv_t ex_key;
 
@@ -302,7 +302,7 @@ int ds_delete(void *vhandle, const word_t *word)
 }
 
 int ds_txn_begin(void *vhandle) {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
     if (dsm->dsm_begin == NULL)
 	return 0;
     else
@@ -310,7 +310,7 @@ int ds_txn_begin(void *vhandle) {
 }
 
 int ds_txn_abort(void *vhandle) {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
     if (dsm->dsm_abort == NULL)
 	return 0;
     else
@@ -318,7 +318,7 @@ int ds_txn_abort(void *vhandle) {
 }
 
 int ds_txn_commit(void *vhandle) {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
     if (dsm->dsm_commit == NULL)
 	return 0;
     else
@@ -338,10 +338,10 @@ static ex_t ds_hook(dbv_t *ex_key,
     ex_t ret;
     word_t w_key;
     dsv_t in_data;
-    ds_userdata_t *ds_data = userdata;
+    ds_userdata_t *ds_data = (ds_userdata_t *)userdata;
     dsh_t *dsh = ds_data->dsh;
 
-    w_key.u.text = ex_key->data;
+    w_key.u.text = (byte *)ex_key->data;
     w_key.leng = ex_key->leng;
 
     memset(&in_data, 0, sizeof(in_data));
@@ -354,7 +354,7 @@ static ex_t ds_hook(dbv_t *ex_key,
 
 ex_t ds_foreach(void *vhandle, ds_foreach_t *hook, void *userdata)
 {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
     ex_t ret;
     ds_userdata_t ds_data;
     ds_data.hook = hook;
@@ -428,7 +428,7 @@ void *ds_init(bfpath *bfp)
 void ds_cleanup(void *dbe)
 {
     if (dsm->dsm_cleanup != NULL)
-	dsm->dsm_cleanup(dbe);
+	dsm->dsm_cleanup((dbe_t *)dbe);
     xfree(msg_count_tok);
     xfree(wordlist_version_tok);
     msg_count_tok = NULL;
@@ -440,7 +440,7 @@ void ds_cleanup(void *dbe)
 */
 int ds_get_msgcounts(void *vhandle, dsv_t *val)
 {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
 
     return ds_read(dsh, msg_count_tok, val);
 }
@@ -450,7 +450,7 @@ int ds_get_msgcounts(void *vhandle, dsv_t *val)
 */
 int  ds_set_msgcounts(void *vhandle, dsv_t *val)
 {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
 
     val->date = today;
 
@@ -459,7 +459,7 @@ int  ds_set_msgcounts(void *vhandle, dsv_t *val)
 
 void *ds_get_dbenv(void *vhandle)
 {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
     return db_get_env(dsh->dbh);
 }
 
@@ -468,7 +468,7 @@ void *ds_get_dbenv(void *vhandle)
 */
 int ds_get_wordlist_encoding(void *vhandle, dsv_t *val)
 {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
 
     return ds_read(dsh, wordlist_encoding_tok, val);
 }
@@ -478,7 +478,7 @@ int ds_get_wordlist_encoding(void *vhandle, dsv_t *val)
 */
 int ds_set_wordlist_encoding(void *vhandle, int enc)
 {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
     dsv_t  val;
 
     val.count[0] = enc;
@@ -493,7 +493,7 @@ int ds_set_wordlist_encoding(void *vhandle, int enc)
 */
 int ds_get_wordlist_version(void *vhandle, dsv_t *val)
 {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
 
     return ds_read(dsh, wordlist_version_tok, val);
 }
@@ -503,7 +503,7 @@ int ds_get_wordlist_version(void *vhandle, dsv_t *val)
 */
 int ds_set_wordlist_version(void *vhandle, dsv_t *val)
 {
-    dsh_t *dsh = vhandle;
+    dsh_t *dsh = (dsh_t *)vhandle;
     dsv_t  tmp;
 
     if (val == NULL)
@@ -582,7 +582,7 @@ u_int32_t ds_pagesize(bfpath *bfp)
 ex_t ds_list_logfiles(bfpath *bfp, int argc, char **argv)
 {
     if (dsm->dsm_list_logfiles == NULL)
-	return 0;
+	return EX_OK;
     else
 	return dsm->dsm_list_logfiles(bfp, argc, argv);
 }

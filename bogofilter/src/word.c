@@ -23,7 +23,7 @@ word_t  *word_news(const char *cstring)
 word_t *word_new(const byte *text, uint len)
 {
     /* to lessen malloc/free calls, allocate struct and data in one block */
-    word_t *self = xmalloc(sizeof(word_t)+len+1);
+    word_t *self = (word_t *)xmalloc(sizeof(word_t)+len+1);
     self->leng = len;
     self->u.text = (byte *)((char *)self+sizeof(word_t));
     if (text != NULL) {

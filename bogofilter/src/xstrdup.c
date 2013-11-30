@@ -11,7 +11,7 @@
 
 char *xstrdup(const char *s) {
     size_t l = strlen(s) + 1;
-    char *t = xmalloc(l);
+    char *t = (char *)xmalloc(l);
     memcpy(t, s, l);
     return t;
 }

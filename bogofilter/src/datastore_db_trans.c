@@ -238,7 +238,7 @@ static int dbx_begin(void *vhandle)
     DB_TXN *t;
     int ret;
 
-    dbh_t *dbh = vhandle;
+    dbh_t *dbh = (dbh_t *)vhandle;
     dbe_t *env = dbh->dbenv;
 
     assert(dbh);
@@ -266,7 +266,7 @@ static int dbx_begin(void *vhandle)
 static int dbx_abort(void *vhandle)
 {
     int ret;
-    dbh_t *dbh = vhandle;
+    dbh_t *dbh = (dbh_t *)vhandle;
     DB_TXN *t;
 
     assert(dbh);
@@ -300,7 +300,7 @@ static int dbx_abort(void *vhandle)
 static int dbx_commit(void *vhandle)
 {
     int ret;
-    dbh_t *dbh = vhandle;
+    dbh_t *dbh = (dbh_t *)vhandle;
     DB_TXN *t;
     u_int32_t id;
 
@@ -419,7 +419,7 @@ static int bf_dbenv_create(DB_ENV **env)
 
 static void dbe_config(void *vhandle)
 {
-    dbe_t *env = vhandle;
+    dbe_t *env = (dbe_t *)vhandle;
     int ret = 0;
     u_int32_t logsize = 1048576;    /* 1 MByte (default in BDB 10 MByte) */
 
@@ -438,7 +438,7 @@ static void dbe_config(void *vhandle)
 static dbe_t *dbx_init(bfpath *bfp)
 {
     u_int32_t flags = 0;
-    dbe_t *env = xcalloc(1, sizeof(dbe_t));
+    dbe_t *env = (dbe_t *)xcalloc(1, sizeof(dbe_t));
 
     env->magic = MAGIC_DBE;	    /* poor man's type checking */
     env->directory = xstrdup(bfp->dirname);
@@ -588,7 +588,7 @@ static int dbx_sync(DB_ENV *dbe, int ret)
 
 ex_t dbx_recover(bfpath *bfp, bool catastrophic, bool force)
 {
-    dbe_t *env = xcalloc(1, sizeof(dbe_t));
+    dbe_t *env = (dbe_t *)xcalloc(1, sizeof(dbe_t));
 
     /* set exclusive/write lock for recovery */
     while ((force || needs_recovery())
@@ -640,7 +640,7 @@ static ex_t dbx_common_close(DB_ENV *dbe, bfpath *bfp)
 static ex_t dbe_env_purgelogs(DB_ENV *dbe)
 {
     char **i, **list;
-    ex_t e;
+    int e;
 
     /* figure redundant log files and nuke them */
     e = BF_LOG_ARCHIVE(dbe, &list, DB_ARCH_ABS);
@@ -709,9 +709,9 @@ ex_t dbx_checkpoint(bfpath *bfp)
 
 static ex_t i_purgelogs(DB_ENV *dbe)
 {
-    int e = dbe_env_checkpoint(dbe);
+    ex_t e = dbe_env_checkpoint(dbe);
 
-    if (e != 0)
+    if (e != EX_OK)
 	return e;
     else
 	return dbe_env_purgelogs(dbe);
@@ -974,11 +974,11 @@ static ex_t dbx_list_logfiles(bfpath *bfp, int argc, char **argv)
 	    flags |= DB_ARCH_ABS;
     }
 
-    e = BF_LOG_ARCHIVE(dbe, &list, flags);
-    if (e != 0) {
+    j = BF_LOG_ARCHIVE(dbe, &list, flags);
+    if (j != 0) {
 	print_error(__FILE__, __LINE__,
 		"DB_ENV->log_archive failed: %s",
-		db_strerror(e));
+		db_strerror(j));
 	exit(EX_ERROR);
     }
 

@@ -55,7 +55,7 @@ static void *list_searchinsert(bfpath *bfp)
     }
 
     l = strlen(bfp->dirname) + 1;
-    n = xmalloc(sizeof(struct envnode) + l);
+    n = (struct envnode *)xmalloc(sizeof(struct envnode) + l);
 
     n->dbe = ds_init(bfp);
 
@@ -87,7 +87,7 @@ void begin_wordlist(wordlist_t *list)
 	}
 	switch (ds_get_wordlist_encoding(list->dsh, &val)) {
 	    case 0:		/* found */
-		list->encoding = val.spamcount;
+		list->encoding = (e_enc)val.spamcount;	/* FIXME: is the cast correct? */
 		break;
 	    case 1:		/* not found */
 		break;
@@ -117,7 +117,7 @@ static bool open_wordlist(wordlist_t *list, dbmode_t mode)
     if (dbe == NULL)
 	exit(EX_ERROR);
 
-    list->dsh = ds_open(dbe, bfp, mode); /* FIXME -- euh, what is here to fix? */
+    list->dsh = (dsh_t *)ds_open(dbe, bfp, mode); /* FIXME -- euh, what is here to fix? */
 
     if (list->dsh == NULL) {
 	int err = errno;

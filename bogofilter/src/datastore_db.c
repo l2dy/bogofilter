@@ -232,7 +232,7 @@ static int DB_SET_FLAGS(DB *db, u_int32_t flags)
 
 void *db_get_env(void *vhandle)
 {
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
 
     assert(handle->magic == MAGIC_DBH);
 
@@ -254,7 +254,7 @@ int subr_db_lock(int fd, int cmd, short int type)
 int db_lock(void *vhandle, int open_mode)
 {
     int e = 0;
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
 
     /* try fcntl lock */
     handle->locked = false;
@@ -301,7 +301,7 @@ static dbh_t *dbh_init(bfpath *bfp)
 {
     dbh_t *handle;
 
-    handle = xmalloc(sizeof(dbh_t));
+    handle = (dbh_t *)xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
 
     handle->dsm = dsm;
@@ -405,7 +405,7 @@ void *dbe_init(bfpath *bfp)
 /* Returns is_swapped flag */
 bool db_is_swapped(void *vhandle)
 {
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
 
     assert(handle->magic == MAGIC_DBH);
 
@@ -416,7 +416,7 @@ bool db_is_swapped(void *vhandle)
 /* Returns created flag */
 bool db_created(void *vhandle)
 {
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
 
     assert(handle->magic == MAGIC_DBH);
 
@@ -565,7 +565,7 @@ void *db_open(void *vhandle,
     int retries = 2; /* how often do we retry to open after ENOENT+EEXIST
 			races? 2 is sufficient unless the kernel or
 			BerkeleyDB are buggy. */
-    dbe_t *env = vhandle;
+    dbe_t *env = (dbe_t *)vhandle;
 
     dbh_t *handle = NULL;
     uint32_t opt_flags = (open_mode == DS_READ) ? DB_RDONLY : 0;
@@ -744,7 +744,7 @@ retry_db_open:
 int db_delete(void *vhandle, const dbv_t *token)
 {
     int ret = 0;
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
     DB *dbp = handle->dbp;
 
     DBT db_key;
@@ -780,7 +780,7 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, /*@out@*/ dbv_t *val)
     DBT db_key;
     DBT db_data;
 
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
     DB *dbp = handle->dbp;
 
     assert(handle);
@@ -837,7 +837,7 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *val)
     DBT db_key;
     DBT db_data;
 
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
     DB *dbp = handle->dbp;
 
     assert(handle->magic == MAGIC_DBH);
@@ -897,7 +897,7 @@ static uint32_t db_get_flags(DB *dbp, uint32_t test)
 void db_close(void *vhandle)
 {
     int ret;
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
     DB *dbp = handle->dbp;
     /* This is _ONLY_ safe as long as we're logging TXNs */
     uint32_t flag = (eTransaction == T_ENABLED) ? DB_NOSYNC : 0;
@@ -947,7 +947,7 @@ void db_close(void *vhandle)
 void db_flush(void *vhandle)
 {
     int ret;
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
     DB *dbp = handle->dbp;
 
     assert(handle->magic == MAGIC_DBH);
@@ -975,10 +975,11 @@ void db_flush(void *vhandle)
 
 ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 {
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
     DB *dbp = handle->dbp;
 
     ex_t ret = EX_OK;
+    int rv;
     bool eflag = false;
 
     DBC dbc;
@@ -993,20 +994,19 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     memset(&key, 0, sizeof(key));
     memset(&data, 0, sizeof(data));
 
-    ret = dbp->cursor(dbp, handle->txn, &dbcp, 0);
-    if (ret) {
+    if (dbp->cursor(dbp, handle->txn, &dbcp, 0)) {
 	print_error(__FILE__, __LINE__, "(cursor): %s", handle->path);
 	return EX_ERROR;
     }
 
 #if DB_AT_LEAST(4,6)
-    for (ret =  dbcp->get(dbcp, &key, &data, DB_FIRST);
-	 ret == 0;
-	 ret =  dbcp->get(dbcp, &key, &data, DB_NEXT))
+    for (rv =  dbcp->get(dbcp, &key, &data, DB_FIRST);
+	 rv == 0;
+	 rv =  dbcp->get(dbcp, &key, &data, DB_NEXT))
 #else
-    for (ret =  dbcp->c_get(dbcp, &key, &data, DB_FIRST);
-	 ret == 0;
-	 ret =  dbcp->c_get(dbcp, &key, &data, DB_NEXT))
+    for (rv =  dbcp->c_get(dbcp, &key, &data, DB_FIRST);
+	 rv == 0;
+	 rv =  dbcp->c_get(dbcp, &key, &data, DB_NEXT))
 #endif
     {
 	int rc;
@@ -1031,7 +1031,7 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 	    break;
     }
 
-    switch (ret) {
+    switch (rv) {
     case 0:
     case DB_NOTFOUND:
 	/* OK */
@@ -1044,9 +1044,9 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     }
 
 #if DB_AT_LEAST(4,6)
-    if ((ret = dbcp->close(dbcp)))
+    if ((rv = dbcp->close(dbcp)))
 #else
-    if ((ret = dbcp->c_close(dbcp)))
+    if ((rv = dbcp->c_close(dbcp)))
 #endif
     {
 	print_error(__FILE__, __LINE__, "(c_close): %s", db_strerror(ret));
@@ -1193,5 +1193,5 @@ ex_t db_verify(bfpath *bfp)
     if (e == 0 && verbose)
 	printf("%s OK.\n", bfp->filename);
 
-    return e;
+    return e ? EX_ERROR : EX_OK;
 }

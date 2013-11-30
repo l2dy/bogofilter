@@ -161,7 +161,7 @@ struct userdata_t {
     ta_t *transaction;
 };
 
-static int maintain_hook(word_t *w_key, dsv_t *in_val,
+static ex_t maintain_hook(word_t *w_key, dsv_t *in_val,
 	void *userdata)
 {
     size_t len;
@@ -178,7 +178,7 @@ static int maintain_hook(word_t *w_key, dsv_t *in_val,
 	return EX_OK;
 
     if (discard_token(&token, in_val)) {
-	int ret = ta_delete(transaction, vhandle, &token);
+	ex_t ret = ta_delete(transaction, vhandle, &token) ? EX_ERROR : EX_OK;
 	if (DEBUG_DATABASE(0))
 	    fprintf(dbgout, "deleting '%.*s'\n", (int)min(INT_MAX, token.leng), (char *)token.u.text);
 	return ret;
@@ -291,7 +291,7 @@ static ex_t maintain_wordlist(void *database)
 	int rc = ds_get_wordlist_encoding(database, &val);
 	new_encoding = encoding;
 	if (rc == 0)
-	    old_encoding = val.spamcount;	/* found */
+	    old_encoding = (e_enc)val.spamcount;	/* found | FIXME: is the cast correct? */
 	else
 	    old_encoding = E_RAW;		/* not found */
 	if (old_encoding != new_encoding) {
@@ -305,7 +305,7 @@ static ex_t maintain_wordlist(void *database)
 	ret = EX_ERROR;
 
     if (upgrade_wordlist_version) {
-	done = check_wordlist_version(database);
+	done = check_wordlist_version((dsh_t *)database);
 	if (!done)
 	    fprintf(dbgout, "Upgrading wordlist.\n");
 	else
@@ -353,7 +353,7 @@ ex_t maintain_wordlist_file(bfpath *bfp)
 
     dbe = ds_init(bfp);
 
-    dsh = ds_open(dbe, bfp, DS_WRITE);
+    dsh = (dsh_t *)ds_open(dbe, bfp, DS_WRITE);
 
     if (dsh == NULL)
 	return EX_ERROR;
