@@ -57,15 +57,17 @@
 		| <a
 		    href="http://fedoraproject.org/wiki/Releases#Current_Supported_Releases">Supported
 		    Releases</a></td></tr>
-                <tr><td>Fedora 19 (Schr&ouml;dinger's&nbsp;Cat)</td>   <td>1.2.3</td>
+                <tr><td>Fedora 20 (Heisenbug)</td> <td>1.2.4</td>
 		    <td><div align="center">BerkeleyDB 4.8</div></td></tr>
-                <tr><td>Fedora 18 (Spherical&nbsp;Cow)</td>   <td>1.2.3</td>
+                <tr><td>Fedora 19 (Schr&ouml;dinger's&nbsp;Cat)</td>   <td>1.2.3</td>
 		    <td><div align="center">BerkeleyDB 4.8</div></td></tr>
 		<tr><td colspan="3"><a href="http://www.freebsd.org/"
 			    target="_blank"><strong>FreeBSD</strong></a>
 			| <a href="http://www.freebsd.org/security/#sup"
 			    target="_blank">FreeBSD support periods</a></td></tr>
                 <tr> <td>FreeBSD ports</td> <td>See <a href="http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
+                <tr> <td>FreeBSD 10.0-RELEASE</td> <td>1.2.4</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
+                <tr> <td>FreeBSD 9.2-RELEASE</td> <td>1.2.4</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 9.1-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 8.4-RELEASE</td> <td>1.2.3</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
                 <tr> <td>FreeBSD 8.3-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
@@ -98,11 +100,12 @@
 			    target="_blank"><strong>openSUSE.org</strong></a>
 		| <a target="_blank"
 		    href="http://en.opensuse.org/Lifetime">Lifetime</a></td></tr>
+		<tr><td>openSUSE 13.1</td> <td>1.2.4</td> <td><div
+			    align="center">BerkeleyDB 4.8</div></td></tr>
 		<tr><td>openSUSE 12.3</td> <td>1.2.3</td> <td><div align="center">BerkeleyDB 4.8</div></td></tr>
-		<tr><td>openSUSE 12.2</td> <td>1.2.3</td> <td><div align="center">BerkeleyDB 4.8</div></td></tr>
 
 		<tr><td colspan="3"><a href="http://www.ubuntu.com/" target="_blank"><strong>Ubuntu Linux</strong></a></td></tr>
-		<tr><td>Ubuntu 13.04 (Raring Ringtail)</td>   <td>1.2.2</td> <td><div align="center">BerkeleyDB 4.8, in universe: SQLite3</div></td></tr>
+		<tr><td>Ubuntu 13.10 (Saucy Salamander)</td>   <td>1.2.4</td> <td><div align="center">BerkeleyDB 4.8, in universe: SQLite3</div></td></tr>
 		<tr><td>Ubuntu 12.10 (Quantal Quetzal)</td>   <td>1.2.2</td> <td><div align="center">BerkeleyDB 4.8, in universe: SQLite3</div></td></tr>
 		<tr><td>Ubuntu 12.04 LTS (Precise Pangolin)</td>   <td>1.2.2</td> <td><div align="center">BerkeleyDB 4.8, in universe: SQLite3</div></td></tr>
 		<tr><td>Ubuntu 10.04 LTS (Lucid Lynx)</td>   <td>1.2.1</td> <td><div align="center">BerkeleyDB 4.7, in universe: SQLite3</div></td></tr>
