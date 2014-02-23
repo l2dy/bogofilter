@@ -53,7 +53,7 @@
           </tr>
         </table>
         <br>
-        <table width="90%" border=0 align="center" cellpadding=10 class="central_table">
+<!--        <table width="90%" border=0 align="center" cellpadding=10 class="central_table">
             <tr bgcolor="#FFFF00"><td width="100%" valign="top" align="left">
 		    <strong>Note that the http://[www.]bogofilter.org/
 			web site and the mailing lists hosted under
@@ -64,6 +64,7 @@
 		    line.</td></tr>
 	    </table>
         <br>
+	    -->
         <table width="90%" border=0 align="center" cellpadding=10 class="central_table">
           <tr bgcolor="#FFFFFF">
             <td align="left" width="169">Download bogofilter</td>
