@@ -1,0 +1,19 @@
+#! /bin/sh
+
+. ${srcdir:=.}/t.frame
+
+# t.passthrough-hb
+#
+#	test for correct passthrough of misdeclared MIME parts
+#	test case provided by Julius Plenz, July 2014.
+
+gzip -c -d <"$srcdir/inputs/t.passthrough-truncation-in.gz" >"$TMPDIR/input"
+$BOGOFILTER -e -p -C < "$TMPDIR/input" \
+| $GREP -v "^X-Bogosity: Unsure," > "$TMPDIR/output"
+
+if  [ $verbose -eq 0 ]; then
+    cmp "$TMPDIR/input" "$TMPDIR/output"
+else
+    set +e
+    diff $DIFF_BRIEF "$TMPDIR/input" "$TMPDIR/output"
+fi

@@ -15,6 +15,13 @@
 
 -------------------------------------------------------------------------------
 
+	2014-07-10
+
+	* Take patch from Julius Plenz to fix a bug in the charset converter
+	  that causes truncation of messages in pass-through mode in rare
+	  circumstances, for instance, if binary data is misdeclared as
+	  text/html.  Also add his test case, t.passthrough-truncation.
+
 	2013-11-30
 
 	* Updated autoconf/automake stuff so that tests work properly with

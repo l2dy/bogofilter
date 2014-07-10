@@ -220,15 +220,25 @@ static int get_decoded_line(buff_t *buff)
 
 #ifndef	DISABLE_UNICODE
     if (encoding == E_UNICODE &&
-	!msg_state->mime_dont_decode)
+	!msg_state->mime_dont_decode &&
+        count > 0)
     {
 	iconvert(linebuff, buff);
+
+	/* If we return count = 0 here, the caller will think we have
+	 * no more bytes left to read, even though before the iconvert
+	 * call we had a positive number of bytes. This *will* lead to
+	 * a message truncation which we try to avoid by simply
+	 * returning the original input buffer (which has positive
+	 * length) instead. */
+	if(buff->t.leng == 0)
+	    memcpy(buff, linebuff, sizeof(*buff));
+
 	/*
 	 * iconvert, treating multi-byte sequences, can shrink or enlarge
 	 * the output compared to its input.  Correct count.
 	 */
-	if (count > 0)
-	    count = buff->t.leng;
+	count = buff->t.leng;
     }
 #endif
 

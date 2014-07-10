@@ -35,7 +35,7 @@ PARSING_TESTS = \
 	t.ignore_spam_header \
 	t.nullstatsprefix \
 	t.integrity t.integrity2 t.integrity3 \
-	t.passthrough-hb \
+	t.passthrough-hb t.passthrough-truncation \
 	t.escaped.html t.escaped.url \
 	t.base64 t.split t.parsing \
 	t.lexer t.lexer.mbx t.lexer.qpcr t.lexer.eoh \
@@ -97,6 +97,7 @@ EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel \
 	inputs/msg.split.dr.0118.base64 \
 	inputs/msg.split.gs.0119.text \
 	inputs/spam.mbx \
+	inputs/t.passthrough-truncation-in.gz \
 	outputs/MH.out \
 	outputs/bogolex.out \
 	outputs/bulkmode.out \
