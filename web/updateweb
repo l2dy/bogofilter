@@ -11,6 +11,7 @@
 
 
 : ${SF_USER:=$(cat ~/.sfuser)}
+: ${ROOTSRV:=$(cat ~/.rootsrv 2>/dev/null)}
 
 set -e
 umask 02
@@ -45,7 +46,7 @@ wait
 
 # check if no uncommitted files are there
 a=$($CMD status -q)
-if test "x$a" != x ; then
+if test "x$a" != x && test -z "$PERMIT_UNCOMMITTED" ; then
 	echo >&2 "### UNCOMMITTED FILES PERSIST IN LOCAL DIRECTORY - COMMIT FIRST ###"
 	echo >&2 "$a"
 	exit 1
@@ -57,7 +58,7 @@ rsync -acvH \
 	--chmod=ug=rwX,o=rX \
 	--delete \
 	--delete-excluded \
-	--exclude .nfs* \
+	--exclude '.nfs*' \
 	--exclude .svn \
 	--exclude README_BEFORE_EDITING \
 	--exclude updateweb \
@@ -65,6 +66,23 @@ rsync -acvH \
 	--exclude '.*.swp' --exclude '#*#' \
 	./  \
 	$SF_USER,bogofilter@web.sourceforge.net:htdocs/
+
+if test -n "$ROOTSRV" ; then
+    echo "==> UPLOADING TO $ROOTSRV"
+    # copy without cruft and internal files
+    rsync -acvH \
+	    --chmod=ug=rwX,o=rX \
+	    --delete \
+	    --delete-excluded \
+	    --exclude '.nfs*' \
+	    --exclude .svn \
+	    --exclude README_BEFORE_EDITING \
+	    --exclude updateweb \
+	    --exclude '*~' --exclude '*.bak' \
+	    --exclude '.*.swp' --exclude '#*#' \
+	    ./  \
+	    $ROOTSRV://usr/local/www/bogofilter.org/
+fi
 
 echo "==> DONE"
 trap 0
