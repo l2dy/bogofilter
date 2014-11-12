@@ -322,7 +322,7 @@
       <tr>
         <td>bogofilter-cvs@lists.sourceforge.net</td>
         <td><a href="https://lists.sourceforge.net/lists/listinfo/bogofilter-cvs">[subscribe]</a>
-        <a href="http://sourceforge.net/mailarchive/forum.php?forum=bogofilter-cvs">[archive]</a></td>
+        <a href="http://sourceforge.net/p/bogofilter/mailman/bogofilter-cvs/">[archive]</a></td>
         <td>Mailing list for announcing code changes to the SVN
         archive. (The CVS name is a leftover from before the migration 
         for our users' convenience.)</td>
@@ -1362,36 +1362,28 @@
     <h3>On FreeBSD</h3>
 
     <p>The FreeBSD ports collection carries the latest stable versions of
-    bogofilter. This approach uses the highly recommended
-    portupgrade and portsnap software packages. To install portupgrade,
-    type (you need to do this only once), as root:</p>
-    <pre>    # pkg_add -r portupgrade</pre>
+    bogofilter to be compiled from source. The bogofilter ports are also auto-built and provided as binary packages for you to install.</p>
 
-    <p>On newer FreeBSD releases, portsnap is in the base system. If
-    typing <kbd>portsnap help</kbd> does not print portsnap's help, you
-    need to install portsnap from ports. To achieve that, type (you need
-    to do this only once), as root:</p>
-    <pre>    # pkg_add -r portsnap</pre>
+    <p>The <a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/pkgng-intro.html">binary
+    packages approach</a> uses default installed software. To install
+    bogofilter from binary package, type, as the privileged user:</p>
+    <pre>    pkg install -y bogofilter</pre>
+
+    <p>The ports from-source approach uses the highly recommended
+    portmaster and portsnap software packages. To install portmaster,
+    type (you need to do this only once), as root:</p>
+    <pre>    pkg install -y portmaster</pre>
 
     <p>To install or upgrade bogofilter, just
     <a
-        href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/portsnap.html">upgrade
+        href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/ports-using.html">upgrade
         your portstree using portsnap</a>,
     then type, as root:</p>
-    <pre>    # portupgrade -N bogofilter</pre>
+    <pre>    portmaster mail/bogofilter</pre>
 
     <p><em>Note: This assumes you are root.</em> If not, read through
     the remainder of this FreeBSD section and then see how you can
     <a href="#build">build</a> if you haven't got root privileges.</p>
-
-    <p>Depending on your system you may have to set some environment
-    variables for the <code>./configure</code> command. Example:</p>
-
-    <pre>    $ env CPPFLAGS=-I/usr/local/include/db3 LIBS=-ldb3 LDFLAGS=-L/usr/local/lib ./configure</pre>
-
-    <p>The actual paths you use here depend on your system and
-    the database versions you have installed. Check and replace
-    accordingly.</p>
 
     <h3>On NetBSD and other systems that use "pkgsrc"</h3>
 
