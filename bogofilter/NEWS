@@ -21,7 +21,7 @@
 	  boundary ended in "--".  The parser would previously never find the
 	  MIME parts because it mistook all boundaries ending in two dashes to
 	  be the final boundary of the multipart, rather than checking if the
-	  two dashes were extra.
+	  two dashes were extra.  Add a test case, t.lexer.boundary--.
 	  Reported by Matt Garretson to the bogofilter mailing list today.
 
 	2014-07-10
