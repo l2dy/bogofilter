@@ -39,6 +39,7 @@ PARSING_TESTS = \
 	t.escaped.html t.escaped.url \
 	t.base64 t.split t.parsing \
 	t.lexer t.lexer.mbx t.lexer.qpcr t.lexer.eoh \
+	  t.lexer.boundary-- \
 	t.spam.header.place \
 	t.block.on.subnets \
 	t.token.count \
