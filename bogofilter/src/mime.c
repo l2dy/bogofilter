@@ -279,6 +279,25 @@ void mime_add_child(mime_t * parent)
     mime_push(parent);
 }
 
+static bool is_final_boundary(
+	const byte	*ins,
+	size_t		 inlen,
+	size_t		 blen
+)
+{
+    if (inlen >= 5
+	    && inlen >= blen + 2
+	    && ins[0] == '-'
+	    && ins[1] == '-'
+	    && ins[blen+2] == '-'
+	    && ins[blen+3] == '-')
+    {
+	return true;
+    }
+    return false;
+}
+
+
 /**
  * Check if the line given in \a boundary is a boundary of one of the
  * outer MIME containers and store the results in \a b.
@@ -301,28 +320,18 @@ static bool get_boundary_props(const word_t * boundary, /**< input line */
 	       (buf[blen - 1] == '\r' || buf[blen - 1] == '\n'))
 	    blen--;
 
-	/* skip initial -- */
-	buf += 2;
-	blen -= 2;
-
-	/* skip and note ending --, if any */
-	if (blen > 2 && buf[blen - 1] == '-' && buf[blen - 2] == '-') {
-	    b->is_final = true;
-	    blen -= 2;
-	} else {
-	    b->is_final = false;
-	}
-
 	/* search stack for matching boundary, in reverse order */
 	for (ptr = mime_stack_bot; ptr != NULL; ptr = ptr->parent)
 	{
 	    if (is_mime_container(ptr)
 		&& ptr->boundary != NULL
-		&& ptr->boundary_len == blen
-		&& (memcmp(ptr->boundary, buf, blen) == 0))
+		&& (ptr->boundary_len + 2 == blen
+		    || ptr->boundary_len + 4 == blen)
+		&& (memcmp(ptr->boundary, buf + 2, ptr->boundary_len) == 0))
 	    {
 		b->depth = ptr->depth;
 		b->is_valid = true;
+		b->is_final = is_final_boundary(buf, blen, ptr->boundary_len);
 		break;
 	    }
 	}
