@@ -18,13 +18,13 @@ dnl set to "yes"    the "Trio" [v]snprintf library (which is
 dnl                 part of the bogofilter source).
 dnl ********************************************************
 dnl
-AC_INIT([bogofilter],[1.2.4])
+AC_INIT([bogofilter],[1.2.5])
 dnl
 AC_PREREQ([2.68])
 AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_SRCDIR([src/bogofilter.c])
 AC_CANONICAL_HOST
-AM_INIT_AUTOMAKE([1.11 foreign tar-ustar parallel-tests dist-bzip2 dist-xz no-installinfo -Wall])
+AM_INIT_AUTOMAKE([1.11 foreign tar-ustar parallel-tests dist-bzip2 dist-xz no-installinfo -Wall subdir-objects])
 AC_CONFIG_HEADERS([src/config.h:config.in])
 
 AC_PROG_AWK
