@@ -279,6 +279,12 @@ void mime_add_child(mime_t * parent)
     mime_push(parent);
 }
 
+/**
+ * Check if the boundary in \a ins of length \inlen is a final (instead
+ * of initial or intermediate) boundary of a MIME multipart,
+ * when the boundary we are currently looking at has length \a blen.
+ * Returns true if it is a final boundary, false otherwise.
+ */
 static bool is_final_boundary(
 	const byte	*ins,
 	size_t		 inlen,
