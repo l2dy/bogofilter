@@ -9,8 +9,8 @@
 #	test case provided by Julius Plenz, July 2014.
 
 gzip -c -d <"$srcdir/inputs/t.passthrough-truncation-in.gz" >"$TMPDIR/input"
-$BOGOFILTER -e -p -C < "$TMPDIR/input" \
-| $GREP -v "^X-Bogosity: Unsure," > "$TMPDIR/output"
+$BOGOFILTER -e -p -C -I "$TMPDIR/input" >"${TMPDIR}/intermediate"
+$GREP -v "^X-Bogosity: Unsure," <"${TMPDIR}/intermediate" >"$TMPDIR/output"
 
 if  [ $verbose -eq 0 ]; then
     cmp "$TMPDIR/input" "$TMPDIR/output"
