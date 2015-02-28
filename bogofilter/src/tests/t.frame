@@ -10,7 +10,9 @@
 
 set -e
 
-exec < /dev/null
+if [ -z "$BF_INTERACTIVE" ] ; then
+	exec < /dev/null
+fi
 
 : ${srcdir=.}
 : ${relpath=..}
