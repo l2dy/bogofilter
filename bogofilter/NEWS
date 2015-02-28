@@ -15,6 +15,14 @@
 
 -------------------------------------------------------------------------------
 
+	2015-02-28
+
+	* Fix the lexer to not try to delete parts from HTML tokens if it is
+	  reading garbage (for instance, binary files misdeclared as HTML).
+	  This was exposed on Fedora 20 and 21 but not Ubuntu 14.04 (x86_64),
+	  and is possibly related to its newer flex 2.5.37 that may have
+	  changed the way it uses yyinput() a bit.  Reported by Matt Garretson.
+
 	2015-02-25
 
 	* Fix the lexer to handle MIME multipart messages properly when the

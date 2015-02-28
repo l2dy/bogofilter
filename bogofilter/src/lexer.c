@@ -329,7 +329,7 @@ int yyinput(byte *buf, size_t used, size_t size)
 	count += cnt;
 
 	/* Note: some malformed messages can cause xfgetsl() to report
-	** "Invalid buffer size, exiting."  ** and then abort.  This
+	** "Invalid buffer size, exiting."  and then abort.  This
 	** can happen when the parser is in html mode and there's a
 	** leading '<' but no closing '>'.
 	**
@@ -343,9 +343,12 @@ int yyinput(byte *buf, size_t used, size_t size)
 
 	if (count >= MAX_TOKEN_LEN * 2 && 
 	    long_token(buff.t.u.text, (uint) count)) {
-	    uint start = buff.t.leng - count;
-	    uint length = count - max_token_len;
-	    buff_shift(&buff, start, length);
+	    /* Make sure not to shift bytes outside the buffer */
+	    if (buff.t.leng >= (uint) count) {
+		    uint start = buff.t.leng - count;
+		    uint length = count - max_token_len;
+		    buff_shift(&buff, start, length);
+	    }
 	    count = buff.t.leng;
 	}
 	else
