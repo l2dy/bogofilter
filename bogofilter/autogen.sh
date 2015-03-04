@@ -46,8 +46,8 @@ echo "Running 'autoreconf -fis'"
 autoreconf -fis
 echo ""
 
-echo "Running './configure --quiet $*'"
-./configure --quiet $*
+echo "Running './configure --quiet $@'"
+./configure --quiet "$@"
 echo ""
 
 echo "Running 'make -s check'"
