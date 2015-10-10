@@ -134,6 +134,8 @@ void free_wordlists()
 	list = free_wordlistnode(list);
     }
 
+    word_lists = NULL;
+
     bogohome_cleanup();
 }
 

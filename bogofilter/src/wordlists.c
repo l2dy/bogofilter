@@ -265,9 +265,6 @@ bool close_wordlists(bool commit /** if unset, abort */)
 	xfree(i);
     }
 
-    if (commit)
-	word_lists = NULL;
-
     return err;
 }
 

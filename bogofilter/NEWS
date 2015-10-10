@@ -17,6 +17,8 @@
 
 	2015-10-10
 
+	* Fix a memory leak in close_wordlists().
+
 	* Fix an out-of-bounds memory read in maint.c's discard_token().
 	  Found with clang 3.6's address sanitizer.
 
