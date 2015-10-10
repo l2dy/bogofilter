@@ -163,10 +163,13 @@ static bool get_double(const char *name, const char *arg, double *d)
 {
     char *s = xstrdup(arg);
     remove_comment(s);
-    if (!xatof(d, s))
+    if (!xatof(d, s)) {
+	xfree(s);
 	return false;
+    }
     if (DEBUG_CONFIG(2))
 	fprintf(dbgout, "%s -> %f\n", name, *d);
+    xfree(s);
     return true;
 }
 
