@@ -24,6 +24,9 @@ Matthias Andree <matthias.andree@gmx.de> 2003
 
 #include <stdlib.h>
 
+#include "bftypes.h"
+#include <sys/types.h>
+
 #ifdef	ENABLE_DB_DATASTORE	/* if Berkeley DB */
 #include <db.h>
 #endif

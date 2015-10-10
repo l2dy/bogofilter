@@ -182,7 +182,7 @@ static void mime_free(mime_t * t)
 	mime_stack_bot = t->parent;
 
     if (mime_stack_top == t)
-	mime_stack_top = NULL;
+	mime_stack_top = t->child;
 
     if (t->boundary) {
 	xfree(t->boundary);
@@ -201,12 +201,21 @@ static void mime_free(mime_t * t)
 
 void mime_cleanup()
 {
+    if (DEBUG_MIME(0))
+	fprintf(dbgout, "*** mime_cleanup\n");
+
     if (msg_state == NULL)
 	return;
 
-    while (mime_stack_top->parent)
+    if (DEBUG_MIME(2))
+	mime_stack_dump();
+
+    while (mime_stack_top->child)
 	mime_pop();
     mime_pop();
+    if (DEBUG_MIME(2))
+	mime_stack_dump();
+
     msg_state = NULL;
 
     mime_stack_top = NULL;
@@ -268,6 +277,9 @@ void mime_reset(void)
 {
     if (DEBUG_MIME(0))
 	fprintf(dbgout, "*** mime_reset\n");
+
+    if (DEBUG_MIME(2))
+	mime_stack_dump();
 
     mime_cleanup();
 

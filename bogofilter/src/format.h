@@ -9,19 +9,16 @@ typedef const char *FIELD;
 
 /* Global variables */
 
-extern const char *spam_header_name;
-extern const char *spam_subject_tag;
-extern const char *unsure_subject_tag;
-#if 0
-extern const char *spam_header_place;
-#endif
+extern char *spam_header_name;
+extern char *spam_subject_tag;
+extern char *unsure_subject_tag;
 
 /* needed by bogoconfig.c */
 
-extern const char *header_format;
-extern const char *terse_format;
-extern const char *log_update_format;
-extern const char *log_header_format;
+extern char *header_format;
+extern char *terse_format;
+extern char *log_update_format;
+extern char *log_header_format;
 extern FIELD *spamicity_tags;
 extern FIELD *spamicity_formats;
 

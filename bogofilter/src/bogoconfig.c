@@ -720,10 +720,10 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 	exit(EX_OK);
 
     case O_BLOCK_ON_SUBNETS:		block_on_subnets = get_bool(name, val);			break;
-    case O_CHARSET_DEFAULT:		charset_default = get_string(name, val);		break;
-    case O_HEADER_FORMAT:		header_format = get_string(name, val);			break;
-    case O_LOG_HEADER_FORMAT:		log_header_format = get_string(name, val);		break;
-    case O_LOG_UPDATE_FORMAT:		log_update_format = get_string(name, val);		break;
+    case O_CHARSET_DEFAULT:		xfree(charset_default); charset_default = get_string(name, val);		break;
+    case O_HEADER_FORMAT:		xfree(header_format); header_format = get_string(name, val);			break;
+    case O_LOG_HEADER_FORMAT:		xfree(log_header_format); log_header_format = get_string(name, val);		break;
+    case O_LOG_UPDATE_FORMAT:		xfree(log_update_format); log_update_format = get_string(name, val);		break;
     case O_MAX_TOKEN_LEN:		max_token_len=atoi(val);				break;
     case O_MIN_TOKEN_LEN:		min_token_len=atoi(val);				break;
     case O_MAX_MULTI_TOKEN_LEN:		max_multi_token_len=atoi(val);				break;
@@ -731,18 +731,18 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
     case O_REPLACE_NONASCII_CHARACTERS:	replace_nonascii_characters = get_bool(name, val);	break;
     case O_SPAMICITY_FORMATS:		set_spamicity_formats(val);				break;
     case O_SPAMICITY_TAGS:		set_spamicity_tags(val);				break;
-    case O_SPAM_HEADER_NAME:		spam_header_name = get_string(name, val);		break;
-    case O_SPAM_HEADER_PLACE:		spam_header_place = get_string(name, val);		break;
-    case O_SPAM_SUBJECT_TAG:		spam_subject_tag = get_string(name, val);		break;
+    case O_SPAM_HEADER_NAME:		xfree(spam_header_name); spam_header_name = get_string(name, val);		break;
+    case O_SPAM_HEADER_PLACE:		xfree(spam_header_place); spam_header_place = get_string(name, val);		break;
+    case O_SPAM_SUBJECT_TAG:		xfree(spam_subject_tag); spam_subject_tag = get_string(name, val);		break;
     case O_STATS_IN_HEADER:		stats_in_header = get_bool(name, val);			break;
     case O_TERSE:			terse = get_bool(name, val);				break;
-    case O_TERSE_FORMAT:		terse_format = get_string(name, val);			break;
+    case O_TERSE_FORMAT:		xfree(terse_format); terse_format = get_string(name, val);			break;
     case O_THRESH_UPDATE:		get_double(name, val, &thresh_update);			break;
     case O_TIMESTAMP:			timestamp_tokens = get_bool(name, val);			break;
     case O_TOKEN_COUNT_FIX:             token_count_fix = atoi(val);                            break;
     case O_TOKEN_COUNT_MIN:             token_count_min = atoi(val);                            break;
     case O_TOKEN_COUNT_MAX:             token_count_max = atoi(val);                            break;
-    case O_UNSURE_SUBJECT_TAG:		unsure_subject_tag = get_string(name, val);		break;
+    case O_UNSURE_SUBJECT_TAG:		xfree(unsure_subject_tag); unsure_subject_tag = get_string(name, val);		break;
     case O_UNICODE:			encoding = get_bool(name, val) ? E_UNICODE : E_RAW;	break;
     case O_WORDLIST:			configure_wordlist(val);				break;
 

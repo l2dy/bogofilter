@@ -24,6 +24,7 @@ NAME:
 #include "format.h"
 #include "textblock.h"
 #include "xmalloc.h"
+#include "globals.h"
 
 #include "lexer.h" /* need have_body */
 

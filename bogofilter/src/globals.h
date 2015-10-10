@@ -9,6 +9,9 @@
 #include "system.h" /* has bool */
 #include "common.h" /* has PATH_LEN */
 
+#include <sys/types.h>
+#include "bftypes.h"
+
 #ifdef __LCLINT__
 typedef int  bool;
 #endif
@@ -126,5 +129,10 @@ typedef volatile int sig_atomic_t;
 
 extern	sig_atomic_t	fDie;	/* true if a terminating signal (such as
 				   SIGINT or SIGTERM) has been received */
+
+void init_globals(void);    /**< initialize all global variables */
+
+extern char *spam_header_name;
+extern char *spam_header_place;
 
 #endif

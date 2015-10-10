@@ -17,10 +17,9 @@
 
 	2015-10-10
 
-	* Fix a memory leak in bogoconfig.c's get_double(), part of the
-	  configuration parser.
+	* Fix build with C89 compilers.
 
-	* Fix a memory leak in wordlists*.c's close_wordlists().
+	* Fix several memory leaks.
 
 	* Fix an out-of-bounds memory read in maint.c's discard_token().
 	  Found with clang 3.6's address sanitizer.

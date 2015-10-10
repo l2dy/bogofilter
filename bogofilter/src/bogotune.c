@@ -1833,6 +1833,8 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     dbgout = stderr;
 
+    init_globals();
+
     progtype = build_progtype(progname, DB_TYPE);
 
     ham_files  = filelist_new("ham");
@@ -1848,6 +1850,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
 	if (ds_path == NULL)
 	    ds_path = get_directory(PR_ENV_BOGO);
+
 	if (ds_path == NULL)
 	    ds_path = get_directory(PR_ENV_HOME);
 
@@ -1861,21 +1864,26 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
 	if (!bfpath_check_mode(bfp, BFP_MUST_EXIST)) {
 	    fprintf(stderr, "Can't open wordlist '%s'\n", bfp->filepath);
+	    xfree(ds_path);
 	    exit(EX_ERROR);
 	}
 
 	if (bfp->exists && bfp->isdir) {
+	    char *tmp;
 	    bfpath_free(bfp);
-	    ds_path = mxcat(ds_path, DIRSEP_S, WORDLIST, NULL);	
+	    tmp = mxcat(ds_path, DIRSEP_S, WORDLIST, NULL);
+	    xfree(ds_path);
+	    ds_path = tmp;
 	    bfp = bfpath_create(ds_path);
 	    if (!bfpath_check_mode(bfp, BFP_MUST_EXIST)) {
 		fprintf(stderr, "Can't open wordlist '%s'\n", bfp->filepath);
+		xfree(ds_path);
 		exit(EX_ERROR);
 	    }
 	}
 
 	env = ds_init(bfp);
-	
+
 	init_wordlist("word", ds_path, 0, WL_REGULAR);
     }
 

@@ -18,8 +18,6 @@ AUTHOR:
 /* Global variables */
 
 extern const char *logtag;
-extern const char *spam_header_name;
-extern const char *spam_header_place;
 extern const char *user_config_file;
 
 extern rc_t query_config(void);

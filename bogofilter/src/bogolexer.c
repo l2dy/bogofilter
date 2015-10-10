@@ -158,8 +158,6 @@ static void process_arglist(int argc, char **argv)
 
 int process_arg(int option, const char *name, const char *val, priority_t precedence, arg_pass_t pass)
 {
-    //pass = 0;		/* suppress compiler warning */
-
     switch (option)
     {
     case ':':
@@ -213,6 +211,7 @@ int process_arg(int option, const char *name, const char *val, priority_t preced
 	break;
 
     case O_CHARSET_DEFAULT:
+	xfree(charset_default);
 	charset_default = get_string(name, val);
 	break;
 
@@ -291,6 +290,8 @@ int main(int argc, char **argv)
     fpo = stdout;
 
     mbox_mode = true;		/* to allow multiple messages */
+
+    init_globals();
 
     process_arglist(argc, argv);
     process_config_files(false, longopts_bogolexer);

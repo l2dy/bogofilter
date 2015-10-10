@@ -19,6 +19,8 @@ NAME:
 
 #include "debug.h"
 
+#include "bftypes.h"
+
 #ifdef	ENABLE_MEMDEBUG
 #include "memdebug.h"
 #else

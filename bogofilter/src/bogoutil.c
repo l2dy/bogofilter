@@ -899,6 +899,8 @@ int main(int argc, char *argv[])
 
     fBogoutil = true;
 
+    init_globals();
+
     signal_setup();			/* setup to catch signals */
     atexit(bf_exit);
 

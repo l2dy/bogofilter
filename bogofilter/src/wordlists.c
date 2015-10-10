@@ -328,6 +328,7 @@ bool configure_wordlist(const char *val)
     int  precedence;
 
     char *tmp = xstrdup(val);
+    char *ftmp = tmp;
 
     ch= tmp[0];		/* save wordlist type (good/spam) */
     tmp = spanword(tmp);
@@ -342,6 +343,7 @@ bool configure_wordlist(const char *val)
 	break;
     default:
 	fprintf( stderr, "Unknown wordlist type - '%c'\n", ch);
+	xfree(ftmp);
 	return (false);
     }
 
@@ -355,7 +357,7 @@ bool configure_wordlist(const char *val)
     (void)spanword(tmp);
 
     init_wordlist(listname, filename, precedence, type);
-
+    xfree(ftmp);
     return true;
 }
 

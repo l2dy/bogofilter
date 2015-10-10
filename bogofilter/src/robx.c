@@ -11,9 +11,10 @@ AUTHOR:
    
 ******************************************************************************/
 
-#include <errno.h>
-
+#include "bftypes.h"
 #include "common.h"
+
+#include <errno.h>
 
 #include "datastore.h"
 #include "rand_sleep.h"

@@ -165,19 +165,17 @@ static void check_for_file(bfpath *bfp)
     int rc;
     struct stat sb;
 
-    bfp->isdir = bfp->isfile = false;
+    bfp->isdir = bfp->isfile = bfp->exists = false;
 
     rc = stat(bfp->filepath, &sb);
     if (rc == 0) {
 	bfp->exists = true;
 	xfree(bfp->dirname);
-	xfree(bfp->filename);
+	xfree(bfp->filename); bfp->filename = NULL;
 	if (S_ISDIR(sb.st_mode)) {
 	    bfp->isdir = true;
 	    bfp->dirname  = xstrdup(bfp->filepath);
-	    bfp->filename = NULL;
-	}
-	if (!S_ISDIR(sb.st_mode)) {
+	} else {
 	    bfp->isfile = true;
 	    bfp->dirname  = get_directory_from_path(bfp->filepath);
 	    bfp->filename = get_file_from_path(bfp->filepath);
