@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2015-10-10
+
+	* Fix an out-of-bounds memory read in maint.c's discard_token().
+	  Found with clang 3.6's address sanitizer.
+
 	2015-02-28
 
 	* Fix the lexer to not try to delete parts from HTML tokens if it is
