@@ -105,8 +105,8 @@ CFLAGS="$RPM_OPT_FLAGS" \
   --with-included-gsl
 
 %build
-make
-make DESTDIR="%{buildroot}" check
+make %_smp_mflags
+make %_smp_mflags DESTDIR="%{buildroot}" check
 
 %clean
 [ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
@@ -152,6 +152,8 @@ rm contrib-static/bogogrep
 strip contrib-static/bogogrep_static
 )
 %endif
+
+find %{buildroot}%{_datadir}/%{name} -name .dirstamp -print -delete
 
 %post
 
