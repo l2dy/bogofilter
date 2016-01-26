@@ -493,10 +493,8 @@ case "x$WITH_DB_ENGINE" in
 	LIBS="$LIBS $LIBDB"
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([
 #include <tcutil.h>
-#include <tchdb.h>
 #include <tcbdb.h>
 #include <stdlib.h>
-#include <time.h>
 #include <stdbool.h>
 #include <stdint.h>
 	], [

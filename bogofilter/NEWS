@@ -15,6 +15,12 @@
 
 -------------------------------------------------------------------------------
 
+	2016-01-26
+
+	* Apply patch from Denny Lin to plug a few memory leaks in the
+	  TokyoCabinet implementation contributed through the bogofilter-dev
+	  mailing list.  Thanks!
+
 	2015-10-10
 
 	* Fix build with C89 compilers.

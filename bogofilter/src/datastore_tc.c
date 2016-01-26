@@ -16,10 +16,8 @@ Pierre Habouzit <madcoder@debian.org>    2007
 #include "common.h"
 
 #include <tcutil.h>
-#include <tchdb.h>
 #include <tcbdb.h>
 #include <stdlib.h>
-#include <time.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -33,9 +31,7 @@ Pierre Habouzit <madcoder@debian.org>    2007
 #define UNUSED(x) ((void)&x)
 
 typedef struct {
-    char *path;
     char *name;
-    bool locked;
     bool created;
     TCBDB *dbp;
 } dbh_t;
@@ -121,9 +117,8 @@ static dbh_t *dbh_init(bfpath *bfp)
     memset(handle, 0, sizeof(dbh_t));	/* valgrind */
 
     handle->name = xstrdup(bfp->filepath);
-
-    handle->locked = false;
     handle->created = false;
+    handle->dbp = tcbdbnew();
 
     return handle;
 }
@@ -133,7 +128,7 @@ static void dbh_free(/*@only@*/ dbh_t *handle)
 {
     if (handle != NULL) {
       xfree(handle->name);
-      xfree(handle->path);
+      tcbdbdel(handle->dbp);
       xfree(handle);
     }
     return;
@@ -180,7 +175,7 @@ void *db_open(void * dummy, bfpath *bfp, dbmode_t open_mode)
 
     if (handle == NULL) return NULL;
 
-    dbp = handle->dbp = tcbdbnew();
+    dbp = handle->dbp;
     res = tcbdbopen(dbp, handle->name, open_flags);
     if (!res && (open_mode & DS_WRITE)) {
         res = tcbdbopen(dbp, handle->name, open_flags | BDBOCREAT);
@@ -318,9 +313,6 @@ void db_close(void *vhandle)
 		    handle->name, 
 		    tcbdbecode(dbp), tcbdberrmsg(tcbdbecode(dbp)));
 
-    tcbdbdel(dbp);
-    handle->dbp = NULL;
-
     dbh_free(handle);
 }
 
@@ -352,37 +344,36 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     char *key, *data;
 
     cursor = tcbdbcurnew(dbp);
-    ret = tcbdbcurfirst(cursor);
-    if (ret) {
-	while ((key = tcbdbcurkey(cursor, &ksiz))) {
-	    data = tcbdbcurval(cursor, &dsiz);
-	    if (data) {
-		/* switch to "dbv_t *" variables */
-		dbv_key.leng = ksiz;
-		dbv_key.data = xmalloc(dbv_key.leng+1);
-		memcpy(dbv_key.data, key, ksiz);
-		((char *)dbv_key.data)[dbv_key.leng] = '\0';
-
-		dbv_data.data = data;
-		dbv_data.leng = dsiz;		/* read count */
-
-		/* call user function */
-		ret = hook(&dbv_key, &dbv_data, userdata);
-
-		xfree(dbv_key.data);
-
-		if (ret != 0)
-		    break;
-		free(data); /* not xfree() as allocated by dpget() */
-	    }
-	    free(key); /* not xfree() as allocated by dpiternext() */
-
-	    tcbdbcurnext(cursor);
-	}
-    } else {
+    if (!tcbdbcurfirst(cursor)) {
 	print_error(__FILE__, __LINE__, "(tc) tcbdbcurfirst err: %d, %s",
 		    tcbdbecode(dbp), tcbdberrmsg(tcbdbecode(dbp)));
 	exit(EX_ERROR);
+    }
+
+    while ((key = tcbdbcurkey(cursor, &ksiz))) {
+	data = tcbdbcurval(cursor, &dsiz);
+	if (data) {
+	    /* switch to "dbv_t *" variables */
+	    dbv_key.data = xstrdup(key);
+	    dbv_key.leng = ksiz;
+
+	    dbv_data.data = data;
+	    dbv_data.leng = dsiz;		/* read count */
+
+	    /* call user function */
+	    ret = hook(&dbv_key, &dbv_data, userdata);
+
+	    xfree(dbv_key.data);
+	    free(data); /* not xfree() as allocated by dpget() */
+
+	    if (ret != 0) {
+		free(key);
+		break;
+	    }
+	}
+	free(key); /* not xfree() as allocated by dpiternext() */
+
+	tcbdbcurnext(cursor);
     }
 
     tcbdbcurdel(cursor);
