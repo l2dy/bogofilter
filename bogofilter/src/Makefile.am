@@ -190,6 +190,11 @@ datastore_SOURCE = datastore_tc.c \
 		   datastore_opthelp_dummies.c \
 		   datastore_dummies.c
 else
+if ENABLE_KYOTOCABINET_DATASTORE
+datastore_SOURCE = datastore_kc.c \
+		   datastore_opthelp_dummies.c \
+		   datastore_dummies.c
+else
 if ENABLE_TRANSACTIONS
 datastore_SOURCE = datastore_db.c datastore_db_trans.c
 else
@@ -198,6 +203,7 @@ datastore_SOURCE = datastore_db.c datastore_db_trad.c \
 		   datastore_opthelp_dummies.c
 else
 datastore_SOURCE = datastore_db.c datastore_db_trad.c datastore_db_trans.c
+endif
 endif
 endif
 endif

@@ -50,6 +50,7 @@ case $DB_NAME in
 	esac ;;
     *QDBM*)	     DB_TXN=false ;;
     *Tokyo*)	     DB_TXN=true  ;;
+    *Kyoto*)	     DB_TXN=true  ;;
     *SQLite*)	     DB_TXN=true  ;;
     *TrivialDB*)     DB_TXN=false ;;
     *)		    echo >&2 "Unknown data base type in bogofilter -V: $DB_NAME"

@@ -173,7 +173,7 @@ to the list.
 
   --prefix=PREFIX         install architecture-independent files in PREFIX
 			  [default: /usr/local]
-  --with-database=ENGINE  Choose database engine {db|qdbm|sqlite3} 
+  --with-database=ENGINE  Choose database engine {db|qdbm|sqlite3|tokyocabinet|kyotocabinet}
   			  [default: db]
   CPPFLAGS=-I/opt/csw/include
 			  Choose additional include file path /opt/csw/include

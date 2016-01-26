@@ -28,6 +28,14 @@ labeled "Incompat" and "Major".
 NOTE: the NEWS document has greater detail on some of these changes.
 
 ------------------------------------------------------------------------
+[Major 1.2.5] Kyoto Cabinet support added.
+
+Bogofilter, as of release 1.2.5, supports Kyoto Cabinet databases,
+courtesy of Denny Lin.  The Kyoto Cabinet database is written and
+maintained by the same author as the Toyko Cabinet database, and they
+recommend to use Kyoto Cabinet instead of Tokyo Cabinet.
+
+------------------------------------------------------------------------
 [Major 1.1.6] Tokyo Cabinet support (B+-trees with transactions) added
 
 Bogofilter, as of release 1.1.6, supports Tokyo Cabinet databases,

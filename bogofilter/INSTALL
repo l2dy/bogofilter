@@ -11,10 +11,13 @@ this writing in alphabetical order
 
    database, with version (patchlevel omitted)	URL to home page
   --------------------------------------------- ---------------------
-1a.Berkeley DB (3.1 - 4.4) with transactions	http://sleepycat.com/
-1b.Berkeley DB (3.1 - 4.4) without transactions	http://sleepycat.com/
+1a.Berkeley DB (3.1 - 6.x) with transactions
+1b.Berkeley DB (3.1 - 6.x) without transactions
+    http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/
 2. QDBM (1.7.23 or newer)			http://qdbm.sf.net/
 3. SQLite (3.2.6 or newer)			http://sqlite.org/
+4. TokyoCabinet			http://fallabs.com/tokyocabinet/
+5. KyotoCabinet			http://fallabs.com/kyotocabinet/
 
 You can use --with-database=ARG (choose from db (for Berkeley DB), qdbm,
 sqlite) to pick the database backend (you must have installed the
