@@ -41,7 +41,12 @@ AC_PATH_PROGS(PERL, perl perl5,,$PATH:/usr/local/bin:/usr/bin)
 AC_PATH_PROGS(NSGMLS,onsgmls nsgmls,nsgmls)
 AC_PATH_PROGS(RPMBUILD,rpmbuild rpm,rpmbuild)
 AC_PATH_PROGS(XMLLINT,xmllint,xmllint)
+AC_PATH_PROGS(FLEX,flex,false)
 AM_PROG_LEX
+if test "x$LEX" = xflex && test "$FLEX" != false ; then
+  LEX="$FLEX"
+  AC_DEFINE(LEX,,path to LEX)
+fi
 
 dnl Check compiler capabilities
 AC_C_CONST
@@ -197,6 +202,7 @@ if test "$GCC" = yes && test "$ICC" = no ; then
 fi
 AM_CONDITIONAL(USE_GCC4, test $gcc4 = yes)
 
+AC_MSG_CHECKING(whether flex needs patching)
 dnl Check whether flex needs patching
 flex=no
 if test -n "$LEX"; then
@@ -205,11 +211,19 @@ if test -n "$LEX"; then
 	*2.5.31) flex=253x ;;
 	*2.5.33) flex=253x ;;
 	*2.5.35) flex=O.K. ;;
+	*2.5.36*) flex=253n ;;
+	*2.5.37*) flex=253n ;;
+	*2.5.38*) flex=253n ;;
+	*2.5.39*) flex=253n ;;
+	*2.6.0*)  flex=253n ;;
+	*2.6.*) flex=O.K. ;;
+	*)	flex=unknown ;;
     esac
 fi
-dnl flex=yes
+AC_MSG_RESULT($flex)
 AM_CONDITIONAL(PATCH_FLEX_254, test $flex = 254)
 AM_CONDITIONAL(PATCH_FLEX_253X, test $flex = 253x)
+AM_CONDITIONAL(PATCH_FLEX_253N, test $flex = 253n)
 
 dnl large file support (LFS)
 AC_SYS_LARGEFILE

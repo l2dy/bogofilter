@@ -241,8 +241,8 @@ VERP		{TOKEN}-{VERPID}-{TOKEN}={TOKEN}@{TOKEN}
 <INITIAL>^Content-(Transfer-Encoding|Type|Disposition):{MTYPE}	{ mime_content(yy_text()); skip_to(':'); header(); return TOKEN; }
 
 <INITIAL>^Message-ID:.*				{ /* save token for logging */
-						  unsigned long off = 11;
-						  while(isspace((unsigned char)yytext[off]) && off < yyleng)
+						  long off = 11;
+						  while(isspace((unsigned char)yytext[off]) && off < INT_MAX && off < yyleng)
 						      off++;
 						  set_msg_id((unsigned char *)(yytext+off), yyleng-off);
 						  header();

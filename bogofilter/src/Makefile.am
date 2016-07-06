@@ -264,7 +264,9 @@ fgetsl_test_CFLAGS= -DMAIN
 EXTRA_DIST = bogoupgrade.in \
 	     version.sh \
 	     strlcat.3 strlcpy.3 \
-	     patch.lexer.254.txt patch.lexer.253x.txt
+	     patch.lexer.254.txt \
+	     patch.lexer.253x.txt \
+	     patch.lexer.253n.txt
 #
 version.c: version.sh ../configure.ac Makefile.am	\
 	$(version_sources)				\
@@ -307,6 +309,9 @@ if PATCH_FLEX_254
 endif
 if PATCH_FLEX_253X
 	patch $@ < $(srcdir)/patch.lexer.253x.txt
+endif
+if PATCH_FLEX_253N
+	patch $@ < $(srcdir)/patch.lexer.253n.txt
 endif
 	rm -f lex.yy.c
 
