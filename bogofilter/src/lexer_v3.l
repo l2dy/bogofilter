@@ -80,7 +80,9 @@
 #define YY_DECL token_t yylex(void)
     YY_DECL;			/* declare function */
 
-#define YY_INPUT(buf,result,max_size) result = yyinput((byte *)buf, result, max_size)
+#define YY_INPUT(buf,result,max_size) \
+    if ( (int)(result = yyinput((byte *)buf, max_size)) < 0 ) \
+        YY_FATAL_ERROR( "input in flex scanner failed" )
 #define YY_EXIT_FAILURE EX_ERROR
 
 #undef	stderr

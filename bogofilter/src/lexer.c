@@ -298,7 +298,7 @@ void yyinit(void)
 	lexer = &v3_lexer;
 }
 
-int yyinput(byte *buf, size_t used, size_t size)
+int yyinput(byte *buf, size_t size)
 /* input getter for the scanner */
 {
     int count;
@@ -330,7 +330,7 @@ int yyinput(byte *buf, size_t used, size_t size)
     }
 
     if (DEBUG_LEXER(2))
-	fprintf(dbgout, "*** yyinput(\"%-.*s\", %lu, %lu) = %d\n", count, buf, (unsigned long)used, (unsigned long)size, count);
+	fprintf(dbgout, "*** yyinput(\"%-.*s\", %lu) = %d\n", count, buf, (unsigned long)size, count);
 
     return (count == EOF ? 0 : count);
 }
