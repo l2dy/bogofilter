@@ -114,7 +114,7 @@ static int yy_get_new_line(buff_t *buff)
 
     if (count == EOF) {
 	if (fpin == NULL || !ferror(fpin)) {
-	    return YY_NULL;
+	    return EOF;	/* pass this back to yyinput() */
 	}
 	else {
 	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
@@ -183,7 +183,7 @@ static int get_decoded_line(buff_t *buff)
 
     if (count == EOF) {
 	if ( !ferror(fpin))
-	    return YY_NULL;
+	    return EOF;	/* pass this back to yyinput() */
 	else {
 	    print_error(__FILE__, __LINE__, "input in flex scanner failed\n");
 	    exit(EX_ERROR);
@@ -302,16 +302,27 @@ int yyinput(byte *buf, size_t size)
 /* input getter for the scanner */
 {
     int count;
-    buff_t buff;
+    static buff_t *buff = NULL;
 
-    buff_init(&buff, buf, 0, (uint) size);
+    /* allocate a new buffer for reading */
+    if (buff == NULL) {
+	buff = buff_new( xmalloc(size + D), 0, size );
+    }
 
-    count = get_decoded_line(&buff);
+    /* if it's empty, put data in it */
+    while (buff->t.leng == 0) {
+	int cnt = get_decoded_line(buff);
+	/* when we hit EOF, this function will eventually return 0 */
+	if (cnt == EOF) break;
+    }
+    count = min(buff->t.leng, size);
+    memcpy(buf, buff->t.u.text, count);
+    buff_shift(buff, 0, count);
 
     if (msg_state &&
 	msg_state->mime_dont_decode &&
 	(msg_state->mime_disposition != MIME_DISPOSITION_UNKNOWN)) {
-	return (count == EOF ? 0 : count);   /* not decode at all */
+	return count;   /* not decode at all */
     }
 
 #if	defined(CP866) && !defined(ENABLE_ICONV)
@@ -332,7 +343,7 @@ int yyinput(byte *buf, size_t size)
     if (DEBUG_LEXER(2))
 	fprintf(dbgout, "*** yyinput(\"%-.*s\", %lu) = %d\n", count, buf, (unsigned long)size, count);
 
-    return (count == EOF ? 0 : count);
+    return count;
 }
 
 static char *charset_as_string(const byte *txt, const size_t len)
