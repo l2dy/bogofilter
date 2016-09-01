@@ -74,12 +74,9 @@ static void convert(iconv_t xd, buff_t *restrict src, buff_t *restrict dst)
 	inbytesleft = src->t.leng - src->read;
 
 	outbuf = (char *)dst->t.u.text + dst->t.leng;
-	outbytesleft = dst->size - dst->read - dst->t.leng;
+	outbytesleft = dst->size - dst->t.leng;
 
-	BOGO_ASSERT(dst->size > (dst->read + dst->t.leng)
-		&& (dst->read + dst->t.leng) >= dst->read
-		&& (dst->read + dst->t.leng) >= dst->t.leng,
-		"outbytesleft underflow!");
+	BOGO_ASSERT(dst->size >= dst->t.leng, "outbytesleft underflow!");
 
 	if (outbytesleft == 0)
 	    break;
@@ -172,7 +169,7 @@ static void convert(iconv_t xd, buff_t *restrict src, buff_t *restrict dst)
 	    }
 	}
 	src->read = src->t.leng - inbytesleft;
-	dst->t.leng = dst->size - dst->read - outbytesleft;
+	dst->t.leng = dst->size - outbytesleft;
 
 	if (src->read >= src->t.leng)
 	    done = true;
