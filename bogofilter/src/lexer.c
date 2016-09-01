@@ -244,6 +244,7 @@ static int get_decoded_line(buff_t *buff)
 	byte *buf = buff->t.u.text;
 	if (memcmp(buf + count - 2, CRLF, 2) == 0) {
 	    count --;
+	    buff->t.leng --;
 	    *(buf + count - 1) = (byte) '\n';
 	}
     }
