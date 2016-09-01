@@ -82,7 +82,7 @@ void buff_shift(buff_t *self, uint start, uint length)
     /* Shift buffer contents to delete the specified segment. */
     /* Implemented for deleting html comments.		      */
 
-    BOGO_ASSERT(start + length <= self->t.leng,
+    BOGO_ASSERT((unsigned long)start + length <= (unsigned long)self->t.leng,
 		"Invalid buff_shift() parameters.");
 
     memmove(self->t.u.text + start, self->t.u.text + start + length, self->t.leng - length);
