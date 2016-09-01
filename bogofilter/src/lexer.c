@@ -301,46 +301,12 @@ void yyinit(void)
 int yyinput(byte *buf, size_t used, size_t size)
 /* input getter for the scanner */
 {
-    int cnt;
-    int count = 0;
+    int count;
     buff_t buff;
 
     buff_init(&buff, buf, 0, (uint) size);
 
-    /* After reading a line of text, check if it has special characters.
-     * If not, trim some, but leave enough to match a max length token.
-     * Then read more text.  This will ensure that a really long sequence
-     * of alphanumerics, which bogofilter will ignore anyway, doesn't crash
-     * the flex lexer.
-     */
-
-    while ((cnt = get_decoded_line(&buff)) != 0) {
-
-	count += cnt;
-
-	/* Note: some malformed messages can cause xfgetsl() to report
-	** "Invalid buffer size, exiting."  ** and then abort.  This
-	** can happen when the parser is in html mode and there's a
-	** leading '<' but no closing '>'.
-	**
-	** The "fix" is to check for a nearly full lexer buffer and
-	** discard most of it.
-	*/
-
-	/* if not nearly full */
-	if (used < 1000 || used < size * 10)
-	    break;
-
-	if (count >= MAX_TOKEN_LEN * 2 && 
-	    long_token(buff.t.u.text, (uint) count)) {
-	    uint start = buff.t.leng - count;
-	    uint length = count - max_token_len;
-	    buff_shift(&buff, start, length);
-	    count = buff.t.leng;
-	}
-	else
-	    break;
-    }
+    count = get_decoded_line(&buff);
 
     if (msg_state &&
 	msg_state->mime_dont_decode &&
