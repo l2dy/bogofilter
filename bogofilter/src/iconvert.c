@@ -76,6 +76,11 @@ static void convert(iconv_t xd, buff_t *restrict src, buff_t *restrict dst)
 	outbuf = (char *)dst->t.u.text + dst->t.leng;
 	outbytesleft = dst->size - dst->read - dst->t.leng;
 
+	BOGO_ASSERT(dst->size > (dst->read + dst->t.leng)
+		&& (dst->read + dst->t.leng) >= dst->read
+		&& (dst->read + dst->t.leng) >= dst->t.leng,
+		"outbytesleft underflow!");
+
 	if (outbytesleft == 0)
 	    break;
 
