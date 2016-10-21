@@ -17,12 +17,14 @@
 
 	2016-01-26
 
-	* Apply patch from Denny Lin, with one fix, to add KyotoCabinet
-	  support. To enable, run configure --with-database=kyotocabinet when
-	  building bogofilter.  Thanks!
+	* Apply patch from Denny Lin, with one fix, to add support for the
+	  KyotoCabinet embedded database library.  To enable, install
+	  KyotoCabinet including the development files, and run
+	  configure --with-database=kyotocabinet when building bogofilter.
+	  Thanks!
 
-	* Apply patch from Denny Lin to plug a few memory leaks in the
-	  TokyoCabinet implementation contributed through the bogofilter-dev
+	* Apply patch from Denny Lin to plug a few memory leaks in bogofilter's
+	  TokyoCabinet implementation, contributed through the bogofilter-dev
 	  mailing list.  Thanks!
 
 	2015-10-10
