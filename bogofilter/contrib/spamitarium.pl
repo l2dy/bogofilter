@@ -17,6 +17,14 @@ use strict;
 #   the documentation below for the options --return-path, --no-local-received,
 #   --remote-ip, --remote-name, --helo, --local-ip, --local-name, --rcpt, and
 #   --add-local-received.
+# * A --timeout option has been added for specifying how long the script should
+#   wait for input, or 0 to disable the timeout completely. This is primarily
+#   useful for debugging the script.
+# * The header parsing code has been refactored to be cleaner and more robust.
+# * In particular, empty header fields are now handled correctly (previously,
+#   they were appended to the previous header field!).
+# * Empty header fields are now included in the output, for more accurate
+#   bogofilter'ing.
 # * Typos and such have been cleaned up in the documentation.
 # * A date-parsing bug which was causing the time zone to be ignored, thus
 #   causing the X-Date-Check header to report an inaccurate delta, has been
@@ -40,13 +48,13 @@ Spamitarium - evaluates and repairs the sanity of email headers...
 
 =cut
 
-my $version = "0.4.0";
+my $version = "0.5.1";
 
 ################################################
 ############### Copyleft Notice ################
 ################################################
 
-# Copyright © 2004 Order amid Chaos, Inc.
+# Copyright Â© 2004 Order amid Chaos, Inc.
 # Author: Tom Anderson 
 # neo+spamitarium@orderamidchaos.com
 # 
@@ -204,6 +212,11 @@ Indicate that spamitarium should add an auto-generated local Received
 line.
 
 =back
+
+=item B<--timeout> I<seconds>
+
+How long to wait for input before giving up. Specify 0 to disable the timeout
+completely. Primarily for debugging purposes.
 
 =back
 
@@ -531,6 +544,7 @@ if (! GetOptions("help|h" => sub { &usage; exit(0); },
 		 "rcpt=s" => \$opt_rcpt,
 		 "no-local-received|nolocalreceived" => \$no_local_received,
 		 "add-local-received|addlocalreceived" => \$add_local_received,
+                 "timeout=i" => \$timeout,  # 0 to disable timeout
 		 )) {
     &usage;
     exit(1);
@@ -549,7 +563,9 @@ eval
 {
 	# set an alarm so that we don't hang on an empty STDIN
 	local $SIG{ALRM} = sub { die "timeout" };
-	alarm $timeout;
+        if ($timeout > 0) {
+            alarm $timeout;
+        }
 
 	# parse the header
 	$start_parse = new Benchmark if $options =~ /b/;
@@ -589,8 +605,8 @@ eval
 	                {
                        	        if (defined $header->{'received'}->[$x]->{'spf'} && $header->{'received'}->[$x]->{'spf'} =~ /\w/)
                                	{
-			                $header->{'x-spf'}->[$x]->{'name'} = "X-SPF";
-			                $header->{'x-spf'}->[$x]->{'value'} = $header->{'received'}->[$x]->{'spf'};
+                                    push(@{$header->{'x-spf'}},
+                                         {'name' => "X-SPF", 'value' => $header->{'received'}->[$x]->{'spf'}});
                                 }
 	                }			
 		}
@@ -657,80 +673,66 @@ exit(0);
 
 sub parse_header
 {
-	my $header = {};
-	my $name = "";
+    local($_);
+    my $header_text = "";
 
-      linein:
-        while (<STDIN>)
-        {
-            alarm 0;
-            # This is really gross. There is a certain prominent email
-            # marketing company whose software has a bug in it which causes
-            # Date: headers to sometimes be terminated with just CR rather than
-            # CRLF. If we interpret RFC 5321 section 2.3.8 strictly, then we're
-            # required to treat such a Date: header and the one following it as
-            # a single header field, but strict adherence to the RFC when that
-            # results in obviously broken behavior is not the best approach. On
-            # the other hand, when we're straying from the RFC, we want to do
-            # so as minimally as possible. Therefore, what we are doing here is
-            # checking specifically for this exact problem -- Date: headers
-            # ending with CR rather than CRLF -- and correcting for just that
-            # one, limited case.
-            my(@lines);
-            # This handles input with both CRLF and LF line terminators.
-            if (/^(Date:.*)\r([^\n].*(.)\n)/) {
-                if ($3 eq "\r") {
-                    @lines = ("$1\r\n", $2);
-                }
-                else {
-                    @lines = ("$1\n", $2);
-                }
+    while (<STDIN>) {
+        last if (/^\r?\n$/);
+        $header_text .= $_;
+    }
+
+    # This is really gross. There is a certain prominent email marketing
+    # company whose software has a bug in it which causes Date: headers to
+    # sometimes be terminated with just CR rather than CRLF. If we interpret
+    # RFC 5321 section 2.3.8 strictly, then we're required to treat such a
+    # Date: header and the one following it as a single header field, but
+    # strict adherence to the RFC when that results in obviously broken
+    # behavior is not the best approach. On the other hand, when we're straying
+    # from the RFC, we want to do so as minimally as possible. Therefore, what
+    # we are doing here is checking specifically for this exact problem --
+    # Date: headers ending with CR rather than CRLF -- and correcting for just
+    # that one, limited case.
+    # This handles input with both CRLF and LF line terminators.
+    $header_text =~ s/^(Date:.*)\r([^\n].*(.)\n)/$1$3\n$2/m;
+
+    my(@headers) = split(/\n\b/, $header_text);
+    
+    my $header = {};
+    my $last_header = undef;
+
+    for (@headers) {
+        s/\s+$//;
+        s/\s+/ /g;  # collapse whitespace
+        if (s/^(\S+):\s*//) {
+            my $name = $1;
+            my $tag = $name;
+            $tag =~ tr/A-Z/a-z/;  # header names are case-insensitive
+            if (! $_ and $header->{$tag} and
+                grep(! $_->{'value'}, @{$header->{$tag}})) {
+                # If an empty header field is repeated multiple times, we only
+                # need to preserve one of them.
+                next;
+            }
+            push(@{$header->{$tag}}, {'name' => $name, 'value' => $_});
+            $last_header = $header->{$tag}->[-1];
+        }
+        else {
+            # What's the right thing to do here? Either there's no colon or
+            # there's whitespace before the colon, both of which are RFC
+            # violations. Our best guess is to append this to the previous
+            # header.
+            if (! $last_header) {
+                error("warn", "Bad initial header line '$_' ignored\n");
             }
             else {
-                @lines = ($_);
+                error("warn", "Bad header line '$_' appended to preceding '" .
+                      $last_header->{'name'} . "' header field");
+                $last_header->{'value'} .= " " . $_;
             }
-
-            foreach my $line (@lines) {
-		chomp($line);
-
-		# we're done with the header when we've found a blank line
-		# and the required headers have been found already
-		last linein if (!defined $line || $line !~ /\S/); 
-			 #&& (
-			 #(defined $header->{'received'} && $header->{'received'}->[0]->{'value'} =~ /\w/) &&
-			 #(defined $header->{'subject'} && $header->{'subject'}->[0]->{'value'} =~ /\w/) &&
-			 #(defined $header->{'to'} && $header->{'to'}->[0]->{'value'} =~ /\w/) &&
-			 #(defined $header->{'from'} && $header->{'from'}->[0]->{'value'} =~ /\w/)));
-
-		# match header lines
-		if ($line =~ /^(\S+?):\s*?(\S.*?)$/)
-		{
-			my $head = $1; my $value = $2;
-			$name = $head;
-			
-			$name =~ tr/A-Z/a-z/;	# header names are case insensitive
-			chomp($name);
-
-			$value =~ s/\s+?/ /gis;	# nix extra spaces & unfold header lines by removing CRLF
-			$value =~ s/(\S)$/$1 /;
-			chomp($value);
-			
-			# if this header name has already been found, append to the end of the array
-			my $count = ((defined $header->{$name}) && (ref($header->{$name}) eq "ARRAY"))? scalar @{$header->{$name}} : 0;
-			
-			# record this header line
-			$header->{$name}->[$count]->{'value'} = $value;
-			$header->{$name}->[$count]->{'name'} = $head; # just for consistency (i.e. pre transforms)
-			
-			#print "found $head [$count] = $value$CRLF";
-		}
-		
-		# if this line doesn't start with "header:", append to last line found (if exists)
-		elsif ($name && $line =~ /\w/ && $line !~ /^:/) { $line =~ s/\s+?/ /gis; $line =~ s/^\s//; $header->{$name}->[(scalar @{$header->{$name}} - 1)]->{'value'} .= $line if ((defined $header->{$name}) && (ref($header->{$name}) eq "ARRAY")); }
-            }
-	}
-
-	return $header;
+        }                      
+    }   
+                
+    return $header;
 }
 
 sub date_check
@@ -1169,9 +1171,7 @@ sub set_field
 				}
 				#else {	$output .= $header->{$name}->[$x]->{'name'} . ": sanity check failed" . $CRLF; }
 			}
-			elsif ($header->{$name}->[$x]->{'value'} and
-			       $header->{$name}->[$x]->{'value'} =~ /\w/)
-			{  
+			else {
 				$output .= $header->{$name}->[$x]->{'name'} . ": " . $header->{$name}->[$x]->{'value'} . $CRLF; 
 			}
 		}
