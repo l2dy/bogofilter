@@ -15,7 +15,7 @@
 
 -------------------------------------------------------------------------------
 
-	2017-09-12
+	2017-09-18
 	* The contrib/spamitarium.pl, originally written by Thomas 'Tom'
 	  Anderson, was enhanced by Jonathan Kamens and grew a few features.
 	  Run perldoc contrib/spamitarium.pl, or spamitarium.pl -h, to read

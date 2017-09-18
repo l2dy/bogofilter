@@ -48,7 +48,7 @@ Spamitarium - evaluates and repairs the sanity of email headers...
 
 =cut
 
-my $version = "0.5.1";
+my $version = "0.5.2";
 
 ################################################
 ############### Copyleft Notice ################
@@ -442,6 +442,7 @@ our $date_limit = 60*60*24*2;  # 2 days
 #################################################
 
 use Benchmark;
+use Data::Dumper;
 use File::Basename;
 use Time::Local;
 use Net::DNS::Resolver;
@@ -586,7 +587,7 @@ eval
 	if ($options =~ /r/)
 	{
 		$start_rcvd = new Benchmark if $options =~ /b/;
-		$header->{'received'} = process_rcvd($header->{'received'},$return_path || $header->{'return-path'}->[0]->{'value'});
+		$header->{'received'} = process_rcvd($header->{'received'},$return_path || ($header->{'return-path'} && $header->{'return-path'}->[0]->{'value'}));
 		$end_rcvd = new Benchmark if $options =~ /b/;
 	}
 
@@ -596,7 +597,7 @@ eval
 		if ($options =~ /t/)
 		{
 			$header->{'x-date-check'}->[0]->{'name'} = "X-Date-Check"; 
-			$header->{'x-date-check'}->[0]->{'value'} = date_check($header->{'date'}->[0]->{'value'},$header->{'received'}->[0]->{'date'});
+			$header->{'x-date-check'}->[0]->{'value'} = date_check($header->{'date'}->[0]->{'value'},$header->{'received'} && $header->{'received'}->[0]->{'date'});
 		}
 
 		if ($options =~ /p/)
@@ -1153,39 +1154,39 @@ sub set_header
 	return $output;
 }
 
-sub set_field
-{
-	my $header = shift;
-	my $name = shift;
-	my $output = "";
+sub set_field {
+    my($header, $name) = @_;
+    my $output = "";
 
-	if ((defined $header->{$name}) && (ref($header->{$name}) eq "ARRAY"))
-	{
-		for (my $x = 0; $x < scalar @{$header->{$name}}; $x++)
-		{
-			if (($name eq "received") && ($options =~ /r/))
-			{
-				if (defined $header->{$name}->[$x]->{'sane'} && $header->{$name}->[$x]->{'sane'} =~ /\w/) 
-				{	
-					$output .= $header->{$name}->[$x]->{'name'} . ": " . $header->{$name}->[$x]->{'sane'} . $CRLF; 
-				}
-				#else {	$output .= $header->{$name}->[$x]->{'name'} . ": sanity check failed" . $CRLF; }
-			}
-			else {
-				$output .= $header->{$name}->[$x]->{'name'} . ": " . $header->{$name}->[$x]->{'value'} . $CRLF; 
-			}
-		}
-	}
-	elsif (defined $header->{$name})
-	{
-		$output .= ucfirst($name) . ": " . $header->{$name} . $CRLF; 	
-	}
-	elsif ($req_fields =~ /(?:^|,)$name(?:,|$)/)
-	{  
-		$output .= ucfirst($name) . ": [no-$name] " . $CRLF; 
-	}
-	
-	return $output;
+    if ($header->{$name}) {
+        foreach my $header (@{$header->{$name}}) {
+            if ($name eq "received" and $options =~ /r/) {
+                if ($header->{'sane'} and $header->{'sane'} =~ /\w/) {
+                    $output .= $header->{'name'} . ": " . $header->{'sane'} .
+                        $CRLF; 
+                }
+                # else {
+                #     $output .= $header->{'name'} . ": sanity check failed" .
+                #         $CRLF;
+                # }
+            }
+            elsif ($header->{'name'} and defined($header->{'value'})) {
+                $output .= $header->{'name'} . ": " . $header->{'value'} .
+                    $CRLF; 
+            }
+            else {
+                my $dumped = Data::Dumper->new([$header], [qw(header)])->
+                    Indent(0)->Dump();
+                error("warn", "Header for $name, $dumped, is missing name " .
+                      "and/or value?");
+            }
+        }
+    }
+    elsif ($req_fields =~ /(?:^|,)$name(?:,|$)/) {
+        $output .= ucfirst($name) . ": [no-$name] " . $CRLF; 
+    }
+    
+    return $output;
 }
 
 ################################################
