@@ -120,7 +120,7 @@ and usually ship with their write cache enabled. They write fast, but
 can lose or corrupt up to a few MB of data when the power fails.
 Note: This problem is not specific to bogofilter.
 
-It is possible to sacrifice a bit bit of the the write speed and get
+It is possible to sacrifice a bit of the the write speed and get
 reliability in turn, by switching off the disk's write cache (see
 appendix A for instructions).
 
