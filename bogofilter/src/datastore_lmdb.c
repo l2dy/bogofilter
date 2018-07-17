@@ -742,12 +742,6 @@ db_delete(void *vhandle, const dbv_t *token){
     if((bflmp = vhandle) == NULL)
         goto jleave;
 
-    /* TODO bogofilter tries to put .WORDLIST_VERSION even into a RDONLY DB.
-     * TODO Since we silently fake set_dbvalue() success for RDONLY, do the
-     * TODO very same for delete(), too */
-    if(bflmp->bflm_flags & a_BFLM_RDONLY)
-        goto jleave;
-
     if(DEBUG_DATABASE(1) && !(bflmp->bflm_flags & a_BFLM_HAS_TXN)){
         emsg = "!HAS_TXN!";
         e = DS_NOTFOUND;
