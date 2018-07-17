@@ -899,8 +899,7 @@ void db_close(void *vhandle)
     int ret;
     dbh_t *handle = (dbh_t *)vhandle;
     DB *dbp = handle->dbp;
-    /* This is _ONLY_ safe as long as we're logging TXNs */
-    uint32_t flag = (eTransaction == T_ENABLED) ? DB_NOSYNC : 0;
+    uint32_t flag = 0;
 
     assert(handle->magic == MAGIC_DBH);
 
