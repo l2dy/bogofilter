@@ -15,6 +15,12 @@
 
 -------------------------------------------------------------------------------
 
+	2018-07-17
+	* The Berkeley DB backend driver forgoes DB_NOSYNC in transactional
+	  mode, so as to synchronize changes from the logs back into the .db
+	  files to keep them up to date and make environments more robust
+	  against a loss of log.* files, for instance, when moving databases.
+
 	2017-09-18
 	* The contrib/spamitarium.pl, originally written by Thomas 'Tom'
 	  Anderson, was enhanced by Jonathan Kamens and grew a few features.

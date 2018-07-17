@@ -694,11 +694,6 @@ db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *value){
     if((bflmp = vhandle) == NULL)
         goto jleave;
 
-    /* TODO bogofilter tries to put .WORDLIST_VERSION even into a RDONLY DB.
-     * TODO Therefore silently fake set_dbvalue() success for RDONLY */
-    if(bflmp->bflm_flags & a_BFLM_RDONLY)
-        goto jleave;
-
     if(DEBUG_DATABASE(1) && !(bflmp->bflm_flags & a_BFLM_HAS_TXN)){
         emsg = "!HAS_TXN!";
         goto jerr;
