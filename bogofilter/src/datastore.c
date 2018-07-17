@@ -161,7 +161,7 @@ void *ds_open(void *dbe, bfpath *bfp, dbmode_t open_mode)
 
     dsh = dsh_init(v);
 
-    if (db_created(v) && ! (open_mode & DS_LOAD)) {
+    if (db_created(v) && ! (open_mode & DS_LOAD) && (open_mode & DS_WRITE)) {
 	if (DST_OK != ds_txn_begin(dsh))
 	    exit(EX_ERROR);
 	ds_set_wordlist_version(dsh, NULL);
