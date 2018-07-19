@@ -187,7 +187,7 @@ a_bflm_init(bfpath *bfp, bool rdonly){
     size_t i;
 
     i = strlen(bfp->filepath) +1;
-    rv = xmalloc(sizeof(*rv) + i);
+    rv = (struct a_bflm *)xmalloc(sizeof(*rv) + i);
     memset(rv, 0, sizeof *rv);
     memcpy(rv->bflm_filepath = (char*)&rv[1], bfp->filepath, i);
 
@@ -283,7 +283,7 @@ jredo_dbi:
         goto jerr;
     }
 
-    if(f == MDB_CREATE && db_name == a_BFLM_DB_NAME_MAN){
+    if(f == MDB_CREATE && 0 == strcmp(db_name, a_BFLM_DB_NAME_MAN)){
         db_name = a_BFLM_DB_NAME_DAT;
         goto jredo_dbi;
     }
@@ -325,13 +325,14 @@ a_bflm_txn_begin(void *vhandle){
 
     e = DST_OK;
 
-    if((bflmp = vhandle) == NULL)
+    if((bflmp = (struct a_bflm *)vhandle) == NULL)
         goto jleave;
 
     if(bflmp->bflm_flags & a_BFLM_DEBUG)
         fprintf(dbgout, "LMDB[%ld]: txn_begin(%p [%s])\n",
             (long)getpid(), bflmp, bflmp->bflm_filepath);
 
+    bflmp->bflm_flags &= ~(a_BFLM_HAS_TXN | a_BFLM_DB_UNAVAIL);
 jredo_txn:
     e = mdb_txn_begin(bflmp->bflm_env, NULL,
             (bflmp->bflm_flags & a_BFLM_RDONLY ? MDB_RDONLY : 0),
@@ -383,7 +384,7 @@ a_bflm_txn_abort(void *vhandle){
 
     e = DST_OK;
 
-    if((bflmp = vhandle) == NULL)
+    if((bflmp = (struct a_bflm *)vhandle) == NULL)
         goto jleave;
 
     if(bflmp->bflm_flags & a_BFLM_DEBUG)
@@ -414,7 +415,7 @@ a_bflm_txn_commit(void *vhandle){
 
     e = DST_OK;
 
-    if((bflmp = vhandle) == NULL)
+    if((bflmp = (struct a_bflm *)vhandle) == NULL)
         goto jleave;
 
     if(bflmp->bflm_flags & a_BFLM_DEBUG)
@@ -565,7 +566,7 @@ a_bflm_txn_cache_put(struct a_bflm *bflmp, MDB_val *key, MDB_val *val_or_null){
 jcache_new:
         i += sizeof(*bflmtcp);
         i = max(i, a_BFLM_TXN_CACHE_SIZE);
-        dp = (char*)(bflmtcp = xmalloc(i));
+        dp = (char*)(bflmtcp = (struct a_bflm_txn_cache *)xmalloc(i));
         bflmtcp->bflmtc_last = bflmp->bflm_txn_cache;
         bflmp->bflm_txn_cache = bflmtcp;
         bflmtcp->bflmtc_caster = bflmtcp->bflmtc_data = (char*)&bflmtcp[1];
@@ -703,7 +704,7 @@ void
 db_close(void *vhandle){
     struct a_bflm *bflmp;
 
-    if((bflmp = vhandle) == NULL)
+    if((bflmp = (struct a_bflm *)vhandle) == NULL)
         goto jleave;
 
     if(bflmp->bflm_flags & a_BFLM_DEBUG)
@@ -725,7 +726,7 @@ db_created(void *vhandle){
     bool created;
     struct a_bflm *bflmp;
 
-    created = ((bflmp = vhandle) != NULL &&
+    created = ((bflmp = (struct a_bflm *)vhandle) != NULL &&
             (bflmp->bflm_flags & a_BFLM_DB_CREATED) != 0);
     return created;
 }
@@ -739,7 +740,7 @@ db_get_dbvalue(void *vhandle, const dbv_t *token, dbv_t *value){
 
     e = DS_NOTFOUND;
 
-    if((bflmp = vhandle) == NULL)
+    if((bflmp = (struct a_bflm *)vhandle) == NULL)
         goto jleave;
 
     if(bflmp->bflm_flags & a_BFLM_DB_UNAVAIL)
@@ -750,7 +751,7 @@ db_get_dbvalue(void *vhandle, const dbv_t *token, dbv_t *value){
             fprintf(dbgout, "LMDB[%ld]: get_dbvalue: key too big "
                 "(> %lu bytes), ignoring %.*s\n",
                 (long)getpid(),(unsigned long)bflmp->bflm_maxkeysize,
-                (int)token->leng, token->data);
+                (int)token->leng, (const char *)token->data);
         goto jleave;
     }
 
@@ -773,7 +774,7 @@ db_get_dbvalue(void *vhandle, const dbv_t *token, dbv_t *value){
 jleave:
     if(DEBUG_DATABASE(3))
         fprintf(dbgout, "LMDB db_get_dbvalue(): %lu <%.*s> -> %d\n",
-            (unsigned long)token->leng, (int)token->leng, token->data,
+            (unsigned long)token->leng, (int)token->leng, (const char *)token->data,
             (e == 0));
     return e;
 jerr:
@@ -799,7 +800,7 @@ db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *value){
 
     e = 0;
 
-    if((bflmp = vhandle) == NULL)
+    if((bflmp = (struct a_bflm *)vhandle) == NULL)
         goto jleave;
 
     if(bflmp->bflm_flags & a_BFLM_DB_UNAVAIL)
@@ -810,7 +811,7 @@ db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *value){
             fprintf(dbgout, "LMDB[%ld]: set_dbvalue: key too big "
                 "(> %lu bytes), ignoring %.*s\n",
                 (long)getpid(),(unsigned long)bflmp->bflm_maxkeysize,
-                (int)token->leng, token->data);
+                (int)token->leng, (const char *)token->data);
         goto jleave;
     }
 
@@ -842,7 +843,7 @@ jredo:
 jleave:
     if(DEBUG_DATABASE(3))
         fprintf(dbgout, "LMDB db_set_dbvalue(): %lu <%.*s> -> %d\n",
-            (unsigned long)token->leng, (int)token->leng, token->data,
+            (unsigned long)token->leng, (int)token->leng, (const char *)token->data,
             (e == 0));
     return e;
 jerr:
@@ -863,7 +864,7 @@ db_delete(void *vhandle, const dbv_t *token){
 
     e = 0;
 
-    if((bflmp = vhandle) == NULL)
+    if((bflmp = (struct a_bflm *)vhandle) == NULL)
         goto jleave;
 
     if(bflmp->bflm_flags & a_BFLM_DB_UNAVAIL)
@@ -874,7 +875,7 @@ db_delete(void *vhandle, const dbv_t *token){
             fprintf(dbgout, "LMDB[%ld]: delete: key too big "
                 "(> %lu bytes), ignoring %.*s\n",
                 (long)getpid(),(unsigned long)bflmp->bflm_maxkeysize,
-                (int)token->leng, token->data);
+                (int)token->leng, (const char *)token->data);
         goto jleave;
     }
 
@@ -911,7 +912,7 @@ jredo:
 jleave:
     if(DEBUG_DATABASE(3))
         fprintf(dbgout, "LMDB db_delete(): %lu <%.*s> -> %d\n",
-            (unsigned long)token->leng, (int)token->leng, token->data,
+            (unsigned long)token->leng, (int)token->leng, (const char *)token->data,
             (e == 0));
     return e;
 jerr:
@@ -927,7 +928,7 @@ void
 db_flush(void *vhandle){
     struct a_bflm *bflmp;
 
-    if((bflmp = vhandle) != NULL){
+    if((bflmp = (struct a_bflm *)vhandle) != NULL){
         int e;
 
         if(bflmp->bflm_flags & a_BFLM_DEBUG)
@@ -953,7 +954,7 @@ db_foreach(void *vhandle, db_foreach_t hook, void *userdata){
 
     rv = EX_OK;
 
-    if((bflmp = vhandle) == NULL)
+    if((bflmp = (struct a_bflm *)vhandle) == NULL)
         goto jleave;
 
     if(bflmp->bflm_flags & a_BFLM_DB_UNAVAIL)
@@ -988,7 +989,7 @@ db_foreach(void *vhandle, db_foreach_t hook, void *userdata){
         /* Copy to dbv_key and dbv_val in order to avoid loss upon possible
          * action on the DB; should not matter, but NUL terminate them */
         dbv_key.leng = (uint32_t)(i = key.mv_size);
-        dbv_key.data = buf = xrealloc(buf, i +1 + val.mv_size +1);
+        dbv_key.data = buf = (char *)xrealloc(buf, i +1 + val.mv_size +1);
         memcpy(buf, key.mv_data, i);
         buf[i++] = '\0';
         dbv_val.leng = (uint32_t)val.mv_size;

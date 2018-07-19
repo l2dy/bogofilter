@@ -140,6 +140,7 @@ static int yy_get_new_line(buff_t *buff)
 	   && count != EOF
 /* don't skip if inside message/rfc822 */
 	   && msg_state->parent == NULL
+	   && buff->t.leng >= hdrlen
 	   && memcmp(buff->t.u.text,spam_header_name,hdrlen) == 0) {
 	count = skip_folded_line(buff);
     }
