@@ -53,6 +53,7 @@ case $DB_NAME in
     *Kyoto*)	     DB_TXN=true  ;;
     *SQLite*)	     DB_TXN=true  ;;
     *TrivialDB*)     DB_TXN=false ;;
+    *LMDB*)	     DB_TXN=true  ;;
     *)		    echo >&2 "Unknown data base type in bogofilter -V: $DB_NAME"
 		    exit 1 ;;
 esac

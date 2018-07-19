@@ -479,7 +479,7 @@ AC_CACHE_SAVE
 WITH_DB_ENGINE=db
 AC_ARG_WITH(database,
 	    AS_HELP_STRING([--with-database=ENGINE],
-	    [choose database engine {db|qdbm|sqlite3|tokyocabinet|kyotocabinet} [[db]]]),
+	    [choose database engine {db|qdbm|sqlite3|tokyocabinet|kyotocabinet|lmdb} [[db]]]),
 	    [ WITH_DB_ENGINE=$withval ]
 )
 
@@ -529,6 +529,29 @@ case "x$WITH_DB_ENGINE" in
 	], [
 	    KCDB *db = kcdbnew();
 	])],,AC_MSG_ERROR(Cannot link to kyotocabinet library.))
+	LIBS="$saveLIBS"
+        ;;
+    xlmdb)
+	AC_DEFINE(ENABLE_LMDB_DATASTORE,1, [Enable LMDB datastore])
+	DB_TYPE=lmdb
+	DB_EXT=.lmdb
+	AC_LIB_LINKFLAGS([lmdb])
+	LIBDB="$LIBLMDB"
+	saveLIBS="$LIBS"
+	LIBS="$LIBS $LIBDB"
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([
+#include <lmdb.h>
+	], [
+		MDB_env *env;
+		MDB_txn *txn;
+		MDB_dbi dbi;
+		mdb_env_create(&env);
+		mdb_env_set_maxreaders(env, 1);
+		mdb_env_set_mapsize(env, 4096*42);
+		mdb_env_open(env, "/tmp", 0, 0660);
+		mdb_txn_begin(env, (void*)0, 0, &txn);
+		mdb_dbi_open(txn, (void*)0, 0, &dbi);
+	])],,AC_MSG_ERROR(Cannot link to lmdb library.))
 	LIBS="$saveLIBS"
         ;;
     xqdbm)
@@ -681,7 +704,7 @@ shared environments, you can use --disable-dbshared-test.])],true)
 	LIBS="$saveLIBS"
     ;;
     *)
-	AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, qdbm, sqlite3, tokyocabinet, kyotocabinet.])
+	AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, qdbm, sqlite3, tokyocabinet, kyotocabinet, lmdb.])
     ;;
 esac
 
@@ -708,6 +731,7 @@ AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
 AM_CONDITIONAL(ENABLE_SQLITE_DATASTORE, test "x$WITH_DB_ENGINE" = "xsqlite3")
 AM_CONDITIONAL(ENABLE_TOKYOCABINET_DATASTORE, test "x$WITH_DB_ENGINE" = "xtokyocabinet")
 AM_CONDITIONAL(ENABLE_KYOTOCABINET_DATASTORE, test "x$WITH_DB_ENGINE" = "xkyotocabinet")
+AM_CONDITIONAL(ENABLE_LMDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xlmdb")
 
 dnl Use TRIO to replace missing snprintf/vsnprintf.
 needtrio=0

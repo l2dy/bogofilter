@@ -18,10 +18,12 @@ this writing in alphabetical order
 3. SQLite (3.2.6 or newer)			http://sqlite.org/
 4. TokyoCabinet			http://fallabs.com/tokyocabinet/
 5. KyotoCabinet			http://fallabs.com/kyotocabinet/
+6. LMDB Lightning Memory-Mapped Database Manager https://symas.com/lmdb/
 
 You can use --with-database=ARG (choose from db (for Berkeley DB), qdbm,
-sqlite) to pick the database backend (you must have installed the
-database and the corresponding developer package). db is the default.
+sqlite, tokyocabinet, kyotocabinet, lmdb) to pick the database backend (you
+must have installed the database and the corresponding developer package).
+db is the default.
 
 If you are using "db", you can use --disable-transactions or
 --enable-transactions to force the use of 1a or 1b. The default is to

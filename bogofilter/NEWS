@@ -15,6 +15,11 @@
 
 -------------------------------------------------------------------------------
 
+	2018-07-19
+	* Support for using LMDB (Lightning Memory-Mapped Database Manager)
+	  as the database back-end. Suggested, courteously implemented and
+	  contributed by Steffen Nurpmeso, steffen .at. sdaoden.eu.
+
 	2018-07-17
 	* The Berkeley DB backend driver forgoes DB_NOSYNC in transactional
 	  mode, so as to synchronize changes from the logs back into the .db
