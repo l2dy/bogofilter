@@ -549,8 +549,8 @@ case "x$WITH_DB_ENGINE" in
 		mdb_env_set_maxreaders(env, 1);
 		mdb_env_set_mapsize(env, 4096*42);
 		mdb_env_open(env, "/tmp", 0, 0660);
-		mdb_txn_begin(env, (void*)0, 0, &txn);
-		mdb_dbi_open(txn, (void*)0, 0, &dbi);
+		mdb_txn_begin(env, 0, 0, &txn);
+		mdb_dbi_open(txn, "", 0, &dbi);
 	])],,AC_MSG_ERROR(Cannot link to lmdb library.))
 	LIBS="$saveLIBS"
         ;;
