@@ -283,7 +283,7 @@ jredo_dbi:
         goto jerr;
     }
 
-    if(f == MDB_CREATE && db_name == a_BFLM_DB_NAME_MAN){
+    if(f == MDB_CREATE && 0 == strcmp(db_name, a_BFLM_DB_NAME_MAN)){
         db_name = a_BFLM_DB_NAME_DAT;
         goto jredo_dbi;
     }
@@ -750,7 +750,7 @@ db_get_dbvalue(void *vhandle, const dbv_t *token, dbv_t *value){
             fprintf(dbgout, "LMDB[%ld]: get_dbvalue: key too big "
                 "(> %lu bytes), ignoring %.*s\n",
                 (long)getpid(),(unsigned long)bflmp->bflm_maxkeysize,
-                (int)token->leng, token->data);
+                (int)token->leng, (const char *)token->data);
         goto jleave;
     }
 
@@ -773,7 +773,7 @@ db_get_dbvalue(void *vhandle, const dbv_t *token, dbv_t *value){
 jleave:
     if(DEBUG_DATABASE(3))
         fprintf(dbgout, "LMDB db_get_dbvalue(): %lu <%.*s> -> %d\n",
-            (unsigned long)token->leng, (int)token->leng, token->data,
+            (unsigned long)token->leng, (int)token->leng, (const char *)token->data,
             (e == 0));
     return e;
 jerr:
@@ -810,7 +810,7 @@ db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *value){
             fprintf(dbgout, "LMDB[%ld]: set_dbvalue: key too big "
                 "(> %lu bytes), ignoring %.*s\n",
                 (long)getpid(),(unsigned long)bflmp->bflm_maxkeysize,
-                (int)token->leng, token->data);
+                (int)token->leng, (const char *)token->data);
         goto jleave;
     }
 
@@ -842,7 +842,7 @@ jredo:
 jleave:
     if(DEBUG_DATABASE(3))
         fprintf(dbgout, "LMDB db_set_dbvalue(): %lu <%.*s> -> %d\n",
-            (unsigned long)token->leng, (int)token->leng, token->data,
+            (unsigned long)token->leng, (int)token->leng, (const char *)token->data,
             (e == 0));
     return e;
 jerr:
@@ -874,7 +874,7 @@ db_delete(void *vhandle, const dbv_t *token){
             fprintf(dbgout, "LMDB[%ld]: delete: key too big "
                 "(> %lu bytes), ignoring %.*s\n",
                 (long)getpid(),(unsigned long)bflmp->bflm_maxkeysize,
-                (int)token->leng, token->data);
+                (int)token->leng, (const char *)token->data);
         goto jleave;
     }
 
@@ -911,7 +911,7 @@ jredo:
 jleave:
     if(DEBUG_DATABASE(3))
         fprintf(dbgout, "LMDB db_delete(): %lu <%.*s> -> %d\n",
-            (unsigned long)token->leng, (int)token->leng, token->data,
+            (unsigned long)token->leng, (int)token->leng, (const char *)token->data,
             (e == 0));
     return e;
 jerr:
