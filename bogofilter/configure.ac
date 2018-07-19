@@ -533,9 +533,6 @@ case "x$WITH_DB_ENGINE" in
         ;;
     xlmdb)
 	AC_DEFINE(ENABLE_LMDB_DATASTORE,1, [Enable LMDB datastore])
-	AC_MSG_WARN([Note that LMDB support is not yet complete.])
-	AC_MSG_WARN([You may wish to choose a different database driver for now.])
-	sleep 10
 	DB_TYPE=lmdb
 	DB_EXT=.lmdb
 	AC_LIB_LINKFLAGS([lmdb])

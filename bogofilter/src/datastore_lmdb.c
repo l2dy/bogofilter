@@ -21,37 +21,55 @@
  *    You open an environment (which may contain multiple DBs), create
  *    a transaction and open a DB in that transaction.
  * 2. LMDB is based on a finite-sized memory map.  When a writable transaction
- *    reaches the size limit, the transaction must be aborted, hen the
+ *    reaches the size limit, the transaction must be aborted, then the
  *    environment must be resized, then a new transaction has to be created.
  *    Resizing will not shrink, effectively.
  * 3. We assume xmalloc() aborts if out of memory.
  * 4. We assume no token->leng actually exceeds int32_t.
+ * 5. mdb_env_get_maxkeysize():
+ *      Depends on the compile-time constant #MDB_MAXKEYSIZE. Default 511.
+ *    We reject any keys which excess this.
  *
  * In order to be able to deal with 2. we need to track all changes that are
  * performed in a txn, so that in case we are running against the wall we are
  * capable to replay all changes after having resized the map.
+ *
+ * Alternatively, define a_BFLM_FIXED_SIZE, in which case all the replay code
+ * is not compiled, but instead the given size is fixed, and any DB overflow
+ * results in program abortion.  Since the DB should only consume disc space
+ * for those pages which are used, this should not hurt in practice.
  */
+
+/* Alternative implementation: fixed DB size */
+/*#define a_BFLM_FIXED_SIZE (1u << 31)*/
 
 /* mdb_env_set_maxreaders() */
 #define a_BFLM_MAXREADERS 15
 
-/* Minimum/initial database size, and DB size grow.
- * Space it so that a DB load does not run against walls too many times.
- * We try _TRIES times to resize for a single new entry before giving up */
-#define a_BFLM_MINSIZE (1u << 21)
-#define a_BFLM_GROW (1u << 24)
-#define a_BFLM_GROW_TRIES 3
+#ifndef a_BFLM_FIXED_SIZE
+    /* DB size grow.  Must be a power of two!
+     * Space it so that a DB load does not run against walls too many times.
+     * We try _TRIES times to resize for a single new entry before giving up.
+     * Note that the minimum size must be capable to store the two used DB
+     * structured without resize etc. */
+# define a_BFLM_GROW (1u << 23)
+# define a_BFLM_GROW_TRIES 3
 
-/* Size of one chunk of the intermediate txn cache, as above.
- * Space it so that a DB load does not require all too many.
- * Of course, if a token requires more space, we allocate a larger chunk */
-#define a_BFLM_TXN_CACHE_SIZE (1u << 20)
+    /* Size of one chunk of the intermediate txn cache, as above.
+     * Space it so that a DB load does not require all too many.
+     * Of course, if a token requires more space, we allocate a larger chunk */
+# define a_BFLM_TXN_CACHE_SIZE (1u << 20)
 
-/* An entry consists of an uint32_t describing the length of the key.
- * If the high bit is set an uint32_t describing the length of the value
- * follows.  After the data buffers there possibly is alignment pad */
-#define a_BFLM_TXN_CACHE_ALIGN(X) \
+    /* An entry consists of an uint32_t describing the length of the key.
+     * If the high bit is set an uint32_t describing the length of the value
+     * follows.  After the data buffers there possibly is alignment pad */
+# define a_BFLM_TXN_CACHE_ALIGN(X) \
     (((X) + (sizeof(uint32_t) - 1)) & ~(sizeof(uint32_t) - 1))
+#endif /* a_BFLM_FIXED_SIZE */
+
+/* The DB names we use: one for our "is-created" event, the other for data */
+#define a_BFLM_DB_NAME_MAN "BF_MAN"
+#define a_BFLM_DB_NAME_DAT "BF_DAT"
 
 #include "common.h"
 
@@ -76,20 +94,25 @@ enum a_bflm_flags{
     a_BFLM_NONE,
     a_BFLM_DEBUG = 1u<<0,
     a_BFLM_RDONLY = 1u<<1,
-    a_BFLM_HAS_TXN = 1u<<2
+    a_BFLM_DB_CREATED = 1u<<2,  /* DBs were newly created */
+    a_BFLM_DB_UNAVAIL = 1u<<3,  /* rdonly open, but no DB exists yet! */
+    a_BFLM_HAS_TXN = 1u<<4
 };
 
 struct a_bflm{
     char *bflm_filepath;    /* bfpath.filepath (points to &self[1]) */
     MDB_env *bflm_env;
-    size_t bflm_mapsize;    /* Current notion of DB map size */
     MDB_txn *bflm_txn;
     MDB_cursor *bflm_cursor;
     MDB_dbi bflm_dbi;
     uint32_t bflm_flags;
+    size_t bflm_maxkeysize; /* mdb_env_get_maxkeysize() */
+#ifndef a_BFLM_FIXED_SIZE
     struct a_bflm_txn_cache *bflm_txn_cache;    /* Stack thereof */
+#endif
 };
 
+#ifndef a_BFLM_FIXED_SIZE
 struct a_bflm_txn_cache{
     struct a_bflm_txn_cache *bflmtc_last;
     struct a_bflm_txn_cache *bflmtc_next;   /* Needs to be build before use! */
@@ -98,9 +121,11 @@ struct a_bflm_txn_cache{
     /* Actually points to &self[1] TODO [0] or [8], dep. __STDC_VERSION__! */
     char *bflmtc_data;
 };
+#endif
 
 /**/
-static struct a_bflm *a_bflm_init(bfpath *bfp);
+static struct a_bflm *a_bflm_init(bfpath *bfp, bool rdonly);
+static int a_bflm__check_create(struct a_bflm *bflmp);
 static void a_bflm_free(struct a_bflm *bflmp);
 
 /**/
@@ -108,6 +133,7 @@ static int a_bflm_txn_begin(void *vhandle);
 static int a_bflm_txn_abort(void *vhandle);
 static int a_bflm_txn_commit(void *vhandle);
 
+#ifndef a_BFLM_FIXED_SIZE
 /**/
 static bool a_bflm_txn_mapfull(struct a_bflm *bflmp, bool close_cursor);
 
@@ -122,6 +148,7 @@ static char const *a_bflm_txn_cache_replay(struct a_bflm *bflmp);
 
 /* Free the recovery stack and possible heap data */
 static void a_bflm_txn_cache_free(struct a_bflm *bflmp);
+#endif /* a_BFLM_FIXED_SIZE */
 
 static dsm_t /* TODO const*/ a_bflm_dsm = {
     /* public -- used in datastore.c */
@@ -152,9 +179,8 @@ static dsm_t /* TODO const*/ a_bflm_dsm = {
 };
 
 static struct a_bflm *
-a_bflm_init(bfpath *bfp){
+a_bflm_init(bfpath *bfp, bool rdonly){
     /* No variable array for .bflm_filepath, use same method as in word.h */
-    MDB_envinfo envinfo;
     int e;
     char const *emsg;
     struct a_bflm *rv;
@@ -165,22 +191,33 @@ a_bflm_init(bfpath *bfp){
     memset(rv, 0, sizeof *rv);
     memcpy(rv->bflm_filepath = (char*)&rv[1], bfp->filepath, i);
 
-    rv->bflm_flags = ((DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB") != NULL)
-            ? a_BFLM_DEBUG : a_BFLM_NONE);
+    rv->bflm_flags = (((DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB") != NULL)
+            ? a_BFLM_DEBUG : a_BFLM_NONE) |
+            (rdonly ? a_BFLM_RDONLY : a_BFLM_NONE));
+
     e = mdb_env_create(&rv->bflm_env);
     if(e != MDB_SUCCESS){
         emsg = "mdb_env_open()";
         goto jerr1;
     }
 
+    rv->bflm_maxkeysize = mdb_env_get_maxkeysize(rv->bflm_env);
+
+    /* To acommodate with bogofilter's db_created() mechanism we cannot use the
+     * unnamed DB which "always exists", but must place data in a named one */
+    e = mdb_env_set_maxdbs(rv->bflm_env, 2);
+    if(e != MDB_SUCCESS){
+        emsg = "mdb_env_set_maxdbs()";
+        goto jerr1;
+    }
+
     mdb_env_set_maxreaders(rv->bflm_env, a_BFLM_MAXREADERS);
-    /* The "problem" is that we need to set_mapsize() before env_open(),
-     * otherwise the LMDB default will be used as a default (in 0.9.22).
-     * But since this is cheap at this point just do it.. */
-    /* TODO We may not do this because with v0.9.22 a further DB open
-     * TODO may crash in mdb_*_put() after a growing _mapsize! */
-#if 0
-    e = mdb_env_set_mapsize(rv->bflm_env, a_BFLM_MINSIZE);
+
+    /* TODO We may not do this unless going for a huge fixed size, because with
+     * TODO v0.9.22 a further DB open will then crash in mdb_*_put() after
+     * TODO a growing _mapsize call! ... */
+#ifdef a_BFLM_FIXED_SIZE
+    e = mdb_env_set_mapsize(rv->bflm_env, a_BFLM_FIXED_SIZE);
     if(e != MDB_SUCCESS){
         emsg = "mdb_env_set_mapsize()";
         goto jerr2;
@@ -193,15 +230,16 @@ a_bflm_init(bfpath *bfp){
         goto jerr2;
     }
 
-    /* ..then query the actual environment and use the reported map size:
-     * Note: LMDB documents to reject requests to shrink the real map size! */
-    /* no error defined */mdb_env_info(rv->bflm_env, &envinfo);
-    rv->bflm_mapsize = envinfo.me_mapsize;
+    /* Let us fake a "has been created" event :( */
+    if(!(rv->bflm_flags & a_BFLM_RDONLY) &&
+            (e = a_bflm__check_create(rv)) != MDB_SUCCESS){
+        emsg = "cannot handle management DB";
+        goto jerr2;
+    }
 
     if(rv->bflm_flags & a_BFLM_DEBUG)
-        fprintf(dbgout, "LMDB[%ld]: init: %p/%s, mapsize: %lu\n",
-            (long)getpid(), rv, rv->bflm_filepath,
-            (unsigned long)rv->bflm_mapsize);
+        fprintf(dbgout, "LMDB[%ld]: init: %p [%s]\n",
+            (long)getpid(), rv, rv->bflm_filepath);
 jleave:
     return rv;
 
@@ -216,14 +254,58 @@ jerr1:
     goto jleave;
 }
 
+static int
+a_bflm__check_create(struct a_bflm *bflmp){
+    char const *db_name;
+    unsigned int f;
+    int e;
+
+jredo_txn:
+    e = mdb_txn_begin(bflmp->bflm_env, NULL, 0, &bflmp->bflm_txn);
+    if(e != MDB_SUCCESS){
+        if(e == MDB_MAP_RESIZED){
+            mdb_env_set_mapsize(bflmp->bflm_env, 0);
+            goto jredo_txn;
+        }
+        goto jleave;
+    }
+
+    db_name = a_BFLM_DB_NAME_MAN;
+    f = 0;
+jredo_dbi:
+    e = mdb_dbi_open(bflmp->bflm_txn, db_name, f, &bflmp->bflm_dbi);
+    if(e != MDB_SUCCESS){
+        if(e == MDB_NOTFOUND && f == 0){
+            bflmp->bflm_flags |= a_BFLM_DB_CREATED;
+            f = MDB_CREATE;
+            goto jredo_dbi;
+        }
+        goto jerr;
+    }
+
+    if(f == MDB_CREATE && db_name == a_BFLM_DB_NAME_MAN){
+        db_name = a_BFLM_DB_NAME_DAT;
+        goto jredo_dbi;
+    }
+
+    e = mdb_txn_commit(bflmp->bflm_txn);
+    if(e != MDB_SUCCESS)
+jerr:
+        mdb_txn_abort(bflmp->bflm_txn);
+jleave:
+    return e;
+}
+
 static void
 a_bflm_free(struct a_bflm *bflmp){
     if(bflmp != NULL){
+#ifndef a_BFLM_FIXED_SIZE
         if(bflmp->bflm_txn_cache != NULL){
             if(DEBUG_DATABASE(1))
                 fprintf(dbgout, "LMDB _free(): error: there is txn_cache!\n");
             a_bflm_txn_cache_free(bflmp);
         }
+#endif
 
         mdb_env_close(bflmp->bflm_env);
 
@@ -250,22 +332,25 @@ a_bflm_txn_begin(void *vhandle){
         fprintf(dbgout, "LMDB[%ld]: txn_begin(%p [%s])\n",
             (long)getpid(), bflmp, bflmp->bflm_filepath);
 
-    if(DEBUG_DATABASE(1) && (bflmp->bflm_flags & a_BFLM_HAS_TXN)){
-        fprintf(dbgout, "LMDB txn_begin(): error: HAS_TXN!\n");
-        e = DST_FAILURE;
-        goto jleave;
-    }
-
+jredo_txn:
     e = mdb_txn_begin(bflmp->bflm_env, NULL,
             (bflmp->bflm_flags & a_BFLM_RDONLY ? MDB_RDONLY : 0),
             &bflmp->bflm_txn);
     if(e != MDB_SUCCESS){
+        if(e == MDB_MAP_RESIZED){
+            mdb_env_set_mapsize(bflmp->bflm_env, 0);
+            goto jredo_txn;
+        }
         emsg = "mdb_txn_begin()";
         goto jerr1;
     }
 
-    e = mdb_dbi_open(bflmp->bflm_txn, NULL, 0, &bflmp->bflm_dbi);
+    e = mdb_dbi_open(bflmp->bflm_txn, a_BFLM_DB_NAME_DAT, 0, &bflmp->bflm_dbi);
     if(e != MDB_SUCCESS){
+        if(e == MDB_NOTFOUND){
+            bflmp->bflm_flags |= a_BFLM_DB_UNAVAIL;
+            goto junavail;
+        }
         emsg = "mdb_dbi_open()";
         goto jerr2;
     }
@@ -276,6 +361,7 @@ a_bflm_txn_begin(void *vhandle){
         goto jerr2;
     }
 
+junavail:
     bflmp->bflm_flags |= a_BFLM_HAS_TXN;
     e = DST_OK;
 jleave:
@@ -304,15 +390,14 @@ a_bflm_txn_abort(void *vhandle){
         fprintf(dbgout, "LMDB[%ld]: txn_abort(%p [%s])\n",
             (long)getpid(), bflmp, bflmp->bflm_filepath);
 
-    if(DEBUG_DATABASE(1) && !(bflmp->bflm_flags & a_BFLM_HAS_TXN)){
-        fprintf(dbgout, "LMDB txn_abort(): error: !HAS_TXN!\n");
-        e = DST_FAILURE;
-        goto jleave;
-    }
+    if(!(bflmp->bflm_flags & a_BFLM_DB_UNAVAIL))
+        mdb_cursor_close(bflmp->bflm_cursor);
 
-    mdb_cursor_close(bflmp->bflm_cursor);
     mdb_txn_abort(bflmp->bflm_txn);
+
+#ifndef a_BFLM_FIXED_SIZE
     a_bflm_txn_cache_free(bflmp);
+#endif
 
     bflmp->bflm_flags &= ~a_BFLM_HAS_TXN;
 jleave:
@@ -322,7 +407,10 @@ jleave:
 static int
 a_bflm_txn_commit(void *vhandle){
     struct a_bflm *bflmp;
-    int e, retries;
+#ifndef a_BFLM_FIXED_SIZE
+    int retries;
+#endif
+    int e;
 
     e = DST_OK;
 
@@ -333,28 +421,30 @@ a_bflm_txn_commit(void *vhandle){
         fprintf(dbgout, "LMDB[%ld]: txn_commit(%p [%s])\n",
             (long)getpid(), bflmp, bflmp->bflm_filepath);
 
-    if(DEBUG_DATABASE(1) && !(bflmp->bflm_flags & a_BFLM_HAS_TXN)){
-        fprintf(dbgout, "LMDB txn_commit(): error: !HAS_TXN!\n");
-        e = DST_FAILURE;
-        goto jleave;
-    }
+    if(!(bflmp->bflm_flags & a_BFLM_DB_UNAVAIL))
+        mdb_cursor_close(bflmp->bflm_cursor);
 
-    mdb_cursor_close(bflmp->bflm_cursor);
-
+#ifndef a_BFLM_FIXED_SIZE
     retries = 0;
 jredo:
+#endif
     e = mdb_txn_commit(bflmp->bflm_txn);
     if(e != MDB_SUCCESS){
-        if(e == MDB_MAP_FULL && ++retries <= a_BFLM_GROW_TRIES &&
+#ifndef a_BFLM_FIXED_SIZE
+        if((e == MDB_MAP_FULL || e == MDB_MAP_RESIZED) &&
+                ++retries <= a_BFLM_GROW_TRIES &&
                 a_bflm_txn_mapfull(bflmp, false)){
             mdb_cursor_close(bflmp->bflm_cursor);
             goto jredo;
         }
+#endif
         mdb_txn_abort(bflmp->bflm_txn);
         e = MDB_PANIC;
     }
 
+#ifndef a_BFLM_FIXED_SIZE
     a_bflm_txn_cache_free(bflmp);
+#endif
 
     bflmp->bflm_flags &= ~a_BFLM_HAS_TXN;
     if(e == MDB_SUCCESS)
@@ -368,6 +458,7 @@ jleave:
     return e;
 }
 
+#ifndef a_BFLM_FIXED_SIZE
 static bool
 a_bflm_txn_mapfull(struct a_bflm *bflmp, bool close_cursor){
     MDB_envinfo envinfo;
@@ -375,33 +466,39 @@ a_bflm_txn_mapfull(struct a_bflm *bflmp, bool close_cursor){
     int e;
     size_t i;
 
-    if(DEBUG_DATABASE(1) && (bflmp->bflm_flags & a_BFLM_RDONLY))
-        fprintf(dbgout, "LDMB txn_mapfull() on RDONLY DB!\n");
-
     /* Abort transaction */
+    if(DEBUG_DATABASE(1) && (bflmp->bflm_flags & a_BFLM_DB_UNAVAIL))
+        exit(EX_ERROR);
+
     if(close_cursor)
         mdb_cursor_close(bflmp->bflm_cursor);
+
     mdb_txn_abort(bflmp->bflm_txn);
 
     /* Resize map */
-    i = bflmp->bflm_mapsize;
-    i += a_BFLM_GROW;
+jredo_txn:
+    /* no error defined */mdb_env_info(bflmp->bflm_env, &envinfo);
+    i = envinfo.me_mapsize;
+    i += a_BFLM_GROW / 10;
+    i = (i + (a_BFLM_GROW - 1)) & ~(a_BFLM_GROW - 1);
     e = mdb_env_set_mapsize(bflmp->bflm_env, i);
     if(e != MDB_SUCCESS){
         emsg = "mdb_env_set_mapsize()";
         goto jerr1;
     }
-    /* no error defined */mdb_env_info(bflmp->bflm_env, &envinfo);
-    bflmp->bflm_mapsize = envinfo.me_mapsize;
 
     /* Recreate transaction */
     e = mdb_txn_begin(bflmp->bflm_env, NULL, 0, &bflmp->bflm_txn);
     if(e != MDB_SUCCESS){
+        if(e == MDB_MAP_RESIZED){
+            mdb_env_set_mapsize(bflmp->bflm_env, 0);
+            goto jredo_txn;
+        }
         emsg = "mdb_txn_begin()";
         goto jerr1;
     }
 
-    e = mdb_dbi_open(bflmp->bflm_txn, NULL, 0, &bflmp->bflm_dbi);
+    e = mdb_dbi_open(bflmp->bflm_txn, a_BFLM_DB_NAME_DAT, 0, &bflmp->bflm_dbi);
     if(e != MDB_SUCCESS){
         emsg = "mdb_dbi_open()";
         goto jerr2;
@@ -419,7 +516,8 @@ a_bflm_txn_mapfull(struct a_bflm *bflmp, bool close_cursor){
     if(bflmp->bflm_flags & a_BFLM_DEBUG)
         fprintf(dbgout, "LMDB[%ld]: txn_mapfull(%p [%s]): "
             "recreated, new size %lu\n",
-            (long)getpid(), bflmp, bflmp->bflm_filepath, bflmp->bflm_mapsize);
+            (long)getpid(), bflmp, bflmp->bflm_filepath,
+            (unsigned long)envinfo.me_mapsize);
     e = 0;
 jleave:
     return (e == 0);
@@ -581,6 +679,7 @@ a_bflm_txn_cache_free(struct a_bflm *bflmp){
         xfree(bflmtcp);
     }
 }
+#endif /* a_BFLM_FIXED_SIZE */
 
 dsm_t /* const TODO */ *dsm = &a_bflm_dsm;
 
@@ -589,11 +688,8 @@ db_open(void *env, bfpath *bfp, dbmode_t open_mode){
     struct a_bflm *bflmp;
     UNUSED(env);
 
-    if((bflmp = a_bflm_init(bfp)) == NULL)
+    if((bflmp = a_bflm_init(bfp, (open_mode == DS_READ))) == NULL)
         goto jleave;
-
-    if(open_mode == DS_READ)
-        bflmp->bflm_flags |= a_BFLM_RDONLY;
 
     if(bflmp->bflm_flags & a_BFLM_DEBUG)
         fprintf(dbgout, "LMDB[%ld]: db_open(%p [%s; rdonly=%d])\n",
@@ -614,9 +710,6 @@ db_close(void *vhandle){
         fprintf(dbgout, "LMDB[%ld]: db_close(%p [%s])\n",
             (long)getpid(), bflmp, bflmp->bflm_filepath);
 
-    if(DEBUG_DATABASE(1) && (bflmp->bflm_flags & a_BFLM_HAS_TXN))
-        fprintf(dbgout, "LMDB db_close(): error: HAS_TXN!\n");
-
     a_bflm_free(bflmp);
 jleave:;
 }
@@ -629,7 +722,12 @@ db_is_swapped(void *vhandle){
 
 bool
 db_created(void *vhandle){
-    return (vhandle != NULL);
+    bool created;
+    struct a_bflm *bflmp;
+
+    created = ((bflmp = vhandle) != NULL &&
+            (bflmp->bflm_flags & a_BFLM_DB_CREATED) != 0);
+    return created;
 }
 
 int
@@ -644,14 +742,17 @@ db_get_dbvalue(void *vhandle, const dbv_t *token, dbv_t *value){
     if((bflmp = vhandle) == NULL)
         goto jleave;
 
-    if(DEBUG_DATABASE(1) && !(bflmp->bflm_flags & a_BFLM_HAS_TXN)){
-        emsg = "!HAS_TXN!";
-        goto jerr;
-    }
+    if(bflmp->bflm_flags & a_BFLM_DB_UNAVAIL)
+        goto jleave;
 
-    if(DEBUG_DATABASE(3))
-        fprintf(dbgout, "LMDB db_get_dbvalue(): %lu <%.*s>\n",
-            (unsigned long)token->leng, (int)token->leng, token->data);
+    if((size_t)token->leng > bflmp->bflm_maxkeysize){
+        if(bflmp->bflm_flags & a_BFLM_DEBUG)
+            fprintf(dbgout, "LMDB[%ld]: get_dbvalue: key too big "
+                "(> %lu bytes), ignoring %.*s\n",
+                (long)getpid(),(unsigned long)bflmp->bflm_maxkeysize,
+                (int)token->leng, token->data);
+        goto jleave;
+    }
 
     key.mv_data = token->data;
     key.mv_size = token->leng;
@@ -670,6 +771,10 @@ db_get_dbvalue(void *vhandle, const dbv_t *token, dbv_t *value){
 
     e = 0;
 jleave:
+    if(DEBUG_DATABASE(3))
+        fprintf(dbgout, "LMDB db_get_dbvalue(): %lu <%.*s> -> %d\n",
+            (unsigned long)token->leng, (int)token->leng, token->data,
+            (e == 0));
     return e;
 jerr:
     if(e != MDB_NOTFOUND){
@@ -687,42 +792,58 @@ db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *value){
     MDB_val key, val;
     char const *emsg;
     struct a_bflm *bflmp;
-    int e, retries;
+#ifndef a_BFLM_FIXED_SIZE
+    int retries;
+#endif
+    int e;
 
     e = 0;
 
     if((bflmp = vhandle) == NULL)
         goto jleave;
 
-    if(DEBUG_DATABASE(1) && !(bflmp->bflm_flags & a_BFLM_HAS_TXN)){
-        emsg = "!HAS_TXN!";
-        goto jerr;
+    if(bflmp->bflm_flags & a_BFLM_DB_UNAVAIL)
+        goto jleave;
+
+    if((size_t)token->leng > bflmp->bflm_maxkeysize){
+        if(bflmp->bflm_flags & a_BFLM_DEBUG)
+            fprintf(dbgout, "LMDB[%ld]: set_dbvalue: key too big "
+                "(> %lu bytes), ignoring %.*s\n",
+                (long)getpid(),(unsigned long)bflmp->bflm_maxkeysize,
+                (int)token->leng, token->data);
+        goto jleave;
     }
 
-    if(DEBUG_DATABASE(3))
-        fprintf(dbgout, "LMDB db_set_dbvalue(): %lu <%.*s>\n",
-            (unsigned long)token->leng, (int)token->leng, token->data);
-
+#ifndef a_BFLM_FIXED_SIZE
     retries = 0;
 jredo:
+#endif
     key.mv_data = token->data;
     key.mv_size = token->leng;
     val.mv_data = value->data;
     val.mv_size = value->leng;
     e = mdb_cursor_put(bflmp->bflm_cursor, &key, &val, 0);
     if(e != MDB_SUCCESS){
+#ifndef a_BFLM_FIXED_SIZE
         if(e == MDB_MAP_FULL && ++retries <= a_BFLM_GROW_TRIES &&
                 a_bflm_txn_mapfull(bflmp, true))
             goto jredo;
+#endif
         emsg = "mdb_cursor_put()";
         goto jerr;
     }
 
+#ifndef a_BFLM_FIXED_SIZE
     if((emsg = a_bflm_txn_cache_put(bflmp, &key, &val)) != NULL)
         goto jerr;
+#endif
 
     e = 0;
 jleave:
+    if(DEBUG_DATABASE(3))
+        fprintf(dbgout, "LMDB db_set_dbvalue(): %lu <%.*s> -> %d\n",
+            (unsigned long)token->leng, (int)token->leng, token->data,
+            (e == 0));
     return e;
 jerr:
     print_error(__FILE__, __LINE__, "LMDB[%ld]: db_set_dbvalue(), %s: %d, %s",
@@ -735,25 +856,32 @@ db_delete(void *vhandle, const dbv_t *token){
     MDB_val key;
     char const *emsg;
     struct a_bflm *bflmp;
-    int e, retries;
+#ifndef a_BFLM_FIXED_SIZE
+    int retries;
+#endif
+    int e;
 
     e = 0;
 
     if((bflmp = vhandle) == NULL)
         goto jleave;
 
-    if(DEBUG_DATABASE(1) && !(bflmp->bflm_flags & a_BFLM_HAS_TXN)){
-        emsg = "!HAS_TXN!";
-        e = DS_NOTFOUND;
-        goto jerr;
+    if(bflmp->bflm_flags & a_BFLM_DB_UNAVAIL)
+        goto jleave;
+
+    if((size_t)token->leng > bflmp->bflm_maxkeysize){
+        if(bflmp->bflm_flags & a_BFLM_DEBUG)
+            fprintf(dbgout, "LMDB[%ld]: delete: key too big "
+                "(> %lu bytes), ignoring %.*s\n",
+                (long)getpid(),(unsigned long)bflmp->bflm_maxkeysize,
+                (int)token->leng, token->data);
+        goto jleave;
     }
 
-    if(DEBUG_DATABASE(3))
-        fprintf(dbgout, "LMDB db_delete(): %lu <%.*s>\n",
-            (unsigned long)token->leng, (int)token->leng, token->data);
-
+#ifndef a_BFLM_FIXED_SIZE
     retries = 0;
 jredo:
+#endif
     key.mv_data = token->data;
     key.mv_size = token->leng;
     e = mdb_cursor_get(bflmp->bflm_cursor, &key, NULL, MDB_SET_KEY);
@@ -764,19 +892,27 @@ jredo:
 
     e = mdb_cursor_del(bflmp->bflm_cursor, 0);
     if(e != MDB_SUCCESS){
+#ifndef a_BFLM_FIXED_SIZE
         /* Should not happen, though */
         if(e == MDB_MAP_FULL && ++retries <= a_BFLM_GROW_TRIES &&
                 a_bflm_txn_mapfull(bflmp, true))
             goto jredo;
+#endif
         emsg = "mdb_cursor_del()";
         goto jerr;
     }
 
+#ifndef a_BFLM_FIXED_SIZE
     if((emsg = a_bflm_txn_cache_put(bflmp, &key, NULL)) != NULL)
         goto jerr;
+#endif
 
     e = 0;
 jleave:
+    if(DEBUG_DATABASE(3))
+        fprintf(dbgout, "LMDB db_delete(): %lu <%.*s> -> %d\n",
+            (unsigned long)token->leng, (int)token->leng, token->data,
+            (e == 0));
     return e;
 jerr:
     print_error(__FILE__, __LINE__, "LMDB[%ld]: db_delete(), %s: %d, %s",
@@ -811,6 +947,7 @@ db_foreach(void *vhandle, db_foreach_t hook, void *userdata){
     MDB_val key, val;
     char *buf;
     MDB_cursor_op cursor_op;
+    MDB_cursor *fecp;
     struct a_bflm *bflmp;
     ex_t rv;
 
@@ -819,21 +956,25 @@ db_foreach(void *vhandle, db_foreach_t hook, void *userdata){
     if((bflmp = vhandle) == NULL)
         goto jleave;
 
-    if(DEBUG_DATABASE(1) && !(bflmp->bflm_flags & a_BFLM_HAS_TXN)){
-        rv = EX_ERROR;
+    if(bflmp->bflm_flags & a_BFLM_DB_UNAVAIL)
         goto jleave;
-    }
 
     if(bflmp->bflm_flags & a_BFLM_DEBUG)
         fprintf(dbgout, "LMDB[%ld]: db_foreach(%p [%s])\n",
             (long)getpid(), bflmp, bflmp->bflm_filepath);
+
+    if(mdb_cursor_open(bflmp->bflm_txn, bflmp->bflm_dbi, &fecp
+            ) != MDB_SUCCESS){
+        rv = EX_ERROR;
+        goto jleave;
+    }
 
     buf = NULL;
     for(cursor_op = MDB_FIRST;; cursor_op = MDB_NEXT){
         size_t i;
         int e;
 
-        e = mdb_cursor_get(bflmp->bflm_cursor, &key, &val, cursor_op);
+        e = mdb_cursor_get(fecp, &key, &val, cursor_op);
         if(e != MDB_SUCCESS){
             if(e != MDB_NOTFOUND){
                 print_error(__FILE__, __LINE__, "LMDB[%ld]: db_foreach(): "
@@ -862,6 +1003,8 @@ db_foreach(void *vhandle, db_foreach_t hook, void *userdata){
     }
     if(buf != NULL)
         xfree(buf);
+
+    mdb_cursor_close(fecp);
 jleave:
     return rv;
 }
