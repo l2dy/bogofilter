@@ -332,6 +332,7 @@ a_bflm_txn_begin(void *vhandle){
         fprintf(dbgout, "LMDB[%ld]: txn_begin(%p [%s])\n",
             (long)getpid(), bflmp, bflmp->bflm_filepath);
 
+    bflmp->bflm_flags &= ~(a_BFLM_HAS_TXN | a_BFLM_DB_UNAVAIL);
 jredo_txn:
     e = mdb_txn_begin(bflmp->bflm_env, NULL,
             (bflmp->bflm_flags & a_BFLM_RDONLY ? MDB_RDONLY : 0),
