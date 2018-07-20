@@ -8,7 +8,7 @@
  * Steffen Nurpmeso <steffen@sdaoden.eu>    2018
  * (copied from datastore_kc.c:
  * Gyepi Sam <gyepi@praxis-sw.com>          2003
- * Matthias Andree <matthias.andree@gmx.de> 2003
+ * Matthias Andree <matthias.andree@gmx.de> 2003, 2018
  * Stefan Bellon <sbellon@sbellon.de>       2003-2004
  * Pierre Habouzit <madcoder@debian.org>    2007
  * Denny Lin <dennylin93@hs.ntnu.edu.tw>    2015)
@@ -41,18 +41,16 @@
  */
 
 /* Alternative implementation: fixed DB size */
-/*#define a_BFLM_FIXED_SIZE (1u << 31)*/
+/*#define a_BFLM_FIXED_SIZE (ULONG_MAX >> (ULONG_MAX != UINT_MAX ? 22 : 1))*/
 
 /* mdb_env_set_maxreaders() */
-#define a_BFLM_MAXREADERS 15
+#define a_BFLM_MAXREADERS 7
 
 #ifndef a_BFLM_FIXED_SIZE
-    /* DB size grow.  Must be a power of two!
+    /* DB size grow.  Must be a power of two (we perform alignment)!
      * Space it so that a DB load does not run against walls too many times.
-     * We try _TRIES times to resize for a single new entry before giving up.
-     * Note that the minimum size must be capable to store the two used DB
-     * structured without resize etc. */
-# define a_BFLM_GROW (1u << 23)
+     * We try _TRIES times to resize for a single new entry before giving up */
+# define a_BFLM_GROW (1u << 24)
 # define a_BFLM_GROW_TRIES 3
 
     /* Size of one chunk of the intermediate txn cache, as above.
@@ -60,7 +58,7 @@
      * Of course, if a token requires more space, we allocate a larger chunk */
 # define a_BFLM_TXN_CACHE_SIZE (1u << 20)
 
-    /* An entry consists of an uint32_t describing the length of the key.
+    /* A cache entry consists of an uint32_t describing the length of the key.
      * If the high bit is set an uint32_t describing the length of the value
      * follows.  After the data buffers there possibly is alignment pad */
 # define a_BFLM_TXN_CACHE_ALIGN(X) \
@@ -74,6 +72,7 @@
 #include "common.h"
 
 #include <errno.h>
+#include <limits.h>
 
 #include <lmdb.h>
 
@@ -82,7 +81,6 @@
 #include "error.h"
 #include "paths.h"
 #include "xmalloc.h"
-#include "xstrdup.h"
 
 #if MDB_VERSION_FULL < MDB_VERINT(0, 9, 22)
 # error "Required LMDB version: 0.9.22 or later (0.9.11 may do, but untested)"
@@ -114,7 +112,7 @@ struct a_bflm{
 
 #ifndef a_BFLM_FIXED_SIZE
 struct a_bflm_txn_cache{
-    struct a_bflm_txn_cache *bflmtc_last;
+    struct a_bflm_txn_cache *bflmtc_last;   /* Up-to-date (stack usage) */
     struct a_bflm_txn_cache *bflmtc_next;   /* Needs to be build before use! */
     char *bflmtc_caster;    /* Current caster */
     char *bflmtc_max;       /* Maximum usable byte, exclusive */
@@ -122,6 +120,9 @@ struct a_bflm_txn_cache{
     char *bflmtc_data;
 };
 #endif
+
+static char const a_bflm_db_name_man[] = a_BFLM_DB_NAME_MAN;
+static char const a_bflm_db_name_dat[] = a_BFLM_DB_NAME_DAT;
 
 /**/
 static struct a_bflm *a_bflm_init(bfpath *bfp, bool rdonly);
@@ -134,17 +135,17 @@ static int a_bflm_txn_abort(void *vhandle);
 static int a_bflm_txn_commit(void *vhandle);
 
 #ifndef a_BFLM_FIXED_SIZE
-/**/
+/* A transaction needs to be resized and all modifications in the cache need to
+ * be replayed, because we have seen MDB_MAP_FULL (or MDB_MAP_RESIZED) */
 static bool a_bflm_txn_mapfull(struct a_bflm *bflmp, bool close_cursor);
+
+/* (NULL on success or an error message otherwise) */
+static char const *a_bflm_txn__replay(struct a_bflm *bflmp);
 
 /* Put an entry; it is a deletion if val_or_null is NULL.
  * Return NULL on success or an error message otherwise */
 static char const *a_bflm_txn_cache_put(struct a_bflm *bflmp, MDB_val *key,
                     MDB_val *val_or_null);
-
-/* Replay all the cache operations in order to redo the transaction.
- * Return NULL on success or an error message otherwise */
-static char const *a_bflm_txn_cache_replay(struct a_bflm *bflmp);
 
 /* Free the recovery stack and possible heap data */
 static void a_bflm_txn_cache_free(struct a_bflm *bflmp);
@@ -192,7 +193,7 @@ a_bflm_init(bfpath *bfp, bool rdonly){
     memcpy(rv->bflm_filepath = (char*)&rv[1], bfp->filepath, i);
 
     rv->bflm_flags = (((DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB") != NULL)
-            ? a_BFLM_DEBUG : a_BFLM_NONE) |
+                ? a_BFLM_DEBUG : a_BFLM_NONE) |
             (rdonly ? a_BFLM_RDONLY : a_BFLM_NONE));
 
     e = mdb_env_create(&rv->bflm_env);
@@ -204,7 +205,7 @@ a_bflm_init(bfpath *bfp, bool rdonly){
     rv->bflm_maxkeysize = mdb_env_get_maxkeysize(rv->bflm_env);
 
     /* To acommodate with bogofilter's db_created() mechanism we cannot use the
-     * unnamed DB which "always exists", but must place data in a named one */
+     * unnamed DB which "always exists", but must place data in named ones */
     e = mdb_env_set_maxdbs(rv->bflm_env, 2);
     if(e != MDB_SUCCESS){
         emsg = "mdb_env_set_maxdbs()";
@@ -259,6 +260,7 @@ a_bflm__check_create(struct a_bflm *bflmp){
     char const *db_name;
     unsigned int f;
     int e;
+    /* TODO compile-time-assert that MDB_CREATE is not 0 */
 
 jredo_txn:
     e = mdb_txn_begin(bflmp->bflm_env, NULL, 0, &bflmp->bflm_txn);
@@ -270,7 +272,7 @@ jredo_txn:
         goto jleave;
     }
 
-    db_name = a_BFLM_DB_NAME_MAN;
+    db_name = a_bflm_db_name_man;
     f = 0;
 jredo_dbi:
     e = mdb_dbi_open(bflmp->bflm_txn, db_name, f, &bflmp->bflm_dbi);
@@ -283,8 +285,8 @@ jredo_dbi:
         goto jerr;
     }
 
-    if(f == MDB_CREATE && 0 == strcmp(db_name, a_BFLM_DB_NAME_MAN)){
-        db_name = a_BFLM_DB_NAME_DAT;
+    if(f == MDB_CREATE && db_name == a_bflm_db_name_man){
+        db_name = a_bflm_db_name_dat;
         goto jredo_dbi;
     }
 
@@ -346,9 +348,9 @@ jredo_txn:
         goto jerr1;
     }
 
-    e = mdb_dbi_open(bflmp->bflm_txn, a_BFLM_DB_NAME_DAT, 0, &bflmp->bflm_dbi);
+    e = mdb_dbi_open(bflmp->bflm_txn, a_bflm_db_name_dat, 0, &bflmp->bflm_dbi);
     if(e != MDB_SUCCESS){
-        if(e == MDB_NOTFOUND){
+        if(e == MDB_NOTFOUND && (bflmp->bflm_flags & a_BFLM_RDONLY)){
             bflmp->bflm_flags |= a_BFLM_DB_UNAVAIL;
             goto junavail;
         }
@@ -476,12 +478,20 @@ a_bflm_txn_mapfull(struct a_bflm *bflmp, bool close_cursor){
 
     mdb_txn_abort(bflmp->bflm_txn);
 
-    /* Resize map */
+    /* Resize map.  To be super-safe, synchronize current map size first */
 jredo_txn:
+    mdb_env_set_mapsize(bflmp->bflm_env, 0);
     /* no error defined */mdb_env_info(bflmp->bflm_env, &envinfo);
     i = envinfo.me_mapsize;
-    i += a_BFLM_GROW / 10;
-    i = (i + (a_BFLM_GROW - 1)) & ~(a_BFLM_GROW - 1);
+    if((size_t)-1 - i >= a_BFLM_GROW * 2){
+        i += a_BFLM_GROW / 10;
+        i = (i + (a_BFLM_GROW - 1)) & ~(a_BFLM_GROW - 1);
+    }else if((size_t)-1 - i >= 1024u * 1024u * 2)
+        i = (size_t)-1 - (1024u * 1024u - 1);
+    else{
+        emsg = "DB size too large";
+        goto jerr1;
+    }
     e = mdb_env_set_mapsize(bflmp->bflm_env, i);
     if(e != MDB_SUCCESS){
         emsg = "mdb_env_set_mapsize()";
@@ -491,15 +501,13 @@ jredo_txn:
     /* Recreate transaction */
     e = mdb_txn_begin(bflmp->bflm_env, NULL, 0, &bflmp->bflm_txn);
     if(e != MDB_SUCCESS){
-        if(e == MDB_MAP_RESIZED){
-            mdb_env_set_mapsize(bflmp->bflm_env, 0);
+        if(e == MDB_MAP_RESIZED)
             goto jredo_txn;
-        }
         emsg = "mdb_txn_begin()";
         goto jerr1;
     }
 
-    e = mdb_dbi_open(bflmp->bflm_txn, a_BFLM_DB_NAME_DAT, 0, &bflmp->bflm_dbi);
+    e = mdb_dbi_open(bflmp->bflm_txn, a_bflm_db_name_dat, 0, &bflmp->bflm_dbi);
     if(e != MDB_SUCCESS){
         emsg = "mdb_dbi_open()";
         goto jerr2;
@@ -511,7 +519,7 @@ jredo_txn:
         goto jerr2;
     }
 
-    if((emsg = a_bflm_txn_cache_replay(bflmp)) != NULL)
+    if((emsg = a_bflm_txn__replay(bflmp)) != NULL)
         goto jerr3;
 
     if(bflmp->bflm_flags & a_BFLM_DEBUG)
@@ -531,6 +539,72 @@ jerr1:
         (long)getpid(), emsg, e, mdb_strerror(e));
     e = 1;
     goto jleave;
+}
+
+static char const *
+a_bflm_txn__replay(struct a_bflm *bflmp){
+    MDB_val key, val;
+    char const *emsg;
+    int e;
+    uint32_t kl, vl;
+    char *dp;
+    struct a_bflm_txn_cache *head, *bflmtcp;
+
+    /* First of all create a list in the right order */
+    for(head = NULL, bflmtcp = bflmp->bflm_txn_cache; bflmtcp != NULL;
+            bflmtcp = bflmtcp->bflmtc_last){
+        bflmtcp->bflmtc_next = head;
+        head = bflmtcp;
+    }
+
+    /* Then replay, using it */
+    for(; head != NULL; head = head->bflmtc_next){
+        for(dp = head->bflmtc_data; dp < head->bflmtc_caster;){
+            bool isins;
+
+            /* For actual loading always use memcpy() for simplicity.
+             * (That is: C standard and undefined behaviour, who knows?) */
+            memcpy(&kl, dp, sizeof kl);
+            dp += sizeof kl;
+            if((isins = ((kl & 0x80000000u) != 0))){
+                kl ^= 0x80000000u;
+                memcpy(&vl, dp, sizeof vl);
+                dp += sizeof vl;
+            }
+
+            key.mv_size = kl;
+            key.mv_data = dp;
+            dp += kl;
+            if(isins){
+                val.mv_size = vl;
+                val.mv_data = dp;
+                dp += vl;
+
+                e = mdb_cursor_put(bflmp->bflm_cursor, &key, &val, 0);
+                if(e != MDB_SUCCESS){
+                    emsg = "mdb_cursor_put()";
+                    goto jleave;
+                }
+            }else{
+                e = mdb_cursor_get(bflmp->bflm_cursor, &key, NULL,
+                        MDB_SET_KEY);
+                if(e != MDB_SUCCESS){
+                    emsg = "mdb_cursor_get() for delete";
+                    goto jleave;
+                }
+                e = mdb_cursor_del(bflmp->bflm_cursor, 0);
+                if(e != MDB_SUCCESS){
+                    emsg = "mdb_cursor_del()";
+                    goto jleave;
+                }
+            }
+            dp = (char*)a_BFLM_TXN_CACHE_ALIGN((uintptr_t)dp);
+        }
+    }
+
+    emsg = NULL;
+jleave:
+    return emsg;
 }
 
 static char const *
@@ -594,73 +668,6 @@ jcache_new:
         dp += vl;
     }
     bflmtcp->bflmtc_caster = (char*)a_BFLM_TXN_CACHE_ALIGN((uintptr_t)dp);
-
-    emsg = NULL;
-jleave:
-    return emsg;
-}
-
-static char const *
-a_bflm_txn_cache_replay(struct a_bflm *bflmp){
-    /* And replay all the changes we have yet seen */
-    MDB_val key, val;
-    char const *emsg;
-    int e;
-    uint32_t kl, vl;
-    char *dp;
-    struct a_bflm_txn_cache *head, *bflmtcp;
-
-    /* First of all create a list in the right order */
-    for(head = NULL, bflmtcp = bflmp->bflm_txn_cache; bflmtcp != NULL;
-            bflmtcp = bflmtcp->bflmtc_last){
-        bflmtcp->bflmtc_next = head;
-        head = bflmtcp;
-    }
-
-    /* Then replay, using it */
-    for(; head != NULL; head = head->bflmtc_next){
-        for(dp = head->bflmtc_data; dp < head->bflmtc_caster;){
-            bool isins;
-
-            /* For actual loading always use memcpy() for simplicity.
-             * (That is: C standard and undefined behaviour, who knows?) */
-            memcpy(&kl, dp, sizeof kl);
-            dp += sizeof kl;
-            if((isins = ((kl & 0x80000000u) != 0))){
-                kl ^= 0x80000000u;
-                memcpy(&vl, dp, sizeof vl);
-                dp += sizeof vl;
-            }
-
-            key.mv_size = kl;
-            key.mv_data = dp;
-            dp += kl;
-            if(isins){
-                val.mv_size = vl;
-                val.mv_data = dp;
-                dp += vl;
-
-                e = mdb_cursor_put(bflmp->bflm_cursor, &key, &val, 0);
-                if(e != MDB_SUCCESS){
-                    emsg = "mdb_cursor_put()";
-                    goto jleave;
-                }
-            }else{
-                e = mdb_cursor_get(bflmp->bflm_cursor, &key, NULL,
-                        MDB_SET_KEY);
-                if(e != MDB_SUCCESS){
-                    emsg = "mdb_cursor_get() for delete";
-                    goto jleave;
-                }
-                e = mdb_cursor_del(bflmp->bflm_cursor, 0);
-                if(e != MDB_SUCCESS){
-                    emsg = "mdb_cursor_del()";
-                    goto jleave;
-                }
-            }
-            dp = (char*)a_BFLM_TXN_CACHE_ALIGN((uintptr_t)dp);
-        }
-    }
 
     emsg = NULL;
 jleave:
@@ -774,8 +781,8 @@ db_get_dbvalue(void *vhandle, const dbv_t *token, dbv_t *value){
 jleave:
     if(DEBUG_DATABASE(3))
         fprintf(dbgout, "LMDB db_get_dbvalue(): %lu <%.*s> -> %d\n",
-            (unsigned long)token->leng, (int)token->leng, (const char *)token->data,
-            (e == 0));
+            (unsigned long)token->leng, (int)token->leng,
+            (char const*)token->data, (e == 0));
     return e;
 jerr:
     if(e != MDB_NOTFOUND){
@@ -803,7 +810,7 @@ db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *value){
     if((bflmp = (struct a_bflm *)vhandle) == NULL)
         goto jleave;
 
-    if(bflmp->bflm_flags & a_BFLM_DB_UNAVAIL)
+    if(bflmp->bflm_flags & a_BFLM_DB_UNAVAIL) /* XXX assert instead */
         goto jleave;
 
     if((size_t)token->leng > bflmp->bflm_maxkeysize){
@@ -843,8 +850,8 @@ jredo:
 jleave:
     if(DEBUG_DATABASE(3))
         fprintf(dbgout, "LMDB db_set_dbvalue(): %lu <%.*s> -> %d\n",
-            (unsigned long)token->leng, (int)token->leng, (const char *)token->data,
-            (e == 0));
+            (unsigned long)token->leng, (int)token->leng,
+            (char const*)token->data, (e == 0));
     return e;
 jerr:
     print_error(__FILE__, __LINE__, "LMDB[%ld]: db_set_dbvalue(), %s: %d, %s",
@@ -912,8 +919,8 @@ jredo:
 jleave:
     if(DEBUG_DATABASE(3))
         fprintf(dbgout, "LMDB db_delete(): %lu <%.*s> -> %d\n",
-            (unsigned long)token->leng, (int)token->leng, (const char *)token->data,
-            (e == 0));
+            (unsigned long)token->leng, (int)token->leng,
+            (char const*)token->data, (e == 0));
     return e;
 jerr:
     print_error(__FILE__, __LINE__, "LMDB[%ld]: db_delete(), %s: %d, %s",
