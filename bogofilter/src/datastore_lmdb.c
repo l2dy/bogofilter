@@ -5,7 +5,7 @@
  * datastore_lmdb.c -- implements the datastore, using LMDB.
  *
  * AUTHORS:
- * Steffen Nurpmeso <steffen@sdaoden.eu>    2018
+ * Steffen Nurpmeso <steffen@sdaoden.eu>    2018, 2019
  * (copied from datastore_kc.c:
  * Gyepi Sam <gyepi@praxis-sw.com>          2003
  * Matthias Andree <matthias.andree@gmx.de> 2003, 2018
@@ -24,11 +24,11 @@
  *    reaches the size limit, the transaction must be aborted, then the
  *    environment must be resized, then a new transaction has to be created.
  *    Resizing will not shrink, effectively.
- * 3. We assume xmalloc() aborts if out of memory.
- * 4. We assume no token->leng actually exceeds int32_t.
- * 5. mdb_env_get_maxkeysize():
+ * 3. mdb_env_get_maxkeysize():
  *      Depends on the compile-time constant #MDB_MAXKEYSIZE. Default 511.
  *    We reject any keys which excess this.
+ * 4. We assume xmalloc() aborts if out of memory.
+ * 5. We assume no token->leng actually exceeds int32_t.
  *
  * In order to be able to deal with 2. we need to track all changes that are
  * performed in a txn, so that in case we are running against the wall we are
@@ -114,8 +114,8 @@ struct a_bflm{
 struct a_bflm_txn_cache{
     struct a_bflm_txn_cache *bflmtc_last;   /* Up-to-date (stack usage) */
     struct a_bflm_txn_cache *bflmtc_next;   /* Needs to be build before use! */
-    char *bflmtc_caster;    /* Current caster */
-    char *bflmtc_max;       /* Maximum usable byte, exclusive */
+    char *bflmtc_caster;                    /* Current caster */
+    char *bflmtc_max;                       /* ..imum usable byte, exclusive */
     /* Actually points to &self[1] TODO [0] or [8], dep. __STDC_VERSION__! */
     char *bflmtc_data;
 };
@@ -615,19 +615,25 @@ a_bflm_txn_cache_put(struct a_bflm *bflmp, MDB_val *key, MDB_val *val_or_null){
     char const *emsg;
     size_t kl, vl, i;
 
-    kl = key->mv_size;
+    if((kl = key->mv_size) >= 0x7FFFFFFFu)
+        goto jeoverflow;
     if(val_or_null != NULL){
-        vl = val_or_null->mv_size;
-        i = (2 * sizeof(uint32_t)) + kl + vl;
+        if((vl = val_or_null->mv_size) >= 0x7FFFFFFFu)
+            goto jeoverflow;
+        if((i = kl + vl) >= 0x7FFFFFFFu - 2 * sizeof(uint32_t))
+            goto jeoverflow;
+        i += 2 * sizeof(uint32_t);
     }else{
         vl = 0;
-        i = sizeof(uint32_t) + kl;
+        if((i = kl) >= 0x7FFFFFFFu - sizeof(uint32_t))
+            goto jeoverflow;
+        i += sizeof(uint32_t);
     }
     i = a_BFLM_TXN_CACHE_ALIGN(i);
 
     /* XXX We actually should abort() the program instead: cannot be handled */
-    if(kl >= 0x7FFFFFFFu || vl >= 0x7FFFFFFFu ||
-            i >= 0x7FFFFFFFu - sizeof(*bflmtcp)){
+    if(i >= 0x7FFFFFFFu - sizeof(*bflmtcp)){
+jeoverflow:
         emsg = "LMDB: entry too large to be stored";
         goto jleave;
     }
