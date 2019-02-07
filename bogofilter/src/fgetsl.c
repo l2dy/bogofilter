@@ -26,6 +26,9 @@ int xfgetsl(char *buf, int max_size, FILE *in, bool no_nul_terminate)
     char *end = buf + max_size;				/* Physical end of buffer */
     char *fin = end - (no_nul_terminate ? 0 : 1);	/* Last available byte    */
 
+    if (cp == fin && no_nul_terminate)
+	return 0;
+
     if (cp >= fin) {
 	fprintf(stderr, "Invalid buffer size, exiting.\n");
 	abort();
