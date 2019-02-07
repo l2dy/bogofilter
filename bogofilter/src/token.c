@@ -31,6 +31,7 @@ AUTHOR:
 
 word_t	*msg_addr;	/* First IP Address in Received: statement */
 word_t	*msg_id;	/* Message ID */
+static size_t max_msg_id_len;
 word_t	*queue_id;	/* Message's first queue ID */
 
 static token_t save_class = NONE;
@@ -571,7 +572,8 @@ void token_init(void)
 	msg_addr = word_new( NULL, max_token_len );
 
 	/* Message ID */
-	msg_id = word_new( NULL, max_token_len * 3 );
+        max_msg_id_len  = max_token_len * 3;
+	msg_id = word_new( NULL, max_msg_id_len );
 
 	/* Message's first queue ID */
 	queue_id = word_new( NULL, max_token_len );
@@ -665,8 +667,8 @@ void set_tag(const char *text)
 
 void set_msg_id(byte *text, uint leng)
 {
-    (void) leng;		/* suppress compiler warning */
-    token_set( msg_id, text, msg_id->leng );
+    uint n = min(leng, max_msg_id_len);
+    token_set( msg_id, text, n );
 }
 
 #define WFREE(n)	word_free(n); n = NULL
