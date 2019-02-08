@@ -9,6 +9,7 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "base64.h"
 #include "bogoconfig.h"
@@ -232,18 +233,14 @@ static int get_decoded_line(buff_t *buff)
 	 * no more bytes left to read, even though before the iconvert
 	 * call we had a positive number of bytes. This *will* lead to
 	 * a message truncation which we try to avoid by simply
-	 * returning the original input buffer (which has positive
-	 * length) instead. */
-	if(buff->t.leng == 0) {
-	    memcpy(buff, linebuff, sizeof(*buff));
-            memset(linebuff, 0, sizeof(buff_t));
-        }
-
-	/*
-	 * iconvert, treating multi-byte sequences, can shrink or enlarge
-	 * the output compared to its input.  Correct count.
-	 */
-	count = buff->t.leng;
+	 * returning another in-band error code. */
+	if (buff->t.leng == 0) {
+	    count = -2;
+        } else {
+	    /* iconvert, treating multi-byte sequences, can shrink or enlarge
+	     * the output compared to its input.  Correct count. */
+	    count = buff->t.leng;
+	}
     }
 #endif
 
@@ -297,7 +294,9 @@ int buff_fill(buff_t *buff, size_t used, size_t need)
     while (size - leng > 2 && need > leng - used) {
 	/* too few, read more */
 	int add = get_decoded_line(buff);
+        /* get_decoded_line never returns EOF!?! */
 	if (add == EOF) return EOF;
+	if (add == -2) continue;
 	if (add == 0) break ;
 	cnt += add;
 	leng += add;
@@ -330,8 +329,8 @@ int yyinput(byte *buf, size_t used, size_t size)
      */
 
     while ((cnt = get_decoded_line(&buff)) != 0) {
-
-	count += cnt;
+        if (cnt > 0)
+            count += cnt;
 
 	/* Note: some malformed messages can cause xfgetsl() to report
 	** "Invalid buffer size, exiting."  and then abort.  This
@@ -363,6 +362,7 @@ int yyinput(byte *buf, size_t used, size_t size)
     if (msg_state &&
 	msg_state->mime_dont_decode &&
 	(msg_state->mime_disposition != MIME_DISPOSITION_UNKNOWN)) {
+        assert(count <= (int)size);
 	return (count == EOF ? 0 : count);   /* not decode at all */
     }
 
@@ -384,6 +384,7 @@ int yyinput(byte *buf, size_t used, size_t size)
     if (DEBUG_LEXER(2))
 	fprintf(dbgout, "*** yyinput(\"%-.*s\", %lu, %lu) = %d\n", count, buf, (unsigned long)used, (unsigned long)size, count);
 
+    assert(count <= (int)size);
     return (count == EOF ? 0 : count);
 }
 
