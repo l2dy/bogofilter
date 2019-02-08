@@ -150,12 +150,14 @@ static int get_decoded_line(buff_t *buff)
 {
     int count;
     buff_t *linebuff;
+    /* since msg_state might change during calls */
+    bool mime_dont_decode = msg_state->mime_dont_decode;
 
 #ifdef	DISABLE_UNICODE
     linebuff = buff;
 #else
     if (encoding == E_RAW ||
-	msg_state->mime_dont_decode ) {
+	mime_dont_decode ) {
 	linebuff = buff;
     }
     else {
@@ -178,6 +180,8 @@ static int get_decoded_line(buff_t *buff)
     }
 #endif
 
+    /* note that this call might invoke got_mimeboundary() thus
+     * changing the global msg_state variable */
     count = yy_get_new_line(linebuff);
 
     if (count == EOF) {
@@ -198,7 +202,7 @@ static int get_decoded_line(buff_t *buff)
 	textblock_add(linebuff->t.u.text+linebuff->read, (size_t) count);
 
     if ( !msg_header && 
-	 !msg_state->mime_dont_decode &&
+	 !mime_dont_decode &&
 	 msg_state->mime_type != MIME_TYPE_UNKNOWN)
     {
 	word_t temp;
@@ -219,7 +223,7 @@ static int get_decoded_line(buff_t *buff)
 
 #ifndef	DISABLE_UNICODE
     if (encoding == E_UNICODE &&
-	!msg_state->mime_dont_decode &&
+	!mime_dont_decode &&
         count > 0)
     {
 	iconvert(linebuff, buff);

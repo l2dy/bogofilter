@@ -56,7 +56,7 @@ int buff_add(buff_t *self, word_t *in)
     int readcnt = in->leng;
     uint new_size = self->t.leng + in->leng;
     if (new_size > self->size) {
-	self->t.u.text = (byte *)xrealloc(self->t.u.text, new_size);
+	self->t.u.text = (byte *)xrealloc(self->t.u.text, new_size + D);
 	self->size = new_size;
     }
     self->read = readpos;
