@@ -230,8 +230,10 @@ static int get_decoded_line(buff_t *buff)
 	 * a message truncation which we try to avoid by simply
 	 * returning the original input buffer (which has positive
 	 * length) instead. */
-	if(buff->t.leng == 0)
+	if(buff->t.leng == 0) {
 	    memcpy(buff, linebuff, sizeof(*buff));
+            memset(linebuff, 0, sizeof(buff_t));
+        }
 
 	/*
 	 * iconvert, treating multi-byte sequences, can shrink or enlarge
