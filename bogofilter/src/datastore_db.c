@@ -189,7 +189,7 @@ static int DB_OPEN(DB *db, bfpath *bfp, const char *database, DBTYPE type, u_int
     if (DEBUG_DATABASE(1) || getenv("BF_DEBUG_DB_OPEN"))
 	fprintf(dbgout, "[pid %lu] DB->open(db=%p, file=%s, database=%s, "
 		"type=%x, flags=%#lx=%s, mode=%#o) -> %d %s\n",
-		(unsigned long)getpid(), (void *)db, 
+		(unsigned long)getpid(), (void *)db,
 		file, database ? database : "NIL",
 		type, (unsigned long)flags,
 		resolveopenflags(flags), mode, ret, db_strerror(ret));
@@ -612,7 +612,7 @@ void *db_open(void *vhandle,
 	handle->open_mode = open_mode;
 	db_file = dsm->dsm_database_name(handle->name);
 
-#ifdef	ENABLE_MEMDEBUG	
+#ifdef	ENABLE_MEMDEBUG
 	if (eTransaction == T_DISABLED)
 	    dbp->set_alloc(dbp, md_malloc, md_realloc, md_free);
 	else
@@ -628,13 +628,30 @@ retry_db_open:
 	if (ret != 0) {
 	    err = (ret != ENOENT) || (opt_flags == DB_RDONLY);
 	    if (!err) {
-		if (
+                ret =
 #if DB_EQUAL(4,1)
-		 (ret = DB_SET_FLAGS(dbp, DB_CHKSUM_SHA1)) != 0 ||
+		 (DB_SET_FLAGS(dbp, DB_CHKSUM_SHA1)) != 0 ||
 #endif
 #if DB_AT_LEAST(4,2)
 		 (ret = DB_SET_FLAGS(dbp, DB_CHKSUM)) != 0 ||
 #endif
+                 0;
+                if (!ret) {
+                    dbp->close(dbp, 0);
+                    if ((ret = db_create (&dbp, dbe, 0)) != 0) {
+                        print_error(__FILE__, __LINE__, "(db) db_create, err: %d, %s",
+                                    ret, db_strerror(ret));
+                        goto open_err;
+                    }
+	            handle->dbp = dbp;
+#ifdef	ENABLE_MEMDEBUG
+                    if (eTransaction == T_DISABLED)
+                        dbp->set_alloc(dbp, md_malloc, md_realloc, md_free);
+                    else
+                        dbe->set_alloc(dbe, md_malloc, md_realloc, md_free);
+#endif
+                }
+		if (ret ||
 		 (ret = DB_OPEN(dbp, bfp, NULL, dbtype, opt_flags | DB_CREATE | DB_EXCL | retryflag, DS_MODE)))
 		    err = true;
 		if (!err)
