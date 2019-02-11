@@ -305,8 +305,10 @@ static char *spanword(char *p)
 {
     const char *delim = ", \t";
     p += strcspn(p, delim);		/* skip to end of word */
-    *p++ = '\0';
-    p += strspn(p, " \t");		/* skip trailing whitespace */
+    if (*p) {
+	    *p++ = '\0';
+	    p += strspn(p, " \t");		/* skip trailing whitespace */
+    }
     return p;
 }
 
