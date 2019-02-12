@@ -256,6 +256,7 @@ static int get_decoded_line(buff_t *buff)
 	byte *buf = buff->t.u.text;
 	if (memcmp(buf + count - 2, CRLF, 2) == 0) {
 	    count --;
+	    --buff->t.leng;
 	    *(buf + count - 1) = (byte) '\n';
 	}
     }
@@ -330,7 +331,7 @@ int yyinput(byte *buf, size_t used, size_t size)
 
     while ((cnt = get_decoded_line(&buff)) != 0) {
         if (cnt > 0)
-            count += cnt;
+            count = buff.t.leng;
 
 	/* Note: some malformed messages can cause xfgetsl() to report
 	** "Invalid buffer size, exiting."  and then abort.  This
