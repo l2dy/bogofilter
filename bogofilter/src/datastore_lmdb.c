@@ -84,6 +84,9 @@
 # error "Required LMDB version: 0.9.22 or later (0.9.11 may do, but untested)"
 #endif
 
+#ifndef MAX
+# define MAX(A,B) ((A) < (B) ? (B) : (A))
+#endif
 #define UNUSED(x) ((void)(x))
 
 enum a_bflm_flags{
@@ -103,6 +106,7 @@ struct a_bflm{
     MDB_dbi bflm_dbi;
     uint32_t bflm_flags;
     size_t bflm_maxkeysize; /* mdb_env_get_maxkeysize() */
+    size_t bflm_dbsize;     /* LMDB bug: forgets env size after txn abort */
 #ifndef a_BFLM_FIXED_SIZE
     struct a_bflm_txn_cache *bflm_txn_cache;    /* Stack thereof */
 #endif
@@ -481,6 +485,11 @@ jredo_txn:
     mdb_env_set_mapsize(bflmp->bflm_env, 0);
     /* no error defined */mdb_env_info(bflmp->bflm_env, &envinfo);
     i = envinfo.me_mapsize;
+    /* LMDB v0.9.23 bug: forgets the environment size upon TXN abort time
+     * unless a successful TXN has been seen */
+    if(bflmp->bflm_dbsize > i)
+        i = bflmp->bflm_dbsize;
+
     if((size_t)-1 - i >= a_BFLM_GROW * 2){
         i += a_BFLM_GROW / 10;
         i = (i + (a_BFLM_GROW - 1)) & ~(a_BFLM_GROW - 1);
@@ -490,11 +499,13 @@ jredo_txn:
         emsg = "DB size too large";
         goto jerr1;
     }
+
     e = mdb_env_set_mapsize(bflmp->bflm_env, i);
     if(e != MDB_SUCCESS){
         emsg = "mdb_env_set_mapsize()";
         goto jerr1;
     }
+    bflmp->bflm_dbsize = i;
 
     /* Recreate transaction */
     e = mdb_txn_begin(bflmp->bflm_env, NULL, 0, &bflmp->bflm_txn);
