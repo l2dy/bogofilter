@@ -38,7 +38,7 @@ PARSING_TESTS = \
 	t.base64 t.split t.parsing \
 	t.lexer t.lexer.mbx t.lexer.qpcr t.lexer.eoh \
 	  t.lexer.boundary-- t.fgetsl.abort \
-	t.sf-bug-121 t.sf-bug-122 \
+	t.sf-bug-121 t.sf-bug-122 t.sf-bug-124 \
 	t.spam.header.place \
 	t.block.on.subnets \
 	t.token.count \
