@@ -25,11 +25,11 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 		Doxyfile gpl-3.0.txt gnugetopt \
 		GETTING.STARTED \
 		NEWS.0 \
-		README.svn \
+		README.git \
 		RELEASE.NOTES \
 		install-staticdblibs.sh
 
-.PHONY:	check rpm svn-check
+.PHONY:	check rpm git-check
 
 #
 # RPM building - there are some cheats here
@@ -107,9 +107,10 @@ rpm:	dist
 	-                CPPFLAGS="-D__NO_CTYPE -I$(SQPFX)"               \
 			$(RPMBUILD)              $(DEF_SQLITE) $(SIGN) -tb $(distdir).tar.gz
 
-svn-check:
+git-check:
 	rm -rf $(PACKAGE)-$(VERSION)-export
-	svn export -rBASE $(srcdir) $(PACKAGE)-$(VERSION)-export
+	mkdir $(PACKAGE)-$$(VERSION)-export
+	git archive HEAD | tar -C $(PACKAGE)-$(VERSION)-export -xf -
 	cd $(PACKAGE)-$(VERSION)-export && autoreconf -i -f -s -v \
 	&& ./configure && make distcheck
 
@@ -123,7 +124,7 @@ rsynconly: .rsyncs
 	@( cat $(srcdir)/.rsyncs | sed -e 's}^}rsync -av -e ssh --delete $(PACKAGE)-$(VERSION)/ }; s/\($$\)/ \&/;' ; echo "wait" ) | $(SHELL) -x
 
 dist-hook:
-	cd $(distdir) && find doc gnugetopt gsl '(' -name .svn -o -name CVS ')' -type d -prune -exec rm -rf '{}' +
+	cd $(distdir) && find doc gnugetopt gsl '(' -name .svn -o name .git -o -name CVS ')' -type d -prune -exec rm -rf '{}' +
 	cd $(distdir) && find doc gnugetopt gsl -name '.#*' -type f -exec rm '{}' ';'
 	rm -f $(distdir)/doc/.cvsignore $(distdir)/ChangeLog
 

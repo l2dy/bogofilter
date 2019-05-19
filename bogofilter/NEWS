@@ -15,6 +15,10 @@
 
 -------------------------------------------------------------------------------
 
+	2019-05-19
+	* Bogofilter's source code repository has been converted to Git,
+	  and is hosted on GitLab and mirrored onto SourceForge.net.
+
 	2018-07-19
 	* Support for using LMDB (Lightning Memory-Mapped Database Manager)
 	  as the database back-end. Suggested, courteously implemented and

@@ -132,9 +132,11 @@ to the list.
   The latest stable version can be downloaded.  The development source
   is in a Subversion repository on SourceForge.  To download the latest SVN
   source, cd to the directory to which you wish to download and type
-  the following command:
+  EITHER ONE of the following commands:
 
-  svn checkout http://svn.code.sf.net/p/bogofilter/code/trunk bogofilter
+  git clone https://gitlab.com/mandree/bogofilter.git
+  OR
+  git clone git://git.code.sf.net/p/bogofilter/git bogofilter-git
 
   b. Building & Installing
   ------------------------
@@ -142,7 +144,7 @@ to the list.
   To compile and install the standard configuration from a tarball, use
   the following commands:
 
-  cd bogofilter-1.0.1	[change to project directory]
+  cd bogofilter-1.2.5	[change to project directory]
   ./configure		[add configure options as required]
   make all check
   make install		[as root]
@@ -154,7 +156,7 @@ to the list.
   ./autogen.sh		[add configure options as required]
   make install		[as root]
 
-  Be sure to read README.svn for additional preparations required.
+  Be sure to read README.git for additional preparations required.
 
   You will need a full set of development tools installed to be able
   to run autogen.sh, including recent automake (1.8) and autoconf
