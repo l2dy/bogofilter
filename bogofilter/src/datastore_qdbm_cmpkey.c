@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include "datastore_qdbm.h"
 
 int cmpkey(const char *aptrin, int asiz, const char *bptrin, int bsiz)

@@ -1,8 +1,5 @@
 /* (C) 2002 by Matthias Andree, redistributable according to the terms
  * of the GNU General Public License, v2.
- *
- * $Id$
- *
  */
 
 #include <string.h>

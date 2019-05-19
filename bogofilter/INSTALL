@@ -1,7 +1,4 @@
-# $Id$
-
 ========================================================================
-
 NOTE: Whenever you are about to update your bogofilter version, be sure
 to read the corresponding RELEASE.NOTES file first.  Any INCOMPATIBLE or
 major changes to bogofilter's mode of operation will be documented in it.

@@ -1,7 +1,5 @@
 #!/usr/bin/perl
 
-# $Id$
-#
 # bogofilter-milter.pl - a Sendmail::Milter Perl script for filtering
 # mail using individual users' bogofilter databases.
 #

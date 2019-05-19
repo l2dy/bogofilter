@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /** \file xatox.h
  * Header file for xato* string-to-number conversion
  * functions with simplified error checking.

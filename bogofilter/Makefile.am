@@ -1,5 +1,3 @@
-# $Id$
-
 # automake options
 AUTOMAKE_OPTIONS = 
 

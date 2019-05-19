@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /** \file bogoreader.h
  * prototypes and definitions for bogoreader.c
  *

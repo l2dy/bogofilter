@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /** \file word.h
  * constants and declarations for word.c
  *

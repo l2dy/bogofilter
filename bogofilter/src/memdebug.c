@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*
 * NAME:
 *    memdebug.c -- memory usage debugging layer for malloc(), free(), etc.

@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /** \file base64.c
  * decode base64 encoded text
  * \author David Relson <relson@osagesoftware.com>

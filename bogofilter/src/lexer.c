@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /**
  * \file lexer.c
  * bogofilter's lexical analyzer (control routines)

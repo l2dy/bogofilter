@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /** \file buff.c
  * implementation of the buff type, a buffer for arbitrary strings
  * and actually a superset of word_t

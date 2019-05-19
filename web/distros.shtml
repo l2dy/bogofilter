@@ -110,7 +110,7 @@
 		<tr><td>Ubuntu 12.04 LTS (Precise Pangolin)</td>   <td>1.2.2</td> <td><div align="center">BerkeleyDB 4.8, in universe: SQLite3</div></td></tr>
 		<tr><td>Ubuntu 10.04 LTS (Lucid Lynx)</td>   <td>1.2.1</td> <td><div align="center">BerkeleyDB 4.7, in universe: SQLite3</div></td></tr>
        </table>
-              <p class="date">Last update: $Date$</p>
+              <p class="date">Last update: 2014-02-17</p>
             </td>
           </tr>
         </table>

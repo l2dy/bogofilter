@@ -1,7 +1,5 @@
 ########### Sample BOGOFILTER Configuration File ###########################
 
-# $Id$
-
 # Default settings (as defined in the bogofilter source code) 
 # have a single hash mark at the beginning of the line.
 

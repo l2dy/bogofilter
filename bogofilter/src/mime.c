@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /**
  * \file mime.c - lexer MIME processing
  *

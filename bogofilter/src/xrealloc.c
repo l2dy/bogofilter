@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*
 * NAME:
 *    xrealloc.c -- front-end to standard heap manipulation routines, with error checking.

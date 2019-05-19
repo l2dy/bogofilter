@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /**
  * \file
  * paths.c -- routines for working with file paths.

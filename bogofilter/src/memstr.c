@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /** \file memstr.c
  * find a C string in memory
  * \author Matthias Andree

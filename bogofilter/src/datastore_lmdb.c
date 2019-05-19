@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*
  * NAME:
  * datastore_lmdb.c -- implements the datastore, using LMDB.

@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /** \file base64.h
  * prototypes and definitions for base64.c
  */

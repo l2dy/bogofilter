@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #ifndef WORDHASH_H
 #define WORDHASH_H
 

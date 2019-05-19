@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /** \file word.c
  * support for strings of arbitrary content, implementation
  *

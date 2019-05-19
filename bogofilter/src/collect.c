@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* collect.c -- tokenize input and cap word frequencies, return a wordhash */
 
 #include "common.h"

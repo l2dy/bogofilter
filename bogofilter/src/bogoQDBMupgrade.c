@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*
   bogoQDBMupgrade.c -- convert QDBM data base from Hash to B+Tree format
   Copyright (C) 2004  Stefan Bellon

@@ -1,4 +1,3 @@
-/* $Id$ */
 /*  constants and declarations for robinson-fisher method */
 
 #ifndef	FISHER_H

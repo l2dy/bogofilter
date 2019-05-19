@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #ifndef DATASTORE_QDBM_H
 #define DATASTORE_QDBM_H
 

@@ -1,5 +1,3 @@
-# $Id$
-
 check_PROGRAMS=dehex spam_header_name dumbhead deqp deb64 escnp abortme \
 	       u_fpe wantcore leakmem ctype
 

@@ -1,5 +1,4 @@
 dnl vim: set noai tw=0:
-dnl $Id$
 dnl
 dnl configure.ac for bogofilter
 dnl (C) Copyright 2003 Clint Adams, Gyepi Sam, David Relson, Matthias Andree

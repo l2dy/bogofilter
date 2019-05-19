@@ -5,8 +5,6 @@
 #    use to copy wordlist.db and related files
 #    from one directory to another
 
-# $Id$
-
 set -e # die on errors
 
 : ${BOGOUTIL:=@transformed_bogoutil@}

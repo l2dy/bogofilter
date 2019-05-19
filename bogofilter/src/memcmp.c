@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* memcmp.c -- Replacement memcmp.c
  *
  * Useful on systems that don't have a working memcmp, such as SunOS

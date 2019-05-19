@@ -1,5 +1,3 @@
-# $Id$
-
 # This .spec file will not build the static package by default.
 # To do this, run either of the next rpm[build] commands:
 #

@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* find_home.h -- library function to figure out the home dir of current user */
 
 #ifndef FIND_HOME_H

@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* register.c -- read input with collect and register to persistent db */
 
 #include "common.h"

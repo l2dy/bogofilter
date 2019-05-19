@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #ifndef XMEMRCHR_H
 #define XMEMRCHR_H
 

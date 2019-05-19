@@ -7,8 +7,6 @@
 # (C) 2004 by Matthias Andree
 # GNU GPL v2.
 
-# $Id$
-
 set -e
 
 : ${BOGOFILTER:=@transformed_bogofilter@}

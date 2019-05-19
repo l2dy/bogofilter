@@ -2875,8 +2875,6 @@
 
 	* Initial release.
 
-$Id$
-
  vim:tw=79 com=bf\:* ts=8 sts=8 sw=8 ai:
 
  LocalWords:  bogofilter bogolexer bogoutil Spamicity spamicity

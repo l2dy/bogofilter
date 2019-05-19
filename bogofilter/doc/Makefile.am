@@ -1,5 +1,3 @@
-# $Id$ 
-
 # Tell BSD make(1) to not remake the .1in and .htmlin files.
 SUFFIXES= .1 .1in .htmlin .html
 

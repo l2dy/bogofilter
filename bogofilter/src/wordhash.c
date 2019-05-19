@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*
 NAME:
    wordhash.c -- Implements a hash data structure.

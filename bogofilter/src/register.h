@@ -1,5 +1,4 @@
 /* register.h -- constants and declarations for register.c */
-/* $Id$ */
 
 #ifndef	REGISTER_H
 #define	REGISTER_H

@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*****************************************************************************/
 /** \file bftypes.h
  * \brief Type definitions for bogofilter.

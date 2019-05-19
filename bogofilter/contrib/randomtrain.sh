@@ -1,7 +1,5 @@
 #! /bin/bash
 #
-# $Id$ #
-#
 #  randomtrain -- bogofilter messages from files in random order
 #                 and train if the result is wrong or uncertain
 #  needs:    POSIX compliant sh, basename rm grep awk wc perl dd bogofilter

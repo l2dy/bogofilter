@@ -6,8 +6,6 @@
 #
 # This file is released under the GPL. See http://www.gnu.org/licenses/gpl.txt
 
-# $Id$ #
-
 # Note:  this script has not yet had bogofilter maintainer review.
 # Security concerned people should not run it if in doubt about its security.
 
