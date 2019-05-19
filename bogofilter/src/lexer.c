@@ -363,7 +363,7 @@ int yyinput(byte *buf, size_t used, size_t size)
     if (msg_state &&
 	msg_state->mime_dont_decode &&
 	(msg_state->mime_disposition != MIME_DISPOSITION_UNKNOWN)) {
-        assert(count <= (int)size);
+        assert(size <= INT_MAX && count <= (int)size);
 	return (count == EOF ? 0 : count);   /* not decode at all */
     }
 
@@ -385,7 +385,7 @@ int yyinput(byte *buf, size_t used, size_t size)
     if (DEBUG_LEXER(2))
 	fprintf(dbgout, "*** yyinput(\"%-.*s\", %lu, %lu) = %d\n", count, buf, (unsigned long)used, (unsigned long)size, count);
 
-    assert(count <= (int)size);
+    assert(size <= INT_MAX && count <= (int)size);
     return (count == EOF ? 0 : count);
 }
 
