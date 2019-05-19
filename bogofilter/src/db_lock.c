@@ -193,6 +193,7 @@ static int create_lockfile(const char *fn, int modes) {
 	}
 	unlink(tmp);
     }
+    if (tmp) free(tmp);
     return lockfd;
 }
 
