@@ -132,7 +132,7 @@ to the list.
   source, cd to the directory to which you wish to download and type
   EITHER ONE of the following commands:
 
-  git clone https://gitlab.com/mandree/bogofilter.git
+  git clone https://gitlab.com/bogofilter/bogofilter.git
   OR
   git clone git://git.code.sf.net/p/bogofilter/git bogofilter-git
 
