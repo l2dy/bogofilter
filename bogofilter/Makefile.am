@@ -106,11 +106,12 @@ rpm:	dist
 			$(RPMBUILD)              $(DEF_SQLITE) $(SIGN) -tb $(distdir).tar.gz
 
 git-check:
+	if test -d $(PACKAGE)-$(VERSION)-export ; then chmod -R u+rwX $(PACKAGE)-$(VERSION)-export ; fi
 	rm -rf $(PACKAGE)-$(VERSION)-export
-	mkdir $(PACKAGE)-$$(VERSION)-export
-	git archive HEAD | tar -C $(PACKAGE)-$(VERSION)-export -xf -
-	cd $(PACKAGE)-$(VERSION)-export && autoreconf -i -f -s -v \
-	&& ./configure && make distcheck
+	mkdir $(PACKAGE)-$(VERSION)-export
+	( cd $(top_srcdir) && git archive --format=tar HEAD ) | tar -C $(PACKAGE)-$(VERSION)-export -xf -
+	cd $(PACKAGE)-$(VERSION)-export && chmod -R u+rwX . && autoreconf -i -f -s -v \
+	&& mkdir _build && cd _build && ../configure && $(MAKE) distcheck
 
 # this target expects a .rsyncs file with lines of this format:
 # host:directory/
