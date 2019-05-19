@@ -98,6 +98,12 @@ EXTRA_DIST=$(TESTSCRIPTS) t.frame t.save t.skel \
 	inputs/msg.split.gs.0119.text \
 	inputs/spam.mbx \
 	inputs/t.passthrough-truncation-in.gz \
+	inputs/input-sf-bug-124-yyinput-tmin.gz \
+	inputs/input-sf-bug-124-count-tmin.gz \
+	inputs/input-sf-bug-124-buffshift-tmin.gz \
+	inputs/input-sf-bug-122-buffadd-tmin.gz \
+	inputs/input-sf-bug-122-buffadd-tmin2.gz \
+	inputs/gconv-tmin2.gz \
 	outputs/MH.out \
 	outputs/bogolex.out \
 	outputs/bulkmode.out \
