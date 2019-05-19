@@ -285,26 +285,6 @@ static int skip_folded_line(buff_t *buff)
     }
 }
 
-int buff_fill(buff_t *buff, size_t used, size_t need)
-{
-    int cnt = 0;
-    size_t leng = buff->t.leng;
-    size_t size = buff->size;
-
-    /* check bytes needed vs. bytes in buff */
-    while (size - leng > 2 && need > leng - used) {
-	/* too few, read more */
-	int add = get_decoded_line(buff);
-        /* get_decoded_line never returns EOF!?! */
-	if (add == EOF) return EOF;
-	if (add == -2) continue;
-	if (add == 0) break ;
-	cnt += add;
-	leng += add;
-    }
-    return cnt;
-}
-
 void yyinit(void)
 {
     yylineno = 0;
