@@ -36,7 +36,8 @@ typedef struct {
 } dbh_t;
 
 static int kc_txn_begin(void *vhandle) {
-    dbh_t *dbh = vhandle;
+    dbh_t *dbh = (dbh_t *)vhandle;
+
     if (!dbh->writable || kcdbbegintran(dbh->dbp, false))
         return DST_OK;
     print_error(__FILE__, __LINE__, "kcdbbegintran(%p), err: %d, %s",
@@ -46,7 +47,8 @@ static int kc_txn_begin(void *vhandle) {
 }
 
 static int kc_txn_abort(void *vhandle) {
-    dbh_t *dbh = vhandle;
+    dbh_t *dbh = (dbh_t *)vhandle;
+
     if (!dbh->writable || kcdbendtran(dbh->dbp, false))
         return DST_OK;
     print_error(__FILE__, __LINE__, "kcdbendtran(%p, false), err: %d, %s",
@@ -56,7 +58,8 @@ static int kc_txn_abort(void *vhandle) {
 }
 
 static int kc_txn_commit(void *vhandle) {
-    dbh_t *dbh = vhandle;
+    dbh_t *dbh = (dbh_t *)vhandle;
+
     if (!dbh->writable || kcdbendtran(dbh->dbp, true))
         return DST_OK;
     print_error(__FILE__, __LINE__, "kc_txn_commit(%p, true), err: %d, %s",
@@ -108,7 +111,7 @@ static dbh_t *dbh_init(bfpath *bfp)
 {
     dbh_t *handle;
 
-    handle = xmalloc(sizeof(dbh_t));
+    handle = (dbh_t *)xmalloc(sizeof(dbh_t));
     memset(handle, 0, sizeof(dbh_t));
 
     handle->name = xstrdup(bfp->filepath);
@@ -140,7 +143,7 @@ bool db_is_swapped(void *vhandle)
 
 bool db_created(void *vhandle)
 {
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
 
     return handle->created;
 }
@@ -184,10 +187,10 @@ open_err:
 
 int db_delete(void *vhandle, const dbv_t *token)
 {
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
     bool ret;
 
-    ret = kcdbremove(handle->dbp, token->data, token->leng);
+    ret = kcdbremove(handle->dbp, (const char *)token->data, token->leng);
     if (!ret) {
         print_error(__FILE__, __LINE__, "kcdbremove(\"%.*s\"), err: %d, %s",
                     CLAMP_INT_MAX(token->leng), (char *)token->data,
@@ -201,11 +204,11 @@ int db_delete(void *vhandle, const dbv_t *token)
 
 int db_get_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
 {
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
     char *data;
     size_t dsiz;
 
-    data = kcdbget(handle->dbp, token->data, token->leng, &dsiz);
+    data = kcdbget(handle->dbp, (const char *)token->data, token->leng, &dsiz);
     if (data == NULL)
         return DS_NOTFOUND;
 
@@ -218,10 +221,10 @@ int db_get_dbvalue(void *vhandle, const dbv_t *token, dbv_t *val)
 
 int db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *val)
 {
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
     bool ret;
 
-    ret = kcdbset(handle->dbp, token->data, token->leng, val->data, val->leng);
+    ret = kcdbset(handle->dbp, (const char *)token->data, token->leng, (const char *)val->data, val->leng);
     if (!ret) {
         print_error(__FILE__, __LINE__,
                     "kcdbset: (%.*s, %.*s), err: %d, %s",
@@ -237,7 +240,7 @@ int db_set_dbvalue(void *vhandle, const dbv_t *token, const dbv_t *val)
 
 void db_close(void *vhandle)
 {
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
 
     if (handle == NULL)
         return;
@@ -256,7 +259,7 @@ void db_close(void *vhandle)
 
 void db_flush(void *vhandle)
 {
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
 
     if (!kcdbsync(handle->dbp, false, NULL, NULL))
         print_error(__FILE__, __LINE__, "kcdbsync(), err: %d, %s",
@@ -265,7 +268,7 @@ void db_flush(void *vhandle)
 
 ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 {
-    dbh_t *handle = vhandle;
+    dbh_t *handle = (dbh_t *)vhandle;
     KCCUR *cursor;
     dbv_t dbv_key, dbv_data;
     size_t ksiz, dsiz;
@@ -286,7 +289,7 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
         /* Copy to dbv_key and dbv_data */
         dbv_key.data = xstrdup(key);
         dbv_key.leng = ksiz;
-        dbv_data.data = data;
+        dbv_data.data = (void *)data;
         dbv_data.leng = dsiz;
 
         /* Call function */
