@@ -35,6 +35,8 @@ export BOGOLEXER
 export BOGOTUNE
 export BOGOUTIL
 export BF_COMPACT
+unset BF_DEBUG_DB
+unset BF_DEBUG_DB_OPEN
 
 # Cater for GNU coreutils "compatibility"
 _POSIX2_VERSION=199209
