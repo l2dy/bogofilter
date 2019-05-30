@@ -202,7 +202,7 @@ static DB_ENV *dbe_recover_open(bfpath *bfp, u_int32_t flags)
     bf_dbenv_create(&dbe);
 
     if (DEBUG_DATABASE(0))
-        fprintf(dbgout, "running regular data base recovery%s\n",
+        fprintf(dbgout, "dbe_recover_open() running regular data base recovery%s\n",
 	       flags & DB_PRIVATE ? " and removing environment" : "");
 
     /* quirk: DB_RECOVER requires DB_CREATE and cannot work with DB_JOINENV */
@@ -599,7 +599,7 @@ ex_t dbx_recover(bfpath *bfp, bool catastrophic, bool force)
 	return EX_OK;
 
     if (DEBUG_DATABASE(0))
-        fprintf(dbgout, "running %s data base recovery\n",
+        fprintf(dbgout, "dbx_recover() running %s data base recovery\n",
 	    catastrophic ? "catastrophic" : "regular");
     env = dbe_xinit(env, bfp,
 		    catastrophic ? DB_RECOVER_FATAL : DB_RECOVER);
