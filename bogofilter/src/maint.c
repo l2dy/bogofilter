@@ -140,7 +140,7 @@ bool discard_token(word_t *token, dsv_t *in_val)
     return discard;
 }
 
-bool do_replace_nonascii_characters(register byte *str, register size_t len)
+bool do_replace_nonascii_characters(byte *str, size_t len)
 {
     bool change = false;
     assert(str != NULL);
