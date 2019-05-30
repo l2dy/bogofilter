@@ -73,7 +73,7 @@ static ex_t robx_hook(word_t *key, dsv_t *data,
 double compute_robinson_x(void)
 {
     int ret;
-    double rx;
+    double rx = 0;
     dsh_t *dsh;
     wordlist_t *wordlist;
 
@@ -104,9 +104,10 @@ double compute_robinson_x(void)
 	}
     } while (ret == DS_ABORT_RETRY);
 
-    rx = rh.sum/rh.count;
     if (rh.count == 0)
 	ret = -1;
+    else
+	rx = rh.sum/rh.count;
     if (verbose > 2)
 	printf("%s: %u, %u, scale: %f, sum: %f, cnt: %6d, .ROBX: %f\n",
 	       MSG_COUNT, rh.spam_cnt, rh.good_cnt,
