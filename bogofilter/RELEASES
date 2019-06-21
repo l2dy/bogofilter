@@ -2,6 +2,13 @@
 ===============================
 with release or promotion date, sorted by age
 
+1.2.4	  (2013-07-01)
+
+WARNING:  versions below are no longer supported and may
+========  have critical or security relevant bugs.
+
+1.2.3	  (2012-12-02)
+1.2.2	  (2010-10-08)
 1.2.1     (2009-08-01) <- date of initial release
 1.2.0     (2009-02-21)
 1.1.7     (2008-05-18)
@@ -13,9 +20,6 @@ with release or promotion date, sorted by age
 "Stable" releases of bogofilter throughout its development
 ==========================================================
 with release or promotion date, sorted by age
-
-WARNING:  these versions are no longer supported and may
-========  have critical or security relevant bugs.
 
 0.96.6    (2005-11-19)
 0.96.2    (2005-10-06) do not install this - security bugs
