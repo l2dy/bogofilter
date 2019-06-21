@@ -516,8 +516,12 @@ case "x$WITH_DB_ENGINE" in
 	AC_DEFINE(ENABLE_QDBM_DATASTORE,1, [Enable qdbm datastore])
 	DB_TYPE=qdbm
 	DB_EXT=.qdbm
-	AC_LIB_LINKFLAGS([qdbm])
-	LIBDB="$LIBQDBM"
+	PKG_CHECK_MODULES(QDBM, qdbm,
+		  [CFLAGS="$CFLAGS $QDBM_CFLAGS"],
+		  [AC_LIB_LINKFLAGS([qdbm])
+		   AC_CHECK_HEADERS(qdbm/depot.h,
+				    CFLAGS="$CFLAGS -I/usr/include/qdbm")])
+	LIBDB="$LIBQDBM $QDBM_LIBS"
 	saveLIBS="$LIBS"
 	LIBS="$LIBS $LIBDB"
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([
