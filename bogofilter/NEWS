@@ -16,6 +16,7 @@
 -------------------------------------------------------------------------------
 
 	2019-06-21
+	* Plugged more memory leaks (one-shot leaks in bogoutil/bogotune).
 	* RPMs or scripts for static library builds have been removed.
 	  Bogofilter no longer supports systems that are too far out of date.
 	  This removes .spec files from the package (for now, it is still
