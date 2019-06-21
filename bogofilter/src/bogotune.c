@@ -1843,7 +1843,6 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 
     /* directories from command line and config file are already handled */
     if (ds_flag == DS_DSK) {
-
 	bfpath *bfp;
 
 	if (ds_path == NULL)
@@ -1875,6 +1874,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	    bfp = bfpath_create(ds_path);
 	    if (!bfpath_check_mode(bfp, BFP_MUST_EXIST)) {
 		fprintf(stderr, "Can't open wordlist '%s'\n", bfp->filepath);
+		bfpath_free(bfp);
 		xfree(ds_path);
 		exit(EX_ERROR);
 	    }
@@ -1883,6 +1883,7 @@ int main(int argc, char **argv) /*@globals errno,stderr,stdout@*/
 	env = ds_init(bfp);
 
 	init_wordlist("word", ds_path, 0, WL_REGULAR);
+	bfpath_free(bfp);
     }
 
     bogotune_init();

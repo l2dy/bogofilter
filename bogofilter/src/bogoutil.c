@@ -938,15 +938,15 @@ int main(int argc, char *argv[])
 
     switch (flag) {
 	case M_RECOVER:
-	    ds_init(bfp);
+	    dsm_init(bfp);
 	    rc = ds_recover(bfp, false);
 	    break;
 	case M_CRECOVER:
-	    ds_init(bfp);
+	    dsm_init(bfp);
 	    rc = ds_recover(bfp, true);
 	    break;
 	case M_CHECKPOINT:
-	    ds_init(bfp);
+	    dsm_init(bfp);
 	    rc = ds_checkpoint(bfp);
 	    break;
 	case M_LIST_LOGFILES:
@@ -954,7 +954,7 @@ int main(int argc, char *argv[])
 	    rc = ds_list_logfiles(bfp, argc - optind, argv + optind);
 	    break;
 	case M_PURGELOGS:
-	    ds_init(bfp);
+	    dsm_init(bfp);
 	    rc = ds_purgelogs(bfp);
 	    break;
 	case M_REMOVEENV:

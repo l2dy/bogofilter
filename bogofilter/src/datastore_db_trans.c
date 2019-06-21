@@ -595,8 +595,10 @@ ex_t dbx_recover(bfpath *bfp, bool catastrophic, bool force)
 
     /* ok, when we have the lock, a concurrent process may have
      * proceeded with recovery */
-    if (!(force || needs_recovery()))
+    if (!(force || needs_recovery())) {
+	dbx_cleanup_lite(env);
 	return EX_OK;
+    }
 
     if (DEBUG_DATABASE(0))
         fprintf(dbgout, "dbx_recover() running %s data base recovery\n",
