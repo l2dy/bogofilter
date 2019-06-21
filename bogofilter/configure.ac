@@ -249,47 +249,6 @@ dnl May not be complete with future extensions, but appears to work
 dnl today, 2003-10-02. Matthias Andree
 AC_DEFINE(__NO_CTYPE,1,[Define __NO_CTYPE to 1 to avoid GLIBC_2.3-specific ctype.h functions.])
 
-dnl Enable building statically linked executables
-
-AC_ARG_ENABLE(static,
-      AS_HELP_STRING([--enable-static], [build static versions as well (unsupported).]))
-
-case a$enable_static in
-ayes)
-    EXE_EXT="_static"
-    AC_MSG_CHECKING([option to link statically])
-    LDEFLAGS="$LDFLAGS"
-    found=0
-    for i in -static ; do
-	LDFLAGS="$LDEFLAGS $i"
-	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdlib.h>]],
-			  [[exit (0);]])],found=1)
-	if test $found -eq 1 ; then break ; fi
-    done
-    if test $found -eq 1 ; then
-	AC_MSG_RESULT($i)
-	STATICLDFLAGS=$i
-	LDFLAGS="$LDEFLAGS"
-    else
-	AC_MSG_RESULT([[?]])
-	AC_MSG_WARN([Cannot figure out how to statically link a program.])
-	STATICLDFLAGS=
-	enable_static=no
-    fi
-    ;;
-ano|a)
-    ;;
-*)
-    STATICLDFLAGS="$enable_static"
-    enable_static=yes
-    ;;
-esac
-
-export STATICLDFLAGS
-AC_SUBST(STATICLDFLAGS)
-AM_CONDITIONAL(ENABLE_STATIC, test x$enable_static = xyes)
-AC_SUBST(EXE_EXT)
-
 dnl Allow the user to specify a header name to use to indicate whether a given
 dnl message is SPAM or not.
 AC_ARG_ENABLE(spam-header-name, 

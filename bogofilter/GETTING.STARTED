@@ -45,8 +45,7 @@ Summary:
     bogofilter" (or comparable commands).
 
     Binary formats include builds for dynamically linked (shared)
-    libaries, e.g. bogofilter-VER.i586.rpm, and a statically linked
-    executable, e.g. bogofilter-static-VER.i586.rpm.
+    libaries, e.g. bogofilter-VER.x64_64.rpm.
 
     It is also available as a .deb pack (use "apt-get bogofilter" to
     install) and via yum (use "yum install bogofilter").
