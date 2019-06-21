@@ -31,9 +31,6 @@ BUILT_SOURCES=	version.c directories.c
 bin_PROGRAMS = bogofilter bogoutil bogolexer bogotune
 bin_SCRIPTS = bogoupgrade
 dist_bin_SCRIPTS = bf_copy bf_compact bf_tar
-if ENABLE_STATIC
-bin_PROGRAMS += bogofilter_static bogoutil_static bogolexer_static bogotune_static
-endif
 
 check_PROGRAMS = debugtest configtest wordhash find_home.test \
 		 fgetsl.test
@@ -233,28 +230,13 @@ CLEANFILES=version.c directories.c bogoupgrade
 
 bogofilter_SOURCES = bogofilter.c bogofilter.h main.c \
 		     common.h
-bogofilter_static_SOURCES = $(bogofilter_SOURCES)
-bogofilter_static_LDFLAGS = $(STATICLDFLAGS)
-bogofilter_static_LDADD = $(LDADD) $(STATIC_DB) $(GSL_LIBS)
-
-bogolexer_static_SOURCES = bogolexer.c
-bogolexer_static_LDFLAGS = $(STATICLDFLAGS)
 
 bogoutil_SOURCES = bogoutil.c bogohist.c bogohist.h
-bogoutil_static_SOURCES = bogoutil.c bogohist.c bogohist.h
-bogoutil_static_LDFLAGS = $(STATICLDFLAGS)
-bogoutil_static_LDADD = $(LDADD) $(STATIC_DB)
 
 bogotune_SOURCES = bogotune.c bogotune.h \
 		   tunelist.c tunelist.h \
 		   common.h
 bogotune_LDADD = $(LDADD) $(LIBDB) $(GSL_LIBS)
-
-bogotune_static_SOURCES = bogotune.c bogotune.h \
-		   tunelist.c tunelist.h \
-		   common.h
-bogotune_static_LDFLAGS = $(STATICLDFLAGS)
-bogotune_static_LDADD= $(LDADD) $(STATIC_DB) $(GSL_LIBS)
 
 debugtest_SOURCES = debug.main.c
 
