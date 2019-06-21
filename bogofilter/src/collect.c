@@ -95,10 +95,12 @@ void collect_words(wordhash_t *wh)
 	if (cls == BOGO_LEX_LINE)
 	{
 	    char *s = (char *)token.u.text;
+	    assert(s != 0);
 	    s += token.leng + 2;
 	    wp->cnts.bad = atoi(s);
-	    s = strchr(s+1, ' ') + 1;
-	    wp->cnts.good = atoi(s);
+	    s = strchr(s+1, ' ');
+	    assert(s != 0);
+	    wp->cnts.good = atoi(s + 1);
 	    wp->cnts.msgs_good = msgs_good;
 	    wp->cnts.msgs_bad = msgs_bad;
 	}
