@@ -41,7 +41,7 @@ static int kc_txn_begin(void *vhandle) {
     if (!dbh->writable || kcdbbegintran(dbh->dbp, false))
         return DST_OK;
     print_error(__FILE__, __LINE__, "kcdbbegintran(%p), err: %d, %s",
-                dbh->dbp,
+                (void *)dbh->dbp,
                 kcdbecode(dbh->dbp), kcdbemsg(dbh->dbp));
     return DST_FAILURE;
 }
@@ -52,7 +52,7 @@ static int kc_txn_abort(void *vhandle) {
     if (!dbh->writable || kcdbendtran(dbh->dbp, false))
         return DST_OK;
     print_error(__FILE__, __LINE__, "kcdbendtran(%p, false), err: %d, %s",
-                dbh->dbp,
+                (void *)dbh->dbp,
                 kcdbecode(dbh->dbp), kcdbemsg(dbh->dbp));
     return DST_FAILURE;
 }
@@ -63,7 +63,7 @@ static int kc_txn_commit(void *vhandle) {
     if (!dbh->writable || kcdbendtran(dbh->dbp, true))
         return DST_OK;
     print_error(__FILE__, __LINE__, "kc_txn_commit(%p, true), err: %d, %s",
-                dbh->dbp,
+                (void *)dbh->dbp,
                 kcdbecode(dbh->dbp), kcdbemsg(dbh->dbp));
     return DST_FAILURE;
 }
