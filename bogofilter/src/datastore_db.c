@@ -628,14 +628,12 @@ retry_db_open:
 	if (ret != 0) {
 	    err = (ret != ENOENT) || (opt_flags == DB_RDONLY);
 	    if (!err) {
-                ret =
+                ret = 0;
 #if DB_EQUAL(4,1)
-		 (DB_SET_FLAGS(dbp, DB_CHKSUM_SHA1)) != 0 ||
+		ret = ((DB_SET_FLAGS(dbp, DB_CHKSUM_SHA1)) != 0);
+#elif DB_AT_LEAST(4,2)
+		ret = ((DB_SET_FLAGS(dbp, DB_CHKSUM)) != 0);
 #endif
-#if DB_AT_LEAST(4,2)
-		 (ret = DB_SET_FLAGS(dbp, DB_CHKSUM)) != 0 ||
-#endif
-                 0;
                 if (!ret) {
                     dbp->close(dbp, 0);
                     if ((ret = db_create (&dbp, dbe, 0)) != 0) {
