@@ -288,18 +288,6 @@ void wordhash_add(wordhash_t *dest, wordhash_t *src, void (*initializer)(void *)
     dest->size = count;
 }
 
-void
-wordhash_foreach (wordhash_t *wh, wh_foreach_t *hook, void *userdata)
-{
-    hashnode_t *hn;
-
-    for (hn = (hashnode_t *)wordhash_first(wh); hn != NULL; hn = (hashnode_t *)wordhash_next(wh)) {
-	(*hook)(hn->key, hn->data, userdata);
-    }
-
-    return;
-}
-
 void *
 wordhash_search_memory (const word_t *t)
 {
