@@ -39,7 +39,7 @@ static void (*fini)(void);
 static int  argc;
 static const char * const *argv;
 static const char *filename;
-static char namebuff[PATH_LEN+1];
+static char namebuff[PATH_LEN + 1 + MEMBERSIZE(struct dirent, d_name)];
 static char dir_name[PATH_LEN+1];
 
 static FILE *yy_file;
