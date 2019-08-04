@@ -278,7 +278,8 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     dbh_t *handle = (dbh_t *)vhandle;
     VILLA *dbp = handle->dbp;
 
-    dbv_t dbv_key, dbv_data;
+    dbv_t dbv_key;
+    dbv_const_t dbv_data;
     int ksiz, dsiz;
     char *key, *data;
 

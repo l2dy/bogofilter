@@ -25,7 +25,7 @@ int ta_commit(ta_t *ta);
 int ta_rollback(ta_t *ta);
 
 int ta_delete(ta_t *ta, void *vhandle, const word_t *word);
-int ta_write(ta_t *ta, void *vhandle, const word_t *word, dsv_t *val);
+int ta_write(ta_t *ta, void *vhandle, const word_t *word, const dsv_t *val);
 int ta_read(ta_t *ta, void *vhandle, const word_t *word, /*@out@*/ dsv_t *val);
 
 #endif /* TRANSACTION_H */

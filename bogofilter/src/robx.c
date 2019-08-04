@@ -33,8 +33,8 @@ typedef struct robhook_data {
 } rhd_t;
 
 static void robx_accum(rhd_t *rh, 
-		       word_t *key,
-		       dsv_t *data)
+		       const word_t *key,
+		       const dsv_t *data)
 {
     uint32_t goodness = data->goodcount;
     uint32_t spamness = data->spamcount;

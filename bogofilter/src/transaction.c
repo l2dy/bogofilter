@@ -95,7 +95,7 @@ int ta_rollback(ta_t *ta)
 
 /* add operation to scheduler queue (internal function) */
 static void ta_add(ta_t *ta, ta_kind_t ta_kind, void *vhandle,
-                   const word_t *word, dsv_t *dsvval)
+                   const word_t *word, const dsv_t *dsvval)
 {
     void *ta_vhandle = vhandle;
     word_t *ta_word = NULL;
@@ -137,7 +137,7 @@ int ta_delete(ta_t *ta, void *vhandle, const word_t *word)
 }
 
 /* add write operation to scheduler queue */
-int ta_write(ta_t *ta, void *vhandle, const word_t *word, dsv_t *val)
+int ta_write(ta_t *ta, void *vhandle, const word_t *word, const dsv_t *val)
 {
     if (ta == NULL)
         return TA_ERR;

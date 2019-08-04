@@ -966,8 +966,8 @@ db_flush(void *vhandle){
 
 ex_t
 db_foreach(void *vhandle, db_foreach_t hook, void *userdata){
-    dbv_t dbv_key, dbv_val;
-    MDB_val key, val;
+    dbv_t dbv_key;
+    dbv_const_t dbv_val;
     char *buf;
     MDB_cursor_op cursor_op;
     MDB_cursor *fecp;
@@ -996,6 +996,7 @@ db_foreach(void *vhandle, db_foreach_t hook, void *userdata){
     for(cursor_op = MDB_FIRST;; cursor_op = MDB_NEXT){
         size_t i;
         int e;
+        MDB_val key, val;
 
         e = mdb_cursor_get(fecp, &key, &val, cursor_op);
         if(e != MDB_SUCCESS){
@@ -1011,13 +1012,11 @@ db_foreach(void *vhandle, db_foreach_t hook, void *userdata){
         /* Copy to dbv_key and dbv_val in order to avoid loss upon possible
          * action on the DB; should not matter, but NUL terminate them */
         dbv_key.leng = (uint32_t)(i = key.mv_size);
-        dbv_key.data = buf = (char *)xrealloc(buf, i +1 + val.mv_size +1);
+        dbv_key.data = buf = (char *)xrealloc(buf, i +1);
         memcpy(buf, key.mv_data, i);
         buf[i++] = '\0';
         dbv_val.leng = (uint32_t)val.mv_size;
-        memcpy(dbv_val.data = &buf[i], val.mv_data, val.mv_size);
-        i += val.mv_size;
-        buf[i++] = '\0';
+        dbv_val.data = val.mv_data;
 
         rv = hook(&dbv_key, &dbv_val, userdata);
 

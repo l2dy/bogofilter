@@ -14,6 +14,12 @@
 	!!!!!!!! READ THE RELEASE.NOTES !!!!!!!!
 
 -------------------------------------------------------------------------------
+	
+	2019-08-04
+	* Const-ness fix initiated for KyotoCabinet driver (fixing a const
+	  qualifier warning there) also improves performance in some
+	  "full-database" operations for LMDB and SQLite3, through reduced
+	  memory allocation and copy operations.
 
 	2019-06-21
 	* Plugged more memory leaks (one-shot leaks in bogoutil/bogotune).

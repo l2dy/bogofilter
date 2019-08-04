@@ -20,7 +20,7 @@ extern	bool     upgrade_wordlist_version;
 /* Function Prototypes */
 ex_t maintain_wordlist_file(bfpath *bfp);
 
-bool discard_token(word_t *token, dsv_t *info);
+bool discard_token(word_t *token, const dsv_t *val);
 
 bool do_replace_nonascii_characters(byte *, size_t);
 

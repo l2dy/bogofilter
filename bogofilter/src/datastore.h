@@ -75,12 +75,18 @@ typedef struct {
 /** Database value type, used to communicate between datastore layer and
  * database layer.
  */
-typedef struct {
+typedef struct dbv_s {
     /** address of buffer    */
     void     *data;
     /** number of data bytes */
     u_int32_t leng;
 } dbv_t;
+typedef struct dbv_const_s {
+    /** address of buffer    */
+    const void *data;
+    /** number of data bytes */
+    u_int32_t leng;
+} dbv_const_t;
 
 #ifndef	ENABLE_DB_DATASTORE	/* if not Berkeley DB */
 typedef	void DB;

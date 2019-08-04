@@ -270,7 +270,8 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
 {
     dbh_t *handle = (dbh_t *)vhandle;
     KCCUR *cursor;
-    dbv_t dbv_key, dbv_data;
+    dbv_t dbv_key;
+    dbv_const_t dbv_data;
     size_t ksiz, dsiz;
     int ret;
     ex_t retval = EX_OK;
@@ -289,7 +290,7 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
         /* Copy to dbv_key and dbv_data */
         dbv_key.data = xstrdup(key);
         dbv_key.leng = ksiz;
-        dbv_data.data = (void *)data;
+        dbv_data.data = data;
         dbv_data.leng = dsiz;
 
         /* Call function */

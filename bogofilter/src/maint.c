@@ -76,28 +76,30 @@ static bool keep_size(size_t size)
     return ok;
 }
 
-static void merge_tokens(const word_t *old_token, const word_t *new_token, dsv_t *in_val, ta_t *transaction, void *vhandle)
+static void merge_tokens(const word_t *old_token, const word_t *new_token, const dsv_t *in_val, ta_t *transaction, void *vhandle)
 {
     int	  ret;
-    dsv_t old_tmp;
+    dsv_t tmp;
 
     /* delete original token */
     ta_delete(transaction, vhandle, old_token);
 
     /* retrieve and update nonascii token*/
-    ret = ta_read(transaction, vhandle, new_token, &old_tmp);
+    ret = ta_read(transaction, vhandle, new_token, &tmp);
 
     if (ret == EX_OK) {
-	in_val->spamcount += old_tmp.spamcount;
-	in_val->goodcount += old_tmp.goodcount;
-	in_val->date       = max(old_tmp.date, in_val->date);	/* date in form YYYYMMDD */
-    }
-    set_date(in_val->date);	/* set timestamp */
-    ta_write(transaction, vhandle, new_token, in_val);
+	tmp.spamcount += in_val->spamcount;
+	tmp.goodcount += in_val->goodcount;
+	tmp.date       = max(tmp.date, in_val->date);	/* date in form YYYYMMDD */
+    } else {
+	memcpy(&tmp, in_val, sizeof(dsv_t));
+    };
+    set_date(tmp.date);	/* set timestamp */
+    ta_write(transaction, vhandle, new_token, &tmp);
     set_date(0);
 }
 
-static void replace_token(const word_t *old_token, const word_t *new_token, dsv_t *in_val, ta_t *transaction, void *vhandle)
+static void replace_token(const word_t *old_token, const word_t *new_token, const dsv_t *in_val, ta_t *transaction, void *vhandle)
 {
     /* delete original token */
     ta_delete(transaction, vhandle, old_token);	
@@ -111,7 +113,7 @@ static void replace_token(const word_t *old_token, const word_t *new_token, dsv_
 /* Keep token if at least one user given constraint should be kept */
 /* Discard if all user given constraints are satisfied */
 
-bool discard_token(word_t *token, dsv_t *in_val)
+bool discard_token(word_t *token, const dsv_t *in_val)
 {
     bool discard;
 

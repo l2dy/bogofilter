@@ -998,7 +998,8 @@ ex_t db_foreach(void *vhandle, db_foreach_t hook, void *userdata)
     DBC *dbcp = &dbc;
     DBT key, data;
 
-    dbv_t dbv_key, dbv_data;
+    dbv_t dbv_key;
+    dbv_const_t dbv_data;
 
     assert(handle->magic == MAGIC_DBH);
     assert((eTransaction == T_DISABLED) == (handle->txn == NULL));

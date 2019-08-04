@@ -188,7 +188,8 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
     sqlite3_stmt *stmt;
     int rc;
     bool loop, found = false;
-    dbv_t key, val;
+    dbv_t key;
+    dbv_const_t val;
 
     /* sqlite3_exec doesn't allow us to retrieve BLOBs */
     rc = sqlite3_prepare_v2(db, cmd, strlen(cmd), &stmt, &tail);
@@ -212,8 +213,7 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
 		    memcpy(key.data, sqlite3_column_blob(stmt, 0), key.leng);
 
 		    val.leng = sqlite3_column_bytes(stmt, /* column */ 1);
-		    val.data = xmalloc(val.leng);
-		    memcpy(val.data, sqlite3_column_blob(stmt, 1), val.leng);
+		    val.data = sqlite3_column_blob(stmt, 1);
 
 		    /* skip ENDIAN32 token */
 		    if (key.leng != strlen(ENDIAN32)
@@ -222,7 +222,6 @@ static int db_loop(sqlite3 *db,	/**< SQLite3 database handle */
 		    else
 			rc = 0;
 
-		    xfree(val.data);
 		    xfree(key.data);
 		    if (rc) {
 			sqlite3_finalize(stmt);

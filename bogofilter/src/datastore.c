@@ -92,10 +92,10 @@ void set_today(void)
     today = time_to_date(0);
 }
 
-static void convert_external_to_internal(dsh_t *dsh, dbv_t *ex_data, dsv_t *in_data)
+static void convert_external_to_internal(dsh_t *dsh, dbv_const_t *ex_data, dsv_t *in_data)
 {
     size_t i = 0;
-    uint32_t *cv = (uint32_t *)ex_data->data;
+    const uint32_t *cv = (const uint32_t *)ex_data->data;
 
     in_data->spamcount = !dsh->is_swapped ? cv[i++] : swap_32bit(cv[i++]);
 
@@ -215,7 +215,7 @@ int ds_read(void *vhandle, const word_t *word, /*@out@*/ dsv_t *val)
 
     switch (ret) {
     case 0:
-	convert_external_to_internal(dsh, &ex_data, val);
+	convert_external_to_internal(dsh, (dbv_const_t *)&ex_data, val);
 
 	if (DEBUG_DATABASE(3)) {
 	    fprintf(dbgout, "ds_read: [%.*s] -- %lu,%lu\n",
@@ -330,7 +330,7 @@ typedef struct {
 } ds_userdata_t;
 
 static ex_t ds_hook(dbv_t *ex_key,
-		    dbv_t *ex_data,
+		    dbv_const_t *ex_data,
 		    void *userdata)
 {
     ex_t ret;
