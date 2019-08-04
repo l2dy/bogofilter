@@ -73,7 +73,13 @@ static ex_t robx_hook(word_t *key, dsv_t *data,
 double compute_robinson_x(void)
 {
     int ret;
-    double rx = 0;
+    double rx = /* C89 does not support NAN, C99 does. */
+#ifdef NAN
+	    NAN
+#else
+	    -999
+#endif
+	    ;
     dsh_t *dsh;
     wordlist_t *wordlist;
 
