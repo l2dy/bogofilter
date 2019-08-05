@@ -2,8 +2,7 @@ check_PROGRAMS=dehex spam_header_name dumbhead deqp deb64 escnp abortme \
 	       u_fpe wantcore leakmem ctype
 
 AM_CPPFLAGS = -I$(srcdir)/..
-AM_LDFLAGS = -L..
-LDADD = -lbogofilter
+LDADD = ../libbogofilter.a
 
 BUILT_SOURCES = t.config t.query.config
 CLEANFILES= $(BUILT_SOURCES)
