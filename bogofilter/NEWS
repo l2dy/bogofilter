@@ -33,6 +33,10 @@
 	2019-05-19
 	* Bogofilter's source code repository has been converted to Git,
 	  and is hosted on GitLab and mirrored onto SourceForge.net.
+	  In contrast to Subversion (SVN), the prior system, Git is
+	  a distributed open-source version control system and has
+	  gained a lot of ground over the past years, and is solid and
+	  scales well.
 
 	2018-07-19
 	* Support for using LMDB (Lightning Memory-Mapped Database Manager)
