@@ -23,6 +23,7 @@ EXTRA_DIST=	autogen.sh gsl config.rpath \
 		Doxyfile gpl-3.0.txt gnugetopt \
 		GETTING.STARTED \
 		NEWS.0 \
+		OBITUARY \
 		README.git \
 		RELEASE.NOTES
 

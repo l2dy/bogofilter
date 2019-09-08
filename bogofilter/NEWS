@@ -15,6 +15,13 @@
 
 -------------------------------------------------------------------------------
 	
+1.2.5.RC1
+	2019-09-08
+	* Release candidate #1 for bogofilter 1.2.5.
+	* Add a file "OBITUARY" to inform the bogofilter community
+	  that and how David M. Relson has passed away in 2013.
+	* Matthias Andree has been maintainer since.
+
 	2019-08-04
 	* Const-ness fix initiated for KyotoCabinet driver (fixing a const
 	  qualifier warning there) also improves performance in some
