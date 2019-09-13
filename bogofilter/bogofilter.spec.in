@@ -43,7 +43,7 @@ Release:	%{Release}
 License:	GPL
 Group:		Networking/Mail
 URL:		http://bogofilter.sourceforge.net
-Source0:	%{Name}-%{Version}.tar.gz
+Source0:	%{Name}-%{Version}.tar.xz
 
 %define _requires_exceptions perl
 
