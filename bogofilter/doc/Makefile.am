@@ -46,7 +46,6 @@ EXTRA_DIST = \
 	     programmer/README.osx \
 	     programmer/RISC-OS/src/Makefile \
 	     programmer/RISC-OS/gsl/Makefile \
-	     rpm.notes.BerkeleyDB \
 	     README.db README.sqlite \
 	     README.validation
 

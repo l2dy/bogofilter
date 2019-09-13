@@ -180,7 +180,7 @@ done
 %doc doc/bogofilter-SA-2002-01
 %doc doc/integrating*
 %doc doc/programmer
-%doc doc/README.*db doc/rpm.notes.BerkeleyDB
+%doc doc/README.*db
 %doc .inst/html .inst/xml
 
 %{_sysconfdir}/bogofilter.cf.example
@@ -217,7 +217,7 @@ done
 %doc doc/bogofilter-SA-2002-01
 %doc doc/integrating*
 %doc doc/programmer
-%doc doc/README.*db doc/rpm.notes.BerkeleyDB
+%doc doc/README.*db
 %doc .inst/html .inst/xml
 
 %{_sysconfdir}/bogofilter.cf.example
