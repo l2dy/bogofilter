@@ -1,8 +1,3 @@
-# This .spec file will not build the static package by default.
-# To do this, run either of the next rpm[build] commands:
-#
-# rpmbuild --define 'bogostatic 1' --sign -bb bogofilter.spec
-#
 # To build with SQLite3, use:
 #
 # rpmbuild --define 'with_sqlite 1' --sign -bb bogofilter.spec
@@ -17,9 +12,6 @@
 %define	Name		@PACKAGE@
 %define	Version		@VERSION@
 %define	Release		1
-
-%{?bogostatic:  %define bogostatic 1}
-%{!?bogostatic: %define bogostatic 0}
 
 %{?with_db42:   %define with_db42 1}
 %{!?with_db42:  %define with_db42 0}
@@ -56,7 +48,6 @@ Source0:	%{Name}-%{Version}.tar.gz
 %define _requires_exceptions perl
 
 Buildroot:	%{_tmppath}/%{Name}-%{Version}-root
-Conflicts:	%{Name}%{DBName}-static
 
 %description
 Bogofilter is a Bayesian spam filter.  In its normal mode of
@@ -73,14 +64,6 @@ This version was built with SQLite3 support.
 This version was built with Berkeley DB support.
 %endif
 
-%package static
-Summary:	Statically linked
-Group:		Networking/Mail
-Conflicts:	%{Name}%{DBName}
-
-%description static
-Statically linked bogofilter, bogolexer, bogoutil, and bogotune.
-
 # use the debug_package macro if applicable:
 %{?debugrpm:%debug_package}
 
@@ -91,9 +74,6 @@ CFLAGS="$RPM_OPT_FLAGS" \
   --prefix=%{_prefix} \
   --mandir=%{_mandir} \
   --sysconfdir=%{_sysconfdir} \
-%if %{?bogostatic}
-  --enable-static \
-%endif
 %if %{?with_db42}
   --with-database=db \
 %endif
@@ -141,34 +121,9 @@ done
 
 mv bogogrep* contrib
 
-%if %{bogostatic}
-(
-cd %{buildroot}%{_datadir}/%{name}
-cp -p -r contrib contrib-static
-rm contrib/bogogrep_static
-rm contrib-static/bogogrep
-strip contrib-static/bogogrep_static
-)
-%endif
-
 find %{buildroot}%{_datadir}/%{name} -name .dirstamp -print -delete
 
 %post
-
-%post static
-for file in bogofilter bogolexer bogoutil bogotune ; do
-    if [ $1 -lt 2 ] ; then
-        ln -s %{_bindir}/${file}_static %{_bindir}/${file} 
-    fi
-done
-
-%postun static
-for file in bogofilter bogolexer bogoutil bogotune ; do
-    if [ $1 -eq 0 ] ; then
-        rm -f %{_bindir}/${file}
-        echo rm -f %{_bindir}/${file}
-    fi
-done
 
 %files
 %defattr(-,root,root)
@@ -205,43 +160,5 @@ done
 %{_mandir}/man1/bf_tar.1*
 
 %{_datadir}/%{name}/contrib/*
-
-%if %{bogostatic}
-%files static
-%defattr(-,root,root)
-
-%doc AUTHORS COPYING INSTALL
-%doc GETTING.STARTED
-%doc NEWS README* RELEASE.NOTES TODO
-%doc doc/bogofilter-tuning.HOWTO.html
-%doc doc/bogofilter-SA-2002-01
-%doc doc/integrating*
-%doc doc/programmer
-%doc doc/README.*db
-%doc .inst/html .inst/xml
-
-%{_sysconfdir}/bogofilter.cf.example
-%config(noreplace) %{_sysconfdir}/bogofilter.cf
-
-%{_bindir}/bogofilter_static
-%{_bindir}/bogolexer_static
-%{_bindir}/bogotune_static
-%{_bindir}/bogoutil_static
-%{_bindir}/bogoupgrade
-%{_bindir}/bf_copy
-%{_bindir}/bf_compact
-%{_bindir}/bf_tar
-
-%{_mandir}/man1/bogofilter.1*
-%{_mandir}/man1/bogolexer.1*
-%{_mandir}/man1/bogotune.1*
-%{_mandir}/man1/bogoutil.1*
-%{_mandir}/man1/bogoupgrade.1*
-%{_mandir}/man1/bf_compact.1*
-%{_mandir}/man1/bf_copy.1*
-%{_mandir}/man1/bf_tar.1*
-
-%{_datadir}/%{name}/contrib-static/*
-%endif
 
 %changelog
