@@ -43,7 +43,7 @@ Summary:
     bogofilter" (or comparable commands).
 
     Binary formats include builds for dynamically linked (shared)
-    libaries, e.g. bogofilter-VER.x64_64.rpm.
+    libraries, e.g. bogofilter-VER.x64_64.rpm.
 
     See the INSTALL file for more info.
 

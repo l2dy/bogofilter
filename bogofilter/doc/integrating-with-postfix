@@ -53,7 +53,7 @@ Filtering:
 	# does not originate on the local system (Gateway submission),
 	# so Postfix avoids some of the local expansions that can leave
 	# misleading traces in headers, such as local address
-	# canonicalizations.
+	# canonicalization.
 	POSTFIX="/usr/sbin/sendmail -G -i"
 	export BOGOFILTER_DIR=/home/bogofilter
 

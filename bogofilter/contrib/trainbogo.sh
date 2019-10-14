@@ -46,7 +46,7 @@ help()
     echo
     echo "  Train bogofilter from a qmail maildir type ham and spam corpus"
     echo
-    echo "    This script relies on you having seperated your qmail maildir messages into"
+    echo "    This script relies on you having separated your qmail maildir messages into"
     echo "    ham and spam directories.  This script randomizes the message order, and"
     echo "    then feeds each message in turn into bogofilter, noting if bogofilter"
     echo "    correctly identified the message as ham or spam. If mis-identified, it"

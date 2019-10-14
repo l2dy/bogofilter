@@ -3,7 +3,7 @@
 # bogofilter-milter.pl - a Sendmail::Milter Perl script for filtering
 # mail using individual users' bogofilter databases.
 #
-# (additional information below the coypright statement)
+# (additional information below the copyright statement)
 
 # Copyright 2003, 2005, 2007, 2008, 2010 Jonathan Kamens
 # <jik@kamens.brookline.ma.us>.  Please send me bug reports,
@@ -996,7 +996,7 @@ sub save_copy {
 	# archive file is a symlink pointing at a nonexistent (yet)
 	# file.  Milter process A tries to open with +< and fails.  IN
 	# the meantime, process B also tries to open with +< and fails.
-	# Then A opens witn +>, locks the file and starts writing to
+	# Then A opens with +>, locks the file and starts writing to
 	# it, and *then* B opens with +>, thus truncating whatever data
 	# was written thus far by A.  I'm not sure what the best way is
 	# to fix this race condition reliably, and it seems rare enough

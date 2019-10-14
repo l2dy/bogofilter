@@ -206,7 +206,7 @@ a_bflm_init(bfpath *bfp, bool rdonly){
 
     rv->bflm_maxkeysize = mdb_env_get_maxkeysize(rv->bflm_env);
 
-    /* To acommodate with bogofilter's db_created() mechanism we cannot use the
+    /* To accommodate bogofilter's db_created() mechanism, we cannot use the 
      * unnamed DB which "always exists", but must place data in named ones */
     e = mdb_env_set_maxdbs(rv->bflm_env, 2);
     if(e != MDB_SUCCESS){

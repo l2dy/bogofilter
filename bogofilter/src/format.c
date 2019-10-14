@@ -1,7 +1,7 @@
 /*****************************************************************************
 
 NAME:
-   format.c -- formats a *printf-like string for ouput
+   format.c -- formats a *printf-like string for output
 
 Most of the ideas in here are stolen from Mutt's snprintf implementation.
 

@@ -179,7 +179,7 @@ This means the Berkeley DB directory can no longer reside on a networked
 or otherwise shared file system (such as NFS, AFS, Coda).
 
 When using BerkeleyDB 4.1 - 4.3, it is recommended that you dump and
-load the data bases to add checksums, for enhanced reliablity. See
+load the data bases to add checksums, for enhanced reliability. See
 section 2.2 in doc/README.db for details.
 
 This means that bogofilter programs now exhibit the A C I D traits:

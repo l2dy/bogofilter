@@ -231,8 +231,8 @@
 	2010-02-14
 
 	* Split error messages for ENOENT and EINVAL into new function.
-	* Avoid divison by zero in robx computation by checking if there are at
-	  least one ham message and one spam message registered.
+	* Avoid division by zero in robx computation by checking if there are 
+	  at least one ham message and one spam message registered.
 
 	2009-08-13
 

@@ -171,7 +171,8 @@
 
 #### TERSE
 #
-#	if enabled, format the X-Bogosity using the 'terse_format' specificaton.
+#	if enabled, format the X-Bogosity using the 'terse_format' 
+#	specification.
 #
 #terse=no			# default
 ##terse=yes			# (alternate)
@@ -226,7 +227,7 @@
 
 ########### Classification Constants Settings #######################
 #
-# See man page for a more detailled description of the parameters.
+# See man page for a more detailed description of the parameters.
 
 #### MINIMUM DEVIATION
 #

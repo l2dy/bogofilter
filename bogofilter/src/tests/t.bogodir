@@ -73,7 +73,7 @@ expect="$TMPDIR/command.d"
 map_rc $BOGOFILTER $OPTS -C -d "$TMPDIR/command.d" < /dev/null
 map_rc $BOGOFILTER $OPTS -c "$TMPDIR/bogodir.cf" -d "$TMPDIR/command.d" < /dev/null
 
-# test whether command line supercedes bogus config file entry
+# test whether command line supersedes bogus config file entry
 cat <<EOF >"$TMPDIR/bogodir.cf"
 bogofilter_dir=$TMPDIR/bogus
 wordlist r,word,wordlist.$DB_EXT,1

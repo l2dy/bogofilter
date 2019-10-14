@@ -12,7 +12,7 @@
  *
  * We throw away headers that are readily identifiable as dates.
  * We throw away all digit strings that don't look like IP address parts.
- * We thow away lines beginning with <tab>id<space> -- mailer UDs.
+ * We throw away lines beginning with <tab>id<space> -- mailer UDs.
  *
  * These are optimizations to keep the token lists from bloating.
  * The big win is recognizing machine-generated unique IDs that

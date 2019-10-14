@@ -275,7 +275,7 @@ Moreover, headers which do not directly influence the email in any
 functional way, nor are visible to the end-user in a standard
 graphical MUA, are highly likely to contain information which 
 spammers think will detract from normal statistical filtering. It
-is therefore desireable to remove these elements, specifically 
+is therefore desirable to remove these elements, specifically 
 X-headers, prior to filtering.  Spamitarium removes all invisible,
 non-functional header lines.
 
@@ -988,7 +988,8 @@ sub process_rcvd
 			}
 		}
 
-		# we implicitely trust the received line set "by" our own server as valid (first untrusted "from")
+		# we implicitly trust the received line set "by" our own server 
+		# as valid (first untrusted "from")
 		if (!$edge_ip) 
 		{ 
 			$edge_ip = $mtai; 

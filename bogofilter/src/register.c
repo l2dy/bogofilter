@@ -39,7 +39,7 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
     sh_t incr = IX_UNDF, decr = IX_UNDF;
 
-    /* If update directory explicity supplied, setup the wordlists. */
+    /* If update directory explicitly supplied, setup the wordlists. */
     if (update_dir) {
 	if (set_wordlist_dir(update_dir, PR_CFG_UPDATE) != 0) {
 	    fprintf(stderr, "Can't find HOME or BOGOFILTER_DIR in environment.\n");

@@ -49,7 +49,7 @@ static ex_t sql_verify(bfpath *bfp);
 /** The layout of the bogofilter table, formatted as SQL statement.
  *
  * The additional index, although making writes a bit slower, speeds up
- * queries noticably as it improves locality of referenced data and
+ * queries noticeably as it improves locality of referenced data and
  * reduces complexity of the retrieval of the value column.
  */
 #define LAYOUT \
