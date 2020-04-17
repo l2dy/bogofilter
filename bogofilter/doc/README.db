@@ -288,11 +288,11 @@ To try this method:
 
   # salvage raw data
   db_dump -r ~/.bogofilter/wordlist.db > ~/.bogofilter/wordlist.saved
-  rm ~/.bogofilter/{__db.*,log.*,wordlist.db}
+  rm -f ~/.bogofilter/{__db.*,log.*,wordlist.db}
   db_load ~/.bogofilter/wordlist.db < ~/.bogofilter/wordlist.saved
   # convert to transactional store
   bogoutil -d ~/.bogofilter/wordlist.db > ~/.bogofilter/wordlist.saved
-  rm ~/.bogofilter/{__db.*,log.*,wordlist.db}
+  rm -f ~/.bogofilter/{__db.*,log.*,wordlist.db}
   bogoutil --db-transaction=yes -l ~/.bogofilter/wordlist.db \
     < ~/.bogofilter/wordlist.saved
 
@@ -323,7 +323,7 @@ To try this, suspend mail delivery to your directory, run these
 commands:
 
   db_dump -r ~/.bogofilter/wordlist.db > ~/.bogofilter/wordlist.saved
-  rm ~/.bogofilter/{__db.*,log.*,wordlist.db}
+  rm -f ~/.bogofilter/{__db.*,log.*,wordlist.db}
   db_load ~/.bogofilter/wordlist.db < ~/.bogofilter/wordlist.saved
 
 and resume mail delivery.
