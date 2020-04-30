@@ -2,7 +2,7 @@
 
 . ${srcdir:=.}/t.frame
 
-# t.sf-buf-121
+# t.sf-buf-122
 
 gzip -c -d <"$srcdir/inputs/input-sf-bug-122-buffadd-tmin.gz" >"$TMPDIR/input1"
 gzip -c -d <"$srcdir/inputs/input-sf-bug-122-buffadd-tmin2.gz" >"$TMPDIR/input2"
