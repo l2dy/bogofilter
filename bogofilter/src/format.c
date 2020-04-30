@@ -15,10 +15,6 @@ Most of the ideas in here are stolen from Mutt's snprintf implementation.
 #include <string.h>
 #include <pwd.h>
 
-#ifdef NEEDTRIO
-#include "trio.h"
-#endif
-
 #include "system.h"
 
 #include "bogoconfig.h"

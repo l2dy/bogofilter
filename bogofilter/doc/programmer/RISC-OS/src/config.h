@@ -251,9 +251,6 @@
 # define HAVE__BOOL 1
 #endif
 
-/* Define to 1 if trio is to be included. */
-/* #undef NEEDTRIO */
-
 /* Name of package */
 #define PACKAGE "bogofilter"
 

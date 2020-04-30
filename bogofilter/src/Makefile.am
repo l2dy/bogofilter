@@ -12,10 +12,10 @@ endif
 noinst_LIBRARIES = libbogofilter.a
 
 if USE_GCC4
-AM_CPPFLAGS = -iquote$(top_srcdir)/gnugetopt -iquote$(top_srcdir)/trio \
+AM_CPPFLAGS = -iquote$(top_srcdir)/gnugetopt \
 	      -I$(srcdir) @GSL_CFLAGS@ -I$(top_srcdir)/gsl/specfunc -I$(top_srcdir)
 else
-AM_CPPFLAGS = -I$(top_srcdir)/gnugetopt -I$(top_srcdir)/trio -I- -I. \
+AM_CPPFLAGS = -I$(top_srcdir)/gnugetopt -I- -I. \
 	      -I$(srcdir) @GSL_CFLAGS@ -I$(top_srcdir)/gsl/specfunc -I$(top_srcdir)
 endif
 
@@ -63,17 +63,6 @@ EXTRA_PROGRAMS=panicenv
 
 panicenv_SOURCES=panicenv.c
 panicenv_LDADD=$(LIBDB)
-
-if NEEDTRIO
-noinst_LIBRARIES += libtrio.a
-libtrio_a_SOURCES= ../trio/triostr.c ../trio/trio.c ../trio/trionan.c \
-		   ../trio/trio.h ../trio/triop.h ../trio/triodef.h \
-		   ../trio/trionan.h ../trio/triostr.h
-check_PROGRAMS += regression
-TESTS+=./regression
-regression_SOURCES= ../trio/regression.c
-LDADD += libtrio.a
-endif
 
 if !DISABLE_UNICODE
 LDADD += @LIBICONV@

@@ -11,10 +11,6 @@ dnl
 dnl BF_ZAP_LIBDB -  LIBDB turns out empty, so that
 dnl set to "zap"    the database library can be taken from
 dnl                 libs (for static linking).
-dnl
-dnl BF_FORCE_TRIO - Unconditionally compile and link against
-dnl set to "yes"    the "Trio" [v]snprintf library (which is
-dnl                 part of the bogofilter source).
 dnl ********************************************************
 dnl
 AC_INIT([bogofilter],[1.2.5])
@@ -695,60 +691,6 @@ AM_CONDITIONAL(ENABLE_TOKYOCABINET_DATASTORE, test "x$WITH_DB_ENGINE" = "xtokyoc
 AM_CONDITIONAL(ENABLE_KYOTOCABINET_DATASTORE, test "x$WITH_DB_ENGINE" = "xkyotocabinet")
 AM_CONDITIONAL(ENABLE_LMDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xlmdb")
 
-dnl Use TRIO to replace missing snprintf/vsnprintf.
-needtrio=0
-if test "$BF_FORCE_TRIO" = "yes" ; then needtrio=1 ; ac_cv_func_vsnprintf=no ; ac_cv_func_snprintf=no ; fi
-if test "x$ac_cv_func_snprintf" != "xyes" ; then
-    AC_DEFINE(snprintf, trio_snprintf, [Define to trio_snprintf if your system lacks snprintf])
-    needtrio=1
-fi
-if test "x$ac_cv_func_vsnprintf" != "xyes" ; then
-    AC_DEFINE(vsnprintf, trio_vsnprintf, [Define to trio_vsnprintf if your system lacks vsnprintf])
-    needtrio=1
-fi
-
-if test $needtrio -gt 0
-then
-    dnl BEGIN TRIO
-    dnl Alpha floating-point compiler option.
-    dnl
-    AC_MSG_CHECKING(for IEEE compilation options)
-    AC_CACHE_VAL(ac_cv_ieee_option, [
-        ac_cv_ieee_option="none"
-
-        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
-        #if !(defined(__alpha) && (defined(__DECC) || defined(__DECCXX) || (defined(__osf__) && defined(__LANGUAGE_C__))) && (defined(VMS) || defined(__VMS)))
-        # error "Option needed"
-        #endif
-        ]])],[ac_cv_ieee_option="/IEEE_MODE=UNDERFLOW_TO_ZERO/FLOAT=IEEE"],[])
-
-        if test $ac_cv_ieee_option = none ; then
-            AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
-            #if !(defined(__alpha) && (defined(__DECC) || defined(__DECCXX) || (defined(__osf__) && defined(__LANGUAGE_C__))) && !(defined(VMS) || defined(__VMS)) && !defined(_CFE))
-            # error "Option needed"
-            #endif
-            ]])],[ac_cv_ieee_option="-ieee"],[])
-        fi
-
-        if test $ac_cv_ieee_option = none ; then
-            AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
-            #if !(defined(__alpha) && (defined(__GNUC__) && (defined(__osf__) || defined(__linux__))))
-            # error "Option needed"
-            #endif
-        ]])],[ac_cv_ieee_option="-mieee"],[])
-        fi
-    ]) dnl end AC_CACHE_VAL
-    AC_MSG_RESULT($ac_cv_ieee_option)
-    if test $ac_cv_ieee_option != none; then
-        CFLAGS="${CFLAGS} ${ac_cv_ieee_option}"
-    fi
-    dnl END TRIO
-
-    AC_DEFINE(NEEDTRIO, 1, [Define to 1 if trio is to be included.])
-fi
-
-AM_CONDITIONAL(NEEDTRIO, test "$needtrio" = "1")
-
 dnl check if XMLTO is somewhere
 AC_CHECK_PROG(ac_cv_enable_xmlto, xmlto, yes, no)
 AC_MSG_CHECKING([whether xmlto is available])
@@ -882,7 +824,6 @@ fi
 
 AC_CONFIG_FILES([Makefile \
 		bogofilter.spec \
-		trio/Makefile \
 		doc/Makefile \
 		src/Makefile \
 		src/tests/Makefile \
