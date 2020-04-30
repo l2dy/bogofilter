@@ -17,6 +17,8 @@
 	
 master	UNRELEASED
 	2020-04-30
+	* Fix Debian Bug#524758, which crashes bogofilter with -R
+	  option if either no spam or no ham have been registered.
 	* Remove the trio library from the distribution.
 
 1.2.5	2019-10-11
