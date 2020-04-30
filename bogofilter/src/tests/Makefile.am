@@ -47,7 +47,8 @@ PARSING_TESTS = \
 	t.crash-invalid-base64 \
 	t.message_addr t.message_id t.queue_id
 
-WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest t.upgrade.subnet.prefix t.multiple.wordlists t.probe t.bf_compact
+WORDLIST_TESTS = t.dump.load t.nonascii.replace t.maint t.robx t.regtest \
+	t.upgrade.subnet.prefix t.multiple.wordlists t.probe t.bf_compact
 
 SCORING_TESTS = t.score1 t.score2 t.systest t.grftest t.wordhist
 
@@ -56,13 +57,16 @@ BULKMODE_TESTS = t.bulkmode t.MH t.maildir t.bogoutil
 INTEGRITY_TESTS = t.lock1 t.lock3 t.valgrind
 # INTEGRITY_TESTS += t.lock2
 
+CRASH_TESTS = t.debian-bug-524758
+
 # these tests are built, but must not be shipped:
 BUILT_TESTS = t.query.config
 
 # test scripts expected to fail
 XFAIL_TESTS =
 
-TESTSCRIPTS = ${ENVIRON_TESTS} ${PARSING_TESTS} ${WORDLIST_TESTS} ${SCORING_TESTS} ${BULKMODE_TESTS} ${INTEGRITY_TESTS}
+TESTSCRIPTS = ${ENVIRON_TESTS} ${PARSING_TESTS} ${WORDLIST_TESTS} \
+	${SCORING_TESTS} ${BULKMODE_TESTS} ${INTEGRITY_TESTS} ${CRASH_TESTS}
 
 TESTS=$(BUILT_TESTS) $(TESTSCRIPTS)
 
