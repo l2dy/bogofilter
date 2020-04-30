@@ -1,7 +1,5 @@
 #! /bin/bash
 #
-# $Id$ #
-#
 #  scramble -- split up files into entries assuming each entry
 #                starts with a given separator
 #              optionally, classify the entries

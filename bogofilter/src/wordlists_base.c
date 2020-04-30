@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include "common.h"
 
 #include "find_home.h"
@@ -133,6 +131,8 @@ void free_wordlists()
     {
 	list = free_wordlistnode(list);
     }
+
+    word_lists = NULL;
 
     bogohome_cleanup();
 }

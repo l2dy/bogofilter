@@ -14,8 +14,6 @@
  * COPYING.
  */
 
-/* $Id$ */
-
 #include "system.h"
 
 #include <stdlib.h>

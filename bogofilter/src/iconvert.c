@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*****************************************************************************
 
 NAME:
@@ -31,7 +29,7 @@ AUTHOR:
 
 #include <stdlib.h>
 #include <errno.h>
-
+#include <assert.h>
 #include "buff.h"
 #include "iconvert.h"
 
@@ -165,6 +163,9 @@ static void convert(iconv_t xd, buff_t *restrict src, buff_t *restrict dst)
 		break;
 
 	    default:
+                /* Linux man page states that other error codes may occur
+                 * thus, safer to leave that loop on unknown error, right? */
+		done = true;
 		break;
 	    }
 	}
@@ -192,6 +193,7 @@ static void copy(buff_t *restrict src, buff_t *restrict dst)
 
 void iconvert(buff_t *restrict src, buff_t *restrict dst)
 {
+    assert(src->t.u.text != dst->t.u.text);
     if (cd == NULL)
 	copy(src, dst);
     else
@@ -200,6 +202,7 @@ void iconvert(buff_t *restrict src, buff_t *restrict dst)
 
 void iconvert_cd(iconv_t xd, buff_t *restrict src, buff_t *restrict dst)
 {
+    assert(src->t.u.text != dst->t.u.text);
     if (xd == (iconv_t)-1)
 	copy(src, dst);
     else

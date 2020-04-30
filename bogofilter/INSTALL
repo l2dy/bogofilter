@@ -1,7 +1,4 @@
-# $Id$
-
 ========================================================================
-
 NOTE: Whenever you are about to update your bogofilter version, be sure
 to read the corresponding RELEASE.NOTES file first.  Any INCOMPATIBLE or
 major changes to bogofilter's mode of operation will be documented in it.
@@ -11,14 +8,19 @@ this writing in alphabetical order
 
    database, with version (patchlevel omitted)	URL to home page
   --------------------------------------------- ---------------------
-1a.Berkeley DB (3.1 - 4.4) with transactions	http://sleepycat.com/
-1b.Berkeley DB (3.1 - 4.4) without transactions	http://sleepycat.com/
+1a.Berkeley DB (3.1 - 6.x) with transactions
+1b.Berkeley DB (3.1 - 6.x) without transactions
+    http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/
 2. QDBM (1.7.23 or newer)			http://qdbm.sf.net/
 3. SQLite (3.2.6 or newer)			http://sqlite.org/
+4. TokyoCabinet			http://fallabs.com/tokyocabinet/
+5. KyotoCabinet			http://fallabs.com/kyotocabinet/
+6. LMDB Lightning Memory-Mapped Database Manager https://symas.com/lmdb/
 
 You can use --with-database=ARG (choose from db (for Berkeley DB), qdbm,
-sqlite) to pick the database backend (you must have installed the
-database and the corresponding developer package). db is the default.
+sqlite, tokyocabinet, kyotocabinet, lmdb) to pick the database backend (you
+must have installed the database and the corresponding developer package).
+db is the default.
 
 If you are using "db", you can use --disable-transactions or
 --enable-transactions to force the use of 1a or 1b. The default is to
@@ -28,8 +30,8 @@ time. See doc/README.db for details.
 REMEMBER to read the doc/programmer/README.* file for your operating
 systems in case of trouble.
 
-NOTE: If you are about to build from code checked out via SVN, then
-please read the README.svn file first before you proceed with this file!
+NOTE: If you are about to build from code checked out via Git, then
+please read the README.git file first before you proceed with this file!
 
 make command
 ============

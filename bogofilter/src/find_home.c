@@ -13,8 +13,6 @@
  * COPYING.
  */
 
-/* $Id$ */
-
 #include "system.h"
 
 #include <pwd.h>

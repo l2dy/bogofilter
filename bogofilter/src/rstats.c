@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*****************************************************************************
 
 NAME:
@@ -68,7 +66,7 @@ static void rstats_print_rtable(rstats_t *rstats_head);
 void rstats_init(void)
 {
     if (stats_head == NULL) {
-	stats_head = xcalloc(1, sizeof(header_t));
+	stats_head = (header_t *)xcalloc(1, sizeof(header_t));
 	stats_tail = (rstats_t *)xcalloc(1, sizeof(rstats_t));
 	stats_head->list = stats_tail;
     }
@@ -121,7 +119,10 @@ static int compare_rstats_t(const void *const pv1, const void *const pv2)
     if (r1->prob > r2->prob) return 1;
     if (r2->prob > r1->prob) return -1;
 
-    return word_cmp(r1->token, r2->token);
+    if (r1->token && r2->token)
+	return word_cmp(r1->token, r2->token);
+
+    return 0; /* undecided */
 }
 
 #define	INTERVALS	10
@@ -244,9 +245,12 @@ static void rstats_print_rtable(rstats_t *rstats_head)
     /* Print 1 line per token */
     for (cur=rstats_head->next; cur != NULL; cur=cur->next)
     {
-	int len = (cur->token->leng >= max_token_len) ? 0 : (max_token_len - cur->token->leng);
+	int len;
 	double fw = calc_prob(cur->good, cur->bad, cur->msgs_good, cur->msgs_bad);
 	char flag = cur->used ? '+' : '-';
+
+	if (!cur->token) continue;
+	len = (cur->token->leng >= max_token_len) ? 0 : (max_token_len - cur->token->leng);
 
 	(void)fprintf(fpo, "%s\"", pfx);
 	(void)word_puts(cur->token, 0, fpo);

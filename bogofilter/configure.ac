@@ -1,5 +1,4 @@
 dnl vim: set noai tw=0:
-dnl $Id$
 dnl
 dnl configure.ac for bogofilter
 dnl (C) Copyright 2003 Clint Adams, Gyepi Sam, David Relson, Matthias Andree
@@ -12,25 +11,22 @@ dnl
 dnl BF_ZAP_LIBDB -  LIBDB turns out empty, so that
 dnl set to "zap"    the database library can be taken from
 dnl                 libs (for static linking).
-dnl
-dnl BF_FORCE_TRIO - Unconditionally compile and link against
-dnl set to "yes"    the "Trio" [v]snprintf library (which is
-dnl                 part of the bogofilter source).
 dnl ********************************************************
 dnl
-AC_INIT([bogofilter],[1.2.4])
+AC_INIT([bogofilter],[1.2.5])
 dnl
 AC_PREREQ([2.68])
 AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_SRCDIR([src/bogofilter.c])
 AC_CANONICAL_HOST
-AM_INIT_AUTOMAKE([foreign 1.10 dist-bzip2 no-installinfo])
+AM_INIT_AUTOMAKE([1.11 foreign tar-ustar parallel-tests no-dist-gzip dist-xz no-installinfo -Wall subdir-objects])
 AC_CONFIG_HEADERS([src/config.h:config.in])
 
 AC_PROG_AWK
 AC_PROG_CC(gcc xlc cc)
-dnl this requires autoconf 2.60:
-dnl AC_USE_SYSTEM_EXTENSIONS
+AM_PROG_AR
+AM_PROG_CC_C_O
+AC_USE_SYSTEM_EXTENSIONS
 AC_CHECK_TOOL(AR, ar, no)
 if test "$AR" = no ; then
   AC_MSG_ERROR([Please make sure that "ar" is in your PATH.])
@@ -40,7 +36,12 @@ AC_PATH_PROGS(PERL, perl perl5,,$PATH:/usr/local/bin:/usr/bin)
 AC_PATH_PROGS(NSGMLS,onsgmls nsgmls,nsgmls)
 AC_PATH_PROGS(RPMBUILD,rpmbuild rpm,rpmbuild)
 AC_PATH_PROGS(XMLLINT,xmllint,xmllint)
+AC_PATH_PROGS(FLEX,flex,false)
 AM_PROG_LEX
+if test "x$LEX" = xflex && test "$FLEX" != false ; then
+  LEX="$FLEX"
+  AC_DEFINE(LEX,,path to LEX)
+fi
 
 dnl Check compiler capabilities
 AC_C_CONST
@@ -196,6 +197,7 @@ if test "$GCC" = yes && test "$ICC" = no ; then
 fi
 AM_CONDITIONAL(USE_GCC4, test $gcc4 = yes)
 
+AC_MSG_CHECKING(whether flex needs patching)
 dnl Check whether flex needs patching
 flex=no
 if test -n "$LEX"; then
@@ -204,11 +206,19 @@ if test -n "$LEX"; then
 	*2.5.31) flex=253x ;;
 	*2.5.33) flex=253x ;;
 	*2.5.35) flex=O.K. ;;
+	*2.5.36*) flex=253n ;;
+	*2.5.37*) flex=253n ;;
+	*2.5.38*) flex=253n ;;
+	*2.5.39*) flex=253n ;;
+	*2.6.0*)  flex=253n ;;
+	*2.6.*) flex=O.K. ;;
+	*)	flex=unknown ;;
     esac
 fi
-dnl flex=yes
+AC_MSG_RESULT($flex)
 AM_CONDITIONAL(PATCH_FLEX_254, test $flex = 254)
 AM_CONDITIONAL(PATCH_FLEX_253X, test $flex = 253x)
+AM_CONDITIONAL(PATCH_FLEX_253N, test $flex = 253n)
 
 dnl large file support (LFS)
 AC_SYS_LARGEFILE
@@ -234,47 +244,6 @@ dnl Coerce GLIBC 2.3 to GLIBC 2.2 compatibility.
 dnl May not be complete with future extensions, but appears to work
 dnl today, 2003-10-02. Matthias Andree
 AC_DEFINE(__NO_CTYPE,1,[Define __NO_CTYPE to 1 to avoid GLIBC_2.3-specific ctype.h functions.])
-
-dnl Enable building statically linked executables
-
-AC_ARG_ENABLE(static,
-      AS_HELP_STRING([--enable-static], [build static versions as well (unsupported).]))
-
-case a$enable_static in
-ayes)
-    EXE_EXT="_static"
-    AC_MSG_CHECKING([option to link statically])
-    LDEFLAGS="$LDFLAGS"
-    found=0
-    for i in -static ; do
-	LDFLAGS="$LDEFLAGS $i"
-	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdlib.h>]],
-			  [[exit (0);]])],found=1)
-	if test $found -eq 1 ; then break ; fi
-    done
-    if test $found -eq 1 ; then
-	AC_MSG_RESULT($i)
-	STATICLDFLAGS=$i
-	LDFLAGS="$LDEFLAGS"
-    else
-	AC_MSG_RESULT([[?]])
-	AC_MSG_WARN([Cannot figure out how to statically link a program.])
-	STATICLDFLAGS=
-	enable_static=no
-    fi
-    ;;
-ano|a)
-    ;;
-*)
-    STATICLDFLAGS="$enable_static"
-    enable_static=yes
-    ;;
-esac
-
-export STATICLDFLAGS
-AC_SUBST(STATICLDFLAGS)
-AM_CONDITIONAL(ENABLE_STATIC, test x$enable_static = xyes)
-AC_SUBST(EXE_EXT)
 
 dnl Allow the user to specify a header name to use to indicate whether a given
 dnl message is SPAM or not.
@@ -380,7 +349,7 @@ AC_HEADER_STDC
 AC_HEADER_STDBOOL
 AC_HEADER_DIRENT
 AC_HEADER_TIME
-AC_CHECK_HEADERS([syslog.h sys/param.h fcntl.h string.h strings.h unistd.h sys/time.h sys/select.h inttypes.h stdarg.h stdint.h])
+AC_CHECK_HEADERS([sys/types.h sys/stat.h stdlib.h syslog.h sys/param.h fcntl.h string.h strings.h memory.h unistd.h sys/time.h sys/select.h inttypes.h stdarg.h stdint.h])
 AC_CHECK_HEADERS([limits.h float.h],,[AC_CHECK_HEADERS(values.h)])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -464,7 +433,7 @@ AC_CACHE_SAVE
 WITH_DB_ENGINE=db
 AC_ARG_WITH(database,
 	    AS_HELP_STRING([--with-database=ENGINE],
-	    [choose database engine {db|qdbm|sqlite3|tokyocabinet} [[db]]]),
+	    [choose database engine {db|qdbm|sqlite3|tokyocabinet|kyotocabinet|lmdb} [[db]]]),
 	    [ WITH_DB_ENGINE=$withval ]
 )
 
@@ -492,10 +461,8 @@ case "x$WITH_DB_ENGINE" in
 	LIBS="$LIBS $LIBDB"
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([
 #include <tcutil.h>
-#include <tchdb.h>
 #include <tcbdb.h>
 #include <stdlib.h>
-#include <time.h>
 #include <stdbool.h>
 #include <stdint.h>
 	], [
@@ -503,12 +470,54 @@ case "x$WITH_DB_ENGINE" in
 	])],,AC_MSG_ERROR(Cannot link to tokyocabinet library.))
 	LIBS="$saveLIBS"
         ;;
+    xkyotocabinet)
+	AC_DEFINE(ENABLE_KYOTOCABINET_DATASTORE,1, [Enable kyotocabinet datastore])
+	DB_TYPE=kyotocabinet
+	DB_EXT=.kct
+	AC_LIB_LINKFLAGS([kyotocabinet])
+	LIBDB="$LIBKYOTOCABINET"
+	saveLIBS="$LIBS"
+	LIBS="$LIBS $LIBDB"
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([
+#include <kclangc.h>
+	], [
+	    KCDB *db = kcdbnew();
+	])],,AC_MSG_ERROR(Cannot link to kyotocabinet library.))
+	LIBS="$saveLIBS"
+        ;;
+    xlmdb)
+	AC_DEFINE(ENABLE_LMDB_DATASTORE,1, [Enable LMDB datastore])
+	DB_TYPE=lmdb
+	DB_EXT=.lmdb
+	AC_LIB_LINKFLAGS([lmdb])
+	LIBDB="$LIBLMDB"
+	saveLIBS="$LIBS"
+	LIBS="$LIBS $LIBDB"
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([
+#include <lmdb.h>
+	], [
+		MDB_env *env;
+		MDB_txn *txn;
+		MDB_dbi dbi;
+		mdb_env_create(&env);
+		mdb_env_set_maxreaders(env, 1);
+		mdb_env_set_mapsize(env, 4096*42);
+		mdb_env_open(env, "/tmp", 0, 0660);
+		mdb_txn_begin(env, 0, 0, &txn);
+		mdb_dbi_open(txn, "", 0, &dbi);
+	])],,AC_MSG_ERROR(Cannot link to lmdb library.))
+	LIBS="$saveLIBS"
+        ;;
     xqdbm)
 	AC_DEFINE(ENABLE_QDBM_DATASTORE,1, [Enable qdbm datastore])
 	DB_TYPE=qdbm
 	DB_EXT=.qdbm
-	AC_LIB_LINKFLAGS([qdbm])
-	LIBDB="$LIBQDBM"
+	PKG_CHECK_MODULES(QDBM, qdbm,
+		  [CFLAGS="$CFLAGS $QDBM_CFLAGS"],
+		  [AC_LIB_LINKFLAGS([qdbm])
+		   AC_CHECK_HEADERS(qdbm/depot.h,
+				    CFLAGS="$CFLAGS -I/usr/include/qdbm")])
+	LIBDB="$LIBQDBM $QDBM_LIBS"
 	saveLIBS="$LIBS"
 	LIBS="$LIBS $LIBDB"
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([
@@ -653,7 +662,7 @@ shared environments, you can use --disable-dbshared-test.])],true)
 	LIBS="$saveLIBS"
     ;;
     *)
-	AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, qdbm, sqlite3, tokyocabinet.])
+	AC_MSG_ERROR([Invalid --with-database argument. Supported engines are db, qdbm, sqlite3, tokyocabinet, kyotocabinet, lmdb.])
     ;;
 esac
 
@@ -679,60 +688,8 @@ AC_SUBST(STATIC_DB)
 AM_CONDITIONAL(ENABLE_QDBM_DATASTORE, test "x$WITH_DB_ENGINE" = "xqdbm")
 AM_CONDITIONAL(ENABLE_SQLITE_DATASTORE, test "x$WITH_DB_ENGINE" = "xsqlite3")
 AM_CONDITIONAL(ENABLE_TOKYOCABINET_DATASTORE, test "x$WITH_DB_ENGINE" = "xtokyocabinet")
-
-dnl Use TRIO to replace missing snprintf/vsnprintf.
-needtrio=0
-if test "$BF_FORCE_TRIO" = "yes" ; then needtrio=1 ; ac_cv_func_vsnprintf=no ; ac_cv_func_snprintf=no ; fi
-if test "x$ac_cv_func_snprintf" != "xyes" ; then
-    AC_DEFINE(snprintf, trio_snprintf, [Define to trio_snprintf if your system lacks snprintf])
-    needtrio=1
-fi
-if test "x$ac_cv_func_vsnprintf" != "xyes" ; then
-    AC_DEFINE(vsnprintf, trio_vsnprintf, [Define to trio_vsnprintf if your system lacks vsnprintf])
-    needtrio=1
-fi
-
-if test $needtrio -gt 0
-then
-    dnl BEGIN TRIO
-    dnl Alpha floating-point compiler option.
-    dnl
-    AC_MSG_CHECKING(for IEEE compilation options)
-    AC_CACHE_VAL(ac_cv_ieee_option, [
-        ac_cv_ieee_option="none"
-
-        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
-        #if !(defined(__alpha) && (defined(__DECC) || defined(__DECCXX) || (defined(__osf__) && defined(__LANGUAGE_C__))) && (defined(VMS) || defined(__VMS)))
-        # error "Option needed"
-        #endif
-        ]])],[ac_cv_ieee_option="/IEEE_MODE=UNDERFLOW_TO_ZERO/FLOAT=IEEE"],[])
-
-        if test $ac_cv_ieee_option = none ; then
-            AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
-            #if !(defined(__alpha) && (defined(__DECC) || defined(__DECCXX) || (defined(__osf__) && defined(__LANGUAGE_C__))) && !(defined(VMS) || defined(__VMS)) && !defined(_CFE))
-            # error "Option needed"
-            #endif
-            ]])],[ac_cv_ieee_option="-ieee"],[])
-        fi
-
-        if test $ac_cv_ieee_option = none ; then
-            AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
-            #if !(defined(__alpha) && (defined(__GNUC__) && (defined(__osf__) || defined(__linux__))))
-            # error "Option needed"
-            #endif
-        ]])],[ac_cv_ieee_option="-mieee"],[])
-        fi
-    ]) dnl end AC_CACHE_VAL
-    AC_MSG_RESULT($ac_cv_ieee_option)
-    if test $ac_cv_ieee_option != none; then
-        CFLAGS="${CFLAGS} ${ac_cv_ieee_option}"
-    fi
-    dnl END TRIO
-
-    AC_DEFINE(NEEDTRIO, 1, [Define to 1 if trio is to be included.])
-fi
-
-AM_CONDITIONAL(NEEDTRIO, test "$needtrio" = "1")
+AM_CONDITIONAL(ENABLE_KYOTOCABINET_DATASTORE, test "x$WITH_DB_ENGINE" = "xkyotocabinet")
+AM_CONDITIONAL(ENABLE_LMDB_DATASTORE, test "x$WITH_DB_ENGINE" = "xlmdb")
 
 dnl check if XMLTO is somewhere
 AC_CHECK_PROG(ac_cv_enable_xmlto, xmlto, yes, no)
@@ -867,7 +824,6 @@ fi
 
 AC_CONFIG_FILES([Makefile \
 		bogofilter.spec \
-		trio/Makefile \
 		doc/Makefile \
 		src/Makefile \
 		src/tests/Makefile \

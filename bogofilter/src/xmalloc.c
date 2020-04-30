@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*
 * NAME:
 *    xmalloc.c -- front-end to standard heap manipulation routines, with error checking.

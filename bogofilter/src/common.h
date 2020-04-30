@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*****************************************************************************
 
 NAME:
@@ -18,6 +16,8 @@ NAME:
 #include <stdio.h>
 
 #include "debug.h"
+
+#include "bftypes.h"
 
 #ifdef	ENABLE_MEMDEBUG
 #include "memdebug.h"
@@ -67,7 +67,8 @@ typedef enum sh_e { IX_SPAM = 0, 	/* index for SPAM */
 /** Default directory */
 #define	DIR_MODE	(mode_t) 0775
 
-#define COUNTOF(array)	(uint) (sizeof(array)/sizeof(array[0]))
+#define COUNTOF(array)	((sizeof(array)/sizeof(array[0])))
+#define MEMBERSIZE(struc, memb) (sizeof ((struc *)0) -> memb)
 
 typedef unsigned char byte;
 
@@ -129,8 +130,8 @@ typedef	enum {
     T_DISABLED =  0,	/*  0 for no transactions - 0 must mean T_DISABLE
 			    for compatibility with dummy functions */
     T_ENABLED  =  1,	/*  1 for transactions */
-    T_DEFAULT_OFF =  2, /*  2 for off, unless explicity specified */
-    T_DEFAULT_ON  =  3, /*  3 for on, unless explicity specified */
+    T_DEFAULT_OFF =  2, /*  2 for off, unless explicitly specified */
+    T_DEFAULT_ON  =  3, /*  3 for  on, unless explicitly specified */
     T_DONT_KNOW		/*  4 for don't know */
 } e_txn;
 

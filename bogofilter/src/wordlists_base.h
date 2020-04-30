@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*  constants and declarations for wordlists_base.c */
 
 #ifndef	WORDLISTS_CORE_H

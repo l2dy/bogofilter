@@ -28,6 +28,27 @@ labeled "Incompat" and "Major".
 NOTE: the NEWS document has greater detail on some of these changes.
 
 ------------------------------------------------------------------------
+[Major 1.2.5] Kyoto Cabinet and LMDB support added.
+
+Bogofilter, as of release 1.2.5, supports:
++ Kyoto Cabinet databases, courtesy of Denny Lin.  The Kyoto Cabinet database
+  is written and maintained by the same author as the Toyko Cabinet database,
+  and they recommend to use Kyoto Cabinet instead of Tokyo Cabinet.
+
++ LMDB databases (Lightning Memory-Mapped Database Manager), courteously
+  implemented and contributed by Steffen Nurpmeso.
+
+------------------------------------------------------------------------
+[Major 1.1.6] Tokyo Cabinet support (B+-trees with transactions) added
+
+Bogofilter, as of release 1.1.6, supports Tokyo Cabinet databases,
+courtesy of Pierre Habouzit. Tokyo Cabinet is the sequel to QDBM
+with support for larger files and also written by Mikio Hirabayashi.
+
+For new installations, if you considered using QDBM, consider using
+Tokyo Cabinet instead.
+
+-----------------------------------------------------------------------
 [Incompat 0.96.0] TDB removed
 
 Support for the TDB database library has been removed.
@@ -158,7 +179,7 @@ This means the Berkeley DB directory can no longer reside on a networked
 or otherwise shared file system (such as NFS, AFS, Coda).
 
 When using BerkeleyDB 4.1 - 4.3, it is recommended that you dump and
-load the data bases to add checksums, for enhanced reliablity. See
+load the data bases to add checksums, for enhanced reliability. See
 section 2.2 in doc/README.db for details.
 
 This means that bogofilter programs now exhibit the A C I D traits:
@@ -189,16 +210,6 @@ recover from application or system crashes.
 
 These benefits are not available when bogofilter is compiled to use the
 TDB or QDBM data bases.
-
------------------------------------------------------------------------
-[Major 1.1.6] Tokyo Cabinet support (B+-trees with transactions) added
-
-Bogofilter, as of release 1.1.6, supports Tokyo Cabinet databases,
-courtesy of Pierre Habouzit. Tokyo Cabinet is the sequel to QDBM
-with support for larger files and also written by Mikio Hirabayashi.
-
-For new installations, if you considered using QDBM, consider using
-Tokyo Cabinet instead.
 
 -----------------------------------------------------------------------
 [Incompat 0.93] Berkeley DB version strings changed

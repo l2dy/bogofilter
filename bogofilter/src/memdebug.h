@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*
 * NAME:
 *    memdebug.h -- header file for memdebug.c

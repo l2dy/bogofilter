@@ -20,9 +20,8 @@
           <tr>
             <td width="100%" valign="top" bgcolor="#FFFFFF">
               <h1 align="center">Bogofilter On Distribution Media (Linux, Unix)</h1>
-		<p>We will gradually phase out information for older
-		distribution media that have reached their respective vendor's
-		end of support life.</p>
+		<p>It turns out that researching the interesting distros and their versions and databases
+		support was so work-intensive we had to stop updating this page. Sorry.</p>
 
               <table class="inside_table" border="1" width="90%" align="center" cellpadding="2" cellspacing="0">
                 <tr align="center" valign="middle">
@@ -32,83 +31,8 @@
                   <td class="top_text_table"> Database <br>
                     Variants</td>
                 </tr>
-		<!--
-		<tr><td colspan="3"><a href="http://www.centos.org/" target="_blank"><strong>Centos</strong></a></td></tr>
-                <tr> <td>Centos 5.1</td> <td>1.1.6</td> <td> <div align="center">BerkeleyDB</div> </td>
-                </tr>
-		-->
-		<tr><td colspan="3"><a href="http://www.debian.org/" target="_blank"><strong>Debian</strong></a></td></tr>
-                <tr>
-                  <td>Debian unstable ("sid")</td>
-                  <td>See <a href="http://packages.debian.org/source/unstable/bogofilter" target="_blank">packages.debian.org</a></td>
-                  <td> <div align="center">BerkeleyDB, SQLite3, TokyoCabinet</div> </td> </tr>
-                <tr>
-                  <td>Debian testing ("wheezy")</td>
-                  <td>See <a href="http://packages.debian.org/source/testing//bogofilter" target="_blank">packages.debian.org</a></td>
-                  <td> <div align="center">BerkeleyDB, SQLite3, TokyoCabinet</div> </td> </tr>
-                <tr>
-                  <td>Debian 6.0 stable ("squeeze")</td> <td>1.2.2</td>
-                  <td> <div align="center">BerkeleyDB v4.8, SQLite3, TokyoCabinet</div> </td> </tr>
-                <tr>
-                  <td>Debian 5.0 oldstable ("lenny")</td> <td>1.1.7</td>
-                  <td> <div align="center">BerkeleyDB v4.6, QDBM, SQLite3</div> </td> </tr>
-		<tr><td colspan="3"><a href="http://fedoraproject.org/"
-			    target="_blank"><strong>Fedora</strong></a>
-		| <a
-		    href="http://fedoraproject.org/wiki/Releases#Current_Supported_Releases">Supported
-		    Releases</a></td></tr>
-                <tr><td>Fedora 16 (Verne)</td>   <td>1.2.2</td>
-		    <td><div align="center">BerkeleyDB 4.8</div></td></tr>
-                <tr><td>Fedora 15 (Lovelock)</td>   <td>1.2.2</td>
-		    <td><div align="center">BerkeleyDB 4.8</div></td></tr>
-		<tr><td colspan="3"><a href="http://www.freebsd.org/"
-			    target="_blank"><strong>FreeBSD</strong></a>
-			| <a href="http://www.freebsd.org/security/#sup"
-			    target="_blank">FreeBSD support periods</a></td></tr>
-                <tr> <td>FreeBSD ports</td> <td>See <a href="http://www.freshports.org/mail/bogofilter/" target="_blank">FreshPorts</a></td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 8.3-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 9.0-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 8.2-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 7.4-RELEASE</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
-                <tr> <td>FreeBSD 8.1-RELEASE</td> <td>1.2.1 +
-			CVE-2010-2494 fix</td> <td> <div align="center">BerkeleyDB, TokyoCabinet, SQLite3</div> </td> </tr>
-		<tr><td colspan="3"><a
-		    href="http://www.gentoo.org/"
-		    target="_blank"><strong>Gentoo</strong></a></td></tr>
-                <tr> <td><a target="_blank"
-			    href="http://packages.gentoo.org/package/mail-filter/bogofilter">Gentoo
-			    bogofilter package</a></td> <td>1.2.2</td> <td> <div
-			    align="center">BerkeleyDB, SQLite3,
-			    TokyoCabinet</div> </td> </tr>
-		<tr><td colspan="3"><a
-		    href="http://www.mandriva.com/en/"
-		    target="_blank"><strong>Mandriva</strong></a></td></tr>
-                <tr> <td>Cooker - Contrib</td> <td>1.2.2</td> <td> <div align="center">BerkeleyDB</div> </td> </tr>
-                <tr> <td>Official - Contrib</td> <td>1.2.1</td> <td>
-			<div align="center">BerkeleyDB 4.8</div> </td> </tr>
-
-		<tr><td colspan="3"><a href="http://www.netbsd.org/" target="_blank"><strong>NetBSD</strong></a></td></tr>
-                <tr>
-                  <td><a href="http://www.netbsd.org/Documentation/software/packages.html">NetBSD pkgsrc</a></td>
-		  <td><a href="ftp://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/mail/bogofilter/README.html">see pkgsrc</a>
-		      or <a href="http://pkgsrc.se/mail/bogofilter">web frontend</a></td>
-                  <td><div align="center">BerkeleyDB, QDBM, SQLite3,
-			  TokyoCabinet</div> </td>
-                </tr>
-		<tr><td colspan="3"><a href="http://www.openSUSE.org/"
-			    target="_blank"><strong>openSUSE.org</strong></a>
-		| <a target="_blank"
-		    href="http://en.opensuse.org/Lifetime">Lifetime</a></td></tr>
-		<tr><td>openSUSE 12.1</td> <td>1.2.1</td> <td><div align="center">BerkeleyDB 4.8</div></td></tr>
-		<tr><td>openSUSE 11.4</td> <td>1.2.1</td> <td><div align="center">BerkeleyDB 4.8</div></td></tr>
-
-		<tr><td colspan="3"><a href="http://www.ubuntu.com/" target="_blank"><strong>Ubuntu Linux</strong></a></td></tr>
-		<tr><td>Ubuntu 11.10 (Oneiric Ocelot)</td>   <td>1.2.2</td> <td><div align="center">BerkeleyDB 4.8, in universe: SQLite3</div></td></tr>
-		<tr><td>Ubuntu 11.04 (Natty Narwhal)</td>   <td>1.2.2</td> <td><div align="center">BerkeleyDB 4.8, in universe: SQLite3</div></td></tr>
-		<tr><td>Ubuntu 10.04.X LTS (Lucid Lynx)</td>   <td>1.2.1</td> <td><div align="center">BerkeleyDB 4.7, in universe: SQLite3</div></td></tr>
-		<tr><td>Ubuntu 8.04.X LTS (Hardy Heron)</td> <td>1.1.5</td> <td><div align="center">BerkeleyDB 4.6, in universe: SQLite3</div></td></tr>
-       </table>
-              <p class="date">Last update: $Date$</p>
+		</table>
+              <p class="date">Last update: 2019-09-08</p>
             </td>
           </tr>
         </table>

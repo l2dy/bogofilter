@@ -13,8 +13,6 @@
  * COPYING.
  */
 
-/* $Id$ */
-
 #include "common.h"
 
 #include <ctype.h>

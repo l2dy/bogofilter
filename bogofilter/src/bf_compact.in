@@ -6,8 +6,6 @@
 #    replaces original directory with new one
 #    renames original directory with '.old' extension
 
-# $Id$
-
 set -e # die on errors
 
 : ${BOGOFILTER:=@transformed_bogofilter@}

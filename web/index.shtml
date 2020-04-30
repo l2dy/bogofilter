@@ -24,9 +24,9 @@
               The program is able to learn from the user's classifications and
               corrections.
               <p>Bogofilter is or can be integrated with graphical mailers,
-	      such as KDE's <a href="http://kontact.kde.org/kmail/">KMail</a>,
-	      GNOME's <a href="http://www.gnome.org/projects/evolution/">Evolution</a>
-	      or <a href="http://www.claws-mail.org/">Claws Mail
+	      such as KDE's <a href="https://kde.org/applications/office/org.kde.kmail2">KMail</a>,
+	      GNOME's <a href="https://wiki.gnome.org/Apps/Evolution">Evolution</a>
+	      or <a href="https://www.claws-mail.org/">Claws Mail
 		  (formerly known as Sylpheed-Claws)</a>, or it is run
 	      by a mail delivery agent (maildrop, procmail) script to
 	      classify an incoming message as spam or ham (using
@@ -53,16 +53,36 @@
           </tr>
         </table>
         <br>
+<!--        <table width="90%" border=0 align="center" cellpadding=10 class="central_table">
+            <tr bgcolor="#FFFF00"><td width="100%" valign="top" align="left">
+		    <strong>Note that the http://[www.]bogofilter.org/
+			web site and the mailing lists hosted under
+			@bogofilter.org are currently down.</strong>
+		    bogofilter.sourceforge.net continues to function,
+		    please bear with us while we are working to bring
+		    the bogofilter.org-hosted services back on
+		    line.</td></tr>
+	    </table>
+        <br>
+	    -->
         <table width="90%" border=0 align="center" cellpadding=10 class="central_table">
           <tr bgcolor="#FFFFFF">
             <td align="left" width="169">Download bogofilter</td>
             <td align="left" width="397">From
-              <a href="http://sourceforge.net/projects/bogofilter/files/" target="_blank">Sourceforge Mirrors</a>.<br>
-              Some <a href="distros.shtml">distributors</a> ship bogofilter.</td>
+              <a href="https://sourceforge.net/projects/bogofilter/files/" target="_blank">Sourceforge Mirrors</a>.
+	      <!-- no longer maintained
+	      <br>
+              Some <a href="distros.shtml">distributors</a> ship bogofilter.
+	      -->
+	      </td>
           </tr>
           <tr bgcolor="#FFFFFF">
             <td align="left" width="169">Project Page</td>
-            <td align="left" width="397">Please see our <a href="http://sourceforge.net/projects/bogofilter/">Sourceforge project page</a>.</td>
+            <td align="left" width="397">Please see our <a href="https://sourceforge.net/projects/bogofilter/">Sourceforge project page</a>.</td>
+          </tr>
+          <tr bgcolor="#FFFFFF">
+            <td align="left" width="169">Gitlab Project</td>
+            <td align="left" width="397">Please see our <a href="https://gitlab.com/bogofilter/bogofilter/">Gitlab project page</a>.</td>
           </tr>
           <tr bgcolor="#FFFFFF">
 	      <td align="left" width="169">Security Announcements</td>

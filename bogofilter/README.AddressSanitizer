@@ -1,0 +1,10 @@
+Matthias Andree's current AddressSanitizer setup:
+
+export ASAN_OPTIONS=check_initialization_order=1\ detect_leaks=0
+export ASAN_SYMBOLIZER_PATH=/usr/bin/llvm-symbolizer-3.6
+
+../configure -C CC="clang-3.6 -O1 -gdwarf-4 -fsanitize=address \
+  -fno-omit-frame-pointer -D__NO_STRING_INLINES -fno-inline-functions \
+  -fno-inline -fno-optimize-sibling-calls" --with-database=sqlite3
+
+make -sj9 check V=0

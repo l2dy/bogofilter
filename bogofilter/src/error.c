@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*****************************************************************************
 
 NAME:
@@ -19,10 +17,6 @@ AUTHOR:
 #endif
 
 #include "error.h"
-
-#ifdef NEEDTRIO
-#include "trio.h"
-#endif
 
 void print_error( const char *file, unsigned long line, const char *format, ... )
 {

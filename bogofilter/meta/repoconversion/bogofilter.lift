@@ -1,0 +1,15 @@
+# Lift commands for bogofilter
+version 3
+verbose 1
+
+# fix up datastore_tc path that dropped bogofilter/ from the svn copy when Clint branched it
+# (but David merged in a different way - so no merge grafted here)
+<6682> delete --delete
+<6683> paths sub bogofilter/
+
+# fix up accidental commit
+<7050> squash --pushback
+<7049> filter --shell head -n3
+
+# coalesce fixups
+<7048> squash --pushback --coalesce

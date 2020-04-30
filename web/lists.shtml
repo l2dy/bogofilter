@@ -56,8 +56,8 @@
                   </tr>
                   <tr> 
                     <td>bogofilter-cvs@lists.sourceforge.net</td>
-                    <td align=center><a href="http://lists.sourceforge.net/mailman/listinfo/bogofilter-cvs">[subscribe]</a><br>
-                      <a href="http://sourceforge.net/mailarchive/forum.php?forum=bogofilter-cvs">[archive]</a></td>
+                    <td align=center><a href="https://sourceforge.net/projects/bogofilter/lists/bogofilter-cvs">[subscribe]</a><br>
+                      <a href="https://sourceforge.net/p/bogofilter/mailman/bogofilter-cvs/">[archive]</a></td>
                     <td>Mailing list for announcing code changes to the SVN archive.</td>
                   </tr>
                 </table>

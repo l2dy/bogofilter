@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*****************************************************************************
 
 NAME:
@@ -13,8 +11,8 @@ AUTHOR:
 #ifndef	CHARSET_H
 #define	CHARSET_H
 
-extern const char *charset_default;
-extern const char *charset_unicode;
+extern char *charset_default;
+extern char *charset_unicode;
 extern bool replace_nonascii_characters;
 
 extern byte charset_table[256];

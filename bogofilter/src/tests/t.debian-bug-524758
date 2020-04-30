@@ -1,0 +1,8 @@
+#! /bin/sh
+
+. ${srcdir:=.}/t.frame
+
+# t.debian-bug-524758
+
+printf '\ngood\n' | $BOGOFILTER -d "$TMPDIR" -n
+printf '\ngood\n' | $BOGOFILTER -d "$TMPDIR" -Rve

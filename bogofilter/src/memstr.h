@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /** \file memstr.h declarations for memstr.c
  * \author Matthias Andree
  * \date 2004

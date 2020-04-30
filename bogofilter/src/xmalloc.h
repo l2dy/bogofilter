@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #ifndef XMALLOC_H
 #define XMALLOC_H
 

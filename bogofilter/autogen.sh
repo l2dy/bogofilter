@@ -1,8 +1,6 @@
 #!/bin/sh
 #
 # Run this to generate all the initial makefiles, etc.
-#
-# $Id$
 
 DIE=0
 
@@ -46,8 +44,8 @@ echo "Running 'autoreconf -fis'"
 autoreconf -fis
 echo ""
 
-echo "Running './configure --quiet $*'"
-./configure --quiet $*
+echo "Running './configure --quiet $@'"
+./configure --quiet "$@"
 echo ""
 
 echo "Running 'make -s check'"

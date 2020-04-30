@@ -1,4 +1,3 @@
-/* $Id$ */
 /*  constants and declarations for bogofilter */
 
 #ifndef	BOGOFILTER_H

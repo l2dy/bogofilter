@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*****************************************************************************
 
 NAME:
@@ -66,8 +64,6 @@ extern void yy_set_state_initial(void);
 extern void 	lexer_init(void);
 extern void	yyinit(void);
 extern int	yyinput(byte *buf, size_t size);
-
-extern int	buff_fill(buff_t *buff, size_t used, size_t need);
 
 extern word_t  *text_decode(word_t *w);
 extern size_t	html_decode(word_t *w);

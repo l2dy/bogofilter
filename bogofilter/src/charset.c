@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*****************************************************************************
 
 NAME:
@@ -36,9 +34,6 @@ AUTHOR:
 #ifndef	DEFAULT_CHARSET
 #define	DEFAULT_CHARSET	"us-ascii"
 #endif
-
-const char *charset_default = DEFAULT_CHARSET;
-const char *charset_unicode = "UTF-8";
 
 byte charset_table[256];
 byte casefold_table[256];

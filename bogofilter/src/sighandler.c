@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*****************************************************************************
 
 NAME:
@@ -35,7 +33,7 @@ static void mysignal(int sig, void (*hdl)(int)) {
     sa.sa_flags = SA_RESTART;
     if (sigaction(sig, &sa, NULL)) {
 	fprintf(stderr, "Cannot set signal %d handler to %p: %s\n",
-		sig, hdl, strerror(errno));
+		sig, (void *)hdl, strerror(errno));
 	exit(EX_ERROR);
     }
 #endif

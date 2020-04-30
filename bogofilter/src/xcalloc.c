@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*
 * NAME:
 *    xcalloc.c -- front-end to standard heap manipulation routines, with error checking.

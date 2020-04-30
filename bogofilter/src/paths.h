@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /**
  * \file
  * paths.h -- prototypes and definitions for paths.c.

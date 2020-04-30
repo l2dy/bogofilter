@@ -1,11 +1,8 @@
-
-All files in this directory are cvs controlled.
+All files in this directory are version-controlled.
 
 To edit,
 
-1. check out the web tree (replace LOGIN by your SourceForge user name)
-   svn checkout --username=LOGIN \
-   svn+ssh://LOGIN@svn.code.sf.net/p/bogofilter/code/trunk bogofilter-code
+1. check out the web directory from Git
 
 2. edit in web
 

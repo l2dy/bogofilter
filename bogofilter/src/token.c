@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*****************************************************************************
 
 NAME:
@@ -33,6 +31,7 @@ AUTHOR:
 
 word_t	*msg_addr;	/* First IP Address in Received: statement */
 word_t	*msg_id;	/* Message ID */
+static size_t max_msg_id_len;
 word_t	*queue_id;	/* Message's first queue ID */
 
 static token_t save_class = NONE;
@@ -85,10 +84,10 @@ static void init_token_array(void)
     byte *text;
     word_t *words;
 		    
-    p_multi_words = calloc( max_token_len, sizeof(word_t) );
-    p_multi_buff  = malloc( max_multi_token_len+D );
-    p_multi_text  = calloc( max_token_len+1+D, multi_token_count );
-    w_token_array = calloc( multi_token_count, sizeof(*w_token_array) );
+    p_multi_words = (word_t *)calloc( max_token_len, sizeof(word_t) );
+    p_multi_buff  = (byte *)malloc( max_multi_token_len+D );
+    p_multi_text  = (byte *)calloc( max_token_len+1+D, multi_token_count );
+    w_token_array = (word_t **)calloc( multi_token_count, sizeof(*w_token_array) );
 
     text = p_multi_text;
     words = p_multi_words;
@@ -187,7 +186,7 @@ token_t parse_new_token(word_t *token)
     /* If saved IPADDR, truncate last octet */
     if ( block_on_subnets && save_class == IPADDR )
     {
-	byte *t = xmemrchr(ipsave->u.text, '.', ipsave->leng);
+	byte *t = (byte *)xmemrchr(ipsave->u.text, '.', ipsave->leng);
 	if (t == NULL)
 	    save_class = NONE;
 	else
@@ -573,7 +572,8 @@ void token_init(void)
 	msg_addr = word_new( NULL, max_token_len );
 
 	/* Message ID */
-	msg_id = word_new( NULL, max_token_len * 3 );
+        max_msg_id_len  = max_token_len * 3;
+	msg_id = word_new( NULL, max_msg_id_len );
 
 	/* Message's first queue ID */
 	queue_id = word_new( NULL, max_token_len );
@@ -667,8 +667,8 @@ void set_tag(const char *text)
 
 void set_msg_id(byte *text, uint leng)
 {
-    (void) leng;		/* suppress compiler warning */
-    token_set( msg_id, text, msg_id->leng );
+    uint n = min(leng, max_msg_id_len);
+    token_set( msg_id, text, n );
 }
 
 #define WFREE(n)	word_free(n); n = NULL

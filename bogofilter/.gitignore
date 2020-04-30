@@ -3,6 +3,7 @@
 /Makefile
 /Makefile.in
 /aclocal.m4
+/ar-lib
 /autogen.log
 /autom4te.cache
 /bogofilter-*.tar.gz
@@ -26,7 +27,9 @@
 /install-sh
 /missing
 /mkinstalldirs
+/test-driver
 /ylwrap
 /ChangeLog
 /tags
 /TAGS
+/_build*

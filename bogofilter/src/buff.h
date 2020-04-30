@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /** \file buff.h
  * declarations and type definitions for buff.c
  *

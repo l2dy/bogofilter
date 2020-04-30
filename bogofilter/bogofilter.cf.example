@@ -1,7 +1,5 @@
 ########### Sample BOGOFILTER Configuration File ###########################
 
-# $Id$
-
 # Default settings (as defined in the bogofilter source code) 
 # have a single hash mark at the beginning of the line.
 
@@ -173,7 +171,8 @@
 
 #### TERSE
 #
-#	if enabled, format the X-Bogosity using the 'terse_format' specificaton.
+#	if enabled, format the X-Bogosity using the 'terse_format' 
+#	specification.
 #
 #terse=no			# default
 ##terse=yes			# (alternate)
@@ -228,7 +227,7 @@
 
 ########### Classification Constants Settings #######################
 #
-# See man page for a more detailled description of the parameters.
+# See man page for a more detailed description of the parameters.
 
 #### MINIMUM DEVIATION
 #

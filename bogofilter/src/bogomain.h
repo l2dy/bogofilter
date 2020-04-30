@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #ifndef BOGOMAIN_H
 #define BOGOMAIN_H
 

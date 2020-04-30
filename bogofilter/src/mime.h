@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /** \file mime.h
  * prototypes and definitions for mime.c
  */

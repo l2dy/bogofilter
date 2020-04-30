@@ -1,0 +1,20 @@
+diff --git a/bogofilter/src/xcalloc.c b/bogofilter/src/xcalloc.c
+index 3ed52b89..2a3f1d12 100644
+--- a/bogofilter/src/xcalloc.c
++++ b/bogofilter/src/xcalloc.c
+@@ -11,6 +11,8 @@
+ 
+ #include "xmalloc.h"
+ 
++#include <stdio.h>
++
+ void
+ *xcalloc(size_t nmemb, size_t size){
+    void *ptr;
+@@ -19,5 +21,6 @@ void
+        ptr = bf_calloc(1, 1);
+    if (ptr == NULL)
+        xmem_error("xcalloc");
++   fprintf(stderr, "*** DEBUG: xcalloc(%zd, %zd [= %zd]) = %p ***\n", nmemb, size, nmemb*size, ptr);
+    return ptr;
+ }

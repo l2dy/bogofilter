@@ -6,8 +6,6 @@
 #
 # This file is released under the GPL. See http://www.gnu.org/licenses/gpl.txt
 
-# $Id$ #
-
 # Note:  this script has not yet had bogofilter maintainer review.
 # Security concerned people should not run it if in doubt about its security.
 
@@ -48,7 +46,7 @@ help()
     echo
     echo "  Train bogofilter from a qmail maildir type ham and spam corpus"
     echo
-    echo "    This script relies on you having seperated your qmail maildir messages into"
+    echo "    This script relies on you having separated your qmail maildir messages into"
     echo "    ham and spam directories.  This script randomizes the message order, and"
     echo "    then feeds each message in turn into bogofilter, noting if bogofilter"
     echo "    correctly identified the message as ham or spam. If mis-identified, it"

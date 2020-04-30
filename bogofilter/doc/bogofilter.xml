@@ -329,7 +329,7 @@ the <option>-S</option> option or the <option>-N</option> option.</para>
 to undo a prior registration of the same message as spam.  If a message was
 incorrectly entered as spam by <option>-s</option> or <option>-u</option>
 and you want to remove it and enter it as non-spam, use <option>-Sn</option>.
-If <option>-S</option> is used for a message that wasn't registered as spam,
+If <option>-S</option> is used for a message that was not registered as spam,
 the counts will still be decremented.</para>
 
 <para>The <option>-N</option> option tells <application>bogofilter</application>

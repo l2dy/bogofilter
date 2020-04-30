@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* register.c -- read input with collect and register to persistent db */
 
 #include "common.h"
@@ -41,7 +39,7 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
 
     sh_t incr = IX_UNDF, decr = IX_UNDF;
 
-    /* If update directory explicity supplied, setup the wordlists. */
+    /* If update directory explicitly supplied, setup the wordlists. */
     if (update_dir) {
 	if (set_wordlist_dir(update_dir, PR_CFG_UPDATE) != 0) {
 	    fprintf(stderr, "Can't find HOME or BOGOFILTER_DIR in environment.\n");
@@ -67,7 +65,7 @@ void register_words(run_t _run_type, wordhash_t *h, u_int32_t msgcount)
     /* When using auto-update with separate wordlists , 
        datastore.c needs to know which to update */
 
-    run_type |= _run_type;
+    run_type = (run_t)(run_type | _run_type);
 
     first = true;
 
@@ -85,9 +83,9 @@ retry:
 	exit(EX_ERROR);
     }
 
-    for (node = wordhash_first(h); node != NULL; node = wordhash_next(h))
+    for (node = (hashnode_t *)wordhash_first(h); node != NULL; node = (hashnode_t *)wordhash_next(h))
     {
-	wordprop = node->data;
+	wordprop = (wordprop_t *)node->data;
 	switch (ds_read(list->dsh, node->key, &val)) {
 	    case DS_ABORT_RETRY:
 		rand_sleep(4*1000,1000*1000);
