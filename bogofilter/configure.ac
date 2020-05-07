@@ -14,7 +14,7 @@ dnl set to "zap"    the database library can be taken from
 dnl                 libs (for static linking).
 dnl ********************************************************
 dnl
-AC_INIT([bogofilter],[1.2.5])
+AC_INIT([bogofilter],[1.2.6-beta1])
 dnl
 AC_PREREQ([2.68])
 AC_USE_SYSTEM_EXTENSIONS
