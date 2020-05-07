@@ -141,8 +141,11 @@ static word_t *yy_text(void)
 
 UINT8		([01]?[0-9]?[0-9]|2([0-4][0-9]|5[0-5]))
 IPADDR		{UINT8}\.{UINT8}\.{UINT8}\.{UINT8}
-BCHARSNOSPC	[[:alnum:]()+_,-./:=?#\']
-BCHARS		[[:alnum:]()+_,-./:=?#\' ]
+/* @ isn't specified for boundary lines by RFC2046,
+ * but is seen in the wild,
+ * see https://sourceforge.net/p/bogofilter/bugs/115/ */
+BCHARSNOSPC	[[:alnum:]@()+_,-./:=?#\']
+BCHARS		[[:alnum:]@()+_,-./:=?#\' ]
 MIME_BOUNDARY	{BCHARS}*{BCHARSNOSPC}
 
 ID		<?[[:alnum:]\-\.]+>?

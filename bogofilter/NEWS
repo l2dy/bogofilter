@@ -24,6 +24,10 @@ master	UNRELEASED
 	  had been fixed independently in 2015, but Doran's analysis
 	  and fixes extended beyond that, and the remaining cleanups
 	  and fixes are worth having.  Thanks.  (Git merge 1b4812ba).
+	* Fix sf.net Bug #115, by adding @ to the list of characters
+	  permitted in MIME boundaries.  Not permitted per RFC2046,
+	  but seen in the wild.
+	  <https://sourceforge.net/p/bogofilter/bugs/115/>
 
 	2020-04-30
 	* Fix Debian Bug#524758, which crashes bogofilter with -R
