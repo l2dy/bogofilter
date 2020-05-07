@@ -3,7 +3,8 @@ dnl
 dnl configure.ac for bogofilter
 dnl (C) Copyright 2003 Clint Adams, Gyepi Sam, David Relson, Matthias Andree
 dnl (C) Copyright 2008 Clint Adams, David Relson, Matthias Andree
-dnl (C) Copyright 2004-2007, 2009 David Relson, Matthias Andree
+dnl (C) Copyright 2004-2013 David Relson, Matthias Andree
+dnl (C) Copyright 2015-2020 Matthias Andree
 dnl
 dnl ********************************************************
 dnl "Magic" environment variables for this script are:
