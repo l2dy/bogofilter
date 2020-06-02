@@ -45,11 +45,12 @@ at compile time; in the default install, either will be present.
 
 2.1 Compatibility, Berkeley DB versions
 
-These versions are supported (with all Sleepycat-posted patches applied
-- if using a pre-packaged Berkeley DB version, the packager should have
-applied the patches, check your vendor's update site regularly):
+These versions are supported (with all Sleepycat- or Oracle-posted patches
+applied - if using a pre-packaged Berkeley DB version, the packager should
+have applied the patches, check your vendor's update site regularly):
 
   Berkeley DB 5.3.21: (May 11, 2012)
+  Berkeley DB 18.1.32: (February 19, 2019)
 
 Other versions of Berkeley DB between the first and last listed above
 may or may not work but usually they will.
