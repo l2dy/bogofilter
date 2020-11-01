@@ -11,13 +11,8 @@ endif
 
 noinst_LIBRARIES = libbogofilter.a
 
-if USE_GCC4
-AM_CPPFLAGS = -iquote$(top_srcdir)/gnugetopt \
-	      -I$(srcdir) @GSL_CFLAGS@ -I$(top_srcdir)/gsl/specfunc -I$(top_srcdir)
-else
-AM_CPPFLAGS = -I$(top_srcdir)/gnugetopt -I- -I. \
-	      -I$(srcdir) @GSL_CFLAGS@ -I$(top_srcdir)/gsl/specfunc -I$(top_srcdir)
-endif
+AM_CPPFLAGS = -I$(top_srcdir)/gnugetopt -I. -I$(srcdir) \
+	      @GSL_CFLAGS@ -I$(top_srcdir)/gsl/specfunc -I$(top_srcdir)
 
 AM_CFLAGS = -DBOGOFILTER
 
