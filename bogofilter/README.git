@@ -9,7 +9,7 @@ for example, configure, ylwrap and others.
 
 These files can be created automatically with recent autoconf and
 automake versions.  You will need autoconf 2.68 and automake 1.11 or
-newer.
+newer, and pkg-config.
 
 To recreate these files, run: autoreconf -i -s -f
 You can optionally add -v to see what autoreconf is doing.
