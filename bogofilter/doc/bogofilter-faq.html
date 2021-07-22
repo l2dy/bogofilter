@@ -119,6 +119,7 @@
           <li><a href="#locksize">Why does bogofilter die after printing<br>
               "Lock table is out of available locks" or<br>
               "Lock table is out of available object entries"?</a></li>
+	  <li><a href="#sigxfsz">Why does bogofilter crash with "File size limit exceeded"?</a></li>
           <li><a href="#page-notfound">Why am I getting DB_PAGE_NOTFOUND messages?</a></li>
           <li><a href="#db-private">Why am I getting &quot;Berkeley DB
               library configured to support only DB_PRIVATE
@@ -1143,6 +1144,13 @@
     <p>to rebuild the lock tables.</p>
 
     <hr>
+
+    <h2 id="sigxfsz">Why does bogofilter crash with "File size limit exceeded"?</h2>
+
+    <p>Some mail transfer agents, such as Postfix, impose file size
+    limits. When bogofilter's database reaches that limit, for instance, because
+    it is executed by Postfix's local(8), which enforces Postfix's mailbox_size_limit 
+    on all files, including bogofilter's database, then bogofilter may crash with SIGXFSZ "File size limit exceeded".</p>
 
     <h2 id="page-notfound">Why am I getting DB_PAGE_NOTFOUND messages?</h2>
 

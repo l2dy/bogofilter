@@ -1,3 +1,17 @@
+NOTE:
+ 
+ There are more ways to integrate with Postfix than the one shown in this
+ document.  Another is to use a transport.  Yet another is to use forwarding
+ or mailbox commands and filter utilities such as Courier's maildrop (which
+ is available standalone).
+
+ NOTE: if you pass things through Postfix's local(8) daemon and use the
+ mailbox_command or forward files or thereabouts, be sure to keep an eye
+ on the database size.  Postfix's local(8) sets a file size resource limit
+ to the mailbox_size_limit (check the postconf(5) man page for the default)
+ and the database cannot exceed this size, or bogofilter may be killed with
+ SIGXFSZ if the database grows beyond this limit.
+
 What:
 
  This document describes how to use bogofilter to filter mail that
