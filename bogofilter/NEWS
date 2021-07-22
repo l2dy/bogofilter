@@ -17,6 +17,10 @@
 	
 master	UNRELEASED
 
+	2021-07-22
+	* Add note to SIGXFSZ crashes to doc/bogofilter-faq.html and 
+	  doc/integrating-with-postfix.
+
 	2020-05-07
 	* Merge remaining fixes for sf.net Bug #116
 	  <https://sourceforge.net/p/bogofilter/bugs/116/>
