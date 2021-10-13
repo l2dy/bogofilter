@@ -134,7 +134,6 @@ find %{buildroot}%{_datadir}/%{name} -name .dirstamp -print -delete
 %doc doc/bogofilter-tuning.HOWTO.html
 %doc doc/bogofilter-SA-2002-01
 %doc doc/integrating*
-%doc doc/programmer
 %doc doc/README.*db
 %doc .inst/html .inst/xml
 

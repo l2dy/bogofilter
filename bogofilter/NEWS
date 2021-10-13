@@ -18,6 +18,11 @@
 master	UNRELEASED
 
 	2021-10-13
+	* the shipped .spec file no longer includes the programmer 
+	  documentation, on the assumption that RPMs are mainly used
+	  for building binary packages for Linux and information for
+	  test suite or other operating systems are not useful in
+	  binary installs.
 	* bogoutil --db-recover[-harder] now logs an error and exits with 
 	  status code 3 (error) unless it is operating on a Berkeley DB 
 	  transactional database.
