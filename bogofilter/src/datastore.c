@@ -5,8 +5,8 @@ datastore.c -- contains database independent components of data storage.
 
 AUTHORS:
 Gyepi Sam <gyepi@praxis-sw.com>   2002 - 2003
-Matthias Andree <matthias.andree@gmx.de> 2003
-David Relson <relson@osagesoftware.com>  2003
+Matthias Andree <matthias.andree@gmx.de> 2003 - 2021
+David Relson <relson@osagesoftware.com>  2003 - 2009
 
 ******************************************************************************/
 
@@ -523,9 +523,11 @@ const char *ds_version_str(void)
 
 ex_t ds_recover(bfpath *bfp, bool catastrophic)
 {
-    if (dsm->dsm_recover == NULL)
-	return EX_OK;
-    else
+    if (dsm->dsm_recover == NULL) {
+	print_error(__FILE__, __LINE__, "ds_recover( '%s' ), recovery not feasible for this type of database", 
+		    bfp->filepath);
+	return EX_ERROR;
+    } else
 	return dsm->dsm_recover(bfp, catastrophic, true);
 }
 

@@ -17,6 +17,11 @@
 	
 master	UNRELEASED
 
+	2021-10-13
+	* bogoutil --db-recover[-harder] now logs an error and exits with 
+	  status code 3 (error) unless it is operating on a Berkeley DB 
+	  transactional database.
+
 	2021-07-22
 	* Add note to SIGXFSZ crashes to doc/bogofilter-faq.html and 
 	  doc/integrating-with-postfix.
